@@ -1,0 +1,190 @@
+# long111 from 3efcd19d04afd9565c6f115994190b3977dc1c88af7378c850f63f2afa2555f3 binary e1b168f5ebec8682c7c09dfc751eb1e69f386c2290550dc6dacc61975e4d2ca1 waits for the card lock 11:09:36
+# lock taken 11:09:36
+# lap bound 1295828 ms (long109's cost read); a segment 2891656 ms, outer 2951 s
+# seg4 from 3efcd19d04afd9565c6f115994190b3977dc1c88af7378c850f63f2afa2555f3 started 11:09:36
+FIELD_LAP lap=0 read=21 before=3.437 after=- deposited=1535/1535 halvings=0 next_halved=0 next_refused=0 ms=902634
+FIELD_LAP lap=1 read=22 before=3.415 after=- deposited=1535/1535 halvings=0 next_halved=0 next_refused=0 ms=892523
+FIELD_LAPS_HELD lap=2 reason=time left=1068387 bound=1295828 ms=1823269
+MEASURE lap=seg4 rc=0 wall_s=1823.8 peak_rss_kib=815036
+-1:5.831455:1.227367:1.431441 0:5.727262:1.236326:1.452598 1:5.651312:1.227923:1.441687 
+-1:1.172 0:1.179 1:1.172 
+sections mean ms 583 over 3070
+== order FIELD_ORDER problems=32 places=8792 place_bits_a_place=2.829 place_length_bits_a_place=0.011 place_content_bits_a_place=2.818 keyed_bits_a_place=5.074 masks_bits_a_place=2.642 masks_length_bits_a_place=0.031 lengths_unread=3 ms=39876 MEASURE lap=seg4_order rc=0 wall_s=40.3 peak_rss_kib=571460 
+MARGINAL read 29 of 32: the state's length code 9.40 bits an answer, the training marginal's on the same answers 9.35, on all 9.37; paired difference +0.05 with deviation 0.27
+== HELD128
+distance	problems	void_mass	length_law
+-128	104	0.295	0.405
+-32	124	0.366	0.476
++0	128	0.399	0.512
++32	128	0.455	0.562
++128	128	0.615	0.695
++512	128	0.900	0.924
+places 900 to 1199	38400	0.927	0.971
+B past the end: mean 205 places, median 177, range 9 to 695; the length law 132
+void mass before the end: mean 95 places
+the opening's expected length less held: mean +111.1 places, median +145.6
+== TRAIN
+distance	problems	void_mass	length_law
+-128	109	0.215	0.200
+-32	128	0.426	0.362
++0	128	0.508	0.429
++32	128	0.585	0.494
++128	128	0.760	0.654
++512	128	0.961	0.911
+places 900 to 1199	38400	0.978	0.971
+B past the end: mean 114 places, median 93, range 8 to 490; the length law 152
+void mass before the end: mean 61 places
+the opening's expected length less held: mean +54.0 places, median +55.0
+OVERRUN seg4_HELD128 answers=128 room=2062 mean_past_end=205.7
+  0-127	mean 62.9	share 0.306	median 69.2	length_law 50.3
+  128-511	mean 77.7	share 0.378	median 64.4	length_law 62.0
+  512-1199	mean 46.3	share 0.225	median 21.7	length_law 19.2
+  1200-end	mean 18.9	share 0.092	median 12.5	length_law 0.8
+OVERRUN seg4_TRAIN answers=128 room=2062 mean_past_end=114.8
+  0-127	mean 45.6	share 0.397	median 39.9	length_law 57.8
+  128-511	mean 39.9	share 0.347	median 29.7	length_law 71.0
+  512-1199	mean 16.4	share 0.143	median 12.8	length_law 22.5
+  1200-end	mean 13.0	share 0.113	median 9.9	length_law 0.9
+CONDITIONED seg4_HELD128 answers=128 mean_past_end=195.6 plain=205.7
+  0-127	conditioned 61.7	plain 62.9
+  128-511	conditioned 75.2	plain 77.7
+  512-1199	conditioned 42.0	plain 46.3
+  1200-end	conditioned 16.7	plain 18.9
+CONDITIONED seg4_TRAIN answers=128 mean_past_end=111.7 plain=114.8
+  0-127	conditioned 45.4	plain 45.6
+  128-511	conditioned 39.3	plain 39.9
+  512-1199	conditioned 15.5	plain 16.4
+  1200-end	conditioned 11.5	plain 13.0
+== write place (the one-end writer, read)
+ENDINGS answers 32: 13 end at or under held over 7069 places (one in 544), 19 past it over 6852 (one in 361), 0 reach the room
+HAZARD past/under 1.51; written/held 1.589; correlation +0.226
+FIELD_LENGTH problems=32 sweeps=2062 refine=0 stopped=- run_bits=1 reads=1935 certified_bits=619.015 passed=0 ms=99964
+MEASURE lap=seg4_place rc=0 wall_s=100.4 peak_rss_kib=371736
+written: 32 answers, 28 open with ```python; a 'y' outside it in 27, its first at places 0 to 5 in 1 (median first 63), 'y' past it 0.011; commonest byte's share at places 10 to 255 (246 places) 0.207; top byte ' ' 0.169, 'y' 0.010, entropy 4.89 bits over 13921 bytes
+written: 32 answers: a fence opened 30, closed 23; parses as Python 0; code lines mean 11.2; identifiers 1289, in the question 0.06, in the held answer 0.07
+family	span	written opened	written closed share	held opened	held closed share	ratio
+bracket	near	191	0.215	178	0.393	0.55
+bracket	far	191	0.283	178	0.607	0.47
+string	near	77	0.156	60	0.400	0.39
+string	far	77	0.195	60	0.583	0.33
+block	near	50	0.000	75	0.000	nan
+block	far	50	0.480	75	0.947	0.51
+RULE: the lowest closure against held is string far at 0.33 (under 0.5)
+== write keyed given held's lengths (judged)
+FIELD_LENGTH problems=32 sweeps=2062 refine=0 stopped=- run_bits=1 reads=649 certified_bits=355.554 passed=0 ms=18364
+MEASURE lap=seg4_keyed rc=0 wall_s=18.6 peak_rss_kib=237020
+written: 32 answers, 26 open with ```python; a 'y' outside it in 27, its first at places 0 to 5 in 0 (median first 62), 'y' past it 0.014; commonest byte's share at places 10 to 255 (246 places) 0.180; top byte ' ' 0.143, 'y' 0.012, entropy 4.98 bits over 8760 bytes
+written: 32 answers: a fence opened 30, closed 25; parses as Python 0; code lines mean 8.4; identifiers 967, in the question 0.06, in the held answer 0.07
+family	span	written opened	written closed share	held opened	held closed share	ratio
+bracket	near	182	0.264	178	0.393	0.67
+bracket	far	182	0.231	178	0.607	0.38
+string	near	79	0.304	60	0.400	0.76
+string	far	79	0.203	60	0.583	0.35
+block	near	38	0.000	75	0.000	nan
+block	far	38	0.579	75	0.947	0.61
+RULE: the lowest closure against held is string far at 0.35 (under 0.5)
+SEGMENT seg4 done 11:42:47
+== SPLIT lap8 places=8792 keyed_bits_a_place=3.827 keyed_length_bits_a_place=0.687 keyed_content_bits_a_place=3.141 keyed_given_bits_a_letter=2.733 letters=8760 
+MEASURE lap=split_lap8 rc=0 wall_s=54.3 peak_rss_kib=571040
+== SPLIT lap12 places=8792 keyed_bits_a_place=5.074 keyed_length_bits_a_place=1.839 keyed_content_bits_a_place=3.235 keyed_given_bits_a_letter=2.617 letters=8760 
+MEASURE lap=split_lap12 rc=0 wall_s=55.7 peak_rss_kib=572844
+STRETCH lap10 paced=0 tick=3 questions=128 kappa_mean=1.0128 kappa_sd=0.2593 overrun_1200_mean=16.7 corr=-0.036
+STRETCH lap10 paced=1 tick=3 questions=128 kappa_mean=2.9635 kappa_sd=0.0993 overrun_1200_mean=16.7 corr=-0.098
+STRETCH lap12 paced=0 tick=3 questions=128 kappa_mean=1.0172 kappa_sd=0.2340 overrun_1200_mean=16.7 corr=-0.037
+STRETCH lap12 paced=1 tick=3 questions=128 kappa_mean=2.9977 kappa_sd=0.0921 overrun_1200_mean=16.7 corr=+0.045
+# the reads' binary joins: f7cfcede3264144772707c164771024b1558934c0b5cc0f2b249f9c8d875b488 11:44:43
+# lap bound 1074568 ms from seg4's sections; a segment 2449136 ms, outer 2509 s
+# laws switched: # Sourced at seg5's start (the unified-theory reading of 11:07), no training: order-field with keyed split into its length and # content parts and keyed given its end (the writer's own states), on lap 8's state and on lap 12's; and the stretch's rate on the # 128 held openings at lap 10 and lap 12 against each one's overrun past 1,200. The binary (the same laws, the reads added) joins. NB=$O/field_pass.reads L8S=$(ls -t $R/2026-11-06-long110/seg2/STATE.* | grep -v stopped | head -1) L10S=$(ls -t $R/2026-11-06-long110/seg3/STATE.* | grep -v stopped | head -1) for pair in lap8:$L8S lap12:$2; do   IFS=: read -r name st <<< "$pair"   rm -rf $O/split_$name   $M split_$name timeout 600 $NB train complete-language order-field $st $(sha $st) $CODEC $(sha $CODEC) $U $P/HELD128.txt $(sha $P/HELD128.txt) 32 $O/split_$name > $O/split_$name.log 2>&1   echo "== SPLIT $name $(grep -E '^FIELD_ORDER' $O/split_$name.log | grep -oE '(keyed|keyed_length|keyed_content|keyed_given)_bits_a_[a-z]+=[0-9.]+|letters=[0-9]+|places=[0-9]+' | tr '\n' ' ')"   grep -E '^MEASURE|rror|panic' $O/split_$name.log | cut -c1-160 done for pair in lap10:$L10S:$R/2026-11-06-long110/seg3_HELD128 lap12:$2:$O/seg4_HELD128; do   IFS=: read -r name st od <<< "$pair"   rm -rf $O/stretch_$name   $M stretch_$name timeout 600 $NB train complete-language stretch-field $st $(sha $st) $CODEC $(sha $CODEC) $U $P/HELD128.txt $(sha $P/HELD128.txt) 128 $O/stretch_$name > $O/stretch_$name.log 2>&1   python3 -I $O/stretch.py $name $O/stretch_$name $od done cp $NB $BIN echo "# the reads' binary joins: $(sha $BIN) $(date -u +%H:%M:%S)" # The lap bound from the last segment's own sections (its laps ran about 900 s against long109's 1,296 s bound, so the segment # left about 1,070 s of card time unused): L = 1.2 x 1,535 x its mean section, the segment two laps at that bound plus 300 s. LN=$(grep -E '^FIELD_SECTION' $O/seg4.log | sed -E 's/.* ms=([0-9]+)$/\1/' | awk -v n_s=1535 '{n++; s+=$1} END {if (n) printf "%d", 1.2*n_s*s/n}') if [ -n "$LN" ] && [ "$LN" -gt 0 ]; then L=$LN; SEG=$((2 * L + 300000)); OUTER=$((SEG / 1000 + 60)); fi echo "# lap bound $L ms from seg4's sections; a segment $SEG ms, outer $OUTER s" 
+# seg5 from 2fcb6a7e96e47906066c04f7728791ee76bb53af31bf3169d41122d47d4afef5 started 11:44:43
+FIELD_LAP lap=0 read=23 before=3.427 after=- deposited=1535/1535 halvings=0 next_halved=0 next_refused=0 ms=915979
+FIELD_LAP lap=1 read=24 before=3.426 after=- deposited=1535/1535 halvings=0 next_halved=0 next_refused=0 ms=859625
+FIELD_LAPS_HELD lap=2 reason=time left=645342 bound=1074568 ms=1803794
+MEASURE lap=seg5 rc=0 wall_s=1804.3 peak_rss_kib=831024
+-1:5.651312:1.227923:1.441687 0:5.720253:1.227474:1.437088 1:5.918940:1.234679:1.442977 
+-1:1.172 0:1.160 1:1.171 
+sections mean ms 577 over 3070
+== order FIELD_ORDER problems=32 places=8792 place_bits_a_place=2.882 place_length_bits_a_place=0.016 place_content_bits_a_place=2.867 keyed_bits_a_place=5.132 keyed_length_bits_a_place=1.887 keyed_content_bits_a_place=3.246 keyed_given_bits_a_letter=2.637 letters=8760 masks_bits_a_place=2.631 masks_length_bits_a_place=0.031 lengths_unread=3 ms=51675 MEASURE lap=seg5_order rc=0 wall_s=52.1 peak_rss_kib=572
+MARGINAL read 29 of 32: the state's length code 9.44 bits an answer, the training marginal's on the same answers 9.43, on all 9.37; paired difference +0.01 with deviation 0.34
+== HELD128
+distance	problems	void_mass	length_law
+-128	104	0.382	0.405
+-32	124	0.475	0.476
++0	128	0.521	0.512
++32	128	0.587	0.562
++128	128	0.743	0.695
++512	128	0.932	0.924
+places 900 to 1199	38400	0.950	0.971
+B past the end: mean 141 places, median 115, range 5 to 550; the length law 132
+void mass before the end: mean 125 places
+the opening's expected length less held: mean +16.6 places, median +63.0
+== TRAIN
+distance	problems	void_mass	length_law
+-128	109	0.290	0.200
+-32	128	0.531	0.362
++0	128	0.612	0.429
++32	128	0.689	0.494
++128	128	0.836	0.654
++512	128	0.972	0.911
+places 900 to 1199	38400	0.985	0.971
+B past the end: mean 80 places, median 65, range 4 to 383; the length law 152
+void mass before the end: mean 78 places
+the opening's expected length less held: mean +3.1 places, median +6.8
+OVERRUN seg5_HELD128 answers=128 room=2062 mean_past_end=141.3
+  0-127	mean 45.9	share 0.325	median 45.1	length_law 50.3
+  128-511	mean 51.3	share 0.363	median 39.9	length_law 62.0
+  512-1199	mean 31.2	share 0.221	median 15.8	length_law 19.2
+  1200-end	mean 12.9	share 0.091	median 8.3	length_law 0.8
+OVERRUN seg5_TRAIN answers=128 room=2062 mean_past_end=80.6
+  0-127	mean 33.4	share 0.414	median 26.5	length_law 57.8
+  128-511	mean 27.3	share 0.338	median 21.7	length_law 71.0
+  512-1199	mean 11.3	share 0.141	median 9.1	length_law 22.5
+  1200-end	mean 8.6	share 0.106	median 6.5	length_law 0.9
+CONDITIONED seg5_HELD128 answers=128 mean_past_end=135.6 plain=141.3
+  0-127	conditioned 45.0	plain 45.9
+  128-511	conditioned 49.7	plain 51.3
+  512-1199	conditioned 29.1	plain 31.2
+  1200-end	conditioned 11.8	plain 12.9
+CONDITIONED seg5_TRAIN answers=128 mean_past_end=78.4 plain=80.6
+  0-127	conditioned 33.1	plain 33.4
+  128-511	conditioned 26.8	plain 27.3
+  512-1199	conditioned 10.7	plain 11.3
+  1200-end	conditioned 7.7	plain 8.6
+== write place (the one-end writer, read)
+ENDINGS answers 32: 12 end at or under held over 6441 places (one in 537), 20 past it over 4485 (one in 224), 0 reach the room
+HAZARD past/under 2.39; written/held 1.247; correlation +0.018
+FIELD_LENGTH problems=32 sweeps=2062 refine=0 stopped=- run_bits=1 reads=1066 certified_bits=448.162 passed=0 ms=30911
+MEASURE lap=seg5_place rc=0 wall_s=31.3 peak_rss_kib=373120
+written: 32 answers, 27 open with ```python; a 'y' outside it in 25, its first at places 0 to 5 in 3 (median first 75), 'y' past it 0.010; commonest byte's share at places 10 to 255 (246 places) 0.192; top byte ' ' 0.185, 'y' 0.010, entropy 4.94 bits over 10926 bytes
+written: 32 answers: a fence opened 30, closed 24; parses as Python 1; code lines mean 12.8; identifiers 1197, in the question 0.03, in the held answer 0.05
+family	span	written opened	written closed share	held opened	held closed share	ratio
+bracket	near	209	0.239	178	0.393	0.61
+bracket	far	209	0.292	178	0.607	0.48
+string	near	85	0.200	60	0.400	0.50
+string	far	85	0.118	60	0.583	0.20
+block	near	49	0.000	75	0.000	nan
+block	far	49	0.551	75	0.947	0.58
+RULE: the lowest closure against held is string far at 0.20 (under 0.5)
+== write keyed given held's lengths (judged)
+FIELD_LENGTH problems=32 sweeps=2062 refine=0 stopped=- run_bits=1 reads=663 certified_bits=351.630 passed=0 ms=17412
+MEASURE lap=seg5_keyed rc=0 wall_s=17.7 peak_rss_kib=240040
+written: 32 answers, 29 open with ```python; a 'y' outside it in 27, its first at places 0 to 5 in 2 (median first 66), 'y' past it 0.012; commonest byte's share at places 10 to 255 (246 places) 0.189; top byte ' ' 0.161, 'y' 0.011, entropy 5.01 bits over 8760 bytes
+written: 32 answers: a fence opened 31, closed 27; parses as Python 1; code lines mean 10.7; identifiers 941, in the question 0.04, in the held answer 0.05
+family	span	written opened	written closed share	held opened	held closed share	ratio
+bracket	near	172	0.221	178	0.393	0.56
+bracket	far	172	0.267	178	0.607	0.44
+string	near	69	0.275	60	0.400	0.69
+string	far	69	0.232	60	0.583	0.40
+block	near	41	0.024	75	0.000	nan
+block	far	41	0.585	75	0.947	0.62
+RULE: the lowest closure against held is string far at 0.40 (under 0.5)
+SEGMENT seg5 done 12:16:35
+== OFFVOID lap12 keyed_bits_a_place=5.074 keyed_length_bits_a_place=1.839 keyed_content_bits_a_place=3.235 keyed_given_bits_a_letter=2.617 keyed_given_off_void_bits_a_letter=2.617 
+# letters parity, binary b9e1a6ed9036b770d6ad73a625661c14a68259319418a5c96b80eb9533be8843 12:17:27
+FIELD_PARITY section=1 withheld=false regions=48 length=2304 sites=24991 faces_unequal=0 covector_unequal=0 learner_equal=true near_equal=true clocks_equal=true rows_equal=true shares_equal=true currents_equal=true host_ms=31761 card_ms=498
+FIELD_PARITY section=2 withheld=true regions=32 length=555 sites=0 faces_unequal=0 covector_unequal=0 learner_equal=true near_equal=true clocks_equal=true rows_equal=true shares_equal=true currents_equal=true host_ms=1390 card_ms=18
+FIELD_PARITY_DONE sections=2 reads_unequal=0 faces_unequal=0 covector_unequal=0 learners_unequal=0 releases=1 releases_unequal=0 card_release_ms=60 host_ms=33151 card_ms=516 elapsed_ms=306391
+MEASURE lap=parity_letters rc=0 wall_s=307.3 peak_rss_kib=4175624
+# LETTERS law joins from seg6: binary b9e1a6ed9036b770d6ad73a625661c14a68259319418a5c96b80eb9533be8843 12:22:35
+# laws switched: # Sourced at seg6's start (the unified-theory reading of 11:49): the writer state compared on its letters off the void (Port::letters, # the release's own draw given the end). First lap 12 read off the void as the release draws (order-field's keyed given its end, # the blind's baseline); then the letters law's card parity under the run's laws; on a pass it joins from this segment on. NB=$O/field_pass.letters L12S=$(ls -t $O/seg4/STATE.* | grep -v stopped | head -1) rm -rf $O/offvoid_lap12 $M offvoid_lap12 timeout 600 $NB train complete-language order-field $L12S $(sha $L12S) $CODEC $(sha $CODEC) $U $P/HELD128.txt $(sha $P/HELD128.txt) 32 $O/offvoid_lap12 > $O/offvoid_lap12.log 2>&1 echo "== OFFVOID lap12 $(grep -E '^FIELD_ORDER' $O/offvoid_lap12.log | grep -oE '(keyed|keyed_length|keyed_content|keyed_given|keyed_given_off_void)_bits_a_[a-z]+=[0-9.]+' | tr '\n' ' ')" echo "# letters parity, binary $(sha $NB) $(date -u +%H:%M:%S)" FIELD_PARITY_PACE=8 $M parity_letters timeout 900 $NB parity complete-language parity-field $T 32 4 8 2 32 2 16 1 8 1 1 8 8 > $O/parity_letters.log 2>&1 grep -E 'FIELD_PARITY_DONE|FIELD_PARITY section|MEASURE|rror|panic' $O/parity_letters.log | sed -E 's/ (rows|reads|first|deposited|halvings|next|pace_nonzero|kappa)=[^ ]*//g' | cut -c1-300 ok=1 grep -qE 'FIELD_PARITY_DONE .*reads_unequal=0 faces_unequal=0 covector_unequal=0 learners_unequal=0 .*releases_unequal=0' $O/parity_letters.log || ok=0 for f in faces_unequal=0 covector_unequal=0 learner_equal=true near_equal=true clocks_equal=true rows_equal=true shares_equal=true currents_equal=true; do   grep -E 'FIELD_PARITY section' $O/parity_letters.log | grep -qv "$f" && ok=0 done if [ $ok = 1 ]; then cp $NB $BIN; echo "# LETTERS law joins from $1: binary $(sha $BIN) $(date -u +%H:%M:%S)"; else echo "# LETTERS parity FAILED: the binary unchanged $(date -u +%H:%M:%S)"; fi 
+# seg6 from 8f55747327d3cb25c31d9ff2808b155202773fd397a697454fa3ea361b15fc8c started 12:22:35
+# long111 stopped in seg6's first minutes (theory, 12:23: hold the letters law; cool the rate to 10 from lap 14) 12:23:47

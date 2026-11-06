@@ -5591,7 +5591,7 @@ const FIXED: u32 = u128::BITS - 3;
 
 /// `(hi, lo)` with `a b = hi 2^128 + lo`, every operation within `u128` (Lean
 /// `Compression/Landmark/Context/BinaryLog.wideMul_eq`).
-fn wide_mul(a: u128, b: u128) -> (u128, u128) {
+pub(crate) fn wide_mul(a: u128, b: u128) -> (u128, u128) {
     let mask = u128::from(u64::MAX);
     let (a1, a0, b1, b0) = (a >> 64, a & mask, b >> 64, b & mask);
     let (p00, p01, p10, p11) = (a0 * b0, a0 * b1, a1 * b0, a1 * b1);

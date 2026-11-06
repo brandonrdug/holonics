@@ -1,0 +1,6 @@
+# lead89 lock taken 22:18:15
+FIELD_OPENING problems=32 places=65984 training_answers=24685 ms=855
+MEASURE lap=held rc=0 wall_s=1.1 peak_rss_kib=233768
+LEAD place 0 over 32: '`' 32, 'y' 0; leads [('`', 32)]; mean lead mass 0.976
+LEAD places 10-255 over 7872: 'y' 0.000; leads [(' ', 0.838), ('void', 0.105), ('r', 0.019), ('e', 0.013), ('\n', 0.008), ('t', 0.005)]; mean lead mass 0.174
+LEAD89 exit 22:18:17

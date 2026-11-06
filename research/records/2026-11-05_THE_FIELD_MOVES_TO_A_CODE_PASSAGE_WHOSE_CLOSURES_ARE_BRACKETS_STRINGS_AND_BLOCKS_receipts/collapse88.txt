@@ -1,0 +1,14 @@
+# collapse88 lock taken 22:14:55 on 955b3cf3862bf76987abb9fdc3000e5cba280138390c72f4a2782ab1a2636689
+== runs_refine0 runs=1 refine=0
+FIELD_LENGTH problems=32 sweeps=2062 refine=0 stopped=- run_bits=1 reads=673 certified_bits=213.385 passed=0 ms=33430
+MEASURE lap=runs_refine0 rc=0 wall_s=33.8 peak_rss_kib=374276
+written: 32 answers, 19 open with ```python; a 'y' outside it in 25, its first at places 0 to 5 in 9 (median first 15), 'y' past it 0.048; commonest byte's share at places 10 to 255 (119 places) 0.272; top byte ' ' 0.241, 'y' 0.040, entropy 4.65 bits over 3128 bytes
+== one_refine3 runs=0 refine=3
+FIELD_LENGTH problems=32 sweeps=2062 refine=3 stopped=- run_bits=0 reads=2115 certified_bits=0.000 passed=0 ms=132136
+MEASURE lap=one_refine3 rc=0 wall_s=132.5 peak_rss_kib=374864
+written: 32 answers, 0 open with ```python; a 'y' outside it in 30, its first at places 0 to 5 in 25 (median first 0), 'y' past it 0.692; commonest byte's share at places 10 to 255 (124 places) 0.641; top byte 'y' 0.662, 'y' 0.662, entropy 1.65 bits over 3234 bytes
+== one_refine0 runs=0 refine=0
+FIELD_LENGTH problems=32 sweeps=2062 refine=0 stopped=- run_bits=0 reads=538 certified_bits=0.000 passed=0 ms=33890
+MEASURE lap=one_refine0 rc=0 wall_s=34.3 peak_rss_kib=373720
+written: 32 answers, 23 open with ```python; a 'y' outside it in 26, its first at places 0 to 5 in 5 (median first 31), 'y' past it 0.084; commonest byte's share at places 10 to 255 (126 places) 0.256; top byte ' ' 0.229, 'y' 0.051, entropy 4.68 bits over 3295 bytes
+COLLAPSE88 exit 22:18:15

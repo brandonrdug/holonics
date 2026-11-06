@@ -150,3 +150,199 @@ sampled parity under the one-rate stretch and the whole-room path states passed,
 fraction trains fewer path states so that a lap fits a clock, which the card law refuses (the design fixes the workload, and
 a run that does not fit gets the card or a stated long run), and the reading preferred the whole room where its cost allows;
 so b1 runs whole, two laps of about 16 card-minutes each, its lap bound the cost read's (`code87_launch2.sh`).
+
+[measurement; agent-inferred] **The collapse is made by the refine passes** (collapse88, lead89; `collapse88.txt`, `lead89.txt`,
+`collapse.py`, `lead.py`). The unified-theory reading of 21:54 fixed a no-run read of code86's write: at least 24 of 32 opening
+with ```` ```python ````, the first `y` outside it more than five places past its front in at least 28, `y` above 90% past it,
+the commonest byte's share across writes at places 10 to 255 above 0.7; stray `y`s starting inside the region in more than four
+writes put the cause in the writer's own loop. Read: none opens with ```` ```python ```` (held 28), the first `y` stands at
+places 0 to 5 in 30 (median 0), `y` 0.773 past it, the shared byte 0.764; so the loop. On the same state, the same 32 and
+keys: the held opening's faces as the writer meets them lead with the backtick at place 0 in all 32 (lead mass 0.976) and
+never with `y` at places 10 to 255 (space 0.84, the void 0.105), so the opening seeds no `y`. The sweeps alone write it well:
+in runs with no refine pass 19 of 32 open with ```` ```python ````, `y` 4.0%, the top byte the space at 24%, the byte entropy
+4.65 bits (held 4.96), the shared byte 0.272; one place a read with no refine pass 23, 5.1%, 4.68 bits, 0.256. One place a
+read with three refine passes: none, `y` 66%, 1.65 bits. The one-place resampling (each place redrawn with every other
+resolved, restricted to letters before the last letter) walks the field to a one-byte fixed point and overwrites the
+opening the sweeps wrote; code84's segment-2 field did not under the same law (`y` 1.7%). It is a failure of the refine law,
+apart from the length laws.
+
+[measurement; agent-inferred] **b1 restores the opening's length and fails at the writer** (code87; `code87_seg2.txt`,
+`b1norefine90.txt`). Two whole-room laps from code84's lap-0 state (916 and 897 card-seconds, 589 ms a section). The opening:
+void mass 0.374, 0.523, 0.588, 0.657, 0.799 and 0.966 at −128, −32, held, +32, +128 and +512 on the held (the length law's
+0.405 to 0.924), its expected length less held −38.0 (median −0.7), `B` past the end 79 against the law's 132 (the training
+problems alike, −8.6); the drift to read 64 −45.2 ± 11.8. Against the acceptance fixed at 21:19: the void mass passes at held
+and at +128. The write in runs with three refine passes: hazard past held over the hazard at or under it 0.87 (28 end at or
+under held, one in 107 places, 4 past it, one in 122), the correlation with held +0.125, written over held 0.397; the held
+context 2.690 and 2.420 at laps 0 and 1 against code85's 2.404 and 2.124. Every write item and the held context fail, and by
+the rule (a hazard ratio under 1.5 after two laps) one rate past the last arrival does not carry length at the writer, b2
+waits, and (c) is next. With no refine pass the same state's write reads the same length (0.87, +0.127, 0.414), so the
+failure is the sweeps', and its content is near held's statistics (14 of 32 open with ```` ```python ````, top byte the space at
+12.9%, `y` 2.1%, entropy 4.92 bits, shared byte 0.188), while the refined write collapsed to `%` (32.7%, entropy 3.60 bits).
+The opening now knows the length, but the writer's states do not, ending at a steady one in about 110 places at or under
+held and past it alike. Two more b1 laps run for the design of (c), not to decide b1 (`code87_launch3.sh`).
+
+[measurement; agent-inferred] **The writer's laws clear the collapse and lift the hazard, and the answers stay short** (closing91;
+`closing91.txt`, `unwrote.py`). On b1's segment-2 state, the same 32 and keys, in runs. The no-run read fixed at 22:38: in 23 of
+the 28 short writes of b1's own write a void unwrote letters (324 letters over 34 reads), at least the 20 the reading named,
+so the void drawn before a written letter was where the length was lost; under the closing law no write unwrites a letter.
+The closing law with the whole room and no refine pass: hazard past held over at or under it 2.13 (one in 64 places past held,
+one in 136 at or under it; 0.87 before), passing; written over held 0.464 and the correlation +0.262, failing. Both laws with
+no refine pass: 0.98, 0.579, +0.234; with three: 1.20, 0.582, +0.236. The content with both laws and three refine passes: the
+top byte the space at 13.1%, the byte entropy 4.82 bits against held's 4.96, 13 of 32 opening with ```` ```python ```` and 15
+of 31 fences closed, all within the reading's bounds, so with the writer's region cut at its near field refine's two-sided
+states no longer collapse. The writer's cut lowers the hazard ratio (the whole room's far voids closed answers past held at one
+in 64 places, the cut's at one in 160) while it raises written over held. b1's segment 3 (laps 2 and 3, 929 and 974
+card-seconds): held context 2.358 and 2.272 against code85's 1.914 and 1.579, the opening's code 5.78 and 5.75 against 4.99 and
+5.00: the whole room slows what the field learns of content, not only its cost.
+
+[measurement; agent-inferred] **With training b1's writer finds its length, and the writer's laws give the near tail's field
+its content** (`code87_seg3.txt`, `closing92.txt`). b1's segment 3 under the old writer, at four laps: hazard ratio 2.35 with
+three refine passes and 2.25 on the sweeps alone (0.87 at two laps), the correlation with held +0.357 and +0.354, written over
+held 0.562 and 0.579; the opening's void mass 0.489 at held and 0.703 at +128, its expected length +30 past held, the drift to
+read 64 −36.3 ± 12.9; its refined write collapsed to `%` (87.5% of its bytes). code86's segment-3 state under both writer laws
+(closing92), with three refine passes: written over held 0.740, hazard ratio 1.41, the correlation −0.004; 25 of 32 opening
+with ```` ```python ````, 22 fences closed, three answers parsing, a tenth of its identifiers standing in the question (held 0.26),
+byte entropy 4.71 bits; with no refine pass the same length and 22 openings. So the collapse was the writer's for both fields;
+the near tail's field holds content and no length (its opening's void mass 0.09 at every distance, never compared far out),
+and b1's holds length and less content. b1 continues two laps with its writes under the writer's laws (`code87_launch4.sh`).
+
+[measurement; agent-inferred] **b1 at six laps writes lengths that follow held** (`code87_seg4.txt`). Two more whole-room laps
+(966 and 960 card-seconds): held context 2.217 and 2.181. Under both writer laws with three refine passes: written over held
+1.402, hazard ratio 2.33, the correlation with held +0.317 (20 longer, 12 shorter), code lines 11.3 a write against held's
+10.9, 31 fences opened and 21 closed; the sweeps alone the same length (1.398, 2.34, +0.318). The opening's void mass 0.390 at
+held and 0.633 at +128, its expected length +81 past held, the drift to read 64 −61.6 ± 12.6. The first write of the code
+line whose length hears the problem; its words stay scrambled.
+
+[measurement; agent-inferred] **Refinement to the faces' own level descends without settling** (settle93; `settle93.txt`,
+`settle.py`). Both writes reached the 1,100 s time guard, so the evidence is incomplete. On code86's state the stop's median
+pass was 29.5 (1 to 134, past pass 3 in 30 of 32), the code per redrawn byte falling 1.72, 1.60, 1.46, 1.33, 1.25 … 0.82 by
+pass 15 as the answers drifted to spaces and short strings (the top byte the space at 39.5%, entropy 3.62 bits, 9 exact
+```` ```python ```` openings against 25 at three passes, near strings closing at 1.89 times held's share), the far closures 0.29
+(brackets), 0.29 (strings) and 0.42 (blocks) of held; on b1's state the median pass 57.0 (4 to 307) and the code per byte rising
+past pass 12 (2.2 to 3.4). By the reading fixed before it the median stop passed pass 3 and the shifts held (2 a byte off at
+three passes, none mended: shifts are the sweeps'), and the closures failed. The level stop's premise failed with it: a fair
+coin once settled needs faces that are one joint's conditionals, and these are not (the strands before and after read
+through their own encodings and nonlinear ticks), so the walk descends. The stop was retired; the passes stop where an
+answer's redrawn code per byte reaches real text's on the field (the unified-theory reading of 00:13), which the withheld code
+reads from above and code86's passes cross between passes 3 and 4, so three passes stand for it.
+
+[definition; agent-inferred, November 6, the unified-theory reading of 00:14] **The octave law at every byte**
+(`FIELD_WRITER_PLACE_ORDER`, `Field::sample_runs`'s `place_order`): each octave of the sweeps drawn in place order rather than its
+keyed order, runs kept; the keyed order within an octave was the one grain where the octave law's reason (the order decides
+what each draw reads) was dropped. **Read on code86's state** (place94; `place94.txt`), against the reading fixed before it:
+in runs with no refine pass, 14 of 32 exact ```` ```python ```` openings (the passage's rate about 27: fails), one a byte off
+(fails), entropy 4.61 bits against held's 4.96 (fails by 0.05), the top byte the space at 18.4% (passes), far brackets 0.00 of
+held over 9 opened (fails) and far strings 0.24 (passes); written over held 0.346, 8 of 32 parsing as Python (the keyed
+sweeps' 4), 24 of 30 fences closed. Nine of the 32 open ```` ````ython ````: places 2 and 3 drawn from one read, the run law
+releasing a place whose face splits between the backtick and `p` beside its unwritten neighbour, so in place order a run loses
+exactly the adjacent joint it should keep. The order is read again one place a read (place94b) before it is judged.
+
+[measurement; agent-inferred] **Place order one place a read** (place94b; `place94b.txt`). On code86's state with no run and no
+refine pass, against the reading fixed blind at 00:57: 15 exact ```` ```python ```` openings and two a byte off (fails), written
+over held 0.218 with the correlation +0.192 (fails), 7 parsing (fails by one), `y` past the opening 4.0% (the lean stays) and
+the entropy 4.82 bits (mended past 4.75). The other openings are ```` ``` ```` alone (7) and ```` ````ython ```` (7), so the
+backtick drawn at place 3 is the faces', not the run law's: in place order every draw has a silent right side, a state the
+training met only at octave ends, and the faces past such a front are the subject.
+
+[measurement; agent-inferred] **b2's far share keeps the content for a lap and loses it after** (code88; `code88.txt`). Four
+laps from code84's lap-0 state on b1's whole room with only the front octave and one keyed place an octave compared, 605 ms a
+section. Against the reading fixed at 23:26: (1) held context 2.456, 2.129, 2.050 and 1.643 against code85's 2.404, 2.124,
+1.914 and 1.579, within 0.05 at lap 1 and not at laps 2 and 3, so the far share was most of b1's dilution early and not after;
+(2) the opening's void mass 0.186 and 0.219 at held after laps 1 and 3, 0.275 and 0.315 at +128, above code86's flat 0.09 and
+rising past held, passes; (3) under both writer laws the correlation with held −0.317 at lap 4 (a 95% band of ±0.35 about zero
+on 32: no length heard from the question), written over held 1.533, the opening's expected length +573 past held, fails. Its
+content is the line's best on fences (19 exact openings, 30 of 32 fences closed).
+
+[measurement; agent-inferred] **Place order is the closer joint before any prefix training** (order95; `order95.txt`). Each
+order's writer's code of the first 32 held answers (8,792 places): code86 (the near tail, nine laps) 3.100 bits a place in place
+order against 3.316 in the writer's keyed octave order; b1 (six laps) 3.498 against 4.516; code88 (two laps) 3.363 against
+4.905, about 18 card-seconds a state. The fixed refutation for code89 (place order at or above keyed) no longer tells anything;
+its read is place order below code88's 3.363 at the same start and laps, and bolder, below code86's 3.100. The one-sided chain's
+3.1 against held context's 1.364 (every fourth byte open) is partly the truth's own: the forward rate is at least the
+every-fourth read less the dependence of sites four apart. `order-field` now also codes the masks' own order (a keyed uniform
+order over the answer and its near tail, with the length's code from the opening's void masses read as `P(L ≤ t)`; an answer
+whose difference there is not positive is counted, its length unwritable by that joint).
+
+[measurement; agent-inferred] **The masks' joint is the closest on the mask-trained fields** (order96, order97; `order96.txt`,
+`order97.txt`). The order reading with the masks' own order and place order's code split on its own faces, bits a place over
+the first 32 held answers: code86 place 3.100 (length 0.027, content 3.072), keyed 3.316, the masks' content 2.794 with its
+length 0.020 (17 lengths unread: the opening gives the held length no mass); code88 place 3.187 (0.018, 3.170), keyed 4.451,
+masks 2.983 and 0.034 (4 unread). Neither opening holds a length: the read length codes sit at a uniform length over the room
+(about 11 bits an answer against `log₂` room 11.0; the truth's 9.6).
+
+[measurement; agent-inferred] **The place-order path makes place order the closest joint and slows content** (code89;
+`code89.txt`, `code89_launch.sh`). Three laps from code84's lap-0 state with prefix path states (`k` uniform, `domain`
+`len + 1`), 169 ms a section, the sampled parity equal: held context 2.882, 2.751, 2.606 (code85's 2.404, 2.124, 1.914), the
+withheld code 2.871, 2.720, 2.585; place order's code 3.272 (length 0.015, content 3.258) against the masks' content 3.614 and
+keyed 3.962, so place order writes by the reading fixed at 02:00, and it is below code88's 3.363 at the start; the masks' joint
+fell with the content. The opening's void mass 0.01 at every distance (no state meets the room). The place-order write (one
+place a read, no refine pass) against the reading fixed at 01:21: written over held 1.515 (fails 0.67 to 1.49 by a little), 6
+exact ```` ```python ```` openings (fails), entropy 4.42 bits and the space at 31.5% (fails), `y` 0.9% (passes); the correlation
++0.045, 5 of 28 fences closed, writes opening on runs of spaces. The keyed write passed its 900 s guard (incomplete). The prefix
+states, each standing for `len + 1` places, took about half the step from the content masks.
+
+[measurement; agent-inferred] **The masks' order writes held's byte statistics and not its fences** (masks98; `masks98.txt`).
+code86's state writing in the masks' own order with code89's 32 lengths, one place a read (1,709 reads, 132 card-seconds):
+byte entropy 4.93 bits against held's 4.96, the top byte the space at 17.6% against 17.4%, `y` 1.2%, 11.4 code lines a write;
+9 exact ```` ```python ```` openings and 14 of 31 fences closed, far brackets, strings and blocks 0.41, 0.34 and 0.47 of held's
+closure. By the reading fixed at 02:38, (b) and the fences fail, and the keyed whole-room writer stays.
+
+[measurement; agent-inferred] **The keyed writer given its lengths keeps its fences and not its openings** (keyed99;
+`keyed99.txt`). code86's state, the keyed writer under both laws with three refine passes given code89's 32 lengths (the region
+`q + L + NEAR`, the answer places drawn over the letters), the same keys: 17 exact ```` ```python ```` openings (fails 23), byte
+entropy 4.69 bits and the space at 25.5% (fail), `y` 1.4%, 22 of 32 fences closed (passes 22), three answers parsing, 12% of its
+identifiers standing in the held answer (the line's most); far brackets, strings and blocks 0.42, 0.28 and 0.55 of held. Beside
+the same state's unconstrained keyed write (25 openings, 22 fences, 4.71 bits, 25%), a given length keeps the fences and the
+space's lean and loses eight openings.
+
+[definition; agent-inferred, November 6, the unified-theory reading of 03:53] **The writer is the sweeps alone.** The sweeps
+release the order's declared joint (each place drawn from the face it read, within the run bound and the closing law); a
+two-sided pass releases a joint only where the faces are one joint's conditionals, and settle93 showed they are not, so the
+passes walk to the field's cheapest bytes (on code86's state the keyed sweeps write 4.91 bits a byte and the space at 19.1%,
+three refine passes 4.71 and 25.3%). The writer is the keyed sweeps with no refine pass until training makes the faces one
+joint's; the stop at real text's code is withdrawn with it. **Read** (keyed100; `keyed100.txt`): code86's state, the keyed
+writer given its own lengths (closing92's sweeps on the same keys), runs, no refine pass: 23 exact ```` ```python ```` openings,
+entropy 4.86 bits, the space at 18.8%, 27 of 30 fences closed, far brackets, strings and blocks 0.34, 0.47 and 0.66 of held,
+every mark fixed before it passing; beside its own unconstrained write (22 openings, 22 fences), resolving the given voids from
+the first read costs nothing. The length is the writer's own subject.
+
+[measurement; agent-inferred] **The one-rate clock is not the far share's lag** (code90; `code90.txt`, `code90_launch.sh`).
+code88's law with the per-blank rate restored past the last arrival, four laps from code84's lap-0 state, its sampled parity
+equal, 620 to 645 ms a section: held context 2.431, 2.131, 2.066 and 1.657 against code88's 2.456, 2.129, 2.050 and 1.643, within
+0.05 at every lap, and 0.152 and 0.078 above code85's at laps 2 and 3. The opening's void at held 0.100 after lap 1 (code88's
+0.186) and 0.281 after lap 3 (code88's 0.219). By the reading fixed at 02:38 the one-rate clock is not the lag, and it stays.
+
+[measurement; agent-inferred] **The opening's length code** (order101 and order97; `order101.txt`, `order97.txt`). The masks'
+length code a read answer (the opening's void masses read as `P(L ≤ t)`), on the first 32 held: b1's six-lap state 9.15 bits
+(30 read), below the marginal 9.6 and the blind 10.5; code88 10.82 (28 read); code86 11.45 (15 read); code89 16.44 (19 read):
+the whole room's opening, trained at every distance, holds the most of the length.
+
+[measurement; agent-inferred] **Length at the opening alone keeps the content and draws ends that follow held** (code91;
+`code91.txt`, `code91_launch.sh`, `marginal.py`). From code86's segment-3 state, four laps with the fully masked state the only
+path state (one keyed far place an octave), 792 to 803 ms a section, the sampled parity equal. Against the reading fixed at
+04:03: (1) held context 1.335, 1.349, 1.311 and 1.306 against code86's 1.364, holds and falls; (2) the opening's length code
+9.69 bits a read answer at lap 2 and 9.57 at lap 4 (31 of 32 read), the mark 9.6 met at lap 4, against the paired training
+marginal 9.36: +0.21 ± 0.28, the length's distribution learned and the question not yet heard; the opening's void mass 0.438 at
+held and 0.633 at +128, its expected length +85 past held; (3) the one-end writer (one uniform against the first read's void
+profile, then the keyed sweeps given it, no refine pass) at lap 4: written over held 2.000 (fails), the correlation with held
++0.223, 28 exact ```` ```python ```` openings (passes), entropy 4.89 bits (passes), the top byte `e` at 10.6% (under the band),
+26 of 32 fences closed (passes), far brackets, strings and blocks 0.59, 0.40 and 0.40 of held; at lap 2 0.889, +0.324, 15 and
+18. The keyed sweeps on their own ends wrote 0.069 of held at lap 2 (the opening's void now a distribution, read a place at a
+time as a hazard) and 1.436 with the correlation +0.301 at lap 4. Given keyed100's lengths, the lap-2 state opened 16 and closed
+21 fences (keyed103; `keyed103.txt`), six of its answers parsing as Python, the line's most: the lost structure at lap 2 was the
+state's, not the drawn length's.
+
+[measurement; agent-inferred] **The depth ring's bracket gain does not hold** (ring102; `ring102.txt`, `ring102_launch.sh`).
+code86's state with head 3 made a depth ring (increments founded at zero, no blank face), its sampled parity equal, against
+code86's state continued, both under code86's laws, two segments each, the writes given keyed100's lengths. The conversion's
+cost: held context 10.91 bits a byte at its start, 1.537, 1.500, 1.430, 1.393 over its first four laps and 1.444, 1.410, 1.348,
+1.376 over the next four (121 and 117 ms a section), against the foil's 1.331, 1.362, 1.309 and 1.299, 1.325, 1.319 (158 and
+169 ms). The brackets, near closed, far closed and left unclosed: the ring after four laps 0.250, 0.402, 0.348 over 92 openers,
+the foil after three 0.168, 0.189, 0.643 over 143; the ring after eight 0.218, 0.244, 0.538 over 78, the foil after six 0.236,
+0.255, 0.509 over 55. Every mark fixed before it fails (far brackets 0.8 of held, near 0.9, unclosed under 0.1), and at the
+second segment ring and foil close alike, so the first segment's gap is not the ring's to claim; the control with `r` held at
+zero, which would separate the ring from the conversion, is not yet run. **The training answers' opening length code**
+(keyed104; `keyed104.txt`): code91's lap-4 state codes the first 32 training answers' lengths at 9.31 bits a read answer against
+their paired marginal 8.98 (+0.33 ± 0.18), so the opening holds the length's distribution and not its fit to the question on
+training answers either; given keyed100's lengths it opens 18 and closes 21 of 29 fences, the space at 10.5%, five answers
+parsing. The long run (long106, Brandon's authorization of 06:29) continues code91's law from its lap-4 state without the ring.

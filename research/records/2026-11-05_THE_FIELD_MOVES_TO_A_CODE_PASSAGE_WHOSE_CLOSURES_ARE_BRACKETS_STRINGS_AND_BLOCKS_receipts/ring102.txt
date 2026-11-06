@@ -1,0 +1,97 @@
+# ring102 waits for code91 05:33:26
+# ring102 binary ae3b300c88414d9809cf826c7ece31b5f478d6b0db7f17a8e714f62c5f994b05 parity lock taken 06:14:26
+FIELD_PARITY section=1 withheld=false regions=26 length=1541 sites=21394 faces_unequal=0 covector_unequal=0 learner_equal=true near_equal=true clocks_equal=true rows_equal=true shares_equal=true currents_equal=true host_ms=29347 card_ms=234
+FIELD_PARITY section=2 withheld=true regions=32 length=555 sites=0 faces_unequal=0 covector_unequal=0 learner_equal=true near_equal=true clocks_equal=true rows_equal=true shares_equal=true currents_equal=true host_ms=2261 card_ms=14
+FIELD_PARITY_DONE sections=2 reads_unequal=0 faces_unequal=0 covector_unequal=0 learners_unequal=0 releases=1 releases_unequal=0 card_release_ms=10 host_ms=31609 card_ms=249 elapsed_ms=244051
+MEASURE lap=parity rc=0 wall_s=257.2 peak_rss_kib=3301952
+# ring1 from 85d0f9a696bbed6fcd30dafcf2ee35824cd7c23c4f0d6dceb59a0c7ad4fb5a89 started 06:18:43
+FIELD_LAP lap=0 read=11 before=2.803 after=- deposited=1535/1535 halvings=0 next_halved=0 next_refused=0 ms=188753
+FIELD_LAP lap=1 read=12 before=2.544 after=- deposited=1535/1535 halvings=0 next_halved=0 next_refused=0 ms=188226
+FIELD_LAP lap=2 read=13 before=2.536 after=- deposited=1535/1535 halvings=0 next_halved=0 next_refused=0 ms=188008
+FIELD_LAP lap=3 read=14 before=2.495 after=- deposited=1535/1535 halvings=0 next_halved=0 next_refused=0 ms=184820
+FIELD_LAPS_HELD lap=4 reason=time left=123922 bound=304236 ms=784550
+MEASURE lap=ring1 rc=0 wall_s=785.1 peak_rss_kib=894792
+-1:13.725690:10.912407:10.927392 0:4.996718:1.537171:1.756045 1:5.115366:1.499672:1.723693 2:5.072548:1.430400:1.644607 3:5.079535:1.393372:1.610752 
+sections mean ms 121 over 6140
+== ring1 write given keyed100's lengths
+FIELD_LENGTH problems=32 sweeps=2062 refine=0 stopped=- run_bits=1 reads=876 certified_bits=262.119 passed=0 ms=13798
+MEASURE lap=ring1_write rc=0 wall_s=14.1 peak_rss_kib=235888
+written: 32 answers, 17 open with ```python; a 'y' outside it in 25, its first at places 0 to 5 in 11 (median first 12), 'y' past it 0.015; commonest byte's share at places 10 to 255 (244 places) 0.187; top byte ' ' 0.113, 'y' 0.015, entropy 4.99 bits over 6483 bytes
+written: 32 answers: a fence opened 29, closed 20; parses as Python 3; code lines mean 7.9; identifiers 483, in the question 0.03, in the held answer 0.05
+family	span	written opened	written closed share	held opened	held closed share	ratio
+bracket	near	92	0.250	178	0.393	0.64
+bracket	far	92	0.402	178	0.607	0.66
+string	near	57	0.263	60	0.400	0.66
+string	far	57	0.158	60	0.583	0.27
+block	near	25	0.000	75	0.000	nan
+block	far	25	0.280	75	0.947	0.30
+RULE: the lowest closure against held is string far at 0.27 (under 0.5)
+SEGMENT ring1 done 06:32:03
+# foil1 from 955b3cf3862bf76987abb9fdc3000e5cba280138390c72f4a2782ab1a2636689 started 06:32:37
+FIELD_LAP lap=0 read=11 before=2.462 after=- deposited=1535/1535 halvings=0 next_halved=0 next_refused=0 ms=237651
+FIELD_LAP lap=1 read=12 before=2.433 after=- deposited=1535/1535 halvings=0 next_halved=0 next_refused=0 ms=244938
+FIELD_LAP lap=2 read=13 before=2.452 after=- deposited=1535/1535 halvings=0 next_halved=0 next_refused=0 ms=252558
+FIELD_LAPS_HELD lap=3 reason=time left=139505 bound=304236 ms=768967
+MEASURE lap=foil1 rc=0 wall_s=769.4 peak_rss_kib=834012
+-1:5.073155:1.363589:1.574047 0:4.930236:1.331493:1.539962 1:5.093433:1.361663:1.573417 2:5.194212:1.309282:1.513218 
+sections mean ms 158 over 4605
+== foil1 write given keyed100's lengths
+FIELD_LENGTH problems=32 sweeps=2062 refine=0 stopped=- run_bits=1 reads=850 certified_bits=271.655 passed=0 ms=15343
+MEASURE lap=foil1_write rc=0 wall_s=15.6 peak_rss_kib=236236
+written: 32 answers, 21 open with ```python; a 'y' outside it in 23, its first at places 0 to 5 in 8 (median first 28), 'y' past it 0.016; commonest byte's share at places 10 to 255 (244 places) 0.174; top byte ' ' 0.121, 'y' 0.016, entropy 5.17 bits over 6483 bytes
+written: 32 answers: a fence opened 30, closed 27; parses as Python 1; code lines mean 6.8; identifiers 555, in the question 0.04, in the held answer 0.04
+family	span	written opened	written closed share	held opened	held closed share	ratio
+bracket	near	143	0.168	178	0.393	0.43
+bracket	far	143	0.189	178	0.607	0.31
+string	near	65	0.354	60	0.400	0.88
+string	far	65	0.200	60	0.583	0.34
+block	near	17	0.059	75	0.000	nan
+block	far	17	0.529	75	0.947	0.56
+RULE: the lowest closure against held is bracket far at 0.31 (under 0.5)
+SEGMENT foil1 done 06:45:42
+# ring2 from dd0db1e81b4b72c4b9d33cde58ba64519d99b86dd5e2598864cc8f7935040a6a started 06:45:42
+FIELD_LAP lap=0 read=15 before=2.499 after=- deposited=1535/1535 halvings=0 next_halved=0 next_refused=0 ms=177085
+FIELD_LAP lap=1 read=16 before=2.469 after=- deposited=1535/1535 halvings=0 next_halved=0 next_refused=0 ms=180484
+FIELD_LAP lap=2 read=17 before=2.471 after=- deposited=1535/1535 halvings=0 next_halved=0 next_refused=0 ms=183952
+FIELD_LAP lap=3 read=18 before=2.460 after=- deposited=1535/1535 halvings=0 next_halved=0 next_refused=0 ms=184063
+FIELD_LAPS_HELD lap=4 reason=time left=150098 bound=304236 ms=758374
+MEASURE lap=ring2 rc=0 wall_s=758.8 peak_rss_kib=835388
+-1:5.079535:1.393372:1.610752 0:5.080550:1.444002:1.659824 1:4.945932:1.409913:1.633768 2:5.122435:1.347911:1.563753 3:4.946419:1.375588:1.598056 
+sections mean ms 117 over 6140
+== ring2 write given keyed100's lengths
+FIELD_LENGTH problems=32 sweeps=2062 refine=0 stopped=- run_bits=1 reads=902 certified_bits=210.060 passed=0 ms=14076
+MEASURE lap=ring2_write rc=0 wall_s=14.4 peak_rss_kib=234324
+written: 32 answers, 16 open with ```python; a 'y' outside it in 27, its first at places 0 to 5 in 12 (median first 17), 'y' past it 0.017; commonest byte's share at places 10 to 255 (244 places) 0.180; top byte ' ' 0.105, 'y' 0.017, entropy 5.05 bits over 6483 bytes
+written: 32 answers: a fence opened 30, closed 23; parses as Python 3; code lines mean 6.4; identifiers 480, in the question 0.03, in the held answer 0.03
+family	span	written opened	written closed share	held opened	held closed share	ratio
+bracket	near	78	0.218	178	0.393	0.55
+bracket	far	78	0.244	178	0.607	0.40
+string	near	23	0.000	60	0.400	0.00
+string	far	23	0.043	60	0.583	0.07
+block	near	14	0.000	75	0.000	nan
+block	far	14	0.357	75	0.947	0.38
+RULE: the lowest closure against held is string near at 0.00 (under 0.5)
+SEGMENT ring2 done 06:58:36
+# foil2 from 70aa7a05afe51e57e49345d0c02238add86e51bb9e10a7aff27372e3ae41a933 started 06:58:36
+FIELD_LAP lap=0 read=14 before=2.426 after=- deposited=1535/1535 halvings=0 next_halved=0 next_refused=0 ms=253977
+FIELD_LAP lap=1 read=15 before=2.436 after=- deposited=1535/1535 halvings=0 next_halved=0 next_refused=0 ms=255446
+FIELD_LAP lap=2 read=16 before=2.411 after=- deposited=1535/1535 halvings=0 next_halved=0 next_refused=0 ms=274993
+FIELD_LAPS_HELD lap=3 reason=time left=86794 bound=304236 ms=821678
+MEASURE lap=foil2 rc=0 wall_s=822.3 peak_rss_kib=808008
+-1:5.194212:1.309282:1.513218 0:5.058122:1.299412:1.508300 1:5.034452:1.324553:1.539464 2:4.974131:1.319423:1.535505 
+sections mean ms 169 over 4605
+== foil2 write given keyed100's lengths
+FIELD_LENGTH problems=32 sweeps=2062 refine=0 stopped=- run_bits=1 reads=878 certified_bits=239.271 passed=0 ms=19470
+MEASURE lap=foil2_write rc=0 wall_s=19.8 peak_rss_kib=233500
+written: 32 answers, 16 open with ```python; a 'y' outside it in 27, its first at places 0 to 5 in 9 (median first 20), 'y' past it 0.018; commonest byte's share at places 10 to 255 (244 places) 0.195; top byte ' ' 0.161, 'y' 0.017, entropy 5.18 bits over 6483 bytes
+written: 32 answers: a fence opened 29, closed 15; parses as Python 3; code lines mean 8.3; identifiers 745, in the question 0.04, in the held answer 0.04
+family	span	written opened	written closed share	held opened	held closed share	ratio
+bracket	near	55	0.236	178	0.393	0.60
+bracket	far	55	0.255	178	0.607	0.42
+string	near	57	0.298	60	0.400	0.75
+string	far	57	0.246	60	0.583	0.42
+block	near	15	0.000	75	0.000	nan
+block	far	15	0.200	75	0.947	0.21
+RULE: the lowest closure against held is block far at 0.21 (under 0.5)
+SEGMENT foil2 done 07:12:38
+MAIN exit 07:12:38

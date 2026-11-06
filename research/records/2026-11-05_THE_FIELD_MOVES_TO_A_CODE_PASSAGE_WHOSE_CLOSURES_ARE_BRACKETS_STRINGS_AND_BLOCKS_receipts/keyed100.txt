@@ -1,0 +1,19 @@
+# keyed100 lock taken 03:54:29 on 955b3cf3862bf76987abb9fdc3000e5cba280138390c72f4a2782ab1a2636689, lengths fd7c4697dd71246b0728d33cacadeb95b9eae18c2c7663ecb681d6c13e940cdd
+FIELD_LENGTH problems=32 sweeps=2062 refine=0 stopped=- run_bits=1 reads=832 certified_bits=321.430 passed=0 ms=15037
+MEASURE lap=code86 rc=0 wall_s=15.3 peak_rss_kib=234592
+ENDINGS answers 32: 19 end at or under held over 4371 places (one in 230), 13 past it over 2112 (one in 162), 0 reach the room
+HAZARD past/under 1.42; written/held 0.740; correlation -0.003
+written: 32 answers, 23 open with ```python; a 'y' outside it in 26, its first at places 0 to 5 in 5 (median first 37), 'y' past it 0.019; commonest byte's share at places 10 to 255 (244 places) 0.223; top byte ' ' 0.188, 'y' 0.018, entropy 4.86 bits over 6483 bytes
+held   : 32 answers, 28 open with ```python; a 'y' outside it in 15, its first at places 0 to 5 in 0 (median first 38), 'y' past it 0.016; commonest byte's share at places 10 to 255 (246 places) 0.197; top byte ' ' 0.174, 'y' 0.009, entropy 4.96 bits over 8760 bytes
+bytes written/held 0.740, correlation -0.003, 13 longer, 19 shorter
+written: 32 answers: a fence opened 30, closed 27; parses as Python 1; code lines mean 4.3; identifiers 382, in the question 0.07, in the held answer 0.05
+held:    32 answers: a fence opened 29, closed 29; parses as Python 26; code lines mean 10.9; identifiers 1117, in the question 0.26, in the held answer 1.00
+family	span	written opened	written closed share	held opened	held closed share	ratio
+bracket	near	48	0.375	178	0.393	0.95
+bracket	far	48	0.208	178	0.607	0.34
+string	near	22	0.227	60	0.400	0.57
+string	far	22	0.273	60	0.583	0.47
+block	near	8	0.000	75	0.000	nan
+block	far	8	0.625	75	0.947	0.66
+RULE: the lowest closure against held is bracket far at 0.34 (under 0.5)
+KEYED100 exit 03:54:45

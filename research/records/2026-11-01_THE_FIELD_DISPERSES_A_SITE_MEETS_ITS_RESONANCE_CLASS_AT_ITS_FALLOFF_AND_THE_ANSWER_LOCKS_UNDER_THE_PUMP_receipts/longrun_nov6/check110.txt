@@ -1,0 +1,56 @@
+# check110 lock taken 09:35:02
+== lap4_now place_bits_a_place=2.936 keyed_bits_a_place=4.061 masks_bits_a_place=2.742 
+MARGINAL read 31 of 32: the state's length code 9.57 bits an answer, the training marginal's on the same answers 9.36, on all 9.37; paired difference +0.21 with deviation 0.28
+CONDITIONED lap4_now_HELD128 answers=128 mean_past_end=184.8 plain=195.8
+  1200-end	conditioned 17.9	plain 22.8
+CONDITIONED lap4_now_TRAIN answers=128 mean_past_end=147.9 plain=158.1
+  1200-end	conditioned 15.3	plain 21.2
+written: 32 answers: a fence opened 31, closed 25; parses as Python 3; code lines mean 7.9; identifiers 629, in the question 0.02, in the held answer 0.03
+25 open with
+top byte ' ' 0.102
+== lap4_code91 place_bits_a_place=2.936 keyed_bits_a_place=4.061 masks_bits_a_place=2.742 
+MARGINAL read 31 of 32: the state's length code 9.57 bits an answer, the training marginal's on the same answers 9.36, on all 9.37; paired difference +0.21 with deviation 0.28
+CONDITIONED lap4_code91_HELD128 answers=128 mean_past_end=184.8 plain=195.8
+  1200-end	conditioned 17.9	plain 22.8
+CONDITIONED lap4_code91_TRAIN answers=128 mean_past_end=147.9 plain=158.1
+  1200-end	conditioned 15.3	plain 21.2
+written: 32 answers: a fence opened 31, closed 25; parses as Python 3; code lines mean 7.9; identifiers 629, in the question 0.02, in the held answer 0.03
+25 open with
+top byte ' ' 0.102
+== lap6w_now place_bits_a_place=2.889 keyed_bits_a_place=3.944 masks_bits_a_place=2.744 
+MARGINAL read 30 of 32: the state's length code 10.94 bits an answer, the training marginal's on the same answers 9.37, on all 9.37; paired difference +1.57 with deviation 0.44
+CONDITIONED lap6w_now_HELD128 answers=128 mean_past_end=507.5 plain=540.6
+  1200-end	conditioned 84.3	plain 96.6
+CONDITIONED lap6w_now_TRAIN answers=128 mean_past_end=454.0 plain=477.1
+  1200-end	conditioned 72.3	plain 83.2
+written: 32 answers: a fence opened 25, closed 6; parses as Python 1; code lines mean 14.5; identifiers 1433, in the question 0.09, in the held answer 0.07
+13 open with
+top byte ' ' 0.195
+== lap6w_code91 
+Traceback (most recent call last):
+  File "2026-11-06-check110/marginal.py", line 13, in <module>
+    order = list(csv.DictReader(open(sys.argv[1]), delimiter="\t"))
+                                ~~~~^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '2026-11-06-check110/lap6w_code91_order/ORDER.tsv'
+Traceback (most recent call last):
+  File "2026-11-06-check110/conditioned.py", line 17, in <module>
+    with open(f"{o}/OPENING.tsv") as f:
+         ~~~~^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '2026-11-06-check110/lap6w_code91_HELD128/OPENING.tsv'
+Traceback (most recent call last):
+  File "2026-11-06-check110/code_reading.py", line 78, in <module>
+    main()
+    ~~~~^^
+  File "2026-11-06-check110/code_reading.py", line 62, in main
+    for line in open(sys.argv[2], "rb"):
+                ~~~~^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '2026-11-06-check110/lap6w_code91_keyed/SAMPLE.tsv'
+Traceback (most recent call last):
+  File "2026-11-06-check110/collapse.py", line 62, in <module>
+    main()
+    ~~~~^^
+  File "2026-11-06-check110/collapse.py", line 53, in main
+    for line in open(sys.argv[2], "rb"):
+                ~~~~^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '2026-11-06-check110/lap6w_code91_keyed/SAMPLE.tsv'
+CHECK110 exit 09:38:19

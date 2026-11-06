@@ -214,9 +214,22 @@ pub struct FieldDeclaration {
     pub frames: usize,
     pub reach: usize,
     pub lanes: usize,
+    /// [definition; agent-inferred, November 6, the unified-theory readings of 04:34 to 04:47] **The depth rings**: the last
+    /// `depth` turned ring sets turn by located increments alone. A depth head's rate is `κ = r_h[u]` on its class sheet (its
+    /// pace row, base zero: only a located increment turns it, so a matched opener and the site before its closer differ by
+    /// exactly zero, an unmatched one by its net winding), its frames turn at `τ = Σ κ` on the solenoid's ring periods, its
+    /// pairs and crowds take no skin (`|μ| = 1`: relative depth carried exactly at any span, its adjoint exactly back), and it
+    /// carries no moment (without a skin its moment would sum the whole region). The ring `ρ ← μρ + r` with `μ = 1` and `r`
+    /// keyed by the arriving class; `r` is located by deposition, never authored.
+    pub depth: usize,
 }
 
 impl FieldDeclaration {
+    /// Whether head `h` is a depth ring ([`FieldDeclaration::depth`]).
+    pub fn is_depth(&self, h: usize) -> bool {
+        h % self.frames + self.depth >= self.frames && self.carries_moment(h)
+    }
+
     /// A lane's coordinates, `W = D / lanes`.
     pub fn lane_width(&self) -> usize {
         self.width / self.lanes
@@ -416,6 +429,9 @@ impl FieldDeclaration {
         if self.frames == 0 || self.heads % self.frames != 0 || self.still > self.frames || self.reach < 2 {
             return refuse("a field's ring sets divide its heads, no more of them are still than there are, and its reach spans two sites");
         }
+        if self.depth > self.frames - self.still {
+            return refuse("a field's depth rings are among its turned ring sets");
+        }
         // The score is released `16 + β` bits from its products' grain, and a head's classes are
         // listed on the card in at most `2^12` buckets.
         if (FACE_BITS as i32) + self.score_shift() < 0 || self.class_trits() > MAX_CLASS_TRITS {
@@ -425,16 +441,19 @@ impl FieldDeclaration {
     }
 
     fn to_text(self) -> String {
-        format!("hnn-field-v13 {} {} {} {} {} {} {} {} {} {}", self.alphabet, self.width, self.heads, self.modes, self.still, self.contacts, self.ticks, self.frames, self.reach, self.lanes)
+        format!("hnn-field-v14 {} {} {} {} {} {} {} {} {} {} {}", self.alphabet, self.width, self.heads, self.modes, self.still, self.contacts, self.ticks, self.frames, self.reach, self.lanes, self.depth)
     }
 
     fn from_text(line: &str) -> Result<Self> {
         let words: Vec<&str> = line.split(' ').collect();
-        if words.len() != 11 || words[0] != "hnn-field-v13" {
-            return refuse("a field's head line that is not hnn-field-v13");
-        }
+        // A v13 head line is a field with no depth ring (the line before the depth rings, its states the line's own).
+        let depth_word = match (words.first().copied(), words.len()) {
+            (Some("hnn-field-v14"), 12) => Some(words[11]),
+            (Some("hnn-field-v13"), 11) => None,
+            _ => return refuse("a field's head line that is not hnn-field-v14"),
+        };
         let n = |w: &str| w.parse::<usize>().map_err(|_| TowerError::Refused("a field's declaration that is not a count"));
-        let d = Self { alphabet: n(words[1])?, width: n(words[2])?, heads: n(words[3])?, modes: n(words[4])?, still: n(words[5])?, contacts: n(words[6])?, ticks: n(words[7])?, frames: n(words[8])?, reach: n(words[9])?, lanes: n(words[10])? };
+        let d = Self { alphabet: n(words[1])?, width: n(words[2])?, heads: n(words[3])?, modes: n(words[4])?, still: n(words[5])?, contacts: n(words[6])?, ticks: n(words[7])?, frames: n(words[8])?, reach: n(words[9])?, lanes: n(words[10])?, depth: depth_word.map(n).transpose()?.unwrap_or(0) };
         d.admit()?;
         Ok(d)
     }
@@ -729,6 +748,13 @@ pub struct Field {
     pi: i128,
     /// The packets' level of a tower of scales ([`Field::scaled_up`]), none for a field on one scale.
     pub scale: Option<Box<Scale>>,
+    /// [measurement; agent-inferred, November 6] Where set, every silent place runs its own per-blank rate past the last arrival
+    /// too (the clock before §16.47's one-rate stretch), a declared comparison; not part of the state.
+    pub per_blank_clock: bool,
+    /// [definition; agent-inferred, November 6, the unified-theory reading of 10:31] Where set, **past the last arrival a silent
+    /// place runs at the bare rate** (`κ = 1`, §16.28) and returns nothing: nothing arrives there, so no guessed duration
+    /// drives its clock; between arrivals each blank keeps its expected duration (§16.44). Not part of the state.
+    pub bare_stretch: bool,
 }
 
 /// [definition; agent-inferred, November 1] A region: each site's class, whether it is
@@ -773,6 +799,20 @@ pub struct Port<'a> {
     /// takes no covector (the near field's margin a writer's state keeps past its front, so the faces before it are the
     /// whole room's).
     pub stop: Option<usize>,
+    /// [definition; agent-inferred, November 5, the unified-theory reading of 23:26] **Which of its places are heard** (none:
+    /// every place before the stop), indexed by the region's sites: a place not heard is read and not compared, and takes no
+    /// covector, as one past the stop. A writer's state compares its front octave whole and, past it, one keyed place an
+    /// octave (b2's far share), the places between read on the one-rate clock and not compared.
+    pub heard: Option<&'a [bool]>,
+    /// [definition; agent-inferred, November 6, the unified-theory reading of 06:50, E] **The room is cut to its windows**
+    /// ([`Region::window`]): where set, a receiver's row is met only at the question's sites, the silent stretch's first
+    /// place and the places within `(NEAR − 1)·ticks` of a heard one; every other receiver meets no source that tick.
+    pub window: bool,
+    /// [definition; agent-inferred, November 6, the unified-theory reading of 11:49] **Compared on its letters off the void**: each
+    /// open place of the port on its target's class within the letters, `−log₂(m_a/(T − m_∅))`, the release's own draw where the
+    /// end is given (a place before the end draws from its face restricted to the letters), so the void logit takes no covector
+    /// there; a resolved place carries no face and is not compared ([`letters_reading`]).
+    pub letters: bool,
 }
 
 /// [definition; agent-inferred, November 3, §16.24] **A port's reading**: its coupling code on `2^(−20)` bits and each
@@ -783,6 +823,9 @@ pub fn port_reading(faces: &[(&[u128], u128)], port: &Port) -> Result<(Vec<Vec<i
     use crate::receiver::coupling::TemperatureRefusal as Why;
     if port.boundary {
         return boundary_reading(faces, port);
+    }
+    if port.letters {
+        return letters_reading(faces, port);
     }
     let read = crate::receiver::coupling::coupling_code(faces, port.void, port.target, None).map_err(|why| {
         TowerError::Refused(match why {
@@ -814,6 +857,31 @@ pub fn port_reading(faces: &[(&[u128], u128)], port: &Port) -> Result<(Vec<Vec<i
 /// the opening's void mass past the end is what a release pays in places). On the face covector's `2^(−24)` and the codes'
 /// `2^(−20)` bits, read alike by the host's return and the card's. A resolved place (`(∅, 0)`, a state of the writer's
 /// path) is not compared: its row is empty and it adds no code.
+/// [`Port::letters`]'s reading: at each open place `i` (within the target) the covector `p̂_a/(1 − p̂_∅) − [a = target_i]` over the
+/// letters on the face covector's `2^(−24)`, zero at the void, and the code `−log₂(m_(target_i)/(T − m_∅))` on `2^(−20)` bits; a
+/// resolved place (an empty face) is not compared.
+fn letters_reading(faces: &[(&[u128], u128)], port: &Port) -> Result<(Vec<Vec<i64>>, i64)> {
+    let one = 1i64 << super::COVECTOR_BITS;
+    let mut rows = Vec::with_capacity(faces.len());
+    let mut code = 0i64;
+    for (i, &(masses, total)) in faces.iter().enumerate() {
+        if (total == 0 && masses.is_empty()) || i >= port.target.len() {
+            rows.push(Vec::new());
+            continue;
+        }
+        if total == 0 || port.void >= masses.len() || masses[port.void] >= total {
+            return refuse("a port's face that is empty, misses a class or holds no letter");
+        }
+        let rest = total - masses[port.void];
+        let mut row: Vec<i64> = masses.iter().map(|&m| (((m << super::COVECTOR_BITS) + rest / 2) / rest) as i64).collect();
+        row[port.void] = 0;
+        row[port.target[i]] -= one;
+        code += crate::hnn::tower::face_code(masses[port.target[i]], rest);
+        rows.push(row);
+    }
+    Ok((rows, code))
+}
+
 fn boundary_reading(faces: &[(&[u128], u128)], port: &Port) -> Result<(Vec<Vec<i64>>, i64)> {
     let one = 1i128 << super::COVECTOR_BITS;
     let mut rows = Vec::with_capacity(faces.len());
@@ -847,6 +915,33 @@ fn boundary_reading(faces: &[(&[u128], u128)], port: &Port) -> Result<(Vec<Vec<i
 }
 
 impl Region<'_> {
+    /// [definition; agent-inferred, November 6, the unified-theory reading of 06:50, E] **The windows a cut room computes**
+    /// ([`Port::window`]): every site before the port, the silent stretch's first place ([`Field::silent_stretch`]) and each
+    /// heard open place, each with the `(NEAR − 1)·ticks` places on either side; none where the port does not cut its room.
+    /// Why exact (the unified-theory reading of 06:50): a silent place is no one's far source, so in one tick a receiver hears
+    /// past its near field only definite sources (the question, whole) and its crowds of them, and the near field and the
+    /// strand's pair contact carry a place's state at most `NEAR − 1` places a tick. A heard place's face after `ticks` ticks
+    /// therefore reads only its window, and a receiver outside every window reads, at worst, its window's edge, which is
+    /// `(NEAR − 1)·ticks` places from it; the stretch's clock past its first place runs at that place's rate (one passage), so
+    /// the clock at every far place is `τ_front + (t − front)κ` from a computed face. Backward, the covector of a heard face
+    /// reaches at most `(NEAR − 1)` places a tick, so it meets no receiver outside its window, and the clock's return reaches
+    /// the stretch's first place, whose window is computed. Not exact where blanks sit between arrivals (masks, writer
+    /// states), whose clocks read each blank's own face: those regions keep their room whole.
+    pub fn window(&self, ticks: usize) -> Option<Vec<bool>> {
+        let port = self.port.filter(|p| p.window)?;
+        let sites = self.classes.len();
+        let reach = (NEAR - 1) * ticks;
+        let mut out: Vec<bool> = (0..sites).map(|t| t < port.start).collect();
+        let stretch = Field::silent_stretch(self);
+        let centres = std::iter::once(stretch).chain((port.start..port.stop.unwrap_or(sites).min(sites)).filter(|&t| self.unresolved[t] && port.heard.is_none_or(|h| h[t])));
+        for c in centres.filter(|&c| c < sites) {
+            for slot in &mut out[c.saturating_sub(reach)..(c + reach + 1).min(sites)] {
+                *slot = true;
+            }
+        }
+        Some(out)
+    }
+
     /// [definition; agent-inferred, November 2, §16.23] **A state's weight in the joint code**, `(m, K)`: of the `m`
     /// sites of its domain `K` are open, so the region's code `Σ_open −log₂ p̂` read at `m/K` is an unbiased reading of
     /// the order-averaged joint code `E_σ L_σ` when `K` is uniform on `1..m` and the open set uniform given `K` (the
@@ -1571,7 +1666,7 @@ impl Field {
         let rings: Vec<(usize, Vec<(i64, i64)>)> = ring_periods(declaration.turned_slots(), declaration.reach).into_iter().map(|n| (n, (0..n.min(declaration.reach)).map(|r| ring_phasor(r, n, pi)).collect())).collect();
         let exponential = Exponential::new(FACE_BITS);
         let decays = rings.iter().map(|&(n, _)| (0..declaration.reach).map(|d| skin_decay(d, n, pi, &exponential)).collect()).collect();
-        Self { declaration, theta, layout, rings, decays, exponential, fine: Exponential::new(MATERIAL_BITS), pi, scale: None }
+        Self { declaration, theta, layout, rings, decays, exponential, fine: Exponential::new(MATERIAL_BITS), pi, scale: None, per_blank_clock: false, bare_stretch: false }
     }
 
     /// Each turned slot's skin decay on `2^(−30)` at every distance within the reach (a
@@ -1588,7 +1683,7 @@ impl Field {
     fn decay(&self, h: usize, l: usize, d: usize) -> (i128, u32) {
         let dd = &self.declaration;
         let set = h % dd.frames;
-        if set < dd.still {
+        if set < dd.still || dd.is_depth(h) {
             return (1, 0);
         }
         (self.decays[l * (dd.frames - dd.still) + set - dd.still][d] as i128, MOVE_BITS)
@@ -1599,7 +1694,7 @@ impl Field {
     /// [`Field::decay`] where the pace is plain), the exact `1` on a still head.
     fn pair_decay(&self, paces: &Paces, h: usize, l: usize, i: usize, j: usize) -> (i128, u32) {
         match paces.row.get(h).copied().flatten() {
-            Some(p) if !paces.plain[p] => (self.skin(self.slot(h, l), paces.sigma[p][i] as i128 - paces.sigma[p][j] as i128) as i128, MOVE_BITS),
+            Some(p) if !paces.plain[p] && !self.declaration.is_depth(h) => (self.skin(self.slot(h, l), paces.sigma[p][i] as i128 - paces.sigma[p][j] as i128) as i128, MOVE_BITS),
             _ => self.decay(h, l, i.abs_diff(j)),
         }
     }
@@ -1608,7 +1703,7 @@ impl Field {
     /// the skin to the place `2^ℓ` away on the crowd's side (inside the region wherever the octave is).
     fn octave_decay(&self, paces: &Paces, h: usize, l: usize, i: usize, level: u32, right: bool) -> (i128, u32) {
         match paces.row.get(h).copied().flatten() {
-            Some(p) if !paces.plain[p] => {
+            Some(p) if !paces.plain[p] && !self.declaration.is_depth(h) => {
                 let k = if right { i + (1 << level) } else { i - (1 << level) };
                 (self.skin(self.slot(h, l), paces.sigma[p][i] as i128 - paces.sigma[p][k] as i128) as i128, MOVE_BITS)
             }
@@ -1664,7 +1759,7 @@ impl Field {
         let sites = region.classes.len();
         let width = d.alphabet + 1;
         let one = 1i128 << PACE_BITS;
-        let stretch = Self::silent_stretch(region);
+        let stretch = if self.per_blank_clock { sites } else { Self::silent_stretch(region) };
         let mut out = Paces { row: vec![None; d.heads], ..Default::default() };
         for h in (0..d.heads).filter(|&h| d.carries_moment(h)) {
             let p = out.kappa.len();
@@ -1673,13 +1768,18 @@ impl Field {
             let (mut kappa, mut tau, mut sigma) = (Vec::with_capacity(sites), Vec::with_capacity(sites), Vec::with_capacity(sites));
             let (mut clock, mut variation) = (0i128, 0i128);
             for t in 0..sites {
-                // [§16.47] Past the last arrival every silent place runs at the first one's rate (one passage).
-                let at = if t > stretch { stretch } else { t };
-                let rate = match blank.get(at).and_then(Option::as_ref).filter(|_| Self::silent(region, at)) {
+                // [§16.47] Past the last arrival every silent place runs at the first one's rate (one passage); under
+                // `bare_stretch` at its own place, which reads no face there, so at the bare rate.
+                let at = if t > stretch && !self.bare_stretch { stretch } else { t };
+                // [the unified-theory reading of November 6, 05:45] A depth ring takes no blank face: a silent site runs at
+                // rate zero every tick (exact on what arrived; an expected increment `ζ^E[r]` would read a blank at full
+                // coherence and turn a closer's frame by its own guess).
+                let rate = match blank.get(at).and_then(Option::as_ref).filter(|_| Self::silent(region, at) && !d.is_depth(h)) {
                     Some(face) => release(face.iter().map(|&(c, w)| w as i128 * self.theta[base + c as usize] as i128).sum(), STATE_BITS),
                     None => self.strand_row(region, base, 1, at)[0] as i128,
                 };
-                let k = one + rate;
+                // A depth ring's rate is its located increment alone (base zero, [`FieldDeclaration::depth`]).
+                let k = if d.is_depth(h) { rate } else { one + rate };
                 if t > 0 {
                     clock += k;
                     variation += k.abs();
@@ -1688,7 +1788,8 @@ impl Field {
                 tau.push(fit64(clock)?);
                 sigma.push(fit64(variation)?);
             }
-            out.plain.push(kappa.iter().all(|&k| k as i128 == one));
+            let rest = if d.is_depth(h) { 0 } else { one };
+            out.plain.push(kappa.iter().all(|&k| k as i128 == rest));
             out.kappa.push(kappa);
             out.tau.push(tau);
             out.sigma.push(sigma);
@@ -1782,7 +1883,7 @@ impl Field {
         let (n, ring) = &self.rings[slot];
         // A turned head's frame is its own clock's (§16, Law 1): the byte place where its pace is plain.
         match paces.row.get(h).copied().flatten() {
-            Some(p) if !paces.plain[p] => self.turn(slot, paces.tau[p][t] as i128),
+            Some(p) if !paces.plain[p] || d.is_depth(h) => self.turn(slot, paces.tau[p][t] as i128),
             _ => ring[t % n],
         }
     }
@@ -1823,7 +1924,7 @@ impl Field {
         }
         if let Some(port) = region.port {
             // [§16.47] A port at its boundary may hold resolved places (a state of the writer's path); it compares its open ones.
-            if port.start > region.classes.len() || (!port.boundary && region.unresolved[port.start..].iter().any(|&u| !u)) || (port.start..region.classes.len()).any(|t| region.locked.get(t).copied().unwrap_or(false)) {
+            if port.start > region.classes.len() || (!port.boundary && !port.letters && region.unresolved[port.start..].iter().any(|&u| !u)) || (port.start..region.classes.len()).any(|t| region.locked.get(t).copied().unwrap_or(false)) {
                 return refuse("a port whose places are not every open, unlocked site to the region's end");
             }
             if port.void >= self.declaration.alphabet || port.target.iter().any(|&c| c == port.void || c >= self.declaration.alphabet) {
@@ -1952,6 +2053,25 @@ impl Field {
         release(div_nearest(2 * self.pi, self.rings[slot].0 as i128), FACE_BITS)
     }
 
+    /// [definition; agent-inferred, November 6] **A field's last `depth` turned ring sets become depth rings**
+    /// ([`FieldDeclaration::depth`]): their increments founded at zero (the rings plain, each a still head's reading with
+    /// frames that can turn), every other parameter kept; a turned head that becomes a ring gives up its clock and its moment.
+    pub fn with_depth(mut self, depth: usize) -> Result<Self> {
+        let declaration = FieldDeclaration { depth, ..self.declaration };
+        declaration.admit()?;
+        let width = declaration.alphabet + 1;
+        for (p, h) in (0..declaration.heads).filter(|&h| declaration.carries_moment(h)).enumerate() {
+            if declaration.is_depth(h) && !self.declaration.is_depth(h) {
+                let base = self.layout.pace + p * width;
+                for v in &mut self.theta[base..base + width] {
+                    *v = 0;
+                }
+            }
+        }
+        self.declaration = declaration;
+        Ok(self)
+    }
+
     /// Head `h`'s clock as the moment reads it ([`moment::Pace`]): none where its pace is plain (the byte place).
     fn pace_of<'a>(&self, paces: &'a Paces, h: usize, turn: &'a dyn Fn(i128) -> (i64, i64), skin: &'a dyn Fn(i128) -> i64) -> Option<moment::Pace<'a>> {
         let p = paces.row.get(h).copied().flatten()?;
@@ -1978,7 +2098,7 @@ impl Field {
         let l = &self.layout;
         let rows = |base: usize| -> Vec<Vec<i64>> { (0..sites).map(|t| self.strand_row(region, base, 2 * tm, t)).collect() };
         let (eb, ea) = (rows(l.moment_before), rows(l.moment_after));
-        for h in (0..d.heads).filter(|&h| d.carries_moment(h)) {
+        for h in (0..d.heads).filter(|&h| d.carries_moment(h) && !d.is_depth(h)) {
             for li in 0..n {
                 let idx = d.moment_index(h) + li;
                 let slot = self.slot(h, li);
@@ -2008,7 +2128,7 @@ impl Field {
         let rows = |base: usize| -> Vec<Vec<i64>> { (0..sites).map(|t| self.strand_row(region, base, 2 * tm, t)).collect() };
         let (eb, ea) = (rows(l.moment_before), rows(l.moment_after));
         let (mut db, mut da) = (vec![vec![0i128; 2 * tm]; sites], vec![vec![0i128; 2 * tm]; sites]);
-        for h in (0..d.heads).filter(|&h| d.carries_moment(h)) {
+        for h in (0..d.heads).filter(|&h| d.carries_moment(h) && !d.is_depth(h)) {
             for li in 0..n {
                 let idx = d.moment_index(h) + li;
                 let slot = self.slot(h, li);
@@ -2072,7 +2192,8 @@ impl Field {
 
     /// One tick of the constitution over the region's faces `x` (`[t][D]`), its temporaries
     /// written to `cell`.
-    fn tick(&self, x: &mut [i64], definite: &[bool], keyed: &[bool], paces: &Paces, moment: &[i64], reaches: &Reaches, cell: &mut TickCell) -> Result<()> {
+    #[allow(clippy::too_many_arguments)]
+    fn tick(&self, x: &mut [i64], definite: &[bool], keyed: &[bool], paces: &Paces, moment: &[i64], reaches: &Reaches, window: Option<&[bool]>, cell: &mut TickCell) -> Result<()> {
         let d = &self.declaration;
         let (dw, m, n, f, heads) = (d.width, d.complex(), d.modes, d.contacts, d.heads);
         let m2 = 2 * m;
@@ -2211,6 +2332,12 @@ impl Field {
                 octave(((lists.off[2 * c + 1] - lists.off[2 * c]) as usize).max(1)) as i128
             };
             for i in 0..sites {
+                // [E] A receiver outside every window of a cut room meets no source this tick: its current is zero.
+                if window.is_some_and(|w| !w[i]) {
+                    cell.rows.push(Vec::new());
+                    cell.crowds.push(Vec::new());
+                    continue;
+                }
                 // Every receiver probes with its own probe word (§16.19), against each source's key.
                 let wi = &cell.pq[(h * sites + i) * span..(h * sites + i + 1) * span];
                 // The lock's temperature for this receiver's kind (§15.10).
@@ -2341,6 +2468,7 @@ impl Field {
         // [§16.44] The blanks run at the bare rate in the first tick, and each later tick at the faces the tick before
         // gave them, its clocks and moments read again.
         let blanks = !paces.kappa.is_empty() && (0..sites).any(|t| Self::silent(region, t));
+        let window = region.window(d.ticks);
         let mut clock: Option<Box<TickClock>> = None;
         for k in 0..d.ticks {
             if let Some(s) = self.scale.as_deref().filter(|s| s.split == k) {
@@ -2349,10 +2477,16 @@ impl Field {
             let own = clock.take();
             let (tick_paces, tick_moment) = own.as_ref().map_or((&paces, &moment), |c| (&c.paces, &c.moment));
             let mut cell = TickCell::default();
-            self.tick(&mut x, &definite, &keyed, tick_paces, tick_moment, &reaches, &mut cell)?;
+            self.tick(&mut x, &definite, &keyed, tick_paces, tick_moment, &reaches, window.as_deref(), &mut cell)?;
             cell.clock = own;
             if blanks && k + 1 < d.ticks {
-                let reads = (0..sites).map(|t| Self::silent(region, t).then(|| self.face_of(&x[t * dw..(t + 1) * dw], &reaches)).transpose()).collect::<Result<Vec<_>>>()?;
+                // [the unified-theory reading of November 6, 08:16] Only the blanks a clock reads are read: every silent place up
+                // to the silent stretch's first, whose rate the stretch past it runs at (every silent place under the per-blank
+                // clock); a face past it is read by no clock and returns no covector (`clock_return` folds the stretch there).
+                let stretch = if self.per_blank_clock { sites } else { Self::silent_stretch(region) };
+                // Under `bare_stretch` no place past the last arrival reads a face, the stretch's first among them.
+                let read_to = if self.bare_stretch && !self.per_blank_clock { stretch } else { stretch + 1 };
+                let reads = (0..sites).map(|t| (Self::silent(region, t) && t < read_to).then(|| self.face_of(&x[t * dw..(t + 1) * dw], &reaches)).transpose()).collect::<Result<Vec<_>>>()?;
                 let blank: Vec<Option<Shares>> = reads.iter().map(|r| r.as_ref().map(|r| shares(&r.face))).collect();
                 let next = self.paces_with(region, &blank)?;
                 let moment = self.moments_of(region, &next)?;
@@ -2665,7 +2799,8 @@ impl Field {
         }
         if let Some(port) = region.port {
             code += port_code(&faces, &port)?;
-            count += region.unresolved[port.start..port.stop.unwrap_or(region.classes.len()).min(region.classes.len())].iter().filter(|&&u| u).count();
+            let stop = port.stop.unwrap_or(region.classes.len()).min(region.classes.len());
+            count += (port.start..stop).filter(|&t| region.unresolved[t] && port.heard.is_none_or(|h| h[t])).count();
         }
         Ok((code, count))
     }
@@ -2924,7 +3059,7 @@ impl Field {
             // A paced head's skins follow its turn (§16): each pair's and crowd's `D(σ_i − σ_j)` returns to the
             // two ends of its variation, `E = 2^40 ∂/∂D` from the value (`p Re(conj(δỹ_i) D ṽ_j)/D`) and the
             // lock (`δs (2 P 2^30 − 2 D Q)` over the lock's grains), then `δσ_i −= sgn b D E`, `δσ_j += sgn b D E`.
-            if let Some(p) = paces.row[h] {
+            if let Some(p) = paces.row[h].filter(|_| !d.is_depth(h)) {
                 let sigma = &paces.sigma[p];
                 for i in 0..sites {
                     for (k, src) in rows[i].iter().enumerate() {
@@ -3242,7 +3377,7 @@ impl Field {
         let m2 = 2 * m;
         let sites = region.classes.len();
         let paced = paces.kappa.len();
-        let moment_modes: Vec<bool> = (0..m).map(|c| d.carries_moment(c / n)).collect();
+        let moment_modes: Vec<bool> = (0..m).map(|c| d.carries_moment(c / n) && !d.is_depth(c / n)).collect();
         for (k, slot) in r.dm.iter_mut().enumerate() {
             if !moment_modes[(k % m2) % m] {
                 *slot = 0;
@@ -3256,9 +3391,10 @@ impl Field {
         let width = d.alphabet + 1;
         // Each blank's rates' covectors `(base, δκ)` a paced head, for its face's return.
         let mut rates: Vec<Vec<(usize, i128)>> = vec![Vec::new(); if faces.is_some() { sites } else { 0 }];
-        let stretch = Self::silent_stretch(region);
+        let stretch = if self.per_blank_clock { sites } else { Self::silent_stretch(region) };
         for p in 0..paced {
             let base = l.pace + p * width;
+            let head = (0..d.heads).find(|&h| paces.row[h] == Some(p)).ok_or(TowerError::Refused("a paced head with no row"))?;
             let (mut tail_tau, mut tail_sig) = (0i128, 0i128);
             let mut dks = vec![0i128; sites];
             for k in (1..sites).rev() {
@@ -3267,7 +3403,7 @@ impl Field {
                 dks[k] = tail_tau + paces.kappa[p][k].signum() as i128 * tail_sig;
             }
             // [§16.47] The silent stretch past the last arrival runs at its first place's rate, so their covectors return there.
-            if stretch < sites {
+            if stretch < sites && !self.bare_stretch {
                 let folded: i128 = dks[stretch + 1..].iter().sum();
                 dks[stretch] += folded;
                 for slot in &mut dks[stretch + 1..] {
@@ -3279,7 +3415,7 @@ impl Field {
                 if dk == 0 {
                     continue;
                 }
-                let face = if Self::silent(region, k) { blank.get(k).and_then(Option::as_ref) } else { Self::carried(region, k) };
+                let face = if Self::silent(region, k) { blank.get(k).and_then(Option::as_ref).filter(|_| !self.declaration.is_depth(head)) } else { Self::carried(region, k) };
                 match face {
                     None if Self::silent(region, k) => {}
                     None => g[base + self.row(region, k)] += dk << STATE_BITS,
@@ -3366,13 +3502,26 @@ impl Field {
     /// places, every other problem's empty. A region's faces are its own (each region is read alone), so the answers are the
     /// same bits; a finished problem no longer takes a region's read (the unified-theory reading of November 5, 17:41: about
     /// 60% of a 32-answer write's region reads were of finished problems).
-    fn read_active(&self, classes: &[Vec<usize>], open: &[Vec<bool>], active: &[usize], realization: &mut dyn FieldRealization) -> Result<Vec<Vec<Option<TowerFace>>>> {
-        let regions: Vec<Region> = active.iter().map(|&k| Region { classes: &classes[k], unresolved: &open[k], faces: &[], locked: &[], echo: &[], domain: None, port: None }).collect();
+    ///
+    /// [definition; agent-inferred, November 5, the unified-theory reading of 22:38] With `near_tail`, **the writer's region ends
+    /// `NEAR` places past its lowest resolved void**, as every training region and the withheld read do: the places past it are
+    /// the void, resolved, and no field trained under the near tail met them (a refine pass redrew each place beside up to
+    /// 2,000 of them). Its faces past the cut are none; every open place stands before it.
+    fn read_active(&self, starts: &[usize], classes: &[Vec<usize>], open: &[Vec<bool>], active: &[usize], void: usize, near_tail: bool, realization: &mut dyn FieldRealization) -> Result<Vec<Vec<Option<TowerFace>>>> {
+        let cut = |k: usize| -> usize {
+            let len = classes[k].len();
+            match (near_tail, (starts[k]..len).find(|&t| !open[k][t] && classes[k][t] == void)) {
+                (true, Some(end)) => (end + NEAR).min(len),
+                _ => len,
+            }
+        };
+        let regions: Vec<Region> = active.iter().map(|&k| Region { classes: &classes[k][..cut(k)], unresolved: &open[k][..cut(k)], faces: &[], locked: &[], echo: &[], domain: None, port: None }).collect();
         let mut faces: Vec<Vec<Option<TowerFace>>> = vec![Vec::new(); classes.len()];
         if regions.is_empty() {
             return Ok(faces);
         }
-        for (read, &k) in realization.read_faces(self, &regions)?.into_iter().zip(active) {
+        for (mut read, &k) in realization.read_faces(self, &regions)?.into_iter().zip(active) {
+            read.resize(classes[k].len(), None);
             faces[k] = read;
         }
         Ok(faces)
@@ -3384,7 +3533,7 @@ impl Field {
     /// faces. A reading only: nothing in the release reads it.
     #[allow(clippy::too_many_arguments)]
     pub fn sample_observed(&self, problems: &[(&[usize], usize)], sweeps: usize, refine: usize, void: usize, seed: u64, realization: &mut dyn FieldRealization, sweep: &mut dyn FnMut(usize, usize) -> bool, observe: &mut dyn FnMut(ReleaseRead)) -> Result<Vec<Vec<usize>>> {
-        self.release(problems, sweeps, refine, void, seed, 0, realization, sweep, observe)
+        self.release(problems, sweeps, refine, void, seed, 0, true, false, None, false, realization, sweep, observe)
     }
 
     /// [definition; agent-inferred, November 5, the unified-theory reading of 17:41, its bound read without a maximum]
@@ -3398,12 +3547,18 @@ impl Field {
     /// write of 32 answers about 3,000 full reads; a place whose face is nearly settled adds almost nothing to the joint's
     /// loss when it is drawn beside the run's first.
     #[allow(clippy::too_many_arguments)]
-    pub fn sample_runs(&self, problems: &[(&[usize], usize)], sweeps: usize, refine: usize, void: usize, seed: u64, run_bound: i128, realization: &mut dyn FieldRealization, sweep: &mut dyn FnMut(usize, usize) -> bool, observe: &mut dyn FnMut(ReleaseRead)) -> Result<Vec<Vec<usize>>> {
-        self.release(problems, sweeps, refine, void, seed, run_bound, realization, sweep, observe)
+    /// `near_tail` is the writer's region law ([`Field::read_active`]); `false` declares the whole room for comparison.
+    /// `place_order` draws each octave's places in place order rather than its keyed order. [agent-inferred, November 6, the
+    /// unified-theory reading of 03:08] `lengths`, where given, fixes each answer's length: its places past it stand resolved as
+    /// the void from the first read (so the region is the question, the answer and its near tail), and every answer place,
+    /// in the sweeps and in refine, draws from its face over the letters; the end never moves. `one_end` draws each answer's
+    /// length from the release's first read when none is given ([`Field::release`]).
+    pub fn sample_runs(&self, problems: &[(&[usize], usize)], sweeps: usize, refine: usize, void: usize, seed: u64, run_bound: i128, near_tail: bool, place_order: bool, lengths: Option<&[usize]>, one_end: bool, realization: &mut dyn FieldRealization, sweep: &mut dyn FnMut(usize, usize) -> bool, observe: &mut dyn FnMut(ReleaseRead)) -> Result<Vec<Vec<usize>>> {
+        self.release(problems, sweeps, refine, void, seed, run_bound, near_tail, place_order, lengths, one_end, realization, sweep, observe)
     }
 
     #[allow(clippy::too_many_arguments)]
-    fn release(&self, problems: &[(&[usize], usize)], sweeps: usize, refine: usize, void: usize, seed: u64, run_bound: i128, realization: &mut dyn FieldRealization, sweep: &mut dyn FnMut(usize, usize) -> bool, observe: &mut dyn FnMut(ReleaseRead)) -> Result<Vec<Vec<usize>>> {
+    fn release(&self, problems: &[(&[usize], usize)], sweeps: usize, refine: usize, void: usize, seed: u64, run_bound: i128, near_tail: bool, place_order: bool, lengths: Option<&[usize]>, one_end: bool, realization: &mut dyn FieldRealization, sweep: &mut dyn FnMut(usize, usize) -> bool, observe: &mut dyn FnMut(ReleaseRead)) -> Result<Vec<Vec<usize>>> {
         if sweeps == 0 || void >= self.declaration.alphabet || problems.iter().any(|&(_, n)| n == 0) {
             return refuse("a sample needs a sweep, an answer place and a void class in the alphabet");
         }
@@ -3413,8 +3568,51 @@ impl Field {
             z = (z ^ (z >> 27)).wrapping_mul(0x94D0_49BB_1331_11EB);
             z ^ (z >> 31)
         };
+        let starts: Vec<usize> = problems.iter().map(|&(q, _)| q.len()).collect();
         let mut classes: Vec<Vec<usize>> = problems.iter().map(|&(q, n)| q.iter().copied().chain(std::iter::repeat_n(void, n)).collect()).collect();
         let mut open: Vec<Vec<bool>> = problems.iter().map(|&(q, n)| (0..q.len() + n).map(|t| t >= q.len()).collect()).collect();
+        // [definition; agent-inferred, November 6, the unified-theory reading of 04:03] With `one_end`, **one end, one draw**: at
+        // the release's first read (every answer place open, training's fully masked state) a place `d` is the void exactly when
+        // the answer is shorter than `d`, so its void mass is the field's `P(L < d | q)`, the length's distribution; the end is
+        // one uniform `u` against that profile, the answer's length the places before the first whose void mass passes `u` (an
+        // exact integer comparison), and the sweeps then write given it. One `u`, not one draw a place: independent draws
+        // multiply survivals, and the earliest void drawn is not the profile's draw.
+        //
+        // [definition; agent-inferred, November 6, the unified-theory reading of 07:21] **The draw is conditioned on the room**:
+        // the answer ends within it, so `P(L ≤ t | L ≤ R) = M(t)/M(R)`, `M` the running maximum of the void mass and `R` the
+        // room's last place; the end is the first place whose void mass passes `u M(R)`, read as `m_∅(t) T_R 2^32 > u m_R T_t`
+        // on 256-bit products (`m_R/T_R` the profile's largest void mass). Why: unconditioned, every `u` above the void mass at the
+        // room's last place landed there, so the opening's shortfall from one was drawn as length (code91: about 22 places of
+        // letter mass past 1,200 on held and training alike, where the length law holds under one).
+        let drawn_lengths: Option<Vec<usize>> = if one_end && lengths.is_none() {
+            let active: Vec<usize> = (0..problems.len()).collect();
+            let faces = self.read_active(&starts, &classes, &open, &active, void, near_tail, realization)?;
+            Some(
+                problems
+                    .iter()
+                    .enumerate()
+                    .map(|(k, &(q, n))| {
+                        let u = mix(((k as u64) << 40) ^ 0x0E4D) as u32 as u128;
+                        let room: Vec<Option<&TowerFace>> = (0..n).map(|j| faces[k][q.len() + j].as_ref()).collect();
+                        one_end_length(&room, void, u)
+                    })
+                    .collect(),
+            )
+        } else {
+            None
+        };
+        let lengths = lengths.or(drawn_lengths.as_deref());
+        let given = lengths.is_some();
+        if let Some(ls) = lengths {
+            if ls.len() != problems.len() {
+                return refuse("a given length for each problem");
+            }
+            for (k, &(q, _)) in problems.iter().enumerate() {
+                for slot in open[k].iter_mut().skip(q.len() + ls[k]) {
+                    *slot = false;
+                }
+            }
+        }
         // [definition; agent-inferred, November 5, §16.47] **The answer is released by octaves of its distance from the
         // question** (the unified-theory reading of 15:04): octave `j` holds the places at distance `[2^j, 2^(j+1))` past
         // the question (the first place at distance one), and its places open to the draws only once every place of the
@@ -3427,8 +3625,15 @@ impl Field {
             .iter()
             .enumerate()
             .map(|(k, &(q, n))| {
+                // [definition; agent-inferred, November 6, the unified-theory reading of 00:14] With `place_order`, **the octave
+                // law at every byte**: the order decides what each draw reads, and by octaves the end reads at least half its
+                // answer as written; measured from the writer's own front the same reason orders every place, so each octave
+                // is drawn in place order (the keyed order within an octave was the one grain where the law was dropped, a
+                // byte drawn with every neighbour blank coding about 5 bits against 1.4 beside them). Runs stay.
                 let mut order: Vec<usize> = (q.len()..q.len() + n).collect();
-                order.sort_by_key(|&t| (octave_of(t + 1 - q.len()), mix(((k as u64) << 32) ^ t as u64 ^ (1 << 62)), t));
+                if !place_order {
+                    order.sort_by_key(|&t| (octave_of(t + 1 - q.len()), mix(((k as u64) << 32) ^ t as u64 ^ (1 << 62)), t));
+                }
                 order
             })
             .collect();
@@ -3441,7 +3646,7 @@ impl Field {
         for done in 0..sweeps {
             let last = done + 1 == sweeps || !sweep(done, sweeps);
             let active: Vec<usize> = (0..problems.len()).filter(|&k| open[k].iter().any(|&u| u)).collect();
-            let faces = self.read_active(&classes, &open, &active, realization)?;
+            let faces = self.read_active(&starts, &classes, &open, &active, void, near_tail, realization)?;
             let (mut bound, mut passed) = (0i128, 0usize);
             let mut runs: Vec<Vec<usize>> = Vec::with_capacity(problems.len());
             for (k, &(q, n)) in problems.iter().enumerate() {
@@ -3482,18 +3687,47 @@ impl Field {
                 runs.push(picked);
             }
             observe(ReleaseRead { read: done, pass: 0, classes: &classes, open: &open, faces: Some(&faces), bound, passed });
+            // [definition; agent-inferred, November 5, the unified-theory reading of 22:38] **A void never unwrites a letter**: in
+            // the sweeps as in refine, a place before the last written letter draws from its face restricted to the letters
+            // (the void's mass removed, an exact integer draw against the rest), and only a place past every letter draws
+            // from its whole face, so the void is drawn only where it closes nothing written. A read's places are drawn from
+            // the farthest in, each beside the letters drawn past it this read. Exact faces are unchanged (the truth's void
+            // has no mass before its last letter). A face before the last letter with no letter mass draws its whole face.
+            // Why: within an octave the keyed order puts most draws before a written letter (93% in octave 6, 96% in octave
+            // 7), the field's void there is a residue of about 1% that costs training 0.014 bits a place, and each such
+            // draw ended the answer there: a flat hazard deaf to held (b1's write, one in 110 places at or under held and
+            // past it alike, 23 of its 28 short writes cut by a void that unwrote letters).
             let mut draws: Vec<(usize, usize, usize)> = Vec::new();
             for (k, picked) in runs.iter().enumerate() {
-                for &t in picked {
+                let q = problems[k].0.len();
+                let mut last_letter = (q..classes[k].len()).rev().find(|&t| !open[k][t] && classes[k][t] != void);
+                let mut far_first = picked.clone();
+                far_first.sort_unstable_by(|a, b| b.cmp(a));
+                for &t in &far_first {
                     let face = faces[k][t].as_ref().ok_or(TowerError::Refused("a sample's open place without a face"))?;
                     drawn_entropy[k][t] = Some(entropy(face));
-                    let u = (((mix(((k as u64) << 40) ^ ((t as u64) << 8) ^ 0xD) as u128) << 64) | mix(((k as u64) << 40) ^ ((t as u64) << 8) ^ 0xE) as u128) % face.total;
-                    let mut acc = 0u128;
-                    let c = face.masses.iter().position(|&m| {
-                        acc += m;
-                        acc > u
-                    });
-                    draws.push((k, t, c.unwrap_or(face.masses.len() - 1)));
+                    let u = ((mix(((k as u64) << 40) ^ ((t as u64) << 8) ^ 0xD) as u128) << 64) | mix(((k as u64) << 40) ^ ((t as u64) << 8) ^ 0xE) as u128;
+                    let letters = face.total - face.masses[void];
+                    let c = if (given || last_letter.is_some_and(|l| t < l)) && letters > 0 {
+                        let u = u % letters;
+                        let mut acc = 0u128;
+                        (0..face.masses.len()).filter(|&c| c != void).find(|&c| {
+                            acc += face.masses[c];
+                            acc > u
+                        })
+                    } else {
+                        let u = u % face.total;
+                        let mut acc = 0u128;
+                        face.masses.iter().position(|&m| {
+                            acc += m;
+                            acc > u
+                        })
+                    };
+                    let c = c.unwrap_or(face.masses.len() - 1);
+                    if c != void && last_letter.is_none_or(|l| t > l) {
+                        last_letter = Some(t);
+                    }
+                    draws.push((k, t, c));
                 }
             }
             for (k, t, c) in draws {
@@ -3537,11 +3771,18 @@ impl Field {
         // boundary drawn as a letter moved out one place, the new boundary waiting for the next pass, so the passes cut
         // deep and grew by one (segment 2's −4.8 places came all in its third pass, from its 14 short answers). A place
         // before the last letter whose face holds no letter mass keeps the letter it had. No place is chosen by its
-        // certainty.
+        // certainty. [agent-inferred, November 6, the unified-theory reading of 00:13] The passes stop where the answer's
+        // redrawn code per byte reaches real text's on this field (the walk helps only while the answer is more surprising to
+        // the field than the truth is); the withheld code reads it from above, and on code86's state the passes cross it
+        // between passes 3 and 4, so `refine = 3` stands for that stop. A stop on the faces' own level (held letters at least
+        // as likely as draws) was built and retired: these faces are no joint's conditionals, so the walk descends
+        // without pausing (to spaces and short strings over tens of passes, §16.47's settle93).
         let mut read = swept;
         let total = swept + refine * problems.iter().map(|&(_, n)| n).max().unwrap_or(0);
         let boundary = |classes: &[usize], open: &[bool], q: usize| (q..classes.len()).find(|&t| classes[t] == void && !open[t]).unwrap_or(classes.len());
-        for pass in 1..=refine as u64 {
+        let mut pass = 0u64;
+        while (pass as usize) < refine {
+            pass += 1;
             let orders: Vec<Vec<usize>> = problems
                 .iter()
                 .enumerate()
@@ -3560,7 +3801,7 @@ impl Field {
                     let end = boundary(&classes[k], &open[k], q.len());
                     while let Some(&t) = orders[k].get(cursors[k]) {
                         cursors[k] += 1;
-                        if t <= end {
+                        if t < end || (!given && t == end) {
                             places[k] = Some((vec![t], end));
                             break;
                         }
@@ -3568,7 +3809,7 @@ impl Field {
                     if let (true, Some((run, _))) = (run_bound > 0, places[k].as_mut()) {
                         let mut held = 0i128;
                         while let Some(&t) = orders[k].get(cursors[k]) {
-                            if t > end {
+                            if t > end || (given && t == end) {
                                 cursors[k] += 1;
                                 continue;
                             }
@@ -3601,7 +3842,7 @@ impl Field {
                     }
                 }
                 let active: Vec<usize> = (0..problems.len()).filter(|&k| places[k].is_some()).collect();
-                let faces = self.read_active(&classes, &open, &active, realization)?;
+                let faces = self.read_active(&starts, &classes, &open, &active, void, near_tail, realization)?;
                 // What the read certifies is its own faces' sum past each run's first place.
                 let (mut bound, mut passed) = (0i128, 0usize);
                 for (k, place) in places.iter().enumerate() {
@@ -3621,7 +3862,7 @@ impl Field {
                     let face = faces[k][t].as_ref().ok_or(TowerError::Refused("a sample's open place without a face"))?;
                     drawn_entropy[k][t] = Some(entropy(face));
                     let u = ((mix(((k as u64) << 40) ^ ((t as u64) << 8) ^ (pass << 56) ^ 0xD) as u128) << 64) | mix(((k as u64) << 40) ^ ((t as u64) << 8) ^ (pass << 56) ^ 0xE) as u128;
-                    let whole = t + 1 >= end;
+                    let whole = !given && t + 1 >= end;
                     let letters = face.total - face.masses[void];
                     classes[k][t] = if whole {
                         let u = u % face.total;
@@ -3653,7 +3894,7 @@ impl Field {
                 }
             }
         }
-        observe(ReleaseRead { read, pass: refine + 1, classes: &classes, open: &open, faces: None, bound: 0, passed: 0 });
+        observe(ReleaseRead { read, pass: pass as usize + 1, classes: &classes, open: &open, faces: None, bound: 0, passed: 0 });
         Ok(problems.iter().enumerate().map(|(k, &(q, _))| classes[k][q.len()..].to_vec()).collect())
     }
 
@@ -4229,6 +4470,12 @@ pub struct FieldReceipt {
     /// where the step before was short of what this section, which it was not fit on, would take; positive where it went
     /// past. `None` at a learner's first section, after a section that deposited nothing, or past its carrier.
     pub transfer: Option<i64>,
+    /// [measurement; agent-inferred, November 6, the unified-theory reading of 08:54] **The external price**, `p_ext =
+    /// Σ_i g_i Δθᵉ_i` on the codes' grain, with `Δθᵉ` the step the moments would deposit before this section's covector
+    /// moves them (`deposit_step(m_(s−1), v_(s−1))`): a step this section never shaped, priced on it as `transfer` prices the
+    /// step before on the next section, with no self-alignment. `transfer − external` of the section before reads the
+    /// step's curvature `ΔθᵀHΔθ` from the pass alone, with no reread. `None` past its carrier.
+    pub external: Option<i64>,
 }
 
 /// A deposited step held for the next regions' read: the proposed step on each family's grain and
@@ -4268,17 +4515,17 @@ fn port_code(faces: &[Option<TowerFace>], port: &Port) -> Result<i64> {
     Ok(port_reading(&port_faces(faces, port)?, port)?.1)
 }
 
-/// A port's places' faces, each `(masses, total)`: every place must carry one, but a port at its boundary may hold
-/// resolved places, which carry none and are read as `(∅, 0)` (§16.47, [`boundary_reading`]).
+/// A port's places' faces, each `(masses, total)`: every place must carry one, but a port at its boundary or on its letters
+/// may hold resolved places, which carry none and are read as `(∅, 0)` (§16.47, [`boundary_reading`], [`letters_reading`]).
 fn port_faces<'f>(faces: &'f [Option<TowerFace>], port: &Port) -> Result<Vec<(&'f [u128], u128)>> {
     let stop = port.stop.unwrap_or(faces.len()).min(faces.len());
     faces[port.start..]
         .iter()
         .enumerate()
         .map(|(k, f)| match f {
-            _ if port.start + k >= stop => Ok((&[][..], 0)),
+            _ if port.start + k >= stop || port.heard.is_some_and(|h| !h[port.start + k]) => Ok((&[][..], 0)),
             Some(f) => Ok((f.masses.as_slice(), f.total)),
-            None if port.boundary => Ok((&[][..], 0)),
+            None if port.boundary || port.letters => Ok((&[][..], 0)),
             None => refuse("a port's place without a face"),
         })
         .collect()
@@ -4609,9 +4856,19 @@ impl FieldLearner {
             return refuse("a section with no unresolved site");
         }
         // The sites the weighed code is a code of (§16.23): each region's domain where it reads an open site.
-        let sites = spans.iter().filter(|s| s.0 > 0).map(|s| s.1 as usize).sum::<usize>() + regions.iter().filter_map(|r| r.port.map(|p| p.stop.unwrap_or(r.classes.len()).min(r.classes.len()) - p.start)).sum::<usize>();
+        let sites = spans.iter().filter(|s| s.0 > 0).map(|s| s.1 as usize).sum::<usize>()
+            + regions.iter().filter_map(|r| r.port.map(|p| (p.start..p.stop.unwrap_or(r.classes.len()).min(r.classes.len())).filter(|&t| r.unresolved[t] && p.heard.is_none_or(|h| h[t])).count())).sum::<usize>();
         let raw = g.clone();
         let transfer = self.last.take().and_then(|s| predicted_change(&self.field, &raw, &s.step, s.halvings));
+        // [the unified-theory reading of November 6, 08:54] The step the moments would deposit before this section moves them,
+        // priced on this section: the external price, a step this section never shaped.
+        let mut external_step = vec![0i128; g.len()];
+        for &(start, len, grain) in &self.field.families_all() {
+            for i in start..start + len {
+                external_step[i] = deposit_step(self.first[i], self.second[i], grain, self.rate_bits);
+            }
+        }
+        let external = predicted_change(&self.field, &raw, &external_step, 0);
         for &(start, len, grain) in &self.field.families_all() {
             for v in &mut g[start..start + len] {
                 *v = on_step_grain(grain, *v);
@@ -4643,7 +4900,7 @@ impl FieldLearner {
         // alike, and the moments carry every covector.
         let (candidate, moved) = stepped(&self.field, &step, 0)?;
         if !moved {
-            return Ok(FieldReceipt { sites, code_before, code_after: None, halvings: 0, deposited: false, next, predicted, change: None, transfer });
+            return Ok(FieldReceipt { sites, code_before, code_after: None, halvings: 0, deposited: false, next, predicted, change: None, transfer, external });
         }
         self.field = candidate;
         if self.read_held {
@@ -4651,7 +4908,7 @@ impl FieldLearner {
         } else {
             self.last = Some(HeldStep { step, halvings: 0 });
         }
-        Ok(FieldReceipt { sites, code_before, code_after: None, halvings: 0, deposited: true, next, predicted, change: None, transfer })
+        Ok(FieldReceipt { sites, code_before, code_after: None, halvings: 0, deposited: true, next, predicted, change: None, transfer, external })
     }
 
     /// [definition; agent-inferred, November 3, the tower record] **The learner grown in scale**: its field grown in scale
@@ -4732,6 +4989,17 @@ pub use scale::Scale;
 mod tests;
 
 /// [definition; §16.47] The octave of a distance `d ≥ 1` from the question: `⌊log₂ d⌋`, so octave `j` holds `[2^j, 2^(j+1))`.
+/// [definition; agent-inferred, November 6, the unified-theory reading of 07:21] **One end, one draw, conditioned on the room**
+/// ([`Field::sample_runs`] with `one_end`): `room`'s faces at the release's first read, place by place, and `u` on `2^(−32)`; the
+/// length is the places before the first whose void mass passes `u M(R)`, `M(R)` the largest void mass over the room (the
+/// running maximum's last value), read exactly as `m_∅(t) T_R 2^32 > u m_R T_t` on 256-bit products; the room's extent where
+/// none passes (none where no place carries void mass).
+pub fn one_end_length(room: &[Option<&TowerFace>], void: usize, u: u128) -> usize {
+    let wide = crate::compression::landmark::context::wide_mul;
+    let Some(top) = room.iter().flatten().copied().reduce(|a, b| if wide(b.masses[void], a.total) > wide(a.masses[void], b.total) { b } else { a }) else { return room.len() };
+    room.iter().position(|f| f.is_some_and(|f| wide(f.masses[void] << 32, top.total) > wide(u * top.masses[void], f.total))).unwrap_or(room.len())
+}
+
 pub fn octave_of(d: usize) -> u32 {
     usize::BITS - 1 - d.leading_zeros()
 }

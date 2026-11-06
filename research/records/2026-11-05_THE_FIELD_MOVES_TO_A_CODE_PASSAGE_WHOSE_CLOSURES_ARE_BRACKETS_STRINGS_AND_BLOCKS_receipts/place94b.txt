@@ -1,0 +1,16 @@
+# place94b lock taken 00:56:13 on 955b3cf3862bf76987abb9fdc3000e5cba280138390c72f4a2782ab1a2636689
+FIELD_LENGTH problems=32 sweeps=2062 refine=0 stopped=- run_bits=0 reads=225 certified_bits=0.000 passed=0 ms=18190
+MEASURE lap=place_one_refine0 rc=0 wall_s=18.6 peak_rss_kib=356056
+ENDINGS answers 32: 30 end at or under held over 1799 places (one in 60), 2 past it over 112 (one in 56), 0 reach the room
+HAZARD past/under 1.07; written/held 0.218; correlation +0.192
+written: 32 answers, 15 open with ```python; a 'y' outside it in 19, its first at places 0 to 5 in 9 (median first 14), 'y' past it 0.040; commonest byte's share at places 10 to 255 (79 places) 0.187; top byte '`' 0.122, 'y' 0.037, entropy 4.82 bits over 1911 bytes
+written: 32 answers: a fence opened 31, closed 21; parses as Python 7; code lines mean 1.8; identifiers 85, in the question 0.09, in the held answer 0.06
+family	span	written opened	written closed share	held opened	held closed share	ratio
+bracket	near	11	0.545	178	0.393	1.39
+bracket	far	11	0.091	178	0.607	0.15
+string	near	5	0.400	60	0.400	1.00
+string	far	5	0.000	60	0.583	0.00
+block	near	0	0.000	75	0.000	nan
+block	far	0	0.000	75	0.947	0.00
+RULE: the lowest closure against held is string far at 0.00 (under 0.5)
+PLACE94B exit 00:56:31

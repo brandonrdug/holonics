@@ -1,0 +1,19 @@
+# masks98 lock taken 02:56:19 on 955b3cf3862bf76987abb9fdc3000e5cba280138390c72f4a2782ab1a2636689, lengths c900476db2ae8cc79f29a5d3fea9becd27221b965e82b34180bbc1390e03701e
+FIELD_MASKS problems=32 reads=1709 ms=132012
+MEASURE lap=code86 rc=0 wall_s=145.5 peak_rss_kib=661992
+ENDINGS answers 32: 22 end at or under held over 4710 places (one in 214), 10 past it over 8560 (one in 856), 0 reach the room
+HAZARD past/under 0.25; written/held 1.515; correlation +0.045
+written: 32 answers, 9 open with ```python; a 'y' outside it in 19, its first at places 0 to 5 in 11 (median first 4), 'y' past it 0.012; commonest byte's share at places 10 to 255 (246 places) 0.221; top byte ' ' 0.176, 'y' 0.012, entropy 4.93 bits over 13270 bytes
+held   : 32 answers, 28 open with ```python; a 'y' outside it in 15, its first at places 0 to 5 in 0 (median first 38), 'y' past it 0.016; commonest byte's share at places 10 to 255 (246 places) 0.197; top byte ' ' 0.174, 'y' 0.009, entropy 4.96 bits over 8760 bytes
+bytes written/held 1.515, correlation +0.045, 10 longer, 22 shorter
+written: 32 answers: a fence opened 31, closed 14; parses as Python 0; code lines mean 11.4; identifiers 1371, in the question 0.04, in the held answer 0.03
+held:    32 answers: a fence opened 29, closed 29; parses as Python 26; code lines mean 10.9; identifiers 1117, in the question 0.26, in the held answer 1.00
+family	span	written opened	written closed share	held opened	held closed share	ratio
+bracket	near	118	0.203	178	0.393	0.52
+bracket	far	118	0.246	178	0.607	0.41
+string	near	86	0.093	60	0.400	0.23
+string	far	86	0.198	60	0.583	0.34
+block	near	27	0.074	75	0.000	nan
+block	far	27	0.444	75	0.947	0.47
+RULE: the lowest closure against held is string near at 0.23 (under 0.5)
+MASKS98 exit 02:58:45

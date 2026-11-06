@@ -1,0 +1,133 @@
+# long109 from 6289a28152b56a55655baf6f6aad14a680c82f5fb88f8420b9bb3e9a4d36f164 binary 83ba5fa3b11f6b4973ba109e322336710f9e656ca6bb8f8a3ecf8a8634cdddbe waits for the card lock 08:45:46
+# lock taken 08:45:46
+# blank-read parity, binary 3008cc2d87f55a8ec4930bf84911161c106eedfdfd99e6a1c89ba783fd4e210a 08:45:46
+FIELD_PARITY section=1 withheld=false regions=48 length=2304 sites=26724 faces_unequal=0 covector_unequal=0 learner_equal=true near_equal=true clocks_equal=true rows_equal=true shares_equal=true currents_equal=true host_ms=29066 card_ms=551
+FIELD_PARITY section=2 withheld=true regions=32 length=555 sites=0 faces_unequal=0 covector_unequal=0 learner_equal=true near_equal=true clocks_equal=true rows_equal=true shares_equal=true currents_equal=true host_ms=3198 card_ms=19
+FIELD_PARITY_DONE sections=2 reads_unequal=0 faces_unequal=0 covector_unequal=0 learners_unequal=0 releases=1 releases_unequal=0 card_release_ms=12 host_ms=32265 card_ms=570 elapsed_ms=290335
+MEASURE lap=parity_blank rc=0 wall_s=303.6 peak_rss_kib=4225880
+# blank reads cut: binary 3008cc2d87f55a8ec4930bf84911161c106eedfdfd99e6a1c89ba783fd4e210a
+# cost read from 6289a28152b56a55655baf6f6aad14a680c82f5fb88f8420b9bb3e9a4d36f164 08:50:50
+dev sections 198 mean_ms 703 max_ms 2335
+MEASURE lap=dev rc=0 wall_s=152.4 peak_rss_kib=835544
+# lap bound 1295828 ms; a segment 2891656 ms, outer 2951 s
+# seg1 from 6289a28152b56a55655baf6f6aad14a680c82f5fb88f8420b9bb3e9a4d36f164 started 08:53:22
+FIELD_LAP lap=0 read=15 before=1.511 after=- deposited=1535/1535 halvings=0 next_halved=0 next_refused=0 ms=1006440
+FIELD_LAP lap=1 read=16 before=1.494 after=- deposited=1535/1535 halvings=0 next_halved=0 next_refused=0 ms=982496
+FIELD_LAPS_HELD lap=2 reason=time left=874318 bound=1295828 ms=2017338
+MEASURE lap=seg1 rc=0 wall_s=2017.9 peak_rss_kib=803104
+-1:5.887970:1.305669:1.513138 0:6.054607:1.337454:1.550272 1:5.300698:1.307989:1.526717 
+-1:1.239 0:1.263 1:1.243 
+sections mean ms 646 over 3070
+== order FIELD_ORDER problems=32 places=8792 place_bits_a_place=2.889 place_length_bits_a_place=0.018 place_content_bits_a_place=2.871 keyed_bits_a_place=3.944 masks_bits_a_place=2.744 masks_length_bits_a_place=0.037 lengths_unread=2 ms=39432 MEASURE lap=seg1_order rc=0 wall_s=39.9 peak_rss_kib=567984 
+MARGINAL read 30 of 32: the state's length code 10.94 bits an answer, the training marginal's on the same answers 9.37, on all 9.37; paired difference +1.57 with deviation 0.44
+== HELD128
+distance	problems	void_mass	length_law
+-128	104	0.161	0.405
+-32	124	0.193	0.476
++0	128	0.208	0.512
++32	128	0.232	0.562
++128	128	0.310	0.695
++512	128	0.668	0.924
+places 900 to 1199	38400	0.779	0.971
+B past the end: mean 540 places, median 542, range 83 to 1244; the length law 132
+void mass before the end: mean 53 places
+the opening's expected length less held: mean +487.8 places, median +517.7
+== TRAIN
+distance	problems	void_mass	length_law
+-128	109	0.050	0.200
+-32	128	0.102	0.362
++0	128	0.130	0.429
++32	128	0.161	0.494
++128	128	0.273	0.654
++512	128	0.738	0.911
+places 900 to 1199	38400	0.851	0.971
+B past the end: mean 476 places, median 449, range 109 to 948; the length law 152
+void mass before the end: mean 16 places
+the opening's expected length less held: mean +461.6 places, median +445.3
+OVERRUN seg1_HELD128 answers=128 room=2062 mean_past_end=540.6
+  0-127	mean 95.1	share 0.176	median 109.6	length_law 50.3
+  128-511	mean 193.5	share 0.358	median 203.1	length_law 62.0
+  512-1199	mean 155.4	share 0.287	median 146.1	length_law 19.2
+  1200-end	mean 96.6	share 0.179	median 91.8	length_law 0.8
+OVERRUN seg1_TRAIN answers=128 room=2062 mean_past_end=477.1
+  0-127	mean 102.8	share 0.216	median 107.2	length_law 57.8
+  128-511	mean 180.2	share 0.378	median 172.8	length_law 71.0
+  512-1199	mean 110.9	share 0.232	median 100.6	length_law 22.5
+  1200-end	mean 83.2	share 0.174	median 71.5	length_law 0.9
+CONDITIONED seg1_HELD128 answers=128 mean_past_end=507.5 plain=540.6
+  0-127	conditioned 93.5	plain 95.1
+  128-511	conditioned 187.8	plain 193.5
+  512-1199	conditioned 141.9	plain 155.4
+  1200-end	conditioned 84.3	plain 96.6
+CONDITIONED seg1_TRAIN answers=128 mean_past_end=454.0 plain=477.1
+  0-127	conditioned 102.4	plain 102.8
+  128-511	conditioned 177.2	plain 180.2
+  512-1199	conditioned 102.1	plain 110.9
+  1200-end	conditioned 72.3	plain 83.2
+== write place (the one-end writer, read)
+ENDINGS answers 32: 6 end at or under held over 7950 places (one in 1325), 26 past it over 19150 (one in 737), 0 reach the room
+HAZARD past/under 1.80; written/held 3.094; correlation -0.037
+FIELD_LENGTH problems=32 sweeps=2062 refine=0 stopped=- run_bits=1 reads=1903 certified_bits=1058.425 passed=0 ms=247490
+MEASURE lap=seg1_place rc=0 wall_s=247.9 peak_rss_kib=372564
+written: 32 answers, 15 open with ```python; a 'y' outside it in 31, its first at places 0 to 5 in 10 (median first 34), 'y' past it 0.017; commonest byte's share at places 10 to 255 (246 places) 0.205; top byte ' ' 0.219, 'y' 0.016, entropy 4.96 bits over 27100 bytes
+written: 32 answers: a fence opened 25, closed 7; parses as Python 0; code lines mean 36.1; identifiers 3774, in the question 0.07, in the held answer 0.05
+family	span	written opened	written closed share	held opened	held closed share	ratio
+bracket	near	160	0.144	178	0.393	0.37
+bracket	far	160	0.256	178	0.607	0.42
+string	near	182	0.170	60	0.400	0.43
+string	far	182	0.176	60	0.583	0.30
+block	near	82	0.000	75	0.000	nan
+block	far	82	0.573	75	0.947	0.61
+RULE: the lowest closure against held is string far at 0.30 (under 0.5)
+== write keyed given held's lengths (judged)
+FIELD_LENGTH problems=32 sweeps=2062 refine=0 stopped=- run_bits=1 reads=660 certified_bits=358.839 passed=0 ms=18799
+MEASURE lap=seg1_keyed rc=0 wall_s=19.1 peak_rss_kib=241780
+written: 32 answers, 13 open with ```python; a 'y' outside it in 30, its first at places 0 to 5 in 15 (median first 13), 'y' past it 0.020; commonest byte's share at places 10 to 255 (246 places) 0.217; top byte ' ' 0.195, 'y' 0.019, entropy 4.99 bits over 8760 bytes
+written: 32 answers: a fence opened 25, closed 6; parses as Python 1; code lines mean 14.5; identifiers 1433, in the question 0.09, in the held answer 0.07
+family	span	written opened	written closed share	held opened	held closed share	ratio
+bracket	near	50	0.200	178	0.393	0.51
+bracket	far	50	0.220	178	0.607	0.36
+string	near	53	0.226	60	0.400	0.57
+string	far	53	0.075	60	0.583	0.13
+block	near	26	0.038	75	0.000	nan
+block	far	26	0.385	75	0.947	0.41
+RULE: the lowest closure against held is string far at 0.13 (under 0.5)
+SEGMENT seg1 done 09:32:15
+# seg1's keyed order code 3.944, fences closed given held's lengths 6
+# the line search law: binary 6e5e489d8509d5f391fe177a9eaf9355ef2c0bce13847b692d3fb1afb04b74b0 09:32:15
+dev_profile sections 189 mean_ms 734
+FIELD_CARD reads=46 read_ms=12022 returns=194 return_ms=137145 pairs=12300683842 batches=849 peak_store=8227443502 landmarks=0 landmark_ms=0 elapsed_ms=151839
+FIELD_PROFILE entry=field_pace_skin_back launches=6312 ms=16284 us_a_launch=2579
+FIELD_PROFILE entry=field_contact_columns launches=12624 ms=15331 us_a_launch=1214
+FIELD_PROFILE entry=field_contact_l5 launches=3388 ms=12048 us_a_launch=3556
+FIELD_PROFILE entry=field_contact_rows launches=12624 ms=11520 us_a_launch=912
+FIELD_PROFILE entry=field_moment_skinned_all launches=3156 ms=9642 us_a_launch=3055
+FIELD_PROFILE entry=field_exposure launches=3396 ms=5288 us_a_launch=1557
+FIELD_PROFILE entry=field_moment_paced_all launches=3396 ms=4163 us_a_launch=1226
+FIELD_PROFILE entry=field_moment_pace_back_all launches=3156 ms=3976 us_a_launch=1259
+FIELD_PROFILE entry=field_moment_return_paced_all launches=3156 ms=3307 us_a_launch=1047
+FIELD_PROFILE entry=field_pace_kappa_back launches=3156 ms=3115 us_a_launch=987
+FIELD_PROFILE entry=field_paces launches=3396 ms=3084 us_a_launch=908
+FIELD_PROFILE entry=field_spread launches=12624 ms=2624 us_a_launch=207
+FIELD_PROFILE entry=field_outer_x32 launches=41028 ms=1879 us_a_launch=45
+FIELD_PROFILE entry=field_affine_tiled_x32 launches=23532 ms=1661 us_a_launch=70
+FIELD_PROFILE entry=field_outer_bound_x32 launches=16569 ms=1604 us_a_launch=96
+FIELD_PROFILE entry=field_transposed launches=26037 ms=1575 us_a_launch=60
+FIELD_PROFILE entry=field_moment_prefix_paced_all launches=16260 ms=1228 us_a_launch=75
+FIELD_PROFILE entry=field_pframes launches=3396 ms=1004 us_a_launch=295
+FIELD_PROFILE entry=field_sums launches=3396 ms=998 us_a_launch=294
+FIELD_PROFILE entry=field_unit_probe launches=3396 ms=997 us_a_launch=293
+FIELD_PROFILE entry=field_unit launches=3396 ms=987 us_a_launch=290
+FIELD_PROFILE entry=field_chart launches=10188 ms=951 us_a_launch=93
+FIELD_PROFILE entry=field_affine_tiled_x64 launches=7641 ms=844 us_a_launch=110
+FIELD_PROFILE entry=field_classes launches=3396 ms=759 us_a_launch=223
+FIELD_PROFILE entry=field_outer_bound_x64 launches=7101 ms=706 us_a_launch=99
+FIELD_PROFILE entry=field_pace_c_back launches=3156 ms=656 us_a_launch=207
+FIELD_PROFILE entry=field_moment_strand_return_all launches=3156 ms=542 us_a_launch=171
+FIELD_PROFILE entry=field_held_rows launches=80 ms=519 us_a_launch=6494
+FIELD_PROFILE entry=field_outer_x64 launches=7101 ms=487 us_a_launch=68
+FIELD_PROFILE entry=field_unit_back launches=3156 ms=462 us_a_launch=146
+# profile read done 09:34:47
+# laws switched: # Sourced at seg2's start: the lap's line search joins (theory, 08:54: mu* = -sum p_ext / sum(t - p_ext), the curvature from the # pass alone, the rate moved before STATE is written; host learner arithmetic only, the card unchanged), then one profiled cost read (FIELD_PROFILE: each kernel's launches and time, the copies and the # allocations) on seg1's state, to read where a section's card time goes under the cut and the blank reads. cp $O/field_pass.price $BIN echo "# the line search law: binary $(sha $BIN) $(date -u +%H:%M:%S)" rm -rf $O/dev_profile FIELD_PROFILE=1 FIELD_GROWTH_HELD=1 FIELD_STEP_TRANSFER=1 $M dev_profile timeout 240 $BIN train complete-language train-field $T 32 4 8 2 32 4 16 60 8 300000 300000 150000 $O/dev_profile $2 $(sha $2) > $O/dev_profile.log 2>&1 grep -E '^FIELD_SECTION' $O/dev_profile.log | sed -E 's/.* ms=([0-9]+)$/\1/' | awk '{n++; s+=$1} END {if (n) printf "dev_profile sections %d mean_ms %.0f\n", n, s/n}' grep -E '^FIELD_CARD ' $O/dev_profile.log | cut -c1-260 grep -E '^FIELD_PROFILE' $O/dev_profile.log | awk '{for (i=1;i<=NF;i++) if ($i ~ /^ms=/) {split($i,a,"="); print a[2], $0}}' | sort -rn | head -30 | cut -d' ' -f2- | cut -c1-200 echo "# profile read done $(date -u +%H:%M:%S)" 
+# seg2 from 8ce78630a6c1c2a2968442da20894c25eff099ed6b4ab2a3ecdda0ea7937f2f4 started 09:34:47
+# long109 paused at seg2's start for the binary check (lap 4 read again on the current binary and on code91's own) 09:34:50

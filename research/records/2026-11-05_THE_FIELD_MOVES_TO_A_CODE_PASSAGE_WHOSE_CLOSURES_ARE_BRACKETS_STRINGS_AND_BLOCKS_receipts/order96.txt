@@ -1,0 +1,4 @@
+# order96 lock taken 01:46:02
+== code86 FIELD_ORDER problems=32 places=8792 place_bits_a_place=3.100 keyed_bits_a_place=3.316 masks_bits_a_place=2.794 masks_length_bits_a_place=0.020 lengths_unread=17 ms=38403 MEASURE lap=code86 rc=0 wall_s=38.9 peak_rss_kib=521516 
+== code88 FIELD_ORDER problems=32 places=8792 place_bits_a_place=3.187 keyed_bits_a_place=4.451 masks_bits_a_place=2.983 masks_length_bits_a_place=0.034 lengths_unread=4 ms=38237 MEASURE lap=code88 rc=0 wall_s=38.8 peak_rss_kib=518208 
+ORDER96 exit 01:47:20

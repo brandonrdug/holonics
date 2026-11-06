@@ -143,6 +143,12 @@ struct Words {
     classes: u64,
     unresolved: u64,
     definite: u64,
+    // [E] Each site's row computed where its region's room is cut to its windows (`Region::window`); none where no region of
+    // the batch is cut.
+    computed: u64,
+    // Each site whose blank face a clock reads: silent, and at or before its region's silent stretch's first place (every
+    // silent site under the per-blank clock). The blank clock's face kernels read these sites alone.
+    blank_read: u64,
     mix_off: u64,
     mix_class: u64,
     mix_share: u64,
@@ -216,6 +222,13 @@ struct Words {
     blank_rate: u64,
     blank_masses: u64,
     blank_totals: u64,
+    // [measurement] Every silent place runs its own rate past the last arrival too (the host's `Field::per_blank_clock`).
+    per_blank: u64,
+    // The depth rings' count (`FieldDeclaration::depth`).
+    depth: u64,
+    // [the unified-theory reading of November 6, 10:31] Past the last arrival a silent place runs at the bare rate (the host's
+    // `Field::bare_stretch`).
+    bare_stretch: u64,
 }
 
 /// The moment kernels' words (`MomentWords` in `kernels/field_moment.cuh`, field for field): the batch's
@@ -987,6 +1000,9 @@ impl<'c> CardField<'c> {
             pace_at: l.pace as u64,
             pi_lo: field.half_turn() as u64,
             pi_hi: (field.half_turn() >> 64) as u64,
+            per_blank: u64::from(field.per_blank_clock),
+            depth: d.depth as u64,
+            bare_stretch: u64::from(field.bare_stretch),
             ..Words::default()
         };
         // The exponential's resident face, read once by its own loop on the card (a tower's packets read the fine field's).
@@ -1163,7 +1179,7 @@ impl<'c> CardField<'c> {
 
     /// A batch's site and region tables uploaded in one transfer, its status word and its faces' buffer, and the words
     /// that read them (the host's tables kept beside them for the reverse and the readings).
-    fn stage(&self, regions: &[Region], a: usize, dw: usize, words: &mut Words) -> Result<Staged<'c>> {
+    fn stage(&self, regions: &[Region], a: usize, dw: usize, ticks: usize, words: &mut Words) -> Result<Staged<'c>> {
         // The batch's sites, region by region, and the carried mixtures as one list a site.
         let mut site_region = Vec::new();
         let mut site_pos = Vec::new();
@@ -1178,6 +1194,21 @@ impl<'c> CardField<'c> {
         let (mut mix_off, mut mix_class, mut mix_share) = (vec![0u32], Vec::new(), Vec::new());
         let mut pairs = 0usize;
         let any_echo = regions.iter().any(|r| r.echo.iter().any(Option::is_some));
+        // [E] The cut rooms' windows, each site's row computed or not (every site of an uncut region).
+        let windows: Vec<Option<Vec<bool>>> = regions.iter().map(|r| r.window(ticks)).collect();
+        let (per_blank, bare) = (words.per_blank != 0, words.bare_stretch != 0);
+        let blank_read: Vec<u8> = regions
+            .iter()
+            .flat_map(|r| {
+                let silent = |t: usize| r.unresolved[t] && r.faces.get(t).and_then(Option::as_ref).is_none();
+                let s = r.classes.len();
+                let stretch = if per_blank { s } else { (0..s).rev().find(|&t| !silent(t)).map_or(0, |last| last + 1) };
+                // Under the bare stretch no place past the last arrival reads a face, its first among them.
+                let read_to = if bare && !per_blank { stretch } else { stretch + 1 };
+                (0..s).map(move |t| u8::from(silent(t) && t < read_to))
+            })
+            .collect();
+        let computed: Vec<u8> = if windows.iter().any(Option::is_some) { regions.iter().zip(&windows).flat_map(|(r, w)| (0..r.classes.len()).map(move |t| u8::from(w.as_ref().is_none_or(|w| w[t])))).collect() } else { Vec::new() };
         // Each region's definite sites and its open ones, by place (§15.9: an open receiver hears every definite
         // site, and a definite source is heard by every open one).
         let (mut dlist, mut dstart, mut olist, mut ostart) = (Vec::<u32>::new(), Vec::<u32>::new(), Vec::<u32>::new(), Vec::<u32>::new());
@@ -1201,7 +1232,9 @@ impl<'c> CardField<'c> {
                 definite.push(u8::from(is_definite));
                 if is_definite {
                     dlist.push(t as u32);
-                } else {
+                } else if windows[r].as_ref().is_none_or(|w| w[t]) {
+                    // [E] A definite source is heard by every open receiver its region computes (the host's `Field::tick`
+                    // skips the rest), so the receivers its return walks are those alone.
                     olist.push(t as u32);
                 }
                 match region.echo.get(t).and_then(Option::as_ref) {
@@ -1250,6 +1283,8 @@ impl<'c> CardField<'c> {
         let classes_at = pack.put(&classes);
         let unresolved_at = pack.put(&unresolved);
         let definite_at = pack.put(&definite);
+        let computed_at = (!computed.is_empty()).then(|| pack.put(&computed));
+        let blank_read_at = pack.put(&blank_read);
         let echo_has_at = pack.put(&echo_has);
         let echo_b_at = pack.put(&echo_b);
         let echo_logits_at = pack.put(&echo_logits);
@@ -1271,6 +1306,8 @@ impl<'c> CardField<'c> {
         words.classes = base + classes_at;
         words.unresolved = base + unresolved_at;
         words.definite = base + definite_at;
+        words.computed = computed_at.map_or(0, |at| base + at);
+        words.blank_read = base + blank_read_at;
         words.echo_has = base + echo_has_at;
         words.echo_b = base + echo_b_at;
         words.echo_logits = base + echo_logits_at;
@@ -1396,7 +1433,7 @@ impl<'c> CardField<'c> {
             owned.push((vec![0usize; packets], unres, faces));
         }
         let pregions: Vec<Region> = owned.iter().map(|(c, u, f)| Region { classes: c, unresolved: u, faces: if f.iter().any(Option::is_some) { f } else { &[] }, locked: &[], echo: &[], domain: None, port: None }).collect();
-        let st = self.stage(&pregions, cd.alphabet, cd.width, &mut tr.cwords)?;
+        let st = self.stage(&pregions, cd.alphabet, cd.width, cd.ticks, &mut tr.cwords)?;
         let (sites, m2, n) = (st.sites, 2 * cd.complex(), cd.modes);
         let ticks: Vec<Tick> = (0..if kept { cd.ticks } else { 1 }).map(|_| self.tick(sites, st.pairs, regions, coarse, stored, returning)).collect::<Result<_>>()?;
         let trips = self.timed(Kind::Alloc, || self.take_zeroed::<i128>(sites.max(1))).map_err(device)?;
@@ -1507,7 +1544,7 @@ impl<'c> CardField<'c> {
         let (dw, m, n, f, a, heads) = (d.width, d.complex(), d.modes, d.contacts, d.alphabet, d.heads);
         let m2 = 2 * m;
         let span = 2 * n;
-        let st = self.stage(regions, a, dw, words)?;
+        let st = self.stage(regions, a, dw, d.ticks, words)?;
         let (sites, pairs) = (st.sites, st.pairs);
         let (site_region, site_pos, region_off, classes, unresolved, definite) = (&st.site_region, &st.site_pos, &st.region_off, &st.classes, &st.unresolved, &st.definite);
         let (echo_has, mix_off, mix_class, mix_share, site_weight) = (&st.echo_has, &st.mix_off, &st.mix_class, &st.mix_share, &st.site_weight);
@@ -1745,14 +1782,16 @@ impl<'c> CardField<'c> {
                     // [§16.47] A place past the port's stop is read and not compared: it carries no face to the reading, and its
                     // covector is zero, written as a zero row (an unported open place would take its own place's).
                     let stop = first + port.stop.unwrap_or(region_off[r + 1] as usize - first).min(region_off[r + 1] as usize - first);
-                    let at: Vec<(&[u128], u128)> = wide.iter().zip(first + port.start..).map(|(m, t)| if unresolved[t] != 0 && t < stop { (m.as_slice(), ts[t] as u128) } else { (&[][..], 0) }).collect();
+                    // [§16.47] A place the port does not hear is read and not compared, as one past the stop.
+                    let heard = |t: usize| t < stop && port.heard.is_none_or(|h| h[t - first]);
+                    let at: Vec<(&[u128], u128)> = wide.iter().zip(first + port.start..).map(|(m, t)| if unresolved[t] != 0 && heard(t) { (m.as_slice(), ts[t] as u128) } else { (&[][..], 0) }).collect();
                     let (rows, _) = holonics::hnn::tower::field::port_reading(&at, &port)?;
                     for (k, row) in rows.into_iter().enumerate() {
                         let t = first + port.start + k;
                         if !row.is_empty() {
                             ported.0.push(t as u32);
                             ported.1.extend(row);
-                        } else if t >= stop && unresolved[t] != 0 {
+                        } else if !heard(t) && unresolved[t] != 0 {
                             ported.0.push(t as u32);
                             ported.1.extend(std::iter::repeat_n(0i64, a));
                         }
@@ -1889,7 +1928,8 @@ impl<'c> CardField<'c> {
                     ok.device_ptr() + (u * regions) as u64,
                     words.status,
                 ]);
-                cmap.push((h * d.modes + li) as u32);
+                // A depth ring's mode carries no moment (its map's top bit, read by the moment kernels).
+                cmap.push((h * d.modes + li) as u32 | if d.is_depth(h) { 1 << 31 } else { 0 });
             }
         }
         let card = self.card;
@@ -1906,6 +1946,9 @@ impl<'c> CardField<'c> {
         let (dw, a) = (d.width, d.alphabet);
         let l = field.layout();
         let dz = self.timed(Kind::Alloc, || self.take::<i128>((sites * a).max(1))).map_err(device)?;
+        // The faces were read at the sites a clock reads alone (`blank_clock`), and return there alone.
+        let unresolved = words.unresolved;
+        words.unresolved = words.blank_read;
         let (mut dkp, mut dzp) = (dkappa.device_ptr(), dz.device_ptr());
         self.launch("field_blank_dz", Self::cells((sites * a) as u64), THREADS, &mut [arg(words), arg(&mut dkp), arg(&mut dzp)])?;
         let tiles = (sites as u64).div_ceil(64);
@@ -1927,7 +1970,9 @@ impl<'c> CardField<'c> {
         let back = self.timed(Kind::Alloc, || self.take_zeroed::<i64>((sites * dw).max(1))).map_err(device)?;
         self.ratio_adjoint(words, clock.fread.device_ptr(), clock.fscale.device_ptr(), dr.device_ptr(), 0, back.device_ptr(), true)?;
         let (mut bp, mut dxp) = (back.device_ptr(), dx.device_ptr());
-        self.launch("field_blank_dx", Self::cells((sites * dw) as u64), THREADS, &mut [arg(words), arg(&mut bp), arg(&mut dxp)])
+        let done = self.launch("field_blank_dx", Self::cells((sites * dw) as u64), THREADS, &mut [arg(words), arg(&mut bp), arg(&mut dxp)]);
+        words.unresolved = unresolved;
+        done
     }
 
     /// [definition; §16.44] **The clocks a tick's blanks run at** (the host's `pass`): the face each unresolved site's state
@@ -1937,8 +1982,13 @@ impl<'c> CardField<'c> {
     fn blank_clock(&self, field: &Field, words: &mut Words, regions: usize, sites: usize) -> Result<CardClock<'c>> {
         let d = field.declaration;
         let (dw, a, n, m2, paced) = (d.width, d.alphabet, d.modes, 2 * d.complex(), d.paced_heads());
-        let fread = self.timed(Kind::Alloc, || self.take::<i32>(sites * dw)).map_err(device)?;
+        let fread = self.timed(Kind::Alloc, || self.take_zeroed::<i32>(sites * dw)).map_err(device)?;
         let fscale = self.timed(Kind::Alloc, || self.take_zeroed::<i128>(sites * d.lanes)).map_err(device)?;
+        // [the unified-theory reading of November 6, 08:16] The faces are read only at the sites a clock reads (`blank_read`): the
+        // face kernels read the open sites, so they are given those sites as the open ones, and the region's own are restored
+        // before the clocks.
+        let unresolved = words.unresolved;
+        words.unresolved = words.blank_read;
         self.chart(words, words.x, &fread, &fscale, true)?;
         let lift = self.timed(Kind::Alloc, || self.take_zeroed::<i64>(sites * dw)).map_err(device)?;
         let lift_bias = field.layout().lift_bias as u64;
@@ -1973,6 +2023,7 @@ impl<'c> CardField<'c> {
         (words.blank_masses, words.blank_totals) = (clock.masses.device_ptr(), clock.totals.device_ptr());
         let mut rp = clock.rates.device_ptr();
         self.launch("field_blank_rates", Self::cells((paced * sites) as u64), THREADS, &mut [arg(words), arg(&mut rp)])?;
+        words.unresolved = unresolved;
         set_clock(words, Some(&clock), [0; 6]);
         self.launch("field_paces", Self::cells((paced * regions) as u64), THREADS, &mut [arg(words)])?;
         self.launch("field_pframes", Self::cells((paced * sites * n) as u64), THREADS, &mut [arg(words)])?;
@@ -2103,7 +2154,7 @@ impl<'c> CardField<'c> {
             card.zero_octets(&cw, 0, 16 * rows * span).map_err(device)?;
             let (mut hh, mut dyhp, mut dsp, mut dqp) = (h as u32, dyh.device_ptr(), ds.device_ptr(), dq.device_ptr());
             self.launch("field_contact_rows", Self::rows_grid(sites as u64, REV_ROWS), (REV_ROWS * 32) as u32, &mut [arg(words), arg(&mut hh), arg(&mut dyhp), arg(&mut dsp), arg(&mut dqp)])?;
-            if d.carries_moment(h) {
+            if d.carries_moment(h) && !d.is_depth(h) {
                 // The head's skins return to its variation (§16), from the pairs' and crowds' covectors just formed.
                 let (mut hh, mut dyhp, mut dsp) = (h as u32, dyh.device_ptr(), ds.device_ptr());
                 self.launch("field_pace_skin_back", Self::rows_grid(sites as u64, CONTACT_ROWS), (CONTACT_ROWS * 32) as u32, &mut [arg(words), arg(&mut hh), arg(&mut dyhp), arg(&mut dsp)])?;
@@ -2635,7 +2686,7 @@ mod tests {
     use super::*;
 
     fn declaration(width: usize, heads: usize, contacts: usize) -> FieldDeclaration {
-        FieldDeclaration { alphabet: 122, width, heads, modes: 8, still: 2, contacts, ticks: 2, frames: 4, reach: 2221, lanes: 1 }
+        FieldDeclaration { alphabet: 122, width, heads, modes: 8, still: 2, contacts, ticks: 2, frames: 4, reach: 2221, lanes: 1, depth: 0 }
     }
 
     /// Every region is in one batch, in order, each batch within the budget; a region past the budget

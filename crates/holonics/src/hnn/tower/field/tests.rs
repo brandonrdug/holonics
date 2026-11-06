@@ -23,7 +23,7 @@ fn keys(n: usize) -> Vec<u8> {
 }
 
 fn tiny_declaration(still: usize) -> FieldDeclaration {
-    FieldDeclaration { alphabet: 5, width: 8, heads: 2, modes: 3, still, contacts: 4, ticks: 2, frames: 2, reach: 16, lanes: 1 }
+    FieldDeclaration { alphabet: 5, width: 8, heads: 2, modes: 3, still, contacts: 4, ticks: 2, frames: 2, reach: 16, lanes: 1, depth: 0 }
 }
 
 /// A tiny field with every family drawn from the keys (the founding holds the returns and the
@@ -220,10 +220,18 @@ fn covector_matches_the_codes_difference() {
     // resolved (a state of the writer's path).
     const PORTED: [bool; 7] = [false, true, false, false, true, true, true];
     const PATH: [bool; 7] = [false, true, false, false, true, false, true];
-    let port = Port { start: 4, void: 0, target: &[2, 3], boundary: false, stop: None };
+    let port = Port { start: 4, void: 0, target: &[2, 3], boundary: false, stop: None, heard: None, window: false, letters: false };
     let bounded = Port { boundary: true, ..port };
-    for (still, r) in [0usize, 1, 2].into_iter().flat_map(|still| [(still, region()), (still, Region { classes: &CLASSES, unresolved: &OPEN, faces: &carried, locked: &[], echo: &[], domain: None, port: None }), (still, Region { classes: &CLASSES, unresolved: &PORTED, faces: &[], locked: &[], echo: &[], domain: None, port: Some(port) }), (still, Region { classes: &CLASSES, unresolved: &PORTED, faces: &[], locked: &[], echo: &[], domain: None, port: Some(bounded) }), (still, Region { classes: &CLASSES, unresolved: &PATH, faces: &[], locked: &[], echo: &[], domain: None, port: Some(bounded) })]) {
-        let field = shaped(still);
+    // [the unified-theory reading of November 6, 11:49] And a port on its letters off the void, with its middle place resolved
+    // (the writer's own state given its end).
+    let lettered = Port { letters: true, target: &[2, 3, 1], ..port };
+    // [the depth rings, November 6] And with a depth ring among the turned sets (its rate the located increment alone, no
+    // skin, no moment).
+    // [the unified-theory reading of November 6, 10:31] And under the bare stretch (`Field::bare_stretch`: past the last arrival
+    // a silent place runs at the bare rate and returns nothing), declared beside the one-rate stretch.
+    for (still, depth, bare, r) in [(0usize, 0usize, false), (1, 0, false), (2, 0, false), (0, 1, false), (1, 1, false), (0, 0, true), (1, 0, true)].into_iter().flat_map(|(still, depth, bare)| [(still, region()), (still, Region { classes: &CLASSES, unresolved: &OPEN, faces: &carried, locked: &[], echo: &[], domain: None, port: None }), (still, Region { classes: &CLASSES, unresolved: &PORTED, faces: &[], locked: &[], echo: &[], domain: None, port: Some(port) }), (still, Region { classes: &CLASSES, unresolved: &PORTED, faces: &[], locked: &[], echo: &[], domain: None, port: Some(bounded) }), (still, Region { classes: &CLASSES, unresolved: &PATH, faces: &[], locked: &[], echo: &[], domain: None, port: Some(bounded) }), (still, Region { classes: &CLASSES, unresolved: &PATH, faces: &[], locked: &[], echo: &[], domain: None, port: Some(lettered) })].map(|(still, r)| (still, depth, bare, r))) {
+        let mut field = shaped_with(FieldDeclaration { depth, ..tiny_declaration(still) });
+        field.bare_stretch = bare;
         let g = covector_of(&field, &r);
         let (m, n, dw) = (field.declaration.complex(), field.declaration.modes, field.declaration.width);
         let l = field.layout.clone();
@@ -801,7 +809,7 @@ fn no_site_meets_itself() {
 /// head's lock of an equal word (`n` at unit power, half its `2n` reals) reads `2⌈log₂ reach⌉` bits.
 #[test]
 fn the_contact_s_gain_covers_the_falloff() {
-    let at = |modes: usize, reach: usize| FieldDeclaration { alphabet: 5, width: 8, heads: 2, modes, still: 1, contacts: 4, ticks: 2, frames: 2, reach, lanes: 1 }.score_shift();
+    let at = |modes: usize, reach: usize| FieldDeclaration { alphabet: 5, width: 8, heads: 2, modes, still: 1, contacts: 4, ticks: 2, frames: 2, reach, lanes: 1, depth: 0 }.score_shift();
     assert_eq!(at(8, 2221), -2, "reading 8's declaration locks an equal word at 32 bits");
     assert_eq!(at(16, 16), 1);
     assert_eq!(at(3, 16), -2);
@@ -810,7 +818,7 @@ fn the_contact_s_gain_covers_the_falloff() {
         let gained = |b: i32| if b >= 0 { (modes as u128) >> b } else { (modes as u128) << -b };
         assert!(gained(beta) >= need && gained(beta + 1) < need, "the largest such shift: modes {modes} reach {reach}");
     }
-    let d = FieldDeclaration { alphabet: 5, width: 8, heads: 2, modes: 8, still: 1, contacts: 4, ticks: 2, frames: 2, reach: 2221, lanes: 1 };
+    let d = FieldDeclaration { alphabet: 5, width: 8, heads: 2, modes: 8, still: 1, contacts: 4, ticks: 2, frames: 2, reach: 2221, lanes: 1, depth: 0 };
     assert_eq!((d.class_trits(), d.classes()), (4, 81), "81 classes at reading 8's reach");
     assert_eq!(FieldDeclaration { modes: 3, ..d }.class_trits(), 3);
     assert_eq!((FieldDeclaration { reach: 81, ..d }.class_trits(), FieldDeclaration { reach: 82, ..d }.class_trits()), (2, 3));
@@ -865,7 +873,7 @@ fn the_skin_decay_is_an_e_fold_a_radian_and_vanishes_below_the_grain() {
 /// and a turned field. Probes across a sheet are left out and counted.
 #[test]
 fn the_covector_matches_the_code_across_the_far_support() {
-    let d = FieldDeclaration { alphabet: 5, width: 8, heads: 2, modes: 3, still: 1, contacts: 4, ticks: 2, frames: 2, reach: 32, lanes: 1 };
+    let d = FieldDeclaration { alphabet: 5, width: 8, heads: 2, modes: 3, still: 1, contacts: 4, ticks: 2, frames: 2, reach: 32, lanes: 1, depth: 0 };
     let classes: Vec<usize> = (0..26).map(|t| [1usize, 3, 2, 4, 0, 2, 1][t % 7]).collect();
     let open: Vec<bool> = (0..26).map(|t| t % 9 == 4 || t == 25).collect();
     let r = Region { classes: &classes, unresolved: &open, faces: &[], locked: &[], echo: &[], domain: None, port: None };
@@ -953,7 +961,7 @@ fn the_covector_matches_the_code_across_the_far_support() {
 /// of a row, the loudest far source 0.005.)
 #[test]
 fn a_listener_s_founding_row_keeps_its_near_field() {
-    let d = FieldDeclaration { alphabet: 44, width: 32, heads: 5, modes: 8, still: 2, contacts: 32, ticks: 2, frames: 5, reach: 484, lanes: 1 };
+    let d = FieldDeclaration { alphabet: 44, width: 32, heads: 5, modes: 8, still: 2, contacts: 32, ticks: 2, frames: 5, reach: 484, lanes: 1, depth: 0 };
     assert_eq!((d.score_shift(), d.listen_shift()), (-2, 2));
     let sites = 420;
     let classes = drawn_classes(7, sites, d.alphabet);
@@ -1003,9 +1011,10 @@ fn the_pace_covector_matches_the_code_at_two_steps() {
     // [§16.47] A silent stretch of six places past the last arrival, whose rates return to its first place.
     let stretch_open: Vec<bool> = (0..26).map(|t| t % 9 == 4 || t >= 20).collect();
     let (mut read, mut seams) = (0usize, 0usize);
-    for still in [0usize, 1] {
+    for (still, depth) in [(0usize, 0usize), (1, 0), (0, 1), (1, 1)] {
         let mut d = tiny_declaration(still);
         d.reach = 32;
+        d.depth = depth;
         let mut field = Field::found(d, &keys(1 << 14)).unwrap();
         let stream = keys(1 << 15);
         for (k, v) in field.theta.iter_mut().enumerate() {
@@ -1078,12 +1087,13 @@ fn a_blank_place_runs_at_its_expected_duration() {
     }
     assert!(moved, "no blank ran off the bare rate");
     // [§16.47] Past the last arrival the silent stretch is one passage: every place there runs at its first place's rate,
-    // so a place `D` past it reads `τ_f + D κ₁`, while a silent place between two arrivals keeps its own face's rate.
+    // so a place `D` past it reads `τ_f + D κ₁`, while a silent place between two arrivals keeps its own face's rate; [the
+    // unified-theory reading of November 6, 08:16] a face past the stretch's first place is read by no clock and is not read.
     let long: Vec<usize> = (0..14).map(|t| [1usize, 3, 2, 4, 0, 2, 1][t % 7]).collect();
     let open: Vec<bool> = (0..14).map(|t| t == 2 || t >= 7).collect();
     let stretch = Region { classes: &long, unresolved: &open, faces: &[], locked: &[], echo: &[], domain: None, port: None };
     assert_eq!(Field::silent_stretch(&stretch), 7);
-    let (mut between, mut past) = (false, 0usize);
+    let mut between = false;
     for cell in &field.pass(&stretch, true).unwrap().ticks[1..] {
         let clock = cell.clock.as_ref().expect("a later tick reads its own clocks");
         for (p, kappa) in clock.paces.kappa.iter().enumerate() {
@@ -1095,11 +1105,34 @@ fn a_blank_place_runs_at_its_expected_duration() {
             for t in 8..14 {
                 assert_eq!(kappa[t], kappa[7], "place {t} runs at the stretch's first rate");
                 assert_eq!(clock.paces.tau[p][t] as i128, clock.paces.tau[p][7] as i128 + (t - 7) as i128 * kappa[7] as i128, "the clock at {t} is c_f + D κ₁");
-                past += (own(t) != own(7)) as usize;
+                assert!(clock.blank[t].is_none() && clock.reads[t].is_none(), "place {t}'s face is read by no clock");
             }
         }
     }
-    assert!(between && past > 0, "the stretch's own faces never differed from its first place's: {between} {past}");
+    assert!(between, "a silent place between arrivals never ran off the bare rate");
+    // [the depth rings] A depth ring takes no blank face: every silent place runs at rate zero at every tick.
+    let ring = shaped_with(FieldDeclaration { depth: 1, ..tiny_declaration(1) });
+    for cell in &ring.pass(&stretch, true).unwrap().ticks[1..] {
+        let clock = cell.clock.as_ref().expect("a later tick reads its own clocks");
+        for kappa in &clock.paces.kappa {
+            for t in (0..14).filter(|&t| Field::silent(&stretch, t)) {
+                assert_eq!(kappa[t], 0, "a depth ring's silent place {t} turns");
+            }
+        }
+    }
+    // Declared against it, the per-blank clock runs every silent place at its own face's rate past the last arrival too.
+    let mut per_blank = field.clone();
+    per_blank.per_blank_clock = true;
+    for cell in &per_blank.pass(&stretch, true).unwrap().ticks[1..] {
+        let clock = cell.clock.as_ref().expect("a later tick reads its own clocks");
+        for (p, kappa) in clock.paces.kappa.iter().enumerate() {
+            let base = per_blank.layout.pace + p * width;
+            for t in 7..14 {
+                let own = (1i128 << PACE_BITS) + release(clock.blank[t].as_ref().unwrap().iter().map(|&(c, w)| w as i128 * per_blank.theta[base + c as usize] as i128).sum(), STATE_BITS);
+                assert_eq!(kappa[t] as i128, own, "the per-blank clock at place {t}");
+            }
+        }
+    }
     let written: Vec<bool> = r.unresolved.iter().map(|_| false).collect();
     let full = Region { unresolved: &written, ..r };
     assert!(field.pass(&full, true).unwrap().ticks.iter().all(|c| c.clock.is_none()), "a region with no blank reads one clock");
@@ -1213,7 +1246,7 @@ fn a_port_is_read_through_its_coupling() {
     let field = shaped(1);
     const PORTED: [bool; 7] = [false, true, false, false, true, true, true];
     let target = [2usize, 3];
-    let r = Region { classes: &CLASSES, unresolved: &PORTED, faces: &[], locked: &[], echo: &[], domain: None, port: Some(Port { start: 4, void: 0, target: &target, boundary: false, stop: None }) };
+    let r = Region { classes: &CLASSES, unresolved: &PORTED, faces: &[], locked: &[], echo: &[], domain: None, port: Some(Port { start: 4, void: 0, target: &target, boundary: false, stop: None, heard: None, window: false, letters: false }) };
     let faces = field.faces(&r).unwrap();
     let place = faces[1].as_ref().unwrap().code(CLASSES[1]);
     let at: Vec<(&[u128], u128)> = faces[4..].iter().map(|f| { let f = f.as_ref().unwrap(); (f.masses.as_slice(), f.total) }).collect();
@@ -1233,7 +1266,7 @@ fn a_port_at_its_boundary_codes_only_the_end() {
     let field = shaped(1);
     const PORTED: [bool; 7] = [false, true, false, false, true, true, true];
     let target = [2usize, 3];
-    let port = Port { start: 4, void: 0, target: &target, boundary: true, stop: None };
+    let port = Port { start: 4, void: 0, target: &target, boundary: true, stop: None, heard: None, window: false, letters: false };
     let r = Region { classes: &CLASSES, unresolved: &PORTED, faces: &[], locked: &[], echo: &[], domain: None, port: Some(port) };
     let faces = field.faces(&r).unwrap();
     let at: Vec<(&[u128], u128)> = faces[4..].iter().map(|f| { let f = f.as_ref().unwrap(); (f.masses.as_slice(), f.total) }).collect();
@@ -1414,6 +1447,85 @@ fn the_room_past_the_front_is_heard_only_through_the_near_field() {
     }
 }
 
+/// [definition; the unified-theory reading of November 6, 10:31] **Past the last arrival the bare rate**: under
+/// `Field::bare_stretch` every silent place past the region's last arrival runs at one on a turned head (its clock the place
+/// count), reads no face and takes no covector, while a silent place between arrivals keeps its own face's rate.
+#[test]
+fn past_the_last_arrival_a_place_runs_at_the_bare_rate() {
+    let mut field = shaped(0);
+    field.bare_stretch = true;
+    let long: Vec<usize> = (0..14).map(|t| [1usize, 3, 2, 4, 0, 2, 1][t % 7]).collect();
+    let open: Vec<bool> = (0..14).map(|t| t == 2 || t >= 7).collect();
+    let r = Region { classes: &long, unresolved: &open, faces: &[], locked: &[], echo: &[], domain: None, port: None };
+    assert_eq!(Field::silent_stretch(&r), 7);
+    let one = 1i64 << PACE_BITS;
+    let mut between = false;
+    for cell in &field.pass(&r, true).unwrap().ticks[1..] {
+        let clock = cell.clock.as_ref().expect("a later tick reads its own clocks");
+        assert!(clock.reads[2].is_some(), "a blank between arrivals reads its face");
+        for (p, kappa) in clock.paces.kappa.iter().enumerate() {
+            between |= kappa[2] != one;
+            for t in 7..14 {
+                assert_eq!(kappa[t], one, "place {t} runs at the bare rate");
+                assert!(clock.reads[t].is_none(), "place {t} reads no face");
+                assert_eq!(clock.paces.tau[p][t] - clock.paces.tau[p][6], (t - 6) as i64 * one, "the clock past the arrival counts places");
+            }
+        }
+    }
+    assert!(between, "a blank between arrivals never ran off the bare rate");
+}
+
+/// [definition; the unified-theory reading of November 6, 06:50, E] **A cut room reads and returns the whole room's bits**: the
+/// opening (the question resolved, every answer place silent) compared at its boundary at a few heard places, the front and
+/// far ones, with its room cut to their windows ([`Port::window`]), reads every tick's state at each heard place, each heard
+/// face, the port's code and the whole covector (the clock's among it) bit for bit as the whole room does, and meets fewer
+/// pairs.
+#[test]
+fn a_cut_room_reads_and_returns_the_whole_rooms_bits() {
+    for still in [0usize, 1, 2] {
+        for ticks in [2usize, 4] {
+            let field = shaped_with(FieldDeclaration { reach: 400, ticks, ..tiny_declaration(still) });
+            let dw = field.declaration.width;
+            let q = [1usize, 4, 0, 2, 3, 1];
+            let sites = field.declaration.reach;
+            let mut classes: Vec<usize> = q.to_vec();
+            classes.resize(sites, 0);
+            let open: Vec<bool> = (0..sites).map(|t| t >= q.len()).collect();
+            let target = [3usize, 1, 2, 4, 1, 3, 2, 1, 4, 2, 3];
+            // The front octave and one far place an octave, as the opening hears them.
+            let heard: Vec<bool> = (0..sites).map(|t| [0usize, 1, 2, 5, 13, 22, 47, 90, 200, 330].iter().any(|&d| t == q.len() + d)).collect();
+            let region = |window: bool| Region {
+                classes: &classes,
+                unresolved: &open,
+                faces: &[],
+                locked: &[],
+                echo: &[],
+                domain: None,
+                port: Some(Port { start: q.len(), void: 0, target: &target, boundary: true, stop: None, heard: Some(&heard), window, letters: false }),
+            };
+            let (whole, cut) = (region(false), region(true));
+            let kept = cut.window(ticks).unwrap();
+            assert!(kept.iter().filter(|&&k| !k).count() > sites / 3, "still {still} ticks {ticks}: the cut leaves a room out");
+            let (wr, cr) = (field.tick_reads(&whole).unwrap(), field.tick_reads(&cut).unwrap());
+            let (wf, cf) = (field.faces(&whole).unwrap(), field.faces(&cut).unwrap());
+            for t in (0..sites).filter(|&t| heard[t]) {
+                for (k, (a, b)) in wr.iter().zip(&cr).enumerate() {
+                    assert_eq!(a.read[t * dw..(t + 1) * dw], b.read[t * dw..(t + 1) * dw], "still {still} ticks {ticks}: place {t} at tick {k}");
+                    assert_eq!(a.pair_read[t * dw..(t + 1) * dw], b.pair_read[t * dw..(t + 1) * dw], "still {still} ticks {ticks}: place {t}'s pair read at tick {k}");
+                }
+                assert_eq!(wf[t], cf[t], "still {still} ticks {ticks}: place {t}'s face");
+            }
+            assert_eq!(field.code(&whole).unwrap(), field.code(&cut).unwrap(), "still {still} ticks {ticks}: the port's code");
+            let (_, gw) = field.read_and_return(&[whole]).unwrap();
+            let (_, gc) = field.read_and_return(&[cut]).unwrap();
+            let unequal = gw.iter().zip(&gc).filter(|(a, b)| a != b).count();
+            assert_eq!(unequal, 0, "still {still} ticks {ticks}: the covector");
+            assert!(gw.iter().any(|&v| v != 0), "still {still} ticks {ticks}: a covector to compare");
+            assert!(field.met_pairs(&cut).unwrap() < field.met_pairs(&whole).unwrap(), "still {still} ticks {ticks}: the cut meets fewer pairs");
+        }
+    }
+}
+
 /// [definition; §16.47] **A read releases a run**: with no bound the runs are the one place a read's writer, the same bits;
 /// with a bound of a bit the writer reads no more often, and its answers keep the closing law at every read, no letter at a
 /// later octave while an earlier one is open, and a boundary that moves at most one place a read in the refine passes.
@@ -1426,14 +1538,14 @@ fn a_read_releases_a_run() {
     let (mut fewer, mut reads_one, mut reads_run) = (false, 0usize, 0usize);
     for seed in 11..19 {
         let one = field.sample_observed(&problems, 9, 2, 0, seed, &mut HostField, &mut |_, _| true, &mut |_| {}).unwrap();
-        assert_eq!(field.sample_runs(&problems, 9, 2, 0, seed, 0, &mut HostField, &mut |_, _| true, &mut |_| {}).unwrap(), one, "no bound, one place a read");
+        assert_eq!(field.sample_runs(&problems, 9, 2, 0, seed, 0, true, false, None, false, &mut HostField, &mut |_, _| true, &mut |_| {}).unwrap(), one, "no bound, one place a read");
         let mut counted = RegionsCounted { regions: Vec::new() };
-        field.sample_runs(&problems, 9, 2, 0, seed, 0, &mut counted, &mut |_, _| true, &mut |_| {}).unwrap();
+        field.sample_runs(&problems, 9, 2, 0, seed, 0, true, false, None, false, &mut counted, &mut |_, _| true, &mut |_| {}).unwrap();
         reads_one += counted.regions.len();
         let mut counted = RegionsCounted { regions: Vec::new() };
         let mut last: Option<Vec<usize>> = None;
         let run = field
-            .sample_runs(&problems, 9, 2, 0, seed, 1 << 20, &mut counted, &mut |_, _| true, &mut |r| {
+            .sample_runs(&problems, 9, 2, 0, seed, 1 << 20, true, false, None, false, &mut counted, &mut |_, _| true, &mut |r| {
                 for (k, &(q, _)) in problems.iter().enumerate() {
                     let earliest = (q.len()..r.classes[k].len()).filter(|&t| r.open[k][t]).map(|t| octave(t + 1 - q.len())).min();
                     if let (0, Some(j)) = (r.pass, earliest) {
@@ -1459,6 +1571,130 @@ fn a_read_releases_a_run() {
     }
     assert!(reads_run <= reads_one, "{reads_run} reads in runs against {reads_one}");
     let _ = fewer;
+}
+
+/// [definition; the unified-theory reading of November 5, 22:38] **A void never unwrites a letter**: at every read of the
+/// sweeps every place written as a letter stays that letter (a place before the last letter draws from its letters, only a
+/// place past every letter from its whole face), the closing law still holds, and some write still ends before its last
+/// place, in one place a read and in runs.
+#[test]
+fn a_void_never_unwrites_a_letter() {
+    let field = shaped(1);
+    let questions: [&[usize]; 2] = [&[1, 4, 0, 2], &[3, 3]];
+    let problems: Vec<(&[usize], usize)> = questions.iter().zip([9usize, 8]).map(|(q, a)| (*q, a)).collect();
+    let mut closed_early = false;
+    for run_bound in [0i128, 1 << 20] {
+        for seed in 11..27 {
+            let mut letters: Vec<Vec<Option<usize>>> = problems.iter().map(|&(q, n)| vec![None; q.len() + n]).collect();
+            let places = field
+                .sample_runs(&problems, 4, 0, 0, seed, run_bound, true, false, None, false, &mut HostField, &mut |_, _| true, &mut |r| {
+                    if r.pass != 0 {
+                        return;
+                    }
+                    for (k, &(q, _)) in problems.iter().enumerate() {
+                        for t in q.len()..r.classes[k].len() {
+                            if let Some(c) = letters[k][t] {
+                                assert_eq!((r.open[k][t], r.classes[k][t]), (false, c), "a written letter unwritten at place {t}, seed {seed}");
+                            } else if !r.open[k][t] && r.classes[k][t] != 0 {
+                                letters[k][t] = Some(r.classes[k][t]);
+                            }
+                        }
+                    }
+                })
+                .unwrap();
+            for (places, n) in places.into_iter().zip([9usize, 8]) {
+                if let Some(end) = places.iter().position(|&c| c == 0) {
+                    assert!(places[end..].iter().all(|&c| c == 0), "a letter past the first void, seed {seed}");
+                    closed_early |= end + 1 < n;
+                }
+            }
+        }
+    }
+    assert!(closed_early, "no write ended before its last place");
+}
+
+/// [definition; the unified-theory reading of November 6, 03:08] **A given length is kept**: with each answer's length given,
+/// every write holds exactly that many letters and the void past them, in the sweeps and through the refine passes, in runs and
+/// one place a read.
+/// [definition; the unified-theory reading of November 6, 07:21] **One end, one draw, conditioned on the room**: a profile whose
+/// void mass rises to one half draws every `u` within the room (unconditioned, a `u` above one half ran to the room's end), the
+/// end at the first place past `u` of the largest void mass, exactly; a profile of totals that differ reads its shares, not its
+/// masses; no void mass anywhere is the room's extent.
+#[test]
+fn one_end_is_drawn_within_the_room() {
+    let face = |void: u128, total: u128| TowerFace { masses: vec![void, total - void], total };
+    let one = 1u128 << 62;
+    // Void shares 0, 1/8, 1/4, 3/8, 1/2, 1/2 over six places.
+    let profile: Vec<TowerFace> = [0u128, 1, 2, 3, 4, 4].iter().map(|&e| face(e * one / 8, one)).collect();
+    let room: Vec<Option<&TowerFace>> = profile.iter().map(Some).collect();
+    // `u` in hundredths of one, on `2^(−32)`.
+    let u = |hundredths: u128| hundredths * (1u128 << 32) / 100;
+    let at = |hundredths: u128| one_end_length(&room, 0, u(hundredths));
+    assert_eq!(at(0), 1, "the first place with any void mass");
+    assert_eq!(at(30), 2, "a void share of 1/4 passes 0.3 of 1/2");
+    assert_eq!(at(70), 3, "3/8 passes 0.7 of 1/2");
+    assert_eq!(at(99), 4, "a u near one ends where the profile reaches its largest, within the room");
+    // Shares, not masses: the same profile on a doubled total at one place.
+    let mut doubled: Vec<TowerFace> = profile.iter().map(|f| face(f.masses[0], f.total)).collect();
+    doubled[2] = face(2 * one / 8, 2 * one);
+    let room2: Vec<Option<&TowerFace>> = doubled.iter().map(Some).collect();
+    assert_eq!(one_end_length(&room2, 0, u(30)), 3, "1/8 at place 2 no longer passes 0.3 of 1/2");
+    let silent: Vec<TowerFace> = (0..4).map(|_| face(0, one)).collect();
+    assert_eq!(one_end_length(&silent.iter().map(Some).collect::<Vec<_>>(), 0, 1 << 31), 4, "no void mass: the room's extent");
+}
+
+#[test]
+fn a_given_length_is_kept() {
+    let field = shaped(1);
+    let questions: [&[usize]; 2] = [&[1, 4, 0, 2], &[3, 3]];
+    let problems: Vec<(&[usize], usize)> = questions.iter().zip([9usize, 8]).map(|(q, a)| (*q, a)).collect();
+    for run_bound in [0i128, 1 << 20] {
+        for seed in 11..19 {
+            let written = field.sample_runs(&problems, 4, 2, 0, seed, run_bound, true, false, Some(&[3, 5]), false, &mut HostField, &mut |_, _| true, &mut |_| {}).unwrap();
+            for (places, l) in written.iter().zip([3usize, 5]) {
+                assert!(places[..l].iter().all(|&c| c != 0), "a void inside the given length, seed {seed}: {places:?}");
+                assert!(places[l..].iter().all(|&c| c == 0), "a letter past the given length, seed {seed}: {places:?}");
+            }
+            // One end, one draw: the length drawn from the first read is kept the same way.
+            let drawn = field.sample_runs(&problems, 4, 2, 0, seed, run_bound, true, false, None, true, &mut HostField, &mut |_, _| true, &mut |_| {}).unwrap();
+            for places in &drawn {
+                let l = places.iter().position(|&c| c == 0).unwrap_or(places.len());
+                assert!(places[l..].iter().all(|&c| c == 0), "a letter past the drawn end, seed {seed}: {places:?}");
+            }
+        }
+    }
+}
+
+/// [definition; the unified-theory reading of November 5, 22:38] **The writer's region ends `NEAR` places past its lowest
+/// void**: past a resolved void the read's faces are the region's cut there, every open place's face that of the cut region,
+/// none past the cut; before any void, and under the whole room, the region is read whole.
+#[test]
+fn the_writer_reads_its_region_to_the_near_field_past_its_void() {
+    let field = shaped(1);
+    let q = [1usize, 4, 0, 2];
+    let n = 12;
+    let mut classes: Vec<usize> = q.iter().copied().chain(std::iter::repeat_n(0, n)).collect();
+    let mut open: Vec<bool> = (0..classes.len()).map(|t| t >= q.len()).collect();
+    for (t, c) in [(4usize, 3usize), (5, 1), (7, 2)] {
+        classes[t] = c;
+        open[t] = false;
+    }
+    let whole = Region { classes: &classes, unresolved: &open, faces: &[], locked: &[], echo: &[], domain: None, port: None };
+    let read = field.read_active(&[q.len()], std::slice::from_ref(&classes), std::slice::from_ref(&open), &[0], 0, true, &mut HostField).unwrap().remove(0);
+    assert_eq!(read, field.faces(&whole).unwrap(), "before any void the region is read whole");
+    let end = 8;
+    for t in end..classes.len() {
+        classes[t] = 0;
+        open[t] = false;
+    }
+    let read = field.read_active(&[q.len()], std::slice::from_ref(&classes), std::slice::from_ref(&open), &[0], 0, true, &mut HostField).unwrap().remove(0);
+    let cut = Region { classes: &classes[..end + NEAR], unresolved: &open[..end + NEAR], faces: &[], locked: &[], echo: &[], domain: None, port: None };
+    let short = field.faces(&cut).unwrap();
+    assert_eq!(read.len(), classes.len());
+    assert_eq!(&read[..end + NEAR], &short[..], "the faces are the cut region's");
+    assert!(read[end + NEAR..].iter().all(Option::is_none), "no face past the cut");
+    let room = field.read_active(&[q.len()], std::slice::from_ref(&classes), std::slice::from_ref(&open), &[0], 0, false, &mut HostField).unwrap().remove(0);
+    assert_eq!(room, field.faces(&Region { classes: &classes, unresolved: &open, faces: &[], locked: &[], echo: &[], domain: None, port: None }).unwrap(), "the whole room, declared");
 }
 
 /// [definition; §16.47] **The answer is released by octaves of distance**: at every read of the sweeps, while a place at
@@ -1502,8 +1738,10 @@ fn refinement_moves_the_end_one_place_a_read() {
     let mut reads = 0;
     for seed in 11..19 {
         let mut last: Option<Vec<usize>> = None;
+        for refine in [3] {
+        last = None;
         field
-            .sample_observed(&problems, 4, 3, 0, seed, &mut HostField, &mut |_, _| true, &mut |r| {
+            .sample_observed(&problems, 4, refine, 0, seed, &mut HostField, &mut |_, _| true, &mut |r| {
                 if r.pass == 0 {
                     return;
                 }
@@ -1525,13 +1763,14 @@ fn refinement_moves_the_end_one_place_a_read() {
                 reads += 1;
             })
             .unwrap();
+        }
     }
     assert!(reads > 0);
 }
 
 /// The packets' field of the tower fixtures: packets of three sites of the tiny field's reach of 16.
 fn coarse_declaration() -> FieldDeclaration {
-    FieldDeclaration { alphabet: 2, width: 8, heads: 2, modes: 3, still: 1, contacts: 4, ticks: 2, frames: 2, reach: 6, lanes: 1 }
+    FieldDeclaration { alphabet: 2, width: 8, heads: 2, modes: 3, still: 1, contacts: 4, ticks: 2, frames: 2, reach: 6, lanes: 1, depth: 0 }
 }
 
 /// A tower of scales on [`shaped`]`(still)`: packets of three sites after the first of its two ticks, founded from the

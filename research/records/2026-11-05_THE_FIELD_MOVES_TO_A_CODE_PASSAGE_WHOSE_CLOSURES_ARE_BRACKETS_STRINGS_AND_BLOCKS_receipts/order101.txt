@@ -1,0 +1,3 @@
+# order101 lock taken 04:28:19
+== b1 FIELD_ORDER problems=32 places=8792 place_bits_a_place=3.498 place_length_bits_a_place=0.029 place_content_bits_a_place=3.469 keyed_bits_a_place=4.516 masks_bits_a_place=3.304 masks_length_bits_a_place=0.031 lengths_unread=2 ms=39141 MEASURE lap=b1 rc=0 wall_s
+ORDER101 exit 04:28:59

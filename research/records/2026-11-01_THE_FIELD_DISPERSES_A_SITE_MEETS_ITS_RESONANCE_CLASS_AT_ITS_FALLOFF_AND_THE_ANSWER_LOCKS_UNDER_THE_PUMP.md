@@ -3771,3 +3771,285 @@ hazard past held at least three times the hazard at or under it (code84's segmen
 +0.3 and written over held 0.7 to 1.4; the opening's void mass at held above 0.3 and at +128 above 0.5; the held context within
 0.02 bits a byte of code85's. **Rule**: a hazard ratio under 1.5 after two laps on the whole room means one rate does not
 carry length, and b2 waits for (c); between 1.5 and 3, two more laps before deciding (code87).
+
+[definition; agent-inferred, November 5, the unified-theory reading of 22:38] **A void never unwrites a letter, and the
+writer's region ends at its near field past its void** (`Field::release`, `Field::read_active`). b1's opening held the length
+(void mass 0.59 at held, 0.80 at +128) while its writes, with and without refinement, ended at a flat one in about 110 places
+(hazard past held over at or under it 0.87): the length is in the field and lost in the writing. Within an octave the keyed
+order puts most draws before a written letter (93% in octave 6, 96% in octave 7), where the truth's void has no mass and the
+field's is a residue of about 1% that costs training 0.014 bits a place, so nothing teaches it away; each such draw ended the
+answer there and unwrote every letter past it (23 of b1's 28 short writes, 324 letters; `unwrote.py`). The law: in the sweeps
+as in refine, a place before the last written letter draws from its face restricted to the letters, and only a place past
+every letter draws from its whole face; a read's places are drawn from the farthest in, so a void is drawn only past every
+letter, this read's among them. Exact faces are unchanged. And the writer's region ends `NEAR` places past its lowest
+resolved void, as every training region and the withheld read do (`near_tail`; the whole room declared by
+`FIELD_WRITER_ROOM`), since a refine pass redrew each place beside up to 2,000 resolved voids no near-tail field met. The
+host's tests: `a_void_never_unwrites_a_letter` (every written letter stays written at every sweep's read, in one place a read
+and in runs, and some write still ends early) and `the_writer_reads_its_region_to_the_near_field_past_its_void`. The release
+is the host's over the card's faces, so the card reads the cut regions with its own kernels. **Fixed before the read**, on
+b1's segment-2 state and keys (closing91): the closing law with no refine pass, written over held 0.7 to 1.4, hazard ratio at
+least 1.5 and correlation above +0.3 (written over held alone passing: the front hears only the prior); both laws with three
+refine passes, the top byte under 20%, the byte entropy within 0.5 bits of held's and at least 10 of 32 opening with
+```` ```python ```` (a collapse with the cut puts the fault in refine's two-sided states).
+
+[definition; agent-inferred, November 5, Brandon's lens of 23:12 and the unified-theory reading of 23:26] **Refinement runs
+until the answer is typical of its faces** (`Field::release` with `SETTLE`; `length-field ... settle`). Brandon read the writes
+under the writer's laws: they hook onto common tokens, keep a register for comments apart from code, and hold the code's
+shape, but they do not take time to converge on words, mangle the fence (```` ```` ````python ````, `pytython`) and close
+brackets only sometimes; the cause is in the architecture and training dynamics, not the data. A byte drawn in the sweeps
+reads a face with most of its neighbours blank (the opening codes about 5 bits a byte, the context about 1.4); the refine
+passes are where a place is redrawn with both sides written, and three of them gave a word no time to converge. The law:
+each problem's passes go on until the first pass whose held letters are at least as likely as its draws, on that pass's own
+faces: at each place the pass redraws, the masses of the class it held and of the class it drew, both on the one face read
+there, and the problem settles when `Π m_held ≥ Π m_drawn` (each face's total cancels, one exact integer comparison) and
+leaves the reads; no pass count is set, only the time guard. The walk is at temperature one, so an answer settles in its
+distribution and never in its letters; the stop overshoots by about a pass. A stop on the slope of the drawn code (a pass
+that fails to lower it) was built first and replaced before any read: it stops wherever one pass's noise outweighs its
+mending. `PASSES.tsv` keeps each pass's redraws and their code, a problem a pass. **Fixed before the read** (settle93, on
+code86's and b1's states against their three-pass writes, the same 32 and keys): fences, brackets and strings within half of
+held's closure near and far, and the code per byte falling then flat; the median stop past pass 3 (else the law is three
+passes); of code86's openings not exactly ```` ```python ````, those a byte off stay so at the stop, at most one mending (more
+mending puts shifts in refine's walk; if they stay, shifts are the sweeps' to prevent, read apart from the stop).
+
+[definition; agent-inferred, November 5, the unified-theory reading of 23:26] **b2's far share, read alone on the whole room**
+(`Port::heard`, `path_far_keyed`, `FIELD_PATH_FAR_KEYED`). b2's far-place law: past the front octave, one place an octave
+through the codec's extent (at most 11), the place the state's keyed order opens first there, alone on the one-rate clock from
+the last arrival, compared at the boundary with weight one; the front octave whole and the near tail as built. The end is one
+variable (9.57 bits an answer, its octave 2.28), and the whole room compared it once a place: the place entropies sum to 638
+bits a state on the truth's curve, as much as an answer's content (430 to 620), so length took about half the step, where the
+keyed places code about 3 bits a state. The port now hears a declared set of its places (`heard`; a place not heard is read and
+not compared and takes no covector, as one past the stop, host and card), and a path state with no resolved void hears its
+front octave and its keyed far places, keeping b1's geometry: the places between stand on the one-rate clock and are not
+compared, so the run reads the far share alone, before b2 proper also drops them (regions with explicit positions). The
+trainer's test `a_path_state_hears_its_front_octave_and_one_keyed_place_an_octave`. **Fixed before the run** (code88, from
+code84's lap-0 state): (1) held context within 0.05 of code85's at laps 0 to 3 (2.404, 2.124, 1.914, 1.579); (2) by lap 2 the
+opening's void mass above code86's flat 0.09 at held, and higher at +128 than at held; (3) under both writer laws the
+correlation with held above +0.3 by lap 4. (1) failing: the far share was not the dilution, and b1's clock is next; (2) flat
+through lap 4: the end's share is too slow at content's rate; only (3) failing: the writes' ends read against their own
+closing fence. None raises the far weight.
+
+[definition; agent-inferred, November 6, the unified-theory reading of 00:58] **The writer's path in place order: a path state
+is a prefix compared at its frontier** (`prefix_region`, `FIELD_PATH_PREFIX`, declared against the octave path). One place a
+read in one order draws exactly the joint its faces make by the chain rule in that order; a run draws several places from one
+read, and refine walks faces that are no joint's, so neither is exact. A path state is the question and the answer's first `k`
+places resolved, compared at its frontier on the frontier's own class (its byte, or the void where the answer ends: content and
+boundary at once), the room past it silent, cut `NEAR − 1` places past the frontier (exact for the frontier's face) and held in
+a port that hears none of its places; `k` is drawn octave-uniform over `[0, len]`. One comparison a state is the place-order
+joint's own code, the end coded once an answer where the writer meets it, so the far share, the closing law and the near cut
+drop out of place order. Neither order was trained at its own states before: the content masks code the order-averaged joint,
+and the octave path states compared only the boundary. Place order, because keyed octaves draw early bytes beside blank
+neighbours (common bytes only, Brandon's read of 23:12). The writer then draws in place order one place a read with no refine
+pass. Its reading, `order-field`: each order's writer's code of held answers, the truth's surprise summed over the states that
+order meets (its excess over the truth's entropy is that joint's divergence), place order's prefixes against the writer's keyed
+octave order with the closing law. **Refutation, fixed before the run**: after a prefix segment, place order's held code at or
+above keyed order's on the same state. The trainer's test `a_prefix_state_is_compared_at_its_frontier`.
+**Its weight** (the unified-theory reading of 01:21, before the run): a prefix state compared one place at weight one while a
+mask state stands for its `m` sites, so the place-order code was about 0.3% of a section's weight, and an octave-uniform `k`
+drew an answer's end in `1/(J·w)` of its states, teaching a hazard that writes 0.34 of held. The state now stands for the
+places its draw samples: `k` uniform in `[0, len]`, `domain` `len + 1`. Fixed for code89's place-order writes on the 32 held:
+written over held 0.67 to 1.49; exact ```` ```python ```` openings at least 23; byte entropy 4.76 to 5.02, the top byte 0.14 to
+0.21, `y` past place 10 under 1.3%; place order's held code below keyed order's. The order reading cannot see length (about
+0.01 bits a place for writes four times short), so the writes judge it.
+
+[definition; agent-inferred, November 6, the unified-theory reading of 02:38] **The prefix path retires, and the clock is read
+alone.** code89's place-order writes failed on content (the content part of place order's code rose to 3.258 against code86's
+3.072, the prefix states taking half the step); inferred cause: a prefix state reads one place at weight `len + 1`, an unbiased
+chain code with about `len + 1` times one place's variance. The clock's own share of code88's lag is read with the per-blank
+rate restored past the last arrival (`Field::per_blank_clock`, `FIELD_CLOCK_PER_BLANK`, host and card, the parity reading the
+same declared law; the field tests' per-blank case in `a_blank_place_runs_at_its_expected_duration`), on code88's law for four
+laps from code84's lap-0 state (code90). Fixed: held context within 0.05 of code88's at laps 1 to 3 means the one-rate clock is
+not the lag, within 0.05 of code85's that it is; the opening's void at held against code88's 0.219. The one-rate clock stays
+unless the context reaches code85's and the void holds. **The masks' order as the writer** (`masks-field`): given each answer's
+length (a place-order write's lengths, drawn from its hazard), the answer and its near tail drawn one place a read in a keyed
+uniform order over those `L + NEAR` places, an answer place from its face over the letters, a near-tail place the void. Fixed on
+code86's state with code89's lengths: exact ```` ```python ```` at least 23 (least sure); entropy 4.76 to 5.02, the top byte 0.14
+to 0.21, `y` past place 10 under 1.3%, at least 22 of 32 fences closed.
+
+[definition; agent-inferred, November 6, the unified-theory reading of 04:03] **One end, one draw; length lives at one state.**
+At the release's first read (every answer place open, training's fully masked state) a place `d` is the void exactly when the
+answer is shorter than `d`, so its void mass is the field's `P(L < d | q)`: the writer draws the end once, one uniform `u`
+against that profile (the length the places before the first whose void mass passes `u`, `m_∅ 2^32 > u T` exactly), and the
+keyed sweeps then write given it (`Field::sample_runs`'s `one_end`, `FIELD_WRITER_ONE_END`; one `u`, since independent draws a
+place multiply survivals and the earliest void is not the profile's draw). Training then needs the room at that state only
+(`FIELD_PATH_OPENING` with the far share): the only path state is the fully masked one, the whole room with one keyed place an
+octave of distance from the question compared at the boundary, weight one, on the one-rate clock, keyed by distance and never by
+the end; every content state keeps the near tail. **Fixed before code91** (from code86's state): held context within 0.05 of
+code86's 1.364 at laps 1 to 3; the opening's length code at most 9.6 bits an answer (the marginal) by lap 3 with at most 4
+unread; the one-end writer at lap 3 with written over held 0.67 to 1.49, at least 23 exact openings, entropy and the space in
+band and at least 22 fences closed. The field test `a_given_length_is_kept` reads the drawn end kept as a given one.
+
+[definition; agent-inferred, November 6, the unified-theory readings of 04:34 to 05:14] **The depth ring** (`FieldDeclaration::
+depth`, `is_depth`, `Field::with_depth`; the card's `depth_head` and `skinless`; `ring-field`). The last `depth` turned ring
+sets turn by located increments alone: a depth head's rate is `κ = r_h[u]` on its class sheet (base zero, its pace row), so a
+matched opener and the site before its closer differ by exactly zero on every ring and an unmatched one by its net winding;
+its frames turn at `τ = Σ κ` on the solenoid's ring periods (plain, at `r = 0`, the constant frame: exactly a still head's
+reading); its pairs and crowds take no skin (`|μ| = 1`, the relative depth carried exactly at any span and its adjoint exactly
+back); it carries no moment (on the card its modes are marked in the moment map and their moments and covectors are zero).
+The ring `ρ ← μρ + r` with `μ = 1` and `r` keyed by the arriving class, located by deposition, never authored: a table of
+openers and closers would be the hand-written grammar the guide refuses. With one increment a kind and no vanishing sum of
+opener increments, an abelian ring read pairwise with nearness carries matching exactly (the unified-theory reading's exhaustive
+check over every three-kind prefix to length 10); a farther zero-turn opener of another kind remains at 0.49% of closer sites,
+which the shears' free group would remove. v14 head lines carry the depth; a v13 line is depth zero. The field tests read the
+covector against the code's difference and the pace covector with a depth ring (`covector_matches_the_codes_difference`,
+`the_pace_covector_matches_the_code_at_two_steps`). **Fixed before its run**: far brackets at least 0.8 of held's closure with
+near at least 0.9, openers left unclosed under 0.1 (keyed100: 0.42), on writes given keyed100's lengths, ring and foil alike;
+if short, split by whether a pair's between-sites were resolved at its later end's draw, and run the conversion with `r` held
+at zero before reading a miss as the ring's.
+**A depth ring takes no blank face** (the unified-theory reading of 05:45, before its run): a silent site runs at rate zero
+at every tick and no clock covector returns through a blank's face on a depth ring (host `paces_with` and `clock_return`, the
+card's `pace_rate`, `field_pace_c_back` and `field_blank_dz`; the field test in `a_blank_place_runs_at_its_expected_duration`).
+A blank's honest contribution through a turned ring is `E[ζ^r]`, its modulus the blank's coherence, where the blank clock would
+carry `ζ^E[r]` at modulus one; a place read as a closer would turn its own frame by its own guess, the tail's one passage would
+turn each unwritten place by its distance times an expected increment (phantom depth), and the face's return would train the
+guesses to serve the ring. The ring is exact on what arrived; an unwritten unbalanced hole is what the resolved-between split
+reads, and `E[ζ^r]` as a face-keyed skin is the general form, later.
+
+[definition; agent-inferred, November 6, the unified-theory reading of 06:50] **The writer's own state, given its end**
+(`FIELD_PATH_WRITER`, `writer_region`, beside the opening). Since `38bdbc64` every path state drew `k = 0`, so the states the
+writer meets past its first read left training, and the writer's keyed order code rose from code86's 3.316 to code91's 4.06
+bits a place while the other orders fell. The one-end writer fixes its length at the first read and sweeps given it, so each
+state it meets afterwards has the same shape: the question, the answer's places to its end with the first `k` resolved in
+its order (octaves of distance, keyed within an octave), and the end's `NEAR` voids resolved, the region cut there. Training
+now forms that state on the truth for each path problem, beside the opening: `k` is met by its octaves (`k = 0`, then
+`[2^(o−1), 2^o)` within the answer, one place left open), every open place is compared at its boundary, and the weight is one.
+The regions are short, and the field and card are unchanged. The trainer test `a_writer_state_is_its_order_given_its_end`
+covers it. **Fixed at the long run's 2 h** (theory, 06:50 and 07:15), on writes of the keyed sweeps given every held answer's
+own length: openings and fences at least foil2's own, the space at least 14%, held context at most foil2's last (1.319) plus
+0.05, the opening's length code at most 9.6 bits with at most 4 unread. The one-end write is read, not judged.
+
+[definition; agent-inferred, November 6, the unified-theory reading of 07:21] **The one-end draw is conditioned on the room**
+(`one_end_length`). An answer ends within the room, so `P(L ≤ t | L ≤ R) = M(t)/M(R)`, with `M` the running maximum of the
+first read's void mass and `R` the room's last place. The single `u` is read against `u M(R)` as an exact comparison on
+256-bit products (`wide_mul`, Lean `BinaryLog.wideMul_eq`). Unconditioned, every `u` above the void mass at the room's last
+place landed there. The field test `one_end_is_drawn_within_the_room` covers it. **Its fixed read** (theory's blind: under 8
+places past 1,200 on both sets), on code91's opening profiles, gives the expected letter mass past each answer's end over the
+bands 0–127, 128–511, 512–1,199 and 1,200 to the room's end, conditioned against plain. seg2 HELD128: 58.6, 74.2, 34.0, 17.9
+against 59.1, 75.8, 38.0, 22.8. seg2 TRAIN: 54.6, 57.6, 20.4, 15.3 against 55.0, 58.8, 23.1, 21.2. Past 1,200 the length law
+holds under one place on both sets. The blind fails: conditioning removes about 5 places past 1,200, and 15 to 18 remain. So
+the far faces themselves are short of the void, and that is a training question. The opening compares one keyed place an
+octave, and octaves 10 and 11 hold the 840 places past 1,200, so a state compares two of them.
+
+[definition; agent-inferred, November 6, the unified-theory reading of 06:50, E] **The opening's room is cut to its windows**
+(`FIELD_ROOM_CUT`, `Port::window`, `Region::window`; the card's `computed` and `skipped_row`). The cut keeps every site at
+its place and skips the rows of every receiver outside the windows, so each distance term (the pair and octave decays, the
+crowd spans, the clocks) is the room's own. The windows are the question, the silent stretch's first place, and each heard
+place with `(NEAR − 1)·ticks` places on either side. A receiver outside them meets no source that tick, takes a zero current,
+and on the card returns nothing (its probe and key covectors zero, and it is passed over among a source's receivers). The
+reasons it is exact: a silent place is no one's far source, the near field and the strand's pair contact carry state at most
+`NEAR − 1` places a tick, and past the stretch's first place the clock runs at that place's rate, which is computed. The host
+test `a_cut_room_reads_and_returns_the_whole_rooms_bits` checks every tick's chart and pair chart at each heard place, each
+heard face, the port's code and the whole covector bit for bit against the whole room. It runs at ticks 2 and 4, with still
+heads 0, 1 and 2, and the cut meets fewer pairs. The cut is not exact where blanks sit between arrivals, whose clocks read
+each blank's own face, so the masks and the writer's states keep their room whole. It joins a run only after its card
+parity, at a segment boundary.
+
+[measurement; November 6, the unified-theory reading of 06:50, D] **The depth ring's located increments** (`depth-field`;
+head 3, on `2^(−24)`). RING.0 (`r = 0`) is zero at every class by construction. The conversion with `r` held at zero was not
+run, so RING.0 is the only control. At ring1's end (4 laps): `(` +0.0076, `)` +0.2021, `[` +0.0685, `]` −0.0845, `{` +0.3804,
+`}` +0.3534, `'` +0.578 (the row's largest), the space +0.187, the newline +0.116. At ring2's end (8 laps): `(` +0.426, `)`
++0.753, `[` +0.197, `]` +0.145, `{` +0.320, `}` +0.417, the newline +0.432. Matching needs `r(open) = −r(close)`. The matched
+sums are `( )` +0.21, `[ ]` −0.016 and `{ }` +0.73 at ring1, and +1.18, +0.34 and +0.74 at ring2. Every class drifts positive,
+so the ring located a clock rate, not depth, and ring1's bracket gain was not the ring's.
+
+[definition; agent-inferred, November 6, the unified-theory reading of 08:16] **Only the blanks a clock reads are read**. Under
+the one-rate clock, a silent place's face is read only by its own rate, and only up to the silent stretch's first place;
+past it every rate is that place's, and its covector folds there (`clock_return`). So each tick's blank faces are read only
+at the silent places up to the stretch's first, or at every silent place under the per-blank clock. That is the host pass;
+the card's blank clock and its return read the same sites (`blank_read`) as the open ones. In the opening that is about one
+face of 2,300 a tick. The field test `a_blank_place_runs_at_its_expected_duration` reads no face past the stretch's first
+place. The cut joins a run after its card parity, at a segment boundary.
+
+[measurement; November 6, long109 seg1 against long106 seg1, and check110] **The writer state at the boundary moved the
+writer's order and not its writes**. Laps 5–6 from code91's lap-4 state, with the writer state, against the same laps without
+it: keyed order code 3.944 against 4.425; held context 1.308 against 1.312; space given held's lengths 19.5% against 16.8%.
+But fences closed fell to 6 against 7, openings to 13 against 19, the length code paired to +1.57 against +1.35, and the
+conditioned band past 1,200 rose to 84.3 against 80.0 (lap 4's own: 25 fences closed, 25 openings, +0.21, 17.9). check110 read
+lap 4 bit-identically on code91's binary and on the run's, so the fall from lap 4 to lap 6 is the state's in both arms. The
+writer state was compared at its boundary, which with the end's voids given compares no letter.
+
+[definition; agent-inferred, November 6, the unified-theory reading of 09:50] **The writer state is compared on its letters**:
+`writer_region` has no port, so every open place is compared on its own class at weight one (K of K) and the end's voids are
+given and not compared. These are the masks' comparisons under the writer's own mask. In a cut room, the receivers a definite
+source's return walks are the computed ones alone (the stage's open-receiver list), and an uncomputed row's skins return
+nothing. Both are exact, since such a row met no source and its covector is zero by the cone.
+
+[measurement; agent-inferred, November 6, the unified-theory reading of 08:54] **The lap's line search** (`FieldReceipt::external`):
+T/A, the transfer against the predicted gain, read +0.086 to +0.100 on every lap of code91 and long106, with about two thirds
+of the held steps raising the code on the section they were not fit on. The FIELD_STEP_PRICE lines since the reread was
+removed read priced=0 at rate 8, so the rate never moved.
+
+[measurement; November 6, the unified-theory reading of 09:56] **The stretch's rate against the far void** (`stretch-field`). κ₁ is
+the rate every place past the last arrival ran at, under the one-rate stretch. Read at the last tick over the 128 held
+openings: at lap 4 (band past 1,200 17.9) paced head 0 was 0.962 ± 0.188 and paced head 1 2.611 ± 0.128, with correlations
+against each question's overrun of −0.07 and −0.03. At foil lap 6 (80.0) they were 1.038 ± 0.259 and 2.841 ± 0.244 (−0.29,
+−0.25). At writer lap 6 (84.3), 1.053 ± 0.350 and 3.016 ± 0.317 (−0.29, −0.26). At lap 8 (124.1), 0.988 ± 0.143 and 3.033 ± 0.105
+(−0.10, −0.23). The far void fails wherever κ₁'s spread couples to the overrun. A place `D` past the arrival reads the question
+at phase `Dκ₁` through skin `D|κ₁|`, so the far scale rests on one place's guessed duration.
+
+[definition; agent-inferred, November 6, the unified-theory reading of 10:31] **Past the last arrival, the bare rate**
+(`Field::bare_stretch`, `FIELD_CLOCK_BARE`; `declared_clocks`). A silent place past a region's last arrival runs at `κ = 1`
+(§16.28), reads no face and returns nothing; between arrivals each blank keeps its expected duration (§16.44). Nothing arrives
+past the last arrival, so no guess drives its clock there, and the void is read in places. On the host, `paces_with` has no
+clamp to the stretch, the pass reads blank faces only before it, and `clock_return` has no fold. On the card, `field_paces`
+has no clamp, `field_pace_kappa_back` has no fold, the `blank_read` mask ends before the stretch, and `field_pace_c_back`
+passes over a place that read no face. Field tests `covector_matches_the_codes_difference` (with the bare stretch) and
+`past_the_last_arrival_a_place_runs_at_the_bare_rate` cover it.
+
+[measurement; November 6, long110 seg2] **The step's halving**. Laps 7 and 8 ran at rates 8 and 9, the second set by the
+transfer's sign alone, since the line search's curvature telescoped: `p_ext` is the step before priced after it stood.
+Held context went 1.257, 1.242 (lap 6: 1.308) and unseen 1.209, 1.190; Σt fell from 45.0e9 to 10.7e9. Given held's lengths,
+fences closed went from 6 to 19 and brackets near from 0.200 to 0.329; the keyed order code was 3.827. The band past 1,200
+rose to 124.1. The rate holds at 9 (`FIELD_STEP_HELD`), since the sign branch would halve every lap: a lap's transfer is its
+loss change plus half its step's energy, positive at any rate in the band.
+
+[measurement; November 6, long110 seg3 and long111 seg4] **The writer state on its letters brought the far void back**. At lap 10
+(rate 9, one-rate stretch), the band past 1,200 was 16.7 held and 14.6 training (lap 8: 124.1 and 80.6; lap 4: 17.9 and 15.3). The
+length code paired was +0.33, and the one-end write ran 0.965× held. Given held's lengths there were 23 openings and 27 of 32
+fences closed. Held context was 1.227. Read under the bare stretch without training, lap 10 coded its length at +0.81 and wrote
+1.40× held, so the bare switch was withheld: the far void had come back on the same clock. At lap 12, the band stayed at
+16.7 and the length code reached +0.05, with 26 openings and 25 fences closed. But the one-end write ran 1.59× held and the
+expected length less held went from +50 to +111. Order-field's split shows 92% of the keyed code's rise from lap 8 to 12 in
+its length part (0.687 → 1.839 a place), while the keyed order given its end fell from 2.733 to 2.617 a letter. κ₁'s
+per-question spread fell to about 0.09–0.10 on head 1 (0.24–0.32 at lap 6), with the coupling near zero.
+
+[definition; agent-inferred, November 6, the unified-theory reading of 11:49] **The writer state is compared on its letters off
+the void** (`Port::letters`, `letters_reading`). Each open place is compared on `−log₂(m_a/(T − m_∅))` with covector `p̂_a/(1 −
+p̂_∅) − [a = target]`, zero at the void. That is the release's own draw where the end is given. On its whole class, an open
+place coded `−log₂ p(a | not ∅) − log₂(1 − p_∅)`, and the second term pushed the void down at every interior place of an
+end-given state, which the writer never reads. The void is compared where it is uncertain: in the opening and the masks'
+near tails. `covector_matches_the_codes_difference` runs a letters port with a resolved place.
+**Held** (the unified-theory reading of 12:23): lap 12 read off the void came out equal to the read with it, to three places, and
+lap 14 brought the expected length back to +17 on the whole-class law, with no law change. So the letters law is declared
+(`FIELD_WRITER_LETTERS`) and held. Its card parity passed. It joins only if the expected length less held passes +40 again and
+the off-void given-end read comes in at least 0.01 bits a letter below the with-void read.
+
+[measurement; November 6, lap 14] **The length heard in the writing and from the question**. The place order's length part
+reads 0.016 bits a place, against the opening's length code of 0.031, though the run trains no prefix state. Over the 128 held
+questions the opening's expected length follows held at +0.575 and carries 0.75 of held's spread. Held regressed on it has
+slope 0.76, so the opening's per-question deviations run about 1.3 times what they predict. The one-end write's correlation
+with held (+0.018 at lap 14) is the single draw's own spread.
+
+[measurement; November 6, long112 and long113] **The length swings on fixed laws, and the bare clock holds it**. Laps 15–16 ran from
+lap 14 at rate 10 (FIELD_STEP_HELD), with the laws fixed. Held context reached 1.209 and 1.213, and lap 15's step price was 0.285×
+lap 14's. But the opening's length broke: expected length less held +706, band past 1,200 140.8 held, one-end write 3.39× held.
+Over laps 8–16 the expected length less held ran +609, +50, +111, +17, +706 with the laws fixed from lap 10. κ₁'s spread on head 1
+was back at 0.17, with the coupling to the band at −0.15. Read on lap 16 without training, the bare stretch coded the length at
++3.16 against one-rate's +1.67 and put the band at 149.1: the readout fit one-rate's phases. Trained on the bare clock from lap
+16, lap 18 read the band at 9.8 held and 7.7 training, the length code at −0.17 (the first under the marginal), the one-end write
+at 1.30× and held context at 1.210. Lap 20, same law, read the band at 9.1, the length code at −0.25, the one-end write at 1.45×,
+26 of 26 fences closed given held's lengths, and held context at 1.201 and 1.204, unseen 1.140. At rate 11, lap 22 read held
+context 1.194 and 1.198, unseen 1.127, the band at 9.3, the one-end write at 1.05× held (correlation +0.081), and keyed_length at
+0.425 a place. On the bare clock the far void held still across three segments and two halvings. Receipts:
+`longrun_nov6/` (each chain's output, the reading scripts).
+At rate 12 (laps 23–24, the run's last, long114), held context read 1.190 and 1.188, and unseen 1.121 and 1.120. Lap 23's step
+price was 0.80e9, 0.38× seg9's mean. The band past 1,200 read 11.8 held, the length code +0.01, and the one-end write 1.60× held.
+Given held's lengths there were 29 openings and 27 of 31 fences closed. From code91's lap 4 (held context 1.306, unseen 1.239) to
+lap 24, held context fell by 0.118 and unseen by 0.119 over twenty laps, about 9 card-hours. Each halving bought its drop in the
+first lap after it (unseen 1.141 → 1.129 at rate 11, 1.127 → 1.121 at rate 12). The one-end write's length follows its
+question only weakly (correlation +0.08 to +0.19), where the opening follows held at +0.58: the single draw's own spread.
+[agent-inferred, the unified-theory reading of 15:29] **The rate is spent as a lever.** The halvings bought 0.0125 on unseen, then 0.007:
+each about half the last, so all further halvings together hold about 0.007 more, and the next run's gains come from the law. The
+lap price scatters by about 0.15e9 either way at every rate (seg10's mean, 0.641e9, is 0.30× seg9's). The next length law starts
+here: on its own training problems the opening sat +90 to +130 places past the boundary law's minimizer through laps 18–24, and
+moved out at lap 24 under the run's smallest step. The boundary's void entries vanish in expectation only when the expected
+length meets the answer's, so at the opening the boundary is outweighed by the other comparisons that reach the void there.
