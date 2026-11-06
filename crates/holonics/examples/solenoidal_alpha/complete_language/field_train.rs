@@ -321,8 +321,12 @@ pub(super) fn opening_region(codec: &FieldCodec, q: &[usize], a: &[usize], seed:
 /// [definition; agent-inferred, November 6, the unified-theory reading of 00:58] **The writer's path in place order**
 /// (`FIELD_PATH_PREFIX`, declared against the octave path): a path state is a prefix, the question and the answer's first `k`
 /// places resolved, compared at its frontier on the frontier's own class (its byte, or the void where the answer ends: content
-/// and boundary at once), the room past it silent and not compared. Each octave of `k` is met alike: an octave `o` of
-/// `[0, len]` drawn uniform (`len` the answer's places, its end the void at `len`), then `k` uniform in it. The region is cut
+/// and boundary at once), the room past it silent and not compared. `k` is uniform in `[0, len]` (`len` the answer's places,
+/// its end the void at `len`) and the state stands for the `len + 1` places its draw samples (`domain`, weight
+/// `(len + 1)/1`, [`Region::weight`]), so each place counts once, the taught hazard is the truth's, and a prefix state weighs an
+/// answer's chain code as a mask state weighs its averaged code (the unified-theory reading of 01:21: at weight one an
+/// octave-uniform `k` drew a 250-place answer's place 130 in 1 of 1,107 states, and the taught hazard wrote 0.34 of held,
+/// 56% of the ends in an octave's first eighth against the truth's 17%). The region is cut
 /// `NEAR − 1` places past the frontier, exact for the frontier's face (the silent room past it is heard only through the near
 /// field, `the_room_past_the_front_is_heard_only_through_the_near_field`); its places past the frontier stand in a port that
 /// hears none of them. Why: one place a read in one order draws exactly the joint its faces make by the chain rule, and a
@@ -333,22 +337,13 @@ pub(super) fn opening_region(codec: &FieldCodec, q: &[usize], a: &[usize], seed:
 pub(super) fn prefix_region(codec: &FieldCodec, q: &[usize], a: &[usize], seed: u64, draw: u64) -> TrainRegion {
     let room = codec.answer;
     let last = a.len().min(room - 1);
-    let key = mix(seed, draw | 5 << 61);
-    let octaves = u64::from(usize::BITS - last.leading_zeros()) + 1;
-    let o = (key % octaves) as u32;
-    let k = if o == 0 {
-        0
-    } else {
-        let low = 1usize << (o - 1);
-        let high = ((1usize << o) - 1).min(last);
-        low + (mix(seed, draw | 6 << 61) as usize) % (high - low + 1)
-    };
+    let k = (mix(seed, draw | 5 << 61) % (last as u64 + 1)) as usize;
     let frontier = q.len() + k;
     let cut = (frontier + holonics::hnn::tower::field::NEAR).min(q.len() + room);
     let classes = region_classes(codec, q, a, cut);
     let unresolved: Vec<bool> = (0..cut).map(|t| t >= frontier).collect();
     let heard = vec![false; cut];
-    TrainRegion { port: Some((frontier + 1, codec.void(), Vec::new(), true, None, Some(heard))), ..TrainRegion::plain(classes, unresolved) }
+    TrainRegion { domain: Some(last + 1), port: Some((frontier + 1, codec.void(), Vec::new(), true, None, Some(heard))), ..TrainRegion::plain(classes, unresolved) }
 }
 
 /// Whether the path states are prefixes in place order ([`prefix_region`]).
@@ -2498,6 +2493,7 @@ mod tests {
                 let Some((start, _, _, true, None, Some(heard))) = state.port.clone() else { panic!("the room past the frontier stands in a port") };
                 assert_eq!(start, frontier + 1);
                 assert!(heard.iter().all(|&h| !h), "the port hears none of its places");
+                assert_eq!(state.domain, Some(a.len().min(codec.answer - 1) + 1), "the state stands for every place its draw samples");
             }
         }
         for (i, (_, a, _)) in problems.iter().enumerate() {

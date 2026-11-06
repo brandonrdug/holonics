@@ -3843,3 +3843,10 @@ pass. Its reading, `order-field`: each order's writer's code of held answers, th
 order meets (its excess over the truth's entropy is that joint's divergence), place order's prefixes against the writer's keyed
 octave order with the closing law. **Refutation, fixed before the run**: after a prefix segment, place order's held code at or
 above keyed order's on the same state. The trainer's test `a_prefix_state_is_compared_at_its_frontier`.
+**Its weight** (the unified-theory reading of 01:21, before the run): a prefix state compared one place at weight one while a
+mask state stands for its `m` sites, so the place-order code was about 0.3% of a section's weight, and an octave-uniform `k`
+drew an answer's end in `1/(J·w)` of its states, teaching a hazard that writes 0.34 of held. The state now stands for the
+places its draw samples: `k` uniform in `[0, len]`, `domain` `len + 1`. Fixed for code89's place-order writes on the 32 held:
+written over held 0.67 to 1.49; exact ```` ```python ```` openings at least 23; byte entropy 4.76 to 5.02, the top byte 0.14 to
+0.21, `y` past place 10 under 1.3%; place order's held code below keyed order's. The order reading cannot see length (about
+0.01 bits a place for writes four times short), so the writes judge it.
