@@ -366,18 +366,19 @@ pub(super) fn path_opening() -> bool {
 /// `lengths`: the near tail of the read's region). This is that state on the truth: the answer's places ordered by octaves of
 /// their distance from the question, keyed within an octave and fresh each draw, as the writer releases them; `k` drawn so
 /// every octave of reads is met alike (`k = 0`, the state just past the end's draw, the first; then `[2^(o−1), 2^o)` within
-/// the answer, at least one place left open); every open place compared on its own class within the letters, off the void, at
-/// weight one (a port on its letters, [`holonics::hnn::tower::field::Port::letters`]), the end's voids given and not compared.
+/// the answer, at least one place left open); every open place compared on its own class at weight one (no port: the
+/// region's `K` open places of `K`, [`holonics::hnn::tower::field::Region::weight`]), the end's voids given and not compared.
 /// Why (the unified-theory reading of 06:50): with the opening as the only path state (code91) the writer's states past its
 /// first read left training, and the writer's own order code rose from 3.316 to 4.06 bits a place while the other orders'
 /// fell; the opening keeps the length and these keep the states the writer writes in. [the unified-theory reading of 09:50]
 /// Not at the boundary: once the end's voids are given, a boundary codes a letter place only as `−log₂(1 − p̂_∅)`, its letters
 /// renormalized off the void, so it compared no letter (long109's seg1 moved the writer's order code and the space, not its
-/// fences or openings); compared on their classes, these are the masks' comparison under the writer's own mask. [the
-/// unified-theory reading of 11:49] Off the void: compared on its whole class an open place codes `−log₂ p(a | not ∅) −
-/// log₂(1 − p_∅)`, and the second term pushed the void down at every interior place of an end-given state, hardest just before
-/// the given voids (the expected length less held went +50 → +111 from lap 10 to 12), while the writer given its end never
-/// draws a void there; on its letters the comparison is the release's own draw. An answer with no place is no state.
+/// fences or openings); compared on their classes, these are the masks' comparison under the writer's own mask.
+/// [the unified-theory readings of 11:49 and 12:23] `FIELD_WRITER_LETTERS` declares each open place compared on its letters
+/// off the void instead ([`holonics::hnn::tower::field::Port::letters`], the release's own draw given the end). It is built and
+/// its card parity passed, but it is held: lap 12 read off the void equalled the read with it to three places, and lap 14
+/// brought the length back on the whole-class law. It joins only if the expected length less held passes +40 again and the
+/// off-void given-end read comes in at least 0.01 bits a letter under the with-void read. An answer with no place is no state.
 ///
 /// [`holonics::hnn::tower::field::Field::sample_runs`]: the writer whose states these are.
 pub(super) fn writer_region(codec: &FieldCodec, q: &[usize], a: &[usize], seed: u64, draw: u64) -> Option<TrainRegion> {
@@ -406,8 +407,17 @@ pub(super) fn writer_region(codec: &FieldCodec, q: &[usize], a: &[usize], seed: 
     for &t in &order[..k] {
         unresolved[t] = false;
     }
-    // [the unified-theory reading of 11:49] Each open place on its letters off the void, the release's own draw given the end.
-    Some(TrainRegion { port: Some((q.len(), codec.void(), a[..len].to_vec(), false, None, None)), letters: true, ..TrainRegion::plain(classes, unresolved) })
+    if writer_letters() {
+        // Declared: each open place on its letters off the void, the release's own draw given the end.
+        return Some(TrainRegion { port: Some((q.len(), codec.void(), a[..len].to_vec(), false, None, None)), letters: true, ..TrainRegion::plain(classes, unresolved) });
+    }
+    Some(TrainRegion::plain(classes, unresolved))
+}
+
+/// Whether the writer's states are compared on their letters off the void (`FIELD_WRITER_LETTERS`, [`writer_region`]).
+pub(super) fn writer_letters() -> bool {
+    static LETTERS: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
+    *LETTERS.get_or_init(|| std::env::var_os("FIELD_WRITER_LETTERS").is_some())
 }
 
 /// [definition; agent-inferred, November 6, the unified-theory reading of 06:50, E] **The opening's room is cut to its windows**
@@ -2960,10 +2970,9 @@ mod tests {
                     assert!((q.len()..end).filter(|&t| octave(t + 1 - q.len()) < far).all(|t| !state.unresolved[t]), "the earlier octaves resolved whole");
                 }
                 met.insert(if k == 0 { 0 } else { octave(k) + 1 });
-                let Some((start, void, target, false, None, None)) = state.port.clone() else { panic!("a port on the letters") };
-                assert!(state.letters && !state.window && state.domain.is_none(), "every open place compared on its letters off the void");
-                assert_eq!((start, void, target), (q.len(), codec.void(), a.clone()));
-                assert_eq!(view_of(&state).weight(), (1, 1), "weight one");
+                assert!(state.port.is_none() && state.domain.is_none() && !state.window && !state.letters, "every open place compared on its own class");
+                let open = state.unresolved.iter().filter(|&&u| u).count() as u64;
+                assert_eq!(view_of(&state).weight(), (open, open), "weight one");
             }
             let most = a.len() - 1;
             let octaves = usize::BITS - most.leading_zeros() + 1;

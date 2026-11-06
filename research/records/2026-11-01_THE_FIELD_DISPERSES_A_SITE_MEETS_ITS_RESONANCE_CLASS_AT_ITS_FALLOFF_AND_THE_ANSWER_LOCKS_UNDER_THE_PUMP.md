@@ -4018,3 +4018,13 @@ p̂_∅) − [a = target]`, zero at the void. That is the release's own draw whe
 place coded `−log₂ p(a | not ∅) − log₂(1 − p_∅)`, and the second term pushed the void down at every interior place of an
 end-given state, which the writer never reads. The void is compared where it is uncertain: in the opening and the masks'
 near tails. `covector_matches_the_codes_difference` runs a letters port with a resolved place.
+**Held** (the unified-theory reading of 12:23): lap 12 read off the void came out equal to the read with it, to three places, and
+lap 14 brought the expected length back to +17 on the whole-class law, with no law change. So the letters law is declared
+(`FIELD_WRITER_LETTERS`) and held. Its card parity passed. It joins only if the expected length less held passes +40 again and
+the off-void given-end read comes in at least 0.01 bits a letter below the with-void read.
+
+[measurement; November 6, lap 14] **The length heard in the writing and from the question**. The place order's length part
+reads 0.016 bits a place, against the opening's length code of 0.031, though the run trains no prefix state. Over the 128 held
+questions the opening's expected length follows held at +0.575 and carries 0.75 of held's spread. Held regressed on it has
+slope 0.76, so the opening's per-question deviations run about 1.3 times what they predict. The one-end write's correlation
+with held (+0.018 at lap 14) is the single draw's own spread.
