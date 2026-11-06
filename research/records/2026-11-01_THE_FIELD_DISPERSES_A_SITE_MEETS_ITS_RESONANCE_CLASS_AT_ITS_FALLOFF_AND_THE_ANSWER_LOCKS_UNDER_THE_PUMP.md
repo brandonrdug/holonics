@@ -4096,3 +4096,27 @@ swings with its moving faces by more than the draw's spread `√C`; its write re
 identifiers, held identifiers, fences closed of opened, code lines): refine 10: 0.145, 0.18, 0.16, 28/29, 8.0; walk 20: 0.126,
 0.22, 0.19, 20/28, 6.5; walk 40: 0.118, 0.26, 0.24, 20/26, 5.7, the words that rise being the field's commonest (`print(`
 repeated). Receipts: `longrun_nov6/rest117.txt`, `rest118.txt`, `passes.py`.
+
+[measurement; November 6, spans119; the unified-theory reading of 17:58] **The cube's move as a silent span is falsified.**
+With `FIELD_WRITER_SPANS` every second refine pass cut the answer into keyed spans of 2, 4, 8 and 16 places, opened each whole
+and redrew it in place order given the rest. Over 40 passes on lap 24 the single-place passes after span passes read the
+standing code at 3.27 to 3.98 bits a place, against the plain walk's 1.72 to 1.87 over passes 27–40. The write closed 6 fences of
+14 and drew 0.05 of the question's identifiers. [inferred, theory, 18:50] The faces are strong only with a definite near field,
+and a silent span with definite flanks is a state the masks `τ = u²` hardly train (chance `E[τ^L (1 − τ)²]`: 0.025 for `L = 2`,
+0.0002 for `L = 16`). Revision stays single-place.
+
+[measurement; November 6, truth120; the unified-theory reading of 18:28] **Held truth is calibrated but is no rest of the walk,
+and the faces' two readings of a pair disagree.** Started from held's answers (`FIELD_WRITER_FROM_TRUTH`: no sweep, the first
+pass read without drawing), the field's drive on the truth is −0.008 bits a place (`S` 0.812, `H` 0.821). One pass of redraws
+raises it to +0.293, it peaks at +0.671 at pass 10 and settles at +0.351 by pass 40, with `S` at 1.472, 0.66 above the truth's.
+Over those 40 passes closed fences fell from 29 to 21, parsing answers from 26 to 0, code lines from 10.9 to 7.3, and question
+identifiers from 0.26 to 0.16. The identifiers' repeat share reaches the truth's own (0.442) by pass 40 of either walk. What piles
+up is concentration: the commonest identifier holds 0.030 of the truth's tokens and 0.10 to 0.11 of a 40-pass walk's. `curl-field`
+reads two-place squares of held truth: for places `i`, `j`, the log odds ratio across their standing and runner-up letters, read
+through `i`'s faces (`λ_i`) and through `j`'s (`λ_j`). One joint's conditionals give `λ_i = λ_j` (Kolmogorov's cycle condition).
+The curl's spread exceeds `λ`'s at every band of distance: d = 1: 4.25 against 3.54 bits; 2–3: 2.67 against 1.67; 4–7: 0.93
+against 0.50; 8–15: 0.60 against 0.40; 16 and past: 0.29 against 0.19. The two readings correlate only +0.08 to +0.47. Lap 4's
+state reads the same (1.09 to 1.77 of λ's spread), so twenty laps of the masked law did not move it. The field's contacts are read
+one way (a place's face reads another through its own query), where the pair contact is a pairing; the curl is that
+antisymmetric part, and its law is owed. Receipts: `longrun_nov6/spans119.txt`, `truth120.txt`, `curl_laps.txt`, `curl.py`,
+`repeat.py`, `curl_laps.sh`.
