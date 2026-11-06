@@ -1273,7 +1273,11 @@ pub(super) fn train(args: &[String], realization: &mut dyn FieldRealization) -> 
         let octave = step_transfer(2 * transfers, curvatures);
         let least = if curvatures > 0 { -externals * 1000 / curvatures } else { 0 };
         println!("FIELD_STEP_PRICE lap={lap} priced={priced} transfer={transfers} external={externals} curvature={curvatures} least_milli={least} octave={octave} rate={}", learner.rate_bits);
-        if transfer_law && priced > 0 {
+        // [agent-inferred, November 6, 10:10] `FIELD_STEP_HELD` holds the rate (the price is printed, never acted on): the
+        // external price `p_ext` is the step before priced after it stood (`deposit_step(m_(s−1), v_(s−1))` is that step), so
+        // `Σ(t − p_ext)` telescopes to the lap's last transfer less its first and no curvature is read from the pass (seg2's
+        // lap 7: 13,426,496 against `Σt` 45,000,785,396); acting on it is the transfer's sign alone.
+        if transfer_law && priced > 0 && std::env::var_os("FIELD_STEP_HELD").is_none() {
             learner.rate_bits = learner.rate_bits.saturating_add_signed(-octave).max(1);
         }
         write_new(&out.join(format!("STATE.{lap}")), learner.to_text().as_bytes())?;
