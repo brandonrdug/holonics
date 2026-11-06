@@ -3877,3 +3877,21 @@ the end; every content state keeps the near tail. **Fixed before code91** (from 
 code86's 1.364 at laps 1 to 3; the opening's length code at most 9.6 bits an answer (the marginal) by lap 3 with at most 4
 unread; the one-end writer at lap 3 with written over held 0.67 to 1.49, at least 23 exact openings, entropy and the space in
 band and at least 22 fences closed. The field test `a_given_length_is_kept` reads the drawn end kept as a given one.
+
+[definition; agent-inferred, November 6, the unified-theory readings of 04:34 to 05:14] **The depth ring** (`FieldDeclaration::
+depth`, `is_depth`, `Field::with_depth`; the card's `depth_head` and `skinless`; `ring-field`). The last `depth` turned ring
+sets turn by located increments alone: a depth head's rate is `κ = r_h[u]` on its class sheet (base zero, its pace row), so a
+matched opener and the site before its closer differ by exactly zero on every ring and an unmatched one by its net winding;
+its frames turn at `τ = Σ κ` on the solenoid's ring periods (plain, at `r = 0`, the constant frame: exactly a still head's
+reading); its pairs and crowds take no skin (`|μ| = 1`, the relative depth carried exactly at any span and its adjoint exactly
+back); it carries no moment (on the card its modes are marked in the moment map and their moments and covectors are zero).
+The ring `ρ ← μρ + r` with `μ = 1` and `r` keyed by the arriving class, located by deposition, never authored: a table of
+openers and closers would be the hand-written grammar the guide refuses. With one increment a kind and no vanishing sum of
+opener increments, an abelian ring read pairwise with nearness carries matching exactly (the unified-theory reading's exhaustive
+check over every three-kind prefix to length 10); a farther zero-turn opener of another kind remains at 0.49% of closer sites,
+which the shears' free group would remove. v14 head lines carry the depth; a v13 line is depth zero. The field tests read the
+covector against the code's difference and the pace covector with a depth ring (`covector_matches_the_codes_difference`,
+`the_pace_covector_matches_the_code_at_two_steps`). **Fixed before its run**: far brackets at least 0.8 of held's closure with
+near at least 0.9, openers left unclosed under 0.1 (keyed100: 0.42), on writes given keyed100's lengths, ring and foil alike;
+if short, split by whether a pair's between-sites were resolved at its later end's draw, and run the conversion with `r` held
+at zero before reading a miss as the ring's.

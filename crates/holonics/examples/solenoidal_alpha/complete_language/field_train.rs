@@ -964,7 +964,7 @@ pub(super) fn train(args: &[String], realization: &mut dyn FieldRealization) -> 
         Some([path, sha]) => FieldLearner::from_text(std::str::from_utf8(&pinned_read(path, sha, STATE_BUDGET)?)?).map_err(|e| e.to_string())?,
         _ => {
             // The founding's heads are its ring sets; the reach is the passages'.
-            let declaration = FieldDeclaration { alphabet: codec.alphabet(), width, heads, modes, still, contacts, ticks, frames: heads, reach, lanes: 1 };
+            let declaration = FieldDeclaration { alphabet: codec.alphabet(), width, heads, modes, still, contacts, ticks, frames: heads, reach, lanes: 1, depth: 0 };
             let mut field = Field::found(declaration, &keys).map_err(|e| e.to_string())?;
             // [measurement; agent-inferred, November 3, §16.31] `FIELD_FOUND_RETURNS` (`returns`, or `lift` for the readout's
             // lift as well): the founding's zero families drawn instead, uniform on `±√(3/fan-in)` from a block of the key
@@ -1863,6 +1863,19 @@ pub(super) fn masks_field(args: &[String], realization: &mut dyn FieldRealizatio
     Ok(())
 }
 
+/// [definition; agent-inferred, November 6] **`ring-field STATE STATE_SHA DEPTH OUT`**: the state with its last `DEPTH` turned
+/// ring sets made depth rings ([`Field::with_depth`]), their increments founded at zero, written to `OUT`.
+pub(super) fn ring_field(args: &[String]) -> Result<()> {
+    if args.len() != 5 {
+        return Err("ring-field STATE STATE_SHA DEPTH OUT".into());
+    }
+    let mut learner = FieldLearner::from_text(std::str::from_utf8(&pinned_read(&args[1], &args[2], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
+    learner.field = learner.field.with_depth(count(&args[3])?).map_err(|e| e.to_string())?;
+    std::fs::write(&args[4], learner.to_text())?;
+    println!("FIELD_RING depth={} heads={} frames={} still={}", learner.field.declaration.depth, learner.field.declaration.heads, learner.field.declaration.frames, learner.field.declaration.still);
+    Ok(())
+}
+
 /// [measurement; agent-inferred, November 5, §16.46] **`opening-field STATE STATE_SHA CODEC CODEC_SHA UNITS UNITS_SHA HELD
 /// HELD_SHA TRAIN TRAIN_SHA COUNT OUT`**: the void's mass across the writer's opening (the unified-theory reading of November
 /// 5, 07:16: the writer overruns its answers, and a byte drawn far out pins the answer at least that long). For each of the
@@ -2599,7 +2612,7 @@ mod tests {
 
     fn toy_learner(codec: &FieldCodec, problems: &Problems) -> FieldLearner {
         let reach = problems.iter().map(|(q, _, _)| q.len() + codec.answer).max().unwrap();
-        let d = FieldDeclaration { alphabet: codec.alphabet(), width: 8, heads: 2, modes: 3, still: 1, contacts: 4, ticks: 2, frames: 2, reach, lanes: 1 };
+        let d = FieldDeclaration { alphabet: codec.alphabet(), width: 8, heads: 2, modes: 3, still: 1, contacts: 4, ticks: 2, frames: 2, reach, lanes: 1, depth: 0 };
         let keys: Vec<u8> = (0..1u64 << 13).flat_map(|i| mix(0x5EED, i).to_be_bytes()).collect();
         FieldLearner::new(Field::found(d, &keys).unwrap(), 4)
     }

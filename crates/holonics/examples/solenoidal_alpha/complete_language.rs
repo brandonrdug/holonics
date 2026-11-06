@@ -799,6 +799,7 @@ pub(super) fn run_with_execution(
         Some("train-field") if backend == CompleteLanguageTrainingBackend::HostReference => field_train::train(args, &mut field_train::host()),
         Some("sample-field") if backend == CompleteLanguageTrainingBackend::HostReference => field_train::sample(args, &mut field_train::host()),
         Some("rows-field") if backend == CompleteLanguageTrainingBackend::HostReference => field_train::rows_field(args),
+        Some("ring-field") if backend == CompleteLanguageTrainingBackend::HostReference => field_train::ring_field(args),
         Some("restate-field") if backend == CompleteLanguageTrainingBackend::HostReference => field_train::restate_field(args, &mut field_train::host()),
         Some("reach-field") if backend == CompleteLanguageTrainingBackend::HostReference => field_train::reach_field(args, &mut field_train::host()),
         Some("opening-field") if backend == CompleteLanguageTrainingBackend::HostReference => field_train::opening_field(args, &mut field_train::host()),
@@ -895,6 +896,7 @@ pub(super) fn run_field_realized(args: &[String], realization: &mut dyn holonics
         Some("length-field") => field_train::length_field(args, realization),
         Some("order-field") => field_train::order_field(args, realization),
         Some("masks-field") => field_train::masks_field(args, realization),
+        Some("ring-field") => field_train::ring_field(args),
         _ => Err("a realized field command is train-field, sample-field, currents-field, expansion-field, restate-field, reach-field, opening-field, length-field or order-field".into()),
     }
 }

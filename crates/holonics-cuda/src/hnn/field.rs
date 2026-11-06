@@ -218,6 +218,8 @@ struct Words {
     blank_totals: u64,
     // [measurement] Every silent place runs its own rate past the last arrival too (the host's `Field::per_blank_clock`).
     per_blank: u64,
+    // The depth rings' count (`FieldDeclaration::depth`).
+    depth: u64,
 }
 
 /// The moment kernels' words (`MomentWords` in `kernels/field_moment.cuh`, field for field): the batch's
@@ -990,6 +992,7 @@ impl<'c> CardField<'c> {
             pi_lo: field.half_turn() as u64,
             pi_hi: (field.half_turn() >> 64) as u64,
             per_blank: u64::from(field.per_blank_clock),
+            depth: d.depth as u64,
             ..Words::default()
         };
         // The exponential's resident face, read once by its own loop on the card (a tower's packets read the fine field's).
@@ -1894,7 +1897,8 @@ impl<'c> CardField<'c> {
                     ok.device_ptr() + (u * regions) as u64,
                     words.status,
                 ]);
-                cmap.push((h * d.modes + li) as u32);
+                // A depth ring's mode carries no moment (its map's top bit, read by the moment kernels).
+                cmap.push((h * d.modes + li) as u32 | if d.is_depth(h) { 1 << 31 } else { 0 });
             }
         }
         let card = self.card;
@@ -2108,7 +2112,7 @@ impl<'c> CardField<'c> {
             card.zero_octets(&cw, 0, 16 * rows * span).map_err(device)?;
             let (mut hh, mut dyhp, mut dsp, mut dqp) = (h as u32, dyh.device_ptr(), ds.device_ptr(), dq.device_ptr());
             self.launch("field_contact_rows", Self::rows_grid(sites as u64, REV_ROWS), (REV_ROWS * 32) as u32, &mut [arg(words), arg(&mut hh), arg(&mut dyhp), arg(&mut dsp), arg(&mut dqp)])?;
-            if d.carries_moment(h) {
+            if d.carries_moment(h) && !d.is_depth(h) {
                 // The head's skins return to its variation (§16), from the pairs' and crowds' covectors just formed.
                 let (mut hh, mut dyhp, mut dsp) = (h as u32, dyh.device_ptr(), ds.device_ptr());
                 self.launch("field_pace_skin_back", Self::rows_grid(sites as u64, CONTACT_ROWS), (CONTACT_ROWS * 32) as u32, &mut [arg(words), arg(&mut hh), arg(&mut dyhp), arg(&mut dsp)])?;
@@ -2640,7 +2644,7 @@ mod tests {
     use super::*;
 
     fn declaration(width: usize, heads: usize, contacts: usize) -> FieldDeclaration {
-        FieldDeclaration { alphabet: 122, width, heads, modes: 8, still: 2, contacts, ticks: 2, frames: 4, reach: 2221, lanes: 1 }
+        FieldDeclaration { alphabet: 122, width, heads, modes: 8, still: 2, contacts, ticks: 2, frames: 4, reach: 2221, lanes: 1, depth: 0 }
     }
 
     /// Every region is in one batch, in order, each batch within the budget; a region past the budget

@@ -214,9 +214,22 @@ pub struct FieldDeclaration {
     pub frames: usize,
     pub reach: usize,
     pub lanes: usize,
+    /// [definition; agent-inferred, November 6, the unified-theory readings of 04:34 to 04:47] **The depth rings**: the last
+    /// `depth` turned ring sets turn by located increments alone. A depth head's rate is `κ = r_h[u]` on its class sheet (its
+    /// pace row, base zero: only a located increment turns it, so a matched opener and the site before its closer differ by
+    /// exactly zero, an unmatched one by its net winding), its frames turn at `τ = Σ κ` on the solenoid's ring periods, its
+    /// pairs and crowds take no skin (`|μ| = 1`: relative depth carried exactly at any span, its adjoint exactly back), and it
+    /// carries no moment (without a skin its moment would sum the whole region). The ring `ρ ← μρ + r` with `μ = 1` and `r`
+    /// keyed by the arriving class; `r` is located by deposition, never authored.
+    pub depth: usize,
 }
 
 impl FieldDeclaration {
+    /// Whether head `h` is a depth ring ([`FieldDeclaration::depth`]).
+    pub fn is_depth(&self, h: usize) -> bool {
+        h % self.frames + self.depth >= self.frames && self.carries_moment(h)
+    }
+
     /// A lane's coordinates, `W = D / lanes`.
     pub fn lane_width(&self) -> usize {
         self.width / self.lanes
@@ -416,6 +429,9 @@ impl FieldDeclaration {
         if self.frames == 0 || self.heads % self.frames != 0 || self.still > self.frames || self.reach < 2 {
             return refuse("a field's ring sets divide its heads, no more of them are still than there are, and its reach spans two sites");
         }
+        if self.depth > self.frames - self.still {
+            return refuse("a field's depth rings are among its turned ring sets");
+        }
         // The score is released `16 + β` bits from its products' grain, and a head's classes are
         // listed on the card in at most `2^12` buckets.
         if (FACE_BITS as i32) + self.score_shift() < 0 || self.class_trits() > MAX_CLASS_TRITS {
@@ -425,16 +441,19 @@ impl FieldDeclaration {
     }
 
     fn to_text(self) -> String {
-        format!("hnn-field-v13 {} {} {} {} {} {} {} {} {} {}", self.alphabet, self.width, self.heads, self.modes, self.still, self.contacts, self.ticks, self.frames, self.reach, self.lanes)
+        format!("hnn-field-v14 {} {} {} {} {} {} {} {} {} {} {}", self.alphabet, self.width, self.heads, self.modes, self.still, self.contacts, self.ticks, self.frames, self.reach, self.lanes, self.depth)
     }
 
     fn from_text(line: &str) -> Result<Self> {
         let words: Vec<&str> = line.split(' ').collect();
-        if words.len() != 11 || words[0] != "hnn-field-v13" {
-            return refuse("a field's head line that is not hnn-field-v13");
-        }
+        // A v13 head line is a field with no depth ring (the line before the depth rings, its states the line's own).
+        let depth_word = match (words.first().copied(), words.len()) {
+            (Some("hnn-field-v14"), 12) => Some(words[11]),
+            (Some("hnn-field-v13"), 11) => None,
+            _ => return refuse("a field's head line that is not hnn-field-v14"),
+        };
         let n = |w: &str| w.parse::<usize>().map_err(|_| TowerError::Refused("a field's declaration that is not a count"));
-        let d = Self { alphabet: n(words[1])?, width: n(words[2])?, heads: n(words[3])?, modes: n(words[4])?, still: n(words[5])?, contacts: n(words[6])?, ticks: n(words[7])?, frames: n(words[8])?, reach: n(words[9])?, lanes: n(words[10])? };
+        let d = Self { alphabet: n(words[1])?, width: n(words[2])?, heads: n(words[3])?, modes: n(words[4])?, still: n(words[5])?, contacts: n(words[6])?, ticks: n(words[7])?, frames: n(words[8])?, reach: n(words[9])?, lanes: n(words[10])?, depth: depth_word.map(n).transpose()?.unwrap_or(0) };
         d.admit()?;
         Ok(d)
     }
@@ -1596,7 +1615,7 @@ impl Field {
     fn decay(&self, h: usize, l: usize, d: usize) -> (i128, u32) {
         let dd = &self.declaration;
         let set = h % dd.frames;
-        if set < dd.still {
+        if set < dd.still || dd.is_depth(h) {
             return (1, 0);
         }
         (self.decays[l * (dd.frames - dd.still) + set - dd.still][d] as i128, MOVE_BITS)
@@ -1607,7 +1626,7 @@ impl Field {
     /// [`Field::decay`] where the pace is plain), the exact `1` on a still head.
     fn pair_decay(&self, paces: &Paces, h: usize, l: usize, i: usize, j: usize) -> (i128, u32) {
         match paces.row.get(h).copied().flatten() {
-            Some(p) if !paces.plain[p] => (self.skin(self.slot(h, l), paces.sigma[p][i] as i128 - paces.sigma[p][j] as i128) as i128, MOVE_BITS),
+            Some(p) if !paces.plain[p] && !self.declaration.is_depth(h) => (self.skin(self.slot(h, l), paces.sigma[p][i] as i128 - paces.sigma[p][j] as i128) as i128, MOVE_BITS),
             _ => self.decay(h, l, i.abs_diff(j)),
         }
     }
@@ -1616,7 +1635,7 @@ impl Field {
     /// the skin to the place `2^ℓ` away on the crowd's side (inside the region wherever the octave is).
     fn octave_decay(&self, paces: &Paces, h: usize, l: usize, i: usize, level: u32, right: bool) -> (i128, u32) {
         match paces.row.get(h).copied().flatten() {
-            Some(p) if !paces.plain[p] => {
+            Some(p) if !paces.plain[p] && !self.declaration.is_depth(h) => {
                 let k = if right { i + (1 << level) } else { i - (1 << level) };
                 (self.skin(self.slot(h, l), paces.sigma[p][i] as i128 - paces.sigma[p][k] as i128) as i128, MOVE_BITS)
             }
@@ -1687,7 +1706,8 @@ impl Field {
                     Some(face) => release(face.iter().map(|&(c, w)| w as i128 * self.theta[base + c as usize] as i128).sum(), STATE_BITS),
                     None => self.strand_row(region, base, 1, at)[0] as i128,
                 };
-                let k = one + rate;
+                // A depth ring's rate is its located increment alone (base zero, [`FieldDeclaration::depth`]).
+                let k = if d.is_depth(h) { rate } else { one + rate };
                 if t > 0 {
                     clock += k;
                     variation += k.abs();
@@ -1696,7 +1716,8 @@ impl Field {
                 tau.push(fit64(clock)?);
                 sigma.push(fit64(variation)?);
             }
-            out.plain.push(kappa.iter().all(|&k| k as i128 == one));
+            let rest = if d.is_depth(h) { 0 } else { one };
+            out.plain.push(kappa.iter().all(|&k| k as i128 == rest));
             out.kappa.push(kappa);
             out.tau.push(tau);
             out.sigma.push(sigma);
@@ -1790,7 +1811,7 @@ impl Field {
         let (n, ring) = &self.rings[slot];
         // A turned head's frame is its own clock's (§16, Law 1): the byte place where its pace is plain.
         match paces.row.get(h).copied().flatten() {
-            Some(p) if !paces.plain[p] => self.turn(slot, paces.tau[p][t] as i128),
+            Some(p) if !paces.plain[p] || d.is_depth(h) => self.turn(slot, paces.tau[p][t] as i128),
             _ => ring[t % n],
         }
     }
@@ -1960,6 +1981,25 @@ impl Field {
         release(div_nearest(2 * self.pi, self.rings[slot].0 as i128), FACE_BITS)
     }
 
+    /// [definition; agent-inferred, November 6] **A field's last `depth` turned ring sets become depth rings**
+    /// ([`FieldDeclaration::depth`]): their increments founded at zero (the rings plain, each a still head's reading with
+    /// frames that can turn), every other parameter kept; a turned head that becomes a ring gives up its clock and its moment.
+    pub fn with_depth(mut self, depth: usize) -> Result<Self> {
+        let declaration = FieldDeclaration { depth, ..self.declaration };
+        declaration.admit()?;
+        let width = declaration.alphabet + 1;
+        for (p, h) in (0..declaration.heads).filter(|&h| declaration.carries_moment(h)).enumerate() {
+            if declaration.is_depth(h) && !self.declaration.is_depth(h) {
+                let base = self.layout.pace + p * width;
+                for v in &mut self.theta[base..base + width] {
+                    *v = 0;
+                }
+            }
+        }
+        self.declaration = declaration;
+        Ok(self)
+    }
+
     /// Head `h`'s clock as the moment reads it ([`moment::Pace`]): none where its pace is plain (the byte place).
     fn pace_of<'a>(&self, paces: &'a Paces, h: usize, turn: &'a dyn Fn(i128) -> (i64, i64), skin: &'a dyn Fn(i128) -> i64) -> Option<moment::Pace<'a>> {
         let p = paces.row.get(h).copied().flatten()?;
@@ -1986,7 +2026,7 @@ impl Field {
         let l = &self.layout;
         let rows = |base: usize| -> Vec<Vec<i64>> { (0..sites).map(|t| self.strand_row(region, base, 2 * tm, t)).collect() };
         let (eb, ea) = (rows(l.moment_before), rows(l.moment_after));
-        for h in (0..d.heads).filter(|&h| d.carries_moment(h)) {
+        for h in (0..d.heads).filter(|&h| d.carries_moment(h) && !d.is_depth(h)) {
             for li in 0..n {
                 let idx = d.moment_index(h) + li;
                 let slot = self.slot(h, li);
@@ -2016,7 +2056,7 @@ impl Field {
         let rows = |base: usize| -> Vec<Vec<i64>> { (0..sites).map(|t| self.strand_row(region, base, 2 * tm, t)).collect() };
         let (eb, ea) = (rows(l.moment_before), rows(l.moment_after));
         let (mut db, mut da) = (vec![vec![0i128; 2 * tm]; sites], vec![vec![0i128; 2 * tm]; sites]);
-        for h in (0..d.heads).filter(|&h| d.carries_moment(h)) {
+        for h in (0..d.heads).filter(|&h| d.carries_moment(h) && !d.is_depth(h)) {
             for li in 0..n {
                 let idx = d.moment_index(h) + li;
                 let slot = self.slot(h, li);
@@ -2933,7 +2973,7 @@ impl Field {
             // A paced head's skins follow its turn (§16): each pair's and crowd's `D(σ_i − σ_j)` returns to the
             // two ends of its variation, `E = 2^40 ∂/∂D` from the value (`p Re(conj(δỹ_i) D ṽ_j)/D`) and the
             // lock (`δs (2 P 2^30 − 2 D Q)` over the lock's grains), then `δσ_i −= sgn b D E`, `δσ_j += sgn b D E`.
-            if let Some(p) = paces.row[h] {
+            if let Some(p) = paces.row[h].filter(|_| !d.is_depth(h)) {
                 let sigma = &paces.sigma[p];
                 for i in 0..sites {
                     for (k, src) in rows[i].iter().enumerate() {
@@ -3251,7 +3291,7 @@ impl Field {
         let m2 = 2 * m;
         let sites = region.classes.len();
         let paced = paces.kappa.len();
-        let moment_modes: Vec<bool> = (0..m).map(|c| d.carries_moment(c / n)).collect();
+        let moment_modes: Vec<bool> = (0..m).map(|c| d.carries_moment(c / n) && !d.is_depth(c / n)).collect();
         for (k, slot) in r.dm.iter_mut().enumerate() {
             if !moment_modes[(k % m2) % m] {
                 *slot = 0;

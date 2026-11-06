@@ -419,6 +419,8 @@ struct FieldWords {
     const uwide *blank_totals;
     // [measurement] Where set, every silent place runs its own rate past the last arrival too (`Field::per_blank_clock`).
     uint64_t per_blank;
+    // The depth rings' count (`FieldDeclaration::depth`): the last `depth` turned ring sets.
+    uint64_t depth;
 };
 
 // [definition; agent-inferred, November 2] **A head's pace index** (§16, `Field::paces`): the heads that carry a moment
@@ -429,6 +431,13 @@ __device__ __forceinline__ int32_t paced_index(const FieldWords &w, uint32_t h) 
         return -1;
     }
     return (int32_t)((h / w.frames) * (w.frames - w.still) + set - w.still);
+}
+
+// [definition; agent-inferred, November 6] A depth ring (`FieldDeclaration::is_depth`): a turned ring set among the last
+// `depth`, turning by its located increments alone, with no skin and no moment.
+__device__ __forceinline__ bool depth_head(const FieldWords &w, uint32_t h) {
+    const uint32_t set = h % w.frames;
+    return set >= w.still && set + w.depth >= w.frames;
 }
 
 // The frame of local mode `l` of head `h` at the batch's site `g`: the identity in a head of a still ring
@@ -443,7 +452,7 @@ __device__ __forceinline__ void frame_of(const FieldWords &w, uint64_t g, uint32
     }
     // A turned head's frame is its own clock's (§16, Law 1), the byte place where its pace is plain.
     const int32_t p = paced_index(w, h);
-    if (p >= 0 && !w.plain[(uint64_t)p * w.R + w.site_region[g]]) {
+    if (p >= 0 && (!w.plain[(uint64_t)p * w.R + w.site_region[g]] || depth_head(w, h))) {
         const uint64_t at = ((uint64_t)p * w.T + g) * w.n + l;
         *ur = w.pframe[2 * at];
         *ui = w.pframe[2 * at + 1];
@@ -481,21 +490,27 @@ __device__ __forceinline__ bool still_head(const FieldWords &w, uint32_t h) {
     return h % w.frames < w.still;
 }
 
+
+// A head carrying no skin (`Field::decay` is `(1, 0)`): a still ring set's, or a depth ring's.
+__device__ __forceinline__ bool skinless(const FieldWords &w, uint32_t h) {
+    return still_head(w, h) || depth_head(w, h);
+}
+
 // A value carried across a pair by its skin decay: `release(D v, 30)` in a turned head, `v` in a still
 // one (`decayed`).
 __device__ __forceinline__ wide carried(const FieldWords &w, uint32_t h, uint32_t l, uint32_t d, int64_t v) {
-    return still_head(w, h) ? (wide)v : rel(decay_of(w, h, l, d) * (wide)v, MOVE_BITS);
+    return skinless(w, h) ? (wide)v : rel(decay_of(w, h, l, d) * (wide)v, MOVE_BITS);
 }
 
 // The skin decay itself, `D` on `2^(−30)`: the exact `1` of a still head.
 __device__ __forceinline__ wide decay_raw(const FieldWords &w, uint32_t h, uint32_t l, uint32_t d) {
-    return still_head(w, h) ? (wide)1 : decay_of(w, h, l, d);
+    return skinless(w, h) ? (wide)1 : decay_of(w, h, l, d);
 }
 
 // A wide value carried across `d` sites by its skin decay: `release(D v, 30)` in a turned head, `v` in
 // a still one (`decayed_wide`).
 __device__ __forceinline__ wide carried_wide(const FieldWords &w, uint32_t h, uint32_t l, uint32_t d, wide v) {
-    return still_head(w, h) ? v : rel(decay_of(w, h, l, d) * v, MOVE_BITS);
+    return skinless(w, h) ? v : rel(decay_of(w, h, l, d) * v, MOVE_BITS);
 }
 
 // The pace's grain (`PACE_BITS`): a rate, a clock and a variation on `2^(−24)`.
@@ -612,17 +627,17 @@ __device__ __forceinline__ wide skin_ij(const FieldWords &w, uint32_t h, uint32_
 
 // The skin itself between two sites, the exact `1` of a still head.
 __device__ __forceinline__ wide skin_raw(const FieldWords &w, uint32_t h, uint32_t l, uint64_t gi, uint64_t gj, uint32_t gap) {
-    return still_head(w, h) ? (wide)1 : skin_ij(w, h, l, gi, gj, gap);
+    return skinless(w, h) ? (wide)1 : skin_ij(w, h, l, gi, gj, gap);
 }
 
 // A value carried across a pair by its skin: `release(D v, 30)` in a turned head, `v` in a still one.
 __device__ __forceinline__ wide carried_ij(const FieldWords &w, uint32_t h, uint32_t l, uint64_t gi, uint64_t gj, uint32_t gap, int64_t v) {
-    return still_head(w, h) ? (wide)v : rel(skin_ij(w, h, l, gi, gj, gap) * (wide)v, MOVE_BITS);
+    return skinless(w, h) ? (wide)v : rel(skin_ij(w, h, l, gi, gj, gap) * (wide)v, MOVE_BITS);
 }
 
 // A wide value carried alike.
 __device__ __forceinline__ wide carried_wide_ij(const FieldWords &w, uint32_t h, uint32_t l, uint64_t gi, uint64_t gj, uint32_t gap, wide v) {
-    return still_head(w, h) ? v : rel(skin_ij(w, h, l, gi, gj, gap) * v, MOVE_BITS);
+    return skinless(w, h) ? v : rel(skin_ij(w, h, l, gi, gj, gap) * v, MOVE_BITS);
 }
 
 // The site an octave's crowd is skinned to from receiver `gi` (§16): the place `2^level` away on its side.
@@ -1730,7 +1745,7 @@ __device__ __forceinline__ int64_t scored(const FieldWords &w, wide temper, int6
 // `gap` sites: the sum over its `n` modes of each mode's lock carried by the skin (checked, exact), released
 // `16 + 2g + 1` bits (§2.5, §12, §15.2, §15.10); its score is `scored`.
 __device__ __forceinline__ int64_t pair_base(const FieldWords &w, uint32_t h, const int64_t *wi, const int64_t *wj, uint64_t gi, uint64_t gj, uint32_t gap) {
-    const uint32_t g = still_head(w, h) ? 0 : MOVE_BITS;
+    const uint32_t g = skinless(w, h) ? 0 : MOVE_BITS;
     wide s = 0;
     for (uint32_t l = 0; l < w.n; l++) {
         const wide lk = lock_pair(wi[l], wi[w.n + l], wj[l], wj[w.n + l], (uint64_t)skin_raw(w, h, l, gi, gj, gap), g);
@@ -1746,7 +1761,7 @@ __device__ __forceinline__ int64_t pair_base(const FieldWords &w, uint32_t h, co
 // a warp read different rows, so each load is a gather of one line a lane: sixteen 8-octet loads were
 // sixteen such gathers, and the skins another eight), its skins `[h][gap][8]` as two `uint4`.
 __device__ __forceinline__ int64_t pair_base8(const FieldWords &w, uint32_t h, const int32_t (&a)[16], const int4 *row, uint64_t gi, uint64_t gj, uint32_t gap) {
-    const bool still = still_head(w, h);
+    const bool still = skinless(w, h);
     const uint32_t g = still ? 0 : MOVE_BITS;
     int32_t b[16];
 #pragma unroll
@@ -1789,7 +1804,7 @@ __device__ __forceinline__ int64_t pair_base8(const FieldWords &w, uint32_t h, c
 // A crowd's lock at unit gain (§14.10, §15.2, §15.10): the head's locks against its summed word `W` over its
 // `count`, `div_nearest(Σ_l lock_l, count² 2^(16 + 2g + 1))`, the words' sum two reads of the prefix sums.
 __device__ __forceinline__ int64_t crowd_base(const FieldWords &w, uint32_t h, const int64_t *wi, const wide *swlo, const wide *swhi, uint64_t count, uint32_t level, uint64_t gi, bool right) {
-    const uint32_t g = still_head(w, h) ? 0 : MOVE_BITS;
+    const uint32_t g = skinless(w, h) ? 0 : MOVE_BITS;
     wide s = 0;
     for (uint32_t l = 0; l < w.n; l++) {
         const wide lk = lock_of(wi[l], wi[w.n + l], swhi[l] - swlo[l], swhi[w.n + l] - swlo[w.n + l], (wide)count, skin_raw(w, h, l, gi, octave_edge(gi, level, right), (uint32_t)1 << level), g, w.status);
@@ -1967,7 +1982,7 @@ __device__ __forceinline__ int64_t carry_d(uint64_t D, int64_t v) {
 }
 
 __device__ __forceinline__ int64_t carried_s(const FieldWords &w, uint32_t h, uint32_t l, uint32_t d, int64_t v) {
-    return still_head(w, h) ? v : carry_d((uint64_t)decay_of(w, h, l, d), v);
+    return skinless(w, h) ? v : carry_d((uint64_t)decay_of(w, h, l, d), v);
 }
 
 // [definition; agent-inferred, November 1] **The contact, the series row and the current over each
@@ -2019,7 +2034,7 @@ __device__ void contact_body(const FieldWords &w, uint32_t store) {
         Big<L> N = big_zero<L>();
         uint32_t negs = 0, met = 0;
         // The numerators of a staged term: the lanes of an entry add their part of it.
-        const bool still_h = still_head(w, h), paced_h = paced_at(w, h, g);
+        const bool still_h = skinless(w, h), paced_h = paced_at(w, h, g);
         const auto numerators = [&](bool crowd, uint32_t nvalid) {
             if (!active) {
                 return;
@@ -2397,8 +2412,11 @@ extern "C" __global__ void field_moment_scatter_all(FieldWords w, const int64_t 
     for (uint64_t c = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; c < (uint64_t)w.T * tm; c += (uint64_t)gridDim.x * blockDim.x) {
         const uint64_t t = c % w.T;
         const uint32_t u = c / w.T;
-        w.moment[t * w.M2 + cmap[u]] = s[(uint64_t)u * 2 * w.T + 2 * t];
-        w.moment[t * w.M2 + w.M + cmap[u]] = s[(uint64_t)u * 2 * w.T + 2 * t + 1];
+        // A depth ring's mode (the map's top bit) carries no moment.
+        const bool dead = cmap[u] >> 31;
+        const uint32_t cm = cmap[u] & 0x7FFFFFFFu;
+        w.moment[t * w.M2 + cm] = dead ? 0 : s[(uint64_t)u * 2 * w.T + 2 * t];
+        w.moment[t * w.M2 + w.M + cm] = dead ? 0 : s[(uint64_t)u * 2 * w.T + 2 * t + 1];
     }
 }
 
@@ -2434,8 +2452,10 @@ extern "C" __global__ void field_moment_ds_all(FieldWords w, const wide *dm, con
     for (uint64_t c = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; c < (uint64_t)w.T * tm; c += (uint64_t)gridDim.x * blockDim.x) {
         const uint64_t t = c % w.T;
         const uint32_t u = c / w.T;
-        ds[(uint64_t)u * 2 * w.T + 2 * t] = fit64(dm[t * w.M2 + cmap[u]], w.status);
-        ds[(uint64_t)u * 2 * w.T + 2 * t + 1] = fit64(dm[t * w.M2 + w.M + cmap[u]], w.status);
+        const bool dead = cmap[u] >> 31;
+        const uint32_t cm = cmap[u] & 0x7FFFFFFFu;
+        ds[(uint64_t)u * 2 * w.T + 2 * t] = dead ? 0 : fit64(dm[t * w.M2 + cm], w.status);
+        ds[(uint64_t)u * 2 * w.T + 2 * t + 1] = dead ? 0 : fit64(dm[t * w.M2 + w.M + cm], w.status);
     }
 }
 
@@ -2861,7 +2881,7 @@ extern "C" __global__ void __launch_bounds__(REV_ROWS * 32, 6) field_contact_row
     const bool active = lane < S * parts;
     const uint32_t entry = lane % S, part = lane / S, m = entry % n;
     const wide ln2 = (wide)(((uwide)w.ln2_hi << 64) | (uwide)w.ln2_lo);
-    const bool still = still_head(w, h);
+    const bool still = skinless(w, h);
     const uint32_t g0 = still ? 0 : MOVE_BITS;
     const uint64_t rows1 = (uint64_t)w.T + w.R;
     for (uint64_t g = ((uint64_t)blockIdx.x * blockDim.x + threadIdx.x) >> 5; g < w.T; g += (uint64_t)gridDim.x * (blockDim.x >> 5)) {
@@ -2899,7 +2919,7 @@ extern "C" __global__ void __launch_bounds__(REV_ROWS * 32, 6) field_contact_row
         // The same for a head of eight modes, from vector rows: the source's sixteen values as eight 16-octet loads
         // and its skins as two (`pair_score8`).
         const bool eight = w.n == 8;
-        const bool still_h = still_head(w, h), paced_h = paced_at(w, h, g);
+        const bool still_h = skinless(w, h), paced_h = paced_at(w, h, g);
         const auto pair_dp8 = [&](uint32_t j, uint32_t gap) -> wide {
             const longlong2 *v2 = reinterpret_cast<const longlong2 *>(values + (uint64_t)j * S);
             uint32_t dec[8];
@@ -3093,7 +3113,7 @@ extern "C" __global__ void __launch_bounds__(CONTACT_ROWS * 32) field_contact_co
     const uint32_t S = w.span, n = w.n, classes = w.nclasses;
     const uint32_t parts = span_parts(S);
     const uint32_t entry = lane % S, part = lane / S, m = entry % n;
-    const bool still = still_head(w, h);
+    const bool still = skinless(w, h);
     const uint32_t g0 = still ? 0 : MOVE_BITS;
     for (uint64_t g = ((uint64_t)blockIdx.x * blockDim.x + threadIdx.x) >> 5; g < w.T; g += (uint64_t)gridDim.x * (blockDim.x >> 5)) {
         const uint32_t r = w.site_region[g];
@@ -3149,7 +3169,7 @@ extern "C" __global__ void field_spread(FieldWords w, uint32_t h, int64_t *dq, i
     // (`blockDim / span` chunks) summed, the chunks' sums scanned, and each chunk's prefix walked again to the
     // outputs. The prefix sums are exact integers (the ring `Z/2^128`), so any chunking gives the same bits.
     __shared__ wide psv[SPREAD_THREADS], psw[SPREAD_THREADS];
-    const bool still = still_head(w, h);
+    const bool still = skinless(w, h);
     const uint32_t g0 = still ? 0 : MOVE_BITS;
     const uint32_t S = w.span;
     const uint32_t nchunk = blockDim.x / S;
@@ -3713,7 +3733,8 @@ extern "C" __global__ void field_paces(FieldWords w) {
         const uint64_t first = w.region_off[r];
         const uint32_t sites = w.region_off[r + 1] - (uint32_t)first;
         const uint32_t stretch = w.per_blank ? sites : silent_stretch(w, first, sites);
-        const wide one = (wide)1 << PACE_BITS;
+        // A depth ring's rate is its located increment alone (base zero).
+        const wide one = depth_head(w, paced_head(w, p)) ? (wide)0 : (wide)1 << PACE_BITS;
         wide clock = 0, variation = 0;
         bool plain = true;
         for (uint32_t t = 0; t < sites; t++) {
@@ -3740,10 +3761,10 @@ extern "C" __global__ void field_pframes(FieldWords w) {
         const uint32_t l = c % w.n;
         const uint64_t g = (c / w.n) % w.T;
         const uint32_t p = c / ((uint64_t)w.n * w.T);
-        if (w.plain[(uint64_t)p * w.R + w.site_region[g]]) {
+        const uint32_t h = paced_head(w, p);
+        if (w.plain[(uint64_t)p * w.R + w.site_region[g]] && !depth_head(w, h)) {
             continue;
         }
-        const uint32_t h = paced_head(w, p);
         const uint32_t slot = l * (w.frames - w.still) + h % w.frames - w.still;
         wide re, im;
         turn_dev(w, slot, (wide)w.tau[(uint64_t)p * w.T + g], &re, &im);
@@ -3762,11 +3783,14 @@ struct PacedMode {
 
 __device__ __forceinline__ PacedMode paced_mode(const FieldWords &w, uint32_t cm, uint32_t r) {
     PacedMode pm;
+    // A depth ring's mode (the map's top bit) is read as a plain one; its moment is discarded and its covector zero.
+    const bool dead = cm >> 31;
+    cm &= 0x7FFFFFFFu;
     const uint32_t h = cm / w.n;
     pm.l = cm % w.n;
     pm.p = paced_index(w, h);
     pm.slot = pm.l * (w.frames - w.still) + h % w.frames - w.still;
-    pm.plain = pm.p < 0 || w.plain[(uint64_t)pm.p * w.R + r] != 0;
+    pm.plain = pm.p < 0 || dead || w.plain[(uint64_t)pm.p * w.R + r] != 0;
     return pm;
 }
 
@@ -4091,11 +4115,12 @@ extern "C" __global__ void field_moment_pace_back_all(const MomentWords *ws, con
     const int64_t *before = befores + (uint64_t)u * stride, *after = afters + (uint64_t)u * stride, *ds = dss + (uint64_t)u * stride;
     const wide *db = d_befores + (uint64_t)u * stride, *da = d_afters + (uint64_t)u * stride;
     const wide *up = ups + (uint64_t)u * pre_stride, *down = downs + (uint64_t)u * pre_stride;
-    const uint32_t cm = cmap[u];
+    const bool dead = cmap[u] >> 31;
+    const uint32_t cm = cmap[u] & 0x7FFFFFFFu;
     for (uint64_t g = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; g < w.T; g += (uint64_t)gridDim.x * blockDim.x) {
         const uint32_t r = w.site_region[g], t = w.site_pos[g];
         PacedMode pm = paced_mode(fw, cm, r);
-        if (pm.p < 0 || !w.ok[r]) {
+        if (pm.p < 0 || dead || !w.ok[r]) {
             continue;
         }
         const uint64_t first = w.region_off[r];
