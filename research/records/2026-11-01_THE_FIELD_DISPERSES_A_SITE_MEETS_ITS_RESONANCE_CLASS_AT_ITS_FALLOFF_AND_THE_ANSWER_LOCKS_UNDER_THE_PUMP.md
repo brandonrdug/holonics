@@ -4001,3 +4001,20 @@ Held context went 1.257, 1.242 (lap 6: 1.308) and unseen 1.209, 1.190; Σt fell 
 fences closed went from 6 to 19 and brackets near from 0.200 to 0.329; the keyed order code was 3.827. The band past 1,200
 rose to 124.1. The rate holds at 9 (`FIELD_STEP_HELD`), since the sign branch would halve every lap: a lap's transfer is its
 loss change plus half its step's energy, positive at any rate in the band.
+
+[measurement; November 6, long110 seg3 and long111 seg4] **The writer state on its letters brought the far void back**. At lap 10
+(rate 9, one-rate stretch), the band past 1,200 was 16.7 held and 14.6 training (lap 8: 124.1 and 80.6; lap 4: 17.9 and 15.3). The
+length code paired was +0.33, and the one-end write ran 0.965× held. Given held's lengths there were 23 openings and 27 of 32
+fences closed. Held context was 1.227. Read under the bare stretch without training, lap 10 coded its length at +0.81 and wrote
+1.40× held, so the bare switch was withheld: the far void had come back on the same clock. At lap 12, the band stayed at
+16.7 and the length code reached +0.05, with 26 openings and 25 fences closed. But the one-end write ran 1.59× held and the
+expected length less held went from +50 to +111. Order-field's split shows 92% of the keyed code's rise from lap 8 to 12 in
+its length part (0.687 → 1.839 a place), while the keyed order given its end fell from 2.733 to 2.617 a letter. κ₁'s
+per-question spread fell to about 0.09–0.10 on head 1 (0.24–0.32 at lap 6), with the coupling near zero.
+
+[definition; agent-inferred, November 6, the unified-theory reading of 11:49] **The writer state is compared on its letters off
+the void** (`Port::letters`, `letters_reading`). Each open place is compared on `−log₂(m_a/(T − m_∅))` with covector `p̂_a/(1 −
+p̂_∅) − [a = target]`, zero at the void. That is the release's own draw where the end is given. On its whole class, an open
+place coded `−log₂ p(a | not ∅) − log₂(1 − p_∅)`, and the second term pushed the void down at every interior place of an
+end-given state, which the writer never reads. The void is compared where it is uncertain: in the opening and the masks'
+near tails. `covector_matches_the_codes_difference` runs a letters port with a resolved place.

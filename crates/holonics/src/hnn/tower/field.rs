@@ -808,6 +808,11 @@ pub struct Port<'a> {
     /// ([`Region::window`]): where set, a receiver's row is met only at the question's sites, the silent stretch's first
     /// place and the places within `(NEAR − 1)·ticks` of a heard one; every other receiver meets no source that tick.
     pub window: bool,
+    /// [definition; agent-inferred, November 6, the unified-theory reading of 11:49] **Compared on its letters off the void**: each
+    /// open place of the port on its target's class within the letters, `−log₂(m_a/(T − m_∅))`, the release's own draw where the
+    /// end is given (a place before the end draws from its face restricted to the letters), so the void logit takes no covector
+    /// there; a resolved place carries no face and is not compared ([`letters_reading`]).
+    pub letters: bool,
 }
 
 /// [definition; agent-inferred, November 3, §16.24] **A port's reading**: its coupling code on `2^(−20)` bits and each
@@ -818,6 +823,9 @@ pub fn port_reading(faces: &[(&[u128], u128)], port: &Port) -> Result<(Vec<Vec<i
     use crate::receiver::coupling::TemperatureRefusal as Why;
     if port.boundary {
         return boundary_reading(faces, port);
+    }
+    if port.letters {
+        return letters_reading(faces, port);
     }
     let read = crate::receiver::coupling::coupling_code(faces, port.void, port.target, None).map_err(|why| {
         TowerError::Refused(match why {
@@ -849,6 +857,31 @@ pub fn port_reading(faces: &[(&[u128], u128)], port: &Port) -> Result<(Vec<Vec<i
 /// the opening's void mass past the end is what a release pays in places). On the face covector's `2^(−24)` and the codes'
 /// `2^(−20)` bits, read alike by the host's return and the card's. A resolved place (`(∅, 0)`, a state of the writer's
 /// path) is not compared: its row is empty and it adds no code.
+/// [`Port::letters`]'s reading: at each open place `i` (within the target) the covector `p̂_a/(1 − p̂_∅) − [a = target_i]` over the
+/// letters on the face covector's `2^(−24)`, zero at the void, and the code `−log₂(m_(target_i)/(T − m_∅))` on `2^(−20)` bits; a
+/// resolved place (an empty face) is not compared.
+fn letters_reading(faces: &[(&[u128], u128)], port: &Port) -> Result<(Vec<Vec<i64>>, i64)> {
+    let one = 1i64 << super::COVECTOR_BITS;
+    let mut rows = Vec::with_capacity(faces.len());
+    let mut code = 0i64;
+    for (i, &(masses, total)) in faces.iter().enumerate() {
+        if (total == 0 && masses.is_empty()) || i >= port.target.len() {
+            rows.push(Vec::new());
+            continue;
+        }
+        if total == 0 || port.void >= masses.len() || masses[port.void] >= total {
+            return refuse("a port's face that is empty, misses a class or holds no letter");
+        }
+        let rest = total - masses[port.void];
+        let mut row: Vec<i64> = masses.iter().map(|&m| (((m << super::COVECTOR_BITS) + rest / 2) / rest) as i64).collect();
+        row[port.void] = 0;
+        row[port.target[i]] -= one;
+        code += crate::hnn::tower::face_code(masses[port.target[i]], rest);
+        rows.push(row);
+    }
+    Ok((rows, code))
+}
+
 fn boundary_reading(faces: &[(&[u128], u128)], port: &Port) -> Result<(Vec<Vec<i64>>, i64)> {
     let one = 1i128 << super::COVECTOR_BITS;
     let mut rows = Vec::with_capacity(faces.len());
@@ -1891,7 +1924,7 @@ impl Field {
         }
         if let Some(port) = region.port {
             // [§16.47] A port at its boundary may hold resolved places (a state of the writer's path); it compares its open ones.
-            if port.start > region.classes.len() || (!port.boundary && region.unresolved[port.start..].iter().any(|&u| !u)) || (port.start..region.classes.len()).any(|t| region.locked.get(t).copied().unwrap_or(false)) {
+            if port.start > region.classes.len() || (!port.boundary && !port.letters && region.unresolved[port.start..].iter().any(|&u| !u)) || (port.start..region.classes.len()).any(|t| region.locked.get(t).copied().unwrap_or(false)) {
                 return refuse("a port whose places are not every open, unlocked site to the region's end");
             }
             if port.void >= self.declaration.alphabet || port.target.iter().any(|&c| c == port.void || c >= self.declaration.alphabet) {
@@ -4482,8 +4515,8 @@ fn port_code(faces: &[Option<TowerFace>], port: &Port) -> Result<i64> {
     Ok(port_reading(&port_faces(faces, port)?, port)?.1)
 }
 
-/// A port's places' faces, each `(masses, total)`: every place must carry one, but a port at its boundary may hold
-/// resolved places, which carry none and are read as `(∅, 0)` (§16.47, [`boundary_reading`]).
+/// A port's places' faces, each `(masses, total)`: every place must carry one, but a port at its boundary or on its letters
+/// may hold resolved places, which carry none and are read as `(∅, 0)` (§16.47, [`boundary_reading`], [`letters_reading`]).
 fn port_faces<'f>(faces: &'f [Option<TowerFace>], port: &Port) -> Result<Vec<(&'f [u128], u128)>> {
     let stop = port.stop.unwrap_or(faces.len()).min(faces.len());
     faces[port.start..]
@@ -4492,7 +4525,7 @@ fn port_faces<'f>(faces: &'f [Option<TowerFace>], port: &Port) -> Result<Vec<(&'
         .map(|(k, f)| match f {
             _ if port.start + k >= stop || port.heard.is_some_and(|h| !h[port.start + k]) => Ok((&[][..], 0)),
             Some(f) => Ok((f.masses.as_slice(), f.total)),
-            None if port.boundary => Ok((&[][..], 0)),
+            None if port.boundary || port.letters => Ok((&[][..], 0)),
             None => refuse("a port's place without a face"),
         })
         .collect()
@@ -4824,7 +4857,7 @@ impl FieldLearner {
         }
         // The sites the weighed code is a code of (§16.23): each region's domain where it reads an open site.
         let sites = spans.iter().filter(|s| s.0 > 0).map(|s| s.1 as usize).sum::<usize>()
-            + regions.iter().filter_map(|r| r.port.map(|p| (p.start..p.stop.unwrap_or(r.classes.len()).min(r.classes.len())).filter(|&t| p.heard.is_none_or(|h| h[t])).count())).sum::<usize>();
+            + regions.iter().filter_map(|r| r.port.map(|p| (p.start..p.stop.unwrap_or(r.classes.len()).min(r.classes.len())).filter(|&t| r.unresolved[t] && p.heard.is_none_or(|h| h[t])).count())).sum::<usize>();
         let raw = g.clone();
         let transfer = self.last.take().and_then(|s| predicted_change(&self.field, &raw, &s.step, s.halvings));
         // [the unified-theory reading of November 6, 08:54] The step the moments would deposit before this section moves them,
