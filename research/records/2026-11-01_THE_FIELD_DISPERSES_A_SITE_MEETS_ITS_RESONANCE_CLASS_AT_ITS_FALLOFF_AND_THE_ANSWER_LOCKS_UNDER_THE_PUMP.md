@@ -4063,3 +4063,36 @@ identifiers matching the question went 0.05, 0.09, 0.13, 0.15, 0.18, and those m
 November 5 drift to spaces does not recur on this state, so refine 10 joins the writer, and the law of the field meeting its own
 release waits. Bracket closure erodes past about 6 passes (near 0.27 at 6, 0.15 at 10). Cost: 6,121 reads, 140 s for 32 answers,
 against 639 reads for the sweeps alone.
+
+[measurement; November 6, drafts116; the unified-theory reading of 17:08, law 2] **Training on the field's own one-read drafts is
+falsified.** `FIELD_PATH_DRAFTS` gave each path problem a third state: a keyed share ρ (uniform up to the whole answer) of its
+places drawn at once from the field's faces, then masks `τ = u²` within the answer compared on the truth given that draft.
+Card parity was equal under every law of the run. One lap from lap 24 (rate 12 held, the bare clock) took 1,124 s against
+800 s, and it made the field worse: held context 1.188 → 1.254, unseen 1.120 → 1.194, the held order code given lengths 2.586 →
+2.622. Given held's lengths the writes were spacier (space 0.157 at refine 0 and 0.189 at refine 10, against 0.133 and 0.145),
+with fewer identifiers from the question (0.04 and 0.08, against 0.05 and 0.18). Only closures rose (bracket near 0.85 and string
+near 0.96 of held's at refine 10). [inferred, with theory's reading of 17:58] A definite letter that may be wrong cannot be told
+from a true one, so the only fit to noisy drafts is to discount every definite letter: silence is the honest unknown (§16.28),
+noise is not. The law's states were one-read parallel draws, where refine's states are the writer's ordered drafts. The law
+stays declared and off. A new kind of state enters a run as a declared share, read after its first sections. Receipts:
+`longrun_nov6/drafts116.txt`.
+
+[measurement and definition; November 6, rest117–118; Brandon's lens of 17:31, the unified-theory reading of 17:38] **The refine
+walk circulates: its drive settles above its spread.** Brandon's lens: refinement is the cube's solving, each place an edge and a
+face coupled to the others, and it should stop where no impulse is left to change. At temperature one the walk has no fixed point,
+so the plateau is zero net drive, not zero change. Each pass now reads its drive (`PassDrive`): over the places it redraws in an
+answer, the standing letters' code `S` and the faces' entropy `H` on the face each is drawn from, `D = S − H` (the face
+temperature covector summed at the standing letters, atlas `ratio.face-temperature-covector`), the varentropy `C` (its curvature),
+the changes and `K = Σ(1 − Σp²)`, the changes a walk at equilibrium keeps. Under the faces' own joint `D` has mean zero. On lap 24,
+given held's lengths, 40 passes walked whole (495 s, 26,818 reads) read, a place over the 32 answers: pass 1 `S` 3.256, `H` 1.790,
+`D` +1.467, `√C/n` 0.019, changes 0.594 against `K` 0.473; pass 10 `D` +0.809; pass 20 +0.469; passes 19–40 between +0.36 and
++0.54, pass 40 `S` 1.862, `H` 1.456, `D` +0.407, changes 0.392 against `K` 0.360. `H` bottoms at 1.289 at pass 27 and rises as
+the faces flatten. At no pass do more than 4 of the 32 answers have `D ≤ √C`; each answer's settled drive is about four to five
+times its spread. So the faces are not one joint's conditionals and the walk keeps producing about 0.4 bits a place a pass: the
+consistency law is owed (theory: Kolmogorov's cycle condition on each two-place square). The rest law as first stated (`D ≤ √C`,
+or a fall of `D` within `√C`) stops every answer by pass 2 to 5 on its second clause, because an answer's pass-to-pass drive
+swings with its moving faces by more than the draw's spread `√C`; its write read space 0.145 and question identifiers 0.13.
+`FIELD_WRITER_REST` stays declared for comparison. As the walk lengthens the words rise and the structure erodes (space, question
+identifiers, held identifiers, fences closed of opened, code lines): refine 10: 0.145, 0.18, 0.16, 28/29, 8.0; walk 20: 0.126,
+0.22, 0.19, 20/28, 6.5; walk 40: 0.118, 0.26, 0.24, 20/26, 5.7, the words that rise being the field's commonest (`print(`
+repeated). Receipts: `longrun_nov6/rest117.txt`, `rest118.txt`, `passes.py`.
