@@ -1,0 +1,81 @@
+# long107 waits for the card lock 07:28:13
+# held108 reads, lock taken 07:57:01; foil2 8c7d1cbd883389d998077e639219668a690f8d91b7b03a14bae7d11ad2a0c131
+== order order_foil2 FIELD_ORDER problems=32 places=8792 place_bits_a_place=2.900 place_length_bits_a_place=0.029 place_content_bits_a_place=2.871 keyed_bits_a_place=3.367 masks_bits_a_place=2.756 masks_length_bits_a_place=0.022 lengths_unread=17 ms=39402 MEASURE lap=order_foil2 rc=0 wall_s=39.9 peak_rss_kib=570080 
+== order order_code86 FIELD_ORDER problems=32 places=8792 place_bits_a_place=3.100 place_length_bits_a_place=0.027 place_content_bits_a_place=3.072 keyed_bits_a_place=3.316 masks_bits_a_place=2.794 masks_length_bits_a_place=0.020 lengths_unread=17 ms=38487 MEASURE lap=order_code86 rc=0 wall_s=39.0 peak_rss_kib=570284 
+== order order_foil2_perblank FIELD_ORDER problems=32 places=8792 place_bits_a_place=2.900 place_length_bits_a_place=0.029 place_content_bits_a_place=2.871 keyed_bits_a_place=3.367 masks_bits_a_place=2.756 masks_length_bits_a_place=0.022 lengths_unread=17 ms=40135 MEASURE lap=order_foil2_perblank rc=0 wall_s=40.6 peak_rss_kib=568436 
+== write_code86 given held's lengths
+FIELD_LENGTH problems=32 sweeps=2062 refine=0 stopped=- run_bits=1 reads=588 certified_bits=460.920 passed=0 ms=18440
+MEASURE lap=write_code86 rc=0 wall_s=18.7 peak_rss_kib=241604
+written: 32 answers, 16 open with ```python; a 'y' outside it in 31, its first at places 0 to 5 in 14 (median first 16), 'y' past it 0.015; commonest byte's share at places 10 to 255 (246 places) 0.236; top byte ' ' 0.220, 'y' 0.015, entropy 4.75 bits over 8760 bytes
+written: 32 answers: a fence opened 32, closed 31; parses as Python 5; code lines mean 5.7; identifiers 537, in the question 0.03, in the held answer 0.05
+family	span	written opened	written closed share	held opened	held closed share	ratio
+bracket	near	68	0.309	178	0.393	0.79
+bracket	far	68	0.250	178	0.607	0.41
+string	near	27	0.259	60	0.400	0.65
+string	far	27	0.111	60	0.583	0.19
+block	near	5	0.000	75	0.000	nan
+block	far	5	0.600	75	0.947	0.63
+RULE: the lowest closure against held is string far at 0.19 (under 0.5)
+== write_foil2 given held's lengths
+FIELD_LENGTH problems=32 sweeps=2062 refine=0 stopped=- run_bits=1 reads=667 certified_bits=303.122 passed=0 ms=20108
+MEASURE lap=write_foil2 rc=0 wall_s=20.4 peak_rss_kib=239516
+written: 32 answers, 24 open with ```python; a 'y' outside it in 28, its first at places 0 to 5 in 5 (median first 37), 'y' past it 0.015; commonest byte's share at places 10 to 255 (246 places) 0.205; top byte ' ' 0.168, 'y' 0.015, entropy 5.14 bits over 8760 bytes
+written: 32 answers: a fence opened 30, closed 17; parses as Python 0; code lines mean 14.4; identifiers 1014, in the question 0.04, in the held answer 0.04
+family	span	written opened	written closed share	held opened	held closed share	ratio
+bracket	near	88	0.227	178	0.393	0.58
+bracket	far	88	0.261	178	0.607	0.43
+string	near	98	0.214	60	0.400	0.54
+string	far	98	0.153	60	0.583	0.26
+block	near	30	0.033	75	0.000	nan
+block	far	30	0.367	75	0.947	0.39
+RULE: the lowest closure against held is string far at 0.26 (under 0.5)
+== write_code91 given held's lengths
+FIELD_LENGTH problems=32 sweeps=2062 refine=0 stopped=- run_bits=1 reads=659 certified_bits=320.626 passed=0 ms=18658
+MEASURE lap=write_code91 rc=0 wall_s=18.9 peak_rss_kib=243668
+written: 32 answers, 25 open with ```python; a 'y' outside it in 27, its first at places 0 to 5 in 3 (median first 24), 'y' past it 0.020; commonest byte's share at places 10 to 255 (246 places) 0.168; top byte ' ' 0.102, 'y' 0.019, entropy 5.02 bits over 8760 bytes
+written: 32 answers: a fence opened 31, closed 25; parses as Python 3; code lines mean 7.9; identifiers 629, in the question 0.02, in the held answer 0.03
+family	span	written opened	written closed share	held opened	held closed share	ratio
+bracket	near	60	0.167	178	0.393	0.42
+bracket	far	60	0.317	178	0.607	0.52
+string	near	56	0.268	60	0.400	0.67
+string	far	56	0.268	60	0.583	0.46
+block	near	15	0.000	75	0.000	nan
+block	far	15	0.467	75	0.947	0.49
+RULE: the lowest closure against held is bracket near at 0.42 (under 0.5)
+== foil2's opening (the start state)
+OVERRUN open_foil2_HELD128 answers=128 room=2062 mean_past_end=1695.9
+  0-127	mean 124.0	share 0.073	median 124.5	length_law 50.3
+  128-511	mean 376.0	share 0.222	median 376.8	length_law 62.0
+  512-1199	mean 670.5	share 0.395	median 679.1	length_law 19.2
+  1200-end	mean 525.4	share 0.310	median 602.2	length_law 0.8
+OVERRUN open_foil2_TRAIN answers=128 room=2062 mean_past_end=1805.8
+  0-127	mean 124.0	share 0.069	median 124.5	length_law 57.8
+  128-511	mean 376.6	share 0.209	median 377.1	length_law 71.0
+  512-1199	mean 677.7	share 0.375	median 679.5	length_law 22.5
+  1200-end	mean 627.5	share 0.347	median 635.4	length_law 0.9
+CONDITIONED open_foil2_HELD128 answers=128 mean_past_end=876.3 plain=1695.9
+  0-127	conditioned 66.0	plain 124.0
+  128-511	conditioned 196.9	plain 376.0
+  512-1199	conditioned 348.0	plain 670.5
+  1200-end	conditioned 265.5	plain 525.4
+CONDITIONED open_foil2_TRAIN answers=128 mean_past_end=765.2 plain=1805.8
+  0-127	conditioned 53.7	plain 124.0
+  128-511	conditioned 161.1	plain 376.6
+  512-1199	conditioned 287.5	plain 677.7
+  1200-end	conditioned 262.9	plain 627.5
+# foil2's keyed order code 3.367 08:00:06
+# long107 binary 7a5feab10660e5eb425ec05d0d67fed2ad19f52d6c35cfb9c24aacae15b3c031 parity 08:00:06
+FIELD_PARITY section=1 withheld=false regions=48 length=2304 sites=26724 faces_unequal=0 covector_unequal=0 learner_equal=true near_equal=true clocks_equal=true rows_equal=true shares_equal=true currents_equal=true host_ms=40833 card_ms=651
+FIELD_PARITY section=2 withheld=true regions=32 length=555 sites=0 faces_unequal=0 covector_unequal=0 learner_equal=true near_equal=true clocks_equal=true rows_equal=true shares_equal=true currents_equal=true host_ms=1630 card_ms=19
+FIELD_PARITY_DONE sections=2 reads_unequal=0 faces_unequal=0 covector_unequal=0 learners_unequal=0 releases=1 releases_unequal=0 card_release_ms=14 host_ms=42464 card_ms=670 elapsed_ms=299407
+MEASURE lap=parity rc=0 wall_s=300.0 peak_rss_kib=4973984
+# cost read from 8c7d1cbd883389d998077e639219668a690f8d91b7b03a14bae7d11ad2a0c131 08:05:06
+dev sections 150 mean_ms 927 max_ms 2080
+MEASURE lap=dev rc=0 wall_s=152.3 peak_rss_kib=890176
+# lap bound 1708381 ms; a segment 3716762 ms, outer 3776 s
+# room cut parity, binary 83ba5fa3b11f6b4973ba109e322336710f9e656ca6bb8f8a3ecf8a8634cdddbe 08:07:38
+FIELD_PARITY section=1 withheld=false regions=48 length=2304 sites=26724 faces_unequal=0 covector_unequal=0 learner_equal=true near_equal=true clocks_equal=true rows_equal=true shares_equal=true currents_equal=true host_ms=32085 card_ms=595
+FIELD_PARITY section=2 withheld=true regions=32 length=555 sites=0 faces_unequal=0 covector_unequal=0 learner_equal=true near_equal=true clocks_equal=true rows_equal=true shares_equal=true currents_equal=true host_ms=2392 card_ms=18
+FIELD_PARITY_DONE sections=2 reads_unequal=0 faces_unequal=0 covector_unequal=0 learners_unequal=0 releases=1 releases_unequal=0 card_release_ms=12 host_ms=34478 card_ms=613 elapsed_ms=292179
+MEASURE lap=parity_cut rc=0 wall_s=292.8 peak_rss_kib=4228008
+# long107 stopped at seg1's start (theory, 08:07: the long run starts from long106's seg1 state) 08:12:39

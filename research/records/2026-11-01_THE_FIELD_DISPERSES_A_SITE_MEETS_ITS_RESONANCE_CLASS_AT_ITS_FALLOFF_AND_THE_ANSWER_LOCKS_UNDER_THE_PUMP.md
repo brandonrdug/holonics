@@ -4028,3 +4028,22 @@ reads 0.016 bits a place, against the opening's length code of 0.031, though the
 questions the opening's expected length follows held at +0.575 and carries 0.75 of held's spread. Held regressed on it has
 slope 0.76, so the opening's per-question deviations run about 1.3 times what they predict. The one-end write's correlation
 with held (+0.018 at lap 14) is the single draw's own spread.
+
+[measurement; November 6, long112 and long113] **The length swings on fixed laws, and the bare clock holds it**. Laps 15–16 ran from
+lap 14 at rate 10 (FIELD_STEP_HELD), with the laws fixed. Held context reached 1.209 and 1.213, and lap 15's step price was 0.285×
+lap 14's. But the opening's length broke: expected length less held +706, band past 1,200 140.8 held, one-end write 3.39× held.
+Over laps 8–16 the expected length less held ran +609, +50, +111, +17, +706 with the laws fixed from lap 10. κ₁'s spread on head 1
+was back at 0.17, with the coupling to the band at −0.15. Read on lap 16 without training, the bare stretch coded the length at
++3.16 against one-rate's +1.67 and put the band at 149.1: the readout fit one-rate's phases. Trained on the bare clock from lap
+16, lap 18 read the band at 9.8 held and 7.7 training, the length code at −0.17 (the first under the marginal), the one-end write
+at 1.30× and held context at 1.210. Lap 20, same law, read the band at 9.1, the length code at −0.25, the one-end write at 1.45×,
+26 of 26 fences closed given held's lengths, and held context at 1.201 and 1.204, unseen 1.140. At rate 11, lap 22 read held
+context 1.194 and 1.198, unseen 1.127, the band at 9.3, the one-end write at 1.05× held (correlation +0.081), and keyed_length at
+0.425 a place. On the bare clock the far void held still across three segments and two halvings. Receipts:
+`longrun_nov6/` (each chain's output, the reading scripts).
+At rate 12 (laps 23–24, the run's last, long114), held context read 1.190 and 1.188, and unseen 1.121 and 1.120. Lap 23's step
+price was 0.80e9, 0.38× seg9's mean. The band past 1,200 read 11.8 held, the length code +0.01, and the one-end write 1.60× held.
+Given held's lengths there were 29 openings and 27 of 31 fences closed. From code91's lap 4 (held context 1.306, unseen 1.239) to
+lap 24, held context fell by 0.118 and unseen by 0.119 over twenty laps, about 9 card-hours. Each halving bought its drop in the
+first lap after it (unseen 1.141 → 1.129 at rate 11, 1.127 → 1.121 at rate 12). The one-end write's length follows its
+question only weakly (correlation +0.08 to +0.19), where the opening follows held at +0.58: the single draw's own spread.
