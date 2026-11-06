@@ -751,6 +751,10 @@ pub struct Field {
     /// [measurement; agent-inferred, November 6] Where set, every silent place runs its own per-blank rate past the last arrival
     /// too (the clock before §16.47's one-rate stretch), a declared comparison; not part of the state.
     pub per_blank_clock: bool,
+    /// [definition; agent-inferred, November 6, the unified-theory reading of 10:31] Where set, **past the last arrival a silent
+    /// place runs at the bare rate** (`κ = 1`, §16.28) and returns nothing: nothing arrives there, so no guessed duration
+    /// drives its clock; between arrivals each blank keeps its expected duration (§16.44). Not part of the state.
+    pub bare_stretch: bool,
 }
 
 /// [definition; agent-inferred, November 1] A region: each site's class, whether it is
@@ -1629,7 +1633,7 @@ impl Field {
         let rings: Vec<(usize, Vec<(i64, i64)>)> = ring_periods(declaration.turned_slots(), declaration.reach).into_iter().map(|n| (n, (0..n.min(declaration.reach)).map(|r| ring_phasor(r, n, pi)).collect())).collect();
         let exponential = Exponential::new(FACE_BITS);
         let decays = rings.iter().map(|&(n, _)| (0..declaration.reach).map(|d| skin_decay(d, n, pi, &exponential)).collect()).collect();
-        Self { declaration, theta, layout, rings, decays, exponential, fine: Exponential::new(MATERIAL_BITS), pi, scale: None, per_blank_clock: false }
+        Self { declaration, theta, layout, rings, decays, exponential, fine: Exponential::new(MATERIAL_BITS), pi, scale: None, per_blank_clock: false, bare_stretch: false }
     }
 
     /// Each turned slot's skin decay on `2^(−30)` at every distance within the reach (a
@@ -1731,8 +1735,9 @@ impl Field {
             let (mut kappa, mut tau, mut sigma) = (Vec::with_capacity(sites), Vec::with_capacity(sites), Vec::with_capacity(sites));
             let (mut clock, mut variation) = (0i128, 0i128);
             for t in 0..sites {
-                // [§16.47] Past the last arrival every silent place runs at the first one's rate (one passage).
-                let at = if t > stretch { stretch } else { t };
+                // [§16.47] Past the last arrival every silent place runs at the first one's rate (one passage); under
+                // `bare_stretch` at its own place, which reads no face there, so at the bare rate.
+                let at = if t > stretch && !self.bare_stretch { stretch } else { t };
                 // [the unified-theory reading of November 6, 05:45] A depth ring takes no blank face: a silent site runs at
                 // rate zero every tick (exact on what arrived; an expected increment `ζ^E[r]` would read a blank at full
                 // coherence and turn a closer's frame by its own guess).
@@ -2446,7 +2451,9 @@ impl Field {
                 // to the silent stretch's first, whose rate the stretch past it runs at (every silent place under the per-blank
                 // clock); a face past it is read by no clock and returns no covector (`clock_return` folds the stretch there).
                 let stretch = if self.per_blank_clock { sites } else { Self::silent_stretch(region) };
-                let reads = (0..sites).map(|t| (Self::silent(region, t) && t <= stretch).then(|| self.face_of(&x[t * dw..(t + 1) * dw], &reaches)).transpose()).collect::<Result<Vec<_>>>()?;
+                // Under `bare_stretch` no place past the last arrival reads a face, the stretch's first among them.
+                let read_to = if self.bare_stretch && !self.per_blank_clock { stretch } else { stretch + 1 };
+                let reads = (0..sites).map(|t| (Self::silent(region, t) && t < read_to).then(|| self.face_of(&x[t * dw..(t + 1) * dw], &reaches)).transpose()).collect::<Result<Vec<_>>>()?;
                 let blank: Vec<Option<Shares>> = reads.iter().map(|r| r.as_ref().map(|r| shares(&r.face))).collect();
                 let next = self.paces_with(region, &blank)?;
                 let moment = self.moments_of(region, &next)?;
@@ -3363,7 +3370,7 @@ impl Field {
                 dks[k] = tail_tau + paces.kappa[p][k].signum() as i128 * tail_sig;
             }
             // [§16.47] The silent stretch past the last arrival runs at its first place's rate, so their covectors return there.
-            if stretch < sites {
+            if stretch < sites && !self.bare_stretch {
                 let folded: i128 = dks[stretch + 1..].iter().sum();
                 dks[stretch] += folded;
                 for slot in &mut dks[stretch + 1..] {

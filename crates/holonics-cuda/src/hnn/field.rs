@@ -226,6 +226,9 @@ struct Words {
     per_blank: u64,
     // The depth rings' count (`FieldDeclaration::depth`).
     depth: u64,
+    // [the unified-theory reading of November 6, 10:31] Past the last arrival a silent place runs at the bare rate (the host's
+    // `Field::bare_stretch`).
+    bare_stretch: u64,
 }
 
 /// The moment kernels' words (`MomentWords` in `kernels/field_moment.cuh`, field for field): the batch's
@@ -999,6 +1002,7 @@ impl<'c> CardField<'c> {
             pi_hi: (field.half_turn() >> 64) as u64,
             per_blank: u64::from(field.per_blank_clock),
             depth: d.depth as u64,
+            bare_stretch: u64::from(field.bare_stretch),
             ..Words::default()
         };
         // The exponential's resident face, read once by its own loop on the card (a tower's packets read the fine field's).
@@ -1192,14 +1196,16 @@ impl<'c> CardField<'c> {
         let any_echo = regions.iter().any(|r| r.echo.iter().any(Option::is_some));
         // [E] The cut rooms' windows, each site's row computed or not (every site of an uncut region).
         let windows: Vec<Option<Vec<bool>>> = regions.iter().map(|r| r.window(ticks)).collect();
-        let per_blank = words.per_blank != 0;
+        let (per_blank, bare) = (words.per_blank != 0, words.bare_stretch != 0);
         let blank_read: Vec<u8> = regions
             .iter()
             .flat_map(|r| {
                 let silent = |t: usize| r.unresolved[t] && r.faces.get(t).and_then(Option::as_ref).is_none();
                 let s = r.classes.len();
                 let stretch = if per_blank { s } else { (0..s).rev().find(|&t| !silent(t)).map_or(0, |last| last + 1) };
-                (0..s).map(move |t| u8::from(silent(t) && t <= stretch))
+                // Under the bare stretch no place past the last arrival reads a face, its first among them.
+                let read_to = if bare && !per_blank { stretch } else { stretch + 1 };
+                (0..s).map(move |t| u8::from(silent(t) && t < read_to))
             })
             .collect();
         let computed: Vec<u8> = if windows.iter().any(Option::is_some) { regions.iter().zip(&windows).flat_map(|(r, w)| (0..r.classes.len()).map(move |t| u8::from(w.as_ref().is_none_or(|w| w[t])))).collect() } else { Vec::new() };

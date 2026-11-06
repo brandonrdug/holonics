@@ -425,6 +425,9 @@ struct FieldWords {
     uint64_t per_blank;
     // The depth rings' count (`FieldDeclaration::depth`): the last `depth` turned ring sets.
     uint64_t depth;
+    // [the unified-theory reading of November 6, 10:31] Where set, past the last arrival a silent place runs at the bare rate
+    // (`Field::bare_stretch`): no clamp to the stretch's first place, and no fold of its covector there.
+    uint64_t bare_stretch;
 };
 
 // [definition; agent-inferred, November 2] **A head's pace index** (§16, `Field::paces`): the heads that carry a moment
@@ -3770,7 +3773,7 @@ extern "C" __global__ void field_paces(FieldWords w) {
         bool plain = true;
         for (uint32_t t = 0; t < sites; t++) {
             const uint64_t g = first + t;
-            const wide k = one + pace_rate(w, p, first + (t > stretch ? stretch : t));
+            const wide k = one + pace_rate(w, p, first + (t > stretch && !w.bare_stretch ? stretch : t));
             if (t > 0) {
                 clock += k;
                 variation += k < 0 ? -k : k;
@@ -4376,11 +4379,11 @@ extern "C" __global__ void field_pace_kappa_back(FieldWords w, wide *dkappa) {
                 const int64_t k = w.kappa[at];
                 own = tau + (k > 0 ? sig : k < 0 ? -sig : 0);
             }
-            if (t > stretch) {
+            if (t > stretch && !w.bare_stretch) {
                 folded += own;
                 dkappa[at] = 0;
             } else {
-                dkappa[at] = own + (t == stretch ? folded : 0);
+                dkappa[at] = own + (t == stretch && !w.bare_stretch ? folded : 0);
             }
         }
     }
@@ -4402,8 +4405,9 @@ extern "C" __global__ void field_pace_c_back(FieldWords w, const wide *dkappa, w
         if (from == to) {
             if (!w.unresolved[t]) {
                 add_wide(g + base + row_of(w, t), dk << FACE_BITS);
-            } else if (w.blank_rate && !depth_head(w, paced_head(w, p))) {
-                // [§16.44] A blank's rate by the shares of the face its clock read, an operand of that clock.
+            } else if (w.blank_rate && !depth_head(w, paced_head(w, p)) && (w.blank_read == nullptr || w.blank_read[t])) {
+                // [§16.44] A blank's rate by the shares of the face its clock read, an operand of that clock (a place that
+                // read no face, past the last arrival under the bare stretch, ran at the bare rate and returns nothing).
                 for (uint32_t a = 0; a < w.A; a++) {
                     const uwide share = blank_share(w, t, a);
                     if (share != 0) {

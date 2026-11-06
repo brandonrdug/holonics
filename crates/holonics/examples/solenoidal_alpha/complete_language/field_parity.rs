@@ -74,7 +74,7 @@ impl Passage {
         let declaration = FieldDeclaration { alphabet: self.codec.alphabet(), width, heads, modes, still, contacts, ticks, frames: heads, reach: self.reach, lanes: 1, depth: 0 };
         let mut field = Field::found(declaration, &self.keys).map_err(|e| e.to_string())?;
         // The trainer's declared clock (`FIELD_CLOCK_PER_BLANK`, `Field::per_blank_clock`), so its parity reads that law.
-        field.per_blank_clock = std::env::var_os("FIELD_CLOCK_PER_BLANK").is_some();
+        super::field_train::declared_clocks(&mut field);
         // The trainer's declared depth rings (`FIELD_DEPTH`), so the parity reads that law.
         if let Some(depth) = std::env::var("FIELD_DEPTH").ok().and_then(|v| v.parse().ok()) {
             field = field.with_depth(depth).map_err(|e| e.to_string())?;

@@ -224,8 +224,11 @@ fn covector_matches_the_codes_difference() {
     let bounded = Port { boundary: true, ..port };
     // [the depth rings, November 6] And with a depth ring among the turned sets (its rate the located increment alone, no
     // skin, no moment).
-    for (still, depth, r) in [(0usize, 0usize), (1, 0), (2, 0), (0, 1), (1, 1)].into_iter().flat_map(|(still, depth)| [(still, region()), (still, Region { classes: &CLASSES, unresolved: &OPEN, faces: &carried, locked: &[], echo: &[], domain: None, port: None }), (still, Region { classes: &CLASSES, unresolved: &PORTED, faces: &[], locked: &[], echo: &[], domain: None, port: Some(port) }), (still, Region { classes: &CLASSES, unresolved: &PORTED, faces: &[], locked: &[], echo: &[], domain: None, port: Some(bounded) }), (still, Region { classes: &CLASSES, unresolved: &PATH, faces: &[], locked: &[], echo: &[], domain: None, port: Some(bounded) })].map(|(still, r)| (still, depth, r))) {
-        let field = shaped_with(FieldDeclaration { depth, ..tiny_declaration(still) });
+    // [the unified-theory reading of November 6, 10:31] And under the bare stretch (`Field::bare_stretch`: past the last arrival
+    // a silent place runs at the bare rate and returns nothing), declared beside the one-rate stretch.
+    for (still, depth, bare, r) in [(0usize, 0usize, false), (1, 0, false), (2, 0, false), (0, 1, false), (1, 1, false), (0, 0, true), (1, 0, true)].into_iter().flat_map(|(still, depth, bare)| [(still, region()), (still, Region { classes: &CLASSES, unresolved: &OPEN, faces: &carried, locked: &[], echo: &[], domain: None, port: None }), (still, Region { classes: &CLASSES, unresolved: &PORTED, faces: &[], locked: &[], echo: &[], domain: None, port: Some(port) }), (still, Region { classes: &CLASSES, unresolved: &PORTED, faces: &[], locked: &[], echo: &[], domain: None, port: Some(bounded) }), (still, Region { classes: &CLASSES, unresolved: &PATH, faces: &[], locked: &[], echo: &[], domain: None, port: Some(bounded) })].map(|(still, r)| (still, depth, bare, r))) {
+        let mut field = shaped_with(FieldDeclaration { depth, ..tiny_declaration(still) });
+        field.bare_stretch = bare;
         let g = covector_of(&field, &r);
         let (m, n, dw) = (field.declaration.complex(), field.declaration.modes, field.declaration.width);
         let l = field.layout.clone();
@@ -1439,6 +1442,34 @@ fn the_room_past_the_front_is_heard_only_through_the_near_field() {
         }
         }
     }
+}
+
+/// [definition; the unified-theory reading of November 6, 10:31] **Past the last arrival the bare rate**: under
+/// `Field::bare_stretch` every silent place past the region's last arrival runs at one on a turned head (its clock the place
+/// count), reads no face and takes no covector, while a silent place between arrivals keeps its own face's rate.
+#[test]
+fn past_the_last_arrival_a_place_runs_at_the_bare_rate() {
+    let mut field = shaped(0);
+    field.bare_stretch = true;
+    let long: Vec<usize> = (0..14).map(|t| [1usize, 3, 2, 4, 0, 2, 1][t % 7]).collect();
+    let open: Vec<bool> = (0..14).map(|t| t == 2 || t >= 7).collect();
+    let r = Region { classes: &long, unresolved: &open, faces: &[], locked: &[], echo: &[], domain: None, port: None };
+    assert_eq!(Field::silent_stretch(&r), 7);
+    let one = 1i64 << PACE_BITS;
+    let mut between = false;
+    for cell in &field.pass(&r, true).unwrap().ticks[1..] {
+        let clock = cell.clock.as_ref().expect("a later tick reads its own clocks");
+        assert!(clock.reads[2].is_some(), "a blank between arrivals reads its face");
+        for (p, kappa) in clock.paces.kappa.iter().enumerate() {
+            between |= kappa[2] != one;
+            for t in 7..14 {
+                assert_eq!(kappa[t], one, "place {t} runs at the bare rate");
+                assert!(clock.reads[t].is_none(), "place {t} reads no face");
+                assert_eq!(clock.paces.tau[p][t] - clock.paces.tau[p][6], (t - 6) as i64 * one, "the clock past the arrival counts places");
+            }
+        }
+    }
+    assert!(between, "a blank between arrivals never ran off the bare rate");
 }
 
 /// [definition; the unified-theory reading of November 6, 06:50, E] **A cut room reads and returns the whole room's bits**: the

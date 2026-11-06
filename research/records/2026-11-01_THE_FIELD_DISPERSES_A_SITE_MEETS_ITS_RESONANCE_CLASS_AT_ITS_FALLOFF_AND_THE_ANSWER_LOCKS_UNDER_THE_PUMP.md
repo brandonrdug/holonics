@@ -3977,3 +3977,27 @@ nothing. Both are exact, since such a row met no source and its covector is zero
 T/A, the transfer against the predicted gain, read +0.086 to +0.100 on every lap of code91 and long106, with about two thirds
 of the held steps raising the code on the section they were not fit on. The FIELD_STEP_PRICE lines since the reread was
 removed read priced=0 at rate 8, so the rate never moved.
+
+[measurement; November 6, the unified-theory reading of 09:56] **The stretch's rate against the far void** (`stretch-field`). κ₁ is
+the rate every place past the last arrival ran at, under the one-rate stretch. Read at the last tick over the 128 held
+openings: at lap 4 (band past 1,200 17.9) paced head 0 was 0.962 ± 0.188 and paced head 1 2.611 ± 0.128, with correlations
+against each question's overrun of −0.07 and −0.03. At foil lap 6 (80.0) they were 1.038 ± 0.259 and 2.841 ± 0.244 (−0.29,
+−0.25). At writer lap 6 (84.3), 1.053 ± 0.350 and 3.016 ± 0.317 (−0.29, −0.26). At lap 8 (124.1), 0.988 ± 0.143 and 3.033 ± 0.105
+(−0.10, −0.23). The far void fails wherever κ₁'s spread couples to the overrun. A place `D` past the arrival reads the question
+at phase `Dκ₁` through skin `D|κ₁|`, so the far scale rests on one place's guessed duration.
+
+[definition; agent-inferred, November 6, the unified-theory reading of 10:31] **Past the last arrival, the bare rate**
+(`Field::bare_stretch`, `FIELD_CLOCK_BARE`; `declared_clocks`). A silent place past a region's last arrival runs at `κ = 1`
+(§16.28), reads no face and returns nothing; between arrivals each blank keeps its expected duration (§16.44). Nothing arrives
+past the last arrival, so no guess drives its clock there, and the void is read in places. On the host, `paces_with` has no
+clamp to the stretch, the pass reads blank faces only before it, and `clock_return` has no fold. On the card, `field_paces`
+has no clamp, `field_pace_kappa_back` has no fold, the `blank_read` mask ends before the stretch, and `field_pace_c_back`
+passes over a place that read no face. Field tests `covector_matches_the_codes_difference` (with the bare stretch) and
+`past_the_last_arrival_a_place_runs_at_the_bare_rate` cover it.
+
+[measurement; November 6, long110 seg2] **The step's halving**. Laps 7 and 8 ran at rates 8 and 9, the second set by the
+transfer's sign alone, since the line search's curvature telescoped: `p_ext` is the step before priced after it stood.
+Held context went 1.257, 1.242 (lap 6: 1.308) and unseen 1.209, 1.190; Σt fell from 45.0e9 to 10.7e9. Given held's lengths,
+fences closed went from 6 to 19 and brackets near from 0.200 to 0.329; the keyed order code was 3.827. The band past 1,200
+rose to 124.1. The rate holds at 9 (`FIELD_STEP_HELD`), since the sign branch would halve every lap: a lap's transfer is its
+loss change plus half its step's energy, positive at any rate in the band.

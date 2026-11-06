@@ -1008,6 +1008,14 @@ fn next_text(next: Option<FieldNext>) -> String {
 /// lap runs. Why: the fifth reading sized its laps from its time, so `LAPS` and the time bound
 /// were the same number read twice, and a lap that could not finish would only have stopped the run
 /// with its partial step.
+/// [agent-inferred, November 6] **The declared clocks**, read alike by training, its parity and every reading of a state, so a
+/// state is read under the clock it was trained on: `FIELD_CLOCK_PER_BLANK` (`Field::per_blank_clock`) and `FIELD_CLOCK_BARE`
+/// (`Field::bare_stretch`, the unified-theory reading of 10:31: past the last arrival a silent place runs at the bare rate).
+pub(super) fn declared_clocks(field: &mut Field) {
+    field.per_blank_clock = std::env::var_os("FIELD_CLOCK_PER_BLANK").is_some();
+    field.bare_stretch = std::env::var_os("FIELD_CLOCK_BARE").is_some();
+}
+
 pub(super) fn train(args: &[String], realization: &mut dyn FieldRealization) -> Result<()> {
     if !(args.len() == 22 || args.len() == 24) {
         return Err("train-field UNITS UNITS_SHA TRAIN TRAIN_SHA DEV DEV_SHA KEYS KEYS_SHA D H n STILL f K SECTION LAPS RATE LAP_MS GROWN_LAP_MS STOP_MS OUT [FROM FROM_SHA]".into());
@@ -1070,7 +1078,7 @@ pub(super) fn train(args: &[String], realization: &mut dyn FieldRealization) -> 
     // [measurement; agent-inferred, November 6, the unified-theory reading of 02:38] `FIELD_CLOCK_PER_BLANK`: every silent place
     // runs its own per-blank rate past the last arrival too (`Field::per_blank_clock`), the clock alone set against §16.47's
     // one-rate stretch, a declared comparison.
-    learner.field.per_blank_clock = std::env::var_os("FIELD_CLOCK_PER_BLANK").is_some();
+    declared_clocks(&mut learner.field);
     if learner.field.declaration.alphabet != codec.alphabet() {
         return Err("a continued learner whose alphabet is not the codec's".into());
     }
@@ -1441,7 +1449,8 @@ pub(super) fn sample(args: &[String], realization: &mut dyn FieldRealization) ->
         return Err("sample-field STATE STATE_SHA CODEC CODEC_SHA UNITS UNITS_SHA HELD HELD_SHA COUNT SWEEPS REFINE STOP_MS OUT".into());
     }
     let started = std::time::Instant::now();
-    let learner = FieldLearner::from_text(std::str::from_utf8(&pinned_read(&args[1], &args[2], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
+    let mut learner = FieldLearner::from_text(std::str::from_utf8(&pinned_read(&args[1], &args[2], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
+    declared_clocks(&mut learner.field);
     let units = units_of(&args[5], &args[6])?;
     let codec = FieldCodec::from_text(std::str::from_utf8(&pinned_read(&args[3], &args[4], CODEC_BUDGET)?)?, units)?;
     let held = problems_of(&pinned_read(&args[7], &args[8], READ_BUDGET as usize)?);
@@ -1740,7 +1749,8 @@ pub(super) fn order_field(args: &[String], realization: &mut dyn FieldRealizatio
         return Err("order-field STATE STATE_SHA CODEC CODEC_SHA UNITS UNITS_SHA HELD HELD_SHA COUNT OUT".into());
     }
     let started = std::time::Instant::now();
-    let learner = FieldLearner::from_text(std::str::from_utf8(&pinned_read(&args[1], &args[2], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
+    let mut learner = FieldLearner::from_text(std::str::from_utf8(&pinned_read(&args[1], &args[2], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
+    declared_clocks(&mut learner.field);
     let field = &learner.field;
     let units = units_of(&args[5], &args[6])?;
     let codec = FieldCodec::from_text(std::str::from_utf8(&pinned_read(&args[3], &args[4], CODEC_BUDGET)?)?, units)?;
@@ -1875,7 +1885,8 @@ pub(super) fn masks_field(args: &[String], realization: &mut dyn FieldRealizatio
         return Err("masks-field STATE STATE_SHA CODEC CODEC_SHA UNITS UNITS_SHA HELD HELD_SHA COUNT ENDS OUT".into());
     }
     let started = std::time::Instant::now();
-    let learner = FieldLearner::from_text(std::str::from_utf8(&pinned_read(&args[1], &args[2], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
+    let mut learner = FieldLearner::from_text(std::str::from_utf8(&pinned_read(&args[1], &args[2], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
+    declared_clocks(&mut learner.field);
     let field = &learner.field;
     let units = units_of(&args[5], &args[6])?;
     let codec = FieldCodec::from_text(std::str::from_utf8(&pinned_read(&args[3], &args[4], CODEC_BUDGET)?)?, units)?;
@@ -2014,7 +2025,8 @@ pub(super) fn stretch_field(args: &[String], realization: &mut dyn FieldRealizat
         return Err("stretch-field STATE STATE_SHA CODEC CODEC_SHA UNITS UNITS_SHA HELD HELD_SHA COUNT OUT".into());
     }
     let started = std::time::Instant::now();
-    let learner = FieldLearner::from_text(std::str::from_utf8(&pinned_read(&args[1], &args[2], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
+    let mut learner = FieldLearner::from_text(std::str::from_utf8(&pinned_read(&args[1], &args[2], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
+    declared_clocks(&mut learner.field);
     let field = &learner.field;
     let units = units_of(&args[5], &args[6])?;
     let codec = FieldCodec::from_text(std::str::from_utf8(&pinned_read(&args[3], &args[4], CODEC_BUDGET)?)?, units)?;
@@ -2049,7 +2061,8 @@ pub(super) fn opening_field(args: &[String], realization: &mut dyn FieldRealizat
         return Err("opening-field STATE STATE_SHA CODEC CODEC_SHA UNITS UNITS_SHA HELD HELD_SHA TRAIN TRAIN_SHA COUNT OUT".into());
     }
     let started = std::time::Instant::now();
-    let learner = FieldLearner::from_text(std::str::from_utf8(&pinned_read(&args[1], &args[2], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
+    let mut learner = FieldLearner::from_text(std::str::from_utf8(&pinned_read(&args[1], &args[2], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
+    declared_clocks(&mut learner.field);
     let field = &learner.field;
     let units = units_of(&args[5], &args[6])?;
     let codec = FieldCodec::from_text(std::str::from_utf8(&pinned_read(&args[3], &args[4], CODEC_BUDGET)?)?, units)?;
@@ -2111,7 +2124,8 @@ pub(super) fn length_field(args: &[String], realization: &mut dyn FieldRealizati
         return Err("length-field STATE STATE_SHA CODEC CODEC_SHA UNITS UNITS_SHA HELD HELD_SHA COUNT SWEEPS REFINE STOP_MS OUT [READS KEY]".into());
     }
     let started = std::time::Instant::now();
-    let learner = FieldLearner::from_text(std::str::from_utf8(&pinned_read(&args[1], &args[2], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
+    let mut learner = FieldLearner::from_text(std::str::from_utf8(&pinned_read(&args[1], &args[2], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
+    declared_clocks(&mut learner.field);
     let units = units_of(&args[5], &args[6])?;
     let codec = FieldCodec::from_text(std::str::from_utf8(&pinned_read(&args[3], &args[4], CODEC_BUDGET)?)?, units)?;
     let held = problems_of(&pinned_read(&args[7], &args[8], READ_BUDGET as usize)?);
