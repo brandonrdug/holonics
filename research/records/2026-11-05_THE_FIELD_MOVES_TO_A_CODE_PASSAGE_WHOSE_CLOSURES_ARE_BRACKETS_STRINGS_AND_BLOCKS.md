@@ -316,3 +316,18 @@ equal, 620 to 645 ms a section: held context 2.431, 2.131, 2.066 and 1.657 again
 length code a read answer (the opening's void masses read as `P(L ≤ t)`), on the first 32 held: b1's six-lap state 9.15 bits
 (30 read), below the marginal 9.6 and the blind 10.5; code88 10.82 (28 read); code86 11.45 (15 read); code89 16.44 (19 read):
 the whole room's opening, trained at every distance, holds the most of the length.
+
+[measurement; agent-inferred] **Length at the opening alone keeps the content and draws ends that follow held** (code91;
+`code91.txt`, `code91_launch.sh`, `marginal.py`). From code86's segment-3 state, four laps with the fully masked state the only
+path state (one keyed far place an octave), 792 to 803 ms a section, the sampled parity equal. Against the reading fixed at
+04:03: (1) held context 1.335, 1.349, 1.311 and 1.306 against code86's 1.364, holds and falls; (2) the opening's length code
+9.69 bits a read answer at lap 2 and 9.57 at lap 4 (31 of 32 read), the mark 9.6 met at lap 4, against the paired training
+marginal 9.36: +0.21 ± 0.28, the length's distribution learned and the question not yet heard; the opening's void mass 0.438 at
+held and 0.633 at +128, its expected length +85 past held; (3) the one-end writer (one uniform against the first read's void
+profile, then the keyed sweeps given it, no refine pass) at lap 4: written over held 2.000 (fails), the correlation with held
++0.223, 28 exact ```` ```python ```` openings (passes), entropy 4.89 bits (passes), the top byte `e` at 10.6% (under the band),
+26 of 32 fences closed (passes), far brackets, strings and blocks 0.59, 0.40 and 0.40 of held; at lap 2 0.889, +0.324, 15 and
+18. The keyed sweeps on their own ends wrote 0.069 of held at lap 2 (the opening's void now a distribution, read a place at a
+time as a hazard) and 1.436 with the correlation +0.301 at lap 4. Given keyed100's lengths, the lap-2 state opened 16 and closed
+21 fences (keyed103; `keyed103.txt`), six of its answers parsing as Python, the line's most: the lost structure at lap 2 was the
+state's, not the drawn length's.
