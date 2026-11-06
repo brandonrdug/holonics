@@ -294,3 +294,14 @@ entropy 4.69 bits and the space at 25.5% (fail), `y` 1.4%, 22 of 32 fences close
 identifiers standing in the held answer (the line's most); far brackets, strings and blocks 0.42, 0.28 and 0.55 of held. Beside
 the same state's unconstrained keyed write (25 openings, 22 fences, 4.71 bits, 25%), a given length keeps the fences and the
 space's lean and loses eight openings.
+
+[definition; agent-inferred, November 6, the unified-theory reading of 03:53] **The writer is the sweeps alone.** The sweeps
+release the order's declared joint (each place drawn from the face it read, within the run bound and the closing law); a
+two-sided pass releases a joint only where the faces are one joint's conditionals, and settle93 showed they are not, so the
+passes walk to the field's cheapest bytes (on code86's state the keyed sweeps write 4.91 bits a byte and the space at 19.1%,
+three refine passes 4.71 and 25.3%). The writer is the keyed sweeps with no refine pass until training makes the faces one
+joint's; the stop at real text's code is withdrawn with it. **Read** (keyed100; `keyed100.txt`): code86's state, the keyed
+writer given its own lengths (closing92's sweeps on the same keys), runs, no refine pass: 23 exact ```` ```python ```` openings,
+entropy 4.86 bits, the space at 18.8%, 27 of 30 fences closed, far brackets, strings and blocks 0.34, 0.47 and 0.66 of held,
+every mark fixed before it passing; beside its own unconstrained write (22 openings, 22 fences), resolving the given voids from
+the first read costs nothing. The length is the writer's own subject.
