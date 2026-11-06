@@ -3578,7 +3578,7 @@ impl Field {
     /// faces. A reading only: nothing in the release reads it.
     #[allow(clippy::too_many_arguments)]
     pub fn sample_observed(&self, problems: &[(&[usize], usize)], sweeps: usize, refine: usize, void: usize, seed: u64, realization: &mut dyn FieldRealization, sweep: &mut dyn FnMut(usize, usize) -> bool, observe: &mut dyn FnMut(ReleaseRead)) -> Result<Vec<Vec<usize>>> {
-        self.release(problems, sweeps, refine, void, seed, 0, true, false, None, false, false, realization, sweep, observe)
+        self.release(problems, sweeps, refine, void, seed, 0, true, false, None, false, false, false, None, realization, sweep, observe)
     }
 
     /// [definition; agent-inferred, November 5, the unified-theory reading of 17:41, its bound read without a maximum]
@@ -3598,13 +3598,15 @@ impl Field {
     /// the void from the first read (so the region is the question, the answer and its near tail), and every answer place,
     /// in the sweeps and in refine, draws from its face over the letters; the end never moves. `one_end` draws each answer's
     /// length from the release's first read when none is given ([`Field::release`]). `rest` lets each answer's refine
-    /// passes stop where they come to rest ([`Field::release`]), `refine` then their most.
-    pub fn sample_runs(&self, problems: &[(&[usize], usize)], sweeps: usize, refine: usize, void: usize, seed: u64, run_bound: i128, near_tail: bool, place_order: bool, lengths: Option<&[usize]>, one_end: bool, rest: bool, realization: &mut dyn FieldRealization, sweep: &mut dyn FnMut(usize, usize) -> bool, observe: &mut dyn FnMut(ReleaseRead)) -> Result<Vec<Vec<usize>>> {
-        self.release(problems, sweeps, refine, void, seed, run_bound, near_tail, place_order, lengths, one_end, rest, realization, sweep, observe)
+    /// passes stop where they come to rest ([`Field::release`]), `refine` then their most. `spans` makes every second refine
+    /// pass a pass of span moves ([`Field::release`]). `from`, with `lengths` its answers' lengths, starts the walk from those
+    /// answers instead of the sweeps, its first refine pass read without drawing ([`Field::release`]).
+    pub fn sample_runs(&self, problems: &[(&[usize], usize)], sweeps: usize, refine: usize, void: usize, seed: u64, run_bound: i128, near_tail: bool, place_order: bool, lengths: Option<&[usize]>, one_end: bool, rest: bool, spans: bool, from: Option<&[Vec<usize>]>, realization: &mut dyn FieldRealization, sweep: &mut dyn FnMut(usize, usize) -> bool, observe: &mut dyn FnMut(ReleaseRead)) -> Result<Vec<Vec<usize>>> {
+        self.release(problems, sweeps, refine, void, seed, run_bound, near_tail, place_order, lengths, one_end, rest, spans, from, realization, sweep, observe)
     }
 
     #[allow(clippy::too_many_arguments)]
-    fn release(&self, problems: &[(&[usize], usize)], sweeps: usize, refine: usize, void: usize, seed: u64, run_bound: i128, near_tail: bool, place_order: bool, lengths: Option<&[usize]>, one_end: bool, rest: bool, realization: &mut dyn FieldRealization, sweep: &mut dyn FnMut(usize, usize) -> bool, observe: &mut dyn FnMut(ReleaseRead)) -> Result<Vec<Vec<usize>>> {
+    fn release(&self, problems: &[(&[usize], usize)], sweeps: usize, refine: usize, void: usize, seed: u64, run_bound: i128, near_tail: bool, place_order: bool, lengths: Option<&[usize]>, one_end: bool, rest: bool, spans: bool, from: Option<&[Vec<usize>]>, realization: &mut dyn FieldRealization, sweep: &mut dyn FnMut(usize, usize) -> bool, observe: &mut dyn FnMut(ReleaseRead)) -> Result<Vec<Vec<usize>>> {
         if sweeps == 0 || void >= self.declaration.alphabet || problems.iter().any(|&(_, n)| n == 0) {
             return refuse("a sample needs a sweep, an answer place and a void class in the alphabet");
         }
@@ -3659,6 +3661,22 @@ impl Field {
                 }
             }
         }
+        // [measurement; agent-inferred, November 6, the unified-theory reading of 18:28] With `from` (and its lengths), **the walk
+        // starts from given answers** (held's truth): every answer place stands resolved as given, no sweep is drawn, and the
+        // first refine pass reads each place's face and keeps its standing letter, so its drive is the field's calibration on
+        // those answers (zero in expectation under the faces' own joint) before the walk moves them.
+        if let Some(answers) = from {
+            let ls = lengths.ok_or(TowerError::Refused("a walk from given answers needs their lengths"))?;
+            if answers.len() != problems.len() || answers.iter().zip(ls).any(|(a, &l)| a.len() < l) {
+                return refuse("a given answer for each problem, as long as its length");
+            }
+            for (k, &(q, _)) in problems.iter().enumerate() {
+                for t in 0..ls[k] {
+                    classes[k][q.len() + t] = answers[k][t];
+                    open[k][q.len() + t] = false;
+                }
+            }
+        }
         // [definition; agent-inferred, November 5, §16.47] **The answer is released by octaves of its distance from the
         // question** (the unified-theory reading of 15:04): octave `j` holds the places at distance `[2^j, 2^(j+1))` past
         // the question (the first place at distance one), and its places open to the draws only once every place of the
@@ -3690,8 +3708,8 @@ impl Field {
         let mut drawn_entropy: Vec<Vec<Option<i128>>> = classes.iter().map(|c| vec![None; c.len()]).collect();
         // Each answer's refine passes' drives ([`PassDrive`]), one a pass it was redrawn in.
         let mut drives: Vec<Vec<PassDrive>> = vec![Vec::new(); problems.len()];
-        let mut swept = sweeps;
-        for done in 0..sweeps {
+        let mut swept = if from.is_some() { 0 } else { sweeps };
+        for done in 0..swept {
             let last = done + 1 == sweeps || !sweep(done, sweeps);
             let active: Vec<usize> = (0..problems.len()).filter(|&k| open[k].iter().any(|&u| u)).collect();
             let faces = self.read_active(&starts, &classes, &open, &active, void, near_tail, realization)?;
@@ -3839,6 +3857,15 @@ impl Field {
         // to 1.38 at pass 8 and rose to 1.48 by pass 10 as some answers heated (one from 1.78 to 3.73 bits a place), so a
         // fixed count both stops answers still falling and walks heating ones on.
         let mut resting = vec![false; problems.len()];
+        // [definition; agent-inferred, November 6, the unified-theory reading of 17:58, the cube's move] With `spans`, **every
+        // second pass moves spans**: the answer's places before its boundary are cut into spans of `2^(1 + (m − 1) mod 4)`
+        // places at the `m`-th span pass (2, 4, 8, 16, then again), from a keyed offset; each span in a keyed order is opened
+        // whole (silent, never a draft) and redrawn in place order, a run a read, given the rest of the answer as it stands.
+        // Why: the single-place walk settles with its drive four to five times its spread (rest118), and a single-letter move
+        // barely leaves a wrong word whose letters each fit their neighbours; if the walk's standing code falls below its
+        // single-place plateau after span moves, the plateau was a trap of the move, and if not, the field's own faces hold
+        // those words.
+        let mut span_kept: Vec<Vec<Option<usize>>> = classes.iter().map(|c| vec![None; c.len()]).collect();
         let mut pass = 0u64;
         while (pass as usize) < refine && !resting.iter().all(|&r| r) {
             pass += 1;
@@ -3853,6 +3880,23 @@ impl Field {
                 })
                 .collect();
             let mut cursors = vec![0usize; problems.len()];
+            let span_lists: Option<Vec<Vec<Vec<usize>>>> = (spans && pass % 2 == 0).then(|| {
+                let length = 1usize << (1 + (pass / 2 - 1) % 4);
+                problems
+                    .iter()
+                    .enumerate()
+                    .map(|(k, &(q, _))| {
+                        let end = boundary(&classes[k], &open[k], q.len());
+                        let offset = (mix(((k as u64) << 32) ^ (pass << 48) ^ (3 << 60)) % length as u64) as usize;
+                        let mut cuts: Vec<usize> = std::iter::once(q.len()).chain((q.len() + offset..end).step_by(length).filter(|&c| c > q.len())).collect();
+                        cuts.push(end);
+                        let mut list: Vec<Vec<usize>> = cuts.windows(2).filter(|w| w[0] < w[1]).map(|w| (w[0]..w[1]).collect()).collect();
+                        list.sort_by_key(|span| (mix(((k as u64) << 32) ^ span[0] as u64 ^ (pass << 48) ^ (5 << 60)), span[0]));
+                        list
+                    })
+                    .collect()
+            });
+            let mut span_cursors = vec![(0usize, 0usize); problems.len()];
             loop {
                 // Each problem's next place in its order standing at or before its boundary, beside that boundary, and the run
                 // past it: the next places at or before the boundary whose entropies at their last draw sum within the bound.
@@ -3862,6 +3906,35 @@ impl Field {
                         continue;
                     }
                     let end = boundary(&classes[k], &open[k], q.len());
+                    if let Some(lists) = &span_lists {
+                        // A span pass: the next run of the open span in place order, the next span opened whole at its turn.
+                        let (si, pi) = &mut span_cursors[k];
+                        let Some(span) = lists[k].get(*si) else { continue };
+                        if *pi == 0 {
+                            for &u in span {
+                                span_kept[k][u] = Some(classes[k][u]);
+                                classes[k][u] = void;
+                                open[k][u] = true;
+                            }
+                        }
+                        let mut run = vec![span[*pi]];
+                        *pi += 1;
+                        let mut held = 0i128;
+                        while run_bound > 0 && *pi < span.len() {
+                            let Some(h) = drawn_entropy[k][span[*pi]] else { break };
+                            if held + h >= run_bound {
+                                break;
+                            }
+                            held += h;
+                            run.push(span[*pi]);
+                            *pi += 1;
+                        }
+                        if *pi == span.len() {
+                            (*si, *pi) = (*si + 1, 0);
+                        }
+                        places[k] = Some((run, end));
+                        continue;
+                    }
                     while let Some(&t) = orders[k].get(cursors[k]) {
                         cursors[k] += 1;
                         if t < end || (!given && t == end) {
@@ -3898,9 +3971,13 @@ impl Field {
                 for (k, place) in places.iter().enumerate() {
                     if let Some((run, _)) = place {
                         for &t in run {
-                            kept[k].push(classes[k][t]);
-                            open[k][t] = true;
-                            classes[k][t] = void;
+                            if let Some(was) = span_kept[k][t].take() {
+                                kept[k].push(was);
+                            } else {
+                                kept[k].push(classes[k][t]);
+                                open[k][t] = true;
+                                classes[k][t] = void;
+                            }
                         }
                     }
                 }
@@ -3951,6 +4028,9 @@ impl Field {
                             acc > u
                         }).unwrap_or(was)
                     };
+                    if from.is_some() && pass == 1 {
+                        classes[k][t] = was;
+                    }
                     moved[k].changes += usize::from(classes[k][t] != was);
                     open[k][t] = false;
                     }

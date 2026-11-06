@@ -1538,14 +1538,14 @@ fn a_read_releases_a_run() {
     let (mut fewer, mut reads_one, mut reads_run) = (false, 0usize, 0usize);
     for seed in 11..19 {
         let one = field.sample_observed(&problems, 9, 2, 0, seed, &mut HostField, &mut |_, _| true, &mut |_| {}).unwrap();
-        assert_eq!(field.sample_runs(&problems, 9, 2, 0, seed, 0, true, false, None, false, false, &mut HostField, &mut |_, _| true, &mut |_| {}).unwrap(), one, "no bound, one place a read");
+        assert_eq!(field.sample_runs(&problems, 9, 2, 0, seed, 0, true, false, None, false, false, false, None, &mut HostField, &mut |_, _| true, &mut |_| {}).unwrap(), one, "no bound, one place a read");
         let mut counted = RegionsCounted { regions: Vec::new() };
-        field.sample_runs(&problems, 9, 2, 0, seed, 0, true, false, None, false, false, &mut counted, &mut |_, _| true, &mut |_| {}).unwrap();
+        field.sample_runs(&problems, 9, 2, 0, seed, 0, true, false, None, false, false, false, None, &mut counted, &mut |_, _| true, &mut |_| {}).unwrap();
         reads_one += counted.regions.len();
         let mut counted = RegionsCounted { regions: Vec::new() };
         let mut last: Option<Vec<usize>> = None;
         let run = field
-            .sample_runs(&problems, 9, 2, 0, seed, 1 << 20, true, false, None, false, false, &mut counted, &mut |_, _| true, &mut |r| {
+            .sample_runs(&problems, 9, 2, 0, seed, 1 << 20, true, false, None, false, false, false, None, &mut counted, &mut |_, _| true, &mut |r| {
                 for (k, &(q, _)) in problems.iter().enumerate() {
                     let earliest = (q.len()..r.classes[k].len()).filter(|&t| r.open[k][t]).map(|t| octave(t + 1 - q.len())).min();
                     if let (0, Some(j)) = (r.pass, earliest) {
@@ -1599,7 +1599,7 @@ fn an_answer_rests_where_its_drive_is_spent() {
             let mut entropies: std::collections::BTreeMap<(usize, usize), i128> = std::collections::BTreeMap::new();
             let mut drives: Vec<Vec<PassDrive>> = Vec::new();
             field
-                .sample_runs(&problems, 9, refine, 0, seed, 1 << 20, true, false, None, false, rest, &mut HostField, &mut |_, _| true, &mut |r| {
+                .sample_runs(&problems, 9, refine, 0, seed, 1 << 20, true, false, None, false, rest, false, None, &mut HostField, &mut |_, _| true, &mut |r| {
                     if let (true, Some(faces)) = (r.pass >= 1, r.faces) {
                         for k in 0..problems.len() {
                             let q = problems[k].0.len();
@@ -1632,6 +1632,86 @@ fn an_answer_rests_where_its_drive_is_spent() {
     assert!(rested > 0 && changed > 0, "{rested} answers rested, {changed} letters changed");
 }
 
+/// [definition; agent-inferred, November 6, the unified-theory reading of 17:58] **A span pass opens a span whole**: with
+/// `spans`, at every read of an even refine pass each answer's open places are the rest of one span in place order (a
+/// contiguous run of places, at most the pass's span length, `2^(1 + (m − 1) mod 4)` at the `m`-th span pass), every place
+/// before the pass's boundary is redrawn once in it, and the closing law holds after the release; odd passes stay single
+/// places and runs.
+#[test]
+fn a_span_pass_opens_a_span_whole() {
+    let field = shaped(1);
+    let questions: [&[usize]; 3] = [&[1, 4, 0, 2], &[3, 3], &[2, 1, 1]];
+    let problems: Vec<(&[usize], usize)> = questions.iter().zip([9usize, 8, 12]).map(|(q, a)| (*q, a)).collect();
+    let (mut widest, mut spanned) = (0usize, 0usize);
+    for seed in 3..11 {
+        let mut drawn: std::collections::BTreeMap<(usize, usize), std::collections::BTreeSet<usize>> = std::collections::BTreeMap::new();
+        let written = field
+            .sample_runs(&problems, 9, 8, 0, seed, 1 << 20, true, false, Some(&[6, 5, 9]), false, false, true, None, &mut HostField, &mut |_, _| true, &mut |r| {
+                if r.pass == 0 || r.faces.is_none() {
+                    return;
+                }
+                for (k, &(q, _)) in problems.iter().enumerate() {
+                    let opened: Vec<usize> = (q.len()..r.classes[k].len()).filter(|&t| r.open[k][t]).collect();
+                    drawn.entry((k, r.pass)).or_default().extend(opened.iter().copied());
+                    if r.pass % 2 == 0 && !opened.is_empty() {
+                        let length = 1usize << (1 + (r.pass / 2 - 1) % 4);
+                        assert!(opened.windows(2).all(|w| w[1] == w[0] + 1), "seed {seed}: a span's open places are contiguous");
+                        assert!(opened.len() <= length, "seed {seed} pass {}: {} open, span {length}", r.pass, opened.len());
+                        widest = widest.max(opened.len());
+                        spanned += usize::from(opened.len() > 1);
+                    }
+                }
+            })
+            .unwrap();
+        for (k, &(q, _)) in problems.iter().enumerate() {
+            let length = [6usize, 5, 9][k];
+            for pass in 1..=8 {
+                let places: Vec<usize> = drawn[&(k, pass)].iter().copied().collect();
+                assert_eq!(places, (q.len()..q.len() + length).collect::<Vec<_>>(), "seed {seed} problem {k} pass {pass}: each place once");
+            }
+            assert!(written[k][..length].iter().all(|&c| c != 0) && written[k][length..].iter().all(|&c| c == 0), "seed {seed}: the given length holds");
+        }
+    }
+    assert!(spanned > 0 && widest > 2, "spans opened ({spanned} reads, widest {widest})");
+}
+
+/// [measurement; agent-inferred, November 6, the unified-theory reading of 18:28] **A walk from given answers** reads them
+/// first: no sweep is drawn, the first refine pass keeps every standing letter (its changes none, its drive read on the
+/// given answers), so one pass returns the answers as given, and later passes walk from them.
+#[test]
+fn a_walk_from_given_answers_reads_them_first() {
+    let field = shaped(1);
+    let questions: [&[usize]; 2] = [&[1, 4, 0, 2], &[3, 3]];
+    let problems: Vec<(&[usize], usize)> = questions.iter().zip([9usize, 8]).map(|(q, a)| (*q, a)).collect();
+    let answers = vec![vec![2usize, 3, 1, 4, 2, 1], vec![1usize, 1, 2, 3, 4]];
+    let lengths = [6usize, 5];
+    let mut moved = 0usize;
+    for seed in 3..9 {
+        for refine in [1usize, 3] {
+            let mut sweeps = 0usize;
+            let mut drives: Vec<Vec<PassDrive>> = Vec::new();
+            let written = field
+                .sample_runs(&problems, 9, refine, 0, seed, 1 << 20, true, false, Some(&lengths), false, false, false, Some(&answers), &mut HostField, &mut |_, _| true, &mut |r| {
+                    sweeps += usize::from(r.pass == 0 && r.faces.is_some());
+                    drives = r.drives.to_vec();
+                })
+                .unwrap();
+            assert_eq!(sweeps, 0, "no sweep is drawn");
+            for k in 0..2 {
+                assert_eq!(drives[k].len(), refine);
+                assert_eq!((drives[k][0].redrawn, drives[k][0].changes), (lengths[k], 0), "the first pass reads every place and keeps it");
+                assert!(written[k][lengths[k]..].iter().all(|&c| c == 0));
+                if refine == 1 {
+                    assert_eq!(written[k][..lengths[k]], answers[k][..], "one pass returns the answers as given");
+                } else {
+                    moved += drives[k][1..].iter().map(|d| d.changes).sum::<usize>();
+                }
+            }
+        }
+    }
+    assert!(moved > 0, "later passes walk");
+}
+
 /// [definition; the unified-theory reading of November 5, 22:38] **A void never unwrites a letter**: at every read of the
 /// sweeps every place written as a letter stays that letter (a place before the last letter draws from its letters, only a
 /// place past every letter from its whole face), the closing law still holds, and some write still ends before its last
@@ -1646,7 +1726,7 @@ fn a_void_never_unwrites_a_letter() {
         for seed in 11..27 {
             let mut letters: Vec<Vec<Option<usize>>> = problems.iter().map(|&(q, n)| vec![None; q.len() + n]).collect();
             let places = field
-                .sample_runs(&problems, 4, 0, 0, seed, run_bound, true, false, None, false, false, &mut HostField, &mut |_, _| true, &mut |r| {
+                .sample_runs(&problems, 4, 0, 0, seed, run_bound, true, false, None, false, false, false, None, &mut HostField, &mut |_, _| true, &mut |r| {
                     if r.pass != 0 {
                         return;
                     }
@@ -1709,13 +1789,13 @@ fn a_given_length_is_kept() {
     let problems: Vec<(&[usize], usize)> = questions.iter().zip([9usize, 8]).map(|(q, a)| (*q, a)).collect();
     for run_bound in [0i128, 1 << 20] {
         for seed in 11..19 {
-            let written = field.sample_runs(&problems, 4, 2, 0, seed, run_bound, true, false, Some(&[3, 5]), false, false, &mut HostField, &mut |_, _| true, &mut |_| {}).unwrap();
+            let written = field.sample_runs(&problems, 4, 2, 0, seed, run_bound, true, false, Some(&[3, 5]), false, false, false, None, &mut HostField, &mut |_, _| true, &mut |_| {}).unwrap();
             for (places, l) in written.iter().zip([3usize, 5]) {
                 assert!(places[..l].iter().all(|&c| c != 0), "a void inside the given length, seed {seed}: {places:?}");
                 assert!(places[l..].iter().all(|&c| c == 0), "a letter past the given length, seed {seed}: {places:?}");
             }
             // One end, one draw: the length drawn from the first read is kept the same way.
-            let drawn = field.sample_runs(&problems, 4, 2, 0, seed, run_bound, true, false, None, true, false, &mut HostField, &mut |_, _| true, &mut |_| {}).unwrap();
+            let drawn = field.sample_runs(&problems, 4, 2, 0, seed, run_bound, true, false, None, true, false, false, None, &mut HostField, &mut |_, _| true, &mut |_| {}).unwrap();
             for places in &drawn {
                 let l = places.iter().position(|&c| c == 0).unwrap_or(places.len());
                 assert!(places[l..].iter().all(|&c| c == 0), "a letter past the drawn end, seed {seed}: {places:?}");

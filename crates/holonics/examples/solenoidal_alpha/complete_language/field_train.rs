@@ -1746,6 +1746,112 @@ pub(super) fn restate_field(args: &[String], realization: &mut dyn FieldRealizat
     Ok(())
 }
 
+/// [measurement; agent-inferred, November 6, the unified-theory reading of 18:28] **The curl on two-place squares**: on each
+/// of `COUNT` held answers, as the writer reads it given its length (the question, the truth, its near tail), `SQUARES` keyed
+/// pairs of answer places `(i, j = i + d)` in each band of distance (`d` = 1, 2–3, 4–7, 8–15, 16 and past): the standing
+/// letters `a_i`, `a_j`, each face's runner-up letter `b_i`, `b_j` (read with only that place open), then each place's face
+/// with the other's letter set to its runner-up; `λ_i` is the log odds ratio `ln p_i(a|a) p_i(b|b) / p_i(b|a) p_i(a|b)` read
+/// through `i`'s faces across `j`'s two letters, `λ_j` the same through `j`'s, both on the codes' `2^(−20)` bits. The faces are
+/// one joint's conditionals on a square only where `λ_i = λ_j` (Kolmogorov's cycle condition); `λ_i − λ_j` is its curl.
+/// Writes `CURL.tsv` (private positions and classes of held answers) and prints the run's size. A reading only.
+pub(super) fn curl_field(args: &[String], realization: &mut dyn FieldRealization) -> Result<()> {
+    if args.len() != 12 {
+        return Err("curl-field STATE STATE_SHA CODEC CODEC_SHA UNITS UNITS_SHA HELD HELD_SHA COUNT SQUARES OUT".into());
+    }
+    let started = std::time::Instant::now();
+    let learner = FieldLearner::from_text(std::str::from_utf8(&pinned_read(&args[1], &args[2], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
+    let field = &learner.field;
+    let units = units_of(&args[5], &args[6])?;
+    let codec = FieldCodec::from_text(std::str::from_utf8(&pinned_read(&args[3], &args[4], CODEC_BUDGET)?)?, units)?;
+    let held = problems_of(&pinned_read(&args[7], &args[8], READ_BUDGET as usize)?);
+    let (n, squares) = (count(&args[9])?.min(held.len()), positive(&args[10])?);
+    let out = Path::new(&args[11]);
+    std::fs::create_dir(out)?;
+    let void = codec.void();
+    let near = holonics::hnn::tower::field::NEAR;
+    let bands: [(usize, usize); 5] = [(1, 1), (2, 3), (4, 7), (8, 15), (16, usize::MAX)];
+    let letters = |f: &holonics::hnn::tower::TowerFace| holonics::hnn::tower::field::letters_face(f, void);
+    let runner_up = |f: &holonics::hnn::tower::TowerFace, standing: usize| (0..f.masses.len()).filter(|&c| c != standing && f.masses[c] > 0).max_by_key(|&c| (f.masses[c], std::cmp::Reverse(c)));
+    let mut rows = rows_file(&out.join("CURL.tsv"), "problem\tband\ti\tj\tlambda_i\tlambda_j\n")?;
+    let (mut read_regions, mut written) = (0usize, 0usize);
+    for k in 0..n {
+        let (q, room) = opening(&codec, field, &held[k].0, b"")?;
+        let mut a = codec.encode(&held[k].1)?;
+        a.truncate(room);
+        if a.len() < 2 {
+            continue;
+        }
+        let mut truth: Vec<usize> = q.iter().chain(&a).copied().collect();
+        truth.extend(std::iter::repeat_n(void, near.min(room - a.len())));
+        // The keyed squares of each band within the answer.
+        let mut picked: Vec<(usize, usize, usize)> = Vec::new();
+        for (b, &(lo, hi)) in bands.iter().enumerate() {
+            let top = hi.min(a.len() - 1);
+            if lo > top {
+                continue;
+            }
+            for s in 0..squares {
+                let key = mix(0xC0_41 << 40 | (k as u64) << 20, (b as u64) << 16 | s as u64);
+                let d = lo + (key as usize >> 8) % (top - lo + 1);
+                let i = q.len() + (key >> 32) as usize % (a.len() - d);
+                picked.push((b, i, i + d));
+            }
+        }
+        // A region of the truth with one place open, and with one other place set to a letter.
+        let state = |open_at: usize, set: Option<(usize, usize)>| -> (Vec<usize>, Vec<bool>) {
+            let mut classes = truth.clone();
+            if let Some((t, c)) = set {
+                classes[t] = c;
+            }
+            let open = (0..classes.len()).map(|t| t == open_at).collect();
+            (classes, open)
+        };
+        let read = |states: &[(Vec<usize>, Vec<bool>)], at: &[usize], realization: &mut dyn FieldRealization| -> Result<Vec<holonics::hnn::tower::TowerFace>> {
+            let mut faces = Vec::with_capacity(states.len());
+            for (chunk, sites) in states.chunks(32).zip(at.chunks(32)) {
+                let regions: Vec<Region> = chunk.iter().map(|(c, o)| Region { classes: c, unresolved: o, faces: &[], locked: &[], echo: &[], domain: None, port: None }).collect();
+                for (f, &t) in realization.read_faces(field, &regions).map_err(|e| e.to_string())?.into_iter().zip(sites) {
+                    let face = f[t].as_ref().ok_or("a square's open place with no face")?;
+                    faces.push(letters(face).ok_or("a square's face with no letter")?);
+                }
+            }
+            Ok(faces)
+        };
+        // The base faces (each place open beside the truth), their runner-ups, then each face across the other's runner-up.
+        let base_states: Vec<_> = picked.iter().flat_map(|&(_, i, j)| [state(i, None), state(j, None)]).collect();
+        let base_at: Vec<usize> = picked.iter().flat_map(|&(_, i, j)| [i, j]).collect();
+        let base = read(&base_states, &base_at, realization)?;
+        let mut cross_states = Vec::with_capacity(base_states.len());
+        let mut runners = Vec::with_capacity(picked.len());
+        for (s, &(_, i, j)) in picked.iter().enumerate() {
+            let (Some(bi), Some(bj)) = (runner_up(&base[2 * s], truth[i]), runner_up(&base[2 * s + 1], truth[j])) else {
+                runners.push(None);
+                continue;
+            };
+            runners.push(Some((bi, bj)));
+            cross_states.push(state(i, Some((j, bj))));
+            cross_states.push(state(j, Some((i, bi))));
+        }
+        let cross_at: Vec<usize> = picked.iter().zip(&runners).filter(|(_, r)| r.is_some()).flat_map(|(&(_, i, j), _)| [i, j]).collect();
+        let cross = read(&cross_states, &cross_at, realization)?;
+        read_regions += base_states.len() + cross_states.len();
+        let mut c = 0usize;
+        for (s, (&(b, i, j), r)) in picked.iter().zip(&runners).enumerate() {
+            let Some((bi, bj)) = *r else { continue };
+            let (ai, aj) = (truth[i], truth[j]);
+            let (fi_a, fj_a, fi_b, fj_b) = (&base[2 * s], &base[2 * s + 1], &cross[2 * c], &cross[2 * c + 1]);
+            c += 1;
+            // ln p(a|a) p(b|b) / p(b|a) p(a|b) = c(b|a) + c(a|b) − c(a|a) − c(b|b), each code −log₂ p on 2^(−20).
+            let lambda_i = fi_a.code(bi) + fi_b.code(ai) - fi_a.code(ai) - fi_b.code(bi);
+            let lambda_j = fj_a.code(bj) + fj_b.code(aj) - fj_a.code(aj) - fj_b.code(bj);
+            row(&mut rows, &format!("{k}\t{b}\t{}\t{}\t{lambda_i}\t{lambda_j}\n", i - q.len(), j - q.len()))?;
+            written += 1;
+        }
+    }
+    println!("FIELD_CURL problems={n} squares={written} regions={read_regions} ms={}", started.elapsed().as_millis());
+    Ok(())
+}
+
 /// [measurement; agent-inferred, November 5, §16.45] **`reach-field STATE STATE_SHA CODEC CODEC_SHA UNITS UNITS_SHA HELD
 /// HELD_SHA COUNT OUT`**: how far the question reaches into a blank answer (the unified-theory reading of November 5: a
 /// turned head's skin is `e^(−2π|σ_i − σ_j|/n)`, `σ` its clock's variation, so a blank run at its expected duration
@@ -2299,6 +2405,9 @@ pub(super) fn length_field(args: &[String], realization: &mut dyn FieldRealizati
     // [measurement; agent-inferred, November 6, Brandon's lens of 17:31] `FIELD_WRITER_REST`: each answer's refine passes stop
     // where they come to rest ([`holonics::hnn::tower::field::Field::sample_runs`]), `refine` their most.
     let rest = std::env::var_os("FIELD_WRITER_REST").is_some();
+    // [measurement; agent-inferred, November 6, the unified-theory reading of 17:58] `FIELD_WRITER_SPANS`: every second refine
+    // pass moves spans, each opened whole and redrawn given the rest ([`holonics::hnn::tower::field::Field::sample_runs`]).
+    let spans = std::env::var_os("FIELD_WRITER_SPANS").is_some();
     let given: Option<Vec<usize>> = match std::env::var("FIELD_WRITER_LENGTHS") {
         Ok(path) => {
             let text = std::fs::read_to_string(path)?;
@@ -2312,6 +2421,20 @@ pub(super) fn length_field(args: &[String], realization: &mut dyn FieldRealizati
             Some((0..problems.len()).map(|k| by.get(&k).copied().ok_or("a problem with no length in FIELD_WRITER_LENGTHS")).collect::<std::result::Result<Vec<usize>, _>>()?.into_iter().zip(&problems).map(|(l, &(_, n))| l.min(n)).collect())
         }
         Err(_) => None,
+    };
+    // [measurement; agent-inferred, November 6, the unified-theory reading of 18:28] `FIELD_WRITER_FROM_TRUTH`: the walk starts
+    // from held's answers (within the room), their lengths given, its first pass read without drawing
+    // ([`holonics::hnn::tower::field::Field::sample_runs`]'s `from`): the field's calibration on the truth, then the walk from it.
+    let truth: Option<Vec<Vec<usize>>> = match std::env::var_os("FIELD_WRITER_FROM_TRUTH") {
+        Some(_) => Some(held.iter().zip(&problems).map(|((_, a), &(_, n))| codec.encode(a).map(|mut c| {
+            c.truncate(n);
+            c
+        })).collect::<std::result::Result<Vec<_>, _>>()?),
+        None => None,
+    };
+    let given = match &truth {
+        Some(t) => Some(t.iter().map(Vec::len).collect()),
+        None => given,
     };
     let (mut reads_made, mut bound_sum, mut passed_sum) = (0usize, 0i128, 0usize);
     // [measurement; agent-inferred, November 5] Each refine pass's redraws and their code, `Σ −log₂ p(c)` of the class each
@@ -2335,6 +2458,8 @@ pub(super) fn length_field(args: &[String], realization: &mut dyn FieldRealizati
             given.as_deref(),
             one_end,
             rest,
+            spans,
+            truth.as_deref(),
             realization,
             &mut |done, _| {
                 if started.elapsed().as_millis() > stop_ms || (reads > 0 && done == reads) {
@@ -2423,7 +2548,7 @@ pub(super) fn length_field(args: &[String], realization: &mut dyn FieldRealizati
         "FIELD_LENGTH problems={} sweeps={sweeps} refine={}{} stopped={} run_bits={run_bits} reads={reads_made} certified_bits={} passed={passed_sum} ms={}",
         problems.len(),
         refine,
-        if rest { "_rest" } else { "" },
+        format!("{}{}{}", if rest { "_rest" } else { "" }, if spans { "_spans" } else { "" }, if truth.is_some() { "_from_truth" } else { "" }),
         stopped.map_or("-".to_string(), |s| s.to_string()),
         bits(bound_sum as i64, 1),
         started.elapsed().as_millis()
