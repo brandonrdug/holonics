@@ -1039,6 +1039,50 @@ pub struct ReleaseRead<'a> {
     /// where a redraw moved a context).
     pub bound: i128,
     pub passed: usize,
+    /// Each answer's refine passes so far, one a pass it was redrawn in ([`PassDrive`]).
+    pub drives: &'a [Vec<PassDrive>],
+}
+
+/// [measurement; agent-inferred, November 6, the unified-theory reading of 17:38] **One answer's refine pass**: the places
+/// it redrew, and over them on the faces they were redrawn from: the standing letters' codes `S = Σ −log₂ p(standing)` and
+/// the faces' entropies `H = Σ H(face)` on `2^(−20)` bits, their varentropies `C` on `2^(−40)` bits², the places whose
+/// letter changed, and `K = Σ (1 − Σ_a p(a)²)` on `2^(−20)`, the changes a walk at equilibrium keeps. The drive `D = S − H`
+/// sums the face temperature covector at the standing letters, the code's derivative in the face's temperature at `τ = 1`,
+/// and `C` its curvature, the Fisher term (atlas `ratio.face-temperature-covector`, Lean `HNN/FaceCovectors`:
+/// `tiltedCode_deriv_one`, `tiltedCode_second_deriv`); under the faces' own conditional the drive has mean zero
+/// (`surprise_mean_zero`), the plateau. Positive: the write is hotter than its faces (standing letters in their tails);
+/// negative, colder; in bits, the row's nats over `ln 2`.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub struct PassDrive {
+    pub redrawn: usize,
+    pub standing: i128,
+    pub entropy: i128,
+    pub varentropy: i128,
+    pub changes: usize,
+    pub equilibrium: i128,
+}
+
+impl PassDrive {
+    /// The drive `D = S − H`.
+    pub fn drive(&self) -> i128 {
+        self.standing - self.entropy
+    }
+
+    /// Whether the answer rests after this pass ([`Field::release`]): `D ≤ √C`, or `D_(p−1) − D ≤ √C` after a pass `p − 1`.
+    pub fn rests(&self, before: Option<i128>) -> bool {
+        let within = |d: i128| d <= 0 || d * d <= self.varentropy;
+        within(self.drive()) || before.is_some_and(|b| within(b - self.drive()))
+    }
+
+    fn add(&mut self, face: &TowerFace, standing: usize) {
+        let unit = 1u128 << 20;
+        let square: u128 = face.masses.iter().map(|&m| ((m << 20) / face.total).pow(2)).sum::<u128>() / unit;
+        self.redrawn += 1;
+        self.standing += face.code(standing) as i128;
+        self.entropy += entropy(face);
+        self.varentropy += varentropy(face);
+        self.equilibrium += unit as i128 - square as i128;
+    }
 }
 
 /// [§16.44] A blank's read of its face off a state: the chart `r̂` and its scales, the lift `R r̂ + b_R`, and the face.
@@ -3533,7 +3577,7 @@ impl Field {
     /// faces. A reading only: nothing in the release reads it.
     #[allow(clippy::too_many_arguments)]
     pub fn sample_observed(&self, problems: &[(&[usize], usize)], sweeps: usize, refine: usize, void: usize, seed: u64, realization: &mut dyn FieldRealization, sweep: &mut dyn FnMut(usize, usize) -> bool, observe: &mut dyn FnMut(ReleaseRead)) -> Result<Vec<Vec<usize>>> {
-        self.release(problems, sweeps, refine, void, seed, 0, true, false, None, false, realization, sweep, observe)
+        self.release(problems, sweeps, refine, void, seed, 0, true, false, None, false, false, realization, sweep, observe)
     }
 
     /// [definition; agent-inferred, November 5, the unified-theory reading of 17:41, its bound read without a maximum]
@@ -3552,13 +3596,14 @@ impl Field {
     /// unified-theory reading of 03:08] `lengths`, where given, fixes each answer's length: its places past it stand resolved as
     /// the void from the first read (so the region is the question, the answer and its near tail), and every answer place,
     /// in the sweeps and in refine, draws from its face over the letters; the end never moves. `one_end` draws each answer's
-    /// length from the release's first read when none is given ([`Field::release`]).
-    pub fn sample_runs(&self, problems: &[(&[usize], usize)], sweeps: usize, refine: usize, void: usize, seed: u64, run_bound: i128, near_tail: bool, place_order: bool, lengths: Option<&[usize]>, one_end: bool, realization: &mut dyn FieldRealization, sweep: &mut dyn FnMut(usize, usize) -> bool, observe: &mut dyn FnMut(ReleaseRead)) -> Result<Vec<Vec<usize>>> {
-        self.release(problems, sweeps, refine, void, seed, run_bound, near_tail, place_order, lengths, one_end, realization, sweep, observe)
+    /// length from the release's first read when none is given ([`Field::release`]). `rest` lets each answer's refine
+    /// passes stop where they come to rest ([`Field::release`]), `refine` then their most.
+    pub fn sample_runs(&self, problems: &[(&[usize], usize)], sweeps: usize, refine: usize, void: usize, seed: u64, run_bound: i128, near_tail: bool, place_order: bool, lengths: Option<&[usize]>, one_end: bool, rest: bool, realization: &mut dyn FieldRealization, sweep: &mut dyn FnMut(usize, usize) -> bool, observe: &mut dyn FnMut(ReleaseRead)) -> Result<Vec<Vec<usize>>> {
+        self.release(problems, sweeps, refine, void, seed, run_bound, near_tail, place_order, lengths, one_end, rest, realization, sweep, observe)
     }
 
     #[allow(clippy::too_many_arguments)]
-    fn release(&self, problems: &[(&[usize], usize)], sweeps: usize, refine: usize, void: usize, seed: u64, run_bound: i128, near_tail: bool, place_order: bool, lengths: Option<&[usize]>, one_end: bool, realization: &mut dyn FieldRealization, sweep: &mut dyn FnMut(usize, usize) -> bool, observe: &mut dyn FnMut(ReleaseRead)) -> Result<Vec<Vec<usize>>> {
+    fn release(&self, problems: &[(&[usize], usize)], sweeps: usize, refine: usize, void: usize, seed: u64, run_bound: i128, near_tail: bool, place_order: bool, lengths: Option<&[usize]>, one_end: bool, rest: bool, realization: &mut dyn FieldRealization, sweep: &mut dyn FnMut(usize, usize) -> bool, observe: &mut dyn FnMut(ReleaseRead)) -> Result<Vec<Vec<usize>>> {
         if sweeps == 0 || void >= self.declaration.alphabet || problems.iter().any(|&(_, n)| n == 0) {
             return refuse("a sample needs a sweep, an answer place and a void class in the alphabet");
         }
@@ -3642,6 +3687,8 @@ impl Field {
         let mut cursors = vec![0usize; problems.len()];
         // Each place's entropy at its last draw, for a refine pass's runs (none where the closing law resolved it).
         let mut drawn_entropy: Vec<Vec<Option<i128>>> = classes.iter().map(|c| vec![None; c.len()]).collect();
+        // Each answer's refine passes' drives ([`PassDrive`]), one a pass it was redrawn in.
+        let mut drives: Vec<Vec<PassDrive>> = vec![Vec::new(); problems.len()];
         let mut swept = sweeps;
         for done in 0..sweeps {
             let last = done + 1 == sweeps || !sweep(done, sweeps);
@@ -3686,7 +3733,7 @@ impl Field {
                 }
                 runs.push(picked);
             }
-            observe(ReleaseRead { read: done, pass: 0, classes: &classes, open: &open, faces: Some(&faces), bound, passed });
+            observe(ReleaseRead { read: done, pass: 0, classes: &classes, open: &open, faces: Some(&faces), bound, passed, drives: &drives });
             // [definition; agent-inferred, November 5, the unified-theory reading of 22:38] **A void never unwrites a letter**: in
             // the sweeps as in refine, a place before the last written letter draws from its face restricted to the letters
             // (the void's mass removed, an exact integer draw against the rest), and only a place past every letter draws
@@ -3747,7 +3794,7 @@ impl Field {
             }
             if last {
                 if done + 1 < sweeps {
-                    observe(ReleaseRead { read: done + 1, pass: 0, classes: &classes, open: &open, faces: None, bound: 0, passed: 0 });
+                    observe(ReleaseRead { read: done + 1, pass: 0, classes: &classes, open: &open, faces: None, bound: 0, passed: 0, drives: &drives });
                     return Ok(problems.iter().enumerate().map(|(k, &(q, _))| classes[k][q.len()..].to_vec()).collect());
                 }
                 break;
@@ -3780,9 +3827,21 @@ impl Field {
         let mut read = swept;
         let total = swept + refine * problems.iter().map(|&(_, n)| n).max().unwrap_or(0);
         let boundary = |classes: &[usize], open: &[bool], q: usize| (q..classes.len()).find(|&t| classes[t] == void && !open[t]).unwrap_or(classes.len());
+        // [definition; agent-inferred, November 6, Brandon's lens of 17:31 and the unified-theory reading of 17:38] **A pass
+        // comes to rest** (with `rest`): at temperature one the walk has no fixed point, so its plateau is zero net drive, not
+        // zero change. Each pass sums over the places it redraws in an answer ([`PassDrive`]) the standing letters' codes
+        // `S` on the faces they are redrawn from and those faces' entropies `H`; `D = S − H` is the drive (positive while
+        // the answer contracts toward what its faces expect, negative while it expands), and the faces' varentropies `C`
+        // are the draws' own spread (the distributed capacitance). An answer rests after the first pass whose drive is
+        // within its spread, `D ≤ √C`, or fell from the pass before by no more than it, `D_(p−1) − D_p ≤ √C`, and its later
+        // passes pass it over. Why (lap 24's ten passes, `PASSES.tsv`): the drawn code a place fell from 1.82 bits at pass 1
+        // to 1.38 at pass 8 and rose to 1.48 by pass 10 as some answers heated (one from 1.78 to 3.73 bits a place), so a
+        // fixed count both stops answers still falling and walks heating ones on.
+        let mut resting = vec![false; problems.len()];
         let mut pass = 0u64;
-        while (pass as usize) < refine {
+        while (pass as usize) < refine && !resting.iter().all(|&r| r) {
             pass += 1;
+            let mut moved: Vec<PassDrive> = vec![PassDrive::default(); problems.len()];
             let orders: Vec<Vec<usize>> = problems
                 .iter()
                 .enumerate()
@@ -3798,6 +3857,9 @@ impl Field {
                 // past it: the next places at or before the boundary whose entropies at their last draw sum within the bound.
                 let mut places: Vec<Option<(Vec<usize>, usize)>> = vec![None; problems.len()];
                 for (k, &(q, _)) in problems.iter().enumerate() {
+                    if resting[k] {
+                        continue;
+                    }
                     let end = boundary(&classes[k], &open[k], q.len());
                     while let Some(&t) = orders[k].get(cursors[k]) {
                         cursors[k] += 1;
@@ -3827,7 +3889,7 @@ impl Field {
                     break;
                 }
                 if !sweep(read, total) {
-                    observe(ReleaseRead { read, pass: pass as usize, classes: &classes, open: &open, faces: None, bound: 0, passed: 0 });
+                    observe(ReleaseRead { read, pass: pass as usize, classes: &classes, open: &open, faces: None, bound: 0, passed: 0, drives: &drives });
                     return Ok(problems.iter().enumerate().map(|(k, &(q, _))| classes[k][q.len()..].to_vec()).collect());
                 }
                 read += 1;
@@ -3855,12 +3917,13 @@ impl Field {
                         passed += usize::from(run_bound > 0 && held >= run_bound);
                     }
                 }
-                observe(ReleaseRead { read: read - 1, pass: pass as usize, classes: &classes, open: &open, faces: Some(&faces), bound, passed });
+                observe(ReleaseRead { read: read - 1, pass: pass as usize, classes: &classes, open: &open, faces: Some(&faces), bound, passed, drives: &drives });
                 for (k, place) in places.into_iter().enumerate() {
                     let Some((run, end)) = place else { continue };
                     for (&t, &was) in run.iter().zip(&kept[k]) {
                     let face = faces[k][t].as_ref().ok_or(TowerError::Refused("a sample's open place without a face"))?;
                     drawn_entropy[k][t] = Some(entropy(face));
+                    moved[k].add(face, was);
                     let u = ((mix(((k as u64) << 40) ^ ((t as u64) << 8) ^ (pass << 56) ^ 0xD) as u128) << 64) | mix(((k as u64) << 40) ^ ((t as u64) << 8) ^ (pass << 56) ^ 0xE) as u128;
                     let whole = !given && t + 1 >= end;
                     let letters = face.total - face.masses[void];
@@ -3881,6 +3944,7 @@ impl Field {
                             acc > u
                         }).unwrap_or(was)
                     };
+                    moved[k].changes += usize::from(classes[k][t] != was);
                     open[k][t] = false;
                     }
                     // A run's draws read one boundary: where its last letter was drawn the void, the closing law resolves every
@@ -3893,8 +3957,13 @@ impl Field {
                     }
                 }
             }
+            for k in (0..problems.len()).filter(|&k| moved[k].redrawn > 0) {
+                let before = drives[k].last().map(PassDrive::drive);
+                drives[k].push(moved[k]);
+                resting[k] = rest && moved[k].rests(before);
+            }
         }
-        observe(ReleaseRead { read, pass: pass as usize + 1, classes: &classes, open: &open, faces: None, bound: 0, passed: 0 });
+        observe(ReleaseRead { read, pass: pass as usize + 1, classes: &classes, open: &open, faces: None, bound: 0, passed: 0, drives: &drives });
         Ok(problems.iter().enumerate().map(|(k, &(q, _))| classes[k][q.len()..].to_vec()).collect())
     }
 
@@ -5004,9 +5073,17 @@ pub fn octave_of(d: usize) -> u32 {
     usize::BITS - 1 - d.leading_zeros()
 }
 
+/// [definition; agent-inferred, November 6] A face's varentropy `Σ_a p(a) (−log₂ p(a))² − H²`, the spread of a draw's
+/// code about the entropy it expects, on `2^(−40)` bits² ([`Field::release`]'s rest).
+pub fn varentropy(face: &TowerFace) -> i128 {
+    let second: u128 = face.masses.iter().enumerate().filter(|&(_, &m)| m > 0).map(|(a, &m)| m * (face.code(a) as u128).pow(2)).sum();
+    let h = entropy(face);
+    div_nearest(second as i128, face.total as i128) - h * h
+}
+
 /// [definition; §16.47] A face's entropy `Σ_a p(a) (−log₂ p(a))` on the codes' `2^(−20)` bits, each class's code
 /// ([`TowerFace::code`]) weighed by its mass over the total and the sum released once at its nearest.
-fn entropy(face: &TowerFace) -> i128 {
+pub fn entropy(face: &TowerFace) -> i128 {
     let sum: i128 = face.masses.iter().enumerate().filter(|&(_, &m)| m > 0).map(|(a, &m)| m as i128 * face.code(a) as i128).sum();
     div_nearest(sum, face.total as i128)
 }

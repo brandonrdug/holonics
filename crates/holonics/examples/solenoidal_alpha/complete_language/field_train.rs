@@ -2296,6 +2296,9 @@ pub(super) fn length_field(args: &[String], realization: &mut dyn FieldRealizati
     // [measurement; agent-inferred, November 6] `FIELD_WRITER_ONE_END`: each answer's length drawn once from the release's first
     // read ([`Field::sample_runs`]'s `one_end`).
     let one_end = std::env::var_os("FIELD_WRITER_ONE_END").is_some();
+    // [measurement; agent-inferred, November 6, Brandon's lens of 17:31] `FIELD_WRITER_REST`: each answer's refine passes stop
+    // where they come to rest ([`holonics::hnn::tower::field::Field::sample_runs`]), `refine` their most.
+    let rest = std::env::var_os("FIELD_WRITER_REST").is_some();
     let given: Option<Vec<usize>> = match std::env::var("FIELD_WRITER_LENGTHS") {
         Ok(path) => {
             let text = std::fs::read_to_string(path)?;
@@ -2312,9 +2315,13 @@ pub(super) fn length_field(args: &[String], realization: &mut dyn FieldRealizati
     };
     let (mut reads_made, mut bound_sum, mut passed_sum) = (0usize, 0i128, 0usize);
     // [measurement; agent-inferred, November 5] Each refine pass's redraws and their code, `Σ −log₂ p(c)` of the class each
-    // drew on the face it was drawn from, a problem a pass (`PASSES.tsv`): whether the answer's own code falls, then holds.
+    // drew on the face it was drawn from, a problem a pass (`PASSES.tsv`): whether the answer's own code falls, then holds;
+    // beside it the pass's drive ([`holonics::hnn::tower::field::PassDrive`]: the standing letters' code, the faces'
+    // entropy, the drive, the varentropy on `2^(−40)` bits², the changes and the changes equilibrium keeps), the rest's
+    // own reading.
     let mut pending: Option<(usize, Vec<Vec<(usize, holonics::hnn::tower::TowerFace)>>)> = None;
     let mut passes: std::collections::BTreeMap<(usize, usize), (usize, i64)> = std::collections::BTreeMap::new();
+    let mut drives: Vec<Vec<holonics::hnn::tower::field::PassDrive>> = Vec::new();
     let answers = field
         .sample_runs(
             &problems,
@@ -2327,6 +2334,7 @@ pub(super) fn length_field(args: &[String], realization: &mut dyn FieldRealizati
             place_order,
             given.as_deref(),
             one_end,
+            rest,
             realization,
             &mut |done, _| {
                 if started.elapsed().as_millis() > stop_ms || (reads > 0 && done == reads) {
@@ -2343,6 +2351,9 @@ pub(super) fn length_field(args: &[String], realization: &mut dyn FieldRealizati
                             *slot = (slot.0 + 1, slot.1 + face.code(r.classes[k][*t]));
                         }
                     }
+                }
+                if r.faces.is_none() {
+                    drives = r.drives.to_vec();
                 }
                 if let (true, Some(faces)) = (r.pass >= 1, r.faces) {
                     pending = Some((r.pass, (0..problems.len()).map(|k| (0..r.classes[k].len()).filter(|&t| r.open[k][t]).filter_map(|t| faces[k][t].clone().map(|f| (t, f))).collect()).collect()));
@@ -2391,9 +2402,10 @@ pub(super) fn length_field(args: &[String], realization: &mut dyn FieldRealizati
     if let Some(why) = failed {
         return Err(why.into());
     }
-    let mut pass_rows = rows_file(&out.join("PASSES.tsv"), "problem\tpass\tredrawn\tcode\n")?;
+    let mut pass_rows = rows_file(&out.join("PASSES.tsv"), "problem\tpass\tredrawn\tcode\tstanding\tentropy\tdrive\tvarentropy\tchanges\tequilibrium\n")?;
     for ((k, pass), (redrawn, code)) in &passes {
-        row(&mut pass_rows, &format!("{k}\t{pass}\t{redrawn}\t{code}\n"))?;
+        let d = drives.get(*k).and_then(|d| d.get(pass - 1)).copied().unwrap_or_default();
+        row(&mut pass_rows, &format!("{k}\t{pass}\t{redrawn}\t{code}\t{}\t{}\t{}\t{}\t{}\t{}\n", d.standing, d.entropy, d.drive(), d.varentropy, d.changes, d.equilibrium))?;
     }
     let mut ends = rows_file(&out.join("ENDS.tsv"), "problem\theld\twritten\tfirst_void_read\tfirst_void_place\tlast_letter_place\tlast_letter_read\n")?;
     let mut file = rows_file(&out.join("SAMPLE.tsv"), "")?;
@@ -2408,9 +2420,10 @@ pub(super) fn length_field(args: &[String], realization: &mut dyn FieldRealizati
         row(&mut ends, &format!("{k}\t{held_length}\t{written}\t{fv_read}\t{fv_place}\t{last}\t{last_read}\n"))?;
     }
     println!(
-        "FIELD_LENGTH problems={} sweeps={sweeps} refine={} stopped={} run_bits={run_bits} reads={reads_made} certified_bits={} passed={passed_sum} ms={}",
+        "FIELD_LENGTH problems={} sweeps={sweeps} refine={}{} stopped={} run_bits={run_bits} reads={reads_made} certified_bits={} passed={passed_sum} ms={}",
         problems.len(),
         refine,
+        if rest { "_rest" } else { "" },
         stopped.map_or("-".to_string(), |s| s.to_string()),
         bits(bound_sum as i64, 1),
         started.elapsed().as_millis()
