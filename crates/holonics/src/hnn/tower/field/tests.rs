@@ -220,16 +220,18 @@ fn covector_matches_the_codes_difference() {
     // resolved (a state of the writer's path).
     const PORTED: [bool; 7] = [false, true, false, false, true, true, true];
     const PATH: [bool; 7] = [false, true, false, false, true, false, true];
-    let port = Port { start: 4, void: 0, target: &[2, 3], boundary: false, stop: None, heard: None, window: false, letters: false };
+    let port = Port { start: 4, void: 0, target: &[2, 3], boundary: false, stop: None, heard: None, window: false, letters: false, pull: None };
     let bounded = Port { boundary: true, ..port };
     // [the unified-theory reading of November 6, 11:49] And a port on its letters off the void, with its middle place resolved
     // (the writer's own state given its end).
     let lettered = Port { letters: true, target: &[2, 3, 1], ..port };
+    // [the unified-theory reading of November 6, 19:04] And a declared pull at the port's first place, the rest past its stop.
+    let pulled = Port { pull: Some((2, 3, 3 << 19)), stop: Some(5), ..port };
     // [the depth rings, November 6] And with a depth ring among the turned sets (its rate the located increment alone, no
     // skin, no moment).
     // [the unified-theory reading of November 6, 10:31] And under the bare stretch (`Field::bare_stretch`: past the last arrival
     // a silent place runs at the bare rate and returns nothing), declared beside the one-rate stretch.
-    for (still, depth, bare, r) in [(0usize, 0usize, false), (1, 0, false), (2, 0, false), (0, 1, false), (1, 1, false), (0, 0, true), (1, 0, true)].into_iter().flat_map(|(still, depth, bare)| [(still, region()), (still, Region { classes: &CLASSES, unresolved: &OPEN, faces: &carried, locked: &[], echo: &[], domain: None, port: None }), (still, Region { classes: &CLASSES, unresolved: &PORTED, faces: &[], locked: &[], echo: &[], domain: None, port: Some(port) }), (still, Region { classes: &CLASSES, unresolved: &PORTED, faces: &[], locked: &[], echo: &[], domain: None, port: Some(bounded) }), (still, Region { classes: &CLASSES, unresolved: &PATH, faces: &[], locked: &[], echo: &[], domain: None, port: Some(bounded) }), (still, Region { classes: &CLASSES, unresolved: &PATH, faces: &[], locked: &[], echo: &[], domain: None, port: Some(lettered) })].map(|(still, r)| (still, depth, bare, r))) {
+    for (still, depth, bare, r) in [(0usize, 0usize, false), (1, 0, false), (2, 0, false), (0, 1, false), (1, 1, false), (0, 0, true), (1, 0, true)].into_iter().flat_map(|(still, depth, bare)| [(still, region()), (still, Region { classes: &CLASSES, unresolved: &OPEN, faces: &carried, locked: &[], echo: &[], domain: None, port: None }), (still, Region { classes: &CLASSES, unresolved: &PORTED, faces: &[], locked: &[], echo: &[], domain: None, port: Some(port) }), (still, Region { classes: &CLASSES, unresolved: &PORTED, faces: &[], locked: &[], echo: &[], domain: None, port: Some(bounded) }), (still, Region { classes: &CLASSES, unresolved: &PATH, faces: &[], locked: &[], echo: &[], domain: None, port: Some(bounded) }), (still, Region { classes: &CLASSES, unresolved: &PATH, faces: &[], locked: &[], echo: &[], domain: None, port: Some(lettered) }), (still, Region { classes: &CLASSES, unresolved: &PORTED, faces: &[], locked: &[], echo: &[], domain: None, port: Some(pulled) })].map(|(still, r)| (still, depth, bare, r))) {
         let mut field = shaped_with(FieldDeclaration { depth, ..tiny_declaration(still) });
         field.bare_stretch = bare;
         let g = covector_of(&field, &r);
@@ -1246,7 +1248,7 @@ fn a_port_is_read_through_its_coupling() {
     let field = shaped(1);
     const PORTED: [bool; 7] = [false, true, false, false, true, true, true];
     let target = [2usize, 3];
-    let r = Region { classes: &CLASSES, unresolved: &PORTED, faces: &[], locked: &[], echo: &[], domain: None, port: Some(Port { start: 4, void: 0, target: &target, boundary: false, stop: None, heard: None, window: false, letters: false }) };
+    let r = Region { classes: &CLASSES, unresolved: &PORTED, faces: &[], locked: &[], echo: &[], domain: None, port: Some(Port { start: 4, void: 0, target: &target, boundary: false, stop: None, heard: None, window: false, letters: false, pull: None }) };
     let faces = field.faces(&r).unwrap();
     let place = faces[1].as_ref().unwrap().code(CLASSES[1]);
     let at: Vec<(&[u128], u128)> = faces[4..].iter().map(|f| { let f = f.as_ref().unwrap(); (f.masses.as_slice(), f.total) }).collect();
@@ -1266,7 +1268,7 @@ fn a_port_at_its_boundary_codes_only_the_end() {
     let field = shaped(1);
     const PORTED: [bool; 7] = [false, true, false, false, true, true, true];
     let target = [2usize, 3];
-    let port = Port { start: 4, void: 0, target: &target, boundary: true, stop: None, heard: None, window: false, letters: false };
+    let port = Port { start: 4, void: 0, target: &target, boundary: true, stop: None, heard: None, window: false, letters: false, pull: None };
     let r = Region { classes: &CLASSES, unresolved: &PORTED, faces: &[], locked: &[], echo: &[], domain: None, port: Some(port) };
     let faces = field.faces(&r).unwrap();
     let at: Vec<(&[u128], u128)> = faces[4..].iter().map(|f| { let f = f.as_ref().unwrap(); (f.masses.as_slice(), f.total) }).collect();
@@ -1501,7 +1503,7 @@ fn a_cut_room_reads_and_returns_the_whole_rooms_bits() {
                 locked: &[],
                 echo: &[],
                 domain: None,
-                port: Some(Port { start: q.len(), void: 0, target: &target, boundary: true, stop: None, heard: Some(&heard), window, letters: false }),
+                port: Some(Port { start: q.len(), void: 0, target: &target, boundary: true, stop: None, heard: Some(&heard), window, letters: false, pull: None }),
             };
             let (whole, cut) = (region(false), region(true));
             let kept = cut.window(ticks).unwrap();
@@ -1710,6 +1712,24 @@ fn a_walk_from_given_answers_reads_them_first() {
         }
     }
     assert!(moved > 0, "later passes walk");
+}
+
+/// [definition; the unified-theory reading of November 6, 19:04] **A declared pull** reads `w (c(b) − c(a))` on its first
+/// place's face and returns `w (e_a − e_b)` there, nothing at its later places, and refuses a class the face does not hold.
+#[test]
+fn a_pull_reads_its_two_classes_ratio() {
+    let face = TowerFace { masses: vec![1, 3, 4], total: 8 };
+    let empty = TowerFace { masses: Vec::new(), total: 0 };
+    let faces = [(face.masses.as_slice(), face.total), (empty.masses.as_slice(), 0)];
+    let port = Port { start: 0, void: 0, target: &[], boundary: false, stop: None, heard: None, window: false, letters: false, pull: Some((2, 1, 1 << 20)) };
+    let (rows, code) = port_reading(&faces, &port).unwrap();
+    assert_eq!(rows, vec![vec![0, -(1 << 24), 1 << 24], Vec::new()]);
+    // c(1) − c(2) = log₂(4/3) bits.
+    assert_eq!(code, face.code(1) - face.code(2));
+    let half = Port { pull: Some((2, 1, -(1 << 19))), ..port };
+    assert_eq!(port_reading(&faces, &half).unwrap().1, -((face.code(1) - face.code(2) + 1) / 2));
+    let missing = TowerFace { masses: vec![1, 0, 4], total: 5 };
+    assert!(port_reading(&[(missing.masses.as_slice(), missing.total)], &port).is_err());
 }
 
 /// [definition; the unified-theory reading of November 5, 22:38] **A void never unwrites a letter**: at every read of the

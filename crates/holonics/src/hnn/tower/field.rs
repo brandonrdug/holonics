@@ -813,6 +813,10 @@ pub struct Port<'a> {
     /// end is given (a place before the end draws from its face restricted to the letters), so the void logit takes no covector
     /// there; a resolved place carries no face and is not compared ([`letters_reading`]).
     pub letters: bool,
+    /// [definition; agent-inferred, November 6, the unified-theory reading of 18:28] **A declared pull** `(a, b, w)` at the
+    /// port's first place ([`pull_reading`]): the code `w (c(b) − c(a))` on its face, `c` the classes' codes and `w` on the
+    /// codes' `2^(−20)` bits, and its covector `w (e_a − e_b)`; every other place of the port is not compared.
+    pub pull: Option<(usize, usize, i64)>,
 }
 
 /// [definition; agent-inferred, November 3, §16.24] **A port's reading**: its coupling code on `2^(−20)` bits and each
@@ -821,6 +825,9 @@ pub struct Port<'a> {
 /// rows from the same faces.
 pub fn port_reading(faces: &[(&[u128], u128)], port: &Port) -> Result<(Vec<Vec<i64>>, i64)> {
     use crate::receiver::coupling::TemperatureRefusal as Why;
+    if let Some(pull) = port.pull {
+        return pull_reading(faces, pull);
+    }
     if port.boundary {
         return boundary_reading(faces, port);
     }
@@ -857,6 +864,28 @@ pub fn port_reading(faces: &[(&[u128], u128)], port: &Port) -> Result<(Vec<Vec<i
 /// the opening's void mass past the end is what a release pays in places). On the face covector's `2^(−24)` and the codes'
 /// `2^(−20)` bits, read alike by the host's return and the card's. A resolved place (`(∅, 0)`, a state of the writer's
 /// path) is not compared: its row is empty and it adds no code.
+/// [`Port::pull`]'s reading: at the port's first place (its face `(m, T)`), the covector `w (e_a − e_b)` on the face covector's
+/// `2^(−24)` and the code `w (c(b) − c(a))` released to the nearest on `2^(−20)` bits, each code `−log₂ m/T`
+/// ([`super::face_code`]); `w (c(b) − c(a))` is a ratio of two classes' masses on one face, so its covector holds no
+/// face's shares. Every later place's row is empty; a first place with no face is not compared.
+fn pull_reading(faces: &[(&[u128], u128)], (a, b, w): (usize, usize, i64)) -> Result<(Vec<Vec<i64>>, i64)> {
+    let mut rows: Vec<Vec<i64>> = vec![Vec::new(); faces.len()];
+    let Some(&(masses, total)) = faces.first() else { return Ok((rows, 0)) };
+    if total == 0 && masses.is_empty() {
+        return Ok((rows, 0));
+    }
+    if a >= masses.len() || b >= masses.len() || a == b || masses[a] == 0 || masses[b] == 0 {
+        return refuse("a pull between two classes the face does not both hold");
+    }
+    let step = w << (super::COVECTOR_BITS - 20);
+    let mut row = vec![0i64; masses.len()];
+    row[a] += step;
+    row[b] -= step;
+    rows[0] = row;
+    let gap = super::face_code(masses[b], total) as i128 - super::face_code(masses[a], total) as i128;
+    Ok((rows, fit64(div_nearest(w as i128 * gap, 1 << 20))?))
+}
+
 /// [`Port::letters`]'s reading: at each open place `i` (within the target) the covector `p̂_a/(1 − p̂_∅) − [a = target_i]` over the
 /// letters on the face covector's `2^(−24)`, zero at the void, and the code `−log₂(m_(target_i)/(T − m_∅))` on `2^(−20)` bits; a
 /// resolved place (an empty face) is not compared.
@@ -1969,7 +1998,8 @@ impl Field {
         }
         if let Some(port) = region.port {
             // [§16.47] A port at its boundary may hold resolved places (a state of the writer's path); it compares its open ones.
-            if port.start > region.classes.len() || (!port.boundary && !port.letters && region.unresolved[port.start..].iter().any(|&u| !u)) || (port.start..region.classes.len()).any(|t| region.locked.get(t).copied().unwrap_or(false)) {
+            // A pull compares its first place alone, and the places past it may stand resolved.
+            if port.start > region.classes.len() || (!port.boundary && !port.letters && port.pull.is_none() && region.unresolved[port.start..].iter().any(|&u| !u)) || (port.start..region.classes.len()).any(|t| region.locked.get(t).copied().unwrap_or(false)) {
                 return refuse("a port whose places are not every open, unlocked site to the region's end");
             }
             if port.void >= self.declaration.alphabet || port.target.iter().any(|&c| c == port.void || c >= self.declaration.alphabet) {

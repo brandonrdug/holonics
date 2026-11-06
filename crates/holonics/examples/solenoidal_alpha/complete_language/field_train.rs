@@ -287,6 +287,10 @@ pub(super) fn region_lengths(codec: &FieldCodec, problems: &Problems, members: &
     if path_writer() {
         out.extend(paths.iter().zip(&draws).filter_map(|(&i, &d)| writer_region(codec, &problems[i].0, &problems[i].1, seed, d).map(|r| r.classes.len())));
     }
+    if path_squares() {
+        // Four states a square, each the truth cut NEAR places past the end (a square whose face holds no runner-up is fewer).
+        out.extend(paths.iter().filter(|&&i| problems[i].1.len().min(codec.answer) >= 2).flat_map(|&i| std::iter::repeat_n((problems[i].0.len() + problems[i].1.len().min(codec.answer) + holonics::hnn::tower::field::NEAR).min(problems[i].0.len() + codec.answer), 4)));
+    }
     if path_drafts() {
         out.extend(paths.iter().filter(|&&i| !problems[i].1.is_empty()).map(|&i| (problems[i].0.len() + problems[i].1.len().min(codec.answer) + holonics::hnn::tower::field::NEAR).min(problems[i].0.len() + codec.answer)));
     }
@@ -606,18 +610,20 @@ pub(super) struct TrainRegion {
     pub window: bool,
     /// Whether its port compares its open places on their letters off the void ([`holonics::hnn::tower::field::Port::letters`]).
     pub letters: bool,
+    /// Its port's declared pull ([`holonics::hnn::tower::field::Port::pull`]).
+    pub pull: Option<(usize, usize, i64)>,
 }
 
 impl TrainRegion {
     /// A region carrying no face and no lock.
     pub(super) fn plain(classes: Vec<usize>, unresolved: Vec<bool>) -> Self {
-        Self { classes, unresolved, faces: Vec::new(), locked: Vec::new(), echo: Vec::new(), domain: None, port: None, window: false, letters: false }
+        Self { classes, unresolved, faces: Vec::new(), locked: Vec::new(), echo: Vec::new(), domain: None, port: None, window: false, letters: false, pull: None }
     }
 }
 
 /// A region as the field reads it.
 fn view_of(region: &TrainRegion) -> Region<'_> {
-    Region { classes: &region.classes, unresolved: &region.unresolved, faces: &region.faces, locked: &region.locked, echo: &region.echo, domain: region.domain, port: region.port.as_ref().map(|(start, void, target, boundary, stop, heard)| Port { start: *start, void: *void, target, boundary: *boundary, stop: *stop, heard: heard.as_deref(), window: region.window, letters: region.letters }) }
+    Region { classes: &region.classes, unresolved: &region.unresolved, faces: &region.faces, locked: &region.locked, echo: &region.echo, domain: region.domain, port: region.port.as_ref().map(|(start, void, target, boundary, stop, heard)| Port { start: *start, void: *void, target, boundary: *boundary, stop: *stop, heard: heard.as_deref(), window: region.window, letters: region.letters, pull: region.pull }) }
 }
 
 /// The regions as the field reads them.
@@ -658,6 +664,12 @@ pub(super) fn section_regions(codec: &FieldCodec, problems: &Problems, members: 
     if path_drafts() {
         let drafts = draft_regions(codec, problems, paths, &draws, seed, &learner.field, realization)?;
         regions.extend(drafts);
+    }
+    // [the unified-theory reading of November 6, 19:04] Then, declared, each path problem's square: the faces' two readings agree.
+    if path_squares() {
+        let (squares, met, curl) = square_regions(codec, problems, paths, &draws, seed, &learner.field, realization)?;
+        regions.extend(squares);
+        println!("FIELD_SQUARES squares={met} curl_bits={}", bits(curl, met.max(1)));
     }
     let next = if learner.holds_step() { learner.read_step_on(&views_of(&regions), realization).map_err(|e| e.to_string())?.1 } else { None };
     Ok((regions, next))
@@ -1746,6 +1758,143 @@ pub(super) fn restate_field(args: &[String], realization: &mut dyn FieldRealizat
     Ok(())
 }
 
+/// The bands of distance a square's two places stand at (§ the curl on two-place squares): 1, 2–3, 4–7, 8–15, 16 and past.
+const SQUARE_BANDS: [(usize, usize); 5] = [(1, 1), (2, 3), (4, 7), (8, 15), (16, usize::MAX)];
+
+/// A square's reading: each place's runner-up letter on its face beside the truth, and the log odds ratio through each
+/// place's faces across the other's standing and runner-up letters, `λ_i`, `λ_j` on the codes' `2^(−20)` bits, with the four
+/// faces on their letters (`[i | j standing, i | j runner-up, j | i standing, j | i runner-up]`).
+struct Square {
+    runners: (usize, usize),
+    lambda_i: i64,
+    lambda_j: i64,
+    faces: [holonics::hnn::tower::TowerFace; 4],
+}
+
+struct SquareReads {
+    squares: Vec<Option<Square>>,
+    regions: usize,
+}
+
+/// [measurement; agent-inferred, November 6, the unified-theory reading of 18:28] **A square's four reads** on a state of the
+/// truth (`truth`: the question, the answer and its near tail, every place resolved): for each `(band, i, j)`, the faces at
+/// `i` and at `j` with only that place open, each face's runner-up letter (the most mass after the standing letter's, on its
+/// letters off the void), then each place's face with the other's letter set to its runner-up. `λ_i = c_i(a'|b) + c_i(a|b')
+/// − c_i(a|b) − c_i(a'|b')` (`a`, `a'` the standing and runner-up letters at `i`, `b`, `b'` at `j`), `λ_j` alike; a square
+/// whose face holds no runner-up is none.
+fn square_reads(field: &Field, void: usize, truth: &[usize], picked: &[(usize, usize, usize)], realization: &mut dyn FieldRealization) -> Result<SquareReads> {
+    let letters = |f: &holonics::hnn::tower::TowerFace| holonics::hnn::tower::field::letters_face(f, void);
+    let runner_up = |f: &holonics::hnn::tower::TowerFace, standing: usize| (0..f.masses.len()).filter(|&c| c != standing && f.masses[c] > 0).max_by_key(|&c| (f.masses[c], std::cmp::Reverse(c)));
+    let state = |open_at: usize, set: Option<(usize, usize)>| -> (Vec<usize>, Vec<bool>) {
+        let mut classes = truth.to_vec();
+        if let Some((t, c)) = set {
+            classes[t] = c;
+        }
+        let open = (0..classes.len()).map(|t| t == open_at).collect();
+        (classes, open)
+    };
+    let read = |states: &[(Vec<usize>, Vec<bool>)], at: &[usize], realization: &mut dyn FieldRealization| -> Result<Vec<holonics::hnn::tower::TowerFace>> {
+        let mut faces = Vec::with_capacity(states.len());
+        for (chunk, sites) in states.chunks(32).zip(at.chunks(32)) {
+            let regions: Vec<Region> = chunk.iter().map(|(c, o)| Region { classes: c, unresolved: o, faces: &[], locked: &[], echo: &[], domain: None, port: None }).collect();
+            for (f, &t) in realization.read_faces(field, &regions).map_err(|e| e.to_string())?.into_iter().zip(sites) {
+                let face = f[t].as_ref().ok_or("a square's open place with no face")?;
+                faces.push(letters(face).ok_or("a square's face with no letter")?);
+            }
+        }
+        Ok(faces)
+    };
+    let base_states: Vec<_> = picked.iter().flat_map(|&(_, i, j)| [state(i, None), state(j, None)]).collect();
+    let base_at: Vec<usize> = picked.iter().flat_map(|&(_, i, j)| [i, j]).collect();
+    let base = read(&base_states, &base_at, realization)?;
+    let mut cross_states = Vec::with_capacity(base_states.len());
+    let mut runners = Vec::with_capacity(picked.len());
+    for (s, &(_, i, j)) in picked.iter().enumerate() {
+        let (Some(bi), Some(bj)) = (runner_up(&base[2 * s], truth[i]), runner_up(&base[2 * s + 1], truth[j])) else {
+            runners.push(None);
+            continue;
+        };
+        runners.push(Some((bi, bj)));
+        cross_states.push(state(i, Some((j, bj))));
+        cross_states.push(state(j, Some((i, bi))));
+    }
+    let cross_at: Vec<usize> = picked.iter().zip(&runners).filter(|(_, r)| r.is_some()).flat_map(|(&(_, i, j), _)| [i, j]).collect();
+    let cross = read(&cross_states, &cross_at, realization)?;
+    let regions = base_states.len() + cross_states.len();
+    let mut squares = Vec::with_capacity(picked.len());
+    let mut c = 0usize;
+    for (s, (&(_, i, j), r)) in picked.iter().zip(&runners).enumerate() {
+        let Some((bi, bj)) = *r else {
+            squares.push(None);
+            continue;
+        };
+        let (ai, aj) = (truth[i], truth[j]);
+        let faces = [base[2 * s].clone(), cross[2 * c].clone(), base[2 * s + 1].clone(), cross[2 * c + 1].clone()];
+        c += 1;
+        let lambda_i = faces[0].code(bi) + faces[1].code(ai) - faces[0].code(ai) - faces[1].code(bi);
+        let lambda_j = faces[2].code(bj) + faces[3].code(aj) - faces[2].code(aj) - faces[3].code(bj);
+        squares.push(Some(Square { runners: (bi, bj), lambda_i, lambda_j, faces }));
+    }
+    Ok(SquareReads { squares, regions })
+}
+
+/// [definition; the unified-theory reading of November 6, 19:04] **The squares agree**: each path problem's square at a keyed
+/// band ([`SQUARE_BANDS`], among those its answer reaches), its places keyed within the answer, on the truth given its end
+/// (the question, the answer and its `NEAR` voids, cut there), read through [`square_reads`] on the learner's field; with
+/// `l = λ_i − λ_j` the loss is `l²/4`, and four states each open at one place carry its covector as a declared pull
+/// ([`holonics::hnn::tower::field::Port::pull`]): `i` beside `j`'s standing letter pulls `(a, a', l/2)` (its code
+/// `(l/2)(c(a') − c(a))`), `i` beside `j`'s runner-up `(a', a, l/2)`, `j` beside `i`'s standing letter `(b, b', −l/2)` and
+/// `j` beside `i`'s runner-up `(b', b, −l/2)`, so the four codes sum to `l·(λ_i − λ_j)/2` at the read and its covector is the
+/// loss's. Why (truth120): the curl's spread exceeded the odds ratio's at every band on lap 4 and lap 24 alike, and the masked
+/// comparison never sets the two readings of a pair against each other; the law keeps handedness, an oriented interaction
+/// must only read the same from both ends. Returns the states and the squares' `Σ|l|` on `2^(−20)` bits.
+pub(super) fn square_regions(codec: &FieldCodec, problems: &Problems, paths: &[usize], draws: &[u64], seed: u64, field: &Field, realization: &mut dyn FieldRealization) -> Result<(Vec<TrainRegion>, usize, i64)> {
+    let near = holonics::hnn::tower::field::NEAR;
+    let void = codec.void();
+    let mut out = Vec::new();
+    let (mut squares, mut curl) = (0usize, 0i64);
+    for (&p, &d) in paths.iter().zip(draws) {
+        let (q, a, _) = &problems[p];
+        let len = a.len().min(codec.answer);
+        if len < 2 {
+            continue;
+        }
+        let truth = region_classes(codec, q, &a[..len], (q.len() + len + near).min(q.len() + codec.answer));
+        let key = mix(seed ^ 0x5C0A_4E00_0000_0000, d);
+        let bands: Vec<(usize, usize)> = SQUARE_BANDS.iter().map(|&(lo, hi)| (lo, hi.min(len - 1))).filter(|&(lo, top)| lo <= top).collect();
+        let (lo, top) = bands[(mix(key, 1) % bands.len() as u64) as usize];
+        let dist = lo + (mix(key, 2) % (top - lo + 1) as u64) as usize;
+        let i = q.len() + (mix(key, 3) % (len - dist) as u64) as usize;
+        let j = i + dist;
+        let read = square_reads(field, void, &truth, &[(0, i, j)], realization)?;
+        let Some(Some(sq)) = read.squares.into_iter().next() else { continue };
+        let l = sq.lambda_i - sq.lambda_j;
+        let half = l / 2;
+        let (ai, aj, (bi, bj)) = (truth[i], truth[j], sq.runners);
+        let state = |open_at: usize, set: Option<(usize, usize)>, pull: (usize, usize, i64)| {
+            let mut classes = truth.clone();
+            if let Some((t, c)) = set {
+                classes[t] = c;
+            }
+            let unresolved = (0..classes.len()).map(|t| t == open_at).collect();
+            TrainRegion { port: Some((open_at, void, Vec::new(), false, Some(open_at + 1), None)), pull: Some(pull), ..TrainRegion::plain(classes, unresolved) }
+        };
+        out.push(state(i, None, (ai, bi, half)));
+        out.push(state(i, Some((j, bj)), (bi, ai, half)));
+        out.push(state(j, None, (aj, bj, -half)));
+        out.push(state(j, Some((i, bi)), (bj, aj, -half)));
+        squares += 1;
+        curl += l.abs();
+    }
+    Ok((out, squares, curl))
+}
+
+/// Whether each path problem's square also trains the faces' agreement ([`square_regions`], `FIELD_PATH_SQUARES`).
+pub(super) fn path_squares() -> bool {
+    static SQUARES: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
+    *SQUARES.get_or_init(|| std::env::var_os("FIELD_PATH_SQUARES").is_some())
+}
+
 /// [measurement; agent-inferred, November 6, the unified-theory reading of 18:28] **The curl on two-place squares**: on each
 /// of `COUNT` held answers, as the writer reads it given its length (the question, the truth, its near tail), `SQUARES` keyed
 /// pairs of answer places `(i, j = i + d)` in each band of distance (`d` = 1, 2–3, 4–7, 8–15, 16 and past): the standing
@@ -1769,9 +1918,6 @@ pub(super) fn curl_field(args: &[String], realization: &mut dyn FieldRealization
     std::fs::create_dir(out)?;
     let void = codec.void();
     let near = holonics::hnn::tower::field::NEAR;
-    let bands: [(usize, usize); 5] = [(1, 1), (2, 3), (4, 7), (8, 15), (16, usize::MAX)];
-    let letters = |f: &holonics::hnn::tower::TowerFace| holonics::hnn::tower::field::letters_face(f, void);
-    let runner_up = |f: &holonics::hnn::tower::TowerFace, standing: usize| (0..f.masses.len()).filter(|&c| c != standing && f.masses[c] > 0).max_by_key(|&c| (f.masses[c], std::cmp::Reverse(c)));
     let mut rows = rows_file(&out.join("CURL.tsv"), "problem\tband\ti\tj\tlambda_i\tlambda_j\n")?;
     let (mut read_regions, mut written) = (0usize, 0usize);
     for k in 0..n {
@@ -1785,7 +1931,7 @@ pub(super) fn curl_field(args: &[String], realization: &mut dyn FieldRealization
         truth.extend(std::iter::repeat_n(void, near.min(room - a.len())));
         // The keyed squares of each band within the answer.
         let mut picked: Vec<(usize, usize, usize)> = Vec::new();
-        for (b, &(lo, hi)) in bands.iter().enumerate() {
+        for (b, &(lo, hi)) in SQUARE_BANDS.iter().enumerate() {
             let top = hi.min(a.len() - 1);
             if lo > top {
                 continue;
@@ -1797,54 +1943,11 @@ pub(super) fn curl_field(args: &[String], realization: &mut dyn FieldRealization
                 picked.push((b, i, i + d));
             }
         }
-        // A region of the truth with one place open, and with one other place set to a letter.
-        let state = |open_at: usize, set: Option<(usize, usize)>| -> (Vec<usize>, Vec<bool>) {
-            let mut classes = truth.clone();
-            if let Some((t, c)) = set {
-                classes[t] = c;
-            }
-            let open = (0..classes.len()).map(|t| t == open_at).collect();
-            (classes, open)
-        };
-        let read = |states: &[(Vec<usize>, Vec<bool>)], at: &[usize], realization: &mut dyn FieldRealization| -> Result<Vec<holonics::hnn::tower::TowerFace>> {
-            let mut faces = Vec::with_capacity(states.len());
-            for (chunk, sites) in states.chunks(32).zip(at.chunks(32)) {
-                let regions: Vec<Region> = chunk.iter().map(|(c, o)| Region { classes: c, unresolved: o, faces: &[], locked: &[], echo: &[], domain: None, port: None }).collect();
-                for (f, &t) in realization.read_faces(field, &regions).map_err(|e| e.to_string())?.into_iter().zip(sites) {
-                    let face = f[t].as_ref().ok_or("a square's open place with no face")?;
-                    faces.push(letters(face).ok_or("a square's face with no letter")?);
-                }
-            }
-            Ok(faces)
-        };
-        // The base faces (each place open beside the truth), their runner-ups, then each face across the other's runner-up.
-        let base_states: Vec<_> = picked.iter().flat_map(|&(_, i, j)| [state(i, None), state(j, None)]).collect();
-        let base_at: Vec<usize> = picked.iter().flat_map(|&(_, i, j)| [i, j]).collect();
-        let base = read(&base_states, &base_at, realization)?;
-        let mut cross_states = Vec::with_capacity(base_states.len());
-        let mut runners = Vec::with_capacity(picked.len());
-        for (s, &(_, i, j)) in picked.iter().enumerate() {
-            let (Some(bi), Some(bj)) = (runner_up(&base[2 * s], truth[i]), runner_up(&base[2 * s + 1], truth[j])) else {
-                runners.push(None);
-                continue;
-            };
-            runners.push(Some((bi, bj)));
-            cross_states.push(state(i, Some((j, bj))));
-            cross_states.push(state(j, Some((i, bi))));
-        }
-        let cross_at: Vec<usize> = picked.iter().zip(&runners).filter(|(_, r)| r.is_some()).flat_map(|(&(_, i, j), _)| [i, j]).collect();
-        let cross = read(&cross_states, &cross_at, realization)?;
-        read_regions += base_states.len() + cross_states.len();
-        let mut c = 0usize;
-        for (s, (&(b, i, j), r)) in picked.iter().zip(&runners).enumerate() {
-            let Some((bi, bj)) = *r else { continue };
-            let (ai, aj) = (truth[i], truth[j]);
-            let (fi_a, fj_a, fi_b, fj_b) = (&base[2 * s], &base[2 * s + 1], &cross[2 * c], &cross[2 * c + 1]);
-            c += 1;
-            // ln p(a|a) p(b|b) / p(b|a) p(a|b) = c(b|a) + c(a|b) − c(a|a) − c(b|b), each code −log₂ p on 2^(−20).
-            let lambda_i = fi_a.code(bi) + fi_b.code(ai) - fi_a.code(ai) - fi_b.code(bi);
-            let lambda_j = fj_a.code(bj) + fj_b.code(aj) - fj_a.code(aj) - fj_b.code(bj);
-            row(&mut rows, &format!("{k}\t{b}\t{}\t{}\t{lambda_i}\t{lambda_j}\n", i - q.len(), j - q.len()))?;
+        let read = square_reads(field, void, &truth, &picked, realization)?;
+        read_regions += read.regions;
+        for (&(b, i, j), square) in picked.iter().zip(&read.squares) {
+            let Some(sq) = square else { continue };
+            row(&mut rows, &format!("{k}\t{b}\t{}\t{}\t{}\t{}\n", i - q.len(), j - q.len(), sq.lambda_i, sq.lambda_j))?;
             written += 1;
         }
     }
@@ -3242,6 +3345,49 @@ mod tests {
             }
         }
         assert!(drafted > 0 && opened.len() > 1, "{drafted} drafted places, {opened:?} open counts");
+    }
+
+    /// [definition; the unified-theory reading of November 6, 19:04] **The squares agree**: each path problem's square is four
+    /// states of its truth cut `NEAR` places past its end, each open at one place of the square and pulling there; the pulls
+    /// weigh `±l/2` with `l = λ_i − λ_j` read through [`square_reads`], and the four states' codes sum to `l²/2` (each released
+    /// to its nearest), so their covector is the loss `l²/4`'s.
+    #[test]
+    fn the_squares_pull_the_two_readings_together() {
+        let (codec, problems) = toy();
+        let near = holonics::hnn::tower::field::NEAR;
+        let learner = toy_learner(&codec, &problems);
+        let paths: Vec<usize> = (0..problems.len()).collect();
+        let mut met = 0usize;
+        for seed in 0..12u64 {
+            let draws: Vec<u64> = paths.iter().map(|&i| seed * 16 + i as u64).collect();
+            let (states, squares, _) = square_regions(&codec, &problems, &paths, &draws, seed, &learner.field, &mut host()).unwrap();
+            assert_eq!(states.len(), 4 * squares);
+            for four in states.chunks(4) {
+                let pulls: Vec<(usize, usize, i64)> = four.iter().map(|s| s.pull.unwrap()).collect();
+                let half = pulls[0].2;
+                assert_eq!(pulls.iter().map(|p| p.2).collect::<Vec<_>>(), vec![half, half, -half, -half]);
+                assert_eq!((pulls[0].0, pulls[0].1), (pulls[1].1, pulls[1].0), "i's pulls swap its two letters");
+                assert_eq!((pulls[2].0, pulls[2].1), (pulls[3].1, pulls[3].0), "j's pulls swap its two letters");
+                let mut code = 0i64;
+                for s in four {
+                    let open: Vec<usize> = (0..s.unresolved.len()).filter(|&t| s.unresolved[t]).collect();
+                    assert_eq!(open.len(), 1, "one place open");
+                    let (start, _, target, boundary, stop, _) = s.port.as_ref().unwrap();
+                    assert_eq!((*start, target.len(), *boundary, *stop), (open[0], 0, false, Some(open[0] + 1)));
+                    code += learner.field.code(&view_of(s)).unwrap().0;
+                }
+                // Σ (l/2)·(each face's term) = (l/2)(λ_i − λ_j) = l²/2 with l = 2·half (to the halves' and terms' rounding).
+                let l = 2 * half;
+                assert!((code - half * l / (1 << 20)).abs() <= 4 + l.abs() / (1 << 19), "codes {code} against {}", half * l / (1 << 20));
+                met += 1;
+            }
+            for (state, &p) in states.chunks(4).zip(paths.iter().filter(|&&p| problems[p].1.len().min(codec.answer) >= 2)) {
+                let (q, a, _) = &problems[p];
+                let len = a.len().min(codec.answer);
+                assert_eq!(state[0].classes, region_classes(&codec, q, &a[..len], (q.len() + len + near).min(q.len() + codec.answer)), "the truth given its end");
+            }
+        }
+        assert!(met > 0);
     }
 
     /// A section's regions on the toy passage are the draws' (one a member), their lengths the projection's, and the
