@@ -4047,3 +4047,9 @@ Given held's lengths there were 29 openings and 27 of 31 fences closed. From cod
 lap 24, held context fell by 0.118 and unseen by 0.119 over twenty laps, about 9 card-hours. Each halving bought its drop in the
 first lap after it (unseen 1.141 → 1.129 at rate 11, 1.127 → 1.121 at rate 12). The one-end write's length follows its
 question only weakly (correlation +0.08 to +0.19), where the opening follows held at +0.58: the single draw's own spread.
+[agent-inferred, the unified-theory reading of 15:29] **The rate is spent as a lever.** The halvings bought 0.0125 on unseen, then 0.007:
+each about half the last, so all further halvings together hold about 0.007 more, and the next run's gains come from the law. The
+lap price scatters by about 0.15e9 either way at every rate (seg10's mean, 0.641e9, is 0.30× seg9's). The next length law starts
+here: on its own training problems the opening sat +90 to +130 places past the boundary law's minimizer through laps 18–24, and
+moved out at lap 24 under the run's smallest step. The boundary's void entries vanish in expectation only when the expected
+length meets the answer's, so at the opening the boundary is outweighed by the other comparisons that reach the void there.
