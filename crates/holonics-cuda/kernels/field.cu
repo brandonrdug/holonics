@@ -4259,6 +4259,10 @@ extern "C" __global__ void __launch_bounds__(CONTACT_ROWS * 32) field_pace_skin_
     const uint64_t rows1 = (uint64_t)w.T + w.R;
     for (uint64_t g = ((uint64_t)blockIdx.x * blockDim.x + threadIdx.x) >> 5; g < w.T; g += (uint64_t)gridDim.x * (blockDim.x >> 5)) {
         const uint64_t hg = (uint64_t)h * w.T + g;
+        // [E] A row the cut room did not compute met no source: its skins return nothing.
+        if (skipped_row(w, g)) {
+            continue;
+        }
         const uint32_t r = w.site_region[g];
         const uint64_t first = w.region_off[r];
         const uint32_t sites = w.region_off[r + 1] - (uint32_t)first, i = w.site_pos[g];

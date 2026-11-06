@@ -1226,7 +1226,9 @@ impl<'c> CardField<'c> {
                 definite.push(u8::from(is_definite));
                 if is_definite {
                     dlist.push(t as u32);
-                } else {
+                } else if windows[r].as_ref().is_none_or(|w| w[t]) {
+                    // [E] A definite source is heard by every open receiver its region computes (the host's `Field::tick`
+                    // skips the rest), so the receivers its return walks are those alone.
                     olist.push(t as u32);
                 }
                 match region.echo.get(t).and_then(Option::as_ref) {

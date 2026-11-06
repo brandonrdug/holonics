@@ -3958,3 +3958,22 @@ at the silent places up to the stretch's first, or at every silent place under t
 the card's blank clock and its return read the same sites (`blank_read`) as the open ones. In the opening that is about one
 face of 2,300 a tick. The field test `a_blank_place_runs_at_its_expected_duration` reads no face past the stretch's first
 place. The cut joins a run after its card parity, at a segment boundary.
+
+[measurement; November 6, long109 seg1 against long106 seg1, and check110] **The writer state at the boundary moved the
+writer's order and not its writes**. Laps 5–6 from code91's lap-4 state, with the writer state, against the same laps without
+it: keyed order code 3.944 against 4.425; held context 1.308 against 1.312; space given held's lengths 19.5% against 16.8%.
+But fences closed fell to 6 against 7, openings to 13 against 19, the length code paired to +1.57 against +1.35, and the
+conditioned band past 1,200 rose to 84.3 against 80.0 (lap 4's own: 25 fences closed, 25 openings, +0.21, 17.9). check110 read
+lap 4 bit-identically on code91's binary and on the run's, so the fall from lap 4 to lap 6 is the state's in both arms. The
+writer state was compared at its boundary, which with the end's voids given compares no letter.
+
+[definition; agent-inferred, November 6, the unified-theory reading of 09:50] **The writer state is compared on its letters**:
+`writer_region` has no port, so every open place is compared on its own class at weight one (K of K) and the end's voids are
+given and not compared. These are the masks' comparisons under the writer's own mask. In a cut room, the receivers a definite
+source's return walks are the computed ones alone (the stage's open-receiver list), and an uncomputed row's skins return
+nothing. Both are exact, since such a row met no source and its covector is zero by the cone.
+
+[measurement; agent-inferred, November 6, the unified-theory reading of 08:54] **The lap's line search** (`FieldReceipt::external`):
+T/A, the transfer against the predicted gain, read +0.086 to +0.100 on every lap of code91 and long106, with about two thirds
+of the held steps raising the code on the section they were not fit on. The FIELD_STEP_PRICE lines since the reread was
+removed read priced=0 at rate 8, so the rate never moved.

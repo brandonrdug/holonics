@@ -366,10 +366,15 @@ pub(super) fn path_opening() -> bool {
 /// `lengths`: the near tail of the read's region). This is that state on the truth: the answer's places ordered by octaves of
 /// their distance from the question, keyed within an octave and fresh each draw, as the writer releases them; `k` drawn so
 /// every octave of reads is met alike (`k = 0`, the state just past the end's draw, the first; then `[2^(o−1), 2^o)` within
-/// the answer, at least one place left open); every open place an answer port compared at its boundary at weight one.
+/// the answer, at least one place left open); every open place compared on its own class at weight one (no port: the
+/// region's `K` open places of `K`, [`holonics::hnn::tower::field::Region::weight`]), the end's voids given and not compared.
 /// Why (the unified-theory reading of 06:50): with the opening as the only path state (code91) the writer's states past its
 /// first read left training, and the writer's own order code rose from 3.316 to 4.06 bits a place while the other orders'
-/// fell; the opening keeps the length and these keep the states the writer writes in. An answer with no place is no state.
+/// fell; the opening keeps the length and these keep the states the writer writes in. [the unified-theory reading of 09:50]
+/// Not at the boundary: once the end's voids are given, a boundary codes a letter place only as `−log₂(1 − p̂_∅)`, its letters
+/// renormalized off the void, so it compared no letter (long109's seg1 moved the writer's order code and the space, not its
+/// fences or openings); compared on their classes, these are the masks' comparison under the writer's own mask. An answer
+/// with no place is no state.
 ///
 /// [`holonics::hnn::tower::field::Field::sample_runs`]: the writer whose states these are.
 pub(super) fn writer_region(codec: &FieldCodec, q: &[usize], a: &[usize], seed: u64, draw: u64) -> Option<TrainRegion> {
@@ -398,7 +403,7 @@ pub(super) fn writer_region(codec: &FieldCodec, q: &[usize], a: &[usize], seed: 
     for &t in &order[..k] {
         unresolved[t] = false;
     }
-    Some(TrainRegion { port: Some((q.len(), codec.void(), a[..len].to_vec(), true, None, None)), ..TrainRegion::plain(classes, unresolved) })
+    Some(TrainRegion::plain(classes, unresolved))
 }
 
 /// [definition; agent-inferred, November 6, the unified-theory reading of 06:50, E] **The opening's room is cut to its windows**
@@ -1995,6 +2000,46 @@ pub(super) fn ring_field(args: &[String]) -> Result<()> {
 /// come from this opening). Writes `OPENING.tsv` (problem, held length, place, void mass, lead, lead mass; private, of the held
 /// answers) and `LENGTHS.tsv` (the training answers' lengths in places, as training draws them, under the extent). A
 /// reading only.
+/// [measurement; agent-inferred, November 6, the unified-theory reading of 09:56] **`stretch-field STATE STATE_SHA CODEC CODEC_SHA
+/// UNITS UNITS_SHA HELD HELD_SHA COUNT OUT`**: each held question's opening (the question and the room, every answer place open,
+/// as `opening-field` reads it), and at the silent stretch's first place, the place whose rate every place past it runs at, each
+/// paced head's rate `κ₁` on `2^(−24)` at each tick whose clock the blanks set ([`Field::blank_clocks`], through the
+/// realization), written to `OUT/STRETCH.tsv` (`problem head tick kappa`). A forward reading only.
+pub(super) fn stretch_field(args: &[String], realization: &mut dyn FieldRealization) -> Result<()> {
+    if args.len() != 11 {
+        return Err("stretch-field STATE STATE_SHA CODEC CODEC_SHA UNITS UNITS_SHA HELD HELD_SHA COUNT OUT".into());
+    }
+    let started = std::time::Instant::now();
+    let learner = FieldLearner::from_text(std::str::from_utf8(&pinned_read(&args[1], &args[2], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
+    let field = &learner.field;
+    let units = units_of(&args[5], &args[6])?;
+    let codec = FieldCodec::from_text(std::str::from_utf8(&pinned_read(&args[3], &args[4], CODEC_BUDGET)?)?, units)?;
+    let held = problems_of(&pinned_read(&args[7], &args[8], READ_BUDGET as usize)?);
+    let n = count(&args[9])?.min(held.len());
+    let out = Path::new(&args[10]);
+    std::fs::create_dir(out)?;
+    let void = codec.void();
+    let mut rows = rows_file(&out.join("STRETCH.tsv"), "problem\thead\ttick\tkappa\n")?;
+    let mut read = 0usize;
+    for (k, (question, _)) in held.iter().take(n).enumerate() {
+        let (q, open) = opening(&codec, field, question, b"")?;
+        let mut classes = q.clone();
+        classes.extend(std::iter::repeat_n(void, open));
+        let unresolved: Vec<bool> = (0..classes.len()).map(|t| t >= q.len()).collect();
+        let region = Region { classes: &classes, unresolved: &unresolved, faces: &[], locked: &[], echo: &[], domain: None, port: None };
+        let clocks = realization.read_blank_clocks(field, &region, &[q.len()]).map_err(|e| e.to_string())?;
+        for (tick, slot) in clocks[0].ticks.iter().enumerate() {
+            let Some((kappa, _)) = slot else { continue };
+            for (head, kv) in kappa.iter().enumerate() {
+                row(&mut rows, &format!("{k}\t{head}\t{tick}\t{kv}\n"))?;
+            }
+        }
+        read += 1;
+    }
+    println!("FIELD_STRETCH problems={read} ms={}", started.elapsed().as_millis());
+    Ok(())
+}
+
 pub(super) fn opening_field(args: &[String], realization: &mut dyn FieldRealization) -> Result<()> {
     if args.len() != 13 {
         return Err("opening-field STATE STATE_SHA CODEC CODEC_SHA UNITS UNITS_SHA HELD HELD_SHA TRAIN TRAIN_SHA COUNT OUT".into());
@@ -2840,7 +2885,7 @@ mod tests {
     /// [definition; the unified-theory reading of November 6, 06:50] **The writer's own state given its end**: the question and
     /// the answer's truth, the end's `NEAR` voids resolved and the region cut there, open places only within the answer and at
     /// least one, the resolved ones the first `k` of the writer's order (octaves of distance, never a place of a later octave
-    /// before an earlier octave is whole), every octave of `k` met, compared at its boundary from the question on with weight one.
+    /// before an earlier octave is whole), every octave of `k` met, each open place compared on its own class with weight one.
     #[test]
     fn a_writer_state_is_its_order_given_its_end() {
         let (codec, problems) = toy();
@@ -2860,9 +2905,9 @@ mod tests {
                     assert!((q.len()..end).filter(|&t| octave(t + 1 - q.len()) < far).all(|t| !state.unresolved[t]), "the earlier octaves resolved whole");
                 }
                 met.insert(if k == 0 { 0 } else { octave(k) + 1 });
-                let Some((start, void, target, true, None, None)) = state.port.clone() else { panic!("compared at its boundary, every place heard") };
-                assert_eq!((start, void, target), (q.len(), codec.void(), a.clone()));
-                assert_eq!(view_of(&state).weight(), (1, 1), "weight one");
+                assert!(state.port.is_none() && state.domain.is_none() && !state.window, "every open place compared on its own class");
+                let open = state.unresolved.iter().filter(|&&u| u).count() as u64;
+                assert_eq!(view_of(&state).weight(), (open, open), "weight one");
             }
             let most = a.len() - 1;
             let octaves = usize::BITS - most.leading_zeros() + 1;
