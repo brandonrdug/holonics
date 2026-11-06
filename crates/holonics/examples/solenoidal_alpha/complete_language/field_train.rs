@@ -1625,8 +1625,13 @@ pub(super) fn reach_field(args: &[String], realization: &mut dyn FieldRealizatio
 /// (the void where the answer ends), `k` from 0 to the end; in the writer's keyed octave order (its key the state's hash, as
 /// `length-field` draws) each place is read beside every place the order resolved before it, a void closing the places past
 /// it. Each region is cut `NEAR` places past its last resolved or read place (the silent room past it is heard only through the
-/// near field). Writes `ORDER.tsv` (problem, places, place-order code, keyed-order code on `2^(−20)` bits; private, of the held
-/// answers). A reading only.
+/// near field). [the unified-theory reading of 01:40] And the masks' own order: the answer and its near tail (the region cut at
+/// `q + L + NEAR`, `L` the answer's places) coded in a keyed uniform order of its places, each read beside what that order
+/// resolved before it, plus the length's code from the opening's faces: the opening's void mass at `t` read as `P(L ≤ t)`, so
+/// `P(L = len)` is its difference at `len` and `len − 1` (an answer where that difference is not positive is counted, its
+/// length code left out: the faces are no one joint's there). For one joint every order codes the same, so the orders'
+/// differences also read how far the faces are from one joint. Writes `ORDER.tsv` (problem, places, place-order code,
+/// keyed-order code, masks'-order code, its length code or `-`; on `2^(−20)` bits; private, of the held answers). A reading only.
 pub(super) fn order_field(args: &[String], realization: &mut dyn FieldRealization) -> Result<()> {
     if args.len() != 11 {
         return Err("order-field STATE STATE_SHA CODEC CODEC_SHA UNITS UNITS_SHA HELD HELD_SHA COUNT OUT".into());
@@ -1650,8 +1655,9 @@ pub(super) fn order_field(args: &[String], realization: &mut dyn FieldRealizatio
     };
     let void = codec.void();
     let near = holonics::hnn::tower::field::NEAR;
-    let mut rows = rows_file(&out.join("ORDER.tsv"), "problem\tplaces\tplace_code\tkeyed_code\n")?;
+    let mut rows = rows_file(&out.join("ORDER.tsv"), "problem\tplaces\tplace_code\tkeyed_code\tmasks_code\tlength_code\n")?;
     let (mut place_total, mut keyed_total, mut places_total) = (0i64, 0i64, 0usize);
+    let (mut masks_total, mut length_total, mut lengths_unread) = (0i64, 0i64, 0usize);
     for (k, (question, answer)) in held.iter().take(n).enumerate() {
         let (q, room) = opening(&codec, field, question, b"")?;
         let a = codec.encode(answer)?;
@@ -1687,19 +1693,61 @@ pub(super) fn order_field(args: &[String], realization: &mut dyn FieldRealizatio
                 }
             }
         }
-        let mut codes = (0i64, 0i64);
+        let keyed_states = states.len();
+        // The masks' order: the answer and its near tail in a keyed uniform order.
+        let span = (a.len() + near).min(room);
+        let mut masks: Vec<usize> = (q.len()..q.len() + span).collect();
+        masks.sort_by_key(|&t| (mix_key(((k as u64) << 32) ^ t as u64 ^ (3 << 61)), t));
+        let mut known = vec![false; q.len() + span];
+        for &t in &masks {
+            let classes: Vec<usize> = (0..q.len() + span).map(|s| if s < q.len() { q[s] } else if known[s] { truth(s) } else { void }).collect();
+            let open: Vec<bool> = (0..q.len() + span).map(|s| s >= q.len() && !known[s]).collect();
+            states.push((classes, open, t, truth(t)));
+            known[t] = true;
+        }
+        let mut codes = (0i64, 0i64, 0i64);
         for (c, chunk) in states.chunks(256).enumerate() {
             let regions: Vec<Region> = chunk.iter().map(|(classes, open, _, _)| Region { classes, unresolved: open, faces: &[], locked: &[], echo: &[], domain: None, port: None }).collect();
             let faces = realization.read_faces(field, &regions).map_err(|e| e.to_string())?;
             for (i, ((_, _, at, class), f)) in chunk.iter().zip(&faces).enumerate() {
                 let code = f[*at].as_ref().ok_or("a read place with no face")?.code(*class);
-                if c * 256 + i < place_states { codes.0 += code } else { codes.1 += code }
+                match c * 256 + i {
+                    s if s < place_states => codes.0 += code,
+                    s if s < keyed_states => codes.1 += code,
+                    _ => codes.2 += code,
+                }
             }
         }
-        row(&mut rows, &format!("{k}\t{}\t{}\t{}\n", end + 1, codes.0, codes.1))?;
+        // The length's code from the opening's faces: `P(L = len) = P(L ≤ len) − P(L ≤ len − 1)` on their void masses.
+        let opening_classes: Vec<usize> = q.iter().copied().chain(std::iter::repeat_n(void, room)).collect();
+        let opening_open: Vec<bool> = (0..opening_classes.len()).map(|t| t >= q.len()).collect();
+        let opening = realization.read_faces(field, &[Region { classes: &opening_classes, unresolved: &opening_open, faces: &[], locked: &[], echo: &[], domain: None, port: None }]).map_err(|e| e.to_string())?.remove(0);
+        let void_at = |t: usize| -> std::result::Result<(u128, u128), String> { let f = opening[t].as_ref().ok_or("an opening place with no face")?; Ok((f.masses[void], f.total)) };
+        let (vn, tn) = void_at(q.len() + end)?;
+        let length = if end == 0 {
+            Some(holonics::hnn::tower::face_code(vn, tn))
+        } else {
+            let (vp, tp) = void_at(q.len() + end - 1)?;
+            // `vn/tn − vp/tp` on the faces' own `2^(−62)` grain (a class's mass is at most `2^62`).
+            let unit = 1u128 << 62;
+            ((vn << 62) / tn).checked_sub((vp << 62) / tp).filter(|&p| p > 0).map(|p| holonics::hnn::tower::face_code(p, unit))
+        };
+        match length {
+            Some(l) => length_total += l,
+            None => lengths_unread += 1,
+        }
+        masks_total += codes.2;
+        row(&mut rows, &format!("{k}\t{}\t{}\t{}\t{}\t{}\n", end + 1, codes.0, codes.1, codes.2, length.map_or("-".to_string(), |l| l.to_string())))?;
         (place_total, keyed_total, places_total) = (place_total + codes.0, keyed_total + codes.1, places_total + end + 1);
     }
-    println!("FIELD_ORDER problems={n} places={places_total} place_bits_a_place={} keyed_bits_a_place={} ms={}", bits(place_total, places_total), bits(keyed_total, places_total), started.elapsed().as_millis());
+    println!(
+        "FIELD_ORDER problems={n} places={places_total} place_bits_a_place={} keyed_bits_a_place={} masks_bits_a_place={} masks_length_bits_a_place={} lengths_unread={lengths_unread} ms={}",
+        bits(place_total, places_total),
+        bits(keyed_total, places_total),
+        bits(masks_total, places_total),
+        bits(length_total, places_total),
+        started.elapsed().as_millis()
+    );
     Ok(())
 }
 

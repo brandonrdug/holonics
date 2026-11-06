@@ -236,3 +236,29 @@ held over 9 opened (fails) and far strings 0.24 (passes); written over held 0.34
 sweeps' 4), 24 of 30 fences closed. Nine of the 32 open ```` ````ython ````: places 2 and 3 drawn from one read, the run law
 releasing a place whose face splits between the backtick and `p` beside its unwritten neighbour, so in place order a run loses
 exactly the adjacent joint it should keep. The order is read again one place a read (place94b) before it is judged.
+
+[measurement; agent-inferred] **Place order one place a read** (place94b; `place94b.txt`). On code86's state with no run and no
+refine pass, against the reading fixed blind at 00:57: 15 exact ```` ```python ```` openings and two a byte off (fails), written
+over held 0.218 with the correlation +0.192 (fails), 7 parsing (fails by one), `y` past the opening 4.0% (the lean stays) and
+the entropy 4.82 bits (mended past 4.75). The other openings are ```` ``` ```` alone (7) and ```` ````ython ```` (7), so the
+backtick drawn at place 3 is the faces', not the run law's: in place order every draw has a silent right side, a state the
+training met only at octave ends, and the faces past such a front are the subject.
+
+[measurement; agent-inferred] **b2's far share keeps the content for a lap and loses it after** (code88; `code88.txt`). Four
+laps from code84's lap-0 state on b1's whole room with only the front octave and one keyed place an octave compared, 605 ms a
+section. Against the reading fixed at 23:26: (1) held context 2.456, 2.129, 2.050 and 1.643 against code85's 2.404, 2.124,
+1.914 and 1.579, within 0.05 at lap 1 and not at laps 2 and 3, so the far share was most of b1's dilution early and not after;
+(2) the opening's void mass 0.186 and 0.219 at held after laps 1 and 3, 0.275 and 0.315 at +128, above code86's flat 0.09 and
+rising past held, passes; (3) under both writer laws the correlation with held −0.317 at lap 4 (a 95% band of ±0.35 about zero
+on 32: no length heard from the question), written over held 1.533, the opening's expected length +573 past held, fails. Its
+content is the line's best on fences (19 exact openings, 30 of 32 fences closed).
+
+[measurement; agent-inferred] **Place order is the closer joint before any prefix training** (order95; `order95.txt`). Each
+order's writer's code of the first 32 held answers (8,792 places): code86 (the near tail, nine laps) 3.100 bits a place in place
+order against 3.316 in the writer's keyed octave order; b1 (six laps) 3.498 against 4.516; code88 (two laps) 3.363 against
+4.905, about 18 card-seconds a state. The fixed refutation for code89 (place order at or above keyed) no longer tells anything;
+its read is place order below code88's 3.363 at the same start and laps, and bolder, below code86's 3.100. The one-sided chain's
+3.1 against held context's 1.364 (every fourth byte open) is partly the truth's own: the forward rate is at least the
+every-fourth read less the dependence of sites four apart. `order-field` now also codes the masks' own order (a keyed uniform
+order over the answer and its near tail, with the length's code from the opening's void masses read as `P(L ≤ t)`; an answer
+whose difference there is not positive is counted, its length unwritable by that joint).

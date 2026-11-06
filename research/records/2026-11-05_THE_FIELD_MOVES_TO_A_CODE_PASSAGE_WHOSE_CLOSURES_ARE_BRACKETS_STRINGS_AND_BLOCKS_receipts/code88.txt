@@ -1,0 +1,144 @@
+# code88 binary edc0c8db6b4dc2f893e33d81ec7fcf810fd8885a52fd746cbc14d8a82eb2344f parity lock taken 00:18:37
+FIELD_PARITY section=1 withheld=false regions=26 length=2304 sites=21474 faces_unequal=0 covector_unequal=0 learner_equal=true near_equal=true clocks_equal=true rows_equal=true shares_equal=true currents_equal=true host_ms=42748 card_ms=482
+FIELD_PARITY section=2 withheld=true regions=32 length=555 sites=0 faces_unequal=0 covector_unequal=0 learner_equal=true near_equal=true clocks_equal=true rows_equal=true shares_equal=true currents_equal=true host_ms=2154 card_ms=21
+FIELD_PARITY_DONE sections=2 reads_unequal=0 faces_unequal=0 covector_unequal=0 learners_unequal=0 releases=1 releases_unequal=0 card_release_ms=73 host_ms=44903 card_ms=503 elapsed_ms=334189
+MEASURE lap=parity rc=0 wall_s=335.5 peak_rss_kib=4792500
+# seg1 from e87c522094abb7686e6536620a563fe424b152d5c217ea91ccfac5339e6ff250 started 00:24:39
+FIELD_LAP lap=0 read=2 before=3.028 after=- deposited=1535/1535 halvings=0 next_halved=0 next_refused=0 ms=918110
+FIELD_LAP lap=1 read=3 before=2.853 after=- deposited=1535/1535 halvings=0 next_halved=0 next_refused=0 ms=946109
+FIELD_LAPS_HELD lap=2 reason=time left=675639 bound=1134290 ms=1892941
+MEASURE lap=seg1 rc=0 wall_s=1893.7 peak_rss_kib=820828
+-1:6.322300:3.065177:3.068981 0:5.104631:2.455629:2.458720 1:5.103494:2.128486:2.134303 
+sections mean ms 605 over 3070
+== HELD128
+FIELD_OPENING problems=128 places=263936 training_answers=24685 ms=2746
+MEASURE lap=seg1_HELD128 rc=0 wall_s=3.0 peak_rss_kib=213836
+distance	problems	void_mass	length_law
+-128	104	0.132	0.405
+-32	124	0.170	0.476
++0	128	0.186	0.512
++32	128	0.210	0.562
++128	128	0.275	0.695
++512	128	0.499	0.924
+places 900 to 1199	38400	0.594	0.971
+B past the end: mean 787 places, median 778, range 139 to 1389; the length law 132
+void mass before the end: mean 41 places
+the opening's expected length less held: mean +747.1 places, median +772.9
+== TRAIN
+FIELD_OPENING problems=128 places=263936 training_answers=24685 ms=2492
+MEASURE lap=seg1_TRAIN rc=0 wall_s=2.7 peak_rss_kib=222588
+distance	problems	void_mass	length_law
+-128	109	0.048	0.200
+-32	128	0.088	0.362
++0	128	0.108	0.429
++32	128	0.127	0.494
++128	128	0.185	0.654
++512	128	0.433	0.911
+places 900 to 1199	38400	0.578	0.971
+B past the end: mean 911 places, median 929, range 375 to 1390; the length law 152
+void mass before the end: mean 13 places
+the opening's expected length less held: mean +899.5 places, median +918.6
+== drift FIELD_LENGTH problems=128 sweeps=2062 refine=0 stopped=64 run_bits=0 reads=65 certified_bits=0.000 passed=0 ms=69834 MEASURE lap=seg1_drift rc=0 wall_s=70.3 peak_rss_kib=721968 
+state	problems	L(0) less held	L(64) less held	drift	se
+state	128	+747.1	+170.7	-576.4	31.1
+== write
+FIELD_LENGTH problems=32 sweeps=2062 refine=3 stopped=- run_bits=1 reads=3815 certified_bits=4001.326 passed=1317 ms=136101
+MEASURE lap=seg1_write rc=0 wall_s=136.5 peak_rss_kib=373404
+ENDINGS answers 32: 18 end at or under held over 4926 places (one in 274), 14 past it over 4569 (one in 326), 0 reach the room
+HAZARD past/under 0.84; written/held 1.084; correlation -0.019
+bytes written/held 1.084, correlation -0.019, 14 longer, 18 shorter
+written: 32 answers: a fence opened 32, closed 22; parses as Python 2; code lines mean 7.8; identifiers 917, in the question 0.05, in the held answer 0.05
+held:    32 answers: a fence opened 29, closed 29; parses as Python 26; code lines mean 10.9; identifiers 1117, in the question 0.26, in the held answer 1.00
+family	span	written opened	written closed share	held opened	held closed share	ratio
+bracket	near	78	0.231	178	0.393	0.59
+bracket	far	78	0.244	178	0.607	0.40
+string	near	30	0.067	60	0.400	0.17
+string	far	30	0.133	60	0.583	0.23
+block	near	28	0.000	75	0.000	nan
+block	far	28	0.536	75	0.947	0.57
+RULE: the lowest closure against held is string near at 0.17 (under 0.5)
+WORDS written=1307 in_training_vocabulary=485 share=0.371
+== the sweeps' write (runs, no refine pass)
+FIELD_LENGTH problems=32 sweeps=2062 refine=0 stopped=- run_bits=1 reads=994 certified_bits=294.946 passed=0 ms=66961
+MEASURE lap=seg1_sweeps rc=0 wall_s=67.4 peak_rss_kib=374888
+ENDINGS answers 32: 18 end at or under held over 4915 places (one in 273), 14 past it over 4567 (one in 326), 0 reach the room
+HAZARD past/under 0.84; written/held 1.082; correlation -0.020
+written: 32 answers, 10 open with ```python; a 'y' outside it in 26, its first at places 0 to 5 in 13 (median first 13), 'y' past it 0.017; commonest byte's share at places 10 to 255 (246 places) 0.190; top byte ' ' 0.132, 'y' 0.015, entropy 4.97 bits over 9482 bytes
+held   : 32 answers, 28 open with ```python; a 'y' outside it in 15, its first at places 0 to 5 in 0 (median first 38), 'y' past it 0.016; commonest byte's share at places 10 to 255 (246 places) 0.197; top byte ' ' 0.174, 'y' 0.009, entropy 4.96 bits over 8760 bytes
+bytes written/held 1.082, correlation -0.020, 14 longer, 18 shorter
+written: 32 answers: a fence opened 32, closed 27; parses as Python 0; code lines mean 8.6; identifiers 699, in the question 0.03, in the held answer 0.03
+held:    32 answers: a fence opened 29, closed 29; parses as Python 26; code lines mean 10.9; identifiers 1117, in the question 0.26, in the held answer 1.00
+UNWROTE short writes 18 of 32: a void unwrote letters in 0 (0 reads, 0 letters); in all writes 0
+== the refined write
+written: 32 answers, 18 open with ```python; a 'y' outside it in 29, its first at places 0 to 5 in 10 (median first 22), 'y' past it 0.014; commonest byte's share at places 10 to 255 (246 places) 0.185; top byte ' ' 0.144, 'y' 0.013, entropy 4.90 bits over 9495 bytes
+SEGMENT seg1 done 01:01:13
+# seg2 from 364fea5343fb0c8e83e342fbf0c6b9c66f831720f7d3831c7e086bb9bbdf6e48 started 01:01:13
+FIELD_LAP lap=0 read=4 before=2.763 after=- deposited=1535/1535 halvings=0 next_halved=0 next_refused=0 ms=893461
+FIELD_LAP lap=1 read=5 before=2.658 after=- deposited=1535/1535 halvings=0 next_halved=0 next_refused=0 ms=967688
+FIELD_LAPS_HELD lap=2 reason=time left=680706 bound=1134290 ms=1887874
+MEASURE lap=seg2 rc=0 wall_s=1888.5 peak_rss_kib=968848
+-1:5.103494:2.128486:2.134303 0:5.195484:2.049725:2.059145 1:5.285754:1.642697:1.785196 
+sections mean ms 604 over 3070
+== HELD128
+FIELD_OPENING problems=128 places=263936 training_answers=24685 ms=2400
+MEASURE lap=seg2_HELD128 rc=0 wall_s=2.7 peak_rss_kib=231036
+distance	problems	void_mass	length_law
+-128	104	0.166	0.405
+-32	124	0.204	0.476
++0	128	0.219	0.512
++32	128	0.243	0.562
++128	128	0.315	0.695
++512	128	0.605	0.924
+places 900 to 1199	38400	0.703	0.971
+B past the end: mean 626 places, median 622, range 77 to 1457; the length law 132
+void mass before the end: mean 54 places
+the opening's expected length less held: mean +573.0 places, median +584.5
+== TRAIN
+FIELD_OPENING problems=128 places=263936 training_answers=24685 ms=2209
+MEASURE lap=seg2_TRAIN rc=0 wall_s=2.5 peak_rss_kib=241496
+distance	problems	void_mass	length_law
+-128	109	0.058	0.200
+-32	128	0.098	0.362
++0	128	0.116	0.429
++32	128	0.138	0.494
++128	128	0.216	0.654
++512	128	0.576	0.911
+places 900 to 1199	38400	0.720	0.971
+B past the end: mean 687 places, median 696, range 223 to 1273; the length law 152
+void mass before the end: mean 16 places
+the opening's expected length less held: mean +671.5 places, median +681.7
+== drift FIELD_LENGTH problems=128 sweeps=2062 refine=0 stopped=64 run_bits=0 reads=65 certified_bits=0.000 passed=0 ms=56311 MEASURE lap=seg2_drift rc=0 wall_s=56.7 peak_rss_kib=723212 
+state	problems	L(0) less held	L(64) less held	drift	se
+state	128	+573.0	+245.3	-327.7	35.8
+== write
+FIELD_LENGTH problems=32 sweeps=2062 refine=3 stopped=- run_bits=1 reads=4933 certified_bits=6566.322 passed=2256 ms=220343
+MEASURE lap=seg2_write rc=0 wall_s=220.8 peak_rss_kib=375148
+ENDINGS answers 32: 15 end at or under held over 5612 places (one in 374), 17 past it over 7820 (one in 460), 0 reach the room
+HAZARD past/under 0.81; written/held 1.533; correlation -0.317
+bytes written/held 1.533, correlation -0.317, 17 longer, 15 shorter
+written: 32 answers: a fence opened 32, closed 30; parses as Python 0; code lines mean 9.7; identifiers 768, in the question 0.05, in the held answer 0.04
+held:    32 answers: a fence opened 29, closed 29; parses as Python 26; code lines mean 10.9; identifiers 1117, in the question 0.26, in the held answer 1.00
+family	span	written opened	written closed share	held opened	held closed share	ratio
+bracket	near	124	0.274	178	0.393	0.70
+bracket	far	124	0.218	178	0.607	0.36
+string	near	48	0.104	60	0.400	0.26
+string	far	48	0.125	60	0.583	0.21
+block	near	36	0.028	75	0.000	nan
+block	far	36	0.472	75	0.947	0.50
+RULE: the lowest closure against held is string far at 0.21 (under 0.5)
+WORDS written=1924 in_training_vocabulary=681 share=0.354
+== the sweeps' write (runs, no refine pass)
+FIELD_LENGTH problems=32 sweeps=2062 refine=0 stopped=- run_bits=1 reads=1335 certified_bits=424.718 passed=0 ms=105692
+MEASURE lap=seg2_sweeps rc=0 wall_s=106.1 peak_rss_kib=376692
+ENDINGS answers 32: 15 end at or under held over 5605 places (one in 374), 17 past it over 7814 (one in 460), 0 reach the room
+HAZARD past/under 0.81; written/held 1.532; correlation -0.318
+written: 32 answers, 10 open with ```python; a 'y' outside it in 32, its first at places 0 to 5 in 21 (median first 4), 'y' past it 0.016; commonest byte's share at places 10 to 255 (246 places) 0.152; top byte ' ' 0.108, 'y' 0.016, entropy 5.12 bits over 13419 bytes
+held   : 32 answers, 28 open with ```python; a 'y' outside it in 15, its first at places 0 to 5 in 0 (median first 38), 'y' past it 0.016; commonest byte's share at places 10 to 255 (246 places) 0.197; top byte ' ' 0.174, 'y' 0.009, entropy 4.96 bits over 8760 bytes
+bytes written/held 1.532, correlation -0.318, 17 longer, 15 shorter
+written: 32 answers: a fence opened 31, closed 25; parses as Python 1; code lines mean 14.7; identifiers 1100, in the question 0.03, in the held answer 0.04
+held:    32 answers: a fence opened 29, closed 29; parses as Python 26; code lines mean 10.9; identifiers 1117, in the question 0.26, in the held answer 1.00
+UNWROTE short writes 15 of 32: a void unwrote letters in 0 (0 reads, 0 letters); in all writes 0
+== the refined write
+written: 32 answers, 19 open with ```python; a 'y' outside it in 28, its first at places 0 to 5 in 13 (median first 21), 'y' past it 0.013; commonest byte's share at places 10 to 255 (246 places) 0.156; top byte ' ' 0.116, 'y' 0.013, entropy 5.13 bits over 13432 bytes
+SEGMENT seg2 done 01:40:05
+MAIN exit 01:40:05
