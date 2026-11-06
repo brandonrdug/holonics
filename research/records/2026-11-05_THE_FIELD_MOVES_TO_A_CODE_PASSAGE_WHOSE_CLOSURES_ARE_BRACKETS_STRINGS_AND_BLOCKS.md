@@ -305,3 +305,14 @@ writer given its own lengths (closing92's sweeps on the same keys), runs, no ref
 entropy 4.86 bits, the space at 18.8%, 27 of 30 fences closed, far brackets, strings and blocks 0.34, 0.47 and 0.66 of held,
 every mark fixed before it passing; beside its own unconstrained write (22 openings, 22 fences), resolving the given voids from
 the first read costs nothing. The length is the writer's own subject.
+
+[measurement; agent-inferred] **The one-rate clock is not the far share's lag** (code90; `code90.txt`, `code90_launch.sh`).
+code88's law with the per-blank rate restored past the last arrival, four laps from code84's lap-0 state, its sampled parity
+equal, 620 to 645 ms a section: held context 2.431, 2.131, 2.066 and 1.657 against code88's 2.456, 2.129, 2.050 and 1.643, within
+0.05 at every lap, and 0.152 and 0.078 above code85's at laps 2 and 3. The opening's void at held 0.100 after lap 1 (code88's
+0.186) and 0.281 after lap 3 (code88's 0.219). By the reading fixed at 02:38 the one-rate clock is not the lag, and it stays.
+
+[measurement; agent-inferred] **The opening's length code** (order101 and order97; `order101.txt`, `order97.txt`). The masks'
+length code a read answer (the opening's void masses read as `P(L ≤ t)`), on the first 32 held: b1's six-lap state 9.15 bits
+(30 read), below the marginal 9.6 and the blind 10.5; code88 10.82 (28 read); code86 11.45 (15 read); code89 16.44 (19 read):
+the whole room's opening, trained at every distance, holds the most of the length.
