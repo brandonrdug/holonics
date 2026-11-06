@@ -366,15 +366,18 @@ pub(super) fn path_opening() -> bool {
 /// `lengths`: the near tail of the read's region). This is that state on the truth: the answer's places ordered by octaves of
 /// their distance from the question, keyed within an octave and fresh each draw, as the writer releases them; `k` drawn so
 /// every octave of reads is met alike (`k = 0`, the state just past the end's draw, the first; then `[2^(o−1), 2^o)` within
-/// the answer, at least one place left open); every open place compared on its own class at weight one (no port: the
-/// region's `K` open places of `K`, [`holonics::hnn::tower::field::Region::weight`]), the end's voids given and not compared.
+/// the answer, at least one place left open); every open place compared on its own class within the letters, off the void, at
+/// weight one (a port on its letters, [`holonics::hnn::tower::field::Port::letters`]), the end's voids given and not compared.
 /// Why (the unified-theory reading of 06:50): with the opening as the only path state (code91) the writer's states past its
 /// first read left training, and the writer's own order code rose from 3.316 to 4.06 bits a place while the other orders'
 /// fell; the opening keeps the length and these keep the states the writer writes in. [the unified-theory reading of 09:50]
 /// Not at the boundary: once the end's voids are given, a boundary codes a letter place only as `−log₂(1 − p̂_∅)`, its letters
 /// renormalized off the void, so it compared no letter (long109's seg1 moved the writer's order code and the space, not its
-/// fences or openings); compared on their classes, these are the masks' comparison under the writer's own mask. An answer
-/// with no place is no state.
+/// fences or openings); compared on their classes, these are the masks' comparison under the writer's own mask. [the
+/// unified-theory reading of 11:49] Off the void: compared on its whole class an open place codes `−log₂ p(a | not ∅) −
+/// log₂(1 − p_∅)`, and the second term pushed the void down at every interior place of an end-given state, hardest just before
+/// the given voids (the expected length less held went +50 → +111 from lap 10 to 12), while the writer given its end never
+/// draws a void there; on its letters the comparison is the release's own draw. An answer with no place is no state.
 ///
 /// [`holonics::hnn::tower::field::Field::sample_runs`]: the writer whose states these are.
 pub(super) fn writer_region(codec: &FieldCodec, q: &[usize], a: &[usize], seed: u64, draw: u64) -> Option<TrainRegion> {
@@ -403,7 +406,8 @@ pub(super) fn writer_region(codec: &FieldCodec, q: &[usize], a: &[usize], seed: 
     for &t in &order[..k] {
         unresolved[t] = false;
     }
-    Some(TrainRegion::plain(classes, unresolved))
+    // [the unified-theory reading of 11:49] Each open place on its letters off the void, the release's own draw given the end.
+    Some(TrainRegion { port: Some((q.len(), codec.void(), a[..len].to_vec(), false, None, None)), letters: true, ..TrainRegion::plain(classes, unresolved) })
 }
 
 /// [definition; agent-inferred, November 6, the unified-theory reading of 06:50, E] **The opening's room is cut to its windows**
@@ -509,18 +513,20 @@ pub(super) struct TrainRegion {
     pub port: Option<(usize, usize, Vec<usize>, bool, Option<usize>, Option<Vec<bool>>)>,
     /// Whether its port cuts the room to its windows ([`holonics::hnn::tower::field::Port::window`]).
     pub window: bool,
+    /// Whether its port compares its open places on their letters off the void ([`holonics::hnn::tower::field::Port::letters`]).
+    pub letters: bool,
 }
 
 impl TrainRegion {
     /// A region carrying no face and no lock.
     pub(super) fn plain(classes: Vec<usize>, unresolved: Vec<bool>) -> Self {
-        Self { classes, unresolved, faces: Vec::new(), locked: Vec::new(), echo: Vec::new(), domain: None, port: None, window: false }
+        Self { classes, unresolved, faces: Vec::new(), locked: Vec::new(), echo: Vec::new(), domain: None, port: None, window: false, letters: false }
     }
 }
 
 /// A region as the field reads it.
 fn view_of(region: &TrainRegion) -> Region<'_> {
-    Region { classes: &region.classes, unresolved: &region.unresolved, faces: &region.faces, locked: &region.locked, echo: &region.echo, domain: region.domain, port: region.port.as_ref().map(|(start, void, target, boundary, stop, heard)| Port { start: *start, void: *void, target, boundary: *boundary, stop: *stop, heard: heard.as_deref(), window: region.window }) }
+    Region { classes: &region.classes, unresolved: &region.unresolved, faces: &region.faces, locked: &region.locked, echo: &region.echo, domain: region.domain, port: region.port.as_ref().map(|(start, void, target, boundary, stop, heard)| Port { start: *start, void: *void, target, boundary: *boundary, stop: *stop, heard: heard.as_deref(), window: region.window, letters: region.letters }) }
 }
 
 /// The regions as the field reads them.
@@ -1848,6 +1854,7 @@ pub(super) fn order_field(args: &[String], realization: &mut dyn FieldRealizatio
     let mut rows = rows_file(&out.join("ORDER.tsv"), "problem\tplaces\tplace_code\tplace_length\tkeyed_code\tmasks_code\tlength_code\n")?;
     let mut place_length_total = 0i64;
     let (mut keyed_length_total, mut given_total, mut letters_total) = (0i64, 0i64, 0usize);
+    let mut given_letters_total = 0i64;
     let (mut place_total, mut keyed_total, mut places_total) = (0i64, 0i64, 0usize);
     let (mut masks_total, mut length_total, mut lengths_unread) = (0i64, 0i64, 0usize);
     for (k, (question, answer)) in held.iter().take(n).enumerate() {
@@ -1913,7 +1920,7 @@ pub(super) fn order_field(args: &[String], realization: &mut dyn FieldRealizatio
             known[t] = true;
         }
         let mut codes = (0i64, 0i64, 0i64);
-        let (mut place_length, mut keyed_length, mut given) = (0i64, 0i64, 0i64);
+        let (mut place_length, mut keyed_length, mut given, mut given_letters) = (0i64, 0i64, 0i64, 0i64);
         for (c, chunk) in states.chunks(256).enumerate() {
             let regions: Vec<Region> = chunk.iter().map(|(classes, open, _, _)| Region { classes, unresolved: open, faces: &[], locked: &[], echo: &[], domain: None, port: None }).collect();
             let faces = realization.read_faces(field, &regions).map_err(|e| e.to_string())?;
@@ -1930,7 +1937,10 @@ pub(super) fn order_field(args: &[String], realization: &mut dyn FieldRealizatio
                         // [the unified-theory reading of 11:07] The keyed order's length part: void or letter at each read.
                         keyed_length += if *class == void { code } else { holonics::hnn::tower::face_code(face.total - face.masses[void], face.total) };
                     }
-                    s if s < given_states => given += code,
+                    s if s < given_states => {
+                        given += code;
+                        given_letters += holonics::hnn::tower::face_code(face.masses[*class], face.total - face.masses[void]);
+                    }
                     _ => codes.2 += code,
                 }
             }
@@ -1956,11 +1966,12 @@ pub(super) fn order_field(args: &[String], realization: &mut dyn FieldRealizatio
         masks_total += codes.2;
         place_length_total += place_length;
         (keyed_length_total, given_total, letters_total) = (keyed_length_total + keyed_length, given_total + given, letters_total + len);
+        given_letters_total += given_letters;
         row(&mut rows, &format!("{k}\t{}\t{}\t{place_length}\t{}\t{}\t{}\n", end + 1, codes.0, codes.1, codes.2, length.map_or("-".to_string(), |l| l.to_string())))?;
         (place_total, keyed_total, places_total) = (place_total + codes.0, keyed_total + codes.1, places_total + end + 1);
     }
     println!(
-        "FIELD_ORDER problems={n} places={places_total} place_bits_a_place={} place_length_bits_a_place={} place_content_bits_a_place={} keyed_bits_a_place={} keyed_length_bits_a_place={} keyed_content_bits_a_place={} keyed_given_bits_a_letter={} letters={letters_total} masks_bits_a_place={} masks_length_bits_a_place={} lengths_unread={lengths_unread} ms={}",
+        "FIELD_ORDER problems={n} places={places_total} place_bits_a_place={} place_length_bits_a_place={} place_content_bits_a_place={} keyed_bits_a_place={} keyed_length_bits_a_place={} keyed_content_bits_a_place={} keyed_given_bits_a_letter={} keyed_given_off_void_bits_a_letter={} letters={letters_total} masks_bits_a_place={} masks_length_bits_a_place={} lengths_unread={lengths_unread} ms={}",
         bits(place_total, places_total),
         bits(place_length_total, places_total),
         bits(place_total - place_length_total, places_total),
@@ -1968,6 +1979,7 @@ pub(super) fn order_field(args: &[String], realization: &mut dyn FieldRealizatio
         bits(keyed_length_total, places_total),
         bits(keyed_total - keyed_length_total, places_total),
         bits(given_total, letters_total),
+        bits(given_letters_total, letters_total),
         bits(masks_total, places_total),
         bits(length_total, places_total),
         started.elapsed().as_millis()
@@ -3025,9 +3037,10 @@ mod tests {
                     assert!((q.len()..end).filter(|&t| octave(t + 1 - q.len()) < far).all(|t| !state.unresolved[t]), "the earlier octaves resolved whole");
                 }
                 met.insert(if k == 0 { 0 } else { octave(k) + 1 });
-                assert!(state.port.is_none() && state.domain.is_none() && !state.window, "every open place compared on its own class");
-                let open = state.unresolved.iter().filter(|&&u| u).count() as u64;
-                assert_eq!(view_of(&state).weight(), (open, open), "weight one");
+                let Some((start, void, target, false, None, None)) = state.port.clone() else { panic!("a port on the letters") };
+                assert!(state.letters && !state.window && state.domain.is_none(), "every open place compared on its letters off the void");
+                assert_eq!((start, void, target), (q.len(), codec.void(), a.clone()));
+                assert_eq!(view_of(&state).weight(), (1, 1), "weight one");
             }
             let most = a.len() - 1;
             let octaves = usize::BITS - most.leading_zeros() + 1;
