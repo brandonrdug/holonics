@@ -1745,14 +1745,16 @@ impl<'c> CardField<'c> {
                     // [§16.47] A place past the port's stop is read and not compared: it carries no face to the reading, and its
                     // covector is zero, written as a zero row (an unported open place would take its own place's).
                     let stop = first + port.stop.unwrap_or(region_off[r + 1] as usize - first).min(region_off[r + 1] as usize - first);
-                    let at: Vec<(&[u128], u128)> = wide.iter().zip(first + port.start..).map(|(m, t)| if unresolved[t] != 0 && t < stop { (m.as_slice(), ts[t] as u128) } else { (&[][..], 0) }).collect();
+                    // [§16.47] A place the port does not hear is read and not compared, as one past the stop.
+                    let heard = |t: usize| t < stop && port.heard.is_none_or(|h| h[t - first]);
+                    let at: Vec<(&[u128], u128)> = wide.iter().zip(first + port.start..).map(|(m, t)| if unresolved[t] != 0 && heard(t) { (m.as_slice(), ts[t] as u128) } else { (&[][..], 0) }).collect();
                     let (rows, _) = holonics::hnn::tower::field::port_reading(&at, &port)?;
                     for (k, row) in rows.into_iter().enumerate() {
                         let t = first + port.start + k;
                         if !row.is_empty() {
                             ported.0.push(t as u32);
                             ported.1.extend(row);
-                        } else if t >= stop && unresolved[t] != 0 {
+                        } else if !heard(t) && unresolved[t] != 0 {
                             ported.0.push(t as u32);
                             ported.1.extend(std::iter::repeat_n(0i64, a));
                         }

@@ -230,6 +230,21 @@ pub(super) fn path_front_cut() -> bool {
     *CUT.get_or_init(|| std::env::var_os("FIELD_PATH_FRONT_CUT").is_some())
 }
 
+/// [definition; agent-inferred, November 5, the unified-theory reading of 23:26] **b2's far share, on the whole room**
+/// (`FIELD_PATH_FAR_KEYED`, declared against b1's every place): a path state with no resolved void compares its front octave
+/// whole and, past it, one place an octave through the codec's extent, the place the state's keyed order opens first there
+/// (the writer's first read in it), at the boundary (letter or void) with weight one; the places between are read on the
+/// one-rate clock past the last arrival and not compared (the port's `heard`). Why: the end is one variable, 9.57 bits an
+/// answer, and the whole room compared it once a place, 638 bits a state on the truth's own curve, as much as an answer's
+/// content (430 to 620), so length took about half the step; the keyed places code about 3 bits a state, the end's octave,
+/// and the front octave codes its place within it. Keyed, not at fixed distances: the clock turns the rings, and fixed
+/// distances meet them at a few phases. It keeps b1's geometry, so it reads the far share alone; b2 proper also drops the
+/// places between (regions with explicit positions).
+pub(super) fn path_far_keyed() -> bool {
+    static KEYED: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
+    *KEYED.get_or_init(|| std::env::var_os("FIELD_PATH_FAR_KEYED").is_some())
+}
+
 /// [agent-inferred, November 1] A region's void tail past its answer, in `[1, room]`, `room` the
 /// codec's answer extent less the answer's: an octave `k` of the room drawn uniform, then a length
 /// uniform in `[2^k, min(2^(k+1) − 1, room)]`. Every octave of tail is met alike, so the field
@@ -297,6 +312,11 @@ pub(super) fn region_lengths(codec: &FieldCodec, problems: &Problems, members: &
 /// stop), which kept the faces and dropped the far comparisons that taught the length. Past a resolved void the region ends
 /// `NEAR` places past it (`near_tail`). A state with nothing open is no state (none).
 pub(super) fn opening_region(codec: &FieldCodec, q: &[usize], a: &[usize], seed: u64, draw: u64) -> Option<TrainRegion> {
+    opening_region_with(codec, q, a, seed, draw, path_far_keyed())
+}
+
+/// [`opening_region`] with b2's far share declared or not ([`path_far_keyed`]).
+pub(super) fn opening_region_with(codec: &FieldCodec, q: &[usize], a: &[usize], seed: u64, draw: u64, far_keyed: bool) -> Option<TrainRegion> {
     let room = codec.answer;
     let classes = region_classes(codec, q, a, q.len() + room);
     let mut unresolved: Vec<bool> = (0..classes.len()).map(|t| t >= q.len()).collect();
@@ -330,6 +350,20 @@ pub(super) fn opening_region(codec: &FieldCodec, q: &[usize], a: &[usize], seed:
         classes.truncate(cut);
         unresolved.truncate(cut);
     }
+    let mut heard = None;
+    if voided.is_none() && !path_front_cut() && far_keyed {
+        let front = holonics::hnn::tower::field::octave_of(order[k] + 1 - q.len());
+        let mut mask: Vec<bool> = (0..classes.len()).map(|t| t >= q.len() && holonics::hnn::tower::field::octave_of(t + 1 - q.len()) <= front).collect();
+        let mut last = front;
+        for &t in &order[k..] {
+            let o = holonics::hnn::tower::field::octave_of(t + 1 - q.len());
+            if o > last {
+                mask[t] = true;
+                last = o;
+            }
+        }
+        heard = Some(mask);
+    }
     if voided.is_none() && path_front_cut() {
         let front = holonics::hnn::tower::field::octave_of(order[k] + 1 - q.len());
         let front_end = (q.len() + (1usize << (front + 1)) - 1).min(classes.len());
@@ -340,7 +374,7 @@ pub(super) fn opening_region(codec: &FieldCodec, q: &[usize], a: &[usize], seed:
     }
     // The answer's cells the region holds: past a cut region the answer goes on, so every place it holds is a letter's.
     let target = a[..a.len().min(classes.len() - q.len())].to_vec();
-    Some(TrainRegion { port: Some((q.len(), codec.void(), target, true, stop)), ..TrainRegion::plain(classes, unresolved) })
+    Some(TrainRegion { port: Some((q.len(), codec.void(), target, true, stop, heard)), ..TrainRegion::plain(classes, unresolved) })
 }
 
 /// A training region: its classes, its unresolved sites, its carried faces and its locks (each
@@ -357,7 +391,7 @@ pub(super) struct TrainRegion {
     pub domain: Option<usize>,
     /// Its answer port (§16.24, [`Region::port`]): the first place, the void, the cells, and whether it is compared at
     /// its boundary (§16.47) rather than through its coupling.
-    pub port: Option<(usize, usize, Vec<usize>, bool, Option<usize>)>,
+    pub port: Option<(usize, usize, Vec<usize>, bool, Option<usize>, Option<Vec<bool>>)>,
 }
 
 impl TrainRegion {
@@ -369,7 +403,7 @@ impl TrainRegion {
 
 /// A region as the field reads it.
 fn view_of(region: &TrainRegion) -> Region<'_> {
-    Region { classes: &region.classes, unresolved: &region.unresolved, faces: &region.faces, locked: &region.locked, echo: &region.echo, domain: region.domain, port: region.port.as_ref().map(|(start, void, target, boundary, stop)| Port { start: *start, void: *void, target, boundary: *boundary, stop: *stop }) }
+    Region { classes: &region.classes, unresolved: &region.unresolved, faces: &region.faces, locked: &region.locked, echo: &region.echo, domain: region.domain, port: region.port.as_ref().map(|(start, void, target, boundary, stop, heard)| Port { start: *start, void: *void, target, boundary: *boundary, stop: *stop, heard: heard.as_deref() }) }
 }
 
 /// The regions as the field reads them.
@@ -2288,7 +2322,7 @@ mod tests {
             } else {
                 assert!(opening.classes.len() <= q.len() + codec.answer, "member {n}'s path within the room");
             }
-            let Some((start, void, target, true, stop)) = opening.port.clone() else { panic!("member {n}'s path is compared at its boundary") };
+            let Some((start, void, target, true, stop, _)) = opening.port.clone() else { panic!("member {n}'s path is compared at its boundary") };
             assert_eq!((start, void, target), (q.len(), codec.void(), a[..a.len().min(opening.classes.len() - q.len())].to_vec()));
             if let Some(stop) = stop {
                 assert_eq!(opening.classes.len() - stop, holonics::hnn::tower::field::NEAR - 1, "member {n}: the margin is the near field's");
@@ -2312,6 +2346,39 @@ mod tests {
             assert_eq!(regions[n], expected, "member {n}");
         }
         answers
+    }
+
+    /// [definition; the unified-theory reading of November 5, 23:26] **b2's far share**: a path state with no resolved void
+    /// hears its front octave whole and, past it, exactly one place an octave, the first its keyed order opens there, over
+    /// the whole room; a state past a resolved void hears every place; without the far share every place is heard.
+    #[test]
+    fn a_path_state_hears_its_front_octave_and_one_keyed_place_an_octave() {
+        let (codec, problems) = toy();
+        let (mut keyed, mut voided) = (0, 0);
+        for (i, (q, a, _)) in problems.iter().enumerate() {
+            for draw in 1..64u64 {
+                let Some(state) = opening_region_with(&codec, q, a, 7 + i as u64, draw, true) else { continue };
+                let Some((start, _, _, true, None, heard)) = state.port.clone() else { panic!("a path state compared at its boundary") };
+                let plain = opening_region_with(&codec, q, a, 7 + i as u64, draw, false).unwrap();
+                assert_eq!(plain.port.as_ref().unwrap().5, None, "without the far share every place is heard");
+                assert_eq!((&plain.classes, &plain.unresolved), (&state.classes, &state.unresolved), "the far share keeps the region");
+                let Some(heard) = heard else {
+                    assert!((start..state.classes.len()).any(|t| !state.unresolved[t] && state.classes[t] == codec.void()), "only a state past a void hears every place");
+                    voided += 1;
+                    continue;
+                };
+                let octave = |t: usize| holonics::hnn::tower::field::octave_of(t + 1 - start);
+                let front = (start..state.classes.len()).filter(|&t| state.unresolved[t]).map(octave).min().unwrap();
+                assert!((start..state.classes.len()).filter(|&t| octave(t) <= front).all(|t| heard[t]), "the front octave is heard whole");
+                let far: Vec<usize> = (start..state.classes.len()).filter(|&t| heard[t] && octave(t) > front).collect();
+                let octaves: std::collections::BTreeSet<u32> = (start..state.classes.len()).filter(|&t| octave(t) > front).map(octave).collect();
+                assert_eq!(far.len(), octaves.len(), "one place an octave past the front");
+                assert!(far.iter().all(|&t| state.unresolved[t]), "the far places are open");
+                assert!(heard[..start].iter().all(|&h| !h), "the question is not a port place");
+                keyed += 1;
+            }
+        }
+        assert!(keyed > 0 && voided > 0, "keyed {keyed}, voided {voided}");
     }
 
     /// A section's regions on the toy passage are the draws' (one a member), their lengths the projection's, and the

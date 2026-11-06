@@ -3810,3 +3810,20 @@ code86's and b1's states against their three-pass writes, the same 32 and keys):
 held's closure near and far, and the code per byte falling then flat; the median stop past pass 3 (else the law is three
 passes); of code86's openings not exactly ```` ```python ````, those a byte off stay so at the stop, at most one mending (more
 mending puts shifts in refine's walk; if they stay, shifts are the sweeps' to prevent, read apart from the stop).
+
+[definition; agent-inferred, November 5, the unified-theory reading of 23:26] **b2's far share, read alone on the whole room**
+(`Port::heard`, `path_far_keyed`, `FIELD_PATH_FAR_KEYED`). b2's far-place law: past the front octave, one place an octave
+through the codec's extent (at most 11), the place the state's keyed order opens first there, alone on the one-rate clock from
+the last arrival, compared at the boundary with weight one; the front octave whole and the near tail as built. The end is one
+variable (9.57 bits an answer, its octave 2.28), and the whole room compared it once a place: the place entropies sum to 638
+bits a state on the truth's curve, as much as an answer's content (430 to 620), so length took about half the step, where the
+keyed places code about 3 bits a state. The port now hears a declared set of its places (`heard`; a place not heard is read and
+not compared and takes no covector, as one past the stop, host and card), and a path state with no resolved void hears its
+front octave and its keyed far places, keeping b1's geometry: the places between stand on the one-rate clock and are not
+compared, so the run reads the far share alone, before b2 proper also drops them (regions with explicit positions). The
+trainer's test `a_path_state_hears_its_front_octave_and_one_keyed_place_an_octave`. **Fixed before the run** (code88, from
+code84's lap-0 state): (1) held context within 0.05 of code85's at laps 0 to 3 (2.404, 2.124, 1.914, 1.579); (2) by lap 2 the
+opening's void mass above code86's flat 0.09 at held, and higher at +128 than at held; (3) under both writer laws the
+correlation with held above +0.3 by lap 4. (1) failing: the far share was not the dilution, and b1's clock is next; (2) flat
+through lap 4: the end's share is too slow at content's rate; only (3) failing: the writes' ends read against their own
+closing fence. None raises the far weight.

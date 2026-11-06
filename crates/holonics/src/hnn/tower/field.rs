@@ -777,6 +777,11 @@ pub struct Port<'a> {
     /// takes no covector (the near field's margin a writer's state keeps past its front, so the faces before it are the
     /// whole room's).
     pub stop: Option<usize>,
+    /// [definition; agent-inferred, November 5, the unified-theory reading of 23:26] **Which of its places are heard** (none:
+    /// every place before the stop), indexed by the region's sites: a place not heard is read and not compared, and takes no
+    /// covector, as one past the stop. A writer's state compares its front octave whole and, past it, one keyed place an
+    /// octave (b2's far share), the places between read on the one-rate clock and not compared.
+    pub heard: Option<&'a [bool]>,
 }
 
 /// [definition; agent-inferred, November 3, §16.24] **A port's reading**: its coupling code on `2^(−20)` bits and each
@@ -2669,7 +2674,8 @@ impl Field {
         }
         if let Some(port) = region.port {
             code += port_code(&faces, &port)?;
-            count += region.unresolved[port.start..port.stop.unwrap_or(region.classes.len()).min(region.classes.len())].iter().filter(|&&u| u).count();
+            let stop = port.stop.unwrap_or(region.classes.len()).min(region.classes.len());
+            count += (port.start..stop).filter(|&t| region.unresolved[t] && port.heard.is_none_or(|h| h[t])).count();
         }
         Ok((code, count))
     }
@@ -4353,7 +4359,7 @@ fn port_faces<'f>(faces: &'f [Option<TowerFace>], port: &Port) -> Result<Vec<(&'
         .iter()
         .enumerate()
         .map(|(k, f)| match f {
-            _ if port.start + k >= stop => Ok((&[][..], 0)),
+            _ if port.start + k >= stop || port.heard.is_some_and(|h| !h[port.start + k]) => Ok((&[][..], 0)),
             Some(f) => Ok((f.masses.as_slice(), f.total)),
             None if port.boundary => Ok((&[][..], 0)),
             None => refuse("a port's place without a face"),
@@ -4686,7 +4692,8 @@ impl FieldLearner {
             return refuse("a section with no unresolved site");
         }
         // The sites the weighed code is a code of (§16.23): each region's domain where it reads an open site.
-        let sites = spans.iter().filter(|s| s.0 > 0).map(|s| s.1 as usize).sum::<usize>() + regions.iter().filter_map(|r| r.port.map(|p| p.stop.unwrap_or(r.classes.len()).min(r.classes.len()) - p.start)).sum::<usize>();
+        let sites = spans.iter().filter(|s| s.0 > 0).map(|s| s.1 as usize).sum::<usize>()
+            + regions.iter().filter_map(|r| r.port.map(|p| (p.start..p.stop.unwrap_or(r.classes.len()).min(r.classes.len())).filter(|&t| p.heard.is_none_or(|h| h[t])).count())).sum::<usize>();
         let raw = g.clone();
         let transfer = self.last.take().and_then(|s| predicted_change(&self.field, &raw, &s.step, s.halvings));
         for &(start, len, grain) in &self.field.families_all() {
