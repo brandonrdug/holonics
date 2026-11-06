@@ -331,3 +331,18 @@ profile, then the keyed sweeps given it, no refine pass) at lap 4: written over 
 time as a hazard) and 1.436 with the correlation +0.301 at lap 4. Given keyed100's lengths, the lap-2 state opened 16 and closed
 21 fences (keyed103; `keyed103.txt`), six of its answers parsing as Python, the line's most: the lost structure at lap 2 was the
 state's, not the drawn length's.
+
+[measurement; agent-inferred] **The depth ring's bracket gain does not hold** (ring102; `ring102.txt`, `ring102_launch.sh`).
+code86's state with head 3 made a depth ring (increments founded at zero, no blank face), its sampled parity equal, against
+code86's state continued, both under code86's laws, two segments each, the writes given keyed100's lengths. The conversion's
+cost: held context 10.91 bits a byte at its start, 1.537, 1.500, 1.430, 1.393 over its first four laps and 1.444, 1.410, 1.348,
+1.376 over the next four (121 and 117 ms a section), against the foil's 1.331, 1.362, 1.309 and 1.299, 1.325, 1.319 (158 and
+169 ms). The brackets, near closed, far closed and left unclosed: the ring after four laps 0.250, 0.402, 0.348 over 92 openers,
+the foil after three 0.168, 0.189, 0.643 over 143; the ring after eight 0.218, 0.244, 0.538 over 78, the foil after six 0.236,
+0.255, 0.509 over 55. Every mark fixed before it fails (far brackets 0.8 of held, near 0.9, unclosed under 0.1), and at the
+second segment ring and foil close alike, so the first segment's gap is not the ring's to claim; the control with `r` held at
+zero, which would separate the ring from the conversion, is not yet run. **The training answers' opening length code**
+(keyed104; `keyed104.txt`): code91's lap-4 state codes the first 32 training answers' lengths at 9.31 bits a read answer against
+their paired marginal 8.98 (+0.33 ± 0.18), so the opening holds the length's distribution and not its fit to the question on
+training answers either; given keyed100's lengths it opens 18 and closes 21 of 29 fences, the space at 10.5%, five answers
+parsing. The long run (long106, Brandon's authorization of 06:29) continues code91's law from its lap-4 state without the ring.

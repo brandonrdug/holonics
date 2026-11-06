@@ -1,0 +1,22 @@
+# keyed104 lock taken 06:32:02 on 6289a28152b56a55655baf6f6aad14a680c82f5fb88f8420b9bb3e9a4d36f164, lengths fd7c4697dd71246b0728d33cacadeb95b9eae18c2c7663ecb681d6c13e940cdd
+FIELD_LENGTH problems=32 sweeps=2062 refine=0 stopped=- run_bits=1 reads=855 certified_bits=243.683 passed=0 ms=16593
+MEASURE lap=code86 rc=0 wall_s=16.9 peak_rss_kib=233500
+ENDINGS answers 32: 19 end at or under held over 4371 places (one in 230), 13 past it over 2112 (one in 162), 0 reach the room
+HAZARD past/under 1.42; written/held 0.740; correlation -0.003
+written: 32 answers, 18 open with ```python; a 'y' outside it in 24, its first at places 0 to 5 in 9 (median first 40), 'y' past it 0.026; commonest byte's share at places 10 to 255 (244 places) 0.180; top byte ' ' 0.105, 'y' 0.023, entropy 5.04 bits over 6483 bytes
+held   : 32 answers, 28 open with ```python; a 'y' outside it in 15, its first at places 0 to 5 in 0 (median first 38), 'y' past it 0.016; commonest byte's share at places 10 to 255 (246 places) 0.197; top byte ' ' 0.174, 'y' 0.009, entropy 4.96 bits over 8760 bytes
+bytes written/held 0.740, correlation -0.003, 13 longer, 19 shorter
+written: 32 answers: a fence opened 29, closed 21; parses as Python 5; code lines mean 5.1; identifiers 379, in the question 0.03, in the held answer 0.03
+held:    32 answers: a fence opened 29, closed 29; parses as Python 26; code lines mean 10.9; identifiers 1117, in the question 0.26, in the held answer 1.00
+family	span	written opened	written closed share	held opened	held closed share	ratio
+bracket	near	49	0.143	178	0.393	0.36
+bracket	far	49	0.306	178	0.607	0.50
+string	near	34	0.324	60	0.400	0.81
+string	far	34	0.176	60	0.583	0.30
+block	near	9	0.000	75	0.000	nan
+block	far	9	0.444	75	0.947	0.47
+RULE: the lowest closure against held is string far at 0.30 (under 0.5)
+FIELD_ORDER problems=32 places=7651 place_bits_a_place=3.312 place_length_bits_a_place=0.040 place_content_bits_a_place=3.271 keyed_bits_a_place=3.813 masks_bits_a_place=3.025 masks_length_bits_a_place=0.036 lengths_unread=2 ms=17017
+MEASURE lap=train_order rc=0 wall_s=17.5 peak_rss_kib=382992
+MARGINAL read 30 of 32: the state's length code 9.31 bits an answer, the training marginal's on the same answers 8.98, on all 8.97; paired difference +0.33 with deviation 0.18
+KEYED104 exit 06:32:37
