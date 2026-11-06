@@ -286,3 +286,11 @@ code86's state writing in the masks' own order with code89's 32 lengths, one pla
 byte entropy 4.93 bits against held's 4.96, the top byte the space at 17.6% against 17.4%, `y` 1.2%, 11.4 code lines a write;
 9 exact ```` ```python ```` openings and 14 of 31 fences closed, far brackets, strings and blocks 0.41, 0.34 and 0.47 of held's
 closure. By the reading fixed at 02:38, (b) and the fences fail, and the keyed whole-room writer stays.
+
+[measurement; agent-inferred] **The keyed writer given its lengths keeps its fences and not its openings** (keyed99;
+`keyed99.txt`). code86's state, the keyed writer under both laws with three refine passes given code89's 32 lengths (the region
+`q + L + NEAR`, the answer places drawn over the letters), the same keys: 17 exact ```` ```python ```` openings (fails 23), byte
+entropy 4.69 bits and the space at 25.5% (fail), `y` 1.4%, 22 of 32 fences closed (passes 22), three answers parsing, 12% of its
+identifiers standing in the held answer (the line's most); far brackets, strings and blocks 0.42, 0.28 and 0.55 of held. Beside
+the same state's unconstrained keyed write (25 openings, 22 fences, 4.71 bits, 25%), a given length keeps the fences and the
+space's lean and loses eight openings.
