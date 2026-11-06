@@ -4152,3 +4152,14 @@ bits, under theory's 3.0. So the faces approached agreement by reading each othe
 held context. At one pull a square the deposit did not move the squares (squares121), and at an answer's weight it decoupled
 them: these charts carry agreement only by decoupling. By theory's falsifier, faces read as one pair energy's conditionals are
 owed. Receipts: `longrun_nov6/squares123.txt`.
+
+[measurement; November 6, squares124; the unified-theory reading of 20:33] **The turn law keeps the readings' scale, and
+prediction still pays.** Theory read squares123's fall of λ's spread as `l²/4`'s own steepest path. That loss is homogeneous in
+the readings' scale, so its gradient shrinks both readings. The turn law pulls `l²/4`'s covector with its radial part removed:
+`w_i = (l/2) λ_j (λ_i + λ_j)/r²` and `w_j = −(l/2) λ_i (λ_i + λ_j)/r²` (times `n_p/4`), with `w_i λ_i + w_j λ_j = 0`. Over the
+cost read's 116 sections the trained squares' `|l|` read 1.072 bits over the first 20 sections and 1.062 over all of them. Held
+context rose from 1.188 to 1.205 and unseen from 1.120 to 1.134, past the 1.199 stop. The curl on that state read curl/λ 1.14,
+1.43, 1.85, 1.26 and 1.66 by band, with λ's spread at d = 1 at 3.44 (kept). So the readings kept their scale and the near curl
+eased (1.20 → 1.14 at d = 1, 1.59 → 1.43 at 2–3), but prediction lost 0.017 bits of held context in 116 sections while the
+trained squares barely moved. The rate (12) was held from the run without squares. Squares weighed as their answers about double
+a path problem's covector mass, so the same rate takes a larger step. Receipts: `longrun_nov6/squares124.txt`.

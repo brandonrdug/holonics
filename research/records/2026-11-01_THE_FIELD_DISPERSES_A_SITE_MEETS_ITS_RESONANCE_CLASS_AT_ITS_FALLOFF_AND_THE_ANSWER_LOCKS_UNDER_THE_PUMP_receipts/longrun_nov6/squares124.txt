@@ -1,0 +1,22 @@
+# squares124 from bdaeff3a76c10712daa51856de87074511c91903330e8a557df91f19889b970e: hnn-field-learner-v3 12 75264 34 -, binary 9c289dd1658748dd9fe346c6f5765153948be57fd616928015c9a43936d66447, the hour ends 21:36:44
+# lock taken 20:36:44
+# no parity: the turn law changes only the pulls' w in the trainer's regions (Port::pull's card parity held at 19:33)
+dev sections 116 mean_ms 1199 max_ms 2689 (lap 24 without squares: 521 ms a section)
+FIELD_UNSEEN lap=-1 code=1.120 sites=43660 next=- ms=10779
+FIELD_STOPPED lap=0 sections=116/1535 reason=run sites=1266591 before=3.392 after=- deposited=116 halvings=0 next_halved=0 next_refused=0 lap_ms=140756 ms=151536
+FIELD_UNSEEN lap=0 stopped code=1.134 sites=43660 next=- ms=151536
+MEASURE lap=dev rc=0 wall_s=152.3 peak_rss_kib=798748
+dev squares: mean |l| a square 1.062 bits over 116 sections, first 20 sections 1.072
+# held context after the cost read's sections: 1.205079 (lap 24: 1.188) 20:39:32
+MAIN held passed 1.199 after the cost read (theory's stop): the chain stops
+== curl on the cost read's stopped state (116 sections)
+FIELD_CURL problems=32 squares=2560 regions=10240 ms=12775
+band	squares	lambda_mean	lambda_sd	curl_sd	curl/lambda	mean_abs_curl	corr
+1	512	+1.226	3.440	3.914	1.14	2.818	+0.51
+2-3	512	+0.516	1.669	2.395	1.43	1.622	+0.32
+4-7	512	+0.001	0.487	0.899	1.85	0.521	+0.09
+8-15	512	+0.019	0.416	0.524	1.26	0.286	+0.45
+16+	512	+0.028	0.180	0.298	1.66	0.163	+0.18
+FIELD_UNSEEN lap=-1 code=1.120 sites=43660 next=- ms=10779
+FIELD_STOPPED lap=0 sections=116/1535 reason=run sites=1266591 before=3.392 after=- deposited=116 halvings=0 next_halved=0 next_refused=0 lap_ms=140756 ms=151536
+FIELD_UNSEEN lap=0 stopped code=1.134 sites=43660 next=- ms=151536

@@ -1842,10 +1842,15 @@ fn square_reads(field: &Field, void: usize, truth: &[usize], picked: &[(usize, u
 /// band ([`SQUARE_BANDS`], among those its answer reaches), its places keyed within the answer, on the truth given its end
 /// (the question, the answer and its `NEAR` voids, cut there), read through [`square_reads`] on the learner's field; with
 /// `l = λ_i − λ_j` the loss is `l²/4`, and four states each open at one place carry its covector as a declared pull
-/// ([`holonics::hnn::tower::field::Port::pull`]): `i` beside `j`'s standing letter pulls `(a, a', w)` (its code
-/// `w (c(a') − c(a))`), `i` beside `j`'s runner-up `(a', a, w)`, `j` beside `i`'s standing letter `(b, b', −w)` and `j`
-/// beside `i`'s runner-up `(b', b, −w)`, so the four codes sum to `2w·(λ_i − λ_j)` at the read and their covector is the
-/// loss's, weighed. [definition; the unified-theory reading of November 6, 20:18] **A square stands for its answer**: its four
+/// ([`holonics::hnn::tower::field::Port::pull`]): `i` beside `j`'s standing letter pulls `(a, a', w_i)` (its code
+/// `w_i (c(a') − c(a))`), `i` beside `j`'s runner-up `(a', a, w_i)`, `j` beside `i`'s standing letter `(b, b', w_j)` and `j`
+/// beside `i`'s runner-up `(b', b, w_j)`, so the four codes sum to `w_i λ_i + w_j λ_j` at the read. [definition; the
+/// unified-theory reading of November 6, 20:33] **The turn law**: the pull compares the two readings' ratio, not their
+/// difference. With `v = (λ_i, λ_j)` and `σ` the swap, `κ = 1 − ⟨v, σv⟩/⟨v, v⟩ = l²/r²` (`r² = λ_i² + λ_j²`), and the pull is
+/// `l²/4`'s covector with its radial part removed, `w_i = (l/2) λ_j (λ_i + λ_j)/r²`, `w_j = −(l/2) λ_i (λ_i + λ_j)/r²` (zero
+/// where `r = 0`), so `w_i λ_i + w_j λ_j = 0`: no common scale of the two readings is pulled, and a one-way square
+/// (`λ_j = 0`) moves only the missing reading. Why (squares123): `l²/4` is homogeneous in the readings' scale, so its
+/// steepest path shrank both (λ's spread at d = 1 3.54 → 2.99) and held context paid. [definition; the unified-theory reading of November 6, 20:18] **A square stands for its answer**: its four
 /// states together weigh as many places as its problem compares in the section (its opening's and its writer state's
 /// compared answer places, `n_p`), `w = (l/2)(n_p/4)`, so prediction and agreement stand equal a problem, local to its
 /// answer. Why (squares121): at `w = l/2` the trained squares' `|l|` ran flat (1.163 to 1.210 bits by quarter) beside about
@@ -1874,7 +1879,10 @@ pub(super) fn square_regions(codec: &FieldCodec, problems: &Problems, paths: &[u
         let Some(Some(sq)) = read.squares.into_iter().next() else { continue };
         let l = sq.lambda_i - sq.lambda_j;
         let compared = opening_region(codec, q, a, seed, d).map_or(0, |r| compared_answer_places(&r, q.len(), len)) + if path_writer() { writer_region(codec, q, a, seed, d).map_or(0, |r| compared_answer_places(&r, q.len(), len)) } else { 0 };
-        let half = fit_i64(div_nearest_i128(l as i128 * compared.max(1) as i128, 8))?;
+        let (li, lj) = (sq.lambda_i as i128, sq.lambda_j as i128);
+        let r2 = li * li + lj * lj;
+        let n = compared.max(1) as i128;
+        let (wi, wj) = if r2 == 0 { (0, 0) } else { (fit_i64(div_nearest_i128(l as i128 * lj * (li + lj) * n, 8 * r2))?, fit_i64(div_nearest_i128(-(l as i128) * li * (li + lj) * n, 8 * r2))?) };
         let (ai, aj, (bi, bj)) = (truth[i], truth[j], sq.runners);
         let state = |open_at: usize, set: Option<(usize, usize)>, pull: (usize, usize, i64)| {
             let mut classes = truth.clone();
@@ -1884,10 +1892,10 @@ pub(super) fn square_regions(codec: &FieldCodec, problems: &Problems, paths: &[u
             let unresolved = (0..classes.len()).map(|t| t == open_at).collect();
             TrainRegion { port: Some((open_at, void, Vec::new(), false, Some(open_at + 1), None)), pull: Some(pull), ..TrainRegion::plain(classes, unresolved) }
         };
-        out.push(state(i, None, (ai, bi, half)));
-        out.push(state(i, Some((j, bj)), (bi, ai, half)));
-        out.push(state(j, None, (aj, bj, -half)));
-        out.push(state(j, Some((i, bi)), (bj, aj, -half)));
+        out.push(state(i, None, (ai, bi, wi)));
+        out.push(state(i, Some((j, bj)), (bi, ai, wi)));
+        out.push(state(j, None, (aj, bj, wj)));
+        out.push(state(j, Some((i, bi)), (bj, aj, wj)));
         squares += 1;
         curl += l.abs();
     }
@@ -3375,10 +3383,10 @@ mod tests {
 
     /// [definition; the unified-theory reading of November 6, 19:04] **The squares agree**: each path problem's square is four
     /// states of its truth cut `NEAR` places past its end, each open at one place of the square and pulling there; the pulls
-    /// weigh `±l/2` with `l = λ_i − λ_j` read through [`square_reads`], and the four states' codes sum to `l²/2` (each released
-    /// to its nearest), so their covector is the loss `l²/4`'s.
-    /// A square's `l = λ_i − λ_j` read back from its four states' own faces (each state's open place, on its letters).
-    fn square_l(field: &Field, codec: &FieldCodec, four: &[TrainRegion]) -> i64 {
+    /// weigh `w_i`, `w_i`, `w_j`, `w_j` (the turn law's, read through [`square_reads`]) with no radial part, `w_i λ_i + w_j λ_j = 0`,
+    /// which the four states' codes sum to (each released to its nearest).
+    /// A square's `(λ_i, λ_j)` read back from its four states' own faces (each state's open place, on its letters).
+    fn square_lambdas(field: &Field, codec: &FieldCodec, four: &[TrainRegion]) -> (i64, i64) {
         let code = |s: &TrainRegion, c: usize| -> i64 {
             let t = s.unresolved.iter().position(|&u| u).unwrap();
             let faces = field.read_faces(&[Region { classes: &s.classes, unresolved: &s.unresolved, faces: &[], locked: &[], echo: &[], domain: None, port: None }]).unwrap();
@@ -3387,7 +3395,7 @@ mod tests {
         let ((a, a2, _), (b, b2, _)) = (four[0].pull.unwrap(), four[2].pull.unwrap());
         let lambda_i = code(&four[0], a2) + code(&four[1], a) - code(&four[0], a) - code(&four[1], a2);
         let lambda_j = code(&four[2], b2) + code(&four[3], b) - code(&four[2], b) - code(&four[3], b2);
-        lambda_i - lambda_j
+        (lambda_i, lambda_j)
     }
 
     #[test]
@@ -3403,8 +3411,8 @@ mod tests {
             assert_eq!(states.len(), 4 * squares);
             for four in states.chunks(4) {
                 let pulls: Vec<(usize, usize, i64)> = four.iter().map(|s| s.pull.unwrap()).collect();
-                let w = pulls[0].2;
-                assert_eq!(pulls.iter().map(|p| p.2).collect::<Vec<_>>(), vec![w, w, -w, -w]);
+                let (wi, wj) = (pulls[0].2, pulls[2].2);
+                assert_eq!(pulls.iter().map(|p| p.2).collect::<Vec<_>>(), vec![wi, wi, wj, wj]);
                 assert_eq!((pulls[0].0, pulls[0].1), (pulls[1].1, pulls[1].0), "i's pulls swap its two letters");
                 assert_eq!((pulls[2].0, pulls[2].1), (pulls[3].1, pulls[3].0), "j's pulls swap its two letters");
                 let mut code = 0i64;
@@ -3415,9 +3423,15 @@ mod tests {
                     assert_eq!((*start, target.len(), *boundary, *stop), (open[0], 0, false, Some(open[0] + 1)));
                     code += learner.field.code(&view_of(s)).unwrap().0;
                 }
-                // Σ w·(each face's term) = w (λ_i − λ_j) = w·l on 2^(−20), to the terms' rounding.
-                let l = square_l(&learner.field, &codec, four);
-                assert!((code as i128 - w as i128 * l as i128 / (1 << 20)).abs() <= 8 + (w.unsigned_abs() >> 18) as i128, "codes {code} against {}", w as i128 * l as i128 / (1 << 20));
+                // Σ w·(each face's term) = w_i λ_i + w_j λ_j = 0: no common scale is pulled (to the terms' rounding).
+                let (li, lj) = square_lambdas(&learner.field, &codec, four);
+                let radial = wi as i128 * li as i128 + wj as i128 * lj as i128;
+                let scale = (wi.unsigned_abs() + wj.unsigned_abs()) as i128 * (li.unsigned_abs() + lj.unsigned_abs()) as i128;
+                assert!(radial.abs() * 64 <= scale + (1 << 40), "the pull has a radial part: {radial} against {scale}");
+                assert!((code as i128 - radial / (1 << 20)).abs() <= 8 + ((wi.unsigned_abs() + wj.unsigned_abs()) >> 18) as i128, "codes {code} against {}", radial / (1 << 20));
+                if lj == 0 && li != 0 {
+                    assert_eq!(wi, 0, "a one-way square moves only the missing reading");
+                }
                 met += 1;
             }
             for (state, &p) in states.chunks(4).zip(paths.iter().filter(|&&p| problems[p].1.len().min(codec.answer) >= 2)) {
