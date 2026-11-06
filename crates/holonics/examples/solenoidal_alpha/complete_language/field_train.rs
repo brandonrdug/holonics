@@ -312,7 +312,49 @@ pub(super) fn region_lengths(codec: &FieldCodec, problems: &Problems, members: &
 /// stop), which kept the faces and dropped the far comparisons that taught the length. Past a resolved void the region ends
 /// `NEAR` places past it (`near_tail`). A state with nothing open is no state (none).
 pub(super) fn opening_region(codec: &FieldCodec, q: &[usize], a: &[usize], seed: u64, draw: u64) -> Option<TrainRegion> {
+    if path_prefix() {
+        return Some(prefix_region(codec, q, a, seed, draw));
+    }
     opening_region_with(codec, q, a, seed, draw, path_far_keyed())
+}
+
+/// [definition; agent-inferred, November 6, the unified-theory reading of 00:58] **The writer's path in place order**
+/// (`FIELD_PATH_PREFIX`, declared against the octave path): a path state is a prefix, the question and the answer's first `k`
+/// places resolved, compared at its frontier on the frontier's own class (its byte, or the void where the answer ends: content
+/// and boundary at once), the room past it silent and not compared. Each octave of `k` is met alike: an octave `o` of
+/// `[0, len]` drawn uniform (`len` the answer's places, its end the void at `len`), then `k` uniform in it. The region is cut
+/// `NEAR − 1` places past the frontier, exact for the frontier's face (the silent room past it is heard only through the near
+/// field, `the_room_past_the_front_is_heard_only_through_the_near_field`); its places past the frontier stand in a port that
+/// hears none of them. Why: one place a read in one order draws exactly the joint its faces make by the chain rule, and a
+/// prefix state compared at its frontier is that joint's own code, the end coded once an answer where the writer meets it; the
+/// content masks code the order-averaged joint and the octave path states compared only the boundary, so neither order was
+/// trained at its own states. Place order, because keyed octaves draw early bytes beside blank neighbours (common bytes only,
+/// Brandon's read of 23:12).
+pub(super) fn prefix_region(codec: &FieldCodec, q: &[usize], a: &[usize], seed: u64, draw: u64) -> TrainRegion {
+    let room = codec.answer;
+    let last = a.len().min(room - 1);
+    let key = mix(seed, draw | 5 << 61);
+    let octaves = u64::from(usize::BITS - last.leading_zeros()) + 1;
+    let o = (key % octaves) as u32;
+    let k = if o == 0 {
+        0
+    } else {
+        let low = 1usize << (o - 1);
+        let high = ((1usize << o) - 1).min(last);
+        low + (mix(seed, draw | 6 << 61) as usize) % (high - low + 1)
+    };
+    let frontier = q.len() + k;
+    let cut = (frontier + holonics::hnn::tower::field::NEAR).min(q.len() + room);
+    let classes = region_classes(codec, q, a, cut);
+    let unresolved: Vec<bool> = (0..cut).map(|t| t >= frontier).collect();
+    let heard = vec![false; cut];
+    TrainRegion { port: Some((frontier + 1, codec.void(), Vec::new(), true, None, Some(heard))), ..TrainRegion::plain(classes, unresolved) }
+}
+
+/// Whether the path states are prefixes in place order ([`prefix_region`]).
+pub(super) fn path_prefix() -> bool {
+    static PREFIX: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
+    *PREFIX.get_or_init(|| std::env::var_os("FIELD_PATH_PREFIX").is_some())
 }
 
 /// [`opening_region`] with b2's far share declared or not ([`path_far_keyed`]).
@@ -1580,6 +1622,92 @@ pub(super) fn reach_field(args: &[String], realization: &mut dyn FieldRealizatio
     Ok(())
 }
 
+/// [measurement; agent-inferred, November 6, the unified-theory reading of 00:58] **`order-field STATE STATE_SHA CODEC
+/// CODEC_SHA UNITS UNITS_SHA HELD HELD_SHA COUNT OUT`**: each order's writer's code of the first `COUNT` held answers, the
+/// truth's surprise summed over the states that order meets, each place read with what the order resolved before it (its
+/// excess over the truth's entropy is that joint's divergence, so the lower code marks the closer joint, no write drawn). In
+/// place order a state is the question and the answer's first `k` places, read at its frontier on the frontier's own class
+/// (the void where the answer ends), `k` from 0 to the end; in the writer's keyed octave order (its key the state's hash, as
+/// `length-field` draws) each place is read beside every place the order resolved before it, a void closing the places past
+/// it. Each region is cut `NEAR` places past its last resolved or read place (the silent room past it is heard only through the
+/// near field). Writes `ORDER.tsv` (problem, places, place-order code, keyed-order code on `2^(−20)` bits; private, of the held
+/// answers). A reading only.
+pub(super) fn order_field(args: &[String], realization: &mut dyn FieldRealization) -> Result<()> {
+    if args.len() != 11 {
+        return Err("order-field STATE STATE_SHA CODEC CODEC_SHA UNITS UNITS_SHA HELD HELD_SHA COUNT OUT".into());
+    }
+    let started = std::time::Instant::now();
+    let learner = FieldLearner::from_text(std::str::from_utf8(&pinned_read(&args[1], &args[2], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
+    let field = &learner.field;
+    let units = units_of(&args[5], &args[6])?;
+    let codec = FieldCodec::from_text(std::str::from_utf8(&pinned_read(&args[3], &args[4], CODEC_BUDGET)?)?, units)?;
+    let held = problems_of(&pinned_read(&args[7], &args[8], READ_BUDGET as usize)?);
+    let n = count(&args[9])?.min(held.len());
+    let out = Path::new(&args[10]);
+    std::fs::create_dir(out)?;
+    let seed = u64::from_str_radix(&args[2][..16], 16).map_err(|_| "a state hash that is not hexadecimal")?;
+    // The release's own key mix (`Field::release`), so the keyed order is the writer's.
+    let mix_key = |counter: u64| -> u64 {
+        let mut z = seed.wrapping_add(counter.wrapping_mul(0x9E37_79B9_7F4A_7C15));
+        z = (z ^ (z >> 30)).wrapping_mul(0xBF58_476D_1CE4_E5B9);
+        z = (z ^ (z >> 27)).wrapping_mul(0x94D0_49BB_1331_11EB);
+        z ^ (z >> 31)
+    };
+    let void = codec.void();
+    let near = holonics::hnn::tower::field::NEAR;
+    let mut rows = rows_file(&out.join("ORDER.tsv"), "problem\tplaces\tplace_code\tkeyed_code\n")?;
+    let (mut place_total, mut keyed_total, mut places_total) = (0i64, 0i64, 0usize);
+    for (k, (question, answer)) in held.iter().take(n).enumerate() {
+        let (q, room) = opening(&codec, field, question, b"")?;
+        let a = codec.encode(answer)?;
+        let end = a.len().min(room - 1);
+        let truth = |t: usize| -> usize { if t - q.len() < a.len() { a[t - q.len()] } else { void } };
+        // Each state: its classes, its open places, the place read and its true class.
+        let mut states: Vec<(Vec<usize>, Vec<bool>, usize, usize)> = Vec::new();
+        for j in 0..=end {
+            let frontier = q.len() + j;
+            let cut = (frontier + near).min(q.len() + room);
+            let classes: Vec<usize> = (0..cut).map(|t| if t < frontier { if t < q.len() { q[t] } else { a[t - q.len()] } } else { void }).collect();
+            let open: Vec<bool> = (0..cut).map(|t| t >= frontier).collect();
+            states.push((classes, open, frontier, truth(frontier)));
+        }
+        let place_states = states.len();
+        let mut order: Vec<usize> = (q.len()..q.len() + room).collect();
+        order.sort_by_key(|&t| (holonics::hnn::tower::field::octave_of(t + 1 - q.len()), mix_key(((k as u64) << 32) ^ t as u64 ^ (1 << 62)), t));
+        let mut resolved = vec![false; q.len() + room];
+        let mut last = q.len();
+        for &t in &order {
+            if resolved[t] {
+                continue;
+            }
+            let cut = (t.max(last) + near).min(q.len() + room);
+            let classes: Vec<usize> = (0..cut).map(|s| if s < q.len() { q[s] } else if resolved[s] { truth(s) } else { void }).collect();
+            let open: Vec<bool> = (0..cut).map(|s| s >= q.len() && !resolved[s]).collect();
+            states.push((classes, open, t, truth(t)));
+            resolved[t] = true;
+            last = last.max(t + 1);
+            if truth(t) == void {
+                for slot in &mut resolved[t + 1..] {
+                    *slot = true;
+                }
+            }
+        }
+        let mut codes = (0i64, 0i64);
+        for (c, chunk) in states.chunks(256).enumerate() {
+            let regions: Vec<Region> = chunk.iter().map(|(classes, open, _, _)| Region { classes, unresolved: open, faces: &[], locked: &[], echo: &[], domain: None, port: None }).collect();
+            let faces = realization.read_faces(field, &regions).map_err(|e| e.to_string())?;
+            for (i, ((_, _, at, class), f)) in chunk.iter().zip(&faces).enumerate() {
+                let code = f[*at].as_ref().ok_or("a read place with no face")?.code(*class);
+                if c * 256 + i < place_states { codes.0 += code } else { codes.1 += code }
+            }
+        }
+        row(&mut rows, &format!("{k}\t{}\t{}\t{}\n", end + 1, codes.0, codes.1))?;
+        (place_total, keyed_total, places_total) = (place_total + codes.0, keyed_total + codes.1, places_total + end + 1);
+    }
+    println!("FIELD_ORDER problems={n} places={places_total} place_bits_a_place={} keyed_bits_a_place={} ms={}", bits(place_total, places_total), bits(keyed_total, places_total), started.elapsed().as_millis());
+    Ok(())
+}
+
 /// [measurement; agent-inferred, November 5, §16.46] **`opening-field STATE STATE_SHA CODEC CODEC_SHA UNITS UNITS_SHA HELD
 /// HELD_SHA TRAIN TRAIN_SHA COUNT OUT`**: the void's mass across the writer's opening (the unified-theory reading of November
 /// 5, 07:16: the writer overruns its answers, and a byte drawn far out pins the answer at least that long). For each of the
@@ -2344,6 +2472,37 @@ mod tests {
             assert_eq!(regions[n], expected, "member {n}");
         }
         answers
+    }
+
+    /// [definition; the unified-theory reading of November 6, 00:58] **A path state in place order is a prefix compared at its
+    /// frontier**: the question and the first `k` answer places resolved to the truth, the frontier open and compared on its own
+    /// class (the void where the answer ends), the places past it open, in a port that hears none, the region `NEAR − 1` past
+    /// the frontier; every `k` from 0 to the answer's end is met, and none past it.
+    #[test]
+    fn a_prefix_state_is_compared_at_its_frontier() {
+        let (codec, problems) = toy();
+        let near = holonics::hnn::tower::field::NEAR;
+        let mut met = std::collections::BTreeSet::new();
+        for (i, (q, a, _)) in problems.iter().enumerate() {
+            for draw in 1..400u64 {
+                let state = prefix_region(&codec, q, a, 9 + i as u64, draw);
+                let frontier = (0..state.classes.len()).find(|&t| state.unresolved[t]).expect("a frontier");
+                let k = frontier - q.len();
+                assert!(k <= a.len(), "no frontier past the answer's end");
+                met.insert((i, k));
+                assert_eq!(&state.classes[..q.len()], &q[..]);
+                assert_eq!(&state.classes[q.len()..frontier], &a[..k], "the prefix is the truth");
+                assert_eq!(state.classes[frontier], if k < a.len() { a[k] } else { codec.void() }, "the frontier's own class");
+                assert!(state.unresolved[frontier..].iter().all(|&u| u), "the room past the frontier is open");
+                assert_eq!(state.classes.len(), (frontier + near).min(q.len() + codec.answer));
+                let Some((start, _, _, true, None, Some(heard))) = state.port.clone() else { panic!("the room past the frontier stands in a port") };
+                assert_eq!(start, frontier + 1);
+                assert!(heard.iter().all(|&h| !h), "the port hears none of its places");
+            }
+        }
+        for (i, (_, a, _)) in problems.iter().enumerate() {
+            assert!((0..=a.len()).all(|k| met.contains(&(i, k))), "problem {i}: every prefix met");
+        }
     }
 
     /// [definition; the unified-theory reading of November 5, 23:26] **b2's far share**: a path state with no resolved void

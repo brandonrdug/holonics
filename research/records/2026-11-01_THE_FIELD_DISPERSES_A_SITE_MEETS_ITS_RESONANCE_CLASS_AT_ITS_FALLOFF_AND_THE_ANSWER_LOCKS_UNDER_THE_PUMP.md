@@ -3827,3 +3827,19 @@ opening's void mass above code86's flat 0.09 at held, and higher at +128 than at
 correlation with held above +0.3 by lap 4. (1) failing: the far share was not the dilution, and b1's clock is next; (2) flat
 through lap 4: the end's share is too slow at content's rate; only (3) failing: the writes' ends read against their own
 closing fence. None raises the far weight.
+
+[definition; agent-inferred, November 6, the unified-theory reading of 00:58] **The writer's path in place order: a path state
+is a prefix compared at its frontier** (`prefix_region`, `FIELD_PATH_PREFIX`, declared against the octave path). One place a
+read in one order draws exactly the joint its faces make by the chain rule in that order; a run draws several places from one
+read, and refine walks faces that are no joint's, so neither is exact. A path state is the question and the answer's first `k`
+places resolved, compared at its frontier on the frontier's own class (its byte, or the void where the answer ends: content and
+boundary at once), the room past it silent, cut `NEAR − 1` places past the frontier (exact for the frontier's face) and held in
+a port that hears none of its places; `k` is drawn octave-uniform over `[0, len]`. One comparison a state is the place-order
+joint's own code, the end coded once an answer where the writer meets it, so the far share, the closing law and the near cut
+drop out of place order. Neither order was trained at its own states before: the content masks code the order-averaged joint,
+and the octave path states compared only the boundary. Place order, because keyed octaves draw early bytes beside blank
+neighbours (common bytes only, Brandon's read of 23:12). The writer then draws in place order one place a read with no refine
+pass. Its reading, `order-field`: each order's writer's code of held answers, the truth's surprise summed over the states that
+order meets (its excess over the truth's entropy is that joint's divergence), place order's prefixes against the writer's keyed
+octave order with the closing law. **Refutation, fixed before the run**: after a prefix segment, place order's held code at or
+above keyed order's on the same state. The trainer's test `a_prefix_state_is_compared_at_its_frontier`.

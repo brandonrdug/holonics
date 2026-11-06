@@ -893,7 +893,8 @@ pub(super) fn run_field_realized(args: &[String], realization: &mut dyn holonics
         Some("reach-field") => field_train::reach_field(args, realization),
         Some("opening-field") => field_train::opening_field(args, realization),
         Some("length-field") => field_train::length_field(args, realization),
-        _ => Err("a realized field command is train-field, sample-field, currents-field, expansion-field, restate-field, reach-field, opening-field or length-field".into()),
+        Some("order-field") => field_train::order_field(args, realization),
+        _ => Err("a realized field command is train-field, sample-field, currents-field, expansion-field, restate-field, reach-field, opening-field, length-field or order-field".into()),
     }
 }
 /// The field's card parity and timing (`field_parity`): `parity-field` reads the host's field
