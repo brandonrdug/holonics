@@ -1,0 +1,5 @@
+# order97 lock taken 02:22:29
+== code89 FIELD_ORDER problems=32 places=8792 place_bits_a_place=3.272 place_length_bits_a_place=0.015 place_content_bits_a_place=3.258 keyed_bits_a_place=3.962 masks_bits_a_place=3.614 masks_length_bits_a_place=0.036 lengths_unread=13 ms=37153 MEASURE lap=code89 rc=0 w
+== code86 FIELD_ORDER problems=32 places=8792 place_bits_a_place=3.100 place_length_bits_a_place=0.027 place_content_bits_a_place=3.072 keyed_bits_a_place=3.316 masks_bits_a_place=2.794 masks_length_bits_a_place=0.020 lengths_unread=17 ms=36870 MEASURE lap=code86 rc=0 w
+== code88 FIELD_ORDER problems=32 places=8792 place_bits_a_place=3.187 place_length_bits_a_place=0.018 place_content_bits_a_place=3.170 keyed_bits_a_place=4.451 masks_bits_a_place=2.983 masks_length_bits_a_place=0.034 lengths_unread=4 ms=35526 MEASURE lap=code88 rc=0 wa
+ORDER97 exit 02:24:20

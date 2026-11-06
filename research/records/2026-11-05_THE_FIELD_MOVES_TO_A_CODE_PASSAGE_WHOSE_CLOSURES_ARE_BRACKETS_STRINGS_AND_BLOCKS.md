@@ -262,3 +262,21 @@ its read is place order below code88's 3.363 at the same start and laps, and bol
 every-fourth read less the dependence of sites four apart. `order-field` now also codes the masks' own order (a keyed uniform
 order over the answer and its near tail, with the length's code from the opening's void masses read as `P(L ≤ t)`; an answer
 whose difference there is not positive is counted, its length unwritable by that joint).
+
+[measurement; agent-inferred] **The masks' joint is the closest on the mask-trained fields** (order96, order97; `order96.txt`,
+`order97.txt`). The order reading with the masks' own order and place order's code split on its own faces, bits a place over
+the first 32 held answers: code86 place 3.100 (length 0.027, content 3.072), keyed 3.316, the masks' content 2.794 with its
+length 0.020 (17 lengths unread: the opening gives the held length no mass); code88 place 3.187 (0.018, 3.170), keyed 4.451,
+masks 2.983 and 0.034 (4 unread). Neither opening holds a length: the read length codes sit at a uniform length over the room
+(about 11 bits an answer against `log₂` room 11.0; the truth's 9.6).
+
+[measurement; agent-inferred] **The place-order path makes place order the closest joint and slows content** (code89;
+`code89.txt`, `code89_launch.sh`). Three laps from code84's lap-0 state with prefix path states (`k` uniform, `domain`
+`len + 1`), 169 ms a section, the sampled parity equal: held context 2.882, 2.751, 2.606 (code85's 2.404, 2.124, 1.914), the
+withheld code 2.871, 2.720, 2.585; place order's code 3.272 (length 0.015, content 3.258) against the masks' content 3.614 and
+keyed 3.962, so place order writes by the reading fixed at 02:00, and it is below code88's 3.363 at the start; the masks' joint
+fell with the content. The opening's void mass 0.01 at every distance (no state meets the room). The place-order write (one
+place a read, no refine pass) against the reading fixed at 01:21: written over held 1.515 (fails 0.67 to 1.49 by a little), 6
+exact ```` ```python ```` openings (fails), entropy 4.42 bits and the space at 31.5% (fails), `y` 0.9% (passes); the correlation
++0.045, 5 of 28 fences closed, writes opening on runs of spaces. The keyed write passed its 900 s guard (incomplete). The prefix
+states, each standing for `len + 1` places, took about half the step from the content masks.
