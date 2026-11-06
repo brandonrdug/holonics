@@ -4088,7 +4088,9 @@ given held's lengths, 40 passes walked whole (495 s, 26,818 reads) read, a place
 `D` +1.467, `√C/n` 0.019, changes 0.594 against `K` 0.473; pass 10 `D` +0.809; pass 20 +0.469; passes 19–40 between +0.36 and
 +0.54, pass 40 `S` 1.862, `H` 1.456, `D` +0.407, changes 0.392 against `K` 0.360. `H` bottoms at 1.289 at pass 27 and rises as
 the faces flatten. At no pass do more than 4 of the 32 answers have `D ≤ √C`; each answer's settled drive is about four to five
-times its spread. So the faces are not one joint's conditionals and the walk keeps producing about 0.4 bits a place a pass: the
+times its spread. So the faces are not one joint's conditionals, and about 0.4 bits a place still drives each pass ([correction,
+theory, 19:09] `D` is a force on the write's temperature, not the walk's entropy production: at rest `E[D_i] = KL(μ_i‖p_i) +
+H(μ_i) − H(p_i)` with `μ_i` the walk's own conditional of the standing letter, zero when the faces are consistent): the
 consistency law is owed (theory: Kolmogorov's cycle condition on each two-place square). The rest law as first stated (`D ≤ √C`,
 or a fall of `D` within `√C`) stops every answer by pass 2 to 5 on its second clause, because an answer's pass-to-pass drive
 swings with its moving faces by more than the draw's spread `√C`; its write read space 0.145 and question identifiers 0.13.
