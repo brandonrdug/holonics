@@ -284,6 +284,9 @@ pub(super) fn region_lengths(codec: &FieldCodec, problems: &Problems, members: &
         })
         .collect();
     out.extend(paths.iter().zip(&draws).filter_map(|(&i, &d)| opening_region(codec, &problems[i].0, &problems[i].1, seed, d).map(|r| r.classes.len())));
+    if path_writer() {
+        out.extend(paths.iter().zip(&draws).filter_map(|(&i, &d)| writer_region(codec, &problems[i].0, &problems[i].1, seed, d).map(|r| r.classes.len())));
+    }
     out
 }
 
@@ -356,6 +359,64 @@ pub(super) fn path_opening() -> bool {
     *OPENING.get_or_init(|| std::env::var_os("FIELD_PATH_OPENING").is_some())
 }
 
+/// [definition; agent-inferred, November 6, the unified-theory reading of 06:50] **The writer's own state, given its end**
+/// (`FIELD_PATH_WRITER`, beside the opening): the one-end writer fixes its length at the release's first read and then
+/// sweeps given it, so every state it meets past that read is the question, the answer's places to its end with the first
+/// `k` of them in its order resolved, and the end's `NEAR` voids resolved, its region cut there ([`Field::sample_runs`] with
+/// `lengths`: the near tail of the read's region). This is that state on the truth: the answer's places ordered by octaves of
+/// their distance from the question, keyed within an octave and fresh each draw, as the writer releases them; `k` drawn so
+/// every octave of reads is met alike (`k = 0`, the state just past the end's draw, the first; then `[2^(o−1), 2^o)` within
+/// the answer, at least one place left open); every open place an answer port compared at its boundary at weight one.
+/// Why (the unified-theory reading of 06:50): with the opening as the only path state (code91) the writer's states past its
+/// first read left training, and the writer's own order code rose from 3.316 to 4.06 bits a place while the other orders'
+/// fell; the opening keeps the length and these keep the states the writer writes in. An answer with no place is no state.
+///
+/// [`holonics::hnn::tower::field::Field::sample_runs`]: the writer whose states these are.
+pub(super) fn writer_region(codec: &FieldCodec, q: &[usize], a: &[usize], seed: u64, draw: u64) -> Option<TrainRegion> {
+    let len = a.len().min(codec.answer);
+    if len == 0 {
+        return None;
+    }
+    let near = holonics::hnn::tower::field::NEAR;
+    let cut = (q.len() + len + near).min(q.len() + codec.answer);
+    let classes = region_classes(codec, q, &a[..len], cut);
+    let mut unresolved: Vec<bool> = (0..cut).map(|t| t >= q.len() && t < q.len() + len).collect();
+    let key = mix(seed, draw | 7 << 61);
+    // The places `k` may resolve and leave one open: `[0, len − 1]`, met by its octaves.
+    let most = len - 1;
+    let octaves = u64::from(usize::BITS - most.leading_zeros()) + 1;
+    let o = (key % octaves) as u32;
+    let k = if o == 0 {
+        0
+    } else {
+        let low = 1usize << (o - 1);
+        let high = ((1usize << o) - 1).min(most);
+        low + (mix(seed, draw | 15 << 60) as usize) % (high - low + 1)
+    };
+    let mut order: Vec<usize> = (q.len()..q.len() + len).collect();
+    order.sort_by_key(|&t| (holonics::hnn::tower::field::octave_of(t + 1 - q.len()), mix(key, t as u64), t));
+    for &t in &order[..k] {
+        unresolved[t] = false;
+    }
+    Some(TrainRegion { port: Some((q.len(), codec.void(), a[..len].to_vec(), true, None, None)), ..TrainRegion::plain(classes, unresolved) })
+}
+
+/// [definition; agent-inferred, November 6, the unified-theory reading of 06:50, E] **The opening's room is cut to its windows**
+/// (`FIELD_ROOM_CUT`): the fully masked path state computes the question, the stretch's first place and each heard place
+/// with `(NEAR − 1)·ticks` places on either side ([`holonics::hnn::tower::field::Region::window`]); its heard faces and its
+/// covector are the whole room's bit for bit (`a_cut_room_reads_and_returns_the_whole_rooms_bits`). The masks and the writer's
+/// states keep their room whole: their blanks sit between arrivals.
+pub(super) fn room_cut() -> bool {
+    static CUT: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
+    *CUT.get_or_init(|| std::env::var_os("FIELD_ROOM_CUT").is_some())
+}
+
+/// Whether each path problem also trains the writer's own state given its end ([`writer_region`]).
+pub(super) fn path_writer() -> bool {
+    static WRITER: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
+    *WRITER.get_or_init(|| std::env::var_os("FIELD_PATH_WRITER").is_some())
+}
+
 /// Whether the path states are prefixes in place order ([`prefix_region`]).
 pub(super) fn path_prefix() -> bool {
     static PREFIX: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
@@ -421,7 +482,9 @@ pub(super) fn opening_region_with(codec: &FieldCodec, q: &[usize], a: &[usize], 
     }
     // The answer's cells the region holds: past a cut region the answer goes on, so every place it holds is a letter's.
     let target = a[..a.len().min(classes.len() - q.len())].to_vec();
-    Some(TrainRegion { port: Some((q.len(), codec.void(), target, true, stop, heard)), ..TrainRegion::plain(classes, unresolved) })
+    // [E] The opening (no void resolved, every answer place silent) cuts its room to its heard places' windows, declared.
+    let window = room_cut() && voided.is_none() && heard.is_some() && k == 0;
+    Some(TrainRegion { port: Some((q.len(), codec.void(), target, true, stop, heard)), window, ..TrainRegion::plain(classes, unresolved) })
 }
 
 /// A training region: its classes, its unresolved sites, its carried faces and its locks (each
@@ -439,18 +502,20 @@ pub(super) struct TrainRegion {
     /// Its answer port (§16.24, [`Region::port`]): the first place, the void, the cells, and whether it is compared at
     /// its boundary (§16.47) rather than through its coupling.
     pub port: Option<(usize, usize, Vec<usize>, bool, Option<usize>, Option<Vec<bool>>)>,
+    /// Whether its port cuts the room to its windows ([`holonics::hnn::tower::field::Port::window`]).
+    pub window: bool,
 }
 
 impl TrainRegion {
     /// A region carrying no face and no lock.
     pub(super) fn plain(classes: Vec<usize>, unresolved: Vec<bool>) -> Self {
-        Self { classes, unresolved, faces: Vec::new(), locked: Vec::new(), echo: Vec::new(), domain: None, port: None }
+        Self { classes, unresolved, faces: Vec::new(), locked: Vec::new(), echo: Vec::new(), domain: None, port: None, window: false }
     }
 }
 
 /// A region as the field reads it.
 fn view_of(region: &TrainRegion) -> Region<'_> {
-    Region { classes: &region.classes, unresolved: &region.unresolved, faces: &region.faces, locked: &region.locked, echo: &region.echo, domain: region.domain, port: region.port.as_ref().map(|(start, void, target, boundary, stop, heard)| Port { start: *start, void: *void, target, boundary: *boundary, stop: *stop, heard: heard.as_deref() }) }
+    Region { classes: &region.classes, unresolved: &region.unresolved, faces: &region.faces, locked: &region.locked, echo: &region.echo, domain: region.domain, port: region.port.as_ref().map(|(start, void, target, boundary, stop, heard)| Port { start: *start, void: *void, target, boundary: *boundary, stop: *stop, heard: heard.as_deref(), window: region.window }) }
 }
 
 /// The regions as the field reads them.
@@ -468,7 +533,7 @@ pub(super) fn section_regions(codec: &FieldCodec, problems: &Problems, members: 
     if paths.len() != members.len() {
         return Err(format!("a section of {} members and {} paths", members.len(), paths.len()).into());
     }
-    let mut regions: Vec<TrainRegion> = Vec::with_capacity(2 * members.len());
+    let mut regions: Vec<TrainRegion> = Vec::with_capacity(3 * members.len());
     let mut draws = Vec::with_capacity(members.len());
     for &i in members {
         let (q, a, _) = &problems[i];
@@ -483,6 +548,10 @@ pub(super) fn section_regions(codec: &FieldCodec, problems: &Problems, members: 
     }
     // [§16.47] Beside the members' regions, a state of each path problem's writer's path, compared at its boundary.
     regions.extend(paths.iter().zip(&draws).filter_map(|(&i, &d)| opening_region(codec, &problems[i].0, &problems[i].1, seed, d)));
+    // [the unified-theory reading of November 6, 06:50] Then, declared, the writer's own state of each path problem given its end.
+    if path_writer() {
+        regions.extend(paths.iter().zip(&draws).filter_map(|(&i, &d)| writer_region(codec, &problems[i].0, &problems[i].1, seed, d)));
+    }
     let next = if learner.holds_step() { learner.read_step_on(&views_of(&regions), realization).map_err(|e| e.to_string())?.1 } else { None };
     Ok((regions, next))
 }
@@ -1865,6 +1934,37 @@ pub(super) fn masks_field(args: &[String], realization: &mut dyn FieldRealizatio
 
 /// [definition; agent-inferred, November 6] **`ring-field STATE STATE_SHA DEPTH OUT`**: the state with its last `DEPTH` turned
 /// ring sets made depth rings ([`Field::with_depth`]), their increments founded at zero, written to `OUT`.
+/// [measurement; agent-inferred, November 6, the unified-theory reading of 06:50, D] **`depth-field STATE STATE_SHA CODEC CODEC_SHA
+/// UNITS UNITS_SHA`**: each depth ring's located increment `r_h[u]` (its pace row on the class sheet, base zero) at the
+/// brackets `( ) [ ] { }`, beside the quotes, the newline, the space and a letter, with the row's largest magnitude over every
+/// class; `r` on its stored grain, the state's own integers. A reading of the constitution only: no face is read.
+pub(super) fn depth_field(args: &[String]) -> Result<()> {
+    if args.len() != 7 {
+        return Err("depth-field STATE STATE_SHA CODEC CODEC_SHA UNITS UNITS_SHA".into());
+    }
+    let learner = FieldLearner::from_text(std::str::from_utf8(&pinned_read(&args[1], &args[2], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
+    let units = units_of(&args[5], &args[6])?;
+    let codec = FieldCodec::from_text(std::str::from_utf8(&pinned_read(&args[3], &args[4], CODEC_BUDGET)?)?, units)?;
+    let (field, d) = (&learner.field, learner.field.declaration);
+    let width = d.alphabet + 1;
+    let bytes: &[u8] = b"()[]{}\"'\n a";
+    for (p, h) in (0..d.heads).filter(|&h| d.carries_moment(h)).enumerate() {
+        if !d.is_depth(h) {
+            continue;
+        }
+        let row = &field.theta[field.layout().pace + p * width..field.layout().pace + (p + 1) * width];
+        let read: Vec<String> = bytes
+            .iter()
+            .map(|&b| match codec.encode(&[b]) {
+                Ok(c) if c.len() == 1 => format!("{}={}", escaped(&[b]), row[c[0]]),
+                _ => format!("{}=-", escaped(&[b])),
+            })
+            .collect();
+        println!("FIELD_DEPTH head={h} {} largest={}", read.join(" "), row.iter().map(|v| v.unsigned_abs()).max().unwrap_or(0));
+    }
+    Ok(())
+}
+
 pub(super) fn ring_field(args: &[String]) -> Result<()> {
     if args.len() != 5 {
         return Err("ring-field STATE STATE_SHA DEPTH OUT".into());
@@ -2726,6 +2826,39 @@ mod tests {
             }
         }
         assert!(keyed > 0 && voided > 0, "keyed {keyed}, voided {voided}");
+    }
+
+    /// [definition; the unified-theory reading of November 6, 06:50] **The writer's own state given its end**: the question and
+    /// the answer's truth, the end's `NEAR` voids resolved and the region cut there, open places only within the answer and at
+    /// least one, the resolved ones the first `k` of the writer's order (octaves of distance, never a place of a later octave
+    /// before an earlier octave is whole), every octave of `k` met, compared at its boundary from the question on with weight one.
+    #[test]
+    fn a_writer_state_is_its_order_given_its_end() {
+        let (codec, problems) = toy();
+        let near = holonics::hnn::tower::field::NEAR;
+        let octave = holonics::hnn::tower::field::octave_of;
+        for (i, (q, a, _)) in problems.iter().enumerate() {
+            let mut met = std::collections::BTreeSet::new();
+            for draw in 1..400u64 {
+                let state = writer_region(&codec, q, a, 9 + i as u64, draw).expect("an answer with places has a state");
+                let end = q.len() + a.len();
+                assert_eq!(state.classes, region_classes(&codec, q, a, (end + near).min(q.len() + codec.answer)), "the truth, cut NEAR places past the end (within the room)");
+                assert!(state.unresolved[..q.len()].iter().all(|&u| !u) && state.unresolved[end..].iter().all(|&u| !u), "only answer places open");
+                let resolved: Vec<usize> = (q.len()..end).filter(|&t| !state.unresolved[t]).collect();
+                let k = resolved.len();
+                assert!(k < a.len(), "a place left open");
+                if let Some(far) = resolved.iter().map(|&t| octave(t + 1 - q.len())).max() {
+                    assert!((q.len()..end).filter(|&t| octave(t + 1 - q.len()) < far).all(|t| !state.unresolved[t]), "the earlier octaves resolved whole");
+                }
+                met.insert(if k == 0 { 0 } else { octave(k) + 1 });
+                let Some((start, void, target, true, None, None)) = state.port.clone() else { panic!("compared at its boundary, every place heard") };
+                assert_eq!((start, void, target), (q.len(), codec.void(), a.clone()));
+                assert_eq!(view_of(&state).weight(), (1, 1), "weight one");
+            }
+            let most = a.len() - 1;
+            let octaves = usize::BITS - most.leading_zeros() + 1;
+            assert_eq!(met.len(), octaves as usize, "problem {i}: every octave of k met");
+        }
     }
 
     /// A section's regions on the toy passage are the draws' (one a member), their lengths the projection's, and the

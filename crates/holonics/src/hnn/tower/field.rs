@@ -800,6 +800,10 @@ pub struct Port<'a> {
     /// covector, as one past the stop. A writer's state compares its front octave whole and, past it, one keyed place an
     /// octave (b2's far share), the places between read on the one-rate clock and not compared.
     pub heard: Option<&'a [bool]>,
+    /// [definition; agent-inferred, November 6, the unified-theory reading of 06:50, E] **The room is cut to its windows**
+    /// ([`Region::window`]): where set, a receiver's row is met only at the question's sites, the silent stretch's first
+    /// place and the places within `(NEAR − 1)·ticks` of a heard one; every other receiver meets no source that tick.
+    pub window: bool,
 }
 
 /// [definition; agent-inferred, November 3, §16.24] **A port's reading**: its coupling code on `2^(−20)` bits and each
@@ -874,6 +878,33 @@ fn boundary_reading(faces: &[(&[u128], u128)], port: &Port) -> Result<(Vec<Vec<i
 }
 
 impl Region<'_> {
+    /// [definition; agent-inferred, November 6, the unified-theory reading of 06:50, E] **The windows a cut room computes**
+    /// ([`Port::window`]): every site before the port, the silent stretch's first place ([`Field::silent_stretch`]) and each
+    /// heard open place, each with the `(NEAR − 1)·ticks` places on either side; none where the port does not cut its room.
+    /// Why exact (the unified-theory reading of 06:50): a silent place is no one's far source, so in one tick a receiver hears
+    /// past its near field only definite sources (the question, whole) and its crowds of them, and the near field and the
+    /// strand's pair contact carry a place's state at most `NEAR − 1` places a tick. A heard place's face after `ticks` ticks
+    /// therefore reads only its window, and a receiver outside every window reads, at worst, its window's edge, which is
+    /// `(NEAR − 1)·ticks` places from it; the stretch's clock past its first place runs at that place's rate (one passage), so
+    /// the clock at every far place is `τ_front + (t − front)κ` from a computed face. Backward, the covector of a heard face
+    /// reaches at most `(NEAR − 1)` places a tick, so it meets no receiver outside its window, and the clock's return reaches
+    /// the stretch's first place, whose window is computed. Not exact where blanks sit between arrivals (masks, writer
+    /// states), whose clocks read each blank's own face: those regions keep their room whole.
+    pub fn window(&self, ticks: usize) -> Option<Vec<bool>> {
+        let port = self.port.filter(|p| p.window)?;
+        let sites = self.classes.len();
+        let reach = (NEAR - 1) * ticks;
+        let mut out: Vec<bool> = (0..sites).map(|t| t < port.start).collect();
+        let stretch = Field::silent_stretch(self);
+        let centres = std::iter::once(stretch).chain((port.start..port.stop.unwrap_or(sites).min(sites)).filter(|&t| self.unresolved[t] && port.heard.is_none_or(|h| h[t])));
+        for c in centres.filter(|&c| c < sites) {
+            for slot in &mut out[c.saturating_sub(reach)..(c + reach + 1).min(sites)] {
+                *slot = true;
+            }
+        }
+        Some(out)
+    }
+
     /// [definition; agent-inferred, November 2, §16.23] **A state's weight in the joint code**, `(m, K)`: of the `m`
     /// sites of its domain `K` are open, so the region's code `Σ_open −log₂ p̂` read at `m/K` is an unbiased reading of
     /// the order-averaged joint code `E_σ L_σ` when `K` is uniform on `1..m` and the open set uniform given `K` (the
@@ -2123,7 +2154,8 @@ impl Field {
 
     /// One tick of the constitution over the region's faces `x` (`[t][D]`), its temporaries
     /// written to `cell`.
-    fn tick(&self, x: &mut [i64], definite: &[bool], keyed: &[bool], paces: &Paces, moment: &[i64], reaches: &Reaches, cell: &mut TickCell) -> Result<()> {
+    #[allow(clippy::too_many_arguments)]
+    fn tick(&self, x: &mut [i64], definite: &[bool], keyed: &[bool], paces: &Paces, moment: &[i64], reaches: &Reaches, window: Option<&[bool]>, cell: &mut TickCell) -> Result<()> {
         let d = &self.declaration;
         let (dw, m, n, f, heads) = (d.width, d.complex(), d.modes, d.contacts, d.heads);
         let m2 = 2 * m;
@@ -2262,6 +2294,12 @@ impl Field {
                 octave(((lists.off[2 * c + 1] - lists.off[2 * c]) as usize).max(1)) as i128
             };
             for i in 0..sites {
+                // [E] A receiver outside every window of a cut room meets no source this tick: its current is zero.
+                if window.is_some_and(|w| !w[i]) {
+                    cell.rows.push(Vec::new());
+                    cell.crowds.push(Vec::new());
+                    continue;
+                }
                 // Every receiver probes with its own probe word (§16.19), against each source's key.
                 let wi = &cell.pq[(h * sites + i) * span..(h * sites + i + 1) * span];
                 // The lock's temperature for this receiver's kind (§15.10).
@@ -2392,6 +2430,7 @@ impl Field {
         // [§16.44] The blanks run at the bare rate in the first tick, and each later tick at the faces the tick before
         // gave them, its clocks and moments read again.
         let blanks = !paces.kappa.is_empty() && (0..sites).any(|t| Self::silent(region, t));
+        let window = region.window(d.ticks);
         let mut clock: Option<Box<TickClock>> = None;
         for k in 0..d.ticks {
             if let Some(s) = self.scale.as_deref().filter(|s| s.split == k) {
@@ -2400,7 +2439,7 @@ impl Field {
             let own = clock.take();
             let (tick_paces, tick_moment) = own.as_ref().map_or((&paces, &moment), |c| (&c.paces, &c.moment));
             let mut cell = TickCell::default();
-            self.tick(&mut x, &definite, &keyed, tick_paces, tick_moment, &reaches, &mut cell)?;
+            self.tick(&mut x, &definite, &keyed, tick_paces, tick_moment, &reaches, window.as_deref(), &mut cell)?;
             cell.clock = own;
             if blanks && k + 1 < d.ticks {
                 let reads = (0..sites).map(|t| Self::silent(region, t).then(|| self.face_of(&x[t * dw..(t + 1) * dw], &reaches)).transpose()).collect::<Result<Vec<_>>>()?;
@@ -3492,8 +3531,15 @@ impl Field {
         // the release's first read (every answer place open, training's fully masked state) a place `d` is the void exactly when
         // the answer is shorter than `d`, so its void mass is the field's `P(L < d | q)`, the length's distribution; the end is
         // one uniform `u` against that profile, the answer's length the places before the first whose void mass passes `u` (an
-        // exact integer comparison, `m_∅ 2^32 > u T`), and the sweeps then write given it. One `u`, not one draw a place:
-        // independent draws multiply survivals, and the earliest void drawn is not the profile's draw.
+        // exact integer comparison), and the sweeps then write given it. One `u`, not one draw a place: independent draws
+        // multiply survivals, and the earliest void drawn is not the profile's draw.
+        //
+        // [definition; agent-inferred, November 6, the unified-theory reading of 07:21] **The draw is conditioned on the room**:
+        // the answer ends within it, so `P(L ≤ t | L ≤ R) = M(t)/M(R)`, `M` the running maximum of the void mass and `R` the
+        // room's last place; the end is the first place whose void mass passes `u M(R)`, read as `m_∅(t) T_R 2^32 > u m_R T_t`
+        // on 256-bit products (`m_R/T_R` the profile's largest void mass). Why: unconditioned, every `u` above the void mass at the
+        // room's last place landed there, so the opening's shortfall from one was drawn as length (code91: about 22 places of
+        // letter mass past 1,200 on held and training alike, where the length law holds under one).
         let drawn_lengths: Option<Vec<usize>> = if one_end && lengths.is_none() {
             let active: Vec<usize> = (0..problems.len()).collect();
             let faces = self.read_active(&starts, &classes, &open, &active, void, near_tail, realization)?;
@@ -3503,7 +3549,8 @@ impl Field {
                     .enumerate()
                     .map(|(k, &(q, n))| {
                         let u = mix(((k as u64) << 40) ^ 0x0E4D) as u32 as u128;
-                        (0..n).find(|&j| faces[k][q.len() + j].as_ref().is_some_and(|f| (f.masses[void] << 32) > u * f.total)).unwrap_or(n)
+                        let room: Vec<Option<&TowerFace>> = (0..n).map(|j| faces[k][q.len() + j].as_ref()).collect();
+                        one_end_length(&room, void, u)
                     })
                     .collect(),
             )
@@ -4883,6 +4930,17 @@ pub use scale::Scale;
 mod tests;
 
 /// [definition; §16.47] The octave of a distance `d ≥ 1` from the question: `⌊log₂ d⌋`, so octave `j` holds `[2^j, 2^(j+1))`.
+/// [definition; agent-inferred, November 6, the unified-theory reading of 07:21] **One end, one draw, conditioned on the room**
+/// ([`Field::sample_runs`] with `one_end`): `room`'s faces at the release's first read, place by place, and `u` on `2^(−32)`; the
+/// length is the places before the first whose void mass passes `u M(R)`, `M(R)` the largest void mass over the room (the
+/// running maximum's last value), read exactly as `m_∅(t) T_R 2^32 > u m_R T_t` on 256-bit products; the room's extent where
+/// none passes (none where no place carries void mass).
+pub fn one_end_length(room: &[Option<&TowerFace>], void: usize, u: u128) -> usize {
+    let wide = crate::compression::landmark::context::wide_mul;
+    let Some(top) = room.iter().flatten().copied().reduce(|a, b| if wide(b.masses[void], a.total) > wide(a.masses[void], b.total) { b } else { a }) else { return room.len() };
+    room.iter().position(|f| f.is_some_and(|f| wide(f.masses[void] << 32, top.total) > wide(u * top.masses[void], f.total))).unwrap_or(room.len())
+}
+
 pub fn octave_of(d: usize) -> u32 {
     usize::BITS - 1 - d.leading_zeros()
 }

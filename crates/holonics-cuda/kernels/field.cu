@@ -308,6 +308,8 @@ struct FieldWords {
     const uint8_t *unresolved;
     // A definite site: known (resolved and carrying no mixture) or locked (a foil, §14.1).
     const uint8_t *definite;
+    // [E] Each site's row computed (the host's `Region::window`); null where no region of the batch cuts its room.
+    const uint8_t *computed;
     // The carried mixtures: site `t`'s shares are `mix_class`, `mix_share` over `mix_off[t]..mix_off[t + 1]`
     // (none where the site is not carried).
     const uint32_t *mix_off;
@@ -481,6 +483,12 @@ __device__ __forceinline__ bool known_site(const FieldWords &w, uint64_t g) {
 
 // A definite site (§14.1): known, or locked (a foil). Only definite sources are heard past the near
 // field, and each class lists its definite members first.
+// [E] A receiver outside every window of a cut room meets no source: its row is not met, its current is zero and it returns
+// nothing (the host's `Field::tick`).
+__device__ __forceinline__ bool skipped_row(const FieldWords &w, uint64_t g) {
+    return w.computed != nullptr && w.computed[g] == 0;
+}
+
 __device__ __forceinline__ bool definite_site(const FieldWords &w, uint64_t g) {
     return w.definite[g] != 0;
 }
@@ -1854,6 +1862,9 @@ extern "C" __global__ void __launch_bounds__(CONTACT_ROWS * 32, 8) field_exposur
     for (uint64_t hg = ((uint64_t)blockIdx.x * blockDim.x + threadIdx.x) >> 5; hg < rows; hg += (uint64_t)gridDim.x * (blockDim.x >> 5)) {
         const uint32_t h = hg / w.T;
         const uint64_t g = hg % w.T;
+        if (skipped_row(w, g)) {
+            continue;
+        }
         const uint32_t r = w.site_region[g];
         const uint64_t first = w.region_off[r];
         const uint32_t sites = w.region_off[r + 1] - (uint32_t)first, i = w.site_pos[g];
@@ -2012,6 +2023,14 @@ __device__ void contact_body(const FieldWords &w, uint32_t store) {
     for (uint64_t hg = ((uint64_t)blockIdx.x * blockDim.x + threadIdx.x) >> 5; hg < rows; hg += (uint64_t)gridDim.x * (blockDim.x >> 5)) {
         const uint32_t h = hg / w.T;
         const uint64_t g = hg % w.T;
+        if (skipped_row(w, g)) {
+            if (lane < n) {
+                const uint32_t mc = h * n + lane;
+                w.y[g * w.M2 + mc] = 0;
+                w.y[g * w.M2 + w.M + mc] = 0;
+            }
+            continue;
+        }
         const uint32_t r = w.site_region[g];
         const uint64_t first = w.region_off[r];
         const uint32_t sites = w.region_off[r + 1] - (uint32_t)first, i = w.site_pos[g];
@@ -2886,6 +2905,15 @@ extern "C" __global__ void __launch_bounds__(REV_ROWS * 32, 6) field_contact_row
     const uint64_t rows1 = (uint64_t)w.T + w.R;
     for (uint64_t g = ((uint64_t)blockIdx.x * blockDim.x + threadIdx.x) >> 5; g < w.T; g += (uint64_t)gridDim.x * (blockDim.x >> 5)) {
         const uint64_t hg = (uint64_t)h * w.T + g;
+        if (skipped_row(w, g)) {
+            if (lane < S) {
+                const uint32_t mc = h * n + lane % n;
+                const uint64_t slot = g * w.M2 + (lane < n ? mc : w.M + mc);
+                w.dp[slot] = 0;
+                dq[slot] = 0;
+            }
+            continue;
+        }
         const uint32_t r = w.site_region[g];
         const uint32_t i = w.site_pos[g];
         const uint64_t first = w.region_off[r];
@@ -3136,7 +3164,7 @@ extern "C" __global__ void __launch_bounds__(CONTACT_ROWS * 32) field_contact_co
         if (part < parts) {
             for (uint32_t k = part; k < K; k += parts) {
                 const uint32_t i = receiver_at(members, off, pmem, poff, olist, c, j, sites, k);
-                if (i == UINT32_MAX) {
+                if (i == UINT32_MAX || skipped_row(w, first + i)) {
                     continue;
                 }
                 const uint64_t at = (uint64_t)i * sites;

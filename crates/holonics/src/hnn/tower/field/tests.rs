@@ -220,7 +220,7 @@ fn covector_matches_the_codes_difference() {
     // resolved (a state of the writer's path).
     const PORTED: [bool; 7] = [false, true, false, false, true, true, true];
     const PATH: [bool; 7] = [false, true, false, false, true, false, true];
-    let port = Port { start: 4, void: 0, target: &[2, 3], boundary: false, stop: None, heard: None };
+    let port = Port { start: 4, void: 0, target: &[2, 3], boundary: false, stop: None, heard: None, window: false };
     let bounded = Port { boundary: true, ..port };
     // [the depth rings, November 6] And with a depth ring among the turned sets (its rate the located increment alone, no
     // skin, no moment).
@@ -1239,7 +1239,7 @@ fn a_port_is_read_through_its_coupling() {
     let field = shaped(1);
     const PORTED: [bool; 7] = [false, true, false, false, true, true, true];
     let target = [2usize, 3];
-    let r = Region { classes: &CLASSES, unresolved: &PORTED, faces: &[], locked: &[], echo: &[], domain: None, port: Some(Port { start: 4, void: 0, target: &target, boundary: false, stop: None, heard: None }) };
+    let r = Region { classes: &CLASSES, unresolved: &PORTED, faces: &[], locked: &[], echo: &[], domain: None, port: Some(Port { start: 4, void: 0, target: &target, boundary: false, stop: None, heard: None, window: false }) };
     let faces = field.faces(&r).unwrap();
     let place = faces[1].as_ref().unwrap().code(CLASSES[1]);
     let at: Vec<(&[u128], u128)> = faces[4..].iter().map(|f| { let f = f.as_ref().unwrap(); (f.masses.as_slice(), f.total) }).collect();
@@ -1259,7 +1259,7 @@ fn a_port_at_its_boundary_codes_only_the_end() {
     let field = shaped(1);
     const PORTED: [bool; 7] = [false, true, false, false, true, true, true];
     let target = [2usize, 3];
-    let port = Port { start: 4, void: 0, target: &target, boundary: true, stop: None, heard: None };
+    let port = Port { start: 4, void: 0, target: &target, boundary: true, stop: None, heard: None, window: false };
     let r = Region { classes: &CLASSES, unresolved: &PORTED, faces: &[], locked: &[], echo: &[], domain: None, port: Some(port) };
     let faces = field.faces(&r).unwrap();
     let at: Vec<(&[u128], u128)> = faces[4..].iter().map(|f| { let f = f.as_ref().unwrap(); (f.masses.as_slice(), f.total) }).collect();
@@ -1440,6 +1440,57 @@ fn the_room_past_the_front_is_heard_only_through_the_near_field() {
     }
 }
 
+/// [definition; the unified-theory reading of November 6, 06:50, E] **A cut room reads and returns the whole room's bits**: the
+/// opening (the question resolved, every answer place silent) compared at its boundary at a few heard places, the front and
+/// far ones, with its room cut to their windows ([`Port::window`]), reads every tick's state at each heard place, each heard
+/// face, the port's code and the whole covector (the clock's among it) bit for bit as the whole room does, and meets fewer
+/// pairs.
+#[test]
+fn a_cut_room_reads_and_returns_the_whole_rooms_bits() {
+    for still in [0usize, 1, 2] {
+        for ticks in [2usize, 4] {
+            let field = shaped_with(FieldDeclaration { reach: 400, ticks, ..tiny_declaration(still) });
+            let dw = field.declaration.width;
+            let q = [1usize, 4, 0, 2, 3, 1];
+            let sites = field.declaration.reach;
+            let mut classes: Vec<usize> = q.to_vec();
+            classes.resize(sites, 0);
+            let open: Vec<bool> = (0..sites).map(|t| t >= q.len()).collect();
+            let target = [3usize, 1, 2, 4, 1, 3, 2, 1, 4, 2, 3];
+            // The front octave and one far place an octave, as the opening hears them.
+            let heard: Vec<bool> = (0..sites).map(|t| [0usize, 1, 2, 5, 13, 22, 47, 90, 200, 330].iter().any(|&d| t == q.len() + d)).collect();
+            let region = |window: bool| Region {
+                classes: &classes,
+                unresolved: &open,
+                faces: &[],
+                locked: &[],
+                echo: &[],
+                domain: None,
+                port: Some(Port { start: q.len(), void: 0, target: &target, boundary: true, stop: None, heard: Some(&heard), window }),
+            };
+            let (whole, cut) = (region(false), region(true));
+            let kept = cut.window(ticks).unwrap();
+            assert!(kept.iter().filter(|&&k| !k).count() > sites / 3, "still {still} ticks {ticks}: the cut leaves a room out");
+            let (wr, cr) = (field.tick_reads(&whole).unwrap(), field.tick_reads(&cut).unwrap());
+            let (wf, cf) = (field.faces(&whole).unwrap(), field.faces(&cut).unwrap());
+            for t in (0..sites).filter(|&t| heard[t]) {
+                for (k, (a, b)) in wr.iter().zip(&cr).enumerate() {
+                    assert_eq!(a.read[t * dw..(t + 1) * dw], b.read[t * dw..(t + 1) * dw], "still {still} ticks {ticks}: place {t} at tick {k}");
+                    assert_eq!(a.pair_read[t * dw..(t + 1) * dw], b.pair_read[t * dw..(t + 1) * dw], "still {still} ticks {ticks}: place {t}'s pair read at tick {k}");
+                }
+                assert_eq!(wf[t], cf[t], "still {still} ticks {ticks}: place {t}'s face");
+            }
+            assert_eq!(field.code(&whole).unwrap(), field.code(&cut).unwrap(), "still {still} ticks {ticks}: the port's code");
+            let (_, gw) = field.read_and_return(&[whole]).unwrap();
+            let (_, gc) = field.read_and_return(&[cut]).unwrap();
+            let unequal = gw.iter().zip(&gc).filter(|(a, b)| a != b).count();
+            assert_eq!(unequal, 0, "still {still} ticks {ticks}: the covector");
+            assert!(gw.iter().any(|&v| v != 0), "still {still} ticks {ticks}: a covector to compare");
+            assert!(field.met_pairs(&cut).unwrap() < field.met_pairs(&whole).unwrap(), "still {still} ticks {ticks}: the cut meets fewer pairs");
+        }
+    }
+}
+
 /// [definition; §16.47] **A read releases a run**: with no bound the runs are the one place a read's writer, the same bits;
 /// with a bound of a bit the writer reads no more often, and its answers keep the closing law at every read, no letter at a
 /// later octave while an earlier one is open, and a boundary that moves at most one place a read in the refine passes.
@@ -1530,6 +1581,33 @@ fn a_void_never_unwrites_a_letter() {
 /// [definition; the unified-theory reading of November 6, 03:08] **A given length is kept**: with each answer's length given,
 /// every write holds exactly that many letters and the void past them, in the sweeps and through the refine passes, in runs and
 /// one place a read.
+/// [definition; the unified-theory reading of November 6, 07:21] **One end, one draw, conditioned on the room**: a profile whose
+/// void mass rises to one half draws every `u` within the room (unconditioned, a `u` above one half ran to the room's end), the
+/// end at the first place past `u` of the largest void mass, exactly; a profile of totals that differ reads its shares, not its
+/// masses; no void mass anywhere is the room's extent.
+#[test]
+fn one_end_is_drawn_within_the_room() {
+    let face = |void: u128, total: u128| TowerFace { masses: vec![void, total - void], total };
+    let one = 1u128 << 62;
+    // Void shares 0, 1/8, 1/4, 3/8, 1/2, 1/2 over six places.
+    let profile: Vec<TowerFace> = [0u128, 1, 2, 3, 4, 4].iter().map(|&e| face(e * one / 8, one)).collect();
+    let room: Vec<Option<&TowerFace>> = profile.iter().map(Some).collect();
+    // `u` in hundredths of one, on `2^(−32)`.
+    let u = |hundredths: u128| hundredths * (1u128 << 32) / 100;
+    let at = |hundredths: u128| one_end_length(&room, 0, u(hundredths));
+    assert_eq!(at(0), 1, "the first place with any void mass");
+    assert_eq!(at(30), 2, "a void share of 1/4 passes 0.3 of 1/2");
+    assert_eq!(at(70), 3, "3/8 passes 0.7 of 1/2");
+    assert_eq!(at(99), 4, "a u near one ends where the profile reaches its largest, within the room");
+    // Shares, not masses: the same profile on a doubled total at one place.
+    let mut doubled: Vec<TowerFace> = profile.iter().map(|f| face(f.masses[0], f.total)).collect();
+    doubled[2] = face(2 * one / 8, 2 * one);
+    let room2: Vec<Option<&TowerFace>> = doubled.iter().map(Some).collect();
+    assert_eq!(one_end_length(&room2, 0, u(30)), 3, "1/8 at place 2 no longer passes 0.3 of 1/2");
+    let silent: Vec<TowerFace> = (0..4).map(|_| face(0, one)).collect();
+    assert_eq!(one_end_length(&silent.iter().map(Some).collect::<Vec<_>>(), 0, 1 << 31), 4, "no void mass: the room's extent");
+}
+
 #[test]
 fn a_given_length_is_kept() {
     let field = shaped(1);

@@ -3903,3 +3903,50 @@ carry `ζ^E[r]` at modulus one; a place read as a closer would turn its own fram
 turn each unwritten place by its distance times an expected increment (phantom depth), and the face's return would train the
 guesses to serve the ring. The ring is exact on what arrived; an unwritten unbalanced hole is what the resolved-between split
 reads, and `E[ζ^r]` as a face-keyed skin is the general form, later.
+
+[definition; agent-inferred, November 6, the unified-theory reading of 06:50] **The writer's own state, given its end**
+(`FIELD_PATH_WRITER`, `writer_region`, beside the opening). Since `38bdbc64` every path state drew `k = 0`, so the states the
+writer meets past its first read left training, and the writer's keyed order code rose from code86's 3.316 to code91's 4.06
+bits a place while the other orders fell. The one-end writer fixes its length at the first read and sweeps given it, so each
+state it meets afterwards has the same shape: the question, the answer's places to its end with the first `k` resolved in
+its order (octaves of distance, keyed within an octave), and the end's `NEAR` voids resolved, the region cut there. Training
+now forms that state on the truth for each path problem, beside the opening: `k` is met by its octaves (`k = 0`, then
+`[2^(o−1), 2^o)` within the answer, one place left open), every open place is compared at its boundary, and the weight is one.
+The regions are short, and the field and card are unchanged. The trainer test `a_writer_state_is_its_order_given_its_end`
+covers it. **Fixed at the long run's 2 h** (theory, 06:50 and 07:15), on writes of the keyed sweeps given every held answer's
+own length: openings and fences at least foil2's own, the space at least 14%, held context at most foil2's last (1.319) plus
+0.05, the opening's length code at most 9.6 bits with at most 4 unread. The one-end write is read, not judged.
+
+[definition; agent-inferred, November 6, the unified-theory reading of 07:21] **The one-end draw is conditioned on the room**
+(`one_end_length`). An answer ends within the room, so `P(L ≤ t | L ≤ R) = M(t)/M(R)`, with `M` the running maximum of the
+first read's void mass and `R` the room's last place. The single `u` is read against `u M(R)` as an exact comparison on
+256-bit products (`wide_mul`, Lean `BinaryLog.wideMul_eq`). Unconditioned, every `u` above the void mass at the room's last
+place landed there. The field test `one_end_is_drawn_within_the_room` covers it. **Its fixed read** (theory's blind: under 8
+places past 1,200 on both sets), on code91's opening profiles, gives the expected letter mass past each answer's end over the
+bands 0–127, 128–511, 512–1,199 and 1,200 to the room's end, conditioned against plain. seg2 HELD128: 58.6, 74.2, 34.0, 17.9
+against 59.1, 75.8, 38.0, 22.8. seg2 TRAIN: 54.6, 57.6, 20.4, 15.3 against 55.0, 58.8, 23.1, 21.2. Past 1,200 the length law
+holds under one place on both sets. The blind fails: conditioning removes about 5 places past 1,200, and 15 to 18 remain. So
+the far faces themselves are short of the void, and that is a training question. The opening compares one keyed place an
+octave, and octaves 10 and 11 hold the 840 places past 1,200, so a state compares two of them.
+
+[definition; agent-inferred, November 6, the unified-theory reading of 06:50, E] **The opening's room is cut to its windows**
+(`FIELD_ROOM_CUT`, `Port::window`, `Region::window`; the card's `computed` and `skipped_row`). The cut keeps every site at
+its place and skips the rows of every receiver outside the windows, so each distance term (the pair and octave decays, the
+crowd spans, the clocks) is the room's own. The windows are the question, the silent stretch's first place, and each heard
+place with `(NEAR − 1)·ticks` places on either side. A receiver outside them meets no source that tick, takes a zero current,
+and on the card returns nothing (its probe and key covectors zero, and it is passed over among a source's receivers). The
+reasons it is exact: a silent place is no one's far source, the near field and the strand's pair contact carry state at most
+`NEAR − 1` places a tick, and past the stretch's first place the clock runs at that place's rate, which is computed. The host
+test `a_cut_room_reads_and_returns_the_whole_rooms_bits` checks every tick's chart and pair chart at each heard place, each
+heard face, the port's code and the whole covector bit for bit against the whole room. It runs at ticks 2 and 4, with still
+heads 0, 1 and 2, and the cut meets fewer pairs. The cut is not exact where blanks sit between arrivals, whose clocks read
+each blank's own face, so the masks and the writer's states keep their room whole. It joins a run only after its card
+parity, at a segment boundary.
+
+[measurement; November 6, the unified-theory reading of 06:50, D] **The depth ring's located increments** (`depth-field`;
+head 3, on `2^(−24)`). RING.0 (`r = 0`) is zero at every class by construction. The conversion with `r` held at zero was not
+run, so RING.0 is the only control. At ring1's end (4 laps): `(` +0.0076, `)` +0.2021, `[` +0.0685, `]` −0.0845, `{` +0.3804,
+`}` +0.3534, `'` +0.578 (the row's largest), the space +0.187, the newline +0.116. At ring2's end (8 laps): `(` +0.426, `)`
++0.753, `[` +0.197, `]` +0.145, `{` +0.320, `}` +0.417, the newline +0.432. Matching needs `r(open) = −r(close)`. The matched
+sums are `( )` +0.21, `[ ]` −0.016 and `{ }` +0.73 at ring1, and +1.18, +0.34 and +0.74 at ring2. Every class drifts positive,
+so the ring located a clock rate, not depth, and ring1's bracket gain was not the ring's.

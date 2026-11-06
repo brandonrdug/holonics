@@ -143,6 +143,9 @@ struct Words {
     classes: u64,
     unresolved: u64,
     definite: u64,
+    // [E] Each site's row computed where its region's room is cut to its windows (`Region::window`); none where no region of
+    // the batch is cut.
+    computed: u64,
     mix_off: u64,
     mix_class: u64,
     mix_share: u64,
@@ -1169,7 +1172,7 @@ impl<'c> CardField<'c> {
 
     /// A batch's site and region tables uploaded in one transfer, its status word and its faces' buffer, and the words
     /// that read them (the host's tables kept beside them for the reverse and the readings).
-    fn stage(&self, regions: &[Region], a: usize, dw: usize, words: &mut Words) -> Result<Staged<'c>> {
+    fn stage(&self, regions: &[Region], a: usize, dw: usize, ticks: usize, words: &mut Words) -> Result<Staged<'c>> {
         // The batch's sites, region by region, and the carried mixtures as one list a site.
         let mut site_region = Vec::new();
         let mut site_pos = Vec::new();
@@ -1184,6 +1187,9 @@ impl<'c> CardField<'c> {
         let (mut mix_off, mut mix_class, mut mix_share) = (vec![0u32], Vec::new(), Vec::new());
         let mut pairs = 0usize;
         let any_echo = regions.iter().any(|r| r.echo.iter().any(Option::is_some));
+        // [E] The cut rooms' windows, each site's row computed or not (every site of an uncut region).
+        let windows: Vec<Option<Vec<bool>>> = regions.iter().map(|r| r.window(ticks)).collect();
+        let computed: Vec<u8> = if windows.iter().any(Option::is_some) { regions.iter().zip(&windows).flat_map(|(r, w)| (0..r.classes.len()).map(move |t| u8::from(w.as_ref().is_none_or(|w| w[t])))).collect() } else { Vec::new() };
         // Each region's definite sites and its open ones, by place (§15.9: an open receiver hears every definite
         // site, and a definite source is heard by every open one).
         let (mut dlist, mut dstart, mut olist, mut ostart) = (Vec::<u32>::new(), Vec::<u32>::new(), Vec::<u32>::new(), Vec::<u32>::new());
@@ -1256,6 +1262,7 @@ impl<'c> CardField<'c> {
         let classes_at = pack.put(&classes);
         let unresolved_at = pack.put(&unresolved);
         let definite_at = pack.put(&definite);
+        let computed_at = (!computed.is_empty()).then(|| pack.put(&computed));
         let echo_has_at = pack.put(&echo_has);
         let echo_b_at = pack.put(&echo_b);
         let echo_logits_at = pack.put(&echo_logits);
@@ -1277,6 +1284,7 @@ impl<'c> CardField<'c> {
         words.classes = base + classes_at;
         words.unresolved = base + unresolved_at;
         words.definite = base + definite_at;
+        words.computed = computed_at.map_or(0, |at| base + at);
         words.echo_has = base + echo_has_at;
         words.echo_b = base + echo_b_at;
         words.echo_logits = base + echo_logits_at;
@@ -1402,7 +1410,7 @@ impl<'c> CardField<'c> {
             owned.push((vec![0usize; packets], unres, faces));
         }
         let pregions: Vec<Region> = owned.iter().map(|(c, u, f)| Region { classes: c, unresolved: u, faces: if f.iter().any(Option::is_some) { f } else { &[] }, locked: &[], echo: &[], domain: None, port: None }).collect();
-        let st = self.stage(&pregions, cd.alphabet, cd.width, &mut tr.cwords)?;
+        let st = self.stage(&pregions, cd.alphabet, cd.width, cd.ticks, &mut tr.cwords)?;
         let (sites, m2, n) = (st.sites, 2 * cd.complex(), cd.modes);
         let ticks: Vec<Tick> = (0..if kept { cd.ticks } else { 1 }).map(|_| self.tick(sites, st.pairs, regions, coarse, stored, returning)).collect::<Result<_>>()?;
         let trips = self.timed(Kind::Alloc, || self.take_zeroed::<i128>(sites.max(1))).map_err(device)?;
@@ -1513,7 +1521,7 @@ impl<'c> CardField<'c> {
         let (dw, m, n, f, a, heads) = (d.width, d.complex(), d.modes, d.contacts, d.alphabet, d.heads);
         let m2 = 2 * m;
         let span = 2 * n;
-        let st = self.stage(regions, a, dw, words)?;
+        let st = self.stage(regions, a, dw, d.ticks, words)?;
         let (sites, pairs) = (st.sites, st.pairs);
         let (site_region, site_pos, region_off, classes, unresolved, definite) = (&st.site_region, &st.site_pos, &st.region_off, &st.classes, &st.unresolved, &st.definite);
         let (echo_has, mix_off, mix_class, mix_share, site_weight) = (&st.echo_has, &st.mix_off, &st.mix_class, &st.mix_share, &st.site_weight);

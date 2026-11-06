@@ -180,7 +180,7 @@ impl Field {
         let reaches = s.coarse.reaches();
         for _ in 0..s.coarse.declaration.ticks {
             let mut cell = TickCell::default();
-            s.coarse.tick(&mut x1, &out.definite, &keyed1, &out.paces, &moment, &reaches, &mut cell)?;
+            s.coarse.tick(&mut x1, &out.definite, &keyed1, &out.paces, &moment, &reaches, None, &mut cell)?;
             if keep {
                 out.ticks.push(cell);
             }
