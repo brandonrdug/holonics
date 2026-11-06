@@ -4173,16 +4173,17 @@ almost no mass on a cross face read `|l|` in the tens of bits, and its pull's fa
 `w/(n_p/4)` is now bounded by one, as a compared place's covector entry is (`|p − e| ≤ 1`), with the two scaled alike so that the
 pull keeps no radial part [agent-inferred]. Receipts: `longrun_nov6/squares125.txt`.
 
-[measurement; November 6, squares126; the unified-theory reading of 21:01] **Bounded, the turn law reaches only a fast mode, so
-the next law is structural.** squares125's law with the bound, one lap from lap 24 at rate 13. Its cost read (107 sections) read
+[measurement; November 6, squares126; the unified-theory reading of 21:01] **Bounded, the turn law reaches only a fast mode.** squares125's law with the bound, one lap from lap 24 at rate 13. Its cost read (107 sections) read
 held context 1.1915 and d = 1 κ 0.506. Its lap was killed at its 293rd section by the desktop app's crash (no state is written
 before a segment's end) and ran again unchanged in its own process scope. The lap took 1,842 s against its 2,407 s bound (0.77),
 1,199 ms a section. Held context went from 1.1877 to 1.1911 and unseen from 1.120 to 1.124. The trained squares' `|l|` read 1.157,
 1.147, 1.147 and 1.191 by quarter of the lap, so it was flat. The curl on held truth read curl/λ 1.13, 1.35, 1.73, 1.34 and 1.67 by
 band. At d = 1 that is λ's spread 3.48, power 32.05 and κ 0.485, against lap 24's 1.20 and 34.1.
 - Theory's fixed reading: κ at lap end ≤ 0.43 means a slow mode, worth further laps; 0.47 or more means a fast mode only. κ read
-  0.485, so the pull's effect is the fast change of its first sections and the next law is structural. Theory's guesses (held
-  1.190–1.196, κ 0.47–0.49) held.
+  0.485, so the pull's effect is the fast change of its first sections. Theory's guesses (held 1.190–1.196, κ 0.47–0.49) held.
+  Theory's 21:15 order test (scans127) decides between a structural face and H2, the far structure. The turn law leaves
+  training: lap 24 stays the line's state (held 1.1877, writes ahead at every key), the squares' pull leaves the trainer with
+  the next build, and curl-field stays as the instrument.
 - The acceptance failed except held: curl/λ is above 0.8 at d = 1 and above 1.0 in every band.
 - The walk from truth at pass 40 (run bits 1) read S 1.472 → 0.971, D 0.351 → 0.300, parses 0 and fences 20 of 30 closed. The
   lower S is a pile-up, not the truth: the repeat share is 0.646, `j` alone is 0.203 of identifier tokens, and 0.38 of identifiers
@@ -4190,4 +4191,10 @@ band. At d = 1 that is λ's spread 3.48, power 32.05 and κ 0.485, against lap 2
 - Refine 10 at the three declared keys closed 23 of 31, 27 of 29 and 24 of 32 fences, against lap 24's 26/28, 29/31 and 26/30.
   The mean, 24.7 closed against 27.0, is inside lap 24's three-key spread but lower at every key. The question share read 0.14,
   0.13 and 0.15, against 0.15, 0.15 and 0.12.
+- Beside squares121 (one lap, the same 2,560 squares, the pull not acting), the curl fell 3% at d = 1 and 8% at 2–3 and rose
+  9% at 16+, while the readings' spread rose 6–25% over 2–15. Agreement came mostly as louder agreeing readings, not less
+  disagreement [measured; theory's reading of 22:18].
+- Dose read: D at pass 40 of the walk from truth was 0.300 here and 0.301 for squares121, so the settled drive did not follow the
+  near agreement at this dose [measured; the steps differ, a weak read]. S fell 0.38 below squares121's with H falling alike: the
+  pull moved the walk's resting law to a common-name pile-up, not toward the truth [inferred].
 Receipts: `longrun_nov6/squares126.txt`.
