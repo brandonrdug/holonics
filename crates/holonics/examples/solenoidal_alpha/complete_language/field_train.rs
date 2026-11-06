@@ -287,6 +287,9 @@ pub(super) fn region_lengths(codec: &FieldCodec, problems: &Problems, members: &
     if path_writer() {
         out.extend(paths.iter().zip(&draws).filter_map(|(&i, &d)| writer_region(codec, &problems[i].0, &problems[i].1, seed, d).map(|r| r.classes.len())));
     }
+    if path_drafts() {
+        out.extend(paths.iter().filter(|&&i| !problems[i].1.is_empty()).map(|&i| (problems[i].0.len() + problems[i].1.len().min(codec.answer) + holonics::hnn::tower::field::NEAR).min(problems[i].0.len() + codec.answer)));
+    }
     out
 }
 
@@ -428,6 +431,84 @@ pub(super) fn writer_letters() -> bool {
 pub(super) fn room_cut() -> bool {
     static CUT: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
     *CUT.get_or_init(|| std::env::var_os("FIELD_ROOM_CUT").is_some())
+}
+
+/// [definition; agent-inferred, November 6, the unified-theory reading of 17:08] **The field meets its own release**
+/// (`FIELD_PATH_DRAFTS`, beside the opening and the writer's state): for each path problem a draw `ρ` uniform on `(0, 1]` (on
+/// `2^(−16)`) opens a keyed `ρ` share of the answer's places (at least one) in the truth's region given its end (the answer,
+/// its end's `NEAR` voids given, the region cut there), and the field as it stands reads it once; each open place is drawn
+/// from its face over the letters (temperature one, keyed, the release's own draw given the end). The draft region holds those
+/// draws and the truth elsewhere, and opens a masks' state over the answer's places (`τ = u²`, [`shape`]'s law, weighed back by
+/// [`weighed_domain`]), each open place compared with the truth's class. Why (the unified-theory reading of 17:08): the
+/// writer places each letter once beside open neighbours, and a written non-word is a context no training comparison met;
+/// here every comparison reads the truth beside the field's own drafts. The read is one card read a section of short regions.
+pub(super) fn draft_regions(codec: &FieldCodec, problems: &Problems, paths: &[usize], draws: &[u64], seed: u64, field: &Field, realization: &mut dyn FieldRealization) -> Result<Vec<TrainRegion>> {
+    let near = holonics::hnn::tower::field::NEAR;
+    let void = codec.void();
+    // Each draft's truth, its open places and its draw.
+    let mut reads: Vec<(Vec<usize>, Vec<bool>, usize, usize, u64)> = Vec::new();
+    for (&i, &d) in paths.iter().zip(draws) {
+        let (q, a, _) = &problems[i];
+        let len = a.len().min(codec.answer);
+        if len == 0 {
+            continue;
+        }
+        let cut = (q.len() + len + near).min(q.len() + codec.answer);
+        let classes = region_classes(codec, q, &a[..len], cut);
+        // The draft's own key stream, apart from every draw-tagged stream of the section's other regions.
+        let key = mix(seed ^ 0x0D2A_F7ED_0000_0000, d);
+        let rho = ((mix(key, 1) >> 1) & 0xFFFF) + 1;
+        let mut open: Vec<bool> = (0..cut).map(|t| t >= q.len() && t < q.len() + len && (mix(key, (t as u64 + 1) << 8 | 2) & 0xFFFF) < rho).collect();
+        if !open.iter().any(|&u| u) {
+            open[q.len() + (mix(key, 3) as usize) % len] = true;
+        }
+        reads.push((classes, open, q.len(), len, d));
+    }
+    if reads.is_empty() {
+        return Ok(Vec::new());
+    }
+    let views: Vec<Region> = reads.iter().map(|(classes, open, _, _, _)| Region { classes, unresolved: open, faces: &[], locked: &[], echo: &[], domain: None, port: None }).collect();
+    let faces = realization.read_faces(field, &views).map_err(|e| e.to_string())?;
+    let mut out = Vec::with_capacity(reads.len());
+    for ((classes, open, start, len, d), f) in reads.iter().zip(&faces) {
+        // The draft: each open place drawn from its face over the letters, the truth elsewhere.
+        let mut drafted = classes.clone();
+        for t in (0..classes.len()).filter(|&t| open[t]) {
+            let face = f[t].as_ref().ok_or("a draft's open place with no face")?;
+            let letters = face.total - face.masses[void];
+            if letters == 0 {
+                continue;
+            }
+            let key = mix(seed ^ 0x0D2A_F7ED_0000_0000, *d);
+            let u = (((mix(key, (t as u64 + 1) << 8 | 4) as u128) << 64) | mix(key, (t as u64 + 1) << 8 | 5) as u128) % letters;
+            let mut acc = 0u128;
+            if let Some(c) = (0..face.masses.len()).filter(|&c| c != void).find(|&c| {
+                acc += face.masses[c];
+                acc > u
+            }) {
+                drafted[t] = c;
+            }
+        }
+        // The masks' state over the answer's places, compared on the truth's classes.
+        // `τ = u²` over the answer's places ([`shape`]'s law), at least one open.
+        let key = mix(seed ^ 0x0D2A_F7ED_0000_0000, *d);
+        let u = ((mix(key, 6) >> 1) & 0xFFFF) + 1;
+        let tau = ((u * u) >> 16).max(1);
+        let mut unresolved: Vec<bool> = (0..classes.len()).map(|t| t >= *start && t < start + len && (mix(key, (t as u64 + 1) << 8 | 7) & 0xFFFF) < tau).collect();
+        if !unresolved.iter().any(|&o| o) {
+            unresolved[start + (mix(key, 8) as usize) % len] = true;
+        }
+        let row: Vec<usize> = (0..classes.len()).map(|t| if unresolved[t] { classes[t] } else { drafted[t] }).collect();
+        let answer_mask: Vec<bool> = unresolved[*start..start + len].to_vec();
+        out.push(TrainRegion { domain: Some(weighed_domain(*len, &answer_mask)), ..TrainRegion::plain(row, unresolved) });
+    }
+    Ok(out)
+}
+
+/// Whether each path problem also trains on its own draft ([`draft_regions`], `FIELD_PATH_DRAFTS`).
+pub(super) fn path_drafts() -> bool {
+    static DRAFTS: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
+    *DRAFTS.get_or_init(|| std::env::var_os("FIELD_PATH_DRAFTS").is_some())
 }
 
 /// Whether each path problem also trains the writer's own state given its end ([`writer_region`]).
@@ -572,6 +653,11 @@ pub(super) fn section_regions(codec: &FieldCodec, problems: &Problems, members: 
     // [the unified-theory reading of November 6, 06:50] Then, declared, the writer's own state of each path problem given its end.
     if path_writer() {
         regions.extend(paths.iter().zip(&draws).filter_map(|(&i, &d)| writer_region(codec, &problems[i].0, &problems[i].1, seed, d)));
+    }
+    // [the unified-theory reading of November 6, 17:08] Then, declared, each path problem's own draft: the field meets its release.
+    if path_drafts() {
+        let drafts = draft_regions(codec, problems, paths, &draws, seed, &learner.field, realization)?;
+        regions.extend(drafts);
     }
     let next = if learner.holds_step() { learner.read_step_on(&views_of(&regions), realization).map_err(|e| e.to_string())?.1 } else { None };
     Ok((regions, next))
@@ -2978,6 +3064,46 @@ mod tests {
             let octaves = usize::BITS - most.leading_zeros() + 1;
             assert_eq!(met.len(), octaves as usize, "problem {i}: every octave of k met");
         }
+    }
+
+    /// [definition; law 2 of the unified-theory reading of November 6] **The field's own draft**: each path problem's truth cut
+    /// `NEAR` places past its end, the masks' open places (`τ = u²` within the answer, at least one) compared on the truth with
+    /// the masks' weight, every other answer place the truth or a letter drawn from the field's own face there (never the
+    /// void), the question and the end's voids given.
+    #[test]
+    fn a_draft_is_the_truth_where_compared_and_the_fields_own_letters_elsewhere() {
+        let (codec, problems) = toy();
+        let near = holonics::hnn::tower::field::NEAR;
+        let learner = toy_learner(&codec, &problems);
+        let paths: Vec<usize> = (0..problems.len()).collect();
+        let (mut drafted, mut opened) = (0usize, std::collections::BTreeSet::new());
+        for seed in 0..40u64 {
+            let draws: Vec<u64> = paths.iter().map(|&i| seed * 16 + i as u64).collect();
+            let drafts = draft_regions(&codec, &problems, &paths, &draws, seed, &learner.field, &mut host()).unwrap();
+            let answered: Vec<_> = problems.iter().filter(|p| !p.1.is_empty()).collect();
+            assert_eq!(drafts.len(), answered.len());
+            for (state, (q, a, _)) in drafts.iter().zip(answered) {
+                let len = a.len().min(codec.answer);
+                let end = q.len() + len;
+                let truth = region_classes(&codec, q, &a[..len], (end + near).min(q.len() + codec.answer));
+                assert_eq!(state.classes.len(), truth.len(), "cut NEAR places past the end (within the room)");
+                assert!(state.unresolved[..q.len()].iter().all(|&u| !u) && state.unresolved[end..].iter().all(|&u| !u), "only answer places open");
+                let open = state.unresolved.iter().filter(|&&u| u).count();
+                assert!(open > 0, "a place compared");
+                opened.insert(open);
+                for t in 0..truth.len() {
+                    if t < q.len() || t >= end || state.unresolved[t] {
+                        assert_eq!(state.classes[t], truth[t], "the truth where compared and outside the answer");
+                    } else {
+                        assert_ne!(state.classes[t], codec.void(), "a drafted place is a letter");
+                        drafted += usize::from(state.classes[t] != truth[t]);
+                    }
+                }
+                assert_eq!(state.domain, Some(weighed_domain(len, &state.unresolved[q.len()..end])), "the masks' weight");
+                assert!(state.port.is_none() && !state.window && !state.letters);
+            }
+        }
+        assert!(drafted > 0 && opened.len() > 1, "{drafted} drafted places, {opened:?} open counts");
     }
 
     /// A section's regions on the toy passage are the draws' (one a member), their lengths the projection's, and the
