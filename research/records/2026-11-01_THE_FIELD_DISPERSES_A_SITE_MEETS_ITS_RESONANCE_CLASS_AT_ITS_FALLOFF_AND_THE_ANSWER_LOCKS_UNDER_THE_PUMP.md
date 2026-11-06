@@ -3895,3 +3895,11 @@ covector against the code's difference and the pace covector with a depth ring (
 near at least 0.9, openers left unclosed under 0.1 (keyed100: 0.42), on writes given keyed100's lengths, ring and foil alike;
 if short, split by whether a pair's between-sites were resolved at its later end's draw, and run the conversion with `r` held
 at zero before reading a miss as the ring's.
+**A depth ring takes no blank face** (the unified-theory reading of 05:45, before its run): a silent site runs at rate zero
+at every tick and no clock covector returns through a blank's face on a depth ring (host `paces_with` and `clock_return`, the
+card's `pace_rate`, `field_pace_c_back` and `field_blank_dz`; the field test in `a_blank_place_runs_at_its_expected_duration`).
+A blank's honest contribution through a turned ring is `E[ζ^r]`, its modulus the blank's coherence, where the blank clock would
+carry `ζ^E[r]` at modulus one; a place read as a closer would turn its own frame by its own guess, the tail's one passage would
+turn each unwritten place by its distance times an expected increment (phantom depth), and the face's return would train the
+guesses to serve the ring. The ring is exact on what arrived; an unwritten unbalanced hole is what the resolved-between split
+reads, and `E[ζ^r]` as a face-keyed skin is the general form, later.

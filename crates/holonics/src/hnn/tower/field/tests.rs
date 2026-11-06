@@ -1103,6 +1103,16 @@ fn a_blank_place_runs_at_its_expected_duration() {
         }
     }
     assert!(between && past > 0, "the stretch's own faces never differed from its first place's: {between} {past}");
+    // [the depth rings] A depth ring takes no blank face: every silent place runs at rate zero at every tick.
+    let ring = shaped_with(FieldDeclaration { depth: 1, ..tiny_declaration(1) });
+    for cell in &ring.pass(&stretch, true).unwrap().ticks[1..] {
+        let clock = cell.clock.as_ref().expect("a later tick reads its own clocks");
+        for kappa in &clock.paces.kappa {
+            for t in (0..14).filter(|&t| Field::silent(&stretch, t)) {
+                assert_eq!(kappa[t], 0, "a depth ring's silent place {t} turns");
+            }
+        }
+    }
     // Declared against it, the per-blank clock runs every silent place at its own face's rate past the last arrival too.
     let mut per_blank = field.clone();
     per_blank.per_blank_clock = true;

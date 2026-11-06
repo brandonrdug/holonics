@@ -3548,7 +3548,8 @@ __device__ __forceinline__ wide pace_rate(const FieldWords &w, uint32_t p, uint6
     const uint32_t from = w.mix_off[s], to = w.mix_off[s + 1];
     if (from == to) {
         if (w.unresolved[s]) {
-            return w.blank_rate ? (wide)w.blank_rate[(uint64_t)p * w.T + s] : 0;
+            // A depth ring takes no blank face: a silent site runs at rate zero every tick.
+            return w.blank_rate && !depth_head(w, paced_head(w, p)) ? (wide)w.blank_rate[(uint64_t)p * w.T + s] : 0;
         }
         return (wide)w.theta[base + row_of(w, s)];
     }
@@ -3584,7 +3585,7 @@ extern "C" __global__ void field_blank_dz(FieldWords w, const wide *dkappa, wide
         wide out = 0;
         for (uint32_t p = 0; p < w.paced; p++) {
             const wide dk = dkappa[(uint64_t)p * w.T + s];
-            if (dk == 0) {
+            if (dk == 0 || depth_head(w, paced_head(w, p))) {
                 continue;
             }
             const uint64_t base = w.pace_at + (uint64_t)p * (w.A + 1);
@@ -4367,7 +4368,7 @@ extern "C" __global__ void field_pace_c_back(FieldWords w, const wide *dkappa, w
         if (from == to) {
             if (!w.unresolved[t]) {
                 add_wide(g + base + row_of(w, t), dk << FACE_BITS);
-            } else if (w.blank_rate) {
+            } else if (w.blank_rate && !depth_head(w, paced_head(w, p))) {
                 // [§16.44] A blank's rate by the shares of the face its clock read, an operand of that clock.
                 for (uint32_t a = 0; a < w.A; a++) {
                     const uwide share = blank_share(w, t, a);

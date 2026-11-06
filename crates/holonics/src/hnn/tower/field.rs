@@ -1702,7 +1702,10 @@ impl Field {
             for t in 0..sites {
                 // [§16.47] Past the last arrival every silent place runs at the first one's rate (one passage).
                 let at = if t > stretch { stretch } else { t };
-                let rate = match blank.get(at).and_then(Option::as_ref).filter(|_| Self::silent(region, at)) {
+                // [the unified-theory reading of November 6, 05:45] A depth ring takes no blank face: a silent site runs at
+                // rate zero every tick (exact on what arrived; an expected increment `ζ^E[r]` would read a blank at full
+                // coherence and turn a closer's frame by its own guess).
+                let rate = match blank.get(at).and_then(Option::as_ref).filter(|_| Self::silent(region, at) && !d.is_depth(h)) {
                     Some(face) => release(face.iter().map(|&(c, w)| w as i128 * self.theta[base + c as usize] as i128).sum(), STATE_BITS),
                     None => self.strand_row(region, base, 1, at)[0] as i128,
                 };
@@ -3308,6 +3311,7 @@ impl Field {
         let stretch = if self.per_blank_clock { sites } else { Self::silent_stretch(region) };
         for p in 0..paced {
             let base = l.pace + p * width;
+            let head = (0..d.heads).find(|&h| paces.row[h] == Some(p)).ok_or(TowerError::Refused("a paced head with no row"))?;
             let (mut tail_tau, mut tail_sig) = (0i128, 0i128);
             let mut dks = vec![0i128; sites];
             for k in (1..sites).rev() {
@@ -3328,7 +3332,7 @@ impl Field {
                 if dk == 0 {
                     continue;
                 }
-                let face = if Self::silent(region, k) { blank.get(k).and_then(Option::as_ref) } else { Self::carried(region, k) };
+                let face = if Self::silent(region, k) { blank.get(k).and_then(Option::as_ref).filter(|_| !self.declaration.is_depth(head)) } else { Self::carried(region, k) };
                 match face {
                     None if Self::silent(region, k) => {}
                     None => g[base + self.row(region, k)] += dk << STATE_BITS,
