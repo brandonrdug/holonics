@@ -1630,8 +1630,10 @@ pub(super) fn reach_field(args: &[String], realization: &mut dyn FieldRealizatio
 /// resolved before it, plus the length's code from the opening's faces: the opening's void mass at `t` read as `P(L ≤ t)`, so
 /// `P(L = len)` is its difference at `len` and `len − 1` (an answer where that difference is not positive is counted, its
 /// length code left out: the faces are no one joint's there). For one joint every order codes the same, so the orders'
-/// differences also read how far the faces are from one joint. Writes `ORDER.tsv` (problem, places, place-order code,
-/// keyed-order code, masks'-order code, its length code or `-`; on `2^(−20)` bits; private, of the held answers). A reading only.
+/// differences also read how far the faces are from one joint. [01:47] Place order's code splits on its own faces into a length
+/// part (`−log₂(1 − v)` at each place before the end, `−log₂ v` at it) and a content part (the rest: each byte's code given that
+/// the answer goes on). Writes `ORDER.tsv` (problem, places, place-order code, its length part, keyed-order code, masks'-order
+/// code, its length code or `-`; on `2^(−20)` bits; private, of the held answers). A reading only.
 pub(super) fn order_field(args: &[String], realization: &mut dyn FieldRealization) -> Result<()> {
     if args.len() != 11 {
         return Err("order-field STATE STATE_SHA CODEC CODEC_SHA UNITS UNITS_SHA HELD HELD_SHA COUNT OUT".into());
@@ -1655,7 +1657,8 @@ pub(super) fn order_field(args: &[String], realization: &mut dyn FieldRealizatio
     };
     let void = codec.void();
     let near = holonics::hnn::tower::field::NEAR;
-    let mut rows = rows_file(&out.join("ORDER.tsv"), "problem\tplaces\tplace_code\tkeyed_code\tmasks_code\tlength_code\n")?;
+    let mut rows = rows_file(&out.join("ORDER.tsv"), "problem\tplaces\tplace_code\tplace_length\tkeyed_code\tmasks_code\tlength_code\n")?;
+    let mut place_length_total = 0i64;
     let (mut place_total, mut keyed_total, mut places_total) = (0i64, 0i64, 0usize);
     let (mut masks_total, mut length_total, mut lengths_unread) = (0i64, 0i64, 0usize);
     for (k, (question, answer)) in held.iter().take(n).enumerate() {
@@ -1706,13 +1709,18 @@ pub(super) fn order_field(args: &[String], realization: &mut dyn FieldRealizatio
             known[t] = true;
         }
         let mut codes = (0i64, 0i64, 0i64);
+        let mut place_length = 0i64;
         for (c, chunk) in states.chunks(256).enumerate() {
             let regions: Vec<Region> = chunk.iter().map(|(classes, open, _, _)| Region { classes, unresolved: open, faces: &[], locked: &[], echo: &[], domain: None, port: None }).collect();
             let faces = realization.read_faces(field, &regions).map_err(|e| e.to_string())?;
             for (i, ((_, _, at, class), f)) in chunk.iter().zip(&faces).enumerate() {
-                let code = f[*at].as_ref().ok_or("a read place with no face")?.code(*class);
+                let face = f[*at].as_ref().ok_or("a read place with no face")?;
+                let code = face.code(*class);
                 match c * 256 + i {
-                    s if s < place_states => codes.0 += code,
+                    s if s < place_states => {
+                        codes.0 += code;
+                        place_length += if *class == void { code } else { holonics::hnn::tower::face_code(face.total - face.masses[void], face.total) };
+                    }
                     s if s < keyed_states => codes.1 += code,
                     _ => codes.2 += code,
                 }
@@ -1737,12 +1745,15 @@ pub(super) fn order_field(args: &[String], realization: &mut dyn FieldRealizatio
             None => lengths_unread += 1,
         }
         masks_total += codes.2;
-        row(&mut rows, &format!("{k}\t{}\t{}\t{}\t{}\t{}\n", end + 1, codes.0, codes.1, codes.2, length.map_or("-".to_string(), |l| l.to_string())))?;
+        place_length_total += place_length;
+        row(&mut rows, &format!("{k}\t{}\t{}\t{place_length}\t{}\t{}\t{}\n", end + 1, codes.0, codes.1, codes.2, length.map_or("-".to_string(), |l| l.to_string())))?;
         (place_total, keyed_total, places_total) = (place_total + codes.0, keyed_total + codes.1, places_total + end + 1);
     }
     println!(
-        "FIELD_ORDER problems={n} places={places_total} place_bits_a_place={} keyed_bits_a_place={} masks_bits_a_place={} masks_length_bits_a_place={} lengths_unread={lengths_unread} ms={}",
+        "FIELD_ORDER problems={n} places={places_total} place_bits_a_place={} place_length_bits_a_place={} place_content_bits_a_place={} keyed_bits_a_place={} masks_bits_a_place={} masks_length_bits_a_place={} lengths_unread={lengths_unread} ms={}",
         bits(place_total, places_total),
+        bits(place_length_total, places_total),
+        bits(place_total - place_length_total, places_total),
         bits(keyed_total, places_total),
         bits(masks_total, places_total),
         bits(length_total, places_total),
