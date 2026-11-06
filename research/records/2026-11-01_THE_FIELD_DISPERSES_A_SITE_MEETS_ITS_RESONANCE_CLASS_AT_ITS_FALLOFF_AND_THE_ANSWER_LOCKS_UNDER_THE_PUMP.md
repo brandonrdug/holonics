@@ -4053,3 +4053,13 @@ lap price scatters by about 0.15e9 either way at every rate (seg10's mean, 0.641
 here: on its own training problems the opening sat +90 to +130 places past the boundary law's minimizer through laps 18–24, and
 moved out at lap 24 under the run's smallest step. The boundary's void entries vanish in expectation only when the expected
 length meets the answer's, so at the opening the boundary is outweighed by the other comparisons that reach the void there.
+
+[measurement and definition; November 6, orders115; the unified-theory reading of 17:08] **The writer refines: the keyed sweeps,
+then 10 refine passes.** Lap 24 was written given held's lengths in three orders. Place order (left to right, coding 1 bit a place
+under keyed) fell into loops ("andatatatata") with 180 identifiers. Keyed gave pseudo-words with 902. The masks' own order closed
+9 of 28 fences. Then the keyed sweeps were refined 0, 1, 3, 6 and 10 passes, each place redrawn beside every other. The
+identifiers matching the question went 0.05, 0.09, 0.13, 0.15, 0.18, and those matching the held answer 0.06, 0.09, 0.12, 0.14,
+0.16. Fences closed 27, 28, 29, 29, 28. The pooled space share went 0.133, 0.143, 0.142, 0.139, 0.145 (the truth's 0.174). The
+November 5 drift to spaces does not recur on this state, so refine 10 joins the writer, and the law of the field meeting its own
+release waits. Bracket closure erodes past about 6 passes (near 0.27 at 6, 0.15 at 10). Cost: 6,121 reads, 140 s for 32 answers,
+against 639 reads for the sweeps alone.
