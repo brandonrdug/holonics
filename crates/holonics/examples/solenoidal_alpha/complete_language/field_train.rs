@@ -346,6 +346,16 @@ pub(super) fn prefix_region(codec: &FieldCodec, q: &[usize], a: &[usize], seed: 
     TrainRegion { domain: Some(last + 1), port: Some((frontier + 1, codec.void(), Vec::new(), true, None, Some(heard))), ..TrainRegion::plain(classes, unresolved) }
 }
 
+/// [definition; agent-inferred, November 6, the unified-theory reading of 04:03] **Length lives at one state**
+/// (`FIELD_PATH_OPENING`, with the far share): the only path state is the fully masked one, the release's first read, where
+/// the void mass at each place is the length's distribution; it keeps the room and compares one keyed place an octave of
+/// distance from the question (b2's far places on the one-rate clock), at the boundary with weight one, keyed by distance and
+/// never by the end. Every other state keeps the near tail.
+pub(super) fn path_opening() -> bool {
+    static OPENING: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
+    *OPENING.get_or_init(|| std::env::var_os("FIELD_PATH_OPENING").is_some())
+}
+
 /// Whether the path states are prefixes in place order ([`prefix_region`]).
 pub(super) fn path_prefix() -> bool {
     static PREFIX: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
@@ -360,7 +370,7 @@ pub(super) fn opening_region_with(codec: &FieldCodec, q: &[usize], a: &[usize], 
     let key = mix(seed, draw | 5 << 61);
     let octaves = u64::from(usize::BITS - room.leading_zeros()) + 1;
     let o = (key % octaves) as u32;
-    let k = if o == 0 {
+    let k = if o == 0 || path_opening() {
         0
     } else {
         let low = 1usize << (o - 1);
@@ -1965,6 +1975,9 @@ pub(super) fn length_field(args: &[String], realization: &mut dyn FieldRealizati
     let place_order = std::env::var_os("FIELD_WRITER_PLACE_ORDER").is_some();
     // [measurement; agent-inferred, November 6] `FIELD_WRITER_LENGTHS`: a write's `ENDS.tsv` whose `written` places fix each
     // answer's length ([`Field::sample_runs`]'s `lengths`), the writer then writing content given its length.
+    // [measurement; agent-inferred, November 6] `FIELD_WRITER_ONE_END`: each answer's length drawn once from the release's first
+    // read ([`Field::sample_runs`]'s `one_end`).
+    let one_end = std::env::var_os("FIELD_WRITER_ONE_END").is_some();
     let given: Option<Vec<usize>> = match std::env::var("FIELD_WRITER_LENGTHS") {
         Ok(path) => {
             let text = std::fs::read_to_string(path)?;
@@ -1995,6 +2008,7 @@ pub(super) fn length_field(args: &[String], realization: &mut dyn FieldRealizati
             near_tail,
             place_order,
             given.as_deref(),
+            one_end,
             realization,
             &mut |done, _| {
                 if started.elapsed().as_millis() > stop_ms || (reads > 0 && done == reads) {

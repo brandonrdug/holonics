@@ -3864,3 +3864,16 @@ length (a place-order write's lengths, drawn from its hazard), the answer and it
 uniform order over those `L + NEAR` places, an answer place from its face over the letters, a near-tail place the void. Fixed on
 code86's state with code89's lengths: exact ```` ```python ```` at least 23 (least sure); entropy 4.76 to 5.02, the top byte 0.14
 to 0.21, `y` past place 10 under 1.3%, at least 22 of 32 fences closed.
+
+[definition; agent-inferred, November 6, the unified-theory reading of 04:03] **One end, one draw; length lives at one state.**
+At the release's first read (every answer place open, training's fully masked state) a place `d` is the void exactly when the
+answer is shorter than `d`, so its void mass is the field's `P(L < d | q)`: the writer draws the end once, one uniform `u`
+against that profile (the length the places before the first whose void mass passes `u`, `m_∅ 2^32 > u T` exactly), and the
+keyed sweeps then write given it (`Field::sample_runs`'s `one_end`, `FIELD_WRITER_ONE_END`; one `u`, since independent draws a
+place multiply survivals and the earliest void is not the profile's draw). Training then needs the room at that state only
+(`FIELD_PATH_OPENING` with the far share): the only path state is the fully masked one, the whole room with one keyed place an
+octave of distance from the question compared at the boundary, weight one, on the one-rate clock, keyed by distance and never by
+the end; every content state keeps the near tail. **Fixed before code91** (from code86's state): held context within 0.05 of
+code86's 1.364 at laps 1 to 3; the opening's length code at most 9.6 bits an answer (the marginal) by lap 3 with at most 4
+unread; the one-end writer at lap 3 with written over held 0.67 to 1.49, at least 23 exact openings, entropy and the space in
+band and at least 22 fences closed. The field test `a_given_length_is_kept` reads the drawn end kept as a given one.

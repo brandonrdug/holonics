@@ -3406,7 +3406,7 @@ impl Field {
     /// faces. A reading only: nothing in the release reads it.
     #[allow(clippy::too_many_arguments)]
     pub fn sample_observed(&self, problems: &[(&[usize], usize)], sweeps: usize, refine: usize, void: usize, seed: u64, realization: &mut dyn FieldRealization, sweep: &mut dyn FnMut(usize, usize) -> bool, observe: &mut dyn FnMut(ReleaseRead)) -> Result<Vec<Vec<usize>>> {
-        self.release(problems, sweeps, refine, void, seed, 0, true, false, None, realization, sweep, observe)
+        self.release(problems, sweeps, refine, void, seed, 0, true, false, None, false, realization, sweep, observe)
     }
 
     /// [definition; agent-inferred, November 5, the unified-theory reading of 17:41, its bound read without a maximum]
@@ -3424,13 +3424,14 @@ impl Field {
     /// `place_order` draws each octave's places in place order rather than its keyed order. [agent-inferred, November 6, the
     /// unified-theory reading of 03:08] `lengths`, where given, fixes each answer's length: its places past it stand resolved as
     /// the void from the first read (so the region is the question, the answer and its near tail), and every answer place,
-    /// in the sweeps and in refine, draws from its face over the letters; the end never moves.
-    pub fn sample_runs(&self, problems: &[(&[usize], usize)], sweeps: usize, refine: usize, void: usize, seed: u64, run_bound: i128, near_tail: bool, place_order: bool, lengths: Option<&[usize]>, realization: &mut dyn FieldRealization, sweep: &mut dyn FnMut(usize, usize) -> bool, observe: &mut dyn FnMut(ReleaseRead)) -> Result<Vec<Vec<usize>>> {
-        self.release(problems, sweeps, refine, void, seed, run_bound, near_tail, place_order, lengths, realization, sweep, observe)
+    /// in the sweeps and in refine, draws from its face over the letters; the end never moves. `one_end` draws each answer's
+    /// length from the release's first read when none is given ([`Field::release`]).
+    pub fn sample_runs(&self, problems: &[(&[usize], usize)], sweeps: usize, refine: usize, void: usize, seed: u64, run_bound: i128, near_tail: bool, place_order: bool, lengths: Option<&[usize]>, one_end: bool, realization: &mut dyn FieldRealization, sweep: &mut dyn FnMut(usize, usize) -> bool, observe: &mut dyn FnMut(ReleaseRead)) -> Result<Vec<Vec<usize>>> {
+        self.release(problems, sweeps, refine, void, seed, run_bound, near_tail, place_order, lengths, one_end, realization, sweep, observe)
     }
 
     #[allow(clippy::too_many_arguments)]
-    fn release(&self, problems: &[(&[usize], usize)], sweeps: usize, refine: usize, void: usize, seed: u64, run_bound: i128, near_tail: bool, place_order: bool, lengths: Option<&[usize]>, realization: &mut dyn FieldRealization, sweep: &mut dyn FnMut(usize, usize) -> bool, observe: &mut dyn FnMut(ReleaseRead)) -> Result<Vec<Vec<usize>>> {
+    fn release(&self, problems: &[(&[usize], usize)], sweeps: usize, refine: usize, void: usize, seed: u64, run_bound: i128, near_tail: bool, place_order: bool, lengths: Option<&[usize]>, one_end: bool, realization: &mut dyn FieldRealization, sweep: &mut dyn FnMut(usize, usize) -> bool, observe: &mut dyn FnMut(ReleaseRead)) -> Result<Vec<Vec<usize>>> {
         if sweeps == 0 || void >= self.declaration.alphabet || problems.iter().any(|&(_, n)| n == 0) {
             return refuse("a sample needs a sweep, an answer place and a void class in the alphabet");
         }
@@ -3443,6 +3444,29 @@ impl Field {
         let starts: Vec<usize> = problems.iter().map(|&(q, _)| q.len()).collect();
         let mut classes: Vec<Vec<usize>> = problems.iter().map(|&(q, n)| q.iter().copied().chain(std::iter::repeat_n(void, n)).collect()).collect();
         let mut open: Vec<Vec<bool>> = problems.iter().map(|&(q, n)| (0..q.len() + n).map(|t| t >= q.len()).collect()).collect();
+        // [definition; agent-inferred, November 6, the unified-theory reading of 04:03] With `one_end`, **one end, one draw**: at
+        // the release's first read (every answer place open, training's fully masked state) a place `d` is the void exactly when
+        // the answer is shorter than `d`, so its void mass is the field's `P(L < d | q)`, the length's distribution; the end is
+        // one uniform `u` against that profile, the answer's length the places before the first whose void mass passes `u` (an
+        // exact integer comparison, `m_∅ 2^32 > u T`), and the sweeps then write given it. One `u`, not one draw a place:
+        // independent draws multiply survivals, and the earliest void drawn is not the profile's draw.
+        let drawn_lengths: Option<Vec<usize>> = if one_end && lengths.is_none() {
+            let active: Vec<usize> = (0..problems.len()).collect();
+            let faces = self.read_active(&starts, &classes, &open, &active, void, near_tail, realization)?;
+            Some(
+                problems
+                    .iter()
+                    .enumerate()
+                    .map(|(k, &(q, n))| {
+                        let u = mix(((k as u64) << 40) ^ 0x0E4D) as u32 as u128;
+                        (0..n).find(|&j| faces[k][q.len() + j].as_ref().is_some_and(|f| (f.masses[void] << 32) > u * f.total)).unwrap_or(n)
+                    })
+                    .collect(),
+            )
+        } else {
+            None
+        };
+        let lengths = lengths.or(drawn_lengths.as_deref());
         let given = lengths.is_some();
         if let Some(ls) = lengths {
             if ls.len() != problems.len() {

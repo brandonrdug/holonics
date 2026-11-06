@@ -1439,14 +1439,14 @@ fn a_read_releases_a_run() {
     let (mut fewer, mut reads_one, mut reads_run) = (false, 0usize, 0usize);
     for seed in 11..19 {
         let one = field.sample_observed(&problems, 9, 2, 0, seed, &mut HostField, &mut |_, _| true, &mut |_| {}).unwrap();
-        assert_eq!(field.sample_runs(&problems, 9, 2, 0, seed, 0, true, false, None, &mut HostField, &mut |_, _| true, &mut |_| {}).unwrap(), one, "no bound, one place a read");
+        assert_eq!(field.sample_runs(&problems, 9, 2, 0, seed, 0, true, false, None, false, &mut HostField, &mut |_, _| true, &mut |_| {}).unwrap(), one, "no bound, one place a read");
         let mut counted = RegionsCounted { regions: Vec::new() };
-        field.sample_runs(&problems, 9, 2, 0, seed, 0, true, false, None, &mut counted, &mut |_, _| true, &mut |_| {}).unwrap();
+        field.sample_runs(&problems, 9, 2, 0, seed, 0, true, false, None, false, &mut counted, &mut |_, _| true, &mut |_| {}).unwrap();
         reads_one += counted.regions.len();
         let mut counted = RegionsCounted { regions: Vec::new() };
         let mut last: Option<Vec<usize>> = None;
         let run = field
-            .sample_runs(&problems, 9, 2, 0, seed, 1 << 20, true, false, None, &mut counted, &mut |_, _| true, &mut |r| {
+            .sample_runs(&problems, 9, 2, 0, seed, 1 << 20, true, false, None, false, &mut counted, &mut |_, _| true, &mut |r| {
                 for (k, &(q, _)) in problems.iter().enumerate() {
                     let earliest = (q.len()..r.classes[k].len()).filter(|&t| r.open[k][t]).map(|t| octave(t + 1 - q.len())).min();
                     if let (0, Some(j)) = (r.pass, earliest) {
@@ -1488,7 +1488,7 @@ fn a_void_never_unwrites_a_letter() {
         for seed in 11..27 {
             let mut letters: Vec<Vec<Option<usize>>> = problems.iter().map(|&(q, n)| vec![None; q.len() + n]).collect();
             let places = field
-                .sample_runs(&problems, 4, 0, 0, seed, run_bound, true, false, None, &mut HostField, &mut |_, _| true, &mut |r| {
+                .sample_runs(&problems, 4, 0, 0, seed, run_bound, true, false, None, false, &mut HostField, &mut |_, _| true, &mut |r| {
                     if r.pass != 0 {
                         return;
                     }
@@ -1524,10 +1524,16 @@ fn a_given_length_is_kept() {
     let problems: Vec<(&[usize], usize)> = questions.iter().zip([9usize, 8]).map(|(q, a)| (*q, a)).collect();
     for run_bound in [0i128, 1 << 20] {
         for seed in 11..19 {
-            let written = field.sample_runs(&problems, 4, 2, 0, seed, run_bound, true, false, Some(&[3, 5]), &mut HostField, &mut |_, _| true, &mut |_| {}).unwrap();
+            let written = field.sample_runs(&problems, 4, 2, 0, seed, run_bound, true, false, Some(&[3, 5]), false, &mut HostField, &mut |_, _| true, &mut |_| {}).unwrap();
             for (places, l) in written.iter().zip([3usize, 5]) {
                 assert!(places[..l].iter().all(|&c| c != 0), "a void inside the given length, seed {seed}: {places:?}");
                 assert!(places[l..].iter().all(|&c| c == 0), "a letter past the given length, seed {seed}: {places:?}");
+            }
+            // One end, one draw: the length drawn from the first read is kept the same way.
+            let drawn = field.sample_runs(&problems, 4, 2, 0, seed, run_bound, true, false, None, true, &mut HostField, &mut |_, _| true, &mut |_| {}).unwrap();
+            for places in &drawn {
+                let l = places.iter().position(|&c| c == 0).unwrap_or(places.len());
+                assert!(places[l..].iter().all(|&c| c == 0), "a letter past the drawn end, seed {seed}: {places:?}");
             }
         }
     }
