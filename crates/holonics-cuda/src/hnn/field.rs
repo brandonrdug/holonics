@@ -216,6 +216,8 @@ struct Words {
     blank_rate: u64,
     blank_masses: u64,
     blank_totals: u64,
+    // [measurement] Every silent place runs its own rate past the last arrival too (the host's `Field::per_blank_clock`).
+    per_blank: u64,
 }
 
 /// The moment kernels' words (`MomentWords` in `kernels/field_moment.cuh`, field for field): the batch's
@@ -987,6 +989,7 @@ impl<'c> CardField<'c> {
             pace_at: l.pace as u64,
             pi_lo: field.half_turn() as u64,
             pi_hi: (field.half_turn() >> 64) as u64,
+            per_blank: u64::from(field.per_blank_clock),
             ..Words::default()
         };
         // The exponential's resident face, read once by its own loop on the card (a tower's packets read the fine field's).

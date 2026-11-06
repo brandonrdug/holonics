@@ -1100,6 +1100,19 @@ fn a_blank_place_runs_at_its_expected_duration() {
         }
     }
     assert!(between && past > 0, "the stretch's own faces never differed from its first place's: {between} {past}");
+    // Declared against it, the per-blank clock runs every silent place at its own face's rate past the last arrival too.
+    let mut per_blank = field.clone();
+    per_blank.per_blank_clock = true;
+    for cell in &per_blank.pass(&stretch, true).unwrap().ticks[1..] {
+        let clock = cell.clock.as_ref().expect("a later tick reads its own clocks");
+        for (p, kappa) in clock.paces.kappa.iter().enumerate() {
+            let base = per_blank.layout.pace + p * width;
+            for t in 7..14 {
+                let own = (1i128 << PACE_BITS) + release(clock.blank[t].as_ref().unwrap().iter().map(|&(c, w)| w as i128 * per_blank.theta[base + c as usize] as i128).sum(), STATE_BITS);
+                assert_eq!(kappa[t] as i128, own, "the per-blank clock at place {t}");
+            }
+        }
+    }
     let written: Vec<bool> = r.unresolved.iter().map(|_| false).collect();
     let full = Region { unresolved: &written, ..r };
     assert!(field.pass(&full, true).unwrap().ticks.iter().all(|c| c.clock.is_none()), "a region with no blank reads one clock");

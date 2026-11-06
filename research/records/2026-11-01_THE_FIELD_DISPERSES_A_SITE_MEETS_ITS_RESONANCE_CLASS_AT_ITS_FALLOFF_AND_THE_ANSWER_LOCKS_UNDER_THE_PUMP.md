@@ -3850,3 +3850,17 @@ places its draw samples: `k` uniform in `[0, len]`, `domain` `len + 1`. Fixed fo
 written over held 0.67 to 1.49; exact ```` ```python ```` openings at least 23; byte entropy 4.76 to 5.02, the top byte 0.14 to
 0.21, `y` past place 10 under 1.3%; place order's held code below keyed order's. The order reading cannot see length (about
 0.01 bits a place for writes four times short), so the writes judge it.
+
+[definition; agent-inferred, November 6, the unified-theory reading of 02:38] **The prefix path retires, and the clock is read
+alone.** code89's place-order writes failed on content (the content part of place order's code rose to 3.258 against code86's
+3.072, the prefix states taking half the step); inferred cause: a prefix state reads one place at weight `len + 1`, an unbiased
+chain code with about `len + 1` times one place's variance. The clock's own share of code88's lag is read with the per-blank
+rate restored past the last arrival (`Field::per_blank_clock`, `FIELD_CLOCK_PER_BLANK`, host and card, the parity reading the
+same declared law; the field tests' per-blank case in `a_blank_place_runs_at_its_expected_duration`), on code88's law for four
+laps from code84's lap-0 state (code90). Fixed: held context within 0.05 of code88's at laps 1 to 3 means the one-rate clock is
+not the lag, within 0.05 of code85's that it is; the opening's void at held against code88's 0.219. The one-rate clock stays
+unless the context reaches code85's and the void holds. **The masks' order as the writer** (`masks-field`): given each answer's
+length (a place-order write's lengths, drawn from its hazard), the answer and its near tail drawn one place a read in a keyed
+uniform order over those `L + NEAR` places, an answer place from its face over the letters, a near-tail place the void. Fixed on
+code86's state with code89's lengths: exact ```` ```python ```` at least 23 (least sure); entropy 4.76 to 5.02, the top byte 0.14
+to 0.21, `y` past place 10 under 1.3%, at least 22 of 32 fences closed.

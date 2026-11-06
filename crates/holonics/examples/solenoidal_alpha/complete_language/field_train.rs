@@ -983,6 +983,10 @@ pub(super) fn train(args: &[String], realization: &mut dyn FieldRealization) -> 
             FieldLearner::new(field, rate)
         }
     };
+    // [measurement; agent-inferred, November 6, the unified-theory reading of 02:38] `FIELD_CLOCK_PER_BLANK`: every silent place
+    // runs its own per-blank rate past the last arrival too (`Field::per_blank_clock`), the clock alone set against §16.47's
+    // one-rate stretch, a declared comparison.
+    learner.field.per_blank_clock = std::env::var_os("FIELD_CLOCK_PER_BLANK").is_some();
     if learner.field.declaration.alphabet != codec.alphabet() {
         return Err("a continued learner whose alphabet is not the codec's".into());
     }
@@ -1759,6 +1763,93 @@ pub(super) fn order_field(args: &[String], realization: &mut dyn FieldRealizatio
         bits(length_total, places_total),
         started.elapsed().as_millis()
     );
+    Ok(())
+}
+
+/// [measurement; agent-inferred, November 6, the unified-theory reading of 02:38] **`masks-field STATE STATE_SHA CODEC CODEC_SHA
+/// UNITS UNITS_SHA HELD HELD_SHA COUNT ENDS OUT`**: the masks' own order as a writer, given each answer's length. For each of the
+/// first `COUNT` held problems, its length `L` is the `written` places of a write's `ENDS.tsv` (a place-order write's lengths,
+/// drawn from its hazard); the region is the question and `L + NEAR` places (the answer and its near tail, as the masks met
+/// them), drawn one place a read in a keyed uniform order of those places (keyed by the state's hash): an answer place from its
+/// face restricted to the letters (an exact integer draw against their masses), a near-tail place the void. Writes `SAMPLE.tsv`
+/// (each answer, private, of the held answers). A reading only.
+pub(super) fn masks_field(args: &[String], realization: &mut dyn FieldRealization) -> Result<()> {
+    if args.len() != 12 {
+        return Err("masks-field STATE STATE_SHA CODEC CODEC_SHA UNITS UNITS_SHA HELD HELD_SHA COUNT ENDS OUT".into());
+    }
+    let started = std::time::Instant::now();
+    let learner = FieldLearner::from_text(std::str::from_utf8(&pinned_read(&args[1], &args[2], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
+    let field = &learner.field;
+    let units = units_of(&args[5], &args[6])?;
+    let codec = FieldCodec::from_text(std::str::from_utf8(&pinned_read(&args[3], &args[4], CODEC_BUDGET)?)?, units)?;
+    let held = problems_of(&pinned_read(&args[7], &args[8], READ_BUDGET as usize)?);
+    let n = count(&args[9])?.min(held.len());
+    let ends = std::fs::read_to_string(&args[10])?;
+    let lengths: std::collections::BTreeMap<usize, usize> = ends
+        .lines()
+        .skip(1)
+        .filter_map(|l| {
+            let mut c = l.split('\t');
+            Some((c.next()?.parse().ok()?, c.nth(1)?.parse().ok()?))
+        })
+        .collect();
+    let out = Path::new(&args[11]);
+    std::fs::create_dir(out)?;
+    let seed = u64::from_str_radix(&args[2][..16], 16).map_err(|_| "a state hash that is not hexadecimal")?;
+    let mix_key = |counter: u64| -> u64 {
+        let mut z = seed.wrapping_add(counter.wrapping_mul(0x9E37_79B9_7F4A_7C15));
+        z = (z ^ (z >> 30)).wrapping_mul(0xBF58_476D_1CE4_E5B9);
+        z = (z ^ (z >> 27)).wrapping_mul(0x94D0_49BB_1331_11EB);
+        z ^ (z >> 31)
+    };
+    let void = codec.void();
+    let near = holonics::hnn::tower::field::NEAR;
+    let (mut classes, mut open, mut orders, mut starts, mut spans) = (Vec::new(), Vec::new(), Vec::new(), Vec::new(), Vec::new());
+    for (k, (question, _)) in held.iter().take(n).enumerate() {
+        let (q, room) = opening(&codec, field, question, b"")?;
+        let length = *lengths.get(&k).ok_or("a problem with no length in ENDS")?;
+        let span = (length + near).min(room);
+        let mut order: Vec<usize> = (q.len()..q.len() + span).collect();
+        order.sort_by_key(|&t| (mix_key(((k as u64) << 32) ^ t as u64 ^ (5 << 60)), t));
+        classes.push(q.iter().copied().chain(std::iter::repeat_n(void, span)).collect::<Vec<usize>>());
+        open.push((0..q.len() + span).map(|t| t >= q.len()).collect::<Vec<bool>>());
+        starts.push(q.len());
+        spans.push(length.min(span));
+        orders.push(order);
+    }
+    let steps = orders.iter().map(Vec::len).max().unwrap_or(0);
+    for step in 0..steps {
+        let active: Vec<usize> = (0..orders.len()).filter(|&k| step < orders[k].len()).collect();
+        let regions: Vec<Region> = active.iter().map(|&k| Region { classes: &classes[k], unresolved: &open[k], faces: &[], locked: &[], echo: &[], domain: None, port: None }).collect();
+        let faces = realization.read_faces(field, &regions).map_err(|e| e.to_string())?;
+        let mut draws = Vec::with_capacity(active.len());
+        for (&k, f) in active.iter().zip(&faces) {
+            let t = orders[k][step];
+            let c = if t - starts[k] >= spans[k] {
+                void
+            } else {
+                let face = f[t].as_ref().ok_or("a drawn place with no face")?;
+                let letters = face.total - face.masses[void];
+                let u = (((mix_key(((k as u64) << 40) ^ ((t as u64) << 8) ^ 0xD) as u128) << 64) | mix_key(((k as u64) << 40) ^ ((t as u64) << 8) ^ 0xE) as u128) % letters.max(1);
+                let mut acc = 0u128;
+                (0..face.masses.len()).filter(|&c| c != void).find(|&c| {
+                    acc += face.masses[c];
+                    acc > u
+                }).unwrap_or(0)
+            };
+            draws.push((k, t, c));
+        }
+        for (k, t, c) in draws {
+            classes[k][t] = c;
+            open[k][t] = false;
+        }
+    }
+    let mut file = rows_file(&out.join("SAMPLE.tsv"), "")?;
+    for k in 0..classes.len() {
+        let places = &classes[k][starts[k]..starts[k] + spans[k]];
+        row(&mut file, &format!("{k}\t{}\n", escaped(&codec.decode(places))))?;
+    }
+    println!("FIELD_MASKS problems={} reads={steps} ms={}", classes.len(), started.elapsed().as_millis());
     Ok(())
 }
 

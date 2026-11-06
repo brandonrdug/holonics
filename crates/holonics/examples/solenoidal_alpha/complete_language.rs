@@ -894,6 +894,7 @@ pub(super) fn run_field_realized(args: &[String], realization: &mut dyn holonics
         Some("opening-field") => field_train::opening_field(args, realization),
         Some("length-field") => field_train::length_field(args, realization),
         Some("order-field") => field_train::order_field(args, realization),
+        Some("masks-field") => field_train::masks_field(args, realization),
         _ => Err("a realized field command is train-field, sample-field, currents-field, expansion-field, restate-field, reach-field, opening-field, length-field or order-field".into()),
     }
 }

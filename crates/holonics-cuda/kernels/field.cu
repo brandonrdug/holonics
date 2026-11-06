@@ -417,6 +417,8 @@ struct FieldWords {
     const int64_t *blank_rate;
     const uint64_t *blank_masses;
     const uwide *blank_totals;
+    // [measurement] Where set, every silent place runs its own rate past the last arrival too (`Field::per_blank_clock`).
+    uint64_t per_blank;
 };
 
 // [definition; agent-inferred, November 2] **A head's pace index** (§16, `Field::paces`): the heads that carry a moment
@@ -3710,7 +3712,7 @@ extern "C" __global__ void field_paces(FieldWords w) {
         const uint32_t p = c / w.R, r = c % w.R;
         const uint64_t first = w.region_off[r];
         const uint32_t sites = w.region_off[r + 1] - (uint32_t)first;
-        const uint32_t stretch = silent_stretch(w, first, sites);
+        const uint32_t stretch = w.per_blank ? sites : silent_stretch(w, first, sites);
         const wide one = (wide)1 << PACE_BITS;
         wide clock = 0, variation = 0;
         bool plain = true;
@@ -4303,7 +4305,7 @@ extern "C" __global__ void field_pace_kappa_back(FieldWords w, wide *dkappa) {
         const uint32_t p = c / w.R, r = c % w.R;
         const uint64_t first = w.region_off[r];
         const uint32_t sites = w.region_off[r + 1] - (uint32_t)first;
-        const uint32_t stretch = silent_stretch(w, first, sites);
+        const uint32_t stretch = w.per_blank ? sites : silent_stretch(w, first, sites);
         wide tau = 0, sig = 0, folded = 0;
         for (uint32_t t = sites; t-- > 0;) {
             const uint64_t at = (uint64_t)p * w.T + first + t;

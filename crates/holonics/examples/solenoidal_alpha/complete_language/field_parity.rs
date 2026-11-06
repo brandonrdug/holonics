@@ -72,7 +72,10 @@ impl Passage {
     fn learner(&self, args: &[String], rate: u32) -> Result<FieldLearner> {
         let (width, heads, modes, still, contacts, ticks) = (positive(&args[0])?, positive(&args[1])?, positive(&args[2])?, count(&args[3])?, positive(&args[4])?, positive(&args[5])?);
         let declaration = FieldDeclaration { alphabet: self.codec.alphabet(), width, heads, modes, still, contacts, ticks, frames: heads, reach: self.reach, lanes: 1 };
-        Ok(FieldLearner::new(Field::found(declaration, &self.keys).map_err(|e| e.to_string())?, rate))
+        let mut field = Field::found(declaration, &self.keys).map_err(|e| e.to_string())?;
+        // The trainer's declared clock (`FIELD_CLOCK_PER_BLANK`, `Field::per_blank_clock`), so its parity reads that law.
+        field.per_blank_clock = std::env::var_os("FIELD_CLOCK_PER_BLANK").is_some();
+        Ok(FieldLearner::new(field, rate))
     }
 }
 

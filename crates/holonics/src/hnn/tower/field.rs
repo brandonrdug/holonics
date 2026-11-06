@@ -729,6 +729,9 @@ pub struct Field {
     pi: i128,
     /// The packets' level of a tower of scales ([`Field::scaled_up`]), none for a field on one scale.
     pub scale: Option<Box<Scale>>,
+    /// [measurement; agent-inferred, November 6] Where set, every silent place runs its own per-blank rate past the last arrival
+    /// too (the clock before §16.47's one-rate stretch), a declared comparison; not part of the state.
+    pub per_blank_clock: bool,
 }
 
 /// [definition; agent-inferred, November 1] A region: each site's class, whether it is
@@ -1576,7 +1579,7 @@ impl Field {
         let rings: Vec<(usize, Vec<(i64, i64)>)> = ring_periods(declaration.turned_slots(), declaration.reach).into_iter().map(|n| (n, (0..n.min(declaration.reach)).map(|r| ring_phasor(r, n, pi)).collect())).collect();
         let exponential = Exponential::new(FACE_BITS);
         let decays = rings.iter().map(|&(n, _)| (0..declaration.reach).map(|d| skin_decay(d, n, pi, &exponential)).collect()).collect();
-        Self { declaration, theta, layout, rings, decays, exponential, fine: Exponential::new(MATERIAL_BITS), pi, scale: None }
+        Self { declaration, theta, layout, rings, decays, exponential, fine: Exponential::new(MATERIAL_BITS), pi, scale: None, per_blank_clock: false }
     }
 
     /// Each turned slot's skin decay on `2^(−30)` at every distance within the reach (a
@@ -1669,7 +1672,7 @@ impl Field {
         let sites = region.classes.len();
         let width = d.alphabet + 1;
         let one = 1i128 << PACE_BITS;
-        let stretch = Self::silent_stretch(region);
+        let stretch = if self.per_blank_clock { sites } else { Self::silent_stretch(region) };
         let mut out = Paces { row: vec![None; d.heads], ..Default::default() };
         for h in (0..d.heads).filter(|&h| d.carries_moment(h)) {
             let p = out.kappa.len();
@@ -3262,7 +3265,7 @@ impl Field {
         let width = d.alphabet + 1;
         // Each blank's rates' covectors `(base, δκ)` a paced head, for its face's return.
         let mut rates: Vec<Vec<(usize, i128)>> = vec![Vec::new(); if faces.is_some() { sites } else { 0 }];
-        let stretch = Self::silent_stretch(region);
+        let stretch = if self.per_blank_clock { sites } else { Self::silent_stretch(region) };
         for p in 0..paced {
             let base = l.pace + p * width;
             let (mut tail_tau, mut tail_sig) = (0i128, 0i128);
