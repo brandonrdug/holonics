@@ -4136,3 +4136,19 @@ and 0.18. drafts116's lap 25 read the same space at refine 10, and the write's k
 over states is unmeasured. Theory's acceptance failed except held. By its fixed reading, the pull did not act at this weight: it
 weighs `|l|/2` at two classes of one place (about 0.58), against roughly a thousand compared places a section. Its weight is read
 before the charts are judged. Receipts: `longrun_nov6/squares121.txt`.
+
+[measurement; November 6, keys122] **The refine-10 write's spread over its keys.** Lap 24, given held's lengths, refine 10, at the
+state's own key and at three declared keys. Space read 0.145, 0.165, 0.164, 0.164; question identifiers 0.18, 0.15, 0.15, 0.12;
+held identifiers 0.16, 0.16, 0.17, 0.15; fences closed 28/29, 26/28, 29/31, 26/30. The state's own key drew the best write. A
+refine-10 gate is read at declared keys paired across states, against this spread. Receipts: `longrun_nov6/keys122.txt`.
+
+[measurement; November 6, squares123; the unified-theory reading of 20:18] **Weighed as their answers, the squares agree by
+decoupling, and prediction pays.** Each pull weighed `w = (l/2)(n_p/4)`, `n_p` the path problem's compared answer places in its
+opening and writer states, so the four states together weigh as its answer. Over the cost read's 119 sections the trained
+squares' mean `|l|` fell from 1.031 bits (the first 20 sections) to a mean of 0.940. Held context rose from 1.188 to 1.232 and
+unseen from 1.120 to 1.160, past theory's stop (1.199), so the lap did not run. On that stopped state the curl on held truth read
+curl/λ 1.15, 1.36, 1.68, 1.33, 1.50 by band (lap 24: 1.20, 1.59, 1.86, 1.49, 1.52). λ's spread at d = 1 fell from 3.54 to 2.99
+bits, under theory's 3.0. So the faces approached agreement by reading each other less, and in 119 sections they lost 0.044 of
+held context. At one pull a square the deposit did not move the squares (squares121), and at an answer's weight it decoupled
+them: these charts carry agreement only by decoupling. By theory's falsifier, faces read as one pair energy's conditionals are
+owed. Receipts: `longrun_nov6/squares123.txt`.
