@@ -4122,3 +4122,17 @@ state reads the same (1.09 to 1.77 of λ's spread), so twenty laps of the masked
 one way (a place's face reads another through its own query), where the pair contact is a pairing; the curl is that
 antisymmetric part, and its law is owed. Receipts: `longrun_nov6/spans119.txt`, `truth120.txt`, `curl_laps.txt`, `curl.py`,
 `repeat.py`, `curl_laps.sh`.
+
+[measurement; November 6, squares121; the unified-theory reading of 19:04] **The squares' agreement at one pull a square does
+not move the curl.** `FIELD_PATH_SQUARES` reads each path problem's square at a keyed band on the truth given its end through
+its four faces, and adds four states each open at one place, pulling there through `Port::pull` (a code `w (c(b) − c(a))`, its
+covector `w (e_a − e_b)`, read on the host for host and card alike), with `l = λ_i − λ_j` and the loss `l²/4`. The four codes
+sum to `l²/2`. Card parity was equal under every law. One lap from lap 24 took 1,725 s (1,122 ms a section against 521) with about
+16 squares a section. Held context read 1.188 → 1.192 and unseen 1.120 → 1.124. The trained squares' mean `|l|` by quarter of the
+lap read 1.163, 1.169, 1.174, 1.210 bits. The curl on held truth after the lap read curl/λ 1.19, 1.55, 1.79, 1.68, 1.49 by band,
+against lap 24's 1.20, 1.59, 1.86, 1.49, 1.52. From truth, the walk's pass 40 read `S` 1.354, `D` +0.301 (lap 24: 1.472,
++0.351) and parses 2 of 26. Refine 10 given held's lengths read space 0.189 and question identifiers 0.09, against lap 24's 0.145
+and 0.18. drafts116's lap 25 read the same space at refine 10, and the write's keys follow the state's hash, so the write's spread
+over states is unmeasured. Theory's acceptance failed except held. By its fixed reading, the pull did not act at this weight: it
+weighs `|l|/2` at two classes of one place (about 0.58), against roughly a thousand compared places a section. Its weight is read
+before the charts are judged. Receipts: `longrun_nov6/squares121.txt`.

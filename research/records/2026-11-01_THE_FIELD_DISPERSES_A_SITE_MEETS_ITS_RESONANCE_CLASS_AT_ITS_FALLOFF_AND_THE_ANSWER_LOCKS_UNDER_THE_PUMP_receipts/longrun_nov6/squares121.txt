@@ -1,0 +1,62 @@
+# squares121 from bdaeff3a76c10712daa51856de87074511c91903330e8a557df91f19889b970e: hnn-field-learner-v3 12 75264 34 -, binary b957bb4ec66f33fb7ccec992ca1196ce9b1aaea3cc9807345f25dcaf034b13a8, the hour ends 20:28:11
+# lock taken 19:28:11
+FIELD_PARITY_DONE sections=2 reads_unequal=0 faces_unequal=0 covector_unequal=0 learners_unequal=0 releases=1 releases_unequal=0 card_release_ms=73 host_ms=53957 card_ms=851 elapsed_ms=341398
+MEASURE lap=parity rc=0 wall_s=342.7 peak_rss_kib=3418964
+FIELD_SQUARES squares=16 curl_bits=0.000
+FIELD_SQUARES squares=16 curl_bits=0.000
+# parity equal under squares 19:33:53
+dev sections 110 mean_ms 1269 max_ms 2661 (lap 24 without squares: 521 ms a section)
+FIELD_UNSEEN lap=-1 code=1.120 sites=43660 next=- ms=10779
+FIELD_STOPPED lap=0 sections=110/1535 reason=run sites=1177156 before=3.381 after=- deposited=110 halvings=0 next_halved=0 next_refused=0 lap_ms=140890 ms=151670
+FIELD_UNSEEN lap=0 stopped code=1.121 sites=43660 next=- ms=151670
+MEASURE lap=dev rc=0 wall_s=152.3 peak_rss_kib=785164
+dev squares: mean |l| a square 1.120 bits over 110 sections, first 20 sections 1.102
+# held context after the cost read's sections: 1.187886 (lap 24: 1.188) 19:36:41
+MAIN the lap (2336861 ms) and its reads do not fit the hour (2430000 ms left): the chain stops
+== launch2
+# squares121 launch2 from bdaeff3a76c10712daa51856de87074511c91903330e8a557df91f19889b970e: hnn-field-learner-v3 12 75264 34 -, binary b957bb4ec66f33fb7ccec992ca1196ce9b1aaea3cc9807345f25dcaf034b13a8, the hour ends 20:37:07
+# lock taken 19:37:07
+# the lap and its reads, after parity and the cost read of 19:28-19:37 (parity equal, held 1.187886 after 110 sections)
+# lap bound 2336861 ms; a segment 2456861 ms, outer 2516 s, 2940 s left for it 19:37:07
+FIELD_LAP lap=0 read=35 before=3.386 after=- deposited=1535/1535 halvings=0 next_halved=0 next_refused=0 ms=1724729
+FIELD_LAPS_HELD lap=1 reason=time left=711992 bound=2336861 ms=1744869
+MEASURE lap=seg rc=0 wall_s=1745.4 peak_rss_kib=816520
+-1:5.456424:1.187713:1.390339 0:5.674061:1.191757:1.393340 
+-1:1.120 0:1.124 
+sections mean ms 1122 over 1535
+squares: mean |l| a square 1.179 bits over 1535 sections
+# reads of 3fe4b9a87a6f461582018bfec41e4e8014cfa1f79b1a1e8a1c2769f4546cd558 20:06:13
+== curl
+FIELD_CURL problems=32 squares=2560 regions=10240 ms=12796
+band	squares	lambda_mean	lambda_sd	curl_sd	curl/lambda	mean_abs_curl	corr
+1	512	+1.154	3.416	4.051	1.19	2.981	+0.48
+2-3	512	+0.503	1.727	2.672	1.55	1.799	+0.25
+4-7	512	+0.005	0.501	0.894	1.79	0.555	+0.12
+8-15	512	+0.017	0.400	0.670	1.68	0.319	+0.18
+16+	512	+0.021	0.183	0.273	1.49	0.163	+0.29
+== truth 40
+FIELD_LENGTH problems=32 sweeps=2062 refine=40_from_truth stopped=- run_bits=1 reads=17118 certified_bits=70501.536 passed=23171 ms=327306
+MEASURE lap=truth40 rc=0 wall_s=327.6 peak_rss_kib=237932
+PASSES truth40
+pass	answers	places	S	H	D	sqrtC/n	changes	K	within
+1	32	8760	0.816	0.840	-0.025	0.015	0.000	0.219	24
+2	32	8760	1.198	0.934	+0.264	0.016	0.256	0.245	10
+5	32	8760	1.826	1.151	+0.675	0.017	0.354	0.301	2
+10	32	8760	1.817	1.127	+0.690	0.016	0.356	0.294	1
+20	32	8760	1.518	1.066	+0.452	0.015	0.315	0.274	1
+30	32	8760	1.395	1.050	+0.346	0.014	0.295	0.264	6
+40	32	8760	1.354	1.053	+0.301	0.014	0.289	0.264	6
+rest pass (None: never) [(1, 24), (2, 8)]
+written: 32 answers: a fence opened 27, closed 21; parses as Python 2; code lines mean 7.9; identifiers 967, in the question 0.14, in the held answer 0.33
+truth40: tokens 967, repeat share 0.575, commonest j 0.107, i 0.073, the 0.049
+== refine 10
+FIELD_LENGTH problems=32 sweeps=2062 refine=10 stopped=- run_bits=1 reads=5653 certified_bits=21894.501 passed=7477 ms=127109
+MEASURE lap=refine10 rc=0 wall_s=127.4 peak_rss_kib=239804
+written: 32 answers, 26 open with ```python; a 'y' outside it in 19, its first at places 0 to 5 in 3 (median first 68), 'y' past it 0.011; commonest byte's share at places 10 to 255 (246 places) 0.218; top byte ' ' 0.189, 'y' 0.008, entropy 4.99 bits over 8760 bytes
+written: 32 answers: a fence opened 29, closed 25; parses as Python 0; code lines mean 10.8; identifiers 1078, in the question 0.09, in the held answer 0.13
+MAIN exit 20:14:01
+== trained squares by quarter
+quarter 1: squares 6143 mean |l| 1.163 bits
+quarter 2: squares 6140 mean |l| 1.169 bits
+quarter 3: squares 6144 mean |l| 1.174 bits
+quarter 4: squares 6126 mean |l| 1.210 bits
