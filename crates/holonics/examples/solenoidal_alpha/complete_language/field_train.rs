@@ -1849,7 +1849,10 @@ fn square_reads(field: &Field, void: usize, truth: &[usize], picked: &[(usize, u
 /// difference. With `v = (λ_i, λ_j)` and `σ` the swap, `κ = 1 − ⟨v, σv⟩/⟨v, v⟩ = l²/r²` (`r² = λ_i² + λ_j²`), and the pull is
 /// `l²/4`'s covector with its radial part removed, `w_i = (l/2) λ_j (λ_i + λ_j)/r²`, `w_j = −(l/2) λ_i (λ_i + λ_j)/r²` (zero
 /// where `r = 0`), so `w_i λ_i + w_j λ_j = 0`: no common scale of the two readings is pulled, and a one-way square
-/// (`λ_j = 0`) moves only the missing reading. Why (squares123): `l²/4` is homogeneous in the readings' scale, so its
+/// (`λ_j = 0`) moves only the missing reading. [agent-inferred, November 6, squares125] Each state's factor `w/(n_p/4)` is
+/// bounded by one, as a compared place's covector entry is (`|p − e| ≤ 1`), the two scaled alike so the pull keeps no radial
+/// part. Why: a runner-up of almost no mass on a cross face read `|l|` in the tens of bits, and squares125's pull outgrew the
+/// card's 128-bit sum at its 249th section. Why (squares123): `l²/4` is homogeneous in the readings' scale, so its
 /// steepest path shrank both (λ's spread at d = 1 3.54 → 2.99) and held context paid. [definition; the unified-theory reading of November 6, 20:18] **A square stands for its answer**: its four
 /// states together weigh as many places as its problem compares in the section (its opening's and its writer state's
 /// compared answer places, `n_p`), `w = (l/2)(n_p/4)`, so prediction and agreement stand equal a problem, local to its
@@ -1882,7 +1885,13 @@ pub(super) fn square_regions(codec: &FieldCodec, problems: &Problems, paths: &[u
         let (li, lj) = (sq.lambda_i as i128, sq.lambda_j as i128);
         let r2 = li * li + lj * lj;
         let n = compared.max(1) as i128;
-        let (wi, wj) = if r2 == 0 { (0, 0) } else { (fit_i64(div_nearest_i128(l as i128 * lj * (li + lj) * n, 8 * r2))?, fit_i64(div_nearest_i128(-(l as i128) * li * (li + lj) * n, 8 * r2))?) };
+        // Each state's factor (on 2^(−20)), bounded by one: the two scaled alike, so the pull keeps no radial part.
+        let (mut fi, mut fj) = if r2 == 0 { (0, 0) } else { (div_nearest_i128(l as i128 * lj * (li + lj), 2 * r2), div_nearest_i128(-(l as i128) * li * (li + lj), 2 * r2)) };
+        let most = fi.abs().max(fj.abs());
+        if most > 1 << 20 {
+            (fi, fj) = (div_nearest_i128(fi << 20, most), div_nearest_i128(fj << 20, most));
+        }
+        let (wi, wj) = (fit_i64(div_nearest_i128(fi * n, 4))?, fit_i64(div_nearest_i128(fj * n, 4))?);
         let (ai, aj, (bi, bj)) = (truth[i], truth[j], sq.runners);
         let state = |open_at: usize, set: Option<(usize, usize)>, pull: (usize, usize, i64)| {
             let mut classes = truth.clone();
@@ -2545,6 +2554,14 @@ pub(super) fn length_field(args: &[String], realization: &mut dyn FieldRealizati
     // [measurement; agent-inferred, November 6, the unified-theory reading of 17:58] `FIELD_WRITER_SPANS`: every second refine
     // pass moves spans, each opened whole and redrawn given the rest ([`holonics::hnn::tower::field::Field::sample_runs`]).
     let spans = std::env::var_os("FIELD_WRITER_SPANS").is_some();
+    // [measurement; agent-inferred, November 6, the unified-theory reading of 21:14] `FIELD_WRITER_REFINE_ORDER`: `place` or
+    // `reversed` walks each single-place refine pass in that scan ([`holonics::hnn::tower::field::RefineOrder`]), keyed otherwise.
+    let refine_order = match std::env::var("FIELD_WRITER_REFINE_ORDER").as_deref() {
+        Ok("place") => holonics::hnn::tower::field::RefineOrder::Place,
+        Ok("reversed") => holonics::hnn::tower::field::RefineOrder::Reversed,
+        Ok(other) if other != "keyed" => return Err(format!("FIELD_WRITER_REFINE_ORDER {other}: keyed, place or reversed").into()),
+        _ => holonics::hnn::tower::field::RefineOrder::Keyed,
+    };
     let given: Option<Vec<usize>> = match std::env::var("FIELD_WRITER_LENGTHS") {
         Ok(path) => {
             let text = std::fs::read_to_string(path)?;
@@ -2597,6 +2614,7 @@ pub(super) fn length_field(args: &[String], realization: &mut dyn FieldRealizati
             rest,
             spans,
             truth.as_deref(),
+            refine_order,
             realization,
             &mut |done, _| {
                 if started.elapsed().as_millis() > stop_ms || (reads > 0 && done == reads) {
@@ -2685,7 +2703,7 @@ pub(super) fn length_field(args: &[String], realization: &mut dyn FieldRealizati
         "FIELD_LENGTH problems={} sweeps={sweeps} refine={}{} stopped={} run_bits={run_bits} reads={reads_made} certified_bits={} passed={passed_sum} ms={}",
         problems.len(),
         refine,
-        format!("{}{}{}", if rest { "_rest" } else { "" }, if spans { "_spans" } else { "" }, if truth.is_some() { "_from_truth" } else { "" }),
+        format!("{}{}{}{}", if rest { "_rest" } else { "" }, if spans { "_spans" } else { "" }, if truth.is_some() { "_from_truth" } else { "" }, match refine_order { holonics::hnn::tower::field::RefineOrder::Keyed => "", holonics::hnn::tower::field::RefineOrder::Place => "_place", holonics::hnn::tower::field::RefineOrder::Reversed => "_reversed" }),
         stopped.map_or("-".to_string(), |s| s.to_string()),
         bits(bound_sum as i64, 1),
         started.elapsed().as_millis()

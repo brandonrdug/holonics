@@ -1540,14 +1540,14 @@ fn a_read_releases_a_run() {
     let (mut fewer, mut reads_one, mut reads_run) = (false, 0usize, 0usize);
     for seed in 11..19 {
         let one = field.sample_observed(&problems, 9, 2, 0, seed, &mut HostField, &mut |_, _| true, &mut |_| {}).unwrap();
-        assert_eq!(field.sample_runs(&problems, 9, 2, 0, seed, 0, true, false, None, false, false, false, None, &mut HostField, &mut |_, _| true, &mut |_| {}).unwrap(), one, "no bound, one place a read");
+        assert_eq!(field.sample_runs(&problems, 9, 2, 0, seed, 0, true, false, None, false, false, false, None, RefineOrder::Keyed, &mut HostField, &mut |_, _| true, &mut |_| {}).unwrap(), one, "no bound, one place a read");
         let mut counted = RegionsCounted { regions: Vec::new() };
-        field.sample_runs(&problems, 9, 2, 0, seed, 0, true, false, None, false, false, false, None, &mut counted, &mut |_, _| true, &mut |_| {}).unwrap();
+        field.sample_runs(&problems, 9, 2, 0, seed, 0, true, false, None, false, false, false, None, RefineOrder::Keyed, &mut counted, &mut |_, _| true, &mut |_| {}).unwrap();
         reads_one += counted.regions.len();
         let mut counted = RegionsCounted { regions: Vec::new() };
         let mut last: Option<Vec<usize>> = None;
         let run = field
-            .sample_runs(&problems, 9, 2, 0, seed, 1 << 20, true, false, None, false, false, false, None, &mut counted, &mut |_, _| true, &mut |r| {
+            .sample_runs(&problems, 9, 2, 0, seed, 1 << 20, true, false, None, false, false, false, None, RefineOrder::Keyed, &mut counted, &mut |_, _| true, &mut |r| {
                 for (k, &(q, _)) in problems.iter().enumerate() {
                     let earliest = (q.len()..r.classes[k].len()).filter(|&t| r.open[k][t]).map(|t| octave(t + 1 - q.len())).min();
                     if let (0, Some(j)) = (r.pass, earliest) {
@@ -1601,7 +1601,7 @@ fn an_answer_rests_where_its_drive_is_spent() {
             let mut entropies: std::collections::BTreeMap<(usize, usize), i128> = std::collections::BTreeMap::new();
             let mut drives: Vec<Vec<PassDrive>> = Vec::new();
             field
-                .sample_runs(&problems, 9, refine, 0, seed, 1 << 20, true, false, None, false, rest, false, None, &mut HostField, &mut |_, _| true, &mut |r| {
+                .sample_runs(&problems, 9, refine, 0, seed, 1 << 20, true, false, None, false, rest, false, None, RefineOrder::Keyed, &mut HostField, &mut |_, _| true, &mut |r| {
                     if let (true, Some(faces)) = (r.pass >= 1, r.faces) {
                         for k in 0..problems.len() {
                             let q = problems[k].0.len();
@@ -1648,7 +1648,7 @@ fn a_span_pass_opens_a_span_whole() {
     for seed in 3..11 {
         let mut drawn: std::collections::BTreeMap<(usize, usize), std::collections::BTreeSet<usize>> = std::collections::BTreeMap::new();
         let written = field
-            .sample_runs(&problems, 9, 8, 0, seed, 1 << 20, true, false, Some(&[6, 5, 9]), false, false, true, None, &mut HostField, &mut |_, _| true, &mut |r| {
+            .sample_runs(&problems, 9, 8, 0, seed, 1 << 20, true, false, Some(&[6, 5, 9]), false, false, true, None, RefineOrder::Keyed, &mut HostField, &mut |_, _| true, &mut |r| {
                 if r.pass == 0 || r.faces.is_none() {
                     return;
                 }
@@ -1677,6 +1677,50 @@ fn a_span_pass_opens_a_span_whole() {
     assert!(spanned > 0 && widest > 2, "spans opened ({spanned} reads, widest {widest})");
 }
 
+/// [measurement; agent-inferred, November 6, the unified-theory reading of 21:14] **A refine pass walks its declared scan**:
+/// one place a read, each place before the given length redrawn once a pass, in place order, in reversed place order, or
+/// (keyed) in an order that is neither on some pass.
+#[test]
+fn a_refine_pass_walks_its_declared_scan() {
+    let field = shaped(1);
+    let questions: [&[usize]; 3] = [&[1, 4, 0, 2], &[3, 3], &[2, 1, 1]];
+    let problems: Vec<(&[usize], usize)> = questions.iter().zip([9usize, 8, 12]).map(|(q, a)| (*q, a)).collect();
+    let lengths = [6usize, 5, 9];
+    let mut keyed_scrambled = false;
+    for order in [RefineOrder::Place, RefineOrder::Reversed, RefineOrder::Keyed] {
+        for seed in 3..9 {
+            let mut walked: std::collections::BTreeMap<(usize, usize), Vec<usize>> = std::collections::BTreeMap::new();
+            field
+                .sample_runs(&problems, 9, 4, 0, seed, 0, true, false, Some(&lengths), false, false, false, None, order, &mut HostField, &mut |_, _| true, &mut |r| {
+                    if r.pass == 0 || r.faces.is_none() {
+                        return;
+                    }
+                    for (k, &(q, _)) in problems.iter().enumerate() {
+                        let opened: Vec<usize> = (q.len()..r.classes[k].len()).filter(|&t| r.open[k][t]).collect();
+                        assert!(opened.len() <= 1, "seed {seed}: one place a read at run bits 0, {opened:?}");
+                        walked.entry((k, r.pass)).or_default().extend(opened);
+                    }
+                })
+                .unwrap();
+            for (k, &(q, _)) in problems.iter().enumerate() {
+                let places: Vec<usize> = (q.len()..q.len() + lengths[k]).collect();
+                for pass in 1..=4 {
+                    let scan = &walked[&(k, pass)];
+                    let mut sorted = scan.clone();
+                    sorted.sort_unstable();
+                    assert_eq!(sorted, places, "{order:?} seed {seed} problem {k} pass {pass}: each place once");
+                    match order {
+                        RefineOrder::Place => assert_eq!(scan, &places, "seed {seed}: place order"),
+                        RefineOrder::Reversed => assert!(scan.iter().rev().eq(places.iter()), "seed {seed}: reversed place order, {scan:?}"),
+                        RefineOrder::Keyed => keyed_scrambled |= scan != &places && !scan.iter().rev().eq(places.iter()),
+                    }
+                }
+            }
+        }
+    }
+    assert!(keyed_scrambled, "the keyed order is neither scan on some pass");
+}
+
 /// [measurement; agent-inferred, November 6, the unified-theory reading of 18:28] **A walk from given answers** reads them
 /// first: no sweep is drawn, the first refine pass keeps every standing letter (its changes none, its drive read on the
 /// given answers), so one pass returns the answers as given, and later passes walk from them.
@@ -1693,7 +1737,7 @@ fn a_walk_from_given_answers_reads_them_first() {
             let mut sweeps = 0usize;
             let mut drives: Vec<Vec<PassDrive>> = Vec::new();
             let written = field
-                .sample_runs(&problems, 9, refine, 0, seed, 1 << 20, true, false, Some(&lengths), false, false, false, Some(&answers), &mut HostField, &mut |_, _| true, &mut |r| {
+                .sample_runs(&problems, 9, refine, 0, seed, 1 << 20, true, false, Some(&lengths), false, false, false, Some(&answers), RefineOrder::Keyed, &mut HostField, &mut |_, _| true, &mut |r| {
                     sweeps += usize::from(r.pass == 0 && r.faces.is_some());
                     drives = r.drives.to_vec();
                 })
@@ -1746,7 +1790,7 @@ fn a_void_never_unwrites_a_letter() {
         for seed in 11..27 {
             let mut letters: Vec<Vec<Option<usize>>> = problems.iter().map(|&(q, n)| vec![None; q.len() + n]).collect();
             let places = field
-                .sample_runs(&problems, 4, 0, 0, seed, run_bound, true, false, None, false, false, false, None, &mut HostField, &mut |_, _| true, &mut |r| {
+                .sample_runs(&problems, 4, 0, 0, seed, run_bound, true, false, None, false, false, false, None, RefineOrder::Keyed, &mut HostField, &mut |_, _| true, &mut |r| {
                     if r.pass != 0 {
                         return;
                     }
@@ -1809,13 +1853,13 @@ fn a_given_length_is_kept() {
     let problems: Vec<(&[usize], usize)> = questions.iter().zip([9usize, 8]).map(|(q, a)| (*q, a)).collect();
     for run_bound in [0i128, 1 << 20] {
         for seed in 11..19 {
-            let written = field.sample_runs(&problems, 4, 2, 0, seed, run_bound, true, false, Some(&[3, 5]), false, false, false, None, &mut HostField, &mut |_, _| true, &mut |_| {}).unwrap();
+            let written = field.sample_runs(&problems, 4, 2, 0, seed, run_bound, true, false, Some(&[3, 5]), false, false, false, None, RefineOrder::Keyed, &mut HostField, &mut |_, _| true, &mut |_| {}).unwrap();
             for (places, l) in written.iter().zip([3usize, 5]) {
                 assert!(places[..l].iter().all(|&c| c != 0), "a void inside the given length, seed {seed}: {places:?}");
                 assert!(places[l..].iter().all(|&c| c == 0), "a letter past the given length, seed {seed}: {places:?}");
             }
             // One end, one draw: the length drawn from the first read is kept the same way.
-            let drawn = field.sample_runs(&problems, 4, 2, 0, seed, run_bound, true, false, None, true, false, false, None, &mut HostField, &mut |_, _| true, &mut |_| {}).unwrap();
+            let drawn = field.sample_runs(&problems, 4, 2, 0, seed, run_bound, true, false, None, true, false, false, None, RefineOrder::Keyed, &mut HostField, &mut |_, _| true, &mut |_| {}).unwrap();
             for places in &drawn {
                 let l = places.iter().position(|&c| c == 0).unwrap_or(places.len());
                 assert!(places[l..].iter().all(|&c| c == 0), "a letter past the drawn end, seed {seed}: {places:?}");

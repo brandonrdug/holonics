@@ -1072,6 +1072,16 @@ pub struct ReleaseRead<'a> {
     pub drives: &'a [Vec<PassDrive>],
 }
 
+/// [measurement; agent-inferred, November 6, the unified-theory reading of 21:14] **The order a refine pass walks an answer
+/// in**: a fresh keyed order each pass (the release's law), place order, or reversed place order. Consistent faces walk every
+/// scan to the same joint; where the faces curl, a scan's direction moves the walk's law, which a declared scan reads.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum RefineOrder {
+    Keyed,
+    Place,
+    Reversed,
+}
+
 /// [measurement; agent-inferred, November 6, the unified-theory reading of 17:38] **One answer's refine pass**: the places
 /// it redrew, and over them on the faces they were redrawn from (the whole face, or its letters where the draw removes the
 /// void's mass, [`letters_face`]; a place whose standing letter has no mass there, or whose face has no letter, is left out): the standing letters' codes `S = Σ −log₂ p(standing)` and
@@ -3608,7 +3618,7 @@ impl Field {
     /// faces. A reading only: nothing in the release reads it.
     #[allow(clippy::too_many_arguments)]
     pub fn sample_observed(&self, problems: &[(&[usize], usize)], sweeps: usize, refine: usize, void: usize, seed: u64, realization: &mut dyn FieldRealization, sweep: &mut dyn FnMut(usize, usize) -> bool, observe: &mut dyn FnMut(ReleaseRead)) -> Result<Vec<Vec<usize>>> {
-        self.release(problems, sweeps, refine, void, seed, 0, true, false, None, false, false, false, None, realization, sweep, observe)
+        self.release(problems, sweeps, refine, void, seed, 0, true, false, None, false, false, false, None, RefineOrder::Keyed, realization, sweep, observe)
     }
 
     /// [definition; agent-inferred, November 5, the unified-theory reading of 17:41, its bound read without a maximum]
@@ -3630,13 +3640,14 @@ impl Field {
     /// length from the release's first read when none is given ([`Field::release`]). `rest` lets each answer's refine
     /// passes stop where they come to rest ([`Field::release`]), `refine` then their most. `spans` makes every second refine
     /// pass a pass of span moves ([`Field::release`]). `from`, with `lengths` its answers' lengths, starts the walk from those
-    /// answers instead of the sweeps, its first refine pass read without drawing ([`Field::release`]).
-    pub fn sample_runs(&self, problems: &[(&[usize], usize)], sweeps: usize, refine: usize, void: usize, seed: u64, run_bound: i128, near_tail: bool, place_order: bool, lengths: Option<&[usize]>, one_end: bool, rest: bool, spans: bool, from: Option<&[Vec<usize>]>, realization: &mut dyn FieldRealization, sweep: &mut dyn FnMut(usize, usize) -> bool, observe: &mut dyn FnMut(ReleaseRead)) -> Result<Vec<Vec<usize>>> {
-        self.release(problems, sweeps, refine, void, seed, run_bound, near_tail, place_order, lengths, one_end, rest, spans, from, realization, sweep, observe)
+    /// answers instead of the sweeps, its first refine pass read without drawing ([`Field::release`]). `refine_order` is the
+    /// order a single-place refine pass walks each answer in ([`RefineOrder`]).
+    pub fn sample_runs(&self, problems: &[(&[usize], usize)], sweeps: usize, refine: usize, void: usize, seed: u64, run_bound: i128, near_tail: bool, place_order: bool, lengths: Option<&[usize]>, one_end: bool, rest: bool, spans: bool, from: Option<&[Vec<usize>]>, refine_order: RefineOrder, realization: &mut dyn FieldRealization, sweep: &mut dyn FnMut(usize, usize) -> bool, observe: &mut dyn FnMut(ReleaseRead)) -> Result<Vec<Vec<usize>>> {
+        self.release(problems, sweeps, refine, void, seed, run_bound, near_tail, place_order, lengths, one_end, rest, spans, from, refine_order, realization, sweep, observe)
     }
 
     #[allow(clippy::too_many_arguments)]
-    fn release(&self, problems: &[(&[usize], usize)], sweeps: usize, refine: usize, void: usize, seed: u64, run_bound: i128, near_tail: bool, place_order: bool, lengths: Option<&[usize]>, one_end: bool, rest: bool, spans: bool, from: Option<&[Vec<usize>]>, realization: &mut dyn FieldRealization, sweep: &mut dyn FnMut(usize, usize) -> bool, observe: &mut dyn FnMut(ReleaseRead)) -> Result<Vec<Vec<usize>>> {
+    fn release(&self, problems: &[(&[usize], usize)], sweeps: usize, refine: usize, void: usize, seed: u64, run_bound: i128, near_tail: bool, place_order: bool, lengths: Option<&[usize]>, one_end: bool, rest: bool, spans: bool, from: Option<&[Vec<usize>]>, refine_order: RefineOrder, realization: &mut dyn FieldRealization, sweep: &mut dyn FnMut(usize, usize) -> bool, observe: &mut dyn FnMut(ReleaseRead)) -> Result<Vec<Vec<usize>>> {
         if sweeps == 0 || void >= self.declaration.alphabet || problems.iter().any(|&(_, n)| n == 0) {
             return refuse("a sample needs a sweep, an answer place and a void class in the alphabet");
         }
@@ -3905,7 +3916,11 @@ impl Field {
                 .enumerate()
                 .map(|(k, &(q, _))| {
                     let mut order: Vec<usize> = (q.len()..classes[k].len()).collect();
-                    order.sort_by_key(|&t| (mix(((k as u64) << 32) ^ t as u64 ^ (pass << 48) ^ (1 << 62)), t));
+                    match refine_order {
+                        RefineOrder::Keyed => order.sort_by_key(|&t| (mix(((k as u64) << 32) ^ t as u64 ^ (pass << 48) ^ (1 << 62)), t)),
+                        RefineOrder::Place => {}
+                        RefineOrder::Reversed => order.reverse(),
+                    }
                     order
                 })
                 .collect();
