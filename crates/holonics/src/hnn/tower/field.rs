@@ -2442,7 +2442,11 @@ impl Field {
             self.tick(&mut x, &definite, &keyed, tick_paces, tick_moment, &reaches, window.as_deref(), &mut cell)?;
             cell.clock = own;
             if blanks && k + 1 < d.ticks {
-                let reads = (0..sites).map(|t| Self::silent(region, t).then(|| self.face_of(&x[t * dw..(t + 1) * dw], &reaches)).transpose()).collect::<Result<Vec<_>>>()?;
+                // [the unified-theory reading of November 6, 08:16] Only the blanks a clock reads are read: every silent place up
+                // to the silent stretch's first, whose rate the stretch past it runs at (every silent place under the per-blank
+                // clock); a face past it is read by no clock and returns no covector (`clock_return` folds the stretch there).
+                let stretch = if self.per_blank_clock { sites } else { Self::silent_stretch(region) };
+                let reads = (0..sites).map(|t| (Self::silent(region, t) && t <= stretch).then(|| self.face_of(&x[t * dw..(t + 1) * dw], &reaches)).transpose()).collect::<Result<Vec<_>>>()?;
                 let blank: Vec<Option<Shares>> = reads.iter().map(|r| r.as_ref().map(|r| shares(&r.face))).collect();
                 let next = self.paces_with(region, &blank)?;
                 let moment = self.moments_of(region, &next)?;

@@ -3950,3 +3950,11 @@ run, so RING.0 is the only control. At ring1's end (4 laps): `(` +0.0076, `)` +0
 +0.753, `[` +0.197, `]` +0.145, `{` +0.320, `}` +0.417, the newline +0.432. Matching needs `r(open) = −r(close)`. The matched
 sums are `( )` +0.21, `[ ]` −0.016 and `{ }` +0.73 at ring1, and +1.18, +0.34 and +0.74 at ring2. Every class drifts positive,
 so the ring located a clock rate, not depth, and ring1's bracket gain was not the ring's.
+
+[definition; agent-inferred, November 6, the unified-theory reading of 08:16] **Only the blanks a clock reads are read**. Under
+the one-rate clock, a silent place's face is read only by its own rate, and only up to the silent stretch's first place;
+past it every rate is that place's, and its covector folds there (`clock_return`). So each tick's blank faces are read only
+at the silent places up to the stretch's first, or at every silent place under the per-blank clock. That is the host pass;
+the card's blank clock and its return read the same sites (`blank_read`) as the open ones. In the opening that is about one
+face of 2,300 a tick. The field test `a_blank_place_runs_at_its_expected_duration` reads no face past the stretch's first
+place. The cut joins a run after its card parity, at a segment boundary.

@@ -310,6 +310,8 @@ struct FieldWords {
     const uint8_t *definite;
     // [E] Each site's row computed (the host's `Region::window`); null where no region of the batch cuts its room.
     const uint8_t *computed;
+    // Each site whose blank face a clock reads (the host's `pass`); the blank clock's face kernels read it as the open sites.
+    const uint8_t *blank_read;
     // The carried mixtures: site `t`'s shares are `mix_class`, `mix_share` over `mix_off[t]..mix_off[t + 1]`
     // (none where the site is not carried).
     const uint32_t *mix_off;

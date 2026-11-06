@@ -1081,12 +1081,13 @@ fn a_blank_place_runs_at_its_expected_duration() {
     }
     assert!(moved, "no blank ran off the bare rate");
     // [§16.47] Past the last arrival the silent stretch is one passage: every place there runs at its first place's rate,
-    // so a place `D` past it reads `τ_f + D κ₁`, while a silent place between two arrivals keeps its own face's rate.
+    // so a place `D` past it reads `τ_f + D κ₁`, while a silent place between two arrivals keeps its own face's rate; [the
+    // unified-theory reading of November 6, 08:16] a face past the stretch's first place is read by no clock and is not read.
     let long: Vec<usize> = (0..14).map(|t| [1usize, 3, 2, 4, 0, 2, 1][t % 7]).collect();
     let open: Vec<bool> = (0..14).map(|t| t == 2 || t >= 7).collect();
     let stretch = Region { classes: &long, unresolved: &open, faces: &[], locked: &[], echo: &[], domain: None, port: None };
     assert_eq!(Field::silent_stretch(&stretch), 7);
-    let (mut between, mut past) = (false, 0usize);
+    let mut between = false;
     for cell in &field.pass(&stretch, true).unwrap().ticks[1..] {
         let clock = cell.clock.as_ref().expect("a later tick reads its own clocks");
         for (p, kappa) in clock.paces.kappa.iter().enumerate() {
@@ -1098,11 +1099,11 @@ fn a_blank_place_runs_at_its_expected_duration() {
             for t in 8..14 {
                 assert_eq!(kappa[t], kappa[7], "place {t} runs at the stretch's first rate");
                 assert_eq!(clock.paces.tau[p][t] as i128, clock.paces.tau[p][7] as i128 + (t - 7) as i128 * kappa[7] as i128, "the clock at {t} is c_f + D κ₁");
-                past += (own(t) != own(7)) as usize;
+                assert!(clock.blank[t].is_none() && clock.reads[t].is_none(), "place {t}'s face is read by no clock");
             }
         }
     }
-    assert!(between && past > 0, "the stretch's own faces never differed from its first place's: {between} {past}");
+    assert!(between, "a silent place between arrivals never ran off the bare rate");
     // [the depth rings] A depth ring takes no blank face: every silent place runs at rate zero at every tick.
     let ring = shaped_with(FieldDeclaration { depth: 1, ..tiny_declaration(1) });
     for cell in &ring.pass(&stretch, true).unwrap().ticks[1..] {
