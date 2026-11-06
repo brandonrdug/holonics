@@ -4198,3 +4198,36 @@ band. At d = 1 that is λ's spread 3.48, power 32.05 and κ 0.485, against lap 2
   near agreement at this dose [measured; the steps differ, a weak read]. S fell 0.38 below squares121's with H falling alike: the
   pull moved the walk's resting law to a common-name pile-up, not toward the truth [inferred].
 Receipts: `longrun_nov6/squares126.txt`.
+
+[measurement; November 6, scans127; the unified-theory reading of 21:14] **Runs move the walk, and a reversed scan moves its
+law: the faces' curl reaches the release, so a structural face is owed.** Four walks from held truth on lap 24's state, 40 passes
+each, every one at run bits 0 (one place a read). Two are keyed, at truth120's key and at a second declared key. One walks place
+order and one reversed place order (`FIELD_WRITER_REFINE_ORDER`, at truth120's key). The reads were fixed before the walks
+(`scan_reads.py`): at pass 40 and over passes 31–40, a walk reads apart from another when, in some read, their difference passes
+the two keyed walks' gap by 0.15 bits a place in S, by 5 parses or by 4 closed fences. A scan is judged against the nearer keyed
+walk [agent-inferred: the conservative reading of "beyond the two keyed walks' gap", accepted by theory].
+
+| walk | S at pass 40 | S over 31–40 | D at pass 40 | parses | fences opened/closed |
+|---|---|---|---|---|---|
+| keyed, truth120's key | 1.161 | 1.249 | +0.281 | 2 | 26/21 |
+| keyed, second key | 1.127 | 1.223 | +0.236 | 0 | 28/23 |
+| place order | 1.338 | 1.416 | +0.316 | 3 | 25/19 |
+| reversed | 1.428 | 1.476 | +0.346 | 0 | 28/21 |
+| truth120 (keyed, run bits 1) | 1.472 | 1.522 | +0.351 | 0 | 26/21 |
+
+- The keyed gap is 0.034 bits in S at pass 40, 0.026 over 31–40, 2 parses and 2 closed fences.
+- Runs: keyed at run bits 0 lies 0.311 bits a place under truth120 in S at pass 40, 0.277 past the gap. So runs move the walk,
+  and later refine reads run at run bits 0. Theory's guess (runs inside the gap) failed. Each run's places are drawn blind to each
+  other, and that costs about 0.3 bits a place by pass 40.
+- Scans: reversed lies 0.267 above the nearer keyed walk at pass 40 (0.233 past the gap) and 0.227 over 31–40 (0.201 past it), so
+  it is apart. Place order lies 0.143 and 0.141 past the gap, just inside 0.15 (0.160 past it against the keyed walks' mean).
+  Parses and fences stay inside the gap for both scans. A fixed scan direction raises the walk's resting code, most when it walks
+  against the text, so the faces' curl moves the walk's law. With no slow mode (squares126), the structural face is owed: faces
+  as forces of one stored energy (theory's law of 21:15, sent with this score).
+- D moved less than S: reversed at pass 40 is 0.087 above the keyed walks' mean, against their gap of 0.045. Theory's "D most" did
+  not hold.
+- The common-identifier pile-up is in every walk: repeat share 0.553, 0.510, 0.628 and 0.608, with `j` the commonest identifier
+  in three of the four.
+- Time: the walks took 652.6, 665.9, 661.6 and 658.6 s, against 475 s projected (1.39×, 23.4 ms a read against truth120's 16.9).
+  All were inside the 900 s deadline, and the four took 2,639 s of the hour. Peak resident set was 240 MB.
+Receipts: `longrun_nov6/scans127.txt`, `longrun_nov6/scan_reads.py`.
