@@ -1156,7 +1156,8 @@ pub(super) fn train(args: &[String], realization: &mut dyn FieldRealization) -> 
     let mut previous = (code, sites);
     let mut grown = widened_first || laned_first;
     let mut fallen = false;
-    // The own curvature `b` of the step the last section stood at full size, which the next section's transfer prices.
+    // [the unified-theory reading of November 6, 08:54] The external price `p_ext` of the step the last section stood at full
+    // size, which the next section's transfer pairs with.
     let mut prior: Option<i128> = None;
     for lap in 0..laps {
         // A lap starts only where the time left holds its bound: no lap is begun that its own
@@ -1172,8 +1173,9 @@ pub(super) fn train(args: &[String], realization: &mut dyn FieldRealization) -> 
         let mut draw = read * train_set.len() as u64;
         let mut read_after = 0usize;
         let (mut code_before, mut code_after, mut sites, mut deposited, mut halvings, mut held_down, mut refused) = (0i64, 0i64, 0usize, 0usize, 0u64, 0usize, 0usize);
-        // The lap's transfers `Σ t` and the own curvatures `Σ b` of the steps they price, over the steps that stood at full size.
-        let (mut transfers, mut curvatures, mut priced) = (0i128, 0i128, 0usize);
+        // The lap's transfers `Σ t`, the external prices `Σ p_ext` they pair with and the curvatures `Σ (t − p_ext)`, over the
+        // steps that stood at full size.
+        let (mut transfers, mut externals, mut curvatures, mut priced) = (0i128, 0i128, 0i128, 0usize);
         let lap_start = std::time::Instant::now();
         let paths = paths_of(seed, read, &sections);
         for (n, &s) in walk(seed, read, sections.len()).iter().enumerate() {
@@ -1218,7 +1220,7 @@ pub(super) fn train(args: &[String], realization: &mut dyn FieldRealization) -> 
             let micro = |c: i64| if receipt.sites == 0 { 0 } else { (c as i128 * 1_000_000) / ((receipt.sites as i128) << 20) };
             let rate_taken = learner.rate_bits;
             println!(
-                "FIELD_SECTION lap={lap} n={n} sites={} before={} after={} halvings={} deposited={} {} predicted_micro={} change_micro={} transfer_micro={} rate={rate_taken} length={length} regions_ms={regions_ms} deposit_ms={deposit_ms} ms={}",
+                "FIELD_SECTION lap={lap} n={n} sites={} before={} after={} halvings={} deposited={} {} predicted_micro={} change_micro={} transfer_micro={} external_micro={} curvature_micro={} rate={rate_taken} length={length} regions_ms={regions_ms} deposit_ms={deposit_ms} ms={}",
                 receipt.sites,
                 bits(receipt.code_before, receipt.sites),
                 receipt.code_after.map_or("-".to_string(), |a| bits(a, receipt.sites)),
@@ -1228,12 +1230,14 @@ pub(super) fn train(args: &[String], realization: &mut dyn FieldRealization) -> 
                 receipt.predicted.map_or("-".to_string(), |p| micro(p).to_string()),
                 receipt.change.map_or("-".to_string(), |c| micro(c).to_string()),
                 receipt.transfer.map_or("-".to_string(), |t| micro(t).to_string()),
+                receipt.external.map_or("-".to_string(), |e| micro(e).to_string()),
+                receipt.transfer.zip(prior).map_or("-".to_string(), |(t, e)| if receipt.sites == 0 { "0".to_string() } else { ((t as i128 - e) * 1_000_000 / ((receipt.sites as i128) << 20)).to_string() }),
                 section_start.elapsed().as_millis()
             );
-            if let (Some(t), Some(b)) = (receipt.transfer, prior) {
-                (transfers, curvatures, priced) = (transfers + t as i128, curvatures + b, priced + 1);
+            if let (Some(t), Some(e)) = (receipt.transfer, prior) {
+                (transfers, externals, curvatures, priced) = (transfers + t as i128, externals + e, curvatures + (t as i128 - e), priced + 1);
             }
-            prior = receipt.predicted.zip(receipt.change).filter(|_| receipt.deposited && receipt.halvings == 0).map(|(a, c)| c as i128 - a as i128);
+            prior = receipt.external.filter(|_| receipt.deposited && receipt.halvings == 0).map(i128::from);
             let (over_lap, over_run) = (lap_start.elapsed().as_millis() > if grown { grown_lap_ms } else { lap_ms }, started.elapsed().as_millis() > stop_ms);
             if over_lap || over_run {
                 // The pending step is judged on the withheld problems as a lap's last step is, so
@@ -1257,6 +1261,16 @@ pub(super) fn train(args: &[String], realization: &mut dyn FieldRealization) -> 
         learner.laps += 1;
         // The lap's last step is read on the withheld problems, which it was not fit on.
         let (code, unseen_sites, next) = unseen_read(&mut learner, &codec, &train_set, &unseen, seed, realization)?;
+        // [measurement; §16.41; the unified-theory reading of November 6, 08:54] **The lap's line search**: along the lap's steps
+        // the joint code's slope at the step is `Σ t` and its curvature `Σ (t − p_ext)`, so its least is `μ* = −Σp_ext / Σ(t −
+        // p_ext)`, exactly `step_transfer(2Σt, Σ(t − p_ext))`; in thousandths of the step where `Σ(t − p_ext) > 0`, and the octave
+        // it reads. The rate moves before the state is written, so a segment's cut keeps the move.
+        let octave = step_transfer(2 * transfers, curvatures);
+        let least = if curvatures > 0 { -externals * 1000 / curvatures } else { 0 };
+        println!("FIELD_STEP_PRICE lap={lap} priced={priced} transfer={transfers} external={externals} curvature={curvatures} least_milli={least} octave={octave} rate={}", learner.rate_bits);
+        if transfer_law && priced > 0 {
+            learner.rate_bits = learner.rate_bits.saturating_add_signed(-octave).max(1);
+        }
         write_new(&out.join(format!("STATE.{lap}")), learner.to_text().as_bytes())?;
         println!(
             "FIELD_LAP lap={lap} read={} sites={sites} before={} after={} deposited={deposited}/{} halvings={halvings} next_halved={held_down} next_refused={refused} ms={}",
@@ -1267,14 +1281,6 @@ pub(super) fn train(args: &[String], realization: &mut dyn FieldRealization) -> 
             lap_start.elapsed().as_millis()
         );
         println!("FIELD_UNSEEN lap={lap} code={} sites={unseen_sites} {} ms={}", bits(code, unseen_sites), next_text(next), started.elapsed().as_millis());
-        // [measurement; §16.41] The lap's steps priced on the sections after them: `Σ t`, `Σ b` (on the codes' `2^(−20)` bits),
-        // the joint parabola's least `μ* = 1 − Σt / 2Σb` in thousandths of the step (where `Σ b > 0`), and the octave it reads.
-        let octave = step_transfer(transfers, curvatures);
-        let least = if curvatures > 0 { (2 * curvatures - transfers) * 1000 / (2 * curvatures) } else { 0 };
-        println!("FIELD_STEP_PRICE lap={lap} priced={priced} transfer={transfers} curvature={curvatures} least_milli={least} octave={octave} rate={}", learner.rate_bits);
-        if transfer_law && priced > 0 {
-            learner.rate_bits = learner.rate_bits.saturating_add_signed(-octave).max(1);
-        }
         // [measurement; agent-inferred, November 3, §16.31] `FIELD_STEP_COHERENCE`: each family's `Σ|m| / Σ√v` in millionths
         // ([`FieldLearner::step_coherence`]) after the lap, which families' steps are driven and which are noise.
         if std::env::var_os("FIELD_STEP_COHERENCE").is_some() {
@@ -1325,7 +1331,10 @@ pub(super) fn train(args: &[String], realization: &mut dyn FieldRealization) -> 
 /// steps priced (a section's own parabola, the receipt's `change − predicted`), so the joint parabola's least is
 /// `μ* = 1 − Σt / 2Σb`. The step halves where `μ* < 1/√2` and doubles where `μ* > √2`, the octave nearest `μ*` on the rate's
 /// own carrier, compared exactly (`u = 2Σb − Σt = 2Σb μ*`: halve where `u < 0` or `u² < 2(Σb)²`, double where `u² > 8(Σb)²`).
-/// Where no curvature is read (`Σ b ≤ 0`) the transfer's sign alone moves it. Why the next sections and not the step's own:
+/// Where no curvature is read (`Σ b ≤ 0`) the transfer's sign alone moves it. [the unified-theory reading of November 6, 08:54]
+/// Since the step fluxes (no reread, so no `change`), the trainer reads it as the lap's line search, `step_transfer(2Σt,
+/// Σ(t − p_ext))`: `μ* = −Σp_ext / Σ(t − p_ext)`, the curvature `t − p_ext` read from the pass alone ([`FieldReceipt::external`]).
+/// Why the next sections and not the step's own:
 /// a step's own parabola read its least near five times the step at rate `2^(−11)` and its law drove the step to `2^(−7)`,
 /// where the joint code rose from 1.127 to 1.59 nats a place (`_receipts/law50/`): a step's own fall is mostly the fit to its
 /// own section, and only the next sections price what it generalizes.

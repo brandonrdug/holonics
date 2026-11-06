@@ -4430,6 +4430,12 @@ pub struct FieldReceipt {
     /// where the step before was short of what this section, which it was not fit on, would take; positive where it went
     /// past. `None` at a learner's first section, after a section that deposited nothing, or past its carrier.
     pub transfer: Option<i64>,
+    /// [measurement; agent-inferred, November 6, the unified-theory reading of 08:54] **The external price**, `p_ext =
+    /// Σ_i g_i Δθᵉ_i` on the codes' grain, with `Δθᵉ` the step the moments would deposit before this section's covector
+    /// moves them (`deposit_step(m_(s−1), v_(s−1))`): a step this section never shaped, priced on it as `transfer` prices the
+    /// step before on the next section, with no self-alignment. `transfer − external` of the section before reads the
+    /// step's curvature `ΔθᵀHΔθ` from the pass alone, with no reread. `None` past its carrier.
+    pub external: Option<i64>,
 }
 
 /// A deposited step held for the next regions' read: the proposed step on each family's grain and
@@ -4814,6 +4820,15 @@ impl FieldLearner {
             + regions.iter().filter_map(|r| r.port.map(|p| (p.start..p.stop.unwrap_or(r.classes.len()).min(r.classes.len())).filter(|&t| p.heard.is_none_or(|h| h[t])).count())).sum::<usize>();
         let raw = g.clone();
         let transfer = self.last.take().and_then(|s| predicted_change(&self.field, &raw, &s.step, s.halvings));
+        // [the unified-theory reading of November 6, 08:54] The step the moments would deposit before this section moves them,
+        // priced on this section: the external price, a step this section never shaped.
+        let mut external_step = vec![0i128; g.len()];
+        for &(start, len, grain) in &self.field.families_all() {
+            for i in start..start + len {
+                external_step[i] = deposit_step(self.first[i], self.second[i], grain, self.rate_bits);
+            }
+        }
+        let external = predicted_change(&self.field, &raw, &external_step, 0);
         for &(start, len, grain) in &self.field.families_all() {
             for v in &mut g[start..start + len] {
                 *v = on_step_grain(grain, *v);
@@ -4845,7 +4860,7 @@ impl FieldLearner {
         // alike, and the moments carry every covector.
         let (candidate, moved) = stepped(&self.field, &step, 0)?;
         if !moved {
-            return Ok(FieldReceipt { sites, code_before, code_after: None, halvings: 0, deposited: false, next, predicted, change: None, transfer });
+            return Ok(FieldReceipt { sites, code_before, code_after: None, halvings: 0, deposited: false, next, predicted, change: None, transfer, external });
         }
         self.field = candidate;
         if self.read_held {
@@ -4853,7 +4868,7 @@ impl FieldLearner {
         } else {
             self.last = Some(HeldStep { step, halvings: 0 });
         }
-        Ok(FieldReceipt { sites, code_before, code_after: None, halvings: 0, deposited: true, next, predicted, change: None, transfer })
+        Ok(FieldReceipt { sites, code_before, code_after: None, halvings: 0, deposited: true, next, predicted, change: None, transfer, external })
     }
 
     /// [definition; agent-inferred, November 3, the tower record] **The learner grown in scale**: its field grown in scale
