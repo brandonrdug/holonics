@@ -1575,15 +1575,16 @@ fn a_read_releases_a_run() {
 
 /// [definition; agent-inferred, November 6, Brandon's lens of 17:31 and the unified-theory reading of 17:38] **An answer rests
 /// where its drive is spent**: each refine pass's [`PassDrive`] sums the faces its draws were read from (their entropies
-/// beside the faces the release shows), and with `rest` an answer is redrawn in pass `p + 1` exactly while no pass so far had
+/// beside the faces the release shows, the letters' face before the last letter), and with `rest` an answer is redrawn in pass `p + 1` exactly while no pass so far had
 /// `D ≤ √C` or a fall of `D` within `√C`; without it every answer walks every pass. A face's varentropy is its codes' spread.
 #[test]
 fn an_answer_rests_where_its_drive_is_spent() {
     let uniform = TowerFace { masses: vec![1, 1, 1, 1], total: 4 };
     assert_eq!((entropy(&uniform), varentropy(&uniform)), (2 << 20, 0));
     let skew = TowerFace { masses: vec![3, 1], total: 4 };
-    let v = varentropy(&skew) as f64 / (1u64 << 40) as f64;
-    assert!((v - 0.4715).abs() < 1e-3, "{v}");
+    // `Var = ¾ log₂²(4/3) + ¼ · 2² − H² ≈ 0.4715` bits², on `2^(−40)`.
+    let v = varentropy(&skew);
+    assert!((v - 4715 * (1i128 << 40) / 10_000).abs() < (1i128 << 40) / 1000, "{v}");
     let mut one = PassDrive::default();
     one.add(&skew, 1);
     assert_eq!((one.redrawn, one.standing, one.entropy), (1, 2 << 20, entropy(&skew)));
@@ -1601,8 +1602,12 @@ fn an_answer_rests_where_its_drive_is_spent() {
                 .sample_runs(&problems, 9, refine, 0, seed, 1 << 20, true, false, None, false, rest, &mut HostField, &mut |_, _| true, &mut |r| {
                     if let (true, Some(faces)) = (r.pass >= 1, r.faces) {
                         for k in 0..problems.len() {
+                            let q = problems[k].0.len();
+                            let end = (q..r.classes[k].len()).find(|&t| r.classes[k][t] == 0 && !r.open[k][t]).unwrap_or(r.classes[k].len());
                             for t in (0..r.classes[k].len()).filter(|&t| r.open[k][t]) {
-                                *entropies.entry((k, r.pass)).or_default() += entropy(faces[k][t].as_ref().unwrap());
+                                let face = faces[k][t].as_ref().unwrap();
+                                let drawn = if t + 1 >= end { Some(face.clone()) } else { letters_face(face, 0) };
+                                *entropies.entry((k, r.pass)).or_default() += drawn.map_or(0, |f| entropy(&f));
                             }
                         }
                     }

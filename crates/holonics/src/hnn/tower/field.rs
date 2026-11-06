@@ -1044,7 +1044,8 @@ pub struct ReleaseRead<'a> {
 }
 
 /// [measurement; agent-inferred, November 6, the unified-theory reading of 17:38] **One answer's refine pass**: the places
-/// it redrew, and over them on the faces they were redrawn from: the standing letters' codes `S = Σ −log₂ p(standing)` and
+/// it redrew, and over them on the faces they were redrawn from (the whole face, or its letters where the draw removes the
+/// void's mass, [`letters_face`]; a place whose standing letter has no mass there, or whose face has no letter, is left out): the standing letters' codes `S = Σ −log₂ p(standing)` and
 /// the faces' entropies `H = Σ H(face)` on `2^(−20)` bits, their varentropies `C` on `2^(−40)` bits², the places whose
 /// letter changed, and `K = Σ (1 − Σ_a p(a)²)` on `2^(−20)`, the changes a walk at equilibrium keeps. The drive `D = S − H`
 /// sums the face temperature covector at the standing letters, the code's derivative in the face's temperature at `τ = 1`,
@@ -3923,10 +3924,16 @@ impl Field {
                     for (&t, &was) in run.iter().zip(&kept[k]) {
                     let face = faces[k][t].as_ref().ok_or(TowerError::Refused("a sample's open place without a face"))?;
                     drawn_entropy[k][t] = Some(entropy(face));
-                    moved[k].add(face, was);
                     let u = ((mix(((k as u64) << 40) ^ ((t as u64) << 8) ^ (pass << 56) ^ 0xD) as u128) << 64) | mix(((k as u64) << 40) ^ ((t as u64) << 8) ^ (pass << 56) ^ 0xE) as u128;
                     let whole = !given && t + 1 >= end;
                     let letters = face.total - face.masses[void];
+                    // The drive is read on the face the place is drawn from: the whole face, or its letters.
+                    let off_void = if whole { None } else { letters_face(face, void) };
+                    if let Some(drawn) = if whole { Some(face) } else { off_void.as_ref() } {
+                        if drawn.masses[was] > 0 {
+                            moved[k].add(drawn, was);
+                        }
+                    }
                     classes[k][t] = if whole {
                         let u = u % face.total;
                         let mut acc = 0u128;
@@ -5071,6 +5078,13 @@ pub fn one_end_length(room: &[Option<&TowerFace>], void: usize, u: u128) -> usiz
 
 pub fn octave_of(d: usize) -> u32 {
     usize::BITS - 1 - d.leading_zeros()
+}
+
+/// A face restricted to the letters, the void's mass removed (`None` where no letter has mass): the face a place before an
+/// answer's last letter is drawn from ([`Field::release`]).
+pub fn letters_face(face: &TowerFace, void: usize) -> Option<TowerFace> {
+    let total = face.total - face.masses[void];
+    (total > 0).then(|| TowerFace { masses: face.masses.iter().enumerate().map(|(c, &m)| if c == void { 0 } else { m }).collect(), total })
 }
 
 /// [definition; agent-inferred, November 6] A face's varentropy `Σ_a p(a) (−log₂ p(a))² − H²`, the spread of a draw's
