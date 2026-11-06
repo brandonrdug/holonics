@@ -3406,7 +3406,7 @@ impl Field {
     /// faces. A reading only: nothing in the release reads it.
     #[allow(clippy::too_many_arguments)]
     pub fn sample_observed(&self, problems: &[(&[usize], usize)], sweeps: usize, refine: usize, void: usize, seed: u64, realization: &mut dyn FieldRealization, sweep: &mut dyn FnMut(usize, usize) -> bool, observe: &mut dyn FnMut(ReleaseRead)) -> Result<Vec<Vec<usize>>> {
-        self.release(problems, sweeps, refine, void, seed, 0, true, false, realization, sweep, observe)
+        self.release(problems, sweeps, refine, void, seed, 0, true, false, None, realization, sweep, observe)
     }
 
     /// [definition; agent-inferred, November 5, the unified-theory reading of 17:41, its bound read without a maximum]
@@ -3421,13 +3421,16 @@ impl Field {
     /// loss when it is drawn beside the run's first.
     #[allow(clippy::too_many_arguments)]
     /// `near_tail` is the writer's region law ([`Field::read_active`]); `false` declares the whole room for comparison.
-    /// `place_order` draws each octave's places in place order rather than its keyed order.
-    pub fn sample_runs(&self, problems: &[(&[usize], usize)], sweeps: usize, refine: usize, void: usize, seed: u64, run_bound: i128, near_tail: bool, place_order: bool, realization: &mut dyn FieldRealization, sweep: &mut dyn FnMut(usize, usize) -> bool, observe: &mut dyn FnMut(ReleaseRead)) -> Result<Vec<Vec<usize>>> {
-        self.release(problems, sweeps, refine, void, seed, run_bound, near_tail, place_order, realization, sweep, observe)
+    /// `place_order` draws each octave's places in place order rather than its keyed order. [agent-inferred, November 6, the
+    /// unified-theory reading of 03:08] `lengths`, where given, fixes each answer's length: its places past it stand resolved as
+    /// the void from the first read (so the region is the question, the answer and its near tail), and every answer place,
+    /// in the sweeps and in refine, draws from its face over the letters; the end never moves.
+    pub fn sample_runs(&self, problems: &[(&[usize], usize)], sweeps: usize, refine: usize, void: usize, seed: u64, run_bound: i128, near_tail: bool, place_order: bool, lengths: Option<&[usize]>, realization: &mut dyn FieldRealization, sweep: &mut dyn FnMut(usize, usize) -> bool, observe: &mut dyn FnMut(ReleaseRead)) -> Result<Vec<Vec<usize>>> {
+        self.release(problems, sweeps, refine, void, seed, run_bound, near_tail, place_order, lengths, realization, sweep, observe)
     }
 
     #[allow(clippy::too_many_arguments)]
-    fn release(&self, problems: &[(&[usize], usize)], sweeps: usize, refine: usize, void: usize, seed: u64, run_bound: i128, near_tail: bool, place_order: bool, realization: &mut dyn FieldRealization, sweep: &mut dyn FnMut(usize, usize) -> bool, observe: &mut dyn FnMut(ReleaseRead)) -> Result<Vec<Vec<usize>>> {
+    fn release(&self, problems: &[(&[usize], usize)], sweeps: usize, refine: usize, void: usize, seed: u64, run_bound: i128, near_tail: bool, place_order: bool, lengths: Option<&[usize]>, realization: &mut dyn FieldRealization, sweep: &mut dyn FnMut(usize, usize) -> bool, observe: &mut dyn FnMut(ReleaseRead)) -> Result<Vec<Vec<usize>>> {
         if sweeps == 0 || void >= self.declaration.alphabet || problems.iter().any(|&(_, n)| n == 0) {
             return refuse("a sample needs a sweep, an answer place and a void class in the alphabet");
         }
@@ -3440,6 +3443,17 @@ impl Field {
         let starts: Vec<usize> = problems.iter().map(|&(q, _)| q.len()).collect();
         let mut classes: Vec<Vec<usize>> = problems.iter().map(|&(q, n)| q.iter().copied().chain(std::iter::repeat_n(void, n)).collect()).collect();
         let mut open: Vec<Vec<bool>> = problems.iter().map(|&(q, n)| (0..q.len() + n).map(|t| t >= q.len()).collect()).collect();
+        let given = lengths.is_some();
+        if let Some(ls) = lengths {
+            if ls.len() != problems.len() {
+                return refuse("a given length for each problem");
+            }
+            for (k, &(q, _)) in problems.iter().enumerate() {
+                for slot in open[k].iter_mut().skip(q.len() + ls[k]) {
+                    *slot = false;
+                }
+            }
+        }
         // [definition; agent-inferred, November 5, §16.47] **The answer is released by octaves of its distance from the
         // question** (the unified-theory reading of 15:04): octave `j` holds the places at distance `[2^j, 2^(j+1))` past
         // the question (the first place at distance one), and its places open to the draws only once every place of the
@@ -3535,7 +3549,7 @@ impl Field {
                     drawn_entropy[k][t] = Some(entropy(face));
                     let u = ((mix(((k as u64) << 40) ^ ((t as u64) << 8) ^ 0xD) as u128) << 64) | mix(((k as u64) << 40) ^ ((t as u64) << 8) ^ 0xE) as u128;
                     let letters = face.total - face.masses[void];
-                    let c = if last_letter.is_some_and(|l| t < l) && letters > 0 {
+                    let c = if (given || last_letter.is_some_and(|l| t < l)) && letters > 0 {
                         let u = u % letters;
                         let mut acc = 0u128;
                         (0..face.masses.len()).filter(|&c| c != void).find(|&c| {
@@ -3628,7 +3642,7 @@ impl Field {
                     let end = boundary(&classes[k], &open[k], q.len());
                     while let Some(&t) = orders[k].get(cursors[k]) {
                         cursors[k] += 1;
-                        if t <= end {
+                        if t < end || (!given && t == end) {
                             places[k] = Some((vec![t], end));
                             break;
                         }
@@ -3636,7 +3650,7 @@ impl Field {
                     if let (true, Some((run, _))) = (run_bound > 0, places[k].as_mut()) {
                         let mut held = 0i128;
                         while let Some(&t) = orders[k].get(cursors[k]) {
-                            if t > end {
+                            if t > end || (given && t == end) {
                                 cursors[k] += 1;
                                 continue;
                             }
@@ -3689,7 +3703,7 @@ impl Field {
                     let face = faces[k][t].as_ref().ok_or(TowerError::Refused("a sample's open place without a face"))?;
                     drawn_entropy[k][t] = Some(entropy(face));
                     let u = ((mix(((k as u64) << 40) ^ ((t as u64) << 8) ^ (pass << 56) ^ 0xD) as u128) << 64) | mix(((k as u64) << 40) ^ ((t as u64) << 8) ^ (pass << 56) ^ 0xE) as u128;
-                    let whole = t + 1 >= end;
+                    let whole = !given && t + 1 >= end;
                     let letters = face.total - face.masses[void];
                     classes[k][t] = if whole {
                         let u = u % face.total;

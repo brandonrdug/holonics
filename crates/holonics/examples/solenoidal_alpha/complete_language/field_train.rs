@@ -1963,6 +1963,22 @@ pub(super) fn length_field(args: &[String], realization: &mut dyn FieldRealizati
     // [measurement; agent-inferred, November 6] `FIELD_WRITER_PLACE_ORDER`: each octave drawn in place order
     // ([`Field::sample_runs`]'s `place_order`), declared against the keyed order within an octave.
     let place_order = std::env::var_os("FIELD_WRITER_PLACE_ORDER").is_some();
+    // [measurement; agent-inferred, November 6] `FIELD_WRITER_LENGTHS`: a write's `ENDS.tsv` whose `written` places fix each
+    // answer's length ([`Field::sample_runs`]'s `lengths`), the writer then writing content given its length.
+    let given: Option<Vec<usize>> = match std::env::var("FIELD_WRITER_LENGTHS") {
+        Ok(path) => {
+            let text = std::fs::read_to_string(path)?;
+            let mut by: std::collections::BTreeMap<usize, usize> = std::collections::BTreeMap::new();
+            for l in text.lines().skip(1) {
+                let mut c = l.split('\t');
+                if let (Some(k), Some(w)) = (c.next().and_then(|v| v.parse().ok()), c.nth(1).and_then(|v| v.parse().ok())) {
+                    by.insert(k, w);
+                }
+            }
+            Some((0..problems.len()).map(|k| by.get(&k).copied().ok_or("a problem with no length in FIELD_WRITER_LENGTHS")).collect::<std::result::Result<Vec<usize>, _>>()?.into_iter().zip(&problems).map(|(l, &(_, n))| l.min(n)).collect())
+        }
+        Err(_) => None,
+    };
     let (mut reads_made, mut bound_sum, mut passed_sum) = (0usize, 0i128, 0usize);
     // [measurement; agent-inferred, November 5] Each refine pass's redraws and their code, `Σ −log₂ p(c)` of the class each
     // drew on the face it was drawn from, a problem a pass (`PASSES.tsv`): whether the answer's own code falls, then holds.
@@ -1978,6 +1994,7 @@ pub(super) fn length_field(args: &[String], realization: &mut dyn FieldRealizati
             run_bits << 20,
             near_tail,
             place_order,
+            given.as_deref(),
             realization,
             &mut |done, _| {
                 if started.elapsed().as_millis() > stop_ms || (reads > 0 && done == reads) {
