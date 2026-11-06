@@ -280,3 +280,9 @@ place a read, no refine pass) against the reading fixed at 01:21: written over h
 exact ```` ```python ```` openings (fails), entropy 4.42 bits and the space at 31.5% (fails), `y` 0.9% (passes); the correlation
 +0.045, 5 of 28 fences closed, writes opening on runs of spaces. The keyed write passed its 900 s guard (incomplete). The prefix
 states, each standing for `len + 1` places, took about half the step from the content masks.
+
+[measurement; agent-inferred] **The masks' order writes held's byte statistics and not its fences** (masks98; `masks98.txt`).
+code86's state writing in the masks' own order with code89's 32 lengths, one place a read (1,709 reads, 132 card-seconds):
+byte entropy 4.93 bits against held's 4.96, the top byte the space at 17.6% against 17.4%, `y` 1.2%, 11.4 code lines a write;
+9 exact ```` ```python ```` openings and 14 of 31 fences closed, far brackets, strings and blocks 0.41, 0.34 and 0.47 of held's
+closure. By the reading fixed at 02:38, (b) and the fences fail, and the keyed whole-room writer stays.
