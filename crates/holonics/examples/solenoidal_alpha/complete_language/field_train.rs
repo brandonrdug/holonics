@@ -1307,7 +1307,7 @@ pub(super) fn sample(args: &[String], realization: &mut dyn FieldRealization) ->
     let units = units_of(&args[5], &args[6])?;
     let codec = FieldCodec::from_text(std::str::from_utf8(&pinned_read(&args[3], &args[4], CODEC_BUDGET)?)?, units)?;
     let held = problems_of(&pinned_read(&args[7], &args[8], READ_BUDGET as usize)?);
-    let (limit, sweeps, refine, stop_ms) = (count(&args[9])?, positive(&args[10])?, refine_of(&args[11])?, positive(&args[12])? as u128);
+    let (limit, sweeps, refine, stop_ms) = (count(&args[9])?, positive(&args[10])?, count(&args[11])?, positive(&args[12])? as u128);
     let out = Path::new(&args[13]);
     std::fs::create_dir(out)?;
     let field = &learner.field;
@@ -1580,12 +1580,6 @@ pub(super) fn reach_field(args: &[String], realization: &mut dyn FieldRealizatio
     Ok(())
 }
 
-/// A release's `REFINE`: a count of passes, or `settle` ([`holonics::hnn::tower::field::SETTLE`]: each answer's passes run
-/// until a pass does not lower its own code per place).
-fn refine_of(arg: &str) -> Result<usize> {
-    if arg == "settle" { Ok(holonics::hnn::tower::field::SETTLE) } else { count(arg) }
-}
-
 /// [measurement; agent-inferred, November 5, §16.46] **`opening-field STATE STATE_SHA CODEC CODEC_SHA UNITS UNITS_SHA HELD
 /// HELD_SHA TRAIN TRAIN_SHA COUNT OUT`**: the void's mass across the writer's opening (the unified-theory reading of November
 /// 5, 07:16: the writer overruns its answers, and a byte drawn far out pins the answer at least that long). For each of the
@@ -1667,7 +1661,7 @@ pub(super) fn length_field(args: &[String], realization: &mut dyn FieldRealizati
     let units = units_of(&args[5], &args[6])?;
     let codec = FieldCodec::from_text(std::str::from_utf8(&pinned_read(&args[3], &args[4], CODEC_BUDGET)?)?, units)?;
     let held = problems_of(&pinned_read(&args[7], &args[8], READ_BUDGET as usize)?);
-    let (limit, sweeps, refine, stop_ms) = (count(&args[9])?, positive(&args[10])?, refine_of(&args[11])?, positive(&args[12])? as u128);
+    let (limit, sweeps, refine, stop_ms) = (count(&args[9])?, positive(&args[10])?, count(&args[11])?, positive(&args[12])? as u128);
     let out = Path::new(&args[13]);
     std::fs::create_dir(out)?;
     let field = &learner.field;
@@ -1693,6 +1687,9 @@ pub(super) fn length_field(args: &[String], realization: &mut dyn FieldRealizati
     // [measurement; agent-inferred, November 5] `FIELD_WRITER_ROOM`: the writer reads the whole room past its lowest void,
     // the region law it replaced ([`Field::sample_runs`]'s `near_tail`), a declared comparison.
     let near_tail = std::env::var_os("FIELD_WRITER_ROOM").is_none();
+    // [measurement; agent-inferred, November 6] `FIELD_WRITER_PLACE_ORDER`: each octave drawn in place order
+    // ([`Field::sample_runs`]'s `place_order`), declared against the keyed order within an octave.
+    let place_order = std::env::var_os("FIELD_WRITER_PLACE_ORDER").is_some();
     let (mut reads_made, mut bound_sum, mut passed_sum) = (0usize, 0i128, 0usize);
     // [measurement; agent-inferred, November 5] Each refine pass's redraws and their code, `Σ −log₂ p(c)` of the class each
     // drew on the face it was drawn from, a problem a pass (`PASSES.tsv`): whether the answer's own code falls, then holds.
@@ -1707,6 +1704,7 @@ pub(super) fn length_field(args: &[String], realization: &mut dyn FieldRealizati
             seed,
             run_bits << 20,
             near_tail,
+            place_order,
             realization,
             &mut |done, _| {
                 if started.elapsed().as_millis() > stop_ms || (reads > 0 && done == reads) {
@@ -1790,7 +1788,7 @@ pub(super) fn length_field(args: &[String], realization: &mut dyn FieldRealizati
     println!(
         "FIELD_LENGTH problems={} sweeps={sweeps} refine={} stopped={} run_bits={run_bits} reads={reads_made} certified_bits={} passed={passed_sum} ms={}",
         problems.len(),
-        if refine == holonics::hnn::tower::field::SETTLE { "settle".to_string() } else { refine.to_string() },
+        refine,
         stopped.map_or("-".to_string(), |s| s.to_string()),
         bits(bound_sum as i64, 1),
         started.elapsed().as_millis()

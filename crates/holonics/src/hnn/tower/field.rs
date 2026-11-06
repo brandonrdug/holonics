@@ -188,10 +188,6 @@ pub const STATE_BITS: u32 = 16;
 /// place without winding, and four bytes before a site code it at 1.98 bits, so a byte's own
 /// spelling context lies inside it).
 pub const NEAR: usize = 6;
-
-/// [definition; agent-inferred, November 5] The release's `refine` that runs each answer's passes until it settles
-/// ([`Field::sample_runs`]): no pass count is set.
-pub const SETTLE: usize = usize::MAX;
 /// The most shells a head's classes may carry (`3^7 = 2,187` classes, within the card's `2^12`
 /// buckets a head and region).
 pub const MAX_CLASS_TRITS: usize = 7;
@@ -3407,7 +3403,7 @@ impl Field {
     /// faces. A reading only: nothing in the release reads it.
     #[allow(clippy::too_many_arguments)]
     pub fn sample_observed(&self, problems: &[(&[usize], usize)], sweeps: usize, refine: usize, void: usize, seed: u64, realization: &mut dyn FieldRealization, sweep: &mut dyn FnMut(usize, usize) -> bool, observe: &mut dyn FnMut(ReleaseRead)) -> Result<Vec<Vec<usize>>> {
-        self.release(problems, sweeps, refine, void, seed, 0, true, realization, sweep, observe)
+        self.release(problems, sweeps, refine, void, seed, 0, true, false, realization, sweep, observe)
     }
 
     /// [definition; agent-inferred, November 5, the unified-theory reading of 17:41, its bound read without a maximum]
@@ -3422,12 +3418,13 @@ impl Field {
     /// loss when it is drawn beside the run's first.
     #[allow(clippy::too_many_arguments)]
     /// `near_tail` is the writer's region law ([`Field::read_active`]); `false` declares the whole room for comparison.
-    pub fn sample_runs(&self, problems: &[(&[usize], usize)], sweeps: usize, refine: usize, void: usize, seed: u64, run_bound: i128, near_tail: bool, realization: &mut dyn FieldRealization, sweep: &mut dyn FnMut(usize, usize) -> bool, observe: &mut dyn FnMut(ReleaseRead)) -> Result<Vec<Vec<usize>>> {
-        self.release(problems, sweeps, refine, void, seed, run_bound, near_tail, realization, sweep, observe)
+    /// `place_order` draws each octave's places in place order rather than its keyed order.
+    pub fn sample_runs(&self, problems: &[(&[usize], usize)], sweeps: usize, refine: usize, void: usize, seed: u64, run_bound: i128, near_tail: bool, place_order: bool, realization: &mut dyn FieldRealization, sweep: &mut dyn FnMut(usize, usize) -> bool, observe: &mut dyn FnMut(ReleaseRead)) -> Result<Vec<Vec<usize>>> {
+        self.release(problems, sweeps, refine, void, seed, run_bound, near_tail, place_order, realization, sweep, observe)
     }
 
     #[allow(clippy::too_many_arguments)]
-    fn release(&self, problems: &[(&[usize], usize)], sweeps: usize, refine: usize, void: usize, seed: u64, run_bound: i128, near_tail: bool, realization: &mut dyn FieldRealization, sweep: &mut dyn FnMut(usize, usize) -> bool, observe: &mut dyn FnMut(ReleaseRead)) -> Result<Vec<Vec<usize>>> {
+    fn release(&self, problems: &[(&[usize], usize)], sweeps: usize, refine: usize, void: usize, seed: u64, run_bound: i128, near_tail: bool, place_order: bool, realization: &mut dyn FieldRealization, sweep: &mut dyn FnMut(usize, usize) -> bool, observe: &mut dyn FnMut(ReleaseRead)) -> Result<Vec<Vec<usize>>> {
         if sweeps == 0 || void >= self.declaration.alphabet || problems.iter().any(|&(_, n)| n == 0) {
             return refuse("a sample needs a sweep, an answer place and a void class in the alphabet");
         }
@@ -3452,8 +3449,15 @@ impl Field {
             .iter()
             .enumerate()
             .map(|(k, &(q, n))| {
+                // [definition; agent-inferred, November 6, the unified-theory reading of 00:14] With `place_order`, **the octave
+                // law at every byte**: the order decides what each draw reads, and by octaves the end reads at least half its
+                // answer as written; measured from the writer's own front the same reason orders every place, so each octave
+                // is drawn in place order (the keyed order within an octave was the one grain where the law was dropped, a
+                // byte drawn with every neighbour blank coding about 5 bits against 1.4 beside them). Runs stay.
                 let mut order: Vec<usize> = (q.len()..q.len() + n).collect();
-                order.sort_by_key(|&t| (octave_of(t + 1 - q.len()), mix(((k as u64) << 32) ^ t as u64 ^ (1 << 62)), t));
+                if !place_order {
+                    order.sort_by_key(|&t| (octave_of(t + 1 - q.len()), mix(((k as u64) << 32) ^ t as u64 ^ (1 << 62)), t));
+                }
                 order
             })
             .collect();
@@ -3591,28 +3595,17 @@ impl Field {
         // boundary drawn as a letter moved out one place, the new boundary waiting for the next pass, so the passes cut
         // deep and grew by one (segment 2's −4.8 places came all in its third pass, from its 14 short answers). A place
         // before the last letter whose face holds no letter mass keeps the letter it had. No place is chosen by its
-        // certainty.
-        //
-        // [definition; agent-inferred, November 5, Brandon's lens of 23:12 and the unified-theory reading of 23:26] With
-        // `refine` [`SETTLE`], **refinement runs until the answer is typical of its faces**: each problem's passes go on until
-        // the first pass whose held letters are at least as likely as its draws, on that pass's own faces: at each place the
-        // pass redraws, the mass of the class the place held and the mass of the class drawn, both on the one face that read
-        // read there, and the problem settles when `Π m_held ≥ Π m_drawn` (each face's total cancels: one exact integer
-        // comparison, no logarithm, no count, no tolerance); it then leaves the reads. No pass count is set and only the time
-        // guard bounds it. Why: the walk is at temperature one, so an answer settles in its distribution, never in its
-        // letters; letters the sweeps left, drawn on wide faces, are less likely than fresh draws on the faces the written
-        // answer reads, and once the answer is typical held and drawn are two draws of one face, a fair coin, so the stop
-        // overshoots by about a pass. A word decided byte by byte from wide faces meets its neighbours written on both sides
-        // only here, and three passes gave it no time to converge (Brandon: "it's clearly not taking time to converge on
-        // real massive words"). A stop read on the slope of the drawn code instead stopped wherever one pass's noise
-        // outweighed its mending.
-        let settle = refine == SETTLE;
-        let mut settled = vec![false; problems.len()];
+        // certainty. [agent-inferred, November 6, the unified-theory reading of 00:13] The passes stop where the answer's
+        // redrawn code per byte reaches real text's on this field (the walk helps only while the answer is more surprising to
+        // the field than the truth is); the withheld code reads it from above, and on code86's state the passes cross it
+        // between passes 3 and 4, so `refine = 3` stands for that stop. A stop on the faces' own level (held letters at least
+        // as likely as draws) was built and retired: these faces are no joint's conditionals, so the walk descends
+        // without pausing (to spaces and short strings over tens of passes, §16.47's settle93).
         let mut read = swept;
-        let total = if settle { usize::MAX } else { swept + refine * problems.iter().map(|&(_, n)| n).max().unwrap_or(0) };
+        let total = swept + refine * problems.iter().map(|&(_, n)| n).max().unwrap_or(0);
         let boundary = |classes: &[usize], open: &[bool], q: usize| (q..classes.len()).find(|&t| classes[t] == void && !open[t]).unwrap_or(classes.len());
         let mut pass = 0u64;
-        while (settle || (pass as usize) < refine) && settled.iter().any(|&s| !s) {
+        while (pass as usize) < refine {
             pass += 1;
             let orders: Vec<Vec<usize>> = problems
                 .iter()
@@ -3624,13 +3617,11 @@ impl Field {
                 })
                 .collect();
             let mut cursors = vec![0usize; problems.len()];
-            // The pass's held and drawn masses, each problem's product over its redraws.
-            let (mut held_mass, mut drawn_mass): (Vec<num_bigint::BigUint>, Vec<num_bigint::BigUint>) = (vec![1u32.into(); problems.len()], vec![1u32.into(); problems.len()]);
             loop {
                 // Each problem's next place in its order standing at or before its boundary, beside that boundary, and the run
                 // past it: the next places at or before the boundary whose entropies at their last draw sum within the bound.
                 let mut places: Vec<Option<(Vec<usize>, usize)>> = vec![None; problems.len()];
-                for (k, &(q, _)) in problems.iter().enumerate().filter(|&(k, _)| !settled[k]) {
+                for (k, &(q, _)) in problems.iter().enumerate() {
                     let end = boundary(&classes[k], &open[k], q.len());
                     while let Some(&t) = orders[k].get(cursors[k]) {
                         cursors[k] += 1;
@@ -3714,10 +3705,6 @@ impl Field {
                             acc > u
                         }).unwrap_or(was)
                     };
-                    if settle {
-                        held_mass[k] *= num_bigint::BigUint::from(face.masses[was]);
-                        drawn_mass[k] *= num_bigint::BigUint::from(face.masses[classes[k][t]]);
-                    }
                     open[k][t] = false;
                     }
                     // A run's draws read one boundary: where its last letter was drawn the void, the closing law resolves every
@@ -3728,11 +3715,6 @@ impl Field {
                             classes[k][t] = void;
                         }
                     }
-                }
-            }
-            if settle {
-                for k in 0..problems.len() {
-                    settled[k] = settled[k] || held_mass[k] >= drawn_mass[k];
                 }
             }
         }

@@ -1,0 +1,26 @@
+# place94 lock taken 00:24:13 on 955b3cf3862bf76987abb9fdc3000e5cba280138390c72f4a2782ab1a2636689
+FIELD_LENGTH problems=32 sweeps=2062 refine=0 stopped=- run_bits=1 reads=386 certified_bits=137.367 passed=0 ms=25561
+MEASURE lap=place_refine0 rc=0 wall_s=26.0 peak_rss_kib=373920
+ENDINGS answers 32: 30 end at or under held over 2654 places (one in 88), 2 past it over 381 (one in 190), 0 reach the room
+HAZARD past/under 0.46; written/held 0.346; correlation +0.091
+written: 32 answers, 14 open with ```python; a 'y' outside it in 24, its first at places 0 to 5 in 13 (median first 4), 'y' past it 0.039; commonest byte's share at places 10 to 255 (113 places) 0.198; top byte ' ' 0.184, 'y' 0.038, entropy 4.61 bits over 3035 bytes
+written: 32 answers: a fence opened 30, closed 24; parses as Python 8; code lines mean 1.9; identifiers 124, in the question 0.11, in the held answer 0.15
+family	span	written opened	written closed share	held opened	held closed share	ratio
+bracket	near	9	0.222	178	0.393	0.57
+bracket	far	9	0.000	178	0.607	0.00
+string	near	7	0.000	60	0.400	0.00
+string	far	7	0.143	60	0.583	0.24
+block	near	1	0.000	75	0.000	nan
+block	far	1	0.000	75	0.947	0.00
+RULE: the lowest closure against held is bracket far at 0.00 (under 0.5)
+-- the keyed sweeps alone (closing92 both_refine0)
+written: 32 answers, 22 open with ```python; a 'y' outside it in 26, its first at places 0 to 5 in 7 (median first 38), 'y' past it 0.016; commonest byte's share at places 10 to 255 (244 places) 0.235; top byte ' ' 0.191, 'y' 0.016, entropy 4.91 bits over 6483 bytes
+family	span	written opened	written closed share	held opened	held closed share	ratio
+bracket	near	34	0.206	178	0.393	0.52
+bracket	far	34	0.353	178	0.607	0.58
+string	near	34	0.412	60	0.400	1.03
+string	far	34	0.118	60	0.583	0.20
+block	near	9	0.000	75	0.000	nan
+block	far	9	0.778	75	0.947	0.82
+RULE: the lowest closure against held is string far at 0.20 (under 0.5)
+PLACE94 exit 00:24:39

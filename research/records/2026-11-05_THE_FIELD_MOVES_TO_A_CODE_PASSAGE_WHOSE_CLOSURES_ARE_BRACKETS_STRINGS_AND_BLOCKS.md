@@ -205,3 +205,34 @@ with ```` ```python ````, 22 fences closed, three answers parsing, a tenth of it
 byte entropy 4.71 bits; with no refine pass the same length and 22 openings. So the collapse was the writer's for both fields;
 the near tail's field holds content and no length (its opening's void mass 0.09 at every distance, never compared far out),
 and b1's holds length and less content. b1 continues two laps with its writes under the writer's laws (`code87_launch4.sh`).
+
+[measurement; agent-inferred] **b1 at six laps writes lengths that follow held** (`code87_seg4.txt`). Two more whole-room laps
+(966 and 960 card-seconds): held context 2.217 and 2.181. Under both writer laws with three refine passes: written over held
+1.402, hazard ratio 2.33, the correlation with held +0.317 (20 longer, 12 shorter), code lines 11.3 a write against held's
+10.9, 31 fences opened and 21 closed; the sweeps alone the same length (1.398, 2.34, +0.318). The opening's void mass 0.390 at
+held and 0.633 at +128, its expected length +81 past held, the drift to read 64 −61.6 ± 12.6. The first write of the code
+line whose length hears the problem; its words stay scrambled.
+
+[measurement; agent-inferred] **Refinement to the faces' own level descends without settling** (settle93; `settle93.txt`,
+`settle.py`). Both writes reached the 1,100 s time guard, so the evidence is incomplete. On code86's state the stop's median
+pass was 29.5 (1 to 134, past pass 3 in 30 of 32), the code per redrawn byte falling 1.72, 1.60, 1.46, 1.33, 1.25 … 0.82 by
+pass 15 as the answers drifted to spaces and short strings (the top byte the space at 39.5%, entropy 3.62 bits, 9 exact
+```` ```python ```` openings against 25 at three passes, near strings closing at 1.89 times held's share), the far closures 0.29
+(brackets), 0.29 (strings) and 0.42 (blocks) of held; on b1's state the median pass 57.0 (4 to 307) and the code per byte rising
+past pass 12 (2.2 to 3.4). By the reading fixed before it the median stop passed pass 3 and the shifts held (2 a byte off at
+three passes, none mended: shifts are the sweeps'), and the closures failed. The level stop's premise failed with it: a fair
+coin once settled needs faces that are one joint's conditionals, and these are not (the strands before and after read
+through their own encodings and nonlinear ticks), so the walk descends. The stop was retired; the passes stop where an
+answer's redrawn code per byte reaches real text's on the field (the unified-theory reading of 00:13), which the withheld code
+reads from above and code86's passes cross between passes 3 and 4, so three passes stand for it.
+
+[definition; agent-inferred, November 6, the unified-theory reading of 00:14] **The octave law at every byte**
+(`FIELD_WRITER_PLACE_ORDER`, `Field::sample_runs`'s `place_order`): each octave of the sweeps drawn in place order rather than its
+keyed order, runs kept; the keyed order within an octave was the one grain where the octave law's reason (the order decides
+what each draw reads) was dropped. **Read on code86's state** (place94; `place94.txt`), against the reading fixed before it:
+in runs with no refine pass, 14 of 32 exact ```` ```python ```` openings (the passage's rate about 27: fails), one a byte off
+(fails), entropy 4.61 bits against held's 4.96 (fails by 0.05), the top byte the space at 18.4% (passes), far brackets 0.00 of
+held over 9 opened (fails) and far strings 0.24 (passes); written over held 0.346, 8 of 32 parsing as Python (the keyed
+sweeps' 4), 24 of 30 fences closed. Nine of the 32 open ```` ````ython ````: places 2 and 3 drawn from one read, the run law
+releasing a place whose face splits between the backtick and `p` beside its unwritten neighbour, so in place order a run loses
+exactly the adjacent joint it should keep. The order is read again one place a read (place94b) before it is judged.
