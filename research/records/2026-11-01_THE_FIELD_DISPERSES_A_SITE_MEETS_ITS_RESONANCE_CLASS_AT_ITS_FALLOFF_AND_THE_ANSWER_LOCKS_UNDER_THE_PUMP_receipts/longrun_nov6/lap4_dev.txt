@@ -1,0 +1,86 @@
+# lap4 development reads (contrast-field on the card), dev1: the joint release at a fixed half step; dev2: its step certified on the free energy. FIELD lines only (the held answers' EXACT.tsv stays private).
+== dev1
+FIELD_CARD_OPEN card=NVIDIA GeForce RTX 4080 SUPER free=15461318656 total=16802250752 batch_budget=10470227968
+FIELD_CONTRAST_DECLARATION alphabet=100 width=32 heads=4 modes=8 ticks=4 reach=3771 rate=12 log2_t=244430039 section=16 sections=1543 train=24685 held=128 places=64 release=joint_64 run_bits=0 rest=false spans=false laps_read=0
+FIELD_EXACT_READ lap=-1 ms=11076
+FIELD_CONTRAST lap=0 n=0 states=16 same=0 gap_micro=11386 deposited=true predicted_micro=-44841 transfer_micro=- external_micro=0 release_reads=64 release_ms=2121 deposit_ms=45 ms=13243
+FIELD_CONTRAST lap=0 n=1 states=16 same=0 gap_micro=196807 deposited=true predicted_micro=-575505 transfer_micro=-36220 external_micro=-36220 release_reads=64 release_ms=37046 deposit_ms=606 ms=50896
+FIELD_CONTRAST lap=0 n=2 states=16 same=0 gap_micro=56891 deposited=true predicted_micro=-22454 transfer_micro=-18105 external_micro=-18105 release_reads=64 release_ms=2916 deposit_ms=69 ms=53883
+FIELD_CONTRAST lap=0 n=3 states=16 same=0 gap_micro=93611 deposited=true predicted_micro=-28528 transfer_micro=-24213 external_micro=-24213 release_reads=64 release_ms=3665 deposit_ms=72 ms=57621
+FIELD_CONTRAST lap=0 n=4 states=16 same=0 gap_micro=220616 deposited=true predicted_micro=-113201 transfer_micro=-35605 external_micro=-35605 release_reads=64 release_ms=7339 deposit_ms=133 ms=65094
+FIELD_CONTRAST lap=0 n=5 states=16 same=0 gap_micro=86650 deposited=true predicted_micro=-53140 transfer_micro=-40417 external_micro=-40417 release_reads=64 release_ms=5178 deposit_ms=97 ms=70371
+FIELD_CONTRAST lap=0 n=6 states=16 same=0 gap_micro=-506674 deposited=true predicted_micro=-262553 transfer_micro=-57936 external_micro=-57936 release_reads=64 release_ms=13999 deposit_ms=360 ms=84731
+FIELD_CONTRAST lap=0 n=7 states=16 same=0 gap_micro=-265435 deposited=true predicted_micro=-130671 transfer_micro=-92393 external_micro=-92393 release_reads=64 release_ms=8162 deposit_ms=166 ms=93059
+FIELD_CONTRAST lap=0 n=8 states=16 same=0 gap_micro=-21319 deposited=true predicted_micro=-43289 transfer_micro=-39030 external_micro=-39030 release_reads=64 release_ms=4038 deposit_ms=79 ms=97177
+FIELD_CONTRAST lap=0 n=9 states=16 same=0 gap_micro=-127444 deposited=true predicted_micro=-31951 transfer_micro=-20704 external_micro=-20704 release_reads=64 release_ms=5015 deposit_ms=95 ms=102287
+FIELD_CONTRAST lap=0 n=10 states=16 same=0 gap_micro=-209830 deposited=true predicted_micro=-61123 transfer_micro=-34066 external_micro=-34066 release_reads=64 release_ms=5790 deposit_ms=108 ms=108187
+FIELD_CONTRAST lap=0 n=11 states=16 same=0 gap_micro=-15252 deposited=true predicted_micro=-14562 transfer_micro=-11812 external_micro=-11812 release_reads=64 release_ms=2602 deposit_ms=56 ms=110847
+FIELD_CONTRAST lap=0 n=12 states=16 same=0 gap_micro=-2730793 deposited=true predicted_micro=-406497 transfer_micro=-149074 external_micro=-149074 release_reads=64 release_ms=27077 deposit_ms=679 ms=138604
+FIELD_CONTRAST lap=0 n=13 states=16 same=0 gap_micro=-539316 deposited=true predicted_micro=-83140 transfer_micro=-46146 external_micro=-46146 release_reads=64 release_ms=6783 deposit_ms=135 ms=145523
+FIELD_CONTRAST lap=0 n=14 states=16 same=0 gap_micro=-16695 deposited=true predicted_micro=-9432 transfer_micro=-9141 external_micro=-9141 release_reads=64 release_ms=1786 deposit_ms=40 ms=147350
+FIELD_CONTRAST lap=0 n=15 states=16 same=0 gap_micro=-33893 deposited=true predicted_micro=-12544 transfer_micro=-11458 external_micro=-11458 release_reads=64 release_ms=2046 deposit_ms=45 ms=149442
+FIELD_CONTRAST lap=0 n=16 states=16 same=0 gap_micro=-315913 deposited=true predicted_micro=-27041 transfer_micro=-13418 external_micro=-13418 release_reads=64 release_ms=4439 deposit_ms=89 ms=153971
+FIELD_CONTRAST lap=0 n=17 states=16 same=0 gap_micro=-528239 deposited=true predicted_micro=-54042 transfer_micro=-34535 external_micro=-34535 release_reads=64 release_ms=5551 deposit_ms=107 ms=159631
+FIELD_CONTRAST lap=0 n=18 states=16 same=0 gap_micro=-317982 deposited=true predicted_micro=-35175 transfer_micro=-25573 external_micro=-25573 release_reads=64 release_ms=4546 deposit_ms=87 ms=164264
+FIELD_CONTRAST lap=0 n=19 states=16 same=0 gap_micro=-398272 deposited=true predicted_micro=-47032 transfer_micro=-36272 external_micro=-36272 release_reads=64 release_ms=4285 deposit_ms=80 ms=168630
+FIELD_CONTRAST lap=0 n=20 states=16 same=0 gap_micro=-848840 deposited=true predicted_micro=-52733 transfer_micro=-30475 external_micro=-30475 release_reads=64 release_ms=7281 deposit_ms=146 ms=176057
+FIELD_CONTRAST lap=0 n=21 states=16 same=0 gap_micro=-2855619 deposited=true predicted_micro=-257389 transfer_micro=-27994 external_micro=-27994 release_reads=64 release_ms=18374 deposit_ms=466 ms=194898
+FIELD_STOPPED lap=0 sections=22/1543 states=352 ms=194916
+FIELD_CARD reads=1410 read_ms=159611 returns=22 return_ms=3725 pairs=26515204479 batches=1644 peak_store=8374072896 landmarks=0 landmark_ms=0 elapsed_ms=194923
+MEASURE lap=dev rc=0 wall_s=195.5 peak_rss_kib=480076
+lap	places	exact_code	face_code	kl_mean	kl_q25	kl_median	kl_q75	kl<=0.3	face_zero_letters
+-1	64	6.6394	6.6444	0.0008	0.0000	0.0001	0.0005	64/64	0
+== dev2
+FIELD_CARD_OPEN card=NVIDIA GeForce RTX 4080 SUPER free=15425667072 total=16802250752 batch_budget=10434576384
+FIELD_CONTRAST_DECLARATION alphabet=100 width=32 heads=4 modes=8 ticks=4 reach=3771 rate=12 log2_t=244430039 section=16 sections=1543 train=24685 held=128 places=64 release=joint_64 run_bits=0 rest=false spans=false laps_read=0
+FIELD_EXACT_READ lap=-1 ms=11292
+FIELD_CONTRAST lap=0 n=0 states=16 same=0 gap_micro=15900 deposited=true predicted_micro=-9991 transfer_micro=- external_micro=0 release_reads=64 release_ms=1735 deposit_ms=47 ms=13075
+FIELD_CONTRAST lap=0 n=1 states=16 same=0 gap_micro=645836 deposited=true predicted_micro=-653680 transfer_micro=-117879 external_micro=-117879 release_reads=64 release_ms=29300 deposit_ms=700 ms=43076
+FIELD_CONTRAST lap=0 n=2 states=16 same=0 gap_micro=47077 deposited=true predicted_micro=-25179 transfer_micro=-20409 external_micro=-20409 release_reads=64 release_ms=2621 deposit_ms=65 ms=45762
+FIELD_CONTRAST lap=0 n=3 states=16 same=0 gap_micro=7159 deposited=true predicted_micro=-29244 transfer_micro=-24421 external_micro=-24421 release_reads=64 release_ms=3010 deposit_ms=73 ms=48846
+FIELD_CONTRAST lap=0 n=4 states=16 same=0 gap_micro=57629 deposited=true predicted_micro=-127913 transfer_micro=-68492 external_micro=-68492 release_reads=64 release_ms=6972 deposit_ms=140 ms=55958
+FIELD_CONTRAST lap=0 n=5 states=16 same=0 gap_micro=-30743 deposited=true predicted_micro=-152121 transfer_micro=-79555 external_micro=-79555 release_reads=64 release_ms=4205 deposit_ms=101 ms=60265
+FIELD_RELEASE_READ lap=0 n=6 read=8 moving=16 moved=60 ms=2653
+FIELD_RELEASE_READ lap=0 n=6 read=16 moving=16 moved=43 ms=5016
+FIELD_RELEASE_READ lap=0 n=6 read=24 moving=14 moved=23 ms=7261
+FIELD_RELEASE_READ lap=0 n=6 read=32 moving=13 moved=20 ms=9326
+FIELD_RELEASE_READ lap=0 n=6 read=40 moving=10 moved=6 ms=11273
+FIELD_RELEASE_READ lap=0 n=6 read=48 moving=7 moved=5 ms=12806
+FIELD_RELEASE_READ lap=0 n=6 read=56 moving=7 moved=4 ms=14188
+FIELD_CONTRAST lap=0 n=6 states=16 same=0 gap_micro=-726060 deposited=true predicted_micro=-238693 transfer_micro=-116389 external_micro=-116389 release_reads=64 release_ms=15127 deposit_ms=379 ms=75771
+FIELD_CONTRAST lap=0 n=7 states=16 same=0 gap_micro=-474821 deposited=true predicted_micro=-127243 transfer_micro=-73106 external_micro=-73106 release_reads=64 release_ms=6664 deposit_ms=172 ms=82608
+FIELD_CONTRAST lap=0 n=8 states=16 same=0 gap_micro=-129017 deposited=true predicted_micro=-51721 transfer_micro=-41144 external_micro=-41144 release_reads=64 release_ms=3947 deposit_ms=88 ms=86644
+FIELD_CONTRAST lap=0 n=9 states=16 same=0 gap_micro=-260536 deposited=true predicted_micro=-64013 transfer_micro=-46424 external_micro=-46424 release_reads=64 release_ms=4664 deposit_ms=104 ms=91413
+FIELD_CONTRAST lap=0 n=10 states=16 same=0 gap_micro=-445246 deposited=true predicted_micro=-78781 transfer_micro=-60767 external_micro=-60767 release_reads=64 release_ms=4994 deposit_ms=110 ms=96517
+FIELD_CONTRAST lap=0 n=11 states=16 same=0 gap_micro=-140432 deposited=true predicted_micro=-25672 transfer_micro=-21001 external_micro=-21001 release_reads=61 release_ms=2013 deposit_ms=60 ms=98591
+FIELD_RELEASE_READ lap=0 n=12 read=8 moving=16 moved=34 ms=4626
+FIELD_RELEASE_READ lap=0 n=12 read=16 moving=14 moved=47 ms=8435
+FIELD_RELEASE_READ lap=0 n=12 read=24 moving=11 moved=15 ms=11319
+FIELD_RELEASE_READ lap=0 n=12 read=32 moving=10 moved=8 ms=13769
+FIELD_RELEASE_READ lap=0 n=12 read=40 moving=8 moved=11 ms=16182
+FIELD_RELEASE_READ lap=0 n=12 read=48 moving=5 moved=3 ms=17999
+FIELD_RELEASE_READ lap=0 n=12 read=56 moving=3 moved=2 ms=19185
+FIELD_CONTRAST lap=0 n=12 states=16 same=0 gap_micro=-2097132 deposited=true predicted_micro=-507898 transfer_micro=-145668 external_micro=-145668 release_reads=64 release_ms=20126 deposit_ms=680 ms=119398
+FIELD_CONTRAST lap=0 n=13 states=16 same=0 gap_micro=-601624 deposited=true predicted_micro=-57487 transfer_micro=-24090 external_micro=-24090 release_reads=64 release_ms=5346 deposit_ms=142 ms=124888
+FIELD_CONTRAST lap=0 n=14 states=16 same=0 gap_micro=-58002 deposited=true predicted_micro=-8393 transfer_micro=-7347 external_micro=-7347 release_reads=64 release_ms=1625 deposit_ms=42 ms=126556
+FIELD_CONTRAST lap=0 n=15 states=16 same=0 gap_micro=-100355 deposited=true predicted_micro=-5646 transfer_micro=-3588 external_micro=-3588 release_reads=64 release_ms=1939 deposit_ms=48 ms=128544
+FIELD_CONTRAST lap=0 n=16 states=16 same=0 gap_micro=-574097 deposited=true predicted_micro=-45041 transfer_micro=-22601 external_micro=-22601 release_reads=64 release_ms=4061 deposit_ms=96 ms=132702
+FIELD_CONTRAST lap=0 n=17 states=16 same=0 gap_micro=-705773 deposited=true predicted_micro=-67968 transfer_micro=-43046 external_micro=-43046 release_reads=64 release_ms=4768 deposit_ms=115 ms=137586
+FIELD_CONTRAST lap=0 n=18 states=16 same=0 gap_micro=-526320 deposited=true predicted_micro=-39478 transfer_micro=-32017 external_micro=-32017 release_reads=64 release_ms=3445 deposit_ms=88 ms=141120
+FIELD_CONTRAST lap=0 n=19 states=16 same=0 gap_micro=-573049 deposited=true predicted_micro=-55484 transfer_micro=-42973 external_micro=-42973 release_reads=57 release_ms=3309 deposit_ms=90 ms=144520
+FIELD_CONTRAST lap=0 n=20 states=16 same=0 gap_micro=-867648 deposited=true predicted_micro=-66455 transfer_micro=-52930 external_micro=-52930 release_reads=55 release_ms=6039 deposit_ms=147 ms=150708
+FIELD_CONTRAST lap=0 n=21 states=16 same=0 gap_micro=-2761211 deposited=true predicted_micro=-257324 transfer_micro=-38284 external_micro=-38284 release_reads=64 release_ms=12465 deposit_ms=510 ms=163684
+FIELD_CONTRAST lap=0 n=22 states=16 same=0 gap_micro=-597798 deposited=true predicted_micro=-31763 transfer_micro=-24574 external_micro=-24574 release_reads=64 release_ms=3495 deposit_ms=86 ms=167266
+FIELD_CONTRAST lap=0 n=23 states=16 same=0 gap_micro=-1885644 deposited=true predicted_micro=-132327 transfer_micro=-89936 external_micro=-89936 release_reads=64 release_ms=9765 deposit_ms=266 ms=177298
+FIELD_RELEASE_READ lap=0 n=24 read=8 moving=16 moved=18 ms=839
+FIELD_RELEASE_READ lap=0 n=24 read=16 moving=13 moved=25 ms=1528
+FIELD_RELEASE_READ lap=0 n=24 read=24 moving=10 moved=17 ms=2112
+FIELD_RELEASE_READ lap=0 n=24 read=32 moving=7 moved=5 ms=2589
+FIELD_RELEASE_READ lap=0 n=24 read=40 moving=4 moved=4 ms=2895
+FIELD_RELEASE_READ lap=0 n=24 read=48 moving=1 moved=0 ms=3113
+FIELD_CONTRAST lap=0 n=24 states=16 same=0 gap_micro=-734088 deposited=true predicted_micro=-35446 transfer_micro=-28194 external_micro=-28194 release_reads=49 release_ms=3114 deposit_ms=101 ms=180514
+FIELD_STOPPED lap=0 sections=25/1543 states=400 ms=180522
+FIELD_CARD reads=1568 read_ms=122723 returns=25 return_ms=4407 pairs=17950224380 batches=1726 peak_store=8343052288 landmarks=0 landmark_ms=0 elapsed_ms=180529
+MEASURE lap=dev rc=0 wall_s=181.1 peak_rss_kib=500216
+lap	places	exact_code	face_code	kl_mean	kl_q25	kl_median	kl_q75	kl<=0.3	face_zero_letters
+-1	64	6.6394	6.6444	0.0008	0.0000	0.0001	0.0005	64/64	0

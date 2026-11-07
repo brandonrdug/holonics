@@ -1693,6 +1693,167 @@ impl Field {
         Ok(self.energy_relax(region, base.read.halvings.len(), Some(&base.read.halvings), Some(&base.held))?.cell.phi)
     }
 
+    /// [definition; agent-inferred, November 7, Brandon's lens of 04:42] **An energy field releases jointly**: the open places
+    /// of each answer (its given length; the question and the near tail resolved) carry letter mixtures `q_t`, every one moved
+    /// at once each read toward its face, `q ← q + 2^(−s)(p(q) − q)`, with `p_t = 2^(z_t)` normalized off the void and
+    /// `z_t = −(1/T) dG/de_t` read at the current mixtures, every region in one read through `realization`. The fixed point
+    /// `q = p(q)` is the stationary point of the answer's free energy `F(q) = G(q)/T − H₂(q)` (bits, on `2^(−32)`), and the step
+    /// is certified on it as the ticks' steps are on `Φ`: a proposal stands where `F` does not rise, and its step then widens
+    /// one octave back toward a half; where `F` rises, the proposal is refused and the step halves. An answer rests when its
+    /// standing move is at most one grain (`2^(−16)`) or its step falls below a grain; the walk ends when every answer rests or
+    /// after `reads` reads. Each place is then drawn from its mixture, keyed by `seed`. `observe` is shown each read's index,
+    /// the answers still moving and the largest standing move. Why (Brandon, November 7 04:42: "if you're implying one pass
+    /// over a negligible amount of data should take 20 minutes, that is unreasonable"): the writer re-read the whole field
+    /// once a place (about 22,000 reads an answer at room 2,062), while every read already returns the energy's slope at every
+    /// open place. Why certified (lap4's development read, November 7): at a fixed half step the mixtures oscillated on real
+    /// fields, their largest move at 300 to 30,000 grains after 64 reads.
+    #[allow(clippy::too_many_arguments)]
+    pub fn energy_release(&self, problems: &[(&[usize], usize)], lengths: &[usize], void: usize, reads: usize, seed: u64, realization: &mut dyn FieldRealization, observe: &mut dyn FnMut(usize, usize, u32)) -> Result<Vec<Vec<usize>>> {
+        let alphabet = self.declaration.alphabet;
+        if !self.declaration.energy || void >= alphabet || alphabet < 2 || problems.len() != lengths.len() || lengths.iter().zip(problems).any(|(&n, &(_, room))| n == 0 || n > room) {
+            return refuse("a joint release needs an energy field, a void in its alphabet and each answer's length within its room");
+        }
+        let one = 1u32 << STATE_BITS;
+        let inverse = temperature_of(-self.theta[self.layout.face_temper], &self.fine)?;
+        // The uniform mixture over the letters off the void, its remainder on the lowest letters.
+        let letters = (alphabet - 1) as u32;
+        let uniform: Vec<u32> = (0..alphabet).map(|c| if c == void { 0 } else { one / letters + u32::from(((if c < void { c } else { c - 1 }) as u32) < one % letters) }).collect();
+        let n = problems.len();
+        let mut classes: Vec<Vec<usize>> = Vec::with_capacity(n);
+        let mut open: Vec<Vec<bool>> = Vec::with_capacity(n);
+        for (&(q, room), &len) in problems.iter().zip(lengths) {
+            let sites = q.len() + len + NEAR.min(room - len);
+            classes.push((0..sites).map(|t| if t < q.len() { q[t] } else { void }).collect());
+            open.push((0..sites).map(|t| t >= q.len() && t < q.len() + len).collect());
+        }
+        let to_shares = |w: &[u32]| -> Shares { w.iter().enumerate().filter(|&(_, &x)| x > 0).map(|(c, &x)| (c as u32, x)).collect() };
+        // A face's masses off the void as weights on 2^(−16) summing to one, the remainder to the largest remainders.
+        let off_void = |face: &TowerFace| -> Option<Vec<u32>> {
+            let total: u128 = face.masses.iter().enumerate().filter(|&(c, _)| c != void).map(|(_, &m)| m).sum();
+            if total == 0 {
+                return None;
+            }
+            let mut w: Vec<u32> = vec![0; alphabet];
+            let mut rest: Vec<(u128, usize)> = Vec::with_capacity(alphabet);
+            let mut sum = 0u32;
+            for (c, &m) in face.masses.iter().enumerate() {
+                if c == void {
+                    continue;
+                }
+                let scaled = m << STATE_BITS;
+                w[c] = (scaled / total) as u32;
+                sum += w[c];
+                rest.push((scaled % total, c));
+            }
+            rest.sort_by(|a, b| b.0.cmp(&a.0).then(a.1.cmp(&b.1)));
+            for &(_, c) in rest.iter().take((one - sum) as usize) {
+                w[c] += 1;
+            }
+            Some(w)
+        };
+        // `−H₂(q)` on 2^(−32) bits: `Σ w (log₂ w − 16) / 2^16` over the open places' weights.
+        let neg_entropy = |mixtures: &[Vec<u32>]| -> i128 {
+            mixtures.iter().flat_map(|q| q.iter()).filter(|&&w| w > 0).map(|&w| (w as i128) * (super::super::log2_reading_at(w as u128, ENERGY_BITS) - ((STATE_BITS as i128) << ENERGY_BITS))).sum::<i128>() >> STATE_BITS
+        };
+        // One read of the answers `which` at their mixtures: each one's faces off the void at its open places and `F`.
+        let read_at = |which: &[usize], mixtures: &[Vec<Vec<u32>>], realization: &mut dyn FieldRealization| -> Result<Vec<(i128, Vec<Option<Vec<u32>>>)>> {
+            let carried: Vec<Vec<Option<Shares>>> = which
+                .iter()
+                .map(|&k| {
+                    let start = problems[k].0.len();
+                    (0..classes[k].len()).map(|t| open[k][t].then(|| to_shares(&mixtures[k][t - start]))).collect()
+                })
+                .collect();
+            let views: Vec<Region> = which.iter().zip(&carried).map(|(&k, c)| Region { classes: &classes[k], unresolved: &open[k], faces: c, locked: &open[k], echo: &[], domain: None, port: None }).collect();
+            let (faces, energies) = realization.read_energy_faces(self, &views)?;
+            which
+                .iter()
+                .enumerate()
+                .map(|(i, &k)| {
+                    let start = problems[k].0.len();
+                    let p: Vec<Option<Vec<u32>>> = (0..lengths[k]).map(|j| faces[i][start + j].as_ref().and_then(off_void)).collect();
+                    let g = release(energies[i].checked_mul(inverse).ok_or(TowerError::Refused("a release's energy past its carrier"))?, MATERIAL_BITS);
+                    Ok((g + neg_entropy(&mixtures[k]), p))
+                })
+                .collect()
+        };
+        let mut mixtures: Vec<Vec<Vec<u32>>> = lengths.iter().map(|&len| vec![uniform.clone(); len]).collect();
+        let everyone: Vec<usize> = (0..n).collect();
+        // Each answer's standing point: its free energy and faces, and its step's halvings.
+        let mut standing: Vec<(i128, Vec<Option<Vec<u32>>>)> = read_at(&everyone, &mixtures, realization)?;
+        let mut halvings = vec![1u32; n];
+        let mut resting = vec![false; n];
+        for read in 1..reads {
+            let moving: Vec<usize> = (0..n).filter(|&k| !resting[k]).collect();
+            if moving.is_empty() {
+                break;
+            }
+            // Each moving answer's proposal: every open place stepped `2^(−s)` toward its face, summing to one.
+            let mut proposed = mixtures.clone();
+            for &k in &moving {
+                for (q, p) in proposed[k].iter_mut().zip(&standing[k].1) {
+                    let Some(p) = p else { continue };
+                    let half = 1i64 << (halvings[k] - 1);
+                    let mut next: Vec<u32> = q.iter().zip(p).map(|(&a, &b)| (a as i64 + ((b as i64 - a as i64 + half) >> halvings[k])).max(0) as u32).collect();
+                    let sum: i64 = next.iter().map(|&x| x as i64).sum();
+                    let top = (0..alphabet).max_by_key(|&c| (next[c], std::cmp::Reverse(c))).unwrap_or(0);
+                    next[top] = (next[top] as i64 + one as i64 - sum).max(0) as u32;
+                    *q = next;
+                }
+            }
+            let reread = read_at(&moving, &proposed, realization)?;
+            let mut largest = 0u32;
+            for (&k, (f, p)) in moving.iter().zip(reread) {
+                if f <= standing[k].0 {
+                    let moved = proposed[k].iter().zip(&mixtures[k]).flat_map(|(a, b)| a.iter().zip(b).map(|(&x, &y)| x.abs_diff(y))).max().unwrap_or(0);
+                    largest = largest.max(moved);
+                    mixtures[k] = std::mem::take(&mut proposed[k]);
+                    standing[k] = (f, p);
+                    halvings[k] = halvings[k].saturating_sub(1).max(1);
+                    resting[k] = moved <= 1;
+                } else {
+                    halvings[k] += 1;
+                    resting[k] = halvings[k] > STATE_BITS;
+                }
+            }
+            observe(read, moving.len(), largest);
+        }
+        // Each place drawn from its mixture, keyed.
+        let mix = |counter: u64| -> u64 {
+            let mut z = seed.wrapping_add(counter.wrapping_mul(0x9E37_79B9_7F4A_7C15));
+            z = (z ^ (z >> 30)).wrapping_mul(0xBF58_476D_1CE4_E5B9);
+            z = (z ^ (z >> 27)).wrapping_mul(0x94D0_49BB_1331_11EB);
+            z ^ (z >> 31)
+        };
+        Ok(mixtures
+            .iter()
+            .enumerate()
+            .map(|(k, answer)| {
+                answer
+                    .iter()
+                    .enumerate()
+                    .map(|(i, q)| {
+                        let u = (mix((k as u64) << 32 | i as u64) >> 48) as u32;
+                        let mut acc = 0u32;
+                        (0..alphabet)
+                            .find(|&c| {
+                                acc += q[c];
+                                acc > u
+                            })
+                            .unwrap_or(void)
+                    })
+                    .collect()
+            })
+            .collect())
+    }
+
+    /// [measurement; November 7] **A region's faces and its energy at the last state** ([`Field::energy_pass`]): the read the
+    /// joint release certifies its step on.
+    pub fn energy_faces_read(&self, region: &Region) -> Result<(Vec<Option<TowerFace>>, i128)> {
+        let (pass, read) = self.energy_pass(region)?;
+        Ok((pass.faces, read.last))
+    }
+
     /// [measurement; the unified-theory reading of November 7, 04:05] **A configuration's energy**: `G(e) = Φ(x^K(e); e)` with
     /// every site resolved at `classes`, relaxed at its own certified halvings, on `2^(−32)` bits; the exact conditional's
     /// terms (`P(e_t = c | rest) ∝ 2^(−G/T)`) and route (b)'s `G`.

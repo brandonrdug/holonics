@@ -2528,3 +2528,28 @@ fn a_contrast_step_lowers_the_truths_energy_against_its_release() {
 fn release_i(v: i128, bits: u32) -> i128 {
     div_nearest(v, 1i128 << bits)
 }
+
+/// [definition; agent-inferred, November 7, Brandon's lens of 04:42] **An energy field releases an answer as one field**: on
+/// the line-shaped field, two answers of given lengths beside their questions are relaxed jointly (every open place's mixture
+/// moved toward its face each read) until no share moves by more than a grain or the reads run out; each comes back at its
+/// length, on the letters (never the void), the same for the same key, and the mixtures' largest move falls from the first
+/// read to the last.
+#[test]
+fn an_energy_field_releases_an_answer_as_one_field() {
+    let field = energetic_line();
+    let void = field.declaration.alphabet - 1;
+    let q1: Vec<usize> = (0..12).map(|t| (t * 3 + 1) % 4).collect();
+    let q2: Vec<usize> = (0..9).map(|t| (t * 2 + t / 3) % 4).collect();
+    let problems: Vec<(&[usize], usize)> = vec![(&q1, 20), (&q2, 14)];
+    let lengths = [9usize, 6];
+    let mut moves = Vec::new();
+    let answers = field.energy_release(&problems, &lengths, void, 64, 7, &mut HostField, &mut |_, _, m| moves.push(m)).unwrap();
+    let again = field.energy_release(&problems, &lengths, void, 64, 7, &mut HostField, &mut |_, _, _| {}).unwrap();
+    println!("moves {moves:?}; answers {answers:?}");
+    assert_eq!(answers, again, "one key, one release");
+    for (a, &n) in answers.iter().zip(&lengths) {
+        assert_eq!(a.len(), n);
+        assert!(a.iter().all(|&c| c != void), "a joint release on the letters: {a:?}");
+    }
+    assert!(moves.len() >= 2 && moves.len() < 63 && moves.last() < moves.first(), "the mixtures settle: {moves:?}");
+}

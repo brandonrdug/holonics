@@ -4399,3 +4399,32 @@ ends meet at a letter's weight over 32 and part again at over 64.**
 - [inferred] There is no square whose ends stay apart while the linear end halves, so none reads as a term in its pair. The
   readings of the sharp squares turn over between /16 and /64, which is a curvature scale under a letter's weight over 16.
 Receipts: `longrun_nov6/settle135.txt`, `settle.py`, `settle_select.py`, `settle_squares.tsv`.
+
+[definition and measurement; November 7, lap4's development reads; the unified-theory reading of 04:05 and Brandon's lens
+of 04:42] **The field meets its own release, released jointly: a lap projects at 2.9 hours on the card.**
+- Route (b): `FieldLearner::section_contrast` deposits `(1/T)[∂G/∂θ(truth) − ∂G/∂θ(e′)]` through the realization's
+  material read (the card's, bit-equal with the host at 1,500 sites, 86 ms against 7.8 s on one host thread). The step
+  fluxes. A step lowers `G(truth) − G(e′)` by its first order (within 0.4% on the tiny field and 0.06% on the line field).
+- The release `e′`. One release per state by the writer as it writes is about 22,000 full reads an answer at room 2,062
+  (the card's measurement, about 140 s a state batched).
+  - Brandon (04:42): "if you're implying one pass over a negligible amount of data should take 20 minutes, that is
+    unreasonable".
+  - `Field::energy_release` relaxes every open place's mixture at once toward its face. Its fixed point is the stationary
+    point of `F(q) = G(q)/T − H₂(q)`, its step is certified on `F` as the ticks' steps are on `Φ`, and each place is drawn
+    from its mixture.
+  - This is the framework's generation law: the joint field is refined and its boundary released [agent-inferred].
+- dev1, a fixed half step: the mixtures oscillated. The largest move stayed at 300 to 30,000 grains after 64 reads.
+- dev2, the step certified: answers rest as their moves reach a grain. After 64 reads at most a few answers of 16 still move,
+  by 2 to 5 grains. This is the 64-read cap.
+- dev2's costs, on the card, 25 sections of 16 from the tempered founding:
+  - release 6.8 s a section on average (median 4.3 s, largest 30 s), 63 reads on average;
+  - deposit 0.05 to 0.7 s;
+  - the exact read at 64 held places, 11 s.
+- A lap of 1,543 sections projects at 2.9 h, or 4.0 h at the mean plus two standard errors. The sections are walked in a
+  keyed order, so the 25 are a fair sample.
+- The gap `(G(truth) − G(e′))/T` a state is +0.007 to +0.65 bits over the first five sections, then −0.03 to −2.8 bits. The
+  steps move the truth's energy below the field's own release.
+- The exact read at the founding: the exact conditional codes 6.639 bits a place and the face 6.644 (`log₂ 100`).
+  `KL(exact ‖ face)` averages 0.0008 bits and is at most 0.3 at 64 of 64 places. Near uniform, the faces propose almost
+  exactly.
+Receipts: `longrun_nov6/lap4_dev.txt`, `lap4_dev.sh`, `lap4_exact.py`.

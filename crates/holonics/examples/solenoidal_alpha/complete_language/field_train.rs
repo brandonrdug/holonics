@@ -2755,17 +2755,18 @@ pub(super) fn length_field(args: &[String], realization: &mut dyn FieldRealizati
 }
 
 /// [definition; the unified-theory reading of November 7, 04:05, route (b)] **`contrast-field STATE STATE_SHA CODEC CODEC_SHA
-/// UNITS UNITS_SHA TRAIN TRAIN_SHA HELD HELD_SHA SECTION LAPS SWEEPS REFINE PLACES LAP_MS STOP_MS OUT`**: an energy field
-/// trained by meeting its own release. Each training problem is a state: its question, its answer (cut to the room) and its
-/// near voids, every site resolved. Each section's states are released by the writer exactly as it writes
-/// ([`WriterLaw`], `SWEEPS` and `REFINE`), each answer's length given (the same open places), keyed by the lap and the
-/// section; the section then deposits `(1/T)[∂G/∂θ(truth) − ∂G/∂θ(e′)]` ([`FieldLearner::section_contrast`]), its step fluxing.
+/// UNITS UNITS_SHA TRAIN TRAIN_SHA HELD HELD_SHA SECTION LAPS READS PLACES LAP_MS STOP_MS OUT`**: an energy field trained by
+/// meeting its own release. Each training problem is a state: its question, its answer (cut to the room) and its near
+/// voids, every site resolved. Each section's states are released jointly, each answer's length given (the same open
+/// places), keyed by the lap and the section: every open place's mixture relaxed at once for at most `READS` reads
+/// ([`holonics::hnn::tower::field::Field::energy_release`]); `FIELD_CONTRAST_WRITER=SWEEPS,REFINE` releases them by the
+/// writer as it writes instead ([`WriterLaw`]), a declared comparison. The section then deposits `(1/T)[∂G/∂θ(truth) − ∂G/∂θ(e′)]` ([`FieldLearner::section_contrast`]), its step fluxing.
 /// Before the first lap and after each, the exact conditional is read at `PLACES` held places ([`exact_read`]). A lap starts
 /// only where `LAP_MS` fits before `STOP_MS`; past `STOP_MS` the run writes `STATE.stopped` and stops. Writes `STATE.<lap>`
 /// and `EXACT.tsv` (private: held answers' letters).
 pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealization) -> Result<()> {
-    if args.len() != 19 {
-        return Err("contrast-field STATE STATE_SHA CODEC CODEC_SHA UNITS UNITS_SHA TRAIN TRAIN_SHA HELD HELD_SHA SECTION LAPS SWEEPS REFINE PLACES LAP_MS STOP_MS OUT".into());
+    if args.len() != 18 {
+        return Err("contrast-field STATE STATE_SHA CODEC CODEC_SHA UNITS UNITS_SHA TRAIN TRAIN_SHA HELD HELD_SHA SECTION LAPS READS PLACES LAP_MS STOP_MS OUT".into());
     }
     let started = std::time::Instant::now();
     let mut learner = FieldLearner::from_text(std::str::from_utf8(&pinned_read(&args[1], &args[2], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
@@ -2777,9 +2778,17 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
     let codec = FieldCodec::from_text(std::str::from_utf8(&pinned_read(&args[3], &args[4], CODEC_BUDGET)?)?, units)?;
     let train_text = problems_of(&pinned_read(&args[7], &args[8], READ_BUDGET as usize)?);
     let held_text = problems_of(&pinned_read(&args[9], &args[10], READ_BUDGET as usize)?);
-    let (section, laps, sweeps, refine, places) = (positive(&args[11])?, count(&args[12])?, positive(&args[13])?, count(&args[14])?, count(&args[15])?);
-    let (lap_ms, stop_ms) = (positive(&args[16])? as u128, positive(&args[17])? as u128);
-    let out = Path::new(&args[18]);
+    let (section, laps, reads, places) = (positive(&args[11])?, count(&args[12])?, positive(&args[13])?, count(&args[14])?);
+    let (lap_ms, stop_ms) = (positive(&args[15])? as u128, positive(&args[16])? as u128);
+    let out = Path::new(&args[17]);
+    // The declared comparison: the writer as it writes, `SWEEPS,REFINE`.
+    let writer: Option<(usize, usize)> = match std::env::var("FIELD_CONTRAST_WRITER") {
+        Ok(v) => match v.split_once(',').map(|(a, b)| (a.trim().parse::<usize>(), b.trim().parse::<usize>())) {
+            Some((Ok(sw), Ok(rf))) if sw > 0 => Some((sw, rf)),
+            _ => return Err(format!("FIELD_CONTRAST_WRITER {v}: SWEEPS,REFINE").into()),
+        },
+        Err(_) => None,
+    };
     std::fs::create_dir(out)?;
     let void = codec.void();
     let near = holonics::hnn::tower::field::NEAR;
@@ -2808,7 +2817,7 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
     };
     let d = learner.field.declaration;
     println!(
-        "FIELD_CONTRAST_DECLARATION alphabet={} width={} heads={} modes={} ticks={} reach={} rate={} log2_t={} section={section} sections={} train={} held={} places={places} sweeps={sweeps} refine={refine} run_bits={} rest={} spans={} laps_read={}",
+        "FIELD_CONTRAST_DECLARATION alphabet={} width={} heads={} modes={} ticks={} reach={} rate={} log2_t={} section={section} sections={} train={} held={} places={places} release={} run_bits={} rest={} spans={} laps_read={}",
         d.alphabet,
         d.width,
         d.heads,
@@ -2820,6 +2829,7 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
         sections.len(),
         train_set.len(),
         held_set.len(),
+        writer.map_or(format!("joint_{reads}"), |(sw, rf)| format!("writer_{sw}_{rf}")),
         law.run_bits,
         law.rest,
         law.spans,
@@ -2848,7 +2858,17 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
             // `STOP_MS` (a cut release deposits nothing: the run stops there, incomplete).
             let mut cut = false;
             let mut reads_made = 0usize;
-            let answers = learner
+            let answers = match writer {
+                None => learner
+                    .field
+                    .energy_release(&problems, &lengths, void, reads, key, realization, &mut |read, moving, moved| {
+                        reads_made = read + 1;
+                        if read % 8 == 0 {
+                            println!("FIELD_RELEASE_READ lap={lap} n={n} read={read} moving={moving} moved={moved} ms={}", section_start.elapsed().as_millis());
+                        }
+                    })
+                    .map_err(|e| e.to_string())?,
+                Some((sweeps, refine)) => learner
                 .field
                 .sample_runs(
                     &problems,
@@ -2879,7 +2899,8 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
                     },
                     &mut |_| {},
                 )
-                .map_err(|e| e.to_string())?;
+                .map_err(|e| e.to_string())?,
+            };
             let release_ms = section_start.elapsed().as_millis();
             if cut {
                 println!("FIELD_STOPPED lap={lap} sections={n}/{} reason=release_cut release_reads={reads_made} release_ms={release_ms} ms={}", sections.len(), started.elapsed().as_millis());

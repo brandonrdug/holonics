@@ -4651,6 +4651,13 @@ pub trait FieldRealization {
     fn read_energy_central_squares(&mut self, field: &Field, squares: &[(&[usize], (usize, usize))], void: usize, steps: &[u32]) -> Result<Vec<Option<Vec<(i128, i128)>>>> {
         squares.par_iter().map(|&(truth, ij)| field.energy_central_square(truth, ij, void, steps)).collect()
     }
+    /// [measurement; November 7] An energy field's faces and its energy `G` at the last state, region by region
+    /// ([`Field::energy_faces_read`]), on the host in parallel unless the realization reads them itself.
+    #[allow(clippy::type_complexity)]
+    fn read_energy_faces(&mut self, field: &Field, regions: &[Region]) -> Result<(Vec<Vec<Option<TowerFace>>>, Vec<i128>)> {
+        let reads: Vec<(Vec<Option<TowerFace>>, i128)> = regions.par_iter().map(|r| field.energy_faces_read(r)).collect::<Result<_>>()?;
+        Ok(reads.into_iter().unzip())
+    }
     /// [measurement; the unified-theory reading of November 7, 04:05] Each resolved region's energy `G` at its own certified
     /// halvings ([`Field::energy_g`]), on the host in parallel unless the realization reads them itself.
     fn read_energies(&mut self, field: &Field, regions: &[&[usize]]) -> Result<Vec<i128>> {
