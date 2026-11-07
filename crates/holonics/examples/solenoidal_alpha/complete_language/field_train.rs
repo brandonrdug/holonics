@@ -2789,6 +2789,13 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
         Err(_) => None,
     };
     let spacing = FieldLearner::kernel_spacing();
+    let whole_blocks = std::env::var_os("FIELD_CONTRAST_WHOLE_BLOCKS").is_some();
+    // [the unified-theory reading of November 7, 07:24] The first section's `k*`: lap 8's acceptance of 0.234 fell between its
+    // fourth and fifth block-size tenths (16.4 and 20.2 places), `FIELD_CONTRAST_BLOCK_PLACES` where declared.
+    let mut block_places: usize = match std::env::var("FIELD_CONTRAST_BLOCK_PLACES") {
+        Ok(v) => v.trim().parse().map_err(|_| format!("FIELD_CONTRAST_BLOCK_PLACES {v}: a count"))?,
+        Err(_) => 18,
+    };
     // The declared comparison: the writer as it writes, `SWEEPS,REFINE`.
     let writer: Option<(usize, usize)> = match std::env::var("FIELD_CONTRAST_WRITER") {
         Ok(v) => match v.split_once(',').map(|(a, b)| (a.trim().parse::<usize>(), b.trim().parse::<usize>())) {
@@ -2826,8 +2833,13 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
         // and the letters' temperature joins the deposit; `FIELD_CONTRAST_ONE_RATE` keeps one rate for every family and the
         // temperature held (laps 4 and 5's law), a declared comparison.
         if std::env::var_os("FIELD_CONTRAST_ONE_RATE").is_none() {
-            learner.open_family_rates();
+            // A continued learner keeps the lengths its families read (carried in its text since November 7, 07:24).
+            if learner.family_rates.is_none() {
+                learner.open_family_rates();
+            }
             learner.temper_learns = true;
+        } else {
+            learner.family_rates = None;
         }
     }
     // [measurement; the unified-theory reading of November 7, 06:57] `FIELD_CONTRAST_LOG2T_SHIFT_MILLI`: the letters' temperature
@@ -2917,20 +2929,36 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
             let members = &sections[s];
             let truths: Vec<Vec<usize>> = members.iter().map(|&i| truth_of(&train_set[i], &train_set[i].1)).collect();
             if writer.is_none() && joint.is_none() {
-                // The kernel: each state's block, its answer places `t ≡ r (mod s)`.
-                let blocks: Vec<Vec<usize>> = members
-                    .iter()
-                    .enumerate()
-                    .map(|(m, &i)| {
-                        let (q, a, _) = &train_set[i];
-                        let r = (mix(seed ^ 0xB10C << 44, read << 40 | (n as u64) << 16 | m as u64) as usize) % spacing.min(a.len());
-                        (r..a.len()).step_by(spacing).map(|j| q.len() + j).collect()
-                    })
-                    .collect();
+                // The kernel: each state's answer places `t ≡ r (mod s)`, cut into blocks of at most `k*` places, each block its own
+                // kernel step from the truth ([the unified-theory reading of November 7, 07:24]: a block of `k` places moves
+                // `k·2Φ(−σ√k/2)` places, most at `σ²k ≈ 5.7`); `FIELD_CONTRAST_WHOLE_BLOCKS` keeps one block a state (laps 4 to 9).
+                let mut blocks: Vec<Vec<usize>> = Vec::new();
+                let mut owners: Vec<usize> = Vec::new();
+                for (m, &i) in members.iter().enumerate() {
+                    let (q, a, _) = &train_set[i];
+                    let r = (mix(seed ^ 0xB10C << 44, read << 40 | (n as u64) << 16 | m as u64) as usize) % spacing.min(a.len());
+                    let residue: Vec<usize> = (r..a.len()).step_by(spacing).map(|j| q.len() + j).collect();
+                    let cut = if whole_blocks { residue.len().max(1) } else { block_places.max(1) };
+                    for chunk in residue.chunks(cut) {
+                        blocks.push(chunk.to_vec());
+                        owners.push(m);
+                    }
+                }
                 let resolved: Vec<Vec<bool>> = truths.iter().map(|t| vec![false; t.len()]).collect();
-                let truth_views: Vec<Region> = truths.iter().zip(&resolved).map(|(c, u)| Region { classes: c, unresolved: u, faces: &[], locked: &[], echo: &[], domain: None, port: None }).collect();
+                let truth_views: Vec<Region> = owners.iter().map(|&m| Region { classes: &truths[m], unresolved: &resolved[m], faces: &[], locked: &[], echo: &[], domain: None, port: None }).collect();
                 let key = mix(seed ^ 0xC0_7A57 << 40, read << 32 | n as u64);
                 let receipt = learner.section_kernel(&truth_views, &blocks, key, realization).map_err(|e| e.to_string())?;
+                // `σ̂² = −2 ln 2 Σ log₂ A / Σ k` over the section's blocks, and the next section's `k* = 5.7/σ̂²` [derived, the 05:55
+                // law]: `k* = 5.7 Σk / (2 ln 2 · −Σ log₂ A)`, `log₂ A` on 2^(−32) bits.
+                if !whole_blocks {
+                    let places: i128 = blocks.iter().map(|b| b.len() as i128).sum();
+                    let fall: i128 = -receipt.log2_a.iter().sum::<i128>();
+                    if fall > 0 {
+                        // 2 ln 2 = 1.386294 on 2^(−20); 5.7 Σk on 2^32 · 2^20 over it.
+                        let two_ln2: i128 = 1_453_635;
+                        block_places = usize::try_from(((57 * places) << 52) / (10 * two_ln2 * fall)).unwrap_or(usize::MAX).clamp(1, 1 << 12);
+                    }
+                }
                 (states, deposited) = (states + receipt.states, deposited + usize::from(receipt.deposited));
                 (places_lap, moved_lap, weight_lap, square_lap, whole_lap) = (places_lap + receipt.places, moved_lap + receipt.moved, weight_lap + receipt.weight, square_lap + receipt.weight_square, whole_lap + receipt.whole);
                 let unit = 1i128 << holonics::hnn::tower::MATERIAL_BITS;
@@ -2952,7 +2980,7 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
                     None => String::new(),
                 };
                 println!(
-                    "FIELD_KERNEL lap={lap} n={n} states={} places={} moved={} accept_milli={} least_milli={} most_milli={} whole={} deposited={} predicted_micro={} transfer_micro={} external_micro={}{newton_text} log2_t={} ms_section={} ms={}",
+                    "FIELD_KERNEL lap={lap} n={n} states={} places={} moved={} accept_milli={} least_milli={} most_milli={} whole={} deposited={} predicted_micro={} transfer_micro={} external_micro={}{newton_text} log2_t={} blocks={} k_star={block_places} ms_section={} ms={}",
                     receipt.states,
                     receipt.places,
                     receipt.moved,
@@ -2965,6 +2993,7 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
                     micro(receipt.transfer),
                     micro(receipt.external),
                     learner.field.theta[learner.field.layout().face_temper],
+                    blocks.len(),
                     section_start.elapsed().as_millis(),
                     started.elapsed().as_millis()
                 );

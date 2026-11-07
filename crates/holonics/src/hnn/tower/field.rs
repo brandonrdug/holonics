@@ -4792,6 +4792,8 @@ pub struct KernelReceipt {
     pub external: Option<i64>,
     /// Each state's block places and weight `min(1, A)` on `2^(−24)`, the acceptance by block size's operand.
     pub per_state: Vec<(usize, i128)>,
+    /// Each state's `log₂ A` on `2^(−32)` bits (the block's per-place spread `σ² = −2 ln 2 E log₂ A / k` reads from it).
+    pub log2_a: Vec<i128>,
     /// The evidence-shrunk Newton step's read, where the learner takes it ([`FieldLearner::newton`]).
     pub newton: Option<NewtonRead>,
     /// [measurement; November 7, lap 7] Each family's part of the transfer and of the predicted change, in the families'
@@ -5073,7 +5075,8 @@ pub struct FieldLearner {
     /// section) and own-section price, each averaged at `2^(−first_rate)`. A step the next section pays for grows shorter, a
     /// step the next section keeps pulling grows longer: for one noisy quadratic mode `E τ = −η|μ|² + η²c` vanishes at the
     /// length `η = |μ|²/c` that lowers the code most per step [derived]; a quarter of the correction a section settles in about
-    /// twenty sections [agent-inferred]. Not carried in the learner's text.
+    /// twenty sections [agent-inferred]. Carried in the learner's text with the two averages (the unified-theory reading of
+    /// November 7, 07:24), so a continued learner keeps them.
     pub family_rates: Option<Vec<i128>>,
     /// [definition; the unified-theory reading of November 7, 06:57] Whether a kernel section deposits the letters'
     /// temperature's covector ([`FieldLearner::section_kernel`]). Not carried in the learner's text.
@@ -5580,12 +5583,14 @@ impl FieldLearner {
         let (faces2, g_prop) = realization.read_energy_faces(f, &proposal_views)?;
         // Each state's `log₂ A` on 2^(−32) bits and its weight `min(1, A)` on 2^(−24).
         let mut weights = Vec::with_capacity(n);
+        let mut log2_a = Vec::with_capacity(n);
         for s in 0..n {
             let mut log_a = release((g_truth[s] - g_prop[s]).checked_mul(inverse).ok_or(TowerError::Refused("a kernel's energy past its carrier"))?, MATERIAL_BITS);
             for (&t, &a) in blocks[s].iter().zip(&proposals[s]) {
                 let (face, face2) = (faces[s][t].as_ref().ok_or(TowerError::Refused("a kernel block place with no face"))?, faces2[s][t].as_ref().ok_or(TowerError::Refused("a kernel block place with no face at its proposal"))?);
                 log_a += ((face.code(a) as i128) - (face2.code(truth[s].classes[t]) as i128)) << (ENERGY_BITS - 20);
             }
+            log2_a.push(log_a);
             let ell = log_a >> (ENERGY_BITS - MATERIAL_BITS);
             weights.push(if ell >= 0 {
                 1i128 << MATERIAL_BITS
@@ -5628,7 +5633,7 @@ impl FieldLearner {
         let states: Vec<Vec<i128>> = (0..n).map(|s| natural(&reads[s].0, &reads[n + s].0)).collect::<Result<_>>()?;
         if self.newton {
             let newton = self.deposit_newton(&states, &weights)?;
-            return Ok(KernelReceipt { states: n, places, moved, weight, weight_square, least, most, whole, deposited: newton.deposited, predicted: newton.predicted, transfer: newton.transfer, external: newton.external, per_state, newton: Some(newton), by_family: Vec::new(), rates: Vec::new() });
+            return Ok(KernelReceipt { states: n, places, moved, weight, weight_square, least, most, whole, deposited: newton.deposited, predicted: newton.predicted, transfer: newton.transfer, external: newton.external, per_state, log2_a, newton: Some(newton), by_family: Vec::new(), rates: Vec::new() });
         }
         // [the unified-theory reading of November 7, 06:26] The Newton terms read along the moments' direction before this section
         // moves them, beside the moments' own step.
@@ -5677,7 +5682,7 @@ impl FieldLearner {
         };
         let by_family = transfers.into_iter().zip(predictions).collect();
         let rates = self.family_rates.clone().unwrap_or_default();
-        Ok(KernelReceipt { states: n, places, moved, weight, weight_square, least, most, whole, deposited, predicted, transfer, external, per_state, newton, by_family, rates })
+        Ok(KernelReceipt { states: n, places, moved, weight, weight_square, least, most, whole, deposited, predicted, transfer, external, per_state, log2_a, newton, by_family, rates })
     }
 
     /// [definition; agent-inferred, November 3, the tower record] **The learner grown in scale**: its field grown in scale
@@ -5716,7 +5721,13 @@ impl FieldLearner {
             Some(h) => (h.halvings.to_string(), format!("{}\n", join(&h.step))),
             None => ("-".to_string(), String::new()),
         };
-        format!("hnn-field-learner-v3 {} {} {} {held}\n{}{}\n{}\n{step}", self.rate_bits, self.drawn, self.laps, self.field.to_text(), join(&self.first), join(&self.second))
+        // [definition; the unified-theory reading of November 7, 07:24] Each family's length and its two averages are carried,
+        // so a continued learner keeps the lengths its families read.
+        let lengths = match &self.family_rates {
+            Some(rates) => format!("family-lengths {}\n", join(&rates.iter().zip(&self.family_transfer).zip(&self.family_price).flat_map(|((&r, &t), &p)| [r, t, p]).collect::<Vec<_>>())),
+            None => String::new(),
+        };
+        format!("hnn-field-learner-v3 {} {} {} {held}\n{}{}\n{}\n{step}{lengths}", self.rate_bits, self.drawn, self.laps, self.field.to_text(), join(&self.first), join(&self.second))
     }
 
     pub fn from_text(text: &str) -> Result<Self> {
@@ -5746,7 +5757,18 @@ impl FieldLearner {
                 Some(HeldStep { step, halvings })
             }
         };
-        Ok(Self { field, first, second, rate_bits, read_held: held.is_some(), newton: false, newton_read: false, first_rate: FIRST_RATE, second_rate: SECOND_RATE, family_rates: None, temper_learns: false, family_transfer: Vec::new(), family_price: Vec::new(), drawn, laps, held, last: None })
+        let families = field.families_all().len();
+        let (family_rates, family_transfer, family_price) = match lines.next().and_then(|l| l.strip_prefix("family-lengths ")) {
+            Some(rest) => {
+                let v = read_numbers::<i128>(Some(rest))?;
+                if v.len() != 3 * families {
+                    return refuse("a learner's family lengths that are not three a family");
+                }
+                (Some(v.iter().step_by(3).copied().collect()), v.iter().skip(1).step_by(3).copied().collect(), v.iter().skip(2).step_by(3).copied().collect())
+            }
+            None => (None, Vec::new(), Vec::new()),
+        };
+        Ok(Self { field, first, second, rate_bits, read_held: held.is_some(), newton: false, newton_read: false, first_rate: FIRST_RATE, second_rate: SECOND_RATE, family_rates, temper_learns: false, family_transfer, family_price, drawn, laps, held, last: None })
     }
 }
 

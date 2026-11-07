@@ -4544,3 +4544,20 @@ length from its own transfer, the letters' temperature learns, and lap 8 lowers 
 - Lap 9 follows on the same law, the lengths unbounded (a negative `ρ` is a left shift checked at its carrier), every
   family reopening at 12.
 Receipts: `longrun_nov6/lap7.txt`, `lap7_dev.sh`, `lap7.sh`, `lap8.txt`, `lap8_dev.sh`, `lap8.sh`, `enumerated.py`.
+
+[measurement; November 7, lap 9; the unified-theory readings of 07:16 and 07:24] **Lap 9 takes the held code under the
+letters' own frequencies, inside its error.**
+- From lap 8's state, the family lengths unbounded (a negative `ρ` a left shift checked at its carrier), every family
+  reopening at 12: 1,543 sections in 428 s, with no carrier refusal.
+- The held enumerated code went from 4.964 to 4.786 bits a place, a paired change of −0.178 with standard error 0.135. The
+  letters' frequencies code the truth at 4.93.
+- The face code went from 5.039 to 5.246, and `KL(enumerated ‖ face)` from 0.251 to 0.523: the faces propose worse as the
+  energy sharpens.
+- `log₂ T` went from 10.12 to 10.25, and acceptance was 0.210. The total share was within 2.1% of zero in every tenth.
+- The two letter biases settled with positive lengths unclamped (read_bias 5.4, lift_bias 9.7 bits). The letters' rows
+  (enc) ended at 10.6 and the moment rows at 17.6 to 24.4.
+- Lap 10's law (theory, 07:24):
+  - each problem's residue is cut into blocks of at most `k*` places, each its own kernel step from the truth, with `k*` re-read each section;
+  - the family lengths are carried in the learner's text.
+- Its development read: 2.8 blocks a problem, 60.2 ms a problem, a lap projected at 1,486 s; acceptance 0.40.
+Receipts: `longrun_nov6/lap9.txt`, `lap9.sh`, `lap10_dev.sh`.
