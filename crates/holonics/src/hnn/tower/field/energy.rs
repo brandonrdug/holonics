@@ -1148,10 +1148,20 @@ impl Field {
     /// each pairing on `2^(−48)`.
     #[cfg(test)]
     pub(super) fn energy_tangent_check(&self, region: &Region, e: u32, seed: u64) -> Result<(Vec<i64>, Vec<i64>, i128, i128)> {
+        let read = self.energy_tangent_read(region, 0, e, seed)?;
+        Ok((read.tangent, read.difference, read.uv, read.vu))
+    }
+
+    /// [measurement; the unified-theory reading of November 7, 03:05] **The force and its tangent on a state** after `ticks`
+    /// ticks of descent: for keyed lane-tangent directions `u`, `v` (on `2^(−24)`), the tangent `δF(v)` beside the force's
+    /// difference across a step of `2^(−e)` along `v`, the two pairings `⟨u, δF(v)⟩` and `⟨v, δF(u)⟩` (on `2^(−48)`), and the
+    /// energy's fall along `v` beside its first order `2^(−e) ⟨F, v⟩` (both on `2^(−32)` bits; a non-gradient force passes
+    /// along `F` itself but not along a random `v`).
+    pub fn energy_tangent_read(&self, region: &Region, ticks: usize, e: u32, seed: u64) -> Result<EnergyTangentRead> {
         let d = &self.declaration;
         let (dw, lanes) = (d.width, d.lanes);
         let w = dw / lanes;
-        let Relaxed { x, cell, held, paces, window, .. } = self.energy_relax(region, 0, None, None)?;
+        let Relaxed { x, cell, held, paces, window, .. } = self.energy_relax(region, ticks, None, None)?;
         let reaches = self.reaches();
         let mix = |counter: u64| -> u64 {
             let mut z = seed.wrapping_add(counter.wrapping_mul(0x9E37_79B9_7F4A_7C15));
@@ -1183,7 +1193,10 @@ impl Field {
         let difference: Vec<i64> = f1.iter().zip(&f0).map(|(&a, &b)| (a - b) << e).collect();
         let pair = |a: &[i64], b: &[i64]| -> i128 { a.iter().zip(b).map(|(&x, &y)| x as i128 * y as i128).sum() };
         let (uv, vu) = (pair(&u, &tv), pair(&v, &tu));
-        Ok((tv, difference, uv, vu))
+        // The energy's fall along `v` against its first order: `Δr̂ = 2^(−e) v` for a lane-tangent `v`, so `ΔΦ ≈ −2^(−e) ⟨F, v⟩`
+        // with `F` on 2^(−24) and `v` on 2^(−24) (2^(−48)), carried to 2^(−32).
+        let first = release(pair(&f0, &v), 16 + e);
+        Ok(EnergyTangentRead { tangent: tv, difference, uv, vu, fall: cell.phi - moved.phi, first })
     }
 
     /// [measurement; a test's reading] **`G` at other letters**: `G(e) = Φ(x^K(e); e)` with site `t` carrying `shares`
@@ -1429,4 +1442,15 @@ pub struct EnergySquare {
     pub glambda: i64,
     /// The eight codes on the face's floor.
     pub floors: u32,
+}
+
+/// [measurement] The force and its tangent read on a state ([`Field::energy_tangent_read`]).
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct EnergyTangentRead {
+    pub tangent: Vec<i64>,
+    pub difference: Vec<i64>,
+    pub uv: i128,
+    pub vu: i128,
+    pub fall: i128,
+    pub first: i128,
 }

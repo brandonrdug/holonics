@@ -1988,13 +1988,14 @@ pub(super) fn curl_field(args: &[String], realization: &mut dyn FieldRealization
         }
         // [measurement; the unified-theory reading of November 7, 01:37] An energy field's square is read at one base, its four
         // corners replayed at the base's halvings under its supports (`Field::energy_square_corners`), with the attribution
-        // read at ε = 2^(−6) beside it; on the host (the card's reverse is not built).
+        // read at ε and 4ε beside it, through the realization (the card's or the host's).
         if field.declaration.energy {
             // The step is read on a letter's own weight in the uniform mixture, `ε = 2^(−4)/A` of a mixture's weight (four
             // times that wide), so every moved mixture stays a mixture at any alphabet. [agent-inferred, November 7: theory's
             // 2^(−6) and 2^(−4) of the five-letter tiny field are 0.08 and 0.31 of a letter's weight there.]
             let eps = ((1u32 << 16) / field.declaration.alphabet as u32) >> ENERGY_EPS_SHIFT;
-            let reads = picked.par_iter().map(|&(_, i, j)| field.energy_square_corners(&truth, (i, j), void, eps)).collect::<std::result::Result<Vec<_>, _>>().map_err(|e| e.to_string())?;
+            let asked: Vec<(&[usize], (usize, usize))> = picked.iter().map(|&(_, i, j)| (truth.as_slice(), (i, j))).collect();
+            let reads = realization.read_energy_squares(field, &asked, void, eps).map_err(|e| e.to_string())?;
             read_regions += 13 * picked.len();
             for (&(b, i, j), square) in picked.iter().zip(&reads) {
                 let Some(sq) = square else { continue };

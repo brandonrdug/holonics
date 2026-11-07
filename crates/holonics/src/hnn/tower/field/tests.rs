@@ -2394,3 +2394,68 @@ fn the_letters_read_the_energy_at_one_temperature() {
         assert!((opened - (1 << 16)).abs() <= 1 << 10, "still {still}: the faces at T0 spread {opened} (2^(−16) bits)");
     }
 }
+
+/// An energy field shaped as the line's (four heads on four ring sets, two still, four ticks) on a small width, every family
+/// drawn as [`shaped`]'s, its clocks plain, the families the energy does not read at zero and its letters at `T = 1`.
+fn energetic_line() -> Field {
+    let d = FieldDeclaration { alphabet: 5, width: 8, heads: 4, modes: 3, still: 2, contacts: 4, ticks: 4, frames: 4, reach: 64, lanes: 1, depth: 0, energy: true };
+    let mut field = shaped_with(d);
+    let (l, d) = (field.layout.clone(), field.declaration);
+    let (dw, m2) = (d.width, 2 * d.complex());
+    field.theta[l.pace..l.pace + d.paced_heads() * (d.alphabet + 1)].fill(0);
+    field.theta[l.face_temper] = 0;
+    for (start, len) in [(l.v, m2 * dw), (l.v_bias, m2), (l.out, dw * m2), (l.out_bias, dw), (l.w, dw * d.contacts), (l.w_bias, dw)] {
+        field.theta[start..start + len].fill(0);
+    }
+    field
+}
+
+/// [definition; the unified-theory reading of November 7, 00:02] **The total derivative holds on a line-shaped field**: on 40
+/// sites (crowds past the near field, far supports by class, four heads, four ticks), a central difference of `G` across an
+/// open site's mixture reads `−2ε(z_b − z_a)`.
+#[test]
+fn the_total_derivative_holds_on_a_line_shaped_field() {
+    let field = energetic_line();
+    let classes: Vec<usize> = (0..40).map(|t| (t * 7 + t / 3) % 5).collect();
+    let open: Vec<bool> = (0..40).map(|t| t % 9 == 4).collect();
+    let r = Region { classes: &classes, unresolved: &open, faces: &[], locked: &[], echo: &[], domain: None, port: None };
+    let logits = field.logits(&r).unwrap();
+    let alphabet = 5u32;
+    let base = (1u32 << 16) / alphabet;
+    let eps = 1i128 << 9;
+    for t in (0..40).filter(|&t| open[t]) {
+        let z = logits[t].as_ref().unwrap();
+        for (a, b) in [(0u32, 1u32), (2, 4)] {
+            let moved = |sign: i128| -> Shares { (0..alphabet).map(|c| (c, (base as i128 + if c == b { sign * eps } else if c == a { -sign * eps } else { 0 }) as u32)).collect() };
+            let dg = field.energy_g_at(&r, t, &moved(1)).unwrap() - field.energy_g_at(&r, t, &moved(-1)).unwrap();
+            let predicted = -2 * eps * (z[b as usize] - z[a as usize]) as i128;
+            assert!(10 * (dg - predicted).abs() <= predicted.abs() + (10 << 23), "site {t} letters {a}, {b}: ΔG {dg} against −2ε Δz {predicted} (2^(−32) bits)");
+        }
+    }
+}
+
+/// [definition; the unified-theory reading of November 7, 02:00] **Squares agree at one base on a line-shaped field**: at `ε`
+/// of a sixty-fourth of a letter's weight the curl is under a twentieth of the readings, and from `ε` to `4ε` the readings grow
+/// about four times while the curl's share grows (measured: 0.013 at `ε`, 0.034 at `4ε`, readings 3.86 times).
+#[test]
+fn squares_agree_at_one_base_on_a_line_shaped_field() {
+    let field = energetic_line();
+    let truth: Vec<usize> = (0..40).map(|t| (t * 7 + t / 3) % 5).collect();
+    let base = (1u32 << 16) / 5;
+    {
+        let eps = base >> 6;
+        let (mut curl, mut size, mut wcurl, mut wsize) = (0i128, 0i128, 0i128, 0i128);
+        for i in (2..33).step_by(5) {
+            for d in [1usize, 2, 5] {
+                let Some(sq) = field.energy_square_corners(&truth, (i, i + d), 4, eps).unwrap() else { continue };
+                curl += (sq.small_i - sq.small_j).abs();
+                size += sq.small_i.abs() + sq.small_j.abs();
+                wcurl += (sq.wide_i - sq.wide_j).abs();
+                wsize += sq.wide_i.abs() + sq.wide_j.abs();
+            }
+        }
+        assert!(20 * curl <= size, "curl/readings {curl}/{size} at ε");
+        assert!(3 * size <= wsize && wsize <= 5 * size, "readings {size} at ε, {wsize} at 4ε");
+        assert!(curl * wsize <= wcurl * size, "the curl's share does not grow with ε: {curl}/{size}, {wcurl}/{wsize}");
+    }
+}

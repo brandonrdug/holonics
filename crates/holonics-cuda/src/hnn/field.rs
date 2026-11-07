@@ -2614,6 +2614,9 @@ pub fn batches(lengths: &[usize], octets: &dyn Fn(usize) -> u64, budget: u64) ->
 }
 
 impl FieldRealization for CardField<'_> {
+    fn read_energy_squares(&mut self, field: &Field, squares: &[(&[usize], (usize, usize))], void: usize, eps: u32) -> Result<Vec<Option<holonics::hnn::tower::field::EnergySquare>>> {
+        self.energy_squares(field, squares, void, eps)
+    }
     fn read_and_return(&mut self, field: &Field, regions: &[Region]) -> Result<(Vec<Vec<Option<TowerFace>>>, Vec<i128>)> {
         let (faces, _, g, _, _) = self.run(field, regions, true, false, None)?;
         Ok((faces, g))

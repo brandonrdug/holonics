@@ -4638,6 +4638,12 @@ pub trait FieldRealization {
         refuse("a realization that cannot read its near fields")
     }
     /// Each of `sites`' clocks by tick in `region` ([`Field::blank_clocks`]), a reading.
+    /// [measurement; the unified-theory reading of November 7, 01:37] An energy field's squares at one base
+    /// ([`Field::energy_square_corners`] for each `(truth, (i, j))`), read on the host in parallel unless the realization
+    /// reads them itself.
+    fn read_energy_squares(&mut self, field: &Field, squares: &[(&[usize], (usize, usize))], void: usize, eps: u32) -> Result<Vec<Option<EnergySquare>>> {
+        squares.par_iter().map(|&(truth, ij)| field.energy_square_corners(truth, ij, void, eps)).collect()
+    }
     fn read_blank_clocks(&mut self, _field: &Field, _region: &Region, _sites: &[usize]) -> Result<Vec<BlankClocks>> {
         refuse("a realization that cannot read its blanks' clocks")
     }
@@ -5233,7 +5239,7 @@ impl FieldLearner {
 mod energy;
 pub mod moment;
 mod scale;
-pub use energy::{EnergyRead, EnergySquare, SquareCorners, ENERGY_BITS, FIRST_HALVINGS, MOST_HALVINGS};
+pub use energy::{EnergyRead, EnergySquare, EnergyTangentRead, SquareCorners, ENERGY_BITS, FIRST_HALVINGS, MOST_HALVINGS};
 pub use scale::Scale;
 
 #[cfg(test)]

@@ -4317,3 +4317,31 @@ derivative and the open sites carrying the locked mixture, on the host with 16 t
 - The scale of `G` against the letters is the next subject: a temperature of the energy, or a founding at which the faces open
   near flat.
 Receipts: `longrun_nov6/energy130.txt`.
+
+[measurement; November 7, energy131 and energy132; the unified-theory readings of 01:37 and 02:00] **At the letters'
+temperature the founding's squares do not agree at one base, and the card reads them 25 times faster.**
+- The founding temperature: over 32 training writer states (every answer place open, carrying the mixture), the faces at
+  `T = 1` spread 24,308 bits. So `log₂ T₀ = 14.57` (`temper-field`, 106 s on 16 threads).
+- The step is read on a letter's own weight in the uniform mixture: `ε = 2^(−4)/A` and `4ε` [agent-inferred]. Theory's
+  `2^(−6)` and `2^(−4)` wrapped the lowered letter at `A = 100`.
+- The read: energy131, 2,560 squares at one base on the host, 1,415 s on 16 threads. The card read the same squares bit for bit
+  in 57 s (energy132, `CardField::energy_squares` through `read_energy_squares`). The raw faces (`T = 1`) were read on the card
+  beside them.
+- By band: no square floors at `T₀`, and whole-letter code curl/λ (reported) is 1.82, 1.77, 1.97, 2.01 and 2.01. λ's means are
+  −0.02 to −0.035 bits, sd 0.04–0.12.
+- The energy's own four-corner square over `T` has sd 0.003–0.006 bits, and against the faces' logit squares it correlates
+  −0.08 to +0.16. Theory's reading: the open-base face is a poor whole-letter proposal (lap 4's KL measures it); only the
+  small-ε curl tests the build.
+- The gate (theory, 02:00), read raw: curl/readings at `ε` is 0.41, 0.54, 0.39, 0.40 and 0.43 (gate ≤ 0.1, fails). Readings
+  grow 3.71, 3.86, 2.97, 3.86 and 3.76 times to `4ε`. Per square the median is 0.13, 0.19, 0.18, 0.28 and 0.46 at `ε`, and 0.20 to
+  0.25 at `4ε`: the far bands rise as `ε` falls (grain).
+- Localization (theory, 03:05) on a 400-site line state of the founding: the force's tangent matches its difference to
+  0.1–0.3%, and the Hessian is symmetric to about 1e−6.
+- Squares' median curl/readings at `ε = letter/16`: 0.049 at K = 0, 0.054 at K = 1, 0.086 at K = 2, 0.171 at K = 3 and 0.173 at
+  K = 4. At K = 4 it reads 0.546 at letter/4 and 0.432 at letter/64.
+- On a line-shaped small field (40 sites, 4 heads, 4 ticks, crowds with counts above one) the same squares agree: 0.013 at
+  letter/64 and 0.034 at `4ε`.
+- So the force, its tangent, the opening and one tick's reverse are right. Over more ticks no step is clean: below letter/16
+  the ratio rises as `ε` falls (grain), and above it the curvature of four ticks grows the curl.
+- [inferred] The descent rounds the state to `2^(−16)` every tick while the face reads it at thousands of bits a unit.
+Receipts: `longrun_nov6/energy131.txt`, `longrun_nov6/energy132.txt`.
