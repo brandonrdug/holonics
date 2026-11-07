@@ -8,7 +8,7 @@ rows = list(csv.DictReader(open(sys.argv[1]), delimiter="\t"))
 by = {}
 for r in rows:
     by.setdefault(int(r["lap"]), []).append(r)
-print("lap\tplaces\tenumerated_code\tface_code\tkl_mean\tkl_q25\tkl_median\tkl_q75\tkl<=0.3\tface_zero_letters")
+print("# codes in nats a byte (each codec letter is one byte); the KL in nats\nlap\tplaces\tenumerated_code\tface_code\tkl_mean\tkl_q25\tkl_median\tkl_q75\tkl<=0.3\tface_zero_letters")
 for lap, rs in sorted(by.items()):
     ex, fc, kl, zeros = [], [], [], 0
     for r in rs:
@@ -35,7 +35,8 @@ for lap, rs in sorted(by.items()):
         kl.append(k)
     s = sorted(kl)
     n = len(s)
-    print(f"{lap}\t{n}\t{statistics.mean(ex):.4f}\t{statistics.mean(fc):.4f}\t{statistics.mean(kl):.4f}\t{s[n // 4]:.4f}\t{s[n // 2]:.4f}\t{s[3 * n // 4]:.4f}\t{sum(1 for x in kl if x <= 0.3)}/{n}\t{zeros}")
+    L = math.log(2)
+    print(f"{lap}\t{n}\t{L * statistics.mean(ex):.4f}\t{L * statistics.mean(fc):.4f}\t{L * statistics.mean(kl):.4f}\t{L * s[n // 4]:.4f}\t{L * s[n // 2]:.4f}\t{L * s[3 * n // 4]:.4f}\t{sum(1 for x in kl if x <= 0.3)}/{n} under 0.3 bits\t{zeros}")
 
 # The paired change of the exact code from the first lap read to each later one, place by place: its mean and standard error
 # (theory, November 7, 05:33: a fall past twice its paired standard error sends the next lap).
@@ -56,4 +57,5 @@ if len(laps) > 1:
         d = [now[k] - base[k] for k in base if k in now]
         m = statistics.mean(d)
         se = statistics.stdev(d) / len(d) ** 0.5 if len(d) > 1 else float("nan")
-        print(f"# exact code from lap {laps[0]} to lap {lap}: paired change {m:+.4f} bits a place, standard error {se:.4f}, over {len(d)} places; falls past twice its error: {m < -2 * se}")
+        L = math.log(2)
+        print(f"# enumerated code from lap {laps[0]} to lap {lap}: paired change {L * m:+.4f} nats a byte, standard error {L * se:.4f}, over {len(d)} places; falls past twice its error: {m < -2 * se}")

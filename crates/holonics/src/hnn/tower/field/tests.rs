@@ -2609,3 +2609,24 @@ fn an_evidence_shrunk_newton_step_moves_by_its_alpha() {
         assert!(!r.deposited && learner.field.theta == before, "an uphill or noisy slope deposits nothing: {r:?}");
     }
 }
+
+/// [definition; the unified-theory reading of November 7, 07:40] **Several blocks a problem, the truth formed once**: on the
+/// warm line-shaped field, one problem's two blocks read grouped give a receipt with two blocks and their weights in
+/// `[0, 1]`, and with one block a problem the grouped read is the plain one's, bit for bit.
+#[test]
+fn a_problems_blocks_share_one_truth() {
+    let mut field = energetic_line();
+    field.theta[field.layout.face_temper] = 10 << MATERIAL_BITS;
+    let classes: Vec<usize> = (0..40).map(|t| (t * 7 + t / 3) % 5).collect();
+    let none = vec![false; 40];
+    let truth = [Region { classes: &classes, unresolved: &none, faces: &[], locked: &[], echo: &[], domain: None, port: None }];
+    let mut grouped = FieldLearner::new(field.clone(), 14);
+    let r = grouped.section_kernel_grouped(&truth, &[0, 0], &[vec![3usize, 14], vec![25, 36]], 5, &mut HostField).unwrap();
+    let unit = 1i128 << MATERIAL_BITS;
+    assert!(r.states == 2 && r.places == 4 && r.per_state.iter().all(|&(k, w)| k == 2 && (0..=unit).contains(&w)), "{r:?}");
+    let (mut a, mut b) = (FieldLearner::new(field.clone(), 14), FieldLearner::new(field, 14));
+    let one = a.section_kernel(&truth, &[vec![3usize, 14, 25]], 9, &mut HostField).unwrap();
+    let two = b.section_kernel_grouped(&truth, &[0], &[vec![3usize, 14, 25]], 9, &mut HostField).unwrap();
+    assert_eq!(one, two);
+    assert_eq!(a.field.theta, b.field.theta);
+}

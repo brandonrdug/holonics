@@ -4561,3 +4561,21 @@ letters' own frequencies, inside its error.**
   - the family lengths are carried in the learner's text.
 - Its development read: 2.8 blocks a problem, 60.2 ms a problem, a lap projected at 1,486 s; acceptance 0.40.
 Receipts: `longrun_nov6/lap9.txt`, `lap9.sh`, `lap10_dev.sh`.
+
+[measurement; November 7, lap 10; codes in nats a byte from here on (Brandon, 07:53: "'bits per letter' is convoluted …
+the natural units might work out more intuitively"); each codec letter is one byte] **Smaller blocks carry context: lap 10
+lowers the held code under the bytes' own frequencies, though it stopped at its deadline.**
+- Each problem's residue was cut into blocks of at most `k*` places, each its own kernel step from the truth. `k*` was re-read
+  each section from `σ̂² = −2 ln 2 E log₂ A/k`; it fell from 16 to 4 over the lap, so the blocks multiplied.
+- The lap stopped at its 1,900 s deadline after 1,239 of 1,543 sections (1,918 s against a 1,486 s projection, 1.29×).
+  The receipt is incomplete.
+- The held enumerated code of its stopped state went from 3.318 to 2.990 nats a byte (from 4.786 to 4.313 bits), a paired
+  change of −0.328 nats with standard error 0.100. The bytes' frequencies code the truth at 3.417 nats.
+- The face code went from 3.636 to 3.445 nats, and `KL(enumerated ‖ face)` from 0.363 to 0.786 nats.
+- Acceptance was 0.45 over 84,692 blocks. The letters' rows lengthened 4 to 6 bits, and the unigram's biases 2 to 6.
+- Moved places a second (`Σ k min(1, A)/s`) were about 225 in lap 9 (one block a problem) and about 138 in lap 10.
+- Lap 11's law (theory, 07:40):
+  - each problem's truth formed once for all its blocks (`FieldLearner::section_kernel_grouped`);
+  - the block size read from the acceptance's own slope, `log₂ k* += ¼(1 + slope)`.
+- In lap 11's development read `k*` fell to 1 within 37 sections, 90.2 ms a problem.
+Receipts: `longrun_nov6/lap10.txt`, `lap10.sh`, `lap11_dev.sh`, `enumerated.py`.

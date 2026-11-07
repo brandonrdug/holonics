@@ -5526,16 +5526,28 @@ impl FieldLearner {
     /// read through the exponential's navigator on `2^(−24)` and released to zero below its carrier (`2^(−23)`). Four reads
     /// a state: the faces at the truth and at the proposal, and the two material covectors.
     pub fn section_kernel(&mut self, truth: &[Region], blocks: &[Vec<usize>], seed: u64, realization: &mut dyn FieldRealization) -> Result<KernelReceipt> {
+        let owners: Vec<usize> = (0..blocks.len()).collect();
+        self.section_kernel_grouped(truth, &owners, blocks, seed, realization)
+    }
+
+    /// [definition; the unified-theory reading of November 7, 07:40] **[`FieldLearner::section_kernel`] with several blocks a
+    /// problem, the truth formed once.** Block `b` belongs to problem `owners[b]`; each problem's places of all its blocks
+    /// are opened together at the truth (each carrying its truth letter whole), so one read gives the truth's `G` and faces
+    /// for every block of it, and one material read its `∂G/∂θ`. Each block's proposal opens the same places, its own carrying
+    /// their drawn letters and the others their truth, so `G′` and `face′` are read in the same structure as `G` and the
+    /// Metropolis–Hastings ratio keeps its law. The deposit is `(1/T) Σ_b w_b [∂G/∂θ(truth_(owner b)) − ∂G/∂θ(e′_b)]`, two reads
+    /// a block and two a problem. With one block a problem it is [`FieldLearner::section_kernel`]'s.
+    pub fn section_kernel_grouped(&mut self, truth: &[Region], owners: &[usize], blocks: &[Vec<usize>], seed: u64, realization: &mut dyn FieldRealization) -> Result<KernelReceipt> {
         let f = &self.field;
         if !f.declaration.energy || f.scale.is_some() {
             return refuse("a kernel section of a field without one energy");
         }
-        if truth.is_empty() || truth.len() != blocks.len() || blocks.iter().zip(truth).any(|(b, r)| b.is_empty() || b.iter().any(|&t| t >= r.classes.len() || r.unresolved[t])) {
-            return refuse("a kernel section needs one nonempty block of resolved places a state");
+        if truth.is_empty() || blocks.is_empty() || owners.len() != blocks.len() || owners.iter().any(|&o| o >= truth.len()) || blocks.iter().zip(owners).any(|(b, &o)| b.is_empty() || b.iter().any(|&t| t >= truth[o].classes.len() || truth[o].unresolved[t])) {
+            return refuse("a kernel section needs nonempty blocks of resolved places, each a problem's");
         }
         let alphabet = f.declaration.alphabet;
         let inverse = temperature_of(-f.theta[f.layout.face_temper], &f.fine)?;
-        let n = truth.len();
+        let (problems, n) = (truth.len(), blocks.len());
         let mix = |counter: u64| -> u64 {
             let mut z = seed.wrapping_add(counter.wrapping_mul(0x9E37_79B9_7F4A_7C15));
             z = (z ^ (z >> 30)).wrapping_mul(0xBF58_476D_1CE4_E5B9);
@@ -5543,52 +5555,64 @@ impl FieldLearner {
             z ^ (z >> 31)
         };
         let one = 1u32 << STATE_BITS;
-        // A state with its block places open, each carrying `letter(t)` whole, and the same state's classes with those letters.
-        let opened = |s: usize, letter: &dyn Fn(usize) -> usize| -> (Vec<usize>, Vec<bool>, Vec<Option<Shares>>) {
-            let mut classes = truth[s].classes.to_vec();
+        // Each problem's opened places: the union of its blocks.
+        let mut union: Vec<Vec<usize>> = vec![Vec::new(); problems];
+        for (b, &o) in blocks.iter().zip(owners) {
+            union[o].extend_from_slice(b);
+        }
+        for u in &mut union {
+            u.sort_unstable();
+            u.dedup();
+        }
+        // A problem with its opened places open, each carrying `letter(t)` whole, and its classes with those letters.
+        let opened = |p: usize, letter: &dyn Fn(usize) -> usize| -> (Vec<usize>, Vec<bool>, Vec<Option<Shares>>) {
+            let mut classes = truth[p].classes.to_vec();
             let mut open = vec![false; classes.len()];
             let mut faces: Vec<Option<Shares>> = vec![None; classes.len()];
-            for &t in &blocks[s] {
+            for &t in &union[p] {
                 classes[t] = letter(t);
                 open[t] = true;
                 faces[t] = Some(vec![(classes[t] as u32, one)]);
             }
             (classes, open, faces)
         };
-        let at_truth: Vec<_> = (0..n).map(|s| opened(s, &|t| truth[s].classes[t])).collect();
+        let at_truth: Vec<_> = (0..problems).map(|p| opened(p, &|t| truth[p].classes[t])).collect();
         let truth_views: Vec<Region> = at_truth.iter().map(|(c, o, fc)| Region { classes: c, unresolved: o, faces: fc, locked: o, echo: &[], domain: None, port: None }).collect();
         let (faces, g_truth) = realization.read_energy_faces(f, &truth_views)?;
         // Each block place's proposal drawn from its face at the truth.
         let mut proposals: Vec<Vec<usize>> = Vec::with_capacity(n);
         for s in 0..n {
+            let o = owners[s];
             let mut drawn = Vec::with_capacity(blocks[s].len());
             for &t in &blocks[s] {
-                let face = faces[s][t].as_ref().ok_or(TowerError::Refused("a kernel block place with no face"))?;
+                let face = faces[o][t].as_ref().ok_or(TowerError::Refused("a kernel block place with no face"))?;
                 let u = ((mix((s as u64) << 32 | t as u64) as u128) << 64 | mix(!((s as u64) << 32 | t as u64)) as u128) % face.total.max(1);
                 let mut acc = 0u128;
                 drawn.push((0..alphabet).find(|&c| {
                     acc += face.masses[c];
                     acc > u
-                }).unwrap_or(truth[s].classes[t]));
+                }).unwrap_or(truth[o].classes[t]));
             }
             proposals.push(drawn);
         }
         let at_proposal: Vec<_> = (0..n)
             .map(|s| {
+                let o = owners[s];
                 let letters: Vec<(usize, usize)> = blocks[s].iter().copied().zip(proposals[s].iter().copied()).collect();
-                opened(s, &|t| letters.iter().find(|&&(p, _)| p == t).map_or(truth[s].classes[t], |&(_, a)| a))
+                opened(o, &|t| letters.iter().find(|&&(p, _)| p == t).map_or(truth[o].classes[t], |&(_, a)| a))
             })
             .collect();
         let proposal_views: Vec<Region> = at_proposal.iter().map(|(c, o, fc)| Region { classes: c, unresolved: o, faces: fc, locked: o, echo: &[], domain: None, port: None }).collect();
         let (faces2, g_prop) = realization.read_energy_faces(f, &proposal_views)?;
-        // Each state's `log₂ A` on 2^(−32) bits and its weight `min(1, A)` on 2^(−24).
+        // Each block's `log₂ A` on 2^(−32) bits and its weight `min(1, A)` on 2^(−24).
         let mut weights = Vec::with_capacity(n);
         let mut log2_a = Vec::with_capacity(n);
         for s in 0..n {
-            let mut log_a = release((g_truth[s] - g_prop[s]).checked_mul(inverse).ok_or(TowerError::Refused("a kernel's energy past its carrier"))?, MATERIAL_BITS);
+            let o = owners[s];
+            let mut log_a = release((g_truth[o] - g_prop[s]).checked_mul(inverse).ok_or(TowerError::Refused("a kernel's energy past its carrier"))?, MATERIAL_BITS);
             for (&t, &a) in blocks[s].iter().zip(&proposals[s]) {
-                let (face, face2) = (faces[s][t].as_ref().ok_or(TowerError::Refused("a kernel block place with no face"))?, faces2[s][t].as_ref().ok_or(TowerError::Refused("a kernel block place with no face at its proposal"))?);
-                log_a += ((face.code(a) as i128) - (face2.code(truth[s].classes[t]) as i128)) << (ENERGY_BITS - 20);
+                let (face, face2) = (faces[o][t].as_ref().ok_or(TowerError::Refused("a kernel block place with no face"))?, faces2[s][t].as_ref().ok_or(TowerError::Refused("a kernel block place with no face at its proposal"))?);
+                log_a += ((face.code(a) as i128) - (face2.code(truth[o].classes[t]) as i128)) << (ENERGY_BITS - 20);
             }
             log2_a.push(log_a);
             let ell = log_a >> (ENERGY_BITS - MATERIAL_BITS);
@@ -5600,10 +5624,10 @@ impl FieldLearner {
                 temperature_of(ell as i32, &f.fine)?
             });
         }
-        // The material covectors at the truth and at the proposals, resolved.
+        // The material covectors at each problem's truth and at each block's proposal, resolved.
         let resolved: Vec<Vec<bool>> = truth.iter().map(|r| vec![false; r.classes.len()]).collect();
-        let mut both: Vec<Region> = (0..n).map(|s| Region { classes: &at_truth[s].0, unresolved: &resolved[s], faces: &[], locked: &[], echo: &[], domain: None, port: None }).collect();
-        both.extend((0..n).map(|s| Region { classes: &at_proposal[s].0, unresolved: &resolved[s], faces: &[], locked: &[], echo: &[], domain: None, port: None }));
+        let mut both: Vec<Region> = (0..problems).map(|p| Region { classes: &at_truth[p].0, unresolved: &resolved[p], faces: &[], locked: &[], echo: &[], domain: None, port: None }).collect();
+        both.extend((0..n).map(|s| Region { classes: &at_proposal[s].0, unresolved: &resolved[owners[s]], faces: &[], locked: &[], echo: &[], domain: None, port: None }));
         let reads = realization.read_energy_material(f, &both)?;
         const OVER: &str = "a kernel covector past its 128-bit carrier";
         let families = f.families_all();
@@ -5624,13 +5648,13 @@ impl FieldLearner {
             Ok(d)
         };
         let places = blocks.iter().map(Vec::len).sum();
-        let moved = (0..n).map(|s| blocks[s].iter().zip(&proposals[s]).filter(|&(&t, &a)| a != truth[s].classes[t]).count()).sum();
+        let moved = (0..n).map(|s| blocks[s].iter().zip(&proposals[s]).filter(|&(&t, &a)| a != truth[owners[s]].classes[t]).count()).sum();
         let weight = weights.iter().sum();
         let weight_square = weights.iter().map(|&w| release(w * w, MATERIAL_BITS)).sum();
         let (least, most) = (weights.iter().copied().min().unwrap_or(0), weights.iter().copied().max().unwrap_or(0));
         let whole = weights.iter().filter(|&&w| w == 1i128 << MATERIAL_BITS).count();
         let per_state: Vec<(usize, i128)> = blocks.iter().map(Vec::len).zip(weights.iter().copied()).collect();
-        let states: Vec<Vec<i128>> = (0..n).map(|s| natural(&reads[s].0, &reads[n + s].0)).collect::<Result<_>>()?;
+        let states: Vec<Vec<i128>> = (0..n).map(|s| natural(&reads[owners[s]].0, &reads[problems + s].0)).collect::<Result<_>>()?;
         if self.newton {
             let newton = self.deposit_newton(&states, &weights)?;
             return Ok(KernelReceipt { states: n, places, moved, weight, weight_square, least, most, whole, deposited: newton.deposited, predicted: newton.predicted, transfer: newton.transfer, external: newton.external, per_state, log2_a, newton: Some(newton), by_family: Vec::new(), rates: Vec::new() });
@@ -5663,7 +5687,7 @@ impl FieldLearner {
         if self.temper_learns {
             let mut gap = 0i128;
             for (s, &w) in weights.iter().enumerate() {
-                gap += release((reads[s].1 - reads[n + s].1).checked_mul(w).ok_or(TowerError::Refused(OVER))?, MATERIAL_BITS);
+                gap += release((reads[owners[s]].1 - reads[problems + s].1).checked_mul(w).ok_or(TowerError::Refused(OVER))?, MATERIAL_BITS);
             }
             let over_t = release(gap.checked_mul(inverse).ok_or(TowerError::Refused(OVER))?, MATERIAL_BITS);
             let nats = release(over_t.checked_mul(crate::hnn::keyed_modes::ln2_face()).ok_or(TowerError::Refused(OVER))?, LN2_FACE_BITS);
