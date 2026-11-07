@@ -9,8 +9,9 @@
 // site's chart read `−∂Φ/∂r̂`: the locks' shares as their scores' covector (`field_energy_rows_back` with the reverse's
 // columns and spread), the pair's and the letters' (held: `field_energy_letter_force`). The tick's step
 // (`field_energy_step`) and its certification are the host loop's (`CardField::energy_run`), which reads each region's
-// energy back. The face at an open site is the energy's force on its letter at the last state (`field_energy_dm`,
-// `field_energy_face` after the encoding's tied face).
+// energy back. The face at an open site is the energy's total derivative on its letter (the unified-theory reading of
+// November 7, 00:02): its partial at the last state with the reverse's letters' covectors through the ticks and the
+// opening (`field_energy_dm`, `field_energy_face` after the encoding's tied face; the reverse's kernels below).
 //
 // Included by `field.cu` after every helper it reads.
 
@@ -535,9 +536,10 @@ extern "C" __global__ void field_energy_accept(FieldWords w, const int64_t *next
     }
 }
 
-// The moment's covector of the face (the host's `energy_pass`): `dm = release(Cᵀ r̂_t, 16) + δp_t` (`[t][2M]`, held on 128
-// bits for the moments' return), `C` the moment's chart into the face and `δp` the probes' share of the force.
-extern "C" __global__ void field_energy_dm(FieldWords w, uint64_t mface, const int32_t *read, const int64_t *dp, wide *dm) {
+// The moment's covector of the face (the host's `energy_faces`): `dm = release(Cᵀ r̂_t, 16) + δp_t − m_t` (`[t][2M]`, held on
+// 128 bits for the moments' return), `C` the moment's chart into the face, `δp` the probes' share of the force and `m` the
+// reverse's moment covector (the opening's and the ticks', `field_energy_reverse_letters`, `field_energy_opening_letters`).
+extern "C" __global__ void field_energy_dm(FieldWords w, uint64_t mface, const int32_t *read, const int64_t *dp, const int64_t *total, wide *dm) {
     const uint64_t cells = (uint64_t)w.T * w.M2;
     for (uint64_t c = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; c < cells; c += (uint64_t)gridDim.x * blockDim.x) {
         const uint64_t t = c / w.M2, k = c % w.M2;
@@ -546,15 +548,17 @@ extern "C" __global__ void field_energy_dm(FieldWords w, uint64_t mface, const i
             sum += (wide)w.theta[mface + (uint64_t)o * w.M2 + k] * (wide)read[t * w.D + o];
         }
         const int64_t back = fit64(rel(sum, FACE_BITS), w.status);
-        dm[c] = fit64((wide)back + (wide)dp[c], w.status);
+        dm[c] = fit64((wide)back + (wide)dp[c] - (wide)total[c], w.status);
     }
 }
 
-// [definition; agent-inferred, November 6] **The face is the energy's force on a letter** (the host's `energy_pass`): at
-// each unresolved site, onto the encoding's tied face `z(a)`, the strand rows against the sites they reach,
-// `release(⟨E₋(a), r̂_(t+1)⟩ + ⟨E₊(a), r̂_(t−1)⟩, 16)`, and the moment's part `release(Σ_k E⁻_m(a)_k δb_t[k] + E⁺_m(a)_k δa_t[k],
-// 24)` through the moment's return (`d_before`, `d_after`, `[u][t]` pairs on 128 bits).
-extern "C" __global__ void field_energy_face(FieldWords w, const int32_t *read, const wide *dbefore, const wide *dafter, uint32_t tm, uint64_t mbefore, uint64_t mafter, int64_t *z) {
+// [definition; the unified-theory reading of November 7, 00:02] **The face is the total derivative of the energy at the last
+// state** (the host's `energy_faces`): at each unresolved site, onto the encoding's tied face `z(a)`, the strand rows against
+// the sites they reach, `release(⟨E₋(a), r̂_(t+1)⟩ + ⟨E₊(a), r̂_(t−1)⟩, 16)`, and `release(μ − θ, 24)`: the moment's part `μ = Σ_k
+// E⁻_m(a)_k δb_t[k] + E⁺_m(a)_k δa_t[k]` through the moment's return (`d_before`, `d_after`, `[u][t]` pairs on 128 bits) and the
+// opening's and the ticks' part `θ = ⟨E(a), λ_own⟩ + ⟨E₋(a), λ_before⟩ + ⟨E₊(a), λ_after⟩` on the letters' covectors (`[t][D]` on
+// `2^(−24)`, the reverse's).
+extern "C" __global__ void field_energy_face(FieldWords w, const int32_t *read, const wide *dbefore, const wide *dafter, uint32_t tm, uint64_t mbefore, uint64_t mafter, const int64_t *own, const int64_t *before, const int64_t *after, int64_t *z) {
     const uint64_t cells = (uint64_t)w.T * w.A;
     for (uint64_t c = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; c < cells; c += (uint64_t)gridDim.x * blockDim.x) {
         const uint64_t t = c / w.A, a = c % w.A;
@@ -572,12 +576,538 @@ extern "C" __global__ void field_energy_face(FieldWords w, const int32_t *read, 
                 strand += (wide)w.theta[w.enc_after + a * w.D + i] * (wide)read[(t - 1) * w.D + i];
             }
         }
+        wide through = 0;
+        for (uint32_t i = 0; i < w.D; i++) {
+            through += (wide)w.theta[w.enc + a * w.D + i] * (wide)own[t * w.D + i] + (wide)w.theta[w.enc_before + a * w.D + i] * (wide)before[t * w.D + i] + (wide)w.theta[w.enc_after + a * w.D + i] * (wide)after[t * w.D + i];
+        }
         wide part = 0;
         for (uint32_t k = 0; k < 2 * tm; k++) {
             const uint32_t u = k < tm ? k : k - tm;
             const uint64_t at = (uint64_t)u * 2 * w.T + 2 * t + (k < tm ? 0 : 1);
             part += (wide)w.theta[mbefore + a * 2 * tm + k] * dbefore[at] + (wide)w.theta[mafter + a * 2 * tm + k] * dafter[at];
         }
-        z[c] = fit64((wide)z[c] + rel(strand, FACE_BITS) + rel(part, COVECTOR_BITS), w.status);
+        z[c] = fit64((wide)z[c] + rel(strand, FACE_BITS) + rel(part - through, COVECTOR_BITS), w.status);
+    }
+}
+
+// -------------------------------------------------------------------------------------------
+// the force's tangent and the reverse through the ticks (the unified-theory reading of November 7, 00:02)
+//
+// [definition; agent-inferred, November 7] **The force's tangent** `δF = −Hess Φ · v` (the host's `energy_tangent` and
+// `lock_words` with a tangent), launch for launch: the words' tangents through the charts with no bias
+// (`field_affine_*` at `NO_BIAS`) and the frame (`field_frame_probe`), through the unit power (`field_energy_unit_tangent`),
+// their prefix sums (`field_sums`), the locks' scores', shares' and brackets' tangents beside the force on the words
+// (`field_energy_tangent_rows`, `field_energy_tangent_columns`, `field_energy_spread`), the unit power's return differentiated
+// (`field_energy_unit_tangent_back`), the frame's and the charts' transposes, and the pair's (`field_energy_pair_tangent`).
+// **The reverse** (the host's `energy_reverse`): from `λ^K = −J F^K` back over each tick that stood at its halvings `h`,
+// `w = s ⊙ λ'` (`field_energy_scaled`), the tick's letters (`field_energy_reverse_letters`), and `λ = λ' + 2^(−h) (r̂⟨λ', F⟩/W
+// + J δF(w))` (`field_energy_lambda`); then the opening's (`field_energy_opening_letters`).
+
+// A pair's score tangent on `2^(−40)` (the host's `lock_words`): `Σ_m [D (δp̂·k̂ + p̂·δk̂) 2^g − D² k̂·δk̂]`, each product
+// checked as the host's, released `2g` and through the receiver's temperature.
+__device__ __forceinline__ wide energy_pair_dz(const FieldWords &w, uint32_t h, const int64_t *pi, const int64_t *tpi, const int64_t *qj, const int64_t *tkj, uint64_t gi, uint64_t gj, uint32_t gap, wide temper) {
+    const uint32_t g = skinless(w, h) ? 0 : MOVE_BITS;
+    wide acc = 0;
+    for (uint32_t l = 0; l < w.n; l++) {
+        const wide dec = skin_raw(w, h, l, gi, gj, gap);
+        wide pair = 0, power = 0;
+        for (uint32_t r = l; r < w.span; r += w.n) {
+            pair += (wide)tpi[r] * (wide)qj[r] + (wide)pi[r] * (wide)tkj[r];
+            power += (wide)qj[r] * (wide)tkj[r];
+        }
+        wide lifted, next;
+        if (!mul_fits(dec * pair, (wide)1 << g, &lifted) || !add_fits(acc, lifted - dec * dec * power, &next)) {
+            atomicOr(w.status, REFUSED_KEY);
+            return 0;
+        }
+        acc = next;
+    }
+    return rel(temper * rel(acc, 2 * g), MATERIAL_BITS);
+}
+
+// A crowd's score tangent on `2^(−40)` (the host's `lock_words`): its summed word `W` and its tangent `δW` over its `count`,
+// `div_nearest(Σ_m [D (δp̂·W + p̂·δW) 2^g |C| − D² W·δW], |C|²)`, released `2g` and through the temperature.
+__device__ __forceinline__ wide energy_crowd_dz(const FieldWords &w, uint32_t h, const int64_t *pi, const int64_t *tpi, const wide *swlo, const wide *swhi, const wide *tswlo, const wide *tswhi, uint64_t count, uint32_t level, uint64_t gi, bool right, wide temper) {
+    const uint32_t g = skinless(w, h) ? 0 : MOVE_BITS;
+    wide acc = 0;
+    for (uint32_t l = 0; l < w.n; l++) {
+        const wide dec = skin_raw(w, h, l, gi, octave_edge(gi, level, right), (uint32_t)1 << level);
+        wide pair = 0, power = 0;
+        for (uint32_t r = l; r < w.span; r += w.n) {
+            const wide W = swhi[r] - swlo[r], dW = tswhi[r] - tswlo[r];
+            pair += (wide)tpi[r] * W + (wide)pi[r] * dW;
+            power += W * dW;
+        }
+        wide lifted, counted, next;
+        if (!mul_fits(dec * pair, (wide)1 << g, &lifted) || !mul_fits(lifted, (wide)count, &counted) || !add_fits(acc, counted - dec * dec * power, &next)) {
+            atomicOr(w.status, REFUSED_KEY);
+            return 0;
+        }
+        acc = next;
+    }
+    return rel(temper * rel(div_nearest(acc, (wide)(count * count)), 2 * g), MATERIAL_BITS);
+}
+
+// A share's tangent on `2^(−63)` (`ln 2 · p (δz − Σ p δz)`), carried to the score covector as a share is (`energy_ds`'s law).
+__device__ __forceinline__ wide energy_tds(const FieldWords &w, wide temper, uint64_t p, wide dz, wide mean) {
+    const wide ln2 = (wide)(((uwide)w.ln2_hi << 64) | (uwide)w.ln2_lo);
+    const wide dp = rel(ln2 * rel((wide)p * (dz - mean), CONTACT_BITS), MOVE_BITS);
+    return rel(temper * rel(dp, SHARE_BITS - CONTACT_BITS), MATERIAL_BITS);
+}
+
+// The unit power's return (`ratio_adjoint`) of a framed word's covector over each head's span, `[h][t][2n]` both: the words'
+// tangents through the unit power. One warp a head and a site.
+extern "C" __global__ void field_energy_unit_tangent(FieldWords w, const int64_t *unit, const wide *scale, const int64_t *framed, int64_t *out) {
+    const uint32_t lane = threadIdx.x & 31;
+    const uint64_t warps = (uint64_t)gridDim.x * (blockDim.x >> 5);
+    const uint64_t rows = (uint64_t)w.H * w.T;
+    for (uint64_t hs = ((uint64_t)blockIdx.x * blockDim.x + threadIdx.x) >> 5; hs < rows; hs += warps) {
+        const wide s = scale[hs];
+        const int64_t *u = unit + hs * w.span;
+        const int64_t *f = framed + hs * w.span;
+        wide dot = 0;
+        for (uint32_t c = lane; c < w.span; c += 32) {
+            dot += (wide)u[c] * (wide)f[c];
+        }
+        dot = warp_sum(dot);
+        const wide mean = div_nearest(dot, (wide)w.span);
+        for (uint32_t c = lane; c < w.span; c += 32) {
+            out[hs * w.span + c] = s == 0 ? 0 : fit64(div_nearest(((wide)f[c] - rel(mean * (wide)u[c], 2 * FACE_BITS)) << FACE_BITS, s), w.status);
+        }
+    }
+}
+
+// [definition; agent-inferred, November 7] **The locks' force on the words and its tangent over one head's rows** (the host's
+// `lock_words` with a tangent `(δk̂, δp̂)` = `(uq, up)`, `[h][t][2n]` on `2^(−24)`, their definite prefix sums `tsw`), one warp a
+// receiving site `i`: each met source's score covector `δs` from its share and its tangent `δs'` from the share's tangent
+// (two passes over the support: `Σ p δz`, then each term), held at the region block's dense address for the columns; the
+// probe role `release(Σ δs D k̂_j + crowds, 32 + g)` into `w.dp` and its tangent `release(Σ (δs' D k̂_j 2^8 + δs D δk̂_j) +
+// crowds, 40 + g)` into `tp`, the key slots zeroed for the columns (`dq`, `tq`); each crowd's key role and its tangent spread
+// by the difference arrays `w.cw`, `tcw`.
+extern "C" __global__ void __launch_bounds__(REV_ROWS * 32, 4) field_energy_tangent_rows(FieldWords w, uint32_t h, const int64_t *uq, const int64_t *up, const wide *tsw, int64_t *ds, wide *tds, int64_t *dq, int64_t *tq, int64_t *tp, wide *tcw) {
+    __shared__ uint32_t stj[REV_ROWS][32];
+    __shared__ int64_t dss[REV_ROWS][32];
+    __shared__ wide tdss[REV_ROWS][32];
+    __shared__ int64_t dsks[REV_ROWS][MAX_CROWD_SLOTS];
+    __shared__ wide tdsks[REV_ROWS][MAX_CROWD_SLOTS];
+    __shared__ uint64_t cnts[REV_ROWS][32];
+    __shared__ uint32_t crlo[REV_ROWS][32], crhi[REV_ROWS][32], crlv[REV_ROWS][32];
+    __shared__ Divisor cdiv[REV_ROWS][32], cdiv2[REV_ROWS][32];
+    __shared__ RowCls rcs[REV_ROWS];
+    const uint32_t warp = threadIdx.x >> 5, lane = threadIdx.x & 31;
+    const uint32_t S = w.span, n = w.n, classes = w.nclasses;
+    const uint32_t parts = span_parts(S);
+    const bool active = lane < S * parts;
+    const uint32_t entry = lane % S, part = lane / S, m = entry % n;
+    const bool still = skinless(w, h);
+    const uint32_t g0 = still ? 0 : MOVE_BITS;
+    const uint64_t rows1 = (uint64_t)w.T + w.R;
+    for (uint64_t g = ((uint64_t)blockIdx.x * blockDim.x + threadIdx.x) >> 5; g < w.T; g += (uint64_t)gridDim.x * (blockDim.x >> 5)) {
+        const uint64_t hg = (uint64_t)h * w.T + g;
+        if (lane < S) {
+            const uint32_t mc = h * n + lane % n;
+            const uint64_t slot = g * w.M2 + (lane < n ? mc : w.M + mc);
+            dq[slot] = 0;
+            tq[slot] = 0;
+            if (skipped_row(w, g)) {
+                w.dp[slot] = 0;
+                tp[slot] = 0;
+            }
+        }
+        if (skipped_row(w, g)) {
+            continue;
+        }
+        const uint32_t r = w.site_region[g];
+        const uint32_t i = w.site_pos[g];
+        const uint64_t first = w.region_off[r];
+        const uint32_t sites = w.region_off[r + 1] - (uint32_t)first;
+        const uint32_t *members = w.members + (uint64_t)h * w.T + first;
+        const uint32_t *off = w.class_off + ((uint64_t)h * w.R + r) * (2 * classes + 1);
+        const uint32_t K = row_prepare(w, hg, off, rcs[warp], lane);
+        const uint64_t *e = w.e + (uint64_t)h * w.E + w.region_eoff[r] + (uint64_t)i * sites;
+        int64_t *dsr = ds + w.region_eoff[r] + (uint64_t)i * sites;
+        wide *tdsr = tds + w.region_eoff[r] + (uint64_t)i * sites;
+        const int64_t *words = w.qf + ((uint64_t)h * w.T + first) * S;
+        const int64_t *twords = uq + ((uint64_t)h * w.T + first) * S;
+        const int64_t *pi = w.pq + hg * S;
+        const int64_t *tpi = up + hg * S;
+        const uint64_t prow0 = (uint64_t)h * rows1 + first + r;
+        const wide *swp = w.sw + prow0 * S;
+        const wide *tswp = tsw + prow0 * S;
+        const uint64_t *scp = w.sc + prow0;
+        const uint32_t nslots = rcs[warp].open ? 0 : crowd_slots(sites);
+        const wide temper = temper_of(w, h, rcs[warp].open != 0);
+        {
+            uint64_t count = 0;
+            uint32_t lo = 0, hi_ = 0, lv = 0;
+            if (lane < nslots && crowd_at(i, sites, lane, &lo, &hi_, &lv)) {
+                count = scp[hi_ + 1] - scp[lo];
+            }
+            cnts[warp][lane] = count;
+            crlo[warp][lane] = lo;
+            crhi[warp][lane] = hi_;
+            crlv[warp][lane] = lv;
+            if (count != 0) {
+                cdiv[warp][lane] = divisor_of(count);
+                cdiv2[warp][lane] = divisor_of(count * count);
+            }
+        }
+        __syncwarp();
+        // Pass one: `Σ p δz` over the row's terms, the pairs' and the crowds' (a crowd a lane).
+        wide weighted = 0;
+        for (uint32_t k = lane; k < K; k += 32) {
+            const uint32_t j = support_at(members, off, rcs[warp], i, sites, k);
+            if (j == UINT32_MAX) {
+                continue;
+            }
+            weighted += (wide)e[j] * energy_pair_dz(w, h, pi, tpi, words + (uint64_t)j * S, twords + (uint64_t)j * S, g, first + j, j > i ? j - i : i - j, temper);
+        }
+        wide cdz = 0;
+        if (cnts[warp][lane] != 0) {
+            const uint32_t lo = crlo[warp][lane], hi_ = crhi[warp][lane], lv = crlv[warp][lane];
+            cdz = energy_crowd_dz(w, h, pi, tpi, swp + (uint64_t)lo * S, swp + (uint64_t)(hi_ + 1) * S, tswp + (uint64_t)lo * S, tswp + (uint64_t)(hi_ + 1) * S, cnts[warp][lane], lv, g, lo > i, temper);
+            weighted += (wide)w.ce[hg * w.slots + lane] * cdz;
+        }
+        const wide mean = rel(warp_sum(weighted), SHARE_BITS);
+        // Pass two: each pair's δs and δs', in chunks of 32 staged for the probe role and its tangent over the span's entries.
+        wide sum = 0, tsum = 0;
+        for (uint32_t k0 = 0; k0 < K; k0 += 32) {
+            const uint32_t k = k0 + lane;
+            const uint32_t j = k < K ? support_at(members, off, rcs[warp], i, sites, k) : UINT32_MAX;
+            int64_t dsv = 0;
+            wide tdsv = 0;
+            if (j != UINT32_MAX) {
+                dsv = energy_ds(w, temper, e[j]);
+                const wide dz = energy_pair_dz(w, h, pi, tpi, words + (uint64_t)j * S, twords + (uint64_t)j * S, g, first + j, j > i ? j - i : i - j, temper);
+                tdsv = energy_tds(w, temper, e[j], dz, mean);
+                dsr[j] = dsv;
+                tdsr[j] = tdsv;
+            }
+            dss[warp][lane] = dsv;
+            tdss[warp][lane] = tdsv;
+            stj[warp][lane] = j;
+            __syncwarp();
+            if (active) {
+                for (uint32_t jj = part; jj < 32; jj += parts) {
+                    const uint32_t jx = stj[warp][jj];
+                    if (jx != UINT32_MAX) {
+                        const wide dec = skin_raw(w, h, m, g, first + jx, jx > i ? jx - i : i - jx);
+                        const wide q = (wide)words[(uint64_t)jx * S + entry], tk = (wide)twords[(uint64_t)jx * S + entry];
+                        sum += (wide)dss[warp][jj] * dec * q;
+                        tsum += ((tdss[warp][jj] * dec * q) << 8) + (wide)dss[warp][jj] * dec * tk;
+                    }
+                }
+            }
+            __syncwarp();
+        }
+        if (cnts[warp][lane] != 0) {
+            const uint64_t p = w.ce[hg * w.slots + lane];
+            dsks[warp][lane] = energy_ds(w, temper, p);
+            tdsks[warp][lane] = energy_tds(w, temper, p, cdz, mean);
+        }
+        __syncwarp();
+        if (active) {
+            for (uint32_t jj = part; jj < nslots; jj += parts) {
+                const uint64_t count = cnts[warp][jj];
+                if (count == 0) {
+                    continue;
+                }
+                const uint32_t lo = crlo[warp][jj], hi_ = crhi[warp][jj], lv = crlv[warp][jj];
+                const wide d = skin_raw(w, h, m, g, octave_edge(g, lv, lo > i), (uint32_t)1 << lv);
+                const wide dsk = dsks[warp][jj], tdsk = tdsks[warp][jj];
+                const wide wsum = swp[(uint64_t)(hi_ + 1) * S + entry] - swp[(uint64_t)lo * S + entry];
+                const wide twsum = tswp[(uint64_t)(hi_ + 1) * S + entry] - tswp[(uint64_t)lo * S + entry];
+                sum += div_nearest_by(dsk * d * wsum, cdiv[warp][jj]);
+                tsum += div_nearest_by(((tdsk * d * wsum) << 8) + dsk * d * twsum, cdiv[warp][jj]);
+                const wide bracket = rel(((d * (wide)pi[entry] * (wide)count) << g0) - d * d * wsum, g0);
+                const wide tbracket = rel(((d * (wide)tpi[entry] * (wide)count) << g0) - d * d * twsum, g0);
+                wide prod = 0, tprod = 0, tlift = 0, tother = 0;
+                if (!mul_fits(dsk, bracket, &prod) || !mul_fits(tdsk, bracket, &tprod) || !mul_fits(tprod, (wide)1 << 8, &tlift) || !mul_fits(dsk, tbracket, &tother)) {
+                    atomicOr(w.status, REFUSED_KEY);
+                }
+                const wide pw = div_nearest_by(prod, cdiv2[warp][jj]);
+                add_wide(w.cw + (first + r + lo) * S + entry, pw);
+                add_wide(w.cw + (first + r + hi_ + 1) * S + entry, -pw);
+                const wide tpw = div_nearest_by(tlift + tother, cdiv2[warp][jj]);
+                add_wide(tcw + (first + r + lo) * S + entry, tpw);
+                add_wide(tcw + (first + r + hi_ + 1) * S + entry, -tpw);
+            }
+        }
+        sum = parts_sum(active ? sum : 0, S, parts);
+        tsum = parts_sum(active ? tsum : 0, S, parts);
+        if (lane < S) {
+            const uint32_t mc = h * n + lane % n;
+            const uint64_t slot = g * w.M2 + (lane < n ? mc : w.M + mc);
+            w.dp[slot] = fit64(rel(sum, CONTACT_BACK + g0), w.status);
+            tp[slot] = fit64(rel(tsum, CONTACT_BACK + 8 + g0), w.status);
+        }
+        __syncwarp();
+    }
+}
+
+// [definition; agent-inferred, November 7] **The key's column return and its tangent over one head** (the host's
+// `lock_words`), one warp a source site `j` over its receivers: `δk̃_j += release(Σ_i δs_ij ((D p̂_i) 2^g − D² k̂_j), 32 + g)`
+// and its tangent `release(Σ_i [δs'_ij β_ij 2^8 + δs_ij ((D δp̂_i) 2^g − D² δk̂_j)], 40 + g)`, `β_ij` the bracket released by
+// the skin's bits, each product checked as the host's.
+extern "C" __global__ void __launch_bounds__(CONTACT_ROWS * 32) field_energy_tangent_columns(FieldWords w, uint32_t h, const int64_t *uq, const int64_t *up, const int64_t *ds, const wide *tds, int64_t *dq, int64_t *tq) {
+    const uint32_t lane = threadIdx.x & 31;
+    const uint32_t S = w.span, n = w.n, classes = w.nclasses;
+    const uint32_t parts = span_parts(S);
+    const uint32_t entry = lane % S, part = lane / S;
+    const uint32_t m = entry % n;
+    const bool still = skinless(w, h);
+    const uint32_t g0 = still ? 0 : MOVE_BITS;
+    for (uint64_t g = ((uint64_t)blockIdx.x * blockDim.x + threadIdx.x) >> 5; g < w.T; g += (uint64_t)gridDim.x * (blockDim.x >> 5)) {
+        const uint32_t r = w.site_region[g];
+        const uint32_t j = w.site_pos[g];
+        const uint64_t first = w.region_off[r];
+        const uint32_t sites = w.region_off[r + 1] - (uint32_t)first;
+        const uint32_t *members = w.members + (uint64_t)h * w.T + first;
+        const uint32_t *off = w.class_off + ((uint64_t)h * w.R + r) * (2 * classes + 1);
+        const uint32_t c = w.cls[(uint64_t)h * w.T + g];
+        const uint32_t *poff = w.poff + ((uint64_t)h * w.R + r) * (classes + 1);
+        const uint32_t *pmem = w.pmem + ((uint64_t)h * w.T + first) * probe_stride(w);
+        const uint32_t *olist = w.olist + w.ostart[r];
+        const uint32_t K = keyed_site(w, g) ? receiver_len(off, poff, w.ostart[r + 1] - w.ostart[r], c, definite_site(w, g)) : 0;
+        const int64_t *dsc = ds + w.region_eoff[r] + j;
+        const wide *tdsc = tds + w.region_eoff[r] + j;
+        const wide qj = (wide)w.qf[((uint64_t)h * w.T + g) * S + entry], tkj = (wide)uq[((uint64_t)h * w.T + g) * S + entry];
+        wide sk = 0, tsk = 0;
+        if (part < parts) {
+            for (uint32_t k = part; k < K; k += parts) {
+                const uint32_t i = receiver_at(members, off, pmem, poff, olist, c, j, sites, k);
+                if (i == UINT32_MAX || skipped_row(w, first + i)) {
+                    continue;
+                }
+                const uint64_t at = (uint64_t)i * sites;
+                const uint32_t gap = j > i ? j - i : i - j;
+                const wide dec = skin_raw(w, h, m, first + i, g, gap);
+                const uint64_t ri = ((uint64_t)h * w.T + first + i) * S + entry;
+                const wide bracket = rel(((dec * (wide)w.pq[ri]) << g0) - dec * dec * qj, g0);
+                const wide tbracket = rel(((dec * (wide)up[ri]) << g0) - dec * dec * tkj, g0);
+                wide prod = 0, tprod = 0, tlift = 0, tother = 0;
+                if (!mul_fits((wide)dsc[at], bracket, &prod) || !mul_fits(tdsc[at], bracket, &tprod) || !mul_fits(tprod, (wide)1 << 8, &tlift) || !mul_fits((wide)dsc[at], tbracket, &tother)) {
+                    atomicOr(w.status, REFUSED_KEY);
+                }
+                sk += prod;
+                tsk += tlift + tother;
+            }
+        }
+        sk = parts_sum(part < parts ? sk : 0, S, parts);
+        tsk = parts_sum(part < parts ? tsk : 0, S, parts);
+        if (lane < S) {
+            const uint32_t mc = h * n + lane % n;
+            const uint64_t slot = g * w.M2 + (lane < n ? mc : w.M + mc);
+            dq[slot] = fit64((wide)dq[slot] + rel(sk, CONTACT_BACK + g0), w.status);
+            tq[slot] = fit64((wide)tq[slot] + rel(tsk, CONTACT_BACK + 8 + g0), w.status);
+        }
+    }
+}
+
+// A crowds' difference array `cw` summed over the places and added at the definite sites (the host's `spread_w`),
+// `dq = fit64(dq + release(Σ cw, 32 + extra + g))`; one block a region, as `field_spread`.
+extern "C" __global__ void field_energy_spread(FieldWords w, uint32_t h, const wide *cw, uint32_t extra, int64_t *dq) {
+    __shared__ wide psw[SPREAD_THREADS];
+    const bool still = skinless(w, h);
+    const uint32_t g0 = still ? 0 : MOVE_BITS;
+    const uint32_t S = w.span;
+    const uint32_t nchunk = blockDim.x / S;
+    const uint32_t x = threadIdx.x % S, ck = threadIdx.x / S;
+    const bool live = ck < nchunk;
+    for (uint32_t r = blockIdx.x; r < w.R; r += gridDim.x) {
+        const uint64_t first = w.region_off[r];
+        const uint32_t sites = w.region_off[r + 1] - (uint32_t)first;
+        const uint32_t len = (sites + nchunk - 1) / nchunk;
+        const uint32_t lo = ck * len, hi = min(sites, lo + len);
+        wide sw = 0;
+        if (live) {
+            for (uint32_t t = lo; t < hi; t++) {
+                sw += cw[(first + r + t) * S + x];
+            }
+            psw[threadIdx.x] = sw;
+        }
+        __syncthreads();
+        if (live) {
+            wide run = 0;
+            for (uint32_t c = 0; c < ck; c++) {
+                run += psw[c * S + x];
+            }
+            for (uint32_t t = lo; t < hi; t++) {
+                run += cw[(first + r + t) * S + x];
+                if (definite_site(w, first + t)) {
+                    const uint32_t m = h * w.n + x % w.n;
+                    const uint64_t slot = (first + t) * w.M2 + (x < w.n ? m : w.M + m);
+                    dq[slot] = fit64((wide)dq[slot] + rel(run, CONTACT_BACK + extra + g0), w.status);
+                }
+            }
+        }
+        __syncthreads();
+    }
+}
+
+// [definition; agent-inferred, November 7] **The unit power's return differentiated** (the host's `energy_tangent`): at each
+// head and site of a word `ŵ` at power `‖w̃‖` (its framed tangent `δw̃`, its unit tangent `δŵ`, the force `f` on it and the
+// force's tangent `δf`, `[t][2M]`), `J δf − release(div_nearest(−(δŵ⟨ŵ, f⟩ + ŵ⟨δŵ, f⟩) 2^16, 2n‖w̃‖), 40) −
+// release(div_nearest(−(J f)⟨ŵ, δw̃⟩ 2^16, 2n‖w̃‖), 40)` into its framed chart slot, zero at a word of no power. One warp a
+// head and a site.
+extern "C" __global__ void field_energy_unit_tangent_back(FieldWords w, const int64_t *unit, const wide *scale, const int64_t *du, const int64_t *dwt, const int64_t *force, const int64_t *tforce, int64_t *out) {
+    const uint32_t lane = threadIdx.x & 31;
+    const uint64_t warps = (uint64_t)gridDim.x * (blockDim.x >> 5);
+    const uint64_t rows = (uint64_t)w.H * w.T;
+    const uint32_t S = w.span;
+    for (uint64_t hs = ((uint64_t)blockIdx.x * blockDim.x + threadIdx.x) >> 5; hs < rows; hs += warps) {
+        const uint32_t h = hs / w.T;
+        const uint64_t t = hs % w.T;
+        const wide s = scale[hs];
+        const bool live = lane < S;
+        const uint64_t slot = t * w.M2 + (lane < w.n ? h * w.n + lane : w.M + h * w.n + lane - w.n);
+        if (s == 0) {
+            if (live) {
+                out[slot] = 0;
+            }
+            continue;
+        }
+        const wide u = live ? (wide)unit[hs * S + lane] : 0;
+        const wide fv = live ? (wide)force[slot] : 0, tv = live ? (wide)tforce[slot] : 0;
+        const wide d_u = live ? (wide)du[hs * S + lane] : 0, dw_ = live ? (wide)dwt[hs * S + lane] : 0;
+        const wide a_wf = warp_sum(u * fv), b_df = warp_sum(d_u * fv), c_wd = warp_sum(u * dw_), dot_t = warp_sum(u * tv);
+        const wide mean_f = div_nearest(a_wf, (wide)S), mean_t = div_nearest(dot_t, (wide)S);
+        if (!live) {
+            continue;
+        }
+        const wide jf = fit64(div_nearest((fv - rel(mean_f * u, 2 * FACE_BITS)) << FACE_BITS, s), w.status);
+        const wide base = fit64(div_nearest((tv - rel(mean_t * u, 2 * FACE_BITS)) << FACE_BITS, s), w.status);
+        const wide den = (wide)S * s;
+        const wide s1 = d_u * a_wf + u * b_df;
+        const wide corr = rel(div_nearest(-(s1 << FACE_BITS), den), 2 * FACE_BITS + 8) + rel(div_nearest(-((jf * c_wd) << FACE_BITS), den), 2 * FACE_BITS + 8);
+        out[slot] = fit64(base + corr, w.status);
+    }
+}
+
+// The pair's force tangent (the host's `energy_tangent`): each drive's force linear in the other's tangent drive, `δa_t = c ⊙
+// δb_s` and `δb_s = c ⊙ δa_t` along the strand (§16.34), released to `2^(−24)`. One thread a site and a pair of contacts.
+extern "C" __global__ void field_energy_pair_tangent(FieldWords w, uint64_t pair_c, const int64_t *ta, const int64_t *tb, int64_t *da, int64_t *db) {
+    const uint32_t half = w.f / 2;
+    const uint64_t cells = (uint64_t)w.T * half;
+    for (uint64_t c = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; c < cells; c += (uint64_t)gridDim.x * blockDim.x) {
+        const uint64_t t = c / half, e = c % half;
+        const uint64_t re = t * w.f + e, im = re + half;
+        const wide cr = w.theta[pair_c + e], ci = w.theta[pair_c + half + e];
+        const uint64_t s = strand_mate(w, t, e);
+        if (s == UINT64_MAX) {
+            da[re] = 0;
+            da[im] = 0;
+        } else {
+            const wide br = tb[s * w.f + e], bi = tb[s * w.f + half + e];
+            da[re] = fit64(rel(cr * br + ci * bi, MATERIAL_BITS), w.status);
+            da[im] = fit64(rel(ci * br - cr * bi, MATERIAL_BITS), w.status);
+        }
+        const uint64_t p = strand_mate(w, t, e ^ 1);
+        if (p == UINT64_MAX) {
+            db[re] = 0;
+            db[im] = 0;
+        } else {
+            const wide ar = ta[p * w.f + e], ai = ta[p * w.f + half + e];
+            db[re] = fit64(rel(cr * ar + ci * ai, MATERIAL_BITS), w.status);
+            db[im] = fit64(rel(ci * ar - cr * ai, MATERIAL_BITS), w.status);
+        }
+    }
+}
+
+// `w = s ⊙ λ` on `2^(−24)` (`release(s λ, 16)`, `s` each lane's scale) at the regions whose tick stood (`halvings[r]`), zero
+// at the rest.
+extern "C" __global__ void field_energy_scaled(FieldWords w, const wide *scale, const int64_t *lambda, const uint32_t *halvings, int64_t *wv) {
+    const uint64_t cells = (uint64_t)w.T * w.D;
+    const uint32_t lw = w.D / w.lanes;
+    for (uint64_t c = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; c < cells; c += (uint64_t)gridDim.x * blockDim.x) {
+        const uint64_t t = c / w.D, i = c % w.D;
+        wv[c] = halvings[w.site_region[t]] == UINT32_MAX ? 0 : fit64(rel(scale[t * w.lanes + i / lw] * (wide)lambda[c], FACE_BITS), w.status);
+    }
+}
+
+// A tick's letters' covectors (the host's `energy_reverse`): at the regions whose tick stood at `h` halvings, `own +=
+// release(R w, h)`, `before_t += release(w_(t+1), h)`, `after_t += release(w_(t−1), h)` (within the region) and `moment +=
+// release(Cᵀ w + δp', h)`, each addition checked.
+extern "C" __global__ void field_energy_reverse_letters(FieldWords w, const int64_t *wv, const int64_t *lift, const int64_t *chart, const int64_t *probe, const uint32_t *halvings, int64_t *own, int64_t *before, int64_t *after, int64_t *moment) {
+    const uint64_t rows = (uint64_t)w.T * w.D;
+    const uint64_t cells = rows + (uint64_t)w.T * w.M2;
+    for (uint64_t c = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; c < cells; c += (uint64_t)gridDim.x * blockDim.x) {
+        if (c < rows) {
+            const uint64_t t = c / w.D, i = c % w.D;
+            const uint32_t h = halvings[w.site_region[t]];
+            if (h == UINT32_MAX) {
+                continue;
+            }
+            own[c] = fit64((wide)own[c] + rel((wide)lift[c], h), w.status);
+            if (t + 1 < w.T && w.site_pos[t + 1] > 0) {
+                before[c] = fit64((wide)before[c] + rel((wide)wv[(t + 1) * w.D + i], h), w.status);
+            }
+            if (w.site_pos[t] > 0) {
+                after[c] = fit64((wide)after[c] + rel((wide)wv[(t - 1) * w.D + i], h), w.status);
+            }
+        } else {
+            const uint64_t k = c - rows;
+            const uint32_t h = halvings[w.site_region[k / w.M2]];
+            if (h == UINT32_MAX) {
+                continue;
+            }
+            moment[k] = fit64((wide)moment[k] + rel((wide)chart[k] + (wide)probe[k], h), w.status);
+        }
+    }
+}
+
+// `λ = λ' + 2^(−h) (r̂ ⟨λ', F⟩/W + J δF)` in place (the host's `energy_reverse`), each lane's at the regions whose tick stood:
+// `release(release(r̂ div_nearest(⟨λ', F⟩, W), 40) + (J δF), h)` added, checked. One warp a site.
+extern "C" __global__ void field_energy_lambda(FieldWords w, const int32_t *read, const int64_t *force, const int64_t *jt, const uint32_t *halvings, int64_t *lambda) {
+    const uint32_t lane = threadIdx.x & 31;
+    const uint64_t warps = (uint64_t)gridDim.x * (blockDim.x >> 5);
+    const uint32_t lw = w.D / w.lanes;
+    for (uint64_t t = ((uint64_t)blockIdx.x * blockDim.x + threadIdx.x) >> 5; t < w.T; t += warps) {
+        const uint32_t h = halvings[w.site_region[t]];
+        if (h == UINT32_MAX) {
+            continue;
+        }
+        for (uint32_t k = 0; k < w.lanes; k++) {
+            const uint64_t at = t * w.D + k * lw;
+            wide dot = 0;
+            for (uint32_t i = lane; i < lw; i += 32) {
+                dot += (wide)lambda[at + i] * (wide)force[at + i];
+            }
+            dot = warp_sum(dot);
+            const wide mean = div_nearest(dot, (wide)lw);
+            for (uint32_t i = lane; i < lw; i += 32) {
+                const wide radial = rel((wide)read[at + i] * mean, 2 * FACE_BITS + 8);
+                lambda[at + i] = fit64((wide)lambda[at + i] + rel(radial + (wide)jt[at + i], h), w.status);
+            }
+        }
+    }
+}
+
+// The opening's letters' covectors (the host's `energy_reverse`): `own += λ⁰`, `before_t += λ⁰_(t+1)`, `after_t += λ⁰_(t−1)`
+// (within the region) and `moment += Cᵀ λ⁰` (`chart`), each addition checked.
+extern "C" __global__ void field_energy_opening_letters(FieldWords w, const int64_t *lambda, const int64_t *chart, int64_t *own, int64_t *before, int64_t *after, int64_t *moment) {
+    const uint64_t rows = (uint64_t)w.T * w.D;
+    const uint64_t cells = rows + (uint64_t)w.T * w.M2;
+    for (uint64_t c = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; c < cells; c += (uint64_t)gridDim.x * blockDim.x) {
+        if (c < rows) {
+            const uint64_t t = c / w.D, i = c % w.D;
+            own[c] = fit64((wide)own[c] + (wide)lambda[c], w.status);
+            if (t + 1 < w.T && w.site_pos[t + 1] > 0) {
+                before[c] = fit64((wide)before[c] + (wide)lambda[(t + 1) * w.D + i], w.status);
+            }
+            if (w.site_pos[t] > 0) {
+                after[c] = fit64((wide)after[c] + (wide)lambda[(t - 1) * w.D + i], w.status);
+            }
+        } else {
+            const uint64_t k = c - rows;
+            moment[k] = fit64((wide)moment[k] + (wide)chart[k], w.status);
+        }
+    }
+}
+
+// `x = −x` (`λ^K = −J F^K`).
+extern "C" __global__ void field_energy_negate(FieldWords w, int64_t *x, uint64_t cells) {
+    for (uint64_t c = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; c < cells; c += (uint64_t)gridDim.x * blockDim.x) {
+        x[c] = -x[c];
     }
 }

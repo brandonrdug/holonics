@@ -1,5 +1,6 @@
 //! [measurement] **The energy field's forward on the card returns the host's bits** (`holonics::hnn::tower::field::energy`,
-//! `holonics_cuda::hnn::CardField::energy_read`): each region's faces, logits and energy read (the opening's and the last
+//! `holonics_cuda::hnn::CardField::energy_read`): each region's faces (the energy's total derivative, through the reverse over
+//! the ticks and the opening), logits and energy read (the opening's and the last
 //! tick's energy, every tick's halvings, the reads and the site pairs met), on the tiny `energetic` fixtures of every ring
 //! set (open, carried and locked sites, regions of several lengths read in one batch), and on a founding of the line's
 //! declaration on a synthetic region of 1,500 sites, timed against the host. Run alone under the card's lock:

@@ -51,6 +51,8 @@ fn affine_tiling(rows: usize, cols: usize, x64: bool) -> Option<(usize, usize)> 
     let shared = ((rows * (cols + 1) + rows) * 4).div_ceil(16) * 16 + per * 8 + per * cols * if x64 { 8 } else { 4 };
     (shared <= AFFINE_SHARED).then_some((per, shared))
 }
+/// The bias offset of an affine map with no bias (`NO_BIAS` in `kernels/field.cu`): a tangent's chart, linear in its direction.
+const NO_BIAS: u64 = u64::MAX;
 /// The widest span the contact's lanes carry (a lane an entry of the span).
 const CONTACT_SPAN: u32 = 32;
 /// The series row's carrier, in limbs of 64 bits: at least five (a term's product with a wide value), at

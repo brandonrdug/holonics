@@ -1,7 +1,8 @@
-//! **The energy field's forward on the card** (`holonics::hnn::tower::field::energy`, the unified-theory reading of
-//! November 6, 22:52; `kernels/field_energy.cuh`): the opening, `K` ticks of certified descent of one stored energy under
-//! the supports held from the opening, and each open site's face as the energy's force on its letter, bit for bit the host's
-//! `Field::energy_pass` ([`holonics::hnn::tower::field::Field::energy_logits`]).
+//! **The energy field's forward on the card** (`holonics::hnn::tower::field::energy`, the unified-theory readings of
+//! November 6, 22:52 and November 7, 00:02; `kernels/field_energy.cuh`): the opening, `K` ticks of certified descent of one
+//! stored energy under the supports held from the opening, and each open site's face as the total derivative of the energy
+//! at the last state, `−dG/de` with `G = Φ(x^K(e); e)`, bit for bit the host's `Field::energy_pass`
+//! ([`holonics::hnn::tower::field::Field::energy_logits`]).
 //!
 //! [definition; agent-inferred, November 6] **The work is laid out as the field's forward is.** The opening and the moments
 //! are the field's own launches; the energy's sites are the host's `Field::energy_sites` (an open site carries the locked
@@ -19,9 +20,13 @@
 //!
 //! [agent-inferred, November 6] **Each tick's cell is kept on the card** ([`EnergyPass::cells`]): the opening's and each
 //! tick's last state's (a candidate whose every region stood is kept as it is; otherwise the tick's states are read again,
-//! the same bits), with each region's halvings, so a reverse through the ticks (the face's total derivative: a
-//! Hessian-vector product of `Φ` per tick) reads every tick's charts, unit words, shares and drives where the forward left
-//! them. The reverse itself is not built: an energy field is read on the card, not trained.
+//! the same bits), with each tick's force and each region's halvings. [definition; the unified-theory reading of November 7,
+//! 00:02] **The face's reverse reads them** ([`CardField::energy_reverse`], the host's `energy_reverse`): from `λ^K = −J F^K`
+//! back over the kept ticks, each region at the halvings it stood at (none where it rested: its covector passes the tick),
+//! the force's tangent along `w = s ⊙ λ'` (`−Hess Φ · w`, [`CardField::energy_tangent`]: the words' tangents, the locks'
+//! scores', shares' and brackets' tangents beside their forces, the unit power's return differentiated, the pair's), the
+//! tick's letters' covectors, and the opening's; the face adds them to the partial face at the last state. The learner's
+//! return (the material's covector through the ticks) is not built: an energy field is read on the card, not trained.
 
 use super::*;
 use holonics::hnn::tower::field::{EnergyRead, Shares, FIRST_HALVINGS, MOST_HALVINGS};
@@ -100,11 +105,57 @@ struct EnergyForce<'c> {
     force: Pooled<'c, i64>,
 }
 
+/// The force's tangent's buffers ([`CardField::energy_tangent`]): the words' tangents (unframed `[t][2M]`, framed and through
+/// the unit power `[h][t][2n]`), their definite prefix sums, one head's score covectors and their tangents at the dense address,
+/// the crowds' difference arrays, the words' forces and their tangents (`[t][2M]`), the unit power's return differentiated,
+/// the pair drives' tangents and their forces, and the force's tangent on the chart reads.
+struct EnergyTangent<'c> {
+    wq: Pooled<'c, i64>,
+    wp: Pooled<'c, i64>,
+    fq: Pooled<'c, i64>,
+    fp: Pooled<'c, i64>,
+    uq: Pooled<'c, i64>,
+    up: Pooled<'c, i64>,
+    tsw: Pooled<'c, i128>,
+    tsv: Pooled<'c, i128>,
+    tsc: Pooled<'c, u64>,
+    ds: Pooled<'c, i64>,
+    tds: Pooled<'c, i128>,
+    cw: Pooled<'c, i128>,
+    tcw: Pooled<'c, i128>,
+    fdq: Pooled<'c, i64>,
+    fdp: Pooled<'c, i64>,
+    tq: Pooled<'c, i64>,
+    tp: Pooled<'c, i64>,
+    cq: Pooled<'c, i64>,
+    cp: Pooled<'c, i64>,
+    ta: Pooled<'c, i64>,
+    tb: Pooled<'c, i64>,
+    da: Pooled<'c, i64>,
+    db: Pooled<'c, i64>,
+    t: Pooled<'c, i64>,
+}
+
+/// The reverse's buffers ([`CardField::energy_reverse`]): the state's covector `λ`, the scaled covector `w = s ⊙ λ`, its lift
+/// `R w` and moment chart `Cᵀ w`, the lanes' adjoint of the tangent, and the letters' covectors (the host's
+/// `LetterCovectors`: own, before and after rows `[t][D]`, the moment's `[t][2M]`, on `2^(−24)`).
+struct EnergyReverse<'c> {
+    lambda: Pooled<'c, i64>,
+    wv: Pooled<'c, i64>,
+    lift: Pooled<'c, i64>,
+    chart: Pooled<'c, i64>,
+    jt: Pooled<'c, i64>,
+    own: Pooled<'c, i64>,
+    before: Pooled<'c, i64>,
+    after: Pooled<'c, i64>,
+    moment: Pooled<'c, i64>,
+}
+
 /// [agent-inferred, November 6] **A batch's energy forward as the card holds it**: every tick's cell (the opening's first,
 /// then each tick's last state's), each region's halvings by tick, and the read's receipt. What a reverse through the ticks
 /// will read.
 pub(super) struct EnergyPass<'c> {
-    #[allow(dead_code, reason = "held for the reverse through the ticks, which is not built")]
+    #[allow(dead_code, reason = "held for a learner's reverse through the ticks (the face's own reverse has read them)")]
     pub(super) cells: Vec<EnergyCell<'c>>,
     pub(super) reads: Vec<EnergyRead>,
     /// The tick's last states read again ([`FieldTimes::energy_rereads`]).
@@ -134,13 +185,17 @@ pub fn energy_octets(d: &FieldDeclaration, sites: usize) -> u64 {
     let held_site = 4 * h * (3 + 2 * probe_stride) + 6 * 8 * dw + 8 + 8 * f + 8 * h * span + 8 * m2 + 3 * 8 * 2 * h + 2 * 8 * h * d.modes as u64 + 112 * tm;
     let force_site = 3 * 8 * m2 + 2 * 16 * span + 2 * 8 * f + 8 * dw;
     let face_site = 16 * m2 + 2 * 8 * a + 16 + tm * (8 * 2 + 16 * 2 * 3 + 16 * 2 * 2 * 16) + 8 * dw + 8 * 2 * m2;
-    cells * (h * 8 * pairs + s * cell_site + cell_fixed) + 8 * pairs + s * (held_site + force_site + face_site) + 4 * h * (3 * d.classes() as u64 + 2)
+    // The reverse: each tick's force, the tangent's words and sums, its forces and the pair's, the covectors; one head's score
+    // covectors and their tangents a pair.
+    let reverse_site = d.ticks as u64 * 8 * dw + 2 * 8 * m2 + 4 * 8 * h * span + 2 * 16 * h * span + 8 * h + 2 * 16 * span + 6 * 8 * m2 + 4 * 8 * f + 8 * dw + 8 * 8 * dw + 2 * 8 * m2;
+    cells * (h * 8 * pairs + s * cell_site + cell_fixed) + (8 + 8 + 16) * pairs + s * (held_site + force_site + face_site + reverse_site) + 4 * h * (3 * d.classes() as u64 + 2)
 }
 
 impl<'c> CardField<'c> {
     /// [definition; the unified-theory reading of November 6, 22:52] **An energy field's faces and logits on the card**
-    /// (the host's `Field::energy_pass` region by region), with each region's energy read ([`EnergyRead`]): the regions'
-    /// energy sites staged, batched by the card's memory, each batch's forward ([`CardField::energy_batch`]).
+    /// (the host's `Field::energy_pass` region by region: each face the energy's total derivative), with each region's energy
+    /// read ([`EnergyRead`]): the regions' energy sites staged, batched by the card's memory, each batch's forward and the
+    /// face's reverse ([`CardField::energy_batch`]).
     #[allow(clippy::type_complexity)]
     pub(super) fn energy_run(&mut self, field: &Field, regions: &[Region]) -> Result<(Vec<Vec<Option<TowerFace>>>, Vec<Vec<Option<Vec<i64>>>>, Vec<EnergyRead>)> {
         let d = field.declaration;
@@ -380,9 +435,164 @@ impl<'c> CardField<'c> {
         self.launch("field_energy_force_add", Self::cells((sites * dw) as u64), THREADS, &mut [arg(words), arg(&mut lfp), arg(&mut fp)])
     }
 
+    /// The tangent's buffers ([`EnergyTangent`]).
+    fn energy_tangent_alloc(&self, field: &Field, sites: usize, pairs: usize, regions: usize) -> Result<EnergyTangent<'c>> {
+        let d = field.declaration;
+        let (dw, m2, f, heads, span) = (d.width, 2 * d.complex(), d.contacts, d.heads, 2 * d.modes);
+        let rows = sites + regions;
+        let i64s = |len: usize| self.timed(Kind::Alloc, || self.take::<i64>(len.max(1))).map_err(device);
+        let i128s = |len: usize| self.timed(Kind::Alloc, || self.take::<i128>(len.max(1))).map_err(device);
+        Ok(EnergyTangent {
+            wq: i64s(sites * m2)?,
+            wp: i64s(sites * m2)?,
+            fq: i64s(heads * sites * span)?,
+            fp: i64s(heads * sites * span)?,
+            uq: i64s(heads * sites * span)?,
+            up: i64s(heads * sites * span)?,
+            tsw: i128s(heads * rows * span)?,
+            tsv: i128s(heads * rows * span)?,
+            tsc: self.timed(Kind::Alloc, || self.take::<u64>((heads * rows).max(1))).map_err(device)?,
+            ds: i64s(pairs)?,
+            tds: i128s(pairs)?,
+            cw: i128s(rows * span)?,
+            tcw: i128s(rows * span)?,
+            fdq: i64s(sites * m2)?,
+            fdp: i64s(sites * m2)?,
+            tq: i64s(sites * m2)?,
+            tp: i64s(sites * m2)?,
+            cq: i64s(sites * m2)?,
+            cp: i64s(sites * m2)?,
+            ta: i64s(sites * f)?,
+            tb: i64s(sites * f)?,
+            da: i64s(sites * f)?,
+            db: i64s(sites * f)?,
+            t: i64s(sites * dw)?,
+        })
+    }
+
+    /// [definition; the unified-theory reading of November 7, 00:02] **The force's tangent** `δF = −Hess Φ · v` at cell `c`
+    /// along `v` (`[t][D]` on `2^(−24)`, at `v`), into `tb.t`, and the probes' share of it `tb.cp` (unframed, `[t][2M]`): the
+    /// host's `energy_tangent` and `lock_words` with a tangent, launch for launch (`kernels/field_energy.cuh`).
+    #[allow(clippy::too_many_arguments)]
+    fn energy_tangent(&self, field: &Field, words: &mut Words, c: &EnergyCell<'c>, held: &EnergyHeld<'c>, tb: &EnergyTangent<'c>, v: u64, sites: usize, regions: usize) -> Result<()> {
+        let card = self.card;
+        let d = field.declaration;
+        let (dw, m, n, f, heads) = (d.width, d.complex(), d.modes, d.contacts, d.heads);
+        let (m2, span) = (2 * m, 2 * n);
+        let rows = sites + regions;
+        let l = field.layout();
+        Self::energy_point(words, c, held);
+        // The words' tangents through the charts (no bias: linear in the direction), framed by head.
+        self.affine("field_affine_x64", words, words.q, NO_BIAS, words.rq, m2, dw, v, dw, tb.wq.device_ptr(), m2, 0, false)?;
+        self.affine("field_affine_x64", words, words.probe, NO_BIAS, words.rprobe, m2, dw, v, dw, tb.wp.device_ptr(), m2, 0, false)?;
+        let (pr0, pq0) = (words.pr, words.pq);
+        for (word, framed) in [(&tb.wq, &tb.fq), (&tb.wp, &tb.fp)] {
+            (words.pr, words.pq) = (word.device_ptr(), framed.device_ptr());
+            self.launch("field_frame_probe", Self::cells((heads * sites * n) as u64), THREADS, &mut [arg(words)])?;
+        }
+        (words.pr, words.pq) = (pr0, pq0);
+        // Through the unit power (its Jacobian is its return).
+        for (unit, scale, framed, out) in [(&c.qf, &c.qscale, &tb.fq, &tb.uq), (&c.pq, &c.pscale, &tb.fp, &tb.up)] {
+            let (mut up_, mut sp, mut fp, mut op) = (unit.device_ptr(), scale.device_ptr(), framed.device_ptr(), out.device_ptr());
+            self.launch("field_energy_unit_tangent", Self::warps((heads * sites) as u64), THREADS, &mut [arg(words), arg(&mut up_), arg(&mut sp), arg(&mut fp), arg(&mut op)])?;
+        }
+        // The key tangents' definite prefix sums, read by the crowds (`field_sums` on the tangent's words).
+        let saved = (words.qf, words.vf, words.sw, words.sv, words.sc);
+        (words.qf, words.vf, words.sw, words.sv, words.sc) = (tb.uq.device_ptr(), tb.uq.device_ptr(), tb.tsw.device_ptr(), tb.tsv.device_ptr(), tb.tsc.device_ptr());
+        self.launch("field_sums", Self::cells((heads * regions * (2 * span + 1)) as u64), THREADS, &mut [arg(words)])?;
+        (words.qf, words.vf, words.sw, words.sv, words.sc) = saved;
+        // The locks' force on the words and its tangent, head by head.
+        words.dp = tb.fdp.device_ptr();
+        words.cw = tb.cw.device_ptr();
+        for h in 0..heads {
+            card.zero_octets(&tb.cw, 0, 16 * rows * span).map_err(device)?;
+            card.zero_octets(&tb.tcw, 0, 16 * rows * span).map_err(device)?;
+            let (mut hh, mut uqp, mut upp, mut tswp, mut dsp, mut tdsp, mut dqp, mut tqp, mut tpp, mut tcwp) = (h as u32, tb.uq.device_ptr(), tb.up.device_ptr(), tb.tsw.device_ptr(), tb.ds.device_ptr(), tb.tds.device_ptr(), tb.fdq.device_ptr(), tb.tq.device_ptr(), tb.tp.device_ptr(), tb.tcw.device_ptr());
+            self.launch("field_energy_tangent_rows", Self::rows_grid(sites as u64, REV_ROWS), (REV_ROWS * 32) as u32, &mut [arg(words), arg(&mut hh), arg(&mut uqp), arg(&mut upp), arg(&mut tswp), arg(&mut dsp), arg(&mut tdsp), arg(&mut dqp), arg(&mut tqp), arg(&mut tpp), arg(&mut tcwp)])?;
+            let (mut hh, mut uqp, mut upp, mut dsp, mut tdsp, mut dqp, mut tqp) = (h as u32, tb.uq.device_ptr(), tb.up.device_ptr(), tb.ds.device_ptr(), tb.tds.device_ptr(), tb.fdq.device_ptr(), tb.tq.device_ptr());
+            self.launch("field_energy_tangent_columns", Self::rows_grid(sites as u64, CONTACT_ROWS), (CONTACT_ROWS * 32) as u32, &mut [arg(words), arg(&mut hh), arg(&mut uqp), arg(&mut upp), arg(&mut dsp), arg(&mut tdsp), arg(&mut dqp), arg(&mut tqp)])?;
+            for (cw, extra, out) in [(&tb.cw, 0u32, &tb.fdq), (&tb.tcw, 8, &tb.tq)] {
+                let (mut hh, mut cwp, mut ex, mut op) = (h as u32, cw.device_ptr(), extra, out.device_ptr());
+                self.launch("field_energy_spread", (regions as u32).clamp(1, 65_535), THREADS, &mut [arg(words), arg(&mut hh), arg(&mut cwp), arg(&mut ex), arg(&mut op)])?;
+            }
+        }
+        // The unit power's return differentiated along the words' tangents, then out of the frame.
+        for (unit, scale, du, dwt, force, tforce, out) in [(&c.qf, &c.qscale, &tb.uq, &tb.fq, &tb.fdq, &tb.tq, &tb.cq), (&c.pq, &c.pscale, &tb.up, &tb.fp, &tb.fdp, &tb.tp, &tb.cp)] {
+            let (mut up_, mut sp, mut dup, mut dwp, mut fp, mut tfp, mut op) = (unit.device_ptr(), scale.device_ptr(), du.device_ptr(), dwt.device_ptr(), force.device_ptr(), tforce.device_ptr(), out.device_ptr());
+            self.launch("field_energy_unit_tangent_back", Self::warps((heads * sites) as u64), THREADS, &mut [arg(words), arg(&mut up_), arg(&mut sp), arg(&mut dup), arg(&mut dwp), arg(&mut fp), arg(&mut tfp), arg(&mut op)])?;
+        }
+        for chart in [&tb.cq, &tb.cp] {
+            let mut cp = chart.device_ptr();
+            self.launch("field_unframe", Self::cells((sites * m) as u64), THREADS, &mut [arg(words), arg(&mut cp)])?;
+        }
+        self.transposed(words, words.q, m2, dw, tb.cq.device_ptr(), m2, tb.t.device_ptr(), false, false)?;
+        self.transposed(words, words.probe, m2, dw, tb.cp.device_ptr(), m2, tb.t.device_ptr(), true, false)?;
+        // The pair: each drive's force linear in the other's tangent drive, through the transposes.
+        self.affine("field_affine_x64", words, words.wa, NO_BIAS, words.ra, f, dw, v, dw, tb.ta.device_ptr(), f, 0, false)?;
+        self.affine("field_affine_x64", words, words.wb, NO_BIAS, words.rb, f, dw, v, dw, tb.tb.device_ptr(), f, 0, false)?;
+        let (mut pc, mut tap, mut tbp, mut dap, mut dbp) = (l.pair_c as u64, tb.ta.device_ptr(), tb.tb.device_ptr(), tb.da.device_ptr(), tb.db.device_ptr());
+        self.launch("field_energy_pair_tangent", Self::cells((sites * f / 2) as u64), THREADS, &mut [arg(words), arg(&mut pc), arg(&mut tap), arg(&mut tbp), arg(&mut dap), arg(&mut dbp)])?;
+        self.transposed(words, words.wa, f, dw, tb.da.device_ptr(), f, tb.t.device_ptr(), true, false)?;
+        self.transposed(words, words.wb, f, dw, tb.db.device_ptr(), f, tb.t.device_ptr(), true, false)
+    }
+
+    /// [definition; the unified-theory reading of November 7, 00:02] **The reverse through the ticks and the opening** (the
+    /// host's `energy_reverse`), every region of the batch at once: from `λ^K = −J F^K` (the force `fb.force` at the last cell)
+    /// back over each kept tick, each region at the halvings it stood at there (none where it did not stand: its covector
+    /// passes the tick unchanged), `w = s ⊙ λ'`, the force's tangent along `w`, the tick's letters' covectors and `λ = λ' +
+    /// 2^(−h) (r̂⟨λ', F⟩/W + J δF)`; then the opening's. Returns the letters' covectors.
+    #[allow(clippy::too_many_arguments)]
+    fn energy_reverse(&self, field: &Field, words: &mut Words, cells: &[EnergyCell<'c>], forces: &[Pooled<'c, i64>], halvings: &[Vec<Option<u32>>], held: &EnergyHeld<'c>, fb: &EnergyForce<'c>, sites: usize, pairs: usize, regions: usize) -> Result<EnergyReverse<'c>> {
+        let d = field.declaration;
+        let (dw, m2) = (d.width, 2 * d.complex());
+        let (mface, _, _) = moment_face(field);
+        let i64s = |len: usize| self.timed(Kind::Alloc, || self.take::<i64>(len.max(1))).map_err(device);
+        let zeroed = |len: usize| self.timed(Kind::Alloc, || self.take_zeroed::<i64>(len.max(1))).map_err(device);
+        let rb = EnergyReverse { lambda: i64s(sites * dw)?, wv: i64s(sites * dw)?, lift: i64s(sites * dw)?, chart: i64s(sites * m2)?, jt: i64s(sites * dw)?, own: zeroed(sites * dw)?, before: zeroed(sites * dw)?, after: zeroed(sites * dw)?, moment: zeroed(sites * m2)? };
+        let last = cells.last().ok_or(TowerError::Refused("an energy forward with no opening"))?;
+        // λ^K = −J F^K.
+        Self::energy_point(words, last, held);
+        self.ratio_adjoint(words, last.read.device_ptr(), last.scale.device_ptr(), fb.force.device_ptr(), 0, rb.lambda.device_ptr(), false)?;
+        let (mut lp, mut cells_n) = (rb.lambda.device_ptr(), (sites * dw) as u64);
+        self.launch("field_energy_negate", Self::cells(cells_n), THREADS, &mut [arg(words), arg(&mut lp), arg(&mut cells_n)])?;
+        let tb = self.energy_tangent_alloc(field, sites, pairs, regions)?;
+        for k in (0..forces.len()).rev() {
+            let at: Vec<u32> = (0..regions).map(|r| halvings[r].get(k).copied().flatten().unwrap_or(u32::MAX)).collect();
+            if at.iter().all(|&h| h == u32::MAX) {
+                continue;
+            }
+            let c = &cells[k];
+            let at_c = self.timed(Kind::Copy, || self.take_up(&at)).map_err(device)?;
+            // `w = s ⊙ λ'`.
+            {
+                let (mut sp, mut lp, mut hp, mut wp) = (c.scale.device_ptr(), rb.lambda.device_ptr(), at_c.device_ptr(), rb.wv.device_ptr());
+                self.launch("field_energy_scaled", Self::cells((sites * dw) as u64), THREADS, &mut [arg(words), arg(&mut sp), arg(&mut lp), arg(&mut hp), arg(&mut wp)])?;
+            }
+            self.energy_tangent(field, words, c, held, &tb, rb.wv.device_ptr(), sites, regions)?;
+            // The tick's letters: `R w`, the neighbours' `w`, and `Cᵀ w + δp'` on the moment.
+            self.affine("field_affine_x64", words, words.read, NO_BIAS, words.rread, dw, dw, rb.wv.device_ptr(), dw, rb.lift.device_ptr(), dw, 0, false)?;
+            self.transposed(words, mface, dw, m2, rb.wv.device_ptr(), dw, rb.chart.device_ptr(), false, false)?;
+            {
+                let (mut wp, mut yp, mut cp, mut pp, mut hp) = (rb.wv.device_ptr(), rb.lift.device_ptr(), rb.chart.device_ptr(), tb.cp.device_ptr(), at_c.device_ptr());
+                let (mut op, mut bp, mut ap, mut mp) = (rb.own.device_ptr(), rb.before.device_ptr(), rb.after.device_ptr(), rb.moment.device_ptr());
+                self.launch("field_energy_reverse_letters", Self::cells((sites * (dw + m2)) as u64), THREADS, &mut [arg(words), arg(&mut wp), arg(&mut yp), arg(&mut cp), arg(&mut pp), arg(&mut hp), arg(&mut op), arg(&mut bp), arg(&mut ap), arg(&mut mp)])?;
+            }
+            // `λ = λ' + 2^(−h) (r̂⟨λ', F⟩/W + J δF)`.
+            self.ratio_adjoint(words, c.read.device_ptr(), c.scale.device_ptr(), tb.t.device_ptr(), 0, rb.jt.device_ptr(), false)?;
+            let (mut rp, mut fp, mut jp, mut hp, mut lp) = (c.read.device_ptr(), forces[k].device_ptr(), rb.jt.device_ptr(), at_c.device_ptr(), rb.lambda.device_ptr());
+            self.launch("field_energy_lambda", Self::warps(sites as u64), THREADS, &mut [arg(words), arg(&mut rp), arg(&mut fp), arg(&mut jp), arg(&mut hp), arg(&mut lp)])?;
+        }
+        // The opening: `x⁰_t = E(u_t) + E₋(u_(t−1)) + E₊(u_(t+1)) + C s_t + b`.
+        self.transposed(words, mface, dw, m2, rb.lambda.device_ptr(), dw, rb.chart.device_ptr(), false, false)?;
+        let (mut lp, mut cp, mut op, mut bp, mut ap, mut mp) = (rb.lambda.device_ptr(), rb.chart.device_ptr(), rb.own.device_ptr(), rb.before.device_ptr(), rb.after.device_ptr(), rb.moment.device_ptr());
+        self.launch("field_energy_opening_letters", Self::cells((sites * (dw + m2)) as u64), THREADS, &mut [arg(words), arg(&mut lp), arg(&mut cp), arg(&mut op), arg(&mut bp), arg(&mut ap), arg(&mut mp)])?;
+        Ok(rb)
+    }
+
     /// [definition; the unified-theory reading of November 6, 22:52] **One batch's energy forward** (the host's
-    /// `energy_relax` and `energy_pass`, region by region in lockstep): the opening, the held letters and classes, `K` ticks
-    /// of certified descent, and each unresolved site's face as the energy's force on its letter at the last state.
+    /// `energy_relax` and `energy_faces`, region by region in lockstep): the opening, the held letters and classes, `K` ticks
+    /// of certified descent, the reverse through the ticks and the opening, and each unresolved site's face as the energy's
+    /// total derivative on its letter at the last state.
     #[allow(clippy::type_complexity)]
     fn energy_batch(&self, field: &Field, regions: &[Region], words: &mut Words) -> Result<(Vec<Vec<Option<TowerFace>>>, Vec<Vec<Option<Vec<i64>>>>, EnergyPass<'c>)> {
         let card = self.card;
@@ -474,12 +684,17 @@ impl<'c> CardField<'c> {
         let mut active = vec![true; rn];
         let mut first = vec![FIRST_HALVINGS; rn];
         let mut rereads = 0u64;
+        let mut forces: Vec<Pooled<'c, i64>> = Vec::with_capacity(d.ticks);
         for _ in 0..d.ticks {
             if !active.iter().any(|&on| on) {
                 break;
             }
             let current = cells.last().ok_or(TowerError::Refused("an energy forward with no opening"))?;
             self.energy_force(field, words, current, &held, &fb, sites, rn)?;
+            // The tick's force, kept for the reverse (the host's `Step::force`).
+            let kept_force = i64s(sites * dw)?;
+            card.copy_within(&fb.force, 0, &kept_force, 0, sites * dw).map_err(device)?;
+            forces.push(kept_force);
             let ticking = active.clone();
             let mut h: Vec<u32> = first.clone();
             let mut searching = active.clone();
@@ -555,9 +770,12 @@ impl<'c> CardField<'c> {
             }
         }
         self.mark("energy_ticks");
-        // The faces: each unresolved site's letter force at the last state.
+        // The faces: each unresolved site's letter force at the last state, with the reverse's letters' covectors through
+        // the ticks that stood and the opening (the total derivative, the host's `energy_faces`).
         let last = cells.last().ok_or(TowerError::Refused("an energy forward with no opening"))?;
         self.energy_force(field, words, last, &held, &fb, sites, rn)?;
+        let rb = self.energy_reverse(field, words, &cells, &forces, &halvings, &held, &fb, sites, pairs, rn)?;
+        self.mark("energy_reverse");
         let z = i64s(sites * a)?;
         let masses = self.timed(Kind::Alloc, || self.take::<u64>((sites * a).max(1))).map_err(device)?;
         let totals = self.timed(Kind::Alloc, || self.take_zeroed::<i128>(sites.max(1))).map_err(device)?;
@@ -568,8 +786,8 @@ impl<'c> CardField<'c> {
         let tm = d.moment_modes();
         let dm = self.timed(Kind::Alloc, || self.take::<i128>((sites * m2).max(1))).map_err(device)?;
         let back = if tm > 0 {
-            let (mut mp, mut rp, mut dpp, mut dmp) = (mface, last.read.device_ptr(), fb.dp.device_ptr(), dm.device_ptr());
-            self.launch("field_energy_dm", Self::cells((sites * m2) as u64), THREADS, &mut [arg(words), arg(&mut mp), arg(&mut rp), arg(&mut dpp), arg(&mut dmp)])?;
+            let (mut mp, mut rp, mut dpp, mut tmp, mut dmp) = (mface, last.read.device_ptr(), fb.dp.device_ptr(), rb.moment.device_ptr(), dm.device_ptr());
+            self.launch("field_energy_dm", Self::cells((sites * m2) as u64), THREADS, &mut [arg(words), arg(&mut mp), arg(&mut rp), arg(&mut dpp), arg(&mut tmp), arg(&mut dmp)])?;
             Some(self.moment_strands_back(field, words, dm.device_ptr(), rn, sites)?)
         } else {
             None
@@ -577,7 +795,8 @@ impl<'c> CardField<'c> {
         {
             let (mut rp, mut dbp, mut dap) = (last.read.device_ptr(), back.as_ref().map_or(0, |b| b.d_before.device_ptr()), back.as_ref().map_or(0, |b| b.d_after.device_ptr()));
             let (mut tm32, mut mb, mut ma, mut zp) = (tm as u32, l.moment_before as u64, l.moment_after as u64, z.device_ptr());
-            self.launch("field_energy_face", Self::cells((sites * a) as u64), THREADS, &mut [arg(words), arg(&mut rp), arg(&mut dbp), arg(&mut dap), arg(&mut tm32), arg(&mut mb), arg(&mut ma), arg(&mut zp)])?;
+            let (mut op, mut bp, mut ap) = (rb.own.device_ptr(), rb.before.device_ptr(), rb.after.device_ptr());
+            self.launch("field_energy_face", Self::cells((sites * a) as u64), THREADS, &mut [arg(words), arg(&mut rp), arg(&mut dbp), arg(&mut dap), arg(&mut tm32), arg(&mut mb), arg(&mut ma), arg(&mut op), arg(&mut bp), arg(&mut ap), arg(&mut zp)])?;
         }
         // The cavity field (§15.3): a carried site's read less its own echo.
         if st.echo_has.iter().any(|&on| on != 0) {

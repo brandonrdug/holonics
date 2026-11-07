@@ -744,6 +744,10 @@ extern "C" __global__ void field_chart(FieldWords w, const int64_t *x, int32_t *
     }
 }
 
+// The bias offset of an affine map with no bias (the host's `affine(.., None, ..)`: a tangent's chart, linear in its
+// direction).
+#define NO_BIAS 0xFFFFFFFFFFFFFFFFull
+
 // `out[t][o] = release(Σ_i W[o][i] x[t][i] + bias[o] 2^24, 24)` (`affine`): the host's carrier bound
 // `wmax · xmax · (cols + 1)` refused at `2^126`, the sum in 64 bits below `2^62` and in 128 otherwise
 // (the same integer either way). With `add`, the result is added to `add[t][o]` (the residual).
@@ -780,7 +784,9 @@ __device__ void affine(const FieldWords &w, uint64_t weight, uint64_t bias, uint
                 sum += (wide)row[i] * (wide)xt[i];
             }
         }
-        sum += (wide)w.theta[bias + o] << MATERIAL_BITS;
+        if (bias != NO_BIAS) {
+            sum += (wide)w.theta[bias + o] << MATERIAL_BITS;
+        }
         const int64_t v = fit64(rel(sum, MATERIAL_BITS), w.status);
         if (add) {
             add[t * out_stride + o] = fit64((wide)add[t * out_stride + o] + (wide)v, w.status);
@@ -812,7 +818,7 @@ __device__ void affine_tiled(const FieldWords &w, uint64_t weight, uint64_t bias
         ws[(i / cols) * stride + i % cols] = w.theta[weight + i];
     }
     for (uint32_t i = threadIdx.x; i < rows; i += blockDim.x) {
-        bs[i] = w.theta[bias + i];
+        bs[i] = bias == NO_BIAS ? 0 : w.theta[bias + i];
     }
     const uint32_t p = threadIdx.x / rows, o = threadIdx.x % rows;
     for (uint64_t t0 = (uint64_t)blockIdx.x * per; t0 < w.T; t0 += (uint64_t)gridDim.x * per) {
