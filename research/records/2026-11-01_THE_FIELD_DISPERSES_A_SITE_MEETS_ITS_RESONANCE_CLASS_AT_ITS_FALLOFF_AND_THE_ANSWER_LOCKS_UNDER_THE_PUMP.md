@@ -4276,3 +4276,24 @@ energy fields).
   symmetric and a square read at one base agrees to first order with no rest. Its rest limit is the partial face.
 - The base holds the classes, the supports and the halvings, and the open site stays a source carrying the locked mixture.
 Receipts: `longrun_nov6/energy129.txt`.
+
+[definition; the unified-theory reading of November 7, 00:02] **The face is the total derivative of one scalar, and a square
+agrees at one base.**
+- The face is now `z_t(a) = −dG/de_t(a)` with `G(e) = Φ(x^K(e); e)`, read through the opening and the declared ticks.
+- The partial at the last state is joined by the reverse. From `λ^K = −J F^K` back over each tick that stood, with `w = s ⊙ λ'`,
+  the tick's letters take `2^(−h) ⟨w, ∂F/∂e⟩` and the adjoint steps `λ = λ' + 2^(−h)(r̂⟨λ', F⟩/W + J δF(w))`. The opening then
+  takes `λ⁰` on its rows.
+- `δF(w) = −Hess Φ · w` is the force's tangent through the words, the locks' scores, shares and brackets, the unit power's
+  return differentiated, and the pair. The Hessian is symmetric, so the tangent is the adjoint.
+- The classes, supports and halvings are held at the base. Every open site carries the locked uniform mixture, so every
+  compared letter state is read in one structure.
+Tests on the tiny field, every ring set:
+- The tangent along a lane-tangent direction matches the force's difference across a step of `2^(−8)` to within a tenth of
+  its norm, and `⟨u, Hv⟩ = ⟨v, Hu⟩` to a hundredth.
+- A central difference of `G` across an open site's mixture moved by `±2^(−7)(δ_b − δ_a)` reads `−2ε(z_b − z_a)`, mostly
+  within 1% (largest 4.3% where the reading is large, falling with `ε`). Where the reading is small it scatters by about
+  `2^(−11)` bits, which is the replayed states' rounding.
+- Theory's identity at one base, with the open sites as mixtures and the reads replayed under the base's supports and
+  halvings: from `ε = 2^(−6)` to `2^(−4)` the readings grow 3.95, 4.08 and 3.67 times.
+- Curl over readings reads 0.050 → 0.140, 0.019 → 0.077 and 0.039 → 0.190, against 1.45–1.90 for the partial face at the same
+  base.

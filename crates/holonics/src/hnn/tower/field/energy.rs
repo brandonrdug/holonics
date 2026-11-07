@@ -90,6 +90,15 @@ struct Held {
     definite: Vec<bool>,
 }
 
+/// The locks' force on the words and its tangent ([`Field::lock_words`]), each `[t][2M]` on `2^(−24)` in the framed unit
+/// chart: the keys' and the probes', and their tangents (empty without one).
+struct LockWords {
+    dq: Vec<i64>,
+    dp: Vec<i64>,
+    tq: Vec<i64>,
+    tp: Vec<i64>,
+}
+
 /// A region relaxed under its energy: the last state, its read, what the ticks held, the clocks and the read's receipt
 /// (the state and the windows are read again only by the tests' letter reading).
 #[cfg_attr(not(test), allow(dead_code))]
@@ -100,6 +109,25 @@ struct Relaxed {
     paces: Paces,
     window: Option<Vec<bool>>,
     read: EnergyRead,
+    /// Each tick that stood: the state it stepped from, that state's read, its force and its halvings.
+    trail: Vec<Step>,
+}
+
+/// A tick that stood ([`Relaxed::trail`]).
+struct Step {
+    cell: EnergyCell,
+    force: Vec<i64>,
+    halvings: u32,
+}
+
+/// [definition; the unified-theory reading of November 7, 00:02] The letters' covectors of the region's opening and ticks,
+/// `(∂x⁰/∂e)ᵀ λ⁰ + Σ_k (∂x^(k+1)/∂e)ᵀ λ^(k+1)` read on each site's rows: its own encoding row's, its before and after contact
+/// rows' (`[t][D]`), and its moment's (`[t][2M]`), all on `2^(−24)`.
+struct LetterCovectors {
+    own: Vec<i64>,
+    before: Vec<i64>,
+    after: Vec<i64>,
+    moment: Vec<i64>,
 }
 
 /// `log₂ m` on `2^(−ENERGY_BITS)` for a positive integer `m`, from its leading 127 bits.
@@ -343,19 +371,25 @@ impl Field {
         Ok(c)
     }
 
-    /// The energy's force on each site's chart read, `−∂Φ/∂r̂` (`[t][D]` on `2^(−24)`), and the probes' share of it
-    /// `[t][2M]` (unframed, on `2^(−24)`), whose turned modes the moment's face reads.
-    fn energy_force(&self, c: &EnergyCell, held: &Held, paces: &Paces, reaches: &Reaches) -> Result<(Vec<i64>, Vec<i64>)> {
+    /// [definition; the unified-theory reading of November 6, 22:52] **The locks' force on the words** in each head's framed
+    /// unit chart (`[t][2M]`, before the unit power's return, on `2^(−24)`): the row's share is the force on its score
+    /// (`−∂Φ/∂z_ij = p_ij`, carried to `2^(−40)` as the reverse's score covector), and each mode's lock returns to its two
+    /// words as the tick's reverse reads it: the probe `Σ_j p_ij T D k̂_j`, each key `Σ_i p_ij T (D p̂_i − D² k̂_j)`, a crowd at
+    /// its mean word. With a tangent of the unit words `(δk̂, δp̂)` (`[h][t][2n]` on `2^(−24)`) also the forces' tangents: the
+    /// scores' `δz = T Σ_m (D(δp̂·k̂ + p̂·δk̂) − D² k̂·δk̂)`, the shares' `δp = ln 2 · p (δz − Σ p δz)`, and the brackets'.
+    fn lock_words(&self, c: &EnergyCell, held: &Held, paces: &Paces, tangent: Option<(&[i64], &[i64])>) -> Result<LockWords> {
         let d = &self.declaration;
-        let (dw, m, n, f, heads) = (d.width, d.complex(), d.modes, d.contacts, d.heads);
+        let (m, n, heads) = (d.complex(), d.modes, d.heads);
         let m2 = 2 * m;
         let span = 2 * n;
         let sites = held.definite.len();
-        let l = &self.layout;
-        // The locks: the row's share is the force on its score (`−∂Φ/∂z_ij = p_ij`), carried to 2^(−40) as the
-        // reverse's score covector, then each mode's lock returns to its two words as the tick's reverse reads it.
-        let mut dq = vec![0i64; sites * m2];
-        let mut dp = vec![0i64; sites * m2];
+        let ln2 = ln2_face();
+        let mut out = LockWords { dq: vec![0i64; sites * m2], dp: vec![0i64; sites * m2], tq: Vec::new(), tp: Vec::new() };
+        if tangent.is_some() {
+            out.tq = vec![0i64; sites * m2];
+            out.tp = vec![0i64; sites * m2];
+        }
+        let carried = |v: Option<i128>| v.ok_or(TowerError::Refused(KEY_RETURN));
         for h in 0..heads {
             let lists = &held.classes[h];
             let rows = &c.rows[h * sites..(h + 1) * sites];
@@ -363,14 +397,66 @@ impl Field {
             let sums = &c.sums[h];
             let qh = &c.q[h * sites * span..(h + 1) * sites * span];
             let ph = &c.pq[h * sites * span..(h + 1) * sites * span];
-            let back = CONTACT_BITS + FACE_BITS + self.decay(h, 0, 0).1 - super::super::COVECTOR_BITS;
+            let g0 = self.decay(h, 0, 0).1;
+            let back = CONTACT_BITS + FACE_BITS + g0 - super::super::COVECTOR_BITS;
+            let tangent_h = tangent.map(|(tk, tp)| (&tk[h * sites * span..(h + 1) * sites * span], &tp[h * sites * span..(h + 1) * sites * span]));
+            let zeros = vec![0i64; sites * span];
+            let tsums = tangent_h.map(|(tk, _)| Sums::of(tk, &zeros, &held.definite, span));
             let mut ds: Vec<Vec<i128>> = Vec::with_capacity(sites);
             let mut dsc: Vec<Vec<i128>> = Vec::with_capacity(sites);
+            let mut tds: Vec<Vec<i128>> = Vec::with_capacity(sites);
+            let mut tdsc: Vec<Vec<i128>> = Vec::with_capacity(sites);
             for i in 0..sites {
                 let temper = self.temper(h, lists.listens(i))?;
-                let force = |p: u64| release(temper * release(p as i128, SHARE_BITS - CONTACT_BITS), MATERIAL_BITS);
-                ds.push(rows[i].iter().map(|src| force(src.p)).collect());
-                dsc.push(crowds[i].iter().map(|cr| force(cr.e)).collect());
+                let force = |p: i128| release(temper * release(p, SHARE_BITS - CONTACT_BITS), MATERIAL_BITS);
+                ds.push(rows[i].iter().map(|src| force(src.p as i128)).collect());
+                dsc.push(crowds[i].iter().map(|cr| force(cr.e as i128)).collect());
+                let Some((tk, tp)) = tangent_h else { continue };
+                let ts = tsums.as_ref().expect("a tangent's sums");
+                // The scores' tangents on 2^(−40).
+                let mut dz: Vec<i128> = Vec::with_capacity(rows[i].len() + crowds[i].len());
+                for src in &rows[i] {
+                    let j = src.j as usize;
+                    let mut acc = 0i128;
+                    let mut g_ = 0u32;
+                    for li in 0..n {
+                        let (dec, g) = self.pair_decay(paces, h, li, i, j);
+                        g_ = g;
+                        let mut pair = 0i128;
+                        let mut power = 0i128;
+                        for r in [li, n + li] {
+                            pair += tp[i * span + r] as i128 * qh[j * span + r] as i128 + ph[i * span + r] as i128 * tk[j * span + r] as i128;
+                            power += qh[j * span + r] as i128 * tk[j * span + r] as i128;
+                        }
+                        acc = carried(acc.checked_add(carried((dec * pair).checked_mul(1i128 << g))? - dec * dec * power))?;
+                    }
+                    dz.push(release(temper * release(acc, 2 * g_), MATERIAL_BITS));
+                }
+                for cr in &crowds[i] {
+                    let count = cr.count as i128;
+                    let mut acc = 0i128;
+                    let mut g_ = 0u32;
+                    for li in 0..n {
+                        let (dec, g) = self.octave_decay(paces, h, li, i, cr.level, cr.lo > i);
+                        g_ = g;
+                        let mut pair = 0i128;
+                        let mut power = 0i128;
+                        for r in [li, n + li] {
+                            let w = sums.words[(cr.hi + 1) * span + r] - sums.words[cr.lo * span + r];
+                            let dw = ts.words[(cr.hi + 1) * span + r] - ts.words[cr.lo * span + r];
+                            pair += tp[i * span + r] as i128 * w + ph[i * span + r] as i128 * dw;
+                            power += w * dw;
+                        }
+                        acc = carried(acc.checked_add(carried(carried((dec * pair).checked_mul(1i128 << g))?.checked_mul(count))? - dec * dec * power))?;
+                    }
+                    dz.push(release(temper * release(div_nearest(acc, count * count), 2 * g_), MATERIAL_BITS));
+                }
+                // The shares' tangents on 2^(−63): `ln 2 · p (δz − Σ p δz)`.
+                let shares: Vec<i128> = rows[i].iter().map(|s| s.p as i128).chain(crowds[i].iter().map(|cr| cr.e as i128)).collect();
+                let mean = release(shares.iter().zip(&dz).map(|(&p, &z)| p * z).sum::<i128>(), SHARE_BITS);
+                let dp: Vec<i128> = shares.iter().zip(&dz).map(|(&p, &z)| release(ln2 * release(p * (z - mean), CONTACT_BITS), MOVE_BITS)).collect();
+                tds.push(dp[..rows[i].len()].iter().map(|&p| force(p)).collect());
+                tdsc.push(dp[rows[i].len()..].iter().map(|&p| force(p)).collect());
             }
             let prefixed = |diff: &[i128]| -> Vec<i128> {
                 let mut out = diff[..sites * span].to_vec();
@@ -383,41 +469,96 @@ impl Field {
             };
             let mut col = vec![0i128; sites * span];
             let mut crowd_w = vec![0i128; (sites + 1) * span];
+            let (mut tcol, mut tcrowd_w) = (vec![0i128; sites * span], vec![0i128; (sites + 1) * span]);
             for i in 0..sites {
                 for (k, src) in rows[i].iter().enumerate() {
                     let j = src.j as usize;
                     for r in 0..span {
                         let (dec, g) = self.pair_decay(paces, h, r % n, i, j);
                         let bracket = release(((dec * ph[i * span + r] as i128) << g) - dec * dec * qh[j * span + r] as i128, g);
-                        col[j * span + r] = col[j * span + r].checked_add(ds[i][k].checked_mul(bracket).ok_or(TowerError::Refused(KEY_RETURN))?).ok_or(TowerError::Refused(KEY_RETURN))?;
+                        col[j * span + r] = carried(col[j * span + r].checked_add(carried(ds[i][k].checked_mul(bracket))?))?;
+                        if let Some((tk, tp)) = tangent_h {
+                            let tbracket = release(((dec * tp[i * span + r] as i128) << g) - dec * dec * tk[j * span + r] as i128, g);
+                            let v = carried(carried(tds[i][k].checked_mul(bracket))?.checked_mul(1 << 8))? + carried(ds[i][k].checked_mul(tbracket))?;
+                            tcol[j * span + r] = carried(tcol[j * span + r].checked_add(v))?;
+                        }
                     }
                 }
                 for (k, cr) in crowds[i].iter().enumerate() {
+                    let count = cr.count as i128;
                     for r in 0..span {
                         let (dec, g) = self.octave_decay(paces, h, r % n, i, cr.level, cr.lo > i);
                         let mean = sums.words[(cr.hi + 1) * span + r] - sums.words[cr.lo * span + r];
-                        let bracket = release(((dec * ph[i * span + r] as i128 * cr.count as i128) << g) - dec * dec * mean, g);
-                        let part = div_nearest(dsc[i][k].checked_mul(bracket).ok_or(TowerError::Refused(KEY_RETURN))?, (cr.count * cr.count) as i128);
+                        let bracket = release(((dec * ph[i * span + r] as i128 * count) << g) - dec * dec * mean, g);
+                        let part = div_nearest(carried(dsc[i][k].checked_mul(bracket))?, count * count);
                         crowd_w[cr.lo * span + r] += part;
                         crowd_w[(cr.hi + 1) * span + r] -= part;
+                        if let Some((_, tp)) = tangent_h {
+                            let ts = tsums.as_ref().expect("a tangent's sums");
+                            let tmean = ts.words[(cr.hi + 1) * span + r] - ts.words[cr.lo * span + r];
+                            let tbracket = release(((dec * tp[i * span + r] as i128 * count) << g) - dec * dec * tmean, g);
+                            let v = carried(carried(tdsc[i][k].checked_mul(bracket))?.checked_mul(1 << 8))? + carried(dsc[i][k].checked_mul(tbracket))?;
+                            let part = div_nearest(v, count * count);
+                            tcrowd_w[cr.lo * span + r] += part;
+                            tcrowd_w[(cr.hi + 1) * span + r] -= part;
+                        }
                     }
                 }
             }
             let spread_w = prefixed(&crowd_w);
+            let tspread_w = prefixed(&tcrowd_w);
             for i in 0..sites {
                 for r in 0..span {
-                    let sq: i128 = rows[i].iter().enumerate().map(|(k, src)| ds[i][k] * self.pair_decay(paces, h, r % n, i, src.j as usize).0 * qh[src.j as usize * span + r] as i128).sum::<i128>()
-                        + crowds[i].iter().enumerate().map(|(k, cr)| div_nearest(dsc[i][k] * self.octave_decay(paces, h, r % n, i, cr.level, cr.lo > i).0 * (sums.words[(cr.hi + 1) * span + r] - sums.words[cr.lo * span + r]), cr.count as i128)).sum::<i128>();
                     let k = h * n + r % n;
-                    let slot = if r < n { k } else { m + k };
-                    dp[i * m2 + slot] = fit64(release(sq, back))?;
-                    dq[i * m2 + slot] = fit64(release(col[i * span + r], back))?;
+                    let slot = i * m2 + if r < n { k } else { m + k };
+                    let mut sq = 0i128;
+                    let mut tsq = 0i128;
+                    for (kk, src) in rows[i].iter().enumerate() {
+                        let j = src.j as usize;
+                        let dec = self.pair_decay(paces, h, r % n, i, j).0;
+                        sq += ds[i][kk] * dec * qh[j * span + r] as i128;
+                        if let Some((tk, _)) = tangent_h {
+                            tsq += ((tds[i][kk] * dec * qh[j * span + r] as i128) << 8) + ds[i][kk] * dec * tk[j * span + r] as i128;
+                        }
+                    }
+                    for (kk, cr) in crowds[i].iter().enumerate() {
+                        let dec = self.octave_decay(paces, h, r % n, i, cr.level, cr.lo > i).0;
+                        let w = sums.words[(cr.hi + 1) * span + r] - sums.words[cr.lo * span + r];
+                        sq += div_nearest(dsc[i][kk] * dec * w, cr.count as i128);
+                        if tangent_h.is_some() {
+                            let ts = tsums.as_ref().expect("a tangent's sums");
+                            let tw = ts.words[(cr.hi + 1) * span + r] - ts.words[cr.lo * span + r];
+                            tsq += div_nearest(((tdsc[i][kk] * dec * w) << 8) + dsc[i][kk] * dec * tw, cr.count as i128);
+                        }
+                    }
+                    out.dp[slot] = fit64(release(sq, back))?;
+                    out.dq[slot] = fit64(release(col[i * span + r], back))?;
                     if held.definite[i] {
-                        dq[i * m2 + slot] = fit64(dq[i * m2 + slot] as i128 + release(spread_w[i * span + r], back))?;
+                        out.dq[slot] = fit64(out.dq[slot] as i128 + release(spread_w[i * span + r], back))?;
+                    }
+                    if tangent_h.is_some() {
+                        out.tp[slot] = fit64(release(tsq, back + 8))?;
+                        out.tq[slot] = fit64(release(tcol[i * span + r], back + 8))?;
+                        if held.definite[i] {
+                            out.tq[slot] = fit64(out.tq[slot] as i128 + release(tspread_w[i * span + r], back + 8))?;
+                        }
                     }
                 }
             }
         }
+        Ok(out)
+    }
+
+    /// The energy's force on each site's chart read, `−∂Φ/∂r̂` (`[t][D]` on `2^(−24)`), and the probes' share of it
+    /// `[t][2M]` (unframed, on `2^(−24)`), whose turned modes the moment's face reads.
+    fn energy_force(&self, c: &EnergyCell, held: &Held, paces: &Paces, reaches: &Reaches) -> Result<(Vec<i64>, Vec<i64>)> {
+        let d = &self.declaration;
+        let (dw, m, n, f, heads) = (d.width, d.complex(), d.modes, d.contacts, d.heads);
+        let m2 = 2 * m;
+        let span = 2 * n;
+        let sites = held.definite.len();
+        let l = &self.layout;
+        let LockWords { mut dq, mut dp, .. } = self.lock_words(c, held, paces, None)?;
         // Through each word's ratio to its own power, then out of the frame.
         for (word, scale, cov) in [(&c.q, &c.qscale, &mut dq), (&c.pq, &c.pscale, &mut dp)] {
             for h in 0..heads {
@@ -499,6 +640,136 @@ impl Field {
         Ok((force, dp))
     }
 
+    /// [definition; the unified-theory reading of November 7, 00:02] **The force's tangent**, `δF = (∂F/∂r̂) v = −Hess Φ · v`
+    /// along a direction `v` of the chart reads (`[t][D]` on `2^(−24)`), and the probes' share of it (`[t][2M]`, unframed,
+    /// on `2^(−24)`): the words' tangents through the charts, the frame and the unit power (whose Jacobian is its own
+    /// return, [`ratio_adjoint`]), the locks' ([`Field::lock_words`]), the unit power's return differentiated along them
+    /// (`δ(J f) = J δf − (δŵ⟨ŵ, f⟩ + ŵ⟨δŵ, f⟩)/(d ‖w̃‖) − J f ⟨ŵ, δw̃⟩/(d ‖w̃‖)`), the frame's and the charts' transposes, and the
+    /// pair's (linear in each drive). The letters' force does not move with the state. `Φ`'s Hessian is symmetric, so the
+    /// tangent is also the tick's adjoint on a covector.
+    fn energy_tangent(&self, c: &EnergyCell, held: &Held, paces: &Paces, reaches: &Reaches, v: &[i64]) -> Result<(Vec<i64>, Vec<i64>)> {
+        let d = &self.declaration;
+        let (dw, m, n, f, heads) = (d.width, d.complex(), d.modes, d.contacts, d.heads);
+        let m2 = 2 * m;
+        let span = 2 * n;
+        let sites = held.definite.len();
+        let l = &self.layout;
+        // The words' tangents, framed and through the unit power: `[h][t][2n]` on 2^(−24).
+        let mut wq = vec![0i64; m2];
+        let mut wp = vec![0i64; m2];
+        let (mut fq, mut fp) = (vec![0i64; heads * sites * span], vec![0i64; heads * sites * span]);
+        for t in 0..sites {
+            let vt = &v[t * dw..(t + 1) * dw];
+            affine(&self.theta[l.q..l.q + m2 * dw], reaches.q, dw, vt, None, 0, MATERIAL_BITS, &mut wq)?;
+            affine(&self.theta[l.probe..l.probe + m2 * dw], reaches.probe, dw, vt, None, 0, MATERIAL_BITS, &mut wp)?;
+            for h in 0..heads {
+                let at = (h * sites + t) * span;
+                for li in 0..n {
+                    let k = h * n + li;
+                    let (ur, ui) = self.frame(paces, t, h, li);
+                    let (ur, ui) = (ur as i128, ui as i128);
+                    for (word, out) in [(&wq, &mut fq), (&wp, &mut fp)] {
+                        let (wr, wi) = (word[k] as i128, word[m + k] as i128);
+                        out[at + li] = fit64(release(ur * wr - ui * wi, MOVE_BITS))?;
+                        out[at + n + li] = fit64(release(ui * wr + ur * wi, MOVE_BITS))?;
+                    }
+                }
+            }
+        }
+        let (mut uq, mut up) = (vec![0i64; heads * sites * span], vec![0i64; heads * sites * span]);
+        for (word, scale, framed, out) in [(&c.q, &c.qscale, &fq, &mut uq), (&c.pq, &c.pscale, &fp, &mut up)] {
+            for hs in 0..heads * sites {
+                let unit: Vec<i32> = word[hs * span..(hs + 1) * span].iter().map(|&x| x as i32).collect();
+                let back = ratio_adjoint(&unit, scale[hs], &framed[hs * span..(hs + 1) * span])?;
+                out[hs * span..(hs + 1) * span].copy_from_slice(&back);
+            }
+        }
+        let LockWords { dq, dp, tq, tp } = self.lock_words(c, held, paces, Some((&uq, &up)))?;
+        // The unit power's return and its tangent, then out of the frame: `[t][2M]`.
+        let (mut cq, mut cp) = (vec![0i64; sites * m2], vec![0i64; sites * m2]);
+        for (word, scale, framed, unit_t, force, tforce, out) in [(&c.q, &c.qscale, &fq, &uq, &dq, &tq, &mut cq), (&c.pq, &c.pscale, &fp, &up, &dp, &tp, &mut cp)] {
+            for h in 0..heads {
+                for t in 0..sites {
+                    let hs = h * sites + t;
+                    let slot = |r: usize| t * m2 + if r < n { h * n + r } else { m + h * n + r - n };
+                    let fv: Vec<i64> = (0..span).map(|r| force[slot(r)]).collect();
+                    let tv: Vec<i64> = (0..span).map(|r| tforce[slot(r)]).collect();
+                    let scale_hs = scale[hs];
+                    if scale_hs == 0 {
+                        continue;
+                    }
+                    let unit: Vec<i32> = word[hs * span..(hs + 1) * span].iter().map(|&x| x as i32).collect();
+                    let du = &unit_t[hs * span..(hs + 1) * span];
+                    let dwt = &framed[hs * span..(hs + 1) * span];
+                    let jf = ratio_adjoint(&unit, scale_hs, &fv)?;
+                    let base = ratio_adjoint(&unit, scale_hs, &tv)?;
+                    let a_wf: i128 = unit.iter().zip(&fv).map(|(&u, &x)| u as i128 * x as i128).sum();
+                    let b_df: i128 = du.iter().zip(&fv).map(|(&u, &x)| u as i128 * x as i128).sum();
+                    let c_wd: i128 = unit.iter().zip(dwt).map(|(&u, &x)| u as i128 * x as i128).sum();
+                    let den = span as i128 * scale_hs;
+                    for r in 0..span {
+                        let s1 = du[r] as i128 * a_wf + unit[r] as i128 * b_df;
+                        let corr = release(div_nearest(-(s1 << FACE_BITS), den), 2 * FACE_BITS + 8) + release(div_nearest(-((jf[r] as i128 * c_wd) << FACE_BITS), den), 2 * FACE_BITS + 8);
+                        out[slot(r)] = fit64(base[r] as i128 + corr)?;
+                    }
+                }
+            }
+        }
+        for t in 0..sites {
+            for k in 0..m {
+                let (ur, ui) = self.frame(paces, t, k / n, k % n);
+                let (ur, ui) = (ur as i128, ui as i128);
+                for chart in [&mut cq, &mut cp] {
+                    let (gr, gi) = (chart[t * m2 + k] as i128, chart[t * m2 + m + k] as i128);
+                    chart[t * m2 + k] = fit64(release(ur * gr + ui * gi, MOVE_BITS))?;
+                    chart[t * m2 + m + k] = fit64(release(ur * gi - ui * gr, MOVE_BITS))?;
+                }
+            }
+        }
+        let mut out = vec![0i64; sites * dw];
+        let mut back = vec![0i64; dw];
+        let add = |out: &mut [i64], t: usize, v: &[i64]| -> Result<()> {
+            for (slot, &x) in out[t * dw..(t + 1) * dw].iter_mut().zip(v) {
+                *slot = fit64(*slot as i128 + x as i128)?;
+            }
+            Ok(())
+        };
+        for (w, reach_w, cov) in [(l.q, reaches.q, &cq), (l.probe, reaches.probe, &cp)] {
+            for t in 0..sites {
+                transposed(&self.theta[w..w + m2 * dw], reach_w, dw, &cov[t * m2..(t + 1) * m2], MATERIAL_BITS, &mut back)?;
+                add(&mut out, t, &back)?;
+            }
+        }
+        // The pair: each drive's force is linear in the other's drive, `δ(∂/∂a_t) = c ⊙ δb_s`, through the transposes.
+        let half = f / 2;
+        let (mut ta, mut tb) = (vec![0i64; sites * f], vec![0i64; sites * f]);
+        for t in 0..sites {
+            let vt = &v[t * dw..(t + 1) * dw];
+            affine(&self.theta[l.a..l.a + f * dw], reaches.a, dw, vt, None, 0, MATERIAL_BITS, &mut ta[t * f..(t + 1) * f])?;
+            affine(&self.theta[l.b..l.b + f * dw], reaches.b, dw, vt, None, 0, MATERIAL_BITS, &mut tb[t * f..(t + 1) * f])?;
+        }
+        let (mut da, mut db) = (vec![0i64; sites * f], vec![0i64; sites * f]);
+        for t in 0..sites {
+            for e in 0..half {
+                let Some(s) = strand_mate(t, e, sites) else { continue };
+                let (cr, ci) = (self.theta[l.pair_c + e] as i128, self.theta[l.pair_c + half + e] as i128);
+                let (ar, ai) = (ta[t * f + e] as i128, ta[t * f + half + e] as i128);
+                let (br, bi) = (tb[s * f + e] as i128, tb[s * f + half + e] as i128);
+                da[t * f + e] = fit64(da[t * f + e] as i128 + release(cr * br + ci * bi, MATERIAL_BITS))?;
+                da[t * f + half + e] = fit64(da[t * f + half + e] as i128 + release(ci * br - cr * bi, MATERIAL_BITS))?;
+                db[s * f + e] = fit64(db[s * f + e] as i128 + release(cr * ar + ci * ai, MATERIAL_BITS))?;
+                db[s * f + half + e] = fit64(db[s * f + half + e] as i128 + release(ci * ar - cr * ai, MATERIAL_BITS))?;
+            }
+        }
+        for (w, reach_w, cov) in [(l.a, reaches.a, &da), (l.b, reaches.b, &db)] {
+            for t in 0..sites {
+                transposed(&self.theta[w..w + f * dw], reach_w, dw, &cov[t * f..(t + 1) * f], MATERIAL_BITS, &mut back)?;
+                add(&mut out, t, &back)?;
+            }
+        }
+        Ok((out, cp))
+    }
+
     /// One descent step: each site's lanes moved by `2^(−h)` of their own scale a unit of force.
     fn energy_step(&self, x: &[i64], scale: &[i128], force: &[i64], h: u32) -> Result<Vec<i64>> {
         let d = &self.declaration;
@@ -577,7 +848,7 @@ impl Field {
     }
 
     /// The opening and `ticks` ticks of certified descent under the held supports ([`Relaxed`]).
-    fn energy_relax(&self, region: &Region, ticks: usize) -> Result<Relaxed> {
+    fn energy_relax(&self, region: &Region, ticks: usize, replay: Option<&[Option<u32>]>, base: Option<&Held>) -> Result<Relaxed> {
         let (faces, locked) = self.energy_sites(region);
         let region = &Region { faces: &faces, locked: &locked, ..*region };
         self.admit_region(region)?;
@@ -601,14 +872,31 @@ impl Field {
         for xt in x.chunks_exact(dw) {
             lane_chart(xt, d.lanes, &mut read0, &mut scale0)?;
         }
-        let classes = self.energy_classes(&read0, &moment, &definite, &keyed, &reaches)?;
+        // A base's classes and supports are held where one is given (the derivative's one scalar, read at other letters).
+        let (classes, definite) = match base {
+            Some(b) => (b.classes.clone(), b.definite.clone()),
+            None => (self.energy_classes(&read0, &moment, &definite, &keyed, &reaches)?, definite),
+        };
         let held = Held { letters, moment, moment_term, classes, definite };
         let mut cell = self.energy_cell(&x, &held, &paces, &reaches, window.as_deref())?;
         let mut read = EnergyRead { opening: cell.phi, last: cell.phi, halvings: Vec::with_capacity(d.ticks), reads: 1, pairs: 0 };
         let mut pairs = cell.pairs;
         let mut first = FIRST_HALVINGS;
-        for _ in 0..ticks {
+        let mut trail = Vec::new();
+        for k in 0..ticks {
             let (force, _) = self.energy_force(&cell, &held, &paces, &reaches)?;
+            // A replay steps at the halvings it is given, uncertified (the base's descent read again on other letters).
+            if let Some(hs) = replay {
+                let Some(Some(h)) = hs.get(k).copied() else { break };
+                let next = self.energy_step(&x, &cell.scale, &force, h)?;
+                let candidate = self.energy_cell(&next, &held, &paces, &reaches, window.as_deref())?;
+                read.reads += 1;
+                pairs += candidate.pairs;
+                read.halvings.push(Some(h));
+                trail.push(Step { cell: std::mem::replace(&mut cell, candidate), force, halvings: h });
+                x = next;
+                continue;
+            }
             let mut stood = None;
             let mut h = first;
             while h <= MOST_HALVINGS {
@@ -623,7 +911,7 @@ impl Field {
                 let slack = (cell.logs + candidate.logs) as i128 + 2;
                 if candidate.phi + slack <= cell.phi {
                     x = next;
-                    cell = candidate;
+                    trail.push(Step { cell: std::mem::replace(&mut cell, candidate), force: force.clone(), halvings: h });
                     stood = Some(h);
                     break;
                 }
@@ -637,7 +925,99 @@ impl Field {
         }
         read.last = cell.phi;
         read.pairs = pairs;
-        Ok(Relaxed { x, cell, held, paces, window, read })
+        Ok(Relaxed { x, cell, held, paces, window, read, trail })
+    }
+
+    /// [definition; the unified-theory reading of November 7, 00:02] **The reverse through the ticks and the opening**: the
+    /// letters' covectors of `G(e) = Φ(x^K(e); e)` beyond its partial derivative at the last state ([`LetterCovectors`]).
+    /// From `λ^K = ∂Φ/∂x^K = −J F^K` back over each tick that stood, `x' = x + 2^(−h) s F` (`s` each lane's scale): with
+    /// `w = s ⊙ λ'`, the tick's letters take `2^(−h) ⟨w, ∂F/∂e⟩` (`R w` on the own row, `w_(t+1)` on the before row, `w_(t−1)` on
+    /// the after row, `Cᵀ w + δg_s(w)` on the moment), and `λ = λ' + 2^(−h) (r̂ ⟨λ', F⟩/W + J δF(w))`, `δF(w) = −Hess Φ · w`
+    /// ([`Field::energy_tangent`], the Hessian symmetric, so the tangent is the adjoint); then the opening takes `λ⁰` on its
+    /// rows and `Cᵀ λ⁰` on the moments. The classes, the supports and the halvings are held at the base.
+    fn energy_reverse(&self, relaxed: &Relaxed) -> Result<LetterCovectors> {
+        let d = &self.declaration;
+        let (dw, m2, lanes) = (d.width, 2 * d.complex(), d.lanes);
+        let w = dw / lanes;
+        let l = &self.layout;
+        let reaches = self.reaches();
+        let Relaxed { cell, held, paces, trail, .. } = relaxed;
+        let sites = held.definite.len();
+        let mut out = LetterCovectors { own: vec![0i64; sites * dw], before: vec![0i64; sites * dw], after: vec![0i64; sites * dw], moment: vec![0i64; sites * m2] };
+        let add = |slot: &mut i64, v: i128| -> Result<()> {
+            *slot = fit64(*slot as i128 + v)?;
+            Ok(())
+        };
+        // λ^K = −J F^K: the energy's covector on the last state.
+        let (last_force, _) = self.energy_force(cell, held, paces, &reaches)?;
+        let mut lambda = vec![0i64; sites * dw];
+        for t in 0..sites {
+            let back = lane_adjoint(&cell.read[t * dw..(t + 1) * dw], &cell.scale[t * lanes..(t + 1) * lanes], &last_force[t * dw..(t + 1) * dw])?;
+            for i in 0..dw {
+                lambda[t * dw + i] = -back[i];
+            }
+        }
+        let mut lift = vec![0i64; dw];
+        let mut chart = vec![0i64; m2];
+        for step in trail.iter().rev() {
+            let (c, force, h) = (&step.cell, &step.force, step.halvings);
+            // `w = s ⊙ λ'` on 2^(−24).
+            let mut wv = vec![0i64; sites * dw];
+            for (k, slot) in wv.iter_mut().enumerate() {
+                let (t, i) = (k / dw, k % dw);
+                *slot = fit64(release(c.scale[t * lanes + i / w] * lambda[k] as i128, FACE_BITS))?;
+            }
+            let (tangent, probe) = self.energy_tangent(c, held, paces, &reaches, &wv)?;
+            for t in 0..sites {
+                let wt = &wv[t * dw..(t + 1) * dw];
+                affine(&self.theta[l.read..l.read + dw * dw], reaches.read, dw, wt, None, 0, MATERIAL_BITS, &mut lift)?;
+                transposed(&self.theta[l.moment_face..l.moment_face + dw * m2], reaches.moment_face, m2, wt, MATERIAL_BITS, &mut chart)?;
+                for i in 0..dw {
+                    add(&mut out.own[t * dw + i], release(lift[i] as i128, h))?;
+                    if t + 1 < sites {
+                        add(&mut out.before[t * dw + i], release(wv[(t + 1) * dw + i] as i128, h))?;
+                    }
+                    if t > 0 {
+                        add(&mut out.after[t * dw + i], release(wv[(t - 1) * dw + i] as i128, h))?;
+                    }
+                }
+                for k in 0..m2 {
+                    add(&mut out.moment[t * m2 + k], release(chart[k] as i128 + probe[t * m2 + k] as i128, h))?;
+                }
+            }
+            // `λ = λ' + 2^(−h) (r̂ ⟨λ', F⟩/W + J δF)`, each lane's.
+            let mut next = lambda.clone();
+            for t in 0..sites {
+                let jt = lane_adjoint(&c.read[t * dw..(t + 1) * dw], &c.scale[t * lanes..(t + 1) * lanes], &tangent[t * dw..(t + 1) * dw])?;
+                for k_ in 0..lanes {
+                    let at = t * dw + k_ * w;
+                    let dot: i128 = (0..w).map(|i| lambda[at + i] as i128 * force[at + i] as i128).sum();
+                    let mean = div_nearest(dot, w as i128);
+                    for i in 0..w {
+                        let radial = release(c.read[at + i] as i128 * mean, 2 * FACE_BITS + 8);
+                        add(&mut next[at + i], release(radial + jt[k_ * w + i] as i128, h))?;
+                    }
+                }
+            }
+            lambda = next;
+        }
+        // The opening: `x⁰_t = E(u_t) + E₋(u_(t−1)) + E₊(u_(t+1)) + C s_t + b`.
+        for t in 0..sites {
+            transposed(&self.theta[l.moment_face..l.moment_face + dw * m2], reaches.moment_face, m2, &lambda[t * dw..(t + 1) * dw], MATERIAL_BITS, &mut chart)?;
+            for i in 0..dw {
+                add(&mut out.own[t * dw + i], lambda[t * dw + i] as i128)?;
+                if t + 1 < sites {
+                    add(&mut out.before[t * dw + i], lambda[(t + 1) * dw + i] as i128)?;
+                }
+                if t > 0 {
+                    add(&mut out.after[t * dw + i], lambda[(t - 1) * dw + i] as i128)?;
+                }
+            }
+            for k in 0..m2 {
+                add(&mut out.moment[t * m2 + k], chart[k] as i128)?;
+            }
+        }
+        Ok(out)
     }
 
     /// [definition; the unified-theory reading of November 6, 22:52] **A region's forward under one energy**
@@ -645,7 +1025,14 @@ impl Field {
     /// face as the energy's force on its letter. Returns the pass's faces and readings (no tick is held: the return is not
     /// built), and the energy at the opening and at the last tick with each tick's halvings (`None` where it rested).
     pub(super) fn energy_pass(&self, region: &Region) -> Result<(FieldPass, EnergyRead)> {
-        let Relaxed { cell, held, paces, read, .. } = self.energy_relax(region, self.declaration.ticks)?;
+        self.energy_faces(region, None, None)
+    }
+
+    /// [`Field::energy_pass`], its descent replayed at given halvings under a base's supports where they are given.
+    fn energy_faces(&self, region: &Region, replay: Option<&[Option<u32>]>, base: Option<&Held>) -> Result<(FieldPass, EnergyRead)> {
+        let relaxed = self.energy_relax(region, replay.map_or(self.declaration.ticks, <[Option<u32>]>::len), replay, base)?;
+        let total = self.energy_reverse(&relaxed)?;
+        let Relaxed { cell, held, paces, read, .. } = relaxed;
         let d = &self.declaration;
         let (dw, m2) = (d.width, 2 * d.complex());
         let sites = region.classes.len();
@@ -661,7 +1048,7 @@ impl Field {
             for t in 0..sites {
                 transposed(&self.theta[l.moment_face..l.moment_face + dw * m2], reaches.moment_face, m2, &cell.read[t * dw..(t + 1) * dw].iter().map(|&v| v as i64).collect::<Vec<_>>(), FACE_BITS, &mut back)?;
                 for k in 0..m2 {
-                    dm[t * m2 + k] = fit64(back[k] as i128 + dp[t * m2 + k] as i128)?;
+                    dm[t * m2 + k] = fit64(back[k] as i128 + dp[t * m2 + k] as i128 - total.moment[t * m2 + k] as i128)?;
                 }
             }
             self.moment_letters(&paces, sites, &dm)?
@@ -685,13 +1072,18 @@ impl Field {
                 if t > 0 {
                     strand += dot(&self.theta[l.after + a * dw..l.after + (a + 1) * dw], &cell.read[(t - 1) * dw..t * dw]);
                 }
+                // The opening's and the ticks' part of the total derivative: `−⟨rows(a), covectors⟩` on 2^(−40).
+                let mut through = 0i128;
+                for (base, cov) in [(l.enc, &total.own), (l.before, &total.before), (l.after, &total.after)] {
+                    through += self.theta[base + a * dw..base + (a + 1) * dw].iter().zip(&cov[t * dw..(t + 1) * dw]).map(|(&e, &c)| e as i128 * c as i128).sum::<i128>();
+                }
                 let mut moment_part = 0i128;
                 if tm > 0 {
                     for k in 0..2 * tm {
                         moment_part += self.theta[l.moment_before + a * 2 * tm + k] as i128 * fb[t][k] + self.theta[l.moment_after + a * 2 * tm + k] as i128 * fa[t][k];
                     }
                 }
-                *slot = fit64(*slot as i128 + release(strand, FACE_BITS) + release(moment_part, super::super::COVECTOR_BITS))?;
+                *slot = fit64(*slot as i128 + release(strand, FACE_BITS) + release(moment_part - through, super::super::COVECTOR_BITS))?;
             }
             if let Some(Some(echo)) = region.echo.get(t) {
                 for (zc, &lc) in z.iter_mut().zip(&echo.logits) {
@@ -714,7 +1106,7 @@ impl Field {
     #[cfg(test)]
     pub(super) fn energy_slope(&self, region: &Region, h: u32) -> Result<(i128, i128)> {
         let d = &self.declaration;
-        let Relaxed { x, cell, held, paces, window, .. } = self.energy_relax(region, 0)?;
+        let Relaxed { x, cell, held, paces, window, .. } = self.energy_relax(region, 0, None, None)?;
         let reaches = self.reaches();
         let (force, _) = self.energy_force(&cell, &held, &paces, &reaches)?;
         let next = self.energy_step(&x, &cell.scale, &force, h)?;
@@ -734,27 +1126,89 @@ impl Field {
         Ok((release(first, 16 + h), cell.phi - after.phi))
     }
 
-    /// [measurement; a test's reading] The energy at a region's relaxed state with site `t`'s letter set to each of
-    /// `letters` (the state, the supports and the clocks held), beside the region's faces: at fixed state the face is the
-    /// energy's force on the letter, so `Φ(b) − Φ(a) = −(z_t(b) − z_t(a))` where the energy is linear in the letter.
+    /// [measurement; a test's reading] **The force's tangent against the force's difference**: at the opening, for a keyed
+    /// direction `v` held in each lane's tangent (`v − r̂⟨r̂, v⟩/W`, on `2^(−24)`), the tangent `δF` beside `2^e (F(x + 2^(−e)
+    /// ‖x‖ v) − F(x))`, and for a second keyed direction `u` the two pairings `⟨u, δF(v)⟩` and `⟨v, δF(u)⟩` (Hessian symmetry),
+    /// each pairing on `2^(−48)`.
     #[cfg(test)]
-    pub(super) fn energy_at_letters(&self, region: &Region, t: usize, letters: &[usize]) -> Result<Vec<i128>> {
-        let Relaxed { x, held, paces, window, .. } = self.energy_relax(region, self.declaration.ticks)?;
+    pub(super) fn energy_tangent_check(&self, region: &Region, e: u32, seed: u64) -> Result<(Vec<i64>, Vec<i64>, i128, i128)> {
+        let d = &self.declaration;
+        let (dw, lanes) = (d.width, d.lanes);
+        let w = dw / lanes;
+        let Relaxed { x, cell, held, paces, window, .. } = self.energy_relax(region, 0, None, None)?;
         let reaches = self.reaches();
-        let mut out = Vec::with_capacity(letters.len());
-        for &a in letters {
-            let mut classes = region.classes.to_vec();
-            let mut unresolved = region.unresolved.to_vec();
-            classes[t] = a;
-            unresolved[t] = false;
-            let (mut faces, mut locked) = self.energy_sites(region);
-            (faces[t], locked[t]) = (None, false);
-            let set = Region { classes: &classes, unresolved: &unresolved, faces: &faces, locked: &locked, ..*region };
-            let (letters, moment, moment_term) = self.energy_letters_of(&set, &paces, &reaches)?;
-            let with = Held { letters, moment, moment_term, classes: held.classes.clone(), definite: held.definite.clone() };
-            out.push(self.energy_cell(&x, &with, &paces, &reaches, window.as_deref())?.phi);
-        }
-        Ok(out)
+        let mix = |counter: u64| -> u64 {
+            let mut z = seed.wrapping_add(counter.wrapping_mul(0x9E37_79B9_7F4A_7C15));
+            z = (z ^ (z >> 30)).wrapping_mul(0xBF58_476D_1CE4_E5B9);
+            z = (z ^ (z >> 27)).wrapping_mul(0x94D0_49BB_1331_11EB);
+            z ^ (z >> 31)
+        };
+        let direction = |salt: u64| -> Vec<i64> {
+            let mut v: Vec<i64> = (0..x.len()).map(|k| ((mix(((k as u64) << 8) ^ salt) >> 40) as i64) - (1 << 23)).collect();
+            for t in 0..x.len() / dw {
+                for l_ in 0..lanes {
+                    let at = t * dw + l_ * w;
+                    let rv: i128 = (0..w).map(|i| cell.read[at + i] as i128 * v[at + i] as i128).sum();
+                    let mean = div_nearest(rv, w as i128);
+                    for i in 0..w {
+                        v[at + i] -= release(mean * cell.read[at + i] as i128, 2 * FACE_BITS) as i64;
+                    }
+                }
+            }
+            v
+        };
+        let (v, u) = (direction(1), direction(2));
+        let (tv, _) = self.energy_tangent(&cell, &held, &paces, &reaches, &v)?;
+        let (tu, _) = self.energy_tangent(&cell, &held, &paces, &reaches, &u)?;
+        let (f0, _) = self.energy_force(&cell, &held, &paces, &reaches)?;
+        let next = self.energy_step(&x, &cell.scale, &v, e)?;
+        let moved = self.energy_cell(&next, &held, &paces, &reaches, window.as_deref())?;
+        let (f1, _) = self.energy_force(&moved, &held, &paces, &reaches)?;
+        let difference: Vec<i64> = f1.iter().zip(&f0).map(|(&a, &b)| (a - b) << e).collect();
+        let pair = |a: &[i64], b: &[i64]| -> i128 { a.iter().zip(b).map(|(&x, &y)| x as i128 * y as i128).sum() };
+        let (uv, vu) = (pair(&u, &tv), pair(&v, &tu));
+        Ok((tv, difference, uv, vu))
+    }
+
+    /// [measurement; a test's reading] **`G` at other letters**: `G(e) = Φ(x^K(e); e)` with site `t` carrying `shares`
+    /// (locked), the opening and the ticks read again from it at the base's halvings, under the base's classes and supports
+    /// (the derivative's one scalar), on `2^(−32)` bits.
+    #[cfg(test)]
+    pub(super) fn energy_g_at(&self, region: &Region, t: usize, shares: &Shares) -> Result<i128> {
+        let base = self.energy_relax(region, self.declaration.ticks, None, None)?;
+        let (mut faces, mut locked) = self.energy_sites(region);
+        (faces[t], locked[t]) = (Some(shares.clone()), true);
+        let set = Region { faces: &faces, locked: &locked, ..*region };
+        let replayed = self.energy_relax(&set, base.read.halvings.len(), Some(&base.read.halvings), Some(&base.held))?;
+        Ok(replayed.cell.phi)
+    }
+
+    /// [measurement; a test's reading] **A square read at one base** (the unified-theory reading of November 7, 00:02): with
+    /// sites `i` and `j` both carrying the uniform mixture (locked), the face's change `z_i(a′) − z_i(a)` as `j`'s mixture
+    /// moves by `ε(b′ − b)`, and `z_j(b′) − z_j(b)` as `i`'s moves by `ε(a′ − a)`, every read replayed at the base's halvings
+    /// under its supports; `ε` on `2^(−16)` of a mixture's weight, the two readings on `2^(−16)` bits.
+    #[cfg(test)]
+    pub(super) fn energy_square(&self, region: &Region, (i, a, a2): (usize, usize, usize), (j, b, b2): (usize, usize, usize), eps: u32) -> Result<(i128, i128)> {
+        let alphabet = self.declaration.alphabet as u32;
+        let base_w = (1u32 << STATE_BITS) / alphabet;
+        let mixture = |shift: Option<(usize, usize)>| -> Shares { (0..alphabet).map(|c| (c, match shift { Some((up, _)) if c as usize == up => base_w + eps, Some((_, down)) if c as usize == down => base_w - eps, _ => base_w })).collect() };
+        let sites = region.classes.len();
+        let mut unresolved = region.unresolved.to_vec();
+        (unresolved[i], unresolved[j]) = (true, true);
+        let read = |si: Option<(usize, usize)>, sj: Option<(usize, usize)>, replay: Option<&[Option<u32>]>, base: Option<&Held>| -> Result<(Vec<Option<Vec<i64>>>, Relaxed)> {
+            let mut faces: Vec<Option<Shares>> = (0..sites).map(|t| region.faces.get(t).cloned().flatten()).collect();
+            let mut locked: Vec<bool> = (0..sites).map(|t| region.locked.get(t).copied().unwrap_or(false)).collect();
+            (faces[i], faces[j], locked[i], locked[j]) = (Some(mixture(si)), Some(mixture(sj)), true, true);
+            let r = Region { unresolved: &unresolved, faces: &faces, locked: &locked, ..*region };
+            let relaxed = self.energy_relax(&r, replay.map_or(self.declaration.ticks, <[Option<u32>]>::len), replay, base)?;
+            Ok((self.energy_faces(&r, replay, base)?.0.logits, relaxed))
+        };
+        let (base_logits, base) = read(None, None, None, None)?;
+        let halvings = base.read.halvings.clone();
+        let gap = |z: &[Option<Vec<i64>>], t: usize, hi: usize, lo: usize| -> i128 { let z = z[t].as_ref().expect("an open site's face"); (z[hi] - z[lo]) as i128 };
+        let (moved_j, _) = read(None, Some((b2, b)), Some(&halvings), Some(&base.held))?;
+        let (moved_i, _) = read(Some((a2, a)), None, Some(&halvings), Some(&base.held))?;
+        Ok((gap(&moved_j, i, a2, a) - gap(&base_logits, i, a2, a), gap(&moved_i, j, b2, b) - gap(&base_logits, j, b2, b)))
     }
 
     /// [measurement] **A region's energy read** ([`EnergyRead`]): the energy at the opening and at the last tick, each
