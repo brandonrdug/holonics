@@ -1,0 +1,22 @@
+# lap 4 replayed on a Colab A100-SXM4-40GB (12 vCPUs, the source at 5c7db3137 built for compute_80), same inputs and keys, deadline 600 s; FIELD lines.
+FIELD_EXACT_READ lap=-1 ms=14125
+FIELD_STOPPED lap=0 sections=1502/1543 states=24029 ms=600088
+FIELD_KERNEL_ACCEPT lap=0 stopped states=24029 places=718418 moved=710915 accept_milli=522 sd_milli=395 whole=6190
+FIELD_CARD reads=3006 read_ms=285720 returns=1502 return_ms=295291 pairs=60570575409 batches=4828 peak_store=9089311488 landmarks=0 landmark_ms=0 elapsed_ms=600099
+FIELD_KERNEL lap=0 n=0 states=16 places=105 moved=105 accept_milli=994 least_milli=947 most_milli=1000 whole=8 deposited=true predicted_micro=-9947 transfer_micro=- external_micro=0 ms_section=135 ms=14261
+FIELD_KERNEL lap=0 n=100 states=16 places=147 moved=146 accept_milli=978 least_milli=869 most_milli=1000 whole=12 deposited=true predicted_micro=-1246 transfer_micro=844 external_micro=844 ms_section=157 ms=54506
+FIELD_KERNEL lap=0 n=200 states=16 places=301 moved=300 accept_milli=939 least_milli=647 most_milli=1000 whole=9 deposited=true predicted_micro=-43532 transfer_micro=-31477 external_micro=-31477 ms_section=279 ms=98781
+FIELD_KERNEL lap=0 n=300 states=16 places=767 moved=756 accept_milli=354 least_milli=4 most_milli=1000 whole=2 deposited=true predicted_micro=-83069 transfer_micro=-35631 external_micro=-35631 ms_section=536 ms=138230
+FIELD_KERNEL lap=0 n=400 states=16 places=265 moved=260 accept_milli=689 least_milli=12 most_milli=1000 whole=4 deposited=true predicted_micro=-10343 transfer_micro=3853 external_micro=3853 ms_section=233 ms=174249
+FIELD_KERNEL lap=0 n=500 states=16 places=312 moved=307 accept_milli=542 least_milli=122 most_milli=1000 whole=2 deposited=true predicted_micro=-15345 transfer_micro=20320 external_micro=20320 ms_section=264 ms=214328
+FIELD_KERNEL lap=0 n=600 states=16 places=840 moved=831 accept_milli=62 least_milli=14 most_milli=302 whole=0 deposited=true predicted_micro=-18676 transfer_micro=-14984 external_micro=-14984 ms_section=580 ms=252816
+FIELD_KERNEL lap=0 n=700 states=16 places=134 moved=130 accept_milli=815 least_milli=464 most_milli=1000 whole=8 deposited=true predicted_micro=-10621 transfer_micro=-2107 external_micro=-2107 ms_section=150 ms=289757
+FIELD_KERNEL lap=0 n=800 states=16 places=555 moved=547 accept_milli=361 least_milli=22 most_milli=1000 whole=3 deposited=true predicted_micro=-19590 transfer_micro=511 external_micro=511 ms_section=424 ms=328707
+FIELD_KERNEL lap=0 n=900 states=16 places=421 moved=416 accept_milli=204 least_milli=0 most_milli=1000 whole=1 deposited=true predicted_micro=-6300 transfer_micro=-1172 external_micro=-1172 ms_section=344 ms=369923
+FIELD_KERNEL lap=0 n=1000 states=16 places=1153 moved=1144 accept_milli=19 least_milli=0 most_milli=122 whole=0 deposited=true predicted_micro=-5285 transfer_micro=-929 external_micro=-929 ms_section=856 ms=410558
+FIELD_KERNEL lap=0 n=1100 states=16 places=805 moved=799 accept_milli=66 least_milli=0 most_milli=780 whole=0 deposited=true predicted_micro=-18531 transfer_micro=-5447 external_micro=-5447 ms_section=601 ms=452167
+FIELD_KERNEL lap=0 n=1200 states=16 places=232 moved=232 accept_milli=467 least_milli=25 most_milli=1000 whole=4 deposited=true predicted_micro=-45311 transfer_micro=-23535 external_micro=-23535 ms_section=200 ms=489726
+FIELD_KERNEL lap=0 n=1300 states=16 places=472 moved=467 accept_milli=395 least_milli=34 most_milli=1000 whole=3 deposited=true predicted_micro=-153149 transfer_micro=-89592 external_micro=-89592 ms_section=358 ms=526632
+FIELD_KERNEL lap=0 n=1400 states=16 places=590 moved=582 accept_milli=199 least_milli=0 most_milli=1000 whole=1 deposited=true predicted_micro=28067 transfer_micro=57257 external_micro=57257 ms_section=423 ms=565405
+FIELD_KERNEL lap=0 n=1500 states=16 places=1175 moved=1163 accept_milli=121 least_milli=0 most_milli=1000 whole=1 deposited=true predicted_micro=-174746 transfer_micro=-13797 external_micro=-13797 ms_section=893 ms=599856
+# against the 4080 SUPER's lap 4 (lap4.txt): 1,502 sections compared, 0 differing in every receipt field (states, places, moved, acceptance, least, most, whole, predicted, transfer); the first 1,502 sections' time 585.1 s on the A100 against 427.6 s (1.37x).

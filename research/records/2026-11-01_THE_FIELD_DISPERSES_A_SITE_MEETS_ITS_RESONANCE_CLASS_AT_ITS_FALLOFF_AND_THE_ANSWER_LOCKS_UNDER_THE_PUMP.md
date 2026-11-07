@@ -4456,3 +4456,32 @@ kernel step from the truth, and lap 4 lowers the held exact code by 0.114 bits a
   is under the 0.5 to 0.9 band.
 - By theory's rule (a fall past twice its paired error) lap 5 follows on the same law at once.
 Receipts: `longrun_nov6/lap4.txt`, `lap4.sh`, `lap4_devk.sh`, `lap4_exact.py`.
+
+[measurement; November 7, lap 5] **Lap 5, on the same law, moves the held exact code a fifth as far, inside its error.**
+- From lap 4's state: 1,543 sections and 24,685 states in 472 s on the card.
+- Acceptance 0.312 (sd 0.373): 0.325 in the first tenth, 0.291 in the last.
+- The exact code went from 6.526 to 6.503 bits a place, a paired change of −0.023 with standard error 0.017, not past twice
+  its error. So by theory's rule no lap 6 follows. The face code went from 6.526 to 6.508, and `KL(exact ‖ face)` from
+  0.0065 to 0.0110.
+- From the founding the held exact code reads 6.639, 6.526 and 6.503, while the letters' own frequencies code the truth at
+  4.93. The field is still near uniform.
+- [inferred] A block holds 29.7 places on average, so `A` is a product of about 30 ratios. Its weight averages 0.31 while the
+  faces are still near uniform, and the moments normalize the deposit's scale, so the collapsed weights mostly select the
+  states with short blocks. The step's rate is the line's `2^(−12)`. The next loop's law (block size, rate) is theory's
+  to set.
+Receipts: `longrun_nov6/lap5.txt`, `lap5.sh`.
+
+[measurement; November 7, lap 4 on a Colab A100; Brandon, 05:11: "I completely authorize any and all interactivity with
+Google Colab using the CLI"] **A lap is bit-identical across devices, and the consumer card is the faster one.**
+- The source at `5c7db3137` was built for a Colab A100-SXM4-40GB (12 vCPUs, its own device's architecture). There the
+  card's energy parity suite passed (10 of 10, bit-equal with its host).
+- Lap 4 replayed from the same inputs and keys reached 1,502 of 1,543 sections by its 600 s deadline, so it is incomplete.
+  Every receipt field of those 1,502 sections equals the 4080 SUPER's: states, places, moved places, acceptance with its
+  least and most, whole weights, and the first-order prices (which read the covector and the material).
+- Their time: 585 s on the A100 against 428 s on the 4080 SUPER, 1.37 times slower. The learner's arithmetic is exact
+  integers (wide words and releases), where the consumer card's integer throughput and clocks lead. The A100's lead is in
+  floating point and tensor cores, which no law here uses [inferred]. The VM's host part is also slower (its material
+  returns 295 s against 228 s).
+- So the A100 is a second device for independent runs beside the card, not a faster one for this learner. The session was
+  stopped after the replay.
+Receipts: `longrun_nov6/lap4_a100.txt`, `lap4_a100.sh`.
