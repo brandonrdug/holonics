@@ -2799,7 +2799,46 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
     };
     // [the unified-theory reading of November 7, 05:55] The kernel steps by the evidence-shrunk Newton step along the moments'
     // direction; `FIELD_CONTRAST_MOMENTS` keeps laps 4 and 5's law (the moments' own step), a declared comparison.
-    learner.newton = writer.is_none() && joint.is_none() && std::env::var_os("FIELD_CONTRAST_MOMENTS").is_none();
+    // [the unified-theory reading of November 7, 06:26] Retired as the step (lap 6 ran away as its curvature fell): the kernel
+    // steps by the moments; `FIELD_CONTRAST_NEWTON` takes the evidence-shrunk Newton step again, a declared comparison, and its
+    // terms are read beside the moments' step either way.
+    let kernel = writer.is_none() && joint.is_none();
+    learner.newton = kernel && std::env::var_os("FIELD_CONTRAST_NEWTON").is_some();
+    learner.newton_read = kernel;
+    // [definition; the unified-theory reading of November 7, 06:26] **More evidence a step**: a section of `n = 16·4^k` states
+    // steps at the state's rate less `k` bits (the step's relative noise falls as `√n`), and the moments count states, moving
+    // `2k` bits faster. Sixteen states a section keep the state's rates.
+    // The state is written at its own rate, so a later run's sections set the step from it again.
+    let mut base_rate = learner.rate_bits;
+    if kernel {
+        let mut k = 0u32;
+        while 16usize << (2 * k) < section {
+            k += 1;
+        }
+        if 16usize << (2 * k) != section {
+            return Err(format!("contrast-field's kernel steps on sections of 16·4^k states, not {section}").into());
+        }
+        base_rate = learner.rate_bits;
+        learner.rate_bits = learner.rate_bits.checked_sub(k).ok_or("a rate below its states' evidence")?;
+        learner.first_rate = holonics::hnn::tower::FIRST_RATE.saturating_sub(2 * k);
+        learner.second_rate = holonics::hnn::tower::SECOND_RATE.saturating_sub(2 * k);
+        // [definition; the unified-theory reading of November 7, 06:57] Each family reads its length from its own transfer,
+        // and the letters' temperature joins the deposit; `FIELD_CONTRAST_ONE_RATE` keeps one rate for every family and the
+        // temperature held (laps 4 and 5's law), a declared comparison.
+        if std::env::var_os("FIELD_CONTRAST_ONE_RATE").is_none() {
+            learner.open_family_rates();
+            learner.temper_learns = true;
+        }
+    }
+    // [measurement; the unified-theory reading of November 7, 06:57] `FIELD_CONTRAST_LOG2T_SHIFT_MILLI`: the letters' temperature
+    // moved by that many thousandths of a bit before the run (the held code read at a sharper `T`, untrained).
+    if let Ok(v) = std::env::var("FIELD_CONTRAST_LOG2T_SHIFT_MILLI") {
+        let milli: i64 = v.trim().parse().map_err(|_| format!("FIELD_CONTRAST_LOG2T_SHIFT_MILLI {v}: thousandths of a bit"))?;
+        let at = learner.field.layout().face_temper;
+        let moved = learner.field.theta[at] as i64 + milli * (1i64 << holonics::hnn::tower::MATERIAL_BITS) / 1000;
+        learner.field.theta[at] = i32::try_from(moved).map_err(|_| "a temperature past its carrier")?;
+        println!("FIELD_CONTRAST_LOG2T_SHIFT milli={milli} log2_t={}", learner.field.theta[at]);
+    }
     std::fs::create_dir(out)?;
     let void = codec.void();
     let near = holonics::hnn::tower::field::NEAR;
@@ -2828,7 +2867,7 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
     };
     let d = learner.field.declaration;
     println!(
-        "FIELD_CONTRAST_DECLARATION alphabet={} width={} heads={} modes={} ticks={} reach={} rate={} log2_t={} section={section} sections={} train={} held={} places={places} release={} newton={} run_bits={} rest={} spans={} laps_read={}",
+        "FIELD_CONTRAST_DECLARATION alphabet={} width={} heads={} modes={} ticks={} reach={} rate={} log2_t={} section={section} sections={} train={} held={} places={places} release={} newton={} moments={},{} run_bits={} rest={} spans={} laps_read={}",
         d.alphabet,
         d.width,
         d.heads,
@@ -2846,6 +2885,8 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
             (None, None) => format!("kernel_spacing_{spacing}"),
         },
         learner.newton,
+        learner.first_rate,
+        learner.second_rate,
         law.run_bits,
         law.rest,
         law.spans,
@@ -2868,6 +2909,9 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
         // Each state's (block places, weight), and each section's (α, shrink) in thousandths, for the lap's tenths.
         let mut by_state: Vec<(usize, i128)> = Vec::new();
         let mut by_section: Vec<(i128, i128)> = Vec::new();
+        // Each family's transfer and predicted change summed over the lap (on 2^(−20) bits).
+        let mut by_family: Vec<(i128, i128)> = Vec::new();
+        let (mut tenth_family, mut tenths_printed): (Vec<(i128, i128)>, usize) = (Vec::new(), 0);
         for (n, &s) in walk(seed, read, sections.len()).iter().enumerate() {
             let section_start = std::time::Instant::now();
             let members = &sections[s];
@@ -2892,6 +2936,12 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
                 let unit = 1i128 << holonics::hnn::tower::MATERIAL_BITS;
                 let micro = |v: Option<i64>| v.map_or("-".to_string(), |c| ((c as i128 * 1_000_000) / ((receipt.states as i128) << 20)).to_string());
                 by_state.extend(receipt.per_state.iter().copied());
+                if by_family.len() < receipt.by_family.len() {
+                    by_family.resize(receipt.by_family.len(), (0, 0));
+                }
+                for (slot, &(t, p)) in by_family.iter_mut().zip(&receipt.by_family) {
+                    *slot = (slot.0 + t.unwrap_or(0) as i128, slot.1 + p.unwrap_or(0) as i128);
+                }
                 let newton_text = match receipt.newton {
                     Some(r) => {
                         let alpha = if r.alpha.1 > 0 { r.alpha.0 * 1000 / r.alpha.1 } else { 0 };
@@ -2902,7 +2952,7 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
                     None => String::new(),
                 };
                 println!(
-                    "FIELD_KERNEL lap={lap} n={n} states={} places={} moved={} accept_milli={} least_milli={} most_milli={} whole={} deposited={} predicted_micro={} transfer_micro={} external_micro={}{newton_text} ms_section={} ms={}",
+                    "FIELD_KERNEL lap={lap} n={n} states={} places={} moved={} accept_milli={} least_milli={} most_milli={} whole={} deposited={} predicted_micro={} transfer_micro={} external_micro={}{newton_text} log2_t={} ms_section={} ms={}",
                     receipt.states,
                     receipt.places,
                     receipt.moved,
@@ -2914,13 +2964,31 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
                     micro(receipt.predicted),
                     micro(receipt.transfer),
                     micro(receipt.external),
+                    learner.field.theta[learner.field.layout().face_temper],
                     section_start.elapsed().as_millis(),
                     started.elapsed().as_millis()
                 );
+                // [measurement; the unified-theory reading of November 7, 06:57] At each tenth of the lap: `log₂ T`, and each family's
+                // length (milli-bits) and its share (transfer over own-section price, thousandths) over the tenth.
+                if !receipt.rates.is_empty() {
+                    if tenth_family.len() < receipt.by_family.len() {
+                        tenth_family.resize(receipt.by_family.len(), (0, 0));
+                    }
+                    for (slot, &(t, p)) in tenth_family.iter_mut().zip(&receipt.by_family) {
+                        *slot = (slot.0 + t.unwrap_or(0) as i128, slot.1 + p.unwrap_or(0) as i128);
+                    }
+                    let tenth = (n + 1) * 10 / sections.len();
+                    if tenth > tenths_printed || n + 1 == sections.len() {
+                        tenths_printed = tenth;
+                        println!("FIELD_KERNEL_TENTH lap={lap} tenth={tenth} log2_t={} {}", learner.field.theta[learner.field.layout().face_temper], rates_text(&learner.field, &receipt.rates, &tenth_family));
+                        tenth_family.iter_mut().for_each(|x| *x = (0, 0));
+                    }
+                }
                 if started.elapsed().as_millis() > stop_ms {
-                    write_new(&out.join("STATE.stopped"), learner.to_text().as_bytes())?;
+                    write_new(&out.join("STATE.stopped"), at_rate(&learner, base_rate).as_bytes())?;
                     println!("FIELD_STOPPED lap={lap} sections={}/{} states={states} ms={}", n + 1, sections.len(), started.elapsed().as_millis());
                     if states > 0 {
+                        println!("FIELD_KERNEL_FAMILIES lap={lap} stopped {}", family_text(&learner.field, &by_family, states));
                         let mean = weight_lap * 1000 / (unit * states as i128);
                         let var = (square_lap * 1_000_000 / (unit * states as i128)) - mean * mean;
                         println!("FIELD_KERNEL_ACCEPT lap={lap} stopped states={states} places={places_lap} moved={moved_lap} accept_milli={mean} sd_milli={} whole={whole_lap}", (var.max(0) as u128).isqrt());
@@ -3009,13 +3077,13 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
                 started.elapsed().as_millis()
             );
             if started.elapsed().as_millis() > stop_ms {
-                write_new(&out.join("STATE.stopped"), learner.to_text().as_bytes())?;
+                write_new(&out.join("STATE.stopped"), at_rate(&learner, base_rate).as_bytes())?;
                 println!("FIELD_STOPPED lap={lap} sections={}/{} states={states} ms={}", n + 1, sections.len(), started.elapsed().as_millis());
                 return Ok(());
             }
         }
         learner.laps += 1;
-        write_new(&out.join(format!("STATE.{lap}")), learner.to_text().as_bytes())?;
+        write_new(&out.join(format!("STATE.{lap}")), at_rate(&learner, base_rate).as_bytes())?;
         if states > 0 && writer.is_none() && joint.is_none() {
             let unit = 1i128 << holonics::hnn::tower::MATERIAL_BITS;
             let mean = weight_lap * 1000 / (unit * states as i128);
@@ -3033,6 +3101,7 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
                 })
                 .collect();
             println!("FIELD_KERNEL_BLOCKS lap={lap} by_block_tenth(places_tenths:accept_milli)={}", tenths.join(","));
+            println!("FIELD_KERNEL_FAMILIES lap={lap} {}", family_text(&learner.field, &by_family, states));
             if !by_section.is_empty() {
                 let median = |v: &mut Vec<i128>| -> i128 {
                     v.sort_unstable();
@@ -3060,6 +3129,57 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
         println!("FIELD_ENUMERATED_READ lap={lap} ms={}", started.elapsed().as_millis());
     }
     Ok(())
+}
+
+/// [measurement; November 7, lap 7] Each family's transfer and predicted change over a lap, named by the layout, in
+/// micro-bits a state: `name=transfer/predicted`.
+fn family_text(field: &Field, sums: &[(i128, i128)], states: usize) -> String {
+    let names = family_names(field);
+    field
+        .families_all()
+        .iter()
+        .zip(sums)
+        .filter(|(fam, _)| fam.1 > 0)
+        .map(|(&(start, _, _), &(t, p))| {
+            let name = names.iter().find(|&&(_, at)| at == start).map_or("?", |&(n, _)| n);
+            let micro = |v: i128| v * 1_000_000 / ((states.max(1) as i128) << 20);
+            format!("{name}={}/{}", micro(t), micro(p))
+        })
+        .collect::<Vec<_>>()
+        .join(" ")
+}
+
+/// [measurement; November 7] Each family's length `ρ_f` in milli-bits and its share (transfer over own-section price, in
+/// thousandths) over a span of sections: `name=ρ/share`.
+fn rates_text(field: &Field, rates: &[i128], sums: &[(i128, i128)]) -> String {
+    let names = family_names(field);
+    field
+        .families_all()
+        .iter()
+        .enumerate()
+        .filter(|&(_, fam)| fam.1 > 0)
+        .map(|(k, &(start, _, _))| {
+            let name = names.iter().find(|&&(_, at)| at == start).map_or("?", |&(n, _)| n);
+            let rho = rates.get(k).copied().unwrap_or(0) * 1000 >> holonics::hnn::tower::MATERIAL_BITS;
+            let (t, p) = sums.get(k).copied().unwrap_or((0, 0));
+            let share = if p == 0 { 0 } else { t * 1000 / p.abs() };
+            format!("{name}={rho}/{share}")
+        })
+        .collect::<Vec<_>>()
+        .join(" ")
+}
+
+/// The layout's families by name and start.
+fn family_names(field: &Field) -> Vec<(&'static str, usize)> {
+    let l = field.layout();
+    vec![("enc", l.enc), ("before", l.before), ("after", l.after), ("q", l.q), ("q_bias", l.q_bias), ("v", l.v), ("v_bias", l.v_bias), ("out", l.out), ("out_bias", l.out_bias), ("a", l.a), ("a_bias", l.a_bias), ("b", l.b), ("b_bias", l.b_bias), ("w", l.w), ("w_bias", l.w_bias), ("read", l.read), ("read_bias", l.read_bias), ("moment_before", l.moment_before), ("moment_after", l.moment_after), ("temper", l.temper), ("probe", l.probe), ("probe_bias", l.probe_bias), ("pace", l.pace), ("moment_face", l.moment_face), ("moment_face_bias", l.moment_face_bias), ("lift_bias", l.lift_bias), ("pair_c", l.pair_c), ("face_temper", l.face_temper)]
+}
+
+/// The learner's text at the rate `rate`, the state's own (a section's evidence sets the step from it; [`contrast_field`]).
+fn at_rate(learner: &FieldLearner, rate: u32) -> String {
+    let mut written = learner.clone();
+    written.rate_bits = rate;
+    written.to_text()
 }
 
 /// [measurement; the unified-theory reading of November 7, 04:05] **The enumerated conditional at held places** (lap 4's score):

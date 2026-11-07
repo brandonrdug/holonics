@@ -1,0 +1,53 @@
+# lap 7: the development reads at 16, 64 and 256 states a section, the lap at 256, and the transfer by family at 16 (FIELD lines).
+== n=16
+FIELD_CONTRAST_DECLARATION alphabet=100 width=32 heads=4 modes=8 ticks=4 reach=3771 rate=12 log2_t=244430039 section=16 sections=1543 train=24685 held=128 places=64 release=kernel_spacing_11 newton=false moments=3,8 run_bits=0 rest=false spans=false laps_read=
+FIELD_STOPPED lap=0 sections=170/1543 states=2717 ms=60242
+FIELD_KERNEL_ACCEPT lap=0 stopped states=2717 places=77100 moved=76281 accept_milli=296 sd_milli=374 whole=360
+FIELD_CARD reads=342 read_ms=31872 returns=170 return_ms=26373 pairs=9758552492 batches=623 peak_store=8397022608 landmarks=0 landmark_ms=0 elapsed_ms=60407
+MEASURE lap=dev16 rc=0 wall_s=61.0 peak_rss_kib=421852
+n=16 sections=170 states=2717 ms_a_state=18.80 lap_projection_s=464 predicted_micro_mean=-30682 transfer_micro_mean=3503
+== n=64
+FIELD_CONTRAST_DECLARATION alphabet=100 width=32 heads=4 modes=8 ticks=4 reach=3771 rate=11 log2_t=244430039 section=64 sections=386 train=24685 held=128 places=64 release=kernel_spacing_11 newton=false moments=1,6 run_bits=0 rest=false spans=false laps_read=2
+FIELD_STOPPED lap=0 sections=46/386 states=2944 ms=60076
+FIELD_KERNEL_ACCEPT lap=0 stopped states=2944 places=85465 moved=84518 accept_milli=339 sd_milli=392 whole=473
+FIELD_CARD reads=94 read_ms=31171 returns=46 return_ms=27004 pairs=11566050720 batches=325 peak_store=8397022608 landmarks=0 landmark_ms=0 elapsed_ms=60081
+MEASURE lap=dev64 rc=0 wall_s=60.6 peak_rss_kib=565844
+n=64 sections=46 states=2944 ms_a_state=17.36 lap_projection_s=428 predicted_micro_mean=-313020 transfer_micro_mean=115832
+== n=256
+FIELD_CONTRAST_DECLARATION alphabet=100 width=32 heads=4 modes=8 ticks=4 reach=3771 rate=10 log2_t=244430039 section=256 sections=97 train=24685 held=128 places=64 release=kernel_spacing_11 newton=false moments=0,4 run_bits=0 rest=false spans=false laps_read=2
+FIELD_STOPPED lap=0 sections=14/97 states=3584 ms=60822
+FIELD_KERNEL_ACCEPT lap=0 stopped states=3584 places=105115 moved=104071 accept_milli=848 sd_milli=257 whole=1917
+FIELD_CARD reads=30 read_ms=30953 returns=14 return_ms=27715 pairs=11047750417 batches=288 peak_store=8384348960 landmarks=0 landmark_ms=0 elapsed_ms=60840
+MEASURE lap=dev256 rc=0 wall_s=61.3 peak_rss_kib=892844
+n=256 sections=14 states=3584 ms_a_state=14.57 lap_projection_s=360 predicted_micro_mean=-2281784 transfer_micro_mean=764596
+MAIN exit 06:33:21
+== lap
+FIELD_ENUMERATED_READ lap=-1 ms=8625
+FIELD_KERNEL_ACCEPT lap=0 states=24685 places=733783 moved=726021 accept_milli=548 sd_milli=387 whole=6780
+FIELD_KERNEL_BLOCKS lap=0 by_block_tenth(places_tenths:accept_milli)=55:888,96:775,130:673,164:586,202:477,248:413,303:436,382:409,520:417,869:404
+FIELD_KERNEL_NEWTON lap=0 by_lap_tenth(alpha_milli:shrink_milli medians)=0:937,0:971,0:881,0:986,0:981,0:950,0:963,0:978,0:980,0:912
+FIELD_ENUMERATED_READ lap=0 ms=445287
+FIELD_CARD reads=198 read_ms=208758 returns=97 return_ms=225092 pairs=79634393899 batches=1637 peak_store=8385451808 landmarks=0 landmark_ms=0 elapsed_ms=445396
+MEASURE lap=lap rc=0 wall_s=446.0 peak_rss_kib=1012036
+lap	places	enumerated_code	face_code	kl_mean	kl_q25	kl_median	kl_q75	kl<=0.3	face_zero_letters
+-1	64	6.5026	6.5083	0.0110	0.0015	0.0063	0.0162	64/64	0
+0	64	6.5241	6.4912	0.0198	0.0031	0.0107	0.0205	64/64	0
+# exact code from lap -1 to lap 0: paired change +0.0216 bits a place, standard error 0.0240, over 64 places; falls past twice its error: False
+== /home/b/Workspaces/holonics/.local/wt/qgchgu-sampler/.local/run/2026-11-07-lap7/lap.log: 97 sections
+tenth	accept_milli	predicted_micro	transfer_micro
+0	836	-3329203	1304955
+1	794	-399785	-7170
+2	505	-360339	122538
+3	537	-1759087	794024
+4	580	-1164302	660753
+5	405	-473688	256003
+6	467	-778555	376366
+7	407	-606130	495808
+8	492	-597152	452943
+9	451	-627857	422639
+block-size tenth	mean places a state	accept_milli
+STATE.0 b0bf786ecb27b637420eedbb0e34f58586de66ee80a591c3991740ea7e8559e6
+MAIN exit 06:41:28
+== by family
+FIELD_KERNEL_FAMILIES lap=0 stopped enc=21/-355 before=22/-369 after=22/-371 q=82/-2266 q_bias=1/-72 v=0/0 v_bias=0/0 out=0/0 out_bias=0/0 a=58/-577 a_bias=3/-27 b=53/-553 b_bias=3/-25 w=0/0 w_bias=0/0 read=6/-82 read_bias=0/0 moment_before=1590/-11455 moment_
+n=16 sections=169 states=2701 ms_a_state=19.01 lap_projection_s=469 predicted_micro_mean=-30926 transfer_micro_mean=3294

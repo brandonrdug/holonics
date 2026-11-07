@@ -4794,6 +4794,12 @@ pub struct KernelReceipt {
     pub per_state: Vec<(usize, i128)>,
     /// The evidence-shrunk Newton step's read, where the learner takes it ([`FieldLearner::newton`]).
     pub newton: Option<NewtonRead>,
+    /// [measurement; November 7, lap 7] Each family's part of the transfer and of the predicted change, in the families'
+    /// order ([`Field::families_all`]), on the codes' grain (`None` past its carrier): where the step that lowers its own
+    /// section raises the next.
+    pub by_family: Vec<(Option<i64>, Option<i64>)>,
+    /// Each family's length `ρ_f` after the section (on `2^(−24)` bits), where the learner reads them.
+    pub rates: Vec<i128>,
 }
 
 /// [measurement; the unified-theory reading of November 7, 05:55] **An evidence-shrunk Newton step's read**
@@ -4905,6 +4911,17 @@ fn predicted_change(field: &Field, g: &[i128], step: &[i128], halvings: u32) -> 
         total = total.checked_add(family >> shift)?;
     }
     i64::try_from(total).ok()
+}
+
+/// [measurement; November 7] [`predicted_change`] over one family `(start, len, grain)` alone.
+fn predicted_change_family(field: &Field, g: &[i128], step: &[i128], halvings: u32, (start, len, grain): (usize, usize, u32)) -> Option<i64> {
+    let _ = field;
+    let shift = if grain == MATERIAL_BITS { 40 + grain - 20 } else { 24 + grain - 20 };
+    let mut family = 0i128;
+    for i in start..start + len {
+        family = family.checked_add(g[i].checked_mul(-release(step[i], halvings))?)?;
+    }
+    i64::try_from(family >> shift).ok()
 }
 
 /// `base` less `release(step, halvings)` in each entry, and whether any entry moved.
@@ -5039,6 +5056,30 @@ pub struct FieldLearner {
     /// Newton step along the moments' direction ([`FieldLearner::section_kernel`]) instead of the moments' own step. Not
     /// carried in the learner's text.
     pub newton: bool,
+    /// [measurement; the unified-theory reading of November 7, 06:26] Whether a kernel section reads the evidence-shrunk Newton
+    /// step's terms (`s`, `v`, `c` and `α`) beside the moments' own step, without taking it. Not carried in the learner's
+    /// text.
+    pub newton_read: bool,
+    /// [definition; the unified-theory reading of November 7, 06:26] **The moments count states, not sections**: the first
+    /// and second moments move at `2^(−first_rate)` and `2^(−second_rate)` a section ([`FIRST_RATE`] and [`SECOND_RATE`]
+    /// at sixteen states a section; a section of `16·4^k` states moves them `2k` bits faster, so a section of 256 is its own
+    /// first moment). Not carried in the learner's text.
+    pub first_rate: u32,
+    pub second_rate: u32,
+    /// [definition; the unified-theory reading of November 7, 06:57] **Each family reads its length from its own transfer**:
+    /// where set, family `f` steps at `2^(−ρ_f)` (`ρ_f` on `2^(−24)` bits, opening at the learner's rate, unbounded: a
+    /// negative `ρ_f` lengthens the step past the moments' unit, checked at its carrier), and after each
+    /// section `ρ_f` moves `¼ τ̄_f/|π̄_f|` bits, `τ̄_f` and `π̄_f` the family's transfer (the step before priced on this
+    /// section) and own-section price, each averaged at `2^(−first_rate)`. A step the next section pays for grows shorter, a
+    /// step the next section keeps pulling grows longer: for one noisy quadratic mode `E τ = −η|μ|² + η²c` vanishes at the
+    /// length `η = |μ|²/c` that lowers the code most per step [derived]; a quarter of the correction a section settles in about
+    /// twenty sections [agent-inferred]. Not carried in the learner's text.
+    pub family_rates: Option<Vec<i128>>,
+    /// [definition; the unified-theory reading of November 7, 06:57] Whether a kernel section deposits the letters'
+    /// temperature's covector ([`FieldLearner::section_kernel`]). Not carried in the learner's text.
+    pub temper_learns: bool,
+    family_transfer: Vec<i128>,
+    family_price: Vec<i128>,
     /// [measurement; §16.41] The step the last section stood at, the operand of the next section's
     /// [`FieldReceipt::transfer`]; a reading's operand, not carried in the learner's text, cleared by every growth, and not
     /// kept under the held read (whose next section moves the step before pricing it).
@@ -5051,7 +5092,7 @@ impl FieldLearner {
     pub fn new(field: Field, rate_bits: u32) -> Self {
         let len = field.material_len();
         let drawn = 4 * field.declaration.founding_draws();
-        Self { field, first: vec![0; len], second: vec![0; len], rate_bits, drawn, laps: 0, held: None, read_held: false, newton: false, last: None }
+        Self { field, first: vec![0; len], second: vec![0; len], rate_bits, drawn, laps: 0, held: None, read_held: false, newton: false, newton_read: false, first_rate: FIRST_RATE, second_rate: SECOND_RATE, family_rates: None, temper_learns: false, family_transfer: Vec::new(), family_price: Vec::new(), last: None }
     }
 
     /// Whether a deposited step is held for the next regions' read.
@@ -5078,7 +5119,7 @@ impl FieldLearner {
         let second = from.iter().map(|&(i, divided)| if divided { div_nearest(self.second[i], f2) } else { self.second[i] }).collect();
         let drawn = self.drawn + 4 * self.field.growth_draws(factor);
         let rate_bits = self.rate_bits + (usize::BITS - (factor - 1).leading_zeros());
-        Ok(Self { field, first, second, rate_bits, drawn, laps: self.laps, held: None, read_held: self.read_held, newton: self.newton, last: None })
+        Ok(Self { field, first, second, rate_bits, drawn, laps: self.laps, held: None, read_held: self.read_held, newton: self.newton, newton_read: self.newton_read, first_rate: self.first_rate, second_rate: self.second_rate, family_rates: None, temper_learns: false, family_transfer: Vec::new(), family_price: Vec::new(), last: None })
     }
 
     /// [definition; agent-inferred, November 4, §16.40] **The learner with one more lane** ([`Field::laned`]), the lane's
@@ -5118,7 +5159,7 @@ impl FieldLearner {
             }
         }
         let drawn = self.drawn + 4 * self.field.declaration.lane_draws();
-        Ok(Self { field, first, second, rate_bits: self.rate_bits, drawn, laps: self.laps, held: None, read_held: self.read_held, newton: self.newton, last: None })
+        Ok(Self { field, first, second, rate_bits: self.rate_bits, drawn, laps: self.laps, held: None, read_held: self.read_held, newton: self.newton, newton_read: self.newton_read, first_rate: self.first_rate, second_rate: self.second_rate, family_rates: None, temper_learns: false, family_transfer: Vec::new(), family_price: Vec::new(), last: None })
     }
 
     /// The held step read on `regions` without a deposit: the faces of `regions` under the
@@ -5214,11 +5255,49 @@ impl FieldLearner {
                 // A coordinate opens at its own first nonzero covector.
                 (*m, *v) = (*gv, square);
             } else {
-                *m = toward(*m, *gv, FIRST_RATE);
-                *v = toward(*v, square, SECOND_RATE);
+                *m = toward(*m, *gv, self.first_rate);
+                *v = toward(*v, square, self.second_rate);
             }
         }
         Ok(())
+    }
+
+    /// The evidence-shrunk Newton step's terms along `direction` (a step on the families' grains, subtracted from the
+    /// material): each state's `u_s = D_s · d` weighed `f_s = w_s u_s`, `s = Σ f`, `v = n/(n − 1) Σ(f − s/n)²`,
+    /// `c = (ln 2/2) Σ w u²`, the shrink `(max(0, s² − v), s²)` and `α = (s² − v) 2^20 / (−s c)` where `s < 0`, `s² > v` and
+    /// `c > 0` (else `(0, 0)`). A reading: nothing is moved.
+    fn newton_terms(&self, states: &[Vec<i128>], weights: &[i128], direction: &[i128]) -> Result<NewtonRead> {
+        const OVER: &str = "a Newton step past its 128-bit carrier";
+        let mut read = NewtonRead::default();
+        let (mut sum, mut squares, mut curvature) = (0i128, 0i128, 0i128);
+        let mut priced = 0usize;
+        for (d, &w) in states.iter().zip(weights) {
+            let Some(u) = predicted_change(&self.field, d, direction, 0) else { continue };
+            let u = u as i128;
+            let f = release(w.checked_mul(u).ok_or(TowerError::Refused(OVER))?, MATERIAL_BITS);
+            sum += f;
+            squares += f.checked_mul(f).ok_or(TowerError::Refused(OVER))?;
+            curvature += release(w.checked_mul(u.checked_mul(u).ok_or(TowerError::Refused(OVER))?).ok_or(TowerError::Refused(OVER))?, MATERIAL_BITS);
+            priced += 1;
+        }
+        let n = priced as i128;
+        let variance = if n > 1 { (n * squares - sum * sum) / (n - 1) } else { 0 };
+        let curvature = release(curvature.checked_mul(crate::hnn::keyed_modes::ln2_face()).ok_or(TowerError::Refused(OVER))?, LN2_FACE_BITS) / 2;
+        (read.slope, read.variance, read.curvature) = (sum, variance, curvature);
+        let evidence = sum * sum - variance;
+        read.shrink = (evidence.max(0), sum * sum);
+        if sum < 0 && evidence > 0 && curvature > 0 {
+            // α = −(s² − v) 2^20 / (s c): s on 2^(−20), v and c on 2^(−40).
+            read.alpha = (evidence.checked_mul(1 << 20).ok_or(TowerError::Refused(OVER))?, (-sum).checked_mul(curvature).ok_or(TowerError::Refused(OVER))?);
+        }
+        Ok(read)
+    }
+
+    /// Opens each family's length at the learner's rate ([`FieldLearner::family_rates`]).
+    pub fn open_family_rates(&mut self) {
+        let families = self.field.families_all().len();
+        self.family_rates = Some(vec![(self.rate_bits as i128) << MATERIAL_BITS; families]);
+        (self.family_transfer, self.family_price) = (vec![0; families], vec![0; families]);
     }
 
     /// [definition; the unified-theory reading of November 7, 05:55; agent-inferred where marked] **An evidence-shrunk Newton
@@ -5253,31 +5332,12 @@ impl FieldLearner {
             }
         }
         let external = predicted_change(&self.field, &raw, &direction, 0);
-        // Each state's slope along `d`, weighed.
-        let mut read = NewtonRead { transfer, external, ..NewtonRead::default() };
-        let (mut sum, mut squares, mut curvature) = (0i128, 0i128, 0i128);
-        let mut priced = 0usize;
-        for (d, &w) in states.iter().zip(weights) {
-            let Some(u) = predicted_change(&self.field, d, &direction, 0) else { continue };
-            let u = u as i128;
-            let f = release(w.checked_mul(u).ok_or(TowerError::Refused(OVER))?, MATERIAL_BITS);
-            sum += f;
-            squares += f.checked_mul(f).ok_or(TowerError::Refused(OVER))?;
-            curvature += release(w.checked_mul(u.checked_mul(u).ok_or(TowerError::Refused(OVER))?).ok_or(TowerError::Refused(OVER))?, MATERIAL_BITS);
-            priced += 1;
-        }
-        let n = priced as i128;
-        let variance = if n > 1 { (n * squares - sum * sum) / (n - 1) } else { 0 };
-        let curvature = release(curvature.checked_mul(crate::hnn::keyed_modes::ln2_face()).ok_or(TowerError::Refused(OVER))?, LN2_FACE_BITS) / 2;
-        (read.slope, read.variance, read.curvature) = (sum, variance, curvature);
-        let evidence = sum * sum - variance;
-        read.shrink = (evidence.max(0), sum * sum);
+        let mut read = self.newton_terms(states, weights, &direction)?;
+        (read.transfer, read.external) = (transfer, external);
         let mut moved = false;
         let mut step = vec![0i128; len];
-        if sum < 0 && evidence > 0 && curvature > 0 {
-            // α = −(s² − v) 2^20 / (s c): s on 2^(−20), v and c on 2^(−40).
-            let (num, den) = (evidence.checked_mul(1 << 20).ok_or(TowerError::Refused(OVER))?, (-sum).checked_mul(curvature).ok_or(TowerError::Refused(OVER))?);
-            read.alpha = (num, den);
+        if read.alpha.1 > 0 {
+            let (num, den) = read.alpha;
             for (st, &dv) in step.iter_mut().zip(&direction) {
                 *st = div_nearest(dv.checked_mul(num).ok_or(TowerError::Refused(OVER))?, den);
             }
@@ -5309,7 +5369,8 @@ impl FieldLearner {
     #[allow(clippy::type_complexity)]
     fn deposit(&mut self, mut g: Vec<i128>) -> Result<(bool, Option<i64>, Option<i64>, Option<i64>)> {
         let raw = g.clone();
-        let transfer = self.last.take().and_then(|s| predicted_change(&self.field, &raw, &s.step, s.halvings));
+        let prev = self.last.take();
+        let transfer = prev.as_ref().and_then(|s| predicted_change(&self.field, &raw, &s.step, s.halvings));
         // [the unified-theory reading of November 6, 08:54] The step the moments would deposit before this section moves them,
         // priced on this section: the external price, a step this section never shaped.
         let mut external_step = vec![0i128; g.len()];
@@ -5319,14 +5380,58 @@ impl FieldLearner {
             }
         }
         let external = predicted_change(&self.field, &raw, &external_step, 0);
+        // The step before priced on this section by family, before the moments move.
+        let families = self.field.families_all();
+        let transfers: Option<Vec<Option<i64>>> = match (&self.family_rates, &prev) {
+            (Some(_), Some(prev)) => Some(families.iter().map(|&fam| predicted_change_family(&self.field, &raw, &prev.step, prev.halvings, fam)).collect()),
+            _ => None,
+        };
         self.moments_take(&mut g)?;
         let mut step = vec![0i128; g.len()];
-        for &(start, len, grain) in &self.field.families_all() {
-            for i in start..start + len {
-                step[i] = deposit_step(self.first[i], self.second[i], grain, self.rate_bits);
+        for (k, &(start, len, grain)) in families.iter().enumerate() {
+            match &self.family_rates {
+                // `2^(−ρ_f)`: the whole bits through the deposit's own law (a right shift, or a left shift checked at its carrier
+                // where `ρ_f < 0`: the unified-theory reading of November 7, 07:16, the law unclamped), the fraction through the
+                // exponential's navigator.
+                Some(rates) => {
+                    let rho = rates[k];
+                    let (whole, part) = (rho >> MATERIAL_BITS, (rho & ((1 << MATERIAL_BITS) - 1)) as i32);
+                    let scale = temperature_of(-part, &self.field.fine)?;
+                    const PAST: &str = "a family's step past its 128-bit carrier";
+                    for i in start..start + len {
+                        let root = super::deposit_root(self.second[i]);
+                        let num = self.first[i].checked_mul(1i128 << grain).ok_or(TowerError::Refused(PAST))?;
+                        let whole_step = if whole >= 0 {
+                            (num >> whole.min(127)) / root
+                        } else {
+                            let k = u32::try_from(-whole).map_err(|_| TowerError::Refused(PAST))?;
+                            num.checked_mul(1i128.checked_shl(k).filter(|&b| b > 0).ok_or(TowerError::Refused(PAST))?).ok_or(TowerError::Refused(PAST))? / root
+                        };
+                        step[i] = release(whole_step.checked_mul(scale).ok_or(TowerError::Refused(PAST))?, MATERIAL_BITS);
+                    }
+                }
+                None => {
+                    for i in start..start + len {
+                        step[i] = deposit_step(self.first[i], self.second[i], grain, self.rate_bits);
+                    }
+                }
             }
         }
         let predicted = predicted_change(&self.field, &raw, &step, 0);
+        // Each family's length moves by a quarter of its averaged transfer over its averaged own-section price.
+        if let (Some(rates), Some(transfers)) = (&mut self.family_rates, transfers) {
+            let rate = self.first_rate;
+            for (k, &fam) in families.iter().enumerate() {
+                let price = predicted_change_family(&self.field, &raw, &step, 0, fam).unwrap_or(0) as i128;
+                let transfer = transfers[k].unwrap_or(0) as i128;
+                let (t_avg, p_avg) = (&mut self.family_transfer[k], &mut self.family_price[k]);
+                *t_avg = toward(*t_avg, transfer, rate);
+                *p_avg = toward(*p_avg, price, rate);
+                if *p_avg != 0 {
+                    rates[k] += div_nearest(*t_avg << MATERIAL_BITS, 4 * p_avg.abs());
+                }
+            }
+        }
         // [definition; Brandon, November 5 17:29 and 17:32] **The step fluxes**: it deposits at its size, and no reread of the
         // section certifies it. The reread kept a step only where the regions reread under it coded strictly fewer bits, a
         // selection on the code (a maximum in effect) that discarded what an expansion measures ("you can't discard failure
@@ -5523,8 +5628,21 @@ impl FieldLearner {
         let states: Vec<Vec<i128>> = (0..n).map(|s| natural(&reads[s].0, &reads[n + s].0)).collect::<Result<_>>()?;
         if self.newton {
             let newton = self.deposit_newton(&states, &weights)?;
-            return Ok(KernelReceipt { states: n, places, moved, weight, weight_square, least, most, whole, deposited: newton.deposited, predicted: newton.predicted, transfer: newton.transfer, external: newton.external, per_state, newton: Some(newton) });
+            return Ok(KernelReceipt { states: n, places, moved, weight, weight_square, least, most, whole, deposited: newton.deposited, predicted: newton.predicted, transfer: newton.transfer, external: newton.external, per_state, newton: Some(newton), by_family: Vec::new(), rates: Vec::new() });
         }
+        // [the unified-theory reading of November 7, 06:26] The Newton terms read along the moments' direction before this section
+        // moves them, beside the moments' own step.
+        let newton = if self.newton_read {
+            let mut direction = vec![0i128; material];
+            for &(start, len, grain) in &families {
+                for i in start..start + len {
+                    direction[i] = deposit_step(self.first[i], self.second[i], grain, self.rate_bits);
+                }
+            }
+            Some(self.newton_terms(&states, &weights, &direction)?)
+        } else {
+            None
+        };
         let mut g = vec![0i128; material];
         for (d, &w) in states.iter().zip(&weights) {
             if w == 0 {
@@ -5534,8 +5652,32 @@ impl FieldLearner {
                 *v += release(x.checked_mul(w).ok_or(TowerError::Refused(OVER))?, MATERIAL_BITS);
             }
         }
+        // [definition; the unified-theory reading of November 7, 06:57] **The letters' temperature joins the deposit**: with
+        // `T = 2^τ`, `∂l/∂τ = −ln 2 Σ_s w_s (G_s − G′_s)/T` from the energies already read, on `2^(−40)` a unit of `τ` (the
+        // family's material grain). Held when `temper_learns` is off.
+        if self.temper_learns {
+            let mut gap = 0i128;
+            for (s, &w) in weights.iter().enumerate() {
+                gap += release((reads[s].1 - reads[n + s].1).checked_mul(w).ok_or(TowerError::Refused(OVER))?, MATERIAL_BITS);
+            }
+            let over_t = release(gap.checked_mul(inverse).ok_or(TowerError::Refused(OVER))?, MATERIAL_BITS);
+            let nats = release(over_t.checked_mul(crate::hnn::keyed_modes::ln2_face()).ok_or(TowerError::Refused(OVER))?, LN2_FACE_BITS);
+            g[f.layout.face_temper] = -(nats << (40 - ENERGY_BITS));
+        }
+        // Each family's part of the step before priced on this section, before the deposit takes it.
+        let transfers: Vec<Option<i64>> = match &self.last {
+            Some(prev) => self.field.families_all().iter().map(|&fam| predicted_change_family(&self.field, &g, &prev.step, prev.halvings, fam)).collect(),
+            None => vec![None; self.field.families_all().len()],
+        };
+        let raw = g.clone();
         let (deposited, predicted, transfer, external) = self.deposit(g)?;
-        Ok(KernelReceipt { states: n, places, moved, weight, weight_square, least, most, whole, deposited, predicted, transfer, external, per_state, newton: None })
+        let predictions: Vec<Option<i64>> = match &self.last {
+            Some(now) if deposited => self.field.families_all().iter().map(|&fam| predicted_change_family(&self.field, &raw, &now.step, now.halvings, fam)).collect(),
+            _ => vec![None; transfers.len()],
+        };
+        let by_family = transfers.into_iter().zip(predictions).collect();
+        let rates = self.family_rates.clone().unwrap_or_default();
+        Ok(KernelReceipt { states: n, places, moved, weight, weight_square, least, most, whole, deposited, predicted, transfer, external, per_state, newton, by_family, rates })
     }
 
     /// [definition; agent-inferred, November 3, the tower record] **The learner grown in scale**: its field grown in scale
@@ -5548,7 +5690,7 @@ impl FieldLearner {
         let (mut first, mut second) = (self.first.clone(), self.second.clone());
         first.resize(len, 0);
         second.resize(len, 0);
-        Ok(Self { field, first, second, rate_bits: self.rate_bits, drawn, laps: self.laps, held: None, read_held: self.read_held, newton: self.newton, last: None })
+        Ok(Self { field, first, second, rate_bits: self.rate_bits, drawn, laps: self.laps, held: None, read_held: self.read_held, newton: self.newton, newton_read: self.newton_read, first_rate: self.first_rate, second_rate: self.second_rate, family_rates: None, temper_learns: false, family_transfer: Vec::new(), family_price: Vec::new(), last: None })
     }
 
     /// [measurement; agent-inferred, November 3, §16.31] **Each family's step coherence**: over the family's entries, `Σ |m|`
@@ -5604,7 +5746,7 @@ impl FieldLearner {
                 Some(HeldStep { step, halvings })
             }
         };
-        Ok(Self { field, first, second, rate_bits, read_held: held.is_some(), newton: false, drawn, laps, held, last: None })
+        Ok(Self { field, first, second, rate_bits, read_held: held.is_some(), newton: false, newton_read: false, first_rate: FIRST_RATE, second_rate: SECOND_RATE, family_rates: None, temper_learns: false, family_transfer: Vec::new(), family_price: Vec::new(), drawn, laps, held, last: None })
     }
 }
 

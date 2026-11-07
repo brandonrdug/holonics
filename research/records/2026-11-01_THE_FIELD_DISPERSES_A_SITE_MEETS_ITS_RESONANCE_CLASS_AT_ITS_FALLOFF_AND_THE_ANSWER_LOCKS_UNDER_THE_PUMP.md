@@ -4508,3 +4508,39 @@ curvature collapses.**
   `α ∝ 1/c` grows, and the evidence stays near one as the slope's variance falls with it. The next law (a trust region on
   `α`, or the curvature held at its running level) is theory's.
 Receipts: `longrun_nov6/lap6.txt`.
+
+[measurement; November 7, lap 7; the unified-theory reading of 06:26] **More states a section do not buy evidence; the
+moments' letter rows hold the step that the next section pays for.**
+- Sections of 16, 64 and 256 states, at rates 12, 11 and 10, the moments counting states:
+  - card time per state 18.80, 17.36 and 14.57 ms (only 22% less at 256: the card is near full at 16);
+  - transfer on the next section +11%, +37% and +34% of the step's own-section price.
+- Lap 7 at 256 (446 s): the held enumerated code went from 6.503 to 6.524 (+0.022 ± 0.024). The Newton terms read beside the
+  step showed the moments' direction uphill on each next section (α = 0) with the shrink near 0.95: the anti-transfer was
+  systematic.
+- The transfer by family, one minute at 16 states (µbits a state, transfer over own-section price):
+  - moment_before +1,590/−11,455, moment_after +981/−10,091, moment_face +307/−2,626;
+  - q +82/−2,266, probe +97/−1,663;
+  - pair_c −12/−119.
+  The passage moments' letter rows held 70% of the step and 88% of the positive transfer.
+
+[definition and measurement; November 7, lap 8; the unified-theory readings of 06:57 and 07:16] **Each family reads its
+length from its own transfer, the letters' temperature learns, and lap 8 lowers the held code 1.54 bits a place.**
+- `FieldLearner::family_rates`: family `f` steps at `2^(−ρ_f)`, opening at 12 bits. After each section `ρ_f` moves
+  `¼ τ̄_f/|π̄_f|`, with `τ̄` and `π̄` the family's transfer and own-section price averaged at `2^(−3)`.
+  - [derived, one noisy quadratic mode] `E τ = −η|μ|² + η²c` vanishes at the length that lowers the code most per step.
+  - A step the next section pays for grows shorter, and one the next section keeps pulling grows longer.
+- `FieldLearner::temper_learns`: `∂l/∂ log₂ T = −ln 2 Σ_s w_s (G_s − G′_s)/T` from the energies already read.
+- The development read from lap 5's state: the held code untrained at `log₂ T` −½ and −1 reads 6.461 and 6.411 (from 6.503).
+- Lap 8, all 1,543 sections in 468 s:
+  - The held enumerated code went from 6.503 to 4.964 bits a place, a paired change of −1.539 with standard error 0.185.
+    The letters' own frequencies code the truth at 4.93.
+  - The face code went from 6.508 to 5.039, and `KL(enumerated ‖ face)` from 0.011 to 0.251 (52 of 64 places at most 0.3).
+  - `log₂ T` went from 14.57 to 10.12, nearly all of it in the lap's first fifth.
+  - Acceptance was 0.203.
+  - The total share (transfer over price) was within 3% of zero in 9 of 10 tenths.
+  - The letters' rows (enc) became the largest learner, their length 12 → 5.4 bits. The moment rows grew 6.3 bits shorter.
+  - The two letter biases (read_bias, lift_bias: the field's unigram) were pulled by every next section. Their lengths ran
+    past zero under a clamp I had set [agent-inferred; theory, 07:16: the law is stable for them unclamped].
+- Lap 9 follows on the same law, the lengths unbounded (a negative `ρ` is a left shift checked at its carrier), every
+  family reopening at 12.
+Receipts: `longrun_nov6/lap7.txt`, `lap7_dev.sh`, `lap7.sh`, `lap8.txt`, `lap8_dev.sh`, `lap8.sh`, `enumerated.py`.
