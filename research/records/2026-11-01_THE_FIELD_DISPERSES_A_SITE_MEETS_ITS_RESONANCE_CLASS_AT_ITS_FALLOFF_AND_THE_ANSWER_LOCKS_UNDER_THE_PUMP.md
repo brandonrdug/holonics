@@ -4297,3 +4297,22 @@ Tests on the tiny field, every ring set:
   halvings: from `ε = 2^(−6)` to `2^(−4)` the readings grow 3.95, 4.08 and 3.67 times.
 - Curl over readings reads 0.050 → 0.140, 0.019 → 0.077 and 0.039 → 0.190, against 1.45–1.90 for the partial face at the same
   base.
+
+[measurement; November 7, energy130; Brandon's host exception of November 6, 23:52:55 UTC, the founding read again with the
+face corrected] **At founding the total-derivative face saturates.** This is energy129's founding read again (lap 24's
+declaration with the energy, KEYS8; curl on held truth, 32 problems, 16 squares a band), with the face as the total
+derivative and the open sites carrying the locked mixture, on the host with 16 threads.
+- The development read was 4 problems, 160 region reads in 7.6 s. It projected 484 s (upper 665 s); the read took 546 s (1.13×)
+  and finished all 32 problems.
+- Curl/λ by band: 2.08, 1.93, 1.90, 2.05 and 1.99. The two ends correlate −0.04 to +0.05, and κ is 0.95–1.04.
+- λ's mean is −59, −55, −55, −52 and −44 bits by band. Its median is −62.0 bits at both ends in every band, the code of the
+  face's floor: one letter of the square has no mass at its face. So the faces' spread passes the 62-bit floor, and the
+  squares read saturation, not the energy's response.
+- The construction's test cannot be read at this scale. On the tiny field the same face agrees at one base (above).
+- [inferred] The face's letter sensitivity at founding is the opening rows `E(a)` (uniform on `±1`) against `λ⁰ = dG/dx⁰`. That
+  sums every receiver's force on a site's key and probe: a site keys every receiver of its class and its near field, at the
+  founding's temperature `2^(−β) = 4`. So a letter moves `G` by hundreds of bits, where the partial face at founding read only
+  the strand rows, with `R = 0`.
+- The scale of `G` against the letters is the next subject: a temperature of the energy, or a founding at which the faces open
+  near flat.
+Receipts: `longrun_nov6/energy130.txt`.
