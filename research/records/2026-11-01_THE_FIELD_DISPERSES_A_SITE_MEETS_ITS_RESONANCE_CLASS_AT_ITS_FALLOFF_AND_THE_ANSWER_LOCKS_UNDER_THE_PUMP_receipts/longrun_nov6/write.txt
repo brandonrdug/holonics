@@ -1,0 +1,12 @@
+write rc 0
+FIELD_WRITE_EQUILIBRIUM sweep=8 ms=121177
+FIELD_WRITE_ENERGY answer=0 length=106 write_nats_a_place_milli=-4566 truth_nats_a_place_milli=-2732 write_less_truth_milli=-1835
+FIELD_WRITE_ENERGY answer=1 length=190 write_nats_a_place_milli=-5337 truth_nats_a_place_milli=-4368 write_less_truth_milli=-969
+FIELD_WRITE_ENERGY answer=2 length=304 write_nats_a_place_milli=-4287 truth_nats_a_place_milli=-2462 write_less_truth_milli=-1825
+FIELD_WRITE_ENERGY answer=3 length=204 write_nats_a_place_milli=-4556 truth_nats_a_place_milli=-3447 write_less_truth_milli=-1109
+FIELD_WRITE_ENERGY answer=4 length=204 write_nats_a_place_milli=-4384 truth_nats_a_place_milli=-2600 write_less_truth_milli=-1784
+FIELD_WRITE_ENERGY answer=5 length=388 write_nats_a_place_milli=-4239 truth_nats_a_place_milli=-2077 write_less_truth_milli=-2162
+FIELD_WRITE_ENERGY answer=6 length=138 write_nats_a_place_milli=-4676 truth_nats_a_place_milli=-3676 write_less_truth_milli=-1001
+FIELD_WRITE_ENERGY answer=7 length=521 write_nats_a_place_milli=-4075 truth_nats_a_place_milli=-3128 write_less_truth_milli=-948
+FIELD_WRITE_DONE ms=238543
+texts identical to the first run

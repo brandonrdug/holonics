@@ -4600,3 +4600,38 @@ target; blocks of four lower the held code to 2.770 nats a byte.**
 - Lap 12 (one place a block, each its own coin) runs on a Colab A100. The k = 8 comparison there was lost when a second GPU
   session reclaimed the first.
 Receipts: `longrun_nov6/lap11.txt`, `lap11.sh`, `pin4.sh`, `singular.py`.
+
+[measurement; November 7, the writer and lap 13; the unified-theory readings of 09:36, 09:55 and 10:12] **The writer's
+equilibrium sits 1 to 2 nats a place below the truths; persistent writes met by the deposit are stable only once the step's
+length is read from the writes' own fluctuation, and then they raise the held code.**
+- `kernel-write` from the k = 4 lap's state wrote 8 held prompts (238.5 s on the card; its halves agreed at sweep 8, 121 s). The
+  texts were shown in the thread only (they derive from private passages). Read as `G/T` a place in nats, each write sits
+  below its truth by 0.95 to 2.16 nats: the field's low basins are not the truths, so the kernel's single steps from the
+  truth never visit them. The first closing read printed −1 for every place (the product had lost its bits); it is now
+  `(g·T⁻¹ ≫ 32)·ln 2 ≫ 30` a place, and the corrected run wrote the same texts.
+- Lap 13 (09:36): 16 persistent writes, one a problem slot, released once and never restarted; each section sweeps one
+  residue class of their places at `T` (`Field::energy_sweep_at`) and deposits `(1/T)Σ[∂G/∂θ(truth) − ∂G/∂θ(write)]`, with
+  `T` learning (`FieldLearner::section_contrast` adds the temperature's covector). `log₂ T` ran from 9.7 to 24.2 in 150
+  sections, and the run stopped at the temperature's carrier refusal (482 s).
+- With `T` held (09:55; each write released once at the longest answer's length and carried whole) the energy's scale ran
+  away instead: the closing read reached −17.6 nats a place by section 53, and a deposited parameter outgrew its 32-bit
+  carrier (220 s).
+- The 10:12 law sinks the writes by 8 sweeps before the first deposit and takes the step's length from the writes'
+  fluctuation along the moments' direction, `η = −2Σp/(n ln 2 Var p)` at the families' held lengths, an eleventh of the
+  harmonic mean of the last eleven (`FieldLearner::section_contrast_scaled`). It ran stably for 781 of 1,543 sections, to
+  its deadline (2,801 s against a 2,195 s projection for the whole lap: 2.5 times the projected time a section, so its stop
+  was owed at the first tenth). The closing read stayed positive, +0.25 nats a place on average (the writes above their
+  truths). The held enumerated code of its stopped state went from 2.770 to 3.187 nats a byte (+0.417 ± 0.162).
+- Lap 12 (one place a block, each with its own coin, from the k = 4 lap's end) was lost with its Colab VM overnight at 488 of
+  1,543 sections. An app restart near 11:15 killed the write-out of lap 13's state at sweep 34, and the card stood idle about
+  5.5 hours.
+- The held code read at `T·2^(j/4)`, `j = −8…8`, from the same enumerated `G` (theory, 16:56; a reading only): at the k = 4
+  lap's end the best is at its own `T` (2.783 at `j = −1`, 2.770 at 0, 2.809 at +1); at lap 13's stop the best is 3.176 at
+  `j = +1`, 0.011 ± 0.032 under its value at `T`. No temperature brings lap 13 near 2.770, so its loss is in the shape of `G`,
+  not its scale.
+- Lap 12 runs again on the card from 17:00, with a saved state at least each hour (Brandon, November 6 17:11):
+  `contrast-field` now rests the learner as `STATE.<lap>.<sections>` at the first section that starts an hour past its last
+  saved state, and reads the held places from it (rows marked `10000·(lap + 1) + sections`). `kernel-write` prints its
+  closing read at `T` and after the descent.
+Receipts: `longrun_nov6/write.sh`, `write.txt`, `lap13.sh`, `lap13.txt`, `lap13b.sh`, `lap13b.txt`, `lap13c.sh`,
+`lap13c.txt`, `lap13d.sh`, `lap13d.txt`, `lap13d_held.sh`, `tempread.py`, `tempread.txt`, `lap12.sh`.

@@ -2789,6 +2789,11 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
         Err(_) => None,
     };
     let spacing = FieldLearner::kernel_spacing();
+    // [the unified-theory reading of November 7, 09:36] `FIELD_CONTRAST_PERSISTENT`: the section deposits against persistent
+    // writes (lap 13's law) instead of a kernel step from the truth.
+    let persistent = std::env::var_os("FIELD_CONTRAST_PERSISTENT").is_some();
+    let mut persistent_writes: Vec<Vec<usize>> = Vec::new();
+    let mut persistent_etas: std::collections::VecDeque<i128> = std::collections::VecDeque::new();
     let whole_blocks = std::env::var_os("FIELD_CONTRAST_WHOLE_BLOCKS").is_some();
     // [the unified-theory reading of November 7, 07:24] The first section's `k*`: lap 8's acceptance of 0.234 fell between its
     // fourth and fifth block-size tenths (16.4 and 20.2 places), `FIELD_CONTRAST_BLOCK_PLACES` where declared.
@@ -2840,7 +2845,10 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
             if learner.family_rates.is_none() {
                 learner.open_family_rates();
             }
-            learner.temper_learns = true;
+            // [the unified-theory reading of November 7, 09:55] Against persistent writes the letters' temperature is held: at
+            // writes not relaxed at the current `T` its covector falls toward zero as `T` grows wherever the writes sit below their
+            // truths (lap 13 ran `log₂ T` from 9.7 to 24.2 bits in 150 sections until a read refused its carrier).
+            learner.temper_learns = !persistent && std::env::var_os("FIELD_CONTRAST_HOLD_T").is_none();
         } else {
             learner.family_rates = None;
         }
@@ -2910,6 +2918,12 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
     let mut enumerated_rows = rows_file(&out.join("ENUMERATED.tsv"), "lap\tproblem\tplace\ttruth\tlog2_t\tface_masses\tface_total\tenergies\ttruth_face_masses\ttruth_face_total\n")?;
     enumerated_read(&learner.field, &held_set, places, &truth_of, realization, -1, &mut enumerated_rows)?;
     println!("FIELD_ENUMERATED_READ lap=-1 ms={}", started.elapsed().as_millis());
+    // [definition; Brandon, November 6 17:11; theory, November 7 16:56] A card run holds at most one hour between saved states:
+    // at the first section start an hour (`SAVE_MS`) past the last saved state, the learner rests as `STATE.<lap>.<sections
+    // done>`, the held places are read from it (`ENUMERATED.tsv` rows marked `10000·(lap + 1) + sections done`) and the run
+    // goes on.
+    const SAVE_MS: u128 = 3_600_000;
+    let mut saved_ms = started.elapsed().as_millis();
     for lap in 0..laps {
         let elapsed = started.elapsed().as_millis();
         if lap > 0 && elapsed + lap_ms > stop_ms {
@@ -2930,9 +2944,103 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
         let mut by_family: Vec<(i128, i128)> = Vec::new();
         let (mut tenth_family, mut tenths_printed): (Vec<(i128, i128)>, usize) = (Vec::new(), 0);
         for (n, &s) in walk(seed, read, sections.len()).iter().enumerate() {
+            let now = started.elapsed().as_millis();
+            if n > 0 && now - saved_ms >= SAVE_MS {
+                write_new(&out.join(format!("STATE.{lap}.{n}")), at_rate(&learner, base_rate).as_bytes())?;
+                enumerated_read(&learner.field, &held_set, places, &truth_of, realization, 10_000 * (lap as i64 + 1) + n as i64, &mut enumerated_rows)?;
+                saved_ms = started.elapsed().as_millis();
+                println!("FIELD_SAVED lap={lap} sections={n}/{} ms={now} read_ms={}", sections.len(), saved_ms - now);
+            }
             let section_start = std::time::Instant::now();
             let members = &sections[s];
             let truths: Vec<Vec<usize>> = members.iter().map(|&i| truth_of(&train_set[i], &train_set[i].1)).collect();
+            if persistent {
+                // [definition; the unified-theory reading of November 7, 09:36] **The field meets its persistent writes**: one
+                // write a problem slot, started once from the joint release and never restarted; each section, write `j` takes the
+                // section's `j`-th question at its true length (cut, or its new places drawn once from their open faces), the
+                // energy's own sweep moves one residue class of its places at the energy's `T`, and the section deposits
+                // `(1/T) Σ_j [∂G/∂θ(truth_j) − ∂G/∂θ(write_j)]` ([`FieldLearner::section_contrast`]): the loss is the closing read
+                // `(G(write) − G(truth))/T`, which rests at the answers' likelihood given their questions.
+                let problems: Vec<(&[usize], usize)> = members.iter().map(|&i| (train_set[i].0.as_slice(), train_set[i].2)).collect();
+                let lengths: Vec<usize> = members.iter().map(|&i| train_set[i].1.len()).collect();
+                let key = mix(seed ^ 0x9E85_15 << 40, read << 32 | n as u64);
+                // [the unified-theory reading of November 7, 09:55] Each write is released once at the longest answer's length and
+                // carried whole: a question takes its first `L` places, and the rest wait unread and unmoved for a longer question.
+                let fresh = persistent_writes.is_empty();
+                if fresh {
+                    let longest = train_set.iter().map(|p| p.1.len()).max().unwrap_or(1);
+                    let wide: Vec<usize> = vec![longest; problems.len()];
+                    persistent_writes = learner.field.energy_release(&problems, &wide, void, 64, key, realization, &mut |_, _, _| {}).map_err(|e| e.to_string())?;
+                }
+                let m = members.len().min(persistent_writes.len());
+                let mut active: Vec<Vec<usize>> = (0..m).map(|j| persistent_writes[j][..lengths[j].min(persistent_writes[j].len())].to_vec()).collect();
+                // [the unified-theory reading of November 7, 10:12] The writes sunk before the first deposit: eight whole sweeps at
+                // `T` over each write's first `L` places.
+                if fresh {
+                    for sweep in 0..8u64 {
+                        let t0 = std::time::Instant::now();
+                        let (mv, pr, en) = learner.field.energy_sweep_at(&problems[..m], &mut active, None, void, 0, mix(key, 100 + sweep), realization, &mut |_, _| {}).map_err(|e| e.to_string())?;
+                        println!("FIELD_PERSISTENT_SINK sweep={} moved={mv} proposed={pr} accept_milli={} write_energy_milli={} ms={}", sweep + 1, mv * 1000 / pr.max(1), (en.iter().sum::<i128>() / m.max(1) as i128) * 1000 >> 32, t0.elapsed().as_millis());
+                    }
+                }
+                // The sweep over one residue class of each write's first `L` places.
+                let positions: Vec<Vec<usize>> = (0..m)
+                    .map(|j| {
+                        let len = active[j].len();
+                        let r = (mix(seed ^ 0xB10C << 44, read << 40 | (n as u64) << 16 | j as u64) as usize) % spacing.min(len);
+                        (r..len).step_by(spacing).collect()
+                    })
+                    .collect();
+                let (moved_w, proposed_w, write_energy) = learner
+                    .field
+                    .energy_sweep_at(&problems[..m], &mut active, Some(&positions), void, 0, mix(key, 7), realization, &mut |_, _| {})
+                    .map_err(|e| e.to_string())?;
+                for j in 0..m {
+                    let len = active[j].len();
+                    persistent_writes[j][..len].copy_from_slice(&active[j]);
+                }
+                let write_energy_milli = (write_energy.iter().sum::<i128>() / m.max(1) as i128) * 1000 >> 32;
+                let release_ms = section_start.elapsed().as_millis();
+                let near = holonics::hnn::tower::field::NEAR;
+                let writes_now: Vec<Vec<usize>> = (0..m)
+                    .map(|j| {
+                        let (q, room) = problems[j];
+                        let w = &active[j];
+                        let mut c: Vec<usize> = q.iter().chain(w).copied().collect();
+                        c.extend(std::iter::repeat_n(void, near.min(room - w.len())));
+                        c
+                    })
+                    .collect();
+                let resolved: Vec<Vec<bool>> = truths.iter().map(|t| vec![false; t.len()]).collect();
+                let truth_views: Vec<Region> = truths[..m].iter().zip(&resolved).map(|(c, u)| Region { classes: c, unresolved: u, faces: &[], locked: &[], echo: &[], domain: None, port: None }).collect();
+                let write_views: Vec<Region> = writes_now.iter().zip(&resolved).map(|(c, u)| Region { classes: c, unresolved: u, faces: &[], locked: &[], echo: &[], domain: None, port: None }).collect();
+                let deposit_start = std::time::Instant::now();
+                let (receipt, eta) = learner.section_contrast_scaled(&truth_views, &write_views, &mut persistent_etas, realization).map_err(|e| e.to_string())?;
+                let deposit_ms = deposit_start.elapsed().as_millis();
+                let eta_milli = eta * 1000 >> 32;
+                let places: i128 = lengths[..m].iter().map(|&l| l as i128).sum::<i128>().max(1);
+                // The closing read `(G(write) − G(truth))/T` a place in thousandths of a nat (`gap` is `Σ (G(truth) − G(write))/T` on 2^(−32) bits).
+                let closing_milli = -(receipt.gap * LN2_Q30 >> 30) * 1000 / places >> 32;
+                (states, deposited) = (states + receipt.states, deposited + usize::from(receipt.deposited));
+                (gap, same) = (gap + receipt.gap, same + receipt.same);
+                (moved_lap, places_lap) = (moved_lap + moved_w, places_lap + proposed_w);
+                let micro = |v: Option<i64>| v.map_or("-".to_string(), |c| ((c as i128 * 1_000_000) / ((receipt.states as i128) << 20)).to_string());
+                println!(
+                    "FIELD_PERSISTENT lap={lap} n={n} writes={m} closing_milli={closing_milli} write_energy_milli={write_energy_milli} eta_milli={eta_milli} moved={moved_w} proposed={proposed_w} accept_milli={} deposited={} predicted_micro={} transfer_micro={} log2_t={} sweep_ms={release_ms} deposit_ms={deposit_ms} ms={}",
+                    moved_w * 1000 / proposed_w.max(1),
+                    receipt.deposited,
+                    micro(receipt.predicted),
+                    micro(receipt.transfer),
+                    learner.field.theta[learner.field.layout().face_temper],
+                    started.elapsed().as_millis()
+                );
+                if started.elapsed().as_millis() > stop_ms {
+                    write_new(&out.join("STATE.stopped"), at_rate(&learner, base_rate).as_bytes())?;
+                    println!("FIELD_STOPPED lap={lap} sections={}/{} states={states} ms={}", n + 1, sections.len(), started.elapsed().as_millis());
+                    return Ok(());
+                }
+                continue;
+            }
             if writer.is_none() && joint.is_none() {
                 // The kernel: each state's answer places `t ≡ r (mod s)`, cut into blocks of at most `k*` places, each block its own
                 // kernel step from the truth ([the unified-theory reading of November 7, 07:24]: a block of `k` places moves
@@ -3173,7 +3281,10 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
         }
         learner.laps += 1;
         write_new(&out.join(format!("STATE.{lap}")), at_rate(&learner, base_rate).as_bytes())?;
-        if states > 0 && writer.is_none() && joint.is_none() {
+        if persistent {
+            println!("FIELD_PERSISTENT_LAP lap={lap} states={states} moved={moved_lap} proposed={places_lap} accept_milli={} closing_milli={} ms={}", moved_lap * 1000 / places_lap.max(1), if states == 0 { 0 } else { -(gap * LN2_Q30 >> 30) * 1000 / (states as i128) >> 32 }, started.elapsed().as_millis());
+        }
+        if states > 0 && writer.is_none() && joint.is_none() && !persistent {
             let unit = 1i128 << holonics::hnn::tower::MATERIAL_BITS;
             let mean = weight_lap * 1000 / (unit * states as i128);
             let var = (square_lap * 1_000_000 / (unit * states as i128)) - mean * mean;
@@ -3474,6 +3585,28 @@ pub(super) fn kernel_write(args: &[String], realization: &mut dyn FieldRealizati
     }
     dump(&format!("equilibrium at sweep {}", stop.map_or("-".to_string(), |s| s.to_string())), &answers)?;
     println!("FIELD_WRITE_EQUILIBRIUM sweep={} ms={}", stop.map_or("-".to_string(), |s| s.to_string()), started.elapsed().as_millis());
+    // The closing read (theory, November 7 16:56: at `T` and after the descent): each write's energy a place beside its true
+    // answer's, both read at the field's own `T`, in nats.
+    let closing = |at: &str, answers: &[Vec<usize>], realization: &mut dyn FieldRealization| -> Result<()> {
+        let configurations: Vec<Vec<usize>> = problems.iter().zip(answers).map(|(&(q, room), a)| {
+            let mut c: Vec<usize> = q.iter().chain(a).copied().collect();
+            c.extend(std::iter::repeat_n(void, holonics::hnn::tower::field::NEAR.min(room - a.len())));
+            c
+        }).collect();
+        let asked: Vec<&[usize]> = configurations.iter().map(Vec::as_slice).collect();
+        let write_g = realization.read_energies(field, &asked).map_err(|e| e.to_string())?;
+        let log2_t = field.theta[field.layout().face_temper] as i128;
+        // `1/T = 2^(−log₂ T)` on 2^(−32); `(G/T) ln 2 / len`, the energy a place in nats, as the sweeps read it.
+        let inverse = exp2_q32(-(log2_t << 8));
+        // `G/T` on 2^(−32) bits (`G` on 2^(−32), `1/T` on 2^(−32)), then nats, then a place's share.
+        let nats = |g: i128| -> i128 { (g * inverse >> 32) * LN2_Q30 >> 30 };
+        for k in 0..problems.len() {
+            let (w, t) = (nats(write_g[k]) / lengths[k] as i128, nats(truth_g[k]) / lengths[k] as i128);
+            println!("FIELD_WRITE_ENERGY at={at} answer={k} length={} write_nats_a_place_milli={} truth_nats_a_place_milli={} write_less_truth_milli={}", lengths[k], milli(w), milli(t), milli(w - t));
+        }
+        Ok(())
+    };
+    closing("T", &answers, realization)?;
     // The descent: T halved each sweep until a sweep moves nothing.
     let mut cool = 0u32;
     while started.elapsed().as_millis() <= stop_ms {
@@ -3486,22 +3619,7 @@ pub(super) fn kernel_write(args: &[String], realization: &mut dyn FieldRealizati
         }
     }
     dump(&format!("descent end at T/2^{cool}"), &answers)?;
-    // Each write's energy per place beside its true answer's (both at the field's own T), nats.
-    let configurations: Vec<Vec<usize>> = problems.iter().zip(&answers).map(|(&(q, room), a)| {
-        let mut c: Vec<usize> = q.iter().chain(a).copied().collect();
-        c.extend(std::iter::repeat_n(void, holonics::hnn::tower::field::NEAR.min(room - a.len())));
-        c
-    }).collect();
-    let asked: Vec<&[usize]> = configurations.iter().map(Vec::as_slice).collect();
-    let write_g = realization.read_energies(field, &asked).map_err(|e| e.to_string())?;
-    let log2_t = field.theta[field.layout().face_temper] as i128;
-    // `1/T = 2^(−log₂ T)` on 2^(−32); `(G/T) ln 2 / len`, the energy a place in nats, as the sweeps read it.
-    let inverse = exp2_q32(-(log2_t << 8));
-    let per_place = |g: i128, len: usize| -> i128 { ((g >> 16) * (inverse >> 16) >> 32) * LN2_Q30 >> 30 } ;
-    for k in 0..problems.len() {
-        let (w, t) = (per_place(write_g[k], 1) / lengths[k] as i128, per_place(truth_g[k], 1) / lengths[k] as i128);
-        println!("FIELD_WRITE_ENERGY answer={k} length={} write_nats_a_place_milli={} truth_nats_a_place_milli={} write_less_truth_milli={}", lengths[k], milli(w), milli(t), milli(w - t));
-    }
+    closing("descent", &answers, realization)?;
     println!("FIELD_WRITE_DONE ms={}", started.elapsed().as_millis());
     Ok(())
 }

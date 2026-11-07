@@ -1859,6 +1859,15 @@ impl Field {
     /// nats on `2^(−32)`. `observe` is shown each position and the moves so far.
     #[allow(clippy::too_many_arguments)]
     pub fn energy_sweep(&self, problems: &[(&[usize], usize)], answers: &mut [Vec<usize>], void: usize, cool: u32, seed: u64, realization: &mut dyn FieldRealization, observe: &mut dyn FnMut(usize, usize)) -> Result<(usize, usize, Vec<i128>)> {
+        self.energy_sweep_at(problems, answers, None, void, cool, seed, realization, observe)
+    }
+
+    /// [`Field::energy_sweep`] over the answer places `positions[k]` of each answer `k` (answer-relative, in their order;
+    /// every place where `None`), the positions of all answers walked together (the unified-theory reading of November 7,
+    /// 09:36: a persistent write moves the kernel's places, one residue class a problem). The energy a place is the mean
+    /// over the positions walked.
+    #[allow(clippy::too_many_arguments)]
+    pub fn energy_sweep_at(&self, problems: &[(&[usize], usize)], answers: &mut [Vec<usize>], positions: Option<&[Vec<usize>]>, void: usize, cool: u32, seed: u64, realization: &mut dyn FieldRealization, observe: &mut dyn FnMut(usize, usize)) -> Result<(usize, usize, Vec<i128>)> {
         let alphabet = self.declaration.alphabet;
         if !self.declaration.energy || problems.len() != answers.len() || void >= alphabet || answers.iter().zip(problems).any(|(a, &(_, room))| a.is_empty() || a.len() > room) {
             return refuse("a kernel sweep needs an energy field and each answer within its room");
@@ -1876,8 +1885,20 @@ impl Field {
         };
         let n = problems.len();
         let longest = answers.iter().map(Vec::len).max().unwrap_or(0);
+        // The walk: each step's place for each answer (`None` where an answer has no place at that step).
+        let steps: Vec<Vec<Option<usize>>> = match positions {
+            None => (0..longest).map(|j| (0..n).map(|k| (j < answers[k].len()).then_some(j)).collect()).collect(),
+            Some(pos) => {
+                if pos.len() != n || pos.iter().zip(answers.iter()).any(|(p, a)| p.iter().any(|&j| j >= a.len())) {
+                    return refuse("a sweep's places outside their answers");
+                }
+                let most = pos.iter().map(Vec::len).max().unwrap_or(0);
+                (0..most).map(|i| (0..n).map(|k| pos[k].get(i).copied()).collect()).collect()
+            }
+        };
         let (mut moved, mut proposed) = (0usize, 0usize);
         let mut energy = vec![0i128; n];
+        let mut walked = vec![0i128; n];
         // An answer's region, every answer place open and carrying its letter whole.
         let region_of = |k: usize, answer: &[usize]| -> (Vec<usize>, Vec<bool>, Vec<Option<Shares>>) {
             let (q, room) = problems[k];
@@ -1896,12 +1917,13 @@ impl Field {
         let (mut faces_now, mut g_now) = read(&states, realization)?;
         let off_void = |face: &TowerFace, c: usize| -> (u128, u128) { (face.masses[c], face.total - face.masses[void]) };
         let lg = |x: u128| -> i128 { super::super::log2_reading_at(x, ENERGY_BITS) };
-        for j in 0..longest {
-            // Each answer at its `j`-th place draws from its current face off the void; a draw of its present letter moves nothing
-            // and needs no read.
-            let mut asked: Vec<(usize, usize)> = Vec::new();
-            for k in (0..n).filter(|&k| j < answers[k].len()) {
+        for (step, at_step) in steps.iter().enumerate() {
+            // Each answer at its place of this step draws from its current face off the void; a draw of its present letter
+            // moves nothing and needs no read.
+            let mut asked: Vec<(usize, usize, usize)> = Vec::new();
+            for (k, j) in at_step.iter().enumerate().filter_map(|(k, j)| j.map(|j| (k, j))) {
                 energy[k] += release(g_now[k].checked_mul(inverse).ok_or(TowerError::Refused("a sweep's energy past its carrier"))?, MATERIAL_BITS);
+                walked[k] += 1;
                 let t = problems[k].0.len() + j;
                 let face = faces_now[k][t].as_ref().ok_or(TowerError::Refused("a sweep's place with no face"))?;
                 let letters = face.total - face.masses[void];
@@ -1915,21 +1937,20 @@ impl Field {
                     acc > u
                 }).unwrap_or(answers[k][j]);
                 if pick != answers[k][j] {
-                    asked.push((k, pick));
+                    asked.push((k, j, pick));
                 }
             }
             if !asked.is_empty() {
                 let next: Vec<_> = asked
                     .iter()
-                    .map(|&(k, pick)| {
+                    .map(|&(k, j, pick)| {
                         let mut a = answers[k].clone();
                         a[j] = pick;
                         region_of(k, &a)
                     })
                     .collect();
                 let (faces_next, g_next) = read(&next, realization)?;
-                for (i, (&(k, b), (fnext, gnext))) in asked.iter().zip(faces_next.into_iter().zip(g_next)).enumerate() {
-                    let _ = i;
+                for (&(k, j, b), (fnext, gnext)) in asked.iter().zip(faces_next.into_iter().zip(g_next)) {
                     proposed += 1;
                     let t = problems[k].0.len() + j;
                     let a = answers[k][j];
@@ -1949,14 +1970,15 @@ impl Field {
                     }
                 }
             }
-            observe(j, moved);
+            observe(step, moved);
         }
         let per: Vec<i128> = energy
             .iter()
             .zip(answers.iter())
-            .map(|(&e, a)| {
+            .zip(&walked)
+            .map(|((&e, a), &w)| {
                 let len = a.len() as i128;
-                release((e / len / len).checked_mul(crate::hnn::keyed_modes::ln2_face()).unwrap_or(i128::MAX), 30)
+                release((e / w.max(1) / len).checked_mul(crate::hnn::keyed_modes::ln2_face()).unwrap_or(i128::MAX), 30)
             })
             .collect();
         Ok((moved, proposed, per))

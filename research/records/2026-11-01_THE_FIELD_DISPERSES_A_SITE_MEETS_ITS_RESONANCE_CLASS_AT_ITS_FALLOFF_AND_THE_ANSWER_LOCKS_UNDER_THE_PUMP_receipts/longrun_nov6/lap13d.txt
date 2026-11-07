@@ -1,0 +1,37 @@
+# lock taken 10:16:03, binary 025bedf368ae5774
+FIELD_STOPPED lap=0 sections=23/1543 states=368 ms=240128
+MEASURE lap=dev rc=0 wall_s=240.7 peak_rss_kib=600028
+FIELD_PERSISTENT lap=0 n=0 writes=16 closing_milli=181 write_energy_milli=-3067 eta_milli=1089 moved=367 proposed=422 accept_milli=869 deposited=true predicted_micro=-5467455 transfer_micro=- log2_t=162185366 sweep_ms=200999 deposit_ms=126 ms=208801
+FIELD_PERSISTENT lap=0 n=1 writes=16 closing_milli=67 write_energy_milli=-2759 eta_milli=996 moved=521 proposed=599 accept_milli=869 deposited=true predicted_micro=-8100616 transfer_micro=-4952528 log2_t=162185283 sweep_ms=3066 deposit_ms=169 ms=212036
+FIELD_PERSISTENT lap=0 n=2 writes=16 closing_milli=-1 write_energy_milli=-3340 eta_milli=2327 moved=197 proposed=256 accept_milli=769 deposited=true predicted_micro=-6082764 transfer_micro=-4171322 log2_t=162185194 sweep_ms=725 deposit_ms=79 ms=212841
+FIELD_PERSISTENT lap=0 n=19 writes=16 closing_milli=269 write_energy_milli=-2892 eta_milli=614 moved=405 proposed=523 accept_milli=774 deposited=true predicted_micro=-2261203 transfer_micro=-1892374 log2_t=162184810 sweep_ms=2346 deposit_ms=147 ms=238262
+# projection 2194566 ms, deadline 2773207 ms
+FIELD_ENUMERATED_READ lap=-1 ms=7684
+FIELD_STOPPED lap=0 sections=781/1543 states=12496 ms=2801096
+FIELD_CARD reads=32221 read_ms=2638580 returns=781 return_ms=113772 pairs=477555063638 batches=34567 peak_store=8367974032 landmarks=0 landmark_ms=0 elapsed_ms=2801168
+MEASURE lap=lap rc=0 wall_s=2801.7 peak_rss_kib=601768
+FIELD_PERSISTENT lap=0 n=0 writes=16 closing_milli=181 write_energy_milli=-3067 eta_milli=1089 moved=367 proposed=422 accept_milli=869 deposited=true predicted_micro=-5467455 transfer_micro=- log2_t=162185366 sweep_ms=206438 deposit_ms=128 ms=214251
+FIELD_PERSISTENT lap=0 n=50 writes=16 closing_milli=332 write_energy_milli=-2688 eta_milli=453 moved=560 proposed=710 accept_milli=788 deposited=true predicted_micro=-1318372 transfer_micro=-1095087 log2_t=162184777 sweep_ms=4243 deposit_ms=203 ms=362727
+FIELD_PERSISTENT lap=0 n=100 writes=16 closing_milli=330 write_energy_milli=-3252 eta_milli=4093 moved=338 proposed=454 accept_milli=744 deposited=true predicted_micro=-1479028 transfer_micro=-1047857 log2_t=162184777 sweep_ms=2025 deposit_ms=138 ms=543346
+FIELD_PERSISTENT lap=0 n=150 writes=16 closing_milli=234 write_energy_milli=-2848 eta_milli=1203 moved=501 proposed=620 accept_milli=808 deposited=true predicted_micro=-852259 transfer_micro=-427387 log2_t=162184777 sweep_ms=3101 deposit_ms=173 ms=713750
+FIELD_PERSISTENT lap=0 n=200 writes=16 closing_milli=300 write_energy_milli=-3204 eta_milli=481 moved=472 proposed=601 accept_milli=785 deposited=true predicted_micro=-899426 transfer_micro=-726234 log2_t=162184777 sweep_ms=3316 deposit_ms=177 ms=848831
+FIELD_PERSISTENT lap=0 n=250 writes=16 closing_milli=237 write_energy_milli=-3049 eta_milli=552 moved=458 proposed=547 accept_milli=837 deposited=true predicted_micro=-338181 transfer_micro=-280478 log2_t=162184777 sweep_ms=2605 deposit_ms=147 ms=1113440
+FIELD_PERSISTENT lap=0 n=300 writes=16 closing_milli=108 write_energy_milli=-3528 eta_milli=1485 moved=200 proposed=240 accept_milli=833 deposited=true predicted_micro=-186000 transfer_micro=16592 log2_t=162184777 sweep_ms=630 deposit_ms=77 ms=1299265
+FIELD_PERSISTENT lap=0 n=350 writes=16 closing_milli=164 write_energy_milli=-3788 eta_milli=1556 moved=219 proposed=266 accept_milli=823 deposited=true predicted_micro=-286997 transfer_micro=-222781 log2_t=162184777 sweep_ms=802 deposit_ms=85 ms=1487831
+FIELD_PERSISTENT lap=0 n=400 writes=16 closing_milli=147 write_energy_milli=-3468 eta_milli=255 moved=366 proposed=457 accept_milli=800 deposited=true predicted_micro=-221917 transfer_micro=-204556 log2_t=162184777 sweep_ms=1893 deposit_ms=135 ms=1678079
+FIELD_PERSISTENT lap=0 n=450 writes=16 closing_milli=319 write_energy_milli=-3567 eta_milli=2153 moved=293 proposed=357 accept_milli=820 deposited=true predicted_micro=-285092 transfer_micro=-168571 log2_t=162184777 sweep_ms=1245 deposit_ms=107 ms=1774084
+FIELD_PERSISTENT lap=0 n=500 writes=16 closing_milli=371 write_energy_milli=-3442 eta_milli=1756 moved=267 proposed=347 accept_milli=769 deposited=true predicted_micro=-248012 transfer_micro=-120192 log2_t=162184777 sweep_ms=1146 deposit_ms=101 ms=1946082
+FIELD_PERSISTENT lap=0 n=550 writes=16 closing_milli=242 write_energy_milli=-3367 eta_milli=3068 moved=381 proposed=473 accept_milli=805 deposited=true predicted_micro=-424326 transfer_micro=-39076 log2_t=162184777 sweep_ms=2101 deposit_ms=137 ms=2027764
+FIELD_PERSISTENT lap=0 n=600 writes=16 closing_milli=351 write_energy_milli=-3280 eta_milli=679 moved=807 proposed=1012 accept_milli=797 deposited=true predicted_micro=-1274667 transfer_micro=-518618 log2_t=162184777 sweep_ms=9033 deposit_ms=379 ms=2178181
+FIELD_PERSISTENT lap=0 n=650 writes=16 closing_milli=274 write_energy_milli=-3048 eta_milli=186 moved=517 proposed=626 accept_milli=825 deposited=true predicted_micro=-35448 transfer_micro=-26245 log2_t=162184777 sweep_ms=3257 deposit_ms=174 ms=2296664
+FIELD_PERSISTENT lap=0 n=700 writes=16 closing_milli=114 write_energy_milli=-4761 eta_milli=272 moved=95 proposed=125 accept_milli=760 deposited=true predicted_micro=-58490 transfer_micro=-18286 log2_t=162184777 sweep_ms=274 deposit_ms=54 ms=2487428
+FIELD_PERSISTENT lap=0 n=750 writes=16 closing_milli=353 write_energy_milli=-3269 eta_milli=700 moved=439 proposed=542 accept_milli=809 deposited=true predicted_micro=-146597 transfer_micro=79661 log2_t=162184777 sweep_ms=2488 deposit_ms=150 ms=2609003
+# codes in nats a byte (each codec letter is one byte); the KL in nats
+lap	places	enumerated_code	face_code	kl_mean	kl_q25	kl_median	kl_q75	kl<=0.3	face_zero_letters
+-1	64	2.7697	3.6063	1.0764	0.2627	0.5000	1.1735	14/64 under 0.3 bits	0
+Traceback (most recent call last):
+  File "$ROOT/.local/wt/qgchgu-sampler/.local/run/2026-11-07-lap13d/singular.py", line 40, in <module>
+    print(f"places {len(out)} open-face KL total {total:.3f} nats (mean {total / len(out):.3f}); the top tenth ({len(top)}) carries {sum(x[0] for x in top) / total:.1%}")
+                                                                         ~~~~~~^~~~~~~~~~
+ZeroDivisionError: division by zero
+STATE b6976799a0fb4c57ed9f9e7bd22d09bdd778e87280d79393b43198956697982f

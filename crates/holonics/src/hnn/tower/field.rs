@@ -5455,6 +5455,111 @@ impl FieldLearner {
         Ok((true, predicted, transfer, external))
     }
 
+    /// [definition; the unified-theory reading of November 7, 10:12] **The contrast with persistent writes, its length from the
+    /// writes' own fluctuation.** The section's covector `g = (1/T) Σ_j [∂G/∂θ(truth_j) − ∂G/∂θ(write_j)]` enters the moments, and
+    /// the direction `d` is the moments' step with each family's length held (its `ρ_f`, unmoved). Along `d` each pair's
+    /// first-order change `p_j = D_j · d` (bits) gives Newton's length `η = −2 Σ p_j / (n ln 2 Var_j p_j)`: the contrast's slope
+    /// over the partition's curvature, the curvature read as half the variance across the pairs of `d·[∂G(write) − ∂G(truth)]`
+    /// (away from the rest it errs the length short). The section steps `d` times an eleventh of the harmonic mean of the last
+    /// eleven positive `η` (`etas`, on `2^(−32)`). The transfer (the step before priced on this section) is read, never acted
+    /// on. `T` is held. Returns the receipt and this section's `η` (on `2^(−32)`, zero where it is not positive).
+    pub fn section_contrast_scaled(&mut self, truth: &[Region], writes: &[Region], etas: &mut std::collections::VecDeque<i128>, realization: &mut dyn FieldRealization) -> Result<(ContrastReceipt, i128)> {
+        let f = &self.field;
+        if !f.declaration.energy || f.scale.is_some() {
+            return refuse("a contrast section of a field without one energy");
+        }
+        if truth.len() < 2 || truth.len() != writes.len() {
+            return refuse("a scaled contrast section needs two pairs or more, one write a truth");
+        }
+        let inverse = temperature_of(-f.theta[f.layout.face_temper], &f.fine)?;
+        let both: Vec<Region> = truth.iter().chain(writes).copied().collect();
+        let reads = realization.read_energy_material(f, &both)?;
+        let n = truth.len();
+        let material = f.material_len();
+        let families = f.families_all();
+        const OVER: &str = "a scaled contrast past its 128-bit carrier";
+        let mut pairs: Vec<Vec<i128>> = Vec::with_capacity(n);
+        let mut gap = 0i128;
+        let mut same = 0usize;
+        for s in 0..n {
+            let ((gt, et), (gw, ew)) = (&reads[s], &reads[n + s]);
+            if gt.len() != material || gw.len() != material {
+                return refuse("a material covector of another length than the field's material");
+            }
+            gap += et - ew;
+            same += usize::from(truth[s].classes == writes[s].classes);
+            let mut d = vec![0i128; material];
+            for &(start, len, grain) in &families {
+                for i in start..start + len {
+                    let scaled = release((gt[i] - gw[i]).checked_mul(inverse).ok_or(TowerError::Refused(OVER))?, MATERIAL_BITS);
+                    d[i] = if grain == MATERIAL_BITS { scaled } else { release(scaled, 40 - super::COVECTOR_BITS) };
+                }
+            }
+            pairs.push(d);
+        }
+        let gap = release(gap.checked_mul(inverse).ok_or(TowerError::Refused(OVER))?, MATERIAL_BITS);
+        let mut g = vec![0i128; material];
+        for d in &pairs {
+            for (v, &x) in g.iter_mut().zip(d) {
+                *v += x;
+            }
+        }
+        let raw = g.clone();
+        let transfer = self.last.take().and_then(|s| predicted_change(&self.field, &raw, &s.step, s.halvings));
+        self.moments_take(&mut g)?;
+        // The direction: the moments' step at each family's held length.
+        let mut direction = vec![0i128; material];
+        let rates = self.family_rates.clone();
+        for (k, &(start, len, grain)) in families.iter().enumerate() {
+            let rho = rates.as_ref().map_or((self.rate_bits as i128) << MATERIAL_BITS, |r| r[k]);
+            let (whole, part) = (rho >> MATERIAL_BITS, (rho & ((1 << MATERIAL_BITS) - 1)) as i32);
+            let scale = temperature_of(-part, &self.field.fine)?;
+            for i in start..start + len {
+                let root = super::deposit_root(self.second[i]);
+                let num = self.first[i].checked_mul(1i128 << grain).ok_or(TowerError::Refused(OVER))?;
+                let whole_step = if whole >= 0 {
+                    (num >> whole.min(127)) / root
+                } else {
+                    num.checked_mul(1i128.checked_shl(u32::try_from(-whole).map_err(|_| TowerError::Refused(OVER))?).filter(|&b| b > 0).ok_or(TowerError::Refused(OVER))?).ok_or(TowerError::Refused(OVER))? / root
+                };
+                direction[i] = release(whole_step.checked_mul(scale).ok_or(TowerError::Refused(OVER))?, MATERIAL_BITS);
+            }
+        }
+        // Each pair's first-order change along the direction, on 2^(−20) bits, and Newton's length.
+        let p: Vec<i128> = pairs.iter().map(|d| predicted_change(&self.field, d, &direction, 0).map(i128::from).ok_or(TowerError::Refused(OVER))).collect::<Result<_>>()?;
+        let sum: i128 = p.iter().sum();
+        let nn = n as i128;
+        let var = (nn * p.iter().map(|&x| x * x).sum::<i128>() - sum * sum) / (nn * (nn - 1));
+        // η = −2 Σp / (n ln 2 Var p): Σp on 2^(−20), Var on 2^(−40); η on 2^(−32).
+        let eta = if var > 0 && sum < 0 {
+            let num = (-2 * sum).checked_mul(1i128 << (20 + 32 + LN2_FACE_BITS)).ok_or(TowerError::Refused(OVER))?;
+            num / (nn * crate::hnn::keyed_modes::ln2_face() * var)
+        } else {
+            0
+        };
+        if eta > 0 {
+            etas.push_back(eta);
+            while etas.len() > 11 {
+                etas.pop_front();
+            }
+        }
+        // An eleventh of the harmonic mean of the last eleven positive lengths.
+        let length = if etas.is_empty() {
+            0
+        } else {
+            let inverse_sum: i128 = etas.iter().map(|&e| (1i128 << 64) / e.max(1)).sum();
+            ((etas.len() as i128) << 64) / inverse_sum.max(1) / 11
+        };
+        let step: Vec<i128> = direction.iter().map(|&dv| release(dv.checked_mul(length).unwrap_or(0), 32)).collect();
+        let predicted = predicted_change(&self.field, &raw, &step, 0);
+        let (candidate, moved) = stepped(&self.field, &step, 0)?;
+        if moved {
+            self.field = candidate;
+            self.last = Some(HeldStep { step, halvings: 0 });
+        }
+        Ok((ContrastReceipt { states: n, same, gap, deposited: moved, predicted, transfer, external: None }, eta))
+    }
+
     /// [definition; the unified-theory reading of November 7, 04:05, route (b)] **An energy field's section meets its own
     /// release.** The open places' code under one energy is
     /// `l = −log₂ P(e_O = truth_O | rest) = G(truth)/T + log₂ Σ_e 2^(−G(e)/T)`, with `G(e) = Φ(x^K(e); e)` each configuration
@@ -5501,6 +5606,12 @@ impl FieldLearner {
             }
         }
         let gap = release(gap.checked_mul(inverse).ok_or(TowerError::Refused(OVER))?, MATERIAL_BITS);
+        // [the unified-theory reading of November 7, 09:36] The letters' temperature in the deposit, as the kernel's:
+        // `∂l/∂τ = −ln 2 Σ_s (G_s − G′_s)/T`, here the gap itself.
+        if self.temper_learns {
+            let nats = release(gap.checked_mul(crate::hnn::keyed_modes::ln2_face()).ok_or(TowerError::Refused(OVER))?, LN2_FACE_BITS);
+            g[f.layout.face_temper] = -(nats << (40 - ENERGY_BITS));
+        }
         let (deposited, predicted, transfer, external) = self.deposit(g)?;
         Ok(ContrastReceipt { states: n, same, gap, deposited, predicted, transfer, external })
     }

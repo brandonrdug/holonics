@@ -1,0 +1,23 @@
+# lock taken 09:55:56, binary e09b20b6f76a4730
+FIELD_STOPPED lap=0 sections=1/1543 states=16 ms=61609
+MEASURE lap=dev rc=0 wall_s=62.2 peak_rss_kib=599084
+FIELD_PERSISTENT lap=0 n=0 writes=16 closing_milli=241 write_energy_milli=-3000 moved=374 proposed=424 accept_milli=882 deposited=true predicted_micro=-54806268 transfer_micro=- log2_t=162184465 sweep_ms=53699 deposit_ms=129 ms=61592
+# projection 83056604 ms, deadline 103850755 ms
+FIELD_ENUMERATED_READ lap=-1 ms=7842
+FIELD_CARD reads=2027 read_ms=191288 returns=55 return_ms=7506 pairs=32739224493 batches=2322 peak_store=8372138128 landmarks=0 landmark_ms=0 elapsed_ms=219243
+MEASURE lap=lap rc=1 wall_s=219.7 peak_rss_kib=601344
+FIELD_PERSISTENT lap=0 n=0 writes=16 closing_milli=241 write_energy_milli=-3000 moved=374 proposed=424 accept_milli=882 deposited=true predicted_micro=-54806268 transfer_micro=- log2_t=162184465 sweep_ms=53151 deposit_ms=127 ms=61121
+FIELD_PERSISTENT lap=0 n=50 writes=16 closing_milli=-7017 write_energy_milli=-44516 moved=714 proposed=718 accept_milli=994 deposited=true predicted_micro=-6026746609 transfer_micro=-3462232603 log2_t=162178802 sweep_ms=4622 deposit_ms=230 ms=202632
+# codes in nats a byte (each codec letter is one byte); the KL in nats
+lap	places	enumerated_code	face_code	kl_mean	kl_q25	kl_median	kl_q75	kl<=0.3	face_zero_letters
+-1	64	2.7697	3.6063	1.0764	0.2627	0.5000	1.1735	14/64 under 0.3 bits	0
+Traceback (most recent call last):
+  File "$ROOT/.local/wt/qgchgu-sampler/.local/run/2026-11-07-lap13c/singular.py", line 40, in <module>
+    print(f"places {len(out)} open-face KL total {total:.3f} nats (mean {total / len(out):.3f}); the top tenth ({len(top)}) carries {sum(x[0] for x in top) / total:.1%}")
+                                                                         ~~~~~~^~~~~~~~~~
+ZeroDivisionError: division by zero
+sha256sum: $ROOT/.local/wt/qgchgu-sampler/.local/run/2026-11-07-lap13c/lap/STATE.stopped: No such file or directory
+STATE 
+sha256sum: $ROOT/.local/wt/qgchgu-sampler/.local/run/2026-11-07-lap13c/lap/STATE.stopped: No such file or directory
+write rc 1
+MAIN exit 10:00:38

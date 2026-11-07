@@ -1,0 +1,8 @@
+# lock taken 09:49:05, binary 5137096659d09170
+FIELD_STOPPED lap=0 sections=28/1543 states=448 ms=63688
+MEASURE lap=dev rc=0 wall_s=64.2 peak_rss_kib=460208
+FIELD_PERSISTENT lap=0 n=0 writes=16 closing_milli=182 moved=359 proposed=424 accept_milli=846 deposited=true predicted_micro=-48618700 transfer_micro=- log2_t=162184465 sweep_ms=7638 deposit_ms=127 ms=15523
+FIELD_PERSISTENT lap=0 n=1 writes=16 closing_milli=102 moved=471 proposed=603 accept_milli=781 deposited=true predicted_micro=-59632498 transfer_micro=-31184467 log2_t=162183588 sweep_ms=3131 deposit_ms=176 ms=18831
+FIELD_PERSISTENT lap=0 n=2 writes=16 closing_milli=142 moved=180 proposed=250 accept_milli=720 deposited=true predicted_micro=-19241233 transfer_micro=-12761932 log2_t=162182846 sweep_ms=736 deposit_ms=80 ms=19648
+FIELD_PERSISTENT lap=0 n=19 writes=16 closing_milli=-100 moved=370 proposed=512 accept_milli=722 deposited=true predicted_micro=-43056955 transfer_micro=-4635340 log2_t=162179036 sweep_ms=2394 deposit_ms=157 ms=44179
+# projection 3079552 ms, deadline 3879440 ms
