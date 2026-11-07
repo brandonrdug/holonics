@@ -1847,6 +1847,121 @@ impl Field {
             .collect())
     }
 
+    /// [definition; the unified-theory readings of November 7, 09:02 and 09:09] **One sweep of the energy's own kernel over
+    /// answers**: every answer place carries its present letter whole in every read (as [`Field::energy_release`]'s reads
+    /// carry their mixtures), so one read gives `G` and every place's face. Each answer place in turn (the `j`-th place of
+    /// every answer, the answers sharing the read) draws `a′` from its face at the current state, off the void; the read at
+    /// the proposal gives `G′` and `face′`, and the place moves when its keyed coin falls under
+    /// `A = 2^((G − G′)/T) q′(a)/q(a′)`, `q` the face off the void, at the temperature `2^(log₂ T − cool)` (`cool` halvings of
+    /// the field's own). A taken move's proposal read is the next position's current read, so a position costs one read.
+    /// The questions' places never move; each answer keeps its length, its near tail resolved at the void. Returns the places
+    /// moved, the places proposed, and each answer's energy a place, the mean of its positions' `G/T` over its length, in
+    /// nats on `2^(−32)`. `observe` is shown each position and the moves so far.
+    #[allow(clippy::too_many_arguments)]
+    pub fn energy_sweep(&self, problems: &[(&[usize], usize)], answers: &mut [Vec<usize>], void: usize, cool: u32, seed: u64, realization: &mut dyn FieldRealization, observe: &mut dyn FnMut(usize, usize)) -> Result<(usize, usize, Vec<i128>)> {
+        let alphabet = self.declaration.alphabet;
+        if !self.declaration.energy || problems.len() != answers.len() || void >= alphabet || answers.iter().zip(problems).any(|(a, &(_, room))| a.is_empty() || a.len() > room) {
+            return refuse("a kernel sweep needs an energy field and each answer within its room");
+        }
+        let mut field = self.clone();
+        let at = field.layout.face_temper;
+        field.theta[at] = fit32(field.theta[at] as i128 - ((cool as i128) << MATERIAL_BITS), "a cooled temperature past its carrier")?;
+        let inverse = temperature_of(-field.theta[at], &field.fine)?;
+        let one = 1u32 << STATE_BITS;
+        let mix = |counter: u64| -> u64 {
+            let mut z = seed.wrapping_add(counter.wrapping_mul(0x9E37_79B9_7F4A_7C15));
+            z = (z ^ (z >> 30)).wrapping_mul(0xBF58_476D_1CE4_E5B9);
+            z = (z ^ (z >> 27)).wrapping_mul(0x94D0_49BB_1331_11EB);
+            z ^ (z >> 31)
+        };
+        let n = problems.len();
+        let longest = answers.iter().map(Vec::len).max().unwrap_or(0);
+        let (mut moved, mut proposed) = (0usize, 0usize);
+        let mut energy = vec![0i128; n];
+        // An answer's region, every answer place open and carrying its letter whole.
+        let region_of = |k: usize, answer: &[usize]| -> (Vec<usize>, Vec<bool>, Vec<Option<Shares>>) {
+            let (q, room) = problems[k];
+            let len = q.len() + answer.len() + NEAR.min(room - answer.len());
+            let classes: Vec<usize> = (0..len).map(|t| if t < q.len() { q[t] } else if t < q.len() + answer.len() { answer[t - q.len()] } else { void }).collect();
+            let open: Vec<bool> = (0..len).map(|t| t >= q.len() && t < q.len() + answer.len()).collect();
+            let faces: Vec<Option<Shares>> = (0..len).map(|t| open[t].then(|| vec![(classes[t] as u32, one)])).collect();
+            (classes, open, faces)
+        };
+        let read = |states: &[(Vec<usize>, Vec<bool>, Vec<Option<Shares>>)], realization: &mut dyn FieldRealization| -> Result<(Vec<Vec<Option<TowerFace>>>, Vec<i128>)> {
+            let views: Vec<Region> = states.iter().map(|(c, o, f)| Region { classes: c, unresolved: o, faces: f, locked: o, echo: &[], domain: None, port: None }).collect();
+            realization.read_energy_faces(&field, &views)
+        };
+        // The current read of every answer.
+        let states: Vec<_> = (0..n).map(|k| region_of(k, &answers[k])).collect();
+        let (mut faces_now, mut g_now) = read(&states, realization)?;
+        let off_void = |face: &TowerFace, c: usize| -> (u128, u128) { (face.masses[c], face.total - face.masses[void]) };
+        let lg = |x: u128| -> i128 { super::super::log2_reading_at(x, ENERGY_BITS) };
+        for j in 0..longest {
+            // Each answer at its `j`-th place draws from its current face off the void; a draw of its present letter moves nothing
+            // and needs no read.
+            let mut asked: Vec<(usize, usize)> = Vec::new();
+            for k in (0..n).filter(|&k| j < answers[k].len()) {
+                energy[k] += release(g_now[k].checked_mul(inverse).ok_or(TowerError::Refused("a sweep's energy past its carrier"))?, MATERIAL_BITS);
+                let t = problems[k].0.len() + j;
+                let face = faces_now[k][t].as_ref().ok_or(TowerError::Refused("a sweep's place with no face"))?;
+                let letters = face.total - face.masses[void];
+                if letters == 0 {
+                    continue;
+                }
+                let u = ((mix(((k as u64) << 40) | (j as u64) << 8 | 1) as u128) << 64 | mix(((k as u64) << 40) | (j as u64) << 8 | 2) as u128) % letters;
+                let mut acc = 0u128;
+                let pick = (0..alphabet).filter(|&c| c != void).find(|&c| {
+                    acc += face.masses[c];
+                    acc > u
+                }).unwrap_or(answers[k][j]);
+                if pick != answers[k][j] {
+                    asked.push((k, pick));
+                }
+            }
+            if !asked.is_empty() {
+                let next: Vec<_> = asked
+                    .iter()
+                    .map(|&(k, pick)| {
+                        let mut a = answers[k].clone();
+                        a[j] = pick;
+                        region_of(k, &a)
+                    })
+                    .collect();
+                let (faces_next, g_next) = read(&next, realization)?;
+                for (i, (&(k, b), (fnext, gnext))) in asked.iter().zip(faces_next.into_iter().zip(g_next)).enumerate() {
+                    let _ = i;
+                    proposed += 1;
+                    let t = problems[k].0.len() + j;
+                    let a = answers[k][j];
+                    let (face, face2) = (faces_now[k][t].as_ref().ok_or(TowerError::Refused("a sweep's place with no face"))?, fnext[t].as_ref().ok_or(TowerError::Refused("a sweep's place with no face at its proposal"))?);
+                    let (qa_m, qa_t) = off_void(face2, a);
+                    let (qb_m, qb_t) = off_void(face, b);
+                    if qa_m == 0 || qb_m == 0 || qa_t == 0 || qb_t == 0 {
+                        continue;
+                    }
+                    let log_a = release((g_now[k] - gnext).checked_mul(inverse).ok_or(TowerError::Refused("a sweep's energy past its carrier"))?, MATERIAL_BITS) + (lg(qa_m) - lg(qa_t)) - (lg(qb_m) - lg(qb_t));
+                    let u = (mix(((k as u64) << 40) | (j as u64) << 8 | 3) >> 1).max(1) as u128;
+                    if lg(u) - (63i128 << ENERGY_BITS) < log_a {
+                        answers[k][j] = b;
+                        faces_now[k] = fnext;
+                        g_now[k] = gnext;
+                        moved += 1;
+                    }
+                }
+            }
+            observe(j, moved);
+        }
+        let per: Vec<i128> = energy
+            .iter()
+            .zip(answers.iter())
+            .map(|(&e, a)| {
+                let len = a.len() as i128;
+                release((e / len / len).checked_mul(crate::hnn::keyed_modes::ln2_face()).unwrap_or(i128::MAX), 30)
+            })
+            .collect();
+        Ok((moved, proposed, per))
+    }
+
     /// [measurement; November 7] **A region's faces and its energy at the last state** ([`Field::energy_pass`]): the read the
     /// joint release certifies its step on.
     pub fn energy_faces_read(&self, region: &Region) -> Result<(Vec<Option<TowerFace>>, i128)> {

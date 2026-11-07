@@ -899,6 +899,7 @@ pub(super) fn run_field_realized(args: &[String], realization: &mut dyn holonics
         Some("reach-field") => field_train::reach_field(args, realization),
         Some("curl-field") => field_train::curl_field(args, realization),
         Some("contrast-field") => field_train::contrast_field(args, realization),
+        Some("kernel-write") => field_train::kernel_write(args, realization),
         Some("opening-field") => field_train::opening_field(args, realization),
         Some("stretch-field") => field_train::stretch_field(args, realization),
         Some("length-field") => field_train::length_field(args, realization),

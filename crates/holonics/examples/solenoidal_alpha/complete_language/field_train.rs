@@ -3374,6 +3374,138 @@ fn enumerated_read(field: &Field, held: &Problems, places: usize, truth_of: &dyn
 /// The enumerated read's key space, apart from every other draw of the run.
 const ENUMERATED_KEY: u64 = 0xE7AC_7 << 40;
 
+/// [definition; the unified-theory reading of November 7, 09:02] **`kernel-write STATE STATE_SHA CODEC CODEC_SHA UNITS
+/// UNITS_SHA HELD HELD_SHA COUNT MAX_SWEEPS STOP_MS OUT`**: the energy's own kernel writes the first `COUNT` held answers at
+/// their true lengths beside their questions (the questions' places never move). It starts from the joint release
+/// ([`holonics::hnn::tower::field::Field::energy_release`]), then sweeps
+/// ([`holonics::hnn::tower::field::Field::energy_sweep`]) at the energy's own `T` until the first doubling of sweeps whose
+/// second half's mean energy per place lies within one standard error of its first half's, then descends, halving `T` each
+/// sweep, until a sweep moves nothing. It prints each sweep's acceptance and energy per place, writes the answers' text at
+/// sweeps 1, 2, 4, 8, … and at both stops to `WRITES.txt` (private), and closes with each write's energy per place beside its
+/// true answer's.
+pub(super) fn kernel_write(args: &[String], realization: &mut dyn FieldRealization) -> Result<()> {
+    if args.len() != 13 {
+        return Err("kernel-write STATE STATE_SHA CODEC CODEC_SHA UNITS UNITS_SHA HELD HELD_SHA COUNT MAX_SWEEPS STOP_MS OUT".into());
+    }
+    let started = std::time::Instant::now();
+    let mut learner = FieldLearner::from_text(std::str::from_utf8(&pinned_read(&args[1], &args[2], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
+    declared_clocks(&mut learner.field);
+    let field = &learner.field;
+    if !field.declaration.energy {
+        return Err("kernel-write writes with a field whose faces are one energy's forces".into());
+    }
+    let units = units_of(&args[5], &args[6])?;
+    let codec = FieldCodec::from_text(std::str::from_utf8(&pinned_read(&args[3], &args[4], CODEC_BUDGET)?)?, units)?;
+    let held = problems_of(&pinned_read(&args[7], &args[8], READ_BUDGET as usize)?);
+    let (count, max_sweeps, stop_ms) = (positive(&args[9])?, positive(&args[10])?, positive(&args[11])? as u128);
+    let out = Path::new(&args[12]);
+    std::fs::create_dir(out)?;
+    let void = codec.void();
+    let seed = u64::from_str_radix(args[2].get(..16).ok_or("a state's hash of fewer than sixteen hex digits")?, 16).map_err(|_| "a state's hash that is not hexadecimal")?;
+    let mut prompts: Vec<(Vec<usize>, usize)> = Vec::new();
+    let mut truths: Vec<Vec<usize>> = Vec::new();
+    for (question, answer) in &held {
+        if prompts.len() == count {
+            break;
+        }
+        let (q, room) = opening(&codec, field, question, b"")?;
+        let mut a = codec.encode(answer)?;
+        a.truncate(room);
+        if a.is_empty() {
+            continue;
+        }
+        prompts.push((q, room));
+        truths.push(a);
+    }
+    let problems: Vec<(&[usize], usize)> = prompts.iter().map(|(q, r)| (q.as_slice(), *r)).collect();
+    let lengths: Vec<usize> = truths.iter().map(Vec::len).collect();
+    let mut writes = std::fs::OpenOptions::new().write(true).create_new(true).open(out.join("WRITES.txt"))?;
+    let mut dump = |label: &str, answers: &[Vec<usize>]| -> Result<()> {
+        use std::io::Write;
+        for (k, a) in answers.iter().enumerate() {
+            writeln!(writes, "=== {label} answer {k} ===")?;
+            writes.write_all(&codec.decode(a))?;
+            writeln!(writes)?;
+        }
+        Ok(())
+    };
+    // The true answers' energies (each configuration relaxed at its own halvings), on 2^(−32) bits.
+    let configurations: Vec<Vec<usize>> = problems.iter().zip(&truths).map(|(&(q, room), a)| {
+        let mut c: Vec<usize> = q.iter().chain(a).copied().collect();
+        c.extend(std::iter::repeat_n(void, holonics::hnn::tower::field::NEAR.min(room - a.len())));
+        c
+    }).collect();
+    let asked: Vec<&[usize]> = configurations.iter().map(Vec::as_slice).collect();
+    let truth_g = realization.read_energies(field, &asked).map_err(|e| e.to_string())?;
+    println!("FIELD_WRITE answers={} lengths={:?} log2_t={} ms={}", problems.len(), lengths, field.theta[field.layout().face_temper], started.elapsed().as_millis());
+    // The joint release to start from.
+    let mut answers = field.energy_release(&problems, &lengths, void, 64, seed, realization, &mut |_, _, _| {}).map_err(|e| e.to_string())?;
+    dump("release", &answers)?;
+    println!("FIELD_WRITE_RELEASE ms={}", started.elapsed().as_millis());
+    let mean_of = |v: &[i128]| -> i128 { v.iter().sum::<i128>() / v.len().max(1) as i128 };
+    let milli = |nats_q32: i128| -> i128 { nats_q32 * 1000 >> 32 };
+    let mut energies: Vec<i128> = Vec::new();
+    let mut stop = None;
+    for sweep in 1..=max_sweeps {
+        let t0 = std::time::Instant::now();
+        let (moved, proposed, per) = field.energy_sweep(&problems, &mut answers, void, 0, mix(seed, sweep as u64), realization, &mut |_, _| {}).map_err(|e| e.to_string())?;
+        let e = mean_of(&per);
+        energies.push(e);
+        println!("FIELD_WRITE_SWEEP sweep={sweep} cool=0 moved={moved} proposed={proposed} accept_milli={} energy_milli={} per_answer_milli={:?} sweep_ms={} ms={}", moved * 1000 / proposed.max(1), milli(e), per.iter().map(|&x| milli(x)).collect::<Vec<_>>(), t0.elapsed().as_millis(), started.elapsed().as_millis());
+        if sweep.is_power_of_two() {
+            dump(&format!("sweep {sweep}"), &answers)?;
+            if sweep >= 2 {
+                let (a, b) = energies.split_at(sweep / 2);
+                let (ma, mb) = (mean_of(a), mean_of(b));
+                let var = |v: &[i128], m: i128| -> i128 { if v.len() < 2 { 0 } else { v.iter().map(|&x| ((x - m) >> 16) * ((x - m) >> 16)).sum::<i128>() / (v.len() as i128 - 1) } };
+                let se2 = var(a, ma) / a.len() as i128 + var(b, mb) / b.len() as i128;
+                let se = ((se2.max(0) as u128).isqrt() as i128) << 16;
+                println!("FIELD_WRITE_HALVES sweep={sweep} first_milli={} second_milli={} se_milli={}", milli(ma), milli(mb), milli(se));
+                if (mb - ma).abs() <= se {
+                    stop = Some(sweep);
+                    break;
+                }
+            }
+        }
+        if started.elapsed().as_millis() > stop_ms {
+            println!("FIELD_WRITE_STOPPED sweep={sweep} reason=time ms={}", started.elapsed().as_millis());
+            break;
+        }
+    }
+    dump(&format!("equilibrium at sweep {}", stop.map_or("-".to_string(), |s| s.to_string())), &answers)?;
+    println!("FIELD_WRITE_EQUILIBRIUM sweep={} ms={}", stop.map_or("-".to_string(), |s| s.to_string()), started.elapsed().as_millis());
+    // The descent: T halved each sweep until a sweep moves nothing.
+    let mut cool = 0u32;
+    while started.elapsed().as_millis() <= stop_ms {
+        cool += 1;
+        let t0 = std::time::Instant::now();
+        let (moved, proposed, per) = field.energy_sweep(&problems, &mut answers, void, cool, mix(seed ^ 0xC001, cool as u64), realization, &mut |_, _| {}).map_err(|e| e.to_string())?;
+        println!("FIELD_WRITE_SWEEP descent cool={cool} moved={moved} proposed={proposed} accept_milli={} energy_milli={} sweep_ms={} ms={}", moved * 1000 / proposed.max(1), milli(mean_of(&per)), t0.elapsed().as_millis(), started.elapsed().as_millis());
+        if moved == 0 || cool >= 20 {
+            break;
+        }
+    }
+    dump(&format!("descent end at T/2^{cool}"), &answers)?;
+    // Each write's energy per place beside its true answer's (both at the field's own T), nats.
+    let configurations: Vec<Vec<usize>> = problems.iter().zip(&answers).map(|(&(q, room), a)| {
+        let mut c: Vec<usize> = q.iter().chain(a).copied().collect();
+        c.extend(std::iter::repeat_n(void, holonics::hnn::tower::field::NEAR.min(room - a.len())));
+        c
+    }).collect();
+    let asked: Vec<&[usize]> = configurations.iter().map(Vec::as_slice).collect();
+    let write_g = realization.read_energies(field, &asked).map_err(|e| e.to_string())?;
+    let log2_t = field.theta[field.layout().face_temper] as i128;
+    // `1/T = 2^(−log₂ T)` on 2^(−32); `(G/T) ln 2 / len`, the energy a place in nats, as the sweeps read it.
+    let inverse = exp2_q32(-(log2_t << 8));
+    let per_place = |g: i128, len: usize| -> i128 { ((g >> 16) * (inverse >> 16) >> 32) * LN2_Q30 >> 30 } ;
+    for k in 0..problems.len() {
+        let (w, t) = (per_place(write_g[k], 1) / lengths[k] as i128, per_place(truth_g[k], 1) / lengths[k] as i128);
+        println!("FIELD_WRITE_ENERGY answer={k} length={} write_nats_a_place_milli={} truth_nats_a_place_milli={} write_less_truth_milli={}", lengths[k], milli(w), milli(t), milli(w - t));
+    }
+    println!("FIELD_WRITE_DONE ms={}", started.elapsed().as_millis());
+    Ok(())
+}
+
 /// [measurement; agent-inferred, November 7] **The writer's declared law** (`FIELD_WRITER_*`): the flags of
 /// [`holonics::hnn::tower::field::Field::sample_runs`] a write reads from its environment, one reading for every command that
 /// writes (`length-field`, and `contrast-field`'s releases, which are the writer exactly as it writes).
