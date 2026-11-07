@@ -2793,6 +2793,10 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
     // writes (lap 13's law) instead of a kernel step from the truth.
     let persistent = std::env::var_os("FIELD_CONTRAST_PERSISTENT").is_some();
     let conditional = std::env::var_os("FIELD_CONTRAST_CONDITIONAL").is_some();
+    let beat_top: Option<u32> = match std::env::var("FIELD_CONTRAST_BEAT") {
+        Ok(v) => Some(v.parse().map_err(|_| "FIELD_CONTRAST_BEAT is the top band".to_string())?),
+        Err(_) => None,
+    };
     // `FIELD_CONTRAST_SECTIONS=N`: a declared read of the first lap's next `N` sections (theory, November 7 20:29: "the first 40
     // sections decide"), after which the learner rests as `STATE.stopped`, as at a deadline.
     let read_sections: usize = match std::env::var("FIELD_CONTRAST_SECTIONS") {
@@ -3109,7 +3113,18 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
                 // deposits against its whole conditional (`FieldLearner::section_conditional`), no proposal and no coin; its
                 // pseudo-likelihood code on the trained places is the `FIELD_CONDITIONAL` line.
                 let receipt = if conditional {
-                    let r = learner.section_conditional(&truth_views, &owners, &blocks, realization).map_err(|e| e.to_string())?;
+                    // [definition; the unified-theory reading of November 7, 21:08] `FIELD_CONTRAST_BEAT=TOP`: each place spent on
+                    // its beat `2^k` by what is left of its news (`FieldLearner::section_conditional_beat`), bands held to
+                    // `0..=TOP`; the counts of counts are the `FIELD_BANDS` line.
+                    let r = match beat_top {
+                        Some(top) => {
+                            let ids: Vec<u64> = members.iter().map(|&i| i as u64).collect();
+                            let r = learner.section_conditional_beat(&truth_views, &owners, &blocks, &ids, read, top, realization).map_err(|e| e.to_string())?;
+                            println!("FIELD_BANDS lap={lap} n={n} {}", r.bands.iter().enumerate().map(|(k, &(seen, spent))| format!("k{k}={seen}/{spent}")).collect::<Vec<_>>().join(" "));
+                            r
+                        }
+                        None => learner.section_conditional(&truth_views, &owners, &blocks, realization).map_err(|e| e.to_string())?,
+                    };
                     let nats: i128 = -r.log2_a.iter().map(|&l| l * LN2_Q30 >> 30).sum::<i128>();
                     println!(
                         "FIELD_CONDITIONAL lap={lap} n={n} places={} pl_code_milli={} truth_p_milli={} mode_milli={} ms={}",

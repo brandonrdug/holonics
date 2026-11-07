@@ -4929,6 +4929,9 @@ pub struct KernelReceipt {
     /// [measurement; theory, November 7 19:50] The section's deposit before its length, `g = Σ_s w_s D_s/T` on the families'
     /// natural grains (empty where the Newton step deposits): the operand of the sections' coherence.
     pub covector: Vec<i128>,
+    /// [measurement; theory, November 7 21:08] The places read and spent in each band `k` of a beat-selected conditional
+    /// section ([`FieldLearner::section_conditional_beat`]): the counts of counts of the field's surprise.
+    pub bands: Vec<(usize, usize)>,
 }
 
 /// [measurement; the unified-theory reading of November 7, 05:55] **An evidence-shrunk Newton step's read**
@@ -5902,7 +5905,7 @@ impl FieldLearner {
         let states: Vec<Vec<i128>> = (0..n).map(|s| natural(&reads[owners[s]].0, &reads[problems + s].0)).collect::<Result<_>>()?;
         if self.newton {
             let newton = self.deposit_newton(&states, &weights)?;
-            return Ok(KernelReceipt { states: n, places, moved, weight, weight_square, least, most, whole, deposited: newton.deposited, predicted: newton.predicted, transfer: newton.transfer, external: newton.external, per_state, log2_a, newton: Some(newton), by_family: Vec::new(), rates: Vec::new(), g_agree, g_gap, covector: Vec::new() });
+            return Ok(KernelReceipt { states: n, places, moved, weight, weight_square, least, most, whole, deposited: newton.deposited, predicted: newton.predicted, transfer: newton.transfer, external: newton.external, per_state, log2_a, newton: Some(newton), by_family: Vec::new(), rates: Vec::new(), g_agree, g_gap, covector: Vec::new(), bands: Vec::new() });
         }
         // [the unified-theory reading of November 7, 06:26] The Newton terms read along the moments' direction before this section
         // moves them, beside the moments' own step.
@@ -5951,7 +5954,7 @@ impl FieldLearner {
         };
         let by_family = transfers.into_iter().zip(predictions).collect();
         let rates = self.family_rates.clone().unwrap_or_default();
-        Ok(KernelReceipt { states: n, places, moved, weight, weight_square, least, most, whole, deposited, predicted, transfer, external, per_state, log2_a, newton, by_family, rates, g_agree, g_gap, covector: raw })
+        Ok(KernelReceipt { states: n, places, moved, weight, weight_square, least, most, whole, deposited, predicted, transfer, external, per_state, log2_a, newton, by_family, rates, g_agree, g_gap, covector: raw, bands: Vec::new() })
     }
 
     /// [definition; the unified-theory reading of November 7, 20:29, law (D)] **The deposit against each place's whole
@@ -5966,6 +5969,90 @@ impl FieldLearner {
     /// each place a state: `weight` the truth's conditional probability `p(t)` on `2^(−24)`, `whole` the places whose truth is
     /// the conditional's mode, `log2_a` each `log₂ p(t)` on `2^(−32)`, nothing moved.
     pub fn section_conditional(&mut self, truth: &[Region], owners: &[usize], blocks: &[Vec<usize>], realization: &mut dyn FieldRealization) -> Result<KernelReceipt> {
+        let shifts: Vec<Vec<u32>> = blocks.iter().map(|b| vec![0; b.len()]).collect();
+        self.section_conditional_weighed(truth, owners, blocks, &shifts, realization)
+    }
+
+    /// [definition; the unified-theory reading of November 7, 21:08] **The places chosen by what is left of their news**: the
+    /// deposit at a place is `(1 − p(t))(∂G/∂θ(t) − the other letters' p-mean)`, so what the field already predicts cancels (a
+    /// static flux induces nothing). Each problem's block places are read once at the truth, open and carrying their letters
+    /// whole (one faces read a problem), and each place takes the band `k = ⌊−log₂(1 − q(t))⌋` of its face's truth share
+    /// `q(t)`, held to `0..=top`. A place is spent on its beat, when the lap's count agrees with the place's phase (a key of
+    /// its problem `ids[o]` and position) modulo `2^k`, and its every covector (material, temperature) is weighed by `2^k`,
+    /// so over `2^k` laps it carries its whole weight: the expectation is the full conditional sum and its rest the held code's,
+    /// news not spent now carried, never dropped. A deposit spreads through `θ` and lowers coupled places' surprise before they
+    /// are reached; their next read climbs a band. The receipt's `bands` are the counts of counts.
+    #[allow(clippy::too_many_arguments)]
+    pub fn section_conditional_beat(&mut self, truth: &[Region], owners: &[usize], blocks: &[Vec<usize>], ids: &[u64], lap: u64, top: u32, realization: &mut dyn FieldRealization) -> Result<KernelReceipt> {
+        let f = &self.field;
+        if ids.len() != truth.len() || blocks.len() != owners.len() || owners.iter().any(|&o| o >= truth.len()) {
+            return refuse("a beat section needs one key a problem and an owner a block");
+        }
+        let problems = truth.len();
+        let one = 1u32 << STATE_BITS;
+        let mut union: Vec<Vec<usize>> = vec![Vec::new(); problems];
+        for (b, &o) in blocks.iter().zip(owners) {
+            union[o].extend_from_slice(b);
+        }
+        let opened: Vec<(Vec<bool>, Vec<Option<Shares>>)> = (0..problems)
+            .map(|p| {
+                let sites = truth[p].classes.len();
+                let mut open = vec![false; sites];
+                let mut faces: Vec<Option<Shares>> = vec![None; sites];
+                for &t in &union[p] {
+                    if t < sites {
+                        open[t] = true;
+                        faces[t] = Some(vec![(truth[p].classes[t] as u32, one)]);
+                    }
+                }
+                (open, faces)
+            })
+            .collect();
+        let views: Vec<Region> = (0..problems).map(|p| Region { classes: truth[p].classes, unresolved: &opened[p].0, faces: &opened[p].1, locked: &opened[p].0, echo: &[], domain: None, port: None }).collect();
+        let (faces, _) = realization.read_energy_faces(f, &views)?;
+        let key = |id: u64, t: usize| -> u64 {
+            let mut z = id.wrapping_mul(0x9E37_79B9_7F4A_7C15) ^ (t as u64).wrapping_mul(0xBF58_476D_1CE4_E5B9);
+            z = (z ^ (z >> 30)).wrapping_mul(0xBF58_476D_1CE4_E5B9);
+            z = (z ^ (z >> 27)).wrapping_mul(0x94D0_49BB_1331_11EB);
+            z ^ (z >> 31)
+        };
+        let mut bands = vec![(0usize, 0usize); top as usize + 1];
+        let (mut kept_blocks, mut kept_owners, mut kept_shifts) = (Vec::new(), Vec::new(), Vec::new());
+        for (b, &o) in blocks.iter().zip(owners) {
+            let (mut places, mut shifts) = (Vec::new(), Vec::new());
+            for &t in b {
+                let face = faces[o].get(t).and_then(Option::as_ref).ok_or(TowerError::Refused("a beat place with no face at the truth"))?;
+                let (m, total) = (face.masses[truth[o].classes[t]], face.total.max(1));
+                let rest = total - m.min(total);
+                // The largest `k` with `2^k (1 − q) ≤ 1`, held to `top`.
+                let mut k = 0u32;
+                while k < top && rest << (k + 1) <= total {
+                    k += 1;
+                }
+                bands[k as usize].0 += 1;
+                if lap & ((1u64 << k) - 1) == key(ids[o], t) & ((1u64 << k) - 1) {
+                    bands[k as usize].1 += 1;
+                    places.push(t);
+                    shifts.push(k);
+                }
+            }
+            if !places.is_empty() {
+                kept_blocks.push(places);
+                kept_owners.push(o);
+                kept_shifts.push(shifts);
+            }
+        }
+        if kept_blocks.is_empty() {
+            let rates = self.family_rates.clone().unwrap_or_default();
+            return Ok(KernelReceipt { states: 0, places: 0, moved: 0, weight: 0, weight_square: 0, least: 0, most: 0, whole: 0, deposited: false, predicted: None, transfer: None, external: None, per_state: Vec::new(), log2_a: Vec::new(), newton: None, by_family: Vec::new(), rates, g_agree: (0, 0), g_gap: 0, covector: Vec::new(), bands });
+        }
+        let mut receipt = self.section_conditional_weighed(truth, &kept_owners, &kept_blocks, &kept_shifts, realization)?;
+        receipt.bands = bands;
+        Ok(receipt)
+    }
+
+    /// [`FieldLearner::section_conditional`] with each place's covectors weighed by `2^shifts[b][i]`.
+    fn section_conditional_weighed(&mut self, truth: &[Region], owners: &[usize], blocks: &[Vec<usize>], shifts: &[Vec<u32>], realization: &mut dyn FieldRealization) -> Result<KernelReceipt> {
         let f = &self.field;
         if !f.declaration.energy || f.scale.is_some() {
             return refuse("a conditional section of a field without one energy");
@@ -5994,7 +6081,11 @@ impl FieldLearner {
             }
             Ok(d)
         };
+        if shifts.len() != blocks.len() || shifts.iter().zip(blocks).any(|(s, b)| s.len() != b.len()) {
+            return refuse("a weighed conditional section needs one shift a place");
+        }
         let places: Vec<(usize, usize)> = blocks.iter().zip(owners).flat_map(|(b, &o)| b.iter().map(move |&t| (o, t))).collect();
+        let place_shift: Vec<u32> = shifts.iter().flatten().copied().collect();
         let resolved: Vec<Vec<bool>> = truth.iter().map(|r| vec![false; r.classes.len()]).collect();
         let mut g = vec![0i128; material];
         // `Σ_places Σ_v p(v)(G(t) − G(x_v))` on 2^(−32): the letters' temperature's operand.
@@ -6005,7 +6096,7 @@ impl FieldLearner {
         // [agent-inferred] Sixteen places a read: their `16·alphabet` configurations' covectors stand together (about 0.8 GB at
         // this field), never a section's.
         const CHUNK: usize = 16;
-        for chunk in places.chunks(CHUNK) {
+        for (c, chunk) in places.chunks(CHUNK).enumerate() {
             let configs: Vec<Vec<usize>> = chunk
                 .iter()
                 .flat_map(|&(o, t)| {
@@ -6040,14 +6131,17 @@ impl FieldLearner {
                 let z: i128 = w.iter().sum();
                 let p: Vec<i128> = w.iter().map(|&x| div_nearest(x << MATERIAL_BITS, z.max(1))).collect();
                 let mt = &reads[at].0;
+                // The place's beat weight `2^k` (one where every place is read).
+                let k = place_shift[c * CHUNK + i];
                 for (v, r) in reads.iter().enumerate() {
                     if v == at || p[v] == 0 {
                         continue;
                     }
+                    let pv = p[v] << k;
                     for (acc, &x) in g.iter_mut().zip(&natural(mt, &r.0)?) {
-                        *acc += release(x.checked_mul(p[v]).ok_or(TowerError::Refused(OVER))?, MATERIAL_BITS);
+                        *acc += release(x.checked_mul(pv).ok_or(TowerError::Refused(OVER))?, MATERIAL_BITS);
                     }
-                    gap += release((reads[at].1 - r.1).checked_mul(p[v]).ok_or(TowerError::Refused(OVER))?, MATERIAL_BITS);
+                    gap += release((reads[at].1 - r.1).checked_mul(pv).ok_or(TowerError::Refused(OVER))?, MATERIAL_BITS);
                 }
                 let pt = p[at];
                 (weight, weight_square, least, most) = (weight + pt, weight_square + release(pt * pt, MATERIAL_BITS), least.min(pt), most.max(pt));
@@ -6074,7 +6168,7 @@ impl FieldLearner {
         let by_family = transfers.into_iter().zip(predictions).collect();
         let rates = self.family_rates.clone().unwrap_or_default();
         let n = places.len();
-        Ok(KernelReceipt { states: n, places: n, moved: 0, weight, weight_square, least, most, whole, deposited, predicted, transfer, external, per_state, log2_a: log2_p, newton: None, by_family, rates, g_agree: (0, 0), g_gap: 0, covector: raw })
+        Ok(KernelReceipt { states: n, places: n, moved: 0, weight, weight_square, least, most, whole, deposited, predicted, transfer, external, per_state, log2_a: log2_p, newton: None, by_family, rates, g_agree: (0, 0), g_gap: 0, covector: raw, bands: Vec::new() })
     }
 
     /// [definition; agent-inferred, November 3, the tower record] **The learner grown in scale**: its field grown in scale

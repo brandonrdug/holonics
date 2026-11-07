@@ -2630,3 +2630,59 @@ fn a_problems_blocks_share_one_truth() {
     assert_eq!(one, two);
     assert_eq!(a.field.theta, b.field.theta);
 }
+
+/// [definition; the unified-theory reading of November 7, 20:29, law (D)] **A place's deposit against its whole
+/// conditional**: on the warm line-shaped field, each place's truth share `p(t)` is the enumerated conditional's,
+/// `2^(−G(x_t)/T) / Σ_v 2^(−G(x_v)/T)` from each letter's energy, within the weights' grain; the section deposits.
+#[test]
+fn a_places_conditional_is_the_enumerated_one() {
+    let mut field = energetic_line();
+    field.theta[field.layout.face_temper] = 10 << MATERIAL_BITS;
+    let classes: Vec<usize> = (0..40).map(|t| (t * 7 + t / 3) % 5).collect();
+    let none = vec![false; 40];
+    let truth = [Region { classes: &classes, unresolved: &none, faces: &[], locked: &[], echo: &[], domain: None, port: None }];
+    let mut learner = FieldLearner::new(field.clone(), 14);
+    let before = learner.field.theta.clone();
+    let r = learner.section_conditional(&truth, &[0, 0], &[vec![3usize], vec![25]], &mut HostField).unwrap();
+    assert!(r.states == 2 && r.moved == 0 && r.deposited && learner.field.theta != before, "{r:?}");
+    let inverse = temperature_of(-field.theta[field.layout.face_temper], &field.fine).unwrap();
+    for (&(_, pt), &t) in r.per_state.iter().zip(&[3usize, 25]) {
+        let g: Vec<i128> = (0..field.declaration.alphabet)
+            .map(|v| {
+                let mut c = classes.clone();
+                c[t] = v;
+                field.energy_g(&c).unwrap()
+            })
+            .collect();
+        let lo = *g.iter().min().unwrap();
+        let w: Vec<i128> = g
+            .iter()
+            .map(|&x| {
+                let ell = release((lo - x) * inverse, MATERIAL_BITS) >> (ENERGY_BITS - MATERIAL_BITS);
+                if ell >= 0 { 1 << MATERIAL_BITS } else if ell <= -((MATERIAL_BITS as i128 - 1) << MATERIAL_BITS) { 0 } else { temperature_of(ell as i32, &field.fine).unwrap() }
+            })
+            .collect();
+        let want = div_nearest(w[classes[t]] << MATERIAL_BITS, w.iter().sum());
+        assert_eq!(pt, want, "place {t}: the conditional's truth share from the material reads against the energies'");
+    }
+}
+
+/// [definition; the unified-theory reading of November 7, 21:08] **Every place on its beat, band zero**: with the bands held
+/// to zero every place is spent at weight one, so the beat section is the full conditional section bit for bit, and its counts
+/// of counts read every place in band zero.
+#[test]
+fn a_beat_held_to_band_zero_is_the_full_conditional() {
+    let mut field = energetic_line();
+    field.theta[field.layout.face_temper] = 10 << MATERIAL_BITS;
+    let classes: Vec<usize> = (0..40).map(|t| (t * 7 + t / 3) % 5).collect();
+    let none = vec![false; 40];
+    let truth = [Region { classes: &classes, unresolved: &none, faces: &[], locked: &[], echo: &[], domain: None, port: None }];
+    let (mut a, mut b) = (FieldLearner::new(field.clone(), 14), FieldLearner::new(field, 14));
+    let blocks = [vec![3usize], vec![14], vec![25]];
+    let full = a.section_conditional(&truth, &[0, 0, 0], &blocks, &mut HostField).unwrap();
+    let mut beat = b.section_conditional_beat(&truth, &[0, 0, 0], &blocks, &[7], 5, 0, &mut HostField).unwrap();
+    assert_eq!(beat.bands, vec![(3, 3)]);
+    beat.bands = Vec::new();
+    assert_eq!(full, beat);
+    assert_eq!(a.field.theta, b.field.theta);
+}
