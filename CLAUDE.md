@@ -368,6 +368,17 @@ foreground shell time went to wait loops.
   harness notifies at its exit. The agent does other work or ends its turn. No foreground
   `sleep N; …` (the harness blocks it: 97 blocked calls), and no wait loops chained in 600-second
   chunks (231 calls in 42 chains).
+- **A run outlives its agent** (Brandon, November 7 18:23). Every run that takes minutes or more is
+  dispatched with `python3 tools/runs.py start NAME SCRIPT` (or `runs.py colab … --session S` on a
+  Colab VM), never as a child of the agent's shell. The local run is then a transient systemd user
+  service whose parent is the user manager. A `systemd-run --scope` run still dies with the session
+  that launched it: lap 12 died that way near 18:14 UTC on November 7, and the Colab VM reclaimed
+  overnight lost lap 12's first run. Each run also saves its state at least each hour
+  (Brandon, November 6 17:11). While runs are out, the waiting agent keeps one Monitor on
+  `python3 -u tools/runs.py watch --every 1800` and re-arms it at each 30-minute expiry. The Monitor
+  delivers every end, kill or failure line, plus a heartbeat with the UTC time and each run's
+  progress, so an idle thread is woken at least every half hour and a missed completion
+  notification is caught. `runs.py status` shows every dispatched run.
 - **Progress is an event, not a poll.** A long run prints one line per unit of work with its elapsed
   milliseconds. When progress matters, one Monitor watches that line with a filter that also matches
   every failure (`error`, `panic`, `Killed`, `exit`). When only completion matters, nothing watches.

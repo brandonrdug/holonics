@@ -2792,6 +2792,13 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
     // [the unified-theory reading of November 7, 09:36] `FIELD_CONTRAST_PERSISTENT`: the section deposits against persistent
     // writes (lap 13's law) instead of a kernel step from the truth.
     let persistent = std::env::var_os("FIELD_CONTRAST_PERSISTENT").is_some();
+    // `FIELD_CONTRAST_FROM_SECTION=N`: the first lap resumes a lap that was killed after its saved state `STATE.<lap>.<N>`
+    // (an exterior kill, November 7 18:14): STATE is that saved state, and the lap's walk goes on from its `N`-th section
+    // with the same keys; later laps walk whole.
+    let from_section: usize = match std::env::var("FIELD_CONTRAST_FROM_SECTION") {
+        Ok(v) => v.parse().map_err(|_| "FIELD_CONTRAST_FROM_SECTION is a section count".to_string())?,
+        Err(_) => 0,
+    };
     let mut persistent_writes: Vec<Vec<usize>> = Vec::new();
     let mut persistent_etas: std::collections::VecDeque<i128> = std::collections::VecDeque::new();
     let whole_blocks = std::env::var_os("FIELD_CONTRAST_WHOLE_BLOCKS").is_some();
@@ -2943,8 +2950,11 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
         // Each family's transfer and predicted change summed over the lap (on 2^(−20) bits).
         let mut by_family: Vec<(i128, i128)> = Vec::new();
         let (mut tenth_family, mut tenths_printed): (Vec<(i128, i128)>, usize) = (Vec::new(), 0);
-        for (n, &s) in walk(seed, read, sections.len()).iter().enumerate() {
+        for (n, &s) in walk(seed, read, sections.len()).iter().enumerate().skip(if lap == 0 { from_section } else { 0 }) {
             let now = started.elapsed().as_millis();
+            if n > 0 && n == from_section && lap == 0 {
+                println!("FIELD_RESUMED lap={lap} sections={n}/{} ms={now}", sections.len());
+            }
             if n > 0 && now - saved_ms >= SAVE_MS {
                 write_new(&out.join(format!("STATE.{lap}.{n}")), at_rate(&learner, base_rate).as_bytes())?;
                 enumerated_read(&learner.field, &held_set, places, &truth_of, realization, 10_000 * (lap as i64 + 1) + n as i64, &mut enumerated_rows)?;
