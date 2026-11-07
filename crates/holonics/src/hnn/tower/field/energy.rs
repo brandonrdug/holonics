@@ -555,8 +555,31 @@ impl Field {
         Ok((self.energy_letters(region), moment, moment_term))
     }
 
+    /// [definition; the unified-theory reading of November 7, 00:02] **An open site stays a source carrying the locked
+    /// mixture**: every unresolved site with no carried face is read as carrying the uniform mixture over the alphabet,
+    /// locked, so it is a definite keyed source and no receiver listens (§16.20's exclusion of the unresolved site goes in an
+    /// energy field). Why: the face is one scalar's gradient only where every letter state compared is read in one
+    /// structure; an open site read apart (unkeyed, a listener at its own temperature, no crowds) makes the energy of a
+    /// region with `i` open another function than the energy with `j` open. Returns the region's faces and locks so read.
+    fn energy_sites(&self, region: &Region) -> (Vec<Option<Shares>>, Vec<bool>) {
+        let alphabet = self.declaration.alphabet as u32;
+        let uniform: Shares = (0..alphabet).map(|c| (c, (1u32 << STATE_BITS) / alphabet)).collect();
+        let sites = region.classes.len();
+        let mut faces: Vec<Option<Shares>> = (0..sites).map(|t| region.faces.get(t).cloned().flatten()).collect();
+        let mut locked: Vec<bool> = (0..sites).map(|t| region.locked.get(t).copied().unwrap_or(false)).collect();
+        for t in 0..sites {
+            if region.unresolved[t] && faces[t].is_none() {
+                faces[t] = Some(uniform.clone());
+                locked[t] = true;
+            }
+        }
+        (faces, locked)
+    }
+
     /// The opening and `ticks` ticks of certified descent under the held supports ([`Relaxed`]).
     fn energy_relax(&self, region: &Region, ticks: usize) -> Result<Relaxed> {
+        let (faces, locked) = self.energy_sites(region);
+        let region = &Region { faces: &faces, locked: &locked, ..*region };
         self.admit_region(region)?;
         let d = &self.declaration;
         if self.scale.is_some() {
@@ -724,7 +747,9 @@ impl Field {
             let mut unresolved = region.unresolved.to_vec();
             classes[t] = a;
             unresolved[t] = false;
-            let set = Region { classes: &classes, unresolved: &unresolved, ..*region };
+            let (mut faces, mut locked) = self.energy_sites(region);
+            (faces[t], locked[t]) = (None, false);
+            let set = Region { classes: &classes, unresolved: &unresolved, faces: &faces, locked: &locked, ..*region };
             let (letters, moment, moment_term) = self.energy_letters_of(&set, &paces, &reaches)?;
             let with = Held { letters, moment, moment_term, classes: held.classes.clone(), definite: held.definite.clone() };
             out.push(self.energy_cell(&x, &with, &paces, &reaches, window.as_deref())?.phi);

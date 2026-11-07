@@ -2301,7 +2301,9 @@ fn an_energy_face_is_its_letters_force() {
 fn the_energy_force_is_its_slope() {
     for still in 0..=2 {
         let field = energetic(still);
-        for h in [8u32, 10, 12] {
+        // Steps of 2^(−8) and 2^(−10) of a site's scale: a larger step reads the energy's curvature, a smaller one nears the
+        // state's grain and the fall its rounding.
+        for h in [8u32, 10] {
             let (predicted, actual) = field.energy_slope(&region(), h).unwrap();
             assert!(predicted > 0 && 20 * (actual - predicted).abs() <= predicted, "still {still} h {h}: fall {actual} against its first order {predicted} (2^(−32) bits)");
         }
