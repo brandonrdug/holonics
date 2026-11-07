@@ -2886,6 +2886,15 @@ impl Field {
         Ok(self.pass(region, false)?.logits)
     }
 
+    /// [measurement] An energy field's logits and its energy read from one forward ([`energy`]), the reference a
+    /// realization's energy forward is checked against bit for bit.
+    pub fn energy_logits(&self, region: &Region) -> Result<(Vec<Option<Vec<i64>>>, EnergyRead)> {
+        if !self.declaration.energy {
+            return refuse("an energy read of a field whose faces are not one energy's forces");
+        }
+        self.energy_pass(region).map(|(pass, read)| (pass.logits, read))
+    }
+
     /// The site pairs the region's contact meets over its ticks and heads (`Σ |S_i^h|`).
     pub fn met_pairs(&self, region: &Region) -> Result<u64> {
         Ok(self.pass(region, false)?.pairs)
@@ -5220,7 +5229,7 @@ impl FieldLearner {
 mod energy;
 pub mod moment;
 mod scale;
-pub use energy::{EnergyRead, ENERGY_BITS};
+pub use energy::{EnergyRead, ENERGY_BITS, FIRST_HALVINGS, MOST_HALVINGS};
 pub use scale::Scale;
 
 #[cfg(test)]

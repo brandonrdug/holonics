@@ -46,9 +46,9 @@ use num_traits::ToPrimitive;
 pub const ENERGY_BITS: u32 = 32;
 /// [agent-inferred, November 6] The first tick's step `η = 2^(−2)` of a site's own scale a unit of force; each later tick
 /// starts one halving above the halvings its tick before stood at, so the step can grow back.
-const FIRST_HALVINGS: u32 = 2;
+pub const FIRST_HALVINGS: u32 = 2;
 /// The most halvings a tick reads before the state rests: past them the step is below the state's grain.
-const MOST_HALVINGS: u32 = STATE_BITS + 8;
+pub const MOST_HALVINGS: u32 = STATE_BITS + 8;
 
 /// A state's read under the held supports: its charts, its rows' shares and crowds, its pair drives, its lifts, and its
 /// energy on `2^(−32)` bits with the count of the logarithms read (the reading's slack).
@@ -560,8 +560,9 @@ impl Field {
     /// locked, so it is a definite keyed source and no receiver listens (§16.20's exclusion of the unresolved site goes in an
     /// energy field). Why: the face is one scalar's gradient only where every letter state compared is read in one
     /// structure; an open site read apart (unkeyed, a listener at its own temperature, no crowds) makes the energy of a
-    /// region with `i` open another function than the energy with `j` open. Returns the region's faces and locks so read.
-    fn energy_sites(&self, region: &Region) -> (Vec<Option<Shares>>, Vec<bool>) {
+    /// region with `i` open another function than the energy with `j` open. Returns the region's faces and locks so read
+    /// (public: a realization stages these sites, `holonics_cuda::hnn::CardField`'s energy forward).
+    pub fn energy_sites(&self, region: &Region) -> (Vec<Option<Shares>>, Vec<bool>) {
         let alphabet = self.declaration.alphabet as u32;
         let uniform: Shares = (0..alphabet).map(|c| (c, (1u32 << STATE_BITS) / alphabet)).collect();
         let sites = region.classes.len();
