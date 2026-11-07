@@ -1254,9 +1254,6 @@ impl Field {
     /// by `ε(a′ − a)`, on `2^(−16)` bits. `None` where a face has no runner-up.
     pub fn energy_square_corners(&self, truth: &[usize], (i, j): (usize, usize), void: usize, eps: u32) -> Result<Option<EnergySquare>> {
         let sites = truth.len();
-        let alphabet = self.declaration.alphabet as u32;
-        let base_w = (1u32 << STATE_BITS) / alphabet;
-        let mixture = |shift: Option<(usize, usize)>| -> Shares { (0..alphabet).map(|c| (c, match shift { Some((up, _)) if c as usize == up => base_w + eps, Some((_, down)) if c as usize == down => base_w - eps, _ => base_w })).collect() };
         let mut open = vec![false; sites];
         (open[i], open[j]) = (true, true);
         let base_region = Region { classes: truth, unresolved: &open, faces: &[], locked: &[], echo: &[], domain: None, port: None };
@@ -1273,56 +1270,84 @@ impl Field {
                 Some(c) => classes[other] = c,
                 None => {
                     unresolved[other] = true;
-                    (faces[other], locked[other]) = (Some(mixture(shift)), true);
+                    (faces[other], locked[other]) = (Some(self.energy_square_mixture(shift, eps)), true);
                 }
             }
             let r = Region { classes: &classes, unresolved: &unresolved, faces: &faces, locked: &locked, echo: &[], domain: None, port: None };
             let (pass, _) = self.energy_faces(&r, Some(&halvings), Some(&base.held))?;
             pass.logits[at].clone().ok_or(TowerError::Refused("a square's open place with no face"))
         };
-        let code = |z: &[i64], a: usize| -> i64 {
-            let face = letters_face(&self.tempered(z, 1), void).expect("a face with a letter");
-            face.code(a)
-        };
-        let runner = |z: &[i64], standing: usize| -> Option<usize> {
-            let face = letters_face(&self.tempered(z, 1), void)?;
-            (0..face.masses.len()).filter(|&c| c != standing && face.masses[c] > 0).max_by_key(|&c| (face.masses[c], std::cmp::Reverse(c)))
-        };
         let (a, b) = (truth[i], truth[j]);
         let zi_b = corner(i, j, Some(b), None)?;
         let zj_a = corner(j, i, Some(a), None)?;
-        let (Some(a2), Some(b2)) = (runner(&zi_b, a), runner(&zj_a, b)) else { return Ok(None) };
+        let Some((a2, b2)) = self.energy_square_runners(&zi_b, &zj_a, (a, b), void) else { return Ok(None) };
         let zi_b2 = corner(i, j, Some(b2), None)?;
         let zj_a2 = corner(j, i, Some(a2), None)?;
-        let lambda_i = code(&zi_b, a2) + code(&zi_b2, a) - code(&zi_b, a) - code(&zi_b2, a2);
-        let lambda_j = code(&zj_a, b2) + code(&zj_a2, b) - code(&zj_a, b) - code(&zj_a2, b2);
-        // The readings on the faces' logits (`c(a′) − c(a) = −(z(a′) − z(a))` where neither letter is on the floor), on
-        // 2^(−20) bits, and how many of the eight codes stand on the face's floor (2^(−62)).
-        let z = |zs: &[i64], a: usize| zs[a] as i64;
-        let zlambda_i = (z(&zi_b, a) + z(&zi_b2, a2) - z(&zi_b, a2) - z(&zi_b2, a)) << 4;
-        let zlambda_j = (z(&zj_a, b) + z(&zj_a2, b2) - z(&zj_a, b2) - z(&zj_a2, b)) << 4;
-        let floor = (62i64 << 20) - (1 << 20);
-        let floors = [code(&zi_b, a2), code(&zi_b2, a), code(&zi_b, a), code(&zi_b2, a2), code(&zj_a, b2), code(&zj_a2, b), code(&zj_a, b), code(&zj_a2, b2)].iter().filter(|&&c| c >= floor).count() as u32;
-        // The energy's own square: `G` at the four corners with both letters set, read again at the base, over `T`: the
-        // joint `2^(−G/T)`'s conditionals read `λ = (G(a′,b) + G(a,b′) − G(a,b) − G(a′,b′))/T` from both ends.
+        // The energy's own square: `G` at the four corners with both letters set, read again at the base.
         let energy_at = |ai: usize, bj: usize| -> Result<i128> {
             let mut classes = truth.to_vec();
             (classes[i], classes[j]) = (ai, bj);
             let r = Region { classes: &classes, unresolved: &vec![false; sites], faces: &[], locked: &[], echo: &[], domain: None, port: None };
             Ok(self.energy_relax(&r, halvings.len(), Some(&halvings), Some(&base.held))?.cell.phi)
         };
-        let g_square = energy_at(a2, b)? + energy_at(a, b2)? - energy_at(a, b)? - energy_at(a2, b2)?;
-        let inverse = temperature_of(-self.theta[self.layout.face_temper], &self.fine)?;
-        let glambda = fit64(release(g_square * inverse, MATERIAL_BITS + ENERGY_BITS - 20))?;
+        let g = [energy_at(a2, b)?, energy_at(a, b2)?, energy_at(a, b)?, energy_at(a2, b2)?];
         // The attribution read at one base: the base's own faces, and each site's with the other's mixture moved.
         let (pass, _) = self.energy_faces(&base_region, Some(&halvings), Some(&base.held))?;
         let (zi, zj) = (pass.logits[i].clone().ok_or(TowerError::Refused("a square's open place with no face"))?, pass.logits[j].clone().ok_or(TowerError::Refused("a square's open place with no face"))?);
         let zi_moved = corner(i, j, None, Some((b2, b)))?;
         let zj_moved = corner(j, i, None, Some((a2, a)))?;
+        let corners = SquareCorners { zi_b: &zi_b, zj_a: &zj_a, zi_b2: &zi_b2, zj_a2: &zj_a2, zi: &zi, zj: &zj, zi_moved: &zi_moved, zj_moved: &zj_moved, g };
+        self.energy_square_reading((a, b), (a2, b2), &corners, void).map(Some)
+    }
+
+    /// [definition; the unified-theory reading of November 7, 01:37] A square's moved mixture ([`Field::energy_square_corners`]):
+    /// the uniform mixture over the alphabet (`2^16/A` a letter), `ε` moved from the letter `down` to `up` where `shift` is
+    /// given. Public: a realization reads a square's corners on the same mixtures.
+    pub fn energy_square_mixture(&self, shift: Option<(usize, usize)>, eps: u32) -> Shares {
+        let alphabet = self.declaration.alphabet as u32;
+        let base_w = (1u32 << STATE_BITS) / alphabet;
+        (0..alphabet).map(|c| (c, match shift { Some((up, _)) if c as usize == up => base_w + eps, Some((_, down)) if c as usize == down => base_w - eps, _ => base_w })).collect()
+    }
+
+    /// [definition; the unified-theory reading of November 7, 01:37] **A square's runner-ups** (the void off): `i`'s next letter
+    /// beside `a` on its face with `j` at `b`, and `j`'s beside `b` with `i` at `a` (the most mass, the least letter on a tie);
+    /// `None` where a face has no runner-up. Public: a realization's corners read the same.
+    pub fn energy_square_runners(&self, zi_b: &[i64], zj_a: &[i64], (a, b): (usize, usize), void: usize) -> Option<(usize, usize)> {
+        let runner = |z: &[i64], standing: usize| -> Option<usize> {
+            let face = letters_face(&self.tempered(z, 1), void)?;
+            (0..face.masses.len()).filter(|&c| c != standing && face.masses[c] > 0).max_by_key(|&c| (face.masses[c], std::cmp::Reverse(c)))
+        };
+        Some((runner(zi_b, a)?, runner(zj_a, b)?))
+    }
+
+    /// [measurement; the unified-theory reading of November 7, 01:37] **A square read from its corners** ([`EnergySquare`]):
+    /// the readings over whole letters, on the faces' logits and on the floor, the energy's own square over `T`, and the
+    /// attribution read at `ε`, from the corners' logits and the four energies ([`SquareCorners`]). Public: a realization's
+    /// corners are read into the same square.
+    pub fn energy_square_reading(&self, (a, b): (usize, usize), (a2, b2): (usize, usize), c: &SquareCorners, void: usize) -> Result<EnergySquare> {
+        let (zi_b, zj_a, zi_b2, zj_a2) = (c.zi_b, c.zj_a, c.zi_b2, c.zj_a2);
+        let code = |z: &[i64], a: usize| -> i64 {
+            let face = letters_face(&self.tempered(z, 1), void).expect("a face with a letter");
+            face.code(a)
+        };
+        let lambda_i = code(zi_b, a2) + code(zi_b2, a) - code(zi_b, a) - code(zi_b2, a2);
+        let lambda_j = code(zj_a, b2) + code(zj_a2, b) - code(zj_a, b) - code(zj_a2, b2);
+        // The readings on the faces' logits (`c(a′) − c(a) = −(z(a′) − z(a))` where neither letter is on the floor), on
+        // 2^(−20) bits, and how many of the eight codes stand on the face's floor (2^(−62)).
+        let z = |zs: &[i64], a: usize| zs[a] as i64;
+        let zlambda_i = (z(zi_b, a) + z(zi_b2, a2) - z(zi_b, a2) - z(zi_b2, a)) << 4;
+        let zlambda_j = (z(zj_a, b) + z(zj_a2, b2) - z(zj_a, b2) - z(zj_a2, b)) << 4;
+        let floor = (62i64 << 20) - (1 << 20);
+        let floors = [code(zi_b, a2), code(zi_b2, a), code(zi_b, a), code(zi_b2, a2), code(zj_a, b2), code(zj_a2, b), code(zj_a, b), code(zj_a2, b2)].iter().filter(|&&c| c >= floor).count() as u32;
+        // The energy's own square over `T`: the joint `2^(−G/T)`'s conditionals read `λ = (G(a′,b) + G(a,b′) − G(a,b) −
+        // G(a′,b′))/T` from both ends.
+        let g_square = c.g[0] + c.g[1] - c.g[2] - c.g[3];
+        let inverse = temperature_of(-self.theta[self.layout.face_temper], &self.fine)?;
+        let glambda = fit64(release(g_square * inverse, MATERIAL_BITS + ENERGY_BITS - 20))?;
         let gap = |z: &[i64], hi: usize, lo: usize| (z[hi] - z[lo]) as i128;
-        let small_i = gap(&zi_moved, a2, a) - gap(&zi, a2, a);
-        let small_j = gap(&zj_moved, b2, b) - gap(&zj, b2, b);
-        Ok(Some(EnergySquare { runners: (a2, b2), lambda_i, lambda_j, small_i, small_j, zlambda_i, zlambda_j, glambda, floors }))
+        let small_i = gap(c.zi_moved, a2, a) - gap(c.zi, a2, a);
+        let small_j = gap(c.zj_moved, b2, b) - gap(c.zj, b2, b);
+        Ok(EnergySquare { runners: (a2, b2), lambda_i, lambda_j, small_i, small_j, zlambda_i, zlambda_j, glambda, floors })
     }
 
     /// [measurement] **A region's energy read** ([`EnergyRead`]): the energy at the opening and at the last tick, each
@@ -1345,6 +1370,22 @@ pub struct EnergyRead {
     pub reads: u64,
     /// The site pairs the locks met over every read.
     pub pairs: u64,
+}
+
+/// A one-base square's corners as read ([`Field::energy_square_reading`]): `i`'s logits with `j` at `b` and at `b′`, `j`'s with
+/// `i` at `a` and at `a′`, the base's own at `i` and `j` and each with the other's mixture moved by `ε` (`b′` up from `b`, `a′`
+/// up from `a`), and `G` at `(a′, b)`, `(a, b′)`, `(a, b)` and `(a′, b′)` on `2^(−32)` bits.
+#[derive(Clone, Copy, Debug)]
+pub struct SquareCorners<'a> {
+    pub zi_b: &'a [i64],
+    pub zj_a: &'a [i64],
+    pub zi_b2: &'a [i64],
+    pub zj_a2: &'a [i64],
+    pub zi: &'a [i64],
+    pub zj: &'a [i64],
+    pub zi_moved: &'a [i64],
+    pub zj_moved: &'a [i64],
+    pub g: [i128; 4],
 }
 
 /// [measurement] A square read at one base ([`Field::energy_square_corners`]): the runner-ups `(a′, b′)`, the two readings

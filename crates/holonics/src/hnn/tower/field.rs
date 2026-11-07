@@ -5233,7 +5233,7 @@ impl FieldLearner {
 mod energy;
 pub mod moment;
 mod scale;
-pub use energy::{EnergyRead, EnergySquare, ENERGY_BITS, FIRST_HALVINGS, MOST_HALVINGS};
+pub use energy::{EnergyRead, EnergySquare, SquareCorners, ENERGY_BITS, FIRST_HALVINGS, MOST_HALVINGS};
 pub use scale::Scale;
 
 #[cfg(test)]
