@@ -2800,6 +2800,7 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
         Ok(v) => v.parse().map_err(|_| "FIELD_COHERENCE_EVERY is a section count".to_string())?,
         Err(_) => 0,
     };
+    learner.coin_measure = std::env::var_os("FIELD_COIN_MEASURE").is_some();
     let coin_tau: Option<u32> = match std::env::var("FIELD_CONTRAST_COIN") {
         Ok(v) => Some(v.parse().map_err(|_| "FIELD_CONTRAST_COIN is the tolerance's bits".to_string())?),
         Err(_) => None,
@@ -3198,6 +3199,30 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
                         r.whole * 1000 / r.places.max(1),
                         section_start.elapsed().as_millis()
                     );
+                    // [measurement; theory, November 7 23:47] The coin's measure: each tolerance's cost a place and added variance,
+                    // and the tolerance that minimizes `cost × (1 + V_coin/V_D)` (a tie to the larger, cheaper `τ`), written to
+                    // `COIN_TAU`.
+                    if let Some(m) = &r.coin_measure {
+                        let alphabet = learner.field.declaration.alphabet as u128;
+                        let places = m.places.max(1) as u128;
+                        let (cf, cm) = (m.forward_us.max(1) * 1000 / m.regions.max(1) as u128, m.material_us.max(1) * 1000 / m.regions.max(1) as u128);
+                        let full = alphabet * cm;
+                        let mut best: Option<(u128, u32)> = None;
+                        let mut cells = Vec::new();
+                        for b in 1..=m.kept.len() as u32 {
+                            let kept_milli = (m.kept[b as usize - 1].max(0) as u128) * 1000 / (places << holonics::hnn::tower::MATERIAL_BITS);
+                            let cost = alphabet * cf + (1000 + kept_milli) * cm / 1000;
+                            let ratio_milli = m.v_coin[b as usize - 1].saturating_mul(1000) / m.v_deposit.max(1);
+                            let work = cost.saturating_mul(1000 + ratio_milli);
+                            if best.is_none_or(|(w, _)| work < w) {
+                                best = Some((work, b));
+                            }
+                            cells.push(format!("b{b}:kept_milli={kept_milli},vratio_milli={ratio_milli},cost_milli={}", cost * 1000 / full.max(1)));
+                        }
+                        let chosen = best.map_or(0, |(_, b)| b);
+                        println!("FIELD_COIN_MEASURE lap={lap} n={n} places={} forward_ns_a_region={cf} material_ns_a_region={cm} {} chosen_tau_bits={chosen}", m.places, cells.join(" "));
+                        std::fs::write(out.join("COIN_TAU"), format!("{chosen}\n"))?;
+                    }
                     if !r.outside.is_empty() {
                         let unit = 1i128 << holonics::hnn::tower::MATERIAL_BITS;
                         let stat = |j: usize| -> String {

@@ -2735,3 +2735,30 @@ fn the_letters_coin_below_every_share_is_the_full_conditional() {
     let coarse = c.section_conditional_coin(&truth, &[0, 0, 0], &blocks, 4, 11, &mut HostField).unwrap();
     assert!(coarse.deposited && coarse.per_state == full.per_state, "the coin reads the same conditional: {coarse:?}");
 }
+
+/// [measurement; the unified-theory reading of November 7, 23:47] **The coin's measure reads and changes nothing**: a full
+/// conditional section with the measure on deposits exactly as without it, and its measure carries a nonzero deposit spread,
+/// tolerances' expected reverses that fall as `τ` coarsens, and added variances that grow with it.
+#[test]
+fn the_coins_measure_changes_nothing_and_orders_its_tolerances() {
+    let mut field = energetic_line();
+    field.theta[field.layout.face_temper] = 10 << MATERIAL_BITS;
+    let classes: Vec<usize> = (0..40).map(|t| (t * 7 + t / 3) % 5).collect();
+    let none = vec![false; 40];
+    let truth = [Region { classes: &classes, unresolved: &none, faces: &[], locked: &[], echo: &[], domain: None, port: None }];
+    let blocks = [vec![3usize], vec![14], vec![25], vec![30]];
+    let (mut a, mut b) = (FieldLearner::new(field.clone(), 14), FieldLearner::new(field, 14));
+    // Warm the second moments so the metric has open entries.
+    a.section_conditional(&truth, &[0; 4], &blocks, &mut HostField).unwrap();
+    b.section_conditional(&truth, &[0; 4], &blocks, &mut HostField).unwrap();
+    b.coin_measure = true;
+    let plain = a.section_conditional(&truth, &[0; 4], &blocks, &mut HostField).unwrap();
+    let mut measured = b.section_conditional(&truth, &[0; 4], &blocks, &mut HostField).unwrap();
+    let m = measured.coin_measure.take().expect("a measure where it was asked");
+    assert_eq!(plain, measured);
+    assert_eq!(a.field.theta, b.field.theta);
+    assert!(m.places == 4 && m.v_deposit > 0, "{m:?}");
+    // Slot `b − 1` is `τ = 2^(−b)`: finer as `b` grows.
+    assert!(m.kept.windows(2).all(|w| w[0] <= w[1]), "finer tolerances keep more reverses: {m:?}");
+    assert!(m.v_coin.windows(2).all(|w| w[0] >= w[1]), "coarser tolerances add more variance: {m:?}");
+}
