@@ -496,3 +496,158 @@ fn the_lines_squares_at_one_base_on_the_card_are_the_hosts() {
     assert_eq!(cold, reference, "the card's squares");
     assert_eq!(warm, reference, "the card's squares, warm");
 }
+
+/// The host's material covectors, read in parallel (`Field::energy_material`).
+fn host_material(field: &Field, regions: &[Region]) -> Vec<(Vec<i128>, i128)> {
+    regions.par_iter().map(|r| field.energy_material(r).unwrap()).collect()
+}
+
+/// The first entry two material covectors differ at, for the receipt.
+fn material_difference(field: &Field, host: &[(Vec<i128>, i128)], card: &[(Vec<i128>, i128)]) -> Option<String> {
+    for (r, ((hg, hphi), (cg, cphi))) in host.iter().zip(card).enumerate() {
+        if hphi != cphi {
+            return Some(format!("region {r}: G host {hphi} card {cphi}"));
+        }
+        if let Some(k) = (0..hg.len()).find(|&k| hg[k] != cg[k]) {
+            let family = field.layout().families.iter().position(|&(s, l, _)| (s..s + l).contains(&k));
+            return Some(format!("region {r}: g[{k}] (family {family:?}) host {} card {}", hg[k], cg[k]));
+        }
+    }
+    (host.len() != card.len()).then(|| "the reads' counts differ".to_string())
+}
+
+/// [measurement; agent-inferred, November 7] **The tiny energy fields' material covector on the card is the host's**: on every
+/// ring set, each region's `∂G/∂θ` (every family on `2^(−40)`) and `G`, the three regions alone and in one batch, and through
+/// the realization.
+#[test]
+#[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
+fn the_tiny_energy_material_on_the_card_is_the_hosts() {
+    let opened = Card::open(0).unwrap();
+    let mut card = CardField::open(&opened).unwrap();
+    let owned = tiny_regions();
+    let regions: Vec<Region> = owned.iter().map(Owned::region).collect();
+    for still in 0..=2 {
+        let field = energetic(still);
+        let reference = host_material(&field, &regions);
+        for (r, region) in regions.iter().enumerate() {
+            let alone = card.energy_material(&field, std::slice::from_ref(region)).unwrap();
+            let diff = material_difference(&field, &reference[r..r + 1], &alone);
+            let nonzero = reference[r].0.iter().filter(|&&v| v != 0).count();
+            println!("ENERGY_MATERIAL tiny still={still} region={r} bit_equal={} nonzero={nonzero} of {} G={}", diff.is_none(), reference[r].0.len(), reference[r].1);
+            assert!(diff.is_none(), "still {still} region {r}: {}", diff.unwrap_or_default());
+        }
+        let batch = card.read_energy_material(&field, &regions).unwrap();
+        let diff = material_difference(&field, &reference, &batch);
+        println!("ENERGY_MATERIAL tiny still={still} batch regions={} bit_equal={}", regions.len(), diff.is_none());
+        assert!(diff.is_none(), "still {still} batch: {}", diff.unwrap_or_default());
+    }
+}
+
+/// [measurement; agent-inferred, November 7] **The line's material covector on the card is the host's at 1,500 sites**: on the
+/// founding of the line's declaration, the synthetic 1,500-site region alone (card cold and warm against the host) and 400 +
+/// 900 + 1,500 sites in one batch, `∂G/∂θ` and `G` bit-equal.
+#[test]
+#[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
+fn the_lines_energy_material_on_the_card_is_the_hosts_at_1500_sites() {
+    let d = line_declaration();
+    let field = Field::found(d, &keys(d.founding_draws())).unwrap();
+    let owned = synthetic(1500, d.alphabet);
+    let region = owned.region();
+    let opened = Card::open(0).unwrap();
+    let mut card = CardField::open(&opened).unwrap();
+    let started = Instant::now();
+    let cold = card.energy_material(&field, std::slice::from_ref(&region)).unwrap();
+    let cold_ms = started.elapsed().as_millis();
+    let started = Instant::now();
+    let warm = card.energy_material(&field, std::slice::from_ref(&region)).unwrap();
+    let warm_ms = started.elapsed().as_millis();
+    let started = Instant::now();
+    let reference = vec![field.energy_material(&region).unwrap()];
+    let host_ms = started.elapsed().as_millis();
+    let diff = material_difference(&field, &reference, &cold);
+    let nonzero = reference[0].0.iter().filter(|&&v| v != 0).count();
+    println!(
+        "ENERGY_MATERIAL line sites=1500 bit_equal={} warm_bit_equal={} card_cold_ms={cold_ms} card_warm_ms={warm_ms} host_ms={host_ms} host_threads=1 nonzero={nonzero} of {} G={} peak_store={}",
+        diff.is_none(),
+        material_difference(&field, &reference, &warm).is_none(),
+        reference[0].0.len(),
+        reference[0].1,
+        card.times().peak_store
+    );
+    assert!(diff.is_none(), "{}", diff.unwrap_or_default());
+    let parts: Vec<Owned> = [400usize, 900, 1500].iter().map(|&n| synthetic(n, d.alphabet)).collect();
+    let regions: Vec<Region> = parts.iter().map(Owned::region).collect();
+    let started = Instant::now();
+    let batch = card.energy_material(&field, &regions).unwrap();
+    let batch_ms = started.elapsed().as_millis();
+    let threads = rayon::current_num_threads();
+    let started = Instant::now();
+    let reference = host_material(&field, &regions);
+    let host_ms = started.elapsed().as_millis();
+    let diff = material_difference(&field, &reference, &batch);
+    println!("ENERGY_MATERIAL line batch regions=3 sites=2800 bit_equal={} card_ms={batch_ms} host_ms={host_ms} host_threads={threads}", diff.is_none());
+    assert!(diff.is_none(), "{}", diff.unwrap_or_default());
+}
+
+/// [measurement; agent-inferred, November 7] **One writer release of the line's energy field on the card** (the lap's
+/// projection: theory wants one release per training state): a founding of the line's declaration, a synthetic question of
+/// 400 known places and the line's answer room of 2,062 places (reach 3,771), released by `Field::sample_runs` through the card
+/// realization as `length-field` does (run bits 0, the near tail, keyed order, sweeps 2,062, refine 10). Prints a line a
+/// thousand reads (elapsed ms, the read's region) and the release's reads, card time and wall time. `FIELD_RELEASE_SWEEPS` and
+/// `FIELD_RELEASE_REFINE` replace the sweeps and the refine (a development read), `FIELD_RELEASE_STOP` stops after that many
+/// sweeps, `FIELD_RELEASE_PROBLEMS` releases that many questions together (each read a batch of their regions).
+#[test]
+#[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
+fn a_writer_release_of_the_lines_energy_field_on_the_card() {
+    let d = line_declaration();
+    let field = Field::found(d, &keys(d.founding_draws())).unwrap();
+    let void = d.alphabet - 1;
+    let room = 2062usize;
+    let env = |name: &str, default: usize| std::env::var(name).ok().and_then(|v| v.parse().ok()).unwrap_or(default);
+    let (sweeps, refine, stop, count) = (env("FIELD_RELEASE_SWEEPS", 2062), env("FIELD_RELEASE_REFINE", 10), env("FIELD_RELEASE_STOP", usize::MAX), env("FIELD_RELEASE_PROBLEMS", 1));
+    let questions: Vec<Vec<usize>> = (0..count as u64)
+        .map(|k| {
+            let mut next = mixer(0x7E1E + k);
+            (0..400).map(|_| (next() % void as u64) as usize).collect()
+        })
+        .collect();
+    let question = &questions[0];
+    let opened = Card::open(0).unwrap();
+    let mut card = CardField::open(&opened).unwrap();
+    let problems: Vec<(&[usize], usize)> = questions.iter().map(|q| (q.as_slice(), room)).collect();
+    let started = Instant::now();
+    let mut reads = 0usize;
+    let answers = field
+        .sample_runs(
+            &problems,
+            sweeps,
+            refine,
+            void,
+            0x5EED_7E1E,
+            0,
+            true,
+            false,
+            None,
+            false,
+            false,
+            false,
+            None,
+            holonics::hnn::tower::field::RefineOrder::Keyed,
+            &mut card,
+            &mut |done, _| done < stop,
+            &mut |r| {
+                if r.faces.is_some() {
+                    reads += 1;
+                    if reads % 1000 == 0 {
+                        let end = (question.len()..r.classes[0].len()).find(|&t| !r.open[0][t] && r.classes[0][t] == void).map_or(r.classes[0].len(), |e| (e + 6).min(r.classes[0].len()));
+                        println!("ENERGY_RELEASE reads={reads} pass={} region_sites={end} elapsed_ms={}", r.pass, started.elapsed().as_millis());
+                    }
+                }
+            },
+        )
+        .unwrap();
+    let wall = started.elapsed().as_millis();
+    let t = card.times();
+    let length = answers[0].iter().position(|&c| c == void).unwrap_or(answers[0].len());
+    println!("ENERGY_RELEASE done problems={count} sweeps={sweeps} refine={refine} stop={stop} reads={reads} card_reads={} card_read_ms={} wall_ms={wall} ms_a_read={} answer_length={length} batches={} peak_store={} card={}", t.reads, t.read_ns / 1_000_000, wall / (reads.max(1) as u128), t.batches, t.peak_store, opened.census().name);
+}

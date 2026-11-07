@@ -30,6 +30,7 @@
 
 use super::*;
 use holonics::hnn::tower::field::{EnergyRead, EnergySquare, Shares, SquareCorners, FIRST_HALVINGS, MOST_HALVINGS};
+use holonics::hnn::tower::FACE_BITS;
 
 /// A region's energy sums on the card (`ENERGY_SUMS` in `kernels/field_energy.cuh`): the locks', the letters' and the
 /// pair's, the logarithms read, the site pairs met, whether a step moved it, and `Φ` on `2^(−32)` bits.
@@ -118,12 +119,14 @@ struct EnergyPlan<'p, 'c> {
     replay: Option<&'p [Vec<Option<u32>>]>,
     base: Option<&'p EnergyLists<'c>>,
     faces: bool,
+    /// Whether the energy's material covector `∂G/∂θ` is read a region (`Field::energy_material`; no faces).
+    material: bool,
 }
 
 impl<'p, 'c> EnergyPlan<'p, 'c> {
     /// The forward as `energy_pass` reads it: certified, under the batch's own supports, with its faces.
     fn forward() -> Self {
-        EnergyPlan { replay: None, base: None, faces: true }
+        EnergyPlan { replay: None, base: None, faces: true, material: false }
     }
 }
 
@@ -187,6 +190,14 @@ struct EnergyReverse<'c> {
     moment: Pooled<'c, i64>,
 }
 
+/// [definition; agent-inferred, November 7] The material covector's accumulators ([`CardField::energy_material_run`]): each
+/// region's `∂G/∂θ` and a stood tick's sum before its halvings' release, theta-long a region, on `2^(−40)`.
+struct EnergyMaterial<'c> {
+    g: Pooled<'c, i128>,
+    tick: Pooled<'c, i128>,
+    len: usize,
+}
+
 /// [agent-inferred, November 6] **A batch's energy forward as the card holds it**: every tick's cell (the opening's first,
 /// then each tick's last state's), each region's halvings by tick, and the read's receipt. What a reverse through the ticks
 /// will read.
@@ -198,6 +209,8 @@ pub(super) struct EnergyPass<'c> {
     pub(super) rereads: u64,
     /// The batch's own supports (none where it read a base's), which a batch of other letters may hold.
     pub(super) lists: Option<EnergyLists<'c>>,
+    /// Each region's material covector `∂G/∂θ` on `2^(−40)` where the plan reads it.
+    pub(super) material: Vec<Vec<i128>>,
 }
 
 /// A region's energy read back: `Φ`, the logarithms read, the site pairs met, and whether the step before it moved it.
@@ -574,7 +587,7 @@ impl<'c> CardField<'c> {
     /// passes the tick unchanged), `w = s ⊙ λ'`, the force's tangent along `w`, the tick's letters' covectors and `λ = λ' +
     /// 2^(−h) (r̂⟨λ', F⟩/W + J δF)`; then the opening's. Returns the letters' covectors.
     #[allow(clippy::too_many_arguments)]
-    fn energy_reverse(&self, field: &Field, words: &mut Words, cells: &[EnergyCell<'c>], forces: &[Pooled<'c, i64>], halvings: &[Vec<Option<u32>>], held: &EnergyHeld<'c>, fb: &EnergyForce<'c>, sites: usize, pairs: usize, regions: usize) -> Result<EnergyReverse<'c>> {
+    fn energy_reverse(&self, field: &Field, words: &mut Words, cells: &[EnergyCell<'c>], forces: &[Pooled<'c, i64>], halvings: &[Vec<Option<u32>>], held: &EnergyHeld<'c>, fb: &EnergyForce<'c>, sites: usize, pairs: usize, regions: usize, material: Option<&EnergyMaterial<'c>>) -> Result<EnergyReverse<'c>> {
         let d = field.declaration;
         let (dw, m2) = (d.width, 2 * d.complex());
         let (mface, _, _) = moment_face(field);
@@ -595,6 +608,10 @@ impl<'c> CardField<'c> {
             }
             let c = &cells[k];
             let at_c = self.timed(Kind::Copy, || self.take_up(&at)).map_err(device)?;
+            // The material reads the forces on the tick's words beside their tangents (the host's `energy_force_parts`).
+            if material.is_some() {
+                self.energy_force(field, words, c, held, fb, sites, regions)?;
+            }
             // `w = s ⊙ λ'`.
             {
                 let (mut sp, mut lp, mut hp, mut wp) = (c.scale.device_ptr(), rb.lambda.device_ptr(), at_c.device_ptr(), rb.wv.device_ptr());
@@ -609,6 +626,9 @@ impl<'c> CardField<'c> {
                 let (mut op, mut bp, mut ap, mut mp) = (rb.own.device_ptr(), rb.before.device_ptr(), rb.after.device_ptr(), rb.moment.device_ptr());
                 self.launch("field_energy_reverse_letters", Self::cells((sites * (dw + m2)) as u64), THREADS, &mut [arg(words), arg(&mut wp), arg(&mut yp), arg(&mut cp), arg(&mut pp), arg(&mut hp), arg(&mut op), arg(&mut bp), arg(&mut ap), arg(&mut mp)])?;
             }
+            if let Some(mb) = material {
+                self.energy_tick_material(field, words, c, held, fb, &tb, &rb, mb, &at_c, sites, regions)?;
+            }
             // `λ = λ' + 2^(−h) (r̂⟨λ', F⟩/W + J δF)`.
             self.ratio_adjoint(words, c.read.device_ptr(), c.scale.device_ptr(), tb.t.device_ptr(), 0, rb.jt.device_ptr(), false)?;
             let (mut rp, mut fp, mut jp, mut hp, mut lp) = (c.read.device_ptr(), forces[k].device_ptr(), rb.jt.device_ptr(), at_c.device_ptr(), rb.lambda.device_ptr());
@@ -619,6 +639,126 @@ impl<'c> CardField<'c> {
         let (mut lp, mut cp, mut op, mut bp, mut ap, mut mp) = (rb.lambda.device_ptr(), rb.chart.device_ptr(), rb.own.device_ptr(), rb.before.device_ptr(), rb.after.device_ptr(), rb.moment.device_ptr());
         self.launch("field_energy_opening_letters", Self::cells((sites * (dw + m2)) as u64), THREADS, &mut [arg(words), arg(&mut lp), arg(&mut cp), arg(&mut op), arg(&mut bp), arg(&mut ap), arg(&mut mp)])?;
         Ok(rb)
+    }
+
+    /// `g[r][base + o cols + i] += Σ_(t∈r) carry(sign y_t[o] x_t[i], shift)` over each region's sites (no `x`: the bias's
+    /// `Σ carry(sign y_t[o], shift)`), `entry` the kinds (`_ll`, `_ls`, `_sl`) of `y` and `x`.
+    #[allow(clippy::too_many_arguments)]
+    fn material_outer(&self, entry: &'static str, words: &mut Words, mb: &EnergyMaterial<'c>, into_tick: bool, base: usize, rows: usize, cols: usize, y: u64, ys: usize, x: u64, xs: usize, shift: i32, sign: i32) -> Result<()> {
+        let g = if into_tick { mb.tick.device_ptr() } else { mb.g.device_ptr() };
+        let entries = rows as u64 * if x != 0 { cols as u64 } else { 1 };
+        let tiles = (words.t as u64).div_ceil(OUTER_TILE);
+        let (mut gp, mut len, mut b, mut r32, mut c32, mut yp, mut ysp, mut xp, mut xsp, mut sh, mut sg) = (g, mb.len as u64, base as u64, rows as u32, cols as u32, y, ys as u64, x, xs as u64, shift, sign);
+        self.launch(entry, Self::cells(entries * tiles), THREADS, &mut [arg(words), arg(&mut gp), arg(&mut len), arg(&mut b), arg(&mut r32), arg(&mut c32), arg(&mut yp), arg(&mut ysp), arg(&mut xp), arg(&mut xsp), arg(&mut sh), arg(&mut sg)])
+    }
+
+    /// `g[r][base + row D + o] += carry(sign wgt src_(t+off)[o], shift)` over each site's letter rows.
+    #[allow(clippy::too_many_arguments)]
+    fn material_rows(&self, entry: &'static str, words: &mut Words, mb: &EnergyMaterial<'c>, into_tick: bool, base: usize, src: u64, off: i32, shift: i32, sign: i32) -> Result<()> {
+        let g = if into_tick { mb.tick.device_ptr() } else { mb.g.device_ptr() };
+        let (mut gp, mut len, mut b, mut sp, mut o, mut sh, mut sg) = (g, mb.len as u64, base as u64, src, off, shift, sign);
+        self.launch(entry, Self::cells((words.t as u64) * words.d as u64), THREADS, &mut [arg(words), arg(&mut gp), arg(&mut len), arg(&mut b), arg(&mut sp), arg(&mut o), arg(&mut sh), arg(&mut sg)])
+    }
+
+    /// [definition; agent-inferred, November 7] **A stood tick's material** (the host's `energy_material`, its second part):
+    /// `2^(−h) Σ_t (δF_words ⊗ r̂ + F_words ⊗ w)` on each chart and drive with the tangents' biases, the contraction's
+    /// `δ(a · b)`, the letters' rows against `w` and `R w`, and the moment's chart against the moments, gathered a region and
+    /// released by its halvings. The words' forces at the tick's cell are `fb`'s, their tangents `tb`'s, `w` and `R w` `rb`'s.
+    #[allow(clippy::too_many_arguments)]
+    fn energy_tick_material(&self, field: &Field, words: &mut Words, c: &EnergyCell<'c>, held: &EnergyHeld<'c>, fb: &EnergyForce<'c>, tb: &EnergyTangent<'c>, rb: &EnergyReverse<'c>, mb: &EnergyMaterial<'c>, at_c: &Pooled<'c, u32>, sites: usize, regions: usize) -> Result<()> {
+        let d = field.declaration;
+        let (dw, m2, f) = (d.width, 2 * d.complex(), d.contacts);
+        let l = field.layout();
+        let (mface, mface_bias, _) = moment_face(field);
+        let card = self.card;
+        card.zero_octets(&mb.tick, 0, 16 * regions * mb.len).map_err(device)?;
+        Self::energy_point(words, c, held);
+        let (read, wv) = (c.read.device_ptr(), rb.wv.device_ptr());
+        for (w_, bias, fw, tw, rows) in [(l.q, l.q_bias, &fb.dq, &tb.cq, m2), (l.probe, l.probe_bias, &fb.dp, &tb.cp, m2), (l.a, l.a_bias, &fb.da, &tb.da, f), (l.b, l.b_bias, &fb.db, &tb.db, f)] {
+            self.material_outer("field_energy_outer_ls", words, mb, true, w_, rows, dw, tw.device_ptr(), rows, read, dw, 0, 1)?;
+            self.material_outer("field_energy_outer_ll", words, mb, true, w_, rows, dw, fw.device_ptr(), rows, wv, dw, -8, 1)?;
+            self.material_outer("field_energy_outer_ll", words, mb, true, bias, rows, 1, tw.device_ptr(), rows, 0, 0, FACE_BITS as i32, 1)?;
+        }
+        {
+            let (mut gp, mut len, mut pc, mut tap, mut tbp) = (mb.tick.device_ptr(), mb.len as u64, l.pair_c as u64, tb.ta.device_ptr(), tb.tb.device_ptr());
+            self.launch("field_energy_pair_material", Self::cells((regions * f / 2) as u64), THREADS, &mut [arg(words), arg(&mut gp), arg(&mut len), arg(&mut pc), arg(&mut tap), arg(&mut tbp)])?;
+        }
+        self.material_outer("field_energy_outer_ll", words, mb, true, l.read, dw, dw, held.own.device_ptr(), dw, wv, dw, 0, 1)?;
+        self.material_rows("field_energy_letter_rows_l", words, mb, true, l.enc, rb.lift.device_ptr(), 0, 0, 1)?;
+        self.material_rows("field_energy_letter_rows_l", words, mb, true, l.before, wv, 1, 0, 1)?;
+        self.material_rows("field_energy_letter_rows_l", words, mb, true, l.after, wv, -1, 0, 1)?;
+        self.material_outer("field_energy_outer_ll", words, mb, true, mface as usize, dw, m2, wv, dw, words.moment, m2, 0, 1)?;
+        self.material_outer("field_energy_outer_ll", words, mb, true, mface_bias as usize, dw, 1, wv, dw, 0, 0, FACE_BITS as i32, 1)?;
+        let (mut tp, mut gp, mut len, mut hp) = (mb.tick.device_ptr(), mb.g.device_ptr(), mb.len as u64, at_c.device_ptr());
+        self.launch("field_energy_tick_release", Self::cells((regions * mb.len) as u64), THREADS, &mut [arg(words), arg(&mut tp), arg(&mut gp), arg(&mut len), arg(&mut hp)])
+    }
+
+    /// [definition; agent-inferred, November 7] **The energy's material covector a region** (the host's `Field::energy_material`):
+    /// the explicit `∂Φ/∂θ` at the last state (every term minus the force's: each chart's and drive's word force against the
+    /// reads with its bias, the contraction against `a · b`, the letters' rows against the lift and the neighbours' reads, the
+    /// read matrix and its bias against the letter, the moment's chart against the moments), the stood ticks
+    /// ([`CardField::energy_tick_material`] inside the reverse), the opening's `(∂x⁰/∂θ)ᵀ λ⁰`, and the moments' covector `−(Cᵀ r̂ +
+    /// δp − m)` (the face's negated) back through the strands; each region's on `2^(−40)`, theta long.
+    #[allow(clippy::too_many_arguments, clippy::type_complexity)]
+    fn energy_material_of(&self, field: &Field, words: &mut Words, cells: &[EnergyCell<'c>], forces: &[Pooled<'c, i64>], halvings: &[Vec<Option<u32>>], held: &EnergyHeld<'c>, fb: &EnergyForce<'c>, sites: usize, pairs: usize, regions: usize) -> Result<Vec<Vec<i128>>> {
+        let card = self.card;
+        let d = field.declaration;
+        let (dw, m2, f) = (d.width, 2 * d.complex(), d.contacts);
+        let l = field.layout();
+        let (mface, mface_bias, _) = moment_face(field);
+        let len = field.theta.len();
+        let zeroed = |n: usize| self.timed(Kind::Alloc, || self.take_zeroed::<i128>(n.max(1))).map_err(device);
+        let mb = EnergyMaterial { g: zeroed(regions * len)?, tick: zeroed(regions * len)?, len };
+        let last = cells.last().ok_or(TowerError::Refused("an energy forward with no opening"))?;
+        // 1. The explicit `∂Φ/∂θ` at the last state.
+        self.energy_force(field, words, last, held, fb, sites, regions)?;
+        let read = last.read.device_ptr();
+        for (w_, bias, fw, rows) in [(l.q, l.q_bias, &fb.dq, m2), (l.probe, l.probe_bias, &fb.dp, m2), (l.a, l.a_bias, &fb.da, f), (l.b, l.b_bias, &fb.db, f)] {
+            self.material_outer("field_energy_outer_ls", words, &mb, false, w_, rows, dw, fw.device_ptr(), rows, read, dw, 0, -1)?;
+            self.material_outer("field_energy_outer_ll", words, &mb, false, bias, rows, 1, fw.device_ptr(), rows, 0, 0, FACE_BITS as i32, -1)?;
+        }
+        {
+            let (mut gp, mut ln, mut pc, mut none_a, mut none_b) = (mb.g.device_ptr(), len as u64, l.pair_c as u64, 0u64, 0u64);
+            self.launch("field_energy_pair_material", Self::cells((regions * f / 2) as u64), THREADS, &mut [arg(words), arg(&mut gp), arg(&mut ln), arg(&mut pc), arg(&mut none_a), arg(&mut none_b)])?;
+        }
+        self.material_outer("field_energy_outer_ls", words, &mb, false, l.read, dw, dw, held.own.device_ptr(), dw, read, dw, 8, -1)?;
+        self.material_outer("field_energy_outer_ll", words, &mb, false, l.lift_bias, dw, 1, held.own.device_ptr(), dw, 0, 0, MATERIAL_BITS as i32, -1)?;
+        self.material_rows("field_energy_letter_rows_l", words, &mb, false, l.enc, last.lift.device_ptr(), 0, 8, -1)?;
+        self.material_rows("field_energy_letter_rows_s", words, &mb, false, l.before, read, 1, 8, -1)?;
+        self.material_rows("field_energy_letter_rows_s", words, &mb, false, l.after, read, -1, 8, -1)?;
+        {
+            let (mut gp, mut ln) = (mb.g.device_ptr(), len as u64);
+            self.launch("field_energy_letter_bias", Self::cells(sites as u64), THREADS, &mut [arg(words), arg(&mut gp), arg(&mut ln)])?;
+        }
+        self.material_outer("field_energy_outer_sl", words, &mb, false, mface as usize, dw, m2, read, dw, words.moment, m2, 8, -1)?;
+        self.material_outer("field_energy_outer_sl", words, &mb, false, mface_bias as usize, dw, 1, read, dw, 0, 0, MATERIAL_BITS as i32, -1)?;
+        // The probes' force at the last state, held for the moments' covector (the reverse's ticks read the force again).
+        let dp_last = self.timed(Kind::Alloc, || self.take::<i64>((sites * m2).max(1))).map_err(device)?;
+        card.copy_within(&fb.dp, 0, &dp_last, 0, sites * m2).map_err(device)?;
+        // 2. The ticks, back from `λ^K = −J F^K`, each stood tick's material gathered and released.
+        let rb = self.energy_reverse(field, words, cells, forces, halvings, held, fb, sites, pairs, regions, Some(&mb))?;
+        Self::energy_point(words, last, held);
+        // 3. The opening: `x⁰_t = E(u_t) + E₋(u_(t−1)) + E₊(u_(t+1)) + C s_t + b`.
+        let lambda = rb.lambda.device_ptr();
+        self.material_rows("field_energy_letter_rows_l", words, &mb, false, l.enc, lambda, 0, 0, 1)?;
+        self.material_rows("field_energy_letter_rows_l", words, &mb, false, l.before, lambda, 1, 0, 1)?;
+        self.material_rows("field_energy_letter_rows_l", words, &mb, false, l.after, lambda, -1, 0, 1)?;
+        self.material_outer("field_energy_outer_ll", words, &mb, false, mface as usize, dw, m2, lambda, dw, words.moment, m2, 0, 1)?;
+        self.material_outer("field_energy_outer_ll", words, &mb, false, mface_bias as usize, dw, 1, lambda, dw, 0, 0, FACE_BITS as i32, 1)?;
+        // The moments' covector `−(Cᵀ r̂ + δp − m)` back through the strands' moment encodings.
+        let tm = d.moment_modes();
+        if tm > 0 {
+            let dm = zeroed(sites * m2)?;
+            let (mut mp, mut rp, mut dpp, mut tmp, mut dmp) = (mface, read, dp_last.device_ptr(), rb.moment.device_ptr(), dm.device_ptr());
+            self.launch("field_energy_dm", Self::cells((sites * m2) as u64), THREADS, &mut [arg(words), arg(&mut mp), arg(&mut rp), arg(&mut dpp), arg(&mut tmp), arg(&mut dmp)])?;
+            let (mut dmp, mut n) = (dm.device_ptr(), (sites * m2) as u64);
+            self.launch("field_energy_negate_wide", Self::cells(n), THREADS, &mut [arg(words), arg(&mut dmp), arg(&mut n)])?;
+            let back = self.moment_strands_back(field, words, dm.device_ptr(), regions, sites)?;
+            let (mut bb, mut ba, mut tm32, mut dbp, mut dap, mut gp, mut ln) = (l.moment_before as u64, l.moment_after as u64, tm as u32, back.d_before.device_ptr(), back.d_after.device_ptr(), mb.g.device_ptr(), len as u64);
+            self.launch("field_energy_strand_material", Self::cells((sites * tm) as u64), THREADS, &mut [arg(words), arg(&mut bb), arg(&mut ba), arg(&mut tm32), arg(&mut dbp), arg(&mut dap), arg(&mut gp), arg(&mut ln)])?;
+        }
+        let g = self.timed(Kind::Copy, || card.fetch_range(&mb.g, 0, regions * len)).map_err(device)?;
+        Ok(g.chunks_exact(len).map(<[i128]>::to_vec).collect())
     }
 
     /// [definition; the unified-theory reading of November 7, 00:02] **A base's definite flags held** (the host's
@@ -906,16 +1046,22 @@ impl<'c> CardField<'c> {
         }
         self.mark("energy_ticks");
         let reads = (0..rn).map(|r| EnergyRead { opening: read0[r].phi, last: now[r].phi, halvings: halvings[r].clone(), reads: reads[r], pairs: met[r] }).collect();
+        // The energy's material covector a region (`Field::energy_material`).
+        if plan.material {
+            let material = self.energy_material_of(field, words, &cells, &forces, &halvings, &held, &fb, sites, pairs, rn)?;
+            self.status(&st.status)?;
+            return Ok((Vec::new(), Vec::new(), EnergyPass { cells, reads, rereads, lists, material }));
+        }
         // A read of the energy alone (a square's `G`) ends at its last state.
         if !plan.faces {
             self.status(&st.status)?;
-            return Ok((Vec::new(), Vec::new(), EnergyPass { cells, reads, rereads, lists }));
+            return Ok((Vec::new(), Vec::new(), EnergyPass { cells, reads, rereads, lists, material: Vec::new() }));
         }
         // The faces: each unresolved site's letter force at the last state, with the reverse's letters' covectors through
         // the ticks that stood and the opening (the total derivative, the host's `energy_faces`).
         let last = cells.last().ok_or(TowerError::Refused("an energy forward with no opening"))?;
         self.energy_force(field, words, last, &held, &fb, sites, rn)?;
-        let rb = self.energy_reverse(field, words, &cells, &forces, &halvings, &held, &fb, sites, pairs, rn)?;
+        let rb = self.energy_reverse(field, words, &cells, &forces, &halvings, &held, &fb, sites, pairs, rn, None)?;
         self.mark("energy_reverse");
         let z = i64s(sites * a)?;
         let masses = self.timed(Kind::Alloc, || self.take::<u64>((sites * a).max(1))).map_err(device)?;
@@ -959,7 +1105,7 @@ impl<'c> CardField<'c> {
             faces.push(span.clone().map(|t| (st.unresolved[t] != 0).then(|| TowerFace { masses: ms[t * a..(t + 1) * a].iter().map(|&v| v as u128).collect(), total: ts[t] as u128 })).collect());
             logits.push(span.map(|t| (st.unresolved[t] != 0).then(|| zs[t * a..(t + 1) * a].to_vec())).collect());
         }
-        Ok((faces, logits, EnergyPass { cells, reads, rereads, lists }))
+        Ok((faces, logits, EnergyPass { cells, reads, rereads, lists, material: Vec::new() }))
     }
 }
 
@@ -1027,7 +1173,7 @@ impl<'c> CardField<'c> {
         let lists = base.lists.ok_or(TowerError::Refused("a square's base read under another's supports"))?;
         let halvings: Vec<Vec<Option<u32>>> = base.reads.iter().map(|r| r.halvings.clone()).collect();
         drop(base.cells);
-        let plan = EnergyPlan { replay: Some(&halvings), base: Some(&lists), faces: true };
+        let plan = EnergyPlan { replay: Some(&halvings), base: Some(&lists), faces: true, material: false };
         let n = squares.len();
         let letters: Vec<(usize, usize)> = squares.iter().map(|(truth, (i, j))| (truth[*i], truth[*j])).collect();
         let corners = |kinds: &dyn Fn(usize) -> Owned, plan: EnergyPlan<'_, 'c>, words: &mut Words| -> Result<(Vec<Vec<Option<Vec<i64>>>>, EnergyPass<'c>)> {
@@ -1084,6 +1230,49 @@ impl<'c> CardField<'c> {
 }
 
 impl CardField<'_> {
+    /// [definition; agent-inferred, November 7] **An energy field's material covector on the card** (the host's
+    /// `Field::energy_material` region by region): each region's `∂G/∂θ` on `2^(−40)` (theta long) and `G` on `2^(−32)` bits,
+    /// the regions batched by the card's memory (each region's two theta-long accumulators beside its forward), each batch's
+    /// certified descent, its reverse with every stood tick's material, and the opening.
+    pub fn energy_material(&mut self, field: &Field, regions: &[Region]) -> Result<Vec<(Vec<i128>, i128)>> {
+        let d = field.declaration;
+        if !d.energy {
+            return Err(TowerError::Refused("an energy material of a field whose faces are not one energy's forces"));
+        }
+        if field.scale.is_some() {
+            return Err(TowerError::Refused("an energy field read with a tower of scales (its energy is not built)"));
+        }
+        admit_regions(&d, regions)?;
+        let sited: Vec<(Vec<Option<Shares>>, Vec<bool>)> = regions.iter().map(|r| field.energy_sites(r)).collect();
+        let staged: Vec<Region> = regions.iter().zip(&sited).map(|(r, (faces, locked))| Region { faces, locked, ..*r }).collect();
+        admit_regions(&d, &staged)?;
+        let card = self.card;
+        let started = Instant::now();
+        let (mut words, upload, face_octets) = self.upload(field, None)?;
+        let lengths: Vec<usize> = staged.iter().map(|r| r.classes.len()).collect();
+        let theta = field.theta.len() as u64;
+        let octets = |sites: usize| energy_octets(&d, sites) + 2 * 16 * theta;
+        let batches = batches(&lengths, &octets, (self.budget - face_octets) / 5 * 4)?;
+        let mut out = Vec::with_capacity(regions.len());
+        let plan = EnergyPlan { replay: None, base: None, faces: false, material: true };
+        for batch in batches {
+            if batch.is_empty() {
+                continue;
+            }
+            let peak = lengths[batch.clone()].iter().map(|&n| octets(n)).sum::<u64>();
+            self.times.peak_store = self.times.peak_store.max(peak);
+            self.times.batches += 1;
+            let (_, _, pass) = self.energy_batch(field, &staged[batch], &mut words, plan)?;
+            self.times.energy_rereads += pass.rereads;
+            out.extend(pass.material.into_iter().zip(pass.reads).map(|(g, read)| (g, read.last)));
+        }
+        let met = self.timed(Kind::Copy, || card.fetch(&upload.met)).map_err(device)?[0] as u128;
+        self.times.pairs += met;
+        self.times.returns += 1;
+        self.times.return_ns += started.elapsed().as_nanos();
+        Ok(out)
+    }
+
     /// [measurement; the unified-theory reading of November 7, 01:37] **Squares read at one base on the card** (the host's
     /// `Field::energy_square_corners` for each `(truth, (i, j))`): the squares batched by the card's memory, each batch's
     /// thirteen reads ([`CardField::energy_square_batch`]).
@@ -1184,7 +1373,7 @@ impl CardField<'_> {
         let lists = base.lists.ok_or(TowerError::Refused("a square's base read under another's supports"))?;
         let halvings: Vec<Vec<Option<u32>>> = base.reads.iter().map(|r| r.halvings.clone()).collect();
         drop(base.cells);
-        let plan = EnergyPlan { replay: Some(&halvings), base: Some(&lists), faces: true };
+        let plan = EnergyPlan { replay: Some(&halvings), base: Some(&lists), faces: true, material: false };
         let n = squares.len();
         let letters: Vec<(usize, usize)> = squares.iter().map(|(truth, (i, j))| (truth[*i], truth[*j])).collect();
         let face_at = |logits: &[Vec<Option<Vec<i64>>>], s: usize, t: usize| -> Result<Vec<i64>> { logits[s][t].clone().ok_or(TowerError::Refused("a square's open place with no face")) };

@@ -1120,3 +1120,194 @@ extern "C" __global__ void field_energy_negate(FieldWords w, int64_t *x, uint64_
         x[c] = -x[c];
     }
 }
+
+// -------------------------------------------------------------------------------------------
+// the energy's material covector (the host's `Field::energy_material`)
+//
+// [definition; agent-inferred, November 7] **`∂G/∂θ` a region** (`G = Φ(x^K(θ); θ)` at the descent's halvings and supports): every
+// family's covector per real unit of its entries on `2^(−40)`, one theta-long accumulator a region (`g + r L`). The explicit
+// `∂Φ/∂θ` at the last state, each stood tick's `2^(−h) ⟨w, ∂F/∂θ⟩` (gathered a tick in `tick + r L`, released by the region's
+// `h` entry by entry, `field_energy_tick_release`) and the opening's `(∂x⁰/∂θ)ᵀ λ⁰` are outer products of a covector with a
+// read summed over the region's sites (`field_energy_outer_*`), a letter's rows by its weights (`field_energy_letter_rows_*`,
+// `field_energy_letter_bias`), and the pair's contraction (`field_energy_pair_material`); the moments' covector returns through
+// the strands (`field_energy_strand_material`).
+
+// A term's carry onto `2^(−40)`: `v 2^shift`, or `release(v, −shift)`.
+__device__ __forceinline__ wide energy_carry(wide v, int32_t shift) {
+    return shift >= 0 ? v << shift : rel(v, (uint32_t)(-shift));
+}
+
+// `g[r][base + o cols + i] += Σ_(t∈r) carry(sign y_t[o] x_t[i], shift)` (with no `x`, `g[r][base + o] += Σ carry(sign y_t[o],
+// shift)`): one thread an entry and a tile of `OUTER_TILE` sites, each region's partial added by the ring's atomic step.
+template <typename Y, typename X>
+__device__ void energy_outer(const FieldWords &w, wide *g, uint64_t L, uint64_t base, uint32_t rows, uint32_t cols, const Y *y, uint64_t ys, const X *x, uint64_t xs, int32_t shift, int32_t sign) {
+    const uint64_t entries = (uint64_t)rows * (x ? cols : 1);
+    const uint64_t tiles = ((uint64_t)w.T + OUTER_TILE - 1) / OUTER_TILE;
+    for (uint64_t c = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; c < entries * tiles; c += (uint64_t)gridDim.x * blockDim.x) {
+        const uint64_t entry = c % entries, tile = c / entries;
+        const uint64_t o = x ? entry / cols : entry, i = x ? entry % cols : 0;
+        const uint64_t from = tile * OUTER_TILE;
+        const uint64_t to = from + OUTER_TILE < w.T ? from + OUTER_TILE : w.T;
+        uint32_t cur = w.site_region[from];
+        wide sum = 0;
+        for (uint64_t t = from; t < to; t++) {
+            const uint32_t r = w.site_region[t];
+            if (r != cur) {
+                if (sum != 0) {
+                    add_wide(g + (uint64_t)cur * L + base + entry, sum);
+                }
+                sum = 0;
+                cur = r;
+            }
+            const wide v = (wide)sign * (wide)y[t * ys + o] * (x ? (wide)x[t * xs + i] : (wide)1);
+            sum += energy_carry(v, shift);
+        }
+        if (sum != 0) {
+            add_wide(g + (uint64_t)cur * L + base + entry, sum);
+        }
+    }
+}
+
+#define ENERGY_OUTER_ENTRY(NAME, Y, X) \
+    extern "C" __global__ void NAME(FieldWords w, wide *g, uint64_t L, uint64_t base, uint32_t rows, uint32_t cols, const Y *y, uint64_t ys, const X *x, uint64_t xs, int32_t shift, int32_t sign) { energy_outer<Y, X>(w, g, L, base, rows, cols, y, ys, x, xs, shift, sign); }
+ENERGY_OUTER_ENTRY(field_energy_outer_ll, int64_t, int64_t)
+ENERGY_OUTER_ENTRY(field_energy_outer_ls, int64_t, int32_t)
+ENERGY_OUTER_ENTRY(field_energy_outer_sl, int32_t, int64_t)
+
+// A site's letter rows and their weights on `2^(−16)` (the host's `weights`): a carried face's shares, else its class's row (the
+// unresolved row where it is open) at its whole weight. Calls `each(row, weight)`.
+template <typename F>
+__device__ __forceinline__ void energy_letter_weights(const FieldWords &w, uint64_t t, F each) {
+    const uint32_t from = w.mix_off[t], to = w.mix_off[t + 1];
+    if (from == to) {
+        each(row_of(w, t), (wide)1 << FACE_BITS);
+        return;
+    }
+    for (uint32_t k = from; k < to; k++) {
+        each((uint64_t)w.mix_class[k], (wide)w.mix_share[k]);
+    }
+}
+
+// `g[r][base + row D + o] += carry(sign wgt src_(t+off)[o], shift)` over each site's letter rows (`off` the strand neighbour
+// read, `+1` the before rows', `−1` the after rows', within the region), by the ring's atomic step.
+template <typename S>
+__device__ void energy_letter_rows(const FieldWords &w, wide *g, uint64_t L, uint64_t base, const S *src, int32_t off, int32_t shift, int32_t sign) {
+    const uint64_t cells = (uint64_t)w.T * w.D;
+    for (uint64_t c = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; c < cells; c += (uint64_t)gridDim.x * blockDim.x) {
+        const uint64_t t = c / w.D, o = c % w.D;
+        uint64_t at = t;
+        if (off > 0) {
+            if (t + 1 >= w.T || w.site_pos[t + 1] == 0) {
+                continue;
+            }
+            at = t + 1;
+        } else if (off < 0) {
+            if (w.site_pos[t] == 0) {
+                continue;
+            }
+            at = t - 1;
+        }
+        const wide v = (wide)src[at * w.D + o];
+        if (v == 0) {
+            continue;
+        }
+        wide *gr = g + (uint64_t)w.site_region[t] * L + base;
+        energy_letter_weights(w, t, [&](uint64_t row, wide wgt) { add_wide(gr + row * w.D + o, energy_carry((wide)sign * wgt * v, shift)); });
+    }
+}
+
+#define ENERGY_LETTER_ENTRY(NAME, S) \
+    extern "C" __global__ void NAME(FieldWords w, wide *g, uint64_t L, uint64_t base, const S *src, int32_t off, int32_t shift, int32_t sign) { energy_letter_rows<S>(w, g, L, base, src, off, shift, sign); }
+ENERGY_LETTER_ENTRY(field_energy_letter_rows_l, int64_t)
+ENERGY_LETTER_ENTRY(field_energy_letter_rows_s, int32_t)
+
+// The class bias's explicit part: `g[r][read_bias + row] −= wgt 2^24` over each site's letter rows within the alphabet.
+extern "C" __global__ void field_energy_letter_bias(FieldWords w, wide *g, uint64_t L) {
+    for (uint64_t t = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; t < w.T; t += (uint64_t)gridDim.x * blockDim.x) {
+        wide *gr = g + (uint64_t)w.site_region[t] * L + w.read_bias;
+        energy_letter_weights(w, t, [&](uint64_t row, wide wgt) {
+            if (row < w.A) {
+                add_wide(gr + row, -(wgt << MATERIAL_BITS));
+            }
+        });
+    }
+}
+
+// The pair's contraction (the host's `energy_material`), one thread a region and a contact pair over the region's sites: the
+// explicit part (`ta` null) `g[r][pair_c + e] −= release(Re(a_t b_s), 16) 2^24` and its imaginary part alike, from the cell's
+// drives `w.pa`, `w.pb`; a tick's (`ta`, `tb` the drives' tangents along `w`) `+= Re(δa_t b_s + a_t δb_s)` and the imaginary.
+extern "C" __global__ void field_energy_pair_material(FieldWords w, wide *g, uint64_t L, uint64_t pair_c, const int64_t *ta, const int64_t *tb) {
+    const uint32_t half = w.f / 2;
+    for (uint64_t c = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; c < (uint64_t)w.R * half; c += (uint64_t)gridDim.x * blockDim.x) {
+        const uint32_t r = c / half, e = c % half;
+        const uint64_t first = w.region_off[r], end = w.region_off[r + 1];
+        wide re = 0, im = 0;
+        for (uint64_t t = first; t < end; t++) {
+            const uint64_t s = strand_mate(w, t, e);
+            if (s == UINT64_MAX) {
+                continue;
+            }
+            const wide ar = w.pa[t * w.f + e], ai = w.pa[t * w.f + half + e];
+            const wide br = w.pb[s * w.f + e], bi = w.pb[s * w.f + half + e];
+            if (ta == nullptr) {
+                re -= rel(ar * br - ai * bi, FACE_BITS) << MATERIAL_BITS;
+                im -= rel(ar * bi + ai * br, FACE_BITS) << MATERIAL_BITS;
+            } else {
+                const wide dar = ta[t * w.f + e], dai = ta[t * w.f + half + e], dbr = tb[s * w.f + e], dbi = tb[s * w.f + half + e];
+                re += dar * br - dai * bi + ar * dbr - ai * dbi;
+                im += dar * bi + dai * br + ar * dbi + ai * dbr;
+            }
+        }
+        g[(uint64_t)r * L + pair_c + e] += re;
+        g[(uint64_t)r * L + pair_c + half + e] += im;
+    }
+}
+
+// A stood tick's material into each region's: `g[r][e] += release(tick[r][e], h_r)` at the regions whose tick stood.
+extern "C" __global__ void field_energy_tick_release(FieldWords w, const wide *tick, wide *g, uint64_t L, const uint32_t *halvings) {
+    for (uint64_t c = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; c < (uint64_t)w.R * L; c += (uint64_t)gridDim.x * blockDim.x) {
+        const uint32_t h = halvings[c / L];
+        if (h != UINT32_MAX && tick[c] != 0) {
+            g[c] += rel(tick[c], h);
+        }
+    }
+}
+
+// The moments' covector back to the strands' moment encodings (the host's `moments_return` and `strand_return`) into each
+// region's material, carried from `2^(−24)` to `2^(−40)`: a class's row takes `d`, a carried face's rows `release(w d, 16)`,
+// a silent open site nothing.
+extern "C" __global__ void field_energy_strand_material(FieldWords w, uint64_t base_before, uint64_t base_after, uint32_t tm, const wide *d_before, const wide *d_after, wide *g, uint64_t L) {
+    for (uint64_t c = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; c < (uint64_t)w.T * tm; c += (uint64_t)gridDim.x * blockDim.x) {
+        const uint64_t t = c % w.T;
+        const uint32_t u = c / w.T;
+        const uint32_t from = w.mix_off[t], to = w.mix_off[t + 1];
+        wide *gr = g + (uint64_t)w.site_region[t] * L;
+        for (uint32_t side = 0; side < 2; side++) {
+            const uint64_t base = side == 0 ? base_before : base_after;
+            const wide *d = side == 0 ? d_before : d_after;
+            for (uint32_t part = 0; part < 2; part++) {
+                const uint32_t col = part == 0 ? u : tm + u;
+                const wide v = d[(uint64_t)u * 2 * w.T + 2 * t + part];
+                if (v == 0) {
+                    continue;
+                }
+                if (from == to) {
+                    if (!w.unresolved[t]) {
+                        add_wide(gr + base + row_of(w, t) * 2 * tm + col, v << FACE_BITS);
+                    }
+                } else {
+                    for (uint32_t k = from; k < to; k++) {
+                        add_wide(gr + base + (uint64_t)w.mix_class[k] * 2 * tm + col, rel((wide)w.mix_share[k] * v, FACE_BITS) << FACE_BITS);
+                    }
+                }
+            }
+        }
+    }
+}
+
+// `x = −x` on 128 bits (the material's moment covector is the face's negated).
+extern "C" __global__ void field_energy_negate_wide(FieldWords w, wide *x, uint64_t cells) {
+    for (uint64_t c = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; c < cells; c += (uint64_t)gridDim.x * blockDim.x) {
+        x[c] = -x[c];
+    }
+}

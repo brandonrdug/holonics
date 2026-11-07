@@ -2623,6 +2623,9 @@ impl FieldRealization for CardField<'_> {
     fn read_energies(&mut self, field: &Field, regions: &[&[usize]]) -> Result<Vec<i128>> {
         self.energies(field, regions)
     }
+    fn read_energy_material(&mut self, field: &Field, regions: &[Region]) -> Result<Vec<(Vec<i128>, i128)>> {
+        self.energy_material(field, regions)
+    }
     fn read_and_return(&mut self, field: &Field, regions: &[Region]) -> Result<(Vec<Vec<Option<TowerFace>>>, Vec<i128>)> {
         let (faces, _, g, _, _) = self.run(field, regions, true, false, None)?;
         Ok((faces, g))
