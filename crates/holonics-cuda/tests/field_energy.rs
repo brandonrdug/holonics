@@ -651,3 +651,55 @@ fn a_writer_release_of_the_lines_energy_field_on_the_card() {
     let length = answers[0].iter().position(|&c| c == void).unwrap_or(answers[0].len());
     println!("ENERGY_RELEASE done problems={count} sweeps={sweeps} refine={refine} stop={stop} reads={reads} card_reads={} card_read_ms={} wall_ms={wall} ms_a_read={} answer_length={length} batches={} peak_store={} card={}", t.reads, t.read_ns / 1_000_000, wall / (reads.max(1) as u128), t.batches, t.peak_store, opened.census().name);
 }
+
+/// Words of one width class from the fixtures' mixer: the carrier's extremes (`i32::MIN`, `i32::MAX`, `±1`, `0`, the powers
+/// of two and their neighbours at the limbs' edges), full-width draws, and draws at 8, 16 and 24 bits (a tile of one, two or
+/// three limbs).
+fn extreme_word(next: &mut impl FnMut() -> u64, class: u64) -> i32 {
+    let edges = [i32::MIN, i32::MAX, -1, 0, 1, i32::MIN + 1, -(1 << 23), (1 << 23) - 1, -(1 << 15), (1 << 15) - 1, -128, 127, 1 << 24, -(1 << 24) - 1];
+    let x = next();
+    match class % 5 {
+        0 => edges[(x % edges.len() as u64) as usize],
+        1 => x as i32,
+        2 => (x as i32) >> 24,
+        3 => (x as i32) >> 16,
+        _ => (x as i32) >> 8,
+    }
+}
+
+/// 64-bit words of one width class: the carrier's extremes (`i64::MIN`, `i64::MAX`, `±1`, `0`, the limbs' edges), full-width
+/// draws, and draws at 8 to 56 bits (a tile of one to seven limbs).
+fn extreme_word64(next: &mut impl FnMut() -> u64, class: u64) -> i64 {
+    let edges = [i64::MIN, i64::MAX, -1, 0, 1, i64::MIN + 1, -(1 << 55), (1 << 55) - 1, -(1 << 31), (1 << 31) - 1, -128, 127, 1 << 40, -(1 << 47) - 1];
+    let x = next() as i64;
+    match class % 9 {
+        0 => edges[(x.unsigned_abs() % edges.len() as u64) as usize],
+        1 => x,
+        c => x >> (64 - 8 * (c - 1)),
+    }
+}
+
+/// [measurement; agent-inferred, November 7] **The tensor cores' score tangent is the scalar one at the carriers'
+/// extremes** (`CardField::dz_check`): a skinless head's `δz = release(T Σ (δp̂·k̂ + p̂·δk̂ − k̂·δk̂), 24)` at unit temperature
+/// from the tiles' limb products (the tangents' 64-bit words in up to eight limbs, the unit words' 32-bit values in up to four,
+/// each tile's limbs from its own bound) against `energy_pair_dz` mode by mode, bit for bit with no refusal, on tangents at
+/// the 64-bit carrier's edges and every limb width and unit words at the 32-bit carrier's, spans of one and two tiles.
+#[test]
+#[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
+fn the_tensor_cores_score_tangent_is_the_scalar_one_at_the_carriers_extremes() {
+    let opened = Card::open(0).unwrap();
+    let card = CardField::open(&opened).unwrap();
+    let mut next = mixer(0x7E46);
+    for &(span, na, nb) in &[(16usize, 53usize, 37usize), (6, 19, 11), (32, 35, 23), (20, 17, 9)] {
+        let mut wide = |rows: usize, shift: u64| -> Vec<i64> { (0..rows * span).map(|e| extreme_word64(&mut next, (e / span) as u64 * 5 + shift)).collect() };
+        let (tp, tk) = (wide(na, 0), wide(nb, 2));
+        let mut narrow = |rows: usize, shift: u64| -> Vec<i64> { (0..rows * span).map(|e| extreme_word(&mut next, (e / span) as u64 * 3 + shift) as i64).collect() };
+        let (p, k) = (narrow(na, 1), narrow(nb, 4));
+        let (new, old, status) = card.dz_check(&tp, &p, &k, &tk, span).unwrap();
+        let differ = new.iter().zip(&old).filter(|(x, y)| x != y).count();
+        let widest = new.iter().map(|v| 128 - v.unsigned_abs().leading_zeros()).max().unwrap_or(0);
+        println!("DZ_CHECK span={span} rows={na} columns={nb} pairs={} differ={differ} status={status} widest_bits={widest}", new.len());
+        assert_eq!(status, 0, "span {span}: a refusal");
+        assert_eq!(differ, 0, "span {span}: the tensor cores' score tangent differs from the scalar one");
+    }
+}

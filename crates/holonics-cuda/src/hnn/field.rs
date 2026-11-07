@@ -706,7 +706,25 @@ pub struct CardField<'c> {
     clock_out: std::cell::RefCell<Vec<BlankClocks>>,
     /// The host's wall time between marks, by name (`FIELD_PHASES`), no stream synchronized.
     phases: Option<std::cell::RefCell<(Instant, std::collections::BTreeMap<&'static str, (u64, u128)>)>>,
+    /// The card's own clock around every launch, by entry (`FIELD_EVENTS`, [`CardField::stamp`]).
+    stamps: Option<std::cell::RefCell<Stamps<'c>>>,
 }
+
+/// [measurement; agent-inferred, November 7] **Each launch timed on the card's own clock** (`CardField::stamp`, a reading
+/// only): a `field_stamp` launch before and after every launch on the same stream writes `%globaltimer` (integer
+/// nanoseconds) into a slot pair, with no host synchronization between launches, so a kernel's time is read without the
+/// synchronized profile's per-launch host latency (`FieldProfile`). The pending slots are read back when the buffer fills
+/// and when the reading is taken. It moves nothing the field computes.
+struct Stamps<'c> {
+    slots: CardBuffer<'c, u64>,
+    pending: Vec<(&'static str, u32)>,
+    kernels: std::collections::BTreeMap<(&'static str, u32), (u64, u128)>,
+    /// The head a per-head launch reads (`u32::MAX` for a launch over every head), kept beside its entry.
+    head: u32,
+}
+
+/// The launches a stamp buffer holds before it is read back.
+const STAMP_LAUNCHES: usize = 1 << 14;
 
 impl<'c> CardField<'c> {
     /// Load the field's image; a batch's stores take the card's free memory at its open less the
@@ -718,7 +736,74 @@ impl<'c> CardField<'c> {
         let (free, total) = (memory.free_bytes as u64, memory.total_bytes as u64);
         let used = total.saturating_sub(free);
         let budget = free.min(BOARD_CEILING.saturating_sub(used)).saturating_sub(MARGIN);
-        Ok(Self { card, module, budget, times: FieldTimes::default(), profile: None, pools: Default::default(), held_questions: Default::default(), covector_shares: Default::default(), row_questions: Default::default(), row_out: Default::default(), row_cov: Default::default(), held_cells: Default::default(), tick_reads: Default::default(), near_sites: Default::default(), near_out: Default::default(), clock_sites: Default::default(), clock_out: Default::default(), phases: None })
+        Ok(Self { card, module, budget, times: FieldTimes::default(), profile: None, pools: Default::default(), held_questions: Default::default(), covector_shares: Default::default(), row_questions: Default::default(), row_out: Default::default(), row_cov: Default::default(), held_cells: Default::default(), tick_reads: Default::default(), near_sites: Default::default(), near_out: Default::default(), clock_sites: Default::default(), clock_out: Default::default(), phases: None, stamps: None })
+    }
+
+    /// Time every launch on the card's own clock from here on ([`Stamps`]).
+    pub fn stamp(&mut self) -> std::result::Result<(), DeviceError> {
+        let slots = self.card.alloc::<u64>(2 * STAMP_LAUNCHES)?;
+        self.stamps = Some(std::cell::RefCell::new(Stamps { slots, pending: Vec::with_capacity(STAMP_LAUNCHES), kernels: Default::default(), head: u32::MAX }));
+        Ok(())
+    }
+
+    /// Read the pending stamps back into their entries' sums.
+    fn stamps_drain(&self, stamps: &mut Stamps<'c>) -> std::result::Result<(), DeviceError> {
+        if stamps.pending.is_empty() {
+            return Ok(());
+        }
+        let times = self.card.fetch_range(&stamps.slots, 0, 2 * stamps.pending.len())?;
+        for (k, entry) in stamps.pending.drain(..).enumerate() {
+            let slot = stamps.kernels.entry(entry).or_insert((0, 0));
+            slot.0 += 1;
+            slot.1 += times[2 * k + 1].saturating_sub(times[2 * k]) as u128;
+        }
+        Ok(())
+    }
+
+    /// Name the head the launches from here on read, for the card-clock reading (`None`: every head).
+    fn stamp_head(&self, head: Option<usize>) {
+        if let Some(stamps) = &self.stamps {
+            stamps.borrow_mut().head = head.map_or(u32::MAX, |h| h as u32);
+        }
+    }
+
+    /// The card-clock reading so far, by entry and head (`u32::MAX`: a launch over every head): launches and nanoseconds on
+    /// the card.
+    pub fn stamped(&self) -> Option<std::collections::BTreeMap<(&'static str, u32), (u64, u128)>> {
+        let stamps = self.stamps.as_ref()?;
+        let mut s = stamps.borrow_mut();
+        self.stamps_drain(&mut *s).ok()?;
+        Some(s.kernels.clone())
+    }
+
+    /// [measurement; agent-inferred, November 7] **The tensor cores' score tangent against the scalar one** on words the caller
+    /// chooses (`field_dz_check_k*`): receivers' `(δp̂, p̂)` (`tp`, `p`, `na × span`) and sources' `(k̂, δk̂)` (`k`, `tk`,
+    /// `nb × span`), each pair's `δz` at a skinless head and unit temperature from the tiles' limb products and from
+    /// `energy_pair_dz` mode by mode, `[na][nb]` both, and the status bits the two raised.
+    pub fn dz_check(&self, tp: &[i64], p: &[i64], k: &[i64], tk: &[i64], span: usize) -> Result<(Vec<i128>, Vec<i128>, u32)> {
+        let (na, nb) = (p.len() / span, k.len() / span);
+        let entry = match span {
+            1..=16 => "field_dz_check_k1",
+            17..=32 => "field_dz_check_k2",
+            _ => return Err(TowerError::Refused("a tangent check past two tiles of 16")),
+        };
+        let (tpc, pc, kc, tkc) = (self.take_up(tp).map_err(device)?, self.take_up(p).map_err(device)?, self.take_up(k).map_err(device)?, self.take_up(tk).map_err(device)?);
+        let mm = self.take_zeroed::<i128>((na * nb).max(1)).map_err(device)?;
+        let sc = self.take_zeroed::<i128>((na * nb).max(1)).map_err(device)?;
+        let st = self.take_zeroed::<u32>(1).map_err(device)?;
+        let (mut a, mut b, mut c, mut e, mut na32, mut nb32, mut s32, mut mp, mut sp, mut stp) = (tpc.device_ptr(), pc.device_ptr(), kc.device_ptr(), tkc.device_ptr(), na as u32, nb as u32, span as u32, mm.device_ptr(), sc.device_ptr(), st.device_ptr());
+        self.launch(entry, Self::warps(na.div_ceil(16) as u64), THREADS, &mut [arg(&mut a), arg(&mut b), arg(&mut c), arg(&mut e), arg(&mut na32), arg(&mut nb32), arg(&mut s32), arg(&mut mp), arg(&mut sp), arg(&mut stp)])?;
+        let new = self.card.fetch_range(&mm, 0, na * nb).map_err(device)?;
+        let old = self.card.fetch_range(&sc, 0, na * nb).map_err(device)?;
+        let status = self.card.fetch_range(&st, 0, 1).map_err(device)?[0];
+        Ok((new, old, status))
+    }
+
+    /// One stamp of the card's clock into `slot` on the stream.
+    fn stamp_at(&self, slots: &CardBuffer<'c, u64>, slot: usize) -> Result<()> {
+        let function = self.module.function("field_stamp").map_err(|e| device(e.into()))?;
+        let mut at = slots.device_ptr() + 8 * slot as u64;
+        function.launch_on_shared(self.card.stream(), Dim3::x(1), Dim3 { x: 1, y: 1, z: 1 }, 0, &mut [arg(&mut at)]).map_err(|e| device(e.into()))
     }
 
     /// The octets a batch's weight and contact stores may take.
@@ -843,7 +928,24 @@ impl<'c> CardField<'c> {
             }
             None => None,
         };
+        let stamped = match &self.stamps {
+            Some(stamps) => {
+                let mut s = stamps.borrow_mut();
+                if s.pending.len() == STAMP_LAUNCHES {
+                    self.stamps_drain(&mut *s).map_err(device)?;
+                }
+                let k = s.pending.len();
+                self.stamp_at(&s.slots, 2 * k)?;
+                let head = s.head;
+                s.pending.push((entry, head));
+                Some(2 * k + 1)
+            }
+            None => None,
+        };
         function.launch_on_shared(self.card.stream(), grid, Dim3 { x: block, y: 1, z: 1 }, shared, params).map_err(|e| device(e.into()))?;
+        if let (Some(stamps), Some(slot)) = (&self.stamps, stamped) {
+            self.stamp_at(&stamps.borrow().slots, slot)?;
+        }
         if let (Some(profile), Some(started)) = (&self.profile, started) {
             self.card.synchronize().map_err(device)?;
             let mut p = profile.borrow_mut();

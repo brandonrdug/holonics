@@ -1883,7 +1883,10 @@ equation extraction (#146).
 - **Systolic realization** (lens, September 29, [record](../../research/records/2026-09-29_SYSTOLIC_FLOW_THE_WORD_IS_A_SYSTOLIC_PULSE_AND_A_TABLE_IS_A_NAVIGATORS_RESIDENT_FACE.md)): the word is a systolic pulse, and
   exact arithmetic on the card is a limb-wise integer multiply-accumulate on the tensor cores with the carry
   cascade between limbs (the odometer). Its layout and width are derived from the device's capacity and
-  the data's rank. `holonics-cuda` has no tensor-core path yet.
+  the data's rank. `holonics-cuda`'s first tensor-core path (November 7, `kernels/field_mma.cuh`): a word is the exact
+  series of its 8-bit limbs, their count read from the operands' own bound, and the skinless heads' score tangents over
+  each resonance class's block are its limb products, recombined by shift into the scalar integer (the lock scores and the
+  probe force were moved too and lost: their kernels' time is not their products, `kernels/field_energy.cuh`).
 
 ### 4. The open joins and the learner's necessities, each disposed
 
