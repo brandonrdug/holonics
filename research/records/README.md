@@ -586,12 +586,13 @@ Follow the relevant RH/Hodge/NS/BSD/Yang–Mills/Iwasawa source at its own state
 are reusable construction material; a conjecture's endpoint neither proves nor postpones a
 separately established local law.
 
-## Hardware and exact realization
+## Hardware and realization at counted widths
 
 Read [THE_MACHINE §Hardware](../../docs/THE_MACHINE.md#hardware) and the hardware law in CLAUDE.md/AGENTS.md.
 The full [boundaries guide](https://github.com/brandonrdug/holonics/blob/13f8c734/docs/HARDWARE_AND_MODALITY_BOUNDARIES.md)
 and [the device law](https://github.com/brandonrdug/holonics/blob/13f8c734/docs/plans/THE_EXACT_DEVICE_LAW_IS_CONSTRUCTED.md) are in history.
 
+- [Precision is a count: a machine number is a graph at counted widths, and the card is a surface of thread potentials](2026-11-07_PRECISION_IS_A_COUNT_A_MACHINE_NUMBER_IS_A_GRAPH_AT_COUNTED_WIDTHS_AND_THE_CARD_IS_A_SURFACE_OF_THREAD_POTENTIALS.md) (#76, #73): Brandon's November 7 lens (no value is exact; numbers are bit widths of graphs; the GPU is a surface of many thread potentials; precision counted by organizations of states, radix, parametrons and transistors) reconciled with his earlier statements; a width is the log of the states a term's organization distinguishes for its receiver, release is dissolution with its remainder carried, counts add in any order; limb dispersal over the card; the learner's step width as the count of its evidence (lap 6's length retired, lap 7 reads more states a section); every use of the retired word mapped to what it becomes.
 - [The hardware is a receiver cover](2026-08-01_THE_HARDWARE_IS_A_RECEIVER_COVER_THE_CARD_MUST_CARRY_THE_CURRENT.md): one caused body across CPU/device charts, actual current ownership and placement.
 - [Warp scheduler, typed reductions and pressure](2026-08-19_THE_WARP_SCHEDULER_DOES_NOT_SCHEDULE_THE_HOLON_THE_REDUCTION_IS_A_TYPED_JUNCTION_AND_THE_CARD_OWES_ITS_PRESSURE_FIELD.md): mathematical work versus hardware scheduling.
 - [Wave 11 section ports and baseline](2026-09-20_WAVE_ELEVEN_RETURNS_THE_SECTION_PORTS_AND_ITS_BASELINE_SHOWS_A_TEXT_WINDOW_ON_ONE_LANE.md): the returned call boundaries and measured source; later corrections belong beside that scope.

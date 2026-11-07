@@ -28,7 +28,7 @@ results from them.
   (today `hnn::receiving`'s combined face `q_C`, the tree's grain logits plus the wave) is another;
   terrain navigators and composed eggs are others. The HNN's scored face is that population at its
   own port (`hnn::receiving::receiving_population`, `receiver::population::port`): the tree and
-  `q_C` at ½/½, `q_C` read through its exact enclosure; it replaced the carried-ratio mixture at
+  `q_C` at ½/½, `q_C` read through its enclosure at a declared width; it replaced the carried-ratio mixture at
   the unified plan's U1, whose codes the standing cut placed within that chart's drift of it. The
   population and its statistical
   families are not yet Holons joined at power ports: their update and code identities are their own
@@ -90,7 +90,7 @@ sequence or SSM needs its actual navigator and receiver map, not only the label 
 
 [definition] The elementary binary face is a polarized distinction relative to an axis/frame.
 `Physics/PhaseCarrier.binaryPhase` and `spinFace` realize two phase sheets separated by a
-half-turn; their coupled phase energy has the exact binary Ising restriction. Binary states,
+half-turn; their coupled phase energy restricts to the binary Ising pairing. Binary states,
 oriented changes and composed paths belong to the construction before any machine-word grouping or
 application alphabet is chosen ([notation](HOLONIC_NOTATION.md#arrows-signs-and-turns)).
 
@@ -188,7 +188,7 @@ material definite on attainable slips; finite phase closure needs its own witnes
 and spectral faces license only their declared receivers. Source order, chart/action maps,
 clock/lift, the complete feature pullback and the receiver identity are fixed in the prototype's
 [machine contract](https://github.com/brandonrdug/holonics/blob/13f8c734/docs/plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#situated-generator-and-receiving-composition).
-A fixed navigator count does not remove ingestion, output or exact bit-growth costs.
+A fixed navigator count does not remove ingestion, output or bit-growth costs.
 
 ## The operative equations
 
@@ -203,7 +203,7 @@ determine its internal grain, source ontology or clock.
 `Foundation/Standing` formalizes memory as present reconstruction and separates present silence
 from future extinction; retention is the future-sufficient quotient, never a tape. Recurrent
 stability is a property of the driven dynamics over its stated engagement; continuous activity and
-an exact period are separate claims. The
+a closed period are separate claims. The
 [September 21 synthesis](../research/records/2026-09-21_SITUATED_GENERATORS_RETAIN_MODES_AND_RELEASE_ACTION.md)
 connects these owners to rotor constraint inference, knot/game navigation and the
 [robotics interface](https://github.com/brandonrdug/holonics/blob/13f8c734/docs/HARDWARE_AND_MODALITY_BOUNDARIES.md#robotics-and-simulation-boundary).
@@ -235,11 +235,12 @@ dissipated power is `⟨Jv,DJv⟩`. A loss, that power and the stored-energy cha
 through a stated material/receiver law. The adjoint uses the operands that produced its forward
 carriers.
 
-[definition] Exactness keeps the source constraint, branch, period, units and remainder.
-Rational/algebraic coordinates carry exact chart values; certified enclosures keep a phase family
-and its error bound. **Periodic closure additionally needs a period or commensurability
-relation**; nonclosing transport remains exact transport. π/e, the golden mode and the distinct
-Copson and Newman boundaries have source owners in the
+[definition] Representation keeps the source constraint, branch, period, units and remainder, each
+term at its counted width. Rational/algebraic coordinates carry their chart values as ratios and
+constraint identities; certified enclosures keep a phase family and its error bound. **Periodic
+closure additionally needs a period or commensurability relation**; nonclosing transport remains
+transport, carried with its remainder. π/e, the golden mode and the distinct Copson and Newman
+boundaries have source owners in the
 [constraint-mode guide](CONSTRAINT_MODES_AND_RECEIVER_FACES.md).
 
 [definition] A numerical enclosure is another receiving construction over a kept difference.
@@ -336,7 +337,7 @@ keeps the rest, and the
 and [pair-material](../research/records/2026-09-22_PAIR_MATERIAL_LEARNS_WITHOUT_A_COMPLETED_UPDATE_ARCHIVE.md)
 records keep the measurements. The prototype's supplied references,
 [connected_holonic_field](https://github.com/brandonrdug/holonics/blob/13f8c734/research/experiments/connected_holonic_field/README.md)
-(exact normalized-current and implicit-solve controls) and
+(the normalized-current and implicit-solve controls) and
 [intrinsic_holonic_flow](https://github.com/brandonrdug/holonics/blob/13f8c734/research/experiments/intrinsic_holonic_flow/README.md)
 (nonlinear phase/shared-cell recurrence), have different scopes; neither is a trained HNN.
 
@@ -466,10 +467,10 @@ them into one readout, `hnn::reference::Exposure`, whose fields are named below.
      U1. Both component codes are reported beside it.
    - The wave's covector comes from its own combined face `q_C`, in the declared odometer chart,
      with its phase excess and winding. It is not the derivative of the quantized mixture score.
-     Exact enclosures and grain fibres accompany the scored readings.
+     Enclosures at declared widths and grain fibres accompany the scored readings.
    - The baselines are fitted online on the same exposure with a declared prior (review E2):
      - order-0 and order-1 with the Krichevsky–Trofimov prior;
-     - PPM (order 2, exact, in `hnn::reference`);
+     - PPM (order 2, integer counts, in `hnn::reference`);
      - xz and zstd bits per character, with their description cost: computed outside the crate
        (no processes in `holonics`), owed to the application that runs the exposure.
    - Failing to beat online order-0 is reported as a failure.
@@ -480,7 +481,7 @@ them into one readout, `hnn::reference::Exposure`, whose fields are named below.
    released part counted as exchange, through `aeon::EnclosedLedger` (the enclosed first law; Lean
    `Aeon/Production/FirstLaw.{ledger_telescopes, ledger_is_first_law, enclosed_contains,
    enclosed_telescopes}`). Beside it, the face's comparison
-   with the literal per aeon: `Σ_k ℓ_k + Σ_k g_k = n·log₂|A|`, exact algebra whose `g_k` is negative
+   with the literal per aeon: `Σ_k ℓ_k + Σ_k g_k = n·log₂|A|`, an identity whose `g_k` is negative
    wherever the face predicts worse than uniform, so it is a reading, not a budget ([the perceived-difference record](../research/records/2026-09-25_THE_CLASSICAL_LOSS_IS_THE_PERCEIVED_DIFFERENCE_AND_THE_DEPOSITION_REMAINDER_IS_A_REPRESENTATION_RESIDUAL.md)).
 3. **Cost against the literal (review E3).** `Kt = |Field::describe()| + |Θ_initial.describe_physics()| + K_keys + L_target|model + ⌈log₂ ExactWork⌉`.
    - The first two terms describe the field and its initial material; the located keys cost
@@ -489,7 +490,7 @@ them into one readout, `hnn::reference::Exposure`, whose fields are named below.
    - The literal is `⌈log₂|A|⌉ · n`, and the pivot pays off exactly when `Kt` is smaller.
    - Over a declared population the description is paid once.
 4. **State against source, in bits.**
-   - The exact bit lengths of the `Current`, the `SourceMoment`, the open pending ratios and the
+   - The bit lengths of the `Current`, the `SourceMoment`, the open pending ratios and the
      constitution.
    - State bits per source bit, with and without the collapse.
    - The moment's total bits per source bit against its capacity crossover `n*` (R2 H1).
@@ -552,7 +553,7 @@ tests can comb through anything valuable").
 1. **No tape in the moment; no lossless source below capacity presented as lossy (R2 H1).**
    - `SourceMoment` is sized once, from the `Field`, and accepts closing source rings only. A
      rotation transport has no ingest port (`compile_fail`).
-   - `Field::declare` computes `n*` by the counting formula, on exact integers, and refuses a
+   - `Field::declare` computes `n*` by the counting formula, on integer counts, and refuses a
      declared population shorter than it. The formula's lift factor is the admitted clock's: `2n + d_g`
      on the identity route (a ring steps by its lock's Boolean fit plus the carry) and `d_g n + d_g`
      on the located route (a digit below the period plus the carry; Lean `HNN/RangedMoment`), which
@@ -620,7 +621,7 @@ tests can comb through anything valuable").
      - `encoding::observed::PairedObservation::encode`: an explicitly declared observation
        boundary, **not** a located latent structure or a known truth. Admission reads the actual
        constitution's source ports `E`, certifies their helical dyads `BE=EΣ`, requires full column
-       rank and checks the exact decoder `D=(EᵀE)⁻¹Eᵀ`, `DE=I`. The rotor action retains its full
+       rank and checks the decoder `D=(EᵀE)⁻¹Eᵀ` by the identity `DE=I`. The rotor action retains its full
        residual `PE=EU+R`, `U=DPE`; it never pretends the source image is rotor-invariant. The
        immutable producing operands travel with `Encoded`. Host and CUDA ingestion/comparison
        refuse a stale source-port witness before mutation; after deposition the boundary is
@@ -628,7 +629,7 @@ tests can comb through anything valuable").
        deliberate authored bootstrap observation chart, not a claim of learned compression,
        arbitrary-label invariance, or semantic truth. Its checked-law formalization is owed #62.
        `OccurrencePlacement` adds a separate occurrence-specific transport: desired ring-frame
-       residues produce bounded digits through the existing carry law, while complete exact
+       residues produce bounded digits through the existing carry law, while the complete
        opening/arrival lifts travel with each slice. The native consumer checks the full frame
        and both endpoint lifts before mutation. CUDA reads these digits occurrence-major, so two
        identical intensity classes may occupy different sites without changing the alphabet;
@@ -651,7 +652,7 @@ tests can comb through anything valuable").
      `From<Released>` or `From<Vec<_>>` exists, so a release cannot be fed back as the next source
      cell.
    - **A wave is not a code** (October 9). A sample read as a *symbol* has no path into the field,
-     as above. A sample read as a *pressure* is a different quantity, an exact amplitude with a power
+     as above. A sample read as a *pressure* is a different quantity, an amplitude with a power
      pairing: `hnn::wave::MatchedWave` carries the incident-wave amplitudes of a source matched
      to a loaded ring's port, with the port's admittance and step, and a ring's port receives it
      (`WavePort::receive`; the executed tick's balance closes with the wave booked as boundary
@@ -717,7 +718,7 @@ tests can comb through anything valuable").
      unlocated chart, a plural fibre, an unread code) are runtime laws, each pinned by a test.
      Supersedes the residue chart's "stated exception" and its September 29
      `[open]` (`hnn::field`, "The port chart").
-     A founded ring's clock reads the cell count, not the class; its learned port reads the exact
+     A founded ring's clock reads the cell count, not the class; its learned port reads the full
      class counts without requiring an injective port chart (#73).
 
 10. **No scalar operand.** `Word::pull_back` accepts only a `RatioCovector`, which only a
@@ -727,14 +728,14 @@ tests can comb through anything valuable").
     `q` included, changes only through `deposit` of a `compare` return and through the collapse
     (design (a), "The light is the change"). `refine` has no path to it.
 12. **No floats.** `#![deny(clippy::float_arithmetic)]`, and `f32`/`f64` are disallowed types.
-13. **No compatibility.** There is one exact code, `Field::describe`; no legacy reader, alias or
+13. **No compatibility.** There is one code, `Field::describe`; no legacy reader, alias or
     `Legacy` law arm.
 14. **No global solve (§8.1).** `propagation.rs` exposes only junction-local solves. A cone test
     checks that an impulse at any ring is supported within `t` hops after `t` ticks, exactly.
 15. **Declared charts and residuals (§8.4).** Every lattice split has its decoder and residual. The receiver's grain reading is
     `CarriedPower` at a face, which returns the carry, the phase class and the fibre. No port method
     takes a free tolerance: `release` reads its receiving phases' grain, and the collapse releases
-    only exact complements (R2 §2), never a carried remainder. A deposit's released tail is fixed by
+    only whole complements (R2 §2), never a carried remainder. A deposit's released tail is fixed by
     the locus's deposit count, reported in its receipt, and bounded over every aeon since the locus's founding
     (`HNN/LatticeDeposit`). A constitution over its bit budget is refused
     (`ConstitutionBudget`); its declaration is not silently coarsened (R3 §5).
@@ -800,7 +801,7 @@ tests can comb through anything valuable").
       appends it whole, each byte for the eye, with its copy length to the private show
       `<out>/releases.show`, and prints the copy length's integers on stdout (never the bytes: the
       release may derive from private data). The copy length is `tools/copy_length.py`'s law ported
-      exactly (`exterior::copy_length`, the suffix automaton of the release with its matching
+      whole (`exterior::copy_length`, the suffix automaton of the release with its matching
       statistics, the same `key value` output), checked against the quadratic definition on 300
       pseudo-random cases and the tool's own cases (`exterior_guards`). The text harnesses show
       through it: `executed text` each request's release against the training passage and its
