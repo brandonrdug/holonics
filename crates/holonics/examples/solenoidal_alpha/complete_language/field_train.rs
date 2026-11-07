@@ -2890,7 +2890,12 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
     std::fs::create_dir(out)?;
     let void = codec.void();
     let near = holonics::hnn::tower::field::NEAR;
-    let seed = u64::from_str_radix(args[2].get(..16).ok_or("a state's hash of fewer than sixteen hex digits")?, 16).map_err(|_| "a state's hash that is not hexadecimal")?;
+    // [definition; theory, November 7 22:08] `FIELD_CONTRAST_SEED=HEX`: a read keyed by a declared seed, so laws read from
+    // different states pair section by section; laps keep the state-keyed walk.
+    let seed = match std::env::var("FIELD_CONTRAST_SEED") {
+        Ok(v) => u64::from_str_radix(&v, 16).map_err(|_| "FIELD_CONTRAST_SEED is hexadecimal")?,
+        Err(_) => u64::from_str_radix(args[2].get(..16).ok_or("a state's hash of fewer than sixteen hex digits")?, 16).map_err(|_| "a state's hash that is not hexadecimal")?,
+    };
     let law = WriterLaw::from_env()?;
     // Each problem's question, its answer cut to the room, and the room (`Problems`' third place).
     let encode = |problems: &[(Vec<u8>, Vec<u8>)], field: &Field| -> Result<Problems> {
@@ -2941,7 +2946,21 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
         learner.laps
     );
     let mut enumerated_rows = rows_file(&out.join("ENUMERATED.tsv"), "lap\tproblem\tplace\ttruth\tlog2_t\tface_masses\tface_total\tenergies\ttruth_face_masses\ttruth_face_total\n")?;
-    enumerated_read(&held_field(&learner, averaging), &held_set, places, &truth_of, realization, -1, &mut enumerated_rows)?;
+    // [definition; theory, November 7 22:41] `FIELD_HOST_HELD=K`: every held read on the host's lanes (`HostHeld`), at `θ` and
+    // `θ̄`, at the lap's start, its `K` crossings, its saves and its stop; the card reads none.
+    let host_crossings: usize = match std::env::var("FIELD_HOST_HELD") {
+        Ok(v) => v.parse().map_err(|_| "FIELD_HOST_HELD is a count of crossings a lap".to_string())?,
+        Err(_) => 0,
+    };
+    let host_held = if host_crossings > 0 {
+        Some(HostHeld::start(enumerated_places(&held_set, places, &truth_of), &out, "lap\tproblem\tplace\ttruth\tlog2_t\tface_masses\tface_total\tenergies\ttruth_face_masses\ttruth_face_total\n")?)
+    } else {
+        None
+    };
+    match &host_held {
+        Some(h) => h.read(-1, &learner),
+        None => enumerated_read(&held_field(&learner, averaging), &held_set, places, &truth_of, realization, -1, &mut enumerated_rows)?,
+    }
     println!("FIELD_ENUMERATED_READ lap=-1 ms={}", started.elapsed().as_millis());
     // [definition; Brandon, November 6 17:11; theory, November 7 16:56] A card run holds at most one hour between saved states:
     // at the first section start an hour (`SAVE_MS`) past the last saved state, the learner rests as `STATE.<lap>.<sections
@@ -2970,6 +2989,7 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
         let (mut tenth_family, mut tenths_printed): (Vec<(i128, i128)>, usize) = (Vec::new(), 0);
         // The sections' coherence over each hundred sections and over the lap (theory, November 7 19:50).
         let (mut coherence_block, mut coherence_lap) = (Coherence::new(&learner.field), Coherence::new(&learner.field));
+        let mut leg = Leg::new(&learner.field);
         let mut coherence_from = 0usize;
         for (n, &s) in walk(seed, read, sections.len()).iter().enumerate().skip(if lap == 0 { from_section } else { 0 }) {
             let now = started.elapsed().as_millis();
@@ -2978,9 +2998,14 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
             }
             if n > 0 && now - saved_ms >= SAVE_MS {
                 write_new(&out.join(format!("STATE.{lap}.{n}")), at_rate(&learner, base_rate).as_bytes())?;
-                enumerated_read(&held_field(&learner, averaging), &held_set, places, &truth_of, realization, 10_000 * (lap as i64 + 1) + n as i64, &mut enumerated_rows)?;
+                match &host_held {
+                    Some(h) => h.read(10_000 * (lap as i64 + 1) + n as i64, &learner),
+                    None => enumerated_read(&held_field(&learner, averaging), &held_set, places, &truth_of, realization, 10_000 * (lap as i64 + 1) + n as i64, &mut enumerated_rows)?,
+                }
                 saved_ms = started.elapsed().as_millis();
                 println!("FIELD_SAVED lap={lap} sections={n}/{} ms={now} read_ms={}", sections.len(), saved_ms - now);
+                leg.print(&learner.field, lap, n, "leg");
+                leg = Leg::new(&learner.field);
             }
             let section_start = std::time::Instant::now();
             let members = &sections[s];
@@ -3253,8 +3278,15 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
                         .collect();
                     println!("FIELD_STEP lap={lap} n={n} {}", text.join(" "));
                 }
+                leg.add(&learner.field, &receipt, &theta_before);
                 if averaging {
                     learner.average_section();
+                }
+                if let Some(h) = &host_held {
+                    let len = sections.len();
+                    if (n + 1) * host_crossings / len > n * host_crossings / len {
+                        h.read(10_000 * (lap as i64 + 1) + (n + 1) as i64, &learner);
+                    }
                 }
                 coherence_block.add(&receipt.covector);
                 coherence_lap.add(&receipt.covector);
@@ -3280,7 +3312,11 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
                     if tenth > tenths_printed && n + 1 < sections.len() {
                         // [measurement; theory, November 7 19:50] The held places read at each tenth, beside the tenth's acceptance and
                         // the sections' coherence (rows marked `10000·(lap + 1) + sections done`).
-                        enumerated_read(&held_field(&learner, averaging), &held_set, places, &truth_of, realization, 10_000 * (lap as i64 + 1) + (n + 1) as i64, &mut enumerated_rows)?;
+                        match &host_held {
+                            // The host's crossings carry the tenths.
+                            Some(_) => {}
+                            None => enumerated_read(&held_field(&learner, averaging), &held_set, places, &truth_of, realization, 10_000 * (lap as i64 + 1) + (n + 1) as i64, &mut enumerated_rows)?,
+                        }
                     }
                     if tenth > tenths_printed || n + 1 == sections.len() {
                         tenths_printed = tenth;
@@ -3292,12 +3328,16 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
                 if started.elapsed().as_millis() > stop_ms || read_done {
                     write_new(&out.join("STATE.stopped"), at_rate(&learner, base_rate).as_bytes())?;
                     // [theory, November 7 21:44] Every stopped read ends with the held read (rows marked `lap`).
-                    enumerated_read(&held_field(&learner, averaging), &held_set, places, &truth_of, realization, lap as i64, &mut enumerated_rows)?;
+                    match &host_held {
+                        Some(h) => h.read(lap as i64, &learner),
+                        None => enumerated_read(&held_field(&learner, averaging), &held_set, places, &truth_of, realization, lap as i64, &mut enumerated_rows)?,
+                    }
                     println!("FIELD_STOPPED lap={lap} sections={}/{} states={states} ms={}", n + 1, sections.len(), started.elapsed().as_millis());
                     if coherence_block.n > 0 {
                         println!("FIELD_COHERENCE lap={lap} sections={coherence_from}..{} n={} {}", n + 1, coherence_block.n, coherence_block.text(&learner.field));
                     }
                     println!("FIELD_COHERENCE_LAP lap={lap} stopped n={} {}", coherence_lap.n, coherence_lap.text(&learner.field));
+                    leg.print(&learner.field, lap, n + 1, "stop");
                     if states > 0 {
                         println!("FIELD_KERNEL_FAMILIES lap={lap} stopped {}", family_text(&learner.field, &by_family, states));
                         let mean = weight_lap * 1000 / (unit * states as i128);
@@ -3407,6 +3447,7 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
                 println!("FIELD_COHERENCE lap={lap} sections={coherence_from}..{} n={} {}", sections.len(), coherence_block.n, coherence_block.text(&learner.field));
             }
             println!("FIELD_COHERENCE_LAP lap={lap} n={} {}", coherence_lap.n, coherence_lap.text(&learner.field));
+            leg.print(&learner.field, lap, sections.len(), "lap");
             // [measurement; the unified-theory reading of November 7, 05:55] The acceptance by tenths of the states' block size,
             // and α and the shrink by tenths of the lap (their medians).
             let mut sized = by_state.clone();
@@ -3443,7 +3484,10 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
             lap_start.elapsed().as_millis(),
             started.elapsed().as_millis()
         );
-        enumerated_read(&held_field(&learner, averaging), &held_set, places, &truth_of, realization, lap as i64, &mut enumerated_rows)?;
+        match &host_held {
+            Some(h) => h.read(lap as i64, &learner),
+            None => enumerated_read(&held_field(&learner, averaging), &held_set, places, &truth_of, realization, lap as i64, &mut enumerated_rows)?,
+        }
         println!("FIELD_ENUMERATED_READ lap={lap} ms={}", started.elapsed().as_millis());
     }
     Ok(())
@@ -3547,6 +3591,67 @@ impl Coherence {
     }
 }
 
+/// [measurement; theory, November 7 22:55] **A leg's readings** (from one saved state to the next): the sections' coherence,
+/// each letter's truth count less its conditional mass, the places' surprise bands, `KL(p ‖ face)` and `p(truth)` a place, and
+/// each family's step, printed at each save as `FIELD_LEG` lines.
+struct Leg {
+    coherence: Coherence,
+    letters: Vec<i128>,
+    bands: Vec<usize>,
+    kl: i128,
+    truth_p: i128,
+    places: usize,
+    steps: Vec<i128>,
+    sections: usize,
+}
+
+impl Leg {
+    fn new(field: &Field) -> Self {
+        Self { coherence: Coherence::new(field), letters: Vec::new(), bands: Vec::new(), kl: 0, truth_p: 0, places: 0, steps: vec![0; field.families_all().len()], sections: 0 }
+    }
+    fn add(&mut self, field: &Field, r: &holonics::hnn::tower::field::KernelReceipt, before: &[i32]) {
+        self.coherence.add(&r.covector);
+        self.sections += 1;
+        if self.letters.len() < r.letter_counts.len() {
+            self.letters.resize(r.letter_counts.len(), 0);
+        }
+        for (a, &c) in self.letters.iter_mut().zip(&r.letter_counts) {
+            *a += c;
+        }
+        if self.bands.len() < r.surprise_bands.len() {
+            self.bands.resize(r.surprise_bands.len(), 0);
+        }
+        for (a, &c) in self.bands.iter_mut().zip(&r.surprise_bands) {
+            *a += c;
+        }
+        (self.kl, self.truth_p, self.places) = (self.kl + r.kl_face, self.truth_p + r.weight, self.places + r.places);
+        for (slot, &(start, len, _)) in self.steps.iter_mut().zip(field.families_all().iter()) {
+            *slot += (start..start + len).map(|i| (field.theta[i] as i128 - before[i] as i128).abs()).sum::<i128>();
+        }
+    }
+    fn print(&self, field: &Field, lap: usize, at: usize, what: &str) {
+        let unit = 1i128 << holonics::hnn::tower::MATERIAL_BITS;
+        let places = self.places.max(1) as i128;
+        let mut letters: Vec<(usize, i128)> = self.letters.iter().copied().enumerate().collect();
+        letters.sort_by_key(|&(a, c)| (std::cmp::Reverse(c.abs()), a));
+        let top: Vec<String> = letters.iter().take(8).map(|&(a, c)| format!("{a}:{}", c * 1000 / unit)).collect();
+        let bands: Vec<String> = self.bands.iter().enumerate().filter(|&(_, &c)| c > 0).map(|(k, c)| format!("k{k}={c}")).collect();
+        let names = family_names(field);
+        let steps: Vec<String> = field
+            .families_all()
+            .iter()
+            .zip(&self.steps)
+            .filter(|&(f, &s)| f.1 > 0 && s > 0)
+            .map(|(&(start, len, _), &s)| format!("{}={}", names.iter().find(|&&(_, at)| at == start).map_or("?", |&(n, _)| n), s * 1000 / (len as i128 * self.sections.max(1) as i128)))
+            .collect();
+        println!("FIELD_LEG lap={lap} {what} sections={at} legsections={} places={} truth_p_milli={} kl_face_milli_nats={}", self.sections, self.places, self.truth_p * 1000 / (unit * places), self.kl * LN2_Q30 / places * 1000 >> 62);
+        println!("FIELD_LEG_COHERENCE lap={lap} {what} n={} {}", self.coherence.n, self.coherence.text(field));
+        println!("FIELD_LEG_LETTERS lap={lap} {what} truth_count_less_mass_milli {}", top.join(" "));
+        println!("FIELD_LEG_BANDS lap={lap} {what} {}", bands.join(" "));
+        println!("FIELD_LEG_STEPS lap={lap} {what} milli_grains_an_entry_a_section {}", steps.join(" "));
+    }
+}
+
 /// The field a held read reads: the averaged constitution where it is kept and declared, the live field otherwise.
 fn held_field(learner: &FieldLearner, averaging: bool) -> Field {
     if averaging { learner.averaged_field() } else { learner.field.clone() }
@@ -3618,32 +3723,48 @@ fn at_rate(learner: &FieldLearner, rate: u32) -> String {
 /// place carrying its truth letter whole, as a kernel block opens it).
 /// The codes and `KL(enumerated ‖ face)` are read from the rows at the receipt (a reading only: nothing in the run reads it).
 fn enumerated_read(field: &Field, held: &Problems, places: usize, truth_of: &dyn Fn(&(Vec<usize>, Vec<usize>, usize), &[usize]) -> Vec<usize>, realization: &mut dyn FieldRealization, lap: i64, rows: &mut std::fs::File) -> Result<()> {
-    let alphabet = field.declaration.alphabet;
-    let chosen: Vec<(usize, Vec<usize>, usize)> = held
-        .iter()
+    let chosen = enumerated_places(held, places, truth_of);
+    for line in enumerated_rows(field, &chosen, realization, lap)? {
+        row(rows, &line)?;
+    }
+    Ok(())
+}
+
+/// The held places an enumerated read takes: each of the first `places` held problems' keyed answer place, its truth and its
+/// question's length.
+type HeldPlaces = Vec<(usize, Vec<usize>, usize, usize)>;
+
+fn enumerated_places(held: &Problems, places: usize, truth_of: &dyn Fn(&(Vec<usize>, Vec<usize>, usize), &[usize]) -> Vec<usize>) -> HeldPlaces {
+    held.iter()
         .take(places)
         .enumerate()
         .map(|(k, p)| {
             let t = p.0.len() + (mix(ENUMERATED_KEY, k as u64) as usize) % p.1.len();
-            (k, truth_of(p, &p.1), t)
+            (k, truth_of(p, &p.1), t, p.0.len())
         })
-        .collect();
+        .collect()
+}
+
+/// [`enumerated_read`]'s rows at `chosen` (each line `lap`-marked), read through `realization`.
+fn enumerated_rows(field: &Field, chosen: &HeldPlaces, realization: &mut dyn FieldRealization, lap: i64) -> Result<Vec<String>> {
+    let alphabet = field.declaration.alphabet;
+    let chosen: Vec<(usize, &Vec<usize>, usize, usize)> = chosen.iter().map(|(k, truth, t, q)| (*k, truth, *t, *q)).collect();
     if chosen.is_empty() {
-        return Ok(());
+        return Ok(Vec::new());
     }
-    let opens: Vec<Vec<bool>> = chosen.iter().map(|(_, truth, t)| (0..truth.len()).map(|s| s == *t).collect()).collect();
-    let views: Vec<Region> = chosen.iter().zip(&opens).map(|((_, truth, _), open)| Region { classes: truth, unresolved: open, faces: &[], locked: &[], echo: &[], domain: None, port: None }).collect();
+    let opens: Vec<Vec<bool>> = chosen.iter().map(|(_, truth, t, _)| (0..truth.len()).map(|s| s == *t).collect()).collect();
+    let views: Vec<Region> = chosen.iter().zip(&opens).map(|((_, truth, _, _), open)| Region { classes: truth, unresolved: open, faces: &[], locked: &[], echo: &[], domain: None, port: None }).collect();
     let faces = realization.read_faces(field, &views).map_err(|e| e.to_string())?;
     // [measurement; the unified-theory reading of November 7, 08:25] The face at the truth beside the open face: the place
     // carrying its truth letter whole (as a kernel block opens it), whose slope keeps the place's own curvature.
-    let carried: Vec<Vec<Option<Shares>>> = chosen.iter().map(|(_, truth, t)| (0..truth.len()).map(|s| (s == *t).then(|| vec![(truth[s] as u32, 1u32 << 16)])).collect()).collect();
-    let truth_views: Vec<Region> = chosen.iter().zip(&opens).zip(&carried).map(|(((_, truth, _), open), c)| Region { classes: truth, unresolved: open, faces: c, locked: open, echo: &[], domain: None, port: None }).collect();
+    let carried: Vec<Vec<Option<Shares>>> = chosen.iter().map(|(_, truth, t, _)| (0..truth.len()).map(|s| (s == *t).then(|| vec![(truth[s] as u32, 1u32 << 16)])).collect()).collect();
+    let truth_views: Vec<Region> = chosen.iter().zip(&opens).zip(&carried).map(|(((_, truth, _, _), open), c)| Region { classes: truth, unresolved: open, faces: c, locked: open, echo: &[], domain: None, port: None }).collect();
     let truth_faces = realization.read_faces(field, &truth_views).map_err(|e| e.to_string())?;
     let configurations: Vec<Vec<usize>> = chosen
         .iter()
-        .flat_map(|(_, truth, t)| {
+        .flat_map(|(_, truth, t, _)| {
             (0..alphabet).map(move |c| {
-                let mut x = truth.clone();
+                let mut x = truth.to_vec();
                 x[*t] = c;
                 x
             })
@@ -3652,16 +3773,68 @@ fn enumerated_read(field: &Field, held: &Problems, places: usize, truth_of: &dyn
     let asked: Vec<&[usize]> = configurations.iter().map(Vec::as_slice).collect();
     let energies = realization.read_energies(field, &asked).map_err(|e| e.to_string())?;
     let log2_t = field.theta[field.layout().face_temper];
-    for (n, (k, truth, t)) in chosen.iter().enumerate() {
+    let mut lines = Vec::with_capacity(chosen.len());
+    for (n, (k, truth, t, q)) in chosen.iter().enumerate() {
         let face = faces[n][*t].as_ref().ok_or("an enumerated read's open place with no face")?;
         let masses: Vec<String> = face.masses.iter().map(u128::to_string).collect();
         let at_truth = truth_faces[n][*t].as_ref().ok_or("an enumerated read's carried place with no face")?;
         let truth_masses: Vec<String> = at_truth.masses.iter().map(u128::to_string).collect();
         let g: Vec<String> = energies[n * alphabet..(n + 1) * alphabet].iter().map(i128::to_string).collect();
-        let q = held[*k].0.len();
-        row(rows, &format!("{lap}\t{k}\t{}\t{}\t{log2_t}\t{}\t{}\t{}\t{}\t{}\n", t - q, truth[*t], masses.join(","), face.total, g.join(","), truth_masses.join(","), at_truth.total))?;
+        lines.push(format!("{lap}\t{k}\t{}\t{}\t{log2_t}\t{}\t{}\t{}\t{}\t{}\n", t - q, truth[*t], masses.join(","), face.total, g.join(","), truth_masses.join(","), at_truth.total));
     }
-    Ok(())
+    Ok(lines)
+}
+
+/// [definition; theory, November 7 22:41, from Brandon's 22:29 lens: the host is a surface too] **The held reader on the host's
+/// lanes**: readings never deposit, so the held reads at every crossing run on the host (the field's own realization,
+/// [`holonics::hnn::tower::field::HostField`]) on a thread of their own while the card keeps learning. Each request is the
+/// field at a crossing, the live `θ` and the averaged `θ̄`, read in order; their rows go to `HELD_LIVE.tsv` and
+/// `HELD_AVERAGE.tsv`, marked as the card's held rows are, with a `FIELD_HOST_HELD` line a read.
+struct HostHeld {
+    send: Option<std::sync::mpsc::Sender<(i64, &'static str, Field)>>,
+    worker: Option<std::thread::JoinHandle<()>>,
+}
+
+impl HostHeld {
+    fn start(chosen: HeldPlaces, out: &std::path::Path, header: &'static str) -> Result<Self> {
+        let (send, receive) = std::sync::mpsc::channel::<(i64, &'static str, Field)>();
+        let mut live = rows_file(&out.join("HELD_LIVE.tsv"), header)?;
+        let mut average = rows_file(&out.join("HELD_AVERAGE.tsv"), header)?;
+        let started = std::time::Instant::now();
+        let worker = std::thread::spawn(move || {
+            for (marker, kind, field) in receive {
+                let t = std::time::Instant::now();
+                match enumerated_rows(&field, &chosen, &mut holonics::hnn::tower::field::HostField, marker) {
+                    Ok(lines) => {
+                        let file = if kind == "average" { &mut average } else { &mut live };
+                        let written = lines.iter().try_for_each(|l| row(file, l));
+                        println!("FIELD_HOST_HELD marker={marker} kind={kind} places={} ms={} at_ms={} ok={}", lines.len(), t.elapsed().as_millis(), started.elapsed().as_millis(), written.is_ok());
+                    }
+                    Err(e) => println!("FIELD_HOST_HELD marker={marker} kind={kind} error={e}"),
+                }
+            }
+        });
+        Ok(Self { send: Some(send), worker: Some(worker) })
+    }
+    fn read(&self, marker: i64, learner: &FieldLearner) {
+        if let Some(send) = &self.send {
+            let _ = send.send((marker, "live", learner.field.clone()));
+            let _ = send.send((marker, "average", learner.averaged_field()));
+        }
+    }
+    fn finish(&mut self) {
+        self.send.take();
+        if let Some(w) = self.worker.take() {
+            let _ = w.join();
+        }
+    }
+}
+
+impl Drop for HostHeld {
+    /// Every requested read completes before the run returns.
+    fn drop(&mut self) {
+        self.finish();
+    }
 }
 
 /// The enumerated read's key space, apart from every other draw of the run.
