@@ -1719,8 +1719,15 @@ __device__ __forceinline__ wide lock_pair(int64_t a0, int64_t a1, int64_t b0, in
 // 2^(ℓ − c)`, `c = ⌈ℓ⌉`, the fraction read through the exponential's resident face at `ℓ`'s `2^(−16)`, released to
 // `2^(−24)`; past its carrier it is refused. A score is `z = release(T S, 24) − falloff` from the lock at unit gain
 // `S` (on `2^(−16)`).
+__device__ __forceinline__ wide temper_log(const FieldWords &w, wide l);
+
 __device__ __forceinline__ wide temper_of(const FieldWords &w, uint32_t h, bool listens) {
-    const wide l = (wide)w.theta[w.temper_at + 2 * h + (listens ? 1 : 0)];
+    return temper_log(w, (wide)w.theta[w.temper_at + 2 * h + (listens ? 1 : 0)]);
+}
+
+// A temperature from its logarithm `ℓ = log₂ T` on `2^(−24)` (the host's `temperature_of`), read as `temper_of` reads a
+// head's: the letters' temperature of an energy field is read through it at `−θ[face_temper]` (`1/T`).
+__device__ __forceinline__ wide temper_log(const FieldWords &w, wide l) {
     const wide c = (l + ((wide)1 << MATERIAL_BITS) - 1) >> MATERIAL_BITS;
     if (c > TEMPER_TOP || c < 1 - (wide)MATERIAL_BITS) {
         atomicOr(w.status, REFUSED_TEMPER);

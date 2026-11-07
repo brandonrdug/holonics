@@ -557,9 +557,12 @@ extern "C" __global__ void field_energy_dm(FieldWords w, uint64_t mface, const i
 // the sites they reach, `release(⟨E₋(a), r̂_(t+1)⟩ + ⟨E₊(a), r̂_(t−1)⟩, 16)`, and `release(μ − θ, 24)`: the moment's part `μ = Σ_k
 // E⁻_m(a)_k δb_t[k] + E⁺_m(a)_k δa_t[k]` through the moment's return (`d_before`, `d_after`, `[u][t]` pairs on 128 bits) and the
 // opening's and the ticks' part `θ = ⟨E(a), λ_own⟩ + ⟨E₋(a), λ_before⟩ + ⟨E₊(a), λ_after⟩` on the letters' covectors (`[t][D]` on
-// `2^(−24)`, the reverse's).
-extern "C" __global__ void field_energy_face(FieldWords w, const int32_t *read, const wide *dbefore, const wide *dafter, uint32_t tm, uint64_t mbefore, uint64_t mafter, const int64_t *own, const int64_t *before, const int64_t *after, int64_t *z) {
+// `2^(−24)`, the reverse's); then at the field's one temperature, `release(z · (1/T), 24)`.
+extern "C" __global__ void field_energy_face(FieldWords w, const int32_t *read, const wide *dbefore, const wide *dafter, uint32_t tm, uint64_t mbefore, uint64_t mafter, const int64_t *own, const int64_t *before, const int64_t *after, uint64_t face_temper, int64_t *z) {
     const uint64_t cells = (uint64_t)w.T * w.A;
+    // The letters read the energy at the field's one temperature, `z = −(1/T) dG/de` (the unified-theory reading of November 7,
+    // 01:37): `1/T` read at `−log₂ T`.
+    const wide inverse = temper_log(w, -(wide)w.theta[face_temper]);
     for (uint64_t c = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; c < cells; c += (uint64_t)gridDim.x * blockDim.x) {
         const uint64_t t = c / w.A, a = c % w.A;
         if (!w.unresolved[t]) {
@@ -586,7 +589,8 @@ extern "C" __global__ void field_energy_face(FieldWords w, const int32_t *read, 
             const uint64_t at = (uint64_t)u * 2 * w.T + 2 * t + (k < tm ? 0 : 1);
             part += (wide)w.theta[mbefore + a * 2 * tm + k] * dbefore[at] + (wide)w.theta[mafter + a * 2 * tm + k] * dafter[at];
         }
-        z[c] = fit64((wide)z[c] + rel(strand, FACE_BITS) + rel(part - through, COVECTOR_BITS), w.status);
+        const int64_t raw = fit64((wide)z[c] + rel(strand, FACE_BITS) + rel(part - through, COVECTOR_BITS), w.status);
+        z[c] = fit64(rel((wide)raw * inverse, MATERIAL_BITS), w.status);
     }
 }
 

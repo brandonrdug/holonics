@@ -7,7 +7,8 @@
 //! `flock -w 900 .local/gpu.lock cargo test --release -p holonics-cuda --test field_energy -- --include-ignored --test-threads=1`.
 use std::time::Instant;
 
-use holonics::hnn::tower::field::{EnergyRead, Field, FieldDeclaration, FieldRealization, Region, Shares};
+use holonics::hnn::tower::field::{EnergyRead, EnergySquare, Field, FieldDeclaration, FieldRealization, Region, Shares};
+use rayon::prelude::*;
 use holonics::hnn::tower::TowerFace;
 use holonics_cuda::hnn::{Card, CardField};
 
@@ -366,4 +367,95 @@ fn the_lines_energy_forward_on_the_card_is_the_hosts_at_1500_sites() {
     for (entry, launches, ns) in top.iter().take(8) {
         println!("ENERGY_PROFILE entry={entry} launches={launches} us={}", ns / 1_000);
     }
+}
+
+/// The square's `ε` the curl's reading uses (`ENERGY_EPS` of `curl-field`, `2^(−6)` of a mixture's weight).
+const SQUARE_EPS: u32 = 1 << 10;
+
+/// The line's square `ε`, `2^9`: below a letter's uniform weight over the line's hundred letters (`2^16/100 = 655`), past
+/// which the moved mixture's lowered letter would pass below zero (`curl-field`'s `2^10` is refused there, on the host and
+/// the card alike).
+const LINE_SQUARE_EPS: u32 = 1 << 9;
+
+/// The host's squares at `eps`, read in parallel (`Field::energy_square_corners`).
+fn host_squares(field: &Field, squares: &[(&[usize], (usize, usize))], void: usize, eps: u32) -> Vec<Option<EnergySquare>> {
+    squares.par_iter().map(|&(truth, ij)| field.energy_square_corners(truth, ij, void, eps).unwrap()).collect()
+}
+
+/// [measurement; the unified-theory reading of November 7, 01:37] **The tiny squares at one base on the card are the host's**:
+/// on every ring set (the letters' temperature drawn), squares over the two tiny truths (7 and 13 sites), all in one batch of
+/// eleven reads, each square's `EnergySquare` (the runner-ups, the readings over whole letters, on the logits and of `G`, the
+/// floors and the attribution read) equal to the host's.
+#[test]
+#[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
+fn the_tiny_squares_at_one_base_on_the_card_are_the_hosts() {
+    let opened = Card::open(0).unwrap();
+    let mut card = CardField::open(&opened).unwrap();
+    let short = vec![1usize, 4, 0, 2, 2, 3, 1];
+    let long: Vec<usize> = (0..13).map(|t| (t * 3 + t / 4) % 5).collect();
+    let squares: Vec<(&[usize], (usize, usize))> = vec![(&short, (1, 3)), (&short, (0, 5)), (&short, (2, 6)), (&short, (3, 4)), (&long, (4, 9)), (&long, (0, 12)), (&long, (6, 7)), (&long, (2, 11))];
+    let void = 4;
+    for still in 0..=2 {
+        let field = energetic(still);
+        let reference = host_squares(&field, &squares, void, SQUARE_EPS);
+        let read = card.energy_squares(&field, &squares, void, SQUARE_EPS).unwrap();
+        for (k, (h, c)) in reference.iter().zip(&read).enumerate() {
+            println!("ENERGY_SQUARE tiny still={still} square={k} bit_equal={} host={h:?}", h == c);
+        }
+        assert_eq!(read, reference, "still {still}: the card's squares");
+        assert!(reference.iter().filter(|s| s.is_some()).count() >= 6, "still {still}: squares with runner-ups");
+    }
+}
+
+/// [measurement; the unified-theory reading of November 7, 01:37] **The line's squares at one base on the card are the
+/// host's**: on the founding of the line's declaration, squares on two synthetic truths of 400 sites (eight a truth, their
+/// sites in the truths' last third, one to eleven apart), at `ε = 2^9` ([`LINE_SQUARE_EPS`]), read in one batch on the card
+/// (cold, then warm) and on the host's threads, square for square equal.
+#[test]
+#[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
+fn the_lines_squares_at_one_base_on_the_card_are_the_hosts() {
+    let d = line_declaration();
+    let field = Field::found(d, &keys(d.founding_draws())).unwrap();
+    let truths: Vec<Vec<usize>> = (0..2u64)
+        .map(|k| {
+            let mut next = mixer(0x5A_0000 + k);
+            (0..400).map(|_| (next() % d.alphabet as u64) as usize).collect()
+        })
+        .collect();
+    let mut next = mixer(0x5A_1111);
+    let mut squares: Vec<(&[usize], (usize, usize))> = Vec::new();
+    for truth in &truths {
+        for _ in 0..8 {
+            let gap = 1 + (next() % 11) as usize;
+            let i = 267 + (next() % (400 - 267 - gap) as u64) as usize;
+            squares.push((truth, (i, i + gap)));
+        }
+    }
+    let void = d.alphabet - 1;
+    let opened = Card::open(0).unwrap();
+    let mut card = CardField::open(&opened).unwrap();
+    let started = Instant::now();
+    let cold = card.energy_squares(&field, &squares, void, LINE_SQUARE_EPS).unwrap();
+    let cold_ms = started.elapsed().as_millis();
+    let started = Instant::now();
+    let warm = card.energy_squares(&field, &squares, void, LINE_SQUARE_EPS).unwrap();
+    let warm_ms = started.elapsed().as_millis();
+    let threads = rayon::current_num_threads();
+    let started = Instant::now();
+    let reference = host_squares(&field, &squares, void, LINE_SQUARE_EPS);
+    let host_ms = started.elapsed().as_millis();
+    for (k, (h, c)) in reference.iter().zip(&cold).enumerate() {
+        println!("ENERGY_SQUARE line square={k} bit_equal={} host={h:?}", h == c);
+    }
+    let n = squares.len() as u128;
+    println!(
+        "ENERGY_SQUARE line squares={n} sites=400 bit_equal={} warm_bit_equal={} card_cold_ms={cold_ms} card_warm_ms={warm_ms} card_ms_a_square={} host_ms={host_ms} host_threads={threads} host_ms_a_square={} peak_store={}",
+        cold == reference,
+        warm == reference,
+        warm_ms / n,
+        host_ms / n,
+        card.times().peak_store
+    );
+    assert_eq!(cold, reference, "the card's squares");
+    assert_eq!(warm, reference, "the card's squares, warm");
 }

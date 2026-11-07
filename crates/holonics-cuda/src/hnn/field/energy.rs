@@ -29,7 +29,7 @@
 //! return (the material's covector through the ticks) is not built: an energy field is read on the card, not trained.
 
 use super::*;
-use holonics::hnn::tower::field::{EnergyRead, Shares, FIRST_HALVINGS, MOST_HALVINGS};
+use holonics::hnn::tower::field::{EnergyRead, EnergySquare, Shares, SquareCorners, FIRST_HALVINGS, MOST_HALVINGS};
 
 /// A region's energy sums on the card (`ENERGY_SUMS` in `kernels/field_energy.cuh`): the locks', the letters' and the
 /// pair's, the logarithms read, the site pairs met, whether a step moved it, and `Φ` on `2^(−32)` bits.
@@ -74,13 +74,9 @@ pub(super) struct EnergyCell<'c> {
 /// lists, each site's letter rows and class bias, the moment's term in the face, the letters' force, the pair's
 /// contraction at every site, and a zero covector of the current (the columns' value part reads it).
 struct EnergyHeld<'c> {
-    cls: Pooled<'c, u32>,
-    class_off: Pooled<'c, u32>,
-    members: Pooled<'c, u32>,
-    pn: Pooled<'c, u32>,
-    pcls: Pooled<'c, u32>,
-    poff: Pooled<'c, u32>,
-    pmem: Pooled<'c, u32>,
+    /// The resonance classes and their lists the rows read (`cls`, `class_off`, `members`, `pn`, `pcls`, `poff`, `pmem`): the
+    /// batch's own ([`EnergyLists`]) or a base's.
+    lists: [u64; 7],
     own: Pooled<'c, i64>,
     before: Pooled<'c, i64>,
     after: Pooled<'c, i64>,
@@ -89,6 +85,46 @@ struct EnergyHeld<'c> {
     lf: Pooled<'c, i64>,
     dc: Pooled<'c, i64>,
     dyh0: Pooled<'c, i64>,
+}
+
+/// [definition; the unified-theory reading of November 7, 00:02] **A batch's supports as a base holds them** (the host's
+/// `Held::classes` and `Held::definite`): the resonance classes and their lists read at the opening (`[h][t]`, per region
+/// `[h][r][..]`), each site's definite flag, and the regions' lengths, so a batch of other letters on the same layout is read
+/// under them (`energy_relax`'s `base`).
+pub(super) struct EnergyLists<'c> {
+    cls: Pooled<'c, u32>,
+    class_off: Pooled<'c, u32>,
+    members: Pooled<'c, u32>,
+    pn: Pooled<'c, u32>,
+    pcls: Pooled<'c, u32>,
+    poff: Pooled<'c, u32>,
+    pmem: Pooled<'c, u32>,
+    definite: Vec<u8>,
+    lengths: Vec<usize>,
+}
+
+impl EnergyLists<'_> {
+    fn pointers(&self) -> [u64; 7] {
+        [self.cls.device_ptr(), self.class_off.device_ptr(), self.members.device_ptr(), self.pn.device_ptr(), self.pcls.device_ptr(), self.poff.device_ptr(), self.pmem.device_ptr()]
+    }
+}
+
+/// [definition; the unified-theory reading of November 7, 00:02] **How a batch is read** (the host's `energy_relax` and
+/// `energy_faces` arguments): its descent certified, or replayed at given halvings a region (`replay`, uncertified: a base's
+/// descent read again on other letters); its supports its own or a base's (`base`); and whether its faces are read (the
+/// reverse through the ticks), or only its energy (a square's `G`).
+#[derive(Clone, Copy)]
+struct EnergyPlan<'p, 'c> {
+    replay: Option<&'p [Vec<Option<u32>>]>,
+    base: Option<&'p EnergyLists<'c>>,
+    faces: bool,
+}
+
+impl<'p, 'c> EnergyPlan<'p, 'c> {
+    /// The forward as `energy_pass` reads it: certified, under the batch's own supports, with its faces.
+    fn forward() -> Self {
+        EnergyPlan { replay: None, base: None, faces: true }
+    }
 }
 
 /// The force's buffers: the key and probe charts' covectors, the values' (read and discarded), one head's score covectors
@@ -160,6 +196,8 @@ pub(super) struct EnergyPass<'c> {
     pub(super) reads: Vec<EnergyRead>,
     /// The tick's last states read again ([`FieldTimes::energy_rereads`]).
     pub(super) rereads: u64,
+    /// The batch's own supports (none where it read a base's), which a batch of other letters may hold.
+    pub(super) lists: Option<EnergyLists<'c>>,
 }
 
 /// A region's energy read back: `Φ`, the logarithms read, the site pairs met, and whether the step before it moved it.
@@ -228,7 +266,7 @@ impl<'c> CardField<'c> {
             let peak = lengths[batch.clone()].iter().map(|&n| octets(n)).sum::<u64>();
             self.times.peak_store = self.times.peak_store.max(peak);
             self.times.batches += 1;
-            let (f, z, pass) = self.energy_batch(field, &staged[batch], &mut words)?;
+            let (f, z, pass) = self.energy_batch(field, &staged[batch], &mut words, EnergyPlan::forward())?;
             faces.extend(f);
             logits.extend(z);
             reads.extend(pass.reads);
@@ -299,13 +337,7 @@ impl<'c> CardField<'c> {
         words.pb = c.pb.device_ptr();
         words.bits = c.bits.device_ptr();
         words.sb = 0;
-        words.cls = held.cls.device_ptr();
-        words.class_off = held.class_off.device_ptr();
-        words.members = held.members.device_ptr();
-        words.pn = held.pn.device_ptr();
-        words.pcls = held.pcls.device_ptr();
-        words.poff = held.poff.device_ptr();
-        words.pmem = held.pmem.device_ptr();
+        [words.cls, words.class_off, words.members, words.pn, words.pcls, words.poff, words.pmem] = held.lists;
     }
 
     /// [definition; agent-inferred, November 6] **A state's energy read** (the host's `energy_cell`) at the cell's state
@@ -589,12 +621,48 @@ impl<'c> CardField<'c> {
         Ok(rb)
     }
 
+    /// [definition; the unified-theory reading of November 7, 00:02] **A base's definite flags held** (the host's
+    /// `Held::definite` under `base`): where they differ from the batch's own, each region's definite and open lists are read
+    /// again from them (the open lists over the batch's own windows, as `stage` reads them) and the words point at them.
+    fn energy_hold_definite(&self, words: &mut Words, regions: &[Region], st: &Staged<'c>, definite: &[u8], ticks: usize) -> Result<Option<Pooled<'c, u8>>> {
+        if definite == st.definite.as_slice() {
+            return Ok(None);
+        }
+        let (mut dlist, mut dstart, mut olist, mut ostart) = (Vec::<u32>::new(), Vec::<u32>::new(), Vec::<u32>::new(), Vec::<u32>::new());
+        for (r, region) in regions.iter().enumerate() {
+            let window = region.window(ticks);
+            dstart.push(dlist.len() as u32);
+            ostart.push(olist.len() as u32);
+            let first = st.region_off[r] as usize;
+            for t in 0..region.classes.len() {
+                if definite[first + t] != 0 {
+                    dlist.push(t as u32);
+                } else if window.as_ref().is_none_or(|w| w[t]) {
+                    olist.push(t as u32);
+                }
+            }
+        }
+        dstart.push(dlist.len() as u32);
+        ostart.push(olist.len() as u32);
+        for list in [&mut dlist, &mut olist] {
+            if list.is_empty() {
+                list.push(0);
+            }
+        }
+        let mut pack = Packed::default();
+        let (def_at, dlist_at, dstart_at, olist_at, ostart_at) = (pack.put(definite), pack.put(&dlist), pack.put(&dstart), pack.put(&olist), pack.put(&ostart));
+        let tables = self.timed(Kind::Copy, || self.take_up(&pack.bytes)).map_err(device)?;
+        let base = tables.device_ptr();
+        (words.definite, words.dlist, words.dstart, words.olist, words.ostart) = (base + def_at, base + dlist_at, base + dstart_at, base + olist_at, base + ostart_at);
+        Ok(Some(tables))
+    }
+
     /// [definition; the unified-theory reading of November 6, 22:52] **One batch's energy forward** (the host's
     /// `energy_relax` and `energy_faces`, region by region in lockstep): the opening, the held letters and classes, `K` ticks
     /// of certified descent, the reverse through the ticks and the opening, and each unresolved site's face as the energy's
     /// total derivative on its letter at the last state.
     #[allow(clippy::type_complexity)]
-    fn energy_batch(&self, field: &Field, regions: &[Region], words: &mut Words) -> Result<(Vec<Vec<Option<TowerFace>>>, Vec<Vec<Option<Vec<i64>>>>, EnergyPass<'c>)> {
+    fn energy_batch(&self, field: &Field, regions: &[Region], words: &mut Words, plan: EnergyPlan<'_, 'c>) -> Result<(Vec<Vec<Option<TowerFace>>>, Vec<Vec<Option<Vec<i64>>>>, EnergyPass<'c>)> {
         let card = self.card;
         let d = field.declaration;
         let (dw, m, n, f, a, heads) = (d.width, d.complex(), d.modes, d.contacts, d.alphabet, d.heads);
@@ -633,14 +701,37 @@ impl<'c> CardField<'c> {
         let classes = d.classes();
         let probe_stride = 1usize << d.class_trits();
         let u32s = |len: usize| self.timed(Kind::Alloc, || self.take::<u32>(len.max(1))).map_err(device);
+        // A base's supports are held where the plan gives one (its layout the batch's), its definite flags with them;
+        // otherwise the batch's own, read at its opening.
+        let lengths: Vec<usize> = regions.iter().map(|r| r.classes.len()).collect();
+        let (lists, _held_definite) = match plan.base {
+            Some(base) => {
+                if base.lengths != lengths {
+                    return Err(TowerError::Refused("a batch read under a base whose regions are not its own layout"));
+                }
+                (None, self.energy_hold_definite(words, regions, &st, &base.definite, d.ticks)?)
+            }
+            None => (
+                Some(EnergyLists {
+                    cls: u32s(heads * sites)?,
+                    class_off: u32s(heads * rn * (2 * classes + 1))?,
+                    members: u32s(heads * sites)?,
+                    pn: u32s(heads * sites)?,
+                    pcls: u32s(heads * sites * probe_stride)?,
+                    poff: u32s(heads * rn * (classes + 1))?,
+                    pmem: u32s(heads * sites * probe_stride)?,
+                    definite: st.definite.clone(),
+                    lengths,
+                }),
+                None,
+            ),
+        };
         let held = EnergyHeld {
-            cls: u32s(heads * sites)?,
-            class_off: u32s(heads * rn * (2 * classes + 1))?,
-            members: u32s(heads * sites)?,
-            pn: u32s(heads * sites)?,
-            pcls: u32s(heads * sites * probe_stride)?,
-            poff: u32s(heads * rn * (classes + 1))?,
-            pmem: u32s(heads * sites * probe_stride)?,
+            lists: match (&lists, plan.base) {
+                (Some(own), _) => own.pointers(),
+                (None, Some(base)) => base.pointers(),
+                (None, None) => unreachable!("a batch's supports are its own or a base's"),
+            },
             own: i64s(sites * dw)?,
             before: i64s(sites * dw)?,
             after: i64s(sites * dw)?,
@@ -674,7 +765,7 @@ impl<'c> CardField<'c> {
         // The opening's read, its classes held.
         let opening = self.energy_cell_alloc(field, sites, pairs, rn)?;
         card.copy_within(state, 0, &opening.x, 0, sites * dw).map_err(device)?;
-        self.energy_cell(field, words, &opening, &held, true, sites, rn)?;
+        self.energy_cell(field, words, &opening, &held, plan.base.is_none(), sites, rn)?;
         let read0 = self.energy_reads(&opening, rn)?;
         let mut cells = vec![opening];
         let mut now: Vec<Read> = read0.clone();
@@ -685,7 +776,51 @@ impl<'c> CardField<'c> {
         let mut first = vec![FIRST_HALVINGS; rn];
         let mut rereads = 0u64;
         let mut forces: Vec<Pooled<'c, i64>> = Vec::with_capacity(d.ticks);
-        for _ in 0..d.ticks {
+        // A replay steps each region at the halvings it is given, uncertified (the host's `energy_relax` with `replay`): every
+        // read counted, a region done where its halvings end or rest.
+        if let Some(replay) = plan.replay {
+            if replay.len() != rn {
+                return Err(TowerError::Refused("a replay's halvings that are not one a region"));
+            }
+            let ticks = replay.iter().map(Vec::len).max().unwrap_or(0);
+            for k in 0..ticks {
+                let at: Vec<u32> = (0..rn)
+                    .map(|r| match replay[r].get(k).copied() {
+                        Some(Some(h)) if active[r] => h,
+                        _ => {
+                            active[r] = false;
+                            u32::MAX
+                        }
+                    })
+                    .collect();
+                if at.iter().all(|&h| h == u32::MAX) {
+                    break;
+                }
+                let current = cells.last().ok_or(TowerError::Refused("an energy forward with no opening"))?;
+                self.energy_force(field, words, current, &held, &fb, sites, rn)?;
+                let kept_force = i64s(sites * dw)?;
+                card.copy_within(&fb.force, 0, &kept_force, 0, sites * dw).map_err(device)?;
+                forces.push(kept_force);
+                let candidate = self.energy_cell_alloc(field, sites, pairs, rn)?;
+                let at_c = self.timed(Kind::Copy, || self.take_up(&at)).map_err(device)?;
+                {
+                    let (mut xp, mut sp, mut fp, mut hp, mut np, mut ep) = (state.device_ptr(), current.scale.device_ptr(), fb.force.device_ptr(), at_c.device_ptr(), candidate.x.device_ptr(), candidate.sums.device_ptr());
+                    self.launch("field_energy_step", Self::cells((sites * dw) as u64), THREADS, &mut [arg(words), arg(&mut xp), arg(&mut sp), arg(&mut fp), arg(&mut hp), arg(&mut np), arg(&mut ep)])?;
+                }
+                self.energy_cell(field, words, &candidate, &held, false, sites, rn)?;
+                let next = self.energy_reads(&candidate, rn)?;
+                for r in (0..rn).filter(|&r| at[r] != u32::MAX) {
+                    reads[r] += 1;
+                    met[r] += next[r].pairs;
+                    halvings[r].push(Some(at[r]));
+                    now[r] = next[r];
+                }
+                // Every region stands at the candidate's state (a region done this tick was copied there).
+                card.copy_within(&candidate.x, 0, state, 0, sites * dw).map_err(device)?;
+                cells.push(candidate);
+            }
+        }
+        for _ in 0..if plan.replay.is_some() { 0 } else { d.ticks } {
             if !active.iter().any(|&on| on) {
                 break;
             }
@@ -770,6 +905,12 @@ impl<'c> CardField<'c> {
             }
         }
         self.mark("energy_ticks");
+        let reads = (0..rn).map(|r| EnergyRead { opening: read0[r].phi, last: now[r].phi, halvings: halvings[r].clone(), reads: reads[r], pairs: met[r] }).collect();
+        // A read of the energy alone (a square's `G`) ends at its last state.
+        if !plan.faces {
+            self.status(&st.status)?;
+            return Ok((Vec::new(), Vec::new(), EnergyPass { cells, reads, rereads, lists }));
+        }
         // The faces: each unresolved site's letter force at the last state, with the reverse's letters' covectors through
         // the ticks that stood and the opening (the total derivative, the host's `energy_faces`).
         let last = cells.last().ok_or(TowerError::Refused("an energy forward with no opening"))?;
@@ -795,8 +936,8 @@ impl<'c> CardField<'c> {
         {
             let (mut rp, mut dbp, mut dap) = (last.read.device_ptr(), back.as_ref().map_or(0, |b| b.d_before.device_ptr()), back.as_ref().map_or(0, |b| b.d_after.device_ptr()));
             let (mut tm32, mut mb, mut ma, mut zp) = (tm as u32, l.moment_before as u64, l.moment_after as u64, z.device_ptr());
-            let (mut op, mut bp, mut ap) = (rb.own.device_ptr(), rb.before.device_ptr(), rb.after.device_ptr());
-            self.launch("field_energy_face", Self::cells((sites * a) as u64), THREADS, &mut [arg(words), arg(&mut rp), arg(&mut dbp), arg(&mut dap), arg(&mut tm32), arg(&mut mb), arg(&mut ma), arg(&mut op), arg(&mut bp), arg(&mut ap), arg(&mut zp)])?;
+            let (mut op, mut bp, mut ap, mut ft) = (rb.own.device_ptr(), rb.before.device_ptr(), rb.after.device_ptr(), l.face_temper as u64);
+            self.launch("field_energy_face", Self::cells((sites * a) as u64), THREADS, &mut [arg(words), arg(&mut rp), arg(&mut dbp), arg(&mut dap), arg(&mut tm32), arg(&mut mb), arg(&mut ma), arg(&mut op), arg(&mut bp), arg(&mut ap), arg(&mut ft), arg(&mut zp)])?;
         }
         // The cavity field (§15.3): a carried site's read less its own echo.
         if st.echo_has.iter().any(|&on| on != 0) {
@@ -818,12 +959,164 @@ impl<'c> CardField<'c> {
             faces.push(span.clone().map(|t| (st.unresolved[t] != 0).then(|| TowerFace { masses: ms[t * a..(t + 1) * a].iter().map(|&v| v as u128).collect(), total: ts[t] as u128 })).collect());
             logits.push(span.map(|t| (st.unresolved[t] != 0).then(|| zs[t * a..(t + 1) * a].to_vec())).collect());
         }
-        let reads = (0..rn).map(|r| EnergyRead { opening: read0[r].phi, last: now[r].phi, halvings: halvings[r].clone(), reads: reads[r], pairs: met[r] }).collect();
-        Ok((faces, logits, EnergyPass { cells, reads, rereads }))
+        Ok((faces, logits, EnergyPass { cells, reads, rereads, lists }))
+    }
+}
+
+/// A region's own parts, as a square's passes build them (the host's `energy_square_corners` regions).
+struct Owned {
+    classes: Vec<usize>,
+    unresolved: Vec<bool>,
+    faces: Vec<Option<Shares>>,
+    locked: Vec<bool>,
+}
+
+impl Owned {
+    /// A square's corner (the host's `corner`): `at` read open; `other` set to `letter`, or open carrying `mixture` locked.
+    fn corner(truth: &[usize], at: usize, other: usize, letter: Option<usize>, mixture: Option<Shares>) -> Self {
+        let sites = truth.len();
+        let mut o = Owned { classes: truth.to_vec(), unresolved: vec![false; sites], faces: vec![None; sites], locked: vec![false; sites] };
+        o.unresolved[at] = true;
+        match letter {
+            Some(c) => o.classes[other] = c,
+            None => {
+                o.unresolved[other] = true;
+                (o.faces[other], o.locked[other]) = (mixture, true);
+            }
+        }
+        o
+    }
+
+    fn region(&self) -> Region<'_> {
+        Region { classes: &self.classes, unresolved: &self.unresolved, faces: &self.faces, locked: &self.locked, echo: &[], domain: None, port: None }
+    }
+}
+
+impl<'c> CardField<'c> {
+    /// One batch of owned regions read on a plan: their energy sites staged (the host's `Field::energy_sites`), admitted,
+    /// and read ([`CardField::energy_batch`]); each region's logits (empty where the plan reads no faces) and the pass.
+    #[allow(clippy::type_complexity)]
+    fn energy_owned(&self, field: &Field, owned: &[Owned], words: &mut Words, plan: EnergyPlan<'_, 'c>) -> Result<(Vec<Vec<Option<Vec<i64>>>>, EnergyPass<'c>)> {
+        let d = field.declaration;
+        let regions: Vec<Region> = owned.iter().map(Owned::region).collect();
+        admit_regions(&d, &regions)?;
+        let sited: Vec<(Vec<Option<Shares>>, Vec<bool>)> = regions.iter().map(|r| field.energy_sites(r)).collect();
+        let staged: Vec<Region> = regions.iter().zip(&sited).map(|(r, (faces, locked))| Region { faces, locked, ..*r }).collect();
+        admit_regions(&d, &staged)?;
+        let (_, logits, pass) = self.energy_batch(field, &staged, words, plan)?;
+        Ok((logits, pass))
+    }
+
+    /// [measurement; the unified-theory reading of November 7, 01:37] **One batch of squares at their bases** (the host's
+    /// `Field::energy_square_corners`, square for square): the bases read (each truth with its two sites open), their supports
+    /// and halvings kept; then on that layout, every region replayed at its base's halvings under its base's supports, `i`'s
+    /// corners with `j` at `b`, `j`'s with `i` at `a`, the runner-ups read on the host's law, the corners at the runner-ups, the
+    /// four energies `G` (no faces), and the attribution's corners with the mixtures moved by `ε`; each square read into the
+    /// host's own [`EnergySquare`] (`Field::energy_square_reading`). A square with no runner-up reads `None` (its later regions
+    /// are read at its own letters, to keep the layout, and discarded).
+    fn energy_square_batch(&self, field: &Field, squares: &[(&[usize], (usize, usize))], void: usize, eps: u32, words: &mut Words) -> Result<Vec<Option<EnergySquare>>> {
+        let open_at = |(truth, (i, j)): &(&[usize], (usize, usize))| {
+            let mut unresolved = vec![false; truth.len()];
+            (unresolved[*i], unresolved[*j]) = (true, true);
+            Owned { classes: truth.to_vec(), unresolved, faces: Vec::new(), locked: Vec::new() }
+        };
+        let face_at = |logits: &[Vec<Option<Vec<i64>>>], s: usize, t: usize| -> Result<Vec<i64>> { logits[s][t].clone().ok_or(TowerError::Refused("a square's open place with no face")) };
+        let bases: Vec<Owned> = squares.iter().map(open_at).collect();
+        let (base_logits, base) = self.energy_owned(field, &bases, words, EnergyPlan::forward())?;
+        drop(bases);
+        let lists = base.lists.ok_or(TowerError::Refused("a square's base read under another's supports"))?;
+        let halvings: Vec<Vec<Option<u32>>> = base.reads.iter().map(|r| r.halvings.clone()).collect();
+        drop(base.cells);
+        let plan = EnergyPlan { replay: Some(&halvings), base: Some(&lists), faces: true };
+        let n = squares.len();
+        let letters: Vec<(usize, usize)> = squares.iter().map(|(truth, (i, j))| (truth[*i], truth[*j])).collect();
+        let corners = |kinds: &dyn Fn(usize) -> Owned, plan: EnergyPlan<'_, 'c>, words: &mut Words| -> Result<(Vec<Vec<Option<Vec<i64>>>>, EnergyPass<'c>)> {
+            let owned: Vec<Owned> = (0..n).map(kinds).collect();
+            self.energy_owned(field, &owned, words, plan)
+        };
+        // `i` open with `j` at its letter, and `j` with `i` at its own.
+        let (zi_b, _) = corners(&|s| Owned::corner(squares[s].0, squares[s].1 .0, squares[s].1 .1, Some(letters[s].1), None), plan, words)?;
+        let (zj_a, _) = corners(&|s| Owned::corner(squares[s].0, squares[s].1 .1, squares[s].1 .0, Some(letters[s].0), None), plan, words)?;
+        let zi_b: Vec<Vec<i64>> = (0..n).map(|s| face_at(&zi_b, s, squares[s].1 .0)).collect::<Result<_>>()?;
+        let zj_a: Vec<Vec<i64>> = (0..n).map(|s| face_at(&zj_a, s, squares[s].1 .1)).collect::<Result<_>>()?;
+        let runners: Vec<Option<(usize, usize)>> = (0..n).map(|s| field.energy_square_runners(&zi_b[s], &zj_a[s], letters[s], void)).collect();
+        let at: Vec<(usize, usize)> = (0..n).map(|s| runners[s].unwrap_or(letters[s])).collect();
+        // The corners at the runner-ups.
+        let (zi_b2, _) = corners(&|s| Owned::corner(squares[s].0, squares[s].1 .0, squares[s].1 .1, Some(at[s].1), None), plan, words)?;
+        let (zj_a2, _) = corners(&|s| Owned::corner(squares[s].0, squares[s].1 .1, squares[s].1 .0, Some(at[s].0), None), plan, words)?;
+        let zi_b2: Vec<Vec<i64>> = (0..n).map(|s| face_at(&zi_b2, s, squares[s].1 .0)).collect::<Result<_>>()?;
+        let zj_a2: Vec<Vec<i64>> = (0..n).map(|s| face_at(&zj_a2, s, squares[s].1 .1)).collect::<Result<_>>()?;
+        // The energy's own square: `G` at `(a′, b)`, `(a, b′)`, `(a, b)`, `(a′, b′)`, read again at the base, no faces.
+        let energies = EnergyPlan { faces: false, ..plan };
+        let mut g = vec![[0i128; 4]; n];
+        for (k, pick) in [|(a, b): (usize, usize), (a2, b2): (usize, usize)| (a2, b), |(a, b), (a2, b2)| (a, b2), |(a, b), _| (a, b), |_, (a2, b2)| (a2, b2)].iter().enumerate() {
+            let (_, pass) = corners(
+                &|s| {
+                    let (truth, (i, j)) = squares[s];
+                    let mut classes = truth.to_vec();
+                    (classes[i], classes[j]) = pick(letters[s], at[s]);
+                    Owned { classes, unresolved: vec![false; truth.len()], faces: Vec::new(), locked: Vec::new() }
+                },
+                energies,
+                words,
+            )?;
+            for s in 0..n {
+                g[s][k] = pass.reads[s].last;
+            }
+        }
+        // The attribution read at one base: the base's own faces, and each site's with the other's mixture moved by `ε`.
+        let (zi_moved, _) = corners(&|s| Owned::corner(squares[s].0, squares[s].1 .0, squares[s].1 .1, None, Some(field.energy_square_mixture(Some((at[s].1, letters[s].1)), eps))), plan, words)?;
+        let (zj_moved, _) = corners(&|s| Owned::corner(squares[s].0, squares[s].1 .1, squares[s].1 .0, None, Some(field.energy_square_mixture(Some((at[s].0, letters[s].0)), eps))), plan, words)?;
+        (0..n)
+            .map(|s| {
+                let Some(runner) = runners[s] else { return Ok(None) };
+                let (i, j) = squares[s].1;
+                let (zi, zj, zim, zjm) = (face_at(&base_logits, s, i)?, face_at(&base_logits, s, j)?, face_at(&zi_moved, s, i)?, face_at(&zj_moved, s, j)?);
+                let read = SquareCorners { zi_b: &zi_b[s], zj_a: &zj_a[s], zi_b2: &zi_b2[s], zj_a2: &zj_a2[s], zi: &zi, zj: &zj, zi_moved: &zim, zj_moved: &zjm, g: g[s] };
+                field.energy_square_reading(letters[s], runner, &read, void).map(Some)
+            })
+            .collect()
     }
 }
 
 impl CardField<'_> {
+    /// [measurement; the unified-theory reading of November 7, 01:37] **Squares read at one base on the card** (the host's
+    /// `Field::energy_square_corners` for each `(truth, (i, j))`): the squares batched by the card's memory, each batch's
+    /// eleven reads ([`CardField::energy_square_batch`]).
+    pub fn energy_squares(&mut self, field: &Field, squares: &[(&[usize], (usize, usize))], void: usize, eps: u32) -> Result<Vec<Option<EnergySquare>>> {
+        let d = field.declaration;
+        if !d.energy {
+            return Err(TowerError::Refused("an energy square of a field whose faces are not one energy's forces"));
+        }
+        if field.scale.is_some() {
+            return Err(TowerError::Refused("an energy field read with a tower of scales (its energy is not built)"));
+        }
+        if squares.iter().any(|(truth, (i, j))| i == j || *i >= truth.len() || *j >= truth.len()) {
+            return Err(TowerError::Refused("a square whose two sites are not two of its truth's"));
+        }
+        let card = self.card;
+        let started = Instant::now();
+        let (mut words, upload, face_octets) = self.upload(field, None)?;
+        let lengths: Vec<usize> = squares.iter().map(|(truth, _)| truth.len()).collect();
+        let octets = |sites: usize| energy_octets(&d, sites);
+        let batches = batches(&lengths, &octets, (self.budget - face_octets) / 5 * 4)?;
+        let mut out = Vec::with_capacity(squares.len());
+        for batch in batches {
+            if batch.is_empty() {
+                continue;
+            }
+            let peak = lengths[batch.clone()].iter().map(|&n| octets(n)).sum::<u64>();
+            self.times.peak_store = self.times.peak_store.max(peak);
+            self.times.batches += 1;
+            out.extend(self.energy_square_batch(field, &squares[batch], void, eps, &mut words)?);
+        }
+        let met = self.timed(Kind::Copy, || card.fetch(&upload.met)).map_err(device)?[0] as u128;
+        self.times.pairs += met;
+        self.times.reads += 1;
+        self.times.read_ns += started.elapsed().as_nanos();
+        Ok(out)
+    }
+
     /// [measurement] **An energy field's faces, logits and energy reads on the card** ([`EnergyRead`] a region): the card's
     /// forward the host's `Field::energy_logits` is checked against.
     #[allow(clippy::type_complexity)]
