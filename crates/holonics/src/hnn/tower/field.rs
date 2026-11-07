@@ -4932,6 +4932,9 @@ pub struct KernelReceipt {
     /// [measurement; theory, November 7 21:08] The places read and spent in each band `k` of a beat-selected conditional
     /// section ([`FieldLearner::section_conditional_beat`]): the counts of counts of the field's surprise.
     pub bands: Vec<(usize, usize)>,
+    /// [measurement; theory, November 7 21:44] Each place's conditional mass outside its face's top 4, 8 and 16 letters (the
+    /// face read at the truth, places open carrying their letters whole), on `2^(−24)`: whether a few letters carry the place.
+    pub outside: Vec<[i128; 3]>,
 }
 
 /// [measurement; the unified-theory reading of November 7, 05:55] **An evidence-shrunk Newton step's read**
@@ -5166,6 +5169,11 @@ fn scaled(base: &Field, step: &[i128], h0: u32, old: &Compared, strict: bool, re
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct FieldLearner {
     pub field: Field,
+    /// [definition; the unified-theory reading of November 7, 21:58] **The averaged constitution** `θ̄`, moved toward the live
+    /// `θ` by `2^(−8)` each section ([`FieldLearner::average_section`]; the second moments' rate, a memory of 256 sections):
+    /// a state stepping noisily about its floor sits above it by `½ tr(H·Cov)` while the mean of its states sits at it, so
+    /// `θ̄` is what is read and saved beside the live `θ`, which keeps stepping. A restart carries both.
+    pub average: Option<Vec<i32>>,
     first: Vec<i128>,
     second: Vec<i128>,
     pub rate_bits: u32,
@@ -5225,7 +5233,7 @@ impl FieldLearner {
     pub fn new(field: Field, rate_bits: u32) -> Self {
         let len = field.material_len();
         let drawn = 4 * field.declaration.founding_draws();
-        Self { field, first: vec![0; len], second: vec![0; len], rate_bits, drawn, laps: 0, held: None, read_held: false, newton: false, newton_read: false, first_rate: FIRST_RATE, second_rate: SECOND_RATE, family_rates: None, temper_learns: false, family_transfer: Vec::new(), family_price: Vec::new(), last: None }
+        Self { field, first: vec![0; len], second: vec![0; len], rate_bits, drawn, laps: 0, held: None, read_held: false, newton: false, newton_read: false, first_rate: FIRST_RATE, second_rate: SECOND_RATE, family_rates: None, temper_learns: false, family_transfer: Vec::new(), family_price: Vec::new(), last: None, average: None }
     }
 
     /// Whether a deposited step is held for the next regions' read.
@@ -5252,7 +5260,7 @@ impl FieldLearner {
         let second = from.iter().map(|&(i, divided)| if divided { div_nearest(self.second[i], f2) } else { self.second[i] }).collect();
         let drawn = self.drawn + 4 * self.field.growth_draws(factor);
         let rate_bits = self.rate_bits + (usize::BITS - (factor - 1).leading_zeros());
-        Ok(Self { field, first, second, rate_bits, drawn, laps: self.laps, held: None, read_held: self.read_held, newton: self.newton, newton_read: self.newton_read, first_rate: self.first_rate, second_rate: self.second_rate, family_rates: None, temper_learns: false, family_transfer: Vec::new(), family_price: Vec::new(), last: None })
+        Ok(Self { field, first, second, rate_bits, drawn, laps: self.laps, held: None, read_held: self.read_held, newton: self.newton, newton_read: self.newton_read, first_rate: self.first_rate, second_rate: self.second_rate, family_rates: None, temper_learns: false, family_transfer: Vec::new(), family_price: Vec::new(), last: None, average: None })
     }
 
     /// [definition; agent-inferred, November 4, §16.40] **The learner with one more lane** ([`Field::laned`]), the lane's
@@ -5292,7 +5300,7 @@ impl FieldLearner {
             }
         }
         let drawn = self.drawn + 4 * self.field.declaration.lane_draws();
-        Ok(Self { field, first, second, rate_bits: self.rate_bits, drawn, laps: self.laps, held: None, read_held: self.read_held, newton: self.newton, newton_read: self.newton_read, first_rate: self.first_rate, second_rate: self.second_rate, family_rates: None, temper_learns: false, family_transfer: Vec::new(), family_price: Vec::new(), last: None })
+        Ok(Self { field, first, second, rate_bits: self.rate_bits, drawn, laps: self.laps, held: None, read_held: self.read_held, newton: self.newton, newton_read: self.newton_read, first_rate: self.first_rate, second_rate: self.second_rate, family_rates: None, temper_learns: false, family_transfer: Vec::new(), family_price: Vec::new(), last: None, average: None })
     }
 
     /// The held step read on `regions` without a deposit: the faces of `regions` under the
@@ -5905,7 +5913,7 @@ impl FieldLearner {
         let states: Vec<Vec<i128>> = (0..n).map(|s| natural(&reads[owners[s]].0, &reads[problems + s].0)).collect::<Result<_>>()?;
         if self.newton {
             let newton = self.deposit_newton(&states, &weights)?;
-            return Ok(KernelReceipt { states: n, places, moved, weight, weight_square, least, most, whole, deposited: newton.deposited, predicted: newton.predicted, transfer: newton.transfer, external: newton.external, per_state, log2_a, newton: Some(newton), by_family: Vec::new(), rates: Vec::new(), g_agree, g_gap, covector: Vec::new(), bands: Vec::new() });
+            return Ok(KernelReceipt { states: n, places, moved, weight, weight_square, least, most, whole, deposited: newton.deposited, predicted: newton.predicted, transfer: newton.transfer, external: newton.external, per_state, log2_a, newton: Some(newton), by_family: Vec::new(), rates: Vec::new(), g_agree, g_gap, covector: Vec::new(), bands: Vec::new(), outside: Vec::new() });
         }
         // [the unified-theory reading of November 7, 06:26] The Newton terms read along the moments' direction before this section
         // moves them, beside the moments' own step.
@@ -5954,7 +5962,31 @@ impl FieldLearner {
         };
         let by_family = transfers.into_iter().zip(predictions).collect();
         let rates = self.family_rates.clone().unwrap_or_default();
-        Ok(KernelReceipt { states: n, places, moved, weight, weight_square, least, most, whole, deposited, predicted, transfer, external, per_state, log2_a, newton, by_family, rates, g_agree, g_gap, covector: raw, bands: Vec::new() })
+        Ok(KernelReceipt { states: n, places, moved, weight, weight_square, least, most, whole, deposited, predicted, transfer, external, per_state, log2_a, newton, by_family, rates, g_agree, g_gap, covector: raw, bands: Vec::new(), outside: Vec::new() })
+    }
+
+    /// The averaged constitution's rate, `2^(−8)` a section (the second moments' own, theory November 7 21:58).
+    const AVERAGE_RATE: u32 = 8;
+
+    /// One section's move of the averaged constitution: `θ̄ ← toward(θ̄, θ, 8)` entry by entry, opened at the live `θ`.
+    pub fn average_section(&mut self) {
+        match &mut self.average {
+            Some(avg) if avg.len() == self.field.theta.len() => {
+                for (a, &t) in avg.iter_mut().zip(&self.field.theta) {
+                    *a = toward(*a as i128, t as i128, Self::AVERAGE_RATE) as i32;
+                }
+            }
+            _ => self.average = Some(self.field.theta.clone()),
+        }
+    }
+
+    /// The field read at the averaged constitution (the live field where none is kept).
+    pub fn averaged_field(&self) -> Field {
+        let mut field = self.field.clone();
+        if let Some(avg) = self.average.as_ref().filter(|a| a.len() == field.theta.len()) {
+            field.theta.clone_from(avg);
+        }
+        field
     }
 
     /// [definition; the unified-theory reading of November 7, 20:29, law (D)] **The deposit against each place's whole
@@ -6044,7 +6076,7 @@ impl FieldLearner {
         }
         if kept_blocks.is_empty() {
             let rates = self.family_rates.clone().unwrap_or_default();
-            return Ok(KernelReceipt { states: 0, places: 0, moved: 0, weight: 0, weight_square: 0, least: 0, most: 0, whole: 0, deposited: false, predicted: None, transfer: None, external: None, per_state: Vec::new(), log2_a: Vec::new(), newton: None, by_family: Vec::new(), rates, g_agree: (0, 0), g_gap: 0, covector: Vec::new(), bands });
+            return Ok(KernelReceipt { states: 0, places: 0, moved: 0, weight: 0, weight_square: 0, least: 0, most: 0, whole: 0, deposited: false, predicted: None, transfer: None, external: None, per_state: Vec::new(), log2_a: Vec::new(), newton: None, by_family: Vec::new(), rates, g_agree: (0, 0), g_gap: 0, covector: Vec::new(), bands, outside: Vec::new() });
         }
         let mut receipt = self.section_conditional_weighed(truth, &kept_owners, &kept_blocks, &kept_shifts, realization)?;
         receipt.bands = bands;
@@ -6087,6 +6119,22 @@ impl FieldLearner {
         let places: Vec<(usize, usize)> = blocks.iter().zip(owners).flat_map(|(b, &o)| b.iter().map(move |&t| (o, t))).collect();
         let place_shift: Vec<u32> = shifts.iter().flatten().copied().collect();
         let resolved: Vec<Vec<bool>> = truth.iter().map(|r| vec![false; r.classes.len()]).collect();
+        // The faces at the truth, each problem's places open carrying their letters whole: one read a problem (theory 21:44).
+        let one = 1u32 << STATE_BITS;
+        let opened: Vec<(Vec<bool>, Vec<Option<Shares>>)> = (0..truth.len())
+            .map(|p| {
+                let sites = truth[p].classes.len();
+                let (mut open, mut carried) = (vec![false; sites], vec![None; sites]);
+                for &(o, t) in places.iter().filter(|&&(o, _)| o == p) {
+                    open[t] = true;
+                    carried[t] = Some(vec![(truth[o].classes[t] as u32, one)]);
+                }
+                (open, carried)
+            })
+            .collect();
+        let views: Vec<Region> = (0..truth.len()).map(|p| Region { classes: truth[p].classes, unresolved: &opened[p].0, faces: &opened[p].1, locked: &opened[p].0, echo: &[], domain: None, port: None }).collect();
+        let (truth_faces, _) = realization.read_energy_faces(f, &views)?;
+        let mut outside = Vec::with_capacity(places.len());
         let mut g = vec![0i128; material];
         // `Σ_places Σ_v p(v)(G(t) − G(x_v))` on 2^(−32): the letters' temperature's operand.
         let mut gap = 0i128;
@@ -6143,6 +6191,12 @@ impl FieldLearner {
                     }
                     gap += release((reads[at].1 - r.1).checked_mul(pv).ok_or(TowerError::Refused(OVER))?, MATERIAL_BITS);
                 }
+                if let Some(face) = truth_faces[o].get(t).and_then(Option::as_ref) {
+                    let mut order: Vec<usize> = (0..alphabet).collect();
+                    order.sort_by_key(|&v| (std::cmp::Reverse(face.masses[v]), v));
+                    let beyond = |top: usize| -> i128 { order[top.min(alphabet)..].iter().map(|&v| p[v]).sum() };
+                    outside.push([beyond(4), beyond(8), beyond(16)]);
+                }
                 let pt = p[at];
                 (weight, weight_square, least, most) = (weight + pt, weight_square + release(pt * pt, MATERIAL_BITS), least.min(pt), most.max(pt));
                 whole += usize::from(p.iter().all(|&x| x <= pt));
@@ -6168,7 +6222,7 @@ impl FieldLearner {
         let by_family = transfers.into_iter().zip(predictions).collect();
         let rates = self.family_rates.clone().unwrap_or_default();
         let n = places.len();
-        Ok(KernelReceipt { states: n, places: n, moved: 0, weight, weight_square, least, most, whole, deposited, predicted, transfer, external, per_state, log2_a: log2_p, newton: None, by_family, rates, g_agree: (0, 0), g_gap: 0, covector: raw, bands: Vec::new() })
+        Ok(KernelReceipt { states: n, places: n, moved: 0, weight, weight_square, least, most, whole, deposited, predicted, transfer, external, per_state, log2_a: log2_p, newton: None, by_family, rates, g_agree: (0, 0), g_gap: 0, covector: raw, bands: Vec::new(), outside })
     }
 
     /// [definition; agent-inferred, November 3, the tower record] **The learner grown in scale**: its field grown in scale
@@ -6181,7 +6235,7 @@ impl FieldLearner {
         let (mut first, mut second) = (self.first.clone(), self.second.clone());
         first.resize(len, 0);
         second.resize(len, 0);
-        Ok(Self { field, first, second, rate_bits: self.rate_bits, drawn, laps: self.laps, held: None, read_held: self.read_held, newton: self.newton, newton_read: self.newton_read, first_rate: self.first_rate, second_rate: self.second_rate, family_rates: None, temper_learns: false, family_transfer: Vec::new(), family_price: Vec::new(), last: None })
+        Ok(Self { field, first, second, rate_bits: self.rate_bits, drawn, laps: self.laps, held: None, read_held: self.read_held, newton: self.newton, newton_read: self.newton_read, first_rate: self.first_rate, second_rate: self.second_rate, family_rates: None, temper_learns: false, family_transfer: Vec::new(), family_price: Vec::new(), last: None, average: None })
     }
 
     /// [measurement; agent-inferred, November 3, §16.31] **Each family's step coherence**: over the family's entries, `Σ |m|`
@@ -6213,7 +6267,11 @@ impl FieldLearner {
             Some(rates) => format!("family-lengths {}\n", join(&rates.iter().zip(&self.family_transfer).zip(&self.family_price).flat_map(|((&r, &t), &p)| [r, t, p]).collect::<Vec<_>>())),
             None => String::new(),
         };
-        format!("hnn-field-learner-v3 {} {} {} {held}\n{}{}\n{}\n{step}{lengths}", self.rate_bits, self.drawn, self.laps, self.field.to_text(), join(&self.first), join(&self.second))
+        let average = match &self.average {
+            Some(avg) => format!("average {}\n", avg.iter().map(i32::to_string).collect::<Vec<_>>().join(" ")),
+            None => String::new(),
+        };
+        format!("hnn-field-learner-v3 {} {} {} {held}\n{}{}\n{}\n{step}{lengths}{average}", self.rate_bits, self.drawn, self.laps, self.field.to_text(), join(&self.first), join(&self.second))
     }
 
     pub fn from_text(text: &str) -> Result<Self> {
@@ -6244,7 +6302,11 @@ impl FieldLearner {
             }
         };
         let families = field.families_all().len();
-        let (family_rates, family_transfer, family_price) = match lines.next().and_then(|l| l.strip_prefix("family-lengths ")) {
+        let lengths_line = match lines.peek() {
+            Some(l) if l.starts_with("family-lengths ") => lines.next(),
+            _ => None,
+        };
+        let (family_rates, family_transfer, family_price) = match lengths_line.and_then(|l| l.strip_prefix("family-lengths ")) {
             Some(rest) => {
                 let v = read_numbers::<i128>(Some(rest))?;
                 if v.len() != 3 * families {
@@ -6254,7 +6316,17 @@ impl FieldLearner {
             }
             None => (None, Vec::new(), Vec::new()),
         };
-        Ok(Self { field, first, second, rate_bits, read_held: held.is_some(), newton: false, newton_read: false, first_rate: FIRST_RATE, second_rate: SECOND_RATE, family_rates, temper_learns: false, family_transfer, family_price, drawn, laps, held, last: None })
+        let average = match lines.next().and_then(|l| l.strip_prefix("average ")) {
+            Some(rest) => {
+                let v = read_numbers::<i32>(Some(rest))?;
+                if v.len() != field.theta.len() {
+                    return refuse("a learner's averaged constitution that is not its field's length");
+                }
+                Some(v)
+            }
+            None => None,
+        };
+        Ok(Self { field, first, second, rate_bits, read_held: held.is_some(), newton: false, newton_read: false, first_rate: FIRST_RATE, second_rate: SECOND_RATE, family_rates, temper_learns: false, family_transfer, family_price, drawn, laps, held, last: None, average })
     }
 }
 

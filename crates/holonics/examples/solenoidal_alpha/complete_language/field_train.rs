@@ -2793,6 +2793,13 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
     // writes (lap 13's law) instead of a kernel step from the truth.
     let persistent = std::env::var_os("FIELD_CONTRAST_PERSISTENT").is_some();
     let conditional = std::env::var_os("FIELD_CONTRAST_CONDITIONAL").is_some();
+    // [definition; the unified-theory reading of November 7, 21:58] `FIELD_CONTRAST_AVERAGE`: the averaged constitution moves
+    // each section (`FieldLearner::average_section`) and every held read reads it; the live field keeps stepping.
+    let averaging = std::env::var_os("FIELD_CONTRAST_AVERAGE").is_some();
+    let coherence_every: usize = match std::env::var("FIELD_COHERENCE_EVERY") {
+        Ok(v) => v.parse().map_err(|_| "FIELD_COHERENCE_EVERY is a section count".to_string())?,
+        Err(_) => 0,
+    };
     let beat_top: Option<u32> = match std::env::var("FIELD_CONTRAST_BEAT") {
         Ok(v) => Some(v.parse().map_err(|_| "FIELD_CONTRAST_BEAT is the top band".to_string())?),
         Err(_) => None,
@@ -2934,7 +2941,7 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
         learner.laps
     );
     let mut enumerated_rows = rows_file(&out.join("ENUMERATED.tsv"), "lap\tproblem\tplace\ttruth\tlog2_t\tface_masses\tface_total\tenergies\ttruth_face_masses\ttruth_face_total\n")?;
-    enumerated_read(&learner.field, &held_set, places, &truth_of, realization, -1, &mut enumerated_rows)?;
+    enumerated_read(&held_field(&learner, averaging), &held_set, places, &truth_of, realization, -1, &mut enumerated_rows)?;
     println!("FIELD_ENUMERATED_READ lap=-1 ms={}", started.elapsed().as_millis());
     // [definition; Brandon, November 6 17:11; theory, November 7 16:56] A card run holds at most one hour between saved states:
     // at the first section start an hour (`SAVE_MS`) past the last saved state, the learner rests as `STATE.<lap>.<sections
@@ -2971,7 +2978,7 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
             }
             if n > 0 && now - saved_ms >= SAVE_MS {
                 write_new(&out.join(format!("STATE.{lap}.{n}")), at_rate(&learner, base_rate).as_bytes())?;
-                enumerated_read(&learner.field, &held_set, places, &truth_of, realization, 10_000 * (lap as i64 + 1) + n as i64, &mut enumerated_rows)?;
+                enumerated_read(&held_field(&learner, averaging), &held_set, places, &truth_of, realization, 10_000 * (lap as i64 + 1) + n as i64, &mut enumerated_rows)?;
                 saved_ms = started.elapsed().as_millis();
                 println!("FIELD_SAVED lap={lap} sections={n}/{} ms={now} read_ms={}", sections.len(), saved_ms - now);
             }
@@ -3108,6 +3115,8 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
                 let resolved: Vec<Vec<bool>> = truths.iter().map(|t| vec![false; t.len()]).collect();
                 let truth_views: Vec<Region> = truths.iter().zip(&resolved).map(|(c, u)| Region { classes: c, unresolved: u, faces: &[], locked: &[], echo: &[], domain: None, port: None }).collect();
                 let key = mix(seed ^ 0xC0_7A57 << 40, read << 32 | n as u64);
+                // [measurement; theory, November 7 21:44] The section's step, `Σ |Δθ|` a family on its grain over its entries.
+                let theta_before = learner.field.theta.clone();
                 // [the unified-theory reading of November 7, 07:40] Each problem's truth formed once for all its blocks.
                 // [definition; the unified-theory reading of November 7, 20:29, law (D)] `FIELD_CONTRAST_CONDITIONAL`: each block place
                 // deposits against its whole conditional (`FieldLearner::section_conditional`), no proposal and no coin; its
@@ -3134,6 +3143,16 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
                         r.whole * 1000 / r.places.max(1),
                         section_start.elapsed().as_millis()
                     );
+                    if !r.outside.is_empty() {
+                        let unit = 1i128 << holonics::hnn::tower::MATERIAL_BITS;
+                        let stat = |j: usize| -> String {
+                            let mut v: Vec<i128> = r.outside.iter().map(|o| o[j]).collect();
+                            let mean = v.iter().sum::<i128>() * 1_000_000 / (unit * v.len() as i128);
+                            v.sort_unstable();
+                            format!("{mean}/{}/{}", v[v.len() * 9 / 10] * 1_000_000 / unit, v[v.len() - 1] * 1_000_000 / unit)
+                        };
+                        println!("FIELD_LETTERS lap={lap} n={n} outside_top4_micro={} outside_top8_micro={} outside_top16_micro={} (mean/q90/max)", stat(0), stat(1), stat(2));
+                    }
                     r
                 } else {
                     learner.section_kernel_grouped(&truth_views, &owners, &blocks, key, realization).map_err(|e| e.to_string())?
@@ -3220,8 +3239,30 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
                     section_start.elapsed().as_millis(),
                     started.elapsed().as_millis()
                 );
+                {
+                    let names = family_names(&learner.field);
+                    let text: Vec<String> = learner
+                        .field
+                        .families_all()
+                        .iter()
+                        .filter(|fam| fam.1 > 0)
+                        .filter_map(|&(start, len, _)| {
+                            let total: i128 = (start..start + len).map(|i| (learner.field.theta[i] as i128 - theta_before[i] as i128).abs()).sum();
+                            (total > 0).then(|| format!("{}={}/{len}", names.iter().find(|&&(_, at)| at == start).map_or("?", |&(n, _)| n), total))
+                        })
+                        .collect();
+                    println!("FIELD_STEP lap={lap} n={n} {}", text.join(" "));
+                }
+                if averaging {
+                    learner.average_section();
+                }
                 coherence_block.add(&receipt.covector);
                 coherence_lap.add(&receipt.covector);
+                // `FIELD_COHERENCE_EVERY=K`: the lap's coherence so far each `K` sections, so a run stopped from outside still
+                // leaves it (November 7: the 40-section read of law (D) was killed inside a 15-minute section).
+                if coherence_every > 0 && (n + 1 - from_section.min(n + 1)) % coherence_every == 0 {
+                    println!("FIELD_COHERENCE_SO_FAR lap={lap} sections={} n={} {}", n + 1, coherence_lap.n, coherence_lap.text(&learner.field));
+                }
                 if (n + 1) % 100 == 0 {
                     println!("FIELD_COHERENCE lap={lap} sections={coherence_from}..{} n={} {}", n + 1, coherence_block.n, coherence_block.text(&learner.field));
                     (coherence_block, coherence_from) = (Coherence::new(&learner.field), n + 1);
@@ -3239,7 +3280,7 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
                     if tenth > tenths_printed && n + 1 < sections.len() {
                         // [measurement; theory, November 7 19:50] The held places read at each tenth, beside the tenth's acceptance and
                         // the sections' coherence (rows marked `10000·(lap + 1) + sections done`).
-                        enumerated_read(&learner.field, &held_set, places, &truth_of, realization, 10_000 * (lap as i64 + 1) + (n + 1) as i64, &mut enumerated_rows)?;
+                        enumerated_read(&held_field(&learner, averaging), &held_set, places, &truth_of, realization, 10_000 * (lap as i64 + 1) + (n + 1) as i64, &mut enumerated_rows)?;
                     }
                     if tenth > tenths_printed || n + 1 == sections.len() {
                         tenths_printed = tenth;
@@ -3250,6 +3291,8 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
                 let read_done = read_sections > 0 && lap == 0 && n + 1 >= from_section + read_sections;
                 if started.elapsed().as_millis() > stop_ms || read_done {
                     write_new(&out.join("STATE.stopped"), at_rate(&learner, base_rate).as_bytes())?;
+                    // [theory, November 7 21:44] Every stopped read ends with the held read (rows marked `lap`).
+                    enumerated_read(&held_field(&learner, averaging), &held_set, places, &truth_of, realization, lap as i64, &mut enumerated_rows)?;
                     println!("FIELD_STOPPED lap={lap} sections={}/{} states={states} ms={}", n + 1, sections.len(), started.elapsed().as_millis());
                     if coherence_block.n > 0 {
                         println!("FIELD_COHERENCE lap={lap} sections={coherence_from}..{} n={} {}", n + 1, coherence_block.n, coherence_block.text(&learner.field));
@@ -3400,7 +3443,7 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
             lap_start.elapsed().as_millis(),
             started.elapsed().as_millis()
         );
-        enumerated_read(&learner.field, &held_set, places, &truth_of, realization, lap as i64, &mut enumerated_rows)?;
+        enumerated_read(&held_field(&learner, averaging), &held_set, places, &truth_of, realization, lap as i64, &mut enumerated_rows)?;
         println!("FIELD_ENUMERATED_READ lap={lap} ms={}", started.elapsed().as_millis());
     }
     Ok(())
@@ -3502,6 +3545,11 @@ impl Coherence {
             .collect::<Vec<_>>()
             .join(" ")
     }
+}
+
+/// The field a held read reads: the averaged constitution where it is kept and declared, the live field otherwise.
+fn held_field(learner: &FieldLearner, averaging: bool) -> Field {
+    if averaging { learner.averaged_field() } else { learner.field.clone() }
 }
 
 fn family_names(field: &Field) -> Vec<(&'static str, usize)> {

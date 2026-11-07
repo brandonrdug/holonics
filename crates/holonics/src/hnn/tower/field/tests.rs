@@ -2686,3 +2686,27 @@ fn a_beat_held_to_band_zero_is_the_full_conditional() {
     assert_eq!(full, beat);
     assert_eq!(a.field.theta, b.field.theta);
 }
+
+/// [definition; the unified-theory reading of November 7, 21:58] **The averaged constitution**: it opens at the live `θ`, moves
+/// toward it by `2^(−8)` a section (a whole unit where the release is zero), reads as its own field, and a learner's text
+/// carries it through a restart.
+#[test]
+fn the_averaged_constitution_follows_and_is_carried() {
+    let field = energetic_line();
+    let mut learner = FieldLearner::new(field, 14);
+    learner.average_section();
+    assert_eq!(learner.average.as_deref(), Some(&learner.field.theta[..]));
+    let before = learner.field.theta.clone();
+    for (i, t) in learner.field.theta.iter_mut().enumerate() {
+        *t += if i % 2 == 0 { 1024 } else { -3 };
+    }
+    learner.average_section();
+    let avg = learner.average.clone().unwrap();
+    for (i, (&a, &b)) in avg.iter().zip(&before).enumerate() {
+        assert_eq!(a - b, if i % 2 == 0 { 4 } else { -1 }, "entry {i}: 1024/256 and a whole unit toward −3");
+    }
+    assert_eq!(learner.averaged_field().theta, avg);
+    let back = FieldLearner::from_text(&learner.to_text()).unwrap();
+    assert_eq!(back.average, learner.average);
+    assert_eq!(back.field.theta, learner.field.theta);
+}
