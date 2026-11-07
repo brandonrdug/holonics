@@ -857,6 +857,11 @@ impl<'c> CardField<'c> {
     /// the octets of the resident face this upload holds.
     fn upload(&self, field: &Field, shared_face: Option<u64>) -> Result<(Words, Upload<'c>, u64)> {
         let d = field.declaration;
+        // [agent-inferred, November 6] The card's energy faces are not built: an energy field (the unified-theory reading of
+        // 22:52) is read on the host reference until its card realization passes its parity.
+        if d.energy {
+            return Err(TowerError::Refused("the card's energy faces are not built: read this field on the host"));
+        }
         let l = field.layout();
         let mut ring_off = Vec::new();
         let mut ring_n = Vec::new();
@@ -2686,7 +2691,7 @@ mod tests {
     use super::*;
 
     fn declaration(width: usize, heads: usize, contacts: usize) -> FieldDeclaration {
-        FieldDeclaration { alphabet: 122, width, heads, modes: 8, still: 2, contacts, ticks: 2, frames: 4, reach: 2221, lanes: 1, depth: 0 }
+        FieldDeclaration { alphabet: 122, width, heads, modes: 8, still: 2, contacts, ticks: 2, frames: 4, reach: 2221, lanes: 1, depth: 0, energy: false }
     }
 
     /// Every region is in one batch, in order, each batch within the budget; a region past the budget

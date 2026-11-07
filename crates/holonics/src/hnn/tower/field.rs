@@ -222,6 +222,11 @@ pub struct FieldDeclaration {
     /// carries no moment (without a skin its moment would sum the whole region). The ring `ρ ← μρ + r` with `μ = 1` and `r`
     /// keyed by the arriving class; `r` is located by deposition, never authored.
     pub depth: usize,
+    /// [definition; the unified-theory reading of November 6, 22:52] **The faces are one stored energy's forces**
+    /// ([`energy`]): each tick descends one energy `Φ` of the region's state and letters, and a site's face is the energy's
+    /// force on its letter. The value chart `V`, the current's return `O` and its bias, and the pair's return `W_c` and its
+    /// bias leave (founded at zero and never read); the pair contact is read through its own contraction `c`.
+    pub energy: bool,
 }
 
 impl FieldDeclaration {
@@ -432,6 +437,11 @@ impl FieldDeclaration {
         if self.depth > self.frames - self.still {
             return refuse("a field's depth rings are among its turned ring sets");
         }
+        // [agent-inferred, November 6] The energy's first build reads no depth ring: a depth ring's rate is read from the
+        // arriving classes, so its letters would enter the energy through its frames, whose force is not built.
+        if self.energy && self.depth > 0 {
+            return refuse("a field read as one energy's forces with depth rings (their letters' force through the frames is not built)");
+        }
         // The score is released `16 + β` bits from its products' grain, and a head's classes are
         // listed on the card in at most `2^12` buckets.
         if (FACE_BITS as i32) + self.score_shift() < 0 || self.class_trits() > MAX_CLASS_TRITS {
@@ -441,19 +451,26 @@ impl FieldDeclaration {
     }
 
     fn to_text(self) -> String {
-        format!("hnn-field-v14 {} {} {} {} {} {} {} {} {} {} {}", self.alphabet, self.width, self.heads, self.modes, self.still, self.contacts, self.ticks, self.frames, self.reach, self.lanes, self.depth)
+        format!("hnn-field-v15 {} {} {} {} {} {} {} {} {} {} {} {}", self.alphabet, self.width, self.heads, self.modes, self.still, self.contacts, self.ticks, self.frames, self.reach, self.lanes, self.depth, u8::from(self.energy))
     }
 
     fn from_text(line: &str) -> Result<Self> {
         let words: Vec<&str> = line.split(' ').collect();
-        // A v13 head line is a field with no depth ring (the line before the depth rings, its states the line's own).
-        let depth_word = match (words.first().copied(), words.len()) {
-            (Some("hnn-field-v14"), 12) => Some(words[11]),
-            (Some("hnn-field-v13"), 11) => None,
-            _ => return refuse("a field's head line that is not hnn-field-v14"),
+        // A v13 head line is a field with no depth ring (the line before the depth rings, its states the line's own), and a
+        // v14 one a field whose faces are read through the readout (the line before the energy, its states the line's own).
+        let (depth_word, energy_word) = match (words.first().copied(), words.len()) {
+            (Some("hnn-field-v15"), 13) => (Some(words[11]), Some(words[12])),
+            (Some("hnn-field-v14"), 12) => (Some(words[11]), None),
+            (Some("hnn-field-v13"), 11) => (None, None),
+            _ => return refuse("a field's head line that is not hnn-field-v15"),
+        };
+        let energy = match energy_word {
+            None | Some("0") => false,
+            Some("1") => true,
+            Some(_) => return refuse("a field's energy word that is not 0 or 1"),
         };
         let n = |w: &str| w.parse::<usize>().map_err(|_| TowerError::Refused("a field's declaration that is not a count"));
-        let d = Self { alphabet: n(words[1])?, width: n(words[2])?, heads: n(words[3])?, modes: n(words[4])?, still: n(words[5])?, contacts: n(words[6])?, ticks: n(words[7])?, frames: n(words[8])?, reach: n(words[9])?, lanes: n(words[10])?, depth: depth_word.map(n).transpose()?.unwrap_or(0) };
+        let d = Self { alphabet: n(words[1])?, width: n(words[2])?, heads: n(words[3])?, modes: n(words[4])?, still: n(words[5])?, contacts: n(words[6])?, ticks: n(words[7])?, frames: n(words[8])?, reach: n(words[9])?, lanes: n(words[10])?, depth: depth_word.map(n).transpose()?.unwrap_or(0), energy };
         d.admit()?;
         Ok(d)
     }
@@ -504,6 +521,10 @@ pub struct FieldLayout {
     pub moment_face_bias: usize,
     /// The lift's bias `b_R` (`D`, §16.26).
     pub lift_bias: usize,
+    /// [definition; the unified-theory reading of November 6, 22:52] The pair contact's contraction `c` (`f`, the contacts' real
+    /// parts then imaginary, on the material's grain) in an energy field ([`FieldDeclaration::energy`]): the strand pair's
+    /// energy is `−Re⟨c, a_t · b_(s(t))⟩`. Absent (zero long) otherwise.
+    pub pair_c: usize,
     pub len: usize,
     pub families: Vec<(usize, usize, u32)>,
 }
@@ -545,7 +566,8 @@ impl FieldLayout {
         let moment_face = push(dw * m2, MATERIAL_BITS);
         let moment_face_bias = push(dw, FACE_BITS);
         let lift_bias = push(dw, FACE_BITS);
-        Self { enc, before, after, q, q_bias, v, v_bias, out, out_bias, a: a_, a_bias, b, b_bias, w, w_bias, read, read_bias, moment_before, moment_after, temper, probe, probe_bias, pace, moment_face, moment_face_bias, lift_bias, len: at, families }
+        let pair_c = if d.energy { push(f, MATERIAL_BITS) } else { at };
+        Self { enc, before, after, q, q_bias, v, v_bias, out, out_bias, a: a_, a_bias, b, b_bias, w, w_bias, read, read_bias, moment_before, moment_after, temper, probe, probe_bias, pace, moment_face, moment_face_bias, lift_bias, pair_c, len: at, families }
     }
 }
 
@@ -1698,6 +1720,12 @@ impl Field {
                 }
             }
         }
+        // [definition; the unified-theory reading of November 6, 22:52] In an energy field the value chart leaves: it is drawn
+        // (so every later draw stands as the line's founding draws it) and set to zero, never read. The pair's contraction `c`
+        // opens at zero as the pair's return did, so each pair contact opens on no energy.
+        if declaration.energy {
+            theta[layout.v..layout.v + m2 * dw].fill(0);
+        }
         // The temperatures open at their derived gains (§15.10), `T = 2^(−β)`, held as `log₂ T = −β` (§16.12).
         for h in 0..declaration.heads {
             for (kind, beta) in [(0usize, declaration.score_shift()), (1, declaration.listen_shift())] {
@@ -2537,6 +2565,10 @@ impl Field {
     /// The region's forward: `K` ticks, then each unresolved site's face. `keep` holds each tick's
     /// temporaries for the reverse.
     fn pass(&self, region: &Region, keep: bool) -> Result<FieldPass> {
+        if self.declaration.energy {
+            // [definition; the unified-theory reading of November 6, 22:52] An energy field's forward ([`energy`]).
+            return self.energy_pass(region).map(|(pass, _)| pass);
+        }
         self.admit_region(region)?;
         let d = &self.declaration;
         let dw = d.width;
@@ -3329,6 +3361,9 @@ impl Field {
         let sites = region.classes.len();
         let l = &self.layout;
         let reaches = self.reaches();
+        if d.energy {
+            return refuse("an energy field's return through its ticks is not built: it is read, not trained");
+        }
         if pass.ticks.len() != d.ticks {
             return refuse("a reverse reads a forward that held every tick");
         }
@@ -5182,8 +5217,10 @@ impl FieldLearner {
     }
 }
 
+mod energy;
 pub mod moment;
 mod scale;
+pub use energy::{EnergyRead, ENERGY_BITS};
 pub use scale::Scale;
 
 #[cfg(test)]

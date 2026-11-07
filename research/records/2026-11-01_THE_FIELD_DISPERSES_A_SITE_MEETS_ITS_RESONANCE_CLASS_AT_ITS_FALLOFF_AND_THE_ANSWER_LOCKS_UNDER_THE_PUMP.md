@@ -4231,3 +4231,48 @@ walk [agent-inferred: the conservative reading of "beyond the two keyed walks' g
 - Time: the walks took 652.6, 665.9, 661.6 and 658.6 s, against 475 s projected (1.39×, 23.4 ms a read against truth120's 16.9).
   All were inside the 900 s deadline, and the four took 2,639 s of the hour. Peak resident set was 240 MB.
 Receipts: `longrun_nov6/scans127.txt`, `longrun_nov6/scan_reads.py`.
+
+[measurement; November 6, keys128; the unified-theory reading of 22:52] **The writes' baseline at run bits 0.** Lap 24 given
+held's lengths, refine 10 at run bits 0 (one place a read, the release's law from scans127), at keys122's three declared keys.
+- Fences closed: 27 of 30, 30 of 31, 24 of 29, against keys122's 26/28, 29/31, 26/30 at run bits 1.
+- Question share: 0.18, 0.17, 0.13, against 0.15, 0.15, 0.12.
+- Parses: 2, 1, 2, against 0, 2, 0. Held-answer identifiers: 0.16, 0.19, 0.13. Repeat share: 0.24, 0.33, 0.30.
+- Each key took 7,722 reads in 187–193 s, against 250 s projected (0.76).
+- Why the reads cost more than their count: a read is one batch over the problems, and at run bits 0 each place is its own region
+  read. scans127's keyed walk at run bits 0 met 153.3 × 10⁹ pairs in 634 s against truth120's 87.1 × 10⁹ in 389 s: the same 4.1–4.5
+  ns a pair, 1.76 times the pairs a pass.
+Receipts: `longrun_nov6/keys128.txt`.
+
+[definition; the unified-theory reading of November 6, 22:52] **The faces as one stored energy's forces: the host reference**
+(`hnn::tower::field::energy`, `FieldDeclaration::energy`, head line `hnn-field-v15`).
+- Each tick descends one energy of the region's state and letters: its receivers' lock partitions, the strand pair's
+  contraction `−Re⟨c, a_t · b_(s(t))⟩` and the letters' rows read against the sites they reach. It descends with `x ← x − η ‖x‖_rms
+  ∂Φ/∂r̂`, each tick's fall certified on the energy's own reading and `η` halved until it is.
+- The classes and supports are read at the opening and held through the ticks.
+- The face is the energy's force on a letter at the last state: `z_t(a) = −∂Φ/∂e_t(a)` with the moment's part.
+- The value chart, the current's return and the pair's return leave. The card refuses an energy field until its realization
+  passes its parity, and the training return is refused until built.
+- [agent-inferred] The first build reads plain clocks, no depth ring and no tower of scales.
+Tests on the tiny field, every family drawn at ±½, clocks plain:
+- Each tick's fall is certified: Φ goes −45.6 → −65.0 bits in four ticks and rests at tick 68 (−70.5).
+- With the moment rows at zero, `Φ(a) − Φ(0) = −(z_t(a) − z_t(0))` at every open site and letter, to the face's grain.
+- A small step's fall over its first-order fall `η Σ(|F|² − ⟨r̂,F⟩²/W)` reads 0.97 to 1.00 at `η = 2^(−8)` to `2^(−12)`.
+- At the rest, the first-order fall is 0.001 bits, against 76.6 at the opening.
+The squares still disagree there. Full swaps read curl/readings 0.79 at four ticks and 0.73 at rest. Read at one base with the
+open sites as locked uniform mixtures, they read 1.45 to 1.90, and those readings did not scale with `ε`.
+
+[measurement; November 6, energy129; Brandon's host exception of 23:52:55 UTC ("You can run it")] **At founding the energy's
+partial face is not reciprocal.** The energy field was founded on lap 24's declaration (KEYS8) and its curl read on held truth
+(32 problems, 16 squares a band, theory's fixed read curl/λ ≤ 0.3 in every band), on the host with 24 threads (the card refuses
+energy fields).
+- The development read (one problem, 40 region reads in 0.43 s) projected 110 s, upper 198 s. The read stopped at that deadline
+  with 20 of 32 problems read (304 squares a band), so it is incomplete evidence. The one problem it timed was a short one.
+- Curl/λ by band: 1.99, 0.88, 1.80, 1.76 and 1.74. At `d = 1`, κ is 0.993 and the two readings correlate +0.01.
+- That is far past the construction's bound in every band, and at `d = 1` worse than the line's lap 24 (1.20).
+- So the face read at the last state carries where the descent stopped, not the energy's response to a letter, as on the tiny
+  field.
+- Theory's call (November 7, 00:02): the face moves to the total derivative, `z_t(a) = −dG/de_t(a)` with `G(e) = Φ(x^K(e); e)`,
+  read through the opening and the declared `K` ticks. It is one scalar's gradient at the ticks actually run, so its Hessian is
+  symmetric and a square read at one base agrees to first order with no rest. Its rest limit is the partial face.
+- The base holds the classes, the supports and the halvings, and the open site stays a source carrying the locked mixture.
+Receipts: `longrun_nov6/energy129.txt`.

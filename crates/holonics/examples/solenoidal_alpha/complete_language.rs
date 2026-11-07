@@ -799,6 +799,7 @@ pub(super) fn run_with_execution(
         Some("train-field") if backend == CompleteLanguageTrainingBackend::HostReference => field_train::train(args, &mut field_train::host()),
         Some("sample-field") if backend == CompleteLanguageTrainingBackend::HostReference => field_train::sample(args, &mut field_train::host()),
         Some("rows-field") if backend == CompleteLanguageTrainingBackend::HostReference => field_train::rows_field(args),
+        Some("found-field") if backend == CompleteLanguageTrainingBackend::HostReference => field_train::found_field(args),
         Some("ring-field") if backend == CompleteLanguageTrainingBackend::HostReference => field_train::ring_field(args),
         Some("depth-field") if backend == CompleteLanguageTrainingBackend::HostReference => field_train::depth_field(args),
         Some("restate-field") if backend == CompleteLanguageTrainingBackend::HostReference => field_train::restate_field(args, &mut field_train::host()),
@@ -881,7 +882,7 @@ pub(super) fn run_with_execution(
         Some("train-native" | "sample-native") => Err("the native route's commands are host-owned; no CUDA fallback".into()),
         Some("sample" | "sample-prepared-retained-fibre-v1" | "sample-prepared-retained-512-v1" | "sample-prepared-retained-full-question-v1") if backend == CompleteLanguageTrainingBackend::HostReference => sample(args),
         Some("sample" | "sample-prepared-retained-fibre-v1" | "sample-prepared-retained-512-v1" | "sample-prepared-retained-full-question-v1") => Err("complete-language continuation remains explicitly host-owned; no CUDA fallback".into()),
-        _ => Err("complete-language requires train, explicit train-retained-fibre-v1 (reference), train-local-retained-fibre-v1 (R/tree/population only), train-prepared-local-retained-fibre-v1 (host prepared input + local R), train-prepared-local-retained-held-v1 (explicit held-map continuation), train-source-framing-retained-held-v1 (explicit known byte-position context), sample, or sample-prepared-retained-fibre-v1; no default backend/model action".into()),
+        other => Err(format!("complete-language requires train, explicit train-retained-fibre-v1 (reference), train-local-retained-fibre-v1 (R/tree/population only), train-prepared-local-retained-fibre-v1 (host prepared input + local R), train-prepared-local-retained-held-v1 (explicit held-map continuation), train-source-framing-retained-held-v1 (explicit known byte-position context), sample, or sample-prepared-retained-fibre-v1; no default backend/model action (read {other:?} on the {backend:?} backend)").into()),
     }
 }
 /// The field's commands (`hnn::tower::field`) with every read and return through a declared

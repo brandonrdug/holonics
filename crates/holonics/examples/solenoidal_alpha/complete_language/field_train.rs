@@ -1160,7 +1160,7 @@ pub(super) fn train(args: &[String], realization: &mut dyn FieldRealization) -> 
         Some([path, sha]) => FieldLearner::from_text(std::str::from_utf8(&pinned_read(path, sha, STATE_BUDGET)?)?).map_err(|e| e.to_string())?,
         _ => {
             // The founding's heads are its ring sets; the reach is the passages'.
-            let declaration = FieldDeclaration { alphabet: codec.alphabet(), width, heads, modes, still, contacts, ticks, frames: heads, reach, lanes: 1, depth: 0 };
+            let declaration = FieldDeclaration { alphabet: codec.alphabet(), width, heads, modes, still, contacts, ticks, frames: heads, reach, lanes: 1, depth: 0, energy: false };
             let mut field = Field::found(declaration, &keys).map_err(|e| e.to_string())?;
             // [measurement; agent-inferred, November 3, §16.31] `FIELD_FOUND_RETURNS` (`returns`, or `lift` for the readout's
             // lift as well): the founding's zero families drawn instead, uniform on `±√(3/fan-in)` from a block of the key
@@ -2711,6 +2711,28 @@ pub(super) fn length_field(args: &[String], realization: &mut dyn FieldRealizati
     Ok(())
 }
 
+/// [definition; agent-inferred, November 6, the unified-theory reading of 22:52] **`found-field STATE STATE_SHA KEYS KEYS_SHA
+/// OUT`**: a fresh founding of the state's declaration on the key stream `KEYS`, at the state's rate, written to `OUT` as a
+/// learner. With `FIELD_ENERGY` set the founding's faces are one stored energy's forces (`FieldDeclaration::energy`); the
+/// line's data, passes and levels are its declaration's, so a founding read compares the two laws on one declaration.
+pub(super) fn found_field(args: &[String]) -> Result<()> {
+    if args.len() != 6 {
+        return Err("found-field STATE STATE_SHA KEYS KEYS_SHA OUT".into());
+    }
+    let learner = FieldLearner::from_text(std::str::from_utf8(&pinned_read(&args[1], &args[2], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
+    let declaration = FieldDeclaration { energy: std::env::var_os("FIELD_ENERGY").is_some(), ..learner.field.declaration };
+    let field = Field::found(declaration, &pinned_read(&args[3], &args[4], READ_BUDGET as usize)?).map_err(|e| e.to_string())?;
+    let founded = FieldLearner::new(field, learner.rate_bits);
+    std::fs::write(&args[5], founded.to_text())?;
+    println!("FIELD_FOUNDED {} rate={} material={}", declaration_line(&founded.field), founded.rate_bits, founded.field.theta.len());
+    Ok(())
+}
+
+/// A field's declaration head line.
+fn declaration_line(field: &Field) -> String {
+    field.to_text().lines().next().unwrap_or("").to_string()
+}
+
 /// [measurement] **`rows-field`**: where an open and a definite receiver's rows put their mass (§15.9's
 /// reading, `Field::row_shares`) on three sets of crib regions: the withheld problems read with their
 /// neighbours (`unseen_regions`), training's masked regions over the whole region and over the answer (`shape`), each
@@ -3210,7 +3232,7 @@ mod tests {
 
     fn toy_learner(codec: &FieldCodec, problems: &Problems) -> FieldLearner {
         let reach = problems.iter().map(|(q, _, _)| q.len() + codec.answer).max().unwrap();
-        let d = FieldDeclaration { alphabet: codec.alphabet(), width: 8, heads: 2, modes: 3, still: 1, contacts: 4, ticks: 2, frames: 2, reach, lanes: 1, depth: 0 };
+        let d = FieldDeclaration { alphabet: codec.alphabet(), width: 8, heads: 2, modes: 3, still: 1, contacts: 4, ticks: 2, frames: 2, reach, lanes: 1, depth: 0, energy: false };
         let keys: Vec<u8> = (0..1u64 << 13).flat_map(|i| mix(0x5EED, i).to_be_bytes()).collect();
         FieldLearner::new(Field::found(d, &keys).unwrap(), 4)
     }
