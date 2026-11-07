@@ -1,8 +1,8 @@
 # U2: F0's memory acceptance run, pinned before its split was read: the depth cut at 12 ticks passes
 
 **Date:** 2026-09-28. Refs #63, #73, #148. **Scope:** the acceptance run of
-[U2](../../docs/plans/THE_REBUILD.md#u2-one-retention-contract-and-f0s-memory) ("The acceptance
-run pins, before it runs"), under [F0's gate](../../docs/plans/THE_REBUILD.md#f0-the-predictor-on-unseen-families-the-releases-gate-73-148).
+[U2](https://github.com/brandonrdug/holonics/blob/0a051ae5/docs/plans/THE_REBUILD.md#u2-one-retention-contract-and-f0s-memory) ("The acceptance
+run pins, before it runs"), under [F0's gate](https://github.com/brandonrdug/holonics/blob/0a051ae5/docs/plans/THE_REBUILD.md#f0-the-predictor-on-unseen-families-the-releases-gate-73-148).
 The pins below were committed before the split was generated and before any of its cells was read.
 The receipt follows them.
 

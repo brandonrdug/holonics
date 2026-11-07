@@ -8,9 +8,8 @@ construction; [CONSTRUCTION_STATE](../CONSTRUCTION_STATE.md) records the positio
 in `crates/` and `lean/` today. The host `holonics::hnn` and resident `holonics-cuda::hnn` implement the
 field. The landmark tree and the population of families that reads it supply the measured
 compression; the loaded resonator (`hnn::ring`) connects the resonator's returned wave and adjoint to
-the field. THE_REBUILD's [unified plan](plans/THE_REBUILD.md#the-unified-plan-september-28) orders
-the joins that remain, and [CONSTRUCTION_STATE](../CONSTRUCTION_STATE.md) distinguishes measured
-results from them.
+the field. [THE_REBUILD](plans/THE_REBUILD.md) orders the joins that remain, and
+[CONSTRUCTION_STATE](../CONSTRUCTION_STATE.md) distinguishes measured results from them.
 
 ## The top: a Holarchy and its aeons
 
@@ -21,7 +20,7 @@ results from them.
   certified on its own, joined at ports by `interconnect`: `hnn::Field::holarchy` returns the
   `holarchy::Holarchy`, and the mount certifies that it glues or refuses with its typed gluing
   defect. `hnn::Field` is the Holarchy's declaration, a chart of it.
-- **The receiving composition** [interpretation; the unified plan, September 28]. At the field's
+- **The receiving composition** [interpretation; the [unified plan](https://github.com/brandonrdug/holonics/blob/0a051ae5/docs/plans/THE_REBUILD.md#the-unified-plan-september-28), September 28]. At the field's
   receiving port the receiver mixes its constituent families by Bayes, the discrete replicator
   (`receiver::population`): the landmark tree (`compression::landmark::context`, the shift
   navigator's landmarks, held in `Θ` at the receiving locus) is one family; a field-derived predictor

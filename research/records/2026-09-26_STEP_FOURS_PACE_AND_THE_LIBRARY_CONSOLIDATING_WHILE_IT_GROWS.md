@@ -8,7 +8,7 @@ from THE_REBUILD's former Decision 31 when the Decisions log dissolved into its 
 The rules that stand are in THE_REBUILD: the development harness and the law gates in
 "Rules of the rebuild" and [(f) Measurement](../../docs/THE_MACHINE.md#measurement); the curation's remaining scope in the Order,
 step 7. The text keeps its original numbering: "Decision N" resolves through THE_REBUILD's
-[Decisions index](../../docs/plans/THE_REBUILD.md#the-decisions-index).
+[Decisions index](https://github.com/brandonrdug/holonics/blob/0a051ae5/docs/plans/THE_REBUILD.md#the-decisions-index).
 
 ## The direction and its receipts (the former Decision 31)
 

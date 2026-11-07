@@ -84,7 +84,7 @@ centres and errors remain exactly unchanged, and its new rest reproduces its fou
 
 [historical] The implementation return initially named source/receiver-relative field action
 as the next operation without retaining its application consumer. Brandon's subsequent roadmap
-clarification exposed that drift. The live [position](../../CONSTRUCTION_STATE.md#roadmap-position)
+clarification exposed that drift. The live [position](https://github.com/brandonrdug/holonics/blob/13f8c734/CONSTRUCTION_STATE.md#roadmap-position)
 and [application contract](../../docs/plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#next-consuming-application)
 now bind the receiver/context work to the same model's request and joint response session.
 

@@ -1,6 +1,6 @@
 # F2: the field-family gate before validation
 
-**Date:** 2026-09-27. **Scope:** [THE_REBUILD F2](../../docs/plans/THE_REBUILD.md#f2-the-field-as-a-family-step-4-73), #73. This pin precedes F2 fitting and validation.
+**Date:** 2026-09-27. **Scope:** [THE_REBUILD F2](https://github.com/brandonrdug/holonics/blob/0a051ae5/docs/plans/THE_REBUILD.md#f2-the-field-as-a-family-step-4-73), #73. This pin precedes F2 fitting and validation.
 
 The dataset's undivided development occurrence family `(provider, record_group)` is canonicalized as sorted-key compact UTF-8 JSON. `SHA-256(seed || NUL || canonical family)`, read as a big-endian integer, puts residue zero modulo five in validation and the rest in choosing. `seed = holonics-f2-development-families-2026-09-27-v1`. The pinned source SHA-256 is `e1001a7ed0dd03c583ab4ef097f3e243b12680daad05911374b8765107f2f8b2`: 17,930 choosing families and 4,519 validation families. The canonical sorted private membership entries have SHA-256 `56aac30511086208f85991168da3239fdaf025379392fa6f6aba37b37f605b73`. The owner-only membership file in `.local/cuts/` is mode `0600` under a `0700` directory. No family key or source text is published. The evaluation partition remains closed.
 
