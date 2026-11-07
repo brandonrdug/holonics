@@ -1961,7 +1961,8 @@ pub(super) fn curl_field(args: &[String], realization: &mut dyn FieldRealization
     std::fs::create_dir(out)?;
     let void = codec.void();
     let near = holonics::hnn::tower::field::NEAR;
-    let mut rows = rows_file(&out.join("CURL.tsv"), "problem\tband\ti\tj\tlambda_i\tlambda_j\tsmall_i\tsmall_j\twide_i\twide_j\tzlambda_i\tzlambda_j\tglambda\tfloors\n")?;
+    let header = if std::env::var_os("FIELD_ENERGY_CENTRAL").is_some() { "problem\tband\ti\tj\tc16_i\tc16_j\tc8_i\tc8_j\tc4_i\tc4_j\n" } else { "problem\tband\ti\tj\tlambda_i\tlambda_j\tsmall_i\tsmall_j\twide_i\twide_j\tzlambda_i\tzlambda_j\tglambda\tfloors\n" };
+    let mut rows = rows_file(&out.join("CURL.tsv"), header)?;
     let (mut read_regions, mut written) = (0usize, 0usize);
     for k in 0..n {
         let (q, room) = opening(&codec, field, &held[k].0, b"")?;
@@ -1989,6 +1990,21 @@ pub(super) fn curl_field(args: &[String], realization: &mut dyn FieldRealization
         // [measurement; the unified-theory reading of November 7, 01:37] An energy field's square is read at one base, its four
         // corners replayed at the base's halvings under its supports (`Field::energy_square_corners`), with the attribution
         // read at ε and 4ε beside it, through the realization (the card's or the host's).
+        // [measurement; the unified-theory reading of November 7, 03:22] `FIELD_ENERGY_CENTRAL`: each square's central readings at
+        // one base at a letter's weight over 16, 8 and 4 (`Field::energy_central_square`), on the host.
+        if field.declaration.energy && std::env::var_os("FIELD_ENERGY_CENTRAL").is_some() {
+            let letter = (1u32 << 16) / field.declaration.alphabet as u32;
+            let steps = [letter >> 4, letter >> 3, letter >> 2];
+            let reads = picked.par_iter().map(|&(_, i, j)| field.energy_central_square(&truth, (i, j), void, &steps)).collect::<std::result::Result<Vec<_>, _>>().map_err(|e| e.to_string())?;
+            read_regions += 15 * picked.len();
+            for (&(b, i, j), square) in picked.iter().zip(&reads) {
+                let Some(r) = square else { continue };
+                let cells: Vec<String> = r.iter().flat_map(|&(x, y)| [(x << 4).to_string(), (y << 4).to_string()]).collect();
+                row(&mut rows, &format!("{k}\t{b}\t{}\t{}\t{}\n", i - q.len(), j - q.len(), cells.join("\t")))?;
+                written += 1;
+            }
+            continue;
+        }
         if field.declaration.energy {
             // The step is read on a letter's own weight in the uniform mixture, `ε = 2^(−4)/A` of a mixture's weight (four
             // times that wide), so every moved mixture stays a mixture at any alphabet. [agent-inferred, November 7: theory's

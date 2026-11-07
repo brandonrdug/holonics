@@ -4345,3 +4345,19 @@ temperature the founding's squares do not agree at one base, and the card reads 
   the ratio rises as `ε` falls (grain), and above it the curvature of four ticks grows the curl.
 - [inferred] The descent rounds the state to `2^(−16)` every tick while the face reads it at thousands of bits a unit.
 Receipts: `longrun_nov6/energy131.txt`, `longrun_nov6/energy132.txt`.
+
+[measurement; November 7, energy133; the unified-theory reading of 03:22] **Central squares at one base: the median square
+agrees, and a floor rules the small ones.** These are held truth's squares on energy131's founding at `K = 4`, read raw
+(`T = 1`). Each reading is `+ε` less `−ε` at the base, so the curvature cancels to third order (`FIELD_ENERGY_CENTRAL`,
+`Field::energy_central_square`). It ran on the host with 16 threads, 1,648 s against a 1,441 s projection.
+- The readings grow 1.89, 2.12, 1.58, 1.96 and 1.92 times from a letter's weight over 16 to over 8, and 1.50–1.89 times to over
+  4.
+- Per-square median curl/readings at /8 is 0.036, 0.045, 0.058, 0.075 and 0.138 by band; at /16 it is 0.051–0.225.
+- Summed over squares the curl/readings is larger: 0.24–0.59 at /8.
+- 8–19% of squares sit above 0.5 at every step. Their readings are 15 times smaller than those of the squares under 0.1 (2.1
+  against 30.8 bits raw at /8), an absolute floor that rules the ratio where a reading is small.
+- By theory's rule (≤ 0.1 at a step whose readings double within 10%), the medians at /8 pass in bands 1, 2–3 and 8–15. Band
+  4–7 passes the bound, but its readings grow only 1.58 times, and band 16+ misses at 0.138.
+- The central fall ratio on a line state is `(Φ(x − δv) − Φ(x + δv))/(2δ⟨F, v⟩)`. It reads 0.89–1.32 at `2^(−10)` and does not
+  close at `2^(−12)`, where the step moves the state by about eight units of its grain.
+Receipts: `longrun_nov6/energy133.txt`, `longrun_nov6/central.py`.

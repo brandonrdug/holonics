@@ -1,0 +1,23 @@
+# energy133: theory's central squares (November 7, 03:22) on energy131's founding at T = 1 (raw: the readings are scale-free, and at T0 they sit at the face's grain): held truth, K = 4, steps of a letter's weight over 16, 8 and 4, each reading central (+eps less -eps). Before it, theory's scale law (November 7, 01:37): the letters read the energy at one temperature T0 (temper-field over 32 training writer states), each square's four corners at one base, the attribution read at eps 2^-6, the logit squares, the floor counts and the energy's own four-corner square beside them. Before it: the energy face's founding read again, its face now the total derivative z = -dG/de, G = Phi(x^K(e); e) (theory, November 7 00:02), open sites carrying the locked uniform mixture; (theory, November 6 22:52: "at founding curl/lambda <= 0.3 in every band, the
+# construction's test"), on the host under Brandon's exception (23:52:55 UTC, "You can run it": found the energy field on the
+# line's declaration and read its curl on 32 held problems, reading only, at most an hour on 24 threads). The card refuses
+# energy fields until their realization passes its parity. Founding: lap 24's declaration (long114/seg10) with the energy, on
+# KEYS8. Read: curl-field, 32 held problems, 16 squares a band (5 bands, 2,560 squares, 10,240 region reads, truth120's
+# workload). Projection from a development read (4 problems, 2 squares a band, 160 region reads: energy129 read one short problem and under-projected); the read runs only if its
+# projection's upper end (1.25x the development rate) fits the hour less the founding; else it stops and says so.
+set -u
+# energy131 binary ad6dbe6e9cf3ebf6aa481f7a752712ff6e0ddfb0ba1918321646b4b4be08353a state bdaeff3a76c1 the hour ends 04:28:32
+FIELD_CURL problems=4 squares=40 regions=600 ms=22527
+MEASURE lap=curl_dev rc=0 wall_s=22.6 peak_rss_kib=778364
+# development: 40 squares in 22527 ms; projection for 2560 squares: 1441 s, upper 1862 s, 3517 s left in the hour
+FIELD_CURL problems=32 squares=2560 regions=38400 ms=1648400
+MEASURE lap=curl rc=0 wall_s=1648.5 peak_rss_kib=2016768
+band	squares	/16: curl/readings median	/8: curl/readings median	/4: curl/readings median	readings /8 over /16	/4 over /8
+1	512	0.061 0.051	0.295 0.036	0.520 0.054	1.89	1.53
+2-3	512	0.284 0.061	0.590 0.045	0.477 0.060	2.12	1.50
+4-7	512	0.133 0.089	0.342 0.058	0.637 0.064	1.58	1.55
+8-15	512	0.195 0.119	0.283 0.075	0.470 0.076	1.96	1.89
+16+	512	0.248 0.225	0.240 0.138	0.350 0.110	1.92	1.87
+MAIN exit 03:56:24
+# central fall on a 400-site line state of the founding, (Phi(x-dv)-Phi(x+dv))/(2d<F,v>), seeds 3 5 7:
+# 2^-10: 0.96 1.12 1.04 (opening), 0.89 1.32 0.98 (4 ticks); 2^-12: 1.003 0.89 1.18 / -1.22 1.42 1.16; 2^-14: scattered

@@ -1196,7 +1196,10 @@ impl Field {
         // The energy's fall along `v` against its first order: `Δr̂ = 2^(−e) v` for a lane-tangent `v`, so `ΔΦ ≈ −2^(−e) ⟨F, v⟩`
         // with `F` on 2^(−24) and `v` on 2^(−24) (2^(−48)), carried to 2^(−32).
         let first = release(pair(&f0, &v), 16 + e);
-        Ok(EnergyTangentRead { tangent: tv, difference, uv, vu, fall: cell.phi - moved.phi, first })
+        // The central fall: `Φ(x − δv) − Φ(x + δv)` against `2 δ ⟨F, v⟩`, its curvature cancelled.
+        let minus: Vec<i64> = v.iter().map(|&x| -x).collect();
+        let behind = self.energy_cell(&self.energy_step(&x, &cell.scale, &minus, e)?, &held, &paces, &reaches, window.as_deref())?;
+        Ok(EnergyTangentRead { tangent: tv, difference, uv, vu, fall: cell.phi - moved.phi, first, central: behind.phi - moved.phi })
     }
 
     /// [measurement; a test's reading] **`G` at other letters**: `G(e) = Φ(x^K(e); e)` with site `t` carrying `shares`
@@ -1329,6 +1332,53 @@ impl Field {
         self.energy_square_reading((a, b), (a2, b2), &corners, void).map(Some)
     }
 
+    /// [measurement; the unified-theory reading of November 7, 03:22] **A square's central readings at one base**: at each step
+    /// `ε` of `steps` (`2^(−16)` of a mixture's weight), `i`'s reading `(z_i(a′) − z_i(a))` with `j`'s mixture moved by `+ε(b′ − b)`
+    /// less the same with it moved by `−ε(b′ − b)`, and `j`'s alike, every read at the base's halvings under its supports, so the
+    /// curvature cancels to third order. Each reading is twice the central difference, on `2^(−16)` bits; `None` where a face
+    /// has no runner-up.
+    pub fn energy_central_square(&self, truth: &[usize], (i, j): (usize, usize), void: usize, steps: &[u32]) -> Result<Option<Vec<(i128, i128)>>> {
+        let sites = truth.len();
+        let base_w = (1u32 << STATE_BITS) / self.declaration.alphabet as u32;
+        if steps.iter().any(|&e| e > base_w) {
+            return refuse("a square's step past a letter's weight in the uniform mixture");
+        }
+        let mut open = vec![false; sites];
+        (open[i], open[j]) = (true, true);
+        let base_region = Region { classes: truth, unresolved: &open, faces: &[], locked: &[], echo: &[], domain: None, port: None };
+        let base = self.energy_relax(&base_region, self.declaration.ticks, None, None)?;
+        let halvings = base.read.halvings.clone();
+        let corner = |at: usize, other: usize, letter: Option<usize>, mixture: Option<Shares>| -> Result<Vec<i64>> {
+            let mut classes = truth.to_vec();
+            let mut unresolved = vec![false; sites];
+            let mut faces: Vec<Option<Shares>> = vec![None; sites];
+            let mut locked = vec![false; sites];
+            unresolved[at] = true;
+            match letter {
+                Some(c) => classes[other] = c,
+                None => {
+                    unresolved[other] = true;
+                    (faces[other], locked[other]) = (mixture, true);
+                }
+            }
+            let r = Region { classes: &classes, unresolved: &unresolved, faces: &faces, locked: &locked, echo: &[], domain: None, port: None };
+            let (pass, _) = self.energy_faces(&r, Some(&halvings), Some(&base.held))?;
+            pass.logits[at].clone().ok_or(TowerError::Refused("a square's open place with no face"))
+        };
+        let (a, b) = (truth[i], truth[j]);
+        let zi_b = corner(i, j, Some(b), None)?;
+        let zj_a = corner(j, i, Some(a), None)?;
+        let Some((a2, b2)) = self.energy_square_runners(&zi_b, &zj_a, (a, b), void) else { return Ok(None) };
+        let gap = |z: &[i64], hi: usize, lo: usize| (z[hi] - z[lo]) as i128;
+        let mut out = Vec::with_capacity(steps.len());
+        for &eps in steps {
+            let ri = gap(&corner(i, j, None, Some(self.energy_square_mixture(Some((b2, b)), eps)))?, a2, a) - gap(&corner(i, j, None, Some(self.energy_square_mixture(Some((b, b2)), eps)))?, a2, a);
+            let rj = gap(&corner(j, i, None, Some(self.energy_square_mixture(Some((a2, a)), eps)))?, b2, b) - gap(&corner(j, i, None, Some(self.energy_square_mixture(Some((a, a2)), eps)))?, b2, b);
+            out.push((ri, rj));
+        }
+        Ok(Some(out))
+    }
+
     /// [definition; the unified-theory reading of November 7, 01:37] A square's moved mixture ([`Field::energy_square_corners`]):
     /// the uniform mixture over the alphabet (`2^16/A` a letter), `ε` moved from the letter `down` to `up` where `shift` is
     /// given. Public: a realization reads a square's corners on the same mixtures.
@@ -1453,4 +1503,6 @@ pub struct EnergyTangentRead {
     pub vu: i128,
     pub fall: i128,
     pub first: i128,
+    /// `Φ(x − δv) − Φ(x + δv)`, on `2^(−32)` bits, against `2 · first`.
+    pub central: i128,
 }
