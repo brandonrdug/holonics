@@ -103,7 +103,7 @@ Author and conjecture names stay as source attribution and statement coordinates
 testimony; order and position
 belong to [THE_REBUILD](../docs/plans/THE_REBUILD.md) and [CONSTRUCTION_STATE](../CONSTRUCTION_STATE.md).
 
-[definition] Lean's exact `ℝ` and `ℂ`, classical mathematics and Mathlib are admitted
+[definition] Lean's mathematical `ℝ` and `ℂ`, classical mathematics and Mathlib are admitted
 mathematical charts, not device floats. Physical interpretation still needs units, constitutive
 laws, boundaries and calibrated receivers. Kernel acceptance proves the stated theorem under its
 assumptions; it supplies neither a molecular experiment nor a trained Athena. Lean is exterior
