@@ -691,8 +691,14 @@ extern "C" __global__ void field_energy_unit_tangent(FieldWords w, const int64_t
 // by the difference arrays `w.cw`, `tcw`. A crowd's tangents read it at its mean word, as a source at the mean (its score's,
 // its probe part `δs'_C D m 2^8 + δs_C D δm`, its key part `div_nearest(δs'_C β_m 2^8 + δs_C δβ, |C|)`).
 //
-// [agent-inferred, November 7] With `blocked` (a skinless head whose class blocks' score tangents the tensor cores formed,
-// `field_energy_still_dz_k*`), a definite row's pairs past the near field read their `δz` from `tds` in both passes.
+// [agent-inferred, November 7] **A pair's score tangent is formed once**: pass one forms each pair's `δz` (`energy_pair_dz`)
+// and keeps it at the pair's dense address in `tds`, and pass two, whose lane takes the same support entry, reads it there and
+// overwrites it with the share's tangent (a formation is the pair's modes of checked 128-bit products and skins; keeping it is
+// one 128-bit store and load at the pair's own address). [measurement, November 7, the line's training read on the RTX 4080
+// SUPER, the card's clock] The kernel at the turned heads 2.94 s and 2.88 s against 2.58 s and 2.54 s formed once, at the
+// skinless heads (scalar) 2.34 s and 2.27 s against 2.15 s and 2.09 s; the first 140 sections 44.11 s against 41.23 s, their
+// receipts identical. With `blocked` (a skinless head whose class blocks' score tangents the tensor cores
+// formed, `field_energy_still_dz_k*`), a definite row's pairs past the near field read their `δz` from `tds` in pass one too.
 extern "C" __global__ void __launch_bounds__(REV_ROWS * 32, 4) field_energy_tangent_rows(FieldWords w, uint32_t h, const int64_t *uq, const int64_t *up, const wide *tsw, int64_t *ds, wide *tds, int64_t *dq, int64_t *tq, int64_t *tp, wide *tcw, uint32_t blocked) {
     __shared__ uint32_t stj[REV_ROWS][32];
     __shared__ int64_t dss[REV_ROWS][32];
@@ -771,7 +777,13 @@ extern "C" __global__ void __launch_bounds__(REV_ROWS * 32, 4) field_energy_tang
             if (j == UINT32_MAX) {
                 continue;
             }
-            const wide dz = formed && k >= NEAR_SLOTS ? tdsr[j] : energy_pair_dz(w, h, pi, tpi, words + (uint64_t)j * S, twords + (uint64_t)j * S, g, first + j, j > i ? j - i : i - j, temper);
+            wide dz;
+            if (formed && k >= NEAR_SLOTS) {
+                dz = tdsr[j];
+            } else {
+                dz = energy_pair_dz(w, h, pi, tpi, words + (uint64_t)j * S, twords + (uint64_t)j * S, g, first + j, j > i ? j - i : i - j, temper);
+                tdsr[j] = dz;
+            }
             weighted += (wide)e[j] * dz;
         }
         wide cdz = 0;
@@ -790,7 +802,7 @@ extern "C" __global__ void __launch_bounds__(REV_ROWS * 32, 4) field_energy_tang
             wide tdsv = 0;
             if (j != UINT32_MAX) {
                 dsv = energy_ds(w, temper, e[j]);
-                const wide dz = formed && k >= NEAR_SLOTS ? tdsr[j] : energy_pair_dz(w, h, pi, tpi, words + (uint64_t)j * S, twords + (uint64_t)j * S, g, first + j, j > i ? j - i : i - j, temper);
+                const wide dz = tdsr[j];
                 tdsv = energy_tds(w, temper, e[j], dz, mean);
                 dsr[j] = dsv;
                 tdsr[j] = tdsv;
@@ -1327,10 +1339,11 @@ extern "C" __global__ void field_energy_negate_wide(FieldWords w, wide *x, uint6
 // (`support_at`; the probers' lists `pmem` are its transpose): past the near field the pairs are the blocks `R_c × S_c`, and a
 // term bilinear in a receiver's word and a source's is a product over each block, its tiles limb by limb on the tensor cores
 // (`field_mma.cuh`). A turned head weighs each mode by its skin `D_l(|i − j|)`, a factor of neither the receiver nor the
-// source: its pairs stay scalar. [measurement, November 7, the line's training read on the RTX 4080 SUPER, 151 sections, the
-// card's clock] Of the skinless pair products only the score tangent pays (below: `field_energy_tangent_rows` at heads 0 and 1
-// 4.63 s scalar against 3.80 s with the tiles' 0.34 s), because the scalar form computes it twice a pair with its 128-bit
-// checks. The lock score (`2⟨p̂, k̂⟩ − |k̂|²`, the exposure) and the probe force (`Σ_j δs_ij k̂_j`, `field_energy_rows_back`)
+// source: its pairs stay scalar. [measurement, November 7, the line's training read on the RTX 4080 SUPER, the card's clock]
+// Of the skinless pair products only the score tangent pays (below: `field_energy_tangent_rows` at heads 0 and 1 4.61 s
+// scalar against 3.84 s with the tiles' 0.35 s, 151 sections), and most of that was the scalar form computing it twice a
+// pair: with each pair's tangent formed once (`field_energy_tangent_rows`) the scalar heads take 4.24 s against the tiles'
+// 3.83 s and 0.36 s, 167 and 166 sections. The lock score (`2⟨p̂, k̂⟩ − |k̂|²`, the exposure) and the probe force (`Σ_j δs_ij k̂_j`, `field_energy_rows_back`)
 // were moved too and lost: their kernels' time is the rows' crowds, releases, stores and atomics and the turned heads, not
 // the skinless products (exposure 4.72 s with the tiles' 0.83 s against 5.02 s; the skinless rows' probe role 1.66 s with
 // the tiles' 1.16 s against 1.67 s): a row meets about a hundred sources over several small class blocks. They stay scalar.
