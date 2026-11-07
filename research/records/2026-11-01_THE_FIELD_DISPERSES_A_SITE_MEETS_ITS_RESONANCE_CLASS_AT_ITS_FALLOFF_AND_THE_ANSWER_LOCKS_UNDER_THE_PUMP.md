@@ -4579,3 +4579,24 @@ lowers the held code under the bytes' own frequencies, though it stopped at its 
   - the block size read from the acceptance's own slope, `log₂ k* += ¼(1 + slope)`.
 - In lap 11's development read `k*` fell to 1 within 37 sections, 90.2 ms a problem.
 Receipts: `longrun_nov6/lap10.txt`, `lap10.sh`, `lap11_dev.sh`, `enumerated.py`.
+
+[measurement; November 7, lap 11, the faces read both ways, and the k = 4 lap; the unified-theory readings of 08:13 to 08:49]
+**A shared coin over many places drags the deposit toward the proposals; single places with their own coins are the
+target; blocks of four lower the held code to 2.770 nats a byte.**
+- Lap 11 read the block size from the elasticity of the mean acceptance (two lengths a section, `log₂ k* += ¼(1 + slope)`).
+  - `k*` ran from 4 to 4096 within 55 sections: where the two acceptances agree within their noise the slope reads near
+    zero, and once both release to zero the read stops.
+  - The lap ran whole (423 s) with acceptance 0.047, and the held enumerated code rose from 2.990 to 3.161 nats a byte
+    (+0.171 ± 0.113).
+  - Theory withdrew the block law: a coin shared over `k` places drags the deposit toward the proposals, and single-place
+    moves rest at the pseudo-likelihood, the held target.
+- The faces read both ways at the held places (lap 10's stop): `KL(enumerated ‖ open face)` 0.786 nats (the open face
+  carries the uniform mixture) against `KL(enumerated ‖ face at the truth)` 0.325. The face at the truth, which the kernel
+  proposes from, is the better proposal, and the singular places' extremes (an open face at 0.08 or 11.2 nats where the
+  enumerated code is 1.6–1.9) settle at the truth.
+- The k = 4 lap from lap 10's stop (all 1,543 sections, 192,800 blocks, 2,473 s): the held enumerated code went from 2.990 to
+  2.770 nats a byte (−0.220 ± 0.123). Acceptance was 0.203, falling from 0.33 to 0.13 over the lap, while both faces'
+  KL rose (open 1.08, at the truth 1.22).
+- Lap 12 (one place a block, each its own coin) runs on a Colab A100. The k = 8 comparison there was lost when a second GPU
+  session reclaimed the first.
+Receipts: `longrun_nov6/lap11.txt`, `lap11.sh`, `pin4.sh`, `singular.py`.

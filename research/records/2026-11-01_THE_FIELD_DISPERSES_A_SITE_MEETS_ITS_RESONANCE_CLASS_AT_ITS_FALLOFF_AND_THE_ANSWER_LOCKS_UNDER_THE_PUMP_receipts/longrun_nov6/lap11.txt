@@ -1,0 +1,71 @@
+# lap 11 (the block size from the mean acceptance's elasticity), the deciding read of both faces, and the k = 4 comparison (FIELD lines; codes in nats a byte).
+== lap 11
+FIELD_STOPPED lap=0 sections=174/1543 states=3995 ms=60204
+FIELD_KERNEL_ACCEPT lap=0 stopped states=3995 places=76603 moved=72599 accept_milli=136 sd_milli=293 whole=285
+MEASURE lap=dev rc=0 wall_s=60.8 peak_rss_kib=571528
+# projection 468279 ms; k* by section: 4 5 4 7 6 6 6 6 6 6 11 11 12 11 13 12 11 11 11 12 12 12 52 52 52 52 52 52 52 52 52 52 52 52 52 52 52 52 52 52 52 52 52 52 52 52 52 52 52 52 52 52 52 52 4096 4096 4096 4096 4096 4096 4096 4096 4096 409
+# deadline 615348 ms
+FIELD_ENUMERATED_READ lap=-1 ms=7320
+FIELD_KERNEL_ACCEPT lap=0 states=25896 places=733794 moved=698734 accept_milli=47 sd_milli=182 whole=626 accepted_places=11786 accepted_places_a_second=28
+FIELD_KERNEL_BLOCKS lap=0 by_block_tenth(places_tenths:accept_milli)=46:247,85:92,118:46,151:39,188:20,235:8,290:8,368:5,499:4,849:5
+FIELD_KERNEL_FAMILIES lap=0 enc=4/-13880 before=58/-13258 after=73/-9379 q=-82/-5656 q_bias=0/0 v=0/0 v_bias=0/0 out=0/0 out_bias=0/0 a=0/-1 a_bias=0/0 b=0/-1 b_bias=0/0 w=0/0 w_bias=0/0 read=4/-13 read_bias=0/-19 moment_before=0/0 moment_after=0/0 temper=0/0 probe=-45/-5399 probe_bias=0/0 pace=0/0 moment_face=0/-1 moment_face_bias=0/0 lift_bias=0/-19 pair_c=0/-2 face_temper=0/-3
+FIELD_ENUMERATED_READ lap=0 ms=422145
+FIELD_CARD reads=3090 read_ms=196937 returns=1543 return_ms=211741 pairs=52760579458 batches=5134 peak_store=8343052288 landmarks=0 landmark_ms=0 elapsed_ms=422213
+MEASURE lap=lap rc=0 wall_s=422.7 peak_rss_kib=572856
+# codes in nats a byte (each codec letter is one byte); the KL in nats
+lap	places	enumerated_code	face_code	kl_mean	kl_q25	kl_median	kl_q75	kl<=0.3	face_zero_letters
+-1	64	2.9898	3.4450	0.7860	0.0733	0.2122	0.6137	32/64 under 0.3 bits	0
+0	64	3.1606	3.3393	0.3536	0.0348	0.0744	0.2310	47/64 under 0.3 bits	0
+# enumerated code from lap -1 to lap 0: paired change +0.1709 nats a byte, standard error 0.1127, over 64 places; falls past twice its error: False
+== /home/b/Workspaces/holonics/.local/wt/qgchgu-sampler/.local/run/2026-11-07-lap11b/lap.log: 1543 sections
+tenth	accept_milli	predicted_micro	transfer_micro
+0	84	-20491	729
+1	25	-9414	31
+2	34	-17794	80
+3	38	-28875	236
+4	31	-20725	-191
+5	21	-25783	133
+6	23	-26690	-206
+7	32	-53835	514
+8	32	-75748	-613
+9	46	-187872	-1211
+block-size tenth	mean places a state	accept_milli
+STATE.0 0d04e9fed5c0abdd5631ac35ee7c59f2b7b3c7feed19c0fd27844aab8d54e536
+MAIN exit 08:28:33
+== both faces (lap 10's stop and lap 11's end)
+lap10
+places 64 open-face KL total 50.307 nats (mean 0.786); the top tenth (6) carries 64.8%
+truth-face KL mean 0.325 nats, top tenth 33.4%; codes: enumerated 2.990, open face 3.445, truth face 3.624 nats a byte
+lap11
+places 64 open-face KL total 22.629 nats (mean 0.354); the top tenth (6) carries 68.4%
+truth-face KL mean 0.175 nats, top tenth 47.4%; codes: enumerated 3.161, open face 3.339, truth face 3.458 nats a byte
+== k = 4
+FIELD_ENUMERATED_READ lap=-1 ms=7568
+FIELD_KERNEL_ACCEPT lap=0 states=192800 places=733794 moved=697300 accept_milli=203 sd_milli=333 whole=19591 accepted_places=144281 accepted_places_a_second=58
+FIELD_KERNEL_BLOCKS lap=0 by_block_tenth(places_tenths:accept_milli)=20:302,40:307,40:246,40:240,40:185,40:163,40:157,40:155,40:145,40:130
+FIELD_KERNEL_FAMILIES lap=0 enc=-21/-21245 before=100/-16500 after=118/-10079 q=99/-6928 q_bias=0/0 v=0/0 v_bias=0/0 out=0/0 out_bias=0/0 a=0/0 a_bias=0/0 b=0/0 b_bias=0/0 w=0/0 w_bias=0/0 read=2/-106 read_bias=-3/-246 moment_before=0/0 moment_after=0/0 temper=0/0 probe=163/-6495 probe_bias=0/0 pace=0/0 moment_face=0/0 moment_face_bias=0/0 lift_bias=0/-27 pair_c=0/0 face_temper=-2/-221
+FIELD_ENUMERATED_READ lap=0 ms=2472451
+FIELD_CARD reads=3092 read_ms=1089618 returns=1543 return_ms=1298894 pairs=314261089376 batches=13946 peak_store=8156948544 landmarks=0 landmark_ms=0 elapsed_ms=2472661
+MEASURE lap=lap rc=0 wall_s=2473.2 peak_rss_kib=1123292
+# codes in nats a byte (each codec letter is one byte); the KL in nats
+lap	places	enumerated_code	face_code	kl_mean	kl_q25	kl_median	kl_q75	kl<=0.3	face_zero_letters
+-1	64	2.9898	3.4450	0.7860	0.0733	0.2122	0.6137	32/64 under 0.3 bits	0
+0	64	2.7697	3.6063	1.0764	0.2627	0.5000	1.1735	14/64 under 0.3 bits	0
+# enumerated code from lap -1 to lap 0: paired change -0.2201 nats a byte, standard error 0.1228, over 64 places; falls past twice its error: False
+places 64 open-face KL total 68.887 nats (mean 1.076); the top tenth (6) carries 48.3%
+truth-face KL mean 1.220 nats, top tenth 39.4%; codes: enumerated 2.770, open face 3.606, truth face 4.376 nats a byte
+== /home/b/Workspaces/holonics/.local/wt/qgchgu-sampler/.local/run/2026-11-07-pin4/lap.log: 1543 sections
+tenth	accept_milli	predicted_micro	transfer_micro
+0	327	-78183	458
+1	261	-56902	-607
+2	227	-72912	2595
+3	206	-43304	614
+4	175	-22361	883
+5	147	-21703	41
+6	146	-32992	-652
+7	152	-39101	-235
+8	135	-27915	400
+9	127	-24772	567
+block-size tenth	mean places a state	accept_milli
+STATE.0 d2d1a56fc0f3f7be79477e6c07a4dd472ec7e1724b52385f0f203ff43b6f7200
+MAIN exit 09:11:04
