@@ -2459,3 +2459,38 @@ fn squares_agree_at_one_base_on_a_line_shaped_field() {
         assert!(curl * wsize <= wcurl * size, "the curl's share does not grow with ε: {curl}/{size}, {wcurl}/{wsize}");
     }
 }
+
+/// [definition; agent-inferred, November 7] **The energy's material covector is `G`'s slope in its material**: at each family's
+/// largest entry, a central difference of `G` (replayed at the base's halvings under its supports) across `±δ` of the entry
+/// reads `2δ ∂G/∂θ`, on the tiny and the line-shaped fields.
+#[test]
+fn the_energy_material_is_g_slope() {
+    let line_classes: Vec<usize> = (0..40).map(|t| (t * 7 + t / 3) % 5).collect();
+    let line_open: Vec<bool> = (0..40).map(|t| t % 9 == 4).collect();
+    for (name, field, classes, open) in [("tiny", energetic(1), CLASSES.to_vec(), OPEN.to_vec()), ("line", energetic_line(), line_classes, line_open)] {
+        let r = Region { classes: &classes, unresolved: &open, faces: &[], locked: &[], echo: &[], domain: None, port: None };
+        let (g, _) = field.energy_material(&r).unwrap();
+        let l = field.layout.clone();
+        let families = [("q", l.q), ("q_bias", l.q_bias), ("probe", l.probe), ("probe_bias", l.probe_bias), ("a", l.a), ("a_bias", l.a_bias), ("b", l.b), ("b_bias", l.b_bias), ("pair_c", l.pair_c), ("read", l.read), ("lift_bias", l.lift_bias), ("enc", l.enc), ("before", l.before), ("after", l.after), ("read_bias", l.read_bias), ("moment_face", l.moment_face), ("moment_face_bias", l.moment_face_bias), ("moment_before", l.moment_before), ("moment_after", l.moment_after)];
+        let mut report = Vec::new();
+        for (fam, start) in families {
+            let &(_, len, grain) = l.families.iter().find(|(s, _, _)| *s == start).unwrap();
+            let Some(k) = (start..start + len).max_by_key(|&k| g[k].abs()) else { continue };
+            if g[k] == 0 {
+                report.push(format!("{fam}: zero"));
+                continue;
+            }
+            let delta = 1i32 << grain.saturating_sub(10);
+            let moved = |sign: i32| -> i128 {
+                let mut f2 = field.clone();
+                f2.theta[k] += sign * delta;
+                f2.energy_g_replayed(&field, &r).unwrap()
+            };
+            let dg = moved(1) - moved(-1);
+            let predicted = div_nearest(g[k] * delta as i128, 1i128 << (grain + 7));
+            report.push(format!("{fam}: ΔG {dg} against {predicted}"));
+            assert!(10 * (dg - predicted).abs() <= predicted.abs() + (10 << 16), "{name} {fam} entry {k}: ΔG {dg} against 2δ ∂G/∂θ {predicted}");
+        }
+        println!("{name}: {}", report.join("; "));
+    }
+}

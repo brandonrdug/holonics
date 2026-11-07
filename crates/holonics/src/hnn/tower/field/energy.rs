@@ -90,6 +90,16 @@ struct Held {
     definite: Vec<bool>,
 }
 
+/// The energy's force on the chart reads and on the words it is read through, or their tangents: `[t][D]` on the reads,
+/// the keys' and probes' unframed `[t][2M]`, the pair drives' `[t][f]`, all on `2^(−24)`.
+struct ForceParts {
+    force: Vec<i64>,
+    keys: Vec<i64>,
+    probes: Vec<i64>,
+    a: Vec<i64>,
+    b: Vec<i64>,
+}
+
 /// The locks' force on the words and its tangent ([`Field::lock_words`]), each `[t][2M]` on `2^(−24)` in the framed unit
 /// chart: the keys' and the probes', and their tangents (empty without one).
 struct LockWords {
@@ -561,6 +571,12 @@ impl Field {
     /// The energy's force on each site's chart read, `−∂Φ/∂r̂` (`[t][D]` on `2^(−24)`), and the probes' share of it
     /// `[t][2M]` (unframed, on `2^(−24)`), whose turned modes the moment's face reads.
     fn energy_force(&self, c: &EnergyCell, held: &Held, paces: &Paces, reaches: &Reaches) -> Result<(Vec<i64>, Vec<i64>)> {
+        let parts = self.energy_force_parts(c, held, paces, reaches)?;
+        Ok((parts.force, parts.probes))
+    }
+
+    /// [`Field::energy_force`] with the forces on its words beside it ([`ForceParts`]).
+    fn energy_force_parts(&self, c: &EnergyCell, held: &Held, paces: &Paces, reaches: &Reaches) -> Result<ForceParts> {
         let d = &self.declaration;
         let (dw, m, n, f, heads) = (d.width, d.complex(), d.modes, d.contacts, d.heads);
         let m2 = 2 * m;
@@ -646,7 +662,7 @@ impl Field {
                 force[t * dw + i] = fit64(force[t * dw + i] as i128 + v)?;
             }
         }
-        Ok((force, dp))
+        Ok(ForceParts { force, keys: dq, probes: dp, a: da, b: db })
     }
 
     /// [definition; the unified-theory reading of November 7, 00:02] **The force's tangent**, `δF = (∂F/∂r̂) v = −Hess Φ · v`
@@ -657,6 +673,12 @@ impl Field {
     /// pair's (linear in each drive). The letters' force does not move with the state. `Φ`'s Hessian is symmetric, so the
     /// tangent is also the tick's adjoint on a covector.
     fn energy_tangent(&self, c: &EnergyCell, held: &Held, paces: &Paces, reaches: &Reaches, v: &[i64]) -> Result<(Vec<i64>, Vec<i64>)> {
+        let parts = self.energy_tangent_parts(c, held, paces, reaches, v)?;
+        Ok((parts.force, parts.probes))
+    }
+
+    /// [`Field::energy_tangent`] with the tangents of the forces on its words beside it ([`ForceParts`]).
+    fn energy_tangent_parts(&self, c: &EnergyCell, held: &Held, paces: &Paces, reaches: &Reaches, v: &[i64]) -> Result<ForceParts> {
         let d = &self.declaration;
         let (dw, m, n, f, heads) = (d.width, d.complex(), d.modes, d.contacts, d.heads);
         let m2 = 2 * m;
@@ -776,7 +798,7 @@ impl Field {
                 add(&mut out, t, &back)?;
             }
         }
-        Ok((out, cp))
+        Ok(ForceParts { force: out, keys: cq, probes: cp, a: da, b: db })
     }
 
     /// One descent step: each site's lanes moved by `2^(−h)` of their own scale a unit of force.
@@ -1430,6 +1452,240 @@ impl Field {
         let wide_i = gap(c.zi_wide, a2, a) - gap(c.zi, a2, a);
         let wide_j = gap(c.zj_wide, b2, b) - gap(c.zj, b2, b);
         Ok(EnergySquare { runners: (a2, b2), lambda_i, lambda_j, small_i, small_j, wide_i, wide_j, zlambda_i, zlambda_j, glambda, floors })
+    }
+
+    /// [definition; agent-inferred, November 7] **The energy's material covector**: `∂G/∂θ` for `G(θ) = Φ(x^K(θ); θ)` at the
+    /// base's halvings and supports, every family's covector per real unit of its entries on `2^(−40)` (the moment encodings'
+    /// through the moments' return), beside `G` on `2^(−32)` bits. Three parts: the energy's explicit `∂Φ/∂θ` at the last
+    /// state (each chart's word force against its read, the pair's drives and contraction, the letters' rows against the reads
+    /// and lifts they meet, the moments' covector); each stood tick's `2^(−h) ⟨w, ∂F/∂θ⟩` with `w = s ⊙ λ'`, which is
+    /// `−D_w(∂Φ/∂θ)`: the word forces' tangents against the reads and the word forces against `w` (the tick's adjoint `λ` as
+    /// in [`Field::energy_reverse`]); and the opening's `(∂x⁰/∂θ)ᵀ λ⁰`. The locks' temperatures are held (theory: lap 4 keeps
+    /// the line's lock gain), and the letters' temperature does not enter `G`.
+    pub fn energy_material(&self, region: &Region) -> Result<(Vec<i128>, i128)> {
+        let (faces, locked) = self.energy_sites(region);
+        let region = &Region { faces: &faces, locked: &locked, ..*region };
+        let relaxed = self.energy_relax(region, self.declaration.ticks, None, None)?;
+        let d = &self.declaration;
+        let (dw, m2, f, lanes, alphabet) = (d.width, 2 * d.complex(), d.contacts, d.lanes, d.alphabet);
+        let w_ = dw / lanes;
+        let half = f / 2;
+        let l = &self.layout;
+        let reaches = self.reaches();
+        let Relaxed { cell, held, paces, trail, .. } = &relaxed;
+        let sites = held.definite.len();
+        let mut g = vec![0i128; self.theta.len()];
+        let mut dm = vec![0i128; sites * m2];
+        // Each site's letter: its rows and their weights on 2^(−16) (a class's whole weight, or a carried mixture's shares).
+        let weights: Vec<Vec<(usize, i128)>> = (0..sites)
+            .map(|t| match Self::carried(region, t) {
+                Some(face) => face.iter().map(|&(c, w)| (c as usize, w as i128)).collect(),
+                None if region.unresolved[t] => vec![(alphabet, 1i128 << STATE_BITS)],
+                None => vec![(region.classes[t], 1i128 << STATE_BITS)],
+            })
+            .collect();
+        let moment = &held.moment;
+        // `y_t ⊗ x_t` into a chart's material of `rows` by `cols`, released by `shift` (2^(−40) at the caller's grains).
+        let outer = |g: &mut [i128], base: usize, rows: usize, cols: usize, y: &[i64], x: &[i128], shift: i32| {
+            for o in 0..rows {
+                if y[o] == 0 {
+                    continue;
+                }
+                for i in 0..cols {
+                    let v = y[o] as i128 * x[i];
+                    g[base + o * cols + i] += if shift >= 0 { v << shift } else { release(v, (-shift) as u32) };
+                }
+            }
+        };
+        let reads = |c: &EnergyCell, t: usize| -> Vec<i128> { c.read[t * dw..(t + 1) * dw].iter().map(|&v| v as i128).collect() };
+        // 1. The explicit `∂Φ/∂θ` at the last state: every term is minus the force's.
+        let last = self.energy_force_parts(cell, held, paces, &reaches)?;
+        for t in 0..sites {
+            let r = reads(cell, t);
+            let neg = |v: &[i64]| -> Vec<i64> { v.iter().map(|&x| -x).collect() };
+            for (w, bias, cov, rows) in [(l.q, l.q_bias, &last.keys, m2), (l.probe, l.probe_bias, &last.probes, m2)] {
+                let c_ = neg(&cov[t * rows..(t + 1) * rows]);
+                outer(&mut g, w, rows, dw, &c_, &r, 0);
+                for o in 0..rows {
+                    g[bias + o] += (c_[o] as i128) << FACE_BITS;
+                }
+            }
+            for (w, bias, cov) in [(l.a, l.a_bias, &last.a), (l.b, l.b_bias, &last.b)] {
+                let c_ = neg(&cov[t * f..(t + 1) * f]);
+                outer(&mut g, w, f, dw, &c_, &r, 0);
+                for o in 0..f {
+                    g[bias + o] += (c_[o] as i128) << FACE_BITS;
+                }
+            }
+            // The pair's contraction: `∂Φ/∂c = −Σ_t a_t · b_(s(t))`.
+            for e in 0..half {
+                let Some(s) = strand_mate(t, e, sites) else { continue };
+                let (ar, ai) = (cell.a[t * f + e] as i128, cell.a[t * f + half + e] as i128);
+                let (br, bi) = (cell.b[s * f + e] as i128, cell.b[s * f + half + e] as i128);
+                g[l.pair_c + e] -= release(ar * br - ai * bi, FACE_BITS) << MATERIAL_BITS;
+                g[l.pair_c + half + e] -= release(ar * bi + ai * br, FACE_BITS) << MATERIAL_BITS;
+            }
+            // The letters: `−⟨E(u_t), R r̂_t + b_R⟩ − c_(u_t) − ⟨E₋(u_t), r̂_(t+1)⟩ − ⟨E₊(u_t), r̂_(t−1)⟩ − ⟨C s_t + b, r̂_t⟩`.
+            let own = &held.letters.own[t];
+            outer(&mut g, l.read, dw, dw, &neg(own), &r, 8);
+            for o in 0..dw {
+                g[l.lift_bias + o] -= (own[o] as i128) << (MATERIAL_BITS);
+            }
+            let lift = &cell.lift[t * dw..(t + 1) * dw];
+            for &(row, wt) in &weights[t] {
+                for o in 0..dw {
+                    g[l.enc + row * dw + o] -= (wt * lift[o] as i128) << 8;
+                    if t + 1 < sites {
+                        g[l.before + row * dw + o] -= (wt * cell.read[(t + 1) * dw + o] as i128) << 8;
+                    }
+                    if t > 0 {
+                        g[l.after + row * dw + o] -= (wt * cell.read[(t - 1) * dw + o] as i128) << 8;
+                    }
+                }
+                if row < alphabet {
+                    g[l.read_bias + row] -= wt << MATERIAL_BITS;
+                }
+            }
+            let s_t: Vec<i128> = moment[t * m2..(t + 1) * m2].iter().map(|&v| v as i128).collect();
+            outer(&mut g, l.moment_face, dw, m2, &neg(&cell.read[t * dw..(t + 1) * dw].iter().map(|&v| v as i64).collect::<Vec<_>>()), &s_t, 8);
+            for o in 0..dw {
+                g[l.moment_face_bias + o] -= (cell.read[t * dw + o] as i128) << MATERIAL_BITS;
+            }
+            // The moment's covector of `G`: `∂Φ/∂s_t = −(Cᵀ r̂_t + the probe's force)`, on 2^(−24).
+            let mut chart = vec![0i64; m2];
+            transposed(&self.theta[l.moment_face..l.moment_face + dw * m2], reaches.moment_face, m2, &cell.read[t * dw..(t + 1) * dw].iter().map(|&v| v as i64).collect::<Vec<_>>(), FACE_BITS, &mut chart)?;
+            for k in 0..m2 {
+                dm[t * m2 + k] -= chart[k] as i128 + last.probes[t * m2 + k] as i128;
+            }
+        }
+        // 2. The ticks, back from `λ^K = −J F^K`.
+        let mut lambda = vec![0i64; sites * dw];
+        for t in 0..sites {
+            let back = lane_adjoint(&cell.read[t * dw..(t + 1) * dw], &cell.scale[t * lanes..(t + 1) * lanes], &last.force[t * dw..(t + 1) * dw])?;
+            for i in 0..dw {
+                lambda[t * dw + i] = -back[i];
+            }
+        }
+        let mut lift = vec![0i64; dw];
+        let mut chart = vec![0i64; m2];
+        let (mut ta, mut tb) = (vec![0i64; f], vec![0i64; f]);
+        for step in trail.iter().rev() {
+            let (c, force, h) = (&step.cell, &step.force, step.halvings);
+            let mut wv = vec![0i64; sites * dw];
+            for (k, slot) in wv.iter_mut().enumerate() {
+                let (t, i) = (k / dw, k % dw);
+                *slot = fit64(release(c.scale[t * lanes + i / w_] * lambda[k] as i128, FACE_BITS))?;
+            }
+            let fp = self.energy_force_parts(c, held, paces, &reaches)?;
+            let tp = self.energy_tangent_parts(c, held, paces, &reaches, &wv)?;
+            // The tick's material, `2^(−h) Σ (δF ⊗ r̂ + F ⊗ w)` for each chart and drive, gathered on 2^(−40) and released by `h`.
+            let mut tick = vec![0i128; self.theta.len()];
+            for t in 0..sites {
+                let r = reads(c, t);
+                let wt: Vec<i128> = wv[t * dw..(t + 1) * dw].iter().map(|&v| v as i128).collect();
+                for (w, bias, fw, tw, rows) in [(l.q, l.q_bias, &fp.keys, &tp.keys, m2), (l.probe, l.probe_bias, &fp.probes, &tp.probes, m2), (l.a, l.a_bias, &fp.a, &tp.a, f), (l.b, l.b_bias, &fp.b, &tp.b, f)] {
+                    outer(&mut tick, w, rows, dw, &tw[t * rows..(t + 1) * rows], &r, 0);
+                    outer(&mut tick, w, rows, dw, &fw[t * rows..(t + 1) * rows], &wt, -8);
+                    for o in 0..rows {
+                        tick[bias + o] += (tw[t * rows + o] as i128) << FACE_BITS;
+                    }
+                }
+                // The contraction: `Σ δ(a_t · b_s)` with `δa = W_a w_t`, `δb_s = W_b w_s`.
+                affine(&self.theta[l.a..l.a + f * dw], reaches.a, dw, &wv[t * dw..(t + 1) * dw], None, 0, MATERIAL_BITS, &mut ta)?;
+                for e in 0..half {
+                    let Some(s) = strand_mate(t, e, sites) else { continue };
+                    affine(&self.theta[l.b..l.b + f * dw], reaches.b, dw, &wv[s * dw..(s + 1) * dw], None, 0, MATERIAL_BITS, &mut tb)?;
+                    let (ar, ai) = (c.a[t * f + e] as i128, c.a[t * f + half + e] as i128);
+                    let (br, bi) = (c.b[s * f + e] as i128, c.b[s * f + half + e] as i128);
+                    let (dar, dai, dbr, dbi) = (ta[e] as i128, ta[half + e] as i128, tb[e] as i128, tb[half + e] as i128);
+                    tick[l.pair_c + e] += dar * br - dai * bi + ar * dbr - ai * dbi;
+                    tick[l.pair_c + half + e] += dar * bi + dai * br + ar * dbi + ai * dbr;
+                }
+                // The letters: `⟨w, ∂F/∂θ⟩` on their rows.
+                let own = &held.letters.own[t];
+                outer(&mut tick, l.read, dw, dw, own, &wt, 0);
+                affine(&self.theta[l.read..l.read + dw * dw], reaches.read, dw, &wv[t * dw..(t + 1) * dw], None, 0, MATERIAL_BITS, &mut lift)?;
+                for &(row, wgt) in &weights[t] {
+                    for o in 0..dw {
+                        tick[l.enc + row * dw + o] += wgt * lift[o] as i128;
+                        if t + 1 < sites {
+                            tick[l.before + row * dw + o] += wgt * wv[(t + 1) * dw + o] as i128;
+                        }
+                        if t > 0 {
+                            tick[l.after + row * dw + o] += wgt * wv[(t - 1) * dw + o] as i128;
+                        }
+                    }
+                }
+                let s_t: Vec<i128> = moment[t * m2..(t + 1) * m2].iter().map(|&v| v as i128).collect();
+                outer(&mut tick, l.moment_face, dw, m2, &wv[t * dw..(t + 1) * dw], &s_t, 0);
+                for o in 0..dw {
+                    tick[l.moment_face_bias + o] += (wv[t * dw + o] as i128) << FACE_BITS;
+                }
+                transposed(&self.theta[l.moment_face..l.moment_face + dw * m2], reaches.moment_face, m2, &wv[t * dw..(t + 1) * dw], MATERIAL_BITS, &mut chart)?;
+                for k in 0..m2 {
+                    dm[t * m2 + k] += release(chart[k] as i128 + tp.probes[t * m2 + k] as i128, h);
+                }
+            }
+            for (slot, v) in g.iter_mut().zip(tick) {
+                *slot += release(v, h);
+            }
+            // `λ = λ' + 2^(−h) (r̂ ⟨λ', F⟩/W + J δF)`.
+            let mut next = lambda.clone();
+            for t in 0..sites {
+                let jt = lane_adjoint(&c.read[t * dw..(t + 1) * dw], &c.scale[t * lanes..(t + 1) * lanes], &tp.force[t * dw..(t + 1) * dw])?;
+                for k_ in 0..lanes {
+                    let at = t * dw + k_ * w_;
+                    let dot: i128 = (0..w_).map(|i| lambda[at + i] as i128 * force[at + i] as i128).sum();
+                    let mean = div_nearest(dot, w_ as i128);
+                    for i in 0..w_ {
+                        let radial = release(c.read[at + i] as i128 * mean, 2 * FACE_BITS + 8);
+                        next[at + i] = fit64(next[at + i] as i128 + release(radial + jt[k_ * w_ + i] as i128, h))?;
+                    }
+                }
+            }
+            lambda = next;
+        }
+        // 3. The opening: `x⁰_t = E(u_t) + E₋(u_(t−1)) + E₊(u_(t+1)) + C s_t + b`.
+        for t in 0..sites {
+            let lt: Vec<i128> = lambda[t * dw..(t + 1) * dw].iter().map(|&v| v as i128).collect();
+            for &(row, wgt) in &weights[t] {
+                for o in 0..dw {
+                    g[l.enc + row * dw + o] += wgt * lt[o];
+                    if t + 1 < sites {
+                        g[l.before + row * dw + o] += wgt * lambda[(t + 1) * dw + o] as i128;
+                    }
+                    if t > 0 {
+                        g[l.after + row * dw + o] += wgt * lambda[(t - 1) * dw + o] as i128;
+                    }
+                }
+            }
+            let s_t: Vec<i128> = moment[t * m2..(t + 1) * m2].iter().map(|&v| v as i128).collect();
+            outer(&mut g, l.moment_face, dw, m2, &lambda[t * dw..(t + 1) * dw], &s_t, 0);
+            for o in 0..dw {
+                g[l.moment_face_bias + o] += lt[o] << FACE_BITS;
+            }
+            transposed(&self.theta[l.moment_face..l.moment_face + dw * m2], reaches.moment_face, m2, &lambda[t * dw..(t + 1) * dw], MATERIAL_BITS, &mut chart)?;
+            for k in 0..m2 {
+                dm[t * m2 + k] += chart[k] as i128;
+            }
+        }
+        // The moments' covector back to the strands' moment encodings (the training return's own law), on 2^(−40).
+        let paced = paces.kappa.len();
+        let (mut gtau, mut gsig) = (vec![vec![0i128; sites]; paced], vec![vec![0i128; sites]; paced]);
+        let mut gm = vec![0i128; self.theta.len()];
+        self.moments_return(region, paces, &dm, &mut gm, &mut gtau, &mut gsig)?;
+        for (slot, v) in g.iter_mut().zip(gm) {
+            *slot += v << FACE_BITS;
+        }
+        Ok((g, cell.phi))
+    }
+
+    /// [measurement; a test's reading] `G` at the base's halvings and supports for a field whose material differs from the
+    /// base's (the material covector's difference read), on `2^(−32)` bits.
+    #[cfg(test)]
+    pub(super) fn energy_g_replayed(&self, base_field: &Field, region: &Region) -> Result<i128> {
+        let base = base_field.energy_relax(region, base_field.declaration.ticks, None, None)?;
+        Ok(self.energy_relax(region, base.read.halvings.len(), Some(&base.read.halvings), Some(&base.held))?.cell.phi)
     }
 
     /// [measurement] **A region's energy read** ([`EnergyRead`]): the energy at the opening and at the last tick, each
