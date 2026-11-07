@@ -690,7 +690,10 @@ extern "C" __global__ void field_energy_unit_tangent(FieldWords w, const int64_t
 // crowds, 40 + g)` into `tp`, the key slots zeroed for the columns (`dq`, `tq`); each crowd's key role and its tangent spread
 // by the difference arrays `w.cw`, `tcw`. A crowd's tangents read it at its mean word, as a source at the mean (its score's,
 // its probe part `δs'_C D m 2^8 + δs_C D δm`, its key part `div_nearest(δs'_C β_m 2^8 + δs_C δβ, |C|)`).
-extern "C" __global__ void __launch_bounds__(REV_ROWS * 32, 4) field_energy_tangent_rows(FieldWords w, uint32_t h, const int64_t *uq, const int64_t *up, const wide *tsw, int64_t *ds, wide *tds, int64_t *dq, int64_t *tq, int64_t *tp, wide *tcw) {
+//
+// [agent-inferred, November 7] With `blocked` (a skinless head whose class blocks' score tangents the tensor cores formed,
+// `field_energy_still_dz_k*`), a definite row's pairs past the near field read their `δz` from `tds` in both passes.
+extern "C" __global__ void __launch_bounds__(REV_ROWS * 32, 4) field_energy_tangent_rows(FieldWords w, uint32_t h, const int64_t *uq, const int64_t *up, const wide *tsw, int64_t *ds, wide *tds, int64_t *dq, int64_t *tq, int64_t *tp, wide *tcw, uint32_t blocked) {
     __shared__ uint32_t stj[REV_ROWS][32];
     __shared__ int64_t dss[REV_ROWS][32];
     __shared__ wide tdss[REV_ROWS][32];
@@ -759,6 +762,8 @@ extern "C" __global__ void __launch_bounds__(REV_ROWS * 32, 4) field_energy_tang
             }
         }
         __syncwarp();
+        // The class runs' score tangents were formed on the tensor cores (a skinless head's definite row).
+        const bool formed = blocked != 0 && skinless(w, h) && !rcs[warp].open;
         // Pass one: `Σ p δz` over the row's terms, the pairs' and the crowds' (a crowd a lane).
         wide weighted = 0;
         for (uint32_t k = lane; k < K; k += 32) {
@@ -766,7 +771,8 @@ extern "C" __global__ void __launch_bounds__(REV_ROWS * 32, 4) field_energy_tang
             if (j == UINT32_MAX) {
                 continue;
             }
-            weighted += (wide)e[j] * energy_pair_dz(w, h, pi, tpi, words + (uint64_t)j * S, twords + (uint64_t)j * S, g, first + j, j > i ? j - i : i - j, temper);
+            const wide dz = formed && k >= NEAR_SLOTS ? tdsr[j] : energy_pair_dz(w, h, pi, tpi, words + (uint64_t)j * S, twords + (uint64_t)j * S, g, first + j, j > i ? j - i : i - j, temper);
+            weighted += (wide)e[j] * dz;
         }
         wide cdz = 0;
         if (cnts[warp][lane] != 0) {
@@ -784,7 +790,7 @@ extern "C" __global__ void __launch_bounds__(REV_ROWS * 32, 4) field_energy_tang
             wide tdsv = 0;
             if (j != UINT32_MAX) {
                 dsv = energy_ds(w, temper, e[j]);
-                const wide dz = energy_pair_dz(w, h, pi, tpi, words + (uint64_t)j * S, twords + (uint64_t)j * S, g, first + j, j > i ? j - i : i - j, temper);
+                const wide dz = formed && k >= NEAR_SLOTS ? tdsr[j] : energy_pair_dz(w, h, pi, tpi, words + (uint64_t)j * S, twords + (uint64_t)j * S, g, first + j, j > i ? j - i : i - j, temper);
                 tdsv = energy_tds(w, temper, e[j], dz, mean);
                 dsr[j] = dsv;
                 tdsr[j] = tdsv;
@@ -1311,3 +1317,240 @@ extern "C" __global__ void field_energy_negate_wide(FieldWords w, wide *x, uint6
         x[c] = -x[c];
     }
 }
+
+// -------------------------------------------------------------------------------------------
+// the skinless heads' pair products on the tensor cores (Brandon, November 7, 05:59)
+//
+// [definition; agent-inferred, November 7] **A skinless head's pairs past the near field are a resonance class's blocks, and
+// their bilinear terms are products.** In a still or depth head the skin is the exact `1` and the grain `g = 0`
+// (`skinless`), and every definite receiver `i` probing class `c` meets every definite member `j` of `c` past its near field
+// (`support_at`; the probers' lists `pmem` are its transpose): past the near field the pairs are the blocks `R_c × S_c`, and a
+// term bilinear in a receiver's word and a source's is a product over each block, its tiles limb by limb on the tensor cores
+// (`field_mma.cuh`). A turned head weighs each mode by its skin `D_l(|i − j|)`, a factor of neither the receiver nor the
+// source: its pairs stay scalar. [measurement, November 7, the line's training read on the RTX 4080 SUPER, 151 sections, the
+// card's clock] Of the skinless pair products only the score tangent pays (below: `field_energy_tangent_rows` at heads 0 and 1
+// 4.63 s scalar against 3.80 s with the tiles' 0.34 s), because the scalar form computes it twice a pair with its 128-bit
+// checks. The lock score (`2⟨p̂, k̂⟩ − |k̂|²`, the exposure) and the probe force (`Σ_j δs_ij k̂_j`, `field_energy_rows_back`)
+// were moved too and lost: their kernels' time is the rows' crowds, releases, stores and atomics and the turned heads, not
+// the skinless products (exposure 4.72 s with the tiles' 0.83 s against 5.02 s; the skinless rows' probe role 1.66 s with
+// the tiles' 1.16 s against 1.67 s): a row meets about a hundred sources over several small class blocks. They stay scalar.
+
+// A lane's 64-bit words of a tile row or column at `k = 16 kt + 4t … 4t + 3` (`row` null for no site), zero past the span.
+template <int KT>
+__device__ __forceinline__ void tile_words64(const int64_t *row, uint32_t S, uint32_t t, int64_t (&out)[KT][4]) {
+#pragma unroll
+    for (int kt = 0; kt < KT; kt++) {
+#pragma unroll
+        for (int k = 0; k < 4; k++) {
+            const uint32_t idx = 16 * kt + 4 * t + k;
+            out[kt][k] = row != nullptr && idx < S ? row[idx] : 0;
+        }
+    }
+}
+
+// [definition; agent-inferred, November 7] **A skinless head's score tangents past the near field, on the tensor cores**
+// (`energy_pair_dz` at a class's block, `field_energy_tangent_rows`'s pairs): at a skinless head the skin is `1` and `g = 0`,
+// so a source's score tangent is `δz_ij = release(T Σ_m (δp̂_i·k̂_j + p̂_i·δk̂_j − k̂_j·δk̂_j), 24)`, the products of the receivers'
+// rows `(δp̂_i, p̂_i)` by the sources' `(k̂_j, δk̂_j)` less each source's own `k̂_j·δk̂_j`. One block a region and a class of head
+// `h`, its warps the probers 16 at a time over the members 8 at a time, both products' limbs (`δp̂`, `δk̂` 64-bit, up to eight
+// limbs; `p̂`, `k̂` the unit words' 32-bit values, up to four) accumulated by shift in one set of accumulators: at most `4 + 4`
+// limb pairs a shift over `K = 16 KT ≤ 32` terms, `8 · 32 · 65 025 < 2^31`. No check of `energy_pair_dz` can fail at a skinless
+// head on the carriers (`|δ| < 2^63`, `|p̂|, |k̂| < 2^31`: each mode's sum below `2^97`, the row's below `2^101`), and the last
+// product `T · acc` is the scalar's own expression, so `δz` is the scalar's integer for every word of the carriers. Each
+// `δz_ij` is written at the pair's dense address in `tds`, which the rows read in both of their passes in its place (and
+// overwrite with the share's tangent in their second).
+template <int KT>
+__device__ void still_dz_body(const FieldWords &w, uint32_t h, const int64_t *uq, const int64_t *up, wide *tds) {
+    const uint32_t warp = threadIdx.x >> 5, lane = threadIdx.x & 31, gq = lane >> 2, tq = lane & 3;
+    const uint32_t warps = blockDim.x >> 5;
+    const uint32_t S = w.span, classes = w.nclasses, pstride = probe_stride(w);
+    const uint64_t units = (uint64_t)w.R * classes;
+    if (!skinless(w, h)) {
+        return;
+    }
+    for (uint64_t u = blockIdx.x; u < units; u += gridDim.x) {
+        const uint32_t c = u % classes;
+        const uint32_t r = u / classes;
+        const uint64_t first = w.region_off[r];
+        const uint32_t sites = w.region_off[r + 1] - (uint32_t)first;
+        const uint32_t *off = w.class_off + ((uint64_t)h * w.R + r) * (2 * classes + 1);
+        const uint32_t *poff = w.poff + ((uint64_t)h * w.R + r) * (classes + 1);
+        const uint32_t *members = w.members + (uint64_t)h * w.T + first;
+        const uint32_t *pmem = w.pmem + ((uint64_t)h * w.T + first) * pstride;
+        const uint32_t s0 = off[2 * c], ns = off[2 * c + 1] - s0;
+        const uint32_t r0 = poff[c], nr = poff[c + 1] - r0;
+        if (ns == 0 || nr == 0) {
+            continue;
+        }
+        const wide temper = temper_of(w, h, false);
+        wide *tblock = tds + w.region_eoff[r];
+        for (uint32_t m0 = warp * 16; m0 < nr; m0 += warps * 16) {
+            uint32_t ri[2];
+            int64_t rt[KT][2][4], rp[KT][2][4];
+#pragma unroll
+            for (int q = 0; q < 2; q++) {
+                const uint32_t at = m0 + gq + 8 * q;
+                uint32_t i = at < nr ? pmem[r0 + at] : UINT32_MAX;
+                if (i != UINT32_MAX && (skipped_row(w, first + i) || !definite_site(w, first + i))) {
+                    i = UINT32_MAX;
+                }
+                ri[q] = i;
+                const uint64_t hg = (uint64_t)h * w.T + first + i;
+                int64_t vt[KT][4], vp[KT][4];
+                tile_words64<KT>(i == UINT32_MAX ? nullptr : up + hg * S, S, tq, vt);
+                tile_words64<KT>(i == UINT32_MAX ? nullptr : w.pq + hg * S, S, tq, vp);
+#pragma unroll
+                for (int kt = 0; kt < KT; kt++) {
+#pragma unroll
+                    for (int k = 0; k < 4; k++) {
+                        rt[kt][q][k] = vt[kt][k];
+                        rp[kt][q][k] = vp[kt][k];
+                    }
+                }
+            }
+            const uint32_t lt = limbs_of(words_bound<KT, 2>(rt), 8), lp = limbs_of(words_bound<KT, 2>(rp), 4);
+            for (uint32_t n0 = 0; n0 < ns; n0 += 8) {
+                const uint32_t jat = n0 + gq;
+                const uint32_t j = jat < ns ? members[s0 + jat] : UINT32_MAX;
+                const uint64_t hj = (uint64_t)h * w.T + first + j;
+                int64_t ck[KT][4], ct[KT][4];
+                tile_words64<KT>(j == UINT32_MAX ? nullptr : w.qf + hj * S, S, tq, ck);
+                tile_words64<KT>(j == UINT32_MAX ? nullptr : uq + hj * S, S, tq, ct);
+                // The source's own `k̂·δk̂`, summed over its group's lanes.
+                uwide own = 0;
+#pragma unroll
+                for (int kt = 0; kt < KT; kt++) {
+#pragma unroll
+                    for (int k = 0; k < 4; k++) {
+                        own += (uwide)((wide)ck[kt][k] * (wide)ct[kt][k]);
+                    }
+                }
+                own += shfl_wide(own, 1);
+                own += shfl_wide(own, 2);
+                const uint32_t lk = limbs_of(words_bound<KT>(ck), 4), lu = limbs_of(words_bound<KT>(ct), 8);
+                int32_t acc[11][4];
+#pragma unroll
+                for (int s = 0; s < 11; s++) {
+                    acc[s][0] = acc[s][1] = acc[s][2] = acc[s][3] = 0;
+                }
+                tile_accumulate<8, 4, KT>(acc, rt, ck, lt, lk);
+                tile_accumulate<4, 8, KT>(acc, rp, ct, lp, lu);
+                wide dot[4];
+                tile_combine<11>(acc, dot);
+#pragma unroll
+                for (int q = 0; q < 4; q++) {
+                    const int from = (int)(2 * tq + (q & 1)) * 4;
+                    const uint32_t jq = __shfl_sync(0xffffffffu, j, from);
+                    const uint64_t olo = __shfl_sync(0xffffffffu, (uint64_t)own, from), ohi = __shfl_sync(0xffffffffu, (uint64_t)(own >> 64), from);
+                    const wide ownq = (wide)(((uwide)ohi << 64) | olo);
+                    const uint32_t i = ri[q >> 1];
+                    if (i == UINT32_MAX || jq == UINT32_MAX) {
+                        continue;
+                    }
+                    const uint32_t gap = jq > i ? jq - i : i - jq;
+                    if (gap < NEAR) {
+                        continue;
+                    }
+                    tblock[(uint64_t)i * sites + jq] = rel(temper * (dot[q] - ownq), MATERIAL_BITS);
+                }
+            }
+        }
+    }
+}
+
+extern "C" __global__ void __launch_bounds__(128) field_energy_still_dz_k1(FieldWords w, uint32_t h, const int64_t *uq, const int64_t *up, wide *tds) { still_dz_body<1>(w, h, uq, up, tds); }
+extern "C" __global__ void __launch_bounds__(128) field_energy_still_dz_k2(FieldWords w, uint32_t h, const int64_t *uq, const int64_t *up, wide *tds) { still_dz_body<2>(w, h, uq, up, tds); }
+
+// [measurement; agent-inferred, November 7] **The tensor cores' score tangent against the scalar one** (`energy_pair_dz` at a
+// skinless head, `T = 2^24`), on words the caller chose: receivers' `(δp̂, p̂)` (`tp`, `p`, `[na][S]`) and sources' `(k̂, δk̂)`
+// (`k`, `tk`, `[nb][S]`), 64-bit words with `p`, `k` in 32 bits; `[na][nb]` both.
+template <int KT>
+__device__ void dz_check_body(const int64_t *tp, const int64_t *p, const int64_t *k, const int64_t *tk, uint32_t na, uint32_t nb, uint32_t S, wide *dz_mma, wide *dz_scalar, uint32_t *status) {
+    const uint32_t lane = threadIdx.x & 31, gq = lane >> 2, tq = lane & 3;
+    const uint64_t warps = (uint64_t)gridDim.x * (blockDim.x >> 5);
+    const uint32_t n = S / 2;
+    const wide temper = (wide)1 << MATERIAL_BITS;
+    for (uint64_t m0 = (((uint64_t)blockIdx.x * blockDim.x + threadIdx.x) >> 5) * 16; m0 < na; m0 += warps * 16) {
+        uint32_t ri[2];
+        int64_t rt[KT][2][4], rp[KT][2][4];
+#pragma unroll
+        for (int q = 0; q < 2; q++) {
+            const uint64_t i = m0 + gq + 8 * q;
+            ri[q] = i < na ? (uint32_t)i : UINT32_MAX;
+            int64_t vt[KT][4], vp[KT][4];
+            tile_words64<KT>(i < na ? tp + i * S : nullptr, S, tq, vt);
+            tile_words64<KT>(i < na ? p + i * S : nullptr, S, tq, vp);
+#pragma unroll
+            for (int kt = 0; kt < KT; kt++) {
+#pragma unroll
+                for (int x = 0; x < 4; x++) {
+                    rt[kt][q][x] = vt[kt][x];
+                    rp[kt][q][x] = vp[kt][x];
+                }
+            }
+        }
+        const uint32_t lt = limbs_of(words_bound<KT, 2>(rt), 8), lp = limbs_of(words_bound<KT, 2>(rp), 4);
+        for (uint32_t n0 = 0; n0 < nb; n0 += 8) {
+            const uint32_t j = n0 + gq < nb ? n0 + gq : UINT32_MAX;
+            int64_t ck[KT][4], ct[KT][4];
+            tile_words64<KT>(j == UINT32_MAX ? nullptr : k + (uint64_t)j * S, S, tq, ck);
+            tile_words64<KT>(j == UINT32_MAX ? nullptr : tk + (uint64_t)j * S, S, tq, ct);
+            uwide own = 0;
+#pragma unroll
+            for (int kt = 0; kt < KT; kt++) {
+#pragma unroll
+                for (int x = 0; x < 4; x++) {
+                    own += (uwide)((wide)ck[kt][x] * (wide)ct[kt][x]);
+                }
+            }
+            own += shfl_wide(own, 1);
+            own += shfl_wide(own, 2);
+            const uint32_t lk = limbs_of(words_bound<KT>(ck), 4), lu = limbs_of(words_bound<KT>(ct), 8);
+            int32_t acc[11][4];
+#pragma unroll
+            for (int s = 0; s < 11; s++) {
+                acc[s][0] = acc[s][1] = acc[s][2] = acc[s][3] = 0;
+            }
+            tile_accumulate<8, 4, KT>(acc, rt, ck, lt, lk);
+            tile_accumulate<4, 8, KT>(acc, rp, ct, lp, lu);
+            wide dot[4];
+            tile_combine<11>(acc, dot);
+#pragma unroll
+            for (int q = 0; q < 4; q++) {
+                const int from = (int)(2 * tq + (q & 1)) * 4;
+                const uint32_t jq = __shfl_sync(0xffffffffu, j, from);
+                const uint64_t olo = __shfl_sync(0xffffffffu, (uint64_t)own, from), ohi = __shfl_sync(0xffffffffu, (uint64_t)(own >> 64), from);
+                const wide ownq = (wide)(((uwide)ohi << 64) | olo);
+                const uint32_t i = ri[q >> 1];
+                if (i == UINT32_MAX || jq == UINT32_MAX) {
+                    continue;
+                }
+                dz_mma[(uint64_t)i * nb + jq] = rel(temper * (dot[q] - ownq), MATERIAL_BITS);
+                // The scalar tangent, mode by mode, as `energy_pair_dz` reads it at a skinless head (`D = 1`, `g = 0`).
+                const int64_t *pi = p + (uint64_t)i * S, *tpi = tp + (uint64_t)i * S, *qj = k + (uint64_t)jq * S, *tkj = tk + (uint64_t)jq * S;
+                wide a = 0;
+                bool refused = false;
+                for (uint32_t l = 0; l < n; l++) {
+                    wide pair = 0, power = 0;
+                    for (uint32_t x = l; x < S; x += n) {
+                        pair += (wide)tpi[x] * (wide)qj[x] + (wide)pi[x] * (wide)tkj[x];
+                        power += (wide)qj[x] * (wide)tkj[x];
+                    }
+                    wide lifted, next;
+                    if (!mul_fits(pair, 1, &lifted) || !add_fits(a, lifted - power, &next)) {
+                        refused = true;
+                        break;
+                    }
+                    a = next;
+                }
+                if (refused) {
+                    atomicOr(status, REFUSED_KEY);
+                }
+                dz_scalar[(uint64_t)i * nb + jq] = refused ? 0 : rel(temper * rel(a, 0), MATERIAL_BITS);
+            }
+        }
+    }
+}
+
+extern "C" __global__ void field_dz_check_k1(const int64_t *tp, const int64_t *p, const int64_t *k, const int64_t *tk, uint32_t na, uint32_t nb, uint32_t S, wide *dz_mma, wide *dz_scalar, uint32_t *status) { dz_check_body<1>(tp, p, k, tk, na, nb, S, dz_mma, dz_scalar, status); }
+extern "C" __global__ void field_dz_check_k2(const int64_t *tp, const int64_t *p, const int64_t *k, const int64_t *tk, uint32_t na, uint32_t nb, uint32_t S, wide *dz_mma, wide *dz_scalar, uint32_t *status) { dz_check_body<2>(tp, p, k, tk, na, nb, S, dz_mma, dz_scalar, status); }

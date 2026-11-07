@@ -4492,6 +4492,11 @@ extern "C" __global__ void field_stamp(uint64_t *slot) {
 }
 
 // -------------------------------------------------------------------------------------------
+// integer products on the tensor cores, by limbs
+
+#include "field_mma.cuh"
+
+// -------------------------------------------------------------------------------------------
 // the energy field (`holonics::hnn::tower::field::energy`)
 
 #include "field_energy.cuh"

@@ -242,6 +242,33 @@ pub fn energy_octets(d: &FieldDeclaration, sites: usize) -> u64 {
     cells * (h * 8 * pairs + s * cell_site + cell_fixed) + (8 + 8 + 16) * pairs + s * (held_site + force_site + face_site + reverse_site) + 4 * h * (3 * d.classes() as u64 + 2)
 }
 
+/// The threads of a block of the skinless heads' score tangents (four warps, `field_energy_still_dz_k*`).
+const STILL_THREADS: u32 = 128;
+
+/// [definition; agent-inferred, November 7] **Whether a skinless head's score tangents run on the tensor cores**, and the tiles
+/// of 16 its span takes (`kernels/field_energy.cuh`, the skinless heads' pair products): where the declaration has a skinless
+/// head (a still or depth ring set) and its span fits two tiles. `FIELD_SCALAR_PAIRS` keeps the scalar products (a reading: the
+/// same bits, the scalar time beside the tensor cores').
+fn still_tiles(field: &Field) -> Option<u32> {
+    let d = field.declaration;
+    if !(0..d.heads).any(|h| skinless_head(field, h)) || std::env::var_os("FIELD_SCALAR_PAIRS").is_some() {
+        return None;
+    }
+    match 2 * d.modes {
+        1..=16 => Some(1),
+        17..=32 => Some(2),
+        _ => None,
+    }
+}
+
+/// Whether head `h` of the declaration is skinless (`skinless` in `kernels/field.cu`: a still ring set's head, or a depth
+/// ring's, a turned set among the last `depth`).
+fn skinless_head(field: &Field, h: usize) -> bool {
+    let d = field.declaration;
+    let set = h % d.frames;
+    set < d.still || set + d.depth >= d.frames
+}
+
 impl<'c> CardField<'c> {
     /// [definition; the unified-theory reading of November 6, 22:52] **An energy field's faces and logits on the card**
     /// (the host's `Field::energy_pass` region by region: each face the energy's total derivative), with each region's energy
@@ -450,6 +477,7 @@ impl<'c> CardField<'c> {
         card.zero_octets(&fb.dp, 0, 8 * sites * m2).map_err(device)?;
         // The locks: each head's shares as their scores' covector, through the probe's and the key's brackets.
         for h in 0..heads {
+            self.stamp_head(Some(h));
             card.zero_octets(&fb.cv, 0, 16 * rows * span).map_err(device)?;
             card.zero_octets(&fb.cw, 0, 16 * rows * span).map_err(device)?;
             let (mut hh, mut dsp, mut dqp) = (h as u32, fb.ds.device_ptr(), fb.dq.device_ptr());
@@ -459,6 +487,7 @@ impl<'c> CardField<'c> {
             let (mut hh, mut dqp, mut dvp) = (h as u32, fb.dq.device_ptr(), fb.dv.device_ptr());
             self.launch("field_spread", (regions as u32).clamp(1, 65_535), THREADS, &mut [arg(words), arg(&mut hh), arg(&mut dqp), arg(&mut dvp)])?;
         }
+        self.stamp_head(None);
         // Through each word's ratio to its own power, then out of the frame.
         let (mut qs, mut dqp) = (c.qscale.device_ptr(), fb.dq.device_ptr());
         self.launch("field_unit_back", Self::warps((heads * sites) as u64), THREADS, &mut [arg(words), arg(&mut qs), arg(&mut dqp)])?;
@@ -549,11 +578,21 @@ impl<'c> CardField<'c> {
         // The locks' force on the words and its tangent, head by head.
         words.dp = tb.fdp.device_ptr();
         words.cw = tb.cw.device_ptr();
+        let still_dz = still_tiles(field).map(|kt| if kt == 1 { "field_energy_still_dz_k1" } else { "field_energy_still_dz_k2" });
         for h in 0..heads {
+            self.stamp_head(Some(h));
             card.zero_octets(&tb.cw, 0, 16 * rows * span).map_err(device)?;
             card.zero_octets(&tb.tcw, 0, 16 * rows * span).map_err(device)?;
+            // A skinless head's class blocks' score tangents on the tensor cores, into `tds` for the rows to read.
+            let mut blocked = 0u32;
+            if let Some(entry) = still_dz.filter(|_| skinless_head(field, h)) {
+                let (mut hh, mut uqp, mut upp, mut tdsp) = (h as u32, tb.uq.device_ptr(), tb.up.device_ptr(), tb.tds.device_ptr());
+                let blocks = (regions * d.classes()).clamp(1, 1 << 20) as u32;
+                self.launch(entry, blocks, STILL_THREADS, &mut [arg(words), arg(&mut hh), arg(&mut uqp), arg(&mut upp), arg(&mut tdsp)])?;
+                blocked = 1;
+            }
             let (mut hh, mut uqp, mut upp, mut tswp, mut dsp, mut tdsp, mut dqp, mut tqp, mut tpp, mut tcwp) = (h as u32, tb.uq.device_ptr(), tb.up.device_ptr(), tb.tsw.device_ptr(), tb.ds.device_ptr(), tb.tds.device_ptr(), tb.fdq.device_ptr(), tb.tq.device_ptr(), tb.tp.device_ptr(), tb.tcw.device_ptr());
-            self.launch("field_energy_tangent_rows", Self::rows_grid(sites as u64, REV_ROWS), (REV_ROWS * 32) as u32, &mut [arg(words), arg(&mut hh), arg(&mut uqp), arg(&mut upp), arg(&mut tswp), arg(&mut dsp), arg(&mut tdsp), arg(&mut dqp), arg(&mut tqp), arg(&mut tpp), arg(&mut tcwp)])?;
+            self.launch("field_energy_tangent_rows", Self::rows_grid(sites as u64, REV_ROWS), (REV_ROWS * 32) as u32, &mut [arg(words), arg(&mut hh), arg(&mut uqp), arg(&mut upp), arg(&mut tswp), arg(&mut dsp), arg(&mut tdsp), arg(&mut dqp), arg(&mut tqp), arg(&mut tpp), arg(&mut tcwp), arg(&mut blocked)])?;
             let (mut hh, mut uqp, mut upp, mut dsp, mut tdsp, mut dqp, mut tqp) = (h as u32, tb.uq.device_ptr(), tb.up.device_ptr(), tb.ds.device_ptr(), tb.tds.device_ptr(), tb.fdq.device_ptr(), tb.tq.device_ptr());
             self.launch("field_energy_tangent_columns", Self::rows_grid(sites as u64, CONTACT_ROWS), (CONTACT_ROWS * 32) as u32, &mut [arg(words), arg(&mut hh), arg(&mut uqp), arg(&mut upp), arg(&mut dsp), arg(&mut tdsp), arg(&mut dqp), arg(&mut tqp)])?;
             for (cw, extra, out) in [(&tb.cw, 0u32, &tb.fdq), (&tb.tcw, 8, &tb.tq)] {
@@ -561,6 +600,7 @@ impl<'c> CardField<'c> {
                 self.launch("field_energy_spread", (regions as u32).clamp(1, 65_535), THREADS, &mut [arg(words), arg(&mut hh), arg(&mut cwp), arg(&mut ex), arg(&mut op)])?;
             }
         }
+        self.stamp_head(None);
         // The unit power's return differentiated along the words' tangents, then out of the frame.
         for (unit, scale, du, dwt, force, tforce, out) in [(&c.qf, &c.qscale, &tb.uq, &tb.fq, &tb.fdq, &tb.tq, &tb.cq), (&c.pq, &c.pscale, &tb.up, &tb.fp, &tb.fdp, &tb.tp, &tb.cp)] {
             let (mut up_, mut sp, mut dup, mut dwp, mut fp, mut tfp, mut op) = (unit.device_ptr(), scale.device_ptr(), du.device_ptr(), dwt.device_ptr(), force.device_ptr(), tforce.device_ptr(), out.device_ptr());

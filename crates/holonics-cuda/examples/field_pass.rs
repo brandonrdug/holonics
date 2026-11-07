@@ -74,8 +74,9 @@ fn run(args: &[String]) -> Result<()> {
         let total: u128 = kernels.values().map(|v| v.1).sum();
         let mut rows: Vec<_> = kernels.iter().collect();
         rows.sort_by_key(|(_, v)| std::cmp::Reverse(v.1));
-        for (entry, (calls, ns)) in rows {
-            println!("FIELD_EVENT entry={entry} launches={calls} card_us={} us_a_launch={} share_permille={}", ns / 1_000, ns / 1_000 / (*calls as u128).max(1), ns * 1000 / total.max(1));
+        for ((entry, head), (calls, ns)) in rows {
+            let head = if *head == u32::MAX { "all".to_string() } else { head.to_string() };
+            println!("FIELD_EVENT entry={entry} head={head} launches={calls} card_us={} us_a_launch={} share_permille={}", ns / 1_000, ns / 1_000 / (*calls as u128).max(1), ns * 1000 / total.max(1));
         }
         println!("FIELD_EVENT_SPLIT card_kernels_ms={} elapsed_ms={}", total / 1_000_000, started.elapsed().as_millis());
     }
