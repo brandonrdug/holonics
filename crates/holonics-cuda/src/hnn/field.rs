@@ -37,6 +37,8 @@ use crate::cuda::{Dim3, Module};
 use crate::hnn::card::{Card, CardBuffer};
 use crate::hnn::DeviceError;
 
+mod energy;
+
 const IMAGE: &[u8] = include_bytes!(concat!(env!("OUT_DIR"), "/field.ptx"));
 const THREADS: u32 = 256;
 /// The dynamic shared memory a tiled affine map may take in a block, the default 48 KiB.
@@ -231,6 +233,17 @@ struct Words {
     bare_stretch: u64,
 }
 
+/// The moments' covector returned to the strands ([`CardField::moment_strands_back`]): each mode's 64-bit covector, the
+/// returns `d_before[u][t]`, `d_after[u][t]`, the modes' words and map, and the buffers their launches read.
+struct MomentBack<'c> {
+    ds: Pooled<'c, i64>,
+    d_before: Pooled<'c, i128>,
+    d_after: Pooled<'c, i128>,
+    ws: Pooled<'c, u64>,
+    cmap: Pooled<'c, u32>,
+    _held: (Pooled<'c, i128>, Pooled<'c, u8>, Pooled<'c, i128>),
+}
+
 /// The moment kernels' words (`MomentWords` in `kernels/field_moment.cuh`, field for field): the batch's
 /// regions and the one ring slot a launch reads.
 #[repr(C)]
@@ -312,6 +325,9 @@ pub struct FieldTimes {
     /// reads and pairs above.
     pub landmarks: u64,
     pub landmark_ns: u128,
+    /// [measurement] An energy field's reads past the host's: a tick's last states read again where its last candidate was
+    /// not every region's state (a region rejected there), the same bits as the candidate each region stood at.
+    pub energy_rereads: u64,
 }
 
 /// One tick's carriers on the card.
@@ -857,11 +873,6 @@ impl<'c> CardField<'c> {
     /// the octets of the resident face this upload holds.
     fn upload(&self, field: &Field, shared_face: Option<u64>) -> Result<(Words, Upload<'c>, u64)> {
         let d = field.declaration;
-        // [agent-inferred, November 6] The card's energy faces are not built: an energy field (the unified-theory reading of
-        // 22:52) is read on the host reference until its card realization passes its parity.
-        if d.energy {
-            return Err(TowerError::Refused("the card's energy faces are not built: read this field on the host"));
-        }
         let l = field.layout();
         let mut ring_off = Vec::new();
         let mut ring_n = Vec::new();
@@ -1029,32 +1040,12 @@ impl<'c> CardField<'c> {
     #[allow(clippy::type_complexity)]
     fn run(&mut self, field: &Field, regions: &[Region], returning: bool, logits: bool, keep: Option<&[usize]>) -> Result<(Vec<Vec<Option<TowerFace>>>, Vec<Vec<Option<Vec<i64>>>>, Vec<i128>, Rows, Vec<Vec<u64>>)> {
         let d = field.declaration;
-        for region in regions {
-            if region.classes.len() != region.unresolved.len() || region.classes.len() < 2 {
-                return Err(TowerError::Refused("a region needs one class and one resolution a site, and two sites to meet"));
-            }
-            if region.classes.len() > d.reach {
-                return Err(TowerError::Refused("a region past the field's reach, where its frames would repeat"));
-            }
-            if region.classes.iter().any(|&c| c >= d.alphabet) {
-                return Err(TowerError::Refused("a region's class outside the field's alphabet"));
-            }
-            if !region.faces.is_empty() && region.faces.len() != region.classes.len() {
-                return Err(TowerError::Refused("a region's carried faces that are not one a site"));
-            }
-            if region.faces.iter().flatten().any(|face| face.is_empty() || face.iter().any(|&(c, w)| c as usize >= d.alphabet || w > 1 << STATE_BITS)) {
-                return Err(TowerError::Refused("a carried face that is empty, or whose class is outside the alphabet or share past one"));
-            }
-            if !region.locked.is_empty() && (region.locked.len() != region.classes.len() || (0..region.classes.len()).any(|t| region.locked[t] && region.faces.get(t).and_then(Option::as_ref).is_none())) {
-                return Err(TowerError::Refused("a region's locks that are not one a site, or a lock on a site that carries no face"));
-            }
-            if !region.echo.is_empty() && region.echo.len() != region.classes.len() {
-                return Err(TowerError::Refused("a region's echoes that are not one a site"));
-            }
-            if region.echo.iter().flatten().any(|e| e.logits.len() != d.alphabet) {
-                return Err(TowerError::Refused("an echo whose logits are not one a class"));
-            }
+        // [agent-inferred, November 6] An energy field's faces and logits are its own forward's (`energy`); its return through
+        // the ticks and its readings are not built, so every other read of it is refused.
+        if d.energy {
+            return Err(TowerError::Refused("the card reads an energy field's faces and logits alone (its return through the ticks is not built)"));
         }
+        admit_regions(&d, regions)?;
         self.mark("outside_the_card");
         let card = self.card;
         let started = Instant::now();
@@ -2412,7 +2403,34 @@ impl<'c> CardField<'c> {
         if tm == 0 {
             return Ok(());
         }
-        let (l, card) = (field.layout(), self.card);
+        let l = field.layout();
+        let back = self.moment_strands_back(field, words, dm, regions, sites)?;
+        let (strand, prefix) = ((2 * sites) as u64, (2 * (sites + regions)) as u64);
+        let (mut wsp, mut cmp) = (back.ws.device_ptr(), back.cmap.device_ptr());
+        let (mut dsp, mut dbp, mut dap, mut gp) = (back.ds.device_ptr(), back.d_before.device_ptr(), back.d_after.device_ptr(), g.device_ptr());
+        let (mut w2, mut base_b, mut base_a, mut tm32) = (*words, l.moment_before as u64, l.moment_after as u64, tm as u32);
+        let (mut stride, mut pre_stride) = (strand, prefix);
+        let grid = |x: usize| Dim3 { x: x.max(1) as u32, y: tm as u32, z: 1 };
+        let mut fw = *words;
+        self.launch("field_moment_strand_return_all", Self::cells((sites * tm) as u64), THREADS, &mut [arg(&mut w2), arg(&mut base_b), arg(&mut base_a), arg(&mut tm32), arg(&mut dbp), arg(&mut dap), arg(&mut gp)])?;
+        // The moments' clock covector (§16, `moment::pace_return`): the strands and their paced prefixes read again.
+        let (before, after) = (self.timed(Kind::Alloc, || self.take::<i64>((tm * 2 * sites).max(1))).map_err(device)?, self.timed(Kind::Alloc, || self.take::<i64>((tm * 2 * sites).max(1))).map_err(device)?);
+        let (up, down) = (self.timed(Kind::Alloc, || self.take::<i128>((tm * 2 * (sites + regions)).max(1))).map_err(device)?, self.timed(Kind::Alloc, || self.take::<i128>((tm * 2 * (sites + regions)).max(1))).map_err(device)?);
+        let (mut bp, mut ap, mut upp, mut dnp, mut zero32) = (before.device_ptr(), after.device_ptr(), up.device_ptr(), down.device_ptr(), 0u32);
+        self.launch("field_moment_strands_all", Self::cells((sites * tm) as u64), THREADS, &mut [arg(&mut w2), arg(&mut base_b), arg(&mut base_a), arg(&mut tm32), arg(&mut bp), arg(&mut ap)])?;
+        self.launch_grid("field_moment_prefix_paced_all", grid(regions), MOMENT_BLOCK, MOMENT_BLOCK * 32, &mut [arg(&mut wsp), arg(&mut cmp), arg(&mut fw), arg(&mut bp), arg(&mut upp), arg(&mut stride), arg(&mut pre_stride), arg(&mut zero32)])?;
+        self.launch_grid("field_moment_prefix_paced_all", grid(regions), MOMENT_BLOCK, MOMENT_BLOCK * 32, &mut [arg(&mut wsp), arg(&mut cmp), arg(&mut fw), arg(&mut ap), arg(&mut dnp), arg(&mut stride), arg(&mut pre_stride), arg(&mut zero32)])?;
+        self.launch_grid("field_moment_pace_back_all", Dim3 { x: Self::cells(sites as u64), y: tm as u32, z: 1 }, THREADS, 0, &mut [arg(&mut wsp), arg(&mut cmp), arg(&mut fw), arg(&mut bp), arg(&mut ap), arg(&mut dsp), arg(&mut dbp), arg(&mut dap), arg(&mut upp), arg(&mut dnp), arg(&mut stride), arg(&mut pre_stride)])?;
+        Ok(())
+    }
+
+    /// [definition; §15.1] **The moments' covector returned to each moment mode's strands** (the host's
+    /// `moment::moments_return`): `dm` (`[t][2M]` on 128 bits) as each mode's 64-bit pairs, admitted, its released prefix,
+    /// each receiver's far octaves at their skins and the return, into `d_before[u][t]`, `d_after[u][t]` (pairs on 128 bits);
+    /// with the mode's words and covector, which the clock's return reads after it. `tm > 0`.
+    fn moment_strands_back(&self, field: &Field, words: &Words, dm: u64, regions: usize, sites: usize) -> Result<MomentBack<'c>> {
+        let d = field.declaration;
+        let tm = d.moment_modes();
         let (strand, prefix) = ((2 * sites) as u64, (2 * (sites + regions)) as u64);
         let ds = self.timed(Kind::Alloc, || self.take::<i64>((tm * 2 * sites).max(1))).map_err(device)?;
         let q = self.timed(Kind::Alloc, || self.take::<i128>((tm * 2 * (sites + regions)).max(1))).map_err(device)?;
@@ -2420,8 +2438,8 @@ impl<'c> CardField<'c> {
         let ok = self.timed(Kind::Alloc, || self.take_up(&vec![0u8; (tm * regions).max(1)])).map_err(device)?;
         let (ws, cmap) = self.moment_modes(field, words, regions, sites, &ok)?;
         let (mut wsp, mut cmp, mut dmp) = (ws.device_ptr(), cmap.device_ptr(), dm);
-        let (mut dsp, mut qp, mut dbp, mut dap, mut gp, mut none) = (ds.device_ptr(), q.device_ptr(), d_before.device_ptr(), d_after.device_ptr(), g.device_ptr(), 0u64);
-        let (mut w2, mut base_b, mut base_a, mut tm32) = (*words, l.moment_before as u64, l.moment_after as u64, tm as u32);
+        let (mut dsp, mut qp, mut dbp, mut dap, mut none) = (ds.device_ptr(), q.device_ptr(), d_before.device_ptr(), d_after.device_ptr(), 0u64);
+        let (mut w2, mut tm32) = (*words, tm as u32);
         let (mut one32, mut stride, mut pre_stride) = (1u32, strand, prefix);
         let grid = |x: usize| Dim3 { x: x.max(1) as u32, y: tm as u32, z: 1 };
         self.launch("field_moment_ds_all", Self::cells((sites * tm) as u64), THREADS, &mut [arg(&mut w2), arg(&mut dmp), arg(&mut cmp), arg(&mut tm32), arg(&mut dsp)])?;
@@ -2438,16 +2456,7 @@ impl<'c> CardField<'c> {
             self.launch("field_moment_skinned_all", Self::cells((tm * regions * 2 * levels as usize) as u64), THREADS, &mut [arg(&mut wsp), arg(&mut cmp), arg(&mut fw), arg(&mut dsp), arg(&mut skp), arg(&mut stride), arg(&mut sk_stride_a), arg(&mut levels_a), arg(&mut tm32)])?;
         }
         self.launch_grid("field_moment_return_paced_all", Dim3 { x: Self::cells(sites as u64), y: tm as u32, z: 1 }, THREADS, 0, &mut [arg(&mut wsp), arg(&mut cmp), arg(&mut fw), arg(&mut dsp), arg(&mut qp), arg(&mut skp), arg(&mut dbp), arg(&mut dap), arg(&mut stride), arg(&mut pre_stride), arg(&mut sk_stride_a)])?;
-        self.launch("field_moment_strand_return_all", Self::cells((sites * tm) as u64), THREADS, &mut [arg(&mut w2), arg(&mut base_b), arg(&mut base_a), arg(&mut tm32), arg(&mut dbp), arg(&mut dap), arg(&mut gp)])?;
-        // The moments' clock covector (§16, `moment::pace_return`): the strands and their paced prefixes read again.
-        let (before, after) = (self.timed(Kind::Alloc, || self.take::<i64>((tm * 2 * sites).max(1))).map_err(device)?, self.timed(Kind::Alloc, || self.take::<i64>((tm * 2 * sites).max(1))).map_err(device)?);
-        let (up, down) = (self.timed(Kind::Alloc, || self.take::<i128>((tm * 2 * (sites + regions)).max(1))).map_err(device)?, self.timed(Kind::Alloc, || self.take::<i128>((tm * 2 * (sites + regions)).max(1))).map_err(device)?);
-        let (mut bp, mut ap, mut upp, mut dnp, mut zero32) = (before.device_ptr(), after.device_ptr(), up.device_ptr(), down.device_ptr(), 0u32);
-        self.launch("field_moment_strands_all", Self::cells((sites * tm) as u64), THREADS, &mut [arg(&mut w2), arg(&mut base_b), arg(&mut base_a), arg(&mut tm32), arg(&mut bp), arg(&mut ap)])?;
-        self.launch_grid("field_moment_prefix_paced_all", grid(regions), MOMENT_BLOCK, MOMENT_BLOCK * 32, &mut [arg(&mut wsp), arg(&mut cmp), arg(&mut fw), arg(&mut bp), arg(&mut upp), arg(&mut stride), arg(&mut pre_stride), arg(&mut zero32)])?;
-        self.launch_grid("field_moment_prefix_paced_all", grid(regions), MOMENT_BLOCK, MOMENT_BLOCK * 32, &mut [arg(&mut wsp), arg(&mut cmp), arg(&mut fw), arg(&mut ap), arg(&mut dnp), arg(&mut stride), arg(&mut pre_stride), arg(&mut zero32)])?;
-        self.launch_grid("field_moment_pace_back_all", Dim3 { x: Self::cells(sites as u64), y: tm as u32, z: 1 }, THREADS, 0, &mut [arg(&mut wsp), arg(&mut cmp), arg(&mut fw), arg(&mut bp), arg(&mut ap), arg(&mut dsp), arg(&mut dbp), arg(&mut dap), arg(&mut upp), arg(&mut dnp), arg(&mut stride), arg(&mut pre_stride)])?;
-        Ok(())
+        Ok(MomentBack { ds, d_before, d_after, ws, cmap, _held: (q, ok, sk) })
     }
 
     /// The batch's refusals, read off the card.
@@ -2546,6 +2555,39 @@ fn encoding_partition(rows: &[(usize, u32, u32)], rows_n: usize) -> (Vec<u32>, V
     (rows_sites, rows_shares, segments)
 }
 
+/// The regions' admission, the host's `Field::admit_region` on the card's side: one class and one resolution a site, two
+/// sites at least and no more than the reach, classes and carried faces within the alphabet, locks only on carried sites,
+/// and echoes one a site.
+fn admit_regions(d: &FieldDeclaration, regions: &[Region]) -> Result<()> {
+    for region in regions {
+        if region.classes.len() != region.unresolved.len() || region.classes.len() < 2 {
+            return Err(TowerError::Refused("a region needs one class and one resolution a site, and two sites to meet"));
+        }
+        if region.classes.len() > d.reach {
+            return Err(TowerError::Refused("a region past the field's reach, where its frames would repeat"));
+        }
+        if region.classes.iter().any(|&c| c >= d.alphabet) {
+            return Err(TowerError::Refused("a region's class outside the field's alphabet"));
+        }
+        if !region.faces.is_empty() && region.faces.len() != region.classes.len() {
+            return Err(TowerError::Refused("a region's carried faces that are not one a site"));
+        }
+        if region.faces.iter().flatten().any(|face| face.is_empty() || face.iter().any(|&(c, w)| c as usize >= d.alphabet || w > 1 << STATE_BITS)) {
+            return Err(TowerError::Refused("a carried face that is empty, or whose class is outside the alphabet or share past one"));
+        }
+        if !region.locked.is_empty() && (region.locked.len() != region.classes.len() || (0..region.classes.len()).any(|t| region.locked[t] && region.faces.get(t).and_then(Option::as_ref).is_none())) {
+            return Err(TowerError::Refused("a region's locks that are not one a site, or a lock on a site that carries no face"));
+        }
+        if !region.echo.is_empty() && region.echo.len() != region.classes.len() {
+            return Err(TowerError::Refused("a region's echoes that are not one a site"));
+        }
+        if region.echo.iter().flatten().any(|e| e.logits.len() != d.alphabet) {
+            return Err(TowerError::Refused("an echo whose logits are not one a class"));
+        }
+    }
+    Ok(())
+}
+
 /// The batches of whole regions, in order, each batch's allocations within `budget`; a region whose
 /// allocations alone pass the budget is refused.
 pub fn batches(lengths: &[usize], octets: &dyn Fn(usize) -> u64, budget: u64) -> Result<Vec<std::ops::Range<usize>>> {
@@ -2576,10 +2618,19 @@ impl FieldRealization for CardField<'_> {
     }
 
     fn read_faces(&mut self, field: &Field, regions: &[Region]) -> Result<Vec<Vec<Option<TowerFace>>>> {
+        // [definition; the unified-theory reading of November 6, 22:52] An energy field's faces are its energy's forces.
+        if field.declaration.energy {
+            return Ok(self.energy_run(field, regions)?.0);
+        }
         Ok(self.run(field, regions, false, false, None)?.0)
     }
 
     fn read_logits(&mut self, field: &Field, regions: &[Region]) -> Result<Vec<FieldRead>> {
+        // An energy field's logits, its echoes zero (the host's `energy_pass`: no tick is held).
+        if field.declaration.energy {
+            let (_, logits, _) = self.energy_run(field, regions)?;
+            return Ok(logits.into_iter().map(|logits| FieldRead { echo: vec![0; logits.len()], logits }).collect());
+        }
         let (_, logits, _, _, echo) = self.run(field, regions, false, true, None)?;
         Ok(logits.into_iter().zip(echo).map(|(logits, echo)| FieldRead { logits, echo }).collect())
     }

@@ -35,7 +35,7 @@ use std::process::Command;
 /// lowers its PTX for any newer card.
 const UNATTENDED_FLOOR: &str = "compute_75";
 
-const SOURCES: [&str; 10] = [
+const SOURCES: [&str; 11] = [
     "kernels/hnn.cu",
     "kernels/exact_integer.cuh",
     "kernels/hnn_word.cuh",
@@ -46,6 +46,7 @@ const SOURCES: [&str; 10] = [
     "kernels/tower.cu",
     "kernels/field.cu",
     "kernels/field_moment.cuh",
+    "kernels/field_energy.cuh",
 ];
 
 /// Ask the mounted device what it is: `nvidia-smi` reports `8.9`, `nvcc` wants `compute_89`.

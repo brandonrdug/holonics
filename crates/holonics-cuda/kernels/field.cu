@@ -4468,3 +4468,8 @@ extern "C" __global__ void field_scale_scatter(FieldWords w, const int64_t *src,
         dst[c] = add ? fit64((wide)dst[c] + (wide)v, w.status) : v;
     }
 }
+
+// -------------------------------------------------------------------------------------------
+// the energy field (`holonics::hnn::tower::field::energy`)
+
+#include "field_energy.cuh"
