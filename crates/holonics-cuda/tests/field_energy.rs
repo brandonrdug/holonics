@@ -407,6 +407,43 @@ fn the_tiny_squares_at_one_base_on_the_card_are_the_hosts() {
     }
 }
 
+/// [measurement; the unified-theory readings of November 7, 03:22 and 04:20] **The central squares and the configurations'
+/// energies on the card are the host's**: on every ring set, the tiny squares' central readings at three steps
+/// (`CardField::energy_central_squares` against `Field::energy_central_square`), and each tiny truth's energy with every
+/// site resolved, and the same with one site at each letter (`CardField::energies` against `Field::energy_g`), equal.
+#[test]
+#[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
+fn the_tiny_central_squares_and_energies_on_the_card_are_the_hosts() {
+    let opened = Card::open(0).unwrap();
+    let mut card = CardField::open(&opened).unwrap();
+    let short = vec![1usize, 4, 0, 2, 2, 3, 1];
+    let long: Vec<usize> = (0..13).map(|t| (t * 3 + t / 4) % 5).collect();
+    let squares: Vec<(&[usize], (usize, usize))> = vec![(&short, (1, 3)), (&short, (0, 5)), (&short, (2, 6)), (&long, (4, 9)), (&long, (0, 12)), (&long, (6, 7))];
+    let void = 4;
+    let steps = [SQUARE_EPS / 4, SQUARE_EPS / 2, SQUARE_EPS];
+    let mut configurations: Vec<Vec<usize>> = vec![short.clone(), long.clone()];
+    configurations.extend((0..5).map(|c| {
+        let mut x = long.clone();
+        x[6] = c;
+        x
+    }));
+    let views: Vec<&[usize]> = configurations.iter().map(|c| c.as_slice()).collect();
+    for still in 0..=2 {
+        let field = energetic(still);
+        let reference: Vec<Option<Vec<(i128, i128)>>> = squares.par_iter().map(|&(truth, ij)| field.energy_central_square(truth, ij, void, &steps).unwrap()).collect();
+        let read = card.energy_central_squares(&field, &squares, void, &steps).unwrap();
+        for (k, (h, c)) in reference.iter().zip(&read).enumerate() {
+            println!("ENERGY_CENTRAL tiny still={still} square={k} bit_equal={} host={h:?}", h == c);
+        }
+        assert_eq!(read, reference, "still {still}: the card's central squares");
+        assert!(reference.iter().filter(|s| s.is_some()).count() >= 4, "still {still}: squares with runner-ups");
+        let host_g: Vec<i128> = views.iter().map(|c| field.energy_g(c).unwrap()).collect();
+        let card_g = card.energies(&field, &views).unwrap();
+        println!("ENERGY_G tiny still={still} bit_equal={} host={host_g:?}", host_g == card_g);
+        assert_eq!(card_g, host_g, "still {still}: the card's energies");
+    }
+}
+
 /// [measurement; the unified-theory reading of November 7, 01:37] **The line's squares at one base on the card are the
 /// host's**: on the founding of the line's declaration, squares on two synthetic truths of 400 sites (eight a truth, their
 /// sites in the truths' last third, one to eleven apart), at `ε = 2^7` ([`LINE_SQUARE_EPS`]), read in one batch on the card

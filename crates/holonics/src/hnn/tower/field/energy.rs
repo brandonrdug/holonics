@@ -1139,16 +1139,21 @@ impl Field {
         Ok((out, read))
     }
 
-    /// [measurement; a test's reading] **The force is the energy's slope**: at the opening, the energy's fall under a step of
-    /// `2^(−h)` beside the step's first-order fall `2^(−h) Σ_t (|F_t|² − ⟨r̂_t, F_t⟩²/W)` (each lane's), both on `2^(−32)` bits.
-    #[cfg(test)]
-    pub(super) fn energy_slope(&self, region: &Region, h: u32) -> Result<(i128, i128)> {
+    /// [measurement; the unified-theory readings of November 6, 22:52 and November 7, 04:04] **The fall along the force**: on
+    /// the state after `ticks` ticks of descent, the step's first-order fall `2^(−h) Σ_t (|F_t|² − ⟨r̂_t, F_t⟩²/W)` (each
+    /// lane's), the energy's fall `Φ(x) − Φ(x + 2^(−h) ‖x‖ F)` under it, and the central fall `Φ(x − 2^(−h) ‖x‖ F) − Φ(x +
+    /// 2^(−h) ‖x‖ F)` against twice the first order, its curvature cancelled; all on `2^(−32)` bits. If `F` is the energy's
+    /// gradient, the central fall's distance from twice the first order falls four times per halving of the step, until the
+    /// state's grain.
+    pub fn energy_fall(&self, region: &Region, ticks: usize, h: u32) -> Result<(i128, i128, i128)> {
         let d = &self.declaration;
-        let Relaxed { x, cell, held, paces, window, .. } = self.energy_relax(region, 0, None, None)?;
+        let Relaxed { x, cell, held, paces, window, .. } = self.energy_relax(region, ticks, None, None)?;
         let reaches = self.reaches();
         let (force, _) = self.energy_force(&cell, &held, &paces, &reaches)?;
         let next = self.energy_step(&x, &cell.scale, &force, h)?;
         let after = self.energy_cell(&next, &held, &paces, &reaches, window.as_deref())?;
+        let back: Vec<i64> = force.iter().map(|&f| -f).collect();
+        let behind = self.energy_cell(&self.energy_step(&x, &cell.scale, &back, h)?, &held, &paces, &reaches, window.as_deref())?;
         let (dw, lanes) = (d.width, d.lanes);
         let w = dw / lanes;
         // |F|² on 2^(−48), ⟨r̂, F⟩² on 2^(−80) over the lane's width.
@@ -1161,7 +1166,7 @@ impl Field {
                 first += ff - release(div_nearest(rf * rf, w as i128), 32);
             }
         }
-        Ok((release(first, 16 + h), cell.phi - after.phi))
+        Ok((release(first, 16 + h), cell.phi - after.phi, behind.phi - after.phi))
     }
 
     /// [measurement; a test's reading] **The force's tangent against the force's difference**: at the opening, for a keyed
@@ -1686,6 +1691,18 @@ impl Field {
     pub(super) fn energy_g_replayed(&self, base_field: &Field, region: &Region) -> Result<i128> {
         let base = base_field.energy_relax(region, base_field.declaration.ticks, None, None)?;
         Ok(self.energy_relax(region, base.read.halvings.len(), Some(&base.read.halvings), Some(&base.held))?.cell.phi)
+    }
+
+    /// [measurement; the unified-theory reading of November 7, 04:05] **A configuration's energy**: `G(e) = Φ(x^K(e); e)` with
+    /// every site resolved at `classes`, relaxed at its own certified halvings, on `2^(−32)` bits; the exact conditional's
+    /// terms (`P(e_t = c | rest) ∝ 2^(−G/T)`) and route (b)'s `G`.
+    pub fn energy_g(&self, classes: &[usize]) -> Result<i128> {
+        if !self.declaration.energy {
+            return refuse("an energy read of a field whose faces are not one energy's forces");
+        }
+        let none = vec![false; classes.len()];
+        let region = Region { classes, unresolved: &none, faces: &[], locked: &[], echo: &[], domain: None, port: None };
+        Ok(self.energy_relax(&region, self.declaration.ticks, None, None)?.cell.phi)
     }
 
     /// [measurement] **A region's energy read** ([`EnergyRead`]): the energy at the opening and at the last tick, each

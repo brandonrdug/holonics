@@ -4644,6 +4644,18 @@ pub trait FieldRealization {
     fn read_energy_squares(&mut self, field: &Field, squares: &[(&[usize], (usize, usize))], void: usize, eps: u32) -> Result<Vec<Option<EnergySquare>>> {
         squares.par_iter().map(|&(truth, ij)| field.energy_square_corners(truth, ij, void, eps)).collect()
     }
+    /// [measurement; the unified-theory readings of November 7, 03:22 and 04:20] An energy field's central squares at one base
+    /// ([`Field::energy_central_square`] for each `(truth, (i, j))` at each step), read on the host in parallel unless the
+    /// realization reads them itself.
+    #[allow(clippy::type_complexity)]
+    fn read_energy_central_squares(&mut self, field: &Field, squares: &[(&[usize], (usize, usize))], void: usize, steps: &[u32]) -> Result<Vec<Option<Vec<(i128, i128)>>>> {
+        squares.par_iter().map(|&(truth, ij)| field.energy_central_square(truth, ij, void, steps)).collect()
+    }
+    /// [measurement; the unified-theory reading of November 7, 04:05] Each resolved region's energy `G` at its own certified
+    /// halvings ([`Field::energy_g`]), on the host in parallel unless the realization reads them itself.
+    fn read_energies(&mut self, field: &Field, regions: &[&[usize]]) -> Result<Vec<i128>> {
+        regions.par_iter().map(|c| field.energy_g(c)).collect()
+    }
     /// [definition; agent-inferred, November 7] An energy field's material covector `∂G/∂θ` and `G` a region
     /// ([`Field::energy_material`]), read on the host in parallel unless the realization reads them itself.
     fn read_energy_material(&mut self, field: &Field, regions: &[Region]) -> Result<Vec<(Vec<i128>, i128)>> {
@@ -4735,6 +4747,21 @@ pub struct FieldReceipt {
     /// moves them (`deposit_step(m_(s−1), v_(s−1))`): a step this section never shaped, priced on it as `transfer` prices the
     /// step before on the next section, with no self-alignment. `transfer − external` of the section before reads the
     /// step's curvature `ΔθᵀHΔθ` from the pass alone, with no reread. `None` past its carrier.
+    pub external: Option<i64>,
+}
+
+/// [measurement; the unified-theory reading of November 7, 04:05] **An energy section's contrast receipt**
+/// ([`FieldLearner::section_contrast`]): its states, how many releases wrote every open place as the truth, the energy's gap
+/// `Σ_s (G(truth_s) − G(e′_s))/T` on `2^(−32)` bits (positive where the field holds its own release below the truth),
+/// whether a step was deposited, and the step's prices as [`FieldReceipt`]'s, on the codes' grain.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub struct ContrastReceipt {
+    pub states: usize,
+    pub same: usize,
+    pub gap: i128,
+    pub deposited: bool,
+    pub predicted: Option<i64>,
+    pub transfer: Option<i64>,
     pub external: Option<i64>,
 }
 
@@ -5108,7 +5135,7 @@ impl FieldLearner {
     /// moments, the step and the certificates' decisions stay on the host.
     pub fn section_realized(&mut self, regions: &[Region], realization: &mut dyn FieldRealization) -> Result<FieldReceipt> {
         let (faces, g, next) = self.open(regions, realization, true)?;
-        let mut g = g.ok_or(TowerError::Refused("a section's opening read returned no covector"))?;
+        let g = g.ok_or(TowerError::Refused("a section's opening read returned no covector"))?;
         let faces_old = compared(&faces, regions)?;
         let spans = spans_of(regions);
         let code_before = code_of(&faces_old, &spans);
@@ -5118,6 +5145,18 @@ impl FieldLearner {
         // The sites the weighed code is a code of (§16.23): each region's domain where it reads an open site.
         let sites = spans.iter().filter(|s| s.0 > 0).map(|s| s.1 as usize).sum::<usize>()
             + regions.iter().filter_map(|r| r.port.map(|p| (p.start..p.stop.unwrap_or(r.classes.len()).min(r.classes.len())).filter(|&t| r.unresolved[t] && p.heard.is_none_or(|h| h[t])).count())).sum::<usize>();
+        let (deposited, predicted, transfer, external) = self.deposit(g)?;
+        Ok(FieldReceipt { sites, code_before, code_after: None, halvings: 0, deposited, next, predicted, change: None, transfer, external })
+    }
+
+    /// [definition; agent-inferred, November 7] **A section's deposit of its covector** `g` (each family's on its natural
+    /// grain, the code's covector): the step the section before stood at priced on it (`transfer`), the step the moments
+    /// would deposit before it moves them priced on it (`external`), the moments moved, and the step deposited at its size
+    /// (fluxing, Brandon, November 5 17:29 and 17:32) with its first-order change (`predicted`). Returns whether it moved the
+    /// material, `predicted`, `transfer` and `external`. Shared by [`FieldLearner::section_realized`] and
+    /// [`FieldLearner::section_contrast`].
+    #[allow(clippy::type_complexity)]
+    fn deposit(&mut self, mut g: Vec<i128>) -> Result<(bool, Option<i64>, Option<i64>, Option<i64>)> {
         let raw = g.clone();
         let transfer = self.last.take().and_then(|s| predicted_change(&self.field, &raw, &s.step, s.halvings));
         // [the unified-theory reading of November 6, 08:54] The step the moments would deposit before this section moves them,
@@ -5160,7 +5199,7 @@ impl FieldLearner {
         // alike, and the moments carry every covector.
         let (candidate, moved) = stepped(&self.field, &step, 0)?;
         if !moved {
-            return Ok(FieldReceipt { sites, code_before, code_after: None, halvings: 0, deposited: false, next, predicted, change: None, transfer, external });
+            return Ok((false, predicted, transfer, external));
         }
         self.field = candidate;
         if self.read_held {
@@ -5168,7 +5207,57 @@ impl FieldLearner {
         } else {
             self.last = Some(HeldStep { step, halvings: 0 });
         }
-        Ok(FieldReceipt { sites, code_before, code_after: None, halvings: 0, deposited: true, next, predicted, change: None, transfer, external })
+        Ok((true, predicted, transfer, external))
+    }
+
+    /// [definition; the unified-theory reading of November 7, 04:05, route (b)] **An energy field's section meets its own
+    /// release.** The open places' code under one energy is
+    /// `l = −log₂ P(e_O = truth_O | rest) = G(truth)/T + log₂ Σ_e 2^(−G(e)/T)`, with `G(e) = Φ(x^K(e); e)` each configuration
+    /// relaxed at its own certified halvings ([`Field::energy_material`]). Its material covector is
+    /// `(1/T)[∂G/∂θ(truth) − E_P ∂G/∂θ(e′)]`, read at one release `e′` a state: `release[s]` is `truth[s]` with its open
+    /// places as the field's own release wrote them (the writer as it writes), every site resolved in both. The section
+    /// deposits that covector as any section's ([`FieldLearner::deposit`]): the step fluxes. The partition function is not
+    /// read, so no code certifies it. `T` is the letters' temperature (`face_temper`), held: neither `G` nor its covector
+    /// reads it. The lock temperatures are held as `G`'s covector holds them.
+    ///
+    /// Covector units: [`Field::energy_material`] reads every family on `2^(−40)` a real unit, the deposit's material
+    /// families on `2^(−40)` and its face families on `2^(−24)`, so a face family's is released 16 bits.
+    pub fn section_contrast(&mut self, truth: &[Region], release_of: &[Region], realization: &mut dyn FieldRealization) -> Result<ContrastReceipt> {
+        let f = &self.field;
+        if !f.declaration.energy || f.scale.is_some() {
+            return refuse("a contrast section of a field without one energy");
+        }
+        if truth.is_empty() || truth.len() != release_of.len() {
+            return refuse("a contrast section needs one release a state");
+        }
+        let inverse = temperature_of(-f.theta[f.layout.face_temper], &f.fine)?;
+        let both: Vec<Region> = truth.iter().chain(release_of).copied().collect();
+        let reads = realization.read_energy_material(f, &both)?;
+        let n = truth.len();
+        let mut g = vec![0i128; f.material_len()];
+        let mut gap = 0i128;
+        let mut same = 0usize;
+        for s in 0..n {
+            let ((gt, et), (gr, er)) = (&reads[s], &reads[n + s]);
+            if gt.len() != g.len() || gr.len() != g.len() {
+                return refuse("a material covector of another length than the field's material");
+            }
+            gap += et - er;
+            same += usize::from(truth[s].classes == release_of[s].classes);
+            for ((v, a), b) in g.iter_mut().zip(gt).zip(gr) {
+                *v += a - b;
+            }
+        }
+        const OVER: &str = "a contrast covector past its 128-bit carrier";
+        for &(start, len, grain) in &f.families_all() {
+            for v in &mut g[start..start + len] {
+                let scaled = release(v.checked_mul(inverse).ok_or(TowerError::Refused(OVER))?, MATERIAL_BITS);
+                *v = if grain == MATERIAL_BITS { scaled } else { release(scaled, 40 - super::COVECTOR_BITS) };
+            }
+        }
+        let gap = release(gap.checked_mul(inverse).ok_or(TowerError::Refused(OVER))?, MATERIAL_BITS);
+        let (deposited, predicted, transfer, external) = self.deposit(g)?;
+        Ok(ContrastReceipt { states: n, same, gap, deposited, predicted, transfer, external })
     }
 
     /// [definition; agent-inferred, November 3, the tower record] **The learner grown in scale**: its field grown in scale

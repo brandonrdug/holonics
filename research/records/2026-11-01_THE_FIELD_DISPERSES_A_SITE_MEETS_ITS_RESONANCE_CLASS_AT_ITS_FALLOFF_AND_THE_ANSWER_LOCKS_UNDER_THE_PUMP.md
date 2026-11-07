@@ -4361,3 +4361,41 @@ agrees, and a floor rules the small ones.** These are held truth's squares on en
 - The central fall ratio on a line state is `(Φ(x − δv) − Φ(x + δv))/(2δ⟨F, v⟩)`. It reads 0.89–1.32 at `2^(−10)` and does not
   close at `2^(−12)`, where the step moves the state by about eight units of its grain.
 Receipts: `longrun_nov6/energy133.txt`, `longrun_nov6/central.py`.
+
+[measurement; November 7, energy133's squares and fall134; the unified-theory reading of 04:04] **The squares above 0.5 are
+mostly grain, and along `F` the energy falls at its first order.**
+- Theory's free check: the 182 squares above 0.5 at /16 and /8. Their median readings are 0.31, 0.52 and 1.16 bits raw at
+  /16, /8 and /4, and their median curl/readings is 1.53, 1.31 and 0.82, falling as the readings grow (median growth from /16
+  to /4 is 3.14). That is grain.
+- 55 of the 2,560 squares (2%) grow at least 3 times to /4 and stay above 0.5 there. These are spread over bands 1 to 15.
+  Problem 18 holds 8 of them, and gaps 1, 15 and 7 are the most common. In each, one end's reading grows linearly while the
+  other's stays flat or shrinks, which is a term in those pairs. At `T₀` they read `10⁻³` to `2·10⁻²` bits a whole letter.
+- The fall along `F` (`Field::energy_fall`) on energy133's 400-site line state, read as distance from 1 of `(Φ(x − δF) −
+  Φ(x + δF))/(2δ⟨F, F⟩)` at `δ = 2^(−8)` to `2^(−12)` of a site's scale:
+  - at the opening: `5.1·10⁻³`, `1.3·10⁻³`, `3.7·10⁻⁴`, then the state's grain (about `10⁻⁴`);
+  - after the four ticks: `2.0·10⁻³`, `5.2·10⁻⁴`, then grain.
+  - The central reading falls 3.84 and 3.86 times per halving, and the one-sided one halves (1.5% and 3.5% at `2^(−8)`).
+- So along `F` the energy's fall is its first order, with an `O(δ²)` central residue, at `K = 0` and at `K = 4`. Along a
+  random direction energy133's reads scatter at the grain, since `⟨F, v⟩` is small there.
+- Device: the host, one thread, 2.5 s. It is a check of the reference's force against its own energy on one state, and the
+  card is bit-equal on both [agent-inferred].
+Receipts: `longrun_nov6/fall134.txt`, `longrun_nov6/energy_fall_force.rs`.
+
+[measurement; November 7, settle135; the unified-theory reading of 04:20] **The settling read, on the card: the sharp squares'
+ends meet at a letter's weight over 32 and part again at over 64.**
+- The central squares now read through the realization. `CardField::energy_central_squares` gives `3 + 4·steps` reads a
+  square, batched. The card's readings at /16 equal energy133's host readings bit for bit on all 55 squares, read in 5.2 s.
+- The read covers energy133's 55 squares that grow at one end, at a letter's weight over 16, 32 and 64, on the founding at
+  `T = 1`. Each reading below is scaled by `16/step`, so a linear one stays put.
+- Three squares have a linear end of at least 20 bits raw at /16 (problem, band, i, j):
+  - 0 3 55 70: linear −455, −362, −303; other −195, −357, −444.
+  - 16 3 134 143: linear −72, −122, −53; other −3, −101, −111.
+  - 17 1 291 294: linear 25, 40, 44; other 46, 47, 54.
+  - The ratio other/linear is 0.43, 0.04 and 1.83 at /16; 0.99, 0.83 and 1.17 at /32; 1.47, 2.09 and 1.25 at /64.
+- So at /32 the two ends agree within 17% in all three. Neither end is linear below /16: the raw linear end of the first square
+  falls 2.5 and 2.4 times per halving.
+- Over all 55 squares: 3 are within 20% at /64, 20 stay as far apart as at /16, and 32 are closing. Most of the 55 read under
+  a bit raw, which is the grain.
+- [inferred] There is no square whose ends stay apart while the linear end halves, so none reads as a term in its pair. The
+  readings of the sharp squares turn over between /16 and /64, which is a curvature scale under a letter's weight over 16.
+Receipts: `longrun_nov6/settle135.txt`, `settle.py`, `settle_select.py`, `settle_squares.tsv`.

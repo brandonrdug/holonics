@@ -1961,8 +1961,32 @@ pub(super) fn curl_field(args: &[String], realization: &mut dyn FieldRealization
     std::fs::create_dir(out)?;
     let void = codec.void();
     let near = holonics::hnn::tower::field::NEAR;
-    let header = if std::env::var_os("FIELD_ENERGY_CENTRAL").is_some() { "problem\tband\ti\tj\tc16_i\tc16_j\tc8_i\tc8_j\tc4_i\tc4_j\n" } else { "problem\tband\ti\tj\tlambda_i\tlambda_j\tsmall_i\tsmall_j\twide_i\twide_j\tzlambda_i\tzlambda_j\tglambda\tfloors\n" };
-    let mut rows = rows_file(&out.join("CURL.tsv"), header)?;
+    // [measurement; the unified-theory reading of November 7, 04:20] `FIELD_ENERGY_SHIFTS` (comma-separated `k`): the central
+    // squares' steps, a letter's weight over `2^k` (4, 3 and 2 where none is given); `FIELD_ENERGY_SQUARES`: a TSV whose rows
+    // `problem band i j` (answer places) are the only squares read, the settling read of chosen squares.
+    let shifts: Vec<u32> = match std::env::var("FIELD_ENERGY_SHIFTS") {
+        Ok(v) => v.split(',').map(|k| k.trim().parse::<u32>().map_err(|_| format!("FIELD_ENERGY_SHIFTS {v}: shifts are counts"))).collect::<std::result::Result<_, _>>()?,
+        Err(_) => vec![4, 3, 2],
+    };
+    let chosen: Option<std::collections::BTreeSet<(usize, usize, usize, usize)>> = match std::env::var("FIELD_ENERGY_SQUARES") {
+        Ok(path) => Some(
+            std::fs::read_to_string(&path)?
+                .lines()
+                .filter_map(|l| {
+                    let c: Vec<usize> = l.split('\t').take(4).filter_map(|v| v.parse().ok()).collect();
+                    (c.len() == 4).then(|| (c[0], c[1], c[2], c[3]))
+                })
+                .collect(),
+        ),
+        Err(_) => None,
+    };
+    let header = if std::env::var_os("FIELD_ENERGY_CENTRAL").is_some() {
+        let cells: Vec<String> = shifts.iter().flat_map(|&k| [format!("c{}_i", 1u32 << k), format!("c{}_j", 1u32 << k)]).collect();
+        format!("problem\tband\ti\tj\t{}\n", cells.join("\t"))
+    } else {
+        "problem\tband\ti\tj\tlambda_i\tlambda_j\tsmall_i\tsmall_j\twide_i\twide_j\tzlambda_i\tzlambda_j\tglambda\tfloors\n".to_string()
+    };
+    let mut rows = rows_file(&out.join("CURL.tsv"), &header)?;
     let (mut read_regions, mut written) = (0usize, 0usize);
     for k in 0..n {
         let (q, room) = opening(&codec, field, &held[k].0, b"")?;
@@ -1987,16 +2011,25 @@ pub(super) fn curl_field(args: &[String], realization: &mut dyn FieldRealization
                 picked.push((b, i, i + d));
             }
         }
+        if let Some(chosen) = &chosen {
+            picked.retain(|&(b, i, j)| chosen.contains(&(k, b, i - q.len(), j - q.len())));
+            picked.dedup();
+            if picked.is_empty() {
+                continue;
+            }
+        }
         // [measurement; the unified-theory reading of November 7, 01:37] An energy field's square is read at one base, its four
         // corners replayed at the base's halvings under its supports (`Field::energy_square_corners`), with the attribution
         // read at ε and 4ε beside it, through the realization (the card's or the host's).
         // [measurement; the unified-theory reading of November 7, 03:22] `FIELD_ENERGY_CENTRAL`: each square's central readings at
-        // one base at a letter's weight over 16, 8 and 4 (`Field::energy_central_square`), on the host.
+        // one base at a letter's weight over 16, 8 and 4 (`Field::energy_central_square`), through the realization (the card's
+        // since November 7, 04:20, or the host's).
         if field.declaration.energy && std::env::var_os("FIELD_ENERGY_CENTRAL").is_some() {
             let letter = (1u32 << 16) / field.declaration.alphabet as u32;
-            let steps = [letter >> 4, letter >> 3, letter >> 2];
-            let reads = picked.par_iter().map(|&(_, i, j)| field.energy_central_square(&truth, (i, j), void, &steps)).collect::<std::result::Result<Vec<_>, _>>().map_err(|e| e.to_string())?;
-            read_regions += 15 * picked.len();
+            let steps: Vec<u32> = shifts.iter().map(|&k| letter >> k).collect();
+            let asked: Vec<(&[usize], (usize, usize))> = picked.iter().map(|&(_, i, j)| (truth.as_slice(), (i, j))).collect();
+            let reads = realization.read_energy_central_squares(field, &asked, void, &steps).map_err(|e| e.to_string())?;
+            read_regions += (3 + 4 * steps.len()) * picked.len();
             for (&(b, i, j), square) in picked.iter().zip(&reads) {
                 let Some(r) = square else { continue };
                 let cells: Vec<String> = r.iter().flat_map(|&(x, y)| [(x << 4).to_string(), (y << 4).to_string()]).collect();
@@ -2569,34 +2602,9 @@ pub(super) fn length_field(args: &[String], realization: &mut dyn FieldRealizati
     let mut before: Option<(Vec<Vec<usize>>, Vec<Vec<bool>>, usize)> = None;
     let mut failed: Option<String> = None;
     let mut stopped = None;
-    // [measurement; agent-inferred, November 5, §16.47] `FIELD_WRITER_RUN_BITS`: the writer releases runs bounded by that many
-    // bits past each run's first place ([`Field::sample_runs`]), a declared comparison with one place a read on the same keys.
-    let run_bits: i128 = std::env::var("FIELD_WRITER_RUN_BITS").ok().and_then(|v| v.parse::<i128>().ok()).unwrap_or(0);
-    // [measurement; agent-inferred, November 5] `FIELD_WRITER_ROOM`: the writer reads the whole room past its lowest void,
-    // the region law it replaced ([`Field::sample_runs`]'s `near_tail`), a declared comparison.
-    let near_tail = std::env::var_os("FIELD_WRITER_ROOM").is_none();
-    // [measurement; agent-inferred, November 6] `FIELD_WRITER_PLACE_ORDER`: each octave drawn in place order
-    // ([`Field::sample_runs`]'s `place_order`), declared against the keyed order within an octave.
-    let place_order = std::env::var_os("FIELD_WRITER_PLACE_ORDER").is_some();
+    let WriterLaw { run_bits, near_tail, place_order, one_end, rest, spans, refine_order } = WriterLaw::from_env()?;
     // [measurement; agent-inferred, November 6] `FIELD_WRITER_LENGTHS`: a write's `ENDS.tsv` whose `written` places fix each
     // answer's length ([`Field::sample_runs`]'s `lengths`), the writer then writing content given its length.
-    // [measurement; agent-inferred, November 6] `FIELD_WRITER_ONE_END`: each answer's length drawn once from the release's first
-    // read ([`Field::sample_runs`]'s `one_end`).
-    let one_end = std::env::var_os("FIELD_WRITER_ONE_END").is_some();
-    // [measurement; agent-inferred, November 6, Brandon's lens of 17:31] `FIELD_WRITER_REST`: each answer's refine passes stop
-    // where they come to rest ([`holonics::hnn::tower::field::Field::sample_runs`]), `refine` their most.
-    let rest = std::env::var_os("FIELD_WRITER_REST").is_some();
-    // [measurement; agent-inferred, November 6, the unified-theory reading of 17:58] `FIELD_WRITER_SPANS`: every second refine
-    // pass moves spans, each opened whole and redrawn given the rest ([`holonics::hnn::tower::field::Field::sample_runs`]).
-    let spans = std::env::var_os("FIELD_WRITER_SPANS").is_some();
-    // [measurement; agent-inferred, November 6, the unified-theory reading of 21:14] `FIELD_WRITER_REFINE_ORDER`: `place` or
-    // `reversed` walks each single-place refine pass in that scan ([`holonics::hnn::tower::field::RefineOrder`]), keyed otherwise.
-    let refine_order = match std::env::var("FIELD_WRITER_REFINE_ORDER").as_deref() {
-        Ok("place") => holonics::hnn::tower::field::RefineOrder::Place,
-        Ok("reversed") => holonics::hnn::tower::field::RefineOrder::Reversed,
-        Ok(other) if other != "keyed" => return Err(format!("FIELD_WRITER_REFINE_ORDER {other}: keyed, place or reversed").into()),
-        _ => holonics::hnn::tower::field::RefineOrder::Keyed,
-    };
     let given: Option<Vec<usize>> = match std::env::var("FIELD_WRITER_LENGTHS") {
         Ok(path) => {
             let text = std::fs::read_to_string(path)?;
@@ -2744,6 +2752,241 @@ pub(super) fn length_field(args: &[String], realization: &mut dyn FieldRealizati
         started.elapsed().as_millis()
     );
     Ok(())
+}
+
+/// [definition; the unified-theory reading of November 7, 04:05, route (b)] **`contrast-field STATE STATE_SHA CODEC CODEC_SHA
+/// UNITS UNITS_SHA TRAIN TRAIN_SHA HELD HELD_SHA SECTION LAPS SWEEPS REFINE PLACES LAP_MS STOP_MS OUT`**: an energy field
+/// trained by meeting its own release. Each training problem is a state: its question, its answer (cut to the room) and its
+/// near voids, every site resolved. Each section's states are released by the writer exactly as it writes
+/// ([`WriterLaw`], `SWEEPS` and `REFINE`), each answer's length given (the same open places), keyed by the lap and the
+/// section; the section then deposits `(1/T)[∂G/∂θ(truth) − ∂G/∂θ(e′)]` ([`FieldLearner::section_contrast`]), its step fluxing.
+/// Before the first lap and after each, the exact conditional is read at `PLACES` held places ([`exact_read`]). A lap starts
+/// only where `LAP_MS` fits before `STOP_MS`; past `STOP_MS` the run writes `STATE.stopped` and stops. Writes `STATE.<lap>`
+/// and `EXACT.tsv` (private: held answers' letters).
+pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealization) -> Result<()> {
+    if args.len() != 19 {
+        return Err("contrast-field STATE STATE_SHA CODEC CODEC_SHA UNITS UNITS_SHA TRAIN TRAIN_SHA HELD HELD_SHA SECTION LAPS SWEEPS REFINE PLACES LAP_MS STOP_MS OUT".into());
+    }
+    let started = std::time::Instant::now();
+    let mut learner = FieldLearner::from_text(std::str::from_utf8(&pinned_read(&args[1], &args[2], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
+    declared_clocks(&mut learner.field);
+    if !learner.field.declaration.energy {
+        return Err("contrast-field trains a field whose faces are one energy's forces".into());
+    }
+    let units = units_of(&args[5], &args[6])?;
+    let codec = FieldCodec::from_text(std::str::from_utf8(&pinned_read(&args[3], &args[4], CODEC_BUDGET)?)?, units)?;
+    let train_text = problems_of(&pinned_read(&args[7], &args[8], READ_BUDGET as usize)?);
+    let held_text = problems_of(&pinned_read(&args[9], &args[10], READ_BUDGET as usize)?);
+    let (section, laps, sweeps, refine, places) = (positive(&args[11])?, count(&args[12])?, positive(&args[13])?, count(&args[14])?, count(&args[15])?);
+    let (lap_ms, stop_ms) = (positive(&args[16])? as u128, positive(&args[17])? as u128);
+    let out = Path::new(&args[18]);
+    std::fs::create_dir(out)?;
+    let void = codec.void();
+    let near = holonics::hnn::tower::field::NEAR;
+    let seed = u64::from_str_radix(args[2].get(..16).ok_or("a state's hash of fewer than sixteen hex digits")?, 16).map_err(|_| "a state's hash that is not hexadecimal")?;
+    let law = WriterLaw::from_env()?;
+    // Each problem's question, its answer cut to the room, and the room (`Problems`' third place).
+    let encode = |problems: &[(Vec<u8>, Vec<u8>)], field: &Field| -> Result<Problems> {
+        let mut set = Vec::with_capacity(problems.len());
+        for (question, answer) in problems {
+            let (q, room) = opening(&codec, field, question, b"")?;
+            let mut a = codec.encode(answer)?;
+            a.truncate(room);
+            if !a.is_empty() {
+                set.push((q, a, room));
+            }
+        }
+        Ok(set)
+    };
+    let train_set = encode(&train_text, &learner.field)?;
+    let held_set = encode(&held_text, &learner.field)?;
+    let (sections, _) = sections_of(&train_set, section, 0, seed);
+    let truth_of = |(q, a, room): &(Vec<usize>, Vec<usize>, usize), letters: &[usize]| -> Vec<usize> {
+        let mut t: Vec<usize> = q.iter().chain(letters).copied().collect();
+        t.extend(std::iter::repeat_n(void, near.min(room - a.len())));
+        t
+    };
+    let d = learner.field.declaration;
+    println!(
+        "FIELD_CONTRAST_DECLARATION alphabet={} width={} heads={} modes={} ticks={} reach={} rate={} log2_t={} section={section} sections={} train={} held={} places={places} sweeps={sweeps} refine={refine} run_bits={} rest={} spans={} laps_read={}",
+        d.alphabet,
+        d.width,
+        d.heads,
+        d.modes,
+        d.ticks,
+        d.reach,
+        learner.rate_bits,
+        learner.field.theta[learner.field.layout().face_temper],
+        sections.len(),
+        train_set.len(),
+        held_set.len(),
+        law.run_bits,
+        law.rest,
+        law.spans,
+        learner.laps
+    );
+    let mut exact_rows = rows_file(&out.join("EXACT.tsv"), "lap\tproblem\tplace\ttruth\tlog2_t\tface_masses\tface_total\tenergies\n")?;
+    exact_read(&learner.field, &held_set, places, &truth_of, realization, -1, &mut exact_rows)?;
+    println!("FIELD_EXACT_READ lap=-1 ms={}", started.elapsed().as_millis());
+    for lap in 0..laps {
+        let elapsed = started.elapsed().as_millis();
+        if lap > 0 && elapsed + lap_ms > stop_ms {
+            println!("FIELD_LAPS_HELD lap={lap} reason=time left={} bound={lap_ms} ms={elapsed}", stop_ms.saturating_sub(elapsed));
+            break;
+        }
+        let read = learner.laps;
+        let lap_start = std::time::Instant::now();
+        let (mut states, mut same, mut gap, mut deposited) = (0usize, 0usize, 0i128, 0usize);
+        for (n, &s) in walk(seed, read, sections.len()).iter().enumerate() {
+            let section_start = std::time::Instant::now();
+            let members = &sections[s];
+            let truths: Vec<Vec<usize>> = members.iter().map(|&i| truth_of(&train_set[i], &train_set[i].1)).collect();
+            let problems: Vec<(&[usize], usize)> = members.iter().map(|&i| (train_set[i].0.as_slice(), train_set[i].2)).collect();
+            let lengths: Vec<usize> = members.iter().map(|&i| train_set[i].1.len()).collect();
+            let key = mix(seed ^ 0xC0_7A57 << 40, read << 32 | n as u64);
+            let answers = learner
+                .field
+                .sample_runs(&problems, sweeps, refine, void, key, law.run_bits << 20, law.near_tail, law.place_order, Some(&lengths), false, law.rest, law.spans, None, law.refine_order, realization, &mut |_, _| true, &mut |_| {})
+                .map_err(|e| e.to_string())?;
+            let release_ms = section_start.elapsed().as_millis();
+            let releases: Vec<Vec<usize>> = members
+                .iter()
+                .zip(&answers)
+                .map(|(&i, written)| written.get(..train_set[i].1.len()).map(|w| truth_of(&train_set[i], w)).ok_or("a release shorter than its given length"))
+                .collect::<std::result::Result<_, _>>()?;
+            let resolved: Vec<Vec<bool>> = truths.iter().map(|t| vec![false; t.len()]).collect();
+            let truth_views: Vec<Region> = truths.iter().zip(&resolved).map(|(c, u)| Region { classes: c, unresolved: u, faces: &[], locked: &[], echo: &[], domain: None, port: None }).collect();
+            let release_views: Vec<Region> = releases.iter().zip(&resolved).map(|(c, u)| Region { classes: c, unresolved: u, faces: &[], locked: &[], echo: &[], domain: None, port: None }).collect();
+            let deposit_start = std::time::Instant::now();
+            let receipt = learner.section_contrast(&truth_views, &release_views, realization).map_err(|e| e.to_string())?;
+            let deposit_ms = deposit_start.elapsed().as_millis();
+            (states, same, gap, deposited) = (states + receipt.states, same + receipt.same, gap + receipt.gap, deposited + usize::from(receipt.deposited));
+            let micro = |v: Option<i64>| v.map_or("-".to_string(), |c| ((c as i128 * 1_000_000) / ((receipt.states as i128) << 20)).to_string());
+            println!(
+                "FIELD_CONTRAST lap={lap} n={n} states={} same={} gap_micro={} deposited={} predicted_micro={} transfer_micro={} external_micro={} release_ms={release_ms} deposit_ms={deposit_ms} ms={}",
+                receipt.states,
+                receipt.same,
+                (receipt.gap * 1_000_000) / ((receipt.states as i128) << 32),
+                receipt.deposited,
+                micro(receipt.predicted),
+                micro(receipt.transfer),
+                micro(receipt.external),
+                started.elapsed().as_millis()
+            );
+            if started.elapsed().as_millis() > stop_ms {
+                write_new(&out.join("STATE.stopped"), learner.to_text().as_bytes())?;
+                println!("FIELD_STOPPED lap={lap} sections={}/{} states={states} ms={}", n + 1, sections.len(), started.elapsed().as_millis());
+                return Ok(());
+            }
+        }
+        learner.laps += 1;
+        write_new(&out.join(format!("STATE.{lap}")), learner.to_text().as_bytes())?;
+        println!(
+            "FIELD_CONTRAST_LAP lap={lap} read={} states={states} same={same} gap_micro={} deposited={deposited}/{} lap_ms={} ms={}",
+            learner.laps,
+            if states == 0 { 0 } else { (gap * 1_000_000) / ((states as i128) << 32) },
+            sections.len(),
+            lap_start.elapsed().as_millis(),
+            started.elapsed().as_millis()
+        );
+        exact_read(&learner.field, &held_set, places, &truth_of, realization, lap as i64, &mut exact_rows)?;
+        println!("FIELD_EXACT_READ lap={lap} ms={}", started.elapsed().as_millis());
+    }
+    Ok(())
+}
+
+/// [measurement; the unified-theory reading of November 7, 04:05] **The exact conditional at held places** (lap 4's score):
+/// for the first `places` held problems, one keyed answer place `t` each, the rest at the truth. The face at `t` (`t` open,
+/// [`FieldRealization::read_faces`]) beside every letter's energy `G(rest, e_t = c)` at its own certified halvings
+/// ([`FieldRealization::read_energies`]), so `P(c | rest) ∝ 2^(−G_c/T)` is the exact conditional and the face only proposes.
+/// Each place's row goes to `rows`: the face's masses and total, `log₂ T` on `2^(−24)`, and the energies on `2^(−32)` bits.
+/// The codes and `KL(exact ‖ face)` are read from the rows at the receipt (a reading only: nothing in the run reads it).
+fn exact_read(field: &Field, held: &Problems, places: usize, truth_of: &dyn Fn(&(Vec<usize>, Vec<usize>, usize), &[usize]) -> Vec<usize>, realization: &mut dyn FieldRealization, lap: i64, rows: &mut std::fs::File) -> Result<()> {
+    let alphabet = field.declaration.alphabet;
+    let chosen: Vec<(usize, Vec<usize>, usize)> = held
+        .iter()
+        .take(places)
+        .enumerate()
+        .map(|(k, p)| {
+            let t = p.0.len() + (mix(EXACT_KEY, k as u64) as usize) % p.1.len();
+            (k, truth_of(p, &p.1), t)
+        })
+        .collect();
+    if chosen.is_empty() {
+        return Ok(());
+    }
+    let opens: Vec<Vec<bool>> = chosen.iter().map(|(_, truth, t)| (0..truth.len()).map(|s| s == *t).collect()).collect();
+    let views: Vec<Region> = chosen.iter().zip(&opens).map(|((_, truth, _), open)| Region { classes: truth, unresolved: open, faces: &[], locked: &[], echo: &[], domain: None, port: None }).collect();
+    let faces = realization.read_faces(field, &views).map_err(|e| e.to_string())?;
+    let configurations: Vec<Vec<usize>> = chosen
+        .iter()
+        .flat_map(|(_, truth, t)| {
+            (0..alphabet).map(move |c| {
+                let mut x = truth.clone();
+                x[*t] = c;
+                x
+            })
+        })
+        .collect();
+    let asked: Vec<&[usize]> = configurations.iter().map(Vec::as_slice).collect();
+    let energies = realization.read_energies(field, &asked).map_err(|e| e.to_string())?;
+    let log2_t = field.theta[field.layout().face_temper];
+    for (n, (k, truth, t)) in chosen.iter().enumerate() {
+        let face = faces[n][*t].as_ref().ok_or("an exact read's open place with no face")?;
+        let masses: Vec<String> = face.masses.iter().map(u128::to_string).collect();
+        let g: Vec<String> = energies[n * alphabet..(n + 1) * alphabet].iter().map(i128::to_string).collect();
+        let q = held[*k].0.len();
+        row(rows, &format!("{lap}\t{k}\t{}\t{}\t{log2_t}\t{}\t{}\t{}\n", t - q, truth[*t], masses.join(","), face.total, g.join(",")))?;
+    }
+    Ok(())
+}
+
+/// The exact read's key space, apart from every other draw of the run.
+const EXACT_KEY: u64 = 0xE7AC_7 << 40;
+
+/// [measurement; agent-inferred, November 7] **The writer's declared law** (`FIELD_WRITER_*`): the flags of
+/// [`holonics::hnn::tower::field::Field::sample_runs`] a write reads from its environment, one reading for every command that
+/// writes (`length-field`, and `contrast-field`'s releases, which are the writer exactly as it writes).
+pub(super) struct WriterLaw {
+    pub run_bits: i128,
+    pub near_tail: bool,
+    pub place_order: bool,
+    pub one_end: bool,
+    pub rest: bool,
+    pub spans: bool,
+    pub refine_order: holonics::hnn::tower::field::RefineOrder,
+}
+
+impl WriterLaw {
+    pub(super) fn from_env() -> Result<Self> {
+        // [measurement; agent-inferred, November 5, §16.47] `FIELD_WRITER_RUN_BITS`: the writer releases runs bounded by that many
+        // bits past each run's first place ([`Field::sample_runs`]), a declared comparison with one place a read on the same keys.
+        let run_bits: i128 = std::env::var("FIELD_WRITER_RUN_BITS").ok().and_then(|v| v.parse::<i128>().ok()).unwrap_or(0);
+        // [measurement; agent-inferred, November 5] `FIELD_WRITER_ROOM`: the writer reads the whole room past its lowest void,
+        // the region law it replaced ([`Field::sample_runs`]'s `near_tail`), a declared comparison.
+        let near_tail = std::env::var_os("FIELD_WRITER_ROOM").is_none();
+        // [measurement; agent-inferred, November 6] `FIELD_WRITER_PLACE_ORDER`: each octave drawn in place order
+        // ([`Field::sample_runs`]'s `place_order`), declared against the keyed order within an octave.
+        let place_order = std::env::var_os("FIELD_WRITER_PLACE_ORDER").is_some();
+        // [measurement; agent-inferred, November 6] `FIELD_WRITER_ONE_END`: each answer's length drawn once from the release's first
+        // read ([`Field::sample_runs`]'s `one_end`).
+        let one_end = std::env::var_os("FIELD_WRITER_ONE_END").is_some();
+        // [measurement; agent-inferred, November 6, Brandon's lens of 17:31] `FIELD_WRITER_REST`: each answer's refine passes stop
+        // where they come to rest ([`holonics::hnn::tower::field::Field::sample_runs`]), `refine` their most.
+        let rest = std::env::var_os("FIELD_WRITER_REST").is_some();
+        // [measurement; agent-inferred, November 6, the unified-theory reading of 17:58] `FIELD_WRITER_SPANS`: every second refine
+        // pass moves spans, each opened whole and redrawn given the rest ([`holonics::hnn::tower::field::Field::sample_runs`]).
+        let spans = std::env::var_os("FIELD_WRITER_SPANS").is_some();
+        // [measurement; agent-inferred, November 6, the unified-theory reading of 21:14] `FIELD_WRITER_REFINE_ORDER`: `place` or
+        // `reversed` walks each single-place refine pass in that scan ([`holonics::hnn::tower::field::RefineOrder`]), keyed otherwise.
+        let refine_order = match std::env::var("FIELD_WRITER_REFINE_ORDER").as_deref() {
+            Ok("place") => holonics::hnn::tower::field::RefineOrder::Place,
+            Ok("reversed") => holonics::hnn::tower::field::RefineOrder::Reversed,
+            Ok(other) if other != "keyed" => return Err(format!("FIELD_WRITER_REFINE_ORDER {other}: keyed, place or reversed").into()),
+            _ => holonics::hnn::tower::field::RefineOrder::Keyed,
+        };
+        Ok(Self { run_bits, near_tail, place_order, one_end, rest, spans, refine_order })
+    }
 }
 
 /// [definition; agent-inferred, November 6, the unified-theory reading of 22:52] **`found-field STATE STATE_SHA KEYS KEYS_SHA

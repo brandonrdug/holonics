@@ -2309,7 +2309,7 @@ fn the_energy_force_is_its_slope() {
         // Steps of 2^(−8) and 2^(−10) of a site's scale: a larger step reads the energy's curvature, a smaller one nears the
         // state's grain and the fall its rounding.
         for h in [8u32, 10] {
-            let (predicted, actual) = field.energy_slope(&region(), h).unwrap();
+            let (predicted, actual, _) = field.energy_fall(&region(), 0, h).unwrap();
             assert!(predicted > 0 && 20 * (actual - predicted).abs() <= predicted, "still {still} h {h}: fall {actual} against its first order {predicted} (2^(−32) bits)");
         }
     }
@@ -2493,4 +2493,38 @@ fn the_energy_material_is_g_slope() {
         }
         println!("{name}: {}", report.join("; "));
     }
+}
+
+/// [definition; the unified-theory reading of November 7, 04:05, route (b)] **A contrast step lowers the truth's energy
+/// against its release**: on the tiny and the line-shaped fields, every site resolved, the truth beside a release that wrote
+/// its open places otherwise, one section's step (the moments opening at its covector, so each entry moves by about its
+/// rate) leaves `G(truth) − G(e′)` lower, by about the step's first-order change read on that gap.
+#[test]
+fn a_contrast_step_lowers_the_truths_energy_against_its_release() {
+    let line_classes: Vec<usize> = (0..40).map(|t| (t * 7 + t / 3) % 5).collect();
+    let line_open: Vec<bool> = (0..40).map(|t| t % 9 == 4).collect();
+    for (name, field, classes, open) in [("tiny", energetic(1), CLASSES.to_vec(), OPEN.to_vec()), ("line", energetic_line(), line_classes, line_open)] {
+        let alphabet = field.declaration.alphabet;
+        let released: Vec<usize> = classes.iter().zip(&open).map(|(&c, &o)| if o { (c + 1) % alphabet } else { c }).collect();
+        let none = vec![false; classes.len()];
+        let truth = [Region { classes: &classes, unresolved: &none, faces: &[], locked: &[], echo: &[], domain: None, port: None }];
+        let release = [Region { classes: &released, ..truth[0] }];
+        let gap = |f: &Field| -> i128 { f.energy_material(&truth[0]).unwrap().1 - f.energy_material(&release[0]).unwrap().1 };
+        let before = gap(&field);
+        let mut learner = FieldLearner::new(field, 14);
+        let receipt = learner.section_contrast(&truth, &release, &mut HostField).unwrap();
+        assert_eq!(receipt.gap, before, "{name}: the receipt's gap at T = 1 is G(truth) − G(e′)");
+        assert!(receipt.deposited && receipt.states == 1 && receipt.same == 0, "{name}: {receipt:?}");
+        let after = gap(&learner.field);
+        // The first-order change on the codes' 2^(−20) bits, against the gap's move on 2^(−32).
+        let predicted = receipt.predicted.unwrap() as i128;
+        let moved = release_i(after - before, 12);
+        println!("{name}: gap {before} → {after} (2^(−32) bits), moved {moved} against its first order {predicted} (2^(−20))");
+        assert!(after < before, "{name}: the step left the gap at {after} from {before}");
+        assert!(4 * (moved - predicted).abs() <= predicted.abs(), "{name}: moved {moved} against {predicted}");
+    }
+}
+
+fn release_i(v: i128, bits: u32) -> i128 {
+    div_nearest(v, 1i128 << bits)
 }

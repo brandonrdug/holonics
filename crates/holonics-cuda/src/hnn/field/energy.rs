@@ -1128,3 +1128,128 @@ impl CardField<'_> {
         self.energy_run(field, regions)
     }
 }
+
+impl CardField<'_> {
+    /// [measurement; the unified-theory readings of November 7, 03:22 and 04:20] **Central squares at one base on the card**
+    /// (the host's `Field::energy_central_square` for each `(truth, (i, j))`): each step's readings `(z_i(a′) − z_i(a))` with
+    /// `j`'s mixture moved by `+ε(b′ − b)` less the same moved by `−ε(b′ − b)`, and `j`'s alike, every corner replayed at the
+    /// base's halvings under its supports; the squares batched by the card's memory, each batch's `3 + 4·steps` reads.
+    pub fn energy_central_squares(&mut self, field: &Field, squares: &[(&[usize], (usize, usize))], void: usize, steps: &[u32]) -> Result<Vec<Option<Vec<(i128, i128)>>>> {
+        let d = field.declaration;
+        if !d.energy || field.scale.is_some() {
+            return Err(TowerError::Refused("a central square of a field whose faces are not one energy's forces"));
+        }
+        let base_w = (1u32 << holonics::hnn::tower::field::STATE_BITS) / d.alphabet as u32;
+        if steps.iter().any(|&e| e > base_w) {
+            return Err(TowerError::Refused("a square's step past a letter's weight in the uniform mixture"));
+        }
+        if squares.iter().any(|(truth, (i, j))| i == j || *i >= truth.len() || *j >= truth.len()) {
+            return Err(TowerError::Refused("a square whose two sites are not two of its truth's"));
+        }
+        let card = self.card;
+        let started = Instant::now();
+        let (mut words, upload, face_octets) = self.upload(field, None)?;
+        let lengths: Vec<usize> = squares.iter().map(|(truth, _)| truth.len()).collect();
+        let octets = |sites: usize| energy_octets(&d, sites);
+        let batches = batches(&lengths, &octets, (self.budget - face_octets) / 5 * 4)?;
+        let mut out = Vec::with_capacity(squares.len());
+        for batch in batches {
+            if batch.is_empty() {
+                continue;
+            }
+            let peak = lengths[batch.clone()].iter().map(|&n| octets(n)).sum::<u64>();
+            self.times.peak_store = self.times.peak_store.max(peak);
+            self.times.batches += 1;
+            out.extend(self.energy_central_batch(field, &squares[batch], void, steps, &mut words)?);
+        }
+        let met = self.timed(Kind::Copy, || card.fetch(&upload.met)).map_err(device)?[0] as u128;
+        self.times.pairs += met;
+        self.times.reads += 1;
+        self.times.read_ns += started.elapsed().as_nanos();
+        Ok(out)
+    }
+
+    #[allow(clippy::type_complexity)]
+    fn energy_central_batch(&self, field: &Field, squares: &[(&[usize], (usize, usize))], void: usize, steps: &[u32], words: &mut Words) -> Result<Vec<Option<Vec<(i128, i128)>>>> {
+        let bases: Vec<Owned> = squares
+            .iter()
+            .map(|(truth, (i, j))| {
+                let mut unresolved = vec![false; truth.len()];
+                (unresolved[*i], unresolved[*j]) = (true, true);
+                Owned { classes: truth.to_vec(), unresolved, faces: Vec::new(), locked: Vec::new() }
+            })
+            .collect();
+        let (_, base) = self.energy_owned(field, &bases, words, EnergyPlan::forward())?;
+        drop(bases);
+        let lists = base.lists.ok_or(TowerError::Refused("a square's base read under another's supports"))?;
+        let halvings: Vec<Vec<Option<u32>>> = base.reads.iter().map(|r| r.halvings.clone()).collect();
+        drop(base.cells);
+        let plan = EnergyPlan { replay: Some(&halvings), base: Some(&lists), faces: true };
+        let n = squares.len();
+        let letters: Vec<(usize, usize)> = squares.iter().map(|(truth, (i, j))| (truth[*i], truth[*j])).collect();
+        let face_at = |logits: &[Vec<Option<Vec<i64>>>], s: usize, t: usize| -> Result<Vec<i64>> { logits[s][t].clone().ok_or(TowerError::Refused("a square's open place with no face")) };
+        // `i`'s face with `j` resolved or carrying a mixture (and `j`'s alike), every square of the batch at once.
+        let read = |own: bool, letter: &dyn Fn(usize) -> Option<usize>, mixture: &dyn Fn(usize) -> Option<Shares>, words: &mut Words| -> Result<Vec<Vec<i64>>> {
+            let owned: Vec<Owned> = (0..n)
+                .map(|s| {
+                    let (truth, (i, j)) = squares[s];
+                    let (at, other) = if own { (i, j) } else { (j, i) };
+                    Owned::corner(truth, at, other, letter(s), mixture(s))
+                })
+                .collect();
+            let (logits, _) = self.energy_owned(field, &owned, words, plan)?;
+            (0..n).map(|s| face_at(&logits, s, if own { squares[s].1 .0 } else { squares[s].1 .1 })).collect()
+        };
+        let zi_b = read(true, &|s| Some(letters[s].1), &|_| None, words)?;
+        let zj_a = read(false, &|s| Some(letters[s].0), &|_| None, words)?;
+        let runners: Vec<Option<(usize, usize)>> = (0..n).map(|s| field.energy_square_runners(&zi_b[s], &zj_a[s], letters[s], void)).collect();
+        let at: Vec<(usize, usize)> = (0..n).map(|s| runners[s].unwrap_or(letters[s])).collect();
+        let gap = |z: &[i64], hi: usize, lo: usize| (z[hi] - z[lo]) as i128;
+        let mut out: Vec<Vec<(i128, i128)>> = vec![Vec::with_capacity(steps.len()); n];
+        for &eps in steps {
+            let zi_up = read(true, &|_| None, &|s| Some(field.energy_square_mixture(Some((at[s].1, letters[s].1)), eps)), words)?;
+            let zi_down = read(true, &|_| None, &|s| Some(field.energy_square_mixture(Some((letters[s].1, at[s].1)), eps)), words)?;
+            let zj_up = read(false, &|_| None, &|s| Some(field.energy_square_mixture(Some((at[s].0, letters[s].0)), eps)), words)?;
+            let zj_down = read(false, &|_| None, &|s| Some(field.energy_square_mixture(Some((letters[s].0, at[s].0)), eps)), words)?;
+            for s in 0..n {
+                let ((a, b), (a2, b2)) = (letters[s], at[s]);
+                out[s].push((gap(&zi_up[s], a2, a) - gap(&zi_down[s], a2, a), gap(&zj_up[s], b2, b) - gap(&zj_down[s], b2, b)));
+            }
+        }
+        Ok(runners.iter().zip(out).map(|(r, o)| r.map(|_| o)).collect())
+    }
+
+    /// [measurement; the unified-theory reading of November 7, 04:05] **Each resolved region's energy on the card**: `G(e) =
+    /// Φ(x^K(e); e)` at its own certified halvings, on `2^(−32)` bits (the host's `Field::energy_g`), no faces read; the
+    /// regions batched by the card's memory. Every site of each region is resolved.
+    pub fn energies(&mut self, field: &Field, regions: &[&[usize]]) -> Result<Vec<i128>> {
+        let d = field.declaration;
+        if !d.energy || field.scale.is_some() {
+            return Err(TowerError::Refused("an energy read of a field whose faces are not one energy's forces"));
+        }
+        let card = self.card;
+        let started = Instant::now();
+        let (mut words, upload, face_octets) = self.upload(field, None)?;
+        let lengths: Vec<usize> = regions.iter().map(|r| r.len()).collect();
+        let octets = |sites: usize| energy_octets(&d, sites);
+        let batches = batches(&lengths, &octets, (self.budget - face_octets) / 5 * 4)?;
+        let mut out = Vec::with_capacity(regions.len());
+        let plan = EnergyPlan { faces: false, ..EnergyPlan::forward() };
+        for batch in batches {
+            if batch.is_empty() {
+                continue;
+            }
+            let peak = lengths[batch.clone()].iter().map(|&n| octets(n)).sum::<u64>();
+            self.times.peak_store = self.times.peak_store.max(peak);
+            self.times.batches += 1;
+            let owned: Vec<Owned> = regions[batch].iter().map(|c| Owned { classes: c.to_vec(), unresolved: vec![false; c.len()], faces: Vec::new(), locked: Vec::new() }).collect();
+            let (_, pass) = self.energy_owned(field, &owned, &mut words, plan)?;
+            out.extend(pass.reads.iter().map(|r| r.last));
+        }
+        let met = self.timed(Kind::Copy, || card.fetch(&upload.met)).map_err(device)?[0] as u128;
+        self.times.pairs += met;
+        self.times.reads += 1;
+        self.times.read_ns += started.elapsed().as_nanos();
+        Ok(out)
+    }
+}
