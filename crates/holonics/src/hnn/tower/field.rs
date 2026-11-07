@@ -5954,6 +5954,129 @@ impl FieldLearner {
         Ok(KernelReceipt { states: n, places, moved, weight, weight_square, least, most, whole, deposited, predicted, transfer, external, per_state, log2_a, newton, by_family, rates, g_agree, g_gap, covector: raw })
     }
 
+    /// [definition; the unified-theory reading of November 7, 20:29, law (D)] **The deposit against each place's whole
+    /// conditional**: at each block place `t` of a problem, every letter `v` of the alphabet is put at `t` with the rest at the
+    /// truth, and one material read gives each configuration's `G(x_v)` and `∂G/∂θ(x_v)` (the two relaxations a state read one
+    /// `G`, so the material read's `G` is the enumerated read's). The place's conditional `p(v) ∝ 2^(−G(x_v)/T)` (each weight on
+    /// `2^(−24)` through the exponential's navigator, released to zero below `2^(−23)` as the kernel's) weighs the deposit
+    /// `(1/T)(∂G/∂θ(t) − Σ_v p(v) ∂G/∂θ(x_v)) = (1/T) Σ_v p(v)(∂G/∂θ(t) − ∂G/∂θ(x_v))`, and the letters' temperature takes
+    /// `G(t) − E_p G`. No proposal and no coin: it is the pseudo-likelihood's gradient at that place, and it rests where the
+    /// held read's code is lowest, where the kernel's rest weighs each letter by `min(q(v)/p(v), q′(t)/p(t))`. The places are
+    /// read a chunk at a time, so a section's configurations never stand together. The receipt reads as the kernel's, with
+    /// each place a state: `weight` the truth's conditional probability `p(t)` on `2^(−24)`, `whole` the places whose truth is
+    /// the conditional's mode, `log2_a` each `log₂ p(t)` on `2^(−32)`, nothing moved.
+    pub fn section_conditional(&mut self, truth: &[Region], owners: &[usize], blocks: &[Vec<usize>], realization: &mut dyn FieldRealization) -> Result<KernelReceipt> {
+        let f = &self.field;
+        if !f.declaration.energy || f.scale.is_some() {
+            return refuse("a conditional section of a field without one energy");
+        }
+        if self.newton {
+            return refuse("a conditional section deposits through the moments, not the Newton step");
+        }
+        if truth.is_empty() || blocks.is_empty() || owners.len() != blocks.len() || owners.iter().any(|&o| o >= truth.len()) || blocks.iter().zip(owners).any(|(b, &o)| b.is_empty() || b.iter().any(|&t| t >= truth[o].classes.len() || truth[o].unresolved[t])) {
+            return refuse("a conditional section needs nonempty blocks of resolved places, each a problem's");
+        }
+        let alphabet = f.declaration.alphabet;
+        let inverse = temperature_of(-f.theta[f.layout.face_temper], &f.fine)?;
+        const OVER: &str = "a conditional covector past its 128-bit carrier";
+        let families = f.families_all();
+        let material = f.material_len();
+        let natural = |gt: &[i128], gv: &[i128]| -> Result<Vec<i128>> {
+            if gt.len() != material || gv.len() != material {
+                return refuse("a material covector of another length than the field's material");
+            }
+            let mut d = vec![0i128; material];
+            for &(start, len, grain) in &families {
+                for i in start..start + len {
+                    let scaled = release((gt[i] - gv[i]).checked_mul(inverse).ok_or(TowerError::Refused(OVER))?, MATERIAL_BITS);
+                    d[i] = if grain == MATERIAL_BITS { scaled } else { release(scaled, 40 - super::COVECTOR_BITS) };
+                }
+            }
+            Ok(d)
+        };
+        let places: Vec<(usize, usize)> = blocks.iter().zip(owners).flat_map(|(b, &o)| b.iter().map(move |&t| (o, t))).collect();
+        let resolved: Vec<Vec<bool>> = truth.iter().map(|r| vec![false; r.classes.len()]).collect();
+        let mut g = vec![0i128; material];
+        // `Σ_places Σ_v p(v)(G(t) − G(x_v))` on 2^(−32): the letters' temperature's operand.
+        let mut gap = 0i128;
+        let (mut weight, mut weight_square, mut least, mut most, mut whole) = (0i128, 0i128, i128::MAX, 0i128, 0usize);
+        let mut per_state = Vec::with_capacity(places.len());
+        let mut log2_p = Vec::with_capacity(places.len());
+        // [agent-inferred] Sixteen places a read: their `16·alphabet` configurations' covectors stand together (about 0.8 GB at
+        // this field), never a section's.
+        const CHUNK: usize = 16;
+        for chunk in places.chunks(CHUNK) {
+            let configs: Vec<Vec<usize>> = chunk
+                .iter()
+                .flat_map(|&(o, t)| {
+                    (0..alphabet).map(move |v| {
+                        let mut c = truth[o].classes.to_vec();
+                        c[t] = v;
+                        c
+                    })
+                })
+                .collect();
+            let regions: Vec<Region> = configs.iter().enumerate().map(|(i, c)| Region { classes: c, unresolved: &resolved[chunk[i / alphabet].0], faces: &[], locked: &[], echo: &[], domain: None, port: None }).collect();
+            let reads = realization.read_energy_material(f, &regions)?;
+            for (i, &(o, t)) in chunk.iter().enumerate() {
+                let reads = &reads[i * alphabet..(i + 1) * alphabet];
+                let at = truth[o].classes[t];
+                let lo = reads.iter().map(|r| r.1).min().unwrap_or(0);
+                // Each letter's `log₂ w = −(G(x_v) − G_min)/T` on 2^(−32), and its weight on 2^(−24).
+                let logs: Vec<i128> = reads.iter().map(|r| (lo - r.1).checked_mul(inverse).map(|x| release(x, MATERIAL_BITS)).ok_or(TowerError::Refused(OVER))).collect::<Result<_>>()?;
+                let w: Vec<i128> = logs
+                    .iter()
+                    .map(|&l| {
+                        let ell = l >> (ENERGY_BITS - MATERIAL_BITS);
+                        if ell >= 0 {
+                            Ok(1i128 << MATERIAL_BITS)
+                        } else if ell <= -((MATERIAL_BITS as i128 - 1) << MATERIAL_BITS) {
+                            Ok(0)
+                        } else {
+                            temperature_of(ell as i32, &f.fine)
+                        }
+                    })
+                    .collect::<Result<_>>()?;
+                let z: i128 = w.iter().sum();
+                let p: Vec<i128> = w.iter().map(|&x| div_nearest(x << MATERIAL_BITS, z.max(1))).collect();
+                let mt = &reads[at].0;
+                for (v, r) in reads.iter().enumerate() {
+                    if v == at || p[v] == 0 {
+                        continue;
+                    }
+                    for (acc, &x) in g.iter_mut().zip(&natural(mt, &r.0)?) {
+                        *acc += release(x.checked_mul(p[v]).ok_or(TowerError::Refused(OVER))?, MATERIAL_BITS);
+                    }
+                    gap += release((reads[at].1 - r.1).checked_mul(p[v]).ok_or(TowerError::Refused(OVER))?, MATERIAL_BITS);
+                }
+                let pt = p[at];
+                (weight, weight_square, least, most) = (weight + pt, weight_square + release(pt * pt, MATERIAL_BITS), least.min(pt), most.max(pt));
+                whole += usize::from(p.iter().all(|&x| x <= pt));
+                per_state.push((1, pt));
+                log2_p.push(logs[at] - (super::log2_reading_at(z.max(1) as u128, ENERGY_BITS) - ((MATERIAL_BITS as i128) << ENERGY_BITS)));
+            }
+        }
+        if self.temper_learns {
+            let over_t = release(gap.checked_mul(inverse).ok_or(TowerError::Refused(OVER))?, MATERIAL_BITS);
+            let nats = release(over_t.checked_mul(crate::hnn::keyed_modes::ln2_face()).ok_or(TowerError::Refused(OVER))?, LN2_FACE_BITS);
+            g[f.layout.face_temper] = -(nats << (40 - ENERGY_BITS));
+        }
+        let transfers: Vec<Option<i64>> = match &self.last {
+            Some(prev) => self.field.families_all().iter().map(|&fam| predicted_change_family(&self.field, &g, &prev.step, prev.halvings, fam)).collect(),
+            None => vec![None; self.field.families_all().len()],
+        };
+        let raw = g.clone();
+        let (deposited, predicted, transfer, external) = self.deposit(g)?;
+        let predictions: Vec<Option<i64>> = match &self.last {
+            Some(now) if deposited => self.field.families_all().iter().map(|&fam| predicted_change_family(&self.field, &raw, &now.step, now.halvings, fam)).collect(),
+            _ => vec![None; transfers.len()],
+        };
+        let by_family = transfers.into_iter().zip(predictions).collect();
+        let rates = self.family_rates.clone().unwrap_or_default();
+        let n = places.len();
+        Ok(KernelReceipt { states: n, places: n, moved: 0, weight, weight_square, least, most, whole, deposited, predicted, transfer, external, per_state, log2_a: log2_p, newton: None, by_family, rates, g_agree: (0, 0), g_gap: 0, covector: raw })
+    }
+
     /// [definition; agent-inferred, November 3, the tower record] **The learner grown in scale**: its field grown in scale
     /// ([`Field::scaled_up`], the key stream read on from the learner's drawn bytes), its moments kept on the fine field's
     /// material and opened at zero on the packets' field's and the glue's, which every coordinate opens at its own first

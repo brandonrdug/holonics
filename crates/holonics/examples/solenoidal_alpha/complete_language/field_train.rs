@@ -2792,6 +2792,13 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
     // [the unified-theory reading of November 7, 09:36] `FIELD_CONTRAST_PERSISTENT`: the section deposits against persistent
     // writes (lap 13's law) instead of a kernel step from the truth.
     let persistent = std::env::var_os("FIELD_CONTRAST_PERSISTENT").is_some();
+    let conditional = std::env::var_os("FIELD_CONTRAST_CONDITIONAL").is_some();
+    // `FIELD_CONTRAST_SECTIONS=N`: a declared read of the first lap's next `N` sections (theory, November 7 20:29: "the first 40
+    // sections decide"), after which the learner rests as `STATE.stopped`, as at a deadline.
+    let read_sections: usize = match std::env::var("FIELD_CONTRAST_SECTIONS") {
+        Ok(v) => v.parse().map_err(|_| "FIELD_CONTRAST_SECTIONS is a section count".to_string())?,
+        Err(_) => 0,
+    };
     // `FIELD_CONTRAST_FROM_SECTION=N`: the first lap resumes a lap that was killed after its saved state `STATE.<lap>.<N>`
     // (an exterior kill, November 7 18:14): STATE is that saved state, and the lap's walk goes on from its `N`-th section
     // with the same keys; later laps walk whole.
@@ -3098,7 +3105,24 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
                 let truth_views: Vec<Region> = truths.iter().zip(&resolved).map(|(c, u)| Region { classes: c, unresolved: u, faces: &[], locked: &[], echo: &[], domain: None, port: None }).collect();
                 let key = mix(seed ^ 0xC0_7A57 << 40, read << 32 | n as u64);
                 // [the unified-theory reading of November 7, 07:40] Each problem's truth formed once for all its blocks.
-                let receipt = learner.section_kernel_grouped(&truth_views, &owners, &blocks, key, realization).map_err(|e| e.to_string())?;
+                // [definition; the unified-theory reading of November 7, 20:29, law (D)] `FIELD_CONTRAST_CONDITIONAL`: each block place
+                // deposits against its whole conditional (`FieldLearner::section_conditional`), no proposal and no coin; its
+                // pseudo-likelihood code on the trained places is the `FIELD_CONDITIONAL` line.
+                let receipt = if conditional {
+                    let r = learner.section_conditional(&truth_views, &owners, &blocks, realization).map_err(|e| e.to_string())?;
+                    let nats: i128 = -r.log2_a.iter().map(|&l| l * LN2_Q30 >> 30).sum::<i128>();
+                    println!(
+                        "FIELD_CONDITIONAL lap={lap} n={n} places={} pl_code_milli={} truth_p_milli={} mode_milli={} ms={}",
+                        r.places,
+                        nats * 1000 / (r.places.max(1) as i128) >> 32,
+                        r.weight * 1000 / ((r.places.max(1) as i128) << holonics::hnn::tower::MATERIAL_BITS),
+                        r.whole * 1000 / r.places.max(1),
+                        section_start.elapsed().as_millis()
+                    );
+                    r
+                } else {
+                    learner.section_kernel_grouped(&truth_views, &owners, &blocks, key, realization).map_err(|e| e.to_string())?
+                };
                 // [definition; the unified-theory reading of November 7, 07:40] **The block size from the acceptance's own slope**:
                 // moved places `k·α(k)` peak where `d ln α/d ln k = −1`, so `log₂ k* += ¼(1 + slope)`, the slope of `log₂ min(1, A)`
                 // on `log₂ k` across the section's blocks (no Gaussian assumed); a section whose blocks share one size moves nothing.
@@ -3181,8 +3205,8 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
                     section_start.elapsed().as_millis(),
                     started.elapsed().as_millis()
                 );
-                coherence_block.add(&learner.field, &receipt.covector);
-                coherence_lap.add(&learner.field, &receipt.covector);
+                coherence_block.add(&receipt.covector);
+                coherence_lap.add(&receipt.covector);
                 if (n + 1) % 100 == 0 {
                     println!("FIELD_COHERENCE lap={lap} sections={coherence_from}..{} n={} {}", n + 1, coherence_block.n, coherence_block.text(&learner.field));
                     (coherence_block, coherence_from) = (Coherence::new(&learner.field), n + 1);
@@ -3208,7 +3232,8 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
                         tenth_family.iter_mut().for_each(|x| *x = (0, 0));
                     }
                 }
-                if started.elapsed().as_millis() > stop_ms {
+                let read_done = read_sections > 0 && lap == 0 && n + 1 >= from_section + read_sections;
+                if started.elapsed().as_millis() > stop_ms || read_done {
                     write_new(&out.join("STATE.stopped"), at_rate(&learner, base_rate).as_bytes())?;
                     println!("FIELD_STOPPED lap={lap} sections={}/{} states={states} ms={}", n + 1, sections.len(), started.elapsed().as_millis());
                     if coherence_block.n > 0 {
@@ -3409,7 +3434,9 @@ fn rates_text(field: &Field, rates: &[i128], sums: &[(i128, i128)]) -> String {
 /// **The sections' coherence**, family by family over a stretch of sections: `n`, `Σ_s |g_s|²` and `|Σ_s g_s|²` of the
 /// deposits before their length on the family's natural grain (each entry read `2^16` coarser so the squares keep their
 /// carrier), and `|Σg|²/(n Σ|g|²)` in thousandths: near 1000 where the sections share dynamics, near `1000/n` where each
-/// section teaches only itself. Its trend across a lap is the grokking read.
+/// section teaches only itself. Its trend across a lap is the grokking read. Kept entry by entry as well (theory, 20:10): each
+/// entry's own `α_i = (Σ_s g_i)²/(n Σ_s g_i²)`, the share of a family's moving entries with `α_i > 1/4` (a noise entry passes
+/// it at `n = 40` with chance 0.0016) and the share of the family's `Σ_i (Σ_s g_i)²` those entries carry.
 struct Coherence {
     n: usize,
     sum: Vec<i128>,
@@ -3418,19 +3445,17 @@ struct Coherence {
 
 impl Coherence {
     fn new(field: &Field) -> Self {
-        Self { n: 0, sum: vec![0; field.material_len()], squares: vec![0; field.families_all().len()] }
+        Self { n: 0, sum: vec![0; field.material_len()], squares: vec![0; field.material_len()] }
     }
-    fn add(&mut self, field: &Field, g: &[i128]) {
+    fn add(&mut self, g: &[i128]) {
         if g.len() != self.sum.len() {
             return;
         }
         self.n += 1;
-        for (f, &(start, len, _)) in field.families_all().iter().enumerate() {
-            for i in start..start + len {
-                let q = g[i] >> 16;
-                self.squares[f] = self.squares[f].saturating_add(q.saturating_mul(q));
-                self.sum[i] = self.sum[i].saturating_add(g[i]);
-            }
+        for (i, &x) in g.iter().enumerate() {
+            let q = x >> 16;
+            self.squares[i] = self.squares[i].saturating_add(q.saturating_mul(q));
+            self.sum[i] = self.sum[i].saturating_add(x);
         }
     }
     fn text(&self, field: &Field) -> String {
@@ -3439,13 +3464,25 @@ impl Coherence {
         field
             .families_all()
             .iter()
-            .enumerate()
-            .filter(|(f, fam)| fam.1 > 0 && self.squares[*f] > 0)
-            .map(|(f, &(start, len, _))| {
+            .filter(|fam| fam.1 > 0)
+            .filter_map(|&(start, len, _)| {
+                let range = start..start + len;
+                let squares: i128 = range.clone().map(|i| self.squares[i]).fold(0, i128::saturating_add);
+                if squares == 0 {
+                    return None;
+                }
                 let name = names.iter().find(|&&(_, at)| at == start).map_or("?", |&(n, _)| n);
-                let whole: i128 = (start..start + len).map(|i| self.sum[i] >> 16).fold(0i128, |a, q| a.saturating_add(q.saturating_mul(q)));
-                let coherence = whole.checked_mul(1000).map_or(-1, |w| w / n.saturating_mul(self.squares[f]).max(1));
-                format!("{name}={}:{}:{coherence}", self.squares[f], whole)
+                let pull = |i: usize| -> i128 {
+                    let q = self.sum[i] >> 16;
+                    q.saturating_mul(q)
+                };
+                let whole: i128 = range.clone().map(pull).fold(0, i128::saturating_add);
+                let coherence = whole.checked_mul(1000).map_or(-1, |w| w / n.saturating_mul(squares).max(1));
+                let moving = range.clone().filter(|&i| self.squares[i] > 0).count();
+                let above: Vec<usize> = range.filter(|&i| self.squares[i] > 0 && pull(i).saturating_mul(4) > n.saturating_mul(self.squares[i])).collect();
+                let carried: i128 = above.iter().map(|&i| pull(i)).fold(0, i128::saturating_add);
+                let carried_milli = carried.checked_mul(1000).map_or(-1, |c| c / whole.max(1));
+                Some(format!("{name}={squares}:{whole}:{coherence}:{}/{moving}:{carried_milli}", above.len()))
             })
             .collect::<Vec<_>>()
             .join(" ")
