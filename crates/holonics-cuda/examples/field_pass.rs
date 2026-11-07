@@ -38,6 +38,11 @@ fn run(args: &[String]) -> Result<()> {
     if std::env::var_os("FIELD_PHASES").is_some() {
         card.trace_phases();
     }
+    // [agent-inferred, November 7] A declared reading (`FIELD_EVENTS`): every launch timed on the card's own clock
+    // (`CardField::stamp`), printed at the end as `FIELD_EVENT` lines.
+    if std::env::var_os("FIELD_EVENTS").is_some() {
+        card.stamp()?;
+    }
     let memory = opened.census().memory;
     println!("FIELD_CARD_OPEN card={} free={} total={} batch_budget={}", opened.census().name, memory.free_bytes, memory.total_bytes, card.budget());
     let started = Instant::now();
@@ -64,6 +69,15 @@ fn run(args: &[String]) -> Result<()> {
         for (name, marks, ns) in phases {
             println!("FIELD_PHASE name={name} marks={marks} ms={} us_a_mark={}", ns / 1_000_000, ns / 1_000 / (marks as u128).max(1));
         }
+    }
+    if let Some(kernels) = card.stamped() {
+        let total: u128 = kernels.values().map(|v| v.1).sum();
+        let mut rows: Vec<_> = kernels.iter().collect();
+        rows.sort_by_key(|(_, v)| std::cmp::Reverse(v.1));
+        for (entry, (calls, ns)) in rows {
+            println!("FIELD_EVENT entry={entry} launches={calls} card_us={} us_a_launch={} share_permille={}", ns / 1_000, ns / 1_000 / (*calls as u128).max(1), ns * 1000 / total.max(1));
+        }
+        println!("FIELD_EVENT_SPLIT card_kernels_ms={} elapsed_ms={}", total / 1_000_000, started.elapsed().as_millis());
     }
     if let Some(p) = card.profiled() {
         let kernels: u128 = p.kernels.values().map(|v| v.1).sum();

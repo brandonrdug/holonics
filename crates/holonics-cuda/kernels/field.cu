@@ -4482,6 +4482,15 @@ extern "C" __global__ void field_scale_scatter(FieldWords w, const int64_t *src,
     }
 }
 
+// [measurement; agent-inferred, November 7] **The card's own clock at a point of its stream** (`FIELD_EVENTS`, a reading
+// only): `%globaltimer`, the card's nanoseconds as an integer, written to `slot` by one thread. Launched before and after a
+// timed launch on the same stream, so the difference is the launch's time on the card with no host synchronization between.
+extern "C" __global__ void field_stamp(uint64_t *slot) {
+    uint64_t t;
+    asm volatile("mov.u64 %0, %%globaltimer;" : "=l"(t));
+    *slot = t;
+}
+
 // -------------------------------------------------------------------------------------------
 // the energy field (`holonics::hnn::tower::field::energy`)
 

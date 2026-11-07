@@ -706,7 +706,23 @@ pub struct CardField<'c> {
     clock_out: std::cell::RefCell<Vec<BlankClocks>>,
     /// The host's wall time between marks, by name (`FIELD_PHASES`), no stream synchronized.
     phases: Option<std::cell::RefCell<(Instant, std::collections::BTreeMap<&'static str, (u64, u128)>)>>,
+    /// The card's own clock around every launch, by entry (`FIELD_EVENTS`, [`CardField::stamp`]).
+    stamps: Option<std::cell::RefCell<Stamps<'c>>>,
 }
+
+/// [measurement; agent-inferred, November 7] **Each launch timed on the card's own clock** (`CardField::stamp`, a reading
+/// only): a `field_stamp` launch before and after every launch on the same stream writes `%globaltimer` (integer
+/// nanoseconds) into a slot pair, with no host synchronization between launches, so a kernel's time is read without the
+/// synchronized profile's per-launch host latency (`FieldProfile`). The pending slots are read back when the buffer fills
+/// and when the reading is taken. It moves nothing the field computes.
+struct Stamps<'c> {
+    slots: CardBuffer<'c, u64>,
+    pending: Vec<&'static str>,
+    kernels: std::collections::BTreeMap<&'static str, (u64, u128)>,
+}
+
+/// The launches a stamp buffer holds before it is read back.
+const STAMP_LAUNCHES: usize = 1 << 14;
 
 impl<'c> CardField<'c> {
     /// Load the field's image; a batch's stores take the card's free memory at its open less the
@@ -718,7 +734,43 @@ impl<'c> CardField<'c> {
         let (free, total) = (memory.free_bytes as u64, memory.total_bytes as u64);
         let used = total.saturating_sub(free);
         let budget = free.min(BOARD_CEILING.saturating_sub(used)).saturating_sub(MARGIN);
-        Ok(Self { card, module, budget, times: FieldTimes::default(), profile: None, pools: Default::default(), held_questions: Default::default(), covector_shares: Default::default(), row_questions: Default::default(), row_out: Default::default(), row_cov: Default::default(), held_cells: Default::default(), tick_reads: Default::default(), near_sites: Default::default(), near_out: Default::default(), clock_sites: Default::default(), clock_out: Default::default(), phases: None })
+        Ok(Self { card, module, budget, times: FieldTimes::default(), profile: None, pools: Default::default(), held_questions: Default::default(), covector_shares: Default::default(), row_questions: Default::default(), row_out: Default::default(), row_cov: Default::default(), held_cells: Default::default(), tick_reads: Default::default(), near_sites: Default::default(), near_out: Default::default(), clock_sites: Default::default(), clock_out: Default::default(), phases: None, stamps: None })
+    }
+
+    /// Time every launch on the card's own clock from here on ([`Stamps`]).
+    pub fn stamp(&mut self) -> std::result::Result<(), DeviceError> {
+        let slots = self.card.alloc::<u64>(2 * STAMP_LAUNCHES)?;
+        self.stamps = Some(std::cell::RefCell::new(Stamps { slots, pending: Vec::with_capacity(STAMP_LAUNCHES), kernels: Default::default() }));
+        Ok(())
+    }
+
+    /// Read the pending stamps back into their entries' sums.
+    fn stamps_drain(&self, stamps: &mut Stamps<'c>) -> std::result::Result<(), DeviceError> {
+        if stamps.pending.is_empty() {
+            return Ok(());
+        }
+        let times = self.card.fetch_range(&stamps.slots, 0, 2 * stamps.pending.len())?;
+        for (k, entry) in stamps.pending.drain(..).enumerate() {
+            let slot = stamps.kernels.entry(entry).or_insert((0, 0));
+            slot.0 += 1;
+            slot.1 += times[2 * k + 1].saturating_sub(times[2 * k]) as u128;
+        }
+        Ok(())
+    }
+
+    /// The card-clock reading so far, by entry: launches and nanoseconds on the card.
+    pub fn stamped(&self) -> Option<std::collections::BTreeMap<&'static str, (u64, u128)>> {
+        let stamps = self.stamps.as_ref()?;
+        let mut s = stamps.borrow_mut();
+        self.stamps_drain(&mut *s).ok()?;
+        Some(s.kernels.clone())
+    }
+
+    /// One stamp of the card's clock into `slot` on the stream.
+    fn stamp_at(&self, slots: &CardBuffer<'c, u64>, slot: usize) -> Result<()> {
+        let function = self.module.function("field_stamp").map_err(|e| device(e.into()))?;
+        let mut at = slots.device_ptr() + 8 * slot as u64;
+        function.launch_on_shared(self.card.stream(), Dim3::x(1), Dim3 { x: 1, y: 1, z: 1 }, 0, &mut [arg(&mut at)]).map_err(|e| device(e.into()))
     }
 
     /// The octets a batch's weight and contact stores may take.
@@ -843,7 +895,23 @@ impl<'c> CardField<'c> {
             }
             None => None,
         };
+        let stamped = match &self.stamps {
+            Some(stamps) => {
+                let mut s = stamps.borrow_mut();
+                if s.pending.len() == STAMP_LAUNCHES {
+                    self.stamps_drain(&mut *s).map_err(device)?;
+                }
+                let k = s.pending.len();
+                self.stamp_at(&s.slots, 2 * k)?;
+                s.pending.push(entry);
+                Some(2 * k + 1)
+            }
+            None => None,
+        };
         function.launch_on_shared(self.card.stream(), grid, Dim3 { x: block, y: 1, z: 1 }, shared, params).map_err(|e| device(e.into()))?;
+        if let (Some(stamps), Some(slot)) = (&self.stamps, stamped) {
+            self.stamp_at(&stamps.borrow().slots, slot)?;
+        }
         if let (Some(profile), Some(started)) = (&self.profile, started) {
             self.card.synchronize().map_err(device)?;
             let mut p = profile.borrow_mut();
