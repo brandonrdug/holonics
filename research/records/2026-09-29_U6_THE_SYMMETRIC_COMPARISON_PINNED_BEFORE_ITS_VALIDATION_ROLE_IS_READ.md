@@ -2,7 +2,7 @@
 
 **Date:** 2026-09-29. Refs #63, #73, #148. **Scope:** item 2 of
 [the text chart's audit](2026-09-29_THE_TEXT_CHART_AUDITED_ONE_PREDICTOR_SEEN_CONVERSATIONS_AND_NO_ARITHMETIC.md)
-(§4), under [THE_REBUILD U6](../../docs/plans/THE_REBUILD.md#u6-the-text-chart), and its one
+(§4), under [THE_REBUILD U6](https://github.com/brandonrdug/holonics/blob/0a051ae5/docs/plans/THE_REBUILD.md#u6-the-text-chart), and its one
 measured run on item 1's split by conversation. The pins below (§1) were committed before either
 role's stream was generated. The projection (§2) follows the streams and precedes the run. The
 receipt (§3) follows the run.

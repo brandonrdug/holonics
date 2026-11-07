@@ -1,6 +1,6 @@
 # F4: the development-family split and the release gate
 
-**Date:** 2026-09-27. **Scope:** F4 in [THE_REBUILD](../../docs/plans/THE_REBUILD.md#f4-release-campaign-5-into-step-8), #73 and #148. This is the pin **before F4 validation**. The existing curated tail, standing cut and wide cut are development receipts, not this validation.
+**Date:** 2026-09-27. **Scope:** F4 in [THE_REBUILD](https://github.com/brandonrdug/holonics/blob/0a051ae5/docs/plans/THE_REBUILD.md#f4-release-campaign-5-into-step-8), #73 and #148. This is the pin **before F4 validation**. The existing curated tail, standing cut and wide cut are development receipts, not this validation.
 
 ## The pinned families
 

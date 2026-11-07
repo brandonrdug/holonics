@@ -26,7 +26,7 @@ a cycle, the aeon boundary is the collapse, and the first law over the aeon is
 `aeon::EnclosedLedger`. `Field` is the Holarchy's declaration, a chart of it, and
 `Reference::expose` is a cut's passage through the resident's aeons. The equations below are that
 Holarchy's element relations and that passage. The receiver's epochs and the pump period as a
-cycle are joined in the code since the unified plan's U5; the one join it does not yet make, the
+cycle are joined in the code since the [unified plan](https://github.com/brandonrdug/holonics/blob/0a051ae5/docs/plans/THE_REBUILD.md#u5-clocks-are-aeons)'s U5; the one join it does not yet make, the
 tree as a Holon at ports, is `[open]` in THE_MACHINE.
 
 Its field is chains of complex parametron rings joined by helical pair contacts. Athena is its
@@ -41,7 +41,7 @@ source/current/material/receiver construction.
 [lessons record](../research/records/2026-09-24_LESSONS_FROM_THE_WORKBENCH_AND_ATHENA_PROTOTYPES.md)
 keeps what it did and did not achieve. Step 4 ports its equations one law at a time, never its
 per-occurrence tape, frozen-cut replay, update journals, slot/session wires, byte or nibble
-codecs, or whole foreign Q/K/V graphs ([rules](plans/THE_REBUILD.md#rules-of-the-rebuild)).
+codecs, or whole foreign Q/K/V graphs ([rules](plans/THE_REBUILD.md#4-rules-of-the-rebuild)).
 
 [definition] A Transformer is also executable generating mathematics. Its architecture supplies
 compositions of contractions, attention, reactions and normalizations; its parameters and
@@ -203,7 +203,7 @@ incidence before any phase/sign/intensity receiver, so encoding keeps real timin
 orientation; it assigns no pump frequency to a character and imposes no torus on every datum.
 
 [proved-derived; formal-checked for the squares; agent-inferred for the chart] **The founding law**
-(`hnn::encoding`, THE_REBUILD U6, the [pin](../research/records/2026-09-29_HOLONIC_ENCODING_FOR_THE_FIELD_PINNED_BEFORE_ITS_RUN.md); Lean
+(`hnn::encoding`, [THE_REBUILD U6](https://github.com/brandonrdug/holonics/blob/0a051ae5/docs/plans/THE_REBUILD.md#u6-the-text-chart), the [pin](../research/records/2026-09-29_HOLONIC_ENCODING_FOR_THE_FIELD_PINNED_BEFORE_ITS_RUN.md); Lean
 `HNN/Encoding`). A passage chart (a finite chart, the admitted transports it knows, the injection
 `B` of the exterior cells, the receiving forms `ρ`, the openings) founds its minimal realization
 with the one closure owner (`receiver::population::birth::Closure`): forward from the openings under
@@ -1237,7 +1237,7 @@ induction.
 
 ### The loaded ring's mode quotient
 
-[definition; agent-inferred, U2 of [the rebuild](plans/THE_REBUILD.md#u2-one-retention-contract-and-f0s-memory)]
+[definition; agent-inferred, U2 of [the rebuild](https://github.com/brandonrdug/holonics/blob/0a051ae5/docs/plans/THE_REBUILD.md#u2-one-retention-contract-and-f0s-memory)]
 A loaded ring's word-local state `x = (u, w)` ticks as one exact linear system per pump phase,
 `x′ = T_t x + B_t e`, `s′ = ρ_t x + D_t e`, and its modes descend to their future quotient: the
 period lift reads the admitted future, one chart for every phase releases at most the phase

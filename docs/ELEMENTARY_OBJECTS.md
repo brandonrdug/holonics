@@ -48,7 +48,7 @@ of the contemporary constitution, checked by `Holon::interconnect`'s typed gluin
 refuses with the gluing defect). The resident keeps that chart's parametric orientation, the complex
 its aeons run on, and not the joined constituents; the `Word` executes the passage. Constituent-native
 execution and a resident that holds the whole therefore remain consuming joins, named by the
-[library spine](plans/THE_REBUILD.md#the-library-spine-october-5). Admission is itself a test:
+[library spine](https://github.com/brandonrdug/holonics/blob/0a051ae5/docs/plans/THE_REBUILD.md#the-library-spine-october-5). Admission is itself a test:
 `Holon::interconnect` refuses a loaded quartic element (`joining loaded quartic elements`) until the
 joined nonlinear constitutive relation is retained, so the executed quartic component is not yet a
 constituent of an interconnection. Owners: [`Field::holarchy`](../crates/holonics/src/hnn/field.rs),
@@ -887,7 +887,7 @@ whole there keeps the descent (`observe_eq_decode_remainder`, `phaseAgreement_of
 
 <a id="the-retention-contract"></a>
 <a id="collapse-relative-to-the-admitted-future"></a>
-[definition; agent-inferred, U2 of [the rebuild](plans/THE_REBUILD.md#u2-one-retention-contract-and-f0s-memory), September 28]
+[definition; agent-inferred, U2 of [the rebuild](https://github.com/brandonrdug/holonics/blob/0a051ae5/docs/plans/THE_REBUILD.md#u2-one-retention-contract-and-f0s-memory), September 28]
 **The retention contract.** Every collapse the machine takes is an instance of one law,
 `Standing.standingLaw_exists_iff_future_factors`: a retention is lawful exactly when every admitted
 future face, under every admitted action word and deposit, factors through it. No dense global
@@ -1531,7 +1531,7 @@ them, read as a family until the byte-tree text line retired on September 30. Th
 navigators' key and survivor families and composed eggs are others. This guide owns the statement;
 [THE_MACHINE](THE_MACHINE.md) and [HNN_FORMULA](HNN_FORMULA.md) cite it. What is built, and what is
 not:
-- **The HNN's receiving face is the population's** (THE_REBUILD U1). Its receiving face reads the
+- **The HNN's receiving face is the population's** ([THE_REBUILD U1](https://github.com/brandonrdug/holonics/blob/0a051ae5/docs/plans/THE_REBUILD.md#u1-one-machine-the-receiving-composition-at-the-fields-port)). Its receiving face reads the
   tree at the receiving locus (`hnn::receiving`), and scores the population at that port
   (`receiver::population::port::PortPopulation`, declared by `hnn::receiving::receiving_population`)
   over the tree's face and the combined tree-plus-wave face at ½/½, cell by cell, including the
@@ -1545,7 +1545,7 @@ not:
   general `∏_h Σ_f π_f L_(f,h) ≠ Σ_f π_f ∏_h L_(f,h)`.
 - **The field is a family at its own port, dormant for text.** Its combined face is the receiver's
   population's second family at the HNN's port (U1). F2's adoption gate
-  ([THE_REBUILD F2](plans/THE_REBUILD.md#f2-the-field-as-a-family-step-4-73), September 28) read
+  ([THE_REBUILD F2](https://github.com/brandonrdug/holonics/blob/0a051ae5/docs/plans/THE_REBUILD.md#f2-the-field-as-a-family-step-4-73), September 28) read
   it on fresh validation families against the population over the tree alone. There it codes
   strictly shorter, by `10` to `10 + 1/16` bits on 2,052 cells. Its work fails the budgets:
   `107 rem 21` ms a receiving epoch, where the tree's whole passage takes 432 ms. So it is not

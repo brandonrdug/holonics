@@ -1,6 +1,6 @@
 # F5: Athena-0's development and blind gate
 
-**Date:** 2026-09-27. **Scope:** [THE_REBUILD F5](../../docs/plans/THE_REBUILD.md#f5-athena-0-the-first-product-outcome-step-8-148), #148 and #73. This pin precedes F5 retrospective selection or any evaluation reading. F4's failed release gate does not prevent building this development-only product surface; it does prevent opening the evaluation partition.
+**Date:** 2026-09-27. **Scope:** [THE_REBUILD F5](https://github.com/brandonrdug/holonics/blob/0a051ae5/docs/plans/THE_REBUILD.md#f5-athena-0-the-first-product-outcome-step-8-148), #148 and #73. This pin precedes F5 retrospective selection or any evaluation reading. F4's failed release gate does not prevent building this development-only product surface; it does prevent opening the evaluation partition.
 
 ## Partition and acceptance
 

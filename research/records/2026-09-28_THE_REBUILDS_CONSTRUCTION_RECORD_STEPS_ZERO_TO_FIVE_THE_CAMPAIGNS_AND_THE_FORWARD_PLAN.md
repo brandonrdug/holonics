@@ -1,8 +1,8 @@
 # The rebuild's construction record: steps 0–5, the campaigns and the forward plan
 
 **Moved here September 28, 2026**, word for word from [THE_REBUILD](../../docs/plans/THE_REBUILD.md) at
-commit `2d34b819`, when the [unified plan](../../docs/plans/THE_REBUILD.md#the-unified-plan-september-28)
-replaced its order ([the audits and review](../../docs/plans/THE_REBUILD.md#the-unified-plan-september-28)).
+commit `2d34b819`, when the [unified plan](https://github.com/brandonrdug/holonics/blob/0a051ae5/docs/plans/THE_REBUILD.md#the-unified-plan-september-28)
+replaced its order ([the audits and review](https://github.com/brandonrdug/holonics/blob/0a051ae5/docs/plans/THE_REBUILD.md#the-unified-plan-september-28)).
 This is history: the laws it states live in their guides and owners, which its text cites, and the
 live gates are the plan's. The measurement protocol and the guards moved to
 [THE_MACHINE](../../docs/THE_MACHINE.md#measurement).
@@ -32,7 +32,7 @@ live gates are the plan's. The measurement protocol and the guards moved to
 This plan replaces the [pre-reset restructure plan](https://github.com/brandonrdug/holonics/blob/13f8c734/docs/plans/THE_REPOSITORY_RESTRUCTURE.md).
 The specification below records the campaign-1 construction. The laws decided since live in their
 guides and owners, the choices they superseded are listed in [(h)](#h-retired-choices), and
-[(i)](../../docs/plans/THE_REBUILD.md#the-decisions-index) maps the former numbered Decisions to their owners. Historical measurements
+[(i)](https://github.com/brandonrdug/holonics/blob/0a051ae5/docs/plans/THE_REBUILD.md#the-decisions-index) maps the former numbered Decisions to their owners. Historical measurements
 retain their original law and population. [CONSTRUCTION_STATE](../../CONSTRUCTION_STATE.md) is the
 short current position; dated records hold the evidence.
 
@@ -594,7 +594,7 @@ archive root. Brandon's Metal port stays on its own branch, `codex/apple-silicon
    do-not-port list.
 5. **The resident HNN in `holonics-cuda::hnn`** (advancing with step 4 since September 25 by the rule "the hardware surfaces advance with the laws"; campaign 1's execution port runs resident, `holonics_cuda::hnn::Resident`, with every return equal to the host reference's). Kernels are ported per law under the hardware law,
    each with its parity check against the host reference. The device debts of #76 (#12–#15, #50)
-   are paid here. The resident population is [F3](../../docs/plans/THE_REBUILD.md#f3-the-resident-population-step-5-76).
+   are paid here. The resident population is [F3](https://github.com/brandonrdug/holonics/blob/0a051ae5/docs/plans/THE_REBUILD.md#f3-the-resident-population-step-5-76).
 6. **Targets, physics and extraction.**
    - The targets continue as landmark discovery on the rebuilt library and their Lean. The egg's
      Legendre period and modular `j`, the Farey and Ford faces, the torus knots, the Fisher
@@ -615,8 +615,8 @@ archive root. Brandon's Metal port stays on its own branch, `codex/apple-silicon
      constructions, and the `BivariateSeries`/`LaurentBody` abbreviations, checked at their owners.
    - Fix stale owner citations when their consumer changes, with the atlas in the same commit.
 8. **Applications** (#148: a workbench, an Athena application, a simulator), rebuilt on the library
-   under the lessons record's requirements. The first outcome is [Athena-0, F5](../../docs/plans/THE_REBUILD.md#f5-athena-0-the-first-product-outcome-step-8-148),
-   after release by egg packing ([F4](../../docs/plans/THE_REBUILD.md#f4-release-campaign-5-into-step-8)).
+   under the lessons record's requirements. The first outcome is [Athena-0, F5](https://github.com/brandonrdug/holonics/blob/0a051ae5/docs/plans/THE_REBUILD.md#f5-athena-0-the-first-product-outcome-step-8-148),
+   after release by egg packing ([F4](https://github.com/brandonrdug/holonics/blob/0a051ae5/docs/plans/THE_REBUILD.md#f4-release-campaign-5-into-step-8)).
    - An outcome is one of:
      - a trainable model;
      - a first usable Athena;

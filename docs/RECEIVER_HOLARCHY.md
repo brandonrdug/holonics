@@ -275,7 +275,7 @@ them from here.
 
 ## The retired byte-tree text line
 
-[definition] THE_REBUILD U6's order (item C.5) retired the byte-tree text line from
+[definition] [THE_REBUILD U6](https://github.com/brandonrdug/holonics/blob/0a051ae5/docs/plans/THE_REBUILD.md#u6-the-text-chart)'s order (item C.5) retired the byte-tree text line from
 `receiver::population` and `compression::landmark::context` on September 30 (history at
 [`f5fd8f3b`](https://github.com/brandonrdug/holonics/tree/f5fd8f3b); the
 [antipattern record](../research/records/2026-09-29_ANTIPATTERN_CATERED_MACHINERY_A_TASKS_SOLUTION_ROUTINE_NEVER_STANDS_IN_FOR_LEARNING.md),

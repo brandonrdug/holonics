@@ -347,7 +347,7 @@ moves, so a better-learned `R` also meets different features.
 ([record](2026-09-26_CAMPAIGN_ONE_MEETS_ITS_CRITERION_THE_TREE_RECEIVES_AND_THE_WAVE_IS_WEIGHED.md)),
 except Decision 26's indexed, normalized open, which stands in `hnn::moment`; their one-line
 retirements are in THE_REBUILD's [(h) Retired choices](2026-09-28_THE_REBUILDS_CONSTRUCTION_RECORD_STEPS_ZERO_TO_FIVE_THE_CAMPAIGNS_AND_THE_FORWARD_PLAN.md#h-retired-choices), and "Decision N" resolves through its
-[Decisions index](../../docs/plans/THE_REBUILD.md#the-decisions-index).
+[Decisions index](https://github.com/brandonrdug/holonics/blob/0a051ae5/docs/plans/THE_REBUILD.md#the-decisions-index).
 
 ### Decision 26
 
