@@ -48,6 +48,24 @@ fn run(args: &[String]) -> Result<()> {
     let started = Instant::now();
     let result = match mode.as_str() {
         "parity" | "time" => exterior::run_field_parity(&rest[1..], &mut card),
+        // [definition; Brandon, November 7 19:22] `FIELD_HOST_LANES`: the energy reads split between the host's cores and
+        // the card at once (`LanesField`), the same bits at any partition; its receipt is the `FIELD_LANES` line.
+        "train" if std::env::var_os("FIELD_HOST_LANES").is_some() => {
+            let mut lanes = holonics::hnn::tower::field::LanesField::new(&mut card);
+            let r = exterior::run_field_with_realization(&rest[1..], &mut lanes);
+            println!(
+                "FIELD_LANES splits={} host_regions={} card_regions={} host_ms={} card_ms={} split_wall_ms={} share_permille={} host_threads={}",
+                lanes.splits,
+                lanes.host_regions,
+                lanes.card_regions,
+                lanes.host_us / 1000,
+                lanes.card_us / 1000,
+                lanes.wall_us / 1000,
+                lanes.share() * 1000 >> 16,
+                rayon::current_num_threads()
+            );
+            r
+        }
         "train" => exterior::run_field_with_realization(&rest[1..], &mut card),
         _ => Err("field_pass parity|time|train complete-language COMMAND ARGS…".into()),
     };

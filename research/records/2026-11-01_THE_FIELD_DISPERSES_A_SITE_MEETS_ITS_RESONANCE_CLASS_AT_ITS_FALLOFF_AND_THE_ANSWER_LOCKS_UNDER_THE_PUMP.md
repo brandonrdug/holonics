@@ -4635,3 +4635,35 @@ length is read from the writes' own fluctuation, and then they raise the held co
   closing read at `T` and after the descent.
 Receipts: `longrun_nov6/write.sh`, `write.txt`, `lap13.sh`, `lap13.txt`, `lap13b.sh`, `lap13b.txt`, `lap13c.sh`,
 `lap13c.txt`, `lap13d.sh`, `lap13d.txt`, `lap13d_held.sh`, `tempread.py`, `tempread.txt`, `lap12.sh`.
+
+[measurement; November 7, lap 12 on the card, the lanes check and the card's launches; theory's readings of 16:56 to 19:51]
+**Single places with their own coins lower the held code to 2.501 nats a byte by section 680, and the lap's second half buys
+nothing; the two relaxations a state read one `G`; the host's cores add nothing beside the card at this kernel.**
+- Lap 12 (one place a block, each its own coin; from the k = 4 lap's end) ran 819 sections, was killed with the session that
+  launched it near 18:14, and resumed from its hourly saved state at section 680 with the same walk and keys
+  (`FIELD_CONTRAST_FROM_SECTION`; the resumed state read the saved held rows bit for bit). Acceptance was 0.42.
+- The held enumerated code: 2.770 at the start, 2.501 at section 680 (−0.269 ± 0.093), 2.543 at 1,355, and 2.623 at the
+  end (+0.122 ± 0.095 from 680). The sections ran 5.5 s on average, against the 4.04 s the 33-section development read
+  projected (sections differ in places, 3.6 to 7.6 s a hundred).
+- Read at `T·2^(j/4)` from the same enumerated `G`, each state's best held code is at its own `T` or a quarter-bit cooler
+  (2.482 at 680, 2.533 at 1,355, 2.623 at the end, at `j = −1, −1, 0`): no temperature returns the end to 680's code, so
+  the second half's loss is in `G`'s shape, as at lap 13. `T` learned: `log₂ T` went from 9.667 to 9.467 by 680 and held.
+- The families' lengths shortened from the lap's start to section 680 and grew again late. From 680 to the end the step grew
+  5.9 times in `q`, 6.1 in `read`, 3.8 in `probe` and 3.4 in `after`, while `lift_bias`'s shrank 41 times.
+- The two relaxations a state (the faces read at the open structure, places carrying their letters whole, and the material
+  read at the resolved one) read the same `G` in bits at all 14,233 states of 33 sections (`KernelReceipt::g_agree`).
+- `LanesField` splits each energy read's regions between the host's cores and the card at once and joins them in order.
+  Over 39 sections from 680 every section line equalled the card-only run's but its time. It took 215.2 s against 214.9 s
+  card alone (0.998×): the partition settled at a 2.3% host share, the card reading a region in 4.3 ms against about 144 ms
+  of a host lane's time at 20 threads. It stays off.
+- The card's own clock over 33 sections (`FIELD_EVENTS`): kernels 104.3 s of 120.6 s, in 287,877 launches (about 8,700 a
+  section, 362 µs each). The faces read's tangent passes lead: `field_energy_tangent_rows` 26.9 s and
+  `field_energy_tangent_columns` 9.5 s. Then the material reverse's `field_contact_columns` 11.8 s and
+  `field_energy_rows_back` 11.2 s, and the forward's `field_exposure` 6.9 s and `field_energy_rows_l5` 6.7 s. The
+  one-block-a-region kernels are under 1%. One relaxation a state (one forward, one reverse giving faces, `G` and
+  `∂G/∂θ`) is the gain inside a section.
+- `contrast-field` now prints each family's sections' coherence `|Σg|²/(n Σ|g|²)` over each hundred sections and the lap
+  (theory 19:50, from Brandon's 19:44 lens: efficiency is learning more from the same passage), and reads the held places at
+  each tenth.
+Receipts: `longrun_nov6/lap12_resume.sh`, `lap12_resume.txt`, `lanes.sh`, `lanes.txt`, `lanes_compare.py`, `events.sh`,
+`events.txt`, `lengths.py`, `lengths.txt`, `tempread12.txt`.

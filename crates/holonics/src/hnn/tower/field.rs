@@ -4713,6 +4713,125 @@ impl FieldRealization for HostField {
     }
 }
 
+/// [definition; Brandon, November 7 19:22: "you can beat the clock speed of the CPU with more threads if the mathematics holds
+/// for the orders you integrate with"] **The card and the host's lanes as one surface**: an energy read's regions are
+/// partitioned between the host's cores (the first `k`, in parallel on the host's pool) and the card (the rest), both at
+/// once, and joined in region order. Each region's read is its own and bit for bit the same on either side (the card's
+/// parity with [`HostField`]), so the joined read is the card's alone at any partition. The host's share is the
+/// partition that ends both sides together, read from the last split read's measured times: with `t_h` and `t_c` the
+/// times a region on each side, `k/n = t_c/(t_h + t_c)`, met halfway from the share before. Every other read is the card's.
+pub struct LanesField<'a> {
+    pub card: &'a mut dyn FieldRealization,
+    /// The host's share of a read's regions on `2^(−16)`.
+    share: u64,
+    /// Regions read and microseconds spent on each side, and the reads split.
+    pub host_regions: u64,
+    pub card_regions: u64,
+    pub host_us: u128,
+    pub card_us: u128,
+    pub wall_us: u128,
+    pub splits: u64,
+}
+
+impl<'a> LanesField<'a> {
+    const ONE: u64 = 1 << 16;
+    /// The opening share, a sixteenth: the host is read before its share is known.
+    pub fn new(card: &'a mut dyn FieldRealization) -> Self {
+        Self { card, share: Self::ONE >> 4, host_regions: 0, card_regions: 0, host_us: 0, card_us: 0, wall_us: 0, splits: 0 }
+    }
+
+    /// The host's share now, on `2^(−16)`.
+    pub fn share(&self) -> u64 {
+        self.share
+    }
+
+    /// `n` regions split at the current share: the host reads `[0, k)` on a scoped thread over the pool while the card
+    /// reads `[k, n)` here; the share is then re-read from the two sides' times.
+    fn split<T: Send>(&mut self, n: usize, host: impl FnOnce(std::ops::Range<usize>) -> Result<Vec<T>> + Send, card: impl FnOnce(&mut dyn FieldRealization, std::ops::Range<usize>) -> Result<Vec<T>>) -> Result<Vec<T>> {
+        let k = if n < 2 { 0 } else { ((n as u64 * self.share) >> 16).clamp(1, n as u64 - 1) as usize };
+        if k == 0 {
+            return card(&mut *self.card, 0..n);
+        }
+        let wall = std::time::Instant::now();
+        let (host_read, card_read) = std::thread::scope(|scope| {
+            let lane = scope.spawn(move || {
+                let t = std::time::Instant::now();
+                host(0..k).map(|v| (v, t.elapsed().as_micros()))
+            });
+            let t = std::time::Instant::now();
+            let c = card(&mut *self.card, k..n).map(|v| (v, t.elapsed().as_micros()));
+            (lane.join().unwrap_or_else(|_| refuse("a host lane panicked")), c)
+        });
+        let ((mut out, th), (rest, tc)) = (host_read?, card_read?);
+        out.extend(rest);
+        self.wall_us += wall.elapsed().as_micros();
+        (self.host_regions, self.card_regions, self.host_us, self.card_us, self.splits) = (self.host_regions + k as u64, self.card_regions + (n - k) as u64, self.host_us + th, self.card_us + tc, self.splits + 1);
+        // Times a region on 2^(-16) microseconds, and the share that would end both together.
+        let (per_h, per_c) = ((th.max(1) << 16) / k as u128, (tc.max(1) << 16) / (n - k) as u128);
+        let even = (per_c << 16) / (per_h + per_c);
+        self.share = ((self.share as u128 + even) / 2).clamp(1, Self::ONE as u128 - 1) as u64;
+        Ok(out)
+    }
+}
+
+impl FieldRealization for LanesField<'_> {
+    fn read_and_return(&mut self, field: &Field, regions: &[Region]) -> Result<(Vec<Vec<Option<TowerFace>>>, Vec<i128>)> {
+        self.card.read_and_return(field, regions)
+    }
+    fn read_faces(&mut self, field: &Field, regions: &[Region]) -> Result<Vec<Vec<Option<TowerFace>>>> {
+        self.card.read_faces(field, regions)
+    }
+    fn read_logits(&mut self, field: &Field, regions: &[Region]) -> Result<Vec<FieldRead>> {
+        self.card.read_logits(field, regions)
+    }
+    fn read_landmarks(&mut self, field: &Field, region: &Region, question: usize, sites: &[usize], count: usize) -> Result<Vec<Vec<(usize, u64)>>> {
+        self.card.read_landmarks(field, region, question, sites, count)
+    }
+    fn met_pairs(&self) -> Option<u128> {
+        self.card.met_pairs()
+    }
+    fn read_row_shares(&mut self, field: &Field, regions: &[Region], questions: &[usize]) -> Result<Vec<HeldRows>> {
+        self.card.read_row_shares(field, regions, questions)
+    }
+    fn read_covector_shares(&mut self, field: &Field, regions: &[Region]) -> Result<Vec<[u128; 2]>> {
+        self.card.read_covector_shares(field, regions)
+    }
+    fn read_row_currents(&mut self, field: &Field, regions: &[Region], questions: &[usize], returning: bool) -> Result<Vec<Vec<RowCurrent>>> {
+        self.card.read_row_currents(field, regions, questions, returning)
+    }
+    fn read_ticks(&mut self, field: &Field, regions: &[Region]) -> Result<Vec<Vec<TickRead>>> {
+        self.card.read_ticks(field, regions)
+    }
+    fn read_near_offsets(&mut self, field: &Field, region: &Region, sites: &[usize]) -> Result<Vec<NearOffsets>> {
+        self.card.read_near_offsets(field, region, sites)
+    }
+    fn read_blank_clocks(&mut self, field: &Field, region: &Region, sites: &[usize]) -> Result<Vec<BlankClocks>> {
+        self.card.read_blank_clocks(field, region, sites)
+    }
+    fn read_energy_squares(&mut self, field: &Field, squares: &[(&[usize], (usize, usize))], void: usize, eps: u32) -> Result<Vec<Option<EnergySquare>>> {
+        self.card.read_energy_squares(field, squares, void, eps)
+    }
+    #[allow(clippy::type_complexity)]
+    fn read_energy_central_squares(&mut self, field: &Field, squares: &[(&[usize], (usize, usize))], void: usize, steps: &[u32]) -> Result<Vec<Option<Vec<(i128, i128)>>>> {
+        self.card.read_energy_central_squares(field, squares, void, steps)
+    }
+    #[allow(clippy::type_complexity)]
+    fn read_energy_faces(&mut self, field: &Field, regions: &[Region]) -> Result<(Vec<Vec<Option<TowerFace>>>, Vec<i128>)> {
+        let joined = self.split(
+            regions.len(),
+            |r| regions[r].par_iter().map(|x| field.energy_faces_read(x)).collect::<Result<Vec<_>>>(),
+            |card, r| card.read_energy_faces(field, &regions[r]).map(|(f, g)| f.into_iter().zip(g).collect()),
+        )?;
+        Ok(joined.into_iter().unzip())
+    }
+    fn read_energies(&mut self, field: &Field, regions: &[&[usize]]) -> Result<Vec<i128>> {
+        self.split(regions.len(), |r| regions[r].par_iter().map(|c| field.energy_g(c)).collect(), |card, r| card.read_energies(field, &regions[r]))
+    }
+    fn read_energy_material(&mut self, field: &Field, regions: &[Region]) -> Result<Vec<(Vec<i128>, i128)>> {
+        self.split(regions.len(), |r| regions[r].par_iter().map(|x| field.energy_material(x)).collect(), |card, r| card.read_energy_material(field, &regions[r]))
+    }
+}
+
 /// [agent-inferred, November 1] A held step read on regions it was not fit on
 /// ([`FieldLearner::read_step_on`]): its change to those regions' code (the stepped material's
 /// code less the material's before the step, on `2^(−20)` bits), the further halvings of the last
@@ -4802,6 +4921,14 @@ pub struct KernelReceipt {
     pub by_family: Vec<(Option<i64>, Option<i64>)>,
     /// Each family's length `ρ_f` after the section (on `2^(−24)` bits), where the learner reads them.
     pub rates: Vec<i128>,
+    /// [measurement; theory, November 7 19:41] Each state's two relaxations, compared: the states (truths and proposals) whose
+    /// `G` read with their faces (places open, carrying their letters whole) is the `G` read with their material (resolved)
+    /// in bits, of all, and the largest gap on `2^(−32)`. Agreement means one relaxation a state gives both.
+    pub g_agree: (usize, usize),
+    pub g_gap: i128,
+    /// [measurement; theory, November 7 19:50] The section's deposit before its length, `g = Σ_s w_s D_s/T` on the families'
+    /// natural grains (empty where the Newton step deposits): the operand of the sections' coherence.
+    pub covector: Vec<i128>,
 }
 
 /// [measurement; the unified-theory reading of November 7, 05:55] **An evidence-shrunk Newton step's read**
@@ -5740,6 +5867,13 @@ impl FieldLearner {
         let mut both: Vec<Region> = (0..problems).map(|p| Region { classes: &at_truth[p].0, unresolved: &resolved[p], faces: &[], locked: &[], echo: &[], domain: None, port: None }).collect();
         both.extend((0..n).map(|s| Region { classes: &at_proposal[s].0, unresolved: &resolved[owners[s]], faces: &[], locked: &[], echo: &[], domain: None, port: None }));
         let reads = realization.read_energy_material(f, &both)?;
+        let (mut g_same, mut g_gap) = (0usize, 0i128);
+        for (i, read) in reads.iter().enumerate() {
+            let g_faces = if i < problems { g_truth[i] } else { g_prop[i - problems] };
+            g_same += usize::from(g_faces == read.1);
+            g_gap = g_gap.max((g_faces - read.1).abs());
+        }
+        let g_agree = (g_same, reads.len());
         const OVER: &str = "a kernel covector past its 128-bit carrier";
         let families = f.families_all();
         let material = f.material_len();
@@ -5768,7 +5902,7 @@ impl FieldLearner {
         let states: Vec<Vec<i128>> = (0..n).map(|s| natural(&reads[owners[s]].0, &reads[problems + s].0)).collect::<Result<_>>()?;
         if self.newton {
             let newton = self.deposit_newton(&states, &weights)?;
-            return Ok(KernelReceipt { states: n, places, moved, weight, weight_square, least, most, whole, deposited: newton.deposited, predicted: newton.predicted, transfer: newton.transfer, external: newton.external, per_state, log2_a, newton: Some(newton), by_family: Vec::new(), rates: Vec::new() });
+            return Ok(KernelReceipt { states: n, places, moved, weight, weight_square, least, most, whole, deposited: newton.deposited, predicted: newton.predicted, transfer: newton.transfer, external: newton.external, per_state, log2_a, newton: Some(newton), by_family: Vec::new(), rates: Vec::new(), g_agree, g_gap, covector: Vec::new() });
         }
         // [the unified-theory reading of November 7, 06:26] The Newton terms read along the moments' direction before this section
         // moves them, beside the moments' own step.
@@ -5817,7 +5951,7 @@ impl FieldLearner {
         };
         let by_family = transfers.into_iter().zip(predictions).collect();
         let rates = self.family_rates.clone().unwrap_or_default();
-        Ok(KernelReceipt { states: n, places, moved, weight, weight_square, least, most, whole, deposited, predicted, transfer, external, per_state, log2_a, newton, by_family, rates })
+        Ok(KernelReceipt { states: n, places, moved, weight, weight_square, least, most, whole, deposited, predicted, transfer, external, per_state, log2_a, newton, by_family, rates, g_agree, g_gap, covector: raw })
     }
 
     /// [definition; agent-inferred, November 3, the tower record] **The learner grown in scale**: its field grown in scale

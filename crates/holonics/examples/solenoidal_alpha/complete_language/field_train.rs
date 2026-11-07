@@ -2950,6 +2950,9 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
         // Each family's transfer and predicted change summed over the lap (on 2^(−20) bits).
         let mut by_family: Vec<(i128, i128)> = Vec::new();
         let (mut tenth_family, mut tenths_printed): (Vec<(i128, i128)>, usize) = (Vec::new(), 0);
+        // The sections' coherence over each hundred sections and over the lap (theory, November 7 19:50).
+        let (mut coherence_block, mut coherence_lap) = (Coherence::new(&learner.field), Coherence::new(&learner.field));
+        let mut coherence_from = 0usize;
         for (n, &s) in walk(seed, read, sections.len()).iter().enumerate().skip(if lap == 0 { from_section } else { 0 }) {
             let now = started.elapsed().as_millis();
             if n > 0 && n == from_section && lap == 0 {
@@ -3155,7 +3158,7 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
                     None => String::new(),
                 };
                 println!(
-                    "FIELD_KERNEL lap={lap} n={n} states={} places={} moved={} accept_milli={} least_milli={} most_milli={} whole={} deposited={} predicted_micro={} transfer_micro={} external_micro={}{newton_text}{entropy_text} log2_t={} blocks={} k_star={block_places} k_up={k_up} k_down={k_down} alpha_up_milli={} alpha_down_milli={} slope_milli={} ms_section={} ms={}",
+                    "FIELD_KERNEL lap={lap} n={n} states={} places={} moved={} accept_milli={} least_milli={} most_milli={} whole={} deposited={} predicted_micro={} transfer_micro={} external_micro={}{newton_text}{entropy_text} log2_t={} blocks={} k_star={block_places} k_up={k_up} k_down={k_down} alpha_up_milli={} alpha_down_milli={} slope_milli={} g_agree={}/{} g_gap={} ms_section={} ms={}",
                     receipt.states,
                     receipt.places,
                     receipt.moved,
@@ -3172,9 +3175,18 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
                     alpha_up * 1000 >> holonics::hnn::tower::MATERIAL_BITS,
                     alpha_down * 1000 >> holonics::hnn::tower::MATERIAL_BITS,
                     slope_milli.map_or("-".to_string(), |v| v.to_string()),
+                    receipt.g_agree.0,
+                    receipt.g_agree.1,
+                    receipt.g_gap,
                     section_start.elapsed().as_millis(),
                     started.elapsed().as_millis()
                 );
+                coherence_block.add(&learner.field, &receipt.covector);
+                coherence_lap.add(&learner.field, &receipt.covector);
+                if (n + 1) % 100 == 0 {
+                    println!("FIELD_COHERENCE lap={lap} sections={coherence_from}..{} n={} {}", n + 1, coherence_block.n, coherence_block.text(&learner.field));
+                    (coherence_block, coherence_from) = (Coherence::new(&learner.field), n + 1);
+                }
                 // [measurement; the unified-theory reading of November 7, 06:57] At each tenth of the lap: `log₂ T`, and each family's
                 // length (milli-bits) and its share (transfer over own-section price, thousandths) over the tenth.
                 if !receipt.rates.is_empty() {
@@ -3185,6 +3197,11 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
                         *slot = (slot.0 + t.unwrap_or(0) as i128, slot.1 + p.unwrap_or(0) as i128);
                     }
                     let tenth = (n + 1) * 10 / sections.len();
+                    if tenth > tenths_printed && n + 1 < sections.len() {
+                        // [measurement; theory, November 7 19:50] The held places read at each tenth, beside the tenth's acceptance and
+                        // the sections' coherence (rows marked `10000·(lap + 1) + sections done`).
+                        enumerated_read(&learner.field, &held_set, places, &truth_of, realization, 10_000 * (lap as i64 + 1) + (n + 1) as i64, &mut enumerated_rows)?;
+                    }
                     if tenth > tenths_printed || n + 1 == sections.len() {
                         tenths_printed = tenth;
                         println!("FIELD_KERNEL_TENTH lap={lap} tenth={tenth} log2_t={} {}", learner.field.theta[learner.field.layout().face_temper], rates_text(&learner.field, &receipt.rates, &tenth_family));
@@ -3194,6 +3211,10 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
                 if started.elapsed().as_millis() > stop_ms {
                     write_new(&out.join("STATE.stopped"), at_rate(&learner, base_rate).as_bytes())?;
                     println!("FIELD_STOPPED lap={lap} sections={}/{} states={states} ms={}", n + 1, sections.len(), started.elapsed().as_millis());
+                    if coherence_block.n > 0 {
+                        println!("FIELD_COHERENCE lap={lap} sections={coherence_from}..{} n={} {}", n + 1, coherence_block.n, coherence_block.text(&learner.field));
+                    }
+                    println!("FIELD_COHERENCE_LAP lap={lap} stopped n={} {}", coherence_lap.n, coherence_lap.text(&learner.field));
                     if states > 0 {
                         println!("FIELD_KERNEL_FAMILIES lap={lap} stopped {}", family_text(&learner.field, &by_family, states));
                         let mean = weight_lap * 1000 / (unit * states as i128);
@@ -3299,6 +3320,10 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
             let mean = weight_lap * 1000 / (unit * states as i128);
             let var = (square_lap * 1_000_000 / (unit * states as i128)) - mean * mean;
             println!("FIELD_KERNEL_ACCEPT lap={lap} states={states} places={places_lap} moved={moved_lap} accept_milli={mean} sd_milli={} whole={whole_lap} accepted_places={} accepted_places_a_second={}", (var.max(0) as u128).isqrt(), accepted_places >> holonics::hnn::tower::MATERIAL_BITS, (accepted_places >> holonics::hnn::tower::MATERIAL_BITS) * 1000 / lap_start.elapsed().as_millis().max(1) as i128);
+            if coherence_block.n > 0 {
+                println!("FIELD_COHERENCE lap={lap} sections={coherence_from}..{} n={} {}", sections.len(), coherence_block.n, coherence_block.text(&learner.field));
+            }
+            println!("FIELD_COHERENCE_LAP lap={lap} n={} {}", coherence_lap.n, coherence_lap.text(&learner.field));
             // [measurement; the unified-theory reading of November 7, 05:55] The acceptance by tenths of the states' block size,
             // and α and the shrink by tenths of the lap (their medians).
             let mut sized = by_state.clone();
@@ -3380,6 +3405,53 @@ fn rates_text(field: &Field, rates: &[i128], sums: &[(i128, i128)]) -> String {
 }
 
 /// The layout's families by name and start.
+/// [measurement; theory, November 7 19:50, from Brandon's 19:44 lens: efficiency is learning more from the same passage]
+/// **The sections' coherence**, family by family over a stretch of sections: `n`, `Σ_s |g_s|²` and `|Σ_s g_s|²` of the
+/// deposits before their length on the family's natural grain (each entry read `2^16` coarser so the squares keep their
+/// carrier), and `|Σg|²/(n Σ|g|²)` in thousandths: near 1000 where the sections share dynamics, near `1000/n` where each
+/// section teaches only itself. Its trend across a lap is the grokking read.
+struct Coherence {
+    n: usize,
+    sum: Vec<i128>,
+    squares: Vec<i128>,
+}
+
+impl Coherence {
+    fn new(field: &Field) -> Self {
+        Self { n: 0, sum: vec![0; field.material_len()], squares: vec![0; field.families_all().len()] }
+    }
+    fn add(&mut self, field: &Field, g: &[i128]) {
+        if g.len() != self.sum.len() {
+            return;
+        }
+        self.n += 1;
+        for (f, &(start, len, _)) in field.families_all().iter().enumerate() {
+            for i in start..start + len {
+                let q = g[i] >> 16;
+                self.squares[f] = self.squares[f].saturating_add(q.saturating_mul(q));
+                self.sum[i] = self.sum[i].saturating_add(g[i]);
+            }
+        }
+    }
+    fn text(&self, field: &Field) -> String {
+        let names = family_names(field);
+        let n = self.n.max(1) as i128;
+        field
+            .families_all()
+            .iter()
+            .enumerate()
+            .filter(|(f, fam)| fam.1 > 0 && self.squares[*f] > 0)
+            .map(|(f, &(start, len, _))| {
+                let name = names.iter().find(|&&(_, at)| at == start).map_or("?", |&(n, _)| n);
+                let whole: i128 = (start..start + len).map(|i| self.sum[i] >> 16).fold(0i128, |a, q| a.saturating_add(q.saturating_mul(q)));
+                let coherence = whole.checked_mul(1000).map_or(-1, |w| w / n.saturating_mul(self.squares[f]).max(1));
+                format!("{name}={}:{}:{coherence}", self.squares[f], whole)
+            })
+            .collect::<Vec<_>>()
+            .join(" ")
+    }
+}
+
 fn family_names(field: &Field) -> Vec<(&'static str, usize)> {
     let l = field.layout();
     vec![("enc", l.enc), ("before", l.before), ("after", l.after), ("q", l.q), ("q_bias", l.q_bias), ("v", l.v), ("v_bias", l.v_bias), ("out", l.out), ("out_bias", l.out_bias), ("a", l.a), ("a_bias", l.a_bias), ("b", l.b), ("b_bias", l.b_bias), ("w", l.w), ("w_bias", l.w_bias), ("read", l.read), ("read_bias", l.read_bias), ("moment_before", l.moment_before), ("moment_after", l.moment_after), ("temper", l.temper), ("probe", l.probe), ("probe_bias", l.probe_bias), ("pace", l.pace), ("moment_face", l.moment_face), ("moment_face_bias", l.moment_face_bias), ("lift_bias", l.lift_bias), ("pair_c", l.pair_c), ("face_temper", l.face_temper)]
