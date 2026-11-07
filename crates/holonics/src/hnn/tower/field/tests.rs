@@ -2714,3 +2714,24 @@ fn the_averaged_constitution_follows_and_is_carried() {
     assert_eq!(back.average, learner.average);
     assert_eq!(back.field.theta, learner.field.theta);
 }
+
+/// [definition; the unified-theory reading of November 7, 22:08] **The letters' coin at a tolerance below every share**: with
+/// `τ = 2^(−24)` every letter of nonzero share is kept at weight one, so the coin's section is the full conditional section bit
+/// for bit (the letters' energies read forward agree with the material reads'); at `τ = 2^(−4)` it keeps fewer reverses and
+/// still deposits.
+#[test]
+fn the_letters_coin_below_every_share_is_the_full_conditional() {
+    let mut field = energetic_line();
+    field.theta[field.layout.face_temper] = 10 << MATERIAL_BITS;
+    let classes: Vec<usize> = (0..40).map(|t| (t * 7 + t / 3) % 5).collect();
+    let none = vec![false; 40];
+    let truth = [Region { classes: &classes, unresolved: &none, faces: &[], locked: &[], echo: &[], domain: None, port: None }];
+    let blocks = [vec![3usize], vec![14], vec![25]];
+    let (mut a, mut b, mut c) = (FieldLearner::new(field.clone(), 14), FieldLearner::new(field.clone(), 14), FieldLearner::new(field, 14));
+    let full = a.section_conditional(&truth, &[0, 0, 0], &blocks, &mut HostField).unwrap();
+    let coin = b.section_conditional_coin(&truth, &[0, 0, 0], &blocks, 24, 11, &mut HostField).unwrap();
+    assert_eq!(full, coin);
+    assert_eq!(a.field.theta, b.field.theta);
+    let coarse = c.section_conditional_coin(&truth, &[0, 0, 0], &blocks, 4, 11, &mut HostField).unwrap();
+    assert!(coarse.deposited && coarse.per_state == full.per_state, "the coin reads the same conditional: {coarse:?}");
+}

@@ -2800,6 +2800,10 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
         Ok(v) => v.parse().map_err(|_| "FIELD_COHERENCE_EVERY is a section count".to_string())?,
         Err(_) => 0,
     };
+    let coin_tau: Option<u32> = match std::env::var("FIELD_CONTRAST_COIN") {
+        Ok(v) => Some(v.parse().map_err(|_| "FIELD_CONTRAST_COIN is the tolerance's bits".to_string())?),
+        Err(_) => None,
+    };
     let beat_top: Option<u32> = match std::env::var("FIELD_CONTRAST_BEAT") {
         Ok(v) => Some(v.parse().map_err(|_| "FIELD_CONTRAST_BEAT is the top band".to_string())?),
         Err(_) => None,
@@ -2918,6 +2922,27 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
         t.extend(std::iter::repeat_n(void, near.min(room - a.len())));
         t
     };
+    // [measurement; theory, November 7 23:05] `FIELD_PAIR_KINDS=N`: the pairs by kind of the `N` longest training problems and
+    // the median one, each at its truth, resolved (the material read's state), read on the host (`Field::energy_pair_kinds`).
+    if let Ok(v) = std::env::var("FIELD_PAIR_KINDS") {
+        let count: usize = v.parse().map_err(|_| "FIELD_PAIR_KINDS is a count of problems".to_string())?;
+        let mut order: Vec<usize> = (0..train_set.len()).collect();
+        order.sort_by_key(|&i| std::cmp::Reverse(train_set[i].0.len() + train_set[i].1.len()));
+        let mut chosen: Vec<usize> = order.iter().take(count).copied().collect();
+        chosen.push(order[order.len() / 2]);
+        for i in chosen {
+            let truth = truth_of(&train_set[i], &train_set[i].1);
+            let none = vec![false; truth.len()];
+            let region = Region { classes: &truth, unresolved: &none, faces: &[], locked: &[], echo: &[], domain: None, port: None };
+            let t = std::time::Instant::now();
+            let k = learner.field.energy_pair_kinds(&region).map_err(|e| e.to_string())?;
+            let heads = k.largest.len().max(1) as u64;
+            println!(
+                "FIELD_PAIR_KINDS problem={i} sites={} heads={heads} near={} sharp={} listened={} pairs_a_site_a_head={} reach_over_classes={} largest_classes={:?} ms={}",
+                k.sites, k.near, k.sharp, k.listened, (k.near + k.sharp + k.listened) / (heads * k.sites.max(1) as u64), learner.field.declaration.reach / k.classes.max(1), k.largest, t.elapsed().as_millis()
+            );
+        }
+    }
     let d = learner.field.declaration;
     println!(
         "FIELD_CONTRAST_DECLARATION alphabet={} width={} heads={} modes={} ticks={} reach={} rate={} log2_t={} section={section} sections={} train={} held={} places={places} release={} newton={} moments={},{} run_bits={} rest={} spans={} laps_read={}",
@@ -3157,7 +3182,12 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
                             println!("FIELD_BANDS lap={lap} n={n} {}", r.bands.iter().enumerate().map(|(k, &(seen, spent))| format!("k{k}={seen}/{spent}")).collect::<Vec<_>>().join(" "));
                             r
                         }
-                        None => learner.section_conditional(&truth_views, &owners, &blocks, realization).map_err(|e| e.to_string())?,
+                        // [definition; the unified-theory reading of November 7, 22:08] `FIELD_CONTRAST_COIN=TAU_BITS`: the letters'
+                        // reverses kept by a coin at `τ = 2^(−TAU_BITS)` (`FieldLearner::section_conditional_coin`).
+                        None => match coin_tau {
+                            Some(tau) => learner.section_conditional_coin(&truth_views, &owners, &blocks, tau, mix(seed ^ 0xC01A << 40, read << 32 | n as u64), realization).map_err(|e| e.to_string())?,
+                            None => learner.section_conditional(&truth_views, &owners, &blocks, realization).map_err(|e| e.to_string())?,
+                        },
                     };
                     let nats: i128 = -r.log2_a.iter().map(|&l| l * LN2_Q30 >> 30).sum::<i128>();
                     println!(
@@ -3904,6 +3934,22 @@ pub(super) fn kernel_write(args: &[String], realization: &mut dyn FieldRealizati
     let asked: Vec<&[usize]> = configurations.iter().map(Vec::as_slice).collect();
     let truth_g = realization.read_energies(field, &asked).map_err(|e| e.to_string())?;
     println!("FIELD_WRITE answers={} lengths={:?} log2_t={} ms={}", problems.len(), lengths, field.theta[field.layout().face_temper], started.elapsed().as_millis());
+    // [measurement; theory, November 7 23:34] `FIELD_WRITE_LEADING`: first the writer started at the truths themselves, 8
+    // sweeps at `T` dumped at 1, 2, 4 and 8 ("from the truth, sweep k"): how long the field's equilibrium keeps the truth's order.
+    if std::env::var_os("FIELD_WRITE_LEADING").is_some() {
+        let mut held_answers = truths.clone();
+        for sweep in 1..=8usize {
+            let (moved, proposed, _) = field.energy_sweep(&problems, &mut held_answers, void, 0, mix(seed ^ 0x7E57, sweep as u64), realization, &mut |_, _| {}).map_err(|e| e.to_string())?;
+            println!("FIELD_WRITE_LEADING sweep={sweep} moved={moved} proposed={proposed} ms={}", started.elapsed().as_millis());
+            if sweep.is_power_of_two() {
+                dump(&format!("from the truth, sweep {sweep}"), &held_answers)?;
+            }
+        }
+        if std::env::var("FIELD_WRITE_LEADING").as_deref() == Ok("only") {
+            println!("FIELD_WRITE_DONE leading ms={}", started.elapsed().as_millis());
+            return Ok(());
+        }
+    }
     // The joint release to start from.
     let mut answers = field.energy_release(&problems, &lengths, void, 64, seed, realization, &mut |_, _, _| {}).map_err(|e| e.to_string())?;
     dump("release", &answers)?;
@@ -3969,6 +4015,8 @@ pub(super) fn kernel_write(args: &[String], realization: &mut dyn FieldRealizati
         let t0 = std::time::Instant::now();
         let (moved, proposed, per) = field.energy_sweep(&problems, &mut answers, void, cool, mix(seed ^ 0xC001, cool as u64), realization, &mut |_, _| {}).map_err(|e| e.to_string())?;
         println!("FIELD_WRITE_SWEEP descent cool={cool} moved={moved} proposed={proposed} accept_milli={} energy_milli={} sweep_ms={} ms={}", moved * 1000 / proposed.max(1), milli(mean_of(&per)), t0.elapsed().as_millis(), started.elapsed().as_millis());
+        // [measurement; theory, November 7 23:05] The descent read step by step against its truths (section 7, on the host).
+        dump(&format!("descent sweep {cool}"), &answers)?;
         if moved == 0 || cool >= 20 {
             break;
         }

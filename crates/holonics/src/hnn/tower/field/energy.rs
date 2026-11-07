@@ -1991,6 +1991,39 @@ impl Field {
         Ok((pass.faces, read.last))
     }
 
+    /// [measurement; theory, November 7 23:05] **A region's pairs by kind**, read from its opening's held supports (the
+    /// classes a relaxation holds through its ticks): over every head and receiving site, the near field's keyed sources
+    /// (`0 < |i − j| < NEAR`), a definite receiver's sharp class members past it (its probe's class and the classes it probes
+    /// across its seams, §15.2), and an open receiver's listen-to-all past it (§15.9); and each head's eight largest definite
+    /// classes, beside `reach / classes`. A reading only.
+    pub fn energy_pair_kinds(&self, region: &Region) -> Result<EnergyPairKinds> {
+        if !self.declaration.energy {
+            return refuse("an energy read of a field whose faces are not one energy's forces");
+        }
+        let relaxed = self.energy_relax(region, 0, None, None)?;
+        let sites = region.classes.len();
+        let mut out = EnergyPairKinds { sites, near: 0, sharp: 0, listened: 0, largest: Vec::new(), classes: self.declaration.classes() };
+        for lists in &relaxed.held.classes {
+            for i in 0..sites {
+                let open = !lists.definite[i];
+                for j in lists.support(i) {
+                    if j.abs_diff(i) < NEAR {
+                        out.near += 1;
+                    } else if open {
+                        out.listened += 1;
+                    } else {
+                        out.sharp += 1;
+                    }
+                }
+            }
+            let mut sizes: Vec<usize> = (0..out.classes).map(|c| (lists.off[2 * c + 1] - lists.off[2 * c]) as usize).collect();
+            sizes.sort_unstable_by(|a, b| b.cmp(a));
+            sizes.truncate(8);
+            out.largest.push(sizes);
+        }
+        Ok(out)
+    }
+
     /// [measurement; the unified-theory reading of November 7, 04:05] **A configuration's energy**: `G(e) = Φ(x^K(e); e)` with
     /// every site resolved at `classes`, relaxed at its own certified halvings, on `2^(−32)` bits; the enumerated conditional's
     /// terms (`P(e_t = c | rest) ∝ 2^(−G/T)`) and route (b)'s `G`.
@@ -2011,6 +2044,18 @@ impl Field {
         }
         Ok(self.energy_pass(region)?.1)
     }
+}
+
+/// [measurement; theory, November 7 23:05] A region's pairs by kind ([`Field::energy_pair_kinds`]), summed over its heads.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct EnergyPairKinds {
+    pub sites: usize,
+    pub near: u64,
+    pub sharp: u64,
+    pub listened: u64,
+    /// Each head's eight largest definite classes.
+    pub largest: Vec<Vec<usize>>,
+    pub classes: usize,
 }
 
 /// [measurement] A region's energy across its ticks: `Φ` on `2^(−32)` bits at the opening and at the last tick, each
