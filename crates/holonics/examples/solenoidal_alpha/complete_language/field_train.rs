@@ -1990,7 +1990,11 @@ pub(super) fn curl_field(args: &[String], realization: &mut dyn FieldRealization
         // corners replayed at the base's halvings under its supports (`Field::energy_square_corners`), with the attribution
         // read at ε = 2^(−6) beside it; on the host (the card's reverse is not built).
         if field.declaration.energy {
-            let reads = picked.par_iter().map(|&(_, i, j)| field.energy_square_corners(&truth, (i, j), void, ENERGY_EPS)).collect::<std::result::Result<Vec<_>, _>>().map_err(|e| e.to_string())?;
+            // The step is read on a letter's own weight in the uniform mixture, `ε = 2^(−4)/A` of a mixture's weight (four
+            // times that wide), so every moved mixture stays a mixture at any alphabet. [agent-inferred, November 7: theory's
+            // 2^(−6) and 2^(−4) of the five-letter tiny field are 0.08 and 0.31 of a letter's weight there.]
+            let eps = ((1u32 << 16) / field.declaration.alphabet as u32) >> ENERGY_EPS_SHIFT;
+            let reads = picked.par_iter().map(|&(_, i, j)| field.energy_square_corners(&truth, (i, j), void, eps)).collect::<std::result::Result<Vec<_>, _>>().map_err(|e| e.to_string())?;
             read_regions += 13 * picked.len();
             for (&(b, i, j), square) in picked.iter().zip(&reads) {
                 let Some(sq) = square else { continue };
@@ -2747,9 +2751,9 @@ fn declaration_line(field: &Field) -> String {
     field.to_text().lines().next().unwrap_or("").to_string()
 }
 
-/// [definition; the unified-theory reading of November 7, 01:37] The attribution read's step: a mixture moved by `2^(−6)` of its
-/// weight, where theory's identity reads the square to first order.
-const ENERGY_EPS: u32 = 1 << 10;
+/// [definition; the unified-theory reading of November 7, 01:37] The attribution read's step: `2^(−4)` of a letter's weight in
+/// the uniform mixture (and four times it), where theory's identity reads the square to first order.
+const ENERGY_EPS_SHIFT: u32 = 4;
 
 /// [definition; the unified-theory reading of November 7, 01:37] **`temper-field STATE STATE_SHA CODEC CODEC_SHA UNITS UNITS_SHA
 /// TRAIN TRAIN_SHA COUNT OUT`**: an energy field's founding temperature, the letters read at one `T`, set where its faces open

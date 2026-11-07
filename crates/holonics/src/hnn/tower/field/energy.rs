@@ -1264,6 +1264,9 @@ impl Field {
         let sites = truth.len();
         let alphabet = self.declaration.alphabet as u32;
         let base_w = (1u32 << STATE_BITS) / alphabet;
+        if 4 * eps > base_w {
+            return refuse("a square's step past a letter's weight in the uniform mixture (its wide read leaves the mixtures)");
+        }
         let mixture = |shift: Option<(usize, usize)>| -> Shares { (0..alphabet).map(|c| (c, match shift { Some((up, _)) if c as usize == up => base_w + eps, Some((_, down)) if c as usize == down => base_w - eps, _ => base_w })).collect() };
         let mut open = vec![false; sites];
         (open[i], open[j]) = (true, true);
