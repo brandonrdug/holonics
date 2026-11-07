@@ -2844,11 +2844,47 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
             let problems: Vec<(&[usize], usize)> = members.iter().map(|&i| (train_set[i].0.as_slice(), train_set[i].2)).collect();
             let lengths: Vec<usize> = members.iter().map(|&i| train_set[i].1.len()).collect();
             let key = mix(seed ^ 0xC0_7A57 << 40, read << 32 | n as u64);
+            // The release's progress, one line every 256 reads with its elapsed milliseconds, and its cut where the run passes
+            // `STOP_MS` (a cut release deposits nothing: the run stops there, incomplete).
+            let mut cut = false;
+            let mut reads_made = 0usize;
             let answers = learner
                 .field
-                .sample_runs(&problems, sweeps, refine, void, key, law.run_bits << 20, law.near_tail, law.place_order, Some(&lengths), false, law.rest, law.spans, None, law.refine_order, realization, &mut |_, _| true, &mut |_| {})
+                .sample_runs(
+                    &problems,
+                    sweeps,
+                    refine,
+                    void,
+                    key,
+                    law.run_bits << 20,
+                    law.near_tail,
+                    law.place_order,
+                    Some(&lengths),
+                    false,
+                    law.rest,
+                    law.spans,
+                    None,
+                    law.refine_order,
+                    realization,
+                    &mut |done, total| {
+                        reads_made = reads_made.max(done + 1);
+                        if done % 256 == 0 {
+                            println!("FIELD_RELEASE_READ lap={lap} n={n} read={done} of={total} ms={}", section_start.elapsed().as_millis());
+                        }
+                        if started.elapsed().as_millis() > stop_ms {
+                            cut = true;
+                            return false;
+                        }
+                        true
+                    },
+                    &mut |_| {},
+                )
                 .map_err(|e| e.to_string())?;
             let release_ms = section_start.elapsed().as_millis();
+            if cut {
+                println!("FIELD_STOPPED lap={lap} sections={n}/{} reason=release_cut release_reads={reads_made} release_ms={release_ms} ms={}", sections.len(), started.elapsed().as_millis());
+                return Ok(());
+            }
             let releases: Vec<Vec<usize>> = members
                 .iter()
                 .zip(&answers)
@@ -2863,7 +2899,7 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
             (states, same, gap, deposited) = (states + receipt.states, same + receipt.same, gap + receipt.gap, deposited + usize::from(receipt.deposited));
             let micro = |v: Option<i64>| v.map_or("-".to_string(), |c| ((c as i128 * 1_000_000) / ((receipt.states as i128) << 20)).to_string());
             println!(
-                "FIELD_CONTRAST lap={lap} n={n} states={} same={} gap_micro={} deposited={} predicted_micro={} transfer_micro={} external_micro={} release_ms={release_ms} deposit_ms={deposit_ms} ms={}",
+                "FIELD_CONTRAST lap={lap} n={n} states={} same={} gap_micro={} deposited={} predicted_micro={} transfer_micro={} external_micro={} release_reads={reads_made} release_ms={release_ms} deposit_ms={deposit_ms} ms={}",
                 receipt.states,
                 receipt.same,
                 (receipt.gap * 1_000_000) / ((receipt.states as i128) << 32),
