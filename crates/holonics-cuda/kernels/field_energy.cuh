@@ -629,8 +629,9 @@ __device__ __forceinline__ wide energy_pair_dz(const FieldWords &w, uint32_t h, 
     return rel(temper * rel(acc, 2 * g), MATERIAL_BITS);
 }
 
-// A crowd's score tangent on `2^(−40)` (the host's `lock_words`): its summed word `W` and its tangent `δW` over its `count`,
-// `div_nearest(Σ_m [D (δp̂·W + p̂·δW) 2^g |C| − D² W·δW], |C|²)`, released `2g` and through the temperature.
+// A crowd's score tangent on `2^(−40)` (the host's `lock_words`): the crowd read at its mean word `m = W/|C|` and its tangent
+// `δm = δW/|C|` (each to the nearest), as a source at the mean, `Σ_m [D (δp̂·m + p̂·δm) 2^g − D² m·δm]`, released `2g` and
+// through the temperature (the count's square never multiplies a tangent: a writer state's crowds passed the carrier so).
 __device__ __forceinline__ wide energy_crowd_dz(const FieldWords &w, uint32_t h, const int64_t *pi, const int64_t *tpi, const wide *swlo, const wide *swhi, const wide *tswlo, const wide *tswhi, uint64_t count, uint32_t level, uint64_t gi, bool right, wide temper) {
     const uint32_t g = skinless(w, h) ? 0 : MOVE_BITS;
     wide acc = 0;
@@ -638,18 +639,18 @@ __device__ __forceinline__ wide energy_crowd_dz(const FieldWords &w, uint32_t h,
         const wide dec = skin_raw(w, h, l, gi, octave_edge(gi, level, right), (uint32_t)1 << level);
         wide pair = 0, power = 0;
         for (uint32_t r = l; r < w.span; r += w.n) {
-            const wide W = swhi[r] - swlo[r], dW = tswhi[r] - tswlo[r];
+            const wide W = div_nearest(swhi[r] - swlo[r], (wide)count), dW = div_nearest(tswhi[r] - tswlo[r], (wide)count);
             pair += (wide)tpi[r] * W + (wide)pi[r] * dW;
             power += W * dW;
         }
-        wide lifted, counted, next;
-        if (!mul_fits(dec * pair, (wide)1 << g, &lifted) || !mul_fits(lifted, (wide)count, &counted) || !add_fits(acc, counted - dec * dec * power, &next)) {
+        wide lifted, next;
+        if (!mul_fits(dec * pair, (wide)1 << g, &lifted) || !add_fits(acc, lifted - dec * dec * power, &next)) {
             atomicOr(w.status, REFUSED_KEY);
             return 0;
         }
         acc = next;
     }
-    return rel(temper * rel(div_nearest(acc, (wide)(count * count)), 2 * g), MATERIAL_BITS);
+    return rel(temper * rel(acc, 2 * g), MATERIAL_BITS);
 }
 
 // A share's tangent on `2^(−63)` (`ln 2 · p (δz − Σ p δz)`), carried to the score covector as a share is (`energy_ds`'s law).
@@ -687,7 +688,8 @@ extern "C" __global__ void field_energy_unit_tangent(FieldWords w, const int64_t
 // (two passes over the support: `Σ p δz`, then each term), held at the region block's dense address for the columns; the
 // probe role `release(Σ δs D k̂_j + crowds, 32 + g)` into `w.dp` and its tangent `release(Σ (δs' D k̂_j 2^8 + δs D δk̂_j) +
 // crowds, 40 + g)` into `tp`, the key slots zeroed for the columns (`dq`, `tq`); each crowd's key role and its tangent spread
-// by the difference arrays `w.cw`, `tcw`.
+// by the difference arrays `w.cw`, `tcw`. A crowd's tangents read it at its mean word, as a source at the mean (its score's,
+// its probe part `δs'_C D m 2^8 + δs_C D δm`, its key part `div_nearest(δs'_C β_m 2^8 + δs_C δβ, |C|)`).
 extern "C" __global__ void __launch_bounds__(REV_ROWS * 32, 4) field_energy_tangent_rows(FieldWords w, uint32_t h, const int64_t *uq, const int64_t *up, const wide *tsw, int64_t *ds, wide *tds, int64_t *dq, int64_t *tq, int64_t *tp, wide *tcw) {
     __shared__ uint32_t stj[REV_ROWS][32];
     __shared__ int64_t dss[REV_ROWS][32];
@@ -821,18 +823,21 @@ extern "C" __global__ void __launch_bounds__(REV_ROWS * 32, 4) field_energy_tang
                 const wide dsk = dsks[warp][jj], tdsk = tdsks[warp][jj];
                 const wide wsum = swp[(uint64_t)(hi_ + 1) * S + entry] - swp[(uint64_t)lo * S + entry];
                 const wide twsum = tswp[(uint64_t)(hi_ + 1) * S + entry] - tswp[(uint64_t)lo * S + entry];
+                // The tangents at the crowd's mean word, as its score's tangent reads it.
+                const wide mw = div_nearest_by(wsum, cdiv[warp][jj]), tmw = div_nearest_by(twsum, cdiv[warp][jj]);
                 sum += div_nearest_by(dsk * d * wsum, cdiv[warp][jj]);
-                tsum += div_nearest_by(((tdsk * d * wsum) << 8) + dsk * d * twsum, cdiv[warp][jj]);
+                tsum += ((tdsk * d * mw) << 8) + dsk * d * tmw;
                 const wide bracket = rel(((d * (wide)pi[entry] * (wide)count) << g0) - d * d * wsum, g0);
-                const wide tbracket = rel(((d * (wide)tpi[entry] * (wide)count) << g0) - d * d * twsum, g0);
+                const wide bracket_m = rel(((d * (wide)pi[entry]) << g0) - d * d * mw, g0);
+                const wide tbracket = rel(((d * (wide)tpi[entry]) << g0) - d * d * tmw, g0);
                 wide prod = 0, tprod = 0, tlift = 0, tother = 0;
-                if (!mul_fits(dsk, bracket, &prod) || !mul_fits(tdsk, bracket, &tprod) || !mul_fits(tprod, (wide)1 << 8, &tlift) || !mul_fits(dsk, tbracket, &tother)) {
+                if (!mul_fits(dsk, bracket, &prod) || !mul_fits(tdsk, bracket_m, &tprod) || !mul_fits(tprod, (wide)1 << 8, &tlift) || !mul_fits(dsk, tbracket, &tother)) {
                     atomicOr(w.status, REFUSED_KEY);
                 }
                 const wide pw = div_nearest_by(prod, cdiv2[warp][jj]);
                 add_wide(w.cw + (first + r + lo) * S + entry, pw);
                 add_wide(w.cw + (first + r + hi_ + 1) * S + entry, -pw);
-                const wide tpw = div_nearest_by(tlift + tother, cdiv2[warp][jj]);
+                const wide tpw = div_nearest_by(tlift + tother, cdiv[warp][jj]);
                 add_wide(tcw + (first + r + lo) * S + entry, tpw);
                 add_wide(tcw + (first + r + hi_ + 1) * S + entry, -tpw);
             }

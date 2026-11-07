@@ -1011,7 +1011,7 @@ impl<'c> CardField<'c> {
     /// `Field::energy_square_corners`, square for square): the bases read (each truth with its two sites open), their supports
     /// and halvings kept; then on that layout, every region replayed at its base's halvings under its base's supports, `i`'s
     /// corners with `j` at `b`, `j`'s with `i` at `a`, the runner-ups read on the host's law, the corners at the runner-ups, the
-    /// four energies `G` (no faces), and the attribution's corners with the mixtures moved by `ε`; each square read into the
+    /// four energies `G` (no faces), and the attribution's corners with the mixtures moved by `ε` and by `4ε`; each square read into the
     /// host's own [`EnergySquare`] (`Field::energy_square_reading`). A square with no runner-up reads `None` (its later regions
     /// are read at its own letters, to keep the layout, and discarded).
     fn energy_square_batch(&self, field: &Field, squares: &[(&[usize], (usize, usize))], void: usize, eps: u32, words: &mut Words) -> Result<Vec<Option<EnergySquare>>> {
@@ -1067,12 +1067,16 @@ impl<'c> CardField<'c> {
         // The attribution read at one base: the base's own faces, and each site's with the other's mixture moved by `ε`.
         let (zi_moved, _) = corners(&|s| Owned::corner(squares[s].0, squares[s].1 .0, squares[s].1 .1, None, Some(field.energy_square_mixture(Some((at[s].1, letters[s].1)), eps))), plan, words)?;
         let (zj_moved, _) = corners(&|s| Owned::corner(squares[s].0, squares[s].1 .1, squares[s].1 .0, None, Some(field.energy_square_mixture(Some((at[s].0, letters[s].0)), eps))), plan, words)?;
+        // And at four times the step.
+        let (zi_wide, _) = corners(&|s| Owned::corner(squares[s].0, squares[s].1 .0, squares[s].1 .1, None, Some(field.energy_square_mixture(Some((at[s].1, letters[s].1)), 4 * eps))), plan, words)?;
+        let (zj_wide, _) = corners(&|s| Owned::corner(squares[s].0, squares[s].1 .1, squares[s].1 .0, None, Some(field.energy_square_mixture(Some((at[s].0, letters[s].0)), 4 * eps))), plan, words)?;
         (0..n)
             .map(|s| {
                 let Some(runner) = runners[s] else { return Ok(None) };
                 let (i, j) = squares[s].1;
                 let (zi, zj, zim, zjm) = (face_at(&base_logits, s, i)?, face_at(&base_logits, s, j)?, face_at(&zi_moved, s, i)?, face_at(&zj_moved, s, j)?);
-                let read = SquareCorners { zi_b: &zi_b[s], zj_a: &zj_a[s], zi_b2: &zi_b2[s], zj_a2: &zj_a2[s], zi: &zi, zj: &zj, zi_moved: &zim, zj_moved: &zjm, g: g[s] };
+                let (ziw, zjw) = (face_at(&zi_wide, s, i)?, face_at(&zj_wide, s, j)?);
+                let read = SquareCorners { zi_b: &zi_b[s], zj_a: &zj_a[s], zi_b2: &zi_b2[s], zj_a2: &zj_a2[s], zi: &zi, zj: &zj, zi_moved: &zim, zj_moved: &zjm, zi_wide: &ziw, zj_wide: &zjw, g: g[s] };
                 field.energy_square_reading(letters[s], runner, &read, void).map(Some)
             })
             .collect()
@@ -1082,7 +1086,7 @@ impl<'c> CardField<'c> {
 impl CardField<'_> {
     /// [measurement; the unified-theory reading of November 7, 01:37] **Squares read at one base on the card** (the host's
     /// `Field::energy_square_corners` for each `(truth, (i, j))`): the squares batched by the card's memory, each batch's
-    /// eleven reads ([`CardField::energy_square_batch`]).
+    /// thirteen reads ([`CardField::energy_square_batch`]).
     pub fn energy_squares(&mut self, field: &Field, squares: &[(&[usize], (usize, usize))], void: usize, eps: u32) -> Result<Vec<Option<EnergySquare>>> {
         let d = field.declaration;
         if !d.energy {

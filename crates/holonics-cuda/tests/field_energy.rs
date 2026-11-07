@@ -372,10 +372,10 @@ fn the_lines_energy_forward_on_the_card_is_the_hosts_at_1500_sites() {
 /// The square's `ε` the curl's reading uses (`ENERGY_EPS` of `curl-field`, `2^(−6)` of a mixture's weight).
 const SQUARE_EPS: u32 = 1 << 10;
 
-/// The line's square `ε`, `2^9`: below a letter's uniform weight over the line's hundred letters (`2^16/100 = 655`), past
-/// which the moved mixture's lowered letter would pass below zero (`curl-field`'s `2^10` is refused there, on the host and
-/// the card alike).
-const LINE_SQUARE_EPS: u32 = 1 << 9;
+/// The line's square `ε`, `2^7`: the wide read's `4ε` below a letter's uniform weight over the line's hundred letters (`2^16/100
+/// = 655`), past which the moved mixture's lowered letter would pass below zero (`curl-field`'s `2^10` is refused there, on the
+/// host and the card alike).
+const LINE_SQUARE_EPS: u32 = 1 << 7;
 
 /// The host's squares at `eps`, read in parallel (`Field::energy_square_corners`).
 fn host_squares(field: &Field, squares: &[(&[usize], (usize, usize))], void: usize, eps: u32) -> Vec<Option<EnergySquare>> {
@@ -384,8 +384,8 @@ fn host_squares(field: &Field, squares: &[(&[usize], (usize, usize))], void: usi
 
 /// [measurement; the unified-theory reading of November 7, 01:37] **The tiny squares at one base on the card are the host's**:
 /// on every ring set (the letters' temperature drawn), squares over the two tiny truths (7 and 13 sites), all in one batch of
-/// eleven reads, each square's `EnergySquare` (the runner-ups, the readings over whole letters, on the logits and of `G`, the
-/// floors and the attribution read) equal to the host's.
+/// thirteen reads, each square's `EnergySquare` (the runner-ups, the readings over whole letters, on the logits and of `G`, the
+/// floors and the attribution read at `ε` and `4ε`) equal to the host's.
 #[test]
 #[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
 fn the_tiny_squares_at_one_base_on_the_card_are_the_hosts() {
@@ -409,7 +409,7 @@ fn the_tiny_squares_at_one_base_on_the_card_are_the_hosts() {
 
 /// [measurement; the unified-theory reading of November 7, 01:37] **The line's squares at one base on the card are the
 /// host's**: on the founding of the line's declaration, squares on two synthetic truths of 400 sites (eight a truth, their
-/// sites in the truths' last third, one to eleven apart), at `ε = 2^9` ([`LINE_SQUARE_EPS`]), read in one batch on the card
+/// sites in the truths' last third, one to eleven apart), at `ε = 2^7` ([`LINE_SQUARE_EPS`]), read in one batch on the card
 /// (cold, then warm) and on the host's threads, square for square equal.
 #[test]
 #[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
