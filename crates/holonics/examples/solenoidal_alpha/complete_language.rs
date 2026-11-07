@@ -800,6 +800,7 @@ pub(super) fn run_with_execution(
         Some("sample-field") if backend == CompleteLanguageTrainingBackend::HostReference => field_train::sample(args, &mut field_train::host()),
         Some("rows-field") if backend == CompleteLanguageTrainingBackend::HostReference => field_train::rows_field(args),
         Some("found-field") if backend == CompleteLanguageTrainingBackend::HostReference => field_train::found_field(args),
+        Some("temper-field") if backend == CompleteLanguageTrainingBackend::HostReference => field_train::temper_field(args),
         Some("ring-field") if backend == CompleteLanguageTrainingBackend::HostReference => field_train::ring_field(args),
         Some("depth-field") if backend == CompleteLanguageTrainingBackend::HostReference => field_train::depth_field(args),
         Some("restate-field") if backend == CompleteLanguageTrainingBackend::HostReference => field_train::restate_field(args, &mut field_train::host()),

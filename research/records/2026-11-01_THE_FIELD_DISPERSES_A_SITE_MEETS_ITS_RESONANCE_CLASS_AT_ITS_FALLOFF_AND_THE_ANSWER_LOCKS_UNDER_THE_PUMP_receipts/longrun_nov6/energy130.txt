@@ -1,0 +1,24 @@
+# energy130: the energy face's founding read again, its face now the total derivative z = -dG/de, G = Phi(x^K(e); e) (theory, November 7 00:02), open sites carrying the locked uniform mixture; (theory, November 6 22:52: "at founding curl/lambda <= 0.3 in every band, the
+# construction's test"), on the host under Brandon's exception (23:52:55 UTC, "You can run it": found the energy field on the
+# line's declaration and read its curl on 32 held problems, reading only, at most an hour on 24 threads). The card refuses
+# energy fields until their realization passes its parity. Founding: lap 24's declaration (long114/seg10) with the energy, on
+# KEYS8. Read: curl-field, 32 held problems, 16 squares a band (5 bands, 2,560 squares, 10,240 region reads, truth120's
+# workload). Projection from a development read (4 problems, 2 squares a band, 160 region reads: energy129 read one short problem and under-projected); the read runs only if its
+# projection's upper end (1.25x the development rate) fits the hour less the founding; else it stops and says so.
+set -u
+# energy130 binary a5a7d201cfdd5f73525e748bd4012c53ff680cdef5c4f67a89f5dc47f3716d61 state bdaeff3a76c1 the hour ends 02:16:43
+DEVICE host exception=exception manifest=found.manifest manifest_sha256=9d138705a024b2d833afc126290d557c9f54ef7aab2808a2febad6c0b6b33615
+FIELD_FOUNDED hnn-field-v15 100 32 4 8 2 32 4 4 3771 1 0 1 rate=12 material=31222
+FIELD_CURL problems=4 squares=40 regions=160 ms=7565
+MEASURE lap=curl_dev rc=0 wall_s=7.6 peak_rss_kib=472712
+# development: 160 region reads in 7565 ms; projection for 10240: 484 s, upper 665 s, 3532 s left in the hour
+FIELD_CURL problems=32 squares=2560 regions=10240 ms=546154
+MEASURE lap=curl rc=0 wall_s=546.2 peak_rss_kib=1083064
+band	squares	lambda_mean	lambda_sd	curl_sd	curl/lambda	mean_abs_curl	corr	power	kappa
+1	512	-59.085	12.654	26.337	2.08	10.410	-0.04	667.08	1.040
+2-3	512	-54.843	16.935	32.762	1.93	16.419	+0.03	1110.25	0.967
+4-7	512	-54.927	15.267	29.032	1.90	14.053	+0.05	887.61	0.950
+8-15	512	-52.063	17.184	35.294	2.05	19.436	-0.03	1213.43	1.027
+16+	512	-44.395	20.561	40.848	1.99	26.989	+0.01	1679.75	0.993
+MAIN exit 01:25:57
+# medians of lambda_i and lambda_j by band: -62.0 bits in every band at both ends (the face floor's code)
