@@ -1961,7 +1961,7 @@ pub(super) fn curl_field(args: &[String], realization: &mut dyn FieldRealization
     std::fs::create_dir(out)?;
     let void = codec.void();
     let near = holonics::hnn::tower::field::NEAR;
-    let mut rows = rows_file(&out.join("CURL.tsv"), "problem\tband\ti\tj\tlambda_i\tlambda_j\tsmall_i\tsmall_j\tzlambda_i\tzlambda_j\tglambda\tfloors\n")?;
+    let mut rows = rows_file(&out.join("CURL.tsv"), "problem\tband\ti\tj\tlambda_i\tlambda_j\tsmall_i\tsmall_j\twide_i\twide_j\tzlambda_i\tzlambda_j\tglambda\tfloors\n")?;
     let (mut read_regions, mut written) = (0usize, 0usize);
     for k in 0..n {
         let (q, room) = opening(&codec, field, &held[k].0, b"")?;
@@ -1991,11 +1991,11 @@ pub(super) fn curl_field(args: &[String], realization: &mut dyn FieldRealization
         // read at ε = 2^(−6) beside it; on the host (the card's reverse is not built).
         if field.declaration.energy {
             let reads = picked.par_iter().map(|&(_, i, j)| field.energy_square_corners(&truth, (i, j), void, ENERGY_EPS)).collect::<std::result::Result<Vec<_>, _>>().map_err(|e| e.to_string())?;
-            read_regions += 7 * picked.len();
+            read_regions += 13 * picked.len();
             for (&(b, i, j), square) in picked.iter().zip(&reads) {
                 let Some(sq) = square else { continue };
                 // The attribution read on the faces' logits (2^(−16) bits), written on the curl's 2^(−20) bits.
-                row(&mut rows, &format!("{k}\t{b}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\n", i - q.len(), j - q.len(), sq.lambda_i, sq.lambda_j, sq.small_i << 4, sq.small_j << 4, sq.zlambda_i, sq.zlambda_j, sq.glambda, sq.floors))?;
+                row(&mut rows, &format!("{k}\t{b}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\n", i - q.len(), j - q.len(), sq.lambda_i, sq.lambda_j, sq.small_i << 4, sq.small_j << 4, sq.wide_i << 4, sq.wide_j << 4, sq.zlambda_i, sq.zlambda_j, sq.glambda, sq.floors))?;
                 written += 1;
             }
             continue;
@@ -2004,7 +2004,7 @@ pub(super) fn curl_field(args: &[String], realization: &mut dyn FieldRealization
         read_regions += read.regions;
         for (&(b, i, j), square) in picked.iter().zip(&read.squares) {
             let Some(sq) = square else { continue };
-            row(&mut rows, &format!("{k}\t{b}\t{}\t{}\t{}\t{}\t-\t-\t-\t-\t-\t-\n", i - q.len(), j - q.len(), sq.lambda_i, sq.lambda_j))?;
+            row(&mut rows, &format!("{k}\t{b}\t{}\t{}\t{}\t{}\t-\t-\t-\t-\t-\t-\t-\t-\n", i - q.len(), j - q.len(), sq.lambda_i, sq.lambda_j))?;
             written += 1;
         }
     }

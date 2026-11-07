@@ -389,7 +389,7 @@ impl Field {
             out.tq = vec![0i64; sites * m2];
             out.tp = vec![0i64; sites * m2];
         }
-        let carried = |v: Option<i128>| v.ok_or(TowerError::Refused(KEY_RETURN));
+        let carry = |what: &'static str, v: Option<i128>| v.ok_or(TowerError::Refused(what));
         for h in 0..heads {
             let lists = &held.classes[h];
             let rows = &c.rows[h * sites..(h + 1) * sites];
@@ -428,7 +428,7 @@ impl Field {
                             pair += tp[i * span + r] as i128 * qh[j * span + r] as i128 + ph[i * span + r] as i128 * tk[j * span + r] as i128;
                             power += qh[j * span + r] as i128 * tk[j * span + r] as i128;
                         }
-                        acc = carried(acc.checked_add(carried((dec * pair).checked_mul(1i128 << g))? - dec * dec * power))?;
+                        acc = carry("a lock score's tangent past its 128-bit carrier", acc.checked_add(carry("a lock score's tangent past its 128-bit carrier", (dec * pair).checked_mul(1i128 << g))? - dec * dec * power))?;
                     }
                     dz.push(release(temper * release(acc, 2 * g_), MATERIAL_BITS));
                 }
@@ -439,17 +439,21 @@ impl Field {
                     for li in 0..n {
                         let (dec, g) = self.octave_decay(paces, h, li, i, cr.level, cr.lo > i);
                         g_ = g;
+                        // [agent-inferred, November 7] A crowd's tangent reads its mean word `m = W/|C|` and its tangent `δm`
+                        // (each to the nearest on its grain), as a source at the mean: the count's square never multiplies a
+                        // tangent, whose words carry the reverse's covectors (a writer state's crowds passed the 128-bit
+                        // carrier read through `|C|²`, energy131's temper read).
                         let mut pair = 0i128;
                         let mut power = 0i128;
                         for r in [li, n + li] {
-                            let w = sums.words[(cr.hi + 1) * span + r] - sums.words[cr.lo * span + r];
-                            let dw = ts.words[(cr.hi + 1) * span + r] - ts.words[cr.lo * span + r];
+                            let w = div_nearest(sums.words[(cr.hi + 1) * span + r] - sums.words[cr.lo * span + r], count);
+                            let dw = div_nearest(ts.words[(cr.hi + 1) * span + r] - ts.words[cr.lo * span + r], count);
                             pair += tp[i * span + r] as i128 * w + ph[i * span + r] as i128 * dw;
                             power += w * dw;
                         }
-                        acc = carried(acc.checked_add(carried(carried((dec * pair).checked_mul(1i128 << g))?.checked_mul(count))? - dec * dec * power))?;
+                        acc = carry("a crowd score's tangent past its 128-bit carrier", acc.checked_add(carry("a crowd score's tangent past its 128-bit carrier", (dec * pair).checked_mul(1i128 << g))? - dec * dec * power))?;
                     }
-                    dz.push(release(temper * release(div_nearest(acc, count * count), 2 * g_), MATERIAL_BITS));
+                    dz.push(release(temper * release(acc, 2 * g_), MATERIAL_BITS));
                 }
                 // The shares' tangents on 2^(−63): `ln 2 · p (δz − Σ p δz)`.
                 let shares: Vec<i128> = rows[i].iter().map(|s| s.p as i128).chain(crowds[i].iter().map(|cr| cr.e as i128)).collect();
@@ -476,11 +480,11 @@ impl Field {
                     for r in 0..span {
                         let (dec, g) = self.pair_decay(paces, h, r % n, i, j);
                         let bracket = release(((dec * ph[i * span + r] as i128) << g) - dec * dec * qh[j * span + r] as i128, g);
-                        col[j * span + r] = carried(col[j * span + r].checked_add(carried(ds[i][k].checked_mul(bracket))?))?;
+                        col[j * span + r] = carry("a key's column past its 128-bit carrier", col[j * span + r].checked_add(carry("a key's column past its 128-bit carrier", ds[i][k].checked_mul(bracket))?))?;
                         if let Some((tk, tp)) = tangent_h {
                             let tbracket = release(((dec * tp[i * span + r] as i128) << g) - dec * dec * tk[j * span + r] as i128, g);
-                            let v = carried(carried(tds[i][k].checked_mul(bracket))?.checked_mul(1 << 8))? + carried(ds[i][k].checked_mul(tbracket))?;
-                            tcol[j * span + r] = carried(tcol[j * span + r].checked_add(v))?;
+                            let v = carry("a key's tangent bracket past its 128-bit carrier", carry("a key's tangent bracket past its 128-bit carrier", tds[i][k].checked_mul(bracket))?.checked_mul(1 << 8))? + carry("a key's tangent bracket past its 128-bit carrier", ds[i][k].checked_mul(tbracket))?;
+                            tcol[j * span + r] = carry("a key's tangent column past its 128-bit carrier", tcol[j * span + r].checked_add(v))?;
                         }
                     }
                 }
@@ -490,15 +494,18 @@ impl Field {
                         let (dec, g) = self.octave_decay(paces, h, r % n, i, cr.level, cr.lo > i);
                         let mean = sums.words[(cr.hi + 1) * span + r] - sums.words[cr.lo * span + r];
                         let bracket = release(((dec * ph[i * span + r] as i128 * count) << g) - dec * dec * mean, g);
-                        let part = div_nearest(carried(dsc[i][k].checked_mul(bracket))?, count * count);
+                        let part = div_nearest(carry("a crowd key's part past its 128-bit carrier", dsc[i][k].checked_mul(bracket))?, count * count);
                         crowd_w[cr.lo * span + r] += part;
                         crowd_w[(cr.hi + 1) * span + r] -= part;
                         if let Some((_, tp)) = tangent_h {
+                            // At the mean word, as the score's tangent reads it: each member's key force `p_C T (D p̂ − D² m)/|C|`.
                             let ts = tsums.as_ref().expect("a tangent's sums");
-                            let tmean = ts.words[(cr.hi + 1) * span + r] - ts.words[cr.lo * span + r];
-                            let tbracket = release(((dec * tp[i * span + r] as i128 * count) << g) - dec * dec * tmean, g);
-                            let v = carried(carried(tdsc[i][k].checked_mul(bracket))?.checked_mul(1 << 8))? + carried(dsc[i][k].checked_mul(tbracket))?;
-                            let part = div_nearest(v, count * count);
+                            let m_ = div_nearest(mean, count);
+                            let tm = div_nearest(ts.words[(cr.hi + 1) * span + r] - ts.words[cr.lo * span + r], count);
+                            let bracket_m = release(((dec * ph[i * span + r] as i128) << g) - dec * dec * m_, g);
+                            let tbracket = release(((dec * tp[i * span + r] as i128) << g) - dec * dec * tm, g);
+                            let v = carry("a crowd key's tangent part past its 128-bit carrier", carry("a crowd key's tangent part past its 128-bit carrier", tdsc[i][k].checked_mul(bracket_m))?.checked_mul(1 << 8))? + carry("a crowd key's tangent part past its 128-bit carrier", dsc[i][k].checked_mul(tbracket))?;
+                            let part = div_nearest(v, count);
                             tcrowd_w[cr.lo * span + r] += part;
                             tcrowd_w[(cr.hi + 1) * span + r] -= part;
                         }
@@ -526,9 +533,11 @@ impl Field {
                         let w = sums.words[(cr.hi + 1) * span + r] - sums.words[cr.lo * span + r];
                         sq += div_nearest(dsc[i][kk] * dec * w, cr.count as i128);
                         if tangent_h.is_some() {
+                            // At the mean word, as the score's tangent reads it.
                             let ts = tsums.as_ref().expect("a tangent's sums");
-                            let tw = ts.words[(cr.hi + 1) * span + r] - ts.words[cr.lo * span + r];
-                            tsq += div_nearest(((tdsc[i][kk] * dec * w) << 8) + dsc[i][kk] * dec * tw, cr.count as i128);
+                            let m_ = div_nearest(w, cr.count as i128);
+                            let tm = div_nearest(ts.words[(cr.hi + 1) * span + r] - ts.words[cr.lo * span + r], cr.count as i128);
+                            tsq += ((tdsc[i][kk] * dec * m_) << 8) + dsc[i][kk] * dec * tm;
                         }
                     }
                     out.dp[slot] = fit64(release(sq, back))?;
@@ -1260,7 +1269,7 @@ impl Field {
         let base = self.energy_relax(&base_region, self.declaration.ticks, None, None)?;
         let halvings = base.read.halvings.clone();
         // A corner: `at` read open, the other site `(t, letter)` set to a letter, or carrying a moved mixture.
-        let corner = |at: usize, other: usize, letter: Option<usize>, shift: Option<(usize, usize)>| -> Result<Vec<i64>> {
+        let corner = |at: usize, other: usize, letter: Option<usize>, mixture: Option<Shares>| -> Result<Vec<i64>> {
             let mut classes = truth.to_vec();
             let mut unresolved = vec![false; sites];
             let mut faces: Vec<Option<Shares>> = vec![None; sites];
@@ -1270,7 +1279,7 @@ impl Field {
                 Some(c) => classes[other] = c,
                 None => {
                     unresolved[other] = true;
-                    (faces[other], locked[other]) = (Some(self.energy_square_mixture(shift, eps)), true);
+                    (faces[other], locked[other]) = (mixture, true);
                 }
             }
             let r = Region { classes: &classes, unresolved: &unresolved, faces: &faces, locked: &locked, echo: &[], domain: None, port: None };
@@ -1294,9 +1303,12 @@ impl Field {
         // The attribution read at one base: the base's own faces, and each site's with the other's mixture moved.
         let (pass, _) = self.energy_faces(&base_region, Some(&halvings), Some(&base.held))?;
         let (zi, zj) = (pass.logits[i].clone().ok_or(TowerError::Refused("a square's open place with no face"))?, pass.logits[j].clone().ok_or(TowerError::Refused("a square's open place with no face"))?);
-        let zi_moved = corner(i, j, None, Some((b2, b)))?;
-        let zj_moved = corner(j, i, None, Some((a2, a)))?;
-        let corners = SquareCorners { zi_b: &zi_b, zj_a: &zj_a, zi_b2: &zi_b2, zj_a2: &zj_a2, zi: &zi, zj: &zj, zi_moved: &zi_moved, zj_moved: &zj_moved, g };
+        let zi_moved = corner(i, j, None, Some(self.energy_square_mixture(Some((b2, b)), eps)))?;
+        let zj_moved = corner(j, i, None, Some(self.energy_square_mixture(Some((a2, a)), eps)))?;
+        // And at four times the step.
+        let zi_wide = corner(i, j, None, Some(self.energy_square_mixture(Some((b2, b)), 4 * eps)))?;
+        let zj_wide = corner(j, i, None, Some(self.energy_square_mixture(Some((a2, a)), 4 * eps)))?;
+        let corners = SquareCorners { zi_b: &zi_b, zj_a: &zj_a, zi_b2: &zi_b2, zj_a2: &zj_a2, zi: &zi, zj: &zj, zi_moved: &zi_moved, zj_moved: &zj_moved, zi_wide: &zi_wide, zj_wide: &zj_wide, g };
         self.energy_square_reading((a, b), (a2, b2), &corners, void).map(Some)
     }
 
@@ -1347,7 +1359,10 @@ impl Field {
         let gap = |z: &[i64], hi: usize, lo: usize| (z[hi] - z[lo]) as i128;
         let small_i = gap(c.zi_moved, a2, a) - gap(c.zi, a2, a);
         let small_j = gap(c.zj_moved, b2, b) - gap(c.zj, b2, b);
-        Ok(EnergySquare { runners: (a2, b2), lambda_i, lambda_j, small_i, small_j, zlambda_i, zlambda_j, glambda, floors })
+        // And at four times the step, so the readings' growth and the curl's are read beside each other.
+        let wide_i = gap(c.zi_wide, a2, a) - gap(c.zi, a2, a);
+        let wide_j = gap(c.zj_wide, b2, b) - gap(c.zj, b2, b);
+        Ok(EnergySquare { runners: (a2, b2), lambda_i, lambda_j, small_i, small_j, wide_i, wide_j, zlambda_i, zlambda_j, glambda, floors })
     }
 
     /// [measurement] **A region's energy read** ([`EnergyRead`]): the energy at the opening and at the last tick, each
@@ -1373,8 +1388,8 @@ pub struct EnergyRead {
 }
 
 /// A one-base square's corners as read ([`Field::energy_square_reading`]): `i`'s logits with `j` at `b` and at `b′`, `j`'s with
-/// `i` at `a` and at `a′`, the base's own at `i` and `j` and each with the other's mixture moved by `ε` (`b′` up from `b`, `a′`
-/// up from `a`), and `G` at `(a′, b)`, `(a, b′)`, `(a, b)` and `(a′, b′)` on `2^(−32)` bits.
+/// `i` at `a` and at `a′`, the base's own at `i` and `j` and each with the other's mixture moved by `ε` and by `4ε` (`b′` up from
+/// `b`, `a′` up from `a`), and `G` at `(a′, b)`, `(a, b′)`, `(a, b)` and `(a′, b′)` on `2^(−32)` bits.
 #[derive(Clone, Copy, Debug)]
 pub struct SquareCorners<'a> {
     pub zi_b: &'a [i64],
@@ -1385,6 +1400,9 @@ pub struct SquareCorners<'a> {
     pub zj: &'a [i64],
     pub zi_moved: &'a [i64],
     pub zj_moved: &'a [i64],
+    /// The same at four times the step.
+    pub zi_wide: &'a [i64],
+    pub zj_wide: &'a [i64],
     pub g: [i128; 4],
 }
 
@@ -1397,6 +1415,9 @@ pub struct EnergySquare {
     pub lambda_j: i64,
     pub small_i: i128,
     pub small_j: i128,
+    /// The attribution read at four times the step.
+    pub wide_i: i128,
+    pub wide_j: i128,
     /// The readings on the faces' logits, on `2^(−20)` bits.
     pub zlambda_i: i64,
     pub zlambda_j: i64,

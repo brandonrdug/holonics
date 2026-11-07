@@ -4199,8 +4199,8 @@ band. At d = 1 that is λ's spread 3.48, power 32.05 and κ 0.485, against lap 2
   pull moved the walk's resting law to a common-name pile-up, not toward the truth [inferred].
 Receipts: `longrun_nov6/squares126.txt`.
 
-[measurement; November 6, scans127; the unified-theory reading of 21:14] **Runs move the walk, and a reversed scan moves its
-law: the faces' curl reaches the release, so a structural face is owed.** Four walks from held truth on lap 24's state, 40 passes
+[measurement; November 6, scans127; the unified-theory reading of 21:14] **Runs move the walk, and the walk depends on its
+visiting order beyond the keys' spread.** Four walks from held truth on lap 24's state, 40 passes
 each, every one at run bits 0 (one place a read). Two are keyed, at truth120's key and at a second declared key. One walks place
 order and one reversed place order (`FIELD_WRITER_REFINE_ORDER`, at truth120's key). The reads were fixed before the walks
 (`scan_reads.py`): at pass 40 and over passes 31–40, a walk reads apart from another when, in some read, their difference passes
@@ -4221,9 +4221,10 @@ walk [agent-inferred: the conservative reading of "beyond the two keyed walks' g
   other, and that costs about 0.3 bits a place by pass 40.
 - Scans: reversed lies 0.267 above the nearer keyed walk at pass 40 (0.233 past the gap) and 0.227 over 31–40 (0.201 past it), so
   it is apart. Place order lies 0.143 and 0.141 past the gap, just inside 0.15 (0.160 past it against the keyed walks' mean).
-  Parses and fences stay inside the gap for both scans. A fixed scan direction raises the walk's resting code, most when it walks
-  against the text, so the faces' curl moves the walk's law. With no slow mode (squares126), the structural face is owed: faces
-  as forces of one stored energy (theory's law of 21:15, sent with this score).
+  Parses and fences stay inside the gap for both scans. At 40 passes the walk depends on its visiting order beyond the keys'
+  spread; that the walks' end states differ is not shown (theory's correction, November 7, 02:00). With no slow mode
+  (squares126), the structural face was taken up: faces as forces of one stored energy (theory's law of 21:15, sent with this
+  score).
 - D moved less than S: reversed at pass 40 is 0.087 above the keyed walks' mean, against their gap of 0.045. Theory's "D most" did
   not hold.
 - The common-identifier pile-up is in every walk: repeat share 0.553, 0.510, 0.628 and 0.608, with `j` the commonest identifier
