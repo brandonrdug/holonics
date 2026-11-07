@@ -1961,7 +1961,7 @@ pub(super) fn curl_field(args: &[String], realization: &mut dyn FieldRealization
     std::fs::create_dir(out)?;
     let void = codec.void();
     let near = holonics::hnn::tower::field::NEAR;
-    let mut rows = rows_file(&out.join("CURL.tsv"), "problem\tband\ti\tj\tlambda_i\tlambda_j\n")?;
+    let mut rows = rows_file(&out.join("CURL.tsv"), "problem\tband\ti\tj\tlambda_i\tlambda_j\tsmall_i\tsmall_j\tzlambda_i\tzlambda_j\tglambda\tfloors\n")?;
     let (mut read_regions, mut written) = (0usize, 0usize);
     for k in 0..n {
         let (q, room) = opening(&codec, field, &held[k].0, b"")?;
@@ -1986,11 +1986,25 @@ pub(super) fn curl_field(args: &[String], realization: &mut dyn FieldRealization
                 picked.push((b, i, i + d));
             }
         }
+        // [measurement; the unified-theory reading of November 7, 01:37] An energy field's square is read at one base, its four
+        // corners replayed at the base's halvings under its supports (`Field::energy_square_corners`), with the attribution
+        // read at ε = 2^(−6) beside it; on the host (the card's reverse is not built).
+        if field.declaration.energy {
+            let reads = picked.par_iter().map(|&(_, i, j)| field.energy_square_corners(&truth, (i, j), void, ENERGY_EPS)).collect::<std::result::Result<Vec<_>, _>>().map_err(|e| e.to_string())?;
+            read_regions += 7 * picked.len();
+            for (&(b, i, j), square) in picked.iter().zip(&reads) {
+                let Some(sq) = square else { continue };
+                // The attribution read on the faces' logits (2^(−16) bits), written on the curl's 2^(−20) bits.
+                row(&mut rows, &format!("{k}\t{b}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\n", i - q.len(), j - q.len(), sq.lambda_i, sq.lambda_j, sq.small_i << 4, sq.small_j << 4, sq.zlambda_i, sq.zlambda_j, sq.glambda, sq.floors))?;
+                written += 1;
+            }
+            continue;
+        }
         let read = square_reads(field, void, &truth, &picked, realization)?;
         read_regions += read.regions;
         for (&(b, i, j), square) in picked.iter().zip(&read.squares) {
             let Some(sq) = square else { continue };
-            row(&mut rows, &format!("{k}\t{b}\t{}\t{}\t{}\t{}\n", i - q.len(), j - q.len(), sq.lambda_i, sq.lambda_j))?;
+            row(&mut rows, &format!("{k}\t{b}\t{}\t{}\t{}\t{}\t-\t-\t-\t-\t-\t-\n", i - q.len(), j - q.len(), sq.lambda_i, sq.lambda_j))?;
             written += 1;
         }
     }
@@ -2731,6 +2745,43 @@ pub(super) fn found_field(args: &[String]) -> Result<()> {
 /// A field's declaration head line.
 fn declaration_line(field: &Field) -> String {
     field.to_text().lines().next().unwrap_or("").to_string()
+}
+
+/// [definition; the unified-theory reading of November 7, 01:37] The attribution read's step: a mixture moved by `2^(−6)` of its
+/// weight, where theory's identity reads the square to first order.
+const ENERGY_EPS: u32 = 1 << 10;
+
+/// [definition; the unified-theory reading of November 7, 01:37] **`temper-field STATE STATE_SHA CODEC CODEC_SHA UNITS UNITS_SHA
+/// TRAIN TRAIN_SHA COUNT OUT`**: an energy field's founding temperature, the letters read at one `T`, set where its faces open
+/// at one bit of spread: over the first `COUNT` training problems' writer states (the question known, every answer place
+/// open), the root mean square of each open site's face spread across the letters at `T = 1` (`Field::energy_temperature`).
+/// Writes the learner with `log₂ T₀` set to `OUT`.
+pub(super) fn temper_field(args: &[String]) -> Result<()> {
+    if args.len() != 11 {
+        return Err("temper-field STATE STATE_SHA CODEC CODEC_SHA UNITS UNITS_SHA TRAIN TRAIN_SHA COUNT OUT".into());
+    }
+    let started = std::time::Instant::now();
+    let mut learner = FieldLearner::from_text(std::str::from_utf8(&pinned_read(&args[1], &args[2], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
+    let units = units_of(&args[5], &args[6])?;
+    let codec = FieldCodec::from_text(std::str::from_utf8(&pinned_read(&args[3], &args[4], CODEC_BUDGET)?)?, units)?;
+    let train = problems_of(&pinned_read(&args[7], &args[8], READ_BUDGET as usize)?);
+    let n = count(&args[9])?.min(train.len());
+    let void = codec.void();
+    let mut states: Vec<(Vec<usize>, Vec<bool>)> = Vec::with_capacity(n);
+    for (question, _) in train.iter().take(n) {
+        let (q, room) = opening(&codec, &learner.field, question, b"")?;
+        let mut classes = q.clone();
+        classes.extend(std::iter::repeat_n(void, room));
+        let open = (0..classes.len()).map(|t| t >= q.len()).collect();
+        states.push((classes, open));
+    }
+    let regions: Vec<Region> = states.iter().map(|(c, o)| Region { classes: c, unresolved: o, faces: &[], locked: &[], echo: &[], domain: None, port: None }).collect();
+    let (ell, spread) = learner.field.energy_temperature(&regions).map_err(|e| e.to_string())?;
+    let at = learner.field.layout().face_temper;
+    learner.field.theta[at] = ell;
+    std::fs::write(&args[10], learner.to_text())?;
+    println!("FIELD_TEMPER problems={n} spread_bits={} log2_T={} ms={}", bits(spread as i64 * 16, 1), bits(ell as i64 >> 4, 1), started.elapsed().as_millis());
+    Ok(())
 }
 
 /// [measurement] **`rows-field`**: where an open and a definite receiver's rows put their mass (§15.9's

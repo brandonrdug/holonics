@@ -2223,6 +2223,8 @@ fn energetic(still: usize) -> Field {
     let (l, d) = (field.layout.clone(), field.declaration);
     let (dw, m2) = (d.width, 2 * d.complex());
     field.theta[l.pace..l.pace + d.paced_heads() * (d.alphabet + 1)].fill(0);
+    // The letters read the energy at `T = 1`.
+    field.theta[l.face_temper] = 0;
     for (start, len) in [(l.v, m2 * dw), (l.v_bias, m2), (l.out, dw * m2), (l.out_bias, dw), (l.w, dw * d.contacts), (l.w_bias, dw)] {
         field.theta[start..start + len].fill(0);
     }
@@ -2242,7 +2244,7 @@ fn an_energy_head_line_states_its_law() {
     let plain = tiny_declaration(1).to_text();
     let v14 = plain[..plain.rfind(' ').unwrap()].replace("hnn-field-v15", "hnn-field-v14");
     assert_eq!(FieldDeclaration::from_text(&v14).unwrap(), tiny_declaration(1));
-    assert_eq!(FieldLayout::new(&d).len, FieldLayout::new(&tiny_declaration(1)).len + d.contacts);
+    assert_eq!(FieldLayout::new(&d).len, FieldLayout::new(&tiny_declaration(1)).len + d.contacts + 1);
     let (e, f) = (Field::found(d, &keys(1 << 14)).unwrap(), Field::found(tiny_declaration(1), &keys(1 << 14)).unwrap());
     let l = e.layout.clone();
     let vlen = 2 * d.complex() * d.width;
@@ -2355,5 +2357,40 @@ fn a_square_agrees_at_one_base() {
         // The readings grow about four times, and the curl's share of them falls as ε falls.
         assert!(3 * sums[0].1 <= sums[1].1 && sums[1].1 <= 5 * sums[0].1, "still {still}: readings {sums:?}");
         assert!(sums[0].0 * sums[1].1 <= sums[1].0 * sums[0].1, "still {still}: the curl's share does not fall with ε, {sums:?}");
+    }
+}
+
+/// [definition; the unified-theory reading of November 7, 01:37] **The letters read the energy at one temperature**: at
+/// `log₂ T = τ` every face's logits are the `T = 1` logits times `2^(−τ)` (to the face's grain), and the founding's
+/// temperature opens the faces at one bit of spread.
+#[test]
+fn the_letters_read_the_energy_at_one_temperature() {
+    for still in 0..=2 {
+        let mut field = energetic(still);
+        let at = field.layout.face_temper;
+        field.theta[at] = 0;
+        let flat = field.logits(&region()).unwrap();
+        let (ell, spread) = field.energy_temperature(&[region()]).unwrap();
+        assert!(spread > 1 << 16, "still {still}: a drawn field's faces spread past a bit ({spread})");
+        field.theta[at] = ell;
+        let tempered = field.logits(&region()).unwrap();
+        let inverse = temperature_of(-ell, &field.fine).unwrap();
+        for (a, b) in flat.iter().zip(&tempered) {
+            if let (Some(a), Some(b)) = (a, b) {
+                for (&x, &y) in a.iter().zip(b) {
+                    assert_eq!(y as i128, release(x as i128 * inverse, MATERIAL_BITS), "still {still}");
+                }
+            }
+        }
+        // The faces at T0: the root mean square of their spread across the letters, one bit to the face's grain.
+        let a_ = field.declaration.alphabet as i128;
+        let (mut second, mut sites) = (0i128, 0i128);
+        for z in tempered.iter().flatten() {
+            let mean = div_nearest(z.iter().map(|&v| v as i128).sum(), a_);
+            second += div_nearest(z.iter().map(|&v| (v as i128 - mean).pow(2)).sum(), a_);
+            sites += 1;
+        }
+        let opened = (div_nearest(second, sites) as u128).isqrt() as i128;
+        assert!((opened - (1 << 16)).abs() <= 1 << 10, "still {still}: the faces at T0 spread {opened} (2^(−16) bits)");
     }
 }

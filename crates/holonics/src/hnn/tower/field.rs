@@ -525,6 +525,10 @@ pub struct FieldLayout {
     /// parts then imaginary, on the material's grain) in an energy field ([`FieldDeclaration::energy`]): the strand pair's
     /// energy is `−Re⟨c, a_t · b_(s(t))⟩`. Absent (zero long) otherwise.
     pub pair_c: usize,
+    /// [definition; the unified-theory reading of November 7, 01:37] **The letters read the energy at one temperature**: an
+    /// energy field's face is `z_t(a) = −(1/T) dG/de_t(a)`, one `T` for the whole field, held as `log₂ T` (one entry on the
+    /// material's grain). Absent (zero long) otherwise.
+    pub face_temper: usize,
     pub len: usize,
     pub families: Vec<(usize, usize, u32)>,
 }
@@ -566,8 +570,8 @@ impl FieldLayout {
         let moment_face = push(dw * m2, MATERIAL_BITS);
         let moment_face_bias = push(dw, FACE_BITS);
         let lift_bias = push(dw, FACE_BITS);
-        let pair_c = if d.energy { push(f, MATERIAL_BITS) } else { at };
-        Self { enc, before, after, q, q_bias, v, v_bias, out, out_bias, a: a_, a_bias, b, b_bias, w, w_bias, read, read_bias, moment_before, moment_after, temper, probe, probe_bias, pace, moment_face, moment_face_bias, lift_bias, pair_c, len: at, families }
+        let (pair_c, face_temper) = if d.energy { (push(f, MATERIAL_BITS), push(1, MATERIAL_BITS)) } else { (at, at) };
+        Self { enc, before, after, q, q_bias, v, v_bias, out, out_bias, a: a_, a_bias, b, b_bias, w, w_bias, read, read_bias, moment_before, moment_after, temper, probe, probe_bias, pace, moment_face, moment_face_bias, lift_bias, pair_c, face_temper, len: at, families }
     }
 }
 
@@ -5220,7 +5224,7 @@ impl FieldLearner {
 mod energy;
 pub mod moment;
 mod scale;
-pub use energy::{EnergyRead, ENERGY_BITS};
+pub use energy::{EnergyRead, EnergySquare, ENERGY_BITS};
 pub use scale::Scale;
 
 #[cfg(test)]
