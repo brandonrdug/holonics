@@ -4644,6 +4644,11 @@ pub trait FieldRealization {
     fn read_energy_squares(&mut self, field: &Field, squares: &[(&[usize], (usize, usize))], void: usize, eps: u32) -> Result<Vec<Option<EnergySquare>>> {
         squares.par_iter().map(|&(truth, ij)| field.energy_square_corners(truth, ij, void, eps)).collect()
     }
+    /// [definition; agent-inferred, November 7] An energy field's material covector `∂G/∂θ` and `G` a region
+    /// ([`Field::energy_material`]), read on the host in parallel unless the realization reads them itself.
+    fn read_energy_material(&mut self, field: &Field, regions: &[Region]) -> Result<Vec<(Vec<i128>, i128)>> {
+        regions.par_iter().map(|r| field.energy_material(r)).collect()
+    }
     fn read_blank_clocks(&mut self, _field: &Field, _region: &Region, _sites: &[usize]) -> Result<Vec<BlankClocks>> {
         refuse("a realization that cannot read its blanks' clocks")
     }
