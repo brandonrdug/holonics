@@ -2269,26 +2269,29 @@ fn each_energy_tick_falls() {
     }
 }
 
-/// [definition; the unified-theory reading of November 6, 22:52] **The face is the energy's force on a letter**: with the
-/// moment encodings at zero the energy is linear in a site's letter at fixed state and supports, so at the relaxed state
-/// `Φ(a) − Φ(0) = −(z_t(a) − z_t(0))` at every open site and letter, to the face's grain.
+/// [definition; the unified-theory reading of November 7, 00:02] **The face is the total derivative of one scalar**:
+/// `z_t(a) = −dG/de_t(a)`, `G(e) = Φ(x^K(e); e)` read through the opening and the ticks at the base's halvings and supports,
+/// so at every open site a central difference of `G` across the site's mixture moved by `±ε(δ_b − δ_a)` reads
+/// `−2ε(z_t(b) − z_t(a))` to the difference's own curvature, on every ring set.
 #[test]
-fn an_energy_face_is_its_letters_force() {
+fn an_energy_face_is_the_total_derivative() {
+    let eps = 1i128 << 9;
     for still in 0..=2 {
-        let mut field = energetic(still);
-        let l = field.layout.clone();
-        let rows = 2 * field.declaration.moment_modes() * (field.declaration.alphabet + 1);
-        field.theta[l.moment_before..l.moment_before + rows].fill(0);
-        field.theta[l.moment_after..l.moment_after + rows].fill(0);
+        let field = energetic(still);
         let r = region();
         let logits = field.logits(&r).unwrap();
-        let letters: Vec<usize> = (0..field.declaration.alphabet).collect();
+        let alphabet = field.declaration.alphabet as u32;
+        let base = (1u32 << 16) / alphabet;
         for t in (0..OPEN.len()).filter(|&t| OPEN[t]) {
             let z = logits[t].as_ref().unwrap();
-            let phi = field.energy_at_letters(&r, t, &letters).unwrap();
-            for a in 1..letters.len() {
-                let (d_phi, d_z) = (phi[a] - phi[0], (z[a] - z[0]) as i128);
-                assert!((d_phi + (d_z << 16)).abs() <= 3 << 16, "still {still} site {t} letter {a}: ΔΦ {d_phi} against Δz {d_z}");
+            for (a, b) in [(0u32, 1u32), (2, 4), (3, 1)] {
+                let moved = |sign: i128| -> Shares { (0..alphabet).map(|c| (c, (base as i128 + if c == b { sign * eps } else if c == a { -sign * eps } else { 0 }) as u32)).collect() };
+                let dg = field.energy_g_at(&r, t, &moved(1)).unwrap() - field.energy_g_at(&r, t, &moved(-1)).unwrap();
+                let predicted = -2 * eps * (z[b as usize] - z[a as usize]) as i128;
+                // A tenth of the reading for the difference's curvature, and 2^23 (2^(−9) bits) for the replayed states'
+                // rounding at the state's grain (measured: the gap falls with ε where the reading is large, and scatters by
+                // about 2^21 where it is small).
+                assert!(10 * (dg - predicted).abs() <= predicted.abs() + (10 << 23), "still {still} site {t} letters {a}, {b}: ΔG {dg} against −2ε Δz {predicted} (2^(−32) bits)");
             }
         }
     }
@@ -2307,5 +2310,50 @@ fn the_energy_force_is_its_slope() {
             let (predicted, actual) = field.energy_slope(&region(), h).unwrap();
             assert!(predicted > 0 && 20 * (actual - predicted).abs() <= predicted, "still {still} h {h}: fall {actual} against its first order {predicted} (2^(−32) bits)");
         }
+    }
+}
+
+/// [definition; the unified-theory reading of November 7, 00:02] **The force's tangent is the energy's Hessian on a
+/// direction**: at the opening, on every ring set, the tangent along a keyed lane-tangent direction matches the force's
+/// difference across a small step to within a tenth of its size, and the Hessian it stands for is symmetric
+/// (`⟨u, H v⟩ = ⟨v, H u⟩` to a hundredth).
+#[test]
+fn the_force_tangent_is_the_energy_hessian() {
+    for still in 0..=2 {
+        let field = energetic(still);
+        for seed in [3u64, 5] {
+            let (tangent, difference, uv, vu) = field.energy_tangent_check(&region(), 8, seed).unwrap();
+            let norm = |a: &[i64]| -> i128 { a.iter().map(|&x| x as i128 * x as i128).sum() };
+            let gap: Vec<i64> = tangent.iter().zip(&difference).map(|(&a, &b)| a - b).collect();
+            assert!(100 * norm(&gap) <= norm(&tangent), "still {still} seed {seed}: |δF − ΔF|² {} against |δF|² {}", norm(&gap), norm(&tangent));
+            assert!(100 * (uv - vu).abs() <= uv.abs() + vu.abs(), "still {still} seed {seed}: ⟨u, Hv⟩ {uv} against ⟨v, Hu⟩ {vu}");
+        }
+    }
+}
+
+/// [definition; the unified-theory reading of November 7, 00:02] **A square agrees at one base** (theory's build identity):
+/// as the face is one scalar's gradient, a square read at one base reads `λ_i = λ_j` to first order, so from `ε = 2^(−6)` to
+/// `2^(−4)` the readings grow four times and the curl, third order, grows more slowly than they do.
+#[test]
+fn a_square_agrees_at_one_base() {
+    let classes = [1usize, 4, 0, 2, 2, 3, 1];
+    let open = [false; 7];
+    let r = Region { classes: &classes, unresolved: &open, faces: &[], locked: &[], echo: &[], domain: None, port: None };
+    for still in 0..=2 {
+        let field = energetic(still);
+        let mut sums = [(0i128, 0i128); 2];
+        for (k, eps) in [1u32 << 10, 1 << 12].into_iter().enumerate() {
+            for i in 0..classes.len() {
+                for j in (i + 1)..classes.len().min(i + 4) {
+                    let (li, lj) = field.energy_square(&r, (i, classes[i], (classes[i] + 1) % 5), (j, classes[j], (classes[j] + 2) % 5), eps).unwrap();
+                    sums[k].0 += (li - lj).abs();
+                    sums[k].1 += li.abs() + lj.abs();
+                }
+            }
+        }
+        println!("still {still}: curl/readings {}/{} at 2^-6, {}/{} at 2^-4", sums[0].0, sums[0].1, sums[1].0, sums[1].1);
+        // The readings grow about four times, and the curl's share of them falls as ε falls.
+        assert!(3 * sums[0].1 <= sums[1].1 && sums[1].1 <= 5 * sums[0].1, "still {still}: readings {sums:?}");
+        assert!(sums[0].0 * sums[1].1 <= sums[1].0 * sums[0].1, "still {still}: the curl's share does not fall with ε, {sums:?}");
     }
 }
