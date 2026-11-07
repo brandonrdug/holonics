@@ -15,7 +15,7 @@ navigator, "session" and "episode" for what are now aeons and epochs.
 `include/holonics/codec/theorem_production_renderer.hpp` contains literal authored theorem
 bodies and explanations; kernel acceptance does not establish that the model inferred those
 bodies. The [evaluation-history review](../research/records/2026-09-15_ATHENA_EVALUATION_HISTORY_AND_SHARED_CONSEQUENCE_KIT.md)
-retains this source finding while preserving the distinct exact solver/factorization results.
+retains this source finding while preserving the distinct solver/factorization results in rationals.
 The frozen C++ source remains historical; no current mathematical solver capability is revoked.
 
 [historical; source-inspected; process-audit] September 13: the interpretation that Hephaestus
@@ -23,7 +23,7 @@ generator construction is a Rust-function emission deliverable, and the subseque
 code-repair priority, are withdrawn. Direct messages had already defined the generators as
 mathematical functions and constituent compositions, including fractal generation and model
 execution. The [generator/campaign audit](../research/records/2026-09-13_GENERATOR_MEANING_AND_CAMPAIGN_DRIFT_AUDIT.md)
-traces the substitution into plans and the unbound native source/condition consumer. The exact
+traces the substitution into plans and the unbound native source/condition consumer. The rational
 operator algebra, resident fixed-feature prediction and Rust printer retain their recorded
 bounded scopes. Printer correspondence and the uncommitted two-symbol assay do not establish
 the requested contextual model construction. Runtime source is preserved by this audit.
@@ -40,10 +40,10 @@ scope is in the [construction record](../research/records/2026-09-09_THE_BYTE_CA
 AC0–AC5 completion statement is withdrawn as completion of generator-bearing HNN construction.
 The [representation audit](../research/records/2026-09-09_THE_BYTE_CLOCK_AND_OCCURRENCE_EXPANSION_ARE_NOT_GENERATOR_CULTIVATION.md)
 shows one contact coordinate per observed source link, operational occurrence-indexed kernel
-material and exact recoverability of all exposed bytes from native lineage. Numerical factor
+material and lossless recoverability of all exposed bytes from native lineage. Numerical factor
 decoding, generic API factoring and restart equality did not establish the requested productive
 generator organization. Their bounded checks stand. This does not reinstate a lexical archive,
-ban finite/discrete charts, or require full-history differentiation or universal exact compression.
+ban finite/discrete charts, or require full-history differentiation or universal lossless compression.
 
 [historical; source-inspected] September 9: the first paused byte-field review correctly
 identified its local return and fixed codec, but overemphasized their absence of full-history
@@ -67,7 +67,7 @@ Current public terminology is HNN; earlier HNA identifiers and campaign records 
 Brandon had replaced that term with **Preimage Fibre** on September 2 and repeated the correction
 on September 3. The terminology and any implied perfect-inverse/raw-past-retention requirement for
 learning are withdrawn. Limited observations can constrain generative families and future conduct.
-Exact persistence, source-codec round trips and declared exact receiver quotients retain their
+Lossless persistence, source-codec round trips and declared receiver quotients retain their
 particular scopes. The [correction record](../research/records/2026-09-07_GENERATOR_RECOVERY_AND_PHASE_TRANSPORT_REJOIN_TEXT_AND_ACOUSTICS.md)
 contains the actual message coordinates and shared text/acoustic attachment.
 
@@ -87,7 +87,7 @@ I/O results retain their own scopes. Native foundations now precede further inhe
 production. See the [audit](../research/records/2026-09-05_CONTEXTUAL_TRANSPORT_PRECEDES_INHERITED_MODEL_PRODUCTION.md).
 
 [historical; source-inspected] 2026-09-04 HNP1 attempted automatic equalization at native Add
-junctions. Actual non-prefix development and exact ablation/restoration returned, but Add's input
+junctions. Actual non-prefix development, ablation and lossless restoration returned, but Add's input
 derivative does not supply a desired comparison target. The automatic policy and session hooks
 were archived before phase admission. The numerical return and formal local laws stand only for
 an already-admitted comparison. See
@@ -146,11 +146,11 @@ retraction is a contamination. Dates are record dates under `research/records/`.
   HIF7 was an error
   (`2026-09-01_HIF7_QUALITATIVE_PROBE_WAS_WRONGLY_PROMOTED_AND_THE_FRAMEWORK_RELEASES_ON_EXACT_CONTRACTS.md`);
   the SCF alternating-sum section identity was replaced by complete factorized sections and carries
-  no broad exactness theorem
+  no broad theorem that the identity holds
   (`2026-09-01_MVF1_COMPLETE_FACTORIZED_GEMMA_SECTIONS_REPLACED_THE_ALTERNATING_SUM_IDENTITY.md`).
 - 2026-09-02: the first engine HNA campaign's reafference-shaped lifecycle is retracted. Adjacent
   byte differences are not native current; an application-supplied admission/status face does not
-  derive current, storage, or morphology; exact file readback is not a world interaction; and an
+  derive current, storage, or morphology; a lossless file readback is not a world interaction; and an
   authored one-edge deposit is not learning. More fundamentally, an HNA operation already returns
   the successor ecology used by the next inference cycle. Self-reentry and an exterior response are
   ordinary sources of the next occurrence, not separate recurrence and privileged-return laws.
@@ -165,8 +165,8 @@ retraction is a contamination. Dates are record dates under `research/records/`.
   so far at the tied cross-section only
   (`2026-09-02_THE_HNA4_MORPHOLOGY_FACTOR_IS_OCCURRENCE_CARRIED_AND_THE_FORMAL_OWNERS_REQUIRE_A_CAUSAL_CONE_ADJOINT_RETURN.md`,
   `2026-09-02_HNA4_THE_RETURN_DEPOSITED_A_FACTORIZED_OVERLAY_ON_THE_TIED_CROSS_SECTION_AND_THE_NEXT_CYCLE_APPLIED_IT.md`).
-- 2026-09-02: the HNA1 "Soulkiller return" is a manifestation: the resident exact foreign
-  operator with its names removed, exciting nothing, carrying no insufficiency, never crossing
+- 2026-09-02: the HNA1 "Soulkiller return" is a manifestation: the resident foreign
+  operator copied whole with its names removed, exciting nothing, carrying no insufficiency, never crossing
   the Soulkiller boundary. Soulkiller is founded by excitation and returns the signature
   quotient of a declared family as cone-restricted ecologies; the resident realization is its
   apparatus
@@ -185,9 +185,9 @@ retraction is a contamination. Dates are record dates under `research/records/`.
   receipts stand as testimony
   (`research/records/2026-09-03_SKE_AUDIT_THE_COORDINATE_GRAIN_THE_HOST_READOUT_AND_THE_COMPRESSION_CLAUSE_WERE_INJECTIONS_AND_THE_CANON_ALREADY_OWNS_THE_ANSWERS.md`).
 
-[established-bounded; source-inspected] Standing at declared scope, for contrast: four exact
+[established-bounded; source-inspected] Standing at declared scope, for contrast: four lossless
 interior recoveries (`2026-08-10_THE_OBJECT_IS_THE_UNRECONSTRUCTABLE_INTERIOR_AND_THE_MACHINE_HAS_ALREADY_RECOVERED_FOUR.md`);
-one exact continuation from a 711 KiB integer container
+one lossless continuation from a 711 KiB integer container
 (`2026-08-18_THE_RATIO_CROSSED_THE_CONTAINER_PRODUCES_AND_ALL_168_GEMMA_CIRCUITS_ARE_FULL_RANK.md`);
 kernel-accepted Lean emission with the theorem header supplied and, in M6, with the teacher
 withheld (`2026-07-31_THE_THEOREM_OPENS_ITS_LOCAL_STAR_THE_KERNEL_RETURN_CAUSES_DEEPER_PROOF_MOTION.md`,
@@ -195,7 +195,7 @@ withheld (`2026-07-31_THE_THEOREM_OPENS_ITS_LOCAL_STAR_THE_KERNEL_RETURN_CAUSES_
 the Soulkiller Complex-Parametron bundle and the complete Gemma excitation scaffold
 (`2026-08-25_SOULKILLER_DISMANTLES_FOREIGN_CONDUCT_WITHOUT_ATTENTION_ONTOLOGY_AND_RETURNS_NATIVE_PARAMETRON_SPOOLS.md`,
 `2026-09-01_SCF2_COMPLETE_GEMMA4_EXCITATION_FOUNDED_THE_SOURCE_NEUTRAL_TRANSPORT_SCAFFOLD.md`);
-and the exact lifecycle apparatus of HIF, SCF, MVF, AAC, and VWS. In those earlier qualitative
+and the lifecycle apparatus of HIF, SCF, MVF, AAC, and VWS. In those earlier qualitative
 prose-generation records, source-bearing shortcuts were later found and removed. The subsequent
 HNA/SKE native recurrence and declared-family emissions retain their own bounded scopes; the
 earlier failures do not establish their absence. The historical attachment question is recorded

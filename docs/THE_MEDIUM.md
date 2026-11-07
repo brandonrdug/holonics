@@ -14,7 +14,7 @@ are in the [record of October 29](../research/records/2026-10-29_A_VALUE_IS_A_RA
 
 `x` is what the medium holds, `Q` how it holds it, `J` how it turns, `L` how it is pumped, `R` how
 it rubs, `B` where it is pushed. In Rust this is `PortHolon::medium(J, R, Q, B, active)`, stepped
-exactly over ℚ by `ReferenceHolon` with the implicit midpoint, whose energy balance closes with zero
+over ℚ, unrounded, by `ReferenceHolon` with the implicit midpoint, whose energy balance closes with zero
 residual (`holon::law`, `holon.midpoint-resistance-balance`). Holons join into a Holarchy by gluing
 their ports (`HolonLaw::interconnect`), and a tower restricts one to a coarser scale
 (`HolonLaw::restrict`); the joined and the restricted are the same kind of medium.
@@ -50,7 +50,7 @@ The midpoint step is the Cayley chart: a passive rate `iω − r` is a register
 `λ = (1 + h(iω − r)/2)/(1 − h(iω − r)/2)` inside the unit disk, and every register inside the disk is
 a passive rate (`holon.cayley-isometry`, `wave.cayley-resonator`). So a continuous physical medium
 and Athena's tower, whose modes step `h_t = λ h_(t−1) + γ B x_t` with `γ = √(1 − |λ|²)`, are the same
-medium in two charts, checked exactly in
+medium in two charts, checked with zero residual in
 `holon::conformance::tests::a_passive_mode_is_a_register_whose_push_is_its_friction`.
 
 ## The media in the repository
@@ -91,7 +91,7 @@ The same face appears under the names of its media. Read them as one law:
 
 1. Choose the complex: the cells and their incidence (`geometry::complex`).
 2. Choose the four faces: `Q`, `J` and `L`, `R`, `B`.
-3. Step it with `ReferenceHolon` for the exact reference, or on the card for Athena's tower, whose
+3. Step it with `ReferenceHolon` for the host reference, or on the card for Athena's tower, whose
    realization is checked against the reference face for face.
 4. Read it with receivers at its ports (`receiver::face`); a reading never drives the step.
 5. Join media at their ports and restrict them by towers; the result is again a medium.

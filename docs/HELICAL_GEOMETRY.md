@@ -49,8 +49,8 @@ its orbit jets and paired quadrance; it adds no new frame system or protein code
 companion is
 [`Geometry/ScrewGeometry.lean`](../lean/Holonics/Geometry/ScrewGeometry.lean).
 It checks the bracket, translation covariance, invariant pairings, polynomial two-jet and moment
-specialization. Axis extraction and general proper rotational recharting currently have exact
-Rust tests; they are not silently included in that Lean proof scope.
+specialization. Axis extraction and general proper rotational recharting currently have
+Rust tests in rationals; they are not silently included in that Lean proof scope.
 
 ## A helix and its independent collapses
 
@@ -82,7 +82,7 @@ has degenerated. Keeping the screw generator avoids inventing a torsion for that
 
 [proved-derived] Without normalizing ω or taking a square root, a rotating generator returns
 `c_⊥=(ω×v)/(ω·ω)` and `h=(ω·v)/(ω·ω)`, with `c_⊥·ω=0` and
-`v=−ω×c_⊥+hω`. For `ω=0`, return the translation or stationary case. These are exact rational
+`v=−ω×c_⊥+hω`. For `ω=0`, return the translation or stationary case. These are rational
 operations in the current library. A whole-generator reversal `(ω,v)↦(−ω,−v)` preserves h;
 chirality and traversal direction are not the same face.
 
@@ -134,7 +134,7 @@ composition and the finite-versus-infinitesimal distinction.
 The source retains both generators, orbit points, parameters and material. Write velocities
 `v_a=V_ξa(x_a)`, `v_b=V_ξb(x_b)` and accelerations `a_a=ω_a×v_a`, `a_b=ω_b×v_b`.
 
-[proved-derived] The exact local contact differential and second variation are
+[proved-derived] The local contact differential and second variation are
 
 ```text
 D Q = (2Δ·v_a, −2Δ·v_b),
@@ -234,7 +234,7 @@ the initial configuration; column i of its Jacobian is `ScrewGenerator::rechart`
 preceding motion; revolute, prismatic and screw joints are the zero-advance, zero-angular and
 general rows of the collapse table; joint space is the torus chart of the revolute phases with
 a line per prismatic parameter; `reciprocal_pairing` is wrench–twist power; each link–link or
-link–object contact is one pair interaction. Exact finite motions remain supplied `AffineMap3`
+link–object contact is one pair interaction. Finite motions in rationals remain supplied `AffineMap3`
 actions with their `RationalPhase`; a general affine action is not identified with `exp(tξ)`.
 For a continuous chain Jacobian, each supplied finite motion must also satisfy its
 generator/parameter differential law; an arbitrary proper rigid matrix with a phase label does
@@ -245,7 +245,7 @@ carry cocycle behind the winding (`Geometry/PhaseCarry`), a lock as the zero-pow
 its Farey address and mediant cost (`Geometry/PairResonance`), the determinant, trace sequence
 and transfer determinant that phase carriage conserves (`Transport/NavigatorTraceFaces`), and
 the holonomy of a cell with harmonic standing relative to node/cell receivers (`Transport/CellHolonomy`).
-`holonics::geometry::winding` (phase, carry, odometer, cell holonomy) and `holonics::navigator::{address,trace}` (lock addresses, trace faces) are their exact Rust owners.
+`holonics::geometry::winding` (phase, carry, odometer, cell holonomy) and `holonics::navigator::{address,trace}` (lock addresses, trace faces) are their Rust owners.
 
 [established-bounded; implemented-exact] **The prototype's Rust consumers** (history; rebuild
 step 1 ports them to `holon::contact`). At `13f8c734`,
@@ -260,7 +260,7 @@ rates separate. Its prefix is the local-joint product `base ∘ T₀ ∘ T₁…
 including cross-joint terms; the all-prismatic target preimage keeps its nullspace, limits and
 endpoint equation. Broader finite screw flows and the generic continuous Jacobian proof remain
 open. The [return and receipts](../research/records/2026-09-21_PAIR_CONTACT_SERIAL_KINEMATICS_AND_THE_RESIDENT_QUADRANCE_RETURN.md)
-give the exact controls.
+give the controls.
 
 ## Two-sided angles are an algebraic chart of this construction
 
@@ -277,7 +277,7 @@ identities of these declared charts. At `k=0`, the algebraic conic contains
 both `C=1` and `C=−1`; the connected normalized flow through `(1,0)` occupies only the first.
 An identity can be correct on that physical branch and false on the entire algebraic fibre.
 The receiver's domain decides which claim is being made. A test of omitted-component coverage
-does not mean an exact algorithm spontaneously invented a false relation on its supplied domain.
+does not mean a correct algorithm spontaneously invented a false relation on its supplied domain.
 
 [definition] The Gram chart `G=K+ιR` is a compact pair/triple receiver for screw data. Its
 adjugate/Jacobi polynomial identities are valid where evaluated, but it omits orbit radius and
@@ -300,7 +300,7 @@ the action and metric needed for each extension.
 
 | Required relation | Existing owner and consuming use |
 |---|---|
-| Phase closure, windings and arithmetic landmarks | `LandmarksAndModuli`, `Farey`, `Polarity`, the retired [`winding_inertia`](https://github.com/brandonrdug/holonics/blob/551d6c5d/crates/holonics/src/geometry/winding_inertia.rs); period/modulus and doubled-angle relations already connect finite navigators to exact algebraic faces |
+| Phase closure, windings and arithmetic landmarks | `LandmarksAndModuli`, `Farey`, `Polarity`, the retired [`winding_inertia`](https://github.com/brandonrdug/holonics/blob/551d6c5d/crates/holonics/src/geometry/winding_inertia.rs); period/modulus and doubled-angle relations already connect finite navigators to algebraic faces |
 | π/e as normalized generating constraints | `PiIterationConstraint`, `Compression/Landmark/ConstraintIdentity`, the retired [`exact_analysis`](https://github.com/brandonrdug/holonics/blob/551d6c5d/crates/holonics/src/geometry/exact_analysis.rs); [September 11 recovery](../research/records/2026-09-11_PI_AND_E_CONSTRAINT_IDENTITIES_HAVE_ORIENTED_GENERATOR_FACES.md) retains branch, winding, independent navigators and remainder |
 | Named critical parameter | The actual `CopsonDeBruijn*` or `Zeta/DeBruijn*` source family; [the maintained distinction](CONSTRAINT_MODES_AND_RECEIVER_FACES.md) prevents conflating the two constants |
 | Inferred navigator/factor family | `NavigatorInference`, `NavigatorFactorization`, `NavigatorObservationScope`, `holonics::ratio::linear` factor owners (the bilinear owner is [history](https://github.com/brandonrdug/holonics/blob/551d6c5d/crates/holonics/src/exact_linear/bilinear.rs)); supplied navigators and inferred parameters are stated separately |
@@ -314,14 +314,14 @@ Their quadrance is `Q=yᵀS_h y`, where `S_h` embeds the six-coordinate spatial 
 `S=[[I,−I],[−I,I]]` at indices `(0,1,2,4,5,6)` and has zero rows/columns at the two homogeneous
 positions `(3,7)`. The initial moment is symmetric rank one and both homogeneous coordinates
 are fixed to one. The product-current identity `Z=y⊗y` and its finite transport are
-the existing moment receiver's source relation. An invariant receiving row space supplies an exact
-reduced recurrence. This does not derive an exponential from a screw generator: a finite map is
-accepted only as an exact proper affine action supplied by the caller, and a phase label is bound
+the existing moment receiver's source relation. An invariant receiving row space supplies a
+reduced recurrence with no remainder. This does not derive an exponential from a screw generator: a finite map is
+accepted only as a rational proper affine action supplied by the caller, and a phase label is bound
 only by the supported Cayley z-rotation/identity-partner relation.
 This follows by the product rule and introduces no new learner or enumeration of a trajectory.
 The phase adapter treats the caller's integer as extra full turns per elementary Cayley passage.
 For a closed period it retains the polygon winding and returns the lifted value
-`polygon + period·extra_turns`; a nonclosed chart period returns its exact endpoint discrepancy
+`polygon + period·extra_turns`; a nonclosed chart period returns its whole endpoint discrepancy
 instead of a winding. An ordered-word witness retains the complete admitted word, including
 repeated generators.
 The receiver factorization is already
@@ -332,7 +332,7 @@ this concrete specialization. The dynamic product-rule equation above is a deriv
 here, not a claim that the new Lean file proves an analytic flow theorem or that a new HNN
 device reduction was executed.
 
-[conditional] For an exact discrete transport T of that product current, the existing receiver
+[conditional] For a rational discrete transport T of that product current, the existing receiver
 factorization constructs U precisely when `E T=U E`, equivalently `ker E⊆ker(E T)`. Otherwise
 its separator is explicitly scoped to the ambient linear moment space; it is not automatically a
 physically realizable screw-pair variation, because symmetry, rank-one, homogeneous and source
@@ -359,8 +359,8 @@ incident field executed only the zero-advance, unit-radius collapse of this pair
 one site per source cell; the
 [design record](../research/records/2026-09-21_THE_HELICAL_PAIR_INTERACTION_IS_THE_HNN_SITE_AND_PHASE_CARRIES_CONTEXT.md)
 records that audit and the prototype's [machine contract](https://github.com/brandonrdug/holonics/blob/13f8c734/docs/plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#situated-generator-and-receiving-composition)
-the packets meant to replace it. The constant-navigator closure is the exact reusable
-specialization; changing material, noncommuting contacts and nonlinear refinement retain their
+the packets meant to replace it. The constant-navigator closure is the reusable
+specialization that closes without remainder; changing material, noncommuting contacts and nonlinear refinement retain their
 source equations and residuals through the same unit.
 
 [established-bounded; source-inspected] `holonics::geometry::screw` holds the Euclidean screw
@@ -373,9 +373,9 @@ mathematical terms, not a reason to reset the framework's already returned capab
 
 [established-bounded; computational-witness] The prototype's
 [helical field consumer](../research/records/2026-09-20_NATIVE_INCIDENCE_FORMS_AND_REUSES_THE_HELICAL_GENERATOR.md)
-used `ScrewGenerator::bracket` to supply exact reference observations in a declared common frame.
+used `ScrewGenerator::bracket` to supply reference observations in rationals in a declared common frame.
 Incidence constructed `s=ξ`, `c=η−ξ`, and one field body formed their relation and normal
-material. The held pair returned the exact bracket `(−24,−22,7,47,52,6)` through its inferred
+material. The held pair returned the true bracket `(−24,−22,7,47,52,6)` through its inferred
 contextual section, while the normal prediction kept its finite-prior residual. The section was
 reused on another condition, and the inferred two-direction condition fibre, transported to
 another source, yielded plural output. Orbit configurations, finite motion, closure and physical

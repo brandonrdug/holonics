@@ -39,17 +39,17 @@ zpow_add_mul_carry       S^(d+n·k) = S^d · C^k            when Sⁿ = C
 phaseTransport_add_carried_period            `Transport/HelicalPairInteraction`: carried material returns after a turn when C commutes with it
 ```
 
-[definition] The carry is the exact defect of additivity of the winding. It is the 2-cocycle
+[definition] The carry is the defect of additivity of the winding. It is the 2-cocycle
 that glues one level of a tower onto the next, and it is content: two towers with the same
 levels and different carries are different objects. The universal-cover case is
 `0 → ℤ → ℝ → S¹ → 0`; choosing a phase section produces the floor cocycle. Carried
 material factors through the phase modulo closure when the carried-period element commutes
 with that material, while the state retains the winding: the torus chart of the material forgets what the helix of the state keeps.
-`RationalPhase { parameter, extra_turns }` retains an exact Cayley circle point and extra turns
+`RationalPhase { parameter, extra_turns }` retains a rational Cayley circle point and extra turns
 per passage: `parameter` is a tangent half-angle, not a turn count or rational angular rate.
 Its `chart_winding`/`lifted_winding` require a separately checked finite closure. A rational
 Cayley point need not close at any finite period. `winding::Odometer` is the mixed-radix cascade
-for declared finite levels; a nonclosing phase retains its exact transport or enclosure and
+for declared finite levels; a nonclosing phase retains its rational transport or enclosure and
 unreduced lift instead of acquiring an invented radix. `Foundation/IwasawaTower` owns the
 compatible-section tower over a prime and `Geometry/PlaceLedger` the product over places. A screw dislocation is the same
 object in a lattice: one step along the axis per circuit, the Burgers step, is the carry of the
@@ -103,7 +103,7 @@ between them, so a nonempty rational tolerance interval has a least-denominator 
 The interval contains infinitely many rational addresses: a finite candidate sweep also needs a
 declared denominator/word bound. The denominator is a period only in a declared normalized
 commensurate clock chart. A rate approximation retains its phase-drift and receiver-error
-bound over the engagement horizon; it does not establish exact physical closure. A unimodular
+bound over the engagement horizon; it does not establish physical closure. A unimodular
 word recharts the pair's two windings without changing any intersection number. Independent
 coprime phases admit the toroidal chart, and the act-and-advance step is its diagonal winding.
 The modular step/inversion representation and a finite rotor step/reflector each supply
@@ -165,7 +165,7 @@ signature `(p,q)`, the Pontryagin arm (realized by the prototype's `StructuralPl
 `λ ↦ −conj λ`. `Hodge/HodgeIndex` and `Coupling/ReflectedPositivity` give related signature
 constructions, and #54 owns the corresponding Lean lift. A general dissipative
 `A=(Ω−M_contact)G` does not satisfy that equality. Signature alone neither makes it a rotation
-nor transfers the conservative bound to all of its off-axis modes. The exact rate form
+nor transfers the conservative bound to all of its off-axis modes. The rate identity
 `A*G+GA=−2G M_contact G` selects the applicable arm.
 
 ## 4. Face = holonomy around a cell
@@ -253,7 +253,7 @@ boundary/gauge conditions. A coherent thread through a tower lifts level by leve
 when the required lifting condition holds (Hensel; `EllipticCurve/FamilyTunnellBrandtPadicHensel`, `Foundation/ContinuingTower`).
 Holon : tensor : matrix is a section with its navigator : its value in a chart : its components
 in a frame. An admitted [D-finite function](https://math.mit.edu/~rstan/pubs/pubfiles/45.pdf) is an algorithmic instance: a navigator (an annihilating
-operator) with finite initial data, closed under sum, product and integral, with a supplied annihilator and sufficient exact initial data deciding equality on the
+operator) with finite initial data, closed under sum, product and integral, with a supplied annihilator and sufficient unrounded initial data deciding equality on the
 admitted germ/domain. Creative telescoping constructs differential/recurrence relations for
 specified sums and integrals, with their boundary terms; it is the target class of the [identity atlas](https://github.com/brandonrdug/holonics/blob/13f8c734/docs/plans/THE_IDENTITIES_OF_A_CONFIGURATION_ARE_THE_KERNEL_OF_ITS_FACE_MAP.md),
 the landmark search of rebuild step 3.
@@ -368,13 +368,13 @@ charts and compatible transition maps. LC coefficients alone do not construct th
 [definition; implemented-exact] `physics::solenoidal::flow::SolenoidalWave` is an executing
 consumer. Its retained current is the finite chart plus the existing `WaveChain` state.
 The caller supplies turns per physical time. Each actual wave tick advances the chart by
-`rate*tick`, returns the existing exact energy balance, and publishes both successors only
+`rate*tick`, returns the existing energy balance, and publishes both successors only
 when both succeed. A source/chart refusal leaves both unchanged. The constructor checks the
 **strict** condition `tick^2 * courant_bound < 4`, rather than silently using the existing
 non-strict convenience predicate. Transverse restriction preserves the physical state and
 commutes with the actual dissipative wave tick. The wave law, storage, source power and heat
 remain owned by `physics::wave`; no LC mode certificate substitutes for its evolution.
-The exterior `solenoidal_wave` example runs these operators and reports every exact balance.
+The exterior `solenoidal_wave` example runs these operators and reports every balance in rationals.
 
 [definition; implemented-exact] `physics::solenoidal::{ContactReading,LcMode,ReflectedPair}`
 consumes the existing contact, port and parametron owners. A contact return carries slip,
@@ -396,13 +396,13 @@ A mounted pump does not by itself certify attraction, stable lock or invariance 
 consume its executed monodromy/Floquet bound and nonlinear lock domain. Linear pump
 reflections and affine point half-turns are different representations. Fluid interpretation
 additionally owes its velocity/pressure/divergence, viscous/thermal balance and time advance;
-classical circulation is not universally quantized. The exact local joins above are
+classical circulation is not universally quantized. The local joins above are
 subclaims used to build that bridge, not substitutes for these missing maps.
 
 [definition; implemented-exact] `ratio::places::PlaceReading::of` is the executable arithmetic
-place receiver from §7's `PlaceLedger`. It consumes the existing exact factorizer and returns
-the sign, ascending prime valuation series, exact factors `p^(-v_p(x))`, and `|x|`.
-Its constructor checks both signed reconstruction from the finite factors and the exact
+place receiver from §7's `PlaceLedger`. It consumes the existing integer factorizer and returns
+the sign, ascending prime valuation series, rational factors `p^(-v_p(x))`, and `|x|`.
+Its constructor checks both signed reconstruction from the finite factors and the
 product-one identity before returning. Zero and raw zero denominators are typed refusals;
 valid raw ratios are normalized. Factoring cost remains operand-dependent trial division
 owned by `ratio::surprisal`, not a new constant-cost or probabilistic owner. The wave example
@@ -420,7 +420,7 @@ is their product, and class increment is derived from the actual field fits and 
 law. It is not an independent simultaneous-tick model and its modulus is not an LCM.
 The retained signed lift distinguishes equal finite faces with different windings.
 Refinement reads a declared finite face restriction; a new fine declaration cannot guess
-missing historical winding. Character phases are exact rational turns on this finite group.
+missing historical winding. Character phases are rational turns on this finite group.
 No infinite solenoid, real-circle completion or general continuation theorem is inferred.
 
 [definition; implemented-exact, combined acceptance pending] `receiver::coupling` reads two
@@ -433,7 +433,7 @@ A constant plateau phase follows from matching successive native increments; no 
 identity follows from phase alone. Equal multisets with the same key cancel at the terminal
 group sum, while intermediate plateaus can have nonzero differences. In particular `[a,b]`
 and `[b,a]` have terminal difference zero but their contact on `a` can read `-A(b)`.
-The exact optimal-contact/phase join remains a Lean obligation in #62.
+The optimal-contact/phase join remains a Lean obligation in #62.
 
 The listener's `--diagnostic-solenoidal-lock` reads actual currents before each emitted class
 and at the accepted terminal section. It is off by default. A change of field declaration
@@ -456,7 +456,7 @@ Floquet and executed tube certificates, rather than a mounted-pump flag.
 ## 11. Source precision and the actual represented move
 
 [definition; implemented component law] The normal epoch already retains
-`R=B-WH`. With fresh gain `gamma`, the exact recurrence is `H+=H+F`,
+`R=B-WH`. With fresh gain `gamma`, the recurrence is `H+=H+F`,
 `R*=R+gamma*G`, `D=R* S^-1`, `W+=W+P`, `R+=R*-P H+`. Thus
 `W+ H+ + R+ = W H+ + R + gamma G`. Another displacement accumulator would count
 unapplied news twice. A fixed source lattice can nevertheless erase every material move:
@@ -506,10 +506,10 @@ before material placement, including sources without an adaptive epoch; lattice 
 precision is checked before its shift too. There is no unbounded reader fallback.
 
 The active SourcePort lattice, its normal map lattice and checkpoint v3 must agree. The
-checkpoint retains the active exponent and exact `W/H/R`, checks the founding lower bound
+checkpoint retains the active exponent and the whole `W/H/R`, checks the founding lower bound
 and dyadic shape, and accepts no old epoch decoder. Census charges the precision metadata;
 allocation and total state budget are checked before publication. CUDA publishes the map at
-the admitted active exponent while unchanged pair factors keep their own exact exponents.
+the admitted active exponent while unchanged pair factors keep their own exponents.
 Material coordinates still use signed i64: a width refusal happens before a large shift or
 acknowledgement, with no host fallback or rounding back to the old grid. Wider auxiliary
 arithmetic is not a wider material carrier. General formal proof of the refinement, actual
@@ -519,8 +519,8 @@ ray composition, finite-budget limitations and full backend continuation remains
 
 The observed grouped epoch now stages its actual SourcePort/Contrast candidate and probes the
 same batch from the immutable opening, with the original target phases and a prequential tree
-rebuilt from the opening tree. Exact negative joint class-plus-phase change admits, exact
-equality is neutral, and a mathematical refusal restages receiving only. Physical-factor
+rebuilt from the opening tree. Negative joint class-plus-phase change admits, equality
+is neutral, and a mathematical refusal restages receiving only. Physical-factor
 displacements still refuse; an executor fault remains a fault. The probe is transient inside
 the transaction. Direct normal close still needs its once-linear receiving witness.
 
@@ -553,9 +553,9 @@ carry, prepared cut and lag. Its first R publication passes. The subsequently fo
 legacy Gram-lattice cold mismatch has a scoped compile-checked correction; full
 post-R cold/contact/next-R/source30/frozen execution remains unqualified.
 
-[measured; October22] Native rational receiving cold continuity now passes firstR and a genuine new contact; the next control-coordinate bound remains unresolved. [Scoped control and exact limits](../research/records/2026-10-22_NATIVE_RATIONAL_COLD_CONTINUES_TO_A_NEW_CONTACT.md).
+[measured; October 22] Native rational receiving cold continuity now passes first R and a genuine new contact; the next control-coordinate bound remains unresolved. [Scoped control and its limits](../research/records/2026-10-22_NATIVE_RATIONAL_COLD_CONTINUES_TO_A_NEW_CONTACT.md).
 
-[measured; October22] An authentic native M/context/source packet separates physical work from numerical coordinate extent: the source12 control needs1,803bits while exact work≈1.7502 is below65,536. [Control refusal and joined carrier obligation](../research/records/2026-10-22_NATIVE_CONTROL_REFUSAL_IS_REPRESENTATION_GROWTH.md).
+[measured; October 22] An authentic native M/context/source packet separates physical work from numerical coordinate extent: the source12 control needs 1,803 bits while the work (≈1.7502) is below 65,536. [Control refusal and joined carrier obligation](../research/records/2026-10-22_NATIVE_CONTROL_REFUSAL_IS_REPRESENTATION_GROWTH.md).
 
 
 The [represented native contact record](../research/records/2026-10-22_REPRESENTED_NATIVE_CONTACT_FIRST_VARIATION.md) separates a physical-reference material first variation at the original held opening from differentiation of chart selection or a finite represented score claim. Both actual/fresh paths, component radii, original return and reverse-rounding discrepancy stay source-bound. The connected control passed first R/cold but refused its fresh contact bound; the later component-radius source is data-qualified only, and native contact/next-R/close/frozen/card readiness remains open.

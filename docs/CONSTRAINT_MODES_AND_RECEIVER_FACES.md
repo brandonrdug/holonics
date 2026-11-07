@@ -12,7 +12,7 @@ does not remove the general-relativistic, mechanical or geometric part of the co
 branch/period and generating law. A receiver reads a face of that mode at its declared
 frame and grain. A numeral, a truncated series or a function name does not supply that full
 contract by itself. Conversely, a formal function name is legitimate shorthand when its
-constraint interpretation is supplied; `Real.exp` in Lean is an exact mathematical function,
+constraint interpretation is supplied; `Real.exp` in Lean is a mathematical function,
 not a machine float. No symbolic rename is needed to repair a lost source relation.
 
 [definition] The normalized exponential mode E satisfies
@@ -26,13 +26,13 @@ be carried by rational homogeneous data satisfying `c²+s²=1`; no angle mantiss
 [proved-derived; formal-checked] The recovered Machin constraint is
 `(5+i)^4=(239+i)(2+2i)` and `π=16 atan(1/5)-4 atan(1/239)`.
 `Compression/Landmark/ConstraintIdentity` (`machin`, `gaussian_machin_factorization`), `PhaseCarrier`, `RatioSeriesTransport` and `RadixWindowReceiver`
-retain its algebra, branch, navigator state and exact window laws. [`exact_value::CertifiedSeries`](https://github.com/brandonrdug/holonics/blob/551d6c5d/crates/holonics/src/exact_value.rs) carried rational partial sums and oriented remainders, as the prototype's `reopening` did at `13f8c734`.
+retain its algebra, branch, navigator state and its window laws at declared widths. [`exact_value::CertifiedSeries`](https://github.com/brandonrdug/holonics/blob/551d6c5d/crates/holonics/src/exact_value.rs) carried rational partial sums and oriented remainders, as the prototype's `reopening` did at `13f8c734`.
 The [September 11 recovery](../research/records/2026-09-11_PI_AND_E_CONSTRAINT_IDENTITIES_HAVE_ORIENTED_GENERATOR_FACES.md)
 connects the August exponential/kernel study to its formal owners and the code of its date.
 
 [definition] Logarithm is the inverse of normalized real exponential transport on the
 positive branch, or a complex lifted branch with its winding. A positive rational kernel K
-can therefore define its log-potential implicitly by `E(s)=K`. Exact normalized transport
+can therefore define its log-potential implicitly by `E(s)=K`. Unrounded normalized transport
 needs K and its row mass; it need not evaluate or store a logarithm. Supplying K does not
 claim that a learning procedure inferred its source. Zero-support entries are absent
 contacts and are not assigned a finite logarithm.
@@ -67,7 +67,7 @@ connection: rational local turn differences `1-c`, `c-a-b`, `a-b` become integer
 residues on a common cyclic chart. Under its irreducibility/domain conditions, Galois-rebased
 interlacing decides finite monodromy. The retired
 [`hypergeometric_closure.rs`](https://github.com/brandonrdug/holonics/blob/814157ad/crates/holonic-engine/src/hypergeometric_closure.rs)
-performed those exact integer operations instead of evaluating transcendental angles, joining
+performed those integer operations instead of evaluating transcendental angles, joining
 constraint-defined analytic solutions, phase, group transport and algebraic closure.
 It does not identify every finite reflection group or rational local descriptor with one
 universal global geometry.
@@ -77,10 +77,10 @@ universal global geometry.
 [definition] Write `C_F : H → H_F`, `g_(G←F) : H_F → H_G`. An invertible change of
 representation has its inverse and commuting overlap relations. A projection or quotient
 instead retains its fibre, decoder and scoped residual. A lossy cast is not an invertible
-chart change. A float codeword can be decoded exactly to a dyadic rational; quantizing a
+chart change. A float codeword can be decoded losslessly to a dyadic rational; quantizing a
 richer source to that codeword is the potentially noninjective step.
 
-[definition] A dilation `D_λ` has exact scale λ and transforms vector/covector components
+[definition] A dilation `D_λ` has scale λ and transforms vector/covector components
 and the measuring form together. For an invertible coordinate change B,
 `v'=Bv`, `α'=B^-T α`, `G'=B^-T G B^-1`, so pairings are preserved. A physical dilation,
 a unit conversion and an observer boost have different contracts. In a local orthonormal
@@ -93,16 +93,16 @@ are stated as integers, with their different mathematical meanings.
 `κ=27/100`, `γ=7/20`, `β∈{1,4}`, connection turn `1/8`, `N=192`.
 The detector is `[1/5,17/50)×[2/25,1/5)`. The magnified windows have widths
 `4/25` and `4/125`, centered at `(15/16,73/384)`, hence dilations `25/4` and `125/4`.
-A pixel/sample address `(i,j)` has exact source coordinate
+A pixel/sample address `(i,j)` has the rational source coordinate
 `c_l+w_l((2i+1-N)/(2N),(2j+1-N)/(2N))`.
 This identifies the chart; it does not turn a prior floating survey's classification into
-an exact arrival proof. Exact/enclosed execution and display projection retain separate roles.
+an arrival proof. Enclosed execution in rationals and display projection retain separate roles.
 
 [proved-derived; formal-checked] A positive scale face k gives a Lorentz-normalized pair
 `γ_k=(k+k^-1)/2`, `ξ_k=(k-k^-1)/2`, with `γ_k²-ξ_k²=1`.
 Thus a boost can consume the mode relation `E(r)=k` without evaluating log k. The local
 examples use k=2 and k=3. At k=φ, the golden constraint gives
-`γ_φ=√5/2`, `ξ_φ=1/2`, an exact algebraic boost face. This is a source-qualified
+`γ_φ=√5/2`, `ξ_φ=1/2`, an algebraic boost face, carried as its constraint identity. This is a source-qualified
 mode conversion, not a claim that one physical speed is universally golden.
 
 [proved-derived; formal-checked] The admitted Copson recurrence similarly carries
@@ -159,7 +159,7 @@ interface may also store surface stress/current; its jump balance retains those 
 The full faces carry normal stress, tangential shear, energy flux, phase and their units.
 Surface area alone neither specifies nor quantifies the interaction.
 
-## Gyroparallelogram and an exact receiver calculation
+## Gyroparallelogram and a receiver calculation in rationals
 
 [definition] In the Lorentz/Einstein velocity chart,
 `u⊞v=u⊕gyr[u,-v]v`, and `D=(B⊞C)⊖A` completes the based gyroparallelogram.
@@ -175,7 +175,7 @@ uses rational velocities `u/c=(3/5,0,0)`, `v/c=(0,4/5,0)`. It obtains
 `[[35,12],[-12,35]]/37`. The fourth vertex is `(315/781,560/781,0)` and its
 Einstein gyromidpoint is `(9/35,16/35,0)`. A supplied local stress tensor yields face
 coefficients `2`, `7/4` and `10/3` for three receivers, while transforming the same tensor,
-receiver and face preserves each contraction exactly. Opposite oriented faces cancel;
+receiver and face preserves each contraction. Opposite oriented faces cancel;
 the supplied friction law deposits `3/5` in its stated normalized power-density unit.
 
 [project-postulate] This is the route from mathematical synthesis to HNN construction:

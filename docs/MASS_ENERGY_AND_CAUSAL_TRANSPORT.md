@@ -220,9 +220,9 @@ The square root \(\sqrt{\mu_0\epsilon_0}\) is inverse speed. Permittivity is \(\
 permeability is \(\mu_0\), so \(\epsilon_0=1/(\mu_0c^2)\). Their ratio determines the wave-impedance relation
 \(Z_0=\sqrt{\mu_0/\epsilon_0}\), while their product determines the speed.[^7]
 
-[proved-derived; formal-checked] The existing `HolonicMaxwellPropagation` proves this exact
+[proved-derived; formal-checked] The existing `HolonicMaxwellPropagation` proves this
 constitutive speed relation and the paired discrete curl–curl evolution. The cellular Maxwell
-owner supplies primal/dual Hodge pairings, an exact midpoint Poynting balance and its temporal
+owner supplies primal/dual Hodge pairings, a midpoint Poynting balance with no remainder and its temporal
 composition. These are finite electromagnetic models with explicit field and boundary
 operators.[^2]
 
@@ -233,9 +233,9 @@ linear transmission line, \(v^2=1/(L'C')\) and \(Z^2=L'/C'\). The existing
 admittance-weighted scattering owner retains that distinction: speed/delay and reflection
 at a junction are related but not the same observable.
 
-[proved-standard] In the present SI, c has an exact defining numerical value while vacuum
+[proved-standard] In the present SI, c has a numerical value fixed by definition while vacuum
 permittivity, permeability and impedance are experimentally determined through the remaining
-constant relations. Their exact identities and their measured coordinate values therefore
+constant relations. Their symbolic identities and their measured coordinate values therefore
 have different roles. A symbolic relation is not invalidated by measurement uncertainty,
 and an SI definition does not derive a dimensionful constant from pure mathematics.[^9]
 
@@ -309,7 +309,7 @@ same scalar mass reading does not retain every internal mode or phase relation.
 
 [definition] Electromagnetic energy density and flux are contractions of a stress tensor,
 not by themselves a total four-momentum vector. A changed observer must transform the fields
-or the full tensor before taking those readings. An exact field boost therefore
+or the full tensor before taking those readings. A full field boost therefore
 transforms E and B, preserving their two electromagnetic invariants, and only then recomputes
 u and S. It does not apply a four-vector boost to a scalar energy-density summary.
 
@@ -376,7 +376,7 @@ heat contractivity.
 [proved-derived; formal-checked] Mode elimination retains coefficients: if
 \(qv_* =\sum_i a_iqv_i\), the contribution \(bv_*\) is represented by adding \(ba_i\)
 to the retained coefficients. It is not deleted. When \(qT_g=U_gq\), this elimination
-remains exact through every admitted generator word. Gram degeneracy diagnoses dependence
+leaves no remainder through every admitted generator word. Gram degeneracy diagnoses dependence
 at the declared receiver; a separating future can require a finer representation.[^2]
 
 [proved-derived] Quadratic-form preservation makes the connection to physical bounds explicit.
@@ -400,7 +400,7 @@ receiver, `ẋ=−νΔ_Dx` gives `(q(t)x(t))̇=−νΔ_C(qx)+q̇x+νe_Δ(x)`.
 Both differential and metric-adjoint defects contribute to `e_Δ`; chain
 compatibility alone is insufficient. The parked four-cycle's harmonic current
 has a nonzero cut defect `5/2`, and its recursive quadratic energy receiver
-keeps the mixed return. The [source, hypotheses and exact witness](../research/records/2026-10-06_THE_HODGE_CUT_RETURNS_ITS_HEAT_AND_MOVING_RECEIVER_DEFECT.md)
+keeps the mixed return. The [source, hypotheses and witness](../research/records/2026-10-06_THE_HODGE_CUT_RETURNS_ITS_HEAT_AND_MOVING_RECEIVER_DEFECT.md)
 retain the finite scope and separate algebraic-cycle and continuum obligations.
 
 [definition] Electromagnetism also uses Hodge duality directly: the six components of its
@@ -512,7 +512,7 @@ and communicative action. These are computational-neuroscience and computational
 research subjects with their particular models and measurements specified.[^12]
 
 [proved-derived; formal-checked] The release model gives
-\(v^+=v+J/m\), \(\Delta K=v\cdot J+|J|^2/(2m)\), exact constant-acceleration flow and
+\(v^+=v+J/m\), \(\Delta K=v\cdot J+|J|^2/(2m)\), the closed-form constant-acceleration flow and
 its endpoint defect. The changing-capacitance owner proves the scalar material-rate term;
 the matrix generalization \(\dot U=V^TI-\tfrac12V^T\dot C V\) follows from differentiating
 the inverse constitutive matrix as derived in the release report. Deterministic transport
@@ -562,7 +562,7 @@ uses Einstein frame, whose prefactor is `exp(-phi/6)`; the frames satisfy
 
 [proved-derived; formal-checked] `Physics/CompactifiedModeTransport.lean` makes the compact
 charge/current step explicit. For `L=L_base+B(v+C)^2/2`, fixed conjugate momentum
-`q=B(v+C)` gives `v=q/B-C`. The exact Routh reduction is
+`q=B(v+C)` gives `v=q/B-C`. The Routh reduction is
 `L-qv=L_base+qC-q^2/(2B)`, for nonzero B. Thus the reduced action retains both connection
 coupling and compact energy. Interpreting C as `C_i dx^i/dt`, with a cyclic vertical coordinate,
 identifies q as the conserved charge coordinate. A physical charge unit is fixed by the
@@ -579,7 +579,7 @@ physical spectral consequence missing from an isolated winding count.
 [definition] The connection also enters finite quantum matter through the existing Fock/CAR
 and Fermi–Hubbard owners. A directed hop A carries the complex link coefficient z, with its
 reverse carrying the conjugate: `H_e=z A+conj(z) A†`. The paired current is
-`J_e=i(z A-conj(z) A†)`. These are the finite matter ports for connection phase; their exact
+`J_e=i(z A-conj(z) A†)`. These are the finite matter ports for connection phase; their
 Hermiticity, occupation and consuming-Hamiltonian results are recorded in the recovery.
 
 ## 13. Mass gaps, retained modes and navigation
@@ -619,7 +619,7 @@ The formal and executable owners supply their stated mathematical domains.[^2]
 | Friction, heat and moving boundaries | Energy storage, source work, relaxation state and interface flux | Dissipation reorganizes energy and can change a subsystem's retained rest energy |
 | Hodge and physical realization | Harmonic class, exact/coexact complement and supported source lift | Balanced modes and transient residues share one generator representation |
 | Fractals and periplus | Recursive restrictions, ordered transport, section/phase residue | Rebase changes representative and remainder together; branch information is measured separately |
-| Attention, SSMs, diffusion and GNNs | Admitted kernels, incidence, retained state and constitutive response | Exact or bounded sufficient representations support reuse across architecture charts |
+| Attention, SSMs, diffusion and GNNs | Admitted kernels, incidence, retained state and constitutive response | Lossless or bounded sufficient representations support reuse across architecture charts |
 | Information, Gamma and zeta | Partition measure, code cost, phase lift and Mellin/Gaussian generator | Entropy and analytic transport use explicit source and unit maps |
 | RH and spectral placement | Actual xi source, heat generator, phase and zero-location family | A transferable bound requires preservation of the required spectral region |
 | Biomechanical prediction and communication | Prepared internal mode, release, medium and receiving contact | Intelligence constructs and navigates prospective consequences through physical transport |
@@ -628,7 +628,7 @@ The formal and executable owners supply their stated mathematical domains.[^2]
 
 1. Particle Data Group. *Kinematics*, 2025 review; invariant products and two-body kinematics.
    [Review](https://pdg.lbl.gov/2025/reviews/rpp2025-rev-kinematics.pdf).
-2. Holonics. Current formal and exact executable constructions:
+2. Holonics. Current formal and executable constructions:
    [formal framework](FORMAL_FRAMEWORK.md), [owner map](THE_MACHINE.md#how-the-geometry-reaches-the-implementation),
    [mass/Maxwell return](../research/records/2026-09-12_MASS_ENERGY_AND_MAXWELL_BOUNDS_UNIFY_TRANSPORT.md),
    [predictive release](../research/records/2026-09-12_PREDICTION_IS_PREPARED_TRANSPORT_AND_RELEASE_IS_BOUNDARY_CURRENT.md),
@@ -649,7 +649,7 @@ The formal and executable owners supply their stated mathematical domains.[^2]
    [Chapter 4](https://www.damtp.cam.ac.uk/user/tong/gr/grhtml/S4.html).
 9. BIPM. *Resolution 1 of the 26th CGPM*, 2018, effective 2019.
    [Resolution](https://www.bipm.org/en/committees/cg/cgpm/26-2018/resolution-1).
-   NIST. *SP 330, Section 2*: exact defining constants and experimental permeability,
+   NIST. *SP 330, Section 2*: defining constants and experimental permeability,
    permittivity and impedance. [Source](https://www.nist.gov/pml/special-publication-330/sp-330-section-2).
 10. NIST Digital Library of Mathematical Functions. Zeta reflection and integral representations.
     [§25.4](https://dlmf.nist.gov/25.4), [§25.5](https://dlmf.nist.gov/25.5).

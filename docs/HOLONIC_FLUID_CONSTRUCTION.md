@@ -3,8 +3,8 @@
 [project-postulate] This is the connected derivation requested by Brandon on September 14.
 The computational object, its interior, contact faces, nonlinear transport and changing
 receivers belong to one construction. The [computational Holon](HOLON.md) supplies its
-operator notation; [constraint modes](CONSTRAINT_MODES_AND_RECEIVER_FACES.md) supply exact
-scale/phase and active receiving faces. The derivation below recovers the classical fluid
+operator notation; [constraint modes](CONSTRAINT_MODES_AND_RECEIVER_FACES.md) supply
+scale/phase as constraint identities and active receiving faces. The derivation below recovers the classical fluid
 specializations and constructs an explicit retained-material extension. It is a mathematical
 construction document, not another scheduler or a substitute for the HNN law.
 
@@ -59,15 +59,15 @@ The physical state includes thermal/internal energy when mechanical energy is di
 velocity and stress retain their units. Analytic modes retain defining constraints and source
 families: `E'(z)=E(z)`, `E(0)=1`, and the rotation kernel `i Θ_turn ℤ` with
 `Θ_turn=2π` in the classical chart. A numeric projection does not define these operations.
-Lean's real/complex carriers express the mathematical laws; Rust realizations use exact
+Lean's real/complex carriers express the mathematical laws; Rust realizations use closed-form
 expressions, rational/algebraic data or certified families as their operation requires.
 
 <a id="2-the-constitutive-contact-equation-is-a-swing"></a>
 
 ## 2. The constitutive contact equation is junction scattering
 
-[proved-derived; formal-checked] Let `D:W→V`, `D†:V→W`, and let K⁻¹ solve
-`K=I+D D†` exactly. Define the graph projection and reflected current on `V⊕W`, with
+[proved-derived; formal-checked] Let `D:W→V`, `D†:V→W`, and let K⁻¹ invert
+`K=I+D D†`. Define the graph projection and reflected current on `V⊕W`, with
 `S_a x=2a−x` the half-turn about `a` ([motion](ELEMENTARY_OBJECTS.md#the-swing)):
 
 ```text
@@ -125,7 +125,7 @@ R_C R_I = diag(C_h,C_h†).
 `graphScattering_inversePair` and `paired_graphSwings_transport` prove the paired operator
 identity in the same formal owner. Thus two constituted scatterings realize a Cayley advection
 step and its opposite transport on
-the paired interior/exterior carrier. This is an exact rational operator identity. C_h is
+the paired interior/exterior carrier. This is a rational operator identity. C_h is
 an approximation to continuous frozen-field evolution, not an assertion that one finite
 step solves nonlinear Euler. Updating the advecting field and material uses the actual
 nonlinear law; its derivative includes those changing operands.
@@ -187,7 +187,7 @@ Integration by parts separates boundary work from mechanical loss. The lost mech
 energy becomes internal/thermal energy in the complete Holon. Across a joined surface,
 equal opposite transmitted tractions cancel only after both bodies and any surface storage
 are included. Slip with `t=−κ_f w` contributes heat `κ_f|w|²` for `κ_f≥0`.
-The prototype's [exact torus contact](https://github.com/brandonrdug/holonics/blob/13f8c734/research/experiments/contact_receiver_faces/README.md) realized
+The prototype's [torus contact](https://github.com/brandonrdug/holonics/blob/13f8c734/research/experiments/contact_receiver_faces/README.md) realized
 oriented surface patches and an explicit slip/traction law; geometry is an operand of this
 calculation, not a decorative skin.
 
@@ -339,7 +339,7 @@ Its variational effort is `μ_Q=W'(Q)−κΔ_E Q`. The advection port is
 `A_Q u=u·∇Q`; on divergence-free velocities its adjoint is
 `A_Q† μ=P(μ∇Q)`. The source pair and receiver pairing determine that adjoint.
 
-[proved-derived] Couple the two fields through that exact adjoint:
+[proved-derived] Couple the two fields through that adjoint:
 
 ```text
 u̇ = −B(u,u)−νΔ_Hu + A_Q†μ_Q,
@@ -478,10 +478,10 @@ tr(M^n)=t_n.
 and [TraceSequence](../lean/Holonics/Geometry/TraceSequence.lean)
 prove those equalities and, under `a²≤4q`, the root pair with `|α|²=q`.
 
-[proved-derived; formal-checked] The exact quadratic form
+[proved-derived; formal-checked] The quadratic form
 `G=[[1,−a/2],[−a/2,q]]` satisfies `MᵀGM=qG`. The new
 `companion_preserves_scaled_metric` and `companion_metric_complete_square` theorems in
-`LocalFactor` prove that identity and its exact completed square.
+`LocalFactor` prove that identity and its completed square.
 
 [proved-derived] For `q>0` and `a²<4q`, G is positive definite; `M/√q` is an isometry of this pairing
 with determinant one. This identifies the local transfer with a constituted rotation mode,
@@ -498,16 +498,16 @@ threshold crossing when that whole accumulated budget stays below or equal to th
 A derived fluid comparison must first include its pressure, boundary, receiver and stress
 returns in the scalar law it supplies. The
 [source-budget record and receipt](../research/records/2026-10-09_THE_ADDITIVE_SOURCE_BUDGET_ENTERS_THE_EXISTING_FLUID_RECEIVER.md)
-state the exact hypotheses and focused acceptance; this does not provide terminal control.
+state the hypotheses and focused acceptance; this does not provide terminal control.
 
 [open] The unified construction does not yet furnish a terminal-uniform 3D NS regularity
 estimate, the Hodge conjecture's algebraic-cycle realization, the RH source's missing
 zero-location conclusion, or BSD's global rank/order/leading-coefficient relation. Those
 are distinct mathematical endpoints. The usable synthesis is already stronger than a list
-of analogies: it gives contact reflection, exact nonlinear unresolved stress, boundary
+of analogies: it gives contact reflection, the whole nonlinear unresolved stress with its mixed terms, boundary
 memory, coupled material dissipation, and source-specific spectral/transfer identities.
 
-## Exact library return after the architecture audit
+## The library return after the architecture audit
 
 [proved-derived] A finite implicit diffusion step has an additional term beyond the
 continuous balance. From `C(φ₁−φ₀)=s−τLφ₁`, pairing with φ₁ gives
@@ -520,7 +520,7 @@ is insufficient to account for the dissipative return.
 [established-bounded; implemented-exact] The prototype's scalar and graded diffusion owners
 ([`diffusion.rs`](https://github.com/brandonrdug/holonics/blob/13f8c734/crates/holonics-cuda/src/diffusion.rs),
 [`sheaf_diffusion.rs`](https://github.com/brandonrdug/holonics/blob/13f8c734/crates/holonics-cuda/src/sheaf_diffusion.rs)) exposed and
-consumed this complete `DiffusionEnergyBalance`, with exact regression over source work, a
+consumed this complete `DiffusionEnergyBalance`, with regression in rationals over source work, a
 harmonic section, a grade-one lower coboundary contribution and a mismatched source operator.
 The bilinear owner ([`exact_linear::bilinear`](https://github.com/brandonrdug/holonics/blob/551d6c5d/crates/holonics/src/exact_linear/bilinear.rs), retired in rebuild step 1) supplied the complete input differential and
 covector return of a factorized interaction, including explicit port precomposition. Applied to
