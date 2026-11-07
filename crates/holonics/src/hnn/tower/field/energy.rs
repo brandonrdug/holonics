@@ -1855,7 +1855,7 @@ impl Field {
     }
 
     /// [measurement; the unified-theory reading of November 7, 04:05] **A configuration's energy**: `G(e) = Φ(x^K(e); e)` with
-    /// every site resolved at `classes`, relaxed at its own certified halvings, on `2^(−32)` bits; the exact conditional's
+    /// every site resolved at `classes`, relaxed at its own certified halvings, on `2^(−32)` bits; the enumerated conditional's
     /// terms (`P(e_t = c | rest) ∝ 2^(−G/T)`) and route (b)'s `G`.
     pub fn energy_g(&self, classes: &[usize]) -> Result<i128> {
         if !self.declaration.energy {

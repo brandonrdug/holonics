@@ -2581,3 +2581,31 @@ fn a_kernel_steps_weight_is_its_metropolis_hastings_ratio() {
     println!("kernel (moved, weight in thousandths, deposited): {seen:?}");
     assert!(seen.iter().any(|&(m, w, _)| m > 0 && w > 500), "a moved proposal weighed near whole at a warm temperature: {seen:?}");
 }
+
+/// [definition; the unified-theory reading of November 7, 05:55] **An evidence-shrunk Newton step moves along the moments'
+/// direction by `α = −(s/c)(1 − v/s²)`**: on the warm line-shaped field, a first kernel section opens the moments (no step:
+/// they hold no direction yet), and a second, on other blocks, steps by `α` times the moments' step where its slope along
+/// it is downhill past its noise, or deposits nothing; its read states `α`, the shrink and the slope's terms.
+#[test]
+fn an_evidence_shrunk_newton_step_moves_by_its_alpha() {
+    let mut field = energetic_line();
+    field.theta[field.layout.face_temper] = 10 << MATERIAL_BITS;
+    let truths: Vec<Vec<usize>> = (0..6).map(|k| (0..40).map(|t| (t * 7 + t / 3 + k) % 5).collect()).collect();
+    let none = vec![false; 40];
+    let regions: Vec<Region> = truths.iter().map(|c| Region { classes: c, unresolved: &none, faces: &[], locked: &[], echo: &[], domain: None, port: None }).collect();
+    let mut learner = FieldLearner::new(field, 14);
+    learner.newton = true;
+    let first = learner.section_kernel(&regions, &vec![vec![3usize, 14, 25, 36]; 6], 1, &mut HostField).unwrap();
+    let r = first.newton.unwrap();
+    assert!(!r.deposited && r.alpha == (0, 0), "the moments hold no direction before their first covector: {r:?}");
+    let before = learner.field.theta.clone();
+    let second = learner.section_kernel(&regions, &vec![vec![8usize, 19, 30]; 6], 2, &mut HostField).unwrap();
+    let r = second.newton.unwrap();
+    println!("second section: {r:?}");
+    assert!(r.curvature > 0, "{r:?}");
+    if r.slope < 0 && r.shrink.0 > 0 {
+        assert!(r.deposited && r.alpha.0 > 0 && r.alpha.1 > 0 && learner.field.theta != before, "a downhill slope past its noise steps: {r:?}");
+    } else {
+        assert!(!r.deposited && learner.field.theta == before, "an uphill or noisy slope deposits nothing: {r:?}");
+    }
+}

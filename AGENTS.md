@@ -116,16 +116,27 @@ general; no cryptanalytic application is pursued.
 
 ## The object's governing laws
 
-[definition] **Exact arithmetic; no floats as storage.** This is a precision law about bit purity
-and computational efficiency: it is for dynamic precision and against arbitrary precision. It
-governs what the machinery stores and computes, not how a reading is written in a report or a chat
-(Brandon, October 18: "It is for dynamic precision, it is against arbitrary precision, it is a
-computational efficiency rule, not a rule about the aesthetics of what you can write in chats. Get
-rid of the rule if it pertains to chats, it's a precision law about bit purity.").
-- Values are exact: ratios with their remainder, and integers carried with their factorization
-  (`13122 = 2·3⁸`, `729 = 3⁶`), never as bare magnitudes.
+[definition] **Precision is the bit widths of graphs; no floats as storage.** This is a precision
+law about bit purity and computational efficiency: it is for dynamic precision and against arbitrary
+precision. It governs what the machinery stores and computes, not how a reading is written in a
+report or a chat (Brandon, October 18: "It is for dynamic precision, it is against arbitrary
+precision, it is a computational efficiency rule, not a rule about the aesthetics of what you can
+write in chats. Get rid of the rule if it pertains to chats, it's a precision law about bit
+purity."). No value is exact (Brandon, November 7: "They're bit widths of graphs. 'exact' is
+*false*, you literally cannot do exact with numbers like pi"); do not call a value, a sum or a
+reading "exact" in this sense, in code, guides or records.
 - Algebraic and transcendental quantities are their constraint identities. π and `e` are
-  navigators; a float is a face of one, and error enters only in how a face is attained.
+  navigators; a number is read at a declared width (a face of its navigator), and error enters
+  only in how a face is attained (September 22: "the way you attain the float is where the error
+  comes from").
+- A value is a word: digits in a chosen basis, partitioned across registers threaded by a
+  parameter and chained with carries, or a graph whose branches and coefficients sum into it
+  (November 5: "graphs with branches that integrate/sum into the value"; November 3: `1097 =
+  137·2³ + 1`, `17179869185 = 2^34 + 2^0`). Ratios keep their remainder, and integers carry their
+  factorization (`13122 = 2·3⁸`, `729 = 3⁶`), never as bare magnitudes.
+- Storing and computing exchange: a compressed form costs navigation to transform into the form a
+  consumer reads, a conserved exchange the design chooses (cached partials beside fitted
+  generators; November 3).
 - Estimation is replaced by partition.
 - Storage is a series. A value is kept as the terms of its expansion, numerators grouped over the
   denominators they share (inversion, charts, basis, gcd, softmax and sigmoid), so terms cancel
@@ -134,14 +145,22 @@ rid of the rule if it pertains to chats, it's a precision law about bit purity."
   October 18: "they're series expansions of ratios in calculus … you store it as a float and you
   kill the series expansion that otherwise had terms that could easily be grouped by denominators
   (inversion, charts, basis, gcd and softmax/sigmoid) and numerators").
-- Width is dynamic, never arbitrary. A carrier widens at a declared crossing when a term outgrows
-  it, and a term is released only by partition at a declared tolerance, with its remainder
-  accounted. A width picked by hand, or a fixed float width standing in for the series, is
-  arbitrary precision.
-- Exact series are the condition for parallel determinism. Integer and rational addition is
+- Width is dynamic, never arbitrary. Each term is as wide as its information needs (November 5:
+  eleven bits need not take sixteen, and a width is not doubled by default). A carrier widens at a
+  declared crossing when a term outgrows it, and a term is released only by partition at a declared
+  tolerance, with its remainder accounted. A width picked by hand, a doubled width, a max, or a
+  fixed float width standing in for the series is arbitrary precision (October 14: "Floats and maxes
+  have the same problem").
+- Integer series are the condition for parallel determinism. Integer and rational addition is
   associative, so co-present terms summed in any order, on any partition of the card, give the same
   bits; float addition is not associative, so a parallel float sum depends on its schedule. This is
-  what lets many cells deposit as one flow.
+  what lets many cells deposit as one flow, and it holds for any limb layout: a term split into
+  narrow limbs whose products and sums fit their accumulator (a tensor core's, for one) gives the
+  same bits. A device's units are widths; which limbs a kernel uses is the realization's choice,
+  never the law's. A card is a surface of many slow lanes (Brandon, November 7: "the GPU is just a
+  surface with a lot of thread potentials"): a realization disperses narrow terms across lanes at
+  once rather than running one wide word per lane, so terms are cut as narrow as their information
+  allows to keep the most lanes busy.
 - Foreign data that arrives as floats is converted at the exterior boundary where it arrives.
   Nothing inside a law, an owner or the HNN stores or consumes a float.
 - A margin, score or reading the machine builds from contributions keeps its series, the winding
@@ -196,10 +215,10 @@ not a statistic.
 - The fluid, wave, Einstein/stress-energy and thermal instances keep their constitutive equations,
   clocks, heat/entropy balances and participating receiver.
 
-[definition] **Exact representation** keeps constraints, branch, units, winding and remainder.
-Periodic closure also needs a period/commensurability relation: an exact rational or algebraic
-phase can have nonperiodic transport. When a value outgrows its carrier, it is rebased, factored or
-re-represented with its decoder and residual. The [helical guide](docs/HELICAL_GEOMETRY.md) and the
+[definition] **Representation at declared widths** keeps constraints, branch, units, winding and
+remainder. Periodic closure also needs a period/commensurability relation: a rational or algebraic
+phase held as its constraint can have nonperiodic transport. When a value outgrows its carrier, it
+is rebased, factored or re-represented with its decoder and residual. The [helical guide](docs/HELICAL_GEOMETRY.md) and the
 [constraint-mode guide](docs/CONSTRAINT_MODES_AND_RECEIVER_FACES.md) supply the cases.
 
 [definition] **Notation and context** ([Holonic notation](docs/HOLONIC_NOTATION.md)).
@@ -230,8 +249,9 @@ stage, port, receiver or predictor: no calculator, hand-written grammar or parse
 counter, sieve, depth-limited context window or classical compressor tuned to a codec stands in for
 learning. Producers, structure and keys are located by the machine's own encoding, dynamics and
 deposition from its passage; tokenizing, encoding and recursive refinement are the field's own. A
-terrain may generate its truth with exact routines, the machine's own laws are exact, and a declared
-family may be a navigator of the machine's own kind whose keys are located; no receiver computes a
+terrain may generate its truth with authored routines at declared widths, the machine's laws are
+its own, and a declared family may be a navigator of the machine's own kind whose keys are located;
+no receiver computes a
 task's answer by an authored routine. A result that is perfect because it was authored is a failed
 build. A precompute or normalization table is lawful as a navigator's resident face: series
 coefficients held while the argument flows through, normalizations as systolic reductions over
@@ -242,8 +262,8 @@ float table or an authored table of answers ([systolic flow](research/records/20
 extraction**: reading a foreign realization's operators and coefficients as the element relations,
 interconnection and navigators of a Holon, so that the extracted equations are native objects. Inherited
 coefficients are an overture (Brandon, October 29; [record](research/records/2026-10-29_INHERITED_WEIGHTS_ARE_AN_OVERTURE_EXTRACTION_RECYCLES_PROCESSED_INFORMATION_INTO_THE_ENGINES_INITIAL_CONFIGURATION.md)): information that
-seeds native navigators' initial configuration and constitution, converted exactly at the boundary,
-after which only deposition changes it. A foreign model is never served, run inside a law or taken
+seeds native navigators' initial configuration and constitution, converted at declared widths at
+the boundary, after which only deposition changes it. A foreign model is never served, run inside a law or taken
 as the model.
 
 [definition] **Hardware law.** Co-present regions execute together when their complete read/write,

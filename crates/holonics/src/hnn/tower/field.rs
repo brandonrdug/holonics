@@ -36,7 +36,7 @@
 //! values     v_t += s_t, p_t += s_t at a turned mode                         linear in the moment (§15.1, §16.20)
 //! contact    z_ij = 2^(−β) Σ_m [D_m Re(conj(p̃_im) k̃_jm) − D_m² |k̃_jm|²/2] − ⌊log₂ |i − j|⌋   the head's lock, j ∈ S_i^h
 //! weights    e_ij = 2^(z_ij), each term keeping its own exponent, zero outside S_i^h   the Gibbs face, in bits
-//! current    y_i = conj(U_i) ⊙ Σ_(j∈S_i) e_ij D(|i−j|) ṽ_j / Σ_(j∈S_i) e_ij (one exact series, released once),   x ← x + O y + b_o
+//! current    y_i = conj(U_i) ⊙ Σ_(j∈S_i) e_ij D(|i−j|) ṽ_j / Σ_(j∈S_i) e_ij (one series, released once),   x ← x + O y + b_o
 //! pair       r̂'_t = x_t / ‖x_t‖_rms,   a_t = W_a r̂'_t + b_a,   b_t = W_b r̂'_t + b_b,   x_t ← x_t + W_c (a_t · b_(s(t))) + b_c
 //!            s(t) the site's strand mate, t − 1 at an even contact and t + 1 at an odd (§16.34)   complex pairs along the strand
 //! face       z_t(a) = ⟨E(a), R r̂(x^K_t) + b_R⟩ + c_a,   p̂_t(a) = 2^(z_a) / Σ_b 2^(z_b)   at the unresolved sites; read through the encoding (§16.26)
@@ -147,8 +147,8 @@
 //! only past locked places; text is uncertain at most places under any model, so it wrote the classes it was surest of
 //! (runs of `0`, `<<`, `=`, `####`), each lock making its neighbour's lock likelier, and left the rest open.
 //!
-//! **Exact integers, grains declared.** Faces, charts, framed charts and currents on `2^(−16)`;
-//! material on `2^(−24)`; frames and skins on `2^(−30)`; each row an exact series of its terms'
+//! **Integers at declared grains.** Faces, charts, framed charts and currents on `2^(−16)`;
+//! material on `2^(−24)`; frames and skins on `2^(−30)`; each row a series of its terms'
 //! exponential faces on `2^(−62)` (§14.11, [`SeriesRow`]), its current released once and its shares
 //! on `2^(−63)`; covectors on `2^(−24)`, the contact's on `2^(−40)`. Every product's
 //! remainder below its grain is released to the nearest numerator and every sum is an integer
@@ -172,7 +172,7 @@ use crate::hnn::keyed_modes::{ln2_face, Exponential};
 use rayon::prelude::*;
 
 /// [agent-inferred, November 1] **A term's share of its row's mass** on `2^(−63)` (§14.11): formed
-/// once, by one division of the exact series, for the return; the declared crossing into the step,
+/// once, by one division of the series, for the return; the declared crossing into the step,
 /// whose own release is to the material's grain.
 pub const SHARE_BITS: u32 = 63;
 /// A key's return past its 128-bit carrier, refused on the host and the card alike.
@@ -712,7 +712,7 @@ pub const PACE_BITS: u32 = MATERIAL_BITS;
 
 /// [definition; agent-inferred, November 2] **A turned head's own clock over a region** (§16, Law 1): for each head
 /// that reads a pace ([`FieldDeclaration::paced_heads`], its index `row[h]`), the rate `κ_h(t) = 1 + ⟨c_h, x⁰_t⟩`,
-/// the clock `τ_h(t) = Σ_(0<k≤t) κ_h(k)` (an exact prefix sum: `τ_h(0) = 0`, each step into a site ticked by that
+/// the clock `τ_h(t) = Σ_(0<k≤t) κ_h(k)` (an integer prefix sum: `τ_h(0) = 0`, each step into a site ticked by that
 /// site's face) and the turn's variation `σ_h(t) = Σ_(0<k≤t) |κ_h(k)|`, on `2^(−24)`; `plain[p]` where every rate
 /// is `1` exactly (the founding), so the clock is the byte place and the field reads its resident faces.
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
@@ -973,14 +973,14 @@ impl Region<'_> {
     /// [definition; agent-inferred, November 6, the unified-theory reading of 06:50, E] **The windows a cut room computes**
     /// ([`Port::window`]): every site before the port, the silent stretch's first place ([`Field::silent_stretch`]) and each
     /// heard open place, each with the `(NEAR − 1)·ticks` places on either side; none where the port does not cut its room.
-    /// Why exact (the unified-theory reading of 06:50): a silent place is no one's far source, so in one tick a receiver hears
+    /// Why the same bits (the unified-theory reading of 06:50): a silent place is no one's far source, so in one tick a receiver hears
     /// past its near field only definite sources (the question, whole) and its crowds of them, and the near field and the
     /// strand's pair contact carry a place's state at most `NEAR − 1` places a tick. A heard place's face after `ticks` ticks
     /// therefore reads only its window, and a receiver outside every window reads, at worst, its window's edge, which is
     /// `(NEAR − 1)·ticks` places from it; the stretch's clock past its first place runs at that place's rate (one passage), so
     /// the clock at every far place is `τ_front + (t − front)κ` from a computed face. Backward, the covector of a heard face
     /// reaches at most `(NEAR − 1)` places a tick, so it meets no receiver outside its window, and the clock's return reaches
-    /// the stretch's first place, whose window is computed. Not exact where blanks sit between arrivals (masks, writer
+    /// the stretch's first place, whose window is computed. Not the same bits where blanks sit between arrivals (masks, writer
     /// states), whose clocks read each blank's own face: those regions keep their room whole.
     pub fn window(&self, ticks: usize) -> Option<Vec<bool>> {
         let port = self.port.filter(|p| p.window)?;
@@ -1754,7 +1754,7 @@ impl Field {
 
     /// [definition; agent-inferred, November 2] **A row's gain bound from its temperatures' octaves** (§16.12): `4n T
     /// + 1` bits with `T ≤ 2^c`, `c` the largest `⌈log₂ T⌉` the material holds, read from `ℓ` alone (no face), so the
-    /// card's launch shape needs nothing of the forward; equal to the exact gain at a whole octave (the founding's).
+    /// card's launch shape needs nothing of the forward; equal to the gain itself at a whole octave (the founding's).
     pub fn row_gain(&self) -> Result<u64> {
         let mut top = i128::MIN;
         for k in 0..2 * self.declaration.heads {
@@ -1794,7 +1794,7 @@ impl Field {
     /// [definition; agent-inferred, November 1] **The skin decay of local mode `l` of head `h` across
     /// `d` sites** (the dispersing field's §12) and the bits it is carried on: `e^(−2π d/n_m)` on
     /// `2^(−30)` in a turned head, one e-fold a radian of turn; in a still head (period infinite) the
-    /// exact `1`, carried on no bits, so a still head's sums are the bare ones (the same integers a
+    /// the `1` itself, carried on no bits, so a still head's sums are the bare ones (the same integers a
     /// `2^30` on `2^(−30)` would release to).
     fn decay(&self, h: usize, l: usize, d: usize) -> (i128, u32) {
         let dd = &self.declaration;
@@ -1807,7 +1807,7 @@ impl Field {
 
     /// [definition; agent-inferred, November 2] **The skin across a pair** (§16, Law 1): local mode `l` of head
     /// `h` between sites `i` and `j`, `e^(−2π |σ_h(i) − σ_h(j)|/n)` on a head that reads a pace (its byte distance's
-    /// [`Field::decay`] where the pace is plain), the exact `1` on a still head.
+    /// [`Field::decay`] where the pace is plain), the `1` itself on a still head.
     fn pair_decay(&self, paces: &Paces, h: usize, l: usize, i: usize, j: usize) -> (i128, u32) {
         match paces.row.get(h).copied().flatten() {
             Some(p) if !paces.plain[p] && !self.declaration.is_depth(h) => (self.skin(self.slot(h, l), paces.sigma[p][i] as i128 - paces.sigma[p][j] as i128) as i128, MOVE_BITS),
@@ -1888,7 +1888,7 @@ impl Field {
                 // `bare_stretch` at its own place, which reads no face there, so at the bare rate.
                 let at = if t > stretch && !self.bare_stretch { stretch } else { t };
                 // [the unified-theory reading of November 6, 05:45] A depth ring takes no blank face: a silent site runs at
-                // rate zero every tick (exact on what arrived; an expected increment `ζ^E[r]` would read a blank at full
+                // rate zero every tick (true to what arrived; an expected increment `ζ^E[r]` would read a blank at full
                 // coherence and turn a closer's frame by its own guess).
                 let rate = match blank.get(at).and_then(Option::as_ref).filter(|_| Self::silent(region, at) && !d.is_depth(h)) {
                     Some(face) => release(face.iter().map(|&(c, w)| w as i128 * self.theta[base + c as usize] as i128).sum(), STATE_BITS),
@@ -2952,7 +2952,7 @@ impl Field {
         port_reading(&port_faces(&pass.faces, port)?, port)
     }
 
-    /// The exact reverse of [`Field::pass`] against each unresolved site's class: the code's own covector, added
+    /// The reverse of [`Field::pass`] against each unresolved site's class: the code's own covector, added
     /// into `g` on each family's natural grain (a face family's `Σ δz` on `2^(−24)`, a material family's `Σ δz x` on
     /// `2^(−40)`), which the reverse's law tests read against the code's difference.
     fn returned(&self, region: &Region, pass: &FieldPass, g: &mut [i128]) -> Result<()> {
@@ -3620,7 +3620,7 @@ impl Field {
     /// release runs that clock backwards. Every answer place opens unresolved beside its known question; over `sweeps`
     /// sweeps the open places are resolved by octaves of their distance from the question, each octave in its keyed order
     /// once the earlier octaves are resolved (§16.47), about `n/sweeps` a sweep, each drawn from its own
-    /// face at temperature one (the field's own probabilities, an exact integer draw against the face's masses) on the read
+    /// face at temperature one (the field's own probabilities, an integer draw against the face's masses) on the read
     /// of the region as it stands, with every place resolved before it known. No place is chosen by its certainty, nothing
     /// is left open, and a place drawn as the void closes the answer there: every place past it is resolved as the void,
     /// so the region stays an answer and its void tail, the only states training reads (§16.35). Returns each problem's
@@ -3712,7 +3712,7 @@ impl Field {
         // the release's first read (every answer place open, training's fully masked state) a place `d` is the void exactly when
         // the answer is shorter than `d`, so its void mass is the field's `P(L < d | q)`, the length's distribution; the end is
         // one uniform `u` against that profile, the answer's length the places before the first whose void mass passes `u` (an
-        // exact integer comparison), and the sweeps then write given it. One `u`, not one draw a place: independent draws
+        // integer comparison), and the sweeps then write given it. One `u`, not one draw a place: independent draws
         // multiply survivals, and the earliest void drawn is not the profile's draw.
         //
         // [definition; agent-inferred, November 6, the unified-theory reading of 07:21] **The draw is conditioned on the room**:
@@ -3769,7 +3769,7 @@ impl Field {
         // [definition; agent-inferred, November 5, §16.47] **The answer is released by octaves of its distance from the
         // question** (the unified-theory reading of 15:04): octave `j` holds the places at distance `[2^j, 2^(j+1))` past
         // the question (the first place at distance one), and its places open to the draws only once every place of the
-        // earlier octaves is resolved; within an octave the keyed order. Why: with exact faces every order draws the same
+        // earlier octaves is resolved; within an octave the keyed order. Why: with faces that are the true conditionals every order draws the same
         // joint, but with the field's the order decides what the end reads, and drawn in one keyed order of the whole
         // extent the end was fixed in the first reads while nearly every place was open (95% of the length's drift in
         // reads 1 to 64), so the written length barely heard the problem (its bytes correlated +0.18 with the held); by
@@ -3844,9 +3844,9 @@ impl Field {
             observe(ReleaseRead { read: done, pass: 0, classes: &classes, open: &open, faces: Some(&faces), bound, passed, drives: &drives });
             // [definition; agent-inferred, November 5, the unified-theory reading of 22:38] **A void never unwrites a letter**: in
             // the sweeps as in refine, a place before the last written letter draws from its face restricted to the letters
-            // (the void's mass removed, an exact integer draw against the rest), and only a place past every letter draws
+            // (the void's mass removed, an integer draw against the rest), and only a place past every letter draws
             // from its whole face, so the void is drawn only where it closes nothing written. A read's places are drawn from
-            // the farthest in, each beside the letters drawn past it this read. Exact faces are unchanged (the truth's void
+            // the farthest in, each beside the letters drawn past it this read. Faces that are the true conditionals are unchanged (the truth's void
             // has no mass before its last letter). A face before the last letter with no letter mass draws its whole face.
             // Why: within an octave the keyed order puts most draws before a written letter (93% in octave 6, 96% in octave
             // 7), the field's void there is a residue of about 1% that costs training 0.014 bits a place, and each such
@@ -3920,7 +3920,7 @@ impl Field {
         // read, passing over a place that stands past the boundary (the first void) when its turn comes, so an end that has
         // moved is met again. A revisited place is opened again, read beside every other place as it now stands, and drawn
         // at temperature one: a place before the last letter from its face restricted to the letters (the void's mass
-        // removed, an exact integer draw against the rest), the last letter and the boundary place from their whole faces,
+        // removed, an integer draw against the rest), the last letter and the boundary place from their whole faces,
         // so the end moves one place in or out a draw and the closing law holds after every draw. Why (the unified-theory
         // reading of November 5, 14:47): drawn from the whole face, a void inside erased every later letter while a
         // boundary drawn as a letter moved out one place, the new boundary waiting for the next pass, so the passes cut
@@ -4776,7 +4776,7 @@ pub struct ContrastReceipt {
 /// ([`FieldLearner::section_kernel`]): its states, block places and the places whose proposal moved off the truth, the
 /// weights `min(1, A)` summed, their squares summed, least and most (on `2^(−24)`) and how many were whole, whether a step
 /// was deposited, and the step's prices as [`FieldReceipt`]'s.
-#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+#[derive(Clone, Debug, Default, PartialEq, Eq)]
 pub struct KernelReceipt {
     pub states: usize,
     pub places: usize,
@@ -4790,11 +4790,32 @@ pub struct KernelReceipt {
     pub predicted: Option<i64>,
     pub transfer: Option<i64>,
     pub external: Option<i64>,
+    /// Each state's block places and weight `min(1, A)` on `2^(−24)`, the acceptance by block size's operand.
+    pub per_state: Vec<(usize, i128)>,
+    /// The evidence-shrunk Newton step's read, where the learner takes it ([`FieldLearner::newton`]).
+    pub newton: Option<NewtonRead>,
+}
+
+/// [measurement; the unified-theory reading of November 7, 05:55] **An evidence-shrunk Newton step's read**
+/// ([`FieldLearner::section_kernel`] with [`FieldLearner::newton`]): whether it moved the material, `α` as (numerator,
+/// denominator), the shrink `(s² − v, s²)`, the slope `s` along the moments' direction (on `2^(−20)` bits), its variance `v`
+/// and the curvature `c` (on `2^(−40)`), and the prices as [`FieldReceipt`]'s.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub struct NewtonRead {
+    pub deposited: bool,
+    pub alpha: (i128, i128),
+    pub shrink: (i128, i128),
+    pub slope: i128,
+    pub variance: i128,
+    pub curvature: i128,
+    pub predicted: Option<i64>,
+    pub transfer: Option<i64>,
+    pub external: Option<i64>,
 }
 
 /// A deposited step held for the next regions' read: the proposed step on each family's grain and
 /// the halvings it was certified at. The material before it is the material less nothing: the
-/// deposit subtracted `release(step, halvings)` from each entry, so adding it back is exact.
+/// deposit subtracted `release(step, halvings)` from each entry, so adding it back restores the same bits.
 #[derive(Clone, Debug, PartialEq, Eq)]
 struct HeldStep {
     step: Vec<i128>,
@@ -4917,7 +4938,7 @@ struct Scaled {
 /// stands halved. Otherwise the excess `e(μ)` of the regions' code over `old`'s at the step's
 /// fraction `μ` is read at `μ = 1` and `μ = ½`, and the parabola `e(μ) = aμ + bμ²` through them
 /// (`e(0) = 0`) has `a = 4e(½) − e(1)`, `b = 2e(1) − 4e(½)`: with `a ≥ 0` (or an excess the codes
-/// read at or below zero where the exact comparison did not stand) the step's direction raises the
+/// read at or below zero where the integer comparison did not stand) the step's direction raises the
 /// regions' code at every size the reads resolve, and it stands nowhere; with `a < 0` (then
 /// `b > 0`) the parabola is lowest at `μ* = −a/2b ≤ ¼`, and the step is read once more at the
 /// largest halving `2^(−h) ≤ μ*`, where the parabola is below zero, standing there or nowhere. A
@@ -5014,6 +5035,10 @@ pub struct FieldLearner {
     /// section's about as often as gradient noise says, so the read mostly threw away and shrank good steps). `true`
     /// keeps the read as a declared comparison. Not carried in the learner's text.
     pub read_held: bool,
+    /// [definition; the unified-theory reading of November 7, 05:55] Whether a kernel section steps by the evidence-shrunk
+    /// Newton step along the moments' direction ([`FieldLearner::section_kernel`]) instead of the moments' own step. Not
+    /// carried in the learner's text.
+    pub newton: bool,
     /// [measurement; §16.41] The step the last section stood at, the operand of the next section's
     /// [`FieldReceipt::transfer`]; a reading's operand, not carried in the learner's text, cleared by every growth, and not
     /// kept under the held read (whose next section moves the step before pricing it).
@@ -5026,7 +5051,7 @@ impl FieldLearner {
     pub fn new(field: Field, rate_bits: u32) -> Self {
         let len = field.material_len();
         let drawn = 4 * field.declaration.founding_draws();
-        Self { field, first: vec![0; len], second: vec![0; len], rate_bits, drawn, laps: 0, held: None, read_held: false, last: None }
+        Self { field, first: vec![0; len], second: vec![0; len], rate_bits, drawn, laps: 0, held: None, read_held: false, newton: false, last: None }
     }
 
     /// Whether a deposited step is held for the next regions' read.
@@ -5053,7 +5078,7 @@ impl FieldLearner {
         let second = from.iter().map(|&(i, divided)| if divided { div_nearest(self.second[i], f2) } else { self.second[i] }).collect();
         let drawn = self.drawn + 4 * self.field.growth_draws(factor);
         let rate_bits = self.rate_bits + (usize::BITS - (factor - 1).leading_zeros());
-        Ok(Self { field, first, second, rate_bits, drawn, laps: self.laps, held: None, read_held: self.read_held, last: None })
+        Ok(Self { field, first, second, rate_bits, drawn, laps: self.laps, held: None, read_held: self.read_held, newton: self.newton, last: None })
     }
 
     /// [definition; agent-inferred, November 4, §16.40] **The learner with one more lane** ([`Field::laned`]), the lane's
@@ -5093,7 +5118,7 @@ impl FieldLearner {
             }
         }
         let drawn = self.drawn + 4 * self.field.declaration.lane_draws();
-        Ok(Self { field, first, second, rate_bits: self.rate_bits, drawn, laps: self.laps, held: None, read_held: self.read_held, last: None })
+        Ok(Self { field, first, second, rate_bits: self.rate_bits, drawn, laps: self.laps, held: None, read_held: self.read_held, newton: self.newton, last: None })
     }
 
     /// The held step read on `regions` without a deposit: the faces of `regions` under the
@@ -5176,6 +5201,105 @@ impl FieldLearner {
         Ok(FieldReceipt { sites, code_before, code_after: None, halvings: 0, deposited, next, predicted, change: None, transfer, external })
     }
 
+    /// The moments moved by a section's covector `g` (each family's on its natural grain; `g` is left on the step's grain).
+    fn moments_take(&mut self, g: &mut [i128]) -> Result<()> {
+        for &(start, len, grain) in &self.field.families_all() {
+            for v in &mut g[start..start + len] {
+                *v = on_step_grain(grain, *v);
+            }
+        }
+        for ((m, v), gv) in self.first.iter_mut().zip(self.second.iter_mut()).zip(g.iter()) {
+            let square = gv.checked_mul(*gv).ok_or(TowerError::Refused("a covector's square outgrew its 128-bit carrier"))?;
+            if *m == 0 && *v == 0 {
+                // A coordinate opens at its own first nonzero covector.
+                (*m, *v) = (*gv, square);
+            } else {
+                *m = toward(*m, *gv, FIRST_RATE);
+                *v = toward(*v, square, SECOND_RATE);
+            }
+        }
+        Ok(())
+    }
+
+    /// [definition; the unified-theory reading of November 7, 05:55; agent-inferred where marked] **An evidence-shrunk Newton
+    /// step along the moments' direction.** `d` is the step the moments would deposit before this section moves them (a
+    /// direction this section never shaped). Each state's first-order change along it is `u_s = D_s · d` (bits on
+    /// `2^(−20)`, `D_s` its covector on the families' natural grains), weighed `f_s = w_s u_s` by its kernel weight `w_s`
+    /// (on `2^(−24)`). The section's slope is `s = Σ f_s`, its variance `v = n/(n − 1) Σ (f_s − s/n)²`, and its curvature
+    /// `c = (ln 2/2) Σ w_s u_s²` (the information `J = (ln 2/2T²) E[min(1, A) D Dᵀ]` along `d`). The step is
+    /// `α d` with `α = −(s/c)(1 − v/s²)`: Newton's along `d`, shrunk by the evidence `1 − v/s²`. [agent-inferred] The shrink
+    /// is floored at zero (its positive part), so a section whose slope is uphill or under its own noise (`s ≥ 0` or
+    /// `s² ≤ v`) deposits nothing. Then the covector `Σ w_s D_s` enters the moments. Returns whether it moved, `α` as
+    /// `(numerator, denominator)`, the shrink as `(s² − v, s²)` (on `2^(−40)`), `s`, `v` and `c`, and the prices.
+    #[allow(clippy::type_complexity)]
+    fn deposit_newton(&mut self, states: &[Vec<i128>], weights: &[i128]) -> Result<NewtonRead> {
+        let len = self.field.material_len();
+        const OVER: &str = "a Newton step past its 128-bit carrier";
+        let mut g = vec![0i128; len];
+        for (d, &w) in states.iter().zip(weights) {
+            if w == 0 {
+                continue;
+            }
+            for (gv, &x) in g.iter_mut().zip(d) {
+                *gv += release(x.checked_mul(w).ok_or(TowerError::Refused(OVER))?, MATERIAL_BITS);
+            }
+        }
+        let raw = g.clone();
+        let transfer = self.last.take().and_then(|s| predicted_change(&self.field, &raw, &s.step, s.halvings));
+        let mut direction = vec![0i128; len];
+        for &(start, n, grain) in &self.field.families_all() {
+            for i in start..start + n {
+                direction[i] = deposit_step(self.first[i], self.second[i], grain, self.rate_bits);
+            }
+        }
+        let external = predicted_change(&self.field, &raw, &direction, 0);
+        // Each state's slope along `d`, weighed.
+        let mut read = NewtonRead { transfer, external, ..NewtonRead::default() };
+        let (mut sum, mut squares, mut curvature) = (0i128, 0i128, 0i128);
+        let mut priced = 0usize;
+        for (d, &w) in states.iter().zip(weights) {
+            let Some(u) = predicted_change(&self.field, d, &direction, 0) else { continue };
+            let u = u as i128;
+            let f = release(w.checked_mul(u).ok_or(TowerError::Refused(OVER))?, MATERIAL_BITS);
+            sum += f;
+            squares += f.checked_mul(f).ok_or(TowerError::Refused(OVER))?;
+            curvature += release(w.checked_mul(u.checked_mul(u).ok_or(TowerError::Refused(OVER))?).ok_or(TowerError::Refused(OVER))?, MATERIAL_BITS);
+            priced += 1;
+        }
+        let n = priced as i128;
+        let variance = if n > 1 { (n * squares - sum * sum) / (n - 1) } else { 0 };
+        let curvature = release(curvature.checked_mul(crate::hnn::keyed_modes::ln2_face()).ok_or(TowerError::Refused(OVER))?, LN2_FACE_BITS) / 2;
+        (read.slope, read.variance, read.curvature) = (sum, variance, curvature);
+        let evidence = sum * sum - variance;
+        read.shrink = (evidence.max(0), sum * sum);
+        let mut moved = false;
+        let mut step = vec![0i128; len];
+        if sum < 0 && evidence > 0 && curvature > 0 {
+            // α = −(s² − v) 2^20 / (s c): s on 2^(−20), v and c on 2^(−40).
+            let (num, den) = (evidence.checked_mul(1 << 20).ok_or(TowerError::Refused(OVER))?, (-sum).checked_mul(curvature).ok_or(TowerError::Refused(OVER))?);
+            read.alpha = (num, den);
+            for (st, &dv) in step.iter_mut().zip(&direction) {
+                *st = div_nearest(dv.checked_mul(num).ok_or(TowerError::Refused(OVER))?, den);
+            }
+            let (candidate, any) = stepped(&self.field, &step, 0)?;
+            if any {
+                self.field = candidate;
+                moved = true;
+            }
+        }
+        read.predicted = predicted_change(&self.field, &raw, &step, 0);
+        self.moments_take(&mut g)?;
+        read.deposited = moved;
+        if moved {
+            if self.read_held {
+                self.held = Some(HeldStep { step, halvings: 0 });
+            } else {
+                self.last = Some(HeldStep { step, halvings: 0 });
+            }
+        }
+        Ok(read)
+    }
+
     /// [definition; agent-inferred, November 7] **A section's deposit of its covector** `g` (each family's on its natural
     /// grain, the code's covector): the step the section before stood at priced on it (`transfer`), the step the moments
     /// would deposit before it moves them priced on it (`external`), the moments moved, and the step deposited at its size
@@ -5195,21 +5319,7 @@ impl FieldLearner {
             }
         }
         let external = predicted_change(&self.field, &raw, &external_step, 0);
-        for &(start, len, grain) in &self.field.families_all() {
-            for v in &mut g[start..start + len] {
-                *v = on_step_grain(grain, *v);
-            }
-        }
-        for ((m, v), gv) in self.first.iter_mut().zip(self.second.iter_mut()).zip(&g) {
-            let square = gv.checked_mul(*gv).ok_or(TowerError::Refused("a covector's square outgrew its 128-bit carrier"))?;
-            if *m == 0 && *v == 0 {
-                // A coordinate opens at its own first nonzero covector.
-                (*m, *v) = (*gv, square);
-            } else {
-                *m = toward(*m, *gv, FIRST_RATE);
-                *v = toward(*v, square, SECOND_RATE);
-            }
-        }
+        self.moments_take(&mut g)?;
         let mut step = vec![0i128; g.len()];
         for &(start, len, grain) in &self.field.families_all() {
             for i in start..start + len {
@@ -5297,14 +5407,14 @@ impl FieldLearner {
     }
 
     /// [definition; the unified-theory reading of November 7, 05:20, route (b)'s negative] **An energy section's step from
-    /// one exact kernel step at the truth.** Each state `truth[s]` (every site resolved) opens its block `blocks[s]`, each
+    /// one invariant kernel step at the truth.** Each state `truth[s]` (every site resolved) opens its block `blocks[s]`, each
     /// block place carrying its truth's letter as a locked mixture, so one read ([`FieldRealization::read_energy_faces`])
     /// gives `G` and every block place's face at the truth. Each block place draws `a_t` from its face (keyed by `seed`, the
     /// state and the place); the proposal read gives `G′` and the faces `face′`. The block's Metropolis–Hastings ratio is
     /// `A = 2^((G − G′)/T) Π_t face′_t(truth_t)/face_t(a_t)`, and the section deposits
     /// `(1/T) Σ_s min(1, A_s)[∂G/∂θ(truth_s) − ∂G/∂θ(e′_s)]` (the accept coin's expectation, no coin), its step fluxing. By
     /// detailed balance the expected deposit is zero at the true distribution for any block and proposal; over the keyed
-    /// blocks every open place is reached, and the rest holds each place's exact conditional at the truth. `min(1, A)` is
+    /// blocks every open place is reached, and the rest holds each place's enumerated conditional at the truth (every letter's `G` read). `min(1, A)` is
     /// read through the exponential's navigator on `2^(−24)` and released to zero below its carrier (`2^(−23)`). Four reads
     /// a state: the faces at the truth and at the proposal, and the two material covectors.
     pub fn section_kernel(&mut self, truth: &[Region], blocks: &[Vec<usize>], seed: u64, realization: &mut dyn FieldRealization) -> Result<KernelReceipt> {
@@ -5386,33 +5496,46 @@ impl FieldLearner {
         both.extend((0..n).map(|s| Region { classes: &at_proposal[s].0, unresolved: &resolved[s], faces: &[], locked: &[], echo: &[], domain: None, port: None }));
         let reads = realization.read_energy_material(f, &both)?;
         const OVER: &str = "a kernel covector past its 128-bit carrier";
-        let mut g = vec![0i128; f.material_len()];
-        for s in 0..n {
-            if weights[s] == 0 {
-                continue;
-            }
-            let ((gt, _), (gp, _)) = (&reads[s], &reads[n + s]);
-            if gt.len() != g.len() || gp.len() != g.len() {
+        let families = f.families_all();
+        let material = f.material_len();
+        // Each state's `D_s/T = (∂G/∂θ(truth) − ∂G/∂θ′)/T` on the families' natural grains (2^(−40) a material family's, 2^(−24) a
+        // face family's).
+        let natural = |gt: &[i128], gp: &[i128]| -> Result<Vec<i128>> {
+            if gt.len() != material || gp.len() != material {
                 return refuse("a material covector of another length than the field's material");
             }
-            for ((v, a), b) in g.iter_mut().zip(gt).zip(gp) {
-                *v += release((a - b).checked_mul(weights[s]).ok_or(TowerError::Refused(OVER))?, MATERIAL_BITS);
+            let mut d = vec![0i128; material];
+            for &(start, len, grain) in &families {
+                for i in start..start + len {
+                    let scaled = release((gt[i] - gp[i]).checked_mul(inverse).ok_or(TowerError::Refused(OVER))?, MATERIAL_BITS);
+                    d[i] = if grain == MATERIAL_BITS { scaled } else { release(scaled, 40 - super::COVECTOR_BITS) };
+                }
             }
-        }
-        for &(start, len, grain) in &f.families_all() {
-            for v in &mut g[start..start + len] {
-                let scaled = release(v.checked_mul(inverse).ok_or(TowerError::Refused(OVER))?, MATERIAL_BITS);
-                *v = if grain == MATERIAL_BITS { scaled } else { release(scaled, 40 - super::COVECTOR_BITS) };
-            }
-        }
+            Ok(d)
+        };
         let places = blocks.iter().map(Vec::len).sum();
         let moved = (0..n).map(|s| blocks[s].iter().zip(&proposals[s]).filter(|&(&t, &a)| a != truth[s].classes[t]).count()).sum();
         let weight = weights.iter().sum();
         let weight_square = weights.iter().map(|&w| release(w * w, MATERIAL_BITS)).sum();
         let (least, most) = (weights.iter().copied().min().unwrap_or(0), weights.iter().copied().max().unwrap_or(0));
         let whole = weights.iter().filter(|&&w| w == 1i128 << MATERIAL_BITS).count();
+        let per_state: Vec<(usize, i128)> = blocks.iter().map(Vec::len).zip(weights.iter().copied()).collect();
+        let states: Vec<Vec<i128>> = (0..n).map(|s| natural(&reads[s].0, &reads[n + s].0)).collect::<Result<_>>()?;
+        if self.newton {
+            let newton = self.deposit_newton(&states, &weights)?;
+            return Ok(KernelReceipt { states: n, places, moved, weight, weight_square, least, most, whole, deposited: newton.deposited, predicted: newton.predicted, transfer: newton.transfer, external: newton.external, per_state, newton: Some(newton) });
+        }
+        let mut g = vec![0i128; material];
+        for (d, &w) in states.iter().zip(&weights) {
+            if w == 0 {
+                continue;
+            }
+            for (v, &x) in g.iter_mut().zip(d) {
+                *v += release(x.checked_mul(w).ok_or(TowerError::Refused(OVER))?, MATERIAL_BITS);
+            }
+        }
         let (deposited, predicted, transfer, external) = self.deposit(g)?;
-        Ok(KernelReceipt { states: n, places, moved, weight, weight_square, least, most, whole, deposited, predicted, transfer, external })
+        Ok(KernelReceipt { states: n, places, moved, weight, weight_square, least, most, whole, deposited, predicted, transfer, external, per_state, newton: None })
     }
 
     /// [definition; agent-inferred, November 3, the tower record] **The learner grown in scale**: its field grown in scale
@@ -5425,7 +5548,7 @@ impl FieldLearner {
         let (mut first, mut second) = (self.first.clone(), self.second.clone());
         first.resize(len, 0);
         second.resize(len, 0);
-        Ok(Self { field, first, second, rate_bits: self.rate_bits, drawn, laps: self.laps, held: None, read_held: self.read_held, last: None })
+        Ok(Self { field, first, second, rate_bits: self.rate_bits, drawn, laps: self.laps, held: None, read_held: self.read_held, newton: self.newton, last: None })
     }
 
     /// [measurement; agent-inferred, November 3, §16.31] **Each family's step coherence**: over the family's entries, `Σ |m|`
@@ -5481,7 +5604,7 @@ impl FieldLearner {
                 Some(HeldStep { step, halvings })
             }
         };
-        Ok(Self { field, first, second, rate_bits, read_held: held.is_some(), drawn, laps, held, last: None })
+        Ok(Self { field, first, second, rate_bits, read_held: held.is_some(), newton: false, drawn, laps, held, last: None })
     }
 }
 

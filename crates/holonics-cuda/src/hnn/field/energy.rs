@@ -8,9 +8,9 @@
 //! are the field's own launches; the energy's sites are the host's `Field::energy_sites` (an open site carries the locked
 //! uniform mixture), staged as any region's. A state's energy read is a cell ([`EnergyCell`]): the chart, the key and probe
 //! words (the probe reading its moment), framed and at unit power, the definite words' prefix sums, the exposure's scores, and
-//! each receiver's lock partition (`field_energy_rows_l*`: its mass the contact's exact series, its `log₂ Z` read from the
+//! each receiver's lock partition (`field_energy_rows_l*`: its mass the contact's series, its `log₂ Z` read from the
 //! mass's leading bits as the host's `log2_big` reads them, its shares), the strand pair's and the letters' energy, each summed
-//! per region as exact integers. The force is the locks' shares as their scores' covector through the reverse's own key and
+//! per region as integers. The force is the locks' shares as their scores' covector through the reverse's own key and
 //! probe brackets (`field_energy_rows_back`, `field_contact_columns`, `field_spread`), the unit powers' and the frames'
 //! returns and the charts' transposes, with the pair's (`field_pair_back` of the contraction) and the letters' (held). The
 //! regions of a batch tick in lockstep: each tick's force, then rounds of candidate steps, each region at its own halvings,

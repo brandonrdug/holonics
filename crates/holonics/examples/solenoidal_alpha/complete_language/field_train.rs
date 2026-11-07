@@ -122,7 +122,7 @@ pub(super) const RECORD: u8 = 0x1E;
 pub(super) const UNIT: u8 = 0x1F;
 
 /// The problems of a passage: `question \n answer` blocks separated by a blank line; or, where the passage carries the
-/// record separator, records `question US answer` separated by it, each part's bytes exact. [agent-inferred, November 5]
+/// record separator, records `question US answer` separated by it, each part's bytes kept whole. [agent-inferred, November 5]
 /// Why the records: the code passage (Brandon, November 5: python-codes-25k in place of GSM8K) has answers that hold
 /// blank lines and questions of several lines, which the blank-line blocks would cut; neither separator stands in it.
 pub(super) fn problems_of(text: &[u8]) -> Vec<(Vec<u8>, Vec<u8>)> {
@@ -337,7 +337,7 @@ pub(super) fn opening_region(codec: &FieldCodec, q: &[usize], a: &[usize], seed:
 /// answer's chain code as a mask state weighs its averaged code (the unified-theory reading of 01:21: at weight one an
 /// octave-uniform `k` drew a 250-place answer's place 130 in 1 of 1,107 states, and the taught hazard wrote 0.34 of held,
 /// 56% of the ends in an octave's first eighth against the truth's 17%). The region is cut
-/// `NEAR − 1` places past the frontier, exact for the frontier's face (the silent room past it is heard only through the near
+/// `NEAR − 1` places past the frontier, the same bits for the frontier's face (the silent room past it is heard only through the near
 /// field, `the_room_past_the_front_is_heard_only_through_the_near_field`); its places past the frontier stand in a port that
 /// hears none of them. Why: one place a read in one order draws exactly the joint its faces make by the chain rule, and a
 /// prefix state compared at its frontier is that joint's own code, the end coded once an answer where the writer meets it; the
@@ -2331,7 +2331,7 @@ pub(super) fn order_field(args: &[String], realization: &mut dyn FieldRealizatio
 /// first `COUNT` held problems, its length `L` is the `written` places of a write's `ENDS.tsv` (a place-order write's lengths,
 /// drawn from its hazard); the region is the question and `L + NEAR` places (the answer and its near tail, as the masks met
 /// them), drawn one place a read in a keyed uniform order of those places (keyed by the state's hash): an answer place from its
-/// face restricted to the letters (an exact integer draw against their masses), a near-tail place the void. Writes `SAMPLE.tsv`
+/// face restricted to the letters (an integer draw against their masses), a near-tail place the void. Writes `SAMPLE.tsv`
 /// (each answer, private, of the held answers). A reading only.
 pub(super) fn masks_field(args: &[String], realization: &mut dyn FieldRealization) -> Result<()> {
     if args.len() != 12 {
@@ -2756,15 +2756,15 @@ pub(super) fn length_field(args: &[String], realization: &mut dyn FieldRealizati
 
 /// [definition; the unified-theory readings of November 7, 04:05 and 05:20, route (b)] **`contrast-field STATE STATE_SHA CODEC
 /// CODEC_SHA UNITS UNITS_SHA TRAIN TRAIN_SHA HELD HELD_SHA SECTION LAPS PLACES LAP_MS STOP_MS OUT`**: an energy field trained by
-/// meeting its own exact kernel. Each training problem is a state: its question, its answer (cut to the room) and its near
+/// meeting its own invariant kernel (a step that leaves `P ∝ 2^(−G/T)` invariant). Each training problem is a state: its question, its answer (cut to the room) and its near
 /// voids, every site resolved. Each state opens one block, its answer places `t ≡ r (mod s)` from the answer's start, `s`
 /// [`FieldLearner::kernel_spacing`] and `r` keyed by the lap, the section and the member, and the
 /// section deposits one Metropolis–Hastings step from the truth weighed by its accept probability
 /// ([`FieldLearner::section_kernel`]). Declared comparisons: `FIELD_CONTRAST_JOINT=READS`, the joint release as the
 /// negative ([`holonics::hnn::tower::field::Field::energy_release`], [`FieldLearner::section_contrast`]), and
 /// `FIELD_CONTRAST_WRITER=SWEEPS,REFINE`, the writer as it writes ([`WriterLaw`]). Before the first lap and after each, the
-/// exact conditional is read at `PLACES` held places ([`exact_read`]). A lap starts only where `LAP_MS` fits before
-/// `STOP_MS`; past `STOP_MS` the run writes `STATE.stopped` and stops. Writes `STATE.<lap>` and `EXACT.tsv` (private: held
+/// enumerated conditional is read at `PLACES` held places ([`enumerated_read`]). A lap starts only where `LAP_MS` fits before
+/// `STOP_MS`; past `STOP_MS` the run writes `STATE.stopped` and stops. Writes `STATE.<lap>` and `ENUMERATED.tsv` (private: held
 /// answers' letters).
 pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealization) -> Result<()> {
     if args.len() != 17 {
@@ -2797,6 +2797,9 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
         },
         Err(_) => None,
     };
+    // [the unified-theory reading of November 7, 05:55] The kernel steps by the evidence-shrunk Newton step along the moments'
+    // direction; `FIELD_CONTRAST_MOMENTS` keeps laps 4 and 5's law (the moments' own step), a declared comparison.
+    learner.newton = writer.is_none() && joint.is_none() && std::env::var_os("FIELD_CONTRAST_MOMENTS").is_none();
     std::fs::create_dir(out)?;
     let void = codec.void();
     let near = holonics::hnn::tower::field::NEAR;
@@ -2825,7 +2828,7 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
     };
     let d = learner.field.declaration;
     println!(
-        "FIELD_CONTRAST_DECLARATION alphabet={} width={} heads={} modes={} ticks={} reach={} rate={} log2_t={} section={section} sections={} train={} held={} places={places} release={} run_bits={} rest={} spans={} laps_read={}",
+        "FIELD_CONTRAST_DECLARATION alphabet={} width={} heads={} modes={} ticks={} reach={} rate={} log2_t={} section={section} sections={} train={} held={} places={places} release={} newton={} run_bits={} rest={} spans={} laps_read={}",
         d.alphabet,
         d.width,
         d.heads,
@@ -2842,14 +2845,15 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
             (None, Some(reads)) => format!("joint_{reads}"),
             (None, None) => format!("kernel_spacing_{spacing}"),
         },
+        learner.newton,
         law.run_bits,
         law.rest,
         law.spans,
         learner.laps
     );
-    let mut exact_rows = rows_file(&out.join("EXACT.tsv"), "lap\tproblem\tplace\ttruth\tlog2_t\tface_masses\tface_total\tenergies\n")?;
-    exact_read(&learner.field, &held_set, places, &truth_of, realization, -1, &mut exact_rows)?;
-    println!("FIELD_EXACT_READ lap=-1 ms={}", started.elapsed().as_millis());
+    let mut enumerated_rows = rows_file(&out.join("ENUMERATED.tsv"), "lap\tproblem\tplace\ttruth\tlog2_t\tface_masses\tface_total\tenergies\n")?;
+    enumerated_read(&learner.field, &held_set, places, &truth_of, realization, -1, &mut enumerated_rows)?;
+    println!("FIELD_ENUMERATED_READ lap=-1 ms={}", started.elapsed().as_millis());
     for lap in 0..laps {
         let elapsed = started.elapsed().as_millis();
         if lap > 0 && elapsed + lap_ms > stop_ms {
@@ -2861,6 +2865,9 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
         let (mut states, mut same, mut gap, mut deposited) = (0usize, 0usize, 0i128, 0usize);
         // The kernel's lap: its block places, moved places, and the weights' sum and squares' sum on 2^(−24).
         let (mut places_lap, mut moved_lap, mut weight_lap, mut square_lap, mut whole_lap) = (0usize, 0usize, 0i128, 0i128, 0usize);
+        // Each state's (block places, weight), and each section's (α, shrink) in thousandths, for the lap's tenths.
+        let mut by_state: Vec<(usize, i128)> = Vec::new();
+        let mut by_section: Vec<(i128, i128)> = Vec::new();
         for (n, &s) in walk(seed, read, sections.len()).iter().enumerate() {
             let section_start = std::time::Instant::now();
             let members = &sections[s];
@@ -2884,8 +2891,18 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
                 (places_lap, moved_lap, weight_lap, square_lap, whole_lap) = (places_lap + receipt.places, moved_lap + receipt.moved, weight_lap + receipt.weight, square_lap + receipt.weight_square, whole_lap + receipt.whole);
                 let unit = 1i128 << holonics::hnn::tower::MATERIAL_BITS;
                 let micro = |v: Option<i64>| v.map_or("-".to_string(), |c| ((c as i128 * 1_000_000) / ((receipt.states as i128) << 20)).to_string());
+                by_state.extend(receipt.per_state.iter().copied());
+                let newton_text = match receipt.newton {
+                    Some(r) => {
+                        let alpha = if r.alpha.1 > 0 { r.alpha.0 * 1000 / r.alpha.1 } else { 0 };
+                        let shrink = if r.shrink.1 > 0 { r.shrink.0 * 1000 / r.shrink.1 } else { 0 };
+                        by_section.push((alpha, shrink));
+                        format!(" alpha_milli={alpha} shrink_milli={shrink} slope_micro={} curvature={} variance={}", (r.slope * 1_000_000) / ((receipt.states as i128) << 20), r.curvature, r.variance)
+                    }
+                    None => String::new(),
+                };
                 println!(
-                    "FIELD_KERNEL lap={lap} n={n} states={} places={} moved={} accept_milli={} least_milli={} most_milli={} whole={} deposited={} predicted_micro={} transfer_micro={} external_micro={} ms_section={} ms={}",
+                    "FIELD_KERNEL lap={lap} n={n} states={} places={} moved={} accept_milli={} least_milli={} most_milli={} whole={} deposited={} predicted_micro={} transfer_micro={} external_micro={}{newton_text} ms_section={} ms={}",
                     receipt.states,
                     receipt.places,
                     receipt.moved,
@@ -3004,6 +3021,32 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
             let mean = weight_lap * 1000 / (unit * states as i128);
             let var = (square_lap * 1_000_000 / (unit * states as i128)) - mean * mean;
             println!("FIELD_KERNEL_ACCEPT lap={lap} states={states} places={places_lap} moved={moved_lap} accept_milli={mean} sd_milli={} whole={whole_lap}", (var.max(0) as u128).isqrt());
+            // [measurement; the unified-theory reading of November 7, 05:55] The acceptance by tenths of the states' block size,
+            // and α and the shrink by tenths of the lap (their medians).
+            let mut sized = by_state.clone();
+            sized.sort_by_key(|&(p, _)| p);
+            let tenths: Vec<String> = (0..10)
+                .map(|k| {
+                    let part = &sized[k * sized.len() / 10..(k + 1) * sized.len() / 10];
+                    let (places, weight) = part.iter().fold((0usize, 0i128), |(p, w), &(q, x)| (p + q, w + x));
+                    format!("{}:{}", places * 10 / part.len().max(1), weight * 1000 / (unit * part.len().max(1) as i128))
+                })
+                .collect();
+            println!("FIELD_KERNEL_BLOCKS lap={lap} by_block_tenth(places_tenths:accept_milli)={}", tenths.join(","));
+            if !by_section.is_empty() {
+                let median = |v: &mut Vec<i128>| -> i128 {
+                    v.sort_unstable();
+                    v[v.len() / 2]
+                };
+                let tenths: Vec<String> = (0..10)
+                    .map(|k| {
+                        let part = &by_section[k * by_section.len() / 10..((k + 1) * by_section.len() / 10).max(k * by_section.len() / 10 + 1).min(by_section.len())];
+                        let (mut a, mut sh): (Vec<i128>, Vec<i128>) = part.iter().copied().unzip();
+                        format!("{}:{}", median(&mut a), median(&mut sh))
+                    })
+                    .collect();
+                println!("FIELD_KERNEL_NEWTON lap={lap} by_lap_tenth(alpha_milli:shrink_milli medians)={}", tenths.join(","));
+            }
         }
         println!(
             "FIELD_CONTRAST_LAP lap={lap} read={} states={states} same={same} gap_micro={} deposited={deposited}/{} lap_ms={} ms={}",
@@ -3013,26 +3056,26 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
             lap_start.elapsed().as_millis(),
             started.elapsed().as_millis()
         );
-        exact_read(&learner.field, &held_set, places, &truth_of, realization, lap as i64, &mut exact_rows)?;
-        println!("FIELD_EXACT_READ lap={lap} ms={}", started.elapsed().as_millis());
+        enumerated_read(&learner.field, &held_set, places, &truth_of, realization, lap as i64, &mut enumerated_rows)?;
+        println!("FIELD_ENUMERATED_READ lap={lap} ms={}", started.elapsed().as_millis());
     }
     Ok(())
 }
 
-/// [measurement; the unified-theory reading of November 7, 04:05] **The exact conditional at held places** (lap 4's score):
+/// [measurement; the unified-theory reading of November 7, 04:05] **The enumerated conditional at held places** (lap 4's score):
 /// for the first `places` held problems, one keyed answer place `t` each, the rest at the truth. The face at `t` (`t` open,
 /// [`FieldRealization::read_faces`]) beside every letter's energy `G(rest, e_t = c)` at its own certified halvings
-/// ([`FieldRealization::read_energies`]), so `P(c | rest) ∝ 2^(−G_c/T)` is the exact conditional and the face only proposes.
+/// ([`FieldRealization::read_energies`]), so `P(c | rest) ∝ 2^(−G_c/T)` is the enumerated conditional (every letter's `G` read) and the face only proposes.
 /// Each place's row goes to `rows`: the face's masses and total, `log₂ T` on `2^(−24)`, and the energies on `2^(−32)` bits.
-/// The codes and `KL(exact ‖ face)` are read from the rows at the receipt (a reading only: nothing in the run reads it).
-fn exact_read(field: &Field, held: &Problems, places: usize, truth_of: &dyn Fn(&(Vec<usize>, Vec<usize>, usize), &[usize]) -> Vec<usize>, realization: &mut dyn FieldRealization, lap: i64, rows: &mut std::fs::File) -> Result<()> {
+/// The codes and `KL(enumerated ‖ face)` are read from the rows at the receipt (a reading only: nothing in the run reads it).
+fn enumerated_read(field: &Field, held: &Problems, places: usize, truth_of: &dyn Fn(&(Vec<usize>, Vec<usize>, usize), &[usize]) -> Vec<usize>, realization: &mut dyn FieldRealization, lap: i64, rows: &mut std::fs::File) -> Result<()> {
     let alphabet = field.declaration.alphabet;
     let chosen: Vec<(usize, Vec<usize>, usize)> = held
         .iter()
         .take(places)
         .enumerate()
         .map(|(k, p)| {
-            let t = p.0.len() + (mix(EXACT_KEY, k as u64) as usize) % p.1.len();
+            let t = p.0.len() + (mix(ENUMERATED_KEY, k as u64) as usize) % p.1.len();
             (k, truth_of(p, &p.1), t)
         })
         .collect();
@@ -3056,7 +3099,7 @@ fn exact_read(field: &Field, held: &Problems, places: usize, truth_of: &dyn Fn(&
     let energies = realization.read_energies(field, &asked).map_err(|e| e.to_string())?;
     let log2_t = field.theta[field.layout().face_temper];
     for (n, (k, truth, t)) in chosen.iter().enumerate() {
-        let face = faces[n][*t].as_ref().ok_or("an exact read's open place with no face")?;
+        let face = faces[n][*t].as_ref().ok_or("an enumerated read's open place with no face")?;
         let masses: Vec<String> = face.masses.iter().map(u128::to_string).collect();
         let g: Vec<String> = energies[n * alphabet..(n + 1) * alphabet].iter().map(i128::to_string).collect();
         let q = held[*k].0.len();
@@ -3065,8 +3108,8 @@ fn exact_read(field: &Field, held: &Problems, places: usize, truth_of: &dyn Fn(&
     Ok(())
 }
 
-/// The exact read's key space, apart from every other draw of the run.
-const EXACT_KEY: u64 = 0xE7AC_7 << 40;
+/// The enumerated read's key space, apart from every other draw of the run.
+const ENUMERATED_KEY: u64 = 0xE7AC_7 << 40;
 
 /// [measurement; agent-inferred, November 7] **The writer's declared law** (`FIELD_WRITER_*`): the flags of
 /// [`holonics::hnn::tower::field::Field::sample_runs`] a write reads from its environment, one reading for every command that
@@ -3965,7 +4008,7 @@ mod tests {
         assert_eq!(bits(held[1].0, 4), bits(held[2].0, 4), "the three-decimal reading cannot tell them apart");
     }
 
-    /// A passage of records keeps each question's and answer's bytes exact, blank lines and several lines included.
+    /// A passage of records keeps each question's and answer's bytes whole, blank lines and several lines included.
     #[test]
     fn a_passage_of_records_keeps_its_blank_lines() {
         let text = b"Add two numbers\nin Python\x1f```python\ndef add(a, b):\n\n    return a + b\n```\x1eSay hi\x1fprint('hi')\x1e";

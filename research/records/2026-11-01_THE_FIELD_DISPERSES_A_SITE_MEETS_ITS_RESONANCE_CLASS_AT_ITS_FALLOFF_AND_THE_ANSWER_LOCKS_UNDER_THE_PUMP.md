@@ -4419,18 +4419,18 @@ of 04:42] **The field meets its own release, released jointly: a lap projects at
 - dev2's costs, on the card, 25 sections of 16 from the tempered founding:
   - release 6.8 s a section on average (median 4.3 s, largest 30 s), 63 reads on average;
   - deposit 0.05 to 0.7 s;
-  - the exact read at 64 held places, 11 s.
+  - the enumerated read at 64 held places, 11 s.
 - A lap of 1,543 sections projects at 2.9 h, or 4.0 h at the mean plus two standard errors. The sections are walked in a
   keyed order, so the 25 are a fair sample.
 - The gap `(G(truth) − G(e′))/T` a state is +0.007 to +0.65 bits over the first five sections, then −0.03 to −2.8 bits. The
   steps move the truth's energy below the field's own release.
-- The exact read at the founding: the exact conditional codes 6.639 bits a place and the face 6.644 (`log₂ 100`).
-  `KL(exact ‖ face)` averages 0.0008 bits and is at most 0.3 at 64 of 64 places. Near uniform, the faces propose almost
+- The enumerated read at the founding: the enumerated conditional (every letter's `G` read) codes 6.639 bits a place and
+  the face 6.644 (`log₂ 100`). `KL(enumerated ‖ face)` averages 0.0008 bits and is at most 0.3 at 64 of 64 places. Near uniform, the faces propose almost
   exactly.
 Receipts: `longrun_nov6/lap4_dev.txt`, `lap4_dev.sh`, `lap4_exact.py`.
 
-[definition and measurement; November 7, lap 4; the unified-theory readings of 05:20 and 05:33] **The negative is one exact
-kernel step from the truth, and lap 4 lowers the held exact code by 0.114 bits a place in 7.3 minutes.**
+[definition and measurement; November 7, lap 4; the unified-theory readings of 05:20 and 05:33] **The negative is one invariant
+kernel step from the truth, and lap 4 lowers the held enumerated code by 0.114 bits a place in 7.3 minutes.**
 - Theory refused the joint release as the negative. It draws each place from its own mixture, so at rest the deposit is the
   gap between the joint and the factorized distributions, not zero. A mean field on the negative side can also lower the
   contrast by spoiling its own release.
@@ -4446,24 +4446,24 @@ kernel step from the truth, and lap 4 lowers the held exact code by 0.114 bits a
 - The development read (60 s, 153 sections): acceptance 0.959 (sd 0.104), 0.318 s a section, a lap projected at 8.2 min.
 - The lap, on the card from the tempered founding:
   - all 1,543 sections, 24,685 states and 733,860 block places in 436.5 s (0.89 of the projection), 457 s with the two
-    exact reads;
+    enumerated reads;
   - acceptance 0.517 (sd 0.395) over the lap, 0.959 in its first tenth and 0.331 in its last, falling as the faces sharpen.
 - The score at 64 held places:
-  - the exact code went from 6.639 to 6.526 bits a place, a paired change of −0.114 with standard error 0.017;
+  - the enumerated code went from 6.639 to 6.526 bits a place, a paired change of −0.114 with standard error 0.017;
   - the face code went from 6.644 to 6.526;
-  - `KL(exact ‖ face)` went from 0.0008 to 0.0065 bits on average (median 0.0021), at most 0.3 at 64 of 64 places.
-- Against theory's blinds: the exact code is far above the 4.6 guessed, the KL is under 0.05, and the last tenth's acceptance
+  - `KL(enumerated ‖ face)` went from 0.0008 to 0.0065 bits on average (median 0.0021), at most 0.3 at 64 of 64 places.
+- Against theory's blinds: the enumerated code is far above the 4.6 guessed, the KL is under 0.05, and the last tenth's acceptance
   is under the 0.5 to 0.9 band.
 - By theory's rule (a fall past twice its paired error) lap 5 follows on the same law at once.
 Receipts: `longrun_nov6/lap4.txt`, `lap4.sh`, `lap4_devk.sh`, `lap4_exact.py`.
 
-[measurement; November 7, lap 5] **Lap 5, on the same law, moves the held exact code a fifth as far, inside its error.**
+[measurement; November 7, lap 5] **Lap 5, on the same law, moves the held enumerated code a fifth as far, inside its error.**
 - From lap 4's state: 1,543 sections and 24,685 states in 472 s on the card.
 - Acceptance 0.312 (sd 0.373): 0.325 in the first tenth, 0.291 in the last.
-- The exact code went from 6.526 to 6.503 bits a place, a paired change of −0.023 with standard error 0.017, not past twice
-  its error. So by theory's rule no lap 6 follows. The face code went from 6.526 to 6.508, and `KL(exact ‖ face)` from
+- The enumerated code went from 6.526 to 6.503 bits a place, a paired change of −0.023 with standard error 0.017, not past twice
+  its error. So by theory's rule no lap 6 follows. The face code went from 6.526 to 6.508, and `KL(enumerated ‖ face)` from
   0.0065 to 0.0110.
-- From the founding the held exact code reads 6.639, 6.526 and 6.503, while the letters' own frequencies code the truth at
+- From the founding the held enumerated code reads 6.639, 6.526 and 6.503, while the letters' own frequencies code the truth at
   4.93. The field is still near uniform.
 - [inferred] A block holds 29.7 places on average, so `A` is a product of about 30 ratios. Its weight averages 0.31 while the
   faces are still near uniform, and the moments normalize the deposit's scale, so the collapsed weights mostly select the
@@ -4478,10 +4478,33 @@ Google Colab using the CLI"] **A lap is bit-identical across devices, and the co
 - Lap 4 replayed from the same inputs and keys reached 1,502 of 1,543 sections by its 600 s deadline, so it is incomplete.
   Every receipt field of those 1,502 sections equals the 4080 SUPER's: states, places, moved places, acceptance with its
   least and most, whole weights, and the first-order prices (which read the covector and the material).
-- Their time: 585 s on the A100 against 428 s on the 4080 SUPER, 1.37 times slower. The learner's arithmetic is exact
-  integers (wide words and releases), where the consumer card's integer throughput and clocks lead. The A100's lead is in
-  floating point and tensor cores, which no law here uses [inferred]. The VM's host part is also slower (its material
-  returns 295 s against 228 s).
-- So the A100 is a second device for independent runs beside the card, not a faster one for this learner. The session was
-  stopped after the replay.
+- Their time: 585 s on the A100 against 428 s on the 4080 SUPER, 1.37 times slower. The VM's host part is also slower (its
+  material returns 295 s against 228 s).
+- [corrected, Brandon 05:59: "'exact' is *false* ... They're bit widths of graphs"] The cause is the realization's layout,
+  not the law or the device. The law declares a width for each term and releases its remainder at a declared tolerance;
+  that is dynamic precision, and π, for one, is a navigator read at a width. The card's kernels hold every term in fixed 64-
+  and 128-bit scalar words on the CUDA cores, where the consumer card's clocks lead.
+- Both cards' tensor cores multiply narrow integer limbs and accumulate in 32 bits. A term split into limbs whose products
+  and sums fit the accumulator gives the same bits, since integer sums are associative. The lock scores, words and rows are
+  matrix products. Moving them onto the tensor cores is the realization's next subject.
+- Until then the A100 is a second device for independent runs beside the card. The session was stopped after the replay.
 Receipts: `longrun_nov6/lap4_a100.txt`, `lap4_a100.sh`.
+
+[measurement; November 7, lap 6; the unified-theory reading of 05:55] **The evidence-shrunk Newton step runs away as its
+curvature collapses.**
+- `FieldLearner::deposit_newton`: along the moments' direction `d` (their step before this section moves them), each
+  state's slope `u_s = D_s · d` is weighed `f_s = w_s u_s`. Then `s = Σ f`, `v = n/(n − 1) Σ(f − s/n)²`,
+  `c = (ln 2/2) Σ w u²`, and the step is `α d` with `α = −(s/c)(1 − v/s²)`. [agent-inferred] The shrink is floored at
+  zero, so a section uphill or under its noise deposits nothing.
+- The development read (60 s, 170 sections from lap 5's state): 63 sections stepped, the rest uphill or noise-bound. Where
+  it stepped, α's median was 5.9 and the shrink's 0.41. The standing steps moved their own sections by −0.1 to −0.3 bits a
+  state and priced at +0.06 to +0.37 bits on the next.
+- Lap 6 stopped at section 202 of 1,543 (69 s), when the card refused a value past its 64-bit carrier. No state was
+  written.
+  - From about section 140 the acceptance climbed to 0.93 and then 1.0.
+  - The curvature fell from 10¹⁰–10¹¹ to 10⁷, and α rose to 878–2,307 with the shrink near 0.99.
+  - Each section predicted −2.4 bits a state on itself, and the transfers on the next ran −0.1 to −3.8 bits.
+- [inferred] The steps drive the faces toward flat. Acceptance near one means `G′ ≈ G`, so the curvature along `d` falls,
+  `α ∝ 1/c` grows, and the evidence stays near one as the slope's variance falls with it. The next law (a trust region on
+  `α`, or the curvature held at its running level) is theory's.
+Receipts: `longrun_nov6/lap6.txt`.
