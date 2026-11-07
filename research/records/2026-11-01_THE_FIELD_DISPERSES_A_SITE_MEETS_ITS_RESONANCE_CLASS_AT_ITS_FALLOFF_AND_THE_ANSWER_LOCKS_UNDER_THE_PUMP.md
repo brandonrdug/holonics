@@ -4428,3 +4428,31 @@ of 04:42] **The field meets its own release, released jointly: a lap projects at
   `KL(exact ‖ face)` averages 0.0008 bits and is at most 0.3 at 64 of 64 places. Near uniform, the faces propose almost
   exactly.
 Receipts: `longrun_nov6/lap4_dev.txt`, `lap4_dev.sh`, `lap4_exact.py`.
+
+[definition and measurement; November 7, lap 4; the unified-theory readings of 05:20 and 05:33] **The negative is one exact
+kernel step from the truth, and lap 4 lowers the held exact code by 0.114 bits a place in 7.3 minutes.**
+- Theory refused the joint release as the negative. It draws each place from its own mixture, so at rest the deposit is the
+  gap between the joint and the factorized distributions, not zero. A mean field on the negative side can also lower the
+  contrast by spoiling its own release.
+- `FieldLearner::section_kernel` replaces it. Each state opens one block, the answer places `t ≡ r (mod 11)`
+  (`FieldLearner::kernel_spacing`, `2(NEAR − 1) + 1`, so that no receiver's near lock sees two block places; `r` is keyed).
+  - Each block place carries its truth as a locked one-hot mixture, so one read gives `G` and the faces at the truth.
+  - `a_t` is drawn from its face. The proposal read gives `G′` and `face′`.
+  - The weight is `min(1, A)` with `A = 2^((G − G′)/T) Π face′_t(truth_t)/face_t(a_t)`, read through the exponential's
+    navigator and released to zero below `2^(−23)`.
+  - The deposit is `(1/T) Σ min(1, A)[∂G/∂θ(truth) − ∂G/∂θ′]`: four reads a state.
+  - By detailed balance the expected deposit is zero at the true distribution for any block. The test counts what the
+    spacing leaves to it (crowds, the ticks' transport).
+- The development read (60 s, 153 sections): acceptance 0.959 (sd 0.104), 0.318 s a section, a lap projected at 8.2 min.
+- The lap, on the card from the tempered founding:
+  - all 1,543 sections, 24,685 states and 733,860 block places in 436.5 s (0.89 of the projection), 457 s with the two
+    exact reads;
+  - acceptance 0.517 (sd 0.395) over the lap, 0.959 in its first tenth and 0.331 in its last, falling as the faces sharpen.
+- The score at 64 held places:
+  - the exact code went from 6.639 to 6.526 bits a place, a paired change of −0.114 with standard error 0.017;
+  - the face code went from 6.644 to 6.526;
+  - `KL(exact ‖ face)` went from 0.0008 to 0.0065 bits on average (median 0.0021), at most 0.3 at 64 of 64 places.
+- Against theory's blinds: the exact code is far above the 4.6 guessed, the KL is under 0.05, and the last tenth's acceptance
+  is under the 0.5 to 0.9 band.
+- By theory's rule (a fall past twice its paired error) lap 5 follows on the same law at once.
+Receipts: `longrun_nov6/lap4.txt`, `lap4.sh`, `lap4_devk.sh`, `lap4_exact.py`.

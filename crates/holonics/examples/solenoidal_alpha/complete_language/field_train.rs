@@ -2754,19 +2754,21 @@ pub(super) fn length_field(args: &[String], realization: &mut dyn FieldRealizati
     Ok(())
 }
 
-/// [definition; the unified-theory reading of November 7, 04:05, route (b)] **`contrast-field STATE STATE_SHA CODEC CODEC_SHA
-/// UNITS UNITS_SHA TRAIN TRAIN_SHA HELD HELD_SHA SECTION LAPS READS PLACES LAP_MS STOP_MS OUT`**: an energy field trained by
-/// meeting its own release. Each training problem is a state: its question, its answer (cut to the room) and its near
-/// voids, every site resolved. Each section's states are released jointly, each answer's length given (the same open
-/// places), keyed by the lap and the section: every open place's mixture relaxed at once for at most `READS` reads
-/// ([`holonics::hnn::tower::field::Field::energy_release`]); `FIELD_CONTRAST_WRITER=SWEEPS,REFINE` releases them by the
-/// writer as it writes instead ([`WriterLaw`]), a declared comparison. The section then deposits `(1/T)[∂G/∂θ(truth) − ∂G/∂θ(e′)]` ([`FieldLearner::section_contrast`]), its step fluxing.
-/// Before the first lap and after each, the exact conditional is read at `PLACES` held places ([`exact_read`]). A lap starts
-/// only where `LAP_MS` fits before `STOP_MS`; past `STOP_MS` the run writes `STATE.stopped` and stops. Writes `STATE.<lap>`
-/// and `EXACT.tsv` (private: held answers' letters).
+/// [definition; the unified-theory readings of November 7, 04:05 and 05:20, route (b)] **`contrast-field STATE STATE_SHA CODEC
+/// CODEC_SHA UNITS UNITS_SHA TRAIN TRAIN_SHA HELD HELD_SHA SECTION LAPS PLACES LAP_MS STOP_MS OUT`**: an energy field trained by
+/// meeting its own exact kernel. Each training problem is a state: its question, its answer (cut to the room) and its near
+/// voids, every site resolved. Each state opens one block, its answer places `t ≡ r (mod s)` from the answer's start, `s`
+/// [`FieldLearner::kernel_spacing`] and `r` keyed by the lap, the section and the member, and the
+/// section deposits one Metropolis–Hastings step from the truth weighed by its accept probability
+/// ([`FieldLearner::section_kernel`]). Declared comparisons: `FIELD_CONTRAST_JOINT=READS`, the joint release as the
+/// negative ([`holonics::hnn::tower::field::Field::energy_release`], [`FieldLearner::section_contrast`]), and
+/// `FIELD_CONTRAST_WRITER=SWEEPS,REFINE`, the writer as it writes ([`WriterLaw`]). Before the first lap and after each, the
+/// exact conditional is read at `PLACES` held places ([`exact_read`]). A lap starts only where `LAP_MS` fits before
+/// `STOP_MS`; past `STOP_MS` the run writes `STATE.stopped` and stops. Writes `STATE.<lap>` and `EXACT.tsv` (private: held
+/// answers' letters).
 pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealization) -> Result<()> {
-    if args.len() != 18 {
-        return Err("contrast-field STATE STATE_SHA CODEC CODEC_SHA UNITS UNITS_SHA TRAIN TRAIN_SHA HELD HELD_SHA SECTION LAPS READS PLACES LAP_MS STOP_MS OUT".into());
+    if args.len() != 17 {
+        return Err("contrast-field STATE STATE_SHA CODEC CODEC_SHA UNITS UNITS_SHA TRAIN TRAIN_SHA HELD HELD_SHA SECTION LAPS PLACES LAP_MS STOP_MS OUT".into());
     }
     let started = std::time::Instant::now();
     let mut learner = FieldLearner::from_text(std::str::from_utf8(&pinned_read(&args[1], &args[2], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
@@ -2778,9 +2780,15 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
     let codec = FieldCodec::from_text(std::str::from_utf8(&pinned_read(&args[3], &args[4], CODEC_BUDGET)?)?, units)?;
     let train_text = problems_of(&pinned_read(&args[7], &args[8], READ_BUDGET as usize)?);
     let held_text = problems_of(&pinned_read(&args[9], &args[10], READ_BUDGET as usize)?);
-    let (section, laps, reads, places) = (positive(&args[11])?, count(&args[12])?, positive(&args[13])?, count(&args[14])?);
-    let (lap_ms, stop_ms) = (positive(&args[15])? as u128, positive(&args[16])? as u128);
-    let out = Path::new(&args[17]);
+    let (section, laps, places) = (positive(&args[11])?, count(&args[12])?, count(&args[13])?);
+    let (lap_ms, stop_ms) = (positive(&args[14])? as u128, positive(&args[15])? as u128);
+    let out = Path::new(&args[16]);
+    // The declared comparison: the joint release, at most `READS` reads.
+    let joint: Option<usize> = match std::env::var("FIELD_CONTRAST_JOINT") {
+        Ok(v) => Some(v.trim().parse::<usize>().ok().filter(|&r| r > 0).ok_or(format!("FIELD_CONTRAST_JOINT {v}: READS"))?),
+        Err(_) => None,
+    };
+    let spacing = FieldLearner::kernel_spacing();
     // The declared comparison: the writer as it writes, `SWEEPS,REFINE`.
     let writer: Option<(usize, usize)> = match std::env::var("FIELD_CONTRAST_WRITER") {
         Ok(v) => match v.split_once(',').map(|(a, b)| (a.trim().parse::<usize>(), b.trim().parse::<usize>())) {
@@ -2829,7 +2837,11 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
         sections.len(),
         train_set.len(),
         held_set.len(),
-        writer.map_or(format!("joint_{reads}"), |(sw, rf)| format!("writer_{sw}_{rf}")),
+        match (writer, joint) {
+            (Some((sw, rf)), _) => format!("writer_{sw}_{rf}"),
+            (None, Some(reads)) => format!("joint_{reads}"),
+            (None, None) => format!("kernel_spacing_{spacing}"),
+        },
         law.run_bits,
         law.rest,
         law.spans,
@@ -2847,10 +2859,59 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
         let read = learner.laps;
         let lap_start = std::time::Instant::now();
         let (mut states, mut same, mut gap, mut deposited) = (0usize, 0usize, 0i128, 0usize);
+        // The kernel's lap: its block places, moved places, and the weights' sum and squares' sum on 2^(−24).
+        let (mut places_lap, mut moved_lap, mut weight_lap, mut square_lap, mut whole_lap) = (0usize, 0usize, 0i128, 0i128, 0usize);
         for (n, &s) in walk(seed, read, sections.len()).iter().enumerate() {
             let section_start = std::time::Instant::now();
             let members = &sections[s];
             let truths: Vec<Vec<usize>> = members.iter().map(|&i| truth_of(&train_set[i], &train_set[i].1)).collect();
+            if writer.is_none() && joint.is_none() {
+                // The kernel: each state's block, its answer places `t ≡ r (mod s)`.
+                let blocks: Vec<Vec<usize>> = members
+                    .iter()
+                    .enumerate()
+                    .map(|(m, &i)| {
+                        let (q, a, _) = &train_set[i];
+                        let r = (mix(seed ^ 0xB10C << 44, read << 40 | (n as u64) << 16 | m as u64) as usize) % spacing.min(a.len());
+                        (r..a.len()).step_by(spacing).map(|j| q.len() + j).collect()
+                    })
+                    .collect();
+                let resolved: Vec<Vec<bool>> = truths.iter().map(|t| vec![false; t.len()]).collect();
+                let truth_views: Vec<Region> = truths.iter().zip(&resolved).map(|(c, u)| Region { classes: c, unresolved: u, faces: &[], locked: &[], echo: &[], domain: None, port: None }).collect();
+                let key = mix(seed ^ 0xC0_7A57 << 40, read << 32 | n as u64);
+                let receipt = learner.section_kernel(&truth_views, &blocks, key, realization).map_err(|e| e.to_string())?;
+                (states, deposited) = (states + receipt.states, deposited + usize::from(receipt.deposited));
+                (places_lap, moved_lap, weight_lap, square_lap, whole_lap) = (places_lap + receipt.places, moved_lap + receipt.moved, weight_lap + receipt.weight, square_lap + receipt.weight_square, whole_lap + receipt.whole);
+                let unit = 1i128 << holonics::hnn::tower::MATERIAL_BITS;
+                let micro = |v: Option<i64>| v.map_or("-".to_string(), |c| ((c as i128 * 1_000_000) / ((receipt.states as i128) << 20)).to_string());
+                println!(
+                    "FIELD_KERNEL lap={lap} n={n} states={} places={} moved={} accept_milli={} least_milli={} most_milli={} whole={} deposited={} predicted_micro={} transfer_micro={} external_micro={} ms_section={} ms={}",
+                    receipt.states,
+                    receipt.places,
+                    receipt.moved,
+                    receipt.weight * 1000 / (unit * receipt.states as i128),
+                    receipt.least * 1000 / unit,
+                    receipt.most * 1000 / unit,
+                    receipt.whole,
+                    receipt.deposited,
+                    micro(receipt.predicted),
+                    micro(receipt.transfer),
+                    micro(receipt.external),
+                    section_start.elapsed().as_millis(),
+                    started.elapsed().as_millis()
+                );
+                if started.elapsed().as_millis() > stop_ms {
+                    write_new(&out.join("STATE.stopped"), learner.to_text().as_bytes())?;
+                    println!("FIELD_STOPPED lap={lap} sections={}/{} states={states} ms={}", n + 1, sections.len(), started.elapsed().as_millis());
+                    if states > 0 {
+                        let mean = weight_lap * 1000 / (unit * states as i128);
+                        let var = (square_lap * 1_000_000 / (unit * states as i128)) - mean * mean;
+                        println!("FIELD_KERNEL_ACCEPT lap={lap} stopped states={states} places={places_lap} moved={moved_lap} accept_milli={mean} sd_milli={} whole={whole_lap}", (var.max(0) as u128).isqrt());
+                    }
+                    return Ok(());
+                }
+                continue;
+            }
             let problems: Vec<(&[usize], usize)> = members.iter().map(|&i| (train_set[i].0.as_slice(), train_set[i].2)).collect();
             let lengths: Vec<usize> = members.iter().map(|&i| train_set[i].1.len()).collect();
             let key = mix(seed ^ 0xC0_7A57 << 40, read << 32 | n as u64);
@@ -2861,7 +2922,7 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
             let answers = match writer {
                 None => learner
                     .field
-                    .energy_release(&problems, &lengths, void, reads, key, realization, &mut |read, moving, moved| {
+                    .energy_release(&problems, &lengths, void, joint.unwrap_or(1), key, realization, &mut |read, moving, moved| {
                         reads_made = read + 1;
                         if read % 8 == 0 {
                             println!("FIELD_RELEASE_READ lap={lap} n={n} read={read} moving={moving} moved={moved} ms={}", section_start.elapsed().as_millis());
@@ -2938,6 +2999,12 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
         }
         learner.laps += 1;
         write_new(&out.join(format!("STATE.{lap}")), learner.to_text().as_bytes())?;
+        if states > 0 && writer.is_none() && joint.is_none() {
+            let unit = 1i128 << holonics::hnn::tower::MATERIAL_BITS;
+            let mean = weight_lap * 1000 / (unit * states as i128);
+            let var = (square_lap * 1_000_000 / (unit * states as i128)) - mean * mean;
+            println!("FIELD_KERNEL_ACCEPT lap={lap} states={states} places={places_lap} moved={moved_lap} accept_milli={mean} sd_milli={} whole={whole_lap}", (var.max(0) as u128).isqrt());
+        }
         println!(
             "FIELD_CONTRAST_LAP lap={lap} read={} states={states} same={same} gap_micro={} deposited={deposited}/{} lap_ms={} ms={}",
             learner.laps,

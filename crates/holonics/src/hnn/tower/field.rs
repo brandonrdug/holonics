@@ -4772,6 +4772,26 @@ pub struct ContrastReceipt {
     pub external: Option<i64>,
 }
 
+/// [measurement; the unified-theory reading of November 7, 05:20] **An energy section's kernel receipt**
+/// ([`FieldLearner::section_kernel`]): its states, block places and the places whose proposal moved off the truth, the
+/// weights `min(1, A)` summed, their squares summed, least and most (on `2^(−24)`) and how many were whole, whether a step
+/// was deposited, and the step's prices as [`FieldReceipt`]'s.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub struct KernelReceipt {
+    pub states: usize,
+    pub places: usize,
+    pub moved: usize,
+    pub weight: i128,
+    pub weight_square: i128,
+    pub least: i128,
+    pub most: i128,
+    pub whole: usize,
+    pub deposited: bool,
+    pub predicted: Option<i64>,
+    pub transfer: Option<i64>,
+    pub external: Option<i64>,
+}
+
 /// A deposited step held for the next regions' read: the proposed step on each family's grain and
 /// the halvings it was certified at. The material before it is the material less nothing: the
 /// deposit subtracted `release(step, halvings)` from each entry, so adding it back is exact.
@@ -5265,6 +5285,134 @@ impl FieldLearner {
         let gap = release(gap.checked_mul(inverse).ok_or(TowerError::Refused(OVER))?, MATERIAL_BITS);
         let (deposited, predicted, transfer, external) = self.deposit(g)?;
         Ok(ContrastReceipt { states: n, same, gap, deposited, predicted, transfer, external })
+    }
+
+    /// [definition; the unified-theory reading of November 7, 05:20; agent-inferred] **A kernel block's spacing**: the least
+    /// spacing at which no receiver's near lock sees two block places. A receiver's near field is `0 < |i − j| < NEAR`, so two
+    /// places `NEAR − 1` from one receiver on either side are `2(NEAR − 1)` apart; a block's places stand `2(NEAR − 1) + 1`
+    /// apart. Couplings past the near field (a crowd joining two, or the ticks' transport) the Metropolis–Hastings test
+    /// counts.
+    pub fn kernel_spacing() -> usize {
+        2 * (NEAR - 1) + 1
+    }
+
+    /// [definition; the unified-theory reading of November 7, 05:20, route (b)'s negative] **An energy section's step from
+    /// one exact kernel step at the truth.** Each state `truth[s]` (every site resolved) opens its block `blocks[s]`, each
+    /// block place carrying its truth's letter as a locked mixture, so one read ([`FieldRealization::read_energy_faces`])
+    /// gives `G` and every block place's face at the truth. Each block place draws `a_t` from its face (keyed by `seed`, the
+    /// state and the place); the proposal read gives `G′` and the faces `face′`. The block's Metropolis–Hastings ratio is
+    /// `A = 2^((G − G′)/T) Π_t face′_t(truth_t)/face_t(a_t)`, and the section deposits
+    /// `(1/T) Σ_s min(1, A_s)[∂G/∂θ(truth_s) − ∂G/∂θ(e′_s)]` (the accept coin's expectation, no coin), its step fluxing. By
+    /// detailed balance the expected deposit is zero at the true distribution for any block and proposal; over the keyed
+    /// blocks every open place is reached, and the rest holds each place's exact conditional at the truth. `min(1, A)` is
+    /// read through the exponential's navigator on `2^(−24)` and released to zero below its carrier (`2^(−23)`). Four reads
+    /// a state: the faces at the truth and at the proposal, and the two material covectors.
+    pub fn section_kernel(&mut self, truth: &[Region], blocks: &[Vec<usize>], seed: u64, realization: &mut dyn FieldRealization) -> Result<KernelReceipt> {
+        let f = &self.field;
+        if !f.declaration.energy || f.scale.is_some() {
+            return refuse("a kernel section of a field without one energy");
+        }
+        if truth.is_empty() || truth.len() != blocks.len() || blocks.iter().zip(truth).any(|(b, r)| b.is_empty() || b.iter().any(|&t| t >= r.classes.len() || r.unresolved[t])) {
+            return refuse("a kernel section needs one nonempty block of resolved places a state");
+        }
+        let alphabet = f.declaration.alphabet;
+        let inverse = temperature_of(-f.theta[f.layout.face_temper], &f.fine)?;
+        let n = truth.len();
+        let mix = |counter: u64| -> u64 {
+            let mut z = seed.wrapping_add(counter.wrapping_mul(0x9E37_79B9_7F4A_7C15));
+            z = (z ^ (z >> 30)).wrapping_mul(0xBF58_476D_1CE4_E5B9);
+            z = (z ^ (z >> 27)).wrapping_mul(0x94D0_49BB_1331_11EB);
+            z ^ (z >> 31)
+        };
+        let one = 1u32 << STATE_BITS;
+        // A state with its block places open, each carrying `letter(t)` whole, and the same state's classes with those letters.
+        let opened = |s: usize, letter: &dyn Fn(usize) -> usize| -> (Vec<usize>, Vec<bool>, Vec<Option<Shares>>) {
+            let mut classes = truth[s].classes.to_vec();
+            let mut open = vec![false; classes.len()];
+            let mut faces: Vec<Option<Shares>> = vec![None; classes.len()];
+            for &t in &blocks[s] {
+                classes[t] = letter(t);
+                open[t] = true;
+                faces[t] = Some(vec![(classes[t] as u32, one)]);
+            }
+            (classes, open, faces)
+        };
+        let at_truth: Vec<_> = (0..n).map(|s| opened(s, &|t| truth[s].classes[t])).collect();
+        let truth_views: Vec<Region> = at_truth.iter().map(|(c, o, fc)| Region { classes: c, unresolved: o, faces: fc, locked: o, echo: &[], domain: None, port: None }).collect();
+        let (faces, g_truth) = realization.read_energy_faces(f, &truth_views)?;
+        // Each block place's proposal drawn from its face at the truth.
+        let mut proposals: Vec<Vec<usize>> = Vec::with_capacity(n);
+        for s in 0..n {
+            let mut drawn = Vec::with_capacity(blocks[s].len());
+            for &t in &blocks[s] {
+                let face = faces[s][t].as_ref().ok_or(TowerError::Refused("a kernel block place with no face"))?;
+                let u = ((mix((s as u64) << 32 | t as u64) as u128) << 64 | mix(!((s as u64) << 32 | t as u64)) as u128) % face.total.max(1);
+                let mut acc = 0u128;
+                drawn.push((0..alphabet).find(|&c| {
+                    acc += face.masses[c];
+                    acc > u
+                }).unwrap_or(truth[s].classes[t]));
+            }
+            proposals.push(drawn);
+        }
+        let at_proposal: Vec<_> = (0..n)
+            .map(|s| {
+                let letters: Vec<(usize, usize)> = blocks[s].iter().copied().zip(proposals[s].iter().copied()).collect();
+                opened(s, &|t| letters.iter().find(|&&(p, _)| p == t).map_or(truth[s].classes[t], |&(_, a)| a))
+            })
+            .collect();
+        let proposal_views: Vec<Region> = at_proposal.iter().map(|(c, o, fc)| Region { classes: c, unresolved: o, faces: fc, locked: o, echo: &[], domain: None, port: None }).collect();
+        let (faces2, g_prop) = realization.read_energy_faces(f, &proposal_views)?;
+        // Each state's `log₂ A` on 2^(−32) bits and its weight `min(1, A)` on 2^(−24).
+        let mut weights = Vec::with_capacity(n);
+        for s in 0..n {
+            let mut log_a = release((g_truth[s] - g_prop[s]).checked_mul(inverse).ok_or(TowerError::Refused("a kernel's energy past its carrier"))?, MATERIAL_BITS);
+            for (&t, &a) in blocks[s].iter().zip(&proposals[s]) {
+                let (face, face2) = (faces[s][t].as_ref().ok_or(TowerError::Refused("a kernel block place with no face"))?, faces2[s][t].as_ref().ok_or(TowerError::Refused("a kernel block place with no face at its proposal"))?);
+                log_a += ((face.code(a) as i128) - (face2.code(truth[s].classes[t]) as i128)) << (ENERGY_BITS - 20);
+            }
+            let ell = log_a >> (ENERGY_BITS - MATERIAL_BITS);
+            weights.push(if ell >= 0 {
+                1i128 << MATERIAL_BITS
+            } else if ell <= -((MATERIAL_BITS as i128 - 1) << MATERIAL_BITS) {
+                0
+            } else {
+                temperature_of(ell as i32, &f.fine)?
+            });
+        }
+        // The material covectors at the truth and at the proposals, resolved.
+        let resolved: Vec<Vec<bool>> = truth.iter().map(|r| vec![false; r.classes.len()]).collect();
+        let mut both: Vec<Region> = (0..n).map(|s| Region { classes: &at_truth[s].0, unresolved: &resolved[s], faces: &[], locked: &[], echo: &[], domain: None, port: None }).collect();
+        both.extend((0..n).map(|s| Region { classes: &at_proposal[s].0, unresolved: &resolved[s], faces: &[], locked: &[], echo: &[], domain: None, port: None }));
+        let reads = realization.read_energy_material(f, &both)?;
+        const OVER: &str = "a kernel covector past its 128-bit carrier";
+        let mut g = vec![0i128; f.material_len()];
+        for s in 0..n {
+            if weights[s] == 0 {
+                continue;
+            }
+            let ((gt, _), (gp, _)) = (&reads[s], &reads[n + s]);
+            if gt.len() != g.len() || gp.len() != g.len() {
+                return refuse("a material covector of another length than the field's material");
+            }
+            for ((v, a), b) in g.iter_mut().zip(gt).zip(gp) {
+                *v += release((a - b).checked_mul(weights[s]).ok_or(TowerError::Refused(OVER))?, MATERIAL_BITS);
+            }
+        }
+        for &(start, len, grain) in &f.families_all() {
+            for v in &mut g[start..start + len] {
+                let scaled = release(v.checked_mul(inverse).ok_or(TowerError::Refused(OVER))?, MATERIAL_BITS);
+                *v = if grain == MATERIAL_BITS { scaled } else { release(scaled, 40 - super::COVECTOR_BITS) };
+            }
+        }
+        let places = blocks.iter().map(Vec::len).sum();
+        let moved = (0..n).map(|s| blocks[s].iter().zip(&proposals[s]).filter(|&(&t, &a)| a != truth[s].classes[t]).count()).sum();
+        let weight = weights.iter().sum();
+        let weight_square = weights.iter().map(|&w| release(w * w, MATERIAL_BITS)).sum();
+        let (least, most) = (weights.iter().copied().min().unwrap_or(0), weights.iter().copied().max().unwrap_or(0));
+        let whole = weights.iter().filter(|&&w| w == 1i128 << MATERIAL_BITS).count();
+        let (deposited, predicted, transfer, external) = self.deposit(g)?;
+        Ok(KernelReceipt { states: n, places, moved, weight, weight_square, least, most, whole, deposited, predicted, transfer, external })
     }
 
     /// [definition; agent-inferred, November 3, the tower record] **The learner grown in scale**: its field grown in scale

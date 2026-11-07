@@ -2553,3 +2553,31 @@ fn an_energy_field_releases_an_answer_as_one_field() {
     }
     assert!(moves.len() >= 2 && moves.len() < 63 && moves.last() < moves.first(), "the mixtures settle: {moves:?}");
 }
+
+/// [definition; the unified-theory reading of November 7, 05:20] **A kernel step's weight is its Metropolis–Hastings ratio**:
+/// on the line-shaped field, a block of places eleven apart opened at the truth, each drawn from its face, weighed by
+/// `min(1, A)` with `A = 2^((G − G′)/T) Π face′(truth)/face(a)`; the receipt's weights lie in `[0, 1]` and a proposal that
+/// moves no place is weighed whole. At `T = 1` the shaped field's faces are sharp and a moved proposal is weighed near zero;
+/// at `T = 2^10` the faces are near uniform, `G′ − G` is small against `T`, and a moved proposal is weighed near whole.
+#[test]
+fn a_kernel_steps_weight_is_its_metropolis_hastings_ratio() {
+    let mut field = energetic_line();
+    field.theta[field.layout.face_temper] = 10 << MATERIAL_BITS;
+    let classes: Vec<usize> = (0..40).map(|t| (t * 7 + t / 3) % 5).collect();
+    let none = vec![false; classes.len()];
+    let truth = [Region { classes: &classes, unresolved: &none, faces: &[], locked: &[], echo: &[], domain: None, port: None }];
+    let mut seen = Vec::new();
+    for seed in 0..6u64 {
+        let mut learner = FieldLearner::new(field.clone(), 14);
+        let blocks = vec![vec![3usize, 14, 25, 36]];
+        let r = learner.section_kernel(&truth, &blocks, seed, &mut HostField).unwrap();
+        let unit = 1i128 << MATERIAL_BITS;
+        assert!(r.states == 1 && r.places == 4 && (0..=unit).contains(&r.least) && r.most <= unit && r.weight == r.least, "{r:?}");
+        if r.moved == 0 {
+            assert_eq!(r.weight, unit, "a proposal that moves no place is weighed whole");
+        }
+        seen.push((r.moved, r.weight * 1000 / unit, r.deposited));
+    }
+    println!("kernel (moved, weight in thousandths, deposited): {seen:?}");
+    assert!(seen.iter().any(|&(m, w, _)| m > 0 && w > 500), "a moved proposal weighed near whole at a warm temperature: {seen:?}");
+}
