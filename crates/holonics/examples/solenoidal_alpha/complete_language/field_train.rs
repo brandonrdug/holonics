@@ -2907,7 +2907,7 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
         law.spans,
         learner.laps
     );
-    let mut enumerated_rows = rows_file(&out.join("ENUMERATED.tsv"), "lap\tproblem\tplace\ttruth\tlog2_t\tface_masses\tface_total\tenergies\n")?;
+    let mut enumerated_rows = rows_file(&out.join("ENUMERATED.tsv"), "lap\tproblem\tplace\ttruth\tlog2_t\tface_masses\tface_total\tenergies\ttruth_face_masses\ttruth_face_total\n")?;
     enumerated_read(&learner.field, &held_set, places, &truth_of, realization, -1, &mut enumerated_rows)?;
     println!("FIELD_ENUMERATED_READ lap=-1 ms={}", started.elapsed().as_millis());
     for lap in 0..laps {
@@ -2937,16 +2937,40 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
                 // The kernel: each state's answer places `t ≡ r (mod s)`, cut into blocks of at most `k*` places, each block its own
                 // kernel step from the truth ([the unified-theory reading of November 7, 07:24]: a block of `k` places moves
                 // `k·2Φ(−σ√k/2)` places, most at `σ²k ≈ 5.7`); `FIELD_CONTRAST_WHOLE_BLOCKS` keeps one block a state (laps 4 to 9).
+                // [definition; the unified-theory reading of November 7, 08:13] Two lengths a section, `k₊ = ⌈k*·2^¼⌉` and
+                // `k₋ = max(1, ⌊k*·2^(−¼)⌋)`, each residue class cut into blocks alternating them (`k₊` first on even sections,
+                // `k₋` on odd); a closing block shorter than its length runs but is not read.
+                let (k_up, k_down) = if pinned_blocks || whole_blocks {
+                    (block_places.max(1), block_places.max(1))
+                } else {
+                    let up = (1..=1usize << 13).find(|&k| log2_q16(k as u64) as i128 >= log2_k_star + (1 << 14)).unwrap_or(1 << 13);
+                    let down = (1..=1usize << 13).rev().find(|&k| log2_q16(k as u64) as i128 <= log2_k_star - (1 << 14)).unwrap_or(1).max(1);
+                    (up, down)
+                };
                 let mut blocks: Vec<Vec<usize>> = Vec::new();
                 let mut owners: Vec<usize> = Vec::new();
+                // Each block's length class (`Some(true)` k₊, `Some(false)` k₋) where it is whole, `None` where it closes short.
+                let mut classes_of: Vec<Option<bool>> = Vec::new();
                 for (m, &i) in members.iter().enumerate() {
                     let (q, a, _) = &train_set[i];
                     let r = (mix(seed ^ 0xB10C << 44, read << 40 | (n as u64) << 16 | m as u64) as usize) % spacing.min(a.len());
                     let residue: Vec<usize> = (r..a.len()).step_by(spacing).map(|j| q.len() + j).collect();
-                    let cut = if whole_blocks { residue.len().max(1) } else { block_places.max(1) };
-                    for chunk in residue.chunks(cut) {
-                        blocks.push(chunk.to_vec());
+                    if whole_blocks {
+                        blocks.push(residue);
                         owners.push(m);
+                        classes_of.push(None);
+                        continue;
+                    }
+                    let mut at = 0usize;
+                    let mut up = n % 2 == 0;
+                    while at < residue.len() {
+                        let len = if up { k_up } else { k_down };
+                        let end = (at + len).min(residue.len());
+                        blocks.push(residue[at..end].to_vec());
+                        owners.push(m);
+                        classes_of.push((end - at == len).then_some(up));
+                        at = end;
+                        up = !up;
                     }
                 }
                 let resolved: Vec<Vec<bool>> = truths.iter().map(|t| vec![false; t.len()]).collect();
@@ -2957,20 +2981,41 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
                 // [definition; the unified-theory reading of November 7, 07:40] **The block size from the acceptance's own slope**:
                 // moved places `k·α(k)` peak where `d ln α/d ln k = −1`, so `log₂ k* += ¼(1 + slope)`, the slope of `log₂ min(1, A)`
                 // on `log₂ k` across the section's blocks (no Gaussian assumed); a section whose blocks share one size moves nothing.
-                if !whole_blocks && !pinned_blocks {
-                    let pts: Vec<(i128, i128)> = blocks.iter().zip(&receipt.log2_a).map(|(b, &la)| (log2_q16(b.len() as u64) as i128, la.min(0) >> 16)).collect();
-                    let m = pts.len() as i128;
-                    let (sx, sy) = (pts.iter().map(|p| p.0).sum::<i128>(), pts.iter().map(|p| p.1).sum::<i128>());
-                    let (sxx, sxy) = (pts.iter().map(|p| p.0 * p.0).sum::<i128>(), pts.iter().map(|p| p.0 * p.1).sum::<i128>());
-                    let den = m * sxx - sx * sx;
-                    if den > 0 {
-                        let slope_q16 = ((m * sxy - sx * sy) << 16) / den;
-                        log2_k_star += ((1i128 << 16) + slope_q16) / 4;
-                        log2_k_star = log2_k_star.clamp(0, 12 << 16);
-                        block_places = (1..=1usize << 12).min_by_key(|&k| (log2_q16(k as u64) as i128 - log2_k_star).abs()).unwrap_or(1);
+                // The elasticity of the mean acceptance, `ln(ᾱ₊/ᾱ₋)/ln(k₊/k₋)`, ᾱ the mean of `min(1, A)` over each length's whole
+                // blocks (never the mean of logs); `log₂ k* += ¼(1 + slope)`.
+                let (mut slope_milli, mut alpha_up, mut alpha_down) = (None, 0i128, 0i128);
+                if !whole_blocks && !pinned_blocks && k_up > k_down {
+                    let mean = |want: bool| -> Option<i128> {
+                        let w: Vec<i128> = classes_of.iter().zip(&receipt.per_state).filter(|(c, _)| **c == Some(want)).map(|(_, &(_, w))| w).collect();
+                        (!w.is_empty()).then(|| w.iter().sum::<i128>() / w.len() as i128)
+                    };
+                    if let (Some(au), Some(ad)) = (mean(true), mean(false)) {
+                        (alpha_up, alpha_down) = (au, ad);
+                        if au > 0 && ad > 0 {
+                            let num = log2_q16(au as u64) as i128 - log2_q16(ad as u64) as i128;
+                            let den = log2_q16(k_up as u64) as i128 - log2_q16(k_down as u64) as i128;
+                            let slope_q16 = (num << 16) / den;
+                            slope_milli = Some(slope_q16 * 1000 >> 16);
+                            log2_k_star = (log2_k_star + ((1i128 << 16) + slope_q16) / 4).clamp(0, 12 << 16);
+                            block_places = (1..=1usize << 12).min_by_key(|&k| (log2_q16(k as u64) as i128 - log2_k_star).abs()).unwrap_or(1);
+                        }
                     }
                 }
                 accepted_places += receipt.per_state.iter().map(|&(k, w)| k as i128 * w).sum::<i128>();
+                // [measurement; the unified-theory reading of November 7, 08:25] The kernel's entropy production, `ℓ = ln A`: its
+                // per-place spread `s₁ = −2 Σℓ/Σk` and `s₂ = Σ(ℓ + k s₁/2)²/Σk` (normality: `s₁ = s₂` at equilibrium), and `⟨A⟩ − 1`
+                // (zero at equilibrium; from the truth, the data's distance from it); thousandths of a nat.
+                let entropy_text = {
+                    let nats: Vec<i128> = receipt.log2_a.iter().map(|&l| l * LN2_Q30 >> 30).collect();
+                    let k_sum: i128 = blocks.iter().map(|b| b.len() as i128).sum::<i128>().max(1);
+                    let s1 = -2 * nats.iter().sum::<i128>() / k_sum;
+                    let s2 = nats.iter().zip(&blocks).map(|(&l, b)| {
+                        let d = l + b.len() as i128 * s1 / 2;
+                        (d >> 16) * (d >> 16)
+                    }).sum::<i128>() / k_sum;
+                    let mean_a = receipt.log2_a.iter().map(|&l| exp2_q32(l)).sum::<i128>() / receipt.log2_a.len().max(1) as i128;
+                    format!(" s1_milli={} s2_milli={} mean_a_less_one_milli={}", (s1 * 1000) >> 32, (s2 * 1000) >> 32, ((mean_a - (1i128 << 32)) * 1000) >> 32)
+                };
                 (states, deposited) = (states + receipt.states, deposited + usize::from(receipt.deposited));
                 (places_lap, moved_lap, weight_lap, square_lap, whole_lap) = (places_lap + receipt.places, moved_lap + receipt.moved, weight_lap + receipt.weight, square_lap + receipt.weight_square, whole_lap + receipt.whole);
                 let unit = 1i128 << holonics::hnn::tower::MATERIAL_BITS;
@@ -2992,7 +3037,7 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
                     None => String::new(),
                 };
                 println!(
-                    "FIELD_KERNEL lap={lap} n={n} states={} places={} moved={} accept_milli={} least_milli={} most_milli={} whole={} deposited={} predicted_micro={} transfer_micro={} external_micro={}{newton_text} log2_t={} blocks={} k_star={block_places} ms_section={} ms={}",
+                    "FIELD_KERNEL lap={lap} n={n} states={} places={} moved={} accept_milli={} least_milli={} most_milli={} whole={} deposited={} predicted_micro={} transfer_micro={} external_micro={}{newton_text}{entropy_text} log2_t={} blocks={} k_star={block_places} k_up={k_up} k_down={k_down} alpha_up_milli={} alpha_down_milli={} slope_milli={} ms_section={} ms={}",
                     receipt.states,
                     receipt.places,
                     receipt.moved,
@@ -3006,6 +3051,9 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
                     micro(receipt.external),
                     learner.field.theta[learner.field.layout().face_temper],
                     blocks.len(),
+                    alpha_up * 1000 >> holonics::hnn::tower::MATERIAL_BITS,
+                    alpha_down * 1000 >> holonics::hnn::tower::MATERIAL_BITS,
+                    slope_milli.map_or("-".to_string(), |v| v.to_string()),
                     section_start.elapsed().as_millis(),
                     started.elapsed().as_millis()
                 );
@@ -3216,6 +3264,32 @@ fn family_names(field: &Field) -> Vec<(&'static str, usize)> {
     vec![("enc", l.enc), ("before", l.before), ("after", l.after), ("q", l.q), ("q_bias", l.q_bias), ("v", l.v), ("v_bias", l.v_bias), ("out", l.out), ("out_bias", l.out_bias), ("a", l.a), ("a_bias", l.a_bias), ("b", l.b), ("b_bias", l.b_bias), ("w", l.w), ("w_bias", l.w_bias), ("read", l.read), ("read_bias", l.read_bias), ("moment_before", l.moment_before), ("moment_after", l.moment_after), ("temper", l.temper), ("probe", l.probe), ("probe_bias", l.probe_bias), ("pace", l.pace), ("moment_face", l.moment_face), ("moment_face_bias", l.moment_face_bias), ("lift_bias", l.lift_bias), ("pair_c", l.pair_c), ("face_temper", l.face_temper)]
 }
 
+/// `ln 2` on `2^(−30)` (`⌊ln 2 · 2^30⌉`), the readings' carrier from bits to nats.
+const LN2_Q30: i128 = 744_261_118;
+
+/// `2^x` on `2^(−32)` for `x` on `2^(−32)` (a reading's face, read at its declared width): the whole part as a shift, the
+/// fraction as the product of `2^(2^(−i))` over its set bits, each the root of the one before by integer square roots.
+fn exp2_q32(x: i128) -> i128 {
+    let whole = x >> 32;
+    let frac = x & ((1i128 << 32) - 1);
+    let mut root: u128 = 2u128 << 32;
+    let mut out: u128 = 1u128 << 32;
+    for i in 1..=32 {
+        root = (root << 32).isqrt();
+        if frac >> (32 - i) & 1 == 1 {
+            out = (out * root) >> 32;
+        }
+    }
+    let out = out as i128;
+    if whole >= 0 {
+        if whole > 60 { i128::MAX >> 2 } else { out << whole }
+    } else if whole < -100 {
+        0
+    } else {
+        out >> (-whole)
+    }
+}
+
 /// `log₂ x` on `2^(−16)` for `x ≥ 1`: the leading bit's place, then sixteen fraction bits by repeated squaring of the mantissa.
 fn log2_q16(x: u64) -> i64 {
     if x == 0 {
@@ -3246,7 +3320,9 @@ fn at_rate(learner: &FieldLearner, rate: u32) -> String {
 /// for the first `places` held problems, one keyed answer place `t` each, the rest at the truth. The face at `t` (`t` open,
 /// [`FieldRealization::read_faces`]) beside every letter's energy `G(rest, e_t = c)` at its own certified halvings
 /// ([`FieldRealization::read_energies`]), so `P(c | rest) ∝ 2^(−G_c/T)` is the enumerated conditional (every letter's `G` read) and the face only proposes.
-/// Each place's row goes to `rows`: the face's masses and total, `log₂ T` on `2^(−24)`, and the energies on `2^(−32)` bits.
+/// Each place's row goes to `rows`: the open face's masses and total (the place open, carrying the uniform mixture as an
+/// energy field's open sites do), `log₂ T` on `2^(−24)`, the energies on `2^(−32)` bits, and the face at the truth (the
+/// place carrying its truth letter whole, as a kernel block opens it).
 /// The codes and `KL(enumerated ‖ face)` are read from the rows at the receipt (a reading only: nothing in the run reads it).
 fn enumerated_read(field: &Field, held: &Problems, places: usize, truth_of: &dyn Fn(&(Vec<usize>, Vec<usize>, usize), &[usize]) -> Vec<usize>, realization: &mut dyn FieldRealization, lap: i64, rows: &mut std::fs::File) -> Result<()> {
     let alphabet = field.declaration.alphabet;
@@ -3265,6 +3341,11 @@ fn enumerated_read(field: &Field, held: &Problems, places: usize, truth_of: &dyn
     let opens: Vec<Vec<bool>> = chosen.iter().map(|(_, truth, t)| (0..truth.len()).map(|s| s == *t).collect()).collect();
     let views: Vec<Region> = chosen.iter().zip(&opens).map(|((_, truth, _), open)| Region { classes: truth, unresolved: open, faces: &[], locked: &[], echo: &[], domain: None, port: None }).collect();
     let faces = realization.read_faces(field, &views).map_err(|e| e.to_string())?;
+    // [measurement; the unified-theory reading of November 7, 08:25] The face at the truth beside the open face: the place
+    // carrying its truth letter whole (as a kernel block opens it), whose slope keeps the place's own curvature.
+    let carried: Vec<Vec<Option<Shares>>> = chosen.iter().map(|(_, truth, t)| (0..truth.len()).map(|s| (s == *t).then(|| vec![(truth[s] as u32, 1u32 << 16)])).collect()).collect();
+    let truth_views: Vec<Region> = chosen.iter().zip(&opens).zip(&carried).map(|(((_, truth, _), open), c)| Region { classes: truth, unresolved: open, faces: c, locked: open, echo: &[], domain: None, port: None }).collect();
+    let truth_faces = realization.read_faces(field, &truth_views).map_err(|e| e.to_string())?;
     let configurations: Vec<Vec<usize>> = chosen
         .iter()
         .flat_map(|(_, truth, t)| {
@@ -3281,9 +3362,11 @@ fn enumerated_read(field: &Field, held: &Problems, places: usize, truth_of: &dyn
     for (n, (k, truth, t)) in chosen.iter().enumerate() {
         let face = faces[n][*t].as_ref().ok_or("an enumerated read's open place with no face")?;
         let masses: Vec<String> = face.masses.iter().map(u128::to_string).collect();
+        let at_truth = truth_faces[n][*t].as_ref().ok_or("an enumerated read's carried place with no face")?;
+        let truth_masses: Vec<String> = at_truth.masses.iter().map(u128::to_string).collect();
         let g: Vec<String> = energies[n * alphabet..(n + 1) * alphabet].iter().map(i128::to_string).collect();
         let q = held[*k].0.len();
-        row(rows, &format!("{lap}\t{k}\t{}\t{}\t{log2_t}\t{}\t{}\t{}\n", t - q, truth[*t], masses.join(","), face.total, g.join(",")))?;
+        row(rows, &format!("{lap}\t{k}\t{}\t{}\t{log2_t}\t{}\t{}\t{}\t{}\t{}\n", t - q, truth[*t], masses.join(","), face.total, g.join(","), truth_masses.join(","), at_truth.total))?;
     }
     Ok(())
 }
