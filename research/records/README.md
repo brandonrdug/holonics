@@ -441,6 +441,7 @@ logarithm of a Holon ratio), and in history the prototype's
 [composition](https://github.com/brandonrdug/holonics/blob/13f8c734/docs/HNN_COMPOSITION.md) and
 [mathematics/native synthesis](https://github.com/brandonrdug/holonics/blob/13f8c734/docs/MATHEMATICS_AND_NATIVE_CONDUCT.md).
 
+- [Reafference: a write is read back through several coupled sections, and a word is an arc of the motor chart](2026-11-08_REAFFERENCE_A_WRITE_IS_READ_BACK_THROUGH_SEVERAL_COUPLED_SECTIONS_AND_A_WORD_IS_AN_ARC_OF_THE_MOTOR_CHART.md): Brandon's November 8 lens on the fresh-writes law; the write read through several coupled frames, the keyboard as a motor chart.
 - [Holonics rejoins classical learning, reflection, packing and compression](2026-09-08_HOLONICS_REJOINS_CLASSICAL_LEARNING_REFLECTION_PACKING_AND_COMPRESSION.md): the earlier source network, including softmax/sigmoid.
 - [Contextual reception and normalization reuse shared native owners](2026-09-12_CONTEXTUAL_RECEPTION_AND_NORMALIZATION_REUSE_THEIR_SHARED_NATIVE_OWNERS.md): forward/adjoint and their native boundary.
 - [Generator inference, codes, free energy and sufficient continuation](2026-09-12_GENERATOR_INFERENCE_CODES_FREE_ENERGY_AND_SUFFICIENT_CONTINUATION.md): source likelihood/code relations and their future update law.
