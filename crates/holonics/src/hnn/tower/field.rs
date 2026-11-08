@@ -5270,8 +5270,10 @@ pub struct KernelReceipt {
     pub letter_counts: Vec<i128>,
     pub surprise_bands: Vec<usize>,
     pub kl_face: i128,
-    /// [measurement; theory, November 8 13:02] The read places' face code of the truth, Σ −log₂ face(t), in bits on 2^(−32).
-    pub face_code: i128,
+    /// [measurement; theory, November 8 13:11] The read places' seven moments of the conditional against its face, summed with
+    /// their beat weights `2^k` (bits on 2^(−32), bits² for the variances): the code, H(p), f(t), E_p f, Var_p log₂ p, Var_p f,
+    /// Cov_p(log₂ p, f), and the summed weight.
+    pub moments: [i128; 8],
     /// [measurement; the unified-theory reading of November 7, 23:47] The letters' coin's measure where it was asked
     /// ([`FieldLearner::coin_measure`]): what each tolerance would cost and how much variance it would add, read at a full
     /// section.
@@ -6381,7 +6383,7 @@ impl FieldLearner {
         let states: Vec<Vec<i128>> = (0..n).map(|s| natural(&reads[owners[s]].0, &reads[problems + s].0)).collect::<Result<_>>()?;
         if self.newton {
             let newton = self.deposit_newton(&states, &weights)?;
-            return Ok(KernelReceipt { states: n, places, moved, weight, weight_square, least, most, whole, deposited: newton.deposited, predicted: newton.predicted, transfer: newton.transfer, external: newton.external, per_state, log2_a, newton: Some(newton), by_family: Vec::new(), rates: Vec::new(), g_agree, g_gap, covector: Vec::new(), bands: Vec::new(), outside: Vec::new(), letter_counts: Vec::new(), surprise_bands: Vec::new(), kl_face: 0, face_code: 0, coin_measure: None });
+            return Ok(KernelReceipt { states: n, places, moved, weight, weight_square, least, most, whole, deposited: newton.deposited, predicted: newton.predicted, transfer: newton.transfer, external: newton.external, per_state, log2_a, newton: Some(newton), by_family: Vec::new(), rates: Vec::new(), g_agree, g_gap, covector: Vec::new(), bands: Vec::new(), outside: Vec::new(), letter_counts: Vec::new(), surprise_bands: Vec::new(), kl_face: 0, moments: [0; 8], coin_measure: None });
         }
         // [the unified-theory reading of November 7, 06:26] The Newton terms read along the moments' direction before this section
         // moves them, beside the moments' own step.
@@ -6430,7 +6432,7 @@ impl FieldLearner {
         };
         let by_family = transfers.into_iter().zip(predictions).collect();
         let rates = self.family_rates.clone().unwrap_or_default();
-        Ok(KernelReceipt { states: n, places, moved, weight, weight_square, least, most, whole, deposited, predicted, transfer, external, per_state, log2_a, newton, by_family, rates, g_agree, g_gap, covector: raw, bands: Vec::new(), outside: Vec::new(), letter_counts: Vec::new(), surprise_bands: Vec::new(), kl_face: 0, face_code: 0, coin_measure: None })
+        Ok(KernelReceipt { states: n, places, moved, weight, weight_square, least, most, whole, deposited, predicted, transfer, external, per_state, log2_a, newton, by_family, rates, g_agree, g_gap, covector: raw, bands: Vec::new(), outside: Vec::new(), letter_counts: Vec::new(), surprise_bands: Vec::new(), kl_face: 0, moments: [0; 8], coin_measure: None })
     }
 
     /// The averaged constitution's rate, `2^(−8)` a section (the second moments' own, theory November 7 21:58).
@@ -6548,7 +6550,7 @@ impl FieldLearner {
         }
         if kept_blocks.is_empty() {
             let rates = self.family_rates.clone().unwrap_or_default();
-            return Ok(KernelReceipt { states: 0, places: 0, moved: 0, weight: 0, weight_square: 0, least: 0, most: 0, whole: 0, deposited: false, predicted: None, transfer: None, external: None, per_state: Vec::new(), log2_a: Vec::new(), newton: None, by_family: Vec::new(), rates, g_agree: (0, 0), g_gap: 0, covector: Vec::new(), bands, outside: Vec::new(), letter_counts: Vec::new(), surprise_bands: Vec::new(), kl_face: 0, face_code: 0, coin_measure: None });
+            return Ok(KernelReceipt { states: 0, places: 0, moved: 0, weight: 0, weight_square: 0, least: 0, most: 0, whole: 0, deposited: false, predicted: None, transfer: None, external: None, per_state: Vec::new(), log2_a: Vec::new(), newton: None, by_family: Vec::new(), rates, g_agree: (0, 0), g_gap: 0, covector: Vec::new(), bands, outside: Vec::new(), letter_counts: Vec::new(), surprise_bands: Vec::new(), kl_face: 0, moments: [0; 8], coin_measure: None });
         }
         let mut receipt = self.section_conditional_weighed(truth, &kept_owners, &kept_blocks, &kept_shifts, None, realization)?;
         receipt.bands = bands;
@@ -6619,7 +6621,7 @@ impl FieldLearner {
         let views: Vec<Region> = (0..truth.len()).map(|p| Region { classes: truth[p].classes, unresolved: &opened[p].0, faces: &opened[p].1, locked: &opened[p].0, echo: &[], domain: None, port: None }).collect();
         let (truth_faces, _) = realization.read_energy_faces(f, &views)?;
         let mut outside = Vec::with_capacity(places.len());
-        let (mut letter_counts, mut surprise_bands, mut kl_face, mut face_code) = (vec![0i128; alphabet], vec![0usize; 17], 0i128, 0i128);
+        let (mut letter_counts, mut surprise_bands, mut kl_face, mut moments) = (vec![0i128; alphabet], vec![0usize; 17], 0i128, [0i128; 8]);
         let mut unigram_acc = self.unigram.as_ref().map(|_| UnigramSection::new(alphabet));
         const TAUS: usize = 16;
         let mut measure = CoinMeasure { places: 0, regions: 0, forward_us: 0, material_us: 0, kept: vec![0; TAUS], v_coin: vec![0; TAUS], v_deposit: 0 };
@@ -6810,15 +6812,40 @@ impl FieldLearner {
                         k += 1;
                     }
                     surprise_bands[k] += 1;
-                    // The face's own code of the truth, −log₂ face(t), in bits on 2^(−32) (theory, November 8 13:02).
-                    face_code += (face.code(at) as i128) << (ENERGY_BITS - 20);
                     // KL(p ‖ face) in bits on 2^(−32): Σ_v p(v)(log₂ p(v) + code_face(v)), each log₂ p(v) = logs[v] − log₂ z.
                     let log2_z = super::log2_reading_at(z.max(1) as u128, ENERGY_BITS) - ((MATERIAL_BITS as i128) << ENERGY_BITS);
+                    // [measurement; theory, November 8 13:11] The place's seven moments of the conditional against its face, in bits
+                    // on 2^(−32) (bits² for the last three), each weighed by the place's beat `2^k`: the code −log₂ p(t), H(p), f(t)
+                    // with f = log₂(p/face), E_p f, Var_p log₂ p, Var_p f and Cov_p(log₂ p, f); the eighth is the weight.
+                    let (mut h, mut ef, mut lp2, mut f2, mut lpf) = (0i128, 0i128, 0i128, 0i128, 0i128);
                     for (v, &pv) in p.iter().enumerate() {
                         if pv > 0 {
                             let log2_p = logs[v] - log2_z;
-                            kl_face += release(pv * (log2_p + ((face.code(v) as i128) << (ENERGY_BITS - 20))), MATERIAL_BITS);
+                            let fv = log2_p + ((face.code(v) as i128) << (ENERGY_BITS - 20));
+                            kl_face += release(pv * fv, MATERIAL_BITS);
+                            h -= release(pv * log2_p, MATERIAL_BITS);
+                            ef += release(pv * fv, MATERIAL_BITS);
+                            lp2 += release(release(pv * log2_p, MATERIAL_BITS) * log2_p, ENERGY_BITS);
+                            f2 += release(release(pv * fv, MATERIAL_BITS) * fv, ENERGY_BITS);
+                            lpf += release(release(pv * log2_p, MATERIAL_BITS) * fv, ENERGY_BITS);
                         }
+                    }
+                    let lp_t = logs[at] - log2_z;
+                    let f_t = lp_t + ((face.code(at) as i128) << (ENERGY_BITS - 20));
+                    let beat = place_shift[c * CHUNK + i];
+                    let elp = -h;
+                    let place = [
+                        -lp_t,
+                        h,
+                        f_t,
+                        ef,
+                        lp2 - release(elp * elp, ENERGY_BITS),
+                        f2 - release(ef * ef, ENERGY_BITS),
+                        lpf - release(elp * ef, ENERGY_BITS),
+                        1,
+                    ];
+                    for (acc, x) in moments.iter_mut().zip(place) {
+                        *acc += x << beat;
                     }
                     let mut order: Vec<usize> = (0..alphabet).collect();
                     order.sort_by_key(|&v| (std::cmp::Reverse(face.masses[v]), v));
@@ -6864,7 +6891,7 @@ impl FieldLearner {
         let by_family = transfers.into_iter().zip(predictions).collect();
         let rates = self.family_rates.clone().unwrap_or_default();
         let n = places.len();
-        Ok(KernelReceipt { states: n, places: n, moved: 0, weight, weight_square, least, most, whole, deposited, predicted, transfer, external, per_state, log2_a: log2_p, newton: None, by_family, rates, g_agree: (0, 0), g_gap: 0, covector: raw, bands: Vec::new(), outside, letter_counts, surprise_bands, kl_face, face_code, coin_measure })
+        Ok(KernelReceipt { states: n, places: n, moved: 0, weight, weight_square, least, most, whole, deposited, predicted, transfer, external, per_state, log2_a: log2_p, newton: None, by_family, rates, g_agree: (0, 0), g_gap: 0, covector: raw, bands: Vec::new(), outside, letter_counts, surprise_bands, kl_face, moments, coin_measure })
     }
 
     /// [definition; agent-inferred, November 3, the tower record] **The learner grown in scale**: its field grown in scale

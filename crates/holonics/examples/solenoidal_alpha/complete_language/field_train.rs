@@ -3847,7 +3847,7 @@ struct Leg {
     letters: Vec<i128>,
     bands: Vec<usize>,
     kl: i128,
-    face_code: i128,
+    moments: [i128; 8],
     truth_p: i128,
     places: usize,
     steps: Vec<i128>,
@@ -3856,7 +3856,7 @@ struct Leg {
 
 impl Leg {
     fn new(field: &Field) -> Self {
-        Self { coherence: Coherence::new(field), letters: Vec::new(), bands: Vec::new(), kl: 0, face_code: 0, truth_p: 0, places: 0, steps: vec![0; field.families_all().len()], sections: 0 }
+        Self { coherence: Coherence::new(field), letters: Vec::new(), bands: Vec::new(), kl: 0, moments: [0; 8], truth_p: 0, places: 0, steps: vec![0; field.families_all().len()], sections: 0 }
     }
     fn add(&mut self, field: &Field, r: &holonics::hnn::tower::field::KernelReceipt, before: &[i32]) {
         self.coherence.add(&r.covector);
@@ -3873,7 +3873,10 @@ impl Leg {
         for (a, &c) in self.bands.iter_mut().zip(&r.surprise_bands) {
             *a += c;
         }
-        (self.kl, self.face_code, self.truth_p, self.places) = (self.kl + r.kl_face, self.face_code + r.face_code, self.truth_p + r.weight, self.places + r.places);
+        (self.kl, self.truth_p, self.places) = (self.kl + r.kl_face, self.truth_p + r.weight, self.places + r.places);
+        for (a, &b) in self.moments.iter_mut().zip(&r.moments) {
+            *a += b;
+        }
         for (slot, &(start, len, _)) in self.steps.iter_mut().zip(field.families_all().iter()) {
             *slot += (start..start + len).map(|i| (field.theta[i] as i128 - before[i] as i128).abs()).sum::<i128>();
         }
@@ -3893,7 +3896,16 @@ impl Leg {
             .filter(|&(f, &s)| f.1 > 0 && s > 0)
             .map(|(&(start, len, _), &s)| format!("{}={}", names.iter().find(|&&(_, at)| at == start).map_or("?", |&(n, _)| n), s * 1000 / (len as i128 * self.sections.max(1) as i128)))
             .collect();
-        println!("FIELD_LEG lap={lap} {what} sections={at} legsections={} places={} truth_p_milli={} kl_face_milli_nats={} face_code_milli_nats={}", self.sections, self.places, self.truth_p * 1000 / (unit * places), self.kl * LN2_Q30 / places * 1000 >> 62, self.face_code * LN2_Q30 / places * 1000 >> 62);
+        println!("FIELD_LEG lap={lap} {what} sections={at} legsections={} places={} truth_p_milli={} kl_face_milli_nats={}", self.sections, self.places, self.truth_p * 1000 / (unit * places), self.kl * LN2_Q30 / places * 1000 >> 62);
+        // [measurement; theory, November 8 13:11] The read places' seven moments in milli-nats (milli-nats² for the variances)
+        // over their beat weights, and the stream's own Newton steps toward sharper (s) and toward the face (w).
+        let w = self.moments[7].max(1);
+        let nats = |x: i128| -> i128 { x * LN2_Q30 / w * 1000 >> 62 };
+        let nats2 = |x: i128| -> i128 { (x * LN2_Q30 >> 30) * LN2_Q30 / w * 1000 >> 62 };
+        let m: Vec<i128> = (0..4).map(|i| nats(self.moments[i])).chain((4..7).map(|i| nats2(self.moments[i]))).collect();
+        let s_step = if m[4] != 0 { 1000 - (m[0] - m[1]) * 1000 / m[4] } else { 0 };
+        let w_step = if m[5] != 0 { 1000 - (m[3] - m[2]) * 1000 / m[5] } else { 0 };
+        println!("FIELD_LEG_MOMENTS lap={lap} {what} sections={at} weight={} code={} h={} f_truth={} kl={} var_lnp={} var_f={} cov={} s_milli={s_step} w_milli={w_step}", self.moments[7], m[0], m[1], m[2], m[3], m[4], m[5], m[6]);
         println!("FIELD_LEG_COHERENCE lap={lap} {what} n={} {}", self.coherence.n, self.coherence.text(field));
         println!("FIELD_LEG_LETTERS lap={lap} {what} truth_count_less_mass_milli {}", top.join(" "));
         println!("FIELD_LEG_BANDS lap={lap} {what} {}", bands.join(" "));
