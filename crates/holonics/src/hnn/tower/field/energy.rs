@@ -2324,7 +2324,7 @@ impl Field {
                     let slack = (cell.logs + candidate.logs) as i128 + 2;
                     // Why a swing tick would release: the band guard's ratio (milli) and whether Q fell past the slack.
                     let note = if !inside { 1 } else if q_next + slack > q_now { 2 } else { 0 };
-                    out.tries.push(RestTry { tick, halvings: hs, fall: q_now - q_next, claim, slack, note, guard_milli: if rhs > 0 { lhs * 1000 / rhs } else { 0 } });
+                    out.tries.push(RestTry { tick, halvings: hs, fall: q_now - q_next, claim, slack, note, guard_milli: if rhs > 0 { lhs * 1000 / rhs } else { 0 }, split: [0; 8] });
                     if inside && q_next + slack <= q_now {
                         out.ticks.push(RestTick { halvings: hs, fall: q_now - q_next, slack, scale_top: 0, rebase_change: cell.phi - candidate.phi, claim, rho_nonpositive, rho_least, rho_median, rho_top, radial_least, radial_median, radial_top, gaps, swing: true });
                         last_q = Some((candidate.phi, work(&cand_force, &v_new) / 2, ((1 << 16) + mu) * kinetic(&v_new) >> 18));
@@ -2350,7 +2350,7 @@ impl Field {
                     break;
                 };
                 // The flow step's candidate is re-based inside itself, before its energy is read.
-                let next = if flowing { rebase(&stepped)? } else { stepped };
+                let next = if flowing { rebase(&stepped)? } else { stepped.clone() };
                 if next == x {
                     below_grain = true;
                     break;
@@ -2364,7 +2364,43 @@ impl Field {
                 let claim = if flowing { release(first_order, 16 + h) } else { 0 };
                 let tried = cell.phi - candidate.phi;
                 if flowing {
-                    out.tries.push(RestTry { tick, halvings: h, fall: tried, claim, slack, note: 0, guard_milli: 0 });
+                    // [measurement; theory, November 8 10:28] The try's fall against ⟨F, Δr̂⟩ lane by lane: its radial part
+                    // ⟨F, r̂⟩⟨r̂, Δr̂⟩/|r̂|² in lanes whose scale rose and in the rest, its tangential rest, and the residual
+                    // (curvature and Φ's own releases), all on Φ's 2^(−32); with the lanes whose scale rose or fell, the
+                    // lanes the re-base changed, and the entries of r̂ that moved.
+                    let (mut radial_rose, mut radial_rest, mut tangential) = (0i128, 0i128, 0i128);
+                    let (mut rose, mut fell, mut rebased, mut moved) = (0i128, 0i128, 0i128, 0i128);
+                    for (k, (((fl, rl), cl), (nl, sl))) in force.chunks_exact(lane_width).zip(cell.read.chunks_exact(lane_width))
+                        .zip(candidate.read.chunks_exact(lane_width)).zip(next.chunks_exact(lane_width).zip(stepped.chunks_exact(lane_width))).enumerate()
+                    {
+                        let d: Vec<i128> = rl.iter().zip(cl).map(|(&a, &b)| b as i128 - a as i128).collect();
+                        moved += d.iter().filter(|&&e| e != 0).count() as i128;
+                        let fd: i128 = fl.iter().zip(&d).map(|(&f, &e)| f as i128 * e).sum();
+                        let rf: i128 = fl.iter().zip(rl).map(|(&f, &r)| f as i128 * r as i128).sum();
+                        let rd: i128 = rl.iter().zip(&d).map(|(&r, &e)| r as i128 * e).sum();
+                        let rr: i128 = rl.iter().map(|&r| r as i128 * r as i128).sum();
+                        let rad = if rr > 0 { div_nearest(rf * rd, rr) } else { 0 };
+                        let (was, now) = (cell.scale.get(k).copied().unwrap_or(0), candidate.scale.get(k).copied().unwrap_or(0));
+                        if now > was {
+                            rose += 1;
+                            radial_rose += rad;
+                        } else {
+                            radial_rest += rad;
+                            if now < was {
+                                fell += 1;
+                            }
+                        }
+                        tangential += fd - rad;
+                        if nl != sl {
+                            rebased += 1;
+                        }
+                    }
+                    let (radial_rose, radial_rest, tangential) = (release(radial_rose, 8), release(radial_rest, 8), release(tangential, 8));
+                    let residual = tried - (radial_rose + radial_rest + tangential);
+                    out.tries.push(RestTry {
+                        tick, halvings: h, fall: tried, claim, slack, note: 0, guard_milli: 0,
+                        split: [radial_rose, radial_rest, tangential, residual, rose, fell, rebased, moved],
+                    });
                 }
                 let half_passes = 2 * tried >= claim;
                 if lined && !(half_passes && tried >= slack) {
@@ -2486,6 +2522,10 @@ pub struct RestTry {
     pub note: u8,
     /// The band guard's ⟨F(x) − F(x'), v'⟩ over 2(1 + μ) Σ|v'|²/η, in thousandths (swing tries).
     pub guard_milli: i128,
+    /// [measurement] A flow try's fall split against ⟨F, Δr̂⟩ (theory, November 8 10:28), on Φ's `2^(−32)`: the radial
+    /// part in lanes whose scale rose, the radial part in the rest, the tangential part, the residual; then the counts of
+    /// lanes whose scale rose, fell or were changed by the re-base, and of r̂'s entries that moved.
+    pub split: [i128; 8],
 }
 
 /// One tick that stood: its halvings, its fall and the slack it fell past (on `2^(−32)`), the lanes' largest scale's top
