@@ -2814,6 +2814,9 @@ pub(super) fn length_field(args: &[String], realization: &mut dyn FieldRealizati
 /// `STOP_MS`; past `STOP_MS` the run writes `STATE.stopped` and stops. Writes `STATE.<lap>` and `ENUMERATED.tsv` (private: held
 /// answers' letters).
 pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealization) -> Result<()> {
+    if std::env::var("FIELD_CENSUS").is_ok_and(|v| v == "1") {
+        holonics::number::census::enable();
+    }
     if args.len() != 17 {
         return Err("contrast-field STATE STATE_SHA CODEC CODEC_SHA UNITS UNITS_SHA TRAIN TRAIN_SHA HELD HELD_SHA SECTION LAPS PLACES LAP_MS STOP_MS OUT".into());
     }
@@ -2995,6 +2998,31 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
                 k.sites, k.near, k.sharp, k.listened, (k.near + k.sharp + k.listened) / (heads * k.sites.max(1) as u64), learner.field.declaration.reach / k.classes.max(1), k.largest, t.elapsed().as_millis()
             );
         }
+    }
+    // [measurement; theory, November 8, the width census's §5] `FIELD_CENSUS_RELAX=N`: the energy's material read (the
+    // relaxation and its reverse, as a conditional section reads each configuration) of the `N` longest training problems and
+    // the median one, each at its truth, resolved, on the host reference with the census on: reads (c), (d), (e) and (g). A read only: it
+    // returns before any section.
+    if let Ok(v) = std::env::var("FIELD_CENSUS_RELAX") {
+        let count: usize = v.parse().map_err(|_| "FIELD_CENSUS_RELAX is a count of problems".to_string())?;
+        holonics::number::census::enable();
+        let mut order: Vec<usize> = (0..train_set.len()).collect();
+        order.sort_by_key(|&i| std::cmp::Reverse(train_set[i].0.len() + train_set[i].1.len()));
+        let mut chosen: Vec<usize> = order.iter().take(count).copied().collect();
+        chosen.push(order[order.len() / 2]);
+        for i in chosen {
+            let truth = truth_of(&train_set[i], &train_set[i].1);
+            let none = vec![false; truth.len()];
+            let region = Region { classes: &truth, unresolved: &none, faces: &[], locked: &[], echo: &[], domain: None, port: None };
+            let t = std::time::Instant::now();
+            let (_, g) = learner.field.energy_material(&region).map_err(|e| e.to_string())?;
+            println!("FIELD_CENSUS_RELAX problem={i} sites={} g={g} ms={}", truth.len(), t.elapsed().as_millis());
+        }
+        for r in holonics::number::census::report() {
+            println!("FIELD_CENSUS_SITE phase=relax most_bits={} met={} site={}", r.most_bits, r.met, r.site);
+        }
+        // A read only: nothing is deposited and no section runs.
+        return Ok(());
     }
     let d = learner.field.declaration;
     println!(
@@ -3756,6 +3784,11 @@ impl Leg {
         println!("FIELD_LEG_LETTERS lap={lap} {what} truth_count_less_mass_milli {}", top.join(" "));
         println!("FIELD_LEG_BANDS lap={lap} {what} {}", bands.join(" "));
         println!("FIELD_LEG_STEPS lap={lap} {what} milli_grains_an_entry_a_section {}", steps.join(" "));
+        // The width census's sites (FIELD_CENSUS=1, theory November 8): each site's largest bit length and how often it was
+        // met, cumulative over the run.
+        for r in holonics::number::census::report() {
+            println!("FIELD_CENSUS_SITE lap={lap} {what} most_bits={} met={} site={}", r.most_bits, r.met, r.site);
+        }
     }
 }
 

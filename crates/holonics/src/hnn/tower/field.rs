@@ -679,7 +679,7 @@ fn temper_octave(ell: i32) -> Result<i128> {
 /// the same bits (the card's `temper_chain`).
 fn temperature_chain(temper: i128, dt: i128) -> Result<i128> {
     let rate = release(temper * ln2_face(), LN2_FACE_BITS);
-    Ok(release(dt.checked_mul(rate).ok_or(TowerError::Refused("a temperature's covector past its 128-bit carrier"))?, MATERIAL_BITS))
+    Ok(release(dt.checked_mul(rate).inspect(|v| crate::number::census::reach("a temperature's covector past its 128-bit carrier", v)).ok_or(TowerError::Refused("a temperature's covector past its 128-bit carrier"))?, MATERIAL_BITS))
 }
 
 /// The refusal of a clock's covector past its 128-bit carrier.
@@ -694,15 +694,15 @@ const LOCK_BACK_BITS: u32 = 2 * FACE_BITS + 1;
 /// `release(b · (a_i z_r − a_r z_i), 46)`: the turn's covector `2^24 b Re(conj(a) i z)` on `2^(−24)` of a quantity `z`
 /// on `2^(−16)` with covector `a` on `2^(−24)`, turned at the rate `b` on `2^(−30)` (§16).
 fn turned_back(b: i128, a: (i128, i128), z: (i128, i128)) -> Result<i128> {
-    let cross = a.1.checked_mul(z.0).zip(a.0.checked_mul(z.1)).and_then(|(x, y)| x.checked_sub(y)).ok_or(TowerError::Refused(PACE_RETURN))?;
-    Ok(release(b.checked_mul(cross).ok_or(TowerError::Refused(PACE_RETURN))?, MOVE_BITS + FACE_BITS))
+    let cross = a.1.checked_mul(z.0).zip(a.0.checked_mul(z.1)).and_then(|(x, y)| x.checked_sub(y)).inspect(|v| crate::number::census::reach(PACE_RETURN, v)).ok_or(TowerError::Refused(PACE_RETURN))?;
+    Ok(release(b.checked_mul(cross).inspect(|v| crate::number::census::reach(PACE_RETURN, v)).ok_or(TowerError::Refused(PACE_RETURN))?, MOVE_BITS + FACE_BITS))
 }
 
 /// The skin's covector on the variation: `2^24 ∂/∂σ = 2^24 (E/2^40) b D` for `E = 2^40 ∂/∂D`, `b` and `D` on
 /// `2^(−30)`, each product released once in that order (§16); its sign is the caller's.
 fn skin_back(b: i128, decay: i128, e: i128) -> Result<i128> {
-    let at = release(e.checked_mul(decay).ok_or(TowerError::Refused(PACE_RETURN))?, MOVE_BITS);
-    Ok(release(release(at.checked_mul(b).ok_or(TowerError::Refused(PACE_RETURN))?, MOVE_BITS), 16))
+    let at = release(e.checked_mul(decay).inspect(|v| crate::number::census::reach(PACE_RETURN, v)).ok_or(TowerError::Refused(PACE_RETURN))?, MOVE_BITS);
+    Ok(release(release(at.checked_mul(b).inspect(|v| crate::number::census::reach(PACE_RETURN, v)).ok_or(TowerError::Refused(PACE_RETURN))?, MOVE_BITS), 16))
 }
 
 /// [definition; agent-inferred, November 2] **The pace's grain**: a clock's rate `κ`, the clock `τ` and its
@@ -1485,7 +1485,7 @@ pub const WEIGHT_BITS: u32 = 62;
 /// pair contact's own slip, `Q = ⟨Δ|Δ⟩` with `Δ = a − D b`; summed over a still head's modes at unit power
 /// it is the head's pairing less a constant.
 fn lock(a: (i128, i128), b: (i128, i128), count: i128, (decay, grain): (i128, u32)) -> Result<i128> {
-    let carried = |v: Option<i128>| v.ok_or(TowerError::Refused("a lock past its 128-bit carrier"));
+    let carried = |v: Option<i128>| v.inspect(|v| crate::number::census::reach("a lock past its 128-bit carrier", v)).ok_or(TowerError::Refused("a lock past its 128-bit carrier"));
     let pairing = carried((a.0 * b.0).checked_add(a.1 * b.1).and_then(|p| p.checked_mul(2 * count * decay)).and_then(|p| p.checked_mul(1i128 << grain)))?;
     let power = carried((b.0 * b.0).checked_add(b.1 * b.1).and_then(|p| p.checked_mul(decay * decay)))?;
     carried(pairing.checked_sub(power))
@@ -2547,7 +2547,7 @@ impl Field {
         cell.rows = Vec::with_capacity(heads * sites);
         cell.y = vec![0i64; sites * m2];
         let one = 1u128 << WEIGHT_BITS;
-        let carried = |v: Option<i128>| v.ok_or(TowerError::Refused("a lock past its 128-bit carrier"));
+        let carried = |v: Option<i128>| v.inspect(|v| crate::number::census::reach("a lock past its 128-bit carrier", v)).ok_or(TowerError::Refused("a lock past its 128-bit carrier"));
         cell.crowds = Vec::with_capacity(heads * sites);
         cell.sums = Vec::with_capacity(heads);
         for h in 0..heads {
@@ -2815,7 +2815,7 @@ impl Field {
             let mean = div_nearest(masses.iter().enumerate().map(|(c, &m)| m as i128 * self.theta[base + c] as i128).sum(), total);
             for (b, slot) in dz.iter_mut().enumerate() {
                 let u = div_nearest(masses[b] as i128 * (self.theta[base + b] as i128 - mean), total);
-                let at = dk.checked_mul(u).and_then(|x| x.checked_mul(ln2_face())).ok_or(TowerError::Refused(PACE_RETURN))?;
+                let at = dk.checked_mul(u).and_then(|x| x.checked_mul(ln2_face())).inspect(|v| crate::number::census::reach(PACE_RETURN, v)).ok_or(TowerError::Refused(PACE_RETURN))?;
                 *slot += release(at, PACE_BITS);
             }
         }
@@ -2826,12 +2826,12 @@ impl Field {
         // blank's small covector is not lost to the grain before it reaches the state; each entry released once from it.
         let mut dy = vec![0i64; dw];
         for (i, slot) in dy.iter_mut().enumerate() {
-            let sum = dz.iter().enumerate().try_fold(0i128, |acc, (c, &dzc)| dzc.checked_mul(self.theta[l.enc + c * dw + i] as i128).and_then(|x| acc.checked_add(x))).ok_or(TowerError::Refused(PACE_RETURN))?;
+            let sum = dz.iter().enumerate().try_fold(0i128, |acc, (c, &dzc)| dzc.checked_mul(self.theta[l.enc + c * dw + i] as i128).and_then(|x| acc.checked_add(x))).inspect(|v| crate::number::census::reach(PACE_RETURN, v)).ok_or(TowerError::Refused(PACE_RETURN))?;
             *slot = fit64(release(sum, STATE_BITS + LN2_FACE_BITS - BLANK_HELD))?;
         }
         for (c, &dzc) in dz.iter().enumerate() {
             for (i, &yi) in read.lift.iter().enumerate() {
-                g[l.enc + c * dw + i] += release(dzc.checked_mul(yi as i128).ok_or(TowerError::Refused(PACE_RETURN))?, STATE_BITS + LN2_FACE_BITS);
+                g[l.enc + c * dw + i] += release(dzc.checked_mul(yi as i128).inspect(|v| crate::number::census::reach(PACE_RETURN, v)).ok_or(TowerError::Refused(PACE_RETURN))?, STATE_BITS + LN2_FACE_BITS);
             }
         }
         for (i, &dyi) in dy.iter().enumerate() {
@@ -3325,7 +3325,7 @@ impl Field {
                             let value = release(src.p as i128 * inner, SHARE_BITS);
                             let (wr, wi, kr, ki) = (probe_of(i, l) as i128, probe_of(i, n + l) as i128, qh[j * span + l] as i128, qh[j * span + n + l] as i128);
                             let bracket = (2 * (wr * kr + wi * ki) << g_) - 2 * dec * (kr * kr + ki * ki);
-                            let lock = release(ds[i][k].checked_mul(bracket).ok_or(TowerError::Refused(PACE_RETURN))?, LOCK_BACK_BITS + 2 * g_ - MOVE_BITS);
+                            let lock = release(ds[i][k].checked_mul(bracket).inspect(|v| crate::number::census::reach(PACE_RETURN, v)).ok_or(TowerError::Refused(PACE_RETURN))?, LOCK_BACK_BITS + 2 * g_ - MOVE_BITS);
                             let at = skin_back(self.turn_rate(self.slot(h, l)), dec, value + lock)?;
                             gsig[p][i] -= sgn * at;
                             gsig[p][j] += sgn * at;
@@ -3347,7 +3347,7 @@ impl Field {
                             let (wr, wi) = (ph[i * span + l] as i128, ph[i * span + n + l] as i128);
                             let (mr, mi) = (sums.words[(c.hi + 1) * span + l] - sums.words[c.lo * span + l], sums.words[(c.hi + 1) * span + n + l] - sums.words[c.lo * span + n + l]);
                             let bracket = div_nearest((2 * count * (wr * mr + wi * mi) << g_) - 2 * dec * (mr * mr + mi * mi), count * count);
-                            let lock = release(dsc[i][k].checked_mul(bracket).ok_or(TowerError::Refused(PACE_RETURN))?, LOCK_BACK_BITS + 2 * g_ - MOVE_BITS);
+                            let lock = release(dsc[i][k].checked_mul(bracket).inspect(|v| crate::number::census::reach(PACE_RETURN, v)).ok_or(TowerError::Refused(PACE_RETURN))?, LOCK_BACK_BITS + 2 * g_ - MOVE_BITS);
                             let at = skin_back(self.turn_rate(self.slot(h, l)), dec, value + lock)?;
                             gsig[p][i] -= sgn * at;
                             gsig[p][e] += sgn * at;
@@ -3369,7 +3369,7 @@ impl Field {
                         // The key's bracket `D ŵ_i − D² ŵ_j` released by the skin's bits once (a
                         // declared crossing, as the probe's `D ŵ` is), so it stands on the probe's grain.
                         let bracket = release(((dec * probe_of(i, r) as i128) << g) - dec * dec * qh[j * span + r] as i128, g);
-                        col[j * span + r] = col[j * span + r].checked_add(ds[i][k].checked_mul(bracket).ok_or(TowerError::Refused(KEY_RETURN))?).ok_or(TowerError::Refused(KEY_RETURN))?;
+                        col[j * span + r] = col[j * span + r].checked_add(ds[i][k].checked_mul(bracket).inspect(|v| crate::number::census::reach(KEY_RETURN, v)).ok_or(TowerError::Refused(KEY_RETURN))?).inspect(|v| crate::number::census::reach(KEY_RETURN, v)).ok_or(TowerError::Refused(KEY_RETURN))?;
                     }
                 }
                 for (k, c) in crowds[i].iter().enumerate() {
@@ -3377,7 +3377,7 @@ impl Field {
                         let (dec, g) = self.octave_decay(paces, h, r % n, i, c.level, c.lo > i);
                         let mean = sums.words[(c.hi + 1) * span + r] - sums.words[c.lo * span + r];
                         let bracket = release(((dec * ph[i * span + r] as i128 * c.count as i128) << g) - dec * dec * mean, g);
-                        let part = div_nearest(dsc[i][k].checked_mul(bracket).ok_or(TowerError::Refused(KEY_RETURN))?, (c.count * c.count) as i128);
+                        let part = div_nearest(dsc[i][k].checked_mul(bracket).inspect(|v| crate::number::census::reach(KEY_RETURN, v)).ok_or(TowerError::Refused(KEY_RETURN))?, (c.count * c.count) as i128);
                         crowd_w[c.lo * span + r] += part;
                         crowd_w[(c.hi + 1) * span + r] -= part;
                     }
@@ -4968,11 +4968,22 @@ fn conditional_shares(gs: &[i128], inverse: i128, fine: &Exponential) -> Result<
     let w: Vec<i128> = gs
         .iter()
         .map(|&gv| {
-            let l = release((lo - gv).checked_mul(inverse).ok_or(TowerError::Refused(OVER))?, MATERIAL_BITS);
+            let l = release((lo - gv).checked_mul(inverse).inspect(|v| crate::number::census::reach(OVER, v)).ok_or(TowerError::Refused(OVER))?, MATERIAL_BITS);
             let ell = l >> (ENERGY_BITS - MATERIAL_BITS);
             if ell >= 0 {
                 Ok(1i128 << MATERIAL_BITS)
             } else if ell <= -((MATERIAL_BITS as i128 - 1) << MATERIAL_BITS) {
+                // The width census's read (b): a letter whose weight releases to zero below 2^(−23), and its weight before
+                // the release on 2^(−32) (eight places finer), the mass the grain drops.
+                if crate::number::census::enabled() {
+                    crate::number::census::tally(CENSUS_RELEASED, 1);
+                    let finer = ell + (8i128 << MATERIAL_BITS);
+                    if finer > -((MATERIAL_BITS as i128 - 1) << MATERIAL_BITS) {
+                        let mass = temperature_of(finer as i32, fine)?;
+                        crate::number::census::tally(CENSUS_RELEASED_MASS, mass as u64);
+                        crate::number::census::reach(CENSUS_RELEASED_MASS_MOST, &mass);
+                    }
+                }
                 Ok(0)
             } else {
                 temperature_of(ell as i32, fine)
@@ -4980,8 +4991,56 @@ fn conditional_shares(gs: &[i128], inverse: i128, fine: &Exponential) -> Result<
         })
         .collect::<Result<_>>()?;
     let z: i128 = w.iter().sum();
-    Ok(w.iter().map(|&x| div_nearest(x << MATERIAL_BITS, z.max(1))).collect())
+    let shares: Vec<i128> = w.iter().map(|&x| div_nearest(x << MATERIAL_BITS, z.max(1))).collect();
+    if crate::number::census::enabled() {
+        crate::number::census::tally(CENSUS_PLACES, 1);
+        // The least nonzero share's depth below one on 2^(−24): its places under the unit, the census's largest the deepest.
+        if let Some(least) = shares.iter().copied().filter(|&p| p > 0).min() {
+            let depth = i128::from(MATERIAL_BITS + 1 - (128 - least.leading_zeros()));
+            crate::number::census::reach(CENSUS_LEAST_SHARE_DEPTH, &depth);
+        }
+        crate::number::census::tally(CENSUS_ZERO_SHARES, shares.iter().filter(|&&p| p == 0).count() as u64);
+    }
+    Ok(shares)
 }
+
+/// The width census's deposit sites, one name a family and kind: a step's lowest set bit 0 to 7 and 8 or more (0–8), a
+/// step released to zero while its moment is not (9), the step's top place (10), the release's summed remainder (11; its
+/// positive and negative parts, 12 and 13) beside the summed change (14), and the entries the covector reached (15).
+fn census_deposit_site(family: usize, kind: usize) -> &'static str {
+    static NAMES: std::sync::OnceLock<Vec<Vec<&'static str>>> = std::sync::OnceLock::new();
+    let names = NAMES.get_or_init(|| {
+        (0..64)
+            .map(|f| {
+                (0..16)
+                    .map(|k| {
+                        let what = match k {
+                            0..=7 => format!("deposit: family {f} steps with lowest bit {k}"),
+                            8 => format!("deposit: family {f} steps with lowest bit 8+"),
+                            9 => format!("deposit: family {f} steps released to zero, moment nonzero"),
+                            10 => format!("deposit: family {f} step top place"),
+                            11 => format!("deposit: family {f} summed |remainder| of the step's release, on 2^-24 of the grain"),
+                            12 => format!("deposit: family {f} summed positive remainder, on 2^-24"),
+                            13 => format!("deposit: family {f} summed negative remainder (magnitude), on 2^-24"),
+                            14 => format!("deposit: family {f} summed |change|, on the grain"),
+                            _ => format!("deposit: family {f} entries whose covector is nonzero"),
+                        };
+                        &*Box::leak(what.into_boxed_str())
+                    })
+                    .collect()
+            })
+            .collect()
+    });
+    names.get(family).map_or("deposit: a family past the census's 64", |n| n[kind])
+}
+
+/// The width census's read (b) sites ([`crate::number::census`]).
+const CENSUS_PLACES: &str = "conditional: places read";
+const CENSUS_RELEASED: &str = "conditional: letters whose weight released to zero below 2^-23";
+const CENSUS_RELEASED_MASS: &str = "conditional: their summed weight before release, on 2^-32";
+const CENSUS_RELEASED_MASS_MOST: &str = "conditional: the largest released weight, on 2^-32";
+const CENSUS_LEAST_SHARE_DEPTH: &str = "conditional: the least nonzero share's places below one, on 2^-24";
+const CENSUS_ZERO_SHARES: &str = "conditional: letters whose share released to zero";
 
 /// [agent-inferred, November 1] A held step read on regions it was not fit on
 /// ([`FieldLearner::read_step_on`]): its change to those regions' code (the stepped material's
@@ -5574,7 +5633,7 @@ impl FieldLearner {
             }
         }
         for ((m, v), gv) in self.first.iter_mut().zip(self.second.iter_mut()).zip(g.iter()) {
-            let square = gv.checked_mul(*gv).ok_or(TowerError::Refused("a covector's square outgrew its 128-bit carrier"))?;
+            let square = gv.checked_mul(*gv).inspect(|v| crate::number::census::reach("a covector's square outgrew its 128-bit carrier", v)).ok_or(TowerError::Refused("a covector's square outgrew its 128-bit carrier"))?;
             if *m == 0 && *v == 0 {
                 // A coordinate opens at its own first nonzero covector.
                 (*m, *v) = (*gv, square);
@@ -5598,21 +5657,21 @@ impl FieldLearner {
         for (d, &w) in states.iter().zip(weights) {
             let Some(u) = predicted_change(&self.field, d, direction, 0) else { continue };
             let u = u as i128;
-            let f = release(w.checked_mul(u).ok_or(TowerError::Refused(OVER))?, MATERIAL_BITS);
+            let f = release(w.checked_mul(u).inspect(|v| crate::number::census::reach(OVER, v)).ok_or(TowerError::Refused(OVER))?, MATERIAL_BITS);
             sum += f;
-            squares += f.checked_mul(f).ok_or(TowerError::Refused(OVER))?;
-            curvature += release(w.checked_mul(u.checked_mul(u).ok_or(TowerError::Refused(OVER))?).ok_or(TowerError::Refused(OVER))?, MATERIAL_BITS);
+            squares += f.checked_mul(f).inspect(|v| crate::number::census::reach(OVER, v)).ok_or(TowerError::Refused(OVER))?;
+            curvature += release(w.checked_mul(u.checked_mul(u).inspect(|v| crate::number::census::reach(OVER, v)).ok_or(TowerError::Refused(OVER))?).inspect(|v| crate::number::census::reach(OVER, v)).ok_or(TowerError::Refused(OVER))?, MATERIAL_BITS);
             priced += 1;
         }
         let n = priced as i128;
         let variance = if n > 1 { (n * squares - sum * sum) / (n - 1) } else { 0 };
-        let curvature = release(curvature.checked_mul(crate::hnn::keyed_modes::ln2_face()).ok_or(TowerError::Refused(OVER))?, LN2_FACE_BITS) / 2;
+        let curvature = release(curvature.checked_mul(crate::hnn::keyed_modes::ln2_face()).inspect(|v| crate::number::census::reach(OVER, v)).ok_or(TowerError::Refused(OVER))?, LN2_FACE_BITS) / 2;
         (read.slope, read.variance, read.curvature) = (sum, variance, curvature);
         let evidence = sum * sum - variance;
         read.shrink = (evidence.max(0), sum * sum);
         if sum < 0 && evidence > 0 && curvature > 0 {
             // α = −(s² − v) 2^20 / (s c): s on 2^(−20), v and c on 2^(−40).
-            read.alpha = (evidence.checked_mul(1 << 20).ok_or(TowerError::Refused(OVER))?, (-sum).checked_mul(curvature).ok_or(TowerError::Refused(OVER))?);
+            read.alpha = (evidence.checked_mul(1 << 20).inspect(|v| crate::number::census::reach(OVER, v)).ok_or(TowerError::Refused(OVER))?, (-sum).checked_mul(curvature).inspect(|v| crate::number::census::reach(OVER, v)).ok_or(TowerError::Refused(OVER))?);
         }
         Ok(read)
     }
@@ -5644,7 +5703,7 @@ impl FieldLearner {
                 continue;
             }
             for (gv, &x) in g.iter_mut().zip(d) {
-                *gv += release(x.checked_mul(w).ok_or(TowerError::Refused(OVER))?, MATERIAL_BITS);
+                *gv += release(x.checked_mul(w).inspect(|v| crate::number::census::reach(OVER, v)).ok_or(TowerError::Refused(OVER))?, MATERIAL_BITS);
             }
         }
         let raw = g.clone();
@@ -5663,7 +5722,7 @@ impl FieldLearner {
         if read.alpha.1 > 0 {
             let (num, den) = read.alpha;
             for (st, &dv) in step.iter_mut().zip(&direction) {
-                *st = div_nearest(dv.checked_mul(num).ok_or(TowerError::Refused(OVER))?, den);
+                *st = div_nearest(dv.checked_mul(num).inspect(|v| crate::number::census::reach(OVER, v)).ok_or(TowerError::Refused(OVER))?, den);
             }
             let (candidate, any) = stepped(&self.field, &step, 0)?;
             if any {
@@ -5724,19 +5783,44 @@ impl FieldLearner {
                     const PAST: &str = "a family's step past its 128-bit carrier";
                     for i in start..start + len {
                         let root = super::deposit_root(self.second[i]);
-                        let num = self.first[i].checked_mul(1i128 << grain).ok_or(TowerError::Refused(PAST))?;
+                        let num = self.first[i].checked_mul(1i128 << grain).inspect(|v| crate::number::census::reach(PAST, v)).ok_or(TowerError::Refused(PAST))?;
                         let whole_step = if whole >= 0 {
                             (num >> whole.min(127)) / root
                         } else {
                             let k = u32::try_from(-whole).map_err(|_| TowerError::Refused(PAST))?;
-                            num.checked_mul(1i128.checked_shl(k).filter(|&b| b > 0).ok_or(TowerError::Refused(PAST))?).ok_or(TowerError::Refused(PAST))? / root
+                            num.checked_mul(1i128.checked_shl(k).filter(|&b| b > 0).inspect(|v| crate::number::census::reach(PAST, v)).ok_or(TowerError::Refused(PAST))?).inspect(|v| crate::number::census::reach(PAST, v)).ok_or(TowerError::Refused(PAST))? / root
                         };
-                        step[i] = release(whole_step.checked_mul(scale).ok_or(TowerError::Refused(PAST))?, MATERIAL_BITS);
+                        let pre = whole_step.checked_mul(scale).inspect(|v| crate::number::census::reach(PAST, v)).ok_or(TowerError::Refused(PAST))?;
+                        step[i] = release(pre, MATERIAL_BITS);
+                        // The release's remainder on 2^(−24) of the family's grain, signed parts apart, beside the change.
+                        if crate::number::census::enabled() {
+                            let rem = pre - (step[i] << MATERIAL_BITS);
+                            crate::number::census::tally(census_deposit_site(k, 11), rem.unsigned_abs() as u64);
+                            crate::number::census::tally(census_deposit_site(k, if rem > 0 { 12 } else { 13 }), rem.unsigned_abs() as u64);
+                            crate::number::census::tally(census_deposit_site(k, 14), step[i].unsigned_abs() as u64);
+                        }
                     }
                 }
                 None => {
                     for i in start..start + len {
                         step[i] = deposit_step(self.first[i], self.second[i], grain, self.rate_bits);
+                    }
+                }
+            }
+        }
+        // The width census's read (a) a step: each family's nonzero steps by their lowest set bit, and the entries whose moment
+        // is nonzero but whose step released to zero.
+        if crate::number::census::enabled() {
+            for (k, &(start, len, _)) in families.iter().enumerate() {
+                for i in start..start + len {
+                    if raw[i] != 0 {
+                        crate::number::census::tally(census_deposit_site(k, 15), 1);
+                    }
+                    if step[i] != 0 {
+                        crate::number::census::tally(census_deposit_site(k, (step[i].trailing_zeros() as usize).min(8)), 1);
+                        crate::number::census::reach(census_deposit_site(k, 10), &step[i]);
+                    } else if self.first[i] != 0 {
+                        crate::number::census::tally(census_deposit_site(k, 9), 1);
                     }
                 }
             }
@@ -5812,13 +5896,13 @@ impl FieldLearner {
             let mut d = vec![0i128; material];
             for &(start, len, grain) in &families {
                 for i in start..start + len {
-                    let scaled = release((gt[i] - gw[i]).checked_mul(inverse).ok_or(TowerError::Refused(OVER))?, MATERIAL_BITS);
+                    let scaled = release((gt[i] - gw[i]).checked_mul(inverse).inspect(|v| crate::number::census::reach(OVER, v)).ok_or(TowerError::Refused(OVER))?, MATERIAL_BITS);
                     d[i] = if grain == MATERIAL_BITS { scaled } else { release(scaled, 40 - super::COVECTOR_BITS) };
                 }
             }
             pairs.push(d);
         }
-        let gap = release(gap.checked_mul(inverse).ok_or(TowerError::Refused(OVER))?, MATERIAL_BITS);
+        let gap = release(gap.checked_mul(inverse).inspect(|v| crate::number::census::reach(OVER, v)).ok_or(TowerError::Refused(OVER))?, MATERIAL_BITS);
         let mut g = vec![0i128; material];
         for d in &pairs {
             for (v, &x) in g.iter_mut().zip(d) {
@@ -5837,23 +5921,23 @@ impl FieldLearner {
             let scale = temperature_of(-part, &self.field.fine)?;
             for i in start..start + len {
                 let root = super::deposit_root(self.second[i]);
-                let num = self.first[i].checked_mul(1i128 << grain).ok_or(TowerError::Refused(OVER))?;
+                let num = self.first[i].checked_mul(1i128 << grain).inspect(|v| crate::number::census::reach(OVER, v)).ok_or(TowerError::Refused(OVER))?;
                 let whole_step = if whole >= 0 {
                     (num >> whole.min(127)) / root
                 } else {
-                    num.checked_mul(1i128.checked_shl(u32::try_from(-whole).map_err(|_| TowerError::Refused(OVER))?).filter(|&b| b > 0).ok_or(TowerError::Refused(OVER))?).ok_or(TowerError::Refused(OVER))? / root
+                    num.checked_mul(1i128.checked_shl(u32::try_from(-whole).map_err(|_| TowerError::Refused(OVER))?).filter(|&b| b > 0).inspect(|v| crate::number::census::reach(OVER, v)).ok_or(TowerError::Refused(OVER))?).inspect(|v| crate::number::census::reach(OVER, v)).ok_or(TowerError::Refused(OVER))? / root
                 };
-                direction[i] = release(whole_step.checked_mul(scale).ok_or(TowerError::Refused(OVER))?, MATERIAL_BITS);
+                direction[i] = release(whole_step.checked_mul(scale).inspect(|v| crate::number::census::reach(OVER, v)).ok_or(TowerError::Refused(OVER))?, MATERIAL_BITS);
             }
         }
         // Each pair's first-order change along the direction, on 2^(−20) bits, and Newton's length.
-        let p: Vec<i128> = pairs.iter().map(|d| predicted_change(&self.field, d, &direction, 0).map(i128::from).ok_or(TowerError::Refused(OVER))).collect::<Result<_>>()?;
+        let p: Vec<i128> = pairs.iter().map(|d| predicted_change(&self.field, d, &direction, 0).map(i128::from).inspect(|v| crate::number::census::reach(OVER, v)).ok_or(TowerError::Refused(OVER))).collect::<Result<_>>()?;
         let sum: i128 = p.iter().sum();
         let nn = n as i128;
         let var = (nn * p.iter().map(|&x| x * x).sum::<i128>() - sum * sum) / (nn * (nn - 1));
         // η = −2 Σp / (n ln 2 Var p): Σp on 2^(−20), Var on 2^(−40); η on 2^(−32).
         let eta = if var > 0 && sum < 0 {
-            let num = (-2 * sum).checked_mul(1i128 << (20 + 32 + LN2_FACE_BITS)).ok_or(TowerError::Refused(OVER))?;
+            let num = (-2 * sum).checked_mul(1i128 << (20 + 32 + LN2_FACE_BITS)).inspect(|v| crate::number::census::reach(OVER, v)).ok_or(TowerError::Refused(OVER))?;
             num / (nn * crate::hnn::keyed_modes::ln2_face() * var)
         } else {
             0
@@ -5922,15 +6006,15 @@ impl FieldLearner {
         const OVER: &str = "a contrast covector past its 128-bit carrier";
         for &(start, len, grain) in &f.families_all() {
             for v in &mut g[start..start + len] {
-                let scaled = release(v.checked_mul(inverse).ok_or(TowerError::Refused(OVER))?, MATERIAL_BITS);
+                let scaled = release(v.checked_mul(inverse).inspect(|v| crate::number::census::reach(OVER, v)).ok_or(TowerError::Refused(OVER))?, MATERIAL_BITS);
                 *v = if grain == MATERIAL_BITS { scaled } else { release(scaled, 40 - super::COVECTOR_BITS) };
             }
         }
-        let gap = release(gap.checked_mul(inverse).ok_or(TowerError::Refused(OVER))?, MATERIAL_BITS);
+        let gap = release(gap.checked_mul(inverse).inspect(|v| crate::number::census::reach(OVER, v)).ok_or(TowerError::Refused(OVER))?, MATERIAL_BITS);
         // [the unified-theory reading of November 7, 09:36] The letters' temperature in the deposit, as the kernel's:
         // `∂l/∂τ = −ln 2 Σ_s (G_s − G′_s)/T`, here the gap itself.
         if self.temper_learns {
-            let nats = release(gap.checked_mul(crate::hnn::keyed_modes::ln2_face()).ok_or(TowerError::Refused(OVER))?, LN2_FACE_BITS);
+            let nats = release(gap.checked_mul(crate::hnn::keyed_modes::ln2_face()).inspect(|v| crate::number::census::reach(OVER, v)).ok_or(TowerError::Refused(OVER))?, LN2_FACE_BITS);
             g[f.layout.face_temper] = -(nats << (40 - ENERGY_BITS));
         }
         let (deposited, predicted, transfer, external) = self.deposit(g)?;
@@ -6080,7 +6164,7 @@ impl FieldLearner {
             let mut d = vec![0i128; material];
             for &(start, len, grain) in &families {
                 for i in start..start + len {
-                    let scaled = release((gt[i] - gp[i]).checked_mul(inverse).ok_or(TowerError::Refused(OVER))?, MATERIAL_BITS);
+                    let scaled = release((gt[i] - gp[i]).checked_mul(inverse).inspect(|v| crate::number::census::reach(OVER, v)).ok_or(TowerError::Refused(OVER))?, MATERIAL_BITS);
                     d[i] = if grain == MATERIAL_BITS { scaled } else { release(scaled, 40 - super::COVECTOR_BITS) };
                 }
             }
@@ -6117,7 +6201,7 @@ impl FieldLearner {
                 continue;
             }
             for (v, &x) in g.iter_mut().zip(d) {
-                *v += release(x.checked_mul(w).ok_or(TowerError::Refused(OVER))?, MATERIAL_BITS);
+                *v += release(x.checked_mul(w).inspect(|v| crate::number::census::reach(OVER, v)).ok_or(TowerError::Refused(OVER))?, MATERIAL_BITS);
             }
         }
         // [definition; the unified-theory reading of November 7, 06:57] **The letters' temperature joins the deposit**: with
@@ -6126,10 +6210,10 @@ impl FieldLearner {
         if self.temper_learns {
             let mut gap = 0i128;
             for (s, &w) in weights.iter().enumerate() {
-                gap += release((reads[owners[s]].1 - reads[problems + s].1).checked_mul(w).ok_or(TowerError::Refused(OVER))?, MATERIAL_BITS);
+                gap += release((reads[owners[s]].1 - reads[problems + s].1).checked_mul(w).inspect(|v| crate::number::census::reach(OVER, v)).ok_or(TowerError::Refused(OVER))?, MATERIAL_BITS);
             }
-            let over_t = release(gap.checked_mul(inverse).ok_or(TowerError::Refused(OVER))?, MATERIAL_BITS);
-            let nats = release(over_t.checked_mul(crate::hnn::keyed_modes::ln2_face()).ok_or(TowerError::Refused(OVER))?, LN2_FACE_BITS);
+            let over_t = release(gap.checked_mul(inverse).inspect(|v| crate::number::census::reach(OVER, v)).ok_or(TowerError::Refused(OVER))?, MATERIAL_BITS);
+            let nats = release(over_t.checked_mul(crate::hnn::keyed_modes::ln2_face()).inspect(|v| crate::number::census::reach(OVER, v)).ok_or(TowerError::Refused(OVER))?, LN2_FACE_BITS);
             g[f.layout.face_temper] = -(nats << (40 - ENERGY_BITS));
         }
         // Each family's part of the step before priced on this section, before the deposit takes it.
@@ -6306,7 +6390,7 @@ impl FieldLearner {
             let mut d = vec![0i128; material];
             for &(start, len, grain) in &families {
                 for i in start..start + len {
-                    let scaled = release((gt[i] - gv[i]).checked_mul(inverse).ok_or(TowerError::Refused(OVER))?, MATERIAL_BITS);
+                    let scaled = release((gt[i] - gv[i]).checked_mul(inverse).inspect(|v| crate::number::census::reach(OVER, v)).ok_or(TowerError::Refused(OVER))?, MATERIAL_BITS);
                     d[i] = if grain == MATERIAL_BITS { scaled } else { release(scaled, 40 - super::COVECTOR_BITS) };
                 }
             }
@@ -6344,9 +6428,16 @@ impl FieldLearner {
         // its root's width.
         let metric = |x: &[i128]| -> u128 {
             x.iter().zip(&second).filter(|&(_, &v)| v > 0).fold(0u128, |acc, (&xi, &v)| {
-                let sq = xi.unsigned_abs().checked_mul(xi.unsigned_abs()).unwrap_or(u128::MAX);
+                let sq = xi.unsigned_abs().checked_mul(xi.unsigned_abs()).unwrap_or_else(|| {
+                    crate::number::census::tally("coin measure: a square saturated", 1);
+                    u128::MAX
+                });
                 let s = (128 - (v as u128).leading_zeros()).saturating_sub(40);
-                acc.saturating_add((sq >> s) / ((v as u128) >> s).max(1))
+                let term = (sq >> s) / ((v as u128) >> s).max(1);
+                acc.checked_add(term).unwrap_or_else(|| {
+                    crate::number::census::tally("coin measure: the metric's sum saturated", 1);
+                    u128::MAX
+                })
             })
         };
         let mut g = vec![0i128; material];
@@ -6432,7 +6523,7 @@ impl FieldLearner {
                 let at = truth[o].classes[t];
                 let lo = gs.iter().copied().min().unwrap_or(0);
                 // Each letter's `log₂ w = −(G(x_v) − G_min)/T` on 2^(−32), and its weight on 2^(−24).
-                let logs: Vec<i128> = gs.iter().map(|&gv| (lo - gv).checked_mul(inverse).map(|x| release(x, MATERIAL_BITS)).ok_or(TowerError::Refused(OVER))).collect::<Result<_>>()?;
+                let logs: Vec<i128> = gs.iter().map(|&gv| (lo - gv).checked_mul(inverse).map(|x| release(x, MATERIAL_BITS)).inspect(|v| crate::number::census::reach(OVER, v)).ok_or(TowerError::Refused(OVER))).collect::<Result<_>>()?;
                 let w: Vec<i128> = logs
                     .iter()
                     .map(|&l| {
@@ -6459,7 +6550,7 @@ impl FieldLearner {
                         let Some((mv, _)) = &reads[v] else { continue };
                         let d = natural(mt, mv)?;
                         for (acc, &x) in place_deposit.iter_mut().zip(&d) {
-                            *acc += release(x.checked_mul(p[v]).ok_or(TowerError::Refused(OVER))?, MATERIAL_BITS);
+                            *acc += release(x.checked_mul(p[v]).inspect(|v| crate::number::census::reach(OVER, v)).ok_or(TowerError::Refused(OVER))?, MATERIAL_BITS);
                         }
                         let norm = metric(&d);
                         for b in 1..=TAUS as u32 {
@@ -6472,7 +6563,14 @@ impl FieldLearner {
                             if k > 0 {
                                 // (2^k − 1) p² ‖d‖², p on 2^(−24): released twice.
                                 let pp = (p[v] as u128 * p[v] as u128) >> (2 * MATERIAL_BITS - 16);
-                                measure.v_coin[b as usize - 1] = measure.v_coin[b as usize - 1].saturating_add(norm.saturating_mul(pp).saturating_mul((1u128 << k) - 1) >> 16);
+                                if norm.checked_mul(pp).and_then(|x| x.checked_mul((1u128 << k) - 1)).is_none() {
+                                    crate::number::census::tally("coin measure: a v_coin term saturated", 1);
+                                }
+                                let term = norm.saturating_mul(pp).saturating_mul((1u128 << k) - 1) >> 16;
+                                if measure.v_coin[b as usize - 1].checked_add(term).is_none() {
+                                    crate::number::census::tally("coin measure: v_coin's sum saturated", 1);
+                                }
+                                measure.v_coin[b as usize - 1] = measure.v_coin[b as usize - 1].saturating_add(term);
                             }
                         }
                     }
@@ -6486,11 +6584,11 @@ impl FieldLearner {
                     }
                     let pv = p[v] << k;
                     // The temperature reads every letter's `G`; the material only the letters whose reverse a coin kept.
-                    gap += release((gs[at] - gs[v]).checked_mul(pv).ok_or(TowerError::Refused(OVER))?, MATERIAL_BITS);
+                    gap += release((gs[at] - gs[v]).checked_mul(pv).inspect(|v| crate::number::census::reach(OVER, v)).ok_or(TowerError::Refused(OVER))?, MATERIAL_BITS);
                     if let Some((mv, kv)) = &reads[v] {
                         let weighed = pv << kv;
                         for (acc, &x) in g.iter_mut().zip(&natural(mt, mv)?) {
-                            *acc += release(x.checked_mul(weighed).ok_or(TowerError::Refused(OVER))?, MATERIAL_BITS);
+                            *acc += release(x.checked_mul(weighed).inspect(|v| crate::number::census::reach(OVER, v)).ok_or(TowerError::Refused(OVER))?, MATERIAL_BITS);
                         }
                     }
                 }
@@ -6528,12 +6626,17 @@ impl FieldLearner {
         let coin_measure = (self.coin_measure && coin.is_none() && !deposits.is_empty()).then(|| {
             let n = deposits.len() as i128;
             let mean: Vec<i128> = (0..material).map(|i| deposits.iter().map(|d| d[i]).sum::<i128>() / n).collect();
-            measure.v_deposit = deposits.iter().fold(0u128, |acc, d| acc.saturating_add(metric(&d.iter().zip(&mean).map(|(&a, &b)| a - b).collect::<Vec<_>>())));
+            measure.v_deposit = deposits.iter().fold(0u128, |acc, d| {
+                acc.checked_add(metric(&d.iter().zip(&mean).map(|(&a, &b)| a - b).collect::<Vec<_>>())).unwrap_or_else(|| {
+                    crate::number::census::tally("coin measure: v_deposit saturated", 1);
+                    u128::MAX
+                })
+            });
             measure.clone()
         });
         if self.temper_learns {
-            let over_t = release(gap.checked_mul(inverse).ok_or(TowerError::Refused(OVER))?, MATERIAL_BITS);
-            let nats = release(over_t.checked_mul(crate::hnn::keyed_modes::ln2_face()).ok_or(TowerError::Refused(OVER))?, LN2_FACE_BITS);
+            let over_t = release(gap.checked_mul(inverse).inspect(|v| crate::number::census::reach(OVER, v)).ok_or(TowerError::Refused(OVER))?, MATERIAL_BITS);
+            let nats = release(over_t.checked_mul(crate::hnn::keyed_modes::ln2_face()).inspect(|v| crate::number::census::reach(OVER, v)).ok_or(TowerError::Refused(OVER))?, LN2_FACE_BITS);
             g[f.layout.face_temper] = -(nats << (40 - ENERGY_BITS));
         }
         let transfers: Vec<Option<i64>> = match &self.last {

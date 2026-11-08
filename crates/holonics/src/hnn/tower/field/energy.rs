@@ -50,6 +50,16 @@ pub const FIRST_HALVINGS: u32 = 2;
 /// The most halvings a tick reads before the state rests: past them the step is below the state's grain.
 pub const MOST_HALVINGS: u32 = STATE_BITS + 8;
 
+/// The width census's reads (c) and (g) ([`crate::number::census`]).
+const CENSUS_RELAXED: &str = "relaxation: regions relaxed";
+const CENSUS_ALL_TICKS: &str = "relaxation: regions that stood at every tick";
+const CENSUS_REST_GRAIN: &str = "relaxation: rested, the step below the state's grain";
+const CENSUS_REST_HALVINGS: &str = "relaxation: rested, no fall past the slack by MOST_HALVINGS";
+const CENSUS_INSIDE_SLACK: &str = "relaxation: a fall inside the slack 2R + 2";
+const CENSUS_SLACK: &str = "relaxation: the slack 2R + 2, on 2^-32";
+const CENSUS_STOOD_AT: &str = "relaxation: the halvings a tick stood at";
+const CENSUS_STEP_AT_NO_HALVING: &str = "relaxation: |scale x force| on the state's grain at no halving";
+
 /// A state's read under the held supports: its charts, its rows' shares and crowds, its pair drives, its lifts, and its
 /// energy on `2^(−32)` bits with the count of the logarithms read (the reading's slack).
 #[derive(Clone, Debug, Default)]
@@ -272,7 +282,7 @@ impl Field {
         }
         // The locks' partitions over the held supports.
         let one = 1u128 << WEIGHT_BITS;
-        let carried = |v: Option<i128>| v.ok_or(TowerError::Refused("a lock past its 128-bit carrier"));
+        let carried = |v: Option<i128>| v.inspect(|v| crate::number::census::reach("a lock past its 128-bit carrier", v)).ok_or(TowerError::Refused("a lock past its 128-bit carrier"));
         let zeros = vec![0i64; sites * span];
         let mut phi_lock = 0i128;
         for h in 0..heads {
@@ -404,7 +414,7 @@ impl Field {
             out.tq = vec![0i64; sites * m2];
             out.tp = vec![0i64; sites * m2];
         }
-        let carry = |what: &'static str, v: Option<i128>| v.ok_or(TowerError::Refused(what));
+        let carry = |what: &'static str, v: Option<i128>| v.inspect(|x| crate::number::census::reach(what, x)).ok_or(TowerError::Refused(what));
         for h in 0..heads {
             let lists = &held.classes[h];
             let rows = &c.rows[h * sites..(h + 1) * sites];
@@ -815,6 +825,11 @@ impl Field {
         for (k, slot) in out.iter_mut().enumerate() {
             let (t, i) = (k / dw, k % dw);
             let s = scale[t * lanes + i / w];
+            // The width census's read (g): `|scale × force|` on the state's grain at no halving, against the
+            // `STATE_BITS + 8` halvings [`MOST_HALVINGS`] reads.
+            if crate::number::census::enabled() {
+                crate::number::census::reach(CENSUS_STEP_AT_NO_HALVING, &(s * force[k] as i128 >> super::super::COVECTOR_BITS));
+            }
             *slot = fit64(*slot as i128 + release(s * force[k] as i128, super::super::COVECTOR_BITS + h))?;
         }
         Ok(out)
@@ -936,9 +951,14 @@ impl Field {
             }
             let mut stood = None;
             let mut h = first;
+            // The width census's read (c): why a tick rests (its step below the state's grain, or no fall past the slack
+            // by `MOST_HALVINGS`), each fall that stayed inside the slack, and the slack's `R`.
+            let census = crate::number::census::enabled();
+            let mut below_grain = false;
             while h <= MOST_HALVINGS {
                 let next = self.energy_step(&x, &cell.scale, &force, h)?;
                 if next == x {
+                    below_grain = true;
                     break;
                 }
                 let candidate = self.energy_cell(&next, &held, &paces, &reaches, window.as_deref())?;
@@ -946,6 +966,12 @@ impl Field {
                 pairs += candidate.pairs;
                 // The fall is certified past the two reads' summed reading error, one unit of `2^(−32)` a logarithm.
                 let slack = (cell.logs + candidate.logs) as i128 + 2;
+                if census {
+                    crate::number::census::reach(CENSUS_SLACK, &slack);
+                    if candidate.phi < cell.phi && candidate.phi + slack > cell.phi {
+                        crate::number::census::tally(CENSUS_INSIDE_SLACK, 1);
+                    }
+                }
                 if candidate.phi + slack <= cell.phi {
                     x = next;
                     trail.push(Step { cell: std::mem::replace(&mut cell, candidate), force: force.clone(), halvings: h });
@@ -956,8 +982,24 @@ impl Field {
             }
             read.halvings.push(stood);
             match stood {
-                Some(h) => first = h.saturating_sub(1),
-                None => break,
+                Some(h) => {
+                    if census {
+                        crate::number::census::reach(CENSUS_STOOD_AT, &i128::from(h));
+                    }
+                    first = h.saturating_sub(1)
+                }
+                None => {
+                    if census {
+                        crate::number::census::tally(if below_grain { CENSUS_REST_GRAIN } else { CENSUS_REST_HALVINGS }, 1);
+                    }
+                    break;
+                }
+            }
+        }
+        if crate::number::census::enabled() {
+            crate::number::census::tally(CENSUS_RELAXED, 1);
+            if read.halvings.len() == ticks && read.halvings.last().is_some_and(Option::is_some) {
+                crate::number::census::tally(CENSUS_ALL_TICKS, 1);
             }
         }
         read.last = cell.phi;

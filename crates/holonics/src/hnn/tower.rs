@@ -282,7 +282,9 @@ fn fit32(x: i128, what: &'static str) -> Result<i32> {
     i32::try_from(x).map_err(|_| TowerError::Refused(what))
 }
 
+#[track_caller]
 fn fit64(x: i128) -> Result<i64> {
+    crate::number::census::reach_here(&x);
     i64::try_from(x).map_err(|_| TowerError::Refused("a released value outgrew its 64-bit carrier"))
 }
 

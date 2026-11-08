@@ -48,6 +48,7 @@
 //! ```
 
 mod accumulation;
+pub mod census;
 mod closing;
 mod inverse;
 mod register;
