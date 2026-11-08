@@ -2801,6 +2801,11 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
         Err(_) => 0,
     };
     learner.coin_measure = std::env::var_os("FIELD_COIN_MEASURE").is_some();
+    // [definition; the unified-theory reading of November 7, 23:34] `FIELD_WIDEN=CAP`: the width law at its share (a state that
+    // carries a `widen` line keeps its own share where this is unset).
+    if let Ok(v) = std::env::var("FIELD_WIDEN") {
+        learner.field.widen = Some(v.parse().map_err(|_| "FIELD_WIDEN is the classes' share".to_string())?);
+    }
     let coin_tau: Option<u32> = match std::env::var("FIELD_CONTRAST_COIN") {
         Ok(v) => Some(v.parse().map_err(|_| "FIELD_CONTRAST_COIN is the tolerance's bits".to_string())?),
         Err(_) => None,

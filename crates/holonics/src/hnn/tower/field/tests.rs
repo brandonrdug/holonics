@@ -2762,3 +2762,42 @@ fn the_coins_measure_changes_nothing_and_orders_its_tolerances() {
     assert!(m.kept.windows(2).all(|w| w[0] <= w[1]), "finer tolerances keep more reverses: {m:?}");
     assert!(m.v_coin.windows(2).all(|w| w[0] >= w[1]), "coarser tolerances add more variance: {m:?}");
 }
+
+/// [definition; the unified-theory reading of November 7, 23:34] **The width law's lists**: with a share no class exceeds, the
+/// widened lists are the base lists, runs and probes in their order; with a small share every leaf past the base holds at
+/// most the share's definite sources or has spent its modes, every site sits in one leaf, and a receiver never probes its own.
+#[test]
+fn the_width_laws_lists_split_only_past_the_share() {
+    let (sites, modes, b) = (300usize, 8usize, 4usize);
+    let word = |t: usize, salt: u64| -> Vec<(i64, i64)> {
+        (0..modes)
+            .map(|li| {
+                let z = (t as u64 * 2654435761 + li as u64 * 40503 + salt).wrapping_mul(0x9E37_79B9_7F4A_7C15);
+                // A skew: most sites share the first modes' shells, so a few base classes are crowded.
+                let (re, im) = if li < b && t % 5 != 0 { (100, 3) } else { (((z >> 7) % 201) as i64 - 100, ((z >> 23) % 201) as i64 - 100) };
+                (re, im)
+            })
+            .collect()
+    };
+    let keys: Vec<Vec<(i64, i64)>> = (0..sites).map(|t| word(t, 1)).collect();
+    let probes_of: Vec<Vec<(i64, i64)>> = (0..sites).map(|t| word(t, 2)).collect();
+    let definite: Vec<bool> = (0..sites).map(|t| t % 7 != 3).collect();
+    let (wide, leaves) = ClassLists::widened(&keys, &probes_of, definite.clone(), b, sites);
+    let base = |w: &[(i64, i64)]| -> u32 { (0..b).rev().fold(0u32, |c, li| 3 * c + shell(w[li].0, w[li].1)) };
+    let plain = ClassLists::of(keys.iter().map(|w| base(w)).collect(), definite.clone(), 81)
+        .probing(probes_of.iter().map(|w| base(w)).collect(), probes_of.iter().map(|w| probes(w[..b].iter().copied(), band_bits(b))).collect());
+    assert_eq!(leaves, 81);
+    assert_eq!(wide, plain);
+    let cap = 10;
+    let (narrow, leaves) = ClassLists::widened(&keys, &probes_of, definite.clone(), b, cap);
+    assert!(leaves > 81, "a crowded class splits");
+    for c in 0..leaves {
+        let def = (narrow.off[2 * c + 1] - narrow.off[2 * c]) as usize;
+        let all = (narrow.off[2 * c + 2] - narrow.off[2 * c]) as usize;
+        assert!(def <= cap || all > 0, "leaf {c}");
+    }
+    assert_eq!(narrow.members.len(), sites);
+    for i in 0..sites {
+        assert!(!narrow.probes[i].contains(&narrow.probe_class[i]), "receiver {i} probes its own leaf");
+    }
+}

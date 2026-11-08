@@ -212,6 +212,11 @@ impl Field {
         let (trits, buckets) = (d.class_trits(), d.classes());
         let (q, pr) = self.energy_words(read, moment, reaches)?;
         let class_of = |word: &[i64], t: usize, h: usize| (0..trits).rev().fold(0u32, |c, li| 3 * c + shell(word[t * m2 + h * n + li], word[t * m2 + m + h * n + li]));
+        // [definition; the unified-theory reading of November 7, 23:34] The width law: each head's lists over its leaves.
+        if let Some(cap) = self.widen {
+            let words = |w: &[i64], h: usize| -> Vec<Vec<(i64, i64)>> { (0..sites).map(|t| (0..n).map(|li| (w[t * m2 + h * n + li], w[t * m2 + m + h * n + li])).collect()).collect() };
+            return Ok((0..heads).map(|h| ClassLists::widened(&words(&q, h), &words(&pr, h), definite.to_vec(), trits, cap).0.keyed(keyed.to_vec())).collect());
+        }
         Ok((0..heads)
             .map(|h| {
                 let class = (0..sites).map(|t| class_of(&q, t, h)).collect();
