@@ -712,6 +712,8 @@ pub struct CardField<'c> {
     phases: Option<std::cell::RefCell<(Instant, std::collections::BTreeMap<&'static str, (u64, u128)>)>>,
     /// The card's own clock around every launch, by entry (`FIELD_EVENTS`, [`CardField::stamp`]).
     stamps: Option<std::cell::RefCell<Stamps<'c>>>,
+    /// The most regions an energy batch holds where declared (`CardField::energy_batch_regions`, a reading).
+    batch_regions: Option<usize>,
 }
 
 /// [measurement; agent-inferred, November 7] **Each launch timed on the card's own clock** (`CardField::stamp`, a reading
@@ -740,7 +742,7 @@ impl<'c> CardField<'c> {
         let (free, total) = (memory.free_bytes as u64, memory.total_bytes as u64);
         let used = total.saturating_sub(free);
         let budget = free.min(BOARD_CEILING.saturating_sub(used)).saturating_sub(MARGIN);
-        Ok(Self { card, module, budget, times: FieldTimes::default(), profile: None, pools: Default::default(), held_questions: Default::default(), covector_shares: Default::default(), row_questions: Default::default(), row_out: Default::default(), row_cov: Default::default(), held_cells: Default::default(), tick_reads: Default::default(), near_sites: Default::default(), near_out: Default::default(), clock_sites: Default::default(), clock_out: Default::default(), phases: None, stamps: None })
+        Ok(Self { card, module, budget, times: FieldTimes::default(), profile: None, pools: Default::default(), held_questions: Default::default(), covector_shares: Default::default(), row_questions: Default::default(), row_out: Default::default(), row_cov: Default::default(), held_cells: Default::default(), tick_reads: Default::default(), near_sites: Default::default(), near_out: Default::default(), clock_sites: Default::default(), clock_out: Default::default(), phases: None, stamps: None, batch_regions: None })
     }
 
     /// Time every launch on the card's own clock from here on ([`Stamps`]).

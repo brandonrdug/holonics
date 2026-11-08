@@ -709,7 +709,8 @@ fn the_tensor_cores_score_tangent_is_the_scalar_one_at_the_carriers_extremes() {
 /// [definition; the unified-theory reading of November 7, 23:34] **The width law on the card is the host's**: with a share small
 /// enough to split the founded line's classes, the card's lists are the host's own (`ClassLists::widened`, built on the host from
 /// the card's opening words), so `∂G/∂θ` and `G` of a batch of 400 + 900 + 1,500 sites, and the faces at an open structure, are
-/// bit-equal to the host's.
+/// bit-equal to the host's. [agent-inferred, November 8] Read again one region a batch, each batch's opening and leaves formed
+/// while the batch before it runs (`CardField::energy_stream`), every bit is still the host's.
 #[test]
 #[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
 fn the_width_law_on_the_card_is_the_hosts() {
@@ -738,10 +739,22 @@ fn the_width_law_on_the_card_is_the_hosts() {
     );
     assert!(diff.is_none(), "{}", diff.unwrap_or_default());
     assert!(reference.iter().zip(&unwidened).any(|(r, &u)| r.1 != u), "the share splits some class (else the test reads nothing)");
+    let host: Vec<_> = regions.iter().map(|r| field.energy_faces_read(r).unwrap()).collect();
     let (faces, g) = card.read_energy_faces(&field, &regions).unwrap();
-    for (k, r) in regions.iter().enumerate() {
-        let (hf, hg) = field.energy_faces_read(r).unwrap();
-        assert_eq!(hg, g[k], "region {k}: G");
-        assert_eq!(hf, faces[k], "region {k}: faces");
+    for (k, (hf, hg)) in host.iter().enumerate() {
+        assert_eq!(*hg, g[k], "region {k}: G");
+        assert_eq!(*hf, faces[k], "region {k}: faces");
+    }
+    // One region a batch: each batch's opening and leaves formed beside the batch before it.
+    card.energy_batch_regions(Some(1));
+    let before = card.times().batches;
+    let streamed = card.energy_material(&field, &regions).unwrap();
+    assert_eq!(card.times().batches - before, regions.len() as u64, "one region a batch");
+    let diff = material_difference(&field, &reference, &streamed);
+    assert!(diff.is_none(), "streamed: {}", diff.unwrap_or_default());
+    let (faces, g) = card.read_energy_faces(&field, &regions).unwrap();
+    for (k, (hf, hg)) in host.iter().enumerate() {
+        assert_eq!(*hg, g[k], "streamed region {k}: G");
+        assert_eq!(*hf, faces[k], "streamed region {k}: faces");
     }
 }
