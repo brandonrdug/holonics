@@ -2874,9 +2874,9 @@ fn the_unigram_steps_toward_its_expected_counts_on_carried_sums() {
     // the step is 2^(−3) of it: −5,544,568 (to the logarithm's grain).
     let want = -44_356_546i128 >> 3;
     assert!((du[1] - want).abs() < 64, "{} against {want}", du[1]);
-    // The mass moves by Δc/T: log₂ M_1 = 1 − 1.3219/8 bits.
+    // The mass moves by Δc/T (Δc·inverse on c's 2^(−16) over 2^(−24) gives log₂ on 2^(−32) after 2^8): log₂ M_1 = 1 − 1.3219/8 bits.
     let moved = carry.mass[1].unwrap() - one;
-    assert!((moved - ((-1.3219_f64 / 8.0) * one as f64) as i128).abs() < (one >> 12), "{moved}");
+    assert!((moved - ((du[1] * inverse) >> 8)).abs() < 1 << 10, "{moved} against {}", (du[1] * inverse) >> 8);
     // A second section carries on: the counts double and the mass of letter 0 grows by its new two places.
     let before = carry.mass[0].unwrap();
     section().finish(&mut carry, inverse, &field.fine).unwrap();
