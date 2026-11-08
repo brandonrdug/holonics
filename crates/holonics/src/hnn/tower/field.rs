@@ -5076,8 +5076,8 @@ impl UnigramSection {
     /// zero). Applied, the bias steps by `Δc_a = 2^(−3) T log₂(N*_a/M_a)` on c's `2^(−16)` (`inverse` = `1/T` on `2^(−24)`),
     /// `N*` Good–Turing's on the carried counts (`(r + 1) N_(r+1)/N_r` while both classes are filled, the letter's own count
     /// past that), normalized to the carried places; both sums come from the same places, so each section's own content
-    /// cancels. The step re-bases the mass it moves, `M_a ← M_a 2^(Δc_a/T)`. In shadow (not applied) the sums are carried and
-    /// no step is formed; a letter not yet seen holds while no letter has been seen once.
+    /// cancels. The mass is re-based after the deposit by what c actually did (theory, 13:59), not here. In shadow (not
+    /// applied) the sums are carried and no step is formed; a letter not yet seen holds while no letter has been seen once.
     fn finish(self, carry: &mut UnigramCarry, inverse: i128, fine: &Exponential) -> Result<Option<Vec<i128>>> {
         let log2 = |v: i128| super::log2_reading_at(v.max(1) as u128, ENERGY_BITS);
         for (c, n) in carry.counts.iter_mut().zip(&self.counts) {
@@ -5131,7 +5131,6 @@ impl UnigramSection {
             let ratio = log2_n - lm;
             // Δc = 2^(−3) T·2^16·ratio/2^32 = (ratio·2^8/inverse) >> 3 (inverse on 2^(−24)); the mass moves by Δc/T = ratio/8.
             du[a] = div_nearest(ratio << 8, inverse.max(1)) >> 3;
-            carry.mass[a] = Some(lm + (ratio >> 3));
         }
         Ok(Some(du))
     }
@@ -5150,6 +5149,31 @@ pub struct UnigramCarry {
 impl UnigramCarry {
     pub fn new(alphabet: usize, applied: bool) -> Self {
         Self { counts: vec![0; alphabet], mass: vec![None; alphabet], applied }
+    }
+
+    /// The mass put back on the carried places: every read letter's `log₂ M_a` shifted alike so that `Σ_a M_a` is the count
+    /// of places carried (the shares sum to one at every place; the shift is a common move of c, a gauge).
+    fn normalize(&mut self, fine: &Exponential) -> Result<()> {
+        let log2 = |v: i128| super::log2_reading_at(v.max(1) as u128, ENERGY_BITS);
+        let Some(top) = self.mass.iter().flatten().copied().max() else { return Ok(()) };
+        let floor = -((MATERIAL_BITS as i128 - 1) << MATERIAL_BITS);
+        let mut below = 0i128;
+        for &m in self.mass.iter().flatten() {
+            let shift = (m - top) >> (ENERGY_BITS - MATERIAL_BITS);
+            if shift > floor {
+                below += temperature_of(shift as i32, fine)?;
+            }
+        }
+        let log2_sum = top + log2(below) - ((MATERIAL_BITS as i128) << ENERGY_BITS);
+        let places: i128 = self.counts.iter().map(|&c| c as i128).sum();
+        if places == 0 {
+            return Ok(());
+        }
+        let shift = log2(places << 32) - (32i128 << ENERGY_BITS) - log2_sum;
+        for m in self.mass.iter_mut().flatten() {
+            *m += shift;
+        }
+        Ok(())
     }
 }
 
@@ -6919,8 +6943,25 @@ impl FieldLearner {
         if let (Some(acc), Some(carry)) = (unigram_acc.take(), self.unigram.as_mut()) {
             self.unigram_step = acc.finish(carry, inverse, &self.field.fine)?;
         }
+        let bias_before = self.unigram.as_ref().map(|_| {
+            let start = self.field.layout.read_bias;
+            self.field.theta[start..start + alphabet].to_vec()
+        });
         let raw = g.clone();
         let (deposited, predicted, transfer, external) = self.deposit(g)?;
+        // [definition; theory, November 8 13:59] The carried mass follows what c actually did: each letter's mass re-based by
+        // the realized change of its bias, log₂ M_a += Δc_a/T, in both modes (in shadow c moves by the moments), then put back
+        // on the carried places (Σ_a M_a = places, a common shift of c, a gauge).
+        if let (Some(before), Some(carry)) = (bias_before, self.unigram.as_mut()) {
+            let start = self.field.layout.read_bias;
+            for (a, &b) in before.iter().enumerate() {
+                let dc = self.field.theta[start + a] as i128 - b as i128;
+                if let Some(m) = carry.mass[a].as_mut() {
+                    *m += (dc * inverse) >> 8;
+                }
+            }
+            carry.normalize(&self.field.fine)?;
+        }
         let predictions: Vec<Option<i64>> = match &self.last {
             Some(now) if deposited => self.field.families_all().iter().map(|&fam| predicted_change_family(&self.field, &raw, &now.step, now.halvings, fam)).collect(),
             _ => vec![None; transfers.len()],

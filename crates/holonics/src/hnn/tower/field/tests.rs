@@ -2846,7 +2846,7 @@ fn the_carried_release_adds_up_what_each_step_releases_to_zero() {
 
 /// [definition; theory, November 8 13:44] **The unigram law's carried sums**: a letter its carried shares under-read against
 /// its expected count steps up, one they over-read steps down, at 2^(−3) of the log ratio; a letter not yet seen holds while
-/// no letter has been seen once; the step re-bases the mass it moves; in shadow the sums carry and no step is formed.
+/// no letter has been seen once; in shadow the sums carry and no step is formed.
 #[test]
 fn the_unigram_steps_toward_its_expected_counts_on_carried_sums() {
     let field = energetic_line();
@@ -2867,6 +2867,14 @@ fn the_unigram_steps_toward_its_expected_counts_on_carried_sums() {
     assert_eq!(shadow.counts, vec![3, 1, 0, 0]);
     // Letters 0 and 1 each carry a mass of two places (log₂ 2 = 1 bit on 2^(−32)), to the logarithm's grain.
     assert!((shadow.mass[0].unwrap() - one).abs() < 64 && (shadow.mass[1].unwrap() - one).abs() < 64, "{:?}", shadow.mass);
+    // Put back on its 4 places: letters 0 and 1 hold 2 places each and letters 2 and 3 a 2^(−39) share, so the shift is
+    // under the logarithm's grain; and a mass moved by a common amount returns to its places.
+    shadow.normalize(&field.fine).unwrap();
+    assert!((shadow.mass[0].unwrap() - one).abs() < 64, "{:?}", shadow.mass);
+    let mut moved = shadow.clone();
+    moved.mass.iter_mut().flatten().for_each(|m| *m += 3 * one);
+    moved.normalize(&field.fine).unwrap();
+    assert!(moved.mass.iter().zip(&shadow.mass).all(|(a, b)| (a.unwrap() - b.unwrap()).abs() < 64), "{:?} {:?}", moved.mass, shadow.mass);
     let mut carry = UnigramCarry::new(4, true);
     let du = section().finish(&mut carry, inverse, &field.fine).unwrap().unwrap();
     assert!(du[0] > 0 && du[1] < 0 && du[2] > 0 && du[2] == du[3], "{du:?}");
@@ -2874,9 +2882,8 @@ fn the_unigram_steps_toward_its_expected_counts_on_carried_sums() {
     // the step is 2^(−3) of it: −5,544,568 (to the logarithm's grain).
     let want = -44_356_546i128 >> 3;
     assert!((du[1] - want).abs() < 64, "{} against {want}", du[1]);
-    // The mass moves by Δc/T (Δc·inverse on c's 2^(−16) over 2^(−24) gives log₂ on 2^(−32) after 2^8): log₂ M_1 = 1 − 1.3219/8 bits.
-    let moved = carry.mass[1].unwrap() - one;
-    assert!((moved - ((du[1] * inverse) >> 8)).abs() < 1 << 10, "{moved} against {}", (du[1] * inverse) >> 8);
+    // The mass is not re-based here: the deposit re-bases it by what c actually did (theory, 13:59).
+    assert!((carry.mass[1].unwrap() - one).abs() < 64, "{:?}", carry.mass);
     // A second section carries on: the counts double and the mass of letter 0 grows by its new two places.
     let before = carry.mass[0].unwrap();
     section().finish(&mut carry, inverse, &field.fine).unwrap();
