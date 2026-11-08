@@ -141,7 +141,7 @@ Sol's own records are on the branch:
 
 `[definition; agent-inferred]`
 
-- **F0, transfer across families, now gates F4's curated release and F5** ([THE_REBUILD](../../docs/plans/THE_REBUILD.md#f0-the-predictor-on-unseen-families-the-releases-gate-73-148)).
+- **F0, transfer across families, now gates F4's curated release and F5** ([THE_REBUILD](https://github.com/brandonrdug/holonics/blob/0a051ae5/docs/plans/THE_REBUILD.md#f0-the-predictor-on-unseen-families-the-releases-gate-73-148)).
   - Its first loop is a diagnosis from the existing run: which families and which components lose
     on the validation passage.
   - Its acceptance is on a fresh development split never used for a diagnostic: charged code

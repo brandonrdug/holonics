@@ -8,7 +8,7 @@ the optimal policy and the diameter, in line with Möbius strips and trefoil
 knots as intersecting strings; "God's Algorithm is equivalent to our navigator I think, the aeons and
 lengths are related to what would traditionally be the diameter; we respect General Relativity,
 spatial and temporal and higher dimensions and derivatives." This record states what is exact, what
-is an image, and what it adds to the [unified plan](../../docs/plans/THE_REBUILD.md#the-unified-plan-september-28).
+is an image, and what it adds to the [unified plan](https://github.com/brandonrdug/holonics/blob/0a051ae5/docs/plans/THE_REBUILD.md#the-unified-plan-september-28).
 Checked items were verified exactly before writing; the rest are cited.
 
 ## 1. The optimal policy and the diameter

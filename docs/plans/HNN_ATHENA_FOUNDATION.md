@@ -1,8 +1,10 @@
 # HNN and Athena: the common foundation and its consuming joins
 
-**Status, October 9:** the pause recorded below ended on October 8, when Brandon handed the lead to
-Claude; Epime coordinates and reviews. The order lives in [THE_REBUILD](THE_REBUILD.md), and the
-briefs of §7 are Claude's to take up or retire.
+**Status, November 7:** a historical supplement. Its mathematics (§§1–5) stays cited by the guides
+and records; its consumer table, briefs and issue drafts (§§6–8) are the October 4 record.
+[THE_REBUILD](THE_REBUILD.md) holds the order and [CONSTRUCTION_STATE](../../CONSTRUCTION_STATE.md)
+the position. The pause recorded below ended on October 8, when the lead passed to Claude, with
+Epime coordinating and reviewing.
 
 **Date:** October 4, 2026 (morning source reconciliation). **Disposition:** local consolidation; Claude paused;
 no training, external issue mutation, push or merge. **Refs:** [#63](https://github.com/brandonrdug/holonics/issues/63),
@@ -53,7 +55,7 @@ The source enters as phase-carried moments. An actual ratio comparison returns i
 covector through the operands that produced the motion, and certified deposition
 changes the reached constitution. The existing
 [continuation chain](../../crates/holonics/src/hnn/word/continuation.rs) carries a
-contact-C change into the next exact propagation with momentum held. Pumps also supply
+contact-C change into the next propagation with momentum held. Pumps also supply
 declared time-dependent material. General coefficient/geometry adaptation must extend
 this same chain, including its work and adjoint. Existing
 [clocked first arrival](../../lean/Holonics/Computation/HolonicRecurrentEcology.lean)
@@ -69,7 +71,7 @@ finite storage change and keep affine source cross/self work. In FrameTransport,
 `tube_section_hasFDerivAt`, `tube_section_fderiv_first`, `tube_section_fderiv_second`,
 `tube_section_actual_area` and `tube_section_actual_flux` derive and consume its actual
 polynomial section derivative. Complete-owner and combined-import checks passed in the
-isolated snapshot; the canonical local sources now match those exact checked bytes and
+isolated snapshot; the canonical local sources now match those checked bytes and
 remain imported by `Framework/Geometry`. These joins prevent a picture or coordinate
 change from standing in for producing geometry or material work. Full moving-volume
 continuity and a native physical receiving decoder remain separate consuming equations.
@@ -108,12 +110,12 @@ record links plus three blank lines**. Its separate atlas correction replaces th
 superseded hnn.resident-passage row instead of duplicating it and awaits independent
 review. This is still a sparse source snapshot, not a complete Cargo source closure.
 Add needed native owners verified from that same tree here before coding; frozen
-native-ready and the old root remain preserved. Each owner then returns its exact
+native-ready and the old root remain preserved. Each owner then returns its whole
 change and consumer receipt on this base.
 
 | Gate | Current state and evidence limit | Next owned change and fixed acceptance |
 |---|---|---|
-| One source and a legitimate native check | Nine declarations have complete-owner/import checks and shared source bindings on 9a; cached dependencies were sealed, not rebuilt. The V3 normal host library, cfg(test) host library and resident_cold_restore integration target pass static checks on the exact candidate Rust bytes. Two full-codegen stages and the first V3 static stage stopped; no executable or fixture runtime is established. | Admission/pruning owner locates codegen cost and changes the lawful owner/check partition, retaining actual consuming calls. Changed source/cache/config and each selected check need their own sealed fixed cost read. No further codegen retry, borrowed executable or raised ceiling follows automatically. Complete the native source closure in this same 9a snapshot; static compilation does not pass the runtime acceptance. |
+| One source and a legitimate native check | Nine declarations have complete-owner/import checks and shared source bindings on 9a; cached dependencies were sealed, not rebuilt. The V3 normal host library, cfg(test) host library and resident_cold_restore integration target pass static checks on the same candidate Rust bytes. Two full-codegen stages and the first V3 static stage stopped; no executable or fixture runtime is established. | Admission/pruning owner locates codegen cost and changes the lawful owner/check partition, retaining actual consuming calls. Changed source/cache/config and each selected check need their own sealed fixed cost read. No further codegen retry, borrowed executable or raised ceiling follows automatically. Complete the native source closure in this same 9a snapshot; static compilation does not pass the runtime acceptance. |
 | Future-sufficient host save and cold card continuation | V3 sources carry bounded Arrived, held address-reader kinds, the declaring family, optional/no-moment state and chosen handles/readings. Exhausted host handles and invalid nonempty/empty-window cursors refuse in the checked source. Patch applicability and normal/cfg(test)/integration static validation pass; runtime equivalence remains open. Card ExposedResident::continuing remains unimplemented. | Existing restore owner consumes the prepared regressions at reference.rs, reference/passage.rs, pending.rs, receiving.rs, moment.rs and resident_cold_restore.rs under an independently admitted changed native partition, then extends the same state relation to the card. Immediate close, ingest→carry-out→close and no-moment/empty-family cold cases must match without live borrowing; checksum-valid malformed shape/rank/targets, exhausted handles and invalid cursors must refuse before publication. Preserve nonempty stimulus gates; the held-kind fixture proves serialization only until an actual production-deposition crossing runs. |
 | Whole refusal-state publication | The opening-only card patch protects one operand projection. The finite model and prepared card fixture omit live chart/operator/store and landmark effects; they cannot certify whole Resident atomicity. | At card `port.rs`, `store.rs`, `tree.rs`, prepare detached candidate chart/operator buffers and landmark mirror, with actual capacity/copy residency accounted for. Publish all owners only after fallible reads succeed. Inject reread/refinement/tree/receipt refusals and preserve committed material, carry, charts/operators, arena and balance; report attempted exterior traffic/work. Preserve the mirror invariant; moving a fallible upload alone cannot prove it. |
 | Signed phase return at the declared boundary | `word.rs` carries transmission but reads reflection through scalar energy. An energy-preserving sign change can alter the later phase face. The independent boundary Lean draft remains unelaborated. | Declare the actual reflected-wave receiver and consume the complex return, or certify its matched absorption relation. At `ReceptionCarry` and its next receiver, check oriented effort/flow and work plus an actual later phase reading. The existing sign/quarter-turn witness must separate the defective return; scalar energy alone cannot pass. |
@@ -163,7 +165,7 @@ mounts the saved constitution and carry, then restores its passage. The actual
 consumer carries lift, open source moment, aeon, balance, charts, address and admitted ranks.
 It refuses pending ratios/staged deposits, stopped deposition and more than one open moment.
 The [saved-passage fixture](https://github.com/brandonrdug/holonics/blob/9a62a68515ebc824d583539e53b1a2d5973a82a3/crates/holonics/src/hnn/tests/reference.rs)
-round-trips the exact text, mounts on the same declared founding field, and checks continuation
+round-trips the text losslessly, mounts on the same declared founding field, and checks continuation
 against the whole run across aeon close. Malformed moment text refuses. This is a real host
 join; its admitted cut/window and refusal scope remain part of its claim. No fresh Rust
 execution is claimed by this foundation step. PR #353 merged as `ec659feb`; its independently
@@ -204,7 +206,7 @@ The source, current, producing constitution, comparison, reached deposit, end ch
 and next clock are bound by the owner. The focused
 [`reference/continuation.rs`](../../crates/holonics/src/hnn/reference/continuation.rs) consumer
 changes contact **C**; K, D, coupling conductance, ring, pump and source/receiver declarations
-remain fixed in that example. A later exact propagation responds; the lattice counterpart retains
+remain fixed in that example. A later propagation responds; the lattice counterpart retains
 changed solve remainders even when its next representative is unchanged. This is a real native
 learning/continuation join, with bounded scope. It is not a fully adapting constitution or a
 complete durable production `Resident` acceptance. The newer passage owner above supplies a
@@ -298,7 +300,7 @@ At a material change with unchanged physical state,
 `W_dep=E_Θ'(x)−E_Θ(x)=½x*(Q_Θ'−Q_Θ)x`. At a simultaneous coordinate rechart use
 `E_Θ'(P x)−E_Θ(x)` with the transformed material; a pure rechart has zero material work.
 `ContinuationReceipt` already separates `before`, `committed`, `deposition_work`, `opening`
-and `opening_difference`. Its exact identity is
+and `opening_difference`. Its identity is
 `committed−before=deposition_work`. Broader ring/pump/source changes need transported state
 and a new consumer; they cannot be silently admitted as contact changes.
 
@@ -307,7 +309,7 @@ and a new consumer; they cannot be silently admitted as contact changes.
 [proved-derived; formal-checked in isolated development] Two checked statements target
 existing [`Geometry/Motion`](../../lean/Holonics/Geometry/Motion.lean):
 `finite_work_form_rechart` and `affine_quadratic_work`. The isolated development module compiles
-without warnings or `sorryAx`. The exact reviewed source is now inserted in the local owner;
+without warnings or `sorryAx`. The reviewed source, unchanged, is now inserted in the local owner;
 its complete-owner and combined-import checks are recorded in the
 [finite-work record](../../research/records/2026-10-04_FINITE_STEP_WORK_AND_GAIN_TRANSPORT_BETWEEN_ENDPOINT_CHARTS.md#complete-actual-owner-and-combined-import-checks-october-4).
 For
@@ -321,7 +323,7 @@ F = TᵀG1T−G0,         F_hat = V0ᵀ F V0,
 The chart identity needs only the ending left inverse; symmetry belongs to the affine
 cross-term equality. A real gain certificate transports by the same congruence, with
 initial invertibility needed for its reverse implication. Material work, source work and
-an unresolved opening residual remain separate operands. Seven exact rational fixtures
+an unresolved opening residual remain separate operands. Seven rational fixtures
 include a present-silent, future-visible quarter-turn: energy neutrality is not retention.
 
 [derived; pointwise area/current algebra formal-checked in isolated development] A smooth
@@ -348,7 +350,7 @@ its actual `HasFDerivAt`, identify both `fderiv` coordinate columns, and derive
 `tube_section_actual_area` and `tube_section_actual_flux` by consuming those same columns.
 The fixed-spine-position polynomial derivative needs no positivity, embedding or C2 spine
 hypothesis; c, frame, a, b and ε are constant in that transverse proof. All five audits use
-only `propext`, `Classical.choice`, `Quot.sound`, without warnings/errors/`sorryAx`. The exact
+only `propext`, `Classical.choice`, `Quot.sound`, without warnings/errors/`sorryAx`. The
 source hash is `0af342373beaff8bd637c23803180897b14a758e408beb4f76968b0967bdb66d`.
 The longitudinal derivative, full 3D cofactor/Piola and moving continuity theorem remain
 derived rather than formalized. Their existing analytic destination is
@@ -358,9 +360,9 @@ continuity current j, the derived relative section flux is
 `j_hat^s=ab(1+εu)(1+2εu)(j−ρw)·t`. An HNN consumer still owes its ring/contact-to-tube
 decoder, material law and independently computed physical work.
 
-### Exact dimensions and the decoder square
+### Dimensions and the decoder square
 
-[derived and exact-witness checked; native decoder proposed] The authoritative dimensional
+[derived and rational-witness checked; native decoder proposed] The authoritative dimensional
 owner is [`Physics/HolonicTypedOriginDimensions`](../../lean/Holonics/Physics/HolonicTypedOriginDimensions.lean):
 source and receiver time exponents remain distinct; their conventional time shadow is
 noninjective. Unit agreement does not replace clock, branch, orientation, quantity role or family.
@@ -389,7 +391,7 @@ The proposed consumer square is
 `decode_1(T_num encode_0(x_phys)+b_num)=T_phys x_phys+b_phys`; it preserves affine
 source cross/self work. No physical `encode/decode` consumer was found in `transit_solve`.
 
-The small scratch checker uses exact rational exponents and `Fraction` witnesses outside HNN.
+The small scratch checker uses rational exponents and `Fraction` witnesses outside HNN.
 Its fixed 8-second receipt passes in 3,003,190 ns with peak RSS 16,276 KiB. It refuses floats,
 wrong units/quantity roles, reversed area orientation, doubled C normalization, another
 admissible family's area (`1` versus `45/32`), substituted source clock, phase branch and carry.
@@ -434,7 +436,7 @@ not an authored task solution. The current native quadratic contact owner does n
 this quartic specialization.
 
 For fixed Θ in canonical coordinates `(u,p)`, put
-`E_Θ=½pᵀC⁻¹p+Σ_contacts V_Θ(z)` and compose the two exact shears
+`E_Θ=½pᵀC⁻¹p+Σ_contacts V_Θ(z)` and compose the two shears
 `u'=u+hC⁻¹p`, `p'=p−h∇V_Θ(u')`. Each is symplectic on its stated Euclidean domain;
 the composition is nonlinear when α or β participates. It does not automatically conserve
 E at finite h: retain `E_Θ(u',p')−E_Θ(u,p)` as its discrete defect, or use another certified
@@ -462,7 +464,7 @@ phase interference keep their distinct receiving laws while those transforms int
 [executable, source-inspected] The scalar torsional realization of
 [`hnn/propagation.rs`](../../crates/holonics/src/hnn/propagation.rs) has angle u, rate w,
 inertia C, torsion stiffness K, damping D, step h and two oppositely oriented wave ports of
-impedance `1/G_c`. For inputs a,b its exact midpoint law is
+impedance `1/G_c`. For inputs a,b its midpoint law is
 
 ```text
 M = 2C + 2h/G_c + hD + h²K/2,
@@ -477,9 +479,9 @@ E⁺−E + hDω² = (hG_c/4)(a²+b²−a_out²−b_out²).
 `a−b−(2/G_c+D)ω`, which is exactly the right-hand wave difference less the damping term.
 The vector law retains the actual solve/split defect. Owners:
 [`HNN/Propagation.transit_balance`](../../lean/Holonics/HNN/Propagation.lean),
-`transit_solve`, `transit_update`, `transit_defect`. A source-grounded exact-fraction C1/C4
-demonstration compares configured inertia; it is neither learned material nor a new Rust run.
-Display interpolation is not the exact continuous ODE solution.
+`transit_solve`, `transit_update`, `transit_defect`. A source-grounded C1/C4 demonstration in
+rationals compares configured inertia; it is neither learned material nor a new Rust run.
+Display interpolation is not the continuous ODE solution itself.
 
 The phase port also needs its own pairing. A complex nonzero channel carries amplitude,
 phase and winding; for the target ratio,
@@ -526,7 +528,7 @@ material-work terms; the displayed specialization does not omit them by assuming
 Spatially varying mass/stiffness/tension changes characteristic transport. A still, unloaded
 body with no supplied energy cannot manufacture a crack. Initial storage, handle work, tip
 transfer to air and acoustic reception all remain in the joined balance. Slow taper may give a
-low-reflection approximation under a stated scale separation; it does not give exactly zero
+low-reflection approximation under a stated scale separation; it does not give zero
 reflection. An HNN consumer needs the explicit rod-to-contact/tube map, not only a drawn taper.
 
 ### Compose reception energy without subtracting the source twice
@@ -591,7 +593,7 @@ Owners: [`Foundation/CausalRelevance`](../../lean/Holonics/Foundation/CausalRele
 [`Holarchy/Hearing`](../../lean/Holonics/Holarchy/Hearing.lean). The
 [natural-grain record](../../research/records/2026-09-25_THE_NATURAL_GRAIN_IS_THE_FUTURE_QUOTIENT_AND_REFLECTION_INTEGRATES_A_FRACTAL_PACKING.md)
 joins this to compression. A finite grain reports carry, phase class and unresolved fibre;
-a nonzero reading below its declared resolution is not exact kernel membership.
+a nonzero reading below its declared resolution is not kernel membership.
 
 Time parity has the actual
 [Typst chain definition](../../research/papers/source/mathematics/definitions/causal-time-parity.typ):
@@ -606,7 +608,7 @@ iteration counts do not become epochs or cycles by renaming them.
 [proved, existing Lean] For a fixed specular wall with normal n, the velocity return is
 `v⁺=v−2⟨n,v⟩n/⟨n,n⟩`. Normal motion reverses; tangential motion and speed squared persist.
 [`HolonicsResearch/Transport/Fold`](../../lean/HolonicsResearch/Transport/Fold.lean),
-`Crease.fold_segment_after` and `Crease.bounce_direction`, supply the exact folded-segment
+`Crease.fold_segment_after` and `Crease.bounce_direction`, supply the folded-segment
 law. Fold plus side residual reconstructs the incoming point. Its `2^k` side words count
 restriction fibres, not optical beams or energy divisions. A moving wall, absorption, frequency
 change or rotor-driven optical surface requires the corresponding port-work/material law.
@@ -657,7 +659,7 @@ algebraic cycles. Hodge, complex-fluid continuation and BSD remain attached to t
 operations with their own unresolved source/consumer joins. Independent briefs below contain
 only public premises, with no private proof files or fresh private claims.
 
-## 6. Consumer dependencies and exact acceptance
+## 6. Consumer dependencies and acceptance
 
 These dependencies refine U1/U2/U3/U6/U7/U8; they do not create a competing step sequence.
 
@@ -679,10 +681,10 @@ graph TD
 
 | Join | Existing owner → consuming path | Concrete missing term and acceptance |
 |---|---|---|
-| General transported material return | `word::continuation::ContactCut` → `Word::continuing`; Lean `Holon/Deposition`, `Geometry/Motion` | General state transport for ring/pump/source-map changes, with same-state/material/chart work separated; exact rechart has zero work, material change has the declared work, stale/foreign producer refuses atomically. |
+| General transported material return | `word::continuation::ContactCut` → `Word::continuing`; Lean `Holon/Deposition`, `Geometry/Motion` | General state transport for ring/pump/source-map changes, with same-state/material/chart work separated; a lossless rechart has zero work, material change has the declared work, stale/foreign producer refuses atomically. |
 | Reception chain | `word.rs`, `pending.rs`, `reference.rs`; current `ChainedBalance` | One telescoping admission/flow/deposition balance with cross terms, pump phase and clock carried, then cold restore of the complete admitted continuing state. Independently computed physical trace terms must close and reject a perturbed flux. Overwrite example above must return `3/2`; reset must be a declared dissipative/absorption action. |
 | Adaptive retention | `HNN/ModeQuotient`, `HNN/Retention`, `Foundation/CausalRelevance` → aeon-boundary collapse | `qT=T̄q`, source and receiver squares, deposition/action square or a concrete separator. Present-null witness must survive until its future is admitted or excluded. |
-| Statistical power port | `receiving::receiving_population`, `receiver::population::port` → `Field::holarchy` | Storage, units, clock, element and interface map with power-preserving join or exact defect. A Bayes/code telescope alone cannot pass. |
+| Statistical power port | `receiving::receiving_population`, `receiver::population::port` → `Field::holarchy` | Storage, units, clock, element and interface map with power-preserving join or its whole defect. A Bayes/code telescope alone cannot pass. |
 | Intrinsic nonlinear dynamics | `FirstArrival` and current ring/contact laws → actual native evolution | A native recurrence whose nonlinear term participates in the same forward and complete pullback; moving receiving family and branch/first-arrival consumer. A fixed linear recurrence with decorated fractal display fails. |
 | Joint release | `hnn::prediction`, `hnn::executed`, `hnn::ratio`, `receiver::release` | One compatible source fibre for the whole requested boundary, complete producing-operand adjoint and certified deposition; autonomous continuation read from that state. Teacher forcing cannot pass joint release. |
 | Resident continuation | Host `reference/passage.rs` and `ContinuingState` → `mount_continued`; card `ExposedResident::continuing` → execution port | Review saved state for its admitted future, boundary/refusal and cold-mount relation; implement actual card passage restore (the default returns None), then parity for that same relation. Preserve certified commuting region partition and capacity-derived launch. A generic GPU pass is not that restore join. |
@@ -699,7 +701,7 @@ conversation, with private data kept out of the repository.
 
 ### Morning source-to-plan reconciliation and the next bounded consumer
 
-[agent-inferred; source-grounded order] The takeover inventory and exact `9a62a685` source
+[agent-inferred; source-grounded order] The takeover inventory and the `9a62a685` source
 change the concrete owed term, while THE_REBUILD remains the order. Saved **whole material
 plus passage** now has a host consumer and same-cut continuation fixture; review future
 sufficiency/refusals rather than proposing it from scratch. Releasing collapse now releases the
@@ -715,7 +717,7 @@ consumer, retaining same family/frame/clock, and reject a stale/foreign producer
 and a perturbed independently computed flux. The boundary circulation/phase-return/held-deposit
 proof lane remains disjoint, source-only and unelaborated under its current import contract.
 No expensive run substitutes for this invariant, and no inactive queue authorizes a run.
-Source integration and exact runner admission are required before execution; this morning step
+Source integration and runner admission are required before execution; this morning step
 launches none. The five new geometry lemmas supply the actual derivative-to-area relation, with
 the native physical decoder and full moving-volume theorem still owed.
 
@@ -723,7 +725,7 @@ Athena's current public F4 output remains incomplete/non-legible and F5's diagno
 spent. F2's field gate reports a shorter charged code but `107 rem 21` ms per window, 46 times
 its passage budget: the field stays dormant for text. These are inherited source measurements,
 not new timings or a ceiling on adaptive dynamics. Efficiency work must first identify the
-actual owner/partition/reduction and retain exact residuals; the 20 W ideal is still a target.
+actual owner/partition/reduction and retain whole residuals; the 20 W ideal is still a target.
 No fresh evaluation family is read, no authored routine supplies an answer, and no product
 acceptance is inferred from restore or law fixtures.
 
@@ -757,17 +759,17 @@ with the reductions above. Return a rival derivation or counterexample when its 
    Deliver initial storage, handle wrench power, taper/constitutive terms, terminal transfer
    and receiving return as one balance, with an explicit rod-to-contact map or its residual.
    Falsify a zero-energy launch, an unmatched branch, a rapidly varying taper and a moving tip.
-   Accept exact work closure at the supplied boundary and a declared approximation regime
+   Accept work closure without remainder at the supplied boundary and a declared approximation regime
    wherever used. Reconcile with `transit_balance`; no rotor/optical coupling is presumed.
 
 3. **Future observability, natural grain and adaptive retention.** Premises: §4;
    `Standing`, `CausalRelevance`, `RelativeCompleteness`, `Hearing`, `HNN/ModeQuotient` and
    the September 25/26 records. Touches faces/placement, cell holonomy, tube and tower.
-   Compare invariant-kernel reduction, nonlinear future-equivalence and an exact fibre
+   Compare invariant-kernel reduction, nonlinear future-equivalence and a lossless fibre
    construction under changing material. Deliver decoder, transition, source, receiver and
    deposition/action squares, or a separating admitted future. Falsify with the dormant h
    witness, delayed observation, changed receiving map and a quotient that loses a later probe.
-   Accept only future/action sufficiency at the declared grain; never infer exact null from
+   Accept only future/action sufficiency at the declared grain; never infer a null from
    resolution. Reconcile at aeon-boundary collapse and the full-state restore contract.
 
 4. **Actual billiards, nonlinear recurrence and fractal navigation.** Premises: §5; `Fold`,
@@ -783,7 +785,7 @@ with the reductions above. Return a rival derivation or counterexample when its 
 
 5. **HNN continuation and Athena's joint boundary.** Premises: §§1,3,6; actual word/pending/
    reference, ratio and release paths; current public reception-carry owners and
-   `HNN/ChainedBalance`, `reference/passage.rs` and the exact saved-passage consumer from §1,
+   `HNN/ChainedBalance`, `reference/passage.rs` and the saved-passage consumer from §1,
    with the earlier failure preserved as a falsifier. Touches
    all six winding objects. Independently compare carried motion with declared absorption,
    passive/active source admission and the joint future fibre. Deliver an independent derivation of the telescoping
@@ -803,13 +805,13 @@ with the reductions above. Return a rival derivation or counterexample when its 
    law against its public negative controls and any heat claim against an unstable Euler step.
    Reconcile with each target owner; do not request, reproduce or publish private proof files.
 
-Each return supplies: exact owned paths and consuming call; hypotheses and equation; source
+Each return supplies: the owned paths and consuming call; hypotheses and equation; source
 premises; independent conclusion with rival route/counterexample; status and validation receipt;
 the concrete reconciliation interface. Source-only work comes first. Any later compile/run
 uses the coordinator's existing lease/caps and shared-slot authorization, declares threads and
 resident set, measures a development unit, fixes the projection/deadline once, launches work
 past 60 s in the background, stops on slower-than-projected evidence, never raises a limit,
-and isolates scratch. Receipts retain exact wall time, peak resident set and measured/projected
+and isolates scratch. Receipts retain wall time, peak resident set and measured/projected
 ratio. These briefs contain no training, paid compute, installs or biology assignment.
 
 The failure checks are explicit: briefs 1/2 prevent the unnamed constitutive join and uncaught
@@ -838,13 +840,13 @@ this supplement does not independently edit those issues.
 
 ### Proposed issue/index update, unposted
 
-Reconcile one exact current-body prefix per existing issue, preserving the full historical ledger,
+Reconcile one current-body prefix per existing issue, preserving the full historical ledger,
 labels, milestones and every unresolved checkbox. Re-read public HEAD and body immediately before
 any later authorized write. The morning drafts are:
 
 - **#63:** retain U0–U8; record takeover with Claude paused, host passage review, boundary/refusal,
   reached nonzero contact-deposit consumer, canonical geometric integration and Athena gates.
-- **#73:** credit current carried reception and `reference/passage.rs`, separate exact fixture
+- **#73:** credit current carried reception and `reference/passage.rs`, separate fixture
   evidence from complete comparison/adjoint and autonomous product acceptance, and retire the
   stale PR #280 opening-proposal sentence without deleting its failure evidence.
 - **#76:** retain the verified 40/0 GPU receipt on `a1f6ec15` and its doc-only final delta to
@@ -887,7 +889,7 @@ Its narrow Rust formatting/parse check and scoped patch checks passed; Cargo int
 needs the shared lease. This helper states no separate law and owns no atlas row. The audit
 receipt is local `.local/lean-rust-pruning/README.md`; it is not a completed broad pruning claim.
 
-**Readiness:** the shared premises, rival derivation routes, exact deliverables and reconciliation
+**Readiness:** the shared premises, rival derivation routes, deliverables and reconciliation
 interfaces are prepared. The actual open construction blockers are the general transported
 material/source return in general charts, independent native flux joins, adaptive
 action-sufficient quotient, statistical power-port map, native nonlinear first-arrival consumer,

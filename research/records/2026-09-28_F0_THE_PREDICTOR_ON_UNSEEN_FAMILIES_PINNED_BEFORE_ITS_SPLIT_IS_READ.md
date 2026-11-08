@@ -1,8 +1,8 @@
 # F0: the predictor on unseen families, its acceptance run pinned before its split is read: the code and the standing fail
 
 **Date:** 2026-09-28. Refs #63, #73, #148. **Scope:** the acceptance of
-[F0](../../docs/plans/THE_REBUILD.md#f0-the-predictor-on-unseen-families-the-releases-gate-73-148),
-the release's gate, as [U6](../../docs/plans/THE_REBUILD.md#u6-the-text-chart)'s first loop. The
+[F0](https://github.com/brandonrdug/holonics/blob/0a051ae5/docs/plans/THE_REBUILD.md#f0-the-predictor-on-unseen-families-the-releases-gate-73-148),
+the release's gate, as [U6](https://github.com/brandonrdug/holonics/blob/0a051ae5/docs/plans/THE_REBUILD.md#u6-the-text-chart)'s first loop. The
 pins below were committed before the split was generated and before any of its cells was read. The
 margin's rule (pin 6) and the release cap's rule (pin 9) were committed before the dry runs that read
 their numbers on spent splits; the numbers were committed before the split was generated. The

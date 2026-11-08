@@ -89,14 +89,16 @@ unknown stream weighs a population of eggs by their description lengths and upda
 
 [The egg](docs/ELEMENTARY_OBJECTS.md#the-egg-a-generator-read-as-a-whole)
 
-**Arithmetic is exact.** There is no floating point inside the machinery:
-- values are ratios with their remainders, and integers are carried with their factorization;
+**Precision is the bit widths of graphs.** No value is exact (π and `e` cannot be, nor anything
+read through them), and no float is stored inside the machinery:
+- a value is a word, or a graph whose branches and coefficients sum into it, read at a declared
+  width; ratios keep their remainders, and integers are carried with their factorization;
 - algebraic and transcendental quantities are their constraint identities (π and `e` are
-  navigators, and a float is one of their faces);
+  navigators, and a number is one of their faces at a declared width);
 - values are stored as series, numerators grouped over shared denominators, so terms cancel and
   a carrier is as wide as its surviving terms need: dynamic precision, never an arbitrary fixed
-  width;
-- exact sums are associative, so co-present cells deposit in parallel with identical bits.
+  width, and a term is released only at a declared tolerance with its remainder carried;
+- integer sums are associative, so co-present cells deposit in parallel with identical bits.
 
 **Mathematics is terrain.** The Riemann hypothesis, the Hodge conjecture, complex Euler and
 Navier–Stokes, and Birch–Swinnerton-Dyer are targets for the same compression and landmark
@@ -127,14 +129,14 @@ later records, and each states its own scope.
 
 | Present construction | Evidence and limit |
 |---|---|
-| The Holon law, exact ratio/ring arithmetic, frames, screws, winding, navigators, receivers and release | [`crates/holonics`](crates/holonics), with the [operator contract](docs/ELEMENTARY_OBJECTS.md#operator-contract) and Lean counterparts |
+| The Holon law, ratio/ring arithmetic at declared widths, frames, screws, winding, navigators, receivers and release | [`crates/holonics`](crates/holonics), with the [operator contract](docs/ELEMENTARY_OBJECTS.md#operator-contract) and Lean counterparts |
 | HNN host and resident CUDA word, source moments, paired adjoint, comparison, deposition and reception carry | [`holonics::hnn`](crates/holonics/src/hnn), [`holonics-cuda::hnn`](crates/holonics-cuda/src/hnn); [carry receipt](research/records/2026-10-03_THE_RECEPTION_CARRIES_THE_INTERIOR_CHANGE_THE_SOURCE_PORT_IMPOSES_THE_MOMENT_AND_REST_IS_COMPLETE_ABSORPTION.md). Per-law parity is scoped to its actual fixture. |
-| Exact source entrance through the producing `Encoded` chart; the card steps by located digits | [Entrance tests](crates/holonics/tests/source_entrance.rs), [encoding/ingest receipt](research/records/2026-10-05_THE_FIELDS_ENTRIES_TAKE_ONLY_THE_ENCODED_SOURCE.md). A refused occurrence moves nothing; a failed device open is discarded. |
+| Source entrance only through the producing `Encoded` chart; the card steps by located digits | [Entrance tests](crates/holonics/tests/source_entrance.rs), [encoding/ingest receipt](research/records/2026-10-05_THE_FIELDS_ENTRIES_TAKE_ONLY_THE_ENCODED_SOURCE.md). A refused occurrence moves nothing; a failed device open is discarded. |
 | Host save and cold continuation of contemporary material, charts, clock and arrived comparison | [Cold-restore tests](crates/holonics/tests/resident_cold_restore.rs), [PR #384](https://github.com/brandonrdug/holonics/pull/384). This establishes the declared host continuation cases; card passage restore, the general action-sufficient quotient and broader adaptive retention keep their own gates. |
 | Nonlinear loaded parametron with an executed-domain certificate and carried pump cycle | [Quartic domain](research/records/2026-10-05_THE_QUARTIC_STEP_NEEDS_AN_EXECUTED_DOMAIN_BEFORE_A_LOCK.md), [continuing component](research/records/2026-10-05_THE_LOADED_COMPONENT_CARRIES_ITS_ADMITTED_PUMP_CYCLE.md). The ordinary rounded word and whole nonlinear field are separate joins, and `Holon::interconnect` refuses a loaded quartic element until the joined nonlinear relation is retained. |
 | Located-key release and two-sided repair on declared known-truth terrain | [Pair comparison](research/records/2026-10-05_THE_PAIR_GAIN_IS_THE_JOINED_BANKS_LOG_DETERMINANT.md), [reflection repair](research/records/2026-10-05_REPAIR_BY_REFLECTION_THE_LOCATED_PAIR_RESTRICTS_THE_ERASED_CELLS_FROM_BOTH_SIDES.md). These receipts do not establish useful learned physical repair. |
 | Charted physical reception: the source-opening split and the receiving-error covectors, charged at their producing operands | Implemented at [`hnn::prediction::charted`](crates/holonics/src/hnn/prediction/charted.rs) ([record](research/records/2026-10-06_THE_CHARTED_PHYSICAL_RECEIVER_CHARGES_ITS_SOURCE_STATE_AND_BOTH_COVECTOR_ERRORS.md)). Four fixed-law fixtures were accepted at source `0da1652c`, an unpublished commit whose files the receipt pins by SHA-256 (the owner has changed since) ([scoped receipt](research/records/receipts/charted-physical-learning-20261006/integrated-source-v1/SCOPED_ACCEPTANCE.v1.json)): Receiving-only publication, with product, erasure and general-boundary acceptance excluded and a missing station held. The stronger physical acceptance remains open. |
-| Landmark-tree compression and receiving populations | Historical scoped readings in [CONSTRUCTION_STATE](CONSTRUCTION_STATE.md#measured-receiving-faces); the count tree earns most of the text compression. Compression scores are not generation acceptance. |
+| Landmark-tree compression and receiving populations | Historical scoped readings in the [measured receiving faces](https://github.com/brandonrdug/holonics/blob/0a051ae5/CONSTRUCTION_STATE.md#measured-receiving-faces) of CONSTRUCTION_STATE as it stood to November 2; the count tree earns most of the text compression. Compression scores are not generation acceptance. |
 | Lean mathematics and the expression atlas | [`lean/`](lean/README.md), [`docs/atlas/`](docs/atlas/README.md); each law keeps its hypotheses, consumer and epistemic grade. |
 | Two current scoped Lean acceptances: the declared future-read score on the continuing source, and the affine Hodge source family entering the geometric degree-four current | Future read: [record](research/records/2026-10-06_A_CURRENTLY_HIDDEN_MODE_CAN_REACH_A_FUTURE_RECEIVER.md), [scoped receipt](research/records/receipts/2026-10-06-future-receiver-score/accepted-terminal-v26/SCOPED_ACCEPTANCE.v1.json); declared finite composed reads and positive receiver metrics only, with no physical-energy or performance claim. Hodge: [record](research/records/2026-10-07_THE_ACCEPTED_DEGREE_THREE_CONE_ENTERS_THE_ACTUAL_GEOMETRIC_DEGREE_FOUR_CURRENT.md), which links its canonical acceptance receipt; sphere filling, unconditional six-pair independence, whole-power spanning and the algebraic-cycle square stay open. This README infers no whole-library build, runtime result, target resolution or product from either. |
 
@@ -170,11 +172,11 @@ symmetric quartic component establishes neither as a generic adaptive HNN consum
 | Host HNN: capacity, rekey, save and continuation | [#73](https://github.com/brandonrdug/holonics/issues/73), formal obligations [#62](https://github.com/brandonrdug/holonics/issues/62); continuation must preserve the source/clock/remainder relation. |
 | Device consumers | [#76](https://github.com/brandonrdug/holonics/issues/76); consume the same host relation, with actual capacity, refusal parity and card restore receipts. |
 | Physical repair: producing chart, source clock and receiver decoding | [#73](https://github.com/brandonrdug/holonics/issues/73), product acceptance [#148](https://github.com/brandonrdug/holonics/issues/148); show the learned physical output and its receipt. |
-| Targets and equation extraction | [Equation extraction #146](https://github.com/brandonrdug/holonics/issues/146), [Hodge spectrum #20](https://github.com/brandonrdug/holonics/issues/20), [Weierstrass division #22](https://github.com/brandonrdug/holonics/issues/22), [Israel junction #23](https://github.com/brandonrdug/holonics/issues/23), [neck sources #32](https://github.com/brandonrdug/holonics/issues/32); exact formal scope stays in [#62](https://github.com/brandonrdug/holonics/issues/62). |
+| Targets and equation extraction | [Equation extraction #146](https://github.com/brandonrdug/holonics/issues/146), [Hodge spectrum #20](https://github.com/brandonrdug/holonics/issues/20), [Weierstrass division #22](https://github.com/brandonrdug/holonics/issues/22), [Israel junction #23](https://github.com/brandonrdug/holonics/issues/23), [neck sources #32](https://github.com/brandonrdug/holonics/issues/32); the formal scope stays in [#62](https://github.com/brandonrdug/holonics/issues/62). |
 
 RH, Hodge, complex Euler/Navier–Stokes and BSD remain attached to the same construction, and none
 is solved here. The [comma/ghost record](research/records/2026-10-05_THE_GHOST_LIVES_IN_THE_GAP_THE_JOINTS_OF_THE_LENS.md)
-joins exact nonclosure and turn/boost normality with six explicitly owed statements. Recursive
+joins the comma's nonclosure and turn/boost normality with six explicitly owed statements. Recursive
 coarse-graining and the RH source-law join remain pending research, as does the Navier–Stokes
 response bound; the Hodge work keeps the open items that its scoped acceptance lists (the scoped
 Lean acceptances row above). The comma calculations and gap interpretations prove no RH claim. The
@@ -284,7 +286,7 @@ git grep -n 'NormalizedKernel' 13f8c734            # the pre-reset tree
 - **Physics.** Start with the [fluid construction](docs/HOLONIC_FLUID_CONSTRUCTION.md),
   [mass–energy](docs/MASS_ENERGY_AND_CAUSAL_TRANSPORT.md) and the atlas's `physics.tsv`.
 - **Formal methods.** Start with [`lean/README`](lean/README.md) and `Holonics.Framework`.
-- **GPU and exact computation.** Start with `crates/holonics-cuda` and the hardware law in
+- **GPU and computation at declared widths.** Start with `crates/holonics-cuda` and the hardware law in
   [CLAUDE.md](CLAUDE.md#the-objects-governing-laws).
 
 ## How the work is done
@@ -293,7 +295,7 @@ git grep -n 'NormalizedKernel' 13f8c734            # the pre-reset tree
   agents make the technical and mathematical decisions and record each, with its reason, where its
   law lives: in its owner, its guide or a dated record.
 - **Practice.** The working practice is written for the agents in [CLAUDE.md](CLAUDE.md) and
-  [AGENTS.md](AGENTS.md). It covers exact arithmetic, "recover before implementing", deletion as
+  [AGENTS.md](AGENTS.md). It covers precision as bit widths, "recover before implementing", deletion as
   consolidation, and privacy.
 - **Checks.** A change passes the gate (`bash tools/gate.sh`: the workspace check, the guard lints
   and the guards' doctests), then the tests of the laws it touched. A kernel change also runs the

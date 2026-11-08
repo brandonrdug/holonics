@@ -69,7 +69,7 @@ from an explicit law from insufficiency of a carrier. Its source-pinned map name
 roles of `Holon`, `Field`, `Word`, host `Resident` and `SourceMoment`. At `3c67beee`, the field
 constructs a Holarchy chart at mount, the word executes the passage, and the resident retains the
 parametric orientation rather than the whole. The existing
-[library spine](../../docs/plans/THE_REBUILD.md#the-library-spine-october-5) already names the
+[library spine](https://github.com/brandonrdug/holonics/blob/0a051ae5/docs/plans/THE_REBUILD.md#the-library-spine-october-5) already names the
 constituent execution/resident-whole join. This is a concrete abstraction and consumer obligation,
 not a reason to relabel every type or discard the working realization wholesale.
 

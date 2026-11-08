@@ -1,7 +1,7 @@
 # Holonic Encoding for the field: the squares close on known-truth terrain, and text founds only its reached cells
 
 **Date:** 2026-09-29. Refs #73, #63. **Scope:** the `hnn::encoding` loop of
-[THE_REBUILD U6](../../docs/plans/THE_REBUILD.md#u6-the-text-chart), run against the acceptance
+[THE_REBUILD U6](https://github.com/brandonrdug/holonics/blob/0a051ae5/docs/plans/THE_REBUILD.md#u6-the-text-chart), run against the acceptance
 [pinned before it](2026-09-29_HOLONIC_ENCODING_FOR_THE_FIELD_PINNED_BEFORE_ITS_RUN.md) (`e0a957db`).
 The build is `38cf65ac` and `397de664`. **Grade:** [proved-derived; formal-checked] for the squares
 and the window-free read, [measured] for the terrain dimensions and the text receipts,

@@ -1,7 +1,7 @@
 # Holonic Encoding for the field (`hnn::encoding`), pinned before its run
 
 **Date:** 2026-09-29. Refs #73, #63. **Scope:** the `hnn::encoding` loop of
-[THE_REBUILD U6](../../docs/plans/THE_REBUILD.md#u6-the-text-chart), under the record
+[THE_REBUILD U6](https://github.com/brandonrdug/holonics/blob/0a051ae5/docs/plans/THE_REBUILD.md#u6-the-text-chart), under the record
 [the text chart is the one machine's field](2026-09-29_THE_TEXT_CHART_IS_THE_ONE_MACHINES_FIELD_TORI_HELICES_EGGS_AND_TUBES_ARE_ONE_FAMILY.md)
 §3 and the governing law "No catered machinery"
 ([antipattern record](2026-09-29_ANTIPATTERN_CATERED_MACHINERY_A_TASKS_SOLUTION_ROUTINE_NEVER_STANDS_IN_FOR_LEARNING.md)).

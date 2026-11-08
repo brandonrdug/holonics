@@ -147,7 +147,7 @@ the navigators' phases after k admitted steps, so a declared linear source chart
 are retained with their source fibre and future-receiver descent law; scalar correlations do
 not in general preserve source order.
 A response position is a receiving phase, `y_j=ρ_R(Ĝ(j)q)`. The declared navigator count is independent
-of source and response length; ingestion, output, exact bit growth and any separating remainder
+of source and response length; ingestion, output, bit growth and any separating remainder
 retain their actual costs. Each navigator advances by its own declared or inferred rate;
 the exterior codec unit does not define a native clock. A navigator with no participation at
 the present phase retains its material, initial configuration, phase and winding under the
@@ -209,7 +209,7 @@ region or return section during its engagement. It may be stationary, cyclic or 
 recurrent. Availability between engagements is a property of retained standing and its
 admitted reactivation; it does not require the same current to circulate continuously.
 Stability additionally concerns the response to perturbations under stated material and
-driving conditions. A single return, exact phase arithmetic or a conserved norm alone does
+driving conditions. A single return, phase arithmetic in rationals or a conserved norm alone does
 not establish attraction, robustness or periodic closure.
 
 [proved-derived] The medium (`holonics::holon::PortHolon::medium` with no active block;
@@ -258,7 +258,7 @@ medium; `reciprocal_pairing` is wrench–twist power; control cadence and held c
 material. A simulator's observation and action vectors are exterior charts of that object, as a
 character is an exterior chart of a text port, and inferring the joint phases and drives that
 produce a requested receiving face is the Bombe's configuration inference. Simulator floats stay
-exterior readings: an imported float is the exact rational of the stored value, not the physical
+exterior readings: an imported float is the dyadic rational its stored bits denote, not the physical
 one, and the chart declares its calibration and quantization residual. The inspected Isaac Sim
 interface (source observation, action face, timing, reset, receiving consequence) is tabled in
 [history](https://github.com/brandonrdug/holonics/blob/13f8c734/docs/HARDWARE_AND_MODALITY_BOUNDARIES.md#robotics-and-simulation-boundary). Owners:
@@ -272,19 +272,19 @@ operations on Holons, with familiar vector/tensor realizations where applicable.
 
 | Operation | Operational notation and effect | Current owner (`holonics` unless marked) |
 |---|---|---|
-| Superpose | α\|A⟩+β\|B⟩ in one compatible current space; phase combines before an intensity reading | exact current addition over `Rat` |
+| Superpose | α\|A⟩+β\|B⟩ in one compatible current space; phase combines before an intensity reading | current addition over `Rat` |
 | Assemble | \|A⊕B⟩ keeps both port blocks; direct sum is distinct from adding them in one space | `holon::PortHolon` port blocks, `holon::dirac` interconnection |
 | Tensor-compose | \|A⊗B⟩ has components A^i B^j, retaining their axis roles and shared parameters | Lean `Foundation/HolonTensorLens`; the prototype's [`BilinearProductCore`](https://github.com/brandonrdug/holonics/blob/551d6c5d/crates/holonics/src/exact_linear/bilinear.rs) |
 | Interact | \|C⟩=𝓘_(K,Θ)(\|A⟩,\|B⟩); a bilinear chart is C^c=I^c_ab A^a B^b | `receiver::reception::JointLaw::interact` (joint reception); `holon::law::HolonLaw::interconnect` (the whole's law); the prototype's [`BilinearRealization::apply`](https://github.com/brandonrdug/holonics/blob/551d6c5d/crates/holonics/src/exact_linear/bilinear.rs) |
 | Receive/contract | ⟨r\|H⟩, or a partial tensor contraction leaving specified output axes | `holon::law::HolonLaw::receive` |
-| Receive then emit | (\|B⟩⟨r\|)\|A⟩=⟨r\|A⟩\|B⟩; a rank-one operator, with an explicitly declared bra | `ratio::linear` exact maps |
+| Receive then emit | (\|B⟩⟨r\|)\|A⟩=⟨r\|A⟩\|B⟩; a rank-one operator, with an explicitly declared bra | `ratio::linear` rational maps |
 | Compose transports | Ĝ₂Ĝ₁\|H⟩; the output port of the first joins the input of the second | `navigator::Transport` |
 | Reflect/interfere | A constituted multiport operator acts on incoming and stored-current kets together | junction scattering `2P_D−I`, a half-turn about the constituted projection; Lean `Computation/HolonicConstitutiveCirculation`; device scattering in history |
 | Attend / normalize participation | `Y_i=Σ_j a_ij U_ij V_j`, `a_ij=exp(s_ij)/Σ_k exp(s_ik)` on admitted contacts; a sigmoid is its binary restriction | Lean `Computation/HolonicAdjointNormalization`; the positive-kernel chart's differential and pullback in the [formula guide](HNN_FORMULA.md#one-connected-tensor-computation) |
 | Differentiate/pull back | δ\|H'⟩=D𝓘_H δ\|H⟩; a covector acts through (D𝓘_H)* on the same material | `holon::law::HolonLaw::pullback` |
 | Generate | \|X(τ)⟩=𝓤_(Θ,K)^(τ←τ₀)(\|Ξ⟩;h), then ⟨r\|b_H(X(τ))⟩; the whole field evolves | `holon::law::HolonLaw::advance`; Lean `Foundation/Holon.ofEvolution`; the field law is rebuild step 4 |
 | Recur / change scale | F^∘n(\|H⟩), or a recursive family H=union_i F_i(H); retain its scale maps and branch constraints | `holon::restriction` (scale square, tube, tower); Lean `Foundation/FractalPacking` |
-| Apply an analytic generator | exp(tA), phase exp(iθ), logarithmic scale and Gamma recurrence with their actual domains and remainders | `navigator::Clock` (Cayley step); the prototype's [exact analysis](https://github.com/brandonrdug/holonics/tree/551d6c5d/crates/holonics/src/geometry/exact_analysis) |
+| Apply an analytic generator | exp(tA), phase exp(iθ), logarithmic scale and Gamma recurrence with their actual domains and remainders | `navigator::Clock` (Cayley step); the prototype's [`exact_analysis`](https://github.com/brandonrdug/holonics/tree/551d6c5d/crates/holonics/src/geometry/exact_analysis) |
 | Encode/reopen | \|ξ⟩=Ê\|H⟩; a decoder and residual reconstruct the requested field/face, with Ê_next T=U Ê | Lean `Physics/ReflectedBoundaryMemory`; the prototype's [`KernelModeReduction`](https://github.com/brandonrdug/holonics/blob/551d6c5d/crates/holonics/src/exact_linear/kernel_modes.rs) and [`ContextualFactorization`](https://github.com/brandonrdug/holonics/blob/551d6c5d/crates/holonics/src/exact_linear/contextual.rs), ported in rebuild step 3 |
 
 [established-bounded; implemented-exact] The prototype's factorized bilinear library
@@ -378,7 +378,7 @@ every elementary carrier.
 | Constitutive response | Material relates arriving current, stored modes, geometry and outgoing field | `CoupledIncidence`, `PortEnergyHeat`; `holonics::holon::element` |
 | Differential and adjoint | Differentiate the transformation, including material/chart motion; compose its adjoints | `Holon/Law.pullback_law`; `HolonLaw::pullback`, bilinear `pullback` |
 | Recursion and generation | Evolve a field/family and read its generated boundary at any nested scope | `Holon.ofEvolution`; `HolonLaw::advance` |
-| Exact inference | Solve for coefficients, factors, modes or compatible realizations | exact preimage/factorization; `holonics::ratio::linear` |
+| Inference in rationals | Solve for coefficients, factors, modes or compatible realizations | preimage and factorization in rationals; `holonics::ratio::linear` |
 | Compression/refinement | `E_next T=U E`, `D E=ρ`, or an explicit transported error; retain newly relevant modes | `ReceiverHistoryCompression`, `ReflectedBoundaryMemory`; history [`KernelModeReduction`](https://github.com/brandonrdug/holonics/blob/551d6c5d/crates/holonics/src/exact_linear/kernel_modes.rs) |
 | Conservation/dissipation | A supplied law accounts for flux, storage and heat | `BoundaryHolon`, `Holon/Law`; `holonics::holon::law::EnergyBalance` |
 | Information and measure | Declared measures yield entropy/loss; oriented current precedes scalar readings | `InformationDifference`, `ReceiverCodeCost`; `holonics::ratio::surprisal` |
@@ -400,7 +400,7 @@ those properties. An operator must carry what its equation uses.
 
 ### Algebra and calculus in those charts
 
-[definition] The familiar elementary operations retain their exact domains:
+[definition] The familiar elementary operations retain their declared domains:
 
 - On a linear current chart, `T(a x+b y)=a Tx+b Ty`. A nonlinear reaction does not inherit
   this law merely because its inputs are tensors.
@@ -415,13 +415,13 @@ those properties. An operator must carry what its equation uses.
   Stokes relation. A constitutive law supplies current, storage and energy; topology alone
   supplies no numerical conductance.
 - A constituted flow composes by its evolution law. Noncommuting operators retain their
-  order and splitting defect. Spectral/modal factorization and exact preimage solving are
+  order and splitting defect. Spectral/modal factorization and preimage solving in rationals are
   representations of those operations, rather than labels that replace them.
 
-[established-bounded; source-inspected] Tensor lenses (`Foundation/HolonTensorLens`), exact linear
-algebra (`holonics::ratio::linear`) and the boundary operators supply these constructions in
+[established-bounded; source-inspected] Tensor lenses (`Foundation/HolonTensorLens`), linear
+algebra in rationals (`holonics::ratio::linear`) and the boundary operators supply these constructions in
 their declared source families. The summary specifies their use in one Holon algebra; it
-does not assert that all nonlinear operators have exact finite modal closures.
+does not assert that all nonlinear operators have finite modal closures without remainder.
 
 ## Generation is an operation on Holons
 
@@ -486,7 +486,7 @@ on the library; foreign forward graphs and Q/K/V caches are not ported whole.
 [established-bounded; source-inspected] The computational Holon's code owners are listed once, in
 the [operator contract](ELEMENTARY_OBJECTS.md#operator-contract), each current owner beside its
 target. The map of the crates:
-- `crates/holonics`, exact over `Rat` throughout, in the ten modules its `lib.rs` names: `ratio`,
+- `crates/holonics`, in rationals (`Rat`) and integers at declared widths, with no floats, in the ten modules its `lib.rs` names: `ratio`,
   `geometry`, `holon`, `navigator`, `receiver`, `holarchy`, `aeon`, `compression`, `hnn` and
   `physics`.
 - `crates/holonics-cuda`: the CUDA driver and the resident HNN (`holonics_cuda::hnn::Resident`),
@@ -512,7 +512,7 @@ exterior projection; an algorithm that needs the omitted structure consumes its 
 
 [interpretation] The user's recollection account motivates constructive recall: a cue
 activates retained modes, which generate a partial field; attended discrepancies direct
-further refinement. It does not require a stored screenshot. Exact replay, plausible
+further refinement. It does not require a stored screenshot. Lossless replay, plausible
 completion and retrieval of a historical detail are different receivers. An unresolved
 region must not become a falsely certain zero or detail. This is a design interpretation,
 not a measurement of the user's neurological memory.
@@ -521,7 +521,7 @@ not a measurement of the user's neurological memory.
 `ReceiverTransformer.excludesInsufficiency` states the precise limit: if two compatible
 interiors share the available cue but differ in the requested detail, the cue alone cannot
 determine that detail. Further interaction can supply a separator. This gives gap-directed
-navigation a constructive task without assuming universal exact recoverability.
+navigation a constructive task without assuming universal lossless recoverability.
 
 [interpretation] Crow gaze, calls, posture and movement can expose internal activity without
 a deliberate message. The July 21 laboratory account already describes its propagation
@@ -541,5 +541,5 @@ behind it are not an available channel. The predecessor's hourglass and boundary
 records inform this relation; historical mind/black-hole slogans supply no new physical law.
 
 [definition] The [illustrated synopsis](../research/papers/source/papers/elementary-holon-generation/main.typ)
-renders this specification, the generation formula and a reusable exact modal construction.
+renders this specification, the generation formula and a reusable modal construction in rationals.
 It owns no separate model architecture and makes no new native capability claim by appearance.

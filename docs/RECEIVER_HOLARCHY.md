@@ -87,7 +87,7 @@ relations; active local probing separates what one passive global reading cannot
 [proved-derived; formal-checked] `Foundation/CausalChord.spectrum_does_not_determine_response`
 exhibits the failure of the spectrum. `Foundation/ReceiverAtlas.fullProbeAtlas_separates` proves
 that the full probe atlas (every Markov parameter at every excitation, readout and time) separates
-the exact linear systems of bounded dimension, and `theEmbeddingIsNotOneVector` exhibits an atlas
+the linear systems of bounded dimension, and `theEmbeddingIsNotOneVector` exhibits an atlas
 whose every chart is inhabited while no coherent placement exists.
 
 <a id="the-causal-chord"></a>
@@ -113,12 +113,12 @@ poles ⊆ eigenvalues with strict inclusion for an unexcited or unobserved mode
 cancels (`release_cancels`).
 
 [definition] **Its Rust realization is retired.** `holonics::receiver::causal_chord` built
-`H(s) = C adj(sI − A) B / det(sI − A)` exactly over `ℚ`. Once `hnn::modes` retired (U2) it had no
+`H(s) = C adj(sI − A) B / det(sI − A)` over `ℚ`. Once `hnn::modes` retired (U2) it had no
 library caller, and it was retired at U3's second loop, September 28
 ([history at `c10acca9`](https://github.com/brandonrdug/holonics/blob/c10acca9/crates/holonics/src/receiver/causal_chord.rs)).
 Its pole readings re-entered `ratio::polynomial`, which stays their owner. The laws only it carried
 are kept here, so that an owner which needs the chord can re-enter them:
-- [proved-standard] **The exact construction.** One Faddeev–LeVerrier recurrence returns both halves
+- [proved-standard] **The construction in rationals.** One Faddeev–LeVerrier recurrence returns both halves
   of `C adj(sI − A) B / det(sI − A)`. With `M_0 = 0`, `M_k = A M_(k−1) + c_(n−k+1) I` and
   `c_(n−k) = −tr(A M_k)/k` for `k = 1, …, n`, it gives `det(sI − A) = Σ_k c_k s^k` and
   `adj(sI − A) = Σ_(k=1..n) M_k s^(n−k)`. The scalar half is
@@ -137,12 +137,12 @@ are kept here, so that an owner which needs the chord can re-enter them:
   to `C = I` with `B = (1, 1)ᵀ` recovers it: the cancellation belongs to the declared atlas, not to
   the operator.
 - [definition] **A pole is named by its factor.** The squarefree decomposition of the reduced
-  denominator carries each pole's multiplicity as an index. A rational pole is an exact rational
+  denominator carries each pole's multiplicity as an index. A rational pole is carried as the rational it is
   (`ratio::polynomial::{rational_root_census, rational_roots_by_lifting}`). Every other pole is
-  named by the exact squarefree factor it is a root of, and its Sturm isolating interval is only a
+  named by the squarefree factor it is a root of, and its Sturm isolating interval is only a
   readout. The half-plane population, with multiplicity, is `ratio::polynomial::half_plane_count`
   (Routh–Hurwitz in its Sturm form). For a symmetric `A` it is Sylvester's inertia of `A`
-  (`ratio::linear::inertia::inertia`), and `ratio::polynomial`'s tests hold the two to exact
+  (`ratio::linear::inertia::inertia`), and `ratio::polynomial`'s tests hold the two to
   agreement.
 - [proved-standard] **Residues.**
   - At a simple rational pole `a`, the residue of `N/D` is `N(a)/D′(a)`: both residues of
@@ -153,8 +153,8 @@ are kept here, so that an owner which needs the chord can re-enter them:
     specializes at every root at once: `1/(s² − 2)` has the residue `x/4`, which is
     `√2/4 = 1/(2√2)` at `√2`.
 - [proved-standard] **The resolvent at a Gaussian-rational point, and the index.**
-  - `(sI − A)⁻¹` at `s = σ + iω` is exact over `ℚ` through the realification
-    `[[σI − A, −ωI], [ωI, σI − A]]`, inverted exactly and re-checked to a zero residual.
+  - `(sI − A)⁻¹` at `s = σ + iω` is computed over `ℚ` through the realification
+    `[[σI − A, −ωI], [ωI, σI − A]]`, inverted in rationals and re-checked to a zero residual.
   - The resolvent's order of growth at an eigenvalue is the eigenvalue's index (its largest Jordan
     block), not its multiplicity. The realifications of `[[i, 1], [0, i]]` and `diag(i, i)` are
     `4 × 4` rational matrices, both with characteristic polynomial `(s² + 1)²`; their minimal
@@ -163,7 +163,7 @@ are kept here, so that an owner which needs the chord can re-enter them:
     Frobenius norm grows by more than `10³` a decade (`δ^(−4)`), and the semisimple one's by less
     (`δ^(−2)`). Some coordinate probe of the defective operator has a reduced denominator of
     degree 4; every probe of the semisimple one stays at degree 2.
-  - Semisimplicity is decided exactly: the minimal polynomial equals its squarefree part
+  - Semisimplicity is decided in rationals: the minimal polynomial equals its squarefree part
     (`ratio::linear::ExactRatMatrix::minimal_polynomial`). The semisimple realification has a
     positive definite conserving receiver (`AᵀG + GA = 0`) and the defective one has none (Lean
     `semisimple_imaginary_has_conserving_receiver`, `jordan_has_no_conserving_receiver`). The
@@ -190,7 +190,7 @@ The first term is supplied port work. `Σ_G` measures the source-free change of 
 carry positive, negative and null directions at once; a discrete transport has `T*G_next T − G`.
 Under a constant invertible chart `Σ_G` transforms by congruence (`CausalChord.rateForm_congruence`),
 so its signature, not the eigenvalues of `A`, is the invariant content; `holonics::ratio::linear::inertia`
-(`inertia`, `congruence`; the pullback bound is in [history](https://github.com/brandonrdug/holonics/blob/551d6c5d/crates/holonics/src/inertia.rs)) reads it exactly. Integrating, differentiating,
+(`inertia`, `congruence`; the pullback bound is in [history](https://github.com/brandonrdug/holonics/blob/551d6c5d/crates/holonics/src/inertia.rs)) reads it in rationals. Integrating, differentiating,
 concentrating, maintaining, exploring and releasing are situated roles of one current at a declared
 metric, source, receiver and clock, not intrinsic capacities. A rise in a receiver intensity or in
 coarse entropy is not heat: physical homeostasis also owes storage, incoming and outgoing power and
@@ -237,16 +237,16 @@ plural_draw_is_held}`). This section keeps the laws of the Rust carriers retired
 (U3; history at `1bdacc8f`, `crates/holonics/src/receiver/release.rs` and
 `crates/holonics/src/receiver/population/health.rs`), for an owner that needs them to re-enter
 them from here.
-- [proved-standard] **The zonotope enclosure.** An exact zonotope
-  `Z = {c + G e : e ∈ [−1, 1]^k}` over `ℚ` maps under an exact linear `M` to the exact zonotope
+- [proved-standard] **The zonotope enclosure.** A zonotope
+  `Z = {c + G e : e ∈ [−1, 1]^k}` over `ℚ` maps under a rational linear `M` onto the zonotope
   `{Mc + (MG) e}`. Under `x_(t+1) = A x_t + B u_t`, the `h`-step image of a box of compatible
   states `Z_x` with a fresh box of admitted inputs `Z_u` at every step is
   `A^h Z_x ⊕ ⨁_(k<h) A^(h−1−k) B Z_u`, with `k_x + h·k_u` generators. Its sup-norm diameter is
-  `2·max_i Σ_j |G_ij|`, exact and linear in the generator count, and it bounds the width of every
+  `2·max_i Σ_j |G_ij|`, rational and linear in the generator count, and it bounds the width of every
   compatible set it encloses (`width_le_of_bounds`). The squared-Euclidean diameter is attained at a
-  vertex of the generator cube, so computing it exactly enumerates `2^k` sign patterns; an enclosure
+  vertex of the generator cube, so computing it, not bounding it, enumerates `2^k` sign patterns; an enclosure
   width is declared in the sup norm.
-- [definition] **The probe searches** (`Ask`). Over an enclosure, observing one generator exactly
+- [definition] **The probe searches** (`Ask`). Over an enclosure, observing one generator's coordinate
   removes it, and the probe is the generator whose removal leaves the least sup-norm diameter. Over
   an enumerated fibre, a declared observation partitions the fibre into its level sets; its survivor
   is the largest width the target reading keeps inside one level set, never more than the whole
@@ -254,7 +254,7 @@ them from here.
   criterion is information, not a survivor width: the chaser's probe (`receiver::population::chaser`,
   U3's second loop) partitions its fibre the same way and is offered as
   `receiver::release::ProbePartition`, the partition's information
-  `I = log₂|Θ| − (1/|Θ|) Σ_c |c| log₂|c|` compared exactly as `∏_c |c|^|c|`
+  `I = log₂|Θ| − (1/|Θ|) Σ_c |c| log₂|c|` compared in integers as `∏_c |c|^|c|`
   (`Population.partitionInformation_lt_iff`).
 - [definition] **The coarsening tower search** (`releaseCoarser`). Up a declared tower of readings,
   finest first, each step's factoring through the step below is checked over the fibre: two
@@ -275,7 +275,7 @@ them from here.
 
 ## The retired byte-tree text line
 
-[definition] THE_REBUILD U6's order (item C.5) retired the byte-tree text line from
+[definition] [THE_REBUILD U6](https://github.com/brandonrdug/holonics/blob/0a051ae5/docs/plans/THE_REBUILD.md#u6-the-text-chart)'s order (item C.5) retired the byte-tree text line from
 `receiver::population` and `compression::landmark::context` on September 30 (history at
 [`f5fd8f3b`](https://github.com/brandonrdug/holonics/tree/f5fd8f3b); the
 [antipattern record](../research/records/2026-09-29_ANTIPATTERN_CATERED_MACHINERY_A_TASKS_SOLUTION_ROUTINE_NEVER_STANDS_IN_FOR_LEARNING.md),
@@ -312,7 +312,7 @@ clock's sentence counter (`boundary`), and the copy stage with its located span 
 - [definition] **A future branch and a native checkpoint** are consequences of the retention law
   ([objects §8](ELEMENTARY_OBJECTS.md#8-deposition); Lean `Foundation/Standing`), not new laws: a
   branch continues each family's contemporary constitution, `face(branch H) = face(H)`, and never
-  reconstructs by replay; an exact codec satisfies `D(E(Θ)) = Θ`, `face(D(E(Θ))) = face(Θ)` and
+  reconstructs by replay; a lossless codec satisfies `D(E(Θ)) = Θ`, `face(D(E(Θ))) = face(Θ)` and
   `E(receive(D(E(Θ)), x)) = E(receive(Θ, x))`.
 - [definition] **The planned incidence and the present retention** (a request's relation planned
   before its target part, a port's run held in its aeon) were the admitted receivers' plumbing and
@@ -369,7 +369,7 @@ reusable in attention, but the actual constitutive law decides the participation
 `V I=d(CV²/2)/dt+gV²+C_dot V²/2`. The last term is exchange with changing geometry/material.
 The existing port-energy and conducting-channel laws supply its inductive/current extension;
 `HolonicMembraneActionTransport` and `ConstitutiveWorldTube` supply addressed membrane and
-constitutive scope. The [exact symbolic join](https://github.com/brandonrdug/holonics/blob/13f8c734/research/experiments/mfr_entropy_heat_current/moving_plate_and_burgers.json)
+constitutive scope. The [symbolic join](https://github.com/brandonrdug/holonics/blob/13f8c734/research/experiments/mfr_entropy_heat_current/moving_plate_and_burgers.json)
 checks the lumped identity and a separating omission of `C_dot V`. It is not a calibrated
 biological membrane or a proof of the full continuum surface law by finite algebra.
 
@@ -460,7 +460,7 @@ The last term is a genuine finite mixed difference. The existing
 [discrete induction](../lean/Holonics/Physics/HolonicDiscreteInduction.lean)
 retains oriented face circulation and the full EMF fibre on its fixed carrier. Moving-face
 transport must supply the additional map; a new scalar flux label would not implement it.
-The exact bilinear difference/pullback library now exposes the corresponding elementary
+The rational bilinear difference/pullback library now exposes the corresponding elementary
 operations. The moving-continuum EM surface consumer remains a specific implementation join.
 
 ## Fractal dynamics are received through a changing family of cuts
@@ -561,7 +561,7 @@ density form, retaining the volume and connection contributions.
 probabilities have `Z=Σm_i>0` and `p_i=m_i/Z`, so the quotient rule adds
 `ṗ_i=(ṁ_i−p_i Ż)/Z`. The moving normalization cannot be omitted when the admitted
 current changes. For a complete probability partition, Z=1 is the corresponding
-specialization. The optical example normalizes the exact admitted current at every cut.
+specialization. The optical example normalizes the whole admitted current at every cut.
 
 [proved-derived] On a fixed positive-support stratum with normalized p,
 
@@ -608,7 +608,7 @@ an event archive or perfect reconstruction of every earlier microscopic state.
 
 [established-bounded; source-inspected] **Current owners.** The moving receiver's rate is
 `receiver::reception::FaceMotion` (Lean `Holarchy/Reception.moving_receiver_rate_of_law`): over a
-solved joint step the face's change splits exactly into the source's motion, the receiver's own
+solved joint step the face's change splits without remainder into the source's motion, the receiver's own
 motion and the chart's explicit motion, `Δy = C_S Δx_S + C_R Δx_R + h c`. Boosts on aeon clocks, the
 Lorentz map and the observer current are `physics::spacetime` (`LightCone`, `DopplerBoost`,
 `LorentzMap`; Lean `Physics/Spacetime`). No current owner projects a receiver point through a
@@ -625,7 +625,7 @@ material and current belong to its containing construction.
 [established-bounded; implemented-exact] The retired
 [`optical_receiver_frames`](https://github.com/brandonrdug/holonics/blob/814157ad/crates/holonic-engine/examples/optical_receiver_frames.rs)
 example consumed that interface and [`EnergyMomentum::{photon,boost_x}`](https://github.com/brandonrdug/holonics/blob/551d6c5d/crates/holonics/src/exact_linear/energy_momentum.rs)
-to form the diagram's 65 exact proper-time cuts. Its receiver world-tube is
+to form the diagram's 65 rational proper-time cuts. Its receiver world-tube is
 
 ```text
 χ_R(τ,u,v)=(γτ+γβu, γβτ+γu, v, 8),
@@ -635,7 +635,7 @@ to form the diagram's 65 exact proper-time cuts. Its receiver world-tube is
 Its tangent time/spatial vectors have the correct Lorentz pairings. Three stationary null
 ray currents intersect this moving aperture. Received packet energies are `4/5`, `20/13`
 and `17/10` in E₀. The local spot rate is `du/dτ=−3/5`; accepted ray indices change from
-{2,3} to {1,2,3} to {1}. The exact source driver retains momentum, frame, orientation,
+{2,3} to {1,2,3} to {1}. The source driver retains momentum, frame, orientation,
 intersections and conditional current weights. A fixed external viewing camera displays
 these returns; it does not supply their I/O direction.
 

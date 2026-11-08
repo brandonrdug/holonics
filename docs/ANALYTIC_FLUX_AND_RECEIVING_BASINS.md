@@ -137,7 +137,7 @@ coordinate change needs the full conjugated generator; bare Newton recalculated 
 is not automatically the same operation. A physical change in receiver coupling is also not
 merely a coordinate equivalence.
 
-## Exact executable receiving regions
+## Executable receiving regions in rationals
 
 [definition] The retired [`geometry::exact_analysis`](https://github.com/brandonrdug/holonics/blob/551d6c5d/crates/holonics/src/geometry/exact_analysis.rs) exported `ComplexJet2`,
 `certify_capture`, `mean_value_release` and `propagate_to_capture`. A supplied callback must
@@ -150,7 +150,7 @@ If `q<1` and `β+qr<r`, N is a strict self-map and contraction. Its unique fixed
 source zero when λ≠0 and the derivative is nonzero throughout. These are sufficient local
 receiving neighborhoods; no global contractive model is imposed.
 
-[established-bounded; implemented-exact] The implementation uses exact rational interval
+[established-bounded; implemented-exact] The implementation uses rational interval
 inequalities and retains those bounds. Propagation uses
 `N(X)⊆N(m)+N'(X)(X−m)` on each convex source box. The midpoint m is an explicit proof anchor;
 the full displacement family and derivative enclosure remain in the result. Directly evaluating
@@ -159,7 +159,7 @@ Capture, domain obstruction and horizon exhaustion all return the current family
 
 [definition] A propagation step count is the first certified inclusion of the complete
 enclosure in one supplied neighborhood. It bounds each member's arrival time; it does not
-prove that every member first arrives at that same step. Exact first-arrival populations
+prove that every member first arrives at that same step. The first-arrival populations themselves, not enclosures of them,
 require the earlier exclusions present in the formal preimage relation. Root receiving
 regions use `Option.some '' U`, excluding the absorbing obstruction from successful capture.
 
@@ -173,7 +173,7 @@ winding there. The nonzero ξ completion factor likewise preserves the divisor i
 Their logarithmic currents differ by the logarithmic derivative of those factors, so this is
 a ζ traversal with a shared zero-count receiver, not a ξ or η traversal renamed after the fact.
 
-[definition] The application was exact CPU mathematical apparatus over the shared library, with
+[definition] The application was host mathematical apparatus in rationals over the shared library, with
 no float-driven semantic decision and no live Lean dependency; it was not a GPU lowering of
 general analytic source evaluation. The [dated return](../research/records/2026-09-14_ANALYTIC_RELEASE_AND_RECURSIVE_RECEIVING_POPULATIONS.md)
 records the actual regions, source config, elapsed costs, checks and remaining scope.

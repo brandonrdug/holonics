@@ -2,7 +2,7 @@
 
 **Date:** 2026-09-28. Refs #63, #73. **Scope:** the first item of THE_REBUILD's ring-search row
 ("residual-founded transport discovery first",
-[§4](../../docs/plans/THE_REBUILD.md#4-the-open-joins-and-the-learners-necessities-each-disposed)):
+[§4](https://github.com/brandonrdug/holonics/blob/0a051ae5/docs/plans/THE_REBUILD.md#4-the-open-joins-and-the-learners-necessities-each-disposed)):
 the founding law of the [learner record's §14.1](2026-09-27_THE_LEARNER_MUST_MOVE_A_CHASE_TERRAIN_DATA_AS_PARTICLES_WITH_FLUX_AND_RELEASE_AS_A_THRESHOLD_COMMIT.md#141-birth)
 (atlas `birth.separator-transport-closure`) as one Rust owner with its Lean counterpart, and its
 consumer on the moiré, a terrain with known truth. The pins below were committed before any pinned

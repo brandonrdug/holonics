@@ -26,7 +26,7 @@ a cycle, the aeon boundary is the collapse, and the first law over the aeon is
 `aeon::EnclosedLedger`. `Field` is the Holarchy's declaration, a chart of it, and
 `Reference::expose` is a cut's passage through the resident's aeons. The equations below are that
 Holarchy's element relations and that passage. The receiver's epochs and the pump period as a
-cycle are joined in the code since the unified plan's U5; the one join it does not yet make, the
+cycle are joined in the code since the [unified plan](https://github.com/brandonrdug/holonics/blob/0a051ae5/docs/plans/THE_REBUILD.md#u5-clocks-are-aeons)'s U5; the one join it does not yet make, the
 tree as a Holon at ports, is `[open]` in THE_MACHINE.
 
 Its field is chains of complex parametron rings joined by helical pair contacts. Athena is its
@@ -41,7 +41,7 @@ source/current/material/receiver construction.
 [lessons record](../research/records/2026-09-24_LESSONS_FROM_THE_WORKBENCH_AND_ATHENA_PROTOTYPES.md)
 keeps what it did and did not achieve. Step 4 ports its equations one law at a time, never its
 per-occurrence tape, frozen-cut replay, update journals, slot/session wires, byte or nibble
-codecs, or whole foreign Q/K/V graphs ([rules](plans/THE_REBUILD.md#rules-of-the-rebuild)).
+codecs, or whole foreign Q/K/V graphs ([rules](plans/THE_REBUILD.md#4-rules-of-the-rebuild)).
 
 [definition] A Transformer is also executable generating mathematics. Its architecture supplies
 compositions of contractions, attention, reactions and normalizations; its parameters and
@@ -52,8 +52,8 @@ executable system; the model specification says which laws interpret that data.
 
 [project-postulate] The [constraint-mode and active-face contract](CONSTRAINT_MODES_AND_RECEIVER_FACES.md)
 governs the notation below. `exp`, phase/π, log, Gamma and named constants refer to their
-normalized generating constraints, branches and periods; a float is only a receiver face. Exact
-rational scales, units and integer grades/counts remain typed. The observing Holon participates
+normalized generating constraints, branches and periods; a float is only a receiver face. Rational
+scales, units and integer grades/counts remain typed. The observing Holon participates
 through its current/material/frame coupling; the GR, stress, gyro and conservation relations are
 part of this construction, not excluded by its software realization.
 
@@ -109,7 +109,7 @@ linear region `C ẋ = −Lx+u`, `C=diag(C_B,C_I) ≻ 0`, `L=[[A,B],[B*,D]] ⪰ 
 `E=[I;−D⁻¹B*]`, its static face and first frequency derivative are
 `S=Λ(0)=E*LE` and `C_eff=Λ′(0)=E*CE=C_B+BD⁻¹C_I D⁻¹B*`. The low-frequency local rates solve
 `S v=λ C_eff v`; that approximation needs separation from the interior poles. The
-[contact and clock derivation](../research/records/2026-10-28_THE_CONTACT_CARRIES_JOINT_PRECISION_AND_COARSE_GRAINING_CARRIES_A_CLOCK.md) gives its exact remainder, a passive
+[contact and clock derivation](../research/records/2026-10-28_THE_CONTACT_CARRIES_JOINT_PRECISION_AND_COARSE_GRAINING_CARRIES_A_CLOCK.md) gives its whole remainder, a passive
 family with identical `S=1` and arbitrarily slow boundary return, and the material variations
 `δS=E*δL E`, `δλ=v*(δS−λδC_eff)v` for a simple normalized generalized eigenvalue. A moving
 extension carries `E*CĖ` in the projected dynamics. These extend the owned static/dynamic Schur
@@ -203,13 +203,13 @@ incidence before any phase/sign/intensity receiver, so encoding keeps real timin
 orientation; it assigns no pump frequency to a character and imposes no torus on every datum.
 
 [proved-derived; formal-checked for the squares; agent-inferred for the chart] **The founding law**
-(`hnn::encoding`, THE_REBUILD U6, the [pin](../research/records/2026-09-29_HOLONIC_ENCODING_FOR_THE_FIELD_PINNED_BEFORE_ITS_RUN.md); Lean
+(`hnn::encoding`, [THE_REBUILD U6](https://github.com/brandonrdug/holonics/blob/0a051ae5/docs/plans/THE_REBUILD.md#u6-the-text-chart), the [pin](../research/records/2026-09-29_HOLONIC_ENCODING_FOR_THE_FIELD_PINNED_BEFORE_ITS_RUN.md); Lean
 `HNN/Encoding`). A passage chart (a finite chart, the admitted transports it knows, the injection
 `B` of the exterior cells, the receiving forms `ρ`, the openings) founds its minimal realization
 with the one closure owner (`receiver::population::birth::Closure`): forward from the openings under
 `T_a` (the reached span `R`), then backward from `ρ` restricted to `R` under `T_a|_R`. It returns
 the constituents with their ports (the chart states each reads) and incidence (the pattern of
-`U_a`), `U_a`, `D`, `J = E B` and the Preimage Fibre, and its consumers' equations hold exactly:
+`U_a`), `U_a`, `D`, `J = E B` and the Preimage Fibre, and its consumers' equations hold with no remainder:
 
 ```text
 D E = ρ,   E T_a = U_a E,   E(T_a x + B e_u) = U_a E x + J e_u      (injection_square)
@@ -254,7 +254,7 @@ input must arrive as flux they can act on, and the output must return as faces a
 decode.
 
 **The source contract.** What an input must carry to be channelled:
-1. **A terrain chart.** A declared alphabet or exact lattice with its units and grain. Floats are
+1. **A terrain chart.** A declared alphabet or rational lattice with its units and grain. Floats are
    converted only at the exterior boundary, at a declared precision.
 2. **Channels as ports.** Each stream (a speaker, a tool, a sensor axis, a colour plane) is its own
    port with its own clock. Parallel streams declare their joint clock. Roles and provenance are
@@ -290,7 +290,7 @@ decode.
 
 **The release contract.** What an output must carry to be decodable:
 1. **A receipt of faces** over the declared partition, each at its receiver's grain, frame and
-   clock, with its fibre as an exact enclosure and its code length against the baselines.
+   clock, with its fibre as a certified enclosure and its code length against the baselines.
 2. **The decoder carried.** `decode(T_native(encode x)) = T(x)`, `D E = ρ` and `E_next T = U E` hold,
    or the separator is returned. A text face reconstructs valid Unicode through its receiving
    relation.
@@ -380,7 +380,7 @@ the source on a depth-limited window (`hnn::moment`, Lean `HNN/Encoding.whole_pa
 buffer is only the offset moment's one-step state. A response position reads `y_j=ρ_R(Ĝ_R(τ_R(j))q)` through a
 separately tagged phase binding. The adjoint of the moment needs no tape: the position adjoint is
 `g∘U^(n−1−k)∘I` (`Transport/SourceMoment`). Navigator count is independent of source length;
-ingestion, exact bit growth and retained source defects keep their own costs.
+ingestion, bit growth and retained source defects keep their own costs.
 
 [definition; not built] A located linear navigator's state enters as a second port block read at
 the opening's phase, `s_g(0)=P_g^(τ_g)(m̃_g+N_g x̃)`, admitted iff `ker N_g ⊆ ker c` and deposited in
@@ -390,7 +390,7 @@ its locus's one step. The port waits for its located source
 [definition] The [helical elementary realization](HELICAL_GEOMETRY.md) makes one geometric
 instance explicit: Lie generators and initial points, frame transport, the pair contact
 differential, its geometric second variation, and a quadratic receiver that factors through the
-moment owner. `holonics::geometry::screw` supplies it exactly; it is an instance, not a
+moment owner. `holonics::geometry::screw` supplies it in rationals; it is an instance, not a
 replacement architecture. The constant-navigator case supplies a finite reusable receiver
 recurrence when the descent equation holds; changing navigators keep the `ChangingReceiver`
 defect instead of deleting the interior.
@@ -452,7 +452,7 @@ receiver, and can coexist in this field. The discrete rate form `T*G_next T−G`
 form `A*G+GA+Ġ`, ties that reading to its metric and clock. Both forms are Hermitian, so their
 content is a signature under congruence (`holonics::ratio::linear::inertia::{inertia, congruence}`), not an
 eigenvalue or a score. One navigator can contract one direction of the field while expanding
-another, and a chart change carries that reading exactly.
+another, and a chart change carries that reading without loss.
 
 ## 1. The model, its dynamics and its output
 
@@ -534,7 +534,7 @@ noise/score field drives refinement of the whole latent field, and DiffWave refi
 waveforms without autoregressive samples ([image diffusion](https://arxiv.org/html/2006.11239v2),
 [acoustic diffusion](https://arxiv.org/html/2009.09761v3)).
 
-[conditional] For the forward SDE `dx=f dt+g(t) dW`, an exact score and the density/regularity
+[conditional] For the forward SDE `dx=f dt+g(t) dW`, the true score and the density/regularity
 hypotheses give the probability-flow ODE `dx=[f−(g²/2)∇log p_t]dt`. Integrating from the prior
 end gives the same one-time marginals as the SDE, not the same stochastic paths or a unique
 historical input. It is a deterministic generative realization, not a requirement to add a
@@ -598,7 +598,7 @@ The readout's checks, stated here so the laws outlive their code:
   power and `r` the executed residual's certified bound (Lean `Holon/Deposition.{committed_energy_bound,
   active_element_growth}`, the square roots at their dyadic ceilings).
 - **The adjoint pairing.** On the executed charts with no transient split, the stations' covectors
-  paired with their logits equal the returned opening covectors paired with the injections, exactly
+  paired with their logits equal the returned opening covectors paired with the injections, with no remainder
   (`HNN/LatticeWord.executed_adjoint_unique`).
 - **The unreached loci.** Every locus outside the refinement's diamond keeps its material and deposit
   clock across the deposit (`HNN/Retention.deposit_descends`).
@@ -606,13 +606,13 @@ The readout's checks, stated here so the laws outlive their code:
   readout, reading every station from the span's last datum, refused a placed datum after an open
   station (`framed_weight_one_sided`); the bank reads each candidate from its own station instead.
 
-### Bounded exact transport-family inference
+### Bounded transport-family inference in rationals
 
-[established-bounded; source-inspected] A finite deterministic construction shows how an exact
+[established-bounded; source-inspected] A finite deterministic construction shows how a rational
 returned operator causes a richer declared family, leaves some predictions open and determines
 others. Its inherited passive chart is `A₀(τ)=I+τL`, with symmetric passive graph Laplacian `L`.
 At a positive rational interval the returned operator belongs to that chart only if it is
-symmetric, has nonpositive off-diagonal entries and unit row sums. Otherwise the exact symmetry
+symmetric, has nonpositive off-diagonal entries and unit row sums. Otherwise the whole symmetry
 and unit-row residuals are kept: asymmetry declares oriented skew-pair transport, a nonzero
 unit-row residual declares diagonal standing/reaction, and a positive symmetric off-diagonal part
 declares active symmetric transport.
@@ -620,10 +620,10 @@ declares active symmetric transport.
 The enriched family is `A(τ)=M+τ(S+K+R)`: positive diagonal receiver capacity `M`, symmetric pair
 carrier `S` (whose signs distinguish passive and active terms), oriented skew pair carrier `K` and
 diagonal reaction `R`. A first complete operator fixes the off-diagonal pair terms and leaves the
-capacity/reaction split open on the diagonal. A receiver question is the exact functional
+capacity/reaction split open on the diagonal. A receiver question is the functional
 `y=rᵀA(τ)φ`. On a nonempty compatible parameter fibre it is determined exactly when its variation
 vanishes on every unresolved kernel direction; otherwise the two models separated by that
-direction return different values, so an exact distinguishing observation exists.
+direction return different values, so a distinguishing observation exists.
 
 [proved-derived; formal-checked] `Transport/GenerativeTransport` proves the time-affine interval
 identity and the kernel criteria for invariant and distinguishing linear predictions. The July
@@ -669,7 +669,7 @@ binds that recursion to a holomorphic source: `f_s v=−f`, its enclosed release
 the complete preimage equation and certified receiving neighbourhoods. For a changing source the
 law is `F_s v=−F−u̇ F_u`; backward heat joins it to the RH zero motion.
 `Mathematics/AnalyticReceiving` binds the operation to `Holon` and clocked first arrivals;
-The retired [`geometry::exact_analysis`](https://github.com/brandonrdug/holonics/blob/551d6c5d/crates/holonics/src/geometry/exact_analysis.rs) supplied the exact enclosure and capture operations. These realize field
+The retired [`geometry::exact_analysis`](https://github.com/brandonrdug/holonics/blob/551d6c5d/crates/holonics/src/geometry/exact_analysis.rs) supplied the certified enclosure and capture operations. These realize field
 refinement without making Newton dynamics every HNN's constitution; their logarithmic one-form
 and contour periods connect potential/phase circulation to the Hodge owners.
 
@@ -707,7 +707,7 @@ V(q)=κ/(2π) Σ_i softplus(−cos(2πq_i))
 q'=q+κ sin(2πp),                 p'=p−∇V(q')      (mod 1).
 ```
 
-[proved-derived] The two substeps are exact flows of complementary periodic Hamiltonians, so
+[proved-derived] The two substeps are the true flows of complementary periodic Hamiltonians, so
 their composition preserves `Σ_i dq_i∧dp_i` and phase volume. It need not preserve one unsplit
 energy or converge to a fixed point. The full derivative includes inbound and outbound attention
 and the sigmoid/softmax differentials. A detector's first reception is an output without global
@@ -787,7 +787,7 @@ This couples exterior and interior currents; `D` is constitution, not a descript
 separate example. It is also a global instantaneous solve over the contact graph, which is action
 at a distance, so the HNN never takes it as its step (light record §8.1). The step 4 word below
 is local: junction scattering about the participation anchor, a half-turn about it
-(`hnn::propagation::{participation, scattering_about}`, with `junction_scattering` the tests' exact
+(`hnn::propagation::{participation, scattering_about}`, with `junction_scattering` the tests' rational
 reference; Lean
 `HNN/Propagation.{junctionScattering_involutive, junctionScattering_isometry, junctionScattering_det}`;
 its determinant is `(−1)^(#ports · dim V)`, one half-turn per contact-port direction), one contact
@@ -898,11 +898,11 @@ realized are not in Lean, and are kept here:
 - `[agent-inferred]` **The grain correction.** At a grain `2^(−g)` in `n` complex dimensions,
   rounding `R̄` Hermitian-symmetrically errs by at most half a unit in each real coordinate, so the
   error `E` has `‖E‖₂ ≤ ‖E‖_F ≤ n` units; removing `round(R̄) + n·I` keeps `sym ⪯ 0`, and the result
-  is re-certified by exact inertia. A passive relation is fixed. The skew projection at the grain
-  rounds the strict upper triangle and completes it by `A_ji = −conj(A_ij)`, `A_ii ∈ iℤ`: exactly
-  skew-Hermitian, within half a unit per real coordinate of `skewPart W`.
+  is re-certified by inertia in rationals. A passive relation is fixed. The skew projection at the grain
+  rounds the strict upper triangle and completes it by `A_ji = −conj(A_ij)`, `A_ii ∈ iℤ`: skew-Hermitian,
+  within half a unit per real coordinate of `skewPart W`.
 - `[measured]` **The scalar shift against the congruence clip.** The least grain integer `τ` with
-  `herm W − τI ⪯ 0` (exact inertia bisection below the Gershgorin bound) is also certified passive,
+  `herm W − τI ⪯ 0` (inertia bisection in rationals below the Gershgorin bound) is also certified passive,
   keeps the skew part, and removes `τ ≤ λ_max(herm W)₊ + 1` unit, bounded by the active part. The
   congruence clip removes `P⁻ᵀ max(D, 0) P⁻¹`, which depends on the elimination order and is unbounded
   relative to `λ_max(herm W)` under an ill-conditioned congruence; on learned native reaction blocks
@@ -1001,7 +1001,7 @@ current. Softmax is not an all-to-all incidence rule: its denominator ranges ove
 contacts. Changing a previously absent edge needs the separate incidence law; the derivative on a
 fixed support does not open it.
 
-[definition] The exact rational positive-kernel/log-potential specialization takes supplied
+[definition] The rational positive-kernel/log-potential specialization takes supplied
 positive rational `K`, `a_ij = K_ij/Σ_j K_ij`, `Y = aV`, with zero entries declaring absent
 contacts; its implicit real log chart is the normalized flow relation `E′ = E`, `E(0) = 1`,
 `E(s)=K`, so no logarithm is evaluated or stored. Its differential carries both changing
@@ -1035,7 +1035,7 @@ corrected its outward-normal sign and constant-input normalization domain.
 [AttentionModeCompression](../lean/Holonics/Computation/AttentionModeCompression.lean)
 owns the law. The prototype's
 [`KernelModeReduction`](https://github.com/brandonrdug/holonics/blob/551d6c5d/crates/holonics/src/exact_linear/kernel_modes.rs)
-constructed an exact finite factorization, transported its signed current columns and tested action
+constructed a rational finite factorization, transported its signed current columns and tested action
 closure, or returned the source-null separator. It is retired: Lean `Compression/Core/FaceMap`
 owns the face map's kernel and its quotient, and no HNN execution consumes it; a loaded ring's
 future quotient is Lean `HNN/ModeQuotient` ([§4](#the-loaded-rings-mode-quotient)).
@@ -1079,7 +1079,7 @@ winner. In the loss, `p−q` is the real codec-chart part of the Holon ratio's c
 [`Computation/HolonicAdjointNormalization`](../lean/Holonics/Computation/HolonicAdjointNormalization.lean)
 (`face_add_common`, `laplacianReturn`, `quadratic_laplacianReturn`,
 `sigmoid_is_binary_normalized_exponential`); Rust `holonics::ratio::exponentiated::RatioFamily`
-carries the cocycle and exact normalization in its symbolic-log domain.
+carries the cocycle and the unrounded normalization in its symbolic-log domain.
 
 [proved-derived; formal-checked] **Gibbs, MDL and MAP.** A code objective `J` over declared
 candidates gives `Π(g)=2^(−J(g))/Z`. MDL and MAP share the minimizing predicate on the feasible
@@ -1101,7 +1101,7 @@ This is navigator inference priced as description plus work.
 ### Reflection, leaders and recursive packing
 
 [proved-derived] For positive diagonal capacities `C`, nonnegative diagonal conductances `W`,
-incidence `d` and `τ≥0`, the diffusion matrix `M=C+τ d*W d` reduces exactly to its boundary.
+incidence `d` and `τ≥0`, the diffusion matrix `M=C+τ d*W d` reduces without remainder to its boundary.
 Partition the unknowns into boundary `b` and interior `i`:
 
 ```text
@@ -1121,7 +1121,7 @@ even for a passive oscillator whose energy decreases.
 germ [agent-inferred: the founding is emanation (FOUND) and the riding is resonance (RIDE)]; an arc's causal path carries more than its endpoints or
 accumulated integral ([leader record](../research/records/2026-07-17_THE_LEADER_GROWS_THE_CHANNEL_THE_RETURN_TRAVELS_THE_FOUND_PATH.md),
 [deposition](ELEMENTARY_OBJECTS.md#8-deposition)). `Foundation/FractalPacking` constructs ordered
-rational child restrictions with exact scale, containment and sibling separation; left/right order
+rational child restrictions with rational scale, containment and sibling separation; left/right order
 changes the resulting cell. The prototype's
 [`diffusion.rs`](https://github.com/brandonrdug/holonics/blob/13f8c734/crates/holonics-cuda/src/diffusion.rs)
 and [`leader_quadrature.rs`](https://github.com/brandonrdug/holonics/blob/13f8c734/crates/holonics-cuda/src/leader_quadrature.rs)
@@ -1173,7 +1173,7 @@ readout omits the induced change.
 [definition] The normal law is one deposition: for features `f` and targets `t`, accumulate
 `H=H_0+Σ w ff*`, `B=B_0+Σ w tf*`, then solve `WH=B`. Mixed current/material features and the
 declared prior belong in `f` and `H_0`. It keeps sufficient statistics, not training samples.
-Exact preimage and factorization solvers infer other unknown functions; each operator uses the law
+Preimage and factorization solvers in rationals infer other unknown functions; each operator uses the law
 appropriate to it.
 
 [definition; agent-inferred, September 29] **The step is certified, never declared.** An HNN
@@ -1205,7 +1205,7 @@ coordinates; it is a chart transition with its own map.
 ## 4. Lattice and mode representations of the same dynamics
 
 [definition] Let `ξ=E_t x` encode active dynamics and `D_t ξ` decode the requested observable
-`ρ_t x`. For an executed step `T_t` the exact compilation conditions are
+`ρ_t x`. For an executed step `T_t` the compilation conditions are
 
 ```text
 E_(t+1) T_t = U_t E_t,          D_t E_t = ρ_t.
@@ -1229,7 +1229,7 @@ the past. The same law explains a boundary whose present response hides circulat
 dynamics. Owner: [ReflectedBoundaryMemory](../lean/Holonics/Physics/ReflectedBoundaryMemory.lean).
 
 [proved-derived; formal-checked] With `x_next=A x+B z+f`, eliminating arbitrary `z` in the next
-boundary encoding is exact precisely when `E_next A=U E` and `E_next B=0`. The receiver
+boundary encoding loses nothing precisely when `E_next A=U E` and `E_next B=0`. The receiver
 factorization of `E_next[A B]` through `[E 0]` in `holonics::ratio::linear` constructs it; a
 returned null-space separator identifies an omitted influence. With a constrained `z`-family,
 factor only that family. The same condition at each step yields the reduced recurrence by
@@ -1237,8 +1237,8 @@ induction.
 
 ### The loaded ring's mode quotient
 
-[definition; agent-inferred, U2 of [the rebuild](plans/THE_REBUILD.md#u2-one-retention-contract-and-f0s-memory)]
-A loaded ring's word-local state `x = (u, w)` ticks as one exact linear system per pump phase,
+[definition; agent-inferred, U2 of [the rebuild](https://github.com/brandonrdug/holonics/blob/0a051ae5/docs/plans/THE_REBUILD.md#u2-one-retention-contract-and-f0s-memory)]
+A loaded ring's word-local state `x = (u, w)` ticks as one rational linear system per pump phase,
 `x′ = T_t x + B_t e`, `s′ = ρ_t x + D_t e`, and its modes descend to their future quotient: the
 period lift reads the admitted future, one chart for every phase releases at most the phase
 family's kernel, the descended ring returns the same wave, the release stores nothing, the learning
@@ -1261,7 +1261,7 @@ removes only factors of `det(sI − T_t)` that every admitted entry cancels
 (`Linearization.release_cancels`, for an onto `V`); a mode that stores energy is dormant, never
 released.
 
-[counterexample; checked on exact fixtures at `h = Y = 1`] **A present-silent coordinate a later
+[counterexample; checked on rational fixtures at `h = Y = 1`] **A present-silent coordinate a later
 phase reads is retained with its separator.** Two nodes, `C = diag(1, 0, 1, 0)`, `K = ½`, a
 half-turn pump `p = ¼` (`K_0 = diag(0, 1, 0, 1)`, `K_1 = diag(1, 0, 1, 0)`): the present blind
 subspace is `span{u_0x, u_1x, w_0y, w_1y}`. With the port alone, `u_0x` and `u_1x` are heard at
@@ -1271,7 +1271,7 @@ retained, 1 released. On the cycle base `C = 2L̃`, `K = 4L̃`, `D = ⅛` the pr
 dimension 6, the release `ker K × ker C` dimension 4, and two directions are heard at tick 1.
 
 [definition] Approximation measures the actual projected residual and propagates its error
-through the admitted dynamics. Exact invisibility, tolerated difference and physical dissipation
+through the admitted dynamics. Invisibility without remainder, tolerated difference and physical dissipation
 are different calculations: a weak perturbation can be amplified later, and a strong one can be
 decoupled from the task. Attention is governed by coupling, phase, sensitivity and the task's
 ongoing dynamics, not a universal amplitude threshold. An HNN represents only the effects its
@@ -1281,7 +1281,7 @@ interactions require; no reconstruction of every cause is implied.
 
 ### Friction, leader formation and return propagation
 
-[definition] The finite phase contact `δ=y−u x`, `|u|=1`, `x'=x+α ū δ`, `y'=y−αδ` has the exact
+[definition] The finite phase contact `δ=y−u x`, `|u|=1`, `x'=x+α ū δ`, `y'=y−αδ` has the
 balance `|x|²+|y|²−|x'|²−|y'|²=2α(1−α)|δ|²` for `0≤α≤1`. It acts on signed/complex relative slip
 and deposits a nonnegative energy difference. A physical unit calibration is additional data;
 softmax weights are not electrical conductances.

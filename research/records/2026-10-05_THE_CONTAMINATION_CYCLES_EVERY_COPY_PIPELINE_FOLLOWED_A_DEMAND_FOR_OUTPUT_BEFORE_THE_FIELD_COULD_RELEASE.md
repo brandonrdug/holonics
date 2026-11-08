@@ -62,7 +62,7 @@ The release Brandon was shown on September 28 went through the September 27 copy
 - **Guard 19**: one release per request, shown whole, with its copy length as a receipt.
 - F5 loses the retrieval control. Brandon reads the releases whole, as they are.
 - The context-count tree is an exterior yardstick. It leaves the constitution once lane A's locks
-  carry the receiving storage ([THE_REBUILD U6, October 5](../../docs/plans/THE_REBUILD.md#u6-the-text-chart)).
+  carry the receiving storage ([THE_REBUILD U6, October 5](https://github.com/brandonrdug/holonics/blob/0a051ae5/docs/plans/THE_REBUILD.md#u6-the-text-chart)).
 - The likeliest re-entries are named so the next review checks them first:
   1. a text release drawn from the tree or its card mirror;
   2. an acceptance that rewards resemblance to recorded replies;
