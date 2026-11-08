@@ -1,0 +1,55 @@
+field.cu	37	FACE_BITS	16	equal
+field.cu	38	MATERIAL_BITS	24	equal
+field.cu	39	MOVE_BITS	30	equal
+field.cu	40	COVECTOR_BITS	24	several host values 192,24
+field.cu	41	UNIT_BITS	62	equal
+field.cu	42	CARRIED_BITS	70	no host twin
+field.cu	43	CONTACT_BACK	32	no host twin
+field.cu	45	CONTACT_BITS	40	equal
+field.cu	48	HOLD_BITS	40	no host twin
+field.cu	49	SHARE_BITS	63	equal
+field.cu	51	MAX_CROWD_SLOTS	32	equal
+field.cu	55	NEAR	6	equal
+field.cu	56	NEAR_SLOTS	10	no host twin
+field.cu	67	TEMPER_TOP	7	equal
+field.cu	68	LN2_FACE_BITS	30	equal
+field.cu	532	PACE_BITS	24	equal; card literal, host derived (MATERIAL_BITS)
+field.cu	1307	WEIGHT_BITS	62	equal
+field.cu	1310	WINDOW_LIMBS	8	no host twin
+field.cu	1312	CONTACT_MIN_BLOCKS	8	no host twin
+field.cu	1314	SPREAD_THREADS	256	no host twin
+field.cu	1317	MAX_CLASS_TRITS	7	equal
+field.cu	1323	MAX_PROBES	127	no host twin
+field.cu	1331	CONTACT_ROWS	4	equal
+field.cu	2913	REV_ROWS	4	equal
+field.cu	3357	ROW_CURRENT_SPAN	32	no host twin
+field.cu	3439	OUTER_TILE	64	equal
+field_energy.cuh	19	ENERGY_BITS	32	equal
+field_energy.cuh	22	TERM_EXPONENT	123	no host twin
+field_energy.cuh	26	ENERGY_SUMS	8	equal
+field_moment.cuh	80	MOMENT_COEFFICIENT_BITS	90	no host twin
+field_moment.cuh	83	MOMENT_RETURN_BITS	84	no host twin
+field_moment.cuh	84	MOMENT_RETURN_RELEASE_BITS	60	no host twin
+tower.cu	72	TOWER_THREADS	256	no host twin
+tower.cu	74	TOWER_LADDER	17	no host twin
+tower.cu	77	TOWER_REFUSED_CARRIER	1	no host twin
+tower.cu	78	TOWER_REFUSED_WORD64	2	no host twin
+tower.cu	79	TOWER_REFUSED_WORD32	4	no host twin
+tower.cu	80	TOWER_REFUSED_UNIT	8	no host twin
+tower.cu	81	TOWER_REFUSED_CLASS	16	no host twin
+tower.cu	82	TOWER_REFUSED_NEWS	32	no host twin
+tower.cu	85	FACE_BITS	16	equal
+tower.cu	86	MATERIAL_BITS	24	equal
+tower.cu	87	MOVE_BITS	30	equal
+tower.cu	88	STATE_BITS	24	several host values 16,24
+tower.cu	89	COVECTOR_BITS	24	several host values 192,24
+tower.cu	90	UNIT_BITS	62	equal
+tower.cu	91	MARGIN	12	several host values 1073741824,12
+tower.cu	92	GATE_REACH	2	equal
+tower.cu	93	TURN_BITS	16	several host values 16,40
+tower.cu	94	READ_BITS	20	equal
+tower.cu	96	SCORE_BITS	48	equal
+tower.cu	3991	OUTER_ROWS	16	equal
+tower.cu	3992	OUTER_COLS	64	equal
+tower.cu	3993	OUTER_CELLS	32	no host twin
+tower.cu	4350	CREDIT_CELLS	32	equal

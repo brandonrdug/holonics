@@ -1,0 +1,13 @@
+file	part	release	div_nearest	fit64	carrier_refusal_lines	saturating
+crates/holonics/src/hnn/tower/field.rs	code	108	23	50	14	17
+crates/holonics/src/hnn/tower/field.rs	test	0	0	0	0	0
+crates/holonics/src/hnn/tower/field/energy.rs	code	74	19	41	8	6
+crates/holonics/src/hnn/tower/field/energy.rs	test	0	0	0	0	0
+crates/holonics/src/hnn/tower/field/moment.rs	code	12	0	2	3	0
+crates/holonics/src/hnn/tower/field/moment.rs	test	0	0	0	0	0
+crates/holonics-cuda/kernels/field.cu	code	103	17	55	0	0
+crates/holonics-cuda/kernels/field.cu	test	0	0	0	0	0
+crates/holonics-cuda/kernels/field_energy.cuh	code	58	11	33	0	0
+crates/holonics-cuda/kernels/field_energy.cuh	test	0	0	0	0	0
+crates/holonics-cuda/kernels/field_moment.cuh	code	8	0	2	0	0
+crates/holonics-cuda/kernels/field_moment.cuh	test	0	0	0	0	0

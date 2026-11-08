@@ -1,0 +1,722 @@
+file	line	name	type	value	expr	uses	files	test	tag	class	quantity	consumer	need
+crates/holonics-cuda/kernels/exact_integer.cuh	66	HNN_EXACT		0	0u	37	2	0					
+crates/holonics-cuda/kernels/exact_integer.cuh	67	HNN_REFUSED_CARRIER		1	1u	1	1	0					
+crates/holonics-cuda/kernels/exact_integer.cuh	68	HNN_REFUSED_MALFORMED		2	2u	1	1	0					
+crates/holonics-cuda/kernels/exact_integer.cuh	69	HNN_REFUSED_WORD		4	4u	3	2	0					
+crates/holonics-cuda/kernels/exact_integer.cuh	70	HNN_REFUSED_OPERAND		8	8u	6	2	0					
+crates/holonics-cuda/kernels/exact_integer.cuh	73	HNN_CARRIER_BOUND		None	(((uwide)1) << 127)	9	3	0					
+crates/holonics-cuda/kernels/exact_integer.cuh	183	HNN_XINT_OK		0	0u	11	4	0					
+crates/holonics-cuda/kernels/exact_integer.cuh	184	HNN_XINT_NEED_CAPACITY		1	1u	14	4	0					
+crates/holonics-cuda/kernels/exact_integer.cuh	185	HNN_XINT_DIV_ZERO		2	2u	1	1	0					
+crates/holonics-cuda/kernels/exact_integer.cuh	186	HNN_XINT_BAD_VIEW		3	3u	12	1	0					
+crates/holonics-cuda/kernels/exact_integer.cuh	187	HNN_XINT_NONINTEGRAL_SHIFT		4	4u	2	1	0					
+crates/holonics-cuda/kernels/field.cu	37	FACE_BITS		16	16	341	17	0					
+crates/holonics-cuda/kernels/field.cu	38	MATERIAL_BITS		24	24	419	15	0					
+crates/holonics-cuda/kernels/field.cu	39	MOVE_BITS		30	30	472	17	0					
+crates/holonics-cuda/kernels/field.cu	40	COVECTOR_BITS		24	24	92	13	0					
+crates/holonics-cuda/kernels/field.cu	41	UNIT_BITS		62	62	46	6	0					
+crates/holonics-cuda/kernels/field.cu	42	CARRIED_BITS		70	70	0	0	0		dead	70, no use	none	declared, unused
+crates/holonics-cuda/kernels/field.cu	43	CONTACT_BACK		32	32	9	2	0		derived, written literal	32 = CONTACT_BITS + FACE_BITS - COVECTOR_BITS (the host computes it)	contact and reverse kernels, field_energy	parity by hand
+crates/holonics-cuda/kernels/field.cu	45	CONTACT_BITS		40	40	7	3	0					
+crates/holonics-cuda/kernels/field.cu	48	HOLD_BITS		40	40	0	0	0		dead	a hold's face on 2^-40; its named host twin is gone	none	declared, unused
+crates/holonics-cuda/kernels/field.cu	49	SHARE_BITS		63	63	43	6	0					
+crates/holonics-cuda/kernels/field.cu	51	MAX_CROWD_SLOTS		32	32	6	3	0		realization, derived bound	one warp; 2(ceil(log2 reach)-1) <= 32 iff reach <= 2^17	affine_tiling, upload	22 slots at reach 3,771
+crates/holonics-cuda/kernels/field.cu	55	NEAR		6	6	120	10	0					
+crates/holonics-cuda/kernels/field.cu	56	NEAR_SLOTS		10	(2 * (NEAR - 1))	7	2	0		derived	2(NEAR-1) = 10	contact kernels	derived
+crates/holonics-cuda/kernels/field.cu	58	REFUSED_CARRIER		1	1u	35	5	0					
+crates/holonics-cuda/kernels/field.cu	59	REFUSED_WORD64		2	2u	2	1	0					
+crates/holonics-cuda/kernels/field.cu	60	REFUSED_WORD32		4	4u	1	1	0					
+crates/holonics-cuda/kernels/field.cu	61	REFUSED_SHIFT		8	8u	0	0	0					
+crates/holonics-cuda/kernels/field.cu	63	REFUSED_KEY		32	32u	9	2	0					
+crates/holonics-cuda/kernels/field.cu	65	REFUSED_TEMPER		64	64u	1	1	0					
+crates/holonics-cuda/kernels/field.cu	67	TEMPER_TOP		7	7	2	2	0		carrier, inherited, written literal	7	temper_log	parity by hand
+crates/holonics-cuda/kernels/field.cu	68	LN2_FACE_BITS		30	30	11	2	0		grain, picked	30	skin kernels	parity by hand
+crates/holonics-cuda/kernels/field.cu	532	PACE_BITS		24	24	29	6	0		identity, written literal	24 (host = MATERIAL_BITS)	skin kernels	parity by hand
+crates/holonics-cuda/kernels/field.cu	751	NO_BIAS		None	0xFFFFFFFFFFFFFFFFull	7	2	0					
+crates/holonics-cuda/kernels/field.cu	1307	WEIGHT_BITS		62	62	16	4	0					
+crates/holonics-cuda/kernels/field.cu	1310	WINDOW_LIMBS		8	8	2	1	0		realization	contact carriers to 8 limbs (512 bits) add in place	add_window	realization
+crates/holonics-cuda/kernels/field.cu	1312	CONTACT_MIN_BLOCKS		8	8	2	2	0		realization	8 resident blocks a multiprocessor	launch bounds	launch geometry
+crates/holonics-cuda/kernels/field.cu	1314	SPREAD_THREADS		256	256	3	2	0		realization	256 a block of field_spread	launch	launch geometry
+crates/holonics-cuda/kernels/field.cu	1317	MAX_CLASS_TRITS		7	7	2	2	0					
+crates/holonics-cuda/kernels/field.cu	1323	MAX_PROBES		127	127	4	2	0	measurement	realization, measured	127 probes keep the contact and reverse kernels' blocks an SM (ptxas -v, theory 00:25)	energy_widened_lists	measured
+crates/holonics-cuda/kernels/field.cu	1331	CONTACT_ROWS		4	4	33	4	0		realization	4 warps a contact block	launch	launch geometry
+crates/holonics-cuda/kernels/field.cu	2913	REV_ROWS		4	4	42	4	0	agent-inferred	realization	4 warps a reverse block	launch	launch geometry
+crates/holonics-cuda/kernels/field.cu	3357	ROW_CURRENT_SPAN		32	32	4	1	0	agent-inferred	realization	32	launch	launch geometry
+crates/holonics-cuda/kernels/field.cu	3439	OUTER_TILE		64	64	13	4	0	agent-inferred	realization	64	launch	launch geometry
+crates/holonics-cuda/kernels/field_energy.cuh	19	ENERGY_BITS		32	32	27	4	0		grain, criterion stated	card twin	energy kernels	parity by hand
+crates/holonics-cuda/kernels/field_energy.cuh	22	TERM_EXPONENT		123	123	1	1	0		derived, written literal	123 = 2*62 - 1: face and multiplier on 2^-62, the face's fraction 2^(f-1); the host's log_row writes 123 too	log_row	parity by hand
+crates/holonics-cuda/kernels/field_energy.cuh	26	ENERGY_SUMS		8	8	11	2	0		realization	8 sums of 128 bits a region (pair on 2^-40, the rest on 2^-32)	energy kernels	realization
+crates/holonics-cuda/kernels/field_energy.cuh	27	ENERGY_LOCK		0	0	2	1	0					
+crates/holonics-cuda/kernels/field_energy.cuh	28	ENERGY_LETTERS		1	1	2	1	0					
+crates/holonics-cuda/kernels/field_energy.cuh	29	ENERGY_PAIR		2	2	2	1	0					
+crates/holonics-cuda/kernels/field_energy.cuh	30	ENERGY_LOGS		3	3	2	2	0					
+crates/holonics-cuda/kernels/field_energy.cuh	31	ENERGY_PAIRS		4	4	2	2	0					
+crates/holonics-cuda/kernels/field_energy.cuh	32	ENERGY_MOVED		5	5	2	2	0					
+crates/holonics-cuda/kernels/field_energy.cuh	33	ENERGY_PHI		6	6	2	2	0					
+crates/holonics-cuda/kernels/field_moment.cuh	75	MOMENT_REFUSED_SHAPE		16	16u	9	2	0					
+crates/holonics-cuda/kernels/field_moment.cuh	80	MOMENT_COEFFICIENT_BITS		90	(3 * MOVE_BITS)	6	2	0					
+crates/holonics-cuda/kernels/field_moment.cuh	83	MOMENT_RETURN_BITS		84	(2 * MOVE_BITS + COVECTOR_BITS)	1	1	0					
+crates/holonics-cuda/kernels/field_moment.cuh	84	MOMENT_RETURN_RELEASE_BITS		60	(MOMENT_RETURN_BITS - COVECTOR_BITS)	12	2	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	64	WP_RINGS		0	0	2	2	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	65	WP_CONTACTS		1	1	3	2	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	66	WP_STEPS		2	2	4	2	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	67	WP_LC		3	3	3	2	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	68	WP_LW		4	4	3	2	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	69	WP_RING_ROWS		5	5	3	2	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	70	WP_ARRIVALS		6	6	3	2	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	71	WP_CONTACT_ROWS		7	7	3	2	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	72	WP_H_MUL		8	8	3	2	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	73	WP_H_SHIFT		9	9	3	2	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	74	WP_X_MUL		10	10	3	2	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	75	WP_X_SHIFT		11	11	3	2	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	76	WP_RING_TABLE		12	12	3	2	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	77	WP_CONTACT_TABLE		13	13	3	2	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	78	WP_INCIDENCE		14	14	3	2	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	79	WP_ROW_RING		15	15	3	2	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	80	WP_ROW_CONTACT		16	16	3	2	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	81	WP_ARRIVAL_TABLE		17	17	3	2	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	82	WP_RECEIVER		18	18	3	2	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	83	WP_EPOCH		19	19	3	2	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	84	WP_APERTURE		20	20	3	2	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	85	WP_MAP_ROWS		21	21	2	2	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	86	WP_GATHER		22	22	2	2	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	87	WP_SOURCES		23	23	2	2	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	88	WP_SOURCE_TABLE		24	24	2	2	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	89	WP_ALPHABET		25	25	2	2	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	90	WP_PAIR_TABLE		26	26	2	2	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	91	WP_INCIDENCES		27	27	2	2	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	92	WP_MAP		28	28	2	2	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	93	WP_RESONATORS		29	29	3	2	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	94	WP_CARRY		30	30	4	2	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	95	WP_OPENED		31	31	6	2	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	97	WR_STRIDE		12	12	26	2	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	98	WR_WIDTH		0	0	9	2	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	99	WR_ROWS		1	1	14	2	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	100	WR_CHART		2	2	3	2	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	101	WR_WC		3	3	6	2	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	102	WR_WC_EXP		4	4	4	2	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	103	WR_STORAGE_EXP		5	5	4	2	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	104	WR_DEGREE		6	6	5	2	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	105	WR_INCIDENCE		7	7	6	2	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	106	WR_WEIGHTS		8	8	3	2	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	107	WR_ANCHOR_EXP		9	9	2	2	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	108	WR_RESONATOR		10	10	8	2	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	111	RZ_STRIDE		19	19	10	2	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	112	RZ_RING		0	0	1	1	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	113	RZ_WIDTH		1	1	5	2	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	114	RZ_ROWS		2	2	5	2	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	115	RZ_CAPACITY		3	3	3	2	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	116	RZ_STIFFNESS		4	4	3	2	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	117	RZ_CHARTS		5	5	3	2	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	118	RZ_PHASES		6	6	5	2	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	119	RZ_LM		7	7	3	2	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	120	RZ_LC		8	8	3	2	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	121	RZ_EH		9	9	5	2	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	122	RZ_RETURN_GAIN		10	10	3	2	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	123	RZ_RETURN_EXP		11	11	3	2	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	124	RZ_DISSIPATION		12	12	1	1	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	125	RZ_OPERATOR		13	13	1	1	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	126	RZ_OPERATOR_EXP		14	14	1	1	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	127	RZ_SATURATION		15	15	5	2	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	128	RZ_BETA		16	16	3	2	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	129	RZ_BETA_EXP		17	17	3	2	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	130	RZ_FORCE_EXP		18	18	4	2	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	132	WI_STRIDE		3	3	4	1	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	133	WI_CONTACT		0	0	0	0	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	134	WI_SLOT		1	1	0	0	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	135	WI_ARRIVAL		2	2	4	1	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	137	WC_STRIDE		20	20	12	2	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	138	WC_WIDTH		0	0	7	2	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	139	WC_FROM		1	1	2	2	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	140	WC_TO		2	2	2	2	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	141	WC_ROWS		3	3	9	2	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	142	WC_ARRIVAL_FROM		4	4	3	2	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	143	WC_ARRIVAL_TO		5	5	3	2	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	144	WC_SELECTION		6	6	3	2	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	145	WC_CHART		7	7	3	2	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	146	WC_C		8	8	6	2	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	147	WC_C_EXP		9	9	3	2	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	148	WC_K		10	10	6	2	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	149	WC_K_EXP		11	11	3	2	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	150	WC_GAIN		12	12	2	2	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	151	WC_GAIN_EXP		13	13	2	2	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	152	WC_RIGHT_EXP		14	14	3	2	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	153	WC_RATE_GAIN		15	15	2	2	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	154	WC_RATE_GAIN_EXP		16	16	2	2	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	155	WC_SHIFT_GAIN		17	17	2	2	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	156	WC_SHIFT_GAIN_EXP		18	18	2	2	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	157	WC_ZETA_EXP		19	19	2	2	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	159	WA_STRIDE		5	5	4	1	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	160	WA_CONTACT		0	0	4	1	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	161	WA_END		1	1	2	1	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	162	WA_RING		2	2	2	1	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	163	WA_COORD		3	3	2	1	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	164	WA_CHANNEL		4	4	4	1	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	166	WS_STRIDE		11	11	4	2	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	167	WS_RING		0	0	1	1	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	168	WS_PHASES		1	1	1	1	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	169	WS_E		2	2	1	1	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	170	WS_COUNTS		3	3	1	1	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	171	WS_GATHER		4	4	1	1	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	172	WS_OPEN_EXP		5	5	2	1	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	173	WS_E_SHIFT		6	6	1	1	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	174	WS_PAIRS		7	7	1	1	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	175	WS_PAIR_BASE		8	8	1	1	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	176	WS_NU		9	9	1	1	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	177	WS_PREPARATION		10	10	2	1	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	179	WQ_STRIDE		8	8	2	2	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	180	WQ_RANK		0	0	1	1	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	181	WQ_OUTPUTS		1	1	1	1	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	182	WQ_CURRENT		2	2	0	0	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	183	WQ_EARLIER		3	3	0	0	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	184	WQ_COUNTS		4	4	0	0	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	185	WQ_WEIGHTS		5	5	1	1	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	186	WQ_SHIFT		6	6	1	1	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	187	WQ_PHASES		7	7	0	0	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	190	WL_STORAGE		0	0	3	2	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	191	WL_ARRIVALS		1	1	3	2	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	192	WL_U		2	2	3	2	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	193	WL_W		3	3	3	2	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	194	WL_REM_ANCHOR		4	4	2	2	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	195	WL_REM_STORAGE		5	5	2	2	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	196	WL_REM_SOLVE		6	6	2	2	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	197	WL_REM_ARRIVAL		7	7	2	2	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	198	WL_REM_DISP		8	8	2	2	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	199	WL_REM_RATE		9	9	2	2	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	200	WL_ANCHOR		10	10	1	1	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	201	WL_OPERAND		11	11	1	1	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	202	WL_RIGHT		12	12	1	1	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	203	WL_ZETA		13	13	1	1	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	204	WL_REC_STORAGE		14	14	3	2	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	205	WL_REC_ARRIVALS		15	15	4	2	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	206	WL_REC_U		16	16	3	2	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	207	WL_REC_W		17	17	3	2	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	208	WL_REC_ANCHOR		18	18	4	2	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	209	WL_REC_MID		19	19	2	2	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	210	WL_REC_RIGHT		20	20	2	2	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	211	WL_REC_ZETA		21	21	2	2	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	212	WL_REC_OMEGA		22	22	3	2	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	213	WL_LOGITS		23	23	2	2	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	214	WL_STATUS		24	24	4	2	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	215	WL_BAR_STORAGE		25	25	5	2	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	216	WL_BAR_ARRIVAL		26	26	1	1	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	217	WL_BAR_DISP		27	27	1	1	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	218	WL_BAR_RATE		28	28	1	1	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	219	WL_REV_EL		29	29	3	2	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	220	WL_REV_ZETA		30	30	3	2	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	221	WL_REV_SOLVED		31	31	3	2	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	222	WL_REV_RATE		32	32	3	2	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	223	WL_REV_DISP		33	33	3	2	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	224	WL_REV_STORAGE		34	34	3	2	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	225	WL_REV_ARRIVAL		35	35	3	2	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	226	WL_ADJ_U		36	36	1	1	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	227	WL_WAVE		37	37	1	1	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	228	WL_CONTRAST		38	38	1	1	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	229	WL_OUTGOING		39	39	1	1	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	230	WL_EXCHANGE		40	40	1	1	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	231	WL_ZETA_BAR		41	41	1	1	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	232	WL_SOLVED		42	42	1	1	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	233	WL_ANCHOR_BAR		43	43	1	1	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	234	WL_REC_ADJ_U		44	44	3	2	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	235	WL_REC_SOLVED		45	45	3	2	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	236	WL_DOTS1		46	46	3	2	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	237	WL_DOTS2		47	47	3	2	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	238	WL_DOTS3		48	48	3	2	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	239	WL_READS		49	49	3	2	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	240	WL_REV_STATUS		50	50	3	2	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	241	WL_RES_U		51	51	6	2	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	242	WL_RES_W		52	52	4	2	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	243	WL_RES_REM_RATE		53	53	5	2	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	244	WL_RES_REM_U		54	54	5	2	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	245	WL_RES_REM_W		55	55	5	2	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	246	WL_RES_REM_OUTPUT		56	56	5	2	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	247	WL_REC_RES_DRIVE		57	57	2	2	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	248	WL_REC_RES_OUTPUT		58	58	2	2	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	249	WL_REC_RES_U		59	59	3	2	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	250	WL_REC_RES_W		60	60	2	2	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	251	WL_REC_RES_RATE		61	61	3	2	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	252	WL_RES_U_BAR		62	62	2	2	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	253	WL_RES_W_BAR		63	63	1	1	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	254	WL_RES_Z_BAR		64	64	2	1	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	255	WL_REC_RES_SOLVED		65	65	3	2	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	256	WL_RES_STATUS		66	66	2	1	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	257	WL_RES_OPERAND_STATUS		67	67	2	1	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	258	WL_SOURCE_OPENING		68	68	3	2	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	261	WSTATUS_BITS		0	0	2	1	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	262	WSTATUS_STAGE		1	1	2	1	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	263	WSTATUS_ROW		2	2	2	1	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	569	STAGE_OPEN		1	1	4	1	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	570	STAGE_JUNCTION		2	2	1	1	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	571	STAGE_OPERAND		3	3	1	1	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	572	STAGE_RIGHT		4	4	1	1	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	573	STAGE_ELEMENT		5	5	1	1	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	574	STAGE_SOLVE		6	6	1	1	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	575	STAGE_ARRIVAL		7	7	1	1	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	576	STAGE_LAST		8	8	2	1	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	577	STAGE_READ		9	9	1	1	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	578	STAGE_RESONATOR		10	10	3	1	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	1239	RSTAGE_ELEMENT		1	1	1	1	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	1240	RSTAGE_ZETA		2	2	1	1	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	1241	RSTAGE_CONTRAST		3	3	1	1	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	1242	RSTAGE_SOLVED		4	4	3	1	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	1243	RSTAGE_STATE		5	5	2	1	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	1244	RSTAGE_OUTGOING		6	6	1	1	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	1245	RSTAGE_DOTS		7	7	2	1	0					
+crates/holonics-cuda/kernels/hnn_word.cuh	1246	RSTAGE_JUNCTION		8	8	1	1	0					
+crates/holonics-cuda/kernels/tower.cu	72	TOWER_THREADS		256	256	13	1	0					
+crates/holonics-cuda/kernels/tower.cu	74	TOWER_LADDER		17	17	2	1	0					
+crates/holonics-cuda/kernels/tower.cu	77	TOWER_REFUSED_CARRIER		1	1u	7	1	0					
+crates/holonics-cuda/kernels/tower.cu	78	TOWER_REFUSED_WORD64		2	2u	7	1	0					
+crates/holonics-cuda/kernels/tower.cu	79	TOWER_REFUSED_WORD32		4	4u	1	1	0					
+crates/holonics-cuda/kernels/tower.cu	80	TOWER_REFUSED_UNIT		8	8u	1	1	0					
+crates/holonics-cuda/kernels/tower.cu	81	TOWER_REFUSED_CLASS		16	16u	2	1	0					
+crates/holonics-cuda/kernels/tower.cu	82	TOWER_REFUSED_NEWS		32	32u	4	1	0					
+crates/holonics-cuda/kernels/tower.cu	85	FACE_BITS		16	16	341	17	0					
+crates/holonics-cuda/kernels/tower.cu	86	MATERIAL_BITS		24	24	419	15	0					
+crates/holonics-cuda/kernels/tower.cu	87	MOVE_BITS		30	30	472	17	0					
+crates/holonics-cuda/kernels/tower.cu	88	STATE_BITS		24	24	78	7	0					
+crates/holonics-cuda/kernels/tower.cu	89	COVECTOR_BITS		24	24	92	13	0					
+crates/holonics-cuda/kernels/tower.cu	90	UNIT_BITS		62	62	46	6	0					
+crates/holonics-cuda/kernels/tower.cu	91	MARGIN		12	12	8	3	0					
+crates/holonics-cuda/kernels/tower.cu	92	GATE_REACH		2	2	14	2	0					
+crates/holonics-cuda/kernels/tower.cu	93	TURN_BITS		16	16	6	3	0					
+crates/holonics-cuda/kernels/tower.cu	94	READ_BITS		20	20	30	6	0					
+crates/holonics-cuda/kernels/tower.cu	96	SCORE_BITS		48	48	2	2	0					
+crates/holonics-cuda/kernels/tower.cu	3991	OUTER_ROWS		16	16	8	2	0					
+crates/holonics-cuda/kernels/tower.cu	3992	OUTER_COLS		64	64	10	2	0					
+crates/holonics-cuda/kernels/tower.cu	3993	OUTER_CELLS		32	32	7	1	0					
+crates/holonics-cuda/kernels/tower.cu	4350	CREDIT_CELLS		32	32	7	2	0					
+crates/holonics-cuda/kernels/tree.cu	31	TREE_NONE		None	0xffffffffu	10	1	0					
+crates/holonics-cuda/kernels/tree.cu	32	TABLE_EMPTY		None	0xffffffffffffffffull	6	1	0					
+crates/holonics-cuda/kernels/tree.cu	33	TREE_MAX_DEPTH		64	64	3	1	0					
+crates/holonics-cuda/kernels/tree.cu	34	TREE_BRANCH_BIT		None	0x80000000u	2	1	0					
+crates/holonics-cuda/kernels/tree.cu	35	TREE_MAX_DIGITS		32	32	6	1	0					
+crates/holonics-cuda/kernels/tree.cu	38	BIG_LIMBS		8	8	14	1	0					
+crates/holonics-cuda/kernels/tree.cu	726	LOG_SLOTS		4	4	4	2	0					
+crates/holonics-cuda/kernels/tree.cu	727	LOG_RELINKS		2	2	6	2	0					
+crates/holonics-cuda/kernels/tree.cu	728	LOG_ROOTS		2	2	8	2	0					
+crates/holonics-cuda/src/bin/mount-smoke.rs	20	IDENTITY_N	usize	1048576	1 << 20	4	1	0					
+crates/holonics-cuda/src/bin/mount-smoke.rs	21	IDENTITY_BLOCK	u32	256	256	3	1	0					
+crates/holonics-cuda/src/bin/mount-smoke.rs	22	IDENTITY_GRID	u32	4096.0	(IDENTITY_N as u32) / IDENTITY_BLOCK	2	1	0					
+crates/holonics-cuda/src/bin/mount-smoke.rs	24	FOLD_COUNT	usize	65536	1 << 16	5	1	0					
+crates/holonics-cuda/src/bin/mount-smoke.rs	25	FOLD_BLOCK	u32	256	256	2	1	0					
+crates/holonics-cuda/src/bin/mount-smoke.rs	26	FOLD_GRID	u32	256.0	(FOLD_COUNT as u32) / FOLD_BLOCK	1	1	0					
+crates/holonics-cuda/src/cuda.rs	695	CU_CTX_SCHED_BLOCKING_SYNC	u32	4	0x04	1	1	0					
+crates/holonics-cuda/src/cuda.rs	697	CU_LIMIT_STACK_SIZE	i32	0	0	4	1	0					
+crates/holonics-cuda/src/cuda.rs	878	ALLOCATION_CALIBRATION_ATTEMPTS	usize	8	8	5	1	0					
+crates/holonics-cuda/src/hnn/card.rs	277	READ_SHARED_PER_THREAD	u32	None	2 * core::mem::size_of::<i128>() as u32	4	2	0					
+crates/holonics-cuda/src/hnn/card.rs	345	CERTIFICATE_SHARED_PER_THREAD	u32	None	core::mem::size_of::<u128>() as u32	4	2	0					
+crates/holonics-cuda/src/hnn/execute.rs	58	WP_HEADER	usize	32	32	1	1	0					
+crates/holonics-cuda/src/hnn/execute.rs	59	WP_RINGS	usize	0	0	2	2	0					
+crates/holonics-cuda/src/hnn/execute.rs	60	WP_CONTACTS	usize	1	1	3	2	0					
+crates/holonics-cuda/src/hnn/execute.rs	61	WP_STEPS	usize	2	2	4	2	0					
+crates/holonics-cuda/src/hnn/execute.rs	62	WP_LC	usize	3	3	3	2	0					
+crates/holonics-cuda/src/hnn/execute.rs	63	WP_LW	usize	4	4	3	2	0					
+crates/holonics-cuda/src/hnn/execute.rs	64	WP_RING_ROWS	usize	5	5	3	2	0					
+crates/holonics-cuda/src/hnn/execute.rs	65	WP_ARRIVALS	usize	6	6	3	2	0					
+crates/holonics-cuda/src/hnn/execute.rs	66	WP_CONTACT_ROWS	usize	7	7	3	2	0					
+crates/holonics-cuda/src/hnn/execute.rs	67	WP_H_MUL	usize	8	8	3	2	0					
+crates/holonics-cuda/src/hnn/execute.rs	68	WP_H_SHIFT	usize	9	9	3	2	0					
+crates/holonics-cuda/src/hnn/execute.rs	69	WP_X_MUL	usize	10	10	3	2	0					
+crates/holonics-cuda/src/hnn/execute.rs	70	WP_X_SHIFT	usize	11	11	3	2	0					
+crates/holonics-cuda/src/hnn/execute.rs	71	WP_RING_TABLE	usize	12	12	3	2	0					
+crates/holonics-cuda/src/hnn/execute.rs	72	WP_CONTACT_TABLE	usize	13	13	3	2	0					
+crates/holonics-cuda/src/hnn/execute.rs	73	WP_INCIDENCE	usize	14	14	3	2	0					
+crates/holonics-cuda/src/hnn/execute.rs	74	WP_ROW_RING	usize	15	15	3	2	0					
+crates/holonics-cuda/src/hnn/execute.rs	75	WP_ROW_CONTACT	usize	16	16	3	2	0					
+crates/holonics-cuda/src/hnn/execute.rs	76	WP_ARRIVAL_TABLE	usize	17	17	3	2	0					
+crates/holonics-cuda/src/hnn/execute.rs	77	WP_RECEIVER	usize	18	18	3	2	0					
+crates/holonics-cuda/src/hnn/execute.rs	78	WP_EPOCH	usize	19	19	3	2	0					
+crates/holonics-cuda/src/hnn/execute.rs	79	WP_APERTURE	usize	20	20	3	2	0					
+crates/holonics-cuda/src/hnn/execute.rs	80	WP_MAP_ROWS	usize	21	21	2	2	0					
+crates/holonics-cuda/src/hnn/execute.rs	81	WP_GATHER	usize	22	22	2	2	0					
+crates/holonics-cuda/src/hnn/execute.rs	82	WP_SOURCES	usize	23	23	2	2	0					
+crates/holonics-cuda/src/hnn/execute.rs	83	WP_SOURCE_TABLE	usize	24	24	2	2	0					
+crates/holonics-cuda/src/hnn/execute.rs	84	WP_ALPHABET	usize	25	25	2	2	0					
+crates/holonics-cuda/src/hnn/execute.rs	85	WP_PAIR_TABLE	usize	26	26	2	2	0					
+crates/holonics-cuda/src/hnn/execute.rs	86	WP_INCIDENCES	usize	27	27	2	2	0					
+crates/holonics-cuda/src/hnn/execute.rs	87	WP_MAP	usize	28	28	2	2	0					
+crates/holonics-cuda/src/hnn/execute.rs	88	WP_RESONATORS	usize	29	29	3	2	0					
+crates/holonics-cuda/src/hnn/execute.rs	89	WP_CARRY	usize	30	30	4	2	0					
+crates/holonics-cuda/src/hnn/execute.rs	90	WP_OPENED	usize	31	31	6	2	0					
+crates/holonics-cuda/src/hnn/execute.rs	92	WR_STRIDE	usize	12	12	26	2	0					
+crates/holonics-cuda/src/hnn/execute.rs	93	WR_WIDTH	usize	0	0	9	2	0					
+crates/holonics-cuda/src/hnn/execute.rs	94	WR_ROWS	usize	1	1	14	2	0					
+crates/holonics-cuda/src/hnn/execute.rs	95	WR_CHART	usize	2	2	3	2	0					
+crates/holonics-cuda/src/hnn/execute.rs	96	WR_WC	usize	3	3	6	2	0					
+crates/holonics-cuda/src/hnn/execute.rs	97	WR_WC_EXP	usize	4	4	4	2	0					
+crates/holonics-cuda/src/hnn/execute.rs	98	WR_STORAGE_EXP	usize	5	5	4	2	0					
+crates/holonics-cuda/src/hnn/execute.rs	99	WR_DEGREE	usize	6	6	5	2	0					
+crates/holonics-cuda/src/hnn/execute.rs	100	WR_INCIDENCE	usize	7	7	6	2	0					
+crates/holonics-cuda/src/hnn/execute.rs	101	WR_WEIGHTS	usize	8	8	3	2	0					
+crates/holonics-cuda/src/hnn/execute.rs	102	WR_ANCHOR_EXP	usize	9	9	2	2	0					
+crates/holonics-cuda/src/hnn/execute.rs	103	WR_RESONATOR	usize	10	10	8	2	0					
+crates/holonics-cuda/src/hnn/execute.rs	105	RZ_STRIDE	usize	19	19	10	2	0					
+crates/holonics-cuda/src/hnn/execute.rs	106	RZ_RING	usize	0	0	1	1	0					
+crates/holonics-cuda/src/hnn/execute.rs	107	RZ_WIDTH	usize	1	1	5	2	0					
+crates/holonics-cuda/src/hnn/execute.rs	108	RZ_ROWS	usize	2	2	5	2	0					
+crates/holonics-cuda/src/hnn/execute.rs	109	RZ_CAPACITY	usize	3	3	3	2	0					
+crates/holonics-cuda/src/hnn/execute.rs	110	RZ_STIFFNESS	usize	4	4	3	2	0					
+crates/holonics-cuda/src/hnn/execute.rs	111	RZ_CHARTS	usize	5	5	3	2	0					
+crates/holonics-cuda/src/hnn/execute.rs	112	RZ_PHASES	usize	6	6	5	2	0					
+crates/holonics-cuda/src/hnn/execute.rs	113	RZ_LM	usize	7	7	3	2	0					
+crates/holonics-cuda/src/hnn/execute.rs	114	RZ_LC	usize	8	8	3	2	0					
+crates/holonics-cuda/src/hnn/execute.rs	115	RZ_EH	usize	9	9	5	2	0					
+crates/holonics-cuda/src/hnn/execute.rs	116	RZ_RETURN_GAIN	usize	10	10	3	2	0					
+crates/holonics-cuda/src/hnn/execute.rs	117	RZ_RETURN_EXP	usize	11	11	3	2	0					
+crates/holonics-cuda/src/hnn/execute.rs	118	RZ_DISSIPATION	usize	12	12	1	1	0					
+crates/holonics-cuda/src/hnn/execute.rs	119	RZ_OPERATOR	usize	13	13	1	1	0					
+crates/holonics-cuda/src/hnn/execute.rs	120	RZ_OPERATOR_EXP	usize	14	14	1	1	0					
+crates/holonics-cuda/src/hnn/execute.rs	121	RZ_SATURATION	usize	15	15	5	2	0					
+crates/holonics-cuda/src/hnn/execute.rs	122	RZ_BETA	usize	16	16	3	2	0					
+crates/holonics-cuda/src/hnn/execute.rs	123	RZ_BETA_EXP	usize	17	17	3	2	0					
+crates/holonics-cuda/src/hnn/execute.rs	124	RZ_FORCE_EXP	usize	18	18	4	2	0					
+crates/holonics-cuda/src/hnn/execute.rs	126	WC_STRIDE	usize	20	20	12	2	0					
+crates/holonics-cuda/src/hnn/execute.rs	127	WC_WIDTH	usize	0	0	7	2	0					
+crates/holonics-cuda/src/hnn/execute.rs	128	WC_FROM	usize	1	1	2	2	0					
+crates/holonics-cuda/src/hnn/execute.rs	129	WC_TO	usize	2	2	2	2	0					
+crates/holonics-cuda/src/hnn/execute.rs	130	WC_ROWS	usize	3	3	9	2	0					
+crates/holonics-cuda/src/hnn/execute.rs	131	WC_ARRIVAL_FROM	usize	4	4	3	2	0					
+crates/holonics-cuda/src/hnn/execute.rs	132	WC_ARRIVAL_TO	usize	5	5	3	2	0					
+crates/holonics-cuda/src/hnn/execute.rs	133	WC_SELECTION	usize	6	6	3	2	0					
+crates/holonics-cuda/src/hnn/execute.rs	134	WC_CHART	usize	7	7	3	2	0					
+crates/holonics-cuda/src/hnn/execute.rs	135	WC_C	usize	8	8	6	2	0					
+crates/holonics-cuda/src/hnn/execute.rs	136	WC_C_EXP	usize	9	9	3	2	0					
+crates/holonics-cuda/src/hnn/execute.rs	137	WC_K	usize	10	10	6	2	0					
+crates/holonics-cuda/src/hnn/execute.rs	138	WC_K_EXP	usize	11	11	3	2	0					
+crates/holonics-cuda/src/hnn/execute.rs	139	WC_GAIN	usize	12	12	2	2	0					
+crates/holonics-cuda/src/hnn/execute.rs	140	WC_GAIN_EXP	usize	13	13	2	2	0					
+crates/holonics-cuda/src/hnn/execute.rs	141	WC_RIGHT_EXP	usize	14	14	3	2	0					
+crates/holonics-cuda/src/hnn/execute.rs	142	WC_RATE_GAIN	usize	15	15	2	2	0					
+crates/holonics-cuda/src/hnn/execute.rs	143	WC_RATE_GAIN_EXP	usize	16	16	2	2	0					
+crates/holonics-cuda/src/hnn/execute.rs	144	WC_SHIFT_GAIN	usize	17	17	2	2	0					
+crates/holonics-cuda/src/hnn/execute.rs	145	WC_SHIFT_GAIN_EXP	usize	18	18	2	2	0					
+crates/holonics-cuda/src/hnn/execute.rs	146	WC_ZETA_EXP	usize	19	19	2	2	0					
+crates/holonics-cuda/src/hnn/execute.rs	148	WS_STRIDE	usize	11	11	4	2	0					
+crates/holonics-cuda/src/hnn/execute.rs	149	WQ_STRIDE	usize	8	8	2	2	0					
+crates/holonics-cuda/src/hnn/execute.rs	152	WL_SOURCE_OPENING	usize	68	68	3	2	0					
+crates/holonics-cuda/src/hnn/execute.rs	153	WL_ENTRIES	usize	69	69	4	1	0					
+crates/holonics-cuda/src/hnn/execute.rs	1201	WL_STORAGE	usize	0	0	3	2	0					
+crates/holonics-cuda/src/hnn/execute.rs	1202	WL_ARRIVALS	usize	1	1	3	2	0					
+crates/holonics-cuda/src/hnn/execute.rs	1203	WL_U	usize	2	2	3	2	0					
+crates/holonics-cuda/src/hnn/execute.rs	1204	WL_W	usize	3	3	3	2	0					
+crates/holonics-cuda/src/hnn/execute.rs	1205	WL_REM_ANCHOR	usize	4	4	2	2	0					
+crates/holonics-cuda/src/hnn/execute.rs	1206	WL_REM_STORAGE	usize	5	5	2	2	0					
+crates/holonics-cuda/src/hnn/execute.rs	1207	WL_REM_SOLVE	usize	6	6	2	2	0					
+crates/holonics-cuda/src/hnn/execute.rs	1208	WL_REM_ARRIVAL	usize	7	7	2	2	0					
+crates/holonics-cuda/src/hnn/execute.rs	1209	WL_REM_DISP	usize	8	8	2	2	0					
+crates/holonics-cuda/src/hnn/execute.rs	1210	WL_REM_RATE	usize	9	9	2	2	0					
+crates/holonics-cuda/src/hnn/execute.rs	1211	WL_REC_STORAGE	usize	14	14	3	2	0					
+crates/holonics-cuda/src/hnn/execute.rs	1212	WL_REC_ARRIVALS	usize	15	15	4	2	0					
+crates/holonics-cuda/src/hnn/execute.rs	1213	WL_REC_U	usize	16	16	3	2	0					
+crates/holonics-cuda/src/hnn/execute.rs	1214	WL_REC_W	usize	17	17	3	2	0					
+crates/holonics-cuda/src/hnn/execute.rs	1215	WL_REC_ANCHOR	usize	18	18	4	2	0					
+crates/holonics-cuda/src/hnn/execute.rs	1216	WL_REC_MID	usize	19	19	2	2	0					
+crates/holonics-cuda/src/hnn/execute.rs	1217	WL_REC_RIGHT	usize	20	20	2	2	0					
+crates/holonics-cuda/src/hnn/execute.rs	1218	WL_REC_ZETA	usize	21	21	2	2	0					
+crates/holonics-cuda/src/hnn/execute.rs	1219	WL_REC_OMEGA	usize	22	22	3	2	0					
+crates/holonics-cuda/src/hnn/execute.rs	1220	WL_LOGITS	usize	23	23	2	2	0					
+crates/holonics-cuda/src/hnn/execute.rs	1221	WL_STATUS	usize	24	24	4	2	0					
+crates/holonics-cuda/src/hnn/execute.rs	1222	WL_BAR_STORAGE	usize	25	25	5	2	0					
+crates/holonics-cuda/src/hnn/execute.rs	1223	WL_REV_EL	usize	29	29	3	2	0					
+crates/holonics-cuda/src/hnn/execute.rs	1224	WL_REV_ZETA	usize	30	30	3	2	0					
+crates/holonics-cuda/src/hnn/execute.rs	1225	WL_REV_SOLVED	usize	31	31	3	2	0					
+crates/holonics-cuda/src/hnn/execute.rs	1226	WL_REV_RATE	usize	32	32	3	2	0					
+crates/holonics-cuda/src/hnn/execute.rs	1227	WL_REV_DISP	usize	33	33	3	2	0					
+crates/holonics-cuda/src/hnn/execute.rs	1228	WL_REV_STORAGE	usize	34	34	3	2	0					
+crates/holonics-cuda/src/hnn/execute.rs	1229	WL_REV_ARRIVAL	usize	35	35	3	2	0					
+crates/holonics-cuda/src/hnn/execute.rs	1230	WL_REC_ADJ_U	usize	44	44	3	2	0					
+crates/holonics-cuda/src/hnn/execute.rs	1231	WL_REC_SOLVED	usize	45	45	3	2	0					
+crates/holonics-cuda/src/hnn/execute.rs	1232	WL_DOTS1	usize	46	46	3	2	0					
+crates/holonics-cuda/src/hnn/execute.rs	1233	WL_DOTS2	usize	47	47	3	2	0					
+crates/holonics-cuda/src/hnn/execute.rs	1234	WL_DOTS3	usize	48	48	3	2	0					
+crates/holonics-cuda/src/hnn/execute.rs	1235	WL_READS	usize	49	49	3	2	0					
+crates/holonics-cuda/src/hnn/execute.rs	1236	WL_REV_STATUS	usize	50	50	3	2	0					
+crates/holonics-cuda/src/hnn/execute.rs	1237	WL_RES_U	usize	51	51	6	2	0					
+crates/holonics-cuda/src/hnn/execute.rs	1238	WL_RES_W	usize	52	52	4	2	0					
+crates/holonics-cuda/src/hnn/execute.rs	1239	WL_RES_REM_RATE	usize	53	53	5	2	0					
+crates/holonics-cuda/src/hnn/execute.rs	1240	WL_RES_REM_U	usize	54	54	5	2	0					
+crates/holonics-cuda/src/hnn/execute.rs	1241	WL_RES_REM_W	usize	55	55	5	2	0					
+crates/holonics-cuda/src/hnn/execute.rs	1242	WL_RES_REM_OUTPUT	usize	56	56	5	2	0					
+crates/holonics-cuda/src/hnn/execute.rs	1243	WL_REC_RES_DRIVE	usize	57	57	2	2	0					
+crates/holonics-cuda/src/hnn/execute.rs	1244	WL_REC_RES_OUTPUT	usize	58	58	2	2	0					
+crates/holonics-cuda/src/hnn/execute.rs	1245	WL_REC_RES_U	usize	59	59	3	2	0					
+crates/holonics-cuda/src/hnn/execute.rs	1246	WL_REC_RES_W	usize	60	60	2	2	0					
+crates/holonics-cuda/src/hnn/execute.rs	1247	WL_REC_RES_RATE	usize	61	61	3	2	0					
+crates/holonics-cuda/src/hnn/execute.rs	1248	WL_RES_U_BAR	usize	62	62	2	2	0					
+crates/holonics-cuda/src/hnn/execute.rs	1249	WL_REC_RES_SOLVED	usize	65	65	3	2	0					
+crates/holonics-cuda/src/hnn/field.rs	43	THREADS	u32	256	256	164	3	0					
+crates/holonics-cuda/src/hnn/field.rs	45	AFFINE_SHARED	usize	49152	48 * 1024	2	1	0					
+crates/holonics-cuda/src/hnn/field.rs	55	NO_BIAS	u64	18446744073709551615	u64::MAX	7	2	0					
+crates/holonics-cuda/src/hnn/field.rs	57	CONTACT_SPAN	u32	32	32	1	1	0					
+crates/holonics-cuda/src/hnn/field.rs	60	MIN_LIMBS	usize	5	5	6	2	0					
+crates/holonics-cuda/src/hnn/field.rs	61	MAX_LIMBS	usize	20	20	2	1	0					
+crates/holonics-cuda/src/hnn/field.rs	63	MAX_MODES	usize	16	16	1	1	0					
+crates/holonics-cuda/src/hnn/field.rs	65	CONTACT_ROWS	u64	4	4	33	4	0					
+crates/holonics-cuda/src/hnn/field.rs	66	REV_ROWS	u64	4	4	42	4	0					
+crates/holonics-cuda/src/hnn/field.rs	68	MOMENT_BLOCK	u32	256	256	14	1	0					
+crates/holonics-cuda/src/hnn/field.rs	70	MAX_CROWD_SLOTS	usize	32	32	6	3	0					
+crates/holonics-cuda/src/hnn/field.rs	72	OUTER_TILE	u64	64	64	13	4	0					
+crates/holonics-cuda/src/hnn/field.rs	74	BOARD_CEILING	u64	12884901888	12 << 30	1	1	0					
+crates/holonics-cuda/src/hnn/field.rs	77	MARGIN	u64	1073741824	1 << 30	8	3	0					
+crates/holonics-cuda/src/hnn/field.rs	731	STAMP_LAUNCHES	usize	16384	1 << 14	3	1	0					
+crates/holonics-cuda/src/hnn/field/energy.rs	37	ENERGY_SUMS	usize	8	8	11	2	0					
+crates/holonics-cuda/src/hnn/field/energy.rs	38	ENERGY_LOGS	usize	3	3	2	2	0					
+crates/holonics-cuda/src/hnn/field/energy.rs	39	ENERGY_PAIRS	usize	4	4	2	2	0					
+crates/holonics-cuda/src/hnn/field/energy.rs	40	ENERGY_MOVED	usize	5	5	2	2	0					
+crates/holonics-cuda/src/hnn/field/energy.rs	41	ENERGY_PHI	usize	6	6	2	2	0					
+crates/holonics-cuda/src/hnn/field/energy.rs	255	STILL_THREADS	u32	128	128	1	1	0					
+crates/holonics-cuda/src/hnn/lattice.rs	50	EXACT	u32	0	0	13	5	0					
+crates/holonics-cuda/src/hnn/lattice.rs	51	REFUSED_CARRIER	u32	1	1	35	5	0					
+crates/holonics-cuda/src/hnn/moment.rs	51	PERIOD_CEILING	u64	2147483648	1 << 31	2	1	0					
+crates/holonics-cuda/src/hnn/tests.rs	1337	CELLS	usize	32768	1 << 15	18	7	1					
+crates/holonics-cuda/src/hnn/tower.rs	98	THREADS	u32	256	256	164	3	0					
+crates/holonics-cuda/src/hnn/tower.rs	100	LADDER	usize	17	17	2	1	0					
+crates/holonics-cuda/src/hnn/tower.rs	102	OUTER_ROWS	u32	16	16	8	2	0					
+crates/holonics-cuda/src/hnn/tower.rs	103	OUTER_COLS	u32	64	64	10	2	0					
+crates/holonics-cuda/src/hnn/tower.rs	829	CREDIT_CELLS	u32	32	32	7	2	0					
+crates/holonics-cuda/src/hnn/tree.rs	85	NONE	u32	4294967295	u32::MAX	15	2	0					
+crates/holonics-cuda/src/hnn/tree.rs	88	EMPTY	u64	18446744073709551615	u64::MAX	3	1	0					
+crates/holonics-cuda/src/hnn/tree.rs	91	MAX_DEPTH	usize	64	64	1	1	0					
+crates/holonics-cuda/src/hnn/tree.rs	94	MAX_DIGITS	usize	32	32	21	1	0					
+crates/holonics-cuda/src/hnn/tree.rs	97	SPLIT_BITS	u64	512	512	2	1	0					
+crates/holonics-cuda/src/hnn/tree.rs	101	LOG_SLOTS	usize	4	4	4	2	0					
+crates/holonics-cuda/src/hnn/tree.rs	102	LOG_RELINKS	usize	2	2	6	2	0					
+crates/holonics-cuda/src/hnn/tree.rs	103	LOG_ROOTS	usize	2	2	8	2	0					
+crates/holonics-cuda/src/hnn/word.rs	55	INVERSE_EXPONENT_CEILING	u32	126	i128::BITS - 2	7	3	0					
+crates/holonics-cuda/src/hnn/word.rs	58	EXACT	u32	0	0	13	5	0					
+crates/holonics-cuda/src/hnn/word.rs	59	REFUSED_CARRIER	u32	1	1	35	5	0					
+crates/holonics-cuda/src/hnn/word.rs	60	REFUSED_WORD	u32	4	4	1	1	0					
+crates/holonics-cuda/src/hnn/word.rs	61	REFUSED_OPERAND	u32	8	8	1	1	0					
+crates/holonics-cuda/src/lib.rs	23	FOLD_CONSTANT	u64	2305843009213693951	2_305_843_009_213_693_951	3	1	0					
+crates/holonics-cuda/tests/field_energy.rs	373	SQUARE_EPS	u32	1024	1 << 10	5	1	1					
+crates/holonics-cuda/tests/field_energy.rs	378	LINE_SQUARE_EPS	u32	128	1 << 7	3	1	1					
+crates/holonics/examples/acoustic_release.rs	30	RINGS	usize	24	24	5	1	0					
+crates/holonics/examples/acoustic_release.rs	32	QUALITY	i64	32	32	1	1	0					
+crates/holonics/examples/acoustic_release.rs	34	STATE_LATTICE	u32	32	32	10	1	0					
+crates/holonics/examples/acoustic_release.rs	36	PCM	u32	15	15	19	2	0					
+crates/holonics/examples/acoustic_release.rs	38	KEY_GRAIN	u32	16	16	2	1	0					
+crates/holonics/examples/acoustic_release.rs	40	CHUNK	usize	8000	8000	12	4	0					
+crates/holonics/examples/listener/continuing.rs	846	ENTROPY_RATE_BITS	u32	None	CLASSES.trailing_zeros()	2	1	0					
+crates/holonics/examples/listener/continuing/diagnostic.rs	798	HISTORICAL_NATIVE_CELL_NS	u128	549667971	549_667_971	3	1	0					
+crates/holonics/examples/listener/continuing/diagnostic.rs	800	HISTORICAL_TRUNK_NATIVE_NS	u128	109004074487	109_004_074_487	3	1	0					
+crates/holonics/examples/listener/continuing/diagnostic.rs	803	HISTORICAL_REPORT64_NS	u128	12581750145	12_581_750_145	7	1	0					
+crates/holonics/examples/listener/continuing/diagnostic.rs	808	UNMEASURED_COST_SETUP_ALLOWANCE_NS	u128	10000000000	10_000_000_000	4	1	0					
+crates/holonics/examples/listener/continuing/diagnostic.rs	810	UNMEASURED_COST_CHECKPOINT_ALLOWANCE_NS	u128	30000000000	30_000_000_000	3	1	0					
+crates/holonics/examples/listener/continuing/diagnostic.rs	811	COST_PROBE_CELLS	usize	64	64	2	1	0					
+crates/holonics/examples/listener/continuing/diagnostic/timing.rs	14	RUN_WALL_CAP_NS	u128	300000000000	300_000_000_000	2	1	0					
+crates/holonics/examples/listener/continuing/diagnostic/timing.rs	15	TERM_OFFSET_NS	u128	295000000000	295_000_000_000	3	1	0					
+crates/holonics/examples/listener/continuing/diagnostic/timing.rs	16	NATIVE_TERM_GRACE_NS	u128	5000000000	5_000_000_000	2	1	0					
+crates/holonics/examples/listener/continuing/diagnostic/timing.rs	17	REPORT_RESERVE_FLOOR_NS	u128	5000000000	5_000_000_000	2	1	0					
+crates/holonics/examples/listener/continuing/diagnostic/timing.rs	18	BLOCK_CELLS	usize	8	8	9	1	0					
+crates/holonics/examples/listener/continuing/work.rs	10	MEASUREMENT_BLOCK_CELLS	usize	8	8	3	1	0					
+crates/holonics/examples/listener/octets.rs	71	BUDGET	u64	1099511627776	1u64 << 40	32	12	0					
+crates/holonics/examples/listener/octets.rs	75	EXPONENT	i64	2	2	3	2	0					
+crates/holonics/examples/listener/octets.rs	76	DEPTH	usize	6	6	4	3	0					
+crates/holonics/examples/listener/octets.rs	78	RELEASE_KEY_BYTES	usize	32	32	13	3	0					
+crates/holonics/examples/listener/sections.rs	557	DIGITS	usize	16	16	14	2	0					
+crates/holonics/examples/listener/sections.rs	560	PLACES	usize	2	2	18	4	0					
+crates/holonics/examples/listener/sections.rs	562	CLASSES	usize	32	DIGITS * PLACES	57	7	0					
+crates/holonics/examples/listener/sections.rs	564	REMAINDER	usize	16	DIGITS * (PLACES - 1)	4	1	0					
+crates/holonics/examples/listener/sections.rs	566	END	u8	0	0x00	5	2	0					
+crates/holonics/examples/mnist_observed/common.rs	34	BUDGET	u64	1099511627776	1u64 << 40	32	12	0					
+crates/holonics/examples/mnist_observed/common.rs	35	MNIST_ALPHABET	usize	16	16	5	1	0					
+crates/holonics/examples/mnist_observed/common.rs	38	RELEASE_KEY_BYTES	usize	32	32	13	3	0	agent-inferred				
+crates/holonics/examples/solenoidal_alpha.rs	142	MATERIAL_BIT_BUDGET	u64	1099511627776	1 << 40	9	3	0					
+crates/holonics/examples/solenoidal_alpha.rs	148	QUERY_BYTE_BUDGET	usize	128	128	12	5	0					
+crates/holonics/examples/solenoidal_alpha/complete_language.rs	46	READ_BUDGET	u64	67108864	64 * 1024 * 1024	147	15	0					
+crates/holonics/examples/solenoidal_alpha/complete_language.rs	47	READING_BITS	u32	None	holonics::ratio::exponentiated::READING_BITS	67	18	0					
+crates/holonics/examples/solenoidal_alpha/complete_language/duplex_train.rs	16	STATE_BUDGET	usize	1073741824	1 << 30	69	7	0					
+crates/holonics/examples/solenoidal_alpha/complete_language/field_train.rs	33	CODEC_BUDGET	usize	16777216	1 << 24	16	1	0					
+crates/holonics/examples/solenoidal_alpha/complete_language/field_train.rs	121	RECORD	u8	30	0x1E	2	1	0		exterior	ASCII RS, the record separator	problems_of	exterior
+crates/holonics/examples/solenoidal_alpha/complete_language/field_train.rs	122	UNIT	u8	31	0x1F	1	1	0		exterior	ASCII US, the codec's unit separator	problems_of, question_text	exterior
+crates/holonics/examples/solenoidal_alpha/complete_language/field_train.rs	726	UNSEEN_DRAW	u64	2305843009213693952	1 << 61	1	1	0					
+crates/holonics/examples/solenoidal_alpha/complete_language/field_train.rs	903	JOINT_KEY	u64	2594073385365405696	9 << 58	2	1	0					
+crates/holonics/examples/solenoidal_alpha/complete_language/field_train.rs	999	CONTEXT	usize	4	4	20	1	0	agent-inferred				
+crates/holonics/examples/solenoidal_alpha/complete_language/field_train.rs	3000	SAVE_MS	u128	3600000	3_600_000	1	1	0	definition				
+crates/holonics/examples/solenoidal_alpha/complete_language/field_train.rs	3726	LN2_Q30	i128	744261118	744_261_118	6	1	0					
+crates/holonics/examples/solenoidal_alpha/complete_language/field_train.rs	3901	ENUMERATED_KEY	u64	None	0xE7AC_7 << 40	1	1	0					
+crates/holonics/examples/solenoidal_alpha/complete_language/field_train.rs	4129	ENERGY_EPS_SHIFT	u32	4	4	1	1	0	definition	read	the attribution read's step 2^-4 of a letter's uniform weight	curl_field	a read's probe step
+crates/holonics/examples/solenoidal_alpha/complete_language/native_train.rs	18	CONTACT_GRAIN_LEVELS	u32	24	24	1	1	0					
+crates/holonics/examples/solenoidal_alpha/complete_language/tower_classes.rs	541	KEY_BUDGET	usize	268435456	1 << 28	1	1	0	agent-inferred				
+crates/holonics/examples/solenoidal_alpha/complete_language/tower_classes.rs	637	SHOWN	usize	5	5	1	1	0					
+crates/holonics/examples/solenoidal_alpha/complete_language/tower_classes.rs	868	MOVE_OCTAVE	i128	30	30	0	0	0					
+crates/holonics/examples/solenoidal_alpha/complete_language/tower_ring.rs	63	REACH	u32	40	40	7	2	0					
+crates/holonics/examples/solenoidal_alpha/complete_language/tower_ring.rs	1505	D	u32	62	62	8329	422	0					
+crates/holonics/examples/solenoidal_alpha/complete_language/tower_ring.rs	2462	CROSSING	usize	2048	1 << 11	1	1	0	agent-inferred				
+crates/holonics/examples/solenoidal_alpha/complete_language/tower_rotor.rs	613	SYMBOLS	usize	None	5usize.pow(7)	1	1	0					
+crates/holonics/examples/solenoidal_alpha/complete_language/tower_situated.rs	59	MOMENT_REACH	i64	1099511627776	1 << 40	1	1	0					
+crates/holonics/examples/solenoidal_alpha/complete_language/tower_train.rs	23	STATE_BUDGET	usize	1073741824	1 << 30	69	7	0					
+crates/holonics/examples/solenoidal_alpha/complete_language/tower_train.rs	2035	SEARCH_DIAGONAL_BITS	u32	50	50	2	1	0					
+crates/holonics/examples/solenoidal_alpha/complete_language/tower_train.rs	2036	SEARCH_KEPT_BITS	u32	30	30	1	1	0					
+crates/holonics/examples/solenoidal_alpha/complete_language/tower_train.rs	2037	SEARCH_FRACTION	u32	46	46	4	1	0					
+crates/holonics/examples/solenoidal_alpha/complete_language/tower_train.rs	2489	BLOCK_GRAIN	u32	5	5	1	1	0	agent-inferred				
+crates/holonics/examples/solenoidal_alpha/complete_language/tower_train.rs	3492	MUTUAL_SHIFT	u32	2	2	3	1	0	agent-inferred				
+crates/holonics/examples/solenoidal_workbench.rs	32	MAX_PERIODS	usize	16	16	2	1	0					
+crates/holonics/examples/solenoidal_workbench.rs	33	MAX_STEPS	usize	256	256	2	1	0					
+crates/holonics/examples/solenoidal_workbench.rs	34	MAX_DECIMAL_DIGITS	usize	128	128	2	1	0					
+crates/holonics/examples/solenoidal_workbench.rs	35	MAX_PERIOD	u64	65536	65_536	2	1	0					
+crates/holonics/src/compression/keys.rs	69	IMAGE_FAMILY_CEILING	usize	16384	1 << 14	2	1	0	agent-inferred				
+crates/holonics/src/compression/keys/duplex/tests.rs	101	DEVELOPMENT_SEED	u64	5207652420540170241	0x4845_4c49_0000_0001	1	1	1					
+crates/holonics/src/compression/keys/duplex/tests.rs	105	SCAN_CEILING	u64	4096	1 << 12	2	1	1					
+crates/holonics/src/compression/keys/duplex/tests.rs	107	ACCEPTANCE_SEED	u64	None	0x4845_4c49_00ac_0001	8	1	1					
+crates/holonics/src/compression/keys/duplex/tests.rs	108	ACCEPTANCE_KEYS	usize	8	8	7	1	1					
+crates/holonics/src/compression/keys/duplex/tests.rs	109	DAMAGED_KEYS	usize	4	4	1	1	1					
+crates/holonics/src/compression/keys/transport.rs	108	HELIX_PERIOD_CEILING	u64	4096	1 << 12	1	1	0	agent-inferred				
+crates/holonics/src/compression/keys/transport.rs	112	LABEL_CEILING	usize	12	12	1	1	0					
+crates/holonics/src/compression/landmark/context.rs	1157	MAX_RUNG	u32	63	u64::BITS - 1	7	1	0					
+crates/holonics/src/compression/landmark/context.rs	2236	BRANCH_BIT	u32	2147483648	1 << 31	11	1	0					
+crates/holonics/src/compression/landmark/context.rs	5590	FIXED	u32	None	u128::BITS - 3	5	1	0	agent-inferred				
+crates/holonics/src/compression/landmark/context.rs	6758	KEPT	u64	127	127	5	1	0					
+crates/holonics/src/compression/landmark/context/baseline.rs	44	PPM_ORDER	usize	2	2	1	1	0	agent-inferred				
+crates/holonics/src/geometry/motion.rs	88	LATTICE_REACH	i64	1073741824	1 << 30	1	1	0	agent-inferred				
+crates/holonics/src/hnn/chart.rs	129	CARRIER	u128	170141183460469231731687303715884105728	1 << 127	3	2	0					
+crates/holonics/src/hnn/chart.rs	145	SPLITS	u64	3	3	1	1	0	agent-inferred				
+crates/holonics/src/hnn/constitution.rs	598	CAMPAIGN_ONE_BUDGET	u64	8589934592	1 << 33	113	31	0					
+crates/holonics/src/hnn/constitution.rs	3125	CEILING	u32	20	20	6	3	0					
+crates/holonics/src/hnn/constitution.rs	11460	FACE	u32	64	64	2	1	0	agent-inferred				
+crates/holonics/src/hnn/contact.rs	233	CENSUS_PRIME	u64	2305843009213693951	(1 << 61) - 1	3	1	0					
+crates/holonics/src/hnn/contact.rs	647	SITE_KINDS	u64	5	5	3	2	0					
+crates/holonics/src/hnn/dynamic_section.rs	97	RAYS	u8	4	4	20	4	0					
+crates/holonics/src/hnn/field.rs	2821	RECEIVING_LAW	u64	3	3	1	1	0	agent-inferred				
+crates/holonics/src/hnn/field.rs	2827	RECEIVING_LAW_LETTERED	u64	4	4	1	1	0	agent-inferred				
+crates/holonics/src/hnn/founding.rs	40	DESCRIPTION_CEILING	u64	260	2 + 2 * (2 * (u64::BITS as u64 + 1) - 1)	4	1	0	definition				
+crates/holonics/src/hnn/keyed_modes.rs	141	UNIT_BITS	u32	62	62	46	6	0		carrier, preset	the exponential navigator's unit (second declaration)	Exponential	declared five times
+crates/holonics/src/hnn/keyed_modes.rs	143	PUSH_BITS	u32	2	2	1	1	0		carrier, derived bound	pushes |beta| <= 2^2, the carrier's headroom	KeyedModes::new	keyed modes only
+crates/holonics/src/hnn/keyed_modes.rs	146	SQUARE_BITS	u32	8	8	3	1	0		carrier, derived bound	square law |h| <= 2^8, the carrier's headroom	KeyedModes::new	keyed modes only
+crates/holonics/src/hnn/keyed_modes.rs	148	LN2_BITS	u32	30	30	1	1	0		grain, picked	ln 2's face 2^-30, the one ln2_face() releases to	ln2_face	twin of field's LN2_FACE_BITS
+crates/holonics/src/hnn/keyed_modes.rs	301	TURNS	usize	4	4	20	5	0					
+crates/holonics/src/hnn/keyed_modes.rs	682	FIRST_RUNG	u32	2	2	1	1	0					
+crates/holonics/src/hnn/keyed_modes.rs	683	LAST_RUNG	u32	24	24	2	1	0					
+crates/holonics/src/hnn/overture.rs	221	REMAINDER_BITS	u32	128	128	1	1	0					
+crates/holonics/src/hnn/overture.rs	302	REFERENCE_BITS	u32	40	40	7	3	0					
+crates/holonics/src/hnn/overture.rs	337	R	u32	40	REFERENCE_BITS	36180	461	0					
+crates/holonics/src/hnn/prediction.rs	1515	DERIVATIVE_BITS	u32	192	192	4	1	0					
+crates/holonics/src/hnn/receiving.rs	1361	TREE	usize	0	0	9	3	0					
+crates/holonics/src/hnn/receiving.rs	1365	COMBINED	usize	1	1	10	4	0					
+crates/holonics/src/hnn/receiving.rs	2114	SECTION_LETTERS	usize	3	3	6	2	0	agent-inferred				
+crates/holonics/src/hnn/receiving.rs	2781	BUDGET	u64	1099511627776	1 << 40	32	12	0					
+crates/holonics/src/hnn/receiving/cells/tests.rs	14	GRAIN	u64	4	4	20	2	1					
+crates/holonics/src/hnn/receiving/comparison_score/tests.rs	8	GRAIN	u64	4	4	20	2	1					
+crates/holonics/src/hnn/reference/native_context.rs	480	FINEST	u32	128	128	4	1	0					
+crates/holonics/src/hnn/ring.rs	3097	ATTAINMENT_BITS	u64	128	128	2	1	0					
+crates/holonics/src/hnn/ring.rs	4015	COVECTOR_BITS	u32	192	192	92	13	0	agent-inferred				
+crates/holonics/src/hnn/ring.rs	4020	ROOT_ATTAINMENT_BITS	u32	96	96	2	1	0					
+crates/holonics/src/hnn/ring.rs	4021	ATTAINMENT_ITERATIONS	usize	64	64	1	1	0					
+crates/holonics/src/hnn/ring.rs	4028	SEPARATION_BITS	u32	48	48	2	1	0	agent-inferred				
+crates/holonics/src/hnn/section_lock.rs	628	ADVANCE_BITS	u64	3	3	5	1	0					
+crates/holonics/src/hnn/tests/constitution.rs	728	CHAIN_DEPOSITS	usize	4	4	3	1	1					
+crates/holonics/src/hnn/tests/learning.rs	16	OPEN_BUDGET	u64	1099511627776	1 << 40	106	15	1					
+crates/holonics/src/hnn/tests/physical_communication.rs	75	HELD_FIXTURE_PARAMETERS	usize	12	3 * 2 * 2	2	1	1					
+crates/holonics/src/hnn/tests/physical_communication.rs	76	HELD_FIXTURE_STATE_COORDINATES	usize	28	2 * (4 + 4) + 2 * 2 + 2 * 4	2	1	1					
+crates/holonics/src/hnn/tests/physical_communication.rs	77	HELD_FIXTURE_RATIOS	usize	336	HELD_FIXTURE_PARAMETERS * HELD_FIXTURE_STATE_COORDINATES	6	1	1					
+crates/holonics/src/hnn/tests/physical_communication.rs	1717	LANDING_TANGENT_PARAMETERS	usize	108	3 * 6 * 6	3	1	1					
+crates/holonics/src/hnn/tests/physical_communication.rs	1721	LANDING_TANGENT_STATE_COORDINATES	usize	40	(8 + 6) + (8 + 6) + (6 + 6)	2	1	1					
+crates/holonics/src/hnn/tests/physical_communication.rs	1726	LANDING_TANGENT_TICKS	usize	3	3	2	1	1					
+crates/holonics/src/hnn/tests/physical_communication.rs	1727	LANDING_TANGENT_COLUMN_TICKS	usize	324	LANDING_TANGENT_PARAMETERS * LANDING_TANGENT_TICKS	3	1	1					
+crates/holonics/src/hnn/tests/receiving.rs	1519	COLD_RESTORE_BUDGET	u64	18446744073709551615	u64::MAX	11	1	1					
+crates/holonics/src/hnn/tests/resonator_deposit.rs	55	COVECTOR	i64	2	2	1	1	1					
+crates/holonics/src/hnn/tower.rs	242	FACE_BITS	u32	16	16	341	17	0		grain, picked	a face: encodings E(a), letter faces z(a), class biases, ring faces	field, energy letters, moment, card field.cu/field_energy/field_moment/tower.cu	top place of |E|,|z| a section; bottom place moved of the face families
+crates/holonics/src/hnn/tower.rs	244	MATERIAL_BITS	u32	24	24	419	15	0		grain, picked (one grain, four quantities)	the material theta (i32), and by identification the clocks (PACE_BITS), law (D)'s conditional p(v) and its weights, the coin's tau	every field owner and kernel	top place of |theta| by family (i32 leaves 7 whole bits); bottom place moved of each family's step; least nonzero p(v) and the weight released below 2^-23
+crates/holonics/src/hnn/tower.rs	246	MOVE_BITS	u32	30	30	472	17	0		grain, picked	decays D, rates b, phasors zeta, exp_series faces	field, energy, moment (COEFFICIENT_BITS = 3x), card	bottom place of the released products; |zeta| stays <= 1
+crates/holonics/src/hnn/tower.rs	248	STATE_BITS	u32	24	24	78	7	0		grain, picked	the tower's mode state (2^-24); not the field's STATE_BITS (16)	tower, card tower.cu	tower only
+crates/holonics/src/hnn/tower.rs	250	COVECTOR_BITS	u32	24	24	92	13	0		grain, picked	the face families' covector	field back = 40+16+g-24, natural (40-24), moment RETURN_BITS	bottom place of the face families' covector
+crates/holonics/src/hnn/tower.rs	252	STEP_BITS	u32	32	32	16	2	0		grain, picked	the tower deposit's covector grain and its epsilon	tower, duplex	tower only
+crates/holonics/src/hnn/tower.rs	255	MARGIN	u32	12	12	8	3	0	agent-inferred	derived from a horizon, reason stale	moves' margin |lambda| <= 1-2^-12 (memory about 4,096 classes)	tower, card tower.cu	reason cites GSM8K's 520-byte problems; ceil(log2 3,771) = 12 restates it from today's longest region
+crates/holonics/src/hnn/tower.rs	257	READ_BITS	u32	20	20	30	6	0		grain, picked	a code reading in bits, 2^-20	tower, split; in the field as the literal 20	written as 20 at 10 lines of the field and the energy (literals.tsv)
+crates/holonics/src/hnn/tower.rs	261	FIRST_RATE	u32	3	3	8	3	0	agent-inferred	schedule, imported	first moment rate 2^-3	FieldLearner::new, scaled	the classical 0.9 read dyadic
+crates/holonics/src/hnn/tower.rs	262	SECOND_RATE	u32	8	8	6	3	0		schedule, imported	second moment rate 2^-8	FieldLearner::new, scaled; AVERAGE_RATE equals it	the classical 0.999 read dyadic
+crates/holonics/src/hnn/tower.rs	263	UNIT_BITS	u32	62	62	46	6	0		carrier, preset	the exponential navigator's unit 1 on 2^-62 (i64 less sign and one doubling)	tower, participation; declared also in keyed_modes, units, field.cu, tower.cu; literal 62 in skin_of, temperature_of	declared five times
+crates/holonics/src/hnn/tower.rs	2698	GATE_REACH	i128	2	2	14	2	0	agent-inferred				
+crates/holonics/src/hnn/tower.rs	2809	TURN_BITS	u32	16	FACE_BITS	6	3	0					
+crates/holonics/src/hnn/tower.rs	2827	FINE	u32	60	60	5	1	0					
+crates/holonics/src/hnn/tower.rs	2843	GUARD	u32	16	16	2	1	0					
+crates/holonics/src/hnn/tower.rs	6083	WEIGHED_DIGITS	u32	60	60	1	1	0					
+crates/holonics/src/hnn/tower.rs	6109	CERTIFICATE_DIGITS	u32	32	32	3	1	0					
+crates/holonics/src/hnn/tower.rs	6117	CERTIFICATE_SLACK	i128	3	3	3	1	0					
+crates/holonics/src/hnn/tower/body.rs	43	KEY_BYTES	usize	8	8	2	1	0					
+crates/holonics/src/hnn/tower/body.rs	45	STATE_LINES	usize	10	10	5	1	0					
+crates/holonics/src/hnn/tower/field.rs	177	SHARE_BITS	u32	63	63	43	6	0	agent-inferred	carrier, preset	a term's share of its row's mass, 1 on 2^-63 (u64 holding [0,1])	field release/round trips, energy log_row, lock_words, energy_faces	none: the share is <= 1 by construction
+crates/holonics/src/hnn/tower/field.rs	181	CONTACT_BITS	u32	40	40	7	3	0		grain, picked	the contact covector dz, ds on 2^-40	tick_return, energy lock_words; host back = CONTACT_BITS+FACE_BITS+g-COVECTOR_BITS	card writes the derived 32 as the literal CONTACT_BACK
+crates/holonics/src/hnn/tower/field.rs	184	STATE_BITS	u32	16	16	78	7	0		identity (= FACE_BITS by value, declared apart)	a site's carried face shares on 2^-16	31 functions of field and energy	name collides with the tower's STATE_BITS 24
+crates/holonics/src/hnn/tower/field.rs	190	NEAR	usize	6	6	120	10	0	agent-inferred	structural	the near field, lcm(2,3) = 6, the solenoid's two finest rings	field, energy, moment, train, card	derived
+crates/holonics/src/hnn/tower/field.rs	193	MAX_CLASS_TRITS	usize	7	7	2	2	0		realization	3^7 = 2,187 classes within the card's 2^12 buckets a head and region	admit, card	the bucket count is the card's
+crates/holonics/src/hnn/tower/field.rs	642	LN2_FACE_BITS	u32	30	30	11	2	0		grain, picked, declared twice	ln 2's face 2^-30; keyed_modes holds the same as LN2_BITS, untied	skin_of, temperature_chain, listen_shift, section reads	one declaration owed
+crates/holonics/src/hnn/tower/field.rs	646	BLANK_HELD	u32	16	STATE_BITS	2	1	0		identity	= STATE_BITS	blank_return, skin_of	derived by name
+crates/holonics/src/hnn/tower/field.rs	650	TEMPER_TOP	i128	7	7	2	2	0		carrier, inherited, written literal	ceil(log2 T) <= 7 and T >= 2^-23: 31 - 24, the additive chart's 32-bit temperature its comment names; host and card now read T in 128 bits	temper_octave, skin_of, card temper_log	the headroom it now stands for: top place of a covector times 1/T
+crates/holonics/src/hnn/tower/field.rs	692	LOCK_BACK_BITS	u32	33	2 * FACE_BITS + 1	2	1	0	agent-inferred	grain, derived	2*16+1, the lock's covector read back	temperature_chain, tick_return	derived
+crates/holonics/src/hnn/tower/field.rs	711	PACE_BITS	u32	24	MATERIAL_BITS	29	6	0	agent-inferred	identity	= MATERIAL_BITS: rate, clock and variation on 2^-24	skin, turn, paces, card literal 24	card twin is a literal
+crates/holonics/src/hnn/tower/field.rs	1473	WEIGHT_BITS	u32	62	62	16	4	0		carrier, preset	a source's and crowd's value multiplier 1 on 2^-62	row_bits, contact_return_bits, crowd_slots, tick, energy_cell, card	none
+crates/holonics/src/hnn/tower/field.rs	4865	ONE	u64	65536	1 << 16	21	6	0					
+crates/holonics/src/hnn/tower/field.rs	6152	AVERAGE_RATE	u32	8	8	1	1	0		schedule	averaged constitution's rate 2^-8 a section (= SECOND_RATE by value)	average_section	picked equal
+crates/holonics/src/hnn/tower/field.rs	6338	TAUS	usize	16	16	3	1	0					
+crates/holonics/src/hnn/tower/field.rs	6360	CHUNK	usize	16	16	12	4	0	agent-inferred	realization	16 places a read (16*alphabet configurations, about 0.8 GB)	section_conditional_weighed	memory partition
+crates/holonics/src/hnn/tower/field/energy.rs	46	ENERGY_BITS	u32	32	32	27	4	0	agent-inferred	grain, criterion stated	Phi, G, log2 p on 2^-32; a fall is certified past slack = logs + logs' + 2 units	energy_cell, log_row, relax, conditional (law D)	smallest certified fall about 2R 2^-32 bits for R logarithms read: count of ticks resting with the fall inside the slack, beside R
+crates/holonics/src/hnn/tower/field/energy.rs	49	FIRST_HALVINGS	u32	2	2	4	3	0	agent-inferred	schedule, picked	eta = 2^-2 at the first tick	energy_relax, energy_batch	picked
+crates/holonics/src/hnn/tower/field/energy.rs	51	MOST_HALVINGS	u32	24	STATE_BITS + 8	4	3	0		schedule, derived with a picked 8	STATE_BITS + 8 = 24 halvings (the field's STATE_BITS, 16)	energy_relax, energy_batch	the 8 assumes |force| times scale below 2^8: print the top place of that product
+crates/holonics/src/hnn/tower/field/moment.rs	131	COEFFICIENT_BITS	u32	90	3 * MOVE_BITS	9	2	0		grain, derived	three faces on 2^-30: W on 2^-90	moments, card MOMENT_COEFFICIENT_BITS	derived
+crates/holonics/src/hnn/tower/field/moment.rs	133	MOMENT_BITS	u32	106	COEFFICIENT_BITS + FACE_BITS	0	0	0		dead	W times an encoding, 2^-106	none	declared, unused
+crates/holonics/src/hnn/tower/field/moment.rs	136	RETURN_BITS	u32	84	2 * MOVE_BITS + COVECTOR_BITS	1	1	0		grain, derived	conj(zeta) D times a covector, 2^-84	RETURN_RELEASE_BITS	derived
+crates/holonics/src/hnn/tower/field/moment.rs	138	RETURN_RELEASE_BITS	u32	60	RETURN_BITS - COVECTOR_BITS	6	2	0		grain, derived	84 - 24 = 60 released	moments_return, card	derived
+crates/holonics/src/hnn/tower/field/moment.rs	143	PACED_L1	u128	2147483648	1 << 31	1	1	0					
+crates/holonics/src/hnn/tower/field/tests.rs	69	STRADDLE_HALVINGS	u32	6	6	3	1	1					
+crates/holonics/src/hnn/tower/field/tests.rs	82	QUIET_DOUBLINGS	u32	4	4	1	1	1					
+crates/holonics/src/hnn/tower/participation.rs	218	ENTROPY_BITS	u32	20	20	10	3	0					
+crates/holonics/src/hnn/tower/split.rs	100	TURN_BITS	u32	40	40	6	3	0					
+crates/holonics/src/hnn/tower/split.rs	103	PRICE_BITS	u32	20	READ_BITS	4	1	0					
+crates/holonics/src/hnn/tower/split.rs	107	SCORE_BITS	u32	48	48	2	2	0					
+crates/holonics/src/hnn/units.rs	59	CODE_BITS	u32	32	32	16	3	0					
+crates/holonics/src/hnn/units.rs	60	NONE	u32	4294967295	u32::MAX	15	2	0					
+crates/holonics/src/hnn/units.rs	61	UNIT_BITS	u32	62	62	46	6	0					
+crates/holonics/src/holarchy/terrain/chase.rs	131	ARENA_SIDE_LIMIT	i64	32768	1 << 15	2	2	0	agent-inferred				
+crates/holonics/src/holarchy/terrain/chase.rs	132	MOVE_CAP_LIMIT	i64	4096	1 << 12	3	3	0					
+crates/holonics/src/holarchy/terrain/chase_tests.rs	73	ESCAPE	u32	12	12	8	2	1					
+crates/holonics/src/holarchy/terrain/mod.rs	169	STEP	u64	None	0x9E37_79B9_7F4A_7C15	3	2	0					
+crates/holonics/src/holarchy/terrain/pursuit.rs	123	TUBE_STATE_LIMIT	usize	4194304	1 << 22	2	2	0	agent-inferred				
+crates/holonics/src/holarchy/terrain/pursuit.rs	935	GRAIN_LIMIT	i64	16	1 << 4	3	2	0	agent-inferred				
+crates/holonics/src/holarchy/terrain/sensing.rs	82	CHANNELS	usize	3	3	21	5	0	definition				
+crates/holonics/src/holarchy/terrain/sensing.rs	86	LAG_LIMIT	usize	8	1 << 3	8	4	0	agent-inferred				
+crates/holonics/src/holarchy/terrain/sensing.rs	90	TURNS	u8	4	4	20	5	0	definition				
+crates/holonics/src/holarchy/terrain/sensing.rs	94	MENU_LIMIT	usize	8	1 << 3	1	1	0	agent-inferred				
+crates/holonics/src/holon/restriction/descent.rs	50	DESCENT_SOURCE_CEILING	usize	4096	4096	3	2	0					
+crates/holonics/src/holon/restriction/tube.rs	88	DECLARED_CHART_CEILING	usize	1024	1024	6	1	0					
+crates/holonics/src/holon/restriction/tube.rs	98	DECLARED_FACE_CEILING	usize	65536	65_536	7	1	0					
+crates/holonics/src/holon/restriction/tube.rs	101	DECLARED_CIRCUIT_CEILING	usize	4096	4096	2	1	0					
+crates/holonics/src/holon/restriction/tube.rs	113	DECLARED_WORK_CEILING	usize	4194304	1 << 22	6	1	0					
+crates/holonics/src/physics/fluid/cells.rs	49	MAX_DIMENSION	usize	3	3	1	1	0					
+crates/holonics/src/ratio/algebraic.rs	197	LOG_TERMS	u32	48	48	3	1	0					
+crates/holonics/src/ratio/algebraic.rs	205	LOG_OCTAVES	u32	96	96	21	8	0	agent-inferred				
+crates/holonics/src/ratio/algebraic.rs	460	STURM_DEGREE_CEILING	usize	1024	1024	2	1	0	definition				
+crates/holonics/src/ratio/algebraic.rs	469	STURM_COEFFICIENT_BIT_CEILING	u64	4194304	1 << 22	2	1	0	definition				
+crates/holonics/src/ratio/algebraic.rs	484	STURM_WORK_CEILING	u128	8589934592	1 << 33	2	1	0					
+crates/holonics/src/ratio/exponentiated/carried.rs	31	READING_BITS	u32	64	64	67	18	0					
+crates/holonics/src/ratio/linear.rs	39	DECLARED_PRIME_IMAGE_CROSSOVER	usize	48	48	4	1	0	agent-inferred				
+crates/holonics/src/ratio/linear/prime_image.rs	124	DECLARED_IMAGE_EXTENT_CEILING	usize	67108864	1 << 26	3	1	0	definition				
+crates/holonics/src/ratio/linear/prime_image.rs	133	DECLARED_PRIME_CEILING	usize	1024	1024	3	1	0	definition				
+crates/holonics/src/ratio/linear/prime_image.rs	140	DECLARED_PRIME_FLOOR	u64	4294967296	1 << 32	5	2	0	definition				
+crates/holonics/src/ratio/linear/prime_image.rs	144	DECLARED_PRIME_MODULUS_CEILING	u64	4611686018427387904	1 << 62	3	1	0					
+crates/holonics/src/ratio/linear/prime_image.rs	152	DECLARED_PROFILE_RETRIES	usize	4	4	1	1	0	definition				
+crates/holonics/src/ratio/polynomial.rs	671	ROOT_BOUND_DOUBLING_CEILING	u32	4096	4096	2	1	0	definition				
+crates/holonics/src/ratio/polynomial.rs	680	HALF_INTEGER_DESCENT_CEILING	u32	4096	4096	2	1	0	definition				
+crates/holonics/src/ratio/polynomial.rs	1518	MONIC_COMPANION_BIT_CEILING	u64	4096	1 << 12	2	1	0	definition				
+crates/holonics/src/ratio/polynomial.rs	1845	SEPARATION_SPLITTING_DEPTH_CEILING	u64	131072	1 << 17	2	1	0					
+crates/holonics/src/ratio/polynomial.rs	1934	HALF_PLANE_REFINEMENT_CEILING	u32	96	96	2	1	0					
+crates/holonics/src/ratio/primality.rs	14	PSI_12	u128	318665857834031151167461	318_665_857_834_031_151_167_461	3	1	0					
+crates/holonics/src/ratio/ring/section.rs	10	MODULUS	u64	2305843009213693951	(1u64 << 61) - 1	21	4	0					
+crates/holonics/src/ratio/surprisal.rs	58	LOG_SERIES_TERMS	u32	64	64	3	1	0					
+crates/holonics/src/ratio/surprisal.rs	60	LOG_SERIES_BITS	u32	192	192	3	1	0					
+crates/holonics/src/receiver/coupling.rs	557	SHARE_BITS_T	u32	24	24	2	1	0					
+crates/holonics/src/receiver/coupling.rs	559	CODE_BITS	u32	20	20	16	3	0					
+crates/holonics/src/receiver/coupling.rs	561	MANTISSA_BITS	u32	62	62	14	1	0					
+crates/holonics/src/receiver/face.rs	400	HORIZON_CEILING	usize	4096	4096	2	1	0	definition				
+crates/holonics/src/receiver/face.rs	406	FAMILY_CEILING	usize	4096	4096	4	2	0	definition				
+crates/holonics/src/receiver/face.rs	675	INDEX_HORIZON_CEILING	usize	1024	1024	2	1	0	definition				
+crates/holonics/src/receiver/population.rs	1281	PRECISION	u64	192	2 * LOG_OCTAVES as u64	10	4	0	agent-inferred				
+crates/holonics/src/receiver/population/birth.rs	120	DECLARED_CHARTS	usize	4	4	2	1	0	agent-inferred				
+crates/holonics/src/receiver/population/composition_tests.rs	393	SEED	u64	20260927	20_260_927	2	2	1					
+crates/holonics/src/receiver/population/dormancy.rs	265	CHUNK	usize	4096	1 << 12	12	4	0					
+crates/holonics/tests/acoustic_encoding.rs	37	RATE	u64	48000	48_000	4	3	1					
+crates/holonics/tests/acoustic_wave_port.rs	47	SAMPLES	usize	240	240	42	1	1					
+crates/holonics/tests/acoustic_wave_port.rs	48	SETTLE	usize	120	120	22	1	1					
+crates/holonics/tests/material_tangent_world.rs	41	N	usize	4	4	7097	381	1					
+crates/holonics/tests/world_model.rs	45	N	usize	4	4	7097	381	1					
