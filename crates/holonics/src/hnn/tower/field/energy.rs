@@ -1932,13 +1932,21 @@ impl Field {
     /// over the positions walked.
     #[allow(clippy::too_many_arguments)]
     pub fn energy_sweep_at(&self, problems: &[(&[usize], usize)], answers: &mut [Vec<usize>], positions: Option<&[Vec<usize>]>, void: usize, cool: u32, seed: u64, realization: &mut dyn FieldRealization, observe: &mut dyn FnMut(usize, usize)) -> Result<(usize, usize, Vec<i128>)> {
+        self.energy_sweep_shifted(problems, answers, positions, void, -((cool as i128) << MATERIAL_BITS), seed, realization, observe)
+    }
+
+    /// [`Field::energy_sweep_at`] at the field's `log₂ T` moved by `shift` on `2^(−24)` (negative cools, positive heats; a
+    /// cooling by `cool` halvings is `shift = −cool·2^24`), so a schedule may step `T` by any part of an octave (theory,
+    /// November 8 12:35: the writer's heating in quarter octaves). The energy a place is read at the sweep's own `T`.
+    #[allow(clippy::too_many_arguments)]
+    pub fn energy_sweep_shifted(&self, problems: &[(&[usize], usize)], answers: &mut [Vec<usize>], positions: Option<&[Vec<usize>]>, void: usize, shift: i128, seed: u64, realization: &mut dyn FieldRealization, observe: &mut dyn FnMut(usize, usize)) -> Result<(usize, usize, Vec<i128>)> {
         let alphabet = self.declaration.alphabet;
         if !self.declaration.energy || problems.len() != answers.len() || void >= alphabet || answers.iter().zip(problems).any(|(a, &(_, room))| a.is_empty() || a.len() > room) {
             return refuse("a kernel sweep needs an energy field and each answer within its room");
         }
         let mut field = self.clone();
         let at = field.layout.face_temper;
-        field.theta[at] = fit32(field.theta[at] as i128 - ((cool as i128) << MATERIAL_BITS), "a cooled temperature past its carrier")?;
+        field.theta[at] = fit32(field.theta[at] as i128 + shift, "a moved temperature past its carrier")?;
         let inverse = temperature_of(-field.theta[at], &field.fine)?;
         let one = 1u32 << STATE_BITS;
         let mix = |counter: u64| -> u64 {

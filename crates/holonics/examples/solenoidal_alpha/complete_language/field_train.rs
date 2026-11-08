@@ -3348,7 +3348,8 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
                     }
                     let places: usize = count.values().sum();
                     let text: Vec<String> = count.iter().map(|(&c, &k)| format!("{}:{k}", if c < 256 { escaped(&[c as u8]) } else { format!("#{c}") })).collect();
-                    println!("FIELD_SECTION_LETTERS lap={lap} n={n} places={places} {}", text.join(" "));
+                    let longest = members.iter().map(|&i| (train_set[i].0.len() + train_set[i].1.len(), i)).max().unwrap_or((0, 0));
+                    println!("FIELD_SECTION_LETTERS lap={lap} n={n} places={places} longest={} longest_problem={} {}", longest.0, longest.1, text.join(" "));
                     continue;
                 }
                 let resolved: Vec<Vec<bool>> = truths.iter().map(|t| vec![false; t.len()]).collect();
@@ -4230,6 +4231,32 @@ pub(super) fn kernel_write(args: &[String], realization: &mut dyn FieldRealizati
         Ok(())
     };
     closing("T", &answers, realization)?;
+    // [measurement; theory, November 8 12:35] `FIELD_WRITE_HEAT=SWEEPS`: the heating from the equilibrium at T, t = T/T′ stepped
+    // in quarter octaves down to 1/4 and then in octaves down to 2^(−10), SWEEPS sweeps a step, each sweep's energy a place
+    // read at its own T′ (the analysis rescales to T: u = e·T′/T), and the uniform letters' energy at T for t = 0, so the
+    // field's entropy a place is S(T) = ln 99 + u(1) − ∫₀¹ u dt. Run on a copy: the descent below starts from the equilibrium.
+    if let Some(heat) = std::env::var("FIELD_WRITE_HEAT").ok().and_then(|v| v.parse::<u32>().ok()).filter(|&k| k > 0) {
+        let mut hot = answers.clone();
+        let quarter = 1i128 << (holonics::hnn::tower::MATERIAL_BITS - 2);
+        let steps: Vec<i128> = (1..=8).map(|j| j * quarter).chain((3..=10).map(|q| q << holonics::hnn::tower::MATERIAL_BITS)).collect();
+        for (k, &shift) in steps.iter().enumerate() {
+            for sweep in 1..=heat {
+                let t0 = std::time::Instant::now();
+                let (moved, proposed, per) = field.energy_sweep_shifted(&problems, &mut hot, None, void, shift, mix(seed ^ 0x4EA7, ((k as u64) << 8) | sweep as u64), realization, &mut |_, _| {}).map_err(|e| e.to_string())?;
+                println!("FIELD_WRITE_HEAT step={} shift_quarters={} sweep={sweep} moved={moved} proposed={proposed} energy_milli={} per_answer_milli={:?} sweep_ms={} ms={}", k + 1, shift / quarter, milli(mean_of(&per)), per.iter().map(|&x| milli(x)).collect::<Vec<_>>(), t0.elapsed().as_millis(), started.elapsed().as_millis());
+            }
+        }
+        // t = 0: each answer's letters drawn uniformly over the alphabet less the void, four draws, read at T.
+        for draw in 0..4u64 {
+            let uniform: Vec<Vec<usize>> = answers.iter().enumerate().map(|(k, a)| {
+                (0..a.len()).map(|j| {
+                    let r = (mix(seed ^ 0x0F1A7, (draw << 40) | ((k as u64) << 20) | j as u64) % (field.declaration.alphabet as u64 - 1)) as usize;
+                    if r >= void { r + 1 } else { r }
+                }).collect()
+            }).collect();
+            closing(&format!("uniform{draw}"), &uniform, realization)?;
+        }
+    }
     // The descent: T halved each sweep until a sweep moves nothing.
     let mut cool = 0u32;
     while started.elapsed().as_millis() <= stop_ms {
