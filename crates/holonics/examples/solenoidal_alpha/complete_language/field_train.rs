@@ -3026,22 +3026,31 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
             if let Ok(most) = std::env::var("FIELD_CENSUS_REST") {
                 let most: usize = most.parse().map_err(|_| "FIELD_CENSUS_REST is a count of ticks".to_string())?;
                 // `FIELD_CENSUS_REST_REBASE`: each lane re-based to its opening scale after each tick (theory, 03:32).
-                let rebase = std::env::var_os("FIELD_CENSUS_REST_REBASE").is_some();
-                let rest = learner.field.energy_rest_read(&region, most, rebase).map_err(|e| e.to_string())?;
+                // `FIELD_CENSUS_REST_FLOW`: the certified flow step (theory, 04:21), re-based inside the candidate.
+                let mode = if std::env::var_os("FIELD_CENSUS_REST_FLOW").is_some() {
+                    holonics::hnn::tower::field::RestMode::Flow
+                } else if std::env::var_os("FIELD_CENSUS_REST_REBASE").is_some() {
+                    holonics::hnn::tower::field::RestMode::Rebase
+                } else {
+                    holonics::hnn::tower::field::RestMode::Law
+                };
+                let rebase = format!("{mode:?}");
+                let rest = learner.field.energy_rest_read(&region, most, mode).map_err(|e| e.to_string())?;
                 for (k, tick) in rest.ticks.iter().enumerate() {
                     println!(
-                        "FIELD_REST_TICK problem={i} rebase={rebase} tick={k} halvings={} fall={} fall_bits={} slack={} fall_over_slack_milli={} scale_top={} rebase_change={}",
+                        "FIELD_REST_TICK problem={i} mode={rebase} tick={k} halvings={} fall={} fall_bits={} slack={} fall_over_slack_milli={} scale_top={} rebase_change={} claim={}",
                         tick.halvings,
                         tick.fall,
                         128 - tick.fall.unsigned_abs().leading_zeros(),
                         tick.slack,
                         tick.fall * 1000 / tick.slack.max(1),
                         tick.scale_top,
-                        tick.rebase_change
+                        tick.rebase_change,
+                        tick.claim
                     );
                 }
                 println!(
-                    "FIELD_REST problem={i} rebase={rebase} sites={} ticks={} ended={:?} opening={} last={} fall={} opening_scale_top={} ms={}",
+                    "FIELD_REST problem={i} mode={rebase} sites={} ticks={} ended={:?} opening={} last={} fall={} opening_scale_top={} ms={}",
                     truth.len(),
                     rest.ticks.len(),
                     rest.ended,

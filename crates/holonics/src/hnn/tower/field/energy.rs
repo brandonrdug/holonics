@@ -2109,7 +2109,13 @@ impl Field {
     /// `x_ℓ ← s⁰_ℓ·r̂_ℓ`: Φ reads a lane only through its direction, so the scale lies in the kernel of every reading of
     /// Φ, and each tick otherwise multiplies it by `√(1 + 2η·mean(r̂F) + η²·mean(F²)) > 1`; each tick reports the lanes'
     /// largest scale's top place before the re-base and the change of Φ the re-base makes (the chart's release).
-    pub fn energy_rest_read(&self, region: &Region, most: usize, rebase: bool) -> Result<EnergyRest> {
+    ///
+    /// [measurement; theory, November 8 04:21 and 04:54] With [`RestMode::Flow`], the tick is a certified flow step: each
+    /// candidate is re-based inside itself (`s⁰·N(x + η s F)`, before its energy is read, so acceptance sees the re-base's
+    /// rounding), and it stands only where its fall passes both the slack and half its first-order claim
+    /// `η Σ (|F|² − ⟨r̂, F⟩²/W)` (half the claim is a quadratic's line minimum, so `η` stops at the energy's own curvature).
+    pub fn energy_rest_read(&self, region: &Region, most: usize, mode: RestMode) -> Result<EnergyRest> {
+        let rebase = mode != RestMode::Law;
         let (faces, locked) = self.energy_sites(region);
         let region = &Region { faces: &faces, locked: &locked, ..*region };
         self.admit_region(region)?;
@@ -2155,11 +2161,36 @@ impl Field {
                 break;
             };
             let (mut stood, mut below_grain, mut last_slack, mut refused) = (None, false, 0i128, false);
+            // The first-order claim on 2^(−48) before its halvings: Σ over lanes of |F|² − ⟨r̂, F⟩²/W (`energy_fall`'s).
+            let mut first_order = 0i128;
+            if mode == RestMode::Flow {
+                for t in 0..x.len() / dw {
+                    for k in 0..lanes {
+                        let at = t * dw + k * lane_width;
+                        let ff: i128 = (0..lane_width).map(|i| force[at + i] as i128 * force[at + i] as i128).sum();
+                        let rf: i128 = (0..lane_width).map(|i| force[at + i] as i128 * cell.read[at + i] as i128).sum();
+                        first_order += ff - release(div_nearest(rf * rf, lane_width as i128), 32);
+                    }
+                }
+            }
             let mut h = first;
             while h <= STEP_CARRIER_HALVINGS {
-                let Ok(next) = self.energy_step(&x, &cell.scale, &force, h) else {
+                let Ok(stepped) = self.energy_step(&x, &cell.scale, &force, h) else {
                     refused = true;
                     break;
+                };
+                // The flow step's candidate is re-based inside itself, before its energy is read.
+                let next = if mode == RestMode::Flow {
+                    let mut based = Vec::with_capacity(stepped.len());
+                    for (k, lane) in stepped.chunks_exact(lane_width).enumerate() {
+                        let (r, _) = ratio_to_power(lane)?;
+                        for &rk in &r {
+                            based.push(fit64(release(scale0[k] * rk as i128, FACE_BITS))?);
+                        }
+                    }
+                    based
+                } else {
+                    stepped
                 };
                 if next == x {
                     below_grain = true;
@@ -2171,10 +2202,11 @@ impl Field {
                 };
                 let slack = (cell.logs + candidate.logs) as i128 + 2;
                 last_slack = slack;
-                if candidate.phi + slack <= cell.phi {
+                let claim = if mode == RestMode::Flow { release(first_order, 16 + h) } else { 0 };
+                if candidate.phi + slack <= cell.phi && 2 * (cell.phi - candidate.phi) >= claim {
                     let fall = cell.phi - candidate.phi;
                     let top = scale_top(&next).unwrap_or(u32::MAX);
-                    let (next, candidate, rebase_change) = if rebase {
+                    let (next, candidate, rebase_change) = if mode == RestMode::Rebase {
                         // Each lane back to its opening scale: its direction kept, released to the state's grain.
                         let mut based = Vec::with_capacity(next.len());
                         for (k, lane) in next.chunks_exact(lane_width).enumerate() {
@@ -2190,7 +2222,7 @@ impl Field {
                     } else {
                         (next, candidate, 0)
                     };
-                    out.ticks.push(RestTick { halvings: h, fall, slack, scale_top: top, rebase_change });
+                    out.ticks.push(RestTick { halvings: h, fall, slack, scale_top: top, rebase_change, claim });
                     x = next;
                     cell = candidate;
                     stood = Some(h);
@@ -2258,6 +2290,17 @@ pub struct RestTick {
     pub slack: i128,
     pub scale_top: u32,
     pub rebase_change: i128,
+    /// The flow step's first-order claim at its halvings (zero in the other modes), on `2^(−32)`.
+    pub claim: i128,
+}
+
+/// How a rest read ticks: as the law runs, re-based to the opening scale after each tick, or as a certified flow step
+/// (re-based inside the candidate, standing at half its first-order claim).
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum RestMode {
+    Law,
+    Rebase,
+    Flow,
 }
 
 /// Why a descent ended: at the read's most ticks, a step below the state's grain at every halving left, no fall past the

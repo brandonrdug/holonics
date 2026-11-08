@@ -6876,7 +6876,7 @@ impl FieldLearner {
 mod energy;
 pub mod moment;
 mod scale;
-pub use energy::{EnergyPairKinds, EnergyRead, EnergyRest, RestEnd, RestTick, EnergySquare, EnergyTangentRead, SquareCorners, ENERGY_BITS, FIRST_HALVINGS, STEP_CARRIER_HALVINGS};
+pub use energy::{EnergyPairKinds, EnergyRead, EnergyRest, RestEnd, RestMode, RestTick, EnergySquare, EnergyTangentRead, SquareCorners, ENERGY_BITS, FIRST_HALVINGS, STEP_CARRIER_HALVINGS};
 pub use scale::Scale;
 
 #[cfg(test)]
