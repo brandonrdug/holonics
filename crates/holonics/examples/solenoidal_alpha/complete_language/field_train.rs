@@ -2845,6 +2845,10 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
     // releases its problems' writes afresh from the faces at their true lengths and sweeps them whole SWEEPS times at T, so
     // nothing persists between sections (each sweep's energy printed, the last two read as the lag).
     let fresh_sweeps: Option<u64> = std::env::var("FIELD_CONTRAST_FRESH").ok().and_then(|v| v.parse().ok()).filter(|&k| k > 0);
+    // [definition; theory, November 8 22:04] `FIELD_FRESH_FROM_TRUTH`: the fresh writes' chain starts at each problem's truth
+    // instead of the field's release, so its SWEEPS whole sweeps at T carry the negative phase from the long chain the truth
+    // melts into; each sweep's share of places still at the truth letter prints as `FIELD_FRESH_RETAIN`.
+    let fresh_from_truth = std::env::var_os("FIELD_FRESH_FROM_TRUTH").is_some();
     // [measurement; theory, November 8 16:49] `FIELD_MELT=SWEEPS`: a melt from the truth, which separates learning from release.
     // At the loaded state, the first section read starts twice, from its truths and from the field's own release at their true
     // lengths (the fork's key), and each start is swept whole SWEEPS times at the field's `T` (cool 0), with no deposition.
@@ -3350,7 +3354,11 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
                 if fresh {
                     let longest = train_set.iter().map(|p| p.1.len()).max().unwrap_or(1);
                     let wide: Vec<usize> = if fresh_sweeps.is_some() { lengths.clone() } else { vec![longest; problems.len()] };
-                    persistent_writes = learner.field.energy_release(&problems, &wide, void, 64, key, realization, &mut |_, _, _| {}).map_err(|e| e.to_string())?;
+                    persistent_writes = if fresh_from_truth && fresh_sweeps.is_some() {
+                        members.iter().map(|&i| train_set[i].1.clone()).collect()
+                    } else {
+                        learner.field.energy_release(&problems, &wide, void, 64, key, realization, &mut |_, _, _| {}).map_err(|e| e.to_string())?
+                    };
                 }
                 let m = members.len().min(persistent_writes.len());
                 let mut active: Vec<Vec<usize>> = (0..m).map(|j| persistent_writes[j][..lengths[j].min(persistent_writes[j].len())].to_vec()).collect();
@@ -3361,6 +3369,11 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
                         let t0 = std::time::Instant::now();
                         let (mv, pr, en) = learner.field.energy_sweep_at(&problems[..m], &mut active, None, void, 0, mix(key, 100 + sweep), realization, &mut |_, _| {}).map_err(|e| e.to_string())?;
                         println!("FIELD_FRESH_SWEEP lap={lap} n={n} sweep={} moved={mv} proposed={pr} accept_milli={} write_energy_milli={} ms={}", sweep + 1, mv * 1000 / pr.max(1), (en.iter().sum::<i128>() / m.max(1) as i128) * 1000 >> 32, t0.elapsed().as_millis());
+                        if fresh_from_truth {
+                            let places: usize = active.iter().map(|a| a.len()).sum::<usize>().max(1);
+                            let agree: usize = active.iter().zip(members).map(|(a, &i)| a.iter().zip(&train_set[i].1).filter(|(x, y)| x == y).count()).sum();
+                            println!("FIELD_FRESH_RETAIN lap={lap} n={n} sweep={} retention_milli={}", sweep + 1, agree * 1000 / places);
+                        }
                     }
                     // [measurement; theory, November 8 14:59] Each section's writes decoded beside their truths (private).
                     use std::io::Write;
