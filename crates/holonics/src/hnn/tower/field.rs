@@ -5015,13 +5015,14 @@ fn census_conditional_place(ells: impl Iterator<Item = i128>, shares: &[i128], f
 
 /// The width census's deposit sites, one name a family and kind: a step's lowest set bit 0 to 7 and 8 or more (0–8), a
 /// step released to zero while its moment is not (9), the step's top place (10), the release's summed remainder (11; its
-/// positive and negative parts, 12 and 13) beside the summed change (14), and the entries the covector reached (15).
+/// positive and negative parts, 12 and 13) beside the summed change (14), the entries the covector reached (15), the whole
+/// step before truncation (16, 17), and the shadow carry's first crossings of half a grain by deposit (18–21).
 fn census_deposit_site(family: usize, kind: usize) -> &'static str {
     static NAMES: std::sync::OnceLock<Vec<Vec<&'static str>>> = std::sync::OnceLock::new();
     let names = NAMES.get_or_init(|| {
         (0..64)
             .map(|f| {
-                (0..16)
+                (0..22)
                     .map(|k| {
                         let what = match k {
                             0..=7 => format!("deposit: family {f} steps with lowest bit {k}"),
@@ -5032,7 +5033,13 @@ fn census_deposit_site(family: usize, kind: usize) -> &'static str {
                             12 => format!("deposit: family {f} summed positive remainder, on 2^-24"),
                             13 => format!("deposit: family {f} summed negative remainder (magnitude), on 2^-24"),
                             14 => format!("deposit: family {f} summed |change|, on the grain"),
-                            _ => format!("deposit: family {f} entries whose covector is nonzero"),
+                            15 => format!("deposit: family {f} entries whose covector is nonzero"),
+                            16 => format!("deposit: family {f} summed positive whole step before truncation, on 2^-24"),
+                            17 => format!("deposit: family {f} summed negative whole step before truncation (magnitude), on 2^-24"),
+                            18 => format!("deposit: family {f} entries whose shadow carry reached half a grain at deposit 1"),
+                            19 => format!("deposit: family {f} entries whose shadow carry first reached half a grain at deposits 2-39"),
+                            20 => format!("deposit: family {f} entries whose shadow carry first reached half a grain at deposits 40-100"),
+                            _ => format!("deposit: family {f} entries whose shadow carry first reached half a grain after deposit 100"),
                         };
                         &*Box::leak(what.into_boxed_str())
                     })
@@ -5780,6 +5787,8 @@ impl FieldLearner {
         };
         self.moments_take(&mut g)?;
         let mut step = vec![0i128; g.len()];
+        // The census's whole steps a deposit (on 2^(−24) of each grain), for the shadow carry.
+        let mut full_steps = if crate::number::census::enabled() { vec![0i128; g.len()] } else { Vec::new() };
         for (k, &(start, len, grain)) in families.iter().enumerate() {
             match &self.family_rates {
                 // `2^(−ρ_f)`: the whole bits through the deposit's own law (a right shift, or a left shift checked at its carrier
@@ -5801,12 +5810,19 @@ impl FieldLearner {
                         };
                         let pre = whole_step.checked_mul(scale).inspect(|v| crate::number::census::reach(PAST, v)).ok_or(TowerError::Refused(PAST))?;
                         step[i] = release(pre, MATERIAL_BITS);
-                        // The release's remainder on 2^(−24) of the family's grain, signed parts apart, beside the change.
+                        // The release's remainder on 2^(−24) of the family's grain, signed parts apart, beside the change; and
+                        // the whole step before the division's and the shift's truncation (the deposit a carried release
+                        // would keep), on the same grain: what a family whose every step releases to zero holds.
                         if crate::number::census::enabled() {
                             let rem = pre - (step[i] << MATERIAL_BITS);
                             crate::number::census::tally(census_deposit_site(k, 11), rem.unsigned_abs() as u64);
                             crate::number::census::tally(census_deposit_site(k, if rem > 0 { 12 } else { 13 }), rem.unsigned_abs() as u64);
                             crate::number::census::tally(census_deposit_site(k, 14), step[i].unsigned_abs() as u64);
+                            if let Some(scaled) = num.checked_mul(scale) {
+                                let full = if whole >= 0 { (scaled >> whole.min(127)) / root } else { scaled.checked_shl((-whole) as u32).unwrap_or(0) / root };
+                                full_steps[i] = full;
+                                crate::number::census::tally(census_deposit_site(k, if full > 0 { 16 } else { 17 }), full.unsigned_abs() as u64);
+                            }
                         }
                     }
                 }
@@ -5816,6 +5832,28 @@ impl FieldLearner {
                     }
                 }
             }
+        }
+        // The shadow carry: each entry's dropped part (its whole step less its released step, on 2^(−24) of its grain) summed
+        // across deposits beside θ, never written to it; the deposit at which an entry's carried sum first reaches half a
+        // grain, counted per family by 1, 39 and 100 deposits and after.
+        if crate::number::census::enabled() && !full_steps.is_empty() {
+            crate::number::census::shadow_carry(step.len(), |sums, crossed, n| {
+                for (k, &(start, len, _)) in families.iter().enumerate() {
+                    for i in start..start + len {
+                        sums[i] += full_steps[i] - (step[i] << MATERIAL_BITS);
+                        if crossed[i] == 0 && sums[i].unsigned_abs() >= 1u128 << (MATERIAL_BITS - 1) {
+                            crossed[i] = n;
+                            let bucket = match n {
+                                1 => 18,
+                                2..=39 => 19,
+                                40..=100 => 20,
+                                _ => 21,
+                            };
+                            crate::number::census::tally(census_deposit_site(k, bucket), 1);
+                        }
+                    }
+                }
+            });
         }
         // The width census's read (a) a step: each family's nonzero steps by their lowest set bit, and the entries whose moment
         // is nonzero but whose step released to zero.
