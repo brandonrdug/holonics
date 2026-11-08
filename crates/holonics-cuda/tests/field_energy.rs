@@ -214,7 +214,9 @@ fn a_tiny_energy_forward_ticked_long_with_a_region_at_rest_is_the_hosts() {
 /// [measurement] **A letters-only energy ticked to its minimum is the host's on the card**: the key and probe charts, the pair
 /// drives and the lift's matrix at zero, so each site's energy is linear in its chart read and its descent converges on
 /// the sphere; past its minimum a step moves the state along its own chart read (the energy unchanged) and no halving
-/// certifies a fall, so the regions exhaust their halvings, at different ticks, and a tick's last states are read again.
+/// certifies a fall, so the regions rest, at different ticks. Since `MOST_HALVINGS` was retired (November 8), a region
+/// rests when its step moves nothing, not when it exhausts 24 halvings, so this descent no longer makes a tick's last
+/// states be read again (rereads 0, every region's bits the host's).
 #[test]
 #[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
 fn a_letters_only_energy_ticked_to_its_minimum_is_the_hosts() {
@@ -243,7 +245,7 @@ fn a_letters_only_energy_ticked_to_its_minimum_is_the_hosts() {
     }
     let rereads = card.times().energy_rereads;
     println!("ENERGY_PARITY letters rested={rested} rereads={rereads}");
-    assert!(rested > 0 && rereads > 0, "the letters' descent reached no rest ({rested}) or no reread ({rereads})");
+    assert!(rested > 0, "the letters' descent reached no rest ({rested}; rereads {rereads})");
 }
 
 /// [measurement] **The field's training return on the card is still the host's** beside the energy forward: on the tiny

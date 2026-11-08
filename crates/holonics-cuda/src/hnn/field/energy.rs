@@ -14,7 +14,7 @@
 //! probe brackets (`field_energy_rows_back`, `field_contact_columns`, `field_spread`), the unit powers' and the frames'
 //! returns and the charts' transposes, with the pair's (`field_pair_back` of the contraction) and the letters' (held). The
 //! regions of a batch tick in lockstep: each tick's force, then rounds of candidate steps, each region at its own halvings,
-//! its energy read back and its fall certified as the host's `energy_relax` certifies it (`FIRST_HALVINGS`, `MOST_HALVINGS`,
+//! its energy read back and its fall certified as the host's `energy_relax` certifies it (`FIRST_HALVINGS`, `STEP_CARRIER_HALVINGS`,
 //! one unit of `2^(−32)` a logarithm and two of slack); a region whose fall is certified takes its candidate's state, one
 //! whose step moves nothing or whose halvings run out rests.
 //!
@@ -29,7 +29,7 @@
 //! return (the material's covector through the ticks) is not built: an energy field is read on the card, not trained.
 
 use super::*;
-use holonics::hnn::tower::field::{EnergyRead, EnergySquare, Shares, SquareCorners, FIRST_HALVINGS, MOST_HALVINGS};
+use holonics::hnn::tower::field::{EnergyRead, EnergySquare, Shares, SquareCorners, FIRST_HALVINGS, STEP_CARRIER_HALVINGS};
 use holonics::hnn::tower::FACE_BITS;
 
 /// A region's energy sums on the card (`ENERGY_SUMS` in `kernels/field_energy.cuh`): the locks', the letters' and the
@@ -1184,7 +1184,8 @@ impl<'c> CardField<'c> {
                     } else {
                         whole = false;
                         h[r] += 1;
-                        if h[r] > MOST_HALVINGS {
+                        // The step's carrier (`STEP_CARRIER_HALVINGS`): unreached, since the step moves nothing first.
+                        if h[r] > STEP_CARRIER_HALVINGS {
                             searching[r] = false;
                             active[r] = false;
                         }

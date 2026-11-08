@@ -47,14 +47,20 @@ pub const ENERGY_BITS: u32 = 32;
 /// [agent-inferred, November 6] The first tick's step `η = 2^(−2)` of a site's own scale a unit of force; each later tick
 /// starts one halving above the halvings its tick before stood at, so the step can grow back.
 pub const FIRST_HALVINGS: u32 = 2;
-/// The most halvings a tick reads before the state rests: past them the step is below the state's grain.
-pub const MOST_HALVINGS: u32 = STATE_BITS + 8;
+/// [definition; theory, November 8 02:56, retiring `MOST_HALVINGS = STATE_BITS + 8`] **The halvings a tick may read are
+/// bounded by the step itself**: a tick halves its step until a fall stands or the step moves nothing (it rests when every
+/// coordinate's step releases to zero, at most its own bit length on the state's grain plus one halvings: the census read
+/// that step at 42 places, so the old bound of 24, whose reason was that past it the step lies below the grain, did not
+/// hold). The one bound left is the release's carrier: the step `release(s·F, COVECTOR_BITS + h)` is read on a 128-place
+/// word, so `h` stops where the shift would leave it. The rest by the step's own width comes first for every step a word
+/// holds, so the bits are those of the old law wherever no tick read past 24 halvings (every tick the census read).
+pub const STEP_CARRIER_HALVINGS: u32 = 126 - super::super::COVECTOR_BITS;
 
 /// The width census's reads (c) and (g) ([`crate::number::census`]).
 const CENSUS_RELAXED: &str = "relaxation: regions relaxed";
 const CENSUS_ALL_TICKS: &str = "relaxation: regions that stood at every tick";
 const CENSUS_REST_GRAIN: &str = "relaxation: rested, the step below the state's grain";
-const CENSUS_REST_HALVINGS: &str = "relaxation: rested, no fall past the slack by MOST_HALVINGS";
+const CENSUS_REST_HALVINGS: &str = "relaxation: rested, no fall past the slack by the step's carrier";
 const CENSUS_INSIDE_SLACK: &str = "relaxation: a fall inside the slack 2R + 2";
 const CENSUS_SLACK: &str = "relaxation: the slack 2R + 2, on 2^-32";
 const CENSUS_STOOD_AT: &str = "relaxation: the halvings a tick stood at";
@@ -826,7 +832,7 @@ impl Field {
             let (t, i) = (k / dw, k % dw);
             let s = scale[t * lanes + i / w];
             // The width census's read (g): `|scale × force|` on the state's grain at no halving, against the
-            // `STATE_BITS + 8` halvings [`MOST_HALVINGS`] reads.
+            // `STATE_BITS + 8` halvings the retired `MOST_HALVINGS` read.
             if crate::number::census::enabled() {
                 crate::number::census::reach(CENSUS_STEP_AT_NO_HALVING, &(s * force[k] as i128 >> super::super::COVECTOR_BITS));
             }
@@ -952,10 +958,10 @@ impl Field {
             let mut stood = None;
             let mut h = first;
             // The width census's read (c): why a tick rests (its step below the state's grain, or no fall past the slack
-            // by `MOST_HALVINGS`), each fall that stayed inside the slack, and the slack's `R`.
+            // by the step's carrier), each fall that stayed inside the slack, and the slack's `R`.
             let census = crate::number::census::enabled();
             let mut below_grain = false;
-            while h <= MOST_HALVINGS {
+            while h <= STEP_CARRIER_HALVINGS {
                 let next = self.energy_step(&x, &cell.scale, &force, h)?;
                 if next == x {
                     below_grain = true;
@@ -2150,7 +2156,7 @@ impl Field {
             };
             let (mut stood, mut below_grain, mut last_slack, mut refused) = (None, false, 0i128, false);
             let mut h = first;
-            while h <= MOST_HALVINGS {
+            while h <= STEP_CARRIER_HALVINGS {
                 let Ok(next) = self.energy_step(&x, &cell.scale, &force, h) else {
                     refused = true;
                     break;
@@ -2255,7 +2261,7 @@ pub struct RestTick {
 }
 
 /// Why a descent ended: at the read's most ticks, a step below the state's grain at every halving left, no fall past the
-/// slack by `MOST_HALVINGS` (the last slack read), or a carrier's refusal (the state's top place where it came).
+/// slack by the step's carrier (the last slack read), or a carrier's refusal (the state's top place where it came).
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
 pub enum RestEnd {
     #[default]
