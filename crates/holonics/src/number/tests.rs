@@ -502,3 +502,89 @@ fn the_owners_cost_beside_native_words() {
          owner {mul_ps}; a value {} bytes beside a word's 8", std::mem::size_of::<Value>()
     );
 }
+
+/// The typed realization's classes are the general form's: each operation, written back, is `Value`'s and the native
+/// word's, and its release recomposes `value · 2^K + remainder`.
+#[test]
+fn the_typed_realization_is_the_general_forms_class() {
+    let mut walk = Walk(14);
+    for _ in 0..DRAWS {
+        let (a, b) = ((walk.next() as i64) >> 33, (walk.next() as i64) >> 33);
+        let (ta, tb) = (Ray64::<31, 0>::read_i64(a).unwrap(), Ray64::<31, 0>::read_i64(b).unwrap());
+        let (va, vb) = (ta.value().unwrap(), tb.value().unwrap());
+        let s: Ray64<32, 0> = ta.add(tb);
+        assert_eq!(s.write_i64(), a + b);
+        assert!(s.value().unwrap().same(&va.add(&vb).unwrap()));
+        let d: Ray64<32, 0> = ta.sub(tb);
+        assert_eq!(d.write_i64(), a - b);
+        let p: Ray64<62, -3> = Ray64::<31, -1>::read_i64(a).unwrap().mul(Ray64::<31, -2>::read_i64(b).unwrap());
+        assert_eq!(p.write_i64(), a * b);
+        assert!(p.value().unwrap().same(&Ray64::<31, -1>::read_i64(a).unwrap().value().unwrap().mul(&Ray64::<31, -2>::read_i64(b).unwrap().value().unwrap()).unwrap()));
+        let (q, r): (Ray64<25, 7>, Ray64<7, 0>) = ta.release_nearest();
+        assert_eq!(q.write_i64() * 128 + r.write_i64(), a);
+        let rel = release(&va, 7, Rounding::Nearest(Tie::Up)).unwrap();
+        assert!(q.value().unwrap().same(&rel.value));
+        assert!(Ray64::<31, 0>::of_value(&va).unwrap() == ta);
+        let w = walk.wide() as i128 >> 2;
+        let big = Ray128::<126, 0>::read_i128(w).unwrap();
+        let s: Ray128<127, 0> = big.add(Ray128::<126, 0>::read_i128(-w).unwrap());
+        assert_eq!(s.write_i128(), 0);
+        let (x, y) = (walk.next(), walk.next());
+        let (ps, pw) = Path64::<64>::read_u64(x).unwrap().add(Path64::<64>::read_u64(y).unwrap());
+        assert_eq!((ps.write_u64(), pw == 1), x.overflowing_add(y));
+        let (pm, hw) = Path64::<64>::read_u64(x).unwrap().mul(Path64::<64>::read_u64(y).unwrap());
+        assert_eq!((pm.write_u64(), hw), (x.wrapping_mul(y), ((u128::from(x) * u128::from(y)) >> 64) as u64));
+        let (x12, y12) = (x & 0xfff, y & 0xfff);
+        let (s12, w12) = Path64::<12>::read_u64(x12).unwrap().add(Path64::<12>::read_u64(y12).unwrap());
+        assert_eq!(s12.write_u64() + (w12 << 12), x12 + y12);
+    }
+    assert!(Ray64::<8, 0>::read_i64(128).is_err());
+    assert!(Ray64::<8, 0>::read_i64(-128).is_ok());
+    assert!(Path64::<12>::read_u64(1 << 12).is_err());
+    let terms: Vec<Ray64<40, 0>> = (0..(1 << 10)).map(|i| Ray64::read_i64(((i as i64) << 28) - (1 << 38)).unwrap()).collect();
+    let total: Ray64<50, 0> = Ray64::sum(&terms).unwrap();
+    assert_eq!(total.write_i64(), terms.iter().map(|t| t.write_i64()).sum::<i64>());
+    assert!(Ray64::<40, 0>::sum::<49>(&terms).is_err());
+}
+
+/// The typed realization's cost beside the native words (run with `--ignored --nocapture`).
+#[test]
+#[ignore]
+fn the_typed_realizations_cost_beside_native_words() {
+    use std::hint::black_box;
+    use std::time::Instant;
+    let mut walk = Walk(15);
+    const N: usize = 1 << 20;
+    let words: Vec<i64> = (0..N).map(|_| (walk.next() as i64) >> 24).collect();
+    let typed: Vec<Ray64<40, 0>> = words.iter().map(|&x| Ray64::read_i64(x).unwrap()).collect();
+    let rounds = 64u128;
+    let t = Instant::now();
+    let mut native = 0i64;
+    for _ in 0..rounds {
+        native = native.wrapping_add(black_box(&words).iter().sum::<i64>());
+    }
+    let native_ps = t.elapsed().as_nanos() * 1000 / (rounds * N as u128);
+    let t = Instant::now();
+    let mut owner = 0i64;
+    for _ in 0..rounds {
+        let s: Ray64<60, 0> = Ray64::sum(black_box(&typed)).unwrap();
+        owner = owner.wrapping_add(s.write_i64());
+    }
+    let owner_ps = t.elapsed().as_nanos() * 1000 / (rounds * N as u128);
+    assert_eq!(native, owner);
+    let t = Instant::now();
+    let mut pairs = 0i64;
+    for w in words.chunks_exact(2) {
+        pairs ^= black_box(black_box(w[0]) + black_box(w[1]));
+    }
+    let native_add_ps = t.elapsed().as_nanos() * 1000 / (N as u128 / 2);
+    let t = Instant::now();
+    let mut tpairs = 0i64;
+    for w in typed.chunks_exact(2) {
+        let s: Ray64<41, 0> = black_box(w[0]).add(black_box(w[1]));
+        tpairs ^= black_box(s.write_i64());
+    }
+    let owner_add_ps = t.elapsed().as_nanos() * 1000 / (N as u128 / 2);
+    assert_eq!(pairs, tpairs);
+    eprintln!("COST_TYPED (ps per term) accumulation: native {native_ps}, owner {owner_ps}; add: native {native_add_ps}, owner {owner_add_ps}; a typed value {} bytes", std::mem::size_of::<Ray64<40, 0>>());
+}
