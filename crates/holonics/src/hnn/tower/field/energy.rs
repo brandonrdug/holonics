@@ -1036,6 +1036,7 @@ impl Field {
                 lambda[t * dw + i] = -back[i];
             }
         }
+        census_lambda(&lambda, &cell.scale, &last_force);
         let mut lift = vec![0i64; dw];
         let mut chart = vec![0i64; m2];
         for step in trail.iter().rev() {
@@ -1618,6 +1619,7 @@ impl Field {
                 lambda[t * dw + i] = -back[i];
             }
         }
+        census_lambda(&lambda, &cell.scale, &last.force);
         let mut lift = vec![0i64; dw];
         let mut chart = vec![0i64; m2];
         let (mut ta, mut tb) = (vec![0i64; f], vec![0i64; f]);
@@ -2206,6 +2208,27 @@ impl Field {
         }
         out.last = cell.phi;
         Ok(out)
+    }
+}
+
+/// The width census (theory, November 8 04:08): the reverse's opening covector `λ^K` (on `2^(−24)`), its top place, its
+/// entries at zero and within one unit (the places the last tick's lane scale took from it), beside the last state's lane
+/// scales and the last tick's force.
+fn census_lambda(lambda: &[i64], scales: &[i128], force: &[i64]) {
+    if !crate::number::census::enabled() {
+        return;
+    }
+    for &l in lambda {
+        crate::number::census::reach("reverse: λ^K's entries, on 2^-24", &l);
+    }
+    crate::number::census::tally("reverse: λ^K's entries", lambda.len() as u64);
+    crate::number::census::tally("reverse: λ^K's entries at zero", lambda.iter().filter(|&&l| l == 0).count() as u64);
+    crate::number::census::tally("reverse: λ^K's entries within one unit", lambda.iter().filter(|&&l| l.unsigned_abs() <= 1).count() as u64);
+    for &s in scales {
+        crate::number::census::reach("reverse: the last state's lane scales", &s);
+    }
+    for &f in force {
+        crate::number::census::reach("reverse: the last tick's force F^K, on 2^-24", &f);
     }
 }
 
