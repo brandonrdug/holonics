@@ -193,8 +193,15 @@ fn text_restores_exactly() {
     let mut learner = FieldLearner::new(field, 6);
     learner.section(&[region()]).unwrap();
     let back = FieldLearner::from_text(&learner.to_text()).unwrap();
-    // The transfer's operand is a reading's, not retained (§16.41).
-    assert_eq!(back, FieldLearner { last: None, ..learner });
+    // The transfer's operand is carried (November 8), so a resumed run prices its first section as the unbroken run does.
+    assert!(learner.last.is_some());
+    assert_eq!(back, learner);
+    // A unigram line with mass and the last step after it both survive.
+    let mut with = learner.clone();
+    with.unigram = Some(UnigramCarry { counts: vec![1; with.field.declaration.alphabet], mass: vec![None; with.field.declaration.alphabet], applied: false });
+    let back = FieldLearner::from_text(&with.to_text()).unwrap();
+    assert_eq!(back.unigram.as_ref().map(|u| &u.counts), with.unigram.as_ref().map(|u| &u.counts));
+    assert_eq!(back.last, with.last);
 }
 
 /// The covector agrees with the code's central difference on every family: the three entries of
@@ -2026,7 +2033,7 @@ fn a_tower_founded_on_a_field_reads_its_faces() {
     }
     let mut learner = FieldLearner::new(towered_live(1), 6);
     learner.section(&[region()]).unwrap();
-    assert_eq!(FieldLearner::from_text(&learner.to_text()).unwrap(), FieldLearner { last: None, ..learner });
+    assert_eq!(FieldLearner::from_text(&learner.to_text()).unwrap(), learner);
 }
 
 /// [definition; the tower record, D1] **The tower's covector agrees with its code's central difference** on the packets'

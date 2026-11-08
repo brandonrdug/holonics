@@ -5665,8 +5665,9 @@ pub struct FieldLearner {
     family_transfer: Vec<i128>,
     family_price: Vec<i128>,
     /// [measurement; §16.41] The step the last section stood at, the operand of the next section's
-    /// [`FieldReceipt::transfer`]; a reading's operand, not carried in the learner's text, cleared by every growth, and not
-    /// kept under the held read (whose next section moves the step before pricing it).
+    /// [`FieldReceipt::transfer`] and of the family rates' move; carried in the learner's text (November 8: a resume without
+    /// it broke bits at its second deposit), cleared by every growth, and not kept under the held read (whose next section
+    /// moves the step before pricing it).
     last: Option<HeldStep>,
 }
 
@@ -7030,7 +7031,11 @@ impl FieldLearner {
             ),
             None => String::new(),
         };
-        format!("hnn-field-learner-v3 {} {} {} {held}\n{}{}\n{}\n{step}{lengths}{average}{carried}{unigram}", self.rate_bits, self.drawn, self.laps, self.field.to_text(), join(&self.first), join(&self.second))
+        let last = match &self.last {
+            Some(l) => format!("last {} {}\n", l.halvings, join(&l.step)),
+            None => String::new(),
+        };
+        format!("hnn-field-learner-v3 {} {} {} {held}\n{}{}\n{}\n{step}{lengths}{average}{carried}{unigram}{last}", self.rate_bits, self.drawn, self.laps, self.field.to_text(), join(&self.first), join(&self.second))
     }
 
     pub fn from_text(text: &str) -> Result<Self> {
@@ -7103,7 +7108,11 @@ impl FieldLearner {
             }
             None => None,
         };
-        let unigram = match lines.next().and_then(|l| l.strip_prefix("unigram ")) {
+        let unigram_line = match lines.peek() {
+            Some(l) if l.starts_with("unigram ") => lines.next(),
+            _ => None,
+        };
+        let unigram = match unigram_line.and_then(|l| l.strip_prefix("unigram ")) {
             Some(rest) => {
                 let (counts, mass) = rest.split_once(" | ").ok_or(TowerError::Refused("a learner's unigram line without its mass"))?;
                 let counts = read_numbers::<u64>(Some(counts))?;
@@ -7118,7 +7127,21 @@ impl FieldLearner {
             }
             None => None,
         };
-        Ok(Self { field, first, second, rate_bits, read_held: held.is_some(), newton: false, newton_read: false, first_rate: FIRST_RATE, second_rate: SECOND_RATE, family_rates, temper_learns: false, family_transfer, family_price, drawn, laps, held, last: None, average, carried, unigram, unigram_step: None, coin_measure: false })
+        // [definition; November 8] The step the last section stood at, carried so a resumed run prices its first section's
+        // transfer and moves the family rates as the unbroken run does (a resume without it broke bits at its second deposit).
+        let last = match lines.peek() {
+            Some(l) if l.starts_with("last ") => {
+                let mut parts = lines.next().unwrap_or("").strip_prefix("last ").unwrap_or("").splitn(2, ' ');
+                let halvings = parts.next().unwrap_or("").parse::<u32>().map_err(|_| TowerError::Refused("a learner's last halvings that are not a count"))?;
+                let step = read_numbers::<i128>(parts.next())?;
+                if step.len() != field.material_len() {
+                    return refuse("a learner's last step that is not its material's length");
+                }
+                Some(HeldStep { step, halvings })
+            }
+            _ => None,
+        };
+        Ok(Self { field, first, second, rate_bits, read_held: held.is_some(), newton: false, newton_read: false, first_rate: FIRST_RATE, second_rate: SECOND_RATE, family_rates, temper_learns: false, family_transfer, family_price, drawn, laps, held, last, average, carried, unigram, unigram_step: None, coin_measure: false })
     }
 }
 
