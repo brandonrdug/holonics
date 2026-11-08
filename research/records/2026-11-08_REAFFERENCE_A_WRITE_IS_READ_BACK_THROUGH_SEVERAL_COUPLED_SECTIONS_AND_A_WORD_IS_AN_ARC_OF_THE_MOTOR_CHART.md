@@ -21,6 +21,13 @@ Brandon, November 8, paraphrased (his words stay out of the repository):
   surfing he calls auto-induction.
 - Information is preferred in packets, quantum-like, so that it reads as sound waves and fluid dynamics do: signal,
   scattering and coupling.
+- Mechanosense is his favourite case, in spiders and their webs (a second message the same minute).
+
+The spider case, as it is known (agent-supplied, for the join): an orb weaver plucks a thread and reads the returning
+vibration through the slit sensilla of its legs, one leg on each of several radii at once, and it can retune the web's
+tension, which changes what the web returns. The web is reafference built outside the body: an exterior structure the
+animal drives and reads. A jumping spider's principal eyes have layered retinas that read depth from defocus and are
+scanned by moving the retina itself: the foveate, several-frame reading with depth.
 
 ## 2. What it touches
 
@@ -41,6 +48,9 @@ Brandon, November 8, paraphrased (his words stay out of the repository):
 - The lens asks for that reading through several coupled sections at once, each in its own frame and clock — the letter
   as it arrives, the word as one arc of a motor chart, the coarse-grained span — so that the comparison lives in their
   coupling, not in one scalar energy.
+- The web gives the coupling its geometry: the produced write is the pluck, each coupled receiver is a leg on its own
+  radius with its own frame, and retuning the web's tension is changing the constitution through which the return is read
+  (a deposition), so the same efference returns differently as the field learns.
 - The keyboard is a concrete motor chart: keys as vertices of a planar configuration, the finger assignment as the
   execution sequence, a word as an open arc over the vertices whose geometry (turns, lengths, crossings) is a reading of
   the word distinct from its letters. Like every chart it is a boundary chart: it lives in a codec at the exterior, and the
