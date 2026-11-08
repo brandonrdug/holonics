@@ -41,9 +41,15 @@
 //! A typed class's width is checked against the law's need when the program is built, so a sum into fewer places than
 //! the wider plus one does not compile:
 //! ```compile_fail
-//! use holonics::number::Ray64;
-//! let a = Ray64::<31, 0>::read_i64(1).unwrap();
-//! let s: Ray64<31, 0> = a.add(a);
+//! use holonics::number::Signed64;
+//! let a = Signed64::<31, 0>::read_i64(1).unwrap();
+//! let s: Signed64<31, 0> = a.add(a);
+//! ```
+//! and neither does one wider than its need (a wider width is the declared crossing `widen`):
+//! ```compile_fail
+//! use holonics::number::Signed64;
+//! let a = Signed64::<31, 0>::read_i64(1).unwrap();
+//! let s: Signed64<40, 0> = a.add(a);
 //! ```
 //! A path's overflow is written out with its winding instead:
 //! ```
@@ -74,7 +80,7 @@ pub use register::{Cuts, Register};
 pub use release::{release, Released, Rounding, Tie};
 pub use shear::{AddShear, Shear};
 pub use value::{Section, Value};
-pub use word::{Path64, Ray128, Ray64};
+pub use word::{Low128, Low64, Path64, Ray128, Ray64, Rule, Signed128, Signed64};
 
 /// **A width**: a count of places. It is held as its own binary expansion: a width of eleven is planes of
 /// eight, two and one places ([`Width::planes`]), never a sixteen-place word (the 11-05 width law).

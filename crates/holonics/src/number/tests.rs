@@ -504,32 +504,65 @@ fn the_owners_cost_beside_native_words() {
 }
 
 /// The typed realization's classes are the general form's: each operation, written back, is `Value`'s and the native
-/// word's, and its release recomposes `value · 2^K + remainder`.
+/// word's, at the section N3's cross rules give; each release recomposes `value · 2^K + remainder` with both inside the
+/// widths its rule needs (`inside` is checked in debug on every result).
 #[test]
 fn the_typed_realization_is_the_general_forms_class() {
     let mut walk = Walk(14);
     for _ in 0..DRAWS {
         let (a, b) = ((walk.next() as i64) >> 33, (walk.next() as i64) >> 33);
-        let (ta, tb) = (Ray64::<31, 0>::read_i64(a).unwrap(), Ray64::<31, 0>::read_i64(b).unwrap());
+        let (ta, tb) = (Signed64::<31, 0>::read_i64(a).unwrap(), Signed64::<31, 0>::read_i64(b).unwrap());
         let (va, vb) = (ta.value().unwrap(), tb.value().unwrap());
-        let s: Ray64<32, 0> = ta.add(tb);
-        assert_eq!(s.write_i64(), a + b);
+        let s: Signed64<32, 0> = ta.add(tb);
+        assert_eq!(s.write_i64().unwrap(), a + b);
         assert!(s.value().unwrap().same(&va.add(&vb).unwrap()));
-        let d: Ray64<32, 0> = ta.sub(tb);
-        assert_eq!(d.write_i64(), a - b);
-        let p: Ray64<62, -3> = Ray64::<31, -1>::read_i64(a).unwrap().mul(Ray64::<31, -2>::read_i64(b).unwrap());
-        assert_eq!(p.write_i64(), a * b);
-        assert!(p.value().unwrap().same(&Ray64::<31, -1>::read_i64(a).unwrap().value().unwrap().mul(&Ray64::<31, -2>::read_i64(b).unwrap().value().unwrap()).unwrap()));
-        let (q, r): (Ray64<25, 7>, Ray64<7, 0>) = ta.release_nearest();
-        assert_eq!(q.write_i64() * 128 + r.write_i64(), a);
-        let rel = release(&va, 7, Rounding::Nearest(Tie::Up)).unwrap();
-        assert!(q.value().unwrap().same(&rel.value));
-        assert!(Ray64::<31, 0>::of_value(&va).unwrap() == ta);
+        let d: Signed64<32, 0> = ta.sub(tb);
+        assert_eq!(d.write_i64().unwrap(), a - b);
+        let p: Signed64<62, -3> = Signed64::<31, -1>::read_i64(a).unwrap().mul(Signed64::<31, -2>::read_i64(b).unwrap());
+        assert_eq!(p.write_i64().unwrap(), a * b);
+        // The cross rules: u32 × u32 into a u64; low + signed and low − low; a product with a signed operand.
+        let (x, y) = (walk.next() as u32, walk.next() as u32);
+        let (lx, ly) = (Low64::<32, 0>::read_u64(u64::from(x)).unwrap(), Low64::<32, 0>::read_u64(u64::from(y)).unwrap());
+        let lp: Low64<64, 0> = lx.mul(ly);
+        assert_eq!(lp.write_u64().unwrap(), u64::from(x) * u64::from(y));
+        let ls: Low64<33, 0> = lx.add(ly);
+        assert_eq!(ls.write_u64().unwrap(), u64::from(x) + u64::from(y));
+        let ld: Signed64<33, 0> = lx.sub(ly);
+        assert_eq!(ld.write_i64().unwrap(), i64::from(x) - i64::from(y));
+        let sm = Signed64::<31, 0>::read_i64(a).unwrap();
+        let mixed: Signed64<34, 0> = lx.add(sm);
+        assert_eq!(mixed.write_i64().unwrap(), i64::from(x) + a);
+        let mp: Signed64<63, 0> = lx.mul(sm);
+        assert_eq!(mp.write_i64().unwrap(), i64::from(x) * a);
+        assert!(mp.value().unwrap().same(&lx.value().unwrap().mul(&sm.value().unwrap()).unwrap()));
+        let neg: Signed64<33, 0> = lx.neg();
+        assert_eq!(neg.write_i64().unwrap(), -i64::from(x));
+        let up: Signed64<33, 0> = lx.signed();
+        assert_eq!(up.write_i64().unwrap(), i64::from(x));
+        // Each release rule recomposes and agrees with the general form's.
+        let (q, r): (Signed64<25, 7>, Signed64<7, 0>) = ta.release_nearest_up();
+        assert_eq!(q.write_i64().unwrap() * 128 + r.write_i64().unwrap(), a);
+        assert!(q.value().unwrap().same(&release(&va, 7, Rounding::Nearest(Tie::Up)).unwrap().value));
+        let (q, r): (Signed64<24, 7>, Low64<7, 0>) = ta.release_floor();
+        assert_eq!(q.write_i64().unwrap() * 128 + r.write_i64().unwrap(), a);
+        assert!(q.value().unwrap().same(&release(&va, 7, Rounding::Floor).unwrap().value));
+        for (rule, general) in [(Rule::Ceiling, Rounding::Ceiling), (Rule::NearestAway, Rounding::Nearest(Tie::Away)), (Rule::NearestEven, Rounding::Nearest(Tie::Even))] {
+            let (q, r): (Signed64<25, 7>, Signed64<8, 0>) = ta.release_by::<7, 25, 7, 8>(rule).unwrap();
+            assert_eq!(q.write_i64().unwrap() * 128 + r.write_i64().unwrap(), a, "{rule:?}");
+            assert!(q.value().unwrap().same(&release(&va, 7, general).unwrap().value), "{rule:?}");
+        }
+        // At all of the word's places the nearest release does not leave the word.
+        let full = walk.next() as i64;
+        let (q, r): (Signed64<45, 20>, Signed64<20, 0>) = Signed64::<64, 0>::read_i64(full).unwrap().release_nearest_up();
+        assert_eq!(i128::from(q.write_i64().unwrap()) * (1 << 20) + i128::from(r.write_i64().unwrap()), i128::from(full));
+        assert!(Signed64::<31, 0>::of_value(&va).unwrap() == ta);
         let w = walk.wide() as i128 >> 2;
-        let big = Ray128::<126, 0>::read_i128(w).unwrap();
-        let s: Ray128<127, 0> = big.add(Ray128::<126, 0>::read_i128(-w).unwrap());
-        assert_eq!(s.write_i128(), 0);
+        let big = Signed128::<126, 0>::read_i128(w).unwrap();
+        let s: Signed128<127, 0> = big.add(Signed128::<126, 0>::read_i128(-w).unwrap());
+        assert_eq!(s.write_i128().unwrap(), 0);
         let (x, y) = (walk.next(), walk.next());
+        let wide: Low128<128, 0> = Low128::<64, 0>::read_u128(u128::from(x)).unwrap().mul(Low128::<64, 0>::read_u128(u128::from(y)).unwrap());
+        assert_eq!(wide.write_u128().unwrap(), u128::from(x) * u128::from(y));
         let (ps, pw) = Path64::<64>::read_u64(x).unwrap().add(Path64::<64>::read_u64(y).unwrap());
         assert_eq!((ps.write_u64(), pw == 1), x.overflowing_add(y));
         let (pm, hw) = Path64::<64>::read_u64(x).unwrap().mul(Path64::<64>::read_u64(y).unwrap());
@@ -538,13 +571,18 @@ fn the_typed_realization_is_the_general_forms_class() {
         let (s12, w12) = Path64::<12>::read_u64(x12).unwrap().add(Path64::<12>::read_u64(y12).unwrap());
         assert_eq!(s12.write_u64() + (w12 << 12), x12 + y12);
     }
-    assert!(Ray64::<8, 0>::read_i64(128).is_err());
-    assert!(Ray64::<8, 0>::read_i64(-128).is_ok());
+    assert!(Signed64::<8, 0>::read_i64(128).is_err());
+    assert!(Signed64::<8, 0>::read_i64(-128).is_ok());
+    assert!(Low64::<8, 0>::read_u64(256).is_err());
     assert!(Path64::<12>::read_u64(1 << 12).is_err());
-    let terms: Vec<Ray64<40, 0>> = (0..(1 << 10)).map(|i| Ray64::read_i64(((i as i64) << 28) - (1 << 38)).unwrap()).collect();
-    let total: Ray64<50, 0> = Ray64::sum(&terms).unwrap();
-    assert_eq!(total.write_i64(), terms.iter().map(|t| t.write_i64()).sum::<i64>());
-    assert!(Ray64::<40, 0>::sum::<49>(&terms).is_err());
+    assert!(Signed64::<31, 0>::read_i64(5).unwrap().release_by::<1, 31, 1, 2>(Rule::Floor).is_err());
+    let terms: Vec<Signed64<40, 0>> = (0..(1 << 10)).map(|i| Signed64::read_i64(((i as i64) << 28) - (1 << 38)).unwrap()).collect();
+    let total: Signed64<50, 0> = Signed64::sum(&terms).unwrap();
+    assert_eq!(total.write_i64().unwrap(), terms.iter().map(|t| t.write_i64().unwrap()).sum::<i64>());
+    assert!(Signed64::<40, 0>::sum::<49>(&terms).is_err());
+    let wide_terms = vec![Signed128::<40, 0>::read_i128(-3).unwrap(); 5];
+    let wide_total: Signed128<120, 0> = Signed128::sum(&wide_terms).unwrap();
+    assert_eq!(wide_total.write_i128().unwrap(), -15);
 }
 
 /// The typed realization's cost beside the native words (run with `--ignored --nocapture`).
@@ -556,7 +594,7 @@ fn the_typed_realizations_cost_beside_native_words() {
     let mut walk = Walk(15);
     const N: usize = 1 << 20;
     let words: Vec<i64> = (0..N).map(|_| (walk.next() as i64) >> 24).collect();
-    let typed: Vec<Ray64<40, 0>> = words.iter().map(|&x| Ray64::read_i64(x).unwrap()).collect();
+    let typed: Vec<Signed64<40, 0>> = words.iter().map(|&x| Signed64::read_i64(x).unwrap()).collect();
     let rounds = 64u128;
     let t = Instant::now();
     let mut native = 0i64;
@@ -567,8 +605,8 @@ fn the_typed_realizations_cost_beside_native_words() {
     let t = Instant::now();
     let mut owner = 0i64;
     for _ in 0..rounds {
-        let s: Ray64<60, 0> = Ray64::sum(black_box(&typed)).unwrap();
-        owner = owner.wrapping_add(s.write_i64());
+        let s: Signed64<60, 0> = Signed64::sum(black_box(&typed)).unwrap();
+        owner = owner.wrapping_add(s.write_i64().unwrap());
     }
     let owner_ps = t.elapsed().as_nanos() * 1000 / (rounds * N as u128);
     assert_eq!(native, owner);
@@ -581,10 +619,10 @@ fn the_typed_realizations_cost_beside_native_words() {
     let t = Instant::now();
     let mut tpairs = 0i64;
     for w in typed.chunks_exact(2) {
-        let s: Ray64<41, 0> = black_box(w[0]).add(black_box(w[1]));
-        tpairs ^= black_box(s.write_i64());
+        let s: Signed64<41, 0> = black_box(w[0]).add(black_box(w[1]));
+        tpairs ^= black_box(s.write_i64().unwrap());
     }
     let owner_add_ps = t.elapsed().as_nanos() * 1000 / (N as u128 / 2);
     assert_eq!(pairs, tpairs);
-    eprintln!("COST_TYPED (ps per term) accumulation: native {native_ps}, owner {owner_ps}; add: native {native_add_ps}, owner {owner_add_ps}; a typed value {} bytes", std::mem::size_of::<Ray64<40, 0>>());
+    eprintln!("COST_TYPED (ps per term) accumulation: native {native_ps}, owner {owner_ps}; add: native {native_add_ps}, owner {owner_add_ps}; a typed value {} bytes", std::mem::size_of::<Signed64<40, 0>>());
 }
