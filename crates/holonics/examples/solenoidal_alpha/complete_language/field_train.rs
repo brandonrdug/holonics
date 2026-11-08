@@ -4016,6 +4016,11 @@ type HeldPlaces = Vec<(usize, Vec<usize>, usize, usize)>;
 /// answer length as the stream does. The first `held.len()` places of a read stay one a problem, continuous with every read
 /// before; the rows keep that order.
 fn enumerated_places(held: &Problems, places: usize, truth_of: &dyn Fn(&(Vec<usize>, Vec<usize>, usize), &[usize]) -> Vec<usize>) -> HeldPlaces {
+    // [measurement; theory, November 8 14:22] `FIELD_HELD_ALL_OF=K`: every answer place of the first K held problems (the
+    // writer's own answers), so the enumerated conditional reads the places the writer's joint code is read on.
+    if let Some(k) = std::env::var("FIELD_HELD_ALL_OF").ok().and_then(|v| v.parse::<usize>().ok()) {
+        return held.iter().take(k).enumerate().flat_map(|(i, p)| (0..p.1.len()).map(move |j| (i, truth_of(p, &p.1), p.0.len() + j, p.0.len()))).collect();
+    }
     let mut chosen: HeldPlaces = held
         .iter()
         .take(places)
