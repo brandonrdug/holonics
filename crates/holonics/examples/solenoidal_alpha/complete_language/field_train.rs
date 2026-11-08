@@ -2850,6 +2850,10 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
     // lengths (the fork's key), and each start is swept whole SWEEPS times at the field's `T` (cool 0), with no deposition.
     // `FIELD_MELT=0` gives the sweep-0 reads alone.
     let melt_sweeps: Option<u64> = std::env::var("FIELD_MELT").ok().and_then(|v| v.parse().ok());
+    // [measurement; theory, November 8 20:48] `FIELD_MELT_ALL`: the melt reads every section of the declared read
+    // (`FIELD_CONTRAST_FROM_SECTION`, `FIELD_CONTRAST_SECTIONS`) in one load, none deposited, and ends after the last, so a bulk
+    // read over many answers (each answer's length printed beside its energies) costs one load.
+    let melt_all = std::env::var_os("FIELD_MELT_ALL").is_some();
     let persistent = std::env::var_os("FIELD_CONTRAST_PERSISTENT").is_some() || fresh_sweeps.is_some() || melt_sweeps.is_some();
     let conditional = std::env::var_os("FIELD_CONTRAST_CONDITIONAL").is_some();
     // [measurement; theory, November 8 11:10] `FIELD_CONTRAST_READ_ONLY`: each section is read and its learner put back as it
@@ -3283,6 +3287,8 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
                         let truth_e = closing_per_place(&learner.field, realization, &problems, &truth_answers, void)?;
                         let shuffle_e = closing_per_place(&learner.field, realization, &problems, &shuffled, void)?;
                         let release_e = closing_per_place(&learner.field, realization, &problems, &released, void)?;
+                        let lens: Vec<String> = truth_answers.iter().map(|a| a.len().to_string()).collect();
+                        println!("FIELD_MELT_READ n={n} lengths={}", lens.join(","));
                         for (kind, v) in [("truth", &truth_e), ("shuffle", &shuffle_e), ("release", &release_e)] {
                             println!("FIELD_MELT_READ n={n} kind={kind} energy_milli={} energies_milli={}", mean(v), list(v));
                         }
@@ -3329,6 +3335,9 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
                         }
                     }
                     println!("FIELD_MELT_DONE n={n} ms={}", started.elapsed().as_millis());
+                    if melt_all && lap == 0 && n + 1 < from_section + read_sections.max(1) {
+                        continue;
+                    }
                     return Ok(());
                 }
                 if fresh_sweeps.is_some() {
