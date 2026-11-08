@@ -3261,8 +3261,13 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
                     let released = learner.field.energy_release(&problems, &lengths, void, 64, key, realization, &mut |_, _, _| {}).map_err(|e| e.to_string())?;
                     // [measurement; theory, November 8 17:18] The soup's advantage placed by reads at sweep 0: `G/T` a place (nats, the
                     // closing read's chart) of the truths, the truths with their letters shuffled within each answer (keyed), and the
-                    // release; order = truth − shuffle, mix = shuffle − release, each answer's in milli-nats a place.
-                    {
+                    // release; order = truth − shuffle, mix = shuffle − release, each answer's in milli-nats a place. [theory, 17:54]
+                    // The release start after its fourth sweep (the fresh writer's own count) is read in the same chart, the
+                    // equilibrium writes, beside truth and shuffle, so no reading crosses charts; FIELD_MELT=0 sweeps it four times.
+                    let list = |v: &[i128]| v.iter().map(|x| x.to_string()).collect::<Vec<_>>().join(",");
+                    let average = |v: &[i128]| v.iter().sum::<i128>() / v.len().max(1) as i128;
+                    let mean = average;
+                    let (truth_e, shuffle_e) = {
                         let shuffled: Vec<Vec<usize>> = truth_answers
                             .iter()
                             .enumerate()
@@ -3275,38 +3280,22 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
                                 a
                             })
                             .collect();
-                        let log2_t = learner.field.theta[learner.field.layout().face_temper] as i128;
-                        let inverse = exp2_q32(-(log2_t << 8));
-                        let mut per_place = |answers: &[Vec<usize>]| -> Result<Vec<i128>> {
-                            let configurations: Vec<Vec<usize>> = problems
-                                .iter()
-                                .zip(answers)
-                                .map(|(&(q, room), a)| {
-                                    let mut c: Vec<usize> = q.iter().chain(a).copied().collect();
-                                    c.extend(std::iter::repeat_n(void, holonics::hnn::tower::field::NEAR.min(room - a.len())));
-                                    c
-                                })
-                                .collect();
-                            let asked: Vec<&[usize]> = configurations.iter().map(Vec::as_slice).collect();
-                            let g = realization.read_energies(&learner.field, &asked).map_err(|e| e.to_string())?;
-                            Ok(g.iter().zip(answers).map(|(&g, a)| (((g * inverse >> 32) * LN2_Q30 >> 30) / a.len().max(1) as i128) * 1000 >> 32).collect())
-                        };
-                        let truth_e = per_place(&truth_answers)?;
-                        let shuffle_e = per_place(&shuffled)?;
-                        let release_e = per_place(&released)?;
-                        let list = |v: &[i128]| v.iter().map(|x| x.to_string()).collect::<Vec<_>>().join(",");
-                        let mean = |v: &[i128]| v.iter().sum::<i128>() / v.len().max(1) as i128;
+                        let truth_e = closing_per_place(&learner.field, realization, &problems, &truth_answers, void)?;
+                        let shuffle_e = closing_per_place(&learner.field, realization, &problems, &shuffled, void)?;
+                        let release_e = closing_per_place(&learner.field, realization, &problems, &released, void)?;
                         for (kind, v) in [("truth", &truth_e), ("shuffle", &shuffle_e), ("release", &release_e)] {
                             println!("FIELD_MELT_READ n={n} kind={kind} energy_milli={} energies_milli={}", mean(v), list(v));
                         }
                         let order: Vec<i128> = truth_e.iter().zip(&shuffle_e).map(|(a, b)| a - b).collect();
                         let mixd: Vec<i128> = shuffle_e.iter().zip(&release_e).map(|(a, b)| a - b).collect();
                         println!("FIELD_MELT_READ n={n} order_milli={} orders_milli={} mix_milli={} mixes_milli={}", mean(&order), list(&order), mean(&mixd), list(&mixd));
-                    }
+                        (truth_e, shuffle_e)
+                    };
                     use std::io::Write;
                     let mut f = std::fs::OpenOptions::new().create(true).append(true).open(out.join("MELT_WRITES.txt"))?;
                     for (start, mut active) in [("truth", truth_answers.clone()), ("release", released)] {
-                        for sweep in 0..=k {
+                        let last = if start == "release" { k.max(4) } else { k };
+                        for sweep in 0..=last {
                             let t0 = std::time::Instant::now();
                             let (mv, pr, en) = if sweep == 0 {
                                 (0usize, 0usize, Vec::new())
@@ -3325,6 +3314,13 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
                                 if energies.is_empty() { "-".to_string() } else { energies.join(",") },
                                 t0.elapsed().as_millis()
                             );
+                            if start == "release" && sweep == 4 {
+                                let eq = closing_per_place(&learner.field, realization, &problems, &active, void)?;
+                                let less = |v: &[i128]| v.iter().zip(&eq).map(|(a, b)| a - b).collect::<Vec<i128>>();
+                                let (t, sh) = (less(&truth_e), less(&shuffle_e));
+                                println!("FIELD_MELT_READ n={n} kind=equilibrium4 energy_milli={} energies_milli={}", average(&eq), list(&eq));
+                                println!("FIELD_MELT_READ n={n} truth_less_equilibrium_milli={} truths_less_milli={} shuffle_less_equilibrium_milli={} shuffles_less_milli={}", average(&t), list(&t), average(&sh), list(&sh));
+                            }
                         }
                         for (j, w) in active.iter().enumerate() {
                             writeln!(f, "=== melt {start} section {n} answer {j} ===")?;
@@ -4079,6 +4075,24 @@ const LN2_Q30: i128 = 744_261_118;
 
 /// `2^x` on `2^(−32)` for `x` on `2^(−32)` (a reading's face, read at its declared width): the whole part as a shift, the
 /// fraction as the product of `2^(2^(−i))` over its set bits, each the root of the one before by integer square roots.
+/// [measurement; theory, November 8 17:18] The closing read's chart: each answer's `G/T` a place in milli-nats, its question,
+/// answer and near tail read at the field's own `T` (`read_energies`, as `FIELD_WRITE_ENERGY` reads it).
+fn closing_per_place(field: &Field, realization: &mut dyn FieldRealization, problems: &[(&[usize], usize)], answers: &[Vec<usize>], void: usize) -> Result<Vec<i128>> {
+    let configurations: Vec<Vec<usize>> = problems
+        .iter()
+        .zip(answers)
+        .map(|(&(q, room), a)| {
+            let mut c: Vec<usize> = q.iter().chain(a).copied().collect();
+            c.extend(std::iter::repeat_n(void, holonics::hnn::tower::field::NEAR.min(room - a.len())));
+            c
+        })
+        .collect();
+    let asked: Vec<&[usize]> = configurations.iter().map(Vec::as_slice).collect();
+    let g = realization.read_energies(field, &asked).map_err(|e| e.to_string())?;
+    let inverse = exp2_q32(-((field.theta[field.layout().face_temper] as i128) << 8));
+    Ok(g.iter().zip(answers).map(|(&g, a)| (((g * inverse >> 32) * LN2_Q30 >> 30) / a.len().max(1) as i128) * 1000 >> 32).collect())
+}
+
 fn exp2_q32(x: i128) -> i128 {
     let whole = x >> 32;
     let frac = x & ((1i128 << 32) - 1);
