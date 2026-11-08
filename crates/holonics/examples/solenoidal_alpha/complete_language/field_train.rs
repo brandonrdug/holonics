@@ -2859,8 +2859,12 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
     // letter, printed, and the section skipped (no read, no deposit), so the walk's letter counts cost no field time.
     let section_letters = std::env::var_os("FIELD_SECTION_LETTERS").is_some();
     // [measurement; theory, November 8 15:11] `FIELD_SAVE_AT=N`: also save at section N, so a resume from that save has an
-    // unbroken twin in the same run (the resume fix's check at scale).
-    let save_at: Option<usize> = std::env::var("FIELD_SAVE_AT").ok().and_then(|v| v.parse().ok());
+    // unbroken twin in the same run (the resume fix's check at scale); several, comma-separated, save at each (theory, November
+    // 8 17:38: the fork's continuation rests and melts at 219 and 239 without breaking its run).
+    let save_at: Vec<usize> = std::env::var("FIELD_SAVE_AT").map(|v| v.split(',').filter_map(|x| x.trim().parse().ok()).collect()).unwrap_or_default();
+    // [measurement; theory, November 8 17:38] `FIELD_CONDITIONAL_ROWS`: each conditional read's per-place code (micro-nats) is
+    // also written to `CONDITIONAL_ROWS.txt`, one line a section, so two reads of one section pair place by place for their SE.
+    let conditional_rows = std::env::var_os("FIELD_CONDITIONAL_ROWS").is_some();
     // [definition; the unified-theory reading of November 7, 21:58] `FIELD_CONTRAST_AVERAGE`: the averaged constitution moves
     // each section (`FieldLearner::average_section`) and every held read reads it; the live field keeps stepping.
     let averaging = std::env::var_os("FIELD_CONTRAST_AVERAGE").is_some();
@@ -3221,7 +3225,7 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
             if n > 0 && n == from_section && lap == 0 {
                 println!("FIELD_RESUMED lap={lap} sections={n}/{} ms={now}", sections.len());
             }
-            if n > 0 && (now - saved_ms >= SAVE_MS || save_at == Some(n)) {
+            if n > 0 && (now - saved_ms >= SAVE_MS || save_at.contains(&n)) {
                 write_new(&out.join(format!("STATE.{lap}.{n}")), at_rate(&learner, base_rate).as_bytes())?;
                 match &host_held {
                     Some(h) => h.read(10_000 * (lap as i64 + 1) + n as i64, &learner),
@@ -3523,6 +3527,12 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
                         r.whole * 1000 / r.places.max(1),
                         section_start.elapsed().as_millis()
                     );
+                    if conditional_rows {
+                        use std::io::Write;
+                        let mut f = std::fs::OpenOptions::new().create(true).append(true).open(out.join("CONDITIONAL_ROWS.txt"))?;
+                        let row: Vec<String> = r.log2_a.iter().map(|&l| (-(l * LN2_Q30 >> 30) * 1_000_000 >> 32).to_string()).collect();
+                        writeln!(f, "lap={lap} n={n} places={} micro_nats={}", r.log2_a.len(), row.join(","))?;
+                    }
                     // [measurement; theory, November 7 23:47] The coin's measure: each tolerance's cost a place and added variance,
                     // and the tolerance that minimizes `cost × (1 + V_coin/V_D)` (a tie to the larger, cheaper `τ`), written to
                     // `COIN_TAU`.

@@ -880,7 +880,10 @@ impl<'c> CardField<'c> {
         let firsts: Vec<usize> = lengths.iter().scan(0usize, |at, &len| { let f = *at; *at += len; Some(f) }).collect();
         let longest = lengths.iter().copied().max().unwrap_or(0);
         let classes = 3usize.pow(b as u32) + 2 * n.saturating_sub(b) * (longest / (cap + 1));
-        let pstride = 1usize << n;
+        // A receiver's row holds its own class and its probed ones; the stride is the batch's longest row (the layout's width as
+        // its rows need, November 8: at the bound `2^n` each batch uploaded two 72 MB tables of mostly empty rows, 1,374 s of
+        // section 163's 5,952), under the law's bound `2^n`.
+        let bound = 1usize << n;
         // Each head and region built on the host's lanes.
         use rayon::prelude::*;
         let definite_all: &[u8] = &st.definite;
@@ -900,6 +903,11 @@ impl<'c> CardField<'c> {
         if let Some(&(_, _, _, leaves)) = built.iter().find(|(.., leaves)| *leaves > classes) {
             return Err(TowerError::Refused(if leaves > classes { "a widened region with more leaves than the width law's bound" } else { "" }));
         }
+        let pstride = built
+            .iter()
+            .flat_map(|(_, _, lists, _)| (0..lists.definite.len()).filter(|&i| lists.definite[i]).map(move |i| 1 + lists.probes[i].len()))
+            .max()
+            .unwrap_or(1);
         // `field_classes`'s layout: `cls`, `pn`, `members` `[h][t]`, `pcls` and `pmem` at the stride, `class_off` `[h][r][2C + 1]`,
         // `poff` `[h][r][C + 1]`.
         let t = sites;
@@ -924,7 +932,7 @@ impl<'c> CardField<'c> {
                 if lists.definite[i] {
                     let row = std::iter::once(lists.probe_class[i]).chain(lists.probes[i].iter().copied()).collect::<Vec<u32>>();
                     // The kernels hold a row's probed classes in shared memory, at most 128 (`MAX_PROBES` + its own).
-                    if row.len() > pstride || row.len() > 128 {
+                    if row.len() > bound || row.len() > 128 {
                         return Err(TowerError::Refused("a widened receiver with more probes than a row holds (MAX_PROBES)"));
                     }
                     pn[h * t + g] = row.len() as u32;
@@ -957,7 +965,7 @@ impl<'c> CardField<'c> {
         (words.nclasses, words.pstride) = (classes as u32, pstride as u32);
         let receivers: Vec<u32> = pn.iter().copied().filter(|&k| k > 0).collect();
         println!(
-            "FIELD_WIDEN_LISTS regions={rn} sites={sites} heads={heads} probes_most={} probes_mean_milli={} leaves_most={} bound={classes} fetch_us={} build_us={} upload_us={} threads={}",
+            "FIELD_WIDEN_LISTS regions={rn} sites={sites} heads={heads} probes_most={} probes_mean_milli={} leaves_most={} bound={classes} stride={pstride} fetch_us={} build_us={} upload_us={} threads={}",
             receivers.iter().max().map_or(0, |&k| k - 1),
             receivers.iter().map(|&k| (k - 1) as u64).sum::<u64>() * 1000 / receivers.len().max(1) as u64,
             built.iter().map(|(.., l)| *l).max().unwrap_or(0),
