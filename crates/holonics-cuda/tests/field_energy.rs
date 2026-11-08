@@ -758,3 +758,109 @@ fn the_width_law_on_the_card_is_the_hosts() {
         assert_eq!(*hf, faces[k], "streamed region {k}: faces");
     }
 }
+
+/// [measurement; agent-inferred, November 8] **A crowds' difference array carried as limbs holds the ring sum's 128 bits**
+/// (`CardField::limbs_check`: `add_difference` against `add_wide`, `kernels/field.cu`): `2^20` terms a cell (past the
+/// `2^19 + 64` a head's crowds can bring one cell), each added as a crowd's term, `v` at its cell and `−v` at its mate; the
+/// carrier's and the digits' extremes, full-width draws and one-digit draws, and a cell whose every term has its two low digits
+/// at `−2^42` (its planes' sums at `∓2^62`), against the host's wrapping sum.
+#[test]
+#[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
+fn a_difference_arrays_limbs_are_its_ring_sum() {
+    let opened = Card::open(0).unwrap();
+    let card = CardField::open(&opened).unwrap();
+    let mut next = mixer(0x11B5);
+    let edges = [0i128, 1, -1, i128::MIN, i128::MAX, i128::MIN + 1, i128::MAX - 1, (1 << 42) - 1, -(1 << 42), 1 << 42, -(1 << 42) - 1, (1 << 43) - 1, -(1 << 43), 1 << 85, -(1 << 85), (1 << 86) - 1, -(1 << 86), (1 << 126) + (1 << 85) + (1 << 42)];
+    let cells = 5usize;
+    let per = 1usize << 20;
+    let values: Vec<i128> = (0..cells * per)
+        .map(|k| {
+            let (cell, x) = (k % cells, next());
+            match cell {
+                // Every term's two low digits at the bottom of their range.
+                0 => -(1i128 << 42) - (1i128 << 85),
+                1 => edges[(x % edges.len() as u64) as usize],
+                2 => ((x as u128) << 64 | next() as u128) as i128,
+                3 => (x as i64 >> 21) as i128,
+                _ => ((x as u128) << 64 | next() as u128) as i128 >> (x % 127),
+            }
+        })
+        .collect();
+    let mut host = vec![0i128; 2 * cells];
+    for (k, &v) in values.iter().enumerate() {
+        host[k % cells] = host[k % cells].wrapping_add(v);
+        host[cells + k % cells] = host[cells + k % cells].wrapping_sub(v);
+    }
+    let (ring, limbs) = card.limbs_check(&values, cells).unwrap();
+    println!("LIMBS_CHECK cells={cells} terms_a_cell={per} ring_equal={} limbs_equal={}", ring == host, limbs == host);
+    assert_eq!(ring, host, "the ring's atomic step");
+    assert_eq!(limbs, host, "the limbs");
+}
+
+/// [measurement; agent-inferred, November 8] **A row's crowd tangents formed at once are the one-lane chain's, bit for bit**
+/// (`CardField::crowds_check`: `energy_crowds_dz` against `energy_crowd_dz`, `kernels/field_energy.cuh`, at a skinless head):
+/// rows of every crowd count from none to 32 (both lane layouts: two lanes a crowd up to 16, one past it) in scattered
+/// slots, at spans of 6, 16 and 32, counts from 1 to `2^18`; words in the line's ranges (unit words on 32 bits, tangents on
+/// 40, every chain passing its checks) and at the carriers' extremes (64-bit words, crowds' sums to `2^120`, so the mean
+/// words take 128-bit quotients and the chains refuse at varied modes). Each crowd's `δz`, the row's `Σ p δz` and the status
+/// bits are equal. The crowds' sums stay inside `|W| + |C|/2 < 2^127`, where `div_nearest` is the quotient (a crowd's sum is
+/// at most `reach · 2^64` on the card).
+#[test]
+#[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
+fn a_rows_crowd_tangents_are_the_one_lane_chains() {
+    let opened = Card::open(0).unwrap();
+    let card = CardField::open(&opened).unwrap();
+    let mut next = mixer(0xC50D);
+    let counts_at = [1u64, 2, 3, 7, 64, 1 << 18];
+    for n in [3usize, 8, 16] {
+        let span = 2 * n;
+        for extreme in [false, true] {
+            let rows = 33 * 4;
+            let (mut p, mut tp, mut sw, mut tsw) = (Vec::new(), Vec::new(), Vec::new(), Vec::new());
+            let (mut counts, mut ce) = (vec![0u64; rows * 32], vec![0u64; rows * 32]);
+            for row in 0..rows {
+                let crowds = row % 33;
+                let (start, step) = ((next() % 32) as usize, 2 * (next() % 16) as usize + 1);
+                for k in 0..crowds {
+                    let slot = (start + k * step) % 32;
+                    let x = next();
+                    counts[row * 32 + slot] = if x % 3 == 0 { counts_at[(x / 3 % counts_at.len() as u64) as usize] } else { 1 + (x >> 46) };
+                    ce[row * 32 + slot] = next() >> 1;
+                }
+                for _ in 0..span {
+                    let (a, b) = (next() as i64, next() as i64);
+                    p.push(if extreme { a } else { a >> 32 });
+                    tp.push(if extreme { b } else { b >> 24 });
+                }
+                for slot in 0..32 {
+                    let count = counts[row * 32 + slot].max(1) as i128;
+                    for (sums, bits) in [(&mut sw, 31u32), (&mut tsw, 39)] {
+                        let (mut lo, mut hi) = (Vec::with_capacity(span), Vec::with_capacity(span));
+                        for _ in 0..span {
+                            let base = (next() as i64 as i128) << 36;
+                            let x = (next() as u128) << 64 | next() as u128;
+                            let sum = if extreme { (x as i128) >> 8 } else { count * ((x as i128) >> (127 - bits)) };
+                            lo.push(base);
+                            hi.push(base + sum);
+                        }
+                        sums.extend(lo);
+                        sums.extend(hi);
+                    }
+                }
+            }
+            for temper in [1i128 << 24, 0x2F3_9A41] {
+                let (fresh, before, status) = card.crowds_check(n, temper, &p, &tp, &sw, &tsw, &counts, &ce).unwrap();
+                let differ = fresh.iter().zip(&before).filter(|(a, b)| a != b).count();
+                let zero = before.chunks_exact(33).zip(counts.chunks_exact(32)).map(|(dz, held)| dz[..32].iter().zip(held).filter(|(dz, count)| **count != 0 && **dz == 0).count()).sum::<usize>();
+                println!("CROWDS_CHECK span={span} extreme={extreme} temper={temper} rows={rows} differ={differ} status={status:?} zero_tangents={zero}");
+                assert_eq!(differ, 0, "span {span}, extreme {extreme}: the crowds' tangents differ from the one-lane chain's");
+                assert_eq!(status[0], status[1], "span {span}, extreme {extreme}: the refusals differ");
+                if extreme {
+                    assert_ne!(status[1], 0, "the extremes refuse some chain (else the refusal is not read)");
+                } else {
+                    assert_eq!(status[1], 0, "the line's ranges pass every check");
+                }
+            }
+        }
+    }
+}

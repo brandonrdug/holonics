@@ -167,6 +167,70 @@ __device__ __forceinline__ void add_wide(wide *at, wide v) {
     atomicAdd(word + 1, hi + (old + lo < old ? 1ull : 0ull));
 }
 
+// [definition; agent-inferred, November 8] **A crowds' difference array carried as a series of three limbs** (the theory
+// lead's reading of November 8: the same sum in `Z/2^128`, its carry released once where the spread reads it). A term `v`
+// is the series `v ≡ a₀ + a₁ 2^43 + a₂ 2^86 (mod 2^128)`, `a₀` and `a₁` its digits of 43 bits read signed and `a₂` the rest,
+// `|a| ≤ 2^42` each; each digit is added into its own plane of 64-bit words by an atomic that returns nothing (no dependent
+// read, so no add waits on another's return), and a zero digit is not added. A crowd's term is `v` at its first place and
+// `−v` past its last, whose digits are `v`'s negated (`|a| ≤ 2^42` still). A plane's word holds its digits' sum whole while
+// fewer than `2^21` terms meet one cell: `|Σ a| ≤ N 2^42 < 2^63`. The arrays start empty a head, and a place inside a region
+// of `S` sites is met by at most one receiver a slot on each side (two terms a slot, 64 at the warp's 32 slots); only the
+// region's first place and the place past its last take one slot's crowd from several receivers, `2^level` at most, under
+// `2S` over the levels `2^level < S`. `S ≤ reach ≤ 2^18` (a region past the reach is refused, and a reach past `2^18` holds
+// more than 32 slots), so `N < 2^20`. The top plane may wrap: `2^86 · 2^64 ≡ 0 (mod 2^128)`. Read back as `A₀ + A₁ 2^43 +
+// A₂ 2^86` on `Z/2^128` (`limbs_at`), a cell is `Σ v` in any order of additions: `add_wide`'s 128 bits. A plane is
+// `[row][span]`, the planes `plane` words apart.
+#define LIMB_BITS 43
+#define DIFFERENCE_LIMBS 3
+
+// A word's low 43 bits read signed (`[−2^42, 2^42)`).
+__device__ __forceinline__ int64_t limb_digit(uint64_t u) {
+    return (int64_t)(u << (64 - LIMB_BITS)) >> (64 - LIMB_BITS);
+}
+
+// A crowd's term `v` into a difference array: `v` at the cell of its first place, `−v` at the cell past its last.
+__device__ __forceinline__ void add_difference(uint64_t *first, uint64_t *past, uint64_t plane, wide v) {
+    const int64_t a0 = limb_digit((uint64_t)(uwide)v);
+    // `v − a₀` has 43 low zero bits on `Z/2^128`; read signed and shifted it is the series' rest exactly.
+    const wide r1 = (wide)((uwide)v - (uwide)(wide)a0) >> LIMB_BITS;
+    const int64_t a1 = limb_digit((uint64_t)(uwide)r1);
+    const int64_t a2 = (int64_t)((r1 - (wide)a1) >> LIMB_BITS);
+    const int64_t digits[DIFFERENCE_LIMBS] = {a0, a1, a2};
+#pragma unroll
+    for (int k = 0; k < DIFFERENCE_LIMBS; k++) {
+        if (digits[k] != 0) {
+            atomicAdd((unsigned long long *)(first + k * plane), (unsigned long long)digits[k]);
+            atomicAdd((unsigned long long *)(past + k * plane), (unsigned long long)(0 - (uint64_t)digits[k]));
+        }
+    }
+}
+
+// A cell's sum on `Z/2^128`, its limbs' carries released.
+__device__ __forceinline__ wide limbs_at(const uint64_t *cell, uint64_t plane) {
+    const uwide s = (uwide)(wide)(int64_t)cell[0] + ((uwide)(wide)(int64_t)cell[plane] << LIMB_BITS) + ((uwide)cell[2 * plane] << (2 * LIMB_BITS));
+    return (wide)s;
+}
+
+// [measurement; agent-inferred, November 8] **A difference array's limbs against the ring sum** (`CardField::limbs_check`, a
+// reading): each `values[k]` added as a crowd's term, `v` at cell `k mod cells` and `−v` at cell `cells + k mod cells`, by
+// `add_wide` into `ring` and by `add_difference` into `limbs` (three planes of `2 cells` words), one thread a value; then
+// each cell's limbs released into `out` (`field_limbs_read`).
+extern "C" __global__ void field_limbs_check(const wide *values, uint64_t count, uint64_t cells, wide *ring, uint64_t *limbs) {
+    for (uint64_t k = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; k < count; k += (uint64_t)gridDim.x * blockDim.x) {
+        const uint64_t c = k % cells;
+        const wide v = values[k];
+        add_wide(ring + c, v);
+        add_wide(ring + cells + c, (wide)((uwide)0 - (uwide)v));
+        add_difference(limbs + c, limbs + cells + c, 2 * cells, v);
+    }
+}
+
+extern "C" __global__ void field_limbs_read(const uint64_t *limbs, uint64_t cells, wide *out) {
+    for (uint64_t c = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; c < 2 * cells; c += (uint64_t)gridDim.x * blockDim.x) {
+        out[c] = limbs_at(limbs + c, 2 * cells);
+    }
+}
+
 __device__ __forceinline__ int64_t fit64(wide v, uint32_t *st) {
     if (v > (wide)INT64_MAX || v < (wide)INT64_MIN) {
         atomicOr(st, REFUSED_WORD64);
@@ -357,8 +421,9 @@ struct FieldWords {
     wide *sw, *sv;
     uint64_t *sc;
     uint64_t *ce;
-    // The reverse's scratch: the crowds' difference arrays over the places `[row][span]`.
-    wide *cv, *cw;
+    // The reverse's scratch: the crowds' difference arrays over the places, each a series of `DIFFERENCE_LIMBS` planes
+    // `[row][span]` of 64-bit limbs (`add_difference`, `difference_plane`).
+    uint64_t *cv, *cw;
     // The site moments `[t][2M]` (§15.1), each site's echo `B` and its logits (§15.3) and the round trips
     // `Σ_j p_ij^(t+1) p_ji^(t)` a site (`[t]`, 128 bits).
     int64_t *moment;
@@ -1326,6 +1391,11 @@ __device__ bool rowdiv_nearest(Big<L> x, const RowDiv<L> &d, uint64_t *quotient)
 // seams.
 __device__ __forceinline__ uint32_t probe_stride(const FieldWords &w) {
     return w.pstride;
+}
+
+// A difference array's limb plane: its `[row][span]` cells, a region's `S + 1` rows (`row = region_off[r] + r + t`).
+__device__ __forceinline__ uint64_t difference_plane(const FieldWords &w) {
+    return ((uint64_t)w.T + w.R) * w.span;
 }
 // Warps (rows) a contact block carries.
 #define CONTACT_ROWS 4
@@ -2928,6 +2998,7 @@ extern "C" __global__ void __launch_bounds__(REV_ROWS * 32, 6) field_contact_row
     const wide ln2 = (wide)(((uwide)w.ln2_hi << 64) | (uwide)w.ln2_lo);
     const bool still = skinless(w, h);
     const uint32_t g0 = still ? 0 : MOVE_BITS;
+    const uint64_t plane = difference_plane(w);
     const uint64_t rows1 = (uint64_t)w.T + w.R;
     for (uint64_t g = ((uint64_t)blockIdx.x * blockDim.x + threadIdx.x) >> 5; g < w.T; g += (uint64_t)gridDim.x * (blockDim.x >> 5)) {
         const uint64_t hg = (uint64_t)h * w.T + g;
@@ -3135,11 +3206,9 @@ extern "C" __global__ void __launch_bounds__(REV_ROWS * 32, 6) field_contact_row
                     atomicOr(w.status, REFUSED_KEY);
                 }
                 const wide pw = div_nearest_by(prod, cdiv2[warp][jj]);
-                add_wide(w.cw + (first + r + lo) * S + entry, pw);
-                add_wide(w.cw + (first + r + hi_ + 1) * S + entry, -pw);
+                add_difference(w.cw + (first + r + lo) * S + entry, w.cw + (first + r + hi_ + 1) * S + entry, plane, pw);
                 const wide pv = div_nearest_by((wide)w.ce[hg * w.slots + jj] * carried_ij(w, h, m, g, octave_edge(g, lv, lo > i), (uint32_t)1 << lv, dyi[entry]), cdiv[warp][jj]);
-                add_wide(w.cv + (first + r + lo) * S + entry, pv);
-                add_wide(w.cv + (first + r + hi_ + 1) * S + entry, -pv);
+                add_difference(w.cv + (first + r + lo) * S + entry, w.cv + (first + r + hi_ + 1) * S + entry, plane, pv);
             }
         }
         sum = parts_sum(active ? sum : 0, S, parts);
@@ -3214,10 +3283,49 @@ extern "C" __global__ void __launch_bounds__(CONTACT_ROWS * 32) field_contact_co
     }
 }
 
+// [measurement; agent-inferred, November 8] **The columns a contact column launch walks** (a reading only, `FIELD_COLUMNS`,
+// `CardField::stamp_columns`): over head `h`'s sources, the longest column (the receivers one source's warp walks in
+// `field_contact_columns`, `receiver_len` as it reads it) into `out[0]` and the receivers every source walks into `out[1]`.
+// One block; it moves nothing the field computes.
+extern "C" __global__ void field_column_lengths(FieldWords w, uint32_t h, uint64_t *out) {
+    __shared__ uint64_t most[32], total[32];
+    const uint32_t classes = w.nclasses;
+    const uint32_t lane = threadIdx.x & 31, warp = threadIdx.x >> 5;
+    uint64_t longest = 0, walked = 0;
+    for (uint64_t g = threadIdx.x; g < w.T; g += blockDim.x) {
+        const uint32_t r = w.site_region[g];
+        const uint32_t *off = w.class_off + ((uint64_t)h * w.R + r) * (2 * classes + 1);
+        const uint32_t c = w.cls[(uint64_t)h * w.T + g];
+        const uint32_t *poff = w.poff + ((uint64_t)h * w.R + r) * (classes + 1);
+        const uint64_t K = keyed_site(w, g) ? receiver_len(off, poff, w.ostart[r + 1] - w.ostart[r], c, definite_site(w, g)) : 0;
+        longest = K > longest ? K : longest;
+        walked += K;
+    }
+    for (int o = 16; o > 0; o >>= 1) {
+        const uint64_t other = __shfl_xor_sync(0xffffffffu, longest, o);
+        longest = other > longest ? other : longest;
+        walked += __shfl_xor_sync(0xffffffffu, walked, o);
+    }
+    if (lane == 0) {
+        most[warp] = longest;
+        total[warp] = walked;
+    }
+    __syncthreads();
+    if (threadIdx.x == 0) {
+        for (uint32_t k = 1; k < blockDim.x / 32; k++) {
+            longest = most[k] > longest ? most[k] : longest;
+            walked += total[k];
+        }
+        out[0] = longest;
+        out[1] = walked;
+    }
+}
+
 // The crowds' members' share (§14.10): the difference arrays `cv`, `cw` summed over the places (the
 // host's `spread`), added at the definite sites only, each released as its own sum:
 // `dv = fit64(dv + release(Σ cv, 63))`, `dq = fit64(dq + release(Σ cw, 32 + 2g))`. One thread an entry of
-// the span and a region, each over its region's sites in order.
+// the span and a region, each over its region's sites in order; a cell's limbs are released into its 128 bits where it
+// is read (`limbs_at`).
 extern "C" __global__ void field_spread(FieldWords w, uint32_t h, int64_t *dq, int64_t *dv) {
     // A block a region: the span's entries across the block's threads, a thread's chunk of the region's sites
     // (`blockDim / span` chunks) summed, the chunks' sums scanned, and each chunk's prefix walked again to the
@@ -3226,6 +3334,7 @@ extern "C" __global__ void field_spread(FieldWords w, uint32_t h, int64_t *dq, i
     const bool still = skinless(w, h);
     const uint32_t g0 = still ? 0 : MOVE_BITS;
     const uint32_t S = w.span;
+    const uint64_t plane = difference_plane(w);
     const uint32_t nchunk = blockDim.x / S;
     const uint32_t x = threadIdx.x % S, ck = threadIdx.x / S;
     const bool live = ck < nchunk;
@@ -3238,8 +3347,8 @@ extern "C" __global__ void field_spread(FieldWords w, uint32_t h, int64_t *dq, i
         if (live) {
             for (uint32_t t = lo; t < hi; t++) {
                 const uint64_t row = first + r + t;
-                sv += w.cv[row * S + x];
-                sw += w.cw[row * S + x];
+                sv += limbs_at(w.cv + row * S + x, plane);
+                sw += limbs_at(w.cw + row * S + x, plane);
             }
             psv[threadIdx.x] = sv;
             psw[threadIdx.x] = sw;
@@ -3253,8 +3362,8 @@ extern "C" __global__ void field_spread(FieldWords w, uint32_t h, int64_t *dq, i
             }
             for (uint32_t t = lo; t < hi; t++) {
                 const uint64_t row = first + r + t;
-                runv += w.cv[row * S + x];
-                runw += w.cw[row * S + x];
+                runv += limbs_at(w.cv + row * S + x, plane);
+                runw += limbs_at(w.cw + row * S + x, plane);
                 if (definite_site(w, first + t)) {
                     const uint32_t m = h * w.n + x % w.n;
                     const uint64_t slot = (first + t) * w.M2 + (x < w.n ? m : w.M + m);

@@ -10,7 +10,8 @@
 //!
 //! Each run prints `FIELD_CARD` with the card's reads, returns, their time, the site pairs met, the landmark reads and the
 //! largest batch's allocations, and the card's free memory at the open and its batch budget; with
-//! `FIELD_PROFILE` set, each kernel's launches and time and the run's copies and allocations.
+//! `FIELD_PROFILE` set, each kernel's launches and time and the run's copies and allocations; with `FIELD_COLUMNS` set,
+//! each contact column launch's longest column beside its card time (`FIELD_COLUMN` lines).
 #![allow(dead_code, clippy::disallowed_methods, clippy::disallowed_types, reason = "explicit exterior CLI file/process boundary")]
 
 #[path = "../../holonics/examples/solenoidal_alpha.rs"]
@@ -42,6 +43,12 @@ fn run(args: &[String]) -> Result<()> {
     // (`CardField::stamp`), printed at the end as `FIELD_EVENT` lines.
     if std::env::var_os("FIELD_EVENTS").is_some() {
         card.stamp()?;
+    }
+    // [measurement; agent-inferred, November 8] A declared reading (`FIELD_COLUMNS`, off unless set): each contact column
+    // launch's longest column (the receivers one source walks) beside its card time (`CardField::stamp_columns`, which also
+    // stamps every launch), printed at the end as `FIELD_COLUMN` lines by head and the longest column's octave.
+    if std::env::var_os("FIELD_COLUMNS").is_some() {
+        card.stamp_columns()?;
     }
     let memory = opened.census().memory;
     println!("FIELD_CARD_OPEN card={} free={} total={} batch_budget={}", opened.census().name, memory.free_bytes, memory.total_bytes, card.budget());
@@ -97,6 +104,11 @@ fn run(args: &[String]) -> Result<()> {
             println!("FIELD_EVENT entry={entry} head={head} launches={calls} card_us={} us_a_launch={} share_permille={}", ns / 1_000, ns / 1_000 / (*calls as u128).max(1), ns * 1000 / total.max(1));
         }
         println!("FIELD_EVENT_SPLIT card_kernels_ms={} elapsed_ms={}", total / 1_000_000, started.elapsed().as_millis());
+    }
+    if let Some(rows) = card.columned() {
+        for line in holonics_cuda::hnn::ColumnRow::lines(&rows) {
+            println!("FIELD_COLUMN {line}");
+        }
     }
     if let Some(p) = card.profiled() {
         let kernels: u128 = p.kernels.values().map(|v| v.1).sum();

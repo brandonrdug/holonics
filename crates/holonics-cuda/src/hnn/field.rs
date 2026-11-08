@@ -68,6 +68,10 @@ const REV_ROWS: u64 = 4;
 const MOMENT_BLOCK: u32 = 256;
 /// The most crowds a receiver hears, one lane each (`MAX_CROWD_SLOTS` in `kernels/field.cu`).
 const MAX_CROWD_SLOTS: usize = 32;
+/// [definition; agent-inferred, November 8] **The limbs a crowds' difference array carries a cell** (`DIFFERENCE_LIMBS` and
+/// `add_difference` in `kernels/field.cu`): three planes `[limb][row][span]` of 64-bit words, the cell's sum on `Z/2^128` read back
+/// with its carries released where the spread reads it.
+const DIFFERENCE_LIMBS: usize = 3;
 /// The sites a thread of a covector sum takes (`OUTER_TILE` in `kernels/field.cu`).
 const OUTER_TILE: u64 = 64;
 /// The device octets a board keeps for its desktop and other clients: the runs keep to the board's total less this (12 GiB of
@@ -464,8 +468,8 @@ struct Back<'c> {
     dp: Pooled<'c, i64>,
     ds: Pooled<'c, i64>,
     dpb: Pooled<'c, i128>,
-    cv: Pooled<'c, i128>,
-    cw: Pooled<'c, i128>,
+    cv: Pooled<'c, u64>,
+    cw: Pooled<'c, u64>,
     dm: Pooled<'c, i128>,
     gtau: Pooled<'c, i128>,
     gsig: Pooled<'c, i128>,
@@ -729,6 +733,74 @@ struct Stamps<'c> {
     kernels: std::collections::BTreeMap<(&'static str, u32), (u64, u128)>,
     /// The head a per-head launch reads (`u32::MAX` for a launch over every head), kept beside its entry.
     head: u32,
+    /// Where declared, each contact column launch's longest column beside its card time ([`Columns`]).
+    columns: Option<Columns<'c>>,
+}
+
+/// The entry whose launches the column reading follows ([`Columns`]).
+const COLUMNS_ENTRY: &str = "field_contact_columns";
+
+/// [measurement; agent-inferred, November 8] **Each contact column launch's longest column beside its card time**
+/// (`FIELD_COLUMNS`, [`CardField::stamp_columns`], a reading only): before each `field_contact_columns` launch, outside its
+/// stamps, `field_column_lengths` writes the launch's longest column (the receivers one source's warp walks) and the
+/// receivers every source walks into a slot pair; the pairs are read back with the stamps and filed with each launch's card
+/// time by head and the longest column's octave. It moves nothing the field computes.
+struct Columns<'c> {
+    slots: CardBuffer<'c, u64>,
+    /// The pending stamps that carry a column: (the stamp's launch, its column slot).
+    pending: Vec<(usize, usize)>,
+    rows: std::collections::BTreeMap<(u32, u32), ColumnRow>,
+}
+
+/// [measurement] **A head's contact column launches whose longest column has `octave` binary digits** ([`Columns`]): their
+/// number and card time, the sum and the largest of their longest columns, and the receivers they walked.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub struct ColumnRow {
+    pub head: u32,
+    pub octave: u32,
+    pub launches: u64,
+    pub card_ns: u128,
+    pub longest: u128,
+    pub longest_max: u64,
+    pub walked: u128,
+}
+
+impl ColumnRow {
+    /// The reading's lines (`FIELD_COLUMN …`, the `FIELD_EVENT` lines' form): a line a head and octave, each launch's mean
+    /// card time and longest column and the receivers it walked, then a line a head over its octaves.
+    pub fn lines(rows: &[ColumnRow]) -> Vec<String> {
+        let mean = |sum: u128, n: u64| sum / (n as u128).max(1);
+        let mut out = Vec::with_capacity(rows.len() + 4);
+        for r in rows {
+            out.push(format!(
+                "head={} longest_octave={} launches={} card_us={} us_a_launch={} longest_mean={} longest_max={} walked_mean={}",
+                r.head,
+                r.octave,
+                r.launches,
+                r.card_ns / 1_000,
+                mean(r.card_ns, r.launches) / 1_000,
+                mean(r.longest, r.launches),
+                r.longest_max,
+                mean(r.walked, r.launches)
+            ));
+        }
+        let mut heads: Vec<u32> = rows.iter().map(|r| r.head).collect();
+        heads.dedup();
+        for head in heads {
+            let of = || rows.iter().filter(move |r| r.head == head);
+            let launches: u64 = of().map(|r| r.launches).sum();
+            let (ns, longest, walked): (u128, u128, u128) = (of().map(|r| r.card_ns).sum(), of().map(|r| r.longest).sum(), of().map(|r| r.walked).sum());
+            out.push(format!(
+                "head={head} longest_octave=all launches={launches} card_us={} us_a_launch={} longest_mean={} longest_max={} walked_mean={}",
+                ns / 1_000,
+                mean(ns, launches) / 1_000,
+                mean(longest, launches),
+                of().map(|r| r.longest_max).max().unwrap_or(0),
+                mean(walked, launches)
+            ));
+        }
+        out
+    }
 }
 
 /// The launches a stamp buffer holds before it is read back.
@@ -750,22 +822,57 @@ impl<'c> CardField<'c> {
     /// Time every launch on the card's own clock from here on ([`Stamps`]).
     pub fn stamp(&mut self) -> std::result::Result<(), DeviceError> {
         let slots = self.card.alloc::<u64>(2 * STAMP_LAUNCHES)?;
-        self.stamps = Some(std::cell::RefCell::new(Stamps { slots, pending: Vec::with_capacity(STAMP_LAUNCHES), kernels: Default::default(), head: u32::MAX }));
+        self.stamps = Some(std::cell::RefCell::new(Stamps { slots, pending: Vec::with_capacity(STAMP_LAUNCHES), kernels: Default::default(), head: u32::MAX, columns: None }));
         Ok(())
     }
 
-    /// Read the pending stamps back into their entries' sums.
+    /// Time every launch on the card's own clock ([`CardField::stamp`]) and read each contact column launch's longest
+    /// column beside its card time ([`Columns`]) from here on.
+    pub fn stamp_columns(&mut self) -> std::result::Result<(), DeviceError> {
+        if self.stamps.is_none() {
+            self.stamp()?;
+        }
+        let slots = self.card.alloc::<u64>(2 * STAMP_LAUNCHES)?;
+        if let Some(stamps) = &self.stamps {
+            stamps.borrow_mut().columns = Some(Columns { slots, pending: Vec::with_capacity(STAMP_LAUNCHES), rows: Default::default() });
+        }
+        Ok(())
+    }
+
+    /// Read the pending stamps back into their entries' sums, and the pending columns into their rows.
     fn stamps_drain(&self, stamps: &mut Stamps<'c>) -> std::result::Result<(), DeviceError> {
         if stamps.pending.is_empty() {
             return Ok(());
         }
         let times = self.card.fetch_range(&stamps.slots, 0, 2 * stamps.pending.len())?;
+        if let Some(columns) = stamps.columns.as_mut().filter(|c| !c.pending.is_empty()) {
+            let read = self.card.fetch_range(&columns.slots, 0, 2 * columns.pending.len())?;
+            for &(k, slot) in &columns.pending {
+                let (longest, walked) = (read[2 * slot], read[2 * slot + 1]);
+                let (head, octave) = (stamps.pending[k].1, u64::BITS - longest.leading_zeros());
+                let row = columns.rows.entry((head, octave)).or_insert(ColumnRow { head, octave, ..Default::default() });
+                row.launches += 1;
+                row.card_ns += times[2 * k + 1].saturating_sub(times[2 * k]) as u128;
+                row.longest += longest as u128;
+                row.longest_max = row.longest_max.max(longest);
+                row.walked += walked as u128;
+            }
+            columns.pending.clear();
+        }
         for (k, entry) in stamps.pending.drain(..).enumerate() {
             let slot = stamps.kernels.entry(entry).or_insert((0, 0));
             slot.0 += 1;
             slot.1 += times[2 * k + 1].saturating_sub(times[2 * k]) as u128;
         }
         Ok(())
+    }
+
+    /// The column reading so far ([`Columns`]), by head and the longest column's octave.
+    pub fn columned(&self) -> Option<Vec<ColumnRow>> {
+        let stamps = self.stamps.as_ref()?;
+        let mut s = stamps.borrow_mut();
+        self.stamps_drain(&mut *s).ok()?;
+        s.columns.as_ref().map(|c| c.rows.values().copied().collect())
     }
 
     /// Name the head the launches from here on read, for the card-clock reading (`None`: every head).
@@ -805,6 +912,51 @@ impl<'c> CardField<'c> {
         let old = self.card.fetch_range(&sc, 0, na * nb).map_err(device)?;
         let status = self.card.fetch_range(&st, 0, 1).map_err(device)?[0];
         Ok((new, old, status))
+    }
+
+    /// [measurement; agent-inferred, November 8] **A crowds' difference array's limbs against the ring sum**
+    /// (`field_limbs_check`): each value added as a crowd's term, `v` at cell `k mod cells` and `−v` at cell
+    /// `cells + k mod cells`, by the ring's atomic step (`add_wide`) and by the limbs (`add_difference`); the `2·cells` sums
+    /// read back, the ring's and the limbs' released (`limbs_at`).
+    pub fn limbs_check(&self, values: &[i128], cells: usize) -> Result<(Vec<i128>, Vec<i128>)> {
+        let cells = cells.max(1);
+        let up = self.take_up(values).map_err(device)?;
+        let ring = self.take_zeroed::<i128>(2 * cells).map_err(device)?;
+        let limbs = self.take_zeroed::<u64>(DIFFERENCE_LIMBS * 2 * cells).map_err(device)?;
+        let out = self.take::<i128>(2 * cells).map_err(device)?;
+        let (mut vp, mut count, mut cl, mut rp, mut lp, mut op) = (up.device_ptr(), values.len() as u64, cells as u64, ring.device_ptr(), limbs.device_ptr(), out.device_ptr());
+        self.launch("field_limbs_check", Self::cells(values.len() as u64), THREADS, &mut [arg(&mut vp), arg(&mut count), arg(&mut cl), arg(&mut rp), arg(&mut lp)])?;
+        self.launch("field_limbs_read", Self::cells(2 * cells as u64), THREADS, &mut [arg(&mut lp), arg(&mut cl), arg(&mut op)])?;
+        let ring = self.card.fetch_range(&ring, 0, 2 * cells).map_err(device)?;
+        let limbs = self.card.fetch_range(&out, 0, 2 * cells).map_err(device)?;
+        Ok((ring, limbs))
+    }
+
+    /// [measurement; agent-inferred, November 8] **A row's crowd tangents against the one-lane chain they replace**
+    /// (`field_crowds_check`), at a skinless head and the temperature `temper`: `rows` rows of `span = 2n` entries, each the
+    /// receiver's `p̂`, `δp̂` (`p`, `tp`, `[row][span]`), each of its 32 slots' two prefix rows of the words and their tangents
+    /// (`sw`, `tsw`, `[row][64][span]`, slot `s`'s at `2s` and `2s + 1`), counts (zero: no crowd) and shares (`counts`, `ce`,
+    /// `[row][32]`). Returns each crowd's `δz` and the row's `Σ p δz` (`[row][33]`) by the row's crowds at once and by the
+    /// one-lane chain, and the status bits each raised.
+    #[allow(clippy::too_many_arguments)]
+    pub fn crowds_check(&self, n: usize, temper: i128, p: &[i64], tp: &[i64], sw: &[i128], tsw: &[i128], counts: &[u64], ce: &[u64]) -> Result<(Vec<i128>, Vec<i128>, [u32; 2])> {
+        let span = 2 * n;
+        let rows = counts.len() / 32;
+        if n == 0 || span > 32 || p.len() != rows * span || tp.len() != p.len() || sw.len() != rows * 64 * span || tsw.len() != sw.len() || ce.len() != counts.len() {
+            return Err(TowerError::Refused("a crowd check's rows, spans and slots that do not agree"));
+        }
+        let (pc, tpc, swc, tswc, cc, cec) = (self.take_up(p).map_err(device)?, self.take_up(tp).map_err(device)?, self.take_up(sw).map_err(device)?, self.take_up(tsw).map_err(device)?, self.take_up(counts).map_err(device)?, self.take_up(ce).map_err(device)?);
+        let fresh = self.take_zeroed::<i128>((rows * 33).max(1)).map_err(device)?;
+        let before = self.take_zeroed::<i128>((rows * 33).max(1)).map_err(device)?;
+        let st = self.take_zeroed::<u32>(2).map_err(device)?;
+        let (mut n32, mut s32, mut r32, mut tlo, mut thi) = (n as u32, span as u32, rows as u32, temper as u64, (temper >> 64) as u64);
+        let (mut pp, mut tpp, mut swp, mut tswp, mut cp, mut cep, mut fp, mut bp, mut stp) = (pc.device_ptr(), tpc.device_ptr(), swc.device_ptr(), tswc.device_ptr(), cc.device_ptr(), cec.device_ptr(), fresh.device_ptr(), before.device_ptr(), st.device_ptr());
+        let grid = (rows as u32).clamp(1, 65_535);
+        self.launch("field_crowds_check", grid, 32, &mut [arg(&mut n32), arg(&mut s32), arg(&mut r32), arg(&mut tlo), arg(&mut thi), arg(&mut pp), arg(&mut tpp), arg(&mut swp), arg(&mut tswp), arg(&mut cp), arg(&mut cep), arg(&mut fp), arg(&mut bp), arg(&mut stp)])?;
+        let fresh = self.card.fetch_range(&fresh, 0, rows * 33).map_err(device)?;
+        let before = self.card.fetch_range(&before, 0, rows * 33).map_err(device)?;
+        let status = self.card.fetch_range(&st, 0, 2).map_err(device)?;
+        Ok((fresh, before, [status[0], status[1]]))
     }
 
     /// One stamp of the card's clock into `slot` on the stream.
@@ -943,6 +1095,16 @@ impl<'c> CardField<'c> {
                     self.stamps_drain(&mut *s).map_err(device)?;
                 }
                 let k = s.pending.len();
+                // The column reading's launch goes before the launch's first stamp, so its time is not the launch's. A column
+                // launch's first two parameters are its words and its head.
+                if let Some(columns) = s.columns.as_mut().filter(|_| entry == COLUMNS_ENTRY && params.len() >= 2) {
+                    let slot = columns.pending.len();
+                    let mut out = columns.slots.device_ptr() + 16 * slot as u64;
+                    let mut lengths = [params[0], params[1], arg(&mut out)];
+                    let reading = self.module.function("field_column_lengths").map_err(|e| device(e.into()))?;
+                    reading.launch_on_shared(self.card.stream(), Dim3::x(1), Dim3 { x: 256, y: 1, z: 1 }, 0, &mut lengths).map_err(|e| device(e.into()))?;
+                    columns.pending.push((k, slot));
+                }
                 self.stamp_at(&s.slots, 2 * k)?;
                 let head = s.head;
                 s.pending.push((entry, head));
@@ -2264,8 +2426,8 @@ impl<'c> CardField<'c> {
         card.zero_octets(&dp, 0, 8 * sites * m2).map_err(device)?;
         for h in 0..heads {
             // The crowds' difference arrays start empty a head (§14.10).
-            card.zero_octets(&cv, 0, 16 * rows * span).map_err(device)?;
-            card.zero_octets(&cw, 0, 16 * rows * span).map_err(device)?;
+            card.zero_octets(&cv, 0, 8 * DIFFERENCE_LIMBS * rows * span).map_err(device)?;
+            card.zero_octets(&cw, 0, 8 * DIFFERENCE_LIMBS * rows * span).map_err(device)?;
             let (mut hh, mut dyhp, mut dsp, mut dqp) = (h as u32, dyh.device_ptr(), ds.device_ptr(), dq.device_ptr());
             self.launch("field_contact_rows", Self::rows_grid(sites as u64, REV_ROWS), (REV_ROWS * 32) as u32, &mut [arg(words), arg(&mut hh), arg(&mut dyhp), arg(&mut dsp), arg(&mut dqp)])?;
             if d.carries_moment(h) && !d.is_depth(h) {
@@ -2337,11 +2499,11 @@ impl<'c> CardField<'c> {
         let dpb = self.timed(Kind::Alloc, || self.take::<i128>(pairs.max(1))).map_err(device)?;
         words.dpb = dpb.device_ptr();
         // The crowds' difference arrays over the places `[site + region][span]`, for the values and for
-        // the word (§14.10).
+        // the word (§14.10), each cell a series of limbs.
         let regions = words.r as usize;
         let rows = sites + regions;
-        let cv = self.timed(Kind::Alloc, || self.take_zeroed::<i128>((rows * span).max(1))).map_err(device)?;
-        let cw = self.timed(Kind::Alloc, || self.take_zeroed::<i128>((rows * span).max(1))).map_err(device)?;
+        let cv = self.timed(Kind::Alloc, || self.take_zeroed::<u64>((DIFFERENCE_LIMBS * rows * span).max(1))).map_err(device)?;
+        let cw = self.timed(Kind::Alloc, || self.take_zeroed::<u64>((DIFFERENCE_LIMBS * rows * span).max(1))).map_err(device)?;
         words.cv = cv.device_ptr();
         words.cw = cw.device_ptr();
         // The values' covector at the moment modes, summed over the ticks (§15.1).
@@ -2626,8 +2788,8 @@ pub fn read_octets(d: &FieldDeclaration, returning: bool, echo: bool, sites: usi
     let tm = d.moment_modes() as u64;
     let moment_site = if tm > 0 { 8 * m2 + 112 * tm } else { 0 };
     // The reverse adds its covectors, the values' sum over the ticks and the moments' return, and the
-    // crowds' two difference arrays.
-    let reverse_site = if returning { 8 * m2 + 8 * a + 5 * 8 * dw + 3 * 8 * f + 8 * m2 + 8 * h * span + 2 * 8 * m2 + 16 * m2 + 2 * 16 * span + 112 * tm } else { 0 };
+    // crowds' two difference arrays (`DIFFERENCE_LIMBS` words a cell).
+    let reverse_site = if returning { 8 * m2 + 8 * a + 5 * 8 * dw + 3 * 8 * f + 8 * m2 + 8 * h * span + 2 * 8 * m2 + 16 * m2 + 2 * 8 * DIFFERENCE_LIMBS as u64 * span + 112 * tm } else { 0 };
     let (s, pairs) = (sites as u64, (sites * sites) as u64);
     // The shares are kept for a return and an echo; the reverse holds one head's covector a pair on 64 bits.
     let weights = h * 8 * pairs * if returning { 2 } else { 1 };

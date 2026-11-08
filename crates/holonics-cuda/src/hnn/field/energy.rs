@@ -144,8 +144,8 @@ struct EnergyForce<'c> {
     dp: Pooled<'c, i64>,
     dv: Pooled<'c, i64>,
     ds: Pooled<'c, i64>,
-    cv: Pooled<'c, i128>,
-    cw: Pooled<'c, i128>,
+    cv: Pooled<'c, u64>,
+    cw: Pooled<'c, u64>,
     da: Pooled<'c, i64>,
     db: Pooled<'c, i64>,
     force: Pooled<'c, i64>,
@@ -167,8 +167,8 @@ struct EnergyTangent<'c> {
     tsc: Pooled<'c, u64>,
     ds: Pooled<'c, i64>,
     tds: Pooled<'c, i128>,
-    cw: Pooled<'c, i128>,
-    tcw: Pooled<'c, i128>,
+    cw: Pooled<'c, u64>,
+    tcw: Pooled<'c, u64>,
     fdq: Pooled<'c, i64>,
     fdp: Pooled<'c, i64>,
     tq: Pooled<'c, i64>,
@@ -250,11 +250,13 @@ pub fn energy_octets_widened(d: &FieldDeclaration, sites: usize, widen: Option<u
     let cell_fixed = (2 * 16 * h * span + 8 * h) + 64 + 16 * ENERGY_SUMS as u64;
     let cells = d.ticks as u64 + 2;
     let held_site = 4 * h * (3 + 2 * probe_stride) + 6 * 8 * dw + 8 + 8 * f + 8 * h * span + 8 * m2 + 3 * 8 * 2 * h + 2 * 8 * h * d.modes as u64 + 112 * tm;
-    let force_site = 3 * 8 * m2 + 2 * 16 * span + 2 * 8 * f + 8 * dw;
+    // The crowds' difference arrays a cell: `DIFFERENCE_LIMBS` words of 64 bits (`add_difference`).
+    let difference = 8 * DIFFERENCE_LIMBS as u64;
+    let force_site = 3 * 8 * m2 + 2 * difference * span + 2 * 8 * f + 8 * dw;
     let face_site = 16 * m2 + 2 * 8 * a + 16 + tm * (8 * 2 + 16 * 2 * 3 + 16 * 2 * 2 * 16) + 8 * dw + 8 * 2 * m2;
     // The reverse: each tick's force, the tangent's words and sums, its forces and the pair's, the covectors; one head's score
     // covectors and their tangents a pair.
-    let reverse_site = d.ticks as u64 * 8 * dw + 2 * 8 * m2 + 4 * 8 * h * span + 2 * 16 * h * span + 8 * h + 2 * 16 * span + 6 * 8 * m2 + 4 * 8 * f + 8 * dw + 8 * 8 * dw + 2 * 8 * m2;
+    let reverse_site = d.ticks as u64 * 8 * dw + 2 * 8 * m2 + 4 * 8 * h * span + 2 * 16 * h * span + 8 * h + 2 * difference * span + 6 * 8 * m2 + 4 * 8 * f + 8 * dw + 8 * 8 * dw + 2 * 8 * m2;
     cells * (h * 8 * pairs + s * cell_site + cell_fixed) + (8 + 8 + 16) * pairs + s * (held_site + force_site + face_site + reverse_site) + 4 * h * (3 * classes + 2)
 }
 
@@ -786,8 +788,8 @@ impl<'c> CardField<'c> {
         // The locks: each head's shares as their scores' covector, through the probe's and the key's brackets.
         for h in 0..heads {
             self.stamp_head(Some(h));
-            card.zero_octets(&fb.cv, 0, 16 * rows * span).map_err(device)?;
-            card.zero_octets(&fb.cw, 0, 16 * rows * span).map_err(device)?;
+            card.zero_octets(&fb.cv, 0, 8 * DIFFERENCE_LIMBS * rows * span).map_err(device)?;
+            card.zero_octets(&fb.cw, 0, 8 * DIFFERENCE_LIMBS * rows * span).map_err(device)?;
             let (mut hh, mut dsp, mut dqp) = (h as u32, fb.ds.device_ptr(), fb.dq.device_ptr());
             self.launch("field_energy_rows_back", Self::rows_grid(sites as u64, REV_ROWS), (REV_ROWS * 32) as u32, &mut [arg(words), arg(&mut hh), arg(&mut dsp), arg(&mut dqp)])?;
             let (mut hh, mut dyhp, mut dsp, mut dqp, mut dvp) = (h as u32, held.dyh0.device_ptr(), fb.ds.device_ptr(), fb.dq.device_ptr(), fb.dv.device_ptr());
@@ -824,6 +826,8 @@ impl<'c> CardField<'c> {
         let rows = sites + regions;
         let i64s = |len: usize| self.timed(Kind::Alloc, || self.take::<i64>(len.max(1))).map_err(device);
         let i128s = |len: usize| self.timed(Kind::Alloc, || self.take::<i128>(len.max(1))).map_err(device);
+        // A crowds' difference array's cells, each a series of limbs.
+        let limbs = |cells: usize| self.timed(Kind::Alloc, || self.take::<u64>((DIFFERENCE_LIMBS * cells).max(1))).map_err(device);
         Ok(EnergyTangent {
             wq: i64s(sites * m2)?,
             wp: i64s(sites * m2)?,
@@ -836,8 +840,8 @@ impl<'c> CardField<'c> {
             tsc: self.timed(Kind::Alloc, || self.take::<u64>((heads * rows).max(1))).map_err(device)?,
             ds: i64s(pairs)?,
             tds: i128s(pairs)?,
-            cw: i128s(rows * span)?,
-            tcw: i128s(rows * span)?,
+            cw: limbs(rows * span)?,
+            tcw: limbs(rows * span)?,
             fdq: i64s(sites * m2)?,
             fdp: i64s(sites * m2)?,
             tq: i64s(sites * m2)?,
@@ -889,8 +893,8 @@ impl<'c> CardField<'c> {
         let still_dz = still_tiles(field).map(|kt| if kt == 1 { "field_energy_still_dz_k1" } else { "field_energy_still_dz_k2" });
         for h in 0..heads {
             self.stamp_head(Some(h));
-            card.zero_octets(&tb.cw, 0, 16 * rows * span).map_err(device)?;
-            card.zero_octets(&tb.tcw, 0, 16 * rows * span).map_err(device)?;
+            card.zero_octets(&tb.cw, 0, 8 * DIFFERENCE_LIMBS * rows * span).map_err(device)?;
+            card.zero_octets(&tb.tcw, 0, 8 * DIFFERENCE_LIMBS * rows * span).map_err(device)?;
             // A skinless head's class blocks' score tangents on the tensor cores, into `tds` for the rows to read.
             let mut blocked = 0u32;
             if let Some(entry) = still_dz.filter(|_| skinless_head(field, h)) {
@@ -1314,6 +1318,11 @@ impl<'c> CardField<'c> {
                     }
                     println!("FIELD_EVENT_AT batches={k} card_kernels_ms={}", total / 1_000_000);
                 }
+                if let Some(rows) = self.columned() {
+                    for line in ColumnRow::lines(&rows) {
+                        println!("FIELD_COLUMN_AT batches={k} {line}");
+                    }
+                }
             }
         }
         let card = self.card;
@@ -1390,8 +1399,8 @@ impl<'c> CardField<'c> {
             dp: i64s(sites * m2)?,
             dv: i64s(sites * m2)?,
             ds: i64s(pairs)?,
-            cv: self.timed(Kind::Alloc, || self.take::<i128>(((sites + rn) * span).max(1))).map_err(device)?,
-            cw: self.timed(Kind::Alloc, || self.take::<i128>(((sites + rn) * span).max(1))).map_err(device)?,
+            cv: self.timed(Kind::Alloc, || self.take::<u64>((DIFFERENCE_LIMBS * (sites + rn) * span).max(1))).map_err(device)?,
+            cw: self.timed(Kind::Alloc, || self.take::<u64>((DIFFERENCE_LIMBS * (sites + rn) * span).max(1))).map_err(device)?,
             da: i64s(sites * f)?,
             db: i64s(sites * f)?,
             force: i64s(sites * dw)?,

@@ -382,6 +382,7 @@ extern "C" __global__ void __launch_bounds__(REV_ROWS * 32, 6) field_energy_rows
     const bool still = skinless(w, h);
     const uint32_t g0 = still ? 0 : MOVE_BITS;
     const uint64_t rows1 = (uint64_t)w.T + w.R;
+    const uint64_t plane = difference_plane(w);
     for (uint64_t g = ((uint64_t)blockIdx.x * blockDim.x + threadIdx.x) >> 5; g < w.T; g += (uint64_t)gridDim.x * (blockDim.x >> 5)) {
         const uint64_t hg = (uint64_t)h * w.T + g;
         if (skipped_row(w, g)) {
@@ -470,8 +471,7 @@ extern "C" __global__ void __launch_bounds__(REV_ROWS * 32, 6) field_energy_rows
                     atomicOr(w.status, REFUSED_KEY);
                 }
                 const wide pw = div_nearest_by(prod, cdiv2[warp][jj]);
-                add_wide(w.cw + (first + r + lo) * S + entry, pw);
-                add_wide(w.cw + (first + r + hi_ + 1) * S + entry, -pw);
+                add_difference(w.cw + (first + r + lo) * S + entry, w.cw + (first + r + hi_ + 1) * S + entry, plane, pw);
             }
         }
         sum = parts_sum(active ? sum : 0, S, parts);
@@ -629,10 +629,81 @@ __device__ __forceinline__ wide energy_pair_dz(const FieldWords &w, uint32_t h, 
     return rel(temper * rel(acc, 2 * g), MATERIAL_BITS);
 }
 
-// A crowd's score tangent on `2^(−40)` (the host's `lock_words`): the crowd read at its mean word `m = W/|C|` and its tangent
-// `δm = δW/|C|` (each to the nearest), as a source at the mean, `Σ_m [D (δp̂·m + p̂·δm) 2^g − D² m·δm]`, released `2g` and
-// through the temperature (the count's square never multiplies a tangent: a writer state's crowds passed the carrier so).
-__device__ __forceinline__ wide energy_crowd_dz(const FieldWords &w, uint32_t h, const int64_t *pi, const int64_t *tpi, const wide *swlo, const wide *swhi, const wide *tswlo, const wide *tswhi, uint64_t count, uint32_t level, uint64_t gi, bool right, wide temper) {
+// [definition; agent-inferred, November 8] **Each crowd's score tangent on `2^(−40)`** (the host's `lock_words`), the row's
+// crowds at once, one warp a row: a crowd is read at its mean word `m = W/|C|` and its tangent `δm = δW/|C|` (each to the
+// nearest, by the reciprocal of `|C|` the row holds, `cdiv`: `div_nearest`'s bits), as a source at the mean, `Σ_l [D_l (δp̂·m +
+// p̂·δm)_l 2^g − D_l² (m·δm)_l]` over the modes `l`, released `2g` and through the temperature (the count's square never
+// multiplies a tangent: a writer state's crowds passed the carrier so). The row's crowds (those holding a count) are taken in
+// slot order, a lane each; mode `l`'s entries `l + kn` of every crowd are formed at once across the lanes (two lanes a crowd,
+// one entry each, where the crowds fill half the warp; else one lane all of them), their products summed on `Z/2^128` (any
+// order, the same bits); and each crowd's checked chain over its modes runs in order on its own lane, every product and
+// partial sum checked as the host's, so the refusal (`REFUSED_KEY`) is raised by the same check of the same crowd, and a
+// refused crowd's tangent is zero. Each tangent is held at its slot in `held` (the row's pass two reads it there and
+// overwrites it with the share's tangent), and the lane's part of `Σ p δz` over the crowds is returned.
+__device__ __forceinline__ wide energy_crowds_dz(const FieldWords &w, uint32_t h, uint64_t hg, const int64_t *pi, const int64_t *tpi, const wide *swp, const wide *tswp, const uint64_t *cnt, const uint32_t *clo, const uint32_t *chi, const uint32_t *clv, const Divisor *cdv, uint64_t gi, uint32_t i, wide temper, wide *held, uint32_t lane) {
+    const uint32_t S = w.span, n = w.n;
+    const uint32_t g = skinless(w, h) ? 0 : MOVE_BITS;
+    const uint32_t present = __ballot_sync(0xffffffffu, cnt[lane] != 0);
+    const uint32_t crowds = __popc(present);
+    if (crowds == 0) {
+        return 0;
+    }
+    // The entries a mode holds, and the lanes a crowd's mode takes.
+    const uint32_t per = (S + n - 1) / n;
+    const uint32_t spread = per == 2 && 2 * crowds <= 32 ? 2 : 1;
+    const uint32_t width = 32 / spread;
+    const uint32_t q = lane % width, k0 = lane / width;
+    const bool live = q < crowds;
+    uint32_t slot = 0;
+    if (live) {
+        uint32_t rest = present;
+        for (uint32_t t = 0; t < q; t++) {
+            rest &= rest - 1;
+        }
+        slot = __ffs(rest) - 1;
+    }
+    const uint32_t lo = clo[slot], lv = clv[slot];
+    const uint64_t hi1 = (uint64_t)chi[slot] + 1;
+    const wide *wlo = swp + (uint64_t)lo * S, *whi = swp + hi1 * S, *tlo = tswp + (uint64_t)lo * S, *thi = tswp + hi1 * S;
+    wide acc = 0;
+    bool refused = false;
+    for (uint32_t l = 0; l < n; l++) {
+        wide pair = 0, power = 0;
+        if (live) {
+            for (uint32_t r = l + k0 * n; r < S; r += spread * n) {
+                const wide W = div_nearest_by(whi[r] - wlo[r], cdv[slot]), dW = div_nearest_by(thi[r] - tlo[r], cdv[slot]);
+                pair += (wide)tpi[r] * W + (wide)pi[r] * dW;
+                power += W * dW;
+            }
+        }
+        if (spread == 2) {
+            pair = (wide)((uwide)pair + shfl_wide((uwide)pair, (int)width));
+            power = (wide)((uwide)power + shfl_wide((uwide)power, (int)width));
+        }
+        if (live && k0 == 0 && !refused) {
+            const wide dec = skin_raw(w, h, l, gi, octave_edge(gi, lv, lo > i), (uint32_t)1 << lv);
+            wide lifted, next;
+            if (!mul_fits(dec * pair, (wide)1 << g, &lifted) || !add_fits(acc, lifted - dec * dec * power, &next)) {
+                atomicOr(w.status, REFUSED_KEY);
+                refused = true;
+            } else {
+                acc = next;
+            }
+        }
+    }
+    wide weighted = 0;
+    if (live && k0 == 0) {
+        const wide dz = refused ? 0 : rel(temper * rel(acc, 2 * g), MATERIAL_BITS);
+        held[slot] = dz;
+        weighted = (wide)w.ce[hg * w.slots + slot] * dz;
+    }
+    __syncwarp();
+    return weighted;
+}
+
+// [measurement] **A crowd's score tangent walked on one lane** (the chain `field_energy_tangent_rows` read before November 8,
+// kept as `field_crowds_check`'s reference): the crowd's span on its own lane, each mean word by `div_nearest` by its count.
+__device__ __forceinline__ wide energy_crowd_dz(const FieldWords &w, uint32_t h, const int64_t *pi, const int64_t *tpi, const wide *swlo, const wide *swhi, const wide *tswlo, const wide *tswhi, uint64_t count, uint32_t level, uint64_t gi, bool right, wide temper, uint32_t *status) {
     const uint32_t g = skinless(w, h) ? 0 : MOVE_BITS;
     wide acc = 0;
     for (uint32_t l = 0; l < w.n; l++) {
@@ -645,7 +716,7 @@ __device__ __forceinline__ wide energy_crowd_dz(const FieldWords &w, uint32_t h,
         }
         wide lifted, next;
         if (!mul_fits(dec * pair, (wide)1 << g, &lifted) || !add_fits(acc, lifted - dec * dec * power, &next)) {
-            atomicOr(w.status, REFUSED_KEY);
+            atomicOr(status, REFUSED_KEY);
             return 0;
         }
         acc = next;
@@ -699,7 +770,16 @@ extern "C" __global__ void field_energy_unit_tangent(FieldWords w, const int64_t
 // skinless heads (scalar) 2.34 s and 2.27 s against 2.15 s and 2.09 s; the first 140 sections 44.11 s against 41.23 s, their
 // receipts identical. With `blocked` (a skinless head whose class blocks' score tangents the tensor cores
 // formed, `field_energy_still_dz_k*`), a definite row's pairs past the near field read their `δz` from `tds` in pass one too.
-extern "C" __global__ void __launch_bounds__(REV_ROWS * 32, 4) field_energy_tangent_rows(FieldWords w, uint32_t h, const int64_t *uq, const int64_t *up, const wide *tsw, int64_t *ds, wide *tds, int64_t *dq, int64_t *tq, int64_t *tp, wide *tcw, uint32_t blocked) {
+//
+// [agent-inferred, November 8] **A crowd's score tangent is formed once, its entries across the lanes** (the theory lead's
+// reading of the kernel at 1ec795150): pass one walked each crowd's span on one lane, two divisions an entry by a divisor
+// the row already held as its reciprocal (`cdiv`); `energy_crowds_dz` forms mode `l`'s entries of every crowd at once by
+// that reciprocal and keeps each crowd's mode chain in order on one lane, and holds the tangent at its slot (`tdsks`) for
+// pass two, as a pair's is held in `tds`. Pass two still reads each crowd's mean words through `cdiv` (a lane an entry and
+// a part of the crowds): holding them for it would take `crowds · span` pairs of 128-bit words a warp (9 KiB at the
+// line's 18 crowds and span 16), past the shared memory that keeps four blocks an SM. The crowds' key roles go to the
+// difference arrays as limbs by atomics that return nothing (`add_difference`).
+extern "C" __global__ void __launch_bounds__(REV_ROWS * 32, 4) field_energy_tangent_rows(FieldWords w, uint32_t h, const int64_t *uq, const int64_t *up, const wide *tsw, int64_t *ds, wide *tds, int64_t *dq, int64_t *tq, int64_t *tp, uint64_t *tcw, uint32_t blocked) {
     __shared__ uint32_t stj[REV_ROWS][32];
     __shared__ int64_t dss[REV_ROWS][32];
     __shared__ wide tdss[REV_ROWS][32];
@@ -717,6 +797,7 @@ extern "C" __global__ void __launch_bounds__(REV_ROWS * 32, 4) field_energy_tang
     const bool still = skinless(w, h);
     const uint32_t g0 = still ? 0 : MOVE_BITS;
     const uint64_t rows1 = (uint64_t)w.T + w.R;
+    const uint64_t plane = difference_plane(w);
     for (uint64_t g = ((uint64_t)blockIdx.x * blockDim.x + threadIdx.x) >> 5; g < w.T; g += (uint64_t)gridDim.x * (blockDim.x >> 5)) {
         const uint64_t hg = (uint64_t)h * w.T + g;
         if (lane < S) {
@@ -770,7 +851,7 @@ extern "C" __global__ void __launch_bounds__(REV_ROWS * 32, 4) field_energy_tang
         __syncwarp();
         // The class runs' score tangents were formed on the tensor cores (a skinless head's definite row).
         const bool formed = blocked != 0 && skinless(w, h) && !rcs[warp].open;
-        // Pass one: `Σ p δz` over the row's terms, the pairs' and the crowds' (a crowd a lane).
+        // Pass one: `Σ p δz` over the row's terms, the pairs' (a lane an entry) and the crowds' (`energy_crowds_dz`).
         wide weighted = 0;
         for (uint32_t k = lane; k < K; k += 32) {
             const uint32_t j = support_at(members, off, rcs[warp], i, sites, k);
@@ -786,12 +867,8 @@ extern "C" __global__ void __launch_bounds__(REV_ROWS * 32, 4) field_energy_tang
             }
             weighted += (wide)e[j] * dz;
         }
-        wide cdz = 0;
-        if (cnts[warp][lane] != 0) {
-            const uint32_t lo = crlo[warp][lane], hi_ = crhi[warp][lane], lv = crlv[warp][lane];
-            cdz = energy_crowd_dz(w, h, pi, tpi, swp + (uint64_t)lo * S, swp + (uint64_t)(hi_ + 1) * S, tswp + (uint64_t)lo * S, tswp + (uint64_t)(hi_ + 1) * S, cnts[warp][lane], lv, g, lo > i, temper);
-            weighted += (wide)w.ce[hg * w.slots + lane] * cdz;
-        }
+        // The crowds' score tangents, each held at its slot in `tdsks` for pass two (as a pair's is in `tds`).
+        weighted += energy_crowds_dz(w, h, hg, pi, tpi, swp, tswp, cnts[warp], crlo[warp], crhi[warp], crlv[warp], cdiv[warp], g, i, temper, tdsks[warp], lane);
         const wide mean = rel(warp_sum(weighted), SHARE_BITS);
         // Pass two: each pair's δs and δs', in chunks of 32 staged for the probe role and its tangent over the span's entries.
         wide sum = 0, tsum = 0;
@@ -827,7 +904,7 @@ extern "C" __global__ void __launch_bounds__(REV_ROWS * 32, 4) field_energy_tang
         if (cnts[warp][lane] != 0) {
             const uint64_t p = w.ce[hg * w.slots + lane];
             dsks[warp][lane] = energy_ds(w, temper, p);
-            tdsks[warp][lane] = energy_tds(w, temper, p, cdz, mean);
+            tdsks[warp][lane] = energy_tds(w, temper, p, tdsks[warp][lane], mean);
         }
         __syncwarp();
         if (active) {
@@ -853,11 +930,9 @@ extern "C" __global__ void __launch_bounds__(REV_ROWS * 32, 4) field_energy_tang
                     atomicOr(w.status, REFUSED_KEY);
                 }
                 const wide pw = div_nearest_by(prod, cdiv2[warp][jj]);
-                add_wide(w.cw + (first + r + lo) * S + entry, pw);
-                add_wide(w.cw + (first + r + hi_ + 1) * S + entry, -pw);
+                add_difference(w.cw + (first + r + lo) * S + entry, w.cw + (first + r + hi_ + 1) * S + entry, plane, pw);
                 const wide tpw = div_nearest_by(tlift + tother, cdiv[warp][jj]);
-                add_wide(tcw + (first + r + lo) * S + entry, tpw);
-                add_wide(tcw + (first + r + hi_ + 1) * S + entry, -tpw);
+                add_difference(tcw + (first + r + lo) * S + entry, tcw + (first + r + hi_ + 1) * S + entry, plane, tpw);
             }
         }
         sum = parts_sum(active ? sum : 0, S, parts);
@@ -932,12 +1007,14 @@ extern "C" __global__ void __launch_bounds__(CONTACT_ROWS * 32) field_energy_tan
 }
 
 // A crowds' difference array `cw` summed over the places and added at the definite sites (the host's `spread_w`),
-// `dq = fit64(dq + release(Σ cw, 32 + extra + g))`; one block a region, as `field_spread`.
-extern "C" __global__ void field_energy_spread(FieldWords w, uint32_t h, const wide *cw, uint32_t extra, int64_t *dq) {
+// `dq = fit64(dq + release(Σ cw, 32 + extra + g))`; one block a region, as `field_spread`, each cell's limbs released into its
+// 128 bits where it is read (`limbs_at`).
+extern "C" __global__ void field_energy_spread(FieldWords w, uint32_t h, const uint64_t *cw, uint32_t extra, int64_t *dq) {
     __shared__ wide psw[SPREAD_THREADS];
     const bool still = skinless(w, h);
     const uint32_t g0 = still ? 0 : MOVE_BITS;
     const uint32_t S = w.span;
+    const uint64_t plane = difference_plane(w);
     const uint32_t nchunk = blockDim.x / S;
     const uint32_t x = threadIdx.x % S, ck = threadIdx.x / S;
     const bool live = ck < nchunk;
@@ -949,7 +1026,7 @@ extern "C" __global__ void field_energy_spread(FieldWords w, uint32_t h, const w
         wide sw = 0;
         if (live) {
             for (uint32_t t = lo; t < hi; t++) {
-                sw += cw[(first + r + t) * S + x];
+                sw += limbs_at(cw + (first + r + t) * S + x, plane);
             }
             psw[threadIdx.x] = sw;
         }
@@ -960,7 +1037,7 @@ extern "C" __global__ void field_energy_spread(FieldWords w, uint32_t h, const w
                 run += psw[c * S + x];
             }
             for (uint32_t t = lo; t < hi; t++) {
-                run += cw[(first + r + t) * S + x];
+                run += limbs_at(cw + (first + r + t) * S + x, plane);
                 if (definite_site(w, first + t)) {
                     const uint32_t m = h * w.n + x % w.n;
                     const uint64_t slot = (first + t) * w.M2 + (x < w.n ? m : w.M + m);
@@ -1562,6 +1639,57 @@ __device__ void dz_check_body(const int64_t *tp, const int64_t *p, const int64_t
                 dz_scalar[(uint64_t)i * nb + jq] = refused ? 0 : rel(temper * rel(a, 0), MATERIAL_BITS);
             }
         }
+    }
+}
+
+// [measurement; agent-inferred, November 8] **The row's crowd tangents against the one-lane chain they replace**
+// (`CardField::crowds_check`, a reading): one warp a row of the caller's crowds at a skinless head (`D = 1`, `g = 0`): each
+// slot's prefix rows `2 slot` and `2 slot + 1` of `sw` and `tsw` (`[row][64][span]`), its count (zero where the slot holds no
+// crowd) and share (`ce`, `[row][32]`), the receiver's `p̂`, `δp̂` (`[row][span]`) and the temperature (`temper_lo`,
+// `temper_hi`): each crowd's `δz` and the row's `Σ p δz` over its crowds (`[row][33]`), by `energy_crowds_dz` into `fresh` and
+// by `energy_crowd_dz` into `before`, the status bits of each into `status[0]` and `status[1]`.
+extern "C" __global__ void field_crowds_check(uint32_t n, uint32_t span, uint32_t rows, uint64_t temper_lo, uint64_t temper_hi, const int64_t *p, const int64_t *tp, const wide *sw, const wide *tsw, const uint64_t *counts, uint64_t *ce, wide *fresh, wide *before, uint32_t *status) {
+    __shared__ uint64_t cnt[32];
+    __shared__ uint32_t clo[32], chi[32], clv[32];
+    __shared__ Divisor cdv[32];
+    __shared__ wide held[32];
+    const uint32_t lane = threadIdx.x & 31;
+    const wide temper = (wide)(((uwide)temper_hi << 64) | (uwide)temper_lo);
+    FieldWords w = {};
+    w.span = span;
+    w.n = n;
+    w.frames = 1;
+    w.still = 1;
+    w.status = status;
+    w.ce = ce;
+    w.slots = 32;
+    for (uint32_t row = blockIdx.x; row < rows; row += gridDim.x) {
+        const uint64_t count = counts[(uint64_t)row * 32 + lane];
+        cnt[lane] = count;
+        clo[lane] = 2 * lane;
+        chi[lane] = 2 * lane;
+        clv[lane] = 2;
+        if (count != 0) {
+            cdv[lane] = divisor_of(count);
+        }
+        held[lane] = 0;
+        __syncwarp();
+        const int64_t *pi = p + (uint64_t)row * span, *tpi = tp + (uint64_t)row * span;
+        const wide *swp = sw + (uint64_t)row * 64 * span, *tswp = tsw + (uint64_t)row * 64 * span;
+        const wide total = warp_sum(energy_crowds_dz(w, 0, row, pi, tpi, swp, tswp, cnt, clo, chi, clv, cdv, 0, 0, temper, held, lane));
+        fresh[(uint64_t)row * 33 + lane] = held[lane];
+        wide dz = 0;
+        if (count != 0) {
+            const uint64_t lo = 2 * lane;
+            dz = energy_crowd_dz(w, 0, pi, tpi, swp + lo * span, swp + (lo + 1) * span, tswp + lo * span, tswp + (lo + 1) * span, count, 2, 0, lo > 0, temper, status + 1);
+        }
+        const wide btotal = warp_sum(count != 0 ? (wide)ce[(uint64_t)row * 32 + lane] * dz : 0);
+        before[(uint64_t)row * 33 + lane] = dz;
+        if (lane == 0) {
+            fresh[(uint64_t)row * 33 + 32] = total;
+            before[(uint64_t)row * 33 + 32] = btotal;
+        }
+        __syncwarp();
     }
 }
 
