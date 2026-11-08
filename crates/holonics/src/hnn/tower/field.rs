@@ -5026,6 +5026,96 @@ fn census_conditional_place(ells: impl Iterator<Item = i128>, shares: &[i128], t
     Ok(())
 }
 
+/// [definition; theory, November 8 05:50 and 05:53] **A conditional section's unigram read**: for each letter, its summed
+/// conditional share `P_a = Σ_t p_t(a)` read from its logarithms (an online `log₂ Σ 2^ℓ`, the largest term's place `m` on
+/// `2^(−32)` and the sum of the rest below it on `2^(−24)`, so a rare letter's share is never released to zero), and its
+/// count in the section's truths.
+struct UnigramSection {
+    top: Vec<Option<i128>>,
+    below: Vec<i128>,
+    counts: Vec<u64>,
+    places: u64,
+}
+
+impl UnigramSection {
+    fn new(alphabet: usize) -> Self {
+        Self { top: vec![None; alphabet], below: vec![0; alphabet], counts: vec![0; alphabet], places: 0 }
+    }
+
+    /// One place: each letter's `ℓ = logs[a] − log₂ z` (on `2^(−32)`) joined to its sum, the truth counted.
+    fn place(&mut self, logs: &[i128], log2_z: i128, truth: usize, fine: &Exponential) -> Result<()> {
+        let one = 1i128 << MATERIAL_BITS;
+        let floor = -((MATERIAL_BITS as i128 - 1) << MATERIAL_BITS);
+        for (a, &l) in logs.iter().enumerate() {
+            let ell = l - log2_z;
+            match self.top[a] {
+                None => {
+                    self.top[a] = Some(ell);
+                    self.below[a] = one;
+                }
+                Some(m) if ell > m => {
+                    let shift = (m - ell) >> (ENERGY_BITS - MATERIAL_BITS);
+                    self.below[a] = one + if shift > floor { release(self.below[a] * temperature_of(shift as i32, fine)?, MATERIAL_BITS) } else { 0 };
+                    self.top[a] = Some(ell);
+                }
+                Some(m) => {
+                    let shift = (ell - m) >> (ENERGY_BITS - MATERIAL_BITS);
+                    if shift > floor {
+                        self.below[a] += temperature_of(shift as i32, fine)?;
+                    }
+                }
+            }
+        }
+        self.counts[truth] += 1;
+        self.places += 1;
+        Ok(())
+    }
+
+    /// The section's Newton step for the bias, `Δc_a = 2^(−rate) T log₂(n*_a/P_a)` on c's `2^(−16)` (`inverse` = `1/T` on
+    /// `2^(−24)`), after adding the section's counts to the carried ones. `n*` is Good–Turing's on the carried counts,
+    /// `(r + 1) N_(r+1)/N_r` while both classes are filled, the letter's own count past that, normalized and scaled to the
+    /// section's places; a letter not yet seen holds while no letter has been seen once (no class to read).
+    fn finish(self, counts: &mut [u64], inverse: i128, rate: u32) -> Result<Vec<i128>> {
+        for (c, n) in counts.iter_mut().zip(&self.counts) {
+            *c += n;
+        }
+        let max_r = counts.iter().copied().max().unwrap_or(0) as usize;
+        let mut classes = vec![0u64; max_r + 2];
+        for &r in counts.iter() {
+            classes[r as usize] += 1;
+        }
+        // Each letter's expected count on 2^(−32) (None: holds).
+        let starred: Vec<Option<i128>> = counts
+            .iter()
+            .map(|&r| {
+                let r = r as usize;
+                if classes[r] > 0 && classes[r + 1] > 0 {
+                    Some(((((r + 1) as i128) * classes[r + 1] as i128) << 32) / classes[r] as i128)
+                } else if r > 0 {
+                    Some((r as i128) << 32)
+                } else {
+                    None
+                }
+            })
+            .collect();
+        let total: i128 = starred.iter().flatten().sum();
+        let log2 = |v: i128| super::log2_reading_at(v.max(1) as u128, ENERGY_BITS);
+        let log2_total = log2(total);
+        let log2_places = log2((self.places as i128) << 32);
+        let mut du = vec![0i128; counts.len()];
+        for a in 0..counts.len() {
+            let (Some(star), Some(m)) = (starred[a], self.top[a]) else { continue };
+            // log₂ n*_a = log₂ star − log₂ total + log₂ places (each on 2^(−32), the 2^(−32) grains cancelling).
+            let log2_n = log2(star) - log2_total + log2_places - (32i128 << ENERGY_BITS);
+            let log2_p = m + log2(self.below[a]) - ((MATERIAL_BITS as i128) << ENERGY_BITS);
+            let ratio = log2_n - log2_p;
+            // Δc = T·2^16·ratio/2^32 = ratio·2^8/inverse (inverse on 2^(−24)), at the moments' rate.
+            du[a] = div_nearest(ratio << 8, inverse.max(1)) >> rate;
+        }
+        Ok(du)
+    }
+}
+
 /// The width census's deposit sites, one name a family and kind: a step's lowest set bit 0 to 7 and 8 or more (0–8), a
 /// step released to zero while its moment is not (9), the step's top place (10), the release's summed remainder (11; its
 /// positive and negative parts, 12 and 13) beside the summed change (14), the entries the covector reached (15), the whole
@@ -5451,6 +5541,14 @@ pub struct FieldLearner {
     /// of the family's grain, is a pick: below it each deposit drops under two units, one-sided, so a grain moves on
     /// that part only after about `2^22` deposits.
     pub carried: Option<Vec<i64>>,
+    /// [definition; theory, November 8 05:50 and 05:53] **The unigram reads its own ratio**: where set, each letter's count
+    /// in the truths a conditional section has deposited (the unigram's sufficient statistic, carried across sections), from
+    /// which counts of counts give each letter's expected count `n*` (Good–Turing), and the bias `c` (read_bias) steps by
+    /// Newton's `Δu_a = T log₂(n*_a/P_a)` toward it at the moments' rate instead of by the moments, `P_a` the section's summed
+    /// conditional share of the letter read from its logarithms ([`UnigramSection`]). A restart carries the counts.
+    pub unigram: Option<Vec<u64>>,
+    /// The bias's Newton step a conditional section read for its deposit (a reading's operand, not carried).
+    pub unigram_step: Option<Vec<i128>>,
     /// [measurement; theory, November 7 23:47] Whether a full conditional section also reads the letters' coin's measure
     /// ([`CoinMeasure`]): its forward read timed beside its material read, and each tolerance's cost and variance.
     pub coin_measure: bool,
@@ -5513,7 +5611,7 @@ impl FieldLearner {
     pub fn new(field: Field, rate_bits: u32) -> Self {
         let len = field.material_len();
         let drawn = 4 * field.declaration.founding_draws();
-        Self { field, first: vec![0; len], second: vec![0; len], rate_bits, drawn, laps: 0, held: None, read_held: false, newton: false, newton_read: false, first_rate: FIRST_RATE, second_rate: SECOND_RATE, family_rates: None, temper_learns: false, family_transfer: Vec::new(), family_price: Vec::new(), last: None, average: None, carried: None, coin_measure: false }
+        Self { field, first: vec![0; len], second: vec![0; len], rate_bits, drawn, laps: 0, held: None, read_held: false, newton: false, newton_read: false, first_rate: FIRST_RATE, second_rate: SECOND_RATE, family_rates: None, temper_learns: false, family_transfer: Vec::new(), family_price: Vec::new(), last: None, average: None, carried: None, unigram: None, unigram_step: None, coin_measure: false }
     }
 
     /// Whether a deposited step is held for the next regions' read.
@@ -5540,7 +5638,7 @@ impl FieldLearner {
         let second = from.iter().map(|&(i, divided)| if divided { div_nearest(self.second[i], f2) } else { self.second[i] }).collect();
         let drawn = self.drawn + 4 * self.field.growth_draws(factor);
         let rate_bits = self.rate_bits + (usize::BITS - (factor - 1).leading_zeros());
-        Ok(Self { field, first, second, rate_bits, drawn, laps: self.laps, held: None, read_held: self.read_held, newton: self.newton, newton_read: self.newton_read, first_rate: self.first_rate, second_rate: self.second_rate, family_rates: None, temper_learns: false, family_transfer: Vec::new(), family_price: Vec::new(), last: None, average: None, carried: None, coin_measure: false })
+        Ok(Self { field, first, second, rate_bits, drawn, laps: self.laps, held: None, read_held: self.read_held, newton: self.newton, newton_read: self.newton_read, first_rate: self.first_rate, second_rate: self.second_rate, family_rates: None, temper_learns: false, family_transfer: Vec::new(), family_price: Vec::new(), last: None, average: None, carried: None, unigram: None, unigram_step: None, coin_measure: false })
     }
 
     /// [definition; agent-inferred, November 4, §16.40] **The learner with one more lane** ([`Field::laned`]), the lane's
@@ -5580,7 +5678,7 @@ impl FieldLearner {
             }
         }
         let drawn = self.drawn + 4 * self.field.declaration.lane_draws();
-        Ok(Self { field, first, second, rate_bits: self.rate_bits, drawn, laps: self.laps, held: None, read_held: self.read_held, newton: self.newton, newton_read: self.newton_read, first_rate: self.first_rate, second_rate: self.second_rate, family_rates: None, temper_learns: false, family_transfer: Vec::new(), family_price: Vec::new(), last: None, average: None, carried: None, coin_measure: false })
+        Ok(Self { field, first, second, rate_bits: self.rate_bits, drawn, laps: self.laps, held: None, read_held: self.read_held, newton: self.newton, newton_read: self.newton_read, first_rate: self.first_rate, second_rate: self.second_rate, family_rates: None, temper_learns: false, family_transfer: Vec::new(), family_price: Vec::new(), last: None, average: None, carried: None, unigram: None, unigram_step: None, coin_measure: false })
     }
 
     /// The held step read on `regions` without a deposit: the faces of `regions` under the
@@ -5917,6 +6015,13 @@ impl FieldLearner {
                         crate::number::census::tally(census_deposit_site(k, 9), 1);
                     }
                 }
+            }
+        }
+        // The unigram's Newton step stands in for the moments' at the bias (θ steps by `−step`).
+        if let Some(du) = self.unigram_step.take() {
+            let start = self.field.layout.read_bias;
+            for (i, d) in du.iter().enumerate() {
+                step[start + i] = -d;
             }
         }
         let predicted = predicted_change(&self.field, &raw, &step, 0);
@@ -6513,6 +6618,7 @@ impl FieldLearner {
         let (truth_faces, _) = realization.read_energy_faces(f, &views)?;
         let mut outside = Vec::with_capacity(places.len());
         let (mut letter_counts, mut surprise_bands, mut kl_face) = (vec![0i128; alphabet], vec![0usize; 17], 0i128);
+        let mut unigram_acc = self.unigram.as_ref().map(|_| UnigramSection::new(alphabet));
         const TAUS: usize = 16;
         let mut measure = CoinMeasure { places: 0, regions: 0, forward_us: 0, material_us: 0, kept: vec![0; TAUS], v_coin: vec![0; TAUS], v_deposit: 0 };
         // Each place's full deposit on the metric, kept only while measuring, for the deposits' spread across places.
@@ -6634,6 +6740,10 @@ impl FieldLearner {
                 let z: i128 = w.iter().sum();
                 let p: Vec<i128> = w.iter().map(|&x| div_nearest(x << MATERIAL_BITS, z.max(1))).collect();
                 census_conditional_place(logs.iter().map(|&l| l >> (ENERGY_BITS - MATERIAL_BITS)), &p, Some(at), &f.fine)?;
+                if let Some(acc) = unigram_acc.as_mut() {
+                    let log2_z = super::log2_reading_at(z.max(1) as u128, ENERGY_BITS) - ((MATERIAL_BITS as i128) << ENERGY_BITS);
+                    acc.place(&logs, log2_z, at, &f.fine)?;
+                }
                 let mt = &reads[at].as_ref().ok_or(TowerError::Refused("a conditional place whose truth was not read"))?.0;
                 if self.coin_measure && coin.is_none() {
                     measure.places += 1;
@@ -6738,6 +6848,9 @@ impl FieldLearner {
             Some(prev) => self.field.families_all().iter().map(|&fam| predicted_change_family(&self.field, &g, &prev.step, prev.halvings, fam)).collect(),
             None => vec![None; self.field.families_all().len()],
         };
+        if let (Some(acc), Some(counts)) = (unigram_acc.take(), self.unigram.as_mut()) {
+            self.unigram_step = Some(acc.finish(counts, inverse, self.first_rate)?);
+        }
         let raw = g.clone();
         let (deposited, predicted, transfer, external) = self.deposit(g)?;
         let predictions: Vec<Option<i64>> = match &self.last {
@@ -6760,7 +6873,7 @@ impl FieldLearner {
         let (mut first, mut second) = (self.first.clone(), self.second.clone());
         first.resize(len, 0);
         second.resize(len, 0);
-        Ok(Self { field, first, second, rate_bits: self.rate_bits, drawn, laps: self.laps, held: None, read_held: self.read_held, newton: self.newton, newton_read: self.newton_read, first_rate: self.first_rate, second_rate: self.second_rate, family_rates: None, temper_learns: false, family_transfer: Vec::new(), family_price: Vec::new(), last: None, average: None, carried: None, coin_measure: false })
+        Ok(Self { field, first, second, rate_bits: self.rate_bits, drawn, laps: self.laps, held: None, read_held: self.read_held, newton: self.newton, newton_read: self.newton_read, first_rate: self.first_rate, second_rate: self.second_rate, family_rates: None, temper_learns: false, family_transfer: Vec::new(), family_price: Vec::new(), last: None, average: None, carried: None, unigram: None, unigram_step: None, coin_measure: false })
     }
 
     /// [measurement; agent-inferred, November 3, §16.31] **Each family's step coherence**: over the family's entries, `Σ |m|`
@@ -6800,7 +6913,11 @@ impl FieldLearner {
             Some(c) => format!("carried {}\n", c.iter().map(i64::to_string).collect::<Vec<_>>().join(" ")),
             None => String::new(),
         };
-        format!("hnn-field-learner-v3 {} {} {} {held}\n{}{}\n{}\n{step}{lengths}{average}{carried}", self.rate_bits, self.drawn, self.laps, self.field.to_text(), join(&self.first), join(&self.second))
+        let unigram = match &self.unigram {
+            Some(c) => format!("unigram {}\n", c.iter().map(u64::to_string).collect::<Vec<_>>().join(" ")),
+            None => String::new(),
+        };
+        format!("hnn-field-learner-v3 {} {} {} {held}\n{}{}\n{}\n{step}{lengths}{average}{carried}{unigram}", self.rate_bits, self.drawn, self.laps, self.field.to_text(), join(&self.first), join(&self.second))
     }
 
     pub fn from_text(text: &str) -> Result<Self> {
@@ -6859,7 +6976,11 @@ impl FieldLearner {
             }
             None => None,
         };
-        let carried = match lines.next().and_then(|l| l.strip_prefix("carried ")) {
+        let carried_line = match lines.peek() {
+            Some(l) if l.starts_with("carried ") => lines.next(),
+            _ => None,
+        };
+        let carried = match carried_line.and_then(|l| l.strip_prefix("carried ")) {
             Some(rest) => {
                 let v = read_numbers::<i64>(Some(rest))?;
                 if v.len() != field.material_len() {
@@ -6869,7 +6990,17 @@ impl FieldLearner {
             }
             None => None,
         };
-        Ok(Self { field, first, second, rate_bits, read_held: held.is_some(), newton: false, newton_read: false, first_rate: FIRST_RATE, second_rate: SECOND_RATE, family_rates, temper_learns: false, family_transfer, family_price, drawn, laps, held, last: None, average, carried, coin_measure: false })
+        let unigram = match lines.next().and_then(|l| l.strip_prefix("unigram ")) {
+            Some(rest) => {
+                let v = read_numbers::<u64>(Some(rest))?;
+                if v.len() != field.declaration.alphabet {
+                    return refuse("a learner's unigram counts that are not one a letter");
+                }
+                Some(v)
+            }
+            None => None,
+        };
+        Ok(Self { field, first, second, rate_bits, read_held: held.is_some(), newton: false, newton_read: false, first_rate: FIRST_RATE, second_rate: SECOND_RATE, family_rates, temper_learns: false, family_transfer, family_price, drawn, laps, held, last: None, average, carried, unigram, unigram_step: None, coin_measure: false })
     }
 }
 

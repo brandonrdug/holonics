@@ -2843,3 +2843,33 @@ fn the_carried_release_adds_up_what_each_step_releases_to_zero() {
     assert_eq!(back.carried, carried.carried);
     assert!(carried.carried.as_ref().unwrap().iter().all(|&r| r.unsigned_abs() <= 1 << 23));
 }
+
+/// [definition; theory, November 8 05:50] **The unigram reads its own ratio**: a letter the section's conditional shares
+/// under-read against its expected count steps up, one they over-read steps down, a letter not yet seen holds while no
+/// letter has been seen once, and the summed shares are read from the logarithms (a share far below the covector's grain
+/// still counts).
+#[test]
+fn the_unigram_steps_toward_its_expected_counts() {
+    let field = energetic_line();
+    let one = 1i128 << ENERGY_BITS;
+    let mut acc = UnigramSection::new(4);
+    // Four places: letters 0 and 1 share the conditional evenly, letter 2 sits 40 bits under, letter 3 too; the truths are
+    // letter 0 three times and letter 1 once.
+    for truth in [0usize, 0, 0, 1] {
+        let logs = vec![0, 0, -40 * one, -40 * one];
+        acc.place(&logs, one, truth, &field.fine).unwrap();
+    }
+    let mut counts = vec![0u64; 4];
+    let inverse = 1i128 << (MATERIAL_BITS - 9); // T = 2^9
+    let du = acc.finish(&mut counts, inverse, 0).unwrap();
+    assert_eq!(counts, vec![3, 1, 0, 0]);
+    // Letter 0 was read at half the places and counted at three of four: it steps up; letter 1 the reverse.
+    assert!(du[0] > 0 && du[1] < 0, "{du:?}");
+    // Letters 2 and 3 are unseen and one letter (1) was seen once: they share N₁ and step toward it from 40 bits under.
+    assert!(du[2] > 0 && du[2] == du[3], "{du:?}");
+    // At T = 2^9 one bit is 2^9·2^16 of c. The expected counts: letter 0 its own 3 (N₄ empty), letter 1 its own 1 (N₂
+    // empty), letters 2 and 3 N₁/N₀ = ½ each, normalized over 5 and scaled to the 4 places: letter 1's n* = 0.8 against
+    // P = 2, log₂ 0.4 = −1.3219 bits, −44,356,546 of c on 2^(−16) (to the logarithm's grain).
+    let want = -44_356_546i128;
+    assert!((du[1] - want).abs() < 64, "{} against {want}", du[1]);
+}
