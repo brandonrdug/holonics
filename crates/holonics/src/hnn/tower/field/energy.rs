@@ -2125,16 +2125,27 @@ impl Field {
         let mut out = EnergyRest { opening: cell.phi, last: cell.phi, ticks: Vec::new(), ended: RestEnd::Most };
         let mut first = FIRST_HALVINGS;
         for _ in 0..most {
-            let (force, _) = self.energy_force(&cell, &held, &paces, &reaches)?;
-            let (mut stood, mut below_grain, mut last_slack) = (None, false, 0i128);
+            // A refusal ends the read where it happened (its tick and the state's top place there), never the whole read.
+            let top = x.iter().map(|v| 64 - v.unsigned_abs().leading_zeros()).max().unwrap_or(0);
+            let Ok((force, _)) = self.energy_force(&cell, &held, &paces, &reaches) else {
+                out.ended = RestEnd::Refused { state_top: top };
+                break;
+            };
+            let (mut stood, mut below_grain, mut last_slack, mut refused) = (None, false, 0i128, false);
             let mut h = first;
             while h <= MOST_HALVINGS {
-                let next = self.energy_step(&x, &cell.scale, &force, h)?;
+                let Ok(next) = self.energy_step(&x, &cell.scale, &force, h) else {
+                    refused = true;
+                    break;
+                };
                 if next == x {
                     below_grain = true;
                     break;
                 }
-                let candidate = self.energy_cell(&next, &held, &paces, &reaches, window.as_deref())?;
+                let Ok(candidate) = self.energy_cell(&next, &held, &paces, &reaches, window.as_deref()) else {
+                    refused = true;
+                    break;
+                };
                 let slack = (cell.logs + candidate.logs) as i128 + 2;
                 last_slack = slack;
                 if candidate.phi + slack <= cell.phi {
@@ -2149,7 +2160,13 @@ impl Field {
             match stood {
                 Some(h) => first = h.saturating_sub(1),
                 None => {
-                    out.ended = if below_grain { RestEnd::BelowGrain } else { RestEnd::InsideSlack { slack: last_slack } };
+                    out.ended = if refused {
+                        RestEnd::Refused { state_top: top }
+                    } else if below_grain {
+                        RestEnd::BelowGrain
+                    } else {
+                        RestEnd::InsideSlack { slack: last_slack }
+                    };
                     break;
                 }
             }
@@ -2176,14 +2193,15 @@ pub struct RestTick {
     pub slack: i128,
 }
 
-/// Why a descent ended: at the read's most ticks, a step below the state's grain at every halving left, or no fall past
-/// the slack by `MOST_HALVINGS` (the last slack read).
+/// Why a descent ended: at the read's most ticks, a step below the state's grain at every halving left, no fall past the
+/// slack by `MOST_HALVINGS` (the last slack read), or a carrier's refusal (the state's top place where it came).
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
 pub enum RestEnd {
     #[default]
     Most,
     BelowGrain,
     InsideSlack { slack: i128 },
+    Refused { state_top: u32 },
 }
 
 /// [measurement; theory, November 7 23:05] A region's pairs by kind ([`Field::energy_pair_kinds`]), summed over its heads.
