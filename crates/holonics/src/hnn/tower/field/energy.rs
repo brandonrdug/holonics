@@ -2311,7 +2311,10 @@ impl Field {
                             }
                         }
                     }
-                    let q_now = cell.phi + work(&force, &v) / 2 + (((1 << 16) + mu) * kinetic(&v) >> 18);
+                    // The certificate spans the unit's re-read (measured November 8, problem 16370: from tick 100 on the
+                    // rescale's work put back 1.6743e13 of the 1.6711e13 the ticks certified): the tick falls from the Q it
+                    // stood at, q_next(t − 1), not from Q after the re-read, so the re-read's work is the tick's to pay.
+                    let q_now = last_q.map(|(phi, w, k)| phi + w + k).unwrap_or(cell.phi + work(&force, &v) / 2 + (((1 << 16) + mu) * kinetic(&v) >> 18));
                     let q_next = candidate.phi + work(&cand_force, &v_new) / 2 + (((1 << 16) + mu) * kinetic(&v_new) >> 18);
                     let sum: Vec<i64> = v.iter().zip(&v_new).map(|(&a, &b)| a + b).collect();
                     let claim = ((1 << 16) - mu) * kinetic(&sum) >> 18;
@@ -2534,7 +2537,8 @@ pub enum RestMode {
     SwingProjected,
     /// The swing on the per-lane unit (theory, November 8 08:01): each lane's unit rms(F_ℓ) is re-read every tick, in the
     /// swing and the flow alike, and the carried motion enters the new metric as `v_ℓ √(rms_(t−1)/rms_t)`, which keeps
-    /// `Σ_ℓ |v_ℓ|²/η_ℓ` unchanged, so the re-read does no work and Q certifies across ticks.
+    /// `Σ_ℓ |v_ℓ|²/η_ℓ` unchanged. The rescale still changes the work `½⟨F, v⟩`, so a swing tick is certified from the Q it
+    /// last stood at, `q_next(t − 1)`, and pays for the re-read (agent-inferred from the measured gap, November 8).
     SwingPerLane,
 }
 
