@@ -2853,6 +2853,9 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
     // [measurement; theory, November 8 11:35] `FIELD_SECTION_LETTERS`: each section's trained places counted by their true
     // letter, printed, and the section skipped (no read, no deposit), so the walk's letter counts cost no field time.
     let section_letters = std::env::var_os("FIELD_SECTION_LETTERS").is_some();
+    // [measurement; theory, November 8 15:11] `FIELD_SAVE_AT=N`: also save at section N, so a resume from that save has an
+    // unbroken twin in the same run (the resume fix's check at scale).
+    let save_at: Option<usize> = std::env::var("FIELD_SAVE_AT").ok().and_then(|v| v.parse().ok());
     // [definition; the unified-theory reading of November 7, 21:58] `FIELD_CONTRAST_AVERAGE`: the averaged constitution moves
     // each section (`FieldLearner::average_section`) and every held read reads it; the live field keeps stepping.
     let averaging = std::env::var_os("FIELD_CONTRAST_AVERAGE").is_some();
@@ -3213,7 +3216,7 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
             if n > 0 && n == from_section && lap == 0 {
                 println!("FIELD_RESUMED lap={lap} sections={n}/{} ms={now}", sections.len());
             }
-            if n > 0 && now - saved_ms >= SAVE_MS {
+            if n > 0 && (now - saved_ms >= SAVE_MS || save_at == Some(n)) {
                 write_new(&out.join(format!("STATE.{lap}.{n}")), at_rate(&learner, base_rate).as_bytes())?;
                 match &host_held {
                     Some(h) => h.read(10_000 * (lap as i64 + 1) + n as i64, &learner),
