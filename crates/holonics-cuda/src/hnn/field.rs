@@ -70,8 +70,10 @@ const MOMENT_BLOCK: u32 = 256;
 const MAX_CROWD_SLOTS: usize = 32;
 /// The sites a thread of a covector sum takes (`OUTER_TILE` in `kernels/field.cu`).
 const OUTER_TILE: u64 = 64;
-/// The device octets the runs keep to (the board's, the desktop included).
-const BOARD_CEILING: u64 = 12 << 30;
+/// The device octets a board keeps for its desktop and other clients: the runs keep to the board's total less this (12 GiB of
+/// the RTX 4080 SUPER's 16, as before; 36 of an A100's 40, so a second run on a cloud card is not refused its budget by a
+/// ceiling sized for the desktop board, November 8: law D's reads beside the fork's continuation on one A100).
+const BOARD_RESERVE: u64 = 4 << 30;
 /// Octets kept free beside a batch's counted allocations for the driver, the material and the
 /// allocator's grain.
 const MARGIN: u64 = 1 << 30;
@@ -741,7 +743,7 @@ impl<'c> CardField<'c> {
         let memory = card.census().memory;
         let (free, total) = (memory.free_bytes as u64, memory.total_bytes as u64);
         let used = total.saturating_sub(free);
-        let budget = free.min(BOARD_CEILING.saturating_sub(used)).saturating_sub(MARGIN);
+        let budget = free.min(total.saturating_sub(BOARD_RESERVE).saturating_sub(used)).saturating_sub(MARGIN);
         Ok(Self { card, module, budget, times: FieldTimes::default(), profile: None, pools: Default::default(), held_questions: Default::default(), covector_shares: Default::default(), row_questions: Default::default(), row_out: Default::default(), row_cov: Default::default(), held_cells: Default::default(), tick_reads: Default::default(), near_sites: Default::default(), near_out: Default::default(), clock_sites: Default::default(), clock_out: Default::default(), phases: None, stamps: None, batch_regions: None })
     }
 
