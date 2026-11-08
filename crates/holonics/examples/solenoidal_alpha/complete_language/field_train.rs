@@ -2846,6 +2846,9 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
     // [measurement; theory, November 8 11:10] `FIELD_CONTRAST_READ_ONLY`: each section is read and its learner put back as it
     // opened, so every section's code is read at the opening state and nothing is deposited (the family split's reads).
     let read_only = std::env::var_os("FIELD_CONTRAST_READ_ONLY").is_some();
+    // [measurement; theory, November 8 11:35] `FIELD_SECTION_LETTERS`: each section's trained places counted by their true
+    // letter, printed, and the section skipped (no read, no deposit), so the walk's letter counts cost no field time.
+    let section_letters = std::env::var_os("FIELD_SECTION_LETTERS").is_some();
     // [definition; the unified-theory reading of November 7, 21:58] `FIELD_CONTRAST_AVERAGE`: the averaged constitution moves
     // each section (`FieldLearner::average_section`) and every held read reads it; the live field keeps stepping.
     let averaging = std::env::var_os("FIELD_CONTRAST_AVERAGE").is_some();
@@ -3327,6 +3330,18 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
                         at = end;
                         up = !up;
                     }
+                }
+                if section_letters {
+                    let mut count = std::collections::BTreeMap::<usize, usize>::new();
+                    for (b, &o) in blocks.iter().zip(&owners) {
+                        for &t in b {
+                            *count.entry(truths[o][t]).or_default() += 1;
+                        }
+                    }
+                    let places: usize = count.values().sum();
+                    let text: Vec<String> = count.iter().map(|(&c, &k)| format!("{}:{k}", if c < 256 { escaped(&[c as u8]) } else { format!("#{c}") })).collect();
+                    println!("FIELD_SECTION_LETTERS lap={lap} n={n} places={places} {}", text.join(" "));
+                    continue;
                 }
                 let resolved: Vec<Vec<bool>> = truths.iter().map(|t| vec![false; t.len()]).collect();
                 let truth_views: Vec<Region> = truths.iter().zip(&resolved).map(|(c, u)| Region { classes: c, unresolved: u, faces: &[], locked: &[], echo: &[], domain: None, port: None }).collect();
