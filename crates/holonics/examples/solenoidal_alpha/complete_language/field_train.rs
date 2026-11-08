@@ -2863,10 +2863,17 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
     if std::env::var_os("FIELD_CARRIED_RELEASE").is_some() && learner.carried.is_none() {
         learner.carried = Some(vec![0; learner.field.material_len()]);
     }
-    // [definition; theory, November 8 05:50] `FIELD_UNIGRAM`: the bias reads its own ratio (`FieldLearner::unigram`); a state
-    // that carries a `unigram` line keeps its counts, and one without opens them at zero.
-    if std::env::var_os("FIELD_UNIGRAM").is_some() && learner.unigram.is_none() {
-        learner.unigram = Some(vec![0; learner.field.declaration.alphabet]);
+    // [definition; theory, November 8 13:44] `FIELD_UNIGRAM=shadow|apply`: the unigram law's carried sums
+    // (`FieldLearner::unigram`); a state that carries a `unigram` line keeps them, one without opens them at zero. `shadow`
+    // carries them with θ untouched; `apply` also steps the bias.
+    if let Ok(mode) = std::env::var("FIELD_UNIGRAM") {
+        let applied = match mode.as_str() {
+            "shadow" => false,
+            "apply" => true,
+            _ => return Err("FIELD_UNIGRAM is shadow or apply".into()),
+        };
+        let alphabet = learner.field.declaration.alphabet;
+        learner.unigram.get_or_insert_with(|| holonics::hnn::tower::field::UnigramCarry::new(alphabet, applied)).applied = applied;
     }
     // [definition; the unified-theory reading of November 7, 23:34] `FIELD_WIDEN=CAP`: the width law at its share (a state that
     // carries a `widen` line keeps its own share where this is unset).

@@ -5071,14 +5071,36 @@ impl UnigramSection {
         Ok(())
     }
 
-    /// The section's Newton step for the bias, `Δc_a = 2^(−rate) T log₂(n*_a/P_a)` on c's `2^(−16)` (`inverse` = `1/T` on
-    /// `2^(−24)`), after adding the section's counts to the carried ones. `n*` is Good–Turing's on the carried counts,
-    /// `(r + 1) N_(r+1)/N_r` while both classes are filled, the letter's own count past that, normalized and scaled to the
-    /// section's places; a letter not yet seen holds while no letter has been seen once (no class to read).
-    fn finish(self, counts: &mut [u64], inverse: i128, rate: u32) -> Result<Vec<i128>> {
-        for (c, n) in counts.iter_mut().zip(&self.counts) {
+    /// [definition; theory, November 8 13:44] The section joins the carried sums: its truths' counts to the carried counts,
+    /// its summed shares to the carried mass (`log₂ M_a`, a logarithmic sum, so a rare letter's share is never released to
+    /// zero). Applied, the bias steps by `Δc_a = 2^(−3) T log₂(N*_a/M_a)` on c's `2^(−16)` (`inverse` = `1/T` on `2^(−24)`),
+    /// `N*` Good–Turing's on the carried counts (`(r + 1) N_(r+1)/N_r` while both classes are filled, the letter's own count
+    /// past that), normalized to the carried places; both sums come from the same places, so each section's own content
+    /// cancels. The step re-bases the mass it moves, `M_a ← M_a 2^(Δc_a/T)`. In shadow (not applied) the sums are carried and
+    /// no step is formed; a letter not yet seen holds while no letter has been seen once.
+    fn finish(self, carry: &mut UnigramCarry, inverse: i128, fine: &Exponential) -> Result<Option<Vec<i128>>> {
+        let log2 = |v: i128| super::log2_reading_at(v.max(1) as u128, ENERGY_BITS);
+        for (c, n) in carry.counts.iter_mut().zip(&self.counts) {
             *c += n;
         }
+        for (a, top) in self.top.iter().enumerate() {
+            let Some(m) = *top else { continue };
+            let lp = m + log2(self.below[a]) - ((MATERIAL_BITS as i128) << ENERGY_BITS);
+            carry.mass[a] = Some(match carry.mass[a] {
+                None => lp,
+                Some(lm) => {
+                    let (hi, lo) = if lm >= lp { (lm, lp) } else { (lp, lm) };
+                    let shift = (lo - hi) >> (ENERGY_BITS - MATERIAL_BITS);
+                    let floor = -((MATERIAL_BITS as i128 - 1) << MATERIAL_BITS);
+                    let tail = if shift > floor { temperature_of(shift as i32, fine)? } else { 0 };
+                    hi + log2((1i128 << MATERIAL_BITS) + tail) - ((MATERIAL_BITS as i128) << ENERGY_BITS)
+                }
+            });
+        }
+        if !carry.applied {
+            return Ok(None);
+        }
+        let counts = &carry.counts;
         let max_r = counts.iter().copied().max().unwrap_or(0) as usize;
         let mut classes = vec![0u64; max_r + 2];
         for &r in counts.iter() {
@@ -5099,20 +5121,35 @@ impl UnigramSection {
             })
             .collect();
         let total: i128 = starred.iter().flatten().sum();
-        let log2 = |v: i128| super::log2_reading_at(v.max(1) as u128, ENERGY_BITS);
-        let log2_total = log2(total);
-        let log2_places = log2((self.places as i128) << 32);
+        let places: i128 = counts.iter().map(|&c| c as i128).sum();
+        let (log2_total, log2_places) = (log2(total), log2(places << 32));
         let mut du = vec![0i128; counts.len()];
         for a in 0..counts.len() {
-            let (Some(star), Some(m)) = (starred[a], self.top[a]) else { continue };
-            // log₂ n*_a = log₂ star − log₂ total + log₂ places (each on 2^(−32), the 2^(−32) grains cancelling).
+            let (Some(star), Some(lm)) = (starred[a], carry.mass[a]) else { continue };
+            // log₂ N*_a = log₂ star − log₂ total + log₂ places (each on 2^(−32), the 2^(−32) grains cancelling).
             let log2_n = log2(star) - log2_total + log2_places - (32i128 << ENERGY_BITS);
-            let log2_p = m + log2(self.below[a]) - ((MATERIAL_BITS as i128) << ENERGY_BITS);
-            let ratio = log2_n - log2_p;
-            // Δc = T·2^16·ratio/2^32 = ratio·2^8/inverse (inverse on 2^(−24)), at the moments' rate.
-            du[a] = div_nearest(ratio << 8, inverse.max(1)) >> rate;
+            let ratio = log2_n - lm;
+            // Δc = 2^(−3) T·2^16·ratio/2^32 = (ratio·2^8/inverse) >> 3 (inverse on 2^(−24)); the mass moves by Δc/T = ratio/8.
+            du[a] = div_nearest(ratio << 8, inverse.max(1)) >> 3;
+            carry.mass[a] = Some(lm + (ratio >> 3));
         }
-        Ok(du)
+        Ok(Some(du))
+    }
+}
+
+/// [definition; theory, November 8 13:44] The unigram law's carried sums: each letter's count in the truths of the read
+/// places, and its summed conditional share over the same places (`log₂ M_a` on `2^(−32)`, `None` until first read).
+/// `applied` steps the bias (a run's choice, not part of the state); otherwise the sums ride in shadow and θ is untouched.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct UnigramCarry {
+    pub counts: Vec<u64>,
+    pub mass: Vec<Option<i128>>,
+    pub applied: bool,
+}
+
+impl UnigramCarry {
+    pub fn new(alphabet: usize, applied: bool) -> Self {
+        Self { counts: vec![0; alphabet], mass: vec![None; alphabet], applied }
     }
 }
 
@@ -5545,12 +5582,12 @@ pub struct FieldLearner {
     /// of the family's grain, is a pick: below it each deposit drops under two units, one-sided, so a grain moves on
     /// that part only after about `2^22` deposits.
     pub carried: Option<Vec<i64>>,
-    /// [definition; theory, November 8 05:50 and 05:53] **The unigram reads its own ratio**: where set, each letter's count
-    /// in the truths a conditional section has deposited (the unigram's sufficient statistic, carried across sections), from
-    /// which counts of counts give each letter's expected count `n*` (Good–Turing), and the bias `c` (read_bias) steps by
-    /// Newton's `Δu_a = T log₂(n*_a/P_a)` toward it at the moments' rate instead of by the moments, `P_a` the section's summed
-    /// conditional share of the letter read from its logarithms ([`UnigramSection`]). A restart carries the counts.
-    pub unigram: Option<Vec<u64>>,
+    /// [definition; theory, November 8 13:44] **The unigram law's carried sums** ([`UnigramCarry`]): each letter's count in the
+    /// truths of the conditional places read and its summed share over the same places, carried across sections (a restart
+    /// carries them); applied, the bias steps by `2^(−3) T log₂(N*_a/M_a)` and the step re-bases the mass. It replaces the
+    /// 05:50 law, whose step set the carried counts against one section's mass and pushed the bias against every section's
+    /// own composition (withdrawn, theory 13:44; its 16 sections are incomplete evidence).
+    pub unigram: Option<UnigramCarry>,
     /// The bias's Newton step a conditional section read for its deposit (a reading's operand, not carried).
     pub unigram_step: Option<Vec<i128>>,
     /// [measurement; theory, November 7 23:47] Whether a full conditional section also reads the letters' coin's measure
@@ -6879,8 +6916,8 @@ impl FieldLearner {
             Some(prev) => self.field.families_all().iter().map(|&fam| predicted_change_family(&self.field, &g, &prev.step, prev.halvings, fam)).collect(),
             None => vec![None; self.field.families_all().len()],
         };
-        if let (Some(acc), Some(counts)) = (unigram_acc.take(), self.unigram.as_mut()) {
-            self.unigram_step = Some(acc.finish(counts, inverse, self.first_rate)?);
+        if let (Some(acc), Some(carry)) = (unigram_acc.take(), self.unigram.as_mut()) {
+            self.unigram_step = acc.finish(carry, inverse, &self.field.fine)?;
         }
         let raw = g.clone();
         let (deposited, predicted, transfer, external) = self.deposit(g)?;
@@ -6945,7 +6982,11 @@ impl FieldLearner {
             None => String::new(),
         };
         let unigram = match &self.unigram {
-            Some(c) => format!("unigram {}\n", c.iter().map(u64::to_string).collect::<Vec<_>>().join(" ")),
+            Some(c) => format!(
+                "unigram {} | {}\n",
+                c.counts.iter().map(u64::to_string).collect::<Vec<_>>().join(" "),
+                c.mass.iter().map(|m| m.map_or("-".to_string(), |v| v.to_string())).collect::<Vec<_>>().join(" ")
+            ),
             None => String::new(),
         };
         format!("hnn-field-learner-v3 {} {} {} {held}\n{}{}\n{}\n{step}{lengths}{average}{carried}{unigram}", self.rate_bits, self.drawn, self.laps, self.field.to_text(), join(&self.first), join(&self.second))
@@ -7023,11 +7064,16 @@ impl FieldLearner {
         };
         let unigram = match lines.next().and_then(|l| l.strip_prefix("unigram ")) {
             Some(rest) => {
-                let v = read_numbers::<u64>(Some(rest))?;
-                if v.len() != field.declaration.alphabet {
-                    return refuse("a learner's unigram counts that are not one a letter");
+                let (counts, mass) = rest.split_once(" | ").ok_or(TowerError::Refused("a learner's unigram line without its mass"))?;
+                let counts = read_numbers::<u64>(Some(counts))?;
+                let mass: Vec<Option<i128>> = mass
+                    .split_whitespace()
+                    .map(|m| if m == "-" { Ok(None) } else { m.parse::<i128>().map(Some).map_err(|_| TowerError::Refused("a learner's unigram mass that is not a number")) })
+                    .collect::<Result<_>>()?;
+                if counts.len() != field.declaration.alphabet || mass.len() != counts.len() {
+                    return refuse("a learner's unigram sums that are not one a letter");
                 }
-                Some(v)
+                Some(UnigramCarry { counts, mass, applied: false })
             }
             None => None,
         };
