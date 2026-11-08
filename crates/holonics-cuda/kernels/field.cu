@@ -1315,9 +1315,12 @@ __device__ bool rowdiv_nearest(Big<L> x, const RowDiv<L> &d, uint64_t *quotient)
 // The most address modes a head's class carries, and the most classes a receiver probes across its seams
 // (`2^b − 1`, its own probe class beside them).
 #define MAX_CLASS_TRITS 7
-// Under the width law (the unified-theory reading of November 7, 23:34) a receiver's address is at most `n` modes deep, so it
-// probes at most `2^n − 1` leaves across its seams (255 at eight modes).
-#define MAX_PROBES 255
+// [measurement; theory, November 8 00:25] A receiver's probes held in a row's shared `RowCls` (`cl`, `cum`): 127 keeps the
+// contact and reverse kernels' blocks an SM (`ptxas -v` at sm_89: at 255, `field_energy_tangent_rows` rises from 21,664 to
+// 25,760 bytes of shared a block, four blocks an SM to three). Under the width law a receiver may probe up to `2^n − 1`
+// leaves; until a row's runs are laid out once a batch in global memory, a widened receiver past 127 is refused
+// (`energy_widened_lists`).
+#define MAX_PROBES 127
 
 // A receiver's stride of probed classes, `2^b` (or `2^n` under the width law): its probe's own class and those across its
 // seams.

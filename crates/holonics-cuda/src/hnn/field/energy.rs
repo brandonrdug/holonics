@@ -923,8 +923,9 @@ impl<'c> CardField<'c> {
                 cls[h * t + g] = lists.class[i];
                 if lists.definite[i] {
                     let row = std::iter::once(lists.probe_class[i]).chain(lists.probes[i].iter().copied()).collect::<Vec<u32>>();
-                    if row.len() > pstride {
-                        return Err(TowerError::Refused("a widened receiver with more probes than its stride"));
+                    // The kernels hold a row's probed classes in shared memory, at most 128 (`MAX_PROBES` + its own).
+                    if row.len() > pstride || row.len() > 128 {
+                        return Err(TowerError::Refused("a widened receiver with more probes than a row holds (MAX_PROBES)"));
                     }
                     pn[h * t + g] = row.len() as u32;
                     for (k, &q) in row.iter().enumerate() {
@@ -954,8 +955,11 @@ impl<'c> CardField<'c> {
         let up = |v: &[u32]| self.timed(Kind::Copy, || self.take_up(v)).map_err(device);
         let lists = EnergyLists { cls: up(&cls)?, class_off: up(&class_off)?, members: up(&members)?, pn: up(&pn)?, pcls: up(&pcls)?, poff: up(&poff)?, pmem: up(&pmem)?, definite: st.definite.clone(), lengths: lengths.to_vec() };
         (words.nclasses, words.pstride) = (classes as u32, pstride as u32);
+        let receivers: Vec<u32> = pn.iter().copied().filter(|&k| k > 0).collect();
         println!(
-            "FIELD_WIDEN_LISTS regions={rn} sites={sites} heads={heads} leaves_most={} bound={classes} fetch_us={} build_us={} upload_us={} threads={}",
+            "FIELD_WIDEN_LISTS regions={rn} sites={sites} heads={heads} probes_most={} probes_mean_milli={} leaves_most={} bound={classes} fetch_us={} build_us={} upload_us={} threads={}",
+            receivers.iter().max().map_or(0, |&k| k - 1),
+            receivers.iter().map(|&k| (k - 1) as u64).sum::<u64>() * 1000 / receivers.len().max(1) as u64,
             built.iter().map(|(.., l)| *l).max().unwrap_or(0),
             fetched.as_micros(),
             (built_at - fetched).as_micros(),
