@@ -1299,6 +1299,23 @@ impl<'c> CardField<'c> {
     /// buffers are dropped only when this returns, after the batch's last fetch.
     #[allow(clippy::type_complexity)]
     fn energy_rest(&self, field: &Field, regions: &[Region], words: &mut Words, opening: EnergyOpening<'c>, plan: EnergyPlan<'_, 'c>, streamed: bool) -> Result<(Vec<Vec<Option<TowerFace>>>, Vec<Vec<Option<Vec<i64>>>>, EnergyPass<'c>)> {
+        // [measurement; theory, November 8 19:42] `FIELD_EVENTS_EVERY=N` (with `FIELD_EVENTS`): the card-clock reading so far,
+        // each kernel's launches and card time, printed every `N` batches as `FIELD_EVENT_AT` lines, so a read cut by its
+        // deadline still gives its kernels' times over a declared count of batches.
+        if let Some(every) = std::env::var("FIELD_EVENTS_EVERY").ok().and_then(|v| v.parse::<u64>().ok()).filter(|&e| e > 0) {
+            static BATCHES: std::sync::atomic::AtomicU64 = std::sync::atomic::AtomicU64::new(0);
+            let k = BATCHES.fetch_add(1, std::sync::atomic::Ordering::Relaxed);
+            if k > 0 && k % every == 0 {
+                if let Some(rows) = self.stamped() {
+                    let total: u128 = rows.values().map(|v| v.1).sum();
+                    for ((entry, head), (calls, ns)) in &rows {
+                        let head = if *head == u32::MAX { "all".to_string() } else { head.to_string() };
+                        println!("FIELD_EVENT_AT batches={k} entry={entry} head={head} launches={calls} card_us={} share_permille={}", ns / 1_000, ns * 1000 / total.max(1));
+                    }
+                    println!("FIELD_EVENT_AT batches={k} card_kernels_ms={}", total / 1_000_000);
+                }
+            }
+        }
         let card = self.card;
         let d = field.declaration;
         let (dw, m, n, f, a, heads) = (d.width, d.complex(), d.modes, d.contacts, d.alphabet, d.heads);
