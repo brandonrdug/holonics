@@ -246,15 +246,24 @@ impl Field {
     /// The energy's read at state `x` under the held supports ([`EnergyCell`]).
     fn energy_cell(&self, x: &[i64], held: &Held, paces: &Paces, reaches: &Reaches, window: Option<&[bool]>) -> Result<EnergyCell> {
         let d = &self.declaration;
+        let mut read = Vec::with_capacity(x.len());
+        let mut scale = Vec::with_capacity(x.len() / d.width * d.lanes);
+        for xt in x.chunks_exact(d.width) {
+            lane_chart(xt, d.lanes, &mut read, &mut scale)?;
+        }
+        self.energy_cell_read(read, scale, held, paces, reaches, window)
+    }
+
+    /// The energy's cell at a face `read` set directly (each lane's chart with its `scale`), as [`Self::energy_cell`] reads
+    /// it after the chart; a measurement reads Φ there at a face no state rounds to.
+    fn energy_cell_read(&self, read: Vec<i32>, scale: Vec<i128>, held: &Held, paces: &Paces, reaches: &Reaches, window: Option<&[bool]>) -> Result<EnergyCell> {
+        let d = &self.declaration;
         let (dw, m, n, f, heads) = (d.width, d.complex(), d.modes, d.contacts, d.heads);
         let m2 = 2 * m;
         let span = 2 * n;
-        let sites = x.len() / dw;
+        let sites = read.len() / dw;
         let l = &self.layout;
-        let mut c = EnergyCell { read: Vec::with_capacity(sites * dw), scale: Vec::with_capacity(sites * d.lanes), ..Default::default() };
-        for xt in x.chunks_exact(dw) {
-            lane_chart(xt, d.lanes, &mut c.read, &mut c.scale)?;
-        }
+        let mut c = EnergyCell { read, scale, ..Default::default() };
         let (q, pr) = self.energy_words(&c.read, &held.moment, reaches)?;
         // The frame and the unit power, by head, as the tick reads them.
         c.q = vec![0i64; heads * sites * span];
@@ -2150,7 +2159,7 @@ impl Field {
             }
             Ok(top)
         };
-        let mut out = EnergyRest { opening: cell.phi, last: cell.phi, opening_scale_top: scale_top(&x)?, ticks: Vec::new(), tries: Vec::new(), ended: RestEnd::Most };
+        let mut out = EnergyRest { opening: cell.phi, last: cell.phi, opening_scale_top: scale_top(&x)?, ticks: Vec::new(), tries: Vec::new(), ended: RestEnd::Most, mirror: Vec::new(), entries: Vec::new() };
         let mut first = FIRST_HALVINGS;
         let swinging = matches!(mode, RestMode::SwingProjected | RestMode::SwingPerLane);
         let projected = matches!(mode, RestMode::Projected | RestMode::PerLane) || swinging;
@@ -2172,6 +2181,9 @@ impl Field {
         let mut prev_rms: Vec<i128> = Vec::new();
         // The last standing swing tick's Q at x' in its parts (Φ, ½⟨F, v⟩, the kinetic term), to read Q's gap across ticks.
         let mut last_q: Option<(i128, i128, i128)> = None;
+        // [measurement; theory, November 8 11:10] The latest tick's flow tries, each with its halvings and the face it read,
+        // for the mirror in r̂ read at the read's end.
+        let mut final_tries: (usize, Vec<(u32, Vec<i32>)>) = (usize::MAX, Vec::new());
         // (theory, 07:28) A state on its chart re-bases to itself: a lane is re-based only when its rms has left its held
         // scale by more than one unit of its grain, so a below-grain step returns x and the read ends by the grain or the
         // field, never by the chart's rounding.
@@ -2417,6 +2429,10 @@ impl Field {
                         tick, halvings: h, fall: tried, claim, slack, note: 0, guard_milli: 0,
                         split: [radial_rose, radial_rest, tangential, residual, rose, fell, rebased, moved, second, unmirrored],
                     });
+                    if final_tries.0 != tick {
+                        final_tries = (tick, Vec::new());
+                    }
+                    final_tries.1.push((h, candidate.read.clone()));
                 }
                 let half_passes = 2 * tried >= claim;
                 if lined && !(half_passes && tried >= slack) {
@@ -2486,6 +2502,44 @@ impl Field {
                 }
             }
         }
+        // [measurement; theory, November 8 11:10] The mirror in r̂ at the read's end, the face set directly: for each of the last
+        // tick's flow tries, Φ at r̂ ± Δr̂ (its rises, ⟨F, Δr̂⟩, and the odd part ½(rise₊ − rise₋) + ⟨F, Δr̂⟩, zero for any
+        // quadratic); and every entry those tries moved, alone at ±1 and ±2 units, D(k) = Φ(r̂ + k e) + Φ(r̂ − k e) − 2Φ(r̂),
+        // with its rises at ±1 and its force on Φ's 2^(−32).
+        if flowing && !final_tries.1.is_empty() && final_tries.0 == out.ticks.len() {
+            let (force, _) = self.energy_force(&cell, &held, &paces, &reaches)?;
+            let phi_at = |read: Vec<i32>| -> Result<i128> { Ok(self.energy_cell_read(read, cell.scale.clone(), &held, &paces, &reaches, window.as_deref())?.phi) };
+            let mut every_moved: std::collections::BTreeSet<usize> = std::collections::BTreeSet::new();
+            for (h, cand) in &final_tries.1 {
+                let delta: Vec<i64> = cand.iter().zip(&cell.read).map(|(&b, &a)| b as i64 - a as i64).collect();
+                let moved: Vec<usize> = delta.iter().enumerate().filter(|&(_, &d)| d != 0).map(|(i, _)| i).collect();
+                if moved.is_empty() {
+                    continue;
+                }
+                let plus: Vec<i32> = cell.read.iter().zip(&delta).map(|(&a, &d)| (a as i64 + d) as i32).collect();
+                let minus: Vec<i32> = cell.read.iter().zip(&delta).map(|(&a, &d)| (a as i64 - d) as i32).collect();
+                let (rise_plus, rise_minus) = (phi_at(plus)? - cell.phi, phi_at(minus)? - cell.phi);
+                let work = release(force.iter().zip(&delta).map(|(&f, &d)| f as i128 * d as i128).sum::<i128>(), 8);
+                out.mirror.push(RestMirror { halvings: *h, moved: moved.len(), rise_plus, rise_minus, work });
+                every_moved.extend(moved);
+            }
+            for i in every_moved {
+                let mut d = [0i128; 2];
+                let mut rises = (0i128, 0i128);
+                for k in 1..=2i32 {
+                    let mut up = cell.read.clone();
+                    let mut down = cell.read.clone();
+                    up[i] += k;
+                    down[i] -= k;
+                    let (u, w) = (phi_at(up)? - cell.phi, phi_at(down)? - cell.phi);
+                    if k == 1 {
+                        rises = (u, w);
+                    }
+                    d[k as usize - 1] = u + w;
+                }
+                out.entries.push(RestEntry { index: i, d1: d[0], d2: d[1], force: release(force[i] as i128, 8), rise_up: rises.0, rise_down: rises.1 });
+            }
+        }
         out.last = cell.phi;
         Ok(out)
     }
@@ -2524,6 +2578,34 @@ pub struct EnergyRest {
     /// slope and curvature).
     pub tries: Vec<RestTry>,
     pub ended: RestEnd,
+    /// [measurement] The mirror in r̂ of the last tick's flow tries at the read's end (theory, November 8 11:10).
+    pub mirror: Vec<RestMirror>,
+    /// [measurement] The last moving try's entries one at a time, their second differences at ±1 and ±2 units of the face.
+    pub entries: Vec<RestEntry>,
+}
+
+/// One flow try mirrored in r̂ at the read's end: its halvings, the entries it moved, Φ's rise at r̂ + Δr̂ and at r̂ − Δr̂,
+/// and ⟨F, Δr̂⟩, all on Φ's `2^(−32)`.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct RestMirror {
+    pub halvings: u32,
+    pub moved: usize,
+    pub rise_plus: i128,
+    pub rise_minus: i128,
+    pub work: i128,
+}
+
+/// One face entry at the read's end: its index, `D(1)` and `D(2)` (Φ's second differences at ±1 and ±2 units), and its force
+/// on Φ's `2^(−32)` a unit of the face.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct RestEntry {
+    pub index: usize,
+    pub d1: i128,
+    pub d2: i128,
+    pub force: i128,
+    /// Φ's rise at `r̂ + e` and at `r̂ − e`.
+    pub rise_up: i128,
+    pub rise_down: i128,
 }
 
 /// One tried candidate of a flow-mode tick: its tick, halvings, fall, first-order claim and slack (on `2^(−32)`).

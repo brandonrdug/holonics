@@ -3090,6 +3090,14 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
                 for t in &rest.tries {
                     println!("FIELD_REST_TRY problem={i} mode={rebase} tick={} halvings={} fall={} claim={} slack={} note={} guard_milli={} radial_rose={} radial_rest={} tangential={} residual={} lanes_rose={} lanes_fell={} lanes_rebased={} moved={} second={} unmirrored={}", t.tick, t.halvings, t.fall, t.claim, t.slack, t.note, t.guard_milli, t.split[0], t.split[1], t.split[2], t.split[3], t.split[4], t.split[5], t.split[6], t.split[7], t.split[8], t.split[9]);
                 }
+                for m in &rest.mirror {
+                    let even = m.rise_plus + m.rise_minus;
+                    let odd = (m.rise_plus - m.rise_minus) / 2 + m.work;
+                    println!("FIELD_REST_MIRROR problem={i} halvings={} moved={} rise_plus={} rise_minus={} work={} even={even} odd={odd}", m.halvings, m.moved, m.rise_plus, m.rise_minus, m.work);
+                }
+                for e in &rest.entries {
+                    println!("FIELD_REST_ENTRY problem={i} index={} d1={} d2={} force={} ratio_milli={} rise_up={} rise_down={}", e.index, e.d1, e.d2, e.force, if e.d1 != 0 { e.d2 * 1000 / e.d1 } else { 0 }, e.rise_up, e.rise_down);
+                }
                 println!(
                     "FIELD_REST problem={i} mode={rebase} sites={} ticks={} ended={:?} opening={} last={} fall={} opening_scale_top={} ms={}",
                     truth.len(),
