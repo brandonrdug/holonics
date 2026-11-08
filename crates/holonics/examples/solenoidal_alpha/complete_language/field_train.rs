@@ -2850,10 +2850,10 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
     // lengths (the fork's key), and each start is swept whole SWEEPS times at the field's `T` (cool 0), with no deposition.
     // `FIELD_MELT=0` gives the sweep-0 reads alone.
     let melt_sweeps: Option<u64> = std::env::var("FIELD_MELT").ok().and_then(|v| v.parse().ok());
-    // [measurement; theory, November 8 20:48] `FIELD_MELT_ALL`: the melt reads every section of the declared read
-    // (`FIELD_CONTRAST_FROM_SECTION`, `FIELD_CONTRAST_SECTIONS`) in one load, none deposited, and ends after the last, so a bulk
-    // read over many answers (each answer's length printed beside its energies) costs one load.
-    let melt_all = std::env::var_os("FIELD_MELT_ALL").is_some();
+    // [measurement; theory, November 8 20:48] `FIELD_MELT_ALL=N,M,…`: the melt reads each listed section of the walk (from
+    // `FIELD_CONTRAST_FROM_SECTION`, at most the first listed) in one load, passing the others unread, none deposited, and ends after
+    // the last, so a bulk read over many answers (each answer's length printed beside its energies) costs one load.
+    let melt_all: Vec<usize> = std::env::var("FIELD_MELT_ALL").map(|v| v.split(',').filter_map(|x| x.trim().parse().ok()).collect()).unwrap_or_default();
     let persistent = std::env::var_os("FIELD_CONTRAST_PERSISTENT").is_some() || fresh_sweeps.is_some() || melt_sweeps.is_some();
     let conditional = std::env::var_os("FIELD_CONTRAST_CONDITIONAL").is_some();
     // [measurement; theory, November 8 11:10] `FIELD_CONTRAST_READ_ONLY`: each section is read and its learner put back as it
@@ -3259,6 +3259,9 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
                 // place (milli-nats), the places moved and proposed, the answers whose first ten letters are their truth's, and those
                 // with a backtick in their first three places (sweep 0 is the start, before any sweep); after the last sweep the
                 // answers are written whole (private), and the run ends.
+                if melt_sweeps.is_some() && !melt_all.is_empty() && !melt_all.contains(&n) {
+                    continue;
+                }
                 if let Some(k) = melt_sweeps {
                     let m = members.len();
                     let truth_answers: Vec<Vec<usize>> = members.iter().map(|&i| train_set[i].1.clone()).collect();
@@ -3335,7 +3338,7 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
                         }
                     }
                     println!("FIELD_MELT_DONE n={n} ms={}", started.elapsed().as_millis());
-                    if melt_all && lap == 0 && n + 1 < from_section + read_sections.max(1) {
+                    if melt_all.iter().any(|&x| x > n) {
                         continue;
                     }
                     return Ok(());
