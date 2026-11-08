@@ -2801,3 +2801,45 @@ fn the_width_laws_lists_split_only_past_the_share() {
         assert!(!narrow.probes[i].contains(&narrow.probe_class[i]), "receiver {i} probes its own leaf");
     }
 }
+
+/// [definition; theory, November 8, the number record's N5] **The carried release** adds sub-grain deposits up: at a rate
+/// that puts every step below one grain (`2^(24−30)` of the moments' unit), the deposits release to zero each section and
+/// the constitution stays where it is, while with their remainders carried each entry moves by whole grains as they
+/// accumulate, in its covector's direction; and the remainders are carried in the learner's text.
+#[test]
+fn the_carried_release_adds_up_what_each_step_releases_to_zero() {
+    let field = energetic_line();
+    let material = field.material_len();
+    let covector: Vec<i128> = (0..material).map(|i| if i % 3 == 0 { -1000 } else { 1000 }).collect();
+    let mut dropped = FieldLearner::new(field.clone(), 30);
+    let mut carried = FieldLearner::new(field.clone(), 30);
+    carried.carried = Some(vec![0; material]);
+    for _ in 0..200 {
+        dropped.deposit(covector.clone()).unwrap();
+        carried.deposit(covector.clone()).unwrap();
+    }
+    assert_eq!(dropped.field.theta, field.theta, "every sub-grain step released to zero");
+    let (mut moved, mut right_way) = (0usize, 0usize);
+    for (i, (&after, &before)) in carried.field.theta[..material].iter().zip(&field.theta[..material]).enumerate() {
+        let change = i64::from(after) - i64::from(before);
+        if change != 0 {
+            moved += 1;
+            // The step is subtracted: a positive covector moves its entry down.
+            if (change < 0) == (covector[i] > 0) {
+                right_way += 1;
+            }
+        }
+        assert!(change.abs() <= 4, "entry {i} moved {change} grains in 200 deposits of 1/64 grain");
+    }
+    // A family on the material's grain steps 2^(24−30) of a grain a deposit, so 200 carry it about three grains; one on the
+    // faces' grain steps 2^(16−30), so its remainder grows without yet reaching half a grain.
+    let fine: usize = field.families().iter().filter(|f| f.2 == MATERIAL_BITS).map(|f| f.1).sum();
+    assert_eq!((moved, right_way), (fine, fine));
+    for &(start, len, grain) in field.families() {
+        let rem = &carried.carried.as_ref().unwrap()[start..start + len];
+        assert!(grain == MATERIAL_BITS || rem.iter().all(|&r| r != 0), "a family on 2^(−{grain}) carries its remainders");
+    }
+    let back = FieldLearner::from_text(&carried.to_text()).unwrap();
+    assert_eq!(back.carried, carried.carried);
+    assert!(carried.carried.as_ref().unwrap().iter().all(|&r| r.unsigned_abs() <= 1 << 23));
+}

@@ -5429,6 +5429,13 @@ pub struct FieldLearner {
     /// finer than `θ`'s grain (theory, 22:08), so the remainder `toward` releases is carried and `θ̄` is the walk's mean,
     /// not its median.
     pub average: Option<Vec<i64>>,
+    /// [definition; theory, November 8 02:24 and 03:01, the number record's N5] **The carried release**: where set, each
+    /// entry's deposit is formed on `2^(−24)` of its grain (the division's and the shift's truncation taken there, not at the
+    /// grain), its carried remainder added, and released to the grain, the new remainder (`|r| ≤ 2^23`) carried to the next
+    /// deposit; so sub-grain deposits add up in the low places and carry into the grain instead of releasing to zero each
+    /// section (moment_face, pair_c, and the nine families whose every step released to zero, the width census of
+    /// November 8). A restart carries it.
+    pub carried: Option<Vec<i64>>,
     /// [measurement; theory, November 7 23:47] Whether a full conditional section also reads the letters' coin's measure
     /// ([`CoinMeasure`]): its forward read timed beside its material read, and each tolerance's cost and variance.
     pub coin_measure: bool,
@@ -5491,7 +5498,7 @@ impl FieldLearner {
     pub fn new(field: Field, rate_bits: u32) -> Self {
         let len = field.material_len();
         let drawn = 4 * field.declaration.founding_draws();
-        Self { field, first: vec![0; len], second: vec![0; len], rate_bits, drawn, laps: 0, held: None, read_held: false, newton: false, newton_read: false, first_rate: FIRST_RATE, second_rate: SECOND_RATE, family_rates: None, temper_learns: false, family_transfer: Vec::new(), family_price: Vec::new(), last: None, average: None, coin_measure: false }
+        Self { field, first: vec![0; len], second: vec![0; len], rate_bits, drawn, laps: 0, held: None, read_held: false, newton: false, newton_read: false, first_rate: FIRST_RATE, second_rate: SECOND_RATE, family_rates: None, temper_learns: false, family_transfer: Vec::new(), family_price: Vec::new(), last: None, average: None, carried: None, coin_measure: false }
     }
 
     /// Whether a deposited step is held for the next regions' read.
@@ -5518,7 +5525,7 @@ impl FieldLearner {
         let second = from.iter().map(|&(i, divided)| if divided { div_nearest(self.second[i], f2) } else { self.second[i] }).collect();
         let drawn = self.drawn + 4 * self.field.growth_draws(factor);
         let rate_bits = self.rate_bits + (usize::BITS - (factor - 1).leading_zeros());
-        Ok(Self { field, first, second, rate_bits, drawn, laps: self.laps, held: None, read_held: self.read_held, newton: self.newton, newton_read: self.newton_read, first_rate: self.first_rate, second_rate: self.second_rate, family_rates: None, temper_learns: false, family_transfer: Vec::new(), family_price: Vec::new(), last: None, average: None, coin_measure: false })
+        Ok(Self { field, first, second, rate_bits, drawn, laps: self.laps, held: None, read_held: self.read_held, newton: self.newton, newton_read: self.newton_read, first_rate: self.first_rate, second_rate: self.second_rate, family_rates: None, temper_learns: false, family_transfer: Vec::new(), family_price: Vec::new(), last: None, average: None, carried: None, coin_measure: false })
     }
 
     /// [definition; agent-inferred, November 4, §16.40] **The learner with one more lane** ([`Field::laned`]), the lane's
@@ -5558,7 +5565,7 @@ impl FieldLearner {
             }
         }
         let drawn = self.drawn + 4 * self.field.declaration.lane_draws();
-        Ok(Self { field, first, second, rate_bits: self.rate_bits, drawn, laps: self.laps, held: None, read_held: self.read_held, newton: self.newton, newton_read: self.newton_read, first_rate: self.first_rate, second_rate: self.second_rate, family_rates: None, temper_learns: false, family_transfer: Vec::new(), family_price: Vec::new(), last: None, average: None, coin_measure: false })
+        Ok(Self { field, first, second, rate_bits: self.rate_bits, drawn, laps: self.laps, held: None, read_held: self.read_held, newton: self.newton, newton_read: self.newton_read, first_rate: self.first_rate, second_rate: self.second_rate, family_rates: None, temper_learns: false, family_transfer: Vec::new(), family_price: Vec::new(), last: None, average: None, carried: None, coin_measure: false })
     }
 
     /// The held step read on `regions` without a deposit: the faces of `regions` under the
@@ -5808,7 +5815,24 @@ impl FieldLearner {
                             let k = u32::try_from(-whole).map_err(|_| TowerError::Refused(PAST))?;
                             num.checked_mul(1i128.checked_shl(k).filter(|&b| b > 0).inspect(|v| crate::number::census::reach(PAST, v)).ok_or(TowerError::Refused(PAST))?).inspect(|v| crate::number::census::reach(PAST, v)).ok_or(TowerError::Refused(PAST))? / root
                         };
-                        let pre = whole_step.checked_mul(scale).inspect(|v| crate::number::census::reach(PAST, v)).ok_or(TowerError::Refused(PAST))?;
+                        let pre = match &mut self.carried {
+                            // The carried release: the whole step on 2^(−24) of the grain, the division's and the shift's truncation
+                            // taken there, plus the entry's carried remainder; released to the grain, the new remainder carried.
+                            Some(carried) => {
+                                let scaled = num.checked_mul(scale).inspect(|v| crate::number::census::reach(PAST, v)).ok_or(TowerError::Refused(PAST))?;
+                                let full = if whole >= 0 {
+                                    (scaled >> whole.min(127)) / root
+                                } else {
+                                    let k = u32::try_from(-whole).map_err(|_| TowerError::Refused(PAST))?;
+                                    scaled.checked_mul(1i128.checked_shl(k).filter(|&b| b > 0).ok_or(TowerError::Refused(PAST))?).ok_or(TowerError::Refused(PAST))? / root
+                                };
+                                let total = full + i128::from(carried[i]);
+                                let s = release(total, MATERIAL_BITS);
+                                carried[i] = i64::try_from(total - (s << MATERIAL_BITS)).map_err(|_| TowerError::Refused("a carried remainder outside its places"))?;
+                                total
+                            }
+                            None => whole_step.checked_mul(scale).inspect(|v| crate::number::census::reach(PAST, v)).ok_or(TowerError::Refused(PAST))?,
+                        };
                         step[i] = release(pre, MATERIAL_BITS);
                         // The release's remainder on 2^(−24) of the family's grain, signed parts apart, beside the change; and
                         // the whole step before the division's and the shift's truncation (the deposit a carried release
@@ -5828,7 +5852,15 @@ impl FieldLearner {
                 }
                 None => {
                     for i in start..start + len {
-                        step[i] = deposit_step(self.first[i], self.second[i], grain, self.rate_bits);
+                        step[i] = match &mut self.carried {
+                            Some(carried) => {
+                                let full = deposit_step(self.first[i], self.second[i], grain + MATERIAL_BITS, self.rate_bits) + i128::from(carried[i]);
+                                let s = release(full, MATERIAL_BITS);
+                                carried[i] = i64::try_from(full - (s << MATERIAL_BITS)).map_err(|_| TowerError::Refused("a carried remainder outside its places"))?;
+                                s
+                            }
+                            None => deposit_step(self.first[i], self.second[i], grain, self.rate_bits),
+                        };
                     }
                 }
             }
@@ -6713,7 +6745,7 @@ impl FieldLearner {
         let (mut first, mut second) = (self.first.clone(), self.second.clone());
         first.resize(len, 0);
         second.resize(len, 0);
-        Ok(Self { field, first, second, rate_bits: self.rate_bits, drawn, laps: self.laps, held: None, read_held: self.read_held, newton: self.newton, newton_read: self.newton_read, first_rate: self.first_rate, second_rate: self.second_rate, family_rates: None, temper_learns: false, family_transfer: Vec::new(), family_price: Vec::new(), last: None, average: None, coin_measure: false })
+        Ok(Self { field, first, second, rate_bits: self.rate_bits, drawn, laps: self.laps, held: None, read_held: self.read_held, newton: self.newton, newton_read: self.newton_read, first_rate: self.first_rate, second_rate: self.second_rate, family_rates: None, temper_learns: false, family_transfer: Vec::new(), family_price: Vec::new(), last: None, average: None, carried: None, coin_measure: false })
     }
 
     /// [measurement; agent-inferred, November 3, §16.31] **Each family's step coherence**: over the family's entries, `Σ |m|`
@@ -6749,7 +6781,11 @@ impl FieldLearner {
             Some(avg) => format!("average {}\n", avg.iter().map(i64::to_string).collect::<Vec<_>>().join(" ")),
             None => String::new(),
         };
-        format!("hnn-field-learner-v3 {} {} {} {held}\n{}{}\n{}\n{step}{lengths}{average}", self.rate_bits, self.drawn, self.laps, self.field.to_text(), join(&self.first), join(&self.second))
+        let carried = match &self.carried {
+            Some(c) => format!("carried {}\n", c.iter().map(i64::to_string).collect::<Vec<_>>().join(" ")),
+            None => String::new(),
+        };
+        format!("hnn-field-learner-v3 {} {} {} {held}\n{}{}\n{}\n{step}{lengths}{average}{carried}", self.rate_bits, self.drawn, self.laps, self.field.to_text(), join(&self.first), join(&self.second))
     }
 
     pub fn from_text(text: &str) -> Result<Self> {
@@ -6794,7 +6830,11 @@ impl FieldLearner {
             }
             None => (None, Vec::new(), Vec::new()),
         };
-        let average = match lines.next().and_then(|l| l.strip_prefix("average ")) {
+        let average_line = match lines.peek() {
+            Some(l) if l.starts_with("average ") => lines.next(),
+            _ => None,
+        };
+        let average = match average_line.and_then(|l| l.strip_prefix("average ")) {
             Some(rest) => {
                 let v = read_numbers::<i64>(Some(rest))?;
                 if v.len() != field.theta.len() {
@@ -6804,7 +6844,17 @@ impl FieldLearner {
             }
             None => None,
         };
-        Ok(Self { field, first, second, rate_bits, read_held: held.is_some(), newton: false, newton_read: false, first_rate: FIRST_RATE, second_rate: SECOND_RATE, family_rates, temper_learns: false, family_transfer, family_price, drawn, laps, held, last: None, average, coin_measure: false })
+        let carried = match lines.next().and_then(|l| l.strip_prefix("carried ")) {
+            Some(rest) => {
+                let v = read_numbers::<i64>(Some(rest))?;
+                if v.len() != field.material_len() {
+                    return refuse("a learner's carried remainders that are not its material's length");
+                }
+                Some(v)
+            }
+            None => None,
+        };
+        Ok(Self { field, first, second, rate_bits, read_held: held.is_some(), newton: false, newton_read: false, first_rate: FIRST_RATE, second_rate: SECOND_RATE, family_rates, temper_learns: false, family_transfer, family_price, drawn, laps, held, last: None, average, carried, coin_measure: false })
     }
 }
 

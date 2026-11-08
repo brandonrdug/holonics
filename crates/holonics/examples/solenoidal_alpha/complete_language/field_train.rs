@@ -2851,6 +2851,12 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
         Err(_) => 0,
     };
     learner.coin_measure = std::env::var_os("FIELD_COIN_MEASURE").is_some();
+    // [definition; theory, November 8, the number record's N5] `FIELD_CARRIED_RELEASE`: each deposit is formed on 2^(−24) of its
+    // grain and its remainder carried to the next (`FieldLearner::carried`); a state that carries a `carried` line keeps its
+    // remainders, and one without opens them at zero.
+    if std::env::var_os("FIELD_CARRIED_RELEASE").is_some() && learner.carried.is_none() {
+        learner.carried = Some(vec![0; learner.field.material_len()]);
+    }
     // [definition; the unified-theory reading of November 7, 23:34] `FIELD_WIDEN=CAP`: the width law at its share (a state that
     // carries a `widen` line keeps its own share where this is unset).
     if let Ok(v) = std::env::var("FIELD_WIDEN") {
