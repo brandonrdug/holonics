@@ -2151,9 +2151,10 @@ impl Field {
             }
             Ok(top)
         };
-        let mut out = EnergyRest { opening: cell.phi, last: cell.phi, opening_scale_top: scale_top(&x)?, ticks: Vec::new(), ended: RestEnd::Most };
+        let mut out = EnergyRest { opening: cell.phi, last: cell.phi, opening_scale_top: scale_top(&x)?, ticks: Vec::new(), tries: Vec::new(), ended: RestEnd::Most };
         let mut first = FIRST_HALVINGS;
-        for _ in 0..most {
+        let flowing = matches!(mode, RestMode::Flow | RestMode::Line);
+        for tick in 0..most {
             // A refusal ends the read where it happened (its tick and the state's top place there), never the whole read.
             let top = x.iter().map(|v| 64 - v.unsigned_abs().leading_zeros()).max().unwrap_or(0);
             let Ok((force, _)) = self.energy_force(&cell, &held, &paces, &reaches) else {
@@ -2163,7 +2164,7 @@ impl Field {
             let (mut stood, mut below_grain, mut last_slack, mut refused) = (None, false, 0i128, false);
             // The first-order claim on 2^(−48) before its halvings: Σ over lanes of |F|² − ⟨r̂, F⟩²/W (`energy_fall`'s).
             let mut first_order = 0i128;
-            if mode == RestMode::Flow {
+            if flowing {
                 for t in 0..x.len() / dw {
                     for k in 0..lanes {
                         let at = t * dw + k * lane_width;
@@ -2174,13 +2175,16 @@ impl Field {
                 }
             }
             let mut h = first;
+            // The line's controller (theory, 05:13): the least halvings whose half-claim failed this tick.
+            let mut failed_half: Option<u32> = None;
+            let mut line_rest = false;
             while h <= STEP_CARRIER_HALVINGS {
                 let Ok(stepped) = self.energy_step(&x, &cell.scale, &force, h) else {
                     refused = true;
                     break;
                 };
                 // The flow step's candidate is re-based inside itself, before its energy is read.
-                let next = if mode == RestMode::Flow {
+                let next = if flowing {
                     let mut based = Vec::with_capacity(stepped.len());
                     for (k, lane) in stepped.chunks_exact(lane_width).enumerate() {
                         let (r, _) = ratio_to_power(lane)?;
@@ -2202,8 +2206,29 @@ impl Field {
                 };
                 let slack = (cell.logs + candidate.logs) as i128 + 2;
                 last_slack = slack;
-                let claim = if mode == RestMode::Flow { release(first_order, 16 + h) } else { 0 };
-                if candidate.phi + slack <= cell.phi && 2 * (cell.phi - candidate.phi) >= claim {
+                let claim = if flowing { release(first_order, 16 + h) } else { 0 };
+                let tried = cell.phi - candidate.phi;
+                if flowing {
+                    out.tries.push(RestTry { tick, halvings: h, fall: tried, claim, slack });
+                }
+                let half_passes = 2 * tried >= claim;
+                if mode == RestMode::Line && !(half_passes && tried >= slack) {
+                    // Passing half the claim but not the slack, the step is short of the line's minimum: double it, unless
+                    // the half-claim failed just above (one doubling up), where the field rests at its release error.
+                    // Failing half the claim, the step is past the minimum: halve it.
+                    if half_passes {
+                        if h == 0 || failed_half == Some(h - 1) {
+                            line_rest = true;
+                            break;
+                        }
+                        h -= 1;
+                    } else {
+                        failed_half = Some(failed_half.map_or(h, |f| f.min(h)));
+                        h += 1;
+                    }
+                    continue;
+                }
+                if candidate.phi + slack <= cell.phi && half_passes {
                     let fall = cell.phi - candidate.phi;
                     let top = scale_top(&next).unwrap_or(u32::MAX);
                     let (next, candidate, rebase_change) = if mode == RestMode::Rebase {
@@ -2231,10 +2256,12 @@ impl Field {
                 h += 1;
             }
             match stood {
-                Some(h) => first = h.saturating_sub(1),
+                Some(h) => first = if mode == RestMode::Line { h } else { h.saturating_sub(1) },
                 None => {
                     out.ended = if refused {
                         RestEnd::Refused { state_top: top }
+                    } else if line_rest {
+                        RestEnd::AtTheLine { slack: last_slack }
                     } else if below_grain {
                         RestEnd::BelowGrain
                     } else {
@@ -2278,7 +2305,20 @@ pub struct EnergyRest {
     /// The lanes' largest scale's top place at the opening (on the state's grain).
     pub opening_scale_top: u32,
     pub ticks: Vec<RestTick>,
+    /// Every candidate the flow modes tried, stood or not (theory, 05:13: three halvings' falls give the line's offset,
+    /// slope and curvature).
+    pub tries: Vec<RestTry>,
     pub ended: RestEnd,
+}
+
+/// One tried candidate of a flow-mode tick: its tick, halvings, fall, first-order claim and slack (on `2^(−32)`).
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct RestTry {
+    pub tick: usize,
+    pub halvings: u32,
+    pub fall: i128,
+    pub claim: i128,
+    pub slack: i128,
 }
 
 /// One tick that stood: its halvings, its fall and the slack it fell past (on `2^(−32)`), the lanes' largest scale's top
@@ -2301,6 +2341,10 @@ pub enum RestMode {
     Law,
     Rebase,
     Flow,
+    /// The flow step with the line's controller (theory, November 8 05:13): passing half the claim but not the slack it
+    /// doubles, failing half the claim it halves, and it rests only on a halving under the slack just below a failed
+    /// half-claim, so every rest is the field's own (its line's best fall under 4/3 of the slack).
+    Line,
 }
 
 /// Why a descent ended: at the read's most ticks, a step below the state's grain at every halving left, no fall past the
@@ -2312,6 +2356,8 @@ pub enum RestEnd {
     BelowGrain,
     InsideSlack { slack: i128 },
     Refused { state_top: u32 },
+    /// The line's rest: a halving under the slack just below a failed half-claim (the slack read there).
+    AtTheLine { slack: i128 },
 }
 
 /// [measurement; theory, November 7 23:05] A region's pairs by kind ([`Field::energy_pair_kinds`]), summed over its heads.

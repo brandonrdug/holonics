@@ -3027,7 +3027,9 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
                 let most: usize = most.parse().map_err(|_| "FIELD_CENSUS_REST is a count of ticks".to_string())?;
                 // `FIELD_CENSUS_REST_REBASE`: each lane re-based to its opening scale after each tick (theory, 03:32).
                 // `FIELD_CENSUS_REST_FLOW`: the certified flow step (theory, 04:21), re-based inside the candidate.
-                let mode = if std::env::var_os("FIELD_CENSUS_REST_FLOW").is_some() {
+                let mode = if std::env::var_os("FIELD_CENSUS_REST_LINE").is_some() {
+                    holonics::hnn::tower::field::RestMode::Line
+                } else if std::env::var_os("FIELD_CENSUS_REST_FLOW").is_some() {
                     holonics::hnn::tower::field::RestMode::Flow
                 } else if std::env::var_os("FIELD_CENSUS_REST_REBASE").is_some() {
                     holonics::hnn::tower::field::RestMode::Rebase
@@ -3048,6 +3050,9 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
                         tick.rebase_change,
                         tick.claim
                     );
+                }
+                for t in &rest.tries {
+                    println!("FIELD_REST_TRY problem={i} mode={rebase} tick={} halvings={} fall={} claim={} slack={}", t.tick, t.halvings, t.fall, t.claim, t.slack);
                 }
                 println!(
                     "FIELD_REST problem={i} mode={rebase} sites={} ticks={} ended={:?} opening={} last={} fall={} opening_scale_top={} ms={}",
