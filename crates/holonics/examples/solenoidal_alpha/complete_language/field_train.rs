@@ -3025,25 +3025,30 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
             // tick's halvings, fall and slack on 2^(−32).
             if let Ok(most) = std::env::var("FIELD_CENSUS_REST") {
                 let most: usize = most.parse().map_err(|_| "FIELD_CENSUS_REST is a count of ticks".to_string())?;
-                let rest = learner.field.energy_rest_read(&region, most).map_err(|e| e.to_string())?;
+                // `FIELD_CENSUS_REST_REBASE`: each lane re-based to its opening scale after each tick (theory, 03:32).
+                let rebase = std::env::var_os("FIELD_CENSUS_REST_REBASE").is_some();
+                let rest = learner.field.energy_rest_read(&region, most, rebase).map_err(|e| e.to_string())?;
                 for (k, tick) in rest.ticks.iter().enumerate() {
                     println!(
-                        "FIELD_REST_TICK problem={i} tick={k} halvings={} fall={} fall_bits={} slack={} fall_over_slack_milli={}",
+                        "FIELD_REST_TICK problem={i} rebase={rebase} tick={k} halvings={} fall={} fall_bits={} slack={} fall_over_slack_milli={} scale_top={} rebase_change={}",
                         tick.halvings,
                         tick.fall,
                         128 - tick.fall.unsigned_abs().leading_zeros(),
                         tick.slack,
-                        tick.fall * 1000 / tick.slack.max(1)
+                        tick.fall * 1000 / tick.slack.max(1),
+                        tick.scale_top,
+                        tick.rebase_change
                     );
                 }
                 println!(
-                    "FIELD_REST problem={i} sites={} ticks={} ended={:?} opening={} last={} fall={} ms={}",
+                    "FIELD_REST problem={i} rebase={rebase} sites={} ticks={} ended={:?} opening={} last={} fall={} opening_scale_top={} ms={}",
                     truth.len(),
                     rest.ticks.len(),
                     rest.ended,
                     rest.opening,
                     rest.last,
                     rest.opening - rest.last,
+                    rest.opening_scale_top,
                     t.elapsed().as_millis()
                 );
                 continue;

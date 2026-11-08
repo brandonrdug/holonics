@@ -4981,18 +4981,31 @@ fn conditional_shares(gs: &[i128], inverse: i128, fine: &Exponential) -> Result<
         .collect::<Result<_>>()?;
     let z: i128 = w.iter().sum();
     let shares: Vec<i128> = w.iter().map(|&x| div_nearest(x << MATERIAL_BITS, z.max(1))).collect();
-    census_conditional_place(gs.iter().map(|&gv| release((lo - gv) * inverse, MATERIAL_BITS) >> (ENERGY_BITS - MATERIAL_BITS)), &shares, fine)?;
+    census_conditional_place(gs.iter().map(|&gv| release((lo - gv) * inverse, MATERIAL_BITS) >> (ENERGY_BITS - MATERIAL_BITS)), &shares, None, fine)?;
     Ok(shares)
 }
 
 /// The width census's read (b) at one place of a conditional: each letter whose weight released to zero below
 /// `2^(−23)` and its weight before the release on `2^(−32)` (eight places finer), the mass the grain drops; the least
 /// nonzero share's places below one; the letters whose share released to zero. Nothing is changed.
-fn census_conditional_place(ells: impl Iterator<Item = i128>, shares: &[i128], fine: &Exponential) -> Result<()> {
+fn census_conditional_place(ells: impl Iterator<Item = i128>, shares: &[i128], truth: Option<usize>, fine: &Exponential) -> Result<()> {
     if !crate::number::census::enabled() {
         return Ok(());
     }
     crate::number::census::tally(CENSUS_PLACES, 1);
+    // The truth's own share at the grain's bottom (theory, November 8 03:32): an admitted letter needs one unit, so the
+    // conditional's grain is set by the truths' least share. The section's code reads the truth's surprise from the
+    // energies' own logarithms (on 2^(−32)), never from the released share, so a truth whose share released to zero is
+    // charged its actual surprise there; its share enters the acceptance's statistics.
+    if let Some(at) = truth {
+        match shares[at] {
+            0 => crate::number::census::tally("conditional: places whose truth's share released to zero", 1),
+            1 => crate::number::census::tally("conditional: places whose truth's share is one unit of 2^-24", 1),
+            2 => crate::number::census::tally("conditional: places whose truth's share is two units of 2^-24", 1),
+            _ => {}
+        }
+        crate::number::census::reach("conditional: the deepest truth share's places below one, on 2^-24", &i128::from(MATERIAL_BITS + 1 - (128 - shares[at].max(1).leading_zeros())));
+    }
     let floor = -((MATERIAL_BITS as i128 - 1) << MATERIAL_BITS);
     for ell in ells {
         if ell <= floor {
@@ -5434,7 +5447,9 @@ pub struct FieldLearner {
     /// grain), its carried remainder added, and released to the grain, the new remainder (`|r| ≤ 2^23`) carried to the next
     /// deposit; so sub-grain deposits add up in the low places and carry into the grain instead of releasing to zero each
     /// section (moment_face, pair_c, and the nine families whose every step released to zero, the width census of
-    /// November 8). A restart carries it.
+    /// November 8). A restart carries it. [declared tolerance; theory, November 8 03:32] The carry's own grain, `2^(−24)`
+    /// of the family's grain, is a pick: below it each deposit drops under two units, one-sided, so a grain moves on
+    /// that part only after about `2^22` deposits.
     pub carried: Option<Vec<i64>>,
     /// [measurement; theory, November 7 23:47] Whether a full conditional section also reads the letters' coin's measure
     /// ([`CoinMeasure`]): its forward read timed beside its material read, and each tolerance's cost and variance.
@@ -6618,7 +6633,7 @@ impl FieldLearner {
                     .collect::<Result<_>>()?;
                 let z: i128 = w.iter().sum();
                 let p: Vec<i128> = w.iter().map(|&x| div_nearest(x << MATERIAL_BITS, z.max(1))).collect();
-                census_conditional_place(logs.iter().map(|&l| l >> (ENERGY_BITS - MATERIAL_BITS)), &p, &f.fine)?;
+                census_conditional_place(logs.iter().map(|&l| l >> (ENERGY_BITS - MATERIAL_BITS)), &p, Some(at), &f.fine)?;
                 let mt = &reads[at].as_ref().ok_or(TowerError::Refused("a conditional place whose truth was not read"))?.0;
                 if self.coin_measure && coin.is_none() {
                     measure.places += 1;

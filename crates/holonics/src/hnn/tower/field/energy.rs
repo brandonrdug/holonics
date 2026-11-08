@@ -2096,7 +2096,12 @@ impl Field {
     /// region with no tick count, at most `most` ticks, each tick's halvings, fall and slack `2R + 2` (both on `2^(−32)`), and
     /// why it ended: whether the ticks' need `K` is a pick, and whether the energy's grain decides where the descent rests
     /// (falls near rest come down to the slack) or not. The same law as [`Field::energy_relax`]'s loop, keeping no trail.
-    pub fn energy_rest_read(&self, region: &Region, most: usize) -> Result<EnergyRest> {
+    ///
+    /// [measurement; theory, November 8 03:32] With `rebase`, each lane is re-based after each tick to its opening scale,
+    /// `x_ℓ ← s⁰_ℓ·r̂_ℓ`: Φ reads a lane only through its direction, so the scale lies in the kernel of every reading of
+    /// Φ, and each tick otherwise multiplies it by `√(1 + 2η·mean(r̂F) + η²·mean(F²)) > 1`; each tick reports the lanes'
+    /// largest scale's top place before the re-base and the change of Φ the re-base makes (the chart's release).
+    pub fn energy_rest_read(&self, region: &Region, most: usize, rebase: bool) -> Result<EnergyRest> {
         let (faces, locked) = self.energy_sites(region);
         let region = &Region { faces: &faces, locked: &locked, ..*region };
         self.admit_region(region)?;
@@ -2122,7 +2127,17 @@ impl Field {
         let classes = self.energy_classes(&read0, &moment, &definite, &keyed, &reaches)?;
         let held = Held { letters, moment, moment_term, classes, definite };
         let mut cell = self.energy_cell(&x, &held, &paces, &reaches, window.as_deref())?;
-        let mut out = EnergyRest { opening: cell.phi, last: cell.phi, ticks: Vec::new(), ended: RestEnd::Most };
+        let lanes = d.lanes;
+        let lane_width = dw / lanes;
+        let scale_top = |x: &[i64]| -> Result<u32> {
+            let mut top = 0u32;
+            for lane in x.chunks_exact(lane_width) {
+                let (_, s) = ratio_to_power(lane)?;
+                top = top.max(128 - s.unsigned_abs().leading_zeros());
+            }
+            Ok(top)
+        };
+        let mut out = EnergyRest { opening: cell.phi, last: cell.phi, opening_scale_top: scale_top(&x)?, ticks: Vec::new(), ended: RestEnd::Most };
         let mut first = FIRST_HALVINGS;
         for _ in 0..most {
             // A refusal ends the read where it happened (its tick and the state's top place there), never the whole read.
@@ -2149,7 +2164,25 @@ impl Field {
                 let slack = (cell.logs + candidate.logs) as i128 + 2;
                 last_slack = slack;
                 if candidate.phi + slack <= cell.phi {
-                    out.ticks.push(RestTick { halvings: h, fall: cell.phi - candidate.phi, slack });
+                    let fall = cell.phi - candidate.phi;
+                    let top = scale_top(&next).unwrap_or(u32::MAX);
+                    let (next, candidate, rebase_change) = if rebase {
+                        // Each lane back to its opening scale: its direction kept, released to the state's grain.
+                        let mut based = Vec::with_capacity(next.len());
+                        for (k, lane) in next.chunks_exact(lane_width).enumerate() {
+                            let (r, _) = ratio_to_power(lane)?;
+                            let s0 = scale0[k];
+                            for &rk in &r {
+                                based.push(fit64(release(s0 * rk as i128, FACE_BITS))?);
+                            }
+                        }
+                        let based_cell = self.energy_cell(&based, &held, &paces, &reaches, window.as_deref())?;
+                        let change = based_cell.phi - candidate.phi;
+                        (based, based_cell, change)
+                    } else {
+                        (next, candidate, 0)
+                    };
+                    out.ticks.push(RestTick { halvings: h, fall, slack, scale_top: top, rebase_change });
                     x = next;
                     cell = candidate;
                     stood = Some(h);
@@ -2181,16 +2214,21 @@ impl Field {
 pub struct EnergyRest {
     pub opening: i128,
     pub last: i128,
+    /// The lanes' largest scale's top place at the opening (on the state's grain).
+    pub opening_scale_top: u32,
     pub ticks: Vec<RestTick>,
     pub ended: RestEnd,
 }
 
-/// One tick that stood: its halvings, its fall and the slack it fell past, on `2^(−32)`.
+/// One tick that stood: its halvings, its fall and the slack it fell past (on `2^(−32)`), the lanes' largest scale's top
+/// place after the step, and the change of Φ the re-base made (zero without it).
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct RestTick {
     pub halvings: u32,
     pub fall: i128,
     pub slack: i128,
+    pub scale_top: u32,
+    pub rebase_change: i128,
 }
 
 /// Why a descent ended: at the read's most ticks, a step below the state's grain at every halving left, no fall past the
