@@ -4000,15 +4000,36 @@ fn enumerated_read(field: &Field, held: &Problems, places: usize, truth_of: &dyn
 /// question's length.
 type HeldPlaces = Vec<(usize, Vec<usize>, usize, usize)>;
 
+/// [definition; theory, November 8 13:13] Past one place a held problem, the rest of `places` are drawn per letter: every held
+/// answer place but the problems' own keyed ones, in a keyed order, without replacement, so they weigh the held problems by
+/// answer length as the stream does. The first `held.len()` places of a read stay one a problem, continuous with every read
+/// before; the rows keep that order.
 fn enumerated_places(held: &Problems, places: usize, truth_of: &dyn Fn(&(Vec<usize>, Vec<usize>, usize), &[usize]) -> Vec<usize>) -> HeldPlaces {
-    held.iter()
+    let mut chosen: HeldPlaces = held
+        .iter()
         .take(places)
         .enumerate()
         .map(|(k, p)| {
             let t = p.0.len() + (mix(ENUMERATED_KEY, k as u64) as usize) % p.1.len();
             (k, truth_of(p, &p.1), t, p.0.len())
         })
-        .collect()
+        .collect();
+    if places > chosen.len() {
+        let first: std::collections::BTreeSet<(usize, usize)> = chosen.iter().map(|(k, _, t, _)| (*k, *t)).collect();
+        let mut letters: Vec<(u64, usize, usize)> = held
+            .iter()
+            .enumerate()
+            .flat_map(|(k, p)| (0..p.1.len()).map(move |j| (k, p.0.len() + j)))
+            .filter(|key| !first.contains(key))
+            .map(|(k, t)| (mix(ENUMERATED_KEY ^ 0x1E77_E5, ((k as u64) << 32) | t as u64), k, t))
+            .collect();
+        letters.sort_unstable();
+        for &(_, k, t) in letters.iter().take(places - chosen.len()) {
+            let p = &held[k];
+            chosen.push((k, truth_of(p, &p.1), t, p.0.len()));
+        }
+    }
+    chosen
 }
 
 /// [`enumerated_read`]'s rows at `chosen` (each line `lap`-marked), read through `realization`.
