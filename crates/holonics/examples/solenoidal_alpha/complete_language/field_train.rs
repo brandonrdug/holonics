@@ -3847,6 +3847,7 @@ struct Leg {
     letters: Vec<i128>,
     bands: Vec<usize>,
     kl: i128,
+    face_code: i128,
     truth_p: i128,
     places: usize,
     steps: Vec<i128>,
@@ -3855,7 +3856,7 @@ struct Leg {
 
 impl Leg {
     fn new(field: &Field) -> Self {
-        Self { coherence: Coherence::new(field), letters: Vec::new(), bands: Vec::new(), kl: 0, truth_p: 0, places: 0, steps: vec![0; field.families_all().len()], sections: 0 }
+        Self { coherence: Coherence::new(field), letters: Vec::new(), bands: Vec::new(), kl: 0, face_code: 0, truth_p: 0, places: 0, steps: vec![0; field.families_all().len()], sections: 0 }
     }
     fn add(&mut self, field: &Field, r: &holonics::hnn::tower::field::KernelReceipt, before: &[i32]) {
         self.coherence.add(&r.covector);
@@ -3872,7 +3873,7 @@ impl Leg {
         for (a, &c) in self.bands.iter_mut().zip(&r.surprise_bands) {
             *a += c;
         }
-        (self.kl, self.truth_p, self.places) = (self.kl + r.kl_face, self.truth_p + r.weight, self.places + r.places);
+        (self.kl, self.face_code, self.truth_p, self.places) = (self.kl + r.kl_face, self.face_code + r.face_code, self.truth_p + r.weight, self.places + r.places);
         for (slot, &(start, len, _)) in self.steps.iter_mut().zip(field.families_all().iter()) {
             *slot += (start..start + len).map(|i| (field.theta[i] as i128 - before[i] as i128).abs()).sum::<i128>();
         }
@@ -3892,7 +3893,7 @@ impl Leg {
             .filter(|&(f, &s)| f.1 > 0 && s > 0)
             .map(|(&(start, len, _), &s)| format!("{}={}", names.iter().find(|&&(_, at)| at == start).map_or("?", |&(n, _)| n), s * 1000 / (len as i128 * self.sections.max(1) as i128)))
             .collect();
-        println!("FIELD_LEG lap={lap} {what} sections={at} legsections={} places={} truth_p_milli={} kl_face_milli_nats={}", self.sections, self.places, self.truth_p * 1000 / (unit * places), self.kl * LN2_Q30 / places * 1000 >> 62);
+        println!("FIELD_LEG lap={lap} {what} sections={at} legsections={} places={} truth_p_milli={} kl_face_milli_nats={} face_code_milli_nats={}", self.sections, self.places, self.truth_p * 1000 / (unit * places), self.kl * LN2_Q30 / places * 1000 >> 62, self.face_code * LN2_Q30 / places * 1000 >> 62);
         println!("FIELD_LEG_COHERENCE lap={lap} {what} n={} {}", self.coherence.n, self.coherence.text(field));
         println!("FIELD_LEG_LETTERS lap={lap} {what} truth_count_less_mass_milli {}", top.join(" "));
         println!("FIELD_LEG_BANDS lap={lap} {what} {}", bands.join(" "));
