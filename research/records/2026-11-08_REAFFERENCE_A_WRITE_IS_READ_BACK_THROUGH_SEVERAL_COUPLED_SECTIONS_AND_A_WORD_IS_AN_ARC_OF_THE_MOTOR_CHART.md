@@ -128,3 +128,33 @@ a signature is a face, the pairing of the thing with the receiver that reads it.
 - The near locks (0 < |i − j| < NEAR) are the field's close-range gaps, its taste, smell and touch; the moments are its
   far rods.
 - The fork is unchanged.
+
+## 7. Theory's scoring (November 8 15:42 and 15:45)
+
+- The calibration blinds. The open face's w sits in 0.85–1.0 with Cov < 0 (0.915, 0.931, 0.933), and the carried face's
+  w passes 1.2 with Cov > 0 (1.38, 1.36, 1.42): both hold, so the earlier split of w was the face alone. The 384 held
+  places' code − H sits within 0.1 of the stream's (−0.100 against −0.110): holds. The 128's predicted 0.15–0.3 under
+  the stream missed (0.106). The eight answers' joint − conditional, predicted near 1.0 nat a place, missed: 3.54 at
+  section 100 against 2.881, a gap of 0.66.
+- [measured] Law D shows no train/held split at this resolution: the 384 per letter against the stream codes 2.758
+  against 2.715 (+0.04 ± 0.1), code − H −0.100 against −0.110, and carried w 1.36 against 1.38.
+- [derived] The open face's w has sat at 0.92–0.94 from section 0 to 179. On the 384 its Newton step g_w is 0.255
+  against SE √(Var f / N) = 0.098, z 2.6, the first past 2 SE: the response beyond first order runs about 7% strong on
+  held letters, worth 0.009 nats a place. [decided] No step, family or stream read is built for it; it is recorded here
+  as the conditional's standing calibration.
+- [derived; its form an inference] From the open face to the carried one, the code at the truth rises 0.58, 0.38 and
+  0.69 nats: carrying a letter lowers the place's own face at it, its reafference read as afference (§1). The release
+  reads each place's face while that place carries its own mixture, so its fixed point q = p(q), stationary for
+  G(q)/T − H(q), keeps that self-reaction; the mean field's E_q[G]/T − H(q) is linear in each place's own mixture and has
+  none. Each mixture is then pushed off the letters it favours and the release starts flat. The fresh-writes fork's lag
+  answers whether that matters at these lengths: sweep 2 already sits at the level and sweep 4 sits above sweep 3
+  (+9 and +15 milli at sections 179 and 180), so four sweeps wash the start out. [decided] The release stays, and its
+  self-reaction is recorded beside the carried face.
+- [measured] Section 179's sixteen fresh writes hold the text blind of section 0: letter soup at the writer's mix, with no
+  word of the corpus past chance, no code fence, and repeats within chance for their skewed mix. 84% of the corpus's
+  answers (20,791 of 24,813) open with the same ten letters, a fence and a line break; no write opens with any of it.
+  [inference] At T the field's joint carries no answer opening, while its conditional at truth contexts reads context
+  (2.7–2.9 nats a place against about 3.4 for letters alone); the opening is the fresh deposit's most consistent term.
+- Blind set before the end read [guess]: by the fork's last section at least 4 of its 16 writes carry a backtick in
+  their first three places. Backticks are 1.75% of the corpus's letters, so chance gives 0.8 of 16, and 4 or more about
+  1% of the time: the opening forms before interior pairs recur past chance.
