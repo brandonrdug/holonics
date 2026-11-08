@@ -2843,6 +2843,9 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
     // writes (lap 13's law) instead of a kernel step from the truth.
     let persistent = std::env::var_os("FIELD_CONTRAST_PERSISTENT").is_some();
     let conditional = std::env::var_os("FIELD_CONTRAST_CONDITIONAL").is_some();
+    // [measurement; theory, November 8 11:10] `FIELD_CONTRAST_READ_ONLY`: each section is read and its learner put back as it
+    // opened, so every section's code is read at the opening state and nothing is deposited (the family split's reads).
+    let read_only = std::env::var_os("FIELD_CONTRAST_READ_ONLY").is_some();
     // [definition; the unified-theory reading of November 7, 21:58] `FIELD_CONTRAST_AVERAGE`: the averaged constitution moves
     // each section (`FieldLearner::average_section`) and every held read reads it; the live field keeps stepping.
     let averaging = std::env::var_os("FIELD_CONTRAST_AVERAGE").is_some();
@@ -3330,6 +3333,7 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
                 let key = mix(seed ^ 0xC0_7A57 << 40, read << 32 | n as u64);
                 // [measurement; theory, November 7 21:44] The section's step, `Σ |Δθ|` a family on its grain over its entries.
                 let theta_before = learner.field.theta.clone();
+                let frozen = read_only.then(|| learner.clone());
                 // [the unified-theory reading of November 7, 07:40] Each problem's truth formed once for all its blocks.
                 // [definition; the unified-theory reading of November 7, 20:29, law (D)] `FIELD_CONTRAST_CONDITIONAL`: each block place
                 // deposits against its whole conditional (`FieldLearner::section_conditional`), no proposal and no coin; its
@@ -3496,7 +3500,10 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
                     println!("FIELD_STEP lap={lap} n={n} {}", text.join(" "));
                 }
                 leg.add(&learner.field, &receipt, &theta_before);
-                if averaging {
+                if let Some(opening) = &frozen {
+                    learner.clone_from(opening);
+                }
+                if averaging && frozen.is_none() {
                     learner.average_section();
                 }
                 if let Some(h) = &host_held {
