@@ -2324,7 +2324,7 @@ impl Field {
                     let slack = (cell.logs + candidate.logs) as i128 + 2;
                     // Why a swing tick would release: the band guard's ratio (milli) and whether Q fell past the slack.
                     let note = if !inside { 1 } else if q_next + slack > q_now { 2 } else { 0 };
-                    out.tries.push(RestTry { tick, halvings: hs, fall: q_now - q_next, claim, slack, note, guard_milli: if rhs > 0 { lhs * 1000 / rhs } else { 0 }, split: [0; 8] });
+                    out.tries.push(RestTry { tick, halvings: hs, fall: q_now - q_next, claim, slack, note, guard_milli: if rhs > 0 { lhs * 1000 / rhs } else { 0 }, split: [0; 10] });
                     if inside && q_next + slack <= q_now {
                         out.ticks.push(RestTick { halvings: hs, fall: q_now - q_next, slack, scale_top: 0, rebase_change: cell.phi - candidate.phi, claim, rho_nonpositive, rho_least, rho_median, rho_top, radial_least, radial_median, radial_top, gaps, swing: true });
                         last_q = Some((candidate.phi, work(&cand_force, &v_new) / 2, ((1 << 16) + mu) * kinetic(&v_new) >> 18));
@@ -2397,9 +2397,25 @@ impl Field {
                     }
                     let (radial_rose, radial_rest, tangential) = (release(radial_rose, 8), release(radial_rest, 8), release(tangential, 8));
                     let residual = tried - (radial_rose + radial_rest + tangential);
+                    // [measurement] Where the try raised Φ, the same move mirrored, x − Δ: the second difference
+                    // Φ(x + Δ) + Φ(x − Δ) − 2Φ(x) is the curvature along the move (ΔᵀHΔ, the same for both signs), and what
+                    // the residual has beyond it is Φ's own releases; with the entries of r̂ whose mirrored move is not −Δr̂.
+                    let (second, unmirrored) = if tried < 0 {
+                        let mirrored: Vec<i64> = x.iter().zip(&next).map(|(&a, &b)| 2 * a - b).collect();
+                        match self.energy_cell(&mirrored, &held, &paces, &reaches, window.as_deref()) {
+                            Ok(m) => {
+                                let off = cell.read.iter().zip(&candidate.read).zip(&m.read)
+                                    .filter(|((a, b), c)| (**c as i128 - **a as i128) != -(**b as i128 - **a as i128)).count() as i128;
+                                (candidate.phi + m.phi - 2 * cell.phi, off)
+                            }
+                            Err(_) => (0, -1),
+                        }
+                    } else {
+                        (0, 0)
+                    };
                     out.tries.push(RestTry {
                         tick, halvings: h, fall: tried, claim, slack, note: 0, guard_milli: 0,
-                        split: [radial_rose, radial_rest, tangential, residual, rose, fell, rebased, moved],
+                        split: [radial_rose, radial_rest, tangential, residual, rose, fell, rebased, moved, second, unmirrored],
                     });
                 }
                 let half_passes = 2 * tried >= claim;
@@ -2524,8 +2540,10 @@ pub struct RestTry {
     pub guard_milli: i128,
     /// [measurement] A flow try's fall split against ⟨F, Δr̂⟩ (theory, November 8 10:28), on Φ's `2^(−32)`: the radial
     /// part in lanes whose scale rose, the radial part in the rest, the tangential part, the residual; then the counts of
-    /// lanes whose scale rose, fell or were changed by the re-base, and of r̂'s entries that moved.
-    pub split: [i128; 8],
+    /// lanes whose scale rose, fell or were changed by the re-base, and of r̂'s entries that moved; where the try raised Φ,
+    /// the second difference along the move mirrored, `Φ(x + Δ) + Φ(x − Δ) − 2Φ(x)`, and the entries of r̂ whose mirrored
+    /// move is not `−Δr̂`.
+    pub split: [i128; 10],
 }
 
 /// One tick that stood: its halvings, its fall and the slack it fell past (on `2^(−32)`), the lanes' largest scale's top
