@@ -4973,17 +4973,6 @@ fn conditional_shares(gs: &[i128], inverse: i128, fine: &Exponential) -> Result<
             if ell >= 0 {
                 Ok(1i128 << MATERIAL_BITS)
             } else if ell <= -((MATERIAL_BITS as i128 - 1) << MATERIAL_BITS) {
-                // The width census's read (b): a letter whose weight releases to zero below 2^(−23), and its weight before
-                // the release on 2^(−32) (eight places finer), the mass the grain drops.
-                if crate::number::census::enabled() {
-                    crate::number::census::tally(CENSUS_RELEASED, 1);
-                    let finer = ell + (8i128 << MATERIAL_BITS);
-                    if finer > -((MATERIAL_BITS as i128 - 1) << MATERIAL_BITS) {
-                        let mass = temperature_of(finer as i32, fine)?;
-                        crate::number::census::tally(CENSUS_RELEASED_MASS, mass as u64);
-                        crate::number::census::reach(CENSUS_RELEASED_MASS_MOST, &mass);
-                    }
-                }
                 Ok(0)
             } else {
                 temperature_of(ell as i32, fine)
@@ -4992,16 +4981,36 @@ fn conditional_shares(gs: &[i128], inverse: i128, fine: &Exponential) -> Result<
         .collect::<Result<_>>()?;
     let z: i128 = w.iter().sum();
     let shares: Vec<i128> = w.iter().map(|&x| div_nearest(x << MATERIAL_BITS, z.max(1))).collect();
-    if crate::number::census::enabled() {
-        crate::number::census::tally(CENSUS_PLACES, 1);
-        // The least nonzero share's depth below one on 2^(−24): its places under the unit, the census's largest the deepest.
-        if let Some(least) = shares.iter().copied().filter(|&p| p > 0).min() {
-            let depth = i128::from(MATERIAL_BITS + 1 - (128 - least.leading_zeros()));
-            crate::number::census::reach(CENSUS_LEAST_SHARE_DEPTH, &depth);
-        }
-        crate::number::census::tally(CENSUS_ZERO_SHARES, shares.iter().filter(|&&p| p == 0).count() as u64);
-    }
+    census_conditional_place(gs.iter().map(|&gv| release((lo - gv) * inverse, MATERIAL_BITS) >> (ENERGY_BITS - MATERIAL_BITS)), &shares, fine)?;
     Ok(shares)
+}
+
+/// The width census's read (b) at one place of a conditional: each letter whose weight released to zero below
+/// `2^(−23)` and its weight before the release on `2^(−32)` (eight places finer), the mass the grain drops; the least
+/// nonzero share's places below one; the letters whose share released to zero. Nothing is changed.
+fn census_conditional_place(ells: impl Iterator<Item = i128>, shares: &[i128], fine: &Exponential) -> Result<()> {
+    if !crate::number::census::enabled() {
+        return Ok(());
+    }
+    crate::number::census::tally(CENSUS_PLACES, 1);
+    let floor = -((MATERIAL_BITS as i128 - 1) << MATERIAL_BITS);
+    for ell in ells {
+        if ell <= floor {
+            crate::number::census::tally(CENSUS_RELEASED, 1);
+            let finer = ell + (8i128 << MATERIAL_BITS);
+            if finer > floor {
+                let mass = temperature_of(finer as i32, fine)?;
+                crate::number::census::tally(CENSUS_RELEASED_MASS, mass as u64);
+                crate::number::census::reach(CENSUS_RELEASED_MASS_MOST, &mass);
+            }
+        }
+    }
+    if let Some(least) = shares.iter().copied().filter(|&p| p > 0).min() {
+        let depth = i128::from(MATERIAL_BITS + 1 - (128 - least.leading_zeros()));
+        crate::number::census::reach(CENSUS_LEAST_SHARE_DEPTH, &depth);
+    }
+    crate::number::census::tally(CENSUS_ZERO_SHARES, shares.iter().filter(|&&p| p == 0).count() as u64);
+    Ok(())
 }
 
 /// The width census's deposit sites, one name a family and kind: a step's lowest set bit 0 to 7 and 8 or more (0–8), a
@@ -6539,6 +6548,7 @@ impl FieldLearner {
                     .collect::<Result<_>>()?;
                 let z: i128 = w.iter().sum();
                 let p: Vec<i128> = w.iter().map(|&x| div_nearest(x << MATERIAL_BITS, z.max(1))).collect();
+                census_conditional_place(logs.iter().map(|&l| l >> (ENERGY_BITS - MATERIAL_BITS)), &p, &f.fine)?;
                 let mt = &reads[at].as_ref().ok_or(TowerError::Refused("a conditional place whose truth was not read"))?.0;
                 if self.coin_measure && coin.is_none() {
                     measure.places += 1;
@@ -6763,7 +6773,7 @@ impl FieldLearner {
 mod energy;
 pub mod moment;
 mod scale;
-pub use energy::{EnergyPairKinds, EnergyRead, EnergySquare, EnergyTangentRead, SquareCorners, ENERGY_BITS, FIRST_HALVINGS, MOST_HALVINGS};
+pub use energy::{EnergyPairKinds, EnergyRead, EnergyRest, RestEnd, RestTick, EnergySquare, EnergyTangentRead, SquareCorners, ENERGY_BITS, FIRST_HALVINGS, MOST_HALVINGS};
 pub use scale::Scale;
 
 #[cfg(test)]

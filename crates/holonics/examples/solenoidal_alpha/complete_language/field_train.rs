@@ -3015,6 +3015,33 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
             let none = vec![false; truth.len()];
             let region = Region { classes: &truth, unresolved: &none, faces: &[], locked: &[], echo: &[], domain: None, port: None };
             let t = std::time::Instant::now();
+            // `FIELD_CENSUS_REST=MOST` (theory, November 8 02:56): the descent read to rest instead, at most MOST ticks, each
+            // tick's halvings, fall and slack on 2^(−32).
+            if let Ok(most) = std::env::var("FIELD_CENSUS_REST") {
+                let most: usize = most.parse().map_err(|_| "FIELD_CENSUS_REST is a count of ticks".to_string())?;
+                let rest = learner.field.energy_rest_read(&region, most).map_err(|e| e.to_string())?;
+                for (k, tick) in rest.ticks.iter().enumerate() {
+                    println!(
+                        "FIELD_REST_TICK problem={i} tick={k} halvings={} fall={} fall_bits={} slack={} fall_over_slack_milli={}",
+                        tick.halvings,
+                        tick.fall,
+                        128 - tick.fall.unsigned_abs().leading_zeros(),
+                        tick.slack,
+                        tick.fall * 1000 / tick.slack.max(1)
+                    );
+                }
+                println!(
+                    "FIELD_REST problem={i} sites={} ticks={} ended={:?} opening={} last={} fall={} ms={}",
+                    truth.len(),
+                    rest.ticks.len(),
+                    rest.ended,
+                    rest.opening,
+                    rest.last,
+                    rest.opening - rest.last,
+                    t.elapsed().as_millis()
+                );
+                continue;
+            }
             let (_, g) = learner.field.energy_material(&region).map_err(|e| e.to_string())?;
             println!("FIELD_CENSUS_RELAX problem={i} sites={} g={g} ms={}", truth.len(), t.elapsed().as_millis());
         }

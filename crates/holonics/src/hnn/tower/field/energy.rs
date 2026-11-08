@@ -2091,6 +2091,99 @@ impl Field {
         }
         Ok(self.energy_pass(region)?.1)
     }
+
+    /// [measurement; theory, November 8 02:56] **The descent read to rest**: the relaxation of [`Field::energy_material`]'s
+    /// region with no tick count, at most `most` ticks, each tick's halvings, fall and slack `2R + 2` (both on `2^(−32)`), and
+    /// why it ended: whether the ticks' need `K` is a pick, and whether the energy's grain decides where the descent rests
+    /// (falls near rest come down to the slack) or not. The same law as [`Field::energy_relax`]'s loop, keeping no trail.
+    pub fn energy_rest_read(&self, region: &Region, most: usize) -> Result<EnergyRest> {
+        let (faces, locked) = self.energy_sites(region);
+        let region = &Region { faces: &faces, locked: &locked, ..*region };
+        self.admit_region(region)?;
+        let d = &self.declaration;
+        if self.scale.is_some() || !d.energy {
+            return refuse("a rest read of a field without one energy");
+        }
+        let (dw, sites) = (d.width, region.classes.len());
+        let reaches = self.reaches();
+        let paces = self.paces(region)?;
+        if paces.plain.iter().any(|&p| !p) {
+            return refuse("a rest read with a clock that is not plain");
+        }
+        let (letters, moment, moment_term) = self.energy_letters_of(region, &paces, &reaches)?;
+        let mut x = self.open(region, &moment)?;
+        let definite: Vec<bool> = (0..sites).map(|t| Self::definite(region, t)).collect();
+        let keyed: Vec<bool> = (0..sites).map(|t| !region.unresolved[t] || Self::carried(region, t).is_some()).collect();
+        let window = region.window(d.ticks);
+        let (mut read0, mut scale0) = (Vec::with_capacity(sites * dw), Vec::with_capacity(sites * d.lanes));
+        for xt in x.chunks_exact(dw) {
+            lane_chart(xt, d.lanes, &mut read0, &mut scale0)?;
+        }
+        let classes = self.energy_classes(&read0, &moment, &definite, &keyed, &reaches)?;
+        let held = Held { letters, moment, moment_term, classes, definite };
+        let mut cell = self.energy_cell(&x, &held, &paces, &reaches, window.as_deref())?;
+        let mut out = EnergyRest { opening: cell.phi, last: cell.phi, ticks: Vec::new(), ended: RestEnd::Most };
+        let mut first = FIRST_HALVINGS;
+        for _ in 0..most {
+            let (force, _) = self.energy_force(&cell, &held, &paces, &reaches)?;
+            let (mut stood, mut below_grain, mut last_slack) = (None, false, 0i128);
+            let mut h = first;
+            while h <= MOST_HALVINGS {
+                let next = self.energy_step(&x, &cell.scale, &force, h)?;
+                if next == x {
+                    below_grain = true;
+                    break;
+                }
+                let candidate = self.energy_cell(&next, &held, &paces, &reaches, window.as_deref())?;
+                let slack = (cell.logs + candidate.logs) as i128 + 2;
+                last_slack = slack;
+                if candidate.phi + slack <= cell.phi {
+                    out.ticks.push(RestTick { halvings: h, fall: cell.phi - candidate.phi, slack });
+                    x = next;
+                    cell = candidate;
+                    stood = Some(h);
+                    break;
+                }
+                h += 1;
+            }
+            match stood {
+                Some(h) => first = h.saturating_sub(1),
+                None => {
+                    out.ended = if below_grain { RestEnd::BelowGrain } else { RestEnd::InsideSlack { slack: last_slack } };
+                    break;
+                }
+            }
+        }
+        out.last = cell.phi;
+        Ok(out)
+    }
+}
+
+/// [measurement] A descent read to rest ([`Field::energy_rest_read`]).
+#[derive(Clone, Debug, Default, PartialEq, Eq)]
+pub struct EnergyRest {
+    pub opening: i128,
+    pub last: i128,
+    pub ticks: Vec<RestTick>,
+    pub ended: RestEnd,
+}
+
+/// One tick that stood: its halvings, its fall and the slack it fell past, on `2^(−32)`.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct RestTick {
+    pub halvings: u32,
+    pub fall: i128,
+    pub slack: i128,
+}
+
+/// Why a descent ended: at the read's most ticks, a step below the state's grain at every halving left, or no fall past
+/// the slack by `MOST_HALVINGS` (the last slack read).
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub enum RestEnd {
+    #[default]
+    Most,
+    BelowGrain,
+    InsideSlack { slack: i128 },
 }
 
 /// [measurement; theory, November 7 23:05] A region's pairs by kind ([`Field::energy_pair_kinds`]), summed over its heads.
