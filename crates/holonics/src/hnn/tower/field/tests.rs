@@ -2812,7 +2812,8 @@ fn the_width_laws_lists_split_only_past_the_share() {
     let plain = ClassLists::of(keys.iter().map(|w| base(w)).collect(), definite.clone(), 81)
         .probing(probes_of.iter().map(|w| base(w)).collect(), probes_of.iter().map(|w| probes(w[..b].iter().copied(), band_bits(b))).collect());
     assert_eq!(leaves, 81);
-    assert_eq!(wide, plain);
+    // The crossings are the width law's own reading (zero in `of`); the lists themselves are the plain ones.
+    assert_eq!(ClassLists { crossings: plain.crossings.clone(), ..wide.clone() }, plain);
     let cap = 10;
     let (narrow, leaves) = ClassLists::widened(&keys, &probes_of, definite.clone(), b, cap);
     assert!(leaves > 81, "a crowded class splits");
