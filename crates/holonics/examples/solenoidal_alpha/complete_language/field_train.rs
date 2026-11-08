@@ -2447,6 +2447,53 @@ pub(super) fn depth_field(args: &[String]) -> Result<()> {
     Ok(())
 }
 
+/// **`census-field FROM FROM_SHA TO TO_SHA`** (the width census's read (a), theory November 8): for each material family of
+/// the later state, its declared grain, the top place its largest `|θ|` occupies beside the 31 an `i32` holds, the bottom place
+/// any entry moved by between the two states (the trailing zeros of the least-moved difference), how many entries moved, how
+/// many sit at zero, how many were released to zero and how many founded from it; and the averaged constitution's top place
+/// beside its 39 (an `i64` eight places finer than `θ`'s `i32`). A reading of the constitution only: no face is read and nothing runs.
+pub(super) fn census_field(args: &[String]) -> Result<()> {
+    if args.len() != 5 {
+        return Err("census-field FROM FROM_SHA TO TO_SHA".into());
+    }
+    let from = FieldLearner::from_text(std::str::from_utf8(&pinned_read(&args[1], &args[2], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
+    let to = FieldLearner::from_text(std::str::from_utf8(&pinned_read(&args[3], &args[4], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
+    if from.field.theta.len() != to.field.theta.len() || from.field.families() != to.field.families() {
+        return Err("census-field: the two states lay out different materials".into());
+    }
+    // The layout's families in the order `FieldLayout::new` pushes them.
+    const NAMES: [&str; 28] = [
+        "enc", "before", "after", "q", "q_bias", "v", "v_bias", "out", "out_bias", "a", "a_bias", "b", "b_bias", "w", "w_bias", "read", "read_bias",
+        "moment_before", "moment_after", "temper", "probe", "probe_bias", "pace", "moment_face", "moment_face_bias", "lift_bias", "pair_c", "face_temper",
+    ];
+    let top = |v: &[i32]| v.iter().map(|x| 32 - x.unsigned_abs().leading_zeros()).max().unwrap_or(0);
+    for (i, &(start, len, grain)) in to.field.families().iter().enumerate() {
+        let (a, b) = (&from.field.theta[start..start + len], &to.field.theta[start..start + len]);
+        let moved: Vec<u32> = a.iter().zip(b).filter(|(x, y)| x != y).map(|(x, y)| (i64::from(*y) - i64::from(*x)).trailing_zeros()).collect();
+        let bottom = moved.iter().min().map_or("-".to_string(), u32::to_string);
+        // The lowest set bit of each moved entry's change, places 0 to 7 and 8 or more, and the change's largest top place.
+        let mut hist = [0usize; 9];
+        moved.iter().for_each(|&z| hist[(z as usize).min(8)] += 1);
+        let step_top = a.iter().zip(b).map(|(x, y)| 64 - (i64::from(*y) - i64::from(*x)).unsigned_abs().leading_zeros()).max().unwrap_or(0);
+        let name = NAMES.get(i).copied().unwrap_or("?");
+        let zeros = b.iter().filter(|&&x| x == 0).count();
+        let released = a.iter().zip(b).filter(|(x, y)| **x != 0 && **y == 0).count();
+        let founded = a.iter().zip(b).filter(|(x, y)| **x == 0 && **y != 0).count();
+        let avg = to.average.as_ref().map_or("-".to_string(), |v| {
+            let t = v[start..start + len].iter().map(|x| 64 - x.unsigned_abs().leading_zeros()).max().unwrap_or(0);
+            format!("{t}/39")
+        });
+        let hist: Vec<String> = hist.iter().map(usize::to_string).collect();
+        println!(
+            "FIELD_CENSUS family={i}:{name} len={len} grain={grain} top={}/31 moved={} bottom_moved={bottom} lowest_bit_hist={} change_top={step_top} zeros={zeros} released={released} founded={founded} average_top={avg}",
+            top(b),
+            moved.len(),
+            hist.join(",")
+        );
+    }
+    Ok(())
+}
+
 pub(super) fn ring_field(args: &[String]) -> Result<()> {
     if args.len() != 5 {
         return Err("ring-field STATE STATE_SHA DEPTH OUT".into());
