@@ -2153,8 +2153,38 @@ impl Field {
         };
         let mut out = EnergyRest { opening: cell.phi, last: cell.phi, opening_scale_top: scale_top(&x)?, ticks: Vec::new(), tries: Vec::new(), ended: RestEnd::Most };
         let mut first = FIRST_HALVINGS;
-        let flowing = matches!(mode, RestMode::Flow | RestMode::Line | RestMode::Projected | RestMode::PerLane);
-        let lined = matches!(mode, RestMode::Line | RestMode::Projected | RestMode::PerLane);
+        let swinging = matches!(mode, RestMode::SwingProjected | RestMode::SwingPerLane);
+        let projected = matches!(mode, RestMode::Projected | RestMode::PerLane) || swinging;
+        let per_lane = matches!(mode, RestMode::PerLane | RestMode::SwingPerLane);
+        let flowing = matches!(mode, RestMode::Flow | RestMode::Line) || projected;
+        let lined = matches!(mode, RestMode::Line) || projected;
+        // The swing (theory, November 8 06:40): the motion v that brought x (on the state's grain), held across ticks at a
+        // held η, and its μ on 2^(−16): μ = (1 − √(ηλ_soft))², ηλ_soft = 1 − 2^(r/2) from the first-order gap rate r a tick
+        // the projected and per-lane reads measured (−0.0068 and −0.0182), so the softest mode is critical.
+        let mu: i128 = match mode {
+            RestMode::SwingProjected => 59_310,
+            RestMode::SwingPerLane => 55_575,
+            _ => 0,
+        };
+        let mut v = vec![0i64; x.len()];
+        let mut swing_h: Option<u32> = None;
+        let rebase = |stepped: &[i64]| -> Result<Vec<i64>> {
+            let mut based = Vec::with_capacity(stepped.len());
+            for (k, lane) in stepped.chunks_exact(lane_width).enumerate() {
+                let (r, _) = ratio_to_power(lane)?;
+                for &rk in &r {
+                    based.push(fit64(release(scale0[k] * rk as i128, FACE_BITS))?);
+                }
+            }
+            Ok(based)
+        };
+        // ⟨F, v⟩ on Φ's 2^(−32): F on 2^(−24) a unit of r̂, v on the state's grain over the lane's held scale.
+        let work = |f: &[i64], vv: &[i64]| -> i128 {
+            f.chunks_exact(lane_width).zip(vv.chunks_exact(lane_width)).enumerate().map(|(k, (fl, vl))| {
+                let fv: i128 = fl.iter().zip(vl).map(|(&a, &b)| a as i128 * b as i128).sum();
+                div_nearest(fv << 8, scale0[k].max(1))
+            }).sum()
+        };
         for tick in 0..most {
             // A refusal ends the read where it happened (its tick and the state's top place there), never the whole read.
             let top = x.iter().map(|v| 64 - v.unsigned_abs().leading_zeros()).max().unwrap_or(0);
@@ -2169,6 +2199,7 @@ impl Field {
             // on F's 2^(−24), and the force a step takes: F, its tangential part F_⊥ = F − r̂⟨r̂, F⟩/W (projected), or F_⊥
             // over the lane's own rms(F) (each lane at its own unit).
             let mut rhos: Vec<i128> = Vec::with_capacity(x.len() / lane_width);
+            let mut lane_rms: Vec<i128> = Vec::with_capacity(x.len() / lane_width);
             let mut step_force = force.clone();
             if flowing {
                 for t in 0..x.len() / dw {
@@ -2179,20 +2210,20 @@ impl Field {
                         let perp = ff - release(div_nearest(rf * rf, lane_width as i128), 32);
                         let mean_rf = div_nearest(rf, lane_width as i128);
                         rhos.push(release(mean_rf, FACE_BITS));
-                        match mode {
-                            RestMode::Projected | RestMode::PerLane => {
-                                let rms = ((ff / lane_width as i128) as u128).isqrt() as i128;
-                                for i in 0..lane_width {
-                                    let fp = force[at + i] as i128 - release(cell.read[at + i] as i128 * mean_rf, 32);
-                                    step_force[at + i] = if mode == RestMode::PerLane {
-                                        if rms == 0 { 0 } else { fit64(div_nearest(fp << super::super::COVECTOR_BITS, rms))? }
-                                    } else {
-                                        fit64(fp)?
-                                    };
-                                }
-                                first_order += if mode == RestMode::PerLane { if rms == 0 { 0 } else { div_nearest(perp << 8, rms) << 16 } } else { perp };
+                        let rms = ((ff / lane_width as i128) as u128).isqrt() as i128;
+                        lane_rms.push(rms);
+                        if projected {
+                            for i in 0..lane_width {
+                                let fp = force[at + i] as i128 - release(cell.read[at + i] as i128 * mean_rf, 32);
+                                step_force[at + i] = if per_lane {
+                                    if rms == 0 { 0 } else { fit64(div_nearest(fp << super::super::COVECTOR_BITS, rms))? }
+                                } else {
+                                    fit64(fp)?
+                                };
                             }
-                            _ => first_order += perp,
+                            first_order += if per_lane { if rms == 0 { 0 } else { div_nearest(perp << 8, rms) << 16 } } else { perp };
+                        } else {
+                            first_order += perp;
                         }
                     }
                 }
@@ -2204,6 +2235,57 @@ impl Field {
                 let n = rhos.len() - pos.len();
                 if pos.is_empty() { (n, 0, 0, 0) } else { (n, rho_bits(pos[0]), rho_bits(pos[pos.len() / 2]), rho_bits(pos[pos.len() - 1])) }
             };
+            // The swing's tick: v' = μv + η F(x) (its step's force), x' = N(x + v') re-based inside, standing where
+            // Q(x, v) = Φ(x) + ½⟨F(x), v⟩ + (1 + μ)/4 Σ_ℓ |v_ℓ|²/η_ℓ falls past the slack and the band guard
+            // ⟨F(x) − F(x'), v'⟩ < 2(1 + μ) Σ_ℓ |v'_ℓ|²/η_ℓ holds; otherwise the motion is released and the tick is the flow
+            // step's, whose halvings the next swing holds.
+            if let Some(hs) = swing_h.filter(|_| swinging) {
+                // Σ_ℓ |v_ℓ|²/η_ℓ on 2^(−32): (|v|/s)² 2^h, times rms(F) on 2^(−24) a lane at its own unit.
+                let kinetic = |vv: &[i64]| -> i128 {
+                    vv.chunks_exact(lane_width).enumerate().map(|(k, vl)| {
+                        let vv2: i128 = vl.iter().map(|&b| b as i128 * b as i128).sum();
+                        let s2 = (scale0[k] * scale0[k]).max(1);
+                        let base = div_nearest(vv2 << 32, s2) << hs;
+                        if per_lane { release(base * lane_rms[k], super::super::COVECTOR_BITS) } else { base }
+                    }).sum()
+                };
+                let stepped = self.energy_step(&x, &cell.scale, &step_force, hs)?;
+                let moved: Vec<i64> = stepped.iter().zip(&x).zip(&v).map(|((&st, _), &vi)| st + release(mu * vi as i128, 16) as i64).collect();
+                let next = rebase(&moved)?;
+                if next != x {
+                    let candidate = self.energy_cell(&next, &held, &paces, &reaches, window.as_deref())?;
+                    let (cand_force, _) = self.energy_force(&candidate, &held, &paces, &reaches)?;
+                    // The motion that brought x': the re-based displacement's tangent part at x'.
+                    let mut v_new: Vec<i64> = next.iter().zip(&x).map(|(&a, &b)| a - b).collect();
+                    for (vl, xl) in v_new.chunks_exact_mut(lane_width).zip(next.chunks_exact(lane_width)) {
+                        let xx: i128 = xl.iter().map(|&a| a as i128 * a as i128).sum();
+                        let xv: i128 = xl.iter().zip(vl.iter()).map(|(&a, &b)| a as i128 * b as i128).sum();
+                        if xx > 0 {
+                            for (vi, &xi) in vl.iter_mut().zip(xl) {
+                                *vi -= div_nearest(xi as i128 * xv, xx) as i64;
+                            }
+                        }
+                    }
+                    let q_now = cell.phi + work(&force, &v) / 2 + (((1 << 16) + mu) * kinetic(&v) >> 18);
+                    let q_next = candidate.phi + work(&cand_force, &v_new) / 2 + (((1 << 16) + mu) * kinetic(&v_new) >> 18);
+                    let sum: Vec<i64> = v.iter().zip(&v_new).map(|(&a, &b)| a + b).collect();
+                    let claim = ((1 << 16) - mu) * kinetic(&sum) >> 18;
+                    let diff: Vec<i64> = force.iter().zip(&cand_force).map(|(&a, &b)| a - b).collect();
+                    let inside = work(&diff, &v_new) < (((1 << 16) + mu) * kinetic(&v_new) >> 15);
+                    let slack = (cell.logs + candidate.logs) as i128 + 2;
+                    out.tries.push(RestTry { tick, halvings: hs, fall: q_now - q_next, claim, slack });
+                    if inside && q_next + slack <= q_now {
+                        out.ticks.push(RestTick { halvings: hs, fall: q_now - q_next, slack, scale_top: 0, rebase_change: cell.phi - candidate.phi, claim, rho_nonpositive, rho_least, rho_median, rho_top, swing: true });
+                        x = next;
+                        cell = candidate;
+                        v = v_new;
+                        continue;
+                    }
+                }
+                // Released: the motion lets go, and the tick is the flow step's.
+                v.iter_mut().for_each(|e| *e = 0);
+                swing_h = None;
+            }
             let mut h = first;
             // The line's controller (theory, 05:13): the least halvings whose half-claim failed this tick.
             let mut failed_half: Option<u32> = None;
@@ -2277,7 +2359,7 @@ impl Field {
                     } else {
                         (next, candidate, 0)
                     };
-                    out.ticks.push(RestTick { halvings: h, fall, slack, scale_top: top, rebase_change, claim, rho_nonpositive, rho_least, rho_median, rho_top });
+                    out.ticks.push(RestTick { halvings: h, fall, slack, scale_top: top, rebase_change, claim, rho_nonpositive, rho_least, rho_median, rho_top, swing: false });
                     x = next;
                     cell = candidate;
                     stood = Some(h);
@@ -2287,7 +2369,13 @@ impl Field {
             }
             match stood {
                 // Each tick starts one halving above the last stood one, so a step that keeps passing grows back.
-                Some(h) => first = h.saturating_sub(1),
+                Some(h) => {
+                    first = h.saturating_sub(1);
+                    if swinging {
+                        // The swing holds the flow step's η until a release re-reads it.
+                        swing_h = Some(h);
+                    }
+                }
                 None => {
                     out.ended = if refused {
                         RestEnd::Refused { state_top: top }
@@ -2369,6 +2457,8 @@ pub struct RestTick {
     pub rho_least: u32,
     pub rho_median: u32,
     pub rho_top: u32,
+    /// Whether the tick was the swing's (its fall and claim are then Q's, and `rebase_change` holds Φ's own fall).
+    pub swing: bool,
 }
 
 /// How a rest read ticks: as the law runs, re-based to the opening scale after each tick, or as a certified flow step
@@ -2387,6 +2477,11 @@ pub enum RestMode {
     Projected,
     /// The projected step with each lane at its own unit, `η = 2^(−h)/rms(F)` a lane, the claim `Σ η_ℓ |F_⊥ℓ|²`.
     PerLane,
+    /// The swing on the projected step (theory, November 8 06:40): motion carried across ticks at a held η, certified on
+    /// `Q = Φ + ½⟨F, v⟩ + (1 + μ)/4 Σ|v|²/η` with the band guard, released to the flow step where either fails.
+    SwingProjected,
+    /// The swing on the per-lane unit.
+    SwingPerLane,
 }
 
 /// Why a descent ended: at the read's most ticks, a step below the state's grain at every halving left, no fall past the

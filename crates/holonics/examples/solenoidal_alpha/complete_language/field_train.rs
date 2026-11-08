@@ -3032,7 +3032,11 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
                 let most: usize = most.parse().map_err(|_| "FIELD_CENSUS_REST is a count of ticks".to_string())?;
                 // `FIELD_CENSUS_REST_REBASE`: each lane re-based to its opening scale after each tick (theory, 03:32).
                 // `FIELD_CENSUS_REST_FLOW`: the certified flow step (theory, 04:21), re-based inside the candidate.
-                let mode = if std::env::var_os("FIELD_CENSUS_REST_PERLANE").is_some() {
+                let mode = if std::env::var_os("FIELD_CENSUS_REST_SWING_PERLANE").is_some() {
+                    holonics::hnn::tower::field::RestMode::SwingPerLane
+                } else if std::env::var_os("FIELD_CENSUS_REST_SWING").is_some() {
+                    holonics::hnn::tower::field::RestMode::SwingProjected
+                } else if std::env::var_os("FIELD_CENSUS_REST_PERLANE").is_some() {
                     holonics::hnn::tower::field::RestMode::PerLane
                 } else if std::env::var_os("FIELD_CENSUS_REST_PROJECTED").is_some() {
                     holonics::hnn::tower::field::RestMode::Projected
@@ -3049,7 +3053,7 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
                 let rest = learner.field.energy_rest_read(&region, most, mode).map_err(|e| e.to_string())?;
                 for (k, tick) in rest.ticks.iter().enumerate() {
                     println!(
-                        "FIELD_REST_TICK problem={i} mode={rebase} tick={k} halvings={} fall={} fall_bits={} slack={} fall_over_slack_milli={} scale_top={} rebase_change={} claim={} rho_nonpositive={} rho_bits={}/{}/{}",
+                        "FIELD_REST_TICK problem={i} mode={rebase} tick={k} halvings={} fall={} fall_bits={} slack={} fall_over_slack_milli={} scale_top={} rebase_change={} claim={} rho_nonpositive={} rho_bits={}/{}/{} swing={}",
                         tick.halvings,
                         tick.fall,
                         128 - tick.fall.unsigned_abs().leading_zeros(),
@@ -3061,7 +3065,8 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
                         tick.rho_nonpositive,
                         tick.rho_least,
                         tick.rho_median,
-                        tick.rho_top
+                        tick.rho_top,
+                        tick.swing
                     );
                 }
                 for t in &rest.tries {
