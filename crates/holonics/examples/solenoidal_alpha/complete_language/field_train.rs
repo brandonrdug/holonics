@@ -3258,6 +3258,16 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
                         let (mv, pr, en) = learner.field.energy_sweep_at(&problems[..m], &mut active, None, void, 0, mix(key, 100 + sweep), realization, &mut |_, _| {}).map_err(|e| e.to_string())?;
                         println!("FIELD_FRESH_SWEEP lap={lap} n={n} sweep={} moved={mv} proposed={pr} accept_milli={} write_energy_milli={} ms={}", sweep + 1, mv * 1000 / pr.max(1), (en.iter().sum::<i128>() / m.max(1) as i128) * 1000 >> 32, t0.elapsed().as_millis());
                     }
+                    // [measurement; theory, November 8 14:59] Each section's writes decoded beside their truths (private).
+                    use std::io::Write;
+                    let mut f = std::fs::OpenOptions::new().create(true).append(true).open(out.join("FRESH_WRITES.txt"))?;
+                    for (j, w) in active.iter().enumerate() {
+                        writeln!(f, "=== section {n} write {j} ===")?;
+                        f.write_all(&codec.decode(w))?;
+                        writeln!(f, "\n=== section {n} truth {j} ===")?;
+                        f.write_all(&codec.decode(&train_set[members[j]].1))?;
+                        writeln!(f)?;
+                    }
                 } else if fresh {
                     for sweep in 0..8u64 {
                         let t0 = std::time::Instant::now();
