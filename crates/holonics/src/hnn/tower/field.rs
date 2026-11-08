@@ -1242,6 +1242,10 @@ pub struct ClassLists {
     pub members: Vec<u32>,
     /// Each receiver's other probed classes (§15.2's multi-probe, [`probes`]), empty where none.
     pub probes: Vec<Vec<u32>>,
+    /// [measurement; theory, November 8 18:33] Each receiver's crossings under the width law: the modes its read examines (the
+    /// base modes and the branch modes of every split it visits) whose phase lies within its band of a cone, so it reads at
+    /// most `2^c` plates; zero outside [`ClassLists::widened`].
+    pub crossings: Vec<u32>,
 }
 
 impl ClassLists {
@@ -1264,7 +1268,8 @@ impl ClassLists {
         let probes = vec![Vec::new(); class.len()];
         let probe_class = class.clone();
         let keyed = vec![true; class.len()];
-        Self { class, probe_class, definite, keyed, off, members, probes }
+        let crossings = vec![0; class.len()];
+        Self { class, probe_class, definite, keyed, off, members, probes, crossings }
     }
 
     /// [definition; the unified-theory reading of November 7, 23:34] **The width law's lists**: each site's address is its
@@ -1338,6 +1343,7 @@ impl ClassLists {
         let class: Vec<u32> = (0..sites).map(|t| nodes[descend(base(&keys[t]) as usize, &keys[t]).0].leaf).collect();
         let mut probe_class = Vec::with_capacity(sites);
         let mut probes_all = Vec::with_capacity(sites);
+        let mut crossings = Vec::with_capacity(sites);
         for w in probes_of {
             let own_base = base(w) as usize;
             let (own_node, depth) = descend(own_base, w);
@@ -1354,6 +1360,10 @@ impl ClassLists {
             // The base classes a crossing reaches (the receiver's own among them), then each one's branches.
             let mut bases = vec![own_base];
             bases.extend(probes((0..b).map(|li| w[li]), band).into_iter().map(|c| c as usize));
+            let mut crossed = vec![false; modes];
+            for li in 0..b {
+                crossed[li] = near_cone(w[li].0, w[li].1);
+            }
             // Each reached base's leaves in turn (the bases in `probes`' order, so a field with no split reads `of`'s runs in its
             // order), each leaf once.
             let mut reached: Vec<u32> = Vec::new();
@@ -1370,6 +1380,7 @@ impl ClassLists {
                         Some((li, children)) => {
                             let (re, im) = w[li];
                             if near_cone(re, im) {
+                                crossed[li] = true;
                                 stack.push(children[across(re, im)]);
                             }
                             stack.push(children[shell(re, im) as usize]);
@@ -1379,8 +1390,10 @@ impl ClassLists {
             }
             probe_class.push(own);
             probes_all.push(reached);
+            crossings.push(crossed.iter().filter(|&&x| x).count() as u32);
         }
-        let lists = Self::of(class, definite, leaves as usize).probing(probe_class, probes_all);
+        let mut lists = Self::of(class, definite, leaves as usize).probing(probe_class, probes_all);
+        lists.crossings = crossings;
         (lists, leaves as usize)
     }
 

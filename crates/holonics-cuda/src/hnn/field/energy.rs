@@ -429,6 +429,33 @@ fn widened_tables(job: &WidenJob) -> Result<(WidenedTables, WidenTimes)> {
         })
         .collect();
     let build_us = started.elapsed().as_micros();
+    // [measurement; theory, November 8 18:33] `FIELD_WIDEN_CENSUS`: the receivers by their crossings `c`, each class's count,
+    // plates read (its own leaf and the leaves its crossings reach), pairs (definite sources in those leaves) and its own
+    // leaf's pairs, summed over the batches so far and printed every 200 batches as `FIELD_WIDEN_CENSUS`.
+    if std::env::var_os("FIELD_WIDEN_CENSUS").is_some() {
+        static CENSUS: std::sync::Mutex<(u64, [[u64; 4]; 9])> = std::sync::Mutex::new((0, [[0; 4]; 9]));
+        let mut census = CENSUS.lock().map_err(|_| TowerError::Refused("the width census's lock was poisoned"))?;
+        census.0 += 1;
+        for (_, _, lists, _) in &built {
+            let size = |q: u32| (lists.off[2 * q as usize + 1] - lists.off[2 * q as usize]) as u64;
+            for i in 0..lists.definite.len() {
+                if !lists.definite[i] {
+                    continue;
+                }
+                let c = (lists.crossings[i] as usize).min(8);
+                let own = size(lists.probe_class[i]);
+                let row = &mut census.1[c];
+                row[0] += 1;
+                row[1] += 1 + lists.probes[i].len() as u64;
+                row[2] += own + lists.probes[i].iter().map(|&q| size(q)).sum::<u64>();
+                row[3] += own;
+            }
+        }
+        if census.0 % 200 == 0 {
+            let text: Vec<String> = census.1.iter().enumerate().filter(|(_, r)| r[0] > 0).map(|(c, r)| format!("c{c}={}/{}/{}/{}", r[0], r[1] * 1000 / r[0], r[2] * 1000 / r[0], r[3] * 1000 / r[0])).collect();
+            println!("FIELD_WIDEN_CENSUS batches={} receivers/plates_milli/pairs_milli/own_pairs_milli {}", census.0, text.join(" "));
+        }
+    }
     if built.iter().any(|(.., leaves)| *leaves > classes) {
         return Err(TowerError::Refused("a widened region with more leaves than the width law's bound"));
     }
