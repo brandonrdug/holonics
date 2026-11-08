@@ -2550,6 +2550,14 @@ pub enum RestMode {
     /// at 6.61026e14, and 21778 416 at 3.53770e15 against 220 at 3.54590e15, the one problem where untransported rests
     /// sooner and deeper. The lanes past their own band are no guard to add: the low-radial lanes that carried the
     /// transport's whole work (100.5% of it from tick 100 on) stayed inside their bands.
+    ///
+    /// [measurement, November 8 09:55] Declining the push before dropping the motion (theory, 09:43: a refused transported
+    /// try re-taken with the motion untransported against the same stood Q) did not keep the motion: the retake stood on
+    /// 2 of 27, 2 of 34, 2 of 29 and 0 of 8 refused ticks (23957, 22383, 21778, 16370), and its Q fell less than the
+    /// transported try's on all but 3, 5, 5 and 0 of them (median −2.2e11 against −5.5e10 on 23957), since a refusal
+    /// comes where the unit grows and the untransported motion then carries the heavier weight. Releases went 25, 32, 27
+    /// and 8 against 22, 16, 34 and 8, and the rests were shallower on 23957 (3.88843e15) and 22383 (3.56285e15), deeper
+    /// on 21778 (3.53862e15, short of the untransported form's 3.54590e15) and the same on 16370, so it is not kept.
     SwingPerLane,
 }
 
