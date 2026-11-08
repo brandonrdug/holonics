@@ -2848,7 +2848,8 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
     // [measurement; theory, November 8 16:49] `FIELD_MELT=SWEEPS`: a melt from the truth, which separates learning from release.
     // At the loaded state, the first section read starts twice, from its truths and from the field's own release at their true
     // lengths (the fork's key), and each start is swept whole SWEEPS times at the field's `T` (cool 0), with no deposition.
-    let melt_sweeps: Option<u64> = std::env::var("FIELD_MELT").ok().and_then(|v| v.parse().ok()).filter(|&k| k > 0);
+    // `FIELD_MELT=0` gives the sweep-0 reads alone.
+    let melt_sweeps: Option<u64> = std::env::var("FIELD_MELT").ok().and_then(|v| v.parse().ok());
     let persistent = std::env::var_os("FIELD_CONTRAST_PERSISTENT").is_some() || fresh_sweeps.is_some() || melt_sweeps.is_some();
     let conditional = std::env::var_os("FIELD_CONTRAST_CONDITIONAL").is_some();
     // [measurement; theory, November 8 11:10] `FIELD_CONTRAST_READ_ONLY`: each section is read and its learner put back as it
@@ -3254,6 +3255,50 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
                     let m = members.len();
                     let truth_answers: Vec<Vec<usize>> = members.iter().map(|&i| train_set[i].1.clone()).collect();
                     let released = learner.field.energy_release(&problems, &lengths, void, 64, key, realization, &mut |_, _, _| {}).map_err(|e| e.to_string())?;
+                    // [measurement; theory, November 8 17:18] The soup's advantage placed by reads at sweep 0: `G/T` a place (nats, the
+                    // closing read's chart) of the truths, the truths with their letters shuffled within each answer (keyed), and the
+                    // release; order = truth − shuffle, mix = shuffle − release, each answer's in milli-nats a place.
+                    {
+                        let shuffled: Vec<Vec<usize>> = truth_answers
+                            .iter()
+                            .enumerate()
+                            .map(|(j, t)| {
+                                let mut a = t.clone();
+                                for i in (1..a.len()).rev() {
+                                    let r = (mix(key, 300 << 32 | (j as u64) << 16 | i as u64) % (i as u64 + 1)) as usize;
+                                    a.swap(i, r);
+                                }
+                                a
+                            })
+                            .collect();
+                        let log2_t = learner.field.theta[learner.field.layout().face_temper] as i128;
+                        let inverse = exp2_q32(-(log2_t << 8));
+                        let mut per_place = |answers: &[Vec<usize>]| -> Result<Vec<i128>> {
+                            let configurations: Vec<Vec<usize>> = problems
+                                .iter()
+                                .zip(answers)
+                                .map(|(&(q, room), a)| {
+                                    let mut c: Vec<usize> = q.iter().chain(a).copied().collect();
+                                    c.extend(std::iter::repeat_n(void, holonics::hnn::tower::field::NEAR.min(room - a.len())));
+                                    c
+                                })
+                                .collect();
+                            let asked: Vec<&[usize]> = configurations.iter().map(Vec::as_slice).collect();
+                            let g = realization.read_energies(&learner.field, &asked).map_err(|e| e.to_string())?;
+                            Ok(g.iter().zip(answers).map(|(&g, a)| (((g * inverse >> 32) * LN2_Q30 >> 30) / a.len().max(1) as i128) * 1000 >> 32).collect())
+                        };
+                        let truth_e = per_place(&truth_answers)?;
+                        let shuffle_e = per_place(&shuffled)?;
+                        let release_e = per_place(&released)?;
+                        let list = |v: &[i128]| v.iter().map(|x| x.to_string()).collect::<Vec<_>>().join(",");
+                        let mean = |v: &[i128]| v.iter().sum::<i128>() / v.len().max(1) as i128;
+                        for (kind, v) in [("truth", &truth_e), ("shuffle", &shuffle_e), ("release", &release_e)] {
+                            println!("FIELD_MELT_READ n={n} kind={kind} energy_milli={} energies_milli={}", mean(v), list(v));
+                        }
+                        let order: Vec<i128> = truth_e.iter().zip(&shuffle_e).map(|(a, b)| a - b).collect();
+                        let mixd: Vec<i128> = shuffle_e.iter().zip(&release_e).map(|(a, b)| a - b).collect();
+                        println!("FIELD_MELT_READ n={n} order_milli={} orders_milli={} mix_milli={} mixes_milli={}", mean(&order), list(&order), mean(&mixd), list(&mixd));
+                    }
                     use std::io::Write;
                     let mut f = std::fs::OpenOptions::new().create(true).append(true).open(out.join("MELT_WRITES.txt"))?;
                     for (start, mut active) in [("truth", truth_answers.clone()), ("release", released)] {
