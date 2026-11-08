@@ -5617,6 +5617,9 @@ pub struct FieldLearner {
     /// [measurement; theory, November 7 23:47] Whether a full conditional section also reads the letters' coin's measure
     /// ([`CoinMeasure`]): its forward read timed beside its material read, and each tolerance's cost and variance.
     pub coin_measure: bool,
+    /// [definition; theory, November 8 14:22] The walk's and the coin's key, carried so a resume keeps the key it opened
+    /// with (an undeclared key is the opening state's hash, which a save would change); the run sets it, a save keeps it.
+    pub key: Option<u64>,
     first: Vec<i128>,
     second: Vec<i128>,
     pub rate_bits: u32,
@@ -5677,7 +5680,7 @@ impl FieldLearner {
     pub fn new(field: Field, rate_bits: u32) -> Self {
         let len = field.material_len();
         let drawn = 4 * field.declaration.founding_draws();
-        Self { field, first: vec![0; len], second: vec![0; len], rate_bits, drawn, laps: 0, held: None, read_held: false, newton: false, newton_read: false, first_rate: FIRST_RATE, second_rate: SECOND_RATE, family_rates: None, temper_learns: false, family_transfer: Vec::new(), family_price: Vec::new(), last: None, average: None, carried: None, unigram: None, unigram_step: None, coin_measure: false }
+        Self { field, first: vec![0; len], second: vec![0; len], rate_bits, drawn, laps: 0, held: None, read_held: false, newton: false, newton_read: false, first_rate: FIRST_RATE, second_rate: SECOND_RATE, family_rates: None, temper_learns: false, family_transfer: Vec::new(), family_price: Vec::new(), last: None, average: None, carried: None, unigram: None, unigram_step: None, coin_measure: false, key: None }
     }
 
     /// Whether a deposited step is held for the next regions' read.
@@ -5704,7 +5707,7 @@ impl FieldLearner {
         let second = from.iter().map(|&(i, divided)| if divided { div_nearest(self.second[i], f2) } else { self.second[i] }).collect();
         let drawn = self.drawn + 4 * self.field.growth_draws(factor);
         let rate_bits = self.rate_bits + (usize::BITS - (factor - 1).leading_zeros());
-        Ok(Self { field, first, second, rate_bits, drawn, laps: self.laps, held: None, read_held: self.read_held, newton: self.newton, newton_read: self.newton_read, first_rate: self.first_rate, second_rate: self.second_rate, family_rates: None, temper_learns: false, family_transfer: Vec::new(), family_price: Vec::new(), last: None, average: None, carried: None, unigram: None, unigram_step: None, coin_measure: false })
+        Ok(Self { field, first, second, rate_bits, drawn, laps: self.laps, held: None, read_held: self.read_held, newton: self.newton, newton_read: self.newton_read, first_rate: self.first_rate, second_rate: self.second_rate, family_rates: None, temper_learns: false, family_transfer: Vec::new(), family_price: Vec::new(), last: None, average: None, carried: None, unigram: None, unigram_step: None, coin_measure: false, key: None })
     }
 
     /// [definition; agent-inferred, November 4, §16.40] **The learner with one more lane** ([`Field::laned`]), the lane's
@@ -5744,7 +5747,7 @@ impl FieldLearner {
             }
         }
         let drawn = self.drawn + 4 * self.field.declaration.lane_draws();
-        Ok(Self { field, first, second, rate_bits: self.rate_bits, drawn, laps: self.laps, held: None, read_held: self.read_held, newton: self.newton, newton_read: self.newton_read, first_rate: self.first_rate, second_rate: self.second_rate, family_rates: None, temper_learns: false, family_transfer: Vec::new(), family_price: Vec::new(), last: None, average: None, carried: None, unigram: None, unigram_step: None, coin_measure: false })
+        Ok(Self { field, first, second, rate_bits: self.rate_bits, drawn, laps: self.laps, held: None, read_held: self.read_held, newton: self.newton, newton_read: self.newton_read, first_rate: self.first_rate, second_rate: self.second_rate, family_rates: None, temper_learns: false, family_transfer: Vec::new(), family_price: Vec::new(), last: None, average: None, carried: None, unigram: None, unigram_step: None, coin_measure: false, key: None })
     }
 
     /// The held step read on `regions` without a deposit: the faces of `regions` under the
@@ -6983,7 +6986,7 @@ impl FieldLearner {
         let (mut first, mut second) = (self.first.clone(), self.second.clone());
         first.resize(len, 0);
         second.resize(len, 0);
-        Ok(Self { field, first, second, rate_bits: self.rate_bits, drawn, laps: self.laps, held: None, read_held: self.read_held, newton: self.newton, newton_read: self.newton_read, first_rate: self.first_rate, second_rate: self.second_rate, family_rates: None, temper_learns: false, family_transfer: Vec::new(), family_price: Vec::new(), last: None, average: None, carried: None, unigram: None, unigram_step: None, coin_measure: false })
+        Ok(Self { field, first, second, rate_bits: self.rate_bits, drawn, laps: self.laps, held: None, read_held: self.read_held, newton: self.newton, newton_read: self.newton_read, first_rate: self.first_rate, second_rate: self.second_rate, family_rates: None, temper_learns: false, family_transfer: Vec::new(), family_price: Vec::new(), last: None, average: None, carried: None, unigram: None, unigram_step: None, coin_measure: false, key: None })
     }
 
     /// [measurement; agent-inferred, November 3, §16.31] **Each family's step coherence**: over the family's entries, `Σ |m|`
@@ -7035,7 +7038,8 @@ impl FieldLearner {
             Some(l) => format!("last {} {}\n", l.halvings, join(&l.step)),
             None => String::new(),
         };
-        format!("hnn-field-learner-v3 {} {} {} {held}\n{}{}\n{}\n{step}{lengths}{average}{carried}{unigram}{last}", self.rate_bits, self.drawn, self.laps, self.field.to_text(), join(&self.first), join(&self.second))
+        let key = self.key.map_or(String::new(), |k| format!("key {k:016x}\n"));
+        format!("hnn-field-learner-v3 {} {} {} {held}\n{}{}\n{}\n{step}{lengths}{average}{carried}{unigram}{last}{key}", self.rate_bits, self.drawn, self.laps, self.field.to_text(), join(&self.first), join(&self.second))
     }
 
     pub fn from_text(text: &str) -> Result<Self> {
@@ -7141,7 +7145,14 @@ impl FieldLearner {
             }
             _ => None,
         };
-        Ok(Self { field, first, second, rate_bits, read_held: held.is_some(), newton: false, newton_read: false, first_rate: FIRST_RATE, second_rate: SECOND_RATE, family_rates, temper_learns: false, family_transfer, family_price, drawn, laps, held, last, average, carried, unigram, unigram_step: None, coin_measure: false })
+        let key = match lines.peek() {
+            Some(l) if l.starts_with("key ") => {
+                let hex = lines.next().unwrap_or("").strip_prefix("key ").unwrap_or("");
+                Some(u64::from_str_radix(hex.trim(), 16).map_err(|_| TowerError::Refused("a learner's key that is not hexadecimal"))?)
+            }
+            _ => None,
+        };
+        Ok(Self { field, first, second, rate_bits, read_held: held.is_some(), newton: false, newton_read: false, first_rate: FIRST_RATE, second_rate: SECOND_RATE, family_rates, temper_learns: false, family_transfer, family_price, drawn, laps, held, last, average, carried, unigram, unigram_step: None, coin_measure: false, key })
     }
 }
 

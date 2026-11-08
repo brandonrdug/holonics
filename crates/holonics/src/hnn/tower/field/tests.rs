@@ -204,6 +204,24 @@ fn text_restores_exactly() {
     assert_eq!(back.last, with.last);
 }
 
+/// [definition; theory, November 8 14:22] **A resume continues the unbroken run**: a learner with its family rates open,
+/// saved after a deposit and reloaded, makes its next two deposits bit for bit as the unbroken learner does (the last step
+/// and the key are carried; November 8, lap 14's resume at 156 broke bits at its second deposit without the last step).
+#[test]
+fn a_resumed_learner_deposits_as_the_unbroken_one() {
+    let mut unbroken = FieldLearner::new(shaped(1), 6);
+    unbroken.open_family_rates();
+    unbroken.key = Some(0xD906_4F6B_736E_5202);
+    unbroken.section(&[region()]).unwrap();
+    let mut resumed = FieldLearner::from_text(&unbroken.to_text()).unwrap();
+    for _ in 0..2 {
+        unbroken.section(&[region()]).unwrap();
+        resumed.section(&[region()]).unwrap();
+        assert_eq!(resumed.to_text(), unbroken.to_text());
+    }
+    assert_eq!(resumed.key, Some(0xD906_4F6B_736E_5202));
+}
+
 /// The covector agrees with the code's central difference on every family: the three entries of
 /// each family with the largest covectors, and in the charts the largest on a turned mode's row
 /// and on a still mode's, are each moved by `±δ` and the code's change is compared with the

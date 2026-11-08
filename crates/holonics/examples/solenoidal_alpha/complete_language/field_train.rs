@@ -2976,10 +2976,14 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
     let near = holonics::hnn::tower::field::NEAR;
     // [definition; theory, November 7 22:08] `FIELD_CONTRAST_SEED=HEX`: a read keyed by a declared seed, so laws read from
     // different states pair section by section; laps keep the state-keyed walk.
-    let seed = match std::env::var("FIELD_CONTRAST_SEED") {
-        Ok(v) => u64::from_str_radix(&v, 16).map_err(|_| "FIELD_CONTRAST_SEED is hexadecimal")?,
-        Err(_) => u64::from_str_radix(args[2].get(..16).ok_or("a state's hash of fewer than sixteen hex digits")?, 16).map_err(|_| "a state's hash that is not hexadecimal")?,
+    // [definition; theory, November 8 14:22] An undeclared seed is the state's carried key, or, for a state without one, its
+    // opening state's hash; the learner carries it so every save keeps it and a resume re-keys nothing.
+    let seed = match (std::env::var("FIELD_CONTRAST_SEED"), learner.key) {
+        (Ok(v), _) => u64::from_str_radix(&v, 16).map_err(|_| "FIELD_CONTRAST_SEED is hexadecimal")?,
+        (Err(_), Some(k)) => k,
+        (Err(_), None) => u64::from_str_radix(args[2].get(..16).ok_or("a state's hash of fewer than sixteen hex digits")?, 16).map_err(|_| "a state's hash that is not hexadecimal")?,
     };
+    learner.key = Some(seed);
     let law = WriterLaw::from_env()?;
     // Each problem's question, its answer cut to the room, and the room (`Problems`' third place).
     let encode = |problems: &[(Vec<u8>, Vec<u8>)], field: &Field| -> Result<Problems> {
