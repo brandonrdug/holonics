@@ -2153,7 +2153,8 @@ impl Field {
         };
         let mut out = EnergyRest { opening: cell.phi, last: cell.phi, opening_scale_top: scale_top(&x)?, ticks: Vec::new(), tries: Vec::new(), ended: RestEnd::Most };
         let mut first = FIRST_HALVINGS;
-        let flowing = matches!(mode, RestMode::Flow | RestMode::Line);
+        let flowing = matches!(mode, RestMode::Flow | RestMode::Line | RestMode::Projected | RestMode::PerLane);
+        let lined = matches!(mode, RestMode::Line | RestMode::Projected | RestMode::PerLane);
         for tick in 0..most {
             // A refusal ends the read where it happened (its tick and the state's top place there), never the whole read.
             let top = x.iter().map(|v| 64 - v.unsigned_abs().leading_zeros()).max().unwrap_or(0);
@@ -2164,22 +2165,51 @@ impl Field {
             let (mut stood, mut below_grain, mut last_slack, mut refused) = (None, false, 0i128, false);
             // The first-order claim on 2^(−48) before its halvings: Σ over lanes of |F|² − ⟨r̂, F⟩²/W (`energy_fall`'s).
             let mut first_order = 0i128;
+            // Each lane's radial curvature ρ = ⟨r̂, F⟩/W (theory, 05:39: the sphere is the line's curvature, η's unit is 1/ρ),
+            // on F's 2^(−24), and the force a step takes: F, its tangential part F_⊥ = F − r̂⟨r̂, F⟩/W (projected), or F_⊥
+            // over the lane's own rms(F) (each lane at its own unit).
+            let mut rhos: Vec<i128> = Vec::with_capacity(x.len() / lane_width);
+            let mut step_force = force.clone();
             if flowing {
                 for t in 0..x.len() / dw {
                     for k in 0..lanes {
                         let at = t * dw + k * lane_width;
                         let ff: i128 = (0..lane_width).map(|i| force[at + i] as i128 * force[at + i] as i128).sum();
                         let rf: i128 = (0..lane_width).map(|i| force[at + i] as i128 * cell.read[at + i] as i128).sum();
-                        first_order += ff - release(div_nearest(rf * rf, lane_width as i128), 32);
+                        let perp = ff - release(div_nearest(rf * rf, lane_width as i128), 32);
+                        let mean_rf = div_nearest(rf, lane_width as i128);
+                        rhos.push(release(mean_rf, FACE_BITS));
+                        match mode {
+                            RestMode::Projected | RestMode::PerLane => {
+                                let rms = ((ff / lane_width as i128) as u128).isqrt() as i128;
+                                for i in 0..lane_width {
+                                    let fp = force[at + i] as i128 - release(cell.read[at + i] as i128 * mean_rf, 32);
+                                    step_force[at + i] = if mode == RestMode::PerLane {
+                                        if rms == 0 { 0 } else { fit64(div_nearest(fp << super::super::COVECTOR_BITS, rms))? }
+                                    } else {
+                                        fit64(fp)?
+                                    };
+                                }
+                                first_order += if mode == RestMode::PerLane { if rms == 0 { 0 } else { div_nearest(perp << 8, rms) << 16 } } else { perp };
+                            }
+                            _ => first_order += perp,
+                        }
                     }
                 }
             }
+            let rho_bits = |v: i128| 128 - v.unsigned_abs().leading_zeros();
+            let (rho_nonpositive, rho_least, rho_median, rho_top) = {
+                let mut pos: Vec<i128> = rhos.iter().copied().filter(|&r| r > 0).collect();
+                pos.sort_unstable();
+                let n = rhos.len() - pos.len();
+                if pos.is_empty() { (n, 0, 0, 0) } else { (n, rho_bits(pos[0]), rho_bits(pos[pos.len() / 2]), rho_bits(pos[pos.len() - 1])) }
+            };
             let mut h = first;
             // The line's controller (theory, 05:13): the least halvings whose half-claim failed this tick.
             let mut failed_half: Option<u32> = None;
             let mut line_rest = false;
             while h <= STEP_CARRIER_HALVINGS {
-                let Ok(stepped) = self.energy_step(&x, &cell.scale, &force, h) else {
+                let Ok(stepped) = self.energy_step(&x, &cell.scale, &step_force, h) else {
                     refused = true;
                     break;
                 };
@@ -2212,7 +2242,7 @@ impl Field {
                     out.tries.push(RestTry { tick, halvings: h, fall: tried, claim, slack });
                 }
                 let half_passes = 2 * tried >= claim;
-                if mode == RestMode::Line && !(half_passes && tried >= slack) {
+                if lined && !(half_passes && tried >= slack) {
                     // Passing half the claim but not the slack, the step is short of the line's minimum: double it, unless
                     // the half-claim failed just above (one doubling up), where the field rests at its release error.
                     // Failing half the claim, the step is past the minimum: halve it.
@@ -2247,7 +2277,7 @@ impl Field {
                     } else {
                         (next, candidate, 0)
                     };
-                    out.ticks.push(RestTick { halvings: h, fall, slack, scale_top: top, rebase_change, claim });
+                    out.ticks.push(RestTick { halvings: h, fall, slack, scale_top: top, rebase_change, claim, rho_nonpositive, rho_least, rho_median, rho_top });
                     x = next;
                     cell = candidate;
                     stood = Some(h);
@@ -2256,7 +2286,7 @@ impl Field {
                 h += 1;
             }
             match stood {
-                Some(h) => first = if mode == RestMode::Line { h } else { h.saturating_sub(1) },
+                Some(h) => first = if lined { h } else { h.saturating_sub(1) },
                 None => {
                     out.ended = if refused {
                         RestEnd::Refused { state_top: top }
@@ -2332,6 +2362,12 @@ pub struct RestTick {
     pub rebase_change: i128,
     /// The flow step's first-order claim at its halvings (zero in the other modes), on `2^(−32)`.
     pub claim: i128,
+    /// The lanes' radial curvature `ρ = ⟨r̂, F⟩/W` (on F's `2^(−24)`; flow modes): the lanes at or below zero, and the
+    /// least, median and top places of the positive ones.
+    pub rho_nonpositive: usize,
+    pub rho_least: u32,
+    pub rho_median: u32,
+    pub rho_top: u32,
 }
 
 /// How a rest read ticks: as the law runs, re-based to the opening scale after each tick, or as a certified flow step
@@ -2345,6 +2381,10 @@ pub enum RestMode {
     /// doubles, failing half the claim it halves, and it rests only on a halving under the slack just below a failed
     /// half-claim, so every rest is the field's own (its line's best fall under 4/3 of the slack).
     Line,
+    /// The line's controller on the projected step `N(r̂ + η F_⊥)`, whose half-claim reads a true line (theory, 05:39).
+    Projected,
+    /// The projected step with each lane at its own unit, `η = 2^(−h)/rms(F)` a lane, the claim `Σ η_ℓ |F_⊥ℓ|²`.
+    PerLane,
 }
 
 /// Why a descent ended: at the read's most ticks, a step below the state's grain at every halving left, no fall past the
