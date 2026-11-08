@@ -703,3 +703,43 @@ fn the_tensor_cores_score_tangent_is_the_scalar_one_at_the_carriers_extremes() {
         assert_eq!(differ, 0, "span {span}: the tensor cores' score tangent differs from the scalar one");
     }
 }
+
+/// [definition; the unified-theory reading of November 7, 23:34] **The width law on the card is the host's**: with a share small
+/// enough to split the founded line's classes, the card's lists are the host's own (`ClassLists::widened`, built on the host from
+/// the card's opening words), so `∂G/∂θ` and `G` of a batch of 400 + 900 + 1,500 sites, and the faces at an open structure, are
+/// bit-equal to the host's.
+#[test]
+#[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
+fn the_width_law_on_the_card_is_the_hosts() {
+    let d = line_declaration();
+    let mut field = Field::found(d, &keys(d.founding_draws())).unwrap();
+    field.widen = Some(6);
+    let parts: Vec<Owned> = [400usize, 900, 1500].iter().map(|&n| synthetic(n, d.alphabet)).collect();
+    let regions: Vec<Region> = parts.iter().map(Owned::region).collect();
+    let opened = Card::open(0).unwrap();
+    let mut card = CardField::open(&opened).unwrap();
+    let started = Instant::now();
+    let batch = card.energy_material(&field, &regions).unwrap();
+    let card_ms = started.elapsed().as_millis();
+    let started = Instant::now();
+    let reference: Vec<(Vec<i128>, i128)> = regions.iter().map(|r| field.energy_material(r).unwrap()).collect();
+    let host_ms = started.elapsed().as_millis();
+    let diff = material_difference(&field, &reference, &batch);
+    let mut plain = field.clone();
+    plain.widen = None;
+    let unwidened: Vec<i128> = regions.iter().map(|r| plain.energy_material(r).unwrap().1).collect();
+    println!(
+        "ENERGY_WIDEN material bit_equal={} card_ms={card_ms} host_ms={host_ms} G={:?} G_unwidened={:?}",
+        diff.is_none(),
+        reference.iter().map(|r| r.1).collect::<Vec<_>>(),
+        unwidened
+    );
+    assert!(diff.is_none(), "{}", diff.unwrap_or_default());
+    assert!(reference.iter().zip(&unwidened).any(|(r, &u)| r.1 != u), "the share splits some class (else the test reads nothing)");
+    let (faces, g) = card.read_energy_faces(&field, &regions).unwrap();
+    for (k, r) in regions.iter().enumerate() {
+        let (hf, hg) = field.energy_faces_read(r).unwrap();
+        assert_eq!(hg, g[k], "region {k}: G");
+        assert_eq!(hf, faces[k], "region {k}: faces");
+    }
+}

@@ -286,6 +286,8 @@ struct FieldWords {
     uint32_t T, R;
     // The crowds' slots a receiver keeps (`2 (levels − 1)` for the reach).
     uint32_t slots, band;
+    // A receiver's stride of probed classes (`2^b`, or `2^n` under the width law) and the padding before the next 8-byte field.
+    uint32_t pstride, pad_;
     uint64_t E;
     // `ln 2` on `2^(−30)`, the weights' return reads it (two words of a signed 128-bit value).
     uint64_t ln2_lo, ln2_hi;
@@ -1313,11 +1315,14 @@ __device__ bool rowdiv_nearest(Big<L> x, const RowDiv<L> &d, uint64_t *quotient)
 // The most address modes a head's class carries, and the most classes a receiver probes across its seams
 // (`2^b − 1`, its own probe class beside them).
 #define MAX_CLASS_TRITS 7
-#define MAX_PROBES 127
+// Under the width law (the unified-theory reading of November 7, 23:34) a receiver's address is at most `n` modes deep, so it
+// probes at most `2^n − 1` leaves across its seams (255 at eight modes).
+#define MAX_PROBES 255
 
-// A receiver's stride of probed classes, `2^b`: its probe's own class and the `2^b − 1` across its seams.
+// A receiver's stride of probed classes, `2^b` (or `2^n` under the width law): its probe's own class and those across its
+// seams.
 __device__ __forceinline__ uint32_t probe_stride(const FieldWords &w) {
-    return (uint32_t)1 << w.ctrits;
+    return w.pstride;
 }
 // Warps (rows) a contact block carries.
 #define CONTACT_ROWS 4
