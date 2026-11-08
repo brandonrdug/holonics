@@ -7,7 +7,7 @@
 //! H = (K, ∂_A;  Π;  𝒟;  𝓔;  G;  π)
 //! ```
 //!
-//! The library is ten modules, each implementing rows of the
+//! The library is eleven modules, each implementing rows of the
 //! [operator contract](../../../docs/ELEMENTARY_OBJECTS.md#operator-contract):
 //!
 //! - [`ratio`]: one per two. The exact rational, rings, the exponentiated/log chart, surprisal,
@@ -34,6 +34,10 @@
 //! - [`hnn`]: the HNN law over aeons — closing rotor rings joined by pair contacts, the change that
 //!   opens at zero and propagates one contact per tick, deposition, retention at the aeon
 //!   boundary, and the exact host reference of the execution port.
+//! - [`number`]: the number of the theory, a class on a graph of places — its grain and width (a need),
+//!   its closing edge with the winding every reduction returns, the release with its remainder,
+//!   inversion at a declared end with its residual, shears, accumulations, and the native registers
+//!   as named presets entering and leaving only by declared maps.
 //! - [`physics`]: the physical instances — fluid, wave, thermal, spacetime and the information
 //!   port — each with its constitutive equations, clocks, balances and participating receiver.
 //!
@@ -47,6 +51,7 @@ pub mod hnn;
 pub mod holarchy;
 pub mod holon;
 pub mod navigator;
+pub mod number;
 pub mod physics;
 pub mod ratio;
 pub mod receiver;
