@@ -3,7 +3,9 @@
 Status (2026-11-08): derived from Brandon's November 8 lens, with the number owner's design and build
 order handed to the design thread (§9, §10). Refs #76, #73, #410. Amended the same day from the owner's
 first property tests (step 1): operands in two sections meet in one before they add (N3), and the bottom
-end of inversion carries its residual (§5.1, N6) [checked S1 to S3].
+end of inversion carries its residual (§5.1, N6) [checked S1 to S3]; and again from its typed presets: a
+product takes a low operand at its own places (N3), and in one fixed section a release's widths follow its
+rule (N5) [checked S4, S5].
 
 The lens, paraphrased (his words stay out of the repository):
 - Bit, tensor and matrix operations are one operation, which reduces to topology: graphs with dynamic
@@ -25,7 +27,7 @@ The lens, paraphrased (his words stay out of the repository):
   version had treated native integers as foreign limbs; §2.4, the digit calculus in §4 and N8 answer it.
 
 Receipts: [`number_graph.py`](2026-11-08_A_NUMBER_IS_A_CLASS_ON_A_GRAPH_OF_PLACES_AND_EVERY_METHOD_IS_A_BRACKETING_A_CHART_OR_AN_END_receipts/number_graph.py),
-66 checks, all pass, about 6 s, stand-in Python on integers and Fractions (output in
+68 checks, all pass, about 6 s, stand-in Python on integers and Fractions (output in
 [`number_graph_output.txt`](2026-11-08_A_NUMBER_IS_A_CLASS_ON_A_GRAPH_OF_PLACES_AND_EVERY_METHOD_IS_A_BRACKETING_A_CHART_OR_AN_END_receipts/number_graph_output.txt)).
 Grades: [standard] a classical result, [checked] a receipt, [derived] derived here, [reading] an
 interpretation, [design] a choice for the code.
@@ -459,13 +461,17 @@ arithmetic).
   `Weighted(c)`, `Solinas(returns)`, and `Rings(coprime lengths)` (residues lane by lane, §2.2, the CRT
   as the one carry). No wrapping or saturating form exists inside; a `Path` overflow returns its winding.
 - **N3 Width is a need.** Every operation derives its result's width from its operands: a sum, the
-  wider plus one; a sum of `n`, the widest plus `⌈log₂ n⌉`. These hold within one section; operands in
-  two sections meet in one first. Under `Ray` and `Path` a low operand of `w` places takes `w + 1` places
-  in the signed section, so a low plus a signed operand needs `max(w_a + 1, w_b) + 1` signed places (3 + 1
+  wider plus one; a sum of `n`, the widest plus `⌈log₂ n⌉`. These hold within one section; in a sum,
+  operands in two sections meet in one first. Under `Ray` and `Path` a low operand of `w` places takes
+  `w + 1` places in the signed section, so a low plus a signed operand needs `max(w_a + 1, w_b) + 1` signed places (3 + 1
   at two places each needs four; one fewer only when the signed operand has a single place), while a
   difference of two low operands is signed at the wider plus one. In a `Ring` both sections hold the same
   class, and a section change costs nothing [checked S1, S2; found by the owner's property tests].
-  A product is `w_a + w_b` at grain `lo_a + lo_b`; a shift moves places. The only widths from outside
+  A product is `w_a + w_b` at grain `lo_a + lo_b`, and a low operand enters it at its own places, since
+  the sign comes from the signed operand alone: low × signed is signed at `w_a + w_b`, low × low is low at
+  `w_a + w_b`, and meeting in one section first would give a place more (one fewer than the rule only
+  where an operand has a single place) [checked S4]. So `u32 × u32` and `u32 × i32` stay in 64 places, one
+  native multiply. A shift moves places. The only widths from outside
   are declared receivers' grains and the exterior boundary (a byte enters at width 8). A width is kept as its own binary expansion: an
   array of width-11 values stores and moves an 8-place plane, a 2-place plane and a 1-place plane,
   11 places a value, never a 16-bit word [design, from the 11-05 law].
@@ -474,7 +480,11 @@ arithmetic).
   carry) happens at a declared point, and any bracketing gives the same bits.
 - **N5 Release.** The only narrowing. It names its rounding rule (floor, nearest with a tie rule,
   ceiling: each chooses a different Euclidean descent, ELEMENTARY_OBJECTS §9) and returns the remainder
-  at the released places. Dropping a remainder is a second declared step: the merge.
+  at the released places. Dropping a remainder is a second declared step: the merge. In one fixed signed
+  section (a typed preset) the widths follow the rule: from `W` places released by `K`, half up leaves
+  the quotient at `W − K + 1` and the remainder at `K`; floor at `W − K` and `K + 1`; ceiling and nearest
+  with ties away or to even at `W − K + 1` and `K + 1`. Half up inside the register is
+  `(x >> K) + ((x >> (K − 1)) & 1)`, never `x + 2^(K−1)` first [checked S5].
 - **N6 Inversion.** One map with its residual, at a declared end (`Top`: lattice reciprocal; `Bottom`:
   inverse mod `2^w`; `Euclid`: inverse mod `m` as a shear word; `Matrix`: Newton–Schulz; `Range`: the
   pseudoinverse on the range), scheduled by the target width's halvings, returning `(X, E)` with its

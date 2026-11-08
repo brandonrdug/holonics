@@ -1600,6 +1600,61 @@ check("S3 the bottom end with its residual carried, X' = X(1+E) and E' = E^2 (si
       "40 and four steps reach 64 places", ok_carried and vals[:4] == [5, 10, 20, 40],
       "10,000 odd 64-bit a; least valuation per step %s (64 = zero mod 2^64)" % vals)
 
+ok_prod = True
+for wa in range(1, 7):
+    for wb in range(1, 7):
+        ls = [a * b for a in range(1 << wa) for b in range(-(1 << (wb - 1)), 1 << (wb - 1))]
+        ll = max(a * b for a in range(1 << wa) for b in range(1 << wb))
+        ok_prod &= signed_width(min(ls), max(ls)) == wa + wb - (1 if wa == 1 else 0)
+        ok_prod &= max(1, ll.bit_length()) == wa + wb - (1 if min(wa, wb) == 1 else 0)
+for wa in range(2, 33):
+    for wb in range(2, 33):
+        top = (1 << wa) - 1
+        ok_prod &= signed_width(top * -(1 << (wb - 1)), top * ((1 << (wb - 1)) - 1)) == wa + wb
+        ok_prod &= (top * ((1 << wb) - 1)).bit_length() == wa + wb
+u32 = ((1 << 32) - 1) ** 2
+ok_prod &= u32.bit_length() == 64 and signed_width(((1 << 32) - 1) * -(1 << 31), ((1 << 32) - 1) * ((1 << 31) - 1)) == 64
+check("S4 a product takes a low operand at its own places, the sign coming from the signed operand alone: "
+      "low x signed is signed at w_a+w_b and low x low is low at w_a+w_b (one fewer only where an operand "
+      "has one place), so meeting in one section first, (w_a+1)+w_b, is a place too many; u32 x u32 and "
+      "u32 x i32 stay in 64 places", ok_prod,
+      "every value pair to 6 places, the corner bounds to 32")
+
+
+def release_one_section(x, k, rule):
+    q0, r0 = x >> k, x & ((1 << k) - 1)
+    half = 1 << (k - 1)
+    if rule == "floor":
+        up = False
+    elif rule == "ceiling":
+        up = r0 != 0
+    else:
+        up = r0 > half or (r0 == half and {"up": True, "away": x >= 0, "even": q0 & 1 == 1}[rule])
+    return (q0 + 1, r0 - (1 << k)) if up else (q0, r0)
+
+
+need = {}
+ok_rel = True
+for rule in ("floor", "ceiling", "up", "away", "even"):
+    dq, dr = 0, 0
+    for w in range(2, 10):
+        for k in range(1, w):
+            qr = [release_one_section(x, k, rule) for x in range(-(1 << (w - 1)), 1 << (w - 1))]
+            ok_rel &= all(q * (1 << k) + r == x for (q, r), x in zip(qr, range(-(1 << (w - 1)), 1 << (w - 1))))
+            dq = max(dq, signed_width(min(q for q, _ in qr), max(q for q, _ in qr)) - (w - k))
+            dr = max(dr, signed_width(min(r for _, r in qr), max(r for _, r in qr)) - k)
+    need[rule] = (dq, dr)
+ok_rel &= need == {"floor": (0, 1), "ceiling": (1, 1), "up": (1, 0), "away": (1, 1), "even": (1, 1)}
+for _ in range(20000):
+    x, k = D.bits(64) - (1 << 63), 1 + D.bits(6) % 63
+    for y in (x, (1 << 63) - 1, -(1 << 63)):
+        ok_rel &= release_one_section(y, k, "up")[0] == (y >> k) + ((y >> (k - 1)) & 1)
+check("S5 in one fixed signed section a release's widths follow its rule: from W places by K, half up "
+      "leaves the quotient at W-K+1 and the remainder at K; floor W-K and K+1; ceiling and nearest with "
+      "ties away or to even W-K+1 and K+1; half up inside the register is (x>>K) + ((x>>(K-1))&1)",
+      ok_rel, "every x to 9 places and every K; the shift form on 20,000 64-bit draws and both ends; "
+      "places beyond (W-K, K) by rule: %s" % need)
+
 # ---------------------------------------------------------------------------------------------
 print("\n%d checks, %d failed, %.1f s" % (len(RESULTS), sum(1 for _, ok in RESULTS if not ok), time.time() - T0))
 sys.exit(0 if all(ok for _, ok in RESULTS) else 1)
