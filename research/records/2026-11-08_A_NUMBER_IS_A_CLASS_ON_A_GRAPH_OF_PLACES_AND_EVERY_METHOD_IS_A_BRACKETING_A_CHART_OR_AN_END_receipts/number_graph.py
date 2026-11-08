@@ -1552,5 +1552,54 @@ check("M4 how digits disperse depends on the radix: the leading digit of 2^k cyc
       "k < 2000 in base 16; k < 3000 in base 10, largest relative deviation from log10(1+1/d): %.4f" % dev)
 
 # ---------------------------------------------------------------------------------------------
+section("S. Sections meet before they add; inversion carries its residual (the owner's property tests)")
+
+
+def signed_width(lo, hi):
+    """The fewest signed places [-2^(s-1), 2^(s-1)) holding every value of [lo, hi]."""
+    s = 1
+    while not (-(1 << (s - 1)) <= lo and hi < (1 << (s - 1))):
+        s += 1
+    return s
+
+
+ok_mix, over = True, []
+for wa in range(1, 7):
+    for wb in range(1, 7):
+        sums = [a + b for a in range(1 << wa) for b in range(-(1 << (wb - 1)), 1 << (wb - 1))]
+        tight = signed_width(min(sums), max(sums))
+        rule = max(wa + 1, wb) + 1
+        ok_mix &= tight == rule - (1 if wb == 1 else 0)
+        over += [(wa, wb)] if tight < rule else []
+ok_mix &= all(signed_width(-(1 << (wb - 1)), (1 << wa) - 1 + (1 << (wb - 1)) - 1)
+              == max(wa + 1, wb) + 1 - (1 if wb == 1 else 0) for wa in range(1, 33) for wb in range(1, 33))
+check("S1 a low operand of w places and a signed one meet in the signed section, where the low one takes "
+      "w+1 places: the sum needs max(w_a+1, w_b)+1 signed places, one fewer only when the signed operand has "
+      "one place (3+1 at two places each needs four)", ok_mix,
+      "every value pair to 6 places, the bounds to 32; the rule is one too many at %d of 36 small "
+      "pairs, those whose signed operand has one place" % len(over))
+
+ok_diff = all(signed_width(min(a - b for a in range(1 << wa) for b in range(1 << wb)),
+                           max(a - b for a in range(1 << wa) for b in range(1 << wb))) == max(wa, wb) + 1
+              for wa in range(1, 7) for wb in range(1, 7))
+check("S2 a difference of two low operands is signed at the wider plus one (not the wider plus two that "
+      "converting both and adding gives)", ok_diff, "every value pair to 6 places")
+
+ok_carried, vals = True, [64] * 5
+for _ in range(10000):
+    a = D.bits(64) | 1
+    x = (3 * a) ^ 2
+    e = (1 - a * x) % (1 << 64)
+    for k in range(5):
+        vals[k] = min(vals[k], 64 if e == 0 else v_p(e, 2))
+        ok_carried &= e == (1 - a * x) % (1 << 64)
+        x, e = (x * (1 + e)) % (1 << 64), (e * e) % (1 << 64)
+    ok_carried &= (a * x) % (1 << 64) == 1 and e == 0
+check("S3 the bottom end with its residual carried, X' = X(1+E) and E' = E^2 (since 1 - A X(1+E) = E^2), "
+      "keeps a step's two products independent: from (3a) xor 2 the residual's valuation runs 5, 10, 20, "
+      "40 and four steps reach 64 places", ok_carried and vals[:4] == [5, 10, 20, 40],
+      "10,000 odd 64-bit a; least valuation per step %s (64 = zero mod 2^64)" % vals)
+
+# ---------------------------------------------------------------------------------------------
 print("\n%d checks, %d failed, %.1f s" % (len(RESULTS), sum(1 for _, ok in RESULTS if not ok), time.time() - T0))
 sys.exit(0 if all(ok for _, ok in RESULTS) else 1)
