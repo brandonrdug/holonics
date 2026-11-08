@@ -107,3 +107,24 @@ angle into a moment read at its port (flow and effort paired at the root); joint
 chart's own object; a surface of hairs, the retinal mosaic or a fish's lateral line is a receiver family over a partition,
 each in its own frame, summed across the nerves; taste and smell are the lock-and-key reading of a shape at close range;
 a signature is a face, the pairing of the thing with the receiver that reads it.
+
+## 6. Theory's derivation (November 8 15:20), correcting §5
+
+- A rigid hair is not a contact (contacts slip and dissipate): it is a transformer of modulus L in the interconnection.
+  The tip's force and velocity (F, v) and the root's torque and turn rate (τ = LF, ω = v/L) carry the same power,
+  Fv = τω; the contacts are at its ends (drag with the medium at the tip, the socket at the root), and the root's receptor
+  is the element that reads. The rigid rod carries the moment to the root whole, the far force amplified by L, which is why
+  the tip's distance costs nothing. A rod is a sensor where its port draws power in and a limb where it drives power out:
+  one object, its place sets its role.
+- Stand: jointed rods are a screw chain, the motor chart; smell and taste are a key fitting a lock at contact range.
+- The field already carries the surface of hairs: a mode's moment `m = Σ_k Ĝ(τ(k))⁻¹ E(u_k)` brings each site's encoding
+  back to the mode's root through the navigator's inverse at that site's clock (the rod); each arrives as a complex number,
+  magnitude and phase (the polar input); far sites arrive turned by more (the periplus) and read as winding plus phase; the
+  sum over sites is the nerve basis integrating them.
+- With a moment a mode at every site and a clock a head (each turned head's pace κ_h reads the passage at its own
+  content-set rate), the moments are a spectrogram of the passage, its face: the Doppler spectrogram. A Doppler factor is
+  the ratio of a source's clock to the receiver's, so two heads reading one passage at different paces see it shifted
+  against each other by the ratio of their paces.
+- The near locks (0 < |i − j| < NEAR) are the field's close-range gaps, its taste, smell and touch; the moments are its
+  far rods.
+- The fork is unchanged.
