@@ -2841,7 +2841,11 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
     let spacing = FieldLearner::kernel_spacing();
     // [the unified-theory reading of November 7, 09:36] `FIELD_CONTRAST_PERSISTENT`: the section deposits against persistent
     // writes (lap 13's law) instead of a kernel step from the truth.
-    let persistent = std::env::var_os("FIELD_CONTRAST_PERSISTENT").is_some();
+    // [definition; theory, November 8 14:46] `FIELD_CONTRAST_FRESH=SWEEPS`: the same deposit against writes, but each section
+    // releases its problems' writes afresh from the faces at their true lengths and sweeps them whole SWEEPS times at T, so
+    // nothing persists between sections (each sweep's energy printed, the last two read as the lag).
+    let fresh_sweeps: Option<u64> = std::env::var("FIELD_CONTRAST_FRESH").ok().and_then(|v| v.parse().ok()).filter(|&k| k > 0);
+    let persistent = std::env::var_os("FIELD_CONTRAST_PERSISTENT").is_some() || fresh_sweeps.is_some();
     let conditional = std::env::var_os("FIELD_CONTRAST_CONDITIONAL").is_some();
     // [measurement; theory, November 8 11:10] `FIELD_CONTRAST_READ_ONLY`: each section is read and its learner put back as it
     // opened, so every section's code is read at the opening state and nothing is deposited (the family split's reads).
@@ -3235,17 +3239,26 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
                 let key = mix(seed ^ 0x9E85_15 << 40, read << 32 | n as u64);
                 // [the unified-theory reading of November 7, 09:55] Each write is released once at the longest answer's length and
                 // carried whole: a question takes its first `L` places, and the rest wait unread and unmoved for a longer question.
+                if fresh_sweeps.is_some() {
+                    persistent_writes.clear();
+                }
                 let fresh = persistent_writes.is_empty();
                 if fresh {
                     let longest = train_set.iter().map(|p| p.1.len()).max().unwrap_or(1);
-                    let wide: Vec<usize> = vec![longest; problems.len()];
+                    let wide: Vec<usize> = if fresh_sweeps.is_some() { lengths.clone() } else { vec![longest; problems.len()] };
                     persistent_writes = learner.field.energy_release(&problems, &wide, void, 64, key, realization, &mut |_, _, _| {}).map_err(|e| e.to_string())?;
                 }
                 let m = members.len().min(persistent_writes.len());
                 let mut active: Vec<Vec<usize>> = (0..m).map(|j| persistent_writes[j][..lengths[j].min(persistent_writes[j].len())].to_vec()).collect();
                 // [the unified-theory reading of November 7, 10:12] The writes sunk before the first deposit: eight whole sweeps at
                 // `T` over each write's first `L` places.
-                if fresh {
+                if let Some(k) = fresh_sweeps {
+                    for sweep in 0..k {
+                        let t0 = std::time::Instant::now();
+                        let (mv, pr, en) = learner.field.energy_sweep_at(&problems[..m], &mut active, None, void, 0, mix(key, 100 + sweep), realization, &mut |_, _| {}).map_err(|e| e.to_string())?;
+                        println!("FIELD_FRESH_SWEEP lap={lap} n={n} sweep={} moved={mv} proposed={pr} accept_milli={} write_energy_milli={} ms={}", sweep + 1, mv * 1000 / pr.max(1), (en.iter().sum::<i128>() / m.max(1) as i128) * 1000 >> 32, t0.elapsed().as_millis());
+                    }
+                } else if fresh {
                     for sweep in 0..8u64 {
                         let t0 = std::time::Instant::now();
                         let (mv, pr, en) = learner.field.energy_sweep_at(&problems[..m], &mut active, None, void, 0, mix(key, 100 + sweep), realization, &mut |_, _| {}).map_err(|e| e.to_string())?;
@@ -3260,10 +3273,15 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
                         (r..len).step_by(spacing).collect()
                     })
                     .collect();
-                let (moved_w, proposed_w, write_energy) = learner
-                    .field
-                    .energy_sweep_at(&problems[..m], &mut active, Some(&positions), void, 0, mix(key, 7), realization, &mut |_, _| {})
-                    .map_err(|e| e.to_string())?;
+                // Under fresh writes the whole sweeps above are the section's sweep (their energies are the FIELD_FRESH_SWEEP lines).
+                let (moved_w, proposed_w, write_energy) = if fresh_sweeps.is_some() {
+                    (0usize, 0usize, vec![0i128; m])
+                } else {
+                    learner
+                        .field
+                        .energy_sweep_at(&problems[..m], &mut active, Some(&positions), void, 0, mix(key, 7), realization, &mut |_, _| {})
+                        .map_err(|e| e.to_string())?
+                };
                 for j in 0..m {
                     let len = active[j].len();
                     persistent_writes[j][..len].copy_from_slice(&active[j]);
