@@ -2286,7 +2286,8 @@ impl Field {
                 h += 1;
             }
             match stood {
-                Some(h) => first = if lined { h } else { h.saturating_sub(1) },
+                // Each tick starts one halving above the last stood one, so a step that keeps passing grows back.
+                Some(h) => first = h.saturating_sub(1),
                 None => {
                     out.ended = if refused {
                         RestEnd::Refused { state_top: top }
@@ -2379,7 +2380,8 @@ pub enum RestMode {
     Flow,
     /// The flow step with the line's controller (theory, November 8 05:13): passing half the claim but not the slack it
     /// doubles, failing half the claim it halves, and it rests only on a halving under the slack just below a failed
-    /// half-claim, so every rest is the field's own (its line's best fall under 4/3 of the slack).
+    /// half-claim, so every rest is the field's own (its line's best fall under 4/3 of the slack). Each tick starts one halving
+    /// above the last stood one, so a step that keeps passing half its claim grows back a doubling a tick.
     Line,
     /// The line's controller on the projected step `N(r̂ + η F_⊥)`, whose half-claim reads a true line (theory, 05:39).
     Projected,
