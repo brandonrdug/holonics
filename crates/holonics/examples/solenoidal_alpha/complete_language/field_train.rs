@@ -3021,6 +3021,11 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
         order.sort_by_key(|&i| std::cmp::Reverse(train_set[i].0.len() + train_set[i].1.len()));
         let mut chosen: Vec<usize> = order.iter().take(count).copied().collect();
         chosen.push(order[order.len() / 2]);
+        // `FIELD_CENSUS_PICK=k`: only the k-th of those problems, so a serial read runs one problem a process.
+        if let Ok(k) = std::env::var("FIELD_CENSUS_PICK") {
+            let k: usize = k.parse().map_err(|_| "FIELD_CENSUS_PICK is an index".to_string())?;
+            chosen = vec![*chosen.get(k).ok_or("FIELD_CENSUS_PICK is past the chosen problems")?];
+        }
         for i in chosen {
             let truth = truth_of(&train_set[i], &train_set[i].1);
             let none = vec![false; truth.len()];

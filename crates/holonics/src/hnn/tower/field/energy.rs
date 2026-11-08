@@ -2539,6 +2539,17 @@ pub enum RestMode {
     /// swing and the flow alike, and the carried motion enters the new metric as `v_ℓ √(rms_(t−1)/rms_t)`, which keeps
     /// `Σ_ℓ |v_ℓ|²/η_ℓ` unchanged. The rescale still changes the work `½⟨F, v⟩`, so a swing tick is certified from the Q it
     /// last stood at, `q_next(t − 1)`, and pays for the re-read (agent-inferred from the measured gap, November 8).
+    ///
+    /// [theory, 09:33] With `s = √(rms_t/rms_(t+1))` the rescale adds `μ(s − 1)v` to the next displacement, whose first-order
+    /// change of Φ, `−μ(s − 1)⟨F, v⟩`, is negative on both legs of an orbit: the transport is a push downhill. Its cost is
+    /// the work's rise `½(s − 1)⟨F, v⟩`, and charging it to the tick whose step carries the rescaled motion takes the push
+    /// only where that tick's fall covers it. Carrying v untransported with Q at x' read in the next tick's metric also
+    /// closes Q (bit for bit, measured on problem 16370) but throws the push away. [measurement, November 8] The four census
+    /// problems rest below the grain under both; here against untransported, ticks and fall: 23957 288 at 3.88964e15
+    /// against 344 at 3.88470e15, 22383 232 at 3.56344e15 against 273 at 3.52481e15, 16370 84 at 6.61400e14 against 221
+    /// at 6.61026e14, and 21778 416 at 3.53770e15 against 220 at 3.54590e15, the one problem where untransported rests
+    /// sooner and deeper. The lanes past their own band are no guard to add: the low-radial lanes that carried the
+    /// transport's whole work (100.5% of it from tick 100 on) stayed inside their bands.
     SwingPerLane,
 }
 
