@@ -2845,7 +2845,11 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
     // releases its problems' writes afresh from the faces at their true lengths and sweeps them whole SWEEPS times at T, so
     // nothing persists between sections (each sweep's energy printed, the last two read as the lag).
     let fresh_sweeps: Option<u64> = std::env::var("FIELD_CONTRAST_FRESH").ok().and_then(|v| v.parse().ok()).filter(|&k| k > 0);
-    let persistent = std::env::var_os("FIELD_CONTRAST_PERSISTENT").is_some() || fresh_sweeps.is_some();
+    // [measurement; theory, November 8 16:49] `FIELD_MELT=SWEEPS`: a melt from the truth, which separates learning from release.
+    // At the loaded state, the first section read starts twice, from its truths and from the field's own release at their true
+    // lengths (the fork's key), and each start is swept whole SWEEPS times at the field's `T` (cool 0), with no deposition.
+    let melt_sweeps: Option<u64> = std::env::var("FIELD_MELT").ok().and_then(|v| v.parse().ok()).filter(|&k| k > 0);
+    let persistent = std::env::var_os("FIELD_CONTRAST_PERSISTENT").is_some() || fresh_sweeps.is_some() || melt_sweeps.is_some();
     let conditional = std::env::var_os("FIELD_CONTRAST_CONDITIONAL").is_some();
     // [measurement; theory, November 8 11:10] `FIELD_CONTRAST_READ_ONLY`: each section is read and its learner put back as it
     // opened, so every section's code is read at the opening state and nothing is deposited (the family split's reads).
@@ -3242,6 +3246,46 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
                 let key = mix(seed ^ 0x9E85_15 << 40, read << 32 | n as u64);
                 // [the unified-theory reading of November 7, 09:55] Each write is released once at the longest answer's length and
                 // carried whole: a question takes its first `L` places, and the rest wait unread and unmoved for a longer question.
+                // The melt (`FIELD_MELT`): each sweep prints the share of answer places at their truth letter, each answer's energy a
+                // place (milli-nats), the places moved and proposed, the answers whose first ten letters are their truth's, and those
+                // with a backtick in their first three places (sweep 0 is the start, before any sweep); after the last sweep the
+                // answers are written whole (private), and the run ends.
+                if let Some(k) = melt_sweeps {
+                    let m = members.len();
+                    let truth_answers: Vec<Vec<usize>> = members.iter().map(|&i| train_set[i].1.clone()).collect();
+                    let released = learner.field.energy_release(&problems, &lengths, void, 64, key, realization, &mut |_, _, _| {}).map_err(|e| e.to_string())?;
+                    use std::io::Write;
+                    let mut f = std::fs::OpenOptions::new().create(true).append(true).open(out.join("MELT_WRITES.txt"))?;
+                    for (start, mut active) in [("truth", truth_answers.clone()), ("release", released)] {
+                        for sweep in 0..=k {
+                            let t0 = std::time::Instant::now();
+                            let (mv, pr, en) = if sweep == 0 {
+                                (0usize, 0usize, Vec::new())
+                            } else {
+                                learner.field.energy_sweep_at(&problems, &mut active, None, void, 0, mix(key, 200 + sweep), realization, &mut |_, _| {}).map_err(|e| e.to_string())?
+                            };
+                            let places: usize = active.iter().map(|a| a.len()).sum::<usize>().max(1);
+                            let agree: usize = active.iter().zip(&truth_answers).map(|(a, t)| a.iter().zip(t).filter(|(x, y)| x == y).count()).sum();
+                            let opening = active.iter().zip(&truth_answers).filter(|(a, t)| { let l = t.len().min(10); a.len() >= l && a[..l] == t[..l] }).count();
+                            let tick = active.iter().filter(|a| codec.decode(&a[..a.len().min(3)]).contains(&b'`')).count();
+                            let energies: Vec<String> = en.iter().map(|e| (e * 1000 >> 32).to_string()).collect();
+                            let mean = if en.is_empty() { "-".to_string() } else { ((en.iter().sum::<i128>() / m.max(1) as i128) * 1000 >> 32).to_string() };
+                            println!(
+                                "FIELD_MELT start={start} n={n} sweep={sweep} retention_milli={} energy_milli={mean} energies_milli={} moved={mv} proposed={pr} opening_intact={opening} backtick_first3={tick} ms={}",
+                                agree * 1000 / places,
+                                if energies.is_empty() { "-".to_string() } else { energies.join(",") },
+                                t0.elapsed().as_millis()
+                            );
+                        }
+                        for (j, w) in active.iter().enumerate() {
+                            writeln!(f, "=== melt {start} section {n} answer {j} ===")?;
+                            f.write_all(&codec.decode(w))?;
+                            writeln!(f)?;
+                        }
+                    }
+                    println!("FIELD_MELT_DONE n={n} ms={}", started.elapsed().as_millis());
+                    return Ok(());
+                }
                 if fresh_sweeps.is_some() {
                     persistent_writes.clear();
                 }

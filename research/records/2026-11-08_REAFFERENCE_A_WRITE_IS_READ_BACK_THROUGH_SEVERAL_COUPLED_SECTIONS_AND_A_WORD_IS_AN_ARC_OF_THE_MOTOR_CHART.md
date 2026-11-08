@@ -158,3 +158,36 @@ a signature is a face, the pairing of the thing with the receiver that reads it.
 - Blind set before the end read [guess]: by the fork's last section at least 4 of its 16 writes carry a backtick in
   their first three places. Backticks are 1.75% of the corpus's letters, so chance gives 0.8 of 16, and 4 or more about
   1% of the time: the opening forms before interior pairs recur past chance.
+
+## 8. Theory, November 8 16:49
+
+Written after Epime's letter of the same afternoon (a critique of the lens as delayed usefulness, chronological coupling and
+the overture), and fixed before the fork's end reads reached theory.
+
+- [correction] §4's cross-susceptibility, in the base-2 chart the sweep uses (acceptance `2^((G − G′)/T)`), reads
+  `E[∂²G/∂θ_a∂θ_b] − (ln 2/T) Cov(∂G/∂θ_a, ∂G/∂θ_b)`, the expectation and covariance under the writer's law at T, never at
+  truth contexts.
+- [correction] §6's "the tip's distance costs nothing" holds for the ideal transformer only: a rod's moment of inertia and its
+  compliance both grow as the cube of its length, so a long hair answers slower and softer.
+- [measured, the corpus split one answer in ten] Held answers code at 3.40 nats a place from letters alone and 2.68 from the
+  previous letter's count. Law D's conditional near section 179 (2.72 on the stream, 2.76 held), with the whole truth on both
+  sides, is still weaker than the previous letter alone.
+- [derived] A letter-pair field with its coupling tempered by λ (0 independent letters, 1 the letter-pair chain), solved in
+  closed form: at the field's conditional gain over letters alone, 0.64 to 0.69 (λ 0.22 to 0.24), its own writer's dependence
+  (its shares' entropy minus its entropy rate) is 0.056 to 0.065 nats a place, the heating read's level. Below λ 0.4 the
+  dependence is 0.13 to 0.17 times the gain squared; from λ 0.8 to 1.0 the gain rises 0.02 while the dependence goes from
+  0.47 to 0.82. A writer's coherence can jump while its conditional barely moves, with no reorganization. At weak coupling, n
+  equal couplings give about 1/n the dependence for one gain, so the curve is an upper reference for a field like this one.
+  The fork's acceptance of H(shares) − S past 0.1 maps to a gain of 0.82 (conditional 2.58) on it.
+- [simulated, the same pair field] From the truth it melts in one sweep: on 300 held answers, retention is 0.069 (λ 0.20) and
+  0.076 (λ 0.25) after sweep 1 and 0.050 (chance) from sweep 2, and the opening never survives a sweep.
+- [decided] The melt from the truth (`FIELD_MELT=SWEEPS` in field_train): at a fixed constitution, a section's problems start
+  from their truths and from the field's own release, each swept whole at the field's T with no deposition. It separates
+  joint-law learning from release behaviour. Outcomes fixed before the read: A, weak coupling (retention at most 0.12 after
+  sweep 1 and within 0.03 of the release start's own agreement from sweep 2, the two starts' energies a place within 0.05
+  nats from sweep 2, the opening intact in at most 1 of 16 after one sweep, on both states); B, two phases (retention at least
+  0.3 through sweep 8 with the truth start's energy below the release start's: a supercooled writer, and the next loop is the
+  release); C, slow mixing (retention above the release start's agreement by more than 0.03 at sweep 8 without B's plateau:
+  the four-sweep writer is not the field's own law). Theory expects A on both states.
+- The fork's end state was lost to a defect (the fresh path ignored `FIELD_CONTRAST_SECTIONS`; fixed in a6c695c41), so its
+  melt and its heat run on a rerun of the same 20 sections from the 179 save.
