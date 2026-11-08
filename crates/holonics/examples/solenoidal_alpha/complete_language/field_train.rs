@@ -3947,7 +3947,9 @@ impl Leg {
         let m: Vec<i128> = (0..4).map(|i| nats(self.moments[i])).chain((4..7).map(|i| nats2(self.moments[i]))).collect();
         let s_step = if m[4] != 0 { 1000 - (m[0] - m[1]) * 1000 / m[4] } else { 0 };
         let w_step = if m[5] != 0 { 1000 - (m[3] - m[2]) * 1000 / m[5] } else { 0 };
-        println!("FIELD_LEG_MOMENTS lap={lap} {what} sections={at} weight={} code={} h={} f_truth={} kl={} var_lnp={} var_f={} cov={} s_milli={s_step} w_milli={w_step}", self.moments[7], m[0], m[1], m[2], m[3], m[4], m[5], m[6]);
+        // [theory, November 8 15:33] The f terms are read against the face carried at the truth (built from the truth letter, so
+        // they leak it); w's calibration is read on held rows against the open face. code, h, var_lnp and s stand.
+        println!("FIELD_LEG_MOMENTS lap={lap} {what} sections={at} weight={} code={} h={} f_carried_truth={} kl_carried={} var_lnp={} var_f_carried={} cov_carried={} s_milli={s_step} w_carried_milli={w_step}", self.moments[7], m[0], m[1], m[2], m[3], m[4], m[5], m[6]);
         println!("FIELD_LEG_COHERENCE lap={lap} {what} n={} {}", self.coherence.n, self.coherence.text(field));
         println!("FIELD_LEG_LETTERS lap={lap} {what} truth_count_less_mass_milli {}", top.join(" "));
         println!("FIELD_LEG_BANDS lap={lap} {what} {}", bands.join(" "));

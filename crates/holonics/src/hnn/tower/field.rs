@@ -5331,7 +5331,8 @@ pub struct KernelReceipt {
     pub letter_counts: Vec<i128>,
     pub surprise_bands: Vec<usize>,
     pub kl_face: i128,
-    /// [measurement; theory, November 8 13:11] The read places' seven moments of the conditional against its face, summed with
+    /// [measurement; theory, November 8 13:11 and 15:33] The read places' seven moments of the conditional against the face
+    /// carried at the truth (the face the kernel block opens; it is built from the truth letter, so f leaks it), summed with
     /// their beat weights `2^k` (bits on 2^(−32), bits² for the variances): the code, H(p), f(t), E_p f, Var_p log₂ p, Var_p f,
     /// Cov_p(log₂ p, f), and the summed weight.
     pub moments: [i128; 8],
