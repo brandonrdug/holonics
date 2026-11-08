@@ -2168,6 +2168,9 @@ impl Field {
         };
         let mut v = vec![0i64; x.len()];
         let mut swing_h: Option<u32> = None;
+        // The per-lane unit the swing holds (theory, 07:05): each lane's rms(F) read where the swing starts, held in its step
+        // and in Q's kinetic term until a release re-reads it.
+        let mut held_rms: Vec<i128> = Vec::new();
         let rebase = |stepped: &[i64]| -> Result<Vec<i64>> {
             let mut based = Vec::with_capacity(stepped.len());
             for (k, lane) in stepped.chunks_exact(lane_width).enumerate() {
@@ -2201,6 +2204,7 @@ impl Field {
             let mut rhos: Vec<i128> = Vec::with_capacity(x.len() / lane_width);
             let mut lane_rms: Vec<i128> = Vec::with_capacity(x.len() / lane_width);
             let mut step_force = force.clone();
+            let mut perp_force = force.clone();
             if flowing {
                 for t in 0..x.len() / dw {
                     for k in 0..lanes {
@@ -2215,6 +2219,7 @@ impl Field {
                         if projected {
                             for i in 0..lane_width {
                                 let fp = force[at + i] as i128 - release(cell.read[at + i] as i128 * mean_rf, 32);
+                                perp_force[at + i] = fit64(fp)?;
                                 step_force[at + i] = if per_lane {
                                     if rms == 0 { 0 } else { fit64(div_nearest(fp << super::super::COVECTOR_BITS, rms))? }
                                 } else {
@@ -2246,10 +2251,23 @@ impl Field {
                         let vv2: i128 = vl.iter().map(|&b| b as i128 * b as i128).sum();
                         let s2 = (scale0[k] * scale0[k]).max(1);
                         let base = div_nearest(vv2 << 32, s2) << hs;
-                        if per_lane { release(base * lane_rms[k], super::super::COVECTOR_BITS) } else { base }
+                        if per_lane { release(base * held_rms[k], super::super::COVECTOR_BITS) } else { base }
                     }).sum()
                 };
-                let stepped = self.energy_step(&x, &cell.scale, &step_force, hs)?;
+                // The step's force at the held unit: F_⊥ itself, or F_⊥ over the lane's held rms.
+                let swing_force: Vec<i64> = if per_lane {
+                    let mut sf = vec![0i64; x.len()];
+                    for (k, (out_l, fl)) in sf.chunks_exact_mut(lane_width).zip(perp_force.chunks_exact(lane_width)).enumerate() {
+                        let rms = held_rms[k];
+                        for (o, &f) in out_l.iter_mut().zip(fl) {
+                            *o = if rms == 0 { 0 } else { fit64(div_nearest((f as i128) << super::super::COVECTOR_BITS, rms))? };
+                        }
+                    }
+                    sf
+                } else {
+                    perp_force.clone()
+                };
+                let stepped = self.energy_step(&x, &cell.scale, &swing_force, hs)?;
                 let moved: Vec<i64> = stepped.iter().zip(&x).zip(&v).map(|((&st, _), &vi)| st + release(mu * vi as i128, 16) as i64).collect();
                 let next = rebase(&moved)?;
                 if next != x {
@@ -2372,8 +2390,9 @@ impl Field {
                 Some(h) => {
                     first = h.saturating_sub(1);
                     if swinging {
-                        // The swing holds the flow step's η until a release re-reads it.
+                        // The swing holds the flow step's η, its per-lane unit included, until a release re-reads it.
                         swing_h = Some(h);
+                        held_rms = lane_rms.clone();
                     }
                 }
                 None => {
