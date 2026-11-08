@@ -87,3 +87,23 @@ scanned by moving the retina itself: the foveate, several-frame reading with dep
   at its own lag, and retuning is deposition. The spider tunes until its own pluck's return cancels, so only prey is news:
   that is the fork's rest, each section's reading of the write equal in expectation to its reading of the truth.
 - None of this changes the fork's law or its acceptance.
+
+## 5. The lens continued: rods, cones and signatures (Brandon, November 8 15:15, paraphrased)
+
+- Measuring devices often compress into the quanta of a cone and a rod: hairs, the retina's cones and rods, the fingers as
+  macroscopic rods. The structure repeats in biology, and often becomes jointed, which adds degrees of freedom for
+  navigation and detection; where it sits decides whether it serves as a measuring device or a limb.
+- Taste and smell are very close chemical gaps whose molecular geometry the nerves feel; what we eat carries taste
+  signatures, because charge and the dispersal of action are always signatured, a kind of Doppler spectrogram the body
+  processes: the "face" of the thing. Transistors are like this in the full process of conduction.
+- The eye's lens mediates photons toward the cones and rods as air conducts heat toward or away from the skin's hairs.
+- A hair senses motion sensitively however far its tip is from the nerve: the angles diverge far from the origin (a
+  periplus), the hair's torque transports to the root of the fibre with tension about the crossing, and the pull arrives
+  as a polar input at the nerve. Hairs integrate across the basis of nerves, as the retina does, which is why a full surface
+  of hairs detects matter moving through air, and water even more so.
+
+The join (agent-inferred, for theory's derivation): a hair is a lever-armed contact whose length transports a distant
+angle into a moment read at its port (flow and effort paired at the root); jointed rods are a chain of screws, the motor
+chart's own object; a surface of hairs, the retinal mosaic or a fish's lateral line is a receiver family over a partition,
+each in its own frame, summed across the nerves; taste and smell are the lock-and-key reading of a shape at close range;
+a signature is a face, the pairing of the thing with the receiver that reads it.
