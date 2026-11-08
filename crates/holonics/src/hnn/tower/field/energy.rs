@@ -2171,16 +2171,26 @@ impl Field {
         // The per-lane unit the swing holds (theory, 07:05): each lane's rms(F) read where the swing starts, held in its step
         // and in Q's kinetic term until a release re-reads it.
         let mut held_rms: Vec<i128> = Vec::new();
+        // (theory, 07:28) A state on its chart re-bases to itself: a lane is re-based only when its rms has left its held
+        // scale by more than one unit of its grain, so a below-grain step returns x and the read ends by the grain or the
+        // field, never by the chart's rounding.
         let rebase = |stepped: &[i64]| -> Result<Vec<i64>> {
             let mut based = Vec::with_capacity(stepped.len());
             for (k, lane) in stepped.chunks_exact(lane_width).enumerate() {
-                let (r, _) = ratio_to_power(lane)?;
+                let (r, s) = ratio_to_power(lane)?;
+                if (s - scale0[k]).abs() <= 1 {
+                    based.extend_from_slice(lane);
+                    continue;
+                }
                 for &rk in &r {
                     based.push(fit64(release(scale0[k] * rk as i128, FACE_BITS))?);
                 }
             }
             Ok(based)
         };
+        // (theory, 07:28) A lane's unit is its metric, not its force: its rms(F) read once, at the read's opening, and held
+        // for every step of the read, flow and swing alike.
+        let mut opening_rms: Vec<i128> = Vec::new();
         // ⟨F, v⟩ on Φ's 2^(−32): F on 2^(−24) a unit of r̂, v on the state's grain over the lane's held scale.
         let work = |f: &[i64], vv: &[i64]| -> i128 {
             f.chunks_exact(lane_width).zip(vv.chunks_exact(lane_width)).enumerate().map(|(k, (fl, vl))| {
@@ -2214,7 +2224,12 @@ impl Field {
                         let perp = ff - release(div_nearest(rf * rf, lane_width as i128), 32);
                         let mean_rf = div_nearest(rf, lane_width as i128);
                         rhos.push(release(mean_rf, FACE_BITS));
-                        let rms = ((ff / lane_width as i128) as u128).isqrt() as i128;
+                        let rms_now = ((ff / lane_width as i128) as u128).isqrt() as i128;
+                        let lane = lane_rms.len();
+                        if opening_rms.len() <= lane {
+                            opening_rms.push(rms_now);
+                        }
+                        let rms = opening_rms[lane];
                         lane_rms.push(rms);
                         if projected {
                             for i in 0..lane_width {
@@ -2289,9 +2304,12 @@ impl Field {
                     let sum: Vec<i64> = v.iter().zip(&v_new).map(|(&a, &b)| a + b).collect();
                     let claim = ((1 << 16) - mu) * kinetic(&sum) >> 18;
                     let diff: Vec<i64> = force.iter().zip(&cand_force).map(|(&a, &b)| a - b).collect();
-                    let inside = work(&diff, &v_new) < (((1 << 16) + mu) * kinetic(&v_new) >> 15);
+                    let (lhs, rhs) = (work(&diff, &v_new), ((1 << 16) + mu) * kinetic(&v_new) >> 15);
+                    let inside = lhs < rhs;
                     let slack = (cell.logs + candidate.logs) as i128 + 2;
-                    out.tries.push(RestTry { tick, halvings: hs, fall: q_now - q_next, claim, slack });
+                    // Why a swing tick would release: the band guard's ratio (milli) and whether Q fell past the slack.
+                    let note = if !inside { 1 } else if q_next + slack > q_now { 2 } else { 0 };
+                    out.tries.push(RestTry { tick, halvings: hs, fall: q_now - q_next, claim, slack, note, guard_milli: if rhs > 0 { lhs * 1000 / rhs } else { 0 } });
                     if inside && q_next + slack <= q_now {
                         out.ticks.push(RestTick { halvings: hs, fall: q_now - q_next, slack, scale_top: 0, rebase_change: cell.phi - candidate.phi, claim, rho_nonpositive, rho_least, rho_median, rho_top, swing: true });
                         x = next;
@@ -2314,18 +2332,7 @@ impl Field {
                     break;
                 };
                 // The flow step's candidate is re-based inside itself, before its energy is read.
-                let next = if flowing {
-                    let mut based = Vec::with_capacity(stepped.len());
-                    for (k, lane) in stepped.chunks_exact(lane_width).enumerate() {
-                        let (r, _) = ratio_to_power(lane)?;
-                        for &rk in &r {
-                            based.push(fit64(release(scale0[k] * rk as i128, FACE_BITS))?);
-                        }
-                    }
-                    based
-                } else {
-                    stepped
-                };
+                let next = if flowing { rebase(&stepped)? } else { stepped };
                 if next == x {
                     below_grain = true;
                     break;
@@ -2339,7 +2346,7 @@ impl Field {
                 let claim = if flowing { release(first_order, 16 + h) } else { 0 };
                 let tried = cell.phi - candidate.phi;
                 if flowing {
-                    out.tries.push(RestTry { tick, halvings: h, fall: tried, claim, slack });
+                    out.tries.push(RestTry { tick, halvings: h, fall: tried, claim, slack, note: 0, guard_milli: 0 });
                 }
                 let half_passes = 2 * tried >= claim;
                 if lined && !(half_passes && tried >= slack) {
@@ -2457,6 +2464,10 @@ pub struct RestTry {
     pub fall: i128,
     pub claim: i128,
     pub slack: i128,
+    /// A swing try's release reason: 0 none, 1 the band guard failed, 2 Q did not fall past the slack.
+    pub note: u8,
+    /// The band guard's ⟨F(x) − F(x'), v'⟩ over 2(1 + μ) Σ|v'|²/η, in thousandths (swing tries).
+    pub guard_milli: i128,
 }
 
 /// One tick that stood: its halvings, its fall and the slack it fell past (on `2^(−32)`), the lanes' largest scale's top

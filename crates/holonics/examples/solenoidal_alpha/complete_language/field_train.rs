@@ -3070,7 +3070,7 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
                     );
                 }
                 for t in &rest.tries {
-                    println!("FIELD_REST_TRY problem={i} mode={rebase} tick={} halvings={} fall={} claim={} slack={}", t.tick, t.halvings, t.fall, t.claim, t.slack);
+                    println!("FIELD_REST_TRY problem={i} mode={rebase} tick={} halvings={} fall={} claim={} slack={} note={} guard_milli={}", t.tick, t.halvings, t.fall, t.claim, t.slack, t.note, t.guard_milli);
                 }
                 println!(
                     "FIELD_REST problem={i} mode={rebase} sites={} ticks={} ended={:?} opening={} last={} fall={} opening_scale_top={} ms={}",
