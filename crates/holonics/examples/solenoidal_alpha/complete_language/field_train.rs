@@ -3334,7 +3334,10 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
                     learner.field.theta[learner.field.layout().face_temper],
                     started.elapsed().as_millis()
                 );
-                if started.elapsed().as_millis() > stop_ms {
+                // The declared read ends this path as it ends the kernel's (`FIELD_CONTRAST_SECTIONS`); without it the fresh-writes
+                // fork of November 8 ran past its 20 sections to the deadline and was stopped at section 204 with no state.
+                let read_done = read_sections > 0 && lap == 0 && n + 1 >= from_section + read_sections;
+                if started.elapsed().as_millis() > stop_ms || read_done {
                     write_new(&out.join("STATE.stopped"), at_rate(&learner, base_rate).as_bytes())?;
                     println!("FIELD_STOPPED lap={lap} sections={}/{} states={states} ms={}", n + 1, sections.len(), started.elapsed().as_millis());
                     return Ok(());
