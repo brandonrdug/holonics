@@ -58,3 +58,32 @@ scanned by moving the retina itself: the foveate, several-frame reading with dep
 - The fresh-writes fork (20 sections from lap 14's save near section 177, beside a law-D control from the same save) is
   the one-section form; its writes are read as text beside their truths, and its acceptance is fixed by theory (section
   7's mark past twice its shuffled spread, and H(shares) − S past 0.1 by heating).
+
+## 4. Theory's derivation (November 8 15:11), correcting §3
+
+- The fork already reads each write back through several frames and clocks at once: its covector spans every family
+  (the letter encodings `enc`, each turned head's moment charts at its own pace κ_h, the pair contacts, the locks'
+  temperatures, the readout). Each family is one section, and the deposit takes each section's reading of the write from
+  its reading of the truth: the world's news κ = S ⊖ E at zero lag. The atlas owns this as `receipt.reafference-lag` (a
+  receiver cancels its own release at its own clock's phase; only a lag leaves news); THE_DIALECT retires `reafference` as
+  a mechanism name, and it stays Brandon's lens word.
+- Two sections of one energy couple through the cross-susceptibility,
+  `−(1/T) Cov(∂G/∂θ_a, ∂G/∂θ_b) + E[∂²G/∂θ_a ∂θ_b]`, the field's mutual induction, which the Newton length already reads
+  along the step. So the comparison lives in the coupling inside the one energy: a new frame enters as a family of G whose
+  section reads the same letters placed in that frame. There is no second energy and no comparison outside it.
+- Stands: the receipt over a partition (letters, words, lines, each in its own frame and clock), its readings summed into
+  the shared families, so the deposit stays one covector.
+- The two frames of a word: the arc (the word's keys as vertices of the staggered key lattice traced in one stroke, an
+  open path of translations and turns, a screw word of the plane) and the execution (which finger strikes each key); the
+  posture over the home keys maps one to the other, and its spectrum over the hand's moves is the geometry spectrum. The
+  anatomy partitions the alphabet: the thumbs' space is the word clock, the pinkies' shift and enter are modifier
+  sections (a and A share a vertex; ( and ) are neighbours). Its owner is the letters' placement `enc`: a declared
+  boundary placement of each letter (vertex, finger, modifier), the writer's own effector chart, entering as an overture of
+  `enc` at a founding, never as a table inside a law.
+- The coarse frame and the packets have an owner: `scaled_up`, a packets' level of `period` sites joined by glue. The
+  energy laws refuse a scaled field today (`section_contrast_scaled` does), so the missing term is G over both levels and
+  the glue.
+- The web: its tension is the constitution's stiffness, the pluck is the release, each leg on its radius is a section read
+  at its own lag, and retuning is deposition. The spider tunes until its own pluck's return cancels, so only prey is news:
+  that is the fork's rest, each section's reading of the write equal in expectation to its reading of the truth.
+- None of this changes the fork's law or its acceptance.
