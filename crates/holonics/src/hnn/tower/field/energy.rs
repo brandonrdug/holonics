@@ -2115,7 +2115,6 @@ impl Field {
     /// rounding), and it stands only where its fall passes both the slack and half its first-order claim
     /// `η Σ (|F|² − ⟨r̂, F⟩²/W)` (half the claim is a quadratic's line minimum, so `η` stops at the energy's own curvature).
     pub fn energy_rest_read(&self, region: &Region, most: usize, mode: RestMode) -> Result<EnergyRest> {
-        let rebase = mode != RestMode::Law;
         let (faces, locked) = self.energy_sites(region);
         let region = &Region { faces: &faces, locked: &locked, ..*region };
         self.admit_region(region)?;
@@ -2168,9 +2167,9 @@ impl Field {
         };
         let mut v = vec![0i64; x.len()];
         let mut swing_h: Option<u32> = None;
-        // The per-lane unit the swing holds (theory, 07:05): each lane's rms(F) read where the swing starts, held in its step
-        // and in Q's kinetic term until a release re-reads it.
-        let mut held_rms: Vec<i128> = Vec::new();
+        // The metric the carried motion was formed in (theory, 08:01): each lane's rms(F) at the tick that formed v; when the
+        // unit is re-read, v_ℓ ← v_ℓ √(rms_(t−1)/rms_t), so Σ_ℓ |v_ℓ|²/η_ℓ is unchanged and the re-read does no work.
+        let mut prev_rms: Vec<i128> = Vec::new();
         // (theory, 07:28) A state on its chart re-bases to itself: a lane is re-based only when its rms has left its held
         // scale by more than one unit of its grain, so a below-grain step returns x and the read ends by the grain or the
         // field, never by the chart's rounding.
@@ -2188,9 +2187,7 @@ impl Field {
             }
             Ok(based)
         };
-        // (theory, 07:28) A lane's unit is its metric, not its force: its rms(F) read once, at the read's opening, and held
-        // for every step of the read, flow and swing alike.
-        let mut opening_rms: Vec<i128> = Vec::new();
+
         // ⟨F, v⟩ on Φ's 2^(−32): F on 2^(−24) a unit of r̂, v on the state's grain over the lane's held scale.
         let work = |f: &[i64], vv: &[i64]| -> i128 {
             f.chunks_exact(lane_width).zip(vv.chunks_exact(lane_width)).enumerate().map(|(k, (fl, vl))| {
@@ -2213,6 +2210,8 @@ impl Field {
             // over the lane's own rms(F) (each lane at its own unit).
             let mut rhos: Vec<i128> = Vec::with_capacity(x.len() / lane_width);
             let mut lane_rms: Vec<i128> = Vec::with_capacity(x.len() / lane_width);
+            // Each lane's radial share ρ_ℓ²/rms(F_ℓ)², in thousandths.
+            let mut radial: Vec<i128> = Vec::with_capacity(x.len() / lane_width);
             let mut step_force = force.clone();
             let mut perp_force = force.clone();
             if flowing {
@@ -2224,13 +2223,11 @@ impl Field {
                         let perp = ff - release(div_nearest(rf * rf, lane_width as i128), 32);
                         let mean_rf = div_nearest(rf, lane_width as i128);
                         rhos.push(release(mean_rf, FACE_BITS));
-                        let rms_now = ((ff / lane_width as i128) as u128).isqrt() as i128;
-                        let lane = lane_rms.len();
-                        if opening_rms.len() <= lane {
-                            opening_rms.push(rms_now);
-                        }
-                        let rms = opening_rms[lane];
+                        // (theory, 08:01) A lane's unit is re-read every tick: rms(F_ℓ) carries its radial part ρ_ℓ, the
+                        // sphere's own curvature, so near rest it is the lane's curvature unit.
+                        let rms = ((ff / lane_width as i128) as u128).isqrt() as i128;
                         lane_rms.push(rms);
+                        radial.push(if rms > 0 { (release(mean_rf * mean_rf, 32) * 1000) / (rms * rms) } else { 0 });
                         if projected {
                             for i in 0..lane_width {
                                 let fp = force[at + i] as i128 - release(cell.read[at + i] as i128 * mean_rf, 32);
@@ -2248,6 +2245,11 @@ impl Field {
                     }
                 }
             }
+            let (radial_least, radial_median, radial_top) = {
+                let mut r = radial.clone();
+                r.sort_unstable();
+                if r.is_empty() { (0, 0, 0) } else { (r[0], r[r.len() / 2], r[r.len() - 1]) }
+            };
             let rho_bits = |v: i128| 128 - v.unsigned_abs().leading_zeros();
             let (rho_nonpositive, rho_least, rho_median, rho_top) = {
                 let mut pos: Vec<i128> = rhos.iter().copied().filter(|&r| r > 0).collect();
@@ -2266,23 +2268,22 @@ impl Field {
                         let vv2: i128 = vl.iter().map(|&b| b as i128 * b as i128).sum();
                         let s2 = (scale0[k] * scale0[k]).max(1);
                         let base = div_nearest(vv2 << 32, s2) << hs;
-                        if per_lane { release(base * held_rms[k], super::super::COVECTOR_BITS) } else { base }
+                        if per_lane { release(base * lane_rms[k], super::super::COVECTOR_BITS) } else { base }
                     }).sum()
                 };
-                // The step's force at the held unit: F_⊥ itself, or F_⊥ over the lane's held rms.
-                let swing_force: Vec<i64> = if per_lane {
-                    let mut sf = vec![0i64; x.len()];
-                    for (k, (out_l, fl)) in sf.chunks_exact_mut(lane_width).zip(perp_force.chunks_exact(lane_width)).enumerate() {
-                        let rms = held_rms[k];
-                        for (o, &f) in out_l.iter_mut().zip(fl) {
-                            *o = if rms == 0 { 0 } else { fit64(div_nearest((f as i128) << super::super::COVECTOR_BITS, rms))? };
+                // The carried motion into this tick's metric: v_ℓ √(rms_(t−1)/rms_t) on 2^(−16), lane by lane.
+                if per_lane && prev_rms.len() == lane_rms.len() {
+                    for (k, vl) in v.chunks_exact_mut(lane_width).enumerate() {
+                        let (was, now) = (prev_rms[k], lane_rms[k]);
+                        if was > 0 && now > 0 && was != now {
+                            let factor = (((was as u128) << 32) / now as u128).isqrt() as i128;
+                            for e in vl.iter_mut() {
+                                *e = fit64(release(*e as i128 * factor, 16))?;
+                            }
                         }
                     }
-                    sf
-                } else {
-                    perp_force.clone()
-                };
-                let stepped = self.energy_step(&x, &cell.scale, &swing_force, hs)?;
+                }
+                let stepped = self.energy_step(&x, &cell.scale, &step_force, hs)?;
                 let moved: Vec<i64> = stepped.iter().zip(&x).zip(&v).map(|((&st, _), &vi)| st + release(mu * vi as i128, 16) as i64).collect();
                 let next = rebase(&moved)?;
                 if next != x {
@@ -2311,10 +2312,11 @@ impl Field {
                     let note = if !inside { 1 } else if q_next + slack > q_now { 2 } else { 0 };
                     out.tries.push(RestTry { tick, halvings: hs, fall: q_now - q_next, claim, slack, note, guard_milli: if rhs > 0 { lhs * 1000 / rhs } else { 0 } });
                     if inside && q_next + slack <= q_now {
-                        out.ticks.push(RestTick { halvings: hs, fall: q_now - q_next, slack, scale_top: 0, rebase_change: cell.phi - candidate.phi, claim, rho_nonpositive, rho_least, rho_median, rho_top, swing: true });
+                        out.ticks.push(RestTick { halvings: hs, fall: q_now - q_next, slack, scale_top: 0, rebase_change: cell.phi - candidate.phi, claim, rho_nonpositive, rho_least, rho_median, rho_top, radial_least, radial_median, radial_top, swing: true });
                         x = next;
                         cell = candidate;
                         v = v_new;
+                        prev_rms = lane_rms.clone();
                         continue;
                     }
                 }
@@ -2384,7 +2386,7 @@ impl Field {
                     } else {
                         (next, candidate, 0)
                     };
-                    out.ticks.push(RestTick { halvings: h, fall, slack, scale_top: top, rebase_change, claim, rho_nonpositive, rho_least, rho_median, rho_top, swing: false });
+                    out.ticks.push(RestTick { halvings: h, fall, slack, scale_top: top, rebase_change, claim, rho_nonpositive, rho_least, rho_median, rho_top, radial_least, radial_median, radial_top, swing: false });
                     x = next;
                     cell = candidate;
                     stood = Some(h);
@@ -2399,7 +2401,7 @@ impl Field {
                     if swinging {
                         // The swing holds the flow step's η, its per-lane unit included, until a release re-reads it.
                         swing_h = Some(h);
-                        held_rms = lane_rms.clone();
+                        prev_rms = lane_rms.clone();
                     }
                 }
                 None => {
@@ -2487,6 +2489,10 @@ pub struct RestTick {
     pub rho_least: u32,
     pub rho_median: u32,
     pub rho_top: u32,
+    /// Each lane's radial share ρ_ℓ²/rms(F_ℓ)² in thousandths (flow modes): least, median and top.
+    pub radial_least: i128,
+    pub radial_median: i128,
+    pub radial_top: i128,
     /// Whether the tick was the swing's (its fall and claim are then Q's, and `rebase_change` holds Φ's own fall).
     pub swing: bool,
 }
@@ -2510,7 +2516,9 @@ pub enum RestMode {
     /// The swing on the projected step (theory, November 8 06:40): motion carried across ticks at a held η, certified on
     /// `Q = Φ + ½⟨F, v⟩ + (1 + μ)/4 Σ|v|²/η` with the band guard, released to the flow step where either fails.
     SwingProjected,
-    /// The swing on the per-lane unit.
+    /// The swing on the per-lane unit (theory, November 8 08:01): each lane's unit rms(F_ℓ) is re-read every tick, in the
+    /// swing and the flow alike, and the carried motion enters the new metric as `v_ℓ √(rms_(t−1)/rms_t)`, which keeps
+    /// `Σ_ℓ |v_ℓ|²/η_ℓ` unchanged, so the re-read does no work and Q certifies across ticks.
     SwingPerLane,
 }
 

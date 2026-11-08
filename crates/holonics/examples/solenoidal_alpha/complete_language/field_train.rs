@@ -3053,7 +3053,7 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
                 let rest = learner.field.energy_rest_read(&region, most, mode).map_err(|e| e.to_string())?;
                 for (k, tick) in rest.ticks.iter().enumerate() {
                     println!(
-                        "FIELD_REST_TICK problem={i} mode={rebase} tick={k} halvings={} fall={} fall_bits={} slack={} fall_over_slack_milli={} scale_top={} rebase_change={} claim={} rho_nonpositive={} rho_bits={}/{}/{} swing={}",
+                        "FIELD_REST_TICK problem={i} mode={rebase} tick={k} halvings={} fall={} fall_bits={} slack={} fall_over_slack_milli={} scale_top={} rebase_change={} claim={} rho_nonpositive={} rho_bits={}/{}/{} radial_milli={}/{}/{} swing={}",
                         tick.halvings,
                         tick.fall,
                         128 - tick.fall.unsigned_abs().leading_zeros(),
@@ -3066,6 +3066,9 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
                         tick.rho_least,
                         tick.rho_median,
                         tick.rho_top,
+                        tick.radial_least,
+                        tick.radial_median,
+                        tick.radial_top,
                         tick.swing
                     );
                 }
