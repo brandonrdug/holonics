@@ -2170,6 +2170,8 @@ impl Field {
         // The metric the carried motion was formed in (theory, 08:01): each lane's rms(F) at the tick that formed v; when the
         // unit is re-read, v_ℓ ← v_ℓ √(rms_(t−1)/rms_t), so Σ_ℓ |v_ℓ|²/η_ℓ is unchanged and the re-read does no work.
         let mut prev_rms: Vec<i128> = Vec::new();
+        // The last standing swing tick's Q at x' in its parts (Φ, ½⟨F, v⟩, the kinetic term), to read Q's gap across ticks.
+        let mut last_q: Option<(i128, i128, i128)> = None;
         // (theory, 07:28) A state on its chart re-bases to itself: a lane is re-based only when its rms has left its held
         // scale by more than one unit of its grain, so a below-grain step returns x and the read ends by the grain or the
         // field, never by the chart's rounding.
@@ -2272,6 +2274,7 @@ impl Field {
                     }).sum()
                 };
                 // The carried motion into this tick's metric: v_ℓ √(rms_(t−1)/rms_t) on 2^(−16), lane by lane.
+                let v_before = v.clone();
                 if per_lane && prev_rms.len() == lane_rms.len() {
                     for (k, vl) in v.chunks_exact_mut(lane_width).enumerate() {
                         let (was, now) = (prev_rms[k], lane_rms[k]);
@@ -2283,6 +2286,14 @@ impl Field {
                         }
                     }
                 }
+                // [measurement] Q's gap across ticks, q_now(t) − q_next(t−1), in its parts: Φ, the work as F is read again,
+                // the work under the re-read's rescale, and the kinetic term.
+                let gaps = last_q.map(|(phi, w, k)| {
+                    let w_before = work(&force, &v_before) / 2;
+                    let w_now = work(&force, &v) / 2;
+                    let k_now = ((1 << 16) + mu) * kinetic(&v) >> 18;
+                    [cell.phi - phi, w_before - w, w_now - w_before, k_now - k]
+                }).unwrap_or([0; 4]);
                 let stepped = self.energy_step(&x, &cell.scale, &step_force, hs)?;
                 let moved: Vec<i64> = stepped.iter().zip(&x).zip(&v).map(|((&st, _), &vi)| st + release(mu * vi as i128, 16) as i64).collect();
                 let next = rebase(&moved)?;
@@ -2312,7 +2323,8 @@ impl Field {
                     let note = if !inside { 1 } else if q_next + slack > q_now { 2 } else { 0 };
                     out.tries.push(RestTry { tick, halvings: hs, fall: q_now - q_next, claim, slack, note, guard_milli: if rhs > 0 { lhs * 1000 / rhs } else { 0 } });
                     if inside && q_next + slack <= q_now {
-                        out.ticks.push(RestTick { halvings: hs, fall: q_now - q_next, slack, scale_top: 0, rebase_change: cell.phi - candidate.phi, claim, rho_nonpositive, rho_least, rho_median, rho_top, radial_least, radial_median, radial_top, swing: true });
+                        out.ticks.push(RestTick { halvings: hs, fall: q_now - q_next, slack, scale_top: 0, rebase_change: cell.phi - candidate.phi, claim, rho_nonpositive, rho_least, rho_median, rho_top, radial_least, radial_median, radial_top, gaps, swing: true });
+                        last_q = Some((candidate.phi, work(&cand_force, &v_new) / 2, ((1 << 16) + mu) * kinetic(&v_new) >> 18));
                         x = next;
                         cell = candidate;
                         v = v_new;
@@ -2323,6 +2335,7 @@ impl Field {
                 // Released: the motion lets go, and the tick is the flow step's.
                 v.iter_mut().for_each(|e| *e = 0);
                 swing_h = None;
+                last_q = None;
             }
             let mut h = first;
             // The line's controller (theory, 05:13): the least halvings whose half-claim failed this tick.
@@ -2386,7 +2399,7 @@ impl Field {
                     } else {
                         (next, candidate, 0)
                     };
-                    out.ticks.push(RestTick { halvings: h, fall, slack, scale_top: top, rebase_change, claim, rho_nonpositive, rho_least, rho_median, rho_top, radial_least, radial_median, radial_top, swing: false });
+                    out.ticks.push(RestTick { halvings: h, fall, slack, scale_top: top, rebase_change, claim, rho_nonpositive, rho_least, rho_median, rho_top, radial_least, radial_median, radial_top, gaps: [0; 4], swing: false });
                     x = next;
                     cell = candidate;
                     stood = Some(h);
@@ -2493,6 +2506,9 @@ pub struct RestTick {
     pub radial_least: i128,
     pub radial_median: i128,
     pub radial_top: i128,
+    /// [measurement] A swing tick's gap from the last standing swing tick's Q at x', `q_now(t) − q_next(t−1)`, in parts: Φ,
+    /// the work ½⟨F, v⟩ as F is read again, the work under the unit re-read's rescale, and the kinetic term (2^(−32)).
+    pub gaps: [i128; 4],
     /// Whether the tick was the swing's (its fall and claim are then Q's, and `rebase_change` holds Φ's own fall).
     pub swing: bool,
 }
