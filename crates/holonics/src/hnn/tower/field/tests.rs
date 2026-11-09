@@ -2100,6 +2100,23 @@ fn the_towers_covector_matches_its_codes_difference() {
 }
 
 
+/// [definition; theory, November 9 23:30] **A grown field keeps its declared clocks** (`Field::clocked_as`): a field grown by
+/// copies or by a lane reads on the clocks the field it grew from declared, and reads its faces on them.
+#[test]
+fn a_grown_field_keeps_its_declared_clocks() {
+    for (per_blank, bare) in [(false, true), (true, false), (true, true)] {
+        let mut field = shaped(1);
+        (field.per_blank_clock, field.bare_stretch) = (per_blank, bare);
+        let faces = field.faces(&region()).unwrap();
+        let (laned, _) = field.laned(&keys(field.declaration.lane_draws())).unwrap();
+        let (grown, _) = field.grown(2, &keys(field.growth_draws(2))).unwrap();
+        for (name, next) in [("laned", &laned), ("grown", &grown)] {
+            assert_eq!((next.per_blank_clock, next.bare_stretch), (per_blank, bare), "{name} at per-blank {per_blank}, bare {bare}");
+            assert_eq!(next.faces(&region()).unwrap(), faces, "{name} at per-blank {per_blank}, bare {bare}");
+        }
+    }
+}
+
 /// [definition; §16.40] **A lane founded beside a field keeps every face**: the laned field (one lane, then two, past the
 /// first) reads every face the field read, its draws counted are the draws read, its families tile its material and its
 /// text restores it; the laned learner keeps every old moment, opens the lane's on its family's second moment and keeps its

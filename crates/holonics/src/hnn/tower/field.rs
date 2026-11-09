@@ -1880,6 +1880,17 @@ impl Field {
         Self { declaration, theta, layout, rings, decays, exponential, fine: Exponential::new(MATERIAL_BITS), pi, scale: None, per_blank_clock: false, bare_stretch: false }
     }
 
+    /// [definition; theory, November 9 23:30] **A grown field keeps its field's declared clocks** ([`Field::per_blank_clock`],
+    /// [`Field::bare_stretch`]): they are laws of the read, not of the state, so a growth by copies ([`Field::grown`]) or by a lane
+    /// ([`Field::laned`]) reads on the clock the field it grew from read on. Why: built fresh, a grown field opened on the default
+    /// clock, so a run that declared `FIELD_CLOCK_BARE` and grew a lane first (`FIELD_LANE_FIRST`, the November 9 lane run, laps
+    /// 27-29: no bare clock) read and trained without it: its opening joint read 1.892426 nats a place on lap 26's state grown by
+    /// the lane, where the state read on its declared clock gives 1.892272, train-field's own read of it.
+    fn clocked_as(mut self, from: &Field) -> Self {
+        (self.per_blank_clock, self.bare_stretch) = (from.per_blank_clock, from.bare_stretch);
+        self
+    }
+
     /// Each turned slot's skin decay on `2^(−30)` at every distance within the reach (a
     /// realization's resident face).
     pub fn decays(&self) -> &[Vec<i64>] {
@@ -4742,7 +4753,7 @@ impl Field {
         repeat(ol.w_bias, layout.w_bias, dw, f, &face, true);
         repeat(ol.read_bias, layout.read_bias, a, 1, &kept, false);
         repeat(ol.moment_face_bias, layout.moment_face_bias, dw, f, &face, true);
-        Ok((Self::with_theta(d, new), from))
+        Ok((Self::with_theta(d, new).clocked_as(self), from))
     }
 
     /// [definition; agent-inferred, November 4, §16.40] **The field with one more lane** (the tower record, D2): a lane of
@@ -4832,7 +4843,7 @@ impl Field {
             }
         }
         debug_assert_eq!(cursor, 4 * old.lane_draws());
-        Ok((Self::with_theta(d, new), from))
+        Ok((Self::with_theta(d, new).clocked_as(self), from))
     }
 }
 
