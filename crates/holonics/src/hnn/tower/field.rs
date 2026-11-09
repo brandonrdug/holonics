@@ -6823,6 +6823,14 @@ impl FieldLearner {
         }
     }
 
+    /// [measurement; theory, November 9 14:30] **The step the last deposit formed**, entry by entry on `2^(−24)` of its
+    /// family's grain before the remainder carried from earlier sections is added ([`HeldStep`]'s `formed`, the length law's
+    /// operand; `θ` moves by `−release(formed + carried)`), where the learner keeps it: none under a held read or where the step
+    /// carried nothing. A reading: it changes nothing.
+    pub fn last_formed_step(&self) -> Option<&[i128]> {
+        self.last.as_ref().map(|held| held.formed.as_slice()).filter(|formed| !formed.is_empty())
+    }
+
     /// The field read at the averaged constitution, each entry released to `θ`'s grain (the live field where none is kept).
     pub fn averaged_field(&self) -> Field {
         let mut field = self.field.clone();

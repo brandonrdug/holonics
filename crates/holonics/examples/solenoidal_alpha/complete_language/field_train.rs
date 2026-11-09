@@ -3241,21 +3241,134 @@ impl SweepWrites {
 /// `truths[j]`, every site resolved, deposited through the one deposit ([`FieldLearner::section_contrast`]). The fresh
 /// writes' sections deposit through it, and the sweep resume's acceptance reads it.
 fn writes_deposit(learner: &mut FieldLearner, problems: &[(&[usize], usize)], truths: &[Vec<usize>], active: &[Vec<usize>], void: usize, realization: &mut dyn FieldRealization) -> Result<holonics::hnn::tower::field::ContrastReceipt> {
-    let near = holonics::hnn::tower::field::NEAR;
     let m = active.len();
-    let writes_now: Vec<Vec<usize>> = (0..m)
-        .map(|j| {
-            let (q, room) = problems[j];
-            let w = &active[j];
-            let mut c: Vec<usize> = q.iter().chain(w).copied().collect();
-            c.extend(std::iter::repeat_n(void, near.min(room - w.len())));
-            c
-        })
-        .collect();
+    let writes_now = writes_regions(problems, active, void);
     let resolved: Vec<Vec<bool>> = truths.iter().map(|t| vec![false; t.len()]).collect();
     let truth_views: Vec<Region> = truths[..m].iter().zip(&resolved).map(|(c, u)| Region { classes: c, unresolved: u, faces: &[], locked: &[], echo: &[], domain: None, port: None }).collect();
     let write_views: Vec<Region> = writes_now.iter().zip(&resolved).map(|(c, u)| Region { classes: c, unresolved: u, faces: &[], locked: &[], echo: &[], domain: None, port: None }).collect();
     Ok(learner.section_contrast(&truth_views, &write_views, realization).map_err(|e| e.to_string())?)
+}
+
+/// Each write's region: its question, the write and the near tail of voids its room leaves.
+fn writes_regions(problems: &[(&[usize], usize)], active: &[Vec<usize>], void: usize) -> Vec<Vec<usize>> {
+    let near = holonics::hnn::tower::field::NEAR;
+    active
+        .iter()
+        .enumerate()
+        .map(|(j, w)| {
+            let (q, room) = problems[j];
+            let mut c: Vec<usize> = q.iter().chain(w).copied().collect();
+            c.extend(std::iter::repeat_n(void, near.min(room - w.len())));
+            c
+        })
+        .collect()
+}
+
+/// [measurement; theory, November 9 14:30] **The writes' contrast covector by problem**, a reading before the deposit: each
+/// write against its truth, read as [`writes_deposit`] reads them, through
+/// [`holonics::hnn::tower::field::contrast_pair_covectors`] (one material read of every truth and write, each pair's
+/// `(1/T)(∂G/∂θ(truth) − ∂G/∂θ(write))` released to the deposit's chart). It reads the field and changes nothing.
+fn writes_pairs(field: &Field, problems: &[(&[usize], usize)], truths: &[Vec<usize>], active: &[Vec<usize>], void: usize, realization: &mut dyn FieldRealization) -> Result<Vec<Vec<i128>>> {
+    let m = active.len();
+    let writes_now = writes_regions(problems, active, void);
+    let resolved: Vec<Vec<bool>> = truths.iter().map(|t| vec![false; t.len()]).collect();
+    let truth_views: Vec<Region> = truths[..m].iter().zip(&resolved).map(|(c, u)| Region { classes: c, unresolved: u, faces: &[], locked: &[], echo: &[], domain: None, port: None }).collect();
+    let write_views: Vec<Region> = writes_now.iter().zip(&resolved).map(|(c, u)| Region { classes: c, unresolved: u, faces: &[], locked: &[], echo: &[], domain: None, port: None }).collect();
+    let pairs = holonics::hnn::tower::field::contrast_pair_covectors(field, &truth_views, &write_views, realization).map_err(|e| e.to_string())?;
+    Ok(pairs.into_iter().map(|p| p.covector).collect())
+}
+
+/// `Σ v²` over `v`, in an unbounded carrier.
+fn square_sum<'a>(v: impl Iterator<Item = &'a i128>) -> num_bigint::BigUint {
+    v.map(|x| num_bigint::BigUint::from(x.unsigned_abs()).pow(2)).sum()
+}
+
+/// `⟨a, b⟩`, in an unbounded carrier.
+fn dot_sum(a: &[i128], b: &[i128]) -> num_bigint::BigInt {
+    a.iter().zip(b).map(|(&x, &y)| num_bigint::BigInt::from(x) * num_bigint::BigInt::from(y)).sum()
+}
+
+/// The cosine of two vectors with squared norms `aa` and `bb` and product `ab`, in signed thousandths: `⌊1000·ab /
+/// ⌊√(aa·bb)⌋⌋` toward zero, held to `±1000`; none where either vector is zero.
+fn cosine_milli(ab: &num_bigint::BigInt, aa: &num_bigint::BigUint, bb: &num_bigint::BigUint) -> Option<i64> {
+    let root = (aa * bb).sqrt();
+    if root == num_bigint::BigUint::from(0u8) {
+        return None;
+    }
+    let c = ab * num_bigint::BigInt::from(1000) / num_bigint::BigInt::from(root);
+    num_traits::ToPrimitive::to_i64(&c.clamp(num_bigint::BigInt::from(-1000), num_bigint::BigInt::from(1000)))
+}
+
+/// [measurement; theory, November 9 14:30] **The delete-one jackknife SE** of a reading from its leave-one-out values
+/// `x_(−p)` over `n` problems: `√((n − 1)/n · Σ_p (x_(−p) − x̄)²) = √((n − 1)·Σ_p (n·x_(−p) − S)² / n³)`, `S = Σ_p x_(−p)`,
+/// floored; none under two problems.
+fn jackknife_se(loo: &[num_bigint::BigUint]) -> Option<num_bigint::BigUint> {
+    let n = loo.len();
+    if n < 2 {
+        return None;
+    }
+    let total: num_bigint::BigInt = loo.iter().map(|x| num_bigint::BigInt::from(x.clone())).sum();
+    let spread: num_bigint::BigInt = loo.iter().map(|x| (num_bigint::BigInt::from(x.clone()) * num_bigint::BigInt::from(n) - &total).pow(2)).sum();
+    let variance = spread * num_bigint::BigInt::from(n - 1) / num_bigint::BigInt::from(n).pow(3);
+    variance.to_biguint().map(|v| v.sqrt())
+}
+
+/// [measurement; theory, November 9 14:30] **A section's covector by family** (`FIELD_COVECTOR_SECTION`), a reading. The
+/// section's contrast covector is `g = Σ_p g(p)` over its problems' covectors (`pairs`, [`writes_pairs`]), in the deposit's
+/// chart (`(1/T)·∂G/∂θ` released to `2^(−24)` of the material on a family at the material's grain and `40 − 24` places further
+/// on any other, the unit the family's moments take; it stands within `⌊(n + 1)/2⌋` units of the covector the deposit takes,
+/// entry by entry, which releases the pairs' sum once). For every family with entries, one line:
+/// - `norm`: `‖g_f‖ = ⌊√Σ g²⌋`, in that unit;
+/// - `norm_se`: the delete-one jackknife SE of `‖g_f‖` over the section's problems ([`jackknife_se`] of `‖g_f − g_f(p)‖`);
+/// - `cos_prev_milli`: the cosine of `g_f` with the previous section's (`prev`), signed thousandths, `-` where none;
+/// - `step_norm`, `step_cos_milli`: the norm of the step `s_f` the deposit took on the family (`step`, `θ` moving by `−s_f`:
+///   as formed on `2^(−24)` of the family's grain, `step_unit=formed`, or as moved on the grain, `θ` before less `θ` after,
+///   `step_unit=moved`), and the cosine of `θ`'s move `−s_f` with `−g_f`, signed thousandths: positive where `θ` moved down
+///   the covector.
+///
+/// Returns the lines (after `lap` and `n`) and `g`. Sums are checked on `i128`, squares and products unbounded.
+fn covector_section_lines(field: &Field, pairs: &[Vec<i128>], prev: Option<&[i128]>, step: &[i128], step_unit: &str) -> Result<(Vec<String>, Vec<i128>)> {
+    const OVER: &str = "a section covector past its 128-bit carrier";
+    let material = field.material_len();
+    if pairs.iter().any(|p| p.len() != material) || step.len() != material || prev.is_some_and(|p| p.len() != material) {
+        return Err("a section covector of another length than the field's material".into());
+    }
+    let mut g = vec![0i128; material];
+    for pair in pairs {
+        for (v, &x) in g.iter_mut().zip(pair) {
+            *v = v.checked_add(x).ok_or(OVER)?;
+        }
+    }
+    let names = family_names(field);
+    let mut lines = Vec::new();
+    for &(start, len, _) in field.families_all().iter().filter(|fam| fam.1 > 0) {
+        let range = start..start + len;
+        let gf = &g[range.clone()];
+        let gg = square_sum(gf.iter());
+        let loo: Vec<num_bigint::BigUint> = pairs
+            .iter()
+            .map(|pair| -> Result<num_bigint::BigUint> {
+                let rest: Vec<i128> = gf.iter().zip(&pair[range.clone()]).map(|(&a, &b)| a.checked_sub(b).ok_or(OVER)).collect::<std::result::Result<_, _>>()?;
+                Ok(square_sum(rest.iter()).sqrt())
+            })
+            .collect::<Result<_>>()?;
+        let cos_prev = prev.and_then(|p| cosine_milli(&dot_sum(gf, &p[range.clone()]), &gg, &square_sum(p[range.clone()].iter())));
+        let sf = &step[range.clone()];
+        let ss = square_sum(sf.iter());
+        // `−s_f` against `−g_f` is `s_f` against `g_f`.
+        let step_cos = cosine_milli(&dot_sum(sf, gf), &ss, &gg);
+        let shown = |v: Option<i64>| v.map_or("-".to_string(), |c| c.to_string());
+        lines.push(format!(
+            "family={} norm={} norm_se={} cos_prev_milli={} step_norm={} step_cos_milli={} step_unit={step_unit}",
+            names.iter().find(|&&(_, at)| at == start).map_or("?", |&(name, _)| name),
+            gg.sqrt(),
+            jackknife_se(&loo).map_or("-".to_string(), |se| se.to_string()),
+            shown(cos_prev),
+            ss.sqrt(),
+            shown(step_cos)
+        ));
+    }
+    Ok((lines, g))
 }
 
 /// [definition; the unified-theory readings of November 7, 04:05 and 05:20, route (b)] **`contrast-field STATE STATE_SHA CODEC
@@ -3684,6 +3797,8 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
     const SAVE_MS: u128 = 3_600_000;
     let mut clock = SaveClock::default();
     clock.held_read(opening_read_ms);
+    // [measurement; theory, November 9 14:30] The previous fresh section's covector, held in memory for the covector line's cosine.
+    let mut prev_covector: Option<Vec<i128>> = None;
     for lap in 0..laps {
         let elapsed = started.elapsed().as_millis();
         if lap > 0 && elapsed + lap_ms > stop_ms {
@@ -3940,6 +4055,9 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
                 }
                 let release_ms = section_start.elapsed().as_millis();
                 let theta_before = learner.field.theta.clone();
+                // [measurement; theory, November 9 14:30] The section's covector by problem, read before the deposit on the field it
+                // deposits on (`FIELD_COVECTOR_SECTION`; a reading).
+                let pairs = writes_pairs(&learner.field, &problems[..m], &truths, &active, void, realization)?;
                 let deposit_start = std::time::Instant::now();
                 // [definition; theory, November 9 05:51] The writes' contrast deposits through the one deposit, as every contrast
                 // does (`FieldLearner::section_contrast`): each entry's step carries its remainder and each family's length moves by
@@ -3971,6 +4089,17 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
                 // [measurement; theory, November 9 05:04] Each family's moved grains and its length, as the kernel's path prints them.
                 println!("FIELD_STEP lap={lap} n={n} {}", step_text(&learner.field, &theta_before));
                 println!("FIELD_LENGTHS lap={lap} n={n} {}", lengths_text(&learner));
+                // [measurement; theory, November 9 14:30] The covector line, a family a line: the step as the deposit formed it where
+                // the learner keeps it, else as it moved (`θ` before less `θ` after).
+                let (step, step_unit): (Vec<i128>, &str) = match learner.last_formed_step() {
+                    Some(formed) => (formed.to_vec(), "formed"),
+                    None => (theta_before.iter().zip(&learner.field.theta).map(|(&b, &a)| b as i128 - a as i128).collect(), "moved"),
+                };
+                let (lines, g) = covector_section_lines(&learner.field, &pairs, prev_covector.as_deref(), &step, step_unit)?;
+                for line in lines {
+                    println!("FIELD_COVECTOR_SECTION lap={lap} n={n} {line}");
+                }
+                prev_covector = Some(g);
                 // The section closes at its last print, before the next start's save (the save law's clock).
                 clock.close(started.elapsed().as_millis());
                 // The declared read ends this path as it ends the kernel's (`FIELD_CONTRAST_SECTIONS`); without it the fresh-writes
@@ -7982,17 +8111,9 @@ mod tests {
         assert_eq!(section_work(&SectionLaw::Writer, &set, &members), (2 + 4 + 7, "places"));
     }
 
-    /// [definition; theory, November 9 13:29] **A fresh section resumed at a sweep boundary is the uninterrupted one, bit for
-    /// bit**, on the host: an energy field of the toy's four problems (every family drawn from the key stream, its family lengths
-    /// open), one fresh section from the truths swept four times, keyed as the trainer keys a section, through the trainer's
-    /// own sweeps ([`fresh_sweeps_at`]), deposit ([`writes_deposit`]) and averaged constitution. The uninterrupted section runs
-    /// on the learner in memory and saves its writes at sweep 2's start ([`SweepWrites`], through its text); the resumed one
-    /// loads the learner from the saved state's text, on a fresh realization, and runs sweeps 2 and 3 from the saved writes. Their writes, each sweep's moves, proposals,
-    /// energies and retention, the deposit's receipt and the learner's state after the section are the same; the sweeps moved
-    /// some write and the learner was not moved by them. A sweep save's text reads back as itself, and a malformed one is refused.
-    #[test]
-    fn a_fresh_section_resumed_at_a_sweep_is_the_uninterrupted_one() {
-        let (codec, problems) = toy();
+    /// The toy's energy learner: an energy field of one lane over the toy's codec, every family drawn from the key stream (the
+    /// pace held at zero), its family lengths open.
+    fn toy_energy_learner(codec: &FieldCodec, problems: &Problems) -> FieldLearner {
         let reach = problems.iter().map(|(q, _, _)| q.len() + codec.answer).max().unwrap();
         let d = FieldDeclaration { alphabet: codec.alphabet(), width: 8, heads: 2, modes: 3, still: 1, contacts: 4, ticks: 2, frames: 2, reach, lanes: 1, depth: 0, energy: true };
         let keys: Vec<u8> = (0..1u64 << 13).flat_map(|i| mix(0x5EED, i).to_be_bytes()).collect();
@@ -8005,8 +8126,23 @@ mod tests {
         }
         let l = field.layout().clone();
         field.theta[l.pace..l.pace + d.paced_heads() * (d.alphabet + 1)].fill(0);
-        let mut opening = FieldLearner::new(field, 14);
-        opening.open_family_rates();
+        let mut learner = FieldLearner::new(field, 14);
+        learner.open_family_rates();
+        learner
+    }
+
+    /// [definition; theory, November 9 13:29] **A fresh section resumed at a sweep boundary is the uninterrupted one, bit for
+    /// bit**, on the host: an energy field of the toy's four problems (every family drawn from the key stream, its family lengths
+    /// open), one fresh section from the truths swept four times, keyed as the trainer keys a section, through the trainer's
+    /// own sweeps ([`fresh_sweeps_at`]), deposit ([`writes_deposit`]) and averaged constitution. The uninterrupted section runs
+    /// on the learner in memory and saves its writes at sweep 2's start ([`SweepWrites`], through its text); the resumed one
+    /// loads the learner from the saved state's text, on a fresh realization, and runs sweeps 2 and 3 from the saved writes. Their writes, each sweep's moves, proposals,
+    /// energies and retention, the deposit's receipt and the learner's state after the section are the same; the sweeps moved
+    /// some write and the learner was not moved by them. A sweep save's text reads back as itself, and a malformed one is refused.
+    #[test]
+    fn a_fresh_section_resumed_at_a_sweep_is_the_uninterrupted_one() {
+        let (codec, problems) = toy();
+        let opening = toy_energy_learner(&codec, &problems);
         let state = at_rate(&opening, opening.rate_bits);
         let state_sha = sha256(state.as_bytes()).unwrap();
         let set = encoded_problems(&codec, &problems_of(TOY), &opening.field).unwrap();
@@ -8068,6 +8204,66 @@ mod tests {
         let first = text.lines().nth(2).unwrap().to_string();
         let parts: Vec<&str> = first.split(' ').collect();
         assert!(SweepWrites::from_text(&text.replacen(&first, &format!("write 0 {} {}", parts[2].parse::<usize>().unwrap() + 1, parts[3]), 1)).is_err());
+    }
+
+    /// [measurement; theory, November 9 14:30] **The covector line is a reading.** One fresh section of the toy's four problems
+    /// from the truths, swept twice, run in the trainer's order with the reading (the problems' covectors read before the
+    /// deposit, the lines after it) and without: the writes and the learner's state after the section are the same bits. Each
+    /// line's `norm` is `⌊√Σ g²⌋` of the family's entries of the problems' covectors summed here; `g` stands within
+    /// `⌊(n + 1)/2⌋` units of the covector the deposit took, entry by entry; at the run's first section `cos_prev_milli` is `-`,
+    /// and against itself a nonzero family's covector reads `1000`. The jackknife reads `√((n − 1)/n·Σ(x − x̄)²)` (three
+    /// leave-one-out values 3, 5, 7 give `⌊√(16/3)⌋ = 2`) and none under two problems.
+    #[test]
+    fn the_covector_line_reads_a_section_and_leaves_its_bits() {
+        use num_bigint::BigUint;
+        let (codec, problems) = toy();
+        let opening = toy_energy_learner(&codec, &problems);
+        let set = encoded_problems(&codec, &problems_of(TOY), &opening.field).unwrap();
+        let void = codec.void();
+        let asked: Vec<(&[usize], usize)> = set.iter().map(|(q, _, room)| (q.as_slice(), *room)).collect();
+        let truths: Vec<Vec<usize>> = set.iter().map(|p| truth_with_voids(void, p, &p.1)).collect();
+        let key = writes_key(0x5EED, 0, 0);
+        let swept = |learner: &FieldLearner| -> Vec<Vec<usize>> {
+            let mut active: Vec<Vec<usize>> = set.iter().map(|p| p.1.clone()).collect();
+            fresh_sweeps_at(&learner.field, &asked, &mut active, 0, 2, key, void, &mut host(), &mut |_, _| Ok(()), &mut |_, _, _, _, _, _| {}).unwrap();
+            active
+        };
+        let mut plain = opening.clone();
+        let plain_writes = swept(&plain);
+        writes_deposit(&mut plain, &asked, &truths, &plain_writes, void, &mut host()).unwrap();
+        plain.average_section();
+        let mut read = opening.clone();
+        let writes = swept(&read);
+        let pairs = writes_pairs(&read.field, &asked, &truths, &writes, void, &mut host()).unwrap();
+        let receipt = writes_deposit(&mut read, &asked, &truths, &writes, void, &mut host()).unwrap();
+        read.average_section();
+        let formed = read.last_formed_step().expect("the deposit keeps the step it formed").to_vec();
+        let (lines, g) = covector_section_lines(&read.field, &pairs, None, &formed, "formed").unwrap();
+        assert_eq!(writes, plain_writes, "the writes");
+        assert_eq!(read.to_text(), plain.to_text(), "the reading leaves the section's bits");
+        assert!(plain_writes.iter().zip(&set).any(|(w, p)| w != &p.1), "the sweeps move some write");
+        let field_of = |line: &str, name: &str| -> String { line.split(' ').find_map(|kv| kv.strip_prefix(&format!("{name}="))).unwrap().to_string() };
+        let families: Vec<(usize, usize, u32)> = read.field.families_all().into_iter().filter(|f| f.1 > 0).collect();
+        assert_eq!(lines.len(), families.len(), "a line a family with entries");
+        let n = pairs.len() as i128;
+        for (line, &(start, len, _)) in lines.iter().zip(&families) {
+            let direct: BigUint = (start..start + len).map(|i| BigUint::from(pairs.iter().map(|p| p[i]).sum::<i128>().unsigned_abs()).pow(2)).sum();
+            assert_eq!(field_of(line, "norm"), direct.sqrt().to_string(), "{line}");
+            assert_eq!(field_of(line, "cos_prev_milli"), "-", "the run's first section");
+            assert_eq!(field_of(line, "step_unit"), "formed");
+        }
+        assert!(g.iter().zip(&receipt.covector).all(|(a, b)| (a - b).abs() <= (n + 1) / 2), "the problems' sum stands beside the deposit's covector");
+        assert!(lines.iter().any(|line| field_of(line, "norm") != "0" && field_of(line, "norm_se") != "-"), "some family reads a covector and its SE");
+        let (again, _) = covector_section_lines(&read.field, &pairs, Some(&g), &formed, "formed").unwrap();
+        for line in &again {
+            if field_of(line, "norm") != "0" {
+                assert_eq!(field_of(line, "cos_prev_milli"), "1000", "{line}");
+            }
+        }
+        assert_eq!(jackknife_se(&[3u8, 5, 7].map(BigUint::from)), Some(BigUint::from(2u8)));
+        assert_eq!(jackknife_se(&[BigUint::from(9u8)]), None);
+        assert_eq!(cosine_milli(&num_bigint::BigInt::from(-6), &BigUint::from(4u8), &BigUint::from(9u8)), Some(-1000), "antiparallel");
+        assert_eq!(cosine_milli(&num_bigint::BigInt::from(0), &BigUint::from(0u8), &BigUint::from(9u8)), None, "a zero vector");
     }
 }
 
