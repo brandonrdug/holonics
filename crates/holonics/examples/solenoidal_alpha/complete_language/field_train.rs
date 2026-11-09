@@ -4446,6 +4446,16 @@ pub(super) fn line_field(args: &[String], realization: &mut dyn FieldRealization
         }
         let etas = args[12].split(',').map(positive).map(|e| e.and_then(|e| u32::try_from(e).map_err(|_| "line-field: a length past 32 bits".into()))).collect::<Result<Vec<u32>>>()?;
         let step: Vec<i128> = directions.step.iter().zip(&keep).map(|(&u, &k)| if k { u } else { 0 }).collect();
+        // Each named family's first length: the least `η` at which one of its entries moves (`|η u_i|` reaching half its grain
+        // on the line), `-` for a family whose step is zero.
+        for name in args[11].split(',') {
+            let k = names.iter().position(|&(n, _)| n == name).ok_or_else(|| format!("line-field: no family named {name}"))?;
+            let (start, n, grain) = families[k];
+            let most = step[start..start + n].iter().map(|v| v.unsigned_abs()).max().unwrap_or(0);
+            let half = 1u128 << (LINE_BITS - grain - 1);
+            let first = if most == 0 { "-".to_string() } else { half.div_ceil(most).to_string() };
+            println!("FIELD_LINE_FIRST family={name} entries={n} grain={grain} first_eta={first}");
+        }
         println!(
             "FIELD_LINE_FAMILIES families={} entries={} norm_micro={} moved_at_one={} etas={}",
             args[11],
