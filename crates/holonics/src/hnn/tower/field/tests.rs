@@ -2916,3 +2916,64 @@ fn the_unigram_steps_toward_its_expected_counts_on_carried_sums() {
     assert_eq!(carry.counts, vec![6, 2, 0, 0]);
     assert!(carry.mass[0].unwrap() > before);
 }
+
+/// [measurement; theory, November 8, the lead reading] **A lead's readings are its rows' nearest thousandths**: parallel,
+/// opposed and orthogonal rows read 1000, −1000 and 0, an eighth turn 707, norm ratios of 5 and √2 read 5000 and 1414, lane by
+/// lane and over the whole site (`6/√78` and `√13.5`), a zero row reads no angle and a zero moment's term no bounded ratio, and
+/// rows that are not one site's lanes are refused.
+#[test]
+fn a_leads_readings_are_its_rows_nearest_thousandths() {
+    let (read, own) = ([1, 0, 0, 0, 1, 1, 0, 0], [5, 0, 0, 0, 1, 0, 0, 0]);
+    let (letters, moment) = ([3, 4, 0, 0, 1, 1, 0, 0], [0, 0, 0, 1, 1, 0, 0, 0]);
+    let lead = EnergyLead::of(2, &read, &own, &letters, &moment).unwrap();
+    assert_eq!((lead.cos_milli(Some(0)), lead.cos_milli(Some(1)), lead.cos_milli(None)), (Some(1000), Some(707), Some(679)));
+    assert_eq!((lead.ratio_milli(Some(0)), lead.ratio_milli(Some(1)), lead.ratio_milli(None)), (Some(5000), Some(1414), Some(3674)));
+    let opposed = EnergyLead::of(1, &[2, 0], &[-7, 0], &[1, 0], &[0, 0]).unwrap();
+    assert_eq!((opposed.cos_milli(None), opposed.ratio_milli(None)), (Some(-1000), None));
+    let orthogonal = EnergyLead::of(1, &[0, 3], &[4, 0], &[0, 0], &[0, 9]).unwrap();
+    assert_eq!((orthogonal.cos_milli(None), orthogonal.ratio_milli(None)), (Some(0), Some(0)));
+    assert_eq!(EnergyLead::of(1, &[0, 0], &[4, 0], &[0, 0], &[0, 9]).unwrap().cos_milli(None), None);
+    assert!(EnergyLead::of(3, &read, &own, &letters, &moment).is_err());
+}
+
+/// [measurement; theory, November 8, the lead reading] **A lead's opening split is the opening, and its read is the relaxed
+/// state's unit**: on the energy fixtures of every ring set and on two lanes, at every site of a resolved configuration (its
+/// two ends among them), the letters' part and the moment's term add to the opening `x⁰_t` ([`Field::opening`]), each lane of
+/// the relaxed chart read stands at unit power on `2^(−16)` (its power `W · 2^32`, to the chart's rounding), and the lead read
+/// is its rows' sums; a field without one energy and a site outside its configuration are refused.
+#[test]
+fn a_leads_opening_split_is_the_opening() {
+    let laned = |still: usize| {
+        let mut field = shaped_with(FieldDeclaration { energy: true, width: 16, lanes: 2, ..tiny_declaration(still) });
+        let (l, d) = (field.layout.clone(), field.declaration);
+        let (dw, m2) = (d.width, 2 * d.complex());
+        field.theta[l.pace..l.pace + d.paced_heads() * (d.alphabet + 1)].fill(0);
+        field.theta[l.face_temper] = 0;
+        for (start, len) in [(l.v, m2 * dw), (l.v_bias, m2), (l.out, dw * m2), (l.out_bias, dw), (l.w, dw * d.contacts), (l.w_bias, dw)] {
+            field.theta[start..start + len].fill(0);
+        }
+        field
+    };
+    let fields: Vec<(String, Field)> = (0..=2).map(|s| (format!("still {s}"), energetic(s))).chain((0..=1).map(|s| (format!("laned still {s}"), laned(s)))).collect();
+    for (name, field) in &fields {
+        let d = field.declaration;
+        let (dw, w) = (d.width, d.width / d.lanes);
+        let none = vec![false; CLASSES.len()];
+        let region = Region { classes: &CLASSES, unresolved: &none, faces: &[], locked: &[], echo: &[], domain: None, port: None };
+        let opening = field.opening(&region).unwrap();
+        for t in 0..CLASSES.len() {
+            let rows = field.energy_lead_rows(&CLASSES, t).unwrap();
+            let split: Vec<i64> = rows.letters.iter().zip(&rows.moment).map(|(a, b)| a + b).collect();
+            assert_eq!(split, opening[t * dw..(t + 1) * dw], "{name}, site {t}: the opening's split");
+            let lead = field.energy_lead(&CLASSES, t).unwrap();
+            assert_eq!(lead, EnergyLead::of(d.lanes, &rows.read, &rows.own, &rows.letters, &rows.moment).unwrap(), "{name}, site {t}");
+            let unit = (w as i128) << 32;
+            for (k, &(_, rr, oo)) in lead.own.iter().enumerate() {
+                assert!((rr - unit).abs() * 64 <= unit && oo > 0, "{name}, site {t}, lane {k}: power {rr} against {unit}, own row {oo}");
+            }
+            eprintln!("LEAD_FIXTURE {name} site={t} cos={:?} ratio={:?}", (0..d.lanes).map(|k| lead.cos_milli(Some(k))).collect::<Vec<_>>(), (0..d.lanes).map(|k| lead.ratio_milli(Some(k))).collect::<Vec<_>>());
+        }
+    }
+    assert!(energetic(1).energy_lead(&CLASSES, CLASSES.len()).is_err());
+    assert!(shaped(1).energy_lead(&CLASSES, 0).is_err());
+}

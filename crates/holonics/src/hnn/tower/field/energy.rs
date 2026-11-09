@@ -2108,6 +2108,45 @@ impl Field {
         Ok(self.energy_relax(&region, self.declaration.ticks, None, None)?.cell.phi)
     }
 
+    /// [measurement; theory, November 8, the lead reading] **Whether a letter leads its own state** at one site of a
+    /// configuration ([`EnergyLead`]): every site of `classes` resolved and relaxed as [`Field::energy_g`] relaxes it (the
+    /// declared ticks at their own certified halvings), and at `site`, lane by lane, (a) the relaxed chart read `r̂_t` (each
+    /// lane at unit power, the unit the energy reads) against the site's own row carried by the lift's transpose,
+    /// `ρ_t = Rᵀ E(u_t)` (the own-row part of the letters' force, as [`Field::energy_force`] forms it), and (b) the opening
+    /// `x⁰_t = E(u_t) + E₋(u_(t−1)) + E₊(u_(t+1)) + (C s_t + b)` split into its letters' part `L_t` and its moment's term
+    /// `M_t`, before any tick. A reading only, through the host's reference; a realization reads the same sums from its own
+    /// buffers ([`FieldRealization::read_energy_leads`]).
+    pub fn energy_lead(&self, classes: &[usize], site: usize) -> Result<EnergyLead> {
+        let rows = self.energy_lead_rows(classes, site)?;
+        EnergyLead::of(self.declaration.lanes, &rows.read, &rows.own, &rows.letters, &rows.moment)
+    }
+
+    /// [`Field::energy_lead`]'s rows at its site ([`LeadRows`]).
+    pub(super) fn energy_lead_rows(&self, classes: &[usize], site: usize) -> Result<LeadRows> {
+        if !self.declaration.energy {
+            return refuse("an energy read of a field whose faces are not one energy's forces");
+        }
+        if site >= classes.len() {
+            return refuse("a lead's site outside its configuration");
+        }
+        let none = vec![false; classes.len()];
+        let region = Region { classes, unresolved: &none, faces: &[], locked: &[], echo: &[], domain: None, port: None };
+        let Relaxed { cell, held, .. } = self.energy_relax(&region, self.declaration.ticks, None, None)?;
+        let dw = self.declaration.width;
+        let l = &self.layout;
+        let mut own = vec![0i64; dw];
+        transposed(&self.theta[l.read..l.read + dw * dw], self.reaches().read, dw, &held.letters.own[site], FACE_BITS, &mut own)?;
+        // The opening's letters' part, as `open` adds it: the site's own row, its strand neighbours' contact rows.
+        let mut letters = held.letters.own[site].clone();
+        let neighbours = [(site > 0).then(|| &held.letters.before[site - 1]), (site + 1 < classes.len()).then(|| &held.letters.after[site + 1])];
+        for row in neighbours.into_iter().flatten() {
+            for (slot, &e) in letters.iter_mut().zip(row) {
+                *slot = fit64(*slot as i128 + e as i128)?;
+            }
+        }
+        Ok(LeadRows { read: cell.read[site * dw..(site + 1) * dw].to_vec(), own, letters, moment: held.moment_term[site * dw..(site + 1) * dw].to_vec() })
+    }
+
     /// [measurement] **A region's energy read** ([`EnergyRead`]): the energy at the opening and at the last tick, each
     /// tick's halvings, and the energy's reads.
     pub fn energy_read(&self, region: &Region) -> Result<EnergyRead> {
@@ -2744,6 +2783,100 @@ pub struct EnergyRead {
     pub reads: u64,
     /// The site pairs the locks met over every read.
     pub pairs: u64,
+}
+
+/// [`Field::energy_lead`]'s rows at its site, each `[D]`: the relaxed chart read on `2^(−16)` (each lane at unit power), the
+/// own row through the lift's transpose `Rᵀ E(u_t)` on `2^(−24)`, and the opening's letters' part
+/// `E(u_t) + E₋(u_(t−1)) + E₊(u_(t+1))` and moment's term `C s_t + b`, both on `2^(−16)`.
+pub(super) struct LeadRows {
+    pub(super) read: Vec<i32>,
+    pub(super) own: Vec<i64>,
+    pub(super) letters: Vec<i64>,
+    pub(super) moment: Vec<i64>,
+}
+
+/// [measurement; theory, November 8, the lead reading] **A site's lead read** ([`Field::energy_lead`]), kept as each lane's
+/// integer sums so that a realization's read is compared term for term and its faces are formed once, at the reading:
+/// `own[ℓ] = (⟨r̂, ρ⟩, ⟨r̂, r̂⟩, ⟨ρ, ρ⟩)` with `r̂` the relaxed chart read on `2^(−16)` and `ρ = Rᵀ E(u_t)` on `2^(−24)`, and
+/// `opening[ℓ] = (⟨L, L⟩, ⟨M, M⟩)` with `L = E(u_t) + E₋(u_(t−1)) + E₊(u_(t+1))` and `M = C s_t + b`, both on `2^(−16)`.
+#[derive(Clone, Debug, Default, PartialEq, Eq)]
+pub struct EnergyLead {
+    pub own: Vec<(i128, i128, i128)>,
+    pub opening: Vec<(i128, i128)>,
+}
+
+/// `Σ a_i b_i` in its 128-bit carrier, refused past it.
+fn lead_dot(a: impl Iterator<Item = i128>, b: impl Iterator<Item = i128>) -> Result<i128> {
+    const OVER: &str = "a lead's sum past its 128-bit carrier";
+    a.zip(b).try_fold(0i128, |s, (x, y)| x.checked_mul(y).and_then(|p| s.checked_add(p)).ok_or(TowerError::Refused(OVER)))
+}
+
+/// [definition; agent-inferred, November 8] `√(p/q)` in thousandths, nearest (a half rounds up), for `p ≥ 0` and `q > 0`: with
+/// `k = ⌊√⌊4·10⁶ p/q⌋⌋ = ⌊2000 √(p/q)⌋` (the integer square root of the floored quotient is the floor of the root of the
+/// quotient itself), `⌊1000 √(p/q) + ½⌋ = ⌊(k + 1)/2⌋`. Every step is an integer's, so the reading is the nearest thousandth
+/// of the ratio's own root.
+fn milli_root(p: &BigInt, q: &BigInt) -> BigInt {
+    let k = (p * BigInt::from(4_000_000u32) / q).sqrt();
+    (k + 1u32) / 2u32
+}
+
+impl EnergyLead {
+    /// The sums of one site's rows ([`LeadRows`]), lane by lane over `lanes` lanes of `D / lanes` coordinates.
+    pub fn of(lanes: usize, read: &[i32], own: &[i64], letters: &[i64], moment: &[i64]) -> Result<Self> {
+        let dw = read.len();
+        if lanes == 0 || dw % lanes != 0 || own.len() != dw || letters.len() != dw || moment.len() != dw {
+            return refuse("a lead's rows that are not one site's lanes");
+        }
+        let w = dw / lanes;
+        let mut out = EnergyLead { own: Vec::with_capacity(lanes), opening: Vec::with_capacity(lanes) };
+        for k in 0..lanes {
+            let at = k * w..(k + 1) * w;
+            let (r, o) = (|| read[at.clone()].iter().map(|&v| v as i128), || own[at.clone()].iter().map(|&v| v as i128));
+            let (lt, mt) = (|| letters[at.clone()].iter().map(|&v| v as i128), || moment[at.clone()].iter().map(|&v| v as i128));
+            out.own.push((lead_dot(r(), o())?, lead_dot(r(), r())?, lead_dot(o(), o())?));
+            out.opening.push((lead_dot(lt(), lt())?, lead_dot(mt(), mt())?));
+        }
+        Ok(out)
+    }
+
+    /// Lane `lane`'s sums, or with `None` the whole site's (every lane's added, in a carrier as wide as they need).
+    fn sums(&self, lane: Option<usize>) -> ([BigInt; 3], [BigInt; 2]) {
+        let keep = |k: usize| lane.is_none_or(|l| l == k);
+        let mut own: [BigInt; 3] = Default::default();
+        let mut opening: [BigInt; 2] = Default::default();
+        for (_, &(dot, rr, oo)) in self.own.iter().enumerate().filter(|(k, _)| keep(*k)) {
+            own[0] += BigInt::from(dot);
+            own[1] += BigInt::from(rr);
+            own[2] += BigInt::from(oo);
+        }
+        for (_, &(ll, mm)) in self.opening.iter().enumerate().filter(|(k, _)| keep(*k)) {
+            opening[0] += BigInt::from(ll);
+            opening[1] += BigInt::from(mm);
+        }
+        (own, opening)
+    }
+
+    /// (a) `cos(r̂, Rᵀ E(u_t))` on lane `lane` (the whole site with `None`) in thousandths, nearest ([`milli_root`] of
+    /// `⟨r̂, ρ⟩² / (⟨r̂, r̂⟩⟨ρ, ρ⟩)`, signed as `⟨r̂, ρ⟩`); `None` where either row is zero there.
+    pub fn cos_milli(&self, lane: Option<usize>) -> Option<i64> {
+        let ([dot, rr, oo], _) = self.sums(lane);
+        let zero = BigInt::from(0u32);
+        if rr == zero || oo == zero {
+            return None;
+        }
+        let magnitude = milli_root(&(&dot * &dot), &(rr * oo)).to_i64()?;
+        Some(if dot < zero { -magnitude } else { magnitude })
+    }
+
+    /// (b) `‖E(u_t) + E₋(u_(t−1)) + E₊(u_(t+1))‖ / ‖C s_t + b‖` at the opening on lane `lane` (the whole site with `None`) in
+    /// thousandths, nearest ([`milli_root`] of `⟨L, L⟩ / ⟨M, M⟩`); `None` where the moment's term is zero there (unbounded).
+    pub fn ratio_milli(&self, lane: Option<usize>) -> Option<u128> {
+        let (_, [ll, mm]) = self.sums(lane);
+        if mm == BigInt::from(0u32) {
+            return None;
+        }
+        milli_root(&ll, &mm).to_u128()
+    }
 }
 
 /// A one-base square's corners as read ([`Field::energy_square_reading`]): `i`'s logits with `j` at `b` and at `b′`, `j`'s with

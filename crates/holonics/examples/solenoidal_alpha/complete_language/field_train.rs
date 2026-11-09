@@ -3013,7 +3013,6 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
     }
     std::fs::create_dir(out)?;
     let void = codec.void();
-    let near = holonics::hnn::tower::field::NEAR;
     // [definition; theory, November 7 22:08] `FIELD_CONTRAST_SEED=HEX`: a read keyed by a declared seed, so laws read from
     // different states pair section by section; laps keep the state-keyed walk.
     // [definition; theory, November 8 14:22] An undeclared seed is the state's carried key, or, for a state without one, its
@@ -3025,27 +3024,10 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
     };
     learner.key = Some(seed);
     let law = WriterLaw::from_env()?;
-    // Each problem's question, its answer cut to the room, and the room (`Problems`' third place).
-    let encode = |problems: &[(Vec<u8>, Vec<u8>)], field: &Field| -> Result<Problems> {
-        let mut set = Vec::with_capacity(problems.len());
-        for (question, answer) in problems {
-            let (q, room) = opening(&codec, field, question, b"")?;
-            let mut a = codec.encode(answer)?;
-            a.truncate(room);
-            if !a.is_empty() {
-                set.push((q, a, room));
-            }
-        }
-        Ok(set)
-    };
-    let train_set = encode(&train_text, &learner.field)?;
-    let held_set = encode(&held_text, &learner.field)?;
+    let train_set = encoded_problems(&codec, &train_text, &learner.field)?;
+    let held_set = encoded_problems(&codec, &held_text, &learner.field)?;
     let (sections, _) = sections_of(&train_set, section, 0, seed);
-    let truth_of = |(q, a, room): &(Vec<usize>, Vec<usize>, usize), letters: &[usize]| -> Vec<usize> {
-        let mut t: Vec<usize> = q.iter().chain(letters).copied().collect();
-        t.extend(std::iter::repeat_n(void, near.min(room - a.len())));
-        t
-    };
+    let truth_of = |p: &(Vec<usize>, Vec<usize>, usize), letters: &[usize]| -> Vec<usize> { truth_with_voids(void, p, letters) };
     // [measurement; theory, November 7 23:05] `FIELD_PAIR_KINDS=N`: the pairs by kind of the `N` longest training problems and
     // the median one, each at its truth, resolved (the material read's state), read on the host (`Field::energy_pair_kinds`).
     if let Ok(v) = std::env::var("FIELD_PAIR_KINDS") {
@@ -4244,6 +4226,112 @@ fn enumerated_places(held: &Problems, places: usize, truth_of: &dyn Fn(&(Vec<usi
     chosen
 }
 
+/// Each problem's question, its answer cut to the room, and the room (`Problems`' third place), as the held reads encode them.
+fn encoded_problems(codec: &FieldCodec, problems: &[(Vec<u8>, Vec<u8>)], field: &Field) -> Result<Problems> {
+    let mut set = Vec::with_capacity(problems.len());
+    for (question, answer) in problems {
+        let (q, room) = opening(codec, field, question, b"")?;
+        let mut a = codec.encode(answer)?;
+        a.truncate(room);
+        if !a.is_empty() {
+            set.push((q, a, room));
+        }
+    }
+    Ok(set)
+}
+
+/// A problem's truth at `letters`: its question, the letters, and the near field's voids its room leaves past them.
+fn truth_with_voids(void: usize, (q, a, room): &(Vec<usize>, Vec<usize>, usize), letters: &[usize]) -> Vec<usize> {
+    let mut t: Vec<usize> = q.iter().chain(letters).copied().collect();
+    t.extend(std::iter::repeat_n(void, holonics::hnn::tower::field::NEAR.min(room - a.len())));
+    t
+}
+
+/// [measurement; theory, November 8, the lead reading] **`lead-field STATE STATE_SHA CODEC CODEC_SHA UNITS UNITS_SHA HELD
+/// HELD_SHA PLACES OUT`**: whether a letter leads its own state, at the held places the enumerated conditional reads
+/// ([`enumerated_places`]: the first `PLACES`, `FIELD_HELD_ALL_OF` as there), each place's configuration its truth with every
+/// site resolved (the enumerated read's configuration at the truth letter: one relaxation a place). Each place's lead
+/// ([`holonics::hnn::tower::field::EnergyLead`], read through the realization's own buffers) gives per lane (a)
+/// `cos(r̂_t, Rᵀ E(u_t))` at the relaxed state and (b) `‖E(u_t) + E₋(u_(t−1)) + E₊(u_(t+1))‖ / ‖C s_t + b‖` at the opening, in
+/// thousandths, nearest. Prints a `FIELD_LEAD` line a lane with the quartiles and median of each over the places (nearest
+/// rank, `⌈p n⌉`-th smallest), one with `lane=all` (each place's whole site: every lane's sums added) and one with
+/// `lane=pooled` (every lane of every place); writes each place's lane sums and readings to `LEAD.tsv` (the series the
+/// readings are formed from; no letter). `FIELD_CONTRAST_AVERAGE` reads the averaged constitution, as the held read does.
+/// A reading only: nothing is deposited and no state is written.
+pub(super) fn lead_field(args: &[String], realization: &mut dyn FieldRealization) -> Result<()> {
+    if args.len() != 11 {
+        return Err("lead-field STATE STATE_SHA CODEC CODEC_SHA UNITS UNITS_SHA HELD HELD_SHA PLACES OUT".into());
+    }
+    let started = std::time::Instant::now();
+    let mut learner = FieldLearner::from_text(std::str::from_utf8(&pinned_read(&args[1], &args[2], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
+    declared_clocks(&mut learner.field);
+    if !learner.field.declaration.energy {
+        return Err("lead-field reads a field whose faces are one energy's forces".into());
+    }
+    let units = units_of(&args[5], &args[6])?;
+    let codec = FieldCodec::from_text(std::str::from_utf8(&pinned_read(&args[3], &args[4], CODEC_BUDGET)?)?, units)?;
+    let held_text = problems_of(&pinned_read(&args[7], &args[8], READ_BUDGET as usize)?);
+    let places = positive(&args[9])?;
+    let out = Path::new(&args[10]);
+    std::fs::create_dir(out)?;
+    let averaging = std::env::var_os("FIELD_CONTRAST_AVERAGE").is_some();
+    let field = held_field(&learner, averaging);
+    let held_set = encoded_problems(&codec, &held_text, &learner.field)?;
+    let void = codec.void();
+    let truth_of = |p: &(Vec<usize>, Vec<usize>, usize), letters: &[usize]| -> Vec<usize> { truth_with_voids(void, p, letters) };
+    let chosen = enumerated_places(&held_set, places, &truth_of);
+    let asked: Vec<(&[usize], usize)> = chosen.iter().map(|(_, truth, t, _)| (truth.as_slice(), *t)).collect();
+    let sites: usize = asked.iter().map(|(c, _)| c.len()).sum();
+    let reading = std::time::Instant::now();
+    let leads = realization.read_energy_leads(&field, &asked).map_err(|e| e.to_string())?;
+    let read_ms = reading.elapsed().as_millis();
+    let lanes = field.declaration.lanes;
+    let cos_text = |c: Option<i64>| c.map_or("none".to_string(), |v| v.to_string());
+    let ratio_text = |r: Option<u128>| r.map_or("inf".to_string(), |v| v.to_string());
+    let mut rows = rows_file(&out.join("LEAD.tsv"), "problem\tplace\tlane\tread_own\tread_read\town_own\tletters_letters\tmoment_moment\tcos_milli\tratio_milli\n")?;
+    for ((k, _, t, q), lead) in chosen.iter().zip(&leads) {
+        for lane in 0..lanes {
+            let ((dot, rr, oo), (ll, mm)) = (lead.own[lane], lead.opening[lane]);
+            row(&mut rows, &format!("{k}\t{}\t{lane}\t{dot}\t{rr}\t{oo}\t{ll}\t{mm}\t{}\t{}\n", t - q, cos_text(lead.cos_milli(Some(lane))), ratio_text(lead.ratio_milli(Some(lane)))))?;
+        }
+    }
+    // A ratio with no bounded value (the moment's term zero) stands above every bounded one.
+    let line = |lane: &str, cos: Vec<Option<i64>>, ratio: Vec<Option<u128>>| {
+        let unread = cos.iter().filter(|c| c.is_none()).count();
+        let unbounded = ratio.iter().filter(|r| r.is_none()).count();
+        let (n, c, r) = (cos.len(), rank_quartiles(cos.into_iter().flatten().collect()), rank_quartiles(ratio.into_iter().map(|r| r.unwrap_or(u128::MAX)).collect()));
+        let c = c.map_or(["none".to_string(), "none".to_string(), "none".to_string()], |(a, b, d)| [a.to_string(), b.to_string(), d.to_string()]);
+        let r = r.map_or(["none".to_string(), "none".to_string(), "none".to_string()], |(a, b, d)| [a, b, d].map(|v| if v == u128::MAX { "inf".to_string() } else { v.to_string() }));
+        println!("FIELD_LEAD lane={lane} cos_q25={} cos_median={} cos_q75={} ratio_q25={} ratio_median={} ratio_q75={} reads={n} cos_unread={unread} ratio_unbounded={unbounded}", c[0], c[1], c[2], r[0], r[1], r[2]);
+    };
+    for lane in 0..lanes {
+        line(&lane.to_string(), leads.iter().map(|l| l.cos_milli(Some(lane))).collect(), leads.iter().map(|l| l.ratio_milli(Some(lane))).collect());
+    }
+    line("all", leads.iter().map(|l| l.cos_milli(None)).collect(), leads.iter().map(|l| l.ratio_milli(None)).collect());
+    line("pooled", leads.iter().flat_map(|l| (0..lanes).map(|k| l.cos_milli(Some(k)))).collect(), leads.iter().flat_map(|l| (0..lanes).map(|k| l.ratio_milli(Some(k)))).collect());
+    println!(
+        "FIELD_LEAD_READ places={} sites={sites} lanes={lanes} width={} ticks={} averaged={} read_ms={read_ms} host_threads={} ms={}",
+        leads.len(),
+        field.declaration.width,
+        field.declaration.ticks,
+        u8::from(averaging),
+        rayon::current_num_threads(),
+        started.elapsed().as_millis()
+    );
+    Ok(())
+}
+
+/// The nearest-rank quartiles `(q25, median, q75)` of `values` (each the `⌈p n⌉`-th smallest), none for no values.
+fn rank_quartiles<T: Ord + Copy>(mut values: Vec<T>) -> Option<(T, T, T)> {
+    if values.is_empty() {
+        return None;
+    }
+    values.sort_unstable();
+    let n = values.len();
+    let at = |quarters: usize| values[(quarters * n).div_ceil(4) - 1];
+    Some((at(1), at(2), at(3)))
+}
+
 /// [`enumerated_read`]'s rows at `chosen` (each line `lap`-marked), read through `realization`.
 fn enumerated_rows(field: &Field, chosen: &HeldPlaces, realization: &mut dyn FieldRealization, lap: i64) -> Result<Vec<String>> {
     let alphabet = field.declaration.alphabet;
@@ -5128,6 +5216,67 @@ mod tests {
         let d = FieldDeclaration { alphabet: codec.alphabet(), width: 8, heads: 2, modes: 3, still: 1, contacts: 4, ticks: 2, frames: 2, reach, lanes: 1, depth: 0, energy: false };
         let keys: Vec<u8> = (0..1u64 << 13).flat_map(|i| mix(0x5EED, i).to_be_bytes()).collect();
         FieldLearner::new(Field::found(d, &keys).unwrap(), 4)
+    }
+
+    /// [measurement; theory, November 8, the lead reading] `lead-field` end to end on the host: an energy field of two lanes,
+    /// every family drawn from the key stream (a founding holds the lift and the moment's chart at zero, where the angle and
+    /// the ratio read nothing) and its clocks plain, reads its lead at six held places (one a problem, then two drawn by
+    /// letter), one row a lane a place whose readings are its sums', each place's sums the host's own `Field::energy_lead` at
+    /// its truth; and a field without one energy is refused. The quartiles are the nearest ranks.
+    #[test]
+    fn the_lead_reading_reads_every_held_place_and_lane() {
+        assert_eq!(rank_quartiles(vec![4, 1, 3, 2]), Some((1, 2, 3)));
+        assert_eq!(rank_quartiles(vec![7]), Some((7, 7, 7)));
+        assert_eq!(rank_quartiles::<i64>(Vec::new()), None);
+        let dir = std::env::temp_dir().join(format!("holonics-lead-{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&dir);
+        std::fs::create_dir_all(&dir).expect("dir");
+        let at = |name: &str| dir.join(name).to_string_lossy().into_owned();
+        let put = |name: &str, bytes: &[u8]| {
+            std::fs::write(dir.join(name), bytes).expect("write");
+            (at(name), sha256(bytes).expect("sha"))
+        };
+        let (codec, problems) = toy();
+        let reach = problems.iter().map(|(q, _, _)| q.len() + codec.answer).max().unwrap();
+        let d = FieldDeclaration { alphabet: codec.alphabet(), width: 8, heads: 2, modes: 3, still: 1, contacts: 4, ticks: 2, frames: 2, reach, lanes: 2, depth: 0, energy: true };
+        let keys: Vec<u8> = (0..1u64 << 13).flat_map(|i| mix(0x5EED, i).to_be_bytes()).collect();
+        let mut field = Field::found(d, &keys).unwrap();
+        let families = field.layout().families.clone();
+        for (n, v) in field.theta.iter_mut().enumerate() {
+            let k = mix(0x1EAD, n as u64) as u32 as i32 as i64;
+            let grain = families.iter().find(|(s, l, _)| (*s..*s + *l).contains(&n)).unwrap().2;
+            *v = ((k << grain) >> 32) as i32;
+        }
+        let l = field.layout().clone();
+        field.theta[l.pace..l.pace + d.paced_heads() * (d.alphabet + 1)].fill(0);
+        let learner = FieldLearner::new(field, 4);
+        let plain = FieldLearner::new(Field::found(FieldDeclaration { energy: false, ..d }, &keys).unwrap(), 4);
+        let (state, state_sha) = put("STATE", learner.to_text().as_bytes());
+        let (other, other_sha) = put("PLAIN", plain.to_text().as_bytes());
+        let (codec_at, codec_sha) = put("CODEC", codec.to_text().as_bytes());
+        let (units, units_sha) = put("UNITS", b"founded-units-v1 0\n");
+        let (held, held_sha) = put("HELD", TOY);
+        let args = |state: &str, sha: &str, out: &str| -> Vec<String> { ["lead-field", state, sha, &codec_at, &codec_sha, &units, &units_sha, &held, &held_sha, "6", out].iter().map(|s| s.to_string()).collect() };
+        lead_field(&args(&state, &state_sha, &at("L")), &mut host()).expect("lead");
+        let rows = String::from_utf8(std::fs::read(dir.join("L/LEAD.tsv")).expect("rows")).unwrap();
+        let rows: Vec<Vec<String>> = rows.lines().skip(1).map(|l| l.split('\t').map(str::to_string).collect()).collect();
+        assert_eq!(rows.len(), 6 * 2, "a row a lane a place");
+        let held_set = encoded_problems(&codec, &problems_of(TOY), &learner.field).unwrap();
+        let void = codec.void();
+        let truth_of = |p: &(Vec<usize>, Vec<usize>, usize), letters: &[usize]| truth_with_voids(void, p, letters);
+        for (n, (_, truth, t, _)) in enumerated_places(&held_set, 6, &truth_of).iter().enumerate() {
+            let lead = learner.field.energy_lead(truth, *t).unwrap();
+            for lane in 0..2 {
+                let cells = &rows[2 * n + lane];
+                let ((dot, rr, oo), (ll, mm)) = (lead.own[lane], lead.opening[lane]);
+                assert_eq!(cells[3..8], [dot.to_string(), rr.to_string(), oo.to_string(), ll.to_string(), mm.to_string()], "place {n}, lane {lane}");
+                let cos: i64 = cells[8].parse().expect("a lane whose rows are not zero");
+                let ratio: u128 = cells[9].parse().expect("a lane whose moment's term is not zero");
+                assert!((-1000..=1000).contains(&cos) && Some(cos) == lead.cos_milli(Some(lane)) && Some(ratio) == lead.ratio_milli(Some(lane)), "place {n}, lane {lane}: {cos} {ratio}");
+            }
+        }
+        assert!(lead_field(&args(&other, &other_sha, &at("P")), &mut host()).is_err(), "a field without one energy");
+        let _ = std::fs::remove_dir_all(&dir);
     }
 
     /// The regions `section_regions` formed for `members` from `first` on, against the draws they stand on: one region a

@@ -7,7 +7,7 @@
 //! `flock -w 900 .local/gpu.lock cargo test --release -p holonics-cuda --test field_energy -- --include-ignored --test-threads=1`.
 use std::time::Instant;
 
-use holonics::hnn::tower::field::{EnergyRead, EnergySquare, Field, FieldDeclaration, FieldRealization, Region, Shares};
+use holonics::hnn::tower::field::{EnergyLead, EnergyRead, EnergySquare, Field, FieldDeclaration, FieldRealization, Region, Shares};
 use rayon::prelude::*;
 use holonics::hnn::tower::TowerFace;
 use holonics_cuda::hnn::{Card, CardField};
@@ -443,6 +443,32 @@ fn the_tiny_central_squares_and_energies_on_the_card_are_the_hosts() {
         let card_g = card.energies(&field, &views).unwrap();
         println!("ENERGY_G tiny still={still} bit_equal={} host={host_g:?}", host_g == card_g);
         assert_eq!(card_g, host_g, "still {still}: the card's energies");
+    }
+}
+
+/// [measurement; theory, November 8, the lead reading] **A place's lead read on the card is the host's**: on every ring set and
+/// on two lanes, the tiny truths' lead reads at both ends and inside (`CardField::energy_leads` against `Field::energy_lead`: the
+/// relaxed chart read against `Rᵀ E(u_t)`, and the opening's letters' part beside its moment's term), read in one batch and
+/// again two regions a batch (each batch reading its own regions' sites), equal.
+#[test]
+#[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
+fn the_tiny_lead_reads_on_the_card_are_the_hosts() {
+    let opened = Card::open(0).unwrap();
+    let mut card = CardField::open(&opened).unwrap();
+    let short = vec![1usize, 4, 0, 2, 2, 3, 1];
+    let long: Vec<usize> = (0..13).map(|t| (t * 3 + t / 4) % 5).collect();
+    let places: Vec<(&[usize], usize)> = vec![(&short, 0), (&short, 3), (&short, 6), (&long, 0), (&long, 7), (&long, 12)];
+    let laned = |still: usize| energetic_with(FieldDeclaration { width: 16, lanes: 2, ..tiny_declaration(still) });
+    let fields: Vec<(String, Field)> = (0..=2).map(|s| (format!("still {s}"), energetic(s))).chain((0..=1).map(|s| (format!("laned still {s}"), laned(s)))).collect();
+    for (name, field) in &fields {
+        let host: Vec<EnergyLead> = places.iter().map(|&(c, t)| field.energy_lead(c, t).unwrap()).collect();
+        let whole = card.energy_leads(field, &places).unwrap();
+        card.energy_batch_regions(Some(2));
+        let cut = card.energy_leads(field, &places).unwrap();
+        card.energy_batch_regions(None);
+        println!("ENERGY_LEAD tiny {name} bit_equal={} cut_bit_equal={}", whole == host, cut == host);
+        assert_eq!(whole, host, "{name}: the card's lead reads");
+        assert_eq!(cut, host, "{name}: the card's lead reads two regions a batch");
     }
 }
 
