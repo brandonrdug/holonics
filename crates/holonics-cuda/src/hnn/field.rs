@@ -705,6 +705,9 @@ pub struct CardField<'c> {
     /// [measurement; theory, November 9 19:43] While the plates are read: each region's sites' classes by head at the last
     /// tick (`[t][h]` flat), by region over the batches.
     plates: std::cell::RefCell<Option<Vec<Vec<u32>>>>,
+    /// [measurement; theory, November 9 21:59] While the key words are read beside the plates: each region's sites' unframed key
+    /// words at the last tick (`[t][2M]`), by region over the batches.
+    words: std::cell::RefCell<Option<Vec<Vec<i64>>>>,
     /// [measurement, §16.42] While a near field is read: the named sites of the batch's one region, and each one's near field
     /// by offset at every kept tick and head.
     near_sites: std::cell::RefCell<Option<Vec<usize>>>,
@@ -815,7 +818,7 @@ impl<'c> CardField<'c> {
         let (free, total) = (memory.free_bytes as u64, memory.total_bytes as u64);
         let used = total.saturating_sub(free);
         let budget = free.min(total.saturating_sub(BOARD_RESERVE).saturating_sub(used)).saturating_sub(MARGIN);
-        Ok(Self { card, module, budget, times: FieldTimes::default(), profile: None, pools: Default::default(), held_questions: Default::default(), covector_shares: Default::default(), row_questions: Default::default(), row_out: Default::default(), row_cov: Default::default(), held_cells: Default::default(), tick_reads: Default::default(), plates: Default::default(), near_sites: Default::default(), near_out: Default::default(), clock_sites: Default::default(), clock_out: Default::default(), phases: None, stamps: None, batch_regions: None })
+        Ok(Self { card, module, budget, times: FieldTimes::default(), profile: None, pools: Default::default(), held_questions: Default::default(), covector_shares: Default::default(), row_questions: Default::default(), row_out: Default::default(), row_cov: Default::default(), held_cells: Default::default(), tick_reads: Default::default(), plates: Default::default(), words: Default::default(), near_sites: Default::default(), near_out: Default::default(), clock_sites: Default::default(), clock_out: Default::default(), phases: None, stamps: None, batch_regions: None })
     }
 
     /// Time every launch on the card's own clock from here on ([`Stamps`]).
@@ -1889,6 +1892,16 @@ impl<'c> CardField<'c> {
                 for r in 0..regions.len() {
                     let (a0, a1) = (region_off[r] as usize, region_off[r + 1] as usize);
                     out[at_region + r] = (a0..a1).flat_map(|t| (0..heads).map(move |h| (h, t))).map(|(h, t)| cls[h * sites + t]).collect();
+                }
+            }
+            // [theory, November 9 21:59] The last tick's key words `[t][2M]` (the word half of `qkv`), where they are read.
+            if self.words.borrow().is_some() {
+                let qkv = self.timed(Kind::Copy, || card.fetch_range(&last.qkv, 0, sites * 2 * m2)).map_err(device)?;
+                if let Some(out) = self.words.borrow_mut().as_mut() {
+                    for r in 0..regions.len() {
+                        let (a0, a1) = (region_off[r] as usize, region_off[r + 1] as usize);
+                        out[at_region + r] = (a0..a1).flat_map(|t| qkv[t * 2 * m2..t * 2 * m2 + m2].iter().copied()).collect();
+                    }
                 }
             }
         }
@@ -2978,6 +2991,18 @@ impl FieldRealization for CardField<'_> {
         let total = self.covector_shares.borrow_mut().take().unwrap_or_default();
         read?;
         Ok(total.chunks_exact(2).map(|c| [c[0] as u128, c[1] as u128]).collect())
+    }
+
+    fn read_words(&mut self, field: &Field, regions: &[Region]) -> Result<holonics::hnn::tower::field::WordsRead> {
+        if field.declaration.energy {
+            return Err(TowerError::Refused("an energy field's key words are not read"));
+        }
+        *self.plates.borrow_mut() = Some(vec![Vec::new(); regions.len()]);
+        *self.words.borrow_mut() = Some(vec![Vec::new(); regions.len()]);
+        let read = self.run(field, regions, false, false, None);
+        let plates = self.plates.borrow_mut().take().unwrap_or_default();
+        let words = self.words.borrow_mut().take().unwrap_or_default();
+        Ok(holonics::hnn::tower::field::WordsRead { faces: read?.0, plates, words })
     }
 
     fn read_plates(&mut self, field: &Field, regions: &[Region]) -> Result<(Vec<Vec<Option<TowerFace>>>, Vec<Vec<u32>>)> {

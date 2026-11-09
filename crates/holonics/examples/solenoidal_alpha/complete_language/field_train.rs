@@ -8824,19 +8824,20 @@ pub(super) fn census_table(text: &str, depth: u32) -> Result<LensTable> {
 /// truth)` with its leaf at the last tick (`[h]`, full depth). Prints each section's time where `timed`. Returns the open
 /// places.
 #[allow(clippy::too_many_arguments)]
-fn lap_visit(codec: &FieldCodec, train: &Problems, sections: &[Vec<usize>], paths: &[Vec<usize>], order: &[usize], seed: u64, mut draw: u64, learner: &mut FieldLearner, realization: &mut dyn FieldRealization, timed: bool, visit: &mut dyn FnMut(&[u32], &holonics::hnn::tower::TowerFace, usize)) -> Result<u64> {
-    let heads = learner.field.declaration.heads;
+fn lap_visit(codec: &FieldCodec, train: &Problems, sections: &[Vec<usize>], paths: &[Vec<usize>], order: &[usize], seed: u64, mut draw: u64, learner: &mut FieldLearner, realization: &mut dyn FieldRealization, timed: bool, visit: &mut dyn FnMut(&[u32], &holonics::hnn::tower::TowerFace, usize, Option<u32>)) -> Result<u64> {
+    let decl = learner.field.declaration;
+    let (heads, m2) = (decl.heads, 2 * decl.complex());
     let mut places = 0u64;
     for (n, &s) in order.iter().enumerate() {
         let section_start = std::time::Instant::now();
         let (regions, _) = section_regions(codec, train, &sections[s], &paths[s], seed, &mut draw, learner, realization)?;
         let views = views_of(&regions);
-        let (faces, leaves) = realization.read_plates(&learner.field, &views).map_err(|e| e.to_string())?;
+        let read = realization.read_words(&learner.field, &views).map_err(|e| e.to_string())?;
         let mut open = 0u64;
-        for ((r, faces), leaves) in views.iter().zip(&faces).zip(&leaves) {
+        for (((r, faces), leaves), words) in views.iter().zip(&read.faces).zip(&read.plates).zip(&read.words) {
             for (t, face) in faces.iter().enumerate() {
                 let Some(face) = face.as_ref().filter(|_| r.unresolved[t]) else { continue };
-                visit(&leaves[t * heads..(t + 1) * heads], face, r.classes[t]);
+                visit(&leaves[t * heads..(t + 1) * heads], face, r.classes[t], holonics::hnn::tower::field::seam_octave(&words[t * m2..(t + 1) * m2], &decl));
                 open += 1;
             }
         }
@@ -8866,7 +8867,9 @@ fn log2_ratio(n: u64, f: u128) -> i128 {
 /// draws its first `SECTIONS` sections make, all of them at zero: `train-field`'s codec, walk, paths, draws and seed, read at
 /// the state's own lap count), reading only and never depositing: at every open site its leaf takes its true letter into
 /// `N_(p, a)` and its face's shares into `F_(p, a)` ([`PlateCounts`]); `CENSUS.tsv` holds every depth's table. A second
-/// visit of the same states reads TRAIN's own code under each depth's residual lens: the code the lens releases on TRAIN
+/// visit of the same states reads TRAIN's own code under each depth's residual lens, and by each site's octave of distance to
+/// the nearest seam (the least `||Re| − |Im|| / (|Re| + |Im|)` over its class modes, `SEAMS.tsv`, `FIELD_LEAVES_SEAM`) its
+/// leaf's U shared over the leaf's sites and the code the lens releases there; the code the lens releases on TRAIN
 /// (plain less lensed, nats a place) beside each depth's stored free energy `U = Σ_leaves Σ_a N_a ln(N_a/F_a)` a place
 /// (`FIELD_LEAVES_U`; theory's checks: released ≥ U at every depth, and U never falls with depth), and the 20 leaves of the
 /// most `U` at each depth with their shells and counts (`LEAVES_U.tsv`). Then the held problems' joint read
@@ -8905,7 +8908,7 @@ pub(super) fn plate_joint_field(args: &[String], realization: &mut dyn FieldReal
     let take = if limit == 0 { order.len() } else { limit.min(order.len()) };
     let mut counts: Vec<std::collections::BTreeMap<Vec<u32>, PlateCounts>> = (0..=trits).map(|_| std::collections::BTreeMap::new()).collect();
     let leaf_at = |leaf: &[u32], d: usize| -> Vec<u32> { leaf.iter().map(|&c| c % 3u32.pow(d as u32)).collect() };
-    let places = lap_visit(&codec, &train_set, &sections, &paths, &order[..take], seed, draw, &mut learner, realization, true, &mut |leaf, face, truth| {
+    let places = lap_visit(&codec, &train_set, &sections, &paths, &order[..take], seed, draw, &mut learner, realization, true, &mut |leaf, face, truth, _| {
         for (d, table) in counts.iter_mut().enumerate().skip(1) {
             table.entry(leaf_at(leaf, d)).or_insert_with(|| PlateCounts::new(a)).add(face, truth);
         }
@@ -8928,15 +8931,32 @@ pub(super) fn plate_joint_field(args: &[String], realization: &mut dyn FieldReal
         }
         println!("FIELD_LEAVES depth={d} cells={} leaves={} open_places={places} sections={take} of={} census_ms={census_ms}", 3u128.pow((heads * d) as u32), table.len(), order.len());
     }
-    // The second visit: TRAIN's own code plain and under each depth's lens.
+    // The second visit: TRAIN's own code plain and under each depth's lens; and by each site's octave of distance to the
+    // nearest seam ([`holonics::hnn::tower::field::seam_octave`]), its leaf's U shared over the leaf's sites and the code the
+    // lens releases at the site, at each depth.
     let mut codes: Vec<[i128; 2]> = vec![[0; 2]; trits + 1];
+    let shares: Vec<std::collections::BTreeMap<Vec<u32>, i128>> = energies.iter().map(|list| list.iter().map(|(u, leaf, n)| (leaf.clone(), holonics::hnn::overture::div_nearest(*u, (*n).max(1) as i128))).collect()).collect();
+    let mut seams: Vec<std::collections::BTreeMap<Option<u32>, (u64, i128, i128)>> = vec![std::collections::BTreeMap::new(); trits + 1];
     let second = std::time::Instant::now();
-    lap_visit(&codec, &train_set, &sections, &paths, &order[..take], seed, draw, &mut learner, realization, false, &mut |leaf, face, truth| {
+    lap_visit(&codec, &train_set, &sections, &paths, &order[..take], seed, draw, &mut learner, realization, false, &mut |leaf, face, truth, octave| {
         let plain = face.code(truth) as i128;
-        for (d, slot) in codes.iter_mut().enumerate().skip(1) {
-            *slot = [slot[0] + plain, slot[1] + lensed_face(face, leaf, d as u32, &tables[d]).code(truth) as i128];
+        for d in 1..=trits {
+            let lensed = lensed_face(face, leaf, d as u32, &tables[d]).code(truth) as i128;
+            codes[d] = [codes[d][0] + plain, codes[d][1] + lensed];
+            let share = shares[d].get(&leaf_at(leaf, d)).copied().unwrap_or(0);
+            let slot = seams[d].entry(octave).or_default();
+            *slot = (slot.0 + 1, slot.1 + share, slot.2 + plain - lensed);
         }
     })?;
+    let mut seam_file = rows_file(&out.join("SEAMS.tsv"), "depth\toctave\tmargin_from\tmargin_to\tsites\tu_nats_a_site\treleased_nats_a_site\n")?;
+    for (d, bins) in seams.iter().enumerate().skip(1) {
+        for (octave, &(sites, u, released)) in bins {
+            let (name, from, to) = match octave { Some(k) => (k.to_string(), format!("2^-{}", k + 1), format!("2^-{k}")), None => ("seam".to_string(), "0".to_string(), "0".to_string()) };
+            let per = |v: i128| decimal_q20(nats_q20(v) / sites.max(1) as i128);
+            row(&mut seam_file, &format!("{d}\t{name}\t{from}\t{to}\t{sites}\t{}\t{}\n", per(u), per(released)))?;
+            println!("FIELD_LEAVES_SEAM depth={d} octave={name} margin={from}..{to} sites={sites} u_nats_a_site={} released_nats_a_site={}", per(u), per(released));
+        }
+    }
     let a_place = |v: i128| if places == 0 { "-".to_string() } else { decimal_q20(nats_q20(v) / places as i128) };
     let mut top = rows_file(&out.join("LEAVES_U.tsv"), "depth\trank\tleaf_shells\tplaces\tu_nats\n")?;
     for d in 1..=trits {

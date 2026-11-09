@@ -1112,6 +1112,39 @@ pub struct ReleaseRead<'a> {
     pub drives: &'a [Vec<PassDrive>],
 }
 
+/// [measurement; theory, November 9 21:59] **A read's faces, plates and key words** ([`Field::read_words`]), one entry a region.
+#[derive(Clone, Debug, Default, PartialEq, Eq)]
+pub struct WordsRead {
+    pub faces: Vec<Vec<Option<TowerFace>>>,
+    pub plates: Vec<Vec<u32>>,
+    pub words: Vec<Vec<i64>>,
+}
+
+/// [definition; theory, November 9 21:59] **A site's distance to the nearest seam, by octave**: over its class modes (each head's
+/// first `b` modes of its key word `[2M]`), the least `||Re| − |Im|| / (|Re| + |Im|)`; its octave `k` is the least with that
+/// margin at or above `2^(−(k+1))` (`0` for `[½, 1]`, `1` for `[¼, ½)`, …), read on the integers; `None` where some class mode
+/// stands on the seam (or at zero).
+pub fn seam_octave(word: &[i64], d: &FieldDeclaration) -> Option<u32> {
+    let (n, m, trits) = (d.modes, d.complex(), d.class_trits());
+    let mut best: Option<u32> = Some(0);
+    for h in 0..d.heads {
+        for l in 0..trits {
+            let c = h * n + l;
+            let (re, im) = (word[c].unsigned_abs() as u128, word[m + c].unsigned_abs() as u128);
+            let (num, den) = (re.abs_diff(im), re + im);
+            if num == 0 {
+                return None;
+            }
+            let mut k = 0u32;
+            while num << (k + 1) < den {
+                k += 1;
+            }
+            best = best.map(|b| b.max(k));
+        }
+    }
+    best
+}
+
 /// [definition; theory, November 9 19:43 and 21:12] **One standing move of the certified exchange walk**
 /// ([`Field::exchange_walk`]): the two places in the answer exchanged, the gain it was proposed on (read on the faces before
 /// it), and its certified fall in the answer's code (read on the faces after it), its heat; on the codes' `2^(−20)` bits.
@@ -1679,6 +1712,9 @@ struct FieldPass {
     /// [measurement; theory, November 9 19:43] Each site's plate at the last tick, `[t][h]`: the resonance class its key word
     /// holds in each head ([`ClassLists::class`]).
     plates: Vec<u32>,
+    /// [measurement; theory, November 9 21:59] Each site's unframed key word at the last tick, `[t][2M]` (real parts then
+    /// imaginary): its class modes' `(Re, Im)`, whose distance to the seam `|Re| = |Im|` a census reads.
+    words: Vec<i64>,
 }
 
 /// The round trips `Σ_j p_ji^(t) p_ij^(t+1)` of each site over consecutive ticks' rows (`[h][i]`), each
@@ -2663,6 +2699,7 @@ impl Field {
             out.pairs += cell.rows.iter().map(|r| r.len() as u64).sum::<u64>();
             if k + 1 == d.ticks {
                 out.plates = (0..sites).flat_map(|t| cell.classes.iter().map(move |l| l.class[t])).collect();
+                out.words = cell.word.clone();
             }
             if let Some(prev) = &before {
                 round_trips(prev, &cell.rows, sites, &mut trips);
@@ -3660,6 +3697,22 @@ impl Field {
 
     /// [measurement; theory, November 9 19:43] **Each region's faces and its sites' plates** at the last tick (`[t][h]` flat:
     /// the class each head's key word holds), read in parallel; a reading only.
+    /// [measurement; theory, November 9 21:59] **Each region's faces, its sites' plates and their key words** at the last tick
+    /// (`[t][h]` and `[t][2M]`), read in parallel; a reading only.
+    pub fn read_words(&self, regions: &[Region]) -> Result<WordsRead> {
+        if self.declaration.energy {
+            return refuse("an energy field's key words are not read");
+        }
+        let reads: Vec<(Vec<Option<TowerFace>>, Vec<u32>, Vec<i64>)> = regions.par_iter().map(|r| self.pass(r, false).map(|p| (p.faces, p.plates, p.words))).collect::<Result<_>>()?;
+        let mut out = WordsRead::default();
+        for (f, p, w) in reads {
+            out.faces.push(f);
+            out.plates.push(p);
+            out.words.push(w);
+        }
+        Ok(out)
+    }
+
     pub fn read_plates(&self, regions: &[Region]) -> Result<(Vec<Vec<Option<TowerFace>>>, Vec<Vec<u32>>)> {
         if self.declaration.energy {
             return refuse("an energy field's plates are not read");
@@ -4797,6 +4850,11 @@ pub trait FieldRealization {
     fn read_plates(&mut self, field: &Field, regions: &[Region]) -> Result<(Vec<Vec<Option<TowerFace>>>, Vec<Vec<u32>>)> {
         field.read_plates(regions)
     }
+    /// [measurement; theory, November 9 21:59] Each region's faces, plates and key words at the last tick
+    /// ([`Field::read_words`]), read on the host where a realization reads none of its own.
+    fn read_words(&mut self, field: &Field, regions: &[Region]) -> Result<WordsRead> {
+        field.read_words(regions)
+    }
     fn read_and_return(&mut self, field: &Field, regions: &[Region]) -> Result<(Vec<Vec<Option<TowerFace>>>, Vec<i128>)>;
     fn read_faces(&mut self, field: &Field, regions: &[Region]) -> Result<Vec<Vec<Option<TowerFace>>>>;
     /// Each unresolved site's readout logits on `2^(−16)` bits ([`Field::logits`]), the release's read.
@@ -4992,6 +5050,9 @@ impl<'a> LanesField<'a> {
 impl FieldRealization for LanesField<'_> {
     fn read_plates(&mut self, field: &Field, regions: &[Region]) -> Result<(Vec<Vec<Option<TowerFace>>>, Vec<Vec<u32>>)> {
         self.card.read_plates(field, regions)
+    }
+    fn read_words(&mut self, field: &Field, regions: &[Region]) -> Result<WordsRead> {
+        self.card.read_words(field, regions)
     }
     fn read_and_return(&mut self, field: &Field, regions: &[Region]) -> Result<(Vec<Vec<Option<TowerFace>>>, Vec<i128>)> {
         self.card.read_and_return(field, regions)

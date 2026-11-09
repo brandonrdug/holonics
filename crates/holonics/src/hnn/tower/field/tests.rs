@@ -3725,3 +3725,32 @@ fn the_exchange_walk_holds_composition() {
         }
     }
 }
+
+/// [measurement; theory, November 9 21:59] **A site's key words are its last tick's, and its seam octave reads the least
+/// margin of its class modes** ([`Field::read_words`], [`seam_octave`]): the read's faces and plates are `read_plates`'s, its
+/// words the last tick's unframed key words; a word whose class modes sit at margins ½, ⅓ and 1/9 reads octave 3 (1/9 lies in
+/// `[1/16, 1/8)`), and one with a mode on the seam reads none.
+#[test]
+fn a_sites_words_are_its_last_ticks_and_its_seam_octave_its_least_margin() {
+    let field = shaped(0);
+    let r = region();
+    let read = field.read_words(&[r]).unwrap();
+    let (faces, plates) = field.read_plates(&[r]).unwrap();
+    assert_eq!((read.faces, read.plates), (faces, plates));
+    let pass = field.pass(&r, true).unwrap();
+    assert_eq!(read.words[0], pass.ticks.last().unwrap().word);
+    let d = field.declaration;
+    let (m, n) = (d.complex(), d.modes);
+    let mut word = vec![0i64; 2 * m];
+    // Class modes are each head's first `b` modes; set every one to margin ½ (Re 3, Im 1), then two to ⅓ and 1/9.
+    for h in 0..d.heads {
+        for l in 0..d.class_trits() {
+            (word[h * n + l], word[m + h * n + l]) = (3, 1);
+        }
+    }
+    (word[0], word[m]) = (2, -1);
+    (word[n], word[m + n]) = (-5, 4);
+    assert_eq!(seam_octave(&word, &d), Some(3));
+    (word[n], word[m + n]) = (-4, 4);
+    assert_eq!(seam_octave(&word, &d), None);
+}

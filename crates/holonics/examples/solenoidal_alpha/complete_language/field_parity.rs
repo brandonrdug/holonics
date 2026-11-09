@@ -451,7 +451,9 @@ pub(super) fn parity(args: &[String], card: &mut dyn FieldRealization) -> Result
     let views: Vec<Region> = owned.iter().map(|(c, u)| Region { classes: c, unresolved: u, faces: &[], locked: &[], echo: &[], domain: None, port: None }).collect();
     let host_plates = HostField.read_plates(&host_learner.field, &views).map_err(|e| e.to_string())?;
     let card_plates = card.read_plates(&card_learner.field, &views).map_err(|e| e.to_string())?;
-    let plates_equal = host_plates == card_plates;
+    // [theory, November 9 21:59] And their key words at the last tick, from which a census reads each site's distance to the seam.
+    let words_equal = HostField.read_words(&host_learner.field, &views).map_err(|e| e.to_string())? == card.read_words(&card_learner.field, &views).map_err(|e| e.to_string())?;
+    let plates_equal = host_plates == card_plates && words_equal;
     releases_unequal += usize::from(!plates_equal);
     // [theory, November 9 21:43] The census lens through both: a table formed from these openings' own faces at depth 2 (each
     // open site's letter as it stands, a fixture), the lens off reading the plain faces exactly, the lens on host for card.
