@@ -2614,36 +2614,47 @@ fn release_i(v: i128, bits: u32) -> i128 {
     div_nearest(v, 1i128 << bits)
 }
 
-/// [measurement; theory, November 9 05:31] **The scaled contrast's pairs add to its covector**: on the warm line-shaped field,
-/// three truths beside writes that moved some of their places, the pairs' covectors [`contrast_pair_covectors`] reads, summed,
-/// are the section's own covector bit for bit, and its gap is their energies' (`Σ (G(truth) − G(write))/T`); the pairs differ,
-/// and a pair whose write is its truth reads zero.
+/// Three truths on the line-shaped field's 40 sites and their writes, each write moving every `(5 + k)`-th place off its truth.
+fn contrast_pairs(alphabet: usize) -> (Vec<Vec<usize>>, Vec<Vec<usize>>) {
+    let truths: Vec<Vec<usize>> = (0..3).map(|k| (0..40).map(|t| (t * 7 + t / 3 + k) % 5).collect()).collect();
+    let writes = truths.iter().enumerate().map(|(k, c)| c.iter().enumerate().map(|(t, &x)| if t % (5 + k) == 2 { (x + 1 + k) % alphabet } else { x }).collect()).collect();
+    (truths, writes)
+}
+
+/// [measurement; theory, November 9 05:31 and 05:51] **The contrast's pairs add to its covector within a unit a pair**: on the
+/// warm line-shaped field, three truths beside writes that moved some of their places, the pairs' covectors
+/// [`contrast_pair_covectors`] reads (each released on its own), summed, stand within `⌊(n + 1)/2⌋ = 2` units of the chart of
+/// the covector the contrast section deposits, entry by entry (the section adds the pairs' unreleased differences and
+/// releases the sum once), and with one pair they are its bits; the section's gap is the pairs' energies'
+/// (`Σ (G(truth) − G(write))/T`); the pairs differ, and a pair whose write is its truth reads zero.
 #[test]
-fn the_scaled_contrasts_pairs_add_to_its_covector() {
+fn the_contrasts_pairs_add_to_its_covector_within_a_unit_a_pair() {
     let mut field = energetic_line();
     field.theta[field.layout.face_temper] = 10 << MATERIAL_BITS;
-    let alphabet = field.declaration.alphabet;
-    let truths: Vec<Vec<usize>> = (0..3).map(|k| (0..40).map(|t| (t * 7 + t / 3 + k) % 5).collect()).collect();
-    let writes: Vec<Vec<usize>> = truths.iter().enumerate().map(|(k, c)| c.iter().enumerate().map(|(t, &x)| if t % (5 + k) == 2 { (x + 1 + k) % alphabet } else { x }).collect()).collect();
+    let (truths, writes) = contrast_pairs(field.declaration.alphabet);
     let none = vec![false; 40];
     let truth: Vec<Region> = truths.iter().map(|c| Region { classes: c, unresolved: &none, faces: &[], locked: &[], echo: &[], domain: None, port: None }).collect();
     let write: Vec<Region> = writes.iter().map(|c| Region { classes: c, unresolved: &none, faces: &[], locked: &[], echo: &[], domain: None, port: None }).collect();
     let read = contrast_pair_covectors(&field, &truth, &write, &mut HostField).unwrap();
     let mut learner = FieldLearner::new(field.clone(), 14);
     learner.open_family_rates();
-    let mut etas = std::collections::VecDeque::new();
-    let (receipt, _) = learner.section_contrast_scaled(&truth, &write, &mut etas, &mut HostField).unwrap();
+    let receipt = learner.section_contrast(&truth, &write, &mut HostField).unwrap();
     let mut sum = vec![0i128; field.material_len()];
     for pair in &read {
         for (s, &x) in sum.iter_mut().zip(&pair.covector) {
             *s += x;
         }
     }
-    assert_eq!(sum, receipt.covector, "the pairs' covectors add to the section's");
+    let bound = (read.len() as i128 + 1) / 2;
+    let off: Vec<i128> = sum.iter().zip(&receipt.covector).map(|(a, b)| (a - b).abs()).collect();
+    println!("pairs' sum against the section's covector: {} of {} entries differ, by at most {}", off.iter().filter(|&&d| d != 0).count(), off.len(), off.iter().max().unwrap());
+    assert!(off.iter().all(|&d| d <= bound), "the pairs' sum stands within {bound} units of the section's covector");
     assert!(sum.iter().any(|&x| x != 0) && read[0].covector != read[1].covector, "nonzero pairs that differ");
     let inverse = temperature_of(-field.theta[field.layout.face_temper], &field.fine).unwrap();
     let gap: i128 = read.iter().map(|p| p.truth_g - p.write_g).sum();
     assert_eq!(release(gap * inverse, MATERIAL_BITS), receipt.gap, "the section's gap is the pairs' energies'");
+    let one = FieldLearner::new(field.clone(), 14).section_contrast(&truth[..1], &write[..1], &mut HostField).unwrap();
+    assert_eq!(read[0].covector, one.covector, "with one pair, the pair's covector is the section's bit for bit");
     let same = contrast_pair_covectors(&field, &truth[..1], &truth[..1], &mut HostField).unwrap();
     assert!(same[0].covector.iter().all(|&x| x == 0) && same[0].truth_g == same[0].write_g, "a write that is its truth reads zero");
 }
@@ -2701,31 +2712,33 @@ fn a_kernel_steps_weight_is_its_metropolis_hastings_ratio() {
     assert!(seen.iter().any(|&(m, w, _)| m > 0 && w > 500), "a moved proposal weighed near whole at a warm temperature: {seen:?}");
 }
 
-/// [definition; the unified-theory reading of November 7, 05:55] **An evidence-shrunk Newton step moves along the moments'
-/// direction by `α = −(s/c)(1 − v/s²)`**: on the warm line-shaped field, a first kernel section opens the moments (no step:
-/// they hold no direction yet), and a second, on other blocks, steps by `α` times the moments' step where its slope along
-/// it is downhill past its noise, or deposits nothing; its read states `α`, the shrink and the slope's terms.
+/// [measurement; the unified-theory reading of November 7, 06:26; theory, November 9 05:51] **The kernel's Newton read moves
+/// nothing**: on the warm line-shaped field, two kernel sections read with the evidence-shrunk Newton terms and two without
+/// deposit the same bits, theirs and their remainders (one deposit, the moments'). The first read's direction is empty (the
+/// moments hold none before their first covector), so its `α` and curvature are zero; the second reads a positive curvature
+/// along the moments' step.
 #[test]
-fn an_evidence_shrunk_newton_step_moves_by_its_alpha() {
+fn the_kernels_newton_read_moves_nothing() {
     let mut field = energetic_line();
     field.theta[field.layout.face_temper] = 10 << MATERIAL_BITS;
     let truths: Vec<Vec<usize>> = (0..6).map(|k| (0..40).map(|t| (t * 7 + t / 3 + k) % 5).collect()).collect();
     let none = vec![false; 40];
     let regions: Vec<Region> = truths.iter().map(|c| Region { classes: c, unresolved: &none, faces: &[], locked: &[], echo: &[], domain: None, port: None }).collect();
-    let mut learner = FieldLearner::new(field, 14);
-    learner.newton = true;
-    let first = learner.section_kernel(&regions, &vec![vec![3usize, 14, 25, 36]; 6], 1, &mut HostField).unwrap();
-    let r = first.newton.unwrap();
-    assert!(!r.deposited && r.alpha == (0, 0), "the moments hold no direction before their first covector: {r:?}");
-    let before = learner.field.theta.clone();
-    let second = learner.section_kernel(&regions, &vec![vec![8usize, 19, 30]; 6], 2, &mut HostField).unwrap();
-    let r = second.newton.unwrap();
-    println!("second section: {r:?}");
-    assert!(r.curvature > 0, "{r:?}");
-    if r.slope < 0 && r.shrink.0 > 0 {
-        assert!(r.deposited && r.alpha.0 > 0 && r.alpha.1 > 0 && learner.field.theta != before, "a downhill slope past its noise steps: {r:?}");
-    } else {
-        assert!(!r.deposited && learner.field.theta == before, "an uphill or noisy slope deposits nothing: {r:?}");
+    let mut read = FieldLearner::new(field.clone(), 14);
+    read.newton_read = true;
+    let mut plain = FieldLearner::new(field, 14);
+    for (k, (blocks, seed)) in [(vec![vec![3usize, 14, 25, 36]; 6], 1u64), (vec![vec![8usize, 19, 30]; 6], 2)].into_iter().enumerate() {
+        let a = read.section_kernel(&regions, &blocks, seed, &mut HostField).unwrap();
+        let b = plain.section_kernel(&regions, &blocks, seed, &mut HostField).unwrap();
+        assert_eq!((&read.field.theta, &read.carried, a.deposited), (&plain.field.theta, &plain.carried, b.deposited), "section {k}: the read moves nothing");
+        assert!(b.newton.is_none());
+        let r = a.newton.unwrap();
+        println!("section {k}: {r:?}");
+        if k == 0 {
+            assert_eq!((r.alpha, r.curvature), ((0, 0), 0), "the moments hold no direction before their first covector");
+        } else {
+            assert!(r.curvature > 0, "{r:?}");
+        }
     }
 }
 
@@ -3114,6 +3127,230 @@ fn a_saved_state_keeps_its_remainders_and_one_without_opens_them_at_zero() {
     assert_eq!(opened.family_transfer, learner.family_transfer.iter().map(|t| t * lift).collect::<Vec<_>>(), "the averages lifted to the price's grain");
     assert_eq!(opened.family_price, learner.family_price.iter().map(|p| p * lift).collect::<Vec<_>>());
     assert_eq!((&opened.field, &opened.first, &opened.second, &opened.family_rates), (&learner.field, &learner.first, &learner.second, &learner.family_rates));
+}
+
+/// The contrast section's regions on the line-shaped field: [`contrast_pairs`]'s truths and writes, every site resolved.
+fn contrast_regions<'a>(truths: &'a [Vec<usize>], writes: &'a [Vec<usize>], none: &'a [bool]) -> (Vec<Region<'a>>, Vec<Region<'a>>) {
+    let view = |c: &'a Vec<usize>| Region { classes: c, unresolved: none, faces: &[], locked: &[], echo: &[], domain: None, port: None };
+    (truths.iter().map(view).collect(), writes.iter().map(view).collect())
+}
+
+/// [definition; theory, November 9 05:51] **The contrast section deposits through the one deposit, and a far family carries
+/// until it moves**: on the warm line-shaped field, three truths beside their writes, every family at the learner's rate (14
+/// bits) but one far family of the material's grain set two bits past it, so its steps sit under a quarter grain. The first
+/// section opens the moments at its covector, and every entry whose moment opened moves or carries a remainder (the near
+/// families move); the far family moves no grain and carries each step whole (its remainder is the step it formed). From the second
+/// section a step before prices the families, so their averages and lengths move. The far family moves its first grain within
+/// eight sections, and after every section each entry holds the carry's invariant: the grains it moved and its remainder are the
+/// steps it formed, `(θ₀ − θ_n) 2^24 + r_n = Σ_k x_k`, with `|r_n| ≤ 2^23` (the Lean obligation listed for #410).
+#[test]
+fn the_contrast_section_deposits_through_the_one_deposit_and_a_far_family_carries_until_it_moves() {
+    let mut field = energetic_line();
+    field.theta[field.layout.face_temper] = 10 << MATERIAL_BITS;
+    let material = field.material_len();
+    let (truths, writes) = contrast_pairs(field.declaration.alphabet);
+    let none = vec![false; 40];
+    let (truth, write) = contrast_regions(&truths, &writes, &none);
+    let families = field.families_all();
+    // The far family: the last family on the material's grain whose entries the contrast's covector reaches in two places or more.
+    let reach = FieldLearner::new(field.clone(), 14).section_contrast(&truth, &write, &mut HostField).unwrap().covector;
+    let far = families.iter().rposition(|&(start, len, grain)| grain == MATERIAL_BITS && (start..start + len).filter(|&i| reach[i] != 0).count() >= 2).expect("a family the covector reaches");
+    let (far_start, far_len, _) = families[far];
+    let mut learner = FieldLearner::new(field.clone(), 14);
+    learner.open_family_rates();
+    learner.family_rates.as_mut().unwrap()[far] = i128::from(MATERIAL_BITS + 2) << MATERIAL_BITS;
+    let opened = learner.family_rates.clone().unwrap();
+    let mut formed_sum = vec![0i128; material];
+    let mut first_far_move = None;
+    for n in 1..=8usize {
+        let (first_before, second_before) = (learner.first.clone(), learner.second.clone());
+        let receipt = learner.section_contrast(&truth, &write, &mut HostField).unwrap();
+        assert_ne!((&learner.first, &learner.second), (&first_before, &second_before), "section {n}: the moments move");
+        if let Some(last) = &learner.last {
+            assert_eq!(last.formed.len(), material, "section {n}: the carried step holds its formed step");
+            for (s, &x) in formed_sum.iter_mut().zip(&last.formed) {
+                *s += x;
+            }
+        }
+        for i in 0..material {
+            let moved = i128::from(field.theta[i]) - i128::from(learner.field.theta[i]);
+            let r = i128::from(learner.carried[i]);
+            assert_eq!((moved << MATERIAL_BITS) + r, formed_sum[i], "section {n}, entry {i}: the grains moved and the remainder are the steps formed");
+            assert!(r.abs() <= 1 << 23, "section {n}, entry {i}: a remainder within half a grain");
+        }
+        let far_moved = (far_start..far_start + far_len).filter(|&i| learner.field.theta[i] != field.theta[i]).count();
+        if n == 1 {
+            assert!(receipt.deposited, "the first section moves the near families");
+            assert_eq!(far_moved, 0, "the far family moves no grain at the first section");
+            let carried: Vec<i128> = (far_start..far_start + far_len).map(|i| i128::from(learner.carried[i])).collect();
+            assert!(carried.iter().filter(|&&r| r != 0).count() >= 2, "the far family carries its steps: {carried:?}");
+            assert_eq!(carried, formed_sum[far_start..far_start + far_len].to_vec(), "each far step carried whole");
+            assert!((0..material).filter(|&i| learner.first[i] != 0).all(|i| learner.carried[i] != 0 || learner.field.theta[i] != field.theta[i]), "every entry whose moment opened moved or carries");
+            assert_eq!(learner.family_rates.as_ref(), Some(&opened), "no step before: no length moves");
+        }
+        if n == 2 {
+            assert!(learner.family_transfer.iter().any(|&t| t != 0) && learner.family_price.iter().any(|&p| p != 0), "a step before: the family averages move");
+            assert_ne!(learner.family_rates.as_ref(), Some(&opened), "and the lengths with them");
+        }
+        if far_moved > 0 && first_far_move.is_none() {
+            first_far_move = Some(n);
+        }
+    }
+    println!("far family {far} ({far_len} entries) moved its first grain at section {first_far_move:?}");
+    assert!(first_far_move.is_some_and(|n| n > 1), "the far family moves a grain within eight sections, after carrying: {first_far_move:?}");
+}
+
+/// The retired scaled contrast's step (`FieldLearner::section_contrast_scaled` at `ee5adedd5`) from a learner's moments, at
+/// the lengths `rhos` (on `2^(−24)` bits): each family's direction with its whole quotient taken on the grain, released to the
+/// grain after the fraction, times one length `L` on `2^(−32)`, released at `2^(−32)`.
+fn retired_scaled_step(learner: &FieldLearner, rhos: &[i128], length: i128) -> Vec<i128> {
+    let f = &learner.field;
+    let mut step = vec![0i128; f.material_len()];
+    for (k, &(start, len, grain)) in f.families_all().iter().enumerate() {
+        let (whole, part) = (rhos[k] >> MATERIAL_BITS, (rhos[k] & ((1 << MATERIAL_BITS) - 1)) as i32);
+        let scale = temperature_of(-part, &f.fine).unwrap();
+        for i in start..start + len {
+            let root = (learner.second[i].max(0) as u128).isqrt() as i128 + 1;
+            let num = learner.first[i] * (1i128 << grain);
+            let whole_step = if whole >= 0 { (num >> whole.min(127)) / root } else { num * (1i128 << -whole) / root };
+            step[i] = release(release(whole_step * scale, MATERIAL_BITS) * length, 32);
+        }
+    }
+    step
+}
+
+/// The scaled law's step before its releases, on `2^(−24)` of each entry's grain: `m 2^grain 2^(−frac ρ) L / (2^(⌊ρ⌋ + 32)
+/// (⌊√v⌋ + 1))`, the fraction as the navigator reads it, floored once.
+fn scaled_before_release(learner: &FieldLearner, rhos: &[i128], length: i128) -> Vec<i128> {
+    use num_bigint::BigInt;
+    let f = &learner.field;
+    let mut y = vec![0i128; f.material_len()];
+    for (k, &(start, len, grain)) in f.families_all().iter().enumerate() {
+        let (whole, part) = (rhos[k] >> MATERIAL_BITS, (rhos[k] & ((1 << MATERIAL_BITS) - 1)) as i32);
+        let scale = temperature_of(-part, &f.fine).unwrap();
+        for i in start..start + len {
+            let root = (learner.second[i].max(0) as u128).isqrt() as i128 + 1;
+            let mut num = BigInt::from(learner.first[i]) * BigInt::from(1i128 << grain) * BigInt::from(scale) * BigInt::from(length);
+            let mut den = BigInt::from(root) << 32usize;
+            if whole >= 0 {
+                den <<= whole as usize;
+            } else {
+                num <<= (-whole) as usize;
+            }
+            y[i] = i128::try_from(&(num / den)).unwrap();
+        }
+    }
+    y
+}
+
+/// [definition; theory, November 9 05:51] **The fold makes the first carried step the scaled one.** On the warm line-shaped
+/// field, a learner's moments are opened and moved by two contrast covectors and its last step is set to the retired scaled
+/// law's at one length `L ≈ 0.267·2^32` (fork3b's run printed its last eleven Newton lengths near that), as a state saved after
+/// a scaled section holds it; one family sits past its grain, so the scaled step releases it to zero. Two such states: one with
+/// spread family lengths, and one with none whose scaled run stepped one bit below the state's rate (sections of 64 states).
+/// The fold reads a partition of lengths that contains the run's, changes the family lengths alone (each by `−log₂ λ`; the
+/// state with none opens them first at the rate its run stepped at, found one bit under its own because no one length forms
+/// the step at its own rate) and refuses a state with no last step or one the carried deposit formed.
+/// Then a third covector moves both laws' moments alike, and the first carried step is compared with the step the retired
+/// law would have taken at `L`.
+///
+/// **What equality holds**: the step the folded deposit forms on the carry's grain is the scaled step before its releases,
+/// `y = m 2^grain 2^(−ρ) λ/(⌊√v⌋ + 1)`, to `|x − y| ≤ |y|(|L* − L|/L + 2^(−22)) + 2` carry grains (`L*` the length the fold
+/// read; `2^(−22)` the length's 24 binary digits and the navigator's fraction), entry by entry. The released steps differ only by
+/// the retired law's own truncations (its direction's whole quotient, then its release to the grain before `L` scaled it), so
+/// `|r − σ| < 1 + 1.5λ + (|y|δ + 3)/2^24` grains: at most one grain wherever that bound is under two. In every family where the
+/// scaled step released all to zero, the folded deposit carries a nonzero sub-grain step.
+#[test]
+fn the_fold_makes_the_first_carried_step_the_scaled_one() {
+    let mut field = energetic_line();
+    field.theta[field.layout.face_temper] = 10 << MATERIAL_BITS;
+    let material = field.material_len();
+    let families = field.families_all();
+    let (truths, writes) = contrast_pairs(field.declaration.alphabet);
+    let none = vec![false; 40];
+    let (truth, write) = contrast_regions(&truths, &writes, &none);
+    let pairs = contrast_pair_covectors(&field, &truth, &write, &mut HostField).unwrap();
+    let combine = |signs: [i128; 3]| -> Vec<i128> { (0..material).map(|i| (0..3).map(|p| signs[p] * pairs[p].covector[i]).sum()).collect() };
+    let length: i128 = 1_145_324_612;
+    for (case, spread, shift) in [("spread lengths", true, 0u32), ("no lengths", false, 1)] {
+        let mut scaled = FieldLearner::new(field.clone(), 14);
+        scaled.moments_take(&mut combine([1, 1, 1])).unwrap();
+        scaled.moments_take(&mut combine([1, 1, -1])).unwrap();
+        // The lengths the scaled run stepped at (the state's own where it carries them).
+        let far = families.iter().rposition(|&(start, len, grain)| grain == MATERIAL_BITS && (start..start + len).filter(|&i| scaled.first[i] != 0).count() >= 2).unwrap();
+        let run: Vec<i128> = if spread {
+            let mut r: Vec<i128> = (0..families.len()).map(|k| (i128::from(14 + (k as u32 % 3)) << MATERIAL_BITS) + ((k as i128 * 0x35_A7B1) & 0xFF_FFFF)).collect();
+            r[far] = i128::from(MATERIAL_BITS + 2) << MATERIAL_BITS;
+            scaled.family_rates = Some(r.clone());
+            (scaled.family_transfer, scaled.family_price) = (vec![3; families.len()], vec![-5; families.len()]);
+            r
+        } else {
+            vec![i128::from(scaled.rate_bits - shift) << MATERIAL_BITS; families.len()]
+        };
+        let last = retired_scaled_step(&scaled, &run, length);
+        assert!(last.iter().any(|&s| s != 0), "{case}: the scaled step moves");
+        scaled.last = Some(HeldStep { step: last, halvings: 0, formed: Vec::new() });
+        let (folded, read) = scaled.deposit_folded().unwrap();
+        println!("{case}: L {length} in {}..={} (folded {}), log₂ λ {} on 2^(−24), {} entries", read.low, read.high, read.length, read.log2_lambda, read.entries);
+        // The one-rate state is read at the rate its run stepped at, `shift` bits under its own.
+        let run_length = length;
+        assert!(read.low <= run_length && run_length <= read.high, "{case}: the partition holds the length the run stepped at");
+        assert_eq!((read.opened, read.shift), (!spread, shift), "{case}: opened at the run's rate");
+        // The lengths alone change.
+        let rates = folded.family_rates.clone().unwrap();
+        let before = run.clone();
+        assert_eq!(rates, before.iter().map(|r| r - read.log2_lambda).collect::<Vec<_>>(), "{case}: each length moves by −log₂ λ");
+        let mut same = folded.clone();
+        (same.family_rates, same.family_transfer, same.family_price) = (scaled.family_rates.clone(), scaled.family_transfer.clone(), scaled.family_price.clone());
+        assert_eq!(same, scaled, "{case}: only the family lengths change");
+        if spread {
+            assert_eq!((&folded.family_transfer, &folded.family_price), (&scaled.family_transfer, &scaled.family_price), "the averages carry over");
+        }
+        // At the state's own moments, the fold's receipt: every entry within one grain of the last step.
+        assert!(read.families.iter().all(|f| f.further == 0), "{case}: {:?}", read.families);
+        // The first carried step against the scaled step at L, after one covector moves both laws' moments alike.
+        let g = combine([-1, 1, 1]);
+        let mut next = folded.clone();
+        next.deposit(g.clone()).unwrap();
+        let carried = next.last.clone().unwrap();
+        let mut reference = scaled.clone();
+        reference.moments_take(&mut g.clone()).unwrap();
+        let sigma = retired_scaled_step(&reference, &run, length);
+        let y = scaled_before_release(&reference, &run, length);
+        // δ = |L* − L|/L + 2^(−22), against the length on the state's rate; and 1.5λ on the carry's grain.
+        let delta_num = (read.length - run_length).abs() * (1 << 22) + run_length;
+        let delta_den = run_length * (1 << 22);
+        let lambda_term = 3 * length / (1i128 << 9);
+        for (k, &(start, len, _)) in families.iter().enumerate() {
+            let (mut moving, mut equal, mut one, mut carrying) = (0usize, 0usize, 0usize, 0usize);
+            for i in start..start + len {
+                let (x, r) = (carried.formed[i], carried.step[i]);
+                let slack = y[i].abs() * delta_num / delta_den;
+                assert!((x - y[i]).abs() <= slack + 2, "{case}, family {k}, entry {i}: formed {x} against the scaled step before its releases {}", y[i]);
+                let off = (r - sigma[i]).abs();
+                let allowed = if lambda_term + slack + 3 < 1 << MATERIAL_BITS { 1 } else { 2 };
+                assert!(off <= allowed, "{case}, family {k}, entry {i}: released {r} against the scaled {}", sigma[i]);
+                moving += usize::from(sigma[i] != 0);
+                equal += usize::from(off == 0);
+                one += usize::from(off == 1);
+                carrying += usize::from(sigma[i] == 0 && r == 0 && x != 0);
+            }
+            if len > 0 {
+                println!("{case}, family {k}: {len} entries, the scaled step moves {moving}; the carried step equal at {equal}, one grain off at {one}; {carrying} carried under a grain");
+            }
+            if len > 0 && moving == 0 && (start..start + len).any(|i| reference.first[i] != 0) {
+                assert!(carrying > 0, "{case}, family {k}: a family the scaled step released to zero carries");
+            }
+        }
+        if spread {
+            assert!((families[far].0..families[far].0 + families[far].1).all(|i| sigma[i] == 0), "the far family's scaled step releases to zero");
+        }
+    }
+    // Refused: no last step, and a last step the carried deposit formed.
+    let mut plain = FieldLearner::new(field.clone(), 14);
+    assert!(plain.deposit_folded().is_err(), "no last step");
+    plain.deposit(combine([1, 1, 1])).unwrap();
+    assert!(plain.deposit_folded().is_err(), "a last step the carried deposit formed");
 }
 
 /// [definition; theory, November 8 13:44] **The unigram law's carried sums**: a letter its carried shares under-read against

@@ -2493,6 +2493,70 @@ pub(super) fn opening_at_force(args: &[String]) -> Result<()> {
     Ok(())
 }
 
+/// [definition; theory, November 9 05:51] **A state of the scaled contrast moved to the one deposit** (`deposit-fold STATE
+/// STATE_SHA OUT`, [`FieldLearner::deposit_folded`]): the scaled law's length `λ`, read from the state's last step against its
+/// moments (the law kept its lengths in the trainer, never in a state), is folded into every family, `ρ_f ← ρ_f − log₂ λ`,
+/// so the first carried step is the scaled one in every moving family. A state with no family-lengths line opens them at the
+/// one rate first (its own, or the rate below it its run stepped at, `rate_shift` bits under). A crossing between laws,
+/// reading-free: no face is read, and the family-lengths line is the only change, checked against the state as this source
+/// writes it (a state saved before the carried deposit gains its `carried` line of zeros on any rewrite, which
+/// `rewritten_as_read` reports). Prints `FIELD_DEPOSIT_FOLD` (`λ` on `2^(−32)` with the
+/// partition of lengths that form the last step, `log₂ λ` on `2^(−24)` bits, in thousandths beside) and one
+/// `FIELD_DEPOSIT_FOLD_FAMILY` line a family: its length before and after in thousandths of a bit, and at the state's own
+/// moments the entries the scaled step moved, the entries where the folded released step is that step, one grain from it and
+/// further, and those the fold forms a sub-grain step for and carries. Recorded where it is done, in the run's record with
+/// its crossing.
+pub(super) fn deposit_fold(args: &[String]) -> Result<()> {
+    if args.len() != 4 {
+        return Err("deposit-fold STATE STATE_SHA OUT".into());
+    }
+    let text = String::from_utf8(pinned_read(&args[1], &args[2], STATE_BUDGET)?)?;
+    let learner = FieldLearner::from_text(&text).map_err(|e| e.to_string())?;
+    let (folded, read) = learner.deposit_folded().map_err(|e| e.to_string())?;
+    let (as_read, moved) = (learner.to_text(), folded.to_text());
+    // The family lengths only: the moved text less its family-lengths line is the state's, as this source writes it.
+    let rest = |t: &str| -> Vec<String> { t.lines().filter(|l| !l.starts_with("family-lengths ")).map(str::to_string).collect() };
+    if rest(&moved) != rest(&as_read) || moved.lines().count() != as_read.lines().count() + usize::from(read.opened) {
+        return Err("deposit-fold: the fold would change more than the family lengths".into());
+    }
+    write_new(std::path::Path::new(&args[3]), moved.as_bytes())?;
+    let bits = holonics::hnn::tower::MATERIAL_BITS;
+    let milli = |v: i128, places: u32| -> i128 { (v * 1000 + (1i128 << (places - 1))) >> places };
+    println!(
+        "FIELD_DEPOSIT_FOLD state={} out={} opened={} rate_shift={} lambda_q32={} lambda_low_q32={} lambda_high_q32={} lambda_milli={} log2_lambda_q24={} log2_lambda_milli={} entries={} rewritten_as_read={}",
+        &args[2][..16.min(args[2].len())],
+        args[3],
+        u8::from(read.opened),
+        read.shift,
+        read.length,
+        read.low,
+        read.high,
+        milli(read.length, 32),
+        read.log2_lambda,
+        milli(read.log2_lambda, bits),
+        read.entries,
+        u8::from(as_read == text)
+    );
+    let names = family_names(&folded.field);
+    for (k, (fam, &(_, len, grain))) in read.families.iter().zip(&folded.field.families_all()).enumerate() {
+        if len == 0 {
+            continue;
+        }
+        let name = names.get(k).map_or_else(|| format!("family{k}"), |(n, _)| n.to_string());
+        println!(
+            "FIELD_DEPOSIT_FOLD_FAMILY family={name} entries={len} grain={grain} rho_milli={}->{} moving={} equal={} one={} further={} carrying={}",
+            milli(fam.before, bits),
+            milli(fam.after, bits),
+            fam.moving,
+            fam.equal,
+            fam.one,
+            fam.further,
+            fam.carrying
+        );
+    }
+    Ok(())
+}
+
 pub(super) fn census_field(args: &[String]) -> Result<()> {
     if args.len() != 5 {
         return Err("census-field FROM FROM_SHA TO TO_SHA".into());
@@ -2996,7 +3060,6 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
         Err(_) => 0,
     };
     let mut persistent_writes: Vec<Vec<usize>> = Vec::new();
-    let mut persistent_etas: std::collections::VecDeque<i128> = std::collections::VecDeque::new();
     let whole_blocks = std::env::var_os("FIELD_CONTRAST_WHOLE_BLOCKS").is_some();
     // [the unified-theory reading of November 7, 07:24] The first section's `k*`: lap 8's acceptance of 0.234 fell between its
     // fourth and fifth block-size tenths (16.4 and 20.2 places), `FIELD_CONTRAST_BLOCK_PLACES` where declared.
@@ -3015,13 +3078,10 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
         },
         Err(_) => None,
     };
-    // [the unified-theory reading of November 7, 05:55] The kernel steps by the evidence-shrunk Newton step along the moments'
-    // direction; `FIELD_CONTRAST_MOMENTS` keeps laps 4 and 5's law (the moments' own step), a declared comparison.
-    // [the unified-theory reading of November 7, 06:26] Retired as the step (lap 6 ran away as its curvature fell): the kernel
-    // steps by the moments; `FIELD_CONTRAST_NEWTON` takes the evidence-shrunk Newton step again, a declared comparison, and its
-    // terms are read beside the moments' step either way.
+    // [the unified-theory reading of November 7, 06:26] The kernel steps by the moments (the evidence-shrunk Newton step it took
+    // instead ran lap 6 away as its curvature fell), and the Newton terms are read beside the moments' step. [definition;
+    // theory, November 9 05:51] There is one deposit: the Newton step's switch (`FIELD_CONTRAST_NEWTON`) retired with it.
     let kernel = writer.is_none() && joint.is_none();
-    learner.newton = kernel && std::env::var_os("FIELD_CONTRAST_NEWTON").is_some();
     learner.newton_read = kernel;
     // [definition; the unified-theory reading of November 7, 06:26] **More evidence a step**: a section of `n = 16·4^k` states
     // steps at the state's rate less `k` bits (the step's relative noise falls as `√n`), and the moments count states, moving
@@ -3205,7 +3265,7 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
     }
     let d = learner.field.declaration;
     println!(
-        "FIELD_CONTRAST_DECLARATION alphabet={} width={} heads={} modes={} ticks={} reach={} rate={} log2_t={} section={section} sections={} train={} held={} places={places} release={} newton={} moments={},{} run_bits={} rest={} spans={} laps_read={}",
+        "FIELD_CONTRAST_DECLARATION alphabet={} width={} heads={} modes={} ticks={} reach={} rate={} log2_t={} section={section} sections={} train={} held={} places={places} release={} moments={},{} run_bits={} rest={} spans={} laps_read={}",
         d.alphabet,
         d.width,
         d.heads,
@@ -3222,7 +3282,6 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
             (None, Some(reads)) => format!("joint_{reads}"),
             (None, None) => format!("kernel_spacing_{spacing}"),
         },
-        learner.newton,
         learner.first_rate,
         learner.second_rate,
         law.run_bits,
@@ -3476,9 +3535,12 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
                 let write_views: Vec<Region> = writes_now.iter().zip(&resolved).map(|(c, u)| Region { classes: c, unresolved: u, faces: &[], locked: &[], echo: &[], domain: None, port: None }).collect();
                 let theta_before = learner.field.theta.clone();
                 let deposit_start = std::time::Instant::now();
-                let (receipt, eta) = learner.section_contrast_scaled(&truth_views, &write_views, &mut persistent_etas, realization).map_err(|e| e.to_string())?;
+                // [definition; theory, November 9 05:51] The writes' contrast deposits through the one deposit, as every contrast
+                // does (`FieldLearner::section_contrast`): each entry's step carries its remainder and each family's length moves by
+                // its own transfer. The scaled contrast's Newton length and its harmonic mean of eleven are retired; a state saved
+                // under them moves to this law by `deposit-fold`.
+                let receipt = learner.section_contrast(&truth_views, &write_views, realization).map_err(|e| e.to_string())?;
                 let deposit_ms = deposit_start.elapsed().as_millis();
-                let eta_milli = eta * 1000 >> 32;
                 let places: i128 = lengths[..m].iter().map(|&l| l as i128).sum::<i128>().max(1);
                 // The closing read `(G(write) − G(truth))/T` a place in thousandths of a nat (`gap` is `Σ (G(truth) − G(write))/T` on 2^(−32) bits).
                 let closing_milli = -(receipt.gap * LN2_Q30 >> 30) * 1000 / places >> 32;
@@ -3493,11 +3555,12 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
                 }
                 let micro = |v: Option<i64>| v.map_or("-".to_string(), |c| ((c as i128 * 1_000_000) / ((receipt.states as i128) << 20)).to_string());
                 println!(
-                    "FIELD_PERSISTENT lap={lap} n={n} writes={m} closing_milli={closing_milli} write_energy_milli={write_energy_milli} eta_milli={eta_milli} moved={moved_w} proposed={proposed_w} accept_milli={} deposited={} predicted_micro={} transfer_micro={} log2_t={} sweep_ms={release_ms} deposit_ms={deposit_ms} ms={}",
+                    "FIELD_PERSISTENT lap={lap} n={n} writes={m} closing_milli={closing_milli} write_energy_milli={write_energy_milli} moved={moved_w} proposed={proposed_w} accept_milli={} deposited={} predicted_micro={} transfer_micro={} external_micro={} log2_t={} sweep_ms={release_ms} deposit_ms={deposit_ms} ms={}",
                     moved_w * 1000 / proposed_w.max(1),
                     receipt.deposited,
                     micro(receipt.predicted),
                     micro(receipt.transfer),
+                    micro(receipt.external),
                     learner.field.theta[learner.field.layout().face_temper],
                     started.elapsed().as_millis()
                 );
@@ -4857,9 +4920,6 @@ pub(super) fn covector_field(args: &[String], realization: &mut dyn FieldRealiza
     if !learner.average.as_ref().is_some_and(|a| a.len() == learner.field.theta.len()) {
         return Err("covector-field reads law (D)'s averaged constitution, and this state carries no average".into());
     }
-    if learner.newton {
-        return Err("covector-field reads law (D), which deposits through the moments, not the Newton step".into());
-    }
     let units = units_of(&args[5], &args[6])?;
     let codec = FieldCodec::from_text(std::str::from_utf8(&pinned_read(&args[3], &args[4], CODEC_BUDGET)?)?, units)?;
     let held_text = problems_of(&pinned_read(&args[7], &args[8], READ_BUDGET as usize)?);
@@ -5026,9 +5086,9 @@ const CONTRAST_BATCH: usize = 16;
 /// swept [`CONTRAST_BATCH`] at a time, in order of answer length, batch `b` keyed as section `b` would be: a write's chain is
 /// its own (its coins keyed by its place in the batch), so a batch shares only its walk, set by its longest answer.
 ///
-/// **Each problem's covector** `g(p) = (1/T)(∂G/∂θ(truth_p) − ∂G/∂θ(write_p))` is the term
-/// [`FieldLearner::section_contrast_scaled`] adds for that pair ([`holonics::hnn::tower::field::contrast_pair_covectors`], the
-/// deposit's chart, sign and units; `T` held, as the law holds it).
+/// **Each problem's covector** `g(p) = (1/T)(∂G/∂θ(truth_p) − ∂G/∂θ(write_p))` is the pair's term of the covector
+/// [`FieldLearner::section_contrast`] deposits ([`holonics::hnn::tower::field::contrast_pair_covectors`], the deposit's chart,
+/// sign and units, released pair by pair where the section releases the sum once; `T` held, as the law holds it).
 ///
 /// **The test** (as `covector-field`'s, with a problem the unit): the problems at even positions of the chosen order are half
 /// A and at odd positions half B; per family `f`, for each problem `p` in B, `b_p = ⟨g_f(p), mean_A g_f⟩`, `S_ab = Σ_B b_p /
@@ -6336,7 +6396,7 @@ mod tests {
     /// [measurement; theory, November 9 05:31] `contrast-covector-field` end to end on the host: three of the toy's four
     /// problems chosen at the middles of three equal parts (indices 0, 2, 3), their writes started at the truths and swept
     /// twice at the live `θ`'s `T` in one batch ordered by answer length, keyed as the trainer keys section 0; each row of
-    /// `CONTRAST_COVECTOR.tsv` is `⟨g_f(p), Σ_other g_f⟩` and `‖g_f(p)‖²` over the scaled contrast's pair covectors of those
+    /// `CONTRAST_COVECTOR.tsv` is `⟨g_f(p), Σ_other g_f⟩` and `‖g_f(p)‖²` over the contrast's pair covectors of those
     /// writes, formed here in unbounded integers; more problems than the file holds are refused; the state is read, never
     /// written.
     #[test]
