@@ -4603,8 +4603,9 @@ fn band_half_width(k: u32) -> (u128, u128) {
 /// `contrast-field` forms them ([`sections_of`] at the state's seed, [`contrast_seed`]) in the keyed order its learner walks them
 /// at its lap count ([`walk`]), and for each walked section from `FROM`, `COUNT` of them, one `FIELD_WALK` line: the walk index,
 /// the section, its problems, the summed answer places `P` (the places a fresh write sweeps, at true lengths), `Σ L²` and the
-/// longest answer. A sweep of the writes costs about `c P²` on the card, so a run's projection is each section's `P²` times the
-/// largest measured `c`. A reading only: it opens nothing on the realization.
+/// longest answer, and `site_reads`, the sites a sweep reads at most (`Σ_k L_k (Q_k + L_k + v_k)`, each proposing answer reading
+/// its whole region with its near tail of voids); a run of fresh writes projects as each section's site reads times the largest
+/// measured rate per site read. A reading only: it opens nothing on the realization.
 pub(super) fn walk_field(args: &[String]) -> Result<()> {
     if args.len() != 12 {
         return Err("walk-field STATE STATE_SHA CODEC CODEC_SHA UNITS UNITS_SHA TRAIN TRAIN_SHA SECTION FROM COUNT".into());
@@ -4618,15 +4619,25 @@ pub(super) fn walk_field(args: &[String]) -> Result<()> {
     let train_set = encoded_problems(&codec, &train_text, &learner.field)?;
     let (sections, _) = sections_of(&train_set, section, 0, seed);
     let order = walk(seed, learner.laps, sections.len());
-    let (mut total_p, mut total_sq) = (0u128, 0u128);
+    let (mut total_p, mut total_sq, mut total_reads) = (0u128, 0u128, 0u128);
     for (n, &s) in order.iter().enumerate().skip(from).take(count) {
         let lengths: Vec<u128> = sections[s].iter().map(|&i| train_set[i].1.len() as u128).collect();
         let p: u128 = lengths.iter().sum();
         let sq: u128 = lengths.iter().map(|l| l * l).sum();
-        (total_p, total_sq) = (total_p + p * p, total_sq + sq);
-        println!("FIELD_WALK n={n} section={s} problems={} places={p} places_squared={} sum_l_squared={sq} longest={}", lengths.len(), p * p, lengths.iter().max().unwrap_or(&0));
+        // [theory, November 9 11:39] A sweep is the longest answer's steps, each proposing answer reading its whole region
+        // (question, answer and the near tail of voids), so it reads at most Σ_k L_k (Q_k + L_k + v_k) sites.
+        let site_reads: u128 = sections[s]
+            .iter()
+            .map(|&i| {
+                let (q, a, room) = (&train_set[i].0, &train_set[i].1, train_set[i].2);
+                let voids = holonics::hnn::tower::field::NEAR.min(room.saturating_sub(a.len()));
+                a.len() as u128 * (q.len() + a.len() + voids) as u128
+            })
+            .sum();
+        (total_p, total_sq, total_reads) = (total_p + p * p, total_sq + sq, total_reads + site_reads);
+        println!("FIELD_WALK n={n} section={s} problems={} places={p} places_squared={} sum_l_squared={sq} site_reads={site_reads} longest={}", lengths.len(), p * p, lengths.iter().max().unwrap_or(&0));
     }
-    println!("FIELD_WALK_READ seed={seed:016x} laps={} sections={} from={from} count={count} sum_places_squared={total_p} sum_l_squared={total_sq}", learner.laps, sections.len());
+    println!("FIELD_WALK_READ seed={seed:016x} laps={} sections={} from={from} count={count} sum_places_squared={total_p} sum_l_squared={total_sq} site_reads={total_reads}", learner.laps, sections.len());
     Ok(())
 }
 
