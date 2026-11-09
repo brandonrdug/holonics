@@ -8464,10 +8464,12 @@ impl PlateCounts {
 /// `f′(a) ∝ f(a) (N_(p, a) + 1)/(F_(p, a) + 1)` renormalized at the place (theory, 20:04: the face already depends on the
 /// state that fixes the plate, so the letters' marginal `N_a` would count the plate's composition twice; the marginal form
 /// `(N_(p, a) + 1)/(N_a + 1)` is kept beside it). One count is added on both sides (a declared prior); each lens mass is
-/// released to its own grain. The same reading is made for each head alone (its classes in place of the joint plate).
-/// `PLATES.tsv` (each joint plate), `HEADS.tsv` (each head and class), `OCCUPANCY.tsv` (the occupied joint plates by their
-/// training places in octave bands 1, 2–3, 4–7, …, with the held places in each band, and the held places on no training
-/// plate), and `FIELD_PLATES`, `FIELD_PLATES_HEAD` and `FIELD_PLATES_OCCUPANCY` lines.
+/// released to its own grain. [theory, November 9 20:13] **A depth ladder**: the joint plate is read at each depth `d` of
+/// `1..=b` trits a head (each head's class taken mod `3^d`, its first `d` shells; `3^(Hd)` cells), since at the full depth
+/// most cells are thin; each head alone is read at the full depth. `PLATES.tsv` (each depth's joint plates), `HEADS.tsv` (each
+/// head and class), `OCCUPANCY.tsv` (at each depth, the occupied plates by their training places in octave bands 1, 2–3,
+/// 4–7, …, with the held places in each band, and the held places on no training plate), and `FIELD_PLATES` (one a depth),
+/// `FIELD_PLATES_HEAD` and `FIELD_PLATES_OCCUPANCY` lines.
 pub(super) fn plate_field(args: &[String], realization: &mut dyn FieldRealization) -> Result<()> {
     if args.len() != 14 {
         return Err("plate-field STATE STATE_SHA CODEC CODEC_SHA UNITS UNITS_SHA HELD HELD_SHA TRAIN TRAIN_SHA COUNT TRAIN_COUNT OUT".into());
@@ -8503,9 +8505,13 @@ pub(super) fn plate_field(args: &[String], realization: &mut dyn FieldRealizatio
         }
         Ok(())
     };
-    // The keys: the joint plate (`None` for the head) and each head's class alone (`Some(h)`).
-    let keys = |plate: &[u32]| -> Vec<(Option<usize>, Vec<u32>)> { std::iter::once((None, plate.to_vec())).chain((0..heads).map(|h| (Some(h), vec![plate[h]]))).collect() };
-    let mut counts: std::collections::BTreeMap<(Option<usize>, Vec<u32>), PlateCounts> = std::collections::BTreeMap::new();
+    // The keys: the joint plate at each depth `d` (`(0, d)`, each class mod 3^d) and each head's class alone at the full depth
+    // (`(1, h)`).
+    let trits = field.declaration.class_trits();
+    let keys = |plate: &[u32]| -> Vec<(u8, usize, Vec<u32>)> {
+        (1..=trits).map(|d| (0u8, d, plate.iter().map(|&c| c % 3u32.pow(d as u32)).collect())).chain((0..heads).map(|h| (1u8, h, vec![plate[h]]))).collect()
+    };
+    let mut counts: std::collections::BTreeMap<(u8, usize, Vec<u32>), PlateCounts> = std::collections::BTreeMap::new();
     let mut totals = vec![0u64; a];
     read(&train, &mut |plate: &[u32], face: &Face, truth: usize| {
         for key in keys(plate) {
@@ -8520,7 +8526,7 @@ pub(super) fn plate_field(args: &[String], realization: &mut dyn FieldRealizatio
         let total = masses.iter().sum();
         Face { masses, total }.code(truth) as i128
     };
-    let mut held_keys: std::collections::BTreeMap<(Option<usize>, Vec<u32>), [i128; 4]> = std::collections::BTreeMap::new();
+    let mut held_keys: std::collections::BTreeMap<(u8, usize, Vec<u32>), [i128; 4]> = std::collections::BTreeMap::new();
     let mut held_places = 0i128;
     read(&held, &mut |plate: &[u32], face: &Face, truth: usize| {
         held_places += 1;
@@ -8537,61 +8543,65 @@ pub(super) fn plate_field(args: &[String], realization: &mut dyn FieldRealizatio
     })?;
     let mean = |v: i128, n: i128| if n == 0 { "-".to_string() } else { decimal_q20(nats_q20(v) / n) };
     // The joint plates and each head's classes, held places first.
-    let mut joint = rows_file(&out.join("PLATES.tsv"), "plate\theld_places\tcode_nats\tlens_code_nats\tmarginal_lens_code_nats\ttrain_places\n")?;
+    let mut joint = rows_file(&out.join("PLATES.tsv"), "depth\tplate\theld_places\tcode_nats\tlens_code_nats\tmarginal_lens_code_nats\ttrain_places\n")?;
     let mut by_head = rows_file(&out.join("HEADS.tsv"), "head\tclass\theld_places\tcode_nats\tlens_code_nats\tmarginal_lens_code_nats\ttrain_places\n")?;
-    let mut rows: Vec<(&(Option<usize>, Vec<u32>), &[i128; 4])> = held_keys.iter().collect();
-    rows.sort_by_key(|(k, s)| (k.0, std::cmp::Reverse(s[0]), k.1.clone()));
-    let mut sums: std::collections::BTreeMap<Option<usize>, [i128; 4]> = std::collections::BTreeMap::new();
+    let mut rows: Vec<(&(u8, usize, Vec<u32>), &[i128; 4])> = held_keys.iter().collect();
+    rows.sort_by_key(|(k, s)| (k.0, k.1, std::cmp::Reverse(s[0]), k.2.clone()));
+    let mut sums: std::collections::BTreeMap<(u8, usize), [i128; 4]> = std::collections::BTreeMap::new();
     for (key, s) in rows {
         let train_places = counts.get(key).map_or(0, PlateCounts::places);
-        let name: Vec<String> = key.1.iter().map(u32::to_string).collect();
+        let name: Vec<String> = key.2.iter().map(u32::to_string).collect();
         let cells = format!("{}\t{}\t{}\t{}\t{train_places}\n", s[0], mean(s[1], s[0]), mean(s[2], s[0]), mean(s[3], s[0]));
-        match key.0 {
-            None => row(&mut joint, &format!("{}\t{cells}", name.join(".")))?,
-            Some(h) => row(&mut by_head, &format!("{h}\t{}\t{cells}", name.join(".")))?,
+        if key.0 == 0 {
+            row(&mut joint, &format!("{}\t{}\t{cells}", key.1, name.join(".")))?;
+        } else {
+            row(&mut by_head, &format!("{}\t{}\t{cells}", key.1, name.join(".")))?;
         }
-        let sum = sums.entry(key.0).or_default();
+        let sum = sums.entry((key.0, key.1)).or_default();
         for i in 0..4 {
             sum[i] += s[i];
         }
     }
-    // Occupancy: the occupied joint plates by their training places in octave bands, with the held places on each band.
-    let mut bands: std::collections::BTreeMap<u32, (u64, i128)> = std::collections::BTreeMap::new();
-    for ((head, _), k) in counts.iter().filter(|(key, _)| key.0.is_none()) {
-        let _ = head;
-        bands.entry(63 - k.places().max(1).leading_zeros()).or_default().0 += 1;
-    }
-    let mut unseen = 0i128;
-    for (key, s) in held_keys.iter().filter(|(key, _)| key.0.is_none()) {
-        match counts.get(key) {
-            Some(k) => bands.entry(63 - k.places().max(1).leading_zeros()).or_default().1 += s[0],
-            None => unseen += s[0],
-        }
-    }
-    let mut occupancy = rows_file(&out.join("OCCUPANCY.tsv"), "band\ttrain_places_from\ttrain_places_to\tplates\theld_places\theld_share_millionths\n")?;
+    // Occupancy at each depth: the occupied plates by their training places in octave bands, with the held places on each.
+    let mut occupancy = rows_file(&out.join("OCCUPANCY.tsv"), "depth\tband\ttrain_places_from\ttrain_places_to\tplates\theld_places\theld_share_millionths\n")?;
     let share = |n: i128| if held_places == 0 { 0 } else { n * 1_000_000 / held_places };
-    for (&b, &(plates, held_in)) in &bands {
-        row(&mut occupancy, &format!("{b}\t{}\t{}\t{plates}\t{held_in}\t{}\n", 1u64 << b, (2u64 << b) - 1, share(held_in)))?;
-        println!("FIELD_PLATES_OCCUPANCY band={b} train_places={}..{} plates={plates} held_places={held_in} held_share_millionths={}", 1u64 << b, (2u64 << b) - 1, share(held_in));
+    for d in 1..=trits {
+        let mut bands: std::collections::BTreeMap<u32, (u64, i128)> = std::collections::BTreeMap::new();
+        for (_, k) in counts.iter().filter(|(key, _)| key.0 == 0 && key.1 == d) {
+            bands.entry(63 - k.places().max(1).leading_zeros()).or_default().0 += 1;
+        }
+        let mut unseen = 0i128;
+        for (key, s) in held_keys.iter().filter(|(key, _)| key.0 == 0 && key.1 == d) {
+            match counts.get(key) {
+                Some(k) => bands.entry(63 - k.places().max(1).leading_zeros()).or_default().1 += s[0],
+                None => unseen += s[0],
+            }
+        }
+        for (&b, &(plates, held_in)) in &bands {
+            row(&mut occupancy, &format!("{d}\t{b}\t{}\t{}\t{plates}\t{held_in}\t{}\n", 1u64 << b, (2u64 << b) - 1, share(held_in)))?;
+            println!("FIELD_PLATES_OCCUPANCY depth={d} band={b} train_places={}..{} plates={plates} held_places={held_in} held_share_millionths={}", 1u64 << b, (2u64 << b) - 1, share(held_in));
+        }
+        row(&mut occupancy, &format!("{d}\t-\t0\t0\t0\t{unseen}\t{}\n", share(unseen)))?;
+        println!("FIELD_PLATES_OCCUPANCY depth={d} band=none plates=0 held_places={unseen} held_share_millionths={}", share(unseen));
     }
-    row(&mut occupancy, &format!("-\t0\t0\t0\t{unseen}\t{}\n", share(unseen)))?;
-    println!("FIELD_PLATES_OCCUPANCY band=none plates=0 held_places={unseen} held_share_millionths={}", share(unseen));
-    for (key, s) in &sums {
-        let occupied = counts.keys().filter(|k| k.0 == *key).count();
-        match key {
-            None => println!(
-                "FIELD_PLATES held_problems={} held_places={} held_plates={} train_problems={} train_places={} train_plates={occupied} code_nats={} lens_code_nats={} marginal_lens_code_nats={} train_ms={train_ms} ms={}",
+    for (&(tag, which), s) in &sums {
+        let occupied = counts.keys().filter(|k| k.0 == tag && k.1 == which).count();
+        let held_cells = held_keys.keys().filter(|k| k.0 == tag && k.1 == which).count();
+        if tag == 0 {
+            println!(
+                "FIELD_PLATES depth={which} cells={} held_problems={} held_places={} held_plates={held_cells} train_problems={} train_places={} train_plates={occupied} code_nats={} lens_code_nats={} marginal_lens_code_nats={} train_ms={train_ms} ms={}",
+                3u128.pow((heads * which) as u32),
                 held.len(),
                 s[0],
-                held_keys.keys().filter(|k| k.0.is_none()).count(),
                 train.len(),
                 totals.iter().sum::<u64>(),
                 mean(s[1], s[0]),
                 mean(s[2], s[0]),
                 mean(s[3], s[0]),
                 started.elapsed().as_millis()
-            ),
-            Some(h) => println!("FIELD_PLATES_HEAD head={h} held_classes={} train_classes={occupied} code_nats={} lens_code_nats={} marginal_lens_code_nats={}", held_keys.keys().filter(|k| k.0 == Some(*h)).count(), mean(s[1], s[0]), mean(s[2], s[0]), mean(s[3], s[0])),
+            );
+        } else {
+            println!("FIELD_PLATES_HEAD head={which} held_classes={held_cells} train_classes={occupied} code_nats={} lens_code_nats={} marginal_lens_code_nats={}", mean(s[1], s[0]), mean(s[2], s[0]), mean(s[3], s[0]));
         }
     }
     Ok(())
