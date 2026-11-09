@@ -8908,10 +8908,13 @@ pub(super) fn plate_joint_field(args: &[String], realization: &mut dyn FieldReal
     let take = if limit == 0 { order.len() } else { limit.min(order.len()) };
     let mut counts: Vec<std::collections::BTreeMap<Vec<u32>, PlateCounts>> = (0..=trits).map(|_| std::collections::BTreeMap::new()).collect();
     let leaf_at = |leaf: &[u32], d: usize| -> Vec<u32> { leaf.iter().map(|&c| c % 3u32.pow(d as u32)).collect() };
-    let places = lap_visit(&codec, &train_set, &sections, &paths, &order[..take], seed, draw, &mut learner, realization, true, &mut |leaf, face, truth, _| {
+    // [theory, November 9 22:07] The seam as a cut: each depth-1 leaf split by its sites' octave of distance to the seam.
+    let mut cut: std::collections::BTreeMap<(Vec<u32>, Option<u32>), PlateCounts> = std::collections::BTreeMap::new();
+    let places = lap_visit(&codec, &train_set, &sections, &paths, &order[..take], seed, draw, &mut learner, realization, true, &mut |leaf, face, truth, octave| {
         for (d, table) in counts.iter_mut().enumerate().skip(1) {
             table.entry(leaf_at(leaf, d)).or_insert_with(|| PlateCounts::new(a)).add(face, truth);
         }
+        cut.entry((leaf_at(leaf, 1), octave)).or_insert_with(|| PlateCounts::new(a)).add(face, truth);
     })?;
     let census_ms = started.elapsed().as_millis();
     let mut file = rows_file(&out.join("CENSUS.tsv"), "depth\tleaf\tcounts\texpected_q20\n")?;
@@ -8931,30 +8934,38 @@ pub(super) fn plate_joint_field(args: &[String], realization: &mut dyn FieldReal
         }
         println!("FIELD_LEAVES depth={d} cells={} leaves={} open_places={places} sections={take} of={} census_ms={census_ms}", 3u128.pow((heads * d) as u32), table.len(), order.len());
     }
+    // [theory, November 9 22:07] U of the depth-1 leaves cut by the seam (leaf × octave) beside U at depths 1 and 2, a place:
+    // counts add, so the cut's U is at least depth 1's; the gap is the free energy the seam's distance reveals.
+    let u_of = |k: &PlateCounts| -> i128 { (0..a).filter(|&c| k.n[c] > 0).map(|c| k.n[c] as i128 * log2_ratio(k.n[c], k.expected(c))).sum() };
+    let u_cut: i128 = cut.values().map(u_of).sum();
+    let u_depth = |d: usize| -> i128 { energies.get(d).map_or(0, |list| list.iter().map(|e| e.0).sum()) };
+    let place = |v: i128| if places == 0 { "-".to_string() } else { decimal_q20(nats_q20(v) / places as i128) };
+    println!("FIELD_LEAVES_SEAM_CUT u_d1_nats_a_place={} u_d1_octave_nats_a_place={} u_d2_nats_a_place={} d1_leaves={} d1_octave_cells={}", place(u_depth(1)), place(u_cut), place(u_depth(2)), counts.get(1).map_or(0, |t| t.len()), cut.len());
     // The second visit: TRAIN's own code plain and under each depth's lens; and by each site's octave of distance to the
-    // nearest seam ([`holonics::hnn::tower::field::seam_octave`]), its leaf's U shared over the leaf's sites and the code the
-    // lens releases at the site, at each depth.
+    // nearest seam ([`holonics::hnn::tower::field::seam_octave`]), at each depth, the site's own charge
+    // `u_t = ln((N + 1)/(F + 1))` at its leaf and its true letter (theory, 22:07: over a leaf's sites these sum to
+    // `Σ_a N_a ln((N_a + 1)/(F_a + 1))`, the leaf's U with one count added on both sides), its plain code, and the code the lens
+    // releases at the site.
     let mut codes: Vec<[i128; 2]> = vec![[0; 2]; trits + 1];
-    let shares: Vec<std::collections::BTreeMap<Vec<u32>, i128>> = energies.iter().map(|list| list.iter().map(|(u, leaf, n)| (leaf.clone(), holonics::hnn::overture::div_nearest(*u, (*n).max(1) as i128))).collect()).collect();
-    let mut seams: Vec<std::collections::BTreeMap<Option<u32>, (u64, i128, i128)>> = vec![std::collections::BTreeMap::new(); trits + 1];
+    let mut seams: Vec<std::collections::BTreeMap<Option<u32>, (u64, i128, i128, i128)>> = vec![std::collections::BTreeMap::new(); trits + 1];
     let second = std::time::Instant::now();
     lap_visit(&codec, &train_set, &sections, &paths, &order[..take], seed, draw, &mut learner, realization, false, &mut |leaf, face, truth, octave| {
         let plain = face.code(truth) as i128;
         for d in 1..=trits {
             let lensed = lensed_face(face, leaf, d as u32, &tables[d]).code(truth) as i128;
             codes[d] = [codes[d][0] + plain, codes[d][1] + lensed];
-            let share = shares[d].get(&leaf_at(leaf, d)).copied().unwrap_or(0);
+            let charge = tables[d].get(&leaf_at(leaf, d)).map_or(0, |(n, f)| log2_ratio(n[truth] + 1, f[truth] + (1 << 20)));
             let slot = seams[d].entry(octave).or_default();
-            *slot = (slot.0 + 1, slot.1 + share, slot.2 + plain - lensed);
+            *slot = (slot.0 + 1, slot.1 + charge, slot.2 + plain - lensed, slot.3 + plain);
         }
     })?;
-    let mut seam_file = rows_file(&out.join("SEAMS.tsv"), "depth\toctave\tmargin_from\tmargin_to\tsites\tu_nats_a_site\treleased_nats_a_site\n")?;
+    let mut seam_file = rows_file(&out.join("SEAMS.tsv"), "depth\toctave\tmargin_from\tmargin_to\tsites\tu_nats_a_site\tplain_code_nats_a_site\treleased_nats_a_site\n")?;
     for (d, bins) in seams.iter().enumerate().skip(1) {
-        for (octave, &(sites, u, released)) in bins {
+        for (octave, &(sites, u, released, plain)) in bins {
             let (name, from, to) = match octave { Some(k) => (k.to_string(), format!("2^-{}", k + 1), format!("2^-{k}")), None => ("seam".to_string(), "0".to_string(), "0".to_string()) };
             let per = |v: i128| decimal_q20(nats_q20(v) / sites.max(1) as i128);
-            row(&mut seam_file, &format!("{d}\t{name}\t{from}\t{to}\t{sites}\t{}\t{}\n", per(u), per(released)))?;
-            println!("FIELD_LEAVES_SEAM depth={d} octave={name} margin={from}..{to} sites={sites} u_nats_a_site={} released_nats_a_site={}", per(u), per(released));
+            row(&mut seam_file, &format!("{d}\t{name}\t{from}\t{to}\t{sites}\t{}\t{}\t{}\n", per(u), per(plain), per(released)))?;
+            println!("FIELD_LEAVES_SEAM depth={d} octave={name} margin={from}..{to} sites={sites} u_nats_a_site={} plain_code_nats_a_site={} released_nats_a_site={}", per(u), per(plain), per(released));
         }
     }
     let a_place = |v: i128| if places == 0 { "-".to_string() } else { decimal_q20(nats_q20(v) / places as i128) };
