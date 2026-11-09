@@ -8469,7 +8469,8 @@ impl PlateCounts {
 /// most cells are thin; each head alone is read at the full depth. `PLATES.tsv` (each depth's joint plates), `HEADS.tsv` (each
 /// head and class), `OCCUPANCY.tsv` (at each depth, the occupied plates by their training places in octave bands 1, 2–3,
 /// 4–7, …, with the held places in each band, and the held places on no training plate), and `FIELD_PLATES` (one a depth),
-/// `FIELD_PLATES_HEAD` and `FIELD_PLATES_OCCUPANCY` lines.
+/// `FIELD_PLATES_HEAD` and `FIELD_PLATES_OCCUPANCY` lines. [theory, November 9 20:51] A second visit over TRAIN reads TRAIN's
+/// own code under each depth's lenses beside its plain code (`FIELD_PLATES_TRAIN`, one line a depth).
 pub(super) fn plate_field(args: &[String], realization: &mut dyn FieldRealization) -> Result<()> {
     if args.len() != 14 {
         return Err("plate-field STATE STATE_SHA CODEC CODEC_SHA UNITS UNITS_SHA HELD HELD_SHA TRAIN TRAIN_SHA COUNT TRAIN_COUNT OUT".into());
@@ -8526,6 +8527,24 @@ pub(super) fn plate_field(args: &[String], realization: &mut dyn FieldRealizatio
         let total = masses.iter().sum();
         Face { masses, total }.code(truth) as i128
     };
+    // [theory, November 9 20:51] A second visit over TRAIN reads its own code under each depth's lenses, beside the plain code:
+    // the counts were fit on these places, so the residual lens cannot code them much above the plain code (a check of the
+    // build), and its gain here against the held gain reads what a plate's counts carry to unseen answers.
+    let mut train_codes: Vec<[i128; 3]> = vec![[0; 3]; trits + 1];
+    let mut train_read = 0i128;
+    read(&train, &mut |plate: &[u32], face: &Face, truth: usize| {
+        train_read += 1;
+        let plain = face.code(truth) as i128;
+        for key in keys(plate).into_iter().filter(|k| k.0 == 0) {
+            let (own, marginal) = match counts.get(&key) {
+                Some(k) => (lens(face, truth, &|c| ((k.n[c] as u128 + 1) << 20, k.expected(c) + (1 << 20))), lens(face, truth, &|c| (k.n[c] as u128 + 1, totals[c] as u128 + 1))),
+                None => (plain, plain),
+            };
+            let slot = &mut train_codes[key.1];
+            *slot = [slot[0] + plain, slot[1] + own, slot[2] + marginal];
+        }
+    })?;
+    let train_lens_ms = started.elapsed().as_millis();
     let mut held_keys: std::collections::BTreeMap<(u8, usize, Vec<u32>), [i128; 4]> = std::collections::BTreeMap::new();
     let mut held_places = 0i128;
     read(&held, &mut |plate: &[u32], face: &Face, truth: usize| {
@@ -8583,6 +8602,9 @@ pub(super) fn plate_field(args: &[String], realization: &mut dyn FieldRealizatio
         }
         row(&mut occupancy, &format!("{d}\t-\t0\t0\t0\t{unseen}\t{}\n", share(unseen)))?;
         println!("FIELD_PLATES_OCCUPANCY depth={d} band=none plates=0 held_places={unseen} held_share_millionths={}", share(unseen));
+    }
+    for (d, c) in train_codes.iter().enumerate().skip(1) {
+        println!("FIELD_PLATES_TRAIN depth={d} train_places={train_read} code_nats={} lens_code_nats={} marginal_lens_code_nats={} train_lens_ms={}", mean(c[0], train_read), mean(c[1], train_read), mean(c[2], train_read), train_lens_ms - train_ms);
     }
     for (&(tag, which), s) in &sums {
         let occupied = counts.keys().filter(|k| k.0 == tag && k.1 == which).count();
