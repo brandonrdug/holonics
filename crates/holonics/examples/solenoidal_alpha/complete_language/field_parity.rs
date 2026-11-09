@@ -439,6 +439,27 @@ pub(super) fn parity(args: &[String], card: &mut dyn FieldRealization) -> Result
         println!("FIELD_PARITY_WRITE problem={i} question={} places={} written={} equal={equal}", questions[i].0.len(), h.len(), h.iter().filter(|&&k| k != p.codec.void()).count());
     }
     println!("FIELD_PARITY_WRITES problems={} sweeps={sweeps} host_ms={}", hosted.len(), ms(t0.elapsed().as_nanos()));
+    // [measurement; theory, November 9 19:43] The plates of the written problems' openings, and the exchange walk from the host's
+    // write (h one nat on the codes' grain, at most 64 moves a problem), through both: plate for plate and move for move.
+    let void = p.codec.void();
+    let owned: Vec<(Vec<usize>, Vec<bool>)> = questions.iter().map(|&(q, room)| {
+        let classes: Vec<usize> = q.iter().copied().chain(std::iter::repeat_n(void, room)).collect();
+        let open = (0..classes.len()).map(|t| t >= q.len()).collect();
+        (classes, open)
+    }).collect();
+    let views: Vec<Region> = owned.iter().map(|(c, u)| Region { classes: c, unresolved: u, faces: &[], locked: &[], echo: &[], domain: None, port: None }).collect();
+    let host_plates = HostField.read_plates(&host_learner.field, &views).map_err(|e| e.to_string())?;
+    let card_plates = card.read_plates(&card_learner.field, &views).map_err(|e| e.to_string())?;
+    let plates_equal = host_plates == card_plates;
+    releases_unequal += usize::from(!plates_equal);
+    let h = ((1i128 << 50) + 744_261_118 - 1) / 744_261_118;
+    let t0 = std::time::Instant::now();
+    let (host_walk, host_moves) = host_learner.field.exchange_walk(&questions, &hosted, void, h, 64, &mut HostField, &mut |_, _| true).map_err(|e| e.to_string())?;
+    let host_walk_ms = ms(t0.elapsed().as_nanos());
+    let (card_walk, card_moves) = card_learner.field.exchange_walk(&questions, &hosted, void, h, 64, card, &mut |_, _| true).map_err(|e| e.to_string())?;
+    let walk_equal = host_walk == card_walk && host_moves == card_moves;
+    releases_unequal += usize::from(!walk_equal);
+    println!("FIELD_PARITY_EXCHANGE plates_equal={plates_equal} walk_equal={walk_equal} moves={} host_ms={host_walk_ms}", host_moves.iter().map(Vec::len).sum::<usize>());
     println!(
         "FIELD_PARITY_DONE sections={} reads={reads_all} reads_unequal={reads_unequal} faces_unequal={faces_unequal} covector_unequal={entries_unequal} learners_unequal={learners_unequal} releases={} releases_unequal={releases_unequal} card_release_ms={card_release_ms} host_ms={} card_ms={} elapsed_ms={}",
         steps.len(),

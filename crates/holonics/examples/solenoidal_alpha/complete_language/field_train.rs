@@ -8385,3 +8385,200 @@ fn log2_milli(v: i128) -> i128 {
     let frac = holonics::hnn::keyed_modes::log2_face(p, 10);
     ((width << 10) + frac) * 1000 >> 10
 }
+
+/// Nats on `2^(−20)` from bits on `2^(−20)` (`ln 2` on `2^(−30)`), and a value on `2^(−20)` written in decimal with six
+/// places (integers alone).
+fn nats_q20(bits: i128) -> i128 {
+    let v = bits * LN2_Q30;
+    if v >= 0 { (v + (1 << 29)) >> 30 } else { -((-v + (1 << 29)) >> 30) }
+}
+
+fn decimal_q20(v: i128) -> String {
+    let m = v.unsigned_abs();
+    let f = ((m & ((1 << 20) - 1)) * 1_000_000 + (1 << 19)) >> 20;
+    let (whole, f) = if f == 1_000_000 { ((m >> 20) + 1, 0) } else { (m >> 20, f) };
+    format!("{}{whole}.{f:06}", if v < 0 { "-" } else { "" })
+}
+
+/// A problem set read from `text` and encoded: each question and answer, the answer shorter than the room and the region
+/// within the field's reach; its opening region (the question resolved, the answer's room open) and its places (the answer's
+/// cells and its first void).
+fn plate_regions(codec: &FieldCodec, field: &Field, text: &[u8]) -> Result<Vec<(Vec<usize>, Vec<bool>, std::ops::Range<usize>)>> {
+    let mut out = Vec::new();
+    for (q, a) in problems_of(text) {
+        let q = codec.encode(&question_text(&q)).map_err(|e| e.to_string())?;
+        let a = codec.encode(&a).map_err(|e| e.to_string())?;
+        if a.len() >= codec.answer || q.len() + codec.answer > field.declaration.reach {
+            continue;
+        }
+        let classes = region_classes(codec, &q, &a, q.len() + codec.answer);
+        let open = (0..classes.len()).map(|t| t >= q.len()).collect();
+        out.push((classes, open, q.len()..q.len() + a.len() + 1));
+    }
+    Ok(out)
+}
+
+/// [measurement; theory, November 9 19:43] `plate-field STATE STATE_SHA CODEC CODEC_SHA UNITS UNITS_SHA HELD HELD_SHA TRAIN
+/// TRAIN_SHA COUNT TRAIN_COUNT OUT`: **the plate census**, a forward-only reading. A site's plate is the tuple of the classes its key word
+/// holds in each head at the last tick ([`Field::read_plates`]). (1) Each held place (the first `COUNT` held problems' opening
+/// regions as the held read meets them: the answer's cells and its first void, every room place open) is read with its
+/// plate and its code `−ln f(truth)`. (2) One forward pass over TRAIN's opening regions counts the true letters at every
+/// answer place by plate (its first `TRAIN_COUNT` problems, all of them at zero), and each held place is coded again under the face times the plate's count ratio,
+/// `f′(a) ∝ f(a) (N_(plate, a) + 1)/(N_a + 1)`, renormalized at the place (one count added to every letter, a declared
+/// prior; each mass released to its own grain). `PLATES.tsv`: each plate's held places, its plain and its lens code in nats,
+/// its training places; one `FIELD_PLATES` summary line.
+pub(super) fn plate_field(args: &[String], realization: &mut dyn FieldRealization) -> Result<()> {
+    if args.len() != 14 {
+        return Err("plate-field STATE STATE_SHA CODEC CODEC_SHA UNITS UNITS_SHA HELD HELD_SHA TRAIN TRAIN_SHA COUNT TRAIN_COUNT OUT".into());
+    }
+    let started = std::time::Instant::now();
+    let mut learner = FieldLearner::from_text(std::str::from_utf8(&pinned_read(&args[1], &args[2], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
+    declared_clocks(&mut learner.field);
+    let field = &learner.field;
+    let units = units_of(&args[5], &args[6])?;
+    let codec = FieldCodec::from_text(std::str::from_utf8(&pinned_read(&args[3], &args[4], CODEC_BUDGET)?)?, units)?;
+    let mut held = plate_regions(&codec, field, &pinned_read(&args[7], &args[8], READ_BUDGET as usize)?)?;
+    held.truncate(count(&args[11])?);
+    let mut train = plate_regions(&codec, field, &pinned_read(&args[9], &args[10], READ_BUDGET as usize)?)?;
+    if let Some(n) = Some(count(&args[12])?).filter(|&n| n > 0) {
+        train.truncate(n);
+    }
+    let out = Path::new(&args[13]);
+    std::fs::create_dir(out)?;
+    let a = field.declaration.alphabet;
+    let heads = field.declaration.heads;
+    // Each region's places with their plates and faces, read in chunks.
+    let mut read = |set: &[(Vec<usize>, Vec<bool>, std::ops::Range<usize>)], visit: &mut dyn FnMut(&[u32], &holonics::hnn::tower::TowerFace, usize)| -> Result<()> {
+        for chunk in set.chunks(64) {
+            let views: Vec<Region> = chunk.iter().map(|(c, u, _)| Region { classes: c, unresolved: u, faces: &[], locked: &[], echo: &[], domain: None, port: None }).collect();
+            let (faces, plates) = realization.read_plates(field, &views).map_err(|e| e.to_string())?;
+            for (((classes, _, places), faces), plates) in chunk.iter().zip(&faces).zip(&plates) {
+                for t in places.clone() {
+                    let face = faces[t].as_ref().ok_or("a held place without a face")?;
+                    visit(&plates[t * heads..(t + 1) * heads], face, classes[t]);
+                }
+            }
+        }
+        Ok(())
+    };
+    let mut counts: std::collections::BTreeMap<Vec<u32>, Vec<u64>> = std::collections::BTreeMap::new();
+    let mut totals = vec![0u64; a];
+    read(&train, &mut |plate: &[u32], _: &holonics::hnn::tower::TowerFace, truth: usize| {
+        counts.entry(plate.to_vec()).or_insert_with(|| vec![0; a])[truth] += 1;
+        totals[truth] += 1;
+    })?;
+    let train_ms = started.elapsed().as_millis();
+    // Each held plate's places, plain code and lens code (bits on 2^(−20)).
+    let mut plates: std::collections::BTreeMap<Vec<u32>, (u64, i128, i128)> = std::collections::BTreeMap::new();
+    let (mut places, mut seen) = (0u64, 0u64);
+    read(&held, &mut |plate: &[u32], face: &holonics::hnn::tower::TowerFace, truth: usize| {
+        let lens = match counts.get(plate) {
+            Some(n) => {
+                let masses: Vec<u128> = face.masses.iter().enumerate().map(|(c, &m)| m * (n[c] as u128 + 1) / (totals[c] as u128 + 1)).collect();
+                let total = masses.iter().sum();
+                holonics::hnn::tower::TowerFace { masses, total }.code(truth) as i128
+            }
+            None => face.code(truth) as i128,
+        };
+        places += 1;
+        seen += u64::from(counts.contains_key(plate));
+        let slot = plates.entry(plate.to_vec()).or_default();
+        *slot = (slot.0 + 1, slot.1 + face.code(truth) as i128, slot.2 + lens);
+    })?;
+    let mut rows: Vec<(&Vec<u32>, &(u64, i128, i128))> = plates.iter().collect();
+    rows.sort_by_key(|(p, s)| (std::cmp::Reverse(s.0), (*p).clone()));
+    let mut file = rows_file(&out.join("PLATES.tsv"), "plate\theld_places\tcode_nats\tlens_code_nats\ttrain_places\n")?;
+    let (mut code, mut lens) = (0i128, 0i128);
+    for (plate, &(n, c, l)) in rows {
+        code += c;
+        lens += l;
+        let name: Vec<String> = plate.iter().map(u32::to_string).collect();
+        let train_places: u64 = counts.get(plate).map_or(0, |v| v.iter().sum());
+        row(&mut file, &format!("{}\t{n}\t{}\t{}\t{train_places}\n", name.join("."), decimal_q20(nats_q20(c) / n as i128), decimal_q20(nats_q20(l) / n as i128)))?;
+    }
+    let mean = |v: i128| if places == 0 { "-".to_string() } else { decimal_q20(nats_q20(v) / places as i128) };
+    println!(
+        "FIELD_PLATES held_problems={} held_places={places} held_plates={} train_problems={} train_places={} train_plates={} held_places_in_train_plates={seen} code_nats={} lens_code_nats={} train_ms={train_ms} ms={}",
+        held.len(),
+        plates.len(),
+        train.len(),
+        totals.iter().sum::<u64>(),
+        counts.len(),
+        mean(code),
+        mean(lens),
+        started.elapsed().as_millis()
+    );
+    Ok(())
+}
+
+/// [definition; theory, November 9 19:43] `exchange-field STATE STATE_SHA CODEC CODEC_SHA UNITS UNITS_SHA HELD HELD_SHA COUNT
+/// SWEEPS H_MILLINATS MOVES STOP_MS OUT`: **the exchange walk** ([`Field::exchange_walk`]). The keyed write given held's
+/// lengths (`FIELD_WRITER_LENGTHS`, required; the writer's laws as `length-field` reads them, refine zero), then the walk
+/// from it: composition held, two places' letters exchanged where the gain from the current faces passes `h`
+/// (`H_MILLINATS` thousandths of a nat, read on the codes' grain: `⌈H 2^50 / (1000 ln 2)⌉` on `2^(−20)` bits), at most
+/// `MOVES` moves a problem. `KEYED.tsv` and `SAMPLE.tsv` hold the keyed write and the walk's in `length-field`'s format,
+/// `MOVES.tsv` every move (its places, gain and heat at each place, in nats); `FIELD_EXCHANGE` a line a problem (its moves,
+/// summed gain, and the heat a move: first, last and its fall), and `FIELD_EXCHANGE_DONE`.
+pub(super) fn exchange_field(args: &[String], realization: &mut dyn FieldRealization) -> Result<()> {
+    if args.len() != 15 {
+        return Err("exchange-field STATE STATE_SHA CODEC CODEC_SHA UNITS UNITS_SHA HELD HELD_SHA COUNT SWEEPS H_MILLINATS MOVES STOP_MS OUT".into());
+    }
+    let started = std::time::Instant::now();
+    let mut learner = FieldLearner::from_text(std::str::from_utf8(&pinned_read(&args[1], &args[2], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
+    declared_clocks(&mut learner.field);
+    let field = &learner.field;
+    let units = units_of(&args[5], &args[6])?;
+    let codec = FieldCodec::from_text(std::str::from_utf8(&pinned_read(&args[3], &args[4], CODEC_BUDGET)?)?, units)?;
+    let held = problems_of(&pinned_read(&args[7], &args[8], READ_BUDGET as usize)?);
+    let (limit, sweeps, h_milli, moves, stop_ms) = (count(&args[9])?, positive(&args[10])?, count(&args[11])?, positive(&args[12])?, positive(&args[13])? as u128);
+    let out = Path::new(&args[14]);
+    std::fs::create_dir(out)?;
+    let held = &held[..limit.min(held.len())];
+    let seed = u64::from_str_radix(args[2].get(..16).ok_or("a writer's key of fewer than sixteen hex digits")?, 16).map_err(|_| "a writer's key that is not hexadecimal")?;
+    let requests: Vec<(Vec<usize>, usize)> = held.iter().map(|(question, _)| opening(&codec, field, question, b"")).collect::<std::result::Result<_, String>>()?;
+    let problems: Vec<(&[usize], usize)> = requests.iter().map(|(q, n)| (q.as_slice(), *n)).collect();
+    let void = codec.void();
+    let WriterLaw { run_bits, near_tail, place_order, one_end, rest, spans, refine_order } = WriterLaw::from_env()?;
+    let path = std::env::var("FIELD_WRITER_LENGTHS").map_err(|_| "exchange-field writes given held's lengths: FIELD_WRITER_LENGTHS")?;
+    let mut by: std::collections::BTreeMap<usize, usize> = std::collections::BTreeMap::new();
+    for l in std::fs::read_to_string(path)?.lines().skip(1) {
+        let mut c = l.split('\t');
+        if let (Some(k), Some(w)) = (c.next().and_then(|v| v.parse().ok()), c.nth(1).and_then(|v| v.parse().ok())) {
+            by.insert(k, w);
+        }
+    }
+    let given: Vec<usize> = (0..problems.len()).map(|k| by.get(&k).copied().ok_or("a problem with no length in FIELD_WRITER_LENGTHS")).collect::<std::result::Result<Vec<usize>, _>>()?.into_iter().zip(&problems).map(|(l, &(_, n))| l.min(n)).collect();
+    let keyed = field
+        .sample_runs(&problems, sweeps, 0, void, seed, run_bits << 20, near_tail, place_order, Some(&given), one_end, rest, spans, None, refine_order, realization, &mut |_, _| started.elapsed().as_millis() <= stop_ms, &mut |_| {})
+        .map_err(|e| e.to_string())?;
+    let keyed_ms = started.elapsed().as_millis();
+    let write = |name: &str, answers: &[Vec<usize>]| -> Result<()> {
+        let mut file = rows_file(&out.join(name), "")?;
+        for (k, places) in answers.iter().enumerate() {
+            let written = places.iter().take_while(|&&c| c != void).count();
+            row(&mut file, &format!("{k}\t{}\n", escaped(&codec.decode(&places[..written])))).map_err(|e| e.to_string())?;
+        }
+        Ok(())
+    };
+    write("KEYED.tsv", &keyed)?;
+    // `h` on the codes' 2^(−20) bits: H thousandths of a nat over ln 2, rounded up.
+    let h = (((h_milli as i128) << 50) + 1000 * LN2_Q30 - 1) / (1000 * LN2_Q30);
+    let (walked, moved) = field
+        .exchange_walk(&problems, &keyed, void, h, moves, realization, &mut |_, _| started.elapsed().as_millis() <= stop_ms)
+        .map_err(|e| e.to_string())?;
+    write("SAMPLE.tsv", &walked)?;
+    let mut file = rows_file(&out.join("MOVES.tsv"), "problem\tmove\ti\tj\tgain_nats\theat_i_nats\theat_j_nats\n")?;
+    let mut total = (0usize, 0i128);
+    for (k, list) in moved.iter().enumerate() {
+        for (n, m) in list.iter().enumerate() {
+            row(&mut file, &format!("{k}\t{}\t{}\t{}\t{}\t{}\t{}\n", n + 1, m.i, m.j, decimal_q20(nats_q20(m.gain)), decimal_q20(nats_q20(m.heat_i)), decimal_q20(nats_q20(m.heat_j))))?;
+        }
+        let gain: i128 = list.iter().map(|m| m.gain).sum();
+        let heat = |m: Option<&holonics::hnn::tower::field::ExchangeMove>| m.map_or("-".to_string(), |m| decimal_q20(nats_q20(m.heat_i + m.heat_j)));
+        let letters = keyed[k].iter().take_while(|&&c| c != void).count();
+        println!("FIELD_EXCHANGE problem={k} letters={letters} moves={} gain_nats={} heat_first_nats={} heat_last_nats={}", list.len(), decimal_q20(nats_q20(gain)), heat(list.first()), heat(list.last()));
+        total = (total.0 + list.len(), total.1 + gain);
+    }
+    println!("FIELD_EXCHANGE_DONE problems={} h_millinats={h_milli} moves={} gain_nats={} keyed_ms={keyed_ms} ms={}", problems.len(), total.0, decimal_q20(nats_q20(total.1)), started.elapsed().as_millis());
+    Ok(())
+}

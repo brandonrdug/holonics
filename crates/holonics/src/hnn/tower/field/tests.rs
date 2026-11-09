@@ -3677,3 +3677,48 @@ fn a_state_under_the_retired_width_law_is_refused() {
     let refused = FieldLearner::from_text(&lines.join("\n")).unwrap_err().to_string();
     assert!(refused.contains("retired"), "{refused}");
 }
+
+/// [measurement; theory, November 9 19:43] **A site's plate is its key word's class in every head at the last tick**
+/// ([`Field::read_plates`]): the reading's plates are the last tick's lists' classes, `[t][h]`, and its faces the plain read's.
+#[test]
+fn a_sites_plate_is_its_classes_at_the_last_tick() {
+    for still in [0usize, 1, 2] {
+        let field = shaped(still);
+        let r = region();
+        let (faces, plates) = field.read_plates(&[r]).unwrap();
+        assert_eq!(faces, field.read_faces(&[r]).unwrap());
+        let pass = field.pass(&r, true).unwrap();
+        let last = pass.ticks.last().unwrap();
+        let heads = field.declaration.heads;
+        let expected: Vec<u32> = (0..CLASSES.len()).flat_map(|t| (0..heads).map(move |h| (h, t))).map(|(h, t)| last.classes[h].class[t]).collect();
+        assert_eq!(plates[0], expected, "still {still}");
+    }
+}
+
+/// [definition; theory, November 9 19:43] **The exchange walk holds composition** ([`Field::exchange_walk`]): from a written
+/// answer it only exchanges letters within it, so each answer's letters are a permutation of the written ones and its
+/// places past them stay void; every move gained more than `h` on the faces it was chosen on, its heats at the two places
+/// sum to its gain, and the walk stops within its declared bound.
+#[test]
+fn the_exchange_walk_holds_composition() {
+    let field = shaped(1);
+    let (q1, q2) = ([1usize, 4, 0, 2, 2, 3], [3usize, 3, 1, 0]);
+    let problems: Vec<(&[usize], usize)> = vec![(&q1, 7), (&q2, 6)];
+    let written = vec![vec![1, 2, 3, 4, 1, 0, 0], vec![4, 4, 2, 1, 3, 0]];
+    let h = 1 << 16;
+    let (answers, moves) = field.exchange_walk(&problems, &written, 0, h, 16, &mut HostField, &mut |_, _| true).unwrap();
+    for (k, (a, w)) in answers.iter().zip(&written).enumerate() {
+        let (mut x, mut y) = (a.clone(), w.clone());
+        x.sort_unstable();
+        y.sort_unstable();
+        assert_eq!(x, y, "problem {k}: composition held");
+        assert_eq!(a.len(), w.len());
+        let n = w.iter().take_while(|&&c| c != 0).count();
+        assert!(a[n..].iter().all(|&c| c == 0), "the void past the letters stays");
+        assert!(moves[k].len() <= 16);
+        for m in &moves[k] {
+            assert!(m.gain > h && m.heat_i + m.heat_j == m.gain && m.i != m.j);
+        }
+    }
+    eprintln!("EXCHANGE_MOVES {:?}", moves.iter().map(Vec::len).collect::<Vec<_>>());
+}

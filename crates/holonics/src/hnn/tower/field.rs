@@ -1112,6 +1112,18 @@ pub struct ReleaseRead<'a> {
     pub drives: &'a [Vec<PassDrive>],
 }
 
+/// [definition; theory, November 9 19:43] **One move of the exchange walk** ([`Field::exchange_walk`]): the two places in the
+/// answer exchanged, the gain it was chosen on, and its Landauer heat at each place (`log₂ f(new | rest) − log₂ f(old | rest)`
+/// on that place's face), all on the codes' `2^(−20)` bits; the heats sum to the gain.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub struct ExchangeMove {
+    pub i: usize,
+    pub j: usize,
+    pub gain: i128,
+    pub heat_i: i128,
+    pub heat_j: i128,
+}
+
 /// [measurement; agent-inferred, November 6, the unified-theory reading of 21:14] **The order a refine pass walks an answer
 /// in**: a fresh keyed order each pass (the release's law), place order, or reversed place order. Consistent faces walk every
 /// scan to the same joint; where the faces curl, a scan's direction moves the walk's law, which a declared scan reads.
@@ -1646,6 +1658,9 @@ struct FieldPass {
     moment: Vec<i64>,
     /// A tower's forward at its split, for the reverse.
     tower: Option<scale::ScalePass>,
+    /// [measurement; theory, November 9 19:43] Each site's plate at the last tick, `[t][h]`: the resonance class its key word
+    /// holds in each head ([`ClassLists::class`]).
+    plates: Vec<u32>,
 }
 
 /// The round trips `Σ_j p_ji^(t) p_ij^(t+1)` of each site over consecutive ticks' rows (`[h][i]`), each
@@ -2628,6 +2643,9 @@ impl Field {
                 clock = Some(Box::new(TickClock { paces: next, moment, blank, reads }));
             }
             out.pairs += cell.rows.iter().map(|r| r.len() as u64).sum::<u64>();
+            if k + 1 == d.ticks {
+                out.plates = (0..sites).flat_map(|t| cell.classes.iter().map(move |l| l.class[t])).collect();
+            }
             if let Some(prev) = &before {
                 round_trips(prev, &cell.rows, sites, &mut trips);
             }
@@ -3622,6 +3640,16 @@ impl Field {
         regions.par_iter().map(|r| self.faces(r)).collect()
     }
 
+    /// [measurement; theory, November 9 19:43] **Each region's faces and its sites' plates** at the last tick (`[t][h]` flat:
+    /// the class each head's key word holds), read in parallel; a reading only.
+    pub fn read_plates(&self, regions: &[Region]) -> Result<(Vec<Vec<Option<TowerFace>>>, Vec<Vec<u32>>)> {
+        if self.declaration.energy {
+            return refuse("an energy field's plates are not read");
+        }
+        let reads: Vec<(Vec<Option<TowerFace>>, Vec<u32>)> = regions.par_iter().map(|r| self.pass(r, false).map(|p| (p.faces, p.plates))).collect::<Result<_>>()?;
+        Ok(reads.into_iter().unzip())
+    }
+
     /// Each region's unresolved sites' logits, read in parallel.
     pub fn read_logits(&self, regions: &[Region]) -> Result<Vec<FieldRead>> {
         regions.par_iter().map(|r| self.pass(r, false).map(|p| FieldRead { logits: p.logits, echo: p.echo })).collect()
@@ -3672,6 +3700,93 @@ impl Field {
             faces[k] = read;
         }
         Ok(faces)
+    }
+
+    /// [definition; theory, November 9 19:43] **The exchange walk**: from a written answer (each problem's letters, its places
+    /// past them the void), composition is held and the walk only exchanges two places' letters within one answer. Each
+    /// place's face is `f_i(· | rest)`: the region (the question, the answer as it stands and the near field past its end)
+    /// read with that place alone open. The gain of exchanging `i` and `j`, from the current faces, is
+    /// `g = z_i(x_j) + z_j(x_i) − z_i(x_i) − z_j(x_j)` with `z = log f` (on the codes' `2^(−20)` bits:
+    /// `c_i(x_i) + c_j(x_j) − c_i(x_j) − c_j(x_i)`, `c = −log₂ f`). Each round, each problem takes its places in the order of
+    /// their own letter's code, worst first, and the first whose best partner (the most gain, the nearer place on a tie)
+    /// gains more than `h`: the two exchange, and the faces at the two places are read again (the regions opened there); the
+    /// other places' faces stand as last read. A problem stops where no pair gains more than `h`, or after `moves` of its own
+    /// moves (the walk's declared bound); the walk stops where every problem has. Each move's Landauer heat is
+    /// `log f_i(new | rest) − log f_i(old | rest)` at both places, read on the faces the move was chosen on. Returns each
+    /// problem's answer (its places past the question) and its moves.
+    #[allow(clippy::too_many_arguments)]
+    pub fn exchange_walk(&self, problems: &[(&[usize], usize)], written: &[Vec<usize>], void: usize, h: i128, moves: usize, realization: &mut dyn FieldRealization, round: &mut dyn FnMut(usize, usize) -> bool) -> Result<(Vec<Vec<usize>>, Vec<Vec<ExchangeMove>>)> {
+        if written.len() != problems.len() {
+            return refuse("an exchange walk with one written answer a problem");
+        }
+        // Each problem's letters (the written places before the first void) and the region a place is read in.
+        let letters: Vec<usize> = written.iter().map(|w| w.iter().take_while(|&&c| c != void).count()).collect();
+        let mut answers: Vec<Vec<usize>> = written.iter().zip(&letters).map(|(w, &n)| w[..n].to_vec()).collect();
+        let region_of = |k: usize, answer: &[usize]| -> Vec<usize> {
+            let (q, room) = problems[k];
+            let mut classes: Vec<usize> = q.iter().chain(answer).copied().collect();
+            classes.extend(std::iter::repeat_n(void, NEAR.min(room.saturating_sub(answer.len()))));
+            classes
+        };
+        // Reads the faces at `places` (problem, place in its answer), each in its own region with that place open.
+        let read = |answers: &[Vec<usize>], places: &[(usize, usize)], realization: &mut dyn FieldRealization| -> Result<Vec<TowerFace>> {
+            let owned: Vec<(Vec<usize>, Vec<bool>)> = places
+                .iter()
+                .map(|&(k, i)| {
+                    let classes = region_of(k, &answers[k]);
+                    let at = problems[k].0.len() + i;
+                    let open = (0..classes.len()).map(|t| t == at).collect();
+                    (classes, open)
+                })
+                .collect();
+            let regions: Vec<Region> = owned.iter().map(|(c, u)| Region { classes: c, unresolved: u, faces: &[], locked: &[], echo: &[], domain: None, port: None }).collect();
+            let faces = if regions.is_empty() { Vec::new() } else { realization.read_faces(self, &regions)? };
+            faces.into_iter().zip(places).map(|(f, &(k, i))| f.get(problems[k].0.len() + i).cloned().flatten().ok_or(TowerError::Refused("an exchange walk's open place without a face"))).collect()
+        };
+        let all: Vec<(usize, usize)> = (0..problems.len()).flat_map(|k| (0..letters[k]).map(move |i| (k, i))).collect();
+        let mut faces: Vec<Vec<TowerFace>> = vec![Vec::new(); problems.len()];
+        for (face, &(k, _)) in read(&answers, &all, realization)?.into_iter().zip(&all) {
+            faces[k].push(face);
+        }
+        let mut walked: Vec<Vec<ExchangeMove>> = vec![Vec::new(); problems.len()];
+        let mut active: Vec<bool> = letters.iter().map(|&n| n >= 2).collect();
+        let mut rounds = 0usize;
+        while active.iter().any(|&a| a) && round(rounds, walked.iter().map(Vec::len).sum()) {
+            rounds += 1;
+            let mut touched: Vec<(usize, usize)> = Vec::new();
+            for k in 0..problems.len() {
+                if !active[k] {
+                    continue;
+                }
+                let (x, f) = (&answers[k], &faces[k]);
+                let code = |i: usize, a: usize| f[i].code(a) as i128;
+                let mut order: Vec<usize> = (0..x.len()).collect();
+                order.sort_by_key(|&i| (std::cmp::Reverse(code(i, x[i])), i));
+                let chosen = order.iter().find_map(|&i| {
+                    let best = (0..x.len()).filter(|&j| j != i && x[j] != x[i]).map(|j| (code(i, x[i]) + code(j, x[j]) - code(i, x[j]) - code(j, x[i]), j)).max_by_key(|&(g, j)| (g, std::cmp::Reverse(j.abs_diff(i)), std::cmp::Reverse(j)));
+                    best.filter(|&(g, _)| g > h).map(|(g, j)| (i, j, g))
+                });
+                let Some((i, j, gain)) = chosen else {
+                    active[k] = false;
+                    continue;
+                };
+                walked[k].push(ExchangeMove { i, j, gain, heat_i: code(i, x[i]) - code(i, x[j]), heat_j: code(j, x[j]) - code(j, x[i]) });
+                answers[k].swap(i, j);
+                touched.extend([(k, i), (k, j)]);
+                if walked[k].len() >= moves {
+                    active[k] = false;
+                }
+            }
+            for (face, &(k, i)) in read(&answers, &touched, realization)?.into_iter().zip(&touched) {
+                faces[k][i] = face;
+            }
+        }
+        let out = answers.iter().zip(written).map(|(a, w)| {
+            let mut placed = a.clone();
+            placed.extend(std::iter::repeat_n(void, w.len() - a.len()));
+            placed
+        }).collect();
+        Ok((out, walked))
     }
 
     /// [measurement; agent-inferred, November 5, §16.47] **The release, read as it writes** ([`Field::sample_realized`],
@@ -4625,6 +4740,11 @@ impl Field {
 /// ([`HostField`]). The card's realization is one such; a realization that cannot read a region
 /// refuses, never substitutes.
 pub trait FieldRealization {
+    /// [measurement; theory, November 9 19:43] Each region's faces and its sites' plates at the last tick
+    /// ([`Field::read_plates`]), read on the host where a realization reads none of its own.
+    fn read_plates(&mut self, field: &Field, regions: &[Region]) -> Result<(Vec<Vec<Option<TowerFace>>>, Vec<Vec<u32>>)> {
+        field.read_plates(regions)
+    }
     fn read_and_return(&mut self, field: &Field, regions: &[Region]) -> Result<(Vec<Vec<Option<TowerFace>>>, Vec<i128>)>;
     fn read_faces(&mut self, field: &Field, regions: &[Region]) -> Result<Vec<Vec<Option<TowerFace>>>>;
     /// Each unresolved site's readout logits on `2^(−16)` bits ([`Field::logits`]), the release's read.
@@ -4818,6 +4938,9 @@ impl<'a> LanesField<'a> {
 }
 
 impl FieldRealization for LanesField<'_> {
+    fn read_plates(&mut self, field: &Field, regions: &[Region]) -> Result<(Vec<Vec<Option<TowerFace>>>, Vec<Vec<u32>>)> {
+        self.card.read_plates(field, regions)
+    }
     fn read_and_return(&mut self, field: &Field, regions: &[Region]) -> Result<(Vec<Vec<Option<TowerFace>>>, Vec<i128>)> {
         self.card.read_and_return(field, regions)
     }
