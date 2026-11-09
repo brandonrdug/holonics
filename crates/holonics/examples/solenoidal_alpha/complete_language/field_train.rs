@@ -4252,8 +4252,9 @@ fn truth_with_voids(void: usize, (q, a, room): &(Vec<usize>, Vec<usize>, usize),
 /// ([`enumerated_places`]: the first `PLACES`, `FIELD_HELD_ALL_OF` as there), each place's configuration its truth with every
 /// site resolved (the enumerated read's configuration at the truth letter: one relaxation a place). Each place's lead
 /// ([`holonics::hnn::tower::field::EnergyLead`], read through the realization's own buffers) gives per lane (a)
-/// `cos(r̂_t, Rᵀ E(u_t))` at the relaxed state and (b) `‖E(u_t) + E₋(u_(t−1)) + E₊(u_(t+1))‖ / ‖C s_t + b‖` at the opening, in
-/// thousandths, nearest. Prints a `FIELD_LEAD` line a lane with the quartiles and median of each over the places (nearest
+/// `cos(r̂_t, Rᵀ E(u_t))` at the relaxed state and (b) `‖E(u_t) + E₋(u_(t−1)) + E₊(u_(t+1))‖ / ‖C s_t + b‖` at the opening, and
+/// beside them (theory, November 9) `c_open = cos(x⁰_t, Rᵀ E(u_t))` (the opening state) and `c_EE = cos(E(u_t), Rᵀ E(u_t))`
+/// (the opening's own term), in thousandths, nearest. Prints a `FIELD_LEAD` line a lane with the quartiles and median of each over the places (nearest
 /// rank, `⌈p n⌉`-th smallest), one with `lane=all` (each place's whole site: every lane's sums added) and one with
 /// `lane=pooled` (every lane of every place); writes each place's lane sums and readings to `LEAD.tsv` (the series the
 /// readings are formed from; no letter). `FIELD_CONTRAST_AVERAGE` reads the averaged constitution, as the held read does.
@@ -4288,27 +4289,43 @@ pub(super) fn lead_field(args: &[String], realization: &mut dyn FieldRealization
     let lanes = field.declaration.lanes;
     let cos_text = |c: Option<i64>| c.map_or("none".to_string(), |v| v.to_string());
     let ratio_text = |r: Option<u128>| r.map_or("inf".to_string(), |v| v.to_string());
-    let mut rows = rows_file(&out.join("LEAD.tsv"), "problem\tplace\tlane\tread_own\tread_read\town_own\tletters_letters\tmoment_moment\tcos_milli\tratio_milli\n")?;
+    let mut rows = rows_file(
+        &out.join("LEAD.tsv"),
+        "problem\tplace\tlane\tread_own\tread_read\town_own\tletters_letters\tmoment_moment\tcos_milli\tratio_milli\topen_own\topen_open\tenc_own\tenc_enc\tc_open_milli\tc_ee_milli\n",
+    )?;
     for ((k, _, t, q), lead) in chosen.iter().zip(&leads) {
         for lane in 0..lanes {
-            let ((dot, rr, oo), (ll, mm)) = (lead.own[lane], lead.opening[lane]);
-            row(&mut rows, &format!("{k}\t{}\t{lane}\t{dot}\t{rr}\t{oo}\t{ll}\t{mm}\t{}\t{}\n", t - q, cos_text(lead.cos_milli(Some(lane))), ratio_text(lead.ratio_milli(Some(lane)))))?;
+            let ((dot, rr, oo), (ll, mm), (xo, xx), (eo, ee)) = (lead.own[lane], lead.opening[lane], lead.open[lane], lead.enc[lane]);
+            let at = Some(lane);
+            let (cos, ratio, c_open, c_ee) = (cos_text(lead.cos_milli(at)), ratio_text(lead.ratio_milli(at)), cos_text(lead.cos_open_milli(at)), cos_text(lead.cos_ee_milli(at)));
+            row(&mut rows, &format!("{k}\t{}\t{lane}\t{dot}\t{rr}\t{oo}\t{ll}\t{mm}\t{cos}\t{ratio}\t{xo}\t{xx}\t{eo}\t{ee}\t{c_open}\t{c_ee}\n", t - q))?;
         }
     }
+    // Each reading of a lead on a lane (the whole site with `None`): the relaxed cosine, the ratio, `c_open` and `c_EE`.
+    type Readings = (Option<i64>, Option<u128>, Option<i64>, Option<i64>);
+    let readings = |l: &holonics::hnn::tower::field::EnergyLead, lane: Option<usize>| -> Readings { (l.cos_milli(lane), l.ratio_milli(lane), l.cos_open_milli(lane), l.cos_ee_milli(lane)) };
+    let quartiles = |values: Vec<Option<i64>>| -> [String; 3] {
+        rank_quartiles(values.into_iter().flatten().collect()).map_or(["none".to_string(), "none".to_string(), "none".to_string()], |(a, b, d)| [a.to_string(), b.to_string(), d.to_string()])
+    };
     // A ratio with no bounded value (the moment's term zero) stands above every bounded one.
-    let line = |lane: &str, cos: Vec<Option<i64>>, ratio: Vec<Option<u128>>| {
-        let unread = cos.iter().filter(|c| c.is_none()).count();
-        let unbounded = ratio.iter().filter(|r| r.is_none()).count();
-        let (n, c, r) = (cos.len(), rank_quartiles(cos.into_iter().flatten().collect()), rank_quartiles(ratio.into_iter().map(|r| r.unwrap_or(u128::MAX)).collect()));
-        let c = c.map_or(["none".to_string(), "none".to_string(), "none".to_string()], |(a, b, d)| [a.to_string(), b.to_string(), d.to_string()]);
-        let r = r.map_or(["none".to_string(), "none".to_string(), "none".to_string()], |(a, b, d)| [a, b, d].map(|v| if v == u128::MAX { "inf".to_string() } else { v.to_string() }));
-        println!("FIELD_LEAD lane={lane} cos_q25={} cos_median={} cos_q75={} ratio_q25={} ratio_median={} ratio_q75={} reads={n} cos_unread={unread} ratio_unbounded={unbounded}", c[0], c[1], c[2], r[0], r[1], r[2]);
+    let line = |lane: &str, reads: Vec<Readings>| {
+        let n = reads.len();
+        let unread = |pick: &dyn Fn(&Readings) -> bool| reads.iter().filter(|r| pick(r)).count();
+        let (cos_unread, unbounded, open_unread, ee_unread) = (unread(&|r| r.0.is_none()), unread(&|r| r.1.is_none()), unread(&|r| r.2.is_none()), unread(&|r| r.3.is_none()));
+        let c = quartiles(reads.iter().map(|r| r.0).collect());
+        let r = rank_quartiles(reads.iter().map(|r| r.1.unwrap_or(u128::MAX)).collect())
+            .map_or(["none".to_string(), "none".to_string(), "none".to_string()], |(a, b, d)| [a, b, d].map(|v| if v == u128::MAX { "inf".to_string() } else { v.to_string() }));
+        let (o, e) = (quartiles(reads.iter().map(|r| r.2).collect()), quartiles(reads.iter().map(|r| r.3).collect()));
+        println!(
+            "FIELD_LEAD lane={lane} cos_q25={} cos_median={} cos_q75={} ratio_q25={} ratio_median={} ratio_q75={} c_open_q25={} c_open_median={} c_open_q75={} c_ee_q25={} c_ee_median={} c_ee_q75={} reads={n} cos_unread={cos_unread} ratio_unbounded={unbounded} c_open_unread={open_unread} c_ee_unread={ee_unread}",
+            c[0], c[1], c[2], r[0], r[1], r[2], o[0], o[1], o[2], e[0], e[1], e[2]
+        );
     };
     for lane in 0..lanes {
-        line(&lane.to_string(), leads.iter().map(|l| l.cos_milli(Some(lane))).collect(), leads.iter().map(|l| l.ratio_milli(Some(lane))).collect());
+        line(&lane.to_string(), leads.iter().map(|l| readings(l, Some(lane))).collect());
     }
-    line("all", leads.iter().map(|l| l.cos_milli(None)).collect(), leads.iter().map(|l| l.ratio_milli(None)).collect());
-    line("pooled", leads.iter().flat_map(|l| (0..lanes).map(|k| l.cos_milli(Some(k)))).collect(), leads.iter().flat_map(|l| (0..lanes).map(|k| l.ratio_milli(Some(k)))).collect());
+    line("all", leads.iter().map(|l| readings(l, None)).collect());
+    line("pooled", leads.iter().flat_map(|l| (0..lanes).map(move |k| readings(l, Some(k)))).collect());
     println!(
         "FIELD_LEAD_READ places={} sites={sites} lanes={lanes} width={} ticks={} averaged={} read_ms={read_ms} host_threads={} ms={}",
         leads.len(),
@@ -5221,8 +5238,9 @@ mod tests {
     /// [measurement; theory, November 8, the lead reading] `lead-field` end to end on the host: an energy field of two lanes,
     /// every family drawn from the key stream (a founding holds the lift and the moment's chart at zero, where the angle and
     /// the ratio read nothing) and its clocks plain, reads its lead at six held places (one a problem, then two drawn by
-    /// letter), one row a lane a place whose readings are its sums', each place's sums the host's own `Field::energy_lead` at
-    /// its truth; and a field without one energy is refused. The quartiles are the nearest ranks.
+    /// letter), one row a lane a place whose readings (the relaxed cosine, the ratio, `c_open` and `c_EE`) are its sums', each
+    /// place's sums the host's own `Field::energy_lead` at its truth; and a field without one energy is refused. The quartiles
+    /// are the nearest ranks.
     #[test]
     fn the_lead_reading_reads_every_held_place_and_lane() {
         assert_eq!(rank_quartiles(vec![4, 1, 3, 2]), Some((1, 2, 3)));
@@ -5273,6 +5291,11 @@ mod tests {
                 let cos: i64 = cells[8].parse().expect("a lane whose rows are not zero");
                 let ratio: u128 = cells[9].parse().expect("a lane whose moment's term is not zero");
                 assert!((-1000..=1000).contains(&cos) && Some(cos) == lead.cos_milli(Some(lane)) && Some(ratio) == lead.ratio_milli(Some(lane)), "place {n}, lane {lane}: {cos} {ratio}");
+                let ((xo, xx), (eo, ee)) = (lead.open[lane], lead.enc[lane]);
+                assert_eq!(cells[10..14], [xo.to_string(), xx.to_string(), eo.to_string(), ee.to_string()], "place {n}, lane {lane}: the opening's sums");
+                let (c_open, c_ee): (i64, i64) = (cells[14].parse().expect("an opening lane not at zero"), cells[15].parse().expect("an own term not at zero"));
+                assert!((-1000..=1000).contains(&c_open) && (-1000..=1000).contains(&c_ee), "place {n}, lane {lane}: {c_open} {c_ee}");
+                assert_eq!((Some(c_open), Some(c_ee)), (lead.cos_open_milli(Some(lane)), lead.cos_ee_milli(Some(lane))), "place {n}, lane {lane}");
             }
         }
         assert!(lead_field(&args(&other, &other_sha, &at("P")), &mut host()).is_err(), "a field without one energy");

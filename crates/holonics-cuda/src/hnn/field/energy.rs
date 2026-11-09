@@ -1162,8 +1162,10 @@ impl<'c> CardField<'c> {
     /// opening's letters' part `E(u_t) + E₋(u_(t−1)) + E₊(u_(t+1))` added from them (the neighbours within the region), and the
     /// own row `Rᵀ E(u_t)` on `2^(−24)` read out of the held letters' force (`held.lf`, which `field_energy_letter_force` forms
     /// as the own row's release with the moment's term and the neighbours' contact rows added at `2^8`: those are taken back
-    /// off, the same integers). Only the site's rows are fetched.
-    fn energy_lead_reads(&self, field: &Field, at: &[usize], st: &Staged<'c>, held: &EnergyHeld<'c>, last: &EnergyCell<'c>) -> Result<Vec<EnergyLead>> {
+    /// off, the same integers). [measurement; theory, November 9] Beside them, the opening state `x⁰_t` (the opening cell's
+    /// state, `opening.x`: `field_open`'s rows with the moment's term added, copied before the first tick and never stepped)
+    /// and the opening's own term `E(u_t)` (`held.own`). Only the site's rows are fetched.
+    fn energy_lead_reads(&self, field: &Field, at: &[usize], st: &Staged<'c>, held: &EnergyHeld<'c>, opening: &EnergyCell<'c>, last: &EnergyCell<'c>) -> Result<Vec<EnergyLead>> {
         let card = self.card;
         let d = field.declaration;
         let dw = d.width;
@@ -1182,7 +1184,7 @@ impl<'c> CardField<'c> {
                 return Err(TowerError::Refused("a lead's site outside its region"));
             }
             let read = self.timed(Kind::Copy, || card.fetch_range(&last.read, g * dw, dw)).map_err(device)?;
-            let (own_row, mterm, lf) = (row(&held.own, g)?, row(&held.mterm, g)?, row(&held.lf, g)?);
+            let (own_row, mterm, lf, x0) = (row(&held.own, g)?, row(&held.mterm, g)?, row(&held.lf, g)?, row(&opening.x, g)?);
             let before = if g > first { Some(row(&held.before, g - 1)?) } else { None };
             let after = if g + 1 < end { Some(row(&held.after, g + 1)?) } else { None };
             let (mut letters, mut own) = (Vec::with_capacity(dw), Vec::with_capacity(dw));
@@ -1191,7 +1193,7 @@ impl<'c> CardField<'c> {
                 letters.push(wide(own_row[i] as i128 + neighbours)?);
                 own.push(wide(lf[i] as i128 - ((mterm[i] as i128 + neighbours) << up))?);
             }
-            out.push(EnergyLead::of(d.lanes, &read, &own, &letters, &mterm)?);
+            out.push(EnergyLead::of(d.lanes, &read, &own, &letters, &mterm, &x0, &own_row)?);
         }
         Ok(out)
     }
@@ -1601,7 +1603,11 @@ impl<'c> CardField<'c> {
         self.mark("energy_ticks");
         let reads = (0..rn).map(|r| EnergyRead { opening: read0[r].phi, last: now[r].phi, halvings: halvings[r].clone(), reads: reads[r], pairs: met[r] }).collect();
         let lead = match plan.lead {
-            Some(at) => self.energy_lead_reads(field, at, &st, &held, cells.last().ok_or(TowerError::Refused("an energy forward with no opening"))?)?,
+            Some(at) => {
+                let (first, last) = (cells.first(), cells.last());
+                let (Some(first), Some(last)) = (first, last) else { return Err(TowerError::Refused("an energy forward with no opening")) };
+                self.energy_lead_reads(field, at, &st, &held, first, last)?
+            }
             None => Vec::new(),
         };
         // The energy's material covector a region (`Field::energy_material`).

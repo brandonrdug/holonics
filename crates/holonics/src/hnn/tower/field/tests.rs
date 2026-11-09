@@ -2920,25 +2920,31 @@ fn the_unigram_steps_toward_its_expected_counts_on_carried_sums() {
 /// [measurement; theory, November 8, the lead reading] **A lead's readings are its rows' nearest thousandths**: parallel,
 /// opposed and orthogonal rows read 1000, −1000 and 0, an eighth turn 707, norm ratios of 5 and √2 read 5000 and 1414, lane by
 /// lane and over the whole site (`6/√78` and `√13.5`), a zero row reads no angle and a zero moment's term no bounded ratio, and
-/// rows that are not one site's lanes are refused.
+/// rows that are not one site's lanes are refused. [theory, November 9] The opening state's and the own term's cosines with
+/// the own row read alike: `3/√26`, `2/√5` and `17/√806` for `c_open`, `0`, `−1` and `−1/√130` for `c_EE`.
 #[test]
 fn a_leads_readings_are_its_rows_nearest_thousandths() {
     let (read, own) = ([1, 0, 0, 0, 1, 1, 0, 0], [5, 0, 0, 0, 1, 0, 0, 0]);
     let (letters, moment) = ([3, 4, 0, 0, 1, 1, 0, 0], [0, 0, 0, 1, 1, 0, 0, 0]);
-    let lead = EnergyLead::of(2, &read, &own, &letters, &moment).unwrap();
+    let (opening, encoding) = ([3, 4, 0, 1, 2, 1, 0, 0], [0, 2, 0, 0, -1, 0, 0, 0]);
+    let lead = EnergyLead::of(2, &read, &own, &letters, &moment, &opening, &encoding).unwrap();
     assert_eq!((lead.cos_milli(Some(0)), lead.cos_milli(Some(1)), lead.cos_milli(None)), (Some(1000), Some(707), Some(679)));
     assert_eq!((lead.ratio_milli(Some(0)), lead.ratio_milli(Some(1)), lead.ratio_milli(None)), (Some(5000), Some(1414), Some(3674)));
-    let opposed = EnergyLead::of(1, &[2, 0], &[-7, 0], &[1, 0], &[0, 0]).unwrap();
-    assert_eq!((opposed.cos_milli(None), opposed.ratio_milli(None)), (Some(-1000), None));
-    let orthogonal = EnergyLead::of(1, &[0, 3], &[4, 0], &[0, 0], &[0, 9]).unwrap();
-    assert_eq!((orthogonal.cos_milli(None), orthogonal.ratio_milli(None)), (Some(0), Some(0)));
-    assert_eq!(EnergyLead::of(1, &[0, 0], &[4, 0], &[0, 0], &[0, 9]).unwrap().cos_milli(None), None);
-    assert!(EnergyLead::of(3, &read, &own, &letters, &moment).is_err());
+    assert_eq!((lead.cos_open_milli(Some(0)), lead.cos_open_milli(Some(1)), lead.cos_open_milli(None)), (Some(588), Some(894), Some(599)));
+    assert_eq!((lead.cos_ee_milli(Some(0)), lead.cos_ee_milli(Some(1)), lead.cos_ee_milli(None)), (Some(0), Some(-1000), Some(-88)));
+    let opposed = EnergyLead::of(1, &[2, 0], &[-7, 0], &[1, 0], &[0, 0], &[0, 0], &[0, 0]).unwrap();
+    assert_eq!((opposed.cos_milli(None), opposed.ratio_milli(None), opposed.cos_open_milli(None), opposed.cos_ee_milli(None)), (Some(-1000), None, None, None));
+    let orthogonal = EnergyLead::of(1, &[0, 3], &[4, 0], &[0, 0], &[0, 9], &[0, 1], &[3, 0]).unwrap();
+    assert_eq!((orthogonal.cos_milli(None), orthogonal.ratio_milli(None), orthogonal.cos_open_milli(None), orthogonal.cos_ee_milli(None)), (Some(0), Some(0), Some(0), Some(1000)));
+    assert_eq!(EnergyLead::of(1, &[0, 0], &[4, 0], &[0, 0], &[0, 9], &[0, 9], &[1, 0]).unwrap().cos_milli(None), None);
+    assert!(EnergyLead::of(3, &read, &own, &letters, &moment, &opening, &encoding).is_err());
+    assert!(EnergyLead::of(2, &read, &own, &letters, &moment, &opening, &encoding[..4]).is_err());
 }
 
 /// [measurement; theory, November 8, the lead reading] **A lead's opening split is the opening, and its read is the relaxed
 /// state's unit**: on the energy fixtures of every ring set and on two lanes, at every site of a resolved configuration (its
-/// two ends among them), the letters' part and the moment's term add to the opening `x⁰_t` ([`Field::opening`]), each lane of
+/// two ends among them), the letters' part and the moment's term add to the opening `x⁰_t` ([`Field::opening`]), the opening
+/// state read is that opening and the own term the letter's encoding row, each lane of
 /// the relaxed chart read stands at unit power on `2^(−16)` (its power `W · 2^32`, to the chart's rounding), and the lead read
 /// is its rows' sums; a field without one energy and a site outside its configuration are refused.
 #[test]
@@ -2965,13 +2971,23 @@ fn a_leads_opening_split_is_the_opening() {
             let rows = field.energy_lead_rows(&CLASSES, t).unwrap();
             let split: Vec<i64> = rows.letters.iter().zip(&rows.moment).map(|(a, b)| a + b).collect();
             assert_eq!(split, opening[t * dw..(t + 1) * dw], "{name}, site {t}: the opening's split");
+            assert_eq!(rows.opening, opening[t * dw..(t + 1) * dw], "{name}, site {t}: the opening state");
+            let own_row: Vec<i64> = field.theta[field.layout.enc + CLASSES[t] * dw..field.layout.enc + (CLASSES[t] + 1) * dw].iter().map(|&v| v as i64).collect();
+            assert_eq!(rows.encoding, own_row, "{name}, site {t}: the opening's own term");
             let lead = field.energy_lead(&CLASSES, t).unwrap();
-            assert_eq!(lead, EnergyLead::of(d.lanes, &rows.read, &rows.own, &rows.letters, &rows.moment).unwrap(), "{name}, site {t}");
+            assert_eq!(lead, EnergyLead::of(d.lanes, &rows.read, &rows.own, &rows.letters, &rows.moment, &rows.opening, &rows.encoding).unwrap(), "{name}, site {t}");
             let unit = (w as i128) << 32;
             for (k, &(_, rr, oo)) in lead.own.iter().enumerate() {
                 assert!((rr - unit).abs() * 64 <= unit && oo > 0, "{name}, site {t}, lane {k}: power {rr} against {unit}, own row {oo}");
             }
-            eprintln!("LEAD_FIXTURE {name} site={t} cos={:?} ratio={:?}", (0..d.lanes).map(|k| lead.cos_milli(Some(k))).collect::<Vec<_>>(), (0..d.lanes).map(|k| lead.ratio_milli(Some(k))).collect::<Vec<_>>());
+            let each = |f: &dyn Fn(Option<usize>) -> Option<i64>| (0..d.lanes).map(|k| f(Some(k))).collect::<Vec<_>>();
+            eprintln!(
+                "LEAD_FIXTURE {name} site={t} cos={:?} ratio={:?} c_open={:?} c_ee={:?}",
+                each(&|k| lead.cos_milli(k)),
+                (0..d.lanes).map(|k| lead.ratio_milli(Some(k))).collect::<Vec<_>>(),
+                each(&|k| lead.cos_open_milli(k)),
+                each(&|k| lead.cos_ee_milli(k))
+            );
         }
     }
     assert!(energetic(1).energy_lead(&CLASSES, CLASSES.len()).is_err());

@@ -448,8 +448,9 @@ fn the_tiny_central_squares_and_energies_on_the_card_are_the_hosts() {
 
 /// [measurement; theory, November 8, the lead reading] **A place's lead read on the card is the host's**: on every ring set and
 /// on two lanes, the tiny truths' lead reads at both ends and inside (`CardField::energy_leads` against `Field::energy_lead`: the
-/// relaxed chart read against `Rᵀ E(u_t)`, and the opening's letters' part beside its moment's term), read in one batch and
-/// again two regions a batch (each batch reading its own regions' sites), equal.
+/// relaxed chart read against `Rᵀ E(u_t)`, the opening's letters' part beside its moment's term, and (theory, November 9) the
+/// opening state and the opening's own term `E(u_t)` against `Rᵀ E(u_t)`), read in one batch and again two regions a batch (each
+/// batch reading its own regions' sites), every lane's sums equal.
 #[test]
 #[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
 fn the_tiny_lead_reads_on_the_card_are_the_hosts() {
@@ -462,11 +463,13 @@ fn the_tiny_lead_reads_on_the_card_are_the_hosts() {
     let fields: Vec<(String, Field)> = (0..=2).map(|s| (format!("still {s}"), energetic(s))).chain((0..=1).map(|s| (format!("laned still {s}"), laned(s)))).collect();
     for (name, field) in &fields {
         let host: Vec<EnergyLead> = places.iter().map(|&(c, t)| field.energy_lead(c, t).unwrap()).collect();
+        assert!(host.iter().all(|l| l.open.len() == field.declaration.lanes && l.enc.len() == field.declaration.lanes), "{name}: the opening's sums a lane");
         let whole = card.energy_leads(field, &places).unwrap();
         card.energy_batch_regions(Some(2));
         let cut = card.energy_leads(field, &places).unwrap();
         card.energy_batch_regions(None);
-        println!("ENERGY_LEAD tiny {name} bit_equal={} cut_bit_equal={}", whole == host, cut == host);
+        let part = |reads: &[EnergyLead]| reads.iter().map(|l| (l.open.clone(), l.enc.clone())).collect::<Vec<_>>();
+        println!("ENERGY_LEAD tiny {name} bit_equal={} cut_bit_equal={} opening_sums_equal={}", whole == host, cut == host, part(&whole) == part(&host) && part(&cut) == part(&host));
         assert_eq!(whole, host, "{name}: the card's lead reads");
         assert_eq!(cut, host, "{name}: the card's lead reads two regions a batch");
     }

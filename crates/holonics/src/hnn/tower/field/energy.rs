@@ -2114,11 +2114,12 @@ impl Field {
     /// lane at unit power, the unit the energy reads) against the site's own row carried by the lift's transpose,
     /// `ρ_t = Rᵀ E(u_t)` (the own-row part of the letters' force, as [`Field::energy_force`] forms it), and (b) the opening
     /// `x⁰_t = E(u_t) + E₋(u_(t−1)) + E₊(u_(t+1)) + (C s_t + b)` split into its letters' part `L_t` and its moment's term
-    /// `M_t`, before any tick. A reading only, through the host's reference; a realization reads the same sums from its own
-    /// buffers ([`FieldRealization::read_energy_leads`]).
+    /// `M_t`, before any tick. [measurement; theory, November 9] Beside them, the opening state `x⁰_t` itself (as
+    /// [`Field::open`] makes it) and the opening's own term `E(u_t)`, each against `ρ_t`. A reading only, through the host's
+    /// reference; a realization reads the same sums from its own buffers ([`FieldRealization::read_energy_leads`]).
     pub fn energy_lead(&self, classes: &[usize], site: usize) -> Result<EnergyLead> {
         let rows = self.energy_lead_rows(classes, site)?;
-        EnergyLead::of(self.declaration.lanes, &rows.read, &rows.own, &rows.letters, &rows.moment)
+        EnergyLead::of(self.declaration.lanes, &rows.read, &rows.own, &rows.letters, &rows.moment, &rows.opening, &rows.encoding)
     }
 
     /// [`Field::energy_lead`]'s rows at its site ([`LeadRows`]).
@@ -2144,7 +2145,16 @@ impl Field {
                 *slot = fit64(*slot as i128 + e as i128)?;
             }
         }
-        Ok(LeadRows { read: cell.read[site * dw..(site + 1) * dw].to_vec(), own, letters, moment: held.moment_term[site * dw..(site + 1) * dw].to_vec() })
+        // The opening state as `open` makes it, from the moments the relaxation held.
+        let opening = self.open(&region, &held.moment)?[site * dw..(site + 1) * dw].to_vec();
+        Ok(LeadRows {
+            read: cell.read[site * dw..(site + 1) * dw].to_vec(),
+            own,
+            letters,
+            moment: held.moment_term[site * dw..(site + 1) * dw].to_vec(),
+            opening,
+            encoding: held.letters.own[site].clone(),
+        })
     }
 
     /// [measurement] **A region's energy read** ([`EnergyRead`]): the energy at the opening and at the last tick, each
@@ -2786,23 +2796,30 @@ pub struct EnergyRead {
 }
 
 /// [`Field::energy_lead`]'s rows at its site, each `[D]`: the relaxed chart read on `2^(−16)` (each lane at unit power), the
-/// own row through the lift's transpose `Rᵀ E(u_t)` on `2^(−24)`, and the opening's letters' part
-/// `E(u_t) + E₋(u_(t−1)) + E₊(u_(t+1))` and moment's term `C s_t + b`, both on `2^(−16)`.
+/// own row through the lift's transpose `Rᵀ E(u_t)` on `2^(−24)`, the opening's letters' part
+/// `E(u_t) + E₋(u_(t−1)) + E₊(u_(t+1))` and moment's term `C s_t + b`, the opening state `x⁰_t` as [`Field::open`] makes it,
+/// and the opening's own term `E(u_t)`, the last four on `2^(−16)`.
 pub(super) struct LeadRows {
     pub(super) read: Vec<i32>,
     pub(super) own: Vec<i64>,
     pub(super) letters: Vec<i64>,
     pub(super) moment: Vec<i64>,
+    pub(super) opening: Vec<i64>,
+    pub(super) encoding: Vec<i64>,
 }
 
 /// [measurement; theory, November 8, the lead reading] **A site's lead read** ([`Field::energy_lead`]), kept as each lane's
 /// integer sums so that a realization's read is compared term for term and its faces are formed once, at the reading:
 /// `own[ℓ] = (⟨r̂, ρ⟩, ⟨r̂, r̂⟩, ⟨ρ, ρ⟩)` with `r̂` the relaxed chart read on `2^(−16)` and `ρ = Rᵀ E(u_t)` on `2^(−24)`, and
 /// `opening[ℓ] = (⟨L, L⟩, ⟨M, M⟩)` with `L = E(u_t) + E₋(u_(t−1)) + E₊(u_(t+1))` and `M = C s_t + b`, both on `2^(−16)`.
+/// [measurement; theory, November 9] Beside them, `open[ℓ] = (⟨x⁰, ρ⟩, ⟨x⁰, x⁰⟩)` with `x⁰_t` the opening state, and
+/// `enc[ℓ] = (⟨E, ρ⟩, ⟨E, E⟩)` with `E = E(u_t)` the opening's own term, both on `2^(−16)` against `ρ` on `2^(−24)`.
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
 pub struct EnergyLead {
     pub own: Vec<(i128, i128, i128)>,
     pub opening: Vec<(i128, i128)>,
+    pub open: Vec<(i128, i128)>,
+    pub enc: Vec<(i128, i128)>,
 }
 
 /// `Σ a_i b_i` in its 128-bit carrier, refused past it.
@@ -2820,58 +2837,67 @@ fn milli_root(p: &BigInt, q: &BigInt) -> BigInt {
     (k + 1u32) / 2u32
 }
 
+/// `⟨a, b⟩ / √(⟨a, a⟩⟨b, b⟩)` in thousandths, nearest ([`milli_root`] of `⟨a, b⟩² / (⟨a, a⟩⟨b, b⟩)`, signed as `⟨a, b⟩`);
+/// `None` where either row is zero.
+fn cos_milli_of(dot: &BigInt, aa: &BigInt, bb: &BigInt) -> Option<i64> {
+    let zero = BigInt::from(0u32);
+    if *aa == zero || *bb == zero {
+        return None;
+    }
+    let magnitude = milli_root(&(dot * dot), &(aa * bb)).to_i64()?;
+    Some(if *dot < zero { -magnitude } else { magnitude })
+}
+
 impl EnergyLead {
     /// The sums of one site's rows ([`LeadRows`]), lane by lane over `lanes` lanes of `D / lanes` coordinates.
-    pub fn of(lanes: usize, read: &[i32], own: &[i64], letters: &[i64], moment: &[i64]) -> Result<Self> {
+    pub fn of(lanes: usize, read: &[i32], own: &[i64], letters: &[i64], moment: &[i64], opening: &[i64], encoding: &[i64]) -> Result<Self> {
         let dw = read.len();
-        if lanes == 0 || dw % lanes != 0 || own.len() != dw || letters.len() != dw || moment.len() != dw {
+        if lanes == 0 || dw % lanes != 0 || [own, letters, moment, opening, encoding].iter().any(|row| row.len() != dw) {
             return refuse("a lead's rows that are not one site's lanes");
         }
         let w = dw / lanes;
-        let mut out = EnergyLead { own: Vec::with_capacity(lanes), opening: Vec::with_capacity(lanes) };
+        let mut out = EnergyLead { own: Vec::with_capacity(lanes), opening: Vec::with_capacity(lanes), open: Vec::with_capacity(lanes), enc: Vec::with_capacity(lanes) };
         for k in 0..lanes {
             let at = k * w..(k + 1) * w;
-            let (r, o) = (|| read[at.clone()].iter().map(|&v| v as i128), || own[at.clone()].iter().map(|&v| v as i128));
-            let (lt, mt) = (|| letters[at.clone()].iter().map(|&v| v as i128), || moment[at.clone()].iter().map(|&v| v as i128));
-            out.own.push((lead_dot(r(), o())?, lead_dot(r(), r())?, lead_dot(o(), o())?));
-            out.opening.push((lead_dot(lt(), lt())?, lead_dot(mt(), mt())?));
+            let wide = |row: &[i64]| row[at.clone()].iter().map(|&v| v as i128).collect::<Vec<i128>>();
+            let r: Vec<i128> = read[at.clone()].iter().map(|&v| v as i128).collect();
+            let (o, lt, mt, x0, e) = (wide(own), wide(letters), wide(moment), wide(opening), wide(encoding));
+            let dot = |a: &[i128], b: &[i128]| lead_dot(a.iter().copied(), b.iter().copied());
+            out.own.push((dot(&r, &o)?, dot(&r, &r)?, dot(&o, &o)?));
+            out.opening.push((dot(&lt, &lt)?, dot(&mt, &mt)?));
+            out.open.push((dot(&x0, &o)?, dot(&x0, &x0)?));
+            out.enc.push((dot(&e, &o)?, dot(&e, &e)?));
         }
         Ok(out)
     }
 
-    /// Lane `lane`'s sums, or with `None` the whole site's (every lane's added, in a carrier as wide as they need).
-    fn sums(&self, lane: Option<usize>) -> ([BigInt; 3], [BigInt; 2]) {
-        let keep = |k: usize| lane.is_none_or(|l| l == k);
-        let mut own: [BigInt; 3] = Default::default();
-        let mut opening: [BigInt; 2] = Default::default();
-        for (_, &(dot, rr, oo)) in self.own.iter().enumerate().filter(|(k, _)| keep(*k)) {
-            own[0] += BigInt::from(dot);
-            own[1] += BigInt::from(rr);
-            own[2] += BigInt::from(oo);
-        }
-        for (_, &(ll, mm)) in self.opening.iter().enumerate().filter(|(k, _)| keep(*k)) {
-            opening[0] += BigInt::from(ll);
-            opening[1] += BigInt::from(mm);
-        }
-        (own, opening)
+    /// One term's sum over lane `lane`, or with `None` over the whole site (every lane's added, in a carrier as wide as they need).
+    fn total(&self, lane: Option<usize>, term: impl Fn(usize) -> i128) -> BigInt {
+        (0..self.own.len()).filter(|&k| lane.is_none_or(|l| l == k)).map(|k| BigInt::from(term(k))).sum()
     }
 
-    /// (a) `cos(r̂, Rᵀ E(u_t))` on lane `lane` (the whole site with `None`) in thousandths, nearest ([`milli_root`] of
-    /// `⟨r̂, ρ⟩² / (⟨r̂, r̂⟩⟨ρ, ρ⟩)`, signed as `⟨r̂, ρ⟩`); `None` where either row is zero there.
+    /// (a) `cos(r̂, Rᵀ E(u_t))` at the relaxed state on lane `lane` (the whole site with `None`) in thousandths, nearest
+    /// ([`cos_milli_of`]); `None` where either row is zero there.
     pub fn cos_milli(&self, lane: Option<usize>) -> Option<i64> {
-        let ([dot, rr, oo], _) = self.sums(lane);
-        let zero = BigInt::from(0u32);
-        if rr == zero || oo == zero {
-            return None;
-        }
-        let magnitude = milli_root(&(&dot * &dot), &(rr * oo)).to_i64()?;
-        Some(if dot < zero { -magnitude } else { magnitude })
+        cos_milli_of(&self.total(lane, |k| self.own[k].0), &self.total(lane, |k| self.own[k].1), &self.total(lane, |k| self.own[k].2))
+    }
+
+    /// `c_open = cos(x⁰_t, Rᵀ E(u_t))`, the opening state against the own row, on lane `lane` (the whole site with `None`) in
+    /// thousandths, nearest ([`cos_milli_of`]); `None` where either row is zero there.
+    pub fn cos_open_milli(&self, lane: Option<usize>) -> Option<i64> {
+        cos_milli_of(&self.total(lane, |k| self.open[k].0), &self.total(lane, |k| self.open[k].1), &self.total(lane, |k| self.own[k].2))
+    }
+
+    /// `c_EE = cos(E(u_t), Rᵀ E(u_t))`, the opening's own term against the own row, on lane `lane` (the whole site with
+    /// `None`) in thousandths, nearest ([`cos_milli_of`]); `None` where either row is zero there.
+    pub fn cos_ee_milli(&self, lane: Option<usize>) -> Option<i64> {
+        cos_milli_of(&self.total(lane, |k| self.enc[k].0), &self.total(lane, |k| self.enc[k].1), &self.total(lane, |k| self.own[k].2))
     }
 
     /// (b) `‖E(u_t) + E₋(u_(t−1)) + E₊(u_(t+1))‖ / ‖C s_t + b‖` at the opening on lane `lane` (the whole site with `None`) in
     /// thousandths, nearest ([`milli_root`] of `⟨L, L⟩ / ⟨M, M⟩`); `None` where the moment's term is zero there (unbounded).
     pub fn ratio_milli(&self, lane: Option<usize>) -> Option<u128> {
-        let (_, [ll, mm]) = self.sums(lane);
+        let (ll, mm) = (self.total(lane, |k| self.opening[k].0), self.total(lane, |k| self.opening[k].1));
         if mm == BigInt::from(0u32) {
             return None;
         }
