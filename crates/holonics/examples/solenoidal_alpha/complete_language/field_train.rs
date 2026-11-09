@@ -2960,12 +2960,13 @@ fn region_sites((q, a, room): &(Vec<usize>, Vec<usize>, usize)) -> u128 {
     (q.len() + a.len() + holonics::hnn::tower::field::NEAR.min(room.saturating_sub(a.len()))) as u128
 }
 
-/// [definition; theory, November 9 11:39] **A sweep's site reads**: the sites a whole sweep of a section's answers at their true
-/// lengths reads in its proposals at most, `Σ_k L_k (Q_k + L_k + v_k)` (the longest answer's steps, each proposing answer
-/// reading its whole region; the sweep's opening read of each region is beside it). `walk-field` prints it before a run, and
-/// the save law projects a section of fresh writes from it ([`section_work`]).
+/// [definition; theory, November 9 11:39 and 12:18] **A sweep's site reads**: the sites a whole sweep of a section's answers at
+/// their true lengths reads at most, `Σ_k (L_k + 1)(Q_k + L_k + v_k)`: its opening read of every answer's region, then the
+/// longest answer's steps, each proposing answer reading its whole region ([`Field::energy_sweep_at`]: a taken move's proposal
+/// read is the next place's current read, so a place costs one read). `walk-field` prints it before a run, and the save law
+/// projects a section of fresh writes from it ([`section_work`]), so the two count the same reads.
 fn sweep_site_reads(set: &Problems, members: &[usize]) -> u128 {
-    members.iter().map(|&i| set[i].1.len() as u128 * region_sites(&set[i])).sum()
+    members.iter().map(|&i| (set[i].1.len() as u128 + 1) * region_sites(&set[i])).sum()
 }
 
 /// [definition; theory, November 9 11:48] **A section's law, as the save law reads its declared work** ([`section_work`]).
@@ -2989,8 +2990,8 @@ enum SectionLaw<'a> {
 /// work**, the save law's projection operand, and its unit: `site_reads`, the sites of the regions its reads hold (each region
 /// `Q + L + v`, [`region_sites`]), or `places`, its answer places.
 /// - Fresh writes: their declared sweeps times [`sweep_site_reads`].
-/// - Persistent writes: the residue class's proposals, `Σ_k |class_k| (Q_k + L_k + v_k)`, and where the writes open their sinks'
-///   whole sweeps.
+/// - Persistent writes: their sweep of one residue class, its opening read and its proposals, `Σ_k (|class_k| + 1)(Q_k + L_k +
+///   v_k)`, and where the writes open their sinks' whole sweeps.
 /// - The kernel: two reads a member and two a block (the faces and the material at the truth, and at each block's proposal),
 ///   `2 Σ_k region_k + 2 Σ_b region_(owner b)`.
 /// - Law D: one faces read a member and one material read a letter at each block place, `Σ_k region_k + alphabet·Σ_b |b|
@@ -3007,7 +3008,7 @@ fn section_work(law: &SectionLaw, set: &Problems, members: &[usize]) -> (u128, &
     match *law {
         SectionLaw::Fresh { sweeps } => (sweeps as u128 * sweep_site_reads(set, members), "site_reads"),
         SectionLaw::Persistent { starts, spacing, sinks } => {
-            let class: u128 = (0..members.len()).zip(starts).map(|(m, &r)| set[members[m]].1.len().saturating_sub(r).div_ceil(spacing.max(1)) as u128 * region(m)).sum();
+            let class: u128 = (0..members.len()).zip(starts).map(|(m, &r)| (set[members[m]].1.len().saturating_sub(r).div_ceil(spacing.max(1)) as u128 + 1) * region(m)).sum();
             (class + sinks as u128 * sweep_site_reads(set, members), "site_reads")
         }
         SectionLaw::Kernel { owners } => (2 * regions + 2 * owners.iter().map(|&o| region(o)).sum::<u128>(), "site_reads"),
@@ -3050,6 +3051,47 @@ fn save_due(since_ms: u128, projected_ms: Option<u128>, hour_ms: u128) -> bool {
     match projected_ms {
         Some(p) => since_ms.saturating_add(p) > hour_ms,
         None => since_ms >= hour_ms,
+    }
+}
+
+/// [definition; theory, November 9 11:48 and 12:18] **The save law's clock**, in milliseconds from the run's start: when the
+/// last saved state was written, the run's largest measured rate, and the section now open. A section opens after any save at
+/// its start and closes at its last print, so its measured time holds its sweeps, its deposit, its prints and any read it
+/// makes itself (a lap's tenth), and never the held read of the save at the next start: that read is counted once, from the
+/// state's write, in the time since the last save.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+struct SaveClock {
+    saved_ms: u128,
+    rate: Option<SaveRate>,
+    open: Option<(u128, u128)>,
+}
+
+impl SaveClock {
+    /// The time since the last saved state, at `now_ms`.
+    fn since(&self, now_ms: u128) -> u128 {
+        now_ms.saturating_sub(self.saved_ms)
+    }
+
+    /// A section of `work` units projected at the measured rate (none before the run has measured a section).
+    fn projected(&self, work: u128) -> Option<u128> {
+        self.rate.map(|r| r.project(work))
+    }
+
+    /// A state written at `now_ms`.
+    fn saved(&mut self, now_ms: u128) {
+        self.saved_ms = now_ms;
+    }
+
+    /// A section of `work` units opens at `now_ms`; a section left open (one skipped unread) is dropped unmeasured.
+    fn open(&mut self, work: u128, now_ms: u128) {
+        self.open = Some((work, now_ms));
+    }
+
+    /// The open section closes at `now_ms`, its last print: its time over its declared work meets the rate.
+    fn close(&mut self, now_ms: u128) {
+        if let Some((work, at)) = self.open.take() {
+            self.rate = SaveRate::larger(self.rate, now_ms.saturating_sub(at), work);
+        }
     }
 }
 
@@ -3430,14 +3472,16 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
         None => enumerated_read(&held_field(&learner, averaging), &held_set, places, &truth_of, realization, -1, &mut enumerated_rows)?,
     }
     println!("FIELD_ENUMERATED_READ lap=-1 ms={}", started.elapsed().as_millis());
-    // [definition; Brandon, November 6 17:11; theory, November 7 16:56 and November 9 11:48] **The save law.** A card run holds
-    // at most one hour (`SAVE_MS`) between saved states. At a section's start the learner rests as `STATE.<lap>.<sections
+    // [definition; Brandon, November 6 17:11; theory, November 7 16:56 and November 9 11:48 and 12:18] **The save law.** A card
+    // run holds at most one hour (`SAVE_MS`) between saved states. At a section's start the learner rests as `STATE.<lap>.<sections
     // done>`, the held places are read from it (`ENUMERATED.tsv` rows marked `10000·(lap + 1) + sections done`) and the run goes
     // on, when the time since the last saved state plus the section's projected time would pass the hour ([`save_due`]). The
     // projection is the section's declared work ([`section_work`]) times the run's largest measured time per unit of work so far
-    // ([`SaveRate`]), each section measured from its start to the next section's start, so its deposit and its reads beside the
-    // declared work are inside the measured rate. The hour is guaranteed only where the projection holds: a save can fall only
-    // at a section's start, so this per-section stop holds the gap to the projection, and a section that runs past its
+    // ([`SaveRate`]). Each section is measured from its start, after any save there, to its last print ([`SaveClock`]), so its
+    // deposit, its prints and its reads beside the declared work are inside the measured rate, and the next start's save and its
+    // held read are outside it (the time since the save counts that read once). The hour is guaranteed only where the
+    // projection holds: a save can fall only at a section's start, so this per-section stop holds the gap to the projection,
+    // and a section that runs past its
     // projection carries the gap past the hour by its excess, after which the next start saves and the measured rate rises to
     // that section's. Before the run has measured any section there is no rate, and the first section meets the plain hour test
     // (an hour since the last saved state). The time is read from the state's write, so a save's held read is inside the next
@@ -3445,10 +3489,7 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
     // section a lap or a resumed run opens at (its state is the one already saved). `FIELD_SAVE_AT` adds declared saves. Each
     // `FIELD_SAVED` line prints its reason (`hour`, the projected crossing, ahead of `declared`) and the projection it used.
     const SAVE_MS: u128 = 3_600_000;
-    let mut saved_ms = 0u128;
-    let mut rate: Option<SaveRate> = None;
-    // The section being measured: its declared work and its start.
-    let mut measuring: Option<(u128, std::time::Instant)> = None;
+    let mut clock = SaveClock::default();
     for lap in 0..laps {
         let elapsed = started.elapsed().as_millis();
         if lap > 0 && elapsed + lap_ms > stop_ms {
@@ -3473,10 +3514,6 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
         let mut leg = Leg::new(&learner.field);
         let mut coherence_from = 0usize;
         for (n, &s) in walk(seed, read, sections.len()).iter().enumerate().skip(if lap == 0 { from_section } else { 0 }) {
-            // The section before this one is measured to this start.
-            if let Some((work, at)) = measuring.take() {
-                rate = SaveRate::larger(rate, at.elapsed().as_millis(), work);
-            }
             let now = started.elapsed().as_millis();
             let opening = if lap == 0 { from_section } else { 0 };
             if n > 0 && n == from_section && lap == 0 {
@@ -3504,12 +3541,11 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
                 }
             };
             let (work, unit) = section_work(&section_law, &train_set, members);
-            let projected = rate.map(|r| r.project(work));
-            let since = now - saved_ms;
+            let (projected, since) = (clock.projected(work), clock.since(now));
             let hour = n != opening && save_due(since, projected, SAVE_MS);
             if hour || (n > 0 && save_at.contains(&n)) {
                 write_new(&out.join(format!("STATE.{lap}.{n}")), at_rate(&learner, base_rate).as_bytes())?;
-                saved_ms = now;
+                clock.saved(now);
                 match &host_held {
                     Some(h) => h.read(10_000 * (lap as i64 + 1) + n as i64, &learner),
                     None => enumerated_read(&held_field(&learner, averaging), &held_set, places, &truth_of, realization, 10_000 * (lap as i64 + 1) + n as i64, &mut enumerated_rows)?,
@@ -3520,14 +3556,14 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
                     started.elapsed().as_millis() - now,
                     if hour { "hour" } else { "declared" },
                     projected.map_or("-".to_string(), |p| p.to_string()),
-                    rate.map_or("-".to_string(), |r| r.ms.to_string()),
-                    rate.map_or("-".to_string(), |r| r.work.to_string())
+                    clock.rate.map_or("-".to_string(), |r| r.ms.to_string()),
+                    clock.rate.map_or("-".to_string(), |r| r.work.to_string())
                 );
                 leg.print(&learner.field, lap, n, "leg");
                 leg = Leg::new(&learner.field);
             }
             let section_start = std::time::Instant::now();
-            measuring = Some((work, section_start));
+            clock.open(work, started.elapsed().as_millis());
             let truths: Vec<Vec<usize>> = members.iter().map(|&i| truth_of(&train_set[i], &train_set[i].1)).collect();
             if persistent {
                 // [definition; the unified-theory reading of November 7, 09:36] **The field meets its persistent writes**: one
@@ -3741,6 +3777,8 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
                 // [measurement; theory, November 9 05:04] Each family's moved grains and its length, as the kernel's path prints them.
                 println!("FIELD_STEP lap={lap} n={n} {}", step_text(&learner.field, &theta_before));
                 println!("FIELD_LENGTHS lap={lap} n={n} {}", lengths_text(&learner));
+                // The section closes at its last print, before the next start's save (the save law's clock).
+                clock.close(started.elapsed().as_millis());
                 // The declared read ends this path as it ends the kernel's (`FIELD_CONTRAST_SECTIONS`); without it the fresh-writes
                 // fork of November 8 ran past its 20 sections to the deadline and was stopped at section 204 with no state.
                 let read_done = read_sections > 0 && lap == 0 && n + 1 >= from_section + read_sections;
@@ -3985,6 +4023,8 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
                         tenth_family.iter_mut().for_each(|x| *x = (0, 0));
                     }
                 }
+                // The section closes at its last print, its tenth's read inside it, before the next start's save.
+                clock.close(started.elapsed().as_millis());
                 let read_done = read_sections > 0 && lap == 0 && n + 1 >= from_section + read_sections;
                 if started.elapsed().as_millis() > stop_ms || read_done {
                     write_new(&out.join("STATE.stopped"), at_rate(&learner, base_rate).as_bytes())?;
@@ -4092,19 +4132,17 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
             // [measurement; theory, November 9 05:04] Each family's moved grains and its length, as the kernel's path prints them.
             println!("FIELD_STEP lap={lap} n={n} {}", step_text(&learner.field, &theta_before));
             println!("FIELD_LENGTHS lap={lap} n={n} {}", lengths_text(&learner));
+            // The section closes at its last print, before the next start's save.
+            clock.close(started.elapsed().as_millis());
             if started.elapsed().as_millis() > stop_ms {
                 write_new(&out.join("STATE.stopped"), at_rate(&learner, base_rate).as_bytes())?;
                 println!("FIELD_STOPPED lap={lap} sections={}/{} states={states} ms={}", n + 1, sections.len(), started.elapsed().as_millis());
                 return Ok(());
             }
         }
-        // The lap's last section is measured to its end, before the lap's own reads.
-        if let Some((work, at)) = measuring.take() {
-            rate = SaveRate::larger(rate, at.elapsed().as_millis(), work);
-        }
         learner.laps += 1;
         write_new(&out.join(format!("STATE.{lap}")), at_rate(&learner, base_rate).as_bytes())?;
-        saved_ms = started.elapsed().as_millis();
+        clock.saved(started.elapsed().as_millis());
         if persistent {
             println!("FIELD_PERSISTENT_LAP lap={lap} states={states} moved={moved_lap} proposed={places_lap} accept_milli={} closing_milli={} ms={}", moved_lap * 1000 / places_lap.max(1), if states == 0 { 0 } else { -(gap * LN2_Q30 >> 30) * 1000 / (states as i128) >> 32 }, started.elapsed().as_millis());
         }
@@ -4782,10 +4820,11 @@ fn band_half_width(k: u32) -> (u128, u128) {
 /// `contrast-field` forms them ([`sections_of`] at the state's seed, [`contrast_seed`]) in the keyed order its learner walks them
 /// at its lap count ([`walk`]), and for each walked section from `FROM`, `COUNT` of them, one `FIELD_WALK` line: the walk index,
 /// the section, its problems, the summed answer places `P` (the places a fresh write sweeps, at true lengths), `Σ L²` and the
-/// longest answer, and `site_reads`, the sites a sweep reads at most in its proposals (`Σ_k L_k (Q_k + L_k + v_k)`,
-/// [`sweep_site_reads`]: each proposing answer reading its whole region with its near tail of voids); the save law projects a
-/// section of fresh writes as its declared sweeps times these site reads times the run's largest measured time per site read
-/// ([`section_work`], [`SaveRate`]). A reading only: it opens nothing on the realization.
+/// longest answer, and `site_reads`, the sites a sweep reads at most (`Σ_k (L_k + 1)(Q_k + L_k + v_k)`, [`sweep_site_reads`]:
+/// its opening read of every answer's region, and each proposing answer reading its whole region with its near tail of voids;
+/// since theory, November 9 12:18, the opening read is counted); the save law projects a section of fresh writes as its
+/// declared sweeps times these site reads times the run's largest measured time per site read ([`section_work`],
+/// [`SaveRate`]), from the same function. A reading only: it opens nothing on the realization.
 pub(super) fn walk_field(args: &[String]) -> Result<()> {
     if args.len() != 12 {
         return Err("walk-field STATE STATE_SHA CODEC CODEC_SHA UNITS UNITS_SHA TRAIN TRAIN_SHA SECTION FROM COUNT".into());
@@ -7631,10 +7670,40 @@ mod tests {
         assert!(crossing.iter().all(|&g| g <= HOUR), "the projected crossing holds the hour: {crossing:?}");
     }
 
-    /// [definition; theory, November 9 11:39 and 11:48] A section's declared work. The fresh writes' is their declared sweeps
-    /// times walk-field's site reads, `Σ_k L_k (Q_k + L_k + v_k)` with `v_k = min(NEAR, room_k − L_k)`, counted here by hand on
-    /// three problems (a room that leaves the whole near tail, one that leaves two voids, one that leaves none). The persistent
-    /// writes' is the places their residue sweep walks, each reading its region, and their sinks' sweeps where they open. The
+    /// [definition; theory, November 9 12:18] The save law's clock, in the trainer's order (a section opens after any save at its
+    /// start and closes at its last print): a section followed by a save does not raise the measured rate by the save's held
+    /// read. Section A reads 1,000 units in 100 s; the next start saves and its held read takes 103 s; section B reads 500 units
+    /// in 45 s. B's 90 ms a unit stays below A's 100, so the rate is A's, where B measured from start to start (148 s) would read
+    /// 296 ms a unit. The read is counted once, in the time since the save, from the state's write.
+    #[test]
+    fn a_saves_held_read_is_not_its_next_sections_rate() {
+        let mut clock = SaveClock::default();
+        assert_eq!((clock.projected(1_000), clock.since(0)), (None, 0), "no rate before a section is measured");
+        clock.open(1_000, 0);
+        clock.close(100_000);
+        assert_eq!(clock.rate, Some(SaveRate { ms: 100_000, work: 1_000 }));
+        clock.saved(100_000);
+        clock.open(500, 203_000);
+        clock.close(248_000);
+        assert_eq!(clock.rate, Some(SaveRate { ms: 100_000, work: 1_000 }), "the save's read is not section B's");
+        assert_eq!(clock.since(248_000), 148_000, "the time since the save holds the read once");
+        assert_eq!(clock.projected(600), Some(60_000));
+        assert!(save_due(clock.since(248_000), clock.projected(600), 200_000), "148 s since the save and 60 s projected pass 200 s");
+        assert!(!save_due(clock.since(248_000), clock.projected(500), 200_000), "148 s and 50 s do not");
+        // A section left open (skipped unread) is dropped unmeasured when the next opens; a closed clock closes nothing.
+        clock.open(10, 250_000);
+        clock.open(1, 251_000);
+        clock.close(252_000);
+        assert_eq!(clock.rate, Some(SaveRate { ms: 1_000, work: 1 }), "1 s over one unit, the skipped section unmeasured");
+        clock.close(900_000);
+        assert_eq!(clock.rate, Some(SaveRate { ms: 1_000, work: 1 }));
+    }
+
+    /// [definition; theory, November 9 11:39, 11:48 and 12:18] A section's declared work. The fresh writes' is their declared
+    /// sweeps times walk-field's site reads, `Σ_k (L_k + 1)(Q_k + L_k + v_k)` with `v_k = min(NEAR, room_k − L_k)` (a sweep's
+    /// opening read of every region and its proposals), counted here by hand on three problems (a room that leaves the whole near
+    /// tail, one that leaves two voids, one that leaves none). The persistent writes' is their residue sweep's opening read and
+    /// the places it walks, each reading its region, and their sinks' sweeps where they open. The
     /// kernel's blocks are each member's residue class in order, cut alternately at `k₋` and `k₊` on an odd section, and the
     /// kernel's and law D's work are read from them; the joint release's is its reads of every region, the writer's its places.
     #[test]
@@ -7642,13 +7711,13 @@ mod tests {
         use holonics::hnn::tower::field::NEAR;
         let set: Problems = vec![(vec![1; 3], vec![2; 2], 2 + NEAR + 4), (vec![1; 5], vec![2; 4], 4 + 2), (vec![1; 1], vec![2; 7], 7)];
         let members = [0usize, 1, 2];
-        let by_hand = 2 * (3 + 2 + NEAR as u128) + 4 * (5 + 4 + 2) + 7 * (1 + 7);
+        let by_hand = 3 * (3 + 2 + NEAR as u128) + 5 * (5 + 4 + 2) + 8 * (1 + 7);
         assert_eq!(sweep_site_reads(&set, &members), by_hand, "walk-field's site reads");
         assert_eq!(sweep_site_reads(&set, &[2, 0, 1]), by_hand);
         assert_eq!(section_work(&SectionLaw::Fresh { sweeps: 24 }, &set, &members), (24 * by_hand, "site_reads"));
         let (seed, read, n, spacing) = (0x5EED_u64, 3u64, 5usize, 3usize);
         let starts: Vec<usize> = members.iter().enumerate().map(|(j, &i)| residue_start(seed, read, n, j, spacing, set[i].1.len())).collect();
-        let swept: u128 = members.iter().zip(&starts).map(|(&i, &r)| (r..set[i].1.len()).step_by(spacing).count() as u128 * region_sites(&set[i])).sum();
+        let swept: u128 = members.iter().zip(&starts).map(|(&i, &r)| (1 + (r..set[i].1.len()).step_by(spacing).count() as u128) * region_sites(&set[i])).sum();
         assert_eq!(section_work(&SectionLaw::Persistent { starts: &starts, spacing, sinks: 0 }, &set, &members), (swept, "site_reads"));
         assert_eq!(section_work(&SectionLaw::Persistent { starts: &starts, spacing, sinks: PERSISTENT_SINKS }, &set, &members).0, swept + PERSISTENT_SINKS as u128 * by_hand);
         let (blocks, owners, classes) = kernel_blocks(&set, &members, seed, read, n, 1, (2, 1), false);
