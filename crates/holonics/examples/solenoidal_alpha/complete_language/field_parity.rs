@@ -440,7 +440,8 @@ pub(super) fn parity(args: &[String], card: &mut dyn FieldRealization) -> Result
     }
     println!("FIELD_PARITY_WRITES problems={} sweeps={sweeps} host_ms={}", hosted.len(), ms(t0.elapsed().as_nanos()));
     // [measurement; theory, November 9 19:43] The plates of the written problems' openings, and the exchange walk from the host's
-    // write (h one nat on the codes' grain, at most 64 moves a problem), through both: plate for plate and move for move.
+    // write through both, plate for plate and move for move: at h zero (any gain moves, so the parity reads moves: at one nat a
+    // short write may have none) and at most 64 moves a problem.
     let void = p.codec.void();
     let owned: Vec<(Vec<usize>, Vec<bool>)> = questions.iter().map(|&(q, room)| {
         let classes: Vec<usize> = q.iter().copied().chain(std::iter::repeat_n(void, room)).collect();
@@ -452,7 +453,7 @@ pub(super) fn parity(args: &[String], card: &mut dyn FieldRealization) -> Result
     let card_plates = card.read_plates(&card_learner.field, &views).map_err(|e| e.to_string())?;
     let plates_equal = host_plates == card_plates;
     releases_unequal += usize::from(!plates_equal);
-    let h = ((1i128 << 50) + 744_261_118 - 1) / 744_261_118;
+    let h = 0i128;
     let t0 = std::time::Instant::now();
     let (host_walk, host_moves) = host_learner.field.exchange_walk(&questions, &hosted, void, h, 64, &mut HostField, &mut |_, _| true).map_err(|e| e.to_string())?;
     let host_walk_ms = ms(t0.elapsed().as_nanos());
