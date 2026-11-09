@@ -5082,7 +5082,8 @@ fn band_half_width(k: u32) -> (u128, u128) {
 /// FROM COUNT`**: the declared workload of a run's sections before it is launched. The training passage's sections as
 /// `contrast-field` forms them ([`sections_of`] at the state's seed, [`contrast_seed`]) in the keyed order its learner walks them
 /// at its lap count ([`walk`]), and for each walked section from `FROM`, `COUNT` of them, one `FIELD_WALK` line: the walk index,
-/// the section, its problems, the summed answer places `P` (the places a fresh write sweeps, at true lengths), `Σ L²` and the
+/// the section, its problems (and their indices in the encoded passage, `members`; the summary prints the passage's and the
+/// encoded set's counts, equal where no answer encoded empty), the summed answer places `P` (the places a fresh write sweeps, at true lengths), `Σ L²` and the
 /// longest answer, and `site_reads`, the sites a sweep reads at most (`Σ_k (L_k + 1)(Q_k + L_k + v_k)`, [`sweep_site_reads`]:
 /// its opening read of every answer's region, and each proposing answer reading its whole region with its near tail of voids;
 /// since theory, November 9 12:18, the opening read is counted); the save law projects a section of fresh writes as its
@@ -5108,9 +5109,10 @@ pub(super) fn walk_field(args: &[String]) -> Result<()> {
         let sq: u128 = lengths.iter().map(|l| l * l).sum();
         let site_reads = sweep_site_reads(&train_set, &sections[s]);
         (total_p, total_sq, total_reads) = (total_p + p * p, total_sq + sq, total_reads + site_reads);
-        println!("FIELD_WALK n={n} section={s} problems={} places={p} places_squared={} sum_l_squared={sq} site_reads={site_reads} longest={}", lengths.len(), p * p, lengths.iter().max().unwrap_or(&0));
+        let members: Vec<String> = sections[s].iter().map(usize::to_string).collect();
+        println!("FIELD_WALK n={n} section={s} problems={} places={p} places_squared={} sum_l_squared={sq} site_reads={site_reads} longest={} members={}", lengths.len(), p * p, lengths.iter().max().unwrap_or(&0), members.join(","));
     }
-    println!("FIELD_WALK_READ seed={seed:016x} laps={} sections={} from={from} count={count} sum_places_squared={total_p} sum_l_squared={total_sq} site_reads={total_reads}", learner.laps, sections.len());
+    println!("FIELD_WALK_READ seed={seed:016x} laps={} sections={} from={from} count={count} sum_places_squared={total_p} sum_l_squared={total_sq} site_reads={total_reads} problems={} encoded={}", learner.laps, sections.len(), train_text.len(), train_set.len());
     Ok(())
 }
 
