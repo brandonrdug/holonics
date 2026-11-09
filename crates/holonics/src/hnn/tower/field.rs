@@ -5175,28 +5175,67 @@ fn conditional_place_shares(gs: &[i128], inverse: i128, fine: &Exponential) -> R
     Ok((logs, z, p))
 }
 
-/// [definition; the unified-theory reading of November 7, 20:29, law (D)] **One letter's material change at a place**:
-/// `(1/T)(∂G/∂θ(t) − ∂G/∂θ(x_v))` entry by entry from the two material covectors `gt` and `gv`, released to `2^(−24)` of the
-/// material and by `40 − 24` places more on a family whose grain is not the material's (the deposit's chart).
-fn conditional_natural(families: &[(usize, usize, u32)], material: usize, inverse: i128, gt: &[i128], gv: &[i128]) -> Result<Vec<i128>> {
-    const OVER: &str = "a conditional covector past its 128-bit carrier";
+/// [definition; the unified-theory readings of November 7, 10:12 and 20:29] **The material change between two
+/// configurations** in the deposit's chart: `(1/T)(∂G/∂θ(x) − ∂G/∂θ(y))` entry by entry from the two material covectors `gt`
+/// and `gv`, released to `2^(−24)` of the material and by `40 − 24` places more on a family whose grain is not the material's.
+/// Law (D)'s letter at a place (`x` the truth, `y` the letter put there; [`conditional_place_covector`]) and the scaled
+/// contrast's pair (`x` the truth, `y` its write; [`contrast_pair_covectors`]); `over` names the carrier's census site.
+fn material_change(families: &[(usize, usize, u32)], material: usize, inverse: i128, gt: &[i128], gv: &[i128], over: &'static str) -> Result<Vec<i128>> {
     if gt.len() != material || gv.len() != material {
         return refuse("a material covector of another length than the field's material");
     }
     let mut d = vec![0i128; material];
     for &(start, len, grain) in families {
         for i in start..start + len {
-            let scaled = release((gt[i] - gv[i]).checked_mul(inverse).inspect(|v| crate::number::census::reach(OVER, v)).ok_or(TowerError::Refused(OVER))?, MATERIAL_BITS);
+            let scaled = release((gt[i] - gv[i]).checked_mul(inverse).inspect(|v| crate::number::census::reach(over, v)).ok_or(TowerError::Refused(over))?, MATERIAL_BITS);
             d[i] = if grain == MATERIAL_BITS { scaled } else { release(scaled, 40 - super::COVECTOR_BITS) };
         }
     }
     Ok(d)
 }
 
+/// [measurement; theory, November 9 05:31] One pair's covector of the scaled contrast ([`contrast_pair_covectors`]).
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct ContrastPair {
+    /// `(1/T)(∂G/∂θ(truth) − ∂G/∂θ(write))` on each family's grain (the deposit's chart, sign and units), the term the
+    /// section adds for this pair.
+    pub covector: Vec<i128>,
+    /// `G(truth)` and `G(write)` on `2^(−32)`, as the material read gives them.
+    pub truth_g: i128,
+    pub write_g: i128,
+}
+
+/// [measurement; theory, November 9 05:31] **The scaled contrast's covector pair by pair** (a reading where it is called
+/// alone; the section's own formation where [`FieldLearner::section_contrast_scaled`] calls it): one material read of every
+/// truth and write together through `realization` ([`FieldRealization::read_energy_material`], as the section reads them),
+/// and each pair's `(1/T)(∂G/∂θ(truth_s) − ∂G/∂θ(write_s))` released to the deposit's chart pair by pair
+/// ([`material_change`]) before any pair is added. The section's covector is these pairs' sum entry by entry, bit for bit.
+/// `T` is the field's own, held (the scaled contrast carries no temperature entry).
+pub fn contrast_pair_covectors(field: &Field, truth: &[Region], writes: &[Region], realization: &mut dyn FieldRealization) -> Result<Vec<ContrastPair>> {
+    const OVER: &str = "a scaled contrast past its 128-bit carrier";
+    if !field.declaration.energy || field.scale.is_some() {
+        return refuse("a contrast section of a field without one energy");
+    }
+    if truth.is_empty() || truth.len() != writes.len() {
+        return refuse("a contrast's pairs need one write a truth");
+    }
+    let inverse = temperature_of(-field.theta[field.layout.face_temper], &field.fine)?;
+    let both: Vec<Region> = truth.iter().chain(writes).copied().collect();
+    let reads = realization.read_energy_material(field, &both)?;
+    let n = truth.len();
+    let (families, material) = (field.families_all(), field.material_len());
+    (0..n)
+        .map(|s| {
+            let ((gt, et), (gw, ew)) = (&reads[s], &reads[n + s]);
+            Ok(ContrastPair { covector: material_change(&families, material, inverse, gt, gw, OVER)?, truth_g: *et, write_g: *ew })
+        })
+        .collect()
+}
+
 /// [definition; the unified-theory reading of November 7, 20:29, law (D)] **One place's covector**, added into `acc` (the
 /// material's length): `Σ_(v ≠ t) p(v)·2^(k + k_v)·(1/T)(∂G/∂θ(t) − ∂G/∂θ(x_v))` over the letters of nonzero share whose
 /// reverse was read (`reads[v]`, its coin's `k_v`), each letter's term released to the deposit's chart before it is added
-/// ([`conditional_natural`]), at the place's beat `2^k`. Returns the place's operand of the letters' temperature,
+/// ([`material_change`]), at the place's beat `2^k`. Returns the place's operand of the letters' temperature,
 /// `Σ_(v ≠ t) p(v)·2^k·(G(t) − G(x_v))` on `2^(−32)`, over every letter's `G`. The section adds its places' terms into one
 /// covector and one operand, so its material covector is its places' sum entry by entry and its operand theirs
 /// ([`temper_covector`] reads the entry from it).
@@ -5214,7 +5253,7 @@ fn conditional_place_covector(families: &[(usize, usize, u32)], material: usize,
         gap = gap.checked_add(term).ok_or(TowerError::Refused(OVER))?;
         if let Some((mv, kv)) = &reads[v] {
             let weighed = pv << kv;
-            for (a, &x) in acc.iter_mut().zip(&conditional_natural(families, material, inverse, mt, mv)?) {
+            for (a, &x) in acc.iter_mut().zip(&material_change(families, material, inverse, mt, mv, OVER)?) {
                 let term = release(x.checked_mul(weighed).inspect(|v| crate::number::census::reach(OVER, v)).ok_or(TowerError::Refused(OVER))?, MATERIAL_BITS);
                 *a = a.checked_add(term).ok_or(TowerError::Refused(OVER))?;
             }
@@ -5575,7 +5614,7 @@ pub struct FieldReceipt {
 /// ([`FieldLearner::section_contrast`]): its states, how many releases wrote every open place as the truth, the energy's gap
 /// `Σ_s (G(truth_s) − G(e′_s))/T` on `2^(−32)` bits (positive where the field holds its own release below the truth),
 /// whether a step was deposited, and the step's prices as [`FieldReceipt`]'s, on the codes' grain.
-#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+#[derive(Clone, Debug, Default, PartialEq, Eq)]
 pub struct ContrastReceipt {
     pub states: usize,
     pub same: usize,
@@ -5584,6 +5623,9 @@ pub struct ContrastReceipt {
     pub predicted: Option<i64>,
     pub transfer: Option<i64>,
     pub external: Option<i64>,
+    /// The section's covector as the moments take it, before they move (theory, November 9 05:31: the per-pair reading's
+    /// sum, [`contrast_pair_covectors`]).
+    pub covector: Vec<i128>,
 }
 
 /// [measurement; the unified-theory reading of November 7, 05:20] **An energy section's kernel receipt**
@@ -6504,38 +6546,25 @@ impl FieldLearner {
             return refuse("a scaled contrast section needs two pairs or more, one write a truth");
         }
         let inverse = temperature_of(-f.theta[f.layout.face_temper], &f.fine)?;
-        let both: Vec<Region> = truth.iter().chain(writes).copied().collect();
-        let reads = realization.read_energy_material(f, &both)?;
         let n = truth.len();
         let material = f.material_len();
         let families = f.families_all();
         const OVER: &str = "a scaled contrast past its 128-bit carrier";
-        let mut pairs: Vec<Vec<i128>> = Vec::with_capacity(n);
+        // Each pair's covector, formed pair by pair before any is added ([`contrast_pair_covectors`]).
+        let read = contrast_pair_covectors(f, truth, writes, realization)?;
         let mut gap = 0i128;
-        let mut same = 0usize;
-        for s in 0..n {
-            let ((gt, et), (gw, ew)) = (&reads[s], &reads[n + s]);
-            if gt.len() != material || gw.len() != material {
-                return refuse("a material covector of another length than the field's material");
-            }
-            gap += et - ew;
-            same += usize::from(truth[s].classes == writes[s].classes);
-            let mut d = vec![0i128; material];
-            for &(start, len, grain) in &families {
-                for i in start..start + len {
-                    let scaled = release((gt[i] - gw[i]).checked_mul(inverse).inspect(|v| crate::number::census::reach(OVER, v)).ok_or(TowerError::Refused(OVER))?, MATERIAL_BITS);
-                    d[i] = if grain == MATERIAL_BITS { scaled } else { release(scaled, 40 - super::COVECTOR_BITS) };
-                }
-            }
-            pairs.push(d);
+        for pair in &read {
+            gap = gap.checked_add(pair.truth_g - pair.write_g).ok_or(TowerError::Refused(OVER))?;
         }
+        let same = truth.iter().zip(writes).filter(|(t, w)| t.classes == w.classes).count();
         let gap = release(gap.checked_mul(inverse).inspect(|v| crate::number::census::reach(OVER, v)).ok_or(TowerError::Refused(OVER))?, MATERIAL_BITS);
         let mut g = vec![0i128; material];
-        for d in &pairs {
-            for (v, &x) in g.iter_mut().zip(d) {
-                *v += x;
+        for pair in &read {
+            for (v, &x) in g.iter_mut().zip(&pair.covector) {
+                *v = v.checked_add(x).ok_or(TowerError::Refused(OVER))?;
             }
         }
+        let pairs: Vec<Vec<i128>> = read.into_iter().map(|pair| pair.covector).collect();
         let raw = g.clone();
         let transfer = self.last.take().and_then(|s| predicted_change(&self.field, &raw, &s.step, s.halvings));
         self.moments_take(&mut g)?;
@@ -6589,7 +6618,7 @@ impl FieldLearner {
             self.field = candidate;
             self.last = Some(HeldStep { step, halvings: 0, formed: Vec::new() });
         }
-        Ok((ContrastReceipt { states: n, same, gap, deposited: moved, predicted, transfer, external: None }, eta))
+        Ok((ContrastReceipt { states: n, same, gap, deposited: moved, predicted, transfer, external: None, covector: raw }, eta))
     }
 
     /// [definition; the unified-theory reading of November 7, 04:05, route (b)] **An energy field's section meets its own
@@ -6644,8 +6673,9 @@ impl FieldLearner {
             let nats = release(gap.checked_mul(crate::hnn::keyed_modes::ln2_face()).inspect(|v| crate::number::census::reach(OVER, v)).ok_or(TowerError::Refused(OVER))?, LN2_FACE_BITS);
             g[f.layout.face_temper] = -(nats << (40 - ENERGY_BITS));
         }
+        let covector = g.clone();
         let Deposit { moved: deposited, predicted, transfer, external, .. } = self.deposit(g)?;
-        Ok(ContrastReceipt { states: n, same, gap, deposited, predicted, transfer, external })
+        Ok(ContrastReceipt { states: n, same, gap, deposited, predicted, transfer, external, covector })
     }
 
     /// [definition; the unified-theory reading of November 7, 05:20; agent-inferred] **A kernel block's spacing**: the least
@@ -7001,7 +7031,7 @@ impl FieldLearner {
         const OVER: &str = "a conditional covector past its 128-bit carrier";
         let families = f.families_all();
         let material = f.material_len();
-        let natural = |gt: &[i128], gv: &[i128]| conditional_natural(&families, material, inverse, gt, gv);
+        let natural = |gt: &[i128], gv: &[i128]| material_change(&families, material, inverse, gt, gv, OVER);
         if shifts.len() != blocks.len() || shifts.iter().zip(blocks).any(|(s, b)| s.len() != b.len()) {
             return refuse("a weighed conditional section needs one shift a place");
         }

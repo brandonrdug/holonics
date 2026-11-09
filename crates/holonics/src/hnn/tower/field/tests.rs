@@ -2614,6 +2614,40 @@ fn release_i(v: i128, bits: u32) -> i128 {
     div_nearest(v, 1i128 << bits)
 }
 
+/// [measurement; theory, November 9 05:31] **The scaled contrast's pairs add to its covector**: on the warm line-shaped field,
+/// three truths beside writes that moved some of their places, the pairs' covectors [`contrast_pair_covectors`] reads, summed,
+/// are the section's own covector bit for bit, and its gap is their energies' (`Σ (G(truth) − G(write))/T`); the pairs differ,
+/// and a pair whose write is its truth reads zero.
+#[test]
+fn the_scaled_contrasts_pairs_add_to_its_covector() {
+    let mut field = energetic_line();
+    field.theta[field.layout.face_temper] = 10 << MATERIAL_BITS;
+    let alphabet = field.declaration.alphabet;
+    let truths: Vec<Vec<usize>> = (0..3).map(|k| (0..40).map(|t| (t * 7 + t / 3 + k) % 5).collect()).collect();
+    let writes: Vec<Vec<usize>> = truths.iter().enumerate().map(|(k, c)| c.iter().enumerate().map(|(t, &x)| if t % (5 + k) == 2 { (x + 1 + k) % alphabet } else { x }).collect()).collect();
+    let none = vec![false; 40];
+    let truth: Vec<Region> = truths.iter().map(|c| Region { classes: c, unresolved: &none, faces: &[], locked: &[], echo: &[], domain: None, port: None }).collect();
+    let write: Vec<Region> = writes.iter().map(|c| Region { classes: c, unresolved: &none, faces: &[], locked: &[], echo: &[], domain: None, port: None }).collect();
+    let read = contrast_pair_covectors(&field, &truth, &write, &mut HostField).unwrap();
+    let mut learner = FieldLearner::new(field.clone(), 14);
+    learner.open_family_rates();
+    let mut etas = std::collections::VecDeque::new();
+    let (receipt, _) = learner.section_contrast_scaled(&truth, &write, &mut etas, &mut HostField).unwrap();
+    let mut sum = vec![0i128; field.material_len()];
+    for pair in &read {
+        for (s, &x) in sum.iter_mut().zip(&pair.covector) {
+            *s += x;
+        }
+    }
+    assert_eq!(sum, receipt.covector, "the pairs' covectors add to the section's");
+    assert!(sum.iter().any(|&x| x != 0) && read[0].covector != read[1].covector, "nonzero pairs that differ");
+    let inverse = temperature_of(-field.theta[field.layout.face_temper], &field.fine).unwrap();
+    let gap: i128 = read.iter().map(|p| p.truth_g - p.write_g).sum();
+    assert_eq!(release(gap * inverse, MATERIAL_BITS), receipt.gap, "the section's gap is the pairs' energies'");
+    let same = contrast_pair_covectors(&field, &truth[..1], &truth[..1], &mut HostField).unwrap();
+    assert!(same[0].covector.iter().all(|&x| x == 0) && same[0].truth_g == same[0].write_g, "a write that is its truth reads zero");
+}
+
 /// [definition; agent-inferred, November 7, Brandon's lens of 04:42] **An energy field releases an answer as one field**: on
 /// the line-shaped field, two answers of given lengths beside their questions are relaxed jointly (every open place's mixture
 /// moved toward its face each read) until no share moves by more than a grain or the reads run out; each comes back at its

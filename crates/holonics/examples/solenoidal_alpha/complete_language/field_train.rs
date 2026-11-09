@@ -2842,6 +2842,36 @@ pub(super) fn length_field(args: &[String], realization: &mut dyn FieldRealizati
     Ok(())
 }
 
+/// [definition; theory, November 7 22:08 and November 8 14:22] **A contrast read's seed**: `FIELD_CONTRAST_SEED=HEX` where it
+/// is declared (so laws read from different states pair section by section), else the state's carried key, else the hash of
+/// the state it opened from (`state_sha`).
+fn contrast_seed(learner: &FieldLearner, state_sha: &str) -> Result<u64> {
+    Ok(match (std::env::var("FIELD_CONTRAST_SEED"), learner.key) {
+        (Ok(v), _) => u64::from_str_radix(&v, 16).map_err(|_| "FIELD_CONTRAST_SEED is hexadecimal")?,
+        (Err(_), Some(k)) => k,
+        (Err(_), None) => u64::from_str_radix(state_sha.get(..16).ok_or("a state's hash of fewer than sixteen hex digits")?, 16).map_err(|_| "a state's hash that is not hexadecimal")?,
+    })
+}
+
+/// The persistent and fresh writes' key at the lap count `read` and the section `n` (its releases, sweeps and sinks).
+fn persistent_key(seed: u64, read: u64, n: usize) -> u64 {
+    mix(seed ^ 0x9E85_15 << 40, read << 32 | n as u64)
+}
+
+/// [definition; theory, November 8 14:46 and 22:04] **The fresh writes' sweeps**: `sweeps` whole sweeps of the energy's own
+/// kernel over `active` at the field's own `T` ([`holonics::hnn::tower::field::Field::energy_sweep_at`], cool 0), sweep `s`
+/// (from zero) keyed `mix(key, 100 + s)`. `each` hears each sweep's number (from one), the places moved and proposed, each
+/// write's energy a place, the writes and the sweep's milliseconds.
+#[allow(clippy::too_many_arguments)]
+fn fresh_sweeps_at(field: &Field, problems: &[(&[usize], usize)], active: &mut [Vec<usize>], sweeps: u64, key: u64, void: usize, realization: &mut dyn FieldRealization, each: &mut dyn FnMut(u64, usize, usize, &[i128], &[Vec<usize>], u128)) -> Result<()> {
+    for sweep in 0..sweeps {
+        let t0 = std::time::Instant::now();
+        let (mv, pr, en) = field.energy_sweep_at(problems, active, None, void, 0, mix(key, 100 + sweep), realization, &mut |_, _| {}).map_err(|e| e.to_string())?;
+        each(sweep + 1, mv, pr, &en, active, t0.elapsed().as_millis());
+    }
+    Ok(())
+}
+
 /// [definition; the unified-theory readings of November 7, 04:05 and 05:20, route (b)] **`contrast-field STATE STATE_SHA CODEC
 /// CODEC_SHA UNITS UNITS_SHA TRAIN TRAIN_SHA HELD HELD_SHA SECTION LAPS PLACES LAP_MS STOP_MS OUT`**: an energy field trained by
 /// meeting its own invariant kernel (a step that leaves `P ∝ 2^(−G/T)` invariant). Each training problem is a state: its question, its answer (cut to the room) and its near
@@ -3041,11 +3071,7 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
     // different states pair section by section; laps keep the state-keyed walk.
     // [definition; theory, November 8 14:22] An undeclared seed is the state's carried key, or, for a state without one, its
     // opening state's hash; the learner carries it so every save keeps it and a resume re-keys nothing.
-    let seed = match (std::env::var("FIELD_CONTRAST_SEED"), learner.key) {
-        (Ok(v), _) => u64::from_str_radix(&v, 16).map_err(|_| "FIELD_CONTRAST_SEED is hexadecimal")?,
-        (Err(_), Some(k)) => k,
-        (Err(_), None) => u64::from_str_radix(args[2].get(..16).ok_or("a state's hash of fewer than sixteen hex digits")?, 16).map_err(|_| "a state's hash that is not hexadecimal")?,
-    };
+    let seed = contrast_seed(&learner, &args[2])?;
     learner.key = Some(seed);
     let law = WriterLaw::from_env()?;
     let train_set = encoded_problems(&codec, &train_text, &learner.field)?;
@@ -3278,7 +3304,7 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
                 // `(G(write) − G(truth))/T`, which rests at the answers' likelihood given their questions.
                 let problems: Vec<(&[usize], usize)> = members.iter().map(|&i| (train_set[i].0.as_slice(), train_set[i].2)).collect();
                 let lengths: Vec<usize> = members.iter().map(|&i| train_set[i].1.len()).collect();
-                let key = mix(seed ^ 0x9E85_15 << 40, read << 32 | n as u64);
+                let key = persistent_key(seed, read, n);
                 // [the unified-theory reading of November 7, 09:55] Each write is released once at the longest answer's length and
                 // carried whole: a question takes its first `L` places, and the rest wait unread and unmoved for a longer question.
                 // The melt (`FIELD_MELT`): each sweep prints the share of answer places at their truth letter, each answer's energy a
@@ -3387,16 +3413,14 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
                 // [the unified-theory reading of November 7, 10:12] The writes sunk before the first deposit: eight whole sweeps at
                 // `T` over each write's first `L` places.
                 if let Some(k) = fresh_sweeps {
-                    for sweep in 0..k {
-                        let t0 = std::time::Instant::now();
-                        let (mv, pr, en) = learner.field.energy_sweep_at(&problems[..m], &mut active, None, void, 0, mix(key, 100 + sweep), realization, &mut |_, _| {}).map_err(|e| e.to_string())?;
-                        println!("FIELD_FRESH_SWEEP lap={lap} n={n} sweep={} moved={mv} proposed={pr} accept_milli={} write_energy_milli={} ms={}", sweep + 1, mv * 1000 / pr.max(1), (en.iter().sum::<i128>() / m.max(1) as i128) * 1000 >> 32, t0.elapsed().as_millis());
+                    fresh_sweeps_at(&learner.field, &problems[..m], &mut active, k, key, void, realization, &mut |sweep, mv, pr, en, active, ms| {
+                        println!("FIELD_FRESH_SWEEP lap={lap} n={n} sweep={sweep} moved={mv} proposed={pr} accept_milli={} write_energy_milli={} ms={ms}", mv * 1000 / pr.max(1), (en.iter().sum::<i128>() / m.max(1) as i128) * 1000 >> 32);
                         if fresh_from_truth {
                             let places: usize = active.iter().map(|a| a.len()).sum::<usize>().max(1);
                             let agree: usize = active.iter().zip(members).map(|(a, &i)| a.iter().zip(&train_set[i].1).filter(|(x, y)| x == y).count()).sum();
-                            println!("FIELD_FRESH_RETAIN lap={lap} n={n} sweep={} retention_milli={}", sweep + 1, agree * 1000 / places);
+                            println!("FIELD_FRESH_RETAIN lap={lap} n={n} sweep={sweep} retention_milli={}", agree * 1000 / places);
                         }
-                    }
+                    })?;
                     // [measurement; theory, November 8 14:59] Each section's writes decoded beside their truths (private).
                     use std::io::Write;
                     let mut f = std::fs::OpenOptions::new().create(true).append(true).open(out.join("FRESH_WRITES.txt"))?;
@@ -4840,6 +4864,224 @@ pub(super) fn covector_field(args: &[String], realization: &mut dyn FieldRealiza
     Ok(())
 }
 
+/// [measurement; theory, November 9 05:31] The `z` at the larger SE: both halves share one `S`, so the larger SE is the `z` of
+/// smaller magnitude (`none` where either is unread).
+fn z_at_larger_se(a: &str, b: &str) -> String {
+    // An unbounded `z` (its SE zero) stands above every bounded one.
+    let size = |z: &str| -> Option<(bool, num_bigint::BigUint)> {
+        match z {
+            "inf" | "-inf" => Some((true, num_bigint::BigUint::default())),
+            v => v.parse::<num_bigint::BigInt>().ok().map(|x| (false, x.magnitude().clone())),
+        }
+    };
+    match (size(a), size(b)) {
+        (Some(x), Some(y)) => if x <= y { a } else { b }.to_string(),
+        _ => "none".to_string(),
+    }
+}
+
+/// [agent-inferred, November 9] The fresh writes' problems a batch: the fork's section (fork3b's sixteen), so its measured
+/// sweep rates project a batch.
+const CONTRAST_BATCH: usize = 16;
+
+/// [measurement; theory, November 9 05:31] **`contrast-covector-field STATE STATE_SHA CODEC CODEC_SHA UNITS UNITS_SHA PROBLEMS
+/// PROBLEMS_SHA COUNT SWEEPS OUT`**: whether the fresh-writes contrast law (fork3b's: `FIELD_CONTRAST_FRESH=SWEEPS`,
+/// `FIELD_FRESH_FROM_TRUTH`) stands where its covector is stationary in each family, at the state's live `θ` (the law deposits
+/// at `θ`, so this is its own point; the averaged constitution is not read).
+///
+/// [agent-inferred, November 9] **The problems**: of the `N` problems the codec encodes from `PROBLEMS` (in the file's
+/// order), the `COUNT` at `⌊(2c + 1)N / (2·COUNT)⌋` for `c = 0..COUNT`, the middles of `COUNT` equal parts of the file:
+/// deterministic, spread across it, each whole (its answer cut to the room, as the trainer reads it). Their indices are
+/// printed, never their letters.
+///
+/// **The writes** are the trainer's fresh writes from the truth: each answer's write starts at its truth at its true length
+/// and is swept whole `SWEEPS` times at the field's `T` ([`fresh_sweeps_at`], keyed as the trainer keys a section's,
+/// [`persistent_key`] with the seed [`contrast_seed`] and the lap count the state carries). [agent-inferred] The problems are
+/// swept [`CONTRAST_BATCH`] at a time, in order of answer length, batch `b` keyed as section `b` would be: a write's chain is
+/// its own (its coins keyed by its place in the batch), so a batch shares only its walk, set by its longest answer.
+///
+/// **Each problem's covector** `g(p) = (1/T)(∂G/∂θ(truth_p) − ∂G/∂θ(write_p))` is the term
+/// [`FieldLearner::section_contrast_scaled`] adds for that pair ([`holonics::hnn::tower::field::contrast_pair_covectors`], the
+/// deposit's chart, sign and units; `T` held, as the law holds it).
+///
+/// **The test** (as `covector-field`'s, with a problem the unit): the problems at even positions of the chosen order are half
+/// A and at odd positions half B; per family `f`, for each problem `p` in B, `b_p = ⟨g_f(p), mean_A g_f⟩`, `S_ab = Σ_B b_p /
+/// m_B`, `SE_ab = SD_B(b_p)/√m_B` ([`stationarity`]), `z_ab = S/SE`; then A and B swapped. `S_ab` and `S_ba` are one
+/// estimate, so the bar is `z > 2` at the larger SE (`z_bar_milli`). `S`, `SE` and `mean_sq` are in `f`'s covector unit squared;
+/// the carrier is `covector-field`'s ([`ProductSum`], unbounded statistics), so `z` is the same bits at any grain of `f`. The
+/// `family=all` line adds the families in their grain units: a null test that leans on the finest grains.
+///
+/// Prints `FIELD_CONTRAST_COVECTOR_CHOICE` (the rule and the indices), `FIELD_CONTRAST_COVECTOR_FIELD` (which field it read),
+/// a `FIELD_CONTRAST_COVECTOR_HALF` line a half, a `FIELD_CONTRAST_COVECTOR_SWEEP` line a batch's sweep and a
+/// `FIELD_CONTRAST_COVECTOR_BATCH` line a batch (its answers' places and longest, its sweep and covector milliseconds, its
+/// writes' share at their truth letters), a `FIELD_CONTRAST_COVECTOR` line a family and one for `all`, and
+/// `FIELD_CONTRAST_COVECTOR_READ`. Writes `CONTRAST_COVECTOR.tsv`: a row a problem and family, its index, position, half, batch
+/// and answer length, `dot = ⟨g_f(p), Σ_other g_f⟩` (so `b_p = dot / other_problems`) and `square = ‖g_f(p)‖²`; no letter.
+/// A reading only: nothing is deposited, no state is written and no write is kept.
+pub(super) fn contrast_covector_field(args: &[String], realization: &mut dyn FieldRealization) -> Result<()> {
+    use holonics::hnn::tower::field::contrast_pair_covectors;
+    use num_bigint::BigInt;
+    if args.len() != 12 {
+        return Err("contrast-covector-field STATE STATE_SHA CODEC CODEC_SHA UNITS UNITS_SHA PROBLEMS PROBLEMS_SHA COUNT SWEEPS OUT".into());
+    }
+    let started = std::time::Instant::now();
+    let mut learner = FieldLearner::from_text(std::str::from_utf8(&pinned_read(&args[1], &args[2], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
+    declared_clocks(&mut learner.field);
+    if !learner.field.declaration.energy || learner.field.scale.is_some() {
+        return Err("contrast-covector-field reads a field whose faces are one energy's forces".into());
+    }
+    let units = units_of(&args[5], &args[6])?;
+    let codec = FieldCodec::from_text(std::str::from_utf8(&pinned_read(&args[3], &args[4], CODEC_BUDGET)?)?, units)?;
+    let text = problems_of(&pinned_read(&args[7], &args[8], READ_BUDGET as usize)?);
+    let (wanted, sweeps) = (positive(&args[9])?, positive(&args[10])? as u64);
+    let out = Path::new(&args[11]);
+    let seed = contrast_seed(&learner, &args[2])?;
+    let field = &learner.field;
+    let set = encoded_problems(&codec, &text, field)?;
+    if wanted < 2 || wanted > set.len() {
+        return Err(format!("contrast-covector-field: COUNT {wanted} of {} problems (two or more, at most all)", set.len()).into());
+    }
+    std::fs::create_dir(out)?;
+    let chosen: Vec<usize> = (0..wanted).map(|c| (2 * c + 1) * set.len() / (2 * wanted)).collect();
+    println!(
+        "FIELD_CONTRAST_COVECTOR_CHOICE problems={} count={wanted} rule=middles_of_equal_parts indices={}",
+        set.len(),
+        chosen.iter().map(usize::to_string).collect::<Vec<_>>().join(",")
+    );
+    let read = learner.laps;
+    println!(
+        "FIELD_CONTRAST_COVECTOR_FIELD field=live entries={} log2_t={} laps={read} seed={seed:016x} sweeps={sweeps} average_carried={} temper=held",
+        field.material_len(),
+        field.theta[field.layout().face_temper],
+        u8::from(learner.average.is_some())
+    );
+    let in_b: Vec<bool> = (0..wanted).map(|c| c % 2 == 1).collect();
+    let problems_b = in_b.iter().filter(|&&b| b).count();
+    let problems_a = wanted - problems_b;
+    println!("FIELD_CONTRAST_COVECTOR_HALF half=A problems={problems_a} positions=even");
+    println!("FIELD_CONTRAST_COVECTOR_HALF half=B problems={problems_b} positions=odd");
+    // The batches: the chosen positions in order of answer length (then position), sixteen at a time.
+    let mut by_length: Vec<usize> = (0..wanted).collect();
+    by_length.sort_by_key(|&c| (set[chosen[c]].1.len(), c));
+    let batches: Vec<&[usize]> = by_length.chunks(CONTRAST_BATCH).collect();
+    let void = codec.void();
+    let mut covectors: Vec<Option<Vec<i128>>> = vec![None; wanted];
+    let mut batch_of = vec![0usize; wanted];
+    let (mut sweep_ms, mut covector_ms) = (0u128, 0u128);
+    for (b, members) in batches.iter().enumerate() {
+        let problems: Vec<(&[usize], usize)> = members.iter().map(|&c| (set[chosen[c]].0.as_slice(), set[chosen[c]].2)).collect();
+        let mut active: Vec<Vec<usize>> = members.iter().map(|&c| set[chosen[c]].1.clone()).collect();
+        let places: usize = active.iter().map(Vec::len).sum();
+        let longest = active.iter().map(Vec::len).max().unwrap_or(0);
+        let key = persistent_key(seed, read, b);
+        let at = std::time::Instant::now();
+        fresh_sweeps_at(field, &problems, &mut active, sweeps, key, void, realization, &mut |sweep, mv, pr, en, _, ms| {
+            println!(
+                "FIELD_CONTRAST_COVECTOR_SWEEP batch={}/{} sweep={sweep} moved={mv} proposed={pr} write_energy_milli={} ms={ms} elapsed_ms={}",
+                b + 1,
+                batches.len(),
+                (en.iter().sum::<i128>() / members.len().max(1) as i128) * 1000 >> 32,
+                started.elapsed().as_millis()
+            );
+        })?;
+        let swept = at.elapsed().as_millis();
+        let agree: usize = active.iter().zip(members.iter()).map(|(w, &c)| w.iter().zip(&set[chosen[c]].1).filter(|(x, y)| x == y).count()).sum();
+        let truths: Vec<Vec<usize>> = members.iter().map(|&c| truth_with_voids(void, &set[chosen[c]], &set[chosen[c]].1)).collect();
+        let writes: Vec<Vec<usize>> = members.iter().zip(&active).map(|(&c, w)| truth_with_voids(void, &set[chosen[c]], w)).collect();
+        let resolved: Vec<Vec<bool>> = truths.iter().map(|t| vec![false; t.len()]).collect();
+        let truth_views: Vec<Region> = truths.iter().zip(&resolved).map(|(c, u)| Region { classes: c, unresolved: u, faces: &[], locked: &[], echo: &[], domain: None, port: None }).collect();
+        let write_views: Vec<Region> = writes.iter().zip(&resolved).map(|(c, u)| Region { classes: c, unresolved: u, faces: &[], locked: &[], echo: &[], domain: None, port: None }).collect();
+        let at = std::time::Instant::now();
+        let pairs = contrast_pair_covectors(field, &truth_views, &write_views, realization).map_err(|e| e.to_string())?;
+        let formed = at.elapsed().as_millis();
+        for (&c, pair) in members.iter().zip(pairs) {
+            covectors[c] = Some(pair.covector);
+            batch_of[c] = b;
+        }
+        (sweep_ms, covector_ms) = (sweep_ms + swept, covector_ms + formed);
+        println!(
+            "FIELD_CONTRAST_COVECTOR_BATCH batch={}/{} problems={} places={places} longest={longest} sweep_ms={swept} covector_ms={formed} retention_milli={} ms={}",
+            b + 1,
+            batches.len(),
+            members.len(),
+            agree * 1000 / places.max(1),
+            started.elapsed().as_millis()
+        );
+    }
+    let covectors: Vec<Vec<i128>> = covectors.into_iter().map(|g| g.ok_or("contrast-covector-field: a problem with no covector")).collect::<std::result::Result<_, _>>()?;
+    let material = field.material_len();
+    let (mut sum_a, mut sum_b) = (vec![0i128; material], vec![0i128; material]);
+    for (g, &b) in covectors.iter().zip(&in_b) {
+        let sum = if b { &mut sum_b } else { &mut sum_a };
+        for (s, &x) in sum.iter_mut().zip(g) {
+            *s = s.checked_add(x).ok_or("contrast-covector-field: a half's sum past its 128-bit carrier")?;
+        }
+    }
+    let families = field.families_all();
+    let names = family_names(field);
+    let name_of = |k: usize| names.get(k).map_or_else(|| format!("family{k}"), |(name, _)| name.to_string());
+    // Each problem's and family's `⟨g_f(p), Σ_other g_f⟩` and `‖g_f(p)‖²`.
+    let mut dots: Vec<Vec<(BigInt, BigInt)>> = Vec::with_capacity(wanted);
+    for (g, &b) in covectors.iter().zip(&in_b) {
+        let other = if b { &sum_a } else { &sum_b };
+        let mut per_family = Vec::with_capacity(families.len());
+        for &(start, n, _) in &families {
+            let (mut dot, mut square) = (ProductSum::default(), ProductSum::default());
+            for j in start..start + n {
+                dot.add_product(g[j], other[j])?;
+                square.add_product(g[j], g[j])?;
+            }
+            per_family.push((dot.big(), square.big()));
+        }
+        dots.push(per_family);
+    }
+    let mut rows = rows_file(&out.join("CONTRAST_COVECTOR.tsv"), "problem\tposition\thalf\tbatch\tanswer_length\tfamily\tdot\tother_problems\tsquare\n")?;
+    for c in 0..wanted {
+        let (half, other) = if in_b[c] { ("b", problems_a) } else { ("a", problems_b) };
+        for (f, &(_, n, _)) in families.iter().enumerate() {
+            if n > 0 {
+                row(&mut rows, &format!("{}\t{c}\t{half}\t{}\t{}\t{}\t{}\t{other}\t{}\n", chosen[c], batch_of[c], set[chosen[c]].1.len(), name_of(f), dots[c][f].0, dots[c][f].1))?;
+            }
+        }
+    }
+    // One half's problems' dots of `pick`, and its mean square.
+    let half_read = |b: bool, pick: &dyn Fn(usize) -> (BigInt, BigInt)| -> (Vec<BigInt>, BigInt) {
+        let mut sums = Vec::new();
+        let mut square = BigInt::from(0);
+        for c in (0..wanted).filter(|&c| in_b[c] == b) {
+            let (d, s) = pick(c);
+            sums.push(d);
+            square += s;
+        }
+        let m = BigInt::from(sums.len().max(1));
+        (sums, (square * 2u32 + &m) / (&m * 2u32))
+    };
+    let line = |family: &str, entries: usize, grain: &str, pick: &dyn Fn(usize) -> (BigInt, BigInt)| {
+        let (sums_b, mean_sq_b) = half_read(true, pick);
+        let (sums_a, mean_sq_a) = half_read(false, pick);
+        let (s_ab, se_ab, z_ab) = stationarity(&sums_b, problems_b, problems_a);
+        let (s_ba, se_ba, z_ba) = stationarity(&sums_a, problems_a, problems_b);
+        let z_bar = z_at_larger_se(&z_ab, &z_ba);
+        println!(
+            "FIELD_CONTRAST_COVECTOR family={family} entries={entries} grain={grain} problems_b={problems_b} s_ab={s_ab} se_ab={se_ab} z_ab_milli={z_ab} problems_a={problems_a} s_ba={s_ba} se_ba={se_ba} z_ba_milli={z_ba} z_bar_milli={z_bar} mean_sq_a={mean_sq_a} mean_sq_b={mean_sq_b}"
+        );
+    };
+    for (f, &(_, n, grain)) in families.iter().enumerate() {
+        if n > 0 {
+            line(&name_of(f), n, &grain.to_string(), &|c| dots[c][f].clone());
+        }
+    }
+    line("all", material, "-", &|c| dots[c].iter().fold((BigInt::from(0), BigInt::from(0)), |(d, s), (x, y)| (d + x, s + y)));
+    println!(
+        "FIELD_CONTRAST_COVECTOR_READ problems={wanted} batches={} sweeps={sweeps} families={} entries={material} sweep_ms={sweep_ms} covector_ms={covector_ms} host_threads={} ms={}",
+        batches.len(),
+        families.iter().filter(|f| f.1 > 0).count(),
+        rayon::current_num_threads(),
+        started.elapsed().as_millis()
+    );
+    Ok(())
+}
+
 /// The nearest-rank quartiles `(q25, median, q75)` of `values` (each the `⌈p n⌉`-th smallest), none for no values.
 fn rank_quartiles<T: Ord + Copy>(mut values: Vec<T>) -> Option<(T, T, T)> {
     if values.is_empty() {
@@ -5885,6 +6127,105 @@ mod tests {
         let enumerated = String::from_utf8(std::fs::read(dir.join("L/ENUMERATED.tsv")).expect("rows")).unwrap();
         assert_eq!(enumerated.lines().count(), 1 + 11 * 6, "the held read's rows, a point's six places each");
         let _ = std::fs::remove_dir_all(&dir);
+    }
+
+    /// [measurement; theory, November 9 05:31] `contrast-covector-field` end to end on the host: three of the toy's four
+    /// problems chosen at the middles of three equal parts (indices 0, 2, 3), their writes started at the truths and swept
+    /// twice at the live `θ`'s `T` in one batch ordered by answer length, keyed as the trainer keys section 0; each row of
+    /// `CONTRAST_COVECTOR.tsv` is `⟨g_f(p), Σ_other g_f⟩` and `‖g_f(p)‖²` over the scaled contrast's pair covectors of those
+    /// writes, formed here in unbounded integers; more problems than the file holds are refused; the state is read, never
+    /// written.
+    #[test]
+    fn the_contrast_covector_reading_reads_the_fresh_writes_pairs() {
+        use holonics::hnn::tower::field::contrast_pair_covectors;
+        use num_bigint::BigInt;
+        let dir = std::env::temp_dir().join(format!("holonics-contrast-covector-{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&dir);
+        std::fs::create_dir_all(&dir).expect("dir");
+        let at = |name: &str| dir.join(name).to_string_lossy().into_owned();
+        let put = |name: &str, bytes: &[u8]| {
+            std::fs::write(dir.join(name), bytes).expect("write");
+            (at(name), sha256(bytes).expect("sha"))
+        };
+        let (codec, problems) = toy();
+        let reach = problems.iter().map(|(q, _, _)| q.len() + codec.answer).max().unwrap();
+        let d = FieldDeclaration { alphabet: codec.alphabet(), width: 8, heads: 2, modes: 3, still: 1, contacts: 4, ticks: 2, frames: 2, reach, lanes: 1, depth: 0, energy: true };
+        let keys: Vec<u8> = (0..1u64 << 13).flat_map(|i| mix(0x5EED, i).to_be_bytes()).collect();
+        let mut field = Field::found(d, &keys).unwrap();
+        let families = field.layout().families.clone();
+        for (n, v) in field.theta.iter_mut().enumerate() {
+            let k = mix(0x11E5, n as u64) as u32 as i32 as i64;
+            let grain = families.iter().find(|(s, l, _)| (*s..*s + *l).contains(&n)).unwrap().2;
+            *v = ((k << grain) >> 32) as i32;
+        }
+        let l = field.layout().clone();
+        field.theta[l.pace..l.pace + d.paced_heads() * (d.alphabet + 1)].fill(0);
+        let learner = FieldLearner::new(field, 14);
+        let text = learner.to_text();
+        let (state, state_sha) = put("STATE", text.as_bytes());
+        let (codec_at, codec_sha) = put("CODEC", codec.to_text().as_bytes());
+        let (units, units_sha) = put("UNITS", b"founded-units-v1 0\n");
+        let (file, file_sha) = put("PROBLEMS", TOY);
+        let args = |count: &str, out: &str| -> Vec<String> { ["contrast-covector-field", &state, &state_sha, &codec_at, &codec_sha, &units, &units_sha, &file, &file_sha, count, "2", &at(out)].iter().map(|s| s.to_string()).collect() };
+        assert!(contrast_covector_field(&args("5", "N"), &mut host()).is_err(), "more problems than the file holds");
+        contrast_covector_field(&args("3", "C"), &mut host()).expect("contrast covector");
+        assert_eq!(std::fs::read(dir.join("STATE")).expect("state"), text.as_bytes(), "the state is read, never written");
+        // The reading's problems, batch, writes and pairs, formed here.
+        let set = encoded_problems(&codec, &problems_of(TOY), &learner.field).unwrap();
+        let chosen = [0usize, 2, 3];
+        let mut order: Vec<usize> = (0..3).collect();
+        order.sort_by_key(|&c| (set[chosen[c]].1.len(), c));
+        let void = codec.void();
+        let asked: Vec<(&[usize], usize)> = order.iter().map(|&c| (set[chosen[c]].0.as_slice(), set[chosen[c]].2)).collect();
+        let mut active: Vec<Vec<usize>> = order.iter().map(|&c| set[chosen[c]].1.clone()).collect();
+        let key = persistent_key(contrast_seed(&learner, &state_sha).unwrap(), learner.laps, 0);
+        fresh_sweeps_at(&learner.field, &asked, &mut active, 2, key, void, &mut host(), &mut |_, _, _, _, _, _| {}).unwrap();
+        assert!(order.iter().zip(&active).any(|(&c, w)| w != &set[chosen[c]].1), "the sweeps move some write off its truth");
+        let truths: Vec<Vec<usize>> = order.iter().map(|&c| truth_with_voids(void, &set[chosen[c]], &set[chosen[c]].1)).collect();
+        let writes: Vec<Vec<usize>> = order.iter().zip(&active).map(|(&c, w)| truth_with_voids(void, &set[chosen[c]], w)).collect();
+        let resolved: Vec<Vec<bool>> = truths.iter().map(|t| vec![false; t.len()]).collect();
+        let truth_views: Vec<Region> = truths.iter().zip(&resolved).map(|(c, u)| Region { classes: c, unresolved: u, faces: &[], locked: &[], echo: &[], domain: None, port: None }).collect();
+        let write_views: Vec<Region> = writes.iter().zip(&resolved).map(|(c, u)| Region { classes: c, unresolved: u, faces: &[], locked: &[], echo: &[], domain: None, port: None }).collect();
+        let pairs = contrast_pair_covectors(&learner.field, &truth_views, &write_views, &mut host()).unwrap();
+        let mut covectors: Vec<Vec<i128>> = vec![Vec::new(); 3];
+        for (&c, pair) in order.iter().zip(pairs) {
+            covectors[c] = pair.covector;
+        }
+        let in_b = [false, true, false];
+        let material = learner.field.material_len();
+        let half_sum = |b: bool| -> Vec<BigInt> { (0..material).map(|j| (0..3).filter(|&c| in_b[c] == b).map(|c| BigInt::from(covectors[c][j])).sum()).collect() };
+        let (sum_a, sum_b) = (half_sum(false), half_sum(true));
+        let all_families = learner.field.families_all();
+        let names = family_names(&learner.field);
+        let rows = String::from_utf8(std::fs::read(dir.join("C/CONTRAST_COVECTOR.tsv")).expect("rows")).unwrap();
+        let mut rows = rows.lines().skip(1);
+        let mut nonzero = 0;
+        for c in 0..3 {
+            let (half, other, others) = if in_b[c] { ("b", &sum_a, 2) } else { ("a", &sum_b, 1) };
+            for (f, &(start, n, _)) in all_families.iter().enumerate() {
+                if n == 0 {
+                    continue;
+                }
+                let dot: BigInt = (start..start + n).map(|j| BigInt::from(covectors[c][j]) * &other[j]).sum();
+                let square: BigInt = (start..start + n).map(|j| BigInt::from(covectors[c][j]) * BigInt::from(covectors[c][j])).sum();
+                nonzero += usize::from(dot != BigInt::from(0));
+                let length = set[chosen[c]].1.len();
+                assert_eq!(rows.next(), Some(format!("{}\t{c}\t{half}\t0\t{length}\t{}\t{dot}\t{others}\t{square}", chosen[c], names[f].0).as_str()), "problem {c}, family {f}");
+            }
+        }
+        assert_eq!(rows.next(), None, "a row a problem and family");
+        assert!(nonzero > 0, "some family's covector meets the other half's");
+        let _ = std::fs::remove_dir_all(&dir);
+    }
+
+    /// [measurement; theory, November 9 05:31] The `z` at the larger SE is the one of smaller magnitude; an unbounded one stands
+    /// above every bounded one, and an unread one leaves none.
+    #[test]
+    fn the_bar_reads_the_z_at_the_larger_se() {
+        assert_eq!(z_at_larger_se("2913", "4663"), "2913");
+        assert_eq!(z_at_larger_se("-4663", "-2913"), "-2913");
+        assert_eq!(z_at_larger_se("inf", "1200"), "1200");
+        assert_eq!(z_at_larger_se("none", "1200"), "none");
     }
 
     /// [agent-inferred, November 9] The two-limb sum of products is the unbounded integers' sum, the extremes of 128 bits
