@@ -742,69 +742,6 @@ fn the_lines_energy_material_on_the_card_is_the_hosts_at_1500_sites() {
     assert!(diff.is_none(), "{}", diff.unwrap_or_default());
 }
 
-/// [measurement; agent-inferred, November 7] **One writer release of the line's energy field on the card** (the lap's
-/// projection: theory wants one release per training state): a founding of the line's declaration, a synthetic question of
-/// 400 known places and the line's answer room of 2,062 places (reach 3,771), released by `Field::sample_runs` through the card
-/// realization as `length-field` does (run bits 0, the near tail, keyed order, sweeps 2,062, refine 10). Prints a line a
-/// thousand reads (elapsed ms, the read's region) and the release's reads, card time and wall time. `FIELD_RELEASE_SWEEPS` and
-/// `FIELD_RELEASE_REFINE` replace the sweeps and the refine (a development read), `FIELD_RELEASE_STOP` stops after that many
-/// sweeps, `FIELD_RELEASE_PROBLEMS` releases that many questions together (each read a batch of their regions).
-#[test]
-#[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
-fn a_writer_release_of_the_lines_energy_field_on_the_card() {
-    let d = line_declaration();
-    let field = Field::found(d, &keys(d.founding_draws())).unwrap();
-    let void = d.alphabet - 1;
-    let room = 2062usize;
-    let env = |name: &str, default: usize| std::env::var(name).ok().and_then(|v| v.parse().ok()).unwrap_or(default);
-    let (sweeps, refine, stop, count) = (env("FIELD_RELEASE_SWEEPS", 2062), env("FIELD_RELEASE_REFINE", 10), env("FIELD_RELEASE_STOP", usize::MAX), env("FIELD_RELEASE_PROBLEMS", 1));
-    let questions: Vec<Vec<usize>> = (0..count as u64)
-        .map(|k| {
-            let mut next = mixer(0x7E1E + k);
-            (0..400).map(|_| (next() % void as u64) as usize).collect()
-        })
-        .collect();
-    let question = &questions[0];
-    let opened = Card::open(0).unwrap();
-    let mut card = CardField::open(&opened).unwrap();
-    let problems: Vec<(&[usize], usize)> = questions.iter().map(|q| (q.as_slice(), room)).collect();
-    let started = Instant::now();
-    let mut reads = 0usize;
-    let answers = field
-        .sample_runs(
-            &problems,
-            sweeps,
-            refine,
-            void,
-            0x5EED_7E1E,
-            0,
-            true,
-            false,
-            None,
-            false,
-            false,
-            false,
-            None,
-            holonics::hnn::tower::field::RefineOrder::Keyed,
-            &mut card,
-            &mut |done, _| done < stop,
-            &mut |r| {
-                if r.faces.is_some() {
-                    reads += 1;
-                    if reads % 1000 == 0 {
-                        let end = (question.len()..r.classes[0].len()).find(|&t| !r.open[0][t] && r.classes[0][t] == void).map_or(r.classes[0].len(), |e| (e + 6).min(r.classes[0].len()));
-                        println!("ENERGY_RELEASE reads={reads} pass={} region_sites={end} elapsed_ms={}", r.pass, started.elapsed().as_millis());
-                    }
-                }
-            },
-        )
-        .unwrap();
-    let wall = started.elapsed().as_millis();
-    let t = card.times();
-    let length = answers[0].iter().position(|&c| c == void).unwrap_or(answers[0].len());
-    println!("ENERGY_RELEASE done problems={count} sweeps={sweeps} refine={refine} stop={stop} reads={reads} card_reads={} card_read_ms={} wall_ms={wall} ms_a_read={} answer_length={length} batches={} peak_store={} card={}", t.reads, t.read_ns / 1_000_000, wall / (reads.max(1) as u128), t.batches, t.peak_store, opened.census().name);
-}
-
 /// Words of one width class from the fixtures' mixer: the carrier's extremes (`i32::MIN`, `i32::MAX`, `±1`, `0`, the powers
 /// of two and their neighbours at the limbs' edges), full-width draws, and draws at 8, 16 and 24 bits (a tile of one, two or
 /// three limbs).
