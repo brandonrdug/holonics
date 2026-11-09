@@ -179,7 +179,20 @@ def cmd_status(a):
 def cmd_stop(a):
     e = entry(a.name)
     if e["backend"] == "colab":
-        print(colab_exec(e["session"], f"import subprocess\nsubprocess.run(['pkill','-f','/content/{e['name']}.sh'])\nprint('stopped')"))
+        # The script and every process under it (a stopped script's own field_pass kept the card on November 9, 08:30).
+        code = ("import subprocess, os, signal\n"
+                "def kids(p):\n"
+                "    out = subprocess.run(['pgrep', '-P', str(p)], capture_output=True, text=True).stdout.split()\n"
+                "    return [d for c in out for d in kids(int(c)) + [int(c)]]\n"
+                f"roots = [int(x) for x in subprocess.run(['pgrep', '-f', '/content/{e['name']}.sh'], capture_output=True, text=True).stdout.split()]\n"
+                "every = [d for r in roots for d in kids(r) + [r]]\n"
+                "for d in every:\n"
+                "    try:\n"
+                "        os.kill(d, signal.SIGTERM)\n"
+                "    except OSError:\n"
+                "        pass\n"
+                "print('stopped', len(every), 'processes')")
+        print(colab_exec(e["session"], code))
     else:
         subprocess.run(["systemctl", "--user", "stop", e["unit"]])
         print(f"stopped {e['unit']}")
