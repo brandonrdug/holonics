@@ -4,6 +4,8 @@
 open, each named by its measurement. [THE_REBUILD](docs/plans/THE_REBUILD.md) is the order, the laws
 live in their guides and owners, and dated records hold the derivations and receipts.
 
+**November 9 note.** The energy line's writes stay unordered through section 259, and the PC lap's held code worsened under a superseded law; the work is stopped for an audit of the agents' own constructs, Colab is off, and the position below (November 7) is behind the line ([record](research/records/2026-11-09_THE_ENERGY_LINE_WRITES_STAY_UNORDERED_THROUGH_259_AND_THE_WORK_STOPS_TO_AUDIT_ITSELF.md)).
+
 This document was rewritten on November 7 as the current position. Its dated paragraphs from
 September 28 to November 2 (the U0 receipt, the measured receiving faces, the October tower,
 listener and native-contact campaigns) are at
