@@ -2452,6 +2452,22 @@ pub(super) fn depth_field(args: &[String]) -> Result<()> {
 /// any entry moved by between the two states (the trailing zeros of the least-moved difference), how many entries moved, how
 /// many sit at zero, how many were released to zero and how many founded from it; and the averaged constitution's top place
 /// beside its 39 (an `i64` eight places finer than `θ`'s `i32`). A reading of the constitution only: no face is read and nothing runs.
+/// [definition; theory, November 8 00:08] **A state's averaged constitution opened at its live θ** (`average-open STATE STATE_SHA
+/// OUT`): a crossing between laws, so a resumed passage averages its own θ and not another passage's (the forks from 179
+/// carried law D's average). Recorded where it is done, in the run's record with its crossing; the state carries only the
+/// average it now has.
+pub(super) fn average_open(args: &[String]) -> Result<()> {
+    if args.len() != 4 {
+        return Err("average-open STATE STATE_SHA OUT".into());
+    }
+    let mut learner = FieldLearner::from_text(std::str::from_utf8(&pinned_read(&args[1], &args[2], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
+    learner.average = None;
+    learner.average_section();
+    write_new(std::path::Path::new(&args[3]), learner.to_text().as_bytes())?;
+    println!("FIELD_AVERAGE_OPEN state={} out={}", &args[2][..16.min(args[2].len())], args[3]);
+    Ok(())
+}
+
 pub(super) fn census_field(args: &[String]) -> Result<()> {
     if args.len() != 5 {
         return Err("census-field FROM FROM_SHA TO TO_SHA".into());
@@ -3438,6 +3454,12 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
                 (states, deposited) = (states + receipt.states, deposited + usize::from(receipt.deposited));
                 (gap, same) = (gap + receipt.gap, same + receipt.same);
                 (moved_lap, places_lap) = (moved_lap + moved_w, places_lap + proposed_w);
+                // [definition; theory, November 8 00:08] The averaged constitution moves at every deposit, this path's as the
+                // kernel's: until then the fresh writes' held reads read an average frozen at their starting state (law D's, for
+                // the forks from 179).
+                if averaging {
+                    learner.average_section();
+                }
                 let micro = |v: Option<i64>| v.map_or("-".to_string(), |c| ((c as i128 * 1_000_000) / ((receipt.states as i128) << 20)).to_string());
                 println!(
                     "FIELD_PERSISTENT lap={lap} n={n} writes={m} closing_milli={closing_milli} write_energy_milli={write_energy_milli} eta_milli={eta_milli} moved={moved_w} proposed={proposed_w} accept_milli={} deposited={} predicted_micro={} transfer_micro={} log2_t={} sweep_ms={release_ms} deposit_ms={deposit_ms} ms={}",
