@@ -8690,6 +8690,7 @@ pub(super) fn exchange_field(args: &[String], realization: &mut dyn FieldRealiza
     // place at the keyed write and at rest, its standing and refused moves; a problem at the cap is a defect, not a rest.
     let mut file = rows_file(&out.join("MOVES.tsv"), "problem\tmove\ti\tj\tproposed_gain_nats\tcertified_fall_nats\n")?;
     let (mut standing, mut refused, mut defects, mut fall) = (0usize, 0usize, 0usize, 0i128);
+    let (mut rested, mut unrested) = (0usize, 0usize);
     for (k, r) in records.iter().enumerate() {
         for (n, m) in r.moves.iter().enumerate() {
             row(&mut file, &format!("{k}\t{}\t{}\t{}\t{}\t{}\n", n + 1, m.i, m.j, decimal_q20(nats_q20(m.gain)), decimal_q20(nats_q20(m.fall))))?;
@@ -8697,20 +8698,22 @@ pub(super) fn exchange_field(args: &[String], realization: &mut dyn FieldRealiza
         let a_place = |c: i128| if r.places == 0 { "-".to_string() } else { decimal_q20(nats_q20(c) / r.places as i128) };
         let heat = |m: Option<&holonics::hnn::tower::field::ExchangeMove>| m.map_or("-".to_string(), |m| decimal_q20(nats_q20(m.fall)));
         println!(
-            "FIELD_EXCHANGE problem={k} letters={} code_keyed_nats_a_place={} code_rest_nats_a_place={} standing={} refused={} at_rest={} defect={} fall_nats={} heat_first_nats={} heat_last_nats={}",
+            "FIELD_EXCHANGE problem={k} letters={} code_keyed_nats_a_place={} code_end_nats_a_place={} standing={} refused={} at_rest={} defect={} unrested={} fall_nats={} heat_first_nats={} heat_last_nats={}",
             r.places,
             a_place(r.start),
             a_place(r.end),
             r.moves.len(),
             r.refused,
-            !r.capped,
+            r.rested,
             r.capped,
+            !r.rested && !r.capped,
             decimal_q20(nats_q20(r.start - r.end)),
             heat(r.moves.first()),
             heat(r.moves.last())
         );
         (standing, refused, defects, fall) = (standing + r.moves.len(), refused + r.refused, defects + usize::from(r.capped), fall + r.start - r.end);
+        (rested, unrested) = (rested + usize::from(r.rested), unrested + usize::from(!r.rested && !r.capped));
     }
-    println!("FIELD_EXCHANGE_DONE problems={} at_rest={} defects={defects} h_millinats={h_milli} proposal_cap={moves} standing={standing} refused={refused} fall_nats={} keyed_ms={keyed_ms} ms={}", problems.len(), problems.len() - defects, decimal_q20(nats_q20(fall)), started.elapsed().as_millis());
+    println!("FIELD_EXCHANGE_DONE problems={} at_rest={rested} defects={defects} unrested={unrested} h_millinats={h_milli} proposal_cap={moves} standing={standing} refused={refused} fall_nats={} keyed_ms={keyed_ms} ms={}", problems.len(), decimal_q20(nats_q20(fall)), started.elapsed().as_millis());
     Ok(())
 }

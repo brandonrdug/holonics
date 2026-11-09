@@ -3717,7 +3717,7 @@ fn the_exchange_walk_holds_composition() {
             let n = w.iter().take_while(|&&c| c != 0).count();
             assert!(a[n..].iter().all(|&c| c == 0), "the void past the letters stays");
             let r = &records[k];
-            assert!(!r.capped, "problem {k} rests before its cap");
+            assert!(r.rested && !r.capped, "problem {k} rests before its cap");
             assert!(r.moves.iter().all(|m| m.fall > h && m.i != m.j), "every standing move fell by more than h");
             assert_eq!(r.start - r.moves.iter().map(|m| m.fall).sum::<i128>(), r.end, "the falls sum to the whole fall");
             assert_eq!(check[k].start, r.end, "the end is the final answer's code read again");

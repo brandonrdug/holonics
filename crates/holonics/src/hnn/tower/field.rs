@@ -1125,7 +1125,8 @@ pub struct ExchangeMove {
 
 /// [definition; theory, November 9 21:12] **One problem's certified exchange walk** ([`Field::exchange_walk`]): its places,
 /// its answer's code at the written answer and where the walk ended (on the codes' `2^(−20)` bits, summed over the places),
-/// its standing moves, the moves refused and undone, and whether it reached the proposal cap (a defect, not a rest).
+/// its standing moves, the moves refused and undone, and how it ended: at rest (no unmarked proposal remained), at the
+/// proposal cap (a defect, not a rest), or neither (the walk was stopped before it rested: unrested).
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
 pub struct ExchangeRecord {
     pub places: usize,
@@ -1133,6 +1134,7 @@ pub struct ExchangeRecord {
     pub end: i128,
     pub moves: Vec<ExchangeMove>,
     pub refused: usize,
+    pub rested: bool,
     pub capped: bool,
 }
 
@@ -3764,7 +3766,8 @@ impl Field {
         let code_of = |faces: &[TowerFace], x: &[usize]| -> i128 { faces.iter().zip(x).map(|(f, &a)| f.code(a) as i128).sum() };
         let everyone: Vec<usize> = (0..problems.len()).collect();
         let mut faces = read(&answers, &everyone, realization)?;
-        let mut records: Vec<ExchangeRecord> = (0..problems.len()).map(|k| { let c = code_of(&faces[k], &answers[k]); ExchangeRecord { places: letters[k], start: c, end: c, ..ExchangeRecord::default() } }).collect();
+        // An answer of fewer than two letters has no exchange: it rests where it is written.
+        let mut records: Vec<ExchangeRecord> = (0..problems.len()).map(|k| { let c = code_of(&faces[k], &answers[k]); ExchangeRecord { places: letters[k], start: c, end: c, rested: letters[k] < 2, ..ExchangeRecord::default() } }).collect();
         let mut marked: Vec<std::collections::BTreeSet<(usize, usize)>> = vec![std::collections::BTreeSet::new(); problems.len()];
         let mut active: Vec<bool> = letters.iter().map(|&n| n >= 2).collect();
         let mut rounds = 0usize;
@@ -3794,7 +3797,10 @@ impl Field {
                 });
                 match chosen {
                     Some((i, j, g)) => proposed.push((k, i, j, g)),
-                    None => active[k] = false,
+                    None => {
+                        records[k].rested = true;
+                        active[k] = false;
+                    }
                 }
             }
             if proposed.is_empty() {
