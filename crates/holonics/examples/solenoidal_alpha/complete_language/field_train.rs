@@ -2852,11 +2852,12 @@ pub(super) fn length_field(args: &[String], realization: &mut dyn FieldRealizati
     if let Some(why) = failed {
         return Err(why.into());
     }
-    let mut pass_rows = rows_file(&out.join("PASSES.tsv"), "problem\tpass\tredrawn\tcode\tstanding\tentropy\tdrive\tvarentropy\tchanges\tequilibrium\n")?;
+    let mut pass_rows = rows_file(&out.join("PASSES.tsv"), "problem\tpass\tredrawn\tcode\tstanding\tentropy\tdrive\tvarentropy\tchanges\tequilibrium\theat\n")?;
     for ((k, pass), (redrawn, code)) in &passes {
         let d = drives.get(*k).and_then(|d| d.get(pass - 1)).copied().unwrap_or_default();
-        row(&mut pass_rows, &format!("{k}\t{pass}\t{redrawn}\t{code}\t{}\t{}\t{}\t{}\t{}\t{}\n", d.standing, d.entropy, d.drive(), d.varentropy, d.changes, d.equilibrium))?;
+        row(&mut pass_rows, &format!("{k}\t{pass}\t{redrawn}\t{code}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\n", d.standing, d.entropy, d.drive(), d.varentropy, d.changes, d.equilibrium, d.heat))?;
     }
+    heat_lines(&drives);
     let mut ends = rows_file(&out.join("ENDS.tsv"), "problem\theld\twritten\tfirst_void_read\tfirst_void_place\tlast_letter_place\tlast_letter_read\n")?;
     let mut file = rows_file(&out.join("SAMPLE.tsv"), "")?;
     for (k, places) in answers.iter().enumerate() {
@@ -6719,6 +6720,35 @@ pub(super) fn host() -> HostField {
 mod tests {
     use super::*;
 
+    /// [theory, November 9 21:43] **The census lens off reads the plain faces exactly, and on reads the residual lens**: on a
+    /// small founded field, a lensed read through an empty table is the host's read face for face; through a table it is
+    /// [`lensed_face`] of each open site's face at its plate, and moves the faces.
+    #[test]
+    fn the_census_lens_off_is_the_plain_read_and_on_is_the_residual_lens() {
+        let d = FieldDeclaration { alphabet: 5, width: 8, heads: 2, modes: 3, still: 1, contacts: 4, ticks: 2, frames: 2, reach: 16, lanes: 1, depth: 0, energy: false };
+        let keys: Vec<u8> = (0..1u32 << 16).map(|i| (i.wrapping_mul(2_654_435_761) >> 13) as u8).collect();
+        let field = Field::found(d, &keys).unwrap();
+        let classes = [1usize, 4, 0, 2, 2, 3, 1];
+        let open = [false, true, false, true, false, false, true];
+        let r = Region { classes: &classes, unresolved: &open, faces: &[], locked: &[], echo: &[], domain: None, port: None };
+        let plain = HostField.read_faces(&field, &[r]).unwrap();
+        let empty = LensTable::new();
+        assert_eq!(Lensed { inner: &mut HostField, table: &empty, depth: 1 }.read_faces(&field, &[r]).unwrap(), plain);
+        let (faces, plates) = HostField.read_plates(&field, &[r]).unwrap();
+        let mut table = LensTable::new();
+        for (t, face) in faces[0].iter().enumerate() {
+            if face.is_some() {
+                let key: Vec<u32> = plates[0][t * 2..t * 2 + 2].iter().map(|&c| c % 3).collect();
+                table.insert(key, (vec![9, 0, 3, 0, 1], vec![1 << 20; 5]));
+            }
+        }
+        let lensed = Lensed { inner: &mut HostField, table: &table, depth: 1 }.read_faces(&field, &[r]).unwrap();
+        for (t, face) in faces[0].iter().enumerate() {
+            assert_eq!(lensed[0][t], face.as_ref().map(|f| lensed_face(f, &plates[0][t * 2..t * 2 + 2], 1, &table)));
+        }
+        assert_ne!(lensed, plain);
+    }
+
     #[test]
     fn the_bytes_codec_reads_a_number_alike_wherever_it_is_written() {
         let problems = vec![(b"Tom has 1,200 apples.".to_vec(), b"He has <<1200+35=1235>>1235\n#### 1235".to_vec())];
@@ -8422,18 +8452,18 @@ fn plate_regions(codec: &FieldCodec, field: &Field, text: &[u8]) -> Result<Vec<(
 /// over the same places, each share formed on `2^(−40)` to the floor with its remainder carried on `2^(−72)` (the remainder
 /// over the face's total, to the nearest), so `F = (shares + carried 2^(−32))` on `2^(−40)`.
 #[derive(Clone, Default)]
-struct PlateCounts {
-    n: Vec<u64>,
+pub(super) struct PlateCounts {
+    pub(super) n: Vec<u64>,
     f: Vec<u128>,
     carried: Vec<i128>,
 }
 
 impl PlateCounts {
-    fn new(a: usize) -> Self {
+    pub(super) fn new(a: usize) -> Self {
         Self { n: vec![0; a], f: vec![0; a], carried: vec![0; a] }
     }
 
-    fn add(&mut self, face: &holonics::hnn::tower::TowerFace, truth: usize) {
+    pub(super) fn add(&mut self, face: &holonics::hnn::tower::TowerFace, truth: usize) {
         self.n[truth] += 1;
         for (c, &m) in face.masses.iter().enumerate() {
             let q = (m << 40) / face.total;
@@ -8444,12 +8474,12 @@ impl PlateCounts {
     }
 
     /// `F_(p, a)` on `2^(−20)`, its carried remainder folded in, to the nearest.
-    fn expected(&self, c: usize) -> u128 {
+    pub(super) fn expected(&self, c: usize) -> u128 {
         let on40 = (self.f[c] as i128 + ((self.carried[c] + (1 << 31)) >> 32)).max(0) as u128;
         (on40 + (1 << 19)) >> 20
     }
 
-    fn places(&self) -> u64 {
+    pub(super) fn places(&self) -> u64 {
         self.n.iter().sum()
     }
 }
@@ -8716,4 +8746,253 @@ pub(super) fn exchange_field(args: &[String], realization: &mut dyn FieldRealiza
     }
     println!("FIELD_EXCHANGE_DONE problems={} at_rest={rested} defects={defects} unrested={unrested} h_millinats={h_milli} proposal_cap={moves} standing={standing} refused={refused} fall_nats={} keyed_ms={keyed_ms} ms={}", problems.len(), decimal_q20(nats_q20(fall)), started.elapsed().as_millis());
     Ok(())
+}
+
+/// [definition; theory, November 9 21:43] **A census table at one depth**: each plate (each head's class mod `3^d`) with its
+/// true letters' counts `N_(p, a)` and the face's own expected counts `F_(p, a)` on `2^(−20)` ([`PlateCounts::expected`]).
+pub(super) type LensTable = std::collections::BTreeMap<Vec<u32>, (Vec<u64>, Vec<u128>)>;
+
+/// [definition; theory, November 9 21:43] **The residual lens on a face**: `f′(a) ∝ f(a) (N_(p, a) + 1)/(F_(p, a) + 1)` at the
+/// site's plate `p` (its classes mod `3^d`), each mass released to its own grain; a plate the table does not hold leaves the face
+/// as it is.
+pub(super) fn lensed_face(face: &holonics::hnn::tower::TowerFace, plate: &[u32], depth: u32, table: &LensTable) -> holonics::hnn::tower::TowerFace {
+    let key: Vec<u32> = plate.iter().map(|&c| c % 3u32.pow(depth)).collect();
+    match table.get(&key) {
+        Some((n, f)) => {
+            let masses: Vec<u128> = face.masses.iter().enumerate().map(|(c, &m)| (m * ((n[c] as u128 + 1) << 20)) / (f[c] + (1 << 20))).collect();
+            let total = masses.iter().sum();
+            holonics::hnn::tower::TowerFace { masses, total }
+        }
+        None => face.clone(),
+    }
+}
+
+/// [definition; theory, November 9 21:43] **A realization that reads every face through a census lens**
+/// ([`lensed_face`]): its faces are the inner realization's, each open site's face lensed at its plate (read beside the faces,
+/// [`FieldRealization::read_plates`]); every other read is the inner one's. A writer or a joint read run through it draws and
+/// codes on the lensed faces; with an empty table it reads the inner faces exactly.
+pub(super) struct Lensed<'a> {
+    pub inner: &'a mut dyn FieldRealization,
+    pub table: &'a LensTable,
+    pub depth: u32,
+}
+
+impl FieldRealization for Lensed<'_> {
+    fn read_faces(&mut self, field: &Field, regions: &[Region]) -> std::result::Result<Vec<Vec<Option<holonics::hnn::tower::TowerFace>>>, holonics::hnn::tower::TowerError> {
+        let heads = field.declaration.heads;
+        let (faces, plates) = self.inner.read_plates(field, regions)?;
+        Ok(faces
+            .into_iter()
+            .zip(plates)
+            .map(|(row, plate)| row.into_iter().enumerate().map(|(t, f)| f.map(|f| lensed_face(&f, &plate[t * heads..(t + 1) * heads], self.depth, self.table))).collect())
+            .collect())
+    }
+    fn read_and_return(&mut self, field: &Field, regions: &[Region]) -> std::result::Result<(Vec<Vec<Option<holonics::hnn::tower::TowerFace>>>, Vec<i128>), holonics::hnn::tower::TowerError> {
+        self.inner.read_and_return(field, regions)
+    }
+    fn read_logits(&mut self, field: &Field, regions: &[Region]) -> std::result::Result<Vec<holonics::hnn::tower::field::FieldRead>, holonics::hnn::tower::TowerError> {
+        self.inner.read_logits(field, regions)
+    }
+    fn read_landmarks(&mut self, field: &Field, region: &Region, question: usize, sites: &[usize], count: usize) -> std::result::Result<Vec<Vec<(usize, u64)>>, holonics::hnn::tower::TowerError> {
+        self.inner.read_landmarks(field, region, question, sites, count)
+    }
+    fn read_plates(&mut self, field: &Field, regions: &[Region]) -> std::result::Result<(Vec<Vec<Option<holonics::hnn::tower::TowerFace>>>, Vec<Vec<u32>>), holonics::hnn::tower::TowerError> {
+        self.inner.read_plates(field, regions)
+    }
+}
+
+/// A census table file's one depth ([`plate_joint_field`]'s `CENSUS.tsv`).
+pub(super) fn census_table(text: &str, depth: u32) -> Result<LensTable> {
+    let mut table = LensTable::new();
+    for line in text.lines().skip(1) {
+        let cells: Vec<&str> = line.split('\t').collect();
+        let [d, plate, n, f] = cells[..] else { return Err("a census row that is not depth, plate, counts and expected counts".into()) };
+        if d.parse::<u32>().map_err(|_| "a census depth that is not a count")? != depth {
+            continue;
+        }
+        let parse = |v: &str| v.parse::<u128>().map_err(|_| "a census count that is not a count");
+        let key: Vec<u32> = plate.split('.').map(|c| c.parse::<u32>().map_err(|_| "a census plate that is not counts")).collect::<std::result::Result<_, _>>()?;
+        let n: Vec<u64> = n.split(',').map(|v| parse(v).map(|x| x as u64)).collect::<std::result::Result<_, _>>()?;
+        let f: Vec<u128> = f.split(',').map(parse).collect::<std::result::Result<_, _>>()?;
+        table.insert(key, (n, f));
+    }
+    Ok(table)
+}
+
+/// One visit of a training lap's own states ([`plate_joint_field`]): the first `take` sections of `order`, their regions and
+/// open-site draws formed as `train-field` forms them from the draw `draw`, read only; at every open site, `visit(leaf, face,
+/// truth)` with its leaf at the last tick (`[h]`, full depth). Prints each section's time where `timed`. Returns the open
+/// places.
+#[allow(clippy::too_many_arguments)]
+fn lap_visit(codec: &FieldCodec, train: &Problems, sections: &[Vec<usize>], paths: &[Vec<usize>], order: &[usize], seed: u64, mut draw: u64, learner: &mut FieldLearner, realization: &mut dyn FieldRealization, timed: bool, visit: &mut dyn FnMut(&[u32], &holonics::hnn::tower::TowerFace, usize)) -> Result<u64> {
+    let heads = learner.field.declaration.heads;
+    let mut places = 0u64;
+    for (n, &s) in order.iter().enumerate() {
+        let section_start = std::time::Instant::now();
+        let (regions, _) = section_regions(codec, train, &sections[s], &paths[s], seed, &mut draw, learner, realization)?;
+        let views = views_of(&regions);
+        let (faces, leaves) = realization.read_plates(&learner.field, &views).map_err(|e| e.to_string())?;
+        let mut open = 0u64;
+        for ((r, faces), leaves) in views.iter().zip(&faces).zip(&leaves) {
+            for (t, face) in faces.iter().enumerate() {
+                let Some(face) = face.as_ref().filter(|_| r.unresolved[t]) else { continue };
+                visit(&leaves[t * heads..(t + 1) * heads], face, r.classes[t]);
+                open += 1;
+            }
+        }
+        places += open;
+        if timed {
+            println!("FIELD_LEAVES_SECTION n={n} section={s} regions={} open_places={open} ms={}", views.len(), section_start.elapsed().as_millis());
+        }
+    }
+    Ok(places)
+}
+
+/// `log₂(N/F)` on the codes' `2^(−20)` bits for a count `N > 0` and an expected count `F` on `2^(−20)` ([`face_code`] of the
+/// ratio, its smaller side over its larger).
+fn log2_ratio(n: u64, f: u128) -> i128 {
+    let (num, den) = ((n as u128) << 20, f.max(1));
+    if num >= den {
+        holonics::hnn::tower::face_code(den, num) as i128
+    } else {
+        -(holonics::hnn::tower::face_code(num, den) as i128)
+    }
+}
+
+/// [measurement; theory, November 9 21:43 and 21:52] `plate-joint-field UNITS UNITS_SHA TRAIN TRAIN_SHA HELD HELD_SHA KEYS
+/// KEYS_SHA SECTION SECTIONS STATE STATE_SHA OUT`: **census 2, on the joint's scale**. A site's *leaf* is the intersection of
+/// its shells (a shell a mode's trit, split by the seam, the cone `|Re| = |Im|`), read at the last tick at each depth
+/// `d = 1..b` (each head's class mod `3^d`). One forward visit of a training lap's own states (the regions and open-site
+/// draws its first `SECTIONS` sections make, all of them at zero: `train-field`'s codec, walk, paths, draws and seed, read at
+/// the state's own lap count), reading only and never depositing: at every open site its leaf takes its true letter into
+/// `N_(p, a)` and its face's shares into `F_(p, a)` ([`PlateCounts`]); `CENSUS.tsv` holds every depth's table. A second
+/// visit of the same states reads TRAIN's own code under each depth's residual lens: the code the lens releases on TRAIN
+/// (plain less lensed, nats a place) beside each depth's stored free energy `U = Σ_leaves Σ_a N_a ln(N_a/F_a)` a place
+/// (`FIELD_LEAVES_U`; theory's checks: released ≥ U at every depth, and U never falls with depth), and the 20 leaves of the
+/// most `U` at each depth with their shells and counts (`LEAVES_U.tsv`). Then the held problems' joint read
+/// (`FIELD_JOINT_NATS`, the train-field lap's own chain, its seed and states) plain (`lap=0`) and through the residual lens at
+/// each depth (`lap=d`, [`Lensed`]). `FIELD_LEAVES` and `FIELD_LEAVES_SECTION` lines count and time the visit.
+pub(super) fn plate_joint_field(args: &[String], realization: &mut dyn FieldRealization) -> Result<()> {
+    if args.len() != 14 {
+        return Err("plate-joint-field UNITS UNITS_SHA TRAIN TRAIN_SHA HELD HELD_SHA KEYS KEYS_SHA SECTION SECTIONS STATE STATE_SHA OUT".into());
+    }
+    let started = std::time::Instant::now();
+    let units = units_of(&args[1], &args[2])?;
+    let train_problems = problems_of(&pinned_read(&args[3], &args[4], READ_BUDGET as usize)?);
+    let dev_problems = problems_of(&pinned_read(&args[5], &args[6], READ_BUDGET as usize)?);
+    let keys = pinned_read(&args[7], &args[8], READ_BUDGET as usize)?;
+    let (section, limit) = (positive(&args[9])?, count(&args[10])?);
+    let mut learner = FieldLearner::from_text(std::str::from_utf8(&pinned_read(&args[11], &args[12], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
+    declared_clocks(&mut learner.field);
+    let out = Path::new(&args[13]);
+    std::fs::create_dir(out)?;
+    let codec = FieldCodec::found(units, &train_problems)?;
+    let encode = |problems: &[(Vec<u8>, Vec<u8>)]| -> Result<Problems> {
+        problems.par_iter().map(|(q, a)| Ok((codec.encode(&question_text(q)).map_err(|e| e.to_string())?, codec.encode(a).map_err(|e| e.to_string())?, a.len()))).collect::<std::result::Result<Vec<_>, String>>().map_err(|e| e.into())
+    };
+    let train_set = encode(&train_problems)?;
+    let dev_set: Problems = encode(&dev_problems)?.into_iter().filter(|(_, a, _)| a.len() < codec.answer).collect();
+    let seed = u64::from_be_bytes(keys.get(keys.len().saturating_sub(8)..).filter(|w| w.len() == 8).ok_or("a key file of fewer than eight bytes")?.try_into()?);
+    let (sections, _) = sections_of(&train_set, section, dev_set.len(), seed);
+    if learner.holds_step() {
+        return Err("plate-joint-field reads a state that holds no step (it never deposits)".into());
+    }
+    let (heads, trits, a) = (learner.field.declaration.heads, learner.field.declaration.class_trits(), learner.field.declaration.alphabet);
+    let read = learner.laps;
+    let draw = read * train_set.len() as u64;
+    let paths = paths_of(seed, read, &sections);
+    let order = walk(seed, read, sections.len());
+    let take = if limit == 0 { order.len() } else { limit.min(order.len()) };
+    let mut counts: Vec<std::collections::BTreeMap<Vec<u32>, PlateCounts>> = (0..=trits).map(|_| std::collections::BTreeMap::new()).collect();
+    let leaf_at = |leaf: &[u32], d: usize| -> Vec<u32> { leaf.iter().map(|&c| c % 3u32.pow(d as u32)).collect() };
+    let places = lap_visit(&codec, &train_set, &sections, &paths, &order[..take], seed, draw, &mut learner, realization, true, &mut |leaf, face, truth| {
+        for (d, table) in counts.iter_mut().enumerate().skip(1) {
+            table.entry(leaf_at(leaf, d)).or_insert_with(|| PlateCounts::new(a)).add(face, truth);
+        }
+    })?;
+    let census_ms = started.elapsed().as_millis();
+    let mut file = rows_file(&out.join("CENSUS.tsv"), "depth\tleaf\tcounts\texpected_q20\n")?;
+    let mut tables: Vec<LensTable> = vec![LensTable::new(); trits + 1];
+    // Each leaf's stored free energy `Σ_a N_a log₂(N_a/F_a)` on 2^(−20) bits.
+    let mut energies: Vec<Vec<(i128, Vec<u32>, u64)>> = vec![Vec::new(); trits + 1];
+    for (d, table) in counts.iter().enumerate().skip(1) {
+        for (leaf, k) in table {
+            let n: Vec<String> = k.n.iter().map(u64::to_string).collect();
+            let f: Vec<u128> = (0..a).map(|c| k.expected(c)).collect();
+            let fs: Vec<String> = f.iter().map(u128::to_string).collect();
+            let name: Vec<String> = leaf.iter().map(u32::to_string).collect();
+            row(&mut file, &format!("{d}\t{}\t{}\t{}\n", name.join("."), n.join(","), fs.join(",")))?;
+            let u: i128 = (0..a).filter(|&c| k.n[c] > 0).map(|c| k.n[c] as i128 * log2_ratio(k.n[c], f[c])).sum();
+            energies[d].push((u, leaf.clone(), k.places()));
+            tables[d].insert(leaf.clone(), (k.n.clone(), f));
+        }
+        println!("FIELD_LEAVES depth={d} cells={} leaves={} open_places={places} sections={take} of={} census_ms={census_ms}", 3u128.pow((heads * d) as u32), table.len(), order.len());
+    }
+    // The second visit: TRAIN's own code plain and under each depth's lens.
+    let mut codes: Vec<[i128; 2]> = vec![[0; 2]; trits + 1];
+    let second = std::time::Instant::now();
+    lap_visit(&codec, &train_set, &sections, &paths, &order[..take], seed, draw, &mut learner, realization, false, &mut |leaf, face, truth| {
+        let plain = face.code(truth) as i128;
+        for (d, slot) in codes.iter_mut().enumerate().skip(1) {
+            *slot = [slot[0] + plain, slot[1] + lensed_face(face, leaf, d as u32, &tables[d]).code(truth) as i128];
+        }
+    })?;
+    let a_place = |v: i128| if places == 0 { "-".to_string() } else { decimal_q20(nats_q20(v) / places as i128) };
+    let mut top = rows_file(&out.join("LEAVES_U.tsv"), "depth\trank\tleaf_shells\tplaces\tu_nats\n")?;
+    for d in 1..=trits {
+        let u: i128 = energies[d].iter().map(|e| e.0).sum();
+        println!("FIELD_LEAVES_U depth={d} u_nats_a_place={} released_nats_a_place={} train_code_nats={} train_lens_code_nats={} second_visit_ms={}", a_place(u), a_place(codes[d][0] - codes[d][1]), a_place(codes[d][0]), a_place(codes[d][1]), second.elapsed().as_millis());
+        let mut list = energies[d].clone();
+        list.sort_by_key(|e| (std::cmp::Reverse(e.0), e.1.clone()));
+        for (rank, (u, leaf, n)) in list.iter().take(20).enumerate() {
+            // Each head's shells as its first `d` trits, least first.
+            let shells: Vec<String> = leaf.iter().map(|&c| (0..d).map(|l| ((c / 3u32.pow(l as u32)) % 3).to_string()).collect::<String>()).collect();
+            row(&mut top, &format!("{d}\t{}\t{}\t{n}\t{}\n", rank + 1, shells.join("."), decimal_q20(nats_q20(*u))))?;
+        }
+    }
+    // The held joint read, plain and through each depth's lens.
+    let mut rows = rows_file(&out.join("JOINT.tsv"), "lap\tproblem\tsites\town\tfoil\tinformation\tseries\n")?;
+    let field = &learner.field;
+    let t0 = std::time::Instant::now();
+    joint_read(field, &codec, &dev_set, seed, realization, 0, &mut rows)?;
+    println!("FIELD_LEAVES_JOINT depth=0 ms={}", t0.elapsed().as_millis());
+    for (d, table) in tables.iter().enumerate().skip(1) {
+        let t0 = std::time::Instant::now();
+        let mut lensed = Lensed { inner: &mut *realization, table, depth: d as u32 };
+        joint_read(field, &codec, &dev_set, seed, &mut lensed, d as i64, &mut rows)?;
+        println!("FIELD_LEAVES_JOINT depth={d} ms={}", t0.elapsed().as_millis());
+    }
+    println!("FIELD_LEAVES_DONE ms={}", started.elapsed().as_millis());
+    Ok(())
+}
+
+/// [definition; theory, November 9 21:43] `lens-field CENSUS CENSUS_SHA DEPTH` followed by `length-field`'s arguments: **the
+/// writer through a census lens** ([`Lensed`]): every face it draws from is lensed at its site's plate by `CENSUS`'s table at
+/// `DEPTH` (an input file, never a switch); its reads, files and heat as `length-field`'s.
+pub(super) fn lens_field(args: &[String], realization: &mut dyn FieldRealization) -> Result<()> {
+    if args.len() < 4 {
+        return Err("lens-field CENSUS CENSUS_SHA DEPTH STATE STATE_SHA CODEC CODEC_SHA UNITS UNITS_SHA HELD HELD_SHA COUNT SWEEPS REFINE STOP_MS OUT".into());
+    }
+    let text = pinned_read(&args[1], &args[2], STATE_BUDGET)?;
+    let depth = positive(&args[3])? as u32;
+    let table = census_table(std::str::from_utf8(&text)?, depth)?;
+    println!("FIELD_LENS depth={depth} plates={}", table.len());
+    let rest: Vec<String> = std::iter::once(args[0].clone()).chain(args[4..].iter().cloned()).collect();
+    let mut lensed = Lensed { inner: realization, table: &table, depth };
+    length_field(&rest, &mut lensed)
+}
+
+/// [measurement; theory, November 9 19:05] `FIELD_HEAT`: the refine walk's Landauer heat ([`PassDrive::heat`]), one line a
+/// refine pass (its heat summed over the problems, in nats and on 2^(−20) bits, and its changed places), then each problem's
+/// running total over its passes. A reading only.
+fn heat_lines(drives: &[Vec<holonics::hnn::tower::field::PassDrive>]) {
+    let passes = drives.iter().map(Vec::len).max().unwrap_or(0);
+    for p in 0..passes {
+        let (heat, changed, redrawn) = drives.iter().filter_map(|d| d.get(p)).fold((0i128, 0usize, 0usize), |(h, c, r), d| (h + d.heat, c + d.changes, r + d.redrawn));
+        println!("FIELD_HEAT pass={} heat_nats={} heat_bits_q20={heat} changed={changed} redrawn={redrawn}", p + 1, decimal_q20(nats_q20(heat)));
+    }
+    for (k, d) in drives.iter().enumerate() {
+        let (heat, changed) = d.iter().fold((0i128, 0usize), |(h, c), p| (h + p.heat, c + p.changes));
+        println!("FIELD_HEAT_TOTAL problem={k} passes={} heat_nats={} heat_bits_q20={heat} changed={changed}", d.len(), decimal_q20(nats_q20(heat)));
+    }
 }

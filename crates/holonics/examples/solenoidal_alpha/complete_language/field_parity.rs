@@ -453,6 +453,31 @@ pub(super) fn parity(args: &[String], card: &mut dyn FieldRealization) -> Result
     let card_plates = card.read_plates(&card_learner.field, &views).map_err(|e| e.to_string())?;
     let plates_equal = host_plates == card_plates;
     releases_unequal += usize::from(!plates_equal);
+    // [theory, November 9 21:43] The census lens through both: a table formed from these openings' own faces at depth 2 (each
+    // open site's letter as it stands, a fixture), the lens off reading the plain faces exactly, the lens on host for card.
+    let (lens_off, lens_equal) = {
+        use super::field_train::{lensed_face, LensTable, Lensed, PlateCounts};
+        let heads = host_learner.field.declaration.heads;
+        let mut counts: std::collections::BTreeMap<Vec<u32>, PlateCounts> = std::collections::BTreeMap::new();
+        for ((faces, plates), (classes, open)) in host_plates.0.iter().zip(&host_plates.1).zip(&owned) {
+            for (t, face) in faces.iter().enumerate() {
+                if let Some(face) = face.as_ref().filter(|_| open[t]) {
+                    let key: Vec<u32> = plates[t * heads..(t + 1) * heads].iter().map(|&c| c % 9).collect();
+                    counts.entry(key).or_insert_with(|| PlateCounts::new(face.masses.len())).add(face, classes[t]);
+                }
+            }
+        }
+        let table: LensTable = counts.iter().map(|(k, c)| (k.clone(), (c.n.clone(), (0..c.n.len()).map(|a| c.expected(a)).collect()))).collect();
+        let empty = LensTable::new();
+        let plain = HostField.read_faces(&host_learner.field, &views).map_err(|e| e.to_string())?;
+        let off = Lensed { inner: &mut HostField, table: &empty, depth: 2 }.read_faces(&host_learner.field, &views).map_err(|e| e.to_string())?;
+        let on_host = Lensed { inner: &mut HostField, table: &table, depth: 2 }.read_faces(&host_learner.field, &views).map_err(|e| e.to_string())?;
+        let on_card = Lensed { inner: &mut *card, table: &table, depth: 2 }.read_faces(&card_learner.field, &views).map_err(|e| e.to_string())?;
+        let _ = lensed_face;
+        (off == plain, on_host == on_card && on_host != plain)
+    };
+    releases_unequal += usize::from(!lens_off) + usize::from(!lens_equal);
+    println!("FIELD_PARITY_LENS lens_off_is_plain={lens_off} lens_on_equal={lens_equal}");
     let h = 0i128;
     let t0 = std::time::Instant::now();
     let (host_walk, host_moves) = host_learner.field.exchange_walk(&questions, &hosted, void, h, 64, &mut HostField, &mut |_, _| true).map_err(|e| e.to_string())?;

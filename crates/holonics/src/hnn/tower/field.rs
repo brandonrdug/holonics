@@ -1166,6 +1166,10 @@ pub struct PassDrive {
     pub varentropy: i128,
     pub changes: usize,
     pub equilibrium: i128,
+    /// [measurement; theory, November 9 19:05] **The pass's Landauer heat**: `Σ (log₂ f(new | rest) − log₂ f(old | rest))`
+    /// over its redraws on the codes' `2^(−20)` bits, each read on the redraw's own whole face at the place (an unchanged
+    /// letter adds zero). A reading only: nothing in the walk reads it.
+    pub heat: i128,
 }
 
 impl PassDrive {
@@ -4301,6 +4305,7 @@ impl Field {
                         classes[k][t] = was;
                     }
                     moved[k].changes += usize::from(classes[k][t] != was);
+                    moved[k].heat += face.code(was) as i128 - face.code(classes[k][t]) as i128;
                     open[k][t] = false;
                     }
                     // A run's draws read one boundary: where its last letter was drawn the void, the closing law resolves every
