@@ -112,10 +112,6 @@ struct Words {
     r: u32,
     slots: u32,
     band: u32,
-    /// A receiver's stride of probed classes (`2^b` at the base address; `2^n` under the width law, a receiver's address at
-    /// most `n` modes deep), and the word's padding to the next 8-byte field.
-    pstride: u32,
-    pad: u32,
     pairs: u64,
     ln2_lo: u64,
     ln2_hi: u64,
@@ -1246,7 +1242,6 @@ impl<'c> CardField<'c> {
             digits: roots.len() as u32,
             slots: slots as u32,
             band: band_bits(d.class_trits()),
-            pstride: 1u32 << d.class_trits(),
             ln2_lo: ln2 as u64,
             ln2_hi: (ln2 >> 64) as u64,
             theta: run_base + theta_at,
@@ -1314,11 +1309,6 @@ impl<'c> CardField<'c> {
     /// region read ([`FieldRealization::read_landmarks`]).
     #[allow(clippy::type_complexity)]
     fn run(&mut self, field: &Field, regions: &[Region], returning: bool, logits: bool, keep: Option<&[usize]>) -> Result<(Vec<Vec<Option<TowerFace>>>, Vec<Vec<Option<Vec<i64>>>>, Vec<i128>, Rows, Vec<Vec<u64>>)> {
-        // [theory, November 7 00:12] The width law is built for the energy's opening only; the ticked pass rebuilds its classes
-        // every tick at the base address, so it refuses a widened field rather than read it at another law.
-        if field.widen.is_some() {
-            return Err(TowerError::Refused("the width law reads only an energy field's opening; the ticked pass keeps the base address"));
-        }
         let d = field.declaration;
         // [agent-inferred, November 6] An energy field's faces and logits are its own forward's (`energy`); its return through
         // the ticks and its readings are not built, so every other read of it is refused.

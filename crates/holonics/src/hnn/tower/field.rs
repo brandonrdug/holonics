@@ -781,16 +781,20 @@ pub struct Field {
     /// place runs at the bare rate** (`κ = 1`, §16.28) and returns nothing: nothing arrives there, so no guessed duration
     /// drives its clock; between arrivals each blank keeps its expected duration (§16.44). Not part of the state.
     pub bare_stretch: bool,
-    /// [definition; the unified-theory reading of November 7, 23:34] **The width law**, where set, at its share `cap`: a class
-    /// past `cap` definite sources extends its address by the next mode's shell, branch by branch ([`ClassLists::widened`]).
-    /// Part of the state (a `widen` line after the material): it changes `G`.
-    pub widen: Option<usize>,
 }
 
+/// [measurement; theory, November 9 10:24] The first word of the line the retired width law wrote after the material
+/// (`widen CAP`, added in `c5aced2e4`, the unified-theory reading of November 7, 23:34: a class past `CAP` definite sources
+/// split its leaves by the next modes' shells, `CAP` 47 in the runs). It failed its lap acceptance on November 8, and in the
+/// twin run's flips it carried 0.36 of the changed lock memberships: its count-threshold splits move leaves by jumps no
+/// membership law can soften. So the base classes (the key word's trits, with the probe classes the base law reads) stand
+/// alone and a state carrying the line is refused ([`Field::from_lines`]).
+const RETIRED_WIDTH_LAW_LINE: &str = "widen";
+
 /// [measurement; theory, November 9 06:41, judged 07:35] The line the retired opening at the letters' force wrote after the
-/// material and the width law's line (each energy site opened at `Rᵀ E(u_t) + E₋(u_(t−1)) + E₊(u_(t+1)) + C s_t + b`, added
-/// in `b69d3d9c9`). It raised the held code from 2.765 to 4.941 nats a place at zero sections and stayed 1.4 to 2.8 nats
-/// above over 60 sections, so the own opening stands alone and a state carrying the line is refused ([`Field::from_lines`]).
+/// material (each energy site opened at `Rᵀ E(u_t) + E₋(u_(t−1)) + E₊(u_(t+1)) + C s_t + b`, added in `b69d3d9c9`). It
+/// raised the held code from 2.765 to 4.941 nats a place at zero sections and stayed 1.4 to 2.8 nats above over 60 sections,
+/// so the own opening stands alone and a state carrying the line is refused ([`Field::from_lines`]).
 const RETIRED_OPENING_AT_FORCE_LINE: &str = "opening force";
 
 /// [definition; agent-inferred, November 1] A region: each site's class, whether it is
@@ -1248,10 +1252,6 @@ pub struct ClassLists {
     pub members: Vec<u32>,
     /// Each receiver's other probed classes (§15.2's multi-probe, [`probes`]), empty where none.
     pub probes: Vec<Vec<u32>>,
-    /// [measurement; theory, November 8 18:33] Each receiver's crossings under the width law: the modes its read examines (the
-    /// base modes and the branch modes of every split it visits) whose phase lies within its band of a cone, so it reads at
-    /// most `2^c` plates; zero outside [`ClassLists::widened`].
-    pub crossings: Vec<u32>,
 }
 
 impl ClassLists {
@@ -1274,83 +1274,7 @@ impl ClassLists {
         let probes = vec![Vec::new(); class.len()];
         let probe_class = class.clone();
         let keyed = vec![true; class.len()];
-        let crossings = vec![0; class.len()];
-        Self { class, probe_class, definite, keyed, off, members, probes, crossings }
-    }
-
-    /// [definition; the unified-theory reading of November 7, 23:34] **The width law's lists**: each site's address is its
-    /// base class (`b` modes' shells, as [`ClassLists::of`]) and, where its base class holds more than `cap` definite sources,
-    /// the next modes' shells, branch by branch: a node past `cap` splits by the first mode from `b` on that leaves its
-    /// definite members on more than one shell (a mode that leaves them on one is skipped), until each leaf holds at most
-    /// `cap` or the modes are spent. A receiver reads its probe word down the same branches to its own leaf, and its probes
-    /// are every leaf a crossing reaches: within the band `ε = 2^(−⌈log₂ w⌉)` of a mode's cone, `w` the depth of its own
-    /// address, the shell across that cone on the base modes ([`probes`]) and on the branch modes alike. A source a leaf
-    /// drops from a receiver's run stays in its octave's crowd: nothing leaves the row, only sharpness moves. The leaves are
-    /// the classes of the lists (`classes` the leaf count).
-    #[allow(clippy::type_complexity)]
-    pub fn widened(keys: &[Vec<(i64, i64)>], probes_of: &[Vec<(i64, i64)>], definite: Vec<bool>, b: usize, cap: usize) -> (Self, usize) {
-        let sites = keys.len();
-        let modes = keys.first().map_or(0, Vec::len);
-        let tree = LeafTree::build(keys, &definite, b, cap);
-        let nodes = &tree.nodes;
-        let leaves = tree.leaves();
-        let base = |w: &[(i64, i64)]| -> u32 { tree.base(w) as u32 };
-        let descend = |node: usize, w: &[(i64, i64)]| -> (usize, usize) { tree.descend(node, w) };
-        let class: Vec<u32> = (0..sites).map(|t| nodes[descend(base(&keys[t]) as usize, &keys[t]).0].leaf).collect();
-        let mut probe_class = Vec::with_capacity(sites);
-        let mut probes_all = Vec::with_capacity(sites);
-        let mut crossings = Vec::with_capacity(sites);
-        for w in probes_of {
-            let own_base = base(w) as usize;
-            let (own_node, depth) = descend(own_base, w);
-            let own = nodes[own_node].leaf;
-            let band = band_bits(depth);
-            let near_cone = |re: i64, im: i64| -> bool {
-                let (rr, ii) = (re as i128 * re as i128, im as i128 * im as i128);
-                rr + ii > 0 && ((rr - ii).abs() << band) < rr + ii
-            };
-            let across = |re: i64, im: i64| -> usize {
-                let s = shell(re, im);
-                if s != 1 { 1 } else if re >= 0 { 2 } else { 0 }
-            };
-            // The base classes a crossing reaches (the receiver's own among them), then each one's branches.
-            let mut bases = vec![own_base];
-            bases.extend(probes((0..b).map(|li| w[li]), band).into_iter().map(|c| c as usize));
-            let mut crossed = vec![false; modes];
-            for li in 0..b {
-                crossed[li] = near_cone(w[li].0, w[li].1);
-            }
-            // Each reached base's leaves in turn (the bases in `probes`' order, so a field with no split reads `of`'s runs in its
-            // order), each leaf once.
-            let mut reached: Vec<u32> = Vec::new();
-            for start in bases {
-                let mut stack = vec![start];
-                while let Some(node) = stack.pop() {
-                    match nodes[node].split {
-                        None => {
-                            let leaf = nodes[node].leaf;
-                            if leaf != own && !reached.contains(&leaf) {
-                                reached.push(leaf);
-                            }
-                        }
-                        Some((li, children)) => {
-                            let (re, im) = w[li];
-                            if near_cone(re, im) {
-                                crossed[li] = true;
-                                stack.push(children[across(re, im)]);
-                            }
-                            stack.push(children[shell(re, im) as usize]);
-                        }
-                    }
-                }
-            }
-            probe_class.push(own);
-            probes_all.push(reached);
-            crossings.push(crossed.iter().filter(|&&x| x).count() as u32);
-        }
-        let mut lists = Self::of(class, definite, leaves).probing(probe_class, probes_all);
-        lists.crossings = crossings;
-        (lists, leaves)
+        Self { class, probe_class, definite, keyed, off, members, probes }
     }
 
     /// The lists with each site's key (§16.20): the sources a near field holds.
@@ -1384,110 +1308,6 @@ impl ClassLists {
     /// Whether receiver `i` listens to every definite site (it is open, §15.9).
     pub fn listens(&self, i: usize) -> bool {
         !self.definite[i]
-    }
-}
-
-/// [definition; the unified-theory reading of November 7, 23:34] **The width law's tree over a region's key words**
-/// ([`ClassLists::widened`], whose lists are its leaves): nodes `0..3^b` are the base classes (`b` modes' shells); a node whose
-/// definite members number past `cap` splits by the first mode from its parent's split mode on (from `b` at a base node) that
-/// leaves those members on more than one shell, into three children by that mode's shell, breadth-first, until each leaf
-/// holds at most `cap` or the modes are spent. [measurement; theory, November 9 09:42, the word reading] Kept as a value so a
-/// reading names each node's parent, split mode and members, and each word's path down it.
-#[derive(Clone, Debug, PartialEq, Eq)]
-pub struct LeafTree {
-    pub b: usize,
-    pub nodes: Vec<LeafNode>,
-}
-
-/// One node of a [`LeafTree`]: its parent (`None` at a base class), the mode it splits by with its three children by that
-/// mode's shell (`None` at a leaf), the sites whose key words descend to it and how many of them are definite (the count the
-/// split reads), and its leaf's number (`u32::MAX` where it splits).
-#[derive(Clone, Debug, PartialEq, Eq)]
-pub struct LeafNode {
-    pub parent: Option<usize>,
-    pub split: Option<(usize, [usize; 3])>,
-    pub members: usize,
-    pub definite: usize,
-    pub leaf: u32,
-}
-
-impl LeafTree {
-    /// The tree of `keys` (a site's words by mode) with their `definite` flags, `b` base modes and the share `cap`.
-    pub fn build(keys: &[Vec<(i64, i64)>], definite: &[bool], b: usize, cap: usize) -> Self {
-        let modes = keys.first().map_or(0, Vec::len);
-        let empty = LeafNode { parent: None, split: None, members: 0, definite: 0, leaf: u32::MAX };
-        let mut tree = LeafTree { b, nodes: vec![empty.clone(); 3usize.pow(b as u32)] };
-        let mut members: Vec<Vec<usize>> = vec![Vec::new(); tree.nodes.len()];
-        for (t, w) in keys.iter().enumerate() {
-            members[tree.base(w)].push(t);
-        }
-        // Split breadth-first: (node, the first mode it may split by).
-        let mut queue: std::collections::VecDeque<(usize, usize)> = (0..tree.nodes.len()).map(|c| (c, b)).collect();
-        while let Some((node, from)) = queue.pop_front() {
-            let count = members[node].iter().filter(|&&t| definite[t]).count();
-            (tree.nodes[node].members, tree.nodes[node].definite) = (members[node].len(), count);
-            if count <= cap {
-                continue;
-            }
-            let mode = (from..modes).find(|&li| {
-                let mut seen = [false; 3];
-                for &t in members[node].iter().filter(|&&t| definite[t]) {
-                    seen[shell(keys[t][li].0, keys[t][li].1) as usize] = true;
-                }
-                seen.iter().filter(|&&x| x).count() > 1
-            });
-            let Some(li) = mode else { continue };
-            let children = [tree.nodes.len(), tree.nodes.len() + 1, tree.nodes.len() + 2];
-            for _ in 0..3 {
-                tree.nodes.push(LeafNode { parent: Some(node), ..empty.clone() });
-                members.push(Vec::new());
-            }
-            for t in std::mem::take(&mut members[node]) {
-                members[children[shell(keys[t][li].0, keys[t][li].1) as usize]].push(t);
-            }
-            tree.nodes[node].split = Some((li, children));
-            for c in children {
-                queue.push_back((c, li + 1));
-            }
-        }
-        // The leaves, numbered in node order.
-        let mut leaves = 0u32;
-        for node in tree.nodes.iter_mut().filter(|n| n.split.is_none()) {
-            node.leaf = leaves;
-            leaves += 1;
-        }
-        tree
-    }
-
-    /// The leaves' count (the lists' classes).
-    pub fn leaves(&self) -> usize {
-        self.nodes.iter().filter(|n| n.split.is_none()).count()
-    }
-
-    /// A word's base class: its first `b` modes' shells.
-    pub fn base(&self, w: &[(i64, i64)]) -> usize {
-        (0..self.b).rev().fold(0usize, |c, li| 3 * c + shell(w[li].0, w[li].1) as usize)
-    }
-
-    /// A word's leaf and its address's depth down the branches from `node` (`b` at a base class, one more a split passed).
-    pub fn descend(&self, mut node: usize, w: &[(i64, i64)]) -> (usize, usize) {
-        let mut depth = self.b;
-        while let Some((li, children)) = self.nodes[node].split {
-            node = children[shell(w[li].0, w[li].1) as usize];
-            depth += 1;
-        }
-        (node, depth)
-    }
-
-    /// A word's path: the nodes it descends from its base class to its leaf, in order.
-    pub fn path(&self, w: &[(i64, i64)]) -> Vec<usize> {
-        let mut node = self.base(w);
-        let mut path = vec![node];
-        while let Some((li, children)) = self.nodes[node].split {
-            node = children[shell(w[li].0, w[li].1) as usize];
-            path.push(node);
-        }
-        path
     }
 }
 
@@ -1976,7 +1796,7 @@ impl Field {
         let rings: Vec<(usize, Vec<(i64, i64)>)> = ring_periods(declaration.turned_slots(), declaration.reach).into_iter().map(|n| (n, (0..n.min(declaration.reach)).map(|r| ring_phasor(r, n, pi)).collect())).collect();
         let exponential = Exponential::new(FACE_BITS);
         let decays = rings.iter().map(|&(n, _)| (0..declaration.reach).map(|d| skin_decay(d, n, pi, &exponential)).collect()).collect();
-        Self { declaration, theta, layout, rings, decays, exponential, fine: Exponential::new(MATERIAL_BITS), pi, scale: None, per_blank_clock: false, bare_stretch: false, widen: None }
+        Self { declaration, theta, layout, rings, decays, exponential, fine: Exponential::new(MATERIAL_BITS), pi, scale: None, per_blank_clock: false, bare_stretch: false }
     }
 
     /// Each turned slot's skin decay on `2^(−30)` at every distance within the reach (a
@@ -4422,9 +4242,6 @@ impl Field {
     pub fn to_text(&self) -> String {
         let theta: Vec<String> = self.theta.iter().map(i32::to_string).collect();
         let mut out = format!("{}\n{}\n", self.declaration.to_text(), theta.join(" "));
-        if let Some(cap) = self.widen {
-            out.push_str(&format!("widen {cap}\n"));
-        }
         if let Some(s) = &self.scale {
             let glue: Vec<String> = s.glue.iter().map(i32::to_string).collect();
             out.push_str(&format!("scale {} {}\n{}{}\n", s.period, s.split, s.coarse.to_text(), glue.join(" ")));
@@ -4444,9 +4261,8 @@ impl Field {
             return refuse("a field's material that is not its declaration's length");
         }
         let mut field = Self::with_theta(d, theta);
-        if let Some(cap) = lines.peek().copied().and_then(|l| l.strip_prefix("widen ")) {
-            field.widen = Some(cap.trim().parse::<usize>().map_err(|_| TowerError::Refused("a width law's share that is not a count"))?);
-            lines.next();
+        if lines.peek().copied().is_some_and(|l| l.split(' ').next() == Some(RETIRED_WIDTH_LAW_LINE)) {
+            return refuse("a state under the width law: that class law retired on November 9, and the base classes stand alone");
         }
         if lines.peek().copied().is_some_and(|l| l.trim_end() == RETIRED_OPENING_AT_FORCE_LINE) {
             return refuse("a state opened at the letters' force: that opening law retired on November 9, and the own opening stands alone");

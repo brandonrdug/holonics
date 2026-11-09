@@ -476,8 +476,7 @@ fn the_tiny_lead_reads_on_the_card_are_the_hosts() {
 }
 
 /// [measurement; theory, November 9, the class reading] **A place's held classes on the card are the host's**: on every ring
-/// set, on two lanes and under the width law at a share of one, the tiny truths' held class reads at both ends and inside,
-/// and every letter at one inner place (`CardField::energy_held_classes` against `Field::energy_held_classes`: each head's
+/// set and on two lanes, the tiny truths' held class reads at both ends and inside, and every letter at one inner place (`CardField::energy_held_classes` against `Field::energy_held_classes`: each head's
 /// class, probe class and support at the place and its neighbours, from the card's own lists, and the relaxation's read with
 /// its halvings), read in one batch and again two regions a batch, equal.
 #[test]
@@ -496,13 +495,7 @@ fn the_tiny_held_class_reads_on_the_card_are_the_hosts() {
         .collect();
     let places: Vec<(&[usize], usize)> = [(&short, 0), (&short, 3), (&short, 6), (&long, 0), (&long, 12)].into_iter().map(|(c, t)| (c.as_slice(), t)).chain(letters.iter().map(|x| (x.as_slice(), 7))).collect();
     let laned = |still: usize| energetic_with(FieldDeclaration { width: 16, lanes: 2, ..tiny_declaration(still) });
-    let own: Vec<(String, Field)> = (0..=2).map(|s| (format!("still {s}"), energetic(s))).chain((0..=1).map(|s| (format!("laned still {s}"), laned(s)))).collect();
-    let widened = own.iter().map(|(name, f)| {
-        let mut w = f.clone();
-        w.widen = Some(1);
-        (format!("{name} widened"), w)
-    });
-    let fields: Vec<(String, Field)> = own.iter().cloned().chain(widened).collect();
+    let fields: Vec<(String, Field)> = (0..=2).map(|s| (format!("still {s}"), energetic(s))).chain((0..=1).map(|s| (format!("laned still {s}"), laned(s)))).collect();
     for (name, field) in &fields {
         let host: Vec<_> = places.iter().map(|&(c, t)| field.energy_held_classes(c, t).unwrap()).collect();
         let whole = card.energy_held_classes(field, &places).unwrap();
@@ -517,11 +510,10 @@ fn the_tiny_held_class_reads_on_the_card_are_the_hosts() {
 }
 
 /// [measurement; theory, November 9 09:34 and 09:42, the word reading] **A place's opening words on the card are the host's**:
-/// on every ring set, on two lanes and under the width law at a share of one, the tiny truths' key words at every site and
-/// probe words at a place's sites read, at both ends and inside, and at one inner place under every letter
-/// (`CardField::energy_opening_word_reads`, read from the card's own `qkv` and `pr` carriers, against
-/// `Field::energy_opening_words`), read in one batch and again two regions a batch, equal; the width law's tree is built on the
-/// host from these words (`LeafTree`, as `ClassLists::widened` builds the card's lists), so it is the host's where they are.
+/// on every ring set and on two lanes, the tiny truths' key words at every site and probe words at a place's sites read, at
+/// both ends and inside, and at one inner place under every letter (`CardField::energy_opening_word_reads`, read from the
+/// card's own `qkv` and `pr` carriers, against `Field::energy_opening_words`), read in one batch and again two regions a
+/// batch, equal.
 #[test]
 #[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
 fn the_tiny_opening_words_on_the_card_are_the_hosts() {
@@ -538,13 +530,7 @@ fn the_tiny_opening_words_on_the_card_are_the_hosts() {
         .collect();
     let places: Vec<(&[usize], usize)> = [(&short, 0), (&short, 3), (&short, 6), (&long, 0), (&long, 12)].into_iter().map(|(c, t)| (c.as_slice(), t)).chain(letters.iter().map(|x| (x.as_slice(), 7))).collect();
     let laned = |still: usize| energetic_with(FieldDeclaration { width: 16, lanes: 2, ..tiny_declaration(still) });
-    let own: Vec<(String, Field)> = (0..=2).map(|s| (format!("still {s}"), energetic(s))).chain((0..=1).map(|s| (format!("laned still {s}"), laned(s)))).collect();
-    let widened = own.iter().map(|(name, f)| {
-        let mut w = f.clone();
-        w.widen = Some(1);
-        (format!("{name} widened"), w)
-    });
-    let fields: Vec<(String, Field)> = own.iter().cloned().chain(widened).collect();
+    let fields: Vec<(String, Field)> = (0..=2).map(|s| (format!("still {s}"), energetic(s))).chain((0..=1).map(|s| (format!("laned still {s}"), laned(s)))).collect();
     for (name, field) in &fields {
         let host: Vec<_> = places.iter().map(|&(c, t)| field.energy_opening_words(c, t).unwrap()).collect();
         let whole = card.energy_opening_word_reads(field, &places).unwrap();
@@ -559,9 +545,9 @@ fn the_tiny_opening_words_on_the_card_are_the_hosts() {
 }
 
 /// [measurement; theory, November 9 08:13 and 08:15, the held-under reading] **An energy held under a base on the card is the
-/// host's, and under itself the plain read**: on every ring set, on two lanes and under the width law at a share of one, the
-/// tiny truths and every letter at one inner place, each held under the field itself, under a base whose pair contraction
-/// is negated and under one whose key chart is negated, in both holds (`CardField::energies_under` against
+/// host's, and under itself the plain read**: on every ring set and on two lanes, the tiny truths and every letter at one
+/// inner place, each held under the field itself, under a base whose pair contraction is negated and under one whose key
+/// chart is negated, in both holds (`CardField::energies_under` against
 /// `Field::energy_g_under`), read in one batch and again two regions a batch, equal; under itself, the card's own
 /// `CardField::energies`.
 #[test]
@@ -581,13 +567,7 @@ fn the_tiny_energies_held_under_a_base_on_the_card_are_the_hosts() {
         .collect();
     let regions: Vec<&[usize]> = [short.as_slice(), long.as_slice()].into_iter().chain(letters.iter().map(Vec::as_slice)).collect();
     let laned = |still: usize| energetic_with(FieldDeclaration { width: 16, lanes: 2, ..tiny_declaration(still) });
-    let own: Vec<(String, Field)> = (0..=2).map(|s| (format!("still {s}"), energetic(s))).chain((0..=1).map(|s| (format!("laned still {s}"), laned(s)))).collect();
-    let widened = own.iter().map(|(name, f)| {
-        let mut w = f.clone();
-        w.widen = Some(1);
-        (format!("{name} widened"), w)
-    });
-    let fields: Vec<(String, Field)> = own.iter().cloned().chain(widened).collect();
+    let fields: Vec<(String, Field)> = (0..=2).map(|s| (format!("still {s}"), energetic(s))).chain((0..=1).map(|s| (format!("laned still {s}"), laned(s)))).collect();
     for (name, field) in &fields {
         let (l, d) = (field.layout().clone(), field.declaration);
         let mut paired = field.clone();
@@ -874,59 +854,6 @@ fn the_tensor_cores_score_tangent_is_the_scalar_one_at_the_carriers_extremes() {
         println!("DZ_CHECK span={span} rows={na} columns={nb} pairs={} differ={differ} status={status} widest_bits={widest}", new.len());
         assert_eq!(status, 0, "span {span}: a refusal");
         assert_eq!(differ, 0, "span {span}: the tensor cores' score tangent differs from the scalar one");
-    }
-}
-
-/// [definition; the unified-theory reading of November 7, 23:34] **The width law on the card is the host's**: with a share small
-/// enough to split the founded line's classes, the card's lists are the host's own (`ClassLists::widened`, built on the host from
-/// the card's opening words), so `∂G/∂θ` and `G` of a batch of 400 + 900 + 1,500 sites, and the faces at an open structure, are
-/// bit-equal to the host's. [agent-inferred, November 8] Read again one region a batch, each batch's opening and leaves formed
-/// while the batch before it runs (`CardField::energy_stream`), every bit is still the host's.
-#[test]
-#[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
-fn the_width_law_on_the_card_is_the_hosts() {
-    let d = line_declaration();
-    let mut field = Field::found(d, &keys(d.founding_draws())).unwrap();
-    field.widen = Some(6);
-    let parts: Vec<Owned> = [400usize, 900, 1500].iter().map(|&n| synthetic(n, d.alphabet)).collect();
-    let regions: Vec<Region> = parts.iter().map(Owned::region).collect();
-    let opened = Card::open(0).unwrap();
-    let mut card = CardField::open(&opened).unwrap();
-    let started = Instant::now();
-    let batch = card.energy_material(&field, &regions).unwrap();
-    let card_ms = started.elapsed().as_millis();
-    let started = Instant::now();
-    let reference: Vec<(Vec<i128>, i128)> = regions.iter().map(|r| field.energy_material(r).unwrap()).collect();
-    let host_ms = started.elapsed().as_millis();
-    let diff = material_difference(&field, &reference, &batch);
-    let mut plain = field.clone();
-    plain.widen = None;
-    let unwidened: Vec<i128> = regions.iter().map(|r| plain.energy_material(r).unwrap().1).collect();
-    println!(
-        "ENERGY_WIDEN material bit_equal={} card_ms={card_ms} host_ms={host_ms} G={:?} G_unwidened={:?}",
-        diff.is_none(),
-        reference.iter().map(|r| r.1).collect::<Vec<_>>(),
-        unwidened
-    );
-    assert!(diff.is_none(), "{}", diff.unwrap_or_default());
-    assert!(reference.iter().zip(&unwidened).any(|(r, &u)| r.1 != u), "the share splits some class (else the test reads nothing)");
-    let host: Vec<_> = regions.iter().map(|r| field.energy_faces_read(r).unwrap()).collect();
-    let (faces, g) = card.read_energy_faces(&field, &regions).unwrap();
-    for (k, (hf, hg)) in host.iter().enumerate() {
-        assert_eq!(*hg, g[k], "region {k}: G");
-        assert_eq!(*hf, faces[k], "region {k}: faces");
-    }
-    // One region a batch: each batch's opening and leaves formed beside the batch before it.
-    card.energy_batch_regions(Some(1));
-    let before = card.times().batches;
-    let streamed = card.energy_material(&field, &regions).unwrap();
-    assert_eq!(card.times().batches - before, regions.len() as u64, "one region a batch");
-    let diff = material_difference(&field, &reference, &streamed);
-    assert!(diff.is_none(), "streamed: {}", diff.unwrap_or_default());
-    let (faces, g) = card.read_energy_faces(&field, &regions).unwrap();
-    for (k, (hf, hg)) in host.iter().enumerate() {
-        assert_eq!(*hg, g[k], "streamed region {k}: G");
-        assert_eq!(*hf, faces[k], "streamed region {k}: faces");
     }
 }
 

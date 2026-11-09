@@ -2886,46 +2886,6 @@ fn the_coins_measure_changes_nothing_and_orders_its_tolerances() {
     assert!(m.v_coin.windows(2).all(|w| w[0] >= w[1]), "coarser tolerances add more variance: {m:?}");
 }
 
-/// [definition; the unified-theory reading of November 7, 23:34] **The width law's lists**: with a share no class exceeds, the
-/// widened lists are the base lists, runs and probes in their order; with a small share every leaf past the base holds at
-/// most the share's definite sources or has spent its modes, every site sits in one leaf, and a receiver never probes its own.
-#[test]
-fn the_width_laws_lists_split_only_past_the_share() {
-    let (sites, modes, b) = (300usize, 8usize, 4usize);
-    let word = |t: usize, salt: u64| -> Vec<(i64, i64)> {
-        (0..modes)
-            .map(|li| {
-                let z = (t as u64 * 2654435761 + li as u64 * 40503 + salt).wrapping_mul(0x9E37_79B9_7F4A_7C15);
-                // A skew: most sites share the first modes' shells, so a few base classes are crowded.
-                let (re, im) = if li < b && t % 5 != 0 { (100, 3) } else { (((z >> 7) % 201) as i64 - 100, ((z >> 23) % 201) as i64 - 100) };
-                (re, im)
-            })
-            .collect()
-    };
-    let keys: Vec<Vec<(i64, i64)>> = (0..sites).map(|t| word(t, 1)).collect();
-    let probes_of: Vec<Vec<(i64, i64)>> = (0..sites).map(|t| word(t, 2)).collect();
-    let definite: Vec<bool> = (0..sites).map(|t| t % 7 != 3).collect();
-    let (wide, leaves) = ClassLists::widened(&keys, &probes_of, definite.clone(), b, sites);
-    let base = |w: &[(i64, i64)]| -> u32 { (0..b).rev().fold(0u32, |c, li| 3 * c + shell(w[li].0, w[li].1)) };
-    let plain = ClassLists::of(keys.iter().map(|w| base(w)).collect(), definite.clone(), 81)
-        .probing(probes_of.iter().map(|w| base(w)).collect(), probes_of.iter().map(|w| probes(w[..b].iter().copied(), band_bits(b))).collect());
-    assert_eq!(leaves, 81);
-    // The crossings are the width law's own reading (zero in `of`); the lists themselves are the plain ones.
-    assert_eq!(ClassLists { crossings: plain.crossings.clone(), ..wide.clone() }, plain);
-    let cap = 10;
-    let (narrow, leaves) = ClassLists::widened(&keys, &probes_of, definite.clone(), b, cap);
-    assert!(leaves > 81, "a crowded class splits");
-    for c in 0..leaves {
-        let def = (narrow.off[2 * c + 1] - narrow.off[2 * c]) as usize;
-        let all = (narrow.off[2 * c + 2] - narrow.off[2 * c]) as usize;
-        assert!(def <= cap || all > 0, "leaf {c}");
-    }
-    assert_eq!(narrow.members.len(), sites);
-    for i in 0..sites {
-        assert!(!narrow.probes[i].contains(&narrow.probe_class[i]), "receiver {i} probes its own leaf");
-    }
-}
-
 /// A covector of one bit a real unit on every entry (`2^40` on a material family's natural `2^(−40)`, `2^16` bits a unit on a
 /// face family's `2^(−24)`), negative on every third: under a rate of 30 bits each entry's step is under its grain.
 fn sub_grain_covector(material: usize) -> Vec<i128> {
@@ -3418,27 +3378,20 @@ fn a_leads_opening_split_is_the_opening() {
 }
 
 /// [measurement; theory, November 9, the class reading] **A held class read is the relaxation's lists and descent**: on the
-/// energy fixtures of every ring set, and with the width law at a share of one, at every place of a short and a long
-/// resolved configuration: the sites read are the place and its neighbours inside the configuration;
+/// energy fixtures of every ring set, at every place of a short and a long resolved configuration: the sites read are the
+/// place and its neighbours inside the configuration;
 /// each row's support holds its whole near field (every site within `NEAR − 1`, all keyed) and only definite class members
 /// past it, ascending and each once; summed over every receiving site and head the supports are the opening's pairs by kind
 /// ([`Field::energy_pair_kinds`], read with no tick: the classes are the opening's); the read's descent is the energy read's
 /// ([`Field::energy_read`]) and its `G` is [`Field::energy_g`]. Some letter at a place moves some class or support at the
-/// place or a neighbour, and the width law moves some support (else the test reads nothing). A site outside its
-/// configuration and a field without one energy are refused.
+/// place or a neighbour (else the test reads nothing). A site outside its configuration and a field without one energy are
+/// refused.
 #[test]
 fn a_held_class_read_is_the_relaxations_lists_and_descent() {
     let long: Vec<usize> = (0..13).map(|t| (t * 3 + t / 4) % 5).collect();
     let configurations: [&[usize]; 2] = [&CLASSES, &long];
-    let mut fields: Vec<(String, Field)> = Vec::new();
-    for still in 0..=2 {
-        let field = energetic(still);
-        let mut widened = field.clone();
-        widened.widen = Some(1);
-        fields.push((format!("still {still}"), field));
-        fields.push((format!("still {still} widened"), widened));
-    }
-    let (mut moved_by_letter, mut moved_by_width) = (false, false);
+    let fields: Vec<(String, Field)> = (0..=2).map(|still| (format!("still {still}"), energetic(still))).collect();
+    let mut moved_by_letter = false;
     for (name, field) in &fields {
         let d = field.declaration;
         for &config in &configurations {
@@ -3466,11 +3419,6 @@ fn a_held_class_read_is_the_relaxations_lists_and_descent() {
                         summed += rows[k].support.len() as u64;
                     }
                 }
-                if field.widen.is_some() {
-                    let mut plain = field.clone();
-                    plain.widen = None;
-                    moved_by_width |= plain.energy_held_classes(config, t).unwrap().heads.iter().zip(&read.heads).any(|(a, b)| a.iter().zip(b).any(|(x, y)| x.support != y.support));
-                }
                 let mut other = config.to_vec();
                 for c in 0..d.alphabet {
                     other[t] = c;
@@ -3483,7 +3431,6 @@ fn a_held_class_read_is_the_relaxations_lists_and_descent() {
         }
     }
     assert!(moved_by_letter, "some letter moves some held class or support");
-    assert!(moved_by_width, "the width law moves some support");
     assert!(energetic(1).energy_held_classes(&CLASSES, CLASSES.len()).is_err());
     assert!(shaped(1).energy_held_classes(&CLASSES, 0).is_err());
 }
@@ -3492,11 +3439,8 @@ fn a_held_class_read_is_the_relaxations_lists_and_descent() {
 /// the energy fixtures of every ring set and on two lanes, at every place of a short and a long resolved configuration, the
 /// sites read are the place and its neighbours inside the configuration, a key word is read at every site, each word holds
 /// `2M` integers, and each head's class and probe class at each site ([`Field::energy_held_classes`]) are the fold of its
-/// first `b` key and probe modes' [`shell`] trits. Under the width law (a share of one) the words are the plain field's (the
-/// law changes no word), and the [`LeafTree`] built from every site's key words is the lists' own: each read site's key path
-/// ends at its class's leaf and its probe path at its probe class's leaf, every path starts at its base class and steps from
-/// parent to child by the parent's split mode, and each node's members are the sites whose key paths pass it; some node
-/// splits (else the tree reads nothing). A site outside its configuration and a field without one energy are refused.
+/// first `b` key and probe modes' [`shell`] trits; some base mode stands on the bridge (else the trits read only the plates).
+/// A site outside its configuration and a field without one energy are refused.
 #[test]
 fn a_places_opening_words_are_what_its_classes_are_read_from() {
     let long: Vec<usize> = (0..13).map(|t| (t * 3 + t / 4) % 5).collect();
@@ -3512,12 +3456,10 @@ fn a_places_opening_words_are_what_its_classes_are_read_from() {
         field
     };
     let fields: Vec<(String, Field)> = (0..=2).map(|s| (format!("still {s}"), energetic(s))).chain((0..=1).map(|s| (format!("laned still {s}"), laned(s)))).collect();
-    let (mut bridged, mut split) = (false, false);
+    let mut bridged = false;
     for (name, field) in &fields {
         let d = field.declaration;
         let (n, m, b) = (d.modes, d.complex(), d.class_trits());
-        let mut widened = field.clone();
-        widened.widen = Some(1);
         for config in [&CLASSES[..], &long[..]] {
             let len = config.len();
             for t in 0..len {
@@ -3535,49 +3477,22 @@ fn a_places_opening_words_are_what_its_classes_are_read_from() {
                         bridged |= (0..b).any(|l| shell(read.keys[s][h * n + l], read.keys[s][m + h * n + l]) == 1);
                     }
                 }
-                assert_eq!(widened.energy_opening_words(config, t).unwrap(), read, "{name}, place {t}: the width law changes no word");
-                let wide = widened.energy_held_classes(config, t).unwrap();
-                let modes_of = |word: &[i64], h: usize| -> Vec<(i64, i64)> { (0..n).map(|l| (word[h * n + l], word[m + h * n + l])).collect() };
-                for h in 0..d.heads {
-                    let keys: Vec<Vec<(i64, i64)>> = read.keys.iter().map(|w| modes_of(w, h)).collect();
-                    let tree = LeafTree::build(&keys, &vec![true; len], b, 1);
-                    split |= tree.nodes.iter().any(|node| node.split.is_some());
-                    let paths: Vec<Vec<usize>> = keys.iter().map(|w| tree.path(w)).collect();
-                    for (node, at) in tree.nodes.iter().enumerate() {
-                        assert_eq!(at.members, paths.iter().filter(|p| p.contains(&node)).count(), "{name}, place {t}, head {h}, node {node}: its members");
-                    }
-                    for (w, path) in keys.iter().zip(&paths) {
-                        assert!(path[0] == tree.base(w) && tree.nodes[path[0]].parent.is_none(), "{name}, place {t}, head {h}: a path starts at its base class");
-                        for step in path.windows(2) {
-                            let (li, children) = tree.nodes[step[0]].split.expect("a path passes split nodes");
-                            assert!(children.contains(&step[1]) && tree.nodes[step[1]].parent == Some(step[0]) && li >= b, "{name}, place {t}, head {h}: a step by its parent's split");
-                        }
-                    }
-                    for (i, at) in wide.heads[h].iter().enumerate() {
-                        let s = read.sites[i];
-                        let probe = modes_of(&read.probes[i], h);
-                        let (key_leaf, probe_leaf) = (tree.nodes[*paths[s].last().unwrap()].leaf, tree.nodes[*tree.path(&probe).last().unwrap()].leaf);
-                        assert_eq!((key_leaf, probe_leaf), (at.class, at.probe_class), "{name}, place {t}, head {h}, site {s}: the tree's leaves are the lists'");
-                        assert_eq!(tree.descend(tree.base(&probe), &probe).1, b + tree.path(&probe).len() - 1, "{name}, place {t}, head {h}, site {s}: the address's depth");
-                    }
-                }
             }
         }
     }
     assert!(bridged, "some mode stands on the bridge (else the trits read only the plates)");
-    assert!(split, "some node of the width law's tree splits");
     assert!(energetic(1).energy_opening_words(&CLASSES, CLASSES.len()).is_err());
     assert!(shaped(1).energy_opening_words(&CLASSES, 0).is_err());
 }
 
 /// [measurement; theory, November 9 08:13 and 08:15, the held-under reading] **An energy held under a base holds the base's
-/// maps and nothing else**: on the energy fixtures of every ring set, plain and under the width law at a share of one, on a
-/// short and a long resolved configuration and every letter at one inner place of the long one: under itself, either hold
-/// reads [`Field::energy_g`]'s bits; under a base that differs only in the pair's contraction (which neither the opening nor
-/// its key and probe words read, so its classes are the field's), the classes hold reads the field's own `G` both ways, and
-/// the classes-and-halvings hold reads it wherever the base's descent stands at the field's halvings; under a base whose key
-/// chart is negated (its keys' shells turned, so its runs hold other sites), some `G` moves, and some paired base stands at
-/// other halvings (else the test reads nothing). A base of another declaration or width law is refused.
+/// maps and nothing else**: on the energy fixtures of every ring set, on a short and a long resolved configuration and every
+/// letter at one inner place of the long one: under itself, either hold reads [`Field::energy_g`]'s bits; under a base that
+/// differs only in the pair's contraction (which neither the opening nor its key and probe words read, so its classes are the
+/// field's), the classes hold reads the field's own `G` both ways, and the classes-and-halvings hold reads it wherever the
+/// base's descent stands at the field's halvings; under a base whose key chart is negated (its keys' shells turned, so its
+/// runs hold other sites), some `G` moves, and some paired base stands at other halvings (else the test reads nothing). A
+/// base of another declaration is refused.
 #[test]
 fn an_energy_held_under_a_base_holds_the_bases_maps() {
     let long: Vec<usize> = (0..13).map(|t| (t * 3 + t / 4) % 5).collect();
@@ -3587,14 +3502,7 @@ fn an_energy_held_under_a_base_holds_the_bases_maps() {
         x[7] = c;
         configurations.push(x);
     }
-    let mut fields: Vec<(String, Field)> = Vec::new();
-    for still in 0..=2 {
-        let field = energetic(still);
-        let mut widened = field.clone();
-        widened.widen = Some(1);
-        fields.push((format!("still {still}"), field));
-        fields.push((format!("still {still} widened"), widened));
-    }
+    let fields: Vec<(String, Field)> = (0..=2).map(|still| (format!("still {still}"), energetic(still))).collect();
     let both = [BaseHold::Classes, BaseHold::ClassesAndHalvings];
     let (mut moved_by_keys, mut halvings_differ) = (false, false);
     for (name, field) in &fields {
@@ -3628,11 +3536,8 @@ fn an_energy_held_under_a_base_holds_the_bases_maps() {
     assert!(moved_by_keys, "a base whose keys turn moves some G");
     assert!(halvings_differ, "some paired base stands at other halvings");
     let (field, other) = (energetic(1), energetic(2));
-    let mut widened = field.clone();
-    widened.widen = Some(1);
     for hold in both {
         assert!(field.energy_g_under(&other, &CLASSES, hold).is_err(), "another declaration");
-        assert!(field.energy_g_under(&widened, &CLASSES, hold).is_err(), "another width law");
         assert!(shaped(1).energy_g_under(&shaped(1), &CLASSES, hold).is_err(), "a field without one energy");
     }
     assert_eq!(BaseHold::of("classes"), Some(BaseHold::Classes));
@@ -3748,6 +3653,27 @@ fn a_state_opened_at_the_retired_force_is_refused() {
     assert_eq!(FieldLearner::from_text(&text).unwrap().to_text(), text);
     let mut lines: Vec<&str> = text.lines().collect();
     lines.insert(3, "opening force");
+    let refused = FieldLearner::from_text(&lines.join("\n")).unwrap_err().to_string();
+    assert!(refused.contains("retired"), "{refused}");
+}
+
+/// [definition; theory, November 9 10:24] **The retired width law is refused**: one class law stands (the base classes, the
+/// trits of the key word, with the probe classes the base law reads), so a field's or a learner's text carrying the retired
+/// law's `widen CAP` line where it wrote it (after the material) is refused with the retirement in the refusal, and the same
+/// texts without it read back as themselves.
+#[test]
+fn a_state_under_the_retired_width_law_is_refused() {
+    let field = energetic(1);
+    let text = field.to_text();
+    assert_eq!(Field::from_text(&text).unwrap(), field);
+    let mut lines: Vec<&str> = text.lines().collect();
+    lines.insert(2, "widen 47");
+    let refused = Field::from_text(&lines.join("\n")).unwrap_err().to_string();
+    assert!(refused.contains("retired"), "{refused}");
+    let text = FieldLearner::new(field, 14).to_text();
+    assert_eq!(FieldLearner::from_text(&text).unwrap().to_text(), text);
+    let mut lines: Vec<&str> = text.lines().collect();
+    lines.insert(3, "widen 47");
     let refused = FieldLearner::from_text(&lines.join("\n")).unwrap_err().to_string();
     assert!(refused.contains("retired"), "{refused}");
 }

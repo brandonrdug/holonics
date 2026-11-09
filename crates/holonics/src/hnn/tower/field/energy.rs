@@ -228,11 +228,6 @@ impl Field {
         let (trits, buckets) = (d.class_trits(), d.classes());
         let (q, pr) = self.energy_words(read, moment, reaches)?;
         let class_of = |word: &[i64], t: usize, h: usize| (0..trits).rev().fold(0u32, |c, li| 3 * c + shell(word[t * m2 + h * n + li], word[t * m2 + m + h * n + li]));
-        // [definition; the unified-theory reading of November 7, 23:34] The width law: each head's lists over its leaves.
-        if let Some(cap) = self.widen {
-            let words = |w: &[i64], h: usize| -> Vec<Vec<(i64, i64)>> { (0..sites).map(|t| (0..n).map(|li| (w[t * m2 + h * n + li], w[t * m2 + m + h * n + li])).collect()).collect() };
-            return Ok((0..heads).map(|h| ClassLists::widened(&words(&q, h), &words(&pr, h), definite.to_vec(), trits, cap).0.keyed(keyed.to_vec())).collect());
-        }
         Ok((0..heads)
             .map(|h| {
                 let class = (0..sites).map(|t| class_of(&q, t, h)).collect();
@@ -2127,21 +2122,20 @@ impl Field {
 
     /// [measurement; theory, November 9 08:13 and 08:15, the held-under reading] **A configuration's energy at this field's
     /// `θ` under a base's discrete maps**: `G(θ; C_B)` or `G(θ; C_B, h_B)`, every site of `classes` resolved. The base field
-    /// (another `θ` of the same declaration and width law) opens the configuration and draws its classes there
-    /// ([`Field::energy_classes`]: each head's key and probe trits, or under the width law the leaves of its own tree and their
-    /// runs, the receivers' probed classes across their seams), and those lists are held through this field's relaxation
-    /// (`energy_relax`'s `base`): they decide each receiver's far sources and a shared head's class falloff, while every word,
-    /// score, lock, crowd, letter, moment, pair term, force and step is this field's. With [`BaseHold::Classes`] the descent is
-    /// this field's own certified one (its halvings recomputed under its own `θ`); with [`BaseHold::ClassesAndHalvings`] the
-    /// base's relaxation is read too and this field's descent is replayed at the base's halvings, uncertified, ending where the
-    /// base's ended (`energy_relax`'s `replay`). A base that is this field reads [`Field::energy_g`]'s bits in either hold.
-    /// Refused where the base is not an energy field of the same declaration and width law.
+    /// (another `θ` of the same declaration) opens the configuration and draws its classes there ([`Field::energy_classes`]:
+    /// each head's key and probe trits and their runs, the receivers' probed classes across their seams), and those lists are
+    /// held through this field's relaxation (`energy_relax`'s `base`): they decide each receiver's far sources and a shared
+    /// head's class falloff, while every word, score, lock, crowd, letter, moment, pair term, force and step is this field's.
+    /// With [`BaseHold::Classes`] the descent is this field's own certified one (its halvings recomputed under its own `θ`);
+    /// with [`BaseHold::ClassesAndHalvings`] the base's relaxation is read too and this field's descent is replayed at the
+    /// base's halvings, uncertified, ending where the base's ended (`energy_relax`'s `replay`). A base that is this field reads
+    /// [`Field::energy_g`]'s bits in either hold. Refused where the base is not an energy field of the same declaration.
     pub fn energy_g_under(&self, base: &Field, classes: &[usize], hold: BaseHold) -> Result<i128> {
         if !self.declaration.energy || !base.declaration.energy {
             return refuse("an energy read of a field whose faces are not one energy's forces");
         }
-        if base.declaration != self.declaration || base.widen != self.widen || base.scale.is_some() != self.scale.is_some() {
-            return refuse("a base's classes held under a field of another declaration or width law");
+        if base.declaration != self.declaration || base.scale.is_some() != self.scale.is_some() {
+            return refuse("a base's classes held under a field of another declaration");
         }
         let none = vec![false; classes.len()];
         let region = Region { classes, unresolved: &none, faces: &[], locked: &[], echo: &[], domain: None, port: None };
@@ -2210,13 +2204,12 @@ impl Field {
     /// resolved and relaxed as [`Field::energy_g`] relaxes it (the declared ticks at their own certified halvings), and at
     /// `site − 1`, `site` and `site + 1` (those inside the configuration; the letter at `site` enters its neighbours' opening
     /// through their before and after rows), each head's key class and probe class as the opening's chart reads them
-    /// ([`Field::energy_classes`]: the trits of the key and probe words, or under the width law the leaves of the region's
-    /// own tree, [`ClassLists::widened`]), and the sources its lock row reads ([`ClassLists::support`]), ascending. Why: the
-    /// classes and the supports are held through every tick and the covector is taken at them, and the covector reverses
-    /// through the ticks that stood at the halvings they stood at; a deposit that redraws a place's classes or moves a tick's
-    /// standing is a discrete change the covector cannot see. Every site is resolved, so every site is definite and keyed and
-    /// the region has no port and no window. A reading only, through the host's reference; a realization reads the same lists
-    /// from its own buffers ([`FieldRealization::read_energy_held_classes`]).
+    /// ([`Field::energy_classes`]: the trits of the key and probe words), and the sources its lock row reads
+    /// ([`ClassLists::support`]), ascending. Why: the classes and the supports are held through every tick and the covector is
+    /// taken at them, and the covector reverses through the ticks that stood at the halvings they stood at; a deposit that
+    /// redraws a place's classes or moves a tick's standing is a discrete change the covector cannot see. Every site is
+    /// resolved, so every site is definite and keyed and the region has no port and no window. A reading only, through the
+    /// host's reference; a realization reads the same lists from its own buffers ([`FieldRealization::read_energy_held_classes`]).
     pub fn energy_held_classes(&self, classes: &[usize], site: usize) -> Result<EnergyHeldClasses> {
         if !self.declaration.energy {
             return refuse("an energy read of a field whose faces are not one energy's forces");
@@ -2247,12 +2240,12 @@ impl Field {
 
     /// [measurement; theory, November 9 09:34, the word reading] **The address words a configuration's opening reads its
     /// classes from, at a place** ([`EnergyOpeningWords`]): every site of `classes` resolved and opened as [`Field::energy_g`]
-    /// opens it (the opening `x⁰`, its lanes' chart): every site's unframed key word `q = Q r̂⁰ + b_q` (the sources' addresses,
-    /// every one of which the width law's tree reads), and at `site − 1`, `site` and `site + 1` (those inside the configuration)
-    /// the probe word `p = P r̂⁰ + b_p + s` with its moment added, each `[2M]` (every head's `n` modes' real parts, then their
-    /// imaginary parts), as `energy_words` forms them and `energy_classes` reads them: each head's class is its first `b`
-    /// modes' [`shell`] trits (or under the width law the leaf its words descend, [`LeafTree`]). A reading of the opening only:
-    /// no tick is taken. A realization reads the same words from its own buffers ([`FieldRealization::read_energy_opening_words`]).
+    /// opens it (the opening `x⁰`, its lanes' chart): every site's unframed key word `q = Q r̂⁰ + b_q` (the sources'
+    /// addresses), and at `site − 1`, `site` and `site + 1` (those inside the configuration) the probe word
+    /// `p = P r̂⁰ + b_p + s` with its moment added, each `[2M]` (every head's `n` modes' real parts, then their imaginary
+    /// parts), as `energy_words` forms them and `energy_classes` reads them: each head's class is its first `b` modes'
+    /// [`shell`] trits. A reading of the opening only: no tick is taken. A realization reads the same words from its own
+    /// buffers ([`FieldRealization::read_energy_opening_words`]).
     pub fn energy_opening_words(&self, classes: &[usize], site: usize) -> Result<EnergyOpeningWords> {
         if !self.declaration.energy {
             return refuse("an energy read of a field whose faces are not one energy's forces");
@@ -2966,8 +2959,7 @@ impl BaseHold {
 /// [measurement; theory, November 9, the class reading] **One head's held classes at one site** ([`EnergyHeldClasses`]): the
 /// site's class as a source (its key word's), its own probed class as a receiver (its probe word's), and the sources its lock
 /// row reads (its near field's keyed sites and the definite members of its probed classes past it), ascending sites of the
-/// configuration. Under the width law the two classes are leaves of that configuration's own tree, numbered over it: the
-/// numbers are comparable only within one configuration, and the support is the reading that compares across them.
+/// configuration.
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
 pub struct HeldSite {
     pub class: u32,

@@ -27,13 +27,6 @@
 //! scores', shares' and brackets' tangents beside their forces, the unit power's return differentiated, the pair's), the
 //! tick's letters' covectors, and the opening's; the face adds them to the partial face at the last state. The learner's
 //! return (the material's covector through the ticks) is not built: an energy field is read on the card, not trained.
-//!
-//! [definition; agent-inferred, November 8] **Under the width law a read's batches stream** ([`CardField::energy_stream`]):
-//! the receivers' leaves (`ClassLists::widened`) are built on the host from the opening's key and probe words, and within a
-//! read the constitution and every batch's regions are fixed before the batch is needed, so the next batch's opening is
-//! formed on the card and its leaves built on the host's lanes while the card runs the batch before it. The schedule moves
-//! no bit: one stream orders the card's work, each batch's words and buffers are its own until it is collected, and the
-//! lanes' indexed collect lays the tables out in the same order on any count of threads.
 
 use super::*;
 use holonics::hnn::tower::field::{BaseHold, EnergyHeldClasses, EnergyLead, EnergyOpeningWords, EnergyRead, EnergySquare, HeldSite, Shares, SquareCorners, FIRST_HALVINGS, STEP_CARRIER_HALVINGS};
@@ -109,10 +102,6 @@ pub(super) struct EnergyLists<'c> {
     pmem: Pooled<'c, u32>,
     definite: Vec<u8>,
     lengths: Vec<usize>,
-    /// The lists' bounds, as the words that read them carry them (`nclasses`, `pstride`): the class count `class_off` is laid
-    /// out at, and a receiver's stride of probed classes in `pcls` and `pmem`.
-    classes: u32,
-    pstride: u32,
 }
 
 impl EnergyLists<'_> {
@@ -248,15 +237,9 @@ struct Read {
 /// carriers; what the batch holds (the classes and their lists, the letters, the moment's term and the letters' force, the
 /// clocks and the moments); the force's buffers (one head's score covectors `S²`); and the face's.
 pub fn energy_octets(d: &FieldDeclaration, sites: usize) -> u64 {
-    energy_octets_widened(d, sites, None)
-}
-
-/// [`energy_octets`] under the width law at share `widen` (theory, November 7 23:34): the class lists sized by the law's bounds,
-/// `3^b + 2(n − b)⌊S/(cap + 1)⌋` leaves and a probe stride of `2^n`.
-pub fn energy_octets_widened(d: &FieldDeclaration, sites: usize, widen: Option<usize>) -> u64 {
     let (dw, m2, f, a, h, span) = (d.width as u64, 2 * d.complex() as u64, d.contacts as u64, d.alphabet as u64, d.heads as u64, 2 * d.modes as u64);
     let (s, pairs, lanes, slots, tm) = (sites as u64, (sites * sites) as u64, d.lanes as u64, crowd_slots(d.reach) as u64, d.moment_modes() as u64);
-    let (probe_stride, classes) = list_bounds(d, sites, widen);
+    let (probe_stride, classes) = list_bounds(d);
     let cell_site = 8 * dw + 4 * dw + 16 * lanes + 8 * 2 * m2 + 8 * m2 + h * span * (8 + 4 + 8 + 8 + 4) + 2 * 16 * h + 2 * 16 * h * span + 8 * h + 8 * h + 8 * h * slots + 2 * 8 * f + 8 * dw + 16 * h;
     let cell_fixed = (2 * 16 * h * span + 8 * h) + 64 + 16 * ENERGY_SUMS as u64;
     let cells = d.ticks as u64 + 2;
@@ -271,21 +254,17 @@ pub fn energy_octets_widened(d: &FieldDeclaration, sites: usize, widen: Option<u
     cells * (h * 8 * pairs + s * cell_site + cell_fixed) + (8 + 8 + 16) * pairs + s * (held_site + force_site + face_site + reverse_site) + 4 * h * (3 * classes + 2)
 }
 
-/// A region's class lists' bounds: a receiver's probe stride and the classes `class_off` is laid out at (`3^b` and `2^b`, or
-/// under the width law at share `cap` the law's `3^b + 2(n − b)⌊S/(cap + 1)⌋` leaves and `2^n`).
-fn list_bounds(d: &FieldDeclaration, sites: usize, widen: Option<usize>) -> (u64, u64) {
-    match widen {
-        Some(cap) => (1u64 << d.modes, (3usize.pow(d.class_trits() as u32) + 2 * d.modes.saturating_sub(d.class_trits()) * (sites / (cap + 1))) as u64),
-        None => (1u64 << d.class_trits(), d.classes() as u64),
-    }
+/// A region's class lists' bounds: a receiver's probe stride `2^b` and the `3^b` classes `class_off` is laid out at.
+fn list_bounds(d: &FieldDeclaration) -> (u64, u64) {
+    (1u64 << d.class_trits(), d.classes() as u64)
 }
 
 /// [agent-inferred, November 9, the held-under reading] **What a base's opening holds beside a batch read under it**
 /// ([`CardField::energies_under`]), a region of `sites` sites: its staging, opened state, moments and their term, clocks, the
 /// opening's state, chart, key and probe words on carriers of their own, and the class lists at their bounds.
-pub fn energy_base_octets(d: &FieldDeclaration, sites: usize, widen: Option<usize>) -> u64 {
+pub fn energy_base_octets(d: &FieldDeclaration, sites: usize) -> u64 {
     let (dw, m2, h, lanes, paced, n) = (d.width as u64, 2 * d.complex() as u64, d.heads as u64, d.lanes as u64, d.paced_heads() as u64, d.modes as u64);
-    let (probe_stride, classes) = list_bounds(d, sites, widen);
+    let (probe_stride, classes) = list_bounds(d);
     let staged = 64 + 8 * dw;
     let opened = 8 * m2 + 8 * dw + 3 * 8 * paced + 2 * 8 * paced * n;
     let words = 8 * dw + 4 * dw + 16 * lanes + 8 * 2 * m2 + 8 * m2;
@@ -321,10 +300,8 @@ fn skinless_head(field: &Field, h: usize) -> bool {
 
 /// [definition; agent-inferred, November 8] **A batch's opening, formed before it runs** ([`CardField::energy_open`]): its
 /// words (the upload's, pointed at the batch's own buffers), its staged sites and opened state, the turned heads' clocks, the
-/// moments and their term in the face, the regions' lengths, and under the width law the opening's words with the host's
-/// build of the receivers' leaves in flight ([`Widening`]). Every buffer here is the batch's own, taken while no other
-/// batch's work is queued and returned to the pool only when [`CardField::energy_rest`] has collected the batch, so an
-/// opening formed beside a running batch shares no buffer with it and is never reused before its own kernels have read it.
+/// moments and their term in the face, and the regions' lengths. Every buffer here is the batch's own and returns to the pool
+/// only when [`CardField::energy_rest`] has collected the batch, so it is never reused before its own kernels have read it.
 struct EnergyOpening<'c> {
     words: Words,
     st: Staged<'c>,
@@ -336,11 +313,10 @@ struct EnergyOpening<'c> {
     pframe: Pooled<'c, i64>,
     moment: Pooled<'c, i64>,
     mterm: Pooled<'c, i64>,
-    widening: Option<Widening<'c>>,
 }
 
-/// The opening's state, chart, key and probe words on carriers of their own (a cell's first five), read once for the width
-/// law's lists.
+/// The opening's state, chart, key and probe words on carriers of their own (a cell's first five), read once for a base's
+/// lists or the word reading.
 struct OpeningWords<'c> {
     x: Pooled<'c, i64>,
     read: Pooled<'c, i32>,
@@ -356,210 +332,6 @@ struct OpeningLists<'c> {
     lists: EnergyLists<'c>,
     _opening: EnergyOpening<'c>,
     _words: OpeningWords<'c>,
-}
-
-/// [definition; agent-inferred, November 8] **The width law's lists in formation**: the opening's words (held with the batch),
-/// the card's time to read and fetch them, and the host's build of the leaves, joined when the batch runs.
-struct Widening<'c> {
-    held: OpeningWords<'c>,
-    fetch_us: u128,
-    build: std::sync::mpsc::Receiver<WidenBuild>,
-}
-
-/// What the host's lanes return for a batch: its tables and their times, or the build's refusal, or its panic (resumed on
-/// the thread that feeds the card).
-type WidenBuild = std::thread::Result<Result<(WidenedTables, WidenTimes)>>;
-
-/// [definition; agent-inferred, November 8] **The host's operands of the width law's lists**, all fixed when the opening has
-/// been read: the opening's key words (`[t][2·2M]`, the key half read) and probe words (`[t][2M]`), each site's definite flag,
-/// the regions' lengths, and the declaration's heads, modes, complex width `M`, base modes `b` and share `cap`.
-#[derive(Clone)]
-struct WidenJob {
-    qkv: Vec<i64>,
-    pr: Vec<i64>,
-    definite: Vec<u8>,
-    lengths: Vec<usize>,
-    heads: usize,
-    n: usize,
-    m: usize,
-    b: usize,
-    cap: usize,
-}
-
-/// [definition; the unified-theory reading of November 7, 23:34] **The width law's lists in `field_classes`'s layout**
-/// ([`widened_tables`]): `cls`, `pn`, `members` `[h][t]`, `pcls` and `pmem` at the stride `[h][t][pstride]`, `class_off`
-/// `[h][r][2C + 1]` and `poff` `[h][r][C + 1]` for the bound `C` (`classes`), with the most leaves a head's region took.
-#[derive(Debug, PartialEq, Eq)]
-struct WidenedTables {
-    cls: Vec<u32>,
-    class_off: Vec<u32>,
-    members: Vec<u32>,
-    pn: Vec<u32>,
-    pcls: Vec<u32>,
-    poff: Vec<u32>,
-    pmem: Vec<u32>,
-    classes: usize,
-    pstride: usize,
-    leaves_most: usize,
-}
-
-/// The lanes' times on a batch's lists (a reading): the leaves' build, the layout's fill, and the lanes' threads.
-#[derive(Clone, Copy, Debug)]
-struct WidenTimes {
-    build_us: u128,
-    fill_us: u128,
-    threads: usize,
-}
-
-/// [agent-inferred, November 8] **The host's lanes for the width law's lists**: a pool of the host's own hardware threads
-/// less the one that feeds the card (`available_parallelism`, 24 on the RTX 4080's host, 12 on an A100's), built once a
-/// process. The thread that feeds the card spends the card's run in its synchronous reads, so the lanes build the next
-/// batch's leaves beside it.
-fn widen_lanes() -> Result<&'static rayon::ThreadPool> {
-    static LANES: std::sync::OnceLock<rayon::ThreadPool> = std::sync::OnceLock::new();
-    if let Some(lanes) = LANES.get() {
-        return Ok(lanes);
-    }
-    let threads = std::thread::available_parallelism().map_or(1, |n| n.get()).saturating_sub(1).max(1);
-    let lanes = rayon::ThreadPoolBuilder::new()
-        .num_threads(threads)
-        .thread_name(|k| format!("field-widen-{k}"))
-        .build()
-        .map_err(|e| TowerError::Realization(format!("the width law's host lanes: {e}")))?;
-    Ok(LANES.get_or_init(|| lanes))
-}
-
-/// The width law's lists built on the host's lanes ([`widened_tables`]), returned when the batch that reads them runs.
-fn widen_spawn(job: WidenJob) -> Result<std::sync::mpsc::Receiver<WidenBuild>> {
-    let lanes = widen_lanes()?;
-    let (sent, build) = std::sync::mpsc::sync_channel(1);
-    lanes.spawn(move || {
-        let built = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| widened_tables(&job)));
-        // A batch that ended before reading its lists (an earlier refusal) has dropped its receiver: nothing reads them.
-        let _ = sent.send(built);
-    });
-    Ok(build)
-}
-
-/// [definition; the unified-theory reading of November 7, 23:34] **The width law's lists from the opening's words** (the
-/// host's `energy_classes` under `widen`): each head's and region's leaves (`ClassLists::widened` on the region's key and
-/// probe words and definite flags) built on the current lanes, collected in head-and-region order (an indexed collect, so the
-/// layout's order is the order of `(h, r)` whatever the lanes' count), then laid out sequentially in `field_classes`'s
-/// layout under the law's bounds: `3^b + 2(n − b)⌊S/(cap + 1)⌋` leaves for the batch's longest region `S`, and a receiver's
-/// row (its own class and its probed ones) at the stride of the batch's longest row (the layout's width as its rows need,
-/// November 8: at the bound `2^n` each batch uploaded two 72 MB tables of mostly empty rows, 1,374 s of section 163's 5,952),
-/// under the law's bound `2^n`. Pure host data in, tables out: the same tables on any lanes.
-fn widened_tables(job: &WidenJob) -> Result<(WidenedTables, WidenTimes)> {
-    use rayon::prelude::*;
-    let started = Instant::now();
-    let WidenJob { qkv, pr, definite, lengths, heads, n, m, b, cap } = job;
-    let (heads, n, m, b, cap) = (*heads, *n, *m, *b, *cap);
-    let (m2, rn, sites) = (2 * m, lengths.len(), definite.len());
-    let firsts: Vec<usize> = lengths.iter().scan(0usize, |at, &len| { let f = *at; *at += len; Some(f) }).collect();
-    let longest = lengths.iter().copied().max().unwrap_or(0);
-    let classes = 3usize.pow(b as u32) + 2 * n.saturating_sub(b) * (longest / (cap + 1));
-    let bound = 1usize << n;
-    let built: Vec<(usize, usize, holonics::hnn::tower::field::ClassLists, usize)> = (0..heads * rn)
-        .into_par_iter()
-        .map(|u| {
-            let (h, r) = (u / rn, u % rn);
-            let (first, len) = (firsts[r], lengths[r]);
-            let keys: Vec<Vec<(i64, i64)>> = (first..first + len).map(|g| (0..n).map(|li| (qkv[g * 2 * m2 + h * n + li], qkv[g * 2 * m2 + m + h * n + li])).collect()).collect();
-            let probes: Vec<Vec<(i64, i64)>> = (first..first + len).map(|g| (0..n).map(|li| (pr[g * m2 + h * n + li], pr[g * m2 + m + h * n + li])).collect()).collect();
-            let flags: Vec<bool> = (first..first + len).map(|g| definite[g] != 0).collect();
-            let (lists, leaves) = holonics::hnn::tower::field::ClassLists::widened(&keys, &probes, flags, b, cap);
-            (h, r, lists, leaves)
-        })
-        .collect();
-    let build_us = started.elapsed().as_micros();
-    // [measurement; theory, November 8 18:33] `FIELD_WIDEN_CENSUS`: the receivers by their crossings `c`, each class's count,
-    // plates read (its own leaf and the leaves its crossings reach), pairs (definite sources in those leaves) and its own
-    // leaf's pairs, summed over the batches so far and printed every 200 batches as `FIELD_WIDEN_CENSUS`.
-    if std::env::var_os("FIELD_WIDEN_CENSUS").is_some() {
-        static CENSUS: std::sync::Mutex<(u64, [[u64; 4]; 9])> = std::sync::Mutex::new((0, [[0; 4]; 9]));
-        let mut census = CENSUS.lock().map_err(|_| TowerError::Refused("the width census's lock was poisoned"))?;
-        census.0 += 1;
-        for (_, _, lists, _) in &built {
-            let size = |q: u32| (lists.off[2 * q as usize + 1] - lists.off[2 * q as usize]) as u64;
-            for i in 0..lists.definite.len() {
-                if !lists.definite[i] {
-                    continue;
-                }
-                let c = (lists.crossings[i] as usize).min(8);
-                let own = size(lists.probe_class[i]);
-                let row = &mut census.1[c];
-                row[0] += 1;
-                row[1] += 1 + lists.probes[i].len() as u64;
-                row[2] += own + lists.probes[i].iter().map(|&q| size(q)).sum::<u64>();
-                row[3] += own;
-            }
-        }
-        if census.0 % 200 == 0 {
-            let text: Vec<String> = census.1.iter().enumerate().filter(|(_, r)| r[0] > 0).map(|(c, r)| format!("c{c}={}/{}/{}/{}", r[0], r[1] * 1000 / r[0], r[2] * 1000 / r[0], r[3] * 1000 / r[0])).collect();
-            println!("FIELD_WIDEN_CENSUS batches={} receivers/plates_milli/pairs_milli/own_pairs_milli {}", census.0, text.join(" "));
-        }
-    }
-    if built.iter().any(|(.., leaves)| *leaves > classes) {
-        return Err(TowerError::Refused("a widened region with more leaves than the width law's bound"));
-    }
-    let pstride = built
-        .iter()
-        .flat_map(|(_, _, lists, _)| (0..lists.definite.len()).filter(|&i| lists.definite[i]).map(move |i| 1 + lists.probes[i].len()))
-        .max()
-        .unwrap_or(1);
-    let t = sites;
-    let mut cls = vec![0u32; heads * t];
-    let mut pn = vec![0u32; heads * t];
-    let mut members = vec![0u32; heads * t];
-    let mut pcls = vec![0u32; heads * t * pstride];
-    let mut pmem = vec![0u32; heads * t * pstride];
-    let mut class_off = vec![0u32; heads * rn * (2 * classes + 1)];
-    let mut poff = vec![0u32; heads * rn * (classes + 1)];
-    for (h, r, lists, leaves) in &built {
-        let (first, len) = (firsts[*r], lengths[*r]);
-        let off = &mut class_off[(h * rn + r) * (2 * classes + 1)..(h * rn + r + 1) * (2 * classes + 1)];
-        off[..=2 * leaves].copy_from_slice(&lists.off[..=2 * leaves]);
-        let total = lists.off[2 * leaves];
-        off[2 * leaves + 1..].iter_mut().for_each(|o| *o = total);
-        members[h * t + first..h * t + first + len].copy_from_slice(&lists.members);
-        let mut count = vec![0u32; classes + 1];
-        for i in 0..len {
-            let g = first + i;
-            cls[h * t + g] = lists.class[i];
-            if lists.definite[i] {
-                let row = std::iter::once(lists.probe_class[i]).chain(lists.probes[i].iter().copied()).collect::<Vec<u32>>();
-                // The kernels hold a row's probed classes in shared memory, at most 128 (`MAX_PROBES` + its own).
-                if row.len() > bound || row.len() > 128 {
-                    return Err(TowerError::Refused("a widened receiver with more probes than a row holds (MAX_PROBES)"));
-                }
-                pn[h * t + g] = row.len() as u32;
-                for (k, &q) in row.iter().enumerate() {
-                    pcls[(h * t + g) * pstride + k] = q;
-                    count[q as usize] += 1;
-                }
-            }
-        }
-        let po = &mut poff[(h * rn + r) * (classes + 1)..(h * rn + r + 1) * (classes + 1)];
-        let mut at = 0u32;
-        for q in 0..classes {
-            po[q] = at;
-            at += count[q];
-        }
-        po[classes] = at;
-        let mut fill: Vec<u32> = po[..classes].to_vec();
-        let block = (h * t + first) * pstride;
-        for i in 0..len {
-            let g = first + i;
-            for k in 0..pn[h * t + g] as usize {
-                let q = pcls[(h * t + g) * pstride + k] as usize;
-                pmem[block + fill[q] as usize] = i as u32;
-                fill[q] += 1;
-            }
-        }
-    }
-    let leaves_most = built.iter().map(|(.., l)| *l).max().unwrap_or(0);
-    let times = WidenTimes { build_us, fill_us: started.elapsed().as_micros() - build_us, threads: rayon::current_num_threads() };
-    Ok((WidenedTables { cls, class_off, members, pn, pcls, poff, pmem, classes, pstride, leaves_most }, times))
 }
 
 impl<'c> CardField<'c> {
@@ -587,12 +359,12 @@ impl<'c> CardField<'c> {
         let started = Instant::now();
         let (words, upload, face_octets) = self.upload(field, None)?;
         let lengths: Vec<usize> = staged.iter().map(|r| r.classes.len()).collect();
-        let octets = |sites: usize| energy_octets_widened(&d, sites, field.widen);
+        let octets = |sites: usize| energy_octets(&d, sites);
         // A pooled buffer is at most a quarter longer than asked (its size class), so the batches are cut at four fifths of
         // the budget.
         let batches = self.energy_cut(&lengths, &octets, (self.budget - face_octets) / 5 * 4)?;
         let (mut faces, mut logits, mut reads) = (Vec::with_capacity(regions.len()), Vec::with_capacity(regions.len()), Vec::with_capacity(regions.len()));
-        self.energy_stream(field, &staged, &lengths, &octets, batches, &words, EnergyPlan::forward(), &mut |f, z, pass| {
+        self.energy_batches(field, &staged, &lengths, &octets, batches, &words, EnergyPlan::forward(), &mut |f, z, pass| {
             faces.extend(f);
             logits.extend(z);
             reads.extend(pass.reads);
@@ -605,22 +377,11 @@ impl<'c> CardField<'c> {
         Ok((faces, logits, reads))
     }
 
-    /// [definition; agent-inferred, November 8] **A read's batches streamed** (zone streaming, under the width law): within a
-    /// read the constitution is fixed (a read-only pass, or a section before its deposit), and every batch's regions are known
-    /// before the first runs, so batch `k + 1`'s opening (its staged sites, opened state, moments and key and probe words) and
-    /// its receivers' leaves depend on nothing batch `k` returns. So batch `k + 1`'s opening is formed on the card before batch
-    /// `k` runs (short work, ending in the fetch of its words), its leaves are built on the host's lanes ([`widen_lanes`])
-    /// while the thread that feeds the card runs batch `k`, and batch `k + 1` then joins them, uploads its tables and runs. The
-    /// card runs one stream, so the batches' kernels never overlap one another; what overlaps is the host's build with the
-    /// card's run. Each batch's words are the upload's with its own pointers (a batch reads only those and what it sets
-    /// itself), and each batch holds its own buffers until it is collected ([`EnergyOpening`]), so the schedule moves no bit:
-    /// every list, face and energy is the serial schedule's. What a formed opening holds beside the running batch is per site
-    /// (its state, the moments and their term, the clocks and the opening's words; no `H·S²` term), inside the margin the
-    /// budget's four fifths leave, so the batches are cut as before. `FIELD_WIDEN_SERIAL` keeps the serial schedule (a reading: the
-    /// same bits, the serial time beside the streamed one). Without the width law, or under a base's supports, each batch's
-    /// opening is formed when it runs. `collect` takes each batch's faces, logits and pass in order and returns its rereads.
+    /// [definition; agent-inferred, November 8] **A read's batches in order**: each batch opened and read on the upload's words
+    /// with its own pointers ([`CardField::energy_batch`]), its buffers held until it is collected. `collect` takes each batch's
+    /// faces, logits and pass in order and returns its rereads.
     #[allow(clippy::too_many_arguments, clippy::type_complexity)]
-    fn energy_stream(
+    fn energy_batches(
         &mut self,
         field: &Field,
         staged: &[Region],
@@ -631,25 +392,14 @@ impl<'c> CardField<'c> {
         plan: EnergyPlan<'_, 'c>,
         collect: &mut dyn FnMut(Vec<Vec<Option<TowerFace>>>, Vec<Vec<Option<Vec<i64>>>>, EnergyPass<'c>) -> u64,
     ) -> Result<()> {
-        let batches: Vec<std::ops::Range<usize>> = batches.into_iter().filter(|b| !b.is_empty()).collect();
-        let streamed = field.widen.is_some() && plan.base.is_none() && std::env::var_os("FIELD_WIDEN_SERIAL").is_none();
-        // The next batch's opening, formed ahead; its refusal is raised when that batch is due, after the running one's.
-        let mut ahead: Option<Result<EnergyOpening<'c>>> = None;
-        for (k, batch) in batches.iter().enumerate() {
-            let opening = match ahead.take() {
-                Some(formed) => formed?,
-                None => self.energy_open(field, &staged[batch.clone()], words, plan.base.is_none())?,
-            };
-            if streamed {
-                ahead = batches.get(k + 1).map(|next| self.energy_open(field, &staged[next.clone()], words, true));
-            }
+        for batch in batches.into_iter().filter(|b| !b.is_empty()) {
             let peak = lengths[batch.clone()].iter().map(|&n| octets(n)).sum::<u64>();
             self.times.peak_store = self.times.peak_store.max(peak);
             self.times.batches += 1;
-            let mut batch_words = opening.words;
             // A plan's lead sites and held places are one a region of the read: the batch reads its own.
             let plan = EnergyPlan { lead: plan.lead.map(|sites| &sites[batch.clone()]), held: plan.held.map(|sites| &sites[batch.clone()]), ..plan };
-            let (f, z, pass) = self.energy_rest(field, &staged[batch.clone()], &mut batch_words, opening, plan, streamed)?;
+            let mut batch_words = *words;
+            let (f, z, pass) = self.energy_batch(field, &staged[batch.clone()], &mut batch_words, plan)?;
             self.times.energy_rereads += collect(f, z, pass);
         }
         Ok(())
@@ -666,8 +416,8 @@ impl<'c> CardField<'c> {
     }
 
     /// [measurement; agent-inferred, November 8] **The most regions an energy batch holds** (`None`: as the card's memory cuts
-    /// them): a reading for the card's parity, which reads regions a few a batch so the width law's next batch is formed beside
-    /// a running one ([`CardField::energy_stream`]). Any partition gives the same bits: each region's sums are its own.
+    /// them): a reading for the card's parity, which reads regions a few a batch. Any partition gives the same bits: each
+    /// region's sums are its own.
     pub fn energy_batch_regions(&mut self, most: Option<usize>) {
         self.batch_regions = most.filter(|&k| k > 0);
     }
@@ -1237,11 +987,11 @@ impl<'c> CardField<'c> {
     /// [measurement; theory, November 9, the class reading] **Each region's held classes read from the batch's own lists**
     /// (the host's `Field::energy_held_classes`): at region `r`'s place `at[r]` and its neighbours inside the region, every
     /// head's row read by `field_energy_held_rows` from the lists the batch's rows read (`cls`, `class_off`, `members`, `pn`,
-    /// `pcls`: written at the opening by `field_classes`, or under the width law built on the host's lanes from the card's
-    /// opening words and uploaded): the site's class `cls[h][g]`, its own probed class (its row's first, `pcls[h][g][0]`), and
-    /// its support as the lock rows walk it (`row_prepare` and `support_at`, the entries that meet a site, in the row's
-    /// order; sorted here). Each row's support is held in a block as long as its region (a source is a site of the region
-    /// other than the receiver, each once). The relaxation's read (`reads[r]`, its halvings by tick) is the batch's own.
+    /// `pcls`: written at the opening by `field_classes`): the site's class `cls[h][g]`, its own probed class (its row's first,
+    /// `pcls[h][g][0]`), and its support as the lock rows walk it (`row_prepare` and `support_at`, the entries that meet a
+    /// site, in the row's order; sorted here). Each row's support is held in a block as long as its region (a source is a site
+    /// of the region other than the receiver, each once). The relaxation's read (`reads[r]`, its halvings by tick) is the
+    /// batch's own.
     fn energy_held_class_reads(&self, field: &Field, words: &mut Words, at: &[usize], st: &Staged<'c>, reads: &[EnergyRead]) -> Result<Vec<EnergyHeldClasses>> {
         let card = self.card;
         let heads = field.declaration.heads;
@@ -1309,12 +1059,10 @@ impl<'c> CardField<'c> {
     }
 
     /// [definition; agent-inferred, November 8] **A batch's opening on the card** (the first part of the host's `energy_relax`,
-    /// formed before the batch runs): the batch's words (`base`: the upload's in a streamed read, the running words of a
-    /// base's corners otherwise, pointed at the batch's own staging), its sites staged and opened, the turned heads' clocks, the
-    /// moments and their term added into the opening, and under the width law (`own_lists`, no base's supports) the opening's
-    /// key and probe words read and fetched, the receivers' leaves handed to the host's lanes to build
-    /// ([`CardField::energy_widened_words`]). Every buffer is the batch's own ([`EnergyOpening`]).
-    fn energy_open(&self, field: &Field, regions: &[Region], base: &Words, own_lists: bool) -> Result<EnergyOpening<'c>> {
+    /// formed before the batch runs): the batch's words (`base`: the upload's, or the running words of a base's corners,
+    /// pointed at the batch's own staging), its sites staged and opened, the turned heads' clocks, and the moments and their
+    /// term added into the opening. Every buffer is the batch's own ([`EnergyOpening`]).
+    fn energy_open(&self, field: &Field, regions: &[Region], base: &Words) -> Result<EnergyOpening<'c>> {
         let card = self.card;
         let d = field.declaration;
         let (dw, m, n, a) = (d.width, d.complex(), d.modes, d.alphabet);
@@ -1351,33 +1099,8 @@ impl<'c> CardField<'c> {
         self.affine("field_affine_x64", words, mface, mface_bias, rmface, dw, m2, words.moment, m2, mterm.device_ptr(), dw, 0, false)?;
         self.affine("field_affine_x64", words, mface, mface_bias, rmface, dw, m2, words.moment, m2, 0, dw, words.x, false)?;
         let lengths: Vec<usize> = regions.iter().map(|r| r.classes.len()).collect();
-        // [definition; the unified-theory reading of November 7, 23:34] Under the width law the lists are built on the host
-        // from the opening's words (`ClassLists::widened`, the host's own lists) and laid out as `field_classes` lays them.
-        let widening = match field.widen {
-            Some(cap) if own_lists => Some(self.energy_widened_words(field, words, &st, &lengths, cap)?),
-            _ => None,
-        };
         self.mark("energy_open");
-        Ok(EnergyOpening { words: batch_words, st, lengths, kappa, tau, sigma, plain, pframe, moment, mterm, widening })
-    }
-
-    /// [definition; the unified-theory reading of November 7, 23:34] **The width law's lists, their card part**: the opening's
-    /// key and probe words read on the card (as `energy_cell` reads them) on carriers of their own, fetched, and handed to the
-    /// host's lanes, which build each head's and region's leaves (`ClassLists::widened`, the host's `energy_classes`) in
-    /// `field_classes`'s layout ([`widened_tables`]) while the card runs on. The carriers stay with the batch.
-    fn energy_widened_words(&self, field: &Field, words: &mut Words, st: &Staged<'c>, lengths: &[usize], cap: usize) -> Result<Widening<'c>> {
-        let card = self.card;
-        let d = field.declaration;
-        let (m, n, heads) = (d.complex(), d.modes, d.heads);
-        let m2 = 2 * m;
-        let sites = st.sites;
-        let started = Instant::now();
-        let held = self.energy_opening_words(field, words, st)?;
-        let qkv = self.timed(Kind::Copy, || card.fetch_range(&held.qkv, 0, sites * 2 * m2)).map_err(device)?;
-        let pr = self.timed(Kind::Copy, || card.fetch_range(&held.pr, 0, sites * m2)).map_err(device)?;
-        let fetch_us = started.elapsed().as_micros();
-        let build = widen_spawn(WidenJob { qkv, pr, definite: st.definite.clone(), lengths: lengths.to_vec(), heads, n, m, b: d.class_trits(), cap })?;
-        Ok(Widening { held, fetch_us, build })
+        Ok(EnergyOpening { words: batch_words, st, lengths, kappa, tau, sigma, plain, pframe, moment, mterm })
     }
 
     /// The opening's key and probe words read on the card as `energy_cell` reads them, on carriers of their own (a cell's state,
@@ -1409,93 +1132,32 @@ impl<'c> CardField<'c> {
 
     /// [measurement; theory, November 9 08:13, the held-under reading] **A base's class lists at a batch's opening, and no
     /// tick**: the base field opens the batch (its own words, `base`: its staging, opened state and moments, the host's
-    /// `energy_relax` up to `energy_classes`), and its lists are built as its own read builds them: under the width law the
-    /// leaves on the host's lanes from its opening words, uploaded ([`CardField::energy_widened_upload`]); otherwise its opening
-    /// words read ([`CardField::energy_opening_words`]) and `field_classes` sorting them into fresh lists at the declaration's
-    /// bounds. The opening and the words stay with the lists until the batch read under them has been collected.
+    /// `energy_relax` up to `energy_classes`), and its lists are built as its own read builds them: its opening words read
+    /// ([`CardField::energy_opening_words`]) and `field_classes` sorting them into fresh lists at the declaration's bounds. The
+    /// opening and the words stay with the lists until the batch read under them has been collected.
     fn energy_opening_lists(&self, base: &Field, regions: &[Region], words: &Words) -> Result<OpeningLists<'c>> {
         let d = base.declaration;
-        let mut opening = self.energy_open(base, regions, words, true)?;
+        let opening = self.energy_open(base, regions, words)?;
         let mut words = opening.words;
         let (sites, rn, heads) = (opening.st.sites, regions.len(), d.heads);
-        let lengths = opening.lengths.clone();
-        let (lists, held) = match opening.widening.take() {
-            Some(Widening { held, fetch_us, build }) => (self.energy_widened_upload(base, &mut words, (fetch_us, build), &opening.st, &lengths, false)?, held),
-            None => {
-                let held = self.energy_opening_words(base, &mut words, &opening.st)?;
-                let (classes, probe_stride) = (d.classes(), 1usize << d.class_trits());
-                let u32s = |len: usize| self.timed(Kind::Alloc, || self.take::<u32>(len.max(1))).map_err(device);
-                let lists = EnergyLists {
-                    cls: u32s(heads * sites)?,
-                    class_off: u32s(heads * rn * (2 * classes + 1))?,
-                    members: u32s(heads * sites)?,
-                    pn: u32s(heads * sites)?,
-                    pcls: u32s(heads * sites * probe_stride)?,
-                    poff: u32s(heads * rn * (classes + 1))?,
-                    pmem: u32s(heads * sites * probe_stride)?,
-                    definite: opening.st.definite.clone(),
-                    lengths,
-                    classes: classes as u32,
-                    pstride: probe_stride as u32,
-                };
-                [words.cls, words.class_off, words.members, words.pn, words.pcls, words.poff, words.pmem] = lists.pointers();
-                (words.nclasses, words.pstride) = (lists.classes, lists.pstride);
-                self.launch_shared("field_classes", (heads * rn).clamp(1, 1 << 20) as u32, 32, 4 * 3 * classes as u32, &mut [arg(&mut words)])?;
-                (lists, held)
-            }
+        let held = self.energy_opening_words(base, &mut words, &opening.st)?;
+        let (classes, probe_stride) = (d.classes(), 1usize << d.class_trits());
+        let u32s = |len: usize| self.timed(Kind::Alloc, || self.take::<u32>(len.max(1))).map_err(device);
+        let lists = EnergyLists {
+            cls: u32s(heads * sites)?,
+            class_off: u32s(heads * rn * (2 * classes + 1))?,
+            members: u32s(heads * sites)?,
+            pn: u32s(heads * sites)?,
+            pcls: u32s(heads * sites * probe_stride)?,
+            poff: u32s(heads * rn * (classes + 1))?,
+            pmem: u32s(heads * sites * probe_stride)?,
+            definite: opening.st.definite.clone(),
+            lengths: opening.lengths.clone(),
         };
+        [words.cls, words.class_off, words.members, words.pn, words.pcls, words.poff, words.pmem] = lists.pointers();
+        self.launch_shared("field_classes", (heads * rn).clamp(1, 1 << 20) as u32, 32, 4 * 3 * classes as u32, &mut [arg(&mut words)])?;
         self.mark("energy_base_lists");
         Ok(OpeningLists { lists, _opening: opening, _words: held })
-    }
-
-    /// [definition; agent-inferred, November 8] **The width law's lists taken from the host's lanes and uploaded**: the build is
-    /// joined (the wait the main thread spent on it is the part of the build the card's run did not hide), its tables go up in
-    /// `field_classes`'s layout under the law's bounds (`3^b + 2(n − b)⌊S/(cap + 1)⌋` leaves for the batch's longest region `S`,
-    /// a receiver's probes at the batch's longest row, under `2^n`), and the words carry the bounds (`nclasses`, `pstride`). The
-    /// round trip prints as `FIELD_WIDEN_LISTS`: the card's read and fetch, the lanes' build and layout, the wait, the upload.
-    fn energy_widened_upload(&self, field: &Field, words: &mut Words, widening: (u128, std::sync::mpsc::Receiver<WidenBuild>), st: &Staged<'c>, lengths: &[usize], streamed: bool) -> Result<EnergyLists<'c>> {
-        let (fetch_us, build) = widening;
-        let waited = Instant::now();
-        let (tables, times) = match build.recv() {
-            Ok(Ok(built)) => built?,
-            Ok(Err(panic)) => std::panic::resume_unwind(panic),
-            Err(_) => return Err(TowerError::Realization("the width law's host lanes ended without the batch's lists".to_string())),
-        };
-        let wait_us = waited.elapsed().as_micros();
-        let uploading = Instant::now();
-        let up = |v: &[u32]| self.timed(Kind::Copy, || self.take_up(v)).map_err(device);
-        let lists = EnergyLists {
-            cls: up(&tables.cls)?,
-            class_off: up(&tables.class_off)?,
-            members: up(&tables.members)?,
-            pn: up(&tables.pn)?,
-            pcls: up(&tables.pcls)?,
-            poff: up(&tables.poff)?,
-            pmem: up(&tables.pmem)?,
-            definite: st.definite.clone(),
-            lengths: lengths.to_vec(),
-            classes: tables.classes as u32,
-            pstride: tables.pstride as u32,
-        };
-        (words.nclasses, words.pstride) = (tables.classes as u32, tables.pstride as u32);
-        let upload_us = uploading.elapsed().as_micros();
-        let receivers: Vec<u32> = tables.pn.iter().copied().filter(|&k| k > 0).collect();
-        println!(
-            "FIELD_WIDEN_LISTS regions={} sites={} heads={} probes_most={} probes_mean_milli={} leaves_most={} bound={} stride={} fetch_us={fetch_us} build_us={} fill_us={} wait_us={wait_us} upload_us={upload_us} threads={} streamed={}",
-            lengths.len(),
-            st.sites,
-            field.declaration.heads,
-            receivers.iter().max().map_or(0, |&k| k - 1),
-            receivers.iter().map(|&k| (k - 1) as u64).sum::<u64>() * 1000 / receivers.len().max(1) as u64,
-            tables.leaves_most,
-            tables.classes,
-            tables.pstride,
-            times.build_us,
-            times.fill_us,
-            times.threads,
-            u8::from(streamed)
-        );
-        Ok(lists)
     }
 
     /// [definition; the unified-theory reading of November 6, 22:52] **One batch's energy forward** (the host's
@@ -1503,9 +1165,9 @@ impl<'c> CardField<'c> {
     /// rest ([`CardField::energy_rest`]) on the batch's words, which are left in `words` (a base's corners read on them).
     #[allow(clippy::type_complexity)]
     fn energy_batch(&self, field: &Field, regions: &[Region], words: &mut Words, plan: EnergyPlan<'_, 'c>) -> Result<(Vec<Vec<Option<TowerFace>>>, Vec<Vec<Option<Vec<i64>>>>, EnergyPass<'c>)> {
-        let opening = self.energy_open(field, regions, words, plan.base.is_none())?;
+        let opening = self.energy_open(field, regions, words)?;
         let mut batch_words = opening.words;
-        let out = self.energy_rest(field, regions, &mut batch_words, opening, plan, false);
+        let out = self.energy_rest(field, regions, &mut batch_words, opening, plan);
         *words = batch_words;
         out
     }
@@ -1515,7 +1177,7 @@ impl<'c> CardField<'c> {
     /// site's face as the energy's total derivative on its letter at the last state. `words` are the opening's; the opening's
     /// buffers are dropped only when this returns, after the batch's last fetch.
     #[allow(clippy::type_complexity)]
-    fn energy_rest(&self, field: &Field, regions: &[Region], words: &mut Words, opening: EnergyOpening<'c>, plan: EnergyPlan<'_, 'c>, streamed: bool) -> Result<(Vec<Vec<Option<TowerFace>>>, Vec<Vec<Option<Vec<i64>>>>, EnergyPass<'c>)> {
+    fn energy_rest(&self, field: &Field, regions: &[Region], words: &mut Words, opening: EnergyOpening<'c>, plan: EnergyPlan<'_, 'c>) -> Result<(Vec<Vec<Option<TowerFace>>>, Vec<Vec<Option<Vec<i64>>>>, EnergyPass<'c>)> {
         // [measurement; theory, November 8 19:42] `FIELD_EVENTS_EVERY=N` (with `FIELD_EVENTS`): the card-clock reading so far,
         // each kernel's launches and card time, printed every `N` batches as `FIELD_EVENT_AT` lines, so a read cut by its
         // deadline still gives its kernels' times over a declared count of batches.
@@ -1544,11 +1206,7 @@ impl<'c> CardField<'c> {
         let (m2, span) = (2 * m, 2 * n);
         let l = field.layout();
         // The opening's buffers, held to the end of the batch (the clocks and moments its words point at).
-        let EnergyOpening { words: _, st, lengths, kappa: _kappa, tau: _tau, sigma: _sigma, plain: _plain, pframe: _pframe, moment: _moment, mterm, widening } = opening;
-        let (_opening_words, widening) = match widening {
-            Some(Widening { held, fetch_us, build }) => (Some(held), Some((fetch_us, build))),
-            None => (None, None),
-        };
+        let EnergyOpening { words: _, st, lengths, kappa: _kappa, tau: _tau, sigma: _sigma, plain: _plain, pframe: _pframe, moment: _moment, mterm } = opening;
         let (sites, pairs, rn) = (st.sites, st.pairs, regions.len());
         let i64s = |len: usize| self.timed(Kind::Alloc, || self.take::<i64>(len.max(1))).map_err(device);
         let (mface, _, _) = moment_face(field);
@@ -1563,30 +1221,22 @@ impl<'c> CardField<'c> {
                 if base.lengths != lengths {
                     return Err(TowerError::Refused("a batch read under a base whose regions are not its own layout"));
                 }
-                // The words read the base's lists at the base's bounds (a base under the width law lays them out at its own).
-                (words.nclasses, words.pstride) = (base.classes, base.pstride);
                 (None, self.energy_hold_definite(words, regions, &st, &base.definite, d.ticks)?)
             }
-            // Under the width law the lists were built on the host's lanes from the opening's words.
-            None => match widening {
-                Some(widening) => (Some(self.energy_widened_upload(field, words, widening, &st, &lengths, streamed)?), None),
-                None => (
-                    Some(EnergyLists {
-                        cls: u32s(heads * sites)?,
-                        class_off: u32s(heads * rn * (2 * classes + 1))?,
-                        members: u32s(heads * sites)?,
-                        pn: u32s(heads * sites)?,
-                        pcls: u32s(heads * sites * probe_stride)?,
-                        poff: u32s(heads * rn * (classes + 1))?,
-                        pmem: u32s(heads * sites * probe_stride)?,
-                        definite: st.definite.clone(),
-                        lengths,
-                        classes: classes as u32,
-                        pstride: probe_stride as u32,
-                    }),
-                    None,
-                ),
-            },
+            None => (
+                Some(EnergyLists {
+                    cls: u32s(heads * sites)?,
+                    class_off: u32s(heads * rn * (2 * classes + 1))?,
+                    members: u32s(heads * sites)?,
+                    pn: u32s(heads * sites)?,
+                    pcls: u32s(heads * sites * probe_stride)?,
+                    poff: u32s(heads * rn * (classes + 1))?,
+                    pmem: u32s(heads * sites * probe_stride)?,
+                    definite: st.definite.clone(),
+                    lengths,
+                }),
+                None,
+            ),
         };
         let held = EnergyHeld {
             lists: match (&lists, plan.base) {
@@ -1627,8 +1277,7 @@ impl<'c> CardField<'c> {
         // The opening's read, its classes held.
         let opening = self.energy_cell_alloc(field, sites, pairs, rn)?;
         card.copy_within(state, 0, &opening.x, 0, sites * dw).map_err(device)?;
-        // Under the width law the lists were built on the host (`energy_widened_lists`); `field_classes` does not run.
-        self.energy_cell(field, words, &opening, &held, plan.base.is_none() && field.widen.is_none(), sites, rn)?;
+        self.energy_cell(field, words, &opening, &held, plan.base.is_none(), sites, rn)?;
         let read0 = self.energy_reads(&opening, rn)?;
         let mut cells = vec![opening];
         let mut now: Vec<Read> = read0.clone();
@@ -1989,11 +1638,11 @@ impl CardField<'_> {
         let (words, upload, face_octets) = self.upload(field, None)?;
         let lengths: Vec<usize> = staged.iter().map(|r| r.classes.len()).collect();
         let theta = field.theta.len() as u64;
-        let octets = |sites: usize| energy_octets_widened(&d, sites, field.widen) + 2 * 16 * theta;
+        let octets = |sites: usize| energy_octets(&d, sites) + 2 * 16 * theta;
         let batches = self.energy_cut(&lengths, &octets, (self.budget - face_octets) / 5 * 4)?;
         let mut out = Vec::with_capacity(regions.len());
         let plan = EnergyPlan { replay: None, base: None, faces: false, material: true, lead: None, held: None };
-        self.energy_stream(field, &staged, &lengths, &octets, batches, &words, plan, &mut |_, _, pass| {
+        self.energy_batches(field, &staged, &lengths, &octets, batches, &words, plan, &mut |_, _, pass| {
             out.extend(pass.material.into_iter().zip(pass.reads).map(|(g, read)| (g, read.last)));
             pass.rereads
         })?;
@@ -2022,7 +1671,7 @@ impl CardField<'_> {
         let started = Instant::now();
         let (mut words, upload, face_octets) = self.upload(field, None)?;
         let lengths: Vec<usize> = squares.iter().map(|(truth, _)| truth.len()).collect();
-        let octets = |sites: usize| energy_octets_widened(&d, sites, field.widen);
+        let octets = |sites: usize| energy_octets(&d, sites);
         let batches = self.energy_cut(&lengths, &octets, (self.budget - face_octets) / 5 * 4)?;
         let mut out = Vec::with_capacity(squares.len());
         for batch in batches {
@@ -2070,7 +1719,7 @@ impl CardField<'_> {
         let started = Instant::now();
         let (mut words, upload, face_octets) = self.upload(field, None)?;
         let lengths: Vec<usize> = squares.iter().map(|(truth, _)| truth.len()).collect();
-        let octets = |sites: usize| energy_octets_widened(&d, sites, field.widen);
+        let octets = |sites: usize| energy_octets(&d, sites);
         let batches = self.energy_cut(&lengths, &octets, (self.budget - face_octets) / 5 * 4)?;
         let mut out = Vec::with_capacity(squares.len());
         for batch in batches {
@@ -2151,18 +1800,18 @@ impl CardField<'_> {
         let started = Instant::now();
         let (words, upload, face_octets) = self.upload(field, None)?;
         let lengths: Vec<usize> = regions.iter().map(|r| r.len()).collect();
-        let octets = |sites: usize| energy_octets_widened(&d, sites, field.widen);
+        let octets = |sites: usize| energy_octets(&d, sites);
         let batches = self.energy_cut(&lengths, &octets, (self.budget - face_octets) / 5 * 4)?;
         let mut out = Vec::with_capacity(regions.len());
         let plan = EnergyPlan { faces: false, ..EnergyPlan::forward() };
-        // Every region resolved, its energy sites staged and admitted (`energy_owned`'s, region by region), so the batches stream.
+        // Every region resolved, its energy sites staged and admitted (`energy_owned`'s, region by region).
         let owned: Vec<Owned> = regions.iter().map(|c| Owned { classes: c.to_vec(), unresolved: vec![false; c.len()], faces: Vec::new(), locked: Vec::new() }).collect();
         let resolved: Vec<Region> = owned.iter().map(Owned::region).collect();
         admit_regions(&d, &resolved)?;
         let sited: Vec<(Vec<Option<Shares>>, Vec<bool>)> = resolved.iter().map(|r| field.energy_sites(r)).collect();
         let staged: Vec<Region> = resolved.iter().zip(&sited).map(|(r, (faces, locked))| Region { faces, locked, ..*r }).collect();
         admit_regions(&d, &staged)?;
-        self.energy_stream(field, &staged, &lengths, &octets, batches, &words, plan, &mut |_, _, pass| {
+        self.energy_batches(field, &staged, &lengths, &octets, batches, &words, plan, &mut |_, _, pass| {
             out.extend(pass.reads.iter().map(|r| r.last));
             0
         })?;
@@ -2177,26 +1826,25 @@ impl CardField<'_> {
     /// `θ` under `base`'s discrete maps, on the card** (the host's `Field::energy_g_under`): both fields uploaded, the regions
     /// batched by the card's memory (each region budgeted for its own read and for what the base's opening holds beside it,
     /// [`energy_base_octets`]), and each batch read twice on one layout. First the base: under [`BaseHold::Classes`] its
-    /// opening and class lists alone ([`CardField::energy_opening_lists`]: `field_classes` on its opening words, or the width
-    /// law's leaves built on the host's lanes from them), under [`BaseHold::ClassesAndHalvings`] its whole certified relaxation
-    /// with no faces, keeping its lists and each region's halvings. Then `field`: its own opening, letters, moments and words,
-    /// relaxed under the base's lists (`EnergyPlan::base`; the words read them at the base's bounds), certified at its own
-    /// halvings or replayed at the base's (`EnergyPlan::replay`), no faces; each region's `G` is its last read. A base that is
-    /// `field` reads [`CardField::energies`]'s bits.
+    /// opening and class lists alone ([`CardField::energy_opening_lists`]: `field_classes` on its opening words), under
+    /// [`BaseHold::ClassesAndHalvings`] its whole certified relaxation with no faces, keeping its lists and each region's
+    /// halvings. Then `field`: its own opening, letters, moments and words, relaxed under the base's lists
+    /// (`EnergyPlan::base`), certified at its own halvings or replayed at the base's (`EnergyPlan::replay`), no faces; each
+    /// region's `G` is its last read. A base that is `field` reads [`CardField::energies`]'s bits.
     pub fn energies_under(&mut self, field: &Field, base: &Field, regions: &[&[usize]], hold: BaseHold) -> Result<Vec<i128>> {
         let d = field.declaration;
         if !d.energy || field.scale.is_some() || !base.declaration.energy || base.scale.is_some() {
             return Err(TowerError::Refused("an energy read of a field whose faces are not one energy's forces"));
         }
-        if base.declaration != d || base.widen != field.widen {
-            return Err(TowerError::Refused("a base's classes held under a field of another declaration or width law"));
+        if base.declaration != d {
+            return Err(TowerError::Refused("a base's classes held under a field of another declaration"));
         }
         let card = self.card;
         let started = Instant::now();
         let (words, upload, face_octets) = self.upload(field, None)?;
         let (base_words, _base_upload, base_face_octets) = self.upload(base, None)?;
         let lengths: Vec<usize> = regions.iter().map(|r| r.len()).collect();
-        let octets = |sites: usize| energy_octets_widened(&d, sites, field.widen) + energy_base_octets(&d, sites, field.widen);
+        let octets = |sites: usize| energy_octets(&d, sites) + energy_base_octets(&d, sites);
         let batches = self.energy_cut(&lengths, &octets, self.budget.saturating_sub(face_octets + base_face_octets) / 5 * 4)?;
         let owned: Vec<Owned> = regions.iter().map(|c| Owned { classes: c.to_vec(), unresolved: vec![false; c.len()], faces: Vec::new(), locked: Vec::new() }).collect();
         let resolved: Vec<Region> = owned.iter().map(Owned::region).collect();
@@ -2213,9 +1861,9 @@ impl CardField<'_> {
             let (opening_lists, relaxed_lists, halvings) = match hold {
                 BaseHold::Classes => (Some(self.energy_opening_lists(base, part, &base_words)?), None, None),
                 BaseHold::ClassesAndHalvings => {
-                    let opening = self.energy_open(base, part, &base_words, true)?;
+                    let opening = self.energy_open(base, part, &base_words)?;
                     let mut relaxing = opening.words;
-                    let EnergyPass { lists, reads, .. } = self.energy_rest(base, part, &mut relaxing, opening, EnergyPlan { faces: false, ..EnergyPlan::forward() }, false)?.2;
+                    let EnergyPass { lists, reads, .. } = self.energy_rest(base, part, &mut relaxing, opening, EnergyPlan { faces: false, ..EnergyPlan::forward() })?.2;
                     self.times.batches += 1;
                     let halvings: Vec<Vec<Option<u32>>> = reads.iter().map(|r| r.halvings.clone()).collect();
                     (None, Some(lists.ok_or(TowerError::Refused("a base read under another's supports"))?), Some(halvings))
@@ -2226,10 +1874,10 @@ impl CardField<'_> {
                 (None, Some(lists)) => lists,
                 (None, None) => return Err(TowerError::Refused("a held-under batch with no base's lists")),
             };
-            let opening = self.energy_open(field, part, &words, false)?;
+            let opening = self.energy_open(field, part, &words)?;
             let mut reading = opening.words;
             let plan = EnergyPlan { faces: false, base: Some(lists), replay: halvings.as_deref(), ..EnergyPlan::forward() };
-            let (_, _, pass) = self.energy_rest(field, part, &mut reading, opening, plan, false)?;
+            let (_, _, pass) = self.energy_rest(field, part, &mut reading, opening, plan)?;
             self.times.batches += 1;
             self.times.energy_rereads += pass.rereads;
             out.extend(pass.reads.iter().map(|r| r.last));
@@ -2259,7 +1907,7 @@ impl CardField<'_> {
         let started = Instant::now();
         let (words, upload, face_octets) = self.upload(field, None)?;
         let lengths: Vec<usize> = places.iter().map(|(c, _)| c.len()).collect();
-        let octets = |sites: usize| energy_octets_widened(&d, sites, field.widen);
+        let octets = |sites: usize| energy_octets(&d, sites);
         let batches = self.energy_cut(&lengths, &octets, (self.budget - face_octets) / 5 * 4)?;
         let sites: Vec<usize> = places.iter().map(|&(_, t)| t).collect();
         let plan = EnergyPlan { faces: false, lead: Some(&sites), ..EnergyPlan::forward() };
@@ -2270,7 +1918,7 @@ impl CardField<'_> {
         let staged: Vec<Region> = resolved.iter().zip(&sited).map(|(r, (faces, locked))| Region { faces, locked, ..*r }).collect();
         admit_regions(&d, &staged)?;
         let mut out = Vec::with_capacity(places.len());
-        self.energy_stream(field, &staged, &lengths, &octets, batches, &words, plan, &mut |_, _, pass| {
+        self.energy_batches(field, &staged, &lengths, &octets, batches, &words, plan, &mut |_, _, pass| {
             out.extend(pass.lead);
             pass.rereads
         })?;
@@ -2298,7 +1946,7 @@ impl CardField<'_> {
         let started = Instant::now();
         let (words, upload, face_octets) = self.upload(field, None)?;
         let lengths: Vec<usize> = places.iter().map(|(c, _)| c.len()).collect();
-        let octets = |sites: usize| energy_octets_widened(&d, sites, field.widen);
+        let octets = |sites: usize| energy_octets(&d, sites);
         let batches = self.energy_cut(&lengths, &octets, (self.budget - face_octets) / 5 * 4)?;
         let sites: Vec<usize> = places.iter().map(|&(_, t)| t).collect();
         let plan = EnergyPlan { faces: false, held: Some(&sites), ..EnergyPlan::forward() };
@@ -2309,7 +1957,7 @@ impl CardField<'_> {
         let staged: Vec<Region> = resolved.iter().zip(&sited).map(|(r, (faces, locked))| Region { faces, locked, ..*r }).collect();
         admit_regions(&d, &staged)?;
         let mut out = Vec::with_capacity(places.len());
-        self.energy_stream(field, &staged, &lengths, &octets, batches, &words, plan, &mut |_, _, pass| {
+        self.energy_batches(field, &staged, &lengths, &octets, batches, &words, plan, &mut |_, _, pass| {
             out.extend(pass.held);
             pass.rereads
         })?;
@@ -2323,7 +1971,7 @@ impl CardField<'_> {
     /// [measurement; theory, November 9 09:34, the word reading] **Each place's opening address words on the card** (the host's
     /// `Field::energy_opening_words` at each `(classes, site)`): every site of the configuration resolved, each batch opened as
     /// the energy's read opens it ([`CardField::energy_open`]: its staging, `field_open`'s rows with the moment's term) and its
-    /// key and probe words read as `energy_cell` and the width law's lists read them ([`CardField::energy_opening_words`]: the
+    /// key and probe words read as `energy_cell` reads them ([`CardField::energy_opening_words`]: the
     /// opening's chart, `Q r̂⁰ + b_q` into the key half of `qkv`, `P r̂⁰ + b_p` into `pr` with `field_moment_add_probe`), then each
     /// region's key rows (every site's, one fetch a region) and probe rows at its place and neighbours (one fetch) taken from
     /// those carriers; no class list is built and no tick is taken. The places batched by the card's memory (each region
@@ -2341,7 +1989,7 @@ impl CardField<'_> {
         let m2 = 2 * d.complex();
         let (words, _upload, face_octets) = self.upload(field, None)?;
         let lengths: Vec<usize> = places.iter().map(|(c, _)| c.len()).collect();
-        let octets = |sites: usize| energy_base_octets(&d, sites, field.widen);
+        let octets = |sites: usize| energy_base_octets(&d, sites);
         let batches = self.energy_cut(&lengths, &octets, self.budget.saturating_sub(face_octets) / 5 * 4)?;
         let owned: Vec<Owned> = places.iter().map(|(c, _)| Owned { classes: c.to_vec(), unresolved: vec![false; c.len()], faces: Vec::new(), locked: Vec::new() }).collect();
         let resolved: Vec<Region> = owned.iter().map(Owned::region).collect();
@@ -2354,7 +2002,7 @@ impl CardField<'_> {
             let peak = lengths[batch.clone()].iter().map(|&n| octets(n)).sum::<u64>();
             self.times.peak_store = self.times.peak_store.max(peak);
             self.times.batches += 1;
-            let opening = self.energy_open(field, &staged[batch.clone()], &words, false)?;
+            let opening = self.energy_open(field, &staged[batch.clone()], &words)?;
             let mut opened = opening.words;
             let held = self.energy_opening_words(field, &mut opened, &opening.st)?;
             for (k, r) in batch.enumerate() {
@@ -2375,67 +2023,5 @@ impl CardField<'_> {
         self.times.reads += 1;
         self.times.read_ns += started.elapsed().as_nanos();
         Ok(out)
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    /// A synthetic batch's operands for the width law's lists: three regions of 37, 64 and 5 sites, two heads of six modes on
-    /// two base modes at a share of three, the key and probe words drawn from a fixed key stream, every third site open.
-    fn job() -> WidenJob {
-        let (heads, n, b, cap) = (2usize, 6usize, 2usize, 3usize);
-        let m = heads * n;
-        let lengths = vec![37usize, 64, 5];
-        let sites: usize = lengths.iter().sum();
-        let mut z = 0x9E37_79B9_7F4A_7C15u64;
-        let mut draw = move || {
-            z ^= z << 13;
-            z ^= z >> 7;
-            z ^= z << 17;
-            (z % 2001) as i64 - 1000
-        };
-        let qkv: Vec<i64> = (0..sites * 4 * m).map(|_| draw()).collect();
-        let pr: Vec<i64> = (0..sites * 2 * m).map(|_| draw()).collect();
-        let definite: Vec<u8> = (0..sites).map(|t| u8::from(t % 3 != 2)).collect();
-        WidenJob { qkv, pr, definite, lengths, heads, n, m, b, cap }
-    }
-
-    /// [definition; agent-inferred, November 8] **The width law's tables are one layout on any lanes**: built on one thread,
-    /// on seven, and on the host's lanes as a streamed batch's are (spawned, its receiver joined), the tables are equal entry
-    /// for entry; each head's and region's classes, members, class offsets and receivers' rows are `ClassLists::widened`'s
-    /// own, placed; and the share splits some class (else the lists are the base classes' and the test reads nothing).
-    #[test]
-    fn the_widened_tables_are_one_layout_on_any_lanes() {
-        let job = job();
-        let on = |threads: usize| rayon::ThreadPoolBuilder::new().num_threads(threads).build().unwrap().install(|| widened_tables(&job)).unwrap().0;
-        let one = on(1);
-        assert_eq!(on(7), one, "seven lanes against one");
-        let spawned = widen_spawn(job.clone()).unwrap().recv().unwrap().unwrap_or_else(|panic| std::panic::resume_unwind(panic)).unwrap().0;
-        assert_eq!(spawned, one, "the host's lanes against one");
-        let (m, n, rn, t) = (job.m, job.n, job.lengths.len(), job.definite.len());
-        let m2 = 2 * m;
-        let mut first = 0;
-        for (r, &len) in job.lengths.iter().enumerate() {
-            for h in 0..job.heads {
-                let keys: Vec<Vec<(i64, i64)>> = (first..first + len).map(|g| (0..n).map(|li| (job.qkv[g * 2 * m2 + h * n + li], job.qkv[g * 2 * m2 + m + h * n + li])).collect()).collect();
-                let probes: Vec<Vec<(i64, i64)>> = (first..first + len).map(|g| (0..n).map(|li| (job.pr[g * m2 + h * n + li], job.pr[g * m2 + m + h * n + li])).collect()).collect();
-                let flags: Vec<bool> = (first..first + len).map(|g| job.definite[g] != 0).collect();
-                let (lists, leaves) = holonics::hnn::tower::field::ClassLists::widened(&keys, &probes, flags, job.b, job.cap);
-                assert_eq!(one.cls[h * t + first..h * t + first + len], lists.class[..], "head {h} region {r}: classes");
-                assert_eq!(one.members[h * t + first..h * t + first + len], lists.members[..], "head {h} region {r}: members");
-                let off = &one.class_off[(h * rn + r) * (2 * one.classes + 1)..(h * rn + r + 1) * (2 * one.classes + 1)];
-                assert_eq!(off[..=2 * leaves], lists.off[..=2 * leaves], "head {h} region {r}: class offsets");
-                for i in (0..len).filter(|&i| lists.definite[i]) {
-                    let g = first + i;
-                    let row: Vec<u32> = std::iter::once(lists.probe_class[i]).chain(lists.probes[i].iter().copied()).collect();
-                    let at = (h * t + g) * one.pstride;
-                    assert_eq!(one.pcls[at..at + one.pn[h * t + g] as usize], row[..], "head {h} region {r} receiver {i}: its row");
-                }
-            }
-            first += len;
-        }
-        assert!(one.leaves_most > 3usize.pow(job.b as u32), "the share splits some class");
     }
 }
