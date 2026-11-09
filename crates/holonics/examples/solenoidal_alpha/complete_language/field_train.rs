@@ -8629,8 +8629,9 @@ pub(super) fn plate_field(args: &[String], realization: &mut dyn FieldRealizatio
     Ok(())
 }
 
-/// [definition; theory, November 9 19:43] `exchange-field STATE STATE_SHA CODEC CODEC_SHA UNITS UNITS_SHA HELD HELD_SHA COUNT
-/// SWEEPS H_MILLINATS MOVES STOP_MS OUT`: **the exchange walk** ([`Field::exchange_walk`]). The keyed write given held's
+/// [definition; theory, November 9 19:43 and 21:12] `exchange-field STATE STATE_SHA CODEC CODEC_SHA UNITS UNITS_SHA HELD
+/// HELD_SHA COUNT SWEEPS H_MILLINATS MOVES STOP_MS OUT`: **the certified exchange walk** ([`Field::exchange_walk`]; `MOVES` its
+/// proposal cap, a defect detector). The keyed write given held's
 /// lengths (`FIELD_WRITER_LENGTHS`, required; the writer's laws as `length-field` reads them, refine zero), then the walk
 /// from it: composition held, two places' letters exchanged where the gain from the current faces passes `h`
 /// (`H_MILLINATS` thousandths of a nat, read on the codes' grain: `⌈H 2^50 / (1000 ln 2)⌉` on `2^(−20)` bits), at most
@@ -8681,25 +8682,35 @@ pub(super) fn exchange_field(args: &[String], realization: &mut dyn FieldRealiza
     write("KEYED.tsv", &keyed)?;
     // `h` on the codes' 2^(−20) bits: H thousandths of a nat over ln 2, rounded up.
     let h = (((h_milli as i128) << 50) + 1000 * LN2_Q30 - 1) / (1000 * LN2_Q30);
-    let (walked, moved) = field
+    let (walked, records) = field
         .exchange_walk(&problems, &keyed, void, h, moves, realization, &mut |_, _| started.elapsed().as_millis() <= stop_ms)
         .map_err(|e| e.to_string())?;
     write("SAMPLE.tsv", &walked)?;
-    let mut file = rows_file(&out.join("MOVES.tsv"), "problem\tmove\ti\tj\tgain_nats\theat_i_nats\theat_j_nats\n")?;
-    let (mut total, mut incomplete) = ((0usize, 0i128), 0usize);
-    for (k, list) in moved.iter().enumerate() {
-        for (n, m) in list.iter().enumerate() {
-            row(&mut file, &format!("{k}\t{}\t{}\t{}\t{}\t{}\t{}\n", n + 1, m.i, m.j, decimal_q20(nats_q20(m.gain)), decimal_q20(nats_q20(m.heat_i)), decimal_q20(nats_q20(m.heat_j))))?;
+    // [theory, November 9 21:12] Each standing move's proposed gain against its certified fall, in nats; each problem's code a
+    // place at the keyed write and at rest, its standing and refused moves; a problem at the cap is a defect, not a rest.
+    let mut file = rows_file(&out.join("MOVES.tsv"), "problem\tmove\ti\tj\tproposed_gain_nats\tcertified_fall_nats\n")?;
+    let (mut standing, mut refused, mut defects, mut fall) = (0usize, 0usize, 0usize, 0i128);
+    for (k, r) in records.iter().enumerate() {
+        for (n, m) in r.moves.iter().enumerate() {
+            row(&mut file, &format!("{k}\t{}\t{}\t{}\t{}\t{}\n", n + 1, m.i, m.j, decimal_q20(nats_q20(m.gain)), decimal_q20(nats_q20(m.fall))))?;
         }
-        let gain: i128 = list.iter().map(|m| m.gain).sum();
-        let heat = |m: Option<&holonics::hnn::tower::field::ExchangeMove>| m.map_or("-".to_string(), |m| decimal_q20(nats_q20(m.heat_i + m.heat_j)));
-        let letters = keyed[k].iter().take_while(|&&c| c != void).count();
-        // [theory, November 9 20:04] A problem that reached the move bound is incomplete, not at rest.
-        let capped = list.len() >= moves;
-        println!("FIELD_EXCHANGE problem={k} letters={letters} moves={} at_rest={} gain_nats={} heat_first_nats={} heat_last_nats={}", list.len(), !capped, decimal_q20(nats_q20(gain)), heat(list.first()), heat(list.last()));
-        total = (total.0 + list.len(), total.1 + gain);
-        incomplete += usize::from(capped);
+        let a_place = |c: i128| if r.places == 0 { "-".to_string() } else { decimal_q20(nats_q20(c) / r.places as i128) };
+        let heat = |m: Option<&holonics::hnn::tower::field::ExchangeMove>| m.map_or("-".to_string(), |m| decimal_q20(nats_q20(m.fall)));
+        println!(
+            "FIELD_EXCHANGE problem={k} letters={} code_keyed_nats_a_place={} code_rest_nats_a_place={} standing={} refused={} at_rest={} defect={} fall_nats={} heat_first_nats={} heat_last_nats={}",
+            r.places,
+            a_place(r.start),
+            a_place(r.end),
+            r.moves.len(),
+            r.refused,
+            !r.capped,
+            r.capped,
+            decimal_q20(nats_q20(r.start - r.end)),
+            heat(r.moves.first()),
+            heat(r.moves.last())
+        );
+        (standing, refused, defects, fall) = (standing + r.moves.len(), refused + r.refused, defects + usize::from(r.capped), fall + r.start - r.end);
     }
-    println!("FIELD_EXCHANGE_DONE problems={} at_rest={} incomplete={incomplete} h_millinats={h_milli} move_cap={moves} moves={} gain_nats={} keyed_ms={keyed_ms} ms={}", problems.len(), problems.len() - incomplete, total.0, decimal_q20(nats_q20(total.1)), started.elapsed().as_millis());
+    println!("FIELD_EXCHANGE_DONE problems={} at_rest={} defects={defects} h_millinats={h_milli} proposal_cap={moves} standing={standing} refused={refused} fall_nats={} keyed_ms={keyed_ms} ms={}", problems.len(), problems.len() - defects, decimal_q20(nats_q20(fall)), started.elapsed().as_millis());
     Ok(())
 }

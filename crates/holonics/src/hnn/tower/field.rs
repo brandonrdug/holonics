@@ -1112,16 +1112,28 @@ pub struct ReleaseRead<'a> {
     pub drives: &'a [Vec<PassDrive>],
 }
 
-/// [definition; theory, November 9 19:43] **One move of the exchange walk** ([`Field::exchange_walk`]): the two places in the
-/// answer exchanged, the gain it was chosen on, and its Landauer heat at each place (`log₂ f(new | rest) − log₂ f(old | rest)`
-/// on that place's face), all on the codes' `2^(−20)` bits; the heats sum to the gain.
+/// [definition; theory, November 9 19:43 and 21:12] **One standing move of the certified exchange walk**
+/// ([`Field::exchange_walk`]): the two places in the answer exchanged, the gain it was proposed on (read on the faces before
+/// it), and its certified fall in the answer's code (read on the faces after it), its heat; on the codes' `2^(−20)` bits.
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
 pub struct ExchangeMove {
     pub i: usize,
     pub j: usize,
     pub gain: i128,
-    pub heat_i: i128,
-    pub heat_j: i128,
+    pub fall: i128,
+}
+
+/// [definition; theory, November 9 21:12] **One problem's certified exchange walk** ([`Field::exchange_walk`]): its places,
+/// its answer's code at the written answer and where the walk ended (on the codes' `2^(−20)` bits, summed over the places),
+/// its standing moves, the moves refused and undone, and whether it reached the proposal cap (a defect, not a rest).
+#[derive(Clone, Debug, Default, PartialEq, Eq)]
+pub struct ExchangeRecord {
+    pub places: usize,
+    pub start: i128,
+    pub end: i128,
+    pub moves: Vec<ExchangeMove>,
+    pub refused: usize,
+    pub capped: bool,
 }
 
 /// [measurement; agent-inferred, November 6, the unified-theory reading of 21:14] **The order a refine pass walks an answer
@@ -3702,24 +3714,24 @@ impl Field {
         Ok(faces)
     }
 
-    /// [definition; theory, November 9 19:43] **The exchange walk**: from a written answer (each problem's letters, its places
-    /// past them the void), composition is held and the walk only exchanges two places' letters within one answer. Each
-    /// place's face is `f_i(· | rest)`: the region (the question, the answer as it stands and the near field past its end)
-    /// read with that place alone open. The gain of exchanging `i` and `j`, from the current faces, is
-    /// `g = z_i(x_j) + z_j(x_i) − z_i(x_i) − z_j(x_j)` with `z = log f` (on the codes' `2^(−20)` bits:
-    /// `c_i(x_i) + c_j(x_j) − c_i(x_j) − c_j(x_i)`, `c = −log₂ f`). Each round, each problem takes its places in the order of
-    /// their own letter's code, worst first, and the first whose best partner (the most gain, the nearer place on a tie)
-    /// gains more than `h`: the two exchange, and the faces at the two places are read again (the regions opened there); the
-    /// other places' faces stand as last read. A problem stops where no pair gains more than `h`, or after `moves` of its own
-    /// moves (the walk's declared bound); the walk stops where every problem has. Each move's Landauer heat is
-    /// `log f_i(new | rest) − log f_i(old | rest)` at both places, read on the faces the move was chosen on. Returns each
-    /// problem's answer (its places past the question) and its moves.
+    /// [definition; theory, November 9 19:43 and 21:12] **The certified exchange walk**: from a written answer (each problem's
+    /// letters, its places past them the void), composition is held and the walk only exchanges two places' letters within one
+    /// answer. Each place's face is `f_t(· | rest)`: the region (the question, the answer as it stands and the near field past
+    /// its end) read with that place alone open; the answer's code is `C = Σ_t −log₂ f_t(x_t)` over its places on the current
+    /// faces (the codes' `2^(−20)` bits, summed whole). Each round, each problem **proposes**: its places in the order of their
+    /// own letter's code, worst first, and the first whose best unmarked partner (the most gain on the current faces,
+    /// `g = c_i(x_i) + c_j(x_j) − c_i(x_j) − c_j(x_i)`, the nearer place on a tie) gains more than `h`. The two **exchange**, and
+    /// every face of the problem is read again (each place's region holds both). The move is **certified** on what it did: it
+    /// stands where `C` fell by more than `h`, its heat that fall; otherwise it is undone (the letters and the faces as they
+    /// were) and the pair is marked, never proposed again until a face at `i` or `j` has changed (a standing move clears the
+    /// marks of every place whose face it changed). A problem rests where no unmarked proposal remains; `cap` proposals is a
+    /// defect detector, a problem that reaches it is a defect, not at rest. Returns each problem's answer (its places past the
+    /// question) and its record.
     #[allow(clippy::too_many_arguments)]
-    pub fn exchange_walk(&self, problems: &[(&[usize], usize)], written: &[Vec<usize>], void: usize, h: i128, moves: usize, realization: &mut dyn FieldRealization, round: &mut dyn FnMut(usize, usize) -> bool) -> Result<(Vec<Vec<usize>>, Vec<Vec<ExchangeMove>>)> {
+    pub fn exchange_walk(&self, problems: &[(&[usize], usize)], written: &[Vec<usize>], void: usize, h: i128, cap: usize, realization: &mut dyn FieldRealization, round: &mut dyn FnMut(usize, usize) -> bool) -> Result<(Vec<Vec<usize>>, Vec<ExchangeRecord>)> {
         if written.len() != problems.len() {
             return refuse("an exchange walk with one written answer a problem");
         }
-        // Each problem's letters (the written places before the first void) and the region a place is read in.
         let letters: Vec<usize> = written.iter().map(|w| w.iter().take_while(|&&c| c != void).count()).collect();
         let mut answers: Vec<Vec<usize>> = written.iter().zip(&letters).map(|(w, &n)| w[..n].to_vec()).collect();
         let region_of = |k: usize, answer: &[usize]| -> Vec<usize> {
@@ -3728,8 +3740,9 @@ impl Field {
             classes.extend(std::iter::repeat_n(void, NEAR.min(room.saturating_sub(answer.len()))));
             classes
         };
-        // Reads the faces at `places` (problem, place in its answer), each in its own region with that place open.
-        let read = |answers: &[Vec<usize>], places: &[(usize, usize)], realization: &mut dyn FieldRealization| -> Result<Vec<TowerFace>> {
+        // Every face of the problems `ks`, each place in its own region with that place open.
+        let read = |answers: &[Vec<usize>], ks: &[usize], realization: &mut dyn FieldRealization| -> Result<Vec<Vec<TowerFace>>> {
+            let places: Vec<(usize, usize)> = ks.iter().flat_map(|&k| (0..answers[k].len()).map(move |i| (k, i))).collect();
             let owned: Vec<(Vec<usize>, Vec<bool>)> = places
                 .iter()
                 .map(|&(k, i)| {
@@ -3741,44 +3754,72 @@ impl Field {
                 .collect();
             let regions: Vec<Region> = owned.iter().map(|(c, u)| Region { classes: c, unresolved: u, faces: &[], locked: &[], echo: &[], domain: None, port: None }).collect();
             let faces = if regions.is_empty() { Vec::new() } else { realization.read_faces(self, &regions)? };
-            faces.into_iter().zip(places).map(|(f, &(k, i))| f.get(problems[k].0.len() + i).cloned().flatten().ok_or(TowerError::Refused("an exchange walk's open place without a face"))).collect()
+            let mut out: Vec<Vec<TowerFace>> = ks.iter().map(|_| Vec::new()).collect();
+            let at: std::collections::BTreeMap<usize, usize> = ks.iter().enumerate().map(|(n, &k)| (k, n)).collect();
+            for (f, &(k, i)) in faces.into_iter().zip(&places) {
+                out[at[&k]].push(f.get(problems[k].0.len() + i).cloned().flatten().ok_or(TowerError::Refused("an exchange walk's open place without a face"))?);
+            }
+            Ok(out)
         };
-        let all: Vec<(usize, usize)> = (0..problems.len()).flat_map(|k| (0..letters[k]).map(move |i| (k, i))).collect();
-        let mut faces: Vec<Vec<TowerFace>> = vec![Vec::new(); problems.len()];
-        for (face, &(k, _)) in read(&answers, &all, realization)?.into_iter().zip(&all) {
-            faces[k].push(face);
-        }
-        let mut walked: Vec<Vec<ExchangeMove>> = vec![Vec::new(); problems.len()];
+        let code_of = |faces: &[TowerFace], x: &[usize]| -> i128 { faces.iter().zip(x).map(|(f, &a)| f.code(a) as i128).sum() };
+        let everyone: Vec<usize> = (0..problems.len()).collect();
+        let mut faces = read(&answers, &everyone, realization)?;
+        let mut records: Vec<ExchangeRecord> = (0..problems.len()).map(|k| { let c = code_of(&faces[k], &answers[k]); ExchangeRecord { places: letters[k], start: c, end: c, ..ExchangeRecord::default() } }).collect();
+        let mut marked: Vec<std::collections::BTreeSet<(usize, usize)>> = vec![std::collections::BTreeSet::new(); problems.len()];
         let mut active: Vec<bool> = letters.iter().map(|&n| n >= 2).collect();
         let mut rounds = 0usize;
-        while active.iter().any(|&a| a) && round(rounds, walked.iter().map(Vec::len).sum()) {
+        while active.iter().any(|&a| a) && round(rounds, records.iter().map(|r| r.moves.len()).sum()) {
             rounds += 1;
-            let mut touched: Vec<(usize, usize)> = Vec::new();
+            // Each active problem's proposal.
+            let mut proposed: Vec<(usize, usize, usize, i128)> = Vec::new();
             for k in 0..problems.len() {
                 if !active[k] {
                     continue;
                 }
-                let (x, f) = (&answers[k], &faces[k]);
+                if records[k].moves.len() + records[k].refused >= cap {
+                    records[k].capped = true;
+                    active[k] = false;
+                    continue;
+                }
+                let (x, f, marks) = (&answers[k], &faces[k], &marked[k]);
                 let code = |i: usize, a: usize| f[i].code(a) as i128;
                 let mut order: Vec<usize> = (0..x.len()).collect();
                 order.sort_by_key(|&i| (std::cmp::Reverse(code(i, x[i])), i));
                 let chosen = order.iter().find_map(|&i| {
-                    let best = (0..x.len()).filter(|&j| j != i && x[j] != x[i]).map(|j| (code(i, x[i]) + code(j, x[j]) - code(i, x[j]) - code(j, x[i]), j)).max_by_key(|&(g, j)| (g, std::cmp::Reverse(j.abs_diff(i)), std::cmp::Reverse(j)));
+                    let best = (0..x.len())
+                        .filter(|&j| j != i && x[j] != x[i] && !marks.contains(&(i.min(j), i.max(j))))
+                        .map(|j| (code(i, x[i]) + code(j, x[j]) - code(i, x[j]) - code(j, x[i]), j))
+                        .max_by_key(|&(g, j)| (g, std::cmp::Reverse(j.abs_diff(i)), std::cmp::Reverse(j)));
                     best.filter(|&(g, _)| g > h).map(|(g, j)| (i, j, g))
                 });
-                let Some((i, j, gain)) = chosen else {
-                    active[k] = false;
-                    continue;
-                };
-                walked[k].push(ExchangeMove { i, j, gain, heat_i: code(i, x[i]) - code(i, x[j]), heat_j: code(j, x[j]) - code(j, x[i]) });
-                answers[k].swap(i, j);
-                touched.extend([(k, i), (k, j)]);
-                if walked[k].len() >= moves {
-                    active[k] = false;
+                match chosen {
+                    Some((i, j, g)) => proposed.push((k, i, j, g)),
+                    None => active[k] = false,
                 }
             }
-            for (face, &(k, i)) in read(&answers, &touched, realization)?.into_iter().zip(&touched) {
-                faces[k][i] = face;
+            if proposed.is_empty() {
+                break;
+            }
+            for &(k, i, j, _) in &proposed {
+                answers[k].swap(i, j);
+            }
+            let ks: Vec<usize> = proposed.iter().map(|p| p.0).collect();
+            let reread = read(&answers, &ks, realization)?;
+            for (&(k, i, j, g), after) in proposed.iter().zip(reread) {
+                let before = records[k].end;
+                let now = code_of(&after, &answers[k]);
+                if before - now > h {
+                    // The move stands: its heat is its certified fall, and every place whose face it changed clears its marks.
+                    let changed: Vec<bool> = faces[k].iter().zip(&after).map(|(a, b)| a != b).collect();
+                    marked[k].retain(|&(a, b)| !changed[a] && !changed[b]);
+                    faces[k] = after;
+                    records[k].moves.push(ExchangeMove { i, j, gain: g, fall: before - now });
+                    records[k].end = now;
+                } else {
+                    answers[k].swap(i, j);
+                    marked[k].insert((i.min(j), i.max(j)));
+                    records[k].refused += 1;
+                }
             }
         }
         let out = answers.iter().zip(written).map(|(a, w)| {
@@ -3786,7 +3827,7 @@ impl Field {
             placed.extend(std::iter::repeat_n(void, w.len() - a.len()));
             placed
         }).collect();
-        Ok((out, walked))
+        Ok((out, records))
     }
 
     /// [measurement; agent-inferred, November 5, §16.47] **The release, read as it writes** ([`Field::sample_realized`],

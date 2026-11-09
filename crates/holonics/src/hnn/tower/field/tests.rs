@@ -3695,30 +3695,33 @@ fn a_sites_plate_is_its_classes_at_the_last_tick() {
     }
 }
 
-/// [definition; theory, November 9 19:43] **The exchange walk holds composition** ([`Field::exchange_walk`]): from a written
-/// answer it only exchanges letters within it, so each answer's letters are a permutation of the written ones and its
-/// places past them stay void; every move gained more than `h` on the faces it was chosen on, its heats at the two places
-/// sum to its gain, and the walk stops within its declared bound.
+/// [definition; theory, November 9 19:43 and 21:12] **The certified exchange walk holds composition and falls at every
+/// standing move** ([`Field::exchange_walk`]): each answer's letters are a permutation of the written ones and its places past
+/// them stay void; every standing move's certified fall passes `h` and the moves' falls sum to the walk's whole fall, read
+/// again on the final answer's faces; and the walk ends at rest, before its cap, on a small field.
 #[test]
 fn the_exchange_walk_holds_composition() {
     let field = shaped(1);
     let (q1, q2) = ([1usize, 4, 0, 2, 2, 3], [3usize, 3, 1, 0]);
     let problems: Vec<(&[usize], usize)> = vec![(&q1, 7), (&q2, 6)];
     let written = vec![vec![1, 2, 3, 4, 1, 0, 0], vec![4, 4, 2, 1, 3, 0]];
-    let h = 1 << 16;
-    let (answers, moves) = field.exchange_walk(&problems, &written, 0, h, 16, &mut HostField, &mut |_, _| true).unwrap();
-    for (k, (a, w)) in answers.iter().zip(&written).enumerate() {
-        let (mut x, mut y) = (a.clone(), w.clone());
-        x.sort_unstable();
-        y.sort_unstable();
-        assert_eq!(x, y, "problem {k}: composition held");
-        assert_eq!(a.len(), w.len());
-        let n = w.iter().take_while(|&&c| c != 0).count();
-        assert!(a[n..].iter().all(|&c| c == 0), "the void past the letters stays");
-        assert!(moves[k].len() <= 16);
-        for m in &moves[k] {
-            assert!(m.gain > h && m.heat_i + m.heat_j == m.gain && m.i != m.j);
+    for h in [0i128, 1 << 14] {
+        let (answers, records) = field.exchange_walk(&problems, &written, 0, h, 4096, &mut HostField, &mut |_, _| true).unwrap();
+        let (again, check) = field.exchange_walk(&problems, &answers, 0, i128::MAX, 4096, &mut HostField, &mut |_, _| true).unwrap();
+        assert_eq!(again, answers);
+        for (k, (a, w)) in answers.iter().zip(&written).enumerate() {
+            let (mut x, mut y) = (a.clone(), w.clone());
+            x.sort_unstable();
+            y.sort_unstable();
+            assert_eq!(x, y, "problem {k}: composition held");
+            let n = w.iter().take_while(|&&c| c != 0).count();
+            assert!(a[n..].iter().all(|&c| c == 0), "the void past the letters stays");
+            let r = &records[k];
+            assert!(!r.capped, "problem {k} rests before its cap");
+            assert!(r.moves.iter().all(|m| m.fall > h && m.i != m.j), "every standing move fell by more than h");
+            assert_eq!(r.start - r.moves.iter().map(|m| m.fall).sum::<i128>(), r.end, "the falls sum to the whole fall");
+            assert_eq!(check[k].start, r.end, "the end is the final answer's code read again");
+            eprintln!("EXCHANGE h={h} problem={k} moves={} refused={} start={} end={}", r.moves.len(), r.refused, r.start, r.end);
         }
     }
-    eprintln!("EXCHANGE_MOVES {:?}", moves.iter().map(Vec::len).collect::<Vec<_>>());
 }

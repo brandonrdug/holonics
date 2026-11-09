@@ -460,7 +460,7 @@ pub(super) fn parity(args: &[String], card: &mut dyn FieldRealization) -> Result
     let (card_walk, card_moves) = card_learner.field.exchange_walk(&questions, &hosted, void, h, 64, card, &mut |_, _| true).map_err(|e| e.to_string())?;
     let walk_equal = host_walk == card_walk && host_moves == card_moves;
     releases_unequal += usize::from(!walk_equal);
-    println!("FIELD_PARITY_EXCHANGE plates_equal={plates_equal} walk_equal={walk_equal} moves={} host_ms={host_walk_ms}", host_moves.iter().map(Vec::len).sum::<usize>());
+    println!("FIELD_PARITY_EXCHANGE plates_equal={plates_equal} walk_equal={walk_equal} standing={} refused={} host_ms={host_walk_ms}", host_moves.iter().map(|r| r.moves.len()).sum::<usize>(), host_moves.iter().map(|r| r.refused).sum::<usize>());
     println!(
         "FIELD_PARITY_DONE sections={} reads={reads_all} reads_unequal={reads_unequal} faces_unequal={faces_unequal} covector_unequal={entries_unequal} learners_unequal={learners_unequal} releases={} releases_unequal={releases_unequal} card_release_ms={card_release_ms} host_ms={} card_ms={} elapsed_ms={}",
         steps.len(),
