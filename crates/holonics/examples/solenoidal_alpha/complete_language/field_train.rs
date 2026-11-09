@@ -2452,7 +2452,7 @@ pub(super) fn depth_field(args: &[String]) -> Result<()> {
 /// any entry moved by between the two states (the trailing zeros of the least-moved difference), how many entries moved, how
 /// many sit at zero, how many were released to zero and how many founded from it; and the averaged constitution's top place
 /// beside its 39 (an `i64` eight places finer than `θ`'s `i32`). A reading of the constitution only: no face is read and nothing runs.
-/// [definition; theory, November 8 00:08] **A state's averaged constitution opened at its live θ** (`average-open STATE STATE_SHA
+/// [definition; theory, November 9 00:08] **A state's averaged constitution opened at its live θ** (`average-open STATE STATE_SHA
 /// OUT`): a crossing between laws, so a resumed passage averages its own θ and not another passage's (the forks from 179
 /// carried law D's average). Recorded where it is done, in the run's record with its crossing; the state carries only the
 /// average it now has.
@@ -3454,7 +3454,7 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
                 (states, deposited) = (states + receipt.states, deposited + usize::from(receipt.deposited));
                 (gap, same) = (gap + receipt.gap, same + receipt.same);
                 (moved_lap, places_lap) = (moved_lap + moved_w, places_lap + proposed_w);
-                // [definition; theory, November 8 00:08] The averaged constitution moves at every deposit, this path's as the
+                // [definition; theory, November 9 00:08] The averaged constitution moves at every deposit, this path's as the
                 // kernel's: until then the fresh writes' held reads read an average frozen at their starting state (law D's, for
                 // the forks from 179).
                 if averaging {
