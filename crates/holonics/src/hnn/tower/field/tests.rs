@@ -3488,6 +3488,76 @@ fn a_held_class_read_is_the_relaxations_lists_and_descent() {
     assert!(shaped(1).energy_held_classes(&CLASSES, 0).is_err());
 }
 
+/// [measurement; theory, November 9 08:13 and 08:15, the held-under reading] **An energy held under a base holds the base's
+/// maps and nothing else**: on the energy fixtures of every ring set, plain and under the width law at a share of one, on a
+/// short and a long resolved configuration and every letter at one inner place of the long one: under itself, either hold
+/// reads [`Field::energy_g`]'s bits; under a base that differs only in the pair's contraction (which neither the opening nor
+/// its key and probe words read, so its classes are the field's), the classes hold reads the field's own `G` both ways, and
+/// the classes-and-halvings hold reads it wherever the base's descent stands at the field's halvings; under a base whose key
+/// chart is negated (its keys' shells turned, so its runs hold other sites), some `G` moves, and some paired base stands at
+/// other halvings (else the test reads nothing). A base of another declaration or width law is refused.
+#[test]
+fn an_energy_held_under_a_base_holds_the_bases_maps() {
+    let long: Vec<usize> = (0..13).map(|t| (t * 3 + t / 4) % 5).collect();
+    let mut configurations: Vec<Vec<usize>> = vec![CLASSES.to_vec(), long.clone()];
+    for c in 0..5 {
+        let mut x = long.clone();
+        x[7] = c;
+        configurations.push(x);
+    }
+    let mut fields: Vec<(String, Field)> = Vec::new();
+    for still in 0..=2 {
+        let field = energetic(still);
+        let mut widened = field.clone();
+        widened.widen = Some(1);
+        fields.push((format!("still {still}"), field));
+        fields.push((format!("still {still} widened"), widened));
+    }
+    let both = [BaseHold::Classes, BaseHold::ClassesAndHalvings];
+    let (mut moved_by_keys, mut halvings_differ) = (false, false);
+    for (name, field) in &fields {
+        let (l, d) = (field.layout.clone(), field.declaration);
+        let mut paired = field.clone();
+        for v in &mut paired.theta[l.pair_c..l.pair_c + d.contacts] {
+            *v = v.wrapping_neg();
+        }
+        let mut keyed = field.clone();
+        for v in &mut keyed.theta[l.q..l.q + 2 * d.complex() * d.width] {
+            *v = v.wrapping_neg();
+        }
+        for x in &configurations {
+            let none = vec![false; x.len()];
+            let region = Region { classes: x, unresolved: &none, faces: &[], locked: &[], echo: &[], domain: None, port: None };
+            let g = field.energy_g(x).unwrap();
+            for hold in both {
+                assert_eq!(field.energy_g_under(field, x, hold).unwrap(), g, "{name}, {x:?}, {}: under itself", hold.word());
+            }
+            assert_eq!(field.energy_g_under(&paired, x, BaseHold::Classes).unwrap(), g, "{name}, {x:?}: the paired base's classes are the field's");
+            assert_eq!(paired.energy_g_under(field, x, BaseHold::Classes).unwrap(), paired.energy_g(x).unwrap(), "{name}, {x:?}: the field's classes are the paired base's");
+            let (own, base) = (field.energy_read(&region).unwrap().halvings, paired.energy_read(&region).unwrap().halvings);
+            if own == base {
+                assert_eq!(field.energy_g_under(&paired, x, BaseHold::ClassesAndHalvings).unwrap(), g, "{name}, {x:?}: the paired base stands at the field's halvings");
+            } else {
+                halvings_differ = true;
+            }
+            moved_by_keys |= field.energy_g_under(&keyed, x, BaseHold::Classes).unwrap() != g;
+        }
+    }
+    assert!(moved_by_keys, "a base whose keys turn moves some G");
+    assert!(halvings_differ, "some paired base stands at other halvings");
+    let (field, other) = (energetic(1), energetic(2));
+    let mut widened = field.clone();
+    widened.widen = Some(1);
+    for hold in both {
+        assert!(field.energy_g_under(&other, &CLASSES, hold).is_err(), "another declaration");
+        assert!(field.energy_g_under(&widened, &CLASSES, hold).is_err(), "another width law");
+        assert!(shaped(1).energy_g_under(&shaped(1), &CLASSES, hold).is_err(), "a field without one energy");
+    }
+    assert_eq!(BaseHold::of("classes"), Some(BaseHold::Classes));
+    assert_eq!(BaseHold::of("classes+halvings").map(BaseHold::word), Some("classes+halvings"));
+    assert_eq!(BaseHold::of("halvings"), None);
+}
+
 /// [measurement; theory, November 8, the line reading] **A held place's code is the conditional section's**: on the warm
 /// line-shaped field, each place's [`conditional_code`] over its letters' energies (each `G` the host's own) is the section's
 /// `−log₂ p(t)` (its receipt's `log2_a`, negated) bit for bit; a truth outside the letters is refused.

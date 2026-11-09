@@ -4813,6 +4813,12 @@ pub trait FieldRealization {
     fn read_energies(&mut self, field: &Field, regions: &[&[usize]]) -> Result<Vec<i128>> {
         regions.par_iter().map(|c| field.energy_g(c)).collect()
     }
+    /// [measurement; theory, November 9 08:13 and 08:15, the held-under reading] Each resolved region's energy at this field's
+    /// `θ` under `base`'s classes, lock lists and supports, and under `hold` its halvings too ([`Field::energy_g_under`]), on
+    /// the host in parallel unless the realization reads them itself.
+    fn read_energies_under(&mut self, field: &Field, base: &Field, regions: &[&[usize]], hold: BaseHold) -> Result<Vec<i128>> {
+        regions.par_iter().map(|c| field.energy_g_under(base, c, hold)).collect()
+    }
     /// [measurement; theory, November 8, the lead reading] Each place's lead read ([`Field::energy_lead`] at its configuration
     /// and site, every site resolved), on the host in parallel unless the realization reads it from its own buffers.
     fn read_energy_leads(&mut self, field: &Field, places: &[(&[usize], usize)]) -> Result<Vec<EnergyLead>> {
@@ -4993,6 +4999,9 @@ impl FieldRealization for LanesField<'_> {
     }
     fn read_energy_held_classes(&mut self, field: &Field, places: &[(&[usize], usize)]) -> Result<Vec<EnergyHeldClasses>> {
         self.card.read_energy_held_classes(field, places)
+    }
+    fn read_energies_under(&mut self, field: &Field, base: &Field, regions: &[&[usize]], hold: BaseHold) -> Result<Vec<i128>> {
+        self.card.read_energies_under(field, base, regions, hold)
     }
     fn read_energy_material(&mut self, field: &Field, regions: &[Region]) -> Result<Vec<(Vec<i128>, i128)>> {
         self.split(regions.len(), |r| regions[r].par_iter().map(|x| field.energy_material(x)).collect(), |card, r| card.read_energy_material(field, &regions[r]))
@@ -7595,7 +7604,7 @@ impl FieldLearner {
 mod energy;
 pub mod moment;
 mod scale;
-pub use energy::{EnergyHeldClasses, EnergyLead, EnergyPairKinds, EnergyRead, EnergyRest, HeldSite, RestEnd, RestMode, RestTick, RestTry, EnergySquare, EnergyTangentRead, SquareCorners, ENERGY_BITS, FIRST_HALVINGS, STEP_CARRIER_HALVINGS};
+pub use energy::{BaseHold, EnergyHeldClasses, EnergyLead, EnergyPairKinds, EnergyRead, EnergyRest, HeldSite, RestEnd, RestMode, RestTick, RestTry, EnergySquare, EnergyTangentRead, SquareCorners, ENERGY_BITS, FIRST_HALVINGS, STEP_CARRIER_HALVINGS};
 pub use scale::Scale;
 
 #[cfg(test)]

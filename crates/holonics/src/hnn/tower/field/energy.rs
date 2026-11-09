@@ -2125,6 +2125,37 @@ impl Field {
         Ok(self.energy_relax(&region, self.declaration.ticks, None, None)?.cell.phi)
     }
 
+    /// [measurement; theory, November 9 08:13 and 08:15, the held-under reading] **A configuration's energy at this field's
+    /// `θ` under a base's discrete maps**: `G(θ; C_B)` or `G(θ; C_B, h_B)`, every site of `classes` resolved. The base field
+    /// (another `θ` of the same declaration and width law) opens the configuration and draws its classes there
+    /// ([`Field::energy_classes`]: each head's key and probe trits, or under the width law the leaves of its own tree and their
+    /// runs, the receivers' probed classes across their seams), and those lists are held through this field's relaxation
+    /// (`energy_relax`'s `base`): they decide each receiver's far sources and a shared head's class falloff, while every word,
+    /// score, lock, crowd, letter, moment, pair term, force and step is this field's. With [`BaseHold::Classes`] the descent is
+    /// this field's own certified one (its halvings recomputed under its own `θ`); with [`BaseHold::ClassesAndHalvings`] the
+    /// base's relaxation is read too and this field's descent is replayed at the base's halvings, uncertified, ending where the
+    /// base's ended (`energy_relax`'s `replay`). A base that is this field reads [`Field::energy_g`]'s bits in either hold.
+    /// Refused where the base is not an energy field of the same declaration and width law.
+    pub fn energy_g_under(&self, base: &Field, classes: &[usize], hold: BaseHold) -> Result<i128> {
+        if !self.declaration.energy || !base.declaration.energy {
+            return refuse("an energy read of a field whose faces are not one energy's forces");
+        }
+        if base.declaration != self.declaration || base.widen != self.widen || base.scale.is_some() != self.scale.is_some() {
+            return refuse("a base's classes held under a field of another declaration or width law");
+        }
+        let none = vec![false; classes.len()];
+        let region = Region { classes, unresolved: &none, faces: &[], locked: &[], echo: &[], domain: None, port: None };
+        let (held, replay) = match hold {
+            BaseHold::Classes => (base.energy_relax(&region, 0, None, None)?.held, None),
+            BaseHold::ClassesAndHalvings => {
+                let relaxed = base.energy_relax(&region, base.declaration.ticks, None, None)?;
+                (relaxed.held, Some(relaxed.read.halvings))
+            }
+        };
+        let ticks = replay.as_ref().map_or(self.declaration.ticks, Vec::len);
+        Ok(self.energy_relax(&region, ticks, replay.as_deref(), Some(&held))?.cell.phi)
+    }
+
     /// [measurement; theory, November 8, the lead reading] **Whether a letter leads its own state** at one site of a
     /// configuration ([`EnergyLead`]): every site of `classes` resolved and relaxed as [`Field::energy_g`] relaxes it (the
     /// declared ticks at their own certified halvings), and at `site`, lane by lane, (a) the relaxed chart read `r̂_t` (each
@@ -2877,6 +2908,33 @@ pub struct EnergyLead {
     pub opening: Vec<(i128, i128)>,
     pub open: Vec<(i128, i128)>,
     pub enc: Vec<(i128, i128)>,
+}
+
+/// [definition; theory, November 9 08:15, the held-under reading] **What a base holds under another field's relaxation**
+/// ([`Field::energy_g_under`]): its classes, lock lists and supports alone (`C_B`, the halvings this field's own), or those
+/// and its relaxation's halvings and stood ticks (`C_B, h_B`).
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum BaseHold {
+    Classes,
+    ClassesAndHalvings,
+}
+
+impl BaseHold {
+    /// The hold's declared word, `classes` or `classes+halvings`.
+    pub fn of(word: &str) -> Option<Self> {
+        match word {
+            "classes" => Some(Self::Classes),
+            "classes+halvings" => Some(Self::ClassesAndHalvings),
+            _ => None,
+        }
+    }
+
+    pub fn word(self) -> &'static str {
+        match self {
+            Self::Classes => "classes",
+            Self::ClassesAndHalvings => "classes+halvings",
+        }
+    }
 }
 
 /// [measurement; theory, November 9, the class reading] **One head's held classes at one site** ([`EnergyHeldClasses`]): the

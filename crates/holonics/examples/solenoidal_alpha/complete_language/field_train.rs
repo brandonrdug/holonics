@@ -4580,6 +4580,81 @@ pub(super) fn class_field(args: &[String], realization: &mut dyn FieldRealizatio
     Ok(())
 }
 
+/// [measurement; theory, November 9 08:13 and 08:15, the held-under reading] **`held-under BASE BASE_SHA STATE STATE_SHA CODEC
+/// CODEC_SHA UNITS UNITS_SHA HELD HELD_SHA PLACES OUT HOLD`**: the trainer's held enumerated read at `STATE`'s live `θ` with
+/// each configuration's discrete maps held at `BASE`'s live `θ`. At the held places the trainer's held read takes
+/// ([`enumerated_places`], `FIELD_HELD_ALL_OF` as there), every letter at each with the rest at the truth, each `G` is read
+/// ([`FieldRealization::read_energies_under`], [`holonics::hnn::tower::field::Field::energy_g_under`]) with `HOLD` declaring
+/// what `BASE` gives: `classes` its classes, lock lists and supports (`G(θ_S; C_B, h_S)`, the halvings `STATE`'s own) and
+/// `classes+halvings` those and its halvings and stood ticks (`G(θ_S; C_B, h_B)`, replayed uncertified); the plain held read is
+/// `G(θ_S; C_S, h_S)`. `BASE` and `STATE` share their declaration and width law (else refused); with `BASE` = `STATE` either
+/// hold reads the plain held read's bits.
+///
+/// Writes `ENUMERATED.tsv` in the trainer's held read's format with `lap` −1: the energies held under `BASE`, the open face and
+/// the face at the truth `STATE`'s own (the face only proposes; it is not read under `BASE`). Prints one `FIELD_HELD_UNDER`
+/// line: the hold, the places and configurations, the held code (each place's `−ln p(truth | rest)` in the conditional
+/// section's chart, [`holonics::hnn::tower::field::conditional_code`] at `STATE`'s `T`) in milli- and micro-nats a place, floor,
+/// whether `BASE`'s `θ` is `STATE`'s, the width law, the read's time and the host's threads. A reading only: nothing is
+/// deposited and no state is written.
+pub(super) fn held_under(args: &[String], realization: &mut dyn FieldRealization) -> Result<()> {
+    use holonics::hnn::tower::field::{conditional_code, BaseHold};
+    const USAGE: &str = "held-under BASE BASE_SHA STATE STATE_SHA CODEC CODEC_SHA UNITS UNITS_SHA HELD HELD_SHA PLACES OUT classes|classes+halvings";
+    if args.len() != 14 {
+        return Err(USAGE.into());
+    }
+    let hold = BaseHold::of(&args[13]).ok_or(USAGE)?;
+    let started = std::time::Instant::now();
+    let read_learner = |path: &str, sha: &str| -> Result<FieldLearner> {
+        let mut learner = FieldLearner::from_text(std::str::from_utf8(&pinned_read(path, sha, STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
+        declared_clocks(&mut learner.field);
+        Ok(learner)
+    };
+    let (base, state) = (read_learner(&args[1], &args[2])?.field, read_learner(&args[3], &args[4])?.field);
+    if !state.declaration.energy || !base.declaration.energy {
+        return Err("held-under reads fields whose faces are one energy's forces".into());
+    }
+    if base.declaration != state.declaration || base.widen != state.widen {
+        return Err("held-under: BASE and STATE of another declaration or width law".into());
+    }
+    let units = units_of(&args[7], &args[8])?;
+    let codec = FieldCodec::from_text(std::str::from_utf8(&pinned_read(&args[5], &args[6], CODEC_BUDGET)?)?, units)?;
+    let held_text = problems_of(&pinned_read(&args[9], &args[10], READ_BUDGET as usize)?);
+    let places = positive(&args[11])?;
+    let out = Path::new(&args[12]);
+    std::fs::create_dir(out)?;
+    let held_set = encoded_problems(&codec, &held_text, &state)?;
+    let void = codec.void();
+    let truth_of = |p: &(Vec<usize>, Vec<usize>, usize), letters: &[usize]| -> Vec<usize> { truth_with_voids(void, p, letters) };
+    let chosen = enumerated_places(&held_set, places, &truth_of);
+    let alphabet = state.declaration.alphabet;
+    let mut rows = rows_file(&out.join("ENUMERATED.tsv"), "lap\tproblem\tplace\ttruth\tlog2_t\tface_masses\tface_total\tenergies\ttruth_face_masses\ttruth_face_total\n")?;
+    let reading = std::time::Instant::now();
+    let (lines, energies) = enumerated_reads(&state, &chosen, realization, -1, Some((&base, hold)))?;
+    let read_ms = reading.elapsed().as_millis();
+    for line in &lines {
+        row(&mut rows, line)?;
+    }
+    let codes = chosen
+        .iter()
+        .enumerate()
+        .map(|(n, (_, truth, t, _))| conditional_code(&state, &energies[n * alphabet..(n + 1) * alphabet], truth[*t]).map(|code| code * LN2_Q30 >> 30).map_err(|e| e.to_string()))
+        .collect::<std::result::Result<Vec<i128>, String>>()?;
+    let (nats, n) = (codes.iter().sum::<i128>(), chosen.len().max(1) as i128);
+    println!(
+        "FIELD_HELD_UNDER hold={} places={} configurations={} held_code_milli={} held_code_micro={} same_theta={} widen={} read_ms={read_ms} host_threads={} ms={}",
+        hold.word(),
+        chosen.len(),
+        energies.len(),
+        nats * 1000 / n >> 32,
+        nats * 1_000_000 / n >> 32,
+        u8::from(base.theta == state.theta),
+        state.widen.map_or("none".to_string(), |c| c.to_string()),
+        rayon::current_num_threads(),
+        started.elapsed().as_millis()
+    );
+    Ok(())
+}
+
 /// [declared read; theory, November 8, the line reading] The line's lengths, `η = 4^k` for `k = 0..=4`, in one section's step.
 const LINE_ETAS: [u32; 5] = [1, 4, 16, 64, 256];
 
@@ -4731,7 +4806,7 @@ pub(super) fn line_field(args: &[String], realization: &mut dyn FieldRealization
             };
             let change: Vec<i128> = point.theta.iter().zip(&learner.field.theta).map(|(&a, &b)| a as i128 - b as i128).collect();
             let realized = line_norm(&on_line(&change)).map_err(|e| e.to_string())?;
-            let (lines, energies) = enumerated_reads(&point, &chosen, realization, marker as i64)?;
+            let (lines, energies) = enumerated_reads(&point, &chosen, realization, marker as i64, None)?;
             let codes = chosen
                 .iter()
                 .enumerate()
@@ -5252,12 +5327,13 @@ fn rank_quartiles<T: Ord + Copy>(mut values: Vec<T>) -> Option<(T, T, T)> {
 
 /// [`enumerated_read`]'s rows at `chosen` (each line `lap`-marked), read through `realization`.
 fn enumerated_rows(field: &Field, chosen: &HeldPlaces, realization: &mut dyn FieldRealization, lap: i64) -> Result<Vec<String>> {
-    Ok(enumerated_reads(field, chosen, realization, lap)?.0)
+    Ok(enumerated_reads(field, chosen, realization, lap, None)?.0)
 }
 
 /// [`enumerated_rows`]'s rows beside the energies they carry: `alphabet` a place, its letters in order, the places in
-/// `chosen`'s order.
-fn enumerated_reads(field: &Field, chosen: &HeldPlaces, realization: &mut dyn FieldRealization, lap: i64) -> Result<(Vec<String>, Vec<i128>)> {
+/// `chosen`'s order. [measurement; theory, November 9 08:13, the held-under reading] With `under`, each configuration's `G` is
+/// read at `field`'s `θ` under the base's discrete maps ([`FieldRealization::read_energies_under`]); the faces are `field`'s own.
+fn enumerated_reads(field: &Field, chosen: &HeldPlaces, realization: &mut dyn FieldRealization, lap: i64, under: Option<(&Field, holonics::hnn::tower::field::BaseHold)>) -> Result<(Vec<String>, Vec<i128>)> {
     let alphabet = field.declaration.alphabet;
     let chosen: Vec<(usize, &Vec<usize>, usize, usize)> = chosen.iter().map(|(k, truth, t, q)| (*k, truth, *t, *q)).collect();
     if chosen.is_empty() {
@@ -5282,7 +5358,11 @@ fn enumerated_reads(field: &Field, chosen: &HeldPlaces, realization: &mut dyn Fi
         })
         .collect();
     let asked: Vec<&[usize]> = configurations.iter().map(Vec::as_slice).collect();
-    let energies = realization.read_energies(field, &asked).map_err(|e| e.to_string())?;
+    let energies = match under {
+        None => realization.read_energies(field, &asked),
+        Some((base, hold)) => realization.read_energies_under(field, base, &asked, hold),
+    }
+    .map_err(|e| e.to_string())?;
     let log2_t = field.theta[field.layout().face_temper];
     let mut lines = Vec::with_capacity(chosen.len());
     for (n, (k, truth, t, q)) in chosen.iter().enumerate() {
@@ -6206,6 +6286,87 @@ mod tests {
             }
         }
         assert!(lead_field(&args(&other, &other_sha, &at("P")), &mut host()).is_err(), "a field without one energy");
+        let _ = std::fs::remove_dir_all(&dir);
+    }
+
+    /// [measurement; theory, November 9 08:13 and 08:15, the held-under reading] `held-under` end to end on the host: an
+    /// energy field whose families are drawn from the key stream reads six held places under itself, and in either hold its
+    /// `ENUMERATED.tsv` is the plain held read's (`lap` −1) row for row; under a base whose key chart is negated, the rows'
+    /// energies are the host's own `Field::energy_g_under` under that base and some move, while every face stays the state's;
+    /// the states are read, never written; a base of another declaration and an undeclared hold are refused.
+    #[test]
+    fn the_held_under_reading_is_the_held_read_under_itself() {
+        use holonics::hnn::tower::field::BaseHold;
+        let dir = std::env::temp_dir().join(format!("holonics-under-{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&dir);
+        std::fs::create_dir_all(&dir).expect("dir");
+        let at = |name: &str| dir.join(name).to_string_lossy().into_owned();
+        let put = |name: &str, bytes: &[u8]| {
+            std::fs::write(dir.join(name), bytes).expect("write");
+            (at(name), sha256(bytes).expect("sha"))
+        };
+        let (codec, problems) = toy();
+        let reach = problems.iter().map(|(q, _, _)| q.len() + codec.answer).max().unwrap();
+        let d = FieldDeclaration { alphabet: codec.alphabet(), width: 8, heads: 2, modes: 3, still: 1, contacts: 4, ticks: 2, frames: 2, reach, lanes: 1, depth: 0, energy: true };
+        let keys: Vec<u8> = (0..1u64 << 13).flat_map(|i| mix(0x5EED, i).to_be_bytes()).collect();
+        let mut field = Field::found(d, &keys).unwrap();
+        let families = field.layout().families.clone();
+        for (n, v) in field.theta.iter_mut().enumerate() {
+            let k = mix(0x0DE5, n as u64) as u32 as i32 as i64;
+            let grain = families.iter().find(|(s, l, _)| (*s..*s + *l).contains(&n)).unwrap().2;
+            *v = ((k << grain) >> 32) as i32;
+        }
+        let l = field.layout().clone();
+        field.theta[l.pace..l.pace + d.paced_heads() * (d.alphabet + 1)].fill(0);
+        let mut keyed = field.clone();
+        for v in &mut keyed.theta[l.q..l.q + 2 * d.complex() * d.width] {
+            *v = v.wrapping_neg();
+        }
+        let (learner, base) = (FieldLearner::new(field, 4), FieldLearner::new(keyed, 4));
+        let plain = FieldLearner::new(Field::found(FieldDeclaration { energy: false, ..d }, &keys).unwrap(), 4);
+        let text = learner.to_text();
+        let (state, state_sha) = put("STATE", text.as_bytes());
+        let (other, other_sha) = put("BASE", base.to_text().as_bytes());
+        let (plain_at, plain_sha) = put("PLAIN", plain.to_text().as_bytes());
+        let (codec_at, codec_sha) = put("CODEC", codec.to_text().as_bytes());
+        let (units, units_sha) = put("UNITS", b"founded-units-v1 0\n");
+        let (held, held_sha) = put("HELD", TOY);
+        let args = |base: &str, base_sha: &str, out: &str, hold: &str| -> Vec<String> {
+            ["held-under", base, base_sha, &state, &state_sha, &codec_at, &codec_sha, &units, &units_sha, &held, &held_sha, "6", out, hold].iter().map(|s| s.to_string()).collect()
+        };
+        let read_rows = |out: &str| -> Vec<String> { String::from_utf8(std::fs::read(dir.join(out).join("ENUMERATED.tsv")).expect("rows")).unwrap().lines().skip(1).map(str::to_string).collect() };
+        let held_set = encoded_problems(&codec, &problems_of(TOY), &learner.field).unwrap();
+        let void = codec.void();
+        let truth_of = |p: &(Vec<usize>, Vec<usize>, usize), letters: &[usize]| truth_with_voids(void, p, letters);
+        let chosen = enumerated_places(&held_set, 6, &truth_of);
+        let expected: Vec<String> = enumerated_rows(&learner.field, &chosen, &mut host(), -1).unwrap().iter().map(|r| r.trim_end().to_string()).collect();
+        for hold in ["classes", "classes+halvings"] {
+            let out = format!("S{}", hold.len());
+            held_under(&args(&state, &state_sha, &at(&out), hold), &mut host()).expect("under itself");
+            assert_eq!(read_rows(&out), expected, "{hold}: under itself, the plain held read");
+            let out = format!("K{}", hold.len());
+            held_under(&args(&other, &other_sha, &at(&out), hold), &mut host()).expect("under the keyed base");
+            let rows = read_rows(&out);
+            assert_eq!(rows.len(), expected.len(), "{hold}: a row a place");
+            let mut moved = false;
+            for ((cells, plain_cells), (_, truth, t, _)) in rows.iter().zip(&expected).zip(&chosen) {
+                let (cells, plain_cells): (Vec<&str>, Vec<&str>) = (cells.split('\t').collect(), plain_cells.split('\t').collect());
+                assert_eq!((&cells[..7], &cells[8..]), (&plain_cells[..7], &plain_cells[8..]), "{hold}: the faces are the state's own");
+                let g: Vec<String> = (0..d.alphabet)
+                    .map(|c| {
+                        let mut x = truth.clone();
+                        x[*t] = c;
+                        learner.field.energy_g_under(&base.field, &x, BaseHold::of(hold).unwrap()).unwrap().to_string()
+                    })
+                    .collect();
+                assert_eq!(cells[7], g.join(","), "{hold}: the energies under the base");
+                moved |= cells[7] != plain_cells[7];
+            }
+            assert!(moved, "{hold}: a base whose keys turn moves some energy");
+        }
+        assert_eq!(std::fs::read(dir.join("STATE")).expect("state"), text.as_bytes(), "the state is read, never written");
+        assert!(held_under(&args(&plain_at, &plain_sha, &at("P"), "classes"), &mut host()).is_err(), "a base of another declaration");
+        assert!(held_under(&args(&state, &state_sha, &at("H"), "halvings"), &mut host()).is_err(), "an undeclared hold");
         let _ = std::fs::remove_dir_all(&dir);
     }
 

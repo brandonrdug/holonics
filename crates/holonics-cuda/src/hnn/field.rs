@@ -2907,6 +2907,9 @@ impl FieldRealization for CardField<'_> {
     fn read_energy_held_classes(&mut self, field: &Field, places: &[(&[usize], usize)]) -> Result<Vec<holonics::hnn::tower::field::EnergyHeldClasses>> {
         self.energy_held_classes(field, places)
     }
+    fn read_energies_under(&mut self, field: &Field, base: &Field, regions: &[&[usize]], hold: holonics::hnn::tower::field::BaseHold) -> Result<Vec<i128>> {
+        self.energies_under(field, base, regions, hold)
+    }
     fn read_energy_faces(&mut self, field: &Field, regions: &[Region]) -> Result<(Vec<Vec<Option<TowerFace>>>, Vec<i128>)> {
         let (faces, _, reads) = self.energy_run(field, regions)?;
         Ok((faces, reads.iter().map(|r| r.last).collect()))
