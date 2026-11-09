@@ -5062,7 +5062,7 @@ pub struct LineDirections {
     pub step: Vec<i128>,
     /// The first moment scaled to `step`'s norm.
     pub first: Vec<i128>,
-    /// The deposit's next step as the learner without a carried release moves it, on each family's grain.
+    /// The deposit's next step as the learner moves it, each entry's carried remainder added, on each family's grain.
     pub released: Vec<i128>,
     /// `‖step‖` on [`LINE_BITS`] (the line's unit length, `η = 1`).
     pub step_norm: u128,
@@ -5485,32 +5485,30 @@ impl UnigramCarry {
 }
 
 /// The width census's deposit sites, one name a family and kind: a step's lowest set bit 0 to 7 and 8 or more (0–8), a
-/// step released to zero while its moment is not (9), the step's top place (10), the release's summed remainder (11; its
-/// positive and negative parts, 12 and 13) beside the summed change (14), the entries the covector reached (15), the whole
-/// step before truncation (16, 17), and the shadow carry's first crossings of half a grain by deposit (18–21).
+/// step released to zero while its moment is not (9), the step's top place (10), the carried remainder after the release
+/// (11; its positive and negative parts, 12 and 13) beside the summed change (14), the entries the covector reached (15),
+/// and the step as formed, before its carried remainder is added and it is released (16, 17). The shadow carry (each
+/// entry's dropped part summed beside `θ`, theory, November 8 03:01) measured what the truncating deposit dropped and
+/// retired with it (November 9 05:00): the carried release drops nothing.
 fn census_deposit_site(family: usize, kind: usize) -> &'static str {
     static NAMES: std::sync::OnceLock<Vec<Vec<&'static str>>> = std::sync::OnceLock::new();
     let names = NAMES.get_or_init(|| {
         (0..64)
             .map(|f| {
-                (0..22)
+                (0..18)
                     .map(|k| {
                         let what = match k {
                             0..=7 => format!("deposit: family {f} steps with lowest bit {k}"),
                             8 => format!("deposit: family {f} steps with lowest bit 8+"),
                             9 => format!("deposit: family {f} steps released to zero, moment nonzero"),
                             10 => format!("deposit: family {f} step top place"),
-                            11 => format!("deposit: family {f} summed |remainder| of the step's release, on 2^-24 of the grain"),
-                            12 => format!("deposit: family {f} summed positive remainder, on 2^-24"),
-                            13 => format!("deposit: family {f} summed negative remainder (magnitude), on 2^-24"),
+                            11 => format!("deposit: family {f} summed |carried remainder| after the step's release, on 2^-24 of the grain"),
+                            12 => format!("deposit: family {f} summed positive carried remainder, on 2^-24"),
+                            13 => format!("deposit: family {f} summed negative carried remainder (magnitude), on 2^-24"),
                             14 => format!("deposit: family {f} summed |change|, on the grain"),
                             15 => format!("deposit: family {f} entries whose covector is nonzero"),
-                            16 => format!("deposit: family {f} summed positive whole step before truncation, on 2^-24"),
-                            17 => format!("deposit: family {f} summed negative whole step before truncation (magnitude), on 2^-24"),
-                            18 => format!("deposit: family {f} entries whose shadow carry reached half a grain at deposit 1"),
-                            19 => format!("deposit: family {f} entries whose shadow carry first reached half a grain at deposits 2-39"),
-                            20 => format!("deposit: family {f} entries whose shadow carry first reached half a grain at deposits 40-100"),
-                            _ => format!("deposit: family {f} entries whose shadow carry first reached half a grain after deposit 100"),
+                            16 => format!("deposit: family {f} summed positive step as formed, on 2^-24"),
+                            _ => format!("deposit: family {f} summed negative step as formed (magnitude), on 2^-24"),
                         };
                         &*Box::leak(what.into_boxed_str())
                     })
@@ -5613,9 +5611,11 @@ pub struct KernelReceipt {
     /// The evidence-shrunk Newton step's read, where the learner takes it ([`FieldLearner::newton`]).
     pub newton: Option<NewtonRead>,
     /// [measurement; November 7, lap 7] Each family's part of the transfer and of the predicted change, in the families'
-    /// order ([`Field::families_all`]), on the codes' grain (`None` past its carrier): where the step that lowers its own
-    /// section raises the next.
-    pub by_family: Vec<(Option<i64>, Option<i64>)>,
+    /// order ([`Field::families_all`]) (`None` past its carrier): where the step that lowers its own section raises the next.
+    /// [definition; theory, November 9 05:00] The length law's own operands: the step before and this section's, each as the
+    /// deposit carries it (what moved and the remainder beside it, [`carried_change_family`]), on [`PRICE_BITS`] (`2^(−44)`
+    /// bits); the transfer `None` where no step was carried before, the price read whether or not the step moved.
+    pub by_family: Vec<(Option<i128>, Option<i128>)>,
     /// Each family's length `ρ_f` after the section (on `2^(−24)` bits), where the learner reads them.
     pub rates: Vec<i128>,
     /// [measurement; theory, November 7 19:41] Each state's two relaxations, compared: the states (truths and proposals) whose
@@ -5686,10 +5686,37 @@ pub struct NewtonRead {
 /// A deposited step held for the next regions' read: the proposed step on each family's grain and
 /// the halvings it was certified at. The material before it is the material less nothing: the
 /// deposit subtracted `release(step, halvings)` from each entry, so adding it back restores the same bits.
+///
+/// [definition; theory, November 9 05:00] `carried` is the remainder the deposit carried beside the step it moved
+/// ([`FieldLearner::carried`]), entry by entry on `2^(−24)` of its family's grain (`|r| ≤ 2^23`), so the step the deposit
+/// carries is `step·2^24 + carried` on the carry's grain: what moved and what it holds for the next deposit. Empty where the
+/// step carries none (the held read's step, [`FieldLearner::deposit_newton`]'s and
+/// [`FieldLearner::section_contrast_scaled`]'s), read as zero; a remainder stands only beside a step at its full size
+/// (`halvings` 0, the deposit's).
 #[derive(Clone, Debug, PartialEq, Eq)]
 struct HeldStep {
     step: Vec<i128>,
     halvings: u32,
+    carried: Vec<i64>,
+}
+
+impl HeldStep {
+    /// Whether the step carries anything: a moved entry or a remainder.
+    fn carries(&self) -> bool {
+        self.step.iter().any(|&s| s != 0) || self.carried.iter().any(|&r| r != 0)
+    }
+}
+
+/// What a section's deposit read and did ([`FieldLearner::deposit`]): whether it moved the material, the moved step's
+/// first-order change on its own section (`predicted`), the step before priced on it (`transfer`) and the moments' step
+/// before it moved them (`external`), on the codes' `2^(−20)` bits, and each family's transfer and own-section price of the
+/// step the deposit carries, the length law's operands, on [`PRICE_BITS`].
+struct Deposit {
+    moved: bool,
+    predicted: Option<i64>,
+    transfer: Option<i64>,
+    external: Option<i64>,
+    by_family: Vec<(Option<i128>, Option<i128>)>,
 }
 
 /// Each unresolved site's face read at its class, the faces the certificates compare.
@@ -5777,15 +5804,29 @@ fn predicted_change(field: &Field, g: &[i128], step: &[i128], halvings: u32) -> 
     i64::try_from(total).ok()
 }
 
-/// [measurement; November 7] [`predicted_change`] over one family `(start, len, grain)` alone.
-fn predicted_change_family(field: &Field, g: &[i128], step: &[i128], halvings: u32, (start, len, grain): (usize, usize, u32)) -> Option<i64> {
-    let _ = field;
+/// The grain the length law reads a family's price on: `2^(−44)` bits, the codes' `2^(−20)` with the carry's 24 places kept.
+pub const PRICE_BITS: u32 = 20 + MATERIAL_BITS;
+
+/// [definition; theory, November 9 05:00] **The carried step's first-order change on one family** `(start, len, grain)`:
+/// `Σ_i g_i Δθ_i` with `Δθ = −(release(step, halvings)·2^24 + carried)`, the step the deposit carries on `2^(−24)` of the
+/// family's grain ([`HeldStep`]: what moved and the remainder carried beside it), and `g` the section's covector as its return
+/// gives it (on `2^(−40)` a real unit on the material's families, `2^(−24)` on the faces'). A unit of `g Δθ` stands at
+/// `2^(−(40 + grain + 24))` bits on a material family and `2^(−(24 + grain + 24))` on a face family, so the same shift as
+/// [`predicted_change`]'s, `40 + grain − 20` or `24 + grain − 20`, puts the price on [`PRICE_BITS`] (`2^(−44)` bits): the 24
+/// places of the carry's grain are kept, so a family whose every step is under its grain prices what it carries (on the
+/// codes' `2^(−20)` its price releases to zero as its step does). Released to its nearest (half away from zero), so a noise
+/// of either sign reads no pull; `None` where a product or the sum passes its carrier. With the next section's covector and the
+/// step the section before carried it is the family's transfer, with the section's own covector and its own step its price:
+/// the length law's two operands ([`FieldLearner::family_rates`]).
+fn carried_change_family(g: &[i128], held: &HeldStep, (start, len, grain): (usize, usize, u32)) -> Option<i128> {
     let shift = if grain == MATERIAL_BITS { 40 + grain - 20 } else { 24 + grain - 20 };
     let mut family = 0i128;
     for i in start..start + len {
-        family = family.checked_add(g[i].checked_mul(-release(step[i], halvings))?)?;
+        let moved = release(held.step[i], held.halvings).checked_mul(1i128 << MATERIAL_BITS)?;
+        let carried = moved.checked_add(held.carried.get(i).map_or(0, |&r| i128::from(r)))?;
+        family = family.checked_add(g[i].checked_mul(-carried)?)?;
     }
-    i64::try_from(family >> shift).ok()
+    Some(release(family, shift))
 }
 
 /// `base` less `release(step, halvings)` in each entry, and whether any entry moved.
@@ -5905,15 +5946,20 @@ pub struct FieldLearner {
     /// finer than `θ`'s grain (theory, 22:08), so the remainder `toward` releases is carried and `θ̄` is the walk's mean,
     /// not its median.
     pub average: Option<Vec<i64>>,
-    /// [definition; theory, November 8 02:24 and 03:01, the number record's N5] **The carried release**: where set, each
-    /// entry's deposit is formed on `2^(−24)` of its grain (the division's and the shift's truncation taken there, not at the
-    /// grain), its carried remainder added, and released to the grain, the new remainder (`|r| ≤ 2^23`) carried to the next
-    /// deposit; so sub-grain deposits add up in the low places and carry into the grain instead of releasing to zero each
-    /// section (moment_face, pair_c, and the nine families whose every step released to zero, the width census of
-    /// November 8). A restart carries it. [declared tolerance; theory, November 8 03:32] The carry's own grain, `2^(−24)`
-    /// of the family's grain, is a pick: below it each deposit drops under two units, one-sided, so a grain moves on
+    /// [definition; theory, November 8 02:24 and 03:01, the number record's N5; the deposit since November 9 05:00] **The
+    /// carried release is the deposit**: each entry's deposit is formed on `2^(−24)` of its grain (the division's and the
+    /// shift's truncation taken there, not at the grain), its carried remainder added, and released to the grain, the new
+    /// remainder (`|r| ≤ 2^23`) carried to the next deposit; so sub-grain deposits add up in the low places and carry into the
+    /// grain instead of releasing to zero each section. Why it is the one deposit (theory, November 9 05:00): under the
+    /// truncating deposit q_bias, a, a_bias, b, b_bias, moment_before, moment_after, probe_bias, moment_face and
+    /// moment_face_bias moved zero grains from section 179 to 379 of law D's trained states, and zero under the fresh writes
+    /// from 219 to 234, their lengths bit-identical at 179, 300 and 379 with both averages at zero: a family whose step sits
+    /// under its grain never deposited, though its covector reached it. One remainder an entry of the material, always
+    /// present; every state saves them, and a state saved without a `carried` line opens them at zero. A growth carries each
+    /// entry's remainder as it carries its moments. [declared tolerance; theory, November 8 03:32] The carry's own grain,
+    /// `2^(−24)` of the family's grain, is a pick: below it each deposit drops under two units, one-sided, so a grain moves on
     /// that part only after about `2^22` deposits.
-    pub carried: Option<Vec<i64>>,
+    pub carried: Vec<i64>,
     /// [definition; theory, November 8 13:44] **The unigram law's carried sums** ([`UnigramCarry`]): each letter's count in the
     /// truths of the conditional places read and its summed share over the same places, carried across sections (a restart
     /// carries them); applied, the bias steps by `2^(−3) T log₂(N*_a/M_a)` and the step re-bases the mass. It replaces the
@@ -5969,16 +6015,26 @@ pub struct FieldLearner {
     /// length `η = |μ|²/c` that lowers the code most per step [derived]; a quarter of the correction a section settles in about
     /// twenty sections [agent-inferred]. Carried in the learner's text with the two averages (the unified-theory reading of
     /// November 7, 07:24), so a continued learner keeps them.
+    ///
+    /// [definition; theory, November 9 05:00] **The length law prices the carried step**: `τ_f` and `π_f` are read on the step
+    /// the deposit carries, what moved plus the remainder carried beside it on `2^(−24)` of the family's grain
+    /// ([`carried_change_family`], on [`PRICE_BITS`]), never on the released step alone. Read on the released step, a family
+    /// whose step releases to zero reads zero price and zero transfer, both averages decay to zero, and its length moves by a
+    /// ratio of two vanishing averages just as it stops moving; priced on what it carries, a family with real descent
+    /// lengthens until its grains move, and one with only noise gets no pull either way.
     pub family_rates: Option<Vec<i128>>,
     /// [definition; the unified-theory reading of November 7, 06:57] Whether a kernel section deposits the letters'
     /// temperature's covector ([`FieldLearner::section_kernel`]). Not carried in the learner's text.
     pub temper_learns: bool,
+    /// Each family's averaged transfer and own-section price, on [`PRICE_BITS`] (`2^(−44)` bits; a state written before the
+    /// length law priced the carried step kept them on the codes' `2^(−20)`, and its text says so).
     family_transfer: Vec<i128>,
     family_price: Vec<i128>,
-    /// [measurement; §16.41] The step the last section stood at, the operand of the next section's
-    /// [`FieldReceipt::transfer`] and of the family rates' move; carried in the learner's text (November 8: a resume without
-    /// it broke bits at its second deposit), cleared by every growth, and not kept under the held read (whose next section
-    /// moves the step before pricing it).
+    /// [measurement; §16.41] The step the last section's deposit carried (what moved and, beside it, the remainder it carried,
+    /// [`HeldStep`]), the operand of the next section's [`FieldReceipt::transfer`] (on what moved) and of the family rates'
+    /// move (on what it carried); kept wherever the deposit carried anything, moved or not; carried in the learner's text
+    /// (November 8: a resume without it broke bits at its second deposit), cleared by every growth, and not kept under the held
+    /// read (whose next section moves the step before pricing it).
     last: Option<HeldStep>,
 }
 
@@ -5988,7 +6044,7 @@ impl FieldLearner {
     pub fn new(field: Field, rate_bits: u32) -> Self {
         let len = field.material_len();
         let drawn = 4 * field.declaration.founding_draws();
-        Self { field, first: vec![0; len], second: vec![0; len], rate_bits, drawn, laps: 0, held: None, read_held: false, newton: false, newton_read: false, first_rate: FIRST_RATE, second_rate: SECOND_RATE, family_rates: None, temper_learns: false, family_transfer: Vec::new(), family_price: Vec::new(), last: None, average: None, carried: None, unigram: None, unigram_step: None, coin_measure: false, key: None }
+        Self { field, first: vec![0; len], second: vec![0; len], rate_bits, drawn, laps: 0, held: None, read_held: false, newton: false, newton_read: false, first_rate: FIRST_RATE, second_rate: SECOND_RATE, family_rates: None, temper_learns: false, family_transfer: Vec::new(), family_price: Vec::new(), last: None, average: None, carried: vec![0; len], unigram: None, unigram_step: None, coin_measure: false, key: None }
     }
 
     /// Whether a deposited step is held for the next regions' read.
@@ -6013,9 +6069,13 @@ impl FieldLearner {
         let (f, f2) = (factor as i128, (factor * factor) as i128);
         let first = from.iter().map(|&(i, divided)| if divided { div_nearest(self.first[i], f) } else { self.first[i] }).collect();
         let second = from.iter().map(|&(i, divided)| if divided { div_nearest(self.second[i], f2) } else { self.second[i] }).collect();
+        // [agent-inferred, November 9] Each remainder as its moments: a divided coordinate's is the old one divided among its
+        // copies (the copies' steps sum to the old step, so their remainders sum to the old remainder, to the division's
+        // nearest on the carry's grain), the readout's kept.
+        let carried = from.iter().map(|&(i, divided)| if divided { div_nearest(i128::from(self.carried[i]), f) as i64 } else { self.carried[i] }).collect();
         let drawn = self.drawn + 4 * self.field.growth_draws(factor);
         let rate_bits = self.rate_bits + (usize::BITS - (factor - 1).leading_zeros());
-        Ok(Self { field, first, second, rate_bits, drawn, laps: self.laps, held: None, read_held: self.read_held, newton: self.newton, newton_read: self.newton_read, first_rate: self.first_rate, second_rate: self.second_rate, family_rates: None, temper_learns: false, family_transfer: Vec::new(), family_price: Vec::new(), last: None, average: None, carried: None, unigram: None, unigram_step: None, coin_measure: false, key: None })
+        Ok(Self { field, first, second, rate_bits, drawn, laps: self.laps, held: None, read_held: self.read_held, newton: self.newton, newton_read: self.newton_read, first_rate: self.first_rate, second_rate: self.second_rate, family_rates: None, temper_learns: false, family_transfer: Vec::new(), family_price: Vec::new(), last: None, average: None, carried, unigram: None, unigram_step: None, coin_measure: false, key: None })
     }
 
     /// [definition; agent-inferred, November 4, §16.40] **The learner with one more lane** ([`Field::laned`]), the lane's
@@ -6054,8 +6114,10 @@ impl FieldLearner {
                 second[k] = mean;
             }
         }
+        // Each old entry keeps its remainder; the lane's open at zero.
+        let carried = from.iter().map(|o| o.map_or(0, |i| self.carried[i])).collect();
         let drawn = self.drawn + 4 * self.field.declaration.lane_draws();
-        Ok(Self { field, first, second, rate_bits: self.rate_bits, drawn, laps: self.laps, held: None, read_held: self.read_held, newton: self.newton, newton_read: self.newton_read, first_rate: self.first_rate, second_rate: self.second_rate, family_rates: None, temper_learns: false, family_transfer: Vec::new(), family_price: Vec::new(), last: None, average: None, carried: None, unigram: None, unigram_step: None, coin_measure: false, key: None })
+        Ok(Self { field, first, second, rate_bits: self.rate_bits, drawn, laps: self.laps, held: None, read_held: self.read_held, newton: self.newton, newton_read: self.newton_read, first_rate: self.first_rate, second_rate: self.second_rate, family_rates: None, temper_learns: false, family_transfer: Vec::new(), family_price: Vec::new(), last: None, average: None, carried, unigram: None, unigram_step: None, coin_measure: false, key: None })
     }
 
     /// [definition; theory, November 9 03:56] **The learner moved to the opening at the letters' force**
@@ -6144,7 +6206,7 @@ impl FieldLearner {
         // The sites the weighed code is a code of (§16.23): each region's domain where it reads an open site.
         let sites = spans.iter().filter(|s| s.0 > 0).map(|s| s.1 as usize).sum::<usize>()
             + regions.iter().filter_map(|r| r.port.map(|p| (p.start..p.stop.unwrap_or(r.classes.len()).min(r.classes.len())).filter(|&t| r.unresolved[t] && p.heard.is_none_or(|h| h[t])).count())).sum::<usize>();
-        let (deposited, predicted, transfer, external) = self.deposit(g)?;
+        let Deposit { moved: deposited, predicted, transfer, external, .. } = self.deposit(g)?;
         Ok(FieldReceipt { sites, code_before, code_after: None, halvings: 0, deposited, next, predicted, change: None, transfer, external })
     }
 
@@ -6258,9 +6320,9 @@ impl FieldLearner {
         read.deposited = moved;
         if moved {
             if self.read_held {
-                self.held = Some(HeldStep { step, halvings: 0 });
+                self.held = Some(HeldStep { step, halvings: 0, carried: Vec::new() });
             } else {
-                self.last = Some(HeldStep { step, halvings: 0 });
+                self.last = Some(HeldStep { step, halvings: 0, carried: Vec::new() });
             }
         }
         Ok(read)
@@ -6269,11 +6331,25 @@ impl FieldLearner {
     /// [definition; agent-inferred, November 7] **A section's deposit of its covector** `g` (each family's on its natural
     /// grain, the code's covector): the step the section before stood at priced on it (`transfer`), the step the moments
     /// would deposit before it moves them priced on it (`external`), the moments moved, and the step deposited at its size
-    /// (fluxing, Brandon, November 5 17:29 and 17:32) with its first-order change (`predicted`). Returns whether it moved the
-    /// material, `predicted`, `transfer` and `external`. Shared by [`FieldLearner::section_realized`] and
-    /// [`FieldLearner::section_contrast`].
-    #[allow(clippy::type_complexity)]
-    fn deposit(&mut self, mut g: Vec<i128>) -> Result<(bool, Option<i64>, Option<i64>, Option<i64>)> {
+    /// (fluxing, Brandon, November 5 17:29 and 17:32) with its first-order change (`predicted`). Shared by
+    /// [`FieldLearner::section_realized`], [`FieldLearner::section_contrast`] and the kernel and conditional sections.
+    ///
+    /// [definition; theory, November 9 05:00] **The deposit is the carried release** ([`FieldLearner::carried`]): each entry's
+    /// step is formed on `2^(−24)` of its family's grain at the family's length `2^(−ρ_f)` (`2^(−rate_bits)` for every family
+    /// where the learner reads no family lengths), `full = ((m 2^grain · 2^(−frac ρ_f)) ≫ ⌊ρ_f⌋) / (⌊√v⌋ + 1)`, the fraction
+    /// through the exponential's navigator on `2^(−24)`; its carried remainder is added, the sum released to the grain (what
+    /// moves), and the new remainder carried. There is no other deposit: the truncating one, which released each step at the
+    /// grain and dropped the rest, is retired. The length law reads the step the deposit carries ([`FieldLearner::family_rates`],
+    /// [`carried_change_family`]): this section's own step and the step before, each what moved plus the remainder carried
+    /// beside it, priced on [`PRICE_BITS`]. Where the unigram's Newton step stands in for the moments' at the bias
+    /// ([`FieldLearner::unigram_step`]) the moments' step is not taken there, so its remainder is not carried: the bias's
+    /// remainders stand as they were, and the step carries the Newton step alone.
+    fn deposit(&mut self, mut g: Vec<i128>) -> Result<Deposit> {
+        const PAST: &str = "a family's step past its 128-bit carrier";
+        const PLACES: &str = "a carried remainder outside its places";
+        if self.carried.len() != g.len() {
+            return refuse("a learner's carried remainders that are not its material's length");
+        }
         let raw = g.clone();
         let prev = self.last.take();
         let transfer = prev.as_ref().and_then(|s| predicted_change(&self.field, &raw, &s.step, s.halvings));
@@ -6286,109 +6362,55 @@ impl FieldLearner {
             }
         }
         let external = predicted_change(&self.field, &raw, &external_step, 0);
-        // The step before priced on this section by family, before the moments move.
+        // The step before, as it carried, priced on this section by family, before the moments move.
         let families = self.field.families_all();
-        let transfers: Option<Vec<Option<i64>>> = match (&self.family_rates, &prev) {
-            (Some(_), Some(prev)) => Some(families.iter().map(|&fam| predicted_change_family(&self.field, &raw, &prev.step, prev.halvings, fam)).collect()),
-            _ => None,
-        };
+        let transfers: Vec<Option<i128>> = families.iter().map(|&fam| prev.as_ref().and_then(|p| carried_change_family(&raw, p, fam))).collect();
         self.moments_take(&mut g)?;
+        // The bias's remainders as they stand, where the unigram's Newton step will stand in for the moments' there.
+        let bias = self.unigram_step.take().map(|du| {
+            let start = self.field.layout.read_bias;
+            let kept = self.carried[start..start + du.len()].to_vec();
+            (start, du, kept)
+        });
         let mut step = vec![0i128; g.len()];
-        // The census's whole steps a deposit (on 2^(−24) of each grain), for the shadow carry.
-        let mut full_steps = if crate::number::census::enabled() { vec![0i128; g.len()] } else { Vec::new() };
         for (k, &(start, len, grain)) in families.iter().enumerate() {
-            match &self.family_rates {
-                // `2^(−ρ_f)`: the whole bits through the deposit's own law (a right shift, or a left shift checked at its carrier
-                // where `ρ_f < 0`: the unified-theory reading of November 7, 07:16, the law unclamped), the fraction through the
-                // exponential's navigator.
-                Some(rates) => {
-                    let rho = rates[k];
-                    let (whole, part) = (rho >> MATERIAL_BITS, (rho & ((1 << MATERIAL_BITS) - 1)) as i32);
-                    let scale = temperature_of(-part, &self.field.fine)?;
-                    const PAST: &str = "a family's step past its 128-bit carrier";
-                    for i in start..start + len {
-                        let root = super::deposit_root(self.second[i]);
-                        let num = self.first[i].checked_mul(1i128 << grain).inspect(|v| crate::number::census::reach(PAST, v)).ok_or(TowerError::Refused(PAST))?;
-                        let whole_step = if whole >= 0 {
-                            (num >> whole.min(127)) / root
-                        } else {
-                            let k = u32::try_from(-whole).map_err(|_| TowerError::Refused(PAST))?;
-                            num.checked_mul(1i128.checked_shl(k).filter(|&b| b > 0).inspect(|v| crate::number::census::reach(PAST, v)).ok_or(TowerError::Refused(PAST))?).inspect(|v| crate::number::census::reach(PAST, v)).ok_or(TowerError::Refused(PAST))? / root
-                        };
-                        let pre = match &mut self.carried {
-                            // The carried release: the whole step on 2^(−24) of the grain, the division's and the shift's truncation
-                            // taken there, plus the entry's carried remainder; released to the grain, the new remainder carried.
-                            Some(carried) => {
-                                let scaled = num.checked_mul(scale).inspect(|v| crate::number::census::reach(PAST, v)).ok_or(TowerError::Refused(PAST))?;
-                                let full = if whole >= 0 {
-                                    (scaled >> whole.min(127)) / root
-                                } else {
-                                    let k = u32::try_from(-whole).map_err(|_| TowerError::Refused(PAST))?;
-                                    scaled.checked_mul(1i128.checked_shl(k).filter(|&b| b > 0).ok_or(TowerError::Refused(PAST))?).ok_or(TowerError::Refused(PAST))? / root
-                                };
-                                let total = full + i128::from(carried[i]);
-                                let s = release(total, MATERIAL_BITS);
-                                carried[i] = i64::try_from(total - (s << MATERIAL_BITS)).map_err(|_| TowerError::Refused("a carried remainder outside its places"))?;
-                                total
-                            }
-                            None => whole_step.checked_mul(scale).inspect(|v| crate::number::census::reach(PAST, v)).ok_or(TowerError::Refused(PAST))?,
-                        };
-                        step[i] = release(pre, MATERIAL_BITS);
-                        // The release's remainder on 2^(−24) of the family's grain, signed parts apart, beside the change; and
-                        // the whole step before the division's and the shift's truncation (the deposit a carried release
-                        // would keep), on the same grain: what a family whose every step releases to zero holds.
-                        if crate::number::census::enabled() {
-                            let rem = pre - (step[i] << MATERIAL_BITS);
-                            crate::number::census::tally(census_deposit_site(k, 11), rem.unsigned_abs() as u64);
-                            crate::number::census::tally(census_deposit_site(k, if rem > 0 { 12 } else { 13 }), rem.unsigned_abs() as u64);
-                            crate::number::census::tally(census_deposit_site(k, 14), step[i].unsigned_abs() as u64);
-                            if let Some(scaled) = num.checked_mul(scale) {
-                                let full = if whole >= 0 { (scaled >> whole.min(127)) / root } else { scaled.checked_shl((-whole) as u32).unwrap_or(0) / root };
-                                full_steps[i] = full;
-                                crate::number::census::tally(census_deposit_site(k, if full > 0 { 16 } else { 17 }), full.unsigned_abs() as u64);
-                            }
-                        }
-                    }
-                }
-                None => {
-                    for i in start..start + len {
-                        step[i] = match &mut self.carried {
-                            Some(carried) => {
-                                let full = deposit_step(self.first[i], self.second[i], grain + MATERIAL_BITS, self.rate_bits) + i128::from(carried[i]);
-                                let s = release(full, MATERIAL_BITS);
-                                carried[i] = i64::try_from(full - (s << MATERIAL_BITS)).map_err(|_| TowerError::Refused("a carried remainder outside its places"))?;
-                                s
-                            }
-                            None => deposit_step(self.first[i], self.second[i], grain, self.rate_bits),
-                        };
-                    }
+            // `2^(−ρ_f)`: the whole bits through the deposit's own law (a right shift, or a left shift checked at its carrier
+            // where `ρ_f < 0`: the unified-theory reading of November 7, 07:16, the law unclamped), the fraction through the
+            // exponential's navigator.
+            let rho = match &self.family_rates {
+                Some(rates) => *rates.get(k).ok_or(TowerError::Refused("a learner's family lengths that are not one a family"))?,
+                None => i128::from(self.rate_bits) << MATERIAL_BITS,
+            };
+            let (whole, part) = (rho >> MATERIAL_BITS, (rho & ((1 << MATERIAL_BITS) - 1)) as i32);
+            let scale = temperature_of(-part, &self.field.fine)?;
+            for i in start..start + len {
+                let root = super::deposit_root(self.second[i]);
+                let num = self.first[i].checked_mul(1i128 << grain).inspect(|v| crate::number::census::reach(PAST, v)).ok_or(TowerError::Refused(PAST))?;
+                let scaled = num.checked_mul(scale).inspect(|v| crate::number::census::reach(PAST, v)).ok_or(TowerError::Refused(PAST))?;
+                // The step on 2^(−24) of the grain, the division's and the shift's truncation taken there.
+                let full = if whole >= 0 {
+                    (scaled >> whole.min(127)) / root
+                } else {
+                    let k = u32::try_from(-whole).map_err(|_| TowerError::Refused(PAST))?;
+                    scaled.checked_mul(1i128.checked_shl(k).filter(|&b| b > 0).ok_or(TowerError::Refused(PAST))?).inspect(|v| crate::number::census::reach(PAST, v)).ok_or(TowerError::Refused(PAST))? / root
+                };
+                // Its carried remainder added; released to the grain (what moves), the new remainder carried.
+                let total = full.checked_add(i128::from(self.carried[i])).ok_or(TowerError::Refused(PAST))?;
+                step[i] = release(total, MATERIAL_BITS);
+                self.carried[i] = i64::try_from(total - (step[i] << MATERIAL_BITS)).map_err(|_| TowerError::Refused(PLACES))?;
+                // The carried remainder on 2^(−24) of the family's grain, signed parts apart, beside the change; and the step as
+                // formed, before its remainder is added, on the same grain.
+                if crate::number::census::enabled() {
+                    let rem = self.carried[i];
+                    crate::number::census::tally(census_deposit_site(k, 11), rem.unsigned_abs());
+                    crate::number::census::tally(census_deposit_site(k, if rem > 0 { 12 } else { 13 }), rem.unsigned_abs());
+                    crate::number::census::tally(census_deposit_site(k, 14), step[i].unsigned_abs() as u64);
+                    crate::number::census::tally(census_deposit_site(k, if full > 0 { 16 } else { 17 }), full.unsigned_abs() as u64);
                 }
             }
         }
-        // The shadow carry: each entry's dropped part (its whole step less its released step, on 2^(−24) of its grain) summed
-        // across deposits beside θ, never written to it; the deposit at which an entry's carried sum first reaches half a
-        // grain, counted per family by 1, 39 and 100 deposits and after.
-        if crate::number::census::enabled() && !full_steps.is_empty() {
-            crate::number::census::shadow_carry(step.len(), |sums, crossed, n| {
-                for (k, &(start, len, _)) in families.iter().enumerate() {
-                    for i in start..start + len {
-                        sums[i] += full_steps[i] - (step[i] << MATERIAL_BITS);
-                        if crossed[i] == 0 && sums[i].unsigned_abs() >= 1u128 << (MATERIAL_BITS - 1) {
-                            crossed[i] = n;
-                            let bucket = match n {
-                                1 => 18,
-                                2..=39 => 19,
-                                40..=100 => 20,
-                                _ => 21,
-                            };
-                            crate::number::census::tally(census_deposit_site(k, bucket), 1);
-                        }
-                    }
-                }
-            });
-        }
         // The width census's read (a) a step: each family's nonzero steps by their lowest set bit, and the entries whose moment
-        // is nonzero but whose step released to zero.
+        // is nonzero but whose step released to zero this deposit.
         if crate::number::census::enabled() {
             for (k, &(start, len, _)) in families.iter().enumerate() {
                 for i in start..start + len {
@@ -6404,46 +6426,59 @@ impl FieldLearner {
                 }
             }
         }
-        // The unigram's Newton step stands in for the moments' at the bias (θ steps by `−step`).
-        if let Some(du) = self.unigram_step.take() {
-            let start = self.field.layout.read_bias;
-            for (i, d) in du.iter().enumerate() {
+        // The step the deposit carries: what moves, and beside it each entry's new remainder.
+        let mut carried = self.carried.clone();
+        // The unigram's Newton step stands in for the moments' at the bias (θ steps by `−step`): the moments' step is not taken
+        // there, so the bias's remainders stand as they were before this deposit and the step carries the Newton step alone.
+        if let Some((start, du, kept)) = bias {
+            for (i, (d, r)) in du.iter().zip(kept).enumerate() {
                 step[start + i] = -d;
+                self.carried[start + i] = r;
+                carried[start + i] = 0;
             }
         }
-        let predicted = predicted_change(&self.field, &raw, &step, 0);
-        // Each family's length moves by a quarter of its averaged transfer over its averaged own-section price.
-        if let (Some(rates), Some(transfers)) = (&mut self.family_rates, transfers) {
+        let formed = HeldStep { step, halvings: 0, carried };
+        let predicted = predicted_change(&self.field, &raw, &formed.step, 0);
+        let prices: Vec<Option<i128>> = families.iter().map(|&fam| carried_change_family(&raw, &formed, fam)).collect();
+        // Each family's length moves by a quarter of its averaged transfer over its averaged own-section price, both read on the
+        // step the deposit carries (on 2^(−44) bits): `ρ_f += ¼ τ̄_f 2^24 / |π̄_f|`, `ρ_f` on 2^(−24) bits. A section with no
+        // step before it reads no transfer and moves neither average.
+        if let (Some(rates), true) = (&mut self.family_rates, prev.is_some()) {
+            const OVER: &str = "a family's length move past its 128-bit carrier";
             let rate = self.first_rate;
-            for (k, &fam) in families.iter().enumerate() {
-                let price = predicted_change_family(&self.field, &raw, &step, 0, fam).unwrap_or(0) as i128;
-                let transfer = transfers[k].unwrap_or(0) as i128;
+            for k in 0..families.len() {
                 let (t_avg, p_avg) = (&mut self.family_transfer[k], &mut self.family_price[k]);
-                *t_avg = toward(*t_avg, transfer, rate);
-                *p_avg = toward(*p_avg, price, rate);
+                *t_avg = toward(*t_avg, transfers[k].unwrap_or(0), rate);
+                *p_avg = toward(*p_avg, prices[k].unwrap_or(0), rate);
                 if *p_avg != 0 {
-                    rates[k] += div_nearest(*t_avg << MATERIAL_BITS, 4 * p_avg.abs());
+                    let lifted = t_avg.checked_mul(1i128 << MATERIAL_BITS).inspect(|v| crate::number::census::reach(OVER, v)).ok_or(TowerError::Refused(OVER))?;
+                    let over = p_avg.checked_abs().and_then(|p| p.checked_mul(4)).ok_or(TowerError::Refused(OVER))?;
+                    rates[k] = rates[k].checked_add(div_nearest(lifted, over)).ok_or(TowerError::Refused(OVER))?;
                 }
             }
         }
+        let by_family = transfers.into_iter().zip(prices).collect();
         // [definition; Brandon, November 5 17:29 and 17:32] **The step fluxes**: it deposits at its size, and no reread of the
         // section certifies it. The reread kept a step only where the regions reread under it coded strictly fewer bits, a
         // selection on the code (a maximum in effect) that discarded what an expansion measures ("you can't discard failure
         // or mistakes, knowing what causes contraction in contrast to expansion is equally important") and cost a full read
         // of the section (27% of path75's second segment). What the step does is read by the passes the field makes anyway:
         // the next section's own covector prices it at first order ([`FieldReceipt::transfer`]), contraction and expansion
-        // alike, and the moments carry every covector.
-        let (candidate, moved) = stepped(&self.field, &step, 0)?;
-        if !moved {
-            return Ok((false, predicted, transfer, external));
+        // alike, and the moments carry every covector. The step the deposit carried is kept for the next section's transfer
+        // wherever it carries anything, moved or not: a step held whole in its remainders is priced on the next section as
+        // well.
+        let (candidate, moved) = stepped(&self.field, &formed.step, 0)?;
+        if moved {
+            self.field = candidate;
         }
-        self.field = candidate;
         if self.read_held {
-            self.held = Some(HeldStep { step, halvings: 0 });
-        } else {
-            self.last = Some(HeldStep { step, halvings: 0 });
+            if moved {
+                self.held = Some(HeldStep { step: formed.step, halvings: 0, carried: Vec::new() });
+            }
+        } else if formed.carries() {
+            self.last = Some(formed);
         }
-        Ok((true, predicted, transfer, external))
+        Ok(Deposit { moved, predicted, transfer, external, by_family })
     }
 
     /// [definition; the unified-theory reading of November 7, 10:12] **The contrast with persistent writes, its length from the
@@ -6546,7 +6581,7 @@ impl FieldLearner {
         let (candidate, moved) = stepped(&self.field, &step, 0)?;
         if moved {
             self.field = candidate;
-            self.last = Some(HeldStep { step, halvings: 0 });
+            self.last = Some(HeldStep { step, halvings: 0, carried: Vec::new() });
         }
         Ok((ContrastReceipt { states: n, same, gap, deposited: moved, predicted, transfer, external: None }, eta))
     }
@@ -6603,7 +6638,7 @@ impl FieldLearner {
             let nats = release(gap.checked_mul(crate::hnn::keyed_modes::ln2_face()).inspect(|v| crate::number::census::reach(OVER, v)).ok_or(TowerError::Refused(OVER))?, LN2_FACE_BITS);
             g[f.layout.face_temper] = -(nats << (40 - ENERGY_BITS));
         }
-        let (deposited, predicted, transfer, external) = self.deposit(g)?;
+        let Deposit { moved: deposited, predicted, transfer, external, .. } = self.deposit(g)?;
         Ok(ContrastReceipt { states: n, same, gap, deposited, predicted, transfer, external })
     }
 
@@ -6802,18 +6837,9 @@ impl FieldLearner {
             let nats = release(over_t.checked_mul(crate::hnn::keyed_modes::ln2_face()).inspect(|v| crate::number::census::reach(OVER, v)).ok_or(TowerError::Refused(OVER))?, LN2_FACE_BITS);
             g[f.layout.face_temper] = -(nats << (40 - ENERGY_BITS));
         }
-        // Each family's part of the step before priced on this section, before the deposit takes it.
-        let transfers: Vec<Option<i64>> = match &self.last {
-            Some(prev) => self.field.families_all().iter().map(|&fam| predicted_change_family(&self.field, &g, &prev.step, prev.halvings, fam)).collect(),
-            None => vec![None; self.field.families_all().len()],
-        };
+        // Each family's part of the step before and of this one, as the deposit carries them, priced on this section.
         let raw = g.clone();
-        let (deposited, predicted, transfer, external) = self.deposit(g)?;
-        let predictions: Vec<Option<i64>> = match &self.last {
-            Some(now) if deposited => self.field.families_all().iter().map(|&fam| predicted_change_family(&self.field, &raw, &now.step, now.halvings, fam)).collect(),
-            _ => vec![None; transfers.len()],
-        };
-        let by_family = transfers.into_iter().zip(predictions).collect();
+        let Deposit { moved: deposited, predicted, transfer, external, by_family } = self.deposit(g)?;
         let rates = self.family_rates.clone().unwrap_or_default();
         Ok(KernelReceipt { states: n, places, moved, weight, weight_square, least, most, whole, deposited, predicted, transfer, external, per_state, log2_a, newton, by_family, rates, g_agree, g_gap, covector: raw, bands: Vec::new(), outside: Vec::new(), letter_counts: Vec::new(), surprise_bands: Vec::new(), kl_face: 0, moments: [0; 8], coin_measure: None })
     }
@@ -7204,10 +7230,6 @@ impl FieldLearner {
         if self.temper_learns {
             g[f.layout.face_temper] = temper_covector(gap, inverse)?;
         }
-        let transfers: Vec<Option<i64>> = match &self.last {
-            Some(prev) => self.field.families_all().iter().map(|&fam| predicted_change_family(&self.field, &g, &prev.step, prev.halvings, fam)).collect(),
-            None => vec![None; self.field.families_all().len()],
-        };
         if let (Some(acc), Some(carry)) = (unigram_acc.take(), self.unigram.as_mut()) {
             self.unigram_step = acc.finish(carry, inverse, &self.field.fine)?;
         }
@@ -7216,7 +7238,7 @@ impl FieldLearner {
             self.field.theta[start..start + alphabet].to_vec()
         });
         let raw = g.clone();
-        let (deposited, predicted, transfer, external) = self.deposit(g)?;
+        let Deposit { moved: deposited, predicted, transfer, external, by_family } = self.deposit(g)?;
         // [definition; theory, November 8 13:59] The carried mass follows what c actually did: each letter's mass re-based by
         // the realized change of its bias, log₂ M_a += Δc_a/T, in both modes (in shadow c moves by the moments), then put back
         // on the carried places (Σ_a M_a = places, a common shift of c, a gauge).
@@ -7230,27 +7252,23 @@ impl FieldLearner {
             }
             carry.normalize(&self.field.fine)?;
         }
-        let predictions: Vec<Option<i64>> = match &self.last {
-            Some(now) if deposited => self.field.families_all().iter().map(|&fam| predicted_change_family(&self.field, &raw, &now.step, now.halvings, fam)).collect(),
-            _ => vec![None; transfers.len()],
-        };
-        let by_family = transfers.into_iter().zip(predictions).collect();
         let rates = self.family_rates.clone().unwrap_or_default();
         let n = places.len();
         Ok(KernelReceipt { states: n, places: n, moved: 0, weight, weight_square, least, most, whole, deposited, predicted, transfer, external, per_state, log2_a: log2_p, newton: None, by_family, rates, g_agree: (0, 0), g_gap: 0, covector: raw, bands: Vec::new(), outside, letter_counts, surprise_bands, kl_face, moments, coin_measure })
     }
 
     /// [definition; agent-inferred, November 3, the tower record] **The learner grown in scale**: its field grown in scale
-    /// ([`Field::scaled_up`], the key stream read on from the learner's drawn bytes), its moments kept on the fine field's
-    /// material and opened at zero on the packets' field's and the glue's, which every coordinate opens at its own first
-    /// nonzero covector.
+    /// ([`Field::scaled_up`], the key stream read on from the learner's drawn bytes), its moments and carried remainders kept
+    /// on the fine field's material and opened at zero on the packets' field's and the glue's, which every coordinate opens at
+    /// its own first nonzero covector.
     pub fn scaled_up(&self, period: usize, split: usize, declaration: FieldDeclaration, keys: &[u8]) -> Result<Self> {
         let (field, drawn) = self.field.scaled_up(period, split, declaration, keys, self.drawn)?;
         let len = field.material_len();
-        let (mut first, mut second) = (self.first.clone(), self.second.clone());
+        let (mut first, mut second, mut carried) = (self.first.clone(), self.second.clone(), self.carried.clone());
         first.resize(len, 0);
         second.resize(len, 0);
-        Ok(Self { field, first, second, rate_bits: self.rate_bits, drawn, laps: self.laps, held: None, read_held: self.read_held, newton: self.newton, newton_read: self.newton_read, first_rate: self.first_rate, second_rate: self.second_rate, family_rates: None, temper_learns: false, family_transfer: Vec::new(), family_price: Vec::new(), last: None, average: None, carried: None, unigram: None, unigram_step: None, coin_measure: false, key: None })
+        carried.resize(len, 0);
+        Ok(Self { field, first, second, rate_bits: self.rate_bits, drawn, laps: self.laps, held: None, read_held: self.read_held, newton: self.newton, newton_read: self.newton_read, first_rate: self.first_rate, second_rate: self.second_rate, family_rates: None, temper_learns: false, family_transfer: Vec::new(), family_price: Vec::new(), last: None, average: None, carried, unigram: None, unigram_step: None, coin_measure: false, key: None })
     }
 
     /// [measurement; agent-inferred, November 3, §16.31] **Each family's step coherence**: over the family's entries, `Σ |m|`
@@ -7277,9 +7295,9 @@ impl FieldLearner {
     /// shift, the fraction through the exponential's navigator), `2^(−rate_bits)` for every family otherwise (the rate at
     /// sixteen states a section). Each entry is formed on `2^(−24)` of its family's grain, the carried release's places
     /// ([`FieldLearner::carried`]: the shift's and the division's truncation taken there), with no carried remainder, and put
-    /// on [`LINE_BITS`]. `released` is the same step as the deposit without a carried release takes it, on each family's grain
-    /// (the whole step truncated at the grain before the fraction scales it), so the line's first point is read beside what
-    /// the learner itself moves.
+    /// on [`LINE_BITS`]. `released` is the same step as the deposit takes it, on each family's grain: each entry's carried
+    /// remainder added and the sum released to the grain (theory, November 9 05:00: the carried release is the deposit), so
+    /// the line's first point is read beside what the learner itself moves.
     ///
     /// `first` is the first moment `m` (the code's covector in `θ`'s own unit, on `2^(−32)`) scaled to `step`'s norm,
     /// `u_i = m_i ‖step‖ / ‖m‖` on [`LINE_BITS`], with neither the second moment nor a family's length in it.
@@ -7291,38 +7309,33 @@ impl FieldLearner {
         let families = self.field.families_all();
         let len = self.field.material_len();
         let (mut step, mut released) = (vec![0i128; len], vec![0i128; len]);
+        if self.carried.len() != len {
+            return refuse("a learner's carried remainders that are not its material's length");
+        }
         for (k, &(start, n, grain)) in families.iter().enumerate() {
             let up = LINE_BITS.checked_sub(grain + MATERIAL_BITS).ok_or(TowerError::Refused("a family finer than the line's grain"))?;
-            match &self.family_rates {
-                Some(rates) => {
-                    let rho = *rates.get(k).ok_or(TowerError::Refused("a learner's family lengths that are not one a family"))?;
-                    let (whole, part) = (rho >> MATERIAL_BITS, (rho & ((1 << MATERIAL_BITS) - 1)) as i32);
-                    let scale = temperature_of(-part, &self.field.fine)?;
-                    // `x 2^(−whole) / root`: the deposit's shift, a left shift checked at its carrier where `whole < 0`.
-                    let over = |x: i128, root: i128| -> Result<i128> {
-                        if whole >= 0 {
-                            Ok((x >> whole.min(127)) / root)
-                        } else {
-                            let bits = u32::try_from(-whole).map_err(|_| TowerError::Refused(PAST))?;
-                            let lift = 1i128.checked_shl(bits).filter(|&b| b > 0).ok_or(TowerError::Refused(PAST))?;
-                            Ok(x.checked_mul(lift).ok_or(TowerError::Refused(PAST))? / root)
-                        }
-                    };
-                    for i in start..start + n {
-                        let root = super::deposit_root(self.second[i]);
-                        let num = self.first[i].checked_mul(1i128 << grain).ok_or(TowerError::Refused(PAST))?;
-                        let full = over(num.checked_mul(scale).ok_or(TowerError::Refused(PAST))?, root)?;
-                        step[i] = full.checked_mul(1i128 << up).ok_or(TowerError::Refused(PAST))?;
-                        released[i] = release(over(num, root)?.checked_mul(scale).ok_or(TowerError::Refused(PAST))?, MATERIAL_BITS);
-                    }
+            let rho = match &self.family_rates {
+                Some(rates) => *rates.get(k).ok_or(TowerError::Refused("a learner's family lengths that are not one a family"))?,
+                None => i128::from(self.rate_bits) << MATERIAL_BITS,
+            };
+            let (whole, part) = (rho >> MATERIAL_BITS, (rho & ((1 << MATERIAL_BITS) - 1)) as i32);
+            let scale = temperature_of(-part, &self.field.fine)?;
+            // `x 2^(−whole) / root`: the deposit's shift, a left shift checked at its carrier where `whole < 0`.
+            let over = |x: i128, root: i128| -> Result<i128> {
+                if whole >= 0 {
+                    Ok((x >> whole.min(127)) / root)
+                } else {
+                    let bits = u32::try_from(-whole).map_err(|_| TowerError::Refused(PAST))?;
+                    let lift = 1i128.checked_shl(bits).filter(|&b| b > 0).ok_or(TowerError::Refused(PAST))?;
+                    Ok(x.checked_mul(lift).ok_or(TowerError::Refused(PAST))? / root)
                 }
-                None => {
-                    for i in start..start + n {
-                        let full = deposit_step(self.first[i], self.second[i], grain + MATERIAL_BITS, self.rate_bits);
-                        step[i] = full.checked_mul(1i128 << up).ok_or(TowerError::Refused(PAST))?;
-                        released[i] = deposit_step(self.first[i], self.second[i], grain, self.rate_bits);
-                    }
-                }
+            };
+            for i in start..start + n {
+                let root = super::deposit_root(self.second[i]);
+                let num = self.first[i].checked_mul(1i128 << grain).ok_or(TowerError::Refused(PAST))?;
+                let full = over(num.checked_mul(scale).ok_or(TowerError::Refused(PAST))?, root)?;
+                step[i] = full.checked_mul(1i128 << up).ok_or(TowerError::Refused(PAST))?;
+                released[i] = release(full.checked_add(i128::from(self.carried[i])).ok_or(TowerError::Refused(PAST))?, MATERIAL_BITS);
             }
         }
         let (step_norm, first_norm) = (line_norm(&step)?, line_norm(&self.first)?);
@@ -7343,19 +7356,18 @@ impl FieldLearner {
             None => ("-".to_string(), String::new()),
         };
         // [definition; the unified-theory reading of November 7, 07:24] Each family's length and its two averages are carried,
-        // so a continued learner keeps the lengths its families read.
+        // so a continued learner keeps the lengths its families read; the line opens with the averages' grain in bits
+        // ([`PRICE_BITS`], theory, November 9 05:00).
         let lengths = match &self.family_rates {
-            Some(rates) => format!("family-lengths {}\n", join(&rates.iter().zip(&self.family_transfer).zip(&self.family_price).flat_map(|((&r, &t), &p)| [r, t, p]).collect::<Vec<_>>())),
+            Some(rates) => format!("family-lengths {PRICE_BITS} {}\n", join(&rates.iter().zip(&self.family_transfer).zip(&self.family_price).flat_map(|((&r, &t), &p)| [r, t, p]).collect::<Vec<_>>())),
             None => String::new(),
         };
         let average = match &self.average {
             Some(avg) => format!("average {}\n", avg.iter().map(i64::to_string).collect::<Vec<_>>().join(" ")),
             None => String::new(),
         };
-        let carried = match &self.carried {
-            Some(c) => format!("carried {}\n", c.iter().map(i64::to_string).collect::<Vec<_>>().join(" ")),
-            None => String::new(),
-        };
+        // [definition; theory, November 9 05:00] Every state saves its carried remainders.
+        let carried = format!("carried {}\n", self.carried.iter().map(i64::to_string).collect::<Vec<_>>().join(" "));
         let unigram = match &self.unigram {
             Some(c) => format!(
                 "unigram {} | {}\n",
@@ -7364,8 +7376,10 @@ impl FieldLearner {
             ),
             None => String::new(),
         };
+        // The last step, and after ` | ` the remainder it carried beside it where it carries one.
         let last = match &self.last {
-            Some(l) => format!("last {} {}\n", l.halvings, join(&l.step)),
+            Some(l) if l.carried.is_empty() => format!("last {} {}\n", l.halvings, join(&l.step)),
+            Some(l) => format!("last {} {} | {}\n", l.halvings, join(&l.step), l.carried.iter().map(i64::to_string).collect::<Vec<_>>().join(" ")),
             None => String::new(),
         };
         let key = self.key.map_or(String::new(), |k| format!("key {k:016x}\n"));
@@ -7396,7 +7410,7 @@ impl FieldLearner {
                 if step.len() != field.material_len() {
                     return refuse("a learner's held step that is not its field's length");
                 }
-                Some(HeldStep { step, halvings })
+                Some(HeldStep { step, halvings, carried: Vec::new() })
             }
         };
         let families = field.families_all().len();
@@ -7404,13 +7418,25 @@ impl FieldLearner {
             Some(l) if l.starts_with("family-lengths ") => lines.next(),
             _ => None,
         };
+        // [definition; theory, November 9 05:00] The line opens with its averages' grain in bits ([`PRICE_BITS`]); a line written
+        // before the length law priced the carried step has none and kept them on the codes' 2^(−20), lifted here to the
+        // price's grain so the averages continue (the transfer and the price lift alike, so their ratio is the one the state
+        // read).
         let (family_rates, family_transfer, family_price) = match lengths_line.and_then(|l| l.strip_prefix("family-lengths ")) {
             Some(rest) => {
                 let v = read_numbers::<i128>(Some(rest))?;
-                if v.len() != 3 * families {
-                    return refuse("a learner's family lengths that are not three a family");
-                }
-                (Some(v.iter().step_by(3).copied().collect()), v.iter().skip(1).step_by(3).copied().collect(), v.iter().skip(2).step_by(3).copied().collect())
+                let (bits, v) = match v.len() {
+                    n if n == 3 * families => (20, &v[..]),
+                    n if n == 3 * families + 1 => (v[0], &v[1..]),
+                    _ => return refuse("a learner's family lengths that are not three a family"),
+                };
+                let lift = u32::try_from(i128::from(PRICE_BITS) - bits).ok().filter(|&l| l < 64).ok_or(TowerError::Refused("a learner's family averages on a grain finer than the price's"))?;
+                let lifted = |x: i128| x.checked_mul(1i128 << lift).ok_or(TowerError::Refused("a learner's family averages past their carrier"));
+                (
+                    Some(v.iter().step_by(3).copied().collect()),
+                    v.iter().skip(1).step_by(3).map(|&t| lifted(t)).collect::<Result<_>>()?,
+                    v.iter().skip(2).step_by(3).map(|&p| lifted(p)).collect::<Result<_>>()?,
+                )
             }
             None => (None, Vec::new(), Vec::new()),
         };
@@ -7432,15 +7458,16 @@ impl FieldLearner {
             Some(l) if l.starts_with("carried ") => lines.next(),
             _ => None,
         };
+        // [definition; theory, November 9 05:00] A state without a `carried` line opens its remainders at zero.
         let carried = match carried_line.and_then(|l| l.strip_prefix("carried ")) {
             Some(rest) => {
                 let v = read_numbers::<i64>(Some(rest))?;
                 if v.len() != field.material_len() {
                     return refuse("a learner's carried remainders that are not its material's length");
                 }
-                Some(v)
+                v
             }
-            None => None,
+            None => vec![0; field.material_len()],
         };
         let unigram_line = match lines.peek() {
             Some(l) if l.starts_with("unigram ") => lines.next(),
@@ -7462,16 +7489,23 @@ impl FieldLearner {
             None => None,
         };
         // [definition; November 8] The step the last section stood at, carried so a resumed run prices its first section's
-        // transfer and moves the family rates as the unbroken run does (a resume without it broke bits at its second deposit).
+        // transfer and moves the family rates as the unbroken run does (a resume without it broke bits at its second deposit);
+        // after ` | ` the remainder it carried beside it (theory, November 9 05:00), none in a state saved before.
         let last = match lines.peek() {
             Some(l) if l.starts_with("last ") => {
-                let mut parts = lines.next().unwrap_or("").strip_prefix("last ").unwrap_or("").splitn(2, ' ');
+                let line = lines.next().unwrap_or("").strip_prefix("last ").unwrap_or("");
+                let (moved, beside) = line.split_once(" | ").map_or((line, None), |(m, c)| (m, Some(c)));
+                let mut parts = moved.splitn(2, ' ');
                 let halvings = parts.next().unwrap_or("").parse::<u32>().map_err(|_| TowerError::Refused("a learner's last halvings that are not a count"))?;
                 let step = read_numbers::<i128>(parts.next())?;
-                if step.len() != field.material_len() {
+                let carried = beside.map_or(Ok(Vec::new()), |c| read_numbers::<i64>(Some(c)))?;
+                if step.len() != field.material_len() || !(carried.is_empty() || carried.len() == step.len()) {
                     return refuse("a learner's last step that is not its material's length");
                 }
-                Some(HeldStep { step, halvings })
+                if !carried.is_empty() && halvings != 0 {
+                    return refuse("a learner's last step carrying a remainder beside a halved step");
+                }
+                Some(HeldStep { step, halvings, carried })
             }
             _ => None,
         };

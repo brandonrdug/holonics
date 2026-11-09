@@ -746,7 +746,7 @@ fn a_step_that_codes_the_next_regions_higher_is_refused() {
         let mut learner = FieldLearner::new(material.clone(), 2);
         learner.field = stepped(&material, &step, 0).unwrap().0;
         let climbed = compared_on(&learner.field);
-        learner.held = Some(HeldStep { step: step.clone(), halvings: 0 });
+        learner.held = Some(HeldStep { step: step.clone(), halvings: 0, carried: Vec::new() });
         let mut counted = Counted { reads: 0 };
         let (faces, next) = learner.read_step_on(&regions, &mut counted).unwrap();
         let next = next.expect("a held step is read");
@@ -2939,46 +2939,126 @@ fn the_width_laws_lists_split_only_past_the_share() {
     }
 }
 
-/// [definition; theory, November 8, the number record's N5] **The carried release** adds sub-grain deposits up: at a rate
-/// that puts every step below one grain (`2^(24−30)` of the moments' unit), the deposits release to zero each section and
-/// the constitution stays where it is, while with their remainders carried each entry moves by whole grains as they
-/// accumulate, in its covector's direction; and the remainders are carried in the learner's text.
+/// A covector of one bit a real unit on every entry (`2^40` on a material family's natural `2^(−40)`, `2^16` bits a unit on a
+/// face family's `2^(−24)`), negative on every third: under a rate of 30 bits each entry's step is under its grain.
+fn sub_grain_covector(material: usize) -> Vec<i128> {
+    (0..material).map(|i| if i % 3 == 0 { -(1i128 << 40) } else { 1i128 << 40 }).collect()
+}
+
+/// [definition; theory, November 8, the number record's N5; the deposit since November 9 05:00] **The carried release is the
+/// deposit**: at a rate that puts every step below one grain (`2^(24−30)` of the moments' unit), a constant covector forms the
+/// same step `x` on `2^(−24)` of each entry's grain at every deposit (the moments open at it and stay there). The first deposit
+/// moves nothing and carries `x` whole, and the step it carried is the last step though no entry moved. After `n` deposits the
+/// entry has moved `release(n x, 24)` grains against its covector and carries `n x` less them (`Σy + r_n = Σx`, the atlas's
+/// `release.carried-residue`), so it first moves one grain at the `⌈2^23/|x|⌉`-th deposit, the one at which its carried sum
+/// reaches the release's half grain: about the 33rd on the material's grain (`|x|` near `2^18`) and the 8,200th on the faces'
+/// (`|x|` near `2^10`), where every step released to zero before the law.
 #[test]
-fn the_carried_release_adds_up_what_each_step_releases_to_zero() {
+fn a_sub_grain_step_carries_its_remainder_and_moves_a_grain_when_the_carry_predicts() {
     let field = energetic_line();
     let material = field.material_len();
-    let covector: Vec<i128> = (0..material).map(|i| if i % 3 == 0 { -1000 } else { 1000 }).collect();
-    let mut dropped = FieldLearner::new(field.clone(), 30);
-    let mut carried = FieldLearner::new(field.clone(), 30);
-    carried.carried = Some(vec![0; material]);
-    for _ in 0..200 {
-        dropped.deposit(covector.clone()).unwrap();
-        carried.deposit(covector.clone()).unwrap();
-    }
-    assert_eq!(dropped.field.theta, field.theta, "every sub-grain step released to zero");
-    let (mut moved, mut right_way) = (0usize, 0usize);
-    for (i, (&after, &before)) in carried.field.theta[..material].iter().zip(&field.theta[..material]).enumerate() {
-        let change = i64::from(after) - i64::from(before);
-        if change != 0 {
-            moved += 1;
-            // The step is subtracted: a positive covector moves its entry down.
-            if (change < 0) == (covector[i] > 0) {
-                right_way += 1;
+    let covector = sub_grain_covector(material);
+    let mut learner = FieldLearner::new(field.clone(), 30);
+    assert_eq!(learner.carried, vec![0; material], "a learner opens its remainders at zero");
+    let first = learner.deposit(covector.clone()).unwrap();
+    assert!(!first.moved && learner.field.theta == field.theta, "every step is under half a grain");
+    let x: Vec<i128> = learner.carried.iter().map(|&r| i128::from(r)).collect();
+    assert!(x.iter().all(|&r| r != 0 && r.unsigned_abs() < 1 << 23), "every entry forms a sub-grain step");
+    assert!(x.iter().zip(&covector).all(|(&r, &g)| (r > 0) == (g > 0)), "the step follows its covector");
+    assert!(learner.last.as_ref().is_some_and(|l| l.step.iter().all(|&s| s == 0) && l.carried == learner.carried), "the step held whole in its remainders is the last step");
+    // The deposit at which each entry first moves, as the carry predicts: the least `n` with `n |x| ≥ 2^23`.
+    let at: Vec<u128> = x.iter().map(|&r| (1u128 << 23).div_ceil(r.unsigned_abs())).collect();
+    let fine: Vec<usize> = field.families().iter().filter(|f| f.2 == MATERIAL_BITS).flat_map(|f| f.0..f.0 + f.1).collect();
+    assert!(fine.iter().all(|&i| (32..=34).contains(&at[i])) && at.iter().all(|&n| n >= 32), "{:?}", &at[..8]);
+    let last = *at.iter().max().unwrap();
+    assert!(last > 8_000 && last < 9_000, "a face family's first grain at deposit {last}");
+    for n in 2..=last {
+        let receipt = learner.deposit(covector.clone()).unwrap();
+        let mut any = false;
+        for i in 0..material {
+            let moved = release(n as i128 * x[i], MATERIAL_BITS);
+            assert_eq!(i128::from(learner.field.theta[i]) - i128::from(field.theta[i]), -moved, "entry {i} at deposit {n}");
+            assert_eq!(i128::from(learner.carried[i]), n as i128 * x[i] - (moved << MATERIAL_BITS), "entry {i}'s remainder at deposit {n}");
+            if n as u128 == at[i] {
+                assert_eq!(moved.abs(), 1, "entry {i} moves its first grain at deposit {n}");
+            } else if (n as u128) < at[i] {
+                assert_eq!(moved, 0, "entry {i} holds before deposit {}", at[i]);
             }
+            any |= release((n as i128 - 1) * x[i], MATERIAL_BITS) != moved;
         }
-        assert!(change.abs() <= 4, "entry {i} moved {change} grains in 200 deposits of 1/64 grain");
+        assert_eq!(receipt.moved, any, "deposit {n}");
     }
-    // A family on the material's grain steps 2^(24−30) of a grain a deposit, so 200 carry it about three grains; one on the
-    // faces' grain steps 2^(16−30), so its remainder grows without yet reaching half a grain.
-    let fine: usize = field.families().iter().filter(|f| f.2 == MATERIAL_BITS).map(|f| f.1).sum();
-    assert_eq!((moved, right_way), (fine, fine));
-    for &(start, len, grain) in field.families() {
-        let rem = &carried.carried.as_ref().unwrap()[start..start + len];
-        assert!(grain == MATERIAL_BITS || rem.iter().all(|&r| r != 0), "a family on 2^(−{grain}) carries its remainders");
+}
+
+/// [definition; theory, November 9 05:00] **The length law prices the carried step**: with every family's length open at 30
+/// bits no entry moves through the first deposits, so the step that moved prices nothing on the codes' grain, yet each family
+/// reads a nonzero price of the step it carries and, once a step was carried before, a nonzero transfer of it (on
+/// `PRICE_BITS`). A covector that keeps its direction descends both, so every family's length lengthens (`ρ_f` falls).
+#[test]
+fn the_length_law_reads_a_nonzero_price_and_transfer_where_no_grain_moves() {
+    let field = energetic_line();
+    let material = field.material_len();
+    let covector = sub_grain_covector(material);
+    let mut learner = FieldLearner::new(field.clone(), 30);
+    learner.open_family_rates();
+    let opened = learner.family_rates.clone().unwrap();
+    let first = learner.deposit(covector.clone()).unwrap();
+    assert!(first.by_family.iter().all(|&(t, p)| t.is_none() && p.is_some()), "no step before: no transfer, the price read");
+    assert_eq!(learner.family_rates.as_ref(), Some(&opened), "no transfer moves no length");
+    let second = learner.deposit(covector.clone()).unwrap();
+    assert!(!first.moved && !second.moved && learner.field.theta == field.theta, "no entry has moved");
+    assert_eq!((second.predicted, second.transfer), (Some(0), Some(0)), "what moved prices nothing on the codes' grain");
+    let rates = learner.family_rates.clone().unwrap();
+    for (k, &(_, len, grain)) in field.families_all().iter().enumerate() {
+        if len == 0 {
+            continue;
+        }
+        let (transfer, price) = second.by_family[k];
+        let (t, p) = (transfer.unwrap(), price.unwrap());
+        assert!(t < 0 && p < 0, "family {k} on 2^(−{grain}): transfer {t}, price {p} on 2^(−{PRICE_BITS}) bits");
+        assert!(learner.family_transfer[k] < 0 && learner.family_price[k] < 0, "family {k}'s averages");
+        assert!(rates[k] < opened[k], "family {k} lengthens: {} from {}", rates[k], opened[k]);
     }
-    let back = FieldLearner::from_text(&carried.to_text()).unwrap();
-    assert_eq!(back.carried, carried.carried);
-    assert!(carried.carried.as_ref().unwrap().iter().all(|&r| r.unsigned_abs() <= 1 << 23));
+}
+
+/// [definition; theory, November 9 05:00] **A state keeps its remainders**: a learner whose deposits carry sub-grain steps saves
+/// its remainders and the remainder its last step carried, and reads them back bit for bit (the same learner, the same text);
+/// a state saved before the law, with no `carried` line, its last step without a remainder and its family averages on the
+/// codes' `2^(−20)` with no grain on the line, opens its remainders at zero, reads its last step alone, and lifts its averages
+/// to the price's grain.
+#[test]
+fn a_saved_state_keeps_its_remainders_and_one_without_opens_them_at_zero() {
+    let field = energetic_line();
+    let material = field.material_len();
+    let covector = sub_grain_covector(material);
+    let mut learner = FieldLearner::new(field, 30);
+    learner.open_family_rates();
+    for _ in 0..3 {
+        learner.deposit(covector.clone()).unwrap();
+    }
+    assert!(learner.carried.iter().all(|&r| r != 0));
+    assert!(learner.last.as_ref().is_some_and(|l| l.carried == learner.carried));
+    let text = learner.to_text();
+    let back = FieldLearner::from_text(&text).unwrap();
+    assert_eq!(back, learner, "the remainders, the last step's and the averages read back bit for bit");
+    assert_eq!(back.to_text(), text);
+    let lift = 1i128 << (PRICE_BITS - 20);
+    let old: Vec<String> = text
+        .lines()
+        .filter(|l| !l.starts_with("carried "))
+        .map(|l| match (l.strip_prefix("last "), l.strip_prefix("family-lengths ")) {
+            (Some(rest), _) => format!("last {}", rest.split(" | ").next().unwrap()),
+            (_, Some(rest)) => format!("family-lengths {}", rest.split(' ').skip(1).collect::<Vec<_>>().join(" ")),
+            _ => l.to_string(),
+        })
+        .collect();
+    let opened = FieldLearner::from_text(&old.join("\n")).unwrap();
+    assert_eq!(opened.carried, vec![0; material], "no carried line: the remainders open at zero");
+    let last = opened.last.as_ref().unwrap();
+    assert!(last.carried.is_empty() && Some(&last.step) == learner.last.as_ref().map(|l| &l.step), "the last step alone");
+    assert_eq!(opened.family_transfer, learner.family_transfer.iter().map(|t| t * lift).collect::<Vec<_>>(), "the averages lifted to the price's grain");
+    assert_eq!(opened.family_price, learner.family_price.iter().map(|p| p * lift).collect::<Vec<_>>());
+    assert_eq!((&opened.field, &opened.first, &opened.second, &opened.family_rates), (&learner.field, &learner.first, &learner.second, &learner.family_rates));
 }
 
 /// [definition; theory, November 8 13:44] **The unigram law's carried sums**: a letter its carried shares under-read against
@@ -3134,10 +3214,11 @@ fn a_held_places_code_is_the_conditional_sections() {
 }
 
 /// [measurement; theory, November 8, the line reading] **The line's step is the deposit's**: with moments a section's covector
-/// leaves where they are (`g = m` on the step's grain and `v = m²`), the deposit with its carried release from zero remainders
-/// moves `θ` to the line's point at `η = 1`, each family at its own length (one whole length negative, the deposit's left
-/// shift) and at the learner's one rate alike, and the deposit without the carried release moves `θ` by `released`. The
-/// first moment's direction is parallel to `m` and has the step's norm; the reading moves no learner.
+/// leaves where they are (`g = m` on the step's grain and `v = m²`), the deposit from zero remainders moves `θ` to the line's
+/// point at `η = 1`, each family at its own length (one whole length negative, the deposit's left shift) and at the learner's
+/// one rate alike, and from carried remainders it moves `θ` by `released`, the step with each entry's remainder added (the
+/// carried release is the deposit, November 9 05:00). The first moment's direction is parallel to `m` and has the step's
+/// norm; the reading moves no learner.
 #[test]
 fn the_lines_step_is_the_deposits() {
     let field = energetic_line();
@@ -3167,15 +3248,23 @@ fn the_lines_step_is_the_deposits() {
                 g[i] = if grain == MATERIAL_BITS { first[i] << 8 } else { first[i] >> 8 };
             }
         }
-        let (mut carried, mut plain) = (learner.clone(), learner.clone());
-        carried.carried = Some(vec![0; len]);
-        carried.deposit(g.clone()).unwrap();
-        assert!(carried.first == learner.first && carried.second == learner.second, "the covector leaves the moments where they are");
+        let mut zero = learner.clone();
+        zero.deposit(g.clone()).unwrap();
+        assert!(zero.first == learner.first && zero.second == learner.second, "the covector leaves the moments where they are");
         let (point, moved) = line_point(&field, &lines.step, 1).unwrap();
-        assert!(moved > 0 && point.theta == carried.field.theta, "lengths {lengths}: the line's first point is the carried release's step");
-        plain.deposit(g).unwrap();
+        assert!(moved > 0 && point.theta == zero.field.theta, "lengths {lengths}: the line's first point is the deposit's step");
         let want: Vec<i32> = field.theta.iter().zip(&lines.released).map(|(&t, &r)| (t as i128 - r) as i32).collect();
-        assert_eq!(plain.field.theta, want, "lengths {lengths}: released is the deposit's own step");
+        assert_eq!(zero.field.theta, want, "lengths {lengths}: released is the deposit's own step from zero remainders");
+        // From carried remainders the deposit moves θ by `released` as the reading forms it with them: spread remainders on the
+        // even entries, and on the odd a half grain against the step (so a step near a whole grain releases one grain less).
+        let mut carrying = learner.clone();
+        carrying.carried = (0..len).map(|k| if k % 2 == 0 { ((k as i64 * 0x51_ED27) % (1 << 23)) - (1 << 22) } else { -(first[k].signum() as i64) << 23 }).collect();
+        let held = carrying.line_directions().unwrap();
+        assert_eq!(held.step, lines.step, "the line's step carries no remainder");
+        carrying.deposit(g).unwrap();
+        let want: Vec<i32> = field.theta.iter().zip(&held.released).map(|(&t, &r)| (t as i128 - r) as i32).collect();
+        assert_eq!(carrying.field.theta, want, "lengths {lengths}: released is the deposit's own step from carried remainders");
+        assert_ne!(held.released, lines.released, "lengths {lengths}: the remainders change what moves");
         let norm = line_norm(&lines.first).unwrap();
         assert!(norm.abs_diff(lines.step_norm) << 16 <= lines.step_norm, "the first moment's norm {norm} against the step's {}", lines.step_norm);
         assert!(lines.first.iter().zip(&first).all(|(&u, &m)| u.signum() == m.signum() || u == 0), "the first moment's direction is m's");
@@ -3228,12 +3317,12 @@ fn the_move_to_the_letters_force_changes_the_law_line_alone() {
     learner.first = (0..len).map(|k| (k as i128 * 7919 - 40_000) << 20).collect();
     learner.second = (0..len).map(|k| ((k as i128 * 104_729) % 1_000_003 + 1) << 30).collect();
     learner.average = Some((0..theta_len).map(|k| ((learner.field.theta[k] as i64) << 8) + (k as i64 % 251)).collect());
-    learner.carried = Some((0..len).map(|k| (k as i64 % 97) - 48).collect());
+    learner.carried = (0..len).map(|k| (k as i64 % 97) - 48).collect();
     learner.family_rates = Some((0..families).map(|f| (f as i128 + 3) << 24).collect());
     learner.family_transfer = (0..families).map(|f| -(f as i128) * 1009).collect();
     learner.family_price = (0..families).map(|f| f as i128 * 2003 + 1).collect();
-    learner.held = Some(HeldStep { step: (0..len).map(|k| k as i128 % 13 - 6).collect(), halvings: 3 });
-    learner.last = Some(HeldStep { step: (0..len).map(|k| k as i128 % 11 - 5).collect(), halvings: 2 });
+    learner.held = Some(HeldStep { step: (0..len).map(|k| k as i128 % 13 - 6).collect(), halvings: 3, carried: Vec::new() });
+    learner.last = Some(HeldStep { step: (0..len).map(|k| k as i128 % 11 - 5).collect(), halvings: 0, carried: (0..len).map(|k| (k as i64 % 89) - 44).collect() });
     learner.key = Some(0x1234_5678_9ABC_DEF0);
     let text = learner.to_text();
     let source = FieldLearner::from_text(&text).unwrap();

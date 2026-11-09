@@ -140,24 +140,3 @@ pub fn report() -> Vec<Reading> {
     let names = NAMES.lock().map(|n| n.clone()).unwrap_or_default();
     names.into_iter().map(|(i, site)| Reading { site, most_bits: MOST[i].load(Ordering::Relaxed), met: MET[i].load(Ordering::Relaxed) }).collect()
 }
-
-/// **A shadow carry** (theory, November 8 03:01): beside a constitution and without writing it, each entry's signed
-/// remainders summed across deposits, on `2^(−fine)` of its grain, and the deposit at which its carried sum first reached
-/// half a grain (zero while it has not). `f` gets the sums, the first crossings and this deposit's ordinal (from one).
-pub fn shadow_carry(len: usize, f: impl FnOnce(&mut [i128], &mut [u64], u64)) {
-    static SHADOW: Mutex<(Vec<i128>, Vec<u64>, u64)> = Mutex::new((Vec::new(), Vec::new(), 0));
-    if !enabled() {
-        return;
-    }
-    if let Ok(mut s) = SHADOW.lock() {
-        let (sums, crossed, deposits) = &mut *s;
-        if sums.len() != len {
-            *sums = vec![0; len];
-            *crossed = vec![0; len];
-            *deposits = 0;
-        }
-        *deposits += 1;
-        let n = *deposits;
-        f(sums, crossed, n);
-    }
-}

@@ -2922,12 +2922,8 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
         Err(_) => 0,
     };
     learner.coin_measure = std::env::var_os("FIELD_COIN_MEASURE").is_some();
-    // [definition; theory, November 8, the number record's N5] `FIELD_CARRIED_RELEASE`: each deposit is formed on 2^(−24) of its
-    // grain and its remainder carried to the next (`FieldLearner::carried`); a state that carries a `carried` line keeps its
-    // remainders, and one without opens them at zero.
-    if std::env::var_os("FIELD_CARRIED_RELEASE").is_some() && learner.carried.is_none() {
-        learner.carried = Some(vec![0; learner.field.material_len()]);
-    }
+    // [definition; theory, November 9 05:00] The deposit is the carried release (`FieldLearner::carried`): a state that carries
+    // a `carried` line keeps its remainders, one without opens them at zero; no switch selects it.
     // [definition; theory, November 8 13:44] `FIELD_UNIGRAM=shadow|apply`: the unigram law's carried sums
     // (`FieldLearner::unigram`); a state that carries a `unigram` line keeps them, one without opens them at zero. `shadow`
     // carries them with θ untouched; `apply` also steps the bias.
@@ -3454,6 +3450,7 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
                 let resolved: Vec<Vec<bool>> = truths.iter().map(|t| vec![false; t.len()]).collect();
                 let truth_views: Vec<Region> = truths[..m].iter().zip(&resolved).map(|(c, u)| Region { classes: c, unresolved: u, faces: &[], locked: &[], echo: &[], domain: None, port: None }).collect();
                 let write_views: Vec<Region> = writes_now.iter().zip(&resolved).map(|(c, u)| Region { classes: c, unresolved: u, faces: &[], locked: &[], echo: &[], domain: None, port: None }).collect();
+                let theta_before = learner.field.theta.clone();
                 let deposit_start = std::time::Instant::now();
                 let (receipt, eta) = learner.section_contrast_scaled(&truth_views, &write_views, &mut persistent_etas, realization).map_err(|e| e.to_string())?;
                 let deposit_ms = deposit_start.elapsed().as_millis();
@@ -3480,6 +3477,9 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
                     learner.field.theta[learner.field.layout().face_temper],
                     started.elapsed().as_millis()
                 );
+                // [measurement; theory, November 9 05:04] Each family's moved grains and its length, as the kernel's path prints them.
+                println!("FIELD_STEP lap={lap} n={n} {}", step_text(&learner.field, &theta_before));
+                println!("FIELD_LENGTHS lap={lap} n={n} {}", lengths_text(&learner));
                 // The declared read ends this path as it ends the kernel's (`FIELD_CONTRAST_SECTIONS`); without it the fresh-writes
                 // fork of November 8 ran past its 20 sections to the deadline and was stopped at section 204 with no state.
                 let read_done = read_sections > 0 && lap == 0 && n + 1 >= from_section + read_sections;
@@ -3671,7 +3671,7 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
                     by_family.resize(receipt.by_family.len(), (0, 0));
                 }
                 for (slot, &(t, p)) in by_family.iter_mut().zip(&receipt.by_family) {
-                    *slot = (slot.0 + t.unwrap_or(0) as i128, slot.1 + p.unwrap_or(0) as i128);
+                    *slot = (slot.0 + t.unwrap_or(0), slot.1 + p.unwrap_or(0));
                 }
                 let newton_text = match receipt.newton {
                     Some(r) => {
@@ -3706,20 +3706,8 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
                     section_start.elapsed().as_millis(),
                     started.elapsed().as_millis()
                 );
-                {
-                    let names = family_names(&learner.field);
-                    let text: Vec<String> = learner
-                        .field
-                        .families_all()
-                        .iter()
-                        .filter(|fam| fam.1 > 0)
-                        .filter_map(|&(start, len, _)| {
-                            let total: i128 = (start..start + len).map(|i| (learner.field.theta[i] as i128 - theta_before[i] as i128).abs()).sum();
-                            (total > 0).then(|| format!("{}={}/{len}", names.iter().find(|&&(_, at)| at == start).map_or("?", |&(n, _)| n), total))
-                        })
-                        .collect();
-                    println!("FIELD_STEP lap={lap} n={n} {}", text.join(" "));
-                }
+                println!("FIELD_STEP lap={lap} n={n} {}", step_text(&learner.field, &theta_before));
+                println!("FIELD_LENGTHS lap={lap} n={n} {}", lengths_text(&learner));
                 leg.add(&learner.field, &receipt, &theta_before);
                 if let Some(opening) = &frozen {
                     learner.clone_from(opening);
@@ -3751,7 +3739,7 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
                         tenth_family.resize(receipt.by_family.len(), (0, 0));
                     }
                     for (slot, &(t, p)) in tenth_family.iter_mut().zip(&receipt.by_family) {
-                        *slot = (slot.0 + t.unwrap_or(0) as i128, slot.1 + p.unwrap_or(0) as i128);
+                        *slot = (slot.0 + t.unwrap_or(0), slot.1 + p.unwrap_or(0));
                     }
                     let tenth = (n + 1) * 10 / sections.len();
                     if tenth > tenths_printed && n + 1 < sections.len() {
@@ -3856,6 +3844,7 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
             let resolved: Vec<Vec<bool>> = truths.iter().map(|t| vec![false; t.len()]).collect();
             let truth_views: Vec<Region> = truths.iter().zip(&resolved).map(|(c, u)| Region { classes: c, unresolved: u, faces: &[], locked: &[], echo: &[], domain: None, port: None }).collect();
             let release_views: Vec<Region> = releases.iter().zip(&resolved).map(|(c, u)| Region { classes: c, unresolved: u, faces: &[], locked: &[], echo: &[], domain: None, port: None }).collect();
+            let theta_before = learner.field.theta.clone();
             let deposit_start = std::time::Instant::now();
             let receipt = learner.section_contrast(&truth_views, &release_views, realization).map_err(|e| e.to_string())?;
             let deposit_ms = deposit_start.elapsed().as_millis();
@@ -3872,6 +3861,9 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
                 micro(receipt.external),
                 started.elapsed().as_millis()
             );
+            // [measurement; theory, November 9 05:04] Each family's moved grains and its length, as the kernel's path prints them.
+            println!("FIELD_STEP lap={lap} n={n} {}", step_text(&learner.field, &theta_before));
+            println!("FIELD_LENGTHS lap={lap} n={n} {}", lengths_text(&learner));
             if started.elapsed().as_millis() > stop_ms {
                 write_new(&out.join("STATE.stopped"), at_rate(&learner, base_rate).as_bytes())?;
                 println!("FIELD_STOPPED lap={lap} sections={}/{} states={states} ms={}", n + 1, sections.len(), started.elapsed().as_millis());
@@ -3939,7 +3931,8 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
 }
 
 /// [measurement; November 7, lap 7] Each family's transfer and predicted change over a lap, named by the layout, in
-/// micro-bits a state: `name=transfer/predicted`.
+/// micro-bits a state: `name=transfer/predicted`. Since November 9 05:00 both are the length law's own operands, the step as
+/// the deposit carries it priced on `2^(−44)` bits ([`holonics::hnn::tower::field::PRICE_BITS`]).
 fn family_text(field: &Field, sums: &[(i128, i128)], states: usize) -> String {
     let names = family_names(field);
     field
@@ -3949,8 +3942,45 @@ fn family_text(field: &Field, sums: &[(i128, i128)], states: usize) -> String {
         .filter(|(fam, _)| fam.1 > 0)
         .map(|(&(start, _, _), &(t, p))| {
             let name = names.iter().find(|&&(_, at)| at == start).map_or("?", |&(n, _)| n);
-            let micro = |v: i128| v * 1_000_000 / ((states.max(1) as i128) << 20);
+            let micro = |v: i128| v * 1_000_000 / ((states.max(1) as i128) << holonics::hnn::tower::field::PRICE_BITS);
             format!("{name}={}/{}", micro(t), micro(p))
+        })
+        .collect::<Vec<_>>()
+        .join(" ")
+}
+
+/// [measurement] Each family's moved grains in a section, `name=Σ|Δθ|/entries`, the families that moved alone (the
+/// `FIELD_STEP` line).
+fn step_text(field: &Field, before: &[i32]) -> String {
+    let names = family_names(field);
+    field
+        .families_all()
+        .iter()
+        .filter(|fam| fam.1 > 0)
+        .filter_map(|&(start, len, _)| {
+            let total: i128 = (start..start + len).map(|i| (field.theta[i] as i128 - before[i] as i128).abs()).sum();
+            (total > 0).then(|| format!("{}={}/{len}", names.iter().find(|&&(_, at)| at == start).map_or("?", |&(n, _)| n), total))
+        })
+        .collect::<Vec<_>>()
+        .join(" ")
+}
+
+/// [measurement; theory, November 9 05:04] **Each family's length after the section**, `name=ρ_f` in milli-bits (the step is
+/// `2^(−ρ_f)` of the moments' unit), every family with entries in the layout's order, read after the section's length update
+/// (the `FIELD_LENGTHS` line beside `FIELD_STEP`, so a family's wake rate reads beside its moved grains); where the learner
+/// reads no family lengths each family's is the learner's one rate. A reading: it changes nothing.
+fn lengths_text(learner: &FieldLearner) -> String {
+    let names = family_names(&learner.field);
+    learner
+        .field
+        .families_all()
+        .iter()
+        .enumerate()
+        .filter(|(_, fam)| fam.1 > 0)
+        .map(|(k, _)| {
+            let name = names.get(k).map_or_else(|| format!("family{k}"), |(n, _)| n.to_string());
+            let rho = learner.family_rates.as_ref().map_or(i128::from(learner.rate_bits) << holonics::hnn::tower::MATERIAL_BITS, |r| r.get(k).copied().unwrap_or(0));
+            format!("{name}={}", rho * 1000 >> holonics::hnn::tower::MATERIAL_BITS)
         })
         .collect::<Vec<_>>()
         .join(" ")
