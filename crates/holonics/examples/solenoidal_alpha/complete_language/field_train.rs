@@ -2971,8 +2971,9 @@ fn sweep_site_reads(set: &Problems, members: &[usize]) -> u128 {
 
 /// [definition; theory, November 9 11:48] **A section's law, as the save law reads its declared work** ([`section_work`]).
 enum SectionLaw<'a> {
-    /// Fresh writes swept whole `sweeps` times (`FIELD_CONTRAST_FRESH=SWEEPS`, the declared count).
-    Fresh { sweeps: u64 },
+    /// Fresh writes swept whole `sweeps` times (`FIELD_CONTRAST_FRESH=SWEEPS`, the declared count), from sweep `from` (zero but
+    /// in a section resumed at a sweep), opened by a release of `release_reads` reads (none from the truths or resumed).
+    Fresh { sweeps: u64, from: u64, release_reads: usize },
     /// Persistent writes: one residue class a member, from `starts` at `spacing`, after `sinks` whole sweeps where the writes
     /// open.
     Persistent { starts: &'a [usize], spacing: usize, sinks: u64 },
@@ -2989,7 +2990,8 @@ enum SectionLaw<'a> {
 /// [definition; theory, November 9 11:48; each law's unit agent-inferred from what its section reads] **A section's declared
 /// work**, the save law's projection operand, and its unit: `site_reads`, the sites of the regions its reads hold (each region
 /// `Q + L + v`, [`region_sites`]), or `places`, its answer places.
-/// - Fresh writes: their declared sweeps times [`sweep_site_reads`].
+/// - Fresh writes: their release, their declared sweeps (those left, in a section resumed at a sweep) times
+///   [`sweep_site_reads`], and their deposit ([`FreshStops`]; since theory, November 9 13:29, whose stops fall between them).
 /// - Persistent writes: their sweep of one residue class, its opening read and its proposals, `Σ_k (|class_k| + 1)(Q_k + L_k +
 ///   v_k)`, and where the writes open their sinks' whole sweeps.
 /// - The kernel: two reads a member and two a block (the faces and the material at the truth, and at each block's proposal),
@@ -3000,13 +3002,13 @@ enum SectionLaw<'a> {
 /// - The writer: its answer places `Σ_k L_k`, since its reads follow its runs' entropies and no count of them is declared
 ///   before the section.
 ///
-/// What a section reads beside its declared work (a release before its sweeps, a deposit's material reads) is carried in the
-/// measured rate ([`SaveRate`]).
+/// What a section reads beside its declared work (on the other paths, a release before its sweeps or a deposit's material
+/// reads) is carried in the measured rate ([`SaveRate`]).
 fn section_work(law: &SectionLaw, set: &Problems, members: &[usize]) -> (u128, &'static str) {
     let region = |m: usize| region_sites(&set[members[m]]);
     let regions: u128 = (0..members.len()).map(region).sum();
     match *law {
-        SectionLaw::Fresh { sweeps } => (sweeps as u128 * sweep_site_reads(set, members), "site_reads"),
+        SectionLaw::Fresh { sweeps, from, release_reads } => (FreshStops::of(set, members, release_reads).section(from, sweeps), "site_reads"),
         SectionLaw::Persistent { starts, spacing, sinks } => {
             let class: u128 = (0..members.len()).zip(starts).map(|(m, &r)| (set[members[m]].1.len().saturating_sub(r).div_ceil(spacing.max(1)) as u128 + 1) * region(m)).sum();
             (class + sinks as u128 * sweep_site_reads(set, members), "site_reads")
@@ -3114,18 +3116,160 @@ fn tenth_read_falls(n: usize, sections: usize, tenths_printed: usize) -> bool {
     (n + 1) * 10 / sections.max(1) > tenths_printed && n + 1 < sections
 }
 
-/// [definition; theory, November 8 14:46 and 22:04] **The fresh writes' sweeps**: `sweeps` whole sweeps of the energy's own
-/// kernel over `active` at the field's own `T` ([`holonics::hnn::tower::field::Field::energy_sweep_at`], cool 0), sweep `s`
-/// (from zero) keyed `mix(key, 100 + s)`. `each` hears each sweep's number (from one), the places moved and proposed, each
-/// write's energy a place, the writes and the sweep's milliseconds.
+/// [definition; theory, November 8 14:46 and 22:04, November 9 13:29] **The fresh writes' sweeps**: whole sweeps of the energy's
+/// own kernel over `active` at the field's own `T` ([`holonics::hnn::tower::field::Field::energy_sweep_at`], cool 0), from sweep
+/// `from` to sweep `sweeps` (from zero), sweep `s` keyed `mix(key, 100 + s)`. `at_start` hears each sweep's index (from zero)
+/// and the writes as that sweep meets them, before it runs (the save law's sweep stop); `each` hears each sweep's number (from
+/// one), the places moved and proposed, each write's energy a place, the writes and the sweep's milliseconds. The sweeps only
+/// read the field, and each opens with a read of every write's region and keys its coins by its own number, so the writes'
+/// letters are the whole state between two sweeps: sweeps `from..sweeps` from the writes after `from` sweeps are the
+/// uninterrupted sweeps' tail.
 #[allow(clippy::too_many_arguments)]
-fn fresh_sweeps_at(field: &Field, problems: &[(&[usize], usize)], active: &mut [Vec<usize>], sweeps: u64, key: u64, void: usize, realization: &mut dyn FieldRealization, each: &mut dyn FnMut(u64, usize, usize, &[i128], &[Vec<usize>], u128)) -> Result<()> {
-    for sweep in 0..sweeps {
+fn fresh_sweeps_at(field: &Field, problems: &[(&[usize], usize)], active: &mut [Vec<usize>], from: u64, sweeps: u64, key: u64, void: usize, realization: &mut dyn FieldRealization, at_start: &mut dyn FnMut(u64, &[Vec<usize>]) -> Result<()>, each: &mut dyn FnMut(u64, usize, usize, &[i128], &[Vec<usize>], u128)) -> Result<()> {
+    for sweep in from..sweeps {
+        at_start(sweep, active)?;
         let t0 = std::time::Instant::now();
         let (mv, pr, en) = field.energy_sweep_at(problems, active, None, void, 0, mix(key, 100 + sweep), realization, &mut |_, _| {}).map_err(|e| e.to_string())?;
         each(sweep + 1, mv, pr, &en, active, t0.elapsed().as_millis());
     }
     Ok(())
+}
+
+/// [measurement; theory, November 8 22:04] **The writes' retention**: the share of their places at their truth's letter, in
+/// thousandths (`FIELD_FRESH_RETAIN`), read afresh from the writes and the truths' answers at each sweep.
+fn retention_milli(active: &[Vec<usize>], answers: &[&[usize]]) -> usize {
+    let places: usize = active.iter().map(|a| a.len()).sum::<usize>().max(1);
+    let agree: usize = active.iter().zip(answers).map(|(a, t)| a.iter().zip(t.iter()).filter(|(x, y)| x == y).count()).sum();
+    agree * 1000 / places
+}
+
+/// The joint release's reads that open the persistent and fresh writes (`FieldLearner`'s field, [`Field::energy_release`]).
+const WRITES_RELEASE_READS: usize = 64;
+
+/// [definition; theory, November 9 13:29] **A fresh section's stops**: the declared work, in site reads, between the save law's
+/// stops on the fresh-writes path. The section's start stops before its release (`release`, at most
+/// [`WRITES_RELEASE_READS`] reads of every region, none where the writes start at the truths or are resumed), each sweep's
+/// start stops before it (`sweep`, [`sweep_site_reads`]), and the last sweep runs on into the deposit (`deposit`, the two
+/// material reads of each write's region and its truth's) and the next section's start.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+struct FreshStops {
+    release: u128,
+    sweep: u128,
+    deposit: u128,
+}
+
+impl FreshStops {
+    fn of(set: &Problems, members: &[usize], release_reads: usize) -> Self {
+        let regions: u128 = members.iter().map(|&i| region_sites(&set[i])).sum();
+        FreshStops { release: release_reads as u128 * regions, sweep: sweep_site_reads(set, members), deposit: 2 * regions }
+    }
+
+    /// The section's declared work from sweep `from` of `sweeps`: its release, its sweeps left and its deposit.
+    fn section(&self, from: u64, sweeps: u64) -> u128 {
+        self.release + u128::from(sweeps.saturating_sub(from)) * self.sweep + self.deposit
+    }
+
+    /// The work from sweep `s`'s start to the next stop: the sweep, and after the last the deposit.
+    fn at_sweep(&self, s: u64, sweeps: u64) -> u128 {
+        self.sweep + if s + 1 == sweeps { self.deposit } else { 0 }
+    }
+}
+
+/// [definition; theory, November 9 13:29] **A sweep save's writes** (`STATE.<lap>.<section>.<done>.writes`). Between two sweeps
+/// of a fresh section the learner is the section's opening state (its sweeps only read the field; only the deposit and the
+/// averaged constitution move it), each sweep opens with its own read of every region and keys its coins by its own number, and
+/// the retention reading is formed afresh from the writes and their truths; so the learner (`STATE.<lap>.<section>`, named by
+/// its hash) and the writes' letters are the whole state, and nothing else is carried. Text, one field a line:
+/// `field-sweep-writes v1`, then `read R section N done S sweeps K key HEX start truth|release state SHA256`, then one line a
+/// write, `write J LEN C,C,…` (its classes in the codec's alphabet; private, the field's own letters for private questions).
+#[derive(Clone, Debug, PartialEq, Eq)]
+struct SweepWrites {
+    read: u64,
+    section: usize,
+    done: u64,
+    sweeps: u64,
+    key: u64,
+    from_truth: bool,
+    state: String,
+    writes: Vec<Vec<usize>>,
+}
+
+impl SweepWrites {
+    fn to_text(&self) -> String {
+        let mut text = format!(
+            "field-sweep-writes v1\nread {} section {} done {} sweeps {} key {:016x} start {} state {}\n",
+            self.read,
+            self.section,
+            self.done,
+            self.sweeps,
+            self.key,
+            if self.from_truth { "truth" } else { "release" },
+            self.state
+        );
+        for (j, w) in self.writes.iter().enumerate() {
+            text.push_str(&format!("write {j} {} {}\n", w.len(), w.iter().map(|c| c.to_string()).collect::<Vec<_>>().join(",")));
+        }
+        text
+    }
+
+    fn from_text(text: &str) -> Result<Self> {
+        let mut lines = text.lines();
+        if lines.next() != Some("field-sweep-writes v1") {
+            return Err("a sweep save's writes open with field-sweep-writes v1".into());
+        }
+        let head: Vec<&str> = lines.next().ok_or("a sweep save's writes without their index")?.split(' ').collect();
+        let named = ["read", "section", "done", "sweeps", "key", "start", "state"];
+        if head.len() != 2 * named.len() || head.iter().step_by(2).zip(named).any(|(a, b)| *a != b) {
+            return Err("a sweep save's index is read R section N done S sweeps K key HEX start truth|release state SHA256".into());
+        }
+        let number = |k: usize| -> Result<u64> { head[2 * k + 1].parse().map_err(|_| format!("a sweep save's {} is a count", named[k]).into()) };
+        let (read, section, done, sweeps) = (number(0)?, number(1)? as usize, number(2)?, number(3)?);
+        let key = u64::from_str_radix(head[9], 16).map_err(|_| "a sweep save's key is hexadecimal")?;
+        let from_truth = match head[11] {
+            "truth" => true,
+            "release" => false,
+            _ => return Err("a sweep save's start is truth or release".into()),
+        };
+        let state = head[13].to_string();
+        if state.len() != 64 || !state.bytes().all(|c| c.is_ascii_hexdigit()) || done >= sweeps {
+            return Err("a sweep save names its state's SHA-256 and a sweep before its last".into());
+        }
+        let mut writes = Vec::new();
+        for (j, line) in lines.enumerate() {
+            let parts: Vec<&str> = line.split(' ').collect();
+            if parts.len() != 4 || parts[0] != "write" || parts[1].parse::<usize>().ok() != Some(j) {
+                return Err(format!("a sweep save's write {j} is write J LEN C,C,…").into());
+            }
+            let classes: Vec<usize> = parts[3].split(',').map(|c| c.parse::<usize>()).collect::<std::result::Result<_, _>>().map_err(|_| format!("a sweep save's write {j} holds classes"))?;
+            if parts[2].parse::<usize>().ok() != Some(classes.len()) || classes.is_empty() {
+                return Err(format!("a sweep save's write {j} is not its length").into());
+            }
+            writes.push(classes);
+        }
+        Ok(SweepWrites { read, section, done, sweeps, key, from_truth, state, writes })
+    }
+}
+
+/// [definition; the unified-theory reading of November 7, 09:36; theory, November 9 05:51] **The writes' deposit**: each write
+/// `active[j]` read as its region (its question, the write and the near tail of voids its room leaves) against its truth
+/// `truths[j]`, every site resolved, deposited through the one deposit ([`FieldLearner::section_contrast`]). The persistent
+/// and fresh writes' sections deposit through it, and the sweep resume's acceptance reads it.
+fn writes_deposit(learner: &mut FieldLearner, problems: &[(&[usize], usize)], truths: &[Vec<usize>], active: &[Vec<usize>], void: usize, realization: &mut dyn FieldRealization) -> Result<holonics::hnn::tower::field::ContrastReceipt> {
+    let near = holonics::hnn::tower::field::NEAR;
+    let m = active.len();
+    let writes_now: Vec<Vec<usize>> = (0..m)
+        .map(|j| {
+            let (q, room) = problems[j];
+            let w = &active[j];
+            let mut c: Vec<usize> = q.iter().chain(w).copied().collect();
+            c.extend(std::iter::repeat_n(void, near.min(room - w.len())));
+            c
+        })
+        .collect();
+    let resolved: Vec<Vec<bool>> = truths.iter().map(|t| vec![false; t.len()]).collect();
+    let truth_views: Vec<Region> = truths[..m].iter().zip(&resolved).map(|(c, u)| Region { classes: c, unresolved: u, faces: &[], locked: &[], echo: &[], domain: None, port: None }).collect();
+    let write_views: Vec<Region> = writes_now.iter().zip(&resolved).map(|(c, u)| Region { classes: c, unresolved: u, faces: &[], locked: &[], echo: &[], domain: None, port: None }).collect();
+    Ok(learner.section_contrast(&truth_views, &write_views, realization).map_err(|e| e.to_string())?)
 }
 
 /// [definition; the unified-theory readings of November 7, 04:05 and 05:20, route (b)] **`contrast-field STATE STATE_SHA CODEC
@@ -3196,8 +3340,24 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
     let section_letters = std::env::var_os("FIELD_SECTION_LETTERS").is_some();
     // [measurement; theory, November 8 15:11] `FIELD_SAVE_AT=N`: also save at section N, so a resume from that save has an
     // unbroken twin in the same run (the resume fix's check at scale); several, comma-separated, save at each (theory, November
-    // 8 17:38: the fork's continuation rests and melts at 219 and 239 without breaking its run).
-    let save_at: Vec<usize> = std::env::var("FIELD_SAVE_AT").map(|v| v.split(',').filter_map(|x| x.trim().parse().ok()).collect()).unwrap_or_default();
+    // 8 17:38: the fork's continuation rests and melts at 219 and 239 without breaking its run). [theory, November 9 13:29] An
+    // entry `N.S` saves at section N's sweep S instead (the sweeps done, from zero; fresh writes only), so a sweep resume has its
+    // unbroken twin in the same run.
+    let (save_at, save_at_sweep): (Vec<usize>, Vec<(usize, u64)>) = {
+        let declared = std::env::var("FIELD_SAVE_AT").unwrap_or_default();
+        let mut at = (Vec::new(), Vec::new());
+        for x in declared.split(',').map(str::trim).filter(|x| !x.is_empty()) {
+            match x.split_once('.') {
+                Some((n, s)) => at.1.push((n.parse().map_err(|_| format!("FIELD_SAVE_AT {x}: N.S"))?, s.parse().map_err(|_| format!("FIELD_SAVE_AT {x}: N.S"))?)),
+                None => {
+                    if let Ok(n) = x.parse() {
+                        at.0.push(n);
+                    }
+                }
+            }
+        }
+        at
+    };
     // [measurement; theory, November 8 17:38] `FIELD_CONDITIONAL_ROWS`: each conditional read's per-place code (micro-nats) is
     // also written to `CONDITIONAL_ROWS.txt`, one line a section, so two reads of one section pair place by place for their SE.
     let conditional_rows = std::env::var_os("FIELD_CONDITIONAL_ROWS").is_some();
@@ -3240,9 +3400,24 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
     // `FIELD_CONTRAST_FROM_SECTION=N`: the first lap resumes a lap that was killed after its saved state `STATE.<lap>.<N>`
     // (an exterior kill, November 7 18:14): STATE is that saved state, and the lap's walk goes on from its `N`-th section
     // with the same keys; later laps walk whole.
-    let from_section: usize = match std::env::var("FIELD_CONTRAST_FROM_SECTION") {
-        Ok(v) => v.parse().map_err(|_| "FIELD_CONTRAST_FROM_SECTION is a section count".to_string())?,
-        Err(_) => 0,
+    // [definition; theory, November 9 13:29] `FIELD_CONTRAST_FROM_WRITES=PATH`: the first lap resumes a fresh section at a sweep,
+    // from a sweep save's writes (`STATE.<lap>.<N>.<S>.writes`, [`SweepWrites`]): STATE is the state the file names by its hash
+    // (`STATE.<lap>.<N>`), the walk goes on from the file's section (`FIELD_CONTRAST_FROM_SECTION`, where declared, must be it),
+    // and that section skips its release and runs its sweeps from the file's `S` on the file's writes, with the same keys.
+    let mut from_writes: Option<SweepWrites> = match std::env::var("FIELD_CONTRAST_FROM_WRITES") {
+        Ok(path) => Some(SweepWrites::from_text(std::str::from_utf8(&std::fs::read(&path)?)?)?),
+        Err(_) => None,
+    };
+    let from_section: usize = match (std::env::var("FIELD_CONTRAST_FROM_SECTION"), &from_writes) {
+        (Ok(v), w) => {
+            let n: usize = v.parse().map_err(|_| "FIELD_CONTRAST_FROM_SECTION is a section count".to_string())?;
+            if w.as_ref().is_some_and(|w| w.section != n) {
+                return Err("FIELD_CONTRAST_FROM_SECTION is not the sweep save's section".into());
+            }
+            n
+        }
+        (Err(_), Some(w)) => w.section,
+        (Err(_), None) => 0,
     };
     let mut persistent_writes: Vec<Vec<usize>> = Vec::new();
     let whole_blocks = std::env::var_os("FIELD_CONTRAST_WHOLE_BLOCKS").is_some();
@@ -3318,6 +3493,12 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
     // opening state's hash; the learner carries it so every save keeps it and a resume re-keys nothing.
     let seed = contrast_seed(&learner, &args[2])?;
     learner.key = Some(seed);
+    // A sweep resume continues the section its writes were saved in: the same state, lap count, key, sweeps and start.
+    if let Some(w) = &from_writes {
+        if !w.state.eq_ignore_ascii_case(&args[2]) || w.read != learner.laps || w.key != persistent_key(seed, learner.laps, w.section) || fresh_sweeps != Some(w.sweeps) || w.from_truth != fresh_from_truth {
+            return Err("a sweep resume needs the state its writes name, its lap count and key, the same FIELD_CONTRAST_FRESH and FIELD_FRESH_FROM_TRUTH".into());
+        }
+    }
     let law = WriterLaw::from_env()?;
     let train_set = encoded_problems(&codec, &train_text, &learner.field)?;
     let held_set = encoded_problems(&codec, &held_text, &learner.field)?;
@@ -3509,7 +3690,14 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
     // is no rate, and the first section meets the plain hour test (an hour since the last saved state). The run's opening state
     // stands from the run's start, a lap's end state from its write, and no hour save falls at the section a lap or a resumed
     // run opens at (its state is the one already saved). `FIELD_SAVE_AT` adds declared saves. Each `FIELD_SAVED` line prints its
-    // reason (`hour`, the projected crossing, ahead of `declared`) and the projection it used.
+    // reason (`hour`, the projected crossing, ahead of `declared`) and the projection it used. [theory, November 9 13:29] On the
+    // fresh-writes path the stops are the sweeps ([`FreshStops`]): the section's start projects its release, up to its first
+    // sweep's start, and each sweep's start is tested in the same way with the work to the next stop (the sweep, and after the
+    // last the deposit); a sweep save writes the writes' letters (`STATE.<lap>.<sections done>.<sweeps done>.writes`,
+    // [`SweepWrites`]) and the learner only where this run has not written it for the section, reads no held places, and is
+    // resumed by `FIELD_CONTRAST_FROM_WRITES`. Its `FIELD_SAVED` line names its sweep (`sweep=-` on a section's). The persistent
+    // writes (`FIELD_CONTRAST_PERSISTENT`) do not sweep so (one residue class a section, the writes carried from section to
+    // section) and keep the section's stop.
     const SAVE_MS: u128 = 3_600_000;
     let mut clock = SaveClock::default();
     clock.held_read(opening_read_ms);
@@ -3539,10 +3727,17 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
         for (n, &s) in walk(seed, read, sections.len()).iter().enumerate().skip(if lap == 0 { from_section } else { 0 }) {
             let now = started.elapsed().as_millis();
             let opening = if lap == 0 { from_section } else { 0 };
-            if n > 0 && n == from_section && lap == 0 {
-                println!("FIELD_RESUMED lap={lap} sections={n}/{} ms={now}", sections.len());
+            // A fresh section resumed at a sweep: the sweep save's writes, taken at the section the run opens at.
+            let resumed = if lap == 0 && n == from_section { from_writes.take() } else { None };
+            let resumed_sweep = resumed.as_ref().map(|w| w.done);
+            if (n > 0 || resumed.is_some()) && n == from_section && lap == 0 {
+                println!("FIELD_RESUMED lap={lap} sections={n}/{} sweep={} ms={now}", sections.len(), resumed_sweep.map_or("-".to_string(), |d| d.to_string()));
             }
             let members = &sections[s];
+            // [definition; theory, November 9 13:29] On the fresh-writes path the save law stops at the section's start (before its
+            // release) and at each sweep's start ([`FreshStops`]); a resumed section opens at its sweep, with no release.
+            let release_reads = if resumed.is_some() || fresh_from_truth { 0 } else { WRITES_RELEASE_READS };
+            let stops = fresh_sweeps.filter(|_| persistent).map(|_| FreshStops::of(&train_set, members, release_reads));
             // The kernel's blocks are cut before the save law reads the section, so its declared work is that of the blocks it
             // steps; the persistent writes' residue classes likewise.
             let kernel_cut = (!persistent && kernel).then(|| {
@@ -3552,7 +3747,7 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
             let starts: Vec<usize> = if persistent && fresh_sweeps.is_none() { members.iter().enumerate().map(|(j, &i)| residue_start(seed, read, n, j, spacing, train_set[i].1.len())).collect() } else { Vec::new() };
             let section_law = if persistent {
                 match fresh_sweeps {
-                    Some(sweeps) => SectionLaw::Fresh { sweeps },
+                    Some(sweeps) => SectionLaw::Fresh { sweeps, from: resumed_sweep.unwrap_or(0), release_reads },
                     None => SectionLaw::Persistent { starts: &starts, spacing, sinks: if persistent_writes.is_empty() { PERSISTENT_SINKS } else { 0 } },
                 }
             } else {
@@ -3567,10 +3762,15 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
             // A lap's tenth read falls in this section where the kernel or law D reads it without HostHeld (the receipt's family
             // lengths are the learner's, so they are known here).
             let tenth_read = kernel_cut.is_some() && !section_letters && host_held.is_none() && learner.family_rates.as_ref().is_some_and(|r| !r.is_empty()) && tenth_read_falls(n, sections.len(), tenths_printed);
-            let (projected, since) = (clock.projected(work, tenth_read), clock.since(now));
+            // The work to the next stop: the section's, or on the fresh-writes path its release, up to its first sweep's start.
+            let to_stop = stops.map_or(work, |st| st.release);
+            let (projected, since) = (clock.projected(to_stop, tenth_read), clock.since(now));
             let hour = n != opening && save_due(since, projected, SAVE_MS);
+            // Whether this section's learner is written in this run (a sweep save writes it only where it is not).
+            let mut state_written = false;
             if hour || (n > 0 && save_at.contains(&n)) {
                 write_new(&out.join(format!("STATE.{lap}.{n}")), at_rate(&learner, base_rate).as_bytes())?;
+                state_written = true;
                 clock.saved(now);
                 let held_read = std::time::Instant::now();
                 match &host_held {
@@ -3580,7 +3780,7 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
                 let held_ms = clock.held;
                 clock.held_read(held_read.elapsed().as_millis());
                 println!(
-                    "FIELD_SAVED lap={lap} sections={n}/{} ms={now} read_ms={} reason={} since_ms={since} projected_ms={} work={work} unit={unit} rate_ms={} rate_work={} tenth_read={} held_ms={} hour_ms={SAVE_MS}",
+                    "FIELD_SAVED lap={lap} sections={n}/{} sweep=- ms={now} read_ms={} reason={} since_ms={since} projected_ms={} work={to_stop} unit={unit} rate_ms={} rate_work={} tenth_read={} held_ms={} hour_ms={SAVE_MS}",
                     sections.len(),
                     started.elapsed().as_millis() - now,
                     if hour { "hour" } else { "declared" },
@@ -3703,23 +3903,60 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
                 if fresh {
                     let longest = train_set.iter().map(|p| p.1.len()).max().unwrap_or(1);
                     let wide: Vec<usize> = if fresh_sweeps.is_some() { lengths.clone() } else { vec![longest; problems.len()] };
-                    persistent_writes = if fresh_from_truth && fresh_sweeps.is_some() {
+                    persistent_writes = if let Some(w) = &resumed {
+                        if w.writes.len() != members.len() || w.writes.iter().zip(&lengths).any(|(w, &l)| w.len() != l) {
+                            return Err("a sweep save's writes are not its section's answers at their lengths".into());
+                        }
+                        w.writes.clone()
+                    } else if fresh_from_truth && fresh_sweeps.is_some() {
                         members.iter().map(|&i| train_set[i].1.clone()).collect()
                     } else {
-                        learner.field.energy_release(&problems, &wide, void, 64, key, realization, &mut |_, _, _| {}).map_err(|e| e.to_string())?
+                        learner.field.energy_release(&problems, &wide, void, WRITES_RELEASE_READS, key, realization, &mut |_, _, _| {}).map_err(|e| e.to_string())?
                     };
                 }
                 let m = members.len().min(persistent_writes.len());
                 let mut active: Vec<Vec<usize>> = (0..m).map(|j| persistent_writes[j][..lengths[j].min(persistent_writes[j].len())].to_vec()).collect();
                 // [the unified-theory reading of November 7, 10:12] The writes sunk before the first deposit: eight whole sweeps at
                 // `T` over each write's first `L` places.
-                if let Some(k) = fresh_sweeps {
-                    fresh_sweeps_at(&learner.field, &problems[..m], &mut active, k, key, void, realization, &mut |sweep, mv, pr, en, active, ms| {
+                if let (Some(k), Some(stops)) = (fresh_sweeps, stops) {
+                    // [definition; theory, November 9 13:29] **The sweep stop**: each sweep's start is tested as a section's start, with
+                    // the work to the next stop (the sweep, and after the last the deposit) at the run's largest measured rate; a save
+                    // there writes the writes' letters ([`SweepWrites`]) and the learner only where this run has not written it for this
+                    // section, and reads no held places. No hour save falls at the sweep a resumed section opens at.
+                    let at_sweep = &mut |sweep: u64, active: &[Vec<usize>]| -> Result<()> {
+                        let now = started.elapsed().as_millis();
+                        let to_stop = stops.at_sweep(sweep, k);
+                        let (projected, since) = (clock.projected(to_stop, false), clock.since(now));
+                        let hour = resumed_sweep != Some(sweep) && save_due(since, projected, SAVE_MS);
+                        if hour || save_at_sweep.contains(&(n, sweep)) {
+                            let text = at_rate(&learner, base_rate);
+                            let state = if state_written {
+                                "kept"
+                            } else {
+                                write_new(&out.join(format!("STATE.{lap}.{n}")), text.as_bytes())?;
+                                state_written = true;
+                                "written"
+                            };
+                            let saved = SweepWrites { read, section: n, done: sweep, sweeps: k, key, from_truth: fresh_from_truth, state: sha256(text.as_bytes())?, writes: active.to_vec() };
+                            write_new(&out.join(format!("STATE.{lap}.{n}.{sweep}.writes")), saved.to_text().as_bytes())?;
+                            clock.saved(now);
+                            println!(
+                                "FIELD_SAVED lap={lap} sections={n}/{} sweep={sweep}/{k} ms={now} read_ms=- reason={} since_ms={since} projected_ms={} work={to_stop} unit=site_reads rate_ms={} rate_work={} tenth_read=0 held_ms=- state={state} write_ms={} hour_ms={SAVE_MS}",
+                                sections.len(),
+                                if hour { "hour" } else { "declared" },
+                                projected.map_or("-".to_string(), |p| p.to_string()),
+                                clock.rate.map_or("-".to_string(), |r| r.ms.to_string()),
+                                clock.rate.map_or("-".to_string(), |r| r.work.to_string()),
+                                started.elapsed().as_millis() - now
+                            );
+                        }
+                        Ok(())
+                    };
+                    fresh_sweeps_at(&learner.field, &problems[..m], &mut active, resumed_sweep.unwrap_or(0), k, key, void, realization, at_sweep, &mut |sweep, mv, pr, en, active, ms| {
                         println!("FIELD_FRESH_SWEEP lap={lap} n={n} sweep={sweep} moved={mv} proposed={pr} accept_milli={} write_energy_milli={} ms={ms}", mv * 1000 / pr.max(1), (en.iter().sum::<i128>() / m.max(1) as i128) * 1000 >> 32);
                         if fresh_from_truth {
-                            let places: usize = active.iter().map(|a| a.len()).sum::<usize>().max(1);
-                            let agree: usize = active.iter().zip(members).map(|(a, &i)| a.iter().zip(&train_set[i].1).filter(|(x, y)| x == y).count()).sum();
-                            println!("FIELD_FRESH_RETAIN lap={lap} n={n} sweep={sweep} retention_milli={}", agree * 1000 / places);
+                            let answers: Vec<&[usize]> = members.iter().map(|&i| train_set[i].1.as_slice()).collect();
+                            println!("FIELD_FRESH_RETAIN lap={lap} n={n} sweep={sweep} retention_milli={}", retention_milli(active, &answers));
                         }
                     })?;
                     // [measurement; theory, November 8 14:59] Each section's writes decoded beside their truths (private).
@@ -3761,26 +3998,13 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
                 }
                 let write_energy_milli = (write_energy.iter().sum::<i128>() / m.max(1) as i128) * 1000 >> 32;
                 let release_ms = section_start.elapsed().as_millis();
-                let near = holonics::hnn::tower::field::NEAR;
-                let writes_now: Vec<Vec<usize>> = (0..m)
-                    .map(|j| {
-                        let (q, room) = problems[j];
-                        let w = &active[j];
-                        let mut c: Vec<usize> = q.iter().chain(w).copied().collect();
-                        c.extend(std::iter::repeat_n(void, near.min(room - w.len())));
-                        c
-                    })
-                    .collect();
-                let resolved: Vec<Vec<bool>> = truths.iter().map(|t| vec![false; t.len()]).collect();
-                let truth_views: Vec<Region> = truths[..m].iter().zip(&resolved).map(|(c, u)| Region { classes: c, unresolved: u, faces: &[], locked: &[], echo: &[], domain: None, port: None }).collect();
-                let write_views: Vec<Region> = writes_now.iter().zip(&resolved).map(|(c, u)| Region { classes: c, unresolved: u, faces: &[], locked: &[], echo: &[], domain: None, port: None }).collect();
                 let theta_before = learner.field.theta.clone();
                 let deposit_start = std::time::Instant::now();
                 // [definition; theory, November 9 05:51] The writes' contrast deposits through the one deposit, as every contrast
                 // does (`FieldLearner::section_contrast`): each entry's step carries its remainder and each family's length moves by
                 // its own transfer. The scaled contrast's Newton length and its harmonic mean of eleven are retired; a state saved
                 // under them moves to this law by `deposit-fold`.
-                let receipt = learner.section_contrast(&truth_views, &write_views, realization).map_err(|e| e.to_string())?;
+                let receipt = writes_deposit(&mut learner, &problems[..m], &truths, &active, void, realization)?;
                 let deposit_ms = deposit_start.elapsed().as_millis();
                 let places: i128 = lengths[..m].iter().map(|&l| l as i128).sum::<i128>().max(1);
                 // The closing read `(G(write) − G(truth))/T` a place in thousandths of a nat (`gap` is `Σ (G(truth) − G(write))/T` on 2^(−32) bits).
@@ -5637,7 +5861,7 @@ pub(super) fn contrast_covector_field(args: &[String], realization: &mut dyn Fie
         let longest = active.iter().map(Vec::len).max().unwrap_or(0);
         let key = persistent_key(seed, read, b);
         let at = std::time::Instant::now();
-        fresh_sweeps_at(field, &problems, &mut active, sweeps, key, void, realization, &mut |sweep, mv, pr, en, _, ms| {
+        fresh_sweeps_at(field, &problems, &mut active, 0, sweeps, key, void, realization, &mut |_, _| Ok(()), &mut |sweep, mv, pr, en, _, ms| {
             println!(
                 "FIELD_CONTRAST_COVECTOR_SWEEP batch={}/{} sweep={sweep} moved={mv} proposed={pr} write_energy_milli={} ms={ms} elapsed_ms={}",
                 b + 1,
@@ -7099,7 +7323,7 @@ mod tests {
         let asked: Vec<(&[usize], usize)> = order.iter().map(|&c| (set[chosen[c]].0.as_slice(), set[chosen[c]].2)).collect();
         let mut active: Vec<Vec<usize>> = order.iter().map(|&c| set[chosen[c]].1.clone()).collect();
         let key = persistent_key(contrast_seed(&learner, &state_sha).unwrap(), learner.laps, 0);
-        fresh_sweeps_at(&learner.field, &asked, &mut active, 2, key, void, &mut host(), &mut |_, _, _, _, _, _| {}).unwrap();
+        fresh_sweeps_at(&learner.field, &asked, &mut active, 0, 2, key, void, &mut host(), &mut |_, _| Ok(()), &mut |_, _, _, _, _, _| {}).unwrap();
         assert!(order.iter().zip(&active).any(|(&c, w)| w != &set[chosen[c]].1), "the sweeps move some write off its truth");
         let truths: Vec<Vec<usize>> = order.iter().map(|&c| truth_with_voids(void, &set[chosen[c]], &set[chosen[c]].1)).collect();
         let writes: Vec<Vec<usize>> = order.iter().zip(&active).map(|(&c, w)| truth_with_voids(void, &set[chosen[c]], w)).collect();
@@ -7787,7 +8011,13 @@ mod tests {
         let by_hand = 3 * (3 + 2 + NEAR as u128) + 5 * (5 + 4 + 2) + 8 * (1 + 7);
         assert_eq!(sweep_site_reads(&set, &members), by_hand, "walk-field's site reads");
         assert_eq!(sweep_site_reads(&set, &[2, 0, 1]), by_hand);
-        assert_eq!(section_work(&SectionLaw::Fresh { sweeps: 24 }, &set, &members), (24 * by_hand, "site_reads"));
+        // Fresh writes: their release, their sweeps left and their deposit, and the work between the sweep stops.
+        let all_regions: u128 = (3 + 2 + NEAR as u128) + (5 + 4 + 2) + (1 + 7);
+        assert_eq!(section_work(&SectionLaw::Fresh { sweeps: 24, from: 0, release_reads: 0 }, &set, &members), (24 * by_hand + 2 * all_regions, "site_reads"));
+        assert_eq!(section_work(&SectionLaw::Fresh { sweeps: 24, from: 3, release_reads: WRITES_RELEASE_READS }, &set, &members).0, 64 * all_regions + 21 * by_hand + 2 * all_regions);
+        let stops = FreshStops::of(&set, &members, WRITES_RELEASE_READS);
+        assert_eq!((stops.release, stops.sweep, stops.deposit), (64 * all_regions, by_hand, 2 * all_regions));
+        assert_eq!((stops.at_sweep(5, 24), stops.at_sweep(23, 24)), (by_hand, by_hand + 2 * all_regions), "the last sweep runs on into the deposit");
         let (seed, read, n, spacing) = (0x5EED_u64, 3u64, 5usize, 3usize);
         let starts: Vec<usize> = members.iter().enumerate().map(|(j, &i)| residue_start(seed, read, n, j, spacing, set[i].1.len())).collect();
         let swept: u128 = members.iter().zip(&starts).map(|(&i, &r)| (1 + (r..set[i].1.len()).step_by(spacing).count() as u128) * region_sites(&set[i])).sum();
@@ -7813,6 +8043,94 @@ mod tests {
         assert_eq!(section_work(&SectionLaw::Conditional { blocks: &blocks, owners: &owners, alphabet: 11 }, &set, &members), (regions + 11 * placed, "site_reads"));
         assert_eq!(section_work(&SectionLaw::Joint { reads: 64 }, &set, &members), (64 * regions, "site_reads"));
         assert_eq!(section_work(&SectionLaw::Writer, &set, &members), (2 + 4 + 7, "places"));
+    }
+
+    /// [definition; theory, November 9 13:29] **A fresh section resumed at a sweep boundary is the uninterrupted one, bit for
+    /// bit**, on the host: an energy field of the toy's four problems (every family drawn from the key stream, its family lengths
+    /// open), one fresh section from the truths swept four times, keyed as the trainer keys a section, through the trainer's
+    /// own sweeps ([`fresh_sweeps_at`]), deposit ([`writes_deposit`]) and averaged constitution. The uninterrupted section runs
+    /// on the learner in memory and saves its writes at sweep 2's start ([`SweepWrites`], through its text); the resumed one
+    /// loads the learner from the saved state's text, on a fresh realization, and runs sweeps 2 and 3 from the saved writes. Their writes, each sweep's moves, proposals,
+    /// energies and retention, the deposit's receipt and the learner's state after the section are the same; the sweeps moved
+    /// some write and the learner was not moved by them. A sweep save's text reads back as itself, and a malformed one is refused.
+    #[test]
+    fn a_fresh_section_resumed_at_a_sweep_is_the_uninterrupted_one() {
+        let (codec, problems) = toy();
+        let reach = problems.iter().map(|(q, _, _)| q.len() + codec.answer).max().unwrap();
+        let d = FieldDeclaration { alphabet: codec.alphabet(), width: 8, heads: 2, modes: 3, still: 1, contacts: 4, ticks: 2, frames: 2, reach, lanes: 1, depth: 0, energy: true };
+        let keys: Vec<u8> = (0..1u64 << 13).flat_map(|i| mix(0x5EED, i).to_be_bytes()).collect();
+        let mut field = Field::found(d, &keys).unwrap();
+        let families = field.layout().families.clone();
+        for (n, v) in field.theta.iter_mut().enumerate() {
+            let k = mix(0x11E5, n as u64) as u32 as i32 as i64;
+            let grain = families.iter().find(|(s, l, _)| (*s..*s + *l).contains(&n)).unwrap().2;
+            *v = ((k << grain) >> 32) as i32;
+        }
+        let l = field.layout().clone();
+        field.theta[l.pace..l.pace + d.paced_heads() * (d.alphabet + 1)].fill(0);
+        let mut opening = FieldLearner::new(field, 14);
+        opening.open_family_rates();
+        let state = at_rate(&opening, opening.rate_bits);
+        let state_sha = sha256(state.as_bytes()).unwrap();
+        let set = encoded_problems(&codec, &problems_of(TOY), &opening.field).unwrap();
+        let void = codec.void();
+        let asked: Vec<(&[usize], usize)> = set.iter().map(|(q, _, room)| (q.as_slice(), *room)).collect();
+        let truths: Vec<Vec<usize>> = set.iter().map(|p| truth_with_voids(void, p, &p.1)).collect();
+        let answers: Vec<&[usize]> = set.iter().map(|p| p.1.as_slice()).collect();
+        let (sweeps, at, section, read) = (4u64, 2u64, 3usize, 0u64);
+        let key = persistent_key(0x5EED, read, section);
+        type Row = (u64, usize, usize, Vec<i128>, usize);
+        // One fresh section from sweep `from`: the sweeps (the writes saved at sweep `at`'s start where `save`), the deposit and
+        // the average, as the trainer runs them.
+        let section_from = |learner: &mut FieldLearner, active: &mut Vec<Vec<usize>>, from: u64, save: bool| -> (Vec<Row>, holonics::hnn::tower::field::ContrastReceipt, Option<String>) {
+            let (mut rows, mut saved): (Vec<Row>, Option<String>) = (Vec::new(), None);
+            let before = learner.to_text();
+            fresh_sweeps_at(
+                &learner.field,
+                &asked,
+                active,
+                from,
+                sweeps,
+                key,
+                void,
+                &mut host(),
+                &mut |sweep, active| {
+                    if save && sweep == at {
+                        saved = Some(SweepWrites { read, section, done: sweep, sweeps, key, from_truth: true, state: state_sha.clone(), writes: active.to_vec() }.to_text());
+                    }
+                    Ok(())
+                },
+                &mut |sweep, mv, pr, en, active, _| rows.push((sweep, mv, pr, en.to_vec(), retention_milli(active, &answers))),
+            )
+            .unwrap();
+            assert_eq!(learner.to_text(), before, "the sweeps leave the learner as it opened");
+            let receipt = writes_deposit(learner, &asked, &truths, active, void, &mut host()).unwrap();
+            learner.average_section();
+            (rows, receipt, saved)
+        };
+        // The uninterrupted section runs on the learner as it stands in memory; the resumed one on the saved state's text.
+        let mut whole = opening.clone();
+        let mut writes: Vec<Vec<usize>> = set.iter().map(|p| p.1.clone()).collect();
+        let (rows, receipt, saved) = section_from(&mut whole, &mut writes, 0, true);
+        assert_eq!(rows.iter().map(|r| r.0).collect::<Vec<_>>(), vec![1, 2, 3, 4]);
+        assert!(rows.iter().any(|r| r.1 > 0), "the sweeps move some write");
+        let saved = SweepWrites::from_text(&saved.expect("a save at sweep 2")).unwrap();
+        assert_eq!((saved.read, saved.section, saved.done, saved.sweeps, saved.key, &saved.state), (read, section, at, sweeps, key, &state_sha));
+        assert_eq!(SweepWrites::from_text(&saved.to_text()).unwrap(), saved, "the save's text reads back as itself");
+        let mut resumed = FieldLearner::from_text(&state).unwrap();
+        let mut resumed_writes = saved.writes.clone();
+        let (resumed_rows, resumed_receipt, _) = section_from(&mut resumed, &mut resumed_writes, saved.done, false);
+        assert_eq!(resumed_writes, writes, "the writes");
+        assert_eq!(resumed_rows, rows[at as usize..].to_vec(), "each sweep's moves, proposals, energies and retention");
+        assert_eq!(resumed_receipt, receipt, "the deposit");
+        assert_eq!(resumed.to_text(), whole.to_text(), "the state after the section");
+        // A malformed save is refused: a wrong header, a sweep at or past the last, a write whose length is not its classes'.
+        let text = saved.to_text();
+        assert!(SweepWrites::from_text(&text.replacen("field-sweep-writes v1", "field-sweep-writes v0", 1)).is_err());
+        assert!(SweepWrites::from_text(&text.replacen(&format!("done {at} "), "done 4 ", 1)).is_err());
+        let first = text.lines().nth(2).unwrap().to_string();
+        let parts: Vec<&str> = first.split(' ').collect();
+        assert!(SweepWrites::from_text(&text.replacen(&first, &format!("write 0 {} {}", parts[2].parse::<usize>().unwrap() + 1, parts[3]), 1)).is_err());
     }
 }
 
