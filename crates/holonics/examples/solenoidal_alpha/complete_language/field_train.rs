@@ -4358,10 +4358,15 @@ const LINE_ETAS: [u32; 5] = [1, 4, 16, 64, 256];
 /// (micro-nats, floor; no letter), and the held read's rows to `ENUMERATED.tsv` marked by the point (0 the baseline, 1 to 5
 /// `m`, 6 to 10 `mv`). `FIELD_LINE_STEP_ONLY` prints the step's lines and reads nothing. A reading only: nothing is
 /// deposited and no state is written.
+///
+/// [measurement; theory, November 9 04:20 (a)] With `FAMILIES ETAS` (comma lists: family names as `FIELD_LINE_FAMILY` prints
+/// them, and lengths in one section's step), the points are instead the `mv` step restricted to those families (every other
+/// entry held at `θ`), one a length (`direction=mv_families`, marked 1 on): the families the deposit's grain truncates, each
+/// along its own `m/√v` at its own length, read where the grain first lets them move and past it. No baseline is read then.
 pub(super) fn line_field(args: &[String], realization: &mut dyn FieldRealization) -> Result<()> {
     use holonics::hnn::tower::field::{conditional_code, line_norm, line_point, LINE_BITS};
-    if args.len() != 11 {
-        return Err("line-field STATE STATE_SHA CODEC CODEC_SHA UNITS UNITS_SHA HELD HELD_SHA PLACES OUT".into());
+    if args.len() != 11 && args.len() != 13 {
+        return Err("line-field STATE STATE_SHA CODEC CODEC_SHA UNITS UNITS_SHA HELD HELD_SHA PLACES OUT [FAMILIES ETAS]".into());
     }
     let started = std::time::Instant::now();
     let mut learner = FieldLearner::from_text(std::str::from_utf8(&pinned_read(&args[1], &args[2], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
@@ -4428,16 +4433,48 @@ pub(super) fn line_field(args: &[String], realization: &mut dyn FieldRealization
         println!("FIELD_LINE_READ points=0 places={} host_threads={} ms={}", chosen.len(), rayon::current_num_threads(), started.elapsed().as_millis());
         return Ok(());
     }
+    // The `mv` step on the named families alone (theory, November 9 04:20 (a)), and its lengths.
+    let restricted: Option<(Vec<i128>, Vec<u32>)> = if args.len() == 13 {
+        let mut keep = vec![false; learner.field.material_len()];
+        for name in args[11].split(',') {
+            let k = names.iter().position(|&(n, _)| n == name).ok_or_else(|| format!("line-field: no family named {name}"))?;
+            let &(start, n, _) = families.get(k).ok_or_else(|| format!("line-field: family {name} past the field's families"))?;
+            if n == 0 {
+                return Err(format!("line-field: family {name} has no entries").into());
+            }
+            keep[start..start + n].fill(true);
+        }
+        let etas = args[12].split(',').map(positive).map(|e| e.and_then(|e| u32::try_from(e).map_err(|_| "line-field: a length past 32 bits".into()))).collect::<Result<Vec<u32>>>()?;
+        let step: Vec<i128> = directions.step.iter().zip(&keep).map(|(&u, &k)| if k { u } else { 0 }).collect();
+        println!(
+            "FIELD_LINE_FAMILIES families={} entries={} norm_micro={} moved_at_one={} etas={}",
+            args[11],
+            keep.iter().filter(|&&k| k).count(),
+            micro(line_norm(&step).map_err(|e| e.to_string())?, LINE_BITS),
+            moved_at_one(&step, all.clone()),
+            args[12]
+        );
+        Some((step, etas))
+    } else {
+        None
+    };
     let mut rows = rows_file(&out.join("ENUMERATED.tsv"), "lap\tproblem\tplace\ttruth\tlog2_t\tface_masses\tface_total\tenergies\ttruth_face_masses\ttruth_face_total\n")?;
     let alphabet = learner.field.declaration.alphabet;
-    let points: Vec<(&str, u32)> = std::iter::once(("none", 0)).chain(LINE_ETAS.iter().map(|&e| ("m", e))).chain(LINE_ETAS.iter().map(|&e| ("mv", e))).collect();
+    let points: Vec<(&str, u32)> = match &restricted {
+        Some((_, etas)) => std::iter::once(("skip", 0)).chain(etas.iter().map(|&e| ("mv_families", e))).collect(),
+        None => std::iter::once(("none", 0)).chain(LINE_ETAS.iter().map(|&e| ("m", e))).chain(LINE_ETAS.iter().map(|&e| ("mv", e))).collect(),
+    };
     for (marker, &(direction, eta)) in points.iter().enumerate() {
+        if direction == "skip" {
+            continue;
+        }
         let at = std::time::Instant::now();
         // A point the field's laws refuse (a carrier passed along the line) is its own line, and the next point is read.
         let mut read_point = || -> Result<(Vec<i128>, usize, u128, i32)> {
             let (point, moved) = match direction {
                 "m" => line_point(&learner.field, &directions.first, eta).map_err(|e| e.to_string())?,
                 "mv" => line_point(&learner.field, &directions.step, eta).map_err(|e| e.to_string())?,
+                "mv_families" => line_point(&learner.field, &restricted.as_ref().ok_or("line-field: no families")?.0, eta).map_err(|e| e.to_string())?,
                 _ => (learner.field.clone(), 0),
             };
             let change: Vec<i128> = point.theta.iter().zip(&learner.field.theta).map(|(&a, &b)| a as i128 - b as i128).collect();
