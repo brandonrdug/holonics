@@ -3054,15 +3054,19 @@ fn save_due(since_ms: u128, projected_ms: Option<u128>, hour_ms: u128) -> bool {
     }
 }
 
-/// [definition; theory, November 9 11:48 and 12:18] **The save law's clock**, in milliseconds from the run's start: when the
-/// last saved state was written, the run's largest measured rate, and the section now open. A section opens after any save at
-/// its start and closes at its last print, so its measured time holds its sweeps, its deposit, its prints and any read it
-/// makes itself (a lap's tenth), and never the held read of the save at the next start: that read is counted once, from the
-/// state's write, in the time since the last save.
+/// [definition; theory, November 9 11:48, 12:18 and the unit rule after] **The save law's clock**, in milliseconds from the
+/// run's start: when the last saved state was written, the run's largest measured rate, the run's largest measured held read,
+/// and the section now open. A section opens after any save at its start and closes at its last print, or before a held read
+/// it makes (a lap's tenth on the kernel and law D paths), so its measured time holds its sweeps, its deposit and its prints,
+/// and every rate is per unit of its declared work. A held read is its own row: its time is kept as the largest held read
+/// (the opening read, each save's, each tenth's and each lap end's feed it), and a section in which a tenth's read falls
+/// projects its work at the rate plus that largest held read. A save's held read is counted once, from the state's write, in
+/// the time since the last save.
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
 struct SaveClock {
     saved_ms: u128,
     rate: Option<SaveRate>,
+    held: Option<u128>,
     open: Option<(u128, u128)>,
 }
 
@@ -3072,9 +3076,10 @@ impl SaveClock {
         now_ms.saturating_sub(self.saved_ms)
     }
 
-    /// A section of `work` units projected at the measured rate (none before the run has measured a section).
-    fn projected(&self, work: u128) -> Option<u128> {
-        self.rate.map(|r| r.project(work))
+    /// A section of `work` units projected at the measured rate, plus the largest held read where a tenth's read falls in it
+    /// (none before the run has measured a section).
+    fn projected(&self, work: u128, tenth_read: bool) -> Option<u128> {
+        self.rate.map(|r| r.project(work) + if tenth_read { self.held.unwrap_or(0) } else { 0 })
     }
 
     /// A state written at `now_ms`.
@@ -3082,17 +3087,31 @@ impl SaveClock {
         self.saved_ms = now_ms;
     }
 
+    /// A held read that took `ms`: the largest so far is kept.
+    fn held_read(&mut self, ms: u128) {
+        self.held = Some(self.held.map_or(ms, |h| h.max(ms)));
+    }
+
     /// A section of `work` units opens at `now_ms`; a section left open (one skipped unread) is dropped unmeasured.
     fn open(&mut self, work: u128, now_ms: u128) {
         self.open = Some((work, now_ms));
     }
 
-    /// The open section closes at `now_ms`, its last print: its time over its declared work meets the rate.
+    /// The open section closes at `now_ms`, its last print or the start of its own held read: its time over its declared work
+    /// meets the rate. A closed clock closes nothing.
     fn close(&mut self, now_ms: u128) {
         if let Some((work, at)) = self.open.take() {
             self.rate = SaveRate::larger(self.rate, now_ms.saturating_sub(at), work);
         }
     }
+}
+
+/// [definition; theory, November 7 19:50] **A tenth's held read falls at section `n`** (from zero) of a lap of `sections`, the
+/// lap's tenths printed so far `tenths_printed`: the tenth `⌊(n + 1)·10/sections⌋` passes the last printed, and the section is
+/// not the lap's last (whose read is the lap's end). The kernel and law D paths read the held places there without HostHeld,
+/// and the save law projects that read at the section's start.
+fn tenth_read_falls(n: usize, sections: usize, tenths_printed: usize) -> bool {
+    (n + 1) * 10 / sections.max(1) > tenths_printed && n + 1 < sections
 }
 
 /// [definition; theory, November 8 14:46 and 22:04] **The fresh writes' sweeps**: `sweeps` whole sweeps of the energy's own
@@ -3467,29 +3486,33 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
     } else {
         None
     };
+    let opening_read = std::time::Instant::now();
     match &host_held {
         Some(h) => h.read(-1, &learner),
         None => enumerated_read(&held_field(&learner, averaging), &held_set, places, &truth_of, realization, -1, &mut enumerated_rows)?,
     }
+    let opening_read_ms = opening_read.elapsed().as_millis();
     println!("FIELD_ENUMERATED_READ lap=-1 ms={}", started.elapsed().as_millis());
-    // [definition; Brandon, November 6 17:11; theory, November 7 16:56 and November 9 11:48 and 12:18] **The save law.** A card
-    // run holds at most one hour (`SAVE_MS`) between saved states. At a section's start the learner rests as `STATE.<lap>.<sections
-    // done>`, the held places are read from it (`ENUMERATED.tsv` rows marked `10000·(lap + 1) + sections done`) and the run goes
-    // on, when the time since the last saved state plus the section's projected time would pass the hour ([`save_due`]). The
-    // projection is the section's declared work ([`section_work`]) times the run's largest measured time per unit of work so far
-    // ([`SaveRate`]). Each section is measured from its start, after any save there, to its last print ([`SaveClock`]), so its
-    // deposit, its prints and its reads beside the declared work are inside the measured rate, and the next start's save and its
-    // held read are outside it (the time since the save counts that read once). The hour is guaranteed only where the
-    // projection holds: a save can fall only at a section's start, so this per-section stop holds the gap to the projection,
-    // and a section that runs past its
-    // projection carries the gap past the hour by its excess, after which the next start saves and the measured rate rises to
-    // that section's. Before the run has measured any section there is no rate, and the first section meets the plain hour test
-    // (an hour since the last saved state). The time is read from the state's write, so a save's held read is inside the next
-    // hour; the run's opening state stands from the run's start, a lap's end state from its write, and no hour save falls at the
-    // section a lap or a resumed run opens at (its state is the one already saved). `FIELD_SAVE_AT` adds declared saves. Each
-    // `FIELD_SAVED` line prints its reason (`hour`, the projected crossing, ahead of `declared`) and the projection it used.
+    // [definition; Brandon, November 6 17:11; theory, November 7 16:56, November 9 11:48, 12:18 and the unit rule after] **The
+    // save law.** A card run holds at most one hour (`SAVE_MS`) between saved states. At a section's start the learner rests as
+    // `STATE.<lap>.<sections done>`, the held places are read from it (`ENUMERATED.tsv` rows marked `10000·(lap + 1) + sections
+    // done`) and the run goes on, when the time since the last saved state plus the section's projected time would pass the hour
+    // ([`save_due`]). The projection is the section's declared work ([`section_work`]) times the run's largest measured time per
+    // unit of work so far ([`SaveRate`]), plus the run's largest held read where a lap's tenth read falls in the section
+    // ([`tenth_read_falls`]). Each section is measured from its start, after any save there, to its last print or to the start
+    // of its tenth's held read ([`SaveClock`]): its deposit, its prints and its reads beside the declared work are inside the
+    // measured rate, every held read is outside it as its own row (the largest kept: the opening read, each save's, each tenth's
+    // and each lap end's), and a save's held read is counted once, from the state's write, in the time since the save. The hour
+    // is guaranteed only where the projection holds: a save can fall only at a section's start, so this per-section stop holds
+    // the gap to the projection, and a section that runs past its projection carries the gap past the hour by its excess, after
+    // which the next start saves and the measured rate rises to that section's. Before the run has measured any section there
+    // is no rate, and the first section meets the plain hour test (an hour since the last saved state). The run's opening state
+    // stands from the run's start, a lap's end state from its write, and no hour save falls at the section a lap or a resumed
+    // run opens at (its state is the one already saved). `FIELD_SAVE_AT` adds declared saves. Each `FIELD_SAVED` line prints its
+    // reason (`hour`, the projected crossing, ahead of `declared`) and the projection it used.
     const SAVE_MS: u128 = 3_600_000;
     let mut clock = SaveClock::default();
+    clock.held_read(opening_read_ms);
     for lap in 0..laps {
         let elapsed = started.elapsed().as_millis();
         if lap > 0 && elapsed + lap_ms > stop_ms {
@@ -3541,23 +3564,31 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
                 }
             };
             let (work, unit) = section_work(&section_law, &train_set, members);
-            let (projected, since) = (clock.projected(work), clock.since(now));
+            // A lap's tenth read falls in this section where the kernel or law D reads it without HostHeld (the receipt's family
+            // lengths are the learner's, so they are known here).
+            let tenth_read = kernel_cut.is_some() && !section_letters && host_held.is_none() && learner.family_rates.as_ref().is_some_and(|r| !r.is_empty()) && tenth_read_falls(n, sections.len(), tenths_printed);
+            let (projected, since) = (clock.projected(work, tenth_read), clock.since(now));
             let hour = n != opening && save_due(since, projected, SAVE_MS);
             if hour || (n > 0 && save_at.contains(&n)) {
                 write_new(&out.join(format!("STATE.{lap}.{n}")), at_rate(&learner, base_rate).as_bytes())?;
                 clock.saved(now);
+                let held_read = std::time::Instant::now();
                 match &host_held {
                     Some(h) => h.read(10_000 * (lap as i64 + 1) + n as i64, &learner),
                     None => enumerated_read(&held_field(&learner, averaging), &held_set, places, &truth_of, realization, 10_000 * (lap as i64 + 1) + n as i64, &mut enumerated_rows)?,
                 }
+                let held_ms = clock.held;
+                clock.held_read(held_read.elapsed().as_millis());
                 println!(
-                    "FIELD_SAVED lap={lap} sections={n}/{} ms={now} read_ms={} reason={} since_ms={since} projected_ms={} work={work} unit={unit} rate_ms={} rate_work={} hour_ms={SAVE_MS}",
+                    "FIELD_SAVED lap={lap} sections={n}/{} ms={now} read_ms={} reason={} since_ms={since} projected_ms={} work={work} unit={unit} rate_ms={} rate_work={} tenth_read={} held_ms={} hour_ms={SAVE_MS}",
                     sections.len(),
                     started.elapsed().as_millis() - now,
                     if hour { "hour" } else { "declared" },
                     projected.map_or("-".to_string(), |p| p.to_string()),
                     clock.rate.map_or("-".to_string(), |r| r.ms.to_string()),
-                    clock.rate.map_or("-".to_string(), |r| r.work.to_string())
+                    clock.rate.map_or("-".to_string(), |r| r.work.to_string()),
+                    u8::from(tenth_read),
+                    held_ms.map_or("-".to_string(), |h| h.to_string())
                 );
                 leg.print(&learner.field, lap, n, "leg");
                 leg = Leg::new(&learner.field);
@@ -4008,13 +4039,19 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
                         *slot = (slot.0 + t.unwrap_or(0), slot.1 + p.unwrap_or(0));
                     }
                     let tenth = (n + 1) * 10 / sections.len();
-                    if tenth > tenths_printed && n + 1 < sections.len() {
+                    if tenth_read_falls(n, sections.len(), tenths_printed) {
                         // [measurement; theory, November 7 19:50] The held places read at each tenth, beside the tenth's acceptance and
                         // the sections' coherence (rows marked `10000·(lap + 1) + sections done`).
                         match &host_held {
                             // The host's crossings carry the tenths.
                             Some(_) => {}
-                            None => enumerated_read(&held_field(&learner, averaging), &held_set, places, &truth_of, realization, 10_000 * (lap as i64 + 1) + (n + 1) as i64, &mut enumerated_rows)?,
+                            None => {
+                                // The section closes before its tenth's read, which is the save law's own row (`SaveClock`).
+                                clock.close(started.elapsed().as_millis());
+                                let held_read = std::time::Instant::now();
+                                enumerated_read(&held_field(&learner, averaging), &held_set, places, &truth_of, realization, 10_000 * (lap as i64 + 1) + (n + 1) as i64, &mut enumerated_rows)?;
+                                clock.held_read(held_read.elapsed().as_millis());
+                            }
                         }
                     }
                     if tenth > tenths_printed || n + 1 == sections.len() {
@@ -4023,7 +4060,7 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
                         tenth_family.iter_mut().for_each(|x| *x = (0, 0));
                     }
                 }
-                // The section closes at its last print, its tenth's read inside it, before the next start's save.
+                // The section closes at its last print (where no tenth's read closed it), before the next start's save.
                 clock.close(started.elapsed().as_millis());
                 let read_done = read_sections > 0 && lap == 0 && n + 1 >= from_section + read_sections;
                 if started.elapsed().as_millis() > stop_ms || read_done {
@@ -4192,10 +4229,12 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
             lap_start.elapsed().as_millis(),
             started.elapsed().as_millis()
         );
+        let held_read = std::time::Instant::now();
         match &host_held {
             Some(h) => h.read(lap as i64, &learner),
             None => enumerated_read(&held_field(&learner, averaging), &held_set, places, &truth_of, realization, lap as i64, &mut enumerated_rows)?,
         }
+        clock.held_read(held_read.elapsed().as_millis());
         println!("FIELD_ENUMERATED_READ lap={lap} ms={}", started.elapsed().as_millis());
     }
     Ok(())
@@ -7678,7 +7717,7 @@ mod tests {
     #[test]
     fn a_saves_held_read_is_not_its_next_sections_rate() {
         let mut clock = SaveClock::default();
-        assert_eq!((clock.projected(1_000), clock.since(0)), (None, 0), "no rate before a section is measured");
+        assert_eq!((clock.projected(1_000, false), clock.since(0)), (None, 0), "no rate before a section is measured");
         clock.open(1_000, 0);
         clock.close(100_000);
         assert_eq!(clock.rate, Some(SaveRate { ms: 100_000, work: 1_000 }));
@@ -7687,9 +7726,9 @@ mod tests {
         clock.close(248_000);
         assert_eq!(clock.rate, Some(SaveRate { ms: 100_000, work: 1_000 }), "the save's read is not section B's");
         assert_eq!(clock.since(248_000), 148_000, "the time since the save holds the read once");
-        assert_eq!(clock.projected(600), Some(60_000));
-        assert!(save_due(clock.since(248_000), clock.projected(600), 200_000), "148 s since the save and 60 s projected pass 200 s");
-        assert!(!save_due(clock.since(248_000), clock.projected(500), 200_000), "148 s and 50 s do not");
+        assert_eq!(clock.projected(600, false), Some(60_000));
+        assert!(save_due(clock.since(248_000), clock.projected(600, false), 200_000), "148 s since the save and 60 s projected pass 200 s");
+        assert!(!save_due(clock.since(248_000), clock.projected(500, false), 200_000), "148 s and 50 s do not");
         // A section left open (skipped unread) is dropped unmeasured when the next opens; a closed clock closes nothing.
         clock.open(10, 250_000);
         clock.open(1, 251_000);
@@ -7697,6 +7736,40 @@ mod tests {
         assert_eq!(clock.rate, Some(SaveRate { ms: 1_000, work: 1 }), "1 s over one unit, the skipped section unmeasured");
         clock.close(900_000);
         assert_eq!(clock.rate, Some(SaveRate { ms: 1_000, work: 1 }));
+    }
+
+    /// [definition; theory, November 9, the unit rule after 12:18] A held read is its own row, in the trainer's call order. The
+    /// opening read takes 90 s; kernel section A reads 1,000 units in 100 s; kernel section B, in which a lap's tenth falls,
+    /// reads 500 units in 40 s and closes before its tenth's held read of 103 s. B's 80 ms a unit leaves the rate A's (with the
+    /// read inside it, 286 ms a unit), the largest held read becomes 103 s, and a section in which a tenth falls projects its
+    /// work at the rate plus that read; the next start's time since the save holds the read, and with it the hour test saves
+    /// where the rate alone would not. A tenth's read falls where `⌊(n + 1)·10/sections⌋` passes the last printed tenth, never
+    /// at the lap's last section.
+    #[test]
+    fn a_tenths_held_read_is_its_own_row() {
+        let mut clock = SaveClock::default();
+        clock.held_read(90_000);
+        assert_eq!(clock.projected(500, true), None, "no rate before a section is measured");
+        clock.open(1_000, 90_000);
+        clock.close(190_000);
+        let tenth = tenth_read_falls(9, 100, 0);
+        assert!(tenth);
+        assert_eq!(clock.projected(500, tenth), Some(50_000 + 90_000), "the rate and the largest held read so far");
+        clock.open(500, 190_000);
+        clock.close(230_000);
+        clock.held_read(103_000);
+        clock.close(333_000);
+        assert_eq!(clock.rate, Some(SaveRate { ms: 100_000, work: 1_000 }), "the tenth's read is not section B's rate");
+        assert_eq!(clock.held, Some(103_000));
+        assert_eq!((clock.projected(500, true), clock.projected(500, false)), (Some(153_000), Some(50_000)));
+        clock.held_read(20_000);
+        assert_eq!(clock.held, Some(103_000), "the largest held read is kept");
+        assert_eq!(clock.since(333_000), 333_000, "the time since the opening state holds every read");
+        assert!(save_due(clock.since(333_000), clock.projected(500, true), 400_000), "333 s, 50 s and a 103 s read pass 400 s");
+        assert!(!save_due(clock.since(333_000), clock.projected(500, false), 400_000), "333 s and 50 s do not");
+        assert!(!tenth_read_falls(8, 100, 0) && !tenth_read_falls(9, 100, 1), "no new tenth");
+        assert!(tenth_read_falls(19, 100, 1) && !tenth_read_falls(99, 100, 9), "the next tenth; the lap's last section reads at the lap's end");
+        assert!(tenth_read_falls(0, 5, 0) && tenth_read_falls(1, 5, 2) && !tenth_read_falls(1, 5, 4), "a lap of five sections");
     }
 
     /// [definition; theory, November 9 11:39, 11:48 and 12:18] A section's declared work. The fresh writes' is their declared
