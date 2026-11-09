@@ -4338,6 +4338,144 @@ pub(super) fn lead_field(args: &[String], realization: &mut dyn FieldRealization
     Ok(())
 }
 
+/// [declared read; theory, November 8, the line reading] The line's lengths, `η = 4^k` for `k = 0..=4`, in one section's step.
+const LINE_ETAS: [u32; 5] = [1, 4, 16, 64, 256];
+
+/// [measurement; theory, November 8, the line reading] **`line-field STATE STATE_SHA CODEC CODEC_SHA UNITS UNITS_SHA HELD
+/// HELD_SHA PLACES OUT`**: whether the deposit has stalled on a descent it does not take. The held code, the enumerated
+/// conditional at the held places the trainer's held read takes ([`enumerated_places`], `FIELD_HELD_ALL_OF` as there; its
+/// reads [`enumerated_reads`]), each place's `−ln p(truth | rest)` in the conditional section's chart
+/// ([`holonics::hnn::tower::field::conditional_code`], read at each point's own `T`), is read at the state's live `θ` (the
+/// baseline, `direction=none eta=0`; not the averaged constitution) and at `θ − η u` for each `η` of [`LINE_ETAS`] along two
+/// directions ([`FieldLearner::line_directions`], each of length one section's step): `mv`, the deposit's next step from the
+/// state's moments with each family at its own length (`η = 1` is that step), and `m`, the first moment scaled to its norm.
+/// Each point keeps every entry at `θ`'s grain and 32-bit carrier ([`holonics::hnn::tower::field::line_point`]).
+///
+/// Prints `FIELD_LINE_STEP` (the step's norm and what moves at `η = 1`), a `FIELD_LINE_FAMILY` line a family (its share of
+/// each direction's squared norm in thousandths, its entries moved at `η = 1`, its length), then a `FIELD_LINE` line a point
+/// as it is read (the held code a place in milli-nats and micro-nats, floor, its entries moved, the realized step's norm in
+/// millionths of `θ`'s unit) and a `FIELD_LINE_READ` line. Writes each point's place codes to `LINE.<direction>.<eta>.tsv`
+/// (micro-nats, floor; no letter), and the held read's rows to `ENUMERATED.tsv` marked by the point (0 the baseline, 1 to 5
+/// `m`, 6 to 10 `mv`). `FIELD_LINE_STEP_ONLY` prints the step's lines and reads nothing. A reading only: nothing is
+/// deposited and no state is written.
+pub(super) fn line_field(args: &[String], realization: &mut dyn FieldRealization) -> Result<()> {
+    use holonics::hnn::tower::field::{conditional_code, line_norm, line_point, LINE_BITS};
+    if args.len() != 11 {
+        return Err("line-field STATE STATE_SHA CODEC CODEC_SHA UNITS UNITS_SHA HELD HELD_SHA PLACES OUT".into());
+    }
+    let started = std::time::Instant::now();
+    let mut learner = FieldLearner::from_text(std::str::from_utf8(&pinned_read(&args[1], &args[2], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
+    declared_clocks(&mut learner.field);
+    if !learner.field.declaration.energy {
+        return Err("line-field reads a field whose faces are one energy's forces".into());
+    }
+    let units = units_of(&args[5], &args[6])?;
+    let codec = FieldCodec::from_text(std::str::from_utf8(&pinned_read(&args[3], &args[4], CODEC_BUDGET)?)?, units)?;
+    let held_text = problems_of(&pinned_read(&args[7], &args[8], READ_BUDGET as usize)?);
+    let places = positive(&args[9])?;
+    let out = Path::new(&args[10]);
+    std::fs::create_dir(out)?;
+    let held_set = encoded_problems(&codec, &held_text, &learner.field)?;
+    let void = codec.void();
+    let truth_of = |p: &(Vec<usize>, Vec<usize>, usize), letters: &[usize]| -> Vec<usize> { truth_with_voids(void, p, letters) };
+    let chosen = enumerated_places(&held_set, places, &truth_of);
+    let directions = learner.line_directions().map_err(|e| e.to_string())?;
+    let families = learner.field.families_all();
+    let mut grains = vec![0u32; learner.field.material_len()];
+    for &(start, n, grain) in &families {
+        grains[start..start + n].fill(grain);
+    }
+    // The moved entries of `u` at `η = 1`, and a change on each family's grain carried to the line's.
+    let moved_at_one = |u: &[i128], range: std::ops::Range<usize>| range.filter(|&i| u[i].unsigned_abs() >= 1u128 << (LINE_BITS - grains[i] - 1)).count();
+    let on_line = |d: &[i128]| -> Vec<i128> { d.iter().zip(&grains).map(|(&x, &g)| x << (LINE_BITS - g)).collect() };
+    let micro = |norm: u128, bits: u32| norm * 1_000_000 >> bits;
+    let all = 0..learner.field.material_len();
+    let released_norm = line_norm(&on_line(&directions.released)).map_err(|e| e.to_string())?;
+    println!(
+        "FIELD_LINE_STEP lengths={} rate_bits={} entries={} norm_micro={} first_norm_micro={} moved_mv={} moved_m={} released_moved={} released_norm_micro={} log2_t={}",
+        if learner.family_rates.is_some() { "family" } else { "rate" },
+        learner.rate_bits,
+        all.len(),
+        micro(directions.step_norm, LINE_BITS),
+        micro(directions.first_norm, holonics::hnn::tower::STEP_BITS),
+        moved_at_one(&directions.step, all.clone()),
+        moved_at_one(&directions.first, all.clone()),
+        directions.released.iter().filter(|&&r| r != 0).count(),
+        micro(released_norm, LINE_BITS),
+        learner.field.theta[learner.field.layout().face_temper]
+    );
+    let square = |u: &[i128], range: std::ops::Range<usize>| -> u128 { u[range].iter().map(|v| v.unsigned_abs().saturating_mul(v.unsigned_abs())).fold(0u128, u128::saturating_add) };
+    let (step_total, first_total) = (square(&directions.step, all.clone()).max(1), square(&directions.first, all.clone()).max(1));
+    let names = family_names(&learner.field);
+    for (k, &(start, n, grain)) in families.iter().enumerate() {
+        if n == 0 {
+            continue;
+        }
+        let name = names.get(k).map_or_else(|| format!("family{k}"), |(name, _)| name.to_string());
+        let length = learner.family_rates.as_ref().map_or_else(|| "-".to_string(), |r| (r[k] * 1000 >> holonics::hnn::tower::MATERIAL_BITS).to_string());
+        println!(
+            "FIELD_LINE_FAMILY family={name} entries={n} grain={grain} length_millibits={length} mv_share_milli={} m_share_milli={} moved_mv={} moved_m={} released_moved={}",
+            square(&directions.step, start..start + n).saturating_mul(1000) / step_total,
+            square(&directions.first, start..start + n).saturating_mul(1000) / first_total,
+            moved_at_one(&directions.step, start..start + n),
+            moved_at_one(&directions.first, start..start + n),
+            directions.released[start..start + n].iter().filter(|&&r| r != 0).count()
+        );
+    }
+    // [measurement; agent-inferred, November 8] `FIELD_LINE_STEP_ONLY`: the step's lines alone, no held read (the moments read
+    // on any host, with no card).
+    if std::env::var_os("FIELD_LINE_STEP_ONLY").is_some() {
+        println!("FIELD_LINE_READ points=0 places={} host_threads={} ms={}", chosen.len(), rayon::current_num_threads(), started.elapsed().as_millis());
+        return Ok(());
+    }
+    let mut rows = rows_file(&out.join("ENUMERATED.tsv"), "lap\tproblem\tplace\ttruth\tlog2_t\tface_masses\tface_total\tenergies\ttruth_face_masses\ttruth_face_total\n")?;
+    let alphabet = learner.field.declaration.alphabet;
+    let points: Vec<(&str, u32)> = std::iter::once(("none", 0)).chain(LINE_ETAS.iter().map(|&e| ("m", e))).chain(LINE_ETAS.iter().map(|&e| ("mv", e))).collect();
+    for (marker, &(direction, eta)) in points.iter().enumerate() {
+        let at = std::time::Instant::now();
+        // A point the field's laws refuse (a carrier passed along the line) is its own line, and the next point is read.
+        let mut read_point = || -> Result<(Vec<i128>, usize, u128, i32)> {
+            let (point, moved) = match direction {
+                "m" => line_point(&learner.field, &directions.first, eta).map_err(|e| e.to_string())?,
+                "mv" => line_point(&learner.field, &directions.step, eta).map_err(|e| e.to_string())?,
+                _ => (learner.field.clone(), 0),
+            };
+            let change: Vec<i128> = point.theta.iter().zip(&learner.field.theta).map(|(&a, &b)| a as i128 - b as i128).collect();
+            let realized = line_norm(&on_line(&change)).map_err(|e| e.to_string())?;
+            let (lines, energies) = enumerated_reads(&point, &chosen, realization, marker as i64)?;
+            let codes = chosen
+                .iter()
+                .enumerate()
+                .map(|(n, (_, truth, t, _))| conditional_code(&point, &energies[n * alphabet..(n + 1) * alphabet], truth[*t]).map(|code| code * LN2_Q30 >> 30).map_err(|e| e.to_string()))
+                .collect::<std::result::Result<Vec<i128>, String>>()?;
+            for line in &lines {
+                row(&mut rows, line)?;
+            }
+            Ok((codes, moved, realized, point.theta[point.layout().face_temper]))
+        };
+        match read_point() {
+            Ok((codes, moved, realized, log2_t)) => {
+                let mut file = rows_file(&out.join(format!("LINE.{direction}.{eta}.tsv")), "problem\tplace\tcode_micro_nats\n")?;
+                for ((k, _, t, q), &place) in chosen.iter().zip(&codes) {
+                    row(&mut file, &format!("{k}\t{}\t{}\n", t - q, place * 1_000_000 >> 32))?;
+                }
+                let (nats, n) = (codes.iter().sum::<i128>(), chosen.len().max(1) as i128);
+                println!(
+                    "FIELD_LINE direction={direction} eta={eta} held_code_milli={} places={} ms={} held_code_micro={} moved={moved} step_micro={} log2_t={log2_t}",
+                    nats * 1000 / n >> 32,
+                    chosen.len(),
+                    at.elapsed().as_millis(),
+                    nats * 1_000_000 / n >> 32,
+                    micro(realized, LINE_BITS)
+                );
+            }
+            Err(e) => println!("FIELD_LINE direction={direction} eta={eta} refused=\"{e}\" places={} ms={}", chosen.len(), at.elapsed().as_millis()),
+        }
+    }
+    println!("FIELD_LINE_READ points={} places={} host_threads={} ms={}", points.len(), chosen.len(), rayon::current_num_threads(), started.elapsed().as_millis());
+    Ok(())
+}
+
 /// The nearest-rank quartiles `(q25, median, q75)` of `values` (each the `⌈p n⌉`-th smallest), none for no values.
 fn rank_quartiles<T: Ord + Copy>(mut values: Vec<T>) -> Option<(T, T, T)> {
     if values.is_empty() {
@@ -4351,10 +4489,16 @@ fn rank_quartiles<T: Ord + Copy>(mut values: Vec<T>) -> Option<(T, T, T)> {
 
 /// [`enumerated_read`]'s rows at `chosen` (each line `lap`-marked), read through `realization`.
 fn enumerated_rows(field: &Field, chosen: &HeldPlaces, realization: &mut dyn FieldRealization, lap: i64) -> Result<Vec<String>> {
+    Ok(enumerated_reads(field, chosen, realization, lap)?.0)
+}
+
+/// [`enumerated_rows`]'s rows beside the energies they carry: `alphabet` a place, its letters in order, the places in
+/// `chosen`'s order.
+fn enumerated_reads(field: &Field, chosen: &HeldPlaces, realization: &mut dyn FieldRealization, lap: i64) -> Result<(Vec<String>, Vec<i128>)> {
     let alphabet = field.declaration.alphabet;
     let chosen: Vec<(usize, &Vec<usize>, usize, usize)> = chosen.iter().map(|(k, truth, t, q)| (*k, truth, *t, *q)).collect();
     if chosen.is_empty() {
-        return Ok(Vec::new());
+        return Ok((Vec::new(), Vec::new()));
     }
     let opens: Vec<Vec<bool>> = chosen.iter().map(|(_, truth, t, _)| (0..truth.len()).map(|s| s == *t).collect()).collect();
     let views: Vec<Region> = chosen.iter().zip(&opens).map(|((_, truth, _, _), open)| Region { classes: truth, unresolved: open, faces: &[], locked: &[], echo: &[], domain: None, port: None }).collect();
@@ -4386,7 +4530,7 @@ fn enumerated_rows(field: &Field, chosen: &HeldPlaces, realization: &mut dyn Fie
         let g: Vec<String> = energies[n * alphabet..(n + 1) * alphabet].iter().map(i128::to_string).collect();
         lines.push(format!("{lap}\t{k}\t{}\t{}\t{log2_t}\t{}\t{}\t{}\t{}\t{}\n", t - q, truth[*t], masses.join(","), face.total, g.join(","), truth_masses.join(","), at_truth.total));
     }
-    Ok(lines)
+    Ok((lines, energies))
 }
 
 /// [definition; theory, November 7 22:41, from Brandon's 22:29 lens: the host is a surface too] **The held reader on the host's
@@ -5299,6 +5443,83 @@ mod tests {
             }
         }
         assert!(lead_field(&args(&other, &other_sha, &at("P")), &mut host()).is_err(), "a field without one energy");
+        let _ = std::fs::remove_dir_all(&dir);
+    }
+
+    /// [measurement; theory, November 8, the line reading] `line-field` end to end on the host: an energy field whose moments
+    /// one conditional section opened (each family at its own length) is read at its live `θ` and at five lengths along each
+    /// direction, eleven points of six held places; each point's place codes are the conditional chart's over the host's own
+    /// energies at that point (the `mv` point at `η = 1` the line's first point along the deposit's step), every point's held
+    /// rows are written beside them, and the state is read, never written.
+    #[test]
+    fn the_line_reading_reads_every_point_and_writes_no_state() {
+        use holonics::hnn::tower::field::{conditional_code, line_point};
+        let dir = std::env::temp_dir().join(format!("holonics-line-{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&dir);
+        std::fs::create_dir_all(&dir).expect("dir");
+        let at = |name: &str| dir.join(name).to_string_lossy().into_owned();
+        let put = |name: &str, bytes: &[u8]| {
+            std::fs::write(dir.join(name), bytes).expect("write");
+            (at(name), sha256(bytes).expect("sha"))
+        };
+        let (codec, problems) = toy();
+        let reach = problems.iter().map(|(q, _, _)| q.len() + codec.answer).max().unwrap();
+        let d = FieldDeclaration { alphabet: codec.alphabet(), width: 8, heads: 2, modes: 3, still: 1, contacts: 4, ticks: 2, frames: 2, reach, lanes: 1, depth: 0, energy: true };
+        let keys: Vec<u8> = (0..1u64 << 13).flat_map(|i| mix(0x5EED, i).to_be_bytes()).collect();
+        let mut field = Field::found(d, &keys).unwrap();
+        let families = field.layout().families.clone();
+        for (n, v) in field.theta.iter_mut().enumerate() {
+            let k = mix(0x11E5, n as u64) as u32 as i32 as i64;
+            let grain = families.iter().find(|(s, l, _)| (*s..*s + *l).contains(&n)).unwrap().2;
+            *v = ((k << grain) >> 32) as i32;
+        }
+        let l = field.layout().clone();
+        field.theta[l.pace..l.pace + d.paced_heads() * (d.alphabet + 1)].fill(0);
+        let mut learner = FieldLearner::new(field, 14);
+        learner.open_family_rates();
+        let held_set = encoded_problems(&codec, &problems_of(TOY), &learner.field).unwrap();
+        let void = codec.void();
+        let truth_of = |p: &(Vec<usize>, Vec<usize>, usize), letters: &[usize]| truth_with_voids(void, p, letters);
+        let truths: Vec<Vec<usize>> = held_set.iter().map(|p| truth_of(p, &p.1)).collect();
+        let resolved: Vec<Vec<bool>> = truths.iter().map(|t| vec![false; t.len()]).collect();
+        let views: Vec<Region> = truths.iter().zip(&resolved).map(|(c, u)| Region { classes: c, unresolved: u, faces: &[], locked: &[], echo: &[], domain: None, port: None }).collect();
+        let blocks: Vec<Vec<usize>> = held_set.iter().map(|p| vec![p.0.len(), p.0.len() + 1]).collect();
+        let owners: Vec<usize> = (0..held_set.len()).collect();
+        learner.section_conditional(&views, &owners, &blocks, &mut host()).expect("a section opens the moments");
+        let text = learner.to_text();
+        let (state, state_sha) = put("STATE", text.as_bytes());
+        let (codec_at, codec_sha) = put("CODEC", codec.to_text().as_bytes());
+        let (units, units_sha) = put("UNITS", b"founded-units-v1 0\n");
+        let (held, held_sha) = put("HELD", TOY);
+        let args: Vec<String> = ["line-field", &state, &state_sha, &codec_at, &codec_sha, &units, &units_sha, &held, &held_sha, "6", &at("L")].iter().map(|s| s.to_string()).collect();
+        line_field(&args, &mut host()).expect("line");
+        assert_eq!(std::fs::read(dir.join("STATE")).expect("state"), text.as_bytes(), "the state is read, never written");
+        let chosen = enumerated_places(&held_set, 6, &truth_of);
+        let directions = learner.line_directions().unwrap();
+        let alphabet = d.alphabet;
+        let points: Vec<(&str, u32, holonics::hnn::tower::field::Field)> = std::iter::once(("none", 0, learner.field.clone()))
+            .chain(LINE_ETAS.iter().map(|&e| ("m", e, line_point(&learner.field, &directions.first, e).unwrap().0)))
+            .chain(LINE_ETAS.iter().map(|&e| ("mv", e, line_point(&learner.field, &directions.step, e).unwrap().0)))
+            .collect();
+        assert!(points[6].2.theta != learner.field.theta, "the deposit's step moves θ at η = 1");
+        for (direction, eta, point) in &points {
+            let rows = String::from_utf8(std::fs::read(dir.join(format!("L/LINE.{direction}.{eta}.tsv"))).expect("a point's codes")).unwrap();
+            let rows: Vec<&str> = rows.lines().skip(1).collect();
+            assert_eq!(rows.len(), 6, "{direction} {eta}: a row a place");
+            for ((k, truth, t, q), cells) in chosen.iter().zip(&rows) {
+                let g: Vec<i128> = (0..alphabet)
+                    .map(|c| {
+                        let mut x = truth.clone();
+                        x[*t] = c;
+                        point.energy_g(&x).unwrap()
+                    })
+                    .collect();
+                let nats = conditional_code(point, &g, truth[*t]).unwrap() * LN2_Q30 >> 30;
+                assert_eq!(*cells, format!("{k}\t{}\t{}", t - q, nats * 1_000_000 >> 32), "{direction} {eta}, problem {k}");
+            }
+        }
+        let enumerated = String::from_utf8(std::fs::read(dir.join("L/ENUMERATED.tsv")).expect("rows")).unwrap();
+        assert_eq!(enumerated.lines().count(), 1 + 11 * 6, "the held read's rows, a point's six places each");
         let _ = std::fs::remove_dir_all(&dir);
     }
 

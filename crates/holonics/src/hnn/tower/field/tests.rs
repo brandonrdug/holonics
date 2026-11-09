@@ -2993,3 +2993,86 @@ fn a_leads_opening_split_is_the_opening() {
     assert!(energetic(1).energy_lead(&CLASSES, CLASSES.len()).is_err());
     assert!(shaped(1).energy_lead(&CLASSES, 0).is_err());
 }
+
+/// [measurement; theory, November 8, the line reading] **A held place's code is the conditional section's**: on the warm
+/// line-shaped field, each place's [`conditional_code`] over its letters' energies (each `G` the host's own) is the section's
+/// `−log₂ p(t)` (its receipt's `log2_a`, negated) bit for bit; a truth outside the letters is refused.
+#[test]
+fn a_held_places_code_is_the_conditional_sections() {
+    let mut field = energetic_line();
+    field.theta[field.layout.face_temper] = 10 << MATERIAL_BITS;
+    let classes: Vec<usize> = (0..40).map(|t| (t * 7 + t / 3) % 5).collect();
+    let none = vec![false; 40];
+    let truth = [Region { classes: &classes, unresolved: &none, faces: &[], locked: &[], echo: &[], domain: None, port: None }];
+    let places = [3usize, 14, 25];
+    let blocks: Vec<Vec<usize>> = places.iter().map(|&t| vec![t]).collect();
+    let mut learner = FieldLearner::new(field.clone(), 14);
+    let r = learner.section_conditional(&truth, &[0, 0, 0], &blocks, &mut HostField).unwrap();
+    assert_eq!(r.log2_a.len(), places.len());
+    for (&l, &t) in r.log2_a.iter().zip(&places) {
+        let g: Vec<i128> = (0..field.declaration.alphabet)
+            .map(|v| {
+                let mut c = classes.clone();
+                c[t] = v;
+                field.energy_g(&c).unwrap()
+            })
+            .collect();
+        assert_eq!(conditional_code(&field, &g, classes[t]).unwrap(), -l, "place {t}");
+    }
+    assert!(conditional_code(&field, &[0; 5], 5).is_err());
+}
+
+/// [measurement; theory, November 8, the line reading] **The line's step is the deposit's**: with moments a section's covector
+/// leaves where they are (`g = m` on the step's grain and `v = m²`), the deposit with its carried release from zero remainders
+/// moves `θ` to the line's point at `η = 1`, each family at its own length (one whole length negative, the deposit's left
+/// shift) and at the learner's one rate alike, and the deposit without the carried release moves `θ` by `released`. The
+/// first moment's direction is parallel to `m` and has the step's norm; the reading moves no learner.
+#[test]
+fn the_lines_step_is_the_deposits() {
+    let field = energetic_line();
+    let families = field.families_all();
+    let len = field.material_len();
+    for lengths in [true, false] {
+        let mut learner = FieldLearner::new(field.clone(), 14);
+        if lengths {
+            learner.open_family_rates();
+            let rates = learner.family_rates.as_mut().unwrap();
+            for (k, r) in rates.iter_mut().enumerate() {
+                *r = ((12 + (k % 5) as i128) << MATERIAL_BITS) + (k as i128 * 0x2B_3C5) % (1 << MATERIAL_BITS);
+            }
+            rates[0] = 77 - (1 << MATERIAL_BITS);
+        }
+        // Moments on 2^(−32) in multiples of 2^8, so the face families' covector on its 2^(−24) carries them whole.
+        let mut next = mixer(0x11E);
+        let first: Vec<i128> = (0..len).map(|_| ((next() as i32 as i128) >> 6) << 8).collect();
+        learner.first = first.clone();
+        learner.second = first.iter().map(|m| m * m).collect();
+        let before = learner.clone();
+        let lines = learner.line_directions().unwrap();
+        assert_eq!(learner, before, "a reading moves no learner");
+        let mut g = vec![0i128; len];
+        for &(start, n, grain) in &families {
+            for i in start..start + n {
+                g[i] = if grain == MATERIAL_BITS { first[i] << 8 } else { first[i] >> 8 };
+            }
+        }
+        let (mut carried, mut plain) = (learner.clone(), learner.clone());
+        carried.carried = Some(vec![0; len]);
+        carried.deposit(g.clone()).unwrap();
+        assert!(carried.first == learner.first && carried.second == learner.second, "the covector leaves the moments where they are");
+        let (point, moved) = line_point(&field, &lines.step, 1).unwrap();
+        assert!(moved > 0 && point.theta == carried.field.theta, "lengths {lengths}: the line's first point is the carried release's step");
+        plain.deposit(g).unwrap();
+        let want: Vec<i32> = field.theta.iter().zip(&lines.released).map(|(&t, &r)| (t as i128 - r) as i32).collect();
+        assert_eq!(plain.field.theta, want, "lengths {lengths}: released is the deposit's own step");
+        let norm = line_norm(&lines.first).unwrap();
+        assert!(norm.abs_diff(lines.step_norm) << 16 <= lines.step_norm, "the first moment's norm {norm} against the step's {}", lines.step_norm);
+        assert!(lines.first.iter().zip(&first).all(|(&u, &m)| u.signum() == m.signum() || u == 0), "the first moment's direction is m's");
+        let (far, _) = line_point(&field, &lines.first, 4).unwrap();
+        for (i, (&a, &b)) in far.theta.iter().zip(&field.theta).enumerate() {
+            let grain = families.iter().find(|&&(s, n, _)| (s..s + n).contains(&i)).unwrap().2;
+            assert_eq!(b as i128 - a as i128, release(4 * lines.first[i], LINE_BITS - grain), "entry {i}");
+        }
+    }
+    assert!(line_point(&field, &[0; 3], 1).is_err());
+}

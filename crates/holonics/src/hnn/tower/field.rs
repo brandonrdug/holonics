@@ -4981,6 +4981,111 @@ impl FieldRealization for LanesField<'_> {
     }
 }
 
+/// [definition; the unified-theory reading of November 7, 20:29, law (D)] **A place's conditional chart**: from its letters'
+/// energies `gs` (on `2^(−32)`) and `1/T` (`inverse`, on `2^(−24)`), each letter's `log₂ w_v = −(G_v − G_min)/T` on
+/// `2^(−32)`, its weight `w_v` on `2^(−24)` through the exponential's navigator (whole at the least energy, released to zero
+/// below `2^(−23)`), and the weights' sum `z`; `p(v) = w_v/z`. The conditional section's chart
+/// ([`FieldLearner::section_conditional`]) and the held reading's ([`conditional_code`]).
+fn conditional_logs(gs: &[i128], inverse: i128, fine: &Exponential) -> Result<(Vec<i128>, Vec<i128>, i128)> {
+    const OVER: &str = "a conditional covector past its 128-bit carrier";
+    let lo = gs.iter().copied().min().unwrap_or(0);
+    let logs: Vec<i128> = gs.iter().map(|&gv| (lo - gv).checked_mul(inverse).map(|x| release(x, MATERIAL_BITS)).inspect(|v| crate::number::census::reach(OVER, v)).ok_or(TowerError::Refused(OVER))).collect::<Result<_>>()?;
+    let w: Vec<i128> = logs
+        .iter()
+        .map(|&l| {
+            let ell = l >> (ENERGY_BITS - MATERIAL_BITS);
+            if ell >= 0 {
+                Ok(1i128 << MATERIAL_BITS)
+            } else if ell <= -((MATERIAL_BITS as i128 - 1) << MATERIAL_BITS) {
+                Ok(0)
+            } else {
+                temperature_of(ell as i32, fine)
+            }
+        })
+        .collect::<Result<_>>()?;
+    let z: i128 = w.iter().sum();
+    Ok((logs, w, z))
+}
+
+/// `log₂ z` on `2^(−32)` of a conditional's weights' sum `z` on `2^(−24)` ([`conditional_logs`]), so `log₂ p(v) = log₂ w_v −
+/// log₂ z`.
+fn log2_mass(z: i128) -> i128 {
+    super::log2_reading_at(z.max(1) as u128, ENERGY_BITS) - ((MATERIAL_BITS as i128) << ENERGY_BITS)
+}
+
+/// [measurement; theory, November 8, the line reading] **A held place's code under its enumerated conditional**:
+/// `−log₂ p(at)` on `2^(−32)` bits, `p(v) ∝ 2^(−G_v/T)` over the place's letters' energies `gs` (one a letter, in order) at
+/// `field`'s own `T`, in the conditional section's chart ([`conditional_logs`]: the truth's `log₂ w` whole, the normalizer the
+/// weights' sum), so it is [`KernelReceipt::log2_a`]'s place, negated, read at a held place. A reading only.
+pub fn conditional_code(field: &Field, gs: &[i128], at: usize) -> Result<i128> {
+    if at >= gs.len() {
+        return refuse("a held place's truth outside its letters' energies");
+    }
+    let inverse = temperature_of(-field.theta[field.layout.face_temper], &field.fine)?;
+    let (logs, _, z) = conditional_logs(gs, inverse, &field.fine)?;
+    Ok(log2_mass(z) - logs[at])
+}
+
+/// [measurement; theory, November 8, the line reading] **The line's grain**: a direction's entry is on `2^(−48)` of `θ`'s own
+/// unit, where the deposit's places `2^(−24)` finer than a family's grain fall on the material's families (grain `2^(−24)`);
+/// a face family's (grain `2^(−16)`, its places on `2^(−40)`) is carried 8 places up, so one Euclidean sum measures every
+/// family in the unit the code's covector is read in ([`predicted_change`]).
+pub const LINE_BITS: u32 = 2 * MATERIAL_BITS;
+
+/// [measurement; theory, November 8, the line reading] The two directions a line reading moves `θ` along
+/// ([`FieldLearner::line_directions`]), each a material entry's on [`LINE_BITS`].
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct LineDirections {
+    /// The deposit's next step from the learner's moments, each family at its own length.
+    pub step: Vec<i128>,
+    /// The first moment scaled to `step`'s norm.
+    pub first: Vec<i128>,
+    /// The deposit's next step as the learner without a carried release moves it, on each family's grain.
+    pub released: Vec<i128>,
+    /// `‖step‖` on [`LINE_BITS`] (the line's unit length, `η = 1`).
+    pub step_norm: u128,
+    /// `‖m‖` on the moments' `2^(−32)`.
+    pub first_norm: u128,
+}
+
+/// `⌊√(Σ x_i²)⌋` of a direction, on its entries' grain; refused past its 128-bit carrier.
+pub fn line_norm(x: &[i128]) -> Result<u128> {
+    const PAST: &str = "a line's norm past its 128-bit carrier";
+    let mut sum = 0u128;
+    for &v in x {
+        let square = v.unsigned_abs().checked_mul(v.unsigned_abs()).ok_or(TowerError::Refused(PAST))?;
+        sum = sum.checked_add(square).ok_or(TowerError::Refused(PAST))?;
+    }
+    Ok(sum.isqrt())
+}
+
+/// [measurement; theory, November 8, the line reading] **A point of a line**: `field` with each material entry moved to
+/// `θ_i − η u_i`, `u` a direction on [`LINE_BITS`] ([`LineDirections`]), released to the entry's own grain (nearest, half
+/// away from zero) and kept in its 32-bit carrier (refused past it), with the entries it moved. The field read is a copy:
+/// no learner's `θ` is written.
+pub fn line_point(field: &Field, direction: &[i128], eta: u32) -> Result<(Field, usize)> {
+    if direction.len() != field.material_len() {
+        return refuse("a line's direction of another length than the field's material");
+    }
+    let mut grains = vec![0u32; direction.len()];
+    for (start, n, grain) in field.families_all() {
+        if grain > LINE_BITS {
+            return refuse("a family finer than the line's grain");
+        }
+        grains[start..start + n].fill(grain);
+    }
+    let mut point = field.clone();
+    let mut moved = 0usize;
+    for ((slot, &u), &grain) in point.material_mut().zip(direction).zip(&grains) {
+        let d = release(u.checked_mul(i128::from(eta)).ok_or(TowerError::Refused("a line's point past its 128-bit carrier"))?, LINE_BITS - grain);
+        if d != 0 {
+            moved += 1;
+            *slot = fit32(*slot as i128 - d, "a line's point outgrew its 32-bit carrier")?;
+        }
+    }
+    Ok((point, moved))
+}
+
 /// A place's conditional `p(v) ∝ 2^(−G_v/T)` on `2^(−24)` from its letters' energies, each weight through the exponential's
 /// navigator and released to zero below `2^(−23)` (the conditional section's own shares).
 fn conditional_shares(gs: &[i128], inverse: i128, fine: &Exponential) -> Result<Vec<i128>> {
@@ -6812,28 +6917,12 @@ impl FieldLearner {
                 let gs = &energies[i * alphabet..(i + 1) * alphabet];
                 let reads = &materials[i * alphabet..(i + 1) * alphabet];
                 let at = truth[o].classes[t];
-                let lo = gs.iter().copied().min().unwrap_or(0);
                 // Each letter's `log₂ w = −(G(x_v) − G_min)/T` on 2^(−32), and its weight on 2^(−24).
-                let logs: Vec<i128> = gs.iter().map(|&gv| (lo - gv).checked_mul(inverse).map(|x| release(x, MATERIAL_BITS)).inspect(|v| crate::number::census::reach(OVER, v)).ok_or(TowerError::Refused(OVER))).collect::<Result<_>>()?;
-                let w: Vec<i128> = logs
-                    .iter()
-                    .map(|&l| {
-                        let ell = l >> (ENERGY_BITS - MATERIAL_BITS);
-                        if ell >= 0 {
-                            Ok(1i128 << MATERIAL_BITS)
-                        } else if ell <= -((MATERIAL_BITS as i128 - 1) << MATERIAL_BITS) {
-                            Ok(0)
-                        } else {
-                            temperature_of(ell as i32, &f.fine)
-                        }
-                    })
-                    .collect::<Result<_>>()?;
-                let z: i128 = w.iter().sum();
+                let (logs, w, z) = conditional_logs(gs, inverse, &f.fine)?;
                 let p: Vec<i128> = w.iter().map(|&x| div_nearest(x << MATERIAL_BITS, z.max(1))).collect();
                 census_conditional_place(logs.iter().map(|&l| l >> (ENERGY_BITS - MATERIAL_BITS)), &p, Some(at), &f.fine)?;
                 if let Some(acc) = unigram_acc.as_mut() {
-                    let log2_z = super::log2_reading_at(z.max(1) as u128, ENERGY_BITS) - ((MATERIAL_BITS as i128) << ENERGY_BITS);
-                    acc.place(&logs, log2_z, at, &f.fine)?;
+                    acc.place(&logs, log2_mass(z), at, &f.fine)?;
                 }
                 let mt = &reads[at].as_ref().ok_or(TowerError::Refused("a conditional place whose truth was not read"))?.0;
                 if self.coin_measure && coin.is_none() {
@@ -6900,7 +6989,7 @@ impl FieldLearner {
                     }
                     surprise_bands[k] += 1;
                     // KL(p ‖ face) in bits on 2^(−32): Σ_v p(v)(log₂ p(v) + code_face(v)), each log₂ p(v) = logs[v] − log₂ z.
-                    let log2_z = super::log2_reading_at(z.max(1) as u128, ENERGY_BITS) - ((MATERIAL_BITS as i128) << ENERGY_BITS);
+                    let log2_z = log2_mass(z);
                     // [measurement; theory, November 8 13:11] The place's seven moments of the conditional against its face, in bits
                     // on 2^(−32) (bits² for the last three), each weighed by the place's beat `2^k`: the code −log₂ p(t), H(p), f(t)
                     // with f = log₂(p/face), E_p f, Var_p log₂ p, Var_p f and Cov_p(log₂ p, f); the eighth is the weight.
@@ -6943,7 +7032,7 @@ impl FieldLearner {
                 (weight, weight_square, least, most) = (weight + pt, weight_square + release(pt * pt, MATERIAL_BITS), least.min(pt), most.max(pt));
                 whole += usize::from(p.iter().all(|&x| x <= pt));
                 per_state.push((1, pt));
-                log2_p.push(logs[at] - (super::log2_reading_at(z.max(1) as u128, ENERGY_BITS) - ((MATERIAL_BITS as i128) << ENERGY_BITS)));
+                log2_p.push(logs[at] - log2_mass(z));
             }
         }
         let coin_measure = (self.coin_measure && coin.is_none() && !deposits.is_empty()).then(|| {
@@ -7024,6 +7113,72 @@ impl FieldLearner {
                 (len, m, v)
             })
             .collect()
+    }
+
+    /// [measurement; theory, November 8, the line reading] **The deposit's next step and the first moment, as directions of
+    /// `θ`** (a reading: nothing is moved).
+    ///
+    /// `step` is the step [`FieldLearner::deposit`] forms from the learner's own moments before a section's covector moves
+    /// them (the external step that `deposit` prices on each section), each family at its own length as the learner holds
+    /// it: `2^(−ρ_f)` from [`FieldLearner::family_rates`] where the learner carries them (the whole bits as the deposit's
+    /// shift, the fraction through the exponential's navigator), `2^(−rate_bits)` for every family otherwise (the rate at
+    /// sixteen states a section). Each entry is formed on `2^(−24)` of its family's grain, the carried release's places
+    /// ([`FieldLearner::carried`]: the shift's and the division's truncation taken there), with no carried remainder, and put
+    /// on [`LINE_BITS`]. `released` is the same step as the deposit without a carried release takes it, on each family's grain
+    /// (the whole step truncated at the grain before the fraction scales it), so the line's first point is read beside what
+    /// the learner itself moves.
+    ///
+    /// `first` is the first moment `m` (the code's covector in `θ`'s own unit, on `2^(−32)`) scaled to `step`'s norm,
+    /// `u_i = m_i ‖step‖ / ‖m‖` on [`LINE_BITS`], with neither the second moment nor a family's length in it.
+    ///
+    /// A bias step that stands in for the moments' ([`FieldLearner::unigram_step`]) is not carried by a state and is not in
+    /// `step`; under the unigram law's shadow the bias steps by the moments, as here.
+    pub fn line_directions(&self) -> Result<LineDirections> {
+        const PAST: &str = "a line's direction past its 128-bit carrier";
+        let families = self.field.families_all();
+        let len = self.field.material_len();
+        let (mut step, mut released) = (vec![0i128; len], vec![0i128; len]);
+        for (k, &(start, n, grain)) in families.iter().enumerate() {
+            let up = LINE_BITS.checked_sub(grain + MATERIAL_BITS).ok_or(TowerError::Refused("a family finer than the line's grain"))?;
+            match &self.family_rates {
+                Some(rates) => {
+                    let rho = *rates.get(k).ok_or(TowerError::Refused("a learner's family lengths that are not one a family"))?;
+                    let (whole, part) = (rho >> MATERIAL_BITS, (rho & ((1 << MATERIAL_BITS) - 1)) as i32);
+                    let scale = temperature_of(-part, &self.field.fine)?;
+                    // `x 2^(−whole) / root`: the deposit's shift, a left shift checked at its carrier where `whole < 0`.
+                    let over = |x: i128, root: i128| -> Result<i128> {
+                        if whole >= 0 {
+                            Ok((x >> whole.min(127)) / root)
+                        } else {
+                            let bits = u32::try_from(-whole).map_err(|_| TowerError::Refused(PAST))?;
+                            let lift = 1i128.checked_shl(bits).filter(|&b| b > 0).ok_or(TowerError::Refused(PAST))?;
+                            Ok(x.checked_mul(lift).ok_or(TowerError::Refused(PAST))? / root)
+                        }
+                    };
+                    for i in start..start + n {
+                        let root = super::deposit_root(self.second[i]);
+                        let num = self.first[i].checked_mul(1i128 << grain).ok_or(TowerError::Refused(PAST))?;
+                        let full = over(num.checked_mul(scale).ok_or(TowerError::Refused(PAST))?, root)?;
+                        step[i] = full.checked_mul(1i128 << up).ok_or(TowerError::Refused(PAST))?;
+                        released[i] = release(over(num, root)?.checked_mul(scale).ok_or(TowerError::Refused(PAST))?, MATERIAL_BITS);
+                    }
+                }
+                None => {
+                    for i in start..start + n {
+                        let full = deposit_step(self.first[i], self.second[i], grain + MATERIAL_BITS, self.rate_bits);
+                        step[i] = full.checked_mul(1i128 << up).ok_or(TowerError::Refused(PAST))?;
+                        released[i] = deposit_step(self.first[i], self.second[i], grain, self.rate_bits);
+                    }
+                }
+            }
+        }
+        let (step_norm, first_norm) = (line_norm(&step)?, line_norm(&self.first)?);
+        if step_norm == 0 || first_norm == 0 {
+            return refuse("a line along moments that are zero");
+        }
+        let (to, from) = (i128::try_from(step_norm).map_err(|_| TowerError::Refused(PAST))?, i128::try_from(first_norm).map_err(|_| TowerError::Refused(PAST))?);
+        let first = self.first.iter().map(|&m| m.checked_mul(to).map(|x| div_nearest(x, from)).ok_or(TowerError::Refused(PAST))).collect::<Result<_>>()?;
+        Ok(LineDirections { step, first, released, step_norm, first_norm })
     }
 
     /// The learner as text: its head line (the held step's halvings, or `-`), the field, each
