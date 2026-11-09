@@ -4551,6 +4551,265 @@ pub(super) fn line_field(args: &[String], realization: &mut dyn FieldRealization
     Ok(())
 }
 
+/// [agent-inferred, November 9] **A sum of products of two covector entries, in two limbs**: `hi·2^128 + lo`, the high limb
+/// signed. Each product of two 128-bit entries (at most `2^254` in magnitude) is carried whole, and a sum past `2^255` is
+/// refused, never wrapped or released.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+struct ProductSum {
+    hi: i128,
+    lo: u128,
+}
+
+impl ProductSum {
+    /// `self + x·y`.
+    fn add_product(&mut self, x: i128, y: i128) -> Result<()> {
+        const PAST: &str = "covector-field: a sum of products past its 256-bit carrier";
+        const LOW: u128 = u64::MAX as u128;
+        let (a, b) = (x.unsigned_abs(), y.unsigned_abs());
+        let (a1, a0, b1, b0) = (a >> 64, a & LOW, b >> 64, b & LOW);
+        let (mid, mid_carry) = (a1 * b0).overflowing_add(a0 * b1);
+        let (lo, lo_carry) = (a0 * b0).overflowing_add(mid << 64);
+        // `a, b ≤ 2^127`, so `a·b ≤ 2^254` and its high limb is below `2^127`.
+        let hi = i128::try_from(a1 * b1 + (mid >> 64) + (u128::from(mid_carry) << 64) + u128::from(lo_carry)).map_err(|_| PAST)?;
+        if (x < 0) != (y < 0) {
+            let (l, borrow) = self.lo.overflowing_sub(lo);
+            self.hi = self.hi.checked_sub(hi).and_then(|h| h.checked_sub(i128::from(borrow))).ok_or(PAST)?;
+            self.lo = l;
+        } else {
+            let (l, carry) = self.lo.overflowing_add(lo);
+            self.hi = self.hi.checked_add(hi).and_then(|h| h.checked_add(i128::from(carry))).ok_or(PAST)?;
+            self.lo = l;
+        }
+        Ok(())
+    }
+
+    fn big(self) -> num_bigint::BigInt {
+        (num_bigint::BigInt::from(self.hi) << 128) + num_bigint::BigInt::from(self.lo)
+    }
+}
+
+/// [measurement; theory, November 9 04:36 and 04:40] **One half's test of first-order stationarity in one family**, from the
+/// problem sums `D_p = Σ_(i ∈ p) ⟨g_f(i), Σ_(a ∈ other) g_f(a)⟩` over the half's problems, the half's place count `n` and the
+/// other half's `n_o`, in the family's covector unit squared: `S = Σ_p D_p / (n_o n)` (nearest), `SE = √((m Σ D_p² − (Σ
+/// D_p)²)/(m − 1)) / (n_o n)` (floor; the SD across the half's `m` problems of their sums of `b_i`, times `√m / n`), and `z =
+/// S/SE` in thousandths toward zero, read from `z² = (Σ D_p)²(m − 1)/(m Σ D_p² − (Σ D_p)²)`, a ratio of integer sums in
+/// which a power of two on the family's unit cancels (its `2^(4k)` above and below), so `z` is the same bits at any grain of
+/// `f`. `none` for fewer than two problems, `inf` where the problems' sums agree.
+fn stationarity(sums: &[num_bigint::BigInt], n: usize, n_other: usize) -> (String, String, String) {
+    use num_bigint::BigInt;
+    use num_traits::{Signed, Zero};
+    let m = BigInt::from(sums.len());
+    let total: BigInt = sums.iter().sum();
+    let squares: BigInt = sums.iter().map(|d| d * d).sum();
+    let scale = BigInt::from(n) * BigInt::from(n_other);
+    let s = if scale.is_zero() {
+        "none".to_string()
+    } else {
+        let q = (total.abs() * 2u32 + &scale) / (&scale * 2u32);
+        (if total.is_negative() { -q } else { q }).to_string()
+    };
+    if sums.len() < 2 || scale.is_zero() {
+        return (s, "none".to_string(), "none".to_string());
+    }
+    let spread = &m * &squares - &total * &total;
+    let one_less = &m - 1u32;
+    let se = (&spread / (&one_less * &scale * &scale)).sqrt().to_string();
+    let z = if spread.is_zero() {
+        if total.is_zero() { "none".to_string() } else if total.is_negative() { "-inf".to_string() } else { "inf".to_string() }
+    } else {
+        let z = (&total * &total * &one_less * 1_000_000u32 / &spread).sqrt();
+        (if total.is_negative() { -z } else { z }).to_string()
+    };
+    (s, se, z)
+}
+
+/// [measurement; theory, November 9 04:36 and 04:40] **`covector-field STATE STATE_SHA CODEC CODEC_SHA UNITS UNITS_SHA HELD
+/// HELD_SHA PLACES OUT`**: whether law (D) stands where its covector is stationary in each family, or a descent in a family
+/// remains that law (D) does not take. At the state's own averaged constitution `θ̄` ([`held_field`] with averaging; a state
+/// that carries no average is refused), at the held places the enumerated conditional reads ([`enumerated_places`],
+/// `FIELD_HELD_ALL_OF` as there), each place's covector `g(i)` is the one [`FieldLearner::section_conditional`] adds for that
+/// place, read through the realization as the section reads it
+/// ([`holonics::hnn::tower::field::conditional_place_covectors`]: every letter at the place with the rest at the truth, the
+/// deposit's chart, sign and units; the letters' temperature's entry the face of the place's own operand where it learns, as
+/// the trainer declares it: held under `FIELD_CONTRAST_ONE_RATE` or `FIELD_CONTRAST_HOLD_T`, since a state does not carry it).
+///
+/// [agent-inferred, November 9] **The halves are halves of the problems**: the problems in the order their first place is
+/// chosen, those at even positions half A and at odd positions half B, a problem's places together. A place's covector reads
+/// its whole passage, so two places of one problem are not independent; two halves of problems are.
+///
+/// Per family `f` (the `FIELD_LINE_FAMILY` names and order): for each place `i` in B, `b_i = ⟨g_f(i), mean_A g_f⟩`;
+/// `S_ab = Σ_B b_i / n_B` with `SE_ab` the SD of B's per-problem sums of `b_i` times `√m_B / n_B` (theory, 04:40: a problem's
+/// places share its passage, so their `b_i` are correlated and a spread across places reads too small), and `z_ab = S/SE`;
+/// then A and B swapped. With the halves independent `E S_f = |E g_f|²`, zero where `f` is stationary, and `z` does not
+/// depend on `f`'s grain ([`stationarity`]); `z > 2` in both halves is a descent in `f` that law (D) does not take. `S_ab`
+/// and `S_ba` are one number, `⟨mean_A g_f, mean_B g_f⟩`: the swap changes only whose spread sets the SE. On held places
+/// `E g_f` is the held code's gradient, which is law (D)'s own expectation only where held and trained places share it (a
+/// training passage given as `HELD` reads law (D)'s own objective). `S`, `SE` and
+/// `mean_sq` are in `f`'s covector unit squared (each entry on its family's grain, as the deposit sums it); `mean_sq_a` is the
+/// mean over A's places of `‖g_f(i)‖²`, the per-place size beside the shared part `S`. The `family=all` line adds the
+/// families in their grain units, so it is a null test that leans on the finest grains; the per-family lines decide.
+///
+/// **The carrier**: the entries are the deposit's own 128-bit integers; the halves' sums are checked at 128 bits; each
+/// product of two entries and their sum over a family is carried in two limbs ([`ProductSum`], refused past `2^255`); the
+/// problems' sums and the statistics are unbounded integers. No entry is released before a product, so the reading rounds
+/// nothing before `S`, `SE` and `z` are formed, and a grain change of `f` multiplies every sum by its power of two with no
+/// remainder.
+///
+/// Prints `FIELD_COVECTOR_FIELD` (which field it read), a `FIELD_COVECTOR_HALF` line a half (its problems and places), a
+/// `FIELD_COVECTOR_CHUNK` line a chunk of [`holonics::hnn::tower::field::CONDITIONAL_CHUNK`] places with its elapsed
+/// milliseconds, a `FIELD_COVECTOR` line a family and one for `all`, and `FIELD_COVECTOR_READ`. Writes `COVECTOR.tsv`: a
+/// row a place and family, its problem and answer place, its half, `dot = ⟨g_f(i), Σ_other g_f⟩` (so `b_i = dot /
+/// other_places`) and `square = ‖g_f(i)‖²`, in `f`'s unit squared; no letter. A reading only: nothing is deposited and no
+/// state is written. The places' covectors stand together (`places × entries × 16` bytes, printed), the letters' materials
+/// one chunk at a time.
+pub(super) fn covector_field(args: &[String], realization: &mut dyn FieldRealization) -> Result<()> {
+    use holonics::hnn::tower::field::{conditional_place_covectors, CONDITIONAL_CHUNK};
+    use num_bigint::BigInt;
+    if args.len() != 11 {
+        return Err("covector-field STATE STATE_SHA CODEC CODEC_SHA UNITS UNITS_SHA HELD HELD_SHA PLACES OUT".into());
+    }
+    let started = std::time::Instant::now();
+    let mut learner = FieldLearner::from_text(std::str::from_utf8(&pinned_read(&args[1], &args[2], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
+    declared_clocks(&mut learner.field);
+    if !learner.field.declaration.energy {
+        return Err("covector-field reads a field whose faces are one energy's forces".into());
+    }
+    if !learner.average.as_ref().is_some_and(|a| a.len() == learner.field.theta.len()) {
+        return Err("covector-field reads law (D)'s averaged constitution, and this state carries no average".into());
+    }
+    if learner.newton {
+        return Err("covector-field reads law (D), which deposits through the moments, not the Newton step".into());
+    }
+    let units = units_of(&args[5], &args[6])?;
+    let codec = FieldCodec::from_text(std::str::from_utf8(&pinned_read(&args[3], &args[4], CODEC_BUDGET)?)?, units)?;
+    let held_text = problems_of(&pinned_read(&args[7], &args[8], READ_BUDGET as usize)?);
+    let places = positive(&args[9])?;
+    let out = Path::new(&args[10]);
+    std::fs::create_dir(out)?;
+    let field = held_field(&learner, true);
+    // A state does not carry whether the letters' temperature learns: law (D)'s covector carries it as the trainer declares it
+    // (held under `FIELD_CONTRAST_ONE_RATE` or `FIELD_CONTRAST_HOLD_T`; law (D) is not persistent).
+    let temper_learns = std::env::var_os("FIELD_CONTRAST_ONE_RATE").is_none() && std::env::var_os("FIELD_CONTRAST_HOLD_T").is_none();
+    let temper = field.layout().face_temper;
+    let material = field.material_len();
+    println!(
+        "FIELD_COVECTOR_FIELD field=averaged entries={material} averaged_moved={} temper_learns={} log2_t={} live_log2_t={}",
+        field.theta.iter().zip(&learner.field.theta).filter(|(a, b)| a != b).count(),
+        u8::from(temper_learns),
+        field.theta[temper],
+        learner.field.theta[temper]
+    );
+    let held_set = encoded_problems(&codec, &held_text, &learner.field)?;
+    let void = codec.void();
+    let truth_of = |p: &(Vec<usize>, Vec<usize>, usize), letters: &[usize]| -> Vec<usize> { truth_with_voids(void, p, letters) };
+    let chosen = enumerated_places(&held_set, places, &truth_of);
+    // The problems in the order their first place is chosen, each read once; a place is `(problem's position, site)`.
+    let mut order: Vec<usize> = Vec::new();
+    let mut position: HashMap<usize, usize> = HashMap::new();
+    for (k, _, _, _) in &chosen {
+        if !position.contains_key(k) {
+            position.insert(*k, order.len());
+            order.push(*k);
+        }
+    }
+    let truths: Vec<&Vec<usize>> = order.iter().map(|k| chosen.iter().find(|c| c.0 == *k).map(|c| &c.1).ok_or("covector-field: a problem with no place")).collect::<std::result::Result<_, _>>()?;
+    let resolved: Vec<Vec<bool>> = truths.iter().map(|t| vec![false; t.len()]).collect();
+    let views: Vec<Region> = truths.iter().zip(&resolved).map(|(c, u)| Region { classes: c, unresolved: u, faces: &[], locked: &[], echo: &[], domain: None, port: None }).collect();
+    let asked: Vec<(usize, usize)> = chosen.iter().map(|(k, _, t, _)| (position[k], *t)).collect();
+    // Half B is the problems at odd positions.
+    let in_b: Vec<bool> = asked.iter().map(|&(p, _)| p % 2 == 1).collect();
+    let (places_b, problems_b) = (in_b.iter().filter(|&&b| b).count(), order.len() / 2);
+    let (places_a, problems_a) = (asked.len() - places_b, order.len() - problems_b);
+    println!("FIELD_COVECTOR_HALF half=A problems={problems_a} places={places_a} positions=even");
+    println!("FIELD_COVECTOR_HALF half=B problems={problems_b} places={places_b} positions=odd");
+    if places_a == 0 || places_b == 0 {
+        return Err("covector-field needs two problems or more, one a half".into());
+    }
+    println!("FIELD_COVECTOR_MEMORY covector_bytes={} chunk_places={CONDITIONAL_CHUNK}", asked.len() * material * 16);
+    let chunks = asked.len().div_ceil(CONDITIONAL_CHUNK);
+    let reading = std::time::Instant::now();
+    let mut realization_us = 0u128;
+    let read = conditional_place_covectors(&field, temper_learns, &views, &asked, realization, &mut |c, n, read_us| {
+        realization_us = read_us;
+        println!("FIELD_COVECTOR_CHUNK chunk={}/{chunks} places={n}/{} realization_ms={} ms={}", c + 1, asked.len(), read_us / 1000, reading.elapsed().as_millis());
+    })
+    .map_err(|e| e.to_string())?;
+    let read_ms = reading.elapsed().as_millis();
+    // Each half's sum, entry by entry, at 128 bits.
+    let (mut sum_a, mut sum_b) = (vec![0i128; material], vec![0i128; material]);
+    for (r, &b) in read.iter().zip(&in_b) {
+        let sum = if b { &mut sum_b } else { &mut sum_a };
+        for (s, &x) in sum.iter_mut().zip(&r.covector) {
+            *s = s.checked_add(x).ok_or("covector-field: a half's sum past its 128-bit carrier")?;
+        }
+    }
+    let families = field.families_all();
+    let names = family_names(&field);
+    // Each place's and family's `⟨g_f(i), Σ_other g_f⟩` and `‖g_f(i)‖²`.
+    let mut dots: Vec<Vec<(BigInt, BigInt)>> = Vec::with_capacity(read.len());
+    for (r, &b) in read.iter().zip(&in_b) {
+        let other = if b { &sum_a } else { &sum_b };
+        let mut per_family = Vec::with_capacity(families.len());
+        for &(start, n, _) in &families {
+            let (mut dot, mut square) = (ProductSum::default(), ProductSum::default());
+            for j in start..start + n {
+                dot.add_product(r.covector[j], other[j])?;
+                square.add_product(r.covector[j], r.covector[j])?;
+            }
+            per_family.push((dot.big(), square.big()));
+        }
+        dots.push(per_family);
+    }
+    let mut rows = rows_file(&out.join("COVECTOR.tsv"), "problem\tplace\thalf\tfamily\tdot\tother_places\tsquare\n")?;
+    let name_of = |k: usize| names.get(k).map_or_else(|| format!("family{k}"), |(name, _)| name.to_string());
+    for (i, (k, _, t, q)) in chosen.iter().enumerate() {
+        let (half, other) = if in_b[i] { ("b", places_a) } else { ("a", places_b) };
+        for (f, &(_, n, _)) in families.iter().enumerate() {
+            if n > 0 {
+                row(&mut rows, &format!("{k}\t{}\t{half}\t{}\t{}\t{other}\t{}\n", t - q, name_of(f), dots[i][f].0, dots[i][f].1))?;
+            }
+        }
+    }
+    // One half's problem sums of `pick`'s dot, and its mean square, over its places.
+    let half_read = |b: bool, pick: &dyn Fn(usize) -> (BigInt, BigInt)| -> (Vec<BigInt>, BigInt) {
+        let mut sums = vec![BigInt::from(0); order.len()];
+        let mut square = BigInt::from(0);
+        for (i, &(p, _)) in asked.iter().enumerate().filter(|&(i, _)| in_b[i] == b) {
+            let (d, s) = pick(i);
+            sums[p] += d;
+            square += s;
+        }
+        let sums: Vec<BigInt> = sums.into_iter().enumerate().filter(|&(p, _)| (p % 2 == 1) == b).map(|(_, s)| s).collect();
+        let n = BigInt::from(if b { places_b } else { places_a });
+        (sums, (square * 2u32 + &n) / (&n * 2u32))
+    };
+    let line = |family: &str, entries: usize, grain: &str, pick: &dyn Fn(usize) -> (BigInt, BigInt)| {
+        let (sums_b, mean_sq_b) = half_read(true, pick);
+        let (sums_a, mean_sq_a) = half_read(false, pick);
+        let (s_ab, se_ab, z_ab) = stationarity(&sums_b, places_b, places_a);
+        let (s_ba, se_ba, z_ba) = stationarity(&sums_a, places_a, places_b);
+        println!(
+            "FIELD_COVECTOR family={family} entries={entries} grain={grain} places_b={places_b} problems_b={problems_b} s_ab={s_ab} se_ab={se_ab} z_ab_milli={z_ab} places_a={places_a} problems_a={problems_a} s_ba={s_ba} se_ba={se_ba} z_ba_milli={z_ba} mean_sq_a={mean_sq_a} mean_sq_b={mean_sq_b}"
+        );
+    };
+    for (f, &(_, n, grain)) in families.iter().enumerate() {
+        if n > 0 {
+            line(&name_of(f), n, &grain.to_string(), &|i| dots[i][f].clone());
+        }
+    }
+    line("all", material, "-", &|i| dots[i].iter().fold((BigInt::from(0), BigInt::from(0)), |(d, s), (x, y)| (d + x, s + y)));
+    println!(
+        "FIELD_COVECTOR_READ places={} problems={} families={} entries={material} averaged=1 read_ms={read_ms} realization_ms={} host_threads={} ms={}",
+        asked.len(),
+        order.len(),
+        families.iter().filter(|f| f.1 > 0).count(),
+        realization_us / 1000,
+        rayon::current_num_threads(),
+        started.elapsed().as_millis()
+    );
+    Ok(())
+}
+
 /// The nearest-rank quartiles `(q25, median, q75)` of `values` (each the `⌈p n⌉`-th smallest), none for no values.
 fn rank_quartiles<T: Ord + Copy>(mut values: Vec<T>) -> Option<(T, T, T)> {
     if values.is_empty() {
@@ -5595,6 +5854,144 @@ mod tests {
         }
         let enumerated = String::from_utf8(std::fs::read(dir.join("L/ENUMERATED.tsv")).expect("rows")).unwrap();
         assert_eq!(enumerated.lines().count(), 1 + 11 * 6, "the held read's rows, a point's six places each");
+        let _ = std::fs::remove_dir_all(&dir);
+    }
+
+    /// [agent-inferred, November 9] The two-limb sum of products is the unbounded integers' sum, the extremes of 128 bits
+    /// included, and refuses past `2^255`.
+    #[test]
+    fn a_sum_of_products_in_two_limbs_is_the_integers_sum() {
+        use num_bigint::BigInt;
+        let values = [0i128, 1, -1, 7, -13, i128::MAX, i128::MIN, i128::MIN + 1, 1 << 64, -(1 << 64) + 3, (1 << 100) + 12345, -(1 << 90) - 777, u64::MAX as i128];
+        let (mut sum, mut want) = (ProductSum::default(), BigInt::from(0));
+        for (n, &x) in values.iter().enumerate() {
+            for &y in &values[n..] {
+                // Two extreme products and their negatives keep the sum inside 2^255 at every step.
+                sum.add_product(x, y).unwrap();
+                want += BigInt::from(x) * BigInt::from(y);
+                assert_eq!(sum.big(), want, "{x} · {y}");
+                sum.add_product(x, -y.max(-i128::MAX)).unwrap();
+                want -= BigInt::from(x) * BigInt::from(y.max(-i128::MAX));
+                assert_eq!(sum.big(), want, "{x} · −{y}");
+            }
+        }
+        let mut past = ProductSum::default();
+        past.add_product(i128::MIN, i128::MIN).unwrap();
+        assert!(past.add_product(i128::MIN, i128::MIN).is_err(), "two products of 2^254 reach 2^255");
+    }
+
+    /// [measurement; theory, November 9 04:40] One half's stationarity test by hand: problem sums 3 and 5 of two places
+    /// each against two places, `S = 8/4 = 2`, `SE = √(4/16) = 1/2` (floor 0), `z = 4`; the sums times `4^k` (a grain `2^k`
+    /// finer) give the same `z`; equal sums read `inf`, one problem `none`.
+    #[test]
+    fn a_halfs_stationarity_reads_its_problem_sums() {
+        use num_bigint::BigInt;
+        let sums = |v: &[i64]| -> Vec<BigInt> { v.iter().map(|&x| BigInt::from(x)).collect() };
+        assert_eq!(stationarity(&sums(&[3, 5]), 2, 2), ("2".to_string(), "0".to_string(), "4000".to_string()));
+        assert_eq!(stationarity(&sums(&[3 << 20, 5 << 20]), 2, 2).2, "4000", "z does not depend on the grain");
+        assert_eq!(stationarity(&sums(&[-3 << 20, -5 << 20]), 2, 2).2, "-4000");
+        assert_eq!(stationarity(&sums(&[11, -4, 7, 2]), 6, 5).2, stationarity(&sums(&[11 << 8, -4 << 8, 7 << 8, 2 << 8]), 6, 5).2);
+        assert_eq!(stationarity(&sums(&[2, 2]), 2, 2).2, "inf");
+        assert_eq!(stationarity(&sums(&[9]), 1, 2), ("5".to_string(), "none".to_string(), "none".to_string()));
+    }
+
+    /// [measurement; theory, November 9 04:36] `covector-field` end to end on the host: an energy field whose temperature
+    /// learns, two conditional sections in, with its averaged constitution kept, read at six held places of four problems
+    /// (halves of two problems each). Each row of `COVECTOR.tsv` is `⟨g_f(i), Σ_other g_f⟩` and `‖g_f(i)‖²` over law (D)'s
+    /// per-place covectors at `θ̄` (not the live `θ`), formed here in unbounded integers; a state with no average is refused;
+    /// the state is read, never written.
+    #[test]
+    fn the_covector_reading_reads_law_ds_places_at_the_average() {
+        use holonics::hnn::tower::field::conditional_place_covectors;
+        use num_bigint::BigInt;
+        let dir = std::env::temp_dir().join(format!("holonics-covector-{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&dir);
+        std::fs::create_dir_all(&dir).expect("dir");
+        let at = |name: &str| dir.join(name).to_string_lossy().into_owned();
+        let put = |name: &str, bytes: &[u8]| {
+            std::fs::write(dir.join(name), bytes).expect("write");
+            (at(name), sha256(bytes).expect("sha"))
+        };
+        let (codec, problems) = toy();
+        let reach = problems.iter().map(|(q, _, _)| q.len() + codec.answer).max().unwrap();
+        let d = FieldDeclaration { alphabet: codec.alphabet(), width: 8, heads: 2, modes: 3, still: 1, contacts: 4, ticks: 2, frames: 2, reach, lanes: 1, depth: 0, energy: true };
+        let keys: Vec<u8> = (0..1u64 << 13).flat_map(|i| mix(0x5EED, i).to_be_bytes()).collect();
+        let mut field = Field::found(d, &keys).unwrap();
+        let families = field.layout().families.clone();
+        for (n, v) in field.theta.iter_mut().enumerate() {
+            let k = mix(0x11E5, n as u64) as u32 as i32 as i64;
+            let grain = families.iter().find(|(s, l, _)| (*s..*s + *l).contains(&n)).unwrap().2;
+            *v = ((k << grain) >> 32) as i32;
+        }
+        let l = field.layout().clone();
+        field.theta[l.pace..l.pace + d.paced_heads() * (d.alphabet + 1)].fill(0);
+        let mut learner = FieldLearner::new(field, 14);
+        learner.temper_learns = true;
+        let held_set = encoded_problems(&codec, &problems_of(TOY), &learner.field).unwrap();
+        let void = codec.void();
+        let truth_of = |p: &(Vec<usize>, Vec<usize>, usize), letters: &[usize]| truth_with_voids(void, p, letters);
+        let truths: Vec<Vec<usize>> = held_set.iter().map(|p| truth_of(p, &p.1)).collect();
+        let resolved: Vec<Vec<bool>> = truths.iter().map(|t| vec![false; t.len()]).collect();
+        let views: Vec<Region> = truths.iter().zip(&resolved).map(|(c, u)| Region { classes: c, unresolved: u, faces: &[], locked: &[], echo: &[], domain: None, port: None }).collect();
+        let blocks: Vec<Vec<usize>> = held_set.iter().map(|p| vec![p.0.len(), p.0.len() + 1]).collect();
+        let owners: Vec<usize> = (0..held_set.len()).collect();
+        let (codec_at, codec_sha) = put("CODEC", codec.to_text().as_bytes());
+        let (units, units_sha) = put("UNITS", b"founded-units-v1 0\n");
+        let (held, held_sha) = put("HELD", TOY);
+        let args = |state: &str, sha: &str, out: &str| -> Vec<String> { ["covector-field", state, sha, &codec_at, &codec_sha, &units, &units_sha, &held, &held_sha, "6", &at(out)].iter().map(|s| s.to_string()).collect() };
+        learner.section_conditional(&views, &owners, &blocks, &mut host()).expect("a section");
+        let (bare, bare_sha) = put("BARE", learner.to_text().as_bytes());
+        assert!(covector_field(&args(&bare, &bare_sha, "N"), &mut host()).is_err(), "a state with no average");
+        learner.average_section();
+        learner.section_conditional(&views, &owners, &blocks, &mut host()).expect("a second section");
+        learner.average_section();
+        let averaged = learner.averaged_field();
+        assert!(averaged.theta != learner.field.theta, "the average lags the live θ");
+        let text = learner.to_text();
+        let (state, state_sha) = put("STATE", text.as_bytes());
+        covector_field(&args(&state, &state_sha, "C"), &mut host()).expect("covector");
+        assert_eq!(std::fs::read(dir.join("STATE")).expect("state"), text.as_bytes(), "the state is read, never written");
+        // The reading's places and halves, formed here: problems in their first place's order, odd positions half B.
+        let chosen = enumerated_places(&held_set, 6, &truth_of);
+        let mut order: Vec<usize> = Vec::new();
+        for (k, _, _, _) in &chosen {
+            if !order.contains(k) {
+                order.push(*k);
+            }
+        }
+        assert!(order.len() == 4 && chosen.len() == 6, "six places of four problems");
+        let views: Vec<Region> = order.iter().map(|&k| Region { classes: &truths[k], unresolved: &resolved[k], faces: &[], locked: &[], echo: &[], domain: None, port: None }).collect();
+        let asked: Vec<(usize, usize)> = chosen.iter().map(|(k, truth, t, _)| {
+            assert_eq!(truth, &truths[*k]);
+            (order.iter().position(|o| o == k).unwrap(), *t)
+        }).collect();
+        let read = conditional_place_covectors(&averaged, true, &views, &asked, &mut host(), &mut |_, _, _| {}).unwrap();
+        let live = conditional_place_covectors(&learner.field, true, &views, &asked, &mut host(), &mut |_, _, _| {}).unwrap();
+        assert!(read != live, "the average's covectors are not the live θ's");
+        let in_b: Vec<bool> = asked.iter().map(|&(p, _)| p % 2 == 1).collect();
+        let material = averaged.material_len();
+        let half_sum = |b: bool| -> Vec<BigInt> { (0..material).map(|j| read.iter().zip(&in_b).filter(|(_, x)| **x == b).map(|(r, _)| BigInt::from(r.covector[j])).sum()).collect() };
+        let (sum_a, sum_b) = (half_sum(false), half_sum(true));
+        let places_b = in_b.iter().filter(|&&b| b).count();
+        let all_families = averaged.families_all();
+        let names = family_names(&averaged);
+        let rows = String::from_utf8(std::fs::read(dir.join("C/COVECTOR.tsv")).expect("rows")).unwrap();
+        let mut rows = rows.lines().skip(1);
+        let mut nonzero = 0;
+        for (i, (k, _, t, q)) in chosen.iter().enumerate() {
+            let (half, other, other_places) = if in_b[i] { ("b", &sum_a, 6 - places_b) } else { ("a", &sum_b, places_b) };
+            for (f, &(start, n, _)) in all_families.iter().enumerate() {
+                if n == 0 {
+                    continue;
+                }
+                let dot: BigInt = (start..start + n).map(|j| BigInt::from(read[i].covector[j]) * &other[j]).sum();
+                let square: BigInt = (start..start + n).map(|j| BigInt::from(read[i].covector[j]) * BigInt::from(read[i].covector[j])).sum();
+                nonzero += usize::from(dot != BigInt::from(0));
+                assert_eq!(rows.next(), Some(format!("{k}\t{}\t{half}\t{}\t{dot}\t{other_places}\t{square}", t - q, names[f].0).as_str()), "place {i}, family {f}");
+            }
+        }
+        assert_eq!(rows.next(), None, "a row a place and family");
+        assert!(nonzero > 0, "some family's covector meets the other half's");
         let _ = std::fs::remove_dir_all(&dir);
     }
 

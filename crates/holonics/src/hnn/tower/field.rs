@@ -5133,6 +5133,165 @@ fn conditional_shares(gs: &[i128], inverse: i128, fine: &Exponential) -> Result<
     Ok(shares)
 }
 
+/// [agent-inferred, November 7] **Law (D)'s chunk**: sixteen places a read, so their `16·alphabet` configurations' material
+/// covectors stand together (about 0.8 GB at a field of 31,223 entries and 101 letters), never a section's.
+pub const CONDITIONAL_CHUNK: usize = 16;
+
+/// Law (D)'s configurations of a chunk of places, `alphabet` a place in letter order: place `(o, t)`'s truth with letter `v`
+/// at `t`, the rest at the truth.
+fn conditional_configurations(truth: &[Region], chunk: &[(usize, usize)], alphabet: usize) -> Vec<Vec<usize>> {
+    chunk
+        .iter()
+        .flat_map(|&(o, t)| {
+            (0..alphabet).map(move |v| {
+                let mut c = truth[o].classes.to_vec();
+                c[t] = v;
+                c
+            })
+        })
+        .collect()
+}
+
+/// Law (D)'s regions of a chunk's configurations ([`conditional_configurations`]), every site resolved.
+fn conditional_regions<'a>(configs: &'a [Vec<usize>], resolved: &'a [Vec<bool>], chunk: &[(usize, usize)], alphabet: usize) -> Vec<Region<'a>> {
+    configs.iter().enumerate().map(|(i, c)| Region { classes: c, unresolved: &resolved[chunk[i / alphabet].0], faces: &[], locked: &[], echo: &[], domain: None, port: None }).collect()
+}
+
+/// Law (D)'s material read of a chunk's regions through `realization`: each configuration's `G` and its material covector
+/// `∂G/∂θ`, every letter's reverse read at weight one.
+type ConditionalReads = (Vec<i128>, Vec<Option<(Vec<i128>, u32)>>);
+fn conditional_material_reads(field: &Field, regions: &[Region], realization: &mut dyn FieldRealization) -> Result<ConditionalReads> {
+    let reads = realization.read_energy_material(field, regions)?;
+    let g: Vec<i128> = reads.iter().map(|r| r.1).collect();
+    Ok((g, reads.into_iter().map(|r| Some((r.0, 0u32))).collect()))
+}
+
+/// [definition; the unified-theory reading of November 7, 20:29, law (D)] **A place's conditional**: its letters' `log₂ w` on
+/// `2^(−32)`, the weights' sum `z` on `2^(−24)` and each letter's share `p(v) = w_v/z` on `2^(−24)`, nearest
+/// ([`conditional_logs`]).
+fn conditional_place_shares(gs: &[i128], inverse: i128, fine: &Exponential) -> Result<(Vec<i128>, i128, Vec<i128>)> {
+    let (logs, w, z) = conditional_logs(gs, inverse, fine)?;
+    let p: Vec<i128> = w.iter().map(|&x| div_nearest(x << MATERIAL_BITS, z.max(1))).collect();
+    Ok((logs, z, p))
+}
+
+/// [definition; the unified-theory reading of November 7, 20:29, law (D)] **One letter's material change at a place**:
+/// `(1/T)(∂G/∂θ(t) − ∂G/∂θ(x_v))` entry by entry from the two material covectors `gt` and `gv`, released to `2^(−24)` of the
+/// material and by `40 − 24` places more on a family whose grain is not the material's (the deposit's chart).
+fn conditional_natural(families: &[(usize, usize, u32)], material: usize, inverse: i128, gt: &[i128], gv: &[i128]) -> Result<Vec<i128>> {
+    const OVER: &str = "a conditional covector past its 128-bit carrier";
+    if gt.len() != material || gv.len() != material {
+        return refuse("a material covector of another length than the field's material");
+    }
+    let mut d = vec![0i128; material];
+    for &(start, len, grain) in families {
+        for i in start..start + len {
+            let scaled = release((gt[i] - gv[i]).checked_mul(inverse).inspect(|v| crate::number::census::reach(OVER, v)).ok_or(TowerError::Refused(OVER))?, MATERIAL_BITS);
+            d[i] = if grain == MATERIAL_BITS { scaled } else { release(scaled, 40 - super::COVECTOR_BITS) };
+        }
+    }
+    Ok(d)
+}
+
+/// [definition; the unified-theory reading of November 7, 20:29, law (D)] **One place's covector**, added into `acc` (the
+/// material's length): `Σ_(v ≠ t) p(v)·2^(k + k_v)·(1/T)(∂G/∂θ(t) − ∂G/∂θ(x_v))` over the letters of nonzero share whose
+/// reverse was read (`reads[v]`, its coin's `k_v`), each letter's term released to the deposit's chart before it is added
+/// ([`conditional_natural`]), at the place's beat `2^k`. Returns the place's operand of the letters' temperature,
+/// `Σ_(v ≠ t) p(v)·2^k·(G(t) − G(x_v))` on `2^(−32)`, over every letter's `G`. The section adds its places' terms into one
+/// covector and one operand, so its material covector is its places' sum entry by entry and its operand theirs
+/// ([`temper_covector`] reads the entry from it).
+#[allow(clippy::too_many_arguments)]
+fn conditional_place_covector(families: &[(usize, usize, u32)], material: usize, inverse: i128, gs: &[i128], reads: &[Option<(Vec<i128>, u32)>], p: &[i128], at: usize, k: u32, acc: &mut [i128]) -> Result<i128> {
+    const OVER: &str = "a conditional covector past its 128-bit carrier";
+    let mt = &reads[at].as_ref().ok_or(TowerError::Refused("a conditional place whose truth was not read"))?.0;
+    let mut gap = 0i128;
+    for v in 0..p.len() {
+        if v == at || p[v] == 0 {
+            continue;
+        }
+        let pv = p[v] << k;
+        let term = release((gs[at] - gs[v]).checked_mul(pv).inspect(|v| crate::number::census::reach(OVER, v)).ok_or(TowerError::Refused(OVER))?, MATERIAL_BITS);
+        gap = gap.checked_add(term).ok_or(TowerError::Refused(OVER))?;
+        if let Some((mv, kv)) = &reads[v] {
+            let weighed = pv << kv;
+            for (a, &x) in acc.iter_mut().zip(&conditional_natural(families, material, inverse, mt, mv)?) {
+                let term = release(x.checked_mul(weighed).inspect(|v| crate::number::census::reach(OVER, v)).ok_or(TowerError::Refused(OVER))?, MATERIAL_BITS);
+                *a = a.checked_add(term).ok_or(TowerError::Refused(OVER))?;
+            }
+        }
+    }
+    Ok(gap)
+}
+
+/// [definition; the unified-theory reading of November 7, 06:57] **The letters' temperature's covector entry** from its
+/// operand `Σ p (G(t) − G(x_v))` on `2^(−32)`: with `T = 2^τ`, `∂l/∂τ = −ln 2 · operand/T`, on `2^(−40)` a unit of `τ`.
+fn temper_covector(gap: i128, inverse: i128) -> Result<i128> {
+    const OVER: &str = "a conditional covector past its 128-bit carrier";
+    let over_t = release(gap.checked_mul(inverse).inspect(|v| crate::number::census::reach(OVER, v)).ok_or(TowerError::Refused(OVER))?, MATERIAL_BITS);
+    let nats = release(over_t.checked_mul(crate::hnn::keyed_modes::ln2_face()).inspect(|v| crate::number::census::reach(OVER, v)).ok_or(TowerError::Refused(OVER))?, LN2_FACE_BITS);
+    Ok(-(nats << (40 - ENERGY_BITS)))
+}
+
+/// [measurement; theory, November 9 04:36] One place's covector of law (D) ([`conditional_place_covectors`]).
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct PlaceCovector {
+    /// The covector the section adds for this place, on each family's grain (the deposit's chart); with the letters'
+    /// temperature learning, its entry is the face of this place's own operand.
+    pub covector: Vec<i128>,
+    /// The place's operand of the letters' temperature, on `2^(−32)`.
+    pub operand: i128,
+    /// `log₂ p(t)` on `2^(−32)`, the place's code negated ([`KernelReceipt::log2_a`]'s place).
+    pub log2_p: i128,
+}
+
+/// [measurement; theory, November 9 04:36] **Law (D)'s covector place by place** (a reading: nothing is deposited and the
+/// learner is not touched): at each place `(o, t)` of `places`, every site of each problem's `truth` resolved, the covector
+/// [`FieldLearner::section_conditional`] adds for that place on `field`. Its letters are put at `t` with the rest at the
+/// truth and read [`CONDITIONAL_CHUNK`] places at a time through `realization` as the section reads them
+/// ([`FieldRealization::read_energy_material`]), so a chunk's letters' materials stand together and a place's are dropped once
+/// its covector is formed; the place's conditional ([`conditional_place_shares`]) weighs its letters' material changes
+/// ([`conditional_place_covector`]); with `temper_learns` the temperature's entry is the face of the place's own operand
+/// ([`temper_covector`]), as the section's is of its places' summed operand. Over a section's places the covectors' other
+/// entries add to the section's covector bit for bit and their operands to the section's operand; the section's temperature
+/// entry is the face of that sum, and the places' own entries differ from it by their faces' rounding. `progress` hears each
+/// chunk's index, the places read so far and the realization's microseconds so far. The places' covectors stand together:
+/// `places × material × 16` bytes.
+pub fn conditional_place_covectors(field: &Field, temper_learns: bool, truth: &[Region], places: &[(usize, usize)], realization: &mut dyn FieldRealization, progress: &mut dyn FnMut(usize, usize, u128)) -> Result<Vec<PlaceCovector>> {
+    if !field.declaration.energy || field.scale.is_some() {
+        return refuse("a conditional covector of a field without one energy");
+    }
+    if places.iter().any(|&(o, t)| o >= truth.len() || t >= truth[o].classes.len() || truth[o].unresolved[t]) {
+        return refuse("a conditional covector needs resolved places, each a problem's");
+    }
+    let alphabet = field.declaration.alphabet;
+    let inverse = temperature_of(-field.theta[field.layout.face_temper], &field.fine)?;
+    let (families, material) = (field.families_all(), field.material_len());
+    let resolved: Vec<Vec<bool>> = truth.iter().map(|r| vec![false; r.classes.len()]).collect();
+    let mut out = Vec::with_capacity(places.len());
+    let mut read_us = 0u128;
+    for (c, chunk) in places.chunks(CONDITIONAL_CHUNK).enumerate() {
+        let configs = conditional_configurations(truth, chunk, alphabet);
+        let regions = conditional_regions(&configs, &resolved, chunk, alphabet);
+        let at = std::time::Instant::now();
+        let (energies, materials) = conditional_material_reads(field, &regions, realization)?;
+        read_us += at.elapsed().as_micros();
+        for (i, &(o, t)) in chunk.iter().enumerate() {
+            let gs = &energies[i * alphabet..(i + 1) * alphabet];
+            let reads = &materials[i * alphabet..(i + 1) * alphabet];
+            let truth_letter = truth[o].classes[t];
+            let (logs, z, p) = conditional_place_shares(gs, inverse, &field.fine)?;
+            let mut covector = vec![0i128; material];
+            let operand = conditional_place_covector(&families, material, inverse, gs, reads, &p, truth_letter, 0, &mut covector)?;
+            if temper_learns {
+                covector[field.layout.face_temper] = temper_covector(operand, inverse)?;
+            }
+            out.push(PlaceCovector { covector, operand, log2_p: logs[truth_letter] - log2_mass(z) });
+        }
+        progress(c, out.len(), read_us);
+    }
+    Ok(out)
+}
+
 /// The width census's read (b) at one place of a conditional: each letter whose weight released to zero below
 /// `2^(−23)` and its weight before the release on `2^(−32)` (eight places finer), the mass the grain drops; the least
 /// nonzero share's places below one; the letters whose share released to zero. Nothing is changed.
@@ -6810,19 +6969,7 @@ impl FieldLearner {
         const OVER: &str = "a conditional covector past its 128-bit carrier";
         let families = f.families_all();
         let material = f.material_len();
-        let natural = |gt: &[i128], gv: &[i128]| -> Result<Vec<i128>> {
-            if gt.len() != material || gv.len() != material {
-                return refuse("a material covector of another length than the field's material");
-            }
-            let mut d = vec![0i128; material];
-            for &(start, len, grain) in &families {
-                for i in start..start + len {
-                    let scaled = release((gt[i] - gv[i]).checked_mul(inverse).inspect(|v| crate::number::census::reach(OVER, v)).ok_or(TowerError::Refused(OVER))?, MATERIAL_BITS);
-                    d[i] = if grain == MATERIAL_BITS { scaled } else { release(scaled, 40 - super::COVECTOR_BITS) };
-                }
-            }
-            Ok(d)
-        };
+        let natural = |gt: &[i128], gv: &[i128]| conditional_natural(&families, material, inverse, gt, gv);
         if shifts.len() != blocks.len() || shifts.iter().zip(blocks).any(|(s, b)| s.len() != b.len()) {
             return refuse("a weighed conditional section needs one shift a place");
         }
@@ -6874,21 +7021,10 @@ impl FieldLearner {
         let (mut weight, mut weight_square, mut least, mut most, mut whole) = (0i128, 0i128, i128::MAX, 0i128, 0usize);
         let mut per_state = Vec::with_capacity(places.len());
         let mut log2_p = Vec::with_capacity(places.len());
-        // [agent-inferred] Sixteen places a read: their `16·alphabet` configurations' covectors stand together (about 0.8 GB at
-        // this field), never a section's.
-        const CHUNK: usize = 16;
+        const CHUNK: usize = CONDITIONAL_CHUNK;
         for (c, chunk) in places.chunks(CHUNK).enumerate() {
-            let configs: Vec<Vec<usize>> = chunk
-                .iter()
-                .flat_map(|&(o, t)| {
-                    (0..alphabet).map(move |v| {
-                        let mut c = truth[o].classes.to_vec();
-                        c[t] = v;
-                        c
-                    })
-                })
-                .collect();
-            let regions: Vec<Region> = configs.iter().enumerate().map(|(i, c)| Region { classes: c, unresolved: &resolved[chunk[i / alphabet].0], faces: &[], locked: &[], echo: &[], domain: None, port: None }).collect();
+            let configs = conditional_configurations(truth, chunk, alphabet);
+            let regions = conditional_regions(&configs, &resolved, chunk, alphabet);
             // Each place's letters' energies and, where a letter's reverse is read, its material covector and its coin's `k`.
             let (energies, materials): (Vec<i128>, Vec<Option<(Vec<i128>, u32)>>) = match coin {
                 None => {
@@ -6899,11 +7035,10 @@ impl FieldLearner {
                         measure.forward_us += t.elapsed().as_micros();
                     }
                     let t = std::time::Instant::now();
-                    let reads = realization.read_energy_material(f, &regions)?;
+                    let reads = conditional_material_reads(f, &regions, realization)?;
                     measure.material_us += t.elapsed().as_micros();
                     measure.regions += regions.len();
-                    let g: Vec<i128> = reads.iter().map(|r| r.1).collect();
-                    (g, reads.into_iter().map(|r| Some((r.0, 0u32))).collect())
+                    reads
                 }
                 Some((tau_bits, key)) => {
                     let asked: Vec<&[usize]> = configs.iter().map(Vec::as_slice).collect();
@@ -6949,9 +7084,8 @@ impl FieldLearner {
                 let gs = &energies[i * alphabet..(i + 1) * alphabet];
                 let reads = &materials[i * alphabet..(i + 1) * alphabet];
                 let at = truth[o].classes[t];
-                // Each letter's `log₂ w = −(G(x_v) − G_min)/T` on 2^(−32), and its weight on 2^(−24).
-                let (logs, w, z) = conditional_logs(gs, inverse, &f.fine)?;
-                let p: Vec<i128> = w.iter().map(|&x| div_nearest(x << MATERIAL_BITS, z.max(1))).collect();
+                // Each letter's `log₂ w = −(G(x_v) − G_min)/T` on 2^(−32), and its share on 2^(−24).
+                let (logs, z, p) = conditional_place_shares(gs, inverse, &f.fine)?;
                 census_conditional_place(logs.iter().map(|&l| l >> (ENERGY_BITS - MATERIAL_BITS)), &p, Some(at), &f.fine)?;
                 if let Some(acc) = unigram_acc.as_mut() {
                     acc.place(&logs, log2_mass(z), at, &f.fine)?;
@@ -6993,22 +7127,11 @@ impl FieldLearner {
                     }
                     deposits.push(place_deposit);
                 }
-                // The place's beat weight `2^k` (one where every place is read).
+                // The place's covector at its beat weight `2^k` (one where every place is read), added into the section's: the
+                // temperature reads every letter's `G`; the material only the letters whose reverse a coin kept.
                 let k = place_shift[c * CHUNK + i];
-                for v in 0..alphabet {
-                    if v == at || p[v] == 0 {
-                        continue;
-                    }
-                    let pv = p[v] << k;
-                    // The temperature reads every letter's `G`; the material only the letters whose reverse a coin kept.
-                    gap += release((gs[at] - gs[v]).checked_mul(pv).inspect(|v| crate::number::census::reach(OVER, v)).ok_or(TowerError::Refused(OVER))?, MATERIAL_BITS);
-                    if let Some((mv, kv)) = &reads[v] {
-                        let weighed = pv << kv;
-                        for (acc, &x) in g.iter_mut().zip(&natural(mt, mv)?) {
-                            *acc += release(x.checked_mul(weighed).inspect(|v| crate::number::census::reach(OVER, v)).ok_or(TowerError::Refused(OVER))?, MATERIAL_BITS);
-                        }
-                    }
-                }
+                let place_gap = conditional_place_covector(&families, material, inverse, gs, reads, &p, at, k, &mut g)?;
+                gap = gap.checked_add(place_gap).ok_or(TowerError::Refused(OVER))?;
                 for (v, &pv) in p.iter().enumerate() {
                     letter_counts[v] += if v == at { (1i128 << MATERIAL_BITS) - pv } else { -pv };
                 }
@@ -7079,9 +7202,7 @@ impl FieldLearner {
             measure.clone()
         });
         if self.temper_learns {
-            let over_t = release(gap.checked_mul(inverse).inspect(|v| crate::number::census::reach(OVER, v)).ok_or(TowerError::Refused(OVER))?, MATERIAL_BITS);
-            let nats = release(over_t.checked_mul(crate::hnn::keyed_modes::ln2_face()).inspect(|v| crate::number::census::reach(OVER, v)).ok_or(TowerError::Refused(OVER))?, LN2_FACE_BITS);
-            g[f.layout.face_temper] = -(nats << (40 - ENERGY_BITS));
+            g[f.layout.face_temper] = temper_covector(gap, inverse)?;
         }
         let transfers: Vec<Option<i64>> = match &self.last {
             Some(prev) => self.field.families_all().iter().map(|&fam| predicted_change_family(&self.field, &g, &prev.step, prev.halvings, fam)).collect(),

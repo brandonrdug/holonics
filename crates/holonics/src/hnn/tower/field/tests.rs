@@ -2752,6 +2752,57 @@ fn a_places_conditional_is_the_enumerated_one() {
     }
 }
 
+/// [measurement; theory, November 9 04:36] **Law (D)'s places' covectors add to the section's**: on the warm line-shaped field,
+/// two problems and seventeen places (past one chunk of sixteen), the covectors [`conditional_place_covectors`] reads place by
+/// place, summed, are the section's own covector bit for bit on every entry; with the letters' temperature learning, the
+/// places' operands add to the section's and the section's temperature entry is the face of that sum (each place's own entry
+/// the face of its operand). Each place's code is the section's, and the places' covectors differ (a sum of one place
+/// repeated would pass a weaker test).
+#[test]
+fn law_ds_places_covectors_add_to_the_sections() {
+    let mut field = energetic_line();
+    field.theta[field.layout.face_temper] = 10 << MATERIAL_BITS;
+    let one: Vec<usize> = (0..40).map(|t| (t * 7 + t / 3) % 5).collect();
+    let two: Vec<usize> = (0..36).map(|t| (t * 3 + t / 5 + 1) % 5).collect();
+    let (none_one, none_two) = (vec![false; 40], vec![false; 36]);
+    let truth = [
+        Region { classes: &one, unresolved: &none_one, faces: &[], locked: &[], echo: &[], domain: None, port: None },
+        Region { classes: &two, unresolved: &none_two, faces: &[], locked: &[], echo: &[], domain: None, port: None },
+    ];
+    let blocks = [vec![3usize, 14, 25], vec![30, 31, 32, 33, 34, 35, 36, 37, 38, 39], vec![1, 5, 9, 20], vec![35]];
+    let owners = [0usize, 0, 1, 1];
+    let places: Vec<(usize, usize)> = blocks.iter().zip(&owners).flat_map(|(b, &o)| b.iter().map(move |&t| (o, t))).collect();
+    assert!(places.len() > CONDITIONAL_CHUNK, "the places run past one chunk");
+    for temper_learns in [false, true] {
+        let mut learner = FieldLearner::new(field.clone(), 14);
+        learner.temper_learns = temper_learns;
+        let mut chunks = Vec::new();
+        let read = conditional_place_covectors(&learner.field, learner.temper_learns, &truth, &places, &mut HostField, &mut |c, n, _| chunks.push((c, n))).unwrap();
+        assert_eq!(chunks, vec![(0, 16), (1, places.len())], "one progress call a chunk");
+        let section = learner.section_conditional(&truth, &owners, &blocks, &mut HostField).unwrap();
+        assert!(section.deposited, "{section:?}");
+        assert_eq!(read.iter().map(|r| r.log2_p).collect::<Vec<_>>(), section.log2_a, "each place's code is the section's");
+        let temper = field.layout.face_temper;
+        let mut sum = vec![0i128; field.material_len()];
+        for r in &read {
+            for (s, &x) in sum.iter_mut().zip(&r.covector) {
+                *s += x;
+            }
+        }
+        let inverse = temperature_of(-field.theta[temper], &field.fine).unwrap();
+        if temper_learns {
+            let operand: i128 = read.iter().map(|r| r.operand).sum();
+            assert_eq!(temper_covector(operand, inverse).unwrap(), section.covector[temper], "the section's temperature entry is the face of its places' operands");
+            assert!(read.iter().all(|r| r.covector[temper] == temper_covector(r.operand, inverse).unwrap()), "each place's entry is the face of its own operand");
+            assert_ne!(section.covector[temper], 0, "the temperature learns here");
+            sum[temper] = section.covector[temper];
+        }
+        assert_eq!(sum, section.covector, "temper_learns={temper_learns}: the places' covectors add to the section's");
+        assert!(sum.iter().any(|&x| x != 0), "a nonzero covector");
+        assert!(read.windows(2).any(|w| w[0].covector != w[1].covector), "the places' covectors differ");
+    }
+}
+
 /// [definition; the unified-theory reading of November 7, 21:08] **Every place on its beat, band zero**: with the bands held
 /// to zero every place is spent at weight one, so the beat section is the full conditional section bit for bit, and its counts
 /// of counts read every place in band zero.
