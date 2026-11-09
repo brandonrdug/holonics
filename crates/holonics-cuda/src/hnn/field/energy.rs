@@ -36,7 +36,7 @@
 //! lanes' indexed collect lays the tables out in the same order on any count of threads.
 
 use super::*;
-use holonics::hnn::tower::field::{BaseHold, EnergyHeldClasses, EnergyLead, EnergyRead, EnergySquare, HeldSite, Shares, SquareCorners, FIRST_HALVINGS, STEP_CARRIER_HALVINGS};
+use holonics::hnn::tower::field::{BaseHold, EnergyHeldClasses, EnergyLead, EnergyOpeningWords, EnergyRead, EnergySquare, HeldSite, Shares, SquareCorners, FIRST_HALVINGS, STEP_CARRIER_HALVINGS};
 use holonics::hnn::tower::{COVECTOR_BITS, FACE_BITS};
 
 /// A region's energy sums on the card (`ENERGY_SUMS` in `kernels/field_energy.cuh`): the locks', the letters' and the
@@ -2315,6 +2315,63 @@ impl CardField<'_> {
         })?;
         let met = self.timed(Kind::Copy, || card.fetch(&upload.met)).map_err(device)?[0] as u128;
         self.times.pairs += met;
+        self.times.reads += 1;
+        self.times.read_ns += started.elapsed().as_nanos();
+        Ok(out)
+    }
+
+    /// [measurement; theory, November 9 09:34, the word reading] **Each place's opening address words on the card** (the host's
+    /// `Field::energy_opening_words` at each `(classes, site)`): every site of the configuration resolved, each batch opened as
+    /// the energy's read opens it ([`CardField::energy_open`]: its staging, `field_open`'s rows with the moment's term) and its
+    /// key and probe words read as `energy_cell` and the width law's lists read them ([`CardField::energy_opening_words`]: the
+    /// opening's chart, `Q r̂⁰ + b_q` into the key half of `qkv`, `P r̂⁰ + b_p` into `pr` with `field_moment_add_probe`), then each
+    /// region's key rows (every site's, one fetch a region) and probe rows at its place and neighbours (one fetch) taken from
+    /// those carriers; no class list is built and no tick is taken. The places batched by the card's memory (each region
+    /// budgeted for its opening, [`energy_base_octets`]).
+    pub fn energy_opening_word_reads(&mut self, field: &Field, places: &[(&[usize], usize)]) -> Result<Vec<EnergyOpeningWords>> {
+        let d = field.declaration;
+        if !d.energy || field.scale.is_some() {
+            return Err(TowerError::Refused("an energy read of a field whose faces are not one energy's forces"));
+        }
+        if places.iter().any(|&(c, t)| t >= c.len()) {
+            return Err(TowerError::Refused("an opening word read's site outside its configuration"));
+        }
+        let card = self.card;
+        let started = Instant::now();
+        let m2 = 2 * d.complex();
+        let (words, _upload, face_octets) = self.upload(field, None)?;
+        let lengths: Vec<usize> = places.iter().map(|(c, _)| c.len()).collect();
+        let octets = |sites: usize| energy_base_octets(&d, sites, field.widen);
+        let batches = self.energy_cut(&lengths, &octets, self.budget.saturating_sub(face_octets) / 5 * 4)?;
+        let owned: Vec<Owned> = places.iter().map(|(c, _)| Owned { classes: c.to_vec(), unresolved: vec![false; c.len()], faces: Vec::new(), locked: Vec::new() }).collect();
+        let resolved: Vec<Region> = owned.iter().map(Owned::region).collect();
+        admit_regions(&d, &resolved)?;
+        let sited: Vec<(Vec<Option<Shares>>, Vec<bool>)> = resolved.iter().map(|r| field.energy_sites(r)).collect();
+        let staged: Vec<Region> = resolved.iter().zip(&sited).map(|(r, (faces, locked))| Region { faces, locked, ..*r }).collect();
+        admit_regions(&d, &staged)?;
+        let mut out = Vec::with_capacity(places.len());
+        for batch in batches.into_iter().filter(|b| !b.is_empty()) {
+            let peak = lengths[batch.clone()].iter().map(|&n| octets(n)).sum::<u64>();
+            self.times.peak_store = self.times.peak_store.max(peak);
+            self.times.batches += 1;
+            let opening = self.energy_open(field, &staged[batch.clone()], &words, false)?;
+            let mut opened = opening.words;
+            let held = self.energy_opening_words(field, &mut opened, &opening.st)?;
+            for (k, r) in batch.enumerate() {
+                let (first, end) = (opening.st.region_off[k] as usize, opening.st.region_off[k + 1] as usize);
+                let t = places[r].1;
+                let sites: Vec<usize> = (t.saturating_sub(1)..=(t + 1).min(end - first - 1)).collect();
+                let g = first + sites[0];
+                // Each carrier's rows come in one fetch: the region's `qkv` rows (the key half of each), and the `pr` rows of the
+                // adjacent sites read.
+                let qkv = self.timed(Kind::Copy, || card.fetch_range(&held.qkv, first * 2 * m2, (end - first) * 2 * m2)).map_err(device)?;
+                let pr = self.timed(Kind::Copy, || card.fetch_range(&held.pr, g * m2, sites.len() * m2)).map_err(device)?;
+                let keys = (0..end - first).map(|i| qkv[i * 2 * m2..i * 2 * m2 + m2].to_vec()).collect();
+                let probes = (0..sites.len()).map(|i| pr[i * m2..(i + 1) * m2].to_vec()).collect();
+                out.push(EnergyOpeningWords { site: t, sites, keys, probes });
+            }
+            self.status(&opening.st.status)?;
+        }
         self.times.reads += 1;
         self.times.read_ns += started.elapsed().as_nanos();
         Ok(out)

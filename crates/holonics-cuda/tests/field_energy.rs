@@ -516,6 +516,48 @@ fn the_tiny_held_class_reads_on_the_card_are_the_hosts() {
     }
 }
 
+/// [measurement; theory, November 9 09:34 and 09:42, the word reading] **A place's opening words on the card are the host's**:
+/// on every ring set, on two lanes and under the width law at a share of one, the tiny truths' key words at every site and
+/// probe words at a place's sites read, at both ends and inside, and at one inner place under every letter
+/// (`CardField::energy_opening_word_reads`, read from the card's own `qkv` and `pr` carriers, against
+/// `Field::energy_opening_words`), read in one batch and again two regions a batch, equal; the width law's tree is built on the
+/// host from these words (`LeafTree`, as `ClassLists::widened` builds the card's lists), so it is the host's where they are.
+#[test]
+#[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
+fn the_tiny_opening_words_on_the_card_are_the_hosts() {
+    let opened = Card::open(0).unwrap();
+    let mut card = CardField::open(&opened).unwrap();
+    let short = vec![1usize, 4, 0, 2, 2, 3, 1];
+    let long: Vec<usize> = (0..13).map(|t| (t * 3 + t / 4) % 5).collect();
+    let letters: Vec<Vec<usize>> = (0..5)
+        .map(|c| {
+            let mut x = long.clone();
+            x[7] = c;
+            x
+        })
+        .collect();
+    let places: Vec<(&[usize], usize)> = [(&short, 0), (&short, 3), (&short, 6), (&long, 0), (&long, 12)].into_iter().map(|(c, t)| (c.as_slice(), t)).chain(letters.iter().map(|x| (x.as_slice(), 7))).collect();
+    let laned = |still: usize| energetic_with(FieldDeclaration { width: 16, lanes: 2, ..tiny_declaration(still) });
+    let own: Vec<(String, Field)> = (0..=2).map(|s| (format!("still {s}"), energetic(s))).chain((0..=1).map(|s| (format!("laned still {s}"), laned(s)))).collect();
+    let widened = own.iter().map(|(name, f)| {
+        let mut w = f.clone();
+        w.widen = Some(1);
+        (format!("{name} widened"), w)
+    });
+    let fields: Vec<(String, Field)> = own.iter().cloned().chain(widened).collect();
+    for (name, field) in &fields {
+        let host: Vec<_> = places.iter().map(|&(c, t)| field.energy_opening_words(c, t).unwrap()).collect();
+        let whole = card.energy_opening_word_reads(field, &places).unwrap();
+        card.energy_batch_regions(Some(2));
+        let cut = card.energy_opening_word_reads(field, &places).unwrap();
+        card.energy_batch_regions(None);
+        let first = whole.iter().zip(&host).position(|(c, h)| c != h);
+        println!("ENERGY_WORDS tiny {name} bit_equal={} cut_bit_equal={} first_difference={first:?}", whole == host, cut == host);
+        assert_eq!(whole, host, "{name}: the card's opening words");
+        assert_eq!(cut, host, "{name}: the card's opening words two regions a batch");
+    }
+}
+
 /// [measurement; theory, November 9 08:13 and 08:15, the held-under reading] **An energy held under a base on the card is the
 /// host's, and under itself the plain read**: on every ring set, on two lanes and under the width law at a share of one, the
 /// tiny truths and every letter at one inner place, each held under the field itself, under a base whose pair contraction

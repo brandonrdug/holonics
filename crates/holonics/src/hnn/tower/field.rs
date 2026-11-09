@@ -1291,61 +1291,11 @@ impl ClassLists {
     pub fn widened(keys: &[Vec<(i64, i64)>], probes_of: &[Vec<(i64, i64)>], definite: Vec<bool>, b: usize, cap: usize) -> (Self, usize) {
         let sites = keys.len();
         let modes = keys.first().map_or(0, Vec::len);
-        let base = |w: &[(i64, i64)]| -> u32 { (0..b).rev().fold(0u32, |c, li| 3 * c + shell(w[li].0, w[li].1)) };
-        // The tree: node 0..3^b are the base classes; each split node holds its mode and its three children.
-        #[derive(Clone)]
-        struct Node {
-            split: Option<(usize, [usize; 3])>,
-            leaf: u32,
-        }
-        let mut nodes: Vec<Node> = (0..3usize.pow(b as u32)).map(|_| Node { split: None, leaf: u32::MAX }).collect();
-        let mut members: Vec<Vec<usize>> = vec![Vec::new(); nodes.len()];
-        for t in 0..sites {
-            members[base(&keys[t]) as usize].push(t);
-        }
-        // Split breadth-first: (node, the first mode it may split by).
-        let mut queue: std::collections::VecDeque<(usize, usize)> = (0..nodes.len()).map(|c| (c, b)).collect();
-        while let Some((node, from)) = queue.pop_front() {
-            let count = members[node].iter().filter(|&&t| definite[t]).count();
-            if count <= cap {
-                continue;
-            }
-            let mode = (from..modes).find(|&li| {
-                let mut seen = [false; 3];
-                for &t in members[node].iter().filter(|&&t| definite[t]) {
-                    seen[shell(keys[t][li].0, keys[t][li].1) as usize] = true;
-                }
-                seen.iter().filter(|&&x| x).count() > 1
-            });
-            let Some(li) = mode else { continue };
-            let children = [nodes.len(), nodes.len() + 1, nodes.len() + 2];
-            for _ in 0..3 {
-                nodes.push(Node { split: None, leaf: u32::MAX });
-                members.push(Vec::new());
-            }
-            for t in std::mem::take(&mut members[node]) {
-                members[children[shell(keys[t][li].0, keys[t][li].1) as usize]].push(t);
-            }
-            nodes[node].split = Some((li, children));
-            for c in children {
-                queue.push_back((c, li + 1));
-            }
-        }
-        // The leaves, numbered in node order.
-        let mut leaves = 0u32;
-        for node in nodes.iter_mut().filter(|n| n.split.is_none()) {
-            node.leaf = leaves;
-            leaves += 1;
-        }
-        // A word's leaf and depth down the branches from a base node.
-        let descend = |mut node: usize, w: &[(i64, i64)]| -> (usize, usize) {
-            let mut depth = b;
-            while let Some((li, children)) = nodes[node].split {
-                node = children[shell(w[li].0, w[li].1) as usize];
-                depth += 1;
-            }
-            (node, depth)
-        };
+        let tree = LeafTree::build(keys, &definite, b, cap);
+        let nodes = &tree.nodes;
+        let leaves = tree.leaves();
+        let base = |w: &[(i64, i64)]| -> u32 { tree.base(w) as u32 };
+        let descend = |node: usize, w: &[(i64, i64)]| -> (usize, usize) { tree.descend(node, w) };
         let class: Vec<u32> = (0..sites).map(|t| nodes[descend(base(&keys[t]) as usize, &keys[t]).0].leaf).collect();
         let mut probe_class = Vec::with_capacity(sites);
         let mut probes_all = Vec::with_capacity(sites);
@@ -1398,9 +1348,9 @@ impl ClassLists {
             probes_all.push(reached);
             crossings.push(crossed.iter().filter(|&&x| x).count() as u32);
         }
-        let mut lists = Self::of(class, definite, leaves as usize).probing(probe_class, probes_all);
+        let mut lists = Self::of(class, definite, leaves).probing(probe_class, probes_all);
         lists.crossings = crossings;
-        (lists, leaves as usize)
+        (lists, leaves)
     }
 
     /// The lists with each site's key (§16.20): the sources a near field holds.
@@ -1434,6 +1384,110 @@ impl ClassLists {
     /// Whether receiver `i` listens to every definite site (it is open, §15.9).
     pub fn listens(&self, i: usize) -> bool {
         !self.definite[i]
+    }
+}
+
+/// [definition; the unified-theory reading of November 7, 23:34] **The width law's tree over a region's key words**
+/// ([`ClassLists::widened`], whose lists are its leaves): nodes `0..3^b` are the base classes (`b` modes' shells); a node whose
+/// definite members number past `cap` splits by the first mode from its parent's split mode on (from `b` at a base node) that
+/// leaves those members on more than one shell, into three children by that mode's shell, breadth-first, until each leaf
+/// holds at most `cap` or the modes are spent. [measurement; theory, November 9 09:42, the word reading] Kept as a value so a
+/// reading names each node's parent, split mode and members, and each word's path down it.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct LeafTree {
+    pub b: usize,
+    pub nodes: Vec<LeafNode>,
+}
+
+/// One node of a [`LeafTree`]: its parent (`None` at a base class), the mode it splits by with its three children by that
+/// mode's shell (`None` at a leaf), the sites whose key words descend to it and how many of them are definite (the count the
+/// split reads), and its leaf's number (`u32::MAX` where it splits).
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct LeafNode {
+    pub parent: Option<usize>,
+    pub split: Option<(usize, [usize; 3])>,
+    pub members: usize,
+    pub definite: usize,
+    pub leaf: u32,
+}
+
+impl LeafTree {
+    /// The tree of `keys` (a site's words by mode) with their `definite` flags, `b` base modes and the share `cap`.
+    pub fn build(keys: &[Vec<(i64, i64)>], definite: &[bool], b: usize, cap: usize) -> Self {
+        let modes = keys.first().map_or(0, Vec::len);
+        let empty = LeafNode { parent: None, split: None, members: 0, definite: 0, leaf: u32::MAX };
+        let mut tree = LeafTree { b, nodes: vec![empty.clone(); 3usize.pow(b as u32)] };
+        let mut members: Vec<Vec<usize>> = vec![Vec::new(); tree.nodes.len()];
+        for (t, w) in keys.iter().enumerate() {
+            members[tree.base(w)].push(t);
+        }
+        // Split breadth-first: (node, the first mode it may split by).
+        let mut queue: std::collections::VecDeque<(usize, usize)> = (0..tree.nodes.len()).map(|c| (c, b)).collect();
+        while let Some((node, from)) = queue.pop_front() {
+            let count = members[node].iter().filter(|&&t| definite[t]).count();
+            (tree.nodes[node].members, tree.nodes[node].definite) = (members[node].len(), count);
+            if count <= cap {
+                continue;
+            }
+            let mode = (from..modes).find(|&li| {
+                let mut seen = [false; 3];
+                for &t in members[node].iter().filter(|&&t| definite[t]) {
+                    seen[shell(keys[t][li].0, keys[t][li].1) as usize] = true;
+                }
+                seen.iter().filter(|&&x| x).count() > 1
+            });
+            let Some(li) = mode else { continue };
+            let children = [tree.nodes.len(), tree.nodes.len() + 1, tree.nodes.len() + 2];
+            for _ in 0..3 {
+                tree.nodes.push(LeafNode { parent: Some(node), ..empty.clone() });
+                members.push(Vec::new());
+            }
+            for t in std::mem::take(&mut members[node]) {
+                members[children[shell(keys[t][li].0, keys[t][li].1) as usize]].push(t);
+            }
+            tree.nodes[node].split = Some((li, children));
+            for c in children {
+                queue.push_back((c, li + 1));
+            }
+        }
+        // The leaves, numbered in node order.
+        let mut leaves = 0u32;
+        for node in tree.nodes.iter_mut().filter(|n| n.split.is_none()) {
+            node.leaf = leaves;
+            leaves += 1;
+        }
+        tree
+    }
+
+    /// The leaves' count (the lists' classes).
+    pub fn leaves(&self) -> usize {
+        self.nodes.iter().filter(|n| n.split.is_none()).count()
+    }
+
+    /// A word's base class: its first `b` modes' shells.
+    pub fn base(&self, w: &[(i64, i64)]) -> usize {
+        (0..self.b).rev().fold(0usize, |c, li| 3 * c + shell(w[li].0, w[li].1) as usize)
+    }
+
+    /// A word's leaf and its address's depth down the branches from `node` (`b` at a base class, one more a split passed).
+    pub fn descend(&self, mut node: usize, w: &[(i64, i64)]) -> (usize, usize) {
+        let mut depth = self.b;
+        while let Some((li, children)) = self.nodes[node].split {
+            node = children[shell(w[li].0, w[li].1) as usize];
+            depth += 1;
+        }
+        (node, depth)
+    }
+
+    /// A word's path: the nodes it descends from its base class to its leaf, in order.
+    pub fn path(&self, w: &[(i64, i64)]) -> Vec<usize> {
+        let mut node = self.base(w);
+        let mut path = vec![node];
+        while let Some((li, children)) = self.nodes[node].split {
+            node = children[shell(w[li].0, w[li].1) as usize];
+            path.push(node);
+        }
+        path
     }
 }
 
@@ -4830,6 +4884,12 @@ pub trait FieldRealization {
     fn read_energy_held_classes(&mut self, field: &Field, places: &[(&[usize], usize)]) -> Result<Vec<EnergyHeldClasses>> {
         places.par_iter().map(|&(c, t)| field.energy_held_classes(c, t)).collect()
     }
+    /// [measurement; theory, November 9 09:34, the word reading] Each place's opening address words ([`Field::energy_opening_words`]
+    /// at its configuration and site, every site resolved), on the host in parallel unless the realization reads them from its
+    /// own buffers.
+    fn read_energy_opening_words(&mut self, field: &Field, places: &[(&[usize], usize)]) -> Result<Vec<EnergyOpeningWords>> {
+        places.par_iter().map(|&(c, t)| field.energy_opening_words(c, t)).collect()
+    }
     /// [definition; agent-inferred, November 7] An energy field's material covector `∂G/∂θ` and `G` a region
     /// ([`Field::energy_material`]), read on the host in parallel unless the realization reads them itself.
     fn read_energy_material(&mut self, field: &Field, regions: &[Region]) -> Result<Vec<(Vec<i128>, i128)>> {
@@ -4999,6 +5059,9 @@ impl FieldRealization for LanesField<'_> {
     }
     fn read_energy_held_classes(&mut self, field: &Field, places: &[(&[usize], usize)]) -> Result<Vec<EnergyHeldClasses>> {
         self.card.read_energy_held_classes(field, places)
+    }
+    fn read_energy_opening_words(&mut self, field: &Field, places: &[(&[usize], usize)]) -> Result<Vec<EnergyOpeningWords>> {
+        self.card.read_energy_opening_words(field, places)
     }
     fn read_energies_under(&mut self, field: &Field, base: &Field, regions: &[&[usize]], hold: BaseHold) -> Result<Vec<i128>> {
         self.card.read_energies_under(field, base, regions, hold)
@@ -7604,7 +7667,7 @@ impl FieldLearner {
 mod energy;
 pub mod moment;
 mod scale;
-pub use energy::{BaseHold, EnergyHeldClasses, EnergyLead, EnergyPairKinds, EnergyRead, EnergyRest, HeldSite, RestEnd, RestMode, RestTick, RestTry, EnergySquare, EnergyTangentRead, SquareCorners, ENERGY_BITS, FIRST_HALVINGS, STEP_CARRIER_HALVINGS};
+pub use energy::{BaseHold, EnergyHeldClasses, EnergyLead, EnergyOpeningWords, EnergyPairKinds, EnergyRead, EnergyRest, HeldSite, RestEnd, RestMode, RestTick, RestTry, EnergySquare, EnergyTangentRead, SquareCorners, ENERGY_BITS, FIRST_HALVINGS, STEP_CARRIER_HALVINGS};
 pub use scale::Scale;
 
 #[cfg(test)]

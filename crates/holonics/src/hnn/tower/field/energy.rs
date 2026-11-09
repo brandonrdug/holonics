@@ -2245,6 +2245,32 @@ impl Field {
         Ok(EnergyHeldClasses { site, sites, heads, read })
     }
 
+    /// [measurement; theory, November 9 09:34, the word reading] **The address words a configuration's opening reads its
+    /// classes from, at a place** ([`EnergyOpeningWords`]): every site of `classes` resolved and opened as [`Field::energy_g`]
+    /// opens it (the opening `x⁰`, its lanes' chart): every site's unframed key word `q = Q r̂⁰ + b_q` (the sources' addresses,
+    /// every one of which the width law's tree reads), and at `site − 1`, `site` and `site + 1` (those inside the configuration)
+    /// the probe word `p = P r̂⁰ + b_p + s` with its moment added, each `[2M]` (every head's `n` modes' real parts, then their
+    /// imaginary parts), as `energy_words` forms them and `energy_classes` reads them: each head's class is its first `b`
+    /// modes' [`shell`] trits (or under the width law the leaf its words descend, [`LeafTree`]). A reading of the opening only:
+    /// no tick is taken. A realization reads the same words from its own buffers ([`FieldRealization::read_energy_opening_words`]).
+    pub fn energy_opening_words(&self, classes: &[usize], site: usize) -> Result<EnergyOpeningWords> {
+        if !self.declaration.energy {
+            return refuse("an energy read of a field whose faces are not one energy's forces");
+        }
+        if site >= classes.len() {
+            return refuse("an opening word read's site outside its configuration");
+        }
+        let none = vec![false; classes.len()];
+        let region = Region { classes, unresolved: &none, faces: &[], locked: &[], echo: &[], domain: None, port: None };
+        let Relaxed { cell, held, .. } = self.energy_relax(&region, 0, None, None)?;
+        let (q, pr) = self.energy_words(&cell.read, &held.moment, &self.reaches())?;
+        let m2 = 2 * self.declaration.complex();
+        let sites: Vec<usize> = (site.saturating_sub(1)..=(site + 1).min(classes.len() - 1)).collect();
+        let keys = (0..classes.len()).map(|s| q[s * m2..(s + 1) * m2].to_vec()).collect();
+        let probes = sites.iter().map(|&s| pr[s * m2..(s + 1) * m2].to_vec()).collect();
+        Ok(EnergyOpeningWords { site, sites, keys, probes })
+    }
+
     /// [measurement] **A region's energy read** ([`EnergyRead`]): the energy at the opening and at the last tick, each
     /// tick's halvings, and the energy's reads.
     pub fn energy_read(&self, region: &Region) -> Result<EnergyRead> {
@@ -2947,6 +2973,19 @@ pub struct HeldSite {
     pub class: u32,
     pub probe_class: u32,
     pub support: Vec<u32>,
+}
+
+/// [measurement; theory, November 9 09:34, the word reading] **A configuration's opening address words at a place**
+/// ([`Field::energy_opening_words`]): the place `site`, the sites read (`site − 1`, `site`, `site + 1` inside the
+/// configuration), every site's unframed key word (`keys[s]` at site `s`), and the probe word with its moment at each site
+/// read (`probes[k]` at `sites[k]`), `[2M]`: head `h`'s mode `l` at `h·n + l` (its real part) and `M + h·n + l` (its
+/// imaginary part), the integers the realization holds.
+#[derive(Clone, Debug, Default, PartialEq, Eq)]
+pub struct EnergyOpeningWords {
+    pub site: usize,
+    pub sites: Vec<usize>,
+    pub keys: Vec<Vec<i64>>,
+    pub probes: Vec<Vec<i64>>,
 }
 
 /// [measurement; theory, November 9, the class reading] **A configuration's held classes at a place**

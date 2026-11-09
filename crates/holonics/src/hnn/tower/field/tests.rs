@@ -3488,6 +3488,88 @@ fn a_held_class_read_is_the_relaxations_lists_and_descent() {
     assert!(shaped(1).energy_held_classes(&CLASSES, 0).is_err());
 }
 
+/// [measurement; theory, November 9 09:34, the word reading] **A place's opening words are what its classes are read from**: on
+/// the energy fixtures of every ring set and on two lanes, at every place of a short and a long resolved configuration, the
+/// sites read are the place and its neighbours inside the configuration, a key word is read at every site, each word holds
+/// `2M` integers, and each head's class and probe class at each site ([`Field::energy_held_classes`]) are the fold of its
+/// first `b` key and probe modes' [`shell`] trits. Under the width law (a share of one) the words are the plain field's (the
+/// law changes no word), and the [`LeafTree`] built from every site's key words is the lists' own: each read site's key path
+/// ends at its class's leaf and its probe path at its probe class's leaf, every path starts at its base class and steps from
+/// parent to child by the parent's split mode, and each node's members are the sites whose key paths pass it; some node
+/// splits (else the tree reads nothing). A site outside its configuration and a field without one energy are refused.
+#[test]
+fn a_places_opening_words_are_what_its_classes_are_read_from() {
+    let long: Vec<usize> = (0..13).map(|t| (t * 3 + t / 4) % 5).collect();
+    let laned = |still: usize| {
+        let mut field = shaped_with(FieldDeclaration { energy: true, width: 16, lanes: 2, ..tiny_declaration(still) });
+        let (l, d) = (field.layout.clone(), field.declaration);
+        let (dw, m2) = (d.width, 2 * d.complex());
+        field.theta[l.pace..l.pace + d.paced_heads() * (d.alphabet + 1)].fill(0);
+        field.theta[l.face_temper] = 0;
+        for (start, len) in [(l.v, m2 * dw), (l.v_bias, m2), (l.out, dw * m2), (l.out_bias, dw), (l.w, dw * d.contacts), (l.w_bias, dw)] {
+            field.theta[start..start + len].fill(0);
+        }
+        field
+    };
+    let fields: Vec<(String, Field)> = (0..=2).map(|s| (format!("still {s}"), energetic(s))).chain((0..=1).map(|s| (format!("laned still {s}"), laned(s)))).collect();
+    let (mut bridged, mut split) = (false, false);
+    for (name, field) in &fields {
+        let d = field.declaration;
+        let (n, m, b) = (d.modes, d.complex(), d.class_trits());
+        let mut widened = field.clone();
+        widened.widen = Some(1);
+        for config in [&CLASSES[..], &long[..]] {
+            let len = config.len();
+            for t in 0..len {
+                let read = field.energy_opening_words(config, t).unwrap();
+                let expected: Vec<usize> = (t.saturating_sub(1)..=(t + 1).min(len - 1)).collect();
+                assert_eq!((read.site, &read.sites), (t, &expected), "{name}, place {t}: the sites read");
+                assert!(read.keys.iter().chain(&read.probes).all(|w| w.len() == 2 * m), "{name}, place {t}: a word of 2M integers");
+                let classes = field.energy_held_classes(config, t).unwrap();
+                let class_of = |word: &[i64], h: usize| (0..b).rev().fold(0u32, |c, l| 3 * c + shell(word[h * n + l], word[m + h * n + l]));
+                assert_eq!(read.keys.len(), len, "{name}, place {t}: a key word a site");
+                for h in 0..d.heads {
+                    for (i, at) in classes.heads[h].iter().enumerate() {
+                        let s = read.sites[i];
+                        assert_eq!((class_of(&read.keys[s], h), class_of(&read.probes[i], h)), (at.class, at.probe_class), "{name}, place {t}, head {h}, site {s}: the trits' classes");
+                        bridged |= (0..b).any(|l| shell(read.keys[s][h * n + l], read.keys[s][m + h * n + l]) == 1);
+                    }
+                }
+                assert_eq!(widened.energy_opening_words(config, t).unwrap(), read, "{name}, place {t}: the width law changes no word");
+                let wide = widened.energy_held_classes(config, t).unwrap();
+                let modes_of = |word: &[i64], h: usize| -> Vec<(i64, i64)> { (0..n).map(|l| (word[h * n + l], word[m + h * n + l])).collect() };
+                for h in 0..d.heads {
+                    let keys: Vec<Vec<(i64, i64)>> = read.keys.iter().map(|w| modes_of(w, h)).collect();
+                    let tree = LeafTree::build(&keys, &vec![true; len], b, 1);
+                    split |= tree.nodes.iter().any(|node| node.split.is_some());
+                    let paths: Vec<Vec<usize>> = keys.iter().map(|w| tree.path(w)).collect();
+                    for (node, at) in tree.nodes.iter().enumerate() {
+                        assert_eq!(at.members, paths.iter().filter(|p| p.contains(&node)).count(), "{name}, place {t}, head {h}, node {node}: its members");
+                    }
+                    for (w, path) in keys.iter().zip(&paths) {
+                        assert!(path[0] == tree.base(w) && tree.nodes[path[0]].parent.is_none(), "{name}, place {t}, head {h}: a path starts at its base class");
+                        for step in path.windows(2) {
+                            let (li, children) = tree.nodes[step[0]].split.expect("a path passes split nodes");
+                            assert!(children.contains(&step[1]) && tree.nodes[step[1]].parent == Some(step[0]) && li >= b, "{name}, place {t}, head {h}: a step by its parent's split");
+                        }
+                    }
+                    for (i, at) in wide.heads[h].iter().enumerate() {
+                        let s = read.sites[i];
+                        let probe = modes_of(&read.probes[i], h);
+                        let (key_leaf, probe_leaf) = (tree.nodes[*paths[s].last().unwrap()].leaf, tree.nodes[*tree.path(&probe).last().unwrap()].leaf);
+                        assert_eq!((key_leaf, probe_leaf), (at.class, at.probe_class), "{name}, place {t}, head {h}, site {s}: the tree's leaves are the lists'");
+                        assert_eq!(tree.descend(tree.base(&probe), &probe).1, b + tree.path(&probe).len() - 1, "{name}, place {t}, head {h}, site {s}: the address's depth");
+                    }
+                }
+            }
+        }
+    }
+    assert!(bridged, "some mode stands on the bridge (else the trits read only the plates)");
+    assert!(split, "some node of the width law's tree splits");
+    assert!(energetic(1).energy_opening_words(&CLASSES, CLASSES.len()).is_err());
+    assert!(shaped(1).energy_opening_words(&CLASSES, 0).is_err());
+}
+
 /// [measurement; theory, November 9 08:13 and 08:15, the held-under reading] **An energy held under a base holds the base's
 /// maps and nothing else**: on the energy fixtures of every ring set, plain and under the width law at a share of one, on a
 /// short and a long resolved configuration and every letter at one inner place of the long one: under itself, either hold

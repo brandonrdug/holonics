@@ -4580,6 +4580,215 @@ pub(super) fn class_field(args: &[String], realization: &mut dyn FieldRealizatio
     Ok(())
 }
 
+/// [definition; theory, November 9 09:34, the word reading] `arcsin(2^(−k))` on `2^(−100)`, `k ≥ 1`, by its series
+/// `Σ_n t_n` with `t_0 = x` and `t_n = t_(n−1) x² (2n − 1)² / (2n (2n + 1))`, summed until a term releases to zero (each term
+/// at most a quarter of the one before, so the sum's floor error is under one unit a term). A reading's navigator, never a
+/// law's: it names the cone band's width in phase.
+fn arcsin_power(k: u32) -> u128 {
+    const ONE: u32 = 100;
+    let mut term: u128 = 1u128 << (ONE - k);
+    let (mut sum, mut n) = (term, 1u128);
+    while term > 0 {
+        term = (term >> (2 * k)) * (2 * n - 1) * (2 * n - 1) / ((2 * n) * (2 * n + 1));
+        sum += term;
+        n += 1;
+    }
+    sum
+}
+
+/// [measurement; theory, November 9 09:34, the word reading] **The cone band's half-width in phase** for `ε = 2^(−k)`: a mode
+/// `w = r e^(iφ)` has `λ = |re² − im²|/(re² + im²) = |cos 2φ|`, and the cone `|re| = |im|` lies at `cos 2φ = 0`, so `λ < ε`
+/// exactly where `φ` lies within `½ arcsin ε` of the cone. Returned in micro-radians and milli-degrees, nearest, with
+/// `π = 6 arcsin ½` from the same series (`arcsin 1 = 3 arcsin ½` where `k = 0`).
+fn band_half_width(k: u32) -> (u128, u128) {
+    let half_pi_third = arcsin_power(1);
+    let arcsin = if k == 0 { 3 * half_pi_third } else { arcsin_power(k) };
+    let pi = 6 * half_pi_third;
+    let micro = (arcsin * 1_000_000 / 2 + (1u128 << 99)) >> 100;
+    let milli_degrees = (arcsin * 180_000 + pi) / (2 * pi);
+    (micro, milli_degrees)
+}
+
+/// [measurement; theory, November 9 09:34 and 09:42, the word reading] **`word-field STATE STATE_SHA CODEC CODEC_SHA UNITS
+/// UNITS_SHA HELD HELD_SHA PLACES OUT`**: the address words a held place's classes and lock supports are read from, written so
+/// a changed support between two states can be told apart as (a) the receiver's own probe path moved, (b) a far source's key
+/// moved, or (c) the width law's tree restructured. At the held places the trainer's held read takes ([`enumerated_places`],
+/// `FIELD_HELD_ALL_OF` as there), at live `θ`, each place's truth configuration is opened as the energy opens it
+/// ([`FieldRealization::read_energy_opening_words`]: on the card from its own `qkv` and `pr` carriers,
+/// [`holonics::hnn::tower::field::Field::energy_opening_words`] on the host); every site of a truth is resolved, so definite.
+///
+/// - `WORDS.tsv`, at `t` and `t ± 1`, a row a site, head, mode and kind: `problem`, `place` (in the answer), `site_offset`
+///   (−1, 0, +1), `head`, `mode`, `kind` (`key`, the unframed `q`; `probe`, `p` with its moment added), `re`, `im` (the
+///   realization's integers), `trit` ([`holonics::hnn::tower::field::shell`]: 2 where `re > |im|`, 0 where `re < −|im|`, 1
+///   otherwise), `band_milli` (`λ = |re² − im²|/(re² + im²)` in thousandths, nearest; `-` for the zero word), `inside` (1 where
+///   `λ < ε`, the code's own near-cone test, [`holonics::hnn::tower::field::probes`]), `base` (1 for the class's own `b` modes,
+///   [`holonics::hnn::tower::field::FieldDeclaration::class_trits`]) and `eps_bits` (`ε = 2^(−eps_bits)`). A probe row's `ε`
+///   is its receiver's own, `band_bits(w)` at its address's depth `w` (`b` at the base law; under the width law `b` plus the
+///   splits its probe path passes); the code reads no band on a key, so a key row's `inside` is the geometry at `band_bits(b)`.
+/// - `KEYS.tsv`, every site's key word (each a definite source): `problem`, `place`, `site` (its index in the region), `head`,
+///   `mode`, `re`, `im`, `trit`, `band_milli`.
+/// - Under the width law (`widen` at share `cap`), each head's tree as the realization builds it
+///   ([`holonics::hnn::tower::field::LeafTree`] from the key words of every site, the build `ClassLists::widened` makes on the
+///   host's lanes from the card's words): `TREE.tsv`, a row a node (`problem`, `place`, `head`, `node`, `parent`, `split_mode`,
+///   `members`, `definite`, `leaf`; `-` for none), and `PATHS.tsv`, every site's key path and each receiver's probe path at
+///   `t ± 1` (`problem`, `place`, `head`, `site`, `kind`, `path` as the node list, `depth`, `eps_bits`).
+///
+/// No letter. Prints one `FIELD_WORD_READ` line: the places and rows of each file, the declaration's heads, modes and `b`, the
+/// width law, the base law's `ε = 2^(−band_bits(b))` and its half-width in phase ([`band_half_width`]: `½ arcsin ε`, the
+/// code's geometry), the receivers by their own `ε` (`eps_counts`, `bits:count`), the base modes inside their band by kind,
+/// the read's time and the host's threads. A reading only: nothing is deposited and no state is written.
+pub(super) fn word_field(args: &[String], realization: &mut dyn FieldRealization) -> Result<()> {
+    use holonics::hnn::tower::field::{band_bits, probes, shell, LeafTree};
+    if args.len() != 11 {
+        return Err("word-field STATE STATE_SHA CODEC CODEC_SHA UNITS UNITS_SHA HELD HELD_SHA PLACES OUT".into());
+    }
+    let started = std::time::Instant::now();
+    let mut learner = FieldLearner::from_text(std::str::from_utf8(&pinned_read(&args[1], &args[2], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
+    declared_clocks(&mut learner.field);
+    if !learner.field.declaration.energy {
+        return Err("word-field reads a field whose faces are one energy's forces".into());
+    }
+    let units = units_of(&args[5], &args[6])?;
+    let codec = FieldCodec::from_text(std::str::from_utf8(&pinned_read(&args[3], &args[4], CODEC_BUDGET)?)?, units)?;
+    let held_text = problems_of(&pinned_read(&args[7], &args[8], READ_BUDGET as usize)?);
+    let places = positive(&args[9])?;
+    let out = Path::new(&args[10]);
+    std::fs::create_dir(out)?;
+    let field = learner.field;
+    let held_set = encoded_problems(&codec, &held_text, &field)?;
+    let void = codec.void();
+    let truth_of = |p: &(Vec<usize>, Vec<usize>, usize), letters: &[usize]| -> Vec<usize> { truth_with_voids(void, p, letters) };
+    let chosen = enumerated_places(&held_set, places, &truth_of);
+    let asked: Vec<(&[usize], usize)> = chosen.iter().map(|(_, truth, t, _)| (truth.as_slice(), *t)).collect();
+    let reading = std::time::Instant::now();
+    let reads = realization.read_energy_opening_words(&field, &asked).map_err(|e| e.to_string())?;
+    let read_ms = reading.elapsed().as_millis();
+    if reads.len() != chosen.len() {
+        return Err("word-field: a read that is not one a place".into());
+    }
+    let d = field.declaration;
+    let (heads, n, m, b) = (d.heads, d.modes, d.complex(), d.class_trits());
+    let k = band_bits(b);
+    // `λ` nearest in thousandths, `⌊(2000 |re² − im²| + s) / 2s⌋` with `s = re² + im²`, in a 128-bit carrier.
+    let band_milli = |re: i64, im: i64| -> Result<String> {
+        const PAST: &str = "word-field: a word past its 128-bit carrier";
+        let (rr, ii) = (re as i128 * re as i128, im as i128 * im as i128);
+        let total = rr.checked_add(ii).ok_or(PAST)?;
+        if total == 0 {
+            return Ok("-".to_string());
+        }
+        let twice = (rr - ii).abs().checked_mul(2000).and_then(|v| v.checked_add(total)).ok_or(PAST)?;
+        Ok((twice / (2 * total)).to_string())
+    };
+    let inside = |re: i64, im: i64, bits: u32| !probes(std::iter::once((re, im)), bits).is_empty();
+    let modes_of = |word: &[i64], h: usize| -> Vec<(i64, i64)> { (0..n).map(|l| (word[h * n + l], word[m + h * n + l])).collect() };
+    let mut words = rows_file(&out.join("WORDS.tsv"), "problem\tplace\tsite_offset\thead\tmode\tkind\tre\tim\ttrit\tband_milli\tinside\tbase\teps_bits\n")?;
+    let mut keys_file = rows_file(&out.join("KEYS.tsv"), "problem\tplace\tsite\thead\tmode\tre\tim\ttrit\tband_milli\n")?;
+    let mut trees = match field.widen {
+        Some(_) => Some((
+            rows_file(&out.join("TREE.tsv"), "problem\tplace\thead\tnode\tparent\tsplit_mode\tmembers\tdefinite\tleaf\n")?,
+            rows_file(&out.join("PATHS.tsv"), "problem\tplace\thead\tsite\tkind\tpath\tdepth\teps_bits\n")?,
+        )),
+        None => None,
+    };
+    let (mut word_rows, mut key_rows, mut node_rows, mut path_rows) = (0u64, 0u64, 0u64, 0u64);
+    let (mut key_inside, mut probe_inside, mut base_words) = (0u64, 0u64, 0u64);
+    let mut eps_counts: std::collections::BTreeMap<u32, u64> = std::collections::BTreeMap::new();
+    let text_of = |v: Option<usize>| v.map_or("-".to_string(), |x| x.to_string());
+    for ((problem, truth, t, q), read) in chosen.iter().zip(&reads) {
+        if read.site != *t || read.keys.len() != truth.len() || read.probes.len() != read.sites.len() {
+            return Err("word-field: a read at another place".into());
+        }
+        let place = t - q;
+        // Each head's tree, where the width law builds one, from every site's key words (every site of a truth definite).
+        let head_trees: Vec<Option<LeafTree>> = (0..heads)
+            .map(|h| field.widen.map(|cap| LeafTree::build(&read.keys.iter().map(|w| modes_of(w, h)).collect::<Vec<_>>(), &vec![true; truth.len()], b, cap)))
+            .collect();
+        // Each receiver's own band at `t ± 1`, by head and site read: `band_bits` at its probe address's depth.
+        let receiver_bits = |h: usize, i: usize| -> u32 {
+            match &head_trees[h] {
+                Some(tree) => band_bits(b + tree.path(&modes_of(&read.probes[i], h)).len() - 1),
+                None => k,
+            }
+        };
+        let mut text = String::new();
+        for (i, &s) in read.sites.iter().enumerate() {
+            let offset = s as i64 - *t as i64;
+            for h in 0..heads {
+                let bits = receiver_bits(h, i);
+                *eps_counts.entry(bits).or_default() += 1;
+                for l in 0..n {
+                    for (kind, word, eps) in [("key", &read.keys[s], k), ("probe", &read.probes[i], bits)] {
+                        let (re, im) = (word[h * n + l], word[m + h * n + l]);
+                        let within = inside(re, im, eps);
+                        if l < b {
+                            base_words += 1;
+                            match kind {
+                                "key" => key_inside += u64::from(within),
+                                _ => probe_inside += u64::from(within),
+                            }
+                        }
+                        text.push_str(&format!("{problem}\t{place}\t{offset}\t{h}\t{l}\t{kind}\t{re}\t{im}\t{}\t{}\t{}\t{}\t{eps}\n", shell(re, im), band_milli(re, im)?, u8::from(within), u8::from(l < b)));
+                        word_rows += 1;
+                    }
+                }
+            }
+        }
+        row(&mut words, &text)?;
+        let mut text = String::new();
+        for (s, word) in read.keys.iter().enumerate() {
+            for h in 0..heads {
+                for l in 0..n {
+                    let (re, im) = (word[h * n + l], word[m + h * n + l]);
+                    text.push_str(&format!("{problem}\t{place}\t{s}\t{h}\t{l}\t{re}\t{im}\t{}\t{}\n", shell(re, im), band_milli(re, im)?));
+                    key_rows += 1;
+                }
+            }
+        }
+        row(&mut keys_file, &text)?;
+        if let Some((tree_file, path_file)) = trees.as_mut() {
+            let (mut nodes, mut paths) = (String::new(), String::new());
+            for (h, tree) in head_trees.iter().enumerate() {
+                let Some(tree) = tree else { continue };
+                for (node, at) in tree.nodes.iter().enumerate() {
+                    let leaf = (at.leaf != u32::MAX).then_some(at.leaf as usize);
+                    nodes.push_str(&format!("{problem}\t{place}\t{h}\t{node}\t{}\t{}\t{}\t{}\t{}\n", text_of(at.parent), text_of(at.split.map(|(li, _)| li)), at.members, at.definite, text_of(leaf)));
+                    node_rows += 1;
+                }
+                let mut path_row = |s: usize, kind: &str, word: &[(i64, i64)]| {
+                    let path = tree.path(word);
+                    let depth = b + path.len() - 1;
+                    let eps = if kind == "probe" { band_bits(depth).to_string() } else { "-".to_string() };
+                    let list: Vec<String> = path.iter().map(usize::to_string).collect();
+                    paths.push_str(&format!("{problem}\t{place}\t{h}\t{s}\t{kind}\t{}\t{depth}\t{eps}\n", list.join(",")));
+                    path_rows += 1;
+                };
+                for (s, word) in read.keys.iter().enumerate() {
+                    path_row(s, "key", &modes_of(word, h));
+                }
+                for (i, &s) in read.sites.iter().enumerate() {
+                    path_row(s, "probe", &modes_of(&read.probes[i], h));
+                }
+            }
+            row(tree_file, &nodes)?;
+            row(path_file, &paths)?;
+        }
+    }
+    let (micro, milli_degrees) = band_half_width(k);
+    let eps_text: Vec<String> = eps_counts.iter().map(|(bits, count)| format!("{bits}:{count}")).collect();
+    println!(
+        "FIELD_WORD_READ places={} word_rows={word_rows} key_rows={key_rows} tree_nodes={node_rows} path_rows={path_rows} heads={heads} modes={n} class_trits={b} widen={} band_bits={k} epsilon=2^-{k} half_width_micro_rad={micro} half_width_milli_deg={milli_degrees} eps_counts={} key_inside={key_inside}/{} probe_inside={probe_inside}/{} read_ms={read_ms} host_threads={} ms={}",
+        reads.len(),
+        field.widen.map_or("none".to_string(), |c| c.to_string()),
+        eps_text.join(","),
+        base_words / 2,
+        base_words / 2,
+        rayon::current_num_threads(),
+        started.elapsed().as_millis()
+    );
+    Ok(())
+}
+
 /// [measurement; theory, November 9 08:13 and 08:15, the held-under reading] **`held-under BASE BASE_SHA STATE STATE_SHA CODEC
 /// CODEC_SHA UNITS UNITS_SHA HELD HELD_SHA PLACES OUT HOLD`**: the trainer's held enumerated read at `STATE`'s live `θ` with
 /// each configuration's discrete maps held at `BASE`'s live `θ`. At the held places the trainer's held read takes
@@ -6286,6 +6495,129 @@ mod tests {
             }
         }
         assert!(lead_field(&args(&other, &other_sha, &at("P")), &mut host()).is_err(), "a field without one energy");
+        let _ = std::fs::remove_dir_all(&dir);
+    }
+
+    /// [measurement; theory, November 9 09:34 and 09:42, the word reading] `word-field` end to end on the host: an energy field
+    /// whose families are drawn from the key stream reads six held places' truths, plain and under the width law at a share of
+    /// one. `WORDS.tsv` holds a row a site read, head, mode and kind, each word the host's own `Field::energy_opening_words`, its
+    /// trit `shell`'s, its band the nearest thousandth of `|re² − im²|/(re² + im²)`, `inside` the near-cone test read here from
+    /// its definition at the row's `ε` (a receiver's own at its address's depth); `KEYS.tsv` a row every site, head and mode;
+    /// under the width law `TREE.tsv` is each head's `LeafTree` from every site's key words and `PATHS.tsv` every site's key path
+    /// and each receiver's probe path down it. The band's half-width in phase is `½ arcsin ε` (45°, 15°, 7.239° and 3.590° for
+    /// `k = 0..3`); the state is read, never written; and a field without one energy is refused.
+    #[test]
+    fn the_word_reading_reads_every_site_head_mode_and_kind() {
+        use holonics::hnn::tower::field::{band_bits, shell, LeafTree};
+        assert_eq!(band_half_width(0), (785_398, 45_000));
+        assert_eq!(band_half_width(1), (261_799, 15_000));
+        assert_eq!(band_half_width(2), (126_340, 7_239));
+        assert_eq!(band_half_width(3), (62_664, 3_590));
+        let dir = std::env::temp_dir().join(format!("holonics-words-{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&dir);
+        std::fs::create_dir_all(&dir).expect("dir");
+        let at = |name: &str| dir.join(name).to_string_lossy().into_owned();
+        let put = |name: &str, bytes: &[u8]| {
+            std::fs::write(dir.join(name), bytes).expect("write");
+            (at(name), sha256(bytes).expect("sha"))
+        };
+        let (codec, problems) = toy();
+        let reach = problems.iter().map(|(q, _, _)| q.len() + codec.answer).max().unwrap();
+        let d = FieldDeclaration { alphabet: codec.alphabet(), width: 8, heads: 2, modes: 5, still: 1, contacts: 4, ticks: 2, frames: 2, reach, lanes: 1, depth: 0, energy: true };
+        let keys: Vec<u8> = (0..1u64 << 13).flat_map(|i| mix(0x5EED, i).to_be_bytes()).collect();
+        let mut field = Field::found(d, &keys).unwrap();
+        let families = field.layout().families.clone();
+        for (n, v) in field.theta.iter_mut().enumerate() {
+            let k = mix(0x30BD, n as u64) as u32 as i32 as i64;
+            let grain = families.iter().find(|(s, l, _)| (*s..*s + *l).contains(&n)).unwrap().2;
+            *v = ((k << grain) >> 32) as i32;
+        }
+        let l = field.layout().clone();
+        field.theta[l.pace..l.pace + d.paced_heads() * (d.alphabet + 1)].fill(0);
+        let mut widened = field.clone();
+        widened.widen = Some(1);
+        let plain = FieldLearner::new(Field::found(FieldDeclaration { energy: false, ..d }, &keys).unwrap(), 4);
+        let (other, other_sha) = put("PLAIN", plain.to_text().as_bytes());
+        let (codec_at, codec_sha) = put("CODEC", codec.to_text().as_bytes());
+        let (units, units_sha) = put("UNITS", b"founded-units-v1 0\n");
+        let (held, held_sha) = put("HELD", TOY);
+        let args = |state: &str, sha: &str, out: &str| -> Vec<String> { ["word-field", state, sha, &codec_at, &codec_sha, &units, &units_sha, &held, &held_sha, "6", out].iter().map(|s| s.to_string()).collect() };
+        let read_rows = |out: &str, name: &str| -> Vec<String> { String::from_utf8(std::fs::read(dir.join(out).join(name)).expect("rows")).unwrap().lines().skip(1).map(str::to_string).collect() };
+        let (n, m, b) = (d.modes, d.complex(), d.class_trits());
+        let k = band_bits(b);
+        let band = |re: i64, im: i64| -> String {
+            let (rr, ii) = (re as i128 * re as i128, im as i128 * im as i128);
+            if rr + ii == 0 { "-".to_string() } else { ((2000 * (rr - ii).abs() + rr + ii) / (2 * (rr + ii))).to_string() }
+        };
+        let near = |re: i64, im: i64, bits: u32| {
+            let (rr, ii) = (re as i128 * re as i128, im as i128 * im as i128);
+            rr + ii > 0 && ((rr - ii).abs() << bits) < rr + ii
+        };
+        let (mut inside_any, mut deeper) = (false, false);
+        for (name, state_field) in [("plain", field), ("widened", widened)] {
+            let learner = FieldLearner::new(state_field, 4);
+            let text = learner.to_text();
+            let (state, state_sha) = put(&format!("STATE.{name}"), text.as_bytes());
+            word_field(&args(&state, &state_sha, &at(name)), &mut host()).expect("words");
+            assert_eq!(std::fs::read(dir.join(format!("STATE.{name}"))).expect("state"), text.as_bytes(), "{name}: the state is read, never written");
+            let held_set = encoded_problems(&codec, &problems_of(TOY), &learner.field).unwrap();
+            let void = codec.void();
+            let truth_of = |p: &(Vec<usize>, Vec<usize>, usize), letters: &[usize]| truth_with_voids(void, p, letters);
+            let (mut words, mut key_rows, mut nodes, mut paths) = (Vec::new(), Vec::new(), Vec::new(), Vec::new());
+            for (problem, truth, t, q) in &enumerated_places(&held_set, 6, &truth_of) {
+                let read = learner.field.energy_opening_words(truth, *t).unwrap();
+                let modes_of = |word: &[i64], h: usize| -> Vec<(i64, i64)> { (0..n).map(|li| (word[h * n + li], word[m + h * n + li])).collect() };
+                let trees: Vec<Option<LeafTree>> = (0..d.heads).map(|h| learner.field.widen.map(|cap| LeafTree::build(&read.keys.iter().map(|w| modes_of(w, h)).collect::<Vec<_>>(), &vec![true; truth.len()], b, cap))).collect();
+                for (i, &s) in read.sites.iter().enumerate() {
+                    for h in 0..d.heads {
+                        let bits = trees[h].as_ref().map_or(k, |tree| band_bits(b + tree.path(&modes_of(&read.probes[i], h)).len() - 1));
+                        deeper |= bits != k;
+                        for li in 0..n {
+                            for (kind, word, eps) in [("key", &read.keys[s], k), ("probe", &read.probes[i], bits)] {
+                                let (re, im) = (word[h * n + li], word[m + h * n + li]);
+                                inside_any |= near(re, im, eps);
+                                words.push(format!("{problem}\t{}\t{}\t{h}\t{li}\t{kind}\t{re}\t{im}\t{}\t{}\t{}\t{}\t{eps}", t - q, s as i64 - *t as i64, shell(re, im), band(re, im), u8::from(near(re, im, eps)), u8::from(li < b)));
+                            }
+                        }
+                    }
+                }
+                for (s, word) in read.keys.iter().enumerate() {
+                    for h in 0..d.heads {
+                        for li in 0..n {
+                            let (re, im) = (word[h * n + li], word[m + h * n + li]);
+                            key_rows.push(format!("{problem}\t{}\t{s}\t{h}\t{li}\t{re}\t{im}\t{}\t{}", t - q, shell(re, im), band(re, im)));
+                        }
+                    }
+                }
+                for (h, tree) in trees.iter().enumerate() {
+                    let Some(tree) = tree else { continue };
+                    let dash = |v: Option<usize>| v.map_or("-".to_string(), |x| x.to_string());
+                    for (node, at) in tree.nodes.iter().enumerate() {
+                        nodes.push(format!("{problem}\t{}\t{h}\t{node}\t{}\t{}\t{}\t{}\t{}", t - q, dash(at.parent), dash(at.split.map(|(li, _)| li)), at.members, at.definite, dash((at.leaf != u32::MAX).then_some(at.leaf as usize))));
+                    }
+                    let path_of = |s: usize, kind: &str, word: Vec<(i64, i64)>| {
+                        let path = tree.path(&word);
+                        let depth = b + path.len() - 1;
+                        let eps = if kind == "probe" { band_bits(depth).to_string() } else { "-".to_string() };
+                        format!("{problem}\t{}\t{h}\t{s}\t{kind}\t{}\t{depth}\t{eps}", t - q, path.iter().map(usize::to_string).collect::<Vec<_>>().join(","))
+                    };
+                    paths.extend(read.keys.iter().enumerate().map(|(s, w)| path_of(s, "key", modes_of(w, h))));
+                    paths.extend(read.sites.iter().enumerate().map(|(i, &s)| path_of(s, "probe", modes_of(&read.probes[i], h))));
+                }
+            }
+            assert_eq!(read_rows(name, "WORDS.tsv"), words, "{name}: the host's own words, trits, bands and the near-cone test");
+            assert_eq!(read_rows(name, "KEYS.tsv"), key_rows, "{name}: every site's key words");
+            if name == "widened" {
+                assert_eq!(read_rows(name, "TREE.tsv"), nodes, "{name}: each head's tree");
+                assert_eq!(read_rows(name, "PATHS.tsv"), paths, "{name}: the key and probe paths");
+                assert!(nodes.iter().any(|r| r.split('\t').nth(5) != Some("-")), "{name}: some node splits");
+            } else {
+                assert!(!dir.join(name).join("TREE.tsv").exists(), "the base law builds no tree");
+            }
+        }
+        assert!(inside_any, "some mode lies inside its band (else the column reads nothing)");
+        assert!(deeper, "some receiver's address passes a split, so its band is its own");
+        assert!(word_field(&args(&other, &other_sha, &at("P")), &mut host()).is_err(), "a field without one energy");
         let _ = std::fs::remove_dir_all(&dir);
     }
 
