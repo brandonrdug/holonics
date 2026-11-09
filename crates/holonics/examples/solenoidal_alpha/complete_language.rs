@@ -804,6 +804,7 @@ pub(super) fn run_with_execution(
         Some("ring-field") if backend == CompleteLanguageTrainingBackend::HostReference => field_train::ring_field(args),
         Some("depth-field") if backend == CompleteLanguageTrainingBackend::HostReference => field_train::depth_field(args),
         Some("census-field") if backend == CompleteLanguageTrainingBackend::HostReference => field_train::census_field(args),
+        Some("opening-at-force") if backend == CompleteLanguageTrainingBackend::HostReference => field_train::opening_at_force(args),
         Some("restate-field") if backend == CompleteLanguageTrainingBackend::HostReference => field_train::restate_field(args, &mut field_train::host()),
         Some("reach-field") if backend == CompleteLanguageTrainingBackend::HostReference => field_train::reach_field(args, &mut field_train::host()),
         Some("curl-field") if backend == CompleteLanguageTrainingBackend::HostReference => field_train::curl_field(args, &mut field_train::host()),
@@ -914,6 +915,7 @@ pub(super) fn run_field_realized(args: &[String], realization: &mut dyn holonics
         Some("depth-field") => field_train::depth_field(args),
         Some("census-field") => field_train::census_field(args),
         Some("average-open") => field_train::average_open(args),
+        Some("opening-at-force") => field_train::opening_at_force(args),
         _ => Err("a realized field command is train-field, sample-field, currents-field, expansion-field, restate-field, reach-field, opening-field, length-field or order-field".into()),
     }
 }

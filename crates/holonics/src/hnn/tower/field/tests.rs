@@ -2256,6 +2256,14 @@ fn energetic(still: usize) -> Field {
     field
 }
 
+/// [`energetic`] under each opening law of the state: the field's own (`E(u_t)` at a site) and the letters' force
+/// ([`Field::opened_at_force`]), each named for the receipt.
+fn energetic_openings(still: usize) -> [(&'static str, Field); 2] {
+    let field = energetic(still);
+    let force = field.opened_at_force().unwrap();
+    [("own", field), ("force", force)]
+}
+
 /// [definition; the unified-theory reading of November 6, 22:52] **An energy field states its law**: its head line is
 /// `hnn-field-v15` with the energy word, a v14 line reads as a field whose faces are read through the readout, its
 /// material carries the pair's contraction past every other family, and its founding is the line's with the value chart
@@ -2284,14 +2292,13 @@ fn an_energy_head_line_states_its_law() {
 /// sites alone.
 #[test]
 fn each_energy_tick_falls() {
-    for still in 0..=2 {
-        let field = energetic(still);
+    for (still, (opening, field)) in (0..=2).flat_map(|still| energetic_openings(still).map(|f| (still, f))) {
         let read = field.energy_read(&region()).unwrap();
-        assert!(read.last < read.opening, "still {still}: {read:?}");
-        assert!(read.halvings.iter().any(Option::is_some), "still {still}: {read:?}");
+        assert!(read.last < read.opening, "still {still} opening {opening}: {read:?}");
+        assert!(read.halvings.iter().any(Option::is_some), "still {still} opening {opening}: {read:?}");
         let faces = field.faces(&region()).unwrap();
         for (t, &open) in OPEN.iter().enumerate() {
-            assert_eq!(faces[t].is_some(), open, "still {still} site {t}");
+            assert_eq!(faces[t].is_some(), open, "still {still} opening {opening} site {t}");
         }
     }
 }
@@ -2299,12 +2306,12 @@ fn each_energy_tick_falls() {
 /// [definition; the unified-theory reading of November 7, 00:02] **The face is the total derivative of one scalar**:
 /// `z_t(a) = −dG/de_t(a)`, `G(e) = Φ(x^K(e); e)` read through the opening and the ticks at the base's halvings and supports,
 /// so at every open site a central difference of `G` across the site's mixture moved by `±ε(δ_b − δ_a)` reads
-/// `−2ε(z_t(b) − z_t(a))` to the difference's own curvature, on every ring set.
+/// `−2ε(z_t(b) − z_t(a))` to the difference's own curvature, on every ring set, under each opening law (at the letters'
+/// force the opening reads the letter through `Rᵀ`, and the face takes its return `R λ⁰`).
 #[test]
 fn an_energy_face_is_the_total_derivative() {
     let eps = 1i128 << 9;
-    for still in 0..=2 {
-        let field = energetic(still);
+    for (still, (opening, field)) in (0..=2).flat_map(|still| energetic_openings(still).map(|f| (still, f))) {
         let r = region();
         let logits = field.logits(&r).unwrap();
         let alphabet = field.declaration.alphabet as u32;
@@ -2318,7 +2325,7 @@ fn an_energy_face_is_the_total_derivative() {
                 // A tenth of the reading for the difference's curvature, and 2^23 (2^(−9) bits) for the replayed states'
                 // rounding at the state's grain (measured: the gap falls with ε where the reading is large, and scatters by
                 // about 2^21 where it is small).
-                assert!(10 * (dg - predicted).abs() <= predicted.abs() + (10 << 23), "still {still} site {t} letters {a}, {b}: ΔG {dg} against −2ε Δz {predicted} (2^(−32) bits)");
+                assert!(10 * (dg - predicted).abs() <= predicted.abs() + (10 << 23), "still {still} opening {opening} site {t} letters {a}, {b}: ΔG {dg} against −2ε Δz {predicted} (2^(−32) bits)");
             }
         }
     }
@@ -2326,16 +2333,18 @@ fn an_energy_face_is_the_total_derivative() {
 
 /// [definition; the unified-theory reading of November 6, 22:52] **The force is the energy's slope**: at the opening, a
 /// small step's fall is its first-order fall `η Σ_t (|F_t|² − ⟨r̂_t, F_t⟩²/W)` to within the step's own curvature, on every
-/// ring set, with the pair's contraction, the moments and the readout drawn.
+/// ring set, with the pair's contraction, the moments and the readout drawn, under each opening law. [measurement; November
+/// 9] The stepped state's rounding at its grain scatters the fall by about `2^21` (1.2 to 2.4 million at `h` 10 to 13 on the
+/// tiny field, under either opening), and at the letters' force the first-order fall is about half the own-row opening's (the
+/// letters' tangential force is zero there), so the reading allows `2^22` for the grain beside the twentieth.
 #[test]
 fn the_energy_force_is_its_slope() {
-    for still in 0..=2 {
-        let field = energetic(still);
+    for (still, (opening, field)) in (0..=2).flat_map(|still| energetic_openings(still).map(|f| (still, f))) {
         // Steps of 2^(−8) and 2^(−10) of a site's scale: a larger step reads the energy's curvature, a smaller one nears the
         // state's grain and the fall its rounding.
         for h in [8u32, 10] {
             let (predicted, actual, _) = field.energy_fall(&region(), 0, h).unwrap();
-            assert!(predicted > 0 && 20 * (actual - predicted).abs() <= predicted, "still {still} h {h}: fall {actual} against its first order {predicted} (2^(−32) bits)");
+            assert!(predicted > 0 && 20 * (actual - predicted).abs() <= predicted + (20 << 22), "still {still} opening {opening} h {h}: fall {actual} against its first order {predicted} (2^(−32) bits)");
         }
     }
 }
@@ -2437,24 +2446,25 @@ fn energetic_line() -> Field {
 
 /// [definition; the unified-theory reading of November 7, 00:02] **The total derivative holds on a line-shaped field**: on 40
 /// sites (crowds past the near field, far supports by class, four heads, four ticks), a central difference of `G` across an
-/// open site's mixture reads `−2ε(z_b − z_a)`.
+/// open site's mixture reads `−2ε(z_b − z_a)`, under each opening law.
 #[test]
 fn the_total_derivative_holds_on_a_line_shaped_field() {
-    let field = energetic_line();
     let classes: Vec<usize> = (0..40).map(|t| (t * 7 + t / 3) % 5).collect();
     let open: Vec<bool> = (0..40).map(|t| t % 9 == 4).collect();
     let r = Region { classes: &classes, unresolved: &open, faces: &[], locked: &[], echo: &[], domain: None, port: None };
-    let logits = field.logits(&r).unwrap();
     let alphabet = 5u32;
     let base = (1u32 << 16) / alphabet;
     let eps = 1i128 << 9;
-    for t in (0..40).filter(|&t| open[t]) {
-        let z = logits[t].as_ref().unwrap();
-        for (a, b) in [(0u32, 1u32), (2, 4)] {
-            let moved = |sign: i128| -> Shares { (0..alphabet).map(|c| (c, (base as i128 + if c == b { sign * eps } else if c == a { -sign * eps } else { 0 }) as u32)).collect() };
-            let dg = field.energy_g_at(&r, t, &moved(1)).unwrap() - field.energy_g_at(&r, t, &moved(-1)).unwrap();
-            let predicted = -2 * eps * (z[b as usize] - z[a as usize]) as i128;
-            assert!(10 * (dg - predicted).abs() <= predicted.abs() + (10 << 23), "site {t} letters {a}, {b}: ΔG {dg} against −2ε Δz {predicted} (2^(−32) bits)");
+    for (opening, field) in [("own", energetic_line()), ("force", energetic_line().opened_at_force().unwrap())] {
+        let logits = field.logits(&r).unwrap();
+        for t in (0..40).filter(|&t| open[t]) {
+            let z = logits[t].as_ref().unwrap();
+            for (a, b) in [(0u32, 1u32), (2, 4)] {
+                let moved = |sign: i128| -> Shares { (0..alphabet).map(|c| (c, (base as i128 + if c == b { sign * eps } else if c == a { -sign * eps } else { 0 }) as u32)).collect() };
+                let dg = field.energy_g_at(&r, t, &moved(1)).unwrap() - field.energy_g_at(&r, t, &moved(-1)).unwrap();
+                let predicted = -2 * eps * (z[b as usize] - z[a as usize]) as i128;
+                assert!(10 * (dg - predicted).abs() <= predicted.abs() + (10 << 23), "opening {opening} site {t} letters {a}, {b}: ΔG {dg} against −2ε Δz {predicted} (2^(−32) bits)");
+            }
         }
     }
 }
@@ -2487,12 +2497,19 @@ fn squares_agree_at_one_base_on_a_line_shaped_field() {
 
 /// [definition; agent-inferred, November 7] **The energy's material covector is `G`'s slope in its material**: at each family's
 /// largest entry, a central difference of `G` (replayed at the base's halvings under its supports) across `±δ` of the entry
-/// reads `2δ ∂G/∂θ`, on the tiny and the line-shaped fields.
+/// reads `2δ ∂G/∂θ`, on the tiny and the line-shaped fields, under each opening law (at the letters' force the opening's own
+/// row returns `R λ⁰` to the encoding and `E ⊗ λ⁰` to the lift).
 #[test]
 fn the_energy_material_is_g_slope() {
     let line_classes: Vec<usize> = (0..40).map(|t| (t * 7 + t / 3) % 5).collect();
     let line_open: Vec<bool> = (0..40).map(|t| t % 9 == 4).collect();
-    for (name, field, classes, open) in [("tiny", energetic(1), CLASSES.to_vec(), OPEN.to_vec()), ("line", energetic_line(), line_classes, line_open)] {
+    let fields = [
+        ("tiny", energetic(1), CLASSES.to_vec(), OPEN.to_vec()),
+        ("line", energetic_line(), line_classes.clone(), line_open.clone()),
+        ("tiny at the letters' force", energetic(1).opened_at_force().unwrap(), CLASSES.to_vec(), OPEN.to_vec()),
+        ("line at the letters' force", energetic_line().opened_at_force().unwrap(), line_classes, line_open),
+    ];
+    for (name, field, classes, open) in fields {
         let r = Region { classes: &classes, unresolved: &open, faces: &[], locked: &[], echo: &[], domain: None, port: None };
         let (g, _) = field.energy_material(&r).unwrap();
         let l = field.layout.clone();
@@ -2518,6 +2535,49 @@ fn the_energy_material_is_g_slope() {
         }
         println!("{name}: {}", report.join("; "));
     }
+}
+
+/// [definition; theory, November 9 04:10] **At the letters' force the opening returns through `R` and `E` entry by entry**:
+/// on the tiny field under the force opening, at every entry of the lift's matrix `R` and of the encoding rows the region's
+/// letters read (every class's row, through the open sites' uniform mixture; where the opening's `E(u_t) ⊗ λ⁰` and `R λ⁰`
+/// enter), a central difference of `G` across `±δ` of the entry reads `2δ ∂G/∂θ`: entry by entry to a tenth beside the
+/// replayed states' rounding, and over each family to a twentieth of its summed reading. [measurement; November 9] The
+/// replayed states' rounding scatters `ΔG` by at most 1.73 million (`2^20.7`) at every step from `2^(−10)` to `2^(−6)` of the
+/// family's grain while the readings grow with the step (so it is the grain's, not the covector's), and at `2^(−6)` the
+/// summed distance is 0.7% of `R`'s summed reading and 0.2% of `E`'s; so the step is `2^(−6)` and the rounding's allowance
+/// `2^22`. The covectors read here are mostly not the own-row opening's.
+#[test]
+fn at_the_letters_force_the_opening_returns_through_r_and_e() {
+    let field = energetic(1).opened_at_force().unwrap();
+    let r = region();
+    let (g, _) = field.energy_material(&r).unwrap();
+    let (own_g, _) = energetic(1).energy_material(&r).unwrap();
+    let (l, d) = (field.layout.clone(), field.declaration);
+    let dw = d.width;
+    let grain_of = |start: usize| l.families.iter().find(|(s, _, _)| *s == start).unwrap().2;
+    let mut differ = 0usize;
+    for (fam, start, len) in [("read", l.read, dw * dw), ("enc", l.enc, d.alphabet * dw)] {
+        let grain = grain_of(start);
+        let delta = 1i32 << grain.saturating_sub(6);
+        let (mut distance, mut size) = (0i128, 0i128);
+        for k in start..start + len {
+            let moved = |sign: i32| -> i128 {
+                let mut f2 = field.clone();
+                f2.theta[k] += sign * delta;
+                f2.energy_g_replayed(&field, &r).unwrap()
+            };
+            let dg = moved(1) - moved(-1);
+            let predicted = div_nearest(g[k] * delta as i128, 1i128 << (grain + 7));
+            assert!(10 * (dg - predicted).abs() <= predicted.abs() + (10 << 22), "{fam} entry {k}: ΔG {dg} against 2δ ∂G/∂θ {predicted}");
+            distance += (dg - predicted).abs();
+            size += predicted.abs();
+            differ += usize::from(g[k] != own_g[k]);
+        }
+        println!("FORCE_OPENING_RETURN {fam} entries={len} summed_distance={distance} summed_reading={size}");
+        assert!(20 * distance <= size, "{fam}: summed distance {distance} against summed reading {size}");
+    }
+    let entries = dw * dw + d.alphabet * dw;
+    assert!(2 * differ > entries, "the force opening's covector on R and E is mostly the own opening's ({differ} of {entries} differ)");
 }
 
 /// [definition; the unified-theory reading of November 7, 04:05, route (b)] **A contrast step lowers the truth's energy
@@ -3075,4 +3135,94 @@ fn the_lines_step_is_the_deposits() {
         }
     }
     assert!(line_point(&field, &[0; 3], 1).is_err());
+}
+
+/// [definition; theory, November 9 03:56] **The opening at the letters' force is a law of the state**: a learner's text
+/// carries it as one `opening force` line after the material (none where the field opens at its own rows, so a state saved
+/// before the law reads the old opening), the transform (`FieldLearner::opened_at_force`, the `opening-at-force` command's)
+/// keeps every entry of the material and the text reads back to the same learner; a field already under the law, a field
+/// whose faces are not one energy's forces, and such a field's text carrying the line are refused.
+#[test]
+fn the_opening_at_the_letters_force_is_a_law_of_the_state() {
+    let line = |text: &str| text.lines().filter(|l| *l == "opening force").count();
+    let field = energetic(1);
+    let old = FieldLearner::from_text(&FieldLearner::new(field.clone(), 14).to_text()).unwrap();
+    assert_eq!(line(&old.to_text()), 0);
+    assert!(!old.field.opening_at_force);
+    let moved_text = old.opened_at_force().unwrap().to_text();
+    assert_eq!(line(&moved_text), 1);
+    let moved = FieldLearner::from_text(&moved_text).unwrap();
+    assert!(moved.field.opening_at_force);
+    assert_eq!(moved.field.theta, field.theta);
+    assert_eq!(moved.to_text(), moved_text);
+    assert_eq!(Field::from_text(&moved.field.to_text()).unwrap(), moved.field);
+    assert!(moved.opened_at_force().is_err(), "a field already opened at the letters' force");
+    assert!(shaped(1).opened_at_force().is_err(), "a field without one energy");
+    let plain = shaped(1).to_text();
+    let mut lines: Vec<&str> = plain.lines().collect();
+    lines.insert(2, "opening force");
+    assert!(Field::from_text(&lines.join("\n")).is_err(), "a field without one energy carrying the line");
+    // The law changes what is read: the energy at the opening differs.
+    assert_ne!(field.energy_read(&region()).unwrap().opening, moved.field.energy_read(&region()).unwrap().opening);
+}
+
+/// [definition; theory, November 9 04:10] **The move to the letters' force changes the law line and nothing else**: a learner
+/// carrying every part of its state (`θ`, both moments, the averaged constitution, the carried remainders, the family
+/// lengths, the held and the last step, the key), moved, writes its own text with one `opening force` line added, and reads
+/// back with `θ`, the moments, the average, the family lengths and the steps bit-identical to the source's.
+#[test]
+fn the_move_to_the_letters_force_changes_the_law_line_alone() {
+    let mut learner = FieldLearner::new(energetic(1), 14);
+    let (len, theta_len, families) = (learner.field.material_len(), learner.field.theta.len(), learner.field.families_all().len());
+    learner.first = (0..len).map(|k| (k as i128 * 7919 - 40_000) << 20).collect();
+    learner.second = (0..len).map(|k| ((k as i128 * 104_729) % 1_000_003 + 1) << 30).collect();
+    learner.average = Some((0..theta_len).map(|k| ((learner.field.theta[k] as i64) << 8) + (k as i64 % 251)).collect());
+    learner.carried = Some((0..len).map(|k| (k as i64 % 97) - 48).collect());
+    learner.family_rates = Some((0..families).map(|f| (f as i128 + 3) << 24).collect());
+    learner.family_transfer = (0..families).map(|f| -(f as i128) * 1009).collect();
+    learner.family_price = (0..families).map(|f| f as i128 * 2003 + 1).collect();
+    learner.held = Some(HeldStep { step: (0..len).map(|k| k as i128 % 13 - 6).collect(), halvings: 3 });
+    learner.last = Some(HeldStep { step: (0..len).map(|k| k as i128 % 11 - 5).collect(), halvings: 2 });
+    learner.key = Some(0x1234_5678_9ABC_DEF0);
+    let text = learner.to_text();
+    let source = FieldLearner::from_text(&text).unwrap();
+    assert_eq!(source.to_text(), text, "the fixture's text reads back as itself");
+    let moved_text = source.opened_at_force().unwrap().to_text();
+    let lines: Vec<&str> = moved_text.lines().collect();
+    let at = lines.iter().position(|l| *l == "opening force").expect("the law line");
+    let rest: Vec<&str> = lines.iter().enumerate().filter(|&(k, _)| k != at).map(|(_, l)| *l).collect();
+    assert_eq!(rest, text.lines().collect::<Vec<_>>(), "the moved text is the source's with the law line alone added");
+    let moved = FieldLearner::from_text(&moved_text).unwrap();
+    assert!(moved.field.opening_at_force && !source.field.opening_at_force);
+    assert_eq!(moved.field.theta, source.field.theta, "θ");
+    assert_eq!((&moved.first, &moved.second), (&source.first, &source.second), "the moments");
+    assert_eq!(moved.average, source.average, "the averaged constitution");
+    assert_eq!((&moved.family_rates, &moved.family_transfer, &moved.family_price), (&source.family_rates, &source.family_transfer, &source.family_price), "the family lengths");
+    assert_eq!((&moved.held, &moved.last, &moved.carried, moved.key), (&source.held, &source.last, &source.carried, source.key), "the steps, the remainders and the key");
+    assert_eq!(moved, FieldLearner { field: source.field.opened_at_force().unwrap(), ..source.clone() }, "the learner, its law aside");
+}
+
+/// [definition; theory, November 9 03:56] **A state moved to the letters' force opens each site at it**: on every ring set,
+/// at every site of a resolved configuration (its two ends among them), the moved state's opening (read back from its text)
+/// is `x⁰_t = release(Rᵀ E(u_t) + (E₋(u_(t−1)) + E₊(u_(t+1)) + C s_t + b) 2^8, 8)`, the letters' force on `2^(−24)` read
+/// once on the state's grain, where the state it was moved from opens at `E(u_t) + E₋(u_(t−1)) + E₊(u_(t+1)) + C s_t + b`.
+#[test]
+fn a_state_moved_to_the_letters_force_opens_at_it() {
+    for still in 0..=2 {
+        let field = energetic(still);
+        let moved = FieldLearner::from_text(&FieldLearner::new(field.clone(), 14).opened_at_force().unwrap().to_text()).unwrap().field;
+        let dw = field.declaration.width;
+        let mut differs = 0;
+        for t in 0..CLASSES.len() {
+            let old = field.energy_lead_rows(&CLASSES, t).unwrap();
+            let rows = moved.energy_lead_rows(&CLASSES, t).unwrap();
+            let own_opening: Vec<i64> = (0..dw).map(|i| old.letters[i] + old.moment[i]).collect();
+            assert_eq!(old.opening, own_opening, "still {still} site {t}: the field's own opening");
+            assert_eq!((&rows.own, &rows.letters, &rows.moment), (&old.own, &old.letters, &old.moment), "still {still} site {t}: the letters and the moments are the law's");
+            let force: Vec<i64> = (0..dw).map(|i| release(rows.own[i] as i128 + (((rows.letters[i] - rows.encoding[i] + rows.moment[i]) as i128) << 8), 8) as i64).collect();
+            assert_eq!(rows.opening, force, "still {still} site {t}: the opening at the letters' force");
+            differs += usize::from(rows.opening != old.opening);
+        }
+        assert!(differs > 0, "still {still}: the two openings agree at every site");
+    }
 }

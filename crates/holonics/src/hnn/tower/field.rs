@@ -785,7 +785,16 @@ pub struct Field {
     /// past `cap` definite sources extends its address by the next mode's shell, branch by branch ([`ClassLists::widened`]).
     /// Part of the state (a `widen` line after the material): it changes `G`.
     pub widen: Option<usize>,
+    /// [definition; theory, November 9 03:56] **The opening at the letters' force**, where set (an energy field only): each
+    /// site opens at the letters' force the ticks descend, `x⁰_t = F_t = Rᵀ E(u_t) + E₋(u_(t−1)) + E₊(u_(t+1)) + C s_t + b`,
+    /// in place of the own row `E(u_t)` (the energy module's opening law). Part of the state (an `opening force` line after
+    /// the material and the width law's line): it changes `G` and every face. A state without the line keeps the opening
+    /// with the own row; [`Field::opened_at_force`] moves one to this law.
+    pub opening_at_force: bool,
 }
+
+/// The state's line of [`Field::opening_at_force`].
+const OPENING_AT_FORCE_LINE: &str = "opening force";
 
 /// [definition; agent-inferred, November 1] A region: each site's class, whether it is
 /// unresolved (read, and compared with its class), and the sites carried as faces. A site carried as
@@ -1916,7 +1925,7 @@ impl Field {
         let rings: Vec<(usize, Vec<(i64, i64)>)> = ring_periods(declaration.turned_slots(), declaration.reach).into_iter().map(|n| (n, (0..n.min(declaration.reach)).map(|r| ring_phasor(r, n, pi)).collect())).collect();
         let exponential = Exponential::new(FACE_BITS);
         let decays = rings.iter().map(|&(n, _)| (0..declaration.reach).map(|d| skin_decay(d, n, pi, &exponential)).collect()).collect();
-        Self { declaration, theta, layout, rings, decays, exponential, fine: Exponential::new(MATERIAL_BITS), pi, scale: None, per_blank_clock: false, bare_stretch: false, widen: None }
+        Self { declaration, theta, layout, rings, decays, exponential, fine: Exponential::new(MATERIAL_BITS), pi, scale: None, per_blank_clock: false, bare_stretch: false, widen: None, opening_at_force: false }
     }
 
     /// Each turned slot's skin decay on `2^(−30)` at every distance within the reach (a
@@ -4365,6 +4374,10 @@ impl Field {
         if let Some(cap) = self.widen {
             out.push_str(&format!("widen {cap}\n"));
         }
+        if self.opening_at_force {
+            out.push_str(OPENING_AT_FORCE_LINE);
+            out.push('\n');
+        }
         if let Some(s) = &self.scale {
             let glue: Vec<String> = s.glue.iter().map(i32::to_string).collect();
             out.push_str(&format!("scale {} {}\n{}{}\n", s.period, s.split, s.coarse.to_text(), glue.join(" ")));
@@ -4386,6 +4399,13 @@ impl Field {
         let mut field = Self::with_theta(d, theta);
         if let Some(cap) = lines.peek().copied().and_then(|l| l.strip_prefix("widen ")) {
             field.widen = Some(cap.trim().parse::<usize>().map_err(|_| TowerError::Refused("a width law's share that is not a count"))?);
+            lines.next();
+        }
+        if lines.peek().copied().is_some_and(|l| l.trim_end() == OPENING_AT_FORCE_LINE) {
+            if !field.declaration.energy {
+                return refuse("an opening at the letters' force on a field whose faces are not one energy's forces");
+            }
+            field.opening_at_force = true;
             lines.next();
         }
         if let Some(head) = lines.peek().copied().filter(|l| l.starts_with("scale ")) {
@@ -4620,7 +4640,8 @@ impl Field {
         repeat(ol.w_bias, layout.w_bias, dw, f, &face, true);
         repeat(ol.read_bias, layout.read_bias, a, 1, &kept, false);
         repeat(ol.moment_face_bias, layout.moment_face_bias, dw, f, &face, true);
-        Ok((Self::with_theta(d, new), from))
+        // The opening law is the state's and carries through a growth.
+        Ok((Self { opening_at_force: self.opening_at_force, ..Self::with_theta(d, new) }, from))
     }
 
     /// [definition; agent-inferred, November 4, §16.40] **The field with one more lane** (the tower record, D2): a lane of
@@ -4710,7 +4731,8 @@ impl Field {
             }
         }
         debug_assert_eq!(cursor, 4 * old.lane_draws());
-        Ok((Self::with_theta(d, new), from))
+        // The opening law is the state's and carries through a growth.
+        Ok((Self { opening_at_force: self.opening_at_force, ..Self::with_theta(d, new) }, from))
     }
 }
 
@@ -5875,6 +5897,16 @@ impl FieldLearner {
         }
         let drawn = self.drawn + 4 * self.field.declaration.lane_draws();
         Ok(Self { field, first, second, rate_bits: self.rate_bits, drawn, laps: self.laps, held: None, read_held: self.read_held, newton: self.newton, newton_read: self.newton_read, first_rate: self.first_rate, second_rate: self.second_rate, family_rates: None, temper_learns: false, family_transfer: Vec::new(), family_price: Vec::new(), last: None, average: None, carried: None, unigram: None, unigram_step: None, coin_measure: false, key: None })
+    }
+
+    /// [definition; theory, November 9 03:56] **The learner moved to the opening at the letters' force**
+    /// ([`Field::opened_at_force`]): the opening law changes and nothing else. `θ`, the averaged constitution, both moments,
+    /// the family lengths, the held and the last step, the carried remainders, the unigram sums and the key carry over as
+    /// they are (theory, November 9 04:10: no path that opens a moment at zero; a fresh second moment is a recorded
+    /// failure, November 7), so the learner's text gains its field's `opening force` line and is otherwise the same bytes,
+    /// and a run resumes the trained state under the law. A reading-free transform of the state.
+    pub fn opened_at_force(&self) -> Result<Self> {
+        Ok(Self { field: self.field.opened_at_force()?, ..self.clone() })
     }
 
     /// The held step read on `regions` without a deposit: the faces of `regions` under the

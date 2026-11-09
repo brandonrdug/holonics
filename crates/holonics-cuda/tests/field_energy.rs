@@ -3,7 +3,8 @@
 //! the ticks and the opening), logits and energy read (the opening's and the last
 //! tick's energy, every tick's halvings, the reads and the site pairs met), on the tiny `energetic` fixtures of every ring
 //! set (open, carried and locked sites, regions of several lengths read in one batch), and on a founding of the line's
-//! declaration on a synthetic region of 1,500 sites, timed against the host. Run alone under the card's lock:
+//! declaration on a synthetic region of 1,500 sites, timed against the host; each under both opening laws of the state (the
+//! own row `E(u_t)` and the letters' force, `Field::opened_at_force`). Run alone under the card's lock:
 //! `flock -w 900 .local/gpu.lock cargo test --release -p holonics-cuda --test field_energy -- --include-ignored --test-threads=1`.
 use std::time::Instant;
 
@@ -66,6 +67,13 @@ fn energetic_with(d: FieldDeclaration) -> Field {
         field.theta[start..start + len].fill(0);
     }
     field
+}
+
+/// A field under each opening law of the state: its own (`E(u_t)` at a site, which retires once the force opening's claim is
+/// judged) and the letters' force (`Field::opened_at_force`, theory November 9 03:56), each named for the receipt.
+fn openings(field: Field) -> [(&'static str, Field); 2] {
+    let force = field.opened_at_force().unwrap();
+    [("own", field), ("force", force)]
 }
 
 /// A region's owned parts.
@@ -142,7 +150,7 @@ fn first_difference(host: &(Vec<Vec<Option<TowerFace>>>, Vec<Vec<Option<Vec<i64>
 
 /// [measurement] **The tiny energy fields' forward on the card is the host's, bit for bit**: on every ring set, each of the
 /// three regions read alone and all three in one batch (their ticks in lockstep, each at its own halvings), through the
-/// energy read and through the realization's faces and logits.
+/// energy read and through the realization's faces and logits, under each opening law.
 #[test]
 #[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
 fn the_tiny_energy_forward_on_the_card_is_the_hosts() {
@@ -150,29 +158,28 @@ fn the_tiny_energy_forward_on_the_card_is_the_hosts() {
     let mut card = CardField::open(&opened).unwrap();
     let owned = tiny_regions();
     let regions: Vec<Region> = owned.iter().map(Owned::region).collect();
-    for still in 0..=2 {
-        let field = energetic(still);
+    for (still, (opening, field)) in (0..=2).flat_map(|still| openings(energetic(still)).map(|f| (still, f))) {
         let reference = host(&field, &regions);
         for (r, region) in regions.iter().enumerate() {
             let alone = card.energy_read(&field, std::slice::from_ref(region)).unwrap();
             let expected = (vec![reference.0[r].clone()], vec![reference.1[r].clone()], vec![reference.2[r].clone()]);
             let diff = first_difference(&expected, &alone);
-            println!("ENERGY_PARITY tiny still={still} region={r} sites={} bit_equal={} read={:?}", region.classes.len(), diff.is_none(), alone.2[0]);
-            assert!(diff.is_none(), "still {still} region {r}: {}", diff.unwrap_or_default());
+            println!("ENERGY_PARITY tiny opening={opening} still={still} region={r} sites={} bit_equal={} read={:?}", region.classes.len(), diff.is_none(), alone.2[0]);
+            assert!(diff.is_none(), "opening {opening} still {still} region {r}: {}", diff.unwrap_or_default());
         }
         let batch = card.energy_read(&field, &regions).unwrap();
         let diff = first_difference(&reference, &batch);
-        println!("ENERGY_PARITY tiny still={still} batch regions={} bit_equal={}", regions.len(), diff.is_none());
-        assert!(diff.is_none(), "still {still} batch: {}", diff.unwrap_or_default());
+        println!("ENERGY_PARITY tiny opening={opening} still={still} batch regions={} bit_equal={}", regions.len(), diff.is_none());
+        assert!(diff.is_none(), "opening {opening} still {still} batch: {}", diff.unwrap_or_default());
         // The realization's faces and logits are the energy forward's.
-        assert_eq!(card.read_faces(&field, &regions).unwrap(), reference.0, "still {still}: the realization's faces");
+        assert_eq!(card.read_faces(&field, &regions).unwrap(), reference.0, "opening {opening} still {still}: the realization's faces");
         let read = card.read_logits(&field, &regions).unwrap();
         for (r, fr) in read.iter().enumerate() {
-            assert_eq!(fr.logits, reference.1[r], "still {still} region {r}: the realization's logits");
+            assert_eq!(fr.logits, reference.1[r], "opening {opening} still {still} region {r}: the realization's logits");
             assert!(fr.echo.iter().all(|&e| e == 0), "an energy read carries no echo");
         }
         // Training is refused: the return through the ticks is not built.
-        assert!(card.read_and_return(&field, &regions).is_err(), "still {still}: an energy field's return is refused on the card");
+        assert!(card.read_and_return(&field, &regions).is_err(), "opening {opening} still {still}: an energy field's return is refused on the card");
     }
 }
 
@@ -296,16 +303,24 @@ fn synthetic(sites: usize, alphabet: usize) -> Owned {
 }
 
 /// [measurement] **The line's founding on a 1,500-site region: the card's energy forward is the host's, bit for bit**, with
-/// the card's time (cold, then warm) beside the host's.
+/// the card's time (cold, then warm) beside the host's, under each opening law (the profiled read at the letters' force).
 #[test]
 #[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
 fn the_lines_energy_forward_on_the_card_is_the_hosts_at_1500_sites() {
     let d = line_declaration();
-    let field = Field::found(d, &keys(d.founding_draws())).unwrap();
+    let opened = Card::open(0).unwrap();
+    for (opening, field) in openings(Field::found(d, &keys(d.founding_draws())).unwrap()) {
+        let mut card = CardField::open(&opened).unwrap();
+        line_forward(&opened, &mut card, &field, opening);
+    }
+}
+
+/// [`the_lines_energy_forward_on_the_card_is_the_hosts_at_1500_sites`] under one opening law.
+fn line_forward(opened: &Card, card: &mut CardField, field: &Field, opening: &str) {
+    let field = field.clone();
+    let d = field.declaration;
     let owned = synthetic(1500, d.alphabet);
     let region = owned.region();
-    let opened = Card::open(0).unwrap();
-    let mut card = CardField::open(&opened).unwrap();
     let started = Instant::now();
     let cold = card.energy_read(&field, std::slice::from_ref(&region)).unwrap();
     let cold_ms = started.elapsed().as_millis();
@@ -319,7 +334,7 @@ fn the_lines_energy_forward_on_the_card_is_the_hosts_at_1500_sites() {
     let warm_diff = first_difference(&reference, &warm);
     let memory = opened.census().memory;
     println!(
-        "ENERGY_PARITY line sites=1500 bit_equal={} warm_bit_equal={} card={} card_cold_ms={cold_ms} card_warm_ms={warm_ms} host_ms={host_ms} host_threads=1 free={} peak_store={} read={:?}",
+        "ENERGY_PARITY line opening={opening} sites=1500 bit_equal={} warm_bit_equal={} card={} card_cold_ms={cold_ms} card_warm_ms={warm_ms} host_ms={host_ms} host_threads=1 free={} peak_store={} read={:?}",
         diff.is_none(),
         warm_diff.is_none(),
         opened.census().name,
@@ -327,8 +342,8 @@ fn the_lines_energy_forward_on_the_card_is_the_hosts_at_1500_sites() {
         card.times().peak_store,
         reference.2[0]
     );
-    assert!(diff.is_none(), "{}", diff.unwrap_or_default());
-    assert!(warm_diff.is_none(), "{}", warm_diff.unwrap_or_default());
+    assert!(diff.is_none(), "opening {opening}: {}", diff.unwrap_or_default());
+    assert!(warm_diff.is_none(), "opening {opening}: {}", warm_diff.unwrap_or_default());
     let single = reference;
     // Three regions of the line's founding in one batch, their ticks in lockstep, each at its own halvings.
     let parts: Vec<Owned> = [400usize, 900, 1500].iter().map(|&n| synthetic(n, d.alphabet)).collect();
@@ -341,10 +356,14 @@ fn the_lines_energy_forward_on_the_card_is_the_hosts_at_1500_sites() {
     let host_ms = started.elapsed().as_millis();
     let diff = first_difference(&reference, &batch);
     for (r, read) in reference.2.iter().enumerate() {
-        println!("ENERGY_PARITY line batch region={r} sites={} halvings={:?} reads={} pairs={}", regions[r].classes.len(), read.halvings, read.reads, read.pairs);
+        println!("ENERGY_PARITY line opening={opening} batch region={r} sites={} halvings={:?} reads={} pairs={}", regions[r].classes.len(), read.halvings, read.reads, read.pairs);
     }
-    println!("ENERGY_PARITY line batch regions=3 sites=2800 bit_equal={} card_ms={batch_ms} host_ms={host_ms} host_threads=1 rereads={}", diff.is_none(), card.times().energy_rereads);
-    assert!(diff.is_none(), "{}", diff.unwrap_or_default());
+    println!("ENERGY_PARITY line opening={opening} batch regions=3 sites=2800 bit_equal={} card_ms={batch_ms} host_ms={host_ms} host_threads=1 rereads={}", diff.is_none(), card.times().energy_rereads);
+    assert!(diff.is_none(), "opening {opening}: {}", diff.unwrap_or_default());
+    // The profiled read under the opening that stands once the claim is judged.
+    if opening != "force" {
+        return;
+    }
     // A profiled read (every launch timed alone, the card synchronized around it): the kernels' time beside the copies' and
     // the allocations', and the pairs the card met over its reads.
     let pairs_before = card.times().pairs;
@@ -460,7 +479,8 @@ fn the_tiny_lead_reads_on_the_card_are_the_hosts() {
     let long: Vec<usize> = (0..13).map(|t| (t * 3 + t / 4) % 5).collect();
     let places: Vec<(&[usize], usize)> = vec![(&short, 0), (&short, 3), (&short, 6), (&long, 0), (&long, 7), (&long, 12)];
     let laned = |still: usize| energetic_with(FieldDeclaration { width: 16, lanes: 2, ..tiny_declaration(still) });
-    let fields: Vec<(String, Field)> = (0..=2).map(|s| (format!("still {s}"), energetic(s))).chain((0..=1).map(|s| (format!("laned still {s}"), laned(s)))).collect();
+    let own: Vec<(String, Field)> = (0..=2).map(|s| (format!("still {s}"), energetic(s))).chain((0..=1).map(|s| (format!("laned still {s}"), laned(s)))).collect();
+    let fields: Vec<(String, Field)> = own.iter().cloned().chain(own.iter().map(|(name, f)| (format!("{name} at the letters' force"), f.opened_at_force().unwrap()))).collect();
     for (name, field) in &fields {
         let host: Vec<EnergyLead> = places.iter().map(|&(c, t)| field.energy_lead(c, t).unwrap()).collect();
         assert!(host.iter().all(|l| l.open.len() == field.declaration.lanes && l.enc.len() == field.declaration.lanes), "{name}: the opening's sums a lane");
@@ -549,7 +569,8 @@ fn material_difference(field: &Field, host: &[(Vec<i128>, i128)], card: &[(Vec<i
 
 /// [measurement; agent-inferred, November 7] **The tiny energy fields' material covector on the card is the host's**: on every
 /// ring set, each region's `∂G/∂θ` (every family on `2^(−40)`) and `G`, the three regions alone and in one batch, and through
-/// the realization.
+/// the realization, under each opening law (at the letters' force the opening's own row returns `R λ⁰` to the encoding and
+/// `E(u_t) ⊗ λ⁰` to the lift).
 #[test]
 #[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
 fn the_tiny_energy_material_on_the_card_is_the_hosts() {
@@ -557,35 +578,42 @@ fn the_tiny_energy_material_on_the_card_is_the_hosts() {
     let mut card = CardField::open(&opened).unwrap();
     let owned = tiny_regions();
     let regions: Vec<Region> = owned.iter().map(Owned::region).collect();
-    for still in 0..=2 {
-        let field = energetic(still);
+    for (still, (opening, field)) in (0..=2).flat_map(|still| openings(energetic(still)).map(|f| (still, f))) {
         let reference = host_material(&field, &regions);
         for (r, region) in regions.iter().enumerate() {
             let alone = card.energy_material(&field, std::slice::from_ref(region)).unwrap();
             let diff = material_difference(&field, &reference[r..r + 1], &alone);
             let nonzero = reference[r].0.iter().filter(|&&v| v != 0).count();
-            println!("ENERGY_MATERIAL tiny still={still} region={r} bit_equal={} nonzero={nonzero} of {} G={}", diff.is_none(), reference[r].0.len(), reference[r].1);
-            assert!(diff.is_none(), "still {still} region {r}: {}", diff.unwrap_or_default());
+            println!("ENERGY_MATERIAL tiny opening={opening} still={still} region={r} bit_equal={} nonzero={nonzero} of {} G={}", diff.is_none(), reference[r].0.len(), reference[r].1);
+            assert!(diff.is_none(), "opening {opening} still {still} region {r}: {}", diff.unwrap_or_default());
         }
         let batch = card.read_energy_material(&field, &regions).unwrap();
         let diff = material_difference(&field, &reference, &batch);
-        println!("ENERGY_MATERIAL tiny still={still} batch regions={} bit_equal={}", regions.len(), diff.is_none());
-        assert!(diff.is_none(), "still {still} batch: {}", diff.unwrap_or_default());
+        println!("ENERGY_MATERIAL tiny opening={opening} still={still} batch regions={} bit_equal={}", regions.len(), diff.is_none());
+        assert!(diff.is_none(), "opening {opening} still {still} batch: {}", diff.unwrap_or_default());
     }
 }
 
 /// [measurement; agent-inferred, November 7] **The line's material covector on the card is the host's at 1,500 sites**: on the
 /// founding of the line's declaration, the synthetic 1,500-site region alone (card cold and warm against the host) and 400 +
-/// 900 + 1,500 sites in one batch, `∂G/∂θ` and `G` bit-equal.
+/// 900 + 1,500 sites in one batch, `∂G/∂θ` and `G` bit-equal, under each opening law.
 #[test]
 #[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
 fn the_lines_energy_material_on_the_card_is_the_hosts_at_1500_sites() {
     let d = line_declaration();
-    let field = Field::found(d, &keys(d.founding_draws())).unwrap();
+    let opened = Card::open(0).unwrap();
+    for (opening, field) in openings(Field::found(d, &keys(d.founding_draws())).unwrap()) {
+        let mut card = CardField::open(&opened).unwrap();
+        line_material(&mut card, &field, opening);
+    }
+}
+
+/// [`the_lines_energy_material_on_the_card_is_the_hosts_at_1500_sites`] under one opening law.
+fn line_material(card: &mut CardField, field: &Field, opening: &str) {
+    let field = field.clone();
+    let d = field.declaration;
     let owned = synthetic(1500, d.alphabet);
     let region = owned.region();
-    let opened = Card::open(0).unwrap();
-    let mut card = CardField::open(&opened).unwrap();
     let started = Instant::now();
     let cold = card.energy_material(&field, std::slice::from_ref(&region)).unwrap();
     let cold_ms = started.elapsed().as_millis();
@@ -598,7 +626,7 @@ fn the_lines_energy_material_on_the_card_is_the_hosts_at_1500_sites() {
     let diff = material_difference(&field, &reference, &cold);
     let nonzero = reference[0].0.iter().filter(|&&v| v != 0).count();
     println!(
-        "ENERGY_MATERIAL line sites=1500 bit_equal={} warm_bit_equal={} card_cold_ms={cold_ms} card_warm_ms={warm_ms} host_ms={host_ms} host_threads=1 nonzero={nonzero} of {} G={} peak_store={}",
+        "ENERGY_MATERIAL line opening={opening} sites=1500 bit_equal={} warm_bit_equal={} card_cold_ms={cold_ms} card_warm_ms={warm_ms} host_ms={host_ms} host_threads=1 nonzero={nonzero} of {} G={} peak_store={}",
         diff.is_none(),
         material_difference(&field, &reference, &warm).is_none(),
         reference[0].0.len(),
@@ -616,7 +644,7 @@ fn the_lines_energy_material_on_the_card_is_the_hosts_at_1500_sites() {
     let reference = host_material(&field, &regions);
     let host_ms = started.elapsed().as_millis();
     let diff = material_difference(&field, &reference, &batch);
-    println!("ENERGY_MATERIAL line batch regions=3 sites=2800 bit_equal={} card_ms={batch_ms} host_ms={host_ms} host_threads={threads}", diff.is_none());
+    println!("ENERGY_MATERIAL line opening={opening} batch regions=3 sites=2800 bit_equal={} card_ms={batch_ms} host_ms={host_ms} host_threads={threads}", diff.is_none());
     assert!(diff.is_none(), "{}", diff.unwrap_or_default());
 }
 
