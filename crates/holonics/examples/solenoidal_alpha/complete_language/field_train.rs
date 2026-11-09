@@ -8418,15 +8418,56 @@ fn plate_regions(codec: &FieldCodec, field: &Field, text: &[u8]) -> Result<Vec<(
     Ok(out)
 }
 
-/// [measurement; theory, November 9 19:43] `plate-field STATE STATE_SHA CODEC CODEC_SHA UNITS UNITS_SHA HELD HELD_SHA TRAIN
-/// TRAIN_SHA COUNT TRAIN_COUNT OUT`: **the plate census**, a forward-only reading. A site's plate is the tuple of the classes its key word
-/// holds in each head at the last tick ([`Field::read_plates`]). (1) Each held place (the first `COUNT` held problems' opening
-/// regions as the held read meets them: the answer's cells and its first void, every room place open) is read with its
-/// plate and its code `−ln f(truth)`. (2) One forward pass over TRAIN's opening regions counts the true letters at every
-/// answer place by plate (its first `TRAIN_COUNT` problems, all of them at zero), and each held place is coded again under the face times the plate's count ratio,
-/// `f′(a) ∝ f(a) (N_(plate, a) + 1)/(N_a + 1)`, renormalized at the place (one count added to every letter, a declared
-/// prior; each mass released to its own grain). `PLATES.tsv`: each plate's held places, its plain and its lens code in nats,
-/// its training places; one `FIELD_PLATES` summary line.
+/// A plate's training reading: its true letters' counts `N_(p, a)`, and the face's own expected counts `F_(p, a) = Σ f(a)`
+/// over the same places, each share formed on `2^(−40)` to the floor with its remainder carried on `2^(−72)` (the remainder
+/// over the face's total, to the nearest), so `F = (shares + carried 2^(−32))` on `2^(−40)`.
+#[derive(Clone, Default)]
+struct PlateCounts {
+    n: Vec<u64>,
+    f: Vec<u128>,
+    carried: Vec<i128>,
+}
+
+impl PlateCounts {
+    fn new(a: usize) -> Self {
+        Self { n: vec![0; a], f: vec![0; a], carried: vec![0; a] }
+    }
+
+    fn add(&mut self, face: &holonics::hnn::tower::TowerFace, truth: usize) {
+        self.n[truth] += 1;
+        for (c, &m) in face.masses.iter().enumerate() {
+            let q = (m << 40) / face.total;
+            let rem = (m << 40) - q * face.total;
+            self.f[c] += q;
+            self.carried[c] += (((rem << 32) + face.total / 2) / face.total) as i128;
+        }
+    }
+
+    /// `F_(p, a)` on `2^(−20)`, its carried remainder folded in, to the nearest.
+    fn expected(&self, c: usize) -> u128 {
+        let on40 = (self.f[c] as i128 + ((self.carried[c] + (1 << 31)) >> 32)).max(0) as u128;
+        (on40 + (1 << 19)) >> 20
+    }
+
+    fn places(&self) -> u64 {
+        self.n.iter().sum()
+    }
+}
+
+/// [measurement; theory, November 9 19:43 and 20:04] `plate-field STATE STATE_SHA CODEC CODEC_SHA UNITS UNITS_SHA HELD
+/// HELD_SHA TRAIN TRAIN_SHA COUNT TRAIN_COUNT OUT`: **the plate census**, a forward-only reading. A site's plate is the tuple
+/// of the classes its key word holds in each head at the last tick ([`Field::read_plates`]). (1) Each held place (the first
+/// `COUNT` held problems' opening regions as the held read meets them: the answer's cells and its first void, every room
+/// place open) is read with its plate and its code `−ln f(truth)`. (2) One forward pass over TRAIN's openings (its first
+/// `TRAIN_COUNT` problems, all of them at zero) counts at every answer place, by plate, the true letters `N_(p, a)` and the
+/// face's own expected counts `F_(p, a) = Σ f(a)` in the same visit, and each held place is coded again under the lens
+/// `f′(a) ∝ f(a) (N_(p, a) + 1)/(F_(p, a) + 1)` renormalized at the place (theory, 20:04: the face already depends on the
+/// state that fixes the plate, so the letters' marginal `N_a` would count the plate's composition twice; the marginal form
+/// `(N_(p, a) + 1)/(N_a + 1)` is kept beside it). One count is added on both sides (a declared prior); each lens mass is
+/// released to its own grain. The same reading is made for each head alone (its classes in place of the joint plate).
+/// `PLATES.tsv` (each joint plate), `HEADS.tsv` (each head and class), `OCCUPANCY.tsv` (the occupied joint plates by their
+/// training places in octave bands 1, 2–3, 4–7, …, with the held places in each band, and the held places on no training
+/// plate), and `FIELD_PLATES`, `FIELD_PLATES_HEAD` and `FIELD_PLATES_OCCUPANCY` lines.
 pub(super) fn plate_field(args: &[String], realization: &mut dyn FieldRealization) -> Result<()> {
     if args.len() != 14 {
         return Err("plate-field STATE STATE_SHA CODEC CODEC_SHA UNITS UNITS_SHA HELD HELD_SHA TRAIN TRAIN_SHA COUNT TRAIN_COUNT OUT".into());
@@ -8445,10 +8486,11 @@ pub(super) fn plate_field(args: &[String], realization: &mut dyn FieldRealizatio
     }
     let out = Path::new(&args[13]);
     std::fs::create_dir(out)?;
+    type Face = holonics::hnn::tower::TowerFace;
     let a = field.declaration.alphabet;
     let heads = field.declaration.heads;
     // Each region's places with their plates and faces, read in chunks.
-    let mut read = |set: &[(Vec<usize>, Vec<bool>, std::ops::Range<usize>)], visit: &mut dyn FnMut(&[u32], &holonics::hnn::tower::TowerFace, usize)| -> Result<()> {
+    let mut read = |set: &[(Vec<usize>, Vec<bool>, std::ops::Range<usize>)], visit: &mut dyn FnMut(&[u32], &Face, usize)| -> Result<()> {
         for chunk in set.chunks(64) {
             let views: Vec<Region> = chunk.iter().map(|(c, u, _)| Region { classes: c, unresolved: u, faces: &[], locked: &[], echo: &[], domain: None, port: None }).collect();
             let (faces, plates) = realization.read_plates(field, &views).map_err(|e| e.to_string())?;
@@ -8461,53 +8503,97 @@ pub(super) fn plate_field(args: &[String], realization: &mut dyn FieldRealizatio
         }
         Ok(())
     };
-    let mut counts: std::collections::BTreeMap<Vec<u32>, Vec<u64>> = std::collections::BTreeMap::new();
+    // The keys: the joint plate (`None` for the head) and each head's class alone (`Some(h)`).
+    let keys = |plate: &[u32]| -> Vec<(Option<usize>, Vec<u32>)> { std::iter::once((None, plate.to_vec())).chain((0..heads).map(|h| (Some(h), vec![plate[h]]))).collect() };
+    let mut counts: std::collections::BTreeMap<(Option<usize>, Vec<u32>), PlateCounts> = std::collections::BTreeMap::new();
     let mut totals = vec![0u64; a];
-    read(&train, &mut |plate: &[u32], _: &holonics::hnn::tower::TowerFace, truth: usize| {
-        counts.entry(plate.to_vec()).or_insert_with(|| vec![0; a])[truth] += 1;
+    read(&train, &mut |plate: &[u32], face: &Face, truth: usize| {
+        for key in keys(plate) {
+            counts.entry(key).or_insert_with(|| PlateCounts::new(a)).add(face, truth);
+        }
         totals[truth] += 1;
     })?;
     let train_ms = started.elapsed().as_millis();
-    // Each held plate's places, plain code and lens code (bits on 2^(−20)).
-    let mut plates: std::collections::BTreeMap<Vec<u32>, (u64, i128, i128)> = std::collections::BTreeMap::new();
-    let (mut places, mut seen) = (0u64, 0u64);
-    read(&held, &mut |plate: &[u32], face: &holonics::hnn::tower::TowerFace, truth: usize| {
-        let lens = match counts.get(plate) {
-            Some(n) => {
-                let masses: Vec<u128> = face.masses.iter().enumerate().map(|(c, &m)| m * (n[c] as u128 + 1) / (totals[c] as u128 + 1)).collect();
-                let total = masses.iter().sum();
-                holonics::hnn::tower::TowerFace { masses, total }.code(truth) as i128
-            }
-            None => face.code(truth) as i128,
-        };
-        places += 1;
-        seen += u64::from(counts.contains_key(plate));
-        let slot = plates.entry(plate.to_vec()).or_default();
-        *slot = (slot.0 + 1, slot.1 + face.code(truth) as i128, slot.2 + lens);
+    // Each held key's places and codes (bits on 2^(−20)): plain, the lens against the face's own counts, the marginal lens.
+    let lens = |face: &Face, truth: usize, ratio: &dyn Fn(usize) -> (u128, u128)| -> i128 {
+        let masses: Vec<u128> = face.masses.iter().enumerate().map(|(c, &m)| { let (num, den) = ratio(c); (m * num) / den.max(1) }).collect();
+        let total = masses.iter().sum();
+        Face { masses, total }.code(truth) as i128
+    };
+    let mut held_keys: std::collections::BTreeMap<(Option<usize>, Vec<u32>), [i128; 4]> = std::collections::BTreeMap::new();
+    let mut held_places = 0i128;
+    read(&held, &mut |plate: &[u32], face: &Face, truth: usize| {
+        held_places += 1;
+        for key in keys(plate) {
+            let plain = face.code(truth) as i128;
+            let (own, marginal) = match counts.get(&key) {
+                // (N + 1) 2^20 over (F + 1) on 2^(−20); (N + 1) over (N_a + 1).
+                Some(k) => (lens(face, truth, &|c| ((k.n[c] as u128 + 1) << 20, k.expected(c) + (1 << 20))), lens(face, truth, &|c| (k.n[c] as u128 + 1, totals[c] as u128 + 1))),
+                None => (plain, plain),
+            };
+            let slot = held_keys.entry(key).or_default();
+            *slot = [slot[0] + 1, slot[1] + plain, slot[2] + own, slot[3] + marginal];
+        }
     })?;
-    let mut rows: Vec<(&Vec<u32>, &(u64, i128, i128))> = plates.iter().collect();
-    rows.sort_by_key(|(p, s)| (std::cmp::Reverse(s.0), (*p).clone()));
-    let mut file = rows_file(&out.join("PLATES.tsv"), "plate\theld_places\tcode_nats\tlens_code_nats\ttrain_places\n")?;
-    let (mut code, mut lens) = (0i128, 0i128);
-    for (plate, &(n, c, l)) in rows {
-        code += c;
-        lens += l;
-        let name: Vec<String> = plate.iter().map(u32::to_string).collect();
-        let train_places: u64 = counts.get(plate).map_or(0, |v| v.iter().sum());
-        row(&mut file, &format!("{}\t{n}\t{}\t{}\t{train_places}\n", name.join("."), decimal_q20(nats_q20(c) / n as i128), decimal_q20(nats_q20(l) / n as i128)))?;
+    let mean = |v: i128, n: i128| if n == 0 { "-".to_string() } else { decimal_q20(nats_q20(v) / n) };
+    // The joint plates and each head's classes, held places first.
+    let mut joint = rows_file(&out.join("PLATES.tsv"), "plate\theld_places\tcode_nats\tlens_code_nats\tmarginal_lens_code_nats\ttrain_places\n")?;
+    let mut by_head = rows_file(&out.join("HEADS.tsv"), "head\tclass\theld_places\tcode_nats\tlens_code_nats\tmarginal_lens_code_nats\ttrain_places\n")?;
+    let mut rows: Vec<(&(Option<usize>, Vec<u32>), &[i128; 4])> = held_keys.iter().collect();
+    rows.sort_by_key(|(k, s)| (k.0, std::cmp::Reverse(s[0]), k.1.clone()));
+    let mut sums: std::collections::BTreeMap<Option<usize>, [i128; 4]> = std::collections::BTreeMap::new();
+    for (key, s) in rows {
+        let train_places = counts.get(key).map_or(0, PlateCounts::places);
+        let name: Vec<String> = key.1.iter().map(u32::to_string).collect();
+        let cells = format!("{}\t{}\t{}\t{}\t{train_places}\n", s[0], mean(s[1], s[0]), mean(s[2], s[0]), mean(s[3], s[0]));
+        match key.0 {
+            None => row(&mut joint, &format!("{}\t{cells}", name.join(".")))?,
+            Some(h) => row(&mut by_head, &format!("{h}\t{}\t{cells}", name.join(".")))?,
+        }
+        let sum = sums.entry(key.0).or_default();
+        for i in 0..4 {
+            sum[i] += s[i];
+        }
     }
-    let mean = |v: i128| if places == 0 { "-".to_string() } else { decimal_q20(nats_q20(v) / places as i128) };
-    println!(
-        "FIELD_PLATES held_problems={} held_places={places} held_plates={} train_problems={} train_places={} train_plates={} held_places_in_train_plates={seen} code_nats={} lens_code_nats={} train_ms={train_ms} ms={}",
-        held.len(),
-        plates.len(),
-        train.len(),
-        totals.iter().sum::<u64>(),
-        counts.len(),
-        mean(code),
-        mean(lens),
-        started.elapsed().as_millis()
-    );
+    // Occupancy: the occupied joint plates by their training places in octave bands, with the held places on each band.
+    let mut bands: std::collections::BTreeMap<u32, (u64, i128)> = std::collections::BTreeMap::new();
+    for ((head, _), k) in counts.iter().filter(|(key, _)| key.0.is_none()) {
+        let _ = head;
+        bands.entry(63 - k.places().max(1).leading_zeros()).or_default().0 += 1;
+    }
+    let mut unseen = 0i128;
+    for (key, s) in held_keys.iter().filter(|(key, _)| key.0.is_none()) {
+        match counts.get(key) {
+            Some(k) => bands.entry(63 - k.places().max(1).leading_zeros()).or_default().1 += s[0],
+            None => unseen += s[0],
+        }
+    }
+    let mut occupancy = rows_file(&out.join("OCCUPANCY.tsv"), "band\ttrain_places_from\ttrain_places_to\tplates\theld_places\theld_share_millionths\n")?;
+    let share = |n: i128| if held_places == 0 { 0 } else { n * 1_000_000 / held_places };
+    for (&b, &(plates, held_in)) in &bands {
+        row(&mut occupancy, &format!("{b}\t{}\t{}\t{plates}\t{held_in}\t{}\n", 1u64 << b, (2u64 << b) - 1, share(held_in)))?;
+        println!("FIELD_PLATES_OCCUPANCY band={b} train_places={}..{} plates={plates} held_places={held_in} held_share_millionths={}", 1u64 << b, (2u64 << b) - 1, share(held_in));
+    }
+    row(&mut occupancy, &format!("-\t0\t0\t0\t{unseen}\t{}\n", share(unseen)))?;
+    println!("FIELD_PLATES_OCCUPANCY band=none plates=0 held_places={unseen} held_share_millionths={}", share(unseen));
+    for (key, s) in &sums {
+        let occupied = counts.keys().filter(|k| k.0 == *key).count();
+        match key {
+            None => println!(
+                "FIELD_PLATES held_problems={} held_places={} held_plates={} train_problems={} train_places={} train_plates={occupied} code_nats={} lens_code_nats={} marginal_lens_code_nats={} train_ms={train_ms} ms={}",
+                held.len(),
+                s[0],
+                held_keys.keys().filter(|k| k.0.is_none()).count(),
+                train.len(),
+                totals.iter().sum::<u64>(),
+                mean(s[1], s[0]),
+                mean(s[2], s[0]),
+                mean(s[3], s[0]),
+                started.elapsed().as_millis()
+            ),
+            Some(h) => println!("FIELD_PLATES_HEAD head={h} held_classes={} train_classes={occupied} code_nats={} lens_code_nats={} marginal_lens_code_nats={}", held_keys.keys().filter(|k| k.0 == Some(*h)).count(), mean(s[1], s[0]), mean(s[2], s[0]), mean(s[3], s[0])),
+        }
+    }
     Ok(())
 }
 
@@ -8568,7 +8654,7 @@ pub(super) fn exchange_field(args: &[String], realization: &mut dyn FieldRealiza
         .map_err(|e| e.to_string())?;
     write("SAMPLE.tsv", &walked)?;
     let mut file = rows_file(&out.join("MOVES.tsv"), "problem\tmove\ti\tj\tgain_nats\theat_i_nats\theat_j_nats\n")?;
-    let mut total = (0usize, 0i128);
+    let (mut total, mut incomplete) = ((0usize, 0i128), 0usize);
     for (k, list) in moved.iter().enumerate() {
         for (n, m) in list.iter().enumerate() {
             row(&mut file, &format!("{k}\t{}\t{}\t{}\t{}\t{}\t{}\n", n + 1, m.i, m.j, decimal_q20(nats_q20(m.gain)), decimal_q20(nats_q20(m.heat_i)), decimal_q20(nats_q20(m.heat_j))))?;
@@ -8576,9 +8662,12 @@ pub(super) fn exchange_field(args: &[String], realization: &mut dyn FieldRealiza
         let gain: i128 = list.iter().map(|m| m.gain).sum();
         let heat = |m: Option<&holonics::hnn::tower::field::ExchangeMove>| m.map_or("-".to_string(), |m| decimal_q20(nats_q20(m.heat_i + m.heat_j)));
         let letters = keyed[k].iter().take_while(|&&c| c != void).count();
-        println!("FIELD_EXCHANGE problem={k} letters={letters} moves={} gain_nats={} heat_first_nats={} heat_last_nats={}", list.len(), decimal_q20(nats_q20(gain)), heat(list.first()), heat(list.last()));
+        // [theory, November 9 20:04] A problem that reached the move bound is incomplete, not at rest.
+        let capped = list.len() >= moves;
+        println!("FIELD_EXCHANGE problem={k} letters={letters} moves={} at_rest={} gain_nats={} heat_first_nats={} heat_last_nats={}", list.len(), !capped, decimal_q20(nats_q20(gain)), heat(list.first()), heat(list.last()));
         total = (total.0 + list.len(), total.1 + gain);
+        incomplete += usize::from(capped);
     }
-    println!("FIELD_EXCHANGE_DONE problems={} h_millinats={h_milli} moves={} gain_nats={} keyed_ms={keyed_ms} ms={}", problems.len(), total.0, decimal_q20(nats_q20(total.1)), started.elapsed().as_millis());
+    println!("FIELD_EXCHANGE_DONE problems={} at_rest={} incomplete={incomplete} h_millinats={h_milli} move_cap={moves} moves={} gain_nats={} keyed_ms={keyed_ms} ms={}", problems.len(), problems.len() - incomplete, total.0, decimal_q20(nats_q20(total.1)), started.elapsed().as_millis());
     Ok(())
 }
