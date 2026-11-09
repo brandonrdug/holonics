@@ -2897,6 +2897,162 @@ fn persistent_key(seed: u64, read: u64, n: usize) -> u64 {
     mix(seed ^ 0x9E85_15 << 40, read << 32 | n as u64)
 }
 
+/// The whole sweeps that sink persistent writes where they open, before their first deposit (the unified-theory reading of
+/// November 7, 10:12).
+const PERSISTENT_SINKS: u64 = 8;
+
+/// [definition; the unified-theory readings of November 7, 05:20 and 09:36] **A member's residue class**: the first answer place
+/// `r` of the class `t ≡ r (mod spacing)` that member `member` of section `n` opens at the lap count `read`, keyed by the seed, for
+/// an answer of `len` places. The kernel's blocks ([`kernel_blocks`]) and the persistent writes' sweep both take their class
+/// from it.
+fn residue_start(seed: u64, read: u64, n: usize, member: usize, spacing: usize, len: usize) -> usize {
+    (mix(seed ^ 0xB10C << 44, read << 40 | (n as u64) << 16 | member as u64) as usize) % spacing.min(len).max(1)
+}
+
+/// [definition; the unified-theory reading of November 7, 08:13] **The kernel's two block lengths**: `k₊ = ⌈k*·2^¼⌉` and
+/// `k₋ = max(1, ⌊k*·2^(−¼)⌋)`, read on `log₂ k*` (`log2_k_star`, on `2^(−16)`), or `k*` (`block_places`) twice where the length
+/// is held (`FIELD_CONTRAST_BLOCK_PIN`, `FIELD_CONTRAST_WHOLE_BLOCKS`).
+fn kernel_lengths(held: bool, block_places: usize, log2_k_star: i128) -> (usize, usize) {
+    if held {
+        return (block_places.max(1), block_places.max(1));
+    }
+    let up = (1..=1usize << 13).find(|&k| log2_q16(k as u64) as i128 >= log2_k_star + (1 << 14)).unwrap_or(1 << 13);
+    let down = (1..=1usize << 13).rev().find(|&k| log2_q16(k as u64) as i128 <= log2_k_star - (1 << 14)).unwrap_or(1).max(1);
+    (up, down)
+}
+
+/// [definition; the unified-theory readings of November 7, 07:24 and 08:13] **The kernel's blocks**: each member's answer places
+/// `t ≡ r (mod spacing)` from its answer's start ([`residue_start`]), cut into blocks alternating the lengths `k₊` and `k₋`
+/// ([`kernel_lengths`]; `k₊` first on even sections, `k₋` on odd), or one block a member where `whole`
+/// (`FIELD_CONTRAST_WHOLE_BLOCKS`, laps 4 to 9). Returns the blocks (places of the member's region), each block's member, and
+/// each block's length class (`Some(true)` k₊, `Some(false)` k₋) where it is whole, `None` where it closes short.
+#[allow(clippy::too_many_arguments)]
+fn kernel_blocks(set: &Problems, members: &[usize], seed: u64, read: u64, n: usize, spacing: usize, (k_up, k_down): (usize, usize), whole: bool) -> (Vec<Vec<usize>>, Vec<usize>, Vec<Option<bool>>) {
+    let (mut blocks, mut owners, mut classes_of): (Vec<Vec<usize>>, Vec<usize>, Vec<Option<bool>>) = (Vec::new(), Vec::new(), Vec::new());
+    for (m, &i) in members.iter().enumerate() {
+        let (q, a, _) = &set[i];
+        let r = residue_start(seed, read, n, m, spacing, a.len());
+        let residue: Vec<usize> = (r..a.len()).step_by(spacing).map(|j| q.len() + j).collect();
+        if whole {
+            blocks.push(residue);
+            owners.push(m);
+            classes_of.push(None);
+            continue;
+        }
+        let mut at = 0usize;
+        let mut up = n % 2 == 0;
+        while at < residue.len() {
+            let len = if up { k_up } else { k_down };
+            let end = (at + len).min(residue.len());
+            blocks.push(residue[at..end].to_vec());
+            owners.push(m);
+            classes_of.push((end - at == len).then_some(up));
+            at = end;
+            up = !up;
+        }
+    }
+    (blocks, owners, classes_of)
+}
+
+/// [definition; theory, November 9 11:39] **The sites one read of a problem's region holds**: its question, its answer and the
+/// near tail of voids its room leaves, `Q + L + v` with `v = min(NEAR, room − L)`.
+fn region_sites((q, a, room): &(Vec<usize>, Vec<usize>, usize)) -> u128 {
+    (q.len() + a.len() + holonics::hnn::tower::field::NEAR.min(room.saturating_sub(a.len()))) as u128
+}
+
+/// [definition; theory, November 9 11:39] **A sweep's site reads**: the sites a whole sweep of a section's answers at their true
+/// lengths reads in its proposals at most, `Σ_k L_k (Q_k + L_k + v_k)` (the longest answer's steps, each proposing answer
+/// reading its whole region; the sweep's opening read of each region is beside it). `walk-field` prints it before a run, and
+/// the save law projects a section of fresh writes from it ([`section_work`]).
+fn sweep_site_reads(set: &Problems, members: &[usize]) -> u128 {
+    members.iter().map(|&i| set[i].1.len() as u128 * region_sites(&set[i])).sum()
+}
+
+/// [definition; theory, November 9 11:48] **A section's law, as the save law reads its declared work** ([`section_work`]).
+enum SectionLaw<'a> {
+    /// Fresh writes swept whole `sweeps` times (`FIELD_CONTRAST_FRESH=SWEEPS`, the declared count).
+    Fresh { sweeps: u64 },
+    /// Persistent writes: one residue class a member, from `starts` at `spacing`, after `sinks` whole sweeps where the writes
+    /// open.
+    Persistent { starts: &'a [usize], spacing: usize, sinks: u64 },
+    /// The kernel: one Metropolis–Hastings step a block from the truth, the blocks' members `owners`.
+    Kernel { owners: &'a [usize] },
+    /// Law D (`FIELD_CONTRAST_CONDITIONAL`, its beat and its coin): each block place against its whole conditional.
+    Conditional { blocks: &'a [Vec<usize>], owners: &'a [usize], alphabet: usize },
+    /// The joint release (`FIELD_CONTRAST_JOINT=READS`), at most `reads` reads.
+    Joint { reads: usize },
+    /// The writer as it writes (`FIELD_CONTRAST_WRITER`).
+    Writer,
+}
+
+/// [definition; theory, November 9 11:48; each law's unit agent-inferred from what its section reads] **A section's declared
+/// work**, the save law's projection operand, and its unit: `site_reads`, the sites of the regions its reads hold (each region
+/// `Q + L + v`, [`region_sites`]), or `places`, its answer places.
+/// - Fresh writes: their declared sweeps times [`sweep_site_reads`].
+/// - Persistent writes: the residue class's proposals, `Σ_k |class_k| (Q_k + L_k + v_k)`, and where the writes open their sinks'
+///   whole sweeps.
+/// - The kernel: two reads a member and two a block (the faces and the material at the truth, and at each block's proposal),
+///   `2 Σ_k region_k + 2 Σ_b region_(owner b)`.
+/// - Law D: one faces read a member and one material read a letter at each block place, `Σ_k region_k + alphabet·Σ_b |b|
+///   region_(owner b)`; its beat and its coin read at most this.
+/// - The joint release: its declared reads of every region at most, `reads·Σ_k region_k`.
+/// - The writer: its answer places `Σ_k L_k`, since its reads follow its runs' entropies and no count of them is declared
+///   before the section.
+///
+/// What a section reads beside its declared work (a release before its sweeps, a deposit's material reads) is carried in the
+/// measured rate ([`SaveRate`]).
+fn section_work(law: &SectionLaw, set: &Problems, members: &[usize]) -> (u128, &'static str) {
+    let region = |m: usize| region_sites(&set[members[m]]);
+    let regions: u128 = (0..members.len()).map(region).sum();
+    match *law {
+        SectionLaw::Fresh { sweeps } => (sweeps as u128 * sweep_site_reads(set, members), "site_reads"),
+        SectionLaw::Persistent { starts, spacing, sinks } => {
+            let class: u128 = (0..members.len()).zip(starts).map(|(m, &r)| set[members[m]].1.len().saturating_sub(r).div_ceil(spacing.max(1)) as u128 * region(m)).sum();
+            (class + sinks as u128 * sweep_site_reads(set, members), "site_reads")
+        }
+        SectionLaw::Kernel { owners } => (2 * regions + 2 * owners.iter().map(|&o| region(o)).sum::<u128>(), "site_reads"),
+        SectionLaw::Conditional { blocks, owners, alphabet } => (regions + alphabet as u128 * blocks.iter().zip(owners).map(|(b, &o)| b.len() as u128 * region(o)).sum::<u128>(), "site_reads"),
+        SectionLaw::Joint { reads } => (reads as u128 * regions, "site_reads"),
+        SectionLaw::Writer => (members.iter().map(|&i| set[i].1.len() as u128).sum(), "places"),
+    }
+}
+
+/// [definition; theory, November 9 11:48] **The run's largest measured rate**: of the sections measured so far in this run, the
+/// one whose measured time over its declared work is the largest, kept as its pair `(ms, work)` undivided (two rates compared by
+/// their cross products). A section of `w` units projects `⌈w·ms/work⌉` ms.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+struct SaveRate {
+    ms: u128,
+    work: u128,
+}
+
+impl SaveRate {
+    /// The larger of `rate` and a section's `ms` over its `work`; a section of no declared work measures no rate.
+    fn larger(rate: Option<SaveRate>, ms: u128, work: u128) -> Option<SaveRate> {
+        match rate {
+            _ if work == 0 => rate,
+            Some(r) if r.ms.saturating_mul(work) >= ms.saturating_mul(r.work) => Some(r),
+            _ => Some(SaveRate { ms, work }),
+        }
+    }
+
+    /// The projected milliseconds of a section of `work` units, rounded up.
+    fn project(self, work: u128) -> u128 {
+        work.saturating_mul(self.ms).div_ceil(self.work)
+    }
+}
+
+/// [definition; theory, November 9 11:48] **The save law's test at a section's start**: save when the time since the last saved
+/// state, `since_ms`, plus the section's projected time would pass the hour, `since + projected > hour` (a section that would
+/// end on the hour does not pass it). Before the run has measured a section there is no projection (`None`), and the
+/// test is the plain hour, `since ≥ hour`.
+fn save_due(since_ms: u128, projected_ms: Option<u128>, hour_ms: u128) -> bool {
+    match projected_ms {
+        Some(p) => since_ms.saturating_add(p) > hour_ms,
+        None => since_ms >= hour_ms,
+    }
+}
+
 /// [definition; theory, November 8 14:46 and 22:04] **The fresh writes' sweeps**: `sweeps` whole sweeps of the energy's own
 /// kernel over `active` at the field's own `T` ([`holonics::hnn::tower::field::Field::energy_sweep_at`], cool 0), sweep `s`
 /// (from zero) keyed `mix(key, 100 + s)`. `each` hears each sweep's number (from one), the places moved and proposed, each
@@ -2921,8 +3077,9 @@ fn fresh_sweeps_at(field: &Field, problems: &[(&[usize], usize)], active: &mut [
 /// negative ([`holonics::hnn::tower::field::Field::energy_release`], [`FieldLearner::section_contrast`]), and
 /// `FIELD_CONTRAST_WRITER=SWEEPS,REFINE`, the writer as it writes ([`WriterLaw`]). Before the first lap and after each, the
 /// enumerated conditional is read at `PLACES` held places ([`enumerated_read`]). A lap starts only where `LAP_MS` fits before
-/// `STOP_MS`; past `STOP_MS` the run writes `STATE.stopped` and stops. Writes `STATE.<lap>` and `ENUMERATED.tsv` (private: held
-/// answers' letters).
+/// `STOP_MS`; past `STOP_MS` the run writes `STATE.stopped` and stops. Writes `STATE.<lap>`, `STATE.<lap>.<sections done>` under
+/// the save law (at most an hour apart where its projection holds; [`save_due`]) and `ENUMERATED.tsv` (private: held answers'
+/// letters).
 pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealization) -> Result<()> {
     if std::env::var("FIELD_CENSUS").is_ok_and(|v| v == "1") {
         holonics::number::census::enable();
@@ -3273,12 +3430,25 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
         None => enumerated_read(&held_field(&learner, averaging), &held_set, places, &truth_of, realization, -1, &mut enumerated_rows)?,
     }
     println!("FIELD_ENUMERATED_READ lap=-1 ms={}", started.elapsed().as_millis());
-    // [definition; Brandon, November 6 17:11; theory, November 7 16:56] A card run holds at most one hour between saved states:
-    // at the first section start an hour (`SAVE_MS`) past the last saved state, the learner rests as `STATE.<lap>.<sections
-    // done>`, the held places are read from it (`ENUMERATED.tsv` rows marked `10000·(lap + 1) + sections done`) and the run
-    // goes on.
+    // [definition; Brandon, November 6 17:11; theory, November 7 16:56 and November 9 11:48] **The save law.** A card run holds
+    // at most one hour (`SAVE_MS`) between saved states. At a section's start the learner rests as `STATE.<lap>.<sections
+    // done>`, the held places are read from it (`ENUMERATED.tsv` rows marked `10000·(lap + 1) + sections done`) and the run goes
+    // on, when the time since the last saved state plus the section's projected time would pass the hour ([`save_due`]). The
+    // projection is the section's declared work ([`section_work`]) times the run's largest measured time per unit of work so far
+    // ([`SaveRate`]), each section measured from its start to the next section's start, so its deposit and its reads beside the
+    // declared work are inside the measured rate. The hour is guaranteed only where the projection holds: a save can fall only
+    // at a section's start, so this per-section stop holds the gap to the projection, and a section that runs past its
+    // projection carries the gap past the hour by its excess, after which the next start saves and the measured rate rises to
+    // that section's. Before the run has measured any section there is no rate, and the first section meets the plain hour test
+    // (an hour since the last saved state). The time is read from the state's write, so a save's held read is inside the next
+    // hour; the run's opening state stands from the run's start, a lap's end state from its write, and no hour save falls at the
+    // section a lap or a resumed run opens at (its state is the one already saved). `FIELD_SAVE_AT` adds declared saves. Each
+    // `FIELD_SAVED` line prints its reason (`hour`, the projected crossing, ahead of `declared`) and the projection it used.
     const SAVE_MS: u128 = 3_600_000;
-    let mut saved_ms = started.elapsed().as_millis();
+    let mut saved_ms = 0u128;
+    let mut rate: Option<SaveRate> = None;
+    // The section being measured: its declared work and its start.
+    let mut measuring: Option<(u128, std::time::Instant)> = None;
     for lap in 0..laps {
         let elapsed = started.elapsed().as_millis();
         if lap > 0 && elapsed + lap_ms > stop_ms {
@@ -3303,23 +3473,61 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
         let mut leg = Leg::new(&learner.field);
         let mut coherence_from = 0usize;
         for (n, &s) in walk(seed, read, sections.len()).iter().enumerate().skip(if lap == 0 { from_section } else { 0 }) {
+            // The section before this one is measured to this start.
+            if let Some((work, at)) = measuring.take() {
+                rate = SaveRate::larger(rate, at.elapsed().as_millis(), work);
+            }
             let now = started.elapsed().as_millis();
+            let opening = if lap == 0 { from_section } else { 0 };
             if n > 0 && n == from_section && lap == 0 {
                 println!("FIELD_RESUMED lap={lap} sections={n}/{} ms={now}", sections.len());
             }
-            if n > 0 && (now - saved_ms >= SAVE_MS || save_at.contains(&n)) {
+            let members = &sections[s];
+            // The kernel's blocks are cut before the save law reads the section, so its declared work is that of the blocks it
+            // steps; the persistent writes' residue classes likewise.
+            let kernel_cut = (!persistent && kernel).then(|| {
+                let lengths = kernel_lengths(pinned_blocks || whole_blocks, block_places, log2_k_star);
+                (lengths, kernel_blocks(&train_set, members, seed, read, n, spacing, lengths, whole_blocks))
+            });
+            let starts: Vec<usize> = if persistent && fresh_sweeps.is_none() { members.iter().enumerate().map(|(j, &i)| residue_start(seed, read, n, j, spacing, train_set[i].1.len())).collect() } else { Vec::new() };
+            let section_law = if persistent {
+                match fresh_sweeps {
+                    Some(sweeps) => SectionLaw::Fresh { sweeps },
+                    None => SectionLaw::Persistent { starts: &starts, spacing, sinks: if persistent_writes.is_empty() { PERSISTENT_SINKS } else { 0 } },
+                }
+            } else {
+                match (&kernel_cut, writer) {
+                    (Some((_, (blocks, owners, _))), _) if conditional => SectionLaw::Conditional { blocks, owners, alphabet: learner.field.declaration.alphabet },
+                    (Some((_, (_, owners, _))), _) => SectionLaw::Kernel { owners },
+                    (None, Some(_)) => SectionLaw::Writer,
+                    (None, None) => SectionLaw::Joint { reads: joint.unwrap_or(1) },
+                }
+            };
+            let (work, unit) = section_work(&section_law, &train_set, members);
+            let projected = rate.map(|r| r.project(work));
+            let since = now - saved_ms;
+            let hour = n != opening && save_due(since, projected, SAVE_MS);
+            if hour || (n > 0 && save_at.contains(&n)) {
                 write_new(&out.join(format!("STATE.{lap}.{n}")), at_rate(&learner, base_rate).as_bytes())?;
+                saved_ms = now;
                 match &host_held {
                     Some(h) => h.read(10_000 * (lap as i64 + 1) + n as i64, &learner),
                     None => enumerated_read(&held_field(&learner, averaging), &held_set, places, &truth_of, realization, 10_000 * (lap as i64 + 1) + n as i64, &mut enumerated_rows)?,
                 }
-                saved_ms = started.elapsed().as_millis();
-                println!("FIELD_SAVED lap={lap} sections={n}/{} ms={now} read_ms={}", sections.len(), saved_ms - now);
+                println!(
+                    "FIELD_SAVED lap={lap} sections={n}/{} ms={now} read_ms={} reason={} since_ms={since} projected_ms={} work={work} unit={unit} rate_ms={} rate_work={} hour_ms={SAVE_MS}",
+                    sections.len(),
+                    started.elapsed().as_millis() - now,
+                    if hour { "hour" } else { "declared" },
+                    projected.map_or("-".to_string(), |p| p.to_string()),
+                    rate.map_or("-".to_string(), |r| r.ms.to_string()),
+                    rate.map_or("-".to_string(), |r| r.work.to_string())
+                );
                 leg.print(&learner.field, lap, n, "leg");
                 leg = Leg::new(&learner.field);
             }
             let section_start = std::time::Instant::now();
-            let members = &sections[s];
+            measuring = Some((work, section_start));
             let truths: Vec<Vec<usize>> = members.iter().map(|&i| truth_of(&train_set[i], &train_set[i].1)).collect();
             if persistent {
                 // [definition; the unified-theory reading of November 7, 09:36] **The field meets its persistent writes**: one
@@ -3458,7 +3666,7 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
                         writeln!(f)?;
                     }
                 } else if fresh {
-                    for sweep in 0..8u64 {
+                    for sweep in 0..PERSISTENT_SINKS {
                         let t0 = std::time::Instant::now();
                         let (mv, pr, en) = learner.field.energy_sweep_at(&problems[..m], &mut active, None, void, 0, mix(key, 100 + sweep), realization, &mut |_, _| {}).map_err(|e| e.to_string())?;
                         println!("FIELD_PERSISTENT_SINK sweep={} moved={mv} proposed={pr} accept_milli={} write_energy_milli={} ms={}", sweep + 1, mv * 1000 / pr.max(1), (en.iter().sum::<i128>() / m.max(1) as i128) * 1000 >> 32, t0.elapsed().as_millis());
@@ -3468,8 +3676,7 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
                 let positions: Vec<Vec<usize>> = (0..m)
                     .map(|j| {
                         let len = active[j].len();
-                        let r = (mix(seed ^ 0xB10C << 44, read << 40 | (n as u64) << 16 | j as u64) as usize) % spacing.min(len);
-                        (r..len).step_by(spacing).collect()
+                        (residue_start(seed, read, n, j, spacing, len)..len).step_by(spacing).collect()
                     })
                     .collect();
                 // Under fresh writes the whole sweeps above are the section's sweep (their energies are the FIELD_FRESH_SWEEP lines).
@@ -3544,46 +3751,13 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
                 }
                 continue;
             }
-            if writer.is_none() && joint.is_none() {
-                // The kernel: each state's answer places `t ≡ r (mod s)`, cut into blocks of at most `k*` places, each block its own
-                // kernel step from the truth ([the unified-theory reading of November 7, 07:24]: a block of `k` places moves
-                // `k·2Φ(−σ√k/2)` places, most at `σ²k ≈ 5.7`); `FIELD_CONTRAST_WHOLE_BLOCKS` keeps one block a state (laps 4 to 9).
-                // [definition; the unified-theory reading of November 7, 08:13] Two lengths a section, `k₊ = ⌈k*·2^¼⌉` and
-                // `k₋ = max(1, ⌊k*·2^(−¼)⌋)`, each residue class cut into blocks alternating them (`k₊` first on even sections,
-                // `k₋` on odd); a closing block shorter than its length runs but is not read.
-                let (k_up, k_down) = if pinned_blocks || whole_blocks {
-                    (block_places.max(1), block_places.max(1))
-                } else {
-                    let up = (1..=1usize << 13).find(|&k| log2_q16(k as u64) as i128 >= log2_k_star + (1 << 14)).unwrap_or(1 << 13);
-                    let down = (1..=1usize << 13).rev().find(|&k| log2_q16(k as u64) as i128 <= log2_k_star - (1 << 14)).unwrap_or(1).max(1);
-                    (up, down)
-                };
-                let mut blocks: Vec<Vec<usize>> = Vec::new();
-                let mut owners: Vec<usize> = Vec::new();
-                // Each block's length class (`Some(true)` k₊, `Some(false)` k₋) where it is whole, `None` where it closes short.
-                let mut classes_of: Vec<Option<bool>> = Vec::new();
-                for (m, &i) in members.iter().enumerate() {
-                    let (q, a, _) = &train_set[i];
-                    let r = (mix(seed ^ 0xB10C << 44, read << 40 | (n as u64) << 16 | m as u64) as usize) % spacing.min(a.len());
-                    let residue: Vec<usize> = (r..a.len()).step_by(spacing).map(|j| q.len() + j).collect();
-                    if whole_blocks {
-                        blocks.push(residue);
-                        owners.push(m);
-                        classes_of.push(None);
-                        continue;
-                    }
-                    let mut at = 0usize;
-                    let mut up = n % 2 == 0;
-                    while at < residue.len() {
-                        let len = if up { k_up } else { k_down };
-                        let end = (at + len).min(residue.len());
-                        blocks.push(residue[at..end].to_vec());
-                        owners.push(m);
-                        classes_of.push((end - at == len).then_some(up));
-                        at = end;
-                        up = !up;
-                    }
-                }
+            // The kernel (the writer and the joint release undeclared): each state's answer places `t ≡ r (mod s)`, cut into blocks
+            // of at most `k*` places, each block its own kernel step from the truth ([the unified-theory reading of November 7,
+            // 07:24]: a block of `k` places moves `k·2Φ(−σ√k/2)` places, most at `σ²k ≈ 5.7`); `FIELD_CONTRAST_WHOLE_BLOCKS`
+            // keeps one block a state (laps 4 to 9). [definition; the unified-theory reading of November 7, 08:13] Two lengths a
+            // section ([`kernel_lengths`]), each residue class cut into blocks alternating them ([`kernel_blocks`], cut at the
+            // section's start for the save law); a closing block shorter than its length runs but is not read.
+            if let Some(((k_up, k_down), (blocks, owners, classes_of))) = kernel_cut {
                 if section_letters {
                     let mut count = std::collections::BTreeMap::<usize, usize>::new();
                     for (b, &o) in blocks.iter().zip(&owners) {
@@ -3924,8 +4098,13 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
                 return Ok(());
             }
         }
+        // The lap's last section is measured to its end, before the lap's own reads.
+        if let Some((work, at)) = measuring.take() {
+            rate = SaveRate::larger(rate, at.elapsed().as_millis(), work);
+        }
         learner.laps += 1;
         write_new(&out.join(format!("STATE.{lap}")), at_rate(&learner, base_rate).as_bytes())?;
+        saved_ms = started.elapsed().as_millis();
         if persistent {
             println!("FIELD_PERSISTENT_LAP lap={lap} states={states} moved={moved_lap} proposed={places_lap} accept_milli={} closing_milli={} ms={}", moved_lap * 1000 / places_lap.max(1), if states == 0 { 0 } else { -(gap * LN2_Q30 >> 30) * 1000 / (states as i128) >> 32 }, started.elapsed().as_millis());
         }
@@ -4603,9 +4782,10 @@ fn band_half_width(k: u32) -> (u128, u128) {
 /// `contrast-field` forms them ([`sections_of`] at the state's seed, [`contrast_seed`]) in the keyed order its learner walks them
 /// at its lap count ([`walk`]), and for each walked section from `FROM`, `COUNT` of them, one `FIELD_WALK` line: the walk index,
 /// the section, its problems, the summed answer places `P` (the places a fresh write sweeps, at true lengths), `Σ L²` and the
-/// longest answer, and `site_reads`, the sites a sweep reads at most (`Σ_k L_k (Q_k + L_k + v_k)`, each proposing answer reading
-/// its whole region with its near tail of voids); a run of fresh writes projects as each section's site reads times the largest
-/// measured rate per site read. A reading only: it opens nothing on the realization.
+/// longest answer, and `site_reads`, the sites a sweep reads at most in its proposals (`Σ_k L_k (Q_k + L_k + v_k)`,
+/// [`sweep_site_reads`]: each proposing answer reading its whole region with its near tail of voids); the save law projects a
+/// section of fresh writes as its declared sweeps times these site reads times the run's largest measured time per site read
+/// ([`section_work`], [`SaveRate`]). A reading only: it opens nothing on the realization.
 pub(super) fn walk_field(args: &[String]) -> Result<()> {
     if args.len() != 12 {
         return Err("walk-field STATE STATE_SHA CODEC CODEC_SHA UNITS UNITS_SHA TRAIN TRAIN_SHA SECTION FROM COUNT".into());
@@ -4624,16 +4804,7 @@ pub(super) fn walk_field(args: &[String]) -> Result<()> {
         let lengths: Vec<u128> = sections[s].iter().map(|&i| train_set[i].1.len() as u128).collect();
         let p: u128 = lengths.iter().sum();
         let sq: u128 = lengths.iter().map(|l| l * l).sum();
-        // [theory, November 9 11:39] A sweep is the longest answer's steps, each proposing answer reading its whole region
-        // (question, answer and the near tail of voids), so it reads at most Σ_k L_k (Q_k + L_k + v_k) sites.
-        let site_reads: u128 = sections[s]
-            .iter()
-            .map(|&i| {
-                let (q, a, room) = (&train_set[i].0, &train_set[i].1, train_set[i].2);
-                let voids = holonics::hnn::tower::field::NEAR.min(room.saturating_sub(a.len()));
-                a.len() as u128 * (q.len() + a.len() + voids) as u128
-            })
-            .sum();
+        let site_reads = sweep_site_reads(&train_set, &sections[s]);
         (total_p, total_sq, total_reads) = (total_p + p * p, total_sq + sq, total_reads + site_reads);
         println!("FIELD_WALK n={n} section={s} problems={} places={p} places_squared={} sum_l_squared={sq} site_reads={site_reads} longest={}", lengths.len(), p * p, lengths.iter().max().unwrap_or(&0));
     }
@@ -7414,6 +7585,92 @@ mod tests {
             }
             assert!(read.iter().enumerate().all(|(t, &n)| n == usize::from(t >= q.len() && t <= q.len() + a.len())), "each answer site and its void once");
         }
+    }
+
+    /// [definition; theory, November 9 11:48] The save law's test: a section that would pass the hour saves, one that would end
+    /// on it does not, and before any rate the plain hour test holds (an hour to the millisecond saves). The rate is the largest
+    /// measured time over declared work, kept as its pair, and its projection rounds up. On a walk of sections that each take
+    /// their work at one rate, the hour test alone (the law this one replaces) saves at the first start past the hour, so a gap
+    /// passes the hour by part of a section; the projected crossing holds every gap to the hour.
+    #[test]
+    fn a_save_falls_where_a_section_would_pass_the_hour() {
+        const HOUR: u128 = 3_600_000;
+        assert!(!save_due(0, Some(HOUR), HOUR), "a section that ends on the hour does not pass it");
+        assert!(save_due(0, Some(HOUR + 1), HOUR));
+        assert!(!save_due(HOUR - 600_000, Some(600_000), HOUR));
+        assert!(save_due(HOUR - 600_000, Some(600_001), HOUR));
+        assert!(!save_due(HOUR, Some(0), HOUR));
+        assert!(save_due(HOUR + 1, Some(0), HOUR));
+        assert!(!save_due(HOUR - 1, None, HOUR), "no rate: the plain hour test");
+        assert!(save_due(HOUR, None, HOUR));
+        assert_eq!(SaveRate::larger(None, 5, 0), None, "a section of no declared work measures no rate");
+        // 300/7 > 200/5, then 450/10 > 300/7.
+        let rate = SaveRate::larger(SaveRate::larger(None, 300, 7), 200, 5);
+        assert_eq!(rate, Some(SaveRate { ms: 300, work: 7 }));
+        let rate = SaveRate::larger(rate, 450, 10);
+        assert_eq!(rate, Some(SaveRate { ms: 450, work: 10 }));
+        assert_eq!(SaveRate { ms: 450, work: 10 }.project(3), 135);
+        assert_eq!(SaveRate { ms: 300, work: 7 }.project(1), 43, "⌈300/7⌉");
+        // Each section takes 90 ms a unit of its work: the gaps between saves under each law.
+        let works: [u128; 9] = [1_000, 5_000, 9_000, 2_000, 11_000, 7_000, 3_000, 13_000, 6_000];
+        let gaps = |projected: bool| -> Vec<u128> {
+            let (mut t, mut saved, mut rate, mut gaps) = (0u128, 0u128, None::<SaveRate>, Vec::new());
+            for &w in works.iter().cycle().take(45) {
+                if save_due(t - saved, if projected { rate.map(|r| r.project(w)) } else { None }, HOUR) {
+                    gaps.push(t - saved);
+                    saved = t;
+                }
+                t += 90 * w;
+                rate = SaveRate::larger(rate, 90 * w, w);
+            }
+            gaps
+        };
+        let (hour_test, crossing) = (gaps(false), gaps(true));
+        assert!(hour_test.len() >= 4 && crossing.len() >= 4);
+        assert!(hour_test.iter().any(|&g| g > HOUR), "the hour test alone passes the hour: {hour_test:?}");
+        assert!(crossing.iter().all(|&g| g <= HOUR), "the projected crossing holds the hour: {crossing:?}");
+    }
+
+    /// [definition; theory, November 9 11:39 and 11:48] A section's declared work. The fresh writes' is their declared sweeps
+    /// times walk-field's site reads, `Σ_k L_k (Q_k + L_k + v_k)` with `v_k = min(NEAR, room_k − L_k)`, counted here by hand on
+    /// three problems (a room that leaves the whole near tail, one that leaves two voids, one that leaves none). The persistent
+    /// writes' is the places their residue sweep walks, each reading its region, and their sinks' sweeps where they open. The
+    /// kernel's blocks are each member's residue class in order, cut alternately at `k₋` and `k₊` on an odd section, and the
+    /// kernel's and law D's work are read from them; the joint release's is its reads of every region, the writer's its places.
+    #[test]
+    fn a_sections_declared_work_is_the_walks_site_reads() {
+        use holonics::hnn::tower::field::NEAR;
+        let set: Problems = vec![(vec![1; 3], vec![2; 2], 2 + NEAR + 4), (vec![1; 5], vec![2; 4], 4 + 2), (vec![1; 1], vec![2; 7], 7)];
+        let members = [0usize, 1, 2];
+        let by_hand = 2 * (3 + 2 + NEAR as u128) + 4 * (5 + 4 + 2) + 7 * (1 + 7);
+        assert_eq!(sweep_site_reads(&set, &members), by_hand, "walk-field's site reads");
+        assert_eq!(sweep_site_reads(&set, &[2, 0, 1]), by_hand);
+        assert_eq!(section_work(&SectionLaw::Fresh { sweeps: 24 }, &set, &members), (24 * by_hand, "site_reads"));
+        let (seed, read, n, spacing) = (0x5EED_u64, 3u64, 5usize, 3usize);
+        let starts: Vec<usize> = members.iter().enumerate().map(|(j, &i)| residue_start(seed, read, n, j, spacing, set[i].1.len())).collect();
+        let swept: u128 = members.iter().zip(&starts).map(|(&i, &r)| (r..set[i].1.len()).step_by(spacing).count() as u128 * region_sites(&set[i])).sum();
+        assert_eq!(section_work(&SectionLaw::Persistent { starts: &starts, spacing, sinks: 0 }, &set, &members), (swept, "site_reads"));
+        assert_eq!(section_work(&SectionLaw::Persistent { starts: &starts, spacing, sinks: PERSISTENT_SINKS }, &set, &members).0, swept + PERSISTENT_SINKS as u128 * by_hand);
+        let (blocks, owners, classes) = kernel_blocks(&set, &members, seed, read, n, 1, (2, 1), false);
+        for (m, &i) in members.iter().enumerate() {
+            let (q, a, _) = &set[i];
+            let joined: Vec<usize> = blocks.iter().zip(&owners).filter(|&(_, &o)| o == m).flat_map(|(b, _)| b.iter().copied()).collect();
+            assert_eq!(joined, (q.len()..q.len() + a.len()).collect::<Vec<_>>(), "member {m}: its residue class in order");
+        }
+        let (f, t) = (Some(false), Some(true));
+        assert_eq!(classes, vec![f, None, f, t, f, f, t, f, t, f], "k₋ first on an odd section, a closing short block unread");
+        let (whole, whole_owners, whole_classes) = kernel_blocks(&set, &members, seed, read, n, spacing, (2, 1), true);
+        assert_eq!((whole_owners, whole_classes), (vec![0, 1, 2], vec![None; 3]));
+        assert!(whole.iter().zip(&starts).zip(&members).all(|((b, &r), &i)| b.len() == (r..set[i].1.len()).step_by(spacing).count()));
+        assert_eq!(kernel_lengths(true, 18, 0), (18, 18));
+        assert_eq!(kernel_lengths(false, 18, log2_q16(18) as i128), (22, 15), "⌈18·2^¼⌉ and ⌊18·2^(−¼)⌋");
+        let regions: u128 = members.iter().map(|&i| region_sites(&set[i])).sum();
+        let owned: u128 = owners.iter().map(|&o| region_sites(&set[members[o]])).sum();
+        let placed: u128 = blocks.iter().zip(&owners).map(|(b, &o)| b.len() as u128 * region_sites(&set[members[o]])).sum();
+        assert_eq!(section_work(&SectionLaw::Kernel { owners: &owners }, &set, &members), (2 * regions + 2 * owned, "site_reads"));
+        assert_eq!(section_work(&SectionLaw::Conditional { blocks: &blocks, owners: &owners, alphabet: 11 }, &set, &members), (regions + 11 * placed, "site_reads"));
+        assert_eq!(section_work(&SectionLaw::Joint { reads: 64 }, &set, &members), (64 * regions, "site_reads"));
+        assert_eq!(section_work(&SectionLaw::Writer, &set, &members), (2 + 4 + 7, "places"));
     }
 }
 
