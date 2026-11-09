@@ -2468,31 +2468,6 @@ pub(super) fn average_open(args: &[String]) -> Result<()> {
     Ok(())
 }
 
-/// [definition; theory, November 9 03:56] **A state moved to the opening at the letters' force** (`opening-at-force STATE
-/// STATE_SHA OUT`, `FieldLearner::opened_at_force`): the same learner with its field under the opening law (each site opens
-/// at the letters' force the ticks descend, `x⁰_t = Rᵀ E(u_t) + E₋ + E₊ + C s_t + b`; the state's `opening force` line), so a
-/// run resumes a trained law-D state under the law. A crossing between laws, reading-free: nothing is read, and the law line
-/// is the only change (theory, November 9 04:10): `θ`, the average, both moments, the family lengths and the held step carry
-/// over as they are, and the written text is checked to be the state's own bytes with that one line added. Recorded where it
-/// is done, in the run's record with its crossing.
-pub(super) fn opening_at_force(args: &[String]) -> Result<()> {
-    if args.len() != 4 {
-        return Err("opening-at-force STATE STATE_SHA OUT".into());
-    }
-    let text = String::from_utf8(pinned_read(&args[1], &args[2], STATE_BUDGET)?)?;
-    let learner = FieldLearner::from_text(&text).map_err(|e| e.to_string())?;
-    let moved = learner.opened_at_force().map_err(|e| e.to_string())?.to_text();
-    // The law line only: the moved text less its one `opening force` line is the state's text, byte for byte.
-    let at = moved.lines().position(|l| l == "opening force").ok_or("opening-at-force: the moved state carries no law line")?;
-    let rest: Vec<&str> = moved.lines().enumerate().filter(|&(k, _)| k != at).map(|(_, l)| l).collect();
-    if rest != text.lines().collect::<Vec<_>>() {
-        return Err("opening-at-force: the state's text does not read back as itself, so the move would change more than its law line".into());
-    }
-    write_new(std::path::Path::new(&args[3]), moved.as_bytes())?;
-    println!("FIELD_OPENING_AT_FORCE state={} out={} line={}", &args[2][..16.min(args[2].len())], args[3], at + 1);
-    Ok(())
-}
-
 /// [definition; theory, November 9 05:51] **A state of the scaled contrast moved to the one deposit** (`deposit-fold STATE
 /// STATE_SHA OUT`, [`FieldLearner::deposit_folded`]): the scaled law's length `λ`, read from the state's last step against its
 /// moments (the law kept its lengths in the trainer, never in a state), is folded into every family, `ρ_f ← ρ_f − log₂ λ`,
@@ -3035,9 +3010,6 @@ pub(super) fn contrast_field(args: &[String], realization: &mut dyn FieldRealiza
     if let Ok(v) = std::env::var("FIELD_WIDEN") {
         learner.field.widen = Some(v.parse().map_err(|_| "FIELD_WIDEN is the classes' share".to_string())?);
     }
-    // [definition; theory, November 9 03:56] The state's opening law, read from its text (`opening-at-force` moves a state to
-    // the letters' force; no switch selects it), stated in the run's receipt.
-    println!("FIELD_CONTRAST_OPENING law={}", if learner.field.opening_at_force { "force" } else { "own" });
     let coin_tau: Option<u32> = match std::env::var("FIELD_CONTRAST_COIN") {
         Ok(v) => Some(v.parse().map_err(|_| "FIELD_CONTRAST_COIN is the tolerance's bits".to_string())?),
         Err(_) => None,
@@ -4495,8 +4467,8 @@ fn support_word(offsets: &[i64]) -> u64 {
 /// HELD_SHA PLACES OUT`**: whether a letter redraws the classes its place's opening is held at, or the halvings its descent
 /// stands at, the two discrete maps the covector is taken across without seeing. At the held places the enumerated
 /// conditional reads ([`enumerated_places`]: the first `PLACES`, `FIELD_HELD_ALL_OF` as there), at the state's live `θ` (not
-/// the averaged constitution) and under its own opening law and width law, each letter `c` of the alphabet at the place with
-/// the rest at the truth (the enumerated read's configurations) is relaxed as `G` is
+/// the averaged constitution) and under its own width law, each letter `c` of the alphabet at the place with the rest at
+/// the truth (the enumerated read's configurations) is relaxed as `G` is
 /// ([`FieldRealization::read_energy_held_classes`]: [`holonics::hnn::tower::field::Field::energy_held_classes`] on the host,
 /// the card's own lists and relaxation on the card), and at the place `t` and at `t ± 1` (the letter at `t` enters its
 /// neighbours' opening through their before and after rows) each head's key class, probe class and lock support are read.
@@ -4596,13 +4568,12 @@ pub(super) fn class_field(args: &[String], realization: &mut dyn FieldRealizatio
     }
     let class_text = if leaves { "none".to_string() } else { format!("{class_moved}/{compared}") };
     println!(
-        "FIELD_CLASS_READ places={} configurations={} rows={rows} heads={heads} ticks={} classes={} widen={} opening={} class_moved={class_text} support_moved={support_moved}/{compared} halvings_moved={halvings_moved}/{letters_compared} read_ms={read_ms} host_threads={} ms={}",
+        "FIELD_CLASS_READ places={} configurations={} rows={rows} heads={heads} ticks={} classes={} widen={} class_moved={class_text} support_moved={support_moved}/{compared} halvings_moved={halvings_moved}/{letters_compared} read_ms={read_ms} host_threads={} ms={}",
         chosen.len(),
         reads.len(),
         field.declaration.ticks,
         if leaves { "leaves" } else { "trits" },
         field.widen.map_or("none".to_string(), |c| c.to_string()),
-        if field.opening_at_force { "force" } else { "own" },
         rayon::current_num_threads(),
         started.elapsed().as_millis()
     );

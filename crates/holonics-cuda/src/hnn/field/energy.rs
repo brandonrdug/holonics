@@ -998,19 +998,10 @@ impl<'c> CardField<'c> {
             let (mut rp, mut fp, mut jp, mut hp, mut lp) = (c.read.device_ptr(), forces[k].device_ptr(), rb.jt.device_ptr(), at_c.device_ptr(), rb.lambda.device_ptr());
             self.launch("field_energy_lambda", Self::warps(sites as u64), THREADS, &mut [arg(words), arg(&mut rp), arg(&mut fp), arg(&mut jp), arg(&mut hp), arg(&mut lp)])?;
         }
-        // The opening: `x⁰_t = E(u_t) + E₋(u_(t−1)) + E₊(u_(t+1)) + C s_t + b`, or at the letters' force (the host's
-        // `energy_opening`) `x⁰_t = Rᵀ E(u_t) + …`, whose own row takes `R λ⁰` (`rb.lift`, as a tick's takes `R w`; the
-        // material's opening reads it there).
+        // The opening: `x⁰_t = E(u_t) + E₋(u_(t−1)) + E₊(u_(t+1)) + C s_t + b`.
         self.transposed(words, mface, dw, m2, rb.lambda.device_ptr(), dw, rb.chart.device_ptr(), false, false)?;
-        let own_cov = if field.opening_at_force {
-            self.affine("field_affine_x64", words, words.read, NO_BIAS, words.rread, dw, dw, rb.lambda.device_ptr(), dw, rb.lift.device_ptr(), dw, 0, false)?;
-            rb.lift.device_ptr()
-        } else {
-            // Retires once the force opening's claim is judged: the own-row opening's `λ⁰` on the own row.
-            rb.lambda.device_ptr()
-        };
-        let (mut lp, mut yp, mut cp, mut op, mut bp, mut ap, mut mp) = (rb.lambda.device_ptr(), own_cov, rb.chart.device_ptr(), rb.own.device_ptr(), rb.before.device_ptr(), rb.after.device_ptr(), rb.moment.device_ptr());
-        self.launch("field_energy_opening_letters", Self::cells((sites * (dw + m2)) as u64), THREADS, &mut [arg(words), arg(&mut lp), arg(&mut yp), arg(&mut cp), arg(&mut op), arg(&mut bp), arg(&mut ap), arg(&mut mp)])?;
+        let (mut lp, mut cp, mut op, mut bp, mut ap, mut mp) = (rb.lambda.device_ptr(), rb.chart.device_ptr(), rb.own.device_ptr(), rb.before.device_ptr(), rb.after.device_ptr(), rb.moment.device_ptr());
+        self.launch("field_energy_opening_letters", Self::cells((sites * (dw + m2)) as u64), THREADS, &mut [arg(words), arg(&mut lp), arg(&mut cp), arg(&mut op), arg(&mut bp), arg(&mut ap), arg(&mut mp)])?;
         Ok(rb)
     }
 
@@ -1111,17 +1102,9 @@ impl<'c> CardField<'c> {
         // 2. The ticks, back from `λ^K = −J F^K`, each stood tick's material gathered and released.
         let rb = self.energy_reverse(field, words, cells, forces, halvings, held, fb, sites, pairs, regions, Some(&mb))?;
         Self::energy_point(words, last, held);
-        // 3. The opening: `x⁰_t = E(u_t) + E₋(u_(t−1)) + E₊(u_(t+1)) + C s_t + b`, or at the letters' force `x⁰_t = Rᵀ E(u_t) +
-        // …` (the host's `energy_opening`): its own row takes `R λ⁰` (`rb.lift`, formed by the reverse's opening) on the
-        // letter's encoding rows and `E(u_t) ⊗ λ⁰_t` on the lift, as a tick's take `R w` and `E ⊗ w`.
+        // 3. The opening: `x⁰_t = E(u_t) + E₋(u_(t−1)) + E₊(u_(t+1)) + C s_t + b`.
         let lambda = rb.lambda.device_ptr();
-        if field.opening_at_force {
-            self.material_outer("field_energy_outer_ll", words, &mb, false, l.read, dw, dw, held.own.device_ptr(), dw, lambda, dw, 0, 1)?;
-            self.material_rows("field_energy_letter_rows_l", words, &mb, false, l.enc, rb.lift.device_ptr(), 0, 0, 1)?;
-        } else {
-            // Retires once the force opening's claim is judged: the own-row opening's `λ⁰` on the encoding.
-            self.material_rows("field_energy_letter_rows_l", words, &mb, false, l.enc, lambda, 0, 0, 1)?;
-        }
+        self.material_rows("field_energy_letter_rows_l", words, &mb, false, l.enc, lambda, 0, 0, 1)?;
         self.material_rows("field_energy_letter_rows_l", words, &mb, false, l.before, lambda, 1, 0, 1)?;
         self.material_rows("field_energy_letter_rows_l", words, &mb, false, l.after, lambda, -1, 0, 1)?;
         self.material_outer("field_energy_outer_ll", words, &mb, false, mface as usize, dw, m2, lambda, dw, words.moment, m2, 0, 1)?;
@@ -1335,22 +1318,7 @@ impl<'c> CardField<'c> {
         let (mface, mface_bias, rmface) = moment_face(field);
         let mterm = i64s(sites * dw)?;
         self.affine("field_affine_x64", words, mface, mface_bias, rmface, dw, m2, words.moment, m2, mterm.device_ptr(), dw, 0, false)?;
-        if field.opening_at_force {
-            // [definition; theory, November 9 03:56] The opening at the letters' force (the host's `energy_opening`): the
-            // letters and their force formed as `energy_rest` forms them (the same kernels, so the same integers), and the
-            // state opened at `release(F, 8)`; these carriers are dropped here and `energy_rest` forms its held ones again.
-            let (own, before, after, bias, lf) = (i64s(sites * dw)?, i64s(sites * dw)?, i64s(sites * dw)?, i64s(sites)?, i64s(sites * dw)?);
-            let (mut op, mut bp, mut ap, mut cp) = (own.device_ptr(), before.device_ptr(), after.device_ptr(), bias.device_ptr());
-            self.launch("field_energy_letters", Self::cells((sites * dw) as u64), THREADS, &mut [arg(words), arg(&mut op), arg(&mut bp), arg(&mut ap), arg(&mut cp)])?;
-            let (mut op, mut bp, mut ap, mut mp, mut lp) = (own.device_ptr(), before.device_ptr(), after.device_ptr(), mterm.device_ptr(), lf.device_ptr());
-            self.launch("field_energy_letter_force", Self::cells((sites * dw) as u64), THREADS, &mut [arg(words), arg(&mut op), arg(&mut bp), arg(&mut ap), arg(&mut mp), arg(&mut lp)])?;
-            let mut lp = lf.device_ptr();
-            self.launch("field_energy_open_at_force", Self::cells((sites * dw) as u64), THREADS, &mut [arg(words), arg(&mut lp)])?;
-        } else {
-            // Retires once the force opening's claim is judged: the own-row opening, `field_open`'s rows with the moment's
-            // term added.
-            self.affine("field_affine_x64", words, mface, mface_bias, rmface, dw, m2, words.moment, m2, 0, dw, words.x, false)?;
-        }
+        self.affine("field_affine_x64", words, mface, mface_bias, rmface, dw, m2, words.moment, m2, 0, dw, words.x, false)?;
         let lengths: Vec<usize> = regions.iter().map(|r| r.classes.len()).collect();
         // [definition; the unified-theory reading of November 7, 23:34] Under the width law the lists are built on the host
         // from the opening's words (`ClassLists::widened`, the host's own lists) and laid out as `field_classes` lays them.

@@ -283,17 +283,6 @@ extern "C" __global__ void field_energy_letter_force(FieldWords w, const int64_t
     }
 }
 
-// [definition; theory, November 9 03:56] **The opening at the letters' force** (the host's `energy_opening` under the state's
-// opening law): each site's state opened at its letters' force `lf` (`field_energy_letter_force`) released once to the state's
-// grain, `x⁰ = release(F, 8)` on `2^(−16)`.
-extern "C" __global__ void field_energy_open_at_force(FieldWords w, const int64_t *lf) {
-    const uint64_t cells = (uint64_t)w.T * w.D;
-    const uint32_t up = COVECTOR_BITS - FACE_BITS;
-    for (uint64_t c = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; c < cells; c += (uint64_t)gridDim.x * blockDim.x) {
-        w.x[c] = fit64(rel((wide)lf[c], up), w.status);
-    }
-}
-
 // [measurement; theory, November 9, the class reading] **A held row's classes and support** (the host's
 // `Field::energy_held_classes`, read by `CardField::energy_held_class_reads`): one warp a requested row `rows[k]` (`h·T + g`),
 // its class as a source `cls[h][g]`, its own probed class (its row's first, or `UINT32_MAX` for an open receiver, which keeps
@@ -1240,16 +1229,15 @@ extern "C" __global__ void field_energy_lambda(FieldWords w, const int32_t *read
     }
 }
 
-// The opening's letters' covectors (the host's `energy_reverse`): `own += own_cov` (`λ⁰` at the own-row opening, `R λ⁰` at the
-// letters' force), `before_t += λ⁰_(t+1)`, `after_t += λ⁰_(t−1)` (within the region) and `moment += Cᵀ λ⁰` (`chart`), each
-// addition checked.
-extern "C" __global__ void field_energy_opening_letters(FieldWords w, const int64_t *lambda, const int64_t *own_cov, const int64_t *chart, int64_t *own, int64_t *before, int64_t *after, int64_t *moment) {
+// The opening's letters' covectors (the host's `energy_reverse`): `own += λ⁰`, `before_t += λ⁰_(t+1)`, `after_t += λ⁰_(t−1)`
+// (within the region) and `moment += Cᵀ λ⁰` (`chart`), each addition checked.
+extern "C" __global__ void field_energy_opening_letters(FieldWords w, const int64_t *lambda, const int64_t *chart, int64_t *own, int64_t *before, int64_t *after, int64_t *moment) {
     const uint64_t rows = (uint64_t)w.T * w.D;
     const uint64_t cells = rows + (uint64_t)w.T * w.M2;
     for (uint64_t c = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; c < cells; c += (uint64_t)gridDim.x * blockDim.x) {
         if (c < rows) {
             const uint64_t t = c / w.D, i = c % w.D;
-            own[c] = fit64((wide)own[c] + (wide)own_cov[c], w.status);
+            own[c] = fit64((wide)own[c] + (wide)lambda[c], w.status);
             if (t + 1 < w.T && w.site_pos[t + 1] > 0) {
                 before[c] = fit64((wide)before[c] + (wide)lambda[(t + 1) * w.D + i], w.status);
             }

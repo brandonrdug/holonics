@@ -23,9 +23,7 @@
 //! ticks (one energy, one support). **The tick descends it**: `x ← x − η ∂Φ/∂r̂`, each site's step on its lanes' own
 //! scale, `Δx = η ‖x‖_rms (−∂Φ/∂r̂)`. `r̂ = x/‖x‖_rms` is the gradient of the convex `√D |x|`, so the step's first-order
 //! change is `−η gᵀ Hess g ≤ 0`; `η` is halved wherever a tick's fall is not certified on the energy's own reading, and
-//! a tick no halving certifies leaves the state at rest. The opening is its start: the field's opening
-//! `x⁰_t = E(u_t) + E₋(u_(t−1)) + E₊(u_(t+1)) + C s_t + b`, or, under the opening law of the state
-//! ([`Field::opening_at_force`], [`Field::opened_at_force`]), the letters' force itself. **The face is the energy's force
+//! a tick no halving certifies leaves the state at rest. The opening as now is its start. **The face is the energy's force
 //! on a letter**: `z_t(a) = −∂Φ/∂e_t(a)` at the last state, one backward of `Φ` to the letter rows at fixed state,
 //! `⟨E(a), R r̂_t + b_R⟩ + c_a + ⟨E₋(a), r̂_(t+1)⟩ + ⟨E₊(a), r̂_(t−1)⟩` with the moment's part, the letter's moment rows
 //! read against the transported covector `−∂Φ/∂s` (each site's `Cᵀ r̂` and its probe's lock force at the turned modes).
@@ -714,49 +712,6 @@ impl Field {
         Ok(out)
     }
 
-    /// [definition; theory, November 9 03:56] **The energy's opening**: the field's opening ([`Field::open`]), or under the
-    /// opening law of the state ([`Field::opening_at_force`]) **each site opens at the letters' force**,
-    /// `x⁰_t = release(F_t, 8)` on the state's grain `2^(−16)` ([`Field::letters_force`], the force the ticks descend, one
-    /// release of the whole sum): `Rᵀ E(u_t) + E₋(u_(t−1)) + E₊(u_(t+1)) + C s_t + b`, the own row carried by the lift's
-    /// transpose where the field's opening adds `E(u_t)` itself. At a carried site the own row is the carried mixture
-    /// `release(Σ_a w_a E(a), 16)`, and an open site is carried as the uniform mixture ([`Field::energy_sites`]), so `E(∗)`
-    /// enters neither opening.
-    ///
-    /// Why (the lead reading on law D's trained state, theory November 9 03:56: `cos(E(u), Rᵀ E(u)) ≈ 0` and
-    /// `cos(x⁰, Rᵀ E(u)) ≈ −0.07`, so the field's opening never starts where the letters term rests): the letters term of the
-    /// energy is `−Σ_t ⟨F_t, r̂_t⟩` plus terms free of `r̂` (`⟨E(u_t), b_R⟩ + c_(u_t)`), and each lane's chart read lies on
-    /// the sphere `‖r̂‖ = √W`. For `F ≠ 0` in `R^W`, `−⟨F, r⟩` on `‖r‖ = √W` has the unique minimiser `√W F/‖F‖` (the
-    /// equality case of Cauchy–Schwarz), so the chart of `x⁰ = F` is that minimiser lane by lane, and there the letters
-    /// term's tangential force `F − ⟨F, r̂⟩ r̂/W` is zero: the descent starts where the letters rest and the ticks move it
-    /// only by the locks' and the pair's forces. A lane whose `F` is zero opens at zero and its step moves nothing (its
-    /// letters term is constant on the sphere). The Lean statement is owed (#410: the minimiser and its zero tangential
-    /// force).
-    ///
-    /// [agent-inferred; theory, November 9 04:10] The own-row opening is kept only for the states saved before the law and
-    /// retires once the force opening's claim is judged (one opening stands); its branches here, in
-    /// [`Field::energy_reverse`] and [`Field::energy_material`] are marked as the ones that retire.
-    fn energy_opening(&self, region: &Region, letters: &Letters, moment: &[i64], moment_term: &[i64], reaches: &Reaches) -> Result<Vec<i64>> {
-        // Retires: the own-row opening.
-        if !self.opening_at_force {
-            return self.open(region, moment);
-        }
-        self.letters_force(letters, moment_term, reaches)?.into_iter().map(|f| fit64(release(f as i128, super::super::COVECTOR_BITS - FACE_BITS))).collect()
-    }
-
-    /// [definition; theory, November 9 03:56] **The field moved to the opening at the letters' force**
-    /// ([`Field::energy_opening`]): the same material under the opening law, a reading-free transform of the state (a
-    /// crossing between laws: every face and `G` change, and the material is kept). Refused on a field whose faces are not
-    /// one energy's forces, and on one already under the law.
-    pub fn opened_at_force(&self) -> Result<Self> {
-        if !self.declaration.energy {
-            return refuse("an opening at the letters' force on a field whose faces are not one energy's forces");
-        }
-        if self.opening_at_force {
-            return refuse("a field already opened at the letters' force");
-        }
-        Ok(Self { opening_at_force: true, ..self.clone() })
-    }
-
     /// [definition; the unified-theory reading of November 7, 00:02] **The force's tangent**, `δF = (∂F/∂r̂) v = −Hess Φ · v`
     /// along a direction `v` of the chart reads (`[t][D]` on `2^(−24)`), and the probes' share of it (`[t][2M]`, unframed,
     /// on `2^(−24)`): the words' tangents through the charts, the frame and the unit power (whose Jacobian is its own
@@ -993,7 +948,7 @@ impl Field {
             return refuse("an energy field read with a clock that is not plain (its letters' force through the frames is not built)");
         }
         let (letters, moment, moment_term) = self.energy_letters_of(region, &paces, &reaches)?;
-        let mut x = self.energy_opening(region, &letters, &moment, &moment_term, &reaches)?;
+        let mut x = self.open(region, &moment)?;
         let definite: Vec<bool> = (0..sites).map(|t| Self::definite(region, t)).collect();
         let keyed: Vec<bool> = (0..sites).map(|t| !region.unresolved[t] || Self::carried(region, t).is_some()).collect();
         let window = region.window(d.ticks);
@@ -1090,10 +1045,7 @@ impl Field {
     /// `w = s ⊙ λ'`, the tick's letters take `2^(−h) ⟨w, ∂F/∂e⟩` (`R w` on the own row, `w_(t+1)` on the before row, `w_(t−1)` on
     /// the after row, `Cᵀ w + δg_s(w)` on the moment), and `λ = λ' + 2^(−h) (r̂ ⟨λ', F⟩/W + J δF(w))`, `δF(w) = −Hess Φ · w`
     /// ([`Field::energy_tangent`], the Hessian symmetric, so the tangent is the adjoint); then the opening takes `λ⁰` on its
-    /// rows and `Cᵀ λ⁰` on the moments. [definition; theory, November 9 03:56] At the letters' force
-    /// ([`Field::energy_opening`]) the own row is read through `Rᵀ`, so it takes `R λ⁰` (the lift's own direction, `release(R
-    /// λ⁰, 24)` on `2^(−24)`, as a tick's own row takes `R w`); the release of `F` to the state's grain is a change of grain
-    /// only, so `λ⁰` passes it unchanged. The classes, the supports and the halvings are held at the base.
+    /// rows and `Cᵀ λ⁰` on the moments. The classes, the supports and the halvings are held at the base.
     fn energy_reverse(&self, relaxed: &Relaxed) -> Result<LetterCovectors> {
         let d = &self.declaration;
         let (dw, m2, lanes) = (d.width, 2 * d.complex(), d.lanes);
@@ -1161,18 +1113,11 @@ impl Field {
             }
             lambda = next;
         }
-        // The opening: `x⁰_t = E(u_t) + E₋(u_(t−1)) + E₊(u_(t+1)) + C s_t + b`, or at the letters' force `x⁰_t = Rᵀ E(u_t) +
-        // E₋(u_(t−1)) + E₊(u_(t+1)) + C s_t + b` (`energy_opening`), whose own row takes `R λ⁰` as a tick's takes `R w`.
+        // The opening: `x⁰_t = E(u_t) + E₋(u_(t−1)) + E₊(u_(t+1)) + C s_t + b`.
         for t in 0..sites {
             transposed(&self.theta[l.moment_face..l.moment_face + dw * m2], reaches.moment_face, m2, &lambda[t * dw..(t + 1) * dw], MATERIAL_BITS, &mut chart)?;
-            if self.opening_at_force {
-                affine(&self.theta[l.read..l.read + dw * dw], reaches.read, dw, &lambda[t * dw..(t + 1) * dw], None, 0, MATERIAL_BITS, &mut lift)?;
-            } else {
-                // Retires: the own-row opening's `λ⁰` on the own row.
-                lift.copy_from_slice(&lambda[t * dw..(t + 1) * dw]);
-            }
             for i in 0..dw {
-                add(&mut out.own[t * dw + i], lift[i] as i128)?;
+                add(&mut out.own[t * dw + i], lambda[t * dw + i] as i128)?;
                 if t + 1 < sites {
                     add(&mut out.before[t * dw + i], lambda[(t + 1) * dw + i] as i128)?;
                 }
@@ -1600,10 +1545,8 @@ impl Field {
     /// state (each chart's word force against its read, the pair's drives and contraction, the letters' rows against the reads
     /// and lifts they meet, the moments' covector); each stood tick's `2^(−h) ⟨w, ∂F/∂θ⟩` with `w = s ⊙ λ'`, which is
     /// `−D_w(∂Φ/∂θ)`: the word forces' tangents against the reads and the word forces against `w` (the tick's adjoint `λ` as
-    /// in [`Field::energy_reverse`]); and the opening's `(∂x⁰/∂θ)ᵀ λ⁰` (at the letters' force, [`Field::energy_opening`], its
-    /// own row's `R λ⁰` on the letter's encoding rows and `E(u_t) ⊗ λ⁰_t` on the lift, `θ[read + o D + i]` taking
-    /// `E_o λ⁰_i` on `2^(−16) · 2^(−24) = 2^(−40)`). The locks' temperatures are held (theory: lap 4 keeps the line's lock
-    /// gain), and the letters' temperature does not enter `G`.
+    /// in [`Field::energy_reverse`]); and the opening's `(∂x⁰/∂θ)ᵀ λ⁰`. The locks' temperatures are held (theory: lap 4 keeps
+    /// the line's lock gain), and the letters' temperature does not enter `G`.
     pub fn energy_material(&self, region: &Region) -> Result<(Vec<i128>, i128)> {
         let (faces, locked) = self.energy_sites(region);
         let region = &Region { faces: &faces, locked: &locked, ..*region };
@@ -1788,21 +1731,12 @@ impl Field {
             }
             lambda = next;
         }
-        // 3. The opening: `x⁰_t = E(u_t) + E₋(u_(t−1)) + E₊(u_(t+1)) + C s_t + b`, or at the letters' force `x⁰_t = Rᵀ E(u_t)
-        // + …` (`energy_opening`): its own row takes `R λ⁰` and the lift `E(u_t) ⊗ λ⁰`, as a tick's take `R w` and `E ⊗ w`.
+        // 3. The opening: `x⁰_t = E(u_t) + E₋(u_(t−1)) + E₊(u_(t+1)) + C s_t + b`.
         for t in 0..sites {
             let lt: Vec<i128> = lambda[t * dw..(t + 1) * dw].iter().map(|&v| v as i128).collect();
-            let own_cov: Vec<i128> = if self.opening_at_force {
-                outer(&mut g, l.read, dw, dw, &held.letters.own[t], &lt, 0);
-                affine(&self.theta[l.read..l.read + dw * dw], reaches.read, dw, &lambda[t * dw..(t + 1) * dw], None, 0, MATERIAL_BITS, &mut lift)?;
-                lift.iter().map(|&v| v as i128).collect()
-            } else {
-                // Retires: the own-row opening's `λ⁰` on the encoding.
-                lt.clone()
-            };
             for &(row, wgt) in &weights[t] {
                 for o in 0..dw {
-                    g[l.enc + row * dw + o] += wgt * own_cov[o];
+                    g[l.enc + row * dw + o] += wgt * lt[o];
                     if t + 1 < sites {
                         g[l.before + row * dw + o] += wgt * lambda[(t + 1) * dw + o] as i128;
                     }
@@ -2198,8 +2132,7 @@ impl Field {
     /// `ρ_t = Rᵀ E(u_t)` (the own-row part of the letters' force, as [`Field::energy_force`] forms it), and (b) the opening
     /// `x⁰_t = E(u_t) + E₋(u_(t−1)) + E₊(u_(t+1)) + (C s_t + b)` split into its letters' part `L_t` and its moment's term
     /// `M_t`, before any tick. [measurement; theory, November 9] Beside them, the opening state `x⁰_t` itself (as
-    /// [`Field::energy_opening`] makes it, under the state's opening law: at the letters' force it is `release(ρ_t + (L_t −
-    /// E(u_t) + M_t) 2^8, 8)`) and the opening's own term `E(u_t)`, each against `ρ_t`. A reading only, through the host's
+    /// [`Field::open`] makes it) and the opening's own term `E(u_t)`, each against `ρ_t`. A reading only, through the host's
     /// reference; a realization reads the same sums from its own buffers ([`FieldRealization::read_energy_leads`]).
     pub fn energy_lead(&self, classes: &[usize], site: usize) -> Result<EnergyLead> {
         let rows = self.energy_lead_rows(classes, site)?;
@@ -2229,9 +2162,8 @@ impl Field {
                 *slot = fit64(*slot as i128 + e as i128)?;
             }
         }
-        // The opening state as the energy opens it (`energy_opening`, under the state's opening law), from the letters and
-        // the moments the relaxation held.
-        let opening = self.energy_opening(&region, &held.letters, &held.moment, &held.moment_term, &self.reaches())?[site * dw..(site + 1) * dw].to_vec();
+        // The opening state as `open` makes it, from the moments the relaxation held.
+        let opening = self.open(&region, &held.moment)?[site * dw..(site + 1) * dw].to_vec();
         Ok(LeadRows {
             read: cell.read[site * dw..(site + 1) * dw].to_vec(),
             own,
@@ -2320,7 +2252,7 @@ impl Field {
             return refuse("a rest read with a clock that is not plain");
         }
         let (letters, moment, moment_term) = self.energy_letters_of(region, &paces, &reaches)?;
-        let mut x = self.energy_opening(region, &letters, &moment, &moment_term, &reaches)?;
+        let mut x = self.open(region, &moment)?;
         let definite: Vec<bool> = (0..sites).map(|t| Self::definite(region, t)).collect();
         let keyed: Vec<bool> = (0..sites).map(|t| !region.unresolved[t] || Self::carried(region, t).is_some()).collect();
         let window = region.window(d.ticks);
