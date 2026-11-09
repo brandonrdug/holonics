@@ -746,7 +746,7 @@ fn a_step_that_codes_the_next_regions_higher_is_refused() {
         let mut learner = FieldLearner::new(material.clone(), 2);
         learner.field = stepped(&material, &step, 0).unwrap().0;
         let climbed = compared_on(&learner.field);
-        learner.held = Some(HeldStep { step: step.clone(), halvings: 0, carried: Vec::new() });
+        learner.held = Some(HeldStep { step: step.clone(), halvings: 0, formed: Vec::new() });
         let mut counted = Counted { reads: 0 };
         let (faces, next) = learner.read_step_on(&regions, &mut counted).unwrap();
         let next = next.expect("a held step is read");
@@ -2965,7 +2965,7 @@ fn a_sub_grain_step_carries_its_remainder_and_moves_a_grain_when_the_carry_predi
     let x: Vec<i128> = learner.carried.iter().map(|&r| i128::from(r)).collect();
     assert!(x.iter().all(|&r| r != 0 && r.unsigned_abs() < 1 << 23), "every entry forms a sub-grain step");
     assert!(x.iter().zip(&covector).all(|(&r, &g)| (r > 0) == (g > 0)), "the step follows its covector");
-    assert!(learner.last.as_ref().is_some_and(|l| l.step.iter().all(|&s| s == 0) && l.carried == learner.carried), "the step held whole in its remainders is the last step");
+    assert!(learner.last.as_ref().is_some_and(|l| l.step.iter().all(|&s| s == 0) && l.formed == x), "the step held whole in its remainders is the last step, its formed step the remainder it opened");
     // The deposit at which each entry first moves, as the carry predicts: the least `n` with `n |x| ≥ 2^23`.
     let at: Vec<u128> = x.iter().map(|&r| (1u128 << 23).div_ceil(r.unsigned_abs())).collect();
     let fine: Vec<usize> = field.families().iter().filter(|f| f.2 == MATERIAL_BITS).flat_map(|f| f.0..f.0 + f.1).collect();
@@ -3021,6 +3021,27 @@ fn the_length_law_reads_a_nonzero_price_and_transfer_where_no_grain_moves() {
     }
 }
 
+/// [definition; theory, November 9 05:51] **The length law prices the step as its section formed it, not the remainder it
+/// carries**: two learners alike but for their carried remainders (each within half a grain) read the same price and transfer
+/// on the same covector, so their family averages and lengths move alike, and hold the same formed step; their remainders, and
+/// so what moves, differ. Each earlier step was priced in its own section, so the remainder adds no term set by the grain.
+#[test]
+fn the_length_law_prices_the_formed_step_not_the_remainder_it_carries() {
+    let field = energetic_line();
+    let material = field.material_len();
+    let covector = sub_grain_covector(material);
+    let mut a = FieldLearner::new(field, 30);
+    a.open_family_rates();
+    a.deposit(covector.clone()).unwrap();
+    let mut b = a.clone();
+    b.carried = (0..material).map(|k| ((k as i64 * 7919) % (1 << 22)) - (1 << 21)).collect();
+    a.deposit(covector.clone()).unwrap();
+    b.deposit(covector).unwrap();
+    assert_eq!((&a.family_transfer, &a.family_price, &a.family_rates), (&b.family_transfer, &b.family_price, &b.family_rates), "the same price, transfer and lengths");
+    assert_eq!(a.last.as_ref().map(|l| &l.formed), b.last.as_ref().map(|l| &l.formed), "the same formed step");
+    assert_ne!(a.carried, b.carried, "the remainders differ");
+}
+
 /// [definition; theory, November 9 05:00] **A state keeps its remainders**: a learner whose deposits carry sub-grain steps saves
 /// its remainders and the remainder its last step carried, and reads them back bit for bit (the same learner, the same text);
 /// a state saved before the law, with no `carried` line, its last step without a remainder and its family averages on the
@@ -3037,7 +3058,7 @@ fn a_saved_state_keeps_its_remainders_and_one_without_opens_them_at_zero() {
         learner.deposit(covector.clone()).unwrap();
     }
     assert!(learner.carried.iter().all(|&r| r != 0));
-    assert!(learner.last.as_ref().is_some_and(|l| l.carried == learner.carried));
+    assert!(learner.last.as_ref().is_some_and(|l| l.formed.len() == material && l.formed.iter().all(|&f| f != 0)));
     let text = learner.to_text();
     let back = FieldLearner::from_text(&text).unwrap();
     assert_eq!(back, learner, "the remainders, the last step's and the averages read back bit for bit");
@@ -3055,7 +3076,7 @@ fn a_saved_state_keeps_its_remainders_and_one_without_opens_them_at_zero() {
     let opened = FieldLearner::from_text(&old.join("\n")).unwrap();
     assert_eq!(opened.carried, vec![0; material], "no carried line: the remainders open at zero");
     let last = opened.last.as_ref().unwrap();
-    assert!(last.carried.is_empty() && Some(&last.step) == learner.last.as_ref().map(|l| &l.step), "the last step alone");
+    assert!(last.formed.is_empty() && Some(&last.step) == learner.last.as_ref().map(|l| &l.step), "the last step alone");
     assert_eq!(opened.family_transfer, learner.family_transfer.iter().map(|t| t * lift).collect::<Vec<_>>(), "the averages lifted to the price's grain");
     assert_eq!(opened.family_price, learner.family_price.iter().map(|p| p * lift).collect::<Vec<_>>());
     assert_eq!((&opened.field, &opened.first, &opened.second, &opened.family_rates), (&learner.field, &learner.first, &learner.second, &learner.family_rates));
@@ -3321,8 +3342,8 @@ fn the_move_to_the_letters_force_changes_the_law_line_alone() {
     learner.family_rates = Some((0..families).map(|f| (f as i128 + 3) << 24).collect());
     learner.family_transfer = (0..families).map(|f| -(f as i128) * 1009).collect();
     learner.family_price = (0..families).map(|f| f as i128 * 2003 + 1).collect();
-    learner.held = Some(HeldStep { step: (0..len).map(|k| k as i128 % 13 - 6).collect(), halvings: 3, carried: Vec::new() });
-    learner.last = Some(HeldStep { step: (0..len).map(|k| k as i128 % 11 - 5).collect(), halvings: 0, carried: (0..len).map(|k| (k as i64 % 89) - 44).collect() });
+    learner.held = Some(HeldStep { step: (0..len).map(|k| k as i128 % 13 - 6).collect(), halvings: 3, formed: Vec::new() });
+    learner.last = Some(HeldStep { step: (0..len).map(|k| k as i128 % 11 - 5).collect(), halvings: 0, formed: (0..len).map(|k| (k as i128 % 89) - 44).collect() });
     learner.key = Some(0x1234_5678_9ABC_DEF0);
     let text = learner.to_text();
     let source = FieldLearner::from_text(&text).unwrap();
