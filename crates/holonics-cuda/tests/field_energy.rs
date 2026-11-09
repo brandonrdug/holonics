@@ -495,6 +495,48 @@ fn the_tiny_lead_reads_on_the_card_are_the_hosts() {
     }
 }
 
+/// [measurement; theory, November 9, the class reading] **A place's held classes on the card are the host's**: on every ring
+/// set, on two lanes, under both opening laws and under the width law at a share of one, the tiny truths' held class reads at
+/// both ends and inside, and every letter at one inner place (`CardField::energy_held_classes` against
+/// `Field::energy_held_classes`: each head's class, probe class and support at the place and its neighbours, from the card's
+/// own lists, and the relaxation's read with its halvings), read in one batch and again two regions a batch, equal.
+#[test]
+#[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
+fn the_tiny_held_class_reads_on_the_card_are_the_hosts() {
+    let opened = Card::open(0).unwrap();
+    let mut card = CardField::open(&opened).unwrap();
+    let short = vec![1usize, 4, 0, 2, 2, 3, 1];
+    let long: Vec<usize> = (0..13).map(|t| (t * 3 + t / 4) % 5).collect();
+    let letters: Vec<Vec<usize>> = (0..5)
+        .map(|c| {
+            let mut x = long.clone();
+            x[7] = c;
+            x
+        })
+        .collect();
+    let places: Vec<(&[usize], usize)> = [(&short, 0), (&short, 3), (&short, 6), (&long, 0), (&long, 12)].into_iter().map(|(c, t)| (c.as_slice(), t)).chain(letters.iter().map(|x| (x.as_slice(), 7))).collect();
+    let laned = |still: usize| energetic_with(FieldDeclaration { width: 16, lanes: 2, ..tiny_declaration(still) });
+    let own: Vec<(String, Field)> = (0..=2).map(|s| (format!("still {s}"), energetic(s))).chain((0..=1).map(|s| (format!("laned still {s}"), laned(s)))).collect();
+    let forced: Vec<(String, Field)> = own.iter().cloned().chain(own.iter().map(|(name, f)| (format!("{name} at the letters' force"), f.opened_at_force().unwrap()))).collect();
+    let widened = forced.iter().map(|(name, f)| {
+        let mut w = f.clone();
+        w.widen = Some(1);
+        (format!("{name} widened"), w)
+    });
+    let fields: Vec<(String, Field)> = forced.iter().cloned().chain(widened).collect();
+    for (name, field) in &fields {
+        let host: Vec<_> = places.iter().map(|&(c, t)| field.energy_held_classes(c, t).unwrap()).collect();
+        let whole = card.energy_held_classes(field, &places).unwrap();
+        card.energy_batch_regions(Some(2));
+        let cut = card.energy_held_classes(field, &places).unwrap();
+        card.energy_batch_regions(None);
+        let first = whole.iter().zip(&host).position(|(c, h)| c != h);
+        println!("ENERGY_HELD_CLASSES tiny {name} bit_equal={} cut_bit_equal={} first_difference={first:?}", whole == host, cut == host);
+        assert_eq!(whole, host, "{name}: the card's held classes");
+        assert_eq!(cut, host, "{name}: the card's held classes two regions a batch");
+    }
+}
+
 /// [measurement; the unified-theory reading of November 7, 01:37] **The line's squares at one base on the card are the
 /// host's**: on the founding of the line's declaration, squares on two synthetic truths of 400 sites (eight a truth, their
 /// sites in the truths' last third, one to eleven apart), at `ε = 2^7` ([`LINE_SQUARE_EPS`]), read in one batch on the card

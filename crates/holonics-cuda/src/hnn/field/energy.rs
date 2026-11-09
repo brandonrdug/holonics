@@ -36,7 +36,7 @@
 //! lanes' indexed collect lays the tables out in the same order on any count of threads.
 
 use super::*;
-use holonics::hnn::tower::field::{EnergyLead, EnergyRead, EnergySquare, Shares, SquareCorners, FIRST_HALVINGS, STEP_CARRIER_HALVINGS};
+use holonics::hnn::tower::field::{EnergyHeldClasses, EnergyLead, EnergyRead, EnergySquare, HeldSite, Shares, SquareCorners, FIRST_HALVINGS, STEP_CARRIER_HALVINGS};
 use holonics::hnn::tower::{COVECTOR_BITS, FACE_BITS};
 
 /// A region's energy sums on the card (`ENERGY_SUMS` in `kernels/field_energy.cuh`): the locks', the letters' and the
@@ -131,12 +131,15 @@ struct EnergyPlan<'p, 'c> {
     /// [measurement; theory, November 8, the lead reading] The site a region's lead is read at (`Field::energy_lead`), one a
     /// region of the read, or none ([`CardField::energy_lead_reads`]).
     lead: Option<&'p [usize]>,
+    /// [measurement; theory, November 9, the class reading] The place a region's held classes are read at
+    /// (`Field::energy_held_classes`), one a region of the read, or none ([`CardField::energy_held_class_reads`]).
+    held: Option<&'p [usize]>,
 }
 
 impl<'p, 'c> EnergyPlan<'p, 'c> {
     /// The forward as `energy_pass` reads it: certified, under the batch's own supports, with its faces.
     fn forward() -> Self {
-        EnergyPlan { replay: None, base: None, faces: true, material: false, lead: None }
+        EnergyPlan { replay: None, base: None, faces: true, material: false, lead: None, held: None }
     }
 }
 
@@ -223,6 +226,8 @@ pub(super) struct EnergyPass<'c> {
     pub(super) material: Vec<Vec<i128>>,
     /// Each region's lead read at its site where the plan reads it ([`CardField::energy_lead_reads`]).
     pub(super) lead: Vec<EnergyLead>,
+    /// Each region's held classes at its place where the plan reads them ([`CardField::energy_held_class_reads`]).
+    pub(super) held: Vec<EnergyHeldClasses>,
 }
 
 /// A region's energy read back: `Φ`, the logarithms read, the site pairs met, and whether the step before it moved it.
@@ -611,8 +616,8 @@ impl<'c> CardField<'c> {
             self.times.peak_store = self.times.peak_store.max(peak);
             self.times.batches += 1;
             let mut batch_words = opening.words;
-            // A plan's lead sites are one a region of the read: the batch reads its own.
-            let plan = EnergyPlan { lead: plan.lead.map(|sites| &sites[batch.clone()]), ..plan };
+            // A plan's lead sites and held places are one a region of the read: the batch reads its own.
+            let plan = EnergyPlan { lead: plan.lead.map(|sites| &sites[batch.clone()]), held: plan.held.map(|sites| &sites[batch.clone()]), ..plan };
             let (f, z, pass) = self.energy_rest(field, &staged[batch.clone()], &mut batch_words, opening, plan, streamed)?;
             self.times.energy_rereads += collect(f, z, pass);
         }
@@ -1215,6 +1220,80 @@ impl<'c> CardField<'c> {
         Ok(out)
     }
 
+    /// [measurement; theory, November 9, the class reading] **Each region's held classes read from the batch's own lists**
+    /// (the host's `Field::energy_held_classes`): at region `r`'s place `at[r]` and its neighbours inside the region, every
+    /// head's row read by `field_energy_held_rows` from the lists the batch's rows read (`cls`, `class_off`, `members`, `pn`,
+    /// `pcls`: written at the opening by `field_classes`, or under the width law built on the host's lanes from the card's
+    /// opening words and uploaded): the site's class `cls[h][g]`, its own probed class (its row's first, `pcls[h][g][0]`), and
+    /// its support as the lock rows walk it (`row_prepare` and `support_at`, the entries that meet a site, in the row's
+    /// order; sorted here). Each row's support is held in a block as long as its region (a source is a site of the region
+    /// other than the receiver, each once). The relaxation's read (`reads[r]`, its halvings by tick) is the batch's own.
+    fn energy_held_class_reads(&self, field: &Field, words: &mut Words, at: &[usize], st: &Staged<'c>, reads: &[EnergyRead]) -> Result<Vec<EnergyHeldClasses>> {
+        let card = self.card;
+        let heads = field.declaration.heads;
+        let rn = st.region_off.len() - 1;
+        if at.len() != rn || reads.len() != rn {
+            return Err(TowerError::Refused("a held class read's places that are not one a region"));
+        }
+        // The rows read, region by region and head by head, each with its support's block.
+        let mut rows: Vec<u64> = Vec::new();
+        let mut blocks: Vec<u64> = vec![0];
+        let mut read_sites: Vec<Vec<usize>> = Vec::with_capacity(rn);
+        for (r, &t) in at.iter().enumerate() {
+            let (first, end) = (st.region_off[r] as usize, st.region_off[r + 1] as usize);
+            let len = end - first;
+            if t >= len {
+                return Err(TowerError::Refused("a held class read's place outside its region"));
+            }
+            let sites: Vec<usize> = (t.saturating_sub(1)..=(t + 1).min(len - 1)).collect();
+            for h in 0..heads {
+                for &s in &sites {
+                    rows.push((h * st.sites + first + s) as u64);
+                    let next = blocks.last().copied().unwrap_or(0) + len as u64;
+                    blocks.push(next);
+                }
+            }
+            read_sites.push(sites);
+        }
+        let count = rows.len();
+        let total = blocks.last().copied().unwrap_or(0) as usize;
+        let rows_c = self.timed(Kind::Copy, || self.take_up(&rows)).map_err(device)?;
+        let blocks_c = self.timed(Kind::Copy, || self.take_up(&blocks)).map_err(device)?;
+        let head = self.timed(Kind::Alloc, || self.take::<u32>(3 * count.max(1))).map_err(device)?;
+        let support = self.timed(Kind::Alloc, || self.take::<u32>(total.max(1))).map_err(device)?;
+        {
+            let (mut rp, mut n, mut bp, mut hp, mut sp) = (rows_c.device_ptr(), count as u64, blocks_c.device_ptr(), head.device_ptr(), support.device_ptr());
+            self.launch("field_energy_held_rows", Self::rows_grid(count as u64, CONTACT_ROWS), (CONTACT_ROWS * 32) as u32, &mut [arg(words), arg(&mut rp), arg(&mut n), arg(&mut bp), arg(&mut hp), arg(&mut sp)])?;
+        }
+        let heads_read = self.timed(Kind::Copy, || card.fetch_range(&head, 0, 3 * count)).map_err(device)?;
+        let supports = self.timed(Kind::Copy, || card.fetch_range(&support, 0, total)).map_err(device)?;
+        let mut out = Vec::with_capacity(rn);
+        let mut k = 0usize;
+        for (r, sites) in read_sites.into_iter().enumerate() {
+            let mut per_head = Vec::with_capacity(heads);
+            for _ in 0..heads {
+                let mut row_sites = Vec::with_capacity(sites.len());
+                for _ in &sites {
+                    let (class, probe_class, written) = (heads_read[3 * k], heads_read[3 * k + 1], heads_read[3 * k + 2] as u64);
+                    let (from, to) = (blocks[k], blocks[k + 1]);
+                    if probe_class == u32::MAX {
+                        return Err(TowerError::Refused("a held class read at a site that is not definite (the card holds no probe class for it)"));
+                    }
+                    if written > to - from {
+                        return Err(TowerError::Refused("a held row's support past its region's block"));
+                    }
+                    let mut support = supports[from as usize..(from + written) as usize].to_vec();
+                    support.sort_unstable();
+                    row_sites.push(HeldSite { class, probe_class, support });
+                    k += 1;
+                }
+                per_head.push(row_sites);
+            }
+            out.push(EnergyHeldClasses { site: at[r], sites, heads: per_head, read: reads[r].clone() });
+        }
+        Ok(out)
+    }
+
     /// [definition; agent-inferred, November 8] **A batch's opening on the card** (the first part of the host's `energy_relax`,
     /// formed before the batch runs): the batch's words (`base`: the upload's in a streamed read, the running words of a
     /// base's corners otherwise, pointed at the batch's own staging), its sites staged and opened, the turned heads' clocks, the
@@ -1633,7 +1712,7 @@ impl<'c> CardField<'c> {
             }
         }
         self.mark("energy_ticks");
-        let reads = (0..rn).map(|r| EnergyRead { opening: read0[r].phi, last: now[r].phi, halvings: halvings[r].clone(), reads: reads[r], pairs: met[r] }).collect();
+        let reads: Vec<EnergyRead> = (0..rn).map(|r| EnergyRead { opening: read0[r].phi, last: now[r].phi, halvings: halvings[r].clone(), reads: reads[r], pairs: met[r] }).collect();
         let lead = match plan.lead {
             Some(at) => {
                 let (first, last) = (cells.first(), cells.last());
@@ -1642,16 +1721,22 @@ impl<'c> CardField<'c> {
             }
             None => Vec::new(),
         };
+        // The held classes a region at its place, read from the batch's own lists (no base's: `energy_held_class_reads`).
+        let held_classes = match plan.held {
+            Some(at) if plan.base.is_none() => self.energy_held_class_reads(field, words, at, &st, &reads)?,
+            Some(_) => return Err(TowerError::Refused("a held class read under a base's supports")),
+            None => Vec::new(),
+        };
         // The energy's material covector a region (`Field::energy_material`).
         if plan.material {
             let material = self.energy_material_of(field, words, &cells, &forces, &halvings, &held, &fb, sites, pairs, rn)?;
             self.status(&st.status)?;
-            return Ok((Vec::new(), Vec::new(), EnergyPass { cells, reads, rereads, lists, material, lead }));
+            return Ok((Vec::new(), Vec::new(), EnergyPass { cells, reads, rereads, lists, material, lead, held: held_classes }));
         }
         // A read of the energy alone (a square's `G`) ends at its last state.
         if !plan.faces {
             self.status(&st.status)?;
-            return Ok((Vec::new(), Vec::new(), EnergyPass { cells, reads, rereads, lists, material: Vec::new(), lead }));
+            return Ok((Vec::new(), Vec::new(), EnergyPass { cells, reads, rereads, lists, material: Vec::new(), lead, held: held_classes }));
         }
         // The faces: each unresolved site's letter force at the last state, with the reverse's letters' covectors through
         // the ticks that stood and the opening (the total derivative, the host's `energy_faces`).
@@ -1701,7 +1786,7 @@ impl<'c> CardField<'c> {
             faces.push(span.clone().map(|t| (st.unresolved[t] != 0).then(|| TowerFace { masses: ms[t * a..(t + 1) * a].iter().map(|&v| v as u128).collect(), total: ts[t] as u128 })).collect());
             logits.push(span.map(|t| (st.unresolved[t] != 0).then(|| zs[t * a..(t + 1) * a].to_vec())).collect());
         }
-        Ok((faces, logits, EnergyPass { cells, reads, rereads, lists, material: Vec::new(), lead }))
+        Ok((faces, logits, EnergyPass { cells, reads, rereads, lists, material: Vec::new(), lead, held: held_classes }))
     }
 }
 
@@ -1769,7 +1854,7 @@ impl<'c> CardField<'c> {
         let lists = base.lists.ok_or(TowerError::Refused("a square's base read under another's supports"))?;
         let halvings: Vec<Vec<Option<u32>>> = base.reads.iter().map(|r| r.halvings.clone()).collect();
         drop(base.cells);
-        let plan = EnergyPlan { replay: Some(&halvings), base: Some(&lists), faces: true, material: false, lead: None };
+        let plan = EnergyPlan { replay: Some(&halvings), base: Some(&lists), faces: true, material: false, lead: None, held: None };
         let n = squares.len();
         let letters: Vec<(usize, usize)> = squares.iter().map(|(truth, (i, j))| (truth[*i], truth[*j])).collect();
         let corners = |kinds: &dyn Fn(usize) -> Owned, plan: EnergyPlan<'_, 'c>, words: &mut Words| -> Result<(Vec<Vec<Option<Vec<i64>>>>, EnergyPass<'c>)> {
@@ -1850,7 +1935,7 @@ impl CardField<'_> {
         let octets = |sites: usize| energy_octets_widened(&d, sites, field.widen) + 2 * 16 * theta;
         let batches = self.energy_cut(&lengths, &octets, (self.budget - face_octets) / 5 * 4)?;
         let mut out = Vec::with_capacity(regions.len());
-        let plan = EnergyPlan { replay: None, base: None, faces: false, material: true, lead: None };
+        let plan = EnergyPlan { replay: None, base: None, faces: false, material: true, lead: None, held: None };
         self.energy_stream(field, &staged, &lengths, &octets, batches, &words, plan, &mut |_, _, pass| {
             out.extend(pass.material.into_iter().zip(pass.reads).map(|(g, read)| (g, read.last)));
             pass.rereads
@@ -1962,7 +2047,7 @@ impl CardField<'_> {
         let lists = base.lists.ok_or(TowerError::Refused("a square's base read under another's supports"))?;
         let halvings: Vec<Vec<Option<u32>>> = base.reads.iter().map(|r| r.halvings.clone()).collect();
         drop(base.cells);
-        let plan = EnergyPlan { replay: Some(&halvings), base: Some(&lists), faces: true, material: false, lead: None };
+        let plan = EnergyPlan { replay: Some(&halvings), base: Some(&lists), faces: true, material: false, lead: None, held: None };
         let n = squares.len();
         let letters: Vec<(usize, usize)> = squares.iter().map(|(truth, (i, j))| (truth[*i], truth[*j])).collect();
         let face_at = |logits: &[Vec<Option<Vec<i64>>>], s: usize, t: usize| -> Result<Vec<i64>> { logits[s][t].clone().ok_or(TowerError::Refused("a square's open place with no face")) };
@@ -2062,6 +2147,45 @@ impl CardField<'_> {
         let mut out = Vec::with_capacity(places.len());
         self.energy_stream(field, &staged, &lengths, &octets, batches, &words, plan, &mut |_, _, pass| {
             out.extend(pass.lead);
+            pass.rereads
+        })?;
+        let met = self.timed(Kind::Copy, || card.fetch(&upload.met)).map_err(device)?[0] as u128;
+        self.times.pairs += met;
+        self.times.reads += 1;
+        self.times.read_ns += started.elapsed().as_nanos();
+        Ok(out)
+    }
+
+    /// [measurement; theory, November 9, the class reading] **Each place's held classes on the card** (the host's
+    /// `Field::energy_held_classes` at each `(classes, site)`): every site of the configuration resolved and relaxed as
+    /// [`CardField::energies`] relaxes it (its own certified halvings, no faces read), each batch's classes, probe classes and
+    /// supports read from its own lists at its regions' places ([`CardField::energy_held_class_reads`]) beside each region's
+    /// halvings; the places batched by the card's memory.
+    pub fn energy_held_classes(&mut self, field: &Field, places: &[(&[usize], usize)]) -> Result<Vec<EnergyHeldClasses>> {
+        let d = field.declaration;
+        if !d.energy || field.scale.is_some() {
+            return Err(TowerError::Refused("an energy read of a field whose faces are not one energy's forces"));
+        }
+        if places.iter().any(|&(c, t)| t >= c.len()) {
+            return Err(TowerError::Refused("a held class read's site outside its configuration"));
+        }
+        let card = self.card;
+        let started = Instant::now();
+        let (words, upload, face_octets) = self.upload(field, None)?;
+        let lengths: Vec<usize> = places.iter().map(|(c, _)| c.len()).collect();
+        let octets = |sites: usize| energy_octets_widened(&d, sites, field.widen);
+        let batches = self.energy_cut(&lengths, &octets, (self.budget - face_octets) / 5 * 4)?;
+        let sites: Vec<usize> = places.iter().map(|&(_, t)| t).collect();
+        let plan = EnergyPlan { faces: false, held: Some(&sites), ..EnergyPlan::forward() };
+        let owned: Vec<Owned> = places.iter().map(|(c, _)| Owned { classes: c.to_vec(), unresolved: vec![false; c.len()], faces: Vec::new(), locked: Vec::new() }).collect();
+        let resolved: Vec<Region> = owned.iter().map(Owned::region).collect();
+        admit_regions(&d, &resolved)?;
+        let sited: Vec<(Vec<Option<Shares>>, Vec<bool>)> = resolved.iter().map(|r| field.energy_sites(r)).collect();
+        let staged: Vec<Region> = resolved.iter().zip(&sited).map(|(r, (faces, locked))| Region { faces, locked, ..*r }).collect();
+        admit_regions(&d, &staged)?;
+        let mut out = Vec::with_capacity(places.len());
+        self.energy_stream(field, &staged, &lengths, &octets, batches, &words, plan, &mut |_, _, pass| {
+            out.extend(pass.held);
             pass.rereads
         })?;
         let met = self.timed(Kind::Copy, || card.fetch(&upload.met)).map_err(device)?[0] as u128;

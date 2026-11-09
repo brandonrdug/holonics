@@ -294,6 +294,48 @@ extern "C" __global__ void field_energy_open_at_force(FieldWords w, const int64_
     }
 }
 
+// [measurement; theory, November 9, the class reading] **A held row's classes and support** (the host's
+// `Field::energy_held_classes`, read by `CardField::energy_held_class_reads`): one warp a requested row `rows[k]` (`h·T + g`),
+// its class as a source `cls[h][g]`, its own probed class (its row's first, or `UINT32_MAX` for an open receiver, which keeps
+// none), and its support as every lock row walks it (`row_prepare`, `support_at`): each entry that meets a site, in the
+// row's order, compacted across the warp's lanes into its block `support[blocks[k]..blocks[k + 1])`, and their count. A
+// skipped row (outside its region's computed window) reads no support. Nothing is written but the row's own outputs.
+extern "C" __global__ void __launch_bounds__(CONTACT_ROWS * 32) field_energy_held_rows(FieldWords w, const uint64_t *rows, uint64_t count, const uint64_t *blocks, uint32_t *head, uint32_t *support) {
+    __shared__ RowCls rcs[CONTACT_ROWS];
+    const uint32_t warp = threadIdx.x >> 5, lane = threadIdx.x & 31;
+    const uint32_t classes = w.nclasses;
+    for (uint64_t k = ((uint64_t)blockIdx.x * blockDim.x + threadIdx.x) >> 5; k < count; k += (uint64_t)gridDim.x * (blockDim.x >> 5)) {
+        const uint64_t hg = rows[k];
+        const uint32_t h = hg / w.T;
+        const uint64_t g = hg % w.T;
+        const uint32_t r = w.site_region[g];
+        const uint64_t first = w.region_off[r];
+        const uint32_t sites = w.region_off[r + 1] - (uint32_t)first, i = w.site_pos[g];
+        const uint32_t *members = w.members + (uint64_t)h * w.T + first;
+        const uint32_t *off = w.class_off + ((uint64_t)h * w.R + r) * (2 * classes + 1);
+        const uint32_t K = skipped_row(w, g) ? 0u : row_prepare(w, hg, off, rcs[warp], lane);
+        const uint64_t cap = blocks[k + 1] - blocks[k];
+        uint32_t *dst = support + blocks[k];
+        uint32_t written = 0;
+        for (uint32_t e0 = 0; e0 < K; e0 += 32) {
+            const uint32_t e = e0 + lane;
+            const uint32_t j = e < K ? support_at(members, off, rcs[warp], i, sites, e) : UINT32_MAX;
+            const uint32_t met = __ballot_sync(0xFFFFFFFFu, j != UINT32_MAX);
+            const uint32_t at = written + __popc(met & ((1u << lane) - 1u));
+            if (j != UINT32_MAX && at < cap) {
+                dst[at] = j;
+            }
+            written += __popc(met);
+        }
+        if (lane == 0) {
+            head[3 * k] = w.cls[hg];
+            head[3 * k + 1] = (K > 0 && rcs[warp].open == 0 && rcs[warp].nc > 0) ? rcs[warp].cl[0] : UINT32_MAX;
+            head[3 * k + 2] = written;
+        }
+        __syncwarp();
+    }
+}
+
 // [definition; agent-inferred, November 6] **The letters' energy** of each region (the host's `energy_cell`, its last part):
 // `−Σ_t [⟨E(u_t), R r̂_t + b_R⟩ + c_(u_t) 2^16 + ⟨C s_t + b, r̂_t⟩ + ⟨E₋(u_t), r̂_(t+1)⟩ + ⟨E₊(u_t), r̂_(t−1)⟩]` on `2^(−32)`, one
 // block a region, its sites over the block's threads, summed as exact integers.

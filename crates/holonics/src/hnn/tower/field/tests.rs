@@ -3240,6 +3240,78 @@ fn a_leads_opening_split_is_the_opening() {
     assert!(shaped(1).energy_lead(&CLASSES, 0).is_err());
 }
 
+/// [measurement; theory, November 9, the class reading] **A held class read is the relaxation's lists and descent**: on the
+/// energy fixtures of every ring set under both opening laws, and with the width law at a share of one, at every place of
+/// a short and a long resolved configuration: the sites read are the place and its neighbours inside the configuration;
+/// each row's support holds its whole near field (every site within `NEAR − 1`, all keyed) and only definite class members
+/// past it, ascending and each once; summed over every receiving site and head the supports are the opening's pairs by kind
+/// ([`Field::energy_pair_kinds`], read with no tick: the classes are the opening's); the read's descent is the energy read's
+/// ([`Field::energy_read`]) and its `G` is [`Field::energy_g`]. Some letter at a place moves some class or support at the
+/// place or a neighbour, and the width law moves some support (else the test reads nothing). A site outside its
+/// configuration and a field without one energy are refused.
+#[test]
+fn a_held_class_read_is_the_relaxations_lists_and_descent() {
+    let long: Vec<usize> = (0..13).map(|t| (t * 3 + t / 4) % 5).collect();
+    let configurations: [&[usize]; 2] = [&CLASSES, &long];
+    let mut fields: Vec<(String, Field)> = Vec::new();
+    for still in 0..=2 {
+        for (law, field) in energetic_openings(still) {
+            let mut widened = field.clone();
+            widened.widen = Some(1);
+            fields.push((format!("still {still} {law}"), field));
+            fields.push((format!("still {still} {law} widened"), widened));
+        }
+    }
+    let (mut moved_by_letter, mut moved_by_width) = (false, false);
+    for (name, field) in &fields {
+        let d = field.declaration;
+        for &config in &configurations {
+            let len = config.len();
+            let none = vec![false; len];
+            let region = Region { classes: config, unresolved: &none, faces: &[], locked: &[], echo: &[], domain: None, port: None };
+            let kinds = field.energy_pair_kinds(&region).unwrap();
+            let energy = field.energy_read(&region).unwrap();
+            let mut summed = 0u64;
+            for t in 0..len {
+                let read = field.energy_held_classes(config, t).unwrap();
+                let expected: Vec<usize> = (t.saturating_sub(1)..=(t + 1).min(len - 1)).collect();
+                assert_eq!((read.site, &read.sites), (t, &expected), "{name}, place {t}: the sites read");
+                assert_eq!(read.heads.len(), d.heads, "{name}, place {t}: a row a head");
+                assert_eq!(read.read, energy, "{name}, place {t}: the relaxation's descent");
+                for (h, rows) in read.heads.iter().enumerate() {
+                    assert_eq!(rows.len(), expected.len(), "{name}, place {t}, head {h}: a row a site");
+                    for (s, at) in expected.iter().zip(rows) {
+                        let near: Vec<u32> = (0..len).filter(|&j| j != *s && j.abs_diff(*s) < NEAR).map(|j| j as u32).collect();
+                        let inside: Vec<u32> = at.support.iter().copied().filter(|&j| (j as usize).abs_diff(*s) < NEAR).collect();
+                        assert_eq!(inside, near, "{name}, place {t}, head {h}, site {s}: the near field whole");
+                        assert!(at.support.windows(2).all(|w| w[0] < w[1]) && at.support.iter().all(|&j| (j as usize) < len && j as usize != *s), "{name}, place {t}, head {h}, site {s}: ascending, each once");
+                    }
+                    if let Some(k) = expected.iter().position(|&s| s == t) {
+                        summed += rows[k].support.len() as u64;
+                    }
+                }
+                if field.widen.is_some() {
+                    let mut plain = field.clone();
+                    plain.widen = None;
+                    moved_by_width |= plain.energy_held_classes(config, t).unwrap().heads.iter().zip(&read.heads).any(|(a, b)| a.iter().zip(b).any(|(x, y)| x.support != y.support));
+                }
+                let mut other = config.to_vec();
+                for c in 0..d.alphabet {
+                    other[t] = c;
+                    let moved = field.energy_held_classes(&other, t).unwrap();
+                    assert_eq!(moved.read.last, field.energy_g(&other).unwrap(), "{name}, place {t}, letter {c}: G");
+                    moved_by_letter |= moved.heads.iter().zip(&read.heads).any(|(a, b)| a.iter().zip(b).any(|(x, y)| x != y));
+                }
+            }
+            assert_eq!(summed, (kinds.near + kinds.sharp + kinds.listened) as u64, "{name}, {len} sites: the supports are the opening's pairs");
+        }
+    }
+    assert!(moved_by_letter, "some letter moves some held class or support");
+    assert!(moved_by_width, "the width law moves some support");
+    assert!(energetic(1).energy_held_classes(&CLASSES, CLASSES.len()).is_err());
+    assert!(shaped(1).energy_held_classes(&CLASSES, 0).is_err());
+}
+
 /// [measurement; theory, November 8, the line reading] **A held place's code is the conditional section's**: on the warm
 /// line-shaped field, each place's [`conditional_code`] over its letters' energies (each `G` the host's own) is the section's
 /// `−log₂ p(t)` (its receipt's `log2_a`, negated) bit for bit; a truth outside the letters is refused.

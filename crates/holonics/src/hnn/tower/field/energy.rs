@@ -2242,6 +2242,46 @@ impl Field {
         })
     }
 
+    /// [measurement; theory, November 9, the class reading] **The classes a configuration's opening draws at a place, the
+    /// supports they give, and the halvings its relaxation stands at** ([`EnergyHeldClasses`]): every site of `classes`
+    /// resolved and relaxed as [`Field::energy_g`] relaxes it (the declared ticks at their own certified halvings), and at
+    /// `site − 1`, `site` and `site + 1` (those inside the configuration; the letter at `site` enters its neighbours' opening
+    /// through their before and after rows), each head's key class and probe class as the opening's chart reads them
+    /// ([`Field::energy_classes`]: the trits of the key and probe words, or under the width law the leaves of the region's
+    /// own tree, [`ClassLists::widened`]), and the sources its lock row reads ([`ClassLists::support`]), ascending. Why: the
+    /// classes and the supports are held through every tick and the covector is taken at them, and the covector reverses
+    /// through the ticks that stood at the halvings they stood at; a deposit that redraws a place's classes or moves a tick's
+    /// standing is a discrete change the covector cannot see. Every site is resolved, so every site is definite and keyed and
+    /// the region has no port and no window. A reading only, through the host's reference; a realization reads the same lists
+    /// from its own buffers ([`FieldRealization::read_energy_held_classes`]).
+    pub fn energy_held_classes(&self, classes: &[usize], site: usize) -> Result<EnergyHeldClasses> {
+        if !self.declaration.energy {
+            return refuse("an energy read of a field whose faces are not one energy's forces");
+        }
+        if site >= classes.len() {
+            return refuse("a held class read's site outside its configuration");
+        }
+        let none = vec![false; classes.len()];
+        let region = Region { classes, unresolved: &none, faces: &[], locked: &[], echo: &[], domain: None, port: None };
+        let Relaxed { held, read, .. } = self.energy_relax(&region, self.declaration.ticks, None, None)?;
+        let sites: Vec<usize> = (site.saturating_sub(1)..=(site + 1).min(classes.len() - 1)).collect();
+        let heads = held
+            .classes
+            .iter()
+            .map(|lists| {
+                sites
+                    .iter()
+                    .map(|&s| {
+                        let mut support: Vec<u32> = lists.support(s).map(|j| j as u32).collect();
+                        support.sort_unstable();
+                        HeldSite { class: lists.class[s], probe_class: lists.probe_class[s], support }
+                    })
+                    .collect()
+            })
+            .collect();
+        Ok(EnergyHeldClasses { site, sites, heads, read })
+    }
+
     /// [measurement] **A region's energy read** ([`EnergyRead`]): the energy at the opening and at the last tick, each
     /// tick's halvings, and the energy's reads.
     pub fn energy_read(&self, region: &Region) -> Result<EnergyRead> {
@@ -2905,6 +2945,30 @@ pub struct EnergyLead {
     pub opening: Vec<(i128, i128)>,
     pub open: Vec<(i128, i128)>,
     pub enc: Vec<(i128, i128)>,
+}
+
+/// [measurement; theory, November 9, the class reading] **One head's held classes at one site** ([`EnergyHeldClasses`]): the
+/// site's class as a source (its key word's), its own probed class as a receiver (its probe word's), and the sources its lock
+/// row reads (its near field's keyed sites and the definite members of its probed classes past it), ascending sites of the
+/// configuration. Under the width law the two classes are leaves of that configuration's own tree, numbered over it: the
+/// numbers are comparable only within one configuration, and the support is the reading that compares across them.
+#[derive(Clone, Debug, Default, PartialEq, Eq)]
+pub struct HeldSite {
+    pub class: u32,
+    pub probe_class: u32,
+    pub support: Vec<u32>,
+}
+
+/// [measurement; theory, November 9, the class reading] **A configuration's held classes at a place**
+/// ([`Field::energy_held_classes`]): the place `site`, the sites read (`site − 1`, `site`, `site + 1` inside the
+/// configuration), each head's [`HeldSite`] at each of them (`heads[h][k]` at `sites[k]`), and the relaxation's read, whose
+/// halvings are the ticks that stood and the halvings each stood at (`None` where a tick rested and the descent ended).
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct EnergyHeldClasses {
+    pub site: usize,
+    pub sites: Vec<usize>,
+    pub heads: Vec<Vec<HeldSite>>,
+    pub read: EnergyRead,
 }
 
 /// `Σ a_i b_i` in its 128-bit carrier, refused past it.

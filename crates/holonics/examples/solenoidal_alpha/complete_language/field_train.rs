@@ -4420,6 +4420,132 @@ pub(super) fn lead_field(args: &[String], realization: &mut dyn FieldRealization
     Ok(())
 }
 
+/// [definition; theory, November 9, the class reading] A support's receipt word: FNV-1a over 64 bits (offset basis
+/// `0xcbf2_9ce4_8422_2325`, prime `0x100_0000_01b3`) of its sorted offsets, each as its eight little-endian octets, so two
+/// places' supports are compared by the word and their sizes without carrying either list. A reading's name, never a key the
+/// machine reads.
+fn support_word(offsets: &[i64]) -> u64 {
+    offsets.iter().flat_map(|o| o.to_le_bytes()).fold(0xcbf2_9ce4_8422_2325u64, |h, b| (h ^ u64::from(b)).wrapping_mul(0x100_0000_01b3))
+}
+
+/// [measurement; theory, November 9, the class reading] **`class-field STATE STATE_SHA CODEC CODEC_SHA UNITS UNITS_SHA HELD
+/// HELD_SHA PLACES OUT`**: whether a letter redraws the classes its place's opening is held at, or the halvings its descent
+/// stands at, the two discrete maps the covector is taken across without seeing. At the held places the enumerated
+/// conditional reads ([`enumerated_places`]: the first `PLACES`, `FIELD_HELD_ALL_OF` as there), at the state's live `θ` (not
+/// the averaged constitution) and under its own opening law and width law, each letter `c` of the alphabet at the place with
+/// the rest at the truth (the enumerated read's configurations) is relaxed as `G` is
+/// ([`FieldRealization::read_energy_held_classes`]: [`holonics::hnn::tower::field::Field::energy_held_classes`] on the host,
+/// the card's own lists and relaxation on the card), and at the place `t` and at `t ± 1` (the letter at `t` enters its
+/// neighbours' opening through their before and after rows) each head's key class, probe class and lock support are read.
+///
+/// Writes `CLASSES.tsv`, a row a configuration, site and head: `problem`, `place` (in the answer), `letter` (its codec
+/// index; no letter text), `site_offset` (−1, 0, +1), `head`, `class`, `probe_class` (the trits' numbers, or under the width
+/// law the configuration's own leaves, comparable only within it), `support_size`, `support_word` ([`support_word`] of the
+/// support's sorted offsets from `t`, in hexadecimal) and `far` (the offsets from `t` of the sources past the row's near
+/// field, comma-separated, `-` for none; the near field is every site within `NEAR − 1` of the row, all keyed, and moves with
+/// no letter). Writes `HALVINGS.tsv`, a row a configuration: `problem`, `place`, `letter`, `stood` (the ticks that stood),
+/// `rested` (1 where a tick rested and ended the descent), `halvings` (each standing tick's halvings in order, `-` for none)
+/// and `g` (`G` on `2^(−32)` bits). Prints one `FIELD_CLASS_READ` line: the places, configurations and rows; the law of the
+/// classes (`trits` or `leaves`); against each place's truth letter, the (letter, site, head) rows whose classes moved (only
+/// under the trits; `none` under the leaves), whose support moved, and the letters whose halvings moved; the read's time and
+/// the host's threads. A reading only: nothing is deposited and no state is written.
+pub(super) fn class_field(args: &[String], realization: &mut dyn FieldRealization) -> Result<()> {
+    use holonics::hnn::tower::field::NEAR;
+    if args.len() != 11 {
+        return Err("class-field STATE STATE_SHA CODEC CODEC_SHA UNITS UNITS_SHA HELD HELD_SHA PLACES OUT".into());
+    }
+    let started = std::time::Instant::now();
+    let mut learner = FieldLearner::from_text(std::str::from_utf8(&pinned_read(&args[1], &args[2], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
+    declared_clocks(&mut learner.field);
+    if !learner.field.declaration.energy {
+        return Err("class-field reads a field whose faces are one energy's forces".into());
+    }
+    let units = units_of(&args[5], &args[6])?;
+    let codec = FieldCodec::from_text(std::str::from_utf8(&pinned_read(&args[3], &args[4], CODEC_BUDGET)?)?, units)?;
+    let held_text = problems_of(&pinned_read(&args[7], &args[8], READ_BUDGET as usize)?);
+    let places = positive(&args[9])?;
+    let out = Path::new(&args[10]);
+    std::fs::create_dir(out)?;
+    let field = learner.field;
+    let held_set = encoded_problems(&codec, &held_text, &field)?;
+    let void = codec.void();
+    let truth_of = |p: &(Vec<usize>, Vec<usize>, usize), letters: &[usize]| -> Vec<usize> { truth_with_voids(void, p, letters) };
+    let chosen = enumerated_places(&held_set, places, &truth_of);
+    let alphabet = field.declaration.alphabet;
+    let configurations: Vec<Vec<usize>> = chosen
+        .iter()
+        .flat_map(|(_, truth, t, _)| {
+            (0..alphabet).map(move |c| {
+                let mut x = truth.clone();
+                x[*t] = c;
+                x
+            })
+        })
+        .collect();
+    let asked: Vec<(&[usize], usize)> = configurations.iter().zip(chosen.iter().flat_map(|(_, _, t, _)| std::iter::repeat_n(*t, alphabet))).map(|(c, t)| (c.as_slice(), t)).collect();
+    let reading = std::time::Instant::now();
+    let reads = realization.read_energy_held_classes(&field, &asked).map_err(|e| e.to_string())?;
+    let read_ms = reading.elapsed().as_millis();
+    if reads.len() != asked.len() {
+        return Err("class-field: a read that is not one a configuration".into());
+    }
+    let heads = field.declaration.heads;
+    let leaves = field.widen.is_some();
+    let mut classes = rows_file(&out.join("CLASSES.tsv"), "problem\tplace\tletter\tsite_offset\thead\tclass\tprobe_class\tsupport_size\tsupport_word\tfar\n")?;
+    let mut halvings = rows_file(&out.join("HALVINGS.tsv"), "problem\tplace\tletter\tstood\trested\thalvings\tg\n")?;
+    let (mut rows, mut compared, mut class_moved, mut support_moved, mut letters_compared, mut halvings_moved) = (0u64, 0u64, 0u64, 0u64, 0u64, 0u64);
+    for (n, (k, truth, t, q)) in chosen.iter().enumerate() {
+        let place = &reads[n * alphabet..(n + 1) * alphabet];
+        let truth_read = &place[truth[*t]];
+        let (mut class_text, mut halving_text) = (String::new(), String::new());
+        for (c, read) in place.iter().enumerate() {
+            if read.site != *t || read.heads.len() != heads {
+                return Err("class-field: a read at another place or of other heads".into());
+            }
+            for (i, &s) in read.sites.iter().enumerate() {
+                let offset = s as i64 - *t as i64;
+                for (h, lists) in read.heads.iter().enumerate() {
+                    let at = &lists[i];
+                    let offsets: Vec<i64> = at.support.iter().map(|&j| j as i64 - *t as i64).collect();
+                    let far: Vec<String> = at.support.iter().filter(|&&j| (j as usize).abs_diff(s) >= NEAR).map(|&j| (j as i64 - *t as i64).to_string()).collect();
+                    let far = if far.is_empty() { "-".to_string() } else { far.join(",") };
+                    class_text.push_str(&format!("{k}\t{}\t{c}\t{offset}\t{h}\t{}\t{}\t{}\t{:016x}\t{far}\n", t - q, at.class, at.probe_class, offsets.len(), support_word(&offsets)));
+                    rows += 1;
+                    if c != truth[*t] {
+                        let base = truth_read.heads.get(h).and_then(|l| truth_read.sites.iter().position(|&x| x == s).map(|p| &l[p])).ok_or("class-field: the truth's read misses a site")?;
+                        compared += 1;
+                        class_moved += u64::from((at.class, at.probe_class) != (base.class, base.probe_class));
+                        support_moved += u64::from(at.support != base.support);
+                    }
+                }
+            }
+            let stood: Vec<String> = read.read.halvings.iter().flatten().map(u32::to_string).collect();
+            let rested = u8::from(read.read.halvings.iter().any(Option::is_none));
+            let list = if stood.is_empty() { "-".to_string() } else { stood.join(",") };
+            halving_text.push_str(&format!("{k}\t{}\t{c}\t{}\t{rested}\t{list}\t{}\n", t - q, stood.len(), read.read.last));
+            if c != truth[*t] {
+                letters_compared += 1;
+                halvings_moved += u64::from(read.read.halvings != truth_read.read.halvings);
+            }
+        }
+        row(&mut classes, &class_text)?;
+        row(&mut halvings, &halving_text)?;
+    }
+    let class_text = if leaves { "none".to_string() } else { format!("{class_moved}/{compared}") };
+    println!(
+        "FIELD_CLASS_READ places={} configurations={} rows={rows} heads={heads} ticks={} classes={} widen={} opening={} class_moved={class_text} support_moved={support_moved}/{compared} halvings_moved={halvings_moved}/{letters_compared} read_ms={read_ms} host_threads={} ms={}",
+        chosen.len(),
+        reads.len(),
+        field.declaration.ticks,
+        if leaves { "leaves" } else { "trits" },
+        field.widen.map_or("none".to_string(), |c| c.to_string()),
+        if field.opening_at_force { "force" } else { "own" },
+        rayon::current_num_threads(),
+        started.elapsed().as_millis()
+    );
+    Ok(())
+}
+
 /// [declared read; theory, November 8, the line reading] The line's lengths, `η = 4^k` for `k = 0..=4`, in one section's step.
 const LINE_ETAS: [u32; 5] = [1, 4, 16, 64, 256];
 
@@ -6049,6 +6175,84 @@ mod tests {
             }
         }
         assert!(lead_field(&args(&other, &other_sha, &at("P")), &mut host()).is_err(), "a field without one energy");
+        let _ = std::fs::remove_dir_all(&dir);
+    }
+
+    /// [measurement; theory, November 9, the class reading] `class-field` end to end on the host: an energy field whose families
+    /// are drawn from the key stream and whose clocks are plain reads six held places (one a problem, then two drawn by
+    /// letter), every letter of the alphabet at each with the rest at the truth; `CLASSES.tsv` holds a row a configuration,
+    /// site read and head, each the host's own `Field::energy_held_classes` (its classes, its support's size, word and far
+    /// offsets from the place), and `HALVINGS.tsv` a row a configuration, its standing ticks' halvings and `G`; the support's
+    /// word is FNV-1a's; the state is read, never written; and a field without one energy is refused.
+    #[test]
+    fn the_class_reading_reads_every_letter_site_and_head() {
+        use holonics::hnn::tower::field::NEAR;
+        assert_eq!(support_word(&[]), 0xcbf2_9ce4_8422_2325);
+        assert_eq!(support_word(&[1]), (0..8).fold(0xcbf2_9ce4_8422_2325u64, |h, k| (h ^ u64::from(u8::from(k == 0))).wrapping_mul(0x100_0000_01b3)));
+        assert_ne!(support_word(&[-1, 2]), support_word(&[2, -1]), "the word reads the order it is given (the offsets are sorted first)");
+        let dir = std::env::temp_dir().join(format!("holonics-class-{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&dir);
+        std::fs::create_dir_all(&dir).expect("dir");
+        let at = |name: &str| dir.join(name).to_string_lossy().into_owned();
+        let put = |name: &str, bytes: &[u8]| {
+            std::fs::write(dir.join(name), bytes).expect("write");
+            (at(name), sha256(bytes).expect("sha"))
+        };
+        let (codec, problems) = toy();
+        let reach = problems.iter().map(|(q, _, _)| q.len() + codec.answer).max().unwrap();
+        let d = FieldDeclaration { alphabet: codec.alphabet(), width: 8, heads: 2, modes: 3, still: 1, contacts: 4, ticks: 2, frames: 2, reach, lanes: 1, depth: 0, energy: true };
+        let keys: Vec<u8> = (0..1u64 << 13).flat_map(|i| mix(0x5EED, i).to_be_bytes()).collect();
+        let mut field = Field::found(d, &keys).unwrap();
+        let families = field.layout().families.clone();
+        for (n, v) in field.theta.iter_mut().enumerate() {
+            let k = mix(0xC1A5, n as u64) as u32 as i32 as i64;
+            let grain = families.iter().find(|(s, l, _)| (*s..*s + *l).contains(&n)).unwrap().2;
+            *v = ((k << grain) >> 32) as i32;
+        }
+        let l = field.layout().clone();
+        field.theta[l.pace..l.pace + d.paced_heads() * (d.alphabet + 1)].fill(0);
+        let learner = FieldLearner::new(field, 4);
+        let plain = FieldLearner::new(Field::found(FieldDeclaration { energy: false, ..d }, &keys).unwrap(), 4);
+        let text = learner.to_text();
+        let (state, state_sha) = put("STATE", text.as_bytes());
+        let (other, other_sha) = put("PLAIN", plain.to_text().as_bytes());
+        let (codec_at, codec_sha) = put("CODEC", codec.to_text().as_bytes());
+        let (units, units_sha) = put("UNITS", b"founded-units-v1 0\n");
+        let (held, held_sha) = put("HELD", TOY);
+        let args = |state: &str, sha: &str, out: &str| -> Vec<String> { ["class-field", state, sha, &codec_at, &codec_sha, &units, &units_sha, &held, &held_sha, "6", out].iter().map(|s| s.to_string()).collect() };
+        class_field(&args(&state, &state_sha, &at("C")), &mut host()).expect("class");
+        assert_eq!(std::fs::read(dir.join("STATE")).expect("state"), text.as_bytes(), "the state is read, never written");
+        let read_rows = |name: &str| -> Vec<String> { String::from_utf8(std::fs::read(dir.join("C").join(name)).expect("rows")).unwrap().lines().skip(1).map(str::to_string).collect() };
+        let (classes, halvings) = (read_rows("CLASSES.tsv"), read_rows("HALVINGS.tsv"));
+        let held_set = encoded_problems(&codec, &problems_of(TOY), &learner.field).unwrap();
+        let void = codec.void();
+        let truth_of = |p: &(Vec<usize>, Vec<usize>, usize), letters: &[usize]| truth_with_voids(void, p, letters);
+        let chosen = enumerated_places(&held_set, 6, &truth_of);
+        let (mut expected, mut expected_halvings) = (Vec::new(), Vec::new());
+        for (k, truth, t, q) in &chosen {
+            for c in 0..d.alphabet {
+                let mut x = truth.clone();
+                x[*t] = c;
+                let read = learner.field.energy_held_classes(&x, *t).unwrap();
+                for (i, &s) in read.sites.iter().enumerate() {
+                    for h in 0..d.heads {
+                        let row = &read.heads[h][i];
+                        let offsets: Vec<i64> = row.support.iter().map(|&j| j as i64 - *t as i64).collect();
+                        let far: Vec<String> = row.support.iter().filter(|&&j| (j as usize).abs_diff(s) >= NEAR).map(|&j| (j as i64 - *t as i64).to_string()).collect();
+                        let far = if far.is_empty() { "-".to_string() } else { far.join(",") };
+                        expected.push(format!("{k}\t{}\t{c}\t{}\t{h}\t{}\t{}\t{}\t{:016x}\t{far}", t - q, s as i64 - *t as i64, row.class, row.probe_class, offsets.len(), support_word(&offsets)));
+                    }
+                }
+                let stood: Vec<String> = read.read.halvings.iter().flatten().map(u32::to_string).collect();
+                let list = if stood.is_empty() { "-".to_string() } else { stood.join(",") };
+                expected_halvings.push(format!("{k}\t{}\t{c}\t{}\t{}\t{list}\t{}", t - q, stood.len(), u8::from(read.read.halvings.iter().any(Option::is_none)), learner.field.energy_g(&x).unwrap()));
+            }
+        }
+        assert!(classes.len() >= 6 * d.alphabet * 2 * d.heads && halvings.len() == 6 * d.alphabet, "a row a configuration, site and head; a row a configuration");
+        assert_eq!(classes, expected, "the host's own held classes");
+        assert_eq!(halvings, expected_halvings, "the host's own descent and G");
+        assert!(classes.iter().any(|r| r.split('\t').nth(9) != Some("-")), "some row hears a source past its near field");
+        assert!(class_field(&args(&other, &other_sha, &at("P")), &mut host()).is_err(), "a field without one energy");
         let _ = std::fs::remove_dir_all(&dir);
     }
 
