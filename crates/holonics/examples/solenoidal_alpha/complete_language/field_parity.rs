@@ -482,9 +482,9 @@ pub(super) fn parity(args: &[String], card: &mut dyn FieldRealization) -> Result
     println!("FIELD_PARITY_LENS lens_off_is_plain={lens_off} lens_on_equal={lens_equal}");
     let h = 0i128;
     let t0 = std::time::Instant::now();
-    let (host_walk, host_moves) = host_learner.field.exchange_walk(&questions, &hosted, void, h, 64, &mut HostField, &mut |_, _| true).map_err(|e| e.to_string())?;
+    let (host_walk, host_moves) = host_learner.field.exchange_walk(&questions, &hosted, void, h, 64, &mut HostField, &mut |_| true).map_err(|e| e.to_string())?;
     let host_walk_ms = ms(t0.elapsed().as_nanos());
-    let (card_walk, card_moves) = card_learner.field.exchange_walk(&questions, &hosted, void, h, 64, card, &mut |_, _| true).map_err(|e| e.to_string())?;
+    let (card_walk, card_moves) = card_learner.field.exchange_walk(&questions, &hosted, void, h, 64, card, &mut |_| true).map_err(|e| e.to_string())?;
     let walk_equal = host_walk == card_walk && host_moves == card_moves;
     releases_unequal += usize::from(!walk_equal);
     println!("FIELD_PARITY_EXCHANGE plates_equal={plates_equal} walk_equal={walk_equal} standing={} refused={} host_ms={host_walk_ms}", host_moves.iter().map(|r| r.moves.len()).sum::<usize>(), host_moves.iter().map(|r| r.refused).sum::<usize>());

@@ -3706,8 +3706,8 @@ fn the_exchange_walk_holds_composition() {
     let problems: Vec<(&[usize], usize)> = vec![(&q1, 7), (&q2, 6)];
     let written = vec![vec![1, 2, 3, 4, 1, 0, 0], vec![4, 4, 2, 1, 3, 0]];
     for h in [0i128, 1 << 14] {
-        let (answers, records) = field.exchange_walk(&problems, &written, 0, h, 4096, &mut HostField, &mut |_, _| true).unwrap();
-        let (again, check) = field.exchange_walk(&problems, &answers, 0, i128::MAX, 4096, &mut HostField, &mut |_, _| true).unwrap();
+        let (answers, records) = field.exchange_walk(&problems, &written, 0, h, 4096, &mut HostField, &mut |_| true).unwrap();
+        let (again, check) = field.exchange_walk(&problems, &answers, 0, i128::MAX, 4096, &mut HostField, &mut |_| true).unwrap();
         assert_eq!(again, answers);
         for (k, (a, w)) in answers.iter().zip(&written).enumerate() {
             let (mut x, mut y) = (a.clone(), w.clone());

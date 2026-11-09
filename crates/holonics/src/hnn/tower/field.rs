@@ -1156,6 +1156,18 @@ pub struct ExchangeMove {
     pub fall: i128,
 }
 
+/// [measurement; theory, November 9 22:32] **One pass of the certified exchange walk**, as it ends ([`Field::exchange_walk`]):
+/// its number (0 before the first), the problems still active after it, the moves it certified and undid, and the answers'
+/// code summed over the problems (on the codes' `2^(−20)` bits).
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub struct ExchangePass {
+    pub pass: usize,
+    pub active: usize,
+    pub accepted: usize,
+    pub refused: usize,
+    pub code: i128,
+}
+
 /// [definition; theory, November 9 21:12] **One problem's certified exchange walk** ([`Field::exchange_walk`]): its places,
 /// its answer's code at the written answer and where the walk ended (on the codes' `2^(−20)` bits, summed over the places),
 /// its standing moves, the moves refused and undone, and how it ended: at rest (no unmarked proposal remained), at the
@@ -3787,7 +3799,12 @@ impl Field {
     /// defect detector, a problem that reaches it is a defect, not at rest. Returns each problem's answer (its places past the
     /// question) and its record.
     #[allow(clippy::too_many_arguments)]
-    pub fn exchange_walk(&self, problems: &[(&[usize], usize)], written: &[Vec<usize>], void: usize, h: i128, cap: usize, realization: &mut dyn FieldRealization, round: &mut dyn FnMut(usize, usize) -> bool) -> Result<(Vec<Vec<usize>>, Vec<ExchangeRecord>)> {
+    ///
+    /// [definition; theory, November 9 22:32] **A pass is a batch**: the problems are separate regions, so their moves commute;
+    /// each pass proposes one move in every problem not at rest, one read of those problems certifies them all at once, each on
+    /// its own answer's code, standing or undone independently. `pass` is shown each pass's [`ExchangePass`] (the pass before
+    /// the first, then each), and the walk stops where it returns false: a problem still active there is unrested.
+    pub fn exchange_walk(&self, problems: &[(&[usize], usize)], written: &[Vec<usize>], void: usize, h: i128, cap: usize, realization: &mut dyn FieldRealization, pass: &mut dyn FnMut(&ExchangePass) -> bool) -> Result<(Vec<Vec<usize>>, Vec<ExchangeRecord>)> {
         if written.len() != problems.len() {
             return refuse("an exchange walk with one written answer a problem");
         }
@@ -3828,8 +3845,11 @@ impl Field {
         let mut marked: Vec<std::collections::BTreeSet<(usize, usize)>> = vec![std::collections::BTreeSet::new(); problems.len()];
         let mut active: Vec<bool> = letters.iter().map(|&n| n >= 2).collect();
         let mut rounds = 0usize;
-        while active.iter().any(|&a| a) && round(rounds, records.iter().map(|r| r.moves.len()).sum()) {
+        let shown = |rounds: usize, active: &[bool], records: &[ExchangeRecord], accepted: usize, refused: usize| ExchangePass { pass: rounds, active: active.iter().filter(|&&a| a).count(), accepted, refused, code: records.iter().map(|r| r.end).sum() };
+        let mut go = pass(&shown(0, &active, &records, 0, 0));
+        while go && active.iter().any(|&a| a) {
             rounds += 1;
+            let (mut accepted, mut refused) = (0usize, 0usize);
             // Each active problem's proposal.
             let mut proposed: Vec<(usize, usize, usize, i128)> = Vec::new();
             for k in 0..problems.len() {
@@ -3878,12 +3898,15 @@ impl Field {
                     faces[k] = after;
                     records[k].moves.push(ExchangeMove { i, j, gain: g, fall: before - now });
                     records[k].end = now;
+                    accepted += 1;
                 } else {
                     answers[k].swap(i, j);
                     marked[k].insert((i.min(j), i.max(j)));
                     records[k].refused += 1;
+                    refused += 1;
                 }
             }
+            go = pass(&shown(rounds, &active, &records, accepted, refused));
         }
         let out = answers.iter().zip(written).map(|(a, w)| {
             let mut placed = a.clone();

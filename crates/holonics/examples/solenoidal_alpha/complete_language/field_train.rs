@@ -8713,7 +8713,12 @@ pub(super) fn exchange_field(args: &[String], realization: &mut dyn FieldRealiza
     // `h` on the codes' 2^(−20) bits: H thousandths of a nat over ln 2, rounded up.
     let h = (((h_milli as i128) << 50) + 1000 * LN2_Q30 - 1) / (1000 * LN2_Q30);
     let (walked, records) = field
-        .exchange_walk(&problems, &keyed, void, h, moves, realization, &mut |_, _| started.elapsed().as_millis() <= stop_ms)
+        .exchange_walk(&problems, &keyed, void, h, moves, realization, &mut |p| {
+            // [theory, November 9 22:32] One progress line a pass, flushed.
+            println!("FIELD_EXCHANGE_PASS pass={} elapsed_ms={} active={} accepted={} refused={} c_nats={}", p.pass, started.elapsed().as_millis(), p.active, p.accepted, p.refused, decimal_q20(nats_q20(p.code)));
+            let _ = std::io::Write::flush(&mut std::io::stdout());
+            started.elapsed().as_millis() <= stop_ms
+        })
         .map_err(|e| e.to_string())?;
     write("SAMPLE.tsv", &walked)?;
     // [theory, November 9 21:12] Each standing move's proposed gain against its certified fall, in nats; each problem's code a
