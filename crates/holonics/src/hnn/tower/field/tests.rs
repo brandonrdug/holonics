@@ -3766,6 +3766,53 @@ fn the_exchange_walk_holds_composition() {
     }
 }
 
+/// [definition; theory, November 10 01:36] **The parallel certified settle holds composition, certifies every pass and rests**
+/// ([`Field::settle`]): on two answers of twenty letters, at `h` zero and at a quarter of a bit, each answer keeps its letters
+/// and its void, every pass that keeps exchanges lowers the pooled code by more than `h` for each one (each problem's kept set
+/// is certified whole), a pass that keeps none leaves it as it was, every problem rests, and its end is its final
+/// answer's code read again; some exchange is kept.
+#[test]
+fn the_parallel_settle_certifies_every_pass_and_rests() {
+    let field = shaped_with(FieldDeclaration { reach: 40, ..tiny_declaration(1) });
+    let (q1, q2) = ([1usize, 4, 0, 2, 2, 3], [3usize, 3, 1, 0]);
+    let problems: Vec<(&[usize], usize)> = vec![(&q1, 24), (&q2, 22)];
+    let letters = |seed: usize, n: usize, room: usize| -> Vec<usize> { (0..room).map(|t| if t < n { 1 + (t * 7 + t / 3 + seed) % 4 } else { 0 }).collect() };
+    let written = vec![letters(0, 20, 24), letters(3, 20, 22)];
+    let mut kept_any = false;
+    for h in [0i128, 1 << 18] {
+        let mut passes: Vec<(usize, usize, i128)> = Vec::new();
+        let (answers, records) = field.settle(&problems, &written, 0, h, &mut HostField, &mut |p| {
+            passes.push((p.pass, p.kept, p.code));
+            true
+        }).unwrap();
+        for w in passes.windows(2) {
+            let ((_, _, before), (pass, kept, after)) = (w[0], w[1]);
+            if kept > 0 {
+                assert!(before - after > h * kept as i128, "h={h} pass {pass}: {kept} kept, the code fell {}", before - after);
+            } else {
+                assert_eq!(before, after, "h={h} pass {pass} kept nothing");
+            }
+        }
+        for (k, (a, w)) in answers.iter().zip(&written).enumerate() {
+            let (mut x, mut y) = (a.clone(), w.clone());
+            x.sort_unstable();
+            y.sort_unstable();
+            assert_eq!(x, y, "problem {k}: composition held");
+            assert!(a[20..].iter().all(|&c| c == 0), "the void past the letters stays");
+            let r = &records[k];
+            assert!(r.rested, "h={h} problem {k} rests");
+            kept_any |= !r.kept.is_empty();
+            eprintln!("SETTLE h={h} problem={k} kept={} undone={} start={} end={} passes={}", r.kept.len(), r.undone, r.start, r.end, passes.len() - 1);
+        }
+        let (again, check) = field.settle(&problems, &answers, 0, i128::MAX, &mut HostField, &mut |_| true).unwrap();
+        assert_eq!(again, answers);
+        for (k, r) in records.iter().enumerate() {
+            assert_eq!(check[k].start, r.end, "the end is the final answer's code read again");
+        }
+    }
+    assert!(kept_any, "the settle kept some exchange");
+}
+
 /// [measurement; theory, November 9 21:59] **A site's key words are its last tick's, and its seam octave reads the least
 /// margin of its class modes** ([`Field::read_words`], [`seam_octave`]): the read's faces and plates are `read_plates`'s, its
 /// words the last tick's unframed key words; a word whose class modes sit at margins ½, ⅓ and 1/9 reads octave 3 (1/9 lies in

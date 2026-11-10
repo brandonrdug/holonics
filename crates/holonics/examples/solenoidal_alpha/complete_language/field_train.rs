@@ -8791,9 +8791,17 @@ pub(super) fn exchange_field(args: &[String], realization: &mut dyn FieldRealiza
     let seed = u64::from_str_radix(args[2].get(..16).ok_or("a writer's key of fewer than sixteen hex digits")?, 16).map_err(|_| "a writer's key that is not hexadecimal")?;
     let requests: Vec<(Vec<usize>, usize)> = held.iter().map(|(question, _)| opening(&codec, field, question, b"")).collect::<std::result::Result<_, String>>()?;
     let problems: Vec<(&[usize], usize)> = requests.iter().map(|(q, n)| (q.as_slice(), *n)).collect();
+    let keyed = keyed_write(field, &codec, &problems, sweeps, seed, realization, &mut |_, _| started.elapsed().as_millis() <= stop_ms)?;
+    let keyed_ms = started.elapsed().as_millis();
+    exchange_report(field, &codec, &problems, &keyed, "keyed", h_milli, moves, out, started, keyed_ms, realization, &mut |_| started.elapsed().as_millis() <= stop_ms)
+}
+
+/// The keyed write given held's lengths (`FIELD_WRITER_LENGTHS`, required; the writer's laws as `length-field` reads them,
+/// refine zero) that [`exchange_field`] and [`settle_field`] start from; `sweep` as [`Field::sample_runs`]'.
+fn keyed_write(field: &Field, codec: &FieldCodec, problems: &[(&[usize], usize)], sweeps: usize, seed: u64, realization: &mut dyn FieldRealization, sweep: &mut dyn FnMut(usize, usize) -> bool) -> Result<Vec<Vec<usize>>> {
     let void = codec.void();
     let WriterLaw { run_bits, near_tail, place_order, one_end, rest, spans, refine_order } = WriterLaw::from_env()?;
-    let path = std::env::var("FIELD_WRITER_LENGTHS").map_err(|_| "exchange-field writes given held's lengths: FIELD_WRITER_LENGTHS")?;
+    let path = std::env::var("FIELD_WRITER_LENGTHS").map_err(|_| "the walk writes given held's lengths: FIELD_WRITER_LENGTHS")?;
     let mut by: std::collections::BTreeMap<usize, usize> = std::collections::BTreeMap::new();
     for l in std::fs::read_to_string(path)?.lines().skip(1) {
         let mut c = l.split('\t');
@@ -8801,12 +8809,79 @@ pub(super) fn exchange_field(args: &[String], realization: &mut dyn FieldRealiza
             by.insert(k, w);
         }
     }
-    let given: Vec<usize> = (0..problems.len()).map(|k| by.get(&k).copied().ok_or("a problem with no length in FIELD_WRITER_LENGTHS")).collect::<std::result::Result<Vec<usize>, _>>()?.into_iter().zip(&problems).map(|(l, &(_, n))| l.min(n)).collect();
-    let keyed = field
-        .sample_runs(&problems, sweeps, 0, void, seed, run_bits << 20, near_tail, place_order, Some(&given), one_end, rest, spans, None, refine_order, realization, &mut |_, _| started.elapsed().as_millis() <= stop_ms, &mut |_| {})
-        .map_err(|e| e.to_string())?;
+    let given: Vec<usize> = (0..problems.len()).map(|k| by.get(&k).copied().ok_or("a problem with no length in FIELD_WRITER_LENGTHS")).collect::<std::result::Result<Vec<usize>, _>>()?.into_iter().zip(problems).map(|(l, &(_, n))| l.min(n)).collect();
+    Ok(field.sample_runs(problems, sweeps, 0, void, seed, run_bits << 20, near_tail, place_order, Some(&given), one_end, rest, spans, None, refine_order, realization, sweep, &mut |_| {}).map_err(|e| e.to_string())?)
+}
+
+/// [definition; theory, November 10 01:36] `settle-field STATE STATE_SHA CODEC CODEC_SHA UNITS UNITS_SHA HELD HELD_SHA COUNT
+/// SWEEPS H_MILLINATS PASSES OUT`: **the parallel certified settle** ([`Field::settle`], the exchange walk's law and `h`) from
+/// [`exchange_field`]'s keyed write, at most `PASSES` passes (a bound by count). `KEYED.tsv` the write, `SAMPLE.pass<k>.tsv`
+/// the answers at every pass (`k` 0 the write), `SAMPLE.tsv` the end, all private; `MOVES.tsv` each kept exchange's proposed
+/// gain and attributed fall in nats. `FIELD_SETTLE_PASS` a pass (flushed): its kept and undone exchanges, the pooled code, the
+/// share of its re-read's code change outside every claimed neighbourhood (millionths of `Σ |c_t − c′_t|`), and its elapsed
+/// time; `FIELD_SETTLE` a problem: its code a place keyed and at its end, its kept exchanges a letter, whether it rested;
+/// `FIELD_SETTLE_DONE`.
+pub(super) fn settle_field(args: &[String], realization: &mut dyn FieldRealization) -> Result<()> {
+    if args.len() != 14 {
+        return Err("settle-field STATE STATE_SHA CODEC CODEC_SHA UNITS UNITS_SHA HELD HELD_SHA COUNT SWEEPS H_MILLINATS PASSES OUT".into());
+    }
+    let started = std::time::Instant::now();
+    let mut learner = FieldLearner::from_text(std::str::from_utf8(&pinned_read(&args[1], &args[2], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
+    declared_clocks(&mut learner.field);
+    let field = &learner.field;
+    let units = units_of(&args[5], &args[6])?;
+    let codec = FieldCodec::from_text(std::str::from_utf8(&pinned_read(&args[3], &args[4], CODEC_BUDGET)?)?, units)?;
+    let held = problems_of(&pinned_read(&args[7], &args[8], READ_BUDGET as usize)?);
+    let (limit, sweeps, h_milli, passes) = (count(&args[9])?, positive(&args[10])?, count(&args[11])?, count(&args[12])?);
+    let out = Path::new(&args[13]);
+    std::fs::create_dir(out)?;
+    let held = &held[..limit.min(held.len())];
+    let seed = u64::from_str_radix(args[2].get(..16).ok_or("a writer's key of fewer than sixteen hex digits")?, 16).map_err(|_| "a writer's key that is not hexadecimal")?;
+    let requests: Vec<(Vec<usize>, usize)> = held.iter().map(|(question, _)| opening(&codec, field, question, b"")).collect::<std::result::Result<_, String>>()?;
+    let problems: Vec<(&[usize], usize)> = requests.iter().map(|(q, n)| (q.as_slice(), *n)).collect();
+    let keyed = keyed_write(field, &codec, &problems, sweeps, seed, realization, &mut |_, _| true)?;
     let keyed_ms = started.elapsed().as_millis();
-    exchange_report(field, &codec, &problems, &keyed, "keyed", h_milli, moves, out, started, keyed_ms, realization, &mut |_| started.elapsed().as_millis() <= stop_ms)
+    let void = codec.void();
+    let write = |name: &str, answers: &[Vec<usize>]| -> Result<()> {
+        let mut file = rows_file(&out.join(name), "")?;
+        for (k, places) in answers.iter().enumerate() {
+            let written = places.iter().take_while(|&&c| c != void).count();
+            row(&mut file, &format!("{k}\t{}\n", escaped(&codec.decode(&places[..written])))).map_err(|e| e.to_string())?;
+        }
+        Ok(())
+    };
+    write("KEYED.tsv", &keyed)?;
+    // `h` on the codes' 2^(−20) bits: H thousandths of a nat over ln 2, rounded up.
+    let h = (((h_milli as i128) << 50) + 1000 * LN2_Q30 - 1) / (1000 * LN2_Q30);
+    let mut saved: Result<()> = Ok(());
+    let (settled, records) = field
+        .settle(&problems, &keyed, void, h, realization, &mut |p| {
+            let share = if p.changed == 0 { 0 } else { p.outside * 1_000_000 / p.changed };
+            println!("FIELD_SETTLE_PASS pass={} elapsed_ms={} active={} kept={} undone={} c_nats={} entropy_nats={} outside_share_millionths={share} outside_nats={} changed_nats={}", p.pass, started.elapsed().as_millis(), p.active, p.kept, p.undone, decimal_q20(nats_q20(p.code)), decimal_q20(nats_q20(p.entropy)), decimal_q20(nats_q20(p.outside)), decimal_q20(nats_q20(p.changed)));
+            let _ = std::io::Write::flush(&mut std::io::stdout());
+            if let Err(e) = write(&format!("SAMPLE.pass{}.tsv", p.pass), p.answers) {
+                saved = Err(e);
+                return false;
+            }
+            p.pass < passes
+        })
+        .map_err(|e| e.to_string())?;
+    saved?;
+    write("SAMPLE.tsv", &settled)?;
+    let mut file = rows_file(&out.join("MOVES.tsv"), "problem\tmove\ti\tj\tproposed_gain_nats\tattributed_fall_nats\n")?;
+    let (mut kept, mut undone, mut rested, mut places, mut start, mut end) = (0usize, 0usize, 0usize, 0usize, 0i128, 0i128);
+    for (k, r) in records.iter().enumerate() {
+        for (n, m) in r.kept.iter().enumerate() {
+            row(&mut file, &format!("{k}\t{}\t{}\t{}\t{}\t{}\n", n + 1, m.i, m.j, decimal_q20(nats_q20(m.gain)), decimal_q20(nats_q20(m.fall))))?;
+        }
+        let a_place = |c: i128| if r.places == 0 { "-".to_string() } else { decimal_q20(nats_q20(c) / r.places as i128) };
+        let a_letter = if r.places == 0 { 0 } else { r.kept.len() * 1000 / r.places };
+        println!("FIELD_SETTLE problem={k} letters={} code_keyed_nats_a_place={} code_end_nats_a_place={} kept={} undone={} moves_a_letter={}.{:03} at_rest={}", r.places, a_place(r.start), a_place(r.end), r.kept.len(), r.undone, a_letter / 1000, a_letter % 1000, r.rested);
+        (kept, undone, rested, places, start, end) = (kept + r.kept.len(), undone + r.undone, rested + usize::from(r.rested), places + r.places, start + r.start, end + r.end);
+    }
+    let pooled = |c: i128| if places == 0 { "-".to_string() } else { decimal_q20(nats_q20(c) / places as i128) };
+    println!("FIELD_SETTLE_DONE problems={} at_rest={rested} h_millinats={h_milli} passes_bound={passes} kept={kept} undone={undone} letters={places} code_keyed_nats_a_place={} code_end_nats_a_place={} fall_nats={} keyed_ms={keyed_ms} ms={}", problems.len(), pooled(start), pooled(end), decimal_q20(nats_q20(start - end)), started.elapsed().as_millis());
+    Ok(())
 }
 
 /// [definition; theory, November 10 01:21] `exchange-held-field STATE STATE_SHA CODEC CODEC_SHA UNITS UNITS_SHA HELD HELD_SHA
@@ -8867,7 +8942,7 @@ fn exchange_report(field: &Field, codec: &FieldCodec, problems: &[(&[usize], usi
     let (walked, records) = field
         .exchange_walk(problems, start, void, h, moves, realization, &mut |p| {
             // [theory, November 9 22:32] One progress line a pass, flushed.
-            println!("FIELD_EXCHANGE_PASS pass={} elapsed_ms={} active={} accepted={} refused={} c_nats={}", p.pass, started.elapsed().as_millis(), p.active, p.accepted, p.refused, decimal_q20(nats_q20(p.code)));
+            println!("FIELD_EXCHANGE_PASS pass={} elapsed_ms={} active={} accepted={} refused={} c_nats={} entropy_nats={}", p.pass, started.elapsed().as_millis(), p.active, p.accepted, p.refused, decimal_q20(nats_q20(p.code)), decimal_q20(nats_q20(p.entropy)));
             let _ = std::io::Write::flush(&mut std::io::stdout());
             go(p)
         })

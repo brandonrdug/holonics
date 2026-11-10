@@ -488,6 +488,14 @@ pub(super) fn parity(args: &[String], card: &mut dyn FieldRealization) -> Result
     let walk_equal = host_walk == card_walk && host_moves == card_moves;
     releases_unequal += usize::from(!walk_equal);
     println!("FIELD_PARITY_EXCHANGE plates_equal={plates_equal} walk_equal={walk_equal} standing={} refused={} host_ms={host_walk_ms}", host_moves.iter().map(|r| r.moves.len()).sum::<usize>(), host_moves.iter().map(|r| r.refused).sum::<usize>());
+    // [theory, November 10 01:36] The parallel certified settle through both, from the host's write at h zero.
+    let t1 = std::time::Instant::now();
+    let (host_settled, host_records) = host_learner.field.settle(&questions, &hosted, void, h, &mut HostField, &mut |_| true).map_err(|e| e.to_string())?;
+    let host_settle_ms = ms(t1.elapsed().as_nanos());
+    let (card_settled, card_records) = card_learner.field.settle(&questions, &hosted, void, h, &mut *card, &mut |_| true).map_err(|e| e.to_string())?;
+    let settle_equal = host_settled == card_settled && host_records == card_records;
+    releases_unequal += usize::from(!settle_equal);
+    println!("FIELD_PARITY_SETTLE settle_equal={settle_equal} kept={} undone={} rested={} host_ms={host_settle_ms}", host_records.iter().map(|r| r.kept.len()).sum::<usize>(), host_records.iter().map(|r| r.undone).sum::<usize>(), host_records.iter().filter(|r| r.rested).count());
     println!(
         "FIELD_PARITY_DONE sections={} reads={reads_all} reads_unequal={reads_unequal} faces_unequal={faces_unequal} covector_unequal={entries_unequal} learners_unequal={learners_unequal} releases={} releases_unequal={releases_unequal} card_release_ms={card_release_ms} host_ms={} card_ms={} elapsed_ms={}",
         steps.len(),
