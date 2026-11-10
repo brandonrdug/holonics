@@ -141,6 +141,9 @@ none singular.
 - agent-inferred: the 32-wide chart's quadratic forms swing over tens of nats, so second-order clouds are not a density ratio
   the faces can take. Their constants alone reach 3.3 bits.
 
+[decision; theory, November 10 09:55] The pair read is withdrawn. The shape reading that motivated it (0.216) was an artifact
+of the chart's coordinate 19, which carries 29.5 of its 32 units of power.
+
 [decision; d5b0bb2dd] The first run (`pair26`) never reached its check: check_ref stopped at its 900 s deadline (rc 124) inside
 the tilts. `pair_tilts` inverted each width-32 covariance by Gauss–Jordan over `BigRational`, which reduces a gcd at every term.
 - Each cloud is now carried as the integral matrix `S = wQ − LLᵀ = w²Σ`.
@@ -167,7 +170,8 @@ its reads (`lane_lap.sh`).
 ## 7. What this decides
 
 [decision; agent-inferred]
-- **No census-derived tilt enters the line.** The faces are read with the rest of the reference locked. They then carry nearly
+- **No census-derived tilt enters the line**, and no further ring, phase, key or reach census is run (theory, November 10
+  09:55). The faces are read with the rest of the reference locked. They then carry nearly
   all that the ring residues (at most 0.008 nats a letter), the letters at any offset (at most 0.015) and the chart's
   second-order clouds can add.
 - **The gap is not in the faces' reading of a given context.** It lies between the neutral rest the moves reach (0.75–0.97
