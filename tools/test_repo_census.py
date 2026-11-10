@@ -164,6 +164,24 @@ class CensusTests(unittest.TestCase):
         self.assertFalse(outer.exists(), out)
         self.assertIn("claude/outer", self.g("for-each-ref", "--format=%(refname:short)", "refs/heads").split())
 
+    def test_dry_run_changes_nothing_and_keep_is_honoured(self):
+        old = time.time() - 5 * 86400
+        os.utime(self.repo / ".local/wt/old-read/.local/run/x.bin", (old, old))
+        before = self.snapshot()
+        for flags in (["--apply"], ["--archive-idle", "30"], ["--retire", "old-read", "outer", "inner"]):
+            code, out = self.tool(*flags, "--dry-run")
+            self.assertIn("would", out), self.assertIn("nothing was changed", out)
+        self.assertEqual(before, self.snapshot())
+        self.assertTrue((self.repo / ".local/wt/old-read/notes.txt").exists())
+        self.assertFalse((self.repo / ".local/archive").exists())
+        code, out = self.tool("--retire-idle", "0", "--keep", "old-read", "canon", "fresh")
+        self.assertTrue((self.repo / ".local/wt/old-read").exists())
+        self.assertTrue((self.repo / ".local/wt/fresh").exists())
+        self.assertFalse((self.repo / ".local/wt/outer").exists(), out)
+        code, out = self.tool("--archive-idle", "30", "--keep", "claude/open-local")
+        local = self.g("for-each-ref", "--format=%(refname:short)", "refs/heads").split()
+        self.assertIn("claude/open-local", local), self.assertNotIn("claude/open-local-2", local)
+
     def test_a_mounted_view_is_read_only(self):
         moved = self.repo.with_name("mounted")
         self.repo.rename(moved)

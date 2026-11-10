@@ -15,6 +15,12 @@ contract, and the steps that would repair them. With no flag it changes nothing 
                                       no worktree holds
   repo_census.py --retire W [W ...]   end a worktree (a path, or its directory's name) without losing a file
   repo_census.py --retire-idle DAYS   the same for every worktree untouched for DAYS days
+  ... --keep NAME [NAME ...]          leave these worktrees and branches out of the two idle sweeps
+  ... --dry-run                       with any of the above: print each step and do none of them
+
+"Untouched" is read from modification times, and a worktree whose states or binaries are only read by a run elsewhere
+looks idle. Retiring it loses nothing but moves its `.local/` to the archive, so a script that names the old path
+breaks. Before an idle sweep, name such worktrees with `--keep`, and read the sweep with `--dry-run` first.
 
 What "loses nothing" means, clause by clause:
 - A merged branch's commits are on `origin/main`, so deleting the name loses nothing.
@@ -51,6 +57,7 @@ PROTECTED_PREFIXES = ("archive/",)
 BUILD_PRODUCTS = ("target", "lean/.lake", "__pycache__", ".pytest_cache", "node_modules")
 DAY = 86400
 ROOT = None  # the main checkout, set in main()
+DRY = False  # --dry-run: print each step, do none
 
 
 def git(*args, cwd=None, check=True, write=False):
@@ -406,6 +413,9 @@ def refuse_foreign(S):
 
 
 def step(text, fn):
+    if DRY:
+        print(f"  would   {text}")
+        return True
     try:
         fn()
         print(f"  done    {text}")
@@ -420,13 +430,16 @@ def apply(S):
     plan = S["plan"]
     if ("prune", None) in plan:
         step(describe("prune", None), lambda: git("worktree", "prune", write=True))
+    freed = True
     for kind, w in plan:
         if kind == "detach":
             if live_reasons(w["path"]) or dirty(w["path"]):
                 print(f"  left    {w['path']} holds main and is dirty or live")
+                freed = False
             else:
-                step(describe(kind, w), lambda w=w: git("checkout", "--detach", cwd=w["path"], write=True))
-    main_free = not any(w["branch"] == "main" for w in read_worktrees()[1:])
+                freed = step(describe(kind, w), lambda w=w: git("checkout", "--detach", cwd=w["path"], write=True)) \
+                    and freed
+    main_free = freed if DRY else not any(w["branch"] == "main" for w in read_worktrees()[1:])
     if any(k == "checkout-main" for k, _ in plan) and main_free:
         head = S["main"]["head"]
         if not reachable(head):  # a detached head of the main checkout that nothing else names
@@ -438,7 +451,10 @@ def apply(S):
             step(describe("checkout-main", None), lambda: git("checkout", "-b", "main", "--track", "origin/main",
                                                              write=True))
     wts = read_worktrees()
-    if wts[0]["branch"] == "main" and "main" in S["refs"]["remotes"] and not dirty(ROOT):
+    if DRY:
+        if any(k == "ff-main" for k, _ in plan):
+            step(describe("ff-main", None), None)
+    elif wts[0]["branch"] == "main" and "main" in S["refs"]["remotes"] and not dirty(ROOT):
         if git("rev-parse", "HEAD") != git("rev-parse", "origin/main"):
             step(describe("ff-main", None), lambda: git("merge", "--ff-only", "origin/main", write=True))
     for kind, name in plan:
@@ -523,6 +539,7 @@ def retire(S, targets):
     stamp = time.strftime("%Y-%m-%d")
     todo = sorted(targets, key=lambda w: -len(w["path"].parts))  # innermost first
     chosen = {str(w["path"]) for w in todo}
+    would = set()
     for w in todo:
         path, name = w["path"], w["path"].name
         if w["missing"]:
@@ -535,10 +552,16 @@ def retire(S, targets):
         if why:
             print(f"  left    {path}: live ({'; '.join(why)})")
             continue
-        inner = [o for o in read_worktrees()[1:] if path in o["path"].parents and o["path"].exists()]
+        inner = [o for o in read_worktrees()[1:] if path in o["path"].parents and o["path"].exists()
+                 and not (DRY and str(o["path"]) in would)]
         if inner:
             print(f"  left    {path}: it contains the worktree {inner[0]['path']}"
                   + ("" if str(inner[0]["path"]) in chosen else " (retire that one first)"))
+            continue
+        if DRY:
+            would.add(str(path))
+            print(f"  would   retire {path} ({w['branch'] or 'detached'} {w['head'][:9]}, "
+                  f"untouched {days(time.time() - w['touch'])}{', uncommitted changes' if w['dirty'] else ''})")
             continue
         dest = ROOT / ".local" / "archive" / "wt" / f"{stamp}-{name}"
         n = 1
@@ -594,7 +617,12 @@ def main():
                                                              "this machine, after reading them")
     ap.add_argument("--retire", nargs="+", metavar="WORKTREE")
     ap.add_argument("--retire-idle", type=float, metavar="DAYS")
+    ap.add_argument("--keep", nargs="+", default=[], metavar="NAME", help="worktrees (path or directory name) and "
+                                                                          "branches the idle sweeps leave alone")
+    ap.add_argument("--dry-run", action="store_true")
     a = ap.parse_args()
+    global DRY
+    DRY = a.dry_run
     ROOT = find_root(a.repo or Path(__file__).resolve().parent)
     changing = a.apply or a.archive or a.archive_idle is not None or a.retire or a.retire_idle is not None
     S = census()
@@ -602,7 +630,7 @@ def main():
         if S["foreign"]:
             show(S)
             refuse_foreign(S)
-        if "main" in S["refs"]["remotes"] or git("remote").strip():
+        if not DRY and ("main" in S["refs"]["remotes"] or git("remote").strip()):
             r = git("fetch", "--prune", "origin", check=False, write=True)
             if r.returncode:
                 print(f"fetch failed: {r.stderr.strip()}", file=sys.stderr)
@@ -626,7 +654,8 @@ def main():
                 targets.append(w)
         if a.retire_idle is not None:
             targets += [w for w in S["wts"][1:] if not w["missing"] and w not in targets
-                        and now - w["touch"] > a.retire_idle * DAY]
+                        and now - w["touch"] > a.retire_idle * DAY
+                        and w["path"].name not in a.keep and str(w["path"]) not in a.keep]
         retire(S, targets)
         S = census()
     if a.archive or a.archive_idle is not None:
@@ -635,10 +664,14 @@ def main():
         if a.archive_idle is not None:
             for name, b in S["branches"].items():
                 tip_when = (b["local"] or b["remote"])[1]
-                if "ahead" in b and not b["held"] and name not in names and now - tip_when > a.archive_idle * DAY:
+                if "ahead" in b and not b["held"] and name not in names and name not in a.keep \
+                        and now - tip_when > a.archive_idle * DAY:
                     names.append(name)
         archive(S, names, a.push_local)
         S = census()
+    if DRY:
+        print("\nDRY RUN: nothing was changed.")
+        return 0
     print()
     show(S)
     return 1 if S["violations"] else 0
