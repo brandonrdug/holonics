@@ -10689,7 +10689,12 @@ pub(super) fn locked_visit_field(args: &[String], realization: &mut dyn FieldRea
     if only.is_some_and(|o| !names.contains(&o)) {
         return Err("a locked visit set that is not held, train_even or train_odd".into());
     }
-    std::fs::create_dir(out)?;
+    // A single set may join an `OUT` the other sets' runs share (its files are created new, never overwritten).
+    if only.is_some() {
+        std::fs::create_dir_all(out)?;
+    } else {
+        std::fs::create_dir(out)?;
+    }
     if field.declaration.energy {
         return Err("a locked visit's chart is not read in an energy field".into());
     }
