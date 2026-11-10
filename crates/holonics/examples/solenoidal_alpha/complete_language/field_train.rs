@@ -6965,6 +6965,43 @@ mod tests {
         let _ = std::fs::remove_dir_all(&dir);
     }
 
+    /// [theory, November 10 02:03] `ring-census-field` end to end on the host: every set, ring, residue and letter is a row, at the
+    /// letters' places and at the stop places, and each ring's residues count every place of its set once.
+    #[test]
+    fn the_ring_census_counts_every_place_once_a_ring() {
+        let dir = std::env::temp_dir().join(format!("holonics-ring-{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&dir);
+        std::fs::create_dir_all(&dir).expect("dir");
+        let put = |name: &str, bytes: &[u8]| {
+            std::fs::write(dir.join(name), bytes).expect("write");
+            (dir.join(name).to_string_lossy().into_owned(), sha256(bytes).expect("sha"))
+        };
+        let (codec, problems) = toy();
+        let learner = toy_learner(&codec, &problems);
+        let (state, state_sha) = put("STATE", learner.to_text().as_bytes());
+        let (codec_path, codec_sha) = put("CODEC", codec.to_text().as_bytes());
+        let (units, units_sha) = put("UNITS", b"founded-units-v1 0\n");
+        let (held, held_sha) = put("HELD", TOY);
+        let (train, train_sha) = put("TRAIN", TOY);
+        let out = dir.join("OUT").to_string_lossy().into_owned();
+        let args: Vec<String> = ["ring-census-field", &state, &state_sha, &codec_path, &codec_sha, &units, &units_sha, &held, &held_sha, &train, &train_sha, "2", &out].iter().map(|s| s.to_string()).collect();
+        ring_census_field(&args, &mut HostField).unwrap();
+        let a = learner.field.declaration.alphabet;
+        let residues: usize = RINGS.iter().map(|r| r.3 as usize).sum();
+        let places: [usize; 3] = [problems.iter().map(|p| p.1.len()).sum(), problems.iter().step_by(2).map(|p| p.1.len()).sum(), problems.iter().skip(1).step_by(2).map(|p| p.1.len()).sum()];
+        for (file, counted) in [("RING.tsv", places), ("RING_STOP.tsv", [4, 2, 2])] {
+            let text = std::fs::read_to_string(dir.join("OUT").join(file)).unwrap();
+            assert_eq!(text.lines().count(), 1 + 3 * residues * a, "{file}");
+            for (set, name) in ["held", "train_even", "train_odd"].iter().enumerate() {
+                for (ring, _, _, _) in RINGS {
+                    let n: usize = text.lines().skip(1).map(|l| l.split('\t').collect::<Vec<_>>()).filter(|c| c[0] == *name && c[1] == ring).map(|c| c[5].parse::<usize>().unwrap()).sum();
+                    assert_eq!(n, counted[set], "{file} {name} {ring}");
+                }
+            }
+        }
+        let _ = std::fs::remove_dir_all(&dir);
+    }
+
     /// [theory, November 10 01:21] `exchange-held-field` starts from the held file's own answers: its start (`HELD.tsv`) is each
     /// reference as written, and the walk from it holds each answer's letters.
     #[test]
@@ -9737,6 +9774,132 @@ pub(super) fn phase_field(args: &[String], realization: &mut dyn FieldRealizatio
         }
     }
     println!("FIELD_PHASE_DONE sections={take} of={} train_ms={train_ms} held_ms={held_ms} ms={}", order.len(), started.elapsed().as_millis());
+    Ok(())
+}
+
+/// [measurement; theory, November 10 02:03] The ring census's rings: a symbol's count (less its closing symbol's, where it has
+/// one) in a reference's letters before a place, modulo the ring.
+const RINGS: [(&str, u8, Option<u8>, i64); 5] = [("backtick", b'`', None, 2), ("paren", b'(', Some(b')'), 3), ("bracket", b'[', Some(b']'), 3), ("dquote", b'"', None, 2), ("squote", b'\'', None, 2)];
+
+/// The ring census's sums: `N` and `F` (each share on the face's own width `2^(−62)`, its remainder carried on `2^(−94)`) by
+/// `[set][ring][residue][letter]`, residues up to three.
+struct RingSums {
+    a: usize,
+    n: Vec<u64>,
+    f: Vec<u128>,
+    fc: Vec<i128>,
+}
+
+impl RingSums {
+    fn new(a: usize, sets: usize) -> Self {
+        let len = sets * RINGS.len() * 3 * a;
+        Self { a, n: vec![0; len], f: vec![0; len], fc: vec![0; len] }
+    }
+
+    fn add(&mut self, set: usize, residues: &[usize; 5], face: &holonics::hnn::tower::TowerFace, truth: usize) {
+        for (ring, &res) in residues.iter().enumerate() {
+            let at = ((set * RINGS.len() + ring) * 3 + res) * self.a;
+            self.n[at + truth] += 1;
+            for (c, &m) in face.masses.iter().enumerate() {
+                let share = (m << 62) / face.total;
+                let rem = (m << 62) - share * face.total;
+                self.f[at + c] += share;
+                self.fc[at + c] += (((rem << 32) + face.total / 2) / face.total) as i128;
+            }
+        }
+    }
+
+    fn write(&self, path: &Path, names: &[&str]) -> Result<()> {
+        let mut file = rows_file(path, "set\tring\tmodulus\tresidue\tletter\tn\tf_q62\tf_carried_q94\n")?;
+        for (set, name) in names.iter().enumerate() {
+            for (ring, &(ring_name, _, _, modulus)) in RINGS.iter().enumerate() {
+                for res in 0..modulus as usize {
+                    let at = ((set * RINGS.len() + ring) * 3 + res) * self.a;
+                    for c in 0..self.a {
+                        row(&mut file, &format!("{name}\t{ring_name}\t{modulus}\t{res}\t{c}\t{}\t{}\t{}\n", self.n[at + c], self.f[at + c], self.fc[at + c]))?;
+                    }
+                }
+            }
+        }
+        Ok(())
+    }
+}
+
+/// [measurement; theory, November 10 02:03] `ring-census-field STATE STATE_SHA CODEC CODEC_SHA UNITS UNITS_SHA HELD HELD_SHA TRAIN
+/// TRAIN_SHA COUNT OUT`: **the locked-state ring census**. Three sets: the held problems, and TRAIN's first `COUNT` problems of
+/// each parity of their index. Each reference (cut to its room) is read with every place locked: every face once, each place
+/// alone open with the rest of the reference given ([`Field::locked_faces`], the run from the references' own re-read), and
+/// the stop place (the first void past the letters) likewise. On the host, from the reference's letters before each place, five
+/// ring residues ([`RINGS`]: the backticks mod 2, `(` less `)` mod 3, `[` less `]` mod 3, the double quotes mod 2, the single
+/// quotes mod 2). `RING.tsv` holds `N` and `F` by set, ring, residue and letter at the letters' places, `RING_STOP.tsv` the same
+/// at the stop places (`F` each share on the face's width `2^(−62)`, its remainder carried on `2^(−94)`). Numbers only.
+pub(super) fn ring_census_field(args: &[String], realization: &mut dyn FieldRealization) -> Result<()> {
+    if args.len() != 13 {
+        return Err("ring-census-field STATE STATE_SHA CODEC CODEC_SHA UNITS UNITS_SHA HELD HELD_SHA TRAIN TRAIN_SHA COUNT OUT".into());
+    }
+    let started = std::time::Instant::now();
+    let mut learner = FieldLearner::from_text(std::str::from_utf8(&pinned_read(&args[1], &args[2], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
+    declared_clocks(&mut learner.field);
+    let field = &learner.field;
+    let units = units_of(&args[5], &args[6])?;
+    let codec = FieldCodec::from_text(std::str::from_utf8(&pinned_read(&args[3], &args[4], CODEC_BUDGET)?)?, units)?;
+    let held = problems_of(&pinned_read(&args[7], &args[8], READ_BUDGET as usize)?);
+    let train = problems_of(&pinned_read(&args[9], &args[10], READ_BUDGET as usize)?);
+    let limit = count(&args[11])?;
+    let out = Path::new(&args[12]);
+    std::fs::create_dir(out)?;
+    let void = codec.void();
+    let a = field.declaration.alphabet;
+    // Each class's count on each ring.
+    let marks: Vec<[i64; 5]> = (0..a)
+        .map(|c| {
+            let bytes = if c == void { Vec::new() } else { codec.decode(&[c]) };
+            RINGS.map(|(_, open, close, _)| bytes.iter().filter(|&&b| b == open).count() as i64 - close.map_or(0, |cl| bytes.iter().filter(|&&b| b == cl).count() as i64))
+        })
+        .collect();
+    let names = ["held", "train_even", "train_odd"];
+    let sets: [Vec<&(Vec<u8>, Vec<u8>)>; 3] = [held.iter().collect(), train.iter().step_by(2).take(limit).collect(), train.iter().skip(1).step_by(2).take(limit).collect()];
+    let (mut letters_sums, mut stop_sums) = (RingSums::new(a, names.len()), RingSums::new(a, names.len()));
+    const BATCH: usize = 32;
+    for (set, problems) in sets.iter().enumerate() {
+        let (mut places, mut stops, mut cut, mut empty) = (0usize, 0usize, 0usize, 0usize);
+        for (b, batch) in problems.chunks(BATCH).enumerate() {
+            let requests: Vec<(Vec<usize>, usize)> = batch.iter().map(|(question, _)| opening(&codec, field, question, b"")).collect::<std::result::Result<_, String>>()?;
+            let mut answers: Vec<Vec<usize>> = Vec::with_capacity(batch.len());
+            for ((_, ans), (_, room)) in batch.iter().zip(&requests) {
+                let mut x = codec.encode(ans).map_err(|e| e.to_string())?;
+                cut += usize::from(x.len() > *room);
+                x.truncate(*room);
+                answers.push(x);
+            }
+            let ks: Vec<usize> = (0..batch.len()).filter(|&k| !answers[k].is_empty()).collect();
+            empty += batch.len() - ks.len();
+            let problems: Vec<(&[usize], usize)> = requests.iter().map(|(q, n)| (q.as_slice(), *n)).collect();
+            let faces = field.locked_faces(&problems, &answers, &ks, void, true, realization).map_err(|e| e.to_string())?;
+            for (&k, f) in ks.iter().zip(&faces) {
+                let x = &answers[k];
+                let mut ring = [0i64; 5];
+                let residues = |ring: &[i64; 5]| -> [usize; 5] { std::array::from_fn(|r| ring[r].rem_euclid(RINGS[r].3) as usize) };
+                for (t, face) in f.iter().enumerate().take(x.len()) {
+                    letters_sums.add(set, &residues(&ring), face, x[t]);
+                    for (r, v) in ring.iter_mut().enumerate() {
+                        *v += marks[x[t]][r];
+                    }
+                }
+                places += x.len();
+                if let Some(face) = f.get(x.len()) {
+                    stop_sums.add(set, &residues(&ring), face, void);
+                    stops += 1;
+                }
+            }
+            println!("FIELD_RING_BATCH set={} batch={b} problems={} places={places} stops={stops} elapsed_ms={}", names[set], batch.len(), started.elapsed().as_millis());
+            let _ = std::io::Write::flush(&mut std::io::stdout());
+        }
+        println!("FIELD_RING_SET set={} problems={} places={places} stops={stops} cut_to_room={cut} empty={empty}", names[set], problems.len());
+    }
+    letters_sums.write(&out.join("RING.tsv"), &names)?;
+    stop_sums.write(&out.join("RING_STOP.tsv"), &names)?;
+    println!("FIELD_RING_DONE ms={}", started.elapsed().as_millis());
     Ok(())
 }
 

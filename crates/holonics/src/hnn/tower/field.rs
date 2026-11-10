@@ -3998,13 +3998,20 @@ impl Field {
     /// each place read in its own region (the question, the answer as it stands and the near field past its end) with that
     /// place alone open, so each face is `f_t(· | rest)`; returned in the order of `ks`.
     fn answer_faces(&self, problems: &[(&[usize], usize)], answers: &[Vec<usize>], ks: &[usize], void: usize, realization: &mut dyn FieldRealization) -> Result<Vec<Vec<TowerFace>>> {
+        self.locked_faces(problems, answers, ks, void, false, realization)
+    }
+
+    /// [measurement; theory, November 10 02:03] **Every face of the answers `ks` with every other place locked**
+    /// ([`Field::answer_faces`]'s read, the exchange walks' own), and with `stop` also the stop place, the first void past the
+    /// letters, where the room holds it (its face last); in the order of `ks`.
+    pub fn locked_faces(&self, problems: &[(&[usize], usize)], answers: &[Vec<usize>], ks: &[usize], void: usize, stop: bool, realization: &mut dyn FieldRealization) -> Result<Vec<Vec<TowerFace>>> {
         let region_of = |k: usize, answer: &[usize]| -> Vec<usize> {
             let (q, room) = problems[k];
             let mut classes: Vec<usize> = q.iter().chain(answer).copied().collect();
             classes.extend(std::iter::repeat_n(void, NEAR.min(room.saturating_sub(answer.len()))));
             classes
         };
-        let places: Vec<(usize, usize)> = ks.iter().flat_map(|&k| (0..answers[k].len()).map(move |i| (k, i))).collect();
+        let places: Vec<(usize, usize)> = ks.iter().flat_map(|&k| (0..answers[k].len() + usize::from(stop && problems[k].1 > answers[k].len())).map(move |i| (k, i))).collect();
         let owned: Vec<(Vec<usize>, Vec<bool>)> = places
             .iter()
             .map(|&(k, i)| {
