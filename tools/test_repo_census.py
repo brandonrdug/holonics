@@ -170,7 +170,13 @@ class CensusTests(unittest.TestCase):
             code, out = self.tool("--retire", "old-read")
             self.assertIn("live (run lap reads it)", out, spelling)
             self.assertTrue(r.exists())
-        script.write_text("learner --units ../old-read-2/x.bin .local/wt/old-reading/x\n")  # other worktrees' names
+        script.write_text("bash chain.sh\n")  # the registered script is often one line that calls another
+        (elsewhere / "chain.sh").write_text(f"bash {elsewhere}/lap_inner.sh\n")
+        (elsewhere / "lap_inner.sh").write_text(f"learner --units {r}/.local/run/x.bin\n")
+        code, out = self.tool("--retire", "old-read")
+        self.assertIn("live (run lap reads it)", out)
+        self.assertTrue(r.exists())
+        (elsewhere / "lap_inner.sh").write_text("learner --units ../old-read-2/x.bin .local/wt/old-reading/x\n")  # others' names
         code, out = self.tool("--retire", "old-read")
         self.assertNotIn("FAILED", out)
         self.assertFalse(r.exists(), out)

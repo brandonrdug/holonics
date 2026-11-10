@@ -21,8 +21,8 @@ contract, and the steps that would repair them. With no flag it changes nothing 
 
 "Untouched" is read from modification times, and a worktree whose states or binaries are only read by a run elsewhere
 looks idle. Retiring it loses nothing but moves its `.local/` to the archive, so a script that names the old path
-breaks. A registered run's script is read for the worktrees it names, but a path built at run time or held in a saved
-state is not seen. Before an idle sweep, name such worktrees with `--keep`, and read the sweep with `--dry-run` first.
+breaks. A registered run's script, and the scripts it calls, are read for the worktrees they name, but a path built at
+run time or held in a saved state is not seen. Before an idle sweep, name such worktrees with `--keep`, and read the sweep with `--dry-run` first.
 
 What "loses nothing" means, clause by clause:
 - A merged branch's commits are on `origin/main`, so deleting the name loses nothing.
@@ -57,6 +57,7 @@ task branch (a cloud session's) reads "not on main" for itself, and that line is
 import argparse
 import json
 import os
+import re
 import shutil
 import signal
 import subprocess
@@ -68,7 +69,8 @@ PROTECTED = {"main", "codex/apple-silicon"}
 PROTECTED_PREFIXES = ("archive/",)
 BUILD_PRODUCTS = ("target", "lean/.lake", "__pycache__", ".pytest_cache", "node_modules")
 DAY = 86400
-SCRIPT_READ = 4 << 20  # a run's script is read for the paths it names up to this many bytes
+SCRIPT_READ = 4 << 20  # a run's scripts are read for the paths they name up to this many bytes
+SCRIPT_DEPTH = 4     # and through this many levels of one script naming another
 ROOT = None  # the main checkout, set in main()
 DRY = False  # --dry-run: print each step, do none
 
@@ -198,24 +200,41 @@ def names_path(text, forms):
     return False
 
 
+def script_texts(entry):
+    """The text of a registered run's script and of the scripts it names in turn (a run's script is often one line that
+    calls the script that holds the paths), to SCRIPT_DEPTH levels and SCRIPT_READ bytes."""
+    todo, seen, texts, total = [(Path(str(entry.get("script") or "")), 0)], set(), [], 0
+    bases = [Path(str(entry["cwd"]))] if entry.get("cwd") else []
+    while todo and total <= SCRIPT_READ:
+        f, depth = todo.pop()
+        try:
+            f = f.resolve()
+            if f in seen or not f.is_file() or f.stat().st_size > SCRIPT_READ:
+                continue
+            text = f.read_text(errors="replace")
+        except OSError:
+            continue
+        seen.add(f)
+        texts.append(text)
+        total += len(text)
+        if depth < SCRIPT_DEPTH:
+            for token in set(re.findall(r"[A-Za-z0-9_./~+-]+\.(?:sh|bash|fish|py)\b", text)):
+                t = Path(token)
+                todo += [(c, depth + 1) for c in ([t] if t.is_absolute() else [f.parent / t] + [b / t for b in bases])]
+    return texts
+
+
 def script_names(entry, path):
-    """Whether a registered run's script names the worktree: by its absolute path, by its path from the main checkout,
+    """Whether a registered run's scripts name the worktree: by its absolute path, by its path from the main checkout,
     or by its path from the run's own directory. A run that only reads a worktree's states or binaries shows nowhere
     else (on November 10, 2026 a worktree whose file fed every lap of a live run stood on an idle sweep's list)."""
-    script = Path(str(entry.get("script") or ""))
-    try:
-        if not script.is_file() or script.stat().st_size > SCRIPT_READ:
-            return False
-        text = script.read_text(errors="replace")
-    except OSError:
-        return False
     forms = [str(path)]
     for start in (ROOT.resolve(), entry.get("cwd")):
         if start:
             rel = os.path.relpath(path, str(start))
             if rel != "." and not os.path.isabs(rel) and rel.strip("./"):
                 forms.append(rel)
-    return names_path(text, forms)
+    return any(names_path(text, forms) for text in script_texts(entry))
 
 
 def live_reasons(path):
