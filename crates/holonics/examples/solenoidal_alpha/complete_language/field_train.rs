@@ -6965,16 +6965,11 @@ mod tests {
         let _ = std::fs::remove_dir_all(&dir);
     }
 
-    /// [theory, November 10 04:40] The pair read's pieces: a rational inverse and determinant are exact, a tilt of equal clouds
+    /// [theory, November 10 04:40] The pair read's pieces: a tilt of equal clouds
     /// and a one-bit constant doubles its letter's share against the rest at step one and leaves the face at step zero's
     /// plain read, and the quadratic form reads `(r − μ)ᵀ Σ⁻¹ (r − μ)` on the codes' grain.
     #[test]
     fn a_pair_tilt_moves_its_letter_by_its_constant_and_its_clouds() {
-        use num_bigint::BigInt;
-        use num_rational::BigRational;
-        let int = |v: i64| BigRational::from_integer(BigInt::from(v));
-        let (inv, det) = rational_inverse(&[vec![int(2), int(1)], vec![int(1), int(1)]]).unwrap();
-        assert_eq!((det, inv), (int(1), vec![vec![int(1), int(-1)], vec![int(-1), int(2)]]));
         let (codec, problems) = toy();
         let ln2 = toy_learner(&codec, &problems).field.ln2();
         let exp = holonics::hnn::keyed_modes::Exponential::new(20);
@@ -9939,53 +9934,16 @@ fn big_log2(x: &num_bigint::BigInt) -> Result<i128> {
     Ok((bits << 20) + holonics::hnn::keyed_modes::log2_face(top, 20))
 }
 
-/// A symmetric matrix's inverse and determinant in exact rationals (Gauss–Jordan, the largest pivot of each column by its
-/// magnitude), or `None` where it is singular.
-fn rational_inverse(m: &[Vec<num_rational::BigRational>]) -> Option<(Vec<Vec<num_rational::BigRational>>, num_rational::BigRational)> {
-    use num_traits::{One, Signed, Zero};
-    let n = m.len();
-    let mut a: Vec<Vec<num_rational::BigRational>> = m.to_vec();
-    let mut inv: Vec<Vec<num_rational::BigRational>> = (0..n).map(|i| (0..n).map(|j| if i == j { num_rational::BigRational::one() } else { num_rational::BigRational::zero() }).collect()).collect();
-    let mut det = num_rational::BigRational::one();
-    for c in 0..n {
-        let p = (c..n).max_by(|&i, &j| a[i][c].abs().cmp(&a[j][c].abs()))?;
-        if a[p][c].is_zero() {
-            return None;
-        }
-        if p != c {
-            a.swap(p, c);
-            inv.swap(p, c);
-            det = -det;
-        }
-        let pivot = a[c][c].clone();
-        det *= &pivot;
-        for j in 0..n {
-            a[c][j] = &a[c][j] / &pivot;
-            inv[c][j] = &inv[c][j] / &pivot;
-        }
-        for i in 0..n {
-            if i != c && !a[i][c].is_zero() {
-                let f = a[i][c].clone();
-                for j in 0..n {
-                    let (x, y) = (&a[c][j] * &f, &inv[c][j] * &f);
-                    a[i][j] -= x;
-                    inv[i][j] -= y;
-                }
-            }
-        }
-    }
-    Some((inv, det))
-}
-
 /// [definition; theory, November 10 04:40] **The pair tilts** from a phase census's tables (`CENSUS_PHASE.tsv` for each letter's
 /// count `n` and summed face share `F`, read off head 0, mode 0, the key word, whose bins partition the set's sites;
 /// `CENSUS_MOMENT.tsv` for its `LN`, `LF`, `QN`, `QF`), of `set`, for each letter of at least `floor` sites: the count cloud
-/// `μ_N = LN/n`, `Σ_N = QN/n − μ_N μ_Nᵀ` and the face cloud `μ_F = LF/F`, `Σ_F = QF/F − μ_F μ_Fᵀ`, in exact rationals; a letter
-/// whose cloud is singular is left out.
+/// `μ_N = LN/n`, `Σ_N = QN/n − μ_N μ_Nᵀ` and the face cloud `μ_F = LF/F`, `Σ_F = QF/F − μ_F μ_Fᵀ`, each carried as the integer
+/// matrix `S = wQ − LLᵀ = w²Σ` and eliminated fraction-free ([`holonics::ratio::linear::integral_adjugate`]); the means, precisions and log-determinants
+/// are released to the codes' grain only at the end. A letter whose cloud is not positive definite is left out.
 fn pair_tilts(phase: &[u8], moment: &[u8], set: &str, dw: usize, floor: u64) -> Result<(Vec<PairTilt>, Vec<(usize, u64, i128)>)> {
     use num_bigint::BigInt;
     use num_rational::BigRational;
-    use num_traits::{Signed, ToPrimitive};
+    use num_traits::ToPrimitive;
     // Each letter's count and summed share on 2^(−72), from head 0, mode 0, the key word.
     let (mut n, mut f): (Vec<u64>, Vec<i128>) = (Vec::new(), Vec::new());
     for line in std::str::from_utf8(phase)?.lines().skip(1) {
@@ -10031,48 +9989,48 @@ fn pair_tilts(phase: &[u8], moment: &[u8], set: &str, dw: usize, floor: u64) -> 
         }
         m
     };
-    let (mut tilts, mut letters) = (Vec::new(), Vec::new());
-    for l in 0..a {
+    // Each letter's two clouds are independent, so the letters run across the host's threads; a letter's result is the same on
+    // any partition (integer arithmetic), and the letters keep their order.
+    let tilt_of = |l: usize| -> std::result::Result<Option<((usize, u64, i128), Option<PairTilt>)>, String> {
         if n[l] < floor || f[l] <= 0 {
-            continue;
+            return Ok(None);
         }
+        let get = |kind: &str, len: usize| get(l, kind, len).map_err(|e| e.to_string());
+        let log2 = |x: &BigInt| big_log2(x).map_err(|e| e.to_string());
         // The two clouds: weights (n, F on 2^(−72)), first moments and second moments, each in r's units.
-        let ln = get(l, "LN", dw)?;
-        let (lf, lfc) = (get(l, "LF", dw)?, get(l, "LF_carried", dw)?);
-        let qn = full(get(l, "QN", tri)?);
-        let (qf, qfc) = (full(get(l, "QF", tri)?), full(get(l, "QF_carried", tri)?));
+        let ln = get("LN", dw)?;
+        let (lf, lfc) = (get("LF", dw)?, get("LF_carried", dw)?);
+        let qn = full(get("QN", tri)?);
+        let (qf, qfc) = (full(get("QF", tri)?), full(get("QF_carried", tri)?));
         let lf_t: Vec<BigInt> = (0..dw).map(|i| (&lf[i] << 32) + &lfc[i]).collect();
         let qf_t: Vec<Vec<BigInt>> = (0..dw).map(|i| (0..dw).map(|j| (&qf[i][j] << 32) + &qfc[i][j]).collect()).collect();
         let clouds = [(BigInt::from(n[l]), ln.clone(), qn), (BigInt::from(f[l]), lf_t, qf_t)];
-        let mut means: Vec<Vec<i128>> = Vec::new();
-        let mut precisions: Vec<Vec<i128>> = Vec::new();
-        let mut logdets: Vec<i128> = Vec::new();
-        let mut singular = false;
+        let (mut means, mut precisions, mut logdets): (Vec<Vec<i128>>, Vec<Vec<i128>>, Vec<i128>) = (Vec::new(), Vec::new(), Vec::new());
         for (w, first, second) in &clouds {
-            let mu: Vec<BigRational> = first.iter().map(|x| BigRational::new(x.clone(), w.clone())).collect();
-            let sigma: Vec<Vec<BigRational>> = (0..dw).map(|i| (0..dw).map(|j| BigRational::new(second[i][j].clone(), w.clone()) - &mu[i] * &mu[j]).collect()).collect();
-            let Some((inv, det)) = rational_inverse(&sigma) else {
-                singular = true;
-                break;
+            // Σ = S / w² with S = w Q − L Lᵀ in integers; Σ⁻¹ = w² adj S / det S and log₂ det Σ = log₂ det S − 2·dw·log₂ w.
+            let s: Vec<Vec<BigInt>> = (0..dw).map(|i| (0..dw).map(|j| w * &second[i][j] - &first[i] * &first[j]).collect()).collect();
+            // A covariance is positive semidefinite by construction, so a determinant that is not positive is a singular cloud.
+            let Some((adj, det)) = holonics::ratio::linear::integral_adjugate(&s).ok().filter(|(_, det)| num_traits::Signed::is_positive(det)) else {
+                return Ok(Some(((l, n[l], i128::MIN), None)));
             };
-            if !det.is_positive() {
-                singular = true;
-                break;
-            }
-            let round = |x: &BigRational, bits: usize| -> Result<i128> { ((x * BigRational::from_integer(BigInt::from(1) << bits)).round().to_integer()).to_i128().ok_or_else(|| "a tilt term past 128 bits".into()) };
-            means.push(mu.iter().map(|x| round(x, 8)).collect::<Result<_>>()?);
-            precisions.push(inv.iter().flatten().map(|x| round(x, 62)).collect::<Result<_>>()?);
-            logdets.push(big_log2(det.numer())? - big_log2(det.denom())?);
-        }
-        if singular {
-            letters.push((l, n[l], i128::MIN));
-            continue;
+            let round = |x: BigRational, bits: usize| -> std::result::Result<i128, String> { (x * BigRational::from_integer(BigInt::from(1) << bits)).round().to_integer().to_i128().ok_or_else(|| "a tilt term past 128 bits".to_string()) };
+            means.push(first.iter().map(|x| round(BigRational::new(x.clone(), w.clone()), 8)).collect::<std::result::Result<_, _>>()?);
+            let w2 = w * w;
+            precisions.push(adj.iter().flatten().map(|x| round(BigRational::new(&w2 * x, det.clone()), 62)).collect::<std::result::Result<_, _>>()?);
+            logdets.push(log2(&det)? - log2(&num_traits::pow::pow(w.clone(), 2 * dw))?);
         }
         // log₂(n/F), F on 2^(−72).
-        let ratio = big_log2(&(BigInt::from(n[l]) << 72))? - big_log2(&BigInt::from(f[l]))?;
+        let ratio = log2(&(BigInt::from(n[l]) << 72))? - log2(&BigInt::from(f[l]))?;
         let constant = (logdets[1] - logdets[0]) / 2 + ratio;
-        letters.push((l, n[l], constant));
-        tilts.push(PairTilt { letter: l, mean: [means[0].clone(), means[1].clone()], precision: [precisions[0].clone(), precisions[1].clone()], constant });
+        let [m0, m1]: [Vec<i128>; 2] = means.try_into().map_err(|_| "two clouds".to_string())?;
+        let [p0, p1]: [Vec<i128>; 2] = precisions.try_into().map_err(|_| "two clouds".to_string())?;
+        Ok(Some(((l, n[l], constant), Some(PairTilt { letter: l, mean: [m0, m1], precision: [p0, p1], constant }))))
+    };
+    let each: Vec<_> = (0..a).into_par_iter().map(tilt_of).collect::<std::result::Result<Vec<_>, String>>()?;
+    let (mut tilts, mut letters) = (Vec::new(), Vec::new());
+    for (letter, tilt) in each.into_iter().flatten() {
+        letters.push(letter);
+        tilts.extend(tilt);
     }
     Ok((tilts, letters))
 }
