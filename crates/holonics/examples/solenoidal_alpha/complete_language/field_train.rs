@@ -10220,6 +10220,108 @@ pub(super) fn charge_field(args: &[String], realization: &mut dyn FieldRealizati
     Ok(())
 }
 
+/// [definition; theory, November 10 04:40] **A ring census's tilts** (`RING.tsv` or `RING_STOP.tsv`, [`ring_census_field`]): each
+/// (ring, residue, letter)'s `N` and `F` pooled over TRAIN's sets (the held set left out), `F` on the face's width with its
+/// carried remainder folded in; a cell of at least `floor` sites kept as `(N, F)` (`F` on `2^(−20)`), the rest dropped.
+/// `[ring][residue][letter]`.
+type RingTilts = Vec<Vec<Vec<Option<(u64, u128)>>>>;
+
+fn ring_tilts(text: &[u8], a: usize, floor: u64) -> Result<RingTilts> {
+    let (mut n, mut f) = (vec![vec![vec![0u64; a]; 3]; RINGS.len()], vec![vec![vec![0i128; a]; 3]; RINGS.len()]);
+    for line in std::str::from_utf8(text)?.lines().skip(1) {
+        let cells: Vec<&str> = line.split('\t').collect();
+        let [set, ring, _, residue, letter, count_n, share, carried] = cells[..] else { return Err("a ring census row that is not set, ring, modulus, residue, letter, n, f and its carried remainder".into()) };
+        if set == "held" {
+            continue;
+        }
+        let r = RINGS.iter().position(|x| x.0 == ring).ok_or("a ring census row of no ring")?;
+        let (res, l) = (residue.parse::<usize>()?, letter.parse::<usize>()?);
+        if res >= 3 || l >= a {
+            return Err("a ring census row outside its rings or its letters".into());
+        }
+        n[r][res][l] += count_n.parse::<u64>()?;
+        f[r][res][l] += share.parse::<u128>()? as i128 + ((carried.parse::<i128>()? + (1 << 31)) >> 32);
+    }
+    Ok((0..RINGS.len()).map(|r| (0..3).map(|res| (0..a).map(|l| (n[r][res][l] >= floor && f[r][res][l] > 0).then(|| (n[r][res][l], ((f[r][res][l] + (1 << 41)) >> 42).max(1) as u128))).collect()).collect()).collect())
+}
+
+/// [definition; theory, November 10 04:40] **A face tilted by one ring's cell row**: each kept letter's mass times `N/F`, then every
+/// mass shifted right together where the largest passes the face's width `2^62` (the face's shares unchanged to that grain).
+fn ring_tilt_face(face: &mut holonics::hnn::tower::TowerFace, cells: &[Option<(u64, u128)>]) {
+    for (m, cell) in face.masses.iter_mut().zip(cells) {
+        if let Some((n, f)) = cell {
+            *m = *m * ((*n as u128) << 20) / f;
+        }
+    }
+    let top = face.masses.iter().copied().max().unwrap_or(0);
+    if top >> 62 > 0 {
+        let shift = 128 - top.leading_zeros() - 62;
+        face.masses.iter_mut().for_each(|m| *m >>= shift);
+    }
+    face.total = face.masses.iter().sum::<u128>().max(1);
+}
+
+/// The ring lens a certificate reads through ([`Field::redraw_lensed`]).
+type RingLens = Box<dyn Fn(&[usize], &mut [holonics::hnn::tower::TowerFace])>;
+
+/// [definition; theory, November 10 04:40] **The ring lens**: at each place the ring residues of the answer's letters before it
+/// ([`RINGS`], each class's counts from its bytes), each ring's kept cells at that residue tilting the face; the letters' places by
+/// `letters`, the stop place (past the letters) by `stops`.
+fn ring_lens(codec: &FieldCodec, a: usize, letters: RingTilts, stops: RingTilts) -> RingLens {
+    let void = codec.void();
+    let marks: Vec<[i64; 5]> = (0..a)
+        .map(|c| {
+            let bytes = if c == void { Vec::new() } else { codec.decode(&[c]) };
+            RINGS.map(|(_, open, close, _)| bytes.iter().filter(|&&b| b == open).count() as i64 - close.map_or(0, |cl| bytes.iter().filter(|&&b| b == cl).count() as i64))
+        })
+        .collect();
+    Box::new(move |x: &[usize], faces: &mut [holonics::hnn::tower::TowerFace]| {
+        let mut ring = [0i64; 5];
+        for (t, face) in faces.iter_mut().enumerate() {
+            let table = if t < x.len() { &letters } else { &stops };
+            for (r, &(_, _, _, modulus)) in RINGS.iter().enumerate() {
+                ring_tilt_face(face, &table[r][ring[r].rem_euclid(modulus) as usize]);
+            }
+            if let Some(&c) = x.get(t) {
+                for (v, d) in ring.iter_mut().zip(&marks[c]) {
+                    *v += d;
+                }
+            }
+        }
+    })
+}
+
+/// [measurement; theory, November 10 04:40] **The brackets' and quotes' closure** of written answers: for `(` `)` and `[` `]` the
+/// pairs matched by a stack, near (the closer within `NEAR − 1` places of its opener) and far, the openers left and the strays,
+/// and the answers closed; for the backtick and the quotes, the answers with an even count. Numbers only.
+fn ring_closure(codec: &FieldCodec, state: &str, answers: &[Vec<usize>]) {
+    let near_reach = holonics::hnn::tower::field::NEAR - 1;
+    let texts: Vec<Vec<u8>> = answers.iter().map(|x| codec.decode(x)).collect();
+    for (ring, open, close) in [("paren", b'(', b')'), ("bracket", b'[', b']')] {
+        let (mut near, mut far, mut left, mut strays, mut closed) = (0usize, 0usize, 0usize, 0usize, 0usize);
+        for bytes in &texts {
+            let (mut stack, mut stray) = (Vec::new(), 0usize);
+            for (i, &b) in bytes.iter().enumerate() {
+                if b == open {
+                    stack.push(i);
+                } else if b == close {
+                    match stack.pop() {
+                        Some(j) if i - j <= near_reach => near += 1,
+                        Some(_) => far += 1,
+                        None => stray += 1,
+                    }
+                }
+            }
+            (left, strays, closed) = (left + stack.len(), strays + stray, closed + usize::from(stack.is_empty() && stray == 0));
+        }
+        println!("FIELD_RING_CLOSURE state={state} ring={ring} pairs_near={near} pairs_far={far} unmatched_open={left} unmatched_close={strays} closed_answers={closed} answers={}", texts.len());
+    }
+    for (ring, mark) in [("backtick", b'`'), ("dquote", b'"'), ("squote", b'\'')] {
+        let even = texts.iter().filter(|bytes| bytes.iter().filter(|&&b| b == mark).count() % 2 == 0).count();
+        println!("FIELD_RING_CLOSURE state={state} ring={ring} even_answers={even} answers={}", texts.len());
+    }
+}
+
 /// [definition; theory, November 10 04:15] `redraw-field STATE STATE_SHA CODEC CODEC_SHA UNITS UNITS_SHA HELD HELD_SHA COUNT
 /// START START_SHA H_MILLINATS PASSES OUT`: **point re-draws at the highest surprise, alternating with exchanges**
 /// ([`Field::redraw`]) from a written start (`START`, a `SAMPLE.tsv`: the settle's rest) of the first `COUNT` held problems,
@@ -10230,9 +10332,16 @@ pub(super) fn charge_field(args: &[String], realization: &mut dyn FieldRealizati
 /// distance from the start: `tv` (half the summed `|N(a) − N₀(a)|` over the letters, a share of them) and `planes` (each bit
 /// plane's `|n_b − n₀_b|`, the bytes with bit `b` set, a share of the bytes); `FIELD_REDRAW` a problem at the end: its code at the
 /// start and the end, its entropy and root at the end, a place, and how it stopped (neutral, rest, or the bound).
+///
+/// [definition; theory, November 10 04:40] `redraw-ring-field` takes `RING RING_SHA RING_STOP RING_STOP_SHA FLOOR` before `OUT`:
+/// **the ring tilts in the certificate** ([`Field::redraw_lensed`]): every face the walk reads is tilted by the spread ring
+/// census's tables ([`ring_tilts`]), each place's by `RING.tsv` at the ring residues of its answer's letters before it and the stop
+/// place's (coded at the void) by `RING_STOP.tsv` at the whole answer's, `f′ ∝ f · Π_rings N/F` ([`ring_tilt_face`]); and the
+/// brackets' and quotes' closure is printed for the start and the end ([`ring_closure`]).
 pub(super) fn redraw_field(args: &[String], realization: &mut dyn FieldRealization) -> Result<()> {
-    if args.len() != 15 {
-        return Err("redraw-field STATE STATE_SHA CODEC CODEC_SHA UNITS UNITS_SHA HELD HELD_SHA COUNT START START_SHA H_MILLINATS PASSES OUT".into());
+    let ringed = args.first().is_some_and(|a| a == "redraw-ring-field");
+    if args.len() != if ringed { 20 } else { 15 } {
+        return Err(if ringed { "redraw-ring-field STATE STATE_SHA CODEC CODEC_SHA UNITS UNITS_SHA HELD HELD_SHA COUNT START START_SHA H_MILLINATS PASSES RING RING_SHA RING_STOP RING_STOP_SHA FLOOR OUT" } else { "redraw-field STATE STATE_SHA CODEC CODEC_SHA UNITS UNITS_SHA HELD HELD_SHA COUNT START START_SHA H_MILLINATS PASSES OUT" }.into());
     }
     let started = std::time::Instant::now();
     let mut learner = FieldLearner::from_text(std::str::from_utf8(&pinned_read(&args[1], &args[2], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
@@ -10243,12 +10352,23 @@ pub(super) fn redraw_field(args: &[String], realization: &mut dyn FieldRealizati
     let held = problems_of(&pinned_read(&args[7], &args[8], READ_BUDGET as usize)?);
     let limit = count(&args[9])?;
     let (h_milli, passes) = (count(&args[12])?, count(&args[13])?);
-    let out = Path::new(&args[14]);
+    let out = Path::new(&args[if ringed { 19 } else { 14 }]);
     std::fs::create_dir(out)?;
     let held = &held[..limit.min(held.len())];
     let requests: Vec<(Vec<usize>, usize)> = held.iter().map(|(question, _)| opening(&codec, field, question, b"")).collect::<std::result::Result<_, String>>()?;
     let problems: Vec<(&[usize], usize)> = requests.iter().map(|(q, n)| (q.as_slice(), *n)).collect();
     let void = codec.void();
+    let lens: Option<RingLens> = if ringed {
+        let a = field.declaration.alphabet;
+        let floor = count(&args[18])? as u64;
+        let letters = ring_tilts(&pinned_read(&args[14], &args[15], READ_BUDGET as usize)?, a, floor)?;
+        let stops = ring_tilts(&pinned_read(&args[16], &args[17], READ_BUDGET as usize)?, a, floor)?;
+        let kept = |t: &RingTilts| t.iter().flatten().flatten().filter(|c| c.is_some()).count();
+        println!("FIELD_RING_TILTS floor={floor} letter_cells={} stop_cells={}", kept(&letters), kept(&stops));
+        Some(ring_lens(&codec, a, letters, stops))
+    } else {
+        None
+    };
     let mut start = written_answers(&codec, &args[10], &args[11], held.len())?;
     for (x, &(_, room)) in start.iter_mut().zip(&problems) {
         x.truncate(room);
@@ -10284,8 +10404,7 @@ pub(super) fn redraw_field(args: &[String], realization: &mut dyn FieldRealizati
     let millionths = |num: i64, den: i64| if den == 0 { "-".to_string() } else { format!("{}.{:06}", num * 1_000_000 / den / 1_000_000, num * 1_000_000 / den % 1_000_000) };
     let h = (((h_milli as i128) << 50) + 1000 * LN2_Q30 - 1) / (1000 * LN2_Q30);
     let mut saved: Result<()> = Ok(());
-    let (settled, records) = field
-        .redraw(&problems, &start, void, h, realization, &mut |p| {
+    let mut shown = |p: &holonics::hnn::tower::field::SettlePass| -> bool {
             let (n, planes, total) = tally(p.answers);
             let tv: i64 = n.iter().zip(&n0).map(|(x, y)| (x - y).abs()).sum::<i64>();
             let plane: Vec<String> = planes.iter().zip(&planes0).map(|(x, y)| millionths((x - y).abs(), total)).collect();
@@ -10311,10 +10430,18 @@ pub(super) fn redraw_field(args: &[String], realization: &mut dyn FieldRealizati
                 return false;
             }
             p.pass < passes
-        })
-        .map_err(|e| e.to_string())?;
+        };
+    let (settled, records) = match lens.as_deref() {
+        Some(lens) => field.redraw_lensed(&problems, &start, void, h, lens, realization, &mut shown),
+        None => field.redraw(&problems, &start, void, h, realization, &mut shown),
+    }
+    .map_err(|e| e.to_string())?;
     saved?;
     write("SAMPLE.tsv", &settled)?;
+    if ringed {
+        ring_closure(&codec, "start", &start);
+        ring_closure(&codec, "end", &settled);
+    }
     let mut file = rows_file(&out.join("MOVES.tsv"), "problem\tmove\tplaces\tproposed_gain_nats\tattributed_fall_nats\n")?;
     let (mut neutral, mut rested, mut kept, mut undone, mut places, mut start_code, mut end_code, mut entropy, mut root) = (0usize, 0usize, 0usize, 0usize, 0usize, 0i128, 0i128, 0i128, 0i128);
     for (k, r) in records.iter().enumerate() {

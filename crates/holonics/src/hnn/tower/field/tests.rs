@@ -3766,6 +3766,52 @@ fn the_exchange_walk_holds_composition() {
     }
 }
 
+/// [definition; theory, November 10 04:40] **The re-draws through a lens code the stop place and certify every pass**
+/// ([`Field::redraw_lensed`]): with a lens that weighs the void four times at the stop place, each answer's code at the start is
+/// its lensed locked faces' code, the stop place at the void among them, and every pass that keeps changes lowers the pooled
+/// code by more than `h` for each one; every answer keeps its length and stops neutral or at rest.
+#[test]
+fn the_lensed_redraw_codes_its_stop_place_and_certifies_every_pass() {
+    let field = shaped_with(FieldDeclaration { reach: 40, ..tiny_declaration(1) });
+    let (q1, q2) = ([1usize, 4, 0, 2, 2, 3], [3usize, 3, 1, 0]);
+    let problems: Vec<(&[usize], usize)> = vec![(&q1, 24), (&q2, 22)];
+    let letters = |seed: usize, n: usize, room: usize| -> Vec<usize> { (0..room).map(|t| if t < n { 1 + (t * 7 + t / 3 + seed) % 4 } else { 0 }).collect() };
+    let written = vec![letters(0, 20, 24), letters(3, 20, 22)];
+    let lens = |x: &[usize], faces: &mut [TowerFace]| {
+        if let Some(stop) = faces.get_mut(x.len()) {
+            stop.masses[0] *= 4;
+            stop.total = stop.masses.iter().sum();
+        }
+    };
+    let answers0: Vec<Vec<usize>> = written.iter().map(|w| w[..20].to_vec()).collect();
+    let mut locked = field.locked_faces(&problems, &answers0, &[0, 1], 0, true, &mut HostField).unwrap();
+    for (x, f) in answers0.iter().zip(locked.iter_mut()) {
+        assert_eq!(f.len(), x.len() + 1, "the stop place is read");
+        lens(x, f);
+    }
+    for h in [0i128, 1 << 18] {
+        let mut passes: Vec<(usize, usize, i128)> = Vec::new();
+        let (answers, records) = field.redraw_lensed(&problems, &written, 0, h, &lens, &mut HostField, &mut |p| {
+            passes.push((p.pass, p.kept, p.code));
+            true
+        }).unwrap();
+        for (k, r) in records.iter().enumerate() {
+            let expected: i128 = locked[k].iter().enumerate().map(|(t, f)| f.code(answers0[k].get(t).copied().unwrap_or(0)) as i128).sum();
+            assert_eq!(r.start, expected, "problem {k}: the start is the lensed code, the stop place's among it");
+            assert!(r.neutral || r.rested, "h={h} problem {k} stops");
+            assert!(answers[k][..20].iter().all(|&c| c != 0) && answers[k][20..].iter().all(|&c| c == 0));
+        }
+        for w in passes.windows(2) {
+            let ((_, _, before), (pass, kept, after)) = (w[0], w[1]);
+            if kept > 0 {
+                assert!(before - after > h * kept as i128, "h={h} pass {pass}");
+            } else {
+                assert_eq!(before, after, "h={h} pass {pass} kept nothing");
+            }
+        }
+    }
+}
+
 /// [definition; theory, November 10 04:15] **A point re-draw proposal** ([`redraw_proposals`]): a place more than a nat past its
 /// face's entropy is re-drawn to its face's top letter, never the void, only where that letter's price is at least a nat; the
 /// most surprised first, and no two claims within `NEAR − 1` of each other.
