@@ -1,0 +1,40 @@
+10. The cost of a number's form (cap_i.py, cap_j.py; the 543,071 cells of two letters each side; HELD128 code 0.5758)   [read 2026-11-10 21:29-21:33Z]
+   counts: largest 191,853; share of cells with count 1: 0.470; 2-3: 0.234; 4-15: 0.196; 16-255: 0.091; 256 and over: 0.008
+   bits a cell: 64-bit register 64 | 32-bit 32 | least fixed width 18 | staircase 8/16/32/64 signed 8.14, unsigned 8.07 |
+     Elias gamma 3.43 | Elias delta 3.65 | entropy of the counts' own law 3.36 | bare binary digits (not parseable alone) 2.22
+   leading digits at a scale (scale by Elias gamma of the length): half of the bits 2.87 | one decimal digit 4.46 | two 4.94 | scale alone 2.44
+   radix economy, whole digits, states of hardware a cell: base 2 4.43 | 3 4.89 | 4 5.75 | 10 11.67 | 16 17.73 | 256 258.15;
+     floors e ln(c+1) 3.79, 2 log2(c+1) 4.03, 3 log3(c+1) 3.81
+   held code with every cell of both tables rounded (context totals re-summed): leading half of bits 0.5764 (+0.0006);
+     two decimal digits 0.5757 (-0.0001); one decimal digit 0.5770 (+0.0012); nearest power of two 0.5795 (+0.0037)
+   held places by the count of the cell they hit: unseen 0.050; 1: 0.019; 2-3: 0.027; 4-15: 0.084; 16-255: 0.325; 256-4095: 0.348; over: 0.147
+   a cell's scale (bit length): entropy alone 2.198 bits; given its context total's scale 1.353; given that and the context's count of
+     distinct letters 0.950. Elias gamma 3.434 = unary scale 2.217 + digits below the leading one 1.217; a sign bit a value adds 29%.
+   Scores. G19a: guessed share of ones 55% (read 47%), entropy 2.4 (read 3.36: missed), bare digits 2.2 (2.22), gamma 3.4 (3.43),
+     staircase 8.3 (8.07), least width 18 (18). G19b: guessed +0.004, +0.0005, +0.012, +0.035; read +0.0006, -0.0001, +0.0012, +0.0037
+     (every loss about a tenth of the guess): THE LOW HALF OF A COUNT'S DIGITS IS BAGGAGE for this ruler, and so is all but its scale
+     to 0.004 nats a place.
+   G20: guessed 2.2, 1.6, 1.45; read 2.198, 1.353, 0.950: A SCALE HELD ONCE BY THE REGION IS CHEAPER (38% then 57% off).
+   G21 (the field's own numbers rounded to their leading digits) fixed, ordered from design, unread.
+11. The region's share of a cell's scale, and the counts of counts (cap_k.py)   [read 2026-11-10 21:38Z]
+   scale entropy of a cell, bits: alone | given its context total's scale | given that and the distinct count | given the distinct count only
+     all cells (share 1.000):                 2.198 | 1.353 | 0.950 | 2.169
+     contexts of two cells or more (0.500):   2.415 | 2.016 | 1.901 | 2.400
+     contexts of eight cells or more (0.080): 2.663 | 2.523 | 2.476 | 2.647
+   contexts 356,758; cells a context 1.522; share of contexts holding one cell 0.761
+   contexts of two cells or more: scale given the total's scale and the cell's rank in its context 1.289 bits
+   share of cells by block j = floor(log2 count), j = 0..11: 0.4703 0.2338 0.1243 0.0720 0.0426 0.0252 0.0149 0.0085 0.0048 0.0021 0.0010 0.0003
+     against 2^-(j+1) (the law Elias gamma is the ideal code of): 0.5000 0.2500 0.1250 0.0625 0.0312 0.0156 0.0078 0.0039 0.0020 0.0010 0.0005 0.0002
+     slope of log2 share by block over j = 0..9: -0.824, so the share of count c falls as c^-1.82 (gamma: c^-2)
+   Score G22: guessed 3.0 alone on shared contexts (read 2.415: missed); the "no guess" 2.71 was a wrong derivation (the pooled conditional
+     does not know a cell is alone; read 2.016); 1.90 held (1.901). The total's scale takes 16.5% off on shared contexts (guess under 15%:
+     missed, narrowly), 5% in contexts of eight or more. Reading: over all cells the fall of G20 (38%) is mostly the lone cell; a large
+     region's total fixes little of a member's scale; the member's rank in its region fixes more (2.415 to 1.289 with the total's scale).
+12. The leading and the trailing decimal digit of the counts (cap_l.py)   [read 2026-11-10 21:44Z]
+   leading digit, counts of 10 or more (78,296 cells): shares 0.502 0.189 0.103 0.063 0.046 0.034 0.026 0.020 0.016; entropy 2.261 bits
+     (Benford 0.301 and 2.876; flat 3.170; the law c^-1.82 gives 0.511 and 2.23). By decade: 10-99 2.288; 100-999 2.126; 1000 and over 1.474 (792 cells, share of 1: 0.721)
+   last digit: counts 10-99 (66,715 cells) 3.2795 bits, shares falling 0.149 to 0.069; counts of 100 or more (11,581 cells) 3.3213 bits of 3.3219
+     (plug-in bias 0.0006); counts of 1000 or more: tens digit 3.3164, last two digits 6.563 of 6.644 (792 cells, bias about 0.09)
+   context totals of 100 or more (12,387): leading digit 2.154 bits, share of 1: 0.525; last digit 3.3204 bits
+   Score G23: (a) guessed share of 1 0.49 and 2.3 bits; read 0.502 and 2.261. (b) guessed 3.31 or more for counts of 100 or more and 3.25 for
+     10 to 99; read 3.3213 and 3.2795. Rule held: THE LEADING DIGITS CARRY THE LAW AND THE TRAILING DIGITS ARE FLAT.

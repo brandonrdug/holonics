@@ -1,0 +1,30 @@
+G19 fixed 2026-11-10 21:29Z, before the read (lens of 21:25Z: the cost of a number's form against standard registers; a value as its
+    significant digits at a scale). On the chain (-1,1) then (-2,-1,1,2) of TRAIN (67,740 and 543,071 cells), HELD128 code 0.5758:
+    (a) bits a cell to hold the 543,071 counts: share of cells with count 1: 55%; entropy of the counts' own law 2.4; bare binary
+        digits 2.2; Elias gamma 3.4; staircase 8/16/32/64 unsigned 8.3; least fixed width 18; a 32-bit register 32.
+    (b) the held code when every cell of both tables is rounded (context totals re-summed): to its leading half of bits +0.004;
+        to two significant decimal digits +0.0005; to one significant decimal digit +0.012; to the nearest power of two +0.035.
+    Rule: half-bits rounding moves the held code under 0.01 nats a place: THE LOW HALF OF A COUNT'S DIGITS IS BAGGAGE for this ruler.
+    At 0.03 or more: the digits carry law. Guess: baggage.
+G20 fixed 2026-11-10 21:30Z, before the read. A cell's scale (the bit length b of its count) on the 543,071 cells of two each side:
+    entropy of b alone 2.2 bits; given the scale of its context's total 1.6; given that and the context's count of distinct letters 1.45.
+    Rule: the context's scale takes a quarter or more off the cell's scale entropy: A SCALE HELD ONCE BY THE REGION IS CHEAPER than one a value.
+    Guess: yes.
+G21 fixed 2026-11-10 21:31Z, before design reads it. The plain 64-contact state at its last lap, copied, every stored number
+    rounded to its leading s significant binary digits at its own scale (nearest, sign kept, zero stays): the held joint moves by
+    +0.0005 at s = 8, +0.006 at s = 4, +0.06 at s = 2, +0.5 at s = 1 (nats a place).
+    Rule: s = 4 moves it under 0.01: DIGITS PAST THE FOURTH ARE BAGGAGE at this state. At 0.03 or more they carry law. Guess: baggage.
+G21b fixed 2026-11-10 21:38Z, before design reads G21 (a derivation made after G21 was fixed; G21 stands as guessed and is scored as guessed).
+    A code at rest in its numbers moves at second order in a relative error: rounding to s leading binary digits leaves a relative
+    error up to 2^-s, so the move falls as 4^-s. From G21's own +0.006 at s = 4: s = 8 moves the held joint under 0.0001 (G21 said +0.0005).
+    Rule: move(2)/move(4) near 16: THE STATE RESTS IN ITS NUMBERS (second order). Near 4: it sits on a slope in them (first order).
+G22 fixed 2026-11-10 21:38Z, before the read. G20 over all cells counted the half of the cells that sit alone in their context, where the cell
+    is the total and its scale is free. On the cells of contexts holding two cells or more: a cell's scale entropy alone 3.0 bits; given its
+    context total's scale 2.71 (this is G20's 1.353 over the share 0.500, no guess); given that and the distinct count 1.90 (likewise).
+    Rule: the context total's scale takes under 15% off there: G20'S SAVING IS MOSTLY THE LONE CELL; the region's branching, not its
+    total's scale, is what a shared region gives. Guess: under 15%.
+G23 fixed 2026-11-10 21:44Z, before the read (lens of 21:40Z: digit classes have laws relative to each other; mantissa and digit distributions).
+    On the 543,071 counts of two letters each side: (a) the leading decimal digit of counts of 10 or more: share of 1 is 0.49, entropy 2.3 bits
+    (the law c^-1.82 read at 21:38Z gives 0.51 and 2.23; Benford 0.301 and 2.88; flat 3.17); (b) the last decimal digit of counts of 100 or
+    more: entropy 3.31 bits or more (flat is 3.322); of counts 10 to 99: 3.25 (the law falls inside a decade).
+    Rule: leading under 2.6 and trailing at 3.31 or more: THE LEADING DIGITS CARRY THE LAW AND THE TRAILING DIGITS ARE FLAT. Guess: yes.
