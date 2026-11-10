@@ -8922,12 +8922,13 @@ fn section_code(faces: &[Vec<Option<holonics::hnn::tower::TowerFace>>], regions:
 
 /// One visit of a training lap's own states ([`plate_joint_field`]): the first `take` sections of `order`, their regions and
 /// open-site draws formed as `train-field` forms them from the draw `draw`, read only; at every charged site ([`Charge`]),
-/// `visit(leaf, face, truth, octave)` with its leaf at the last tick (`[h]`, full depth) and its octave of distance to the seam.
+/// `visit(leaf, face, truth, octave, asked)` with its leaf at the last tick (`[h]`, full depth), its octave of distance to the
+/// seam and whether it is a question's site.
 /// Prints each section's time where `timed`. Where `line` is given (`SITES:BITS`, the `sites` and `before` of the
 /// `FIELD_SECTION lap=0 n=0` line of the run that continued from the state, or `-` where none), the first section is read
 /// against it and its own letters changed (checks 1 and 3, printed with PASS or FAIL); a FAIL refuses the visit.
 #[allow(clippy::too_many_arguments)]
-fn lap_visit(codec: &FieldCodec, train: &Problems, sections: &[Vec<usize>], paths: &[Vec<usize>], order: &[usize], seed: u64, mut draw: u64, learner: &mut FieldLearner, realization: &mut dyn FieldRealization, timed: bool, line: Option<&str>, visit: &mut dyn FnMut(&[u32], &holonics::hnn::tower::TowerFace, usize, Option<u32>)) -> Result<Charge> {
+fn lap_visit(codec: &FieldCodec, train: &Problems, sections: &[Vec<usize>], paths: &[Vec<usize>], order: &[usize], seed: u64, mut draw: u64, learner: &mut FieldLearner, realization: &mut dyn FieldRealization, timed: bool, line: Option<&str>, visit: &mut dyn FnMut(&[u32], &holonics::hnn::tower::TowerFace, usize, Option<u32>, bool)) -> Result<Charge> {
     if path_drafts() || path_squares() {
         return Err("census 2b charges the lap's members, openings and writers; a declared draft or square region is not among them".into());
     }
@@ -8968,9 +8969,10 @@ fn lap_visit(codec: &FieldCodec, train: &Problems, sections: &[Vec<usize>], path
                 if !seen.insert((problem, d, t)) {
                     continue;
                 }
-                visit(&leaves[t * heads..(t + 1) * heads], face, r.classes[t], holonics::hnn::tower::field::seam_octave(&words[t * m2..(t + 1) * m2], &decl));
+                let asked = t < train[problem].0.len();
+                visit(&leaves[t * heads..(t + 1) * heads], face, r.classes[t], holonics::hnn::tower::field::seam_octave(&words[t * m2..(t + 1) * m2], &decl), asked);
                 own_code += face.code(r.classes[t]) as i128;
-                charge.question += u64::from(t < train[problem].0.len());
+                charge.question += u64::from(asked);
                 charged[ri].push(t);
                 open += 1;
             }
@@ -9035,6 +9037,11 @@ fn log2_ratio(n: u64, f: u128) -> i128 {
 /// (`FIELD_JOINT_NATS`, the train-field lap's own chain, its seed and states) plain (`lap=0`) and through the residual lens at
 /// each depth (`lap=d`, [`Lensed`]). `FIELD_LEAVES` and `FIELD_LEAVES_SECTION` lines count and time the visit.
 ///
+/// [measurement; theory, November 10 00:07] The charged sites part by side: the answer's table (`CENSUS.tsv`) is the one the lens,
+/// the held joint (which codes answer places only) and the seam reading read; the question's (`CENSUS_QUESTION.tsv`, the
+/// letters a masked member compares at their places) prints its plain code, U and released code beside the answer's
+/// (`FIELD_LEAVES_U part=`), each under its own table.
+///
 /// [measurement; theory, November 9 23:30, census 2b] Every count, U, seam and code reads the charged sites alone ([`Charge`]:
 /// the sites the lap's code compares at their own place, once a draw; census 2 had charged every open site, the openings'
 /// boundary places among them). `LINE` (`SITES:BITS`, or `-`) is the `FIELD_SECTION lap=0 n=0` line of the run that continued
@@ -9075,17 +9082,24 @@ pub(super) fn plate_joint_field(args: &[String], realization: &mut dyn FieldReal
     let paths = paths_of(seed, read, &sections);
     let order = walk(seed, read, sections.len());
     let take = if limit == 0 { order.len() } else { limit.min(order.len()) };
-    let mut counts: Vec<std::collections::BTreeMap<Vec<u32>, PlateCounts>> = (0..=trits).map(|_| std::collections::BTreeMap::new()).collect();
+    // [theory, November 10 00:07] Two tables, by the site's side: the answer's (part 0), which the lens, the held joint (it codes
+    // answer places only) and the seam reading read, and the question's (part 1), whose letters a masked member compares at their
+    // places; at one trit a question's site and an answer's would share leaves.
+    let mut counts: [Vec<std::collections::BTreeMap<Vec<u32>, PlateCounts>>; 2] = std::array::from_fn(|_| (0..=trits).map(|_| std::collections::BTreeMap::new()).collect());
     let leaf_at = |leaf: &[u32], d: usize| -> Vec<u32> { leaf.iter().map(|&c| c % 3u32.pow(d as u32)).collect() };
     // [theory, November 9 22:07] The seam as a cut: each depth-1 leaf split by its sites' octave of distance to the seam.
     let mut cut: std::collections::BTreeMap<(Vec<u32>, Option<u32>), PlateCounts> = std::collections::BTreeMap::new();
-    let charge = lap_visit(&codec, &train_set, &sections, &paths, &order[..take], seed, draw, &mut learner, realization, true, Some(line), &mut |leaf, face, truth, octave| {
-        for (d, table) in counts.iter_mut().enumerate().skip(1) {
+    let charge = lap_visit(&codec, &train_set, &sections, &paths, &order[..take], seed, draw, &mut learner, realization, true, Some(line), &mut |leaf, face, truth, octave, asked| {
+        for (d, table) in counts[usize::from(asked)].iter_mut().enumerate().skip(1) {
             table.entry(leaf_at(leaf, d)).or_insert_with(|| PlateCounts::new(a)).add(face, truth);
         }
-        cut.entry((leaf_at(leaf, 1), octave)).or_insert_with(|| PlateCounts::new(a)).add(face, truth);
+        if !asked {
+            cut.entry((leaf_at(leaf, 1), octave)).or_insert_with(|| PlateCounts::new(a)).add(face, truth);
+        }
     })?;
-    let places = charge.sites;
+    // Each part's charged places: the answer's, then the question's.
+    let parts = [charge.sites - charge.question, charge.question];
+    let places = parts[0];
     let census_ms = started.elapsed().as_millis();
     // Checks 2 and 3 over the whole visit, before any reading.
     let bounded = charge.sites <= charge.bound;
@@ -9105,50 +9119,58 @@ pub(super) fn plate_joint_field(args: &[String], realization: &mut dyn FieldReal
         bits(i64::try_from(charge.charged_code)?, charge.sites as usize),
         if places == 0 { "-".to_string() } else { decimal_q20(nats_q20(charge.charged_code) / places as i128) }
     );
-    let mut file = rows_file(&out.join("CENSUS.tsv"), "depth\tleaf\tcounts\texpected_q20\n")?;
-    let mut tables: Vec<LensTable> = vec![LensTable::new(); trits + 1];
-    // Each leaf's stored free energy `Σ_a N_a log₂(N_a/F_a)` on 2^(−20) bits.
-    let mut energies: Vec<Vec<(i128, Vec<u32>, u64)>> = vec![Vec::new(); trits + 1];
-    for (d, table) in counts.iter().enumerate().skip(1) {
-        for (leaf, k) in table {
-            let n: Vec<String> = k.n.iter().map(u64::to_string).collect();
-            let f: Vec<u128> = (0..a).map(|c| k.expected(c)).collect();
-            let fs: Vec<String> = f.iter().map(u128::to_string).collect();
-            let name: Vec<String> = leaf.iter().map(u32::to_string).collect();
-            row(&mut file, &format!("{d}\t{}\t{}\t{}\n", name.join("."), n.join(","), fs.join(",")))?;
-            let u: i128 = (0..a).filter(|&c| k.n[c] > 0).map(|c| k.n[c] as i128 * log2_ratio(k.n[c], f[c])).sum();
-            energies[d].push((u, leaf.clone(), k.places()));
-            tables[d].insert(leaf.clone(), (k.n.clone(), f));
+    // The answer's table is `CENSUS.tsv` (the one `lens-field` reads), the question's `CENSUS_QUESTION.tsv`.
+    let mut tables: [Vec<LensTable>; 2] = std::array::from_fn(|_| vec![LensTable::new(); trits + 1]);
+    // Each leaf's stored free energy `Σ_a N_a log₂(N_a/F_a)` on 2^(−20) bits, a part.
+    let mut energies: [Vec<Vec<(i128, Vec<u32>, u64)>>; 2] = std::array::from_fn(|_| vec![Vec::new(); trits + 1]);
+    for (part, name) in [(0usize, "CENSUS.tsv"), (1, "CENSUS_QUESTION.tsv")] {
+        let mut file = rows_file(&out.join(name), "depth\tleaf\tcounts\texpected_q20\n")?;
+        for (d, table) in counts[part].iter().enumerate().skip(1) {
+            for (leaf, k) in table {
+                let n: Vec<String> = k.n.iter().map(u64::to_string).collect();
+                let f: Vec<u128> = (0..a).map(|c| k.expected(c)).collect();
+                let fs: Vec<String> = f.iter().map(u128::to_string).collect();
+                let name: Vec<String> = leaf.iter().map(u32::to_string).collect();
+                row(&mut file, &format!("{d}\t{}\t{}\t{}\n", name.join("."), n.join(","), fs.join(",")))?;
+                let u: i128 = (0..a).filter(|&c| k.n[c] > 0).map(|c| k.n[c] as i128 * log2_ratio(k.n[c], f[c])).sum();
+                energies[part][d].push((u, leaf.clone(), k.places()));
+                tables[part][d].insert(leaf.clone(), (k.n.clone(), f));
+            }
+            println!("FIELD_LEAVES part={} depth={d} cells={} leaves={} charged_places={} sections={take} of={} census_ms={census_ms}", ["answer", "question"][part], 3u128.pow((heads * d) as u32), table.len(), parts[part], order.len());
         }
-        println!("FIELD_LEAVES depth={d} cells={} leaves={} charged_places={places} sections={take} of={} census_ms={census_ms}", 3u128.pow((heads * d) as u32), table.len(), order.len());
     }
     // [theory, November 9 22:07] U of the depth-1 leaves cut by the seam (leaf × octave) beside U at depths 1 and 2, a place:
     // counts add, so the cut's U is at least depth 1's; the gap is the free energy the seam's distance reveals.
     let u_of = |k: &PlateCounts| -> i128 { (0..a).filter(|&c| k.n[c] > 0).map(|c| k.n[c] as i128 * log2_ratio(k.n[c], k.expected(c))).sum() };
     let u_cut: i128 = cut.values().map(u_of).sum();
-    let u_depth = |d: usize| -> i128 { energies.get(d).map_or(0, |list| list.iter().map(|e| e.0).sum()) };
+    let u_depth = |d: usize| -> i128 { energies[0].get(d).map_or(0, |list| list.iter().map(|e| e.0).sum()) };
     let place = |v: i128| if places == 0 { "-".to_string() } else { decimal_q20(nats_q20(v) / places as i128) };
-    println!("FIELD_LEAVES_SEAM_CUT u_d1_nats_a_place={} u_d1_octave_nats_a_place={} u_d2_nats_a_place={} d1_leaves={} d1_octave_cells={}", place(u_depth(1)), place(u_cut), place(u_depth(2)), counts.get(1).map_or(0, |t| t.len()), cut.len());
+    println!("FIELD_LEAVES_SEAM_CUT u_d1_nats_a_place={} u_d1_octave_nats_a_place={} u_d2_nats_a_place={} d1_leaves={} d1_octave_cells={}", place(u_depth(1)), place(u_cut), place(u_depth(2)), counts[0].get(1).map_or(0, |t| t.len()), cut.len());
     // The second visit: TRAIN's own code plain and under each depth's lens; and by each site's octave of distance to the
     // nearest seam ([`holonics::hnn::tower::field::seam_octave`]), at each depth, the site's own charge
     // `u_t = ln((N + 1)/(F + 1))` at its leaf and its true letter (theory, 22:07: over a leaf's sites these sum to
     // `Σ_a N_a ln((N_a + 1)/(F_a + 1))`, the leaf's U with one count added on both sides), its plain code, and the code the lens
     // releases at the site.
-    let mut codes: Vec<[i128; 2]> = vec![[0; 2]; trits + 1];
+    // Each part's plain and lensed code a depth, each part under its own table; the seam reading reads the answer's sites.
+    let mut codes: [Vec<[i128; 2]>; 2] = std::array::from_fn(|_| vec![[0; 2]; trits + 1]);
     let mut seams: Vec<std::collections::BTreeMap<Option<u32>, (u64, i128, i128, i128)>> = vec![std::collections::BTreeMap::new(); trits + 1];
     let second = std::time::Instant::now();
-    let again = lap_visit(&codec, &train_set, &sections, &paths, &order[..take], seed, draw, &mut learner, realization, false, None, &mut |leaf, face, truth, octave| {
+    let again = lap_visit(&codec, &train_set, &sections, &paths, &order[..take], seed, draw, &mut learner, realization, false, None, &mut |leaf, face, truth, octave, asked| {
         let plain = face.code(truth) as i128;
+        let part = usize::from(asked);
         for d in 1..=trits {
-            let lensed = lensed_face(face, leaf, d as u32, &tables[d]).code(truth) as i128;
-            codes[d] = [codes[d][0] + plain, codes[d][1] + lensed];
-            let charge = tables[d].get(&leaf_at(leaf, d)).map_or(0, |(n, f)| log2_ratio(n[truth] + 1, f[truth] + (1 << 20)));
+            let lensed = lensed_face(face, leaf, d as u32, &tables[part][d]).code(truth) as i128;
+            codes[part][d] = [codes[part][d][0] + plain, codes[part][d][1] + lensed];
+            if asked {
+                continue;
+            }
+            let charge = tables[0][d].get(&leaf_at(leaf, d)).map_or(0, |(n, f)| log2_ratio(n[truth] + 1, f[truth] + (1 << 20)));
             let slot = seams[d].entry(octave).or_default();
             *slot = (slot.0 + 1, slot.1 + charge, slot.2 + plain - lensed, slot.3 + plain);
         }
     })?;
-    if again.sites != places {
-        return Err(format!("the second visit charged {} sites where the first charged {places}", again.sites).into());
+    if again.sites != charge.sites || again.question != charge.question {
+        return Err(format!("the second visit charged {} sites ({} asked) where the first charged {} ({})", again.sites, again.question, charge.sites, charge.question).into());
     }
     let mut seam_file = rows_file(&out.join("SEAMS.tsv"), "depth\toctave\tmargin_from\tmargin_to\tsites\tu_nats_a_site\tplain_code_nats_a_site\treleased_nats_a_site\n")?;
     for (d, bins) in seams.iter().enumerate().skip(1) {
@@ -9159,12 +9181,16 @@ pub(super) fn plate_joint_field(args: &[String], realization: &mut dyn FieldReal
             println!("FIELD_LEAVES_SEAM depth={d} octave={name} margin={from}..{to} sites={sites} u_nats_a_site={} plain_code_nats_a_site={} released_nats_a_site={}", per(u), per(plain), per(released));
         }
     }
-    let a_place = |v: i128| if places == 0 { "-".to_string() } else { decimal_q20(nats_q20(v) / places as i128) };
     let mut top = rows_file(&out.join("LEAVES_U.tsv"), "depth\trank\tleaf_shells\tplaces\tu_nats\n")?;
     for d in 1..=trits {
-        let u: i128 = energies[d].iter().map(|e| e.0).sum();
-        println!("FIELD_LEAVES_U depth={d} u_nats_a_place={} released_nats_a_place={} train_code_nats={} train_lens_code_nats={} second_visit_ms={}", a_place(u), a_place(codes[d][0] - codes[d][1]), a_place(codes[d][0]), a_place(codes[d][1]), second.elapsed().as_millis());
-        let mut list = energies[d].clone();
+        // The answer's line, then the question's beside it, each a place of its own part.
+        for (part, name) in ["answer", "question"].iter().enumerate() {
+            let a_place = |v: i128| if parts[part] == 0 { "-".to_string() } else { decimal_q20(nats_q20(v) / parts[part] as i128) };
+            let u: i128 = energies[part][d].iter().map(|e| e.0).sum();
+            let [plain, lensed] = codes[part][d];
+            println!("FIELD_LEAVES_U part={name} depth={d} places={} u_nats_a_place={} released_nats_a_place={} train_code_nats={} train_lens_code_nats={} second_visit_ms={}", parts[part], a_place(u), a_place(plain - lensed), a_place(plain), a_place(lensed), second.elapsed().as_millis());
+        }
+        let mut list = energies[0][d].clone();
         list.sort_by_key(|e| (std::cmp::Reverse(e.0), e.1.clone()));
         for (rank, (u, leaf, n)) in list.iter().take(20).enumerate() {
             // Each head's shells as its first `d` trits, least first.
@@ -9178,7 +9204,7 @@ pub(super) fn plate_joint_field(args: &[String], realization: &mut dyn FieldReal
     let t0 = std::time::Instant::now();
     joint_read(field, &codec, &dev_set, seed, realization, 0, &mut rows)?;
     println!("FIELD_LEAVES_JOINT depth=0 ms={}", t0.elapsed().as_millis());
-    for (d, table) in tables.iter().enumerate().skip(1) {
+    for (d, table) in tables[0].iter().enumerate().skip(1) {
         let t0 = std::time::Instant::now();
         let mut lensed = Lensed { inner: &mut *realization, table, depth: d as u32 };
         joint_read(field, &codec, &dev_set, seed, &mut lensed, d as i64, &mut rows)?;
