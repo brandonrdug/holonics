@@ -936,6 +936,7 @@ pub(super) fn run_field_realized(args: &[String], realization: &mut dyn holonics
         Some("charge-field") => field_train::charge_field(args, realization),
         Some("reach-census-field") => field_train::reach_census_field(args, realization),
         Some("reach2-field") => field_train::reach2_field(args, realization),
+        Some("pair-field") => field_train::pair_field(args, realization),
         Some("redraw-field") => field_train::redraw_field(args, realization),
         Some("redraw-ring-field") => field_train::redraw_field(args, realization),
         Some("order-field") => field_train::order_field(args, realization),

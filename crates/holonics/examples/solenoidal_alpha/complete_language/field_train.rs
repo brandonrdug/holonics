@@ -6965,6 +6965,30 @@ mod tests {
         let _ = std::fs::remove_dir_all(&dir);
     }
 
+    /// [theory, November 10 04:40] The pair read's pieces: a rational inverse and determinant are exact, a tilt of equal clouds
+    /// and a one-bit constant doubles its letter's share against the rest at step one and leaves the face at step zero's
+    /// plain read, and the quadratic form reads `(r − μ)ᵀ Σ⁻¹ (r − μ)` on the codes' grain.
+    #[test]
+    fn a_pair_tilt_moves_its_letter_by_its_constant_and_its_clouds() {
+        use num_bigint::BigInt;
+        use num_rational::BigRational;
+        let int = |v: i64| BigRational::from_integer(BigInt::from(v));
+        let (inv, det) = rational_inverse(&[vec![int(2), int(1)], vec![int(1), int(1)]]).unwrap();
+        assert_eq!((det, inv), (int(1), vec![vec![int(1), int(-1)], vec![int(-1), int(2)]]));
+        let (codec, problems) = toy();
+        let ln2 = toy_learner(&codec, &problems).field.ln2();
+        let exp = holonics::hnn::keyed_modes::Exponential::new(20);
+        let face = holonics::hnn::tower::TowerFace { masses: vec![1 << 60, 1 << 60, 1 << 60], total: 3 << 60 };
+        // Σ = 2^32 a unit of r's units squared: its precision 2^(−32) on 2^(−62).
+        let p = 1i128 << 30;
+        let r = vec![1i32 << 16, 0];
+        // r one unit (2^16 on 2^(−16)) from a mean at zero, Σ = 2^32: the form reads one nat.
+        assert_eq!(pair_form(&r, &[0, 0], &[p, 0, 0, p]), 1 << 20);
+        let tilt = PairTilt { letter: 1, mean: [vec![0; 2], vec![0; 2]], precision: [vec![p, 0, 0, p], vec![p, 0, 0, p]], constant: 1 << 20 };
+        let tilted = pair_tilted(&face, &r, std::slice::from_ref(&tilt), 4, &exp, ln2);
+        assert_eq!((tilted.masses[1], tilted.masses[0], tilted.masses[2]), (1 << 60, 1 << 59, 1 << 59));
+    }
+
     /// [theory, November 10 04:40] `reach2-field` end to end on the host: every (set, d, far, letter) is a row (far a letter, the
     /// void, or the blank of an open place), and each offset counts every site of its set once.
     #[test]
@@ -9892,6 +9916,316 @@ fn parity_sample<'p>(train: &'p [(Vec<u8>, Vec<u8>)], parity: usize, sample: &st
 
 /// [definition; theory, November 10 03:45] The reach census's offsets: `±1, 2, 3, 4, 6, 8, 12, 16, …, 192, 256`.
 const REACH: [usize; 16] = [1, 2, 3, 4, 6, 8, 12, 16, 24, 32, 48, 64, 96, 128, 192, 256];
+
+/// [definition; theory, November 10 04:40] **One letter's pair tilt** ([`pair_field`]): the count cloud's and the face cloud's
+/// Gaussians over the readout's chart `r` (on `2^(−16)`), each as its mean (on `2^(−24)`, `r`'s units times `2^8`) and its
+/// precision `Σ⁻¹` (on `2^(−62)` a unit of `r`'s units squared, the whole symmetric matrix), and the constant
+/// `−½ log₂ det Σ_N + ½ log₂ det Σ_F + log₂(n/F)` on the codes' `2^(−20)` bits.
+struct PairTilt {
+    letter: usize,
+    mean: [Vec<i128>; 2],
+    precision: [Vec<i128>; 2],
+    constant: i128,
+}
+
+/// `log₂ x` on `2^(−20)` for a positive integer ([`holonics::hnn::keyed_modes::log2_face`] of its top 62 bits).
+fn big_log2(x: &num_bigint::BigInt) -> Result<i128> {
+    use num_traits::{Signed, ToPrimitive};
+    if !x.is_positive() {
+        return Err("the logarithm of a determinant that is not positive".into());
+    }
+    let bits = x.bits() as i128;
+    let top = if bits > 62 { (x >> (bits as usize - 62)).to_u128() } else { (x << (62 - bits as usize)).to_u128() }.ok_or("a mantissa past 128 bits")?;
+    Ok((bits << 20) + holonics::hnn::keyed_modes::log2_face(top, 20))
+}
+
+/// A symmetric matrix's inverse and determinant in exact rationals (Gauss–Jordan, the largest pivot of each column by its
+/// magnitude), or `None` where it is singular.
+fn rational_inverse(m: &[Vec<num_rational::BigRational>]) -> Option<(Vec<Vec<num_rational::BigRational>>, num_rational::BigRational)> {
+    use num_traits::{One, Signed, Zero};
+    let n = m.len();
+    let mut a: Vec<Vec<num_rational::BigRational>> = m.to_vec();
+    let mut inv: Vec<Vec<num_rational::BigRational>> = (0..n).map(|i| (0..n).map(|j| if i == j { num_rational::BigRational::one() } else { num_rational::BigRational::zero() }).collect()).collect();
+    let mut det = num_rational::BigRational::one();
+    for c in 0..n {
+        let p = (c..n).max_by(|&i, &j| a[i][c].abs().cmp(&a[j][c].abs()))?;
+        if a[p][c].is_zero() {
+            return None;
+        }
+        if p != c {
+            a.swap(p, c);
+            inv.swap(p, c);
+            det = -det;
+        }
+        let pivot = a[c][c].clone();
+        det *= &pivot;
+        for j in 0..n {
+            a[c][j] = &a[c][j] / &pivot;
+            inv[c][j] = &inv[c][j] / &pivot;
+        }
+        for i in 0..n {
+            if i != c && !a[i][c].is_zero() {
+                let f = a[i][c].clone();
+                for j in 0..n {
+                    let (x, y) = (&a[c][j] * &f, &inv[c][j] * &f);
+                    a[i][j] -= x;
+                    inv[i][j] -= y;
+                }
+            }
+        }
+    }
+    Some((inv, det))
+}
+
+/// [definition; theory, November 10 04:40] **The pair tilts** from a phase census's tables (`CENSUS_PHASE.tsv` for each letter's
+/// count `n` and summed face share `F`, read off head 0, mode 0, the key word, whose bins partition the set's sites;
+/// `CENSUS_MOMENT.tsv` for its `LN`, `LF`, `QN`, `QF`), of `set`, for each letter of at least `floor` sites: the count cloud
+/// `μ_N = LN/n`, `Σ_N = QN/n − μ_N μ_Nᵀ` and the face cloud `μ_F = LF/F`, `Σ_F = QF/F − μ_F μ_Fᵀ`, in exact rationals; a letter
+/// whose cloud is singular is left out.
+fn pair_tilts(phase: &[u8], moment: &[u8], set: &str, dw: usize, floor: u64) -> Result<(Vec<PairTilt>, Vec<(usize, u64, i128)>)> {
+    use num_bigint::BigInt;
+    use num_rational::BigRational;
+    use num_traits::{Signed, ToPrimitive};
+    // Each letter's count and summed share on 2^(−72), from head 0, mode 0, the key word.
+    let (mut n, mut f): (Vec<u64>, Vec<i128>) = (Vec::new(), Vec::new());
+    for line in std::str::from_utf8(phase)?.lines().skip(1) {
+        let c: Vec<&str> = line.split('\t').collect();
+        if c.len() != 11 || c[0] != set || c[1] != "0" || c[2] != "0" || c[3] != "key" {
+            continue;
+        }
+        let counts: Vec<u64> = c[8].split(',').map(|v| v.parse::<u64>()).collect::<std::result::Result<_, _>>()?;
+        let shares: Vec<i128> = c[9].split(',').map(|v| v.parse::<i128>()).collect::<std::result::Result<_, _>>()?;
+        let carried: Vec<i128> = c[10].split(',').map(|v| v.parse::<i128>()).collect::<std::result::Result<_, _>>()?;
+        if n.is_empty() {
+            (n, f) = (vec![0; counts.len()], vec![0; counts.len()]);
+        }
+        for l in 0..counts.len() {
+            n[l] += counts[l];
+            f[l] += (shares[l] << 32) + carried[l];
+        }
+    }
+    if n.is_empty() {
+        return Err(format!("a phase census with no head 0, mode 0 key rows of set {set}").into());
+    }
+    let a = n.len();
+    let tri = dw * (dw + 1) / 2;
+    let mut rows: std::collections::HashMap<(usize, String), Vec<BigInt>> = std::collections::HashMap::new();
+    for line in std::str::from_utf8(moment)?.lines().skip(1) {
+        let c: Vec<&str> = line.split('\t').collect();
+        if c.len() != 4 || c[0] != set || c[1] == "-" {
+            continue;
+        }
+        let v: Vec<BigInt> = c[3].split(',').map(|x| x.parse::<BigInt>()).collect::<std::result::Result<_, _>>()?;
+        rows.insert((c[1].parse::<usize>()?, c[2].to_string()), v);
+    }
+    let get = |l: usize, kind: &str, len: usize| -> Result<&Vec<BigInt>> { rows.get(&(l, kind.to_string())).filter(|v| v.len() == len).ok_or_else(|| format!("a moment row {kind} of letter {l} missing or not its length").into()) };
+    let full = |q: &[BigInt]| -> Vec<Vec<BigInt>> {
+        let mut m = vec![vec![BigInt::from(0); dw]; dw];
+        let mut k = 0;
+        for i in 0..dw {
+            for j in i..dw {
+                m[i][j] = q[k].clone();
+                m[j][i] = q[k].clone();
+                k += 1;
+            }
+        }
+        m
+    };
+    let (mut tilts, mut letters) = (Vec::new(), Vec::new());
+    for l in 0..a {
+        if n[l] < floor || f[l] <= 0 {
+            continue;
+        }
+        // The two clouds: weights (n, F on 2^(−72)), first moments and second moments, each in r's units.
+        let ln = get(l, "LN", dw)?;
+        let (lf, lfc) = (get(l, "LF", dw)?, get(l, "LF_carried", dw)?);
+        let qn = full(get(l, "QN", tri)?);
+        let (qf, qfc) = (full(get(l, "QF", tri)?), full(get(l, "QF_carried", tri)?));
+        let lf_t: Vec<BigInt> = (0..dw).map(|i| (&lf[i] << 32) + &lfc[i]).collect();
+        let qf_t: Vec<Vec<BigInt>> = (0..dw).map(|i| (0..dw).map(|j| (&qf[i][j] << 32) + &qfc[i][j]).collect()).collect();
+        let clouds = [(BigInt::from(n[l]), ln.clone(), qn), (BigInt::from(f[l]), lf_t, qf_t)];
+        let mut means: Vec<Vec<i128>> = Vec::new();
+        let mut precisions: Vec<Vec<i128>> = Vec::new();
+        let mut logdets: Vec<i128> = Vec::new();
+        let mut singular = false;
+        for (w, first, second) in &clouds {
+            let mu: Vec<BigRational> = first.iter().map(|x| BigRational::new(x.clone(), w.clone())).collect();
+            let sigma: Vec<Vec<BigRational>> = (0..dw).map(|i| (0..dw).map(|j| BigRational::new(second[i][j].clone(), w.clone()) - &mu[i] * &mu[j]).collect()).collect();
+            let Some((inv, det)) = rational_inverse(&sigma) else {
+                singular = true;
+                break;
+            };
+            if !det.is_positive() {
+                singular = true;
+                break;
+            }
+            let round = |x: &BigRational, bits: usize| -> Result<i128> { ((x * BigRational::from_integer(BigInt::from(1) << bits)).round().to_integer()).to_i128().ok_or_else(|| "a tilt term past 128 bits".into()) };
+            means.push(mu.iter().map(|x| round(x, 8)).collect::<Result<_>>()?);
+            precisions.push(inv.iter().flatten().map(|x| round(x, 62)).collect::<Result<_>>()?);
+            logdets.push(big_log2(det.numer())? - big_log2(det.denom())?);
+        }
+        if singular {
+            letters.push((l, n[l], i128::MIN));
+            continue;
+        }
+        // log₂(n/F), F on 2^(−72).
+        let ratio = big_log2(&(BigInt::from(n[l]) << 72))? - big_log2(&BigInt::from(f[l]))?;
+        let constant = (logdets[1] - logdets[0]) / 2 + ratio;
+        letters.push((l, n[l], constant));
+        tilts.push(PairTilt { letter: l, mean: [means[0].clone(), means[1].clone()], precision: [precisions[0].clone(), precisions[1].clone()], constant });
+    }
+    Ok((tilts, letters))
+}
+
+/// `(r − μ)ᵀ Σ⁻¹ (r − μ)` in nats on `2^(−20)` for a chart `r` (on `2^(−16)`), the mean on `2^(−24)` and the precision on `2^(−62)`.
+fn pair_form(r: &[i32], mean: &[i128], precision: &[i128]) -> i128 {
+    let dw = r.len();
+    let d: Vec<i128> = (0..dw).map(|i| ((r[i] as i128) << 8) - mean[i]).collect();
+    let mut q = 0i128;
+    for i in 0..dw {
+        let row = &precision[i * dw..(i + 1) * dw];
+        let mut s = 0i128;
+        for j in 0..dw {
+            s += row[j] * d[j];
+        }
+        q += (s >> 24) * d[i];
+    }
+    // d on 2^(−8) of r's units and the precision on 2^(−62): the row sums on 2^(−70), released 2^24 inside, times d on 2^(−54);
+    // released to the codes' 2^(−20).
+    q >> 34
+}
+
+/// [definition; theory, November 10 04:40] **A face tilted by the pair tilts at its chart, at `step` quarters**:
+/// `f′(a) ∝ f(a) · exp(step/4 · tilt_a(r))`, `tilt_a(r) = ln G_N(r) − ln G_F(r) + ln(n/F)` for each tilted letter (the rest
+/// untilted), each exponent read in bits and released through the exponential's navigator below the largest.
+fn pair_tilted(face: &holonics::hnn::tower::TowerFace, r: &[i32], tilts: &[PairTilt], quarters: i128, exp: &holonics::hnn::keyed_modes::Exponential, ln2: i128) -> holonics::hnn::tower::TowerFace {
+    let mut k = vec![0i128; face.masses.len()];
+    for p in tilts {
+        // ln G_N − ln G_F = −½ q_N + ½ q_F + (the constant's log-determinants); in bits: the forms' nats over ln 2.
+        let (qn, qf) = (pair_form(r, &p.mean[0], &p.precision[0]), pair_form(r, &p.mean[1], &p.precision[1]));
+        let bits = (((qf - qn) << 29) / ln2) + p.constant;
+        k[p.letter] = bits * quarters / 4;
+    }
+    let top = k.iter().copied().max().unwrap_or(0);
+    let masses: Vec<u128> = face.masses.iter().zip(&k).map(|(&m, &e)| if e == 0 && top == 0 { m } else { ((m * exp.below_one(e - top)) >> 62).max(1) }).collect();
+    let total = masses.iter().sum::<u128>().max(1);
+    holonics::hnn::tower::TowerFace { masses, total }
+}
+
+/// The pair tilts as a realization: every face its inner realization reads, tilted at its open site's chart ([`pair_tilted`]).
+struct PairTilted<'a> {
+    inner: &'a mut dyn FieldRealization,
+    tilts: &'a [PairTilt],
+    quarters: i128,
+    exp: &'a holonics::hnn::keyed_modes::Exponential,
+    ln2: i128,
+}
+
+impl FieldRealization for PairTilted<'_> {
+    fn read_faces(&mut self, field: &Field, regions: &[Region]) -> std::result::Result<Vec<Vec<Option<holonics::hnn::tower::TowerFace>>>, holonics::hnn::tower::TowerError> {
+        let dw = field.declaration.width;
+        let read = self.inner.read_words(field, regions)?;
+        Ok(read.faces.into_iter().zip(read.charts).map(|(row, chart)| row.into_iter().enumerate().map(|(t, f)| f.map(|f| pair_tilted(&f, &chart[t * dw..(t + 1) * dw], self.tilts, self.quarters, self.exp, self.ln2))).collect()).collect())
+    }
+    fn read_and_return(&mut self, field: &Field, regions: &[Region]) -> std::result::Result<(Vec<Vec<Option<holonics::hnn::tower::TowerFace>>>, Vec<i128>), holonics::hnn::tower::TowerError> {
+        self.inner.read_and_return(field, regions)
+    }
+    fn read_logits(&mut self, field: &Field, regions: &[Region]) -> std::result::Result<Vec<holonics::hnn::tower::field::FieldRead>, holonics::hnn::tower::TowerError> {
+        self.inner.read_logits(field, regions)
+    }
+    fn read_landmarks(&mut self, field: &Field, region: &Region, question: usize, sites: &[usize], count: usize) -> std::result::Result<Vec<Vec<(usize, u64)>>, holonics::hnn::tower::TowerError> {
+        self.inner.read_landmarks(field, region, question, sites, count)
+    }
+}
+
+/// [measurement; theory, November 10 04:40] `pair-field UNITS UNITS_SHA TRAIN TRAIN_SHA HELD HELD_SHA KEYS KEYS_SHA SECTION SECTIONS
+/// STATE STATE_SHA LINE PHASE PHASE_SHA MOMENT MOMENT_SHA EVERY OUT`: **the pair read**: from a phase census's TRAIN even tables
+/// (`PHASE` its `CENSUS_PHASE.tsv`, `MOMENT` its `CENSUS_MOMENT.tsv`), for each letter of 2,000 sites or more, the tilt
+/// `ln Gauss(count cloud) − ln Gauss(face cloud) + ln(n/F)` over the readout's chart ([`pair_tilts`]); the faces times
+/// `exp(step × tilt)` at steps ¼, ½ and 1 ([`pair_tilted`]) beside the plain ones; read on TRAIN's odd problems' answer sites of
+/// the lap's own states (census 2b's charge set, every `EVERY`th odd problem, its checks first), `FIELD_PAIR_TRAIN`, and on the
+/// held joint (`FIELD_JOINT_NATS` at `lap` 0 plain and 1, 2, 4 for the quarters), each in nats a place. Numbers only.
+pub(super) fn pair_field(args: &[String], realization: &mut dyn FieldRealization) -> Result<()> {
+    if args.len() != 20 {
+        return Err("pair-field UNITS UNITS_SHA TRAIN TRAIN_SHA HELD HELD_SHA KEYS KEYS_SHA SECTION SECTIONS STATE STATE_SHA LINE PHASE PHASE_SHA MOMENT MOMENT_SHA EVERY OUT".into());
+    }
+    let started = std::time::Instant::now();
+    let units = units_of(&args[1], &args[2])?;
+    let train_problems = problems_of(&pinned_read(&args[3], &args[4], READ_BUDGET as usize)?);
+    let dev_problems = problems_of(&pinned_read(&args[5], &args[6], READ_BUDGET as usize)?);
+    let keys = pinned_read(&args[7], &args[8], READ_BUDGET as usize)?;
+    let (section, limit) = (positive(&args[9])?, count(&args[10])?);
+    let mut learner = FieldLearner::from_text(std::str::from_utf8(&pinned_read(&args[11], &args[12], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
+    declared_clocks(&mut learner.field);
+    let line = args[13].as_str();
+    let phase = pinned_read(&args[14], &args[15], READ_BUDGET as usize)?;
+    let moment = pinned_read(&args[16], &args[17], READ_BUDGET as usize)?;
+    let every = positive(&args[18])?;
+    let out = Path::new(&args[19]);
+    std::fs::create_dir(out)?;
+    let codec = FieldCodec::found(units, &train_problems)?;
+    let encode = |problems: &[(Vec<u8>, Vec<u8>)]| -> Result<Problems> {
+        problems.par_iter().map(|(q, a)| Ok((codec.encode(&question_text(q)).map_err(|e| e.to_string())?, codec.encode(a).map_err(|e| e.to_string())?, a.len()))).collect::<std::result::Result<Vec<_>, String>>().map_err(|e| e.into())
+    };
+    let train_set = encode(&train_problems)?;
+    let dev_set: Problems = encode(&dev_problems)?.into_iter().filter(|(_, a, _)| a.len() < codec.answer).collect();
+    let seed = u64::from_be_bytes(keys.get(keys.len().saturating_sub(8)..).filter(|w| w.len() == 8).ok_or("a key file of fewer than eight bytes")?.try_into()?);
+    let (sections, _) = sections_of(&train_set, section, dev_set.len(), seed);
+    if learner.holds_step() {
+        return Err("pair-field reads a state that holds no step (it never deposits)".into());
+    }
+    println!("FIELD_CLOCKS per_blank={} bare={} laps_read={}", learner.field.per_blank_clock, learner.field.bare_stretch, learner.laps);
+    let dw = learner.field.declaration.width;
+    let (tilts, letters) = pair_tilts(&phase, &moment, "train_even", dw, 2000)?;
+    for &(l, n, c) in &letters {
+        println!("FIELD_PAIR_LETTER letter={l} sites={n} {}", if c == i128::MIN { "singular=true".to_string() } else { format!("constant_bits={}", decimal_q20(c)) });
+    }
+    println!("FIELD_PAIR_TILTS letters={} tilted={} ms={}", letters.len(), tilts.len(), started.elapsed().as_millis());
+    let exp = holonics::hnn::keyed_modes::Exponential::new(20);
+    let ln2 = learner.field.ln2();
+    let quarters: [i128; 4] = [0, 1, 2, 4];
+    let read = learner.laps;
+    let draw = read * train_set.len() as u64;
+    let paths = paths_of(seed, read, &sections);
+    let order = walk(seed, read, sections.len());
+    let take = if limit == 0 { order.len() } else { limit.min(order.len()) };
+    // TRAIN's odd problems' answer sites: their code plain and at each step.
+    let (mut codes, mut sites) = ([0i128; 4], 0u64);
+    let charge = lap_visit(&codec, &train_set, &sections, &paths, &order[..take], seed, draw, &mut learner, realization, true, Some(line), &mut |site| {
+        if site.asked || site.problem % 2 == 0 || (site.problem / 2) % every != 0 {
+            return;
+        }
+        for (c, &q) in codes.iter_mut().zip(&quarters) {
+            *c += if q == 0 { site.face.code(site.truth) as i128 } else { pair_tilted(site.face, site.chart, &tilts, q, &exp, ln2).code(site.truth) as i128 };
+        }
+        sites += 1;
+    })?;
+    let bounded = charge.sites <= charge.bound;
+    println!("FIELD_CHECK check=2 result={} charged={} question={} answer={} bound={} sections={take}", if bounded { "PASS" } else { "FAIL" }, charge.sites, charge.question, charge.sites - charge.question, charge.bound);
+    println!("FIELD_CHECK check=3 part=visit result={} leaks={}", if charge.leaks == 0 { "PASS" } else { "FAIL" }, charge.leaks);
+    if !bounded || charge.leaks > 0 {
+        return Err("the pair read refuses to read: a check failed over the visit".into());
+    }
+    let a_place = |v: i128| if sites == 0 { "-".to_string() } else { decimal_q20(nats_q20(v) / sites as i128) };
+    for (c, &q) in codes.iter().zip(&quarters) {
+        println!("FIELD_PAIR_TRAIN set=train_odd step={}/4 sites={sites} code_nats_a_place={} change_nats_a_place={}", q, a_place(*c), a_place(*c - codes[0]));
+    }
+    let _ = std::io::Write::flush(&mut std::io::stdout());
+    let train_ms = started.elapsed().as_millis();
+    // The held joint, plain and at each step.
+    let mut rows = rows_file(&out.join("JOINT.tsv"), "lap\tproblem\tsites\town\tfoil\tinformation\tseries\n")?;
+    let field = &learner.field;
+    for &q in &quarters {
+        if q == 0 {
+            joint_read(field, &codec, &dev_set, seed, realization, 0, &mut rows)?;
+        } else {
+            let mut tilted = PairTilted { inner: &mut *realization, tilts: &tilts, quarters: q, exp: &exp, ln2 };
+            joint_read(field, &codec, &dev_set, seed, &mut tilted, q as i64, &mut rows)?;
+        }
+    }
+    println!("FIELD_PAIR_DONE sections={take} of={} train_ms={train_ms} ms={}", order.len(), started.elapsed().as_millis());
+    Ok(())
+}
 
 /// [measurement; theory, November 10 04:40] **The reach census's sums on a partly locked state**: `N` and `F` by
 /// `[set][offset][far][letter]`, the far place's letter where it is locked, a blank (`far = alphabet`) where it is open, the void
