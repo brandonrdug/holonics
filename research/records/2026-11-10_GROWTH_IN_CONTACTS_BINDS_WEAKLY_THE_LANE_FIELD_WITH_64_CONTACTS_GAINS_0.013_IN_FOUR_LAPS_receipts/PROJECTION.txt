@@ -1,0 +1,7 @@
+Measured reads (November 10, RTX 4080 SUPER under .local/gpu.lock, alone; the lane chain interleaving by stages):
+ grow.sh on lap33/STATE.0 (field_pass.v14): wall 9.4 s; faces of 1020 held joint states identical (174,266 faces), held joint 1.839301 -> 1.839301 nats a place; material 57,398 -> 63,606 (width 64, lanes 2, f 32 -> 64)
+ refread (field_pass 790bad001) lap33/STATE.0: wall 114.4 s; its growth: 116.0 s; both code 0.602896 / entropy 0.576677 nats a place over 43,342 places (the growth keeps the references' faces)
+ grown lap read (control's field_pass, train-field, lap 34's walk, stopped at 170 s): 222 sections, 158,389 ms against the control's 158,088 ms on the same sections (ratio 1.002; blocks of 20: 0.978 to 1.029; against a rerun of the v14 build in the window 1.023 median, 1.050 largest)
+ law check: field_pass.v14 on lap33/STATE.0 reproduces lap34.log's first 227 FIELD_SECTION lines bit for bit; field_pass (790bad001, the current line) does not (predicted_micro differs from section 0: carried remainders and later laws), so it is not used to train
+ the control's reads binary (field_pass.reads) reads the grown state: opening-field on HELD128 byte-identical to lap33_HELD128/OPENING.tsv
+Projection of one grown lap (contacts_lap.sh): lap 1,155,000 ms (largest control lap 1,099,888 ms x 1.0501), bound 1,160,000 ms; the run 1,460,000 ms, outer 1,520 s; reads as lane_lap.sh's; refread 120 s (deadline 150 s)

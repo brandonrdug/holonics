@@ -4,6 +4,8 @@
 open, each named by its measurement. [THE_REBUILD](docs/plans/THE_REBUILD.md) is the order, the laws
 live in their guides and owners, and dated records hold the derivations and receipts.
 
+**November 10 note, later.** Growing the lane field's pair contacts from 32 to 64 (every face kept) lowers the held joint 0.013 and the references' locked code 0.012 against the lane-only control over four laps: the contact count binds, weakly ([record](research/records/2026-11-10_GROWTH_IN_CONTACTS_BINDS_WEAKLY_THE_LANE_FIELD_WITH_64_CONTACTS_GAINS_0.013_IN_FOUR_LAPS.md)).
+
 **November 10 note.** On the November 6 face field, certified exchanges and point re-draws bring held answer regions to a neutral rest above the reference's own neutral point, the locked faces already carry what the ring, reach and pair censuses add, and the 64-wide lane keeps lowering the held joint more slowly ([record](research/records/2026-11-10_POINT_REDRAWS_REST_AT_THE_FACES_OWN_ENTROPY_AND_THE_FACES_ALREADY_HOLD_WHAT_THE_RING_REACH_AND_PAIR_CENSUSES_ADD.md)).
 
 **November 9 note.** The energy line's writes stay unordered through section 259, and the PC lap's held code worsened under a superseded law; the work is stopped for an audit of the agents' own constructs, Colab is off, and the position below (November 7) is behind the line ([record](research/records/2026-11-09_THE_ENERGY_LINE_WRITES_STAY_UNORDERED_THROUGH_259_AND_THE_WORK_STOPS_TO_AUDIT_ITSELF.md)).
