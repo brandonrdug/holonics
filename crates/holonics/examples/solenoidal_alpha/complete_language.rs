@@ -800,6 +800,7 @@ pub(super) fn run_with_execution(
         Some("sample-field") if backend == CompleteLanguageTrainingBackend::HostReference => field_train::sample(args, &mut field_train::host()),
         Some("rows-field") if backend == CompleteLanguageTrainingBackend::HostReference => field_train::rows_field(args),
         Some("found-field") if backend == CompleteLanguageTrainingBackend::HostReference => field_train::found_field(args),
+        Some("grow-contacts-field") if backend == CompleteLanguageTrainingBackend::HostReference => field_train::grow_contacts_field(args, &mut field_train::host()),
         Some("temper-field") if backend == CompleteLanguageTrainingBackend::HostReference => field_train::temper_field(args),
         Some("ring-field") if backend == CompleteLanguageTrainingBackend::HostReference => field_train::ring_field(args),
         Some("depth-field") if backend == CompleteLanguageTrainingBackend::HostReference => field_train::depth_field(args),
@@ -906,6 +907,7 @@ pub(super) fn run_with_execution(
 pub(super) fn run_field_realized(args: &[String], realization: &mut dyn holonics::hnn::tower::field::FieldRealization) -> Result<()> {
     match args.first().map(String::as_str) {
         Some("train-field") => field_train::train(args, realization),
+        Some("grow-contacts-field") => field_train::grow_contacts_field(args, realization),
         Some("sample-field") => field_train::sample(args, realization),
         Some("currents-field") => field_train::currents_field(args, realization),
         Some("expansion-field") => field_train::expansion_field(args, realization),

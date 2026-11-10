@@ -394,6 +394,25 @@ impl FieldDeclaration {
         3 * self.alphabet * w + 2 * self.moment_modes() * w
     }
 
+    /// [definition; theory, November 10 09:55] The declaration with `added` more pair contacts ([`Field::contacted`]): the
+    /// merge's contact count grows and nothing else (the width, heads, modes, lanes, ticks and reach are kept). The new contacts
+    /// come in complex pairs even at each strand side, as the founding's do.
+    pub fn contacted(&self, added: usize) -> Result<Self> {
+        if added == 0 || added % 4 != 0 {
+            return refuse("a growth in contacts adds complex pairs, even at each strand side (a count divisible by four)");
+        }
+        let contacts = self.contacts.checked_add(added).ok_or(TowerError::Refused("a contact count outgrew its carrier"))?;
+        let d = Self { contacts, ..*self };
+        d.admit()?;
+        Ok(d)
+    }
+
+    /// The key draws a growth in contacts by `added` reads ([`Field::contacted`]): the new contacts' rows of both pair drives
+    /// over the whole width, as the founding draws them (`a` then `b`).
+    pub fn contact_draws(&self, added: usize) -> usize {
+        2 * added * self.width
+    }
+
     /// The turned slots: `(frames − still) · n`, slot `l · (frames − still) + (g − still)` the ring
     /// of local mode `l` in every head of turned ring set `g`.
     pub fn turned_slots(&self) -> usize {
@@ -5348,6 +5367,89 @@ impl Field {
     }
 }
 
+impl Field {
+    /// [definition; theory, November 10 09:55] **The field with `added` more pair contacts** (the merge's `c = (aᵀs)(bᵀx)`
+    /// joined to the face by `W`): the new contacts' `a` and `b` rows are the pair drives, drawn as a founding of this
+    /// declaration draws them, uniform on `±√(3/D)` at the material's grain, read from `keys` four bytes a draw (the new set's
+    /// rows in order, `a` then `b`); every family that writes the face from the contacts (the pair's return `W`, and in an
+    /// energy field the contraction `c`) takes the new contacts' columns at zero, and the contacts' biases open at zero as a
+    /// founding opens them. Every sum the forward forms is then the old sum, so every face is kept bit for bit; the new
+    /// contacts have a covector from the first section on (`W`'s new columns read the new `c`; the drives learn once `W` moves).
+    ///
+    /// The contacts are complex pairs (`e`, `f/2 + e`): the real parts then the imaginary parts, so the old contacts keep
+    /// their pair and strand side (`e` even reads the site before, odd the one after) at the same indices within each half,
+    /// and the new ones follow them in each half. The heads, the lanes and everything else are copied family by family.
+    ///
+    /// Returns the grown field and, for each entry, the old entry it carries (`None` for a new contact's own).
+    pub fn contacted(&self, added: usize, keys: &[u8]) -> Result<(Self, Vec<Option<usize>>)> {
+        if self.scale.is_some() {
+            return refuse("a tower's levels grow their contacts level by level, not through the fine field alone");
+        }
+        let old = self.declaration;
+        let d = old.contacted(added)?;
+        let layout = FieldLayout::new(&d);
+        let ol = &self.layout;
+        let (dw, fc, f2) = (old.width, old.contacts, d.contacts);
+        let mut new = vec![0i32; layout.len];
+        let mut from: Vec<Option<usize>> = vec![None; layout.len];
+        // Contact `e` of the old set at its index in the grown: a real part keeps its place, an imaginary part moves past the new
+        // real parts. The new contact `k` (of `added`) follows its half's old contacts.
+        let kept = |e: usize| if e < fc / 2 { e } else { f2 / 2 + e - fc / 2 };
+        let fresh = |k: usize| if k < added / 2 { fc / 2 + k } else { f2 / 2 + fc / 2 + k - added / 2 };
+        if ol.families.len() != layout.families.len() {
+            return refuse("a growth in contacts that changes the families");
+        }
+        // The families that read or write the face through a contact, by their old start: the pair drives (a contact a row),
+        // their biases, the pair's return (a contact a column) and the energy's contraction.
+        let drives = [(ol.a, layout.a), (ol.b, layout.b)];
+        for (&(os, ol_len, _), &(ns, nl_len, _)) in ol.families.iter().zip(&layout.families) {
+            if let Some(&(_, ns)) = drives.iter().find(|&&(o, _)| o == os) {
+                for e in 0..fc {
+                    for j in 0..dw {
+                        new[ns + kept(e) * dw + j] = self.theta[os + e * dw + j];
+                        from[ns + kept(e) * dw + j] = Some(os + e * dw + j);
+                    }
+                }
+            } else if os == ol.a_bias || os == ol.b_bias || (d.energy && os == ol.pair_c) {
+                for e in 0..fc {
+                    new[ns + kept(e)] = self.theta[os + e];
+                    from[ns + kept(e)] = Some(os + e);
+                }
+            } else if os == ol.w {
+                for r in 0..dw {
+                    for e in 0..fc {
+                        new[ns + r * f2 + kept(e)] = self.theta[os + r * fc + e];
+                        from[ns + r * f2 + kept(e)] = Some(os + r * fc + e);
+                    }
+                }
+            } else {
+                if ol_len != nl_len {
+                    return refuse("a family that changes its length with the contacts but is not one they index");
+                }
+                for i in 0..ol_len {
+                    new[ns + i] = self.theta[os + i];
+                    from[ns + i] = Some(os + i);
+                }
+            }
+        }
+        // The new contacts' drives: a founding's draws at the grown width's scale, the new set's rows in order.
+        let (num, den) = chart_scale(dw);
+        let mut cursor = 0usize;
+        for start in [layout.a, layout.b] {
+            for k in 0..added {
+                for j in 0..dw {
+                    let word = keys.get(cursor..cursor + 4).ok_or(TowerError::Refused("fewer key bytes than the new contacts' founding reads"))?;
+                    cursor += 4;
+                    let draw = i32::from_be_bytes([word[0], word[1], word[2], word[3]]) as i128;
+                    new[start + fresh(k) * dw + j] = fit32((draw * ((num << MATERIAL_BITS) / den) as i128) >> 31, "a new contact's founded value outgrew its 32-bit carrier")?;
+                }
+            }
+        }
+        debug_assert_eq!(cursor, 4 * old.contact_draws(added));
+        Ok((Self::with_theta(d, new).clocked_as(self), from))
+    }
+}
+
 fn read_numbers<T: std::str::FromStr>(line: Option<&str>) -> Result<Vec<T>> {
     let line = line.ok_or(TowerError::Refused("a field's text ended before its material"))?;
     if line.is_empty() {
@@ -6893,6 +6995,38 @@ impl FieldLearner {
         let carried = from.iter().map(|o| o.map_or(0, |i| self.carried[i])).collect();
         let drawn = self.drawn + 4 * self.field.declaration.lane_draws();
         Ok(Self { field, first, second, rate_bits: self.rate_bits, drawn, laps: self.laps, held: None, read_held: self.read_held, newton_read: self.newton_read, first_rate: self.first_rate, second_rate: self.second_rate, family_rates: None, temper_learns: false, family_transfer: Vec::new(), family_price: Vec::new(), last: None, average: None, carried, unigram: None, unigram_step: None, coin_measure: false, key: None })
+    }
+
+    /// [definition; theory, November 10 09:55] **The learner with `added` more pair contacts** ([`Field::contacted`]), the
+    /// contacts' draws read from the founding key stream past every draw read before. Every old entry keeps its moments and its
+    /// remainder, and the families' lengths (the families are the same ones); each new contact's entries open on the moments the
+    /// lane's open on ([`FieldLearner::laned`]): the first at zero, the second at the mean of the family's old second moments, so a
+    /// new contact's first step is an eighth of its covector over the family's own scale, the step its family's trained entries
+    /// take, and not the largest normalized step of a fresh entry. The rate is kept: no coordinate is shared among copies. The step
+    /// the last section stood at is of the old layout and is dropped, as every growth drops it.
+    pub fn contacted(&self, added: usize, keys: &[u8]) -> Result<Self> {
+        if self.held.is_some() {
+            return refuse("a learner grows its contacts after its held step is read");
+        }
+        let rest = keys.get(self.drawn..).ok_or(TowerError::Refused("fewer key bytes than the new contacts' draws"))?;
+        let (field, from) = self.field.contacted(added, rest)?;
+        let first = from.iter().map(|o| o.map_or(0, |i| self.first[i])).collect();
+        let mut second: Vec<i128> = from.iter().map(|o| o.map_or(0, |i| self.second[i])).collect();
+        for &(start, len, _) in field.families_all().iter() {
+            let old: Vec<i128> = (start..start + len).filter_map(|k| from[k].map(|i| self.second[i])).collect();
+            if old.len() == len || old.is_empty() {
+                continue;
+            }
+            // The mean term by term (each second moment is under `2^126`, so a family's sum is not formed).
+            let n = old.len() as i128;
+            let mean = old.iter().map(|v| v / n).sum::<i128>() + old.iter().map(|v| v % n).sum::<i128>() / n;
+            for k in (start..start + len).filter(|&k| from[k].is_none()) {
+                second[k] = mean;
+            }
+        }
+        let carried = from.iter().map(|o| o.map_or(0, |i| self.carried[i])).collect();
+        let drawn = self.drawn + 4 * self.field.declaration.contact_draws(added);
+        Ok(Self { field, first, second, rate_bits: self.rate_bits, drawn, laps: self.laps, held: None, read_held: self.read_held, newton_read: self.newton_read, first_rate: self.first_rate, second_rate: self.second_rate, family_rates: self.family_rates.clone(), temper_learns: false, family_transfer: self.family_transfer.clone(), family_price: self.family_price.clone(), last: None, average: None, carried, unigram: None, unigram_step: None, coin_measure: false, key: None })
     }
 
     /// The held step read on `regions` without a deposit: the faces of `regions` under the

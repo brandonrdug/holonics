@@ -2189,6 +2189,127 @@ fn a_lane_founded_beside_a_field_reads_its_faces() {
     assert_eq!(back, laned);
 }
 
+/// The faces, readout logits and lifts a region reads, the forward's whole readout.
+fn readout_of(field: &Field, region: &Region) -> (Vec<Option<TowerFace>>, Vec<Option<Vec<i64>>>, Vec<i64>) {
+    let pass = field.pass(region, false).unwrap();
+    (pass.faces, pass.logits, pass.lift)
+}
+
+/// [definition; theory, November 10 09:55] **A growth in contacts keeps every face**: on fields of one lane and of two, each
+/// ring set still or turned, in the energy's reading too, a field with `added` more pair contacts (twice, past the first) reads
+/// every face, readout logit and lift the field read, bit for bit; its draws counted are the draws read; the old contacts keep
+/// their entries and their pair and strand side within each half, the new ones follow them, `W`'s new columns and the contacts'
+/// biases are zero and the new drives are drawn; its families tile its material, its text restores it, and it keeps the declared
+/// clocks.
+#[test]
+fn a_growth_in_contacts_keeps_every_face() {
+    let mut cases: Vec<(String, Field)> = (0..=2).map(|s| (format!("still {s}"), shaped(s))).collect();
+    cases.push(("two lanes".into(), shaped_with(FieldDeclaration { width: 16, lanes: 2, ..tiny_declaration(1) })));
+    cases.push(("energy".into(), energetic_line()));
+    for (name, mut field) in cases {
+        (field.per_blank_clock, field.bare_stretch) = (name == "still 1", name != "still 0");
+        let before = readout_of(&field, &region());
+        let mut grown = field.clone();
+        for added in [4usize, 8] {
+            let d = grown.declaration;
+            let draws = d.contact_draws(added);
+            assert_eq!(draws, 2 * added * d.width);
+            assert!(grown.contacted(added, &keys(draws).as_slice()[..4 * draws - 1]).is_err(), "{name}: the draws counted are the draws read");
+            assert!(d.contacted(added - 1).is_err() && d.contacted(0).is_err(), "{name}: the new contacts come in complex pairs even at each strand side");
+            let stream = keys(draws);
+            let (next, from) = grown.contacted(added, &stream).unwrap();
+            assert_eq!(from.len(), next.theta.len());
+            assert_eq!(next.declaration, FieldDeclaration { contacts: d.contacts + added, ..d });
+            assert_eq!((next.per_blank_clock, next.bare_stretch), (field.per_blank_clock, field.bare_stretch), "{name}: the declared clocks");
+            assert_eq!(readout_of(&next, &region()), before, "{name}: every face is kept (adding {added})");
+            let mut at = 0;
+            for (start, len, _) in next.families_all() {
+                assert_eq!(start, at);
+                at += len;
+            }
+            assert_eq!(at, next.material_len());
+            let restored = Field { per_blank_clock: next.per_blank_clock, bare_stretch: next.bare_stretch, ..Field::from_text(&next.to_text()).unwrap() };
+            assert_eq!(restored, next, "{name}: the text restores it (the clocks are the run's declaration, not the state's)");
+            // The entries: each old entry is carried whole, each new contact has its place in its half.
+            let (ol, nl, dw, fc, f2) = (grown.layout.clone(), next.layout.clone(), d.width, d.contacts, d.contacts + added);
+            assert!(from.iter().flatten().all(|&i| i < grown.theta.len()) && from.iter().flatten().count() == grown.theta.len());
+            for (n, o) in from.iter().enumerate() {
+                if let Some(o) = o {
+                    assert_eq!(next.theta[n], grown.theta[*o], "{name}: entry {n} carries {o}");
+                }
+            }
+            let fresh = |k: usize| if k < added / 2 { fc / 2 + k } else { f2 / 2 + fc / 2 + k - added / 2 };
+            let kept = |e: usize| if e < fc / 2 { e } else { f2 / 2 + e - fc / 2 };
+            for e in 0..fc {
+                assert_eq!(next.theta[nl.a + kept(e) * dw..nl.a + (kept(e) + 1) * dw], grown.theta[ol.a + e * dw..ol.a + (e + 1) * dw], "{name}: contact {e}'s a row");
+                assert_eq!(next.theta[nl.b + kept(e) * dw..nl.b + (kept(e) + 1) * dw], grown.theta[ol.b + e * dw..ol.b + (e + 1) * dw], "{name}: contact {e}'s b row");
+                // Its strand side (the parity of its index within its half) is kept.
+                assert_eq!(kept(e) % (f2 / 2) % 2, e % (fc / 2) % 2, "{name}: contact {e} keeps its side");
+            }
+            for k in 0..added {
+                assert_eq!(fresh(k) % (f2 / 2) % 2, k % 2, "{name}: new contact {k}'s side");
+                assert!(next.theta[nl.a + fresh(k) * dw..nl.a + (fresh(k) + 1) * dw].iter().any(|&v| v != 0), "{name}: new contact {k}'s a row is drawn");
+                assert!(next.theta[nl.b + fresh(k) * dw..nl.b + (fresh(k) + 1) * dw].iter().any(|&v| v != 0), "{name}: new contact {k}'s b row is drawn");
+                assert_eq!(next.theta[nl.a_bias + fresh(k)], 0);
+                assert_eq!(next.theta[nl.b_bias + fresh(k)], 0);
+                for r in 0..dw {
+                    assert_eq!(next.theta[nl.w + r * f2 + fresh(k)], 0, "{name}: W's new column {k}");
+                }
+                if d.energy {
+                    assert_eq!(next.theta[nl.pair_c + fresh(k)], 0);
+                }
+            }
+            grown = next;
+        }
+        assert_eq!(readout_of(&grown, &region()), before, "{name}: still every face after two growths");
+    }
+}
+
+/// [definition; theory, November 10 09:55] **A deposit after a growth in contacts reaches the new contacts**: the grown learner
+/// keeps every old moment and remainder, opens each new contact's moments on its family's second moment ([`FieldLearner::laned`]'s
+/// law) and keeps its rate and draws counted; one section after the growth moves the new contacts' drives and `W`'s new columns
+/// from their opening (the pair's return `W` first, then, once it is nonzero, the drives), and the grown learner restores from
+/// its text.
+#[test]
+fn a_deposit_after_a_growth_in_contacts_reaches_the_new_contacts() {
+    let mut learner = FieldLearner::new(shaped(1), 4);
+    // The founding's draws, then the shaped fixture's own material: the learner opens on a shaped field and learns it.
+    for _ in 0..2 {
+        learner.section(&[region()]).unwrap();
+    }
+    let stream = keys(1 << 16);
+    let faces = learner.field.faces(&region()).unwrap();
+    let grown = learner.contacted(4, &stream).unwrap();
+    assert_eq!((grown.drawn, grown.rate_bits), (learner.drawn + 4 * learner.field.declaration.contact_draws(4), learner.rate_bits));
+    assert_eq!(grown.field.faces(&region()).unwrap(), faces);
+    let (nl, ol, dw) = (grown.field.layout().clone(), learner.field.layout().clone(), learner.field.declaration.width);
+    assert_eq!(grown.first[nl.read_bias], learner.first[ol.read_bias]);
+    assert_eq!(grown.first[nl.q + 5], learner.first[ol.q + 5]);
+    assert_eq!(grown.carried[nl.w + 1], learner.carried[ol.w + 1]);
+    // An old contact's drive entry keeps its moments (contact 1, a real part); the new real contact 0 sits at index 2.
+    assert_eq!((grown.first[nl.a + dw + 3], grown.second[nl.a + dw + 3]), (learner.first[ol.a + dw + 3], learner.second[ol.a + dw + 3]));
+    let old_w = &learner.second[ol.w..ol.w + dw * 4];
+    let mean = old_w.iter().map(|v| v / old_w.len() as i128).sum::<i128>() + old_w.iter().map(|v| v % old_w.len() as i128).sum::<i128>() / old_w.len() as i128;
+    assert!(mean > 0);
+    assert_eq!((grown.first[nl.w + 2], grown.second[nl.w + 2]), (0, mean), "a new contact's entries open on their family's statistics");
+    let back = FieldLearner { read_held: grown.read_held, ..FieldLearner::from_text(&grown.to_text()).unwrap() };
+    assert_eq!(back, grown);
+    // The deposit: the new W columns part from zero in the first section the adjoint reaches them.
+    let mut grown = grown;
+    let (a_new, f2) = (nl.a + 2 * dw, 8);
+    let a_before: Vec<i32> = grown.field.theta[a_new..a_new + dw].to_vec();
+    let b_new = nl.b + 2 * dw;
+    let b_before: Vec<i32> = grown.field.theta[b_new..b_new + dw].to_vec();
+    let g = covector_of(&grown.field, &region());
+    assert!((0..dw).any(|r| g[nl.w + r * f2 + 2] != 0), "W's new columns carry a covector from the first section on");
+    for _ in 0..3 {
+        grown.section(&[region()]).unwrap();
+    }
+    assert!((0..dw).any(|r| grown.field.theta[nl.w + r * f2 + 2] != 0), "the deposit reaches W's new columns");
+    assert!(grown.field.theta[a_new..a_new + dw] != a_before[..], "the deposit reaches the new contact's drive");
+    assert!(grown.field.theta[b_new..b_new + dw] != b_before[..], "the deposit reaches the new contact's other drive");
+}
+
 /// [definition; §16.40] **A laned field's covector agrees with its code's central difference**: on a field of two lanes
 /// with every family shaped, each family's three entries with the largest covectors (the probe law of
 /// [`covector_matches_the_codes_difference`], a probe whose step moves a site across a sheet left out and counted), so each

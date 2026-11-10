@@ -255,6 +255,13 @@ pub(super) fn parity(args: &[String], card: &mut dyn FieldRealization) -> Result
         }
         println!("FIELD_PARITY_LANE lanes={} width={} material={}", founded.field.declaration.lanes, founded.field.declaration.width, founded.field.material_len());
     }
+    // [definition; theory, November 10 09:55] Growth in contacts (`FIELD_PARITY_CONTACTS=k`): the founded field (after its lanes) with
+    // `k` more pair contacts ([`FieldLearner::contacted`]), so the parity reads the new contacts' drives, their columns of the pair's
+    // return and their adjoint on both realizations (the new columns open at zero and carry a covector from the first section on).
+    if let Some(k) = std::env::var("FIELD_PARITY_CONTACTS").ok().and_then(|v| v.parse::<usize>().ok()).filter(|&k| k > 0) {
+        founded = founded.contacted(k, &p.keys).map_err(|e| e.to_string())?;
+        println!("FIELD_PARITY_CONTACTS contacts={} width={} material={}", founded.field.declaration.contacts, founded.field.declaration.width, founded.field.material_len());
+    }
     // [agent-inferred, November 2] A pace far from the founding (`FIELD_PARITY_PACE=s`, §16): every pace entry drawn from
     // the key file's tail, a 32-bit word shifted down `s` bits, so the clocks run off the byte place (fractional,
     // fast, stopping and backward rates) and the parity reads the series between whole places on both realizations.

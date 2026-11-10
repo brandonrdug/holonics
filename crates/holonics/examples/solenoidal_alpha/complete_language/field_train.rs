@@ -6419,6 +6419,78 @@ pub(super) fn found_field(args: &[String]) -> Result<()> {
     Ok(())
 }
 
+/// [definition; theory, November 10 09:55] **`grow-contacts-field STATE STATE_SHA KEYS KEYS_SHA ADDED CODEC CODEC_SHA UNITS
+/// UNITS_SHA HELD HELD_SHA OUT`**: the growth in contacts ([`FieldLearner::contacted`]). Reads the learner `STATE`, adds `ADDED`
+/// pair contacts (their drives drawn from `KEYS` past every draw the state has read), and writes the grown learner to the file
+/// `OUT`, with its held joint read as `train-field`'s lap -1 reads it (`FIELD_JOINT_NATS`, the held problems' own and foil
+/// states, the key file's last word the seed) before the growth (`lap=-1`) and after it (`lap=0`), and the faces of every one of
+/// those states compared bit for bit through the declared realization (`FIELD_GROW_CONTACTS_KEPT`): a growth that moved a face is
+/// refused and nothing is written. The held joint's rows go to `OUT.JOINT.tsv`. The clocks are the run's declaration
+/// ([`declared_clocks`]), read alike before and after.
+pub(super) fn grow_contacts_field(args: &[String], realization: &mut dyn FieldRealization) -> Result<()> {
+    if args.len() != 13 {
+        return Err("grow-contacts-field STATE STATE_SHA KEYS KEYS_SHA ADDED CODEC CODEC_SHA UNITS UNITS_SHA HELD HELD_SHA OUT".into());
+    }
+    let started = std::time::Instant::now();
+    let mut learner = FieldLearner::from_text(std::str::from_utf8(&pinned_read(&args[1], &args[2], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
+    declared_clocks(&mut learner.field);
+    let keys = pinned_read(&args[3], &args[4], READ_BUDGET as usize)?;
+    let seed = u64::from_be_bytes(keys.get(keys.len().saturating_sub(8)..).filter(|w| w.len() == 8).ok_or("a key file of fewer than eight bytes")?.try_into()?);
+    let added = positive(&args[5])?;
+    let units = units_of(&args[8], &args[9])?;
+    let codec = FieldCodec::from_text(std::str::from_utf8(&pinned_read(&args[6], &args[7], CODEC_BUDGET)?)?, units)?;
+    let held_text = pinned_read(&args[10], &args[11], READ_BUDGET as usize)?;
+    if learner.field.declaration.alphabet != codec.alphabet() {
+        return Err("a learner whose alphabet is not the codec's".into());
+    }
+    // The key file's last word is the masks' seed and no growth may reach it.
+    let drawn = learner.drawn + 4 * learner.field.declaration.contact_draws(added);
+    if drawn + 8 > keys.len() {
+        return Err(format!("a key file of {} bytes, and the growth would read {drawn} before its last word", keys.len()).into());
+    }
+    let out = Path::new(&args[12]);
+    if out.exists() {
+        return Err("a grown state's path that exists".into());
+    }
+    let held: Problems = {
+        let dev = problems_of(&held_text);
+        let encoded = dev.par_iter().map(|(q, a)| Ok((codec.encode(&question_text(q)).map_err(|e| e.to_string())?, codec.encode(a).map_err(|e| e.to_string())?, a.len()))).collect::<std::result::Result<Vec<_>, String>>()?;
+        encoded.into_iter().filter(|(_, a, _)| a.len() < codec.answer).collect()
+    };
+    let before = learner.field.declaration;
+    let grown = learner.contacted(added, &keys).map_err(|e| e.to_string())?;
+    let after = grown.field.declaration;
+    println!("FIELD_GROW_CONTACTS from_contacts={} to_contacts={} width={} lanes={} heads={} rate={} drawn={} material={} ms={}", before.contacts, after.contacts, after.width, after.lanes, after.heads, grown.rate_bits, grown.drawn, grown.field.theta.len(), started.elapsed().as_millis());
+    // The faces of the held joint's states, bit for bit.
+    let n = held.len();
+    let mut states: Vec<(Vec<usize>, Vec<bool>)> = Vec::new();
+    for i in 0..n {
+        let ((q, a, _), (fq, _, _)) = (&held[i], &held[(i + 1) % n]);
+        for question in [q, fq] {
+            for (c, u, _) in joint_states(codec.void(), question, a, seed, i as u64) {
+                states.push((c, u));
+            }
+        }
+    }
+    let mut compared = 0usize;
+    for chunk in states.chunks(64) {
+        let views: Vec<Region> = chunk.iter().map(|(c, u)| Region { classes: c, unresolved: u, faces: &[], locked: &[], echo: &[], domain: None, port: None }).collect();
+        let was = realization.read_faces(&learner.field, &views).map_err(|e| e.to_string())?;
+        let now = realization.read_faces(&grown.field, &views).map_err(|e| e.to_string())?;
+        if was != now {
+            return Err("a growth in contacts that moved a face (the grown field is not written)".into());
+        }
+        compared += was.iter().flatten().flatten().count();
+    }
+    println!("FIELD_GROW_CONTACTS_KEPT states={} faces={compared} identical=true ms={}", states.len(), started.elapsed().as_millis());
+    let mut rows = rows_file(Path::new(&format!("{}.JOINT.tsv", args[12])), "lap\tproblem\tanswer_sites\town_bits\tfoil_bits\tinformation_bits\tinformation_millibits_by_site\n")?;
+    joint_read(&learner.field, &codec, &held, seed, realization, -1, &mut rows)?;
+    joint_read(&grown.field, &codec, &held, seed, realization, 0, &mut rows)?;
+    write_new(out, grown.to_text().as_bytes())?;
+    println!("FIELD_GROWN {} rate={} material={} ms={}", declaration_line(&grown.field), grown.rate_bits, grown.field.theta.len(), started.elapsed().as_millis());
+    Ok(())
+}
+
 /// A field's declaration head line.
 fn declaration_line(field: &Field) -> String {
     field.to_text().lines().next().unwrap_or("").to_string()
@@ -10628,7 +10700,14 @@ pub(super) fn charge_field(args: &[String], realization: &mut dyn FieldRealizati
     let void = codec.void();
     let a = field.declaration.alphabet;
     let references: Vec<Vec<usize>> = held.iter().map(|(_, ans)| codec.encode(ans)).collect::<Result<_>>()?;
-    let states = [("rest", written_answers(&codec, &args[10], &args[11], held.len())?), ("keyed", written_answers(&codec, &args[12], &args[13], held.len())?), ("reference", references)];
+    // [definition; theory, November 10 09:55] `FIELD_CHARGE_REFERENCE_ONLY`: the held file's references alone are read (every face once,
+    // each place alone open), the rest and keyed files ignored (pass `-` for them), so two states' references are read on all the
+    // held problems at the cost of one locked read.
+    let states: Vec<(&str, Vec<Vec<usize>>)> = if std::env::var_os("FIELD_CHARGE_REFERENCE_ONLY").is_some() {
+        vec![("reference", references)]
+    } else {
+        vec![("rest", written_answers(&codec, &args[10], &args[11], held.len())?), ("keyed", written_answers(&codec, &args[12], &args[13], held.len())?), ("reference", references)]
+    };
     let nats = |v: i128| decimal_q20(nats_q20(v));
     let share = |n: usize, of: usize| if of == 0 { "-".to_string() } else { format!("{}.{:06}", n * 1_000_000 / of / 1_000_000, n * 1_000_000 / of % 1_000_000) };
     for (name, mut answers) in states {
