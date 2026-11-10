@@ -2009,3 +2009,152 @@ fn a_steps_transfer_is_the_next_sections_change_in_the_small() {
     }
     assert!(read >= 2, "read {read}");
 }
+
+/// A tiny learner grown by a lane and by four contacts (width 16 in two lanes, eight contacts, four of them new), a section into
+/// its life so every moment is open.
+fn grown_learner() -> FieldLearner {
+    let mut learner = FieldLearner::new(Field::found(tiny_declaration(1), &keys(1 << 14)).unwrap(), 6);
+    for _ in 0..2 {
+        learner.section(&[region()]).unwrap();
+    }
+    let stream = keys(1 << 16);
+    let learner = learner.laned(&stream).unwrap();
+    learner.contacted(4, &stream).unwrap()
+}
+
+/// [definition; theory, November 10 19:05] **The founded parts tile the grown entries**: each of the fifteen parts holds entries, the
+/// old entries and `W`'s lane rows hold none, and a new contact's `W` column, `a` row and `b` row are its parts' at every face
+/// coordinate (the lane's included).
+#[test]
+fn the_founded_parts_hold_the_lane_and_the_new_contacts() {
+    let learner = grown_learner();
+    let field = &learner.field;
+    let parts = field.founded_parts(4);
+    let (d, l) = (field.declaration, field.layout().clone());
+    assert_eq!((d.width, d.lanes, d.contacts), (16, 2, 8));
+    let count = |p: usize| parts.iter().filter(|&&q| q as usize == p).count();
+    // f = 8: new contacts are the real parts [2, 4) and the imaginary [6, 8).
+    let new_contacts = [2usize, 3, 6, 7];
+    assert_eq!(count(0), 16 * 4, "W's new columns: every face coordinate of the four new contacts");
+    assert_eq!(count(1), 16 * 4 + 4, "the new a rows and their biases");
+    assert_eq!(count(2), 16 * 4 + 4, "the new b rows and their biases");
+    let (a1, m2) = (d.alphabet + 1, 2 * d.complex());
+    assert_eq!((count(3), count(4), count(5)), (a1 * 8, a1 * 8, a1 * 8));
+    assert_eq!((count(6), count(7), count(8)), (m2 * 8, m2 * 8, m2 * 8));
+    assert_eq!((count(9), count(10)), (8 * m2, 8 * m2));
+    assert_eq!(count(11), 16 * 16 - 8 * 8, "the lift's rows and columns of the lane");
+    assert_eq!(count(12), 4 * 8, "the face biases' lane entries");
+    assert_eq!((count(13), count(14)), (4 * 8, 4 * 8), "the lane's columns of a and b over the old contacts");
+    for &e in &new_contacts {
+        assert!((0..16).all(|r| parts[l.w + r * 8 + e] == 0));
+        assert!((0..16).all(|j| parts[l.a + e * 16 + j] == 1 && parts[l.b + e * 16 + j] == 2));
+    }
+    // An old contact's W column over the face's first lane is no part; over the lane's rows it is none either.
+    assert!((0..16).all(|r| parts[l.w + r * 8] == OLD_PART));
+    assert_eq!(parts.iter().filter(|&&q| q == OLD_PART).count(), field.theta.len() - (0..PARTS).map(count).sum::<usize>());
+    assert!(parts[l.q] == OLD_PART && parts[l.q + 8] == 6);
+}
+
+/// [definition; theory, November 10 19:05] **The cosine rule**: a part whose two displacements run along one line (`c = 1`) goes one octave
+/// faster, one that reverses (`c = −1`) one slower, one at exactly `c = 1/2` rests, and a part with no travel goes slower; never
+/// under the old rate (`octaves 0`) nor past the rate's own bits; the travel is read from three materials by [`part_travel`].
+#[test]
+fn the_cosine_rule_moves_a_part_one_octave_by_its_travel() {
+    use std::cmp::Ordering::*;
+    assert_eq!(PartTravel { entries: 4, dot: 4, first: 4, second: 4 }.against_half(), Greater);
+    assert_eq!(PartTravel { entries: 4, dot: -4, first: 4, second: 4 }.against_half(), Less);
+    assert_eq!(PartTravel { entries: 1, dot: 1, first: 4, second: 1 }.against_half(), Equal, "c = 1/2 exactly");
+    assert_eq!(PartTravel { entries: 1, dot: 1, first: 4, second: 1 }.cosine_micro(), 500_000);
+    assert_eq!(PartTravel { entries: 2, dot: 3, first: 8, second: 2 }.against_half(), Greater, "c = 3/4");
+    assert_eq!(PartTravel { entries: 2, dot: 0, first: 8, second: 0 }.against_half(), Less, "no travel");
+    let mut travel = [PartTravel::default(); PARTS];
+    travel[0] = PartTravel { entries: 4, dot: 4, first: 4, second: 4 };
+    travel[1] = PartTravel { entries: 4, dot: -4, first: 4, second: 4 };
+    travel[2] = PartTravel { entries: 1, dot: 1, first: 4, second: 1 };
+    travel[3] = PartTravel { entries: 4, dot: 4, first: 4, second: 4 };
+    let mut octaves = [0u32; PARTS];
+    (octaves[0], octaves[1], octaves[2], octaves[3]) = (3, 2, 2, 5);
+    let rp = RateParts { contacts_before: 4, octaves };
+    let next = rp.updated(&travel, 6);
+    assert_eq!((next.octaves[0], next.octaves[1], next.octaves[2], next.octaves[3]), (4, 1, 2, 5), "up, down, rest, and the rate's own bits (5 under six)");
+    assert_eq!(next.octaves[4], 0, "the old rate is the floor: a part with no travel at 0 stays at 0");
+    // From three materials: part 0's entries move one way twice, part 1's out and back.
+    let learner = grown_learner();
+    let parts = learner.field.founded_parts(4);
+    let n = parts.len();
+    let (older, mut old, mut now) = (vec![0i32; n], vec![0i32; n], vec![0i32; n]);
+    for (i, &p) in parts.iter().enumerate() {
+        match p {
+            0 => (old[i], now[i]) = (10, 20),
+            1 => (old[i], now[i]) = (10, 0),
+            _ => {}
+        }
+    }
+    let t = part_travel(&parts, &older, &old, &now);
+    assert_eq!((t[0].against_half(), t[1].against_half(), t[2].against_half()), (Greater, Less, Less));
+    assert_eq!(t[0].entries, 64);
+}
+
+/// [definition; theory, November 10 19:05] **A part steps at its own rate, and every part at the old rate is the plain deposit**: with
+/// the parts' octaves zero, three sections give the plain learner's material and moments bit for bit; with a part at `k` octaves its
+/// entries' step is the deposit's at `rate − k` and the old entries' the plain rate's; and the parts' rates round-trip through the
+/// learner's text, a state without them reading as none.
+#[test]
+fn a_part_steps_at_its_own_rate_and_the_plain_rate_is_the_plain_deposit() {
+    let plain = grown_learner();
+    let mut zero = plain.clone();
+    zero.rate_parts = Some(RateParts { contacts_before: 4, octaves: [0; PARTS] });
+    let mut plain = plain;
+    for _ in 0..3 {
+        plain.section(&[region()]).unwrap();
+        zero.section(&[region()]).unwrap();
+    }
+    assert_eq!((plain.field.theta.clone(), plain.first.clone(), plain.second.clone()), (zero.field.theta.clone(), zero.first.clone(), zero.second.clone()), "octaves 0: the plain deposit");
+    // One octave count per part: part 0 (W's new columns) at 2, part 1 (the new a rows) at 3.
+    let mut fast = grown_learner();
+    let mut octaves = [0u32; PARTS];
+    (octaves[0], octaves[1]) = (2, 3);
+    fast.rate_parts = Some(RateParts { contacts_before: 4, octaves });
+    let parts = fast.field.founded_parts(4);
+    let rates = fast.entry_rates();
+    assert!(parts.iter().zip(&rates).all(|(&p, &r)| r == match p { 0 => 4, 1 => 3, _ => 6 }), "rate 6, its octaves less");
+    fast.section(&[region()]).unwrap();
+    let step = fast.last.as_ref().unwrap().step.clone();
+    for &(start, len, grain) in &fast.field.families_all() {
+        for i in start..start + len {
+            assert_eq!(step[i], deposit_step(fast.first[i], fast.second[i], grain, rates[i]), "entry {i} steps at its part's rate");
+        }
+    }
+    // The text.
+    let back = FieldLearner::from_text(&fast.to_text()).unwrap();
+    assert_eq!(back.rate_parts, fast.rate_parts);
+    assert_eq!(back.field.theta, fast.field.theta);
+    let stripped: String = fast.to_text().lines().filter(|l| !l.starts_with("parts ")).map(|l| format!("{l}\n")).collect();
+    assert_eq!(FieldLearner::from_text(&stripped).unwrap().rate_parts, None, "a state without the line has no parts' rates");
+    assert_eq!(stripped, grown_learner_text_of(&fast), "the state's other lines are a plain state's");
+}
+
+/// The learner's text without its parts' rates (what a binary without them writes).
+fn grown_learner_text_of(learner: &FieldLearner) -> String {
+    let mut plain = learner.clone();
+    plain.rate_parts = None;
+    plain.to_text()
+}
+
+/// [measurement; theory, November 10 19:05] The founded parts and their travel read from saved states (`HOLONICS_PARTS_OLDER`,
+/// `HOLONICS_PARTS_OLD`, `HOLONICS_PARTS_NOW`, `HOLONICS_PARTS_BEFORE`: the paths of three learner states of one line and the contact
+/// count before the growth): the entries each part holds and its travel's cosine in millionths, printed as `PART name entries c`, the
+/// line `tools/part_rates.py` is checked against. Reads saved text and computes no model; ignored by default.
+#[test]
+#[ignore]
+#[allow(clippy::disallowed_methods, reason = "an exterior reading of saved state files")]
+fn founded_parts_and_their_cosines_on_saved_states() {
+    let var = |k: &str| std::env::var(k).unwrap_or_else(|_| panic!("{k} names a saved state"));
+    let load = |k: &str| FieldLearner::from_text(&std::fs::read_to_string(var(k)).unwrap()).unwrap();
+    let (older, old, now) = (load("HOLONICS_PARTS_OLDER"), load("HOLONICS_PARTS_OLD"), load("HOLONICS_PARTS_NOW"));
+    let parts = now.field.founded_parts(var("HOLONICS_PARTS_BEFORE").parse().unwrap());
+    let travel = part_travel(&parts, &older.field.theta, &old.field.theta, &now.field.theta);
+    for (name, t) in PART_NAMES.iter().zip(&travel) {
+        println!("PART {name} {} {} {:?}", t.entries, t.cosine_micro(), t.against_half());
+    }
+}

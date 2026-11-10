@@ -255,6 +255,22 @@ pub(super) fn parity(args: &[String], card: &mut dyn FieldRealization) -> Result
         }
         println!("FIELD_PARITY_LANE lanes={} width={} material={}", founded.field.declaration.lanes, founded.field.declaration.width, founded.field.material_len());
     }
+    // [definition; theory, November 10 09:55] Growth in contacts (`FIELD_PARITY_CONTACTS=k`): the founded field (after its lanes) with `k`
+    // more pair contacts ([`FieldLearner::contacted`]), read on both realizations.
+    let mut contacts_before = None;
+    if let Some(k) = std::env::var("FIELD_PARITY_CONTACTS").ok().and_then(|v| v.parse::<usize>().ok()).filter(|&k| k > 0) {
+        contacts_before = Some(founded.field.declaration.contacts);
+        founded = founded.contacted(k, &p.keys).map_err(|e| e.to_string())?;
+        println!("FIELD_PARITY_CONTACTS contacts={} width={} material={}", founded.field.declaration.contacts, founded.field.declaration.width, founded.field.material_len());
+    }
+    // [definition; theory, November 10 19:05] The founded parts' rates (`FIELD_PARITY_PARTS=k`): every part of the lane and the new contacts
+    // `k` octaves faster ([`FieldLearner::rate_parts`]), so both learners deposit at the parts' own rates and their texts, parts' line
+    // included, are compared after every section.
+    if let Some(k) = std::env::var("FIELD_PARITY_PARTS").ok().and_then(|v| v.parse::<u32>().ok()) {
+        let rp = holonics::hnn::tower::field::RateParts { contacts_before: contacts_before.unwrap_or(founded.field.declaration.contacts), octaves: [k; holonics::hnn::tower::field::PARTS] };
+        founded.rate_parts = Some(rp);
+        println!("FIELD_PARITY_PARTS octaves={k} contacts_before={}", rp.contacts_before);
+    }
     // [agent-inferred, November 2] A pace far from the founding (`FIELD_PARITY_PACE=s`, §16): every pace entry drawn from
     // the key file's tail, a 32-bit word shifted down `s` bits, so the clocks run off the byte place (fractional,
     // fast, stopping and backward rates) and the parity reads the series between whole places on both realizations.

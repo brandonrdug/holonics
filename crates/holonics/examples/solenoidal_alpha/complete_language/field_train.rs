@@ -1079,6 +1079,10 @@ pub(super) fn train(args: &[String], realization: &mut dyn FieldRealization) -> 
     // runs its own per-blank rate past the last arrival too (`Field::per_blank_clock`), the clock alone set against §16.47's
     // one-rate stretch, a declared comparison.
     declared_clocks(&mut learner.field);
+    if let Some(rp) = learner.rate_parts {
+        let octaves: Vec<String> = holonics::hnn::tower::field::PART_NAMES.iter().zip(rp.octaves).map(|(n, k)| format!("{n}={k}")).collect();
+        println!("FIELD_PART_RATES contacts_before={} rate_bits={} octaves {}", rp.contacts_before, learner.rate_bits, octaves.join(" "));
+    }
     if learner.field.declaration.alphabet != codec.alphabet() {
         return Err("a continued learner whose alphabet is not the codec's".into());
     }

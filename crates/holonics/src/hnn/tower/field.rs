@@ -4641,6 +4641,152 @@ fn predicted_change(field: &Field, g: &[i128], step: &[i128], halvings: u32) -> 
     i64::try_from(total).ok()
 }
 
+/// [definition; theory, November 10 19:05] **The founded parts**: a part is a family of entries founded together, and steps at a rate
+/// of its own ([`RateParts`]): `W`'s new columns, the new `a` rows, the new `b` rows (with the contacts' biases founded with them),
+/// and each lane family on its own (the second lane's coordinates, [`Field::laned`], of the encodings `E`, `E₋`, `E₊`, the key,
+/// value and probe charts, the current's return, the moment's chart, the readout's lift, the face biases together, and the lane's
+/// columns of `a` and `b`). The old entries (and `W`'s lane rows) are no part.
+pub const PART_NAMES: [&str; 15] = ["w_new", "a_new", "b_new", "enc_lane", "before_lane", "after_lane", "q_lane", "v_lane", "probe_lane", "out_lane", "moment_face_lane", "read_lane", "face_biases_lane", "a_lane", "b_lane"];
+
+/// The number of founded parts ([`PART_NAMES`]).
+pub const PARTS: usize = PART_NAMES.len();
+
+/// The part of an entry no founded part holds.
+pub const OLD_PART: u8 = u8::MAX;
+
+/// [definition; theory, November 10 19:05] **A deposit rate per founded part**: part `p` steps at `2^(−(rate − octaves[p]))`, `octaves[p]`
+/// octaves faster than the old entries' `2^(−rate)`; `contacts_before` the contact count before the growth in contacts, which
+/// tells the new contacts ([`Field::founded_parts`]). Carried in the learner's text, with no run switch; moved between laps from the
+/// saved states by [`RateParts::updated`].
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct RateParts {
+    pub contacts_before: usize,
+    pub octaves: [u32; PARTS],
+}
+
+/// [definition; theory, November 10 19:05] **A part's travel over two laps**: with `d₁ = S_(k−1) − S_(k−2)` and `d₂ = S_k − S_(k−1)` the
+/// part's displacements over the entries it holds, `Σ d₁d₂`, `Σ d₁²` and `Σ d₂²` (on the material's integers, each within `i128`).
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub struct PartTravel {
+    pub entries: usize,
+    pub dot: i128,
+    pub first: i128,
+    pub second: i128,
+}
+
+impl PartTravel {
+    /// The cosine of the two displacements against `1/2`, exactly: `Greater` where `c > 1/2` (straight travel: `4 (Σ d₁d₂)² > Σd₁² Σd₂²`
+    /// with the dot positive), `Less` where `c < 1/2` (a wander, a reversal, or no travel at all), `Equal` where a lap's travel
+    /// equals its wander.
+    pub fn against_half(&self) -> std::cmp::Ordering {
+        use num_bigint::BigInt;
+        if self.first == 0 || self.second == 0 || self.dot <= 0 {
+            return std::cmp::Ordering::Less;
+        }
+        (BigInt::from(4) * BigInt::from(self.dot) * BigInt::from(self.dot)).cmp(&(BigInt::from(self.first) * BigInt::from(self.second)))
+    }
+
+    /// The cosine in millionths (`⌊10⁶ c⌋` toward zero; `0` where a displacement is zero).
+    pub fn cosine_micro(&self) -> i64 {
+        use num_bigint::BigInt;
+        use num_traits::ToPrimitive;
+        let root = (BigInt::from(self.first) * BigInt::from(self.second)).sqrt();
+        if root.sign() != num_bigint::Sign::Plus {
+            return 0;
+        }
+        (BigInt::from(self.dot) * BigInt::from(1_000_000) / root).to_i64().unwrap_or(0)
+    }
+}
+
+/// [definition; theory, November 10 19:05] Each part's travel from three saved materials (`older`, `old`, `now`, each the field's
+/// material in order) over the entries `parts` ([`Field::founded_parts`]) assigns it.
+pub fn part_travel(parts: &[u8], older: &[i32], old: &[i32], now: &[i32]) -> [PartTravel; PARTS] {
+    let mut out = [PartTravel::default(); PARTS];
+    for (i, &p) in parts.iter().enumerate() {
+        if p == OLD_PART {
+            continue;
+        }
+        let (d1, d2) = (i128::from(old[i]) - i128::from(older[i]), i128::from(now[i]) - i128::from(old[i]));
+        let t = &mut out[p as usize];
+        t.entries += 1;
+        t.dot += d1 * d2;
+        t.first += d1 * d1;
+        t.second += d2 * d2;
+    }
+    out
+}
+
+impl RateParts {
+    /// [definition; theory, November 10 19:05] **The update at a lap's end**: each part with `c > 1/2` goes one octave faster, each with
+    /// `c < 1/2` one slower, never under the old rate (`octaves 0`) nor past the rate's own bits (`rate_bits − 1`); a part whose
+    /// travel equals its wander rests.
+    pub fn updated(&self, travel: &[PartTravel; PARTS], rate_bits: u32) -> Self {
+        let mut octaves = self.octaves;
+        for (k, t) in octaves.iter_mut().zip(travel) {
+            *k = match t.against_half() {
+                std::cmp::Ordering::Greater => (*k + 1).min(rate_bits.saturating_sub(1)),
+                std::cmp::Ordering::Less => k.saturating_sub(1),
+                std::cmp::Ordering::Equal => *k,
+            };
+        }
+        Self { octaves, ..*self }
+    }
+}
+
+impl Field {
+    /// [definition; theory, November 10 19:05] **Each material entry's founded part** ([`PART_NAMES`] by index; [`OLD_PART`] none): the
+    /// lane's entries (the face coordinates past the first lane, where the field has more than one) by family, the new contacts'
+    /// (the pair drives' rows and their biases, the pair's return's columns, of the contacts past `contacts_before`'s: real parts
+    /// `[before/2, f/2)`, imaginary `[f/2 + before/2, f)`) over them.
+    pub fn founded_parts(&self, contacts_before: usize) -> Vec<u8> {
+        let (d, l) = (&self.declaration, &self.layout);
+        let (dw, f, m2, a1) = (d.width, d.contacts, 2 * d.complex(), d.alphabet + 1);
+        let lw = if d.lanes > 1 { d.lane_width() } else { dw };
+        let (half_old, half_new) = (contacts_before / 2, f / 2);
+        let new_contact = |e: usize| (half_old..half_new).contains(&e) || e >= half_new + half_old;
+        let mut parts = vec![OLD_PART; self.theta.len()];
+        for (part, start) in [(3u8, l.enc), (4, l.before), (5, l.after)] {
+            for r in 0..a1 {
+                parts[start + r * dw + lw..start + (r + 1) * dw].fill(part);
+            }
+        }
+        for (part, start) in [(6u8, l.q), (7, l.v), (8, l.probe)] {
+            for r in 0..m2 {
+                parts[start + r * dw + lw..start + (r + 1) * dw].fill(part);
+            }
+        }
+        for (part, start) in [(9u8, l.out), (10, l.moment_face)] {
+            parts[start + lw * m2..start + dw * m2].fill(part);
+        }
+        for r in 0..dw {
+            for c in 0..dw {
+                if r >= lw || c >= lw {
+                    parts[l.read + r * dw + c] = 11;
+                }
+            }
+        }
+        for start in [l.out_bias, l.w_bias, l.moment_face_bias, l.lift_bias] {
+            parts[start + lw..start + dw].fill(12);
+        }
+        for (part, start) in [(13u8, l.a), (14, l.b)] {
+            for e in 0..f {
+                parts[start + e * dw + lw..start + (e + 1) * dw].fill(part);
+            }
+        }
+        // The new contacts', over the lane's.
+        for e in (0..f).filter(|&e| new_contact(e)) {
+            for (part, start, bias) in [(1u8, l.a, l.a_bias), (2, l.b, l.b_bias)] {
+                parts[start + e * dw..start + (e + 1) * dw].fill(part);
+                parts[bias + e] = part;
+            }
+            for r in 0..dw {
+                parts[l.w + r * f + e] = 0;
+            }
+        }
+        parts
+    }
+}
+
 /// `base` less `release(step, halvings)` in each entry, and whether any entry moved.
 fn stepped(base: &Field, step: &[i128], halvings: u32) -> Result<(Field, bool)> {
     let mut candidate = base.clone();
@@ -4769,6 +4915,9 @@ pub struct FieldLearner {
     /// section's about as often as gradient noise says, so the read mostly threw away and shrank good steps). `true`
     /// keeps the read as a declared comparison. Not carried in the learner's text.
     pub read_held: bool,
+    /// [definition; theory, November 10 19:05] The founded parts' deposit rates ([`RateParts`]), carried in the learner's text; none
+    /// (every entry at `rate_bits`) in a state without them.
+    pub rate_parts: Option<RateParts>,
     /// [measurement; §16.41] The step the last section stood at, the operand of the next section's
     /// [`FieldReceipt::transfer`]; a reading's operand, not carried in the learner's text, cleared by every growth, and not
     /// kept under the held read (whose next section moves the step before pricing it).
@@ -4781,7 +4930,7 @@ impl FieldLearner {
     pub fn new(field: Field, rate_bits: u32) -> Self {
         let len = field.material_len();
         let drawn = 4 * field.declaration.founding_draws();
-        Self { field, first: vec![0; len], second: vec![0; len], rate_bits, drawn, laps: 0, held: None, read_held: false, last: None }
+        Self { field, first: vec![0; len], second: vec![0; len], rate_bits, drawn, laps: 0, held: None, read_held: false, rate_parts: None, last: None }
     }
 
     /// Whether a deposited step is held for the next regions' read.
@@ -4808,7 +4957,7 @@ impl FieldLearner {
         let second = from.iter().map(|&(i, divided)| if divided { div_nearest(self.second[i], f2) } else { self.second[i] }).collect();
         let drawn = self.drawn + 4 * self.field.growth_draws(factor);
         let rate_bits = self.rate_bits + (usize::BITS - (factor - 1).leading_zeros());
-        Ok(Self { field, first, second, rate_bits, drawn, laps: self.laps, held: None, read_held: self.read_held, last: None })
+        Ok(Self { field, first, second, rate_bits, drawn, laps: self.laps, held: None, read_held: self.read_held, rate_parts: None, last: None })
     }
 
     /// [definition; agent-inferred, November 4, §16.40] **The learner with one more lane** ([`Field::laned`]), the lane's
@@ -4848,7 +4997,7 @@ impl FieldLearner {
             }
         }
         let drawn = self.drawn + 4 * self.field.declaration.lane_draws();
-        Ok(Self { field, first, second, rate_bits: self.rate_bits, drawn, laps: self.laps, held: None, read_held: self.read_held, last: None })
+        Ok(Self { field, first, second, rate_bits: self.rate_bits, drawn, laps: self.laps, held: None, read_held: self.read_held, rate_parts: None, last: None })
     }
 
     /// [definition; theory, November 10 09:55] **The learner with `added` more pair contacts** ([`Field::contacted`]), the
@@ -4879,7 +5028,7 @@ impl FieldLearner {
             }
         }
         let drawn = self.drawn + 4 * self.field.declaration.contact_draws(added);
-        Ok(Self { field, first, second, rate_bits: self.rate_bits, drawn, laps: self.laps, held: None, read_held: self.read_held, last: None })
+        Ok(Self { field, first, second, rate_bits: self.rate_bits, drawn, laps: self.laps, held: None, read_held: self.read_held, rate_parts: None, last: None })
     }
 
     /// The held step read on `regions` without a deposit: the faces of `regions` under the
@@ -4935,6 +5084,20 @@ impl FieldLearner {
         })
     }
 
+    /// [definition; theory, November 10 19:05] **Each entry's deposit rate**: the learner's `rate_bits`, and for an entry of a founded
+    /// part ([`Field::founded_parts`]) that many bits less its part's octaves ([`RateParts`]), never under one bit.
+    pub fn entry_rates(&self) -> Vec<u32> {
+        let mut rates = vec![self.rate_bits; self.field.material_len()];
+        if let Some(rp) = self.rate_parts {
+            for (rate, &p) in rates.iter_mut().zip(&self.field.founded_parts(rp.contacts_before)) {
+                if p != OLD_PART {
+                    *rate = self.rate_bits.saturating_sub(rp.octaves[p as usize]).max(1);
+                }
+            }
+        }
+        rates
+    }
+
     /// One section: the step the section before deposited read on its regions, then its regions
     /// read and returned on the material that stands, the moments moved, and the step deposited
     /// at the size where the regions reread under it code strictly fewer bits ([`scaled`]: its
@@ -4962,10 +5125,11 @@ impl FieldLearner {
         let transfer = self.last.take().and_then(|s| predicted_change(&self.field, &raw, &s.step, s.halvings));
         // [the unified-theory reading of November 6, 08:54] The step the moments would deposit before this section moves them,
         // priced on this section: the external price, a step this section never shaped.
+        let rates = self.entry_rates();
         let mut external_step = vec![0i128; g.len()];
         for &(start, len, grain) in &self.field.families_all() {
             for i in start..start + len {
-                external_step[i] = deposit_step(self.first[i], self.second[i], grain, self.rate_bits);
+                external_step[i] = deposit_step(self.first[i], self.second[i], grain, rates[i]);
             }
         }
         let external = predicted_change(&self.field, &raw, &external_step, 0);
@@ -4987,7 +5151,7 @@ impl FieldLearner {
         let mut step = vec![0i128; g.len()];
         for &(start, len, grain) in &self.field.families_all() {
             for i in start..start + len {
-                step[i] = deposit_step(self.first[i], self.second[i], grain, self.rate_bits);
+                step[i] = deposit_step(self.first[i], self.second[i], grain, rates[i]);
             }
         }
         let predicted = predicted_change(&self.field, &raw, &step, 0);
@@ -5021,7 +5185,7 @@ impl FieldLearner {
         let (mut first, mut second) = (self.first.clone(), self.second.clone());
         first.resize(len, 0);
         second.resize(len, 0);
-        Ok(Self { field, first, second, rate_bits: self.rate_bits, drawn, laps: self.laps, held: None, read_held: self.read_held, last: None })
+        Ok(Self { field, first, second, rate_bits: self.rate_bits, drawn, laps: self.laps, held: None, read_held: self.read_held, rate_parts: None, last: None })
     }
 
     /// [measurement; agent-inferred, November 3, §16.31] **Each family's step coherence**: over the family's entries, `Σ |m|`
@@ -5047,7 +5211,11 @@ impl FieldLearner {
             Some(h) => (h.halvings.to_string(), format!("{}\n", join(&h.step))),
             None => ("-".to_string(), String::new()),
         };
-        format!("hnn-field-learner-v3 {} {} {} {held}\n{}{}\n{}\n{step}", self.rate_bits, self.drawn, self.laps, self.field.to_text(), join(&self.first), join(&self.second))
+        {
+            // [definition; theory, November 10 19:05] The founded parts' rates, a trailing line a binary without them never reads.
+            let parts = self.rate_parts.map_or(String::new(), |rp| format!("parts {} {}\n", rp.contacts_before, rp.octaves.iter().map(u32::to_string).collect::<Vec<_>>().join(" ")));
+            format!("hnn-field-learner-v3 {} {} {} {held}\n{}{}\n{}\n{step}{parts}", self.rate_bits, self.drawn, self.laps, self.field.to_text(), join(&self.first), join(&self.second))
+        }
     }
 
     pub fn from_text(text: &str) -> Result<Self> {
@@ -5077,7 +5245,22 @@ impl FieldLearner {
                 Some(HeldStep { step, halvings })
             }
         };
-        Ok(Self { field, first, second, rate_bits, read_held: held.is_some(), drawn, laps, held, last: None })
+        // [definition; theory, November 10 19:05] The founded parts' rates, a trailing line (`parts CONTACTS_BEFORE k₀ … k₁₄`).
+        let rate_parts = match lines.peek() {
+            Some(l) if l.starts_with("parts ") => {
+                let v = read_numbers::<usize>(lines.next().and_then(|l| l.strip_prefix("parts ")))?;
+                if v.len() != 1 + PARTS {
+                    return refuse("a learner's founded parts' rates that are not one a part");
+                }
+                let mut octaves = [0u32; PARTS];
+                for (slot, &k) in octaves.iter_mut().zip(&v[1..]) {
+                    *slot = u32::try_from(k).map_err(|_| TowerError::Refused("a part's octaves past a count"))?;
+                }
+                Some(RateParts { contacts_before: v[0], octaves })
+            }
+            _ => None,
+        };
+        Ok(Self { field, first, second, rate_bits, read_held: held.is_some(), drawn, laps, held, rate_parts, last: None })
     }
 }
 
