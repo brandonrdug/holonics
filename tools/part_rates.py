@@ -1,4 +1,4 @@
-#!/usr/bin/env python3 -I
+#!/usr/bin/env -S python3 -I
 """part_rates.py: the founded parts' deposit rates, moved between laps from saved states (host arithmetic: no card, no model).
 
   part_rates.py open STATE CONTACTS_BEFORE OCTAVES OUT

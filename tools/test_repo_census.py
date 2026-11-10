@@ -152,6 +152,29 @@ class CensusTests(unittest.TestCase):
         self.assertIn("retired by name: target", manifest), self.assertIn("tag archive/wt/old-read", manifest)
         self.assertEqual(self.g("rev-parse", "archive/wt/old-read"), self.read_head)
 
+    def test_a_worktree_that_a_run_or_a_process_only_reads_is_live(self):
+        r, elsewhere = self.repo / ".local/wt/old-read", self.repo / ".local/wt/fresh"
+        old = time.time() - 5 * 86400
+        os.utime(r / ".local/run/x.bin", (old, old))
+        reader = subprocess.Popen([sys.executable, "-c", "import time; time.sleep(120)", f"--units={r}/.local/run/x.bin"])
+        self.addCleanup(reader.kill)
+        code, out = self.tool("--retire", "old-read")
+        self.assertRegex(out, r"live \(process \d+\)")
+        reader.kill(), reader.wait()
+        reg, script = self.repo / ".local/dispatch", elsewhere / "lap.sh"
+        reg.mkdir(parents=True)
+        (reg / "lap.json").write_text(json.dumps({"name": "lap", "backend": "colab", "cwd": str(elsewhere),
+                                                  "script": str(script)}))
+        for spelling in (f"{r}/.local/run/x.bin", ".local/wt/old-read/.local/run/x.bin", "../old-read/.local/run/x.bin"):
+            script.write_text(f"learner --units {spelling}\n")
+            code, out = self.tool("--retire", "old-read")
+            self.assertIn("live (run lap reads it)", out, spelling)
+            self.assertTrue(r.exists())
+        script.write_text("learner --units ../old-read-2/x.bin .local/wt/old-reading/x\n")  # other worktrees' names
+        code, out = self.tool("--retire", "old-read")
+        self.assertNotIn("FAILED", out)
+        self.assertFalse(r.exists(), out)
+
     def test_retire_takes_the_inner_worktree_first(self):
         outer = self.repo / ".local/wt/outer"
         code, out = self.tool("--retire", "outer")

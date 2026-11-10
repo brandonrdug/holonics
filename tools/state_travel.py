@@ -1,4 +1,4 @@
-#!/usr/bin/env python3 -I
+#!/usr/bin/env -S python3 -I
 """state_travel.py G L2 L4: the travel of a grown field's entries, read on the host from three saved learner states (no card, no
 learning; arithmetic on the states' material lines).
 

@@ -21,7 +21,8 @@ contract, and the steps that would repair them. With no flag it changes nothing 
 
 "Untouched" is read from modification times, and a worktree whose states or binaries are only read by a run elsewhere
 looks idle. Retiring it loses nothing but moves its `.local/` to the archive, so a script that names the old path
-breaks. Before an idle sweep, name such worktrees with `--keep`, and read the sweep with `--dry-run` first.
+breaks. A registered run's script is read for the worktrees it names, but a path built at run time or held in a saved
+state is not seen. Before an idle sweep, name such worktrees with `--keep`, and read the sweep with `--dry-run` first.
 
 What "loses nothing" means, clause by clause:
 - A merged branch's commits are on `origin/main`, so deleting the name loses nothing.
@@ -31,8 +32,9 @@ What "loses nothing" means, clause by clause:
 - A retired worktree's `.local/` is moved whole to `<main>/.local/archive/wt/<date>-<name>/`, with every other
   untracked or ignored file, a patch of its uncommitted changes and a manifest. Build products (BUILD_PRODUCTS) are
   retired by name. A detached head that no ref reaches is tagged `archive/wt/<name>` first.
-- A worktree with a live run is never touched: a run in the registry of `tools/runs.py` that has not ended, a process
-  whose directory is inside the worktree, or a file under its `.local/` written in the last day.
+- A worktree with a live run is never touched: a run in the registry of `tools/runs.py` that has not ended and that
+  stands in the worktree or whose script names it, a process whose directory, executable or command line is inside
+  it, or a file under its `.local/` written in the last day.
 
 Housekeeping runs on the host. Through a mount, a container or a VM the worktrees' recorded paths do not resolve and
 git reads every one of them as prunable (all 89 did on November 10, 2026); pruning there would cut live worktrees from
@@ -66,6 +68,7 @@ PROTECTED = {"main", "codex/apple-silicon"}
 PROTECTED_PREFIXES = ("archive/",)
 BUILD_PRODUCTS = ("target", "lean/.lake", "__pycache__", ".pytest_cache", "node_modules")
 DAY = 86400
+SCRIPT_READ = 4 << 20  # a run's script is read for the paths it names up to this many bytes
 ROOT = None  # the main checkout, set in main()
 DRY = False  # --dry-run: print each step, do none
 
@@ -183,6 +186,38 @@ def unit_active(unit):
     return r.stdout.strip() in ("active", "activating", "deactivating")
 
 
+def names_path(text, forms):
+    """Whether a text names one of the spellings of a path, and not a longer name that begins with it."""
+    for form in forms:
+        at = text.find(form)
+        while at >= 0:
+            end = at + len(form)
+            if end == len(text) or not (text[end].isalnum() or text[end] in "_-."):
+                return True
+            at = text.find(form, at + 1)
+    return False
+
+
+def script_names(entry, path):
+    """Whether a registered run's script names the worktree: by its absolute path, by its path from the main checkout,
+    or by its path from the run's own directory. A run that only reads a worktree's states or binaries shows nowhere
+    else (on November 10, 2026 a worktree whose file fed every lap of a live run stood on an idle sweep's list)."""
+    script = Path(str(entry.get("script") or ""))
+    try:
+        if not script.is_file() or script.stat().st_size > SCRIPT_READ:
+            return False
+        text = script.read_text(errors="replace")
+    except OSError:
+        return False
+    forms = [str(path)]
+    for start in (ROOT.resolve(), entry.get("cwd")):
+        if start:
+            rel = os.path.relpath(path, str(start))
+            if rel != "." and not os.path.isabs(rel) and rel.strip("./"):
+                forms.append(rel)
+    return names_path(text, forms)
+
+
 def live_reasons(path):
     """Why a worktree must not be touched now."""
     path, why = path.resolve(), []
@@ -194,12 +229,13 @@ def live_reasons(path):
             continue
         inside = any(str(e.get(k, "")).startswith(str(path) + os.sep) or e.get(k) == str(path)
                      for k in ("cwd", "out", "log", "script"))
-        if not inside:
+        reads = not inside and script_names(e, path)
+        if not (inside or reads):
             continue
         ended = (reg / f"{e.get('name')}.exit").exists()
         active = unit_active(e["unit"]) if e.get("backend") == "local" and e.get("unit") else None
         if active or (active is None and not ended):
-            why.append(f"run {e.get('name')}")
+            why.append(f"run {e.get('name')}" + (" reads it" if reads else ""))
     mine = set()
     pid = os.getpid()
     while pid > 1:  # this process and its ancestors may stand inside the worktree
@@ -211,11 +247,17 @@ def live_reasons(path):
     for p in Path("/proc").glob("[0-9]*"):
         if int(p.name) in mine:
             continue
+        spots = []  # where the process stands, what it runs, and what its command line names
+        for link in ("cwd", "exe"):
+            try:
+                spots.append(os.readlink(p / link))
+            except OSError:
+                pass
         try:
-            cwd = os.readlink(p / "cwd")
+            spots += [a for a in (p / "cmdline").read_bytes().decode(errors="replace").split("\0") if a]
         except OSError:
-            continue
-        if cwd == str(path) or cwd.startswith(str(path) + os.sep):
+            pass
+        if any(s == str(path) or (str(path) + os.sep) in s for s in spots):
             why.append(f"process {p.name}")
             break
     local = path / ".local"
