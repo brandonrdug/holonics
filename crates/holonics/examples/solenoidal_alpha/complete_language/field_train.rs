@@ -6965,6 +6965,38 @@ mod tests {
         let _ = std::fs::remove_dir_all(&dir);
     }
 
+    /// [theory, November 10 04:40] `reach2-field` end to end on the host: every (set, d, far, letter) is a row (far a letter, the
+    /// void, or the blank of an open place), and each offset counts every site of its set once.
+    #[test]
+    fn the_reach_census_on_2bs_charge_counts_every_site_once_an_offset() {
+        let dir = std::env::temp_dir().join(format!("holonics-reach2-{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&dir);
+        std::fs::create_dir_all(&dir).expect("dir");
+        let put = |name: &str, bytes: &[u8]| {
+            std::fs::write(dir.join(name), bytes).expect("write");
+            (dir.join(name).to_string_lossy().into_owned(), sha256(bytes).expect("sha"))
+        };
+        let (codec, problems) = toy();
+        let learner = toy_learner(&codec, &problems);
+        let keys: Vec<u8> = (0..1u64 << 13).flat_map(|i| mix(0x5EED, i).to_be_bytes()).collect();
+        let (state, state_sha) = put("STATE", learner.to_text().as_bytes());
+        let (units, units_sha) = put("UNITS", b"founded-units-v1 0\n");
+        let (train, train_sha) = put("TRAIN", TOY);
+        let (held, held_sha) = put("HELD", TOY);
+        let (key, key_sha) = put("KEYS", &keys);
+        let out = dir.join("OUT").to_string_lossy().into_owned();
+        let args: Vec<String> = ["reach2-field", &units, &units_sha, &train, &train_sha, &held, &held_sha, &key, &key_sha, "2", "0", &state, &state_sha, "-", "1", &out].iter().map(|s| s.to_string()).collect();
+        reach2_field(&args, &mut HostField).unwrap();
+        let a = learner.field.declaration.alphabet;
+        let text = std::fs::read_to_string(dir.join("OUT/REACH2.tsv")).unwrap();
+        assert_eq!(text.lines().count(), 1 + 3 * 2 * REACH.len() * (a + 1) * a);
+        for name in ["train_even", "train_odd", "held"] {
+            let at = |d: &str| -> usize { text.lines().skip(1).map(|l| l.split('\t').collect::<Vec<_>>()).filter(|c| c[0] == name && c[1] == d).map(|c| c[4].parse::<usize>().unwrap()).sum() };
+            assert_eq!(at("-1"), at("256"), "{name}: every offset counts every site once");
+        }
+        let _ = std::fs::remove_dir_all(&dir);
+    }
+
     /// [theory, November 10 03:45] `reach-census-field` end to end on the host: every (set, d, far letter, letter) is a row, and
     /// at each offset every place of its set is counted once.
     #[test]
@@ -6987,7 +7019,8 @@ mod tests {
         let args: Vec<String> = ["reach-census-field", &state, &state_sha, &codec_path, &codec_sha, &units, &units_sha, &held, &held_sha, &train, &train_sha, "every-1", &out].iter().map(|s| s.to_string()).collect();
         reach_census_field(&args, &mut HostField).unwrap();
         let a = learner.field.declaration.alphabet;
-        let text = std::fs::read_to_string(dir.join("OUT/REACH.tsv")).unwrap();
+        let text: String = ["held", "train_even", "train_odd"].iter().map(|s| std::fs::read_to_string(dir.join(format!("OUT/REACH.{s}.tsv"))).unwrap().lines().skip(1).map(|l| format!("{l}\n")).collect::<String>()).collect();
+        let text = format!("header\n{text}");
         assert_eq!(text.lines().count(), 1 + 3 * 2 * REACH.len() * a * a);
         let places: [usize; 3] = [problems.iter().map(|p| p.1.len()).sum(), problems.iter().step_by(2).map(|p| p.1.len()).sum(), problems.iter().skip(1).step_by(2).map(|p| p.1.len()).sum()];
         for (set, name) in ["held", "train_even", "train_odd"].iter().enumerate() {
@@ -9231,6 +9264,10 @@ pub(super) struct SiteRead<'a> {
     pub key: &'a [i64],
     pub probe: &'a [i64],
     pub chart: &'a [i32],
+    /// [theory, November 10 04:40] Its region's classes and open sites, and its place in them.
+    pub classes: &'a [usize],
+    pub open: &'a [bool],
+    pub at: usize,
 }
 
 /// One visit of a training lap's own states ([`plate_joint_field`]): the first `take` sections of `order`, their regions and
@@ -9293,6 +9330,9 @@ fn lap_visit(codec: &FieldCodec, train: &Problems, sections: &[Vec<usize>], path
                     key: &words[t * m2..(t + 1) * m2],
                     probe: &probes[t * m2..(t + 1) * m2],
                     chart: &charts[t * dw..(t + 1) * dw],
+                    classes: r.classes,
+                    open: r.unresolved,
+                    at: t,
                 });
                 own_code += face.code(r.classes[t]) as i128;
                 charge.question += u64::from(asked);
@@ -9760,7 +9800,7 @@ pub(super) fn phase_field(args: &[String], realization: &mut dyn FieldRealizatio
         for (ri, (c, u)) in chunk.iter().enumerate() {
             for t in (0..c.len()).filter(|&t| u[t]) {
                 let face = words.faces[ri][t].as_ref().ok_or("a held state's open place without a face")?;
-                census.add(2, &SiteRead { leaf: &words.plates[ri][t * heads..(t + 1) * heads], face, truth: c[t], octave: None, asked: false, problem: ri, key: &words.words[ri][t * m2..(t + 1) * m2], probe: &words.probes[ri][t * m2..(t + 1) * m2], chart: &words.charts[ri][t * dw..(t + 1) * dw] }, &edges);
+                census.add(2, &SiteRead { leaf: &words.plates[ri][t * heads..(t + 1) * heads], face, truth: c[t], octave: None, asked: false, problem: ri, key: &words.words[ri][t * m2..(t + 1) * m2], probe: &words.probes[ri][t * m2..(t + 1) * m2], chart: &words.charts[ri][t * dw..(t + 1) * dw], classes: c, open: u, at: t }, &edges);
             }
         }
     }
@@ -9853,6 +9893,153 @@ fn parity_sample<'p>(train: &'p [(Vec<u8>, Vec<u8>)], parity: usize, sample: &st
 /// [definition; theory, November 10 03:45] The reach census's offsets: `±1, 2, 3, 4, 6, 8, 12, 16, …, 192, 256`.
 const REACH: [usize; 16] = [1, 2, 3, 4, 6, 8, 12, 16, 24, 32, 48, 64, 96, 128, 192, 256];
 
+/// [measurement; theory, November 10 04:40] **The reach census's sums on a partly locked state**: `N` and `F` by
+/// `[set][offset][far][letter]`, the far place's letter where it is locked, a blank (`far = alphabet`) where it is open, the void
+/// past the region's ends; `F` each share on the face's width `2^(−62)`, its remainder carried on `2^(−94)`.
+struct Reach2 {
+    a: usize,
+    offsets: Vec<i64>,
+    n: Vec<u64>,
+    f: Vec<u128>,
+    fc: Vec<i128>,
+    places: [usize; 3],
+}
+
+impl Reach2 {
+    fn new(a: usize) -> Self {
+        let offsets: Vec<i64> = REACH.iter().flat_map(|&d| [-(d as i64), d as i64]).collect();
+        let cells = 3 * offsets.len() * (a + 1) * a;
+        Self { a, offsets, n: vec![0; cells], f: vec![0; cells], fc: vec![0; cells], places: [0; 3] }
+    }
+
+    fn add(&mut self, set: usize, face: &holonics::hnn::tower::TowerFace, truth: usize, classes: &[usize], open: &[bool], at: usize, void: usize) {
+        let shares: Vec<(u128, i128)> = face
+            .masses
+            .iter()
+            .map(|&m| {
+                let share = (m << 62) / face.total;
+                let rem = (m << 62) - share * face.total;
+                (share, (((rem << 32) + face.total / 2) / face.total) as i128)
+            })
+            .collect();
+        let a = self.a;
+        for (o, &d) in self.offsets.iter().enumerate() {
+            let far = match usize::try_from(at as i64 + d).ok().filter(|&u| u < classes.len()) {
+                Some(u) if open[u] => a,
+                Some(u) => classes[u],
+                None => void,
+            };
+            let cell = ((set * self.offsets.len() + o) * (a + 1) + far) * a;
+            self.n[cell + truth] += 1;
+            for (l, &(share, carried)) in shares.iter().enumerate() {
+                self.f[cell + l] += share;
+                self.fc[cell + l] += carried;
+            }
+        }
+        self.places[set] += 1;
+    }
+}
+
+/// [measurement; theory, November 10 04:40] `reach2-field UNITS UNITS_SHA TRAIN TRAIN_SHA HELD HELD_SHA KEYS KEYS_SHA SECTION
+/// SECTIONS STATE STATE_SHA LINE EVERY OUT`: **the reach census on census 2b's charge set**: the lap's own partly locked states
+/// ([`lap_visit`], 2b's checks with `LINE`), at the answer sites it charges of TRAIN's spread sample (every `EVERY`th problem of
+/// each parity of the index, two sets), and the held problems' own joint states (every open place); at each site `t` and each
+/// offset `d = ±`[`REACH`], the far place's letter where it is locked, a blank where it is open and the void past the region's
+/// ends, against the letter at `t` ([`Reach2`]). `REACH2.tsv` holds every (set, d, far, letter, n, f) (far `blank` for an open
+/// place); `FIELD_REACH2` a line per (set, d): `U` a place, `Σ N ln(N/F)` over (far, letter) less the same with far pooled, and
+/// the places. Numbers only.
+pub(super) fn reach2_field(args: &[String], realization: &mut dyn FieldRealization) -> Result<()> {
+    if args.len() != 16 {
+        return Err("reach2-field UNITS UNITS_SHA TRAIN TRAIN_SHA HELD HELD_SHA KEYS KEYS_SHA SECTION SECTIONS STATE STATE_SHA LINE EVERY OUT".into());
+    }
+    let started = std::time::Instant::now();
+    let units = units_of(&args[1], &args[2])?;
+    let train_problems = problems_of(&pinned_read(&args[3], &args[4], READ_BUDGET as usize)?);
+    let dev_problems = problems_of(&pinned_read(&args[5], &args[6], READ_BUDGET as usize)?);
+    let keys = pinned_read(&args[7], &args[8], READ_BUDGET as usize)?;
+    let (section, limit) = (positive(&args[9])?, count(&args[10])?);
+    let mut learner = FieldLearner::from_text(std::str::from_utf8(&pinned_read(&args[11], &args[12], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
+    declared_clocks(&mut learner.field);
+    let line = args[13].as_str();
+    let every = positive(&args[14])?;
+    let out = Path::new(&args[15]);
+    std::fs::create_dir(out)?;
+    let codec = FieldCodec::found(units, &train_problems)?;
+    let encode = |problems: &[(Vec<u8>, Vec<u8>)]| -> Result<Problems> {
+        problems.par_iter().map(|(q, a)| Ok((codec.encode(&question_text(q)).map_err(|e| e.to_string())?, codec.encode(a).map_err(|e| e.to_string())?, a.len()))).collect::<std::result::Result<Vec<_>, String>>().map_err(|e| e.into())
+    };
+    let train_set = encode(&train_problems)?;
+    let dev_set: Problems = encode(&dev_problems)?.into_iter().filter(|(_, a, _)| a.len() < codec.answer).collect();
+    let seed = u64::from_be_bytes(keys.get(keys.len().saturating_sub(8)..).filter(|w| w.len() == 8).ok_or("a key file of fewer than eight bytes")?.try_into()?);
+    let (sections, _) = sections_of(&train_set, section, dev_set.len(), seed);
+    if learner.holds_step() {
+        return Err("reach2-field reads a state that holds no step (it never deposits)".into());
+    }
+    println!("FIELD_CLOCKS per_blank={} bare={} laps_read={}", learner.field.per_blank_clock, learner.field.bare_stretch, learner.laps);
+    let (a, void) = (learner.field.declaration.alphabet, codec.void());
+    let read = learner.laps;
+    let draw = read * train_set.len() as u64;
+    let paths = paths_of(seed, read, &sections);
+    let order = walk(seed, read, sections.len());
+    let take = if limit == 0 { order.len() } else { limit.min(order.len()) };
+    let mut sums = Reach2::new(a);
+    let charge = lap_visit(&codec, &train_set, &sections, &paths, &order[..take], seed, draw, &mut learner, realization, true, Some(line), &mut |site| {
+        if !site.asked && (site.problem / 2) % every == 0 {
+            sums.add(site.problem % 2, site.face, site.truth, site.classes, site.open, site.at, void);
+        }
+    })?;
+    let bounded = charge.sites <= charge.bound;
+    println!("FIELD_CHECK check=2 result={} charged={} question={} answer={} bound={} sections={take}", if bounded { "PASS" } else { "FAIL" }, charge.sites, charge.question, charge.sites - charge.question, charge.bound);
+    println!("FIELD_CHECK check=3 part=visit result={} leaks={}", if charge.leaks == 0 { "PASS" } else { "FAIL" }, charge.leaks);
+    if !bounded || charge.leaks > 0 {
+        return Err("the reach census refuses to read: a check failed over the visit".into());
+    }
+    let train_ms = started.elapsed().as_millis();
+    let mut states: Vec<(Vec<usize>, Vec<bool>)> = Vec::new();
+    for (i, (q, ans, _)) in dev_set.iter().enumerate() {
+        states.extend(joint_states(void, q, ans, seed, i as u64).into_iter().map(|(c, u, _)| (c, u)));
+    }
+    for chunk in states.chunks(64) {
+        let views: Vec<Region> = chunk.iter().map(|(c, u)| Region { classes: c, unresolved: u, faces: &[], locked: &[], echo: &[], domain: None, port: None }).collect();
+        let faces = realization.read_faces(&learner.field, &views).map_err(|e| e.to_string())?;
+        for ((c, u), f) in chunk.iter().zip(&faces) {
+            for t in (0..c.len()).filter(|&t| u[t]) {
+                let face = f[t].as_ref().ok_or("a held state's open place without a face")?;
+                sums.add(2, face, c[t], c, u, t, void);
+            }
+        }
+    }
+    let names = ["train_even", "train_odd", "held"];
+    let folded = |i: usize| -> u128 { (sums.f[i] as i128 + ((sums.fc[i] + (1 << 31)) >> 32)).max(0) as u128 };
+    let on20 = |v: u128| -> u128 { (v + (1 << 41)) >> 42 };
+    let charged = |counts: &[u64], expected: &[u128]| -> i128 { counts.iter().zip(expected).filter(|&(&c, _)| c > 0).map(|(&c, &e)| c as i128 * log2_ratio(c, e)).sum() };
+    let mut file = rows_file(&out.join("REACH2.tsv"), "set\td\tfar\tletter\tn\tf_q62\n")?;
+    for (set, name) in names.iter().enumerate() {
+        for (o, &d) in sums.offsets.iter().enumerate() {
+            let base = (set * sums.offsets.len() + o) * (a + 1) * a;
+            let (mut joint, mut pooled_n, mut pooled_f) = (0i128, vec![0u64; a], vec![0u128; a]);
+            for far in 0..=a {
+                let cell = base + far * a;
+                let counts = &sums.n[cell..cell + a];
+                let expected: Vec<u128> = (0..a).map(|l| folded(cell + l)).collect();
+                joint += charged(counts, &expected.iter().map(|&v| on20(v)).collect::<Vec<_>>());
+                let far_name = if far == a { "blank".to_string() } else { far.to_string() };
+                for l in 0..a {
+                    pooled_n[l] += counts[l];
+                    pooled_f[l] += expected[l];
+                    row(&mut file, &format!("{name}\t{d}\t{far_name}\t{l}\t{}\t{}\n", counts[l], expected[l]))?;
+                }
+            }
+            let marginal = charged(&pooled_n, &pooled_f.iter().map(|&v| on20(v)).collect::<Vec<_>>());
+            let places = sums.places[set];
+            let per = |v: i128| if places == 0 { "-".to_string() } else { decimal_q20(nats_q20(v) / places as i128) };
+            println!("FIELD_REACH2 set={name} d={d} places={places} u_nats_a_place={} joint_nats_a_place={} pooled_nats_a_place={}", per(joint - marginal), per(joint), per(marginal));
+        }
+    }
+    println!("FIELD_REACH2_DONE sections={take} of={} train_ms={train_ms} ms={}", order.len(), started.elapsed().as_millis());
+    Ok(())
+}
+
 /// [measurement; theory, November 10 03:45] `reach-census-field STATE STATE_SHA CODEC CODEC_SHA UNITS UNITS_SHA HELD HELD_SHA
 /// TRAIN TRAIN_SHA SAMPLE OUT`: **the reach census**, on the ring census's locked visit ([`ring_census_field`]: each reference
 /// cut to its room, every answer place read once with the rest locked, [`Field::locked_faces`]), three sets (the held
@@ -9862,9 +10049,13 @@ const REACH: [usize; 16] = [1, 2, 3, 4, 6, 8, 12, 16, 24, 32, 48, 64, 96, 128, 1
 /// the nearest in `REACH.tsv`). `REACH.tsv` holds every (set, d, far letter, letter, n, f); `FIELD_REACH` a line per (set, d):
 /// `U` a place, `Σ N ln(N/F)` over (far letter, letter) less the same with the far letter pooled, and the places. Numbers
 /// only.
+///
+/// [measurement; theory, November 10 04:55] `SET` (held, train_even or train_odd, before `OUT`) reads that set alone; every set's
+/// table is written as `REACH.<set>.tsv` at the end of its set, and its `FIELD_REACH` lines flushed there, so a partition of the
+/// sets across runs loses nothing a deadline stops.
 pub(super) fn reach_census_field(args: &[String], realization: &mut dyn FieldRealization) -> Result<()> {
-    if args.len() != 13 {
-        return Err("reach-census-field STATE STATE_SHA CODEC CODEC_SHA UNITS UNITS_SHA HELD HELD_SHA TRAIN TRAIN_SHA SAMPLE OUT".into());
+    if args.len() != 13 && args.len() != 14 {
+        return Err("reach-census-field STATE STATE_SHA CODEC CODEC_SHA UNITS UNITS_SHA HELD HELD_SHA TRAIN TRAIN_SHA SAMPLE [SET] OUT".into());
     }
     let started = std::time::Instant::now();
     let mut learner = FieldLearner::from_text(std::str::from_utf8(&pinned_read(&args[1], &args[2], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
@@ -9875,11 +10066,15 @@ pub(super) fn reach_census_field(args: &[String], realization: &mut dyn FieldRea
     let held = problems_of(&pinned_read(&args[7], &args[8], READ_BUDGET as usize)?);
     let train = problems_of(&pinned_read(&args[9], &args[10], READ_BUDGET as usize)?);
     let sample = args[11].as_str();
-    let out = Path::new(&args[12]);
+    let only = (args.len() == 14).then(|| args[12].as_str());
+    let out = Path::new(&args[args.len() - 1]);
     std::fs::create_dir(out)?;
     let void = codec.void();
     let a = field.declaration.alphabet;
     let names = ["held", "train_even", "train_odd"];
+    if only.is_some_and(|o| !names.contains(&o)) {
+        return Err("a reach census set that is not held, train_even or train_odd".into());
+    }
     let sets: [Vec<&(Vec<u8>, Vec<u8>)>; 3] = [held.iter().collect(), parity_sample(&train, 0, sample)?, parity_sample(&train, 1, sample)?];
     let offsets: Vec<i64> = REACH.iter().flat_map(|&d| [-(d as i64), d as i64]).collect();
     // [set][d][far][letter]: counts, shares on 2^(−62) and their carried remainders on 2^(−94).
@@ -9888,6 +10083,9 @@ pub(super) fn reach_census_field(args: &[String], realization: &mut dyn FieldRea
     let mut places = [0usize; 3];
     const BATCH: usize = 32;
     for (set, problems) in sets.iter().enumerate() {
+        if only.is_some_and(|o| o != names[set]) {
+            continue;
+        }
         for (b, batch) in problems.chunks(BATCH).enumerate() {
             let requests: Vec<(Vec<usize>, usize)> = batch.iter().map(|(question, _)| opening(&codec, field, question, b"")).collect::<std::result::Result<_, String>>()?;
             let mut answers: Vec<Vec<usize>> = Vec::with_capacity(batch.len());
@@ -9928,33 +10126,40 @@ pub(super) fn reach_census_field(args: &[String], realization: &mut dyn FieldRea
             println!("FIELD_REACH_BATCH set={} batch={b} problems={} places={} elapsed_ms={}", names[set], batch.len(), places[set], started.elapsed().as_millis());
             let _ = std::io::Write::flush(&mut std::io::stdout());
         }
+        reach_table(&out.join(format!("REACH.{}.tsv", names[set])), names[set], &offsets, a, &n[set * offsets.len() * a * a..(set + 1) * offsets.len() * a * a], &f[set * offsets.len() * a * a..(set + 1) * offsets.len() * a * a], &fc[set * offsets.len() * a * a..(set + 1) * offsets.len() * a * a], places[set])?;
     }
-    // Each cell's F on 2^(−62), its carried remainder folded in to the nearest, and on the codes' 2^(−20).
+    println!("FIELD_REACH_DONE ms={}", started.elapsed().as_millis());
+    Ok(())
+}
+
+/// One reach census set's table (`[d][far][letter]`: its counts, shares on `2^(−62)` and their carried remainders on `2^(−94)`)
+/// written to `path` (set, d, far, letter, n, f folded to the nearest) and its `FIELD_REACH` lines printed and flushed: `U` a
+/// place, `Σ N ln(N/F)` over (far, letter) less the same with the far letter pooled.
+#[allow(clippy::too_many_arguments)]
+fn reach_table(path: &Path, name: &str, offsets: &[i64], a: usize, n: &[u64], f: &[u128], fc: &[i128], places: usize) -> Result<()> {
     let folded = |i: usize| -> u128 { (f[i] as i128 + ((fc[i] + (1 << 31)) >> 32)).max(0) as u128 };
     let on20 = |v: u128| -> u128 { (v + (1 << 41)) >> 42 };
     let charge = |counts: &[u64], expected: &[u128]| -> i128 { counts.iter().zip(expected).filter(|&(&c, _)| c > 0).map(|(&c, &e)| c as i128 * log2_ratio(c, e)).sum() };
-    let mut file = rows_file(&out.join("REACH.tsv"), "set\td\tfar\tletter\tn\tf_q62\n")?;
-    for (set, name) in names.iter().enumerate() {
-        for (o, &d) in offsets.iter().enumerate() {
-            let base = (set * offsets.len() + o) * a * a;
-            let (mut joint, mut pooled_n, mut pooled_f) = (0i128, vec![0u64; a], vec![0u128; a]);
-            for far in 0..a {
-                let cell = base + far * a;
-                let counts = &n[cell..cell + a];
-                let expected: Vec<u128> = (0..a).map(|l| folded(cell + l)).collect();
-                joint += charge(counts, &expected.iter().map(|&v| on20(v)).collect::<Vec<_>>());
-                for l in 0..a {
-                    pooled_n[l] += counts[l];
-                    pooled_f[l] += expected[l];
-                    row(&mut file, &format!("{name}\t{d}\t{far}\t{l}\t{}\t{}\n", counts[l], expected[l]))?;
-                }
+    let per = |v: i128| if places == 0 { "-".to_string() } else { decimal_q20(nats_q20(v) / places as i128) };
+    let mut file = rows_file(path, "set\td\tfar\tletter\tn\tf_q62\n")?;
+    for (o, &d) in offsets.iter().enumerate() {
+        let base = o * a * a;
+        let (mut joint, mut pooled_n, mut pooled_f) = (0i128, vec![0u64; a], vec![0u128; a]);
+        for far in 0..a {
+            let cell = base + far * a;
+            let counts = &n[cell..cell + a];
+            let expected: Vec<u128> = (0..a).map(|l| folded(cell + l)).collect();
+            joint += charge(counts, &expected.iter().map(|&v| on20(v)).collect::<Vec<_>>());
+            for l in 0..a {
+                pooled_n[l] += counts[l];
+                pooled_f[l] += expected[l];
+                row(&mut file, &format!("{name}\t{d}\t{far}\t{l}\t{}\t{}\n", counts[l], expected[l]))?;
             }
-            let marginal = charge(&pooled_n, &pooled_f.iter().map(|&v| on20(v)).collect::<Vec<_>>());
-            let u = joint - marginal;
-            println!("FIELD_REACH set={name} d={d} places={} u_nats_a_place={} joint_nats_a_place={} pooled_nats_a_place={}", places[set], if places[set] == 0 { "-".to_string() } else { decimal_q20(nats_q20(u) / places[set] as i128) }, if places[set] == 0 { "-".to_string() } else { decimal_q20(nats_q20(joint) / places[set] as i128) }, if places[set] == 0 { "-".to_string() } else { decimal_q20(nats_q20(marginal) / places[set] as i128) });
         }
+        let marginal = charge(&pooled_n, &pooled_f.iter().map(|&v| on20(v)).collect::<Vec<_>>());
+        println!("FIELD_REACH set={name} d={d} places={places} u_nats_a_place={} joint_nats_a_place={} pooled_nats_a_place={}", per(joint - marginal), per(joint), per(marginal));
     }
-    println!("FIELD_REACH_DONE ms={}", started.elapsed().as_millis());
+    let _ = std::io::Write::flush(&mut std::io::stdout());
     Ok(())
 }
 
