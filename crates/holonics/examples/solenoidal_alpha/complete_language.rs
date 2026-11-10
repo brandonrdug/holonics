@@ -933,6 +933,7 @@ pub(super) fn run_field_realized(args: &[String], realization: &mut dyn holonics
         Some("exchange-held-field") => field_train::exchange_held_field(args, realization),
         Some("settle-field") => field_train::settle_field(args, realization),
         Some("ring-census-field") => field_train::ring_census_field(args, realization),
+        Some("charge-field") => field_train::charge_field(args, realization),
         Some("order-field") => field_train::order_field(args, realization),
         Some("masks-field") => field_train::masks_field(args, realization),
         Some("ring-field") => field_train::ring_field(args),

@@ -6965,6 +6965,34 @@ mod tests {
         let _ = std::fs::remove_dir_all(&dir);
     }
 
+    /// [theory, November 10 03:25] `charge-field` end to end on the host: three states read, the reference's own state at each
+    /// problem, and every state's pooled line.
+    #[test]
+    fn the_state_charge_census_reads_its_three_states() {
+        let dir = std::env::temp_dir().join(format!("holonics-charge-{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&dir);
+        std::fs::create_dir_all(&dir).expect("dir");
+        let put = |name: &str, bytes: &[u8]| {
+            std::fs::write(dir.join(name), bytes).expect("write");
+            (dir.join(name).to_string_lossy().into_owned(), sha256(bytes).expect("sha"))
+        };
+        let (codec, problems) = toy();
+        let learner = toy_learner(&codec, &problems);
+        let raw = problems_of(TOY);
+        let written: String = raw.iter().enumerate().map(|(k, (_, ans))| format!("{k}\t{}\n", escaped(ans))).collect();
+        let (state, state_sha) = put("STATE", learner.to_text().as_bytes());
+        let (codec_path, codec_sha) = put("CODEC", codec.to_text().as_bytes());
+        let (units, units_sha) = put("UNITS", b"founded-units-v1 0\n");
+        let (held, held_sha) = put("HELD", TOY);
+        let (rest, rest_sha) = put("REST", written.as_bytes());
+        let (keyed, keyed_sha) = put("KEYED", written.as_bytes());
+        let out = dir.join("OUT").to_string_lossy().into_owned();
+        let args: Vec<String> = ["charge-field", &state, &state_sha, &codec_path, &codec_sha, &units, &units_sha, &held, &held_sha, "4", &rest, &rest_sha, &keyed, &keyed_sha, &out].iter().map(|s| s.to_string()).collect();
+        charge_field(&args, &mut HostField).unwrap();
+        assert_eq!(written_answers(&codec, &rest, &rest_sha, 4).unwrap(), problems.iter().map(|p| p.1.clone()).collect::<Vec<_>>());
+        let _ = std::fs::remove_dir_all(&dir);
+    }
+
     /// [theory, November 10 02:03] `ring-census-field` end to end on the host: every set, ring, residue and letter is a row, at the
     /// letters' places and at the stop places, and each ring's residues count every place of its set once.
     #[test]
@@ -9900,6 +9928,142 @@ pub(super) fn ring_census_field(args: &[String], realization: &mut dyn FieldReal
     letters_sums.write(&out.join("RING.tsv"), &names)?;
     stop_sums.write(&out.join("RING_STOP.tsv"), &names)?;
     println!("FIELD_RING_DONE ms={}", started.elapsed().as_millis());
+    Ok(())
+}
+
+/// The answers a written file holds (`SAMPLE.tsv`'s format: a line a problem, its index and its escaped letters), encoded.
+fn written_answers(codec: &FieldCodec, path: &str, sha: &str, problems: usize) -> Result<Vec<Vec<usize>>> {
+    let text = pinned_read(path, sha, READ_BUDGET as usize)?;
+    let mut out = Vec::with_capacity(problems);
+    for (n, line) in text.split(|&b| b == b'\n').filter(|l| !l.is_empty()).take(problems).enumerate() {
+        let tab = line.iter().position(|&b| b == b'\t').ok_or("a written line without its index")?;
+        if std::str::from_utf8(&line[..tab])?.parse::<usize>()? != n {
+            return Err("a written file whose lines are not its problems in order".into());
+        }
+        out.push(codec.encode(&super::written_coupling::unescape(&line[tab + 1..])?)?);
+    }
+    if out.len() != problems {
+        return Err(format!("a written file of {} answers for {problems} problems", out.len()).into());
+    }
+    Ok(out)
+}
+
+/// [measurement; theory, November 10 03:25] `charge-field STATE STATE_SHA CODEC CODEC_SHA UNITS UNITS_SHA HELD HELD_SHA COUNT
+/// REST REST_SHA KEYED KEYED_SHA OUT`: **the state charge census**, a reading of three locked states of the first `COUNT` held
+/// problems: the settle's rest (`REST`, a `SAMPLE.tsv`), the keyed write it started from (`KEYED`) and the held file's own
+/// references, each cut to its room. Each state is read with every place locked ([`Field::locked_faces`]: every face once,
+/// that place alone open, the rest given), and at each place `v = −ln f_t(x_t) − H(f_t)` in nats, the letter's surprise less
+/// its face's entropy. Printed a state: its code and summed entropy pooled and a problem; the share of places with `v > 1`
+/// and with `v > 2`; the runs of `v > 1` by length (1, 2, 3–4, 5–8, …) and the share of those places in runs of three or
+/// more; `v` by the place's share of its answer (tenths, `⌊10 t/n⌋`); and each answer's root charge
+/// `Σ_a N(a) ln(N(a)/Σ_t f_t(a))` (its letters' counts against the faces' summed shares, [`PlateCounts`]) beside its excess
+/// (code less entropy) and its share of it. Numbers only.
+pub(super) fn charge_field(args: &[String], realization: &mut dyn FieldRealization) -> Result<()> {
+    if args.len() != 15 {
+        return Err("charge-field STATE STATE_SHA CODEC CODEC_SHA UNITS UNITS_SHA HELD HELD_SHA COUNT REST REST_SHA KEYED KEYED_SHA OUT".into());
+    }
+    let started = std::time::Instant::now();
+    let mut learner = FieldLearner::from_text(std::str::from_utf8(&pinned_read(&args[1], &args[2], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
+    declared_clocks(&mut learner.field);
+    let field = &learner.field;
+    let units = units_of(&args[5], &args[6])?;
+    let codec = FieldCodec::from_text(std::str::from_utf8(&pinned_read(&args[3], &args[4], CODEC_BUDGET)?)?, units)?;
+    let held = problems_of(&pinned_read(&args[7], &args[8], READ_BUDGET as usize)?);
+    let limit = count(&args[9])?;
+    let out = Path::new(&args[14]);
+    std::fs::create_dir(out)?;
+    let held = &held[..limit.min(held.len())];
+    let requests: Vec<(Vec<usize>, usize)> = held.iter().map(|(question, _)| opening(&codec, field, question, b"")).collect::<std::result::Result<_, String>>()?;
+    let problems: Vec<(&[usize], usize)> = requests.iter().map(|(q, n)| (q.as_slice(), *n)).collect();
+    let void = codec.void();
+    let a = field.declaration.alphabet;
+    let references: Vec<Vec<usize>> = held.iter().map(|(_, ans)| codec.encode(ans)).collect::<Result<_>>()?;
+    let states = [("rest", written_answers(&codec, &args[10], &args[11], held.len())?), ("keyed", written_answers(&codec, &args[12], &args[13], held.len())?), ("reference", references)];
+    let nats = |v: i128| decimal_q20(nats_q20(v));
+    let share = |n: usize, of: usize| if of == 0 { "-".to_string() } else { format!("{}.{:06}", n * 1_000_000 / of / 1_000_000, n * 1_000_000 / of % 1_000_000) };
+    for (name, mut answers) in states {
+        let state_start = std::time::Instant::now();
+        let mut cut = 0usize;
+        for (x, &(_, room)) in answers.iter_mut().zip(&problems) {
+            cut += usize::from(x.len() > room);
+            x.truncate(room);
+        }
+        let ks: Vec<usize> = (0..problems.len()).filter(|&k| !answers[k].is_empty()).collect();
+        let faces = field.locked_faces(&problems, &answers, &ks, void, false, realization).map_err(|e| e.to_string())?;
+        let (mut places, mut over1, mut over2, mut in_long) = (0usize, 0usize, 0usize, 0usize);
+        let (mut code, mut entropy, mut root) = (0i128, 0i128, 0i128);
+        let mut runs: Vec<(usize, usize)> = Vec::new();
+        let mut tenths = [(0i128, 0usize); 10];
+        for (&k, f) in ks.iter().zip(&faces) {
+            let x = &answers[k];
+            let n = x.len();
+            let (mut c_k, mut h_k) = (0i128, 0i128);
+            let mut counts = PlateCounts::new(a);
+            let mut run = 0usize;
+            let close = |run: usize, runs: &mut Vec<(usize, usize)>, in_long: &mut usize| {
+                if run > 0 {
+                    let bin = (usize::BITS - (run - 1).leading_zeros()) as usize;
+                    if runs.len() <= bin {
+                        runs.resize(bin + 1, (0, 0));
+                    }
+                    runs[bin] = (runs[bin].0 + 1, runs[bin].1 + run);
+                    if run >= 3 {
+                        *in_long += run;
+                    }
+                }
+            };
+            for (t, face) in f.iter().enumerate().take(n) {
+                let (c, h) = (face.code(x[t]) as i128, holonics::hnn::tower::field::entropy(face));
+                (c_k, h_k) = (c_k + c, h_k + h);
+                counts.add(face, x[t]);
+                let v = nats_q20(c - h);
+                over1 += usize::from(v > 1 << 20);
+                over2 += usize::from(v > 2 << 20);
+                if v > 1 << 20 {
+                    run += 1;
+                } else {
+                    close(run, &mut runs, &mut in_long);
+                    run = 0;
+                }
+                let tenth = &mut tenths[(10 * t / n).min(9)];
+                *tenth = (tenth.0 + c - h, tenth.1 + 1);
+            }
+            close(run, &mut runs, &mut in_long);
+            let r_k: i128 = (0..a).filter(|&l| counts.n[l] > 0).map(|l| counts.n[l] as i128 * log2_ratio(counts.n[l], counts.expected(l))).sum();
+            let excess = c_k - h_k;
+            println!(
+                "FIELD_CHARGE_PROBLEM state={name} problem={k} letters={n} code_nats={} entropy_nats={} excess_nats={} root_nats={} root_share_of_excess={}",
+                nats(c_k),
+                nats(h_k),
+                nats(excess),
+                nats(r_k),
+                if excess <= 0 { "-".to_string() } else { decimal_q20((r_k << 20) / excess) }
+            );
+            (places, code, entropy, root) = (places + n, code + c_k, entropy + h_k, root + r_k);
+        }
+        let excess = code - entropy;
+        let a_place = |v: i128| if places == 0 { "-".to_string() } else { decimal_q20(nats_q20(v) / places as i128) };
+        println!(
+            "FIELD_CHARGE_STATE state={name} problems={} letters={places} cut_to_room={cut} code_nats={} entropy_nats={} code_nats_a_place={} entropy_nats_a_place={} excess_nats={} root_nats={} root_share_of_excess={} v_over_1_share={} v_over_2_share={} ms={}",
+            ks.len(),
+            nats(code),
+            nats(entropy),
+            a_place(code),
+            a_place(entropy),
+            nats(excess),
+            nats(root),
+            if excess <= 0 { "-".to_string() } else { decimal_q20((root << 20) / excess) },
+            share(over1, places),
+            share(over2, places),
+            state_start.elapsed().as_millis()
+        );
+        let hist: Vec<String> = runs.iter().enumerate().map(|(b, &(n, sites))| format!("{}:{n}:{sites}", if b == 0 { "1".to_string() } else if b == 1 { "2".to_string() } else { format!("{}-{}", (1usize << (b - 1)) + 1, 1usize << b) })).collect();
+        println!("FIELD_CHARGE_RUNS state={name} runs_by_length={} over_1_places={over1} share_in_runs_of_3_or_more={}", hist.join(","), share(in_long, over1));
+        for (b, &(v, n)) in tenths.iter().enumerate() {
+            println!("FIELD_CHARGE_WRITTEN state={name} written=0.{b}-{} places={n} v_nats_a_place={}", if b == 9 { "1".to_string() } else { format!("0.{}", b + 1) }, if n == 0 { "-".to_string() } else { decimal_q20(nats_q20(v) / n as i128) });
+        }
+    }
+    println!("FIELD_CHARGE_DONE ms={}", started.elapsed().as_millis());
     Ok(())
 }
 
