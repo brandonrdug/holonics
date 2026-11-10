@@ -1855,6 +1855,8 @@ pub(super) fn order_field(args: &[String], realization: &mut dyn FieldRealizatio
     let mut place_length_total = 0i64;
     let (mut keyed_length_total, mut given_total, mut letters_total) = (0i64, 0i64, 0usize);
     let mut given_letters_total = 0i64;
+    // [measurement; theory, November 10 21:03] The keyed order given its end by octave: each octave's places and code (on `2^(−20)` bits).
+    let mut by_octave: Vec<(usize, i64)> = Vec::new();
     let (mut place_total, mut keyed_total, mut places_total) = (0i64, 0i64, 0usize);
     let (mut masks_total, mut length_total, mut lengths_unread) = (0i64, 0i64, 0usize);
     for (k, (question, answer)) in held.iter().take(n).enumerate() {
@@ -1939,6 +1941,12 @@ pub(super) fn order_field(args: &[String], realization: &mut dyn FieldRealizatio
                     }
                     s if s < given_states => {
                         given += code;
+                        let octave = holonics::hnn::tower::field::octave_of(*at + 1 - q.len()) as usize;
+                        if by_octave.len() <= octave {
+                            by_octave.resize(octave + 1, (0, 0));
+                        }
+                        by_octave[octave].0 += 1;
+                        by_octave[octave].1 += code;
                         given_letters += holonics::hnn::tower::face_code(face.masses[*class], face.total - face.masses[void]);
                     }
                     _ => codes.2 += code,
@@ -1984,6 +1992,25 @@ pub(super) fn order_field(args: &[String], realization: &mut dyn FieldRealizatio
         bits(length_total, places_total),
         started.elapsed().as_millis()
     );
+    // [measurement; theory, November 10 21:03] **The keyed order given the answer's length, by octave** (`keyed_given_bits_a_letter`, the
+    // same states): octave `j` holds the answer's places whose position `d` (one-based, from the answer's first place) lies in
+    // `[2^j, 2^(j+1))`; the order takes the octaves in turn, each in its keyed order. A place of octave `j` is locked with every place of
+    // the octaves before it written (positions `1 .. 2^j − 1`), the places of its own octave that the key put before it, nothing of
+    // the octaves after it but the end's near voids, and the question. Mean code in nats a place, and the places.
+    println!("FIELD_ORDER_OCTAVE_NOTE octave j holds positions d in [2^j, 2^(j+1)) of the answer (d one-based); at a place of octave j written: the question, every place of the octaves before j, the places of octave j the key put before it, and the end's near voids; unwritten: the octaves after j and the rest of its own");
+    let ln2 = field.ln2();
+    let (mut octave_places, mut octave_code) = (0usize, 0i128);
+    for (octave, &(places, code)) in by_octave.iter().enumerate() {
+        println!(
+            "FIELD_ORDER_OCTAVE octave={octave} positions={}..{} places={places} given_nats_a_letter={}",
+            1usize << octave,
+            (1usize << (octave + 1)) - 1,
+            micro_nats(code as i128 * ln2, places as i128)
+        );
+        octave_places += places;
+        octave_code += code as i128;
+    }
+    println!("FIELD_ORDER_OCTAVE_TOTAL places={octave_places} given_nats_a_letter={} given_bits_a_letter={}", micro_nats(octave_code * ln2, octave_places as i128), bits(octave_code as i64, octave_places));
     Ok(())
 }
 
@@ -3018,6 +3045,31 @@ mod tests {
     /// the answer's truth, the end's `NEAR` voids resolved and the region cut there, open places only within the answer and at
     /// least one, the resolved ones the first `k` of the writer's order (octaves of distance, never a place of a later octave
     /// before an earlier octave is whole), every octave of `k` met, each open place compared on its own class with weight one.
+    /// [theory, November 10 21:03] `order-field` prints the keyed order given the answer's length by octave: the octaves' places sum to
+    /// the letters read, an octave `j` holds positions `[2^j, 2^(j+1))`, and the total line is `keyed_given_bits_a_letter`'s.
+    #[test]
+    fn the_keyed_order_given_its_end_splits_by_octave() {
+        assert_eq!((1..=8).map(|d| holonics::hnn::tower::field::octave_of(d)).collect::<Vec<_>>(), vec![0, 1, 1, 2, 2, 2, 2, 3]);
+        let dir = std::env::temp_dir().join(format!("holonics-octave-{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&dir);
+        std::fs::create_dir_all(&dir).expect("dir");
+        let put = |name: &str, bytes: &[u8]| {
+            std::fs::write(dir.join(name), bytes).expect("write");
+            (dir.join(name).to_string_lossy().into_owned(), sha256(bytes).expect("sha"))
+        };
+        let (codec, problems) = toy();
+        let learner = toy_learner(&codec, &problems);
+        let (state, state_sha) = put("STATE", learner.to_text().as_bytes());
+        let (codec_path, codec_sha) = put("CODEC", codec.to_text().as_bytes());
+        let (units, units_sha) = put("UNITS", b"founded-units-v1 0\n");
+        let (held, held_sha) = put("HELD", TOY);
+        let out = dir.join("OUT").to_string_lossy().into_owned();
+        let args: Vec<String> = ["order-field", &state, &state_sha, &codec_path, &codec_sha, &units, &units_sha, &held, &held_sha, "2", &out].iter().map(|s| s.to_string()).collect();
+        order_field(&args, &mut HostField).unwrap();
+        assert!(dir.join("OUT/ORDER.tsv").exists());
+        let _ = std::fs::remove_dir_all(&dir);
+    }
+
     #[test]
     fn a_writer_state_is_its_order_given_its_end() {
         let (codec, problems) = toy();
