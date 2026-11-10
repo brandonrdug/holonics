@@ -7173,6 +7173,52 @@ mod tests {
         assert_eq!(read[q.len() + last].as_ref().unwrap(), &visit[last], "the face at the last place with the whole answer before it is the visit's");
     }
 
+    /// [theory, November 10 21:03] **The open transmission's regions** write exactly the window and leave the rest of the answer open:
+    /// with one target a region and with shared regions each eligible place is a target once (the rest out), a target's window is the
+    /// reference's `l` letters before and `r` after (the splits too), every other answer place is open, the void past the end stays given,
+    /// and with the whole preceding answer written (the last place, `l = n − 1`) the face is the locked visit's.
+    #[test]
+    fn the_open_transmission_writes_only_the_window_and_leaves_the_rest_open() {
+        let (codec, problems) = toy();
+        let learner = toy_learner(&codec, &problems);
+        let (q, x, _) = &problems[0];
+        let (q, x, void) = (&q[..], &x[..], codec.void());
+        let n = x.len();
+        let tail = 6.min(codec.answer - n);
+        for (l, r) in [(0, 0), (2, 0), (4, 0), (1, 1), (3, 3), (3, 1), (1, 3), (2, 1), (1, 2)] {
+            for spacing in [0usize, 20] {
+                let (regions, out) = open_regions(q, x, void, l, r, tail, spacing);
+                let eligible: Vec<usize> = (0..n).filter(|&t| t >= l && t + r < n).collect();
+                assert_eq!(out, n - eligible.len());
+                let mut covered: Vec<usize> = regions.iter().flat_map(|g| g.2.iter().copied()).collect();
+                covered.sort_unstable();
+                assert_eq!(covered, eligible, "(l, r) = ({l}, {r}) spacing {spacing}: each eligible place a target once");
+                for (classes, open, targets) in &regions {
+                    assert_eq!(classes.len(), q.len() + n + tail);
+                    assert!(spacing != 0 || targets.len() == 1);
+                    for p in 0..n + tail {
+                        let known = targets.iter().any(|&t| (p < t && t - p <= l) || (p > t && p - t <= r));
+                        if p < n {
+                            assert_eq!(open[q.len() + p], !known, "(l, r) = ({l}, {r}) place {p}: open unless in a window");
+                            if known {
+                                assert_eq!(classes[q.len() + p], x[p]);
+                            }
+                        } else {
+                            assert!(!open[q.len() + p] && classes[q.len() + p] == void, "the void past the answer's end stays given");
+                        }
+                    }
+                }
+            }
+        }
+        let last = n - 1;
+        let (regions, _) = open_regions(q, x, void, last, 0, tail, 0);
+        let (classes, open, _) = regions.iter().find(|g| g.2 == [last]).unwrap();
+        let region = Region { classes, unresolved: open, faces: &[], locked: &[], echo: &[], domain: None, port: None };
+        let read = HostField.read_faces(&learner.field, std::slice::from_ref(&region)).unwrap().remove(0);
+        let visit = learner.field.locked_faces(&[(q, codec.answer)], std::slice::from_ref(&x.to_vec()), &[0], void, false, &mut HostField).unwrap().remove(0);
+        assert_eq!(read[q.len() + last].as_ref().unwrap(), &visit[last]);
+    }
+
     /// [theory, November 10 20:34] `transmission-field` end to end on the host, on a state with a trailing `parts` line (the rate arm's):
     /// it reads both modes at every `d` and leaves the state unchanged.
     #[test]
@@ -10839,6 +10885,40 @@ fn transmission_patterns(q: &[usize], x: &[usize], void: usize, both: bool, d: u
     (regions, out)
 }
 
+/// [definition; theory, November 10 21:03] **An open transmission's regions** ([`transmission_field`] `open-S`): for an answer `x` of `n`
+/// letters after the question `q`, the regions that write at each place `t` exactly its `l` letters before it and `r` after it, every
+/// other place of the answer **open** (unknown, no void written), the lengths given as the keyed and locked reads give them (the void
+/// past the answer's end, `tail` places of it, stays). With `spacing` zero each eligible target is a region of its own; with `spacing`
+/// `S` (at least `l + r + 1`) the targets of one shift of the period `S` share a region, so other targets' windows are known there
+/// too. A target without its letters (`t < l`, `t + r ≥ n`) is left out and counted out. Returns the regions (classes, open sites,
+/// targets) and the count out.
+fn open_regions(q: &[usize], x: &[usize], void: usize, l: usize, r: usize, tail: usize, spacing: usize) -> (Vec<(Vec<usize>, Vec<bool>, Vec<usize>)>, usize) {
+    let n = x.len();
+    let eligible = |t: usize| t >= l && t + r < n;
+    let out = (0..n).filter(|&t| !eligible(t)).count();
+    let groups: Vec<Vec<usize>> = if spacing == 0 {
+        (0..n).filter(|&t| eligible(t)).map(|t| vec![t]).collect()
+    } else {
+        let period = spacing.max(l + r + 1);
+        (0..period).map(|shift| (shift..n).step_by(period).filter(|&t| eligible(t)).collect::<Vec<usize>>()).filter(|g| !g.is_empty()).collect()
+    };
+    let regions = groups
+        .into_iter()
+        .map(|targets| {
+            let mut classes: Vec<usize> = q.iter().copied().chain(std::iter::repeat_n(void, n + tail)).collect();
+            let mut open: Vec<bool> = (0..classes.len()).map(|i| i >= q.len() && i < q.len() + n).collect();
+            for &t in &targets {
+                for p in (t - l..t).chain(t + 1..=t + r) {
+                    classes[q.len() + p] = x[p];
+                    open[q.len() + p] = false;
+                }
+            }
+            (classes, open, targets)
+        })
+        .collect();
+    (regions, out)
+}
+
 /// [measurement; theory, November 10 20:34] `transmission-field STATE STATE_SHA CODEC CODEC_SHA UNITS UNITS_SHA HELD HELD_SHA COUNT`:
 /// **the field's transmission by joint**, a reading of a saved state (its bytes unchanged) on the first `COUNT` held problems. At an
 /// answer place `t`, the reference's exactly `d` nearest letters written and the rest of the answer the void letter (not an open
@@ -10849,9 +10929,15 @@ fn transmission_patterns(q: &[usize], x: &[usize], void: usize, both: bool, d: u
 /// `FIELD_TRANSMISSION mode= d= places= out= code_nats_a_place=` a mode and `d`: the places read, the targets left out for want of their
 /// letters, and the mean code.
 pub(super) fn transmission_field(args: &[String], realization: &mut dyn FieldRealization) -> Result<()> {
-    if args.len() != 10 {
-        return Err("transmission-field STATE STATE_SHA CODEC CODEC_SHA UNITS UNITS_SHA HELD HELD_SHA COUNT".into());
+    if args.len() != 10 && args.len() != 11 {
+        return Err("transmission-field STATE STATE_SHA CODEC CODEC_SHA UNITS UNITS_SHA HELD HELD_SHA COUNT [void|open-S]".into());
     }
+    // [definition; theory, November 10 21:03] `open-S`: the rest of the answer open, not the void, the targets of a shift of period `S`
+    // sharing a region (`open-0`: one target a region); rows left d = 0..4, both d = 1..4 and the uneven splits (3,1), (1,3), (2,1), (1,2).
+    let open_spacing: Option<usize> = match args.get(10).map(String::as_str) {
+        None | Some("void") => None,
+        Some(m) => Some(m.strip_prefix("open-").and_then(|s| s.parse().ok()).ok_or("a transmission mode that is not void or open-S")?),
+    };
     let started = std::time::Instant::now();
     let mut learner = FieldLearner::from_text(std::str::from_utf8(&pinned_read(&args[1], &args[2], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
     declared_clocks(&mut learner.field);
@@ -10872,6 +10958,36 @@ pub(super) fn transmission_field(args: &[String], realization: &mut dyn FieldRea
     }
     println!("FIELD_CLOCKS per_blank={} bare={} problems={} places={}", field.per_blank_clock, field.bare_stretch, references.len(), references.iter().map(|r| r.1.len()).sum::<usize>());
     const CHUNK: usize = 64;
+    if let Some(spacing) = open_spacing {
+        let rows: [(&str, usize, usize); 13] = [("open-left", 0, 0), ("open-left", 1, 0), ("open-left", 2, 0), ("open-left", 3, 0), ("open-left", 4, 0), ("open-both", 1, 1), ("open-both", 2, 2), ("open-both", 3, 3), ("open-both", 4, 4), ("open-split", 3, 1), ("open-split", 1, 3), ("open-split", 2, 1), ("open-split", 1, 2)];
+        for (name, l, r) in rows {
+            let (mut sum, mut places, mut out, mut regions_read) = (0i128, 0usize, 0usize, 0usize);
+            let mut pending: Vec<(Vec<usize>, Vec<bool>, Vec<usize>, usize)> = Vec::new();
+            for (k, (q, x, room)) in references.iter().enumerate() {
+                let (regions, o) = open_regions(q, x, void, l, r, holonics::hnn::tower::field::NEAR.min(room.saturating_sub(x.len())), spacing);
+                out += o;
+                pending.extend(regions.into_iter().map(|(c, u, t)| (c, u, t, k)));
+            }
+            for chunk in pending.chunks(CHUNK) {
+                let views: Vec<Region> = chunk.iter().map(|(c, u, _, _)| Region { classes: c, unresolved: u, faces: &[], locked: &[], echo: &[], domain: None, port: None }).collect();
+                let faces = realization.read_faces(field, &views).map_err(|e| e.to_string())?;
+                regions_read += chunk.len();
+                for ((_, _, targets, k), read) in chunk.iter().zip(&faces) {
+                    let (q, x, _) = &references[*k];
+                    for &t in targets {
+                        let face = read.get(q.len() + t).and_then(Option::as_ref).ok_or("a transmission target without a face")?;
+                        sum += face.code(x[t]) as i128;
+                        places += 1;
+                    }
+                }
+            }
+            let mean = if places == 0 { "-".to_string() } else { decimal_q20(nats_q20(sum) / places as i128) };
+            println!("FIELD_TRANSMISSION mode={name} l={l} r={r} spacing={spacing} regions={regions_read} places={places} out={out} code_nats_a_place={mean} ms={}", started.elapsed().as_millis());
+            let _ = std::io::Write::flush(&mut std::io::stdout());
+        }
+        println!("FIELD_TRANSMISSION_DONE ms={}", started.elapsed().as_millis());
+        return Ok(());
+    }
     let modes: [(&str, bool, std::ops::RangeInclusive<usize>); 2] = [("left", false, 0..=4), ("both", true, 1..=4)];
     for (name, both, ds) in modes {
         for d in ds {

@@ -148,4 +148,5 @@ def main():
     print(f"W: new columns' rms at L4 {w_new[2]:.4g} against the old columns' {w_old[2]:.4g}: ratio {w_new[2] / w_old[2]:.3f} (at G: new {w_new[0]:.4g}, old {w_old[0]:.4g}; at L2: new {w_new[1]:.4g}, old {w_old[1]:.4g})")
 
 
-main()
+if __name__ == "__main__":
+    main()

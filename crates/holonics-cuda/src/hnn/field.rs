@@ -3130,6 +3130,31 @@ mod tests {
     /// by default, run with `--ignored --nocapture`.
     #[test]
     #[ignore]
+    fn the_contacts_by_fours_tile_on_the_card() {
+        // [theory, November 10 21:10] Contacts come in fours (f/2 even): each f from 68 by fours on the main line's declaration (width 64, two
+        // lanes), its material, whether the contacts' two maps tile a block (`affine_tiling`: `(f, dw)` and `(dw, f)`) with the shared octets, and
+        // the octets of the longest region; then the first f past 128 and the first refused, and the shared figure that refuses it.
+        let base = FieldDeclaration { alphabet: 100, width: 64, heads: 4, modes: 8, still: 2, contacts: 64, ticks: 4, frames: 4, reach: 3771, lanes: 2, depth: 0, energy: false };
+        let mut first_refused = None;
+        for f in (68..=512).step_by(4) {
+            let d = FieldDeclaration { contacts: f, ..base };
+            let field = holonics::hnn::tower::field::Field::found(d, &vec![7u8; 4 * d.founding_draws()]).expect("admitted");
+            let (dw, a, b) = (d.width, affine_tiling(f, d.width, false), affine_tiling(d.width, f, true));
+            let shared = |t: Option<(usize, usize)>| t.map_or("NO".to_string(), |(per, sh)| format!("{per}/{sh}"));
+            if f <= 132 || (a.is_some() && b.is_some() && f % 16 == 0) || (first_refused.is_none() && (a.is_none() || b.is_none())) {
+                // The shared octets a refused map would need: `((rows (cols + 1) + rows) 4 rounded to 16) + per 8 + per cols (4 or 8)`.
+                let need = |rows: usize, cols: usize, x64: bool| ((rows * (cols + 1) + rows) * 4).div_ceil(16) * 16 + (256usize.checked_div(rows).unwrap_or(0)) * 8 + (256usize.checked_div(rows).unwrap_or(0)) * cols * if x64 { 8 } else { 4 };
+                println!("CONTACTS f={f} material={} (f,dw) {} needs {} (dw,f) {} needs {} limit {} region_3771_octets={}", field.material_len(), shared(a), need(f, dw, false), shared(b), need(dw, f, true), AFFINE_SHARED, region_octets(&d, true, 3771));
+            }
+            if first_refused.is_none() && (a.is_none() || b.is_none()) {
+                first_refused = Some(f);
+            }
+        }
+        println!("CONTACTS first_refused={first_refused:?}");
+    }
+
+    #[test]
+    #[ignore]
     fn the_card_footprint_by_growth_route() {
         let base = FieldDeclaration { alphabet: 100, width: 64, heads: 4, modes: 8, still: 2, contacts: 64, ticks: 4, frames: 4, reach: 3771, lanes: 2, depth: 0, energy: false };
         let describe = |name: &str, d: FieldDeclaration| {
