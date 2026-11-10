@@ -414,11 +414,13 @@ pub(super) fn parity(args: &[String], card: &mut dyn FieldRealization) -> Result
             some.is_empty() || host == card.read_row_currents(&card_learner.field, some, &questions, true).map_err(|e| e.to_string())?
         };
         let learner_equal = host_regions == card_regions && receipt_h == receipt_c && host_learner.to_text() == card_learner.to_text() && marks_equal && near_equal && clocks_equal && rows_equal && shares_equal && currents_equal;
+        // The learners' texts alone (the deposit's bits: material, moments, remainders), apart from the readings beside them.
+        let text_equal = host_learner.to_text() == card_learner.to_text();
         learners_unequal += usize::from(!learner_equal);
         let length = views.iter().map(|r| r.classes.len()).max().unwrap_or(0);
         let next = receipt_h.next.map_or("-".to_string(), |n| format!("{}/{}/{}", n.change, n.halvings, n.refused));
         println!(
-            "FIELD_PARITY section={} withheld={end} regions={} length={length} sites={} rows={rows} reads={calls} faces_unequal={faces} covector_unequal={entries} first={} deposited={} halvings={} next={next} learner_equal={learner_equal} near_equal={near_equal} clocks_equal={clocks_equal} rows_equal={rows_equal} shares_equal={shares_equal} currents_equal={currents_equal} pace_nonzero={} kappa={} host_ms={} card_ms={}",
+            "FIELD_PARITY section={} withheld={end} regions={} length={length} sites={} rows={rows} reads={calls} faces_unequal={faces} covector_unequal={entries} first={} deposited={} halvings={} next={next} learner_equal={learner_equal} text_equal={text_equal} near_equal={near_equal} clocks_equal={clocks_equal} rows_equal={rows_equal} shares_equal={shares_equal} currents_equal={currents_equal} pace_nonzero={} kappa={} host_ms={} card_ms={}",
             k + 1,
             views.len(),
             receipt_h.sites,
