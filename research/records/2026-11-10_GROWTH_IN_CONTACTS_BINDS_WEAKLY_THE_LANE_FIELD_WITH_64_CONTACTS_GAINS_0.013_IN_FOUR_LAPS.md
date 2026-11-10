@@ -108,6 +108,10 @@ declare (8 for the card reads).
 | visit, TRAIN even | 2,052 s | 2,565 s | 1,891 s | 0.92 | 1.16 GB |
 | visit, TRAIN odd | 2,052 s | 2,565 s | 1,850 s | 0.90 | 1.11 GB |
 
+Gate 3 on the line's code (crates as at ab82a0cb0): the card suite `cargo test -p holonics-cuda -- --include-ignored
+--test-threads=1`, alone on the idle card under the lock, passes 149 of 149 in 781 s (its first read at this size; outer guard
+3,600 s).
+
 Scripts in `*_receipts/`, with the machine root replaced by `${HOLONICS_ROOT}`:
 - the run scripts: `grow.sh`, `contacts_lap.sh`, `chain4.sh`, `refread.sh` and `visit.sh`;
 - the projection's measured reads (`PROJECTION.txt`);
