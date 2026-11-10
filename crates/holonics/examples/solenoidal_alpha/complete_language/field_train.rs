@@ -7123,6 +7123,84 @@ mod tests {
         let _ = std::fs::remove_dir_all(&dir);
     }
 
+    /// [theory, November 10, order 2] `locked-visit-field` end to end on the host: each set's file holds one record for every answer
+    /// place and every stop place the room holds, in problem then place order; each record's letter is the reference's, its face
+    /// the shares `Field::locked_faces` gives (each class's mass released at `2^(−16)`, the shares summing to within the alphabet
+    /// of `2^16`) and its chart the place's own region's chart; and the header states the layout and the count.
+    #[test]
+    fn the_locked_visit_writes_the_locked_faces_and_charts_of_every_place() {
+        let dir = std::env::temp_dir().join(format!("holonics-visit-{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&dir);
+        std::fs::create_dir_all(&dir).expect("dir");
+        let put = |name: &str, bytes: &[u8]| {
+            std::fs::write(dir.join(name), bytes).expect("write");
+            (dir.join(name).to_string_lossy().into_owned(), sha256(bytes).expect("sha"))
+        };
+        let (codec, problems) = toy();
+        let learner = toy_learner(&codec, &problems);
+        let (state, state_sha) = put("STATE", learner.to_text().as_bytes());
+        let (codec_path, codec_sha) = put("CODEC", codec.to_text().as_bytes());
+        let (units, units_sha) = put("UNITS", b"founded-units-v1 0\n");
+        let (held, held_sha) = put("HELD", TOY);
+        let (train, train_sha) = put("TRAIN", TOY);
+        let out = dir.join("OUT").to_string_lossy().into_owned();
+        let args: Vec<String> = ["locked-visit-field", &state, &state_sha, &codec_path, &codec_sha, &units, &units_sha, &held, &held_sha, &train, &train_sha, "every-1", &out].iter().map(|s| s.to_string()).collect();
+        locked_visit_field(&args, &mut HostField).unwrap();
+        let field = &learner.field;
+        let (a, dw, void) = (field.declaration.alphabet, field.declaration.width, codec.void());
+        let raw = problems_of(TOY);
+        let sets: [Vec<usize>; 3] = [(0..raw.len()).collect(), (0..raw.len()).step_by(2).collect(), (1..raw.len()).step_by(2).collect()];
+        for (set, name) in ["held", "train_even", "train_odd"].iter().enumerate() {
+            let bytes = std::fs::read(dir.join(format!("OUT/{name}.bin"))).unwrap();
+            let record = visit_record_bytes(a, dw);
+            assert_eq!(record, 11 + 2 * a + 4 * dw);
+            let mut expected: Vec<Vec<u8>> = Vec::new();
+            for &i in &sets[set] {
+                let (q, room) = opening(&codec, field, &raw[i].0, b"").unwrap();
+                let mut x = codec.encode(&raw[i].1).unwrap();
+                x.truncate(room);
+                if x.is_empty() {
+                    continue;
+                }
+                let faces = field.locked_faces(&[(&q, room)], std::slice::from_ref(&x), &[0], void, true, &mut HostField).unwrap().remove(0);
+                let stops = usize::from(room > x.len());
+                assert_eq!(faces.len(), x.len() + stops, "problem {i}: a face for every letter place and the stop where the room holds it");
+                for (t, face) in faces.iter().enumerate() {
+                    let stop = t == x.len();
+                    let mut classes: Vec<usize> = q.iter().chain(&x).copied().collect();
+                    classes.extend(std::iter::repeat_n(void, holonics::hnn::tower::field::NEAR.min(room - x.len())));
+                    let open: Vec<bool> = (0..classes.len()).map(|u| u == q.len() + t).collect();
+                    let region = Region { classes: &classes, unresolved: &open, faces: &[], locked: &[], echo: &[], domain: None, port: None };
+                    let chart = field.read_words(std::slice::from_ref(&region)).unwrap().charts.remove(0);
+                    let mut r = Vec::new();
+                    r.extend((i as u32).to_le_bytes());
+                    r.extend((t as u32).to_le_bytes());
+                    r.push(u8::from(stop));
+                    r.extend((if stop { void } else { x[t] } as u16).to_le_bytes());
+                    let mut sum = 0u32;
+                    for &m in &face.masses {
+                        let share = ((m << 16) / face.total).min(65535) as u16;
+                        sum += u32::from(share);
+                        r.extend(share.to_le_bytes());
+                    }
+                    assert!(sum <= 1 << 16 && (1 << 16) - sum <= a as u32, "problem {i} place {t}: the shares sum to {sum}");
+                    for v in &chart[(q.len() + t) * dw..(q.len() + t + 1) * dw] {
+                        r.extend(v.to_le_bytes());
+                    }
+                    assert_eq!(r.len(), record);
+                    expected.push(r);
+                }
+            }
+            assert!(!expected.is_empty());
+            assert_eq!(bytes.len(), expected.len() * record, "{name}: a record for every place and every stop");
+            assert!(bytes.chunks(record).zip(&expected).all(|(got, want)| got == &want[..]), "{name}: the records are the locked faces and charts");
+            let header = std::fs::read_to_string(dir.join(format!("OUT/{name}.header"))).unwrap();
+            assert!(header.contains(&format!("records={} record_bytes={record} alphabet={a} width={dw}", expected.len())), "{header}");
+            assert!(header.contains(&format!("state_sha={state_sha}")) && !header.contains("Tom"));
+        }
+        let _ = std::fs::remove_dir_all(&dir);
+    }
+
     /// [theory, November 10 03:25] `charge-field` end to end on the host: three states read, the reference's own state at each
     /// problem, and every state's pooled line.
     #[test]
@@ -10493,6 +10571,156 @@ pub(super) fn reach_census_field(args: &[String], realization: &mut dyn FieldRea
         reach_table(&out.join(format!("REACH.{}.tsv", names[set])), names[set], &offsets, a, &n[set * offsets.len() * a * a..(set + 1) * offsets.len() * a * a], &f[set * offsets.len() * a * a..(set + 1) * offsets.len() * a * a], &fc[set * offsets.len() * a * a..(set + 1) * offsets.len() * a * a], places[set])?;
     }
     println!("FIELD_REACH_DONE ms={}", started.elapsed().as_millis());
+    Ok(())
+}
+
+/// [measurement; theory, November 10, order 2] The indices ([`parity_sample`]'s) of TRAIN's sample of one parity: every other
+/// problem from `parity`, then `SAMPLE` (the first so many, or `every-K`, every `K`th of those).
+fn parity_sample_indices(len: usize, parity: usize, sample: &str) -> Result<Vec<usize>> {
+    let of = (parity..len).step_by(2);
+    Ok(match sample.strip_prefix("every-") {
+        Some(k) => of.step_by(positive(k)?).collect(),
+        None => of.take(count(sample)?).collect(),
+    })
+}
+
+/// The bytes a locked visit's record holds (`<set>.header` states the layout): the problem (`u32`), the place (`u32`), the
+/// stop flag (`u8`), the letter (`u16`), the face's `alphabet` shares (`u16` each) and the readout chart's `width` values
+/// (`i32` each).
+fn visit_record_bytes(alphabet: usize, width: usize) -> usize {
+    4 + 4 + 1 + 2 + 2 * alphabet + 4 * width
+}
+
+/// [measurement; theory, November 10, order 2] **A locked visit's records** for the problems `ids` of `problems` (each reference
+/// cut to its room, every answer place read once with the rest locked, [`Field::locked_faces`]'s regions, and the stop place, the
+/// first void past the letters, where the room holds it), written in problem then place order to `file` as binary records
+/// ([`visit_record_bytes`]): the problem's index, the place, the stop flag, the letter (the codec's class, the void at a stop),
+/// each class's share of the face at `2^(−16)` (released by partition, `⌊m 2^16 / M⌋`, its remainder dropped; a face with all its
+/// mass on one class holds `65535`, the share `2^16` not fitting 16 bits), and the readout's chart at the place on its own
+/// grain (the lanes' ratios to their power, `2^(−16)`: [`Field::read_words`]'s chart), read from the last tick of the place's
+/// region. Returns the record count. Numbers only.
+fn locked_visit_records(field: &Field, codec: &FieldCodec, problems: &[&(Vec<u8>, Vec<u8>)], ids: &[usize], file: &mut std::io::BufWriter<std::fs::File>, realization: &mut dyn FieldRealization, started: std::time::Instant, name: &str) -> Result<usize> {
+    use std::io::Write;
+    let (void, a, dw) = (codec.void(), field.declaration.alphabet, field.declaration.width);
+    let mut records = 0usize;
+    const BATCH: usize = 32;
+    const CHUNK: usize = 256;
+    for (b, (batch, ids)) in problems.chunks(BATCH).zip(ids.chunks(BATCH)).enumerate() {
+        let requests: Vec<(Vec<usize>, usize)> = batch.iter().map(|(question, _)| opening(codec, field, question, b"")).collect::<std::result::Result<_, String>>()?;
+        let mut answers: Vec<Vec<usize>> = Vec::with_capacity(batch.len());
+        for ((_, ans), (_, room)) in batch.iter().zip(&requests) {
+            let mut x = codec.encode(ans)?;
+            x.truncate(*room);
+            answers.push(x);
+        }
+        // Each place's region, as `Field::locked_faces` forms it: the question, the answer as it stands and the near field past its end.
+        let mut places: Vec<(usize, usize)> = Vec::new();
+        for (k, x) in answers.iter().enumerate() {
+            if x.is_empty() {
+                continue;
+            }
+            places.extend((0..x.len() + usize::from(requests[k].1 > x.len())).map(|i| (k, i)));
+        }
+        for chunk in places.chunks(CHUNK) {
+            let owned: Vec<(Vec<usize>, Vec<bool>)> = chunk
+                .iter()
+                .map(|&(k, i)| {
+                    let (q, room) = (&requests[k].0, requests[k].1);
+                    let mut classes: Vec<usize> = q.iter().chain(&answers[k]).copied().collect();
+                    classes.extend(std::iter::repeat_n(void, holonics::hnn::tower::field::NEAR.min(room.saturating_sub(answers[k].len()))));
+                    let at = q.len() + i;
+                    let open = (0..classes.len()).map(|t| t == at).collect();
+                    (classes, open)
+                })
+                .collect();
+            let regions: Vec<Region> = owned.iter().map(|(c, u)| Region { classes: c, unresolved: u, faces: &[], locked: &[], echo: &[], domain: None, port: None }).collect();
+            let read = realization.read_words(field, &regions).map_err(|e| e.to_string())?;
+            for (r, &(k, i)) in chunk.iter().enumerate() {
+                let at = requests[k].0.len() + i;
+                let face = read.faces[r].get(at).and_then(Option::as_ref).ok_or("a visit's open place without a face")?;
+                let chart = read.charts[r].get(at * dw..(at + 1) * dw).ok_or("a visit's open place without a chart")?;
+                let stop = i == answers[k].len();
+                let letter = if stop { void } else { answers[k][i] };
+                file.write_all(&u32::try_from(ids[k])?.to_le_bytes())?;
+                file.write_all(&u32::try_from(i)?.to_le_bytes())?;
+                file.write_all(&[u8::from(stop)])?;
+                file.write_all(&u16::try_from(letter)?.to_le_bytes())?;
+                for &m in &face.masses {
+                    let share = ((m << 16) / face.total).min(u128::from(u16::MAX));
+                    file.write_all(&(share as u16).to_le_bytes())?;
+                }
+                debug_assert_eq!(face.masses.len(), a);
+                for &v in chart {
+                    file.write_all(&v.to_le_bytes())?;
+                }
+                records += 1;
+            }
+        }
+        println!("FIELD_VISIT_BATCH set={name} batch={b} problems={} records={records} elapsed_ms={}", batch.len(), started.elapsed().as_millis());
+        let _ = std::io::Write::flush(&mut std::io::stdout());
+    }
+    file.flush()?;
+    Ok(records)
+}
+
+/// [measurement; theory, November 10, order 2] `locked-visit-field STATE STATE_SHA CODEC CODEC_SHA UNITS UNITS_SHA HELD HELD_SHA
+/// TRAIN TRAIN_SHA SAMPLE [SET] OUT`: **the locked visit's records**, the reach census's visit ([`reach_census_field`]: each
+/// reference cut to its room, every answer place read once with the rest locked) on three sets (the held problems, and TRAIN's
+/// sample of each parity, [`parity_sample`]), written for each place as one binary record to `OUT/<set>.bin` in problem then place
+/// order ([`locked_visit_records`]; the stop place too, flagged, where the room holds it) with `OUT/<set>.header` stating the
+/// layout, the alphabet, the width, the record count, the state's and the codec's sha and the grains. `SET` (held, train_even or
+/// train_odd, before `OUT`) reads that set alone, its files complete at the end of its set. No passage's text is written.
+pub(super) fn locked_visit_field(args: &[String], realization: &mut dyn FieldRealization) -> Result<()> {
+    if args.len() != 13 && args.len() != 14 {
+        return Err("locked-visit-field STATE STATE_SHA CODEC CODEC_SHA UNITS UNITS_SHA HELD HELD_SHA TRAIN TRAIN_SHA SAMPLE [SET] OUT".into());
+    }
+    let started = std::time::Instant::now();
+    let mut learner = FieldLearner::from_text(std::str::from_utf8(&pinned_read(&args[1], &args[2], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
+    declared_clocks(&mut learner.field);
+    let field = &learner.field;
+    let units = units_of(&args[5], &args[6])?;
+    let codec = FieldCodec::from_text(std::str::from_utf8(&pinned_read(&args[3], &args[4], CODEC_BUDGET)?)?, units)?;
+    let held = problems_of(&pinned_read(&args[7], &args[8], READ_BUDGET as usize)?);
+    let train = problems_of(&pinned_read(&args[9], &args[10], READ_BUDGET as usize)?);
+    let sample = args[11].as_str();
+    let only = (args.len() == 14).then(|| args[12].as_str());
+    let out = Path::new(&args[args.len() - 1]);
+    let names = ["held", "train_even", "train_odd"];
+    if only.is_some_and(|o| !names.contains(&o)) {
+        return Err("a locked visit set that is not held, train_even or train_odd".into());
+    }
+    std::fs::create_dir(out)?;
+    if field.declaration.energy {
+        return Err("a locked visit's chart is not read in an energy field".into());
+    }
+    let (a, dw) = (field.declaration.alphabet, field.declaration.width);
+    let ids: [Vec<usize>; 3] = [(0..held.len()).collect(), parity_sample_indices(train.len(), 0, sample)?, parity_sample_indices(train.len(), 1, sample)?];
+    for (set, name) in names.iter().enumerate() {
+        if only.is_some_and(|o| o != *name) {
+            continue;
+        }
+        let problems: Vec<&(Vec<u8>, Vec<u8>)> = if set == 0 { held.iter().collect() } else { ids[set].iter().map(|&i| &train[i]).collect() };
+        let file = std::fs::OpenOptions::new().write(true).create_new(true).open(out.join(format!("{name}.bin")))?;
+        let mut file = std::io::BufWriter::new(file);
+        let records = locked_visit_records(field, &codec, &problems, &ids[set], &mut file, realization, started, name)?;
+        let header = format!(
+            "locked-visit-v1 set={name} sample={sample} problems={} records={records} record_bytes={} alphabet={a} width={dw}\n\
+             state_sha={} codec_sha={} clocks per_blank={} bare={}\n\
+             record (packed, little-endian, in problem then place order): problem u32 (index in HELD for held, in TRAIN for the train sets), place u32 (0-based in the answer; the stop place is the answer's length), stop u8 (0 a letter place, 1 the stop place, the first void past the letters, where the room holds it), letter u16 (the codec's class index, the void at a stop), face {a} x u16, chart {dw} x i32\n\
+             face: each class's share of the place's face at 2^-16, u16, released by partition floor(m 2^16 / M) with the remainder dropped (the shares sum to at most 2^16 and within the alphabet of it; a face with all its mass on one class holds 65535, 2^16 not fitting 16 bits)\n\
+             chart: the readout's chart at the place, the lanes' ratios to their own power on 2^-16 (i32), {dw} values, from the last tick of the place's region with every other place locked (Field::read_words)\n\
+             numbers only: no passage text is written\n",
+            problems.len(),
+            visit_record_bytes(a, dw),
+            args[2],
+            args[4],
+            u8::from(field.per_blank_clock),
+            u8::from(field.bare_stretch),
+        );
+        std::fs::write(out.join(format!("{name}.header")), header)?;
+        println!("FIELD_VISIT_SET set={name} problems={} records={records} record_bytes={} bytes={} ms={}", problems.len(), visit_record_bytes(a, dw), records * visit_record_bytes(a, dw), started.elapsed().as_millis());
+    }
+    println!("FIELD_VISIT_DONE ms={}", started.elapsed().as_millis());
     Ok(())
 }
 
