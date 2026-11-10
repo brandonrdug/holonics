@@ -1,0 +1,6 @@
+Measured reads (November 10, RTX 4080 SUPER under .local/gpu.lock, between the main line's stages):
+ law check: field_pass.rate (0b2ba0bad) on ct4's state with every part at 2^-12 (part_rates.py open ... 0,..,0): its first 218 FIELD_SECTION lines are ct5.log's bit for bit
+ rate read: field_pass.rate on ct4's state with the opening rates (octaves 3 on w_new, a_new, b_new, enc_lane, before_lane, after_lane): 206 sections in 157,364 ms against ct5's 157,317 ms on the same sections (ratio 1.0003; blocks of 20 sections 0.967 to 1.059; against the zero-rate rerun 1.012 to 1.093)
+ reads: field_pass.rate_reads (34989233c) opening-field on ct4's state is byte-identical to ct4_HELD128/OPENING.tsv
+ card parity (FIELD_PARITY_LANE=1, CONTACTS=32, PARTS=2: every part at two octaves): faces and covectors equal, the host's and the card's learner texts (parts line included) equal after sections 2 and 3; section 1 reads clocks_equal=false as every parity read of a laned field does (the plain, the laned and the grown field alike)
+Projection of one lap (rate_lap.sh): 1,110,258 ms (largest main-line lap, ct5) x 1.0933 = 1,213,860 ms, bound 1,215,000 ms; the run 1,515,000 ms, outer 1,575 s; the update 0.1 s on the host; reads, settle, re-draws and refread as contacts_lap.sh's.
