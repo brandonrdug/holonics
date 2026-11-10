@@ -7123,6 +7123,80 @@ mod tests {
         let _ = std::fs::remove_dir_all(&dir);
     }
 
+    /// [theory, November 10 20:34] **The transmission patterns cover each place once per (mode, d)**: over every shift of the period the
+    /// targets are exactly the eligible places, each once (the places out are those without their `d` letters, counted); in a region
+    /// the open sites are its targets, each target's window holds the reference's `d` letters (each side for both) and every other place
+    /// of the answer is the void; and with the window the whole preceding answer (left, `d = n − 1`, the last place) the face read is
+    /// the locked visit's.
+    #[test]
+    fn the_transmission_patterns_cover_each_place_once_and_write_exactly_the_window() {
+        let (codec, problems) = toy();
+        let learner = toy_learner(&codec, &problems);
+        let (q, x, _) = &problems[0];
+        let (q, x, void) = (&q[..], &x[..], codec.void());
+        let n = x.len();
+        assert!(n > 12);
+        for both in [false, true] {
+            for d in if both { 1..=4 } else { 0..=4 } {
+                let (regions, out) = transmission_patterns(q, x, void, both, d, 4);
+                let eligible: Vec<usize> = (0..n).filter(|&t| t >= d && (!both || t + d < n)).collect();
+                assert_eq!(out, n - eligible.len(), "mode both={both} d={d}: the places out");
+                let mut covered: Vec<usize> = regions.iter().flat_map(|r| r.2.iter().copied()).collect();
+                covered.sort_unstable();
+                assert_eq!(covered, eligible, "mode both={both} d={d}: each eligible place a target once");
+                let period = if both { 2 * d + 9 } else { d + 5 };
+                assert!(regions.len() <= period, "at most one region a shift");
+                for (classes, open, targets) in &regions {
+                    assert_eq!(classes.len(), q.len() + n + 4);
+                    assert_eq!(&classes[..q.len()], q, "the question as given");
+                    let opened: Vec<usize> = (0..classes.len()).filter(|&i| open[i]).map(|i| i - q.len()).collect();
+                    assert_eq!(&opened, targets);
+                    for p in 0..n + 4 {
+                        let near = targets.iter().any(|&t| p != t && (p < t && t - p <= d || both && p > t && p - t <= d));
+                        let want = if near { x[p] } else { void };
+                        if !open[q.len() + p] {
+                            assert_eq!(classes[q.len() + p], want, "mode both={both} d={d} place {p}");
+                        }
+                    }
+                }
+            }
+        }
+        // d the whole preceding answer, the last place: the locked visit's face.
+        let last = n - 1;
+        let (room, tail) = (codec.answer, 6.min(codec.answer - n));
+        assert!(tail >= 4, "the toy's room holds the four voids");
+        let (regions, _) = transmission_patterns(q, x, void, false, last, tail);
+        let (classes, open, _) = regions.iter().find(|r| r.2.contains(&last)).unwrap();
+        let region = Region { classes, unresolved: open, faces: &[], locked: &[], echo: &[], domain: None, port: None };
+        let read = HostField.read_faces(&learner.field, std::slice::from_ref(&region)).unwrap().remove(0);
+        let visit = learner.field.locked_faces(&[(q, room)], std::slice::from_ref(&x.to_vec()), &[0], void, false, &mut HostField).unwrap().remove(0);
+        assert_eq!(read[q.len() + last].as_ref().unwrap(), &visit[last], "the face at the last place with the whole answer before it is the visit's");
+    }
+
+    /// [theory, November 10 20:34] `transmission-field` end to end on the host, on a state with a trailing `parts` line (the rate arm's):
+    /// it reads both modes at every `d` and leaves the state unchanged.
+    #[test]
+    fn the_transmission_reading_runs_on_a_state_with_the_rate_line() {
+        let dir = std::env::temp_dir().join(format!("holonics-transmission-{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&dir);
+        std::fs::create_dir_all(&dir).expect("dir");
+        let put = |name: &str, bytes: &[u8]| {
+            std::fs::write(dir.join(name), bytes).expect("write");
+            (dir.join(name).to_string_lossy().into_owned(), sha256(bytes).expect("sha"))
+        };
+        let (codec, problems) = toy();
+        let learner = toy_learner(&codec, &problems);
+        let text = format!("{}parts 4 1 1 1 1 1 1 0 0 0 0 0 0 0 0 0\n", learner.to_text());
+        let (state, state_sha) = put("STATE", text.as_bytes());
+        let (codec_path, codec_sha) = put("CODEC", codec.to_text().as_bytes());
+        let (units, units_sha) = put("UNITS", b"founded-units-v1 0\n");
+        let (held, held_sha) = put("HELD", TOY);
+        let args: Vec<String> = ["transmission-field", &state, &state_sha, &codec_path, &codec_sha, &units, &units_sha, &held, &held_sha, "3"].iter().map(|s| s.to_string()).collect();
+        transmission_field(&args, &mut HostField).unwrap();
+        assert_eq!(std::fs::read(dir.join("STATE")).unwrap(), text.as_bytes());
+        let _ = std::fs::remove_dir_all(&dir);
+    }
+
     /// [theory, November 10, order 2] `locked-visit-field` end to end on the host: each set's file holds one record for every answer
     /// place and every stop place the room holds, in problem then place order; each record's letter is the reference's, its face
     /// the shares `Field::locked_faces` gives (each class's mass released at `2^(−16)`, the shares summing to within the alphabet
@@ -10726,6 +10800,106 @@ pub(super) fn locked_visit_field(args: &[String], realization: &mut dyn FieldRea
         println!("FIELD_VISIT_SET set={name} problems={} records={records} record_bytes={} bytes={} ms={}", problems.len(), visit_record_bytes(a, dw), records * visit_record_bytes(a, dw), started.elapsed().as_millis());
     }
     println!("FIELD_VISIT_DONE ms={}", started.elapsed().as_millis());
+    Ok(())
+}
+
+/// [definition; theory, November 10 20:34] **A transmission pattern's regions** ([`transmission_field`]): for an answer `x` of `n` letters
+/// after the question `q`, the regions that write at each place `t` exactly its `d` nearest letters (the `d` before it, `left`; the `d`
+/// each side, `both`) and the rest of the answer the void letter, with `tail` voids past the answer's end, `t` alone open. The window
+/// repeats with period `P` (`d + 5`: `d` letters, the place, four voids; `2d + 9`: four voids, `d` letters, the place, `d` letters, four
+/// voids) and every shift `s < P` of it is a region, so each answer place is a target once. A target without its `d` letters (`t < d`,
+/// and for both sides `t + d ≥ n`) is left out and counted out: it is no target, and its window is not written. Returns the regions
+/// (each with its targets, the answer places its open sites are) and the count out.
+fn transmission_patterns(q: &[usize], x: &[usize], void: usize, both: bool, d: usize, tail: usize) -> (Vec<(Vec<usize>, Vec<bool>, Vec<usize>)>, usize) {
+    let n = x.len();
+    let period = if both { 2 * d + 9 } else { d + 5 };
+    let eligible = |t: usize| t >= d && (!both || t + d < n);
+    let out = (0..n).filter(|&t| !eligible(t)).count();
+    let mut regions = Vec::new();
+    for shift in 0..period {
+        let targets: Vec<usize> = (shift..n).step_by(period).filter(|&t| eligible(t)).collect();
+        if targets.is_empty() {
+            continue;
+        }
+        let mut classes: Vec<usize> = q.iter().copied().chain(std::iter::repeat_n(void, n + tail)).collect();
+        let mut open = vec![false; classes.len()];
+        for &t in &targets {
+            open[q.len() + t] = true;
+            for p in t.saturating_sub(d)..t {
+                classes[q.len() + p] = x[p];
+            }
+            if both {
+                for p in t + 1..=t + d {
+                    classes[q.len() + p] = x[p];
+                }
+            }
+        }
+        regions.push((classes, open, targets));
+    }
+    (regions, out)
+}
+
+/// [measurement; theory, November 10 20:34] `transmission-field STATE STATE_SHA CODEC CODEC_SHA UNITS UNITS_SHA HELD HELD_SHA COUNT`:
+/// **the field's transmission by joint**, a reading of a saved state (its bytes unchanged) on the first `COUNT` held problems. At an
+/// answer place `t`, the reference's exactly `d` nearest letters written and the rest of the answer the void letter (not an open
+/// blank), the question given as always, the code `−ln f_t(x_t)` read at `t`, in nats: `left` with the `d` letters before `t`
+/// (`d = 0..4`) and `both` with `d` each side (`d = 1..4`). Batched in periodic patterns over the answer ([`transmission_patterns`]),
+/// every shift of the period, so each answer place is a target once per (mode, `d`). The reference is cut to its room as the visits
+/// cut it, and the tail past its end is the visit's (`min(NEAR, room − n)` voids, four at least). Prints
+/// `FIELD_TRANSMISSION mode= d= places= out= code_nats_a_place=` a mode and `d`: the places read, the targets left out for want of their
+/// letters, and the mean code.
+pub(super) fn transmission_field(args: &[String], realization: &mut dyn FieldRealization) -> Result<()> {
+    if args.len() != 10 {
+        return Err("transmission-field STATE STATE_SHA CODEC CODEC_SHA UNITS UNITS_SHA HELD HELD_SHA COUNT".into());
+    }
+    let started = std::time::Instant::now();
+    let mut learner = FieldLearner::from_text(std::str::from_utf8(&pinned_read(&args[1], &args[2], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
+    declared_clocks(&mut learner.field);
+    let field = &learner.field;
+    let units = units_of(&args[5], &args[6])?;
+    let codec = FieldCodec::from_text(std::str::from_utf8(&pinned_read(&args[3], &args[4], CODEC_BUDGET)?)?, units)?;
+    let held = problems_of(&pinned_read(&args[7], &args[8], READ_BUDGET as usize)?);
+    let limit = count(&args[9])?.min(held.len());
+    let void = codec.void();
+    let mut references: Vec<(Vec<usize>, Vec<usize>, usize)> = Vec::new();
+    for (question, answer) in held.iter().take(limit) {
+        let (q, room) = opening(&codec, field, question, b"")?;
+        let mut x = codec.encode(answer)?;
+        x.truncate(room);
+        if !x.is_empty() {
+            references.push((q, x, room));
+        }
+    }
+    println!("FIELD_CLOCKS per_blank={} bare={} problems={} places={}", field.per_blank_clock, field.bare_stretch, references.len(), references.iter().map(|r| r.1.len()).sum::<usize>());
+    const CHUNK: usize = 64;
+    let modes: [(&str, bool, std::ops::RangeInclusive<usize>); 2] = [("left", false, 0..=4), ("both", true, 1..=4)];
+    for (name, both, ds) in modes {
+        for d in ds {
+            let (mut sum, mut places, mut out) = (0i128, 0usize, 0usize);
+            let mut pending: Vec<(Vec<usize>, Vec<bool>, Vec<usize>, usize)> = Vec::new();
+            for (k, (q, x, room)) in references.iter().enumerate() {
+                let (regions, o) = transmission_patterns(q, x, void, both, d, holonics::hnn::tower::field::NEAR.min(room.saturating_sub(x.len())));
+                out += o;
+                pending.extend(regions.into_iter().map(|(c, u, t)| (c, u, t, k)));
+            }
+            for chunk in pending.chunks(CHUNK) {
+                let views: Vec<Region> = chunk.iter().map(|(c, u, _, _)| Region { classes: c, unresolved: u, faces: &[], locked: &[], echo: &[], domain: None, port: None }).collect();
+                let faces = realization.read_faces(field, &views).map_err(|e| e.to_string())?;
+                for ((_, _, targets, k), read) in chunk.iter().zip(&faces) {
+                    let (q, x, _) = &references[*k];
+                    for &t in targets {
+                        let face = read.get(q.len() + t).and_then(Option::as_ref).ok_or("a transmission target without a face")?;
+                        sum += face.code(x[t]) as i128;
+                        places += 1;
+                    }
+                }
+            }
+            let mean = if places == 0 { "-".to_string() } else { decimal_q20(nats_q20(sum) / places as i128) };
+            println!("FIELD_TRANSMISSION mode={name} d={d} places={places} out={out} code_nats_a_place={mean} ms={}", started.elapsed().as_millis());
+            let _ = std::io::Write::flush(&mut std::io::stdout());
+        }
+    }
+    println!("FIELD_TRANSMISSION_DONE ms={}", started.elapsed().as_millis());
     Ok(())
 }
 
