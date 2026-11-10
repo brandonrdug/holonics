@@ -927,18 +927,33 @@ fn joint_read(field: &Field, codec: &FieldCodec, problems: &Problems, seed: u64,
     // Each held problem's per-site terms, own and foil, on 2^(−20) bits.
     let mut own: Vec<Vec<i64>> = problems.iter().map(|(_, a, _)| vec![0i64; a.len() + 1]).collect();
     let mut foil: Vec<Vec<i64>> = own.clone();
+    // [measurement; theory, November 9 23:30] The own code by the share of the answer already written when a place is coded,
+    // `(m − K)/m` of a state with `K` of its `m` places open, in tenths: each tenth's code on 2^(−20) bits and its places
+    // (each state's `|S_s|/K_s` a coded place).
+    let mut tenths = [(0i128, 0i128); 10];
     for chunk in states.chunks(64) {
         let views: Vec<Region> = chunk.iter().map(|(_, _, _, c, u)| Region { classes: c, unresolved: u, faces: &[], locked: &[], echo: &[], domain: None, port: None }).collect();
         let faces = realization.read_faces(field, &views).map_err(|e| e.to_string())?;
         for ((i, is_foil, (size, k), c, _), faces) in chunk.iter().zip(faces) {
             let q_len = c.len() - problems[*i].1.len() - 1;
             let terms = if *is_foil { &mut foil[*i] } else { &mut own[*i] };
+            let m = (c.len() - q_len) as u64;
+            let tenth = &mut tenths[(10 * (m - k) / m).min(9) as usize];
+            let mut coded = 0i128;
             for (t, face) in faces.iter().enumerate() {
                 if let Some(face) = face {
                     let x = face.code(c[t]) as i128 * *size as i128;
                     let k = *k as i128;
-                    terms[t - q_len] += (if x >= 0 { (x + k / 2) / k } else { -((-x + k / 2) / k) }) as i64;
+                    let term = (if x >= 0 { (x + k / 2) / k } else { -((-x + k / 2) / k) }) as i64;
+                    terms[t - q_len] += term;
+                    if !is_foil {
+                        tenth.0 += term as i128;
+                    }
+                    coded += 1;
                 }
+            }
+            if !is_foil {
+                tenth.1 += (coded * *size as i128 + *k as i128 / 2) / *k as i128;
             }
         }
     }
@@ -981,6 +996,9 @@ fn joint_read(field: &Field, codec: &FieldCodec, problems: &Problems, seed: u64,
         micro_nats(own_sum * ln2, words),
         micro_nats((foil_sum - own_sum) * ln2, words)
     );
+    for (b, &(code, places)) in tenths.iter().enumerate() {
+        println!("FIELD_JOINT_WRITTEN lap={lap} written=0.{b}-{} places={places} own_nats_a_place={}", if b == 9 { "1".to_string() } else { format!("0.{}", b + 1) }, micro_nats(code * ln2, places));
+    }
     per.sort_unstable();
     let q = |f: usize| per.get((f * per.len()) / 4).copied().unwrap_or(0) as i128;
     println!(
@@ -6916,6 +6934,26 @@ mod tests {
         assert_eq!(tail(9, 3, 1), 1);
     }
 
+    /// [census 2b, November 9 23:30] A section's code read from its faces ([`section_code`]) is the code and the sites its deposit
+    /// reads ([`FieldLearner::section_realized`]'s `code_before`), on a section of members and openings (ports at their boundary),
+    /// the ports' part among it.
+    #[test]
+    fn a_sections_code_from_its_faces_is_its_deposits() {
+        let (codec, problems) = toy();
+        let mut learner = toy_learner(&codec, &problems);
+        let members: Vec<usize> = (0..problems.len()).collect();
+        let paths: Vec<usize> = members.iter().rev().copied().collect();
+        let mut draw = 0u64;
+        let (regions, _) = section_regions(&codec, &problems, &members, &paths, 9, &mut draw, &mut learner, &mut HostField).unwrap();
+        let views = views_of(&regions);
+        assert!(views.iter().any(|r| r.port.is_some()) && views.iter().any(|r| r.domain.is_some()));
+        let faces = HostField.read_faces(&learner.field, &views).unwrap();
+        let (code, sites, ported) = section_code(&faces, &views).unwrap();
+        let receipt = learner.section_realized(&views, &mut HostField).unwrap();
+        assert_eq!((code, sites), (receipt.code_before, receipt.sites));
+        assert!(ported != 0 && ported != code, "the ports' part {ported} of {code}");
+    }
+
     /// [§16.32] A state's weighed domain is `⌊2√(mK)⌋`: its weight `domain/K` is `2√(m/K)`, the importance ratio `2√τ` of
     /// the density `τ = u²` read at `τ = K/m` times the joint code's `m/K`.
     #[test]
@@ -8824,34 +8862,150 @@ pub(super) fn census_table(text: &str, depth: u32) -> Result<LensTable> {
     Ok(table)
 }
 
+/// [measurement; theory, November 9 23:30] **A visit's charge** ([`lap_visit`]): the sites whose letter the lap's code compares
+/// at their own place, the sites that take a content covector (each region's open sites before its port: the members' masks
+/// and the writers' states; an opening compared at its boundary codes whether the answer has ended, never which letter it
+/// holds, and is charged nothing), each counted once a draw; beside them the lap's code as its deposit reads it, and the counts
+/// the checks read.
+#[derive(Clone, Debug, Default)]
+struct Charge {
+    /// The sites charged, and of them those in a question (a member masked over its whole region compares its question's
+    /// letters at their places).
+    sites: u64,
+    question: u64,
+    /// Σ over the visit's draws of the drawn problems' answer places `|a| + 1` (the answer and its first void), the member's
+    /// and the path problem's.
+    bound: u64,
+    /// The sites compared at their own place whose input holds their own letter (resolved, carried or locked).
+    leaks: u64,
+    /// The visit's code as the deposit reads it ([`section_code`]) on `2^(−20)` bits, its sites, and of it the ports' part.
+    code: i128,
+    code_sites: u64,
+    ported: i128,
+    /// The charged sites' own code, each once, on `2^(−20)` bits.
+    charged_code: i128,
+}
+
+/// [measurement; theory, November 9 23:30] **A section's code as its deposit reads it**, from faces already read on its
+/// regions: [`FieldLearner::section_realized`]'s `code_before` and sites (each region's sites before its port at its weight
+/// `m/K`, released once a region to the nearest, half away from zero, and its port's code; the sites each weighed region's
+/// domain where it reads an open site and each port's heard places before its stop), and of the code the ports' part. The same
+/// law read on the same faces; nothing moves.
+fn section_code(faces: &[Vec<Option<holonics::hnn::tower::TowerFace>>], regions: &[Region]) -> Result<(i64, usize, i64)> {
+    let (mut code, mut sites, mut ported) = (0i64, 0usize, 0i64);
+    for (r, f) in regions.iter().zip(faces) {
+        let len = r.classes.len();
+        let end = r.port.map_or(len, |p| p.start);
+        let own: i64 = f[..end].iter().zip(r.classes).filter_map(|(face, &c)| face.as_ref().map(|face| face.code(c))).sum();
+        let (m, k) = r.weight();
+        code += if m == k { own } else { holonics::hnn::overture::div_nearest(own as i128 * m as i128, k as i128) as i64 };
+        if r.unresolved[..end].iter().any(|&u| u) {
+            sites += m as usize;
+        }
+        if let Some(p) = r.port {
+            let stop = p.stop.unwrap_or(len).min(len);
+            let at: Vec<(&[u128], u128)> = (p.start..len)
+                .map(|t| match &f[t] {
+                    _ if t >= stop || p.heard.is_some_and(|h| !h[t]) => Ok((&[][..], 0)),
+                    Some(face) => Ok((face.masses.as_slice(), face.total)),
+                    None if p.boundary || p.letters => Ok((&[][..], 0)),
+                    None => Err("a port's place without a face"),
+                })
+                .collect::<std::result::Result<_, _>>()?;
+            let c = holonics::hnn::tower::field::port_reading(&at, &p).map_err(|e| e.to_string())?.1;
+            (code, ported) = (code + c, ported + c);
+            sites += (p.start..stop).filter(|&t| r.unresolved[t] && p.heard.is_none_or(|h| h[t])).count();
+        }
+    }
+    Ok((code, sites, ported))
+}
+
 /// One visit of a training lap's own states ([`plate_joint_field`]): the first `take` sections of `order`, their regions and
-/// open-site draws formed as `train-field` forms them from the draw `draw`, read only; at every open site, `visit(leaf, face,
-/// truth)` with its leaf at the last tick (`[h]`, full depth). Prints each section's time where `timed`. Returns the open
-/// places.
+/// open-site draws formed as `train-field` forms them from the draw `draw`, read only; at every charged site ([`Charge`]),
+/// `visit(leaf, face, truth, octave)` with its leaf at the last tick (`[h]`, full depth) and its octave of distance to the seam.
+/// Prints each section's time where `timed`. Where `line` is given (`SITES:BITS`, the `sites` and `before` of the
+/// `FIELD_SECTION lap=0 n=0` line of the run that continued from the state, or `-` where none), the first section is read
+/// against it and its own letters changed (checks 1 and 3, printed with PASS or FAIL); a FAIL refuses the visit.
 #[allow(clippy::too_many_arguments)]
-fn lap_visit(codec: &FieldCodec, train: &Problems, sections: &[Vec<usize>], paths: &[Vec<usize>], order: &[usize], seed: u64, mut draw: u64, learner: &mut FieldLearner, realization: &mut dyn FieldRealization, timed: bool, visit: &mut dyn FnMut(&[u32], &holonics::hnn::tower::TowerFace, usize, Option<u32>)) -> Result<u64> {
+fn lap_visit(codec: &FieldCodec, train: &Problems, sections: &[Vec<usize>], paths: &[Vec<usize>], order: &[usize], seed: u64, mut draw: u64, learner: &mut FieldLearner, realization: &mut dyn FieldRealization, timed: bool, line: Option<&str>, visit: &mut dyn FnMut(&[u32], &holonics::hnn::tower::TowerFace, usize, Option<u32>)) -> Result<Charge> {
+    if path_drafts() || path_squares() {
+        return Err("census 2b charges the lap's members, openings and writers; a declared draft or square region is not among them".into());
+    }
     let decl = learner.field.declaration;
     let (heads, m2) = (decl.heads, 2 * decl.complex());
-    let mut places = 0u64;
+    let mut charge = Charge::default();
     for (n, &s) in order.iter().enumerate() {
         let section_start = std::time::Instant::now();
-        let (regions, _) = section_regions(codec, train, &sections[s], &paths[s], seed, &mut draw, learner, realization)?;
+        let (members, path) = (&sections[s], &paths[s]);
+        let draws: Vec<u64> = (1..=members.len() as u64).map(|k| draw + k).collect();
+        let (regions, _) = section_regions(codec, train, members, path, seed, &mut draw, learner, realization)?;
         let views = views_of(&regions);
+        // Each region's problem and draw: the members, then the openings (charged nothing), then the writers' states (a path
+        // problem with an answer, [`writer_region`]).
+        let writers: Vec<(usize, u64)> = if path_writer() { path.iter().zip(&draws).filter(|&(&j, _)| train[j].1.len().min(codec.answer) > 0).map(|(&j, &d)| (j, d)).collect() } else { Vec::new() };
+        let rest = &views[members.len()..];
+        let openings = rest.iter().take_while(|r| r.port.is_some()).count();
+        if rest.len() != openings + writers.len() || rest[openings..].iter().any(|r| r.port.is_some() || r.domain.is_some()) {
+            return Err(format!("section {s}: {} regions past its {} members are not its openings and its {} writers' states", rest.len(), members.len(), writers.len()).into());
+        }
+        let owner: Vec<Option<(usize, u64)>> = members.iter().zip(&draws).map(|(&i, &d)| Some((i, d))).chain(std::iter::repeat_n(None, openings)).chain(writers.iter().map(|&w| Some(w))).collect();
+        charge.bound += members.iter().chain(path).map(|&i| train[i].1.len() as u64 + 1).sum::<u64>();
         let read = realization.read_words(&learner.field, &views).map_err(|e| e.to_string())?;
-        let mut open = 0u64;
-        for (((r, faces), leaves), words) in views.iter().zip(&read.faces).zip(&read.plates).zip(&read.words) {
-            for (t, face) in faces.iter().enumerate() {
-                let Some(face) = face.as_ref().filter(|_| r.unresolved[t]) else { continue };
+        let (code, sites, ported) = section_code(&read.faces, &views)?;
+        (charge.code, charge.code_sites, charge.ported) = (charge.code + code as i128, charge.code_sites + sites as u64, charge.ported + ported as i128);
+        let mut seen: std::collections::HashSet<(usize, u64, usize)> = std::collections::HashSet::new();
+        let mut charged: Vec<Vec<usize>> = vec![Vec::new(); views.len()];
+        let (mut open, mut own_code) = (0u64, 0i128);
+        for (ri, (((r, faces), leaves), words)) in views.iter().zip(&read.faces).zip(&read.plates).zip(&read.words).enumerate() {
+            let end = r.port.map_or(r.classes.len(), |p| p.start);
+            for (t, face) in faces[..end].iter().enumerate() {
+                let Some(face) = face else { continue };
+                if !r.unresolved[t] || r.faces.get(t).is_some_and(|f| f.is_some()) || r.locked.get(t).is_some_and(|&l| l) {
+                    charge.leaks += 1;
+                    continue;
+                }
+                let (problem, d) = owner[ri].ok_or("an opening's site compared at its own place")?;
+                if !seen.insert((problem, d, t)) {
+                    continue;
+                }
                 visit(&leaves[t * heads..(t + 1) * heads], face, r.classes[t], holonics::hnn::tower::field::seam_octave(&words[t * m2..(t + 1) * m2], &decl));
+                own_code += face.code(r.classes[t]) as i128;
+                charge.question += u64::from(t < train[problem].0.len());
+                charged[ri].push(t);
                 open += 1;
             }
         }
-        places += open;
+        (charge.sites, charge.charged_code) = (charge.sites + open, charge.charged_code + own_code);
+        if let Some(line) = line.filter(|_| n == 0) {
+            // Check 1: the section's code as its deposit reads it, against the line the lap printed for it.
+            let (before, ported_bits) = (bits(code, sites), bits(ported, sites));
+            let verdict = match line.split_once(':') {
+                Some((ls, lb)) => if ls == sites.to_string() && lb == before { "PASS" } else { "FAIL" },
+                None => "NO_LINE",
+            };
+            println!("FIELD_CHECK check=1 result={verdict} section={s} sites={sites} before={before} code_q20={code} ported_bits_a_site={ported_bits} charged={open} charged_bits_a_site={} line={line} matched=FIELD_SECTION_lap0_n0", bits(own_code as i64, open as usize));
+            // Check 3: every charged site's own class changed reads the same faces at every site.
+            let mut changed: Vec<TrainRegion> = regions.clone();
+            let mut moved = 0u64;
+            for (region, sites) in changed.iter_mut().zip(&charged) {
+                for &t in sites {
+                    region.classes[t] = if region.classes[t] == 0 { 1 } else { 0 };
+                    moved += 1;
+                }
+            }
+            let again = realization.read_words(&learner.field, &views_of(&changed)).map_err(|e| e.to_string())?;
+            let equal = again.faces == read.faces;
+            let leaks = charge.leaks;
+            println!("FIELD_CHECK check=3 part=first_section result={} leaks={leaks} changed_sites={moved} faces_equal={equal}", if equal && leaks == 0 { "PASS" } else { "FAIL" });
+            if verdict == "FAIL" || !equal || leaks > 0 {
+                return Err("census 2b refuses to read: a check failed on the lap's first section".into());
+            }
+        }
         if timed {
-            println!("FIELD_LEAVES_SECTION n={n} section={s} regions={} open_places={open} ms={}", views.len(), section_start.elapsed().as_millis());
+            println!("FIELD_LEAVES_SECTION n={n} section={s} regions={} charged={open} code_sites={sites} ms={}", views.len(), section_start.elapsed().as_millis());
         }
     }
-    Ok(places)
+    Ok(charge)
 }
 
 /// `log₂(N/F)` on the codes' `2^(−20)` bits for a count `N > 0` and an expected count `F` on `2^(−20)` ([`face_code`] of the
@@ -8880,9 +9034,17 @@ fn log2_ratio(n: u64, f: u128) -> i128 {
 /// most `U` at each depth with their shells and counts (`LEAVES_U.tsv`). Then the held problems' joint read
 /// (`FIELD_JOINT_NATS`, the train-field lap's own chain, its seed and states) plain (`lap=0`) and through the residual lens at
 /// each depth (`lap=d`, [`Lensed`]). `FIELD_LEAVES` and `FIELD_LEAVES_SECTION` lines count and time the visit.
+///
+/// [measurement; theory, November 9 23:30, census 2b] Every count, U, seam and code reads the charged sites alone ([`Charge`]:
+/// the sites the lap's code compares at their own place, once a draw; census 2 had charged every open site, the openings'
+/// boundary places among them). `LINE` (`SITES:BITS`, or `-`) is the `FIELD_SECTION lap=0 n=0` line of the run that continued
+/// from the state. Before any reading, each check printed with PASS or FAIL, and a FAIL refuses the read: (1) the first section's
+/// code as the deposit reads it is the line's, in its units (bits a site over the line's sites); (2) the charged sites are at most
+/// the visit's draws' answer places ([`Charge::bound`]); (3) no charged site's input holds its own letter (none resolved, carried
+/// or locked, and the first section read with every charged site's class changed returns the same faces at every site).
 pub(super) fn plate_joint_field(args: &[String], realization: &mut dyn FieldRealization) -> Result<()> {
-    if args.len() != 14 {
-        return Err("plate-joint-field UNITS UNITS_SHA TRAIN TRAIN_SHA HELD HELD_SHA KEYS KEYS_SHA SECTION SECTIONS STATE STATE_SHA OUT".into());
+    if args.len() != 15 {
+        return Err("plate-joint-field UNITS UNITS_SHA TRAIN TRAIN_SHA HELD HELD_SHA KEYS KEYS_SHA SECTION SECTIONS STATE STATE_SHA LINE OUT".into());
     }
     let started = std::time::Instant::now();
     let units = units_of(&args[1], &args[2])?;
@@ -8892,7 +9054,8 @@ pub(super) fn plate_joint_field(args: &[String], realization: &mut dyn FieldReal
     let (section, limit) = (positive(&args[9])?, count(&args[10])?);
     let mut learner = FieldLearner::from_text(std::str::from_utf8(&pinned_read(&args[11], &args[12], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
     declared_clocks(&mut learner.field);
-    let out = Path::new(&args[13]);
+    let line = args[13].as_str();
+    let out = Path::new(&args[14]);
     std::fs::create_dir(out)?;
     let codec = FieldCodec::found(units, &train_problems)?;
     let encode = |problems: &[(Vec<u8>, Vec<u8>)]| -> Result<Problems> {
@@ -8905,6 +9068,7 @@ pub(super) fn plate_joint_field(args: &[String], realization: &mut dyn FieldReal
     if learner.holds_step() {
         return Err("plate-joint-field reads a state that holds no step (it never deposits)".into());
     }
+    println!("FIELD_CLOCKS per_blank={} bare={} laps_read={}", learner.field.per_blank_clock, learner.field.bare_stretch, learner.laps);
     let (heads, trits, a) = (learner.field.declaration.heads, learner.field.declaration.class_trits(), learner.field.declaration.alphabet);
     let read = learner.laps;
     let draw = read * train_set.len() as u64;
@@ -8915,13 +9079,32 @@ pub(super) fn plate_joint_field(args: &[String], realization: &mut dyn FieldReal
     let leaf_at = |leaf: &[u32], d: usize| -> Vec<u32> { leaf.iter().map(|&c| c % 3u32.pow(d as u32)).collect() };
     // [theory, November 9 22:07] The seam as a cut: each depth-1 leaf split by its sites' octave of distance to the seam.
     let mut cut: std::collections::BTreeMap<(Vec<u32>, Option<u32>), PlateCounts> = std::collections::BTreeMap::new();
-    let places = lap_visit(&codec, &train_set, &sections, &paths, &order[..take], seed, draw, &mut learner, realization, true, &mut |leaf, face, truth, octave| {
+    let charge = lap_visit(&codec, &train_set, &sections, &paths, &order[..take], seed, draw, &mut learner, realization, true, Some(line), &mut |leaf, face, truth, octave| {
         for (d, table) in counts.iter_mut().enumerate().skip(1) {
             table.entry(leaf_at(leaf, d)).or_insert_with(|| PlateCounts::new(a)).add(face, truth);
         }
         cut.entry((leaf_at(leaf, 1), octave)).or_insert_with(|| PlateCounts::new(a)).add(face, truth);
     })?;
+    let places = charge.sites;
     let census_ms = started.elapsed().as_millis();
+    // Checks 2 and 3 over the whole visit, before any reading.
+    let bounded = charge.sites <= charge.bound;
+    println!("FIELD_CHECK check=2 result={} charged={} question={} answer={} bound={} sections={take}", if bounded { "PASS" } else { "FAIL" }, charge.sites, charge.question, charge.sites - charge.question, charge.bound);
+    println!("FIELD_CHECK check=3 part=visit result={} leaks={}", if charge.leaks == 0 { "PASS" } else { "FAIL" }, charge.leaks);
+    if !bounded || charge.leaks > 0 {
+        return Err("census 2b refuses to read: a check failed over the visit".into());
+    }
+    // The visit's code in the lap's units (bits a site over the deposit's sites), beside FIELD_LAP's `before` (read on a field
+    // that moves through its lap, so not the same number), and the charged sites' own.
+    println!(
+        "FIELD_CHARGE sites={} lap_code_bits_a_site={} lap_code_sites={} ported_bits_a_site={} charged_bits_a_site={} charged_nats_a_place={}",
+        charge.sites,
+        bits(i64::try_from(charge.code)?, charge.code_sites as usize),
+        charge.code_sites,
+        bits(i64::try_from(charge.ported)?, charge.code_sites as usize),
+        bits(i64::try_from(charge.charged_code)?, charge.sites as usize),
+        if places == 0 { "-".to_string() } else { decimal_q20(nats_q20(charge.charged_code) / places as i128) }
+    );
     let mut file = rows_file(&out.join("CENSUS.tsv"), "depth\tleaf\tcounts\texpected_q20\n")?;
     let mut tables: Vec<LensTable> = vec![LensTable::new(); trits + 1];
     // Each leaf's stored free energy `Σ_a N_a log₂(N_a/F_a)` on 2^(−20) bits.
@@ -8937,7 +9120,7 @@ pub(super) fn plate_joint_field(args: &[String], realization: &mut dyn FieldReal
             energies[d].push((u, leaf.clone(), k.places()));
             tables[d].insert(leaf.clone(), (k.n.clone(), f));
         }
-        println!("FIELD_LEAVES depth={d} cells={} leaves={} open_places={places} sections={take} of={} census_ms={census_ms}", 3u128.pow((heads * d) as u32), table.len(), order.len());
+        println!("FIELD_LEAVES depth={d} cells={} leaves={} charged_places={places} sections={take} of={} census_ms={census_ms}", 3u128.pow((heads * d) as u32), table.len(), order.len());
     }
     // [theory, November 9 22:07] U of the depth-1 leaves cut by the seam (leaf × octave) beside U at depths 1 and 2, a place:
     // counts add, so the cut's U is at least depth 1's; the gap is the free energy the seam's distance reveals.
@@ -8954,7 +9137,7 @@ pub(super) fn plate_joint_field(args: &[String], realization: &mut dyn FieldReal
     let mut codes: Vec<[i128; 2]> = vec![[0; 2]; trits + 1];
     let mut seams: Vec<std::collections::BTreeMap<Option<u32>, (u64, i128, i128, i128)>> = vec![std::collections::BTreeMap::new(); trits + 1];
     let second = std::time::Instant::now();
-    lap_visit(&codec, &train_set, &sections, &paths, &order[..take], seed, draw, &mut learner, realization, false, &mut |leaf, face, truth, octave| {
+    let again = lap_visit(&codec, &train_set, &sections, &paths, &order[..take], seed, draw, &mut learner, realization, false, None, &mut |leaf, face, truth, octave| {
         let plain = face.code(truth) as i128;
         for d in 1..=trits {
             let lensed = lensed_face(face, leaf, d as u32, &tables[d]).code(truth) as i128;
@@ -8964,6 +9147,9 @@ pub(super) fn plate_joint_field(args: &[String], realization: &mut dyn FieldReal
             *slot = (slot.0 + 1, slot.1 + charge, slot.2 + plain - lensed, slot.3 + plain);
         }
     })?;
+    if again.sites != places {
+        return Err(format!("the second visit charged {} sites where the first charged {places}", again.sites).into());
+    }
     let mut seam_file = rows_file(&out.join("SEAMS.tsv"), "depth\toctave\tmargin_from\tmargin_to\tsites\tu_nats_a_site\tplain_code_nats_a_site\treleased_nats_a_site\n")?;
     for (d, bins) in seams.iter().enumerate().skip(1) {
         for (octave, &(sites, u, released, plain)) in bins {
