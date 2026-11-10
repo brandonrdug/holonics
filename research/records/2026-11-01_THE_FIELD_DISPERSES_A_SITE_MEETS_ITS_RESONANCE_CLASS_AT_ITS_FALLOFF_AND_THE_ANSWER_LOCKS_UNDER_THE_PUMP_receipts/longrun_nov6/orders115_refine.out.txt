@@ -1,0 +1,11 @@
+== refine 1
+FIELD_LENGTH problems=32 sweeps=2062 refine=1 stopped=- run_bits=1 reads=1274 certified_bits=965.522 passed=236 ms=36533
+MEASURE lap=refine1 rc=0 wall_s=36.8 peak_rss_kib=236868
+written: 32 answers, 29 open with ```python; a 'y' outside it in 23, its first at places 0 to 5 in 0 (median first 50), 'y' past it 0.013; commonest byte's share at places 10 to 255 (246 places) 0.182; top byte ' ' 0.143
+written: 32 answers: a fence opened 30, closed 28; parses as Python 2; code lines mean 9.7; identifiers 1015, in the question 0.09, in the held answer 0.09
+== refine 3
+FIELD_LENGTH problems=32 sweeps=2062 refine=3 stopped=- run_bits=1 reads=2337 certified_bits=5582.042 passed=1870 ms=60500
+MEASURE lap=refine3 rc=0 wall_s=60.8 peak_rss_kib=242832
+written: 32 answers, 29 open with ```python; a 'y' outside it in 26, its first at places 0 to 5 in 0 (median first 53), 'y' past it 0.013; commonest byte's share at places 10 to 255 (246 places) 0.181; top byte ' ' 0.142
+written: 32 answers: a fence opened 31, closed 29; parses as Python 1; code lines mean 9.9; identifiers 960, in the question 0.13, in the held answer 0.12
+REFINE exit 17:01:44

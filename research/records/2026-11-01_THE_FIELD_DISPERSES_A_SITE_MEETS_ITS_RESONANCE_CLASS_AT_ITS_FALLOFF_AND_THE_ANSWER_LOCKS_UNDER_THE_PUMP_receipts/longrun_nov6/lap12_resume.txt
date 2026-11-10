@@ -1,0 +1,19 @@
+# lock taken 18:24:04, binary 38b90fa5ee7e6974, state 7c77b05dc6a8ac07
+FIELD_ENUMERATED_READ lap=-1 ms=8463
+FIELD_RESUMED lap=0 sections=680/1543 ms=8463
+FIELD_SAVED lap=0 sections=1355/1543 ms=3608509 read_ms=7498
+FIELD_KERNEL_ACCEPT lap=0 states=420083 places=420083 moved=400632 accept_milli=421 sd_milli=404 whole=98146 accepted_places=176982 accepted_places_a_second=38
+FIELD_KERNEL_FAMILIES lap=0 enc=-3/-4657 before=-3/-2016 after=-17/-3128 q=2/-564 q_bias=0/0 v=0/0 v_bias=0/0 out=0/0 out_bias=0/0 a=0/0 a_bias=0/0 b=0/0 b_bias=0/0 w=0/0 w_bias=0/0 read=0/-15 read_bias=7/-660 moment_before=0/0 moment_after=0/0 temper=0/0 probe=0/-478 probe_bias=0/0 pace=0/0 moment_face=0/0 moment_face_bias=0/0 lift_bias=0/0 pair_c=0/0 face_temper=0/0
+FIELD_ENUMERATED_READ lap=0 ms=4655429
+FIELD_CARD reads=1735 read_ms=2004556 returns=863 return_ms=2464031 pairs=693100974436 batches=25251 peak_store=8327680328 landmarks=0 landmark_ms=0 elapsed_ms=4655627
+MEASURE lap=lap rc=0 wall_s=4656.2 peak_rss_kib=3493080
+# codes in nats a byte (each codec letter is one byte); the KL in nats
+lap	places	enumerated_code	face_code	kl_mean	kl_q25	kl_median	kl_q75	kl<=0.3	face_zero_letters
+-1	64	2.5012	3.7793	1.3377	0.3016	0.5223	1.3241	8/64 under 0.3 bits	0
+0	64	2.6229	3.5392	1.2525	0.2790	0.5615	1.4675	9/64 under 0.3 bits	0
+11355	64	2.5426	3.5451	1.4017	0.2851	0.7241	1.4850	6/64 under 0.3 bits	0
+# enumerated code from lap -1 to lap 0: paired change +0.1217 nats a byte, standard error 0.0948, over 64 places; falls past twice its error: False
+# enumerated code from lap -1 to lap 11355: paired change +0.0415 nats a byte, standard error 0.0680, over 64 places; falls past twice its error: False
+$ROOT/.local/wt/qgchgu-sampler/.local/run/2026-11-07-lap12card/resume/STATE.0 82166241aede6afb4b33f57661beef6507e9c3d3ffee783b0bf0ef610f55ba2e
+$ROOT/.local/wt/qgchgu-sampler/.local/run/2026-11-07-lap12card/resume/STATE.0.1355 73995fa3bc33d33804fa52b92e6486a466d6f7b2abeb5f08b76a28b8afcdaa19
+MAIN exit 19:41:41

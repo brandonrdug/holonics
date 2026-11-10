@@ -83,7 +83,7 @@ fn question_and_answer(problem: &[u8]) -> (&[u8], &[u8]) {
 
 /// The bytes a `FREE.tsv` field escapes: `\\`, `\'`, `\"`, `\t`, `\n`, `\r` and `\xNN`, as
 /// `read-lines` and `release-field` write them. Any other escape is refused.
-fn unescape(field: &[u8]) -> Result<Vec<u8>> {
+pub(super) fn unescape(field: &[u8]) -> Result<Vec<u8>> {
     let hex = |b: u8| (b as char).to_digit(16).map(|d| d as u8);
     let mut out = Vec::with_capacity(field.len());
     let mut at = 0;

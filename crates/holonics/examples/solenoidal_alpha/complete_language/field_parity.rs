@@ -71,7 +71,7 @@ impl Passage {
     /// The founded learner of the declaration `D H n STILL f K` at `RATE`.
     fn learner(&self, args: &[String], rate: u32) -> Result<FieldLearner> {
         let (width, heads, modes, still, contacts, ticks) = (positive(&args[0])?, positive(&args[1])?, positive(&args[2])?, count(&args[3])?, positive(&args[4])?, positive(&args[5])?);
-        let declaration = FieldDeclaration { alphabet: self.codec.alphabet(), width, heads, modes, still, contacts, ticks, frames: heads, reach: self.reach, lanes: 1, depth: 0 };
+        let declaration = FieldDeclaration { alphabet: self.codec.alphabet(), width, heads, modes, still, contacts, ticks, frames: heads, reach: self.reach, lanes: 1, depth: 0, energy: false };
         let mut field = Field::found(declaration, &self.keys).map_err(|e| e.to_string())?;
         // The trainer's declared clock (`FIELD_CLOCK_PER_BLANK`, `Field::per_blank_clock`), so its parity reads that law.
         super::field_train::declared_clocks(&mut field);
@@ -255,6 +255,13 @@ pub(super) fn parity(args: &[String], card: &mut dyn FieldRealization) -> Result
         }
         println!("FIELD_PARITY_LANE lanes={} width={} material={}", founded.field.declaration.lanes, founded.field.declaration.width, founded.field.material_len());
     }
+    // [definition; theory, November 10 09:55] Growth in contacts (`FIELD_PARITY_CONTACTS=k`): the founded field (after its lanes) with
+    // `k` more pair contacts ([`FieldLearner::contacted`]), so the parity reads the new contacts' drives, their columns of the pair's
+    // return and their adjoint on both realizations (the new columns open at zero and carry a covector from the first section on).
+    if let Some(k) = std::env::var("FIELD_PARITY_CONTACTS").ok().and_then(|v| v.parse::<usize>().ok()).filter(|&k| k > 0) {
+        founded = founded.contacted(k, &p.keys).map_err(|e| e.to_string())?;
+        println!("FIELD_PARITY_CONTACTS contacts={} width={} material={}", founded.field.declaration.contacts, founded.field.declaration.width, founded.field.material_len());
+    }
     // [agent-inferred, November 2] A pace far from the founding (`FIELD_PARITY_PACE=s`, §16): every pace entry drawn from
     // the key file's tail, a 32-bit word shifted down `s` bits, so the clocks run off the byte place (fractional,
     // fast, stopping and backward rates) and the parity reads the series between whole places on both realizations.
@@ -407,11 +414,13 @@ pub(super) fn parity(args: &[String], card: &mut dyn FieldRealization) -> Result
             some.is_empty() || host == card.read_row_currents(&card_learner.field, some, &questions, true).map_err(|e| e.to_string())?
         };
         let learner_equal = host_regions == card_regions && receipt_h == receipt_c && host_learner.to_text() == card_learner.to_text() && marks_equal && near_equal && clocks_equal && rows_equal && shares_equal && currents_equal;
+        // The learners' texts alone (the deposit's bits: material, moments, remainders), apart from the readings beside them.
+        let text_equal = host_learner.to_text() == card_learner.to_text();
         learners_unequal += usize::from(!learner_equal);
         let length = views.iter().map(|r| r.classes.len()).max().unwrap_or(0);
         let next = receipt_h.next.map_or("-".to_string(), |n| format!("{}/{}/{}", n.change, n.halvings, n.refused));
         println!(
-            "FIELD_PARITY section={} withheld={end} regions={} length={length} sites={} rows={rows} reads={calls} faces_unequal={faces} covector_unequal={entries} first={} deposited={} halvings={} next={next} learner_equal={learner_equal} near_equal={near_equal} clocks_equal={clocks_equal} rows_equal={rows_equal} shares_equal={shares_equal} currents_equal={currents_equal} pace_nonzero={} kappa={} host_ms={} card_ms={}",
+            "FIELD_PARITY section={} withheld={end} regions={} length={length} sites={} rows={rows} reads={calls} faces_unequal={faces} covector_unequal={entries} first={} deposited={} halvings={} next={next} learner_equal={learner_equal} text_equal={text_equal} near_equal={near_equal} clocks_equal={clocks_equal} rows_equal={rows_equal} shares_equal={shares_equal} currents_equal={currents_equal} pace_nonzero={} kappa={} host_ms={} card_ms={}",
             k + 1,
             views.len(),
             receipt_h.sites,
@@ -439,6 +448,71 @@ pub(super) fn parity(args: &[String], card: &mut dyn FieldRealization) -> Result
         println!("FIELD_PARITY_WRITE problem={i} question={} places={} written={} equal={equal}", questions[i].0.len(), h.len(), h.iter().filter(|&&k| k != p.codec.void()).count());
     }
     println!("FIELD_PARITY_WRITES problems={} sweeps={sweeps} host_ms={}", hosted.len(), ms(t0.elapsed().as_nanos()));
+    // [measurement; theory, November 9 19:43] The plates of the written problems' openings, and the exchange walk from the host's
+    // write through both, plate for plate and move for move: at h zero (any gain moves, so the parity reads moves: at one nat a
+    // short write may have none) and at most 64 moves a problem.
+    let void = p.codec.void();
+    let owned: Vec<(Vec<usize>, Vec<bool>)> = questions.iter().map(|&(q, room)| {
+        let classes: Vec<usize> = q.iter().copied().chain(std::iter::repeat_n(void, room)).collect();
+        let open = (0..classes.len()).map(|t| t >= q.len()).collect();
+        (classes, open)
+    }).collect();
+    let views: Vec<Region> = owned.iter().map(|(c, u)| Region { classes: c, unresolved: u, faces: &[], locked: &[], echo: &[], domain: None, port: None }).collect();
+    let host_plates = HostField.read_plates(&host_learner.field, &views).map_err(|e| e.to_string())?;
+    let card_plates = card.read_plates(&card_learner.field, &views).map_err(|e| e.to_string())?;
+    // [theory, November 9 21:59] And their key words at the last tick, from which a census reads each site's distance to the seam.
+    let words_equal = HostField.read_words(&host_learner.field, &views).map_err(|e| e.to_string())? == card.read_words(&card_learner.field, &views).map_err(|e| e.to_string())?;
+    let plates_equal = host_plates == card_plates && words_equal;
+    releases_unequal += usize::from(!plates_equal);
+    // [theory, November 9 21:43] The census lens through both: a table formed from these openings' own faces at depth 2 (each
+    // open site's letter as it stands, a fixture), the lens off reading the plain faces exactly, the lens on host for card.
+    let (lens_off, lens_equal) = {
+        use super::field_train::{lensed_face, LensTable, Lensed, PlateCounts};
+        let heads = host_learner.field.declaration.heads;
+        let mut counts: std::collections::BTreeMap<Vec<u32>, PlateCounts> = std::collections::BTreeMap::new();
+        for ((faces, plates), (classes, open)) in host_plates.0.iter().zip(&host_plates.1).zip(&owned) {
+            for (t, face) in faces.iter().enumerate() {
+                if let Some(face) = face.as_ref().filter(|_| open[t]) {
+                    let key: Vec<u32> = plates[t * heads..(t + 1) * heads].iter().map(|&c| c % 9).collect();
+                    counts.entry(key).or_insert_with(|| PlateCounts::new(face.masses.len())).add(face, classes[t]);
+                }
+            }
+        }
+        let table: LensTable = counts.iter().map(|(k, c)| (k.clone(), (c.n.clone(), (0..c.n.len()).map(|a| c.expected(a)).collect()))).collect();
+        let empty = LensTable::new();
+        let plain = HostField.read_faces(&host_learner.field, &views).map_err(|e| e.to_string())?;
+        let off = Lensed { inner: &mut HostField, table: &empty, depth: 2 }.read_faces(&host_learner.field, &views).map_err(|e| e.to_string())?;
+        let on_host = Lensed { inner: &mut HostField, table: &table, depth: 2 }.read_faces(&host_learner.field, &views).map_err(|e| e.to_string())?;
+        let on_card = Lensed { inner: &mut *card, table: &table, depth: 2 }.read_faces(&card_learner.field, &views).map_err(|e| e.to_string())?;
+        let _ = lensed_face;
+        (off == plain, on_host == on_card && on_host != plain)
+    };
+    releases_unequal += usize::from(!lens_off) + usize::from(!lens_equal);
+    println!("FIELD_PARITY_LENS lens_off_is_plain={lens_off} lens_on_equal={lens_equal}");
+    let h = 0i128;
+    let t0 = std::time::Instant::now();
+    let (host_walk, host_moves) = host_learner.field.exchange_walk(&questions, &hosted, void, h, 64, &mut HostField, &mut |_| true).map_err(|e| e.to_string())?;
+    let host_walk_ms = ms(t0.elapsed().as_nanos());
+    let (card_walk, card_moves) = card_learner.field.exchange_walk(&questions, &hosted, void, h, 64, card, &mut |_| true).map_err(|e| e.to_string())?;
+    let walk_equal = host_walk == card_walk && host_moves == card_moves;
+    releases_unequal += usize::from(!walk_equal);
+    println!("FIELD_PARITY_EXCHANGE plates_equal={plates_equal} walk_equal={walk_equal} standing={} refused={} host_ms={host_walk_ms}", host_moves.iter().map(|r| r.moves.len()).sum::<usize>(), host_moves.iter().map(|r| r.refused).sum::<usize>());
+    // [theory, November 10 01:36] The parallel certified settle through both, from the host's write at h zero.
+    let t1 = std::time::Instant::now();
+    let (host_settled, host_records) = host_learner.field.settle(&questions, &hosted, void, h, &mut HostField, &mut |_| true).map_err(|e| e.to_string())?;
+    let host_settle_ms = ms(t1.elapsed().as_nanos());
+    let (card_settled, card_records) = card_learner.field.settle(&questions, &hosted, void, h, &mut *card, &mut |_| true).map_err(|e| e.to_string())?;
+    let settle_equal = host_settled == card_settled && host_records == card_records;
+    releases_unequal += usize::from(!settle_equal);
+    println!("FIELD_PARITY_SETTLE settle_equal={settle_equal} kept={} undone={} rested={} host_ms={host_settle_ms}", host_records.iter().map(|r| r.kept.len()).sum::<usize>(), host_records.iter().map(|r| r.undone).sum::<usize>(), host_records.iter().filter(|r| r.rested).count());
+    // [theory, November 10 04:15] The point re-draws alternating with exchanges through both, from the host's write at h zero.
+    let t2 = std::time::Instant::now();
+    let (host_drawn, host_drawn_records) = host_learner.field.redraw(&questions, &hosted, void, h, &mut HostField, &mut |_| true).map_err(|e| e.to_string())?;
+    let host_redraw_ms = ms(t2.elapsed().as_nanos());
+    let (card_drawn, card_drawn_records) = card_learner.field.redraw(&questions, &hosted, void, h, &mut *card, &mut |_| true).map_err(|e| e.to_string())?;
+    let redraw_equal = host_drawn == card_drawn && host_drawn_records == card_drawn_records;
+    releases_unequal += usize::from(!redraw_equal);
+    println!("FIELD_PARITY_REDRAW redraw_equal={redraw_equal} kept={} undone={} neutral={} host_ms={host_redraw_ms}", host_drawn_records.iter().map(|r| r.kept.len()).sum::<usize>(), host_drawn_records.iter().map(|r| r.undone).sum::<usize>(), host_drawn_records.iter().filter(|r| r.neutral).count());
     println!(
         "FIELD_PARITY_DONE sections={} reads={reads_all} reads_unequal={reads_unequal} faces_unequal={faces_unequal} covector_unequal={entries_unequal} learners_unequal={learners_unequal} releases={} releases_unequal={releases_unequal} card_release_ms={card_release_ms} host_ms={} card_ms={} elapsed_ms={}",
         steps.len(),

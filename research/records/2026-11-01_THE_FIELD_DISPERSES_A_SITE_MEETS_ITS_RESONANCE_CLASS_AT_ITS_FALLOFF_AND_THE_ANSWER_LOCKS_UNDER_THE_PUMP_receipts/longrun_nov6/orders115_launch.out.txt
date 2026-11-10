@@ -1,0 +1,41 @@
+# orders115 on lap 24 bdaeff3a76c10712daa51856de87074511c91903330e8a557df91f19889b970e 16:58:16
+== keyed
+FIELD_LENGTH problems=32 sweeps=2062 refine=0 stopped=- run_bits=1 reads=639 certified_bits=338.118 passed=0 ms=20082
+MEASURE lap=keyed rc=0 wall_s=20.4 peak_rss_kib=237040
+written: 32 answers, 0 open with ```python; a 'y' outside it in 0, its first at places 0 to 5 in 0 (median first -), 'y' past it 0.000; commonest byte's share at places 10 to 255 (11 places) 0.399; top byte '\t' 0.244, 'y' 0.000, entropy 3.19 bits over 655 bytes
+written: 32 answers: a fence opened 0, closed 0; parses as Python 0; code lines mean 1.0; identifiers 0, in the question 0.00, in the held answer 0.00
+family	span	written opened	written closed share	held opened	held closed share	ratio
+bracket	near	0	0.000	178	0.393	0.00
+bracket	far	0	0.000	178	0.607	0.00
+string	near	0	0.000	60	0.400	0.00
+string	far	0	0.000	60	0.583	0.00
+block	near	0	0.000	75	0.000	nan
+block	far	0	0.000	75	0.947	0.00
+RULE: the lowest closure against held is bracket near at 0.00 (under 0.5)
+== place
+FIELD_LENGTH problems=32 sweeps=2062 refine=0 stopped=- run_bits=1 reads=661 certified_bits=164.397 passed=0 ms=20194
+MEASURE lap=place rc=0 wall_s=20.5 peak_rss_kib=237484
+written: 32 answers, 0 open with ```python; a 'y' outside it in 0, its first at places 0 to 5 in 0 (median first -), 'y' past it 0.000; commonest byte's share at places 10 to 255 (11 places) 0.396; top byte '\t' 0.244, 'y' 0.000, entropy 3.21 bits over 656 bytes
+written: 32 answers: a fence opened 0, closed 0; parses as Python 0; code lines mean 1.0; identifiers 0, in the question 0.00, in the held answer 0.00
+family	span	written opened	written closed share	held opened	held closed share	ratio
+bracket	near	0	0.000	178	0.393	0.00
+bracket	far	0	0.000	178	0.607	0.00
+string	near	0	0.000	60	0.400	0.00
+string	far	0	0.000	60	0.583	0.00
+block	near	0	0.000	75	0.000	nan
+block	far	0	0.000	75	0.947	0.00
+RULE: the lowest closure against held is bracket near at 0.00 (under 0.5)
+== masks
+FIELD_MASKS problems=32 reads=708 ms=22456
+MEASURE lap=masks rc=0 wall_s=22.7 peak_rss_kib=229856
+written: 32 answers, 24 open with ```python; a 'y' outside it in 24, its first at places 0 to 5 in 3 (median first 87), 'y' past it 0.014; commonest byte's share at places 10 to 255 (246 places) 0.208; top byte ' ' 0.181, 'y' 0.010, entropy 4.86 bits over 8760 bytes
+written: 32 answers: a fence opened 28, closed 9; parses as Python 0; code lines mean 11.2; identifiers 1079, in the question 0.05, in the held answer 0.06
+family	span	written opened	written closed share	held opened	held closed share	ratio
+bracket	near	130	0.200	178	0.393	0.51
+bracket	far	130	0.223	178	0.607	0.37
+string	near	61	0.180	60	0.400	0.45
+string	far	61	0.098	60	0.583	0.17
+block	near	41	0.000	75	0.000	nan
+block	far	41	0.561	75	0.947	0.59
+RULE: the lowest closure against held is string far at 0.17 (under 0.5)
+ORDERS115 exit 16:59:19

@@ -1,0 +1,25 @@
+== curl_lap4
+FIELD_CURL problems=32 squares=2560 regions=10240 ms=11174
+band	squares	lambda_mean	lambda_sd	curl_sd	curl/lambda	mean_abs_curl	corr
+1	512	+1.029	3.428	3.736	1.09	2.701	+0.54
+2-3	512	+0.428	1.663	2.369	1.42	1.539	+0.33
+4-7	512	+0.042	0.418	0.739	1.77	0.485	+0.13
+8-15	512	+0.023	0.449	0.576	1.28	0.260	+0.43
+16+	512	+0.021	0.256	0.290	1.13	0.158	+0.54
+== curl_drafts25
+FIELD_CURL problems=32 squares=2560 regions=10240 ms=11212
+band	squares	lambda_mean	lambda_sd	curl_sd	curl/lambda	mean_abs_curl	corr
+1	512	+1.210	2.904	3.585	1.23	2.538	+0.45
+2-3	512	+0.418	1.408	2.112	1.50	1.463	+0.28
+4-7	512	+0.006	0.420	0.778	1.85	0.440	+0.08
+8-15	512	+0.026	0.327	0.476	1.45	0.255	+0.32
+16+	512	+0.031	0.246	0.261	1.06	0.139	+0.57
+== repeats
+truth1: tokens 1117, repeat share 0.442, commonest the 0.030, return 0.026, def 0.024
+seg10_keyed: tokens 902, repeat share 0.038, commonest in 0.022, a 0.011, i 0.010
+refine3: tokens 960, repeat share 0.120, commonest a 0.033, for 0.025, in 0.020
+refine10: tokens 954, repeat share 0.227, commonest the 0.043, in 0.029, a 0.027
+lap24_walk: tokens 785, repeat share 0.315, commonest the 0.065, num 0.031, return 0.028
+lap24_walk: tokens 668, repeat share 0.451, commonest the 0.102, j 0.067, return 0.061
+truth40: tokens 1039, repeat share 0.562, commonest j 0.108, the 0.086, return 0.069
+held: tokens 1117, repeat share 0.442, commonest the 0.030, return 0.026, def 0.024

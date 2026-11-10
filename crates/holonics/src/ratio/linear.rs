@@ -71,6 +71,91 @@ fn certified_work(
     work
 }
 
+/// Fraction-free Gauss--Jordan (Montante/Bareiss) of an integral square matrix `A`. `[A | I]` stays in `BigInt`; each step
+/// `a_ij <- (a_kk a_ij - a_ik a_kj) / a_(k-1)(k-1)` is checked to divide with no remainder, and the end is `[d I | X]` with
+/// `d = det(PA)` for the row exchanges `P` it made and `X = d A^-1`. Returns the augmented rows and whether the exchanges were
+/// odd. [`ExactRatMatrix::inverse`] and [`integral_adjugate`] are its two readers.
+fn fraction_free_gauss_jordan(rows: &[Vec<BigInt>]) -> Result<(Vec<Vec<BigInt>>, bool), ExactLinearError> {
+    let extent = rows.len();
+    if rows.iter().any(|row| row.len() != extent) {
+        return Err(ExactLinearError::NonsquareMatrix);
+    }
+    let width = extent
+        .checked_mul(2)
+        .ok_or(ExactLinearError::ExtentOverflow)?;
+    let mut augmented: Vec<Vec<BigInt>> = rows
+        .iter()
+        .enumerate()
+        .map(|(row, values)| {
+            let mut values = values.clone();
+            values.extend((0..extent).map(|column| {
+                if row == column {
+                    BigInt::one()
+                } else {
+                    BigInt::zero()
+                }
+            }));
+            values
+        })
+        .collect();
+    let mut odd = false;
+    let mut previous_pivot = BigInt::one();
+    for pivot_at in 0..extent {
+        let pivot_row = (pivot_at..extent)
+            .find(|row| !augmented[*row][pivot_at].is_zero())
+            .ok_or(ExactLinearError::SingularMatrix)?;
+        if pivot_row != pivot_at {
+            augmented.swap(pivot_row, pivot_at);
+            odd = !odd;
+        }
+        let pivot = augmented[pivot_at][pivot_at].clone();
+        if pivot.is_zero() {
+            return Err(ExactLinearError::SingularMatrix);
+        }
+        let pivot_row_values = augmented[pivot_at].clone();
+        for row in 0..extent {
+            if row == pivot_at {
+                continue;
+            }
+            let eliminated = augmented[row][pivot_at].clone();
+            for column in 0..width {
+                if column == pivot_at {
+                    continue;
+                }
+                let numerator =
+                    &pivot * &augmented[row][column] - &eliminated * &pivot_row_values[column];
+                if &numerator % &previous_pivot != BigInt::zero() {
+                    return Err(ExactLinearError::InverseCertificateFailure);
+                }
+                augmented[row][column] = numerator / &previous_pivot;
+            }
+            augmented[row][pivot_at] = BigInt::zero();
+        }
+        previous_pivot = pivot;
+    }
+    Ok((augmented, odd))
+}
+
+/// **The adjugate and determinant** of an integral square matrix, read from one
+/// [`fraction_free_gauss_jordan`]: `adj A = +-X` and `det A = +-d`, with the sign of its row exchanges. The words grow
+/// linearly with the order (Hadamard's bound) and no gcd is taken at any term, so a covariance carried as the integral
+/// matrix `S` gives its precision `adj S / det S` and its log-determinant together (the field's pair tilts, November 10). A
+/// singular matrix refuses.
+pub fn integral_adjugate(rows: &[Vec<BigInt>]) -> Result<(Vec<Vec<BigInt>>, BigInt), ExactLinearError> {
+    let extent = rows.len();
+    if extent == 0 {
+        return Ok((Vec::new(), BigInt::one()));
+    }
+    let (augmented, odd) = fraction_free_gauss_jordan(rows)?;
+    let signed = |value: &BigInt| if odd { -value } else { value.clone() };
+    let determinant = signed(&augmented[extent - 1][extent - 1]);
+    let adjugate = augmented
+        .iter()
+        .map(|row| row[extent..].iter().map(signed).collect())
+        .collect();
+    Ok((adjugate, determinant))
+}
+
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct ExactRatMatrix {
     rows: usize,
@@ -586,58 +671,14 @@ impl ExactRatMatrix {
         if extent == 0 {
             return Self::identity(0);
         }
-        let width = extent
-            .checked_mul(2)
-            .ok_or(ExactLinearError::ExtentOverflow)?;
-        let mut augmented = Vec::with_capacity(extent);
-        for row in 0..extent {
-            let mut values = Vec::with_capacity(width);
-            for column in 0..extent {
-                values.push(self.get(row, column)?.numer().clone());
-            }
-            values.extend((0..extent).map(|column| {
-                if row == column {
-                    BigInt::one()
-                } else {
-                    BigInt::zero()
-                }
-            }));
-            augmented.push(values);
-        }
-
-        let mut previous_pivot = BigInt::one();
-        for pivot_at in 0..extent {
-            let pivot_row = (pivot_at..extent)
-                .find(|row| !augmented[*row][pivot_at].is_zero())
-                .ok_or(ExactLinearError::SingularMatrix)?;
-            if pivot_row != pivot_at {
-                augmented.swap(pivot_row, pivot_at);
-            }
-            let pivot = augmented[pivot_at][pivot_at].clone();
-            if pivot.is_zero() {
-                return Err(ExactLinearError::SingularMatrix);
-            }
-            let pivot_row_values = augmented[pivot_at].clone();
-            for row in 0..extent {
-                if row == pivot_at {
-                    continue;
-                }
-                let eliminated = augmented[row][pivot_at].clone();
-                for column in 0..width {
-                    if column == pivot_at {
-                        continue;
-                    }
-                    let numerator =
-                        &pivot * &augmented[row][column] - &eliminated * &pivot_row_values[column];
-                    if &numerator % &previous_pivot != BigInt::zero() {
-                        return Err(ExactLinearError::InverseCertificateFailure);
-                    }
-                    augmented[row][column] = numerator / &previous_pivot;
-                }
-                augmented[row][pivot_at] = BigInt::zero();
-            }
-            previous_pivot = pivot;
-        }
+        let rows = (0..extent)
+            .map(|row| {
+                (0..extent)
+                    .map(|column| Ok(self.get(row, column)?.numer().clone()))
+                    .collect::<Result<Vec<_>, ExactLinearError>>()
+            })
+            .collect::<Result<Vec<_>, _>>()?;
+        let (augmented, _) = fraction_free_gauss_jordan(&rows)?;
 
         let inverse = Self::new(
             (0..extent)
@@ -1131,6 +1172,31 @@ pub enum ExactLinearError {
 mod tests {
     use super::*;
     use num_bigint::BigInt;
+
+    /// The adjugate and determinant read from one fraction-free elimination: `A adj A = det A · I`, the sign of a row
+    /// exchange carried, and a singular matrix refused.
+    #[test]
+    fn the_integral_adjugate_is_the_determinant_times_the_inverse() {
+        let int = |v: i64| BigInt::from(v);
+        let (adj, det) = integral_adjugate(&[vec![int(2), int(1)], vec![int(1), int(1)]]).unwrap();
+        assert_eq!((det, adj), (int(1), vec![vec![int(1), int(-1)], vec![int(-1), int(2)]]));
+        let check = |a: Vec<Vec<BigInt>>, want: BigInt| {
+            let (adj, det) = integral_adjugate(&a).unwrap();
+            assert_eq!(det, want);
+            for i in 0..a.len() {
+                for j in 0..a.len() {
+                    let e: BigInt = (0..a.len()).map(|k| &a[i][k] * &adj[k][j]).sum();
+                    assert_eq!(e, if i == j { det.clone() } else { int(0) });
+                }
+            }
+        };
+        check(vec![vec![int(4), int(2), int(1)], vec![int(2), int(5), int(3)], vec![int(1), int(3), int(6)]], int(67));
+        // A zero leading pivot forces a row exchange; det [[0, 1], [1, 0]] = -1.
+        check(vec![vec![int(0), int(1)], vec![int(1), int(0)]], int(-1));
+        check(vec![vec![int(0), int(2), int(1)], vec![int(3), int(0), int(1)], vec![int(1), int(1), int(0)]], int(5));
+        assert_eq!(integral_adjugate(&[vec![int(1), int(2)], vec![int(2), int(4)]]), Err(ExactLinearError::SingularMatrix));
+        assert_eq!(integral_adjugate(&[]), Ok((Vec::new(), int(1))));
+    }
 
     fn rat(numerator: i64, denominator: i64) -> Rat {
         Rat::new(BigInt::from(numerator), BigInt::from(denominator))

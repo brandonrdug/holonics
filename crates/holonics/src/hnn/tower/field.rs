@@ -36,7 +36,7 @@
 //! values     v_t += s_t, p_t += s_t at a turned mode                         linear in the moment (§15.1, §16.20)
 //! contact    z_ij = 2^(−β) Σ_m [D_m Re(conj(p̃_im) k̃_jm) − D_m² |k̃_jm|²/2] − ⌊log₂ |i − j|⌋   the head's lock, j ∈ S_i^h
 //! weights    e_ij = 2^(z_ij), each term keeping its own exponent, zero outside S_i^h   the Gibbs face, in bits
-//! current    y_i = conj(U_i) ⊙ Σ_(j∈S_i) e_ij D(|i−j|) ṽ_j / Σ_(j∈S_i) e_ij (one exact series, released once),   x ← x + O y + b_o
+//! current    y_i = conj(U_i) ⊙ Σ_(j∈S_i) e_ij D(|i−j|) ṽ_j / Σ_(j∈S_i) e_ij (one series, released once),   x ← x + O y + b_o
 //! pair       r̂'_t = x_t / ‖x_t‖_rms,   a_t = W_a r̂'_t + b_a,   b_t = W_b r̂'_t + b_b,   x_t ← x_t + W_c (a_t · b_(s(t))) + b_c
 //!            s(t) the site's strand mate, t − 1 at an even contact and t + 1 at an odd (§16.34)   complex pairs along the strand
 //! face       z_t(a) = ⟨E(a), R r̂(x^K_t) + b_R⟩ + c_a,   p̂_t(a) = 2^(z_a) / Σ_b 2^(z_b)   at the unresolved sites; read through the encoding (§16.26)
@@ -147,8 +147,8 @@
 //! only past locked places; text is uncertain at most places under any model, so it wrote the classes it was surest of
 //! (runs of `0`, `<<`, `=`, `####`), each lock making its neighbour's lock likelier, and left the rest open.
 //!
-//! **Exact integers, grains declared.** Faces, charts, framed charts and currents on `2^(−16)`;
-//! material on `2^(−24)`; frames and skins on `2^(−30)`; each row an exact series of its terms'
+//! **Integers at declared grains.** Faces, charts, framed charts and currents on `2^(−16)`;
+//! material on `2^(−24)`; frames and skins on `2^(−30)`; each row a series of its terms'
 //! exponential faces on `2^(−62)` (§14.11, [`SeriesRow`]), its current released once and its shares
 //! on `2^(−63)`; covectors on `2^(−24)`, the contact's on `2^(−40)`. Every product's
 //! remainder below its grain is released to the nearest numerator and every sum is an integer
@@ -172,7 +172,7 @@ use crate::hnn::keyed_modes::{ln2_face, Exponential};
 use rayon::prelude::*;
 
 /// [agent-inferred, November 1] **A term's share of its row's mass** on `2^(−63)` (§14.11): formed
-/// once, by one division of the exact series, for the return; the declared crossing into the step,
+/// once, by one division of the series, for the return; the declared crossing into the step,
 /// whose own release is to the material's grain.
 pub const SHARE_BITS: u32 = 63;
 /// A key's return past its 128-bit carrier, refused on the host and the card alike.
@@ -222,6 +222,11 @@ pub struct FieldDeclaration {
     /// carries no moment (without a skin its moment would sum the whole region). The ring `ρ ← μρ + r` with `μ = 1` and `r`
     /// keyed by the arriving class; `r` is located by deposition, never authored.
     pub depth: usize,
+    /// [definition; the unified-theory reading of November 6, 22:52] **The faces are one stored energy's forces**
+    /// ([`energy`]): each tick descends one energy `Φ` of the region's state and letters, and a site's face is the energy's
+    /// force on its letter. The value chart `V`, the current's return `O` and its bias, and the pair's return `W_c` and its
+    /// bias leave (founded at zero and never read); the pair contact is read through its own contraction `c`.
+    pub energy: bool,
 }
 
 impl FieldDeclaration {
@@ -389,6 +394,25 @@ impl FieldDeclaration {
         3 * self.alphabet * w + 2 * self.moment_modes() * w
     }
 
+    /// [definition; theory, November 10 09:55] The declaration with `added` more pair contacts ([`Field::contacted`]): the
+    /// merge's contact count grows and nothing else (the width, heads, modes, lanes, ticks and reach are kept). The new contacts
+    /// come in complex pairs even at each strand side, as the founding's do.
+    pub fn contacted(&self, added: usize) -> Result<Self> {
+        if added == 0 || added % 4 != 0 {
+            return refuse("a growth in contacts adds complex pairs, even at each strand side (a count divisible by four)");
+        }
+        let contacts = self.contacts.checked_add(added).ok_or(TowerError::Refused("a contact count outgrew its carrier"))?;
+        let d = Self { contacts, ..*self };
+        d.admit()?;
+        Ok(d)
+    }
+
+    /// The key draws a growth in contacts by `added` reads ([`Field::contacted`]): the new contacts' rows of both pair drives
+    /// over the whole width, as the founding draws them (`a` then `b`).
+    pub fn contact_draws(&self, added: usize) -> usize {
+        2 * added * self.width
+    }
+
     /// The turned slots: `(frames − still) · n`, slot `l · (frames − still) + (g − still)` the ring
     /// of local mode `l` in every head of turned ring set `g`.
     pub fn turned_slots(&self) -> usize {
@@ -432,6 +456,11 @@ impl FieldDeclaration {
         if self.depth > self.frames - self.still {
             return refuse("a field's depth rings are among its turned ring sets");
         }
+        // [agent-inferred, November 6] The energy's first build reads no depth ring: a depth ring's rate is read from the
+        // arriving classes, so its letters would enter the energy through its frames, whose force is not built.
+        if self.energy && self.depth > 0 {
+            return refuse("a field read as one energy's forces with depth rings (their letters' force through the frames is not built)");
+        }
         // The score is released `16 + β` bits from its products' grain, and a head's classes are
         // listed on the card in at most `2^12` buckets.
         if (FACE_BITS as i32) + self.score_shift() < 0 || self.class_trits() > MAX_CLASS_TRITS {
@@ -441,19 +470,26 @@ impl FieldDeclaration {
     }
 
     fn to_text(self) -> String {
-        format!("hnn-field-v14 {} {} {} {} {} {} {} {} {} {} {}", self.alphabet, self.width, self.heads, self.modes, self.still, self.contacts, self.ticks, self.frames, self.reach, self.lanes, self.depth)
+        format!("hnn-field-v15 {} {} {} {} {} {} {} {} {} {} {} {}", self.alphabet, self.width, self.heads, self.modes, self.still, self.contacts, self.ticks, self.frames, self.reach, self.lanes, self.depth, u8::from(self.energy))
     }
 
     fn from_text(line: &str) -> Result<Self> {
         let words: Vec<&str> = line.split(' ').collect();
-        // A v13 head line is a field with no depth ring (the line before the depth rings, its states the line's own).
-        let depth_word = match (words.first().copied(), words.len()) {
-            (Some("hnn-field-v14"), 12) => Some(words[11]),
-            (Some("hnn-field-v13"), 11) => None,
-            _ => return refuse("a field's head line that is not hnn-field-v14"),
+        // A v13 head line is a field with no depth ring (the line before the depth rings, its states the line's own), and a
+        // v14 one a field whose faces are read through the readout (the line before the energy, its states the line's own).
+        let (depth_word, energy_word) = match (words.first().copied(), words.len()) {
+            (Some("hnn-field-v15"), 13) => (Some(words[11]), Some(words[12])),
+            (Some("hnn-field-v14"), 12) => (Some(words[11]), None),
+            (Some("hnn-field-v13"), 11) => (None, None),
+            _ => return refuse("a field's head line that is not hnn-field-v15"),
+        };
+        let energy = match energy_word {
+            None | Some("0") => false,
+            Some("1") => true,
+            Some(_) => return refuse("a field's energy word that is not 0 or 1"),
         };
         let n = |w: &str| w.parse::<usize>().map_err(|_| TowerError::Refused("a field's declaration that is not a count"));
-        let d = Self { alphabet: n(words[1])?, width: n(words[2])?, heads: n(words[3])?, modes: n(words[4])?, still: n(words[5])?, contacts: n(words[6])?, ticks: n(words[7])?, frames: n(words[8])?, reach: n(words[9])?, lanes: n(words[10])?, depth: depth_word.map(n).transpose()?.unwrap_or(0) };
+        let d = Self { alphabet: n(words[1])?, width: n(words[2])?, heads: n(words[3])?, modes: n(words[4])?, still: n(words[5])?, contacts: n(words[6])?, ticks: n(words[7])?, frames: n(words[8])?, reach: n(words[9])?, lanes: n(words[10])?, depth: depth_word.map(n).transpose()?.unwrap_or(0), energy };
         d.admit()?;
         Ok(d)
     }
@@ -504,6 +540,14 @@ pub struct FieldLayout {
     pub moment_face_bias: usize,
     /// The lift's bias `b_R` (`D`, §16.26).
     pub lift_bias: usize,
+    /// [definition; the unified-theory reading of November 6, 22:52] The pair contact's contraction `c` (`f`, the contacts' real
+    /// parts then imaginary, on the material's grain) in an energy field ([`FieldDeclaration::energy`]): the strand pair's
+    /// energy is `−Re⟨c, a_t · b_(s(t))⟩`. Absent (zero long) otherwise.
+    pub pair_c: usize,
+    /// [definition; the unified-theory reading of November 7, 01:37] **The letters read the energy at one temperature**: an
+    /// energy field's face is `z_t(a) = −(1/T) dG/de_t(a)`, one `T` for the whole field, held as `log₂ T` (one entry on the
+    /// material's grain). Absent (zero long) otherwise.
+    pub face_temper: usize,
     pub len: usize,
     pub families: Vec<(usize, usize, u32)>,
 }
@@ -545,7 +589,8 @@ impl FieldLayout {
         let moment_face = push(dw * m2, MATERIAL_BITS);
         let moment_face_bias = push(dw, FACE_BITS);
         let lift_bias = push(dw, FACE_BITS);
-        Self { enc, before, after, q, q_bias, v, v_bias, out, out_bias, a: a_, a_bias, b, b_bias, w, w_bias, read, read_bias, moment_before, moment_after, temper, probe, probe_bias, pace, moment_face, moment_face_bias, lift_bias, len: at, families }
+        let (pair_c, face_temper) = if d.energy { (push(f, MATERIAL_BITS), push(1, MATERIAL_BITS)) } else { (at, at) };
+        Self { enc, before, after, q, q_bias, v, v_bias, out, out_bias, a: a_, a_bias, b, b_bias, w, w_bias, read, read_bias, moment_before, moment_after, temper, probe, probe_bias, pace, moment_face, moment_face_bias, lift_bias, pair_c, face_temper, len: at, families }
     }
 }
 
@@ -653,7 +698,7 @@ fn temper_octave(ell: i32) -> Result<i128> {
 /// the same bits (the card's `temper_chain`).
 fn temperature_chain(temper: i128, dt: i128) -> Result<i128> {
     let rate = release(temper * ln2_face(), LN2_FACE_BITS);
-    Ok(release(dt.checked_mul(rate).ok_or(TowerError::Refused("a temperature's covector past its 128-bit carrier"))?, MATERIAL_BITS))
+    Ok(release(dt.checked_mul(rate).inspect(|v| crate::number::census::reach("a temperature's covector past its 128-bit carrier", v)).ok_or(TowerError::Refused("a temperature's covector past its 128-bit carrier"))?, MATERIAL_BITS))
 }
 
 /// The refusal of a clock's covector past its 128-bit carrier.
@@ -668,15 +713,15 @@ const LOCK_BACK_BITS: u32 = 2 * FACE_BITS + 1;
 /// `release(b · (a_i z_r − a_r z_i), 46)`: the turn's covector `2^24 b Re(conj(a) i z)` on `2^(−24)` of a quantity `z`
 /// on `2^(−16)` with covector `a` on `2^(−24)`, turned at the rate `b` on `2^(−30)` (§16).
 fn turned_back(b: i128, a: (i128, i128), z: (i128, i128)) -> Result<i128> {
-    let cross = a.1.checked_mul(z.0).zip(a.0.checked_mul(z.1)).and_then(|(x, y)| x.checked_sub(y)).ok_or(TowerError::Refused(PACE_RETURN))?;
-    Ok(release(b.checked_mul(cross).ok_or(TowerError::Refused(PACE_RETURN))?, MOVE_BITS + FACE_BITS))
+    let cross = a.1.checked_mul(z.0).zip(a.0.checked_mul(z.1)).and_then(|(x, y)| x.checked_sub(y)).inspect(|v| crate::number::census::reach(PACE_RETURN, v)).ok_or(TowerError::Refused(PACE_RETURN))?;
+    Ok(release(b.checked_mul(cross).inspect(|v| crate::number::census::reach(PACE_RETURN, v)).ok_or(TowerError::Refused(PACE_RETURN))?, MOVE_BITS + FACE_BITS))
 }
 
 /// The skin's covector on the variation: `2^24 ∂/∂σ = 2^24 (E/2^40) b D` for `E = 2^40 ∂/∂D`, `b` and `D` on
 /// `2^(−30)`, each product released once in that order (§16); its sign is the caller's.
 fn skin_back(b: i128, decay: i128, e: i128) -> Result<i128> {
-    let at = release(e.checked_mul(decay).ok_or(TowerError::Refused(PACE_RETURN))?, MOVE_BITS);
-    Ok(release(release(at.checked_mul(b).ok_or(TowerError::Refused(PACE_RETURN))?, MOVE_BITS), 16))
+    let at = release(e.checked_mul(decay).inspect(|v| crate::number::census::reach(PACE_RETURN, v)).ok_or(TowerError::Refused(PACE_RETURN))?, MOVE_BITS);
+    Ok(release(release(at.checked_mul(b).inspect(|v| crate::number::census::reach(PACE_RETURN, v)).ok_or(TowerError::Refused(PACE_RETURN))?, MOVE_BITS), 16))
 }
 
 /// [definition; agent-inferred, November 2] **The pace's grain**: a clock's rate `κ`, the clock `τ` and its
@@ -686,7 +731,7 @@ pub const PACE_BITS: u32 = MATERIAL_BITS;
 
 /// [definition; agent-inferred, November 2] **A turned head's own clock over a region** (§16, Law 1): for each head
 /// that reads a pace ([`FieldDeclaration::paced_heads`], its index `row[h]`), the rate `κ_h(t) = 1 + ⟨c_h, x⁰_t⟩`,
-/// the clock `τ_h(t) = Σ_(0<k≤t) κ_h(k)` (an exact prefix sum: `τ_h(0) = 0`, each step into a site ticked by that
+/// the clock `τ_h(t) = Σ_(0<k≤t) κ_h(k)` (an integer prefix sum: `τ_h(0) = 0`, each step into a site ticked by that
 /// site's face) and the turn's variation `σ_h(t) = Σ_(0<k≤t) |κ_h(k)|`, on `2^(−24)`; `plain[p]` where every rate
 /// is `1` exactly (the founding), so the clock is the byte place and the field reads its resident faces.
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
@@ -757,6 +802,20 @@ pub struct Field {
     pub bare_stretch: bool,
 }
 
+/// [measurement; theory, November 9 10:24] The first word of the line the retired width law wrote after the material
+/// (`widen CAP`, added in `c5aced2e4`, the unified-theory reading of November 7, 23:34: a class past `CAP` definite sources
+/// split its leaves by the next modes' shells, `CAP` 47 in the runs). It failed its lap acceptance on November 8, and in the
+/// twin run's flips it carried 0.36 of the changed lock memberships: its count-threshold splits move leaves by jumps no
+/// membership law can soften. So the base classes (the key word's trits, with the probe classes the base law reads) stand
+/// alone and a state carrying the line is refused ([`Field::from_lines`]).
+const RETIRED_WIDTH_LAW_LINE: &str = "widen";
+
+/// [measurement; theory, November 9 06:41, judged 07:35] The line the retired opening at the letters' force wrote after the
+/// material (each energy site opened at `Rᵀ E(u_t) + E₋(u_(t−1)) + E₊(u_(t+1)) + C s_t + b`, added in `b69d3d9c9`). It
+/// raised the held code from 2.765 to 4.941 nats a place at zero sections and stayed 1.4 to 2.8 nats above over 60 sections,
+/// so the own opening stands alone and a state carrying the line is refused ([`Field::from_lines`]).
+const RETIRED_OPENING_AT_FORCE_LINE: &str = "opening force";
+
 /// [definition; agent-inferred, November 1] A region: each site's class, whether it is
 /// unresolved (read, and compared with its class), and the sites carried as faces. A site carried as
 /// a face (`faces[t]`, its classes' shares on `2^(−16)`, [`shares`]) opens on the mixture of its
@@ -813,6 +872,10 @@ pub struct Port<'a> {
     /// end is given (a place before the end draws from its face restricted to the letters), so the void logit takes no covector
     /// there; a resolved place carries no face and is not compared ([`letters_reading`]).
     pub letters: bool,
+    /// [definition; agent-inferred, November 6, the unified-theory reading of 18:28] **A declared pull** `(a, b, w)` at the
+    /// port's first place ([`pull_reading`]): the code `w (c(b) − c(a))` on its face, `c` the classes' codes and `w` on the
+    /// codes' `2^(−20)` bits, and its covector `w (e_a − e_b)`; every other place of the port is not compared.
+    pub pull: Option<(usize, usize, i64)>,
 }
 
 /// [definition; agent-inferred, November 3, §16.24] **A port's reading**: its coupling code on `2^(−20)` bits and each
@@ -821,6 +884,9 @@ pub struct Port<'a> {
 /// rows from the same faces.
 pub fn port_reading(faces: &[(&[u128], u128)], port: &Port) -> Result<(Vec<Vec<i64>>, i64)> {
     use crate::receiver::coupling::TemperatureRefusal as Why;
+    if let Some(pull) = port.pull {
+        return pull_reading(faces, pull);
+    }
     if port.boundary {
         return boundary_reading(faces, port);
     }
@@ -857,6 +923,28 @@ pub fn port_reading(faces: &[(&[u128], u128)], port: &Port) -> Result<(Vec<Vec<i
 /// the opening's void mass past the end is what a release pays in places). On the face covector's `2^(−24)` and the codes'
 /// `2^(−20)` bits, read alike by the host's return and the card's. A resolved place (`(∅, 0)`, a state of the writer's
 /// path) is not compared: its row is empty and it adds no code.
+/// [`Port::pull`]'s reading: at the port's first place (its face `(m, T)`), the covector `w (e_a − e_b)` on the face covector's
+/// `2^(−24)` and the code `w (c(b) − c(a))` released to the nearest on `2^(−20)` bits, each code `−log₂ m/T`
+/// ([`super::face_code`]); `w (c(b) − c(a))` is a ratio of two classes' masses on one face, so its covector holds no
+/// face's shares. Every later place's row is empty; a first place with no face is not compared.
+fn pull_reading(faces: &[(&[u128], u128)], (a, b, w): (usize, usize, i64)) -> Result<(Vec<Vec<i64>>, i64)> {
+    let mut rows: Vec<Vec<i64>> = vec![Vec::new(); faces.len()];
+    let Some(&(masses, total)) = faces.first() else { return Ok((rows, 0)) };
+    if total == 0 && masses.is_empty() {
+        return Ok((rows, 0));
+    }
+    if a >= masses.len() || b >= masses.len() || a == b || masses[a] == 0 || masses[b] == 0 {
+        return refuse("a pull between two classes the face does not both hold");
+    }
+    let step = w << (super::COVECTOR_BITS - 20);
+    let mut row = vec![0i64; masses.len()];
+    row[a] += step;
+    row[b] -= step;
+    rows[0] = row;
+    let gap = super::face_code(masses[b], total) as i128 - super::face_code(masses[a], total) as i128;
+    Ok((rows, fit64(div_nearest(w as i128 * gap, 1 << 20))?))
+}
+
 /// [`Port::letters`]'s reading: at each open place `i` (within the target) the covector `p̂_a/(1 − p̂_∅) − [a = target_i]` over the
 /// letters on the face covector's `2^(−24)`, zero at the void, and the code `−log₂(m_(target_i)/(T − m_∅))` on `2^(−20)` bits; a
 /// resolved place (an empty face) is not compared.
@@ -918,14 +1006,14 @@ impl Region<'_> {
     /// [definition; agent-inferred, November 6, the unified-theory reading of 06:50, E] **The windows a cut room computes**
     /// ([`Port::window`]): every site before the port, the silent stretch's first place ([`Field::silent_stretch`]) and each
     /// heard open place, each with the `(NEAR − 1)·ticks` places on either side; none where the port does not cut its room.
-    /// Why exact (the unified-theory reading of 06:50): a silent place is no one's far source, so in one tick a receiver hears
+    /// Why the same bits (the unified-theory reading of 06:50): a silent place is no one's far source, so in one tick a receiver hears
     /// past its near field only definite sources (the question, whole) and its crowds of them, and the near field and the
     /// strand's pair contact carry a place's state at most `NEAR − 1` places a tick. A heard place's face after `ticks` ticks
     /// therefore reads only its window, and a receiver outside every window reads, at worst, its window's edge, which is
     /// `(NEAR − 1)·ticks` places from it; the stretch's clock past its first place runs at that place's rate (one passage), so
     /// the clock at every far place is `τ_front + (t − front)κ` from a computed face. Backward, the covector of a heard face
     /// reaches at most `(NEAR − 1)` places a tick, so it meets no receiver outside its window, and the clock's return reaches
-    /// the stretch's first place, whose window is computed. Not exact where blanks sit between arrivals (masks, writer
+    /// the stretch's first place, whose window is computed. Not the same bits where blanks sit between arrivals (masks, writer
     /// states), whose clocks read each blank's own face: those regions keep their room whole.
     pub fn window(&self, ticks: usize) -> Option<Vec<bool>> {
         let port = self.port.filter(|p| p.window)?;
@@ -1039,6 +1127,360 @@ pub struct ReleaseRead<'a> {
     /// where a redraw moved a context).
     pub bound: i128,
     pub passed: usize,
+    /// Each answer's refine passes so far, one a pass it was redrawn in ([`PassDrive`]).
+    pub drives: &'a [Vec<PassDrive>],
+}
+
+/// [measurement; theory, November 9 21:59] **A read's faces, plates and key words** ([`Field::read_words`]), one entry a region.
+/// [measurement; theory, November 10 01:29] With them each site's unframed probe word at the last tick (`[t][2M]`, the word
+/// its probed classes are read from, its moment added as the tick adds it) and the readout's chart of its last state
+/// (`[t][D]` on `2^(−16)`, the vector the lift reads), zero at a resolved site, which no face reads.
+#[derive(Clone, Debug, Default, PartialEq, Eq)]
+pub struct WordsRead {
+    pub faces: Vec<Vec<Option<TowerFace>>>,
+    pub plates: Vec<Vec<u32>>,
+    pub words: Vec<Vec<i64>>,
+    pub probes: Vec<Vec<i64>>,
+    pub charts: Vec<Vec<i32>>,
+}
+
+/// [definition; theory, November 10 01:29] The phase census's bins: `π/12` each from `arg 0`, so the cone (`π/4` multiples)
+/// and the axes lie on edges.
+pub const PHASE_BINS: usize = 24;
+
+/// [definition; theory, November 10 01:29] **The phase bins' edge directions** at the frames' grain (`2^(−30)`, the turn's
+/// faces, [`turn_phasor`] at `k/24` of a turn), each cone and axis edge held exactly (`(±1, ±1)` and `(±1, 0)`, `(0, ±1)` on the
+/// grain), so a mode on the cone meets an edge on the integers.
+pub fn phase_edges(pi: i128) -> [(i64, i64); PHASE_BINS] {
+    let one = 1i64 << MOVE_BITS;
+    std::array::from_fn(|k| match k % 6 {
+        0 => [(one, 0), (0, one), (-one, 0), (0, -one)][k / 6],
+        3 => [(one, one), (-one, one), (-one, -one), (one, -one)][k / 6],
+        _ => ring_phasor(k, PHASE_BINS, pi),
+    })
+}
+
+/// [definition; theory, November 10 01:29] **A mode's phase bin** on the integers, no angle formed: `k` where `(re, im)` lies at
+/// or past edge `k` and before edge `k + 1` counterclockwise (the sign of `e_k × w`), except that a mode on the cone between a
+/// sky or ground sector and the bridge is the bridge's ([`shell`]: `|Re| ≤ |Im|` is the bridge), so each bin lies in one shell;
+/// `PHASE_BINS` (a bin of its own) for the zero word.
+pub fn phase_bin(re: i64, im: i64, edges: &[(i64, i64); PHASE_BINS]) -> usize {
+    if re == 0 && im == 0 {
+        return PHASE_BINS;
+    }
+    let half = PHASE_BINS / 2;
+    let (upper, (x, y)) = if im > 0 || (im == 0 && re > 0) { (true, (re as i128, im as i128)) } else { (false, (-(re as i128), -(im as i128))) };
+    let cross = |k: usize| edges[k].0 as i128 * y - edges[k].1 as i128 * x;
+    let within = (0..half).rev().find(|&k| cross(k) >= 0).unwrap_or(0);
+    let bin = within + if upper { 0 } else { half };
+    // The cone at 3π/4 and 7π/4 opens a sky or ground sector counterclockwise; a mode on it is the bridge's.
+    if re.unsigned_abs() == im.unsigned_abs() && (re < 0) != (im < 0) {
+        bin - 1
+    } else {
+        bin
+    }
+}
+
+/// [definition; theory, November 10 01:29] The shell ([`shell`]) every mode in a phase bin holds: the sky for the bins within
+/// `π/4` of `arg 0`, the ground within `π/4` of `π`, the bridge for the rest and for the zero word.
+pub fn phase_bin_shell(bin: usize) -> u32 {
+    match bin {
+        0..=2 | 21..=23 => 2,
+        9..=14 => 0,
+        _ => 1,
+    }
+}
+
+/// [definition; theory, November 9 21:59] **A site's distance to the nearest seam, by octave**: over its class modes (each head's
+/// first `b` modes of its key word `[2M]`), the least `||Re| − |Im|| / (|Re| + |Im|)`; its octave `k` is the least with that
+/// margin at or above `2^(−(k+1))` (`0` for `[½, 1]`, `1` for `[¼, ½)`, …), read on the integers; `None` where some class mode
+/// stands on the seam (or at zero).
+pub fn seam_octave(word: &[i64], d: &FieldDeclaration) -> Option<u32> {
+    let (n, m, trits) = (d.modes, d.complex(), d.class_trits());
+    let mut best: Option<u32> = Some(0);
+    for h in 0..d.heads {
+        for l in 0..trits {
+            let c = h * n + l;
+            let (re, im) = (word[c].unsigned_abs() as u128, word[m + c].unsigned_abs() as u128);
+            let (num, den) = (re.abs_diff(im), re + im);
+            if num == 0 {
+                return None;
+            }
+            let mut k = 0u32;
+            while num << (k + 1) < den {
+                k += 1;
+            }
+            best = best.map(|b| b.max(k));
+        }
+    }
+    best
+}
+
+/// [definition; theory, November 9 19:43 and 21:12] **One standing move of the certified exchange walk**
+/// ([`Field::exchange_walk`]): the two places in the answer exchanged, the gain it was proposed on (read on the faces before
+/// it), and its certified fall in the answer's code (read on the faces after it), its heat; on the codes' `2^(−20)` bits.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub struct ExchangeMove {
+    pub i: usize,
+    pub j: usize,
+    pub gain: i128,
+    pub fall: i128,
+}
+
+/// [measurement; theory, November 9 22:32] **One pass of the certified exchange walk**, as it ends ([`Field::exchange_walk`]):
+/// its number (0 before the first), the problems still active after it, the moves it certified and undid, and the answers'
+/// code summed over the problems (on the codes' `2^(−20)` bits).
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub struct ExchangePass {
+    pub pass: usize,
+    pub active: usize,
+    pub accepted: usize,
+    pub refused: usize,
+    pub code: i128,
+    /// [measurement; theory, November 10 02:03] The faces' summed entropy `Σ_t H(f_t)` over every problem's places at the state,
+    /// on the codes' `2^(−20)` bits ([`entropy`]): the code the faces expect, beside the code `C` the state reads.
+    pub entropy: i128,
+}
+
+/// [measurement; theory, November 10 01:36] **One pass of the parallel certified settle**, as it ends ([`Field::settle`]): its
+/// number (0 before the first), the problems still active after it, the exchanges it kept and undid, the answers' code summed
+/// over the problems, and of its apply-all re-read's code change (each place's `|c_t − c′_t|`, on the codes' `2^(−20)` bits)
+/// the part outside every claimed neighbourhood and the whole; and each problem's answer as it stands (its letters).
+#[derive(Clone, Copy, Debug)]
+pub struct SettlePass<'a> {
+    pub pass: usize,
+    pub active: usize,
+    pub kept: usize,
+    pub undone: usize,
+    pub code: i128,
+    /// [measurement; theory, November 10 02:03] The faces' summed entropy `Σ_t H(f_t)` at the state ([`ExchangePass::entropy`]).
+    pub entropy: i128,
+    /// [measurement; theory, November 10 03:55] The answers' summed root charge ([`root_charge`]), the places whose surprise
+    /// passes their face's entropy by more than a nat (`v > 1`), and the places.
+    pub root: i128,
+    pub over: usize,
+    /// The places whose `v` passes two nats.
+    pub over2: usize,
+    pub places: usize,
+    /// The pass's proposer (its number modulo the walk's cycle: [`Field::redraw`]'s 1 a re-draw, 0 an exchange; 0 before the
+    /// first pass).
+    pub kind: usize,
+    pub outside: i128,
+    pub changed: i128,
+    pub answers: &'a [Vec<usize>],
+}
+
+/// [definition; theory, November 10 03:55] **One kept change of a certified walk** ([`Field::settle`], [`Field::redraw`]): each
+/// place it rewrote with its letter before and after, its bare gain, and the fall attributed to it on the read that certified
+/// it (on the codes' `2^(−20)` bits).
+#[derive(Clone, Debug, Default, PartialEq, Eq)]
+pub struct CertifiedMove {
+    pub at: Vec<(usize, usize, usize)>,
+    pub gain: i128,
+    pub fall: i128,
+}
+
+/// [definition; theory, November 10 03:55] **One problem's certified walk** ([`Field::redraw`]): its places, its code at the
+/// written answer and at its end, its faces' summed entropy and its root charge at its end, its kept changes and those undone,
+/// and how it stopped: at neutrality, at rest (a pass kept nothing), or neither (the walk was stopped).
+#[derive(Clone, Debug, Default, PartialEq, Eq)]
+pub struct CertifiedRecord {
+    pub places: usize,
+    pub start: i128,
+    pub end: i128,
+    pub entropy: i128,
+    pub root: i128,
+    pub kept: Vec<CertifiedMove>,
+    pub undone: usize,
+    pub rested: bool,
+    pub neutral: bool,
+}
+
+/// [definition; theory, November 10 01:36] **The settle's exchange proposals** on an answer's letters `x` and its locked faces:
+/// every pair with bare gain `g = c_i(x_i) + c_j(x_j) − c_i(x_j) − c_j(x_i)` above `h`, the most first (then the nearer pair,
+/// then the earlier), each admitted where its claim (the places within `NEAR − 1` of `i` and of `j`) touches no place already
+/// claimed; each the two places and the letters they take, with its gain.
+pub fn exchange_proposals(x: &[usize], f: &[TowerFace], h: i128) -> Vec<(Vec<(usize, usize)>, i128)> {
+    let (len, reach) = (x.len(), NEAR - 1);
+    let c = |i: usize, a: usize| f[i].code(a) as i128;
+    let mut pairs: Vec<(i128, usize, usize)> = Vec::new();
+    for i in 0..len {
+        for j in i + 1..len {
+            if x[i] != x[j] {
+                let g = c(i, x[i]) + c(j, x[j]) - c(i, x[j]) - c(j, x[i]);
+                if g > h {
+                    pairs.push((g, i, j));
+                }
+            }
+        }
+    }
+    pairs.sort_by_key(|&(g, i, j)| (std::cmp::Reverse(g), j - i, i));
+    let hood = |p: usize| p.saturating_sub(reach)..=(p + reach).min(len - 1);
+    let mut claimed = vec![false; len];
+    let mut out = Vec::new();
+    for (g, i, j) in pairs {
+        if hood(i).chain(hood(j)).any(|t| claimed[t]) {
+            continue;
+        }
+        for t in hood(i).chain(hood(j)) {
+            claimed[t] = true;
+        }
+        out.push((vec![(i, x[j]), (j, x[i])], g));
+    }
+    out
+}
+
+/// [definition; theory, November 10 04:15] **The point re-draw proposals** on an answer's letters `x` and its locked faces:
+/// every place with `v_t = c_t(x_t) − H(f_t)` above a nat, the most first (then the earlier), re-drawn to its face's top
+/// letter (the most mass, the void never, the earlier on a tie) where that letter's bare price
+/// `ln f_t(top) − ln f_t(x_t)` is at least a nat, each admitted where its claim (the places within `NEAR − 1`) touches no
+/// place already claimed; each its place and its letter, with its bare gain `c_t(x_t) − c_t(top)` on the codes' bits.
+pub fn redraw_proposals(x: &[usize], f: &[TowerFace], void: usize) -> Vec<(Vec<(usize, usize)>, i128)> {
+    let (len, reach) = (x.len(), NEAR - 1);
+    let ln2 = crate::hnn::keyed_modes::ln2_face();
+    let nats = |bits: i128| (bits * ln2) >> 30;
+    let v: Vec<i128> = (0..len).map(|t| f[t].code(x[t]) as i128 - entropy(&f[t])).collect();
+    let mut order: Vec<usize> = (0..len).filter(|&t| nats(v[t]) > 1 << 20).collect();
+    order.sort_by_key(|&t| (std::cmp::Reverse(v[t]), t));
+    let mut claimed = vec![false; len];
+    let mut out = Vec::new();
+    for t in order {
+        let Some(top) = (0..f[t].masses.len()).filter(|&b| b != void).max_by_key(|&b| (f[t].masses[b], std::cmp::Reverse(b))) else { continue };
+        let gain = f[t].code(x[t]) as i128 - f[t].code(top) as i128;
+        if top == x[t] || nats(gain) < 1 << 20 {
+            continue;
+        }
+        let hood = t.saturating_sub(reach)..=(t + reach).min(len - 1);
+        if hood.clone().any(|u| claimed[u]) {
+            continue;
+        }
+        for u in hood {
+            claimed[u] = true;
+        }
+        out.push((vec![(t, top)], gain));
+    }
+    out
+}
+
+/// [definition; theory, November 10 03:55] **An answer's letter balance**: each letter's count `N(a)` on `2^72` and the
+/// faces' summed share `F(a) = Σ_t f_t(a)` on `2^(−72)` (each share floored on `2^(−40)`, its remainder carried on `2^(−72)`).
+pub fn letter_balance(x: &[usize], faces: &[TowerFace]) -> (Vec<i128>, Vec<i128>) {
+    let a = faces.first().map_or(0, |f| f.masses.len());
+    let mut n = vec![0i128; a];
+    for &c in x {
+        n[c] += 1 << 72;
+    }
+    let mut f = vec![0i128; a];
+    for face in faces {
+        for (c, &m) in face.masses.iter().enumerate() {
+            let share = (m << 40) / face.total;
+            let rem = (m << 40) - share * face.total;
+            f[c] += ((share as i128) << 32) + (((rem << 32) + face.total / 2) / face.total) as i128;
+        }
+    }
+    (n, f)
+}
+
+/// [definition; theory, November 10 03:25 and 03:55] **An answer's root charge** `Σ_a N(a) log₂(N(a)/F(a))` on the codes'
+/// `2^(−20)` bits ([`letter_balance`]; each ratio read through [`super::code_of`], its smaller side over its larger, both
+/// scaled down together to the width its quotient reads: a count on `2^72` passes the `2^66` [`super::face_code`] can shift by
+/// its unit, which wrapped and read the November 10 128-problem run's root as −636,886 nats).
+pub fn root_charge(x: &[usize], faces: &[TowerFace]) -> i128 {
+    let (n, f) = letter_balance(x, faces);
+    (0..n.len())
+        .filter(|&c| n[c] > 0 && f[c] > 0)
+        .map(|c| {
+            let (num, den) = (n[c] as u128, f[c] as u128);
+            let ratio = if num >= den { super::code_of(den, num) as i128 } else { -(super::code_of(num, den) as i128) };
+            (n[c] >> 72) * ratio
+        })
+        .sum()
+}
+
+/// [definition; theory, November 10 01:36] **One problem's settle** ([`Field::settle`]): its places, its answer's code at the
+/// written answer and where the settle ended (on the codes' `2^(−20)` bits), its kept exchanges (each with its proposed gain
+/// and the fall attributed to it on the read that certified it), the exchanges undone, and whether it rested (a pass kept
+/// nothing).
+#[derive(Clone, Debug, Default, PartialEq, Eq)]
+pub struct SettleRecord {
+    pub places: usize,
+    pub start: i128,
+    pub end: i128,
+    pub kept: Vec<ExchangeMove>,
+    pub undone: usize,
+    pub rested: bool,
+}
+
+/// [definition; theory, November 9 21:12] **One problem's certified exchange walk** ([`Field::exchange_walk`]): its places,
+/// its answer's code at the written answer and where the walk ended (on the codes' `2^(−20)` bits, summed over the places),
+/// its standing moves, the moves refused and undone, and how it ended: at rest (no unmarked proposal remained), at the
+/// proposal cap (a defect, not a rest), or neither (the walk was stopped before it rested: unrested).
+#[derive(Clone, Debug, Default, PartialEq, Eq)]
+pub struct ExchangeRecord {
+    pub places: usize,
+    pub start: i128,
+    pub end: i128,
+    pub moves: Vec<ExchangeMove>,
+    pub refused: usize,
+    pub rested: bool,
+    pub capped: bool,
+}
+
+/// [measurement; agent-inferred, November 6, the unified-theory reading of 21:14] **The order a refine pass walks an answer
+/// in**: a fresh keyed order each pass (the release's law), place order, or reversed place order. Consistent faces walk every
+/// scan to the same joint; where the faces curl, a scan's direction moves the walk's law, which a declared scan reads.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum RefineOrder {
+    Keyed,
+    Place,
+    Reversed,
+}
+
+/// [measurement; agent-inferred, November 6, the unified-theory reading of 17:38] **One answer's refine pass**: the places
+/// it redrew, and over them on the faces they were redrawn from (the whole face, or its letters where the draw removes the
+/// void's mass, [`letters_face`]; a place whose standing letter has no mass there, or whose face has no letter, is left out): the standing letters' codes `S = Σ −log₂ p(standing)` and
+/// the faces' entropies `H = Σ H(face)` on `2^(−20)` bits, their varentropies `C` on `2^(−40)` bits², the places whose
+/// letter changed, and `K = Σ (1 − Σ_a p(a)²)` on `2^(−20)`, the changes a walk at equilibrium keeps. The drive `D = S − H`
+/// sums the face temperature covector at the standing letters, the code's derivative in the face's temperature at `τ = 1`,
+/// and `C` its curvature, the Fisher term (atlas `ratio.face-temperature-covector`, Lean `HNN/FaceCovectors`:
+/// `tiltedCode_deriv_one`, `tiltedCode_second_deriv`); under the faces' own conditional the drive has mean zero
+/// (`surprise_mean_zero`), the plateau. Positive: the write is hotter than its faces (standing letters in their tails);
+/// negative, colder; in bits, the row's nats over `ln 2`.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub struct PassDrive {
+    pub redrawn: usize,
+    pub standing: i128,
+    pub entropy: i128,
+    pub varentropy: i128,
+    pub changes: usize,
+    pub equilibrium: i128,
+    /// [measurement; theory, November 9 19:05] **The pass's Landauer heat**: `Σ (log₂ f(new | rest) − log₂ f(old | rest))`
+    /// over its redraws on the codes' `2^(−20)` bits, each read on the redraw's own whole face at the place (an unchanged
+    /// letter adds zero). A reading only: nothing in the walk reads it.
+    pub heat: i128,
+}
+
+impl PassDrive {
+    /// The drive `D = S − H`.
+    pub fn drive(&self) -> i128 {
+        self.standing - self.entropy
+    }
+
+    /// Whether the answer rests after this pass ([`Field::release`]): `D ≤ √C`, or `D_(p−1) − D ≤ √C` after a pass `p − 1`.
+    pub fn rests(&self, before: Option<i128>) -> bool {
+        let within = |d: i128| d <= 0 || d * d <= self.varentropy;
+        within(self.drive()) || before.is_some_and(|b| within(b - self.drive()))
+    }
+
+    fn add(&mut self, face: &TowerFace, standing: usize) {
+        let unit = 1u128 << 20;
+        let square: u128 = face.masses.iter().map(|&m| ((m << 20) / face.total).pow(2)).sum::<u128>() / unit;
+        self.redrawn += 1;
+        self.standing += face.code(standing) as i128;
+        self.entropy += entropy(face);
+        self.varentropy += varentropy(face);
+        self.equilibrium += unit as i128 - square as i128;
+    }
 }
 
 /// [§16.44] A blank's read of its face off a state: the chart `r̂` and its scales, the lift `R r̂ + b_R`, and the face.
@@ -1254,7 +1696,7 @@ pub const WEIGHT_BITS: u32 = 62;
 /// pair contact's own slip, `Q = ⟨Δ|Δ⟩` with `Δ = a − D b`; summed over a still head's modes at unit power
 /// it is the head's pairing less a constant.
 fn lock(a: (i128, i128), b: (i128, i128), count: i128, (decay, grain): (i128, u32)) -> Result<i128> {
-    let carried = |v: Option<i128>| v.ok_or(TowerError::Refused("a lock past its 128-bit carrier"));
+    let carried = |v: Option<i128>| v.inspect(|v| crate::number::census::reach("a lock past its 128-bit carrier", v)).ok_or(TowerError::Refused("a lock past its 128-bit carrier"));
     let pairing = carried((a.0 * b.0).checked_add(a.1 * b.1).and_then(|p| p.checked_mul(2 * count * decay)).and_then(|p| p.checked_mul(1i128 << grain)))?;
     let power = carried((b.0 * b.0).checked_add(b.1 * b.1).and_then(|p| p.checked_mul(decay * decay)))?;
     carried(pairing.checked_sub(power))
@@ -1522,6 +1964,14 @@ struct FieldPass {
     moment: Vec<i64>,
     /// A tower's forward at its split, for the reverse.
     tower: Option<scale::ScalePass>,
+    /// [measurement; theory, November 9 19:43] Each site's plate at the last tick, `[t][h]`: the resonance class its key word
+    /// holds in each head ([`ClassLists::class`]).
+    plates: Vec<u32>,
+    /// [measurement; theory, November 9 21:59] Each site's unframed key word at the last tick, `[t][2M]` (real parts then
+    /// imaginary): its class modes' `(Re, Im)`, whose distance to the seam `|Re| = |Im|` a census reads.
+    words: Vec<i64>,
+    /// [measurement; theory, November 10 01:29] Each site's unframed probe word at the last tick, `[t][2M]`.
+    probes: Vec<i64>,
 }
 
 /// The round trips `Σ_j p_ji^(t) p_ij^(t+1)` of each site over consecutive ticks' rows (`[h][i]`), each
@@ -1614,6 +2064,12 @@ impl Field {
                 }
             }
         }
+        // [definition; the unified-theory reading of November 6, 22:52] In an energy field the value chart leaves: it is drawn
+        // (so every later draw stands as the line's founding draws it) and set to zero, never read. The pair's contraction `c`
+        // opens at zero as the pair's return did, so each pair contact opens on no energy.
+        if declaration.energy {
+            theta[layout.v..layout.v + m2 * dw].fill(0);
+        }
         // The temperatures open at their derived gains (§15.10), `T = 2^(−β)`, held as `log₂ T = −β` (§16.12).
         for h in 0..declaration.heads {
             for (kind, beta) in [(0usize, declaration.score_shift()), (1, declaration.listen_shift())] {
@@ -1638,7 +2094,7 @@ impl Field {
 
     /// [definition; agent-inferred, November 2] **A row's gain bound from its temperatures' octaves** (§16.12): `4n T
     /// + 1` bits with `T ≤ 2^c`, `c` the largest `⌈log₂ T⌉` the material holds, read from `ℓ` alone (no face), so the
-    /// card's launch shape needs nothing of the forward; equal to the exact gain at a whole octave (the founding's).
+    /// card's launch shape needs nothing of the forward; equal to the gain itself at a whole octave (the founding's).
     pub fn row_gain(&self) -> Result<u64> {
         let mut top = i128::MIN;
         for k in 0..2 * self.declaration.heads {
@@ -1669,6 +2125,17 @@ impl Field {
         Self { declaration, theta, layout, rings, decays, exponential, fine: Exponential::new(MATERIAL_BITS), pi, scale: None, per_blank_clock: false, bare_stretch: false }
     }
 
+    /// [definition; theory, November 9 23:30] **A grown field keeps its field's declared clocks** ([`Field::per_blank_clock`],
+    /// [`Field::bare_stretch`]): they are laws of the read, not of the state, so a growth by copies ([`Field::grown`]) or by a lane
+    /// ([`Field::laned`]) reads on the clock the field it grew from read on. Why: built fresh, a grown field opened on the default
+    /// clock, so a run that declared `FIELD_CLOCK_BARE` and grew a lane first (`FIELD_LANE_FIRST`, the November 9 lane run, laps
+    /// 27-29: no bare clock) read and trained without it: its opening joint read 1.892426 nats a place on lap 26's state grown by
+    /// the lane, where the state read on its declared clock gives 1.892272, train-field's own read of it.
+    fn clocked_as(mut self, from: &Field) -> Self {
+        (self.per_blank_clock, self.bare_stretch) = (from.per_blank_clock, from.bare_stretch);
+        self
+    }
+
     /// Each turned slot's skin decay on `2^(−30)` at every distance within the reach (a
     /// realization's resident face).
     pub fn decays(&self) -> &[Vec<i64>] {
@@ -1678,7 +2145,7 @@ impl Field {
     /// [definition; agent-inferred, November 1] **The skin decay of local mode `l` of head `h` across
     /// `d` sites** (the dispersing field's §12) and the bits it is carried on: `e^(−2π d/n_m)` on
     /// `2^(−30)` in a turned head, one e-fold a radian of turn; in a still head (period infinite) the
-    /// exact `1`, carried on no bits, so a still head's sums are the bare ones (the same integers a
+    /// the `1` itself, carried on no bits, so a still head's sums are the bare ones (the same integers a
     /// `2^30` on `2^(−30)` would release to).
     fn decay(&self, h: usize, l: usize, d: usize) -> (i128, u32) {
         let dd = &self.declaration;
@@ -1691,7 +2158,7 @@ impl Field {
 
     /// [definition; agent-inferred, November 2] **The skin across a pair** (§16, Law 1): local mode `l` of head
     /// `h` between sites `i` and `j`, `e^(−2π |σ_h(i) − σ_h(j)|/n)` on a head that reads a pace (its byte distance's
-    /// [`Field::decay`] where the pace is plain), the exact `1` on a still head.
+    /// [`Field::decay`] where the pace is plain), the `1` itself on a still head.
     fn pair_decay(&self, paces: &Paces, h: usize, l: usize, i: usize, j: usize) -> (i128, u32) {
         match paces.row.get(h).copied().flatten() {
             Some(p) if !paces.plain[p] && !self.declaration.is_depth(h) => (self.skin(self.slot(h, l), paces.sigma[p][i] as i128 - paces.sigma[p][j] as i128) as i128, MOVE_BITS),
@@ -1772,7 +2239,7 @@ impl Field {
                 // `bare_stretch` at its own place, which reads no face there, so at the bare rate.
                 let at = if t > stretch && !self.bare_stretch { stretch } else { t };
                 // [the unified-theory reading of November 6, 05:45] A depth ring takes no blank face: a silent site runs at
-                // rate zero every tick (exact on what arrived; an expected increment `ζ^E[r]` would read a blank at full
+                // rate zero every tick (true to what arrived; an expected increment `ζ^E[r]` would read a blank at full
                 // coherence and turn a closer's frame by its own guess).
                 let rate = match blank.get(at).and_then(Option::as_ref).filter(|_| Self::silent(region, at) && !d.is_depth(h)) {
                     Some(face) => release(face.iter().map(|&(c, w)| w as i128 * self.theta[base + c as usize] as i128).sum(), STATE_BITS),
@@ -1924,7 +2391,8 @@ impl Field {
         }
         if let Some(port) = region.port {
             // [§16.47] A port at its boundary may hold resolved places (a state of the writer's path); it compares its open ones.
-            if port.start > region.classes.len() || (!port.boundary && !port.letters && region.unresolved[port.start..].iter().any(|&u| !u)) || (port.start..region.classes.len()).any(|t| region.locked.get(t).copied().unwrap_or(false)) {
+            // A pull compares its first place alone, and the places past it may stand resolved.
+            if port.start > region.classes.len() || (!port.boundary && !port.letters && port.pull.is_none() && region.unresolved[port.start..].iter().any(|&u| !u)) || (port.start..region.classes.len()).any(|t| region.locked.get(t).copied().unwrap_or(false)) {
                 return refuse("a port whose places are not every open, unlocked site to the region's end");
             }
             if port.void >= self.declaration.alphabet || port.target.iter().any(|&c| c == port.void || c >= self.declaration.alphabet) {
@@ -2309,7 +2777,7 @@ impl Field {
         cell.rows = Vec::with_capacity(heads * sites);
         cell.y = vec![0i64; sites * m2];
         let one = 1u128 << WEIGHT_BITS;
-        let carried = |v: Option<i128>| v.ok_or(TowerError::Refused("a lock past its 128-bit carrier"));
+        let carried = |v: Option<i128>| v.inspect(|v| crate::number::census::reach("a lock past its 128-bit carrier", v)).ok_or(TowerError::Refused("a lock past its 128-bit carrier"));
         cell.crowds = Vec::with_capacity(heads * sites);
         cell.sums = Vec::with_capacity(heads);
         for h in 0..heads {
@@ -2452,6 +2920,10 @@ impl Field {
     /// The region's forward: `K` ticks, then each unresolved site's face. `keep` holds each tick's
     /// temporaries for the reverse.
     fn pass(&self, region: &Region, keep: bool) -> Result<FieldPass> {
+        if self.declaration.energy {
+            // [definition; the unified-theory reading of November 6, 22:52] An energy field's forward ([`energy`]).
+            return self.energy_pass(region).map(|(pass, _)| pass);
+        }
         self.admit_region(region)?;
         let d = &self.declaration;
         let dw = d.width;
@@ -2493,6 +2965,11 @@ impl Field {
                 clock = Some(Box::new(TickClock { paces: next, moment, blank, reads }));
             }
             out.pairs += cell.rows.iter().map(|r| r.len() as u64).sum::<u64>();
+            if k + 1 == d.ticks {
+                out.plates = (0..sites).flat_map(|t| cell.classes.iter().map(move |l| l.class[t])).collect();
+                out.words = cell.word.clone();
+                out.probes = cell.probe.clone();
+            }
             if let Some(prev) = &before {
                 round_trips(prev, &cell.rows, sites, &mut trips);
             }
@@ -2573,7 +3050,7 @@ impl Field {
             let mean = div_nearest(masses.iter().enumerate().map(|(c, &m)| m as i128 * self.theta[base + c] as i128).sum(), total);
             for (b, slot) in dz.iter_mut().enumerate() {
                 let u = div_nearest(masses[b] as i128 * (self.theta[base + b] as i128 - mean), total);
-                let at = dk.checked_mul(u).and_then(|x| x.checked_mul(ln2_face())).ok_or(TowerError::Refused(PACE_RETURN))?;
+                let at = dk.checked_mul(u).and_then(|x| x.checked_mul(ln2_face())).inspect(|v| crate::number::census::reach(PACE_RETURN, v)).ok_or(TowerError::Refused(PACE_RETURN))?;
                 *slot += release(at, PACE_BITS);
             }
         }
@@ -2584,12 +3061,12 @@ impl Field {
         // blank's small covector is not lost to the grain before it reaches the state; each entry released once from it.
         let mut dy = vec![0i64; dw];
         for (i, slot) in dy.iter_mut().enumerate() {
-            let sum = dz.iter().enumerate().try_fold(0i128, |acc, (c, &dzc)| dzc.checked_mul(self.theta[l.enc + c * dw + i] as i128).and_then(|x| acc.checked_add(x))).ok_or(TowerError::Refused(PACE_RETURN))?;
+            let sum = dz.iter().enumerate().try_fold(0i128, |acc, (c, &dzc)| dzc.checked_mul(self.theta[l.enc + c * dw + i] as i128).and_then(|x| acc.checked_add(x))).inspect(|v| crate::number::census::reach(PACE_RETURN, v)).ok_or(TowerError::Refused(PACE_RETURN))?;
             *slot = fit64(release(sum, STATE_BITS + LN2_FACE_BITS - BLANK_HELD))?;
         }
         for (c, &dzc) in dz.iter().enumerate() {
             for (i, &yi) in read.lift.iter().enumerate() {
-                g[l.enc + c * dw + i] += release(dzc.checked_mul(yi as i128).ok_or(TowerError::Refused(PACE_RETURN))?, STATE_BITS + LN2_FACE_BITS);
+                g[l.enc + c * dw + i] += release(dzc.checked_mul(yi as i128).inspect(|v| crate::number::census::reach(PACE_RETURN, v)).ok_or(TowerError::Refused(PACE_RETURN))?, STATE_BITS + LN2_FACE_BITS);
             }
         }
         for (i, &dyi) in dy.iter().enumerate() {
@@ -2769,6 +3246,15 @@ impl Field {
         Ok(self.pass(region, false)?.logits)
     }
 
+    /// [measurement] An energy field's logits and its energy read from one forward ([`energy`]), the reference a
+    /// realization's energy forward is checked against bit for bit.
+    pub fn energy_logits(&self, region: &Region) -> Result<(Vec<Option<Vec<i64>>>, EnergyRead)> {
+        if !self.declaration.energy {
+            return refuse("an energy read of a field whose faces are not one energy's forces");
+        }
+        self.energy_pass(region).map(|(pass, read)| (pass.logits, read))
+    }
+
     /// The site pairs the region's contact meets over its ticks and heads (`Σ |S_i^h|`).
     pub fn met_pairs(&self, region: &Region) -> Result<u64> {
         Ok(self.pass(region, false)?.pairs)
@@ -2822,7 +3308,7 @@ impl Field {
         port_reading(&port_faces(&pass.faces, port)?, port)
     }
 
-    /// The exact reverse of [`Field::pass`] against each unresolved site's class: the code's own covector, added
+    /// The reverse of [`Field::pass`] against each unresolved site's class: the code's own covector, added
     /// into `g` on each family's natural grain (a face family's `Σ δz` on `2^(−24)`, a material family's `Σ δz x` on
     /// `2^(−40)`), which the reverse's law tests read against the code's difference.
     fn returned(&self, region: &Region, pass: &FieldPass, g: &mut [i128]) -> Result<()> {
@@ -3074,7 +3560,7 @@ impl Field {
                             let value = release(src.p as i128 * inner, SHARE_BITS);
                             let (wr, wi, kr, ki) = (probe_of(i, l) as i128, probe_of(i, n + l) as i128, qh[j * span + l] as i128, qh[j * span + n + l] as i128);
                             let bracket = (2 * (wr * kr + wi * ki) << g_) - 2 * dec * (kr * kr + ki * ki);
-                            let lock = release(ds[i][k].checked_mul(bracket).ok_or(TowerError::Refused(PACE_RETURN))?, LOCK_BACK_BITS + 2 * g_ - MOVE_BITS);
+                            let lock = release(ds[i][k].checked_mul(bracket).inspect(|v| crate::number::census::reach(PACE_RETURN, v)).ok_or(TowerError::Refused(PACE_RETURN))?, LOCK_BACK_BITS + 2 * g_ - MOVE_BITS);
                             let at = skin_back(self.turn_rate(self.slot(h, l)), dec, value + lock)?;
                             gsig[p][i] -= sgn * at;
                             gsig[p][j] += sgn * at;
@@ -3096,7 +3582,7 @@ impl Field {
                             let (wr, wi) = (ph[i * span + l] as i128, ph[i * span + n + l] as i128);
                             let (mr, mi) = (sums.words[(c.hi + 1) * span + l] - sums.words[c.lo * span + l], sums.words[(c.hi + 1) * span + n + l] - sums.words[c.lo * span + n + l]);
                             let bracket = div_nearest((2 * count * (wr * mr + wi * mi) << g_) - 2 * dec * (mr * mr + mi * mi), count * count);
-                            let lock = release(dsc[i][k].checked_mul(bracket).ok_or(TowerError::Refused(PACE_RETURN))?, LOCK_BACK_BITS + 2 * g_ - MOVE_BITS);
+                            let lock = release(dsc[i][k].checked_mul(bracket).inspect(|v| crate::number::census::reach(PACE_RETURN, v)).ok_or(TowerError::Refused(PACE_RETURN))?, LOCK_BACK_BITS + 2 * g_ - MOVE_BITS);
                             let at = skin_back(self.turn_rate(self.slot(h, l)), dec, value + lock)?;
                             gsig[p][i] -= sgn * at;
                             gsig[p][e] += sgn * at;
@@ -3118,7 +3604,7 @@ impl Field {
                         // The key's bracket `D ŵ_i − D² ŵ_j` released by the skin's bits once (a
                         // declared crossing, as the probe's `D ŵ` is), so it stands on the probe's grain.
                         let bracket = release(((dec * probe_of(i, r) as i128) << g) - dec * dec * qh[j * span + r] as i128, g);
-                        col[j * span + r] = col[j * span + r].checked_add(ds[i][k].checked_mul(bracket).ok_or(TowerError::Refused(KEY_RETURN))?).ok_or(TowerError::Refused(KEY_RETURN))?;
+                        col[j * span + r] = col[j * span + r].checked_add(ds[i][k].checked_mul(bracket).inspect(|v| crate::number::census::reach(KEY_RETURN, v)).ok_or(TowerError::Refused(KEY_RETURN))?).inspect(|v| crate::number::census::reach(KEY_RETURN, v)).ok_or(TowerError::Refused(KEY_RETURN))?;
                     }
                 }
                 for (k, c) in crowds[i].iter().enumerate() {
@@ -3126,7 +3612,7 @@ impl Field {
                         let (dec, g) = self.octave_decay(paces, h, r % n, i, c.level, c.lo > i);
                         let mean = sums.words[(c.hi + 1) * span + r] - sums.words[c.lo * span + r];
                         let bracket = release(((dec * ph[i * span + r] as i128 * c.count as i128) << g) - dec * dec * mean, g);
-                        let part = div_nearest(dsc[i][k].checked_mul(bracket).ok_or(TowerError::Refused(KEY_RETURN))?, (c.count * c.count) as i128);
+                        let part = div_nearest(dsc[i][k].checked_mul(bracket).inspect(|v| crate::number::census::reach(KEY_RETURN, v)).ok_or(TowerError::Refused(KEY_RETURN))?, (c.count * c.count) as i128);
                         crowd_w[c.lo * span + r] += part;
                         crowd_w[(c.hi + 1) * span + r] -= part;
                     }
@@ -3244,6 +3730,9 @@ impl Field {
         let sites = region.classes.len();
         let l = &self.layout;
         let reaches = self.reaches();
+        if d.energy {
+            return refuse("an energy field's return through its ticks is not built: it is read, not trained");
+        }
         if pass.ticks.len() != d.ticks {
             return refuse("a reverse reads a forward that held every tick");
         }
@@ -3475,6 +3964,34 @@ impl Field {
         regions.par_iter().map(|r| self.faces(r)).collect()
     }
 
+    /// [measurement; theory, November 9 19:43] **Each region's faces and its sites' plates** at the last tick (`[t][h]` flat:
+    /// the class each head's key word holds), read in parallel; a reading only.
+    /// [measurement; theory, November 9 21:59] **Each region's faces, its sites' plates and their key words** at the last tick
+    /// (`[t][h]` and `[t][2M]`), read in parallel; a reading only.
+    pub fn read_words(&self, regions: &[Region]) -> Result<WordsRead> {
+        if self.declaration.energy {
+            return refuse("an energy field's key words are not read");
+        }
+        let reads: Vec<FieldPass> = regions.par_iter().map(|r| self.pass(r, false)).collect::<Result<_>>()?;
+        let mut out = WordsRead::default();
+        for p in reads {
+            out.faces.push(p.faces);
+            out.plates.push(p.plates);
+            out.words.push(p.words);
+            out.probes.push(p.probes);
+            out.charts.push(p.read);
+        }
+        Ok(out)
+    }
+
+    pub fn read_plates(&self, regions: &[Region]) -> Result<(Vec<Vec<Option<TowerFace>>>, Vec<Vec<u32>>)> {
+        if self.declaration.energy {
+            return refuse("an energy field's plates are not read");
+        }
+        let reads: Vec<(Vec<Option<TowerFace>>, Vec<u32>)> = regions.par_iter().map(|r| self.pass(r, false).map(|p| (p.faces, p.plates))).collect::<Result<_>>()?;
+        Ok(reads.into_iter().unzip())
+    }
+
     /// Each region's unresolved sites' logits, read in parallel.
     pub fn read_logits(&self, regions: &[Region]) -> Result<Vec<FieldRead>> {
         regions.par_iter().map(|r| self.pass(r, false).map(|p| FieldRead { logits: p.logits, echo: p.echo })).collect()
@@ -3487,7 +4004,7 @@ impl Field {
     /// release runs that clock backwards. Every answer place opens unresolved beside its known question; over `sweeps`
     /// sweeps the open places are resolved by octaves of their distance from the question, each octave in its keyed order
     /// once the earlier octaves are resolved (§16.47), about `n/sweeps` a sweep, each drawn from its own
-    /// face at temperature one (the field's own probabilities, an exact integer draw against the face's masses) on the read
+    /// face at temperature one (the field's own probabilities, an integer draw against the face's masses) on the read
     /// of the region as it stands, with every place resolved before it known. No place is chosen by its certainty, nothing
     /// is left open, and a place drawn as the void closes the answer there: every place past it is resolved as the void,
     /// so the region stays an answer and its void tail, the only states training reads (§16.35). Returns each problem's
@@ -3527,13 +4044,416 @@ impl Field {
         Ok(faces)
     }
 
+    /// [definition; theory, November 9 19:43 and 21:12] **The certified exchange walk**: from a written answer (each problem's
+    /// letters, its places past them the void), composition is held and the walk only exchanges two places' letters within one
+    /// answer. Each place's face is `f_t(· | rest)`: the region (the question, the answer as it stands and the near field past
+    /// its end) read with that place alone open; the answer's code is `C = Σ_t −log₂ f_t(x_t)` over its places on the current
+    /// faces (the codes' `2^(−20)` bits, summed whole). Each round, each problem **proposes**: its places in the order of their
+    /// own letter's code, worst first, and the first whose best unmarked partner (the most gain on the current faces,
+    /// `g = c_i(x_i) + c_j(x_j) − c_i(x_j) − c_j(x_i)`, the nearer place on a tie) gains more than `h`. The two **exchange**, and
+    /// every face of the problem is read again (each place's region holds both). The move is **certified** on what it did: it
+    /// stands where `C` fell by more than `h`, its heat that fall; otherwise it is undone (the letters and the faces as they
+    /// were) and the pair is marked, never proposed again until a face at `i` or `j` has changed (a standing move clears the
+    /// marks of every place whose face it changed). A problem rests where no unmarked proposal remains; `cap` proposals is a
+    /// defect detector, a problem that reaches it is a defect, not at rest. Returns each problem's answer (its places past the
+    /// question) and its record.
+    #[allow(clippy::too_many_arguments)]
+    ///
+    /// [definition; theory, November 9 22:32] **A pass is a batch**: the problems are separate regions, so their moves commute;
+    /// each pass proposes one move in every problem not at rest, one read of those problems certifies them all at once, each on
+    /// its own answer's code, standing or undone independently. `pass` is shown each pass's [`ExchangePass`] (the pass before
+    /// the first, then each), and the walk stops where it returns false: a problem still active there is unrested.
+    pub fn exchange_walk(&self, problems: &[(&[usize], usize)], written: &[Vec<usize>], void: usize, h: i128, cap: usize, realization: &mut dyn FieldRealization, pass: &mut dyn FnMut(&ExchangePass) -> bool) -> Result<(Vec<Vec<usize>>, Vec<ExchangeRecord>)> {
+        if written.len() != problems.len() {
+            return refuse("an exchange walk with one written answer a problem");
+        }
+        let letters: Vec<usize> = written.iter().map(|w| w.iter().take_while(|&&c| c != void).count()).collect();
+        let mut answers: Vec<Vec<usize>> = written.iter().zip(&letters).map(|(w, &n)| w[..n].to_vec()).collect();
+        let read = |answers: &[Vec<usize>], ks: &[usize], realization: &mut dyn FieldRealization| -> Result<Vec<Vec<TowerFace>>> { self.answer_faces(problems, answers, ks, void, realization) };
+        let code_of = |faces: &[TowerFace], x: &[usize]| -> i128 { faces.iter().zip(x).map(|(f, &a)| f.code(a) as i128).sum() };
+        let everyone: Vec<usize> = (0..problems.len()).collect();
+        let mut faces = read(&answers, &everyone, realization)?;
+        // An answer of fewer than two letters has no exchange: it rests where it is written.
+        let mut records: Vec<ExchangeRecord> = (0..problems.len()).map(|k| { let c = code_of(&faces[k], &answers[k]); ExchangeRecord { places: letters[k], start: c, end: c, rested: letters[k] < 2, ..ExchangeRecord::default() } }).collect();
+        let mut marked: Vec<std::collections::BTreeSet<(usize, usize)>> = vec![std::collections::BTreeSet::new(); problems.len()];
+        let mut active: Vec<bool> = letters.iter().map(|&n| n >= 2).collect();
+        let mut rounds = 0usize;
+        let summed = |faces: &[Vec<TowerFace>]| -> i128 { faces.iter().flatten().map(entropy).sum() };
+        let shown = |rounds: usize, active: &[bool], records: &[ExchangeRecord], faces: &[Vec<TowerFace>], accepted: usize, refused: usize| ExchangePass { pass: rounds, active: active.iter().filter(|&&a| a).count(), accepted, refused, code: records.iter().map(|r| r.end).sum(), entropy: summed(faces) };
+        let mut go = pass(&shown(0, &active, &records, &faces, 0, 0));
+        while go && active.iter().any(|&a| a) {
+            rounds += 1;
+            let (mut accepted, mut refused) = (0usize, 0usize);
+            // Each active problem's proposal.
+            let mut proposed: Vec<(usize, usize, usize, i128)> = Vec::new();
+            for k in 0..problems.len() {
+                if !active[k] {
+                    continue;
+                }
+                if records[k].moves.len() + records[k].refused >= cap {
+                    records[k].capped = true;
+                    active[k] = false;
+                    continue;
+                }
+                let (x, f, marks) = (&answers[k], &faces[k], &marked[k]);
+                let code = |i: usize, a: usize| f[i].code(a) as i128;
+                let mut order: Vec<usize> = (0..x.len()).collect();
+                order.sort_by_key(|&i| (std::cmp::Reverse(code(i, x[i])), i));
+                let chosen = order.iter().find_map(|&i| {
+                    let best = (0..x.len())
+                        .filter(|&j| j != i && x[j] != x[i] && !marks.contains(&(i.min(j), i.max(j))))
+                        .map(|j| (code(i, x[i]) + code(j, x[j]) - code(i, x[j]) - code(j, x[i]), j))
+                        .max_by_key(|&(g, j)| (g, std::cmp::Reverse(j.abs_diff(i)), std::cmp::Reverse(j)));
+                    best.filter(|&(g, _)| g > h).map(|(g, j)| (i, j, g))
+                });
+                match chosen {
+                    Some((i, j, g)) => proposed.push((k, i, j, g)),
+                    None => {
+                        records[k].rested = true;
+                        active[k] = false;
+                    }
+                }
+            }
+            if proposed.is_empty() {
+                break;
+            }
+            for &(k, i, j, _) in &proposed {
+                answers[k].swap(i, j);
+            }
+            let ks: Vec<usize> = proposed.iter().map(|p| p.0).collect();
+            let reread = read(&answers, &ks, realization)?;
+            for (&(k, i, j, g), after) in proposed.iter().zip(reread) {
+                let before = records[k].end;
+                let now = code_of(&after, &answers[k]);
+                if before - now > h {
+                    // The move stands: its heat is its certified fall, and every place whose face it changed clears its marks.
+                    let changed: Vec<bool> = faces[k].iter().zip(&after).map(|(a, b)| a != b).collect();
+                    marked[k].retain(|&(a, b)| !changed[a] && !changed[b]);
+                    faces[k] = after;
+                    records[k].moves.push(ExchangeMove { i, j, gain: g, fall: before - now });
+                    records[k].end = now;
+                    accepted += 1;
+                } else {
+                    answers[k].swap(i, j);
+                    marked[k].insert((i.min(j), i.max(j)));
+                    records[k].refused += 1;
+                    refused += 1;
+                }
+            }
+            go = pass(&shown(rounds, &active, &records, &faces, accepted, refused));
+        }
+        let out = answers.iter().zip(written).map(|(a, w)| {
+            let mut placed = a.clone();
+            placed.extend(std::iter::repeat_n(void, w.len() - a.len()));
+            placed
+        }).collect();
+        Ok((out, records))
+    }
+
+    /// [definition; theory, November 9 19:43] **Every face of the answers `ks`** ([`Field::exchange_walk`], [`Field::settle`]):
+    /// each place read in its own region (the question, the answer as it stands and the near field past its end) with that
+    /// place alone open, so each face is `f_t(· | rest)`; returned in the order of `ks`.
+    fn answer_faces(&self, problems: &[(&[usize], usize)], answers: &[Vec<usize>], ks: &[usize], void: usize, realization: &mut dyn FieldRealization) -> Result<Vec<Vec<TowerFace>>> {
+        self.locked_faces(problems, answers, ks, void, false, realization)
+    }
+
+    /// [measurement; theory, November 10 02:03] **Every face of the answers `ks` with every other place locked**
+    /// ([`Field::answer_faces`]'s read, the exchange walks' own), and with `stop` also the stop place, the first void past the
+    /// letters, where the room holds it (its face last); in the order of `ks`.
+    pub fn locked_faces(&self, problems: &[(&[usize], usize)], answers: &[Vec<usize>], ks: &[usize], void: usize, stop: bool, realization: &mut dyn FieldRealization) -> Result<Vec<Vec<TowerFace>>> {
+        let region_of = |k: usize, answer: &[usize]| -> Vec<usize> {
+            let (q, room) = problems[k];
+            let mut classes: Vec<usize> = q.iter().chain(answer).copied().collect();
+            classes.extend(std::iter::repeat_n(void, NEAR.min(room.saturating_sub(answer.len()))));
+            classes
+        };
+        let places: Vec<(usize, usize)> = ks.iter().flat_map(|&k| (0..answers[k].len() + usize::from(stop && problems[k].1 > answers[k].len())).map(move |i| (k, i))).collect();
+        let owned: Vec<(Vec<usize>, Vec<bool>)> = places
+            .iter()
+            .map(|&(k, i)| {
+                let classes = region_of(k, &answers[k]);
+                let at = problems[k].0.len() + i;
+                let open = (0..classes.len()).map(|t| t == at).collect();
+                (classes, open)
+            })
+            .collect();
+        let regions: Vec<Region> = owned.iter().map(|(c, u)| Region { classes: c, unresolved: u, faces: &[], locked: &[], echo: &[], domain: None, port: None }).collect();
+        let faces = if regions.is_empty() { Vec::new() } else { realization.read_faces(self, &regions)? };
+        let mut out: Vec<Vec<TowerFace>> = ks.iter().map(|_| Vec::new()).collect();
+        let at: std::collections::BTreeMap<usize, usize> = ks.iter().enumerate().map(|(n, &k)| (k, n)).collect();
+        for (f, &(k, i)) in faces.into_iter().zip(&places) {
+            out[at[&k]].push(f.get(problems[k].0.len() + i).cloned().flatten().ok_or(TowerError::Refused("an exchange walk's open place without a face"))?);
+        }
+        Ok(out)
+    }
+
+    /// [definition; theory, November 10 01:36] **The parallel certified settle**: the exchange walk's law and `h`
+    /// ([`Field::exchange_walk`]: composition held, two places' letters exchanged, each place's face `f_t(· | rest)`, the
+    /// answer's code `C = Σ_t −log₂ f_t(x_t)` on the codes' `2^(−20)` bits), many exchanges a pass. Each pass, in each active
+    /// problem: (1) **propose** greedily by bare gain `g = c_i(x_i) + c_j(x_j) − c_i(x_j) − c_j(x_i)` on the current faces (the
+    /// most first, then the nearer pair, then the earlier), every pair with `g > h` whose claim (the places within `NEAR − 1`
+    /// of `i` and of `j`, the near field's reach) touches no place already claimed; (2) **keep by attribution**: every
+    /// proposal applied, one re-read, each place's fall `c_t(x_t) − c′_t(x′_t)` attributed to the exchange that claimed it,
+    /// the exchanges whose claimed places fell by more than `h` kept and the rest undone; (3) **certify the kept set whole**:
+    /// re-read, `C` must fall by more than `h` × the kept exchanges; where it does not, the weaker half by attributed fall
+    /// (`⌈n/2⌉`, agent-inferred: the fewest re-reads that still end) is undone and the set re-read, until certified or empty.
+    /// A problem rests at a pass that keeps nothing. `pass` is shown each pass ([`SettlePass`], the pass before the first,
+    /// then each) and the settle stops where it returns false: a problem still active there has not rested. Returns each
+    /// problem's answer (its places past the question, the void past its letters) and its record.
+    pub fn settle(&self, problems: &[(&[usize], usize)], written: &[Vec<usize>], void: usize, h: i128, realization: &mut dyn FieldRealization, pass: &mut dyn FnMut(&SettlePass) -> bool) -> Result<(Vec<Vec<usize>>, Vec<SettleRecord>)> {
+        let (out, records) = self.certified_passes(problems, written, void, h, false, 2, 1, false, &|_, _| {}, realization, &mut |_, x, f| exchange_proposals(x, f, h), pass)?;
+        let records = records
+            .into_iter()
+            .map(|r| SettleRecord { places: r.places, start: r.start, end: r.end, kept: r.kept.iter().map(|m| ExchangeMove { i: m.at[0].0, j: m.at[1].0, gain: m.gain, fall: m.fall }).collect(), undone: r.undone, rested: r.rested })
+            .collect();
+        Ok((out, records))
+    }
+
+    /// [definition; theory, November 10 04:15] **Point re-draws at the highest surprise, alternating with exchanges**: the
+    /// odd passes re-draw ([`redraw_proposals`]: each place with `v_t = c_t(x_t) − H(f_t)` above a nat, the most first, to
+    /// its face's top letter given the rest, where that letter's bare price `ln f_t(top) − ln f_t(x_t)` is at least a nat, the
+    /// claims within `NEAR − 1` disjoint), the even passes exchange ([`exchange_proposals`], the settle's); each pass certified
+    /// as the settle certifies ([`Field::settle`]: one re-read, each claim's attributed fall above `h` kept, the kept set's
+    /// whole fall above `h` × the kept, the weaker half undone until it is). An answer stops at neutrality (its code at or under
+    /// its faces' summed entropy) or where nothing stands in a re-draw pass and an exchange pass in a row; `pass` stops the
+    /// whole. Returns each answer and its record.
+    pub fn redraw(&self, problems: &[(&[usize], usize)], written: &[Vec<usize>], void: usize, h: i128, realization: &mut dyn FieldRealization, pass: &mut dyn FnMut(&SettlePass) -> bool) -> Result<(Vec<Vec<usize>>, Vec<CertifiedRecord>)> {
+        self.certified_passes(problems, written, void, h, true, 1, 2, false, &|_, _| {}, realization, &mut |round, x, f| if round % 2 == 1 { redraw_proposals(x, f, void) } else { exchange_proposals(x, f, h) }, pass)
+    }
+
+    /// [definition; theory, November 10 04:40] **The re-draws through a lens on the certificate** ([`Field::redraw`]'s law and
+    /// stops): every face the walk reads (each answer's places and its stop place, the first void past its letters where the
+    /// room holds it) passes through `lens` (the answer's letters and its faces in place order, the stop place's last), and the
+    /// certificate's code is read on the lensed faces, the stop place's at the void among them; the proposals, `v`, the entropy
+    /// and the neutrality read the lensed faces too. A lens is a function of the answer as it stands, so a change's attributed
+    /// fall carries what it did to the lens at every claimed place.
+    #[allow(clippy::too_many_arguments)]
+    pub fn redraw_lensed(&self, problems: &[(&[usize], usize)], written: &[Vec<usize>], void: usize, h: i128, lens: &dyn Fn(&[usize], &mut [TowerFace]), realization: &mut dyn FieldRealization, pass: &mut dyn FnMut(&SettlePass) -> bool) -> Result<(Vec<Vec<usize>>, Vec<CertifiedRecord>)> {
+        self.certified_passes(problems, written, void, h, true, 1, 2, true, lens, realization, &mut |round, x, f| if round % 2 == 1 { redraw_proposals(x, f, void) } else { exchange_proposals(x, f, h) }, pass)
+    }
+
+    /// [definition; theory, November 10 01:36 and 03:55] **The certified passes** [`Field::settle`] and [`Field::redraw`] share:
+    /// each pass, each active problem's proposals (`propose`, from its letters and its locked faces: each a set of places and
+    /// the letters they take, its bare gain, the claims of different proposals disjoint), all applied and read once, each
+    /// place's fall attributed to the proposal whose claim (the places within `NEAR − 1` of a place it rewrites) holds it, the
+    /// proposals whose claims fell by more than `h` kept and the rest undone, then the kept set certified whole on a re-read
+    /// (its fall above `h` × the kept), its weaker half by attributed fall (`⌈n/2⌉`) undone and the set re-read until it is.
+    /// `propose` is shown the pass's number. A problem of fewer than `least` letters rests where it is written; one rests after
+    /// `cycle` passes in a row that keep nothing (one of each proposer); where `neutral`, one stops at neutrality (its code at or
+    /// under its faces' summed entropy). [theory, November 10 04:40] Where `stop`, each answer's stop place (the first void past
+    /// its letters, where the room holds it) is read and coded at the void beside its letters, inside the claims near it; every
+    /// face read passes through `lens` (the answer and its faces in place order) before anything reads it.
+    #[allow(clippy::too_many_arguments)]
+    fn certified_passes(&self, problems: &[(&[usize], usize)], written: &[Vec<usize>], void: usize, h: i128, neutral: bool, least: usize, cycle: usize, stop: bool, lens: &dyn Fn(&[usize], &mut [TowerFace]), realization: &mut dyn FieldRealization, propose: &mut dyn FnMut(usize, &[usize], &[TowerFace]) -> Vec<(Vec<(usize, usize)>, i128)>, pass: &mut dyn FnMut(&SettlePass) -> bool) -> Result<(Vec<Vec<usize>>, Vec<CertifiedRecord>)> {
+        if written.len() != problems.len() {
+            return refuse("a certified walk with one written answer a problem");
+        }
+        let reach = NEAR - 1;
+        let letters: Vec<usize> = written.iter().map(|w| w.iter().take_while(|&&c| c != void).count()).collect();
+        let mut answers: Vec<Vec<usize>> = written.iter().zip(&letters).map(|(w, &n)| w[..n].to_vec()).collect();
+        // Each place's code at its letter, the stop place's (past the letters) at the void.
+        let codes = |faces: &[TowerFace], x: &[usize]| -> Vec<i128> { faces.iter().enumerate().map(|(t, f)| f.code(x.get(t).copied().unwrap_or(void)) as i128).collect() };
+        let summed = |faces: &[TowerFace]| -> i128 { faces.iter().map(entropy).sum() };
+        let read = |answers: &[Vec<usize>], ks: &[usize], realization: &mut dyn FieldRealization| -> Result<Vec<Vec<TowerFace>>> {
+            let mut faces = self.locked_faces(problems, answers, ks, void, stop, realization)?;
+            for (&k, f) in ks.iter().zip(faces.iter_mut()) {
+                lens(&answers[k], f);
+            }
+            Ok(faces)
+        };
+        let everyone: Vec<usize> = (0..problems.len()).collect();
+        let mut faces = read(&answers, &everyone, realization)?;
+        let mut records: Vec<CertifiedRecord> = (0..problems.len())
+            .map(|k| {
+                let c = codes(&faces[k], &answers[k]).iter().sum();
+                CertifiedRecord { places: letters[k], start: c, end: c, rested: letters[k] < least, ..CertifiedRecord::default() }
+            })
+            .collect();
+        let mut active: Vec<bool> = letters.iter().map(|&n| n >= least).collect();
+        let stand = |k: usize, faces: &[Vec<TowerFace>], answers: &[Vec<usize>], records: &mut [CertifiedRecord], active: &mut [bool]| {
+            records[k].entropy = summed(&faces[k]);
+            records[k].root = root_charge(&answers[k], &faces[k][..answers[k].len()]);
+            if neutral && active[k] && records[k].end <= records[k].entropy {
+                records[k].neutral = true;
+                active[k] = false;
+            }
+        };
+        for k in 0..problems.len() {
+            stand(k, &faces, &answers, &mut records, &mut active);
+        }
+        #[allow(clippy::too_many_arguments)]
+        fn report<'a>(rounds: usize, active: &[bool], records: &[CertifiedRecord], faces: &[Vec<TowerFace>], answers: &'a [Vec<usize>], kept: usize, undone: usize, outside: i128, changed: i128) -> SettlePass<'a> {
+            let ln2 = crate::hnn::keyed_modes::ln2_face();
+            let past = |nats: i128| -> usize { faces.iter().zip(answers).map(|(f, x)| f.iter().zip(x).filter(|&(face, &a)| ((face.code(a) as i128 - entropy(face)) * ln2) >> 30 > nats << 20).count()).sum() };
+            let (over, over2) = (past(1), past(2));
+            SettlePass {
+                pass: rounds,
+                active: active.iter().filter(|&&a| a).count(),
+                kept,
+                undone,
+                code: records.iter().map(|r| r.end).sum(),
+                entropy: records.iter().map(|r| r.entropy).sum(),
+                root: records.iter().map(|r| r.root).sum(),
+                over,
+                over2,
+                places: answers.iter().map(Vec::len).sum(),
+                kind: 0,
+                outside,
+                changed,
+                answers,
+            }
+        }
+        let mut go = pass(&report(0, &active, &records, &faces, &answers, 0, 0, 0, 0));
+        let kind = |rounds: usize| rounds % cycle;
+        let mut rounds = 0usize;
+        let mut idle = vec![0usize; problems.len()];
+        while go && active.iter().any(|&a| a) {
+            rounds += 1;
+            // (1) Each active problem's proposals, their claims disjoint; each place's claimant.
+            let mut proposals: Vec<Vec<(Vec<(usize, usize, usize)>, i128)>> = vec![Vec::new(); problems.len()];
+            let mut claim: Vec<Vec<Option<usize>>> = faces.iter().map(|f| vec![None; f.len()]).collect();
+            for k in 0..problems.len() {
+                if !active[k] {
+                    continue;
+                }
+                let len = faces[k].len();
+                for (n, (at, g)) in propose(rounds, &answers[k], &faces[k][..answers[k].len()]).into_iter().enumerate() {
+                    for &(t, _) in &at {
+                        for u in t.saturating_sub(reach)..=(t + reach).min(len - 1) {
+                            if claim[k][u].is_some_and(|o| o != n) {
+                                return refuse("a certified walk's proposals that share a claimed place");
+                            }
+                            claim[k][u] = Some(n);
+                        }
+                    }
+                    let at = at.into_iter().map(|(t, to)| (t, answers[k][t], to)).collect();
+                    proposals[k].push((at, g));
+                }
+                if proposals[k].is_empty() {
+                    idle[k] += 1;
+                    if idle[k] >= cycle {
+                        records[k].rested = true;
+                        active[k] = false;
+                    }
+                }
+            }
+            let ks: Vec<usize> = (0..problems.len()).filter(|&k| !proposals[k].is_empty()).collect();
+            if ks.is_empty() {
+                go = pass(&SettlePass { kind: kind(rounds), ..report(rounds, &active, &records, &faces, &answers, 0, 0, 0, 0) });
+                continue;
+            }
+            let apply = |answers: &mut [Vec<usize>], k: usize, at: &[(usize, usize, usize)]| at.iter().for_each(|&(t, _, to)| answers[k][t] = to);
+            let undo = |answers: &mut [Vec<usize>], k: usize, at: &[(usize, usize, usize)]| at.iter().for_each(|&(t, from, _)| answers[k][t] = from);
+            // (2) Every proposal applied and read once; each place's fall attributed to its claimant.
+            let before: Vec<Vec<i128>> = (0..problems.len()).map(|k| if proposals[k].is_empty() { Vec::new() } else { codes(&faces[k], &answers[k]) }).collect();
+            for &k in &ks {
+                for (at, _) in &proposals[k] {
+                    apply(&mut answers, k, at);
+                }
+            }
+            let reread = read(&answers, &ks, realization)?;
+            let attributed = |k: usize, now: &[i128], n: usize| -> Vec<i128> {
+                let mut fall = vec![0i128; n];
+                for (t, owner) in claim[k].iter().enumerate() {
+                    if let Some(p) = owner {
+                        fall[*p] += before[k][t] - now[t];
+                    }
+                }
+                fall
+            };
+            let (mut kept_all, mut undone_all, mut outside, mut changed) = (0usize, 0usize, 0i128, 0i128);
+            let mut now_faces: Vec<Option<Vec<TowerFace>>> = vec![None; problems.len()];
+            let mut kept: Vec<Vec<usize>> = vec![Vec::new(); problems.len()];
+            for (&k, after) in ks.iter().zip(reread) {
+                let now = codes(&after, &answers[k]);
+                for (t, owner) in claim[k].iter().enumerate() {
+                    let delta = (before[k][t] - now[t]).abs();
+                    changed += delta;
+                    if owner.is_none() {
+                        outside += delta;
+                    }
+                }
+                let fall = attributed(k, &now, proposals[k].len());
+                for (p, (at, _)) in proposals[k].iter().enumerate() {
+                    if fall[p] > h {
+                        kept[k].push(p);
+                    } else {
+                        undo(&mut answers, k, at);
+                        undone_all += 1;
+                    }
+                }
+                if kept[k].len() == proposals[k].len() {
+                    now_faces[k] = Some(after);
+                }
+            }
+            // (3) Each kept set certified whole, its weaker half undone until it is.
+            let mut pending: Vec<usize> = ks.iter().copied().filter(|&k| !kept[k].is_empty()).collect();
+            while !pending.is_empty() {
+                let stale: Vec<usize> = pending.iter().copied().filter(|&k| now_faces[k].is_none()).collect();
+                for (&k, f) in stale.iter().zip(read(&answers, &stale, realization)?) {
+                    now_faces[k] = Some(f);
+                }
+                let mut next = Vec::new();
+                for k in pending {
+                    let f = now_faces[k].take().ok_or(TowerError::Refused("a certified walk's kept set without its read"))?;
+                    let now = codes(&f, &answers[k]);
+                    let c: i128 = now.iter().sum();
+                    let fall = attributed(k, &now, proposals[k].len());
+                    if records[k].end - c > h * kept[k].len() as i128 {
+                        for &p in &kept[k] {
+                            let (at, g) = &proposals[k][p];
+                            records[k].kept.push(CertifiedMove { at: at.clone(), gain: *g, fall: fall[p] });
+                        }
+                        kept_all += kept[k].len();
+                        records[k].end = c;
+                        faces[k] = f;
+                        continue;
+                    }
+                    let mut by: Vec<usize> = kept[k].clone();
+                    by.sort_by_key(|&p| (fall[p], p));
+                    let weak = by.len().div_ceil(2);
+                    for &p in &by[..weak] {
+                        undo(&mut answers, k, &proposals[k][p].0);
+                    }
+                    undone_all += weak;
+                    kept[k] = by[weak..].to_vec();
+                    kept[k].sort_unstable();
+                    if !kept[k].is_empty() {
+                        next.push(k);
+                    }
+                }
+                pending = next;
+            }
+            for &k in &ks {
+                records[k].undone += proposals[k].len() - kept[k].len();
+                if kept[k].is_empty() {
+                    idle[k] += 1;
+                    if idle[k] >= cycle {
+                        records[k].rested = true;
+                        active[k] = false;
+                    }
+                } else {
+                    idle[k] = 0;
+                    stand(k, &faces, &answers, &mut records, &mut active);
+                }
+            }
+            go = pass(&SettlePass { kind: kind(rounds), ..report(rounds, &active, &records, &faces, &answers, kept_all, undone_all, outside, changed) });
+        }
+        let out = answers.iter().zip(written).map(|(a, w)| {
+            let mut placed = a.clone();
+            placed.extend(std::iter::repeat_n(void, w.len() - a.len()));
+            placed
+        }).collect();
+        Ok((out, records))
+    }
+
     /// [measurement; agent-inferred, November 5, §16.47] **The release, read as it writes** ([`Field::sample_realized`],
     /// draw for draw): `observe` is shown every read the release makes (each sweep's and each refine step's), with every
     /// problem's classes, open places and faces as that read meets them, before its draws, and once more at the end with no
     /// faces. A reading only: nothing in the release reads it.
     #[allow(clippy::too_many_arguments)]
     pub fn sample_observed(&self, problems: &[(&[usize], usize)], sweeps: usize, refine: usize, void: usize, seed: u64, realization: &mut dyn FieldRealization, sweep: &mut dyn FnMut(usize, usize) -> bool, observe: &mut dyn FnMut(ReleaseRead)) -> Result<Vec<Vec<usize>>> {
-        self.release(problems, sweeps, refine, void, seed, 0, true, false, None, false, realization, sweep, observe)
+        self.release(problems, sweeps, refine, void, seed, 0, true, false, None, false, false, false, None, RefineOrder::Keyed, realization, sweep, observe)
     }
 
     /// [definition; agent-inferred, November 5, the unified-theory reading of 17:41, its bound read without a maximum]
@@ -3552,13 +4472,17 @@ impl Field {
     /// unified-theory reading of 03:08] `lengths`, where given, fixes each answer's length: its places past it stand resolved as
     /// the void from the first read (so the region is the question, the answer and its near tail), and every answer place,
     /// in the sweeps and in refine, draws from its face over the letters; the end never moves. `one_end` draws each answer's
-    /// length from the release's first read when none is given ([`Field::release`]).
-    pub fn sample_runs(&self, problems: &[(&[usize], usize)], sweeps: usize, refine: usize, void: usize, seed: u64, run_bound: i128, near_tail: bool, place_order: bool, lengths: Option<&[usize]>, one_end: bool, realization: &mut dyn FieldRealization, sweep: &mut dyn FnMut(usize, usize) -> bool, observe: &mut dyn FnMut(ReleaseRead)) -> Result<Vec<Vec<usize>>> {
-        self.release(problems, sweeps, refine, void, seed, run_bound, near_tail, place_order, lengths, one_end, realization, sweep, observe)
+    /// length from the release's first read when none is given ([`Field::release`]). `rest` lets each answer's refine
+    /// passes stop where they come to rest ([`Field::release`]), `refine` then their most. `spans` makes every second refine
+    /// pass a pass of span moves ([`Field::release`]). `from`, with `lengths` its answers' lengths, starts the walk from those
+    /// answers instead of the sweeps, its first refine pass read without drawing ([`Field::release`]). `refine_order` is the
+    /// order a single-place refine pass walks each answer in ([`RefineOrder`]).
+    pub fn sample_runs(&self, problems: &[(&[usize], usize)], sweeps: usize, refine: usize, void: usize, seed: u64, run_bound: i128, near_tail: bool, place_order: bool, lengths: Option<&[usize]>, one_end: bool, rest: bool, spans: bool, from: Option<&[Vec<usize>]>, refine_order: RefineOrder, realization: &mut dyn FieldRealization, sweep: &mut dyn FnMut(usize, usize) -> bool, observe: &mut dyn FnMut(ReleaseRead)) -> Result<Vec<Vec<usize>>> {
+        self.release(problems, sweeps, refine, void, seed, run_bound, near_tail, place_order, lengths, one_end, rest, spans, from, refine_order, realization, sweep, observe)
     }
 
     #[allow(clippy::too_many_arguments)]
-    fn release(&self, problems: &[(&[usize], usize)], sweeps: usize, refine: usize, void: usize, seed: u64, run_bound: i128, near_tail: bool, place_order: bool, lengths: Option<&[usize]>, one_end: bool, realization: &mut dyn FieldRealization, sweep: &mut dyn FnMut(usize, usize) -> bool, observe: &mut dyn FnMut(ReleaseRead)) -> Result<Vec<Vec<usize>>> {
+    fn release(&self, problems: &[(&[usize], usize)], sweeps: usize, refine: usize, void: usize, seed: u64, run_bound: i128, near_tail: bool, place_order: bool, lengths: Option<&[usize]>, one_end: bool, rest: bool, spans: bool, from: Option<&[Vec<usize>]>, refine_order: RefineOrder, realization: &mut dyn FieldRealization, sweep: &mut dyn FnMut(usize, usize) -> bool, observe: &mut dyn FnMut(ReleaseRead)) -> Result<Vec<Vec<usize>>> {
         if sweeps == 0 || void >= self.declaration.alphabet || problems.iter().any(|&(_, n)| n == 0) {
             return refuse("a sample needs a sweep, an answer place and a void class in the alphabet");
         }
@@ -3575,7 +4499,7 @@ impl Field {
         // the release's first read (every answer place open, training's fully masked state) a place `d` is the void exactly when
         // the answer is shorter than `d`, so its void mass is the field's `P(L < d | q)`, the length's distribution; the end is
         // one uniform `u` against that profile, the answer's length the places before the first whose void mass passes `u` (an
-        // exact integer comparison), and the sweeps then write given it. One `u`, not one draw a place: independent draws
+        // integer comparison), and the sweeps then write given it. One `u`, not one draw a place: independent draws
         // multiply survivals, and the earliest void drawn is not the profile's draw.
         //
         // [definition; agent-inferred, November 6, the unified-theory reading of 07:21] **The draw is conditioned on the room**:
@@ -3613,10 +4537,26 @@ impl Field {
                 }
             }
         }
+        // [measurement; agent-inferred, November 6, the unified-theory reading of 18:28] With `from` (and its lengths), **the walk
+        // starts from given answers** (held's truth): every answer place stands resolved as given, no sweep is drawn, and the
+        // first refine pass reads each place's face and keeps its standing letter, so its drive is the field's calibration on
+        // those answers (zero in expectation under the faces' own joint) before the walk moves them.
+        if let Some(answers) = from {
+            let ls = lengths.ok_or(TowerError::Refused("a walk from given answers needs their lengths"))?;
+            if answers.len() != problems.len() || answers.iter().zip(ls).any(|(a, &l)| a.len() < l) {
+                return refuse("a given answer for each problem, as long as its length");
+            }
+            for (k, &(q, _)) in problems.iter().enumerate() {
+                for t in 0..ls[k] {
+                    classes[k][q.len() + t] = answers[k][t];
+                    open[k][q.len() + t] = false;
+                }
+            }
+        }
         // [definition; agent-inferred, November 5, §16.47] **The answer is released by octaves of its distance from the
         // question** (the unified-theory reading of 15:04): octave `j` holds the places at distance `[2^j, 2^(j+1))` past
         // the question (the first place at distance one), and its places open to the draws only once every place of the
-        // earlier octaves is resolved; within an octave the keyed order. Why: with exact faces every order draws the same
+        // earlier octaves is resolved; within an octave the keyed order. Why: with faces that are the true conditionals every order draws the same
         // joint, but with the field's the order decides what the end reads, and drawn in one keyed order of the whole
         // extent the end was fixed in the first reads while nearly every place was open (95% of the length's drift in
         // reads 1 to 64), so the written length barely heard the problem (its bytes correlated +0.18 with the held); by
@@ -3642,8 +4582,10 @@ impl Field {
         let mut cursors = vec![0usize; problems.len()];
         // Each place's entropy at its last draw, for a refine pass's runs (none where the closing law resolved it).
         let mut drawn_entropy: Vec<Vec<Option<i128>>> = classes.iter().map(|c| vec![None; c.len()]).collect();
-        let mut swept = sweeps;
-        for done in 0..sweeps {
+        // Each answer's refine passes' drives ([`PassDrive`]), one a pass it was redrawn in.
+        let mut drives: Vec<Vec<PassDrive>> = vec![Vec::new(); problems.len()];
+        let mut swept = if from.is_some() { 0 } else { sweeps };
+        for done in 0..swept {
             let last = done + 1 == sweeps || !sweep(done, sweeps);
             let active: Vec<usize> = (0..problems.len()).filter(|&k| open[k].iter().any(|&u| u)).collect();
             let faces = self.read_active(&starts, &classes, &open, &active, void, near_tail, realization)?;
@@ -3686,12 +4628,12 @@ impl Field {
                 }
                 runs.push(picked);
             }
-            observe(ReleaseRead { read: done, pass: 0, classes: &classes, open: &open, faces: Some(&faces), bound, passed });
+            observe(ReleaseRead { read: done, pass: 0, classes: &classes, open: &open, faces: Some(&faces), bound, passed, drives: &drives });
             // [definition; agent-inferred, November 5, the unified-theory reading of 22:38] **A void never unwrites a letter**: in
             // the sweeps as in refine, a place before the last written letter draws from its face restricted to the letters
-            // (the void's mass removed, an exact integer draw against the rest), and only a place past every letter draws
+            // (the void's mass removed, an integer draw against the rest), and only a place past every letter draws
             // from its whole face, so the void is drawn only where it closes nothing written. A read's places are drawn from
-            // the farthest in, each beside the letters drawn past it this read. Exact faces are unchanged (the truth's void
+            // the farthest in, each beside the letters drawn past it this read. Faces that are the true conditionals are unchanged (the truth's void
             // has no mass before its last letter). A face before the last letter with no letter mass draws its whole face.
             // Why: within an octave the keyed order puts most draws before a written letter (93% in octave 6, 96% in octave
             // 7), the field's void there is a residue of about 1% that costs training 0.014 bits a place, and each such
@@ -3747,7 +4689,7 @@ impl Field {
             }
             if last {
                 if done + 1 < sweeps {
-                    observe(ReleaseRead { read: done + 1, pass: 0, classes: &classes, open: &open, faces: None, bound: 0, passed: 0 });
+                    observe(ReleaseRead { read: done + 1, pass: 0, classes: &classes, open: &open, faces: None, bound: 0, passed: 0, drives: &drives });
                     return Ok(problems.iter().enumerate().map(|(k, &(q, _))| classes[k][q.len()..].to_vec()).collect());
                 }
                 break;
@@ -3765,7 +4707,7 @@ impl Field {
         // read, passing over a place that stands past the boundary (the first void) when its turn comes, so an end that has
         // moved is met again. A revisited place is opened again, read beside every other place as it now stands, and drawn
         // at temperature one: a place before the last letter from its face restricted to the letters (the void's mass
-        // removed, an exact integer draw against the rest), the last letter and the boundary place from their whole faces,
+        // removed, an integer draw against the rest), the last letter and the boundary place from their whole faces,
         // so the end moves one place in or out a draw and the closing law holds after every draw. Why (the unified-theory
         // reading of November 5, 14:47): drawn from the whole face, a void inside erased every later letter while a
         // boundary drawn as a letter moved out one place, the new boundary waiting for the next pass, so the passes cut
@@ -3780,25 +4722,99 @@ impl Field {
         let mut read = swept;
         let total = swept + refine * problems.iter().map(|&(_, n)| n).max().unwrap_or(0);
         let boundary = |classes: &[usize], open: &[bool], q: usize| (q..classes.len()).find(|&t| classes[t] == void && !open[t]).unwrap_or(classes.len());
+        // [definition; agent-inferred, November 6, Brandon's lens of 17:31 and the unified-theory reading of 17:38] **A pass
+        // comes to rest** (with `rest`): at temperature one the walk has no fixed point, so its plateau is zero net drive, not
+        // zero change. Each pass sums over the places it redraws in an answer ([`PassDrive`]) the standing letters' codes
+        // `S` on the faces they are redrawn from and those faces' entropies `H`; `D = S − H` is the drive (positive while
+        // the answer contracts toward what its faces expect, negative while it expands), and the faces' varentropies `C`
+        // are the draws' own spread (the distributed capacitance). An answer rests after the first pass whose drive is
+        // within its spread, `D ≤ √C`, or fell from the pass before by no more than it, `D_(p−1) − D_p ≤ √C`, and its later
+        // passes pass it over. Why (lap 24's ten passes, `PASSES.tsv`): the drawn code a place fell from 1.82 bits at pass 1
+        // to 1.38 at pass 8 and rose to 1.48 by pass 10 as some answers heated (one from 1.78 to 3.73 bits a place), so a
+        // fixed count both stops answers still falling and walks heating ones on.
+        let mut resting = vec![false; problems.len()];
+        // [definition; agent-inferred, November 6, the unified-theory reading of 17:58, the cube's move] With `spans`, **every
+        // second pass moves spans**: the answer's places before its boundary are cut into spans of `2^(1 + (m − 1) mod 4)`
+        // places at the `m`-th span pass (2, 4, 8, 16, then again), from a keyed offset; each span in a keyed order is opened
+        // whole (silent, never a draft) and redrawn in place order, a run a read, given the rest of the answer as it stands.
+        // Why: the single-place walk settles with its drive four to five times its spread (rest118), and a single-letter move
+        // barely leaves a wrong word whose letters each fit their neighbours; if the walk's standing code falls below its
+        // single-place plateau after span moves, the plateau was a trap of the move, and if not, the field's own faces hold
+        // those words.
+        let mut span_kept: Vec<Vec<Option<usize>>> = classes.iter().map(|c| vec![None; c.len()]).collect();
         let mut pass = 0u64;
-        while (pass as usize) < refine {
+        while (pass as usize) < refine && !resting.iter().all(|&r| r) {
             pass += 1;
+            let mut moved: Vec<PassDrive> = vec![PassDrive::default(); problems.len()];
             let orders: Vec<Vec<usize>> = problems
                 .iter()
                 .enumerate()
                 .map(|(k, &(q, _))| {
                     let mut order: Vec<usize> = (q.len()..classes[k].len()).collect();
-                    order.sort_by_key(|&t| (mix(((k as u64) << 32) ^ t as u64 ^ (pass << 48) ^ (1 << 62)), t));
+                    match refine_order {
+                        RefineOrder::Keyed => order.sort_by_key(|&t| (mix(((k as u64) << 32) ^ t as u64 ^ (pass << 48) ^ (1 << 62)), t)),
+                        RefineOrder::Place => {}
+                        RefineOrder::Reversed => order.reverse(),
+                    }
                     order
                 })
                 .collect();
             let mut cursors = vec![0usize; problems.len()];
+            let span_lists: Option<Vec<Vec<Vec<usize>>>> = (spans && pass % 2 == 0).then(|| {
+                let length = 1usize << (1 + (pass / 2 - 1) % 4);
+                problems
+                    .iter()
+                    .enumerate()
+                    .map(|(k, &(q, _))| {
+                        let end = boundary(&classes[k], &open[k], q.len());
+                        let offset = (mix(((k as u64) << 32) ^ (pass << 48) ^ (3 << 60)) % length as u64) as usize;
+                        let mut cuts: Vec<usize> = std::iter::once(q.len()).chain((q.len() + offset..end).step_by(length).filter(|&c| c > q.len())).collect();
+                        cuts.push(end);
+                        let mut list: Vec<Vec<usize>> = cuts.windows(2).filter(|w| w[0] < w[1]).map(|w| (w[0]..w[1]).collect()).collect();
+                        list.sort_by_key(|span| (mix(((k as u64) << 32) ^ span[0] as u64 ^ (pass << 48) ^ (5 << 60)), span[0]));
+                        list
+                    })
+                    .collect()
+            });
+            let mut span_cursors = vec![(0usize, 0usize); problems.len()];
             loop {
                 // Each problem's next place in its order standing at or before its boundary, beside that boundary, and the run
                 // past it: the next places at or before the boundary whose entropies at their last draw sum within the bound.
                 let mut places: Vec<Option<(Vec<usize>, usize)>> = vec![None; problems.len()];
                 for (k, &(q, _)) in problems.iter().enumerate() {
+                    if resting[k] {
+                        continue;
+                    }
                     let end = boundary(&classes[k], &open[k], q.len());
+                    if let Some(lists) = &span_lists {
+                        // A span pass: the next run of the open span in place order, the next span opened whole at its turn.
+                        let (si, pi) = &mut span_cursors[k];
+                        let Some(span) = lists[k].get(*si) else { continue };
+                        if *pi == 0 {
+                            for &u in span {
+                                span_kept[k][u] = Some(classes[k][u]);
+                                classes[k][u] = void;
+                                open[k][u] = true;
+                            }
+                        }
+                        let mut run = vec![span[*pi]];
+                        *pi += 1;
+                        let mut held = 0i128;
+                        while run_bound > 0 && *pi < span.len() {
+                            let Some(h) = drawn_entropy[k][span[*pi]] else { break };
+                            if held + h >= run_bound {
+                                break;
+                            }
+                            held += h;
+                            run.push(span[*pi]);
+                            *pi += 1;
+                        }
+                        if *pi == span.len() {
+                            (*si, *pi) = (*si + 1, 0);
+                        }
+                        places[k] = Some((run, end));
+                        continue;
+                    }
                     while let Some(&t) = orders[k].get(cursors[k]) {
                         cursors[k] += 1;
                         if t < end || (!given && t == end) {
@@ -3827,7 +4843,7 @@ impl Field {
                     break;
                 }
                 if !sweep(read, total) {
-                    observe(ReleaseRead { read, pass: pass as usize, classes: &classes, open: &open, faces: None, bound: 0, passed: 0 });
+                    observe(ReleaseRead { read, pass: pass as usize, classes: &classes, open: &open, faces: None, bound: 0, passed: 0, drives: &drives });
                     return Ok(problems.iter().enumerate().map(|(k, &(q, _))| classes[k][q.len()..].to_vec()).collect());
                 }
                 read += 1;
@@ -3835,9 +4851,13 @@ impl Field {
                 for (k, place) in places.iter().enumerate() {
                     if let Some((run, _)) = place {
                         for &t in run {
-                            kept[k].push(classes[k][t]);
-                            open[k][t] = true;
-                            classes[k][t] = void;
+                            if let Some(was) = span_kept[k][t].take() {
+                                kept[k].push(was);
+                            } else {
+                                kept[k].push(classes[k][t]);
+                                open[k][t] = true;
+                                classes[k][t] = void;
+                            }
                         }
                     }
                 }
@@ -3855,7 +4875,7 @@ impl Field {
                         passed += usize::from(run_bound > 0 && held >= run_bound);
                     }
                 }
-                observe(ReleaseRead { read: read - 1, pass: pass as usize, classes: &classes, open: &open, faces: Some(&faces), bound, passed });
+                observe(ReleaseRead { read: read - 1, pass: pass as usize, classes: &classes, open: &open, faces: Some(&faces), bound, passed, drives: &drives });
                 for (k, place) in places.into_iter().enumerate() {
                     let Some((run, end)) = place else { continue };
                     for (&t, &was) in run.iter().zip(&kept[k]) {
@@ -3864,6 +4884,13 @@ impl Field {
                     let u = ((mix(((k as u64) << 40) ^ ((t as u64) << 8) ^ (pass << 56) ^ 0xD) as u128) << 64) | mix(((k as u64) << 40) ^ ((t as u64) << 8) ^ (pass << 56) ^ 0xE) as u128;
                     let whole = !given && t + 1 >= end;
                     let letters = face.total - face.masses[void];
+                    // The drive is read on the face the place is drawn from: the whole face, or its letters.
+                    let off_void = if whole { None } else { letters_face(face, void) };
+                    if let Some(drawn) = if whole { Some(face) } else { off_void.as_ref() } {
+                        if drawn.masses[was] > 0 {
+                            moved[k].add(drawn, was);
+                        }
+                    }
                     classes[k][t] = if whole {
                         let u = u % face.total;
                         let mut acc = 0u128;
@@ -3881,6 +4908,11 @@ impl Field {
                             acc > u
                         }).unwrap_or(was)
                     };
+                    if from.is_some() && pass == 1 {
+                        classes[k][t] = was;
+                    }
+                    moved[k].changes += usize::from(classes[k][t] != was);
+                    moved[k].heat += face.code(was) as i128 - face.code(classes[k][t]) as i128;
                     open[k][t] = false;
                     }
                     // A run's draws read one boundary: where its last letter was drawn the void, the closing law resolves every
@@ -3893,8 +4925,13 @@ impl Field {
                     }
                 }
             }
+            for k in (0..problems.len()).filter(|&k| moved[k].redrawn > 0) {
+                let before = drives[k].last().map(PassDrive::drive);
+                drives[k].push(moved[k]);
+                resting[k] = rest && moved[k].rests(before);
+            }
         }
-        observe(ReleaseRead { read, pass: pass as usize + 1, classes: &classes, open: &open, faces: None, bound: 0, passed: 0 });
+        observe(ReleaseRead { read, pass: pass as usize + 1, classes: &classes, open: &open, faces: None, bound: 0, passed: 0, drives: &drives });
         Ok(problems.iter().enumerate().map(|(k, &(q, _))| classes[k][q.len()..].to_vec()).collect())
     }
 
@@ -3998,6 +5035,12 @@ impl Field {
             return refuse("a field's material that is not its declaration's length");
         }
         let mut field = Self::with_theta(d, theta);
+        if lines.peek().copied().is_some_and(|l| l.split(' ').next() == Some(RETIRED_WIDTH_LAW_LINE)) {
+            return refuse("a state under the width law: that class law retired on November 9, and the base classes stand alone");
+        }
+        if lines.peek().copied().is_some_and(|l| l.trim_end() == RETIRED_OPENING_AT_FORCE_LINE) {
+            return refuse("a state opened at the letters' force: that opening law retired on November 9, and the own opening stands alone");
+        }
         if let Some(head) = lines.peek().copied().filter(|l| l.starts_with("scale ")) {
             lines.next();
             let words: Vec<usize> = head.split(' ').skip(1).map(|w| w.parse::<usize>().map_err(|_| TowerError::Refused("a scale's line that is not two counts"))).collect::<Result<_>>()?;
@@ -4230,7 +5273,7 @@ impl Field {
         repeat(ol.w_bias, layout.w_bias, dw, f, &face, true);
         repeat(ol.read_bias, layout.read_bias, a, 1, &kept, false);
         repeat(ol.moment_face_bias, layout.moment_face_bias, dw, f, &face, true);
-        Ok((Self::with_theta(d, new), from))
+        Ok((Self::with_theta(d, new).clocked_as(self), from))
     }
 
     /// [definition; agent-inferred, November 4, §16.40] **The field with one more lane** (the tower record, D2): a lane of
@@ -4320,7 +5363,90 @@ impl Field {
             }
         }
         debug_assert_eq!(cursor, 4 * old.lane_draws());
-        Ok((Self::with_theta(d, new), from))
+        Ok((Self::with_theta(d, new).clocked_as(self), from))
+    }
+}
+
+impl Field {
+    /// [definition; theory, November 10 09:55] **The field with `added` more pair contacts** (the merge's `c = (aᵀs)(bᵀx)`
+    /// joined to the face by `W`): the new contacts' `a` and `b` rows are the pair drives, drawn as a founding of this
+    /// declaration draws them, uniform on `±√(3/D)` at the material's grain, read from `keys` four bytes a draw (the new set's
+    /// rows in order, `a` then `b`); every family that writes the face from the contacts (the pair's return `W`, and in an
+    /// energy field the contraction `c`) takes the new contacts' columns at zero, and the contacts' biases open at zero as a
+    /// founding opens them. Every sum the forward forms is then the old sum, so every face is kept bit for bit; the new
+    /// contacts have a covector from the first section on (`W`'s new columns read the new `c`; the drives learn once `W` moves).
+    ///
+    /// The contacts are complex pairs (`e`, `f/2 + e`): the real parts then the imaginary parts, so the old contacts keep
+    /// their pair and strand side (`e` even reads the site before, odd the one after) at the same indices within each half,
+    /// and the new ones follow them in each half. The heads, the lanes and everything else are copied family by family.
+    ///
+    /// Returns the grown field and, for each entry, the old entry it carries (`None` for a new contact's own).
+    pub fn contacted(&self, added: usize, keys: &[u8]) -> Result<(Self, Vec<Option<usize>>)> {
+        if self.scale.is_some() {
+            return refuse("a tower's levels grow their contacts level by level, not through the fine field alone");
+        }
+        let old = self.declaration;
+        let d = old.contacted(added)?;
+        let layout = FieldLayout::new(&d);
+        let ol = &self.layout;
+        let (dw, fc, f2) = (old.width, old.contacts, d.contacts);
+        let mut new = vec![0i32; layout.len];
+        let mut from: Vec<Option<usize>> = vec![None; layout.len];
+        // Contact `e` of the old set at its index in the grown: a real part keeps its place, an imaginary part moves past the new
+        // real parts. The new contact `k` (of `added`) follows its half's old contacts.
+        let kept = |e: usize| if e < fc / 2 { e } else { f2 / 2 + e - fc / 2 };
+        let fresh = |k: usize| if k < added / 2 { fc / 2 + k } else { f2 / 2 + fc / 2 + k - added / 2 };
+        if ol.families.len() != layout.families.len() {
+            return refuse("a growth in contacts that changes the families");
+        }
+        // The families that read or write the face through a contact, by their old start: the pair drives (a contact a row),
+        // their biases, the pair's return (a contact a column) and the energy's contraction.
+        let drives = [(ol.a, layout.a), (ol.b, layout.b)];
+        for (&(os, ol_len, _), &(ns, nl_len, _)) in ol.families.iter().zip(&layout.families) {
+            if let Some(&(_, ns)) = drives.iter().find(|&&(o, _)| o == os) {
+                for e in 0..fc {
+                    for j in 0..dw {
+                        new[ns + kept(e) * dw + j] = self.theta[os + e * dw + j];
+                        from[ns + kept(e) * dw + j] = Some(os + e * dw + j);
+                    }
+                }
+            } else if os == ol.a_bias || os == ol.b_bias || (d.energy && os == ol.pair_c) {
+                for e in 0..fc {
+                    new[ns + kept(e)] = self.theta[os + e];
+                    from[ns + kept(e)] = Some(os + e);
+                }
+            } else if os == ol.w {
+                for r in 0..dw {
+                    for e in 0..fc {
+                        new[ns + r * f2 + kept(e)] = self.theta[os + r * fc + e];
+                        from[ns + r * f2 + kept(e)] = Some(os + r * fc + e);
+                    }
+                }
+            } else {
+                if ol_len != nl_len {
+                    return refuse("a family that changes its length with the contacts but is not one they index");
+                }
+                for i in 0..ol_len {
+                    new[ns + i] = self.theta[os + i];
+                    from[ns + i] = Some(os + i);
+                }
+            }
+        }
+        // The new contacts' drives: a founding's draws at the grown width's scale, the new set's rows in order.
+        let (num, den) = chart_scale(dw);
+        let mut cursor = 0usize;
+        for start in [layout.a, layout.b] {
+            for k in 0..added {
+                for j in 0..dw {
+                    let word = keys.get(cursor..cursor + 4).ok_or(TowerError::Refused("fewer key bytes than the new contacts' founding reads"))?;
+                    cursor += 4;
+                    let draw = i32::from_be_bytes([word[0], word[1], word[2], word[3]]) as i128;
+                    new[start + fresh(k) * dw + j] = fit32((draw * ((num << MATERIAL_BITS) / den) as i128) >> 31, "a new contact's founded value outgrew its 32-bit carrier")?;
+                }
+            }
+        }
+        debug_assert_eq!(cursor, 4 * old.contact_draws(added));
+        Ok((Self::with_theta(d, new).clocked_as(self), from))
     }
 }
 
@@ -4356,6 +5482,16 @@ impl Field {
 /// ([`HostField`]). The card's realization is one such; a realization that cannot read a region
 /// refuses, never substitutes.
 pub trait FieldRealization {
+    /// [measurement; theory, November 9 19:43] Each region's faces and its sites' plates at the last tick
+    /// ([`Field::read_plates`]), read on the host where a realization reads none of its own.
+    fn read_plates(&mut self, field: &Field, regions: &[Region]) -> Result<(Vec<Vec<Option<TowerFace>>>, Vec<Vec<u32>>)> {
+        field.read_plates(regions)
+    }
+    /// [measurement; theory, November 9 21:59] Each region's faces, plates and key words at the last tick
+    /// ([`Field::read_words`]), read on the host where a realization reads none of its own.
+    fn read_words(&mut self, field: &Field, regions: &[Region]) -> Result<WordsRead> {
+        field.read_words(regions)
+    }
     fn read_and_return(&mut self, field: &Field, regions: &[Region]) -> Result<(Vec<Vec<Option<TowerFace>>>, Vec<i128>)>;
     fn read_faces(&mut self, field: &Field, regions: &[Region]) -> Result<Vec<Vec<Option<TowerFace>>>>;
     /// Each unresolved site's readout logits on `2^(−16)` bits ([`Field::logits`]), the release's read.
@@ -4389,6 +5525,59 @@ pub trait FieldRealization {
         refuse("a realization that cannot read its near fields")
     }
     /// Each of `sites`' clocks by tick in `region` ([`Field::blank_clocks`]), a reading.
+    /// [measurement; the unified-theory reading of November 7, 01:37] An energy field's squares at one base
+    /// ([`Field::energy_square_corners`] for each `(truth, (i, j))`), read on the host in parallel unless the realization
+    /// reads them itself.
+    fn read_energy_squares(&mut self, field: &Field, squares: &[(&[usize], (usize, usize))], void: usize, eps: u32) -> Result<Vec<Option<EnergySquare>>> {
+        squares.par_iter().map(|&(truth, ij)| field.energy_square_corners(truth, ij, void, eps)).collect()
+    }
+    /// [measurement; the unified-theory readings of November 7, 03:22 and 04:20] An energy field's central squares at one base
+    /// ([`Field::energy_central_square`] for each `(truth, (i, j))` at each step), read on the host in parallel unless the
+    /// realization reads them itself.
+    #[allow(clippy::type_complexity)]
+    fn read_energy_central_squares(&mut self, field: &Field, squares: &[(&[usize], (usize, usize))], void: usize, steps: &[u32]) -> Result<Vec<Option<Vec<(i128, i128)>>>> {
+        squares.par_iter().map(|&(truth, ij)| field.energy_central_square(truth, ij, void, steps)).collect()
+    }
+    /// [measurement; November 7] An energy field's faces and its energy `G` at the last state, region by region
+    /// ([`Field::energy_faces_read`]), on the host in parallel unless the realization reads them itself.
+    #[allow(clippy::type_complexity)]
+    fn read_energy_faces(&mut self, field: &Field, regions: &[Region]) -> Result<(Vec<Vec<Option<TowerFace>>>, Vec<i128>)> {
+        let reads: Vec<(Vec<Option<TowerFace>>, i128)> = regions.par_iter().map(|r| field.energy_faces_read(r)).collect::<Result<_>>()?;
+        Ok(reads.into_iter().unzip())
+    }
+    /// [measurement; the unified-theory reading of November 7, 04:05] Each resolved region's energy `G` at its own certified
+    /// halvings ([`Field::energy_g`]), on the host in parallel unless the realization reads them itself.
+    fn read_energies(&mut self, field: &Field, regions: &[&[usize]]) -> Result<Vec<i128>> {
+        regions.par_iter().map(|c| field.energy_g(c)).collect()
+    }
+    /// [measurement; theory, November 9 08:13 and 08:15, the held-under reading] Each resolved region's energy at this field's
+    /// `θ` under `base`'s classes, lock lists and supports, and under `hold` its halvings too ([`Field::energy_g_under`]), on
+    /// the host in parallel unless the realization reads them itself.
+    fn read_energies_under(&mut self, field: &Field, base: &Field, regions: &[&[usize]], hold: BaseHold) -> Result<Vec<i128>> {
+        regions.par_iter().map(|c| field.energy_g_under(base, c, hold)).collect()
+    }
+    /// [measurement; theory, November 8, the lead reading] Each place's lead read ([`Field::energy_lead`] at its configuration
+    /// and site, every site resolved), on the host in parallel unless the realization reads it from its own buffers.
+    fn read_energy_leads(&mut self, field: &Field, places: &[(&[usize], usize)]) -> Result<Vec<EnergyLead>> {
+        places.par_iter().map(|&(c, t)| field.energy_lead(c, t)).collect()
+    }
+    /// [measurement; theory, November 9, the class reading] Each place's held classes, supports and halvings
+    /// ([`Field::energy_held_classes`] at its configuration and site, every site resolved), on the host in parallel unless the
+    /// realization reads them from its own buffers.
+    fn read_energy_held_classes(&mut self, field: &Field, places: &[(&[usize], usize)]) -> Result<Vec<EnergyHeldClasses>> {
+        places.par_iter().map(|&(c, t)| field.energy_held_classes(c, t)).collect()
+    }
+    /// [measurement; theory, November 9 09:34, the word reading] Each place's opening address words ([`Field::energy_opening_words`]
+    /// at its configuration and site, every site resolved), on the host in parallel unless the realization reads them from its
+    /// own buffers.
+    fn read_energy_opening_words(&mut self, field: &Field, places: &[(&[usize], usize)]) -> Result<Vec<EnergyOpeningWords>> {
+        places.par_iter().map(|&(c, t)| field.energy_opening_words(c, t)).collect()
+    }
+    /// [definition; agent-inferred, November 7] An energy field's material covector `∂G/∂θ` and `G` a region
+    /// ([`Field::energy_material`]), read on the host in parallel unless the realization reads them itself.
+    fn read_energy_material(&mut self, field: &Field, regions: &[Region]) -> Result<Vec<(Vec<i128>, i128)>> {
+        regions.par_iter().map(|r| field.energy_material(r)).collect()
+    }
     fn read_blank_clocks(&mut self, _field: &Field, _region: &Region, _sites: &[usize]) -> Result<Vec<BlankClocks>> {
         refuse("a realization that cannot read its blanks' clocks")
     }
@@ -4434,6 +5623,708 @@ impl FieldRealization for HostField {
     }
 }
 
+/// [definition; Brandon, November 7 19:22: "you can beat the clock speed of the CPU with more threads if the mathematics holds
+/// for the orders you integrate with"] **The card and the host's lanes as one surface**: an energy read's regions are
+/// partitioned between the host's cores (the first `k`, in parallel on the host's pool) and the card (the rest), both at
+/// once, and joined in region order. Each region's read is its own and bit for bit the same on either side (the card's
+/// parity with [`HostField`]), so the joined read is the card's alone at any partition. The host's share is the
+/// partition that ends both sides together, read from the last split read's measured times: with `t_h` and `t_c` the
+/// times a region on each side, `k/n = t_c/(t_h + t_c)`, met halfway from the share before. Every other read is the card's.
+pub struct LanesField<'a> {
+    pub card: &'a mut dyn FieldRealization,
+    /// The host's share of a read's regions on `2^(−16)`.
+    share: u64,
+    /// Regions read and microseconds spent on each side, and the reads split.
+    pub host_regions: u64,
+    pub card_regions: u64,
+    pub host_us: u128,
+    pub card_us: u128,
+    pub wall_us: u128,
+    pub splits: u64,
+}
+
+impl<'a> LanesField<'a> {
+    const ONE: u64 = 1 << 16;
+    /// The opening share, a sixteenth: the host is read before its share is known.
+    pub fn new(card: &'a mut dyn FieldRealization) -> Self {
+        Self { card, share: Self::ONE >> 4, host_regions: 0, card_regions: 0, host_us: 0, card_us: 0, wall_us: 0, splits: 0 }
+    }
+
+    /// The host's share now, on `2^(−16)`.
+    pub fn share(&self) -> u64 {
+        self.share
+    }
+
+    /// `n` regions split at the current share: the host reads `[0, k)` on a scoped thread over the pool while the card
+    /// reads `[k, n)` here; the share is then re-read from the two sides' times.
+    fn split<T: Send>(&mut self, n: usize, host: impl FnOnce(std::ops::Range<usize>) -> Result<Vec<T>> + Send, card: impl FnOnce(&mut dyn FieldRealization, std::ops::Range<usize>) -> Result<Vec<T>>) -> Result<Vec<T>> {
+        let k = if n < 2 { 0 } else { ((n as u64 * self.share) >> 16).clamp(1, n as u64 - 1) as usize };
+        if k == 0 {
+            return card(&mut *self.card, 0..n);
+        }
+        let wall = std::time::Instant::now();
+        let (host_read, card_read) = std::thread::scope(|scope| {
+            let lane = scope.spawn(move || {
+                let t = std::time::Instant::now();
+                host(0..k).map(|v| (v, t.elapsed().as_micros()))
+            });
+            let t = std::time::Instant::now();
+            let c = card(&mut *self.card, k..n).map(|v| (v, t.elapsed().as_micros()));
+            (lane.join().unwrap_or_else(|_| refuse("a host lane panicked")), c)
+        });
+        let ((mut out, th), (rest, tc)) = (host_read?, card_read?);
+        out.extend(rest);
+        self.wall_us += wall.elapsed().as_micros();
+        (self.host_regions, self.card_regions, self.host_us, self.card_us, self.splits) = (self.host_regions + k as u64, self.card_regions + (n - k) as u64, self.host_us + th, self.card_us + tc, self.splits + 1);
+        // Times a region on 2^(-16) microseconds, and the share that would end both together.
+        let (per_h, per_c) = ((th.max(1) << 16) / k as u128, (tc.max(1) << 16) / (n - k) as u128);
+        let even = (per_c << 16) / (per_h + per_c);
+        self.share = ((self.share as u128 + even) / 2).clamp(1, Self::ONE as u128 - 1) as u64;
+        Ok(out)
+    }
+}
+
+impl FieldRealization for LanesField<'_> {
+    fn read_plates(&mut self, field: &Field, regions: &[Region]) -> Result<(Vec<Vec<Option<TowerFace>>>, Vec<Vec<u32>>)> {
+        self.card.read_plates(field, regions)
+    }
+    fn read_words(&mut self, field: &Field, regions: &[Region]) -> Result<WordsRead> {
+        self.card.read_words(field, regions)
+    }
+    fn read_and_return(&mut self, field: &Field, regions: &[Region]) -> Result<(Vec<Vec<Option<TowerFace>>>, Vec<i128>)> {
+        self.card.read_and_return(field, regions)
+    }
+    fn read_faces(&mut self, field: &Field, regions: &[Region]) -> Result<Vec<Vec<Option<TowerFace>>>> {
+        self.card.read_faces(field, regions)
+    }
+    fn read_logits(&mut self, field: &Field, regions: &[Region]) -> Result<Vec<FieldRead>> {
+        self.card.read_logits(field, regions)
+    }
+    fn read_landmarks(&mut self, field: &Field, region: &Region, question: usize, sites: &[usize], count: usize) -> Result<Vec<Vec<(usize, u64)>>> {
+        self.card.read_landmarks(field, region, question, sites, count)
+    }
+    fn met_pairs(&self) -> Option<u128> {
+        self.card.met_pairs()
+    }
+    fn read_row_shares(&mut self, field: &Field, regions: &[Region], questions: &[usize]) -> Result<Vec<HeldRows>> {
+        self.card.read_row_shares(field, regions, questions)
+    }
+    fn read_covector_shares(&mut self, field: &Field, regions: &[Region]) -> Result<Vec<[u128; 2]>> {
+        self.card.read_covector_shares(field, regions)
+    }
+    fn read_row_currents(&mut self, field: &Field, regions: &[Region], questions: &[usize], returning: bool) -> Result<Vec<Vec<RowCurrent>>> {
+        self.card.read_row_currents(field, regions, questions, returning)
+    }
+    fn read_ticks(&mut self, field: &Field, regions: &[Region]) -> Result<Vec<Vec<TickRead>>> {
+        self.card.read_ticks(field, regions)
+    }
+    fn read_near_offsets(&mut self, field: &Field, region: &Region, sites: &[usize]) -> Result<Vec<NearOffsets>> {
+        self.card.read_near_offsets(field, region, sites)
+    }
+    fn read_blank_clocks(&mut self, field: &Field, region: &Region, sites: &[usize]) -> Result<Vec<BlankClocks>> {
+        self.card.read_blank_clocks(field, region, sites)
+    }
+    fn read_energy_squares(&mut self, field: &Field, squares: &[(&[usize], (usize, usize))], void: usize, eps: u32) -> Result<Vec<Option<EnergySquare>>> {
+        self.card.read_energy_squares(field, squares, void, eps)
+    }
+    #[allow(clippy::type_complexity)]
+    fn read_energy_central_squares(&mut self, field: &Field, squares: &[(&[usize], (usize, usize))], void: usize, steps: &[u32]) -> Result<Vec<Option<Vec<(i128, i128)>>>> {
+        self.card.read_energy_central_squares(field, squares, void, steps)
+    }
+    #[allow(clippy::type_complexity)]
+    fn read_energy_faces(&mut self, field: &Field, regions: &[Region]) -> Result<(Vec<Vec<Option<TowerFace>>>, Vec<i128>)> {
+        let joined = self.split(
+            regions.len(),
+            |r| regions[r].par_iter().map(|x| field.energy_faces_read(x)).collect::<Result<Vec<_>>>(),
+            |card, r| card.read_energy_faces(field, &regions[r]).map(|(f, g)| f.into_iter().zip(g).collect()),
+        )?;
+        Ok(joined.into_iter().unzip())
+    }
+    fn read_energies(&mut self, field: &Field, regions: &[&[usize]]) -> Result<Vec<i128>> {
+        self.split(regions.len(), |r| regions[r].par_iter().map(|c| field.energy_g(c)).collect(), |card, r| card.read_energies(field, &regions[r]))
+    }
+    fn read_energy_leads(&mut self, field: &Field, places: &[(&[usize], usize)]) -> Result<Vec<EnergyLead>> {
+        self.card.read_energy_leads(field, places)
+    }
+    fn read_energy_held_classes(&mut self, field: &Field, places: &[(&[usize], usize)]) -> Result<Vec<EnergyHeldClasses>> {
+        self.card.read_energy_held_classes(field, places)
+    }
+    fn read_energy_opening_words(&mut self, field: &Field, places: &[(&[usize], usize)]) -> Result<Vec<EnergyOpeningWords>> {
+        self.card.read_energy_opening_words(field, places)
+    }
+    fn read_energies_under(&mut self, field: &Field, base: &Field, regions: &[&[usize]], hold: BaseHold) -> Result<Vec<i128>> {
+        self.card.read_energies_under(field, base, regions, hold)
+    }
+    fn read_energy_material(&mut self, field: &Field, regions: &[Region]) -> Result<Vec<(Vec<i128>, i128)>> {
+        self.split(regions.len(), |r| regions[r].par_iter().map(|x| field.energy_material(x)).collect(), |card, r| card.read_energy_material(field, &regions[r]))
+    }
+}
+
+/// [definition; the unified-theory reading of November 7, 20:29, law (D)] **A place's conditional chart**: from its letters'
+/// energies `gs` (on `2^(−32)`) and `1/T` (`inverse`, on `2^(−24)`), each letter's `log₂ w_v = −(G_v − G_min)/T` on
+/// `2^(−32)`, its weight `w_v` on `2^(−24)` through the exponential's navigator (whole at the least energy, released to zero
+/// below `2^(−23)`), and the weights' sum `z`; `p(v) = w_v/z`. The conditional section's chart
+/// ([`FieldLearner::section_conditional`]) and the held reading's ([`conditional_code`]).
+fn conditional_logs(gs: &[i128], inverse: i128, fine: &Exponential) -> Result<(Vec<i128>, Vec<i128>, i128)> {
+    const OVER: &str = "a conditional covector past its 128-bit carrier";
+    let lo = gs.iter().copied().min().unwrap_or(0);
+    let logs: Vec<i128> = gs.iter().map(|&gv| (lo - gv).checked_mul(inverse).map(|x| release(x, MATERIAL_BITS)).inspect(|v| crate::number::census::reach(OVER, v)).ok_or(TowerError::Refused(OVER))).collect::<Result<_>>()?;
+    let w: Vec<i128> = logs
+        .iter()
+        .map(|&l| {
+            let ell = l >> (ENERGY_BITS - MATERIAL_BITS);
+            if ell >= 0 {
+                Ok(1i128 << MATERIAL_BITS)
+            } else if ell <= -((MATERIAL_BITS as i128 - 1) << MATERIAL_BITS) {
+                Ok(0)
+            } else {
+                temperature_of(ell as i32, fine)
+            }
+        })
+        .collect::<Result<_>>()?;
+    let z: i128 = w.iter().sum();
+    Ok((logs, w, z))
+}
+
+/// `log₂ z` on `2^(−32)` of a conditional's weights' sum `z` on `2^(−24)` ([`conditional_logs`]), so `log₂ p(v) = log₂ w_v −
+/// log₂ z`.
+fn log2_mass(z: i128) -> i128 {
+    super::log2_reading_at(z.max(1) as u128, ENERGY_BITS) - ((MATERIAL_BITS as i128) << ENERGY_BITS)
+}
+
+/// [measurement; theory, November 8, the line reading] **A held place's code under its enumerated conditional**:
+/// `−log₂ p(at)` on `2^(−32)` bits, `p(v) ∝ 2^(−G_v/T)` over the place's letters' energies `gs` (one a letter, in order) at
+/// `field`'s own `T`, in the conditional section's chart ([`conditional_logs`]: the truth's `log₂ w` whole, the normalizer the
+/// weights' sum), so it is [`KernelReceipt::log2_a`]'s place, negated, read at a held place. A reading only.
+pub fn conditional_code(field: &Field, gs: &[i128], at: usize) -> Result<i128> {
+    if at >= gs.len() {
+        return refuse("a held place's truth outside its letters' energies");
+    }
+    let inverse = temperature_of(-field.theta[field.layout.face_temper], &field.fine)?;
+    let (logs, _, z) = conditional_logs(gs, inverse, &field.fine)?;
+    Ok(log2_mass(z) - logs[at])
+}
+
+/// [measurement; theory, November 8, the line reading] **The line's grain**: a direction's entry is on `2^(−48)` of `θ`'s own
+/// unit, where the deposit's places `2^(−24)` finer than a family's grain fall on the material's families (grain `2^(−24)`);
+/// a face family's (grain `2^(−16)`, its places on `2^(−40)`) is carried 8 places up, so one Euclidean sum measures every
+/// family in the unit the code's covector is read in ([`predicted_change`]).
+pub const LINE_BITS: u32 = 2 * MATERIAL_BITS;
+
+/// [measurement; theory, November 8, the line reading] The two directions a line reading moves `θ` along
+/// ([`FieldLearner::line_directions`]), each a material entry's on [`LINE_BITS`].
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct LineDirections {
+    /// The deposit's next step from the learner's moments, each family at its own length.
+    pub step: Vec<i128>,
+    /// The first moment scaled to `step`'s norm.
+    pub first: Vec<i128>,
+    /// The deposit's next step as the learner moves it, each entry's carried remainder added, on each family's grain.
+    pub released: Vec<i128>,
+    /// `‖step‖` on [`LINE_BITS`] (the line's unit length, `η = 1`).
+    pub step_norm: u128,
+    /// `‖m‖` on the moments' `2^(−32)`.
+    pub first_norm: u128,
+}
+
+/// `⌊√(Σ x_i²)⌋` of a direction, on its entries' grain; refused past its 128-bit carrier.
+pub fn line_norm(x: &[i128]) -> Result<u128> {
+    const PAST: &str = "a line's norm past its 128-bit carrier";
+    let mut sum = 0u128;
+    for &v in x {
+        let square = v.unsigned_abs().checked_mul(v.unsigned_abs()).ok_or(TowerError::Refused(PAST))?;
+        sum = sum.checked_add(square).ok_or(TowerError::Refused(PAST))?;
+    }
+    Ok(sum.isqrt())
+}
+
+/// [measurement; theory, November 8, the line reading] **A point of a line**: `field` with each material entry moved to
+/// `θ_i − η u_i`, `u` a direction on [`LINE_BITS`] ([`LineDirections`]), released to the entry's own grain (nearest, half
+/// away from zero) and kept in its 32-bit carrier (refused past it), with the entries it moved. The field read is a copy:
+/// no learner's `θ` is written.
+pub fn line_point(field: &Field, direction: &[i128], eta: u32) -> Result<(Field, usize)> {
+    if direction.len() != field.material_len() {
+        return refuse("a line's direction of another length than the field's material");
+    }
+    let mut grains = vec![0u32; direction.len()];
+    for (start, n, grain) in field.families_all() {
+        if grain > LINE_BITS {
+            return refuse("a family finer than the line's grain");
+        }
+        grains[start..start + n].fill(grain);
+    }
+    let mut point = field.clone();
+    let mut moved = 0usize;
+    for ((slot, &u), &grain) in point.material_mut().zip(direction).zip(&grains) {
+        let d = release(u.checked_mul(i128::from(eta)).ok_or(TowerError::Refused("a line's point past its 128-bit carrier"))?, LINE_BITS - grain);
+        if d != 0 {
+            moved += 1;
+            *slot = fit32(*slot as i128 - d, "a line's point outgrew its 32-bit carrier")?;
+        }
+    }
+    Ok((point, moved))
+}
+
+/// A place's conditional `p(v) ∝ 2^(−G_v/T)` on `2^(−24)` from its letters' energies, each weight through the exponential's
+/// navigator and released to zero below `2^(−23)` (the conditional section's own shares).
+fn conditional_shares(gs: &[i128], inverse: i128, fine: &Exponential) -> Result<Vec<i128>> {
+    const OVER: &str = "a conditional covector past its 128-bit carrier";
+    let lo = gs.iter().copied().min().unwrap_or(0);
+    let w: Vec<i128> = gs
+        .iter()
+        .map(|&gv| {
+            let l = release((lo - gv).checked_mul(inverse).inspect(|v| crate::number::census::reach(OVER, v)).ok_or(TowerError::Refused(OVER))?, MATERIAL_BITS);
+            let ell = l >> (ENERGY_BITS - MATERIAL_BITS);
+            if ell >= 0 {
+                Ok(1i128 << MATERIAL_BITS)
+            } else if ell <= -((MATERIAL_BITS as i128 - 1) << MATERIAL_BITS) {
+                Ok(0)
+            } else {
+                temperature_of(ell as i32, fine)
+            }
+        })
+        .collect::<Result<_>>()?;
+    let z: i128 = w.iter().sum();
+    let shares: Vec<i128> = w.iter().map(|&x| div_nearest(x << MATERIAL_BITS, z.max(1))).collect();
+    census_conditional_place(gs.iter().map(|&gv| release((lo - gv) * inverse, MATERIAL_BITS) >> (ENERGY_BITS - MATERIAL_BITS)), &shares, None, fine)?;
+    Ok(shares)
+}
+
+/// [agent-inferred, November 7] **Law (D)'s chunk**: sixteen places a read, so their `16·alphabet` configurations' material
+/// covectors stand together (about 0.8 GB at a field of 31,223 entries and 101 letters), never a section's.
+pub const CONDITIONAL_CHUNK: usize = 16;
+
+/// Law (D)'s configurations of a chunk of places, `alphabet` a place in letter order: place `(o, t)`'s truth with letter `v`
+/// at `t`, the rest at the truth.
+fn conditional_configurations(truth: &[Region], chunk: &[(usize, usize)], alphabet: usize) -> Vec<Vec<usize>> {
+    chunk
+        .iter()
+        .flat_map(|&(o, t)| {
+            (0..alphabet).map(move |v| {
+                let mut c = truth[o].classes.to_vec();
+                c[t] = v;
+                c
+            })
+        })
+        .collect()
+}
+
+/// Law (D)'s regions of a chunk's configurations ([`conditional_configurations`]), every site resolved.
+fn conditional_regions<'a>(configs: &'a [Vec<usize>], resolved: &'a [Vec<bool>], chunk: &[(usize, usize)], alphabet: usize) -> Vec<Region<'a>> {
+    configs.iter().enumerate().map(|(i, c)| Region { classes: c, unresolved: &resolved[chunk[i / alphabet].0], faces: &[], locked: &[], echo: &[], domain: None, port: None }).collect()
+}
+
+/// Law (D)'s material read of a chunk's regions through `realization`: each configuration's `G` and its material covector
+/// `∂G/∂θ`, every letter's reverse read at weight one.
+type ConditionalReads = (Vec<i128>, Vec<Option<(Vec<i128>, u32)>>);
+fn conditional_material_reads(field: &Field, regions: &[Region], realization: &mut dyn FieldRealization) -> Result<ConditionalReads> {
+    let reads = realization.read_energy_material(field, regions)?;
+    let g: Vec<i128> = reads.iter().map(|r| r.1).collect();
+    Ok((g, reads.into_iter().map(|r| Some((r.0, 0u32))).collect()))
+}
+
+/// [definition; the unified-theory reading of November 7, 20:29, law (D)] **A place's conditional**: its letters' `log₂ w` on
+/// `2^(−32)`, the weights' sum `z` on `2^(−24)` and each letter's share `p(v) = w_v/z` on `2^(−24)`, nearest
+/// ([`conditional_logs`]).
+fn conditional_place_shares(gs: &[i128], inverse: i128, fine: &Exponential) -> Result<(Vec<i128>, i128, Vec<i128>)> {
+    let (logs, w, z) = conditional_logs(gs, inverse, fine)?;
+    let p: Vec<i128> = w.iter().map(|&x| div_nearest(x << MATERIAL_BITS, z.max(1))).collect();
+    Ok((logs, z, p))
+}
+
+/// [definition; the unified-theory readings of November 7, 10:12 and 20:29] **The material change between two
+/// configurations** in the deposit's chart: `(1/T)(∂G/∂θ(x) − ∂G/∂θ(y))` entry by entry from the two material covectors `gt`
+/// and `gv`, released to `2^(−24)` of the material and by `40 − 24` places more on a family whose grain is not the material's.
+/// Law (D)'s letter at a place (`x` the truth, `y` the letter put there; [`conditional_place_covector`]) and the scaled
+/// contrast's pair (`x` the truth, `y` its write; [`contrast_pair_covectors`]); `over` names the carrier's census site.
+fn material_change(families: &[(usize, usize, u32)], material: usize, inverse: i128, gt: &[i128], gv: &[i128], over: &'static str) -> Result<Vec<i128>> {
+    if gt.len() != material || gv.len() != material {
+        return refuse("a material covector of another length than the field's material");
+    }
+    let mut d = vec![0i128; material];
+    for &(start, len, grain) in families {
+        for i in start..start + len {
+            let scaled = release((gt[i] - gv[i]).checked_mul(inverse).inspect(|v| crate::number::census::reach(over, v)).ok_or(TowerError::Refused(over))?, MATERIAL_BITS);
+            d[i] = if grain == MATERIAL_BITS { scaled } else { release(scaled, 40 - super::COVECTOR_BITS) };
+        }
+    }
+    Ok(d)
+}
+
+/// [measurement; theory, November 9 05:31] One pair's covector of the contrast ([`contrast_pair_covectors`]).
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct ContrastPair {
+    /// `(1/T)(∂G/∂θ(truth) − ∂G/∂θ(write))` on each family's grain (the deposit's chart, sign and units), the pair's term of
+    /// the section's covector, released on its own.
+    pub covector: Vec<i128>,
+    /// `G(truth)` and `G(write)` on `2^(−32)`, as the material read gives them.
+    pub truth_g: i128,
+    pub write_g: i128,
+}
+
+/// [measurement; theory, November 9 05:31 and 05:51] **The contrast's covector pair by pair**, a reading (contrast-covector-field's
+/// per-problem factor): one material read of every truth and write together through `realization`
+/// ([`FieldRealization::read_energy_material`], as the section reads them), and each pair's `(1/T)(∂G/∂θ(truth_s) −
+/// ∂G/∂θ(write_s))` released to the deposit's chart pair by pair ([`material_change`]). The section that deposits
+/// ([`FieldLearner::section_contrast`]) adds the pairs' unreleased differences and releases their sum once, so with one pair
+/// the two are the same bits and with `n` the pairs' sum stands within `⌊(n + 1)/2⌋` units of the chart of the section's
+/// covector, entry by entry. `T` is the field's own, held (the section's temperature entry, where
+/// [`FieldLearner::temper_learns`] writes one, is no pair's).
+pub fn contrast_pair_covectors(field: &Field, truth: &[Region], writes: &[Region], realization: &mut dyn FieldRealization) -> Result<Vec<ContrastPair>> {
+    const OVER: &str = "a contrast pair past its 128-bit carrier";
+    if !field.declaration.energy || field.scale.is_some() {
+        return refuse("a contrast section of a field without one energy");
+    }
+    if truth.is_empty() || truth.len() != writes.len() {
+        return refuse("a contrast's pairs need one write a truth");
+    }
+    let inverse = temperature_of(-field.theta[field.layout.face_temper], &field.fine)?;
+    let both: Vec<Region> = truth.iter().chain(writes).copied().collect();
+    let reads = realization.read_energy_material(field, &both)?;
+    let n = truth.len();
+    let (families, material) = (field.families_all(), field.material_len());
+    (0..n)
+        .map(|s| {
+            let ((gt, et), (gw, ew)) = (&reads[s], &reads[n + s]);
+            Ok(ContrastPair { covector: material_change(&families, material, inverse, gt, gw, OVER)?, truth_g: *et, write_g: *ew })
+        })
+        .collect()
+}
+
+/// [definition; the unified-theory reading of November 7, 20:29, law (D)] **One place's covector**, added into `acc` (the
+/// material's length): `Σ_(v ≠ t) p(v)·2^(k + k_v)·(1/T)(∂G/∂θ(t) − ∂G/∂θ(x_v))` over the letters of nonzero share whose
+/// reverse was read (`reads[v]`, its coin's `k_v`), each letter's term released to the deposit's chart before it is added
+/// ([`material_change`]), at the place's beat `2^k`. Returns the place's operand of the letters' temperature,
+/// `Σ_(v ≠ t) p(v)·2^k·(G(t) − G(x_v))` on `2^(−32)`, over every letter's `G`. The section adds its places' terms into one
+/// covector and one operand, so its material covector is its places' sum entry by entry and its operand theirs
+/// ([`temper_covector`] reads the entry from it).
+#[allow(clippy::too_many_arguments)]
+fn conditional_place_covector(families: &[(usize, usize, u32)], material: usize, inverse: i128, gs: &[i128], reads: &[Option<(Vec<i128>, u32)>], p: &[i128], at: usize, k: u32, acc: &mut [i128]) -> Result<i128> {
+    const OVER: &str = "a conditional covector past its 128-bit carrier";
+    let mt = &reads[at].as_ref().ok_or(TowerError::Refused("a conditional place whose truth was not read"))?.0;
+    let mut gap = 0i128;
+    for v in 0..p.len() {
+        if v == at || p[v] == 0 {
+            continue;
+        }
+        let pv = p[v] << k;
+        let term = release((gs[at] - gs[v]).checked_mul(pv).inspect(|v| crate::number::census::reach(OVER, v)).ok_or(TowerError::Refused(OVER))?, MATERIAL_BITS);
+        gap = gap.checked_add(term).ok_or(TowerError::Refused(OVER))?;
+        if let Some((mv, kv)) = &reads[v] {
+            let weighed = pv << kv;
+            for (a, &x) in acc.iter_mut().zip(&material_change(families, material, inverse, mt, mv, OVER)?) {
+                let term = release(x.checked_mul(weighed).inspect(|v| crate::number::census::reach(OVER, v)).ok_or(TowerError::Refused(OVER))?, MATERIAL_BITS);
+                *a = a.checked_add(term).ok_or(TowerError::Refused(OVER))?;
+            }
+        }
+    }
+    Ok(gap)
+}
+
+/// [definition; the unified-theory reading of November 7, 06:57] **The letters' temperature's covector entry** from its
+/// operand `Σ p (G(t) − G(x_v))` on `2^(−32)`: with `T = 2^τ`, `∂l/∂τ = −ln 2 · operand/T`, on `2^(−40)` a unit of `τ`.
+fn temper_covector(gap: i128, inverse: i128) -> Result<i128> {
+    const OVER: &str = "a conditional covector past its 128-bit carrier";
+    let over_t = release(gap.checked_mul(inverse).inspect(|v| crate::number::census::reach(OVER, v)).ok_or(TowerError::Refused(OVER))?, MATERIAL_BITS);
+    let nats = release(over_t.checked_mul(crate::hnn::keyed_modes::ln2_face()).inspect(|v| crate::number::census::reach(OVER, v)).ok_or(TowerError::Refused(OVER))?, LN2_FACE_BITS);
+    Ok(-(nats << (40 - ENERGY_BITS)))
+}
+
+/// [measurement; theory, November 9 04:36] One place's covector of law (D) ([`conditional_place_covectors`]).
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct PlaceCovector {
+    /// The covector the section adds for this place, on each family's grain (the deposit's chart); with the letters'
+    /// temperature learning, its entry is the face of this place's own operand.
+    pub covector: Vec<i128>,
+    /// The place's operand of the letters' temperature, on `2^(−32)`.
+    pub operand: i128,
+    /// `log₂ p(t)` on `2^(−32)`, the place's code negated ([`KernelReceipt::log2_a`]'s place).
+    pub log2_p: i128,
+}
+
+/// [measurement; theory, November 9 04:36] **Law (D)'s covector place by place** (a reading: nothing is deposited and the
+/// learner is not touched): at each place `(o, t)` of `places`, every site of each problem's `truth` resolved, the covector
+/// [`FieldLearner::section_conditional`] adds for that place on `field`. Its letters are put at `t` with the rest at the
+/// truth and read [`CONDITIONAL_CHUNK`] places at a time through `realization` as the section reads them
+/// ([`FieldRealization::read_energy_material`]), so a chunk's letters' materials stand together and a place's are dropped once
+/// its covector is formed; the place's conditional ([`conditional_place_shares`]) weighs its letters' material changes
+/// ([`conditional_place_covector`]); with `temper_learns` the temperature's entry is the face of the place's own operand
+/// ([`temper_covector`]), as the section's is of its places' summed operand. Over a section's places the covectors' other
+/// entries add to the section's covector bit for bit and their operands to the section's operand; the section's temperature
+/// entry is the face of that sum, and the places' own entries differ from it by their faces' rounding. `progress` hears each
+/// chunk's index, the places read so far and the realization's microseconds so far. The places' covectors stand together:
+/// `places × material × 16` bytes.
+pub fn conditional_place_covectors(field: &Field, temper_learns: bool, truth: &[Region], places: &[(usize, usize)], realization: &mut dyn FieldRealization, progress: &mut dyn FnMut(usize, usize, u128)) -> Result<Vec<PlaceCovector>> {
+    if !field.declaration.energy || field.scale.is_some() {
+        return refuse("a conditional covector of a field without one energy");
+    }
+    if places.iter().any(|&(o, t)| o >= truth.len() || t >= truth[o].classes.len() || truth[o].unresolved[t]) {
+        return refuse("a conditional covector needs resolved places, each a problem's");
+    }
+    let alphabet = field.declaration.alphabet;
+    let inverse = temperature_of(-field.theta[field.layout.face_temper], &field.fine)?;
+    let (families, material) = (field.families_all(), field.material_len());
+    let resolved: Vec<Vec<bool>> = truth.iter().map(|r| vec![false; r.classes.len()]).collect();
+    let mut out = Vec::with_capacity(places.len());
+    let mut read_us = 0u128;
+    for (c, chunk) in places.chunks(CONDITIONAL_CHUNK).enumerate() {
+        let configs = conditional_configurations(truth, chunk, alphabet);
+        let regions = conditional_regions(&configs, &resolved, chunk, alphabet);
+        let at = std::time::Instant::now();
+        let (energies, materials) = conditional_material_reads(field, &regions, realization)?;
+        read_us += at.elapsed().as_micros();
+        for (i, &(o, t)) in chunk.iter().enumerate() {
+            let gs = &energies[i * alphabet..(i + 1) * alphabet];
+            let reads = &materials[i * alphabet..(i + 1) * alphabet];
+            let truth_letter = truth[o].classes[t];
+            let (logs, z, p) = conditional_place_shares(gs, inverse, &field.fine)?;
+            let mut covector = vec![0i128; material];
+            let operand = conditional_place_covector(&families, material, inverse, gs, reads, &p, truth_letter, 0, &mut covector)?;
+            if temper_learns {
+                covector[field.layout.face_temper] = temper_covector(operand, inverse)?;
+            }
+            out.push(PlaceCovector { covector, operand, log2_p: logs[truth_letter] - log2_mass(z) });
+        }
+        progress(c, out.len(), read_us);
+    }
+    Ok(out)
+}
+
+/// The width census's read (b) at one place of a conditional: each letter whose weight released to zero below
+/// `2^(−23)` and its weight before the release on `2^(−32)` (eight places finer), the mass the grain drops; the least
+/// nonzero share's places below one; the letters whose share released to zero. Nothing is changed.
+fn census_conditional_place(ells: impl Iterator<Item = i128>, shares: &[i128], truth: Option<usize>, fine: &Exponential) -> Result<()> {
+    if !crate::number::census::enabled() {
+        return Ok(());
+    }
+    crate::number::census::tally(CENSUS_PLACES, 1);
+    // The truth's own share at the grain's bottom (theory, November 8 03:32): an admitted letter needs one unit, so the
+    // conditional's grain is set by the truths' least share. The section's code reads the truth's surprise from the
+    // energies' own logarithms (on 2^(−32)), never from the released share, so a truth whose share released to zero is
+    // charged its actual surprise there; its share enters the acceptance's statistics.
+    if let Some(at) = truth {
+        match shares[at] {
+            0 => crate::number::census::tally("conditional: places whose truth's share released to zero", 1),
+            1 => crate::number::census::tally("conditional: places whose truth's share is one unit of 2^-24", 1),
+            2 => crate::number::census::tally("conditional: places whose truth's share is two units of 2^-24", 1),
+            _ => {}
+        }
+        crate::number::census::reach("conditional: the deepest truth share's places below one, on 2^-24", &i128::from(MATERIAL_BITS + 1 - (128 - shares[at].max(1).leading_zeros())));
+    }
+    let floor = -((MATERIAL_BITS as i128 - 1) << MATERIAL_BITS);
+    for ell in ells {
+        if ell <= floor {
+            crate::number::census::tally(CENSUS_RELEASED, 1);
+            let finer = ell + (8i128 << MATERIAL_BITS);
+            if finer > floor {
+                let mass = temperature_of(finer as i32, fine)?;
+                crate::number::census::tally(CENSUS_RELEASED_MASS, mass as u64);
+                crate::number::census::reach(CENSUS_RELEASED_MASS_MOST, &mass);
+            }
+        }
+    }
+    if let Some(least) = shares.iter().copied().filter(|&p| p > 0).min() {
+        let depth = i128::from(MATERIAL_BITS + 1 - (128 - least.leading_zeros()));
+        crate::number::census::reach(CENSUS_LEAST_SHARE_DEPTH, &depth);
+    }
+    crate::number::census::tally(CENSUS_ZERO_SHARES, shares.iter().filter(|&&p| p == 0).count() as u64);
+    Ok(())
+}
+
+/// [definition; theory, November 8 05:50 and 05:53] **A conditional section's unigram read**: for each letter, its summed
+/// conditional share `P_a = Σ_t p_t(a)` read from its logarithms (an online `log₂ Σ 2^ℓ`, the largest term's place `m` on
+/// `2^(−32)` and the sum of the rest below it on `2^(−24)`, so a rare letter's share is never released to zero), and its
+/// count in the section's truths.
+struct UnigramSection {
+    top: Vec<Option<i128>>,
+    below: Vec<i128>,
+    counts: Vec<u64>,
+    places: u64,
+}
+
+impl UnigramSection {
+    fn new(alphabet: usize) -> Self {
+        Self { top: vec![None; alphabet], below: vec![0; alphabet], counts: vec![0; alphabet], places: 0 }
+    }
+
+    /// One place: each letter's `ℓ = logs[a] − log₂ z` (on `2^(−32)`) joined to its sum, the truth counted.
+    fn place(&mut self, logs: &[i128], log2_z: i128, truth: usize, fine: &Exponential) -> Result<()> {
+        let one = 1i128 << MATERIAL_BITS;
+        let floor = -((MATERIAL_BITS as i128 - 1) << MATERIAL_BITS);
+        for (a, &l) in logs.iter().enumerate() {
+            let ell = l - log2_z;
+            match self.top[a] {
+                None => {
+                    self.top[a] = Some(ell);
+                    self.below[a] = one;
+                }
+                Some(m) if ell > m => {
+                    let shift = (m - ell) >> (ENERGY_BITS - MATERIAL_BITS);
+                    self.below[a] = one + if shift > floor { release(self.below[a] * temperature_of(shift as i32, fine)?, MATERIAL_BITS) } else { 0 };
+                    self.top[a] = Some(ell);
+                }
+                Some(m) => {
+                    let shift = (ell - m) >> (ENERGY_BITS - MATERIAL_BITS);
+                    if shift > floor {
+                        self.below[a] += temperature_of(shift as i32, fine)?;
+                    }
+                }
+            }
+        }
+        self.counts[truth] += 1;
+        self.places += 1;
+        Ok(())
+    }
+
+    /// [definition; theory, November 8 13:44] The section joins the carried sums: its truths' counts to the carried counts,
+    /// its summed shares to the carried mass (`log₂ M_a`, a logarithmic sum, so a rare letter's share is never released to
+    /// zero). Applied, the bias steps by `Δc_a = 2^(−3) T log₂(N*_a/M_a)` on c's `2^(−16)` (`inverse` = `1/T` on `2^(−24)`),
+    /// `N*` Good–Turing's on the carried counts (`(r + 1) N_(r+1)/N_r` while both classes are filled, the letter's own count
+    /// past that), normalized to the carried places; both sums come from the same places, so each section's own content
+    /// cancels. The mass is re-based after the deposit by what c actually did (theory, 13:59), not here. In shadow (not
+    /// applied) the sums are carried and no step is formed; a letter not yet seen holds while no letter has been seen once.
+    fn finish(self, carry: &mut UnigramCarry, inverse: i128, fine: &Exponential) -> Result<Option<Vec<i128>>> {
+        let log2 = |v: i128| super::log2_reading_at(v.max(1) as u128, ENERGY_BITS);
+        for (c, n) in carry.counts.iter_mut().zip(&self.counts) {
+            *c += n;
+        }
+        for (a, top) in self.top.iter().enumerate() {
+            let Some(m) = *top else { continue };
+            let lp = m + log2(self.below[a]) - ((MATERIAL_BITS as i128) << ENERGY_BITS);
+            carry.mass[a] = Some(match carry.mass[a] {
+                None => lp,
+                Some(lm) => {
+                    let (hi, lo) = if lm >= lp { (lm, lp) } else { (lp, lm) };
+                    let shift = (lo - hi) >> (ENERGY_BITS - MATERIAL_BITS);
+                    let floor = -((MATERIAL_BITS as i128 - 1) << MATERIAL_BITS);
+                    let tail = if shift > floor { temperature_of(shift as i32, fine)? } else { 0 };
+                    hi + log2((1i128 << MATERIAL_BITS) + tail) - ((MATERIAL_BITS as i128) << ENERGY_BITS)
+                }
+            });
+        }
+        if !carry.applied {
+            return Ok(None);
+        }
+        let counts = &carry.counts;
+        let max_r = counts.iter().copied().max().unwrap_or(0) as usize;
+        let mut classes = vec![0u64; max_r + 2];
+        for &r in counts.iter() {
+            classes[r as usize] += 1;
+        }
+        // Each letter's expected count on 2^(−32) (None: holds).
+        let starred: Vec<Option<i128>> = counts
+            .iter()
+            .map(|&r| {
+                let r = r as usize;
+                if classes[r] > 0 && classes[r + 1] > 0 {
+                    Some(((((r + 1) as i128) * classes[r + 1] as i128) << 32) / classes[r] as i128)
+                } else if r > 0 {
+                    Some((r as i128) << 32)
+                } else {
+                    None
+                }
+            })
+            .collect();
+        let total: i128 = starred.iter().flatten().sum();
+        let places: i128 = counts.iter().map(|&c| c as i128).sum();
+        let (log2_total, log2_places) = (log2(total), log2(places << 32));
+        let mut du = vec![0i128; counts.len()];
+        for a in 0..counts.len() {
+            let (Some(star), Some(lm)) = (starred[a], carry.mass[a]) else { continue };
+            // log₂ N*_a = log₂ star − log₂ total + log₂ places (each on 2^(−32), the 2^(−32) grains cancelling).
+            let log2_n = log2(star) - log2_total + log2_places - (32i128 << ENERGY_BITS);
+            let ratio = log2_n - lm;
+            // Δc = 2^(−3) T·2^16·ratio/2^32 = (ratio·2^8/inverse) >> 3 (inverse on 2^(−24)); the mass moves by Δc/T = ratio/8.
+            du[a] = div_nearest(ratio << 8, inverse.max(1)) >> 3;
+        }
+        Ok(Some(du))
+    }
+}
+
+/// [definition; theory, November 8 13:44] The unigram law's carried sums: each letter's count in the truths of the read
+/// places, and its summed conditional share over the same places (`log₂ M_a` on `2^(−32)`, `None` until first read).
+/// `applied` steps the bias (a run's choice, not part of the state); otherwise the sums ride in shadow and θ is untouched.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct UnigramCarry {
+    pub counts: Vec<u64>,
+    pub mass: Vec<Option<i128>>,
+    pub applied: bool,
+}
+
+impl UnigramCarry {
+    pub fn new(alphabet: usize, applied: bool) -> Self {
+        Self { counts: vec![0; alphabet], mass: vec![None; alphabet], applied }
+    }
+
+    /// The mass put back on the carried places: every read letter's `log₂ M_a` shifted alike so that `Σ_a M_a` is the count
+    /// of places carried (the shares sum to one at every place; the shift is a common move of c, a gauge).
+    fn normalize(&mut self, fine: &Exponential) -> Result<()> {
+        let log2 = |v: i128| super::log2_reading_at(v.max(1) as u128, ENERGY_BITS);
+        let Some(top) = self.mass.iter().flatten().copied().max() else { return Ok(()) };
+        let floor = -((MATERIAL_BITS as i128 - 1) << MATERIAL_BITS);
+        let mut below = 0i128;
+        for &m in self.mass.iter().flatten() {
+            let shift = (m - top) >> (ENERGY_BITS - MATERIAL_BITS);
+            if shift > floor {
+                below += temperature_of(shift as i32, fine)?;
+            }
+        }
+        let log2_sum = top + log2(below) - ((MATERIAL_BITS as i128) << ENERGY_BITS);
+        let places: i128 = self.counts.iter().map(|&c| c as i128).sum();
+        if places == 0 {
+            return Ok(());
+        }
+        let shift = log2(places << 32) - (32i128 << ENERGY_BITS) - log2_sum;
+        for m in self.mass.iter_mut().flatten() {
+            *m += shift;
+        }
+        Ok(())
+    }
+}
+
+/// The width census's deposit sites, one name a family and kind: a step's lowest set bit 0 to 7 and 8 or more (0–8), a
+/// step released to zero while its moment is not (9), the step's top place (10), the carried remainder after the release
+/// (11; its positive and negative parts, 12 and 13) beside the summed change (14), the entries the covector reached (15),
+/// and the step as formed, before its carried remainder is added and it is released (16, 17). The shadow carry (each
+/// entry's dropped part summed beside `θ`, theory, November 8 03:01) measured what the truncating deposit dropped and
+/// retired with it (November 9 05:00): the carried release drops nothing.
+fn census_deposit_site(family: usize, kind: usize) -> &'static str {
+    static NAMES: std::sync::OnceLock<Vec<Vec<&'static str>>> = std::sync::OnceLock::new();
+    let names = NAMES.get_or_init(|| {
+        (0..64)
+            .map(|f| {
+                (0..18)
+                    .map(|k| {
+                        let what = match k {
+                            0..=7 => format!("deposit: family {f} steps with lowest bit {k}"),
+                            8 => format!("deposit: family {f} steps with lowest bit 8+"),
+                            9 => format!("deposit: family {f} steps released to zero, moment nonzero"),
+                            10 => format!("deposit: family {f} step top place"),
+                            11 => format!("deposit: family {f} summed |carried remainder| after the step's release, on 2^-24 of the grain"),
+                            12 => format!("deposit: family {f} summed positive carried remainder, on 2^-24"),
+                            13 => format!("deposit: family {f} summed negative carried remainder (magnitude), on 2^-24"),
+                            14 => format!("deposit: family {f} summed |change|, on the grain"),
+                            15 => format!("deposit: family {f} entries whose covector is nonzero"),
+                            16 => format!("deposit: family {f} summed positive step as formed, on 2^-24"),
+                            _ => format!("deposit: family {f} summed negative step as formed (magnitude), on 2^-24"),
+                        };
+                        &*Box::leak(what.into_boxed_str())
+                    })
+                    .collect()
+            })
+            .collect()
+    });
+    names.get(family).map_or("deposit: a family past the census's 64", |n| n[kind])
+}
+
+/// The width census's read (b) sites ([`crate::number::census`]).
+const CENSUS_PLACES: &str = "conditional: places read";
+const CENSUS_RELEASED: &str = "conditional: letters whose weight released to zero below 2^-23";
+const CENSUS_RELEASED_MASS: &str = "conditional: their summed weight before release, on 2^-32";
+const CENSUS_RELEASED_MASS_MOST: &str = "conditional: the largest released weight, on 2^-32";
+const CENSUS_LEAST_SHARE_DEPTH: &str = "conditional: the least nonzero share's places below one, on 2^-24";
+const CENSUS_ZERO_SHARES: &str = "conditional: letters whose share released to zero";
+
 /// [agent-inferred, November 1] A held step read on regions it was not fit on
 /// ([`FieldLearner::read_step_on`]): its change to those regions' code (the stepped material's
 /// code less the material's before the step, on `2^(−20)` bits), the further halvings of the last
@@ -4478,13 +6369,155 @@ pub struct FieldReceipt {
     pub external: Option<i64>,
 }
 
+/// [measurement; the unified-theory reading of November 7, 04:05] **An energy section's contrast receipt**
+/// ([`FieldLearner::section_contrast`]): its states, how many releases wrote every open place as the truth, the energy's gap
+/// `Σ_s (G(truth_s) − G(e′_s))/T` on `2^(−32)` bits (positive where the field holds its own release below the truth),
+/// whether a step was deposited, and the step's prices as [`FieldReceipt`]'s, on the codes' grain.
+#[derive(Clone, Debug, Default, PartialEq, Eq)]
+pub struct ContrastReceipt {
+    pub states: usize,
+    pub same: usize,
+    pub gap: i128,
+    pub deposited: bool,
+    pub predicted: Option<i64>,
+    pub transfer: Option<i64>,
+    pub external: Option<i64>,
+    /// The section's covector as the moments take it, before they move ([`contrast_pair_covectors`] reads it pair by pair).
+    pub covector: Vec<i128>,
+}
+
+/// [measurement; the unified-theory reading of November 7, 05:20] **An energy section's kernel receipt**
+/// ([`FieldLearner::section_kernel`]): its states, block places and the places whose proposal moved off the truth, the
+/// weights `min(1, A)` summed, their squares summed, least and most (on `2^(−24)`) and how many were whole, whether a step
+/// was deposited, and the step's prices as [`FieldReceipt`]'s.
+#[derive(Clone, Debug, Default, PartialEq, Eq)]
+pub struct KernelReceipt {
+    pub states: usize,
+    pub places: usize,
+    pub moved: usize,
+    pub weight: i128,
+    pub weight_square: i128,
+    pub least: i128,
+    pub most: i128,
+    pub whole: usize,
+    pub deposited: bool,
+    pub predicted: Option<i64>,
+    pub transfer: Option<i64>,
+    pub external: Option<i64>,
+    /// Each state's block places and weight `min(1, A)` on `2^(−24)`, the acceptance by block size's operand.
+    pub per_state: Vec<(usize, i128)>,
+    /// Each state's `log₂ A` on `2^(−32)` bits (the block's per-place spread `σ² = −2 ln 2 E log₂ A / k` reads from it).
+    pub log2_a: Vec<i128>,
+    /// The evidence-shrunk Newton step's terms along the moments' direction, where the learner reads them
+    /// ([`FieldLearner::newton_read`]; a reading: the section deposits through the moments).
+    pub newton: Option<NewtonRead>,
+    /// [measurement; November 7, lap 7] Each family's part of the transfer and of the predicted change, in the families'
+    /// order ([`Field::families_all`]) (`None` past its carrier): where the step that lowers its own section raises the next.
+    /// [definition; theory, November 9 05:00] The length law's own operands: the step before and this section's, each as the
+    /// deposit carries it (what moved and the remainder beside it, [`carried_change_family`]), on [`PRICE_BITS`] (`2^(−44)`
+    /// bits); the transfer `None` where no step was carried before, the price read whether or not the step moved.
+    pub by_family: Vec<(Option<i128>, Option<i128>)>,
+    /// Each family's length `ρ_f` after the section (on `2^(−24)` bits), where the learner reads them.
+    pub rates: Vec<i128>,
+    /// [measurement; theory, November 7 19:41] Each state's two relaxations, compared: the states (truths and proposals) whose
+    /// `G` read with their faces (places open, carrying their letters whole) is the `G` read with their material (resolved)
+    /// in bits, of all, and the largest gap on `2^(−32)`. Agreement means one relaxation a state gives both.
+    pub g_agree: (usize, usize),
+    pub g_gap: i128,
+    /// [measurement; theory, November 7 19:50] The section's deposit before its length, `g = Σ_s w_s D_s/T` on the families'
+    /// natural grains: the operand of the sections' coherence.
+    pub covector: Vec<i128>,
+    /// [measurement; theory, November 7 21:08] The places read and spent in each band `k` of a beat-selected conditional
+    /// section ([`FieldLearner::section_conditional_beat`]): the counts of counts of the field's surprise.
+    pub bands: Vec<(usize, usize)>,
+    /// [measurement; theory, November 7 21:44] Each place's conditional mass outside its face's top 4, 8 and 16 letters (the
+    /// face read at the truth, places open carrying their letters whole), on `2^(−24)`: whether a few letters carry the place.
+    pub outside: Vec<[i128; 3]>,
+    /// [measurement; theory, November 7 22:55] Each letter's count as a truth less its conditional mass, `Σ_places (1[t = a] −
+    /// p(a))` on `2^(−24)` (the counts the kernel's rest missed); the places' surprise bands `k = ⌊−log₂(1 − q(t))⌋` from the
+    /// face at the truth (held to 16, read whether or not a beat spends them); and `Σ_places KL(p ‖ face)` on `2^(−32)` bits.
+    pub letter_counts: Vec<i128>,
+    pub surprise_bands: Vec<usize>,
+    pub kl_face: i128,
+    /// [measurement; theory, November 8 13:11 and 15:33] The read places' seven moments of the conditional against the face
+    /// carried at the truth (the face the kernel block opens; it is built from the truth letter, so f leaks it), summed with
+    /// their beat weights `2^k` (bits on 2^(−32), bits² for the variances): the code, H(p), f(t), E_p f, Var_p log₂ p, Var_p f,
+    /// Cov_p(log₂ p, f), and the summed weight.
+    pub moments: [i128; 8],
+    /// [measurement; the unified-theory reading of November 7, 23:47] The letters' coin's measure where it was asked
+    /// ([`FieldLearner::coin_measure`]): what each tolerance would cost and how much variance it would add, read at a full
+    /// section.
+    pub coin_measure: Option<CoinMeasure>,
+}
+
+/// [measurement; the unified-theory reading of November 7, 23:47] **The letters' coin's measure** at a full conditional
+/// section, on the step's metric (each covector entry over its deposit root, `Σ_i x_i²/v_i` with `v` the second moments): the
+/// card's time for the section's configurations read forward only and read with their reverse, and for each tolerance
+/// `τ = 2^(−b)`, `b = 1..=16`, the expected reverses a place beyond its truth's (`Σ_v 2^(−k_v)` on `2^(−24)`) and the
+/// coin's added variance `Σ_places Σ_(p<τ) (2^(k_v) − 1) p(v)² ‖g(t) − g(v)‖²`, beside the full deposit's spread across
+/// places `Σ_places ‖D_place − D̄‖²` (each on the metric's grain).
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct CoinMeasure {
+    pub places: usize,
+    pub regions: usize,
+    pub forward_us: u128,
+    pub material_us: u128,
+    pub kept: Vec<i128>,
+    pub v_coin: Vec<u128>,
+    pub v_deposit: u128,
+}
+
+/// [measurement; the unified-theory reading of November 7, 05:55 and 06:26] **An evidence-shrunk Newton step's terms**
+/// ([`FieldLearner::section_kernel`] with [`FieldLearner::newton_read`]), read beside the moments' own step and never taken:
+/// `α` as (numerator, denominator), the shrink `(s² − v, s²)`, the slope `s` along the moments' direction (on `2^(−20)` bits),
+/// its variance `v` and the curvature `c` (on `2^(−40)`). The step they once set retired (lap 6 ran away as its curvature
+/// fell, November 7 06:26; its deposit and switch retired November 9 05:51): the one deposit is the moments'
+/// ([`FieldLearner::deposit`]).
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub struct NewtonRead {
+    pub alpha: (i128, i128),
+    pub shrink: (i128, i128),
+    pub slope: i128,
+    pub variance: i128,
+    pub curvature: i128,
+}
+
 /// A deposited step held for the next regions' read: the proposed step on each family's grain and
 /// the halvings it was certified at. The material before it is the material less nothing: the
-/// deposit subtracted `release(step, halvings)` from each entry, so adding it back is exact.
+/// deposit subtracted `release(step, halvings)` from each entry, so adding it back restores the same bits.
+///
+/// [definition; theory, November 9 05:51] `formed` is the step as its section formed it, entry by entry on `2^(−24)` of its
+/// family's grain, before the remainder carried from earlier sections is added ([`FieldLearner::carried`]): the step the
+/// length law prices ([`carried_change_family`]). The remainder holds up to half a grain of earlier sections' steps, each
+/// priced in its own section; pricing it again each section until it releases would add a term set by the grain, not the
+/// step, so a carrier's width would set a law's rate. Empty where the step forms none on the carry's grain (the held read's
+/// step, and the last step of a state saved before the length law priced the formed step or under the retired scaled
+/// contrast, [`FieldLearner::deposit_folded`]), read as `release(step, halvings)·2^24`; a formed step stands only beside a
+/// step at its full size (`halvings` 0, the deposit's).
 #[derive(Clone, Debug, PartialEq, Eq)]
 struct HeldStep {
     step: Vec<i128>,
     halvings: u32,
+    formed: Vec<i128>,
+}
+
+impl HeldStep {
+    /// Whether the step carries anything: a moved entry or a formed step held in the remainders.
+    fn carries(&self) -> bool {
+        self.step.iter().any(|&s| s != 0) || self.formed.iter().any(|&r| r != 0)
+    }
+}
+
+/// What a section's deposit read and did ([`FieldLearner::deposit`]): whether it moved the material, the moved step's
+/// first-order change on its own section (`predicted`), the step before priced on it (`transfer`) and the moments' step
+/// before it moved them (`external`), on the codes' `2^(−20)` bits, and each family's transfer and own-section price of the
+/// step the deposit carries, the length law's operands, on [`PRICE_BITS`].
+struct Deposit {
+    moved: bool,
+    predicted: Option<i64>,
+    transfer: Option<i64>,
+    external: Option<i64>,
+    by_family: Vec<(Option<i128>, Option<i128>)>,
 }
 
 /// Each unresolved site's face read at its class, the faces the certificates compare.
@@ -4572,6 +6605,110 @@ fn predicted_change(field: &Field, g: &[i128], step: &[i128], halvings: u32) -> 
     i64::try_from(total).ok()
 }
 
+/// The grain the length law reads a family's price on: `2^(−44)` bits, the codes' `2^(−20)` with the carry's 24 places kept.
+pub const PRICE_BITS: u32 = 20 + MATERIAL_BITS;
+
+/// [definition; theory, November 9 05:00] **The carried step's first-order change on one family** `(start, len, grain)`:
+/// `Σ_i g_i Δθ_i` with `Δθ = −formed`, the step as its section formed it on `2^(−24)` of the family's grain ([`HeldStep`];
+/// `release(step, halvings)·2^24` where none is held; theory, November 9 05:51: never the earlier remainder, which its own
+/// sections priced), and `g` the section's covector as its return
+/// gives it (on `2^(−40)` a real unit on the material's families, `2^(−24)` on the faces'). A unit of `g Δθ` stands at
+/// `2^(−(40 + grain + 24))` bits on a material family and `2^(−(24 + grain + 24))` on a face family, so the same shift as
+/// [`predicted_change`]'s, `40 + grain − 20` or `24 + grain − 20`, puts the price on [`PRICE_BITS`] (`2^(−44)` bits): the 24
+/// places of the carry's grain are kept, so a family whose every step is under its grain prices what it carries (on the
+/// codes' `2^(−20)` its price releases to zero as its step does). Released to its nearest (half away from zero), so a noise
+/// of either sign reads no pull; `None` where a product or the sum passes its carrier. With the next section's covector and the
+/// step the section before carried it is the family's transfer, with the section's own covector and its own step its price:
+/// the length law's two operands ([`FieldLearner::family_rates`]).
+fn carried_change_family(g: &[i128], held: &HeldStep, (start, len, grain): (usize, usize, u32)) -> Option<i128> {
+    let shift = if grain == MATERIAL_BITS { 40 + grain - 20 } else { 24 + grain - 20 };
+    let mut family = 0i128;
+    for i in start..start + len {
+        let formed = match held.formed.get(i) {
+            Some(&f) => f,
+            None => release(held.step[i], held.halvings).checked_mul(1i128 << MATERIAL_BITS)?,
+        };
+        family = family.checked_add(g[i].checked_mul(-formed)?)?;
+    }
+    Some(release(family, shift))
+}
+
+/// The refusal of a deposit's step past its carrier (one census site for the deposit and its readers).
+const STEP_PAST: &str = "a family's step past its 128-bit carrier";
+
+/// A family's length `ρ` (on `2^(−24)` bits) as the deposit applies it: its whole bits `⌊ρ⌋` (a right shift, or a left
+/// shift checked at its carrier where `ρ < 0`: the unified-theory reading of November 7, 07:16, the law unclamped) and the
+/// factor `2^(−frac ρ)` on `2^(−24)` through the exponential's navigator.
+fn length_parts(rho: i128, fine: &Exponential) -> Result<(i128, i128)> {
+    let (whole, part) = (rho >> MATERIAL_BITS, (rho & ((1 << MATERIAL_BITS) - 1)) as i32);
+    Ok((whole, temperature_of(-part, fine)?))
+}
+
+/// [definition; theory, November 9 05:00] **One entry's step as the deposit forms it**, on `2^(−24)` of its grain
+/// ([`FieldLearner::deposit`]): `((m 2^grain · 2^(−frac ρ)) ≫ ⌊ρ⌋) / (⌊√v⌋ + 1)`, the shift's and the division's
+/// truncation taken on the carry's grain, before any remainder is added.
+fn formed_step(m: i128, v: i128, grain: u32, whole: i128, scale: i128) -> Result<i128> {
+    let root = super::deposit_root(v);
+    let num = m.checked_mul(1i128 << grain).inspect(|v| crate::number::census::reach(STEP_PAST, v)).ok_or(TowerError::Refused(STEP_PAST))?;
+    let scaled = num.checked_mul(scale).inspect(|v| crate::number::census::reach(STEP_PAST, v)).ok_or(TowerError::Refused(STEP_PAST))?;
+    Ok(if whole >= 0 {
+        (scaled >> whole.min(127)) / root
+    } else {
+        let k = u32::try_from(-whole).map_err(|_| TowerError::Refused(STEP_PAST))?;
+        scaled.checked_mul(1i128.checked_shl(k).filter(|&b| b > 0).ok_or(TowerError::Refused(STEP_PAST))?).inspect(|v| crate::number::census::reach(STEP_PAST, v)).ok_or(TowerError::Refused(STEP_PAST))? / root
+    })
+}
+
+/// [measurement; theory, November 9 05:51] **The retired scaled contrast's direction, as it formed it** (at `ee5adedd5`),
+/// read only by [`FieldLearner::deposit_folded`] to locate the length a scaled state's last step holds: the moments' step at
+/// the family's held length with its whole quotient taken on the grain before the fraction,
+/// `d = release(((m 2^grain ≫ ⌊ρ⌋) / (⌊√v⌋ + 1)) · 2^(−frac ρ), 24)`; the scaled law stepped `release(d · L, 32)`, `L` its
+/// length on `2^(−32)`.
+fn scaled_direction(m: i128, v: i128, grain: u32, whole: i128, scale: i128) -> Result<i128> {
+    const OVER: &str = "a scaled direction past its 128-bit carrier";
+    let root = super::deposit_root(v);
+    let num = m.checked_mul(1i128 << grain).ok_or(TowerError::Refused(OVER))?;
+    let quotient = if whole >= 0 {
+        (num >> whole.min(127)) / root
+    } else {
+        let k = u32::try_from(-whole).map_err(|_| TowerError::Refused(OVER))?;
+        num.checked_mul(1i128.checked_shl(k).filter(|&b| b > 0).ok_or(TowerError::Refused(OVER))?).ok_or(TowerError::Refused(OVER))? / root
+    };
+    Ok(release(quotient.checked_mul(scale).ok_or(TowerError::Refused(OVER))?, MATERIAL_BITS))
+}
+
+/// [measurement; theory, November 9 05:51] **What the fold read** ([`FieldLearner::deposit_folded`]): the scaled law's
+/// length on `2^(−32)` the fold used (`length`, the middle of the lengths that form the state's last step from its moments,
+/// `low..=high`), `log₂ λ` on `2^(−24)` bits (its 24 binary digits, `λ = length/2^32`), the entries the length was read from
+/// (those whose direction is nonzero), whether the family lengths were opened before the fold (the state carried none) and
+/// how many bits under the learner's rate they opened (`shift`, zero where they carried over), and each family's agreement.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct DepositFold {
+    pub length: i128,
+    pub low: i128,
+    pub high: i128,
+    pub log2_lambda: i128,
+    pub entries: usize,
+    pub opened: bool,
+    pub shift: u32,
+    pub families: Vec<FoldFamily>,
+}
+
+/// [measurement; theory, November 9 05:51] **One family under the fold**: its length before and after (on `2^(−24)` bits);
+/// at the state's own moments and remainders, the entries the scaled law's last step moved, the entries where the folded
+/// deposit's released step is that step, one grain from it and further; and the entries the folded deposit forms a nonzero
+/// step for where the scaled step released to zero (carried, under half a grain or not).
+#[derive(Clone, Debug, Default, PartialEq, Eq)]
+pub struct FoldFamily {
+    pub before: i128,
+    pub after: i128,
+    pub moving: usize,
+    pub equal: usize,
+    pub one: usize,
+    pub further: usize,
+    pub carrying: usize,
+}
+
 /// `base` less `release(step, halvings)` in each entry, and whether any entry moved.
 fn stepped(base: &Field, step: &[i128], halvings: u32) -> Result<(Field, bool)> {
     let mut candidate = base.clone();
@@ -4603,7 +6740,7 @@ struct Scaled {
 /// stands halved. Otherwise the excess `e(μ)` of the regions' code over `old`'s at the step's
 /// fraction `μ` is read at `μ = 1` and `μ = ½`, and the parabola `e(μ) = aμ + bμ²` through them
 /// (`e(0) = 0`) has `a = 4e(½) − e(1)`, `b = 2e(1) − 4e(½)`: with `a ≥ 0` (or an excess the codes
-/// read at or below zero where the exact comparison did not stand) the step's direction raises the
+/// read at or below zero where the integer comparison did not stand) the step's direction raises the
 /// regions' code at every size the reads resolve, and it stands nowhere; with `a < 0` (then
 /// `b > 0`) the parabola is lowest at `μ* = −a/2b ≤ ¼`, and the step is read once more at the
 /// largest halving `2^(−h) ≤ μ*`, where the parabola is below zero, standing there or nowhere. A
@@ -4682,6 +6819,41 @@ fn scaled(base: &Field, step: &[i128], h0: u32, old: &Compared, strict: bool, re
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct FieldLearner {
     pub field: Field,
+    /// [definition; the unified-theory reading of November 7, 21:58] **The averaged constitution** `θ̄`, moved toward the live
+    /// `θ` by `2^(−8)` each section ([`FieldLearner::average_section`]; the second moments' rate, a memory of 256 sections):
+    /// a state stepping noisily about its floor sits above it by `½ tr(H·Cov)` while the mean of its states sits at it, so
+    /// `θ̄` is what is read and saved beside the live `θ`, which keeps stepping. A restart carries both. It is kept 8 bits
+    /// finer than `θ`'s grain (theory, 22:08), so the remainder `toward` releases is carried and `θ̄` is the walk's mean,
+    /// not its median.
+    pub average: Option<Vec<i64>>,
+    /// [definition; theory, November 8 02:24 and 03:01, the number record's N5; the deposit since November 9 05:00] **The
+    /// carried release is the deposit**: each entry's deposit is formed on `2^(−24)` of its grain (the division's and the
+    /// shift's truncation taken there, not at the grain), its carried remainder added, and released to the grain, the new
+    /// remainder (`|r| ≤ 2^23`) carried to the next deposit; so sub-grain deposits add up in the low places and carry into the
+    /// grain instead of releasing to zero each section. Why it is the one deposit (theory, November 9 05:00): under the
+    /// truncating deposit q_bias, a, a_bias, b, b_bias, moment_before, moment_after, probe_bias, moment_face and
+    /// moment_face_bias moved zero grains from section 179 to 379 of law D's trained states, and zero under the fresh writes
+    /// from 219 to 234, their lengths bit-identical at 179, 300 and 379 with both averages at zero: a family whose step sits
+    /// under its grain never deposited, though its covector reached it. One remainder an entry of the material, always
+    /// present; every state saves them, and a state saved without a `carried` line opens them at zero. A growth carries each
+    /// entry's remainder as it carries its moments. [declared tolerance; theory, November 8 03:32] The carry's own grain,
+    /// `2^(−24)` of the family's grain, is a pick: below it each deposit drops under two units, one-sided, so a grain moves on
+    /// that part only after about `2^22` deposits.
+    pub carried: Vec<i64>,
+    /// [definition; theory, November 8 13:44] **The unigram law's carried sums** ([`UnigramCarry`]): each letter's count in the
+    /// truths of the conditional places read and its summed share over the same places, carried across sections (a restart
+    /// carries them); applied, the bias steps by `2^(−3) T log₂(N*_a/M_a)` and the step re-bases the mass. It replaces the
+    /// 05:50 law, whose step set the carried counts against one section's mass and pushed the bias against every section's
+    /// own composition (withdrawn, theory 13:44; its 16 sections are incomplete evidence).
+    pub unigram: Option<UnigramCarry>,
+    /// The bias's Newton step a conditional section read for its deposit (a reading's operand, not carried).
+    pub unigram_step: Option<Vec<i128>>,
+    /// [measurement; theory, November 7 23:47] Whether a full conditional section also reads the letters' coin's measure
+    /// ([`CoinMeasure`]): its forward read timed beside its material read, and each tolerance's cost and variance.
+    pub coin_measure: bool,
+    /// [definition; theory, November 8 14:22] The walk's and the coin's key, carried so a resume keeps the key it opened
+    /// with (an undeclared key is the opening state's hash, which a save would change); the run sets it, a save keeps it.
+    pub key: Option<u64>,
     first: Vec<i128>,
     second: Vec<i128>,
     pub rate_bits: u32,
@@ -4700,9 +6872,46 @@ pub struct FieldLearner {
     /// section's about as often as gradient noise says, so the read mostly threw away and shrank good steps). `true`
     /// keeps the read as a declared comparison. Not carried in the learner's text.
     pub read_held: bool,
-    /// [measurement; §16.41] The step the last section stood at, the operand of the next section's
-    /// [`FieldReceipt::transfer`]; a reading's operand, not carried in the learner's text, cleared by every growth, and not
-    /// kept under the held read (whose next section moves the step before pricing it).
+    /// [measurement; the unified-theory reading of November 7, 06:26] Whether a kernel section reads the evidence-shrunk Newton
+    /// step's terms (`s`, `v`, `c` and `α`, [`NewtonRead`]) beside the moments' own step, without taking it. Not carried in the
+    /// learner's text. [definition; theory, November 9 05:51] There is one deposit ([`FieldLearner::deposit`]): the Newton
+    /// step a kernel section once took in its place, and the switch that chose it, are retired.
+    pub newton_read: bool,
+    /// [definition; the unified-theory reading of November 7, 06:26] **The moments count states, not sections**: the first
+    /// and second moments move at `2^(−first_rate)` and `2^(−second_rate)` a section ([`FIRST_RATE`] and [`SECOND_RATE`]
+    /// at sixteen states a section; a section of `16·4^k` states moves them `2k` bits faster, so a section of 256 is its own
+    /// first moment). Not carried in the learner's text.
+    pub first_rate: u32,
+    pub second_rate: u32,
+    /// [definition; the unified-theory reading of November 7, 06:57] **Each family reads its length from its own transfer**:
+    /// where set, family `f` steps at `2^(−ρ_f)` (`ρ_f` on `2^(−24)` bits, opening at the learner's rate, unbounded: a
+    /// negative `ρ_f` lengthens the step past the moments' unit, checked at its carrier), and after each
+    /// section `ρ_f` moves `¼ τ̄_f/|π̄_f|` bits, `τ̄_f` and `π̄_f` the family's transfer (the step before priced on this
+    /// section) and own-section price, each averaged at `2^(−first_rate)`. A step the next section pays for grows shorter, a
+    /// step the next section keeps pulling grows longer: for one noisy quadratic mode `E τ = −η|μ|² + η²c` vanishes at the
+    /// length `η = |μ|²/c` that lowers the code most per step [derived]; a quarter of the correction a section settles in about
+    /// twenty sections [agent-inferred]. Carried in the learner's text with the two averages (the unified-theory reading of
+    /// November 7, 07:24), so a continued learner keeps them.
+    ///
+    /// [definition; theory, November 9 05:00] **The length law prices the carried step**: `τ_f` and `π_f` are read on the step
+    /// the deposit carries, what moved plus the remainder carried beside it on `2^(−24)` of the family's grain
+    /// ([`carried_change_family`], on [`PRICE_BITS`]), never on the released step alone. Read on the released step, a family
+    /// whose step releases to zero reads zero price and zero transfer, both averages decay to zero, and its length moves by a
+    /// ratio of two vanishing averages just as it stops moving; priced on what it carries, a family with real descent
+    /// lengthens until its grains move, and one with only noise gets no pull either way.
+    pub family_rates: Option<Vec<i128>>,
+    /// [definition; the unified-theory reading of November 7, 06:57] Whether a kernel section deposits the letters'
+    /// temperature's covector ([`FieldLearner::section_kernel`]). Not carried in the learner's text.
+    pub temper_learns: bool,
+    /// Each family's averaged transfer and own-section price, on [`PRICE_BITS`] (`2^(−44)` bits; a state written before the
+    /// length law priced the carried step kept them on the codes' `2^(−20)`, and its text says so).
+    family_transfer: Vec<i128>,
+    family_price: Vec<i128>,
+    /// [measurement; §16.41] The step the last section's deposit carried (what moved and, beside it, the remainder it carried,
+    /// [`HeldStep`]), the operand of the next section's [`FieldReceipt::transfer`] (on what moved) and of the family rates'
+    /// move (on what it carried); kept wherever the deposit carried anything, moved or not; carried in the learner's text
+    /// (November 8: a resume without it broke bits at its second deposit), cleared by every growth, and not kept under the held
+    /// read (whose next section moves the step before pricing it).
     last: Option<HeldStep>,
 }
 
@@ -4712,7 +6921,7 @@ impl FieldLearner {
     pub fn new(field: Field, rate_bits: u32) -> Self {
         let len = field.material_len();
         let drawn = 4 * field.declaration.founding_draws();
-        Self { field, first: vec![0; len], second: vec![0; len], rate_bits, drawn, laps: 0, held: None, read_held: false, last: None }
+        Self { field, first: vec![0; len], second: vec![0; len], rate_bits, drawn, laps: 0, held: None, read_held: false, newton_read: false, first_rate: FIRST_RATE, second_rate: SECOND_RATE, family_rates: None, temper_learns: false, family_transfer: Vec::new(), family_price: Vec::new(), last: None, average: None, carried: vec![0; len], unigram: None, unigram_step: None, coin_measure: false, key: None }
     }
 
     /// Whether a deposited step is held for the next regions' read.
@@ -4737,9 +6946,13 @@ impl FieldLearner {
         let (f, f2) = (factor as i128, (factor * factor) as i128);
         let first = from.iter().map(|&(i, divided)| if divided { div_nearest(self.first[i], f) } else { self.first[i] }).collect();
         let second = from.iter().map(|&(i, divided)| if divided { div_nearest(self.second[i], f2) } else { self.second[i] }).collect();
+        // [agent-inferred, November 9] Each remainder as its moments: a divided coordinate's is the old one divided among its
+        // copies (the copies' steps sum to the old step, so their remainders sum to the old remainder, to the division's
+        // nearest on the carry's grain), the readout's kept.
+        let carried = from.iter().map(|&(i, divided)| if divided { div_nearest(i128::from(self.carried[i]), f) as i64 } else { self.carried[i] }).collect();
         let drawn = self.drawn + 4 * self.field.growth_draws(factor);
         let rate_bits = self.rate_bits + (usize::BITS - (factor - 1).leading_zeros());
-        Ok(Self { field, first, second, rate_bits, drawn, laps: self.laps, held: None, read_held: self.read_held, last: None })
+        Ok(Self { field, first, second, rate_bits, drawn, laps: self.laps, held: None, read_held: self.read_held, newton_read: self.newton_read, first_rate: self.first_rate, second_rate: self.second_rate, family_rates: None, temper_learns: false, family_transfer: Vec::new(), family_price: Vec::new(), last: None, average: None, carried, unigram: None, unigram_step: None, coin_measure: false, key: None })
     }
 
     /// [definition; agent-inferred, November 4, §16.40] **The learner with one more lane** ([`Field::laned`]), the lane's
@@ -4778,8 +6991,42 @@ impl FieldLearner {
                 second[k] = mean;
             }
         }
+        // Each old entry keeps its remainder; the lane's open at zero.
+        let carried = from.iter().map(|o| o.map_or(0, |i| self.carried[i])).collect();
         let drawn = self.drawn + 4 * self.field.declaration.lane_draws();
-        Ok(Self { field, first, second, rate_bits: self.rate_bits, drawn, laps: self.laps, held: None, read_held: self.read_held, last: None })
+        Ok(Self { field, first, second, rate_bits: self.rate_bits, drawn, laps: self.laps, held: None, read_held: self.read_held, newton_read: self.newton_read, first_rate: self.first_rate, second_rate: self.second_rate, family_rates: None, temper_learns: false, family_transfer: Vec::new(), family_price: Vec::new(), last: None, average: None, carried, unigram: None, unigram_step: None, coin_measure: false, key: None })
+    }
+
+    /// [definition; theory, November 10 09:55] **The learner with `added` more pair contacts** ([`Field::contacted`]), the
+    /// contacts' draws read from the founding key stream past every draw read before. Every old entry keeps its moments and its
+    /// remainder, and the families' lengths (the families are the same ones); each new contact's entries open on the moments the
+    /// lane's open on ([`FieldLearner::laned`]): the first at zero, the second at the mean of the family's old second moments, so a
+    /// new contact's first step is an eighth of its covector over the family's own scale, the step its family's trained entries
+    /// take, and not the largest normalized step of a fresh entry. The rate is kept: no coordinate is shared among copies. The step
+    /// the last section stood at is of the old layout and is dropped, as every growth drops it.
+    pub fn contacted(&self, added: usize, keys: &[u8]) -> Result<Self> {
+        if self.held.is_some() {
+            return refuse("a learner grows its contacts after its held step is read");
+        }
+        let rest = keys.get(self.drawn..).ok_or(TowerError::Refused("fewer key bytes than the new contacts' draws"))?;
+        let (field, from) = self.field.contacted(added, rest)?;
+        let first = from.iter().map(|o| o.map_or(0, |i| self.first[i])).collect();
+        let mut second: Vec<i128> = from.iter().map(|o| o.map_or(0, |i| self.second[i])).collect();
+        for &(start, len, _) in field.families_all().iter() {
+            let old: Vec<i128> = (start..start + len).filter_map(|k| from[k].map(|i| self.second[i])).collect();
+            if old.len() == len || old.is_empty() {
+                continue;
+            }
+            // The mean term by term (each second moment is under `2^126`, so a family's sum is not formed).
+            let n = old.len() as i128;
+            let mean = old.iter().map(|v| v / n).sum::<i128>() + old.iter().map(|v| v % n).sum::<i128>() / n;
+            for k in (start..start + len).filter(|&k| from[k].is_none()) {
+                second[k] = mean;
+            }
+        }
+        let carried = from.iter().map(|o| o.map_or(0, |i| self.carried[i])).collect();
+        let drawn = self.drawn + 4 * self.field.declaration.contact_draws(added);
+        Ok(Self { field, first, second, rate_bits: self.rate_bits, drawn, laps: self.laps, held: None, read_held: self.read_held, newton_read: self.newton_read, first_rate: self.first_rate, second_rate: self.second_rate, family_rates: self.family_rates.clone(), temper_learns: false, family_transfer: self.family_transfer.clone(), family_price: self.family_price.clone(), last: None, average: None, carried, unigram: None, unigram_step: None, coin_measure: false, key: None })
     }
 
     /// The held step read on `regions` without a deposit: the faces of `regions` under the
@@ -4848,7 +7095,7 @@ impl FieldLearner {
     /// moments, the step and the certificates' decisions stay on the host.
     pub fn section_realized(&mut self, regions: &[Region], realization: &mut dyn FieldRealization) -> Result<FieldReceipt> {
         let (faces, g, next) = self.open(regions, realization, true)?;
-        let mut g = g.ok_or(TowerError::Refused("a section's opening read returned no covector"))?;
+        let g = g.ok_or(TowerError::Refused("a section's opening read returned no covector"))?;
         let faces_old = compared(&faces, regions)?;
         let spans = spans_of(regions);
         let code_before = code_of(&faces_old, &spans);
@@ -4858,8 +7105,228 @@ impl FieldLearner {
         // The sites the weighed code is a code of (§16.23): each region's domain where it reads an open site.
         let sites = spans.iter().filter(|s| s.0 > 0).map(|s| s.1 as usize).sum::<usize>()
             + regions.iter().filter_map(|r| r.port.map(|p| (p.start..p.stop.unwrap_or(r.classes.len()).min(r.classes.len())).filter(|&t| r.unresolved[t] && p.heard.is_none_or(|h| h[t])).count())).sum::<usize>();
+        let Deposit { moved: deposited, predicted, transfer, external, .. } = self.deposit(g)?;
+        Ok(FieldReceipt { sites, code_before, code_after: None, halvings: 0, deposited, next, predicted, change: None, transfer, external })
+    }
+
+    /// The moments moved by a section's covector `g` (each family's on its natural grain; `g` is left on the step's grain).
+    fn moments_take(&mut self, g: &mut [i128]) -> Result<()> {
+        for &(start, len, grain) in &self.field.families_all() {
+            for v in &mut g[start..start + len] {
+                *v = on_step_grain(grain, *v);
+            }
+        }
+        for ((m, v), gv) in self.first.iter_mut().zip(self.second.iter_mut()).zip(g.iter()) {
+            let square = gv.checked_mul(*gv).inspect(|v| crate::number::census::reach("a covector's square outgrew its 128-bit carrier", v)).ok_or(TowerError::Refused("a covector's square outgrew its 128-bit carrier"))?;
+            if *m == 0 && *v == 0 {
+                // A coordinate opens at its own first nonzero covector.
+                (*m, *v) = (*gv, square);
+            } else {
+                *m = toward(*m, *gv, self.first_rate);
+                *v = toward(*v, square, self.second_rate);
+            }
+        }
+        Ok(())
+    }
+
+    /// [measurement; the unified-theory reading of November 7, 05:55 and 06:26] **The evidence-shrunk Newton step's terms**
+    /// along `direction` `d` (a step on the families' grains, subtracted from the material; the kernel reads it along the step
+    /// the moments would deposit before its section moves them): each state's first-order change `u_s = D_s · d` (bits on
+    /// `2^(−20)`) weighed `f_s = w_s u_s` by its kernel weight, the slope `s = Σ f`, its variance `v = n/(n − 1) Σ(f − s/n)²`,
+    /// the curvature `c = (ln 2/2) Σ w u²` (the information `J = (ln 2/2T²) E[min(1, A) D Dᵀ]` along `d`), the shrink
+    /// `(max(0, s² − v), s²)` and `α = −(s/c)(1 − v/s²) = (s² − v) 2^20 / (−s c)` where `s < 0`, `s² > v` and `c > 0` (else
+    /// `(0, 0)`): Newton's length along `d`, shrunk by the evidence. A reading: nothing is moved.
+    fn newton_terms(&self, states: &[Vec<i128>], weights: &[i128], direction: &[i128]) -> Result<NewtonRead> {
+        const OVER: &str = "a Newton step past its 128-bit carrier";
+        let mut read = NewtonRead::default();
+        let (mut sum, mut squares, mut curvature) = (0i128, 0i128, 0i128);
+        let mut priced = 0usize;
+        for (d, &w) in states.iter().zip(weights) {
+            let Some(u) = predicted_change(&self.field, d, direction, 0) else { continue };
+            let u = u as i128;
+            let f = release(w.checked_mul(u).inspect(|v| crate::number::census::reach(OVER, v)).ok_or(TowerError::Refused(OVER))?, MATERIAL_BITS);
+            sum += f;
+            squares += f.checked_mul(f).inspect(|v| crate::number::census::reach(OVER, v)).ok_or(TowerError::Refused(OVER))?;
+            curvature += release(w.checked_mul(u.checked_mul(u).inspect(|v| crate::number::census::reach(OVER, v)).ok_or(TowerError::Refused(OVER))?).inspect(|v| crate::number::census::reach(OVER, v)).ok_or(TowerError::Refused(OVER))?, MATERIAL_BITS);
+            priced += 1;
+        }
+        let n = priced as i128;
+        let variance = if n > 1 { (n * squares - sum * sum) / (n - 1) } else { 0 };
+        let curvature = release(curvature.checked_mul(crate::hnn::keyed_modes::ln2_face()).inspect(|v| crate::number::census::reach(OVER, v)).ok_or(TowerError::Refused(OVER))?, LN2_FACE_BITS) / 2;
+        (read.slope, read.variance, read.curvature) = (sum, variance, curvature);
+        let evidence = sum * sum - variance;
+        read.shrink = (evidence.max(0), sum * sum);
+        if sum < 0 && evidence > 0 && curvature > 0 {
+            // α = −(s² − v) 2^20 / (s c): s on 2^(−20), v and c on 2^(−40).
+            read.alpha = (evidence.checked_mul(1 << 20).inspect(|v| crate::number::census::reach(OVER, v)).ok_or(TowerError::Refused(OVER))?, (-sum).checked_mul(curvature).inspect(|v| crate::number::census::reach(OVER, v)).ok_or(TowerError::Refused(OVER))?);
+        }
+        Ok(read)
+    }
+
+    /// Opens each family's length at the learner's rate ([`FieldLearner::family_rates`]).
+    pub fn open_family_rates(&mut self) {
+        let families = self.field.families_all().len();
+        self.family_rates = Some(vec![(self.rate_bits as i128) << MATERIAL_BITS; families]);
+        (self.family_transfer, self.family_price) = (vec![0; families], vec![0; families]);
+    }
+
+    /// Family `k`'s length `ρ_k` on `2^(−24)` bits as the deposit reads it: its own where the learner reads family lengths,
+    /// the learner's rate otherwise.
+    fn family_length(&self, k: usize) -> Result<i128> {
+        match &self.family_rates {
+            Some(rates) => rates.get(k).copied().ok_or(TowerError::Refused("a learner's family lengths that are not one a family")),
+            None => Ok(i128::from(self.rate_bits) << MATERIAL_BITS),
+        }
+    }
+
+    /// [measurement; theory, November 9 05:51] **The lengths that form a scaled step from the learner's moments**, its
+    /// families at `rhos` ([`scaled_direction`]): each entry with a nonzero direction `d` bounds the scaled law's length `L`
+    /// (on `2^(−32)`) to `⌈(|s| 2^32 − 2^31)/|d|⌉ ≤ L ≤ ⌊(|s| 2^32 + 2^31 − 1)/|d|⌋`, the release of `d L` at `2^(−32)` to the
+    /// nearest (half away from zero) being `s`; returns their intersection (from `L = 1`) and how many entries bound it, or
+    /// `None` where none forms it: an empty intersection, a moved entry with no direction, or a step against its direction.
+    fn scaled_partition(&self, rhos: &[i128], step: &[i128]) -> Result<Option<(i128, i128, usize)>> {
+        const OVER: &str = "a fold past its 128-bit carrier";
+        let half = 1i128 << 31;
+        let (mut low, mut high, mut entries) = (1i128, i128::MAX, 0usize);
+        for (k, &(start, len, grain)) in self.field.families_all().iter().enumerate() {
+            let (whole, scale) = length_parts(rhos[k], &self.field.fine)?;
+            for i in start..start + len {
+                let d = scaled_direction(self.first[i], self.second[i], grain, whole, scale)?;
+                let s = step[i];
+                if d == 0 {
+                    if s != 0 {
+                        return Ok(None);
+                    }
+                    continue;
+                }
+                if s != 0 && (s > 0) != (d > 0) {
+                    return Ok(None);
+                }
+                let (a, b) = (d.abs(), s.abs().checked_mul(1i128 << 32).ok_or(TowerError::Refused(OVER))?);
+                let from = (b - half).div_euclid(a) + i128::from((b - half).rem_euclid(a) != 0);
+                let to = (b + half - 1).div_euclid(a);
+                (low, high) = (low.max(from), high.min(to));
+                entries += 1;
+            }
+        }
+        Ok((low <= high || entries == 0).then_some((low, high, entries)))
+    }
+
+    /// [definition; theory, November 9 05:51; agent-inferred where marked] **A state of the scaled contrast moved to the one
+    /// deposit.** The retired scaled law stepped `release(d · L, 32)` with `d` its direction released to the grain at each
+    /// family's held length ([`scaled_direction`]) and `L` one length on `2^(−32)` for every family (an eleventh of the harmonic
+    /// mean of its last eleven Newton lengths). The fold puts that length into every family, `ρ_f ← ρ_f − log₂ λ` with
+    /// `λ = L/2^32`, so the deposit's step `2^(−ρ_f) λ m 2^grain/(⌊√v⌋ + 1)` is the scaled step before its releases: the
+    /// first carried step equals the scaled one in every moving family, no heat appears at the switch, and the length law
+    /// moves each family from there. Only the family lengths change: `θ`, the average, both moments, the remainders, the last
+    /// step (which the first section prices as its transfer) and the family averages carry over as they are.
+    ///
+    /// **Where `L` is read** [measurement]: the scaled law kept its last eleven lengths in the trainer and never in a state,
+    /// so no state holds `L`. A state saved after a scaled section holds that section's moments and its step (`last`), and the
+    /// step is `release(d_i L, 32)` entry by entry with `d_i` formed from those moments at the held lengths. Each entry with
+    /// `d_i ≠ 0` bounds `L` to the integers with `|s_i| 2^32 − 2^31 ≤ |d_i| L < |s_i| 2^32 + 2^31` (the release to the
+    /// nearest, half away from zero); the fold intersects them (estimation replaced by partition) and refuses a state no one
+    /// length fits. [agent-inferred] It folds the middle of that partition (every length in it forms the same last step, so
+    /// its error is at most half the partition, at most half a grain on the largest entry), and `log₂ λ` is read to 24 binary
+    /// digits (the tower's `log2_reading_at`, floored: a declared tolerance of `2^(−24)` bits in each length).
+    ///
+    /// **A state with no family-lengths line** (a run under one rate) opens its lengths at the one rate first, as
+    /// [`FieldLearner::open_family_rates`] does (every `ρ_f` at the rate, both averages at zero): at the state's own rate
+    /// (`rate_bits`, the rate at sixteen states a section) where one length forms its last step there. [agent-inferred] A
+    /// state is written at that rate, but a one-rate run on sections of `16·4^k` states stepped `k` bits under it, and its
+    /// direction's whole quotient, taken on the grain, does not halve with the rate, so no one length forms its step at the
+    /// state's rate; the fold then reads each rate below it in turn and opens the lengths at the first one a length forms the
+    /// step at (`shift` bits under), the rate the run stepped at.
+    ///
+    /// Refused: a held step (read it first), no last step, a last step the carried deposit formed or a halved one (not the
+    /// scaled law's), and a last step no one length forms from the state's moments (at the lengths the state carries, or at
+    /// any rate from its own down where it carries none).
+    pub fn deposit_folded(&self) -> Result<(Self, DepositFold)> {
+        const OVER: &str = "a fold past its 128-bit carrier";
+        if self.held.is_some() {
+            return refuse("a learner folds after its held step is read");
+        }
+        let last = self.last.as_ref().ok_or(TowerError::Refused("a state with no last step holds no scaled length (the scaled law saved none; its last step is the length's only operand)"))?;
+        if !last.formed.is_empty() || last.halvings != 0 {
+            return refuse("a last step the carried deposit formed, or a halved one, is no scaled section's");
+        }
+        let material = self.field.material_len();
+        if last.step.len() != material || self.carried.len() != material {
+            return refuse("a learner's last step or remainders that are not its material's length");
+        }
+        let mut folded = self.clone();
+        let opened = folded.family_rates.is_none();
+        let families = self.field.families_all();
+        // [agent-inferred] A state with no lengths is read at its own rate, then at each rate below it until one length forms
+        // its last step: the rate a one-rate run stepped at on sections of `16·4^k` states, `k` bits under the state's.
+        let mut shift = 0u32;
+        let (low, high, entries) = loop {
+            if opened {
+                folded.family_rates = Some(vec![i128::from(self.rate_bits - shift) << MATERIAL_BITS; families.len()]);
+                (folded.family_transfer, folded.family_price) = (vec![0; families.len()], vec![0; families.len()]);
+            }
+            let rhos = (0..families.len()).map(|k| folded.family_length(k)).collect::<Result<Vec<_>>>()?;
+            match self.scaled_partition(&rhos, &last.step)? {
+                Some((_, _, 0)) => return refuse("a state whose directions are all zero reads no scaled length"),
+                Some(partition) => break partition,
+                None if opened && shift < self.rate_bits => shift += 1,
+                None => return refuse("a last step that no one length forms from the state's moments: the state is not the scaled law's"),
+            }
+        };
+        let length = low + (high - low) / 2;
+        let log2_lambda = super::log2_reading_at(u128::try_from(length).map_err(|_| TowerError::Refused(OVER))?, MATERIAL_BITS) - (32i128 << MATERIAL_BITS);
+        let mut read = Vec::with_capacity(families.len());
+        for (k, &(start, len, grain)) in families.iter().enumerate() {
+            let before = folded.family_length(k)?;
+            let after = before.checked_sub(log2_lambda).ok_or(TowerError::Refused(OVER))?;
+            if let Some(rates) = &mut folded.family_rates {
+                rates[k] = after;
+            }
+            // At the state's own moments and remainders: the folded deposit's released step beside the scaled law's last.
+            let (whole, scale) = length_parts(after, &self.field.fine)?;
+            let mut fam = FoldFamily { before, after, ..FoldFamily::default() };
+            for i in start..start + len {
+                let x = formed_step(self.first[i], self.second[i], grain, whole, scale)?;
+                let r = release(x.checked_add(i128::from(self.carried[i])).ok_or(TowerError::Refused(OVER))?, MATERIAL_BITS);
+                let s = last.step[i];
+                fam.moving += usize::from(s != 0);
+                match (r - s).abs() {
+                    0 => fam.equal += 1,
+                    1 => fam.one += 1,
+                    _ => fam.further += 1,
+                }
+                fam.carrying += usize::from(s == 0 && r == 0 && x != 0);
+            }
+            read.push(fam);
+        }
+        Ok((folded, DepositFold { length, low, high, log2_lambda, entries, opened, shift, families: read }))
+    }
+
+    /// [definition; agent-inferred, November 7] **A section's deposit of its covector** `g` (each family's on its natural
+    /// grain, the code's covector): the step the section before stood at priced on it (`transfer`), the step the moments
+    /// would deposit before it moves them priced on it (`external`), the moments moved, and the step deposited at its size
+    /// (fluxing, Brandon, November 5 17:29 and 17:32) with its first-order change (`predicted`). Shared by
+    /// [`FieldLearner::section_realized`], [`FieldLearner::section_contrast`] and the kernel and conditional sections.
+    ///
+    /// [definition; theory, November 9 05:00] **The deposit is the carried release** ([`FieldLearner::carried`]): each entry's
+    /// step is formed on `2^(−24)` of its family's grain at the family's length `2^(−ρ_f)` (`2^(−rate_bits)` for every family
+    /// where the learner reads no family lengths), `full = ((m 2^grain · 2^(−frac ρ_f)) ≫ ⌊ρ_f⌋) / (⌊√v⌋ + 1)`, the fraction
+    /// through the exponential's navigator on `2^(−24)`; its carried remainder is added, the sum released to the grain (what
+    /// moves), and the new remainder carried. There is no other deposit: the truncating one, which released each step at the
+    /// grain and dropped the rest, is retired. The length law reads the step the deposit carries ([`FieldLearner::family_rates`],
+    /// [`carried_change_family`]): this section's own step and the step before, each what moved plus the remainder carried
+    /// beside it, priced on [`PRICE_BITS`]. Where the unigram's Newton step stands in for the moments' at the bias
+    /// ([`FieldLearner::unigram_step`]) the moments' step is not taken there, so its remainder is not carried: the bias's
+    /// remainders stand as they were, and the step carries the Newton step alone.
+    fn deposit(&mut self, mut g: Vec<i128>) -> Result<Deposit> {
+        const PAST: &str = STEP_PAST;
+        const PLACES: &str = "a carried remainder outside its places";
+        if self.carried.len() != g.len() {
+            return refuse("a learner's carried remainders that are not its material's length");
+        }
         let raw = g.clone();
-        let transfer = self.last.take().and_then(|s| predicted_change(&self.field, &raw, &s.step, s.halvings));
+        let prev = self.last.take();
+        let transfer = prev.as_ref().and_then(|s| predicted_change(&self.field, &raw, &s.step, s.halvings));
         // [the unified-theory reading of November 6, 08:54] The step the moments would deposit before this section moves them,
         // priced on this section: the external price, a step this section never shaped.
         let mut external_step = vec![0i128; g.len()];
@@ -4869,59 +7336,811 @@ impl FieldLearner {
             }
         }
         let external = predicted_change(&self.field, &raw, &external_step, 0);
-        for &(start, len, grain) in &self.field.families_all() {
-            for v in &mut g[start..start + len] {
-                *v = on_step_grain(grain, *v);
-            }
-        }
-        for ((m, v), gv) in self.first.iter_mut().zip(self.second.iter_mut()).zip(&g) {
-            let square = gv.checked_mul(*gv).ok_or(TowerError::Refused("a covector's square outgrew its 128-bit carrier"))?;
-            if *m == 0 && *v == 0 {
-                // A coordinate opens at its own first nonzero covector.
-                (*m, *v) = (*gv, square);
-            } else {
-                *m = toward(*m, *gv, FIRST_RATE);
-                *v = toward(*v, square, SECOND_RATE);
-            }
-        }
+        // The step before, as it carried, priced on this section by family, before the moments move.
+        let families = self.field.families_all();
+        let transfers: Vec<Option<i128>> = families.iter().map(|&fam| prev.as_ref().and_then(|p| carried_change_family(&raw, p, fam))).collect();
+        self.moments_take(&mut g)?;
+        // The bias's remainders as they stand, where the unigram's Newton step will stand in for the moments' there.
+        let bias = self.unigram_step.take().map(|du| {
+            let start = self.field.layout.read_bias;
+            let kept = self.carried[start..start + du.len()].to_vec();
+            (start, du, kept)
+        });
         let mut step = vec![0i128; g.len()];
-        for &(start, len, grain) in &self.field.families_all() {
+        // Each entry's step as this section forms it on 2^(−24) of its grain, before the earlier remainder (the length law's price).
+        let mut fulls = vec![0i128; g.len()];
+        for (k, &(start, len, grain)) in families.iter().enumerate() {
+            // `2^(−ρ_f)`: the whole bits through the deposit's own law (a right shift, or a left shift checked at its carrier
+            // where `ρ_f < 0`: the unified-theory reading of November 7, 07:16, the law unclamped), the fraction through the
+            // exponential's navigator.
+            let (whole, scale) = length_parts(self.family_length(k)?, &self.field.fine)?;
             for i in start..start + len {
-                step[i] = deposit_step(self.first[i], self.second[i], grain, self.rate_bits);
+                // The step on 2^(−24) of the grain, the division's and the shift's truncation taken there.
+                let full = formed_step(self.first[i], self.second[i], grain, whole, scale)?;
+                // Its carried remainder added; released to the grain (what moves), the new remainder carried.
+                fulls[i] = full;
+                let total = full.checked_add(i128::from(self.carried[i])).ok_or(TowerError::Refused(PAST))?;
+                step[i] = release(total, MATERIAL_BITS);
+                self.carried[i] = i64::try_from(total - (step[i] << MATERIAL_BITS)).map_err(|_| TowerError::Refused(PLACES))?;
+                // The carried remainder on 2^(−24) of the family's grain, signed parts apart, beside the change; and the step as
+                // formed, before its remainder is added, on the same grain.
+                if crate::number::census::enabled() {
+                    let rem = self.carried[i];
+                    crate::number::census::tally(census_deposit_site(k, 11), rem.unsigned_abs());
+                    crate::number::census::tally(census_deposit_site(k, if rem > 0 { 12 } else { 13 }), rem.unsigned_abs());
+                    crate::number::census::tally(census_deposit_site(k, 14), step[i].unsigned_abs() as u64);
+                    crate::number::census::tally(census_deposit_site(k, if full > 0 { 16 } else { 17 }), full.unsigned_abs() as u64);
+                }
             }
         }
-        let predicted = predicted_change(&self.field, &raw, &step, 0);
+        // The width census's read (a) a step: each family's nonzero steps by their lowest set bit, and the entries whose moment
+        // is nonzero but whose step released to zero this deposit.
+        if crate::number::census::enabled() {
+            for (k, &(start, len, _)) in families.iter().enumerate() {
+                for i in start..start + len {
+                    if raw[i] != 0 {
+                        crate::number::census::tally(census_deposit_site(k, 15), 1);
+                    }
+                    if step[i] != 0 {
+                        crate::number::census::tally(census_deposit_site(k, (step[i].trailing_zeros() as usize).min(8)), 1);
+                        crate::number::census::reach(census_deposit_site(k, 10), &step[i]);
+                    } else if self.first[i] != 0 {
+                        crate::number::census::tally(census_deposit_site(k, 9), 1);
+                    }
+                }
+            }
+        }
+        // The step the deposit carries: what moves, and beside it the step as this section formed it (the length law's).
+        // The unigram's Newton step stands in for the moments' at the bias (θ steps by `−step`): the moments' step is not taken
+        // there, so the bias's remainders stand as they were before this deposit and the step carries the Newton step alone.
+        if let Some((start, du, kept)) = bias {
+            for (i, (d, r)) in du.iter().zip(kept).enumerate() {
+                step[start + i] = -d;
+                self.carried[start + i] = r;
+                fulls[start + i] = (-d).checked_mul(1i128 << MATERIAL_BITS).ok_or(TowerError::Refused(PAST))?;
+            }
+        }
+        let formed = HeldStep { step, halvings: 0, formed: fulls };
+        let predicted = predicted_change(&self.field, &raw, &formed.step, 0);
+        let prices: Vec<Option<i128>> = families.iter().map(|&fam| carried_change_family(&raw, &formed, fam)).collect();
+        // Each family's length moves by a quarter of its averaged transfer over its averaged own-section price, both read on the
+        // step the deposit carries (on 2^(−44) bits): `ρ_f += ¼ τ̄_f 2^24 / |π̄_f|`, `ρ_f` on 2^(−24) bits. A section with no
+        // step before it reads no transfer and moves neither average.
+        if let (Some(rates), true) = (&mut self.family_rates, prev.is_some()) {
+            const OVER: &str = "a family's length move past its 128-bit carrier";
+            let rate = self.first_rate;
+            for k in 0..families.len() {
+                let (t_avg, p_avg) = (&mut self.family_transfer[k], &mut self.family_price[k]);
+                *t_avg = toward(*t_avg, transfers[k].unwrap_or(0), rate);
+                *p_avg = toward(*p_avg, prices[k].unwrap_or(0), rate);
+                if *p_avg != 0 {
+                    let lifted = t_avg.checked_mul(1i128 << MATERIAL_BITS).inspect(|v| crate::number::census::reach(OVER, v)).ok_or(TowerError::Refused(OVER))?;
+                    let over = p_avg.checked_abs().and_then(|p| p.checked_mul(4)).ok_or(TowerError::Refused(OVER))?;
+                    rates[k] = rates[k].checked_add(div_nearest(lifted, over)).ok_or(TowerError::Refused(OVER))?;
+                }
+            }
+        }
+        let by_family = transfers.into_iter().zip(prices).collect();
         // [definition; Brandon, November 5 17:29 and 17:32] **The step fluxes**: it deposits at its size, and no reread of the
         // section certifies it. The reread kept a step only where the regions reread under it coded strictly fewer bits, a
         // selection on the code (a maximum in effect) that discarded what an expansion measures ("you can't discard failure
         // or mistakes, knowing what causes contraction in contrast to expansion is equally important") and cost a full read
         // of the section (27% of path75's second segment). What the step does is read by the passes the field makes anyway:
         // the next section's own covector prices it at first order ([`FieldReceipt::transfer`]), contraction and expansion
-        // alike, and the moments carry every covector.
-        let (candidate, moved) = stepped(&self.field, &step, 0)?;
-        if !moved {
-            return Ok(FieldReceipt { sites, code_before, code_after: None, halvings: 0, deposited: false, next, predicted, change: None, transfer, external });
+        // alike, and the moments carry every covector. The step the deposit carried is kept for the next section's transfer
+        // wherever it carries anything, moved or not: a step held whole in its remainders is priced on the next section as
+        // well.
+        let (candidate, moved) = stepped(&self.field, &formed.step, 0)?;
+        if moved {
+            self.field = candidate;
         }
-        self.field = candidate;
         if self.read_held {
-            self.held = Some(HeldStep { step, halvings: 0 });
-        } else {
-            self.last = Some(HeldStep { step, halvings: 0 });
+            if moved {
+                self.held = Some(HeldStep { step: formed.step, halvings: 0, formed: Vec::new() });
+            }
+        } else if formed.carries() {
+            self.last = Some(formed);
         }
-        Ok(FieldReceipt { sites, code_before, code_after: None, halvings: 0, deposited: true, next, predicted, change: None, transfer, external })
+        Ok(Deposit { moved, predicted, transfer, external, by_family })
+    }
+
+    /// [definition; the unified-theory reading of November 7, 04:05, route (b)] **An energy field's section meets its own
+    /// release.** The open places' code under one energy is
+    /// `l = −log₂ P(e_O = truth_O | rest) = G(truth)/T + log₂ Σ_e 2^(−G(e)/T)`, with `G(e) = Φ(x^K(e); e)` each configuration
+    /// relaxed at its own certified halvings ([`Field::energy_material`]). Its material covector is
+    /// `(1/T)[∂G/∂θ(truth) − E_P ∂G/∂θ(e′)]`, read at one release `e′` a state: `release[s]` is `truth[s]` with its open
+    /// places as the field's own release wrote them (the writer as it writes), every site resolved in both. The section
+    /// deposits that covector as any section's ([`FieldLearner::deposit`]): the step fluxes. The partition function is not
+    /// read, so no code certifies it. `T` is the letters' temperature (`face_temper`), held: neither `G` nor its covector
+    /// reads it. The lock temperatures are held as `G`'s covector holds them.
+    ///
+    /// [definition; theory, November 9 05:51] **The contrast deposits through the one deposit.** The contrast covector is the
+    /// truth against the field's own writes at any sweep count: the joint release, the writer, and the persistent and fresh
+    /// writes swept at `T` alike, so every one of them is this section. The scaled contrast, which released the covector's
+    /// direction to the grain and set its length by one Newton length `η = −2Σp/(n ln 2 Var p)` for every family (an eleventh
+    /// of the harmonic mean of the last eleven), is retired: its length read the code's curvature along the step as the family
+    /// length law does ([`FieldLearner::family_rates`]), two laws for one quantity, and under it the families whose direction
+    /// sat under half a grain (the moment rows, `moment_face`, `a`, `b`, `pair_c` among them) moved zero grains and carried
+    /// nothing. Here each entry's step carries its remainder ([`FieldLearner::carried`]) and each family's length moves by
+    /// its own transfer. A state saved under the scaled law moves to this one by [`FieldLearner::deposit_folded`].
+    ///
+    /// Covector units: [`Field::energy_material`] reads every family on `2^(−40)` a real unit, the deposit's material
+    /// families on `2^(−40)` and its face families on `2^(−24)`, so a face family's is released 16 bits. The pairs' differences
+    /// are summed before the one release, so [`contrast_pair_covectors`] reads the same covector pair by pair within
+    /// `⌊(n + 1)/2⌋` units of the chart (bit for bit with one pair).
+    pub fn section_contrast(&mut self, truth: &[Region], release_of: &[Region], realization: &mut dyn FieldRealization) -> Result<ContrastReceipt> {
+        let f = &self.field;
+        if !f.declaration.energy || f.scale.is_some() {
+            return refuse("a contrast section of a field without one energy");
+        }
+        if truth.is_empty() || truth.len() != release_of.len() {
+            return refuse("a contrast section needs one release a state");
+        }
+        let inverse = temperature_of(-f.theta[f.layout.face_temper], &f.fine)?;
+        let both: Vec<Region> = truth.iter().chain(release_of).copied().collect();
+        let reads = realization.read_energy_material(f, &both)?;
+        let n = truth.len();
+        let mut g = vec![0i128; f.material_len()];
+        let mut gap = 0i128;
+        let mut same = 0usize;
+        for s in 0..n {
+            let ((gt, et), (gr, er)) = (&reads[s], &reads[n + s]);
+            if gt.len() != g.len() || gr.len() != g.len() {
+                return refuse("a material covector of another length than the field's material");
+            }
+            gap += et - er;
+            same += usize::from(truth[s].classes == release_of[s].classes);
+            for ((v, a), b) in g.iter_mut().zip(gt).zip(gr) {
+                *v += a - b;
+            }
+        }
+        const OVER: &str = "a contrast covector past its 128-bit carrier";
+        for &(start, len, grain) in &f.families_all() {
+            for v in &mut g[start..start + len] {
+                let scaled = release(v.checked_mul(inverse).inspect(|v| crate::number::census::reach(OVER, v)).ok_or(TowerError::Refused(OVER))?, MATERIAL_BITS);
+                *v = if grain == MATERIAL_BITS { scaled } else { release(scaled, 40 - super::COVECTOR_BITS) };
+            }
+        }
+        let gap = release(gap.checked_mul(inverse).inspect(|v| crate::number::census::reach(OVER, v)).ok_or(TowerError::Refused(OVER))?, MATERIAL_BITS);
+        // [the unified-theory reading of November 7, 09:36] The letters' temperature in the deposit, as the kernel's:
+        // `∂l/∂τ = −ln 2 Σ_s (G_s − G′_s)/T`, here the gap itself.
+        if self.temper_learns {
+            let nats = release(gap.checked_mul(crate::hnn::keyed_modes::ln2_face()).inspect(|v| crate::number::census::reach(OVER, v)).ok_or(TowerError::Refused(OVER))?, LN2_FACE_BITS);
+            g[f.layout.face_temper] = -(nats << (40 - ENERGY_BITS));
+        }
+        let covector = g.clone();
+        let Deposit { moved: deposited, predicted, transfer, external, .. } = self.deposit(g)?;
+        Ok(ContrastReceipt { states: n, same, gap, deposited, predicted, transfer, external, covector })
+    }
+
+    /// [definition; the unified-theory reading of November 7, 05:20; agent-inferred] **A kernel block's spacing**: the least
+    /// spacing at which no receiver's near lock sees two block places. A receiver's near field is `0 < |i − j| < NEAR`, so two
+    /// places `NEAR − 1` from one receiver on either side are `2(NEAR − 1)` apart; a block's places stand `2(NEAR − 1) + 1`
+    /// apart. Couplings past the near field (a crowd joining two, or the ticks' transport) the Metropolis–Hastings test
+    /// counts.
+    pub fn kernel_spacing() -> usize {
+        2 * (NEAR - 1) + 1
+    }
+
+    /// [definition; the unified-theory reading of November 7, 05:20, route (b)'s negative] **An energy section's step from
+    /// one invariant kernel step at the truth.** Each state `truth[s]` (every site resolved) opens its block `blocks[s]`, each
+    /// block place carrying its truth's letter as a locked mixture, so one read ([`FieldRealization::read_energy_faces`])
+    /// gives `G` and every block place's face at the truth. Each block place draws `a_t` from its face (keyed by `seed`, the
+    /// state and the place); the proposal read gives `G′` and the faces `face′`. The block's Metropolis–Hastings ratio is
+    /// `A = 2^((G − G′)/T) Π_t face′_t(truth_t)/face_t(a_t)`, and the section deposits
+    /// `(1/T) Σ_s min(1, A_s)[∂G/∂θ(truth_s) − ∂G/∂θ(e′_s)]` (the accept coin's expectation, no coin), its step fluxing. By
+    /// detailed balance the expected deposit is zero at the true distribution for any block and proposal; over the keyed
+    /// blocks every open place is reached, and the rest holds each place's enumerated conditional at the truth (every letter's `G` read). `min(1, A)` is
+    /// read through the exponential's navigator on `2^(−24)` and released to zero below its carrier (`2^(−23)`). Four reads
+    /// a state: the faces at the truth and at the proposal, and the two material covectors.
+    pub fn section_kernel(&mut self, truth: &[Region], blocks: &[Vec<usize>], seed: u64, realization: &mut dyn FieldRealization) -> Result<KernelReceipt> {
+        let owners: Vec<usize> = (0..blocks.len()).collect();
+        self.section_kernel_grouped(truth, &owners, blocks, seed, realization)
+    }
+
+    /// [definition; the unified-theory reading of November 7, 07:40] **[`FieldLearner::section_kernel`] with several blocks a
+    /// problem, the truth formed once.** Block `b` belongs to problem `owners[b]`; each problem's places of all its blocks
+    /// are opened together at the truth (each carrying its truth letter whole), so one read gives the truth's `G` and faces
+    /// for every block of it, and one material read its `∂G/∂θ`. Each block's proposal opens the same places, its own carrying
+    /// their drawn letters and the others their truth, so `G′` and `face′` are read in the same structure as `G` and the
+    /// Metropolis–Hastings ratio keeps its law. The deposit is `(1/T) Σ_b w_b [∂G/∂θ(truth_(owner b)) − ∂G/∂θ(e′_b)]`, two reads
+    /// a block and two a problem. With one block a problem it is [`FieldLearner::section_kernel`]'s.
+    pub fn section_kernel_grouped(&mut self, truth: &[Region], owners: &[usize], blocks: &[Vec<usize>], seed: u64, realization: &mut dyn FieldRealization) -> Result<KernelReceipt> {
+        let f = &self.field;
+        if !f.declaration.energy || f.scale.is_some() {
+            return refuse("a kernel section of a field without one energy");
+        }
+        if truth.is_empty() || blocks.is_empty() || owners.len() != blocks.len() || owners.iter().any(|&o| o >= truth.len()) || blocks.iter().zip(owners).any(|(b, &o)| b.is_empty() || b.iter().any(|&t| t >= truth[o].classes.len() || truth[o].unresolved[t])) {
+            return refuse("a kernel section needs nonempty blocks of resolved places, each a problem's");
+        }
+        let alphabet = f.declaration.alphabet;
+        let inverse = temperature_of(-f.theta[f.layout.face_temper], &f.fine)?;
+        let (problems, n) = (truth.len(), blocks.len());
+        let mix = |counter: u64| -> u64 {
+            let mut z = seed.wrapping_add(counter.wrapping_mul(0x9E37_79B9_7F4A_7C15));
+            z = (z ^ (z >> 30)).wrapping_mul(0xBF58_476D_1CE4_E5B9);
+            z = (z ^ (z >> 27)).wrapping_mul(0x94D0_49BB_1331_11EB);
+            z ^ (z >> 31)
+        };
+        let one = 1u32 << STATE_BITS;
+        // Each problem's opened places: the union of its blocks.
+        let mut union: Vec<Vec<usize>> = vec![Vec::new(); problems];
+        for (b, &o) in blocks.iter().zip(owners) {
+            union[o].extend_from_slice(b);
+        }
+        for u in &mut union {
+            u.sort_unstable();
+            u.dedup();
+        }
+        // A problem with its opened places open, each carrying `letter(t)` whole, and its classes with those letters.
+        let opened = |p: usize, letter: &dyn Fn(usize) -> usize| -> (Vec<usize>, Vec<bool>, Vec<Option<Shares>>) {
+            let mut classes = truth[p].classes.to_vec();
+            let mut open = vec![false; classes.len()];
+            let mut faces: Vec<Option<Shares>> = vec![None; classes.len()];
+            for &t in &union[p] {
+                classes[t] = letter(t);
+                open[t] = true;
+                faces[t] = Some(vec![(classes[t] as u32, one)]);
+            }
+            (classes, open, faces)
+        };
+        let at_truth: Vec<_> = (0..problems).map(|p| opened(p, &|t| truth[p].classes[t])).collect();
+        let truth_views: Vec<Region> = at_truth.iter().map(|(c, o, fc)| Region { classes: c, unresolved: o, faces: fc, locked: o, echo: &[], domain: None, port: None }).collect();
+        let (faces, g_truth) = realization.read_energy_faces(f, &truth_views)?;
+        // Each block place's proposal drawn from its face at the truth.
+        let mut proposals: Vec<Vec<usize>> = Vec::with_capacity(n);
+        for s in 0..n {
+            let o = owners[s];
+            let mut drawn = Vec::with_capacity(blocks[s].len());
+            for &t in &blocks[s] {
+                let face = faces[o][t].as_ref().ok_or(TowerError::Refused("a kernel block place with no face"))?;
+                let u = ((mix((s as u64) << 32 | t as u64) as u128) << 64 | mix(!((s as u64) << 32 | t as u64)) as u128) % face.total.max(1);
+                let mut acc = 0u128;
+                drawn.push((0..alphabet).find(|&c| {
+                    acc += face.masses[c];
+                    acc > u
+                }).unwrap_or(truth[o].classes[t]));
+            }
+            proposals.push(drawn);
+        }
+        let at_proposal: Vec<_> = (0..n)
+            .map(|s| {
+                let o = owners[s];
+                let letters: Vec<(usize, usize)> = blocks[s].iter().copied().zip(proposals[s].iter().copied()).collect();
+                opened(o, &|t| letters.iter().find(|&&(p, _)| p == t).map_or(truth[o].classes[t], |&(_, a)| a))
+            })
+            .collect();
+        let proposal_views: Vec<Region> = at_proposal.iter().map(|(c, o, fc)| Region { classes: c, unresolved: o, faces: fc, locked: o, echo: &[], domain: None, port: None }).collect();
+        let (faces2, g_prop) = realization.read_energy_faces(f, &proposal_views)?;
+        // Each block's `log₂ A` on 2^(−32) bits and its weight `min(1, A)` on 2^(−24).
+        let mut weights = Vec::with_capacity(n);
+        let mut log2_a = Vec::with_capacity(n);
+        for s in 0..n {
+            let o = owners[s];
+            let mut log_a = release((g_truth[o] - g_prop[s]).checked_mul(inverse).ok_or(TowerError::Refused("a kernel's energy past its carrier"))?, MATERIAL_BITS);
+            for (&t, &a) in blocks[s].iter().zip(&proposals[s]) {
+                let (face, face2) = (faces[o][t].as_ref().ok_or(TowerError::Refused("a kernel block place with no face"))?, faces2[s][t].as_ref().ok_or(TowerError::Refused("a kernel block place with no face at its proposal"))?);
+                log_a += ((face.code(a) as i128) - (face2.code(truth[o].classes[t]) as i128)) << (ENERGY_BITS - 20);
+            }
+            log2_a.push(log_a);
+            let ell = log_a >> (ENERGY_BITS - MATERIAL_BITS);
+            weights.push(if ell >= 0 {
+                1i128 << MATERIAL_BITS
+            } else if ell <= -((MATERIAL_BITS as i128 - 1) << MATERIAL_BITS) {
+                0
+            } else {
+                temperature_of(ell as i32, &f.fine)?
+            });
+        }
+        // The material covectors at each problem's truth and at each block's proposal, resolved.
+        let resolved: Vec<Vec<bool>> = truth.iter().map(|r| vec![false; r.classes.len()]).collect();
+        let mut both: Vec<Region> = (0..problems).map(|p| Region { classes: &at_truth[p].0, unresolved: &resolved[p], faces: &[], locked: &[], echo: &[], domain: None, port: None }).collect();
+        both.extend((0..n).map(|s| Region { classes: &at_proposal[s].0, unresolved: &resolved[owners[s]], faces: &[], locked: &[], echo: &[], domain: None, port: None }));
+        let reads = realization.read_energy_material(f, &both)?;
+        let (mut g_same, mut g_gap) = (0usize, 0i128);
+        for (i, read) in reads.iter().enumerate() {
+            let g_faces = if i < problems { g_truth[i] } else { g_prop[i - problems] };
+            g_same += usize::from(g_faces == read.1);
+            g_gap = g_gap.max((g_faces - read.1).abs());
+        }
+        let g_agree = (g_same, reads.len());
+        const OVER: &str = "a kernel covector past its 128-bit carrier";
+        let families = f.families_all();
+        let material = f.material_len();
+        // Each state's `D_s/T = (∂G/∂θ(truth) − ∂G/∂θ′)/T` on the families' natural grains (2^(−40) a material family's, 2^(−24) a
+        // face family's).
+        let natural = |gt: &[i128], gp: &[i128]| -> Result<Vec<i128>> {
+            if gt.len() != material || gp.len() != material {
+                return refuse("a material covector of another length than the field's material");
+            }
+            let mut d = vec![0i128; material];
+            for &(start, len, grain) in &families {
+                for i in start..start + len {
+                    let scaled = release((gt[i] - gp[i]).checked_mul(inverse).inspect(|v| crate::number::census::reach(OVER, v)).ok_or(TowerError::Refused(OVER))?, MATERIAL_BITS);
+                    d[i] = if grain == MATERIAL_BITS { scaled } else { release(scaled, 40 - super::COVECTOR_BITS) };
+                }
+            }
+            Ok(d)
+        };
+        let places = blocks.iter().map(Vec::len).sum();
+        let moved = (0..n).map(|s| blocks[s].iter().zip(&proposals[s]).filter(|&(&t, &a)| a != truth[owners[s]].classes[t]).count()).sum();
+        let weight = weights.iter().sum();
+        let weight_square = weights.iter().map(|&w| release(w * w, MATERIAL_BITS)).sum();
+        let (least, most) = (weights.iter().copied().min().unwrap_or(0), weights.iter().copied().max().unwrap_or(0));
+        let whole = weights.iter().filter(|&&w| w == 1i128 << MATERIAL_BITS).count();
+        let per_state: Vec<(usize, i128)> = blocks.iter().map(Vec::len).zip(weights.iter().copied()).collect();
+        let states: Vec<Vec<i128>> = (0..n).map(|s| natural(&reads[owners[s]].0, &reads[problems + s].0)).collect::<Result<_>>()?;
+        // [the unified-theory reading of November 7, 06:26] The Newton terms read along the moments' direction before this section
+        // moves them, beside the moments' own step.
+        let newton = if self.newton_read {
+            let mut direction = vec![0i128; material];
+            for &(start, len, grain) in &families {
+                for i in start..start + len {
+                    direction[i] = deposit_step(self.first[i], self.second[i], grain, self.rate_bits);
+                }
+            }
+            Some(self.newton_terms(&states, &weights, &direction)?)
+        } else {
+            None
+        };
+        let mut g = vec![0i128; material];
+        for (d, &w) in states.iter().zip(&weights) {
+            if w == 0 {
+                continue;
+            }
+            for (v, &x) in g.iter_mut().zip(d) {
+                *v += release(x.checked_mul(w).inspect(|v| crate::number::census::reach(OVER, v)).ok_or(TowerError::Refused(OVER))?, MATERIAL_BITS);
+            }
+        }
+        // [definition; the unified-theory reading of November 7, 06:57] **The letters' temperature joins the deposit**: with
+        // `T = 2^τ`, `∂l/∂τ = −ln 2 Σ_s w_s (G_s − G′_s)/T` from the energies already read, on `2^(−40)` a unit of `τ` (the
+        // family's material grain). Held when `temper_learns` is off.
+        if self.temper_learns {
+            let mut gap = 0i128;
+            for (s, &w) in weights.iter().enumerate() {
+                gap += release((reads[owners[s]].1 - reads[problems + s].1).checked_mul(w).inspect(|v| crate::number::census::reach(OVER, v)).ok_or(TowerError::Refused(OVER))?, MATERIAL_BITS);
+            }
+            let over_t = release(gap.checked_mul(inverse).inspect(|v| crate::number::census::reach(OVER, v)).ok_or(TowerError::Refused(OVER))?, MATERIAL_BITS);
+            let nats = release(over_t.checked_mul(crate::hnn::keyed_modes::ln2_face()).inspect(|v| crate::number::census::reach(OVER, v)).ok_or(TowerError::Refused(OVER))?, LN2_FACE_BITS);
+            g[f.layout.face_temper] = -(nats << (40 - ENERGY_BITS));
+        }
+        // Each family's part of the step before and of this one, as the deposit carries them, priced on this section.
+        let raw = g.clone();
+        let Deposit { moved: deposited, predicted, transfer, external, by_family } = self.deposit(g)?;
+        let rates = self.family_rates.clone().unwrap_or_default();
+        Ok(KernelReceipt { states: n, places, moved, weight, weight_square, least, most, whole, deposited, predicted, transfer, external, per_state, log2_a, newton, by_family, rates, g_agree, g_gap, covector: raw, bands: Vec::new(), outside: Vec::new(), letter_counts: Vec::new(), surprise_bands: Vec::new(), kl_face: 0, moments: [0; 8], coin_measure: None })
+    }
+
+    /// The averaged constitution's rate, `2^(−8)` a section (the second moments' own, theory November 7 21:58).
+    const AVERAGE_RATE: u32 = 8;
+
+    /// One section's move of the averaged constitution: `θ̄ ← toward(θ̄, θ, 8)` entry by entry on `θ`'s grain `2^(−8)` finer,
+    /// opened at the live `θ`.
+    pub fn average_section(&mut self) {
+        let fine = Self::AVERAGE_RATE;
+        match &mut self.average {
+            Some(avg) if avg.len() == self.field.theta.len() => {
+                for (a, &t) in avg.iter_mut().zip(&self.field.theta) {
+                    *a = toward(*a as i128, (t as i128) << fine, Self::AVERAGE_RATE) as i64;
+                }
+            }
+            _ => self.average = Some(self.field.theta.iter().map(|&t| (t as i64) << fine).collect()),
+        }
+    }
+
+    /// [measurement; theory, November 9 14:30] **The step the last deposit formed**, entry by entry on `2^(−24)` of its
+    /// family's grain before the remainder carried from earlier sections is added ([`HeldStep`]'s `formed`, the length law's
+    /// operand; `θ` moves by `−release(formed + carried)`), where the learner keeps it: none under a held read or where the step
+    /// carried nothing. A reading: it changes nothing.
+    pub fn last_formed_step(&self) -> Option<&[i128]> {
+        self.last.as_ref().map(|held| held.formed.as_slice()).filter(|formed| !formed.is_empty())
+    }
+
+    /// The field read at the averaged constitution, each entry released to `θ`'s grain (the live field where none is kept).
+    pub fn averaged_field(&self) -> Field {
+        let mut field = self.field.clone();
+        if let Some(avg) = self.average.as_ref().filter(|a| a.len() == field.theta.len()) {
+            for (t, &a) in field.theta.iter_mut().zip(avg) {
+                *t = release(a as i128, Self::AVERAGE_RATE) as i32;
+            }
+        }
+        field
+    }
+
+    /// [definition; the unified-theory reading of November 7, 20:29, law (D)] **The deposit against each place's whole
+    /// conditional**: at each block place `t` of a problem, every letter `v` of the alphabet is put at `t` with the rest at the
+    /// truth, and one material read gives each configuration's `G(x_v)` and `∂G/∂θ(x_v)` (the two relaxations a state read one
+    /// `G`, so the material read's `G` is the enumerated read's). The place's conditional `p(v) ∝ 2^(−G(x_v)/T)` (each weight on
+    /// `2^(−24)` through the exponential's navigator, released to zero below `2^(−23)` as the kernel's) weighs the deposit
+    /// `(1/T)(∂G/∂θ(t) − Σ_v p(v) ∂G/∂θ(x_v)) = (1/T) Σ_v p(v)(∂G/∂θ(t) − ∂G/∂θ(x_v))`, and the letters' temperature takes
+    /// `G(t) − E_p G`. No proposal and no coin: it is the pseudo-likelihood's gradient at that place, and it rests where the
+    /// held read's code is lowest, where the kernel's rest weighs each letter by `min(q(v)/p(v), q′(t)/p(t))`. The places are
+    /// read a chunk at a time, so a section's configurations never stand together. The receipt reads as the kernel's, with
+    /// each place a state: `weight` the truth's conditional probability `p(t)` on `2^(−24)`, `whole` the places whose truth is
+    /// the conditional's mode, `log2_a` each `log₂ p(t)` on `2^(−32)`, nothing moved.
+    pub fn section_conditional(&mut self, truth: &[Region], owners: &[usize], blocks: &[Vec<usize>], realization: &mut dyn FieldRealization) -> Result<KernelReceipt> {
+        let shifts: Vec<Vec<u32>> = blocks.iter().map(|b| vec![0; b.len()]).collect();
+        self.section_conditional_weighed(truth, owners, blocks, &shifts, None, realization)
+    }
+
+    /// [definition; the unified-theory reading of November 7, 21:08] **The places chosen by what is left of their news**: the
+    /// deposit at a place is `(1 − p(t))(∂G/∂θ(t) − the other letters' p-mean)`, so what the field already predicts cancels (a
+    /// static flux induces nothing). Each problem's block places are read once at the truth, open and carrying their letters
+    /// whole (one faces read a problem), and each place takes the band `k = ⌊−log₂(1 − q(t))⌋` of its face's truth share
+    /// `q(t)`, held to `0..=top`. A place is spent on its beat, when the lap's count agrees with the place's phase (a key of
+    /// its problem `ids[o]` and position) modulo `2^k`, and its every covector (material, temperature) is weighed by `2^k`,
+    /// so over `2^k` laps it carries its whole weight: the expectation is the full conditional sum and its rest the held code's,
+    /// news not spent now carried, never dropped. A deposit spreads through `θ` and lowers coupled places' surprise before they
+    /// are reached; their next read climbs a band. The receipt's `bands` are the counts of counts.
+    #[allow(clippy::too_many_arguments)]
+    pub fn section_conditional_beat(&mut self, truth: &[Region], owners: &[usize], blocks: &[Vec<usize>], ids: &[u64], lap: u64, top: u32, realization: &mut dyn FieldRealization) -> Result<KernelReceipt> {
+        let f = &self.field;
+        if ids.len() != truth.len() || blocks.len() != owners.len() || owners.iter().any(|&o| o >= truth.len()) {
+            return refuse("a beat section needs one key a problem and an owner a block");
+        }
+        let problems = truth.len();
+        let one = 1u32 << STATE_BITS;
+        let mut union: Vec<Vec<usize>> = vec![Vec::new(); problems];
+        for (b, &o) in blocks.iter().zip(owners) {
+            union[o].extend_from_slice(b);
+        }
+        let opened: Vec<(Vec<bool>, Vec<Option<Shares>>)> = (0..problems)
+            .map(|p| {
+                let sites = truth[p].classes.len();
+                let mut open = vec![false; sites];
+                let mut faces: Vec<Option<Shares>> = vec![None; sites];
+                for &t in &union[p] {
+                    if t < sites {
+                        open[t] = true;
+                        faces[t] = Some(vec![(truth[p].classes[t] as u32, one)]);
+                    }
+                }
+                (open, faces)
+            })
+            .collect();
+        let views: Vec<Region> = (0..problems).map(|p| Region { classes: truth[p].classes, unresolved: &opened[p].0, faces: &opened[p].1, locked: &opened[p].0, echo: &[], domain: None, port: None }).collect();
+        let (faces, _) = realization.read_energy_faces(f, &views)?;
+        let key = |id: u64, t: usize| -> u64 {
+            let mut z = id.wrapping_mul(0x9E37_79B9_7F4A_7C15) ^ (t as u64).wrapping_mul(0xBF58_476D_1CE4_E5B9);
+            z = (z ^ (z >> 30)).wrapping_mul(0xBF58_476D_1CE4_E5B9);
+            z = (z ^ (z >> 27)).wrapping_mul(0x94D0_49BB_1331_11EB);
+            z ^ (z >> 31)
+        };
+        let mut bands = vec![(0usize, 0usize); top as usize + 1];
+        let (mut kept_blocks, mut kept_owners, mut kept_shifts) = (Vec::new(), Vec::new(), Vec::new());
+        for (b, &o) in blocks.iter().zip(owners) {
+            let (mut places, mut shifts) = (Vec::new(), Vec::new());
+            for &t in b {
+                let face = faces[o].get(t).and_then(Option::as_ref).ok_or(TowerError::Refused("a beat place with no face at the truth"))?;
+                let (m, total) = (face.masses[truth[o].classes[t]], face.total.max(1));
+                let rest = total - m.min(total);
+                // The largest `k` with `2^k (1 − q) ≤ 1`, held to `top`.
+                let mut k = 0u32;
+                while k < top && rest << (k + 1) <= total {
+                    k += 1;
+                }
+                bands[k as usize].0 += 1;
+                if lap & ((1u64 << k) - 1) == key(ids[o], t) & ((1u64 << k) - 1) {
+                    bands[k as usize].1 += 1;
+                    places.push(t);
+                    shifts.push(k);
+                }
+            }
+            if !places.is_empty() {
+                kept_blocks.push(places);
+                kept_owners.push(o);
+                kept_shifts.push(shifts);
+            }
+        }
+        if kept_blocks.is_empty() {
+            let rates = self.family_rates.clone().unwrap_or_default();
+            return Ok(KernelReceipt { states: 0, places: 0, moved: 0, weight: 0, weight_square: 0, least: 0, most: 0, whole: 0, deposited: false, predicted: None, transfer: None, external: None, per_state: Vec::new(), log2_a: Vec::new(), newton: None, by_family: Vec::new(), rates, g_agree: (0, 0), g_gap: 0, covector: Vec::new(), bands, outside: Vec::new(), letter_counts: Vec::new(), surprise_bands: Vec::new(), kl_face: 0, moments: [0; 8], coin_measure: None });
+        }
+        let mut receipt = self.section_conditional_weighed(truth, &kept_owners, &kept_blocks, &kept_shifts, None, realization)?;
+        receipt.bands = bands;
+        Ok(receipt)
+    }
+
+    /// [`FieldLearner::section_conditional`] with each place's covectors weighed by `2^shifts[b][i]`.
+    /// [definition; the unified-theory reading of November 7, 22:08] **The letters' coin**: [`FieldLearner::section_conditional`]
+    /// with every letter's energy read forward only (its `G` is the material read's), so each place's conditional `p` is whole,
+    /// and the reverse run only for the letters a coin keeps: letter `v` with chance `2^(−k_v)`, `k_v = max(0, ⌈log₂(τ/p(v))⌉)`
+    /// for `τ = 2^(−tau_bits)`, on a coin keyed by `key`, the place and the letter, its covector weighed by `2^(k_v)`. The
+    /// covector's expectation is the full conditional's, so the rest is the held code's; the letters' temperature reads every
+    /// letter's `G`. With `τ` at or below every nonzero `p(v)` every letter is kept at weight one and the section is
+    /// [`FieldLearner::section_conditional`]'s bit for bit.
+    pub fn section_conditional_coin(&mut self, truth: &[Region], owners: &[usize], blocks: &[Vec<usize>], tau_bits: u32, key: u64, realization: &mut dyn FieldRealization) -> Result<KernelReceipt> {
+        let shifts: Vec<Vec<u32>> = blocks.iter().map(|b| vec![0; b.len()]).collect();
+        self.section_conditional_weighed(truth, owners, blocks, &shifts, Some((tau_bits, key)), realization)
+    }
+
+    fn section_conditional_weighed(&mut self, truth: &[Region], owners: &[usize], blocks: &[Vec<usize>], shifts: &[Vec<u32>], coin: Option<(u32, u64)>, realization: &mut dyn FieldRealization) -> Result<KernelReceipt> {
+        let f = &self.field;
+        if !f.declaration.energy || f.scale.is_some() {
+            return refuse("a conditional section of a field without one energy");
+        }
+        if truth.is_empty() || blocks.is_empty() || owners.len() != blocks.len() || owners.iter().any(|&o| o >= truth.len()) || blocks.iter().zip(owners).any(|(b, &o)| b.is_empty() || b.iter().any(|&t| t >= truth[o].classes.len() || truth[o].unresolved[t])) {
+            return refuse("a conditional section needs nonempty blocks of resolved places, each a problem's");
+        }
+        let alphabet = f.declaration.alphabet;
+        let inverse = temperature_of(-f.theta[f.layout.face_temper], &f.fine)?;
+        const OVER: &str = "a conditional covector past its 128-bit carrier";
+        let families = f.families_all();
+        let material = f.material_len();
+        let natural = |gt: &[i128], gv: &[i128]| material_change(&families, material, inverse, gt, gv, OVER);
+        if shifts.len() != blocks.len() || shifts.iter().zip(blocks).any(|(s, b)| s.len() != b.len()) {
+            return refuse("a weighed conditional section needs one shift a place");
+        }
+        let places: Vec<(usize, usize)> = blocks.iter().zip(owners).flat_map(|(b, &o)| b.iter().map(move |&t| (o, t))).collect();
+        let place_shift: Vec<u32> = shifts.iter().flatten().copied().collect();
+        let resolved: Vec<Vec<bool>> = truth.iter().map(|r| vec![false; r.classes.len()]).collect();
+        // The faces at the truth, each problem's places open carrying their letters whole: one read a problem (theory 21:44).
+        let one = 1u32 << STATE_BITS;
+        let opened: Vec<(Vec<bool>, Vec<Option<Shares>>)> = (0..truth.len())
+            .map(|p| {
+                let sites = truth[p].classes.len();
+                let (mut open, mut carried) = (vec![false; sites], vec![None; sites]);
+                for &(o, t) in places.iter().filter(|&&(o, _)| o == p) {
+                    open[t] = true;
+                    carried[t] = Some(vec![(truth[o].classes[t] as u32, one)]);
+                }
+                (open, carried)
+            })
+            .collect();
+        let views: Vec<Region> = (0..truth.len()).map(|p| Region { classes: truth[p].classes, unresolved: &opened[p].0, faces: &opened[p].1, locked: &opened[p].0, echo: &[], domain: None, port: None }).collect();
+        let (truth_faces, _) = realization.read_energy_faces(f, &views)?;
+        let mut outside = Vec::with_capacity(places.len());
+        let (mut letter_counts, mut surprise_bands, mut kl_face, mut moments) = (vec![0i128; alphabet], vec![0usize; 17], 0i128, [0i128; 8]);
+        let mut unigram_acc = self.unigram.as_ref().map(|_| UnigramSection::new(alphabet));
+        const TAUS: usize = 16;
+        let mut measure = CoinMeasure { places: 0, regions: 0, forward_us: 0, material_us: 0, kept: vec![0; TAUS], v_coin: vec![0; TAUS], v_deposit: 0 };
+        // Each place's full deposit on the metric, kept only while measuring, for the deposits' spread across places.
+        let mut deposits: Vec<Vec<i128>> = Vec::new();
+        let second = self.second.clone();
+        // `‖x‖²` on the step's metric: `Σ_i x_i²/v_i` over the entries whose second moment is open, each ratio read at 40 bits of
+        // its root's width.
+        let metric = |x: &[i128]| -> u128 {
+            x.iter().zip(&second).filter(|&(_, &v)| v > 0).fold(0u128, |acc, (&xi, &v)| {
+                let sq = xi.unsigned_abs().checked_mul(xi.unsigned_abs()).unwrap_or_else(|| {
+                    crate::number::census::tally("coin measure: a square saturated", 1);
+                    u128::MAX
+                });
+                let s = (128 - (v as u128).leading_zeros()).saturating_sub(40);
+                let term = (sq >> s) / ((v as u128) >> s).max(1);
+                acc.checked_add(term).unwrap_or_else(|| {
+                    crate::number::census::tally("coin measure: the metric's sum saturated", 1);
+                    u128::MAX
+                })
+            })
+        };
+        let mut g = vec![0i128; material];
+        // `Σ_places Σ_v p(v)(G(t) − G(x_v))` on 2^(−32): the letters' temperature's operand.
+        let mut gap = 0i128;
+        let (mut weight, mut weight_square, mut least, mut most, mut whole) = (0i128, 0i128, i128::MAX, 0i128, 0usize);
+        let mut per_state = Vec::with_capacity(places.len());
+        let mut log2_p = Vec::with_capacity(places.len());
+        const CHUNK: usize = CONDITIONAL_CHUNK;
+        for (c, chunk) in places.chunks(CHUNK).enumerate() {
+            let configs = conditional_configurations(truth, chunk, alphabet);
+            let regions = conditional_regions(&configs, &resolved, chunk, alphabet);
+            // Each place's letters' energies and, where a letter's reverse is read, its material covector and its coin's `k`.
+            let (energies, materials): (Vec<i128>, Vec<Option<(Vec<i128>, u32)>>) = match coin {
+                None => {
+                    if self.coin_measure {
+                        let asked: Vec<&[usize]> = configs.iter().map(Vec::as_slice).collect();
+                        let t = std::time::Instant::now();
+                        let _ = realization.read_energies(f, &asked)?;
+                        measure.forward_us += t.elapsed().as_micros();
+                    }
+                    let t = std::time::Instant::now();
+                    let reads = conditional_material_reads(f, &regions, realization)?;
+                    measure.material_us += t.elapsed().as_micros();
+                    measure.regions += regions.len();
+                    reads
+                }
+                Some((tau_bits, key)) => {
+                    let asked: Vec<&[usize]> = configs.iter().map(Vec::as_slice).collect();
+                    let g = realization.read_energies(f, &asked)?;
+                    // The conditional a place, as below, to read each letter's coin.
+                    let mut keep: Vec<Option<u32>> = vec![None; g.len()];
+                    for (i, &(o, t)) in chunk.iter().enumerate() {
+                        let gs = &g[i * alphabet..(i + 1) * alphabet];
+                        let p = conditional_shares(gs, inverse, &f.fine)?;
+                        let at = truth[o].classes[t];
+                        let tau = 1i128 << (MATERIAL_BITS.saturating_sub(tau_bits.min(MATERIAL_BITS)));
+                        for v in 0..alphabet {
+                            if v == at {
+                                keep[i * alphabet + v] = Some(0);
+                                continue;
+                            }
+                            if p[v] == 0 {
+                                continue;
+                            }
+                            // `k = ⌈log₂(τ / p)⌉`, zero where `p ≥ τ`.
+                            let mut k = 0u32;
+                            while (p[v] << k) < tau && k < 62 {
+                                k += 1;
+                            }
+                            let place = (c * CHUNK + i) as u64;
+                            let draw = { let mut z = key ^ place.wrapping_mul(0x9E37_79B9_7F4A_7C15) ^ (v as u64).wrapping_mul(0xBF58_476D_1CE4_E5B9); z = (z ^ (z >> 30)).wrapping_mul(0xBF58_476D_1CE4_E5B9); z = (z ^ (z >> 27)).wrapping_mul(0x94D0_49BB_1331_11EB); z ^ (z >> 31) };
+                            if k == 0 || draw & ((1u64 << k) - 1) == 0 {
+                                keep[i * alphabet + v] = Some(k);
+                            }
+                        }
+                    }
+                    let kept: Vec<usize> = (0..g.len()).filter(|&j| keep[j].is_some()).collect();
+                    let kept_regions: Vec<Region> = kept.iter().map(|&j| regions[j]).collect();
+                    let reads = realization.read_energy_material(f, &kept_regions)?;
+                    let mut materials: Vec<Option<(Vec<i128>, u32)>> = vec![None; g.len()];
+                    for (&j, r) in kept.iter().zip(reads) {
+                        materials[j] = Some((r.0, keep[j].unwrap_or(0)));
+                    }
+                    (g, materials)
+                }
+            };
+            for (i, &(o, t)) in chunk.iter().enumerate() {
+                let gs = &energies[i * alphabet..(i + 1) * alphabet];
+                let reads = &materials[i * alphabet..(i + 1) * alphabet];
+                let at = truth[o].classes[t];
+                // Each letter's `log₂ w = −(G(x_v) − G_min)/T` on 2^(−32), and its share on 2^(−24).
+                let (logs, z, p) = conditional_place_shares(gs, inverse, &f.fine)?;
+                census_conditional_place(logs.iter().map(|&l| l >> (ENERGY_BITS - MATERIAL_BITS)), &p, Some(at), &f.fine)?;
+                if let Some(acc) = unigram_acc.as_mut() {
+                    acc.place(&logs, log2_mass(z), at, &f.fine)?;
+                }
+                let mt = &reads[at].as_ref().ok_or(TowerError::Refused("a conditional place whose truth was not read"))?.0;
+                if self.coin_measure && coin.is_none() {
+                    measure.places += 1;
+                    let mut place_deposit = vec![0i128; material];
+                    for v in 0..alphabet {
+                        if v == at || p[v] == 0 {
+                            continue;
+                        }
+                        let Some((mv, _)) = &reads[v] else { continue };
+                        let d = natural(mt, mv)?;
+                        for (acc, &x) in place_deposit.iter_mut().zip(&d) {
+                            *acc += release(x.checked_mul(p[v]).inspect(|v| crate::number::census::reach(OVER, v)).ok_or(TowerError::Refused(OVER))?, MATERIAL_BITS);
+                        }
+                        let norm = metric(&d);
+                        for b in 1..=TAUS as u32 {
+                            let tau = 1i128 << (MATERIAL_BITS - b.min(MATERIAL_BITS));
+                            let mut k = 0u32;
+                            while (p[v] << k) < tau && k < 62 {
+                                k += 1;
+                            }
+                            measure.kept[b as usize - 1] += (1i128 << MATERIAL_BITS) >> k;
+                            if k > 0 {
+                                // (2^k − 1) p² ‖d‖², p on 2^(−24): released twice.
+                                let pp = (p[v] as u128 * p[v] as u128) >> (2 * MATERIAL_BITS - 16);
+                                if norm.checked_mul(pp).and_then(|x| x.checked_mul((1u128 << k) - 1)).is_none() {
+                                    crate::number::census::tally("coin measure: a v_coin term saturated", 1);
+                                }
+                                let term = norm.saturating_mul(pp).saturating_mul((1u128 << k) - 1) >> 16;
+                                if measure.v_coin[b as usize - 1].checked_add(term).is_none() {
+                                    crate::number::census::tally("coin measure: v_coin's sum saturated", 1);
+                                }
+                                measure.v_coin[b as usize - 1] = measure.v_coin[b as usize - 1].saturating_add(term);
+                            }
+                        }
+                    }
+                    deposits.push(place_deposit);
+                }
+                // The place's covector at its beat weight `2^k` (one where every place is read), added into the section's: the
+                // temperature reads every letter's `G`; the material only the letters whose reverse a coin kept.
+                let k = place_shift[c * CHUNK + i];
+                let place_gap = conditional_place_covector(&families, material, inverse, gs, reads, &p, at, k, &mut g)?;
+                gap = gap.checked_add(place_gap).ok_or(TowerError::Refused(OVER))?;
+                for (v, &pv) in p.iter().enumerate() {
+                    letter_counts[v] += if v == at { (1i128 << MATERIAL_BITS) - pv } else { -pv };
+                }
+                if let Some(face) = truth_faces[o].get(t).and_then(Option::as_ref) {
+                    let (m, total) = (face.masses[at], face.total.max(1));
+                    let rest = total - m.min(total);
+                    let mut k = 0usize;
+                    while k < 16 && rest << (k + 1) <= total {
+                        k += 1;
+                    }
+                    surprise_bands[k] += 1;
+                    // KL(p ‖ face) in bits on 2^(−32): Σ_v p(v)(log₂ p(v) + code_face(v)), each log₂ p(v) = logs[v] − log₂ z.
+                    let log2_z = log2_mass(z);
+                    // [measurement; theory, November 8 13:11] The place's seven moments of the conditional against its face, in bits
+                    // on 2^(−32) (bits² for the last three), each weighed by the place's beat `2^k`: the code −log₂ p(t), H(p), f(t)
+                    // with f = log₂(p/face), E_p f, Var_p log₂ p, Var_p f and Cov_p(log₂ p, f); the eighth is the weight.
+                    let (mut h, mut ef, mut lp2, mut f2, mut lpf) = (0i128, 0i128, 0i128, 0i128, 0i128);
+                    for (v, &pv) in p.iter().enumerate() {
+                        if pv > 0 {
+                            let log2_p = logs[v] - log2_z;
+                            let fv = log2_p + ((face.code(v) as i128) << (ENERGY_BITS - 20));
+                            kl_face += release(pv * fv, MATERIAL_BITS);
+                            h -= release(pv * log2_p, MATERIAL_BITS);
+                            ef += release(pv * fv, MATERIAL_BITS);
+                            lp2 += release(release(pv * log2_p, MATERIAL_BITS) * log2_p, ENERGY_BITS);
+                            f2 += release(release(pv * fv, MATERIAL_BITS) * fv, ENERGY_BITS);
+                            lpf += release(release(pv * log2_p, MATERIAL_BITS) * fv, ENERGY_BITS);
+                        }
+                    }
+                    let lp_t = logs[at] - log2_z;
+                    let f_t = lp_t + ((face.code(at) as i128) << (ENERGY_BITS - 20));
+                    let beat = place_shift[c * CHUNK + i];
+                    let elp = -h;
+                    let place = [
+                        -lp_t,
+                        h,
+                        f_t,
+                        ef,
+                        lp2 - release(elp * elp, ENERGY_BITS),
+                        f2 - release(ef * ef, ENERGY_BITS),
+                        lpf - release(elp * ef, ENERGY_BITS),
+                        1,
+                    ];
+                    for (acc, x) in moments.iter_mut().zip(place) {
+                        *acc += x << beat;
+                    }
+                    let mut order: Vec<usize> = (0..alphabet).collect();
+                    order.sort_by_key(|&v| (std::cmp::Reverse(face.masses[v]), v));
+                    let beyond = |top: usize| -> i128 { order[top.min(alphabet)..].iter().map(|&v| p[v]).sum() };
+                    outside.push([beyond(4), beyond(8), beyond(16)]);
+                }
+                let pt = p[at];
+                (weight, weight_square, least, most) = (weight + pt, weight_square + release(pt * pt, MATERIAL_BITS), least.min(pt), most.max(pt));
+                whole += usize::from(p.iter().all(|&x| x <= pt));
+                per_state.push((1, pt));
+                log2_p.push(logs[at] - log2_mass(z));
+            }
+        }
+        let coin_measure = (self.coin_measure && coin.is_none() && !deposits.is_empty()).then(|| {
+            let n = deposits.len() as i128;
+            let mean: Vec<i128> = (0..material).map(|i| deposits.iter().map(|d| d[i]).sum::<i128>() / n).collect();
+            measure.v_deposit = deposits.iter().fold(0u128, |acc, d| {
+                acc.checked_add(metric(&d.iter().zip(&mean).map(|(&a, &b)| a - b).collect::<Vec<_>>())).unwrap_or_else(|| {
+                    crate::number::census::tally("coin measure: v_deposit saturated", 1);
+                    u128::MAX
+                })
+            });
+            measure.clone()
+        });
+        if self.temper_learns {
+            g[f.layout.face_temper] = temper_covector(gap, inverse)?;
+        }
+        if let (Some(acc), Some(carry)) = (unigram_acc.take(), self.unigram.as_mut()) {
+            self.unigram_step = acc.finish(carry, inverse, &self.field.fine)?;
+        }
+        let bias_before = self.unigram.as_ref().map(|_| {
+            let start = self.field.layout.read_bias;
+            self.field.theta[start..start + alphabet].to_vec()
+        });
+        let raw = g.clone();
+        let Deposit { moved: deposited, predicted, transfer, external, by_family } = self.deposit(g)?;
+        // [definition; theory, November 8 13:59] The carried mass follows what c actually did: each letter's mass re-based by
+        // the realized change of its bias, log₂ M_a += Δc_a/T, in both modes (in shadow c moves by the moments), then put back
+        // on the carried places (Σ_a M_a = places, a common shift of c, a gauge).
+        if let (Some(before), Some(carry)) = (bias_before, self.unigram.as_mut()) {
+            let start = self.field.layout.read_bias;
+            for (a, &b) in before.iter().enumerate() {
+                let dc = self.field.theta[start + a] as i128 - b as i128;
+                if let Some(m) = carry.mass[a].as_mut() {
+                    *m += (dc * inverse) >> 8;
+                }
+            }
+            carry.normalize(&self.field.fine)?;
+        }
+        let rates = self.family_rates.clone().unwrap_or_default();
+        let n = places.len();
+        Ok(KernelReceipt { states: n, places: n, moved: 0, weight, weight_square, least, most, whole, deposited, predicted, transfer, external, per_state, log2_a: log2_p, newton: None, by_family, rates, g_agree: (0, 0), g_gap: 0, covector: raw, bands: Vec::new(), outside, letter_counts, surprise_bands, kl_face, moments, coin_measure })
     }
 
     /// [definition; agent-inferred, November 3, the tower record] **The learner grown in scale**: its field grown in scale
-    /// ([`Field::scaled_up`], the key stream read on from the learner's drawn bytes), its moments kept on the fine field's
-    /// material and opened at zero on the packets' field's and the glue's, which every coordinate opens at its own first
-    /// nonzero covector.
+    /// ([`Field::scaled_up`], the key stream read on from the learner's drawn bytes), its moments and carried remainders kept
+    /// on the fine field's material and opened at zero on the packets' field's and the glue's, which every coordinate opens at
+    /// its own first nonzero covector.
     pub fn scaled_up(&self, period: usize, split: usize, declaration: FieldDeclaration, keys: &[u8]) -> Result<Self> {
         let (field, drawn) = self.field.scaled_up(period, split, declaration, keys, self.drawn)?;
         let len = field.material_len();
-        let (mut first, mut second) = (self.first.clone(), self.second.clone());
+        let (mut first, mut second, mut carried) = (self.first.clone(), self.second.clone(), self.carried.clone());
         first.resize(len, 0);
         second.resize(len, 0);
-        Ok(Self { field, first, second, rate_bits: self.rate_bits, drawn, laps: self.laps, held: None, read_held: self.read_held, last: None })
+        carried.resize(len, 0);
+        Ok(Self { field, first, second, rate_bits: self.rate_bits, drawn, laps: self.laps, held: None, read_held: self.read_held, newton_read: self.newton_read, first_rate: self.first_rate, second_rate: self.second_rate, family_rates: None, temper_learns: false, family_transfer: Vec::new(), family_price: Vec::new(), last: None, average: None, carried, unigram: None, unigram_step: None, coin_measure: false, key: None })
     }
 
     /// [measurement; agent-inferred, November 3, §16.31] **Each family's step coherence**: over the family's entries, `Σ |m|`
@@ -4939,6 +8158,67 @@ impl FieldLearner {
             .collect()
     }
 
+    /// [measurement; theory, November 8, the line reading] **The deposit's next step and the first moment, as directions of
+    /// `θ`** (a reading: nothing is moved).
+    ///
+    /// `step` is the step [`FieldLearner::deposit`] forms from the learner's own moments before a section's covector moves
+    /// them (the external step that `deposit` prices on each section), each family at its own length as the learner holds
+    /// it: `2^(−ρ_f)` from [`FieldLearner::family_rates`] where the learner carries them (the whole bits as the deposit's
+    /// shift, the fraction through the exponential's navigator), `2^(−rate_bits)` for every family otherwise (the rate at
+    /// sixteen states a section). Each entry is formed on `2^(−24)` of its family's grain, the carried release's places
+    /// ([`FieldLearner::carried`]: the shift's and the division's truncation taken there), with no carried remainder, and put
+    /// on [`LINE_BITS`]. `released` is the same step as the deposit takes it, on each family's grain: each entry's carried
+    /// remainder added and the sum released to the grain (theory, November 9 05:00: the carried release is the deposit), so
+    /// the line's first point is read beside what the learner itself moves.
+    ///
+    /// `first` is the first moment `m` (the code's covector in `θ`'s own unit, on `2^(−32)`) scaled to `step`'s norm,
+    /// `u_i = m_i ‖step‖ / ‖m‖` on [`LINE_BITS`], with neither the second moment nor a family's length in it.
+    ///
+    /// A bias step that stands in for the moments' ([`FieldLearner::unigram_step`]) is not carried by a state and is not in
+    /// `step`; under the unigram law's shadow the bias steps by the moments, as here.
+    pub fn line_directions(&self) -> Result<LineDirections> {
+        const PAST: &str = "a line's direction past its 128-bit carrier";
+        let families = self.field.families_all();
+        let len = self.field.material_len();
+        let (mut step, mut released) = (vec![0i128; len], vec![0i128; len]);
+        if self.carried.len() != len {
+            return refuse("a learner's carried remainders that are not its material's length");
+        }
+        for (k, &(start, n, grain)) in families.iter().enumerate() {
+            let up = LINE_BITS.checked_sub(grain + MATERIAL_BITS).ok_or(TowerError::Refused("a family finer than the line's grain"))?;
+            let rho = match &self.family_rates {
+                Some(rates) => *rates.get(k).ok_or(TowerError::Refused("a learner's family lengths that are not one a family"))?,
+                None => i128::from(self.rate_bits) << MATERIAL_BITS,
+            };
+            let (whole, part) = (rho >> MATERIAL_BITS, (rho & ((1 << MATERIAL_BITS) - 1)) as i32);
+            let scale = temperature_of(-part, &self.field.fine)?;
+            // `x 2^(−whole) / root`: the deposit's shift, a left shift checked at its carrier where `whole < 0`.
+            let over = |x: i128, root: i128| -> Result<i128> {
+                if whole >= 0 {
+                    Ok((x >> whole.min(127)) / root)
+                } else {
+                    let bits = u32::try_from(-whole).map_err(|_| TowerError::Refused(PAST))?;
+                    let lift = 1i128.checked_shl(bits).filter(|&b| b > 0).ok_or(TowerError::Refused(PAST))?;
+                    Ok(x.checked_mul(lift).ok_or(TowerError::Refused(PAST))? / root)
+                }
+            };
+            for i in start..start + n {
+                let root = super::deposit_root(self.second[i]);
+                let num = self.first[i].checked_mul(1i128 << grain).ok_or(TowerError::Refused(PAST))?;
+                let full = over(num.checked_mul(scale).ok_or(TowerError::Refused(PAST))?, root)?;
+                step[i] = full.checked_mul(1i128 << up).ok_or(TowerError::Refused(PAST))?;
+                released[i] = release(full.checked_add(i128::from(self.carried[i])).ok_or(TowerError::Refused(PAST))?, MATERIAL_BITS);
+            }
+        }
+        let (step_norm, first_norm) = (line_norm(&step)?, line_norm(&self.first)?);
+        if step_norm == 0 || first_norm == 0 {
+            return refuse("a line along moments that are zero");
+        }
+        let (to, from) = (i128::try_from(step_norm).map_err(|_| TowerError::Refused(PAST))?, i128::try_from(first_norm).map_err(|_| TowerError::Refused(PAST))?);
+        let first = self.first.iter().map(|&m| m.checked_mul(to).map(|x| div_nearest(x, from)).ok_or(TowerError::Refused(PAST))).collect::<Result<_>>()?;
+        Ok(LineDirections { step, first, released, step_norm, first_norm })
+    }
+
     /// The learner as text: its head line (the held step's halvings, or `-`), the field, each
     /// moment on one line, then the held step on one line when one is held.
     pub fn to_text(&self) -> String {
@@ -4947,7 +8227,35 @@ impl FieldLearner {
             Some(h) => (h.halvings.to_string(), format!("{}\n", join(&h.step))),
             None => ("-".to_string(), String::new()),
         };
-        format!("hnn-field-learner-v3 {} {} {} {held}\n{}{}\n{}\n{step}", self.rate_bits, self.drawn, self.laps, self.field.to_text(), join(&self.first), join(&self.second))
+        // [definition; the unified-theory reading of November 7, 07:24] Each family's length and its two averages are carried,
+        // so a continued learner keeps the lengths its families read; the line opens with the averages' grain in bits
+        // ([`PRICE_BITS`], theory, November 9 05:00).
+        let lengths = match &self.family_rates {
+            Some(rates) => format!("family-lengths {PRICE_BITS} {}\n", join(&rates.iter().zip(&self.family_transfer).zip(&self.family_price).flat_map(|((&r, &t), &p)| [r, t, p]).collect::<Vec<_>>())),
+            None => String::new(),
+        };
+        let average = match &self.average {
+            Some(avg) => format!("average {}\n", avg.iter().map(i64::to_string).collect::<Vec<_>>().join(" ")),
+            None => String::new(),
+        };
+        // [definition; theory, November 9 05:00] Every state saves its carried remainders.
+        let carried = format!("carried {}\n", self.carried.iter().map(i64::to_string).collect::<Vec<_>>().join(" "));
+        let unigram = match &self.unigram {
+            Some(c) => format!(
+                "unigram {} | {}\n",
+                c.counts.iter().map(u64::to_string).collect::<Vec<_>>().join(" "),
+                c.mass.iter().map(|m| m.map_or("-".to_string(), |v| v.to_string())).collect::<Vec<_>>().join(" ")
+            ),
+            None => String::new(),
+        };
+        // The last step, and after ` | ` the step as its section formed it where it holds one.
+        let last = match &self.last {
+            Some(l) if l.formed.is_empty() => format!("last {} {}\n", l.halvings, join(&l.step)),
+            Some(l) => format!("last {} {} | {}\n", l.halvings, join(&l.step), join(&l.formed)),
+            None => String::new(),
+        };
+        let key = self.key.map_or(String::new(), |k| format!("key {k:016x}\n"));
+        format!("hnn-field-learner-v3 {} {} {} {held}\n{}{}\n{}\n{step}{lengths}{average}{carried}{unigram}{last}{key}", self.rate_bits, self.drawn, self.laps, self.field.to_text(), join(&self.first), join(&self.second))
     }
 
     pub fn from_text(text: &str) -> Result<Self> {
@@ -4974,15 +8282,121 @@ impl FieldLearner {
                 if step.len() != field.material_len() {
                     return refuse("a learner's held step that is not its field's length");
                 }
-                Some(HeldStep { step, halvings })
+                Some(HeldStep { step, halvings, formed: Vec::new() })
             }
         };
-        Ok(Self { field, first, second, rate_bits, read_held: held.is_some(), drawn, laps, held, last: None })
+        let families = field.families_all().len();
+        let lengths_line = match lines.peek() {
+            Some(l) if l.starts_with("family-lengths ") => lines.next(),
+            _ => None,
+        };
+        // [definition; theory, November 9 05:00] The line opens with its averages' grain in bits ([`PRICE_BITS`]); a line written
+        // before the length law priced the carried step has none and kept them on the codes' 2^(−20), lifted here to the
+        // price's grain so the averages continue (the transfer and the price lift alike, so their ratio is the one the state
+        // read).
+        let (family_rates, family_transfer, family_price) = match lengths_line.and_then(|l| l.strip_prefix("family-lengths ")) {
+            Some(rest) => {
+                let v = read_numbers::<i128>(Some(rest))?;
+                let (bits, v) = match v.len() {
+                    n if n == 3 * families => (20, &v[..]),
+                    n if n == 3 * families + 1 => (v[0], &v[1..]),
+                    _ => return refuse("a learner's family lengths that are not three a family"),
+                };
+                let lift = u32::try_from(i128::from(PRICE_BITS) - bits).ok().filter(|&l| l < 64).ok_or(TowerError::Refused("a learner's family averages on a grain finer than the price's"))?;
+                let lifted = |x: i128| x.checked_mul(1i128 << lift).ok_or(TowerError::Refused("a learner's family averages past their carrier"));
+                (
+                    Some(v.iter().step_by(3).copied().collect()),
+                    v.iter().skip(1).step_by(3).map(|&t| lifted(t)).collect::<Result<_>>()?,
+                    v.iter().skip(2).step_by(3).map(|&p| lifted(p)).collect::<Result<_>>()?,
+                )
+            }
+            None => (None, Vec::new(), Vec::new()),
+        };
+        let average_line = match lines.peek() {
+            Some(l) if l.starts_with("average ") => lines.next(),
+            _ => None,
+        };
+        let average = match average_line.and_then(|l| l.strip_prefix("average ")) {
+            Some(rest) => {
+                let v = read_numbers::<i64>(Some(rest))?;
+                if v.len() != field.theta.len() {
+                    return refuse("a learner's averaged constitution that is not its field's length");
+                }
+                Some(v)
+            }
+            None => None,
+        };
+        let carried_line = match lines.peek() {
+            Some(l) if l.starts_with("carried ") => lines.next(),
+            _ => None,
+        };
+        // [definition; theory, November 9 05:00] A state without a `carried` line opens its remainders at zero.
+        let carried = match carried_line.and_then(|l| l.strip_prefix("carried ")) {
+            Some(rest) => {
+                let v = read_numbers::<i64>(Some(rest))?;
+                if v.len() != field.material_len() {
+                    return refuse("a learner's carried remainders that are not its material's length");
+                }
+                v
+            }
+            None => vec![0; field.material_len()],
+        };
+        let unigram_line = match lines.peek() {
+            Some(l) if l.starts_with("unigram ") => lines.next(),
+            _ => None,
+        };
+        let unigram = match unigram_line.and_then(|l| l.strip_prefix("unigram ")) {
+            Some(rest) => {
+                let (counts, mass) = rest.split_once(" | ").ok_or(TowerError::Refused("a learner's unigram line without its mass"))?;
+                let counts = read_numbers::<u64>(Some(counts))?;
+                let mass: Vec<Option<i128>> = mass
+                    .split_whitespace()
+                    .map(|m| if m == "-" { Ok(None) } else { m.parse::<i128>().map(Some).map_err(|_| TowerError::Refused("a learner's unigram mass that is not a number")) })
+                    .collect::<Result<_>>()?;
+                if counts.len() != field.declaration.alphabet || mass.len() != counts.len() {
+                    return refuse("a learner's unigram sums that are not one a letter");
+                }
+                Some(UnigramCarry { counts, mass, applied: false })
+            }
+            None => None,
+        };
+        // [definition; November 8] The step the last section stood at, carried so a resumed run prices its first section's
+        // transfer and moves the family rates as the unbroken run does (a resume without it broke bits at its second deposit);
+        // after ` | ` the step as its section formed it on the carry's grain (theory, November 9 05:51), none in a state saved
+        // before.
+        let last = match lines.peek() {
+            Some(l) if l.starts_with("last ") => {
+                let line = lines.next().unwrap_or("").strip_prefix("last ").unwrap_or("");
+                let (moved, beside) = line.split_once(" | ").map_or((line, None), |(m, c)| (m, Some(c)));
+                let mut parts = moved.splitn(2, ' ');
+                let halvings = parts.next().unwrap_or("").parse::<u32>().map_err(|_| TowerError::Refused("a learner's last halvings that are not a count"))?;
+                let step = read_numbers::<i128>(parts.next())?;
+                let formed = beside.map_or(Ok(Vec::new()), |c| read_numbers::<i128>(Some(c)))?;
+                if step.len() != field.material_len() || !(formed.is_empty() || formed.len() == step.len()) {
+                    return refuse("a learner's last step that is not its material's length");
+                }
+                if !formed.is_empty() && halvings != 0 {
+                    return refuse("a learner's last step holding a formed step beside a halved step");
+                }
+                Some(HeldStep { step, halvings, formed })
+            }
+            _ => None,
+        };
+        let key = match lines.peek() {
+            Some(l) if l.starts_with("key ") => {
+                let hex = lines.next().unwrap_or("").strip_prefix("key ").unwrap_or("");
+                Some(u64::from_str_radix(hex.trim(), 16).map_err(|_| TowerError::Refused("a learner's key that is not hexadecimal"))?)
+            }
+            _ => None,
+        };
+        Ok(Self { field, first, second, rate_bits, read_held: held.is_some(), newton_read: false, first_rate: FIRST_RATE, second_rate: SECOND_RATE, family_rates, temper_learns: false, family_transfer, family_price, drawn, laps, held, last, average, carried, unigram, unigram_step: None, coin_measure: false, key })
     }
 }
 
+mod energy;
 pub mod moment;
 mod scale;
+pub use energy::{BaseHold, EnergyHeldClasses, EnergyLead, EnergyOpeningWords, EnergyPairKinds, EnergyRead, EnergyRest, HeldSite, RestEnd, RestMode, RestTick, RestTry, EnergySquare, EnergyTangentRead, SquareCorners, ENERGY_BITS, FIRST_HALVINGS, STEP_CARRIER_HALVINGS};
 pub use scale::Scale;
 
 #[cfg(test)]
@@ -5004,9 +8418,24 @@ pub fn octave_of(d: usize) -> u32 {
     usize::BITS - 1 - d.leading_zeros()
 }
 
+/// A face restricted to the letters, the void's mass removed (`None` where no letter has mass): the face a place before an
+/// answer's last letter is drawn from ([`Field::release`]).
+pub fn letters_face(face: &TowerFace, void: usize) -> Option<TowerFace> {
+    let total = face.total - face.masses[void];
+    (total > 0).then(|| TowerFace { masses: face.masses.iter().enumerate().map(|(c, &m)| if c == void { 0 } else { m }).collect(), total })
+}
+
+/// [definition; agent-inferred, November 6] A face's varentropy `Σ_a p(a) (−log₂ p(a))² − H²`, the spread of a draw's
+/// code about the entropy it expects, on `2^(−40)` bits² ([`Field::release`]'s rest).
+pub fn varentropy(face: &TowerFace) -> i128 {
+    let second: u128 = face.masses.iter().enumerate().filter(|&(_, &m)| m > 0).map(|(a, &m)| m * (face.code(a) as u128).pow(2)).sum();
+    let h = entropy(face);
+    div_nearest(second as i128, face.total as i128) - h * h
+}
+
 /// [definition; §16.47] A face's entropy `Σ_a p(a) (−log₂ p(a))` on the codes' `2^(−20)` bits, each class's code
 /// ([`TowerFace::code`]) weighed by its mass over the total and the sum released once at its nearest.
-fn entropy(face: &TowerFace) -> i128 {
+pub fn entropy(face: &TowerFace) -> i128 {
     let sum: i128 = face.masses.iter().enumerate().filter(|&(_, &m)| m > 0).map(|(a, &m)| m as i128 * face.code(a) as i128).sum();
     div_nearest(sum, face.total as i128)
 }

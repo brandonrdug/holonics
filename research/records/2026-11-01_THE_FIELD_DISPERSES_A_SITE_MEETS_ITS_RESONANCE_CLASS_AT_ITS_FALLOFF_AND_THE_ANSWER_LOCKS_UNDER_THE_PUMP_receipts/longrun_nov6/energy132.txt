@@ -1,0 +1,26 @@
+# energy132: the founding's squares at one base on the card (CardField::energy_squares through read_energy_squares). Two reads
+# of energy131's 2,560 squares: at T0 (TEMPERED.STATE, against the host's energy131 bit for bit) and at T = 1 (FOUNDED.STATE, the
+# raw faces: T only rescales, so the attribution read's curl/readings is read there clear of the face's grain at T0, where its
+# readings were 3-20 units of 2^-16). Projection: 25 ms a square on the card (the worker's receipt) -> about 64 s a read with the
+# host's part; outer deadline 600 s each. RTX 4080 SUPER under .local/gpu.lock; host part one process, 8 threads.
+# lock taken 02:42:50, binary 70f7cb2fc651dbcc
+== t0
+FIELD_CURL problems=32 squares=2560 regions=33280 ms=56669
+MEASURE lap=curl_t0 rc=0 wall_s=57.2 peak_rss_kib=322792
+band	squares	floored	code: mean sd curl/lam	logit: mean sd curl/lam	G/T: mean sd	logit vs G/T corr	attribution 2^-6: curl/readings	2^-4: curl/readings	readings x	curl x
+1	512	0	-0.035 0.041 1.82	-0.035 0.041 1.82	-0.001 0.006	+0.12	0.428	0.591	3.67	5.07
+2-3	512	0	-0.033 0.047 1.77	-0.033 0.047 1.77	-0.001 0.005	+0.16	0.533	0.640	3.86	4.63
+4-7	512	0	-0.031 0.059 1.97	-0.031 0.059 1.97	-0.001 0.004	-0.06	0.393	1.108	2.97	8.37
+8-15	512	0	-0.034 0.116 2.01	-0.034 0.116 2.01	-0.000 0.004	-0.08	0.387	0.669	3.90	6.75
+16+	512	0	-0.021 0.085 2.01	-0.021 0.085 2.01	-0.001 0.003	+0.11	0.445	0.520	3.74	4.38
+== raw
+FIELD_CURL problems=32 squares=2560 regions=33280 ms=57328
+MEASURE lap=curl_raw rc=0 wall_s=57.8 peak_rss_kib=320152
+band	squares	floored	code: mean sd curl/lam	logit: mean sd curl/lam	G/T: mean sd	logit vs G/T corr	attribution 2^-6: curl/readings	2^-4: curl/readings	readings x	curl x
+1	512	512	-58.076 13.324 1.72	-844.377 1011.369 1.82	-34.921 144.867	+0.11	0.414	0.574	3.71	5.13
+2-3	512	512	-55.533 15.414 2.00	-777.100 1144.424 1.80	-22.442 123.304	+0.13	0.535	0.646	3.86	4.66
+4-7	512	512	-54.150 16.593 1.91	-747.783 1424.628 1.97	-17.485 105.246	-0.05	0.390	1.107	2.97	8.42
+8-15	512	512	-51.108 17.613 2.09	-818.999 2828.829 2.01	-9.116 100.713	-0.08	0.396	0.688	3.86	6.71
+16+	512	512	-44.220 20.917 2.01	-518.807 2078.887 2.01	-18.761 75.935	+0.11	0.429	0.512	3.76	4.49
+# the card's T0 squares against the host's energy131: bit-equal
+MAIN exit 02:44:46

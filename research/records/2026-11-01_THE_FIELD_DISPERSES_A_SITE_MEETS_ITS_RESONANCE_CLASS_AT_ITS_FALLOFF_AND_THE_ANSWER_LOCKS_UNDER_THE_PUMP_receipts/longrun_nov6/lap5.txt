@@ -1,0 +1,29 @@
+# lap 5: contrast-field (the kernel negative) from lap 4's STATE.0, FIELD lines; the held places' EXACT.tsv stays private.
+FIELD_CARD_OPEN card=NVIDIA GeForce RTX 4080 SUPER free=15225651200 total=16802250752 batch_budget=10234560512
+FIELD_CONTRAST_DECLARATION alphabet=100 width=32 heads=4 modes=8 ticks=4 reach=3771 rate=12 log2_t=244430039 section=16 sections=1543 train=24685 held=128 places=64 release=kernel_spacing_11 run_bits=0 rest=false spans=false laps_read=1
+FIELD_EXACT_READ lap=-1 ms=9108
+FIELD_KERNEL_ACCEPT lap=0 states=24685 places=733804 moved=725640 accept_milli=312 sd_milli=373 whole=3342
+FIELD_EXACT_READ lap=0 ms=490785
+FIELD_CARD reads=3090 read_ms=236208 returns=1543 return_ms=247165 pairs=70757003353 batches=5103 peak_store=8186745968 landmarks=0 landmark_ms=0 elapsed_ms=490790
+MEASURE lap=lap rc=0 wall_s=491.4 peak_rss_kib=419388
+FIELD_KERNEL lap=0 n=0 states=16 places=404 moved=402 accept_milli=278 least_milli=31 most_milli=1000 whole=2 deposited=true predicted_micro=-26795 transfer_micro=- external_micro=-3911 ms_section=273 ms=9382
+FIELD_KERNEL lap=0 n=100 states=16 places=315 moved=313 accept_milli=313 least_milli=0 most_milli=1000 whole=2 deposited=true predicted_micro=-75409 transfer_micro=-16588 external_micro=-16588 ms_section=196 ms=39543
+FIELD_KERNEL lap=0 n=200 states=16 places=186 moved=185 accept_milli=470 least_milli=0 most_milli=1000 whole=3 deposited=true predicted_micro=-131347 transfer_micro=-75804 external_micro=-75804 ms_section=122 ms=65995
+FIELD_KERNEL lap=0 n=300 states=16 places=462 moved=457 accept_milli=250 least_milli=0 most_milli=1000 whole=1 deposited=true predicted_micro=-77628 transfer_micro=-40158 external_micro=-40158 ms_section=272 ms=99127
+FIELD_KERNEL lap=0 n=400 states=16 places=196 moved=195 accept_milli=500 least_milli=127 most_milli=1000 whole=3 deposited=true predicted_micro=-43931 transfer_micro=-4011 external_micro=-4011 ms_section=145 ms=128116
+FIELD_KERNEL lap=0 n=500 states=16 places=292 moved=291 accept_milli=152 least_milli=14 most_milli=893 whole=0 deposited=true predicted_micro=-11504 transfer_micro=-10723 external_micro=-10723 ms_section=177 ms=162184
+FIELD_KERNEL lap=0 n=600 states=16 places=145 moved=144 accept_milli=614 least_milli=136 most_milli=1000 whole=5 deposited=true predicted_micro=-80067 transfer_micro=-9186 external_micro=-9186 ms_section=138 ms=191095
+FIELD_KERNEL lap=0 n=700 states=16 places=290 moved=286 accept_milli=372 least_milli=29 most_milli=1000 whole=3 deposited=true predicted_micro=-48018 transfer_micro=-28195 external_micro=-28195 ms_section=189 ms=224299
+FIELD_KERNEL lap=0 n=800 states=16 places=401 moved=398 accept_milli=262 least_milli=11 most_milli=1000 whole=1 deposited=true predicted_micro=-13635 transfer_micro=-6506 external_micro=-6506 ms_section=249 ms=255412
+FIELD_KERNEL lap=0 n=900 states=16 places=210 moved=207 accept_milli=639 least_milli=152 most_milli=1000 whole=4 deposited=true predicted_micro=-6065 transfer_micro=15992 external_micro=15992 ms_section=153 ms=283481
+FIELD_KERNEL lap=0 n=1000 states=16 places=596 moved=590 accept_milli=28 least_milli=0 most_milli=327 whole=0 deposited=true predicted_micro=11014 transfer_micro=16271 external_micro=16271 ms_section=328 ms=312566
+FIELD_KERNEL lap=0 n=1100 states=16 places=676 moved=667 accept_milli=110 least_milli=0 most_milli=1000 whole=1 deposited=true predicted_micro=-56720 transfer_micro=-22113 external_micro=-22113 ms_section=359 ms=344468
+FIELD_KERNEL lap=0 n=1200 states=16 places=1554 moved=1534 accept_milli=8 least_milli=0 most_milli=44 whole=0 deposited=true predicted_micro=280 transfer_micro=1020 external_micro=1020 ms_section=1458 ms=376869
+FIELD_KERNEL lap=0 n=1300 states=16 places=362 moved=360 accept_milli=291 least_milli=4 most_milli=1000 whole=3 deposited=true predicted_micro=-4891 transfer_micro=1208 external_micro=1208 ms_section=222 ms=408595
+FIELD_KERNEL lap=0 n=1400 states=16 places=1987 moved=1958 accept_milli=16 least_milli=0 most_milli=143 whole=0 deposited=true predicted_micro=-288 transfer_micro=2131 external_micro=2131 ms_section=1834 ms=440607
+FIELD_KERNEL lap=0 n=1500 states=16 places=240 moved=238 accept_milli=327 least_milli=38 most_milli=1000 whole=2 deposited=true predicted_micro=-2168 transfer_micro=9271 external_micro=9271 ms_section=170 ms=470805
+== score
+lap	places	exact_code	face_code	kl_mean	kl_q25	kl_median	kl_q75	kl<=0.3	face_zero_letters
+-1	64	6.5257	6.5256	0.0065	0.0008	0.0021	0.0066	64/64	0
+0	64	6.5026	6.5083	0.0110	0.0015	0.0063	0.0162	64/64	0
+# exact code from lap -1 to lap 0: paired change -0.0231 bits a place, standard error 0.0172, over 64 places; falls past twice its error: False

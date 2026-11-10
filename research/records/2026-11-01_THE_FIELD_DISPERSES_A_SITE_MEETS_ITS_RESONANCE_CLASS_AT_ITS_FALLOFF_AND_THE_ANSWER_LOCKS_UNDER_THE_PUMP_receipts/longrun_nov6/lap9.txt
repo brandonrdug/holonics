@@ -1,0 +1,44 @@
+# lap 9: contrast-field from lap 8's state, the family lengths unbounded (FIELD lines).
+FIELD_ENUMERATED_READ lap=-1 ms=7783
+FIELD_KERNEL_TENTH lap=0 tenth=1 log2_t=171937182 enc=9849/-47 before=11895/-6 after=11394/-13 q=11075/-20 q_bias=10951/-12 v=12000/0 v_bias=12000/0 out=12000/0 out_bias=12000/0 a=12906/-11 a_bias=16581/119 b=13303/-4 b_bias=18259/184 w=12000/0 w_bias=12000/0 read=10741/-28 read_bias=5211/-127 moment_before=14578/77 moment_after=12192/2 temper=12000/0 probe=11644/-9 probe_bias=12150/1 pace=12000/0 moment_face=12924/6 moment_face_bias=14345/54 lift_bias=3702/-145 pair_c=13473/0 face_temper=10089/-193
+FIELD_KERNEL_TENTH lap=0 tenth=2 log2_t=171986675 enc=9478/-7 before=11940/3 after=11152/-9 q=11962/25 q_bias=12269/32 v=12000/0 v_bias=12000/0 out=12000/0 out_bias=12000/0 a=15313/33 a_bias=16581/0 b=15386/31 b_bias=18259/0 w=12000/0 w_bias=12000/0 read=11225/10 read_bias=5025/-1 moment_before=16814/84 moment_after=12589/15 temper=12000/0 probe=12147/15 probe_bias=13200/44 pace=12000/0 moment_face=15626/74 moment_face_bias=17584/407 lift_bias=5121/39 pair_c=15261/43 face_temper=21139/71
+FIELD_KERNEL_TENTH lap=0 tenth=3 log2_t=171986704 enc=9220/-6 before=11720/-5 after=10960/-2 q=12296/8 q_bias=12756/3 v=12000/0 v_bias=12000/0 out=12000/0 out_bias=12000/0 a=19874/25 a_bias=19110/1271 b=19541/17 b_bias=18259/0 w=12000/0 w_bias=12000/0 read=10320/-34 read_bias=4719/-2 moment_before=21391/278 moment_after=12546/0 temper=12000/0 probe=12174/-1 probe_bias=13845/8 pace=12000/0 moment_face=18456/13 moment_face_bias=17584/0 lift_bias=4293/-5 pair_c=19343/17 face_temper=16981/-50
+FIELD_KERNEL_TENTH lap=0 tenth=4 log2_t=171985124 enc=9529/7 before=11497/-6 after=10810/0 q=12333/0 q_bias=13957/19 v=12000/0 v_bias=12000/0 out=12000/0 out_bias=12000/0 a=22144/58 a_bias=19110/0 b=21964/62 b_bias=18259/0 w=12000/0 w_bias=12000/0 read=11112/18 read_bias=4833/-2 moment_before=21391/0 moment_after=13982/40 temper=12000/0 probe=12416/5 probe_bias=15132/17 pace=12000/0 moment_face=20476/38 moment_face_bias=17584/0 lift_bias=5968/11 pair_c=20835/78 face_temper=17443/13
+FIELD_KERNEL_TENTH lap=0 tenth=5 log2_t=171986537 enc=9256/-9 before=11547/-2 after=10982/-2 q=11246/-31 q_bias=12878/-26 v=12000/0 v_bias=12000/0 out=12000/0 out_bias=12000/0 a=22089/19 a_bias=19110/0 b=21470/16 b_bias=18259/0 w=12000/0 w_bias=12000/0 read=10188/-22 read_bias=4360/-3 moment_before=21391/0 moment_after=14425/-4 temper=12000/0 probe=11262/-30 probe_bias=14519/-48 pace=12000/0 moment_face=21715/3 moment_face_bias=17584/0 lift_bias=5699/33 pair_c=19960/39 face_temper=19056/247
+FIELD_KERNEL_TENTH lap=0 tenth=6 log2_t=171994251 enc=9467/2 before=11374/-4 after=10836/-6 q=11461/4 q_bias=13884/14 v=12000/0 v_bias=12000/0 out=12000/0 out_bias=12000/0 a=21775/-2 a_bias=19110/0 b=21285/16 b_bias=18259/0 w=12000/0 w_bias=12000/0 read=9888/-15 read_bias=4376/-9 moment_before=21391/0 moment_after=14563/-4 temper=12000/0 probe=11569/9 probe_bias=14958/18 pace=12000/0 moment_face=22850/20 moment_face_bias=17584/0 lift_bias=4807/-33 pair_c=19327/-58 face_temper=17843/-93
+FIELD_KERNEL_TENTH lap=0 tenth=7 log2_t=171994171 enc=10318/25 before=11806/12 after=11514/19 q=12008/17 q_bias=16011/66 v=12000/0 v_bias=12000/0 out=12000/0 out_bias=12000/0 a=21123/63 a_bias=19110/0 b=21116/76 b_bias=18259/0 w=12000/0 w_bias=12000/0 read=12735/102 read_bias=4635/4 moment_before=21391/0 moment_after=17610/247 temper=12000/0 probe=12497/27 probe_bias=17046/54 pace=12000/0 moment_face=23309/110 moment_face_bias=17584/0 lift_bias=6368/33 pair_c=20289/119 face_temper=18040/97
+FIELD_KERNEL_TENTH lap=0 tenth=8 log2_t=171995900 enc=10334/3 before=11385/-6 after=11363/-3 q=11843/-7 q_bias=16304/101 v=12000/0 v_bias=12000/0 out=12000/0 out_bias=12000/0 a=21577/5 a_bias=19110/0 b=21735/5 b_bias=18259/0 w=12000/0 w_bias=12000/0 read=12923/13 read_bias=4187/-11 moment_before=21391/0 moment_after=17621/0 temper=12000/0 probe=12430/0 probe_bias=17046/0 pace=12000/0 moment_face=24292/242 moment_face_bias=17584/0 lift_bias=5607/-9 pair_c=18698/-8 face_temper=16835/71
+FIELD_KERNEL_TENTH lap=0 tenth=9 log2_t=171996020 enc=10248/-2 before=11581/3 after=11681/2 q=12386/14 q_bias=16387/-33 v=12000/0 v_bias=12000/0 out=12000/0 out_bias=12000/0 a=22099/20 a_bias=19110/0 b=22377/17 b_bias=18259/0 w=12000/0 w_bias=12000/0 read=12952/-2 read_bias=4184/0 moment_before=21391/0 moment_after=17621/0 temper=12000/0 probe=12842/10 probe_bias=17046/0 pace=12000/0 moment_face=24035/-18 moment_face_bias=17584/0 lift_bias=7977/56 pair_c=21218/48 face_temper=17833/196
+FIELD_KERNEL_TENTH lap=0 tenth=10 log2_t=171996576 enc=10642/15 before=12405/23 after=11864/2 q=12745/14 q_bias=16391/2 v=12000/0 v_bias=12000/0 out=12000/0 out_bias=12000/0 a=20160/3 a_bias=19110/0 b=20463/-5 b_bias=18259/0 w=12000/0 w_bias=12000/0 read=12550/-14 read_bias=5383/39 moment_before=21391/0 moment_after=17593/-2 temper=12000/0 probe=13256/14 probe_bias=17046/0 pace=12000/0 moment_face=24389/43 moment_face_bias=17584/0 lift_bias=9658/65 pair_c=18626/-59 face_temper=16990/106
+FIELD_KERNEL_ACCEPT lap=0 states=24685 places=733787 moved=694924 accept_milli=210 sd_milli=344 whole=2857
+FIELD_KERNEL_BLOCKS lap=0 by_block_tenth(places_tenths:accept_milli)=55:441,96:335,130:279,164:260,202:209,248:175,303:152,382:123,520:89,869:35
+FIELD_KERNEL_FAMILIES lap=0 enc=-15/-7843 before=0/-1784 after=-3/-2633 q=8/-10881 q_bias=0/-143 v=0/0 v_bias=0/0 out=0/0 out_bias=0/0 a=0/-111 a_bias=0/0 b=0/-83 b_bias=0/0 w=0/0 w_bias=0/0 read=-3/-1016 read_bias=0/-18 moment_before=122/-1556 moment_after=89/-8911 temper=0/0 probe=13/-6512 probe_bias=0/-52 pace=0/0 moment_face=11/-505 moment_face_bias=1/-21 lift_bias=0/-39 pair_c=0/-15 face_temper=-9/-50
+FIELD_ENUMERATED_READ lap=0 ms=427350
+FIELD_CARD reads=3090 read_ms=201614 returns=1543 return_ms=209216 pairs=43515652916 batches=5082 peak_store=8383478600 landmarks=0 landmark_ms=0 elapsed_ms=427554
+MEASURE lap=lap rc=0 wall_s=428.2 peak_rss_kib=426076
+lap	places	enumerated_code	face_code	kl_mean	kl_q25	kl_median	kl_q75	kl<=0.3	face_zero_letters
+-1	64	4.9637	5.0387	0.2507	0.0411	0.0925	0.2519	52/64	0
+0	64	4.7861	5.2458	0.5234	0.0558	0.1479	0.4486	43/64	0
+# exact code from lap -1 to lap 0: paired change -0.1776 bits a place, standard error 0.1347, over 64 places; falls past twice its error: False
+== /home/b/Workspaces/holonics/.local/wt/qgchgu-sampler/.local/run/2026-11-07-lap8/lap9.log: 1543 sections
+tenth	accept_milli	predicted_micro	transfer_micro
+0	247	-84138	69
+1	256	-64948	1337
+2	244	-57209	-209
+3	195	-39600	613
+4	207	-40935	-726
+5	182	-48773	61
+6	207	-28734	733
+7	180	-22064	-86
+8	200	-23141	198
+9	180	-12513	182
+block-size tenth	mean places a state	accept_milli
+STATE.0 0235ad010657952380149abedc4acba6081ca7899eb2fd1fd788a23dd12f61c2
+MAIN exit 07:26:04
+== lap 10's development read
+FIELD_STOPPED lap=0 sections=55/1543 states=2499 ms=60625
+FIELD_KERNEL_ACCEPT lap=0 stopped states=2499 places=25927 moved=24513 accept_milli=430 sd_milli=404 whole=610
+FIELD_CARD reads=112 read_ms=30398 returns=55 return_ms=28382 pairs=8094814202 batches=415 peak_store=8384242432 landmarks=0 landmark_ms=0 elapsed_ms=60632
+MEASURE lap=dev rc=0 wall_s=61.2 peak_rss_kib=658588
+sections=55 problems=880 blocks=2499 ms_a_problem=60.21 lap_projection_s=1486 accept_milli_mean=402 k_star first [8, 12, 20, 13, 13] last [12, 17, 16, 14, 20]
+MAIN exit 07:33:04

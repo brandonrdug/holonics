@@ -1,0 +1,26 @@
+# lock taken 09:38:47, binary 40ba790abdd766de
+FIELD_STOPPED lap=0 sections=28/1543 states=448 ms=62467
+MEASURE lap=dev rc=0 wall_s=63.0 peak_rss_kib=448776
+FIELD_PERSISTENT lap=0 n=0 writes=16 closing_milli=182 moved=359 proposed=424 accept_milli=846 deposited=true predicted_micro=-48730559 transfer_micro=- log2_t=162152131 sweep_ms=7451 deposit_ms=131 ms=15169
+FIELD_PERSISTENT lap=0 n=1 writes=16 closing_milli=118 moved=514 proposed=604 accept_milli=850 deposited=true predicted_micro=-58458032 transfer_micro=-30625326 log2_t=162107071 sweep_ms=3059 deposit_ms=171 ms=18400
+FIELD_PERSISTENT lap=0 n=2 writes=16 closing_milli=131 moved=194 proposed=261 accept_milli=743 deposited=true predicted_micro=-18697446 transfer_micro=-12353266 log2_t=162052465 sweep_ms=701 deposit_ms=75 ms=19177
+FIELD_PERSISTENT lap=0 n=19 writes=16 closing_milli=-194 moved=340 proposed=509 accept_milli=667 deposited=true predicted_micro=-27726744 transfer_micro=9797503 log2_t=159613410 sweep_ms=2296 deposit_ms=149 ms=42990
+# projection 3021745 ms, deadline 3807181 ms
+FIELD_ENUMERATED_READ lap=-1 ms=7558
+FIELD_CARD reads=5692 read_ms=454084 returns=151 return_ms=20702 pairs=84962381850 batches=6263 peak_store=8372138128 landmarks=0 landmark_ms=0 elapsed_ms=481897
+MEASURE lap=lap rc=1 wall_s=482.4 peak_rss_kib=495356
+FIELD_PERSISTENT lap=0 n=0 writes=16 closing_milli=182 moved=359 proposed=424 accept_milli=846 deposited=true predicted_micro=-48730559 transfer_micro=- log2_t=162152131 sweep_ms=7448 deposit_ms=135 ms=15142
+FIELD_PERSISTENT lap=0 n=150 writes=16 closing_milli=1 moved=652 proposed=652 accept_milli=1000 deposited=true predicted_micro=531119 transfer_micro=622424 log2_t=405984820 sweep_ms=2989 deposit_ms=165 ms=481891
+# codes in nats a byte (each codec letter is one byte); the KL in nats
+lap	places	enumerated_code	face_code	kl_mean	kl_q25	kl_median	kl_q75	kl<=0.3	face_zero_letters
+-1	64	2.7697	3.6063	1.0764	0.2627	0.5000	1.1735	14/64 under 0.3 bits	0
+Traceback (most recent call last):
+  File "$ROOT/.local/wt/qgchgu-sampler/.local/run/2026-11-07-lap13/singular.py", line 40, in <module>
+    print(f"places {len(out)} open-face KL total {total:.3f} nats (mean {total / len(out):.3f}); the top tenth ({len(top)}) carries {sum(x[0] for x in top) / total:.1%}")
+                                                                         ~~~~~~^~~~~~~~~~
+ZeroDivisionError: division by zero
+sha256sum: $ROOT/.local/wt/qgchgu-sampler/.local/run/2026-11-07-lap13/lap/STATE.stopped: No such file or directory
+STATE 
+sha256sum: $ROOT/.local/wt/qgchgu-sampler/.local/run/2026-11-07-lap13/lap/STATE.stopped: No such file or directory
+write rc 1
+MAIN exit 09:47:53

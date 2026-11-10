@@ -1,0 +1,26 @@
+# keys128: the writes' new baseline at run bits 0 (theory, 22:52: runs move the walk, scans127, so the release runs at run bits 0
+# from here, sweep and refine). Lap 24 (long114/seg10) given held's lengths, refine 10, at the three declared keys of keys122
+# (run bits 1 there: fences closed 26/28, 29/31, 26/30; question 0.15, 0.15, 0.12; space 0.165, 0.164, 0.164), every other law
+# as keys122. Projection: keys122's walks took 128-142 s; at run bits 0 a pass reads each place in its own region read, 1.76x
+# the card's pairs of a run-bits-1 pass (scans127 against truth120, at 4.1-4.5 ns a pair), so about 250 s a key, outer deadline
+# 600 s a key as keys122's; about 13 min for three. RTX 4080 SUPER under .local/gpu.lock; host part one process.
+# lock taken 22:53:29
+== key 1111111111111111
+FIELD_LENGTH problems=32 sweeps=2062 refine=10 stopped=- run_bits=0 reads=7722 certified_bits=0.000 passed=0 ms=192545
+MEASURE lap=k1111111111111111 rc=0 wall_s=192.9 peak_rss_kib=237220
+written: 32 answers, 26 open with ```python; a 'y' outside it in 23, its first at places 0 to 5 in 1 (median first 46), 'y' past it 0.017; commonest byte's share at places 10 to 255 (246 places) 0.191; top byte ' ' 0.156, 'y' 0.014, entropy 5.17 bits over 8760 bytes
+written: 32 answers: a fence opened 30, closed 27; parses as Python 2; code lines mean 9.8; identifiers 941, in the question 0.18, in the held answer 0.16
+k1111111111111111: tokens 941, repeat share 0.238, commonest the 0.037, j 0.034, if 0.027
+== key 2222222222222222
+FIELD_LENGTH problems=32 sweeps=2062 refine=10 stopped=- run_bits=0 reads=7722 certified_bits=0.000 passed=0 ms=188600
+MEASURE lap=k2222222222222222 rc=0 wall_s=188.9 peak_rss_kib=239780
+written: 32 answers, 30 open with ```python; a 'y' outside it in 24, its first at places 0 to 5 in 0 (median first 59), 'y' past it 0.010; commonest byte's share at places 10 to 255 (246 places) 0.204; top byte ' ' 0.172, 'y' 0.010, entropy 4.95 bits over 8760 bytes
+written: 32 answers: a fence opened 31, closed 30; parses as Python 1; code lines mean 10.1; identifiers 1090, in the question 0.17, in the held answer 0.19
+k2222222222222222: tokens 1090, repeat share 0.327, commonest j 0.049, the 0.039, in 0.030
+== key 3333333333333333
+FIELD_LENGTH problems=32 sweeps=2062 refine=10 stopped=- run_bits=0 reads=7722 certified_bits=0.000 passed=0 ms=187451
+MEASURE lap=k3333333333333333 rc=0 wall_s=187.7 peak_rss_kib=241308
+written: 32 answers, 28 open with ```python; a 'y' outside it in 18, its first at places 0 to 5 in 0 (median first 104), 'y' past it 0.014; commonest byte's share at places 10 to 255 (246 places) 0.185; top byte ' ' 0.153, 'y' 0.009, entropy 5.44 bits over 8760 bytes
+written: 32 answers: a fence opened 29, closed 24; parses as Python 2; code lines mean 10.3; identifiers 1057, in the question 0.13, in the held answer 0.13
+k3333333333333333: tokens 1057, repeat share 0.303, commonest j 0.074, a 0.031, the 0.030
+MAIN exit 23:02:58

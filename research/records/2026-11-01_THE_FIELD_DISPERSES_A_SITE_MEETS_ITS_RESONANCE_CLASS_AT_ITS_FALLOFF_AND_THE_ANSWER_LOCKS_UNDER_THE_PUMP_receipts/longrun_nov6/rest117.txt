@@ -1,0 +1,44 @@
+# rest117 binary e26a72468c5b9c2cb1fcf2725f5b9f4bdd52c21978f3ee0d21c24849ca333147 waits for the card lock 17:54:39
+# lock taken 17:55:16
+== lap24 walk bdaeff3a76c1
+FIELD_LENGTH problems=32 sweeps=2062 refine=20 stopped=- run_bits=1 reads=12796 certified_bits=40135.512 passed=13636 ms=275164
+MEASURE lap=lap24_walk rc=0 wall_s=275.5 peak_rss_kib=236568
+PASSES lap24_walk
+pass	answers	places	S	H	D	sqrtC/n	changes	K	within
+1	32	8760	3.256	1.790	+1.466	0.019	0.594	0.473	0
+2	32	8760	2.992	1.687	+1.306	0.019	0.552	0.445	0
+3	32	8760	2.786	1.587	+1.198	0.018	0.520	0.420	0
+4	32	8760	2.561	1.527	+1.034	0.018	0.485	0.400	0
+5	32	8760	2.511	1.453	+1.059	0.018	0.470	0.381	0
+6	32	8760	2.351	1.394	+0.957	0.018	0.448	0.365	2
+7	32	8760	2.274	1.415	+0.860	0.018	0.440	0.366	0
+8	32	8760	2.280	1.407	+0.873	0.018	0.434	0.362	1
+9	32	8760	2.215	1.421	+0.795	0.018	0.433	0.363	1
+10	32	8760	2.253	1.444	+0.809	0.017	0.432	0.365	0
+11	32	8760	2.304	1.458	+0.846	0.017	0.435	0.367	2
+12	32	8760	2.227	1.461	+0.767	0.017	0.431	0.370	3
+13	32	8760	2.140	1.448	+0.692	0.017	0.425	0.365	0
+14	32	8760	2.074	1.419	+0.654	0.017	0.413	0.356	1
+15	32	8760	1.998	1.409	+0.589	0.017	0.400	0.350	1
+16	32	8760	1.982	1.385	+0.597	0.017	0.389	0.344	2
+17	32	8760	1.916	1.363	+0.553	0.016	0.379	0.338	0
+18	32	8760	1.871	1.356	+0.515	0.016	0.370	0.338	1
+19	32	8760	1.816	1.342	+0.474	0.016	0.368	0.334	1
+20	32	8760	1.816	1.347	+0.469	0.016	0.374	0.334	1
+rest pass (None: never) [(2, 16), (3, 10), (4, 5), (5, 1)]
+written: 32 answers, 24 open with ```python; a 'y' outside it in 21, its first at places 0 to 5 in 0 (median first 66), 'y' past it 0.013; commonest byte's share at places 10 to 255 (246 places) 0.172; top byte ' ' 0.126, 'y' 0.009, entropy 5.41 bits over 8760 bytes
+written: 32 answers: a fence opened 28, closed 20; parses as Python 3; code lines mean 6.5; identifiers 785, in the question 0.22, in the held answer 0.19
+== lap24 rest bdaeff3a76c1
+FIELD_LENGTH problems=32 sweeps=2062 refine=20_rest stopped=- run_bits=1 reads=2927 certified_bits=4897.815 passed=1632 ms=62194
+MEASURE lap=lap24_rest rc=0 wall_s=62.5 peak_rss_kib=241112
+PASSES lap24_rest
+pass	answers	places	S	H	D	sqrtC/n	changes	K	within
+1	32	8760	3.256	1.790	+1.466	0.019	0.594	0.473	0
+2	32	8760	2.992	1.687	+1.306	0.019	0.552	0.445	0
+3	16	4378	2.772	1.616	+1.155	0.026	0.516	0.424	0
+4	6	1353	1.993	1.041	+0.952	0.041	0.370	0.284	0
+5	1	580	1.799	0.955	+0.844	0.064	0.333	0.262	0
+rest pass (None: never) [(2, 16), (3, 10), (4, 5), (5, 1)]
+written: 32 answers, 29 open with ```python; a 'y' outside it in 23, its first at places 0 to 5 in 0 (median first 53), 'y' past it 0.012; commonest byte's share at places 10 to 255 (246 places) 0.188; top byte ' ' 0.145, 'y' 0.011, entropy 4.99 bits over 8760 bytes
+written: 32 answers: a fence opened 31, closed 29; parses as Python 2; code lines mean 10.6; identifiers 1037, in the question 0.13, in the held answer 0.13
+STOPPED by opus: drafts116 state falsified, its walks skipped 18:05:18

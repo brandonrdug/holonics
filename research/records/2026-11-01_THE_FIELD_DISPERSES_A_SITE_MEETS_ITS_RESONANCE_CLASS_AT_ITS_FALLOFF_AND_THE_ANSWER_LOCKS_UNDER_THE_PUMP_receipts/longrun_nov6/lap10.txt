@@ -1,0 +1,46 @@
+# lap 10: contrast-field from lap 9's state, blocks of at most k* places (stopped at its deadline), and the held read of its STATE.stopped (FIELD lines; codes in nats a byte).
+FIELD_ENUMERATED_READ lap=-1 ms=7552
+FIELD_KERNEL_TENTH lap=0 tenth=1 log2_t=171410845 enc=10959/-23 before=11494/-4 after=11346/-8 q=11607/-2 q_bias=11950/-1 v=12000/0 v_bias=12000/0 out=12000/0 out_bias=12000/0 a=11559/95 a_bias=20545/326 b=11634/112 b_bias=21995/347 w=12000/0 w_bias=12000/0 read=10793/-31 read_bias=6927/-164 moment_before=15249/128 moment_after=13246/59 temper=12000/0 probe=11874/4 probe_bias=12664/27 pace=12000/0 moment_face=12958/89 moment_face_bias=16782/149 lift_bias=4045/-261 pair_c=11058/15 face_temper=17772/-313
+FIELD_KERNEL_TENTH lap=0 tenth=2 log2_t=171410070 enc=9974/-26 before=10770/-11 after=10693/-20 q=11340/3 q_bias=11773/12 v=12000/0 v_bias=12000/0 out=12000/0 out_bias=12000/0 a=10541/26 a_bias=20545/0 b=10832/37 b_bias=21995/0 w=12000/0 w_bias=12000/0 read=9409/-32 read_bias=4909/-33 moment_before=17496/110 moment_after=12883/25 temper=12000/0 probe=10605/-32 probe_bias=12116/-28 pace=12000/0 moment_face=11614/10 moment_face_bias=18656/0 lift_bias=1809/-50 pair_c=8345/-37 face_temper=17953/0
+FIELD_KERNEL_TENTH lap=0 tenth=3 log2_t=171409795 enc=9262/-22 before=10301/-3 after=10477/6 q=11231/12 q_bias=12299/20 v=12000/0 v_bias=12000/0 out=12000/0 out_bias=12000/0 a=14976/193 a_bias=20545/0 b=15111/184 b_bias=21995/0 w=12000/0 w_bias=12000/0 read=9621/35 read_bias=4030/-45 moment_before=18155/0 moment_after=13801/85 temper=12000/0 probe=9806/-14 probe_bias=11621/-16 pace=12000/0 moment_face=15538/169 moment_face_bias=18656/0 lift_bias=-659/-110 pair_c=11705/164 face_temper=15131/-86
+FIELD_KERNEL_TENTH lap=0 tenth=4 log2_t=171408822 enc=8986/-11 before=9312/-27 after=8987/-44 q=10631/-12 q_bias=12005/-6 v=12000/0 v_bias=12000/0 out=12000/0 out_bias=12000/0 a=14846/-58 a_bias=20545/0 b=14948/-60 b_bias=21995/0 w=12000/0 w_bias=12000/0 read=8759/-32 read_bias=4512/8 moment_before=18155/0 moment_after=14955/6 temper=12000/0 probe=9433/-11 probe_bias=13724/60 pace=12000/0 moment_face=16027/-27 moment_face_bias=18656/0 lift_bias=1881/54 pair_c=10902/-70 face_temper=20360/238
+FIELD_KERNEL_TENTH lap=0 tenth=5 log2_t=171408828 enc=8792/-3 before=8444/-21 after=8108/-22 q=10834/3 q_bias=13087/25 v=12000/0 v_bias=12000/0 out=12000/0 out_bias=12000/0 a=19058/109 a_bias=20545/0 b=19230/108 b_bias=21995/0 w=12000/0 w_bias=12000/0 read=10080/39 read_bias=4847/24 moment_before=18155/0 moment_after=15146/13 temper=12000/0 probe=9700/6 probe_bias=14845/25 pace=12000/0 moment_face=17608/25 moment_face_bias=18656/0 lift_bias=3756/111 pair_c=15046/175 face_temper=17050/-48
+FIELD_KERNEL_TENTH lap=0 tenth=6 log2_t=171400268 enc=8432/-17 before=7866/-16 after=7673/-14 q=11142/3 q_bias=15393/58 v=12000/0 v_bias=12000/0 out=12000/0 out_bias=12000/0 a=22204/161 a_bias=20545/0 b=22194/154 b_bias=21995/0 w=12000/0 w_bias=12000/0 read=11168/23 read_bias=4680/-12 moment_before=18155/0 moment_after=16342/29 temper=12000/0 probe=9768/3 probe_bias=16616/56 pace=12000/0 moment_face=21769/111 moment_face_bias=18656/0 lift_bias=4614/16 pair_c=11314/-195 face_temper=16323/-162
+FIELD_KERNEL_TENTH lap=0 tenth=7 log2_t=171278684 enc=7105/-29 before=7098/-5 after=7128/-11 q=10972/-5 q_bias=15097/-6 v=12000/0 v_bias=12000/0 out=12000/0 out_bias=12000/0 a=22820/15 a_bias=20545/0 b=22805/15 b_bias=21995/0 w=12000/0 w_bias=12000/0 read=12712/45 read_bias=3203/-39 moment_before=18155/0 moment_after=16305/-43 temper=12000/0 probe=9412/-6 probe_bias=17023/29 pace=12000/0 moment_face=22308/25 moment_face_bias=18656/0 lift_bias=4120/-14 pair_c=13400/44 face_temper=10020/-528
+FIELD_KERNEL_TENTH lap=0 tenth=8 log2_t=169201116 enc=6558/-10 before=6768/-8 after=7008/-4 q=11113/9 q_bias=16866/64 v=12000/0 v_bias=12000/0 out=12000/0 out_bias=12000/0 a=22969/50 a_bias=20545/0 b=22845/53 b_bias=21995/0 w=12000/0 w_bias=12000/0 read=12201/-10 read_bias=3150/-1 moment_before=18155/0 moment_after=19788/106 temper=12000/0 probe=9704/11 probe_bias=17044/0 pace=12000/0 moment_face=24051/78 moment_face_bias=18656/0 lift_bias=3677/-2 pair_c=15159/39 face_temper=13169/-9
+FIELD_STOPPED lap=0 sections=1239/1543 states=84692 ms=1917776
+FIELD_KERNEL_FAMILIES lap=0 stopped enc=-237/-15471 before=-111/-14876 after=-134/-13964 q=53/-15685 q_bias=1/-162 v=0/0 v_bias=0/0 out=0/0 out_bias=0/0 a=108/-934 a_bias=3/-9 b=90/-777 b_bias=3/-9 w=0/0 w_bias=0/0 read=4/-1408 read_bias=0/-11 moment_before=425/-3344 moment_after=396/-7164 temper=0/0 probe=4/-23122 probe_bias=0/-95 pace=0/0 moment_face=193/-2053 moment_face_bias=5/-35 lift_bias=-4/-188 pair_c=69/-754 face_temper=-5/-55
+FIELD_KERNEL_ACCEPT lap=0 stopped states=84692 places=588472 moved=556649 accept_milli=450 sd_milli=395 whole=19970
+FIELD_CARD reads=2480 read_ms=845051 returns=1239 return_ms=1028040 pairs=205382478715 batches=10762 peak_store=8385438048 landmarks=0 landmark_ms=0 elapsed_ms=1918005
+MEASURE lap=lap rc=0 wall_s=1918.6 peak_rss_kib=1425192
+# codes in nats a byte (each codec letter is one byte); the KL in nats
+lap	places	enumerated_code	face_code	kl_mean	kl_q25	kl_median	kl_q75	kl<=0.3	face_zero_letters
+-1	64	3.3175	3.6361	0.3628	0.0386	0.1025	0.3109	43/64 under 0.3 bits	0
+== /home/b/Workspaces/holonics/.local/wt/qgchgu-sampler/.local/run/2026-11-07-lap10/lap.log: 1239 sections
+tenth	accept_milli	predicted_micro	transfer_micro
+0	402	-118830	-1990
+1	413	-55854	276
+2	404	-49754	494
+3	403	-56993	-5126
+4	398	-43191	580
+5	396	-47345	-375
+6	375	-46342	1684
+7	379	-51690	-1954
+8	387	-75666	-329
+9	409	-76550	-2193
+block-size tenth	mean places a state	accept_milli
+MAIN exit 08:05:27
+== held read of STATE.stopped
+# codes in nats a byte (each codec letter is one byte); the KL in nats
+lap	places	enumerated_code	face_code	kl_mean	kl_q25	kl_median	kl_q75	kl<=0.3	face_zero_letters
+-1	64	2.9898	3.4450	0.7860	0.0733	0.2122	0.6137	32/64 under 0.3 bits	0
+# paired change from lap 9's end: -0.3277 nats a byte, standard error 0.1004, over 64 places
+== lap 11's development read
+suite rc 0
+test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 1 filtered out; finished in 49.56s
+FIELD_STOPPED lap=0 sections=37/1543 states=6141 ms=60719
+FIELD_KERNEL_ACCEPT lap=0 stopped states=6141 places=15558 moved=14693 accept_milli=547 sd_milli=395 whole=1813
+FIELD_CARD reads=76 read_ms=29439 returns=37 return_ms=28123 pairs=7644555499 batches=368 peak_store=8384668152 landmarks=0 landmark_ms=0 elapsed_ms=60745
+MEASURE lap=dev rc=0 wall_s=61.3 peak_rss_kib=1372460
+sections=37 problems=592 blocks=6141 ms_a_problem=90.22 lap_projection_s=2227 accept_milli_mean=421 k_star first [9, 6, 6, 6, 6, 5] last [1, 1, 1, 1, 1, 1]
+MAIN exit 08:08:53

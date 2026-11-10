@@ -1,0 +1,13 @@
+# fall134: theory's fall along F (November 7, 04:04) on energy133's 400-site line state of energy131's founding (FOUNDED.STATE), Field::energy_fall:
+# first = 2^-h sum_t (|F_t|^2 - <r_t,F_t>^2/W), one-sided = Phi(x) - Phi(x + 2^-h |x| F), central = Phi(x - 2^-h |x| F) - Phi(x + 2^-h |x| F), on 2^-32 bits.
+# Host, one thread (a check of the reference's force against its own energy on one state; the card is bit-equal on both), 2.5 s in all.
+ticks 0 h 8: first 1572669539033 one-sided 1595920517601 central 3129244837592 central/2first 0.994883 one-sided/first 1.014784 ms 101
+ticks 0 h 9: first 786334769517 one-sided 793096018792 central 1570577888041 central/2first 0.998670 one-sided/first 1.008598 ms 94
+ticks 0 h 10: first 393167384758 one-sided 394968443183 central 786044143150 central/2first 0.999630 one-sided/first 1.004581 ms 94
+ticks 0 h 11: first 196583692379 one-sided 197078189411 central 393169934948 central/2first 1.000006 one-sided/first 1.002515 ms 93
+ticks 0 h 12: first 98291846190 one-sided 98392415909 central 196573715483 central/2first 0.999949 one-sided/first 1.001023 ms 94
+ticks 4 h 8: first 1372075242859 one-sided 1324210215890 central 2738654281911 central/2first 0.997997 one-sided/first 0.965115 ms 392
+ticks 4 h 9: first 686037621430 one-sided 674398393434 central 1371363765703 central/2first 0.999481 one-sided/first 0.983034 ms 400
+ticks 4 h 10: first 343018810715 one-sided 340140575061 central 685902297875 central/2first 0.999803 one-sided/first 0.991609 ms 382
+ticks 4 h 11: first 171509405357 one-sided 170758072743 central 342973457060 central/2first 0.999868 one-sided/first 0.995619 ms 381
+ticks 4 h 12: first 85754702679 one-sided 85624111872 central 171569330442 central/2first 1.000349 one-sided/first 0.998477 ms 379

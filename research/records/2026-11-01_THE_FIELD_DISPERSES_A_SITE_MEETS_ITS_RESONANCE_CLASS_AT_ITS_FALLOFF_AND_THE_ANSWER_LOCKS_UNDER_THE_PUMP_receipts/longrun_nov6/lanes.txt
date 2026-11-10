@@ -1,0 +1,6 @@
+# lanes check, lock 19:41:52, binary 2ca6df5a4bc02e3d
+lanes rc 0
+FIELD_STOPPED lap=0 sections=719/1543 states=18383 ms=225220
+FIELD_LANES splits=118 host_regions=824 card_regions=43590 host_ms=118583 card_ms=188133 split_wall_ms=215666 share_permille=23 host_threads=20
+FIELD_CARD reads=81 read_ms=88612 returns=39 return_ms=99670 pairs=28577633175 batches=1033 peak_store=8459471472 landmarks=0 landmark_ms=0 elapsed_ms=225446
+sections 39: identical but their times 39; card alone 214855 ms, card and host lanes 215183 ms (0.998x)

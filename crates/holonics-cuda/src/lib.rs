@@ -12,6 +12,7 @@
 pub mod cuda;
 pub mod ffi;
 pub mod hnn;
+pub mod number;
 
 pub use cuda::{
     BorrowedContext, Context, CudaError, Device, DeviceAttribute, DeviceBuffer, Dim3, Event,

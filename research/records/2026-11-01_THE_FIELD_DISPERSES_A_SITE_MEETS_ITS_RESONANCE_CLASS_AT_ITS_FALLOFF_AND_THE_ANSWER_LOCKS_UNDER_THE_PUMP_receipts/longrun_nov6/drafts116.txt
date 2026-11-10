@@ -1,0 +1,59 @@
+# drafts116 from bdaeff3a76c10712daa51856de87074511c91903330e8a557df91f19889b970e: hnn-field-learner-v3 12 75264 34 -, binary b0c3a9c6c62709c5f38453e38e54763c6ce9e5908af5cd8dd421660174ce433b, the hour ends 18:23:53
+# lock taken 17:23:53
+FIELD_PARITY_DONE sections=2 reads_unequal=0 faces_unequal=0 covector_unequal=0 learners_unequal=0 releases=1 releases_unequal=0 card_release_ms=58 host_ms=58327 card_ms=540 elapsed_ms=327042
+MEASURE lap=parity rc=0 wall_s=327.8 peak_rss_kib=4430260
+# parity equal under drafts 17:29:21
+dev sections 206 mean_ms 675 max_ms 1952 (lap 24 without drafts: 525 ms a section)
+MEASURE lap=dev rc=0 wall_s=152.3 peak_rss_kib=873088
+# lap bound 1243850 ms; 1 lap(s), a segment 1363850 ms, outer 1423 s, 2520 s left for it 17:31:53
+FIELD_LAP lap=0 read=35 before=3.534 after=- deposited=1535/1535 halvings=0 next_halved=0 next_refused=0 ms=1124026
+FIELD_LAPS_HELD lap=1 reason=time left=219590 bound=1243850 ms=1144260
+MEASURE lap=seg rc=0 wall_s=1145.0 peak_rss_kib=872356
+-1:5.456424:1.187713:1.390339 0:5.654104:1.253939:1.457530 
+-1:1.120 0:1.194 
+sections mean ms 731 over 1535
+# reads of 24e5e17f4f786dafb4922c5a768f77ac41383005ecff96814aaa4f68402034d3 17:50:58
+== order FIELD_ORDER problems=32 places=8792 place_bits_a_place=2.877 place_length_bits_a_place=0.018 place_content_bits_a_place=2.859 keyed_bits_a_place=3.617 keyed_length_bits_a_place=0.750 keyed_content_bits_a_place=2.867 keyed_given_bits_a_letter=2.622 keyed_given_off_void_bits_a_letter=2.622 letters=8760 masks_bits_a_place=2.649 masks_length_bits_a_place=0.028 lengths_unread=5 ms=59744 MEASURE lap=ord
+distance	problems	void_mass	length_law
+-128	104	0.340	0.405
+-32	124	0.441	0.476
++0	128	0.489	0.512
++32	128	0.547	0.562
++128	128	0.692	0.695
++512	128	0.916	0.924
+places 900 to 1199	38400	0.951	0.971
+B past the end: mean 154 places, median 114, range 3 to 746; the length law 132
+void mass before the end: mean 107 places
+the opening's expected length less held: mean +47.1 places, median +65.0
+OVERRUN opening answers=128 room=2062 mean_past_end=154.4
+  0-127	mean 51.5	share 0.333	median 45.9	length_law 50.3
+  128-511	mean 67.1	share 0.435	median 46.1	length_law 62.0
+  512-1199	mean 28.2	share 0.183	median 13.2	length_law 19.2
+  1200-end	mean 7.6	share 0.049	median 3.2	length_law 0.8
+== refine 0
+FIELD_LENGTH problems=32 sweeps=2062 refine=0 stopped=- run_bits=1 reads=678 certified_bits=219.372 passed=0 ms=20046
+MEASURE lap=refine0 rc=0 wall_s=20.4 peak_rss_kib=237332
+written: 32 answers, 26 open with ```python; a 'y' outside it in 22, its first at places 0 to 5 in 1 (median first 51), 'y' past it 0.012; commonest byte's share at places 10 to 255 (246 places) 0.188; top byte ' ' 0.157, 'y' 0.011, entropy 4.93 bits over 8760 bytes
+written: 32 answers: a fence opened 31, closed 26; parses as Python 0; code lines mean 11.1; identifiers 1132, in the question 0.04, in the held answer 0.05
+family	span	written opened	written closed share	held opened	held closed share	ratio
+bracket	near	173	0.185	178	0.393	0.47
+bracket	far	173	0.301	178	0.607	0.50
+string	near	59	0.153	60	0.400	0.38
+string	far	59	0.237	60	0.583	0.41
+block	near	38	0.000	75	0.000	nan
+block	far	38	0.500	75	0.947	0.53
+RULE: the lowest closure against held is string near at 0.38 (under 0.5)
+== refine 10
+FIELD_LENGTH problems=32 sweeps=2062 refine=10 stopped=- run_bits=1 reads=7294 certified_bits=15586.850 passed=5071 ms=172532
+MEASURE lap=refine10 rc=0 wall_s=172.9 peak_rss_kib=236988
+written: 32 answers, 26 open with ```python; a 'y' outside it in 22, its first at places 0 to 5 in 1 (median first 48), 'y' past it 0.011; commonest byte's share at places 10 to 255 (246 places) 0.215; top byte ' ' 0.189, 'y' 0.009, entropy 5.29 bits over 8760 bytes
+written: 32 answers: a fence opened 29, closed 27; parses as Python 1; code lines mean 9.8; identifiers 1010, in the question 0.08, in the held answer 0.11
+family	span	written opened	written closed share	held opened	held closed share	ratio
+bracket	near	232	0.336	178	0.393	0.85
+bracket	far	232	0.151	178	0.607	0.25
+string	near	122	0.385	60	0.400	0.96
+string	far	122	0.238	60	0.583	0.41
+block	near	39	0.000	75	0.000	nan
+block	far	39	0.487	75	0.947	0.51
+RULE: the lowest closure against held is bracket far at 0.25 (under 0.5)
+MAIN exit 17:55:16

@@ -4053,3 +4053,617 @@ lap price scatters by about 0.15e9 either way at every rate (seg10's mean, 0.641
 here: on its own training problems the opening sat +90 to +130 places past the boundary law's minimizer through laps 18–24, and
 moved out at lap 24 under the run's smallest step. The boundary's void entries vanish in expectation only when the expected
 length meets the answer's, so at the opening the boundary is outweighed by the other comparisons that reach the void there.
+
+[measurement and definition; November 6, orders115; the unified-theory reading of 17:08] **The writer refines: the keyed sweeps,
+then 10 refine passes.** Lap 24 was written given held's lengths in three orders. Place order (left to right, coding 1 bit a place
+under keyed) fell into loops ("andatatatata") with 180 identifiers. Keyed gave pseudo-words with 902. The masks' own order closed
+9 of 28 fences. Then the keyed sweeps were refined 0, 1, 3, 6 and 10 passes, each place redrawn beside every other. The
+identifiers matching the question went 0.05, 0.09, 0.13, 0.15, 0.18, and those matching the held answer 0.06, 0.09, 0.12, 0.14,
+0.16. Fences closed 27, 28, 29, 29, 28. The pooled space share went 0.133, 0.143, 0.142, 0.139, 0.145 (the truth's 0.174). The
+November 5 drift to spaces does not recur on this state, so refine 10 joins the writer, and the law of the field meeting its own
+release waits. Bracket closure erodes past about 6 passes (near 0.27 at 6, 0.15 at 10). Cost: 6,121 reads, 140 s for 32 answers,
+against 639 reads for the sweeps alone.
+
+[measurement; November 6, drafts116; the unified-theory reading of 17:08, law 2] **Training on the field's own one-read drafts is
+falsified.** `FIELD_PATH_DRAFTS` gave each path problem a third state: a keyed share ρ (uniform up to the whole answer) of its
+places drawn at once from the field's faces, then masks `τ = u²` within the answer compared on the truth given that draft.
+Card parity was equal under every law of the run. One lap from lap 24 (rate 12 held, the bare clock) took 1,124 s against
+800 s, and it made the field worse: held context 1.188 → 1.254, unseen 1.120 → 1.194, the held order code given lengths 2.586 →
+2.622. Given held's lengths the writes were spacier (space 0.157 at refine 0 and 0.189 at refine 10, against 0.133 and 0.145),
+with fewer identifiers from the question (0.04 and 0.08, against 0.05 and 0.18). Only closures rose (bracket near 0.85 and string
+near 0.96 of held's at refine 10). [inferred, with theory's reading of 17:58] A definite letter that may be wrong cannot be told
+from a true one, so the only fit to noisy drafts is to discount every definite letter: silence is the honest unknown (§16.28),
+noise is not. The law's states were one-read parallel draws, where refine's states are the writer's ordered drafts. The law
+stays declared and off. A new kind of state enters a run as a declared share, read after its first sections. Receipts:
+`longrun_nov6/drafts116.txt`.
+
+[measurement and definition; November 6, rest117–118; Brandon's lens of 17:31, the unified-theory reading of 17:38] **The refine
+walk circulates: its drive settles above its spread.** Brandon's lens: refinement is the cube's solving, each place an edge and a
+face coupled to the others, and it should stop where no impulse is left to change. At temperature one the walk has no fixed point,
+so the plateau is zero net drive, not zero change. Each pass now reads its drive (`PassDrive`): over the places it redraws in an
+answer, the standing letters' code `S` and the faces' entropy `H` on the face each is drawn from, `D = S − H` (the face
+temperature covector summed at the standing letters, atlas `ratio.face-temperature-covector`), the varentropy `C` (its curvature),
+the changes and `K = Σ(1 − Σp²)`, the changes a walk at equilibrium keeps. Under the faces' own joint `D` has mean zero. On lap 24,
+given held's lengths, 40 passes walked whole (495 s, 26,818 reads) read, a place over the 32 answers: pass 1 `S` 3.256, `H` 1.790,
+`D` +1.467, `√C/n` 0.019, changes 0.594 against `K` 0.473; pass 10 `D` +0.809; pass 20 +0.469; passes 19–40 between +0.36 and
++0.54, pass 40 `S` 1.862, `H` 1.456, `D` +0.407, changes 0.392 against `K` 0.360. `H` bottoms at 1.289 at pass 27 and rises as
+the faces flatten. At no pass do more than 4 of the 32 answers have `D ≤ √C`; each answer's settled drive is about four to five
+times its spread. So the faces are not one joint's conditionals, and about 0.4 bits a place still drives each pass ([correction,
+theory, 19:09] `D` is a force on the write's temperature, not the walk's entropy production: at rest `E[D_i] = KL(μ_i‖p_i) +
+H(μ_i) − H(p_i)` with `μ_i` the walk's own conditional of the standing letter, zero when the faces are consistent): the
+consistency law is owed (theory: Kolmogorov's cycle condition on each two-place square). The rest law as first stated (`D ≤ √C`,
+or a fall of `D` within `√C`) stops every answer by pass 2 to 5 on its second clause, because an answer's pass-to-pass drive
+swings with its moving faces by more than the draw's spread `√C`; its write read space 0.145 and question identifiers 0.13.
+`FIELD_WRITER_REST` stays declared for comparison. As the walk lengthens the words rise and the structure erodes (space, question
+identifiers, held identifiers, fences closed of opened, code lines): refine 10: 0.145, 0.18, 0.16, 28/29, 8.0; walk 20: 0.126,
+0.22, 0.19, 20/28, 6.5; walk 40: 0.118, 0.26, 0.24, 20/26, 5.7, the words that rise being the field's commonest (`print(`
+repeated). Receipts: `longrun_nov6/rest117.txt`, `rest118.txt`, `passes.py`.
+
+[measurement; November 6, spans119; the unified-theory reading of 17:58] **The cube's move as a silent span is falsified.**
+With `FIELD_WRITER_SPANS` every second refine pass cut the answer into keyed spans of 2, 4, 8 and 16 places, opened each whole
+and redrew it in place order given the rest. Over 40 passes on lap 24 the single-place passes after span passes read the
+standing code at 3.27 to 3.98 bits a place, against the plain walk's 1.72 to 1.87 over passes 27–40. The write closed 6 fences of
+14 and drew 0.05 of the question's identifiers. [inferred, theory, 18:50] The faces are strong only with a definite near field,
+and a silent span with definite flanks is a state the masks `τ = u²` hardly train (chance `E[τ^L (1 − τ)²]`: 0.025 for `L = 2`,
+0.0002 for `L = 16`). Revision stays single-place.
+
+[measurement; November 6, truth120; the unified-theory reading of 18:28] **Held truth is calibrated but is no rest of the walk,
+and the faces' two readings of a pair disagree.** Started from held's answers (`FIELD_WRITER_FROM_TRUTH`: no sweep, the first
+pass read without drawing), the field's drive on the truth is −0.008 bits a place (`S` 0.812, `H` 0.821). One pass of redraws
+raises it to +0.293, it peaks at +0.671 at pass 10 and settles at +0.351 by pass 40, with `S` at 1.472, 0.66 above the truth's.
+Over those 40 passes closed fences fell from 29 to 21, parsing answers from 26 to 0, code lines from 10.9 to 7.3, and question
+identifiers from 0.26 to 0.16. The identifiers' repeat share reaches the truth's own (0.442) by pass 40 of either walk. What piles
+up is concentration: the commonest identifier holds 0.030 of the truth's tokens and 0.10 to 0.11 of a 40-pass walk's. `curl-field`
+reads two-place squares of held truth: for places `i`, `j`, the log odds ratio across their standing and runner-up letters, read
+through `i`'s faces (`λ_i`) and through `j`'s (`λ_j`). One joint's conditionals give `λ_i = λ_j` (Kolmogorov's cycle condition).
+The curl's spread exceeds `λ`'s at every band of distance: d = 1: 4.25 against 3.54 bits; 2–3: 2.67 against 1.67; 4–7: 0.93
+against 0.50; 8–15: 0.60 against 0.40; 16 and past: 0.29 against 0.19. The two readings correlate only +0.08 to +0.47. Lap 4's
+state reads the same (1.09 to 1.77 of λ's spread), so twenty laps of the masked law did not move it. The field's contacts are read
+one way (a place's face reads another through its own query), where the pair contact is a pairing; the curl is that
+antisymmetric part, and its law is owed. Receipts: `longrun_nov6/spans119.txt`, `truth120.txt`, `curl_laps.txt`, `curl.py`,
+`repeat.py`, `curl_laps.sh`.
+
+[measurement; November 6, squares121; the unified-theory reading of 19:04] **The squares' agreement at one pull a square does
+not move the curl.** `FIELD_PATH_SQUARES` reads each path problem's square at a keyed band on the truth given its end through
+its four faces, and adds four states each open at one place, pulling there through `Port::pull` (a code `w (c(b) − c(a))`, its
+covector `w (e_a − e_b)`, read on the host for host and card alike), with `l = λ_i − λ_j` and the loss `l²/4`. The four codes
+sum to `l²/2`. Card parity was equal under every law. One lap from lap 24 took 1,725 s (1,122 ms a section against 521) with about
+16 squares a section. Held context read 1.188 → 1.192 and unseen 1.120 → 1.124. The trained squares' mean `|l|` by quarter of the
+lap read 1.163, 1.169, 1.174, 1.210 bits. The curl on held truth after the lap read curl/λ 1.19, 1.55, 1.79, 1.68, 1.49 by band,
+against lap 24's 1.20, 1.59, 1.86, 1.49, 1.52. From truth, the walk's pass 40 read `S` 1.354, `D` +0.301 (lap 24: 1.472,
++0.351) and parses 2 of 26. Refine 10 given held's lengths read space 0.189 and question identifiers 0.09, against lap 24's 0.145
+and 0.18. drafts116's lap 25 read the same space at refine 10, and the write's keys follow the state's hash, so the write's spread
+over states is unmeasured. Theory's acceptance failed except held. By its fixed reading, the pull did not act at this weight: it
+weighs `|l|/2` at two classes of one place (about 0.58), against roughly a thousand compared places a section. Its weight is read
+before the charts are judged. Receipts: `longrun_nov6/squares121.txt`.
+
+[measurement; November 6, keys122] **The refine-10 write's spread over its keys.** Lap 24, given held's lengths, refine 10, at the
+state's own key and at three declared keys. Space read 0.145, 0.165, 0.164, 0.164; question identifiers 0.18, 0.15, 0.15, 0.12;
+held identifiers 0.16, 0.16, 0.17, 0.15; fences closed 28/29, 26/28, 29/31, 26/30. The state's own key drew the best write. A
+refine-10 gate is read at declared keys paired across states, against this spread. Receipts: `longrun_nov6/keys122.txt`.
+
+[measurement; November 6, squares123; the unified-theory reading of 20:18] **Weighed as their answers, the squares agree by
+decoupling, and prediction pays.** Each pull weighed `w = (l/2)(n_p/4)`, `n_p` the path problem's compared answer places in its
+opening and writer states, so the four states together weigh as its answer. Over the cost read's 119 sections the trained
+squares' mean `|l|` fell from 1.031 bits (the first 20 sections) to a mean of 0.940. Held context rose from 1.188 to 1.232 and
+unseen from 1.120 to 1.160, past theory's stop (1.199), so the lap did not run. On that stopped state the curl on held truth read
+curl/λ 1.15, 1.36, 1.68, 1.33, 1.50 by band (lap 24: 1.20, 1.59, 1.86, 1.49, 1.52). λ's spread at d = 1 fell from 3.54 to 2.99
+bits, under theory's 3.0. So the faces approached agreement by reading each other less, and in 119 sections they lost 0.044 of
+held context. At one pull a square the deposit did not move the squares (squares121), and at an answer's weight it decoupled
+them: these charts carry agreement only by decoupling. By theory's falsifier, faces read as one pair energy's conditionals are
+owed. Receipts: `longrun_nov6/squares123.txt`.
+
+[measurement; November 6, squares124; the unified-theory reading of 20:33] **The turn law keeps the readings' scale, and
+prediction still pays.** Theory read squares123's fall of λ's spread as `l²/4`'s own steepest path. That loss is homogeneous in
+the readings' scale, so its gradient shrinks both readings. The turn law pulls `l²/4`'s covector with its radial part removed:
+`w_i = (l/2) λ_j (λ_i + λ_j)/r²` and `w_j = −(l/2) λ_i (λ_i + λ_j)/r²` (times `n_p/4`), with `w_i λ_i + w_j λ_j = 0`. Over the
+cost read's 116 sections the trained squares' `|l|` read 1.072 bits over the first 20 sections and 1.062 over all of them. Held
+context rose from 1.188 to 1.205 and unseen from 1.120 to 1.134, past the 1.199 stop. The curl on that state read curl/λ 1.14,
+1.43, 1.85, 1.26 and 1.66 by band, with λ's spread at d = 1 at 3.44 (kept). So the readings kept their scale and the near curl
+eased (1.20 → 1.14 at d = 1, 1.59 → 1.43 at 2–3), but prediction lost 0.017 bits of held context in 116 sections while the
+trained squares barely moved. The rate (12) was held from the run without squares. Squares weighed as their answers about double
+a path problem's covector mass, so the same rate takes a larger step. Receipts: `longrun_nov6/squares124.txt`.
+
+[measurement; November 6, squares125; the unified-theory reading of 20:54] **At half the step the turn law holds held context, and
+an unbounded pull overflows the card.** Lap 24's state at rate 13, every other law fixed. Over the cost read's 123 sections held
+context read 1.196 (under the 1.199 stop), unseen 1.126, and the trained squares' `|l|` 1.101 over the first 20 sections and
+1.085 over all of them. The curl on that state read curl/λ 1.14 at d = 1, with λ's spread 3.44, power 31.41 and κ = curl_sd²/power
+0.492. The lap died at its 249th section: the card refused the field because a sum outgrew its 128-bit carrier. One runner-up of
+almost no mass on a cross face read `|l|` in the tens of bits, and its pull's factor grew with it. So each state's factor
+`w/(n_p/4)` is now bounded by one, as a compared place's covector entry is (`|p − e| ≤ 1`), with the two scaled alike so that the
+pull keeps no radial part [agent-inferred]. Receipts: `longrun_nov6/squares125.txt`.
+
+[measurement; November 6, squares126; the unified-theory reading of 21:01] **Bounded, the turn law reaches only a fast mode.** squares125's law with the bound, one lap from lap 24 at rate 13. Its cost read (107 sections) read
+held context 1.1915 and d = 1 κ 0.506. Its lap was killed at its 293rd section by the desktop app's crash (no state is written
+before a segment's end) and ran again unchanged in its own process scope. The lap took 1,842 s against its 2,407 s bound (0.77),
+1,199 ms a section. Held context went from 1.1877 to 1.1911 and unseen from 1.120 to 1.124. The trained squares' `|l|` read 1.157,
+1.147, 1.147 and 1.191 by quarter of the lap, so it was flat. The curl on held truth read curl/λ 1.13, 1.35, 1.73, 1.34 and 1.67 by
+band. At d = 1 that is λ's spread 3.48, power 32.05 and κ 0.485, against lap 24's 1.20 and 34.1.
+- Theory's fixed reading: κ at lap end ≤ 0.43 means a slow mode, worth further laps; 0.47 or more means a fast mode only. κ read
+  0.485, so the pull's effect is the fast change of its first sections. Theory's guesses (held 1.190–1.196, κ 0.47–0.49) held.
+  Theory's 21:15 order test (scans127) decides between a structural face and H2, the far structure. The turn law leaves
+  training: lap 24 stays the line's state (held 1.1877, writes ahead at every key), the squares' pull leaves the trainer with
+  the next build, and curl-field stays as the instrument.
+- The acceptance failed except held: curl/λ is above 0.8 at d = 1 and above 1.0 in every band.
+- The walk from truth at pass 40 (run bits 1) read S 1.472 → 0.971, D 0.351 → 0.300, parses 0 and fences 20 of 30 closed. The
+  lower S is a pile-up, not the truth: the repeat share is 0.646, `j` alone is 0.203 of identifier tokens, and 0.38 of identifiers
+  are in the held answer.
+- Refine 10 at the three declared keys closed 23 of 31, 27 of 29 and 24 of 32 fences, against lap 24's 26/28, 29/31 and 26/30.
+  The mean, 24.7 closed against 27.0, is inside lap 24's three-key spread but lower at every key. The question share read 0.14,
+  0.13 and 0.15, against 0.15, 0.15 and 0.12.
+- Beside squares121 (one lap, the same 2,560 squares, the pull not acting), the curl fell 3% at d = 1 and 8% at 2–3 and rose
+  9% at 16+, while the readings' spread rose 6–25% over 2–15. Agreement came mostly as louder agreeing readings, not less
+  disagreement [measured; theory's reading of 22:18].
+- Dose read: D at pass 40 of the walk from truth was 0.300 here and 0.301 for squares121, so the settled drive did not follow the
+  near agreement at this dose [measured; the steps differ, a weak read]. S fell 0.38 below squares121's with H falling alike: the
+  pull moved the walk's resting law to a common-name pile-up, not toward the truth [inferred].
+Receipts: `longrun_nov6/squares126.txt`.
+
+[measurement; November 6, scans127; the unified-theory reading of 21:14] **Runs move the walk, and the walk depends on its
+visiting order beyond the keys' spread.** Four walks from held truth on lap 24's state, 40 passes
+each, every one at run bits 0 (one place a read). Two are keyed, at truth120's key and at a second declared key. One walks place
+order and one reversed place order (`FIELD_WRITER_REFINE_ORDER`, at truth120's key). The reads were fixed before the walks
+(`scan_reads.py`): at pass 40 and over passes 31–40, a walk reads apart from another when, in some read, their difference passes
+the two keyed walks' gap by 0.15 bits a place in S, by 5 parses or by 4 closed fences. A scan is judged against the nearer keyed
+walk [agent-inferred: the conservative reading of "beyond the two keyed walks' gap", accepted by theory].
+
+| walk | S at pass 40 | S over 31–40 | D at pass 40 | parses | fences opened/closed |
+|---|---|---|---|---|---|
+| keyed, truth120's key | 1.161 | 1.249 | +0.281 | 2 | 26/21 |
+| keyed, second key | 1.127 | 1.223 | +0.236 | 0 | 28/23 |
+| place order | 1.338 | 1.416 | +0.316 | 3 | 25/19 |
+| reversed | 1.428 | 1.476 | +0.346 | 0 | 28/21 |
+| truth120 (keyed, run bits 1) | 1.472 | 1.522 | +0.351 | 0 | 26/21 |
+
+- The keyed gap is 0.034 bits in S at pass 40, 0.026 over 31–40, 2 parses and 2 closed fences.
+- Runs: keyed at run bits 0 lies 0.311 bits a place under truth120 in S at pass 40, 0.277 past the gap. So runs move the walk,
+  and later refine reads run at run bits 0. Theory's guess (runs inside the gap) failed. Each run's places are drawn blind to each
+  other, and that costs about 0.3 bits a place by pass 40.
+- Scans: reversed lies 0.267 above the nearer keyed walk at pass 40 (0.233 past the gap) and 0.227 over 31–40 (0.201 past it), so
+  it is apart. Place order lies 0.143 and 0.141 past the gap, just inside 0.15 (0.160 past it against the keyed walks' mean).
+  Parses and fences stay inside the gap for both scans. At 40 passes the walk depends on its visiting order beyond the keys'
+  spread; that the walks' end states differ is not shown (theory's correction, November 7, 02:00). With no slow mode
+  (squares126), the structural face was taken up: faces as forces of one stored energy (theory's law of 21:15, sent with this
+  score).
+- D moved less than S: reversed at pass 40 is 0.087 above the keyed walks' mean, against their gap of 0.045. Theory's "D most" did
+  not hold.
+- The common-identifier pile-up is in every walk: repeat share 0.553, 0.510, 0.628 and 0.608, with `j` the commonest identifier
+  in three of the four.
+- Time: the walks took 652.6, 665.9, 661.6 and 658.6 s, against 475 s projected (1.39×, 23.4 ms a read against truth120's 16.9).
+  All were inside the 900 s deadline, and the four took 2,639 s of the hour. Peak resident set was 240 MB.
+Receipts: `longrun_nov6/scans127.txt`, `longrun_nov6/scan_reads.py`.
+
+[measurement; November 6, keys128; the unified-theory reading of 22:52] **The writes' baseline at run bits 0.** Lap 24 given
+held's lengths, refine 10 at run bits 0 (one place a read, the release's law from scans127), at keys122's three declared keys.
+- Fences closed: 27 of 30, 30 of 31, 24 of 29, against keys122's 26/28, 29/31, 26/30 at run bits 1.
+- Question share: 0.18, 0.17, 0.13, against 0.15, 0.15, 0.12.
+- Parses: 2, 1, 2, against 0, 2, 0. Held-answer identifiers: 0.16, 0.19, 0.13. Repeat share: 0.24, 0.33, 0.30.
+- Each key took 7,722 reads in 187–193 s, against 250 s projected (0.76).
+- Why the reads cost more than their count: a read is one batch over the problems, and at run bits 0 each place is its own region
+  read. scans127's keyed walk at run bits 0 met 153.3 × 10⁹ pairs in 634 s against truth120's 87.1 × 10⁹ in 389 s: the same 4.1–4.5
+  ns a pair, 1.76 times the pairs a pass.
+Receipts: `longrun_nov6/keys128.txt`.
+
+[definition; the unified-theory reading of November 6, 22:52] **The faces as one stored energy's forces: the host reference**
+(`hnn::tower::field::energy`, `FieldDeclaration::energy`, head line `hnn-field-v15`).
+- Each tick descends one energy of the region's state and letters: its receivers' lock partitions, the strand pair's
+  contraction `−Re⟨c, a_t · b_(s(t))⟩` and the letters' rows read against the sites they reach. It descends with `x ← x − η ‖x‖_rms
+  ∂Φ/∂r̂`, each tick's fall certified on the energy's own reading and `η` halved until it is.
+- The classes and supports are read at the opening and held through the ticks.
+- The face is the energy's force on a letter at the last state: `z_t(a) = −∂Φ/∂e_t(a)` with the moment's part.
+- The value chart, the current's return and the pair's return leave. The card refuses an energy field until its realization
+  passes its parity, and the training return is refused until built.
+- [agent-inferred] The first build reads plain clocks, no depth ring and no tower of scales.
+Tests on the tiny field, every family drawn at ±½, clocks plain:
+- Each tick's fall is certified: Φ goes −45.6 → −65.0 bits in four ticks and rests at tick 68 (−70.5).
+- With the moment rows at zero, `Φ(a) − Φ(0) = −(z_t(a) − z_t(0))` at every open site and letter, to the face's grain.
+- A small step's fall over its first-order fall `η Σ(|F|² − ⟨r̂,F⟩²/W)` reads 0.97 to 1.00 at `η = 2^(−8)` to `2^(−12)`.
+- At the rest, the first-order fall is 0.001 bits, against 76.6 at the opening.
+The squares still disagree there. Full swaps read curl/readings 0.79 at four ticks and 0.73 at rest. Read at one base with the
+open sites as locked uniform mixtures, they read 1.45 to 1.90, and those readings did not scale with `ε`.
+
+[measurement; November 6, energy129; Brandon's host exception of 23:52:55 UTC ("You can run it")] **At founding the energy's
+partial face is not reciprocal.** The energy field was founded on lap 24's declaration (KEYS8) and its curl read on held truth
+(32 problems, 16 squares a band, theory's fixed read curl/λ ≤ 0.3 in every band), on the host with 24 threads (the card refuses
+energy fields).
+- The development read (one problem, 40 region reads in 0.43 s) projected 110 s, upper 198 s. The read stopped at that deadline
+  with 20 of 32 problems read (304 squares a band), so it is incomplete evidence. The one problem it timed was a short one.
+- Curl/λ by band: 1.99, 0.88, 1.80, 1.76 and 1.74. At `d = 1`, κ is 0.993 and the two readings correlate +0.01.
+- That is far past the construction's bound in every band, and at `d = 1` worse than the line's lap 24 (1.20).
+- So the face read at the last state carries where the descent stopped, not the energy's response to a letter, as on the tiny
+  field.
+- Theory's call (November 7, 00:02): the face moves to the total derivative, `z_t(a) = −dG/de_t(a)` with `G(e) = Φ(x^K(e); e)`,
+  read through the opening and the declared `K` ticks. It is one scalar's gradient at the ticks actually run, so its Hessian is
+  symmetric and a square read at one base agrees to first order with no rest. Its rest limit is the partial face.
+- The base holds the classes, the supports and the halvings, and the open site stays a source carrying the locked mixture.
+Receipts: `longrun_nov6/energy129.txt`.
+
+[definition; the unified-theory reading of November 7, 00:02] **The face is the total derivative of one scalar, and a square
+agrees at one base.**
+- The face is now `z_t(a) = −dG/de_t(a)` with `G(e) = Φ(x^K(e); e)`, read through the opening and the declared ticks.
+- The partial at the last state is joined by the reverse. From `λ^K = −J F^K` back over each tick that stood, with `w = s ⊙ λ'`,
+  the tick's letters take `2^(−h) ⟨w, ∂F/∂e⟩` and the adjoint steps `λ = λ' + 2^(−h)(r̂⟨λ', F⟩/W + J δF(w))`. The opening then
+  takes `λ⁰` on its rows.
+- `δF(w) = −Hess Φ · w` is the force's tangent through the words, the locks' scores, shares and brackets, the unit power's
+  return differentiated, and the pair. The Hessian is symmetric, so the tangent is the adjoint.
+- The classes, supports and halvings are held at the base. Every open site carries the locked uniform mixture, so every
+  compared letter state is read in one structure.
+Tests on the tiny field, every ring set:
+- The tangent along a lane-tangent direction matches the force's difference across a step of `2^(−8)` to within a tenth of
+  its norm, and `⟨u, Hv⟩ = ⟨v, Hu⟩` to a hundredth.
+- A central difference of `G` across an open site's mixture moved by `±2^(−7)(δ_b − δ_a)` reads `−2ε(z_b − z_a)`, mostly
+  within 1% (largest 4.3% where the reading is large, falling with `ε`). Where the reading is small it scatters by about
+  `2^(−11)` bits, which is the replayed states' rounding.
+- Theory's identity at one base, with the open sites as mixtures and the reads replayed under the base's supports and
+  halvings: from `ε = 2^(−6)` to `2^(−4)` the readings grow 3.95, 4.08 and 3.67 times.
+- Curl over readings reads 0.050 → 0.140, 0.019 → 0.077 and 0.039 → 0.190, against 1.45–1.90 for the partial face at the same
+  base.
+
+[measurement; November 7, energy130; Brandon's host exception of November 6, 23:52:55 UTC, the founding read again with the
+face corrected] **At founding the total-derivative face saturates.** This is energy129's founding read again (lap 24's
+declaration with the energy, KEYS8; curl on held truth, 32 problems, 16 squares a band), with the face as the total
+derivative and the open sites carrying the locked mixture, on the host with 16 threads.
+- The development read was 4 problems, 160 region reads in 7.6 s. It projected 484 s (upper 665 s); the read took 546 s (1.13×)
+  and finished all 32 problems.
+- Curl/λ by band: 2.08, 1.93, 1.90, 2.05 and 1.99. The two ends correlate −0.04 to +0.05, and κ is 0.95–1.04.
+- λ's mean is −59, −55, −55, −52 and −44 bits by band. Its median is −62.0 bits at both ends in every band, the code of the
+  face's floor: one letter of the square has no mass at its face. So the faces' spread passes the 62-bit floor, and the
+  squares read saturation, not the energy's response.
+- The construction's test cannot be read at this scale. On the tiny field the same face agrees at one base (above).
+- [inferred] The face's letter sensitivity at founding is the opening rows `E(a)` (uniform on `±1`) against `λ⁰ = dG/dx⁰`. That
+  sums every receiver's force on a site's key and probe: a site keys every receiver of its class and its near field, at the
+  founding's temperature `2^(−β) = 4`. So a letter moves `G` by hundreds of bits, where the partial face at founding read only
+  the strand rows, with `R = 0`.
+- The scale of `G` against the letters is the next subject: a temperature of the energy, or a founding at which the faces open
+  near flat.
+Receipts: `longrun_nov6/energy130.txt`.
+
+[measurement; November 7, energy131 and energy132; the unified-theory readings of 01:37 and 02:00] **At the letters'
+temperature the founding's squares do not agree at one base, and the card reads them 25 times faster.**
+- The founding temperature: over 32 training writer states (every answer place open, carrying the mixture), the faces at
+  `T = 1` spread 24,308 bits. So `log₂ T₀ = 14.57` (`temper-field`, 106 s on 16 threads).
+- The step is read on a letter's own weight in the uniform mixture: `ε = 2^(−4)/A` and `4ε` [agent-inferred]. Theory's
+  `2^(−6)` and `2^(−4)` wrapped the lowered letter at `A = 100`.
+- The read: energy131, 2,560 squares at one base on the host, 1,415 s on 16 threads. The card read the same squares bit for bit
+  in 57 s (energy132, `CardField::energy_squares` through `read_energy_squares`). The raw faces (`T = 1`) were read on the card
+  beside them.
+- By band: no square floors at `T₀`, and whole-letter code curl/λ (reported) is 1.82, 1.77, 1.97, 2.01 and 2.01. λ's means are
+  −0.02 to −0.035 bits, sd 0.04–0.12.
+- The energy's own four-corner square over `T` has sd 0.003–0.006 bits, and against the faces' logit squares it correlates
+  −0.08 to +0.16. Theory's reading: the open-base face is a poor whole-letter proposal (lap 4's KL measures it); only the
+  small-ε curl tests the build.
+- The gate (theory, 02:00), read raw: curl/readings at `ε` is 0.41, 0.54, 0.39, 0.40 and 0.43 (gate ≤ 0.1, fails). Readings
+  grow 3.71, 3.86, 2.97, 3.86 and 3.76 times to `4ε`. Per square the median is 0.13, 0.19, 0.18, 0.28 and 0.46 at `ε`, and 0.20 to
+  0.25 at `4ε`: the far bands rise as `ε` falls (grain).
+- Localization (theory, 03:05) on a 400-site line state of the founding: the force's tangent matches its difference to
+  0.1–0.3%, and the Hessian is symmetric to about 1e−6.
+- Squares' median curl/readings at `ε = letter/16`: 0.049 at K = 0, 0.054 at K = 1, 0.086 at K = 2, 0.171 at K = 3 and 0.173 at
+  K = 4. At K = 4 it reads 0.546 at letter/4 and 0.432 at letter/64.
+- On a line-shaped small field (40 sites, 4 heads, 4 ticks, crowds with counts above one) the same squares agree: 0.013 at
+  letter/64 and 0.034 at `4ε`.
+- So the force, its tangent, the opening and one tick's reverse are right. Over more ticks no step is clean: below letter/16
+  the ratio rises as `ε` falls (grain), and above it the curvature of four ticks grows the curl.
+- [inferred] The descent rounds the state to `2^(−16)` every tick while the face reads it at thousands of bits a unit.
+Receipts: `longrun_nov6/energy131.txt`, `longrun_nov6/energy132.txt`.
+
+[measurement; November 7, energy133; the unified-theory reading of 03:22] **Central squares at one base: the median square
+agrees, and a floor rules the small ones.** These are held truth's squares on energy131's founding at `K = 4`, read raw
+(`T = 1`). Each reading is `+ε` less `−ε` at the base, so the curvature cancels to third order (`FIELD_ENERGY_CENTRAL`,
+`Field::energy_central_square`). It ran on the host with 16 threads, 1,648 s against a 1,441 s projection.
+- The readings grow 1.89, 2.12, 1.58, 1.96 and 1.92 times from a letter's weight over 16 to over 8, and 1.50–1.89 times to over
+  4.
+- Per-square median curl/readings at /8 is 0.036, 0.045, 0.058, 0.075 and 0.138 by band; at /16 it is 0.051–0.225.
+- Summed over squares the curl/readings is larger: 0.24–0.59 at /8.
+- 8–19% of squares sit above 0.5 at every step. Their readings are 15 times smaller than those of the squares under 0.1 (2.1
+  against 30.8 bits raw at /8), an absolute floor that rules the ratio where a reading is small.
+- By theory's rule (≤ 0.1 at a step whose readings double within 10%), the medians at /8 pass in bands 1, 2–3 and 8–15. Band
+  4–7 passes the bound, but its readings grow only 1.58 times, and band 16+ misses at 0.138.
+- The central fall ratio on a line state is `(Φ(x − δv) − Φ(x + δv))/(2δ⟨F, v⟩)`. It reads 0.89–1.32 at `2^(−10)` and does not
+  close at `2^(−12)`, where the step moves the state by about eight units of its grain.
+Receipts: `longrun_nov6/energy133.txt`, `longrun_nov6/central.py`.
+
+[measurement; November 7, energy133's squares and fall134; the unified-theory reading of 04:04] **The squares above 0.5 are
+mostly grain, and along `F` the energy falls at its first order.**
+- Theory's free check: the 182 squares above 0.5 at /16 and /8. Their median readings are 0.31, 0.52 and 1.16 bits raw at
+  /16, /8 and /4, and their median curl/readings is 1.53, 1.31 and 0.82, falling as the readings grow (median growth from /16
+  to /4 is 3.14). That is grain.
+- 55 of the 2,560 squares (2%) grow at least 3 times to /4 and stay above 0.5 there. These are spread over bands 1 to 15.
+  Problem 18 holds 8 of them, and gaps 1, 15 and 7 are the most common. In each, one end's reading grows linearly while the
+  other's stays flat or shrinks, which is a term in those pairs. At `T₀` they read `10⁻³` to `2·10⁻²` bits a whole letter.
+- The fall along `F` (`Field::energy_fall`) on energy133's 400-site line state, read as distance from 1 of `(Φ(x − δF) −
+  Φ(x + δF))/(2δ⟨F, F⟩)` at `δ = 2^(−8)` to `2^(−12)` of a site's scale:
+  - at the opening: `5.1·10⁻³`, `1.3·10⁻³`, `3.7·10⁻⁴`, then the state's grain (about `10⁻⁴`);
+  - after the four ticks: `2.0·10⁻³`, `5.2·10⁻⁴`, then grain.
+  - The central reading falls 3.84 and 3.86 times per halving, and the one-sided one halves (1.5% and 3.5% at `2^(−8)`).
+- So along `F` the energy's fall is its first order, with an `O(δ²)` central residue, at `K = 0` and at `K = 4`. Along a
+  random direction energy133's reads scatter at the grain, since `⟨F, v⟩` is small there.
+- Device: the host, one thread, 2.5 s. It is a check of the reference's force against its own energy on one state, and the
+  card is bit-equal on both [agent-inferred].
+Receipts: `longrun_nov6/fall134.txt`, `longrun_nov6/energy_fall_force.rs`.
+
+[measurement; November 7, settle135; the unified-theory reading of 04:20] **The settling read, on the card: the sharp squares'
+ends meet at a letter's weight over 32 and part again at over 64.**
+- The central squares now read through the realization. `CardField::energy_central_squares` gives `3 + 4·steps` reads a
+  square, batched. The card's readings at /16 equal energy133's host readings bit for bit on all 55 squares, read in 5.2 s.
+- The read covers energy133's 55 squares that grow at one end, at a letter's weight over 16, 32 and 64, on the founding at
+  `T = 1`. Each reading below is scaled by `16/step`, so a linear one stays put.
+- Three squares have a linear end of at least 20 bits raw at /16 (problem, band, i, j):
+  - 0 3 55 70: linear −455, −362, −303; other −195, −357, −444.
+  - 16 3 134 143: linear −72, −122, −53; other −3, −101, −111.
+  - 17 1 291 294: linear 25, 40, 44; other 46, 47, 54.
+  - The ratio other/linear is 0.43, 0.04 and 1.83 at /16; 0.99, 0.83 and 1.17 at /32; 1.47, 2.09 and 1.25 at /64.
+- So at /32 the two ends agree within 17% in all three. Neither end is linear below /16: the raw linear end of the first square
+  falls 2.5 and 2.4 times per halving.
+- Over all 55 squares: 3 are within 20% at /64, 20 stay as far apart as at /16, and 32 are closing. Most of the 55 read under
+  a bit raw, which is the grain.
+- [inferred] There is no square whose ends stay apart while the linear end halves, so none reads as a term in its pair. The
+  readings of the sharp squares turn over between /16 and /64, which is a curvature scale under a letter's weight over 16.
+Receipts: `longrun_nov6/settle135.txt`, `settle.py`, `settle_select.py`, `settle_squares.tsv`.
+
+[definition and measurement; November 7, lap4's development reads; the unified-theory reading of 04:05 and Brandon's lens
+of 04:42] **The field meets its own release, released jointly: a lap projects at 2.9 hours on the card.**
+- Route (b): `FieldLearner::section_contrast` deposits `(1/T)[∂G/∂θ(truth) − ∂G/∂θ(e′)]` through the realization's
+  material read (the card's, bit-equal with the host at 1,500 sites, 86 ms against 7.8 s on one host thread). The step
+  fluxes. A step lowers `G(truth) − G(e′)` by its first order (within 0.4% on the tiny field and 0.06% on the line field).
+- The release `e′`. One release per state by the writer as it writes is about 22,000 full reads an answer at room 2,062
+  (the card's measurement, about 140 s a state batched).
+  - Brandon (04:42): "if you're implying one pass over a negligible amount of data should take 20 minutes, that is
+    unreasonable".
+  - `Field::energy_release` relaxes every open place's mixture at once toward its face. Its fixed point is the stationary
+    point of `F(q) = G(q)/T − H₂(q)`, its step is certified on `F` as the ticks' steps are on `Φ`, and each place is drawn
+    from its mixture.
+  - This is the framework's generation law: the joint field is refined and its boundary released [agent-inferred].
+- dev1, a fixed half step: the mixtures oscillated. The largest move stayed at 300 to 30,000 grains after 64 reads.
+- dev2, the step certified: answers rest as their moves reach a grain. After 64 reads at most a few answers of 16 still move,
+  by 2 to 5 grains. This is the 64-read cap.
+- dev2's costs, on the card, 25 sections of 16 from the tempered founding:
+  - release 6.8 s a section on average (median 4.3 s, largest 30 s), 63 reads on average;
+  - deposit 0.05 to 0.7 s;
+  - the enumerated read at 64 held places, 11 s.
+- A lap of 1,543 sections projects at 2.9 h, or 4.0 h at the mean plus two standard errors. The sections are walked in a
+  keyed order, so the 25 are a fair sample.
+- The gap `(G(truth) − G(e′))/T` a state is +0.007 to +0.65 bits over the first five sections, then −0.03 to −2.8 bits. The
+  steps move the truth's energy below the field's own release.
+- The enumerated read at the founding: the enumerated conditional (every letter's `G` read) codes 6.639 bits a place and
+  the face 6.644 (`log₂ 100`). `KL(enumerated ‖ face)` averages 0.0008 bits and is at most 0.3 at 64 of 64 places. Near uniform, the faces propose almost
+  exactly.
+Receipts: `longrun_nov6/lap4_dev.txt`, `lap4_dev.sh`, `lap4_exact.py`.
+
+[definition and measurement; November 7, lap 4; the unified-theory readings of 05:20 and 05:33] **The negative is one invariant
+kernel step from the truth, and lap 4 lowers the held enumerated code by 0.114 bits a place in 7.3 minutes.**
+- Theory refused the joint release as the negative. It draws each place from its own mixture, so at rest the deposit is the
+  gap between the joint and the factorized distributions, not zero. A mean field on the negative side can also lower the
+  contrast by spoiling its own release.
+- `FieldLearner::section_kernel` replaces it. Each state opens one block, the answer places `t ≡ r (mod 11)`
+  (`FieldLearner::kernel_spacing`, `2(NEAR − 1) + 1`, so that no receiver's near lock sees two block places; `r` is keyed).
+  - Each block place carries its truth as a locked one-hot mixture, so one read gives `G` and the faces at the truth.
+  - `a_t` is drawn from its face. The proposal read gives `G′` and `face′`.
+  - The weight is `min(1, A)` with `A = 2^((G − G′)/T) Π face′_t(truth_t)/face_t(a_t)`, read through the exponential's
+    navigator and released to zero below `2^(−23)`.
+  - The deposit is `(1/T) Σ min(1, A)[∂G/∂θ(truth) − ∂G/∂θ′]`: four reads a state.
+  - By detailed balance the expected deposit is zero at the true distribution for any block. The test counts what the
+    spacing leaves to it (crowds, the ticks' transport).
+- The development read (60 s, 153 sections): acceptance 0.959 (sd 0.104), 0.318 s a section, a lap projected at 8.2 min.
+- The lap, on the card from the tempered founding:
+  - all 1,543 sections, 24,685 states and 733,860 block places in 436.5 s (0.89 of the projection), 457 s with the two
+    enumerated reads;
+  - acceptance 0.517 (sd 0.395) over the lap, 0.959 in its first tenth and 0.331 in its last, falling as the faces sharpen.
+- The score at 64 held places:
+  - the enumerated code went from 6.639 to 6.526 bits a place, a paired change of −0.114 with standard error 0.017;
+  - the face code went from 6.644 to 6.526;
+  - `KL(enumerated ‖ face)` went from 0.0008 to 0.0065 bits on average (median 0.0021), at most 0.3 at 64 of 64 places.
+- Against theory's blinds: the enumerated code is far above the 4.6 guessed, the KL is under 0.05, and the last tenth's acceptance
+  is under the 0.5 to 0.9 band.
+- By theory's rule (a fall past twice its paired error) lap 5 follows on the same law at once.
+Receipts: `longrun_nov6/lap4.txt`, `lap4.sh`, `lap4_devk.sh`, `lap4_exact.py`.
+
+[measurement; November 7, lap 5] **Lap 5, on the same law, moves the held enumerated code a fifth as far, inside its error.**
+- From lap 4's state: 1,543 sections and 24,685 states in 472 s on the card.
+- Acceptance 0.312 (sd 0.373): 0.325 in the first tenth, 0.291 in the last.
+- The enumerated code went from 6.526 to 6.503 bits a place, a paired change of −0.023 with standard error 0.017, not past twice
+  its error. So by theory's rule no lap 6 follows. The face code went from 6.526 to 6.508, and `KL(enumerated ‖ face)` from
+  0.0065 to 0.0110.
+- From the founding the held enumerated code reads 6.639, 6.526 and 6.503, while the letters' own frequencies code the truth at
+  4.93. The field is still near uniform.
+- [inferred] A block holds 29.7 places on average, so `A` is a product of about 30 ratios. Its weight averages 0.31 while the
+  faces are still near uniform, and the moments normalize the deposit's scale, so the collapsed weights mostly select the
+  states with short blocks. The step's rate is the line's `2^(−12)`. The next loop's law (block size, rate) is theory's
+  to set.
+Receipts: `longrun_nov6/lap5.txt`, `lap5.sh`.
+
+[measurement; November 7, lap 4 on a Colab A100; Brandon, 05:11: "I completely authorize any and all interactivity with
+Google Colab using the CLI"] **A lap is bit-identical across devices, and the consumer card is the faster one.**
+- The source at `5c7db3137` was built for a Colab A100-SXM4-40GB (12 vCPUs, its own device's architecture). There the
+  card's energy parity suite passed (10 of 10, bit-equal with its host).
+- Lap 4 replayed from the same inputs and keys reached 1,502 of 1,543 sections by its 600 s deadline, so it is incomplete.
+  Every receipt field of those 1,502 sections equals the 4080 SUPER's: states, places, moved places, acceptance with its
+  least and most, whole weights, and the first-order prices (which read the covector and the material).
+- Their time: 585 s on the A100 against 428 s on the 4080 SUPER, 1.37 times slower. The VM's host part is also slower (its
+  material returns 295 s against 228 s).
+- [corrected, Brandon 05:59: "'exact' is *false* ... They're bit widths of graphs"] The cause is the realization's layout,
+  not the law or the device. The law declares a width for each term and releases its remainder at a declared tolerance;
+  that is dynamic precision, and π, for one, is a navigator read at a width. The card's kernels hold every term in fixed 64-
+  and 128-bit scalar words on the CUDA cores, where the consumer card's clocks lead.
+- Both cards' tensor cores multiply narrow integer limbs and accumulate in 32 bits. A term split into limbs whose products
+  and sums fit the accumulator gives the same bits, since integer sums are associative. The lock scores, words and rows are
+  matrix products. Moving them onto the tensor cores is the realization's next subject.
+- Until then the A100 is a second device for independent runs beside the card. The session was stopped after the replay.
+Receipts: `longrun_nov6/lap4_a100.txt`, `lap4_a100.sh`.
+
+[measurement; November 7, lap 6; the unified-theory reading of 05:55] **The evidence-shrunk Newton step runs away as its
+curvature collapses.**
+- `FieldLearner::deposit_newton`: along the moments' direction `d` (their step before this section moves them), each
+  state's slope `u_s = D_s · d` is weighed `f_s = w_s u_s`. Then `s = Σ f`, `v = n/(n − 1) Σ(f − s/n)²`,
+  `c = (ln 2/2) Σ w u²`, and the step is `α d` with `α = −(s/c)(1 − v/s²)`. [agent-inferred] The shrink is floored at
+  zero, so a section uphill or under its noise deposits nothing.
+- The development read (60 s, 170 sections from lap 5's state): 63 sections stepped, the rest uphill or noise-bound. Where
+  it stepped, α's median was 5.9 and the shrink's 0.41. The standing steps moved their own sections by −0.1 to −0.3 bits a
+  state and priced at +0.06 to +0.37 bits on the next.
+- Lap 6 stopped at section 202 of 1,543 (69 s), when the card refused a value past its 64-bit carrier. No state was
+  written.
+  - From about section 140 the acceptance climbed to 0.93 and then 1.0.
+  - The curvature fell from 10¹⁰–10¹¹ to 10⁷, and α rose to 878–2,307 with the shrink near 0.99.
+  - Each section predicted −2.4 bits a state on itself, and the transfers on the next ran −0.1 to −3.8 bits.
+- [inferred] The steps drive the faces toward flat. Acceptance near one means `G′ ≈ G`, so the curvature along `d` falls,
+  `α ∝ 1/c` grows, and the evidence stays near one as the slope's variance falls with it. The next law (a trust region on
+  `α`, or the curvature held at its running level) is theory's.
+Receipts: `longrun_nov6/lap6.txt`.
+
+[measurement; November 7, lap 7; the unified-theory reading of 06:26] **More states a section do not buy evidence; the
+moments' letter rows hold the step that the next section pays for.**
+- Sections of 16, 64 and 256 states, at rates 12, 11 and 10, the moments counting states:
+  - card time per state 18.80, 17.36 and 14.57 ms (only 22% less at 256: the card is near full at 16);
+  - transfer on the next section +11%, +37% and +34% of the step's own-section price.
+- Lap 7 at 256 (446 s): the held enumerated code went from 6.503 to 6.524 (+0.022 ± 0.024). The Newton terms read beside the
+  step showed the moments' direction uphill on each next section (α = 0) with the shrink near 0.95: the anti-transfer was
+  systematic.
+- The transfer by family, one minute at 16 states (µbits a state, transfer over own-section price):
+  - moment_before +1,590/−11,455, moment_after +981/−10,091, moment_face +307/−2,626;
+  - q +82/−2,266, probe +97/−1,663;
+  - pair_c −12/−119.
+  The passage moments' letter rows held 70% of the step and 88% of the positive transfer.
+
+[definition and measurement; November 7, lap 8; the unified-theory readings of 06:57 and 07:16] **Each family reads its
+length from its own transfer, the letters' temperature learns, and lap 8 lowers the held code 1.54 bits a place.**
+- `FieldLearner::family_rates`: family `f` steps at `2^(−ρ_f)`, opening at 12 bits. After each section `ρ_f` moves
+  `¼ τ̄_f/|π̄_f|`, with `τ̄` and `π̄` the family's transfer and own-section price averaged at `2^(−3)`.
+  - [derived, one noisy quadratic mode] `E τ = −η|μ|² + η²c` vanishes at the length that lowers the code most per step.
+  - A step the next section pays for grows shorter, and one the next section keeps pulling grows longer.
+- `FieldLearner::temper_learns`: `∂l/∂ log₂ T = −ln 2 Σ_s w_s (G_s − G′_s)/T` from the energies already read.
+- The development read from lap 5's state: the held code untrained at `log₂ T` −½ and −1 reads 6.461 and 6.411 (from 6.503).
+- Lap 8, all 1,543 sections in 468 s:
+  - The held enumerated code went from 6.503 to 4.964 bits a place, a paired change of −1.539 with standard error 0.185.
+    The letters' own frequencies code the truth at 4.93.
+  - The face code went from 6.508 to 5.039, and `KL(enumerated ‖ face)` from 0.011 to 0.251 (52 of 64 places at most 0.3).
+  - `log₂ T` went from 14.57 to 10.12, nearly all of it in the lap's first fifth.
+  - Acceptance was 0.203.
+  - The total share (transfer over price) was within 3% of zero in 9 of 10 tenths.
+  - The letters' rows (enc) became the largest learner, their length 12 → 5.4 bits. The moment rows grew 6.3 bits shorter.
+  - The two letter biases (read_bias, lift_bias: the field's unigram) were pulled by every next section. Their lengths ran
+    past zero under a clamp I had set [agent-inferred; theory, 07:16: the law is stable for them unclamped].
+- Lap 9 follows on the same law, the lengths unbounded (a negative `ρ` is a left shift checked at its carrier), every
+  family reopening at 12.
+Receipts: `longrun_nov6/lap7.txt`, `lap7_dev.sh`, `lap7.sh`, `lap8.txt`, `lap8_dev.sh`, `lap8.sh`, `enumerated.py`.
+
+[measurement; November 7, lap 9; the unified-theory readings of 07:16 and 07:24] **Lap 9 takes the held code under the
+letters' own frequencies, inside its error.**
+- From lap 8's state, the family lengths unbounded (a negative `ρ` a left shift checked at its carrier), every family
+  reopening at 12: 1,543 sections in 428 s, with no carrier refusal.
+- The held enumerated code went from 4.964 to 4.786 bits a place, a paired change of −0.178 with standard error 0.135. The
+  letters' frequencies code the truth at 4.93.
+- The face code went from 5.039 to 5.246, and `KL(enumerated ‖ face)` from 0.251 to 0.523: the faces propose worse as the
+  energy sharpens.
+- `log₂ T` went from 10.12 to 10.25, and acceptance was 0.210. The total share was within 2.1% of zero in every tenth.
+- The two letter biases settled with positive lengths unclamped (read_bias 5.4, lift_bias 9.7 bits). The letters' rows
+  (enc) ended at 10.6 and the moment rows at 17.6 to 24.4.
+- Lap 10's law (theory, 07:24):
+  - each problem's residue is cut into blocks of at most `k*` places, each its own kernel step from the truth, with `k*` re-read each section;
+  - the family lengths are carried in the learner's text.
+- Its development read: 2.8 blocks a problem, 60.2 ms a problem, a lap projected at 1,486 s; acceptance 0.40.
+Receipts: `longrun_nov6/lap9.txt`, `lap9.sh`, `lap10_dev.sh`.
+
+[measurement; November 7, lap 10; codes in nats a byte from here on (Brandon, 07:53: "'bits per letter' is convoluted …
+the natural units might work out more intuitively"); each codec letter is one byte] **Smaller blocks carry context: lap 10
+lowers the held code under the bytes' own frequencies, though it stopped at its deadline.**
+- Each problem's residue was cut into blocks of at most `k*` places, each its own kernel step from the truth. `k*` was re-read
+  each section from `σ̂² = −2 ln 2 E log₂ A/k`; it fell from 16 to 4 over the lap, so the blocks multiplied.
+- The lap stopped at its 1,900 s deadline after 1,239 of 1,543 sections (1,918 s against a 1,486 s projection, 1.29×).
+  The receipt is incomplete.
+- The held enumerated code of its stopped state went from 3.318 to 2.990 nats a byte (from 4.786 to 4.313 bits), a paired
+  change of −0.328 nats with standard error 0.100. The bytes' frequencies code the truth at 3.417 nats.
+- The face code went from 3.636 to 3.445 nats, and `KL(enumerated ‖ face)` from 0.363 to 0.786 nats.
+- Acceptance was 0.45 over 84,692 blocks. The letters' rows lengthened 4 to 6 bits, and the unigram's biases 2 to 6.
+- Moved places a second (`Σ k min(1, A)/s`) were about 225 in lap 9 (one block a problem) and about 138 in lap 10.
+- Lap 11's law (theory, 07:40):
+  - each problem's truth formed once for all its blocks (`FieldLearner::section_kernel_grouped`);
+  - the block size read from the acceptance's own slope, `log₂ k* += ¼(1 + slope)`.
+- In lap 11's development read `k*` fell to 1 within 37 sections, 90.2 ms a problem.
+Receipts: `longrun_nov6/lap10.txt`, `lap10.sh`, `lap11_dev.sh`, `enumerated.py`.
+
+[measurement; November 7, lap 11, the faces read both ways, and the k = 4 lap; the unified-theory readings of 08:13 to 08:49]
+**A shared coin over many places drags the deposit toward the proposals; single places with their own coins are the
+target; blocks of four lower the held code to 2.770 nats a byte.**
+- Lap 11 read the block size from the elasticity of the mean acceptance (two lengths a section, `log₂ k* += ¼(1 + slope)`).
+  - `k*` ran from 4 to 4096 within 55 sections: where the two acceptances agree within their noise the slope reads near
+    zero, and once both release to zero the read stops.
+  - The lap ran whole (423 s) with acceptance 0.047, and the held enumerated code rose from 2.990 to 3.161 nats a byte
+    (+0.171 ± 0.113).
+  - Theory withdrew the block law: a coin shared over `k` places drags the deposit toward the proposals, and single-place
+    moves rest at the pseudo-likelihood, the held target.
+- The faces read both ways at the held places (lap 10's stop): `KL(enumerated ‖ open face)` 0.786 nats (the open face
+  carries the uniform mixture) against `KL(enumerated ‖ face at the truth)` 0.325. The face at the truth, which the kernel
+  proposes from, is the better proposal, and the singular places' extremes (an open face at 0.08 or 11.2 nats where the
+  enumerated code is 1.6–1.9) settle at the truth.
+- The k = 4 lap from lap 10's stop (all 1,543 sections, 192,800 blocks, 2,473 s): the held enumerated code went from 2.990 to
+  2.770 nats a byte (−0.220 ± 0.123). Acceptance was 0.203, falling from 0.33 to 0.13 over the lap, while both faces'
+  KL rose (open 1.08, at the truth 1.22).
+- Lap 12 (one place a block, each its own coin) runs on a Colab A100. The k = 8 comparison there was lost when a second GPU
+  session reclaimed the first.
+Receipts: `longrun_nov6/lap11.txt`, `lap11.sh`, `pin4.sh`, `singular.py`.
+
+[measurement; November 7, the writer and lap 13; the unified-theory readings of 09:36, 09:55 and 10:12] **The writer's
+equilibrium sits 1 to 2 nats a place below the truths; persistent writes met by the deposit are stable only once the step's
+length is read from the writes' own fluctuation, and then they raise the held code.**
+- `kernel-write` from the k = 4 lap's state wrote 8 held prompts (238.5 s on the card; its halves agreed at sweep 8, 121 s). The
+  texts were shown in the thread only (they derive from private passages). Read as `G/T` a place in nats, each write sits
+  below its truth by 0.95 to 2.16 nats: the field's low basins are not the truths, so the kernel's single steps from the
+  truth never visit them. The first closing read printed −1 for every place (the product had lost its bits); it is now
+  `(g·T⁻¹ ≫ 32)·ln 2 ≫ 30` a place, and the corrected run wrote the same texts.
+- Lap 13 (09:36): 16 persistent writes, one a problem slot, released once and never restarted; each section sweeps one
+  residue class of their places at `T` (`Field::energy_sweep_at`) and deposits `(1/T)Σ[∂G/∂θ(truth) − ∂G/∂θ(write)]`, with
+  `T` learning (`FieldLearner::section_contrast` adds the temperature's covector). `log₂ T` ran from 9.7 to 24.2 in 150
+  sections, and the run stopped at the temperature's carrier refusal (482 s).
+- With `T` held (09:55; each write released once at the longest answer's length and carried whole) the energy's scale ran
+  away instead: the closing read reached −17.6 nats a place by section 53, and a deposited parameter outgrew its 32-bit
+  carrier (220 s).
+- The 10:12 law sinks the writes by 8 sweeps before the first deposit and takes the step's length from the writes'
+  fluctuation along the moments' direction, `η = −2Σp/(n ln 2 Var p)` at the families' held lengths, an eleventh of the
+  harmonic mean of the last eleven (`FieldLearner::section_contrast_scaled`). It ran stably for 781 of 1,543 sections, to
+  its deadline (2,801 s against a 2,195 s projection for the whole lap: 2.5 times the projected time a section, so its stop
+  was owed at the first tenth). The closing read stayed positive, +0.25 nats a place on average (the writes above their
+  truths). The held enumerated code of its stopped state went from 2.770 to 3.187 nats a byte (+0.417 ± 0.162).
+- Lap 12 (one place a block, each with its own coin, from the k = 4 lap's end) was lost with its Colab VM overnight at 488 of
+  1,543 sections. An app restart near 11:15 killed the write-out of lap 13's state at sweep 34, and the card stood idle about
+  5.5 hours.
+- The held code read at `T·2^(j/4)`, `j = −8…8`, from the same enumerated `G` (theory, 16:56; a reading only): at the k = 4
+  lap's end the best is at its own `T` (2.783 at `j = −1`, 2.770 at 0, 2.809 at +1); at lap 13's stop the best is 3.176 at
+  `j = +1`, 0.011 ± 0.032 under its value at `T`. No temperature brings lap 13 near 2.770, so its loss is in the shape of `G`,
+  not its scale.
+- Lap 12 runs again on the card from 17:00, with a saved state at least each hour (Brandon, November 6 17:11):
+  `contrast-field` now rests the learner as `STATE.<lap>.<sections>` at the first section that starts an hour past its last
+  saved state, and reads the held places from it (rows marked `10000·(lap + 1) + sections`). `kernel-write` prints its
+  closing read at `T` and after the descent.
+Receipts: `longrun_nov6/write.sh`, `write.txt`, `lap13.sh`, `lap13.txt`, `lap13b.sh`, `lap13b.txt`, `lap13c.sh`,
+`lap13c.txt`, `lap13d.sh`, `lap13d.txt`, `lap13d_held.sh`, `tempread.py`, `tempread.txt`, `lap12.sh`.
+
+[measurement; November 7, lap 12 on the card, the lanes check and the card's launches; theory's readings of 16:56 to 19:51]
+**Single places with their own coins lower the held code to 2.501 nats a byte by section 680, and the lap's second half buys
+nothing; the two relaxations a state read one `G`; the host's cores add nothing beside the card at this kernel.**
+- Lap 12 (one place a block, each its own coin; from the k = 4 lap's end) ran 819 sections, was killed with the session that
+  launched it near 18:14, and resumed from its hourly saved state at section 680 with the same walk and keys
+  (`FIELD_CONTRAST_FROM_SECTION`; the resumed state read the saved held rows bit for bit). Acceptance was 0.42.
+- The held enumerated code: 2.770 at the start, 2.501 at section 680 (−0.269 ± 0.093), 2.543 at 1,355, and 2.623 at the
+  end (+0.122 ± 0.095 from 680). The sections ran 5.5 s on average, against the 4.04 s the 33-section development read
+  projected (sections differ in places, 3.6 to 7.6 s a hundred).
+- Read at `T·2^(j/4)` from the same enumerated `G`, each state's best held code is at its own `T` or a quarter-bit cooler
+  (2.482 at 680, 2.533 at 1,355, 2.623 at the end, at `j = −1, −1, 0`): no temperature returns the end to 680's code, so
+  the second half's loss is in `G`'s shape, as at lap 13. `T` learned: `log₂ T` went from 9.667 to 9.467 by 680 and held.
+- The families' lengths shortened from the lap's start to section 680 and grew again late. From 680 to the end the step grew
+  5.9 times in `q`, 6.1 in `read`, 3.8 in `probe` and 3.4 in `after`, while `lift_bias`'s shrank 41 times.
+- The two relaxations a state (the faces read at the open structure, places carrying their letters whole, and the material
+  read at the resolved one) read the same `G` in bits at all 14,233 states of 33 sections (`KernelReceipt::g_agree`).
+- `LanesField` splits each energy read's regions between the host's cores and the card at once and joins them in order.
+  Over 39 sections from 680 every section line equalled the card-only run's but its time. It took 215.2 s against 214.9 s
+  card alone (0.998×): the partition settled at a 2.3% host share, the card reading a region in 4.3 ms against about 144 ms
+  of a host lane's time at 20 threads. It stays off.
+- The card's own clock over 33 sections (`FIELD_EVENTS`): kernels 104.3 s of 120.6 s, in 287,877 launches (about 8,700 a
+  section, 362 µs each). The faces read's tangent passes lead: `field_energy_tangent_rows` 26.9 s and
+  `field_energy_tangent_columns` 9.5 s. Then the material reverse's `field_contact_columns` 11.8 s and
+  `field_energy_rows_back` 11.2 s, and the forward's `field_exposure` 6.9 s and `field_energy_rows_l5` 6.7 s. The
+  one-block-a-region kernels are under 1%. One relaxation a state (one forward, one reverse giving faces, `G` and
+  `∂G/∂θ`) is the gain inside a section.
+- `contrast-field` now prints each family's sections' coherence `|Σg|²/(n Σ|g|²)` over each hundred sections and the lap
+  (theory 19:50, from Brandon's 19:44 lens: efficiency is learning more from the same passage), and reads the held places at
+  each tenth.
+Receipts: `longrun_nov6/lap12_resume.sh`, `lap12_resume.txt`, `lanes.sh`, `lanes.txt`, `lanes_compare.py`, `events.sh`,
+`events.txt`, `lengths.py`, `lengths.txt`, `tempread12.txt`.

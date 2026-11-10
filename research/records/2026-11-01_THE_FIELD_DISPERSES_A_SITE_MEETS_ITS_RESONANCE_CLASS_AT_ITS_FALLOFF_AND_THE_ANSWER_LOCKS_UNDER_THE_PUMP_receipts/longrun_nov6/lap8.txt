@@ -1,0 +1,56 @@
+# lap 8: the development read (the held code at sharper T, one minute of the law) and the lap (FIELD lines).
+== log2 T shift -500 milli
+FIELD_CONTRAST_LOG2T_SHIFT milli=-500 log2_t=236041431
+MEASURE lap=held-500 rc=0 wall_s=9.6 peak_rss_kib=406152
+lap	places	enumerated_code	face_code	kl_mean	kl_q25	kl_median	kl_q75	kl<=0.3	face_zero_letters
+-1	64	6.4605	6.4662	0.0180	0.0028	0.0105	0.0265	64/64	0
+== log2 T shift -1000 milli
+FIELD_CONTRAST_LOG2T_SHIFT milli=-1000 log2_t=227652823
+MEASURE lap=held-1000 rc=0 wall_s=9.6 peak_rss_kib=407492
+lap	places	enumerated_code	face_code	kl_mean	kl_q25	kl_median	kl_q75	kl<=0.3	face_zero_letters
+-1	64	6.4112	6.4159	0.0285	0.0054	0.0188	0.0434	64/64	0
+== lap 8 law, one minute
+FIELD_KERNEL_TENTH lap=0 tenth=1 log2_t=175567758 enc=12959/13 before=13400/24 after=13138/18 q=12797/13 q_bias=14265/55 v=12000/0 v_bias=12000/0 out=12000/0 out_bias=12000/0 a=18121/96 a_bias=22487/1067 b=18077/95 b_bias=21207/996 w=12000/0 w_bias=12000/0 read=15564/51 read_bias=-12013/-561 moment_before=15459/68 moment_after=14556/53 temper=12000/0 probe=12268/-4 probe_bias=12752/11 pace=12000/0 moment_face=16483/67 moment_face_bias=18407/93 lift_bias=-14906/-674 pair_c=16010/94 face_temper=7196/12
+FIELD_STOPPED lap=0 sections=169/1543 states=2701 ms=60365
+FIELD_KERNEL_ACCEPT lap=0 stopped states=2701 places=76756 moved=75350 accept_milli=201 sd_milli=349 whole=301
+FIELD_CARD reads=340 read_ms=32123 returns=169 return_ms=26311 pairs=9618656804 batches=620 peak_store=8397022608 landmarks=0 landmark_ms=0 elapsed_ms=60371
+MEASURE lap=dev rc=0 wall_s=60.9 peak_rss_kib=431976
+sections=169 ms_a_state=18.94 lap_projection_s=467 predicted_micro_mean=-113279 transfer_micro_mean=1136 log2_t_first=244425944 last=176147367
+MAIN exit 07:07:35
+== lap
+FIELD_ENUMERATED_READ lap=-1 ms=9079
+FIELD_KERNEL_TENTH lap=0 tenth=1 log2_t=175567758 enc=12959/13 before=13400/24 after=13138/18 q=12797/13 q_bias=14265/55 v=12000/0 v_bias=12000/0 out=12000/0 out_bias=12000/0 a=18121/96 a_bias=22487/1067 b=18077/95 b_bias=21207/996 w=12000/0 w_bias=12000/0 read=15564/51 read_bias=-12013/-561 moment_before=15459/68 moment_after=14556/53 temper=12000/0 probe=12268/-4 probe_bias=12752/11 pace=12000/0 moment_face=16483/67 moment_face_bias=18407/93 lift_bias=-14906/-674 pair_c=16010/94 face_temper=7196/12
+FIELD_KERNEL_TENTH lap=0 tenth=2 log2_t=169574444 enc=11439/-53 before=13720/-4 after=13242/-10 q=12476/-24 q_bias=16829/19 v=12000/0 v_bias=12000/0 out=12000/0 out_bias=12000/0 a=22384/1 a_bias=22487/0 b=22021/-1 b_bias=21207/0 w=12000/0 w_bias=12000/0 read=16449/-1 read_bias=-29315/-449 moment_before=16111/-2 moment_after=14997/-29 temper=12000/0 probe=11652/-24 probe_bias=11902/-45 pace=12000/0 moment_face=21096/36 moment_face_bias=18407/0 lift_bias=-33916/-519 pair_c=19850/24 face_temper=6555/0
+FIELD_KERNEL_TENTH lap=0 tenth=3 log2_t=169714249 enc=9076/-64 before=12926/-21 after=12486/-22 q=12202/-4 q_bias=17799/115 v=12000/0 v_bias=12000/0 out=12000/0 out_bias=12000/0 a=22152/37 a_bias=22487/0 b=22143/70 b_bias=21207/0 w=12000/0 w_bias=12000/0 read=16309/0 read_bias=-39149/-257 moment_before=16823/17 moment_after=15705/0 temper=12000/0 probe=10874/-19 probe_bias=11890/6 pace=12000/0 moment_face=23652/90 moment_face_bias=18407/0 lift_bias=-39748/-156 pair_c=17570/-80 face_temper=9828/59
+FIELD_KERNEL_TENTH lap=0 tenth=4 log2_t=169717372 enc=7526/-30 before=13123/11 after=12431/5 q=12078/-2 q_bias=17799/0 v=12000/0 v_bias=12000/0 out=12000/0 out_bias=12000/0 a=21639/31 a_bias=22487/0 b=21172/36 b_bias=21207/0 w=12000/0 w_bias=12000/0 read=15557/-13 read_bias=-44033/-128 moment_before=16918/-8 moment_after=16850/19 temper=12000/0 probe=11442/16 probe_bias=14038/47 pace=12000/0 moment_face=22988/58 moment_face_bias=18407/0 lift_bias=-40110/-27 pair_c=17742/6 face_temper=18170/188
+FIELD_KERNEL_TENTH lap=0 tenth=5 log2_t=169719012 enc=7337/-8 before=13538/3 after=12378/-6 q=12254/2 q_bias=17799/0 v=12000/0 v_bias=12000/0 out=12000/0 out_bias=12000/0 a=21137/4 a_bias=22487/0 b=21694/28 b_bias=21207/0 w=12000/0 w_bias=12000/0 read=15300/-34 read_bias=-45440/-38 moment_before=16823/-1 moment_after=16487/-24 temper=12000/0 probe=11708/2 probe_bias=16872/41 pace=12000/0 moment_face=22905/3 moment_face_bias=18407/0 lift_bias=-39762/1 pair_c=18674/48 face_temper=16774/28
+FIELD_KERNEL_TENTH lap=0 tenth=6 log2_t=169719533 enc=7429/-1 before=14306/18 after=12705/7 q=12212/0 q_bias=17799/0 v=12000/0 v_bias=12000/0 out=12000/0 out_bias=12000/0 a=21009/21 a_bias=22487/0 b=21123/4 b_bias=21207/0 w=12000/0 w_bias=12000/0 read=14724/-15 read_bias=-47276/-59 moment_before=16567/-20 moment_after=16576/4 temper=12000/0 probe=11430/-7 probe_bias=16872/0 pace=12000/0 moment_face=22884/42 moment_face_bias=18407/0 lift_bias=-40428/-24 pair_c=19110/61 face_temper=19299/76
+FIELD_KERNEL_TENTH lap=0 tenth=7 log2_t=169720012 enc=7057/-9 before=13803/-17 after=12496/-9 q=12990/19 q_bias=17799/0 v=12000/0 v_bias=12000/0 out=12000/0 out_bias=12000/0 a=21956/172 a_bias=22487/0 b=22146/186 b_bias=21207/0 w=12000/0 w_bias=12000/0 read=14426/-6 read_bias=-48073/-8 moment_before=16755/10 moment_after=16280/-6 temper=12000/0 probe=12505/31 probe_bias=16872/0 pace=12000/0 moment_face=22532/88 moment_face_bias=18407/0 lift_bias=-39342/17 pair_c=20519/171 face_temper=17031/-53
+FIELD_KERNEL_TENTH lap=0 tenth=8 log2_t=169721465 enc=6680/-10 before=13895/6 after=12599/3 q=12440/-10 q_bias=17799/0 v=12000/0 v_bias=12000/0 out=12000/0 out_bias=12000/0 a=21036/18 a_bias=22487/0 b=21169/24 b_bias=21207/0 w=12000/0 w_bias=12000/0 read=14630/10 read_bias=-49302/-39 moment_before=16723/0 moment_after=17302/58 temper=12000/0 probe=12275/-7 probe_bias=16489/-121 pace=12000/0 moment_face=22647/21 moment_face_bias=18407/0 lift_bias=-41855/-88 pair_c=19733/-27 face_temper=15118/-168
+FIELD_KERNEL_TENTH lap=0 tenth=9 log2_t=169731304 enc=5964/-23 before=12402/-51 after=11497/-34 q=11217/-43 q_bias=17799/0 v=12000/0 v_bias=12000/0 out=12000/0 out_bias=12000/0 a=17984/-200 a_bias=22487/0 b=17199/-222 b_bias=21207/0 w=12000/0 w_bias=12000/0 read=13805/-37 read_bias=-48774/23 moment_before=16327/-31 moment_after=17302/0 temper=12000/0 probe=11208/-37 probe_bias=16489/0 pace=12000/0 moment_face=18830/-195 moment_face_bias=18407/0 lift_bias=-39499/69 pair_c=15324/-310 face_temper=15072/-162
+FIELD_KERNEL_TENTH lap=0 tenth=10 log2_t=169739470 enc=5417/-13 before=11301/-31 after=10729/-22 q=10539/-23 q_bias=17799/0 v=12000/0 v_bias=12000/0 out=12000/0 out_bias=12000/0 a=17195/-49 a_bias=22487/0 b=16526/-44 b_bias=21207/0 w=12000/0 w_bias=12000/0 read=12585/-43 read_bias=-48691/-6 moment_before=18317/49 moment_after=18383/365 temper=12000/0 probe=10704/-13 probe_bias=16488/4 pace=12000/0 moment_face=18665/-23 moment_face_bias=18407/0 lift_bias=-41571/-77 pair_c=13610/-15 face_temper=15534/22
+FIELD_KERNEL_ACCEPT lap=0 states=24685 places=733933 moved=700778 accept_milli=203 sd_milli=348 whole=2957
+FIELD_KERNEL_BLOCKS lap=0 by_block_tenth(places_tenths:accept_milli)=55:417,96:354,130:279,164:252,202:210,248:179,303:141,382:105,520:75,869:22
+FIELD_KERNEL_FAMILIES lap=0 enc=-758/-52263 before=-4/-870 after=-11/-1468 q=-107/-12979 q_bias=2/-47 v=0/0 v_bias=0/0 out=0/0 out_bias=0/0 a=6/-72 a_bias=0/0 b=6/-74 b_bias=0/0 w=0/0 w_bias=0/0 read=-1/-89 read_bias=-155/-729 moment_before=193/-3299 moment_after=118/-4218 temper=0/0 probe=-91/-13103 probe_bias=0/-144 pace=0/0 moment_face=30/-476 moment_face_bias=1/-14 lift_bias=-443/-1968 pair_c=7/-88 face_temper=31/-1470
+FIELD_ENUMERATED_READ lap=0 ms=467059
+FIELD_CARD reads=3090 read_ms=221359 returns=1543 return_ms=230404 pairs=58077523626 batches=5080 peak_store=8397022608 landmarks=0 landmark_ms=0 elapsed_ms=467235
+MEASURE lap=lap rc=0 wall_s=467.8 peak_rss_kib=421496
+lap	places	enumerated_code	face_code	kl_mean	kl_q25	kl_median	kl_q75	kl<=0.3	face_zero_letters
+-1	64	6.5026	6.5083	0.0110	0.0015	0.0063	0.0162	64/64	0
+0	64	4.9637	5.0387	0.2507	0.0411	0.0925	0.2519	52/64	0
+# exact code from lap -1 to lap 0: paired change -1.5389 bits a place, standard error 0.1854, over 64 places; falls past twice its error: True
+== /home/b/Workspaces/holonics/.local/wt/qgchgu-sampler/.local/run/2026-11-07-lap8/lap.log: 1543 sections
+tenth	accept_milli	predicted_micro	transfer_micro
+0	201	-113362	1588
+1	183	-56223	-3503
+2	149	-59635	-1360
+3	170	-71445	-859
+4	207	-85227	-508
+5	230	-83655	-227
+6	243	-73906	-239
+7	245	-88711	-878
+8	206	-98434	-2584
+9	200	-202647	-3160
+block-size tenth	mean places a state	accept_milli
+STATE.0 23cdace2ce7716e31187f9c17a683a7c57fe278224f6f44444f5b740d51e0888
+MAIN exit 07:16:23

@@ -144,7 +144,10 @@ pub const PACED_L1: u128 = 1 << 31;
 
 fn carried(x: Option<i128>) -> Result<i128> {
     match x {
-        Some(v) => Ok(v),
+        Some(v) => {
+            crate::number::census::reach(CARRIER, &v);
+            Ok(v)
+        }
         None => refuse(CARRIER),
     }
 }

@@ -1,0 +1,26 @@
+# squares125 from 3e6c51de925a49522bcaeb956e01bdbfbc27fffb161b1cfdcb05e3e1c5927cf2: hnn-field-learner-v3 13 75264 34 -, binary 9c289dd1658748dd9fe346c6f5765153948be57fd616928015c9a43936d66447, the hour ends 21:54:50
+# lock taken 20:54:50
+# no parity: the turn law changes only the pulls' w in the trainer's regions (Port::pull's card parity held at 19:33)
+dev sections 123 mean_ms 1137 max_ms 2583 (lap 24 without squares: 521 ms a section)
+FIELD_UNSEEN lap=-1 code=1.120 sites=43660 next=- ms=10398
+FIELD_STOPPED lap=0 sections=123/1535 reason=run sites=1355842 before=3.391 after=- deposited=123 halvings=0 next_halved=0 next_refused=0 lap_ms=141147 ms=151546
+FIELD_UNSEEN lap=0 stopped code=1.126 sites=43660 next=- ms=151546
+MEASURE lap=dev rc=0 wall_s=152.0 peak_rss_kib=817268
+dev squares: mean |l| a square 1.085 bits over 123 sections, first 20 sections 1.101
+== curl on the cost read's stopped state
+FIELD_CURL problems=32 squares=2560 regions=10240 ms=10743
+band	squares	lambda_mean	lambda_sd	curl_sd	curl/lambda	mean_abs_curl	corr	power	kappa
+1	512	+1.288	3.442	3.930	1.14	2.867	+0.51	31.41	0.492
+2-3	512	+0.537	1.687	2.507	1.49	1.681	+0.29	8.84	0.711
+4-7	512	+0.005	0.515	0.917	1.78	0.513	+0.12	0.95	0.885
+8-15	512	+0.032	0.457	0.564	1.23	0.308	+0.46	0.58	0.551
+16+	512	+0.012	0.186	0.304	1.63	0.162	+0.20	0.12	0.799
+# held context after the cost read's sections: 1.196306 (lap 24: 1.188) 20:57:47
+# lap bound 2094803 ms; a segment 2214803 ms, outer 2274 s, 2523 s left for it 20:57:47
+MEASURE lap=seg rc=1 wall_s=330.6 peak_rss_kib=879064
+-1:5.456424:1.187713:1.390339 
+-1:1.120 
+sections mean ms 1277 over 249
+squares: mean |l| a square 1.126 bits over 250 sections
+MAIN no state
+# the lap's last line: tower realization refused: the card refused the field: a sum outgrew its 128-bit carrier

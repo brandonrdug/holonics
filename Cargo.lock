@@ -44,6 +44,7 @@ name = "holonics"
 version = "0.1.0"
 dependencies = [
  "num-bigint",
+ "num-integer",
  "num-rational",
  "num-traits",
  "rayon",
@@ -56,6 +57,7 @@ version = "0.1.0"
 dependencies = [
  "holonics",
  "num-bigint",
+ "num-rational",
  "num-traits",
  "rayon",
  "thiserror",

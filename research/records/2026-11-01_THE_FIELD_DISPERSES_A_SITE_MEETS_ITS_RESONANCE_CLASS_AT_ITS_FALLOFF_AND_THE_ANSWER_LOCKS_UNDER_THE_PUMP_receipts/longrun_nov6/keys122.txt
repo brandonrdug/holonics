@@ -1,0 +1,17 @@
+# lock taken 20:15:08
+== key 1111111111111111
+FIELD_LENGTH problems=32 sweeps=2062 refine=10 stopped=- run_bits=1 reads=5629 certified_bits=21896.271 passed=7495 ms=128075
+MEASURE lap=k1111111111111111 rc=0 wall_s=128.4 peak_rss_kib=237208
+written: 32 answers, 26 open with ```python; a 'y' outside it in 19, its first at places 0 to 5 in 0 (median first 72), 'y' past it 0.013; commonest byte's share at places 10 to 255 (246 places) 0.195; top byte ' ' 0.165, 'y' 0.010, entropy 5.10 bits over 8760 bytes
+written: 32 answers: a fence opened 28, closed 26; parses as Python 0; code lines mean 11.3; identifiers 1102, in the question 0.15, in the held answer 0.16
+== key 2222222222222222
+FIELD_LENGTH problems=32 sweeps=2062 refine=10 stopped=- run_bits=1 reads=5680 certified_bits=21480.773 passed=7411 ms=128873
+MEASURE lap=k2222222222222222 rc=0 wall_s=129.1 peak_rss_kib=237648
+written: 32 answers, 28 open with ```python; a 'y' outside it in 22, its first at places 0 to 5 in 0 (median first 73), 'y' past it 0.016; commonest byte's share at places 10 to 255 (246 places) 0.187; top byte ' ' 0.164, 'y' 0.013, entropy 4.96 bits over 8760 bytes
+written: 32 answers: a fence opened 31, closed 29; parses as Python 2; code lines mean 9.4; identifiers 1146, in the question 0.15, in the held answer 0.17
+== key 3333333333333333
+FIELD_LENGTH problems=32 sweeps=2062 refine=10 stopped=- run_bits=1 reads=6111 certified_bits=22067.319 passed=7536 ms=141938
+MEASURE lap=k3333333333333333 rc=0 wall_s=142.2 peak_rss_kib=241332
+written: 32 answers, 26 open with ```python; a 'y' outside it in 19, its first at places 0 to 5 in 3 (median first 58), 'y' past it 0.013; commonest byte's share at places 10 to 255 (246 places) 0.199; top byte ' ' 0.164, 'y' 0.009, entropy 5.25 bits over 8760 bytes
+written: 32 answers: a fence opened 30, closed 26; parses as Python 0; code lines mean 11.2; identifiers 1057, in the question 0.12, in the held answer 0.15
+MAIN exit 20:21:48
