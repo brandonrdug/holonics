@@ -1495,6 +1495,38 @@ pub(super) fn grow_contacts_field(args: &[String], realization: &mut dyn FieldRe
     Ok(())
 }
 
+/// [measurement; theory, November 10 21:34] **`joint-field STATE STATE_SHA CODEC CODEC_SHA UNITS UNITS_SHA HELD HELD_SHA KEYS KEYS_SHA OUT`**:
+/// the held joint of a saved state as `train-field` reads it at its lap -1 (`FIELD_JOINT_NATS lap=-1`: the held problems' own and foil
+/// states, the key file's last word the seed), on the declared clocks, through the declared realization. Reads only: never trains, never
+/// writes a state; the rows go to `OUT/JOINT.tsv` (private).
+pub(super) fn joint_field(args: &[String], realization: &mut dyn FieldRealization) -> Result<()> {
+    if args.len() != 12 {
+        return Err("joint-field STATE STATE_SHA CODEC CODEC_SHA UNITS UNITS_SHA HELD HELD_SHA KEYS KEYS_SHA OUT".into());
+    }
+    let started = std::time::Instant::now();
+    let mut learner = FieldLearner::from_text(std::str::from_utf8(&pinned_read(&args[1], &args[2], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
+    declared_clocks(&mut learner.field);
+    let units = units_of(&args[5], &args[6])?;
+    let codec = FieldCodec::from_text(std::str::from_utf8(&pinned_read(&args[3], &args[4], CODEC_BUDGET)?)?, units)?;
+    let held_text = pinned_read(&args[7], &args[8], READ_BUDGET as usize)?;
+    let keys = pinned_read(&args[9], &args[10], READ_BUDGET as usize)?;
+    let seed = u64::from_be_bytes(keys.get(keys.len().saturating_sub(8)..).filter(|w| w.len() == 8).ok_or("a key file of fewer than eight bytes")?.try_into()?);
+    if learner.field.declaration.alphabet != codec.alphabet() {
+        return Err("a learner whose alphabet is not the codec's".into());
+    }
+    let held: Problems = {
+        let dev = problems_of(&held_text);
+        let encoded = dev.par_iter().map(|(q, a)| Ok((codec.encode(&question_text(q)).map_err(|e| e.to_string())?, codec.encode(a).map_err(|e| e.to_string())?, a.len()))).collect::<std::result::Result<Vec<_>, String>>()?;
+        encoded.into_iter().filter(|(_, a, _)| a.len() < codec.answer).collect()
+    };
+    let out = Path::new(&args[11]);
+    std::fs::create_dir(out)?;
+    let mut rows = rows_file(&out.join("JOINT.tsv"), "lap\tproblem\tanswer_sites\town_bits\tfoil_bits\tinformation_bits\tinformation_millibits_by_site\n")?;
+    joint_read(&learner.field, &codec, &held, seed, realization, -1, &mut rows)?;
+    println!("FIELD_JOINT_FIELD ms={}", started.elapsed().as_millis());
+    Ok(())
+}
+
 fn rows_file(path: &Path, head: &str) -> Result<std::fs::File> {
     use std::io::Write;
     let mut file = std::fs::OpenOptions::new().write(true).create_new(true).open(path)?;
@@ -3045,6 +3077,34 @@ mod tests {
     /// the answer's truth, the end's `NEAR` voids resolved and the region cut there, open places only within the answer and at
     /// least one, the resolved ones the first `k` of the writer's order (octaves of distance, never a place of a later octave
     /// before an earlier octave is whole), every octave of `k` met, each open place compared on its own class with weight one.
+    /// [theory, November 10 21:34] `joint-field` reads a saved state's held joint (the lap -1 line) and writes nothing but its rows: the state's
+    /// bytes are unchanged and `JOINT.tsv` holds a row for every held problem.
+    #[test]
+    fn the_joint_field_command_reads_a_state_and_leaves_it_unchanged() {
+        let dir = std::env::temp_dir().join(format!("holonics-joint-{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&dir);
+        std::fs::create_dir_all(&dir).expect("dir");
+        let put = |name: &str, bytes: &[u8]| {
+            std::fs::write(dir.join(name), bytes).expect("write");
+            (dir.join(name).to_string_lossy().into_owned(), sha256(bytes).expect("sha"))
+        };
+        let (codec, problems) = toy();
+        let learner = toy_learner(&codec, &problems);
+        let text = learner.to_text();
+        let keys: Vec<u8> = (0..1u64 << 10).flat_map(|i| mix(0x5EED, i).to_be_bytes()).collect();
+        let (state, state_sha) = put("STATE", text.as_bytes());
+        let (codec_path, codec_sha) = put("CODEC", codec.to_text().as_bytes());
+        let (units, units_sha) = put("UNITS", b"founded-units-v1 0\n");
+        let (held, held_sha) = put("HELD", TOY);
+        let (key, key_sha) = put("KEYS", &keys);
+        let out = dir.join("OUT").to_string_lossy().into_owned();
+        let args: Vec<String> = ["joint-field", &state, &state_sha, &codec_path, &codec_sha, &units, &units_sha, &held, &held_sha, &key, &key_sha, &out].iter().map(|s| s.to_string()).collect();
+        joint_field(&args, &mut HostField).unwrap();
+        assert_eq!(std::fs::read(dir.join("STATE")).unwrap(), text.as_bytes());
+        assert!(std::fs::read_to_string(dir.join("OUT/JOINT.tsv")).unwrap().lines().count() > 1);
+        let _ = std::fs::remove_dir_all(&dir);
+    }
+
     /// [theory, November 10 21:03] `order-field` prints the keyed order given the answer's length by octave: the octaves' places sum to
     /// the letters read, an octave `j` holds positions `[2^j, 2^(j+1))`, and the total line is `keyed_given_bits_a_letter`'s.
     #[test]
