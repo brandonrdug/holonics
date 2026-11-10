@@ -1363,14 +1363,16 @@ pub fn letter_balance(x: &[usize], faces: &[TowerFace]) -> (Vec<i128>, Vec<i128>
 }
 
 /// [definition; theory, November 10 03:25 and 03:55] **An answer's root charge** `Σ_a N(a) log₂(N(a)/F(a))` on the codes'
-/// `2^(−20)` bits ([`letter_balance`]; each ratio read through [`super::face_code`], its smaller side over its larger).
+/// `2^(−20)` bits ([`letter_balance`]; each ratio read through [`super::code_of`], its smaller side over its larger, both
+/// scaled down together to the width its quotient reads: a count on `2^72` passes the `2^66` [`super::face_code`] can shift by
+/// its unit, which wrapped and read the November 10 128-problem run's root as −636,886 nats).
 pub fn root_charge(x: &[usize], faces: &[TowerFace]) -> i128 {
     let (n, f) = letter_balance(x, faces);
     (0..n.len())
         .filter(|&c| n[c] > 0 && f[c] > 0)
         .map(|c| {
             let (num, den) = (n[c] as u128, f[c] as u128);
-            let ratio = if num >= den { super::face_code(den, num) as i128 } else { -(super::face_code(num, den) as i128) };
+            let ratio = if num >= den { super::code_of(den, num) as i128 } else { -(super::code_of(num, den) as i128) };
             (n[c] >> 72) * ratio
         })
         .sum()

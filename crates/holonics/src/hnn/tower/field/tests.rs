@@ -3766,6 +3766,22 @@ fn the_exchange_walk_holds_composition() {
     }
 }
 
+/// [definition; theory, November 10 05:30] **An answer's root charge is its letters' counts against its faces' summed shares**
+/// ([`root_charge`]): faces that share their mass evenly between letters 1 and 2 under an answer of three 1s and one 2 hold
+/// `F = (2, 2)` against `N = (3, 1)`, so the charge is `3 log₂(3/2) + log₂(1/2)` bits, positive, at the counts' `2^72`; and
+/// faces whose shares match the counts read none.
+#[test]
+fn an_answers_root_charge_is_its_counts_against_its_summed_shares() {
+    let face = |m1: u128, m2: u128| TowerFace { masses: vec![0, m1, m2], total: m1 + m2 };
+    let x = [1usize, 1, 1, 2];
+    let even = vec![face(1 << 60, 1 << 60); 4];
+    // 3 log₂ 1.5 − 1 = 0.754887… bits on 2^(−20): 791,557.
+    let r = root_charge(&x, &even);
+    assert!((r - 791_557).abs() < 64, "the root charge {r}");
+    let matched = vec![face(3 << 58, 1 << 58); 4];
+    assert!(root_charge(&x, &matched).abs() < 64);
+}
+
 /// [definition; theory, November 10 04:40] **The re-draws through a lens code the stop place and certify every pass**
 /// ([`Field::redraw_lensed`]): with a lens that weighs the void four times at the stop place, each answer's code at the start is
 /// its lensed locked faces' code, the stop place at the void among them, and every pass that keeps changes lowers the pooled
