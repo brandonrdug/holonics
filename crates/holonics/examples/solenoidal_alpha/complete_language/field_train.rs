@@ -10220,6 +10220,119 @@ pub(super) fn charge_field(args: &[String], realization: &mut dyn FieldRealizati
     Ok(())
 }
 
+/// [definition; theory, November 10 04:15] `redraw-field STATE STATE_SHA CODEC CODEC_SHA UNITS UNITS_SHA HELD HELD_SHA COUNT
+/// START START_SHA H_MILLINATS PASSES OUT`: **point re-draws at the highest surprise, alternating with exchanges**
+/// ([`Field::redraw`]) from a written start (`START`, a `SAMPLE.tsv`: the settle's rest) of the first `COUNT` held problems,
+/// each cut to its room, at most `PASSES` passes (a bound by count). `SAMPLE.pass<k>.tsv` the answers at every pass (`k` 0 the
+/// start), `SAMPLE.tsv` the end, all private; `MOVES.tsv` each kept change's places, letters, bare gain and attributed fall.
+/// `FIELD_REDRAW_PASS` a pass (flushed): its kind (re-draw or exchange), the pooled code, the faces' summed entropy and the
+/// root charge in nats, its kept and undone changes, the shares of places with `v` above one and two nats, and the letters'
+/// distance from the start: `tv` (half the summed `|N(a) − N₀(a)|` over the letters, a share of them) and `planes` (each bit
+/// plane's `|n_b − n₀_b|`, the bytes with bit `b` set, a share of the bytes); `FIELD_REDRAW` a problem at the end: its code at the
+/// start and the end, its entropy and root at the end, a place, and how it stopped (neutral, rest, or the bound).
+pub(super) fn redraw_field(args: &[String], realization: &mut dyn FieldRealization) -> Result<()> {
+    if args.len() != 15 {
+        return Err("redraw-field STATE STATE_SHA CODEC CODEC_SHA UNITS UNITS_SHA HELD HELD_SHA COUNT START START_SHA H_MILLINATS PASSES OUT".into());
+    }
+    let started = std::time::Instant::now();
+    let mut learner = FieldLearner::from_text(std::str::from_utf8(&pinned_read(&args[1], &args[2], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
+    declared_clocks(&mut learner.field);
+    let field = &learner.field;
+    let units = units_of(&args[5], &args[6])?;
+    let codec = FieldCodec::from_text(std::str::from_utf8(&pinned_read(&args[3], &args[4], CODEC_BUDGET)?)?, units)?;
+    let held = problems_of(&pinned_read(&args[7], &args[8], READ_BUDGET as usize)?);
+    let limit = count(&args[9])?;
+    let (h_milli, passes) = (count(&args[12])?, count(&args[13])?);
+    let out = Path::new(&args[14]);
+    std::fs::create_dir(out)?;
+    let held = &held[..limit.min(held.len())];
+    let requests: Vec<(Vec<usize>, usize)> = held.iter().map(|(question, _)| opening(&codec, field, question, b"")).collect::<std::result::Result<_, String>>()?;
+    let problems: Vec<(&[usize], usize)> = requests.iter().map(|(q, n)| (q.as_slice(), *n)).collect();
+    let void = codec.void();
+    let mut start = written_answers(&codec, &args[10], &args[11], held.len())?;
+    for (x, &(_, room)) in start.iter_mut().zip(&problems) {
+        x.truncate(room);
+    }
+    let write = |name: &str, answers: &[Vec<usize>]| -> Result<()> {
+        let mut file = rows_file(&out.join(name), "")?;
+        for (k, places) in answers.iter().enumerate() {
+            let written = places.iter().take_while(|&&c| c != void).count();
+            row(&mut file, &format!("{k}\t{}\n", escaped(&codec.decode(&places[..written])))).map_err(|e| e.to_string())?;
+        }
+        Ok(())
+    };
+    // The letters' distance from the start: TV over the letters, and each bit plane over the bytes.
+    let a = field.declaration.alphabet;
+    let bytes: Vec<Vec<u8>> = (0..a).map(|c| codec.decode(&[c])).collect();
+    let tally = |answers: &[Vec<usize>]| -> (Vec<i64>, [i64; 8], i64) {
+        let (mut n, mut planes, mut total) = (vec![0i64; a], [0i64; 8], 0i64);
+        for x in answers {
+            for &c in x.iter().take_while(|&&c| c != void) {
+                n[c] += 1;
+                for &byte in &bytes[c] {
+                    total += 1;
+                    for (b, plane) in planes.iter_mut().enumerate() {
+                        *plane += i64::from(byte >> b & 1);
+                    }
+                }
+            }
+        }
+        (n, planes, total)
+    };
+    let (n0, planes0, _) = tally(&start);
+    let letters: i64 = n0.iter().sum();
+    let millionths = |num: i64, den: i64| if den == 0 { "-".to_string() } else { format!("{}.{:06}", num * 1_000_000 / den / 1_000_000, num * 1_000_000 / den % 1_000_000) };
+    let h = (((h_milli as i128) << 50) + 1000 * LN2_Q30 - 1) / (1000 * LN2_Q30);
+    let mut saved: Result<()> = Ok(());
+    let (settled, records) = field
+        .redraw(&problems, &start, void, h, realization, &mut |p| {
+            let (n, planes, total) = tally(p.answers);
+            let tv: i64 = n.iter().zip(&n0).map(|(x, y)| (x - y).abs()).sum::<i64>();
+            let plane: Vec<String> = planes.iter().zip(&planes0).map(|(x, y)| millionths((x - y).abs(), total)).collect();
+            let kind = if p.pass == 0 { "start" } else if p.kind == 1 { "redraw" } else { "exchange" };
+            println!(
+                "FIELD_REDRAW_PASS pass={} kind={kind} elapsed_ms={} active={} kept={} undone={} c_nats={} entropy_nats={} root_nats={} v_over_1_share={} v_over_2_share={} tv={} planes={}",
+                p.pass,
+                started.elapsed().as_millis(),
+                p.active,
+                p.kept,
+                p.undone,
+                decimal_q20(nats_q20(p.code)),
+                decimal_q20(nats_q20(p.entropy)),
+                decimal_q20(nats_q20(p.root)),
+                millionths(p.over as i64, p.places as i64),
+                millionths(p.over2 as i64, p.places as i64),
+                millionths(tv, 2 * letters),
+                plane.join(",")
+            );
+            let _ = std::io::Write::flush(&mut std::io::stdout());
+            if let Err(e) = write(&format!("SAMPLE.pass{}.tsv", p.pass), p.answers) {
+                saved = Err(e);
+                return false;
+            }
+            p.pass < passes
+        })
+        .map_err(|e| e.to_string())?;
+    saved?;
+    write("SAMPLE.tsv", &settled)?;
+    let mut file = rows_file(&out.join("MOVES.tsv"), "problem\tmove\tplaces\tproposed_gain_nats\tattributed_fall_nats\n")?;
+    let (mut neutral, mut rested, mut kept, mut undone, mut places, mut start_code, mut end_code, mut entropy, mut root) = (0usize, 0usize, 0usize, 0usize, 0usize, 0i128, 0i128, 0i128, 0i128);
+    for (k, r) in records.iter().enumerate() {
+        for (n, m) in r.kept.iter().enumerate() {
+            let at: Vec<String> = m.at.iter().map(|&(t, from, to)| format!("{t}:{from}>{to}")).collect();
+            row(&mut file, &format!("{k}\t{}\t{}\t{}\t{}\n", n + 1, at.join(","), decimal_q20(nats_q20(m.gain)), decimal_q20(nats_q20(m.fall))))?;
+        }
+        let a_place = |c: i128| if r.places == 0 { "-".to_string() } else { decimal_q20(nats_q20(c) / r.places as i128) };
+        let stop = if r.neutral { "neutral" } else if r.rested { "rest" } else { "bound" };
+        println!("FIELD_REDRAW problem={k} letters={} code_start_nats_a_place={} code_end_nats_a_place={} entropy_end_nats_a_place={} root_end_nats={} kept={} undone={} stop={stop}", r.places, a_place(r.start), a_place(r.end), a_place(r.entropy), decimal_q20(nats_q20(r.root)), r.kept.len(), r.undone);
+        (neutral, rested, kept, undone, places) = (neutral + usize::from(r.neutral), rested + usize::from(r.rested && !r.neutral), kept + r.kept.len(), undone + r.undone, places + r.places);
+        (start_code, end_code, entropy, root) = (start_code + r.start, end_code + r.end, entropy + r.entropy, root + r.root);
+    }
+    let pooled = |c: i128| if places == 0 { "-".to_string() } else { decimal_q20(nats_q20(c) / places as i128) };
+    println!("FIELD_REDRAW_DONE problems={} neutral={neutral} rested={rested} h_millinats={h_milli} passes_bound={passes} kept={kept} undone={undone} letters={places} code_start_nats_a_place={} code_end_nats_a_place={} entropy_end_nats_a_place={} root_end_nats={} ms={}", problems.len(), pooled(start_code), pooled(end_code), pooled(entropy), decimal_q20(nats_q20(root)), started.elapsed().as_millis());
+    Ok(())
+}
+
 /// [definition; theory, November 9 21:43] `lens-field CENSUS CENSUS_SHA DEPTH` followed by `length-field`'s arguments: **the
 /// writer through a census lens** ([`Lensed`]): every face it draws from is lensed at its site's plate by `CENSUS`'s table at
 /// `DEPTH` (an input file, never a switch); its reads, files and heat as `length-field`'s.

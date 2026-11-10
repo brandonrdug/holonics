@@ -496,6 +496,14 @@ pub(super) fn parity(args: &[String], card: &mut dyn FieldRealization) -> Result
     let settle_equal = host_settled == card_settled && host_records == card_records;
     releases_unequal += usize::from(!settle_equal);
     println!("FIELD_PARITY_SETTLE settle_equal={settle_equal} kept={} undone={} rested={} host_ms={host_settle_ms}", host_records.iter().map(|r| r.kept.len()).sum::<usize>(), host_records.iter().map(|r| r.undone).sum::<usize>(), host_records.iter().filter(|r| r.rested).count());
+    // [theory, November 10 04:15] The point re-draws alternating with exchanges through both, from the host's write at h zero.
+    let t2 = std::time::Instant::now();
+    let (host_drawn, host_drawn_records) = host_learner.field.redraw(&questions, &hosted, void, h, &mut HostField, &mut |_| true).map_err(|e| e.to_string())?;
+    let host_redraw_ms = ms(t2.elapsed().as_nanos());
+    let (card_drawn, card_drawn_records) = card_learner.field.redraw(&questions, &hosted, void, h, &mut *card, &mut |_| true).map_err(|e| e.to_string())?;
+    let redraw_equal = host_drawn == card_drawn && host_drawn_records == card_drawn_records;
+    releases_unequal += usize::from(!redraw_equal);
+    println!("FIELD_PARITY_REDRAW redraw_equal={redraw_equal} kept={} undone={} neutral={} host_ms={host_redraw_ms}", host_drawn_records.iter().map(|r| r.kept.len()).sum::<usize>(), host_drawn_records.iter().map(|r| r.undone).sum::<usize>(), host_drawn_records.iter().filter(|r| r.neutral).count());
     println!(
         "FIELD_PARITY_DONE sections={} reads={reads_all} reads_unequal={reads_unequal} faces_unequal={faces_unequal} covector_unequal={entries_unequal} learners_unequal={learners_unequal} releases={} releases_unequal={releases_unequal} card_release_ms={card_release_ms} host_ms={} card_ms={} elapsed_ms={}",
         steps.len(),

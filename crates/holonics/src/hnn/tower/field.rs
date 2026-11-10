@@ -1236,9 +1236,144 @@ pub struct SettlePass<'a> {
     pub code: i128,
     /// [measurement; theory, November 10 02:03] The faces' summed entropy `Σ_t H(f_t)` at the state ([`ExchangePass::entropy`]).
     pub entropy: i128,
+    /// [measurement; theory, November 10 03:55] The answers' summed root charge ([`root_charge`]), the places whose surprise
+    /// passes their face's entropy by more than a nat (`v > 1`), and the places.
+    pub root: i128,
+    pub over: usize,
+    /// The places whose `v` passes two nats.
+    pub over2: usize,
+    pub places: usize,
+    /// The pass's proposer (its number modulo the walk's cycle: [`Field::redraw`]'s 1 a re-draw, 0 an exchange; 0 before the
+    /// first pass).
+    pub kind: usize,
     pub outside: i128,
     pub changed: i128,
     pub answers: &'a [Vec<usize>],
+}
+
+/// [definition; theory, November 10 03:55] **One kept change of a certified walk** ([`Field::settle`], [`Field::redraw`]): each
+/// place it rewrote with its letter before and after, its bare gain, and the fall attributed to it on the read that certified
+/// it (on the codes' `2^(−20)` bits).
+#[derive(Clone, Debug, Default, PartialEq, Eq)]
+pub struct CertifiedMove {
+    pub at: Vec<(usize, usize, usize)>,
+    pub gain: i128,
+    pub fall: i128,
+}
+
+/// [definition; theory, November 10 03:55] **One problem's certified walk** ([`Field::redraw`]): its places, its code at the
+/// written answer and at its end, its faces' summed entropy and its root charge at its end, its kept changes and those undone,
+/// and how it stopped: at neutrality, at rest (a pass kept nothing), or neither (the walk was stopped).
+#[derive(Clone, Debug, Default, PartialEq, Eq)]
+pub struct CertifiedRecord {
+    pub places: usize,
+    pub start: i128,
+    pub end: i128,
+    pub entropy: i128,
+    pub root: i128,
+    pub kept: Vec<CertifiedMove>,
+    pub undone: usize,
+    pub rested: bool,
+    pub neutral: bool,
+}
+
+/// [definition; theory, November 10 01:36] **The settle's exchange proposals** on an answer's letters `x` and its locked faces:
+/// every pair with bare gain `g = c_i(x_i) + c_j(x_j) − c_i(x_j) − c_j(x_i)` above `h`, the most first (then the nearer pair,
+/// then the earlier), each admitted where its claim (the places within `NEAR − 1` of `i` and of `j`) touches no place already
+/// claimed; each the two places and the letters they take, with its gain.
+pub fn exchange_proposals(x: &[usize], f: &[TowerFace], h: i128) -> Vec<(Vec<(usize, usize)>, i128)> {
+    let (len, reach) = (x.len(), NEAR - 1);
+    let c = |i: usize, a: usize| f[i].code(a) as i128;
+    let mut pairs: Vec<(i128, usize, usize)> = Vec::new();
+    for i in 0..len {
+        for j in i + 1..len {
+            if x[i] != x[j] {
+                let g = c(i, x[i]) + c(j, x[j]) - c(i, x[j]) - c(j, x[i]);
+                if g > h {
+                    pairs.push((g, i, j));
+                }
+            }
+        }
+    }
+    pairs.sort_by_key(|&(g, i, j)| (std::cmp::Reverse(g), j - i, i));
+    let hood = |p: usize| p.saturating_sub(reach)..=(p + reach).min(len - 1);
+    let mut claimed = vec![false; len];
+    let mut out = Vec::new();
+    for (g, i, j) in pairs {
+        if hood(i).chain(hood(j)).any(|t| claimed[t]) {
+            continue;
+        }
+        for t in hood(i).chain(hood(j)) {
+            claimed[t] = true;
+        }
+        out.push((vec![(i, x[j]), (j, x[i])], g));
+    }
+    out
+}
+
+/// [definition; theory, November 10 04:15] **The point re-draw proposals** on an answer's letters `x` and its locked faces:
+/// every place with `v_t = c_t(x_t) − H(f_t)` above a nat, the most first (then the earlier), re-drawn to its face's top
+/// letter (the most mass, the void never, the earlier on a tie) where that letter's bare price
+/// `ln f_t(top) − ln f_t(x_t)` is at least a nat, each admitted where its claim (the places within `NEAR − 1`) touches no
+/// place already claimed; each its place and its letter, with its bare gain `c_t(x_t) − c_t(top)` on the codes' bits.
+pub fn redraw_proposals(x: &[usize], f: &[TowerFace], void: usize) -> Vec<(Vec<(usize, usize)>, i128)> {
+    let (len, reach) = (x.len(), NEAR - 1);
+    let ln2 = crate::hnn::keyed_modes::ln2_face();
+    let nats = |bits: i128| (bits * ln2) >> 30;
+    let v: Vec<i128> = (0..len).map(|t| f[t].code(x[t]) as i128 - entropy(&f[t])).collect();
+    let mut order: Vec<usize> = (0..len).filter(|&t| nats(v[t]) > 1 << 20).collect();
+    order.sort_by_key(|&t| (std::cmp::Reverse(v[t]), t));
+    let mut claimed = vec![false; len];
+    let mut out = Vec::new();
+    for t in order {
+        let Some(top) = (0..f[t].masses.len()).filter(|&b| b != void).max_by_key(|&b| (f[t].masses[b], std::cmp::Reverse(b))) else { continue };
+        let gain = f[t].code(x[t]) as i128 - f[t].code(top) as i128;
+        if top == x[t] || nats(gain) < 1 << 20 {
+            continue;
+        }
+        let hood = t.saturating_sub(reach)..=(t + reach).min(len - 1);
+        if hood.clone().any(|u| claimed[u]) {
+            continue;
+        }
+        for u in hood {
+            claimed[u] = true;
+        }
+        out.push((vec![(t, top)], gain));
+    }
+    out
+}
+
+/// [definition; theory, November 10 03:55] **An answer's letter balance**: each letter's count `N(a)` on `2^72` and the
+/// faces' summed share `F(a) = Σ_t f_t(a)` on `2^(−72)` (each share floored on `2^(−40)`, its remainder carried on `2^(−72)`).
+pub fn letter_balance(x: &[usize], faces: &[TowerFace]) -> (Vec<i128>, Vec<i128>) {
+    let a = faces.first().map_or(0, |f| f.masses.len());
+    let mut n = vec![0i128; a];
+    for &c in x {
+        n[c] += 1 << 72;
+    }
+    let mut f = vec![0i128; a];
+    for face in faces {
+        for (c, &m) in face.masses.iter().enumerate() {
+            let share = (m << 40) / face.total;
+            let rem = (m << 40) - share * face.total;
+            f[c] += ((share as i128) << 32) + (((rem << 32) + face.total / 2) / face.total) as i128;
+        }
+    }
+    (n, f)
+}
+
+/// [definition; theory, November 10 03:25 and 03:55] **An answer's root charge** `Σ_a N(a) log₂(N(a)/F(a))` on the codes'
+/// `2^(−20)` bits ([`letter_balance`]; each ratio read through [`super::face_code`], its smaller side over its larger).
+pub fn root_charge(x: &[usize], faces: &[TowerFace]) -> i128 {
+    let (n, f) = letter_balance(x, faces);
+    (0..n.len())
+        .filter(|&c| n[c] > 0 && f[c] > 0)
+        .map(|c| {
+            let (num, den) = (n[c] as u128, f[c] as u128);
+            let ratio = if num >= den { super::face_code(den, num) as i128 } else { -(super::face_code(num, den) as i128) };
+            (n[c] >> 72) * ratio
+        })
+        .sum()
 }
 
 /// [definition; theory, November 10 01:36] **One problem's settle** ([`Field::settle`]): its places, its answer's code at the
@@ -4045,75 +4180,133 @@ impl Field {
     /// then each) and the settle stops where it returns false: a problem still active there has not rested. Returns each
     /// problem's answer (its places past the question, the void past its letters) and its record.
     pub fn settle(&self, problems: &[(&[usize], usize)], written: &[Vec<usize>], void: usize, h: i128, realization: &mut dyn FieldRealization, pass: &mut dyn FnMut(&SettlePass) -> bool) -> Result<(Vec<Vec<usize>>, Vec<SettleRecord>)> {
+        let (out, records) = self.certified_passes(problems, written, void, h, false, 2, 1, realization, &mut |_, x, f| exchange_proposals(x, f, h), pass)?;
+        let records = records
+            .into_iter()
+            .map(|r| SettleRecord { places: r.places, start: r.start, end: r.end, kept: r.kept.iter().map(|m| ExchangeMove { i: m.at[0].0, j: m.at[1].0, gain: m.gain, fall: m.fall }).collect(), undone: r.undone, rested: r.rested })
+            .collect();
+        Ok((out, records))
+    }
+
+    /// [definition; theory, November 10 04:15] **Point re-draws at the highest surprise, alternating with exchanges**: the
+    /// odd passes re-draw ([`redraw_proposals`]: each place with `v_t = c_t(x_t) − H(f_t)` above a nat, the most first, to
+    /// its face's top letter given the rest, where that letter's bare price `ln f_t(top) − ln f_t(x_t)` is at least a nat, the
+    /// claims within `NEAR − 1` disjoint), the even passes exchange ([`exchange_proposals`], the settle's); each pass certified
+    /// as the settle certifies ([`Field::settle`]: one re-read, each claim's attributed fall above `h` kept, the kept set's
+    /// whole fall above `h` × the kept, the weaker half undone until it is). An answer stops at neutrality (its code at or under
+    /// its faces' summed entropy) or where nothing stands in a re-draw pass and an exchange pass in a row; `pass` stops the
+    /// whole. Returns each answer and its record.
+    pub fn redraw(&self, problems: &[(&[usize], usize)], written: &[Vec<usize>], void: usize, h: i128, realization: &mut dyn FieldRealization, pass: &mut dyn FnMut(&SettlePass) -> bool) -> Result<(Vec<Vec<usize>>, Vec<CertifiedRecord>)> {
+        self.certified_passes(problems, written, void, h, true, 1, 2, realization, &mut |round, x, f| if round % 2 == 1 { redraw_proposals(x, f, void) } else { exchange_proposals(x, f, h) }, pass)
+    }
+
+    /// [definition; theory, November 10 01:36 and 03:55] **The certified passes** [`Field::settle`] and [`Field::redraw`] share:
+    /// each pass, each active problem's proposals (`propose`, from its letters and its locked faces: each a set of places and
+    /// the letters they take, its bare gain, the claims of different proposals disjoint), all applied and read once, each
+    /// place's fall attributed to the proposal whose claim (the places within `NEAR − 1` of a place it rewrites) holds it, the
+    /// proposals whose claims fell by more than `h` kept and the rest undone, then the kept set certified whole on a re-read
+    /// (its fall above `h` × the kept), its weaker half by attributed fall (`⌈n/2⌉`) undone and the set re-read until it is.
+    /// `propose` is shown the pass's number. A problem of fewer than `least` letters rests where it is written; one rests after
+    /// `cycle` passes in a row that keep nothing (one of each proposer); where `neutral`, one stops at neutrality (its code at or
+    /// under its faces' summed entropy).
+    #[allow(clippy::too_many_arguments)]
+    fn certified_passes(&self, problems: &[(&[usize], usize)], written: &[Vec<usize>], void: usize, h: i128, neutral: bool, least: usize, cycle: usize, realization: &mut dyn FieldRealization, propose: &mut dyn FnMut(usize, &[usize], &[TowerFace]) -> Vec<(Vec<(usize, usize)>, i128)>, pass: &mut dyn FnMut(&SettlePass) -> bool) -> Result<(Vec<Vec<usize>>, Vec<CertifiedRecord>)> {
         if written.len() != problems.len() {
-            return refuse("a settle with one written answer a problem");
+            return refuse("a certified walk with one written answer a problem");
         }
         let reach = NEAR - 1;
         let letters: Vec<usize> = written.iter().map(|w| w.iter().take_while(|&&c| c != void).count()).collect();
         let mut answers: Vec<Vec<usize>> = written.iter().zip(&letters).map(|(w, &n)| w[..n].to_vec()).collect();
         let codes = |faces: &[TowerFace], x: &[usize]| -> Vec<i128> { faces.iter().zip(x).map(|(f, &a)| f.code(a) as i128).collect() };
+        let summed = |faces: &[TowerFace]| -> i128 { faces.iter().map(entropy).sum() };
         let everyone: Vec<usize> = (0..problems.len()).collect();
         let mut faces = self.answer_faces(problems, &answers, &everyone, void, realization)?;
-        let mut records: Vec<SettleRecord> = (0..problems.len())
+        let mut records: Vec<CertifiedRecord> = (0..problems.len())
             .map(|k| {
                 let c = codes(&faces[k], &answers[k]).iter().sum();
-                SettleRecord { places: letters[k], start: c, end: c, rested: letters[k] < 2, ..SettleRecord::default() }
+                CertifiedRecord { places: letters[k], start: c, end: c, rested: letters[k] < least, ..CertifiedRecord::default() }
             })
             .collect();
-        let mut active: Vec<bool> = letters.iter().map(|&n| n >= 2).collect();
-        let total = |records: &[SettleRecord]| records.iter().map(|r| r.end).sum::<i128>();
-        let summed = |faces: &[Vec<TowerFace>]| -> i128 { faces.iter().flatten().map(entropy).sum() };
-        let mut go = pass(&SettlePass { pass: 0, active: active.iter().filter(|&&a| a).count(), kept: 0, undone: 0, code: total(&records), entropy: summed(&faces), outside: 0, changed: 0, answers: &answers });
+        let mut active: Vec<bool> = letters.iter().map(|&n| n >= least).collect();
+        let stand = |k: usize, faces: &[Vec<TowerFace>], answers: &[Vec<usize>], records: &mut [CertifiedRecord], active: &mut [bool]| {
+            records[k].entropy = summed(&faces[k]);
+            records[k].root = root_charge(&answers[k], &faces[k]);
+            if neutral && active[k] && records[k].end <= records[k].entropy {
+                records[k].neutral = true;
+                active[k] = false;
+            }
+        };
+        for k in 0..problems.len() {
+            stand(k, &faces, &answers, &mut records, &mut active);
+        }
+        #[allow(clippy::too_many_arguments)]
+        fn report<'a>(rounds: usize, active: &[bool], records: &[CertifiedRecord], faces: &[Vec<TowerFace>], answers: &'a [Vec<usize>], kept: usize, undone: usize, outside: i128, changed: i128) -> SettlePass<'a> {
+            let ln2 = crate::hnn::keyed_modes::ln2_face();
+            let past = |nats: i128| -> usize { faces.iter().zip(answers).map(|(f, x)| f.iter().zip(x).filter(|&(face, &a)| ((face.code(a) as i128 - entropy(face)) * ln2) >> 30 > nats << 20).count()).sum() };
+            let (over, over2) = (past(1), past(2));
+            SettlePass {
+                pass: rounds,
+                active: active.iter().filter(|&&a| a).count(),
+                kept,
+                undone,
+                code: records.iter().map(|r| r.end).sum(),
+                entropy: records.iter().map(|r| r.entropy).sum(),
+                root: records.iter().map(|r| r.root).sum(),
+                over,
+                over2,
+                places: answers.iter().map(Vec::len).sum(),
+                kind: 0,
+                outside,
+                changed,
+                answers,
+            }
+        }
+        let mut go = pass(&report(0, &active, &records, &faces, &answers, 0, 0, 0, 0));
+        let kind = |rounds: usize| rounds % cycle;
         let mut rounds = 0usize;
+        let mut idle = vec![0usize; problems.len()];
         while go && active.iter().any(|&a| a) {
             rounds += 1;
-            // (1) Each active problem's proposals, greedy by bare gain, their claims disjoint; each place's claimant.
-            let mut proposals: Vec<Vec<(usize, usize, i128)>> = vec![Vec::new(); problems.len()];
+            // (1) Each active problem's proposals, their claims disjoint; each place's claimant.
+            let mut proposals: Vec<Vec<(Vec<(usize, usize, usize)>, i128)>> = vec![Vec::new(); problems.len()];
             let mut claim: Vec<Vec<Option<usize>>> = answers.iter().map(|a| vec![None; a.len()]).collect();
             for k in 0..problems.len() {
                 if !active[k] {
                     continue;
                 }
-                let (x, f) = (&answers[k], &faces[k]);
-                let len = x.len();
-                let c = |i: usize, a: usize| f[i].code(a) as i128;
-                let mut pairs: Vec<(i128, usize, usize)> = Vec::new();
-                for i in 0..len {
-                    for j in i + 1..len {
-                        if x[i] != x[j] {
-                            let g = c(i, x[i]) + c(j, x[j]) - c(i, x[j]) - c(j, x[i]);
-                            if g > h {
-                                pairs.push((g, i, j));
+                let len = answers[k].len();
+                for (n, (at, g)) in propose(rounds, &answers[k], &faces[k]).into_iter().enumerate() {
+                    for &(t, _) in &at {
+                        for u in t.saturating_sub(reach)..=(t + reach).min(len - 1) {
+                            if claim[k][u].is_some_and(|o| o != n) {
+                                return refuse("a certified walk's proposals that share a claimed place");
                             }
+                            claim[k][u] = Some(n);
                         }
                     }
-                }
-                pairs.sort_by_key(|&(g, i, j)| (std::cmp::Reverse(g), j - i, i));
-                let hood = |p: usize| p.saturating_sub(reach)..=(p + reach).min(len - 1);
-                for (g, i, j) in pairs {
-                    if hood(i).chain(hood(j)).any(|t| claim[k][t].is_some()) {
-                        continue;
-                    }
-                    let n = proposals[k].len();
-                    for t in hood(i).chain(hood(j)) {
-                        claim[k][t] = Some(n);
-                    }
-                    proposals[k].push((i, j, g));
+                    let at = at.into_iter().map(|(t, to)| (t, answers[k][t], to)).collect();
+                    proposals[k].push((at, g));
                 }
                 if proposals[k].is_empty() {
-                    records[k].rested = true;
-                    active[k] = false;
+                    idle[k] += 1;
+                    if idle[k] >= cycle {
+                        records[k].rested = true;
+                        active[k] = false;
+                    }
                 }
             }
             let ks: Vec<usize> = (0..problems.len()).filter(|&k| !proposals[k].is_empty()).collect();
             if ks.is_empty() {
-                break;
+                go = pass(&SettlePass { kind: kind(rounds), ..report(rounds, &active, &records, &faces, &answers, 0, 0, 0, 0) });
+                continue;
             }
+            let apply = |answers: &mut [Vec<usize>], k: usize, at: &[(usize, usize, usize)]| at.iter().for_each(|&(t, _, to)| answers[k][t] = to);
+            let undo = |answers: &mut [Vec<usize>], k: usize, at: &[(usize, usize, usize)]| at.iter().for_each(|&(t, from, _)| answers[k][t] = from);
             // (2) Every proposal applied and read once; each place's fall attributed to its claimant.
             let before: Vec<Vec<i128>> = (0..problems.len()).map(|k| if proposals[k].is_empty() { Vec::new() } else { codes(&faces[k], &answers[k]) }).collect();
             for &k in &ks {
-                for &(i, j, _) in &proposals[k] {
-                    answers[k].swap(i, j);
+                for (at, _) in &proposals[k] {
+                    apply(&mut answers, k, at);
                 }
             }
             let reread = self.answer_faces(problems, &answers, &ks, void, realization)?;
@@ -4139,11 +4332,11 @@ impl Field {
                     }
                 }
                 let fall = attributed(k, &now, proposals[k].len());
-                for (p, &(i, j, _)) in proposals[k].iter().enumerate() {
+                for (p, (at, _)) in proposals[k].iter().enumerate() {
                     if fall[p] > h {
                         kept[k].push(p);
                     } else {
-                        answers[k].swap(i, j);
+                        undo(&mut answers, k, at);
                         undone_all += 1;
                     }
                 }
@@ -4160,14 +4353,14 @@ impl Field {
                 }
                 let mut next = Vec::new();
                 for k in pending {
-                    let f = now_faces[k].take().ok_or(TowerError::Refused("a settle's kept set without its read"))?;
+                    let f = now_faces[k].take().ok_or(TowerError::Refused("a certified walk's kept set without its read"))?;
                     let now = codes(&f, &answers[k]);
                     let c: i128 = now.iter().sum();
                     let fall = attributed(k, &now, proposals[k].len());
                     if records[k].end - c > h * kept[k].len() as i128 {
                         for &p in &kept[k] {
-                            let (i, j, g) = proposals[k][p];
-                            records[k].kept.push(ExchangeMove { i, j, gain: g, fall: fall[p] });
+                            let (at, g) = &proposals[k][p];
+                            records[k].kept.push(CertifiedMove { at: at.clone(), gain: *g, fall: fall[p] });
                         }
                         kept_all += kept[k].len();
                         records[k].end = c;
@@ -4178,8 +4371,7 @@ impl Field {
                     by.sort_by_key(|&p| (fall[p], p));
                     let weak = by.len().div_ceil(2);
                     for &p in &by[..weak] {
-                        let (i, j, _) = proposals[k][p];
-                        answers[k].swap(i, j);
+                        undo(&mut answers, k, &proposals[k][p].0);
                     }
                     undone_all += weak;
                     kept[k] = by[weak..].to_vec();
@@ -4193,11 +4385,17 @@ impl Field {
             for &k in &ks {
                 records[k].undone += proposals[k].len() - kept[k].len();
                 if kept[k].is_empty() {
-                    records[k].rested = true;
-                    active[k] = false;
+                    idle[k] += 1;
+                    if idle[k] >= cycle {
+                        records[k].rested = true;
+                        active[k] = false;
+                    }
+                } else {
+                    idle[k] = 0;
+                    stand(k, &faces, &answers, &mut records, &mut active);
                 }
             }
-            go = pass(&SettlePass { pass: rounds, active: active.iter().filter(|&&a| a).count(), kept: kept_all, undone: undone_all, code: total(&records), entropy: summed(&faces), outside, changed, answers: &answers });
+            go = pass(&SettlePass { kind: kind(rounds), ..report(rounds, &active, &records, &faces, &answers, kept_all, undone_all, outside, changed) });
         }
         let out = answers.iter().zip(written).map(|(a, w)| {
             let mut placed = a.clone();
