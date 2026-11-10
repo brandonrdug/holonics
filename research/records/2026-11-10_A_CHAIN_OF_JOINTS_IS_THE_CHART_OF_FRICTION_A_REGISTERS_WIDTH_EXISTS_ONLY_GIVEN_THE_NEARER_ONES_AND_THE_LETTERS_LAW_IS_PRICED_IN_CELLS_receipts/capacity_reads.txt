@@ -1,0 +1,62 @@
+Host count rulers on the python-codes passage, 2026-11-10 (theory lead; a VM on the PC's host; TRAIN 8,096,768 places, HELD128 43,470 places;
+nats a place; tables Witten-Bell; rulers on text, never machinery). Guesses and their times: guess_capacity.txt.
+
+1. Two letters each side, table cut to its k most frequent contexts (rest read one each side)        [cap_a.py, cap_a2.py]
+   k=0 1.6397   1,000 1.4094   10,000 0.9750   100,000 0.6291   all (356,758 contexts, 543,071 cells) 0.5758
+   41.3% of contexts occur once; 2.87% of HELD places meet an unseen context.
+2. The field at ct4 (64 contacts, locked visit) against that table cut to k contexts: lacks       [cap_a3.py]
+   k=1,000 0.0528   10,000 0.1268   100,000 0.2156   all 0.2334
+   84% of the 0.2334 sits in contexts seen 10 to 999 times; at unseen and once-seen contexts the field is the better
+   (1.40 against 3.04; 1.19 against 1.47).
+3. Left tables (cells, HELD128, held 0-31)                                                           [cap_c.py]
+   one back 6,708: 2.710, 2.710   two back 67,760: 1.982, 1.898   three back 244,378: 1.467, 1.423
+   four back 542,182: 1.239, 1.224   eight back: 1.105
+4. Scattered written letters: a uniformly random order, each place coded from the written ones among its
+   eight neighbours (four each side), every subset its own table, four draws of the order            [cap_b.py]
+   order-averaged 1.5247 (held 0-31: 1.5193)
+   by tenth of the answer written: 3.187 2.807 2.326 1.873 1.443 1.094 0.836 0.658 0.539 0.451
+   by the two nearest neighbours: none written 2.763; left only 1.310; right only 1.304; both 0.514
+5. Two-grain ruler, left only: near pair letter for letter, far pair (-4,-3) as one of K classes     [cap_d.py]
+   same back-off references: two back 1.9815 (67,760 cells); class = letter at -3: 1.4671 (244,378);
+   class = the far pair itself: 1.2193 (542,182)
+   located classes (followed alike, then reassigned):  K=16 1.5965 (175,615)   64 1.4306 (268,092)
+                                                       256 1.2803 (383,033)   1024 1.2256 (494,415)
+   classes by a hash of the far pair:                  K=16 1.5998 (259,018)   64 1.4054 (387,374)
+                                                       256 1.2858 (479,097)   1021 1.2365 (522,375)
+   against the exact tables' line at equal cells: located 0.003, 0.008, 0.047, 0.022 under; hash 0.151, 0.082, 0.028 above.
+6. The field's own reads beside them (design's logs, RTX 4080; held 0-31 unless said)
+   order read, nats a place:   masks (random order)   place order (content)   octaves, end given (a letter)
+   lap 26 (31,190 numbers)        -                      1.953                   1.784
+   ct4 (63,606 numbers)           1.704                  1.858                   1.697
+   ct6                            1.706                  1.792                   1.677
+   held joint on the 128: lap 26 1.8923; lane lap 37 (57,398 numbers) 1.8286; 32 contacts +4 laps 1.8176; ct4 1.8043; ct6 1.7917
+   references' locked code on the 128: 0.646; 0.5885; 0.5798; 0.5678; ct6 0.5597
+   ct6's release (32 held, lengths given): 0 parse; 22 open with the fence; identifiers found in the question 0.06;
+   after re-draws its own code 0.836 against its faces' entropy 0.868 (27 of 32 neutral).
+
+7. Registers by distance, left only (cap_e.py, cap_e_right.py; HELD128; nats a place)                  [read 2026-11-10 20:28-20:33Z]
+   the letter at -d, given the d-1 nearer letters letter for letter:
+     d   what it adds   its own content given the nearer letters (right-only table, depth d-1)   bits   share that bears on the place
+     1      0.708          3.418                                                               4.93      0.21
+     2      0.728          2.700                                                               3.90      0.27
+     3      0.514          1.972                                                               2.85      0.26
+     4      0.228          1.460                                                               2.11      0.16
+     5      0.082          1.234                                                               1.78      0.07
+     6      0.024          1.151                                                               1.66      0.02
+   cells of the whole table: 6,708; 67,760; 244,378; 542,182; 925,764; 1,351,427.  fall of code per nat of cells: 0.40 (2 to 3 back),
+   0.29 (3 to 4), 0.15 (4 to 5), 0.06 (5 to 6).
+   the same letter read only as one of K classes (one class map for every context); share of what it adds that K classes hold
+   (hash of the letter, located classes):
+     d=1:  K=2 0.03 0.18   4 0.09 0.41   8 0.21 0.55   16 0.40 0.72   32 0.64 0.93   64 0.81 0.99      width (90%) 32
+     d=2:  K=2 0.11 0.20   4 0.31 0.41   8 0.51 0.57   16 0.70 0.70   32 0.85 0.92   64 0.92 0.99      width 32
+     d=3:  K=2 0.16 0.21   4 0.40 0.42   8 0.62 0.59   16 0.79 0.80   32 0.90 0.94   64 0.95 0.99      width 32
+     d=4:  K=2 0.14 0.09   4 0.42 0.39   8 0.67 0.60   16 0.81 0.80   32 0.91 0.94   64 0.97 1.00      width 32
+     d=5:  K=2 -.14 -.27   4 0.25 0.15   8 0.61 0.43   16 0.77 0.70   32 0.89 0.87   64 0.98 0.99      width 64
+     d=6:  K=32 0.81 0.71 (the run stopped on time there)
+   (hash rows at "32" and "64" hold 31 and 51 distinct classes.)
+   Score of G11: widths guessed 64, 32, 16, 16, 8, 8; read 32, 32, 32, 32, 64, over 32: the width does NOT narrow with distance (missed).
+   What the letter adds at d=5, 6: guessed 0.07, 0.04; read 0.082, 0.024. Hash at K=16: guessed 0.45, 0.55, 0.65 at d=1, 3, 5; read
+   0.40, 0.79, 0.77 (missed at d>=3: a hash holds as much as located classes from d=2). Right-only tables: guessed 2.72, 2.00, 1.49,
+   1.26; read 2.700, 1.972, 1.460, 1.234 (all within 0.03).
+8. Both sides by ring (both3.py): HELD128 one each side 1.640 (67,740 cells); two 0.576 (543,071); three 0.401 (1,354,931);
+   four 0.378 (2,244,361). Held 0-31: 3.481 unigram; 1.564; 0.569; 0.419; 0.397. Left only on held 0-31: 2.710, 1.898, 1.423, 1.224.

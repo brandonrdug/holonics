@@ -1,0 +1,7 @@
+ct4 field 0.5678 | fitted pair reader 1.0398 (all held; unseen sides read by the branch product) | branch product 1.1478 | joint 0.5758
+   field x fitted pair reader   0.4610 weights [(0.7, 0.4), (0.7, 0.4)]  THE FIELD LACKS 0.1069
+   field x branch product       0.4828 weights [(0.7, 0.4), (0.7, 0.4)]  THE FIELD LACKS 0.0850
+   field x joint table          0.3301 weights [(0.6, 0.6), (0.6, 0.6)]  THE FIELD LACKS 0.2377
+   fitted pair reader x joint table 0.5656 weights [(0.4, 0.7), (0.4, 0.7)]: the pair reader lacks 0.4742 of the joint table
+   fitted pair reader x field 0.4610 weights [(0.4, 0.7), (0.4, 0.7)]: the pair reader lacks 0.5789 of the field
+done 14s

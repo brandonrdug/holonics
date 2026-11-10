@@ -1,0 +1,47 @@
+Fixed 2026-11-10T19:27:04Z, before any read (theory lead). HELD128, nats a place, two letters each side unless said.
+G1  HELD places whose context (two each side) never occurs in TRAIN: 6%.
+G2  distinct TRAIN contexts about 450k; 45% of them occur once.
+G3  table cut to its k most frequent contexts, the rest read by the one-each-side table: k=1e3 1.25, 1e4 0.90, 1e5 0.65, all 0.585.
+G4  the pair contact's form at one tick (opening rows + strand pair contacts + readout through the encoding, face 64 wide),
+    fitted to convergence on TRAIN: no contacts 1.75; 32 contacts 1.30; 64 contacts 1.18; 128 contacts 1.08.
+G5  64 contacts hold what the table holds at about 3k contexts (about 100 contexts a complex contact).
+Added 2026-11-10T19:27:59Z, after the count read above (scores: G1 2.9% missed; G2 357k and 41% close; G3 1.41 / 0.975 / 0.63 / 0.576) and before the next read:
+G6  ct4's lack against the table cut to its k most frequent contexts: 1k 0.03, 10k 0.12, 100k 0.21, all 0.233.
+G7  of ct4's 0.233 lack, the contexts seen 10 to 999 times carry 70%, those seen 1000 times or more under 15%, the rest 15%.
+Added 2026-11-10T19:49:07Z, before the reads below (theory lead). Known beforehand: ct4's order read on held 0-31
+(random order 1.704, place order 1.867, keyed order content 2.113 nats a place), held joint 1.804 on the 128, lap 26's curve by
+share written (3.16, 2.33, 1.68, 1.25, 0.68 at 5, 35, 55, 75, 95 percent; joint 1.892), left tables 1.98, 1.47, 1.24, 1.105.
+G8  count ruler on scattered written letters (a uniformly random order, up to four letters each side, every subset of the
+    eight neighbours its own table, Witten-Bell from far to near), HELD128, by share of the answer written:
+    5%: 3.20; 35%: 2.29; 55%: 1.66; 75%: 1.09; 95%: 0.55; its order-averaged code 1.85 (within 0.1 of the field's 1.80).
+    So at the same reach a random order costs about 0.6 more than place order (four back: 1.24).
+G9  left tables' context-letter cells: two back 35k, three back 180k, four back 500k; their codes on held 0-31 within 0.03 of
+    the 128's (1.98, 1.47, 1.24).
+Added 2026-11-10T20:13:14Z, before the read below (theory lead). Known beforehand: left tables on HELD128 (cells, nats a place):
+two back 67,760: 1.982; three back 244,378: 1.467; four back 542,182: 1.239. The field in place order (untrained there) 1.79-1.87.
+G10 two-grain count ruler, left only, HELD128: the near pair (two back) kept letter for letter, the far pair (places -4,-3) read only
+    as one of K classes; classes located on TRAIN (far pairs followed alike over the next three letters, then reassigned to lower
+    the next letter's code); cells are (class, near pair, letter); Witten-Bell onto the two-back chain.
+    located classes: K=16: 1.72; K=64: 1.52; K=256: 1.37; K=1024: 1.29.   cells at K=64: 200k; at K=256: 330k.
+    control, classes by a hash of the far pair: K=64: 1.80; K=256: 1.66; K=1024: 1.50.
+    Rule fixed now: the exact tables' line is 0.28 nats a doubling of cells from 68k to 244k and 0.20 from 244k to 542k. A located
+    radix COMPRESSES the letters' law if some K sits 0.10 or more under that line at equal cells; if every K sits within 0.05 of
+    it, classes of the far pair do not compress it (a lexicon), and what binds is the count of numbers.
+Added 2026-11-10T20:28:28Z, before the read below (theory lead). Known beforehand: left tables on HELD128 (1 back 2.710, 2 back 1.982,
+3 back 1.467, 4 back 1.239, 8 back 1.105) and G10's result (the far pair through K classes; located and hashed classes on one line).
+G11 registers by distance on the left. For d = 1..6: the letters nearer than d kept letter for letter, the letter at -d read only as one
+    of K classes (one class map for every context, located on TRAIN: k-means on the letters that follow it, then reassignment),
+    Witten-Bell onto the (d-1)-back chain. Width at d = the smallest K of 2,4,8,16,32,64,101 that holds 90% of what the letter adds.
+    widths: d=1: 64; d=2: 32; d=3: 16; d=4: 16; d=5: 8; d=6: 8.    what the whole letter adds: d=5: 0.07; d=6: 0.04.
+    control, classes by a hash of the letter, K=16: holds 45% at d=1, 55% at d=3, 65% at d=5.
+    the register's own content given the nearer letters (the letter at -d coded from the d-1 letters nearer to the place, which is the
+    right-only table of depth d-1 on HELD128): d=2: 2.72; d=3: 2.00; d=4: 1.49; d=5: 1.26 nats (within 0.03 of the left tables).
+Added 2026-11-10T20:33:25Z, before any read of the machine's own transmission by joint (theory lead). Known beforehand: the text's
+tables on held 0-31 (left: 3.481, 2.710, 1.898, 1.423, 1.224 at 0..4 back; both sides: 1.564, 0.569, 0.419, 0.397 at 1..4 each side),
+the field's orders on held 0-31 (masks 1.70, place order 1.79, octaves with the end given 1.68), class prices fitted to lap 26.
+G12 the field's code at a place of held 0-31 when exactly its d nearest letters are written and the rest of the answer is void for at
+    least four places beyond (question given as always), last state of the plain 64-contact arm:
+    left only:  d=0: 3.30; d=1: 2.75; d=2: 2.15; d=3: 1.97; d=4: 1.90.     both sides, d each: d=1: 1.72; d=2: 0.66; d=3: 0.56; d=4: 0.53.
+    So the field's joints pass 0.71, 0.74, 0.38, 0.35 of what the text's joints pass at d = 1, 2, 3, 4 on the left.
+    Rule fixed now: SHORT CHAIN if the field's gain at d=1 and at d=2 (left) is each 0.70 or more of the text's and its gain at d=3 is
+    under 0.50 of the text's; FRICTION AT EVERY JOINT if the three ratios at d=1,2,3 lie within 0.15 of one another. Guess: short chain.

@@ -1,0 +1,32 @@
+Guesses G13 to G18 of 2026-11-10, each fixed before its read (UTC). They continue guess_capacity.txt (G1 to G12) in the receipts of
+the record A CHAIN OF JOINTS IS THE CHART OF FRICTION ... of the same day.
+
+G13-G16 fixed 2026-11-10 20:50Z, before any of these reads (lens of 20:45Z: stereo is degrees of freedom, not the number two; the chain is a tree).
+G13 four letters split between the sides (HELD128, Witten-Bell chain; known: 4 left 1.239, 2+2 0.576, 4 right 1.234):
+    3 left 1 right 0.70; 1 left 3 right 0.70; 2 left 1 right 1.00; 1 left 2 right 1.00.
+    Rule: (3,1) and (1,3) within 0.20 of the even split and over 0.40 under the one-sided four: BOTH ENDS MATTER, BALANCE DOES NOT.
+    Nearer the one-sided than the even: balance matters. Guess: both ends matter, balance does not.
+G14 the two sides read as separate branches whose messages multiply at the place: Q(x) ~ P(x|two left) P(x|two right) / P(x)
+    (135,520 cells instead of 543,071): HELD128 code 0.85, so it lacks 0.27 against the joint table (0.576).
+    One each side: 1.75 against 1.640. One shared exponent chosen on the read itself (a floor): 0.80.
+    Rule: lack <= 0.10: the sides CONVERGE AS BRANCHES (a tree's junction). Lack >= 0.25: they BIND THROUGH A LOOP across the place.
+    Between: mixed. Guess: loop, barely.
+G15 the field (ct4, locked visit, dumped held places) multiplied into the branch product: the field lacks 0.10 of the branches' law
+    (it lacks 0.2334 of the joint table's). Rule: <= 0.078 (a third): what the field lacks is the closure; >= 0.156: it lacks the
+    branches themselves; between: mixed. Guess: mixed.
+G16 the text by stride (HELD128): letters at +-s only: s=2 2.55, 4 3.00, 8 3.20, 16 3.28 (s=1 is 1.640);
+    letters at +-s and +-3s: s=1 1.15, 2 2.25, 4 2.85, 8 3.12.
+
+G17 fixed 2026-11-10 20:56Z, after G13-G16 were read (branch product unfitted: 1.148 and 2.159) and before this read.
+    The best pair-contact reader across a place: Q(x|L,R) ~ a(L,x) b(x,R), both tables fitted by conditional likelihood on TRAIN
+    (this is the conditional of every model with only pair terms among left block, place, right block; 2 x 67k cells at two each side).
+    HELD128 code: two each side 1.02 (lacks 0.44 against the joint table 0.576); one each side 2.05 (lacks 0.41 against 1.640).
+    Rule: lack <= 0.10: the closure across a place is MADE OF PAIR CONTACTS; lack >= 0.25: it is THREE-BODY (it needs the product
+    cell left x place x right); between: mixed. Guess: three-body.
+
+G18 fixed 2026-11-10 21:01Z, before design reads it. The field's octave-order held read (end given; ct6 1.677 on held 0-31) split by
+    octave, taking an octave of stride s to lock the odd multiples of s with every multiple of 2s written. The text's row, two
+    written each side at +-s, +-3s (HELD128): s=1 0.709, 2 1.673, 4 2.656, 8 3.192, 16 and coarser about 3.33.
+    Field, finest first: 0.90, 1.80, 2.70, 3.15, 3.30.
+    Rule: over half of the octave order's lack against the text's row sits in the finest octave: THE LACK IS THE CLOSURE ACROSS A PLACE.
+    Guess: yes.

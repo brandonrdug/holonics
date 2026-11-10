@@ -18,6 +18,12 @@ letters around each place:
 | a joint table of three letters each side | 0.419 |
 
 So the field holds the joint law of two letters each side and nothing joint beyond it. Two facts about the merge go with this:
+
+[correction, November 10 evening] That sentence is withdrawn. Equal heights are not equal
+knowledge: multiplied into the count table the field lacks 0.233 to 0.285 of that law
+([the chord record](2026-11-10_A_CHORD_IS_CIRCLES_CLOSING_AT_THEIR_LEAST_COMMON_MULTIPLE_DEPTH_IS_THE_RADIX_AND_INDUCTION_RECURS_ACROSS_GRAINS.md) 2.8), and most of the lack is the closure of the second ring across a place
+([the grip record](2026-11-10_A_HELD_LETTER_IS_A_LEAKY_GRIP_THE_LAW_ACROSS_A_PLACE_IS_THREE_BODY_WIDTHS_ADD_ALONG_A_BRANCH_AND_PLASTICITY_IS_ANISOTROPY.md) section 3). The two facts below stand.
+
 - The strand contact joins sites two apart in the first tick.
 - Later hops reuse the same 8 complex contacts a side and add none.
 

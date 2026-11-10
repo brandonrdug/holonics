@@ -1,0 +1,12 @@
+places 43470  9s
+ct4 field 0.5678 | joint table 0.5758 | branch product 1.1478 | left pair 1.9815 | right pair 1.9719 | one each side joint 1.6397
+   field x joint table (two each side)      0.3301  weights [(0.6, 0.6), (0.6, 0.6)]  THE FIELD LACKS 0.2377   12s
+   field x branch product (two each side)   0.4828  weights [(0.7, 0.4), (0.7, 0.4)]  THE FIELD LACKS 0.0850   14s
+   field x left pair                        0.5327  weights [(0.9, 0.3), (0.9, 0.3)]  THE FIELD LACKS 0.0352   16s
+   field x right pair                       0.5323  weights [(0.9, 0.3), (0.8, 0.3)]  THE FIELD LACKS 0.0355   18s
+   field x one each side joint              0.5313  weights [(0.8, 0.3), (0.8, 0.3)]  THE FIELD LACKS 0.0365   20s
+   field x branch product (one each side)   0.5661  weights [(0.9, 0.1), (0.9, 0.1)]  THE FIELD LACKS 0.0017   22s
+Traceback (most recent call last):
+  File "cap_f.py", line 68, in <module>
+    d=np.fromfile(V+nm+'/held.bin',dtype=dt); assert (d['letter']==let).all()
+ValueError: operands could not be broadcast together with shapes (31555,) (43470,) 

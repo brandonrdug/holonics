@@ -258,6 +258,11 @@ Each item names its test. Nothing here is ordered except where it says so.
    1.667, 1.431 and 1.352 at 32, 64 and 128 contacts against a neighbour table, a slow fall. If
    the form saturates far above the count, what is owed is depth (products of more than two
    letters), never a larger count of contacts.
+   [retired and answered, November 10 evening] The ruler as designed was retired
+   ([the chain record](2026-11-10_A_CHAIN_OF_JOINTS_IS_THE_CHART_OF_FRICTION_A_REGISTERS_WIDTH_EXISTS_ONLY_GIVEN_THE_NEARER_ONES_AND_THE_LETTERS_LAW_IS_PRICED_IN_CELLS.md), item 6). Its question was answered by a stronger ruler: the best
+   product of a left and a right contact at unlimited rank codes 1.030 where the count of two
+   letters each side codes 0.576 ([the grip record](2026-11-10_A_HELD_LETTER_IS_A_LEAKY_GRIP_THE_LAW_ACROSS_A_PLACE_IS_THREE_BODY_WIDTHS_ADD_ALONG_A_BRANCH_AND_PLASTICITY_IS_ANISOTROPY.md) 2.3). The form saturates 0.455 above the
+   count, so by the rule of this item depth is owed: a word of contacts across ticks.
 3. **A renaming ruler.** [candidate] Held problems under a consistent renaming of their identifiers,
    read by the same locked visit: a field that holds the relations codes the renamed passage as it
    coded the original after each name's first arrival; a recitation does not. It is the
@@ -284,7 +289,7 @@ Each item names its test. Nothing here is ordered except where it says so.
 
 ## 5. Owed
 
-- The contact form's ruler of item 2, designed against `Field`'s contact as coded.
+- ~~The contact form's ruler of item 2~~ (retired and answered the same evening; see item 2).
 - The rate-by-part laps' score, and the same product read on each arm's last state.
 - Lean: 2.2's kernel and residuals and 2.5's reflection are finite arithmetic and can join
   `RelationLadder` and the comma lemmas; carried in #410.

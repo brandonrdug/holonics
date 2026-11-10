@@ -1,0 +1,13 @@
+3 LEFT 1 RIGHT (levels: 1L; 1L1R; 2L1R; 3L1R), HELD128
+   unigram                            3.418 nats a place   (101 context-letter cells)
+   (-1,)                              2.710 nats a place   (6708 context-letter cells)
+   (-1, 1)                            1.642 nats a place   (67740 context-letter cells)
+   (-2, -1, 1)                        0.967 nats a place   (244640 context-letter cells)
+   (-3, -2, -1, 1)                    0.695 nats a place   (543012 context-letter cells)
+1 LEFT 3 RIGHT (levels: 1R; 1L1R; 1L2R; 1L3R), HELD128
+   unigram                            3.418 nats a place   (101 context-letter cells)
+   (1,)                               2.700 nats a place   (6637 context-letter cells)
+   (-1, 1)                            1.642 nats a place   (67740 context-letter cells)
+   (-1, 1, 2)                         0.984 nats a place   (244417 context-letter cells)
+   (-1, 1, 2, 3)                      0.713 nats a place   (542705 context-letter cells)
+done 7s
