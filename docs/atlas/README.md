@@ -8,6 +8,11 @@ context. This atlas holds the rest.
 Use it before deriving, designing or claiming absence. Grep it for the objects, operations and
 classical names of the subject, read the matched rows, then open the owner.
 
+A lens that arrives in a discipline's language (music, lightning, a vortex ring, a cipher, a
+packing, a zeta function) is routed through [the charts](CHARTS.md): the object and the operation
+the discipline is a chart of, the row prefixes that already hold it, and what stays behind in the
+discipline.
+
 ```bash
 rg -i 'contact|DQ|slip' docs/atlas/          # by object or operation
 rg -i 'Foster|Weil|de Bruijn' docs/atlas/     # by classical name
