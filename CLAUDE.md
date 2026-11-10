@@ -665,7 +665,10 @@ machine. The contract, each clause with its reason:
 - **Housekeeping runs on the host.** Never run `git worktree prune`, a checkout or a branch
   deletion through a mount, a container or a VM in which the worktrees' paths do not resolve.
   Reason: there every worktree reads "prunable" (all 89 did on November 10), and pruning would cut
-  live worktrees from the repository. A census there is read-only (`GIT_OPTIONAL_LOCKS=0`).
+  live worktrees from the repository. A census there is read-only (`GIT_OPTIONAL_LOCKS=0`). A
+  shallow clone (a cloud session's) is read-only for the same kind of reason: it cannot tell
+  ancestry, and on November 10 one read five merged branches as sharing no history with `main`.
+  Which branches are merged is read on the PC's full clone, after a fetch.
 - **Protected names**, never deleted by a census: `main`, `archive/*` and `codex/apple-silicon`.
 - Stage explicit paths. Retire by explicit deletion, never by a broad restore, reset, stash or
   clean over work that has not been accounted for.

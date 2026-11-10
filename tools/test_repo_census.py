@@ -182,6 +182,54 @@ class CensusTests(unittest.TestCase):
         local = self.g("for-each-ref", "--format=%(refname:short)", "refs/heads").split()
         self.assertIn("claude/open-local", local), self.assertNotIn("claude/open-local-2", local)
 
+    def test_a_dirty_holder_of_main_is_detached_with_its_changes(self):
+        canon = self.repo / ".local/wt/canon"
+        (canon / "a.txt").write_text("uncommitted\n")
+        code, out = self.tool("--apply")
+        self.assertNotIn("FAILED", out)
+        self.assertEqual(self.g("branch", "--show-current"), "main")
+        self.assertEqual(self.g("rev-parse", "HEAD"), self.g("rev-parse", "origin/main"))
+        self.assertEqual((canon / "a.txt").read_text(), "uncommitted\n")
+
+    def test_a_remote_branch_that_moved_is_left(self):
+        other = self.repo.with_name("other")
+        sh("git", "clone", "-q", str(self.origin), str(other), cwd=self.repo.parent)
+        sh("git", "checkout", "-q", "claude/merged-pushed", cwd=other)
+        self.commit("late.txt", cwd=other)
+        sh("git", "push", "-q", "origin", "claude/merged-pushed", cwd=other)
+        late = sh("git", "rev-parse", "HEAD", cwd=other)
+        code, out = self.tool("--apply", "--no-fetch")  # stale refs still read the branch as merged
+        self.assertIn("FAILED  delete on origin: claude/merged-pushed", out)
+        self.assertEqual(sh("git", "rev-parse", "refs/heads/claude/merged-pushed", cwd=self.origin), late)
+        self.g("checkout", "-q", "--detach")
+        code, out = self.tool("--apply")  # with the fetch it reads as unmerged and is not in the plan
+        self.assertNotIn("delete on origin: claude/merged-pushed", out)
+        self.assertEqual(sh("git", "rev-parse", "refs/heads/claude/merged-pushed", cwd=self.origin), late)
+
+    def test_a_failed_fetch_stops_every_change(self):
+        self.g("remote", "set-url", "origin", str(self.origin) + "-gone")
+        before = self.snapshot()
+        code, out = self.tool("--apply")
+        self.assertNotEqual(code, 0)
+        self.assertIn("refused: the fetch failed", out)
+        self.assertEqual(before, self.snapshot())
+
+    def test_a_shallow_clone_is_read_only(self):
+        canon = self.repo / ".local/wt/canon"  # it holds main
+        for name in ("d.txt", "e.txt"):
+            self.commit(name, cwd=canon)
+        sh("git", "push", "-q", "origin", "main", cwd=canon)
+        shallow = self.repo.with_name("shallow")
+        sh("git", "clone", "-q", "--depth", "1", "--no-single-branch", "file://" + str(self.origin), str(shallow),
+           cwd=self.repo.parent)
+        code, out = self.tool(repo=shallow)
+        self.assertIn("THIS CLONE IS SHALLOW", out)
+        code, out = self.tool("--apply", repo=shallow)
+        self.assertNotEqual(code, 0)
+        self.assertIn("refused: this clone is shallow", out)
+        remote = sh("git", "for-each-ref", "--format=%(refname:short)", "refs/heads", cwd=self.origin).split()
+        self.assertIn("claude/merged-pushed", remote)
+
     def test_a_mounted_view_is_read_only(self):
         moved = self.repo.with_name("mounted")
         self.repo.rename(moved)
