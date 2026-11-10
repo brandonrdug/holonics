@@ -220,6 +220,64 @@ class CensusTests(unittest.TestCase):
         self.assertEqual(self.g("rev-parse", "HEAD"), self.g("rev-parse", "origin/main"))
         self.assertEqual((canon / "a.txt").read_text(), "uncommitted\n")
 
+    def test_a_local_main_with_commits_of_its_own_is_tagged_and_never_checked_out_stale(self):
+        canon = self.repo / ".local/wt/canon"  # it holds main; the main checkout is detached
+        self.commit("only-here.txt", cwd=canon)
+        stale = sh("git", "rev-parse", "HEAD", cwd=canon)
+        other = self.repo.with_name("other")
+        sh("git", "clone", "-q", str(self.origin), str(other), cwd=self.repo.parent)
+        self.commit("onward.txt", cwd=other)
+        sh("git", "push", "-q", "origin", "main", cwd=other)
+        tag = f"archive/main-local-{stale[:9]}"
+        before = self.snapshot()
+        code, out = self.tool("--apply", "--dry-run")
+        self.assertIn(f"would   tag {tag}", out)
+        self.assertEqual(before[1], self.snapshot()[1])
+        self.assertEqual(self.g("tag", "-l", tag), "")
+        code, out = self.tool("--apply")
+        self.assertNotIn("FAILED", out)
+        self.assertEqual(self.g("rev-parse", tag), stale)  # every commit of the old line is kept
+        self.assertEqual(self.g("branch", "--show-current"), "main")
+        self.assertEqual(self.g("rev-parse", "HEAD"), self.g("rev-parse", "origin/main"))
+        self.assertTrue((self.repo / "onward.txt").exists()), self.assertFalse((self.repo / "only-here.txt").exists())
+        self.assertEqual(sh("git", "branch", "--show-current", cwd=canon), "")
+        self.assertEqual(sh("git", "rev-parse", "HEAD", cwd=canon), stale)
+        self.assertEqual(sh("git", "tag", "-l", tag, cwd=self.origin), "")  # it never left: its tag stays here
+        # A commit made on main in the main checkout itself: ahead of origin/main, with nothing to fast-forward.
+        self.commit("ahead.txt")
+        ahead = self.g("rev-parse", "HEAD")
+        code, out = self.tool("--apply")
+        self.assertNotIn("FAILED", out)
+        self.assertEqual(self.g("rev-parse", f"archive/main-local-{ahead[:9]}"), ahead)
+        self.assertEqual(self.g("rev-parse", "main"), self.g("rev-parse", "origin/main"))
+        code, out = self.tool("--apply")  # and a second pass finds nothing to do about main
+        self.assertNotIn("FAILED", out), self.assertNotIn("main-local", out)
+        # With uncommitted changes in the main checkout nothing about main moves.
+        self.commit("ahead-2.txt")
+        (self.repo / "a.txt").write_text("uncommitted\n")
+        kept = self.g("rev-parse", "main")
+        code, out = self.tool("--apply")
+        self.assertEqual(self.g("rev-parse", "main"), kept)
+        self.assertEqual((self.repo / "a.txt").read_text(), "uncommitted\n")
+
+    def test_a_change_is_refused_from_a_worktrees_copy_of_the_tool(self):
+        def run(copy, *args):
+            copy.parent.mkdir(exist_ok=True)
+            copy.write_text(TOOL.read_text())
+            r = subprocess.run([sys.executable, str(copy), *args], capture_output=True, text=True)
+            return r.returncode, r.stdout + r.stderr
+        before = self.snapshot()
+        code, out = run(self.repo / ".local/wt/fresh/tools/repo_census.py", "--apply")
+        self.assertNotEqual(code, 0)
+        self.assertIn("refused: this copy of the tool is the worktree's", out)
+        self.assertEqual(before, self.snapshot())
+        code, out = run(self.repo / ".local/wt/fresh/tools/repo_census.py", "--apply", "--dry-run")  # a read is fine
+        self.assertIn("would   delete the merged local branch claude/merged-local", out)
+        self.assertEqual(before[1], self.snapshot()[1])
+        code, out = run(self.repo / "tools/repo_census.py", "--apply")  # the main checkout's own copy acts
+        self.assertNotIn("refused", out), self.assertNotIn("FAILED", out)
+        self.assertEqual(self.g("rev-parse", "HEAD"), self.g("rev-parse", "origin/main"))
+
     def test_a_remote_branch_that_moved_is_left(self):
         other = self.repo.with_name("other")
         sh("git", "clone", "-q", str(self.origin), str(other), cwd=self.repo.parent)

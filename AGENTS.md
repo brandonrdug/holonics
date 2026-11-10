@@ -668,6 +668,17 @@ machine. The contract, each clause with its reason:
   (the main checkout onto `main` at `origin/main`, merged branches deleted on both sides).
   `tools/test_repo_census.py` checks each of these on a synthetic repository and runs in gate 1.
   Reason: the contract is kept as a habit, never as a cleanup campaign.
+  - A local `main` that holds commits `origin/main` lacks is tagged `archive/main-local-<commit>`
+    before it moves, and is never checked out as it stands. Reason: on November 10 the PC's local
+    `main` held 551 commits of October that were nowhere else; the cleanup checked it out and could
+    not fast-forward it, and the reference tree stood a month old, without `tools/runs.py`, until
+    it was repaired by hand.
+  - A change is made from the main checkout (`cd` there, then `python3 tools/repo_census.py ...`),
+    and the tool refuses one from a worktree's copy. Reason: the main checkout's copy is `main`'s,
+    and a worktree's can be days behind and would delete by an older reading.
+  - On the PC, Claude's sessions run the tool under Brandon's allow rule in the repository's
+    `.claude/settings.json` (November 10); a run with `--push-local` asks him, because it publishes
+    commits that never left the PC. No agent adds a permission rule of its own.
 - **Housekeeping runs on the host.** Never run `git worktree prune`, a checkout or a branch
   deletion through a mount, a container or a VM in which the worktrees' paths do not resolve.
   Reason: there every worktree reads "prunable" (all 89 did on November 10), and pruning would cut
