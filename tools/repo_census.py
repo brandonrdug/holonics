@@ -9,7 +9,9 @@ contract, and the steps that would repair them. With no flag it changes nothing 
   ... --no-fetch                      with any change below: skip the fetch (a remote deletion still carries its lease)
   repo_census.py --apply              fetch, then do the steps that lose nothing:
                                         prune worktree entries whose directory is gone,
-                                        put the main checkout on `main` at `origin/main` (fast-forward only),
+                                        put the main checkout on `main` at `origin/main` (a local `main` that
+                                        holds commits `origin/main` lacks is tagged first, never fast-forwarded
+                                        over and never left checked out),
                                         delete local and remote branches already merged into `origin/main`
   repo_census.py --archive B [B ...]  set a branch aside: tag `archive/<B>` at its tip, push the tag, delete the branch
   repo_census.py --archive-idle DAYS  the same for every unmerged branch whose tip is older than DAYS days and that
@@ -19,6 +21,10 @@ contract, and the steps that would repair them. With no flag it changes nothing 
   ... --keep NAME [NAME ...]          leave these worktrees and branches out of the two idle sweeps
   ... --dry-run                       with any of the above: fetch, print each step and do none of them
 
+A change is made with the main checkout's copy of this tool (`cd` there, then `python3 tools/repo_census.py ...`): it is
+`main`'s, while a worktree's copy can be days behind and would delete by an older reading. From a worktree's copy the
+census and `--dry-run` work and every change is refused.
+
 "Untouched" is read from modification times, and a worktree whose states or binaries are only read by a run elsewhere
 looks idle. Retiring it loses nothing but moves its `.local/` to the archive, so a script that names the old path
 breaks. A registered run's script, and the scripts it calls, are read for the worktrees they name, but a path built at
@@ -26,6 +32,10 @@ run time or held in a saved state is not seen. Before an idle sweep, name such w
 
 What "loses nothing" means, clause by clause:
 - A merged branch's commits are on `origin/main`, so deleting the name loses nothing.
+- A local `main` that holds commits `origin/main` lacks is tagged `archive/main-local-<commit>` at its tip before
+  `main` moves to `origin/main`. The tag stays on this machine: those commits never left it (the publication rule
+  below). On November 10, 2026 the PC's local `main` held 551 such commits from October; the tool then checked that
+  stale `main` out in the main checkout and failed to fast-forward it, which left the reference tree a month old.
 - An archived branch keeps every commit under its tag. A branch that never left this machine is tagged locally and its
   tag is pushed only with `--push-local`, after its content has been read against the publication rule (the repository
   is public, and an unpushed branch was never checked for private material).
@@ -91,6 +101,17 @@ def protected(name):
 
 def days(seconds):
     return f"{seconds / DAY:.1f} d"
+
+
+def worktree_copy():
+    """The linked worktree of ROOT's repository that holds this file, if one does. Its copy may be days behind `main`."""
+    r = subprocess.run(["git", "-C", str(Path(__file__).resolve().parent), "rev-parse", "--path-format=absolute",
+                        "--show-toplevel", "--git-common-dir"], capture_output=True, text=True)
+    lines = r.stdout.split("\n")
+    if r.returncode or len(lines) < 2:
+        return None  # a copy outside any repository (one taken with `git show origin/main:...`, for one)
+    top, common = Path(lines[0]).resolve(), Path(lines[1]).resolve()
+    return top if common.parent == ROOT.resolve() and top != ROOT.resolve() else None
 
 
 def find_root(start):
@@ -348,6 +369,8 @@ def census():
                     P.append(("ff-main", None))
             else:
                 V.append(f"local main {local_main[:9]} holds commits that origin/main does not")
+                if not m_dirty:
+                    P.append(("aside-main", local_main))
     elif "main" not in refs["heads"] and not m_dirty:
         P.append(("ff-main", None))
 
@@ -474,6 +497,8 @@ def show(S):
 def describe(kind, arg):
     if kind == "detach":
         return f"detach the worktree that holds main: {arg['path']}"
+    if kind == "aside-main":
+        return f"tag {aside_tag(arg)} at local main's tip, then put main and the main checkout at origin/main"
     return {"prune": "prune worktree entries whose directory is gone",
             "checkout-main": "put the main checkout on main",
             "ff-main": "fast-forward main to origin/main",
@@ -484,6 +509,10 @@ def describe(kind, arg):
 # ---------------------------------------------------------------------------------------------------------------------
 # Changing
 # ---------------------------------------------------------------------------------------------------------------------
+
+def aside_tag(sha):
+    return f"archive/main-local-{sha[:9]}"
+
 
 def refuse_foreign(S):
     if S["foreign"]:
@@ -527,14 +556,23 @@ def apply(S):
                 freed = step(describe(kind, w), lambda w=w: git("checkout", "--detach", cwd=w["path"], write=True)) \
                     and freed
     main_free = freed if DRY else not any(w["branch"] == "main" for w in read_worktrees()[1:])
-    if any(k == "checkout-main" for k, _ in plan) and main_free:
+    aside = next((sha for k, sha in plan if k == "aside-main"), None)
+    if (aside or any(k == "checkout-main" for k, _ in plan)) and main_free:
         head = S["main"]["head"]
         if not reachable(head):  # a detached head of the main checkout that nothing else names
             tag = f"archive/wt/main-checkout-{head[:9]}"
             step(f"tag {tag}", lambda: git("tag", tag, head, write=True))
         heads, remotes = S["refs"]["heads"], S["refs"]["remotes"]
-        if "main" in heads and "main" in remotes and git("merge-base", "--is-ancestor", heads["main"][0],
-                                                          remotes["main"][0], check=False).returncode == 0:
+        if aside:
+            # Local main holds commits origin/main lacks. Checking it out would put the reference tree on a stale
+            # line, and it cannot be fast-forwarded: its tip is tagged, then main moves. Without the tag, nothing moves.
+            tag = aside_tag(aside)
+            if S["refs"]["tags"].get(tag) == aside or step(f"tag {tag} at local main's tip {aside[:9]}",
+                                                           lambda: git("tag", tag, aside, write=True)):
+                step("put the main checkout on main at origin/main",
+                     lambda: git("checkout", "-B", "main", "origin/main", write=True))
+        elif "main" in heads and "main" in remotes and git("merge-base", "--is-ancestor", heads["main"][0],
+                                                            remotes["main"][0], check=False).returncode == 0:
             step("put the main checkout on main at origin/main",
                  lambda: git("checkout", "-B", "main", "origin/main", write=True))
         elif "main" in heads:
@@ -547,7 +585,8 @@ def apply(S):
         if any(k == "ff-main" for k, _ in plan):
             step(describe("ff-main", None), None)
     elif wts[0]["branch"] == "main" and "main" in S["refs"]["remotes"] and not dirty(ROOT):
-        if git("rev-parse", "HEAD") != git("rev-parse", "origin/main"):
+        behind = git("merge-base", "--is-ancestor", "HEAD", "origin/main", check=False).returncode == 0
+        if behind and git("rev-parse", "HEAD") != git("rev-parse", "origin/main"):
             step(describe("ff-main", None), lambda: git("merge", "--ff-only", "origin/main", write=True))
     for kind, name in plan:
         if kind == "del-local":
@@ -717,6 +756,9 @@ def main():
     DRY = a.dry_run
     ROOT = find_root(a.repo or Path(__file__).resolve().parent)
     changing = a.apply or a.archive or a.archive_idle is not None or a.retire or a.retire_idle is not None
+    if changing and not DRY and worktree_copy():
+        sys.exit(f"refused: this copy of the tool is the worktree's at {worktree_copy()}, which may be behind main. "
+                 f"A change is made with the main checkout's copy: cd {ROOT} && python3 tools/repo_census.py ...")
     S = census()
     if a.fetch or changing:
         if S["foreign"] or (S["shallow"] and changing):

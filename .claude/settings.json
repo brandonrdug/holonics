@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python3 tools/repo_census.py *)"
+    ],
+    "ask": [
+      "Bash(python3 tools/repo_census.py *--push-local*)"
+    ]
+  }
+}

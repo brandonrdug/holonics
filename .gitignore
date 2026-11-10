@@ -6,8 +6,10 @@ __pycache__/
 *.pyc
 *.log
 
-# Local agent/runtime configuration and isolated harness worktrees.
-.claude/
+# Local agent/runtime configuration and isolated harness worktrees. The one tracked file is the
+# repository's permission rules (CLAUDE.md, the trunk contract).
+.claude/*
+!.claude/settings.json
 .codex/
 .agents/
 .opencode/
