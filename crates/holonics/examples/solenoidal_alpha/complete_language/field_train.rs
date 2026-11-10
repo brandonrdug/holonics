@@ -6934,6 +6934,42 @@ mod tests {
         assert_eq!(tail(9, 3, 1), 1);
     }
 
+    /// [theory, November 10 01:21] `exchange-held-field` starts from the held file's own answers: its start (`HELD.tsv`) is each
+    /// reference as written, and the walk from it holds each answer's letters.
+    #[test]
+    fn the_walk_from_held_starts_at_the_references_and_holds_their_letters() {
+        let dir = std::env::temp_dir().join(format!("holonics-exchange-held-{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&dir);
+        std::fs::create_dir_all(&dir).expect("dir");
+        let put = |name: &str, bytes: &[u8]| {
+            std::fs::write(dir.join(name), bytes).expect("write");
+            (dir.join(name).to_string_lossy().into_owned(), sha256(bytes).expect("sha"))
+        };
+        let (codec, problems) = toy();
+        let learner = toy_learner(&codec, &problems);
+        let (state, state_sha) = put("STATE", learner.to_text().as_bytes());
+        let (codec_path, codec_sha) = put("CODEC", codec.to_text().as_bytes());
+        let (units, units_sha) = put("UNITS", b"founded-units-v1 0\n");
+        let (held, held_sha) = put("HELD", TOY);
+        let out = dir.join("OUT").to_string_lossy().into_owned();
+        let args: Vec<String> = ["exchange-held-field", &state, &state_sha, &codec_path, &codec_sha, &units, &units_sha, &held, &held_sha, "2", "0", "64", "2", &out].iter().map(|s| s.to_string()).collect();
+        exchange_held_field(&args, &mut HostField).unwrap();
+        let start = std::fs::read_to_string(dir.join("OUT/HELD.tsv")).unwrap();
+        let end = std::fs::read_to_string(dir.join("OUT/SAMPLE.tsv")).unwrap();
+        let raw = problems_of(TOY);
+        assert_eq!((start.lines().count(), end.lines().count()), (2, 2));
+        let sorted = |l: &str| {
+            let mut b = l.as_bytes().to_vec();
+            b.sort_unstable();
+            b
+        };
+        for (k, (s_line, e_line)) in start.lines().zip(end.lines()).enumerate() {
+            assert_eq!(s_line, format!("{k}\t{}", escaped(&raw[k].1)), "problem {k} starts at its reference");
+            assert_eq!(sorted(s_line), sorted(e_line), "problem {k}: the walk holds the answer's letters");
+        }
+        let _ = std::fs::remove_dir_all(&dir);
+    }
+
     /// [census 2b, November 9 23:30] A section's code read from its faces ([`section_code`]) is the code and the sites its deposit
     /// reads ([`FieldLearner::section_realized`]'s `code_before`), on a section of members and openings (ports at their boundary),
     /// the ports' part among it.
@@ -8739,31 +8775,79 @@ pub(super) fn exchange_field(args: &[String], realization: &mut dyn FieldRealiza
         .sample_runs(&problems, sweeps, 0, void, seed, run_bits << 20, near_tail, place_order, Some(&given), one_end, rest, spans, None, refine_order, realization, &mut |_, _| started.elapsed().as_millis() <= stop_ms, &mut |_| {})
         .map_err(|e| e.to_string())?;
     let keyed_ms = started.elapsed().as_millis();
-    let write = |name: &str, answers: &[Vec<usize>]| -> Result<()> {
-        let mut file = rows_file(&out.join(name), "")?;
+    exchange_report(field, &codec, &problems, &keyed, "keyed", h_milli, moves, out, started, keyed_ms, realization, &mut |_| started.elapsed().as_millis() <= stop_ms)
+}
+
+/// [definition; theory, November 10 01:21] `exchange-held-field STATE STATE_SHA CODEC CODEC_SHA UNITS UNITS_SHA HELD HELD_SHA
+/// COUNT H_MILLINATS MOVES PASSES OUT`: **the certified exchange walk from given answers**: [`exchange_field`]'s walk, law and
+/// `h`, started from the held file's own reference answers for the same first `COUNT` problems (each cut to its room) instead of
+/// the keyed write, and stopped by pass count: `PASSES` passes, never time. `HELD.tsv` holds the start (the references as the
+/// walk reads them), `SAMPLE.tsv` the walk's end, both private; every other output as `exchange-field`'s.
+pub(super) fn exchange_held_field(args: &[String], realization: &mut dyn FieldRealization) -> Result<()> {
+    if args.len() != 14 {
+        return Err("exchange-held-field STATE STATE_SHA CODEC CODEC_SHA UNITS UNITS_SHA HELD HELD_SHA COUNT H_MILLINATS MOVES PASSES OUT".into());
+    }
+    let started = std::time::Instant::now();
+    let mut learner = FieldLearner::from_text(std::str::from_utf8(&pinned_read(&args[1], &args[2], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
+    declared_clocks(&mut learner.field);
+    let field = &learner.field;
+    let units = units_of(&args[5], &args[6])?;
+    let codec = FieldCodec::from_text(std::str::from_utf8(&pinned_read(&args[3], &args[4], CODEC_BUDGET)?)?, units)?;
+    let held = problems_of(&pinned_read(&args[7], &args[8], READ_BUDGET as usize)?);
+    let (limit, h_milli, moves, passes) = (count(&args[9])?, count(&args[10])?, positive(&args[11])?, count(&args[12])?);
+    let out = Path::new(&args[13]);
+    std::fs::create_dir(out)?;
+    let held = &held[..limit.min(held.len())];
+    let requests: Vec<(Vec<usize>, usize)> = held.iter().map(|(question, _)| opening(&codec, field, question, b"")).collect::<std::result::Result<_, String>>()?;
+    let problems: Vec<(&[usize], usize)> = requests.iter().map(|(q, n)| (q.as_slice(), *n)).collect();
+    // Each reference answer's letters, cut to its room (the walk reads a written answer's letters up to its first void).
+    let mut cut = 0usize;
+    let given: Vec<Vec<usize>> = held
+        .iter()
+        .zip(&problems)
+        .map(|((_, a), &(_, room))| {
+            let mut letters = codec.encode(a).map_err(|e| e.to_string())?;
+            cut += usize::from(letters.len() > room);
+            letters.truncate(room);
+            Ok(letters)
+        })
+        .collect::<std::result::Result<_, String>>()?;
+    println!("FIELD_EXCHANGE_START start=held problems={} letters={} cut_to_room={cut} passes={passes}", given.len(), given.iter().map(Vec::len).sum::<usize>());
+    exchange_report(field, &codec, &problems, &given, "held", h_milli, moves, out, started, started.elapsed().as_millis(), realization, &mut |p| p.pass < passes)
+}
+
+/// The certified exchange walk from `start` (`name` its kind: the keyed write or the held references) and its report, as
+/// [`exchange_field`] prints it: `FIELD_EXCHANGE_PASS` a pass (flushed), `FIELD_EXCHANGE` a problem, `MOVES.tsv`, and
+/// `FIELD_EXCHANGE_DONE` with the pooled code a place at the start and the end; `go` is shown each pass and stops the walk.
+#[allow(clippy::too_many_arguments)]
+fn exchange_report(field: &Field, codec: &FieldCodec, problems: &[(&[usize], usize)], start: &[Vec<usize>], name: &str, h_milli: usize, moves: usize, out: &Path, started: std::time::Instant, opened_ms: u128, realization: &mut dyn FieldRealization, go: &mut dyn FnMut(&holonics::hnn::tower::field::ExchangePass) -> bool) -> Result<()> {
+    let void = codec.void();
+    let write = |file_name: &str, answers: &[Vec<usize>]| -> Result<()> {
+        let mut file = rows_file(&out.join(file_name), "")?;
         for (k, places) in answers.iter().enumerate() {
             let written = places.iter().take_while(|&&c| c != void).count();
             row(&mut file, &format!("{k}\t{}\n", escaped(&codec.decode(&places[..written])))).map_err(|e| e.to_string())?;
         }
         Ok(())
     };
-    write("KEYED.tsv", &keyed)?;
+    write(if name == "keyed" { "KEYED.tsv" } else { "HELD.tsv" }, start)?;
     // `h` on the codes' 2^(−20) bits: H thousandths of a nat over ln 2, rounded up.
     let h = (((h_milli as i128) << 50) + 1000 * LN2_Q30 - 1) / (1000 * LN2_Q30);
     let (walked, records) = field
-        .exchange_walk(&problems, &keyed, void, h, moves, realization, &mut |p| {
+        .exchange_walk(problems, start, void, h, moves, realization, &mut |p| {
             // [theory, November 9 22:32] One progress line a pass, flushed.
             println!("FIELD_EXCHANGE_PASS pass={} elapsed_ms={} active={} accepted={} refused={} c_nats={}", p.pass, started.elapsed().as_millis(), p.active, p.accepted, p.refused, decimal_q20(nats_q20(p.code)));
             let _ = std::io::Write::flush(&mut std::io::stdout());
-            started.elapsed().as_millis() <= stop_ms
+            go(p)
         })
         .map_err(|e| e.to_string())?;
     write("SAMPLE.tsv", &walked)?;
     // [theory, November 9 21:12] Each standing move's proposed gain against its certified fall, in nats; each problem's code a
-    // place at the keyed write and at rest, its standing and refused moves; a problem at the cap is a defect, not a rest.
+    // place at the start and at its end, its standing and refused moves; a problem at the cap is a defect, not a rest.
     let mut file = rows_file(&out.join("MOVES.tsv"), "problem\tmove\ti\tj\tproposed_gain_nats\tcertified_fall_nats\n")?;
     let (mut standing, mut refused, mut defects, mut fall) = (0usize, 0usize, 0usize, 0i128);
     let (mut rested, mut unrested) = (0usize, 0usize);
+    let (mut places, mut code_start, mut code_end) = (0usize, 0i128, 0i128);
     for (k, r) in records.iter().enumerate() {
         for (n, m) in r.moves.iter().enumerate() {
             row(&mut file, &format!("{k}\t{}\t{}\t{}\t{}\t{}\n", n + 1, m.i, m.j, decimal_q20(nats_q20(m.gain)), decimal_q20(nats_q20(m.fall))))?;
@@ -8771,7 +8855,7 @@ pub(super) fn exchange_field(args: &[String], realization: &mut dyn FieldRealiza
         let a_place = |c: i128| if r.places == 0 { "-".to_string() } else { decimal_q20(nats_q20(c) / r.places as i128) };
         let heat = |m: Option<&holonics::hnn::tower::field::ExchangeMove>| m.map_or("-".to_string(), |m| decimal_q20(nats_q20(m.fall)));
         println!(
-            "FIELD_EXCHANGE problem={k} letters={} code_keyed_nats_a_place={} code_end_nats_a_place={} standing={} refused={} at_rest={} defect={} unrested={} fall_nats={} heat_first_nats={} heat_last_nats={}",
+            "FIELD_EXCHANGE problem={k} letters={} code_{name}_nats_a_place={} code_end_nats_a_place={} standing={} refused={} at_rest={} defect={} unrested={} fall_nats={} heat_first_nats={} heat_last_nats={}",
             r.places,
             a_place(r.start),
             a_place(r.end),
@@ -8786,8 +8870,17 @@ pub(super) fn exchange_field(args: &[String], realization: &mut dyn FieldRealiza
         );
         (standing, refused, defects, fall) = (standing + r.moves.len(), refused + r.refused, defects + usize::from(r.capped), fall + r.start - r.end);
         (rested, unrested) = (rested + usize::from(r.rested), unrested + usize::from(!r.rested && !r.capped));
+        (places, code_start, code_end) = (places + r.places, code_start + r.start, code_end + r.end);
     }
-    println!("FIELD_EXCHANGE_DONE problems={} at_rest={rested} defects={defects} unrested={unrested} h_millinats={h_milli} proposal_cap={moves} standing={standing} refused={refused} fall_nats={} keyed_ms={keyed_ms} ms={}", problems.len(), decimal_q20(nats_q20(fall)), started.elapsed().as_millis());
+    let pooled = |c: i128| if places == 0 { "-".to_string() } else { decimal_q20(nats_q20(c) / places as i128) };
+    println!(
+        "FIELD_EXCHANGE_DONE problems={} start={name} at_rest={rested} defects={defects} unrested={unrested} h_millinats={h_milli} proposal_cap={moves} standing={standing} refused={refused} fall_nats={} letters={places} code_start_nats_a_place={} code_end_nats_a_place={} {name}_ms={opened_ms} ms={}",
+        problems.len(),
+        decimal_q20(nats_q20(fall)),
+        pooled(code_start),
+        pooled(code_end),
+        started.elapsed().as_millis()
+    );
     Ok(())
 }
 
