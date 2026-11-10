@@ -2100,6 +2100,29 @@ fn the_towers_covector_matches_its_codes_difference() {
 }
 
 
+/// [definition; theory, November 10 01:29] **A mode's phase bin is its sector on the integers**: the axes and the cone lie on
+/// edges (a mode on the cone between a sky or ground sector and the bridge is the bridge's), a mode just counterclockwise of
+/// edge `k` lies in bin `k`, the zero word has a bin of its own, and every word's bin holds its shell.
+#[test]
+fn a_modes_phase_bin_is_its_sector_and_holds_one_shell() {
+    let field = shaped(1);
+    let edges = phase_edges(field.half_turn());
+    let one = 1i64 << 20;
+    for (re, im, bin) in [(one, 0, 0), (one, one, 3), (0, one, 6), (-one, one, 8), (-one, 0, 12), (-one, -one, 15), (0, -one, 18), (one, -one, 20), (0, 0, PHASE_BINS)] {
+        assert_eq!(phase_bin(re, im, &edges), bin, "({re}, {im})");
+    }
+    for (k, &(ex, ey)) in edges.iter().enumerate() {
+        let (re, im) = (ex - (ey >> 10), ey + (ex >> 10));
+        assert_eq!(phase_bin(re, im, &edges), k, "just past edge {k}");
+    }
+    for k in 0..4096i64 {
+        let (re, im) = ((k * 7919 + 13) % 2001 - 1000, (k * 104_729 + 7) % 2001 - 1000);
+        for (x, y) in [(re, im), (re, re), (re, -re), (re << 30, im << 30)] {
+            assert_eq!(phase_bin_shell(phase_bin(x, y, &edges)), shell(x, y), "({x}, {y})");
+        }
+    }
+}
+
 /// [definition; theory, November 9 23:30] **A grown field keeps its declared clocks** (`Field::clocked_as`): a field grown by
 /// copies or by a lane reads on the clocks the field it grew from declared, and reads its faces on them.
 #[test]

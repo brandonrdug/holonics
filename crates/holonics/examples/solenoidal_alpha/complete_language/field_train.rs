@@ -6934,6 +6934,37 @@ mod tests {
         assert_eq!(tail(9, 3, 1), 1);
     }
 
+    /// [theory, November 10 01:29] `phase-field` end to end on the host: its checks pass on a small field (every group's bins
+    /// sum to its set's sites, the bins balance, mode 0's key sector is 2b's depth-1 class, the moments sum), and its tables hold
+    /// every set, head, mode, word and bin, and every set's letters.
+    #[test]
+    fn the_phase_census_reads_every_bin_and_moment_on_a_small_field() {
+        let dir = std::env::temp_dir().join(format!("holonics-phase-{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&dir);
+        std::fs::create_dir_all(&dir).expect("dir");
+        let put = |name: &str, bytes: &[u8]| {
+            std::fs::write(dir.join(name), bytes).expect("write");
+            (dir.join(name).to_string_lossy().into_owned(), sha256(bytes).expect("sha"))
+        };
+        let (codec, problems) = toy();
+        let learner = toy_learner(&codec, &problems);
+        let keys: Vec<u8> = (0..1u64 << 13).flat_map(|i| mix(0x5EED, i).to_be_bytes()).collect();
+        let (state, state_sha) = put("STATE", learner.to_text().as_bytes());
+        let (units, units_sha) = put("UNITS", b"founded-units-v1 0\n");
+        let (train, train_sha) = put("TRAIN", TOY);
+        let (held, held_sha) = put("HELD", TOY);
+        let (key, key_sha) = put("KEYS", &keys);
+        let out = dir.join("OUT").to_string_lossy().into_owned();
+        let args: Vec<String> = ["phase-field", &units, &units_sha, &train, &train_sha, &held, &held_sha, &key, &key_sha, "2", "0", &state, &state_sha, "-", &out].iter().map(|s| s.to_string()).collect();
+        phase_field(&args, &mut HostField).unwrap();
+        let d = learner.field.declaration;
+        let phase = std::fs::read_to_string(dir.join("OUT/CENSUS_PHASE.tsv")).unwrap();
+        assert_eq!(phase.lines().count(), 1 + PHASE_SETS.len() * d.heads * d.modes * 2 * (holonics::hnn::tower::field::PHASE_BINS + 1));
+        let moment = std::fs::read_to_string(dir.join("OUT/CENSUS_MOMENT.tsv")).unwrap();
+        assert_eq!(moment.lines().count(), 1 + PHASE_SETS.len() * (2 + 6 * d.alphabet));
+        let _ = std::fs::remove_dir_all(&dir);
+    }
+
     /// [theory, November 10 01:21] `exchange-held-field` starts from the held file's own answers: its start (`HELD.tsv`) is each
     /// reference as written, and the walk from it holds each answer's letters.
     #[test]
@@ -9013,6 +9044,21 @@ fn section_code(faces: &[Vec<Option<holonics::hnn::tower::TowerFace>>], regions:
     Ok((code, sites, ported))
 }
 
+/// [measurement; theory, November 10 01:29] **A charged site as a visit reads it** ([`lap_visit`]): its leaf at the last tick
+/// (`[h]`), its face and true letter, its octave of distance to the seam, whether it is a question's, its problem, its unframed
+/// key and probe words at the last tick (`[2M]`) and the readout's chart of its last state (`[D]`).
+pub(super) struct SiteRead<'a> {
+    pub leaf: &'a [u32],
+    pub face: &'a holonics::hnn::tower::TowerFace,
+    pub truth: usize,
+    pub octave: Option<u32>,
+    pub asked: bool,
+    pub problem: usize,
+    pub key: &'a [i64],
+    pub probe: &'a [i64],
+    pub chart: &'a [i32],
+}
+
 /// One visit of a training lap's own states ([`plate_joint_field`]): the first `take` sections of `order`, their regions and
 /// open-site draws formed as `train-field` forms them from the draw `draw`, read only; at every charged site ([`Charge`]),
 /// `visit(leaf, face, truth, octave, asked)` with its leaf at the last tick (`[h]`, full depth), its octave of distance to the
@@ -9021,12 +9067,12 @@ fn section_code(faces: &[Vec<Option<holonics::hnn::tower::TowerFace>>], regions:
 /// `FIELD_SECTION lap=0 n=0` line of the run that continued from the state, or `-` where none), the first section is read
 /// against it and its own letters changed (checks 1 and 3, printed with PASS or FAIL); a FAIL refuses the visit.
 #[allow(clippy::too_many_arguments)]
-fn lap_visit(codec: &FieldCodec, train: &Problems, sections: &[Vec<usize>], paths: &[Vec<usize>], order: &[usize], seed: u64, mut draw: u64, learner: &mut FieldLearner, realization: &mut dyn FieldRealization, timed: bool, line: Option<&str>, visit: &mut dyn FnMut(&[u32], &holonics::hnn::tower::TowerFace, usize, Option<u32>, bool)) -> Result<Charge> {
+fn lap_visit(codec: &FieldCodec, train: &Problems, sections: &[Vec<usize>], paths: &[Vec<usize>], order: &[usize], seed: u64, mut draw: u64, learner: &mut FieldLearner, realization: &mut dyn FieldRealization, timed: bool, line: Option<&str>, visit: &mut dyn FnMut(&SiteRead)) -> Result<Charge> {
     if path_drafts() || path_squares() {
         return Err("census 2b charges the lap's members, openings and writers; a declared draft or square region is not among them".into());
     }
     let decl = learner.field.declaration;
-    let (heads, m2) = (decl.heads, 2 * decl.complex());
+    let (heads, m2, dw) = (decl.heads, 2 * decl.complex(), decl.width);
     let mut charge = Charge::default();
     for (n, &s) in order.iter().enumerate() {
         let section_start = std::time::Instant::now();
@@ -9050,7 +9096,7 @@ fn lap_visit(codec: &FieldCodec, train: &Problems, sections: &[Vec<usize>], path
         let mut seen: std::collections::HashSet<(usize, u64, usize)> = std::collections::HashSet::new();
         let mut charged: Vec<Vec<usize>> = vec![Vec::new(); views.len()];
         let (mut open, mut own_code) = (0u64, 0i128);
-        for (ri, (((r, faces), leaves), words)) in views.iter().zip(&read.faces).zip(&read.plates).zip(&read.words).enumerate() {
+        for (ri, (((((r, faces), leaves), words), probes), charts)) in views.iter().zip(&read.faces).zip(&read.plates).zip(&read.words).zip(&read.probes).zip(&read.charts).enumerate() {
             let end = r.port.map_or(r.classes.len(), |p| p.start);
             for (t, face) in faces[..end].iter().enumerate() {
                 let Some(face) = face else { continue };
@@ -9063,7 +9109,17 @@ fn lap_visit(codec: &FieldCodec, train: &Problems, sections: &[Vec<usize>], path
                     continue;
                 }
                 let asked = t < train[problem].0.len();
-                visit(&leaves[t * heads..(t + 1) * heads], face, r.classes[t], holonics::hnn::tower::field::seam_octave(&words[t * m2..(t + 1) * m2], &decl), asked);
+                visit(&SiteRead {
+                    leaf: &leaves[t * heads..(t + 1) * heads],
+                    face,
+                    truth: r.classes[t],
+                    octave: holonics::hnn::tower::field::seam_octave(&words[t * m2..(t + 1) * m2], &decl),
+                    asked,
+                    problem,
+                    key: &words[t * m2..(t + 1) * m2],
+                    probe: &probes[t * m2..(t + 1) * m2],
+                    chart: &charts[t * dw..(t + 1) * dw],
+                });
                 own_code += face.code(r.classes[t]) as i128;
                 charge.question += u64::from(asked);
                 charged[ri].push(t);
@@ -9182,7 +9238,8 @@ pub(super) fn plate_joint_field(args: &[String], realization: &mut dyn FieldReal
     let leaf_at = |leaf: &[u32], d: usize| -> Vec<u32> { leaf.iter().map(|&c| c % 3u32.pow(d as u32)).collect() };
     // [theory, November 9 22:07] The seam as a cut: each depth-1 leaf split by its sites' octave of distance to the seam.
     let mut cut: std::collections::BTreeMap<(Vec<u32>, Option<u32>), PlateCounts> = std::collections::BTreeMap::new();
-    let charge = lap_visit(&codec, &train_set, &sections, &paths, &order[..take], seed, draw, &mut learner, realization, true, Some(line), &mut |leaf, face, truth, octave, asked| {
+    let charge = lap_visit(&codec, &train_set, &sections, &paths, &order[..take], seed, draw, &mut learner, realization, true, Some(line), &mut |site| {
+        let (leaf, face, truth, octave, asked) = (site.leaf, site.face, site.truth, site.octave, site.asked);
         for (d, table) in counts[usize::from(asked)].iter_mut().enumerate().skip(1) {
             table.entry(leaf_at(leaf, d)).or_insert_with(|| PlateCounts::new(a)).add(face, truth);
         }
@@ -9248,7 +9305,8 @@ pub(super) fn plate_joint_field(args: &[String], realization: &mut dyn FieldReal
     let mut codes: [Vec<[i128; 2]>; 2] = std::array::from_fn(|_| vec![[0; 2]; trits + 1]);
     let mut seams: Vec<std::collections::BTreeMap<Option<u32>, (u64, i128, i128, i128)>> = vec![std::collections::BTreeMap::new(); trits + 1];
     let second = std::time::Instant::now();
-    let again = lap_visit(&codec, &train_set, &sections, &paths, &order[..take], seed, draw, &mut learner, realization, false, None, &mut |leaf, face, truth, octave, asked| {
+    let again = lap_visit(&codec, &train_set, &sections, &paths, &order[..take], seed, draw, &mut learner, realization, false, None, &mut |site| {
+        let (leaf, face, truth, octave, asked) = (site.leaf, site.face, site.truth, site.octave, site.asked);
         let plain = face.code(truth) as i128;
         let part = usize::from(asked);
         for d in 1..=trits {
@@ -9304,6 +9362,306 @@ pub(super) fn plate_joint_field(args: &[String], realization: &mut dyn FieldReal
         println!("FIELD_LEAVES_JOINT depth={d} ms={}", t0.elapsed().as_millis());
     }
     println!("FIELD_LEAVES_DONE ms={}", started.elapsed().as_millis());
+    Ok(())
+}
+
+/// The phase census's sets: TRAIN's even problems, its odd problems, and the held problems.
+const PHASE_SETS: [&str; 3] = ["train_even", "train_odd", "held"];
+
+/// [measurement; theory, November 10 01:29] One phase-census site while its batch is summed ([`PhaseCensus`]): its set and
+/// true letter, each letter's face share on `2^(−40)` floored and its remainder carried on `2^(−72)` ([`PlateCounts::add`]'s
+/// law), each head's, mode's and word's phase bin (`[h][l][w]`, `w` 0 the key and 1 the probe), and the readout's chart `r`
+/// with its products `r_i r_j` (`i ≤ j`).
+struct PhaseSite {
+    set: usize,
+    truth: usize,
+    q: Vec<u128>,
+    c: Vec<i128>,
+    bins: Vec<u8>,
+    r: Vec<i32>,
+    rr: Vec<i64>,
+}
+
+/// [measurement; theory, November 10 01:29 and 01:30] **The phase census's sums**, by set: `N[a]` and `F[a]` (each share on
+/// `2^(−40)`, its carried remainder on `2^(−72)`) in each head's, mode's and word's phase bins (`[set][h][l][w][bin][a]`,
+/// [`PHASE_BINS`] and the zero word); and the moments of the readout's chart `r` (on `2^(−16)`) by letter, `LN[a] = Σ_(x = a) r`,
+/// `LF[a] = Σ f(a) r` (main on `2^(−56)`, carried on `2^(−88)`), `QN[a] = Σ_(x = a) r rᵀ` (on `2^(−32)`) and
+/// `QF[a] = Σ f(a) r rᵀ` (main on `2^(−72)`, carried on `2^(−104)`), upper triangles, with each set's sites, `Σ r` and `Σ |r|`;
+/// and, at every site and head, whether mode 0's bin of each word holds the shell of the site's depth-1 class (2b's plate).
+struct PhaseCensus {
+    a: usize,
+    heads: usize,
+    modes: usize,
+    dw: usize,
+    n: Vec<u64>,
+    f: Vec<u128>,
+    fc: Vec<i128>,
+    ln: Vec<i128>,
+    lf: Vec<i128>,
+    lfc: Vec<i128>,
+    qn: Vec<i128>,
+    qf: Vec<i128>,
+    qfc: Vec<i128>,
+    sites: [u64; 3],
+    rsum: Vec<i128>,
+    rabs: Vec<i128>,
+    unmatched: [u64; 2],
+    matched_sites: u64,
+    pending: Vec<PhaseSite>,
+}
+
+impl PhaseCensus {
+    /// The sites a batch holds before it is summed.
+    const BATCH: usize = 8192;
+
+    fn new(d: &FieldDeclaration) -> Self {
+        let (a, heads, modes, dw) = (d.alphabet, d.heads, d.modes, d.width);
+        let tri = dw * (dw + 1) / 2;
+        let bins = PHASE_SETS.len() * heads * modes * 2 * (holonics::hnn::tower::field::PHASE_BINS + 1) * a;
+        let lin = PHASE_SETS.len() * a * dw;
+        let quad = PHASE_SETS.len() * a * tri;
+        Self { a, heads, modes, dw, n: vec![0; bins], f: vec![0; bins], fc: vec![0; bins], ln: vec![0; lin], lf: vec![0; lin], lfc: vec![0; lin], qn: vec![0; quad], qf: vec![0; quad], qfc: vec![0; quad], sites: [0; 3], rsum: vec![0; PHASE_SETS.len() * dw], rabs: vec![0; PHASE_SETS.len() * dw], unmatched: [0; 2], matched_sites: 0, pending: Vec::new() }
+    }
+
+    /// A site into `set`: its shares, bins and products; mode 0's bins checked against its plate.
+    fn add(&mut self, set: usize, site: &SiteRead, edges: &[(i64, i64); holonics::hnn::tower::field::PHASE_BINS]) {
+        use holonics::hnn::tower::field::{phase_bin, phase_bin_shell};
+        let (n, m) = (self.modes, self.heads * self.modes);
+        let face = site.face;
+        let (mut q, mut c) = (Vec::with_capacity(self.a), Vec::with_capacity(self.a));
+        for &mass in &face.masses {
+            let share = (mass << 40) / face.total;
+            let rem = (mass << 40) - share * face.total;
+            q.push(share);
+            c.push((((rem << 32) + face.total / 2) / face.total) as i128);
+        }
+        let mut bins = Vec::with_capacity(self.heads * n * 2);
+        for h in 0..self.heads {
+            for l in 0..n {
+                for word in [site.key, site.probe] {
+                    bins.push(phase_bin(word[h * n + l], word[m + h * n + l], edges) as u8);
+                }
+            }
+            for (w, word) in [site.key, site.probe].iter().enumerate() {
+                let bin = phase_bin(word[h * n], word[m + h * n], edges);
+                self.unmatched[w] += u64::from(phase_bin_shell(bin) != site.leaf[h] % 3);
+            }
+        }
+        self.matched_sites += 1;
+        let r = site.chart.to_vec();
+        let rr: Vec<i64> = (0..self.dw).flat_map(|i| (i..self.dw).map(move |j| (i, j))).map(|(i, j)| r[i] as i64 * r[j] as i64).collect();
+        self.pending.push(PhaseSite { set, truth: site.truth, q, c, bins, r, rr });
+        if self.pending.len() >= Self::BATCH {
+            self.flush();
+        }
+    }
+
+    /// The pending sites summed in, in parallel by disjoint parts of the sums (a group of bins, a set's letter), so each sum
+    /// is the same integers in any schedule.
+    fn flush(&mut self) {
+        let sites = std::mem::take(&mut self.pending);
+        let (a, dw) = (self.a, self.dw);
+        let tri = dw * (dw + 1) / 2;
+        let group = (holonics::hnn::tower::field::PHASE_BINS + 1) * a;
+        let per_set = self.heads * self.modes * 2;
+        self.n.par_chunks_mut(group).zip(self.f.par_chunks_mut(group)).zip(self.fc.par_chunks_mut(group)).enumerate().for_each(|(g, ((n, f), fc))| {
+            let (set, k) = (g / per_set, g % per_set);
+            for s in sites.iter().filter(|s| s.set == set) {
+                let at = s.bins[k] as usize * a;
+                n[at + s.truth] += 1;
+                for l in 0..a {
+                    f[at + l] += s.q[l];
+                    fc[at + l] += s.c[l];
+                }
+            }
+        });
+        self.ln.par_chunks_mut(dw).zip(self.lf.par_chunks_mut(dw)).zip(self.lfc.par_chunks_mut(dw)).enumerate().for_each(|(g, ((ln, lf), lfc))| {
+            let (set, letter) = (g / a, g % a);
+            for s in sites.iter().filter(|s| s.set == set) {
+                let (q, c) = (s.q[letter] as i128, s.c[letter]);
+                for j in 0..dw {
+                    let r = s.r[j] as i128;
+                    lf[j] += q * r;
+                    lfc[j] += c * r;
+                    if s.truth == letter {
+                        ln[j] += r;
+                    }
+                }
+            }
+        });
+        self.qn.par_chunks_mut(tri).zip(self.qf.par_chunks_mut(tri)).zip(self.qfc.par_chunks_mut(tri)).enumerate().for_each(|(g, ((qn, qf), qfc))| {
+            let (set, letter) = (g / a, g % a);
+            for s in sites.iter().filter(|s| s.set == set) {
+                let (q, c) = (s.q[letter] as i128, s.c[letter]);
+                for (k, &rr) in s.rr.iter().enumerate() {
+                    let rr = rr as i128;
+                    qf[k] += q * rr;
+                    qfc[k] += c * rr;
+                    if s.truth == letter {
+                        qn[k] += rr;
+                    }
+                }
+            }
+        });
+        for s in &sites {
+            self.sites[s.set] += 1;
+            for (j, &r) in s.r.iter().enumerate() {
+                self.rsum[s.set * dw + j] += r as i128;
+                self.rabs[s.set * dw + j] += (r as i128).abs();
+            }
+        }
+    }
+}
+
+/// [measurement; theory, November 10 01:29 and 01:30] `phase-field UNITS UNITS_SHA TRAIN TRAIN_SHA HELD HELD_SHA KEYS KEYS_SHA
+/// SECTION SECTIONS STATE STATE_SHA LINE OUT`: **the phase census**, its own forward read on census 2b's charge set at its
+/// answer sites ([`lap_visit`], the same tick as 2b's classes: the last), three sets kept apart: TRAIN's even problems, its odd
+/// problems, and the held problems (each held problem's own joint states, every open place the joint codes, [`joint_states`]).
+/// At each site, for every head, all its modes and both unframed words (the key and the probe), the mode's phase bin
+/// ([`holonics::hnn::tower::field::phase_bin`]: `π/12` from `arg 0`, the cone on edges, read on the integers) takes the true
+/// letter into `N[a]` and the face's shares into `F[a]` (`CENSUS_PHASE.tsv`); the readout's chart `r` (the vector the lift
+/// reads) gives each letter's `LN`, `LF`, `QN` and `QF` (`CENSUS_MOMENT.tsv`, [`PhaseCensus`]), each set's site count beside
+/// them. Checks first, each printed with PASS or FAIL, a FAIL refusing the tables: census 2b's (`LINE` and the charge, as
+/// `plate-joint-field`), then every (head, mode, word)'s bins sum to its set's sites; `Σ_a (N − F)` is zero in every bin up to
+/// the carried remainder (half a grain a letter a site); mode 0's sector of the key word at each site and head holds the shell
+/// of 2b's depth-1 class (the probe's misses printed beside); `Σ_a LN = Σ r` exactly and `Σ_a LF = Σ r` up to the carried
+/// remainder.
+pub(super) fn phase_field(args: &[String], realization: &mut dyn FieldRealization) -> Result<()> {
+    use holonics::hnn::tower::field::{phase_edges, PHASE_BINS};
+    if args.len() != 15 {
+        return Err("phase-field UNITS UNITS_SHA TRAIN TRAIN_SHA HELD HELD_SHA KEYS KEYS_SHA SECTION SECTIONS STATE STATE_SHA LINE OUT".into());
+    }
+    let started = std::time::Instant::now();
+    let units = units_of(&args[1], &args[2])?;
+    let train_problems = problems_of(&pinned_read(&args[3], &args[4], READ_BUDGET as usize)?);
+    let dev_problems = problems_of(&pinned_read(&args[5], &args[6], READ_BUDGET as usize)?);
+    let keys = pinned_read(&args[7], &args[8], READ_BUDGET as usize)?;
+    let (section, limit) = (positive(&args[9])?, count(&args[10])?);
+    let mut learner = FieldLearner::from_text(std::str::from_utf8(&pinned_read(&args[11], &args[12], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
+    declared_clocks(&mut learner.field);
+    let line = args[13].as_str();
+    let out = Path::new(&args[14]);
+    std::fs::create_dir(out)?;
+    let codec = FieldCodec::found(units, &train_problems)?;
+    let encode = |problems: &[(Vec<u8>, Vec<u8>)]| -> Result<Problems> {
+        problems.par_iter().map(|(q, a)| Ok((codec.encode(&question_text(q)).map_err(|e| e.to_string())?, codec.encode(a).map_err(|e| e.to_string())?, a.len()))).collect::<std::result::Result<Vec<_>, String>>().map_err(|e| e.into())
+    };
+    let train_set = encode(&train_problems)?;
+    let dev_set: Problems = encode(&dev_problems)?.into_iter().filter(|(_, a, _)| a.len() < codec.answer).collect();
+    let seed = u64::from_be_bytes(keys.get(keys.len().saturating_sub(8)..).filter(|w| w.len() == 8).ok_or("a key file of fewer than eight bytes")?.try_into()?);
+    let (sections, _) = sections_of(&train_set, section, dev_set.len(), seed);
+    if learner.holds_step() {
+        return Err("phase-field reads a state that holds no step (it never deposits)".into());
+    }
+    let d = learner.field.declaration;
+    println!("FIELD_CLOCKS per_blank={} bare={} laps_read={}", learner.field.per_blank_clock, learner.field.bare_stretch, learner.laps);
+    let (heads, modes, a, dw, m2) = (d.heads, d.modes, d.alphabet, d.width, 2 * d.complex());
+    let edges = phase_edges(learner.field.half_turn());
+    let read = learner.laps;
+    let draw = read * train_set.len() as u64;
+    let paths = paths_of(seed, read, &sections);
+    let order = walk(seed, read, sections.len());
+    let take = if limit == 0 { order.len() } else { limit.min(order.len()) };
+    let mut census = PhaseCensus::new(&d);
+    let charge = lap_visit(&codec, &train_set, &sections, &paths, &order[..take], seed, draw, &mut learner, realization, true, Some(line), &mut |site| {
+        if !site.asked {
+            census.add(site.problem % 2, site, &edges);
+        }
+    })?;
+    let bounded = charge.sites <= charge.bound;
+    println!("FIELD_CHECK check=2 result={} charged={} question={} answer={} bound={} sections={take}", if bounded { "PASS" } else { "FAIL" }, charge.sites, charge.question, charge.sites - charge.question, charge.bound);
+    println!("FIELD_CHECK check=3 part=visit result={} leaks={}", if charge.leaks == 0 { "PASS" } else { "FAIL" }, charge.leaks);
+    if !bounded || charge.leaks > 0 {
+        return Err("the phase census refuses to read: a check failed over the visit".into());
+    }
+    let train_ms = started.elapsed().as_millis();
+    // The held set: each held problem's own joint states, every open place.
+    let mut states: Vec<(Vec<usize>, Vec<bool>)> = Vec::new();
+    for (i, (q, ans, _)) in dev_set.iter().enumerate() {
+        states.extend(joint_states(codec.void(), q, ans, seed, i as u64).into_iter().map(|(c, u, _)| (c, u)));
+    }
+    for chunk in states.chunks(64) {
+        let views: Vec<Region> = chunk.iter().map(|(c, u)| Region { classes: c, unresolved: u, faces: &[], locked: &[], echo: &[], domain: None, port: None }).collect();
+        let words = realization.read_words(&learner.field, &views).map_err(|e| e.to_string())?;
+        for (ri, (c, u)) in chunk.iter().enumerate() {
+            for t in (0..c.len()).filter(|&t| u[t]) {
+                let face = words.faces[ri][t].as_ref().ok_or("a held state's open place without a face")?;
+                census.add(2, &SiteRead { leaf: &words.plates[ri][t * heads..(t + 1) * heads], face, truth: c[t], octave: None, asked: false, problem: ri, key: &words.words[ri][t * m2..(t + 1) * m2], probe: &words.probes[ri][t * m2..(t + 1) * m2], chart: &words.charts[ri][t * dw..(t + 1) * dw] }, &edges);
+            }
+        }
+    }
+    census.flush();
+    let held_ms = started.elapsed().as_millis();
+    for (set, name) in PHASE_SETS.iter().enumerate() {
+        println!("FIELD_PHASE_SET set={name} sites={}", census.sites[set]);
+    }
+    // The checks over the sums, before any table.
+    let groups = heads * modes * 2;
+    let group = (PHASE_BINS + 1) * a;
+    let (mut unsummed, mut unbalanced) = (0usize, 0usize);
+    for set in 0..PHASE_SETS.len() {
+        for k in 0..groups {
+            let at = (set * groups + k) * group;
+            let mut total = 0u64;
+            for b in 0..=PHASE_BINS {
+                let bin = at + b * a;
+                let n: u64 = census.n[bin..bin + a].iter().sum();
+                let f: i128 = (0..a).map(|l| ((census.f[bin + l] as i128) << 32) + census.fc[bin + l]).sum();
+                unbalanced += usize::from(((n as i128) << 72).abs_diff(f) > n as u128 * a as u128 / 2 + 1);
+                total += n;
+            }
+            unsummed += usize::from(total != census.sites[set]);
+        }
+    }
+    println!("FIELD_CHECK check=phase_sum result={} unsummed_groups={unsummed} groups={}", if unsummed == 0 { "PASS" } else { "FAIL" }, PHASE_SETS.len() * groups);
+    println!("FIELD_CHECK check=phase_balance result={} unbalanced_bins={unbalanced} bins={}", if unbalanced == 0 { "PASS" } else { "FAIL" }, PHASE_SETS.len() * groups * (PHASE_BINS + 1));
+    let sectored = census.unmatched[0] == 0;
+    println!("FIELD_CHECK check=mode0_sector result={} key_unmatched={} probe_unmatched={} site_heads={} word_2b_reads={}", if sectored { "PASS" } else { "FAIL" }, census.unmatched[0], census.unmatched[1], census.matched_sites * heads as u64, if sectored { "key" } else if census.unmatched[1] == 0 { "probe" } else { "neither" });
+    let (mut ln_off, mut lf_off) = (0usize, 0usize);
+    for set in 0..PHASE_SETS.len() {
+        for j in 0..dw {
+            let ln: i128 = (0..a).map(|l| census.ln[(set * a + l) * dw + j]).sum();
+            let lf: i128 = (0..a).map(|l| (census.lf[(set * a + l) * dw + j] << 32) + census.lfc[(set * a + l) * dw + j]).sum();
+            ln_off += usize::from(ln != census.rsum[set * dw + j]);
+            lf_off += usize::from((census.rsum[set * dw + j] << 72).abs_diff(lf) > census.rabs[set * dw + j].unsigned_abs() * a as u128 / 2 + 1);
+        }
+    }
+    println!("FIELD_CHECK check=moment_sum result={} ln_unequal={ln_off} lf_unequal={lf_off} coordinates={}", if ln_off == 0 && lf_off == 0 { "PASS" } else { "FAIL" }, PHASE_SETS.len() * dw);
+    if unsummed > 0 || unbalanced > 0 || !sectored || ln_off > 0 || lf_off > 0 {
+        return Err("the phase census refuses to write its tables: a check failed".into());
+    }
+    let join = |v: &[i128]| v.iter().map(i128::to_string).collect::<Vec<_>>().join(",");
+    let mut file = rows_file(&out.join("CENSUS_PHASE.tsv"), "set\thead\tmode\tword\tbin\tfrom_pi_12\tto_pi_12\tsites\tcounts\texpected_q40\texpected_carried_q72\n")?;
+    for (set, name) in PHASE_SETS.iter().enumerate() {
+        for h in 0..heads {
+            for l in 0..modes {
+                for (w, word) in ["key", "probe"].iter().enumerate() {
+                    let at = (set * groups + (h * modes + l) * 2 + w) * group;
+                    for b in 0..=PHASE_BINS {
+                        let bin = at + b * a;
+                        let n = &census.n[bin..bin + a];
+                        let (from, to) = if b == PHASE_BINS { ("zero".to_string(), "zero".to_string()) } else { (b.to_string(), (b + 1).to_string()) };
+                        let counts: Vec<String> = n.iter().map(u64::to_string).collect();
+                        let f: Vec<String> = census.f[bin..bin + a].iter().map(u128::to_string).collect();
+                        row(&mut file, &format!("{name}\t{h}\t{l}\t{word}\t{b}\t{from}\t{to}\t{}\t{}\t{}\t{}\n", n.iter().sum::<u64>(), counts.join(","), f.join(","), join(&census.fc[bin..bin + a])))?;
+                    }
+                }
+            }
+        }
+    }
+    let tri = dw * (dw + 1) / 2;
+    let mut moments = rows_file(&out.join("CENSUS_MOMENT.tsv"), "set\tletter\tkind\tvalues\n")?;
+    for (set, name) in PHASE_SETS.iter().enumerate() {
+        row(&mut moments, &format!("{name}\t-\tsites\t{}\n", census.sites[set]))?;
+        row(&mut moments, &format!("{name}\t-\tR\t{}\n", join(&census.rsum[set * dw..(set + 1) * dw])))?;
+        for l in 0..a {
+            let (lin, quad) = ((set * a + l) * dw, (set * a + l) * tri);
+            for (kind, v) in [("LN", &census.ln[lin..lin + dw]), ("LF", &census.lf[lin..lin + dw]), ("LF_carried", &census.lfc[lin..lin + dw]), ("QN", &census.qn[quad..quad + tri]), ("QF", &census.qf[quad..quad + tri]), ("QF_carried", &census.qfc[quad..quad + tri])] {
+                row(&mut moments, &format!("{name}\t{l}\t{kind}\t{}\n", join(v)))?;
+            }
+        }
+    }
+    println!("FIELD_PHASE_DONE sections={take} of={} train_ms={train_ms} held_ms={held_ms} ms={}", order.len(), started.elapsed().as_millis());
     Ok(())
 }
 

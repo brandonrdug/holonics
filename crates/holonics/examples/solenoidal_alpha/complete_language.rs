@@ -926,6 +926,7 @@ pub(super) fn run_field_realized(args: &[String], realization: &mut dyn holonics
         Some("length-field") => field_train::length_field(args, realization),
         Some("plate-field") => field_train::plate_field(args, realization),
         Some("plate-joint-field") => field_train::plate_joint_field(args, realization),
+        Some("phase-field") => field_train::phase_field(args, realization),
         Some("lens-field") => field_train::lens_field(args, realization),
         Some("exchange-field") => field_train::exchange_field(args, realization),
         Some("exchange-held-field") => field_train::exchange_held_field(args, realization),

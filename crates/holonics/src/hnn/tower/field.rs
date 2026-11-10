@@ -1113,11 +1113,63 @@ pub struct ReleaseRead<'a> {
 }
 
 /// [measurement; theory, November 9 21:59] **A read's faces, plates and key words** ([`Field::read_words`]), one entry a region.
+/// [measurement; theory, November 10 01:29] With them each site's unframed probe word at the last tick (`[t][2M]`, the word
+/// its probed classes are read from, its moment added as the tick adds it) and the readout's chart of its last state
+/// (`[t][D]` on `2^(−16)`, the vector the lift reads), zero at a resolved site, which no face reads.
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
 pub struct WordsRead {
     pub faces: Vec<Vec<Option<TowerFace>>>,
     pub plates: Vec<Vec<u32>>,
     pub words: Vec<Vec<i64>>,
+    pub probes: Vec<Vec<i64>>,
+    pub charts: Vec<Vec<i32>>,
+}
+
+/// [definition; theory, November 10 01:29] The phase census's bins: `π/12` each from `arg 0`, so the cone (`π/4` multiples)
+/// and the axes lie on edges.
+pub const PHASE_BINS: usize = 24;
+
+/// [definition; theory, November 10 01:29] **The phase bins' edge directions** at the frames' grain (`2^(−30)`, the turn's
+/// faces, [`turn_phasor`] at `k/24` of a turn), each cone and axis edge held exactly (`(±1, ±1)` and `(±1, 0)`, `(0, ±1)` on the
+/// grain), so a mode on the cone meets an edge on the integers.
+pub fn phase_edges(pi: i128) -> [(i64, i64); PHASE_BINS] {
+    let one = 1i64 << MOVE_BITS;
+    std::array::from_fn(|k| match k % 6 {
+        0 => [(one, 0), (0, one), (-one, 0), (0, -one)][k / 6],
+        3 => [(one, one), (-one, one), (-one, -one), (one, -one)][k / 6],
+        _ => ring_phasor(k, PHASE_BINS, pi),
+    })
+}
+
+/// [definition; theory, November 10 01:29] **A mode's phase bin** on the integers, no angle formed: `k` where `(re, im)` lies at
+/// or past edge `k` and before edge `k + 1` counterclockwise (the sign of `e_k × w`), except that a mode on the cone between a
+/// sky or ground sector and the bridge is the bridge's ([`shell`]: `|Re| ≤ |Im|` is the bridge), so each bin lies in one shell;
+/// `PHASE_BINS` (a bin of its own) for the zero word.
+pub fn phase_bin(re: i64, im: i64, edges: &[(i64, i64); PHASE_BINS]) -> usize {
+    if re == 0 && im == 0 {
+        return PHASE_BINS;
+    }
+    let half = PHASE_BINS / 2;
+    let (upper, (x, y)) = if im > 0 || (im == 0 && re > 0) { (true, (re as i128, im as i128)) } else { (false, (-(re as i128), -(im as i128))) };
+    let cross = |k: usize| edges[k].0 as i128 * y - edges[k].1 as i128 * x;
+    let within = (0..half).rev().find(|&k| cross(k) >= 0).unwrap_or(0);
+    let bin = within + if upper { 0 } else { half };
+    // The cone at 3π/4 and 7π/4 opens a sky or ground sector counterclockwise; a mode on it is the bridge's.
+    if re.unsigned_abs() == im.unsigned_abs() && (re < 0) != (im < 0) {
+        bin - 1
+    } else {
+        bin
+    }
+}
+
+/// [definition; theory, November 10 01:29] The shell ([`shell`]) every mode in a phase bin holds: the sky for the bins within
+/// `π/4` of `arg 0`, the ground within `π/4` of `π`, the bridge for the rest and for the zero word.
+pub fn phase_bin_shell(bin: usize) -> u32 {
+    match bin {
+        0..=2 | 21..=23 => 2,
+        9..=14 => 0,
+        _ => 1,
+    }
 }
 
 /// [definition; theory, November 9 21:59] **A site's distance to the nearest seam, by octave**: over its class modes (each head's
@@ -1727,6 +1779,8 @@ struct FieldPass {
     /// [measurement; theory, November 9 21:59] Each site's unframed key word at the last tick, `[t][2M]` (real parts then
     /// imaginary): its class modes' `(Re, Im)`, whose distance to the seam `|Re| = |Im|` a census reads.
     words: Vec<i64>,
+    /// [measurement; theory, November 10 01:29] Each site's unframed probe word at the last tick, `[t][2M]`.
+    probes: Vec<i64>,
 }
 
 /// The round trips `Σ_j p_ji^(t) p_ij^(t+1)` of each site over consecutive ticks' rows (`[h][i]`), each
@@ -2723,6 +2777,7 @@ impl Field {
             if k + 1 == d.ticks {
                 out.plates = (0..sites).flat_map(|t| cell.classes.iter().map(move |l| l.class[t])).collect();
                 out.words = cell.word.clone();
+                out.probes = cell.probe.clone();
             }
             if let Some(prev) = &before {
                 round_trips(prev, &cell.rows, sites, &mut trips);
@@ -3726,12 +3781,14 @@ impl Field {
         if self.declaration.energy {
             return refuse("an energy field's key words are not read");
         }
-        let reads: Vec<(Vec<Option<TowerFace>>, Vec<u32>, Vec<i64>)> = regions.par_iter().map(|r| self.pass(r, false).map(|p| (p.faces, p.plates, p.words))).collect::<Result<_>>()?;
+        let reads: Vec<FieldPass> = regions.par_iter().map(|r| self.pass(r, false)).collect::<Result<_>>()?;
         let mut out = WordsRead::default();
-        for (f, p, w) in reads {
-            out.faces.push(f);
-            out.plates.push(p);
-            out.words.push(w);
+        for p in reads {
+            out.faces.push(p.faces);
+            out.plates.push(p.plates);
+            out.words.push(p.words);
+            out.probes.push(p.probes);
+            out.charts.push(p.read);
         }
         Ok(out)
     }

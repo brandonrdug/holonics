@@ -708,6 +708,10 @@ pub struct CardField<'c> {
     /// [measurement; theory, November 9 21:59] While the key words are read beside the plates: each region's sites' unframed key
     /// words at the last tick (`[t][2M]`), by region over the batches.
     words: std::cell::RefCell<Option<Vec<Vec<i64>>>>,
+    /// [measurement; theory, November 10 01:29] Beside the key words: each region's sites' unframed probe words at the last tick
+    /// (`[t][2M]`) and the readout's chart of their last state (`[t][D]`, zero at a resolved site).
+    probes: std::cell::RefCell<Option<Vec<Vec<i64>>>>,
+    charts: std::cell::RefCell<Option<Vec<Vec<i32>>>>,
     /// [measurement, §16.42] While a near field is read: the named sites of the batch's one region, and each one's near field
     /// by offset at every kept tick and head.
     near_sites: std::cell::RefCell<Option<Vec<usize>>>,
@@ -818,7 +822,7 @@ impl<'c> CardField<'c> {
         let (free, total) = (memory.free_bytes as u64, memory.total_bytes as u64);
         let used = total.saturating_sub(free);
         let budget = free.min(total.saturating_sub(BOARD_RESERVE).saturating_sub(used)).saturating_sub(MARGIN);
-        Ok(Self { card, module, budget, times: FieldTimes::default(), profile: None, pools: Default::default(), held_questions: Default::default(), covector_shares: Default::default(), row_questions: Default::default(), row_out: Default::default(), row_cov: Default::default(), held_cells: Default::default(), tick_reads: Default::default(), plates: Default::default(), words: Default::default(), near_sites: Default::default(), near_out: Default::default(), clock_sites: Default::default(), clock_out: Default::default(), phases: None, stamps: None, batch_regions: None })
+        Ok(Self { card, module, budget, times: FieldTimes::default(), profile: None, pools: Default::default(), held_questions: Default::default(), covector_shares: Default::default(), row_questions: Default::default(), row_out: Default::default(), row_cov: Default::default(), held_cells: Default::default(), tick_reads: Default::default(), plates: Default::default(), words: Default::default(), probes: Default::default(), charts: Default::default(), near_sites: Default::default(), near_out: Default::default(), clock_sites: Default::default(), clock_out: Default::default(), phases: None, stamps: None, batch_regions: None })
     }
 
     /// Time every launch on the card's own clock from here on ([`Stamps`]).
@@ -1904,6 +1908,16 @@ impl<'c> CardField<'c> {
                     }
                 }
             }
+            // [theory, November 10 01:29] The last tick's probe words `[t][2M]` (`pr`, its moment added), where they are read.
+            if self.probes.borrow().is_some() {
+                let probe = self.timed(Kind::Copy, || card.fetch_range(&pr, 0, sites * m2)).map_err(device)?;
+                if let Some(out) = self.probes.borrow_mut().as_mut() {
+                    for r in 0..regions.len() {
+                        let (a0, a1) = (region_off[r] as usize, region_off[r + 1] as usize);
+                        out[at_region + r] = probe[a0 * m2..a1 * m2].to_vec();
+                    }
+                }
+            }
         }
         // Each named site's clocks by tick (a reading, §16.44), the batch's one region.
         if let Some(named) = self.clock_sites.borrow().as_ref() {
@@ -2033,6 +2047,17 @@ impl<'c> CardField<'c> {
         let masses = self.timed(Kind::Alloc, || self.take::<u64>(sites * a)).map_err(device)?;
         let totals = self.timed(Kind::Alloc, || self.take_zeroed::<i128>(sites)).map_err(device)?;
         self.chart(words, words.x, &fread, &fscale, true)?;
+        // [theory, November 10 01:29] The readout's chart `[t][D]` where it is read: written at the unresolved sites, zero at the rest
+        // (the host's `FieldPass::read`).
+        if self.charts.borrow().is_some() {
+            let read = self.timed(Kind::Copy, || card.fetch_range(&fread, 0, sites * dw)).map_err(device)?;
+            if let Some(out) = self.charts.borrow_mut().as_mut() {
+                for r in 0..regions.len() {
+                    let (a0, a1) = (region_off[r] as usize, region_off[r + 1] as usize);
+                    out[at_region + r] = (a0..a1).flat_map(|t| read[t * dw..(t + 1) * dw].iter().map(move |&v| if unresolved[t] != 0 { v } else { 0 })).collect();
+                }
+            }
+        }
         // The face read through the encoding (§16.26, the host's `Field::tied`): the lift `y = R r̂ + b_R`, then
         // `z(a) = rel(⟨E(a), y⟩, 16) + c_a`.
         let lift = self.timed(Kind::Alloc, || self.take_zeroed::<i64>(sites * dw)).map_err(device)?;
@@ -2999,10 +3024,14 @@ impl FieldRealization for CardField<'_> {
         }
         *self.plates.borrow_mut() = Some(vec![Vec::new(); regions.len()]);
         *self.words.borrow_mut() = Some(vec![Vec::new(); regions.len()]);
+        *self.probes.borrow_mut() = Some(vec![Vec::new(); regions.len()]);
+        *self.charts.borrow_mut() = Some(vec![Vec::new(); regions.len()]);
         let read = self.run(field, regions, false, false, None);
         let plates = self.plates.borrow_mut().take().unwrap_or_default();
         let words = self.words.borrow_mut().take().unwrap_or_default();
-        Ok(holonics::hnn::tower::field::WordsRead { faces: read?.0, plates, words })
+        let probes = self.probes.borrow_mut().take().unwrap_or_default();
+        let charts = self.charts.borrow_mut().take().unwrap_or_default();
+        Ok(holonics::hnn::tower::field::WordsRead { faces: read?.0, plates, words, probes, charts })
     }
 
     fn read_plates(&mut self, field: &Field, regions: &[Region]) -> Result<(Vec<Vec<Option<TowerFace>>>, Vec<Vec<u32>>)> {
