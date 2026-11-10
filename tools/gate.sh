@@ -19,6 +19,7 @@ run guard-doctests env RUSTC_BOOTSTRAP=1 cargo test -p holonics --doc
 run diagnostic-timing-controls cargo test -p holonics --example listener continuing::diagnostic::
 run diagnostic-supervisor-controls python3 tools/test_listener_diagnostic_stage.py
 run diagnostic-receipt-controls python3 tools/test_listener_diagnostic_receipts.py
+run trunk-census-controls python3 tools/test_repo_census.py
 run listener-continuation-controls cargo test -p holonics --example listener continuing::tests::
 run projected-statistics-controls cargo test -p holonics --lib projected_statistics_tests
 run native-class-advance-controls cargo test -p holonics --lib class_advance_tests

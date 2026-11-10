@@ -4,7 +4,7 @@ PASS A1 raw place sums minus canonical digits is the boundary (2-x)*carries: 200
 PASS A1 the boundary evaluates to zero at x=2 (same integer)
 PASS A2 XOR-and-shift loop: iterations = 1 + longest carry chain (generate, then propagates): 64-bit pairs, mean iterations 6.31 (log2 64 = 6)
 
-== B. The modulus is the place graph's closing edge (Smith normal form of the relations) (t=0.2s)
+== B. The modulus is the place graph's closing edge (Smith normal form of the relations) (t=0.1s)
 PASS B1 path -> Z/2^n, cycle -> Z/(2^n-1), twisted cycle -> Z/(2^n+1), no edges -> (Z/2)^n, closing weight c -> Z/(2^n-c): n = 2..10; n=4 path 16 cycle 15 twist 17 xor [2, 2, 2, 2]; n=8 path 256 cycle 255 twist 257 xor [2, 2, 2, 2, 2, 2, 2, 2]
 PASS B1 two closing edges (Solinas shape) -> Z/(2^n - 2^m - 1): Goldilocks 2^448-2^224-1 has this shape
 PASS B1 the open ray -> Z (all invariant factors 1, one free place)
@@ -27,7 +27,7 @@ PASS D1 contrast: a canonical binary carry crosses all 64 places
 PASS D2 3:2 compressor: x+y+z = (x^y^z) + 2*maj(x,y,z), constant depth; Dadda stages: stages to reduce a column of height h to 2: {3: 1, 16: 6, 64: 10, 256: 13}
 PASS D3 non-adjacent form: a unique section of the signed-digit fibre with weight 1/3: k < 2^16: 0.3688 nonzeros per place (binary 1/2); 1365 strings of length 10, all distinct values
 
-== E. Multiplication: a contraction, then the boundary; fast methods are decompositions (t=2.2s)
+== E. Multiplication: a contraction, then the boundary; fast methods are decompositions (t=2.1s)
 PASS E1 product = digit convolution (contraction) then carries; the carry bond's width is the bits of the count of terms meeting: 64-bit: max column 31, max carry 28 (5 bits; ceil_log2(64)+1 = 7)
 PASS E2 Karatsuba: 3^k one-place products for 2^k places (similarity dimension log2 3 = 1.585): leaf counts {2: 3, 4: 9, 8: 27, 16: 81, 32: 243, 64: 729, 128: 2187, 256: 6561}
 PASS E2 Strassen: 7^k products for 2^k x 2^k (similarity dimension log2 7 = 2.807): counts {2: 7, 4: 49, 8: 343, 16: 2401}
@@ -54,26 +54,26 @@ PASS G1 a shear (x, y + f(x)) inverts for any f, rounded or not: integer lifting
 PASS G2 reversible adder: (a, b) -> (a, a+b), every carry computed and uncomputed in place, the ancilla returns to 0, only the top carry (the winding) is written out: n=5 exhaustive, n=32 sampled; gates for n=32: 129 CNOT, 64 Toffoli
 PASS G3 Landauer cost = log2 of the fibre: bits merged per operation on two 8-bit inputs: a+b 7.28, a*b 2.29, a^b 8.00, carry-save collapse s+2c 6.64, in-place (a, a+b) 0.00
 
-== H. Analysis: the carry's one-way cone, its Walsh face, and recovering a register (t=4.1s)
+== H. Analysis: the carry's one-way cone, its Walsh face, and recovering a register (t=4.2s)
 PASS H1 the carry cone is one-way: an input bit only reaches its own and higher places
 PASS H1 rotation closes the cone into a cycle: with rotation every output bit depends on every input bit after a few rounds, without it never: rounds to full dependence (16-bit ARX toy): rotate 0 -> None, rotate 3 -> 9, rotate 7 -> 5
 PASS H2 the carry is the only nonlinearity: sum bit k has algebraic degree k+1 over F_2 and best linear correlation 1 (k=0) then 1/2: degrees (6-bit) [1, 2, 3, 4, 5, 6]; best |correlation| (4-bit) ['1', '1/2', '1/2', '1/2']
 PASS H3 Berlekamp-Massey: 2L output bits recover a register's feedback (its closing edges) and regenerate the rest: 40 random registers of length 8..31
 PASS H4 with the carry (2-adic): 2*log2(q)+2 low bits recover p/q by Euclid (rational reconstruction); -1/19 repeats with period ord_19(2): period of -1/19 in Z_2: 18
 
-== I. The carry is Witt addition: binary for p=2, balanced ternary for p=3 (t=4.4s)
+== I. The carry is Witt addition: binary for p=2, balanced ternary for p=3 (t=4.5s)
 PASS I1 Witt addition polynomials reproduce the carries: p=2 gives bit addition (S_1 = a1+b1+a0*b0 mod 2, the AND), p=3 gives balanced ternary (the Teichmueller lift of 2 is -1): 3 places, 3000 random pairs each
 PASS I2 reading: the Moebius function against the carry parity (-1)^s_2(n) (Mauduit-Rivat: o(N)): N=10^6: sum mu*(-1)^s2 = 172 (0.172 sqrt N); Mertens M(N) = 212 (0.212 sqrt N)
 PASS I3 dyadic shell model of fluids: energy passes shell to shell as a carry (flux telescopes, total conserved): 12 shells, 200 random states, Fractions
 
-== J. Elliptic curves: scalar multiplication is the scalar's register; NAF is its signed section (t=5.4s)
+== J. Elliptic curves: scalar multiplication is the scalar's register; NAF is its signed section (t=5.3s)
 PASS J1 [k]P by the binary register and by its non-adjacent form agree on y^2 = x^3+2x+3 over F_(2^61-1): mean additions per 64-bit scalar: binary 32.4, NAF 21.8
 
-== K. Coprime rings carry nothing between them: residues on rings, the CRT as the one carry (t=5.5s)
+== K. Coprime rings carry nothing between them: residues on rings, the CRT as the one carry (t=5.4s)
 PASS K1 two rings are coprime exactly when their lengths are: gcd(2^a-1, 2^b-1) = 2^gcd(a,b) - 1: a, b <= 40
 PASS K2 residues on rings of 19, 31 and 61 places add and multiply lane by lane, each lane closing its own carry end-around; the mixed-radix reconstruction is the only carry between lanes: 3000 random pairs below (2^19-1)(2^31-1)(2^61-1)
 
-== L. A data type is a register: its places, carry cuts, closing edge, section and fields (t=5.6s)
+== L. A data type is a register: its places, carry cuts, closing edge, section and fields (t=5.5s)
 PASS L1 u64 and i64 are one ring Z/2^64 with two sections: wrapping +, -, * give the same bits; the signed value weights the top place -2^63; sign extension writes the top place out as the tail; the two orders differ exactly when the top places differ: 20000 random pairs
 PASS L1 the top place's weight -2^63 is the 2-adic tail of ones summed into one place: 2^63 + 2^64 + ... + 2^(63+K) = -2^63 mod 2^(64+K): K = 0..64
 PASS L2 three sections of 8 places: two's complement holds 256 values; ones' complement and sign-magnitude hold 255 (two zeros); ones' complement addition is the ring Z/(2^8-1), its sign a place, while sign-magnitude's sign is a separate half-turn state: exhaustive at 8 places
@@ -81,11 +81,18 @@ PASS L3 lanes and bitfields are the register with carry edges cut at the field b
 PASS L4 a float's register is three fields: a half-turn, a level and a phase (value = (-1)^s 2^(e-127) (1 + m/2^23)); matches the platform's binary32: 3000 random normal patterns (the platform float read only at this boundary)
 PASS L4 adding two floats' bit patterns as integers multiplies their values in the log chart (Mitchell): the mantissa's carry into the exponent field is the helix's winding carry, and the product is within 8/9 of the true one: 5000 pairs; smallest ratio 0.8898; the bits read as an integer are log2 to within 0.0861 (log2(1+f) - f <= 0.0861)
 
-== M. The digit face's calculus: the increment's carries are the derivative's defect (t=6.1s)
+== M. The digit face's calculus: the increment's carries are the derivative's defect (t=6.0s)
 PASS M1 an increment moves the digit sum by s_b(n+1) - s_b(n) = 1 - (b-1) v_b(n+1): the carry run is the defect of the derivative: b = 2..16, n < 5000
 PASS M2 summing the increments: sum_(k<=N) v_b(k) = (N - s_b(N))/(b-1), the carries of counting to N; at a prime radix it is v_p(N!) (Legendre), at a composite one it is not: b = 2..16, N <= 3000; b = 10, N = 5: 0 carries, v_10(5!) = 1
 PASS M3 at a prime radix the difference calculus's basis C(n,k) factors place by place (Lucas); at a composite radix it does not: n < 200, all k: failures {2: 0, 3: 0, 5: 0, 7: 0} at primes, {4: 2553, 6: 8530, 10: 9095} at composites
 PASS M3 Mahler's basis: (1+p)^x = sum_k C(x,k) p^k, coefficients of valuation k, so the series converges at every p-adic x: p = 2, 3, 5, 25 coefficients
 PASS M4 how digits disperse depends on the radix: the leading digit of 2^k cycles 1, 2, 4, 8 in base 16 (log_16 2 = 1/4 closes the phase) and spreads in base 10 as the phase k log10 2 fills its circle (Benford): k < 2000 in base 16; k < 3000 in base 10, largest relative deviation from log10(1+1/d): 0.0101
 
-63 checks, 0 failed, 6.3 s
+== S. Sections meet before they add; inversion carries its residual (the owner's property tests) (t=6.2s)
+PASS S1 a low operand of w places and a signed one meet in the signed section, where the low one takes w+1 places: the sum needs max(w_a+1, w_b)+1 signed places, one fewer only when the signed operand has one place (3+1 at two places each needs four): every value pair to 6 places, the bounds to 32; the rule is one too many at 6 of 36 small pairs, those whose signed operand has one place
+PASS S2 a difference of two low operands is signed at the wider plus one (not the wider plus two that converting both and adding gives): every value pair to 6 places
+PASS S3 the bottom end with its residual carried, X' = X(1+E) and E' = E^2 (since 1 - A X(1+E) = E^2), keeps a step's two products independent: from (3a) xor 2 the residual's valuation runs 5, 10, 20, 40 and four steps reach 64 places: 10,000 odd 64-bit a; least valuation per step [5, 10, 20, 40, 64] (64 = zero mod 2^64)
+PASS S4 a product takes a low operand at its own places, the sign coming from the signed operand alone: low x signed is signed at w_a+w_b and low x low is low at w_a+w_b (one fewer only where an operand has one place), so meeting in one section first, (w_a+1)+w_b, is a place too many; u32 x u32 and u32 x i32 stay in 64 places: every value pair to 6 places, the corner bounds to 32
+PASS S5 in one fixed signed section a release's widths follow its rule: from W places by K, half up leaves the quotient at W-K+1 and the remainder at K; floor W-K and K+1; ceiling and nearest with ties away or to even W-K+1 and K+1; half up inside the register is (x>>K) + ((x>>(K-1))&1): every x to 9 places and every K; the shift form on 20,000 64-bit draws and both ends; places beyond (W-K, K) by rule: {'floor': (0, 1), 'ceiling': (1, 1), 'up': (1, 0), 'away': (1, 1), 'even': (1, 1)}
+
+68 checks, 0 failed, 6.4 s

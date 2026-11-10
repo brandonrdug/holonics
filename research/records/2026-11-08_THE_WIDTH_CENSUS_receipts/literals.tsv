@@ -1,0 +1,70 @@
+file	line	literal	text
+field.rs	350	62	62 + WEIGHT_BITS + reach_bits + spread + terms + 64 + reach_bits + 1
+field.rs	638	62	release(exponential.below_one(-bits) as i128, 62 - MOVE_BITS) as i64
+field.rs	664	62	Ok(release(face as i128, (62 - MATERIAL_BITS as i128 - c) as u32))
+field.rs	705	16	Ok(release(release(at.checked_mul(b).ok_or(TowerError::Refused(PACE_RETURN))?, MOVE_BITS), 16))
+field.rs	751	16	let (re, im) = exp_series(0, release(theta, 16));
+field.rs	910	20	let step = w << (super::COVECTOR_BITS - 20);
+field.rs	916	20	Ok((rows, fit64(div_nearest(w as i128 * gap, 1 << 20))?))
+field.rs	1148	20	let unit = 1u128 << 20;
+field.rs	1149	20	let square: u128 = face.masses.iter().map(|&m| ((m << 20) / face.total).pow(2)).sum::<u128>() / unit;
+field.rs	1897	62	Ok(62 + WEIGHT_BITS + reach_bits + spread + terms + 64 + reach_bits + 1)
+field.rs	1902	16	let pi = half_turn(MOVE_BITS + 16);
+field.rs	2924	8	acc.far_effective += ((far * far) >> (SHARE_BITS - 8)) / collision;
+field.rs	4865	16	const ONE: u64 = 1 << 16;
+field.rs	4879	16	let k = if n < 2 { 0 } else { ((n as u64 * self.share) >> 16).clamp(1, n as u64 - 1) as usize };
+field.rs	4898	16	let (per_h, per_c) = ((th.max(1) << 16) / k as u128, (tc.max(1) << 16) / (n - k) as u128);
+field.rs	4899	16	let even = (per_c << 16) / (per_h + per_c);
+field.rs	5219	40	let shift = if grain == MATERIAL_BITS { 40 + grain - 20 } else { 24 + grain - 20 };
+field.rs	5219	20	let shift = if grain == MATERIAL_BITS { 40 + grain - 20 } else { 24 + grain - 20 };
+field.rs	5232	40	let shift = if grain == MATERIAL_BITS { 40 + grain - 20 } else { 24 + grain - 20 };
+field.rs	5232	20	let shift = if grain == MATERIAL_BITS { 40 + grain - 20 } else { 24 + grain - 20 };
+field.rs	5615	20	read.alpha = (evidence.checked_mul(1 << 20).ok_or(TowerError::Refused(OVER))?, (-sum).checked_mul(curvature).ok_or(TowerError::Refused(OVER))?);
+field.rs	5816	40	d[i] = if grain == MATERIAL_BITS { scaled } else { release(scaled, 40 - super::COVECTOR_BITS) };
+field.rs	5856	20	let num = (-2 * sum).checked_mul(1i128 << (20 + 32 + LN2_FACE_BITS)).ok_or(TowerError::Refused(OVER))?;
+field.rs	5926	40	*v = if grain == MATERIAL_BITS { scaled } else { release(scaled, 40 - super::COVECTOR_BITS) };
+field.rs	5934	40	g[f.layout.face_temper] = -(nats << (40 - ENERGY_BITS));
+field.rs	6047	20	log_a += ((face.code(a) as i128) - (face2.code(truth[o].classes[t]) as i128)) << (ENERGY_BITS - 20);
+field.rs	6084	40	d[i] = if grain == MATERIAL_BITS { scaled } else { release(scaled, 40 - super::COVECTOR_BITS) };
+field.rs	6133	40	g[f.layout.face_temper] = -(nats << (40 - ENERGY_BITS));
+field.rs	6310	40	d[i] = if grain == MATERIAL_BITS { scaled } else { release(scaled, 40 - super::COVECTOR_BITS) };
+field.rs	6474	16	let pp = (p[v] as u128 * p[v] as u128) >> (2 * MATERIAL_BITS - 16);
+field.rs	6475	16	measure.v_coin[b as usize - 1] = measure.v_coin[b as usize - 1].saturating_add(norm.saturating_mul(pp).saturating_mul((1u128 << k) - 1) >> 16);
+field.rs	6513	20	kl_face += release(pv * (log2_p + ((face.code(v) as i128) << (ENERGY_BITS - 20))), MATERIAL_BITS);
+field.rs	6537	40	g[f.layout.face_temper] = -(nats << (40 - ENERGY_BITS));
+energy.rs	51	8	pub const MOST_HALVINGS: u32 = STATE_BITS + 8;
+energy.rs	501	8	let v = carry("a key's tangent bracket past its 128-bit carrier", carry("a key's tangent bracket past its 128-bit carrier", tds[i][k].checked_mul(bracket))?.checked_mul(1 << 8))? + carry("a key's tang
+energy.rs	522	8	let v = carry("a crowd key's tangent part past its 128-bit carrier", carry("a crowd key's tangent part past its 128-bit carrier", tdsc[i][k].checked_mul(bracket_m))?.checked_mul(1 << 8))? + carry("a c
+energy.rs	543	8	tsq += ((tds[i][kk] * dec * qh[j * span + r] as i128) << 8) + ds[i][kk] * dec * tk[j * span + r] as i128;
+energy.rs	555	8	tsq += ((tdsc[i][kk] * dec * m_) << 8) + dsc[i][kk] * dec * tm;
+energy.rs	564	8	out.tp[slot] = fit64(release(tsq, back + 8))?;
+energy.rs	565	8	out.tq[slot] = fit64(release(tcol[i * span + r], back + 8))?;
+energy.rs	567	8	out.tq[slot] = fit64(out.tq[slot] as i128 + release(tspread_w[i * span + r], back + 8))?;
+energy.rs	748	8	let corr = release(div_nearest(-(s1 << FACE_BITS), den), 2 * FACE_BITS + 8) + release(div_nearest(-((jf[r] as i128 * c_wd) << FACE_BITS), den), 2 * FACE_BITS + 8);
+energy.rs	1034	8	let radial = release(c.read[at + i] as i128 * mean, 2 * FACE_BITS + 8);
+energy.rs	1174	16	Ok((release(first, 16 + h), cell.phi - after.phi, behind.phi - after.phi))
+energy.rs	1230	16	let first = release(pair(&f0, &v), 16 + e);
+energy.rs	1451	20	let floor = (62i64 << 20) - (1 << 20);
+energy.rs	1451	62	let floor = (62i64 << 20) - (1 << 20);
+energy.rs	1457	20	let glambda = fit64(release(g_square * inverse, MATERIAL_BITS + ENERGY_BITS - 20))?;
+energy.rs	1547	8	g[l.enc + row * dw + o] -= (wt * lift[o] as i128) << 8;
+energy.rs	1549	8	g[l.before + row * dw + o] -= (wt * cell.read[(t + 1) * dw + o] as i128) << 8;
+energy.rs	1552	8	g[l.after + row * dw + o] -= (wt * cell.read[(t - 1) * dw + o] as i128) << 8;
+energy.rs	1651	8	let radial = release(c.read[at + i] as i128 * mean, 2 * FACE_BITS + 8);
+field.cu	586	16	exp_series_dev(0, rel(theta, 16), re, im);
+field.cu	777	62	if (terms < ((uwide)1 << 62)) {
+field.cu	857	62	if (terms < ((uwide)1 << 62)) {
+field.cu	2723	16	z[c] = fit64(rel(sum, 16) + (wide)w.theta[bias + a], w.status);
+field.cu	2740	16	dy[c] = fit64(rel(sum, 16), w.status);
+field.cu	2760	16	sum += rel((wide)dz[t * w.A + a] * (wide)y[t * w.D + i], 16);
+field.cu	3344	8	add_wide(cell + 6, (wide)(((f * f) >> (SHARE_BITS - 8)) / (uwide)coll));
+field.cu	3595	16	return rel(rel(y, MOVE_BITS), 16);
+field_energy.cuh	75	62	m = (m * m) >> 62;
+field_energy.cuh	821	8	tsum += ((tdss[warp][jj] * dec * q) << 8) + (wide)dss[warp][jj] * dec * tk;
+field_energy.cuh	847	8	tsum += ((tdsk * d * mw) << 8) + dsk * d * tmw;
+field_energy.cuh	852	8	if (!mul_fits(dsk, bracket, &prod) || !mul_fits(tdsk, bracket_m, &tprod) || !mul_fits(tprod, (wide)1 << 8, &tlift) || !mul_fits(dsk, tbracket, &tother)) {
+field_energy.cuh	869	8	tp[slot] = fit64(rel(tsum, CONTACT_BACK + 8 + g0), w.status);
+field_energy.cuh	916	8	if (!mul_fits((wide)dsc[at], bracket, &prod) || !mul_fits(tdsc[at], bracket, &tprod) || !mul_fits(tprod, (wide)1 << 8, &tlift) || !mul_fits((wide)dsc[at], tbracket, &tother)) {
+field_energy.cuh	929	8	tq[slot] = fit64((wide)tq[slot] + rel(tsk, CONTACT_BACK + 8 + g0), w.status);
+field_energy.cuh	1009	8	const wide corr = rel(div_nearest(-(s1 << FACE_BITS), den), 2 * FACE_BITS + 8) + rel(div_nearest(-((jf * c_wd) << FACE_BITS), den), 2 * FACE_BITS + 8);
+field_energy.cuh	1106	8	const wide radial = rel((wide)read[at + i] * mean, 2 * FACE_BITS + 8);

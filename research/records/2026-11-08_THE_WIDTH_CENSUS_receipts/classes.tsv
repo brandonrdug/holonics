@@ -1,0 +1,58 @@
+# base	name	class	quantity	consumer	need (what the card read prints, or the static derivation)
+tower.rs	FACE_BITS	grain, picked	a face: encodings E(a), letter faces z(a), class biases, ring faces	field, energy letters, moment, card field.cu/field_energy/field_moment/tower.cu	top place of |E|,|z| a section; bottom place moved of the face families
+tower.rs	MATERIAL_BITS	grain, picked (one grain, four quantities)	the material theta (i32), and by identification the clocks (PACE_BITS), law (D)'s conditional p(v) and its weights, the coin's tau	every field owner and kernel	top place of |theta| by family (i32 leaves 7 whole bits); bottom place moved of each family's step; least nonzero p(v) and the weight released below 2^-23
+tower.rs	MOVE_BITS	grain, picked	decays D, rates b, phasors zeta, exp_series faces	field, energy, moment (COEFFICIENT_BITS = 3x), card	bottom place of the released products; |zeta| stays <= 1
+tower.rs	STATE_BITS	grain, picked	the tower's mode state (2^-24); not the field's STATE_BITS (16)	tower, card tower.cu	tower only
+tower.rs	COVECTOR_BITS	grain, picked	the face families' covector	field back = 40+16+g-24, natural (40-24), moment RETURN_BITS	bottom place of the face families' covector
+tower.rs	STEP_BITS	grain, picked	the tower deposit's covector grain and its epsilon	tower, duplex	tower only
+tower.rs	MARGIN	derived from a horizon, reason stale	moves' margin |lambda| <= 1-2^-12 (memory about 4,096 classes)	tower, card tower.cu	reason cites GSM8K's 520-byte problems; ceil(log2 3,771) = 12 restates it from today's longest region
+tower.rs	READ_BITS	grain, picked	a code reading in bits, 2^-20	tower, split; in the field as the literal 20	written as 20 at 10 lines of the field and the energy (literals.tsv)
+tower.rs	FIRST_RATE	schedule, imported	first moment rate 2^-3	FieldLearner::new, scaled	the classical 0.9 read dyadic
+tower.rs	SECOND_RATE	schedule, imported	second moment rate 2^-8	FieldLearner::new, scaled; AVERAGE_RATE equals it	the classical 0.999 read dyadic
+tower.rs	UNIT_BITS	carrier, preset	the exponential navigator's unit 1 on 2^-62 (i64 less sign and one doubling)	tower, participation; declared also in keyed_modes, units, field.cu, tower.cu; literal 62 in skin_of, temperature_of	declared five times
+field.rs	SHARE_BITS	carrier, preset	a term's share of its row's mass, 1 on 2^-63 (u64 holding [0,1])	field release/round trips, energy log_row, lock_words, energy_faces	none: the share is <= 1 by construction
+field.rs	CONTACT_BITS	grain, picked	the contact covector dz, ds on 2^-40	tick_return, energy lock_words; host back = CONTACT_BITS+FACE_BITS+g-COVECTOR_BITS	card writes the derived 32 as the literal CONTACT_BACK
+field.rs	STATE_BITS	identity (= FACE_BITS by value, declared apart)	a site's carried face shares on 2^-16	31 functions of field and energy	name collides with the tower's STATE_BITS 24
+field.rs	NEAR	structural	the near field, lcm(2,3) = 6, the solenoid's two finest rings	field, energy, moment, train, card	derived
+field.rs	MAX_CLASS_TRITS	realization	3^7 = 2,187 classes within the card's 2^12 buckets a head and region	admit, card	the bucket count is the card's
+field.rs	LN2_FACE_BITS	grain, picked, declared twice	ln 2's face 2^-30; keyed_modes holds the same as LN2_BITS, untied	skin_of, temperature_chain, listen_shift, section reads	one declaration owed
+field.rs	BLANK_HELD	identity	= STATE_BITS	blank_return, skin_of	derived by name
+field.rs	TEMPER_TOP	carrier, inherited, written literal	ceil(log2 T) <= 7 and T >= 2^-23: 31 - 24, the additive chart's 32-bit temperature its comment names; host and card now read T in 128 bits	temper_octave, skin_of, card temper_log	the headroom it now stands for: top place of a covector times 1/T
+field.rs	LOCK_BACK_BITS	grain, derived	2*16+1, the lock's covector read back	temperature_chain, tick_return	derived
+field.rs	PACE_BITS	identity	= MATERIAL_BITS: rate, clock and variation on 2^-24	skin, turn, paces, card literal 24	card twin is a literal
+field.rs	WEIGHT_BITS	carrier, preset	a source's and crowd's value multiplier 1 on 2^-62	row_bits, contact_return_bits, crowd_slots, tick, energy_cell, card	none
+field.rs	CHUNK	realization	16 places a read (16*alphabet configurations, about 0.8 GB)	section_conditional_weighed	memory partition
+field.rs	AVERAGE_RATE	schedule	averaged constitution's rate 2^-8 a section (= SECOND_RATE by value)	average_section	picked equal
+energy.rs	ENERGY_BITS	grain, criterion stated	Phi, G, log2 p on 2^-32; a fall is certified past slack = logs + logs' + 2 units	energy_cell, log_row, relax, conditional (law D)	smallest certified fall about 2R 2^-32 bits for R logarithms read: count of ticks resting with the fall inside the slack, beside R
+energy.rs	FIRST_HALVINGS	schedule, picked	eta = 2^-2 at the first tick	energy_relax, energy_batch	picked
+energy.rs	MOST_HALVINGS	schedule, derived with a picked 8	STATE_BITS + 8 = 24 halvings (the field's STATE_BITS, 16)	energy_relax, energy_batch	the 8 assumes |force| times scale below 2^8: print the top place of that product
+moment.rs	COEFFICIENT_BITS	grain, derived	three faces on 2^-30: W on 2^-90	moments, card MOMENT_COEFFICIENT_BITS	derived
+moment.rs	MOMENT_BITS	dead	W times an encoding, 2^-106	none	declared, unused
+moment.rs	RETURN_BITS	grain, derived	conj(zeta) D times a covector, 2^-84	RETURN_RELEASE_BITS	derived
+moment.rs	RETURN_RELEASE_BITS	grain, derived	84 - 24 = 60 released	moments_return, card	derived
+field_train.rs	UNIT	exterior	ASCII US, the codec's unit separator	problems_of, question_text	exterior
+field_train.rs	RECORD	exterior	ASCII RS, the record separator	problems_of	exterior
+field_train.rs	ENERGY_EPS_SHIFT	read	the attribution read's step 2^-4 of a letter's uniform weight	curl_field	a read's probe step
+keyed_modes.rs	UNIT_BITS	carrier, preset	the exponential navigator's unit (second declaration)	Exponential	declared five times
+keyed_modes.rs	PUSH_BITS	carrier, derived bound	pushes |beta| <= 2^2, the carrier's headroom	KeyedModes::new	keyed modes only
+keyed_modes.rs	SQUARE_BITS	carrier, derived bound	square law |h| <= 2^8, the carrier's headroom	KeyedModes::new	keyed modes only
+keyed_modes.rs	LN2_BITS	grain, picked	ln 2's face 2^-30, the one ln2_face() releases to	ln2_face	twin of field's LN2_FACE_BITS
+field.cu	CARRIED_BITS	dead	70, no use	none	declared, unused
+field.cu	HOLD_BITS	dead	a hold's face on 2^-40; its named host twin is gone	none	declared, unused
+field.cu	CONTACT_BACK	derived, written literal	32 = CONTACT_BITS + FACE_BITS - COVECTOR_BITS (the host computes it)	contact and reverse kernels, field_energy	parity by hand
+field.cu	MAX_CROWD_SLOTS	realization, derived bound	one warp; 2(ceil(log2 reach)-1) <= 32 iff reach <= 2^17	affine_tiling, upload	22 slots at reach 3,771
+field.cu	NEAR_SLOTS	derived	2(NEAR-1) = 10	contact kernels	derived
+field.cu	WINDOW_LIMBS	realization	contact carriers to 8 limbs (512 bits) add in place	add_window	realization
+field.cu	MAX_PROBES	realization, measured	127 probes keep the contact and reverse kernels' blocks an SM (ptxas -v, theory 00:25)	energy_widened_lists	measured
+field.cu	CONTACT_MIN_BLOCKS	realization	8 resident blocks a multiprocessor	launch bounds	launch geometry
+field.cu	SPREAD_THREADS	realization	256 a block of field_spread	launch	launch geometry
+field.cu	CONTACT_ROWS	realization	4 warps a contact block	launch	launch geometry
+field.cu	REV_ROWS	realization	4 warps a reverse block	launch	launch geometry
+field.cu	ROW_CURRENT_SPAN	realization	32	launch	launch geometry
+field.cu	OUTER_TILE	realization	64	launch	launch geometry
+field.cu	PACE_BITS	identity, written literal	24 (host = MATERIAL_BITS)	skin kernels	parity by hand
+field.cu	TEMPER_TOP	carrier, inherited, written literal	7	temper_log	parity by hand
+field.cu	LN2_FACE_BITS	grain, picked	30	skin kernels	parity by hand
+field_energy.cuh	TERM_EXPONENT	derived, written literal	123 = 2*62 - 1: face and multiplier on 2^-62, the face's fraction 2^(f-1); the host's log_row writes 123 too	log_row	parity by hand
+field_energy.cuh	ENERGY_SUMS	realization	8 sums of 128 bits a region (pair on 2^-40, the rest on 2^-32)	energy kernels	realization
+field_energy.cuh	ENERGY_BITS	grain, criterion stated	card twin	energy kernels	parity by hand
