@@ -1,0 +1,9 @@
+all cells                    share 1.000 | scale alone 2.198 bits | given context total scale 1.353 | given that and distinct count 0.950 | given distinct count only 2.169
+contexts of 2 cells or more  share 0.500 | scale alone 2.415 bits | given context total scale 2.016 | given that and distinct count 1.901 | given distinct count only 2.400
+contexts of 8 cells or more  share 0.080 | scale alone 2.663 bits | given context total scale 2.523 | given that and distinct count 2.476 | given distinct count only 2.647
+contexts 356758, cells a context 1.522; share of contexts with one cell 0.761
+contexts of 2 cells or more: scale given context total scale and the cell rank in its context 1.289 bits
+share of cells with floor(log2 count) = j, against 2^-(j+1):
+   j=0 0.4703|0.5000  j=1 0.2338|0.2500  j=2 0.1243|0.1250  j=3 0.0720|0.0625  j=4 0.0426|0.0312  j=5 0.0252|0.0156  j=6 0.0149|0.0078  j=7 0.0085|0.0039  j=8 0.0048|0.0020  j=9 0.0021|0.0010  j=10 0.0010|0.0005  j=11 0.0003|0.0002
+slope of log2 share by block over j = 0..9: -0.824 (the inverse-square law of gamma gives -1; share of count c then falls as c^(slope-1))
+done 1s

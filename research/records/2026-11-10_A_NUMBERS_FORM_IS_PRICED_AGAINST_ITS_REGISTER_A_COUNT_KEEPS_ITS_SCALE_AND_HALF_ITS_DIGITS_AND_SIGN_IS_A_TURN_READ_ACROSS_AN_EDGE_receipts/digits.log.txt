@@ -1,0 +1,23 @@
+bases against e: 2: 1.0615, 3: 1.0046, 4: 1.0615, 10: 1.5977, 16: 2.1230, 256: 16.9836
+staircase means: need uniform in a step 1.3863, log-uniform 1.4427
+3007000: 22 binary places, 10 occupied, 7 signed digits; sparse base ten 10.732 bits against literal 23.253
+bare binary lengths, Kraft weight of the first 12 dyadic blocks: 6.0
+carry into place k of a sum, P and entropy: [(1, 0.45, 0.9928), (2, 0.495, 0.9999), (3, 0.4995, 1.0)]
+two-digit operands, uniform:
+  H(last digit of x+y | last digits) = 0.0000
+  H(last digit of x*y | last digits) = 0.0000
+  H(tens digit of x+y | tens digits) = 0.9928
+  H(tens digit of x*y | last digits) = 2.9791 of 3.3219
+count by 1 on ten: carries .........x digits 1 2 3 4 5 6 7 8 9 0
+count by 3 on ten: carries ...x..x..x digits 3 6 9 2 5 8 1 4 7 0
+count by 7 on ten: carries .xx.xx.xxx digits 7 4 1 8 5 2 9 6 3 0
+count by 9 on ten: carries .xxxxxxxxx digits 9 8 7 6 5 4 3 2 1 0
+count by 2 on ten: carries ....x....x digits 2 4 6 8 0 2 4 6 8 0
+count by 4 on ten: carries ..x.x..x.x digits 4 8 2 6 0 4 8 2 6 0
+count by 5 on ten: carries .x.x.x.x.x digits 5 0 5 0 5 0 5 0 5 0
+carry count, balance, complement and reversed rows hold for every 0 < s < b <= 60: True
+grain 1, modulo 10: x + 9 = 6 = x - 1;  x*9 = 3 = -x
+grain 2, modulo 100: x + 99 = 66 = x - 1;  x*99 = 33 = -x
+grain 3, modulo 1000: x + 999 = 566 = x - 1;  x*999 = 433 = -x
+base 2i: [1,0,3] = (-1+0j) ; [1,0.2] = 1j ; base -2: [1,1] = -1
+leading digit under c^-1.82: share of 1 0.511, entropy 2.231 bits; Benford 0.301, 2.876

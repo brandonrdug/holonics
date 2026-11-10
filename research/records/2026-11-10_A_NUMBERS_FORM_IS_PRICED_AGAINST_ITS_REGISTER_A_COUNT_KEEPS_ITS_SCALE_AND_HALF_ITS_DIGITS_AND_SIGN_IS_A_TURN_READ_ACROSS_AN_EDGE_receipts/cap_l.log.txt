@@ -1,0 +1,11 @@
+counts 10..1000000000: cells 78296 | leading digit shares 0.502 0.189 0.103 0.063 0.046 0.034 0.026 0.020 0.016 | entropy 2.261 bits (Benford 2.876, flat 3.170)
+counts 10..99: cells 66715 | leading digit shares 0.495 0.189 0.102 0.065 0.048 0.036 0.027 0.021 0.017 | entropy 2.288 bits (Benford 2.876, flat 3.170)
+counts 100..999: cells 10789 | leading digit shares 0.530 0.192 0.108 0.059 0.038 0.027 0.019 0.013 0.013 | entropy 2.126 bits (Benford 2.876, flat 3.170)
+counts 1000..1000000000: cells 792 | leading digit shares 0.721 0.124 0.073 0.025 0.021 0.014 0.014 0.005 0.003 | entropy 1.474 bits (Benford 2.876, flat 3.170)
+counts 10..99: cells 66715 | last digit shares 0.149 0.130 0.117 0.108 0.100 0.090 0.085 0.079 0.073 0.069 | entropy 3.2795 bits (flat 3.3219; plug-in bias 0.0001)
+counts 100..1000000000: cells 11581 | last digit shares 0.106 0.104 0.102 0.099 0.099 0.101 0.097 0.098 0.096 0.098 | entropy 3.3213 bits (flat 3.3219; plug-in bias 0.0006)
+counts 100..999: cells 10789 | last digit shares 0.106 0.103 0.103 0.100 0.101 0.101 0.095 0.098 0.095 0.098 | entropy 3.3210 bits (flat 3.3219; plug-in bias 0.0006)
+counts 1000..1000000000: cells 792 | last digit shares 0.096 0.112 0.097 0.083 0.080 0.091 0.129 0.104 0.102 0.106 | entropy 3.3088 bits (flat 3.3219; plug-in bias 0.0082)
+counts 1000 and over: tens digit entropy 3.3164 bits; last two digits 6.5632 of 6.6439
+context totals 100 and over: 12387 | leading digit entropy 2.154, share of 1 0.525 | last digit entropy 3.3204
+done 0s

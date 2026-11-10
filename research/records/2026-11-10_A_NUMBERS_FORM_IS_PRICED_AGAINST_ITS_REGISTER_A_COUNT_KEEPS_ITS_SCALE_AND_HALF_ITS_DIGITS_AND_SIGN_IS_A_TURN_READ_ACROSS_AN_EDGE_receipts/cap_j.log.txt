@@ -1,0 +1,6 @@
+cells 543071 contexts 356758
+entropy of a cell scale: alone 2.198 bits | given its context total scale 1.353 | given that and the count of distinct letters 0.950
+share of cells whose context holds one cell: 0.500; in contexts of total 1: 0.271
+entropy of the relative scale (context scale minus cell scale) alone: 2.135 bits; given the context scale: 1.353
+bits a cell: unary scale 2.217 + digits below the leading one 1.217 = Elias gamma 3.434; a sign bit a value would add 1 (29%)
+done 0s
