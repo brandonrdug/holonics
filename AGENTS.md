@@ -654,10 +654,12 @@ machine. The contract, each clause with its reason:
   checkout's `.local/archive/wt/<date>-<task>/` with every other untracked file and a patch of its
   uncommitted changes (an artifact a record cites is committed as a receipt first, as the waiting
   standard says), and a detached head that no ref reaches is tagged `archive/wt/<task>`
-  (`repo_census.py --retire` does all of it, innermost worktree first). A worktree with a live run
-  (a run in `python3 tools/runs.py status` that has not ended, a process standing in it, a file
-  under its `.local/` written in the last day) is never touched. Reason: `.local/` is untracked,
-  and removing a worktree deletes it.
+  (`repo_census.py --retire` does all of it, innermost worktree first). A worktree whose states or
+  binaries are only read by a run elsewhere looks idle, and retiring it moves the paths that run
+  names: an idle sweep is read with `--dry-run` first, and such worktrees are named with `--keep`.
+  A worktree with a live run (a run in `python3 tools/runs.py status` that has not ended, a
+  process standing in it, a file under its `.local/` written in the last day) is never touched.
+  Reason: `.local/` is untracked, and removing a worktree deletes it.
 - **Census at the start and at the end of a task.** `python3 tools/repo_census.py` prints the main
   checkout's state, every branch against `origin/main`, every worktree, each violation of this
   contract and the steps that would repair it; `--apply` performs the steps that lose nothing
