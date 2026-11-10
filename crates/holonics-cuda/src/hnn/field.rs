@@ -3121,6 +3121,36 @@ mod tests {
         FieldDeclaration { alphabet: 122, width, heads, modes: 8, still: 2, contacts, ticks: 2, frames: 4, reach: 2221, lanes: 1, depth: 0, energy: false }
     }
 
+    /// [measurement; theory, November 10 20:34] **The card's footprint by growth route** (host arithmetic, no card read): from the
+    /// main line's declaration (width 64 in two lanes, 64 contacts, four heads of eight modes, four ticks, reach 3,771, 100 classes), each
+    /// growth route at two and four times (`contacts`: f; `lane`: lanes, the width a lane's coordinates more each; `width`:
+    /// [`FieldDeclaration::grown`], the width, the contacts and the lanes by the factor): the material's length, whether every affine map
+    /// of the declaration still tiles a block (`affine_tiling`: the contacts' rows and the width's rows are a block's threads at most),
+    /// and the octets of the longest region (a return at the reach's 3,771 sites) and of one thousand. Printed as `ROUTE` lines; ignored
+    /// by default, run with `--ignored --nocapture`.
+    #[test]
+    #[ignore]
+    fn the_card_footprint_by_growth_route() {
+        let base = FieldDeclaration { alphabet: 100, width: 64, heads: 4, modes: 8, still: 2, contacts: 64, ticks: 4, frames: 4, reach: 3771, lanes: 2, depth: 0, energy: false };
+        let describe = |name: &str, d: FieldDeclaration| {
+            let draws = 4 * d.founding_draws();
+            let field = holonics::hnn::tower::field::Field::found(d, &vec![7u8; draws]).expect("founded");
+            let (m2, dw, f) = (2 * d.complex(), d.width, d.contacts);
+            let tiled: Vec<String> = [(m2, dw, false), (dw, m2, true), (f, dw, false), (dw, f, true), (dw, dw, false)].iter().map(|&(r, c, x)| affine_tiling(r, c, x).map_or(format!("{r}x{c}:NO"), |(per, sh)| format!("{r}x{c}:{per}/{sh}"))).collect();
+            println!("ROUTE {name} width={dw} lanes={} contacts={f} material={} tiles[{}] region_3771_octets={} region_1000_octets={} site_octets={}", d.lanes, field.material_len(), tiled.join(" "), region_octets(&d, true, 3771), region_octets(&d, true, 1000), (region_octets(&d, true, 1001) - region_octets(&d, true, 1000)));
+        };
+        describe("base", base);
+        for k in [2usize, 4] {
+            describe(&format!("contacts x{k}"), FieldDeclaration { contacts: base.contacts * k, ..base });
+            let mut laned = base;
+            for _ in 0..(k - 1) * base.lanes {
+                laned = laned.laned().expect("laned");
+            }
+            describe(&format!("lane x{k}"), laned);
+            describe(&format!("width x{k}"), base.grown(k).expect("grown"));
+        }
+    }
+
     /// Every region is in one batch, in order, each batch within the budget; a region past the budget
     /// alone is refused.
     #[test]
