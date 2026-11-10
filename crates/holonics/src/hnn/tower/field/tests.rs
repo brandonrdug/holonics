@@ -2210,7 +2210,8 @@ fn a_growth_in_contacts_keeps_every_face() {
         (field.per_blank_clock, field.bare_stretch) = (name == "still 1", name != "still 0");
         let before = readout_of(&field, &region());
         let mut grown = field.clone();
-        for added in [4usize, 8] {
+        // Any added count that keeps the contacts in complex pairs even at each strand side (a multiple of four), not only doublings.
+        for added in [4usize, 12, 8, 20] {
             let d = grown.declaration;
             let draws = d.contact_draws(added);
             assert_eq!(draws, 2 * added * d.width);
