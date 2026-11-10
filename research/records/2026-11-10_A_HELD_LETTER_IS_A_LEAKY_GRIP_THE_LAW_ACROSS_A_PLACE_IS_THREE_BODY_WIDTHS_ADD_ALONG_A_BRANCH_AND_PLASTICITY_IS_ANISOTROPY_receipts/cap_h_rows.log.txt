@@ -1,0 +1,35 @@
+3 LEFT 1 RIGHT, held 0-31
+   unigram                            3.481 nats a place   (101 context-letter cells)
+   (-1,)                              2.710 nats a place   (6708 context-letter cells)
+   (-1, 1)                            1.574 nats a place   (67740 context-letter cells)
+   (-2, -1, 1)                        0.923 nats a place   (244640 context-letter cells)
+   (-3, -2, -1, 1)                    0.690 nats a place   (543012 context-letter cells)
+1 LEFT 3 RIGHT, held 0-31
+   unigram                            3.481 nats a place   (101 context-letter cells)
+   (1,)                               2.699 nats a place   (6637 context-letter cells)
+   (-1, 1)                            1.573 nats a place   (67740 context-letter cells)
+   (-1, 1, 2)                         0.938 nats a place   (244417 context-letter cells)
+   (-1, 1, 2, 3)                      0.714 nats a place   (542705 context-letter cells)
+STRIDE 1, held 0-31
+   unigram                            3.481 nats a place   (101 context-letter cells)
+   (-1, 1)                            1.564 nats a place   (67740 context-letter cells)
+   (-3, -1, 1, 3)                     0.698 nats a place   (885547 context-letter cells)
+STRIDE 2, held 0-31
+   unigram                            3.481 nats a place   (101 context-letter cells)
+   (-2, 2)                            2.289 nats a place   (131426 context-letter cells)
+   (-6, -2, 2, 6)                     1.654 nats a place   (2170090 context-letter cells)
+STRIDE 4, held 0-31
+   unigram                            3.481 nats a place   (101 context-letter cells)
+   (-4, 4)                            2.848 nats a place   (188991 context-letter cells)
+   (-12, -4, 4, 12)                   2.619 nats a place   (3651675 context-letter cells)
+STRIDE 8, held 0-31
+   unigram                            3.481 nats a place   (101 context-letter cells)
+   (-8, 8)                            3.167 nats a place   (228236 context-letter cells)
+   (-24, -8, 8, 24)                   3.216 nats a place   (4515833 context-letter cells)
+RIGHT ONLY, held 0-31
+   unigram                            3.481 nats a place   (101 context-letter cells)
+   (1,)                               2.699 nats a place   (6637 context-letter cells)
+   (1, 2)                             1.887 nats a place   (67466 context-letter cells)
+   (1, 2, 3)                          1.413 nats a place   (244000 context-letter cells)
+   (1, 2, 3, 4)                       1.222 nats a place   (542145 context-letter cells)
+done 18s

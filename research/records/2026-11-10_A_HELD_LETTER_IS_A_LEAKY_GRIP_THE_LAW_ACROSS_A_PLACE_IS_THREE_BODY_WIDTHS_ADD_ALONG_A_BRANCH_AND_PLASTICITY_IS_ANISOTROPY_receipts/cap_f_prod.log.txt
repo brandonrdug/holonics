@@ -1,0 +1,21 @@
+places 43470  10s
+two each side: left 1.9815 right 1.9719 joint 0.5758 | one each side: left 2.7099 right 2.7002 joint 1.6397
+BRANCH PRODUCT P(x|L)P(x|R)/P(x): two each side 1.1478 (lacks 0.5720 against joint)   one each side 2.1585 (lacks 0.5188)
+one shared exponent a, weights (a,a,1-2a), chosen on the read itself:
+   a=0.5  two each side 1.3487   one each side 2.3411
+   a=0.6  two each side 1.2465   one each side 2.2596
+   a=0.7  two each side 1.1846   one each side 2.2043
+   a=0.8  two each side 1.1521   one each side 2.1710
+   a=0.9  two each side 1.1415   one each side 2.1566
+   a=1.0  two each side 1.1478   one each side 2.1585
+   a=1.1  two each side 1.1672   one each side 2.1747
+by count of the joint context in TRAIN: share of places | joint table | branch product | share of the lack
+       0..0          0.0287 |  3.125 |  3.071 | -0.003
+       1..1          0.0135 |  1.462 |  2.029 |  0.013
+       2..9          0.0567 |  1.001 |  1.766 |  0.076
+      10..99         0.1995 |  0.727 |  1.544 |  0.285
+     100..999        0.3798 |  0.513 |  1.220 |  0.470
+    1000..9999       0.2159 |  0.299 |  0.697 |  0.150
+   10000..1000000000 0.1060 |  0.050 |  0.098 |  0.009
+joint x branch product (best of grid, on the read): 0.5580
+done 12s

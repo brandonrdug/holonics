@@ -1,0 +1,25 @@
+STRIDE 1: letters at +-1 then +-1,+-3, HELD128
+   unigram                            3.418 nats a place   (101 context-letter cells)
+   (-1, 1)                            1.640 nats a place   (67740 context-letter cells)
+   (-3, -1, 1, 3)                     0.709 nats a place   (885547 context-letter cells)
+   2s
+STRIDE 2: letters at +-2 then +-2,+-6, HELD128
+   unigram                            3.418 nats a place   (101 context-letter cells)
+   (-2, 2)                            2.372 nats a place   (131426 context-letter cells)
+   (-6, -2, 2, 6)                     1.673 nats a place   (2170090 context-letter cells)
+   3s
+STRIDE 4: letters at +-4 then +-4,+-12, HELD128
+   unigram                            3.418 nats a place   (101 context-letter cells)
+   (-4, 4)                            2.933 nats a place   (188991 context-letter cells)
+   (-12, -4, 4, 12)                   2.656 nats a place   (3651675 context-letter cells)
+   5s
+STRIDE 8: letters at +-8 then +-8,+-24, HELD128
+   unigram                            3.418 nats a place   (101 context-letter cells)
+   (-8, 8)                            3.193 nats a place   (228236 context-letter cells)
+   (-24, -8, 8, 24)                   3.192 nats a place   (4515833 context-letter cells)
+   8s
+STRIDE 16: letters at +-16, HELD128
+   unigram                            3.418 nats a place   (101 context-letter cells)
+   (-16, 16)                          3.325 nats a place   (249812 context-letter cells)
+   8s
+done 8s
