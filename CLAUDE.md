@@ -486,7 +486,10 @@ hundreds of CPU seconds: the run rules were kept and the architecture and data w
   ([the record](research/records/2026-11-11_A_FLOCK_OF_UNLIKE_MEMBERS_JOINS_A_ROUND_ONLY_AT_ITS_OWN_GRAIN_A_PAIRS_TELESCOPING_PART_IS_TAKEN_ONCE_A_SITE_AND_A_GROUP_DETECTS_THROUGH_ITS_CONTACTS.md)).
   A device's rate is stated from a run's own counters (units, wall time, threads, splits), never
   from a summary row: on November 11 that row was misread twice, as the whole host at 1/43 of the
-  card and then as twenty lanes at half of it. Reason for the scope (the direction is
+  card and then as twenty lanes at half of it. Two devices are compared on one unit of work run
+  on both (the same section), never across counters that share a name: the same night a host
+  lane was priced at 91 times the card by dividing across two counts both printed as sites, where
+  the section itself gives about 480. Reason for the scope (the direction is
   Brandon's; the wording is `agent-inferred`): integer series give the same bits on any partition
   of any device, so placement is a realization, and a rule that keeps a kind of work off a device
   makes partials of the dynamics close in partitions the transport drew (his correction of
