@@ -415,7 +415,8 @@ pub(super) fn writer_region(codec: &FieldCodec, q: &[usize], a: &[usize], seed: 
 /// (`FIELD_ROOM_CUT`): the fully masked path state computes the question, the stretch's first place and each heard place
 /// with `(NEAR − 1)·ticks` places on either side ([`holonics::hnn::tower::field::Region::window`]); its heard faces and its
 /// covector are the whole room's bit for bit (`a_cut_room_reads_and_returns_the_whole_rooms_bits`). The masks and the writer's
-/// states keep their room whole: their blanks sit between arrivals.
+/// states keep their room whole: their blanks sit between arrivals. A field with carry circles keeps every room whole
+/// (`FieldDeclaration::room_window`): a circle carries a place's state the whole strand inside one tick.
 pub(super) fn room_cut() -> bool {
     static CUT: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
     *CUT.get_or_init(|| std::env::var_os("FIELD_ROOM_CUT").is_some())

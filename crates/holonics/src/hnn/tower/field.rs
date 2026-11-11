@@ -230,14 +230,20 @@ pub struct FieldDeclaration {
     /// ([`carry_gate`]): `γ = γ̂(q)/(1 + d)`, `γ̂(q) = ((4 − q²) + 4iq)/(4 + q²)` the Cayley step of `iq/2` on one circle (`carryTurn_eq_cayley`: it
     /// keeps the circle, so a site's turn does no work), `d = max(0, h)` a pure dissipation's implicit step (monotone, never past a sign change),
     /// with `q = Q r̂ + q_b` and `h = H r̂ + h_b` read from the site's own pair chart ([`FieldLayout::carry`]). So `|γ|² = 1/(1 + d)² ≤ 1`
-    /// (`carryGate_normSq_le_one`: the move is passive by its form), and founded at `q = h = 0` the gate is `1`, a stationary grip that turns
-    /// without work.
+    /// (`carryGate_normSq_le_one`: the move is passive by its form). Founded ([`Field::with_carry`]) a circle is a turn with the near field's
+    /// friction: `q`'s rows drawn, `q_b = 0`, `H = 0` and `h_b = 1/(NEAR − 2) = 1/4` ([`CARRY_LEAK_FOUNDING`]), so `d = 1/4` at every site and
+    /// `|γ| = 4/5`, a group of `N = (1 + d)/d = NEAR − 1 = 5` places (atlas `contact.carried-product-group-size`).
     ///
     /// Why (the follow-up record §8.5 and §9 item 4): the built gate `g/√(1 + |g|²)` founded at `g = 0` was total friction, so every letter past the
     /// first waited behind gates deposition had to open first, and a letter `d` back entered as `|γ|^(2(d−1))`; it tied the gate's modulus to its
     /// phase through a fixed `1`, an unlocated friction. Founded as a turn, a letter `d` back enters at modulus one and its pull is first order at every
     /// distance, and deposition locates the turn's phase and the leak. `max(0, h)` with its right derivative at `0` lets friction open at first
-    /// order from rest, where an even function of `h` would have no covector there. The circles are the last contacts, grown with `W`'s columns at
+    /// order from rest, where an even function of `h` would have no covector there. Why founded with friction (theory, November 11 19:56, G83
+    /// scored, G85): a contact has finite width; founded at `d = 0` a circle's group `N = (1 + d)/d` is unbounded and its scan sums `b` over
+    /// its whole region (2,000 to 3,000 sites a section), so `Q`, `p = a Q` and the circle's covector grew with the region's length, and the
+    /// first carry lap (tc1) was refused at its fifth section with a sum past its 128-bit carrier. The width the field already declares for
+    /// a tick is the near field's, a place's state moving at most `NEAR − 1` places a tick; a circle hears one side, so its group is founded
+    /// at `N = NEAR − 1`. A field with carry circles keeps every room whole ([`FieldDeclaration::room_window`]). The circles are the last contacts, grown with `W`'s columns at
     /// zero ([`Field::with_carry`]), so a trained field continues bit for bit. `C` is even (a carry circle's side is its contact's parity, so as
     /// many scan from each side) and at most `f/2`; `C = 0` is the `hnn-field-v14` line exactly, and `C > 0` writes `hnn-field-v14t` with `C` its
     /// thirteenth word. The retired carry (`hnn-field-v14k`, founded at zero friction) is refused.
@@ -440,6 +446,18 @@ impl FieldDeclaration {
     /// The first complex contact that is a carry circle, `f/2 − C` ([`FieldDeclaration::carry`]).
     pub fn carry_first(&self) -> usize {
         self.contacts / 2 - self.carry
+    }
+
+    /// [definition; theory, November 11 19:56 (G83's second defect, G85)] **The cut room's admission**, one owner for the host's forward and the
+    /// card's region upload: the region's windows ([`Region::window`]) where the field has no carry circle, and none (the room whole) where
+    /// it has. Why: the cut reads the whole room's bits only because the near field and the strand's pair contact carry a place's state at
+    /// most `NEAR − 1` places a tick; a carry circle's scan carries it the whole strand inside one tick, over every site, computed or not, so
+    /// from the second tick a cut room's heard faces would read, through the circles, receivers that met no source.
+    pub fn room_window(&self, region: &Region) -> Option<Vec<bool>> {
+        if self.carry > 0 {
+            return None;
+        }
+        region.window(self.ticks)
     }
 
     /// The turned slots: `(frames − still) · n`, slot `l · (frames − still) + (g − still)` the ring
@@ -877,7 +895,8 @@ pub struct Port<'a> {
     pub heard: Option<&'a [bool]>,
     /// [definition; agent-inferred, November 6, the unified-theory reading of 06:50, E] **The room is cut to its windows**
     /// ([`Region::window`]): where set, a receiver's row is met only at the question's sites, the silent stretch's first
-    /// place and the places within `(NEAR − 1)·ticks` of a heard one; every other receiver meets no source that tick.
+    /// place and the places within `(NEAR − 1)·ticks` of a heard one; every other receiver meets no source that tick. A field with carry
+    /// circles keeps the room whole ([`FieldDeclaration::room_window`]): a circle carries a place's state the whole strand inside one tick.
     pub window: bool,
     /// [definition; agent-inferred, November 6, the unified-theory reading of 11:49] **Compared on its letters off the void**: each
     /// open place of the port on its target's class within the letters, `−log₂(m_a/(T − m_∅))`, the release's own draw where the
@@ -997,7 +1016,9 @@ impl Region<'_> {
     /// the clock at every far place is `τ_front + (t − front)κ` from a computed face. Backward, the covector of a heard face
     /// reaches at most `(NEAR − 1)` places a tick, so it meets no receiver outside its window, and the clock's return reaches
     /// the stretch's first place, whose window is computed. Not exact where blanks sit between arrivals (masks, writer
-    /// states), whose clocks read each blank's own face: those regions keep their room whole.
+    /// states), whose clocks read each blank's own face: those regions keep their room whole. Nor where the field has carry circles,
+    /// whose scan carries a place's state the whole strand in one tick: the forward asks [`FieldDeclaration::room_window`], which keeps
+    /// those rooms whole.
     pub fn window(&self, ticks: usize) -> Option<Vec<bool>> {
         let port = self.port.filter(|p| p.window)?;
         let sites = self.classes.len();
@@ -1625,6 +1646,11 @@ const CARRY_TURN_BOUND: i128 = 1 << 78;
 const CARRY_TURN_ROOT: u128 = 1 << 39;
 /// The friction's carrier bound: `d` (on `2^(−16)`) must stay under `2^47`.
 const CARRY_FRICTION_BOUND: i128 = 1 << 47;
+
+/// [definition; theory, November 11 19:56, G85] **A circle's founded leak** `h_b = 1/(NEAR − 2)` on the face's grain (`2^14` on `2^(−16)`, so
+/// `d = 1/4` and `|γ| = 4/5` at every site): the group `N = (1 + d)/d` founded at `NEAR − 1` places, the near field's reach a tick on one side
+/// ([`FieldDeclaration::carry`]).
+pub const CARRY_LEAK_FOUNDING: i32 = ((1usize << FACE_BITS) / (NEAR - 2)) as i32;
 
 /// [definition; theory, November 11 17:25; `lean/Holonics/HNN/CarryGate.lean`] **The carry's gate, a turn and a friction charted apart**
 /// ([`FieldDeclaration::carry`]): from `q` and `h` on `2^(−16)` (a site's turn and leak charts), `d = max(0, h)`, and on `2^(−30)`, each part by one
@@ -2642,7 +2668,7 @@ impl Field {
         // [§16.44] The blanks run at the bare rate in the first tick, and each later tick at the faces the tick before
         // gave them, its clocks and moments read again.
         let blanks = !paces.kappa.is_empty() && (0..sites).any(|t| Self::silent(region, t));
-        let window = region.window(d.ticks);
+        let window = d.room_window(region);
         let mut clock: Option<Box<TickClock>> = None;
         for k in 0..d.ticks {
             if let Some(s) = self.scale.as_deref().filter(|s| s.split == k) {
@@ -4851,9 +4877,11 @@ impl Field {
     /// contacts, their `a` and `b` drawn as a growth draws them, their columns of `W` and their biases at zero; then the circles' charts after
     /// every family: the turn rows `Q` drawn uniform on `±√(3/D)` at the material's grain from `keys` past the contacts' draws (four bytes a draw,
     /// the rows in order, as the contacts' drives are drawn), so `q` opens at unit power and a site's turn is a phase of about a radian set by its
-    /// own read; the leak rows `H` and both biases at zero, so `d = 0` and each circle is founded as a turn without friction (`carryGate_zero`).
-    /// Every sum the forward forms into the face is then the old sum (the circles' `W` columns are zero), so every face is kept bit for bit;
-    /// the circles' return has a covector from the first section on.
+    /// own read; the leak rows `H` and the turn's bias `q_b` at zero, and the leak's bias `h_b` at [`CARRY_LEAK_FOUNDING`], so `d = 1/4` at every
+    /// site and each circle is founded as a turn with the near field's friction, `|γ| = 4/5`, a group of `NEAR − 1` places (founded at `d = 0`
+    /// the group was unbounded and the first carry lap was refused, [`FieldDeclaration::carry`]). Every sum the forward forms into the face is
+    /// then the old sum (the circles' `W` columns are zero), so every face is kept bit for bit; the circles' return has a covector from the
+    /// first section on.
     ///
     /// Refused for a tower's levels and for a field that already has carry circles (a plain growth by contacts in such a field is refused
     /// too, [`FieldDeclaration::contacted`]: the circles stay the last contacts). Returns the grown field and, for each entry, the old entry
@@ -4886,6 +4914,7 @@ impl Field {
             *v = fit32((draw * ((num << MATERIAL_BITS) / den) as i128) >> 31, "a carry circle's founded turn row outgrew its 32-bit carrier")?;
         }
         debug_assert_eq!(cursor, 4 * self.declaration.carry_draws(circles));
+        theta[layout.carry_bias + circles..layout.carry_bias + 2 * circles].fill(CARRY_LEAK_FOUNDING);
         let mut out = Self::with_theta(d, theta);
         (out.per_blank_clock, out.bare_stretch) = (self.per_blank_clock, self.bare_stretch);
         Ok((out, from))

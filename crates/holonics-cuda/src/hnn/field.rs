@@ -1216,7 +1216,8 @@ impl<'c> CardField<'c> {
 
     /// A batch's site and region tables uploaded in one transfer, its status word and its faces' buffer, and the words
     /// that read them (the host's tables kept beside them for the reverse and the readings).
-    fn stage(&self, regions: &[Region], a: usize, dw: usize, ticks: usize, words: &mut Words) -> Result<Staged<'c>> {
+    fn stage(&self, regions: &[Region], a: usize, dw: usize, declaration: &FieldDeclaration, words: &mut Words) -> Result<Staged<'c>> {
+        let ticks = declaration.ticks;
         // The batch's sites, region by region, and the carried mixtures as one list a site.
         let mut site_region = Vec::new();
         let mut site_pos = Vec::new();
@@ -1231,8 +1232,9 @@ impl<'c> CardField<'c> {
         let (mut mix_off, mut mix_class, mut mix_share) = (vec![0u32], Vec::new(), Vec::new());
         let mut pairs = 0usize;
         let any_echo = regions.iter().any(|r| r.echo.iter().any(Option::is_some));
-        // [E] The cut rooms' windows, each site's row computed or not (every site of an uncut region).
-        let windows: Vec<Option<Vec<bool>>> = regions.iter().map(|r| r.window(ticks)).collect();
+        // [E] The cut rooms' windows, each site's row computed or not (every site of an uncut region); kept whole where the field has carry
+        // circles (the host's `FieldDeclaration::room_window`, the one owner of the cut's admission).
+        let windows: Vec<Option<Vec<bool>>> = regions.iter().map(|r| declaration.room_window(r)).collect();
         let (per_blank, bare) = (words.per_blank != 0, words.bare_stretch != 0);
         let blank_read: Vec<u8> = regions
             .iter()
@@ -1482,7 +1484,7 @@ impl<'c> CardField<'c> {
             owned.push((vec![0usize; packets], unres, faces));
         }
         let pregions: Vec<Region> = owned.iter().map(|(c, u, f)| Region { classes: c, unresolved: u, faces: if f.iter().any(Option::is_some) { f } else { &[] }, locked: &[], echo: &[], domain: None, port: None }).collect();
-        let st = self.stage(&pregions, cd.alphabet, cd.width, cd.ticks, &mut tr.cwords)?;
+        let st = self.stage(&pregions, cd.alphabet, cd.width, &cd, &mut tr.cwords)?;
         let (sites, m2, n) = (st.sites, 2 * cd.complex(), cd.modes);
         let ticks: Vec<Tick> = (0..if kept { cd.ticks } else { 1 }).map(|_| self.tick(sites, st.pairs, regions, coarse, stored, returning)).collect::<Result<_>>()?;
         let trips = self.timed(Kind::Alloc, || self.take_zeroed::<i128>(sites.max(1))).map_err(device)?;
@@ -1594,7 +1596,7 @@ impl<'c> CardField<'c> {
         let (dw, m, n, f, a, heads) = (d.width, d.complex(), d.modes, d.contacts, d.alphabet, d.heads);
         let m2 = 2 * m;
         let span = 2 * n;
-        let st = self.stage(regions, a, dw, d.ticks, words)?;
+        let st = self.stage(regions, a, dw, &d, words)?;
         let (sites, pairs) = (st.sites, st.pairs);
         let (site_region, site_pos, region_off, classes, unresolved, definite) = (&st.site_region, &st.site_pos, &st.region_off, &st.classes, &st.unresolved, &st.definite);
         let (echo_has, mix_off, mix_class, mix_share, site_weight) = (&st.echo_has, &st.mix_off, &st.mix_class, &st.mix_share, &st.site_weight);

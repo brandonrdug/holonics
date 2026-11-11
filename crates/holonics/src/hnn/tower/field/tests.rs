@@ -2279,7 +2279,8 @@ fn a_growth_by_carry_circles_keeps_every_face_and_returns_through_its_circles() 
         let (dw, f) = (d.width, d.contacts);
         let circle_columns: Vec<usize> = (4..6).flat_map(|e| [e, f / 2 + e]).collect();
         assert!(circle_columns.iter().all(|&e| (0..dw).all(|r| grown.theta[l.w + r * f + e] == 0)), "the circles' W columns at zero");
-        assert!(grown.theta[l.carry + 2 * dw..l.carry + 4 * dw].iter().all(|&v| v == 0) && grown.theta[l.carry_bias..l.carry_bias + 4].iter().all(|&v| v == 0), "the leak rows and both biases at zero");
+        assert!(grown.theta[l.carry + 2 * dw..l.carry + 4 * dw].iter().all(|&v| v == 0) && grown.theta[l.carry_bias..l.carry_bias + 2].iter().all(|&v| v == 0), "the leak rows and the turn's biases at zero");
+        assert!(grown.theta[l.carry_bias + 2..l.carry_bias + 4].iter().all(|&v| v == CARRY_LEAK_FOUNDING) && CARRY_LEAK_FOUNDING == 1 << 14, "the leak's biases at the near field's friction, 1/4");
         assert!(grown.theta[l.carry..l.carry + 2 * dw].iter().any(|&v| v != 0), "the turn rows drawn");
         let g = covector_of(&grown, &region());
         assert!(circle_columns.iter().any(|&e| (0..dw).any(|r| g[l.w + r * f + e] != 0)), "still {still}: the circles' W columns have a covector");
@@ -2646,9 +2647,10 @@ fn the_parallel_settle_certifies_every_pass_and_rests() {
 }
 
 
-/// [measurement; theory, November 11 18:33, part P2] **The carry circles' gates, read**: on a drawn field grown by two carry circles (founded: the leak
-/// rows and biases at zero), every (open site, tick) read has `h = 0`, so `|γ| = |γ̂(q)|`, one to the grain (`2^30` less the rounding of its two
-/// parts), and `h ≥ 0` counts every read; a moved leak row turns some reads below zero and closes their friction count; the read changes no face.
+/// [measurement; theory, November 11 18:33, part P2; the founding of 19:56, G85] **The carry circles' gates, read**: on a drawn field grown by two
+/// carry circles (founded: the leak rows at zero and the leak's bias at `1/4`), every (open site, tick) read has `h = 1/4`, so `d = 1/4` and
+/// `|γ| = 4/5`, `2^32/5` on `2^(−30)` within the rounding of its two parts, and `h ≥ 0` counts every read; a moved leak row turns some reads
+/// below zero and closes their count; the read changes no face.
 #[test]
 fn the_carry_circles_gates_are_read_from_the_forwards_own_cells() {
     let plain = shaped_with(four_contacts(1));
@@ -2659,17 +2661,56 @@ fn the_carry_circles_gates_are_read_from_the_forwards_own_cells() {
     let open = OPEN.iter().filter(|&&u| u).count() as u64;
     assert_eq!(gates.reads, open * grown.declaration.ticks as u64);
     for k in 0..2 {
-        assert_eq!(gates.friction[k], gates.reads, "at rest every leak read stands at zero");
-        let low = u128::from(gates.reads) * ((1u128 << 30) - 2);
-        assert!(gates.modulus[k] >= low && gates.modulus[k] <= u128::from(gates.reads) << 30, "circle {k}: |γ| one to the grain");
+        assert_eq!(gates.friction[k], gates.reads, "founded, every leak read stands at 1/4");
+        let mean = gates.modulus[k] / u128::from(gates.reads);
+        assert!(mean.abs_diff(858_993_459) <= 2, "circle {k}: |γ| = 4/5 to the grain, {mean}");
     }
     assert_eq!(grown.faces(&r).unwrap(), faces, "the read changes no face");
     // A leak row moved below zero at every coordinate's sign: some reads lose their friction count.
     let (l, dw) = (grown.layout.clone(), grown.declaration.width);
     for j in 0..dw {
-        grown.theta[l.carry + 2 * dw + j] = if j % 2 == 0 { -(1 << 22) } else { 1 << 21 };
+        grown.theta[l.carry + 2 * dw + j] = if j % 2 == 0 { -(1 << 24) } else { 1 << 24 };
     }
     let moved = grown.carry_gates_of(&r).unwrap();
     assert_eq!(moved.reads, gates.reads);
     assert!(moved.friction[0] < moved.reads, "a moved leak row closes some reads' friction");
+}
+
+/// [definition; theory, November 11 19:56, G83's second defect, G85] **A field with carry circles keeps every room whole**: with the circles' charts,
+/// biases and `W` columns drawn (so from the second tick a circle carries a place's state past any window), a region whose port cuts its room reads
+/// the same faces, the same port code and the same covector as the same region with the cut off, because [`FieldDeclaration::room_window`] admits
+/// no window where the field has circles; the same region on the field without circles still cuts.
+#[test]
+fn a_field_with_carry_circles_keeps_every_room_whole() {
+    for ticks in [2usize, 4] {
+        let plain = Field::found(FieldDeclaration { reach: 400, ticks, ..four_contacts(1) }, &keys(1 << 14)).unwrap();
+        let (grown, _) = plain.with_carry(2, &keys(plain.declaration.carry_draws(2))).unwrap();
+        let field = drawn(grown);
+        let q = [1usize, 4, 0, 2, 3, 1];
+        let sites = field.declaration.reach;
+        let mut classes: Vec<usize> = q.to_vec();
+        classes.resize(sites, 0);
+        let open: Vec<bool> = (0..sites).map(|t| t >= q.len()).collect();
+        let target = [3usize, 1, 2, 4, 1, 3, 2, 1, 4, 2, 3];
+        let heard: Vec<bool> = (0..sites).map(|t| [0usize, 1, 2, 5, 13, 22, 47, 90, 200, 330].iter().any(|&d| t == q.len() + d)).collect();
+        let region = |window: bool| Region {
+            classes: &classes,
+            unresolved: &open,
+            faces: &[],
+            locked: &[],
+            echo: &[],
+            domain: None,
+            port: Some(Port { start: q.len(), void: 0, target: &target, boundary: true, stop: None, heard: Some(&heard), window, letters: false }),
+        };
+        let (whole, cut) = (region(false), region(true));
+        assert!(cut.window(ticks).is_some() && field.declaration.room_window(&cut).is_none(), "ticks {ticks}: the region cuts, the field keeps it whole");
+        assert!(plain.declaration.room_window(&cut).is_some(), "ticks {ticks}: without circles the cut stands");
+        assert_eq!(field.faces(&whole).unwrap(), field.faces(&cut).unwrap(), "ticks {ticks}: every face");
+        assert_eq!(field.code(&whole).unwrap(), field.code(&cut).unwrap(), "ticks {ticks}: the port's code");
+        let (_, gw) = field.read_and_return(&[whole]).unwrap();
+        let (_, gc) = field.read_and_return(&[cut]).unwrap();
+        assert_eq!(gw, gc, "ticks {ticks}: the covector");
+        let l = field.layout.clone();
+        assert!(gw[l.carry..l.carry_bias].iter().any(|&v| v != 0), "ticks {ticks}: the circles' charts have a covector to compare");
+    }
 }
