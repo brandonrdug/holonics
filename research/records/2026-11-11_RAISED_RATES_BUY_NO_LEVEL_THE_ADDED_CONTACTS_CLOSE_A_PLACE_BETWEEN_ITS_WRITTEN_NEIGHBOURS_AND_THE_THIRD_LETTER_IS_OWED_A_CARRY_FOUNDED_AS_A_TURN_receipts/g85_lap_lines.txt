@@ -1,0 +1,98 @@
+# G85's laps, 2026-11-11 UTC, on the card (RTX 4080 SUPER under HOLONICS_ROOT/.local/gpu.lock, each its own hold), dispatched one at a time with
+# tools/runs.py: tf1 from rt18/STATE.0 grown by 32 carry circles with the near field's friction (65f8e92439f7c2dd), tf2 from tf1, tf3 from tf2,
+# with the build of ccc28b5cd (837bc5887de82cda), the line's law otherwise (mean_lap.sh's exports, environment and arguments), the bounds fixed
+# once from the development section (L 3,703,955 ms, the run's 4,003,955 ms, outer 4,063 s; the early stop at 2,413 ms a section over the
+# first 100). Each pairs with rt19, rt20 and rt21 (g83_lap_lines.txt) on the same sections. Walls on the MEASURE lines.
+## tf1 (the run's output)
+# tf1 from HOLONICS_ROOT/.local/wt/turn-carry/.local/run/tf/grow/STATE.0 65f8e92439f7c2dd: hnn-field-learner-v3 12 175104 69 -; hnn-field-v14t 100 64 4 8 2 128 4 4 3771 2 0 32; binary 837bc5887de82cda (ccc28b5cd); lap bound 3703955 ms, the run's 4003955 ms, outer 4063 s 20:43:57
+# parts parts 32 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+# tf1: lock taken 20:43:57 wait_s=.002667794
+EARLY_RATE tf1 sections=100 mean_section_ms=840 bound_ms=2413 20:45:37
+# tf1: lap exit 0 released 21:05:49
+FIELD_PART_RATES contacts_before=32 rate_bits=12 octaves w_new=0 a_new=0 b_new=0 enc_lane=0 before_lane=0 after_lane=0 q_lane=0 v_lane=0 probe_lane=0 out_lane=0 moment_face_lane=0 read_lane=0 face_biases_lane=0 a_lane=0 b_lane=0 carry=0 w_carry=0 a_carry=0 b_carry=0
+FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.731382 foil_nats_a_place=1.866629 information_nats_a_place=0.135247 own_nats_a_word=13.010058 information_nats_a_word=1.016280
+FIELD_MEAN lap=0 states=1535 entries=80182 moved=78022 square=264850109262767
+FIELD_LAP lap=0 read=70 sites=16553256 before=3.212 after=- deposited=1535/1535 halvings=0 next_halved=0 next_refused=0 ms=1293107
+FIELD_JOINT_NATS lap=0 places=43470 words=5785 own_nats_a_place=1.730347 foil_nats_a_place=1.865091 information_nats_a_place=0.134744 own_nats_a_word=13.002281 information_nats_a_word=1.012500
+MEASURE lap=tf1 rc=0 wall_s=1311.3 peak_rss_kib=955304
+SECTION_STEPS tf1 sections=1535 halved_or_next=0
+CODEC
+JOINT.tsv
+MEAN.0
+STATE.0
+# mean_tf1: state 989402591cbd9e32; binary 837bc5887de82cda; asked 21:05:49
+# mean_tf1: lock taken 21:05:49 wait_s=.012773493
+# mean_tf1: run_s=10.443334138 rc=0 released 21:05:59
+# binary 837bc5887de82cda state 989402591cbd9e32: hnn-field-v14t 100 64 4 8 2 128 4 4 3771 2 0 32; mode open-0; projected 238 s, deadline 297 s
+# lock taken 21:05:59
+# released 21:09:08
+MEASURE lap=transmission_open_tf1_mean rc=0 wall_s=188.7 peak_rss_kib=367444
+MAIN tf1 done 21:09:08
+## tf1's first five sections (its log)
+FIELD_SECTION lap=0 n=0 sites=10173 before=3.372 after=- halvings=0 deposited=true next=- predicted_micro=-8223 change_micro=- transfer_micro=- external_micro=-36 curvature_micro=- rate=12 length=2924 regions_ms=1 deposit_ms=772 ms=1639
+FIELD_SECTION lap=0 n=1 sites=8258 before=3.937 after=- halvings=0 deposited=true next=- predicted_micro=-7115 change_micro=- transfer_micro=947 external_micro=947 curvature_micro=992 rate=12 length=2502 regions_ms=1 deposit_ms=953 ms=1845
+FIELD_SECTION lap=0 n=2 sites=4607 before=3.055 after=- halvings=0 deposited=true next=- predicted_micro=-4151 change_micro=- transfer_micro=-141 external_micro=-141 curvature_micro=-1841 rate=12 length=2238 regions_ms=1 deposit_ms=705 ms=706
+FIELD_SECTION lap=0 n=3 sites=4639 before=3.543 after=- halvings=0 deposited=true next=- predicted_micro=-4291 change_micro=- transfer_micro=1821 external_micro=1821 curvature_micro=1962 rate=12 length=2416 regions_ms=1 deposit_ms=666 ms=1312
+FIELD_SECTION lap=0 n=4 sites=6299 before=3.630 after=- halvings=0 deposited=true next=- predicted_micro=-9758 change_micro=- transfer_micro=611 external_micro=611 curvature_micro=-729 rate=12 length=2302 regions_ms=1 deposit_ms=666 ms=668
+## tf2 (the run's output)
+# tf2 from HOLONICS_ROOT/.local/wt/turn-carry/.local/run/tf/tf1/STATE.0 12e5c7efdab75cb6: hnn-field-learner-v3 12 175104 70 -; hnn-field-v14t 100 64 4 8 2 128 4 4 3771 2 0 32; binary 837bc5887de82cda (ccc28b5cd); lap bound 3703955 ms, the run's 4003955 ms, outer 4063 s 21:09:26
+# parts parts 32 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+# tf2: lock taken 21:09:26 wait_s=.002876369
+EARLY_RATE tf2 sections=100 mean_section_ms=874 bound_ms=2413 21:11:06
+# tf2: lap exit 0 released 21:32:02
+FIELD_PART_RATES contacts_before=32 rate_bits=12 octaves w_new=0 a_new=0 b_new=0 enc_lane=0 before_lane=0 after_lane=0 q_lane=0 v_lane=0 probe_lane=0 out_lane=0 moment_face_lane=0 read_lane=0 face_biases_lane=0 a_lane=0 b_lane=0 carry=0 w_carry=0 a_carry=0 b_carry=0
+FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.730347 foil_nats_a_place=1.865091 information_nats_a_place=0.134744 own_nats_a_word=13.002281 information_nats_a_word=1.012500
+FIELD_MEAN lap=0 states=1535 entries=80182 moved=77903 square=387429324272416
+FIELD_LAP lap=0 read=71 sites=16541481 before=3.220 after=- deposited=1535/1535 halvings=0 next_halved=0 next_refused=0 ms=1337153
+FIELD_JOINT_NATS lap=0 places=43470 words=5785 own_nats_a_place=1.718801 foil_nats_a_place=1.849442 information_nats_a_place=0.130641 own_nats_a_word=12.915521 information_nats_a_word=0.981670
+MEASURE lap=tf2 rc=0 wall_s=1356.3 peak_rss_kib=880004
+SECTION_STEPS tf2 sections=1535 halved_or_next=0
+CODEC
+JOINT.tsv
+MEAN.0
+STATE.0
+# mean_tf2: state b4b22958f0da9998; binary 837bc5887de82cda; asked 21:32:02
+# mean_tf2: lock taken 21:32:02 wait_s=.024175410
+# mean_tf2: run_s=11.325854889 rc=0 released 21:32:14
+# binary 837bc5887de82cda state b4b22958f0da9998: hnn-field-v14t 100 64 4 8 2 128 4 4 3771 2 0 32; mode open-0; projected 238 s, deadline 297 s
+# lock taken 21:32:14
+# released 21:35:41
+MEASURE lap=transmission_open_tf2_mean rc=0 wall_s=207.2 peak_rss_kib=368656
+MAIN tf2 done 21:35:41
+## tf2's first five sections (its log)
+FIELD_SECTION lap=0 n=0 sites=10942 before=3.048 after=- halvings=0 deposited=true next=- predicted_micro=-5190 change_micro=- transfer_micro=- external_micro=-42 curvature_micro=- rate=12 length=2255 regions_ms=1 deposit_ms=674 ms=1465
+FIELD_SECTION lap=0 n=1 sites=6377 before=3.547 after=- halvings=0 deposited=true next=- predicted_micro=-3869 change_micro=- transfer_micro=431 external_micro=431 curvature_micro=503 rate=12 length=2252 regions_ms=1 deposit_ms=730 ms=1383
+FIELD_SECTION lap=0 n=2 sites=10793 before=3.624 after=- halvings=0 deposited=true next=- predicted_micro=-5309 change_micro=- transfer_micro=203 external_micro=203 curvature_micro=-50 rate=12 length=2277 regions_ms=1 deposit_ms=769 ms=771
+FIELD_SECTION lap=0 n=3 sites=13601 before=3.295 after=- halvings=0 deposited=true next=- predicted_micro=-4918 change_micro=- transfer_micro=-411 external_micro=-411 curvature_micro=-573 rate=12 length=2274 regions_ms=2 deposit_ms=760 ms=1520
+FIELD_SECTION lap=0 n=4 sites=30799 before=3.335 after=- halvings=0 deposited=true next=- predicted_micro=-8608 change_micro=- transfer_micro=355 external_micro=355 curvature_micro=537 rate=12 length=2363 regions_ms=1 deposit_ms=1257 ms=1259
+## tf3 (the run's output)
+# tf3 from HOLONICS_ROOT/.local/wt/turn-carry/.local/run/tf/tf2/STATE.0 550f46038252b7bd: hnn-field-learner-v3 12 175104 71 -; hnn-field-v14t 100 64 4 8 2 128 4 4 3771 2 0 32; binary 837bc5887de82cda (ccc28b5cd); lap bound 3703955 ms, the run's 4003955 ms, outer 4063 s 21:35:54
+# parts parts 32 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+# tf3: lock taken 21:35:54 wait_s=.002571168
+EARLY_RATE tf3 sections=100 mean_section_ms=955 bound_ms=2413 21:37:44
+# tf3: lap exit 0 released 21:56:58
+FIELD_PART_RATES contacts_before=32 rate_bits=12 octaves w_new=0 a_new=0 b_new=0 enc_lane=0 before_lane=0 after_lane=0 q_lane=0 v_lane=0 probe_lane=0 out_lane=0 moment_face_lane=0 read_lane=0 face_biases_lane=0 a_lane=0 b_lane=0 carry=0 w_carry=0 a_carry=0 b_carry=0
+FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.718801 foil_nats_a_place=1.849442 information_nats_a_place=0.130641 own_nats_a_word=12.915521 information_nats_a_word=0.981670
+FIELD_MEAN lap=0 states=1535 entries=80182 moved=77824 square=337298321919092
+FIELD_LAP lap=0 read=72 sites=16528287 before=3.201 after=- deposited=1535/1535 halvings=0 next_halved=0 next_refused=0 ms=1245622
+FIELD_JOINT_NATS lap=0 places=43470 words=5785 own_nats_a_place=1.714448 foil_nats_a_place=1.848549 information_nats_a_place=0.134101 own_nats_a_word=12.882812 information_nats_a_word=1.007668
+MEASURE lap=tf3 rc=0 wall_s=1264.4 peak_rss_kib=804768
+SECTION_STEPS tf3 sections=1535 halved_or_next=0
+CODEC
+JOINT.tsv
+MEAN.0
+STATE.0
+# mean_tf3: state 303ccfe811ba2e1a; binary 837bc5887de82cda; asked 21:56:58
+# mean_tf3: lock taken 21:56:58 wait_s=.013378631
+# mean_tf3: run_s=9.329235317 rc=0 released 21:57:08
+# binary 837bc5887de82cda state 303ccfe811ba2e1a: hnn-field-v14t 100 64 4 8 2 128 4 4 3771 2 0 32; mode open-0; projected 238 s, deadline 297 s
+# lock taken 21:57:08
+# released 21:59:57
+MEASURE lap=transmission_open_tf3_mean rc=0 wall_s=169.4 peak_rss_kib=367996
+MAIN tf3 done 21:59:57
+## tf3's first five sections (its log)
+FIELD_SECTION lap=0 n=0 sites=8217 before=3.437 after=- halvings=0 deposited=true next=- predicted_micro=-4242 change_micro=- transfer_micro=- external_micro=17 curvature_micro=- rate=12 length=2270 regions_ms=1 deposit_ms=761 ms=1622
+FIELD_SECTION lap=0 n=1 sites=6403 before=3.299 after=- halvings=0 deposited=true next=- predicted_micro=-3613 change_micro=- transfer_micro=2135 external_micro=2135 curvature_micro=2112 rate=12 length=2241 regions_ms=1 deposit_ms=760 ms=1457
+FIELD_SECTION lap=0 n=2 sites=7003 before=3.687 after=- halvings=0 deposited=true next=- predicted_micro=-3823 change_micro=- transfer_micro=160 external_micro=160 curvature_micro=-1792 rate=12 length=2215 regions_ms=1 deposit_ms=791 ms=793
+FIELD_SECTION lap=0 n=3 sites=6297 before=3.295 after=- halvings=0 deposited=true next=- predicted_micro=-5122 change_micro=- transfer_micro=-344 external_micro=-344 curvature_micro=-523 rate=12 length=2208 regions_ms=1 deposit_ms=698 ms=1434
+FIELD_SECTION lap=0 n=4 sites=20946 before=2.513 after=- halvings=0 deposited=true next=- predicted_micro=-7816 change_micro=- transfer_micro=108 external_micro=108 curvature_micro=212 rate=12 length=2762 regions_ms=1 deposit_ms=1704 ms=1706
