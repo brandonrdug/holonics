@@ -253,7 +253,7 @@ theorem two_mul_trace_stiffness_covariance {P Q H C S : Matrix n n K} (hQ : Q * 
     (hP : Pᵀ = P) (hH : Hᵀ = H)
     (h : -(P * H) * S + S * (-(P * H))ᵀ + P * C * P = 0) :
     2 * (H * S).trace = (C * P).trace := by
-  have hPQ : P * Q = 1 := Matrix.mul_eq_one_comm.mp hQ
+  have hPQ : P * Q = 1 := mul_eq_one_comm.mp hQ
   have h0 : Q * (-(P * H) * S + S * (-(P * H))ᵀ + P * C * P) = 0 := by
     rw [h, Matrix.mul_zero]
   rw [Matrix.transpose_neg, Matrix.transpose_mul, hP, hH] at h0
