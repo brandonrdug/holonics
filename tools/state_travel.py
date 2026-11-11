@@ -79,7 +79,12 @@ a_bias, b, b_bias, w, w_bias, read, read_bias, moment_before, moment_after, temp
 moment_face_bias, lift_bias, and gchart with the carry). Every other entry and every other line is HEAD's. A read of OUT beside
 HEAD's and DONOR's tells how much of a reading's difference between two states those families carry; where a reading is first order
 in the states' difference, the shifts of grafts that partition the material add up to the whole difference, and what the sum leaves
-is the reading's curvature between them. OUT is a ruler's state: it is read, and no lap trains from it. Numbers only.
+is the reading's curvature between them. A name may also be `part:NAME`, the entries of one founded part as the rate law names
+them (tools/part_rates.py: w_new .. b_lane, and g_chart with the carry), or `FAMILY/old`, a family's entries of no part (the base
+rate's); the parts and the families' old entries partition the material, so a lap's difference between two lap means is split by the
+rate each entry trains at. Both read the count of contacts before the growth from HEAD's `parts` line, or from a name
+`contacts:N` where HEAD carries none (where it carries one the two agree). No entry is named twice. OUT is a ruler's state: it is
+read, and no lap trains from it. Numbers only.
 """
 import os
 import sys
@@ -462,17 +467,47 @@ def graft(out, head, donor, names):
     fam, total = layout(d)
     assert dd == d and total == len(theta) == len(other), "states of one declaration"
     spans = {name: (at, int(np.prod(shape))) for name, at, shape, _ in fam}
-    assert names and all(n in spans for n in names) and len(set(names)) == len(names), f"families of the layout, each once: {' '.join(spans)}"
-    material = theta.copy()
+    declared = [n for n in names if n.startswith("contacts:")]
+    names = [n for n in names if not n.startswith("contacts:")]
+    assert len(declared) <= 1 and names and len(set(names)) == len(names), "names of the layout, each once, and at most one contacts:N"
+    founded = None
+    if any(n.startswith("part:") or n.endswith("/old") for n in names):
+        sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+        import part_rates
+
+        carried = part_rates.parts_line(lines)
+        before = int(declared[0].split(":", 1)[1]) if declared else None
+        assert carried is not None or before is not None, "a part or a family's old entries need HEAD's parts line or contacts:N"
+        assert carried is None or before is None or carried[0] == before, "contacts:N is HEAD's parts line's count"
+        before = carried[0] if carried is not None else before
+        assert 0 < before <= d["contacts"] and before % 4 == 0, "the contacts before the growth, by fours"
+        founded = np.array(part_rates.founded_parts(d, before))
+        assert len(founded) == total
+    else:
+        assert not declared, "contacts:N goes with a part or a family's old entries"
+    named = np.zeros(total, dtype=np.int64)
     for n in names:
-        at, k = spans[n]
-        material[at:at + k] = other[at:at + k]
+        chosen = np.zeros(total, dtype=bool)
+        if n.startswith("part:"):
+            assert n[5:] in part_rates.PART_NAMES, f"parts of the rate law: {' '.join(part_rates.PART_NAMES)}"
+            chosen = founded == part_rates.PART_NAMES.index(n[5:])
+        elif n.endswith("/old"):
+            assert n[:-4] in spans, f"families of the layout: {' '.join(spans)}"
+            at, k = spans[n[:-4]]
+            chosen[at:at + k] = founded[at:at + k] == part_rates.OLD
+        else:
+            assert n in spans, f"families of the layout, each once: {' '.join(spans)}"
+            at, k = spans[n]
+            chosen[at:at + k] = True
+        assert chosen.any(), f"{n} names no entry of this declaration"
+        named += chosen
+    assert (named <= 1).all(), "no entry is named twice"
+    material = np.where(named == 1, other, theta)
     lines[2] = " ".join(str(int(x)) for x in material)
     with open(out, "x") as f:
         f.write("\n".join(lines))
     moved = (material - theta).astype(np.float64)
-    entries = sum(spans[n][1] for n in names)
-    print(f"STATE_GRAFT families={','.join(names)} entries={entries} of={total} moved={int((moved != 0).sum())} rms_from_head={float(np.sqrt((moved ** 2).mean())):.5g}")
+    print(f"STATE_GRAFT families={','.join(names)} entries={int(named.sum())} of={total} moved={int((moved != 0).sum())} rms_from_head={float(np.sqrt((moved ** 2).mean())):.5g}")
 
 
 def main():

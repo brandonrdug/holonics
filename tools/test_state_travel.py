@@ -31,6 +31,11 @@ head's, one state under another head is its own material, and a file that stands
 Controls of its graft: the named families' entries are the donor's and every other entry and line the head's; grafts of two parts
 that partition the layout's families move, between them, every entry the two states differ in, once; every family grafted gives the
 donor's material under the head's other lines; an unknown family, a family named twice and a standing file are refused.
+A graft by rate part: `part:NAME` takes the entries Field::founded_parts gives that part and `FAMILY/old` a family's entries of
+no part; the fifteen parts and every family's old entries, each grafted alone, move every entry once between them (a partition of
+the material); the count before the growth is the head's `parts` line's, or `contacts:N` on a head that carries none, and the two
+give one file; an entry named twice (a family beside one of its parts), a part of another law, a count that is not the head's, and
+a part named on a head with no count are refused.
 """
 import io
 import os
@@ -378,6 +383,61 @@ def graft_controls():
     print(f"state_travel graft: {len(lines)} lines, the controls hold")
 
 
+def graft_part_controls():
+    import part_rates
+
+    rng = np.random.default_rng(20261116)
+    fam, total = state_travel.layout(D)
+    a = rng.integers(-100000, 100000, size=total).astype(np.int64)
+    b = a + rng.integers(1, 10, size=total)
+    founded = np.array(part_rates.founded_parts(D, OLD_F))
+    spans = {name: (at, int(np.prod(shape))) for name, at, shape, _ in fam}
+    parts = [f"part:{name}" for i, name in enumerate(part_rates.PART_NAMES) if (founded == i).any()]
+    olds = [f"{name}/old" for name, (at, k) in spans.items() if (founded[at:at + k] == part_rates.OLD).any()]
+    assert len(parts) == 15 and "part:g_chart" not in parts and "q_bias/old" in olds
+    with tempfile.TemporaryDirectory() as tmp:
+        pa, pb, bare = os.path.join(tmp, "a"), os.path.join(tmp, "b"), os.path.join(tmp, "bare")
+        write(pa, a, [7] * total, [OLD_F] + [0] * 16)
+        write(pb, b, [9] * total, [OLD_F] + [2] * 16)
+        write(bare, a)
+        quiet = io.StringIO()
+        moved = np.zeros(total, dtype=np.int64)
+        with redirect_stdout(quiet):
+            for i, name in enumerate(parts + olds):
+                state_travel.graft(os.path.join(tmp, f"g{i}"), pa, pb, [name])
+                _, got = state_travel.state(os.path.join(tmp, f"g{i}"))
+                moved += got != a
+                if name.startswith("part:"):
+                    assert ((got != a) == (founded == part_rates.PART_NAMES.index(name[5:]))).all(), name
+                else:
+                    at, k = spans[name[:-4]]
+                    inside = np.zeros(total, dtype=bool)
+                    inside[at:at + k] = founded[at:at + k] == part_rates.OLD
+                    assert ((got != a) == inside).all(), name
+                assert (got[got != a] == b[got != a]).all()
+            # One graft of every part and every family's old entries is the donor's material.
+            state_travel.graft(os.path.join(tmp, "whole"), pa, pb, parts + olds)
+            # The count from the head's line, and declared on a head that carries none: one file.
+            state_travel.graft(os.path.join(tmp, "carried"), pa, pb, ["part:q_lane", "v/old"])
+            state_travel.graft(os.path.join(tmp, "agreed"), pa, pb, ["contacts:8", "part:q_lane", "v/old"])
+            state_travel.graft(os.path.join(tmp, "declared"), bare, pb, ["contacts:8", "part:q_lane", "v/old"])
+        assert (moved == 1).all(), "the parts and the families' old entries hold every entry once"
+        assert (state_travel.state(os.path.join(tmp, "whole"))[1] == b).all()
+        carried, agreed, declared = (state_travel.state(os.path.join(tmp, name))[1] for name in ("carried", "agreed", "declared"))
+        assert (carried == agreed).all() and (carried == declared).all() and (carried != a).any()
+        lines = quiet.getvalue().splitlines()
+        assert sum(int(fields(line)["entries"]) for line in lines[:len(parts) + len(olds)]) == total
+        for bad, head in ((["q", "part:q_lane"], pa), (["q/old", "q"], pa), (["part:no_such_part"], pa), (["part:g_chart"], pa), (["contacts:12", "part:q_lane"], pa),
+                          (["part:q_lane"], bare), (["v/old"], bare), (["contacts:8", "q"], pa), (["contacts:8", "contacts:8", "part:q_lane"], pa), (["no_such_family/old"], pa)):
+            try:
+                with redirect_stdout(quiet):
+                    state_travel.graft(os.path.join(tmp, "bad"), head, pb, bad)
+                raise RuntimeError(f"a graft that names {bad} was written")
+            except AssertionError:
+                assert not os.path.exists(os.path.join(tmp, "bad"))
+    print(f"state_travel graft by part: {len(lines)} lines, the controls hold")
+
+
 def main():
     rank_controls()
     scale_controls()
@@ -385,6 +445,7 @@ def main():
     lag_controls()
     mean_controls()
     graft_controls()
+    graft_part_controls()
 
 
 if __name__ == "__main__":
