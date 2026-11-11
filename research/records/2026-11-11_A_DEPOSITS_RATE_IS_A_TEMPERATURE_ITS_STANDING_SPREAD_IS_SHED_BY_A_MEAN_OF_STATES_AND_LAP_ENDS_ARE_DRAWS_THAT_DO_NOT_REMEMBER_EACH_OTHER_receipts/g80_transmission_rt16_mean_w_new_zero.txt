@@ -1,0 +1,27 @@
+# G80, M3 (ii), the ruler state rt16/MEAN.0 with W's added columns from g0 (6f4eda3310e5f0d2): the transmission read, open-0, held 0-31, transmission_open.sh with the lap-mean binary (b8fe4ba838dd27a6), 2026-11-11 UTC;
+# FIELD_TRANSMISSION lines whole, then the script's OPEN lines.
+FIELD_TRANSMISSION mode=open-left l=0 r=0 spacing=0 regions=8760 places=8760 out=0 code_nats_a_place=3.265498 ms=14955
+FIELD_TRANSMISSION mode=open-left l=1 r=0 spacing=0 regions=8728 places=8728 out=32 code_nats_a_place=2.705420 ms=28495
+FIELD_TRANSMISSION mode=open-left l=2 r=0 spacing=0 regions=8696 places=8696 out=64 code_nats_a_place=2.317896 ms=43531
+FIELD_TRANSMISSION mode=open-left l=3 r=0 spacing=0 regions=8664 places=8664 out=96 code_nats_a_place=2.151934 ms=58642
+FIELD_TRANSMISSION mode=open-left l=4 r=0 spacing=0 regions=8632 places=8632 out=128 code_nats_a_place=2.122583 ms=73176
+FIELD_TRANSMISSION mode=open-left l=8 r=0 spacing=0 regions=8504 places=8504 out=256 code_nats_a_place=2.091945 ms=86765
+FIELD_TRANSMISSION mode=open-both l=1 r=1 spacing=0 regions=8696 places=8696 out=64 code_nats_a_place=2.006805 ms=100014
+FIELD_TRANSMISSION mode=open-both l=2 r=2 spacing=0 regions=8632 places=8632 out=128 code_nats_a_place=1.400588 ms=113663
+FIELD_TRANSMISSION mode=open-both l=3 r=3 spacing=0 regions=8568 places=8568 out=192 code_nats_a_place=1.232809 ms=129021
+FIELD_TRANSMISSION mode=open-both l=4 r=4 spacing=0 regions=8504 places=8504 out=256 code_nats_a_place=1.195752 ms=143478
+FIELD_TRANSMISSION mode=open-split l=3 r=1 spacing=0 regions=8632 places=8632 out=128 code_nats_a_place=1.525815 ms=157566
+FIELD_TRANSMISSION mode=open-split l=1 r=3 spacing=0 regions=8632 places=8632 out=128 code_nats_a_place=1.576673 ms=170937
+FIELD_TRANSMISSION mode=open-split l=2 r=1 spacing=0 regions=8664 places=8664 out=96 code_nats_a_place=1.648345 ms=185045
+FIELD_TRANSMISSION mode=open-split l=1 r=2 spacing=0 regions=8664 places=8664 out=96 code_nats_a_place=1.679909 ms=199730
+FIELD_TRANSMISSION_DONE ms=199736
+MEASURE lap=transmission_open_w_new_zero_lm rc=0 wall_s=200.3 peak_rss_kib=362616
+OPEN w_new_zero_lm left d=0..4 field 3.265 2.705 2.318 2.152 2.123
+OPEN w_new_zero_lm left d=0..4 text  3.481 2.710 1.898 1.423 1.224
+OPEN w_new_zero_lm left (d-1 minus d) d=1..4 field 0.560 0.388 0.166 0.029
+OPEN w_new_zero_lm left (d-1 minus d) d=1..4 text  0.71 0.73 0.51 0.23
+OPEN w_new_zero_lm both d=1..4 field 2.007 1.401 1.233 1.196
+OPEN w_new_zero_lm both d=1..4 text  1.564 0.569 0.419 0.397
+OPEN w_new_zero_lm splits (3L,1R) (1L,3R) (2L,1R) (1L,2R) field 1.526 1.577 1.648 1.680
+OPEN w_new_zero_lm splits text  0.690 0.714 0.923 0.938
+OPEN w_new_zero_lm places a row (left d=0) 8760, regions 8760

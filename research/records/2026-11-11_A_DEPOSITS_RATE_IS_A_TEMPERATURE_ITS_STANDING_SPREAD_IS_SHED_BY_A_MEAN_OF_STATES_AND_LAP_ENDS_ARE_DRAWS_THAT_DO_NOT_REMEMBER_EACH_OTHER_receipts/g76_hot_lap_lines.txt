@@ -1,0 +1,189 @@
+# G76: Part H, the whole machine one and two octaves hotter beside the floor, 2026-11-11 14:49 to 16:24 UTC on the card: six laps of
+# bin-lap-mean b8fe4ba838dd27a6 (8368f084b) with mean_lap.sh's arguments and bounds (L 1215000 ms, the run's 1515000 ms, outer 1575 s), each
+# taking the card lock on its own and followed by the held read (laps 0) of its MEAN.0; then the pair lines (h_pair.py, Part Q's g64q.py with
+# the pair named) of each hot lap against the floor lap of its walk.
+# H1: the hot states, tools/part_rates.py base from rt15/STATE.0 (160e3474a8795ee8):
+#   hot1.from15 54a890c6b820dc99: FIELD_BASE_RATE was=12 rate_bits=11 octaves_hotter=1; 1 line of 6 differs: 'hnn-field-learner-v3 12 134144 66 -' -> 'hnn-field-learner-v3 11 134144 66 -'
+#   hot2.from15 c30bbcdf4bd011b9: FIELD_BASE_RATE was=12 rate_bits=10 octaves_hotter=2; 1 line of 6 differs: 'hnn-field-learner-v3 12 134144 66 -' -> 'hnn-field-learner-v3 10 134144 66 -'
+## rt16 from rt15/STATE.0
+# rt16 from STATE.0 160e3474a8795ee8e8a655b8e684559ad3c5a39efb9a00d135151544caf34711: hnn-field-learner-v3 12 134144 66 -; binary b8fe4ba838dd27a6 (8368f084b); lap bound 1215000 ms, the run's 1515000 ms, outer 1575 s 14:49:00
+# rt16: lock taken 14:49:00 wait_s=.002218867
+# rt16: released 15:03:51
+FIELD_PART_RATES contacts_before=32 rate_bits=12 octaves w_new=0 a_new=0 b_new=0 enc_lane=0 before_lane=0 after_lane=0 q_lane=0 v_lane=0 probe_lane=0 out_lane=0 moment_face_lane=0 read_lane=0 face_biases_lane=0 a_lane=0 b_lane=0 g_chart=0
+FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.733768 foil_nats_a_place=1.867618 information_nats_a_place=0.133849 own_nats_a_word=13.027988 information_nats_a_word=1.005780
+FIELD_MEAN lap=0 states=1535 entries=63606 moved=61441 square=91521954399234
+FIELD_LAP lap=0 read=67 sites=16605376 before=3.233 after=- deposited=1535/1535 halvings=0 next_halved=0 next_refused=0 ms=874474
+FIELD_JOINT_NATS lap=0 places=43470 words=5785 own_nats_a_place=1.737425 foil_nats_a_place=1.874460 information_nats_a_place=0.137035 own_nats_a_word=13.055467 information_nats_a_word=1.029717
+MEASURE lap=rt16 rc=0 wall_s=891.6 peak_rss_kib=833596
+mean_rt16 FIELD_HELD lap=-1 answer=5.507602 classes=43470 context=0.922491 context_classes=43470 foil=1.088968 question=0.166477 ms=3576
+mean_rt16 FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.726734 foil_nats_a_place=1.860096 information_nats_a_place=0.133362 own_nats_a_word=12.975131 information_nats_a_word=1.002118
+mean_rt16 FIELD_UNSEEN lap=-1 code=0.853 sites=43660 next=- ms=9395
+mean_rt16 MEASURE lap=held_mean_rt16 rc=0 wall_s=9.8 peak_rss_kib=853140
+FILES rt16 STATE.0=2f7fe874630595bc MEAN.0=a400e81f7a0862c8
+## hot2_16 from hot2.from15
+# hot2_16 from hot2.from15 c30bbcdf4bd011b97dbe33e528c8e0aa788231fcbdab0372da7350db29e81059: hnn-field-learner-v3 10 134144 66 -; binary b8fe4ba838dd27a6 (8368f084b); lap bound 1215000 ms, the run's 1515000 ms, outer 1575 s 15:04:12
+# hot2_16: lock taken 15:04:12 wait_s=.001669425
+# hot2_16: released 15:19:03
+FIELD_PART_RATES contacts_before=32 rate_bits=10 octaves w_new=0 a_new=0 b_new=0 enc_lane=0 before_lane=0 after_lane=0 q_lane=0 v_lane=0 probe_lane=0 out_lane=0 moment_face_lane=0 read_lane=0 face_biases_lane=0 a_lane=0 b_lane=0 g_chart=0
+FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.733768 foil_nats_a_place=1.867618 information_nats_a_place=0.133849 own_nats_a_word=13.027988 information_nats_a_word=1.005780
+FIELD_MEAN lap=0 states=1535 entries=63606 moved=61479 square=961122214574991
+FIELD_LAP lap=0 read=67 sites=16605376 before=3.262 after=- deposited=1535/1535 halvings=0 next_halved=0 next_refused=0 ms=873312
+FIELD_JOINT_NATS lap=0 places=43470 words=5785 own_nats_a_place=1.773298 foil_nats_a_place=1.911968 information_nats_a_place=0.138671 own_nats_a_word=13.325023 information_nats_a_word=1.042008
+MEASURE lap=hot2_16 rc=0 wall_s=890.7 peak_rss_kib=834188
+mean_hot2_16 FIELD_HELD lap=-1 answer=5.183751 classes=43470 context=0.924839 context_classes=43470 foil=1.093155 question=0.168316 ms=3624
+mean_hot2_16 FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.728260 foil_nats_a_place=1.859327 information_nats_a_place=0.131067 own_nats_a_word=12.986596 information_nats_a_word=0.984871
+mean_hot2_16 FIELD_UNSEEN lap=-1 code=0.855 sites=43660 next=- ms=9432
+mean_hot2_16 MEASURE lap=held_mean_hot2_16 rc=0 wall_s=9.8 peak_rss_kib=819636
+FILES hot2_16 STATE.0=7f2b5573500e414b MEAN.0=61d0ed1ecf699d61
+## hot1_16 from hot1.from15
+# hot1_16 from hot1.from15 54a890c6b820dc99ec2ee88607acdb24c9c6e88a91ec6e7520ce71fb1f6d723f: hnn-field-learner-v3 11 134144 66 -; binary b8fe4ba838dd27a6 (8368f084b); lap bound 1215000 ms, the run's 1515000 ms, outer 1575 s 15:19:13
+# hot1_16: lock taken 15:19:13 wait_s=.002686823
+# hot1_16: released 15:34:04
+FIELD_PART_RATES contacts_before=32 rate_bits=11 octaves w_new=0 a_new=0 b_new=0 enc_lane=0 before_lane=0 after_lane=0 q_lane=0 v_lane=0 probe_lane=0 out_lane=0 moment_face_lane=0 read_lane=0 face_biases_lane=0 a_lane=0 b_lane=0 g_chart=0
+FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.733768 foil_nats_a_place=1.867618 information_nats_a_place=0.133849 own_nats_a_word=13.027988 information_nats_a_word=1.005780
+FIELD_MEAN lap=0 states=1535 entries=63606 moved=61466 square=286272112519863
+FIELD_LAP lap=0 read=67 sites=16605376 before=3.243 after=- deposited=1535/1535 halvings=0 next_halved=0 next_refused=0 ms=873268
+FIELD_JOINT_NATS lap=0 places=43470 words=5785 own_nats_a_place=1.752473 foil_nats_a_place=1.892187 information_nats_a_place=0.139714 own_nats_a_word=13.168542 information_nats_a_word=1.049847
+MEASURE lap=hot1_16 rc=0 wall_s=890.5 peak_rss_kib=848584
+mean_hot1_16 FIELD_HELD lap=-1 answer=5.385581 classes=43470 context=0.922229 context_classes=43470 foil=1.089349 question=0.167120 ms=3577
+mean_hot1_16 FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.726659 foil_nats_a_place=1.858867 information_nats_a_place=0.132208 own_nats_a_word=12.974565 information_nats_a_word=0.993443
+mean_hot1_16 FIELD_UNSEEN lap=-1 code=0.853 sites=43660 next=- ms=9394
+mean_hot1_16 MEASURE lap=held_mean_hot1_16 rc=0 wall_s=9.8 peak_rss_kib=832260
+FILES hot1_16 STATE.0=a0779a3971c84a49 MEAN.0=ab65f807121c0e3d
+## rt17 from rt16/STATE.0
+# rt17 from STATE.0 2f7fe874630595bcbc4154750c0f0381e761d0bcedd5e8395eb6d3f30a76f433: hnn-field-learner-v3 12 134144 67 -; binary b8fe4ba838dd27a6 (8368f084b); lap bound 1215000 ms, the run's 1515000 ms, outer 1575 s 15:34:14
+# rt17: lock taken 15:34:14 wait_s=.002352403
+# rt17: released 15:49:30
+FIELD_PART_RATES contacts_before=32 rate_bits=12 octaves w_new=0 a_new=0 b_new=0 enc_lane=0 before_lane=0 after_lane=0 q_lane=0 v_lane=0 probe_lane=0 out_lane=0 moment_face_lane=0 read_lane=0 face_biases_lane=0 a_lane=0 b_lane=0 g_chart=0
+FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.737425 foil_nats_a_place=1.874460 information_nats_a_place=0.137035 own_nats_a_word=13.055467 information_nats_a_word=1.029717
+FIELD_MEAN lap=0 states=1535 entries=63606 moved=61259 square=90133614648102
+FIELD_LAP lap=0 read=68 sites=16500977 before=3.227 after=- deposited=1535/1535 halvings=0 next_halved=0 next_refused=0 ms=897366
+FIELD_JOINT_NATS lap=0 places=43470 words=5785 own_nats_a_place=1.733189 foil_nats_a_place=1.866533 information_nats_a_place=0.133344 own_nats_a_word=13.023636 information_nats_a_word=1.001978
+MEASURE lap=rt17 rc=0 wall_s=915.9 peak_rss_kib=867484
+mean_rt17 FIELD_HELD lap=-1 answer=5.485195 classes=43470 context=0.919823 context_classes=43470 foil=1.086918 question=0.167095 ms=4406
+mean_rt17 FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.726466 foil_nats_a_place=1.858970 information_nats_a_place=0.132504 own_nats_a_word=12.973118 information_nats_a_word=0.995669
+mean_rt17 FIELD_UNSEEN lap=-1 code=0.852 sites=43660 next=- ms=11099
+mean_rt17 MEASURE lap=held_mean_rt17 rc=0 wall_s=11.7 peak_rss_kib=819936
+FILES rt17 STATE.0=b6117e5fabfb907f MEAN.0=f4d9eb1267d79fb7
+## hot2_17 from hot2_16/STATE.0
+# hot2_17 from STATE.0 7f2b5573500e414b6f25f3b4df2c40b7d8cd98b25974cedc3c38d6e3e9f8df03: hnn-field-learner-v3 10 134144 67 -; binary b8fe4ba838dd27a6 (8368f084b); lap bound 1215000 ms, the run's 1515000 ms, outer 1575 s 15:49:41
+# hot2_17: lock taken 15:49:41 wait_s=.009493920
+# hot2_17: released 16:06:29
+FIELD_PART_RATES contacts_before=32 rate_bits=10 octaves w_new=0 a_new=0 b_new=0 enc_lane=0 before_lane=0 after_lane=0 q_lane=0 v_lane=0 probe_lane=0 out_lane=0 moment_face_lane=0 read_lane=0 face_biases_lane=0 a_lane=0 b_lane=0 g_chart=0
+FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.773298 foil_nats_a_place=1.911968 information_nats_a_place=0.138671 own_nats_a_word=13.325023 information_nats_a_word=1.042008
+FIELD_MEAN lap=0 states=1535 entries=63606 moved=61289 square=964199302274253
+FIELD_LAP lap=0 read=68 sites=16500977 before=3.255 after=- deposited=1535/1535 halvings=0 next_halved=0 next_refused=0 ms=986387
+FIELD_JOINT_NATS lap=0 places=43470 words=5785 own_nats_a_place=1.749088 foil_nats_a_place=1.880397 information_nats_a_place=0.131309 own_nats_a_word=13.143106 information_nats_a_word=0.986690
+MEASURE lap=hot2_17 rc=0 wall_s=1007.8 peak_rss_kib=840260
+mean_hot2_17 FIELD_HELD lap=-1 answer=5.227771 classes=43470 context=0.921688 context_classes=43470 foil=1.091285 question=0.169596 ms=4523
+mean_hot2_17 FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.727243 foil_nats_a_place=1.858853 information_nats_a_place=0.131610 own_nats_a_word=12.978957 information_nats_a_word=0.988952
+mean_hot2_17 FIELD_UNSEEN lap=-1 code=0.854 sites=43660 next=- ms=11199
+mean_hot2_17 MEASURE lap=held_mean_hot2_17 rc=0 wall_s=11.9 peak_rss_kib=831208
+FILES hot2_17 STATE.0=e2b2c022713537a2 MEAN.0=0e9846b1fc814037
+## hot1_17 from hot1_16/STATE.0
+# hot1_17 from STATE.0 a0779a3971c84a49514f0608aa84e770b9f5f5922d11ac169527ae8513284fb9: hnn-field-learner-v3 11 134144 67 -; binary b8fe4ba838dd27a6 (8368f084b); lap bound 1215000 ms, the run's 1515000 ms, outer 1575 s 16:06:42
+# hot1_17: lock taken 16:06:42 wait_s=.004695363
+# hot1_17: released 16:24:00
+FIELD_PART_RATES contacts_before=32 rate_bits=11 octaves w_new=0 a_new=0 b_new=0 enc_lane=0 before_lane=0 after_lane=0 q_lane=0 v_lane=0 probe_lane=0 out_lane=0 moment_face_lane=0 read_lane=0 face_biases_lane=0 a_lane=0 b_lane=0 g_chart=0
+FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.752473 foil_nats_a_place=1.892187 information_nats_a_place=0.139714 own_nats_a_word=13.168542 information_nats_a_word=1.049847
+FIELD_MEAN lap=0 states=1535 entries=63606 moved=61280 square=289077837169255
+FIELD_LAP lap=0 read=68 sites=16500977 before=3.236 after=- deposited=1535/1535 halvings=0 next_halved=0 next_refused=0 ms=1016746
+FIELD_JOINT_NATS lap=0 places=43470 words=5785 own_nats_a_place=1.737622 foil_nats_a_place=1.869948 information_nats_a_place=0.132325 own_nats_a_word=13.056947 information_nats_a_word=0.994328
+MEASURE lap=hot1_17 rc=0 wall_s=1038.4 peak_rss_kib=833536
+mean_hot1_17 FIELD_HELD lap=-1 answer=5.407624 classes=43470 context=0.920238 context_classes=43470 foil=1.087662 question=0.167424 ms=4932
+mean_hot1_17 FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.726260 foil_nats_a_place=1.858478 information_nats_a_place=0.132218 own_nats_a_word=12.971570 information_nats_a_word=0.993520
+mean_hot1_17 FIELD_UNSEEN lap=-1 code=0.852 sites=43660 next=- ms=12512
+mean_hot1_17 MEASURE lap=held_mean_hot1_17 rc=0 wall_s=13.1 peak_rss_kib=821712
+FILES hot1_17 STATE.0=cbdeb8de7ca9d9b3 MEAN.0=85d9dba173d02e26
+## the chain's checks (a refused step, a halved step or a stop ends a hot line; a first lap's mean more than 0.0030 above rt16's ends it)
+# rt16's mean reads 1.726734
+HELD hot2_16 1.728260 15:19:13
+LINE_CLEAN hot2_16
+HELD hot1_16 1.726659 15:34:14
+LINE_CLEAN hot1_16
+H3_READY 15:34:14
+HELD rt17 1.726466 15:49:41
+# hot2_17 runs: hot2_16's mean 1.728260 against rt16's 1.726734 (difference .001526)
+HELD hot2_17 1.727243 16:06:42
+LINE_CLEAN hot2_17
+# hot1_17 runs: hot1_16's mean 1.726659 against rt16's 1.726734 (difference -.000075)
+HELD hot1_17 1.726260 16:24:13
+LINE_CLEAN hot1_17
+H_DONE 16:24:13
+## pair hot2_16 against rt16
+G63D_PAIR hot2_16/rt16 sections=1535
+  G63D_LAP hot2_16 sections=1535 before=3.314740 predicted=-17722.686 external=1998.752 external_n=1535 N=19471.594
+  G63D_LAP rt16 sections=1535 before=3.286165 predicted=-4632.164 external=163.252 external_n=1535 N=4775.009
+  G63D_PAIRED before_d=+0.028575 se=0.000405 n=1535 predicted_d=-13090.522 se=540.110 n=1535 external_d=+1835.500 se=105.445 n=1535 twice_N_excess=+29393.169 se=1062.818 n=1535
+  G63D_BEFORE first_blocks_of_8 +0.007578 +0.015485 +0.018206 +0.028810 twentieth_1 +0.025123 twentieth_20 +0.026335 slope_3_20 -0.013753 se 0.001579 (bits a lap)
+  G64_TWENTIETHS d=before(A)-before(B) site-weighted: +0.025123 +0.030947 +0.027643 +0.026884 +0.063125 +0.033614 +0.030792 +0.022876 +0.026883 +0.028439 +0.028829 +0.025373 +0.028266 +0.027259 +0.026066 +0.025229 +0.027384 +0.026122 +0.025933 +0.026335
+  G64_TWENTIETHS_2_3 positions 77..230 sections=154 before_d=+0.028753 se=0.000841 weighted=+0.029221 twice_N_excess=+33338.287 se=1204.149
+  G64_LINE hot2_16 FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.733768 foil_nats_a_place=1.867618 information_nats_a_place=0.133849 own_nats_a_word=13.027988 information_nats_a_word=1.005780
+  G64_LINE hot2_16 FIELD_MEAN lap=0 states=1535 entries=63606 moved=61479 square=961122214574991
+  G64_LINE hot2_16 FIELD_LAP lap=0 read=67 sites=16605376 before=3.262 after=- deposited=1535/1535 halvings=0 next_halved=0 next_refused=0 ms=873312
+  G64_LINE hot2_16 FIELD_JOINT_NATS lap=0 places=43470 words=5785 own_nats_a_place=1.773298 foil_nats_a_place=1.911968 information_nats_a_place=0.138671 own_nats_a_word=13.325023 information_nats_a_word=1.042008
+  G64_FILES hot2_16 STATE.0=7f2b5573500e414b MEAN.0=61d0ed1ecf699d61
+  G64_LINE rt16 FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.733768 foil_nats_a_place=1.867618 information_nats_a_place=0.133849 own_nats_a_word=13.027988 information_nats_a_word=1.005780
+  G64_LINE rt16 FIELD_MEAN lap=0 states=1535 entries=63606 moved=61441 square=91521954399234
+  G64_LINE rt16 FIELD_LAP lap=0 read=67 sites=16605376 before=3.233 after=- deposited=1535/1535 halvings=0 next_halved=0 next_refused=0 ms=874474
+  G64_LINE rt16 FIELD_JOINT_NATS lap=0 places=43470 words=5785 own_nats_a_place=1.737425 foil_nats_a_place=1.874460 information_nats_a_place=0.137035 own_nats_a_word=13.055467 information_nats_a_word=1.029717
+  G64_FILES rt16 STATE.0=2f7fe874630595bc MEAN.0=a400e81f7a0862c8
+  G64_TWENTIETHS_N twice the paired excess of N (7/8 external - predicted), plain mean a twentieth: +39505.9 +34658.1 +32018.5 +28686.6 +52779.1 +26997.8 +25259.2 +22178.0 +26954.4 +28232.7 +27535.5 +25535.8 +27644.7 +27132.9 +24743.2 +27283.4 +27304.9 +29071.1 +27466.5 +27228.9
+## pair hot1_16 against rt16
+G63D_PAIR hot1_16/rt16 sections=1535
+  G63D_LAP hot1_16 sections=1535 before=3.295546 predicted=-9150.429 external=684.093 external_n=1535 N=9749.010
+  G63D_LAP rt16 sections=1535 before=3.286165 predicted=-4632.164 external=163.252 external_n=1535 N=4775.009
+  G63D_PAIRED before_d=+0.009380 se=0.000179 n=1535 predicted_d=-4518.265 se=198.370 n=1535 external_d=+520.840 se=42.291 n=1535 twice_N_excess=+9948.001 se=391.507 n=1535
+  G63D_BEFORE first_blocks_of_8 +0.001944 +0.003642 +0.004393 +0.007989 twentieth_1 +0.006850 twentieth_20 +0.007502 slope_3_20 -0.005171 se 0.000689 (bits a lap)
+  G64_TWENTIETHS d=before(A)-before(B) site-weighted: +0.006850 +0.009807 +0.008931 +0.008534 +0.021618 +0.011344 +0.011061 +0.007490 +0.008338 +0.009291 +0.009293 +0.009361 +0.008433 +0.008832 +0.009649 +0.008341 +0.008696 +0.008693 +0.008521 +0.007502
+  G64_TWENTIETHS_2_3 positions 77..230 sections=154 before_d=+0.009149 se=0.000421 weighted=+0.009350 twice_N_excess=+10895.536 se=511.898
+  G64_LINE hot1_16 FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.733768 foil_nats_a_place=1.867618 information_nats_a_place=0.133849 own_nats_a_word=13.027988 information_nats_a_word=1.005780
+  G64_LINE hot1_16 FIELD_MEAN lap=0 states=1535 entries=63606 moved=61466 square=286272112519863
+  G64_LINE hot1_16 FIELD_LAP lap=0 read=67 sites=16605376 before=3.243 after=- deposited=1535/1535 halvings=0 next_halved=0 next_refused=0 ms=873268
+  G64_LINE hot1_16 FIELD_JOINT_NATS lap=0 places=43470 words=5785 own_nats_a_place=1.752473 foil_nats_a_place=1.892187 information_nats_a_place=0.139714 own_nats_a_word=13.168542 information_nats_a_word=1.049847
+  G64_FILES hot1_16 STATE.0=a0779a3971c84a49 MEAN.0=ab65f807121c0e3d
+  G64_LINE rt16 FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.733768 foil_nats_a_place=1.867618 information_nats_a_place=0.133849 own_nats_a_word=13.027988 information_nats_a_word=1.005780
+  G64_LINE rt16 FIELD_MEAN lap=0 states=1535 entries=63606 moved=61441 square=91521954399234
+  G64_LINE rt16 FIELD_LAP lap=0 read=67 sites=16605376 before=3.233 after=- deposited=1535/1535 halvings=0 next_halved=0 next_refused=0 ms=874474
+  G64_LINE rt16 FIELD_JOINT_NATS lap=0 places=43470 words=5785 own_nats_a_place=1.737425 foil_nats_a_place=1.874460 information_nats_a_place=0.137035 own_nats_a_word=13.055467 information_nats_a_word=1.029717
+  G64_FILES rt16 STATE.0=2f7fe874630595bc MEAN.0=a400e81f7a0862c8
+  G64_TWENTIETHS_N twice the paired excess of N (7/8 external - predicted), plain mean a twentieth: +11448.2 +11326.2 +10464.9 +9506.7 +16845.6 +10260.6 +9215.9 +7618.6 +8785.2 +9224.9 +9123.7 +9687.7 +8891.8 +9513.1 +9101.4 +9671.5 +9394.0 +10194.8 +9520.3 +9238.0
+## pair hot2_17 against rt17
+G63D_PAIR hot2_17/rt17 sections=1535
+  G63D_LAP hot2_17 sections=1535 before=3.306782 predicted=-17178.066 external=1693.695 external_n=1535 N=18660.050
+  G63D_LAP rt17 sections=1535 before=3.279793 predicted=-4744.442 external=200.454 external_n=1535 N=4919.840
+  G63D_PAIRED before_d=+0.026989 se=0.000392 n=1535 predicted_d=-12433.624 se=514.225 n=1535 external_d=+1493.241 se=101.195 n=1535 twice_N_excess=+27480.420 se=1016.388 n=1535
+  G63D_BEFORE first_blocks_of_8 +0.031735 +0.027011 +0.029564 +0.019250 twentieth_1 +0.024833 twentieth_20 +0.026226 slope_3_20 -0.016164 se 0.001490 (bits a lap)
+  G64_TWENTIETHS d=before(A)-before(B) site-weighted: +0.024833 +0.023032 +0.034538 +0.034037 +0.028333 +0.041898 +0.041286 +0.028972 +0.026259 +0.024515 +0.026980 +0.024382 +0.023596 +0.022537 +0.022972 +0.024949 +0.023209 +0.022956 +0.024221 +0.026226
+  G64_TWENTIETHS_2_3 positions 77..230 sections=154 before_d=+0.027591 se=0.000949 weighted=+0.029131 twice_N_excess=+30559.412 se=3490.907
+  G64_LINE hot2_17 FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.773298 foil_nats_a_place=1.911968 information_nats_a_place=0.138671 own_nats_a_word=13.325023 information_nats_a_word=1.042008
+  G64_LINE hot2_17 FIELD_MEAN lap=0 states=1535 entries=63606 moved=61289 square=964199302274253
+  G64_LINE hot2_17 FIELD_LAP lap=0 read=68 sites=16500977 before=3.255 after=- deposited=1535/1535 halvings=0 next_halved=0 next_refused=0 ms=986387
+  G64_LINE hot2_17 FIELD_JOINT_NATS lap=0 places=43470 words=5785 own_nats_a_place=1.749088 foil_nats_a_place=1.880397 information_nats_a_place=0.131309 own_nats_a_word=13.143106 information_nats_a_word=0.986690
+  G64_FILES hot2_17 STATE.0=e2b2c022713537a2 MEAN.0=0e9846b1fc814037
+  G64_LINE rt17 FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.737425 foil_nats_a_place=1.874460 information_nats_a_place=0.137035 own_nats_a_word=13.055467 information_nats_a_word=1.029717
+  G64_LINE rt17 FIELD_MEAN lap=0 states=1535 entries=63606 moved=61259 square=90133614648102
+  G64_LINE rt17 FIELD_LAP lap=0 read=68 sites=16500977 before=3.227 after=- deposited=1535/1535 halvings=0 next_halved=0 next_refused=0 ms=897366
+  G64_LINE rt17 FIELD_JOINT_NATS lap=0 places=43470 words=5785 own_nats_a_place=1.733189 foil_nats_a_place=1.866533 information_nats_a_place=0.133344 own_nats_a_word=13.023636 information_nats_a_word=1.001978
+  G64_FILES rt17 STATE.0=b6117e5fabfb907f MEAN.0=f4d9eb1267d79fb7
+  G64_TWENTIETHS_N twice the paired excess of N (7/8 external - predicted), plain mean a twentieth: +26106.7 +31109.5 +30009.3 +35536.1 +26309.7 +45520.6 +24697.3 +22620.5 +24376.5 +24431.3 +25606.9 +25996.8 +23837.3 +23344.7 +25813.1 +27546.1 +24319.7 +28987.5 +26999.0 +26278.1
+## pair hot1_17 against rt17
+G63D_PAIR hot1_17/rt17 sections=1535
+  G63D_LAP hot1_17 sections=1535 before=3.288939 predicted=-9268.402 external=632.952 external_n=1535 N=9822.235
+  G63D_LAP rt17 sections=1535 before=3.279793 predicted=-4744.442 external=200.454 external_n=1535 N=4919.840
+  G63D_PAIRED before_d=+0.009145 se=0.000185 n=1535 predicted_d=-4523.960 se=207.104 n=1535 external_d=+432.498 se=40.633 n=1535 twice_N_excess=+9804.791 se=416.599 n=1535
+  G63D_BEFORE first_blocks_of_8 +0.009379 +0.010796 +0.010173 +0.005408 twentieth_1 +0.007829 twentieth_20 +0.009759 slope_3_20 -0.005427 se 0.000715 (bits a lap)
+  G64_TWENTIETHS d=before(A)-before(B) site-weighted: +0.007829 +0.007173 +0.010921 +0.010233 +0.008431 +0.016772 +0.015886 +0.009305 +0.009123 +0.008791 +0.009404 +0.008323 +0.007470 +0.007848 +0.007911 +0.008516 +0.007297 +0.006901 +0.008164 +0.009759
+  G64_TWENTIETHS_2_3 positions 77..230 sections=154 before_d=+0.008766 se=0.000422 weighted=+0.009160 twice_N_excess=+10369.162 se=890.711
+  G64_LINE hot1_17 FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.752473 foil_nats_a_place=1.892187 information_nats_a_place=0.139714 own_nats_a_word=13.168542 information_nats_a_word=1.049847
+  G64_LINE hot1_17 FIELD_MEAN lap=0 states=1535 entries=63606 moved=61280 square=289077837169255
+  G64_LINE hot1_17 FIELD_LAP lap=0 read=68 sites=16500977 before=3.236 after=- deposited=1535/1535 halvings=0 next_halved=0 next_refused=0 ms=1016746
+  G64_LINE hot1_17 FIELD_JOINT_NATS lap=0 places=43470 words=5785 own_nats_a_place=1.737622 foil_nats_a_place=1.869948 information_nats_a_place=0.132325 own_nats_a_word=13.056947 information_nats_a_word=0.994328
+  G64_FILES hot1_17 STATE.0=cbdeb8de7ca9d9b3 MEAN.0=85d9dba173d02e26
+  G64_LINE rt17 FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.737425 foil_nats_a_place=1.874460 information_nats_a_place=0.137035 own_nats_a_word=13.055467 information_nats_a_word=1.029717
+  G64_LINE rt17 FIELD_MEAN lap=0 states=1535 entries=63606 moved=61259 square=90133614648102
+  G64_LINE rt17 FIELD_LAP lap=0 read=68 sites=16500977 before=3.227 after=- deposited=1535/1535 halvings=0 next_halved=0 next_refused=0 ms=897366
+  G64_LINE rt17 FIELD_JOINT_NATS lap=0 places=43470 words=5785 own_nats_a_place=1.733189 foil_nats_a_place=1.866533 information_nats_a_place=0.133344 own_nats_a_word=13.023636 information_nats_a_word=1.001978
+  G64_FILES rt17 STATE.0=b6117e5fabfb907f MEAN.0=f4d9eb1267d79fb7
+  G64_TWENTIETHS_N twice the paired excess of N (7/8 external - predicted), plain mean a twentieth: +9537.8 +10365.4 +10373.0 +11618.3 +9404.0 +17903.2 +8217.9 +8098.7 +9069.2 +8926.3 +8720.0 +9280.9 +8554.2 +8590.6 +9172.5 +10033.0 +8656.0 +10232.7 +9620.1 +9672.9
+## walk positions with equal sites: hot2_16 and hot1_16 against rt16 1535 of 1535; hot2_17 and hot1_17 against rt17 1535 of 1535

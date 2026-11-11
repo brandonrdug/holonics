@@ -1,0 +1,8 @@
+# G78, J4: the host ruler cap_t.py (cf4dd2495, sha256 27c2b56569db6f87) at depth 3, a dispatched run, 2026-11-11 15:52:02 to 16:47:18 UTC on the PC's host.
+# nice -n 19 python3 -I cap_t.py 3 6 given SEED (SEED: the last eight bytes of the held reads' key file)
+# Projection before the read: depth 2's 201.0 s times depth 3's states over depth 2's (74185 / 6758) = 2206 s; deadline 1.5 times it, 3309 s.
+CHAIN depth=3 states=74185 answers=128 places=43470 longest=1147 length=given draws=the field's processes=6 built_s=2
+PROJECTION states=74185 projected_s=2206 deadline_s=3309 15:52:06
+J4_INCOMPLETE past the deadline of 3309 s
+# INCOMPLETE: the read passed its deadline and was stopped (its whole process group); it printed no CHAIN_STRATA and no CHAIN_JOINT. Not relaunched.
+# Resident sets read at 16:38:54 UTC (2811 s in): the main process 287188 KiB, the six workers 302380 to 467664 KiB, each at 99% of a core.

@@ -1,0 +1,13 @@
+# G78: the host ruler cap_t.py at e0af53de4 (sha256 f9881d457286c3ee), its left mode: the chain's left-to-right code on the places with at least n answer letters before them. Read 2026-11-11 15:58 to 15:59 UTC, niced 19, own draws.
+# python3 -I cap_t_left.py 1 left (wall_s=3.3 s, peak_rss_kib=522440)
+CHAIN depth=1 states=101 answers=128 places=43470 longest=1147 length=given draws=own processes=1 built_s=3
+CHAIN_LEFT depth=1 states=101 letters_before_at_least=0/1/2/3/4 nats_a_place=2.709884/2.714471/2.720169/2.725680/2.727726 places=43470/43342/43214/43087/42960
+# python3 -I cap_t_left.py 2 left (wall_s=5.8 s, peak_rss_kib=587680)
+CHAIN depth=2 states=6758 answers=128 places=43470 longest=1147 length=given draws=own processes=1 built_s=5
+CHAIN_LEFT depth=2 states=6758 letters_before_at_least=0/1/2/3/4 nats_a_place=1.981518/1.983826/1.988977/1.992698/1.994268 places=43470/43342/43214/43087/42960
+# python3 -I cap_t_left.py 3 left (wall_s=8.6 s, peak_rss_kib=663204)
+CHAIN depth=3 states=74185 answers=128 places=43470 longest=1147 length=given draws=own processes=1 built_s=8
+CHAIN_LEFT depth=3 states=74185 letters_before_at_least=0/1/2/3/4 nats_a_place=1.467117/1.467771/1.471288/1.475240/1.477572 places=43470/43342/43214/43087/42960
+# python3 -I cap_t_left.py 4 left (wall_s=16.4 s, peak_rss_kib=1920496)
+CHAIN depth=4 states=317662 answers=128 places=43470 longest=1147 length=given draws=own processes=1 built_s=16
+CHAIN_LEFT depth=4 states=317662 letters_before_at_least=0/1/2/3/4 nats_a_place=1.239279/1.239126/1.241850/1.245044/1.248463 places=43470/43342/43214/43087/42960

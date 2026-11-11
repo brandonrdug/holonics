@@ -1,0 +1,27 @@
+# G79, K4: the transmission read of rt16/MEAN.0 (a400e81f7a0862c8), open-0, held 0-31, transmission_open.sh with the lap-mean binary
+# (bin-lap-mean b8fe4ba838dd27a6, its only change), 2026-11-11 16:24:39 to 16:28:02 UTC; FIELD_TRANSMISSION lines whole, then the script's OPEN lines.
+FIELD_TRANSMISSION mode=open-left l=0 r=0 spacing=0 regions=8760 places=8760 out=0 code_nats_a_place=3.195863 ms=16714
+FIELD_TRANSMISSION mode=open-left l=1 r=0 spacing=0 regions=8728 places=8728 out=32 code_nats_a_place=2.624433 ms=32575
+FIELD_TRANSMISSION mode=open-left l=2 r=0 spacing=0 regions=8696 places=8696 out=64 code_nats_a_place=2.174649 ms=46747
+FIELD_TRANSMISSION mode=open-left l=3 r=0 spacing=0 regions=8664 places=8664 out=96 code_nats_a_place=1.992698 ms=60593
+FIELD_TRANSMISSION mode=open-left l=4 r=0 spacing=0 regions=8632 places=8632 out=128 code_nats_a_place=1.959286 ms=74792
+FIELD_TRANSMISSION mode=open-left l=8 r=0 spacing=0 regions=8504 places=8504 out=256 code_nats_a_place=1.915994 ms=88012
+FIELD_TRANSMISSION mode=open-both l=1 r=1 spacing=0 regions=8696 places=8696 out=64 code_nats_a_place=1.859708 ms=102953
+FIELD_TRANSMISSION mode=open-both l=2 r=2 spacing=0 regions=8632 places=8632 out=128 code_nats_a_place=1.193999 ms=118552
+FIELD_TRANSMISSION mode=open-both l=3 r=3 spacing=0 regions=8568 places=8568 out=192 code_nats_a_place=1.029030 ms=132664
+FIELD_TRANSMISSION mode=open-both l=4 r=4 spacing=0 regions=8504 places=8504 out=256 code_nats_a_place=0.988936 ms=146756
+FIELD_TRANSMISSION mode=open-split l=3 r=1 spacing=0 regions=8632 places=8632 out=128 code_nats_a_place=1.341738 ms=160903
+FIELD_TRANSMISSION mode=open-split l=1 r=3 spacing=0 regions=8632 places=8632 out=128 code_nats_a_place=1.388974 ms=175447
+FIELD_TRANSMISSION mode=open-split l=2 r=1 spacing=0 regions=8664 places=8664 out=96 code_nats_a_place=1.474488 ms=189779
+FIELD_TRANSMISSION mode=open-split l=1 r=2 spacing=0 regions=8664 places=8664 out=96 code_nats_a_place=1.490624 ms=202633
+FIELD_TRANSMISSION_DONE ms=202636
+MEASURE lap=transmission_open_rt16_mean rc=0 wall_s=203.3 peak_rss_kib=364228
+OPEN rt16_mean left d=0..4 field 3.196 2.624 2.175 1.993 1.959
+OPEN rt16_mean left d=0..4 text  3.481 2.710 1.898 1.423 1.224
+OPEN rt16_mean left (d-1 minus d) d=1..4 field 0.571 0.450 0.182 0.033
+OPEN rt16_mean left (d-1 minus d) d=1..4 text  0.71 0.73 0.51 0.23
+OPEN rt16_mean both d=1..4 field 1.860 1.194 1.029 0.989
+OPEN rt16_mean both d=1..4 text  1.564 0.569 0.419 0.397
+OPEN rt16_mean splits (3L,1R) (1L,3R) (2L,1R) (1L,2R) field 1.342 1.389 1.474 1.491
+OPEN rt16_mean splits text  0.690 0.714 0.923 0.938
+OPEN rt16_mean places a row (left d=0) 8760, regions 8760

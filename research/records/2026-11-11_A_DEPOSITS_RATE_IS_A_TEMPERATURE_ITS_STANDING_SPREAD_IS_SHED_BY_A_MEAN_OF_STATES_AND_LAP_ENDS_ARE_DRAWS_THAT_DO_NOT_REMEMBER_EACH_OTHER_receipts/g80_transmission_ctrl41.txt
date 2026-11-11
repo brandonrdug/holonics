@@ -1,0 +1,27 @@
+# G80, M2 (ii), ctrl41 (64c06fe8bb7477ce): the transmission read, open-0, held 0-31, transmission_open.sh with the lap-mean binary (b8fe4ba838dd27a6), 2026-11-11 UTC;
+# FIELD_TRANSMISSION lines whole, then the script's OPEN lines.
+FIELD_TRANSMISSION mode=open-left l=0 r=0 spacing=0 regions=8760 places=8760 out=0 code_nats_a_place=3.216480 ms=15915
+FIELD_TRANSMISSION mode=open-left l=1 r=0 spacing=0 regions=8728 places=8728 out=32 code_nats_a_place=2.676955 ms=29984
+FIELD_TRANSMISSION mode=open-left l=2 r=0 spacing=0 regions=8696 places=8696 out=64 code_nats_a_place=2.250986 ms=43793
+FIELD_TRANSMISSION mode=open-left l=3 r=0 spacing=0 regions=8664 places=8664 out=96 code_nats_a_place=2.088263 ms=56901
+FIELD_TRANSMISSION mode=open-left l=4 r=0 spacing=0 regions=8632 places=8632 out=128 code_nats_a_place=2.059643 ms=69973
+FIELD_TRANSMISSION mode=open-left l=8 r=0 spacing=0 regions=8504 places=8504 out=256 code_nats_a_place=2.026283 ms=82921
+FIELD_TRANSMISSION mode=open-both l=1 r=1 spacing=0 regions=8696 places=8696 out=64 code_nats_a_place=1.968042 ms=96482
+FIELD_TRANSMISSION mode=open-both l=2 r=2 spacing=0 regions=8632 places=8632 out=128 code_nats_a_place=1.345951 ms=111430
+FIELD_TRANSMISSION mode=open-both l=3 r=3 spacing=0 regions=8568 places=8568 out=192 code_nats_a_place=1.181056 ms=125551
+FIELD_TRANSMISSION mode=open-both l=4 r=4 spacing=0 regions=8504 places=8504 out=256 code_nats_a_place=1.137309 ms=139889
+FIELD_TRANSMISSION mode=open-split l=3 r=1 spacing=0 regions=8632 places=8632 out=128 code_nats_a_place=1.465024 ms=153180
+FIELD_TRANSMISSION mode=open-split l=1 r=3 spacing=0 regions=8632 places=8632 out=128 code_nats_a_place=1.533957 ms=167656
+FIELD_TRANSMISSION mode=open-split l=2 r=1 spacing=0 regions=8664 places=8664 out=96 code_nats_a_place=1.582438 ms=180823
+FIELD_TRANSMISSION mode=open-split l=1 r=2 spacing=0 regions=8664 places=8664 out=96 code_nats_a_place=1.641850 ms=194922
+FIELD_TRANSMISSION_DONE ms=194928
+MEASURE lap=transmission_open_ctrl41_lm rc=0 wall_s=195.6 peak_rss_kib=361664
+OPEN ctrl41_lm left d=0..4 field 3.216 2.677 2.251 2.088 2.060
+OPEN ctrl41_lm left d=0..4 text  3.481 2.710 1.898 1.423 1.224
+OPEN ctrl41_lm left (d-1 minus d) d=1..4 field 0.540 0.426 0.163 0.029
+OPEN ctrl41_lm left (d-1 minus d) d=1..4 text  0.71 0.73 0.51 0.23
+OPEN ctrl41_lm both d=1..4 field 1.968 1.346 1.181 1.137
+OPEN ctrl41_lm both d=1..4 text  1.564 0.569 0.419 0.397
+OPEN ctrl41_lm splits (3L,1R) (1L,3R) (2L,1R) (1L,2R) field 1.465 1.534 1.582 1.642
+OPEN ctrl41_lm splits text  0.690 0.714 0.923 0.938
+OPEN ctrl41_lm places a row (left d=0) 8760, regions 8760
