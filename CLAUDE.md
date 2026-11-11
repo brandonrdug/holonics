@@ -460,12 +460,16 @@ November 11. They are written here with their reasons so that no agent holds the
   end state says that it is one. Two lines, or two laps of one line, are compared at lap means.
   Reason: a deposit's rate holds a standing spread (a quarter of the step times the noise, atlas
   `deposition.rate-temperature-standing-spread`), and a lap's end state is one draw of it. On
-  November 11 lap ends at the old rate read 0.0055 to 0.0078 nats a place above their laps' means
-  and scattered 0.003 from lap to lap, where two laps' means stood 0.0008 apart; a lap with raised
-  rates read 0.0041 above its control at lap ends and 0.0009 under it at lap means; and a line's
-  lead read as closed at one lap's end where means of states held it at 0.0068. Scope: every
-  level, every comparison of lines and every score of a guess on a held read. A lap-end read stays
-  the state's own reading, and a build still enters a line by reproducing the line's lap-end lines
+  November 11 lap ends at the old rate read 0.0055 to 0.0107 nats a place above their laps' means
+  and scattered 0.003 from lap to lap, where successive laps' means fell smoothly, 0.0003 to 0.0033
+  a lap; a lap with raised rates read 0.0041 above its control at lap ends and 0.0009 under it at
+  lap means; and a line's lead read as closed at one lap's end where means of states held it at
+  0.0068. Scope: every level, every comparison of lines and every score of a guess on a held read.
+  A lap-end read stays the state's own reading, and a build still enters a line by reproducing the
+  line's lap-end lines. The release's stages are read on a lap's end state: there the mean stands
+  above its end at every stage, because the release settles by exchange and a sharper face decides
+  (G70, November 11; the reason is `agent-inferred`;
+  [the follow-up record](research/records/FOLLOWUP) §4).
   ([the record](research/records/2026-11-11_A_DEPOSITS_RATE_IS_A_TEMPERATURE_ITS_STANDING_SPREAD_IS_SHED_BY_A_MEAN_OF_STATES_AND_LAP_ENDS_ARE_DRAWS_THAT_DO_NOT_REMEMBER_EACH_OTHER.md)).
 
 [project-postulate] **GPU first, and the design fixes the workload** (Brandon, October 27;

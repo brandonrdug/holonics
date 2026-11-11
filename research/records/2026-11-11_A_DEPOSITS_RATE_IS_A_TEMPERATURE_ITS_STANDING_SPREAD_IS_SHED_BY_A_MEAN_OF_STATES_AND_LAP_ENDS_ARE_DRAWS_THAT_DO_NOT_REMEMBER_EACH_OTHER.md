@@ -168,6 +168,8 @@ Two laps from the rate line's twelfth state, both drawing lap 13's paths and mas
 
 **A raised rate on the second lane's maps buys a fall on a start two laps share.** Inside the lap the raised lap gains 0.0020 bits a lap on the floor's lap, the figure guessed from trend laps 2 and 3. The spread arrives as before (the excess by eights of sections from the start: 1.4, 6.8, 10.1, 9.4 thousandths of a bit).
 
+> **Withdrawn the same day** ([the follow-up record](FOLLOWUP) §2): the slope inside a raised lap is the raised parts' rent falling as their charts lengthen toward a rest length, and no fall of the level. At lap means the raised line led the old rate by 0.00086, 0.00032 and 0.00008 over three laps, and the pair ended.
+
 ### 5.3 A lap's mean sheds nearly the whole spread the held code sees (G65 (a), (b), (d), (f); scored 12:47 and 12:53 UTC)
 
 Held reads with a lap count of 0, by the build that wrote the states, after its control printed each lap's own line. Joints and information in nats a place, the opening in bits a byte:
@@ -189,6 +191,8 @@ Guessed: lap 12's mean 0.0022 to 0.0046 under its end (0.0034), MISSED at more t
 The raised lap's mean less the floor lap's mean: -0.000863 nats a place (guessed -0.0020 to +0.0008, -0.0005, under zero: HELD). At their lap ends the raised lap stood 0.004111 above. The raised parts' spread is shed whole by the mean, and what the lap bought is kept: half a lap of §5.2's slope is 0.0007 nats a site on the trained sections, and the held answers read 0.0009. The information a place is 0.0006 higher on the raised lap's mean and its opening 0.062 bits a byte lower; the context and unseen codes agree to 0.001.
 
 This is §2's closing sentence put to a read. It is one pair of laps on one walk: the size is one reading, and the sign rests on the pair sharing its walk and on §5.2's slope, 3.4 standard errors under zero. Whether the gain adds with a second raised lap is G68, fixed 13:07 UTC and unread when this record closed.
+
+> **Withdrawn the same day** ([the follow-up record](FOLLOWUP) §2): what the first raised lap bought was not kept as a lead. The old rate took it back within two laps (G68, G72), so "the fall is kept" does not stand; "the spread is rent" does.
 
 ### 5.5 Means of two lap ends, and the scan line's level (G65 (c), G67; scored 12:11 and 12:45 UTC)
 
@@ -223,6 +227,8 @@ Scores: the third and fourth letters MISSED; letters five to eight HELD at 0.040
 
 Circles 16 to 31 hold 2.1 times the gate of circles 0 to 15 at every lap; which contacts those are is unread in the source.
 
+> **Corrected the same day** ([the follow-up record](FOLLOWUP) §8): the product of gates is not the whole reason. The scan keeps one complex number a contact, `Q(t) = b(t) + γ(t) Q(t−1)`, and its gates are complex scalars, which commute, so `p(t+1) = a(t+1) Q(t)` is a weighted sum of pairs of sites, `a(t+1) b(t−k)`, and never a term in two earlier letters together. A joint law of three letters is out of its reach at any gate (agent-inferred, read from `Field` in `crates/holonics/src/hnn/tower/field.rs`). So the carry's founding is not the next loop's subject either.
+
 ### 5.7 The opening's draw is in the matrices (G66, scored 12:53 UTC)
 
 `tools/state_travel.py graft` writes a ruler's state: one state with some families of its material replaced by another's. Grafts of `rt5`'s families into `rt6` (the two lap ends whose openings stand furthest apart, 5.251122 and 5.767364 bits a byte), each read once; the controls printed their lap lines, and the five parts cover the material.
@@ -239,12 +245,12 @@ Guessed: the five shifts add to within 0.10 of the whole, HELD (-0.549171); the 
 
 ## 6. What is decided
 
-1. **A line's level, its opening code and its information are read at its lap's mean.** A lap end's read is that state's own and is one draw: at the floor it stands 0.0055 to 0.0078 nats a place above its lap's mean and scatters 0.003 from lap to lap, where two laps' means stand 0.0008 apart. The rate line's level at lap 12 is 1.7341 nats a place, where its lap end was quoted at 1.7420. Every held figure in the records of November 10 and 11 before this one is a lap end's. The guides carry the rule with this occasion.
-2. **A raised rate is rent on a read and no debt on the position** (§2, §5.4), on one pair of laps. The second raised lap beside a second floor lap is G68.
+1. **A line's level, its opening code and its information are read at its lap's mean.** A lap end's read is that state's own and is one draw: at the floor it stands 0.0055 to 0.0078 nats a place above its lap's mean and scatters 0.003 from lap to lap, where the means of successive laps fell smoothly, 0.0003 to 0.0033 a lap over laps 13 to 17 ("two laps' means stand 0.0008 apart" was one pair and is withdrawn, [the follow-up record](FOLLOWUP) §2). The rate line's level at lap 12 is 1.7341 nats a place, where its lap end was quoted at 1.7420. Every held figure in the records of November 10 and 11 before this one is a lap end's. The guides carry the rule with this occasion.
+2. **A raised rate is rent on a read and no debt on the position** (§2, §5.4), on one pair of laps. The second raised lap beside a second floor lap is G68. *Later the same day:* the rent stands, and the first lap's gain was not kept; the raised pair ended at its third lap ([the follow-up record](FOLLOWUP) §2).
 3. **The rate rule is rebuilt on means.** The lap cosine at lap ends is held down by the ends' draws (`c = (d² − s²)/(d² + 2s²)` for a lap's travel `d` and end draws of variance `s²` that do not remember each other), which is why the part rule walked every part to the floor. What the cosine reads on means is G69. `tools/part_rates.py trend` is corrected to means or retired once G69 is read.
 4. **The price of a raised rate is by part** (§5.2): 0.86 to 0.97 of `2N` on the second lane's maps, under it where a part's travel repeats. No card time is spent on the price by part, since the rule is rebuilt on means, where the price is shed.
-5. **The carry as built gives a term of three sites and no more** (§5.5, §5.6): 0.005 to 0.007 nats a place from its first lap, with laps of 1,305 to 1,450 s where the rate line's take 800 to 870 s. Its acceptance failed on the third and fourth letters. The next loop for that law is its founding: a gate founded at zero puts every longer unit behind a product of gates not yet open. Its rate is not the subject, and no further scan lap is run on the built founding.
-6. **The release is read from a lap's mean** if G70 holds (fixed 13:07 UTC): the settle, the re-draw and the reference's locked read on `rt13`'s mean beside its end state.
+5. **The carry as built gives a term of three sites and no more** (§5.5, §5.6): 0.005 to 0.007 nats a place from its first lap, with laps of 1,305 to 1,450 s where the rate line's take 800 to 870 s. Its acceptance failed on the third and fourth letters. ~~The next loop for that law is its founding: a gate founded at zero puts every longer unit behind a product of gates not yet open.~~ Its rate is not the subject, and no further scan lap is run on the built founding. *Corrected the same day* (§5.6's note, [the follow-up record](FOLLOWUP) §8): a one-state scan with commuting gates carries pairs of sites and no joint of three letters, so its founding is not the next subject; the local joint law is.
+6. **The release is read from a lap's mean** if G70 holds (fixed 13:07 UTC): the settle, the re-draw and the reference's locked read on `rt13`'s mean beside its end state. *G70 missed with the sign against* ([the follow-up record](FOLLOWUP) §4): the release's reads stay on a lap's end state.
 7. **Owed.** The lap lines print the held read of the lap's mean (the reading's consumer; it enters by reproducing a lap). The gate's read by class of site (word letters, separators), which G30' and G46 asked for and the build does not print. Lean (#410): the saving of a mean of `n` states, `Σ_{i<j} q_ij / (2n²)` on a quadratic code (§4), and §2 item 6's ratio of the standing spread to `d/(2n)` under the information equality; both are stated here with their hypotheses and neither is proved in the library.
 
 ## 7. Withdrawn
