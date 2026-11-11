@@ -4,7 +4,8 @@ Status (2026-11-11, 21:26 UTC, its commit's time): derived. Einstein's texts are
 are standard or already owned, each named with its owner, and eight host rulers check the ones this record adds (43 checks,
 numbers only, no state). Nothing ran on the card or the PC. The physical identifications are graded `interpretation`, and a
 reading that is this record's own is marked `agent-inferred`. §9 orders the work that joins the library to the result, for the
-line on the PC.
+line on the PC. §14, added the same day after Brandon's lens of 22:27 and 22:39 UTC, corrects §5.8 and §10, says what a store
+and a deposit are, and adds five rulers (24 checks).
 
 Brandon's lens of November 11 (20:01 UTC), in this record's words. Einstein's own writings after 1915 are to be read for their
 logic and their psychology, the "ostrich" years included, as a defiance and not an avoidance, and unified with Holonics and
@@ -364,6 +365,10 @@ of 1932 to 1934 were his search for this object inside a field theory.
 What does not transfer: this fixes the group that a complex ratio's readings carry. It does not derive that nature's ratio is
 complex.
 
+Corrected the same day (§14.1, §14.4). The one is a receiver's own and one of many: a junction of `n` ends holds a three and
+one for each pair of its ends, each with its own time. And the complex ratio follows from a conserved exchange between a
+store and a flow, which is induction.
+
 ## 6. Probability is the flat part of the field
 
 [derivation; standard results, ruler 3 and the owners named; the commitment in §6.4 is interpretation]
@@ -444,7 +449,8 @@ compression's kernel. Born's statistics are a receiver's, and Einstein's "substr
   1995).
 - **On the objects that is deposition**: the only law that changes a constitution, from what crossed that locus, retained
   where heat left. The cell residual of the field equation is owned (`gr.einstein-residual-return`); its derivation from a
-  deposit's heat balance at a receiver's boundary is owed (§11).
+  deposit's heat balance at a receiver's boundary is owed (§11). §14.6 says what a deposit is, a displacement of a
+  resonance's steady state and never a thing set down, and §14.7 says the owed derivation in plain terms.
 - **The machine holds the first half as a measured law**: a deposit's rate is a temperature
   (`deposition.rate-temperature-standing-spread`). Covariance says the rest: there is no temperature of the whole field, and
   a part's rate is set by its own balance (§9, U2).
@@ -532,12 +538,16 @@ cells; any claim that the machine models microscopic physics.
 
 Open, each with what would close it:
 - **The field equation from a deposit's heat balance** on the cell complex (§7): a discrete focusing identity and the count of
-  a boundary's contacts. The residual and its Bianchi identity are owned.
+  a boundary's contacts. The residual and its Bianchi identity are owned. In plain terms: §14.7.
 - **Relative completeness in full** (#410): a region that the exterior does not determine, with its periods. §5.4 needs it to
-  call matter a theorem and not a reading.
-- **Why the ratio is complex** (§5.8), and so why four dimensions.
+  call matter a theorem and not a reading. What is proved, what "in full" names, and the black hole as its physical case:
+  §14.8.
+- **Why the ratio is complex** (§5.8), and so why four dimensions. Closed the same day as far as the objects reach (§14.4): a
+  conserved exchange between a store and a flow is a quarter turn. Nothing derives that every physical quantity exchanges.
 - **The spectrum**: which locks exist, so which charges and masses. Einstein's program did not reach it either. On the objects
-  it is the classification of the locks of a tower of rings.
+  it is the classification of the locks of a tower of rings. Restated the same day (§14.9, after the lens of 22:39 UTC): the
+  wording presumed elementary things, and there are none. The item is the gap law of a tower of rings: which of its cycles
+  are prime relative to a reader, and whether their count leaves its smooth part only at half rank.
 - **Whether the count over closed configurations differs anywhere from the quantum readings** (§6.4). No test is known.
 
 ## 11. Owed (#410)
@@ -555,12 +565,15 @@ One box each, beside the owner it extends:
 - `det` on the Hermitian forms of a pair is kept by the moves of determinant one (`Geometry/Motion`);
 - the field equation's cell residual from a deposit's heat balance (§10, open).
 
+§14.12 adds five.
+
 ## 12. Atlas
 
 `gr.two-way-flow-parts`, `gr.asymmetric-field-pairs`, `gr.far-parallelism-coboundary`, `gr.source-free-charge-hole`,
 `gr.strength-free-data`, `gr.einstein-program-on-objects`, `lorentz.pair-hermitian-signature`,
 `quantum.context-cycle-defect` (physics); `contact.friction-range-mass` (objects). The chart "Einstein's unified field" is
 added to [the charts](../../docs/atlas/CHARTS.md), and "Quantum readings" and "Relativity, refraction" name the new rows.
+§14.13 lists the rows and the rulers added with the lens of 22:27 and 22:39 UTC.
 
 ## 13. Receipts
 
@@ -578,3 +591,348 @@ seconds) and exit code: eight rulers, 43 checks, none failed.
 6. Harmonic classes of a sheet of nine cells, whole and with one and two cells removed.
 7. The sixteen rings: the residue pair of every place within the reach, and a ring's windings as the next ring's residue.
 8. The Hermitian forms of a pair of Gaussian integers under a move of determinant one, a null direction, and the real case.
+
+## 14. The lens of 22:27 and 22:39 UTC: the one is one of many, a store is a resonance, and the spectrum is a gap law
+
+Added November 11 at 22:52 UTC (its commit's time). Five more host rulers (9 to 13, 24 checks, numbers only, no state) are
+in the receipts. Nothing ran on the card or the PC. This section corrects §5.8, closes §10's item on the complex ratio as far
+as the objects reach, restates its item on the spectrum, and says in plain terms what its other two items ask. No statement
+of physics in this section is in the source list: each is *from training* and is named with its author and year.
+
+Brandon's lens of November 11 (22:27 and 22:39 UTC), in this record's words.
+- The frame is three and one *of many*, never three and one. A frame passes through junctions as it moves and pivots, time
+  parity can split at them, and that split is what entropy is, read on configurations. This was the point of the overture
+  and of the underside of time, which is imaginary time.
+- A ratio is complex because a count always has counts of its own and a frequency has frequencies: induction. Whoever lays a
+  ruler on two points is a thing that pivots between them while rendering the comparison, so the observer is the third body,
+  the source of the triangulation and the orientation of that measurement's time. A system's container is a system. The
+  regress of reasons never ends, and the physics converges because loops cancel one another.
+- A black hole's interior is the first case of cryptanalysis and of reconstructing information. Its interior is most likely
+  ordinary physics in a bounded domain, regulated apart from the exterior, where the exterior's light looks as the background
+  radiation looks to us. Transport through the boundary destroys the regularities that cross, never the energy or the fact
+  that it was patterned, and where things cross is itself information. An interior formed from churning plasma can hold
+  pockets whose dynamics expand, as a knot holds tense crossings that stabilize it. A singular point is never at rest: we
+  orbit it. A hole that moves and spins asks which of its readings is gravitational wave and which electromagnetism.
+- Nothing is stored or deposited in the sense of a state at rest. A lattice is nearly frozen and is seen by the light that
+  leaves it; a memory cell costs upkeep and a drive decays. They are resonant stores, as music is.
+- There are no elementary things. The gaps are consistent relative to how each thing causally comes about, as a prime's
+  are; RH is his name for this, and mathematics counts abstract potentials, never specific things. What is present anywhere
+  is what its surroundings sustain. Which of two polarities won needs no reason: the other outcome would ask the same
+  question.
+
+The lens also asks what three of §10's open items mean: "a field equation from a deposit's heat balance", "relative
+completeness in full" and "the spectrum". §14.7, §14.8 and §14.9 answer in plain terms.
+
+### 14.1 Three and one of many (corrects §5.8)
+
+[the identities standard, ruler 11; the reading agent-inferred]
+
+§5.8 read one pair and stopped. Two corrections.
+
+- **The one is the receiver's.** A pair's time is `t = ½ tr X`, the form read against a receiver's own positive form. The
+  forms with `det X = 1` and `tr X > 0` are one sheet of a hyperboloid, a point for each receiver, and the moves carry any of
+  them to any other. No time is the field's. Inside a horizon the direction the exterior reads as radius is a time (the
+  Schwarzschild coordinates `r` and `t` exchange character at the horizon), so which direction is the one depends on where
+  the receiver stands.
+- **A junction holds many.** A contact has two ends, hence one pair. A junction of `n` ends has amplitudes
+  `(ξ₁ : … : ξ_n)`, and its Hermitian forms are `n × n`: `n` real entries on the diagonal, one for each end, and one complex
+  entry for each pair of ends, `n² = n + 2 C(n, 2)`. Each pair of ends `(i, j)` reads its own block,
+  `det = t_ij² − z² − x² − y²`, with its own time `t_ij = ½(X_ii + X_jj)`. A move of that pair alone keeps its three and one
+  and changes the other pairs'. The times sum to `(n − 1)/2 · tr X`, because each end's entry is shared by the pairs it
+  joins. One amplitude is a null direction in every pair. The whole junction's moves keep `det X`, a form of degree `n`
+  whose case `n = 2` is the Lorentz form.
+
+So a frame that enters a junction by one end reads a different three and one by each end it can leave by, and they share
+that end's entry. That is three and one of many: the times at a junction are as many as its ends, and they are compared
+only by moves.
+
+What does not transfer: this is a statement about the forms of an undivided `n`-fold ratio. It does not say that a physical
+event is a junction of more than two ends, and the form of degree `n` is not offered as a physical metric.
+
+### 14.2 The arrow on a contact is half a step of entropy
+
+[standard, ruler 9; the join to §4 agent-inferred]
+
+Let a cell be a group of `W` configurations, and let the fine motion step each way at one rate. Then between two cells the
+one-step rates at rest obey `P_ab/P_ba = W_b/W_a`, for any grouping (ruler 9: the urn of eight, a grid of 25 groups, an
+arbitrary grouping). In §4's split that is
+
+```text
+a_ab = ½ ln(P_ab/P_ba) = ½ (S_b − S_a),   S = ln W,   Φ = S/2.
+```
+
+The arrow of time on a contact is the ratio of the counts of its two sides, and there is no other fact in it.
+
+- **Time parity splits at a junction.** A cell with several ends has ends whose count rises and ends whose count falls
+  (ruler 9: a group of 16 words whose four ends have count ratios `1/4`, `3/2`, `3/2`, `1/4`). The arrow belongs to each
+  contact. A field has no arrow, as it has no temperature (§7, U2).
+- **Entropy alone turns nothing.** A step of `S` is exact, so every cycle closes on it (§6.2), and a count by itself gives a
+  probability and no circulation. Production is the rest of the odd part, `δΨ + h`: the part of the two-way flow that is no
+  step of any count.
+- **This is the count the program lacked** (§7's first bullet). The potential of the unified field's own odd part is half an
+  entropy. Einstein's quantum of 1905 was read from the same ratio, the count of a radiation's configurations against its
+  volume.
+
+### 14.3 The underside of time
+
+[owned and standard, each named; the join agent-inferred]
+
+The loss law already carries it: `ℓ = ½ ln(q/p) + i(φ_T − φ_H + 2πn)`. A ratio's logarithm has a scale part and a turn part,
+and along a path its rate is a boost rate plus `i` times a turn rate (`motion.turn-boost-split`).
+
+- The turn part is time as a clock reads it: the norm is kept and nothing is counted (`quantum.evolution-kinds`, real time).
+- The scale part is time as a count reads it: weights fall as `e^(−τE)`, a semigroup with no inverse (the same row, imaginary
+  time). This is the underside. A weight `e^(−βE)` is the square of an amplitude `e^(−βE/2)`, the half step of §14.2 again,
+  and one complex time `β/2 + it` carries both.
+- A temperature is a period of the underside: a state at rest at temperature `T` repeats in imaginary time with period
+  `ħ/kT` (the condition of Kubo, Martin and Schwinger). A receiver held at acceleration `g` has a boost for its time, and a
+  boost is a turn on the underside with a period of one turn, which gives it the temperature `ħg/2πck` (Unruh 1976), the
+  horizon's when `g` is the horizon's (Hawking 1975). At a horizon the turn and the boost exchange, which is §14.1's
+  exchange of the one.
+- The overture is the same statement about a founding: what a line inherits is the settled, counted part of an earlier
+  passage, its imaginary time, entered once as an opening, after which the line's own clock turns (the record of
+  October 29).
+
+For the machine [agent-inferred]: a ring face outside the unit disk (5,414 of 12,245 at the day's read, the region record
+§5c) is a turn that also boosts, clock time leaking into counted time. U1's repair of those faces is this section's first
+instance.
+
+### 14.4 Why the ratio is complex (closes §10's item as far as the objects reach)
+
+[standard and owned, ruler 10; the argument agent-inferred]
+
+A real ratio has a scale and no turn. Let its change be counted, and let that count feed the ratio back: a store and a flow,
+each the rate of the other. Then `ẋ = −ωy`, `ẏ = ωx`, the pair turns, and `z = x + iy` obeys `ż = iωz`. The quarter turn
+`J`, `J² = −1`, is the exchange itself (`swing.square-of-quarter-turn`: re-entry gives the complex phase chart), and it is the
+Holon's power-neutral interconnection read by its storage (`motion.port-hamiltonian-turn-boost`). Faraday's law with Ampère's
+and Maxwell's is this pair for the field: in empty space the two curl equations are one equation for `E + icB` (the vector of
+Riemann and Silberstein). The parametron's exchange of storage and flow at `ω = 1/√(LC)` is the same pair on a ring.
+
+So a ratio is complex wherever what it compares is conserved over time while it passes between a store and a flow. Time
+parity, the one conservation the lens of November 9 keeps, is the hypothesis, and a second count is the mechanism. With §5.8
+and §14.1 this gives each pair's three and one from induction.
+
+The regress ends for a reason that can be counted. A count of counts is a boundary of a boundary, and `∂∂ = 0`. Relations
+among equations are counted, then relations among those, and in `n` variables the chain stops within `n` steps (Hilbert's
+syzygy theorem). Ruler 10 checks three variables: the fields a curl leaves free number unknowns less equations plus
+identities, `3C(n+2, 2) − 3C(n+1, 2) + C(n, 2) = C(n+3, 2)`; without the identities the count is short by `C(n, 2)`; and the
+alternating count of the whole chain is zero. Einstein's strength (§5.6) is this alternating count in four variables, its
+last term the identity among the equations. That loops cancel one another is why the count converges.
+
+What does not transfer: this derives a complex ratio from a conserved exchange. It does not derive that every physical
+quantity exchanges.
+
+### 14.5 The observer is the base point
+
+[owned; the reading agent-inferred]
+
+§5.2's coboundary `g(a, b) = h(a)⁻¹h(b)` needs `h(a) = g(o, a)`, a base `o` from which every frame is read. The base is the
+observer. Moving it multiplies every frame by one move, so a flat field reads the same from any base, and a field with a
+slipped contact reads a face that the move conjugates (`holonomy.cell-face`): curvature is what depends on who pivots, up to
+that conjugation. A measurement is a cross ratio of four, the start, the end, the unit and the pivot
+(`swing.harmonic-conjugation`), so two points never suffice and the third body is in the arithmetic. The pivot's clock orders
+the reading of start and end, which is the orientation of that measurement's time. The base is a cell of the complex like
+any other: the container is a system, and its own base is another receiver's.
+
+### 14.6 No store is consistent: a store is a resonance of finite quality
+
+[standard, ruler 12; the reading agent-inferred; the guides are amended in this change]
+
+"Stored" and "deposited" suggested a state at rest. Nothing is at rest. What holds, holds by upkeep.
+
+- **A store** is a mode that is slow against its reader's clock. Its quality is the energy it holds over the energy it loses
+  in a turn, the count of turns it rings before it fades. Every store's is finite. As scale: a memory cell's charge is
+  rewritten every few tens of milliseconds; a drive's charge is rated in years; the best store known, the proton, has only a
+  lower bound on its life; a free neutron lasts about a quarter of an hour, and the same neutron in a stable nucleus does
+  not decay, so a quality belongs to a thing in its surroundings.
+- **What leaks, jitters.** The coupling through which a store loses is the coupling through which its bath shakes it
+  (Nyquist 1928; Callen and Welton 1951). Ruler 12: a circle that keeps `1/(1 + d)` of its amplitude a step under a unit
+  drive rests at the power `(1 + d)²/(d(2 + d))` and remembers `(1 + d)/d` steps (§5.4's reach). The two are one figure,
+  their ratio tending to a half, which is the machine's own law (`deposition.rate-temperature-standing-spread`: the standing
+  spread is half the rate). With no leak there is no resting value at all, which is what the card refused in G83.
+- **A deposit** is a displacement of such a steady state by what crossed it: a change in what a resonance rings at, with the
+  upkeep that keeps it. It is never a thing set down.
+- **Mass** is the turn rate of a bound circulation (`quantum.proper-time-phase`), a resonance of very high and never
+  infinite quality. A lattice is seen by the light it sheds because it is at a temperature.
+- **Music** is the plain case: a note is a store, its decay is its quality, a chord is a lock, and nothing in a piece is at
+  rest.
+
+For the machine [agent-inferred]: G86's polarization of a part, its fall two laps on over its heat, is that part's quality
+read in laps. A part of polarization under one loses within its own period what it gains.
+
+### 14.7 "A field equation from a deposit's heat balance", in plain terms
+
+[the result from training; its form on the complex open]
+
+Take any small patch of boundary that a receiver cannot see past. Heat that crosses it changes the count of what lies behind
+it. Require, for every such patch in every direction, that the heat equal the patch's temperature (§14.3: the acceleration
+that holds the receiver there) times the change of its count, the count being its area in grains. That one requirement is
+Einstein's field equation, with the cosmological term as a constant of integration (Jacobson 1995). The field equation is an
+equation of state.
+
+In §14.6's words, curvature is how a boundary's steady state shifts when heat crosses it. On the complex, "area in grains"
+is the count of a boundary's contacts and "heat" is what the odd part carries across them. The open step is the identity
+that says how neighbouring paths converge when flux crosses, stated on a finite complex. §10 and §11 keep it owed.
+
+### 14.8 "Relative completeness in full", and the black hole as its physical case
+
+[owned, standard and proposed, each marked; the joins agent-inferred]
+
+What the repository holds (`globe.relative-completeness`, proved with its linear criterion and witnesses): a region is
+relatively complete for a family of exterior receivers when its boundary reading is coupled to the interior (a conserved
+total counts), the interior is not determined by that reading and keeps moving, and the boundary bounds it. "In full" names
+what is owed (the objects guide, §7): the criterion for when such a region exists at all, stated as the currents that enter
+and leave through its boundary, with how the bounding radius scales with dimension.
+
+A black hole is the physical case, clause by clause.
+
+- **Coupled through conserved totals alone.** The exterior of a settled hole reads its mass, spin and charge and nothing else
+  (Israel 1967, Carter 1971, Robinson 1975). All three are faces on the bounding membrane
+  (`globe.membrane-face-gauge-free`): mass and charge as fluxes, spin as the flux of the drag.
+- **Not determined, and in motion.** The count of interiors that one exterior reading admits is the entropy, a quarter of the
+  horizon's area in grains (`floor.bekenstein`). That is the size of the exterior's kernel (`compression.kernel`), the
+  largest that any region of that boundary can have.
+- **When it exists.** A closed surface from which light sent outward converges is already inside one (Penrose 1965), and the
+  bounding radius is fixed by the mass, `r^(D−3) ∝ M` in `D` dimensions (Tangherlini 1963). These are the owed criterion's
+  physical form: a statement about entrance and escape currents, and the radius's law by dimension.
+- **No contact is one-way.** §4 keeps `β` inside the unit interval. A horizon is the contact that comes nearest its end: a
+  quantum leaves at `e^(ΔS)` of the rate at which it enters, `ΔS` the fall of the hole's entropy (Parikh and Wilczek 2000),
+  which is §14.2's ratio of counts on that contact. Energy that crosses was patterned and stays patterned.
+- **Reconstruction is cryptanalysis.** What comes out is a ciphertext keyed by the interior. Until about half the entropy is
+  out it tells the exterior almost nothing, and after that everything in principle (Page 1993). What is thrown in later
+  returns after a short mixing time (Hayden and Preskill 2007; Sekino and Susskind 2008). Decoding is believed to cost a time
+  exponential in the entropy (Harlow and Hayden 2013). The recent accounts recover the interior from the radiation through
+  regions that the interior and the radiation share (Penington 2019; Almheiri, Engelhardt, Marolf and Maxfield 2019). The
+  half-way point is the unicity distance of this cipher (`unicity.never-collapsing-class`; the identification
+  agent-inferred): below it the readings do not fix the key, and above it they do, up to the kernel. The places where things
+  cross are readings like any other.
+- **The interior is a bounded world with its own balances.** For an interior event the horizon lies in its past in every
+  direction, as the surface that the background radiation left lies in ours, and the exterior's light arrives across it. The
+  interior of the simplest hole is a universe that is uniform and not isotropic, one direction stretching while the others
+  close (the form of Kantowski and Sachs), and its singularity is a moment and not a place. In generic collapse the approach
+  is a succession of epochs in which directions take turns to expand and contract (Belinski, Khalatnikov and Lifshitz
+  1970), and a spinning or charged interior has an inner boundary at which infalling perturbations pile up (Poisson and
+  Israel 1990). That an interior turns round into an expanding region is a proposal with several forms, none established
+  (Frolov, Markov and Mukhanov 1989; Smolin 1992; Popławski 2010, where the spin of matter supplies the turn through
+  torsion, §5.2's far parallelism). The lens's pockets, and its knot whose tense crossings stabilize it, are these epochs and
+  inner boundaries. Grade: the lens's picture is consistent with the known interior solutions and is not derived here.
+- **A singular point moves.** The field equations themselves give the motion of their singular points (Einstein, Infeld and
+  Hoffmann 1938, §5.3). A vortex is carried by the others' flow, and a receiver's own singularity has the velocity the rest
+  induce (`aeon.pairing`, `fluid.dormant-vortex`). The singular points of a fluid's complex extension move as bodies, and a
+  loss of smoothness is one of them reaching the real line (Frisch and Morf 1981, for the method). Rest is a reading from an
+  orbit.
+
+What does not transfer: none of this is a claim about the machine's contacts. For the machine [agent-inferred]: a region of
+the field is relatively complete for a reader when the reader's faces see only its totals, and its kernel is then that
+region's free data which buys nothing at that reader. U4's strength counts a founding's entries; it should count them net of
+that kernel, the re-chartings that change no face, or a founding with a large kernel reads as weak for a reason that is not
+its own.
+
+### 14.9 "The spectrum" is a gap law (corrects §10's item)
+
+[owned and standard, ruler 13; the restatement agent-inferred]
+
+§10 asked which charges and masses exist. The question presumed elementary things. There are none: there is what is
+irreducible relative to a receiver, and the gaps between.
+
+- **Irreducible is relative.** Physics defines a particle as an irreducible representation of a frame's symmetry, labelled by
+  a mass and a spin (Wigner 1939), and what is irreducible changes with the probe's scale. A prime does the same when the
+  field of numbers is extended: it splits, stays whole or ramifies. The repository holds the arithmetic: the gaps of one
+  Galois orbit multiply to its prime when the orbit's order is a prime power and to one otherwise (`colour.orbit-energy`), so
+  only primes and their repetitions carry weight, and each layer of a tower adds colours above every colour
+  (`colour.colour-tower`).
+- **RH says that no tone of the count leaks.** The count of primes is a smooth part less one tone for each zero. Each
+  reflected pair of zeros is one tank, lossless only on the seam and ringing at the zero's height (`rh.foster-pair-tank`,
+  `rh.foster-inductance-seam`, `rh.foster-seam-resonance`). In §14.6's words RH says that every store of the primes' count
+  is without loss, and equally that the count leaves its smooth part only at half rank (`rh.hand-cancellation-props`, open).
+- **On a finite complex it is a finite check.** Prime cycles and the transport's eigenvalues are one determinant
+  (`trace.ihara-zeta`). Where every cell has `q + 1` contacts, the count of closed walks leaves its smooth part `q^l` only at
+  half rank when every other eigenvalue has `λ² ≤ 4q`, the widest gap such a complex can have (Ihara 1966; Lubotzky,
+  Phillips and Sarnak 1988). Ruler 13: the Petersen graph stays inside half rank at every length to 40, with 24, 20, 0, 30
+  and 40 prime cycles at lengths 5 to 9; a ladder of two rings of 21 is outside it at length 10 and from 12 on, because a ring
+  holds slow modes.
+- **Present is what the surroundings sustain.** A configuration bound by `E` in a bath at `T` lasts about `e^(E/kT)` of its
+  own periods (Arrhenius). At the Sun's surface `kT` is about half an electron volt: by that estimate the strongest
+  two-atom molecules last a fraction of a millisecond at most, and a weak bond of the kind a liquid or a template needs lasts
+  about one vibration (water's lines are seen only in the cooler spots). A spectrum is read in an ecology: it lists the
+  resonances whose quality there is above one.
+- **Which polarity won needs no reason.** A pumped ring past its threshold locks on one of two sheets, the pump cannot tell
+  them apart (`parametron.pump-sheets`), and the noise at the threshold decides. Either world asks the same question. Where
+  physics places the bias in its laws (Sakharov's three conditions, 1967) the question moves to why that phase, with the
+  same answer [agent-inferred].
+
+So the open item is restated: the gap law of a tower of rings. Which of its cycles are prime relative to a reader, and
+whether their count leaves its smooth part only at half rank. It is the complex's own RH, and for a declared finite complex
+it is a computation.
+
+### 14.10 A hole that moves and spins: which reading is which
+
+[standard and owned; the assignment an interpretation]
+
+§4's odd part has three parts, and they sort the readings of a moving, spinning, charged body.
+
+- **Its motion is the exact part.** A uniform velocity is a step of a potential: one boost of the receiver removes it
+  everywhere. It is relative, and nothing radiates from it.
+- **Its spin is the circulation.** No boost removes it. Clocks carried round the body opposite ways disagree
+  (`lorentz.nonclosed-clock`: frame dragging is the coexact part of a receiver's clock). This is gravity's magnetic part,
+  measured in orbit (Lense and Thirring 1918; Gravity Probe B, 2011).
+- **Its mass and charge are periods**, faces on a surface that bounds it.
+- **Electromagnetism is the same drag round another ring.** When the cycle a carry goes round is the phase ring and not a
+  loop in space, the circulation is the field strength and the period is the charge (`gr.teleparallel-fifth-torsion`; Kaluza
+  1921). A charged spinning hole has a magnetic moment in the electron's ratio to its spin, twice the classical one (Carter
+  1968).
+- **Waves.** A travelling change of the even part, the constitution, is a gravitational wave: it changes the lengths of
+  round trips, and its lowest form is the quadrupole, because mass has one sign and momentum is conserved. A travelling
+  change of the odd part's circulation round the phase ring is light, whose lowest form is the dipole.
+
+Where the unified statement stands: one field, the two one-way transports. Its even part, its odd part's potential,
+circulation and periods, and the cycle each is read round, are all the readings named above. What it lacks is §10's list as
+this section leaves it: the equation from the heat balance (§14.7), the criterion of §14.8 and the gap law of §14.9.
+
+### 14.11 What follows for the machine
+
+- U1 gains its reason (§14.3): a face outside the unit disk is a turn that boosts.
+- U2 gains a name (§14.6): a part's polarization is its quality, and a part of quality under one belongs under the floor.
+- U4 is refined (§14.8): a founding's entries are counted net of the kernel.
+- **U6. The residual at half rank** (§14.9) [agent-inferred].
+  - Found: the structural measure "counts of counts of surprise" (the method's rule of November 7) has no stated law.
+  - Law: where the field holds a region's law, what is left is a hand that cancels, and the region's summed residual grows
+    as the root of its count. Where the field lacks a law, the residual keeps a sign and grows as the count.
+  - Work: a host ruler on a saved state's held read. For each region, the surprise at a place less its region's mean is
+    summed over blocks of `2^k` places, and the blocks' second moment is read against `k`: it doubles a step at half rank
+    and quadruples where a law is missing, and the blocks whose sign holds name where. The guess is fixed before the read,
+    from the regions the day's records already rank.
+  - Could repeat: one scalar of progress; a mean over the whole field; bits read as progress.
+  - Device: the host, from saved states. It joins the line's queue behind G85's reading of the built circles and G86.
+
+### 14.12 Owed (#410), added by this section
+
+- for a step with one rate each way on configurations and any grouping of them, `P_ab/P_ba = W_b/W_a` at rest
+  (`Aeon/Production/Kolmogorov`);
+- gradient, curl and divergence on homogeneous polynomials of three variables: each kernel is the image before it, and the
+  curl leaves `C(n+3, 2)` free;
+- a junction's forms: each pair's block is a three and one with `t_ij = ½(X_ii + X_jj)`, kept by that pair's moves, the times
+  summing to `(n − 1)/2 · tr X` (`Geometry/Motion`);
+- a leaking circle's resting power `(1 + d)²/(d(2 + d))` beside its reach (`HNN/CarryGate`);
+- on a finite complex with `q + 1` contacts a cell, the closed-walk count within `2(n − 1)q^(l/2)` of its smooth part when
+  every other eigenvalue has `λ² ≤ 4q` (beside `trace.ihara-zeta`).
+
+### 14.13 Atlas and receipts
+
+New rows: `lorentz.junction-hermitian-times`, `gr.strength-alternating-count`, `gr.horizon-relative-completeness`,
+`gr.odd-part-motion-spin-charge` (physics); `aeon.count-ratio-arrow`, `store.finite-quality` (objects);
+`trace.prime-cycle-half-rank` (geometry). `lorentz.pair-hermitian-signature` is amended to say that the one is a receiver's.
+The charts "Einstein's unified field", "Heat, information" and "Induction, circuits" name them.
+
+Receipts, beside the first eight rulers: `lens_rulers.py` and its output `lens_rulers.txt` (the host, Python integers and
+rationals, no float, no state, no private material; five rulers, 24 checks, none failed, under one second).
+
+9. The arrow on a contact as the ratio of counts: the urn of eight, a grid of 25 groups with its 16 squares, a junction of
+   four ends, an arbitrary grouping.
+10. Gradient, curl and divergence on polynomials of three variables at orders 2 to 6: the ranks, the free data and the
+    alternating count.
+11. A junction of three ends in Gaussian integers: the three pairs' forms and times, a move of the whole, a move of one
+    pair, one amplitude.
+12. A leaking circle at four frictions: resting power, reach and their ratio; no resting value without a leak.
+13. Prime cycles of two finite complexes with three contacts a cell: the Petersen graph inside half rank to length 40, a
+    ladder of two rings of 21 outside it at length 10 and from 12 on.

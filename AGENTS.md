@@ -292,6 +292,18 @@ reason). The machine is made of stores, and a cache is refused.
   it, it leaks or emits by its own dynamics, it is reached by propagation, and what it holds is
   shared by every mode that couples to it. A capacitor's charge, a ring's winding, a resonator's
   amplitude, a contact's deposit and a constitution are stores.
+- **No store is at rest** (Brandon, November 11). A store holds by upkeep. It is a resonance whose
+  steady state stands while flux passes through it, and it relaxes and jitters through the one
+  coupling (atlas `store.finite-quality`; the machine's instance is
+  `deposition.rate-temperature-standing-spread`). Its quality, the energy it holds over the energy
+  it loses in a turn, is finite. "Stored" and "deposited" say that a mode is slow against its
+  reader's clock. They never say that a configuration is frozen at a place. A deposit is a
+  displacement of such a steady state by what crossed it. Reason: a mass, a lattice, a memory cell
+  and a drive are each in motion and each costs upkeep, and a word that privileges a state at rest
+  invites a design that treats a parameter as a fact set down, with no rate, no leak and no bath
+  ([the record](research/records/2026-11-11_EINSTEINS_FIELD_PROGRAM_ON_THE_COMPLEX_THE_UNIFIED_FIELD_IS_A_TWO_WAY_FLOW_A_GRAIN_GIVES_THE_MASS_AND_A_PROBABILITY_IS_ITS_FLAT_PART.md) §14.6).
+  Scope: the words in guides, records and briefs, and any design that reasons from them. The
+  objects (store, deposition, retention) keep their laws.
 - A **cache** is a table addressed by a content key or a named subject, with no dynamics of its own
   and no coupling between its entries. Its memory grows with the items seen, and a lookup stands in
   for propagation.
