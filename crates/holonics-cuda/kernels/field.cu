@@ -441,6 +441,10 @@ struct FieldWords {
     int64_t *pgam;
     int64_t *psr;
     int64_t *pqm;
+    // [definition; theory, November 11 04:14, step S] **The skin's exponent from site addresses**: `2π σ_x = q_x k + r_x`, `0 ≤ r_x < k`, `k = (n ln 2) << 24` of the
+    // slot, written once a (site, paced head, mode) in `field_paces` beside `σ`: `[p][l][t]` three words each, `q`, then `r`'s low and high 64 bits (`r < k` is held 128 bits wide
+    // from the start: `k` passes `INT64_MAX` at `n ≥ 739` and 64 unsigned bits at `n ≥ 1478`, and the pair's compare is made on 128 bits from `k` itself).
+    int64_t *saddr;
 };
 
 // [definition; agent-inferred, November 2] **A head's pace index** (§16, `Field::paces`): the heads that carry a moment
@@ -621,6 +625,36 @@ __device__ void turn_dev(const FieldWords &w, uint32_t slot, wide rho, wide *re,
 // (the host's `Field::skin`, `skin_of`): the resident decay at a whole distance within the reach, otherwise
 // `e^(−2π|s|/n)` read through the exponential's face, `release(below_one(−bits), 32)` with `bits = div_nearest(2π |s|,
 // (n ln 2) 2^24)` on `2^(−16)`.
+__device__ __forceinline__ wide skin_k(const FieldWords &w, uint32_t slot) {
+    const wide ln2 = (wide)(((uwide)w.ln2_hi << 64) | (uwide)w.ln2_lo);
+    return ((wide)w.ring_n[slot] * ln2) << PACE_BITS;
+}
+
+// [definition; theory, November 11 04:14, step S] **The skin across a variation from the two sites' addresses.** `div_nearest(2π |σ_i − σ_j|, k)` for the later site `a`
+// (the larger `σ`) and the other `b`, with `2π σ_x = q_x k + r_x`: `Q = q_a − q_b`, `R = r_a − r_b`; where `R < 0`, `Q −= 1` and `R += k` (the borrow: the carry law's
+// `winding_add`, Geometry/PhaseCarry); then `bits = Q + [R + ⌊k/2⌋ ≥ k]` (the rounding carry: `winding_add_right`). The same integer as the division, with none run in a pair.
+__device__ __forceinline__ wide skin_pair(const FieldWords &w, uint32_t slot, uint32_t l, int32_t p, uint64_t gi, uint64_t gj) {
+    const wide si = (wide)w.sigma[(uint64_t)p * w.T + gi], sj = (wide)w.sigma[(uint64_t)p * w.T + gj];
+    wide s = si - sj;
+    s = s < 0 ? -s : s;
+    if ((s & (((wide)1 << PACE_BITS) - 1)) == 0 && (uint64_t)(s >> PACE_BITS) < w.dreach) {
+        return (wide)w.decay[(uint64_t)slot * w.dreach + (uint64_t)(s >> PACE_BITS)];
+    }
+    const uint64_t base = ((uint64_t)p * w.n + l) * w.T;
+    const uint64_t a = 3 * (base + (si < sj ? gj : gi)), b = 3 * (base + (si < sj ? gi : gj));
+    const wide ra = (wide)(((uwide)(uint64_t)w.saddr[a + 2] << 64) | (uwide)(uint64_t)w.saddr[a + 1]);
+    const wide rb = (wide)(((uwide)(uint64_t)w.saddr[b + 2] << 64) | (uwide)(uint64_t)w.saddr[b + 1]);
+    wide Q = (wide)w.saddr[a] - (wide)w.saddr[b];
+    wide R = ra - rb;
+    const wide k = skin_k(w, slot);
+    if (R < 0) {
+        Q -= 1;
+        R += k;
+    }
+    const wide bits = Q + (R + (k >> 1) >= k ? 1 : 0);
+    return rel((wide)below_one_face(-bits, w.face, w.digits), UNIT_BITS - MOVE_BITS);
+}
+
 __device__ wide skin_dev(const FieldWords &w, uint32_t slot, wide s) {
     s = s < 0 ? -s : s;
     if ((s & (((wide)1 << PACE_BITS) - 1)) == 0 && (uint64_t)(s >> PACE_BITS) < w.dreach) {
@@ -646,7 +680,7 @@ __device__ __forceinline__ wide skin_ij(const FieldWords &w, uint32_t h, uint32_
     if (paced_at(w, h, gi)) {
         const int32_t p = paced_index(w, h);
         const uint32_t slot = l * (w.frames - w.still) + h % w.frames - w.still;
-        return skin_dev(w, slot, (wide)w.sigma[(uint64_t)p * w.T + gi] - (wide)w.sigma[(uint64_t)p * w.T + gj]);
+        return skin_pair(w, slot, l, p, gi, gj);
     }
     return decay_of(w, h, l, gap);
 }
@@ -3872,6 +3906,23 @@ extern "C" __global__ void field_paces(FieldWords w) {
             w.kappa[at] = fit64(k, w.status);
             w.tau[at] = fit64(clock, w.status);
             w.sigma[at] = fit64(variation, w.status);
+            // [theory, November 11 04:14, step S] The skin's address of this site for each mode: `2π σ = q k + r` (`σ ≥ 0`), once here, not once a pair.
+            {
+                const wide pi = (wide)(((uwide)w.pi_hi << 64) | (uwide)w.pi_lo);
+                const wide x = 2 * pi * variation;
+                const uint32_t hrel = paced_head(w, p) % w.frames - w.still;
+                for (uint32_t l = 0; l < w.n; l++) {
+                    const wide k = skin_k(w, l * (w.frames - w.still) + hrel);
+                    if (k <= 0) {
+                        continue;
+                    }
+                    const wide q = x / k, r = x - q * k;
+                    const uint64_t a = 3 * (((uint64_t)p * w.n + l) * w.T + g);
+                    w.saddr[a] = fit64(q, w.status);
+                    w.saddr[a + 1] = (int64_t)(uint64_t)((uwide)r);
+                    w.saddr[a + 2] = (int64_t)(uint64_t)((uwide)r >> 64);
+                }
+            }
         }
         w.plain[(uint64_t)p * w.R + r] = plain ? 1 : 0;
     }
@@ -3935,7 +3986,7 @@ __device__ __forceinline__ MomentGauss paced_phase(const FieldWords &w, const Pa
 
 // `e^(−2π|σ_t − σ_k|/n)` (`Law::between`, paced).
 __device__ __forceinline__ wide paced_between(const FieldWords &w, const PacedMode &pm, uint64_t gt, uint64_t gk) {
-    return skin_dev(w, pm.slot, (wide)w.sigma[(uint64_t)pm.p * w.T + gt] - (wide)w.sigma[(uint64_t)pm.p * w.T + gk]);
+    return skin_pair(w, pm.slot, pm.l, pm.p, gt, gk);
 }
 
 // The paced region's admission (`Law::new` with a pace): the forward's or the return's certificate with the faces'

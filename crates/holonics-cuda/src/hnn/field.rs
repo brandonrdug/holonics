@@ -240,6 +240,8 @@ struct Words {
     pgam: u64,
     psr: u64,
     pqm: u64,
+    // [theory, November 11 04:14, step S] The skin's site addresses `[p][l][t]` three words each (`FieldWords::saddr`), the clock's own beside `sigma`.
+    saddr: u64,
 }
 
 /// The moment kernels' words (`MomentWords` in `kernels/field_moment.cuh`, field for field): the batch's
@@ -345,6 +347,7 @@ struct CardClock<'c> {
     kappa: Pooled<'c, i64>,
     tau: Pooled<'c, i64>,
     sigma: Pooled<'c, i64>,
+    saddr: Pooled<'c, i64>,
     plain: Pooled<'c, u8>,
     pframe: Pooled<'c, i64>,
     moment: Pooled<'c, i64>,
@@ -359,14 +362,15 @@ struct CardClock<'c> {
 
 /// The words a tick reads its clocks through (§16.44): its own, or the pass's `base` (`kappa`, `tau`, `sigma`, `plain`,
 /// `pframe`, `moment`), with no blank rates.
-fn set_clock(w: &mut Words, clock: Option<&CardClock>, base: [u64; 6]) {
+fn set_clock(w: &mut Words, clock: Option<&CardClock>, base: [u64; 7]) {
     match clock {
         Some(c) => {
             (w.kappa, w.tau, w.sigma, w.plain, w.pframe, w.moment) = (c.kappa.device_ptr(), c.tau.device_ptr(), c.sigma.device_ptr(), c.plain.device_ptr(), c.pframe.device_ptr(), c.moment.device_ptr());
+            w.saddr = c.saddr.device_ptr();
             (w.blank_rate, w.blank_masses, w.blank_totals) = (c.rates.device_ptr(), c.masses.device_ptr(), c.totals.device_ptr());
         }
         None => {
-            [w.kappa, w.tau, w.sigma, w.plain, w.pframe, w.moment] = base;
+            [w.kappa, w.tau, w.sigma, w.plain, w.pframe, w.moment, w.saddr] = base;
             (w.blank_rate, w.blank_masses, w.blank_totals) = (0, 0, 0);
         }
     }
@@ -1607,11 +1611,13 @@ impl<'c> CardField<'c> {
         let kappa = self.timed(Kind::Alloc, || self.take::<i64>((paced * sites).max(1))).map_err(device)?;
         let tau = self.timed(Kind::Alloc, || self.take::<i64>((paced * sites).max(1))).map_err(device)?;
         let sigma = self.timed(Kind::Alloc, || self.take::<i64>((paced * sites).max(1))).map_err(device)?;
+        let saddr = self.timed(Kind::Alloc, || self.take::<i64>((3 * paced * n * sites).max(1))).map_err(device)?;
         let plain = self.timed(Kind::Alloc, || self.take::<u8>((paced * regions.len()).max(1))).map_err(device)?;
         let pframe = self.timed(Kind::Alloc, || self.take::<i64>((2 * paced * sites * n).max(1))).map_err(device)?;
         words.kappa = kappa.device_ptr();
         words.tau = tau.device_ptr();
         words.sigma = sigma.device_ptr();
+        words.saddr = saddr.device_ptr();
         words.plain = plain.device_ptr();
         words.pframe = pframe.device_ptr();
         let t64 = sites as u64;
@@ -1633,7 +1639,7 @@ impl<'c> CardField<'c> {
         self.mark("batch_setup");
         // [§16.44] The blanks run at the bare rate in the first tick, and each later tick at the faces the tick before
         // gave them (the host's `pass`).
-        let base_clock = [words.kappa, words.tau, words.sigma, words.plain, words.pframe, words.moment];
+        let base_clock = [words.kappa, words.tau, words.sigma, words.plain, words.pframe, words.moment, words.saddr];
         let blanks = paced > 0 && (0..sites).any(|t| unresolved[t] != 0 && st.mix_off[t] == st.mix_off[t + 1]);
         let mut clocks: Vec<Option<CardClock<'c>>> = vec![None];
         for k in 0..d.ticks {
@@ -2048,6 +2054,7 @@ impl<'c> CardField<'c> {
             kappa: alloc64(paced * sites)?,
             tau: alloc64(paced * sites)?,
             sigma: alloc64(paced * sites)?,
+            saddr: alloc64(3 * paced * n * sites)?,
             plain: self.timed(Kind::Alloc, || self.take::<u8>((paced * regions).max(1))).map_err(device)?,
             pframe: alloc64(2 * paced * sites * n)?,
             moment: self.timed(Kind::Alloc, || self.take_zeroed::<i64>((sites * m2).max(1))).map_err(device)?,
@@ -2062,7 +2069,7 @@ impl<'c> CardField<'c> {
         let mut rp = clock.rates.device_ptr();
         self.launch("field_blank_rates", Self::cells((paced * sites) as u64), THREADS, &mut [arg(words), arg(&mut rp)])?;
         words.unresolved = unresolved;
-        set_clock(words, Some(&clock), [0; 6]);
+        set_clock(words, Some(&clock), [0; 7]);
         self.launch("field_paces", Self::cells((paced * regions) as u64), THREADS, &mut [arg(words)])?;
         self.launch("field_pframes", Self::cells((paced * sites * n) as u64), THREADS, &mut [arg(words)])?;
         self.moments(field, words, regions, sites)?;
@@ -2301,7 +2308,7 @@ impl<'c> CardField<'c> {
     }
 
     #[allow(clippy::too_many_arguments)]
-    fn reverse(&self, field: &Field, words: &mut Words, ticks: &[Tick<'c>], (clocks, base_clock): (&[Option<CardClock<'c>>], [u64; 6]), g: &CardBuffer<'c, i128>, fread: &CardBuffer<'c, i32>, fscale: &CardBuffer<'c, i128>, lift: &CardBuffer<'c, i64>, masses: &CardBuffer<'c, u64>, totals: &CardBuffer<'c, i128>, classes: &[u32], unresolved: &[u8], site_pos: &[u32], mix_off: &[u32], mix_class: &[u32], mix_share: &[u32], site_weight: &[(u64, u64)], ported: &(Vec<u32>, Vec<i64>), sites: usize, pairs: usize, mut tower: Option<(&mut TowerRun<'c>, &TowerBatch<'c>)>) -> Result<()> {
+    fn reverse(&self, field: &Field, words: &mut Words, ticks: &[Tick<'c>], (clocks, base_clock): (&[Option<CardClock<'c>>], [u64; 7]), g: &CardBuffer<'c, i128>, fread: &CardBuffer<'c, i32>, fscale: &CardBuffer<'c, i128>, lift: &CardBuffer<'c, i64>, masses: &CardBuffer<'c, u64>, totals: &CardBuffer<'c, i128>, classes: &[u32], unresolved: &[u8], site_pos: &[u32], mix_off: &[u32], mix_class: &[u32], mix_share: &[u32], site_weight: &[(u64, u64)], ported: &(Vec<u32>, Vec<i64>), sites: usize, pairs: usize, mut tower: Option<(&mut TowerRun<'c>, &TowerBatch<'c>)>) -> Result<()> {
         let card = self.card;
         let d = field.declaration;
         let (dw, m, n, f, a, heads) = (d.width, d.complex(), d.modes, d.contacts, d.alphabet, d.heads);
@@ -2548,7 +2555,10 @@ pub fn read_octets(d: &FieldDeclaration, returning: bool, echo: bool, sites: usi
     // The moments: the pass's values `[t][2M]`, and a mode's strands, moments, prefix sums and admission
     // (112 octets a site), batched over the modes.
     let tm = d.moment_modes() as u64;
+    // [theory, November 11 04:14, step S] The skin's site addresses: three words a (paced head, mode, site) for the pass's clock and each kept tick's own.
+    let address_site = 24 * d.paced_heads() as u64 * d.modes as u64 * (ticks_kept + 1);
     let moment_site = if tm > 0 { 8 * m2 + 112 * tm } else { 0 };
+    let moment_site = moment_site + address_site;
     // The reverse adds its covectors, the values' sum over the ticks and the moments' return, and the
     // crowds' two difference arrays.
     let reverse_site = if returning { (if d.carry { 8 * f } else { 0 }) + 8 * m2 + 8 * a + 5 * 8 * dw + 3 * 8 * f + 8 * m2 + 8 * h * span + 2 * 8 * m2 + 16 * m2 + 2 * 16 * span + 112 * tm } else { 0 };
