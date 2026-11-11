@@ -1,0 +1,47 @@
+# The held reads, 2026-11-11 UTC, on the card, each its own hold (laps 0, bound 24 s; projection 12 s): mean_gN and end_gN, each g lap's
+# MEAN.0 and STATE.0, by the letter-rates binary (88bf7343806e4b78; card_p8 (c) shows its reads print bin-joint-strata's lines); mean_rt19 to
+# mean_rt21 by bin-joint-strata (4bd56aa83f564d66, G84's reads), mean_rt18 by the letter-rates binary (card_p8 (c)); end_rt18 to end_rt21, the line's lap ends, by the letter-rates binary for their
+# quarters. Rows: the held answer, the joint code (own and foil, nats a place over the held passage's 43,470 places), its quarters by open
+# share (each over its own places), the unseen code.
+## mean_g1
+FIELD_PART_RATES contacts_before=32 rate_bits=12 octaves w_new=0 a_new=0 b_new=0 enc_lane=3 before_lane=4 after_lane=4 q_lane=1 v_lane=1 probe_lane=2 out_lane=0 moment_face_lane=0 read_lane=0 face_biases_lane=0 a_lane=0 b_lane=0 carry=0 enc_first=1 before_first=4 after_first=4
+FIELD_HELD lap=-1 answer=5.548883 classes=43470 context=0.914928 context_classes=43470 foil=1.081737 question=0.166809 ms=3748
+FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.724267 foil_nats_a_place=1.857457 information_nats_a_place=0.133190 own_nats_a_word=12.956594 information_nats_a_word=1.000826
+FIELD_JOINT_STRATA lap=-1 open_quarters=1/2/3/4 own_nats_a_place=0.667630/1.266349/2.025143/2.928508 foil_nats_a_place=0.765888/1.406684/2.180848/3.066810 places=10818/10881/10853/10918 open_sites=5333/16153/26922/38725 terms_own=10925906397/20844742846/33249110933/48368653716 terms_foil=12533907419/23154741652/35805484635/50652913534
+FIELD_UNSEEN lap=-1 code=0.846 sites=43660 next=- ms=9823
+MEASURE lap=held_mean_g1 rc=0 wall_s=10.2 peak_rss_kib=876656
+## end_g1
+FIELD_PART_RATES contacts_before=32 rate_bits=12 octaves w_new=0 a_new=0 b_new=0 enc_lane=3 before_lane=4 after_lane=4 q_lane=1 v_lane=1 probe_lane=2 out_lane=0 moment_face_lane=0 read_lane=0 face_biases_lane=0 a_lane=0 b_lane=0 carry=0 enc_first=1 before_first=4 after_first=4
+FIELD_HELD lap=-1 answer=5.899498 classes=43470 context=0.923369 context_classes=43470 foil=1.090440 question=0.167071 ms=3679
+FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.732257 foil_nats_a_place=1.868644 information_nats_a_place=0.136387 own_nats_a_word=13.016630 information_nats_a_word=1.024846
+FIELD_JOINT_STRATA lap=-1 open_quarters=1/2/3/4 own_nats_a_place=0.665753/1.273787/2.035091/2.944877 foil_nats_a_place=0.764832/1.412913/2.192465/3.094638 places=10818/10881/10853/10918 open_sites=5333/16153/26922/38725 terms_own=10895179916/20967187948/33412430022/48639011868 terms_foil=12516636053/23257271933/35996215530/51112531626
+FIELD_UNSEEN lap=-1 code=0.857 sites=43660 next=- ms=9749
+MEASURE lap=held_end_g1 rc=0 wall_s=10.1 peak_rss_kib=834624
+## mean_rt18
+FIELD_PART_RATES contacts_before=32 rate_bits=12 octaves w_new=0 a_new=0 b_new=0 enc_lane=0 before_lane=0 after_lane=0 q_lane=0 v_lane=0 probe_lane=0 out_lane=0 moment_face_lane=0 read_lane=0 face_biases_lane=0 a_lane=0 b_lane=0 carry=0 enc_first=0 before_first=0 after_first=0
+FIELD_HELD lap=-1 answer=5.494087 classes=43470 context=0.918991 context_classes=43470 foil=1.085865 question=0.166874 ms=3282
+FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.724823 foil_nats_a_place=1.858689 information_nats_a_place=0.133866 own_nats_a_word=12.960772 information_nats_a_word=1.005902
+FIELD_JOINT_STRATA lap=-1 open_quarters=1/2/3/4 own_nats_a_place=0.666008/1.268640/2.025980/2.929213 foil_nats_a_place=0.766214/1.407255/2.182751/3.068928 places=10818/10881/10853/10918 open_sites=5333/16153/26922/38725 terms_own=10899359385/20882460081/33262853414/48380297948 terms_foil=12539255449/23164133712/35836739385/50687895401
+FIELD_UNSEEN lap=-1 code=0.851 sites=43660 next=- ms=8577
+MEASURE lap=held_eq_mean_rt18 rc=0 wall_s=8.9 peak_rss_kib=895280
+## mean_rt19
+FIELD_PART_RATES contacts_before=32 rate_bits=12 octaves w_new=0 a_new=0 b_new=0 enc_lane=0 before_lane=0 after_lane=0 q_lane=0 v_lane=0 probe_lane=0 out_lane=0 moment_face_lane=0 read_lane=0 face_biases_lane=0 a_lane=0 b_lane=0 g_chart=0
+FIELD_HELD lap=-1 answer=5.544979 classes=43470 context=0.917015 context_classes=43470 foil=1.083572 question=0.166558 ms=3621
+FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.725007 foil_nats_a_place=1.858998 information_nats_a_place=0.133991 own_nats_a_word=12.962152 information_nats_a_word=1.006842
+FIELD_JOINT_STRATA lap=-1 open_quarters=1/2/3/4 own_nats_a_place=0.667096/1.268232/2.026825/2.928434 foil_nats_a_place=0.766173/1.407739/2.182201/3.070264 places=10818/10881/10853/10918 open_sites=5333/16153/26922/38725 terms_own=10917168291/20875745023/33276712374/48367423537 terms_foil=12538572460/23172097007/35827699419/50709966841
+FIELD_UNSEEN lap=-1 code=0.848 sites=43660 next=- ms=9457
+MEASURE lap=held_mean_rt19 rc=0 wall_s=9.9 peak_rss_kib=840832
+## mean_rt20
+FIELD_PART_RATES contacts_before=32 rate_bits=12 octaves w_new=0 a_new=0 b_new=0 enc_lane=0 before_lane=0 after_lane=0 q_lane=0 v_lane=0 probe_lane=0 out_lane=0 moment_face_lane=0 read_lane=0 face_biases_lane=0 a_lane=0 b_lane=0 g_chart=0
+FIELD_HELD lap=-1 answer=5.542437 classes=43470 context=0.916390 context_classes=43470 foil=1.082362 question=0.165972 ms=3797
+FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.723131 foil_nats_a_place=1.857466 information_nats_a_place=0.134336 own_nats_a_word=12.948054 information_nats_a_word=1.009433
+FIELD_JOINT_STRATA lap=-1 open_quarters=1/2/3/4 own_nats_a_place=0.665667/1.267970/2.022982/2.926461 foil_nats_a_place=0.764235/1.405781/2.178170/3.072044 places=10818/10881/10853/10918 open_sites=5333/16153/26922/38725 terms_own=10893769656/20871439208/33213626251/48334834618 terms_foil=12506864123/23139876506/35761531746/50739354375
+FIELD_UNSEEN lap=-1 code=0.848 sites=43660 next=- ms=10092
+MEASURE lap=held_mean_rt20 rc=0 wall_s=10.5 peak_rss_kib=862852
+## mean_rt21
+FIELD_PART_RATES contacts_before=32 rate_bits=12 octaves w_new=0 a_new=0 b_new=0 enc_lane=0 before_lane=0 after_lane=0 q_lane=0 v_lane=0 probe_lane=0 out_lane=0 moment_face_lane=0 read_lane=0 face_biases_lane=0 a_lane=0 b_lane=0 g_chart=0
+FIELD_HELD lap=-1 answer=5.547793 classes=43470 context=0.914532 context_classes=43470 foil=1.081103 question=0.166571 ms=3526
+FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.722262 foil_nats_a_place=1.856552 information_nats_a_place=0.134290 own_nats_a_word=12.941525 information_nats_a_word=1.009088
+FIELD_JOINT_STRATA lap=-1 open_quarters=1/2/3/4 own_nats_a_place=0.664185/1.265700/2.022761/2.926952 foil_nats_a_place=0.764125/1.402861/2.178690/3.070904 places=10818/10881/10853/10918 open_sites=5333/16153/26922/38725 terms_own=10869516369/20834062229/33210002506/48342956941 terms_foil=12505053556/23091814061/35770069673/50720535097
+FIELD_UNSEEN lap=-1 code=0.846 sites=43660 next=- ms=9216
+MEASURE lap=held_mean_rt21 rc=0 wall_s=9.6 peak_rss_kib=835824

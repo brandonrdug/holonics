@@ -1,0 +1,26 @@
+# The polar law's decisions (tools/part_rates.py polar at 7464c528f, one host thread, in rationals), 2026-11-11 UTC: before each g lap, from the
+# four last lap means at the parts' own rates, sections 1,535 and sites 16,560,945 (the printed unit only, millionths of a bit a site): g1 from
+# rt15 to rt18's means onto rt18/STATE.0, g2 from rt16, rt17, rt18 and g1's onto g1/STATE.0, g3 from rt17, rt18, g1 and g2's onto g2/STATE.0.
+# Each line: a part, its entries, its heat at its own rates and at the base, its fall two laps on, pi = fall/heat, its octave before and after.
+## g1
+FIELD_PART_POLAR part=w_new entries=2048 heat=402.421 heat_base=402.421 fall2=18.588 pi=0.0461904 octave_was=0 octave=0
+FIELD_PART_POLAR part=a_new entries=2080 heat=342.064 heat_base=342.064 fall2=18.6953 pi=0.0546543 octave_was=0 octave=0
+FIELD_PART_POLAR part=b_new entries=2080 heat=395.704 heat_base=395.704 fall2=15.8059 pi=0.0399438 octave_was=0 octave=0
+FIELD_PART_POLAR part=enc_lane entries=3232 heat=64.0273 heat_base=64.0273 fall2=35.0404 pi=0.547273 octave_was=0 octave=3
+FIELD_PART_POLAR part=before_lane entries=3232 heat=44.1674 heat_base=44.1674 fall2=32.7423 pi=0.741322 octave_was=0 octave=4
+FIELD_PART_POLAR part=after_lane entries=3232 heat=44.1892 heat_base=44.1892 fall2=33.4807 pi=0.757667 octave_was=0 octave=4
+FIELD_PART_POLAR part=q_lane entries=2048 heat=302.293 heat_base=302.293 fall2=34.8224 pi=0.115194 octave_was=0 octave=1
+FIELD_PART_POLAR part=v_lane entries=2048 heat=328.604 heat_base=328.604 fall2=37.7417 pi=0.114855 octave_was=0 octave=1
+FIELD_PART_POLAR part=probe_lane entries=2048 heat=203.17 heat_base=203.17 fall2=36.5093 pi=0.179699 octave_was=0 octave=2
+FIELD_PART_POLAR part=out_lane entries=2048 heat=778.455 heat_base=778.455 fall2=9.19308 pi=0.0118094 octave_was=0 octave=0
+FIELD_PART_POLAR part=moment_face_lane entries=2048 heat=290.477 heat_base=290.477 fall2=17.5604 pi=0.0604538 octave_was=0 octave=0
+FIELD_PART_POLAR part=read_lane entries=3072 heat=1385.48 heat_base=1385.48 fall2=30.9146 pi=0.0223133 octave_was=0 octave=0
+FIELD_PART_POLAR part=face_biases_lane entries=128 heat=90.1092 heat_base=90.1092 fall2=2.47321 pi=0.0274468 octave_was=0 octave=0
+FIELD_PART_POLAR part=a_lane entries=1024 heat=525.077 heat_base=525.077 fall2=-15.1311 pi=-0.0288168 octave_was=0 octave=0
+FIELD_PART_POLAR part=b_lane entries=1024 heat=712.797 heat_base=712.797 fall2=1.33025 pi=0.00186624 octave_was=0 octave=0
+FIELD_PART_POLAR part=carry entries=0 heat=0 heat_base=0 fall2=0 pi=- octave_was=0 octave=0
+FIELD_PART_POLAR part=enc_first entries=3232 heat=159.906 heat_base=159.906 fall2=23.9992 pi=0.150083 octave_was=0 octave=1
+FIELD_PART_POLAR part=before_first entries=3232 heat=33.8028 heat_base=33.8028 fall2=42.6984 pi=1.26316 octave_was=0 octave=4
+FIELD_PART_POLAR part=after_first entries=3232 heat=33.085 heat_base=33.085 fall2=40.3762 pi=1.22038 octave_was=0 octave=4
+FIELD_PART_POLAR_FIELD pi_F=0.0622256 old_entries=22518 heat_old=4824.16 fall2_old=265.151 rate_bits=12 units=millionths of a bit a site
+METER polar_g1 rc=0 started=22:25:30Z ended=22:25:30Z wall_s=0.2 user_s=0.2 sys_s=0.0 peak_rss_kib=81028

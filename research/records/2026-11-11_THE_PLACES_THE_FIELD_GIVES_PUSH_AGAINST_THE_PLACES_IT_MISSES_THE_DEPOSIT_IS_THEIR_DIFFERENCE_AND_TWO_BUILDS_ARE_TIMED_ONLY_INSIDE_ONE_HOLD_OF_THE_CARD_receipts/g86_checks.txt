@@ -1,0 +1,140 @@
+# G86's gates, 2026-11-11 UTC. LR is HOLONICS_ROOT/.local/wt/letter-rates/.local/run, RUN HOLONICS_ROOT/.local/wt/qgchgu-sampler/.local/run/
+# 2026-11-10-contacts. On the host (22:13:05 to 22:20:35, no card): the workspace check, gate 1, the field's tests, the parts and travel tools'
+# controls and the release build, on the working tree committed as 7464c528f (binary 88bf7343806e4b78). On the card (RTX 4080 SUPER under
+# HOLONICS_ROOT/.local/gpu.lock): (b) the build from rt17/STATE.0 with the new parts at octave 0 and the law not run, lap bound 200,000 ms: every
+# section it read is rt18's, timings aside; (c) its held reads stand in for bin-joint-strata's: rt21/MEAN.0 prints mean_rt21's 42 lines; rt18/
+# MEAN.0 prints mean_rt18's 41 and the strata line, which the binary that read mean_rt18 did not print (the gate as first written compared
+# against that older read and stopped; the shared lines were checked by hand, 41 of 41 equal, and (d) ran on its own); (d) the polar law for
+# g1, its state checked, and the build's held read of it equal to rt18/STATE.0's (1.731382, 1.866629).
+## the host
+# host gates at c9f062785 (with the build's working tree) 22:13:05
+CHECK_EXIT 0 22:13:29
+GATE_EXIT 0 22:17:18
+gate check: ok (786 ms)
+gate guard-lints: ok (32207 ms)
+gate guard-doctests: ok (34741 ms)
+gate diagnostic-timing-controls: ok (41704 ms)
+gate diagnostic-supervisor-controls: ok (1294 ms)
+gate diagnostic-receipt-controls: ok (249 ms)
+gate trunk-census-controls: ok (6051 ms)
+gate travel-rank-controls: ok (231 ms)
+gate part-rate-controls: ok (100 ms)
+gate listener-continuation-controls: ok (53358 ms)
+gate projected-statistics-controls: ok (54739 ms)
+gate native-class-advance-controls: ok (101 ms)
+gate native-gram-carry-conservation: ok (48 ms)
+gate finite-solenoidal-controls: ok (62 ms)
+gate rational-place-controls: ok (46 ms)
+gate plural-coupling-controls: ok (224 ms)
+gate grouped-tube-controls: ok (108 ms)
+gate observed-tube-controls: ok (845 ms)
+gate source-refinement-controls: ok (49 ms)
+gate actual-source-alignment: ok (48 ms)
+gate actual-ray-joint-controls: ok (56 ms)
+gate actual-factor-refusal: ok (51 ms)
+gate refined-source-native-restore: ok (99 ms)
+gate solenoidal-listener-controls: ok (77 ms)
+gate offline-coupling-controls: ok (825 ms)
+METER gate rc=0 started=22:13:29Z ended=22:17:18Z wall_s=228.1 user_s=561.9 sys_s=35.3 peak_rss_kib=4903256
+FIELD_TESTS_EXIT 0 22:19:37
+test result: ok. 94 passed; 0 failed; 1 ignored; 0 measured; 2004 filtered out; finished in 139.43s
+METER field_tests rc=0 started=22:17:18Z ended=22:19:37Z wall_s=139.5 user_s=293.4 sys_s=1.8 peak_rss_kib=96568
+TOOLS_EXIT 0 22:19:37
+part_rates carry: the circles' four parts, twenty-two written, sixteen read at octave 0, the retired head refused
+part_rates first: the letter rows' three parts, nineteen written without circles, older lines read at octave 0
+part_rates polar: octaves known from their ratio, the edges, the clamps, a part with no fall at 0
+part_rates polar: equal polarization is the fixed point; a part's doubled travel stands two octaves above the floor
+part_rates: 9 lines, the controls hold
+METER tools rc=0 started=22:19:37Z ended=22:19:37Z wall_s=0.2 user_s=0.1 sys_s=0.0 peak_rss_kib=32244
+state_travel rank: 36 lines, three controls hold
+state_travel scale: 154 lines, three controls hold
+state_travel weighed: 153 lines, three controls hold
+state_travel lag: 50 lines, the control holds
+state_travel mean: 3 lines, the controls hold
+state_travel graft: 3 lines, the controls hold
+state_travel graft by part: 45 lines, the controls hold
+METER tools2 rc=0 started=22:19:37Z ended=22:19:37Z wall_s=0.2 user_s=0.2 sys_s=0.0 peak_rss_kib=41392
+RELEASE_EXIT 0 22:20:35
+METER release rc=0 started=22:19:37Z ended=22:20:35Z wall_s=57.8 user_s=149.6 sys_s=4.2 peak_rss_kib=3718140
+88bf7343806e4b78a0525755e0b7e4b24bd9434c7e3a3cbb347c2884ce4427ef  HOLONICS_ROOT/.local/wt/letter-rates/target/release/examples/field_pass
+MAIN host gates done 22:20:35
+## the card, (b) and (c)
+# card_p8: build 7464c528f binary 88bf7343806e4b78 22:21:05
+# rt18b from STATE.0 b6117e5fabfb907f39c895032422968ce2834b91a7898a38c40b0458fd9cfaec: hnn-field-learner-v3 12 134144 68 -; binary 88bf7343806e4b78; lap bound 200000 ms, the run's 500000 ms, outer 560 s 22:21:05
+# parts parts 32 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+# rt18b: lock taken 22:21:05 wait_s=.003757376
+# rt18b: released 22:24:35
+FIELD_PART_RATES contacts_before=32 rate_bits=12 octaves w_new=0 a_new=0 b_new=0 enc_lane=0 before_lane=0 after_lane=0 q_lane=0 v_lane=0 probe_lane=0 out_lane=0 moment_face_lane=0 read_lane=0 face_biases_lane=0 a_lane=0 b_lane=0 carry=0 enc_first=0 before_firs
+FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.733189 foil_nats_a_place=1.866533 information_nats_a_place=0.133344 own_nats_a_word=13.023636 information_nats_a_word=1.001978
+FIELD_STOPPED lap=0 sections=388/1535 reason=lap sites=4238678 before=3.215 after=- deposited=388 halvings=0 next_halved=0 next_refused=0 lap_ms=201117 ms=209711
+MEASURE lap=rt18b rc=0 wall_s=210.2 peak_rss_kib=897764
+CODEC
+JOINT.tsv
+STATE.stopped
+MAIN rt18b exit 22:24:35
+grep: write error: Broken pipe
+REPRO_B sections_read=388 differing=0 opening_equal=true
+FIELD_PART_RATES contacts_before=32 rate_bits=12 octaves w_new=0 a_new=0 b_new=0 enc_lane=0 before_lane=0 after_lane=0 q_lane=0 v_lane=0 probe_lane=0 out_lane=0 moment_face_lane=0 read_lane=0 face_biases_lane=0 a_lane=0 b_lane=0 carry=0 enc_first=0 before_first=0 after_first=0
+# eq_mean_rt21: state 9ba17cf02d066ce2; binary 88bf7343806e4b78; asked 22:24:35
+# eq_mean_rt21: lock taken 22:24:35 wait_s=.014525754
+# eq_mean_rt21: run_s=8.958136232 rc=0 released 22:24:44
+  FIELD_HELD lap=-1 answer=5.547793 classes=43470 context=0.914532 context_classes=43470 foil=1.081103 question=0.166571 ms=3283
+  FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.722262 foil_nats_a_place=1.856552 information_nats_a_place=0.134290 own_nats_a_word=12.941525 information_nats_a_word=1.009088
+  FIELD_UNSEEN lap=-1 code=0.846 sites=43660 next=- ms=8591
+  FIELD_CARD reads=45 read_ms=7663 returns=0 return_ms=0 pairs=4433948442 batches=58 peak_store=8543512590 landmarks=0 landmark_ms=0 elapsed_ms=8596
+  MEASURE lap=held_eq_mean_rt21 rc=0 wall_s=8.9 peak_rss_kib=835128
+READ eq_mean_rt21 held=1.722262
+HELD_EQ rt21 lines=42 line_lines=42 differing=0
+# eq_mean_rt18: state 9cbccb98c686eae6; binary 88bf7343806e4b78; asked 22:24:44
+# eq_mean_rt18: lock taken 22:24:44 wait_s=.014993690
+# eq_mean_rt18: run_s=8.955046544 rc=0 released 22:24:53
+  FIELD_HELD lap=-1 answer=5.494087 classes=43470 context=0.918991 context_classes=43470 foil=1.085865 question=0.166874 ms=3282
+  FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.724823 foil_nats_a_place=1.858689 information_nats_a_place=0.133866 own_nats_a_word=12.960772 information_nats_a_word=1.005902
+  FIELD_UNSEEN lap=-1 code=0.851 sites=43660 next=- ms=8577
+  FIELD_CARD reads=45 read_ms=7649 returns=0 return_ms=0 pairs=4431699561 batches=58 peak_store=8543512590 landmarks=0 landmark_ms=0 elapsed_ms=8582
+  MEASURE lap=held_eq_mean_rt18 rc=0 wall_s=8.9 peak_rss_kib=895280
+READ eq_mean_rt18 held=1.724823
+HELD_EQ rt18 lines=42 line_lines=41 differing=1
+39a40
+> FIELD_JOINT_STRATA lap=-1 open_quarters=1/2/3/4 own_nats_a_place=0.666008/1.268640/2.025980/2.929213 foil_nats_a_place=0.766214/1.407255/2.182751/3.068928 places=10818/10881/10853/10918 open_sites=5333/16153/26922/38725 terms_own=10899359
+STOP_E (c) the build's held read of rt18/MEAN.0 differs from mean_rt18's
+MAIN card_p8 stopped 22:24:53
+RUN_EXIT 1 2026-11-11T22:24:53Z
+## the card, (d)
+# card_p8: build 7464c528f binary 88bf7343806e4b78 22:25:08
+POLAR_EXIT 0 22:25:09
+FIELD_PART_POLAR part=w_new entries=2048 heat=402.421 heat_base=402.421 fall2=18.588 pi=0.0461904 octave_was=0 octave=0
+FIELD_PART_POLAR part=a_new entries=2080 heat=342.064 heat_base=342.064 fall2=18.6953 pi=0.0546543 octave_was=0 octave=0
+FIELD_PART_POLAR part=b_new entries=2080 heat=395.704 heat_base=395.704 fall2=15.8059 pi=0.0399438 octave_was=0 octave=0
+FIELD_PART_POLAR part=enc_lane entries=3232 heat=64.0273 heat_base=64.0273 fall2=35.0404 pi=0.547273 octave_was=0 octave=3
+FIELD_PART_POLAR part=before_lane entries=3232 heat=44.1674 heat_base=44.1674 fall2=32.7423 pi=0.741322 octave_was=0 octave=4
+FIELD_PART_POLAR part=after_lane entries=3232 heat=44.1892 heat_base=44.1892 fall2=33.4807 pi=0.757667 octave_was=0 octave=4
+FIELD_PART_POLAR part=q_lane entries=2048 heat=302.293 heat_base=302.293 fall2=34.8224 pi=0.115194 octave_was=0 octave=1
+FIELD_PART_POLAR part=v_lane entries=2048 heat=328.604 heat_base=328.604 fall2=37.7417 pi=0.114855 octave_was=0 octave=1
+FIELD_PART_POLAR part=probe_lane entries=2048 heat=203.17 heat_base=203.17 fall2=36.5093 pi=0.179699 octave_was=0 octave=2
+FIELD_PART_POLAR part=out_lane entries=2048 heat=778.455 heat_base=778.455 fall2=9.19308 pi=0.0118094 octave_was=0 octave=0
+FIELD_PART_POLAR part=moment_face_lane entries=2048 heat=290.477 heat_base=290.477 fall2=17.5604 pi=0.0604538 octave_was=0 octave=0
+FIELD_PART_POLAR part=read_lane entries=3072 heat=1385.48 heat_base=1385.48 fall2=30.9146 pi=0.0223133 octave_was=0 octave=0
+FIELD_PART_POLAR part=face_biases_lane entries=128 heat=90.1092 heat_base=90.1092 fall2=2.47321 pi=0.0274468 octave_was=0 octave=0
+FIELD_PART_POLAR part=a_lane entries=1024 heat=525.077 heat_base=525.077 fall2=-15.1311 pi=-0.0288168 octave_was=0 octave=0
+FIELD_PART_POLAR part=b_lane entries=1024 heat=712.797 heat_base=712.797 fall2=1.33025 pi=0.00186624 octave_was=0 octave=0
+FIELD_PART_POLAR part=carry entries=0 heat=0 heat_base=0 fall2=0 pi=- octave_was=0 octave=0
+FIELD_PART_POLAR part=enc_first entries=3232 heat=159.906 heat_base=159.906 fall2=23.9992 pi=0.150083 octave_was=0 octave=1
+FIELD_PART_POLAR part=before_first entries=3232 heat=33.8028 heat_base=33.8028 fall2=42.6984 pi=1.26316 octave_was=0 octave=4
+FIELD_PART_POLAR part=after_first entries=3232 heat=33.085 heat_base=33.085 fall2=40.3762 pi=1.22038 octave_was=0 octave=4
+FIELD_PART_POLAR_FIELD pi_F=0.0622256 old_entries=22518 heat_old=4824.16 fall2_old=265.151 rate_bits=12 units=millionths of a bit a site
+METER polar_g1 rc=0 started=22:25:08Z ended=22:25:09Z wall_s=0.3 user_s=0.2 sys_s=0.0 peak_rss_kib=81084
+POLAR_STATE lines=6 other_lines_differing=0 parts_before=parts 32 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 parts_after=parts 32 0 0 0 3 4 4 1 1 2 0 0 0 0 0 0 0 1 4 4
+# g1_from: state b2ba5adf11bfc53c; binary 88bf7343806e4b78; asked 22:25:09
+# g1_from: lock taken 22:25:09 wait_s=.012401795
+# g1_from: run_s=9.234391326 rc=0 released 22:25:18
+  FIELD_HELD lap=-1 answer=5.703487 classes=43470 context=0.922518 context_classes=43470 foil=1.090844 question=0.168326 ms=3508
+  FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.731382 foil_nats_a_place=1.866629 information_nats_a_place=0.135247 own_nats_a_word=13.010058 information_nats_a_word=1.016280
+  FIELD_UNSEEN lap=-1 code=0.854 sites=43660 next=- ms=8794
+  FIELD_CARD reads=45 read_ms=7874 returns=0 return_ms=0 pairs=4434273792 batches=58 peak_store=8543512590 landmarks=0 landmark_ms=0 elapsed_ms=8800
+  MEASURE lap=held_g1_from rc=0 wall_s=9.2 peak_rss_kib=812768
+READ g1_from held=1.731382
+HELD_D 1.731382 1.866629
+FIELD_PART_RATES contacts_before=32 rate_bits=12 octaves w_new=0 a_new=0 b_new=0 enc_lane=3 before_lane=4 after_lane=4 q_lane=1 v_lane=1 probe_lane=2 out_lane=0 moment_face_lane=0 read_lane=0 face_biases_lane=0 a_lane=0 b_lane=0 carry=0 enc_first=1 before_first=4 after_first=4
+MAIN card_p8 done 22:25:18
+RUN_EXIT 0 2026-11-11T22:25:18Z
