@@ -1,6 +1,6 @@
 # Einstein's field program on the complex: the unified field is a two-way flow, a grain gives the mass, and a probability is its flat part
 
-Status (2026-11-11, 21:30 UTC): derived. Einstein's texts are read from the source list gathered the same day. The identities
+Status (2026-11-11, 21:26 UTC, its commit's time): derived. Einstein's texts are read from the source list gathered the same day. The identities
 are standard or already owned, each named with its owner, and eight host rulers check the ones this record adds (43 checks,
 numbers only, no state). Nothing ran on the card or the PC. The physical identifications are graded `interpretation`, and a
 reading that is this record's own is marked `agent-inferred`. §9 orders the work that joins the library to the result, for the
