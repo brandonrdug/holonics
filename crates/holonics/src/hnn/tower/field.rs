@@ -1562,6 +1562,8 @@ struct FieldPass {
     moment: Vec<i64>,
     /// A tower's forward at its split, for the reverse.
     tower: Option<scale::ScalePass>,
+    /// [measurement; theory, November 11 04:48, G39] The sites whose face covector a return leaves zero (empty: none), a reading of where the deposit's mass lies.
+    skip: Vec<bool>,
 }
 
 /// The round trips `Σ_j p_ji^(t) p_ij^(t+1)` of each site over consecutive ticks' rows (`[h][i]`), each
@@ -3403,6 +3405,9 @@ impl Field {
             let mut xs: Vec<&[i32]> = Vec::new();
             for t in 0..sites {
                 let Some(face) = &pass.faces[t] else { continue };
+                if pass.skip.get(t).copied().unwrap_or(false) {
+                    continue;
+                }
                 let dz = match &ported {
                     Some((start, rows)) if t >= *start => rows[t - start].clone(),
                     _ => {
@@ -4589,7 +4594,75 @@ pub struct TickRead {
     pub pair_scale: Vec<i128>,
 }
 
+/// [measurement; theory, November 11 04:48, G39] **A section's return split by news** ([`Field::read_and_return_split`]): the covector of the whole section, and of its quiet places alone.
+#[derive(Clone, Debug, Default)]
+pub struct SplitReturn {
+    /// `G`: the section's deposit covector (the regions' returns summed), each family on its natural grain.
+    pub total: Vec<i128>,
+    /// `G_quiet`: the same return with the loud places' face covector zeroed (a place is loud where its news mass is at or above `2^(−bits)`).
+    pub quiet: Vec<i128>,
+    /// The places read (an open site with a face) that are loud, and that are quiet.
+    pub loud: u64,
+    pub quiet_places: u64,
+    /// The CPU time each phase took summed over the regions (ns; the regions run on the host's threads in parallel): the forward, the return of `G`, the return of `G_quiet`.
+    pub forward_ns: u128,
+    pub return_ns: u128,
+    pub quiet_return_ns: u128,
+}
+
 impl Field {
+    /// [measurement; theory, November 11 04:48, G39] **A section's return read twice**: each region's forward once, then its return `G`, then its return with the face covector of
+    /// every loud place zeroed, `G_quiet`. A place's news mass is `m_t = ½ |p_t − q_t|₁` of its face `p_t` against its truth `q_t` (one-hot at the region's class), which is
+    /// `1 − p_t(x_t)`: quiet where `m_t < 2^(−bits)`, i.e. `(total − mass(x_t)) 2^bits < total` on the face's integers. The deposit weights `m/K` are as they stand. A reading: the field and
+    /// the regions are not changed.
+    pub fn read_and_return_split(&self, regions: &[Region], bits: u32) -> Result<SplitReturn> {
+        let len = self.material_len();
+        regions
+            .par_iter()
+            .try_fold(
+                || SplitReturn { total: vec![0i128; len], quiet: vec![0i128; len], ..Default::default() },
+                |mut acc, region| -> Result<_> {
+                    let t0 = std::time::Instant::now();
+                    let mut pass = self.pass(region, true)?;
+                    acc.forward_ns += t0.elapsed().as_nanos();
+                    let t1 = std::time::Instant::now();
+                    self.returned(region, &pass, &mut acc.total)?;
+                    acc.return_ns += t1.elapsed().as_nanos();
+                    let mut loud = vec![false; region.classes.len()];
+                    for (t, face) in pass.faces.iter().enumerate() {
+                        let Some(face) = face else { continue };
+                        let own = face.masses.get(region.classes[t]).copied().unwrap_or(0);
+                        let news = face.total.saturating_sub(own);
+                        if news.checked_shl(bits).is_some_and(|n| n < face.total) {
+                            acc.quiet_places += 1;
+                        } else {
+                            loud[t] = true;
+                            acc.loud += 1;
+                        }
+                    }
+                    pass.skip = loud;
+                    let t2 = std::time::Instant::now();
+                    self.returned(region, &pass, &mut acc.quiet)?;
+                    acc.quiet_return_ns += t2.elapsed().as_nanos();
+                    Ok(acc)
+                },
+            )
+            .try_reduce(
+                || SplitReturn { total: vec![0i128; len], quiet: vec![0i128; len], ..Default::default() },
+                |mut a, b| {
+                    for (x, y) in a.total.iter_mut().zip(&b.total) {
+                        *x += y;
+                    }
+                    for (x, y) in a.quiet.iter_mut().zip(&b.quiet) {
+                        *x += y;
+                    }
+                    (a.loud, a.quiet_places) = (a.loud + b.loud, a.quiet_places + b.quiet_places);
+                    (a.forward_ns, a.return_ns, a.quiet_return_ns) = (a.forward_ns + b.forward_ns, a.return_ns + b.return_ns, a.quiet_return_ns + b.quiet_return_ns);
+                    Ok(a)
+                },
+            )
+    }
+
     /// [measurement; theory, November 11 00:22] **The carry's `γ` over a read pair chart** (`TickRead::pair_read`, `[t][D]`): at every site and complex contact
     /// the `γ = g / √(1 + |g|²)` of `g = G r̂` ([`gamma_of`]), `[t][f/2]` on `2^(−30)`, a reading (the forward's own arithmetic on the chart the realization read).
     pub fn carry_gammas(&self, pair_read: &[i32]) -> Result<Vec<(i64, i64)>> {

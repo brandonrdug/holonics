@@ -799,6 +799,11 @@ pub(super) fn run_with_execution(
         Some("train-field") if backend == CompleteLanguageTrainingBackend::HostReference => field_train::train(args, &mut field_train::host()),
         Some("grow-contacts-field") if backend == CompleteLanguageTrainingBackend::HostReference => field_train::grow_contacts_field(args, &mut field_train::host()),
         Some("sample-field") if backend == CompleteLanguageTrainingBackend::HostReference => field_train::sample(args, &mut field_train::host()),
+        Some("split-field") if backend == CompleteLanguageTrainingBackend::HostReference => field_train::split_field(args, &mut field_train::host()),
+        Some("joint-field") if backend == CompleteLanguageTrainingBackend::HostReference => field_train::joint_field(args, &mut field_train::host()),
+        Some("order-field") if backend == CompleteLanguageTrainingBackend::HostReference => field_train::order_field(args, &mut field_train::host()),
+        Some("gamma-field") if backend == CompleteLanguageTrainingBackend::HostReference => field_train::gamma_field(args, &mut field_train::host()),
+        Some("expansion-field") if backend == CompleteLanguageTrainingBackend::HostReference => field_train::expansion_field(args, &mut field_train::host()),
         Some("rows-field") if backend == CompleteLanguageTrainingBackend::HostReference => field_train::rows_field(args),
         Some("ring-field") if backend == CompleteLanguageTrainingBackend::HostReference => field_train::ring_field(args),
         Some("depth-field") if backend == CompleteLanguageTrainingBackend::HostReference => field_train::depth_field(args),
@@ -961,10 +966,17 @@ pub(super) fn run_tower_classes_realized(args: &[String], realization: &mut dyn 
     }
 }
 
-/// [project-postulate, October 27] Every command of this route but `read-written-coupling` (an
+/// [project-postulate, October 27; narrowed November 11] Every command of this route but `read-written-coupling` (an
 /// exterior reading of released text) learns, reads, founds or releases on the host, which is model
 /// compute: it runs only under Brandon's own exception or as the parity
-/// reference that checks a card run (the guide's "GPU first, and the design fixes the workload").
+/// reference that checks a card run (the guide's "GPU first, and the design fixes the workload"),
+/// **or as a reading from a saved state** (CLAUDE.md, "The host is a second surface beside the card",
+/// the November 11 clause: a reading run from a saved state while the card trains leaves the state's
+/// bytes the same and no lap waits for it, so it needs no exception; it also carries the bits
+/// criterion that separates a reading from a law). The October 27 text said every read computes on
+/// the model; that holds for training, founding, growing, releasing and every verb that writes a
+/// state, and those stay refused without the exception or a parity manifest. A reading is passed by
+/// a third manifest, `kind reading`, only for the verbs of [`READING_VERBS`] ([`host_exception`]).
 /// `HOLONICS_HOST_EXCEPTION` names the manifest that says which ([`host_exception`]); without it,
 /// or with a manifest that does not name this run, the command is refused before it reads
 /// anything, and with it the run's first line names its device and the manifest's SHA-256. Card
@@ -982,11 +994,35 @@ pub(super) fn run(args: &[String]) -> Result<()> {
     }
     let (kind, digest) = host_exception(path.trim(), args)?;
     println!("DEVICE host exception={kind} manifest={} manifest_sha256={digest}", path.trim());
-    run_with_execution(
+    let result = run_with_execution(
         args,
         &HostObservedEpochExecution,
         CompleteLanguageTrainingBackend::HostReference,
-    )
+    );
+    // [November 11] A reading leaves its state's bytes the same: the digest is checked again after the run and both are printed on the device line.
+    if kind == "reading" {
+        let (before, after) = reading_digests(path.trim())?;
+        println!("DEVICE host exception=reading state_sha256_before={before} state_sha256_after={after}");
+        if before != after {
+            return Err("a reading changed the state it opened".into());
+        }
+    }
+    result
+}
+
+/// [theory, November 11 04:49] **The verbs a `reading` manifest passes**: each opens a saved state read-only and writes none (its output is a table of numbers under its own new output
+/// directory). The held and locked visits (`joint-field` the held joint of a state as a lap reads it), the structure measures (`order-field` the keyed order's codes, `expansion-field` the
+/// expansion and volume, `gamma-field` the carry's `|γ|`) and the covector split (`split-field`). Everything else stays refused without Brandon's exception or a parity manifest: `train-field` and every
+/// `train-*`, `grow-contacts-field`, `sample-field`, `rows-field`, `ring-field`, `depth-field`, `restate-field`, `reach-field`, `opening-field` and `length-field` (these release or found), `found-*`,
+/// `grow-*`, `release-*`, and every verb of the tower, native and class routes. A new reading verb enters this list only where it writes no state.
+const READING_VERBS: [&str; 5] = ["joint-field", "order-field", "expansion-field", "gamma-field", "split-field"];
+
+/// The digest of the state a `reading` manifest names, before the run and after it: the manifest's `state_sha256` and the file's own now.
+fn reading_digests(manifest: &str) -> Result<(String, String)> {
+    let text = std::fs::read_to_string(manifest)?;
+    let field = |key: &str| text.lines().find_map(|l| l.strip_prefix(key).and_then(|r| r.strip_prefix(' '))).map(|v| v.trim().to_owned());
+    let (state, before) = (field("state").ok_or("a reading manifest names no state")?, field("state_sha256").ok_or("a reading manifest names no state_sha256")?);
+    Ok((before, sha256(&std::fs::read(state)?)?))
 }
 
 /// [project-postulate, October 27] **The host exception's manifest**: one `key value` a line, each
@@ -1051,7 +1087,21 @@ fn host_exception(path: &str, args: &[String]) -> Result<(String, String)> {
                 return Err("the card log holds no card release of this command into another output".into());
             }
         }
-        _ => return Err("a host exception's kind is exception or parity".into()),
+        "reading" => {
+            // [theory, November 11 04:49] A reading: a verb that opens a state read-only and writes none, with the state's digest bound.
+            let verb = args.first().map(String::as_str).unwrap_or("");
+            if !READING_VERBS.contains(&verb) {
+                return Err(format!("a reading manifest passes only the verbs that open a saved state and write none ({}), not {verb}", READING_VERBS.join(", ")).into());
+            }
+            let state = field("state")?;
+            if args.get(1).map(String::as_str) != Some(state.as_str()) {
+                return Err("the reading manifest names another state than the one this run opens".into());
+            }
+            if sha256(&std::fs::read(&state)?)? != field("state_sha256")? {
+                return Err("the state's digest is not the reading manifest's".into());
+            }
+        }
+        _ => return Err("a host exception's kind is exception, parity or reading".into()),
     }
     Ok((kind, sha256(text.as_bytes())?))
 }
@@ -1086,6 +1136,40 @@ mod tests {
         let other = write("other.log", "TOWER_COMMAND release-tower-classes STATE OTHER 1024 1 CARD\nTOWER_REALIZATION card NVIDIA\n");
         let elsewhere = write("elsewhere", &format!("kind parity\ncommand release-tower-classes STATE SHA 1024 1 HOST\ncard_log {other}\n"));
         assert!(host_exception(&elsewhere, &release).is_err());
+        std::fs::remove_dir_all(&dir).expect("remove");
+    }
+    /// [theory, November 11 04:49] A `reading` manifest passes a reading verb on the state it names with an equal digest; the same manifest does not pass a training verb, and a
+    /// changed digest is refused.
+    #[test]
+    fn a_reading_manifest_passes_only_a_reading_verb_on_its_state() {
+        let dir = std::env::temp_dir().join(format!("holonics-host-reading-{}", std::process::id()));
+        std::fs::create_dir_all(&dir).expect("dir");
+        let state = dir.join("STATE.0");
+        std::fs::write(&state, b"hnn-field-v14 a saved state\n").expect("state");
+        let state = state.to_string_lossy().into_owned();
+        let digest = sha256(&std::fs::read(&state).expect("read")).expect("sha");
+        let write = |name: &str, command: &str, sha: &str| {
+            let path = dir.join(name);
+            std::fs::write(&path, format!("kind reading\ncommand {command}\nstate {state}\nstate_sha256 {sha}\n")).expect("write");
+            path.to_string_lossy().into_owned()
+        };
+        let reading: Vec<String> = ["split-field", &state, &digest, "UNITS", "SHA", "OUT"].iter().map(|s| s.to_string()).collect();
+        let manifest = write("reading", &reading.join(" "), &digest);
+        assert_eq!(host_exception(&manifest, &reading).expect("a reading verb").0, "reading");
+        assert_eq!(reading_digests(&manifest).expect("digests"), (digest.clone(), digest.clone()));
+        let train: Vec<String> = ["train-field", &state, &digest, "OUT"].iter().map(|s| s.to_string()).collect();
+        let on_train = write("train", &train.join(" "), &digest);
+        assert!(host_exception(&on_train, &train).is_err(), "a training verb is refused under a reading manifest");
+        for verb in ["grow-contacts-field", "sample-field", "release-tower-classes", "found-units", "length-field", "opening-field"] {
+            let args: Vec<String> = [verb, &state, &digest].iter().map(|s| s.to_string()).collect();
+            assert!(host_exception(&write("other", &args.join(" "), &digest), &args).is_err(), "{verb}");
+        }
+        let changed = write("changed", &reading.join(" "), &"0".repeat(64));
+        assert!(host_exception(&changed, &reading).is_err(), "a changed digest is refused");
+        let moved = write("moved", &reading.join(" "), &digest);
+        std::fs::write(&state, b"another state\n").expect("rewrite");
+        assert!(host_exception(&moved, &reading).is_err(), "a state that changed since the manifest is refused");
+        assert_ne!(reading_digests(&moved).expect("digests").0, reading_digests(&moved).expect("digests").1);
         std::fs::remove_dir_all(&dir).expect("remove");
     }
     #[test]
