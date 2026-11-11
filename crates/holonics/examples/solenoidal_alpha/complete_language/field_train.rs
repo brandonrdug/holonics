@@ -3295,15 +3295,15 @@ mod tests {
 }
 
 
-/// [measurement; theory, November 11 04:48, G39] **`split-field STATE STATE_SHA UNITS UNITS_SHA TRAIN TRAIN_SHA HELD HELD_SHA KEYS KEYS_SHA SECTION OUT`**: the deposit covector of the
+/// [measurement; theory, November 11 04:48, G39; BITS November 11 06:00, G52] **`split-field STATE STATE_SHA UNITS UNITS_SHA TRAIN TRAIN_SHA HELD HELD_SHA KEYS KEYS_SHA SECTION BITS OUT`**: the deposit covector of the
 /// first section of the walk a saved state's next lap makes, split by news. The section's regions are formed as `train-field` forms them (the codec founded on `TRAIN`, the walk, the
 /// paths and the draws keyed by the state's laps and `KEYS`; the step the state holds is read on them first, as the section's own opening) and read twice
-/// ([`Field::read_and_return_split`]): the return `G`, and the return with the face covector of the places whose news mass `m_t = ½|p_t − q_t|₁` is at or above `2^(−6)` zeroed
+/// ([`Field::read_and_return_split`]): the return `G`, and the return with the face covector of the places whose news mass `m_t = ½|p_t − q_t|₁` is at or above `2^(−BITS)` zeroed
 /// (`G_quiet`; `G_loud = G − G_quiet`). The deposit weights stay as they are. Opens STATE read-only and writes none: `OUT/G.tsv` and `OUT/GQ.tsv` (one integer an entry of the material, `G` and `G_quiet`),
 /// and prints the places by kind and each phase's CPU time with the wall time and the host threads. A reading from a saved state, on the host beside the card (the guard's `reading` manifest).
 pub(super) fn split_field(args: &[String], realization: &mut dyn FieldRealization) -> Result<()> {
-    if args.len() != 13 {
-        return Err("split-field STATE STATE_SHA UNITS UNITS_SHA TRAIN TRAIN_SHA HELD HELD_SHA KEYS KEYS_SHA SECTION OUT".into());
+    if args.len() != 14 {
+        return Err("split-field STATE STATE_SHA UNITS UNITS_SHA TRAIN TRAIN_SHA HELD HELD_SHA KEYS KEYS_SHA SECTION BITS OUT".into());
     }
     use std::io::Write;
     let started = std::time::Instant::now();
@@ -3314,7 +3314,9 @@ pub(super) fn split_field(args: &[String], realization: &mut dyn FieldRealizatio
     let dev_problems = problems_of(&pinned_read(&args[7], &args[8], READ_BUDGET as usize)?);
     let keys = pinned_read(&args[9], &args[10], READ_BUDGET as usize)?;
     let section = positive(&args[11])?;
-    let out = Path::new(&args[12]);
+    // The news-mass threshold `2^(−BITS)` that separates the quiet places from the loud (G39 read it at 6).
+    let bits = u32::try_from(positive(&args[12])?)?;
+    let out = Path::new(&args[13]);
     std::fs::create_dir(out)?;
     let codec = FieldCodec::found(units, &train_problems)?;
     let encode = |problems: &[(Vec<u8>, Vec<u8>)]| -> Result<Problems> {
@@ -3333,7 +3335,7 @@ pub(super) fn split_field(args: &[String], realization: &mut dyn FieldRealizatio
     let (threads, formed) = (rayon::current_num_threads(), started.elapsed().as_millis());
     println!("FIELD_SPLIT_SECTION lap={read} section={s} regions={} sites={} threads={threads} regions_formed_ms={formed}", views.len(), views.iter().map(|v| v.classes.len()).sum::<usize>());
     let read_start = std::time::Instant::now();
-    let split = learner.field.read_and_return_split(&views, 6).map_err(|e| e.to_string())?;
+    let split = learner.field.read_and_return_split(&views, bits).map_err(|e| e.to_string())?;
     let wall = read_start.elapsed().as_millis();
     for (name, g) in [("G.tsv", &split.total), ("GQ.tsv", &split.quiet)] {
         let mut file = rows_file(&out.join(name), "")?;
@@ -3342,7 +3344,7 @@ pub(super) fn split_field(args: &[String], realization: &mut dyn FieldRealizatio
         }
     }
     println!(
-        "FIELD_SPLIT places_loud={} places_quiet={} bits=6 material={} threads={threads} wall_ms={wall} forward_cpu_ms={} return_cpu_ms={} quiet_return_cpu_ms={} total_elapsed_ms={}",
+        "FIELD_SPLIT places_loud={} places_quiet={} bits={bits} material={} threads={threads} wall_ms={wall} forward_cpu_ms={} return_cpu_ms={} quiet_return_cpu_ms={} total_elapsed_ms={}",
         split.loud,
         split.quiet_places,
         split.total.len(),
