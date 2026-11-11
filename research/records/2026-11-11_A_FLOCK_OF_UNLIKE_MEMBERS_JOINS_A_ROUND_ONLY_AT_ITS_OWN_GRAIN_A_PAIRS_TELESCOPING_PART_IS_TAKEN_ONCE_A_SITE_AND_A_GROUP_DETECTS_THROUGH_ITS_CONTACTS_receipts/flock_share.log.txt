@@ -1,0 +1,10 @@
+tc=4316us tl=1004941us L=20 t0=0us  rates add to 1091261/1004941 = 1.086 times the card alone over long rounds
+    n   card_alone   least(k)        gain   built(k)        gain   share    a lane joins
+   16      69056us    69056us(   0)  1.000  1004941us(   1)  0.069  0.0043   no
+  232    1001312us  1001312us(   0)  1.000  1004941us(   1)  0.996  0.0043   no
+  234    1009944us  1004941us(   2)  1.005  1005628us(   1)  1.004  0.0043   yes
+  376    1622816us  1536496us(  20)  1.056  1540812us(  19)  1.053  0.0638   yes
+  752    3245632us  3014823us(  54)  1.077  3042780us(  47)  1.067  0.0630   yes
+ 1600    6905600us  6387680us( 120)  1.081  7034587us( 123)  0.982  0.0737   yes
+16000   69056000us 63617840us(1260)  1.085 63626472us(1258)  1.085  0.0788   yes
+as run: host 6.95 regions/s on about 7 of 20 threads, card 231.7 regions/s: 3.0% of the card; a lane 233 times the card a region; 20 lanes scaling freely 8.6% at most; split wall 1828 ms a split against the card alone at 1623 ms plus the same join
