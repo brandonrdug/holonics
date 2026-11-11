@@ -15,6 +15,10 @@ Three small states of one declaration are written with a planted travel of three
                    at each lap end) read cosine -1 between lap ends, so `update` slows the part; the laps' means, which shed the draw,
                    read cosine 1, so `means` raises it, in the end state the next lap trains from;
   refusals         a state of another declaration, and a file that stands, are refused.
+
+`base`, the learner's own rate word: the written file is the state's with the second word of its first line changed and nothing else
+(every other word, line and the material byte for byte, with or without a parts line); a rate at or under a part's octave, a rate of
+no bits and a file that stands are refused.
 """
 import io
 import os
@@ -148,7 +152,29 @@ def main():
                 raise AssertionError(f"not refused: {args[0]} onto {os.path.basename(args[4])} writing {os.path.basename(args[5])}")
         assert not os.path.exists(p("r1"))
         print("part_rates means: a state of another declaration and a standing file are refused")
-    print("part_rates: 4 lines, the controls hold")
+
+        # The base rate: the head line's rate word alone.
+        run("base", p("s2"), "11", p("b"))
+        was, now = open(p("s2")).read(), open(p("b")).read()
+        assert was.startswith("hnn-field-learner-v3 12 0 0 -\n") and now == "hnn-field-learner-v3 11 0 0 -\n" + was.split("\n", 1)[1]
+        bare = "\n".join(l for l in was.split("\n") if not l.startswith("parts "))
+        with open(p("bare"), "w") as f:
+            f.write(bare)
+        run("base", p("bare"), "9", p("b9"))
+        assert open(p("b9")).read() == "hnn-field-learner-v3 9 0 0 -\n" + bare.split("\n", 1)[1]
+        # s2 carries an octave of 3 (enc_lane): a rate of 3 bits is refused, 4 is written; no bits and a standing file are refused.
+        for args in (("base", p("s2"), "3", p("r2")), ("base", p("s2"), "0", p("r3")), ("base", p("s2"), "11", p("b"))):
+            try:
+                run(*args)
+            except (AssertionError, FileExistsError):
+                pass
+            else:
+                raise AssertionError(f"not refused: base at {args[2]} bits writing {os.path.basename(args[3])}")
+        assert not os.path.exists(p("r2")) and not os.path.exists(p("r3"))
+        run("base", p("s2"), "4", p("b4"))
+        assert open(p("b4")).read().startswith("hnn-field-learner-v3 4 0 0 -\n")
+        print("part_rates base: the rate word alone moves; a rate under a part's octave, no bits and a standing file are refused")
+    print("part_rates: 5 lines, the controls hold")
 
 
 if __name__ == "__main__":

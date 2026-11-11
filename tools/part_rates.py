@@ -5,6 +5,7 @@
   part_rates.py update OLDER OLD NOW OUT
   part_rates.py means OLDER OLD NOW STATE OUT    (theory, November 11: the same rule read on lap means; see below)
   part_rates.py trend OLDEST OLDER OLD NOW OUT   (theory, November 11 03:54: the slope-corrected rule; see trend())
+  part_rates.py base STATE RATE_BITS OUT         (theory, November 11: the learner's own rate word; see below)
 
 The learner's text carries each founded part's octaves in a trailing `parts CONTACTS_BEFORE k0 .. k15` line (holonics::hnn::tower::field::
 RateParts); the trainer steps part p at 2^-(rate - k_p). `open` writes STATE with the octaves OCTAVES (sixteen counts, or fifteen with g_chart at the old rate, comma separated, in
@@ -20,6 +21,12 @@ rate's standing spread, so between lap ends a part's cosine is (d^2 - s^2) / (d^
 variance s^2, and a part that travels steadily under a large spread reads as one at rest; a lap's mean sheds the spread of every
 direction that relaxes inside the lap. The three materials are read only; OUT is a state a tool wrote, checked before a lap trains
 from it. Controls: tools/test_part_rates.py.
+
+`base` writes STATE with the learner's rate word (the second word of its first line, which the trainer reads from the state and
+steps every entry of no founded part at, 2^-RATE_BITS; a founded part steps at 2^-(RATE_BITS - k_p)) set to RATE_BITS, and every other
+word, line and the material as they stand. One bit fewer is the whole machine one octave hotter, parts and old entries alike, which no
+octave line can say (an octave is never under 0). It refuses a rate that leaves a part's octave at or past it. OUT is a state a tool
+wrote, checked before a lap trains from it.
 """
 import sys
 from math import isqrt
@@ -196,6 +203,22 @@ def main():
         write(lines, contacts_before, nxt, args[-1])
     elif len(args) == 6 and args[0] == "trend":
         trend(args[1:5], args[5])
+    elif len(args) == 4 and args[0] == "base":
+        lines, d, rate, _ = load(args[1])
+        bits = int(args[2])
+        head = lines[0].split(" ")
+        assert head[0] == "hnn-field-learner-v3" and len(head) == 5 and head[4] == "-", "a learner's text with no held step"
+        held = parts_line(lines)
+        octaves = held[1] if held is not None else [0] * PARTS
+        assert bits >= 1 and all(k < bits for k in octaves), "a rate of one bit or more, past every part's octave"
+        head[1] = str(bits)
+        print(f"FIELD_BASE_RATE was={rate} rate_bits={bits} octaves_hotter={rate - bits}")
+        if held is not None:
+            parts = founded_parts(d, held[0])
+            for p, name in enumerate(PART_NAMES):
+                print(f"FIELD_PART_RATE part={name} entries={parts.count(p)} c=- rate_octaves={octaves[p]} rate_bits={bits - octaves[p]}")
+        with open(args[3], "x") as f:
+            f.write("\n".join([" ".join(head)] + lines[1:]))
     else:
         sys.exit(__doc__)
 
