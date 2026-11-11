@@ -805,13 +805,16 @@ const JOINT_KEY: u64 = 9 << 58;
 /// decision of the run reads it. It is not screened by the answer's own restatements, so it contains the question's
 /// information about the plan of a solution as well as about its names.
 ///
-/// [measurement; theory, November 11 15:50] **The same code by how much of the answer is open** (`FIELD_JOINT_STRATA`): each
+/// [measurement; theory, November 11 15:20] **The same code by how much of the answer is open** (`FIELD_JOINT_STRATA`): each
 /// term summed above is also summed in its state's stratum of [`joint_states`], the quarter of `1..m` its `K` open sites
 /// were drawn from (the first quarter the fewest open), and each stratum's density is over its own `Σ |S_s|`: the mean over
 /// that quarter's `K` of an open site's code. The strata's terms are the joint code's own, so their sums are its sum. Why: a
 /// chain of count tables that marginalizes its open letters codes every order alike, so its joint code is its left-to-right
 /// code; the field's joint code read beside such a chain's, quarter by quarter, says whether the field's lack sits where most
 /// of an answer stands written (a law it does not hold) or where most is open (letters it does not carry across open sites).
+/// `open_sites` is each stratum's `Σ K_s` over the problems, which the keyed draws fix: a host ruler that takes the same seed
+/// and prints the same four counts read the same states (`cap_t.py`, the receipts of the record of November 11 on the places
+/// the field gives).
 fn joint_read(field: &Field, codec: &FieldCodec, problems: &Problems, seed: u64, realization: &mut dyn FieldRealization, lap: i64, rows: &mut std::fs::File) -> Result<()> {
     let started = std::time::Instant::now();
     let n = problems.len();
@@ -828,8 +831,8 @@ fn joint_read(field: &Field, codec: &FieldCodec, problems: &Problems, seed: u64,
     // Each held problem's per-site terms, own and foil, on 2^(−20) bits.
     let mut own: Vec<Vec<i64>> = problems.iter().map(|(_, a, _)| vec![0i64; a.len() + 1]).collect();
     let mut foil: Vec<Vec<i64>> = own.clone();
-    // Each stratum's terms beside the own question and the foil's, and its `Σ |S_s|` over the problems.
-    let mut strata = [(0i128, 0i128, 0i128); CONTEXT];
+    // Each stratum's terms beside the own question and the foil's, and its `Σ |S_s|` and `Σ K_s` over the problems.
+    let mut strata = [(0i128, 0i128, 0i128, 0i128); CONTEXT];
     for chunk in states.chunks(64) {
         let views: Vec<Region> = chunk.iter().map(|(_, _, _, c, u)| Region { classes: c, unresolved: u, faces: &[], locked: &[], echo: &[], domain: None, port: None }).collect();
         let faces = realization.read_faces(field, &views).map_err(|e| e.to_string())?;
@@ -840,6 +843,7 @@ fn joint_read(field: &Field, codec: &FieldCodec, problems: &Problems, seed: u64,
             let stratum = (0..CONTEXT).find(|&s| (*k as usize) < 1 + (s + 1) * m / CONTEXT).unwrap_or(CONTEXT - 1);
             if !*is_foil {
                 strata[stratum].2 += *size as i128;
+                strata[stratum].3 += *k as i128;
             }
             let terms = if *is_foil { &mut foil[*i] } else { &mut own[*i] };
             for (t, face) in faces.iter().enumerate() {
@@ -896,13 +900,17 @@ fn joint_read(field: &Field, codec: &FieldCodec, problems: &Problems, seed: u64,
         micro_nats(own_sum * ln2, words),
         micro_nats((foil_sum - own_sum) * ln2, words)
     );
+    if strata.iter().map(|s| s.0).sum::<i128>() != own_sum || strata.iter().map(|s| s.1).sum::<i128>() != foil_sum || strata.iter().map(|s| s.2).sum::<i128>() != sites {
+        return Err("a joint read whose strata do not sum to it".into());
+    }
     println!(
-        "FIELD_JOINT_STRATA lap={lap} open_quarters=1/2/3/4 own_nats_a_place={} foil_nats_a_place={} places={} terms_own={} terms_foil={}",
-        strata.iter().map(|&(o, _, n)| micro_nats(o * ln2, n)).collect::<Vec<_>>().join("/"),
-        strata.iter().map(|&(_, f, n)| micro_nats(f * ln2, n)).collect::<Vec<_>>().join("/"),
-        strata.iter().map(|&(_, _, n)| n.to_string()).collect::<Vec<_>>().join("/"),
-        strata.iter().map(|&(o, _, _)| o.to_string()).collect::<Vec<_>>().join("/"),
-        strata.iter().map(|&(_, f, _)| f.to_string()).collect::<Vec<_>>().join("/")
+        "FIELD_JOINT_STRATA lap={lap} open_quarters=1/2/3/4 own_nats_a_place={} foil_nats_a_place={} places={} open_sites={} terms_own={} terms_foil={}",
+        strata.iter().map(|&(o, _, n, _)| micro_nats(o * ln2, n)).collect::<Vec<_>>().join("/"),
+        strata.iter().map(|&(_, f, n, _)| micro_nats(f * ln2, n)).collect::<Vec<_>>().join("/"),
+        strata.iter().map(|&(_, _, n, _)| n.to_string()).collect::<Vec<_>>().join("/"),
+        strata.iter().map(|&(_, _, _, k)| k.to_string()).collect::<Vec<_>>().join("/"),
+        strata.iter().map(|&(o, _, _, _)| o.to_string()).collect::<Vec<_>>().join("/"),
+        strata.iter().map(|&(_, f, _, _)| f.to_string()).collect::<Vec<_>>().join("/")
     );
     per.sort_unstable();
     let q = |f: usize| per.get((f * per.len()) / 4).copied().unwrap_or(0) as i128;
