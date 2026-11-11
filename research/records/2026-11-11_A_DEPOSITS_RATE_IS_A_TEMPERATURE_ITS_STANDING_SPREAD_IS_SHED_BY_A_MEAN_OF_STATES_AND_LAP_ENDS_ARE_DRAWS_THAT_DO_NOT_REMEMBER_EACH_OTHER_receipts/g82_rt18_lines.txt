@@ -1,0 +1,40 @@
+# G82: the line's lap 18, 2026-11-11 17:05:15 to 17:21:31 UTC on the card (NVIDIA GeForce RTX 4080 SUPER, under HOLONICS_ROOT/.local/gpu.lock):
+# rt18 from rt17/STATE.0 by RUN/mean_lap.sh (bin-lap-mean b8fe4ba838dd27a6 at 8368f084b, the line's exports and arguments; lap bound
+# 1215000 ms, the run's 1515000 ms, outer 1575 s), then the held read of rt18/MEAN.0 by RUN/g61/held_group.sh as mean_rt17's (laps 0,
+# its own hold of the lock, bound 24 s). RUN is HOLONICS_ROOT/.local/wt/qgchgu-sampler/.local/run/2026-11-10-contacts. Dispatched as
+# runs.py g82-rt18. Lines below are the run's own (the lap's and the read's, as mean_lap.sh and held_group.sh print them), machine paths named.
+# Projection: 900 s for the lap plus 10 s for the read (910 s). Deadline: the bounds above (outer 1575 s for the lap, 24 s for the read).
+# Measured wall: the lap 963.1 s (MEASURE; FIELD_LAP ms=942374, FIELD_CARD elapsed_ms=962312), the read 12.2 s; the run 976 s,
+#   1.073 times its projection (lap 1.070, read 1.22). Peak resident set: the lap 810724 KiB, the read 826924 KiB; the card's peak store
+#   8529573980 bytes (lap), 8372721976 (read).
+# Host threads: the lap's process held 28 threads at every one of 63 samples (/proc, every 15 s), and had used 224.9 CPU seconds at its
+#   last sample (17:21:03), about 0.24 of a core over the lap. Beside it ran G81's twelve cap_o.py fits, one compute thread each
+#   (OMP_NUM_THREADS=OPENBLAS_NUM_THREADS=MKL_NUM_THREADS=1), on the host's 24 hardware threads. The lap's time stands beside rt17's
+#   (897366 ms alone) as a run's time, not as a timing comparison (no shared hold, no repeated control).
+# Every one of the 1535 FIELD_SECTION lines reads halvings=0 and next=-.
+# States: rt17/STATE.0 b6117e5fabfb907f (from), rt18/STATE.0 e801cae90b4254cc, rt18/MEAN.0 9cbccb98c686eae6.
+## rt18 from rt17/STATE.0
+# rt18 from STATE.0 b6117e5fabfb907f39c895032422968ce2834b91a7898a38c40b0458fd9cfaec: hnn-field-learner-v3 12 134144 68 -; binary b8fe4ba838dd27a6 (8368f084b); lap bound 1215000 ms, the run's 1515000 ms, outer 1575 s 17:05:15
+# parts parts 32 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+# rt18: lock taken 17:05:15 wait_s=.003692566
+# rt18: released 17:21:18
+FIELD_PART_RATES contacts_before=32 rate_bits=12 octaves w_new=0 a_new=0 b_new=0 enc_lane=0 before_lane=0 after_lane=0 q_lane=0 v_lane=0 probe_lane=0 out_lane=0 moment_face_lane=0 read_lane=0 face_biases_lane=0 a_lane=0 b_lane=0 g_chart=0
+FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.733189 foil_nats_a_place=1.866533 information_nats_a_place=0.133344 own_nats_a_word=13.023636 information_nats_a_word=1.001978
+FIELD_MEAN lap=0 states=1535 entries=63606 moved=61450 square=95109773613274
+FIELD_LAP lap=0 read=69 sites=16542162 before=3.217 after=- deposited=1535/1535 halvings=0 next_halved=0 next_refused=0 ms=942374
+FIELD_JOINT_NATS lap=0 places=43470 words=5785 own_nats_a_place=1.731382 foil_nats_a_place=1.866629 information_nats_a_place=0.135247 own_nats_a_word=13.010058 information_nats_a_word=1.016280
+MEASURE lap=rt18 rc=0 wall_s=963.1 peak_rss_kib=810724
+FILES CODEC JOINT.tsv MEAN.0 STATE.0 
+HOST_THREADS samples=63 threads_max=28 last=HOST_SAMPLE 17:21:03 pid=2466371 threads=28 cpu_s=224.9
+## the held read of rt18/MEAN.0
+# group H-rt18 17:21:18
+# mean_rt18: state rt18/MEAN.0 9cbccb98c686eae6; binary field_pass b8fe4ba838dd27a6; asked 17:21:18
+# mean_rt18: lock taken 17:21:18 wait_s=.029061065
+# mean_rt18: run_s=12.273266735 rc=0 released 17:21:31
+  FIELD_HELD lap=-1 answer=5.494087 classes=43470 context=0.918991 context_classes=43470 foil=1.085865 question=0.166874 ms=4819
+  FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.724823 foil_nats_a_place=1.858689 information_nats_a_place=0.133866 own_nats_a_word=12.960772 information_nats_a_word=1.005902
+  FIELD_UNSEEN lap=-1 code=0.851 sites=43660 next=- ms=11682
+  MEASURE lap=held_mean_rt18 rc=0 wall_s=12.2 peak_rss_kib=826924
+READ mean_rt18 held=1.724823
+MAIN group H-rt18 done 17:21:31
+RUN_EXIT 0 2026-11-11T17:21:31Z
