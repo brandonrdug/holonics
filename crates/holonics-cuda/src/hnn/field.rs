@@ -37,10 +37,10 @@ use crate::cuda::{Dim3, Module};
 use crate::hnn::card::{Card, CardBuffer};
 use crate::hnn::DeviceError;
 
-mod energy;
-
 const IMAGE: &[u8] = include_bytes!(concat!(env!("OUT_DIR"), "/field.ptx"));
 const THREADS: u32 = 256;
+/// [theory, November 11 00:22] The bias offset of an affine map with no bias (`NO_BIAS` in `kernels/field.cu`): the carry's third chart `G r̂`.
+const NO_BIAS: u64 = u64::MAX;
 /// The dynamic shared memory a tiled affine map may take in a block, the default 48 KiB.
 const AFFINE_SHARED: usize = 48 * 1024;
 
@@ -51,8 +51,6 @@ fn affine_tiling(rows: usize, cols: usize, x64: bool) -> Option<(usize, usize)> 
     let shared = ((rows * (cols + 1) + rows) * 4).div_ceil(16) * 16 + per * 8 + per * cols * if x64 { 8 } else { 4 };
     (shared <= AFFINE_SHARED).then_some((per, shared))
 }
-/// The bias offset of an affine map with no bias (`NO_BIAS` in `kernels/field.cu`): a tangent's chart, linear in its direction.
-const NO_BIAS: u64 = u64::MAX;
 /// The widest span the contact's lanes carry (a lane an entry of the span).
 const CONTACT_SPAN: u32 = 32;
 /// The series row's carrier, in limbs of 64 bits: at least five (a term's product with a wide value), at
@@ -68,16 +66,10 @@ const REV_ROWS: u64 = 4;
 const MOMENT_BLOCK: u32 = 256;
 /// The most crowds a receiver hears, one lane each (`MAX_CROWD_SLOTS` in `kernels/field.cu`).
 const MAX_CROWD_SLOTS: usize = 32;
-/// [definition; agent-inferred, November 8] **The limbs a crowds' difference array carries a cell** (`DIFFERENCE_LIMBS` and
-/// `add_difference` in `kernels/field.cu`): three planes `[limb][row][span]` of 64-bit words, the cell's sum on `Z/2^128` read back
-/// with its carries released where the spread reads it.
-const DIFFERENCE_LIMBS: usize = 3;
 /// The sites a thread of a covector sum takes (`OUTER_TILE` in `kernels/field.cu`).
 const OUTER_TILE: u64 = 64;
-/// The device octets a board keeps for its desktop and other clients: the runs keep to the board's total less this (12 GiB of
-/// the RTX 4080 SUPER's 16, as before; 36 of an A100's 40, so a second run on a cloud card is not refused its budget by a
-/// ceiling sized for the desktop board, November 8: law D's reads beside the fork's continuation on one A100).
-const BOARD_RESERVE: u64 = 4 << 30;
+/// The device octets the runs keep to (the board's, the desktop included).
+const BOARD_CEILING: u64 = 12 << 30;
 /// Octets kept free beside a batch's counted allocations for the driver, the material and the
 /// allocator's grain.
 const MARGIN: u64 = 1 << 30;
@@ -239,23 +231,17 @@ struct Words {
     // [the unified-theory reading of November 6, 10:31] Past the last arrival a silent place runs at the bare rate (the host's
     // `Field::bare_stretch`).
     bare_stretch: u64,
-    // [definition; theory, November 11 00:22, ruling R5 amended] The carry along the strand, forward only here (`FieldDeclaration::carry`): whether it is on,
-    // the third chart `G`'s offset in the material and its reach, and (set per tick) the chart's output.
+    // [definition; theory, November 11 00:22, ruling R5 amended] The carry along the strand (`FieldDeclaration::carry`): whether it is on, `G`'s offset in
+    // the material and its reach, and (set per tick) the third chart's output, `γ`, the scale and the scan's operand.
     carry_on: u64,
     wg: u64,
     rg: u64,
     pg: u64,
-}
-
-/// The moments' covector returned to the strands ([`CardField::moment_strands_back`]): each mode's 64-bit covector, the
-/// returns `d_before[u][t]`, `d_after[u][t]`, the modes' words and map, and the buffers their launches read.
-struct MomentBack<'c> {
-    ds: Pooled<'c, i64>,
-    d_before: Pooled<'c, i128>,
-    d_after: Pooled<'c, i128>,
-    ws: Pooled<'c, u64>,
-    cmap: Pooled<'c, u32>,
-    _held: (Pooled<'c, i128>, Pooled<'c, u8>, Pooled<'c, i128>),
+    pgam: u64,
+    psr: u64,
+    pqm: u64,
+    // [theory, November 11 04:14, step S] The skin's site addresses `[p][l][t]` three words each (`FieldWords::saddr`), the clock's own beside `sigma`.
+    saddr: u64,
 }
 
 /// The moment kernels' words (`MomentWords` in `kernels/field_moment.cuh`, field for field): the batch's
@@ -339,9 +325,6 @@ pub struct FieldTimes {
     /// reads and pairs above.
     pub landmarks: u64,
     pub landmark_ns: u128,
-    /// [measurement] An energy field's reads past the host's: a tick's last states read again where its last candidate was
-    /// not every region's state (a region rejected there), the same bits as the candidate each region stood at.
-    pub energy_rereads: u64,
 }
 
 /// One tick's carriers on the card.
@@ -364,6 +347,7 @@ struct CardClock<'c> {
     kappa: Pooled<'c, i64>,
     tau: Pooled<'c, i64>,
     sigma: Pooled<'c, i64>,
+    saddr: Pooled<'c, i64>,
     plain: Pooled<'c, u8>,
     pframe: Pooled<'c, i64>,
     moment: Pooled<'c, i64>,
@@ -378,14 +362,15 @@ struct CardClock<'c> {
 
 /// The words a tick reads its clocks through (§16.44): its own, or the pass's `base` (`kappa`, `tau`, `sigma`, `plain`,
 /// `pframe`, `moment`), with no blank rates.
-fn set_clock(w: &mut Words, clock: Option<&CardClock>, base: [u64; 6]) {
+fn set_clock(w: &mut Words, clock: Option<&CardClock>, base: [u64; 7]) {
     match clock {
         Some(c) => {
             (w.kappa, w.tau, w.sigma, w.plain, w.pframe, w.moment) = (c.kappa.device_ptr(), c.tau.device_ptr(), c.sigma.device_ptr(), c.plain.device_ptr(), c.pframe.device_ptr(), c.moment.device_ptr());
+            w.saddr = c.saddr.device_ptr();
             (w.blank_rate, w.blank_masses, w.blank_totals) = (c.rates.device_ptr(), c.masses.device_ptr(), c.totals.device_ptr());
         }
         None => {
-            [w.kappa, w.tau, w.sigma, w.plain, w.pframe, w.moment] = base;
+            [w.kappa, w.tau, w.sigma, w.plain, w.pframe, w.moment, w.saddr] = base;
             (w.blank_rate, w.blank_masses, w.blank_totals) = (0, 0, 0);
         }
     }
@@ -416,6 +401,9 @@ fn set_tick(w: &mut Words, tick: &Tick, returning: bool) {
     w.y = tick.y.device_ptr();
     w.pa = tick.pa.device_ptr();
     w.pg = tick.pg.device_ptr();
+    w.pgam = tick.pgam.device_ptr();
+    w.psr = tick.psr.device_ptr();
+    w.pqm = tick.pqm.device_ptr();
     w.pb = tick.pb.device_ptr();
     w.pc = tick.pc.device_ptr();
     w.bits = tick.bits.device_ptr();
@@ -461,6 +449,8 @@ struct Back<'c> {
     dc: Pooled<'c, i64>,
     da: Pooled<'c, i64>,
     db: Pooled<'c, i64>,
+    /// [theory, November 11 00:22] The scan's covector at the third chart's output `[t][f]` (one slot without the carry).
+    dg: Pooled<'c, i64>,
     ra: Pooled<'c, i64>,
     rb: Pooled<'c, i64>,
     dmid: Pooled<'c, i64>,
@@ -471,8 +461,8 @@ struct Back<'c> {
     dp: Pooled<'c, i64>,
     ds: Pooled<'c, i64>,
     dpb: Pooled<'c, i128>,
-    cv: Pooled<'c, u64>,
-    cw: Pooled<'c, u64>,
+    cv: Pooled<'c, i128>,
+    cw: Pooled<'c, i128>,
     dm: Pooled<'c, i128>,
     gtau: Pooled<'c, i128>,
     gsig: Pooled<'c, i128>,
@@ -542,8 +532,11 @@ struct Tick<'c> {
     read2: Pooled<'c, i32>,
     scale2: Pooled<'c, i128>,
     pa: Pooled<'c, i64>,
-    /// [theory, November 11 00:22] The carry's third chart's output `[t][f]` (one slot without it).
+    /// [theory, November 11 00:22] The carry's third chart's output `[t][f]`, its `γ` `[t][f]`, the scale `[t][f/2]` and the scan's operand `[t][f]` (one slot each without it).
     pg: Pooled<'c, i64>,
+    pgam: Pooled<'c, i64>,
+    psr: Pooled<'c, i64>,
+    pqm: Pooled<'c, i64>,
     pb: Pooled<'c, i64>,
     pc: Pooled<'c, i64>,
     /// The tick's carrier width: the binary length of its largest unit word.
@@ -713,16 +706,6 @@ pub struct CardField<'c> {
     held_cells: std::cell::RefCell<Vec<i128>>,
     /// [measurement, November 4] While the ticks are read: each region's tick reads, region by region.
     tick_reads: std::cell::RefCell<Option<Vec<Vec<TickRead>>>>,
-    /// [measurement; theory, November 9 19:43] While the plates are read: each region's sites' classes by head at the last
-    /// tick (`[t][h]` flat), by region over the batches.
-    plates: std::cell::RefCell<Option<Vec<Vec<u32>>>>,
-    /// [measurement; theory, November 9 21:59] While the key words are read beside the plates: each region's sites' unframed key
-    /// words at the last tick (`[t][2M]`), by region over the batches.
-    words: std::cell::RefCell<Option<Vec<Vec<i64>>>>,
-    /// [measurement; theory, November 10 01:29] Beside the key words: each region's sites' unframed probe words at the last tick
-    /// (`[t][2M]`) and the readout's chart of their last state (`[t][D]`, zero at a resolved site).
-    probes: std::cell::RefCell<Option<Vec<Vec<i64>>>>,
-    charts: std::cell::RefCell<Option<Vec<Vec<i32>>>>,
     /// [measurement, §16.42] While a near field is read: the named sites of the batch's one region, and each one's near field
     /// by offset at every kept tick and head.
     near_sites: std::cell::RefCell<Option<Vec<usize>>>,
@@ -733,95 +716,7 @@ pub struct CardField<'c> {
     clock_out: std::cell::RefCell<Vec<BlankClocks>>,
     /// The host's wall time between marks, by name (`FIELD_PHASES`), no stream synchronized.
     phases: Option<std::cell::RefCell<(Instant, std::collections::BTreeMap<&'static str, (u64, u128)>)>>,
-    /// The card's own clock around every launch, by entry (`FIELD_EVENTS`, [`CardField::stamp`]).
-    stamps: Option<std::cell::RefCell<Stamps<'c>>>,
-    /// The most regions an energy batch holds where declared (`CardField::energy_batch_regions`, a reading).
-    batch_regions: Option<usize>,
 }
-
-/// [measurement; agent-inferred, November 7] **Each launch timed on the card's own clock** (`CardField::stamp`, a reading
-/// only): a `field_stamp` launch before and after every launch on the same stream writes `%globaltimer` (integer
-/// nanoseconds) into a slot pair, with no host synchronization between launches, so a kernel's time is read without the
-/// synchronized profile's per-launch host latency (`FieldProfile`). The pending slots are read back when the buffer fills
-/// and when the reading is taken. It moves nothing the field computes.
-struct Stamps<'c> {
-    slots: CardBuffer<'c, u64>,
-    pending: Vec<(&'static str, u32)>,
-    kernels: std::collections::BTreeMap<(&'static str, u32), (u64, u128)>,
-    /// The head a per-head launch reads (`u32::MAX` for a launch over every head), kept beside its entry.
-    head: u32,
-    /// Where declared, each contact column launch's longest column beside its card time ([`Columns`]).
-    columns: Option<Columns<'c>>,
-}
-
-/// The entry whose launches the column reading follows ([`Columns`]).
-const COLUMNS_ENTRY: &str = "field_contact_columns";
-
-/// [measurement; agent-inferred, November 8] **Each contact column launch's longest column beside its card time**
-/// (`FIELD_COLUMNS`, [`CardField::stamp_columns`], a reading only): before each `field_contact_columns` launch, outside its
-/// stamps, `field_column_lengths` writes the launch's longest column (the receivers one source's warp walks) and the
-/// receivers every source walks into a slot pair; the pairs are read back with the stamps and filed with each launch's card
-/// time by head and the longest column's octave. It moves nothing the field computes.
-struct Columns<'c> {
-    slots: CardBuffer<'c, u64>,
-    /// The pending stamps that carry a column: (the stamp's launch, its column slot).
-    pending: Vec<(usize, usize)>,
-    rows: std::collections::BTreeMap<(u32, u32), ColumnRow>,
-}
-
-/// [measurement] **A head's contact column launches whose longest column has `octave` binary digits** ([`Columns`]): their
-/// number and card time, the sum and the largest of their longest columns, and the receivers they walked.
-#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
-pub struct ColumnRow {
-    pub head: u32,
-    pub octave: u32,
-    pub launches: u64,
-    pub card_ns: u128,
-    pub longest: u128,
-    pub longest_max: u64,
-    pub walked: u128,
-}
-
-impl ColumnRow {
-    /// The reading's lines (`FIELD_COLUMN …`, the `FIELD_EVENT` lines' form): a line a head and octave, each launch's mean
-    /// card time and longest column and the receivers it walked, then a line a head over its octaves.
-    pub fn lines(rows: &[ColumnRow]) -> Vec<String> {
-        let mean = |sum: u128, n: u64| sum / (n as u128).max(1);
-        let mut out = Vec::with_capacity(rows.len() + 4);
-        for r in rows {
-            out.push(format!(
-                "head={} longest_octave={} launches={} card_us={} us_a_launch={} longest_mean={} longest_max={} walked_mean={}",
-                r.head,
-                r.octave,
-                r.launches,
-                r.card_ns / 1_000,
-                mean(r.card_ns, r.launches) / 1_000,
-                mean(r.longest, r.launches),
-                r.longest_max,
-                mean(r.walked, r.launches)
-            ));
-        }
-        let mut heads: Vec<u32> = rows.iter().map(|r| r.head).collect();
-        heads.dedup();
-        for head in heads {
-            let of = || rows.iter().filter(move |r| r.head == head);
-            let launches: u64 = of().map(|r| r.launches).sum();
-            let (ns, longest, walked): (u128, u128, u128) = (of().map(|r| r.card_ns).sum(), of().map(|r| r.longest).sum(), of().map(|r| r.walked).sum());
-            out.push(format!(
-                "head={head} longest_octave=all launches={launches} card_us={} us_a_launch={} longest_mean={} longest_max={} walked_mean={}",
-                ns / 1_000,
-                mean(ns, launches) / 1_000,
-                mean(longest, launches),
-                of().map(|r| r.longest_max).max().unwrap_or(0),
-                mean(walked, launches)
-            ));
-        }
-        out
-    }
-}
-
-/// The launches a stamp buffer holds before it is read back.
-const STAMP_LAUNCHES: usize = 1 << 14;
 
 impl<'c> CardField<'c> {
     /// Load the field's image; a batch's stores take the card's free memory at its open less the
@@ -832,155 +727,8 @@ impl<'c> CardField<'c> {
         let memory = card.census().memory;
         let (free, total) = (memory.free_bytes as u64, memory.total_bytes as u64);
         let used = total.saturating_sub(free);
-        let budget = free.min(total.saturating_sub(BOARD_RESERVE).saturating_sub(used)).saturating_sub(MARGIN);
-        Ok(Self { card, module, budget, times: FieldTimes::default(), profile: None, pools: Default::default(), held_questions: Default::default(), covector_shares: Default::default(), row_questions: Default::default(), row_out: Default::default(), row_cov: Default::default(), held_cells: Default::default(), tick_reads: Default::default(), plates: Default::default(), words: Default::default(), probes: Default::default(), charts: Default::default(), near_sites: Default::default(), near_out: Default::default(), clock_sites: Default::default(), clock_out: Default::default(), phases: None, stamps: None, batch_regions: None })
-    }
-
-    /// Time every launch on the card's own clock from here on ([`Stamps`]).
-    pub fn stamp(&mut self) -> std::result::Result<(), DeviceError> {
-        let slots = self.card.alloc::<u64>(2 * STAMP_LAUNCHES)?;
-        self.stamps = Some(std::cell::RefCell::new(Stamps { slots, pending: Vec::with_capacity(STAMP_LAUNCHES), kernels: Default::default(), head: u32::MAX, columns: None }));
-        Ok(())
-    }
-
-    /// Time every launch on the card's own clock ([`CardField::stamp`]) and read each contact column launch's longest
-    /// column beside its card time ([`Columns`]) from here on.
-    pub fn stamp_columns(&mut self) -> std::result::Result<(), DeviceError> {
-        if self.stamps.is_none() {
-            self.stamp()?;
-        }
-        let slots = self.card.alloc::<u64>(2 * STAMP_LAUNCHES)?;
-        if let Some(stamps) = &self.stamps {
-            stamps.borrow_mut().columns = Some(Columns { slots, pending: Vec::with_capacity(STAMP_LAUNCHES), rows: Default::default() });
-        }
-        Ok(())
-    }
-
-    /// Read the pending stamps back into their entries' sums, and the pending columns into their rows.
-    fn stamps_drain(&self, stamps: &mut Stamps<'c>) -> std::result::Result<(), DeviceError> {
-        if stamps.pending.is_empty() {
-            return Ok(());
-        }
-        let times = self.card.fetch_range(&stamps.slots, 0, 2 * stamps.pending.len())?;
-        if let Some(columns) = stamps.columns.as_mut().filter(|c| !c.pending.is_empty()) {
-            let read = self.card.fetch_range(&columns.slots, 0, 2 * columns.pending.len())?;
-            for &(k, slot) in &columns.pending {
-                let (longest, walked) = (read[2 * slot], read[2 * slot + 1]);
-                let (head, octave) = (stamps.pending[k].1, u64::BITS - longest.leading_zeros());
-                let row = columns.rows.entry((head, octave)).or_insert(ColumnRow { head, octave, ..Default::default() });
-                row.launches += 1;
-                row.card_ns += times[2 * k + 1].saturating_sub(times[2 * k]) as u128;
-                row.longest += longest as u128;
-                row.longest_max = row.longest_max.max(longest);
-                row.walked += walked as u128;
-            }
-            columns.pending.clear();
-        }
-        for (k, entry) in stamps.pending.drain(..).enumerate() {
-            let slot = stamps.kernels.entry(entry).or_insert((0, 0));
-            slot.0 += 1;
-            slot.1 += times[2 * k + 1].saturating_sub(times[2 * k]) as u128;
-        }
-        Ok(())
-    }
-
-    /// The column reading so far ([`Columns`]), by head and the longest column's octave.
-    pub fn columned(&self) -> Option<Vec<ColumnRow>> {
-        let stamps = self.stamps.as_ref()?;
-        let mut s = stamps.borrow_mut();
-        self.stamps_drain(&mut *s).ok()?;
-        s.columns.as_ref().map(|c| c.rows.values().copied().collect())
-    }
-
-    /// Name the head the launches from here on read, for the card-clock reading (`None`: every head).
-    fn stamp_head(&self, head: Option<usize>) {
-        if let Some(stamps) = &self.stamps {
-            stamps.borrow_mut().head = head.map_or(u32::MAX, |h| h as u32);
-        }
-    }
-
-    /// The card-clock reading so far, by entry and head (`u32::MAX`: a launch over every head): launches and nanoseconds on
-    /// the card.
-    pub fn stamped(&self) -> Option<std::collections::BTreeMap<(&'static str, u32), (u64, u128)>> {
-        let stamps = self.stamps.as_ref()?;
-        let mut s = stamps.borrow_mut();
-        self.stamps_drain(&mut *s).ok()?;
-        Some(s.kernels.clone())
-    }
-
-    /// [measurement; agent-inferred, November 7] **The tensor cores' score tangent against the scalar one** on words the caller
-    /// chooses (`field_dz_check_k*`): receivers' `(δp̂, p̂)` (`tp`, `p`, `na × span`) and sources' `(k̂, δk̂)` (`k`, `tk`,
-    /// `nb × span`), each pair's `δz` at a skinless head and unit temperature from the tiles' limb products and from
-    /// `energy_pair_dz` mode by mode, `[na][nb]` both, and the status bits the two raised.
-    pub fn dz_check(&self, tp: &[i64], p: &[i64], k: &[i64], tk: &[i64], span: usize) -> Result<(Vec<i128>, Vec<i128>, u32)> {
-        let (na, nb) = (p.len() / span, k.len() / span);
-        let entry = match span {
-            1..=16 => "field_dz_check_k1",
-            17..=32 => "field_dz_check_k2",
-            _ => return Err(TowerError::Refused("a tangent check past two tiles of 16")),
-        };
-        let (tpc, pc, kc, tkc) = (self.take_up(tp).map_err(device)?, self.take_up(p).map_err(device)?, self.take_up(k).map_err(device)?, self.take_up(tk).map_err(device)?);
-        let mm = self.take_zeroed::<i128>((na * nb).max(1)).map_err(device)?;
-        let sc = self.take_zeroed::<i128>((na * nb).max(1)).map_err(device)?;
-        let st = self.take_zeroed::<u32>(1).map_err(device)?;
-        let (mut a, mut b, mut c, mut e, mut na32, mut nb32, mut s32, mut mp, mut sp, mut stp) = (tpc.device_ptr(), pc.device_ptr(), kc.device_ptr(), tkc.device_ptr(), na as u32, nb as u32, span as u32, mm.device_ptr(), sc.device_ptr(), st.device_ptr());
-        self.launch(entry, Self::warps(na.div_ceil(16) as u64), THREADS, &mut [arg(&mut a), arg(&mut b), arg(&mut c), arg(&mut e), arg(&mut na32), arg(&mut nb32), arg(&mut s32), arg(&mut mp), arg(&mut sp), arg(&mut stp)])?;
-        let new = self.card.fetch_range(&mm, 0, na * nb).map_err(device)?;
-        let old = self.card.fetch_range(&sc, 0, na * nb).map_err(device)?;
-        let status = self.card.fetch_range(&st, 0, 1).map_err(device)?[0];
-        Ok((new, old, status))
-    }
-
-    /// [measurement; agent-inferred, November 8] **A crowds' difference array's limbs against the ring sum**
-    /// (`field_limbs_check`): each value added as a crowd's term, `v` at cell `k mod cells` and `−v` at cell
-    /// `cells + k mod cells`, by the ring's atomic step (`add_wide`) and by the limbs (`add_difference`); the `2·cells` sums
-    /// read back, the ring's and the limbs' released (`limbs_at`).
-    pub fn limbs_check(&self, values: &[i128], cells: usize) -> Result<(Vec<i128>, Vec<i128>)> {
-        let cells = cells.max(1);
-        let up = self.take_up(values).map_err(device)?;
-        let ring = self.take_zeroed::<i128>(2 * cells).map_err(device)?;
-        let limbs = self.take_zeroed::<u64>(DIFFERENCE_LIMBS * 2 * cells).map_err(device)?;
-        let out = self.take::<i128>(2 * cells).map_err(device)?;
-        let (mut vp, mut count, mut cl, mut rp, mut lp, mut op) = (up.device_ptr(), values.len() as u64, cells as u64, ring.device_ptr(), limbs.device_ptr(), out.device_ptr());
-        self.launch("field_limbs_check", Self::cells(values.len() as u64), THREADS, &mut [arg(&mut vp), arg(&mut count), arg(&mut cl), arg(&mut rp), arg(&mut lp)])?;
-        self.launch("field_limbs_read", Self::cells(2 * cells as u64), THREADS, &mut [arg(&mut lp), arg(&mut cl), arg(&mut op)])?;
-        let ring = self.card.fetch_range(&ring, 0, 2 * cells).map_err(device)?;
-        let limbs = self.card.fetch_range(&out, 0, 2 * cells).map_err(device)?;
-        Ok((ring, limbs))
-    }
-
-    /// [measurement; agent-inferred, November 8] **A row's crowd tangents against the one-lane chain they replace**
-    /// (`field_crowds_check`), at a skinless head and the temperature `temper`: `rows` rows of `span = 2n` entries, each the
-    /// receiver's `p̂`, `δp̂` (`p`, `tp`, `[row][span]`), each of its 32 slots' two prefix rows of the words and their tangents
-    /// (`sw`, `tsw`, `[row][64][span]`, slot `s`'s at `2s` and `2s + 1`), counts (zero: no crowd) and shares (`counts`, `ce`,
-    /// `[row][32]`). Returns each crowd's `δz` and the row's `Σ p δz` (`[row][33]`) by the row's crowds at once and by the
-    /// one-lane chain, and the status bits each raised.
-    #[allow(clippy::too_many_arguments)]
-    pub fn crowds_check(&self, n: usize, temper: i128, p: &[i64], tp: &[i64], sw: &[i128], tsw: &[i128], counts: &[u64], ce: &[u64]) -> Result<(Vec<i128>, Vec<i128>, [u32; 2])> {
-        let span = 2 * n;
-        let rows = counts.len() / 32;
-        if n == 0 || span > 32 || p.len() != rows * span || tp.len() != p.len() || sw.len() != rows * 64 * span || tsw.len() != sw.len() || ce.len() != counts.len() {
-            return Err(TowerError::Refused("a crowd check's rows, spans and slots that do not agree"));
-        }
-        let (pc, tpc, swc, tswc, cc, cec) = (self.take_up(p).map_err(device)?, self.take_up(tp).map_err(device)?, self.take_up(sw).map_err(device)?, self.take_up(tsw).map_err(device)?, self.take_up(counts).map_err(device)?, self.take_up(ce).map_err(device)?);
-        let fresh = self.take_zeroed::<i128>((rows * 33).max(1)).map_err(device)?;
-        let before = self.take_zeroed::<i128>((rows * 33).max(1)).map_err(device)?;
-        let st = self.take_zeroed::<u32>(2).map_err(device)?;
-        let (mut n32, mut s32, mut r32, mut tlo, mut thi) = (n as u32, span as u32, rows as u32, temper as u64, (temper >> 64) as u64);
-        let (mut pp, mut tpp, mut swp, mut tswp, mut cp, mut cep, mut fp, mut bp, mut stp) = (pc.device_ptr(), tpc.device_ptr(), swc.device_ptr(), tswc.device_ptr(), cc.device_ptr(), cec.device_ptr(), fresh.device_ptr(), before.device_ptr(), st.device_ptr());
-        let grid = (rows as u32).clamp(1, 65_535);
-        self.launch("field_crowds_check", grid, 32, &mut [arg(&mut n32), arg(&mut s32), arg(&mut r32), arg(&mut tlo), arg(&mut thi), arg(&mut pp), arg(&mut tpp), arg(&mut swp), arg(&mut tswp), arg(&mut cp), arg(&mut cep), arg(&mut fp), arg(&mut bp), arg(&mut stp)])?;
-        let fresh = self.card.fetch_range(&fresh, 0, rows * 33).map_err(device)?;
-        let before = self.card.fetch_range(&before, 0, rows * 33).map_err(device)?;
-        let status = self.card.fetch_range(&st, 0, 2).map_err(device)?;
-        Ok((fresh, before, [status[0], status[1]]))
-    }
-
-    /// One stamp of the card's clock into `slot` on the stream.
-    fn stamp_at(&self, slots: &CardBuffer<'c, u64>, slot: usize) -> Result<()> {
-        let function = self.module.function("field_stamp").map_err(|e| device(e.into()))?;
-        let mut at = slots.device_ptr() + 8 * slot as u64;
-        function.launch_on_shared(self.card.stream(), Dim3::x(1), Dim3 { x: 1, y: 1, z: 1 }, 0, &mut [arg(&mut at)]).map_err(|e| device(e.into()))
+        let budget = free.min(BOARD_CEILING.saturating_sub(used)).saturating_sub(MARGIN);
+        Ok(Self { card, module, budget, times: FieldTimes::default(), profile: None, pools: Default::default(), held_questions: Default::default(), covector_shares: Default::default(), row_questions: Default::default(), row_out: Default::default(), row_cov: Default::default(), held_cells: Default::default(), tick_reads: Default::default(), near_sites: Default::default(), near_out: Default::default(), clock_sites: Default::default(), clock_out: Default::default(), phases: None })
     }
 
     /// The octets a batch's weight and contact stores may take.
@@ -1105,34 +853,7 @@ impl<'c> CardField<'c> {
             }
             None => None,
         };
-        let stamped = match &self.stamps {
-            Some(stamps) => {
-                let mut s = stamps.borrow_mut();
-                if s.pending.len() == STAMP_LAUNCHES {
-                    self.stamps_drain(&mut *s).map_err(device)?;
-                }
-                let k = s.pending.len();
-                // The column reading's launch goes before the launch's first stamp, so its time is not the launch's. A column
-                // launch's first two parameters are its words and its head.
-                if let Some(columns) = s.columns.as_mut().filter(|_| entry == COLUMNS_ENTRY && params.len() >= 2) {
-                    let slot = columns.pending.len();
-                    let mut out = columns.slots.device_ptr() + 16 * slot as u64;
-                    let mut lengths = [params[0], params[1], arg(&mut out)];
-                    let reading = self.module.function("field_column_lengths").map_err(|e| device(e.into()))?;
-                    reading.launch_on_shared(self.card.stream(), Dim3::x(1), Dim3 { x: 256, y: 1, z: 1 }, 0, &mut lengths).map_err(|e| device(e.into()))?;
-                    columns.pending.push((k, slot));
-                }
-                self.stamp_at(&s.slots, 2 * k)?;
-                let head = s.head;
-                s.pending.push((entry, head));
-                Some(2 * k + 1)
-            }
-            None => None,
-        };
         function.launch_on_shared(self.card.stream(), grid, Dim3 { x: block, y: 1, z: 1 }, shared, params).map_err(|e| device(e.into()))?;
-        if let (Some(stamps), Some(slot)) = (&self.stamps, stamped) {
-            self.stamp_at(&stamps.borrow().slots, slot)?;
-        }
         if let (Some(profile), Some(started)) = (&self.profile, started) {
             self.card.synchronize().map_err(device)?;
             let mut p = profile.borrow_mut();
@@ -1288,6 +1009,9 @@ impl<'c> CardField<'c> {
             rv: reach(l.v, m2 * dw),
             rout: reach(l.out, dw * m2),
             ra: reach(l.a, f * dw),
+            rg: reach(l.gchart, if d.carry { f * dw } else { 0 }),
+            wg: l.gchart as u64,
+            carry_on: u64::from(d.carry),
             rb: reach(l.b, f * dw),
             rw: reach(l.w, dw * f),
             rread: reach(l.read, dw * dw),
@@ -1311,9 +1035,6 @@ impl<'c> CardField<'c> {
             per_blank: u64::from(field.per_blank_clock),
             depth: d.depth as u64,
             bare_stretch: u64::from(field.bare_stretch),
-            carry_on: u64::from(d.carry),
-            wg: l.gchart as u64,
-            rg: reach(l.gchart, if d.carry { f * dw } else { 0 }),
             ..Words::default()
         };
         // The exponential's resident face, read once by its own loop on the card (a tower's packets read the fine field's).
@@ -1334,17 +1055,33 @@ impl<'c> CardField<'c> {
     /// region read ([`FieldRealization::read_landmarks`]).
     #[allow(clippy::type_complexity)]
     fn run(&mut self, field: &Field, regions: &[Region], returning: bool, logits: bool, keep: Option<&[usize]>) -> Result<(Vec<Vec<Option<TowerFace>>>, Vec<Vec<Option<Vec<i64>>>>, Vec<i128>, Rows, Vec<Vec<u64>>)> {
-        // [theory, November 10 23:30] The carry is read forward here; its adjoint is on claude/v14-face-line.
-        if returning && field.declaration.carry {
-            return Err(TowerError::Refused("a return through the carry is on claude/v14-face-line (this line reads a carrying state's faces)"));
-        }
         let d = field.declaration;
-        // [agent-inferred, November 6] An energy field's faces and logits are its own forward's (`energy`); its return through
-        // the ticks and its readings are not built, so every other read of it is refused.
-        if d.energy {
-            return Err(TowerError::Refused("the card reads an energy field's faces and logits alone (its return through the ticks is not built)"));
+        for region in regions {
+            if region.classes.len() != region.unresolved.len() || region.classes.len() < 2 {
+                return Err(TowerError::Refused("a region needs one class and one resolution a site, and two sites to meet"));
+            }
+            if region.classes.len() > d.reach {
+                return Err(TowerError::Refused("a region past the field's reach, where its frames would repeat"));
+            }
+            if region.classes.iter().any(|&c| c >= d.alphabet) {
+                return Err(TowerError::Refused("a region's class outside the field's alphabet"));
+            }
+            if !region.faces.is_empty() && region.faces.len() != region.classes.len() {
+                return Err(TowerError::Refused("a region's carried faces that are not one a site"));
+            }
+            if region.faces.iter().flatten().any(|face| face.is_empty() || face.iter().any(|&(c, w)| c as usize >= d.alphabet || w > 1 << STATE_BITS)) {
+                return Err(TowerError::Refused("a carried face that is empty, or whose class is outside the alphabet or share past one"));
+            }
+            if !region.locked.is_empty() && (region.locked.len() != region.classes.len() || (0..region.classes.len()).any(|t| region.locked[t] && region.faces.get(t).and_then(Option::as_ref).is_none())) {
+                return Err(TowerError::Refused("a region's locks that are not one a site, or a lock on a site that carries no face"));
+            }
+            if !region.echo.is_empty() && region.echo.len() != region.classes.len() {
+                return Err(TowerError::Refused("a region's echoes that are not one a site"));
+            }
+            if region.echo.iter().flatten().any(|e| e.logits.len() != d.alphabet) {
+                return Err(TowerError::Refused("an echo whose logits are not one a class"));
+            }
         }
-        admit_regions(&d, regions)?;
         self.mark("outside_the_card");
         let card = self.card;
         let started = Instant::now();
@@ -1467,6 +1204,9 @@ impl<'c> CardField<'c> {
             scale2: self.timed(Kind::Alloc, || self.take::<i128>((sites * lanes).max(1))).map_err(device)?,
             pa: alloc64(sites * f)?,
             pg: alloc64(if field.declaration.carry { sites * f } else { 1 })?,
+            pgam: alloc64(if field.declaration.carry { sites * f } else { 1 })?,
+            psr: alloc64(if field.declaration.carry { sites * f / 2 } else { 1 })?,
+            pqm: alloc64(if field.declaration.carry { sites * f } else { 1 })?,
             pb: alloc64(sites * f)?,
             pc: alloc64(sites * f)?,
             bits: self.timed(Kind::Alloc, || self.take_zeroed::<u32>(4)).map_err(device)?,
@@ -1686,6 +1426,8 @@ impl<'c> CardField<'c> {
         if d.carry {
             // [theory, November 11 00:22] The third chart, then the scan: one thread a (region, complex contact), sites in strand order.
             self.affine("field_affine_x32", words, words.wg, NO_BIAS, words.rg, f, dw, tick.read2.device_ptr(), dw, tick.pg.device_ptr(), f, 0, false)?;
+            // [theory, November 11 04:48, step G] The root and the three divisions off the chain, on the pair's grid; then the chain.
+            self.launch("field_pair_gamma", Self::cells((sites * f / 2) as u64), THREADS, &mut [arg(words)])?;
             self.launch("field_pair_scan", Self::cells((words.r as usize * f / 2) as u64), THREADS, &mut [arg(words)])?;
         } else {
             self.launch("field_pair", Self::cells((sites * f / 2) as u64), THREADS, &mut [arg(words)])?;
@@ -1758,6 +1500,7 @@ impl<'c> CardField<'c> {
         // fine field's own laws on the packets' strand.
         if paced > 0 {
             self.launch("field_paces", Self::cells((paced * regions) as u64), THREADS, &mut [arg(&mut tr.cwords)])?;
+            self.launch("field_skin_addresses", Self::cells((paced * n * sites) as u64), THREADS, &mut [arg(&mut tr.cwords)])?;
             self.launch("field_pframes", Self::cells((paced * sites * n) as u64), THREADS, &mut [arg(&mut tr.cwords)])?;
         }
         let d0 = field.declaration.width;
@@ -1871,11 +1614,13 @@ impl<'c> CardField<'c> {
         let kappa = self.timed(Kind::Alloc, || self.take::<i64>((paced * sites).max(1))).map_err(device)?;
         let tau = self.timed(Kind::Alloc, || self.take::<i64>((paced * sites).max(1))).map_err(device)?;
         let sigma = self.timed(Kind::Alloc, || self.take::<i64>((paced * sites).max(1))).map_err(device)?;
+        let saddr = self.timed(Kind::Alloc, || self.take::<i64>((3 * paced * n * sites).max(1))).map_err(device)?;
         let plain = self.timed(Kind::Alloc, || self.take::<u8>((paced * regions.len()).max(1))).map_err(device)?;
         let pframe = self.timed(Kind::Alloc, || self.take::<i64>((2 * paced * sites * n).max(1))).map_err(device)?;
         words.kappa = kappa.device_ptr();
         words.tau = tau.device_ptr();
         words.sigma = sigma.device_ptr();
+        words.saddr = saddr.device_ptr();
         words.plain = plain.device_ptr();
         words.pframe = pframe.device_ptr();
         let t64 = sites as u64;
@@ -1884,6 +1629,7 @@ impl<'c> CardField<'c> {
         self.launch("field_open", Self::cells(t64 * dw as u64), THREADS, &mut [arg(words)])?;
         if paced > 0 {
             self.launch("field_paces", Self::cells((paced * regions.len()) as u64), THREADS, &mut [arg(words)])?;
+            self.launch("field_skin_addresses", Self::cells((paced * n * sites) as u64), THREADS, &mut [arg(words)])?;
             self.launch("field_pframes", Self::cells((paced * sites * n) as u64), THREADS, &mut [arg(words)])?;
         }
         self.moments(field, words, regions.len(), sites)?;
@@ -1897,7 +1643,7 @@ impl<'c> CardField<'c> {
         self.mark("batch_setup");
         // [§16.44] The blanks run at the bare rate in the first tick, and each later tick at the faces the tick before
         // gave them (the host's `pass`).
-        let base_clock = [words.kappa, words.tau, words.sigma, words.plain, words.pframe, words.moment];
+        let base_clock = [words.kappa, words.tau, words.sigma, words.plain, words.pframe, words.moment, words.saddr];
         let blanks = paced > 0 && (0..sites).any(|t| unresolved[t] != 0 && st.mix_off[t] == st.mix_off[t + 1]);
         let mut clocks: Vec<Option<CardClock<'c>>> = vec![None];
         for k in 0..d.ticks {
@@ -1914,37 +1660,6 @@ impl<'c> CardField<'c> {
             }
         }
         set_clock(words, None, base_clock);
-        // [measurement; theory, November 9 19:43] The last tick's classes `[h][t]` read as each region's plates `[t][h]`.
-        if self.plates.borrow().is_some() {
-            let last = &ticks[if kept { d.ticks - 1 } else { 0 }];
-            let cls = self.timed(Kind::Copy, || card.fetch_range(&last.cls, 0, heads * sites)).map_err(device)?;
-            if let Some(out) = self.plates.borrow_mut().as_mut() {
-                for r in 0..regions.len() {
-                    let (a0, a1) = (region_off[r] as usize, region_off[r + 1] as usize);
-                    out[at_region + r] = (a0..a1).flat_map(|t| (0..heads).map(move |h| (h, t))).map(|(h, t)| cls[h * sites + t]).collect();
-                }
-            }
-            // [theory, November 9 21:59] The last tick's key words `[t][2M]` (the word half of `qkv`), where they are read.
-            if self.words.borrow().is_some() {
-                let qkv = self.timed(Kind::Copy, || card.fetch_range(&last.qkv, 0, sites * 2 * m2)).map_err(device)?;
-                if let Some(out) = self.words.borrow_mut().as_mut() {
-                    for r in 0..regions.len() {
-                        let (a0, a1) = (region_off[r] as usize, region_off[r + 1] as usize);
-                        out[at_region + r] = (a0..a1).flat_map(|t| qkv[t * 2 * m2..t * 2 * m2 + m2].iter().copied()).collect();
-                    }
-                }
-            }
-            // [theory, November 10 01:29] The last tick's probe words `[t][2M]` (`pr`, its moment added), where they are read.
-            if self.probes.borrow().is_some() {
-                let probe = self.timed(Kind::Copy, || card.fetch_range(&pr, 0, sites * m2)).map_err(device)?;
-                if let Some(out) = self.probes.borrow_mut().as_mut() {
-                    for r in 0..regions.len() {
-                        let (a0, a1) = (region_off[r] as usize, region_off[r + 1] as usize);
-                        out[at_region + r] = probe[a0 * m2..a1 * m2].to_vec();
-                    }
-                }
-            }
-        }
         // Each named site's clocks by tick (a reading, §16.44), the batch's one region.
         if let Some(named) = self.clock_sites.borrow().as_ref() {
             let mut out = self.clock_out.borrow_mut();
@@ -2073,17 +1788,6 @@ impl<'c> CardField<'c> {
         let masses = self.timed(Kind::Alloc, || self.take::<u64>(sites * a)).map_err(device)?;
         let totals = self.timed(Kind::Alloc, || self.take_zeroed::<i128>(sites)).map_err(device)?;
         self.chart(words, words.x, &fread, &fscale, true)?;
-        // [theory, November 10 01:29] The readout's chart `[t][D]` where it is read: written at the unresolved sites, zero at the rest
-        // (the host's `FieldPass::read`).
-        if self.charts.borrow().is_some() {
-            let read = self.timed(Kind::Copy, || card.fetch_range(&fread, 0, sites * dw)).map_err(device)?;
-            if let Some(out) = self.charts.borrow_mut().as_mut() {
-                for r in 0..regions.len() {
-                    let (a0, a1) = (region_off[r] as usize, region_off[r + 1] as usize);
-                    out[at_region + r] = (a0..a1).flat_map(|t| read[t * dw..(t + 1) * dw].iter().map(move |&v| if unresolved[t] != 0 { v } else { 0 })).collect();
-                }
-            }
-        }
         // The face read through the encoding (§16.26, the host's `Field::tied`): the lift `y = R r̂ + b_R`, then
         // `z(a) = rel(⟨E(a), y⟩, 16) + c_a`.
         let lift = self.timed(Kind::Alloc, || self.take_zeroed::<i64>(sites * dw)).map_err(device)?;
@@ -2354,6 +2058,7 @@ impl<'c> CardField<'c> {
             kappa: alloc64(paced * sites)?,
             tau: alloc64(paced * sites)?,
             sigma: alloc64(paced * sites)?,
+            saddr: alloc64(3 * paced * n * sites)?,
             plain: self.timed(Kind::Alloc, || self.take::<u8>((paced * regions).max(1))).map_err(device)?,
             pframe: alloc64(2 * paced * sites * n)?,
             moment: self.timed(Kind::Alloc, || self.take_zeroed::<i64>((sites * m2).max(1))).map_err(device)?,
@@ -2368,8 +2073,9 @@ impl<'c> CardField<'c> {
         let mut rp = clock.rates.device_ptr();
         self.launch("field_blank_rates", Self::cells((paced * sites) as u64), THREADS, &mut [arg(words), arg(&mut rp)])?;
         words.unresolved = unresolved;
-        set_clock(words, Some(&clock), [0; 6]);
+        set_clock(words, Some(&clock), [0; 7]);
         self.launch("field_paces", Self::cells((paced * regions) as u64), THREADS, &mut [arg(words)])?;
+        self.launch("field_skin_addresses", Self::cells((paced * n * sites) as u64), THREADS, &mut [arg(words)])?;
         self.launch("field_pframes", Self::cells((paced * sites * n) as u64), THREADS, &mut [arg(words)])?;
         self.moments(field, words, regions, sites)?;
         Ok(clock)
@@ -2435,7 +2141,7 @@ impl<'c> CardField<'c> {
         let regions = words.r as usize;
         let rows = sites + regions;
         let paced = d.paced_heads();
-        let Back { dx, dr, dc, da, db, ra, rb, dmid, dy, dyh, dq, dv, dp, ds, cv, cw, pr_back, .. } = b;
+        let Back { dx, dr, dc, da, db, dg, ra, rb, dmid, dy, dyh, dq, dv, dp, ds, cv, cw, pr_back, .. } = b;
         words.qf = tick.qf.device_ptr();
         words.qf32 = tick.qf32.device_ptr();
         words.pq = tick.pq.device_ptr();
@@ -2458,6 +2164,10 @@ impl<'c> CardField<'c> {
         words.sc = tick.sc.device_ptr();
         words.ce = tick.ce.device_ptr();
         words.pa = tick.pa.device_ptr();
+        words.pg = tick.pg.device_ptr();
+        words.pgam = tick.pgam.device_ptr();
+        words.psr = tick.psr.device_ptr();
+        words.pqm = tick.pqm.device_ptr();
         words.pb = tick.pb.device_ptr();
         words.pc = tick.pc.device_ptr();
         // The pair contact: x_out = x_mid + W_c c + b_c.
@@ -2465,13 +2175,25 @@ impl<'c> CardField<'c> {
         self.outer(words, g, words.w, dw, f, dx.device_ptr(), dw, tick.pc.device_ptr(), f, true, false)?;
         self.transposed(words, words.w, dw, f, dx.device_ptr(), dw, dc.device_ptr(), false, false)?;
         let (mut dcp, mut dap, mut dbp) = (dc.device_ptr(), da.device_ptr(), db.device_ptr());
-        self.launch("field_pair_back", Self::cells((sites * f / 2) as u64), THREADS, &mut [arg(words), arg(&mut dcp), arg(&mut dap), arg(&mut dbp)])?;
+        if d.carry {
+            // [theory, November 11 00:22] The scan's reverse, the same (region, contact) jobs in the opposite strand order, with the forward's `γ`, `s` and `Q` operand.
+            let mut dgp = dg.device_ptr();
+            self.launch("field_pair_scan_back", Self::cells((words.r as usize * f / 2) as u64), THREADS, &mut [arg(words), arg(&mut dcp), arg(&mut dap), arg(&mut dbp), arg(&mut dgp)])?;
+        } else {
+            self.launch("field_pair_back", Self::cells((sites * f / 2) as u64), THREADS, &mut [arg(words), arg(&mut dcp), arg(&mut dap), arg(&mut dbp)])?;
+        }
         self.outer(words, g, words.wa, f, dw, da.device_ptr(), f, tick.read2.device_ptr(), dw, false, false)?;
         self.outer(words, g, words.wb, f, dw, db.device_ptr(), f, tick.read2.device_ptr(), dw, false, false)?;
         self.outer(words, g, words.a_bias, f, 0, da.device_ptr(), f, 0, 0, false, false)?;
         self.outer(words, g, words.b_bias, f, 0, db.device_ptr(), f, 0, 0, false, false)?;
+        if d.carry {
+            self.outer(words, g, words.wg, f, dw, dg.device_ptr(), f, tick.read2.device_ptr(), dw, false, false)?;
+        }
         self.transposed(words, words.wa, f, dw, da.device_ptr(), f, ra.device_ptr(), false, false)?;
         self.transposed(words, words.wb, f, dw, db.device_ptr(), f, rb.device_ptr(), false, false)?;
+        if d.carry {
+            self.transposed(words, words.wg, f, dw, dg.device_ptr(), f, rb.device_ptr(), true, false)?;
+        }
         let (mut rap, mut rbp, mut cells) = (ra.device_ptr(), rb.device_ptr(), (sites * dw) as u64);
         self.launch("field_add", Self::cells(cells), THREADS, &mut [arg(words), arg(&mut rap), arg(&mut rbp), arg(&mut cells)])?;
         self.ratio_adjoint(words, tick.read2.device_ptr(), tick.scale2.device_ptr(), rb.device_ptr(), dx.device_ptr(), dmid.device_ptr(), false)?;
@@ -2494,8 +2216,8 @@ impl<'c> CardField<'c> {
         card.zero_octets(&dp, 0, 8 * sites * m2).map_err(device)?;
         for h in 0..heads {
             // The crowds' difference arrays start empty a head (§14.10).
-            card.zero_octets(&cv, 0, 8 * DIFFERENCE_LIMBS * rows * span).map_err(device)?;
-            card.zero_octets(&cw, 0, 8 * DIFFERENCE_LIMBS * rows * span).map_err(device)?;
+            card.zero_octets(&cv, 0, 16 * rows * span).map_err(device)?;
+            card.zero_octets(&cw, 0, 16 * rows * span).map_err(device)?;
             let (mut hh, mut dyhp, mut dsp, mut dqp) = (h as u32, dyh.device_ptr(), ds.device_ptr(), dq.device_ptr());
             self.launch("field_contact_rows", Self::rows_grid(sites as u64, REV_ROWS), (REV_ROWS * 32) as u32, &mut [arg(words), arg(&mut hh), arg(&mut dyhp), arg(&mut dsp), arg(&mut dqp)])?;
             if d.carries_moment(h) && !d.is_depth(h) {
@@ -2551,6 +2273,7 @@ impl<'c> CardField<'c> {
         let dc = alloc64(sites * f)?;
         let da = alloc64(sites * f)?;
         let db = alloc64(sites * f)?;
+        let dg = alloc64(if d.carry { sites * f } else { 1 })?;
         let ra = alloc64(sites * dw)?;
         let rb = alloc64(sites * dw)?;
         let dmid = alloc64(sites * dw)?;
@@ -2567,11 +2290,11 @@ impl<'c> CardField<'c> {
         let dpb = self.timed(Kind::Alloc, || self.take::<i128>(pairs.max(1))).map_err(device)?;
         words.dpb = dpb.device_ptr();
         // The crowds' difference arrays over the places `[site + region][span]`, for the values and for
-        // the word (§14.10), each cell a series of limbs.
+        // the word (§14.10).
         let regions = words.r as usize;
         let rows = sites + regions;
-        let cv = self.timed(Kind::Alloc, || self.take_zeroed::<u64>((DIFFERENCE_LIMBS * rows * span).max(1))).map_err(device)?;
-        let cw = self.timed(Kind::Alloc, || self.take_zeroed::<u64>((DIFFERENCE_LIMBS * rows * span).max(1))).map_err(device)?;
+        let cv = self.timed(Kind::Alloc, || self.take_zeroed::<i128>((rows * span).max(1))).map_err(device)?;
+        let cw = self.timed(Kind::Alloc, || self.take_zeroed::<i128>((rows * span).max(1))).map_err(device)?;
         words.cv = cv.device_ptr();
         words.cw = cw.device_ptr();
         // The values' covector at the moment modes, summed over the ticks (§15.1).
@@ -2586,11 +2309,11 @@ impl<'c> CardField<'c> {
         words.gtau = gtau.device_ptr();
         words.gsig = gsig.device_ptr();
         words.cds = cds.device_ptr();
-        Ok(Back { dx, dr, dc, da, db, ra, rb, dmid, dy, dyh, dq, dv, dp, ds, dpb, cv, cw, dm, gtau, gsig, cds, pr_back })
+        Ok(Back { dx, dr, dc, da, db, dg, ra, rb, dmid, dy, dyh, dq, dv, dp, ds, dpb, cv, cw, dm, gtau, gsig, cds, pr_back })
     }
 
     #[allow(clippy::too_many_arguments)]
-    fn reverse(&self, field: &Field, words: &mut Words, ticks: &[Tick<'c>], (clocks, base_clock): (&[Option<CardClock<'c>>], [u64; 6]), g: &CardBuffer<'c, i128>, fread: &CardBuffer<'c, i32>, fscale: &CardBuffer<'c, i128>, lift: &CardBuffer<'c, i64>, masses: &CardBuffer<'c, u64>, totals: &CardBuffer<'c, i128>, classes: &[u32], unresolved: &[u8], site_pos: &[u32], mix_off: &[u32], mix_class: &[u32], mix_share: &[u32], site_weight: &[(u64, u64)], ported: &(Vec<u32>, Vec<i64>), sites: usize, pairs: usize, mut tower: Option<(&mut TowerRun<'c>, &TowerBatch<'c>)>) -> Result<()> {
+    fn reverse(&self, field: &Field, words: &mut Words, ticks: &[Tick<'c>], (clocks, base_clock): (&[Option<CardClock<'c>>], [u64; 7]), g: &CardBuffer<'c, i128>, fread: &CardBuffer<'c, i32>, fscale: &CardBuffer<'c, i128>, lift: &CardBuffer<'c, i64>, masses: &CardBuffer<'c, u64>, totals: &CardBuffer<'c, i128>, classes: &[u32], unresolved: &[u8], site_pos: &[u32], mix_off: &[u32], mix_class: &[u32], mix_share: &[u32], site_weight: &[(u64, u64)], ported: &(Vec<u32>, Vec<i64>), sites: usize, pairs: usize, mut tower: Option<(&mut TowerRun<'c>, &TowerBatch<'c>)>) -> Result<()> {
         let card = self.card;
         let d = field.declaration;
         let (dw, m, n, f, a, heads) = (d.width, d.complex(), d.modes, d.contacts, d.alphabet, d.heads);
@@ -2751,34 +2474,7 @@ impl<'c> CardField<'c> {
         if tm == 0 {
             return Ok(());
         }
-        let l = field.layout();
-        let back = self.moment_strands_back(field, words, dm, regions, sites)?;
-        let (strand, prefix) = ((2 * sites) as u64, (2 * (sites + regions)) as u64);
-        let (mut wsp, mut cmp) = (back.ws.device_ptr(), back.cmap.device_ptr());
-        let (mut dsp, mut dbp, mut dap, mut gp) = (back.ds.device_ptr(), back.d_before.device_ptr(), back.d_after.device_ptr(), g.device_ptr());
-        let (mut w2, mut base_b, mut base_a, mut tm32) = (*words, l.moment_before as u64, l.moment_after as u64, tm as u32);
-        let (mut stride, mut pre_stride) = (strand, prefix);
-        let grid = |x: usize| Dim3 { x: x.max(1) as u32, y: tm as u32, z: 1 };
-        let mut fw = *words;
-        self.launch("field_moment_strand_return_all", Self::cells((sites * tm) as u64), THREADS, &mut [arg(&mut w2), arg(&mut base_b), arg(&mut base_a), arg(&mut tm32), arg(&mut dbp), arg(&mut dap), arg(&mut gp)])?;
-        // The moments' clock covector (§16, `moment::pace_return`): the strands and their paced prefixes read again.
-        let (before, after) = (self.timed(Kind::Alloc, || self.take::<i64>((tm * 2 * sites).max(1))).map_err(device)?, self.timed(Kind::Alloc, || self.take::<i64>((tm * 2 * sites).max(1))).map_err(device)?);
-        let (up, down) = (self.timed(Kind::Alloc, || self.take::<i128>((tm * 2 * (sites + regions)).max(1))).map_err(device)?, self.timed(Kind::Alloc, || self.take::<i128>((tm * 2 * (sites + regions)).max(1))).map_err(device)?);
-        let (mut bp, mut ap, mut upp, mut dnp, mut zero32) = (before.device_ptr(), after.device_ptr(), up.device_ptr(), down.device_ptr(), 0u32);
-        self.launch("field_moment_strands_all", Self::cells((sites * tm) as u64), THREADS, &mut [arg(&mut w2), arg(&mut base_b), arg(&mut base_a), arg(&mut tm32), arg(&mut bp), arg(&mut ap)])?;
-        self.launch_grid("field_moment_prefix_paced_all", grid(regions), MOMENT_BLOCK, MOMENT_BLOCK * 32, &mut [arg(&mut wsp), arg(&mut cmp), arg(&mut fw), arg(&mut bp), arg(&mut upp), arg(&mut stride), arg(&mut pre_stride), arg(&mut zero32)])?;
-        self.launch_grid("field_moment_prefix_paced_all", grid(regions), MOMENT_BLOCK, MOMENT_BLOCK * 32, &mut [arg(&mut wsp), arg(&mut cmp), arg(&mut fw), arg(&mut ap), arg(&mut dnp), arg(&mut stride), arg(&mut pre_stride), arg(&mut zero32)])?;
-        self.launch_grid("field_moment_pace_back_all", Dim3 { x: Self::cells(sites as u64), y: tm as u32, z: 1 }, THREADS, 0, &mut [arg(&mut wsp), arg(&mut cmp), arg(&mut fw), arg(&mut bp), arg(&mut ap), arg(&mut dsp), arg(&mut dbp), arg(&mut dap), arg(&mut upp), arg(&mut dnp), arg(&mut stride), arg(&mut pre_stride)])?;
-        Ok(())
-    }
-
-    /// [definition; §15.1] **The moments' covector returned to each moment mode's strands** (the host's
-    /// `moment::moments_return`): `dm` (`[t][2M]` on 128 bits) as each mode's 64-bit pairs, admitted, its released prefix,
-    /// each receiver's far octaves at their skins and the return, into `d_before[u][t]`, `d_after[u][t]` (pairs on 128 bits);
-    /// with the mode's words and covector, which the clock's return reads after it. `tm > 0`.
-    fn moment_strands_back(&self, field: &Field, words: &Words, dm: u64, regions: usize, sites: usize) -> Result<MomentBack<'c>> {
-        let d = field.declaration;
-        let tm = d.moment_modes();
+        let (l, card) = (field.layout(), self.card);
         let (strand, prefix) = ((2 * sites) as u64, (2 * (sites + regions)) as u64);
         let ds = self.timed(Kind::Alloc, || self.take::<i64>((tm * 2 * sites).max(1))).map_err(device)?;
         let q = self.timed(Kind::Alloc, || self.take::<i128>((tm * 2 * (sites + regions)).max(1))).map_err(device)?;
@@ -2786,8 +2482,8 @@ impl<'c> CardField<'c> {
         let ok = self.timed(Kind::Alloc, || self.take_up(&vec![0u8; (tm * regions).max(1)])).map_err(device)?;
         let (ws, cmap) = self.moment_modes(field, words, regions, sites, &ok)?;
         let (mut wsp, mut cmp, mut dmp) = (ws.device_ptr(), cmap.device_ptr(), dm);
-        let (mut dsp, mut qp, mut dbp, mut dap, mut none) = (ds.device_ptr(), q.device_ptr(), d_before.device_ptr(), d_after.device_ptr(), 0u64);
-        let (mut w2, mut tm32) = (*words, tm as u32);
+        let (mut dsp, mut qp, mut dbp, mut dap, mut gp, mut none) = (ds.device_ptr(), q.device_ptr(), d_before.device_ptr(), d_after.device_ptr(), g.device_ptr(), 0u64);
+        let (mut w2, mut base_b, mut base_a, mut tm32) = (*words, l.moment_before as u64, l.moment_after as u64, tm as u32);
         let (mut one32, mut stride, mut pre_stride) = (1u32, strand, prefix);
         let grid = |x: usize| Dim3 { x: x.max(1) as u32, y: tm as u32, z: 1 };
         self.launch("field_moment_ds_all", Self::cells((sites * tm) as u64), THREADS, &mut [arg(&mut w2), arg(&mut dmp), arg(&mut cmp), arg(&mut tm32), arg(&mut dsp)])?;
@@ -2804,7 +2500,16 @@ impl<'c> CardField<'c> {
             self.launch("field_moment_skinned_all", Self::cells((tm * regions * 2 * levels as usize) as u64), THREADS, &mut [arg(&mut wsp), arg(&mut cmp), arg(&mut fw), arg(&mut dsp), arg(&mut skp), arg(&mut stride), arg(&mut sk_stride_a), arg(&mut levels_a), arg(&mut tm32)])?;
         }
         self.launch_grid("field_moment_return_paced_all", Dim3 { x: Self::cells(sites as u64), y: tm as u32, z: 1 }, THREADS, 0, &mut [arg(&mut wsp), arg(&mut cmp), arg(&mut fw), arg(&mut dsp), arg(&mut qp), arg(&mut skp), arg(&mut dbp), arg(&mut dap), arg(&mut stride), arg(&mut pre_stride), arg(&mut sk_stride_a)])?;
-        Ok(MomentBack { ds, d_before, d_after, ws, cmap, _held: (q, ok, sk) })
+        self.launch("field_moment_strand_return_all", Self::cells((sites * tm) as u64), THREADS, &mut [arg(&mut w2), arg(&mut base_b), arg(&mut base_a), arg(&mut tm32), arg(&mut dbp), arg(&mut dap), arg(&mut gp)])?;
+        // The moments' clock covector (§16, `moment::pace_return`): the strands and their paced prefixes read again.
+        let (before, after) = (self.timed(Kind::Alloc, || self.take::<i64>((tm * 2 * sites).max(1))).map_err(device)?, self.timed(Kind::Alloc, || self.take::<i64>((tm * 2 * sites).max(1))).map_err(device)?);
+        let (up, down) = (self.timed(Kind::Alloc, || self.take::<i128>((tm * 2 * (sites + regions)).max(1))).map_err(device)?, self.timed(Kind::Alloc, || self.take::<i128>((tm * 2 * (sites + regions)).max(1))).map_err(device)?);
+        let (mut bp, mut ap, mut upp, mut dnp, mut zero32) = (before.device_ptr(), after.device_ptr(), up.device_ptr(), down.device_ptr(), 0u32);
+        self.launch("field_moment_strands_all", Self::cells((sites * tm) as u64), THREADS, &mut [arg(&mut w2), arg(&mut base_b), arg(&mut base_a), arg(&mut tm32), arg(&mut bp), arg(&mut ap)])?;
+        self.launch_grid("field_moment_prefix_paced_all", grid(regions), MOMENT_BLOCK, MOMENT_BLOCK * 32, &mut [arg(&mut wsp), arg(&mut cmp), arg(&mut fw), arg(&mut bp), arg(&mut upp), arg(&mut stride), arg(&mut pre_stride), arg(&mut zero32)])?;
+        self.launch_grid("field_moment_prefix_paced_all", grid(regions), MOMENT_BLOCK, MOMENT_BLOCK * 32, &mut [arg(&mut wsp), arg(&mut cmp), arg(&mut fw), arg(&mut ap), arg(&mut dnp), arg(&mut stride), arg(&mut pre_stride), arg(&mut zero32)])?;
+        self.launch_grid("field_moment_pace_back_all", Dim3 { x: Self::cells(sites as u64), y: tm as u32, z: 1 }, THREADS, 0, &mut [arg(&mut wsp), arg(&mut cmp), arg(&mut fw), arg(&mut bp), arg(&mut ap), arg(&mut dsp), arg(&mut dbp), arg(&mut dap), arg(&mut upp), arg(&mut dnp), arg(&mut stride), arg(&mut pre_stride)])?;
+        Ok(())
     }
 
     /// The batch's refusals, read off the card.
@@ -2845,8 +2550,7 @@ pub fn read_octets(d: &FieldDeclaration, returning: bool, echo: bool, sites: usi
     let probe_site = 4 * h * (1 + 2 * (1u64 << d.class_trits()));
     // The chart's and the pair contact's scales are one a lane (§16.40).
     let lanes = d.lanes as u64;
-    // [theory, November 11 00:22] The carry's third chart's output, one word a contact a site.
-    let carry_site = if d.carry { 8 * f } else { 0 };
+    let carry_site = if d.carry { 28 * f } else { 0 };
     let tick_site = carry_site + 4 * dw + 16 * lanes + 8 * 2 * m2 + 2 * 8 * h * span + 16 * h + 8 * h + 4 * h + 4 * h + 8 * m2 + 4 * dw + 16 * lanes + 3 * 8 * f + (2 * 16 * span + 8) * h + 8 * h * slots + probe_site + 4 * h * span + 8 * h * span + 4 * h * span + 16 * h;
     let tick_fixed = tick_fixed_octets(d);
     // The face: its read, scale, logits, masses and total, and (§16.26) the lift and its covector.
@@ -2856,10 +2560,13 @@ pub fn read_octets(d: &FieldDeclaration, returning: bool, echo: bool, sites: usi
     // The moments: the pass's values `[t][2M]`, and a mode's strands, moments, prefix sums and admission
     // (112 octets a site), batched over the modes.
     let tm = d.moment_modes() as u64;
+    // [theory, November 11 04:14, step S] The skin's site addresses: three words a (paced head, mode, site) for the pass's clock and each kept tick's own.
+    let address_site = 24 * d.paced_heads() as u64 * d.modes as u64 * (ticks_kept + 1);
     let moment_site = if tm > 0 { 8 * m2 + 112 * tm } else { 0 };
+    let moment_site = moment_site + address_site;
     // The reverse adds its covectors, the values' sum over the ticks and the moments' return, and the
-    // crowds' two difference arrays (`DIFFERENCE_LIMBS` words a cell).
-    let reverse_site = if returning { 8 * m2 + 8 * a + 5 * 8 * dw + 3 * 8 * f + 8 * m2 + 8 * h * span + 2 * 8 * m2 + 16 * m2 + 2 * 8 * DIFFERENCE_LIMBS as u64 * span + 112 * tm } else { 0 };
+    // crowds' two difference arrays.
+    let reverse_site = if returning { (if d.carry { 8 * f } else { 0 }) + 8 * m2 + 8 * a + 5 * 8 * dw + 3 * 8 * f + 8 * m2 + 8 * h * span + 2 * 8 * m2 + 16 * m2 + 2 * 16 * span + 112 * tm } else { 0 };
     let (s, pairs) = (sites as u64, (sites * sites) as u64);
     // The shares are kept for a return and an echo; the reverse holds one head's covector a pair on 64 bits.
     let weights = h * 8 * pairs * if returning { 2 } else { 1 };
@@ -2905,39 +2612,6 @@ fn encoding_partition(rows: &[(usize, u32, u32)], rows_n: usize) -> (Vec<u32>, V
     (rows_sites, rows_shares, segments)
 }
 
-/// The regions' admission, the host's `Field::admit_region` on the card's side: one class and one resolution a site, two
-/// sites at least and no more than the reach, classes and carried faces within the alphabet, locks only on carried sites,
-/// and echoes one a site.
-fn admit_regions(d: &FieldDeclaration, regions: &[Region]) -> Result<()> {
-    for region in regions {
-        if region.classes.len() != region.unresolved.len() || region.classes.len() < 2 {
-            return Err(TowerError::Refused("a region needs one class and one resolution a site, and two sites to meet"));
-        }
-        if region.classes.len() > d.reach {
-            return Err(TowerError::Refused("a region past the field's reach, where its frames would repeat"));
-        }
-        if region.classes.iter().any(|&c| c >= d.alphabet) {
-            return Err(TowerError::Refused("a region's class outside the field's alphabet"));
-        }
-        if !region.faces.is_empty() && region.faces.len() != region.classes.len() {
-            return Err(TowerError::Refused("a region's carried faces that are not one a site"));
-        }
-        if region.faces.iter().flatten().any(|face| face.is_empty() || face.iter().any(|&(c, w)| c as usize >= d.alphabet || w > 1 << STATE_BITS)) {
-            return Err(TowerError::Refused("a carried face that is empty, or whose class is outside the alphabet or share past one"));
-        }
-        if !region.locked.is_empty() && (region.locked.len() != region.classes.len() || (0..region.classes.len()).any(|t| region.locked[t] && region.faces.get(t).and_then(Option::as_ref).is_none())) {
-            return Err(TowerError::Refused("a region's locks that are not one a site, or a lock on a site that carries no face"));
-        }
-        if !region.echo.is_empty() && region.echo.len() != region.classes.len() {
-            return Err(TowerError::Refused("a region's echoes that are not one a site"));
-        }
-        if region.echo.iter().flatten().any(|e| e.logits.len() != d.alphabet) {
-            return Err(TowerError::Refused("an echo whose logits are not one a class"));
-        }
-    }
-    Ok(())
-}
-
 /// The batches of whole regions, in order, each batch's allocations within `budget`; a region whose
 /// allocations alone pass the budget is refused.
 pub fn batches(lengths: &[usize], octets: &dyn Fn(usize) -> u64, budget: u64) -> Result<Vec<std::ops::Range<usize>>> {
@@ -2962,53 +2636,16 @@ pub fn batches(lengths: &[usize], octets: &dyn Fn(usize) -> u64, budget: u64) ->
 }
 
 impl FieldRealization for CardField<'_> {
-    fn read_energy_squares(&mut self, field: &Field, squares: &[(&[usize], (usize, usize))], void: usize, eps: u32) -> Result<Vec<Option<holonics::hnn::tower::field::EnergySquare>>> {
-        self.energy_squares(field, squares, void, eps)
-    }
-    fn read_energy_central_squares(&mut self, field: &Field, squares: &[(&[usize], (usize, usize))], void: usize, steps: &[u32]) -> Result<Vec<Option<Vec<(i128, i128)>>>> {
-        self.energy_central_squares(field, squares, void, steps)
-    }
-    fn read_energies(&mut self, field: &Field, regions: &[&[usize]]) -> Result<Vec<i128>> {
-        self.energies(field, regions)
-    }
-    fn read_energy_leads(&mut self, field: &Field, places: &[(&[usize], usize)]) -> Result<Vec<holonics::hnn::tower::field::EnergyLead>> {
-        self.energy_leads(field, places)
-    }
-    fn read_energy_held_classes(&mut self, field: &Field, places: &[(&[usize], usize)]) -> Result<Vec<holonics::hnn::tower::field::EnergyHeldClasses>> {
-        self.energy_held_classes(field, places)
-    }
-    fn read_energies_under(&mut self, field: &Field, base: &Field, regions: &[&[usize]], hold: holonics::hnn::tower::field::BaseHold) -> Result<Vec<i128>> {
-        self.energies_under(field, base, regions, hold)
-    }
-    fn read_energy_opening_words(&mut self, field: &Field, places: &[(&[usize], usize)]) -> Result<Vec<holonics::hnn::tower::field::EnergyOpeningWords>> {
-        self.energy_opening_word_reads(field, places)
-    }
-    fn read_energy_faces(&mut self, field: &Field, regions: &[Region]) -> Result<(Vec<Vec<Option<TowerFace>>>, Vec<i128>)> {
-        let (faces, _, reads) = self.energy_run(field, regions)?;
-        Ok((faces, reads.iter().map(|r| r.last).collect()))
-    }
-    fn read_energy_material(&mut self, field: &Field, regions: &[Region]) -> Result<Vec<(Vec<i128>, i128)>> {
-        self.energy_material(field, regions)
-    }
     fn read_and_return(&mut self, field: &Field, regions: &[Region]) -> Result<(Vec<Vec<Option<TowerFace>>>, Vec<i128>)> {
         let (faces, _, g, _, _) = self.run(field, regions, true, false, None)?;
         Ok((faces, g))
     }
 
     fn read_faces(&mut self, field: &Field, regions: &[Region]) -> Result<Vec<Vec<Option<TowerFace>>>> {
-        // [definition; the unified-theory reading of November 6, 22:52] An energy field's faces are its energy's forces.
-        if field.declaration.energy {
-            return Ok(self.energy_run(field, regions)?.0);
-        }
         Ok(self.run(field, regions, false, false, None)?.0)
     }
 
     fn read_logits(&mut self, field: &Field, regions: &[Region]) -> Result<Vec<FieldRead>> {
-        // An energy field's logits, its echoes zero (the host's `energy_pass`: no tick is held).
-        if field.declaration.energy {
-            let (_, logits, _) = self.energy_run(field, regions)?;
-            return Ok(logits.into_iter().map(|logits| FieldRead { echo: vec![0; logits.len()], logits }).collect());
-        }
         let (_, logits, _, _, echo) = self.run(field, regions, false, true, None)?;
         Ok(logits.into_iter().zip(echo).map(|(logits, echo)| FieldRead { logits, echo }).collect())
     }
@@ -3044,32 +2681,6 @@ impl FieldRealization for CardField<'_> {
         let total = self.covector_shares.borrow_mut().take().unwrap_or_default();
         read?;
         Ok(total.chunks_exact(2).map(|c| [c[0] as u128, c[1] as u128]).collect())
-    }
-
-    fn read_words(&mut self, field: &Field, regions: &[Region]) -> Result<holonics::hnn::tower::field::WordsRead> {
-        if field.declaration.energy {
-            return Err(TowerError::Refused("an energy field's key words are not read"));
-        }
-        *self.plates.borrow_mut() = Some(vec![Vec::new(); regions.len()]);
-        *self.words.borrow_mut() = Some(vec![Vec::new(); regions.len()]);
-        *self.probes.borrow_mut() = Some(vec![Vec::new(); regions.len()]);
-        *self.charts.borrow_mut() = Some(vec![Vec::new(); regions.len()]);
-        let read = self.run(field, regions, false, false, None);
-        let plates = self.plates.borrow_mut().take().unwrap_or_default();
-        let words = self.words.borrow_mut().take().unwrap_or_default();
-        let probes = self.probes.borrow_mut().take().unwrap_or_default();
-        let charts = self.charts.borrow_mut().take().unwrap_or_default();
-        Ok(holonics::hnn::tower::field::WordsRead { faces: read?.0, plates, words, probes, charts })
-    }
-
-    fn read_plates(&mut self, field: &Field, regions: &[Region]) -> Result<(Vec<Vec<Option<TowerFace>>>, Vec<Vec<u32>>)> {
-        if field.declaration.energy {
-            return Err(TowerError::Refused("an energy field's plates are not read"));
-        }
-        *self.plates.borrow_mut() = Some(vec![Vec::new(); regions.len()]);
-        let read = self.run(field, regions, false, false, None);
-        let plates = self.plates.borrow_mut().take().unwrap_or_default();
-        Ok((read?.0, plates))
     }
 
     fn read_ticks(&mut self, field: &Field, regions: &[Region]) -> Result<Vec<Vec<TickRead>>> {
@@ -3146,7 +2757,7 @@ mod tests {
     use super::*;
 
     fn declaration(width: usize, heads: usize, contacts: usize) -> FieldDeclaration {
-        FieldDeclaration { alphabet: 122, width, heads, modes: 8, still: 2, contacts, ticks: 2, frames: 4, reach: 2221, lanes: 1, depth: 0, energy: false, carry: false }
+        FieldDeclaration { alphabet: 122, width, heads, modes: 8, still: 2, contacts, ticks: 2, frames: 4, reach: 2221, lanes: 1, depth: 0, carry: false }
     }
 
     /// [measurement; theory, November 10 20:34] **The card's footprint by growth route** (host arithmetic, no card read): from the
@@ -3162,7 +2773,7 @@ mod tests {
         // [theory, November 10 21:10] Contacts come in fours (f/2 even): each f from 68 by fours on the main line's declaration (width 64, two
         // lanes), its material, whether the contacts' two maps tile a block (`affine_tiling`: `(f, dw)` and `(dw, f)`) with the shared octets, and
         // the octets of the longest region; then the first f past 128 and the first refused, and the shared figure that refuses it.
-        let base = FieldDeclaration { alphabet: 100, width: 64, heads: 4, modes: 8, still: 2, contacts: 64, ticks: 4, frames: 4, reach: 3771, lanes: 2, depth: 0, energy: false, carry: false };
+        let base = FieldDeclaration { alphabet: 100, width: 64, heads: 4, modes: 8, still: 2, contacts: 64, ticks: 4, frames: 4, reach: 3771, lanes: 2, depth: 0, carry: false };
         let mut first_refused = None;
         for f in (68..=512).step_by(4) {
             let d = FieldDeclaration { contacts: f, ..base };
@@ -3184,7 +2795,7 @@ mod tests {
     #[test]
     #[ignore]
     fn the_card_footprint_by_growth_route() {
-        let base = FieldDeclaration { alphabet: 100, width: 64, heads: 4, modes: 8, still: 2, contacts: 64, ticks: 4, frames: 4, reach: 3771, lanes: 2, depth: 0, energy: false, carry: false };
+        let base = FieldDeclaration { alphabet: 100, width: 64, heads: 4, modes: 8, still: 2, contacts: 64, ticks: 4, frames: 4, reach: 3771, lanes: 2, depth: 0, carry: false };
         let describe = |name: &str, d: FieldDeclaration| {
             let draws = 4 * d.founding_draws();
             let field = holonics::hnn::tower::field::Field::found(d, &vec![7u8; draws]).expect("founded");
