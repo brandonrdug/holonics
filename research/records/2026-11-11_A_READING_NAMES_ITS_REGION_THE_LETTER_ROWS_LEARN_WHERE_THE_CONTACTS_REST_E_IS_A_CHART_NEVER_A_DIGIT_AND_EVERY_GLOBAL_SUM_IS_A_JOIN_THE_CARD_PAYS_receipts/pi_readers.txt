@@ -1,0 +1,16 @@
+# pi_readers.py (a host ruler on the cloud container, numbers only: Python integers reproducing tower.rs half_turn, exp_series and field.rs turn_phasor and skin_of at main 202c11d4, against pi and ln 2 attained at 400 bits; the faces of the line's declaration, 16 turned slots at reach 3,771), read 2026-11-11 from 19:24:26 UTC, 0 s, rc=0.
+RING_PERIODS 2 3 4 9 16 27 32 81 128 243 256 729 1024 2187 4096 6561
+ANGLE_CLOSEST gap_from_half=1.657e-04 of a unit of 2^-30 (12.6 bits) at ring 1024 residue 30; next 1.657e-04 at ring 1024
+PI_WIDTH extra_bits=0 angle_faces_not_nearest=805 of 12245
+PI_WIDTH extra_bits=1 angle_faces_not_nearest=2243 of 12245
+PI_WIDTH extra_bits=2 angle_faces_not_nearest=2255 of 12245
+PI_WIDTH extra_bits=3 angle_faces_not_nearest=730 of 12245
+PI_WIDTH extra_bits=4 angle_faces_not_nearest=342 of 12245
+PI_WIDTH extra_bits=5 angle_faces_not_nearest=158 of 12245
+PI_WIDTH extra_bits=6 angle_faces_not_nearest=73 of 12245
+PI_WIDTH extra_bits=7 angle_faces_not_nearest=73 of 12245
+PI_WIDTH extra_bits=8 angle_faces_not_nearest=23 of 12245
+PI_WIDTH extra_bits=9 angle_faces_not_nearest=16 of 12245
+PI_WIDTH extra_bits=10 angle_faces_not_nearest=12 of 12245
+PI_WIDTH extra_bits=11 angle_faces_not_nearest=3 of 12245
+PI_WIDTH extra_bits=12 angle_faces_not_nearest=0 of 12245
