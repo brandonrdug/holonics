@@ -1426,6 +1426,8 @@ impl<'c> CardField<'c> {
         if d.carry {
             // [theory, November 11 00:22] The third chart, then the scan: one thread a (region, complex contact), sites in strand order.
             self.affine("field_affine_x32", words, words.wg, NO_BIAS, words.rg, f, dw, tick.read2.device_ptr(), dw, tick.pg.device_ptr(), f, 0, false)?;
+            // [theory, November 11 04:48, step G] The root and the three divisions off the chain, on the pair's grid; then the chain.
+            self.launch("field_pair_gamma", Self::cells((sites * f / 2) as u64), THREADS, &mut [arg(words)])?;
             self.launch("field_pair_scan", Self::cells((words.r as usize * f / 2) as u64), THREADS, &mut [arg(words)])?;
         } else {
             self.launch("field_pair", Self::cells((sites * f / 2) as u64), THREADS, &mut [arg(words)])?;

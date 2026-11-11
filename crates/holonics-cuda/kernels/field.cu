@@ -2687,17 +2687,7 @@ extern "C" __global__ void field_pair_scan(FieldWords w) {
         for (uint64_t step = 0; step < sites; ++step) {
             const uint64_t t = first + ((e % 2 == 0) ? step : sites - 1 - step);
             const uint64_t re = t * w.f + e, im = re + half;
-            const wide gr = w.pg[re], gi = w.pg[im];
-            const wide d = ((wide)1 << 32) + gr * gr + gi * gi;
-            if (d >= ((wide)1 << 95)) {
-                atomicOr(w.status, REFUSED_CARRIER);
-                return;
-            }
-            const wide root = (wide)isqrt128((uwide)(d << 32));
-            const wide yr = div_nearest(gr << 46, root), yi = div_nearest(gi << 46, root);
-            w.pgam[re] = fit64(yr, w.status);
-            w.pgam[im] = fit64(yi, w.status);
-            w.psr[t * half + e] = fit64(div_nearest((wide)1 << 62, root), w.status);
+            const wide yr = w.pgam[re], yi = w.pgam[im];
             w.pqm[re] = fit64(qr, w.status);
             w.pqm[im] = fit64(qi, w.status);
             const wide ar = w.pa[re], ai = w.pa[im];
@@ -2708,6 +2698,29 @@ extern "C" __global__ void field_pair_scan(FieldWords w) {
             qr = fit64(nr, w.status);
             qi = fit64(ni, w.status);
         }
+    }
+}
+
+// [definition; theory, November 11 04:48, step G] **The scan's pre-pass**: `γ = g / √(1 + |g|²)` and the scale `s` depend on (t, e) only through the third chart's output `pg`, so they are
+// attained off the chain, on `field_pair`'s grid (T f/2 cells, one thread a cell): the radicand's exact integer square root (the refusal where `(1 + |g|²) 2^32` passes the carrier),
+// `γ = g 2^46 / root` and `s = 2^62 / root`, each to the nearest, written to `pgam` (`|γ| < 2^30`, so `fit64` never binds) and `psr`. The chain (`field_pair_scan`) reads `pgam` and
+// keeps its two products a step; the reverse reads `pgam`, `psr` and `pqm` as before. Every bit is the scan's own.
+extern "C" __global__ void field_pair_gamma(FieldWords w) {
+    const uint32_t half = w.f / 2;
+    const uint64_t cells = (uint64_t)w.T * half;
+    for (uint64_t c = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; c < cells; c += (uint64_t)gridDim.x * blockDim.x) {
+        const uint64_t t = c / half, e = c % half;
+        const uint64_t re = t * w.f + e, im = re + half;
+        const wide gr = w.pg[re], gi = w.pg[im];
+        const wide d = ((wide)1 << 32) + gr * gr + gi * gi;
+        if (d >= ((wide)1 << 95)) {
+            atomicOr(w.status, REFUSED_CARRIER);
+            continue;
+        }
+        const wide root = (wide)isqrt128((uwide)(d << 32));
+        w.pgam[re] = fit64(div_nearest(gr << 46, root), w.status);
+        w.pgam[im] = fit64(div_nearest(gi << 46, root), w.status);
+        w.psr[t * half + e] = fit64(div_nearest((wide)1 << 62, root), w.status);
     }
 }
 
