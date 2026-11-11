@@ -469,7 +469,7 @@ November 11. They are written here with their reasons so that no agent holds the
   line's lap-end lines. The release's stages are read on a lap's end state: there the mean stands
   above its end at every stage, because the release settles by exchange and a sharper face decides
   (G70, November 11; the reason is `agent-inferred`;
-  [the follow-up record](research/records/FOLLOWUP) §4).
+  [the follow-up record](research/records/2026-11-11_THE_RATE_LINE_STOPS_AT_ITS_REST_THE_ADDED_CONTACTS_CLOSE_A_PLACE_BETWEEN_ITS_WRITTEN_NEIGHBOURS_AND_THE_THIRD_LETTER_IS_OWED_A_CARRY_FOUNDED_AS_A_TURN.md) §4).
   ([the record](research/records/2026-11-11_A_DEPOSITS_RATE_IS_A_TEMPERATURE_ITS_STANDING_SPREAD_IS_SHED_BY_A_MEAN_OF_STATES_AND_LAP_ENDS_ARE_DRAWS_THAT_DO_NOT_REMEMBER_EACH_OTHER.md)).
 
 [project-postulate] **GPU first, and the design fixes the workload** (Brandon, October 27;
