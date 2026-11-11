@@ -93,12 +93,16 @@ fission are travels that align or part between blocks, readable by the weighed p
 
 - **The base rate word** (`2^(−12)`) steps every entry that no growth founded. Lane 1's letter rows, the most polarized blocks,
   are among them and have no part of their own (`RateParts` partitions by founding, not by block).
-- **The step's certificate** accepts, halves or refuses the whole section's step on one sum of the code over the section's own
-  regions, and again over the next section's regions.
+- ~~**The step's certificate** accepts, halves or refuses the whole section's step on one sum of the code over the section's own
+  regions, and again over the next section's regions.~~ [correction, 20:45 UTC, read in the code] The field's step has had no
+  certificate since November 5 (Brandon, 17:29 and 17:32: the step fluxes): `FieldLearner::section_realized` deposits the step at
+  its size, no reread certifies it, and every section line's halvings reads 0 by construction. This item was read from the
+  field's module doc, which still describes the certificate of November 1 to 3 (its repair rides G86's build). "It halved or
+  refused no step on laps 16 to 18" held by construction.
 
-Both are averages over the whole field, the kind of reading §3 shows to hide where the learning is. The next loops localize
-them: G84 tests whether a rate pays where a block is polarized, and the certificate is to be read per region (it halved or
-refused no step on laps 16 to 18, so the reading comes first and a change of law only if a region binds).
+So one scalar of the deposit's law is global, the base rate word, an average over every old entry and the kind of reading §3
+shows to hide where the learning is. G84 tested whether a rate pays where a block is polarized (it does, by the rule's edge);
+G86 sets each part's rate by its polarization and gives the first lane's letter rows parts of their own.
 
 ## 5. Radix e is a chart and never a digit
 
@@ -256,8 +260,8 @@ and `ln 2` attained at 400 bits, on the line's declaration (16 turned slots, rea
   divergent classes, and by Riemann's rearrangement theorem a reordering reaches any sum. The exponential's terms grouped by
   `k mod 4` are the cosine and the sine, the four classes of the quarter points (`i^k = 1, i, −1, −i`; `ring_route.py` attains
   the roots so). The precision law's "numerators grouped over the denominators they share" is the same move, and a class's
-  partial sum is a register of the value (a word partitioned across registers, November 5). In the field it splits a section's
-  summed code, the step's certificate, into its regions' partial sums: the certificate per region that §4 owes.
+  partial sum is a register of the value (a word partitioned across registers, November 5). In the field it would split a section's
+  summed code into its regions' partial sums (the certificate per region this item named has no object: the step fluxes, §4).
 - **Spacetime is relational** (correcting §5b). Under general covariance the manifold's points carry no physical identity: what
   is physical is coincidences, the meetings of worldlines and the values fields take there (Einstein's point-coincidence
   argument, 1916, his answer to the hole argument). A contact has finite width and length, and motion is momentum exchanged
@@ -298,12 +302,12 @@ What follows for the machine, as a test:
   partition; a float sum's bits follow its schedule.
 - **A harmonic class costs a join.** A lane-local step (a stencil, `x ↦ x − aΔx`) relaxes the exact and coexact parts and leaves
   the harmonic part fixed (`thermal.heat-kernel`). A quantity that depends on every lane of its support (a row's normalizer
-  `Σ_b 2^(z_b)`, a scan's carry along a strand, a section's summed certificate) needs depth at least `⌈log_k p⌉` over `p` lanes at
+  `Σ_b 2^(z_b)`, a scan's carry along a strand, a section's summed code) needs depth at least `⌈log_k p⌉` over `p` lanes at
   fan-in `k`: one grid-wide join. So a pass's time is bound by its work over its lanes and by its count of independent joins in
   sequence, beside `holarchy.work-depth-bound`.
-- **Every global average in the law is such a join.** The section's certificate is a join over every region of a section, and
-  the base rate word is the same averaging held as one number for every old entry. A certificate read per region (§4) turns one
-  grid-wide join into a join per region.
+- **Every global average in the law is such a join.** The base rate word is an averaging held as one number for every old
+  entry, and a rate read per region (§4, G86) turns it into a number per part. (The section's certificate this item first named
+  is not in the law: the step fluxes, §4.)
 - **Graphics, physics and learning are the same three moves.** A stencil is local diffusion; a ray is a gather along a chain; a
   texture fetch is a gather by address; a matrix product is a reduction tree; a softmax is a row's harmonic class. The carry of
   addition is itself an associative product (`radix.adder-bracketing`), which is why a scan carries in logarithmic depth.
