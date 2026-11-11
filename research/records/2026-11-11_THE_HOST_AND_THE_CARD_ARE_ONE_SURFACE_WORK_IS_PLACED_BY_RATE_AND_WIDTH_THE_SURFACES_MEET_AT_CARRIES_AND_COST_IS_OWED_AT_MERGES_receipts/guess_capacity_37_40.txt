@@ -1,0 +1,53 @@
+G37 fixed 2026-11-11T01:28Z, unread (host rulers for the lens of 01:19Z: where the news lies and how many events each grain has).
+  a) TRAIN grains: separators (space class and punctuation) are 0.33 of places (held 0.28 to 0.38); unit starts (a word letter after a
+     non-word letter) 0.15 of places (0.12 to 0.18); newlines 0.035 (0.025 to 0.045).
+  b) rt4 locked visit, covector mass m_t = |p_t - q_t|^2 (q the reference letter's indicator): half of the summed mass lies in 0.14 of the
+     held places (held 0.10 to 0.18).
+  c) the share of held places with m_t under 2^-6 is 0.42 (held 0.34 to 0.50).
+  d) mean m_t at unit starts over inside units: 1.5 (held 1.3 to 1.7).
+  Rule: b under 0.2 and c over 0.34: the lap's arithmetic is spread evenly over places while its news is not; cost does not follow news.
+
+G38 fixed 2026-11-11T01:28Z, unread (design's 5 s samples and lap profile of rt7).
+  a) training sections: the card's time share (nvidia sample) median 0.90 or more; the host process 0.25 of one core or less.
+  b) the card's own kernel time over the section wall (stamps): 0.80 (held 0.70 to 0.90).
+  c) re-draw stage: kernel time over wall 0.50 or less (the gaps are waits on the host's chain).
+  Rule: b 0.70 or more: placing the same events on the host adds at most 1/b - 1, and the lever is the event structure (cost following
+        news; wider launches), not placement. b under 0.50: the lap is latency-bound and its narrow chain goes to the host first.
+
+G37 read 2026-11-11T01:30Z (cap_t.py; cap_t_grains.log, cap_t_news.log).
+  a) held: separators 0.3301 (0.2052 space class, 0.1249 punctuation and the rest); unit starts 0.1390 (1,125,322 units of 4.82 word
+     letters); newlines 0.0342 (277,282 lines of 29.2 places); 24,685 passages of 328.0 places.
+  b) missed, more concentrated than guessed: half of the covector mass lies in 0.070 of the held places on rt4 (0.072 on ct8); nine tenths
+     in 0.170 (0.175); 0.99 in 0.271 (0.279).
+  c) missed, more places are quiet than guessed: 0.6845 of places have mass under 2^-6 and hold 0.0038 of it (ct8 0.6748, 0.0037);
+     0.5462 are under 2^-10; the face sits at 0.95 or more on the reference letter at 0.6123 of places, at 0.99 or more at 0.4267.
+  d) held: 1.427 (ct8 1.393), with the unit ruler's own starts (0.4078 of places, the stops counted as starts of their own units).
+  Rule: met (b under 0.2, c over 0.34): on the locked faces the news is concentrated and the lap's arithmetic is not.
+
+G39 fixed 2026-11-11T01:31Z, unread (design, one section at rt7's state: the section's deposit covector G split by place at covector
+  mass 2^-6 into G_quiet + G_loud, with the built site weights).
+  |G_quiet| / |G| is 0.30 (held 0.15 to 0.45); the cosine of G_loud with G is 0.93 (held 0.85 or more).
+  Rule: quiet ratio 0.2 or less and cosine 0.95 or more: cost may follow news (a visit clock counted in news is a candidate law).
+        quiet ratio 0.5 or more: the quiet places carry a coherent push; the covector mass is the wrong count for a clock.
+
+G38 read 2026-11-11T01:39Z (design's coarse profile of rt7: nvidia-smi and ps every 5 s; no stamps in the v14 card driver yet).
+  a) held: training 1,069.8 s, 209 samples: card time share mean 0.94, median 0.95, least 0.26; the host training process 0.15 of one core.
+  b) on the proxy only, above the band: the time share with a kernel resident is 0.94 against the guessed 0.80 (0.70 to 0.90); the stamps'
+     kernel time over wall is unread.
+  c) missed on what was sampled: the re-draw stage's last 82 s (14 samples) read 0.89 (median 0.99); the 0.44 was one sample at its start.
+  Rule (b 0.70 or more): placing today's events on the host adds at most 1/0.94 - 1 = 0.06. The lever is inside the launches: the card
+  drew 186 W of 320 in training with a kernel resident 0.94 of the time.
+
+G40 fixed 2026-11-11T01:48Z, unread (design: a FIELD_PROFILE card read of training sections from rt7's state; the instrument is built,
+  field_pass.rs). Read before fixing: two older profiles in design's run directory (November 5, another declaration, training: launches
+  under 200 us hold 0.027 of kernel time, the contact family 0.385, the affine maps 0.357; November 6, this passage, a release read:
+  0.160, 0.637, 0.022; least launch 22 us), and the source (sections are cut from problems sorted by length; a contact row is summed
+  whole in 5 to 20 limbs of 64 bits a lane and divided once).
+  a) kernels are 0.85 or more of the profiled elapsed time; allocations 0.03 or less.
+  b) entries under 200 us a launch hold 0.10 of kernel time (held 0.05 to 0.16).
+  c) the contact family (exposure, contact_l*, contact rows and columns, pair, echo, skin back, spread) holds 0.60 (held 0.50 to 0.75);
+     the affine maps 0.08 or less.
+  d) the five heaviest entries hold 0.55 or more, each in the contact or the moment family.
+  Rule: c 0.50 or more: the card's lever is the wide row (one word of 5 to 20 limbs a lane and a long division a row); the digit
+        partition applies inside the card first (limbs across lanes, carries deferred, the carry and the division once a row).
+        b 0.15 or more: those entries are the first candidates for the host by n*.
