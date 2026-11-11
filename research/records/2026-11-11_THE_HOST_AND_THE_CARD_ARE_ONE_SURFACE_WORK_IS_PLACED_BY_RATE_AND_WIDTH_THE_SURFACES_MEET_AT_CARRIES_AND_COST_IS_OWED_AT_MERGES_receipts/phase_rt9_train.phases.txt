@@ -1,0 +1,13 @@
+FIELD_CARD_OPEN card=NVIDIA GeForce RTX 4080 SUPER free=15542321152 total=16802250752 batch_budget=10551230464
+FIELD_CARD reads=46 read_ms=11444 returns=316 return_ms=197554 pairs=18219004308 batches=1351 peak_store=8438645954 landmarks=0 landmark_ms=0 elapsed_ms=213042
+FIELD_PHASE name=batch_drop_and_collect marks=1351 ms=3470 us_a_mark=2569
+FIELD_PHASE name=batch_setup marks=1351 ms=38277 us_a_mark=28332
+FIELD_PHASE name=face_launch marks=1351 ms=1072 us_a_mark=793
+FIELD_PHASE name=outside_the_card marks=362 ms=3945 us_a_mark=10898
+FIELD_PHASE name=reverse_launch marks=1351 ms=121648 us_a_mark=90043
+FIELD_PHASE name=run_setup marks=1351 ms=184 us_a_mark=136
+FIELD_PHASE name=status_wait marks=1351 ms=723 us_a_mark=535
+FIELD_PHASE name=tick_exposure_wait marks=5404 ms=22244 us_a_mark=4116
+FIELD_PHASE name=tick_launch_post marks=5404 ms=93 us_a_mark=17
+FIELD_PHASE name=tick_launch_pre marks=5404 ms=21226 us_a_mark=3927
+MEASURE lap=phase_rt9_train rc=0 wall_s=213.5 peak_rss_kib=786680

@@ -1,6 +1,6 @@
 # A grip of letters is a navigator word, the fixed-advance moment reads only pair terms, and the contact's product must carry along its own circle
 
-Status (2026-11-10, night; amended 2026-11-11, 00:22 UTC): a ruling of theory with its host rulers. A lens of 23:49 UTC amended the ruling within the hour: §8 holds the amended law and its reads, and §2.4 and G30 stand only as the first form. The card attempt is unbuilt. Refs #73, #406, #408, #410.
+Status (2026-11-10, night; amended 2026-11-11, 00:22 UTC; G33 scored 2026-11-11, 01:52 UTC): a ruling of theory with its host rulers. A lens of 23:49 UTC amended the ruling within the hour: §8 holds the amended law and its reads, and §2.4 and G30 stand only as the first form. The card attempt is unbuilt. Refs #73, #406, #408, #410.
 
 [historical] The lens (Brandon, November 10, 22:15 UTC, paraphrased). Walking toward a wall, a step is not a fixed half of what remains. Each step is founded discretely, the gap it leaves has a basis of its own, and the steps still possible re-tile as one moves, so one stride can be longer than another and change how many remain. This record takes that part of the lens to the machine: what a written letter does to the frame in which the next one is read. The rest of the lens is in [the navigation record](2026-11-10_THE_COST_OF_NAVIGATING_BETWEEN_STATES_HAS_A_FLOOR_FROM_COUNTING_A_HALF_FROM_REVERSAL_WITH_A_POSITIVE_PAIRING_AND_LANDMARKS_ARE_ITS_COMPRESSED_POTENTIAL.md).
 
@@ -41,7 +41,7 @@ It also corrects a reading of the same evening. At 22:40 UTC theory read design'
 
 Logits that are sums over the letters of pair terms are what a pair-only reader fits. So a source that enters by place-clocked moments and is read linearly holds no joint term of two written letters, at any width. A joint term can enter only where the passage is not linear in the encodings: a product of two faces, or a normalization.
 
-[amended November 11] This is the plain clock's case. The built field's turned heads read their moment on clocks whose rate is a class's own (`tower.field-pace`), which is a content stride of a restricted form: one real rate a class a head, with the skin tied to the turn. What those clocks have located on this line is G33 (§8.4).
+[amended November 11] This is the plain clock's case. The built field's turned heads read their moment on clocks whose rate is a class's own (`tower.field-pace`), which is a content stride of a restricted form: one real rate a class a head, with the skin tied to the turn. What those clocks have located on this line is G33 (§8.4), read on November 11: lines, and not words.
 
 ### 2.2 The content-stride moment
 
@@ -159,7 +159,7 @@ All fixed in `guess_capacity_28_30.txt` before their reads.
 
 ## 7. Owed
 
-- Design: the amended attempt of §8.4 with G30′, and G33.
+- Design: the amended attempt of §8.4 with G30′. G33 is read and scored (§8.4).
 - Theory: the rulers on design's own places, since the field and the rulers were read on different places. The locked visits of §8.2 are on the rulers' places, which closes this for the locked read.
 - Theory: the ruler for both sides, a left word times a right word at the open site.
 - Lean, for #410: the append law `m(l ++ w) = A(w) m(l) + m(w)` for an advance that depends on the letter, over a commutative ring, with `moment_append` as its constant case; and the statement that a linear reading of the fixed-advance moment is a sum of one-letter terms.
@@ -305,7 +305,18 @@ The reasons for the amendment:
 
 **G30′** (fixed 00:20 UTC, unread). Four laps from rt4, beside the part-rate line's laps 5 to 8: the third letter passes 0.21 or more (now 0.169); the fourth 0.06 or more (now 0.029); letters five to eight together 0.03 or more; the held joint ends 0.02 or more under the line's at lap 8; the locked code inside units ends 0.02 or more under the line's (rt4: 0.442; theory reads design's visit); mean `|γ|` is 0.08 (0.05 or more: the carry opened; under 0.02: it did not, and travel binds); and on 6 of the 32 circles the mean `|γ|` at separator sites is 0.7 or less of that at word-letter sites (4 or more: the strides are locating units; none with the strides open: place strides, units not located).
 
-**G33** (fixed 00:20 UTC, unread; a host read of rt4). Each paced head's rate `1 + c_h[u]` by class: the separators' mean rate over the word letters' is 1.3 on the stronger head. 1.5 or more, or 0.67 or less, on a head: that clock already stops or idles at separators, and the opening moment is cut into units there. 0.8 to 1.25 on both heads: the clocks are place clocks in effect.
+**G33** (fixed 00:20 UTC; a host read of rt4). Each paced head's rate `1 + c_h[u]` by class: the separators' mean rate over the word letters' is 1.3 on the stronger head. 1.5 or more, or 0.67 or less, on a head: that clock already stops or idles at separators, and the opening moment is cut into units there. 0.8 to 1.25 on both heads: the clocks are place clocks in effect.
+
+[measurement; design's host read of the pace family on rt4, November 11 01:51 UTC; host only, no lap waited] **G33 scored: held.** The separators' mean rate over the word letters' is 1.37 on the stronger head (head 1, whose rates spread 1.62) and 1.28 on head 0 (spread 1.23), against the guessed 1.3. This is the rule's middle case: the clocks lean on separators and neither stops there in the mean.
+
+| Class (rate over a word letter's) | Head 1 | Head 0 |
+| --- | --- | --- |
+| newline | 4.96 | 1.75 |
+| punctuation | 1.32 | 1.29 |
+| the space | 0.72 | 1.16 |
+
+- **The mean hides a split on head 1.** Its clock runs 4.96 word letters' worth at a newline (rate 13.497 against 2.720) and runs the space slower than a letter (1.956). The unresolved row reads 1.000 on both heads.
+- **What the built clocks have located.** Head 1 strides at lines, and no head stops at the space. The line is the grain the built class clocks already cut; the word is not. This is the occasion the scan of §8.4 answers at the contact's circles, and G30′'s last clause (the strides at separator sites) is the read that says whether the scan locates the word.
 
 ### 8.5 What does not transfer
 
@@ -317,8 +328,8 @@ The reasons for the amendment:
 
 ### 8.6 Owed
 
-- Design: the amended attempt on host and card with its parity; G30′; G33.
-- Theory: the locked visit of the attempt's state read inside units (a clause of G30′); the scores of G30′ and G33.
+- Design: the amended attempt on host and card with its parity; G30′.
+- Theory: the locked visit of the attempt's state read inside units (a clause of G30′); the score of G30′.
 - Theory: the unit-grain ruler for both sides, and a ruler whose stops are located from fitted strides in place of the kinds of letters.
 - Lean, for #410: associativity of `(A₂, m₂) ∘ (A₁, m₁) = (A₂A₁, A₂m₁ + m₂)` and the telescoped moment over any bracketing; `m(l ++ w) − m(l′ ++ w) = A(w)(m(l) − m(l′))`; `|g / (1 + |g|²)^(1/2)| < 1`.
 
@@ -336,5 +347,6 @@ In `*_receipts/` (`README.md` there lists every file):
 - `cap_r.py`, `cap_r.log.txt`: design's locked visits, the field's surprise against itself, by unit start and by kind.
 - `cap_s.py`, `cap_s.log.txt`: the field's stored faces multiplied into a count law.
 - `guess_capacity_32_36.txt`: G32, G34, G35, G36, G30′ and G33 as fixed, with their times.
+- G33's read and its score, with their times, are in `guess_capacity_33_43.txt` in the receipts of [the two-surface record](2026-11-11_THE_HOST_AND_THE_CARD_ARE_ONE_SURFACE_WORK_IS_PLACED_BY_RATE_AND_WIDTH_THE_SURFACES_MEET_AT_CARRIES_AND_COST_IS_OWED_AT_MERGES.md); design's script and its table of rates by class stay in its run directory (the passage is private).
 
 The reads of §8 ran on the same VM between 23:55 and 00:20 UTC, each inside one call of at most 180 s; the tables took 8 to 20 s each.

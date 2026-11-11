@@ -1,0 +1,78 @@
+G33 read 2026-11-11T01:52Z (design's host read of the pace family on rt4; numbers relayed 01:51Z, script g33.py in design's run directory).
+  Held: separators (space class and punctuation, weighted by frequency) over word letters is 1.37 on the stronger head (head 1, spread
+  1.62) and 1.28 on head 0 (spread 1.23). The rule's middle case: the clocks lean on separators and neither stops there in the mean.
+  By class the mean hides a split on head 1: newline 4.96 word letters (rate 13.497 against 2.720), punctuation 1.32, the space 0.72
+  (rate 1.956, slower than a word letter). Head 0: newline 1.75, punctuation 1.29, the space 1.16. Mean rates 3.05 and 2.70; the
+  unresolved row 1.000 on both. So head 1's clock strides at lines and not at words: the line is the grain the built clocks already cut.
+
+Control for G30' recorded 2026-11-11T02:24Z (design's relay of 02:24Z; the part-rate line with the unamended carry, laps 5 to 8 from the lap-4 state):
+  held joint 1.7622 at lap 4, then 1.7544, 1.7524, 1.7506, 1.7459 (laps removed 0.0078, 0.0020, 0.0019, 0.0047); locked code 0.5305 to 0.5198.
+  The plain-rate line from the same lap-4 state read 1.7748 at its lap 10; the part-rate line at lap 8 is 0.029 under it. The line runs on to laps 9 to 12.
+  G30' is scored against these four laps: the amended carry's lap 8 held joint is guessed 0.02 or more under 1.7459, its locked code inside units 0.02 or more under the line's.
+
+Part-rate guess of 2026-11-10T19:05Z scored 2026-11-11T02:57Z (design's relays of 02:24Z and 02:54Z; laps 5 to 8 of the part-rate line against the plain line's last lap):
+  held joint 1.7459 against 1.7748: 0.029 under, guessed 0.03 or more: missed by 0.001.
+  locked code 0.5198 (design's read) against the plain line's, whose last value by design's instrument is asked for; by my read of the two visits
+  (rt4 0.5289, ct8 0.5516) the gap is about 0.032, guessed 0.02 or more.
+
+G41 fixed 2026-11-11T02:57Z, unread (rt10 to rt12 of the part-rate line, every part at the floor rate 2^-12 but the lane's face biases; after the alarm at rt9, +0.0014).
+  Read before fixing: laps 6 to 9 moved -0.0020, -0.0019, -0.0047, +0.0014; the plain line at the same rate moved -0.0003 at its last lap; cosines after
+  rt9: contacts 0.03 to 0.10, lane E rows 0.27 to 0.33, face biases 0.38. [derived, linear relaxation] a part at stationarity reads c between -1/2 and 0
+  (successive displacements of a walk that relaxes are anticorrelated), so the contacts diffuse with almost no drift and the lane parts still drift under noise.
+  Guess: the three laps together move the held joint -0.003 (held -0.008 to +0.002); no lap rises more than 0.004.
+  Rule: within 0.002 of zero: at the floor the line has stalled and the lever is the law (the carry, then the floor). -0.006 or under: the part rates left a
+  slope the plain rate follows. Stop rule sent: a rise above 0.004 in one lap or two rises in a row; rt8 then stands as the best state.
+
+Part-rate guess, locked code, scored 2026-11-11T02:59Z (design's relay of 02:59Z, refread.sh on HELD128, one instrument for both lines):
+  plain ct9 0.549086, ct10 0.545518 (entropy 0.512671); part-rate rt8 0.519775. The part-rate line at lap 8 is 0.0257 under the plain line at its lap 10
+  (two laps later), guessed 0.02 or more: held. The held joint's 0.029 is also against plain's lap 10; at equal laps both gaps are a little larger.
+
+G40 READ 2026-11-11T03:39Z (design's FIELD_PROFILE reads from rt9; logs prof_rt9_train.log, prof_rt9_redraw.log; relayed 03:26Z; logs re-read by theory)
+ training (301 sections, 212.3 s): kernels 0.743 of elapsed [guess >= 0.85: MISSED]; allocations 0.093 [guess <= 0.03: MISSED];
+  copies 0.022; host remainder 0.142. entries under 200 us a launch 0.228 of kernel time [guess 0.10, 0.05-0.16: MISSED high];
+  contact family 0.487 [guess 0.60, 0.50-0.75: MISSED by 0.013]; affine 0.030 [guess <= 0.08: HELD];
+  top five 0.504 [guess >= 0.55: MISSED], each contact or moment/pace [kinds HELD].
+ re-draw (32 held, 93.4 s): kernels 0.783, allocations 0.119, copies 0.062; under 200 us 0.004; contact 0.572; affine 0.074; top five 0.821.
+ G38b RESCORED: kernel time over wall 0.743 in training, inside the guessed band 0.70-0.90: HELD. The nvidia-smi proxy (0.94) over-read
+  (it counts transfers and allocations as busy). WITHDRAWN: "the host can add at most 0.06", "the lever is inside the launches".
+ rule fired: short launches 0.228 >= 0.15. By the law's own measure none moves to the host: least launch 23 us, mean copy 94 us (a crossing
+  costs four launch latencies), so n* is negative in mid-chain.
+ read from source (v14 field.rs, field.cu): read_octets reserves 280 octets a PAIR OF SITES of a region's square (4 ticks x 4 heads x 8 x 2
+  + 24), dense address [i][j]; the opening regions are question + 2062 room places; pairs met (FIELD_CARD) 57.8e6 a return over 16 head-ticks
+  = 3.6e6 a head-tick against about 90e6 reserved (my estimate from batches and peak_store): about 4%. batches 1267 over 306 returns = 4.14.
+
+G42 FIXED 2026-11-11T03:39Z (unread): the share store addressed by the support (row stride NEAR_SLOTS + the region's definite count, entry k), one change:
+ a) batches a return 1.0-1.3 (now 4.14); b) card memory peak <= 6 GB (now 12.3); c) lap wall 880 s (800-960; now 1070);
+ d) profiled: kernels >= 0.85 of elapsed, allocations <= 0.04; e) forward contact (contact_l5 + exposure) ns a pair met <= 1.0 (now 1.24).
+ acceptance of the realization: the state after one lap from rt9 has the dense build's bytes (rt10's sha).
+ rule: c above 960 s with a held means the fixed cost a batch was not the cost; then the phase trace (FIELD_PHASES) decides the next step.
+ note 2026-11-11T03:42Z on G42e, after fixing and before any read: the re-draw's own log reads reads=29 batches=141 pairs=23511449429, so its
+  forward contact (contact_l5 + exposure, 41.0 s) is 1.75 ns a pair met, slower a pair than training's 1.30 ns (l5 + l6 + exposure over
+  17.70e9). Training's "now 1.24" left out contact_l6; the base is 1.30. The premise of e (fuller launches run faster a pair) has no
+  support in these two reads. The guess stays as fixed; a miss on e is expected.
+
+Correction 2026-11-11T03:52Z to the part-rate scores of 02:57Z and 02:59Z: the plain line's last state (ct10) is six laps from the shared state and
+ the part-rate line's rt8 is eight, so those gaps (0.029, 0.0257) compare unequal laps, and "two laps later" was backwards. At equal laps
+ (six): held joint 1.7524 against 1.7748, 0.0224 under (guess 0.03: MISSED); locked code 0.5215 against 0.5455, 0.0240 under (guess 0.02:
+ HELD). At lap 4 the gaps were 0.0216 and 0.0229: the gap was made in the first four laps and has been level since.
+
+G43 FIXED 2026-11-11T03:52Z (unread). Read before fixing: the eleven FIELD_PART_RATE logs (rt1 to rt11) and rt10's held joint 1.7428 (relayed 03:50Z).
+ [derived; checked by a simulation on a noisy quadratic] with the earlier lap of a pair at rate eta, the cosine of the two lap
+ displacements is c = c_s - eta*Hbar (c_s the drift's share of the displacement's power), and the code's expected fall over a lap is
+ greatest at eta* = c_s/Hbar, where c = 0; at 2 eta* the expected fall is zero. On the logs: enc/before/after of the lane read
+ 0.68, 0.60, 0.45, 0.19 with the earlier lap at octaves 0, 3, 4, 5: h0 = 0.012, 0.019, 0.016 from the three differences; at the floor
+ they now read 0.29 to 0.33. The 1/2 rule lowers a part that still drifts.
+ Test: three laps from rt9 under the zero-seeking rule (faster iff c^ > h/2 + eps, slower iff c^ < -h/4 - eps, never under octave 0),
+ opened at octaves w 0, a_new 1, b_new 1, enc 4, before 4, after 4, q 0, v 2, probe 0, out 0, moment_face 0, read 0, face_biases 3, a 0, b 0,
+ beside rt10 to rt12 at the floor.
+ a) cosines of enc, before, after of the lane read from two laps both at octave 4: 0.06 (-0.05 to 0.15).
+ b) v_lane from two laps at octave 2: 0.0 (-0.12 to 0.12); face biases from two laps at octave 3: 0.2 (0.05 to 0.3).
+ c) held joint at lap 12: 0.004 under the floor line's (0.000 to 0.009); no lap rises more than 0.004.
+ Rule: a at 0.2 or more: the cosine does not fall with the rate as the first four laps' line says, and the zero rule has no ground.
+ a held: the 1/2 rule is retired for the zero rule on later lines. c alone decides nothing (0.004 is within two laps' noise).
+
+Note 2026-11-11T04:02Z on the G40 read's source line: "pairs met 57.8e6 a return" took every met pair as a return's. Over the run's 306 returns and
+ 46 reads it is 50 to 58 million a run of a section, 3.1 to 3.6 million a head-tick, 25 to 29 times under the reservation. The record carries these.
+Design's dry run of the zero-seeking rule (relayed 03:55Z; host only, states of laps 6 to 9, present octave 0 unless said): a_new 0.052 and b_new 0.062
+ faster (eps 0.02); w_new -0.011 rests; enc, before, after 0.30 faster; q, v, probe, out, moment_face 0.12 to 0.31 faster; read -0.046 rests;
+ face biases 0.31 at octave 1 faster (eps 0.15); a_lane -0.25 and b_lane -0.23 rest on the floor. Every term an integer released at 2^-40.
