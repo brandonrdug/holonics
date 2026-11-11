@@ -1,0 +1,59 @@
+# state_travel.py rank 32 on the growth line (host arithmetic, 0.10 s); the whole output's sha256 begins 2194fb6e and stays on the PC
+# declaration {'alphabet': 100, 'width': 64, 'heads': 4, 'modes': 8, 'still': 2, 'contacts': 64, 'ticks': 4, 'frames': 4, 'reach': 3771, 'lanes': 2, 'carry': False}; contacts 32 -> 64; a drawn subspace of r directions holds r/64
+# state 0 g0/STATE.0
+# state 1 ct1/STATE.0
+# state 2 ct2/STATE.0
+# state 3 ct3/STATE.0
+# state 4 ct4/STATE.0
+FORM w contacts=new state=0 rms=0 pr=nan
+FORM w contacts=old state=0 rms=3.9813e+06 pr=11.43
+FORM w contacts=new state=1 rms=1.2649e+05 pr=20.08
+FORM w contacts=old state=1 rms=3.9837e+06 pr=11.44
+FORM w contacts=new state=2 rms=2.255e+05 pr=20.32
+FORM w contacts=old state=2 rms=3.9874e+06 pr=11.45
+FORM w contacts=new state=3 rms=3.1269e+05 pr=19.91
+FORM w contacts=old state=3 rms=3.9897e+06 pr=11.46
+FORM w contacts=new state=4 rms=3.8328e+05 pr=19.22
+FORM w contacts=old state=4 rms=3.9913e+06 pr=11.48
+LAP lap=0 family=a contacts=new rms=67813 pr=7.27 top1=0.3247 top4=0.5581
+LAP lap=0 family=a contacts=old rms=81576 pr=19.72 top1=0.0942 top4=0.3200
+LAP lap=0 family=b contacts=new rms=75292 pr=3.47 top1=0.5217 top4=0.6869
+LAP lap=0 family=b contacts=old rms=69586 pr=20.18 top1=0.0868 top4=0.3076
+LAP lap=0 family=w contacts=new rms=1.2649e+05 pr=20.08 top1=0.0883 top4=0.3032
+LAP lap=0 family=w contacts=old rms=56508 pr=17.56 top1=0.1052 top4=0.3645
+LAP lap=1 family=a contacts=new rms=3.128e+05 pr=17.02 top1=0.1375 top4=0.3636
+LAP lap=1 family=a contacts=old rms=80688 pr=19.44 top1=0.0970 top4=0.3269
+LAP lap=1 family=b contacts=new rms=3.2981e+05 pr=16.97 top1=0.1119 top4=0.3739
+LAP lap=1 family=b contacts=old rms=70093 pr=19.90 top1=0.0892 top4=0.3153
+LAP lap=1 family=w contacts=new rms=1.212e+05 pr=19.80 top1=0.0916 top4=0.3145
+LAP lap=1 family=w contacts=old rms=58641 pr=17.65 top1=0.1101 top4=0.3603
+LAP lap=2 family=a contacts=new rms=3.3085e+05 pr=17.97 top1=0.1121 top4=0.3554
+LAP lap=2 family=a contacts=old rms=78372 pr=19.89 top1=0.0889 top4=0.3147
+LAP lap=2 family=b contacts=new rms=3.4532e+05 pr=17.41 top1=0.1189 top4=0.3634
+LAP lap=2 family=b contacts=old rms=72326 pr=19.54 top1=0.0901 top4=0.3283
+LAP lap=2 family=w contacts=new rms=1.1723e+05 pr=19.07 top1=0.1089 top4=0.3365
+LAP lap=2 family=w contacts=old rms=58936 pr=18.10 top1=0.0961 top4=0.3408
+LAP lap=3 family=a contacts=new rms=2.9424e+05 pr=18.48 top1=0.1049 top4=0.3383
+LAP lap=3 family=a contacts=old rms=82069 pr=19.42 top1=0.0941 top4=0.3268
+LAP lap=3 family=b contacts=new rms=2.88e+05 pr=17.77 top1=0.1160 top4=0.3563
+LAP lap=3 family=b contacts=old rms=70510 pr=19.50 top1=0.0953 top4=0.3267
+LAP lap=3 family=w contacts=new rms=1.0837e+05 pr=17.59 top1=0.1239 top4=0.3576
+LAP lap=3 family=w contacts=old rms=57942 pr=18.45 top1=0.1002 top4=0.3348
+TRAVEL_PAIR laps=0,1 family=a contacts=new cos=0.6191 f1=0.0151 f2=0.1149 f4=0.1921 f8=0.3436 f16=0.5366 pr_held=21.83
+TRAVEL_PAIR laps=0,1 family=a contacts=old cos=-0.1325 f1=0.0342 f2=0.0576 f4=0.0874 f8=0.1772 f16=0.3259 pr_held=29.31
+TRAVEL_PAIR laps=0,1 family=b contacts=new cos=0.6119 f1=0.0344 f2=0.0899 f4=0.1919 f8=0.3460 f16=0.5929 pr_held=23.78
+TRAVEL_PAIR laps=0,1 family=b contacts=old cos=0.0229 f1=0.0245 f2=0.0446 f4=0.0857 f8=0.1644 f16=0.3009 pr_held=29.64
+TRAVEL_PAIR laps=0,1 family=w contacts=new cos=0.6575 f1=0.0436 f2=0.0810 f4=0.1481 f8=0.2956 f16=0.4984 pr_held=26.57
+TRAVEL_PAIR laps=0,1 family=w contacts=old cos=0.0459 f1=0.0118 f2=0.0361 f4=0.0697 f8=0.1425 f16=0.2816 pr_held=30.05
+TRAVEL_PAIR laps=1,2 family=a contacts=new cos=0.8207 f1=0.0829 f2=0.1449 f4=0.2747 f8=0.4481 f16=0.6730 pr_held=20.96
+TRAVEL_PAIR laps=1,2 family=a contacts=old cos=-0.1090 f1=0.0220 f2=0.0451 f4=0.0947 f8=0.1682 f16=0.3110 pr_held=29.16
+TRAVEL_PAIR laps=1,2 family=b contacts=new cos=0.8199 f1=0.0951 f2=0.1588 f4=0.2731 f8=0.4186 f16=0.6445 pr_held=21.11
+TRAVEL_PAIR laps=1,2 family=b contacts=old cos=0.0291 f1=0.0332 f2=0.0542 f4=0.1015 f8=0.1646 f16=0.2922 pr_held=28.36
+TRAVEL_PAIR laps=1,2 family=w contacts=new cos=0.5805 f1=0.0598 f2=0.0963 f4=0.1961 f8=0.3011 f16=0.4693 pr_held=24.52
+TRAVEL_PAIR laps=1,2 family=w contacts=old cos=0.0986 f1=0.0229 f2=0.0408 f4=0.0865 f8=0.1691 f16=0.3166 pr_held=29.66
+TRAVEL_PAIR laps=2,3 family=a contacts=new cos=0.8336 f1=0.0866 f2=0.1499 f4=0.2609 f8=0.4351 f16=0.6816 pr_held=21.23
+TRAVEL_PAIR laps=2,3 family=a contacts=old cos=-0.0514 f1=0.0193 f2=0.0462 f4=0.0904 f8=0.1784 f16=0.3148 pr_held=29.30
+TRAVEL_PAIR laps=2,3 family=b contacts=new cos=0.8338 f1=0.0980 f2=0.1752 f4=0.2861 f8=0.4700 f16=0.6821 pr_held=19.64
+TRAVEL_PAIR laps=2,3 family=b contacts=old cos=0.0032 f1=0.0248 f2=0.0463 f4=0.0868 f8=0.1452 f16=0.2966 pr_held=29.46
+TRAVEL_PAIR laps=2,3 family=w contacts=new cos=0.5162 f1=0.0543 f2=0.1100 f4=0.1581 f8=0.2702 f16=0.4433 pr_held=24.81
+TRAVEL_PAIR laps=2,3 family=w contacts=old cos=0.1450 f1=0.0203 f2=0.0378 f4=0.0699 f8=0.1538 f16=0.3271 pr_held=29.00

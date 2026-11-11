@@ -163,7 +163,7 @@ pub use card::{
     certificate_layout, copy_layout, ingest_layout, read_layout, word_layout,
 };
 pub use epoch::EpochFlowExecution;
-pub use field::{CardField, ColumnRow, FieldTimes};
+pub use field::{CardField, FieldTimes};
 pub use execute_exact::{ExactWordCarry, ExactWordMatrix, ExactWordStage};
 pub use inverse_exact::{ExactInverseExecution, ExactInverseOperator};
 pub use lattice::{Gather, LatticeCoordinates, LatticeRead, ResidentLattice, ResidentRead};

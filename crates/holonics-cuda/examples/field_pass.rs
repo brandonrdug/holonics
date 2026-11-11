@@ -10,8 +10,7 @@
 //!
 //! Each run prints `FIELD_CARD` with the card's reads, returns, their time, the site pairs met, the landmark reads and the
 //! largest batch's allocations, and the card's free memory at the open and its batch budget; with
-//! `FIELD_PROFILE` set, each kernel's launches and time and the run's copies and allocations; with `FIELD_COLUMNS` set,
-//! each contact column launch's longest column beside its card time (`FIELD_COLUMN` lines).
+//! `FIELD_PROFILE` set, each kernel's launches and time and the run's copies and allocations.
 #![allow(dead_code, clippy::disallowed_methods, clippy::disallowed_types, reason = "explicit exterior CLI file/process boundary")]
 
 #[path = "../../holonics/examples/solenoidal_alpha.rs"]
@@ -39,40 +38,11 @@ fn run(args: &[String]) -> Result<()> {
     if std::env::var_os("FIELD_PHASES").is_some() {
         card.trace_phases();
     }
-    // [agent-inferred, November 7] A declared reading (`FIELD_EVENTS`): every launch timed on the card's own clock
-    // (`CardField::stamp`), printed at the end as `FIELD_EVENT` lines.
-    if std::env::var_os("FIELD_EVENTS").is_some() {
-        card.stamp()?;
-    }
-    // [measurement; agent-inferred, November 8] A declared reading (`FIELD_COLUMNS`, off unless set): each contact column
-    // launch's longest column (the receivers one source walks) beside its card time (`CardField::stamp_columns`, which also
-    // stamps every launch), printed at the end as `FIELD_COLUMN` lines by head and the longest column's octave.
-    if std::env::var_os("FIELD_COLUMNS").is_some() {
-        card.stamp_columns()?;
-    }
     let memory = opened.census().memory;
     println!("FIELD_CARD_OPEN card={} free={} total={} batch_budget={}", opened.census().name, memory.free_bytes, memory.total_bytes, card.budget());
     let started = Instant::now();
     let result = match mode.as_str() {
         "parity" | "time" => exterior::run_field_parity(&rest[1..], &mut card),
-        // [definition; Brandon, November 7 19:22] `FIELD_HOST_LANES`: the energy reads split between the host's cores and
-        // the card at once (`LanesField`), the same bits at any partition; its receipt is the `FIELD_LANES` line.
-        "train" if std::env::var_os("FIELD_HOST_LANES").is_some() => {
-            let mut lanes = holonics::hnn::tower::field::LanesField::new(&mut card);
-            let r = exterior::run_field_with_realization(&rest[1..], &mut lanes);
-            println!(
-                "FIELD_LANES splits={} host_regions={} card_regions={} host_ms={} card_ms={} split_wall_ms={} share_permille={} host_threads={}",
-                lanes.splits,
-                lanes.host_regions,
-                lanes.card_regions,
-                lanes.host_us / 1000,
-                lanes.card_us / 1000,
-                lanes.wall_us / 1000,
-                lanes.share() * 1000 >> 16,
-                rayon::current_num_threads()
-            );
-            r
-        }
         "train" => exterior::run_field_with_realization(&rest[1..], &mut card),
         _ => Err("field_pass parity|time|train complete-language COMMAND ARGS…".into()),
     };
@@ -93,21 +63,6 @@ fn run(args: &[String]) -> Result<()> {
     if let Some(phases) = card.phased() {
         for (name, marks, ns) in phases {
             println!("FIELD_PHASE name={name} marks={marks} ms={} us_a_mark={}", ns / 1_000_000, ns / 1_000 / (marks as u128).max(1));
-        }
-    }
-    if let Some(kernels) = card.stamped() {
-        let total: u128 = kernels.values().map(|v| v.1).sum();
-        let mut rows: Vec<_> = kernels.iter().collect();
-        rows.sort_by_key(|(_, v)| std::cmp::Reverse(v.1));
-        for ((entry, head), (calls, ns)) in rows {
-            let head = if *head == u32::MAX { "all".to_string() } else { head.to_string() };
-            println!("FIELD_EVENT entry={entry} head={head} launches={calls} card_us={} us_a_launch={} share_permille={}", ns / 1_000, ns / 1_000 / (*calls as u128).max(1), ns * 1000 / total.max(1));
-        }
-        println!("FIELD_EVENT_SPLIT card_kernels_ms={} elapsed_ms={}", total / 1_000_000, started.elapsed().as_millis());
-    }
-    if let Some(rows) = card.columned() {
-        for line in holonics_cuda::hnn::ColumnRow::lines(&rows) {
-            println!("FIELD_COLUMN {line}");
         }
     }
     if let Some(p) = card.profiled() {

@@ -35,7 +35,7 @@ use std::process::Command;
 /// lowers its PTX for any newer card.
 const UNATTENDED_FLOOR: &str = "compute_75";
 
-const SOURCES: [&str; 14] = [
+const SOURCES: [&str; 12] = [
     "kernels/hnn.cu",
     "kernels/exact_integer.cuh",
     "kernels/hnn_word.cuh",
@@ -46,8 +46,6 @@ const SOURCES: [&str; 14] = [
     "kernels/tower.cu",
     "kernels/field.cu",
     "kernels/field_moment.cuh",
-    "kernels/field_energy.cuh",
-    "kernels/field_mma.cuh",
     "kernels/number.cu",
     "kernels/number.cuh",
 ];

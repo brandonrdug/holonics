@@ -1,5 +1,7 @@
 # The field disperses: a site meets its resonance class at its falloff, and the answer locks under the pump
 
+> **Note of November 11.** This record's laws through the reading of November 6 at 10:31 (inside §16.47) are the field that trains, now `main`'s field. Its later parts, from the stored-energy reading of November 6 at 22:52, describe the energy field, one attempt of November 6 to 9. That attempt's code, with the pull, the family lengths, melt, the contrast laws and the `FIELD_WRITER_LETTERS` comparison, left the tree on November 11 and is at [`b6ff1f795`](https://github.com/brandonrdug/holonics/tree/b6ff1f795) ([the port's record](2026-11-11_THE_TRAINING_LINE_BECOMES_THE_TRUNKS_FIELD_THE_ENERGY_ATTEMPT_LEAVES_THE_TREE_AND_A_READING_A_LINE_IS_SCORED_BY_IS_CONSUMED_CODE.md)).
+
 November 1. Design, agent-inferred, written before any of it is built (Refs #404 #406 #407). It
 replaces three laws of the field
 ([record](2026-11-01_THE_PROBLEM_IS_ONE_FIELD_EVERY_SITE_READS_EVERY_OTHER_AND_THE_ANSWER_IS_REFINED_NOT_SPOKEN.md),

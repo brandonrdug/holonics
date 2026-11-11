@@ -394,7 +394,11 @@ here with their reasons so that no agent holds them as slogans.
 - **Theory picks, and a run tests a stated prediction** (November 4). Derive which law the theory
   gives, fix its guess as a number before the read, run that one law and score the guess, a miss
   included. Reason: arms cost card time and choose by a short reading, and a winner picked that way
-  carries no reason. A comparison is lawful when it tests a stated prediction.
+  carries no reason. A comparison is lawful when it tests a stated prediction. Before a guess is
+  fixed, what the logs and the records already print about its premise is read. Reason: on
+  November 11 a guess of four parts spent two on the rank of a travel whose end the record of the
+  day before had printed, and a guess on a premise a log has settled tests the guesser's memory
+  ([the record](research/records/2026-11-11_THE_ADDED_CONTACTS_TRAVEL_EACH_ITS_OWN_DIRECTION_SO_NO_FOUNDING_IS_BUILT_THEY_TOOK_THEIR_CHARGE_IN_FOUR_PART_RATE_LAPS_AND_A_GUESSES_PREMISE_IS_READ_FROM_THE_LOGS_FIRST.md)).
 - **A build is one attempt** (November 9). A realization is named as an attempt with its receipt,
   never as "the field" or "the law"; "law" names the theory's statements. When a build fails, first
   check whether the built object is the theory's object, then step back and abstract. Reason: from
@@ -442,6 +446,14 @@ here with their reasons so that no agent holds them as slogans.
   trained at the base rate. A tree's parity of card against host cannot see a difference of law
   between two trees. Scope: every build whose laps or reads enter a line's score; a first build of
   a new line has no lap to reproduce ([the record](research/records/2026-11-11_A_BUILD_ENTERS_A_LINE_BY_REPRODUCING_THE_LINES_OWN_LAP_A_COMMIT_CALLED_A_READING_HAD_CHANGED_THE_TRAINING_COMPARISON_AND_A_ONCE_A_SITE_PART_NEEDS_ITS_OWN_GRID.md)).
+  The line's reads are held the same way: a build that replaces the binary a line's laps are read
+  with prints, from the lap's saved state, the lines of that lap's own read logs, timings aside.
+  A reading that a live line's read script calls is consumed code, and a port carries it. Reason:
+  on November 11 the port of the training line to `main` first set aside the release's stages, the
+  locked visit and two censuses as readings to bring back later, while every lap of both running
+  lines was scored by three of them (the settle, the re-draw and the charge) from a separately
+  staged binary
+  ([the port's record](research/records/2026-11-11_THE_TRAINING_LINE_BECOMES_THE_TRUNKS_FIELD_THE_ENERGY_ATTEMPT_LEAVES_THE_TREE_AND_A_READING_A_LINE_IS_SCORED_BY_IS_CONSUMED_CODE.md)).
 
 [project-postulate] **GPU first, and the design fixes the workload** (Brandon, October 27;
 [the record](research/records/2026-10-27_THE_LEARNER_RUNS_ON_THE_CARD_AND_ITS_WORKLOAD_IS_NEVER_TRADED_FOR_TIME.md)). The RTX 4080 SUPER is a consumer card, and
