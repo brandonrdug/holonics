@@ -686,6 +686,8 @@ impl<T: Poolable> Drop for Pooled<'_, T> {
 #[derive(Clone, Debug, Default)]
 pub struct FieldProfile {
     pub kernels: std::collections::BTreeMap<&'static str, (u64, u128)>,
+    /// [measurement; theory, November 11] Each entry's blocks × block-threads summed over its launches (a reading of the launches' grids; the mean grid is this over the launches).
+    pub threads: std::collections::BTreeMap<&'static str, u128>,
     pub copies: (u64, u128),
     pub allocations: (u64, u128),
 }
@@ -1137,6 +1139,7 @@ impl<'c> CardField<'c> {
             let slot = p.kernels.entry(entry).or_insert((0, 0));
             slot.0 += 1;
             slot.1 += started.elapsed().as_nanos();
+            *p.threads.entry(entry).or_insert(0) += u128::from(grid.x) * u128::from(grid.y) * u128::from(grid.z) * u128::from(block);
         }
         Ok(())
     }
