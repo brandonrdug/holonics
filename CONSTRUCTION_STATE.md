@@ -139,6 +139,22 @@ repository was reset on September 24; the pre-reset tree is
     row stride by region (atlas `tower.field-support-stride`) is ordered and unbuilt.
   - #404's boxes (online learning of real text, retention, a question answered from the retained
     state with its sources, readable text) are unticked except the host's cold restart.
+- **The unification's work** (November 11, from Brandon's lens of that day;
+  [the Einstein record](research/records/2026-11-11_EINSTEINS_FIELD_PROGRAM_ON_THE_COMPLEX_THE_UNIFIED_FIELD_IS_A_TWO_WAY_FLOW_A_GRAIN_GIVES_THE_MASS_AND_A_PROBABILITY_IS_ITS_FLAT_PART.md) §9).
+  Einstein's unified-field program is read on the objects as one two-way flow on a complex, and five
+  items join the library to it. None has run; each has its guess fixed before its read.
+  - A turn is a unit and a friction is declared in every gate: a friction is a range and its
+    inverse a mass (atlas `contact.friction-range-mass`). The carry's friction, founded at `1/4`
+    after the card refused the frictionless carry (G83, G85), is its first instance; the ring faces outside the
+    unit disk are repaired at the next founding.
+  - No global word in the law: a part's rate is its own temperature. G86 is its first test; an
+    octave under the floor for a part whose travel returns is the next.
+  - The square of two places returns from history as a host reading on saved states (atlas
+    `hnn.field-square-affinity`, retired at the port), because local ratios are one law's only
+    where every cycle closes; it enters the law only if its curl sits where the release fails.
+  - A founding is judged by its strength: the held code it buys over the entries it founds, by
+    region (a host ruler over the committed receipts).
+  - The formal joins are eight boxes in #410.
 
 ## Built and lawful
 
