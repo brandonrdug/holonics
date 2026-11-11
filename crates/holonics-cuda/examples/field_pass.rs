@@ -68,7 +68,8 @@ fn run(args: &[String]) -> Result<()> {
     if let Some(p) = card.profiled() {
         let kernels: u128 = p.kernels.values().map(|v| v.1).sum();
         for (entry, (calls, ns)) in &p.kernels {
-            println!("FIELD_PROFILE entry={entry} launches={calls} ms={} us_a_launch={}", ns / 1_000_000, ns / 1_000 / (*calls as u128).max(1));
+            let threads = p.threads.get(entry).copied().unwrap_or(0);
+            println!("FIELD_PROFILE entry={entry} launches={calls} ms={} us_a_launch={} grid_threads={threads} mean_grid_threads={}", ns / 1_000_000, ns / 1_000 / (*calls as u128).max(1), threads / (*calls as u128).max(1));
         }
         println!(
             "FIELD_PROFILE_SPLIT kernels_ms={} copies={} copies_ms={} allocations={} allocations_ms={} elapsed_ms={}",
