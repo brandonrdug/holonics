@@ -1,0 +1,88 @@
+# G85's gates and the tf projection (the order of 19:58 a to f), 2026-11-11 20:32:31 to 20:43:22 UTC, on the card (RTX 4080 SUPER under
+# HOLONICS_ROOT/.local/gpu.lock), the build ccc28b5cd (binary 837bc5887de82cda): (a) the card suite alone; (b) the reproduction at C = 0 from
+# rt17/STATE.0, lap bound 200,000 ms: 365 sections, every one rt18's (timings aside); (c) the growth of rt18/STATE.0 by 32 circles (h_b at 1/4)
+# and its held read with FIELD_CARRY_GATES; (d) one development section in one hold, the line's binary on rt18/STATE.0, the build on the grown
+# state, the line's binary again; (e) no gate failed and the card stayed under 12 GB; (f) the projection fixed once. Projections and measured
+# times on each step's lines (the suite 368.6 s, (b) 211.3 s, the growth 6.9 s, the read 9.9 s, the hold's runs 11.6, 12.9 and 12.0 s).
+# card_tf: build ccc28b5cd binary 837bc5887de82cda; line b8fe4ba838dd27a6 20:32:31
+SUITE_BUILD_EXIT 0 20:32:47
+# (a) suite: lock taken 20:32:47
+SUITE_EXIT 0 20:38:55
+# (a) suite: released 20:38:55
+test result: ok. 83 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 321.77s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.08s
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.40s
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.32s
+test result: ok. 46 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 32.11s
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 5.04s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+METER tf_suite rc=0 started=20:32:47Z ended=20:38:55Z wall_s=368.6 user_s=890.4 sys_s=60.4 peak_rss_kib=1766008
+# rt18b from STATE.0 b6117e5fabfb907f39c895032422968ce2834b91a7898a38c40b0458fd9cfaec: hnn-field-learner-v3 12 134144 68 -; binary 837bc5887de82cda; lap bound 200000 ms, the run's 500000 ms, outer 560 s 20:38:55
+# parts parts 32 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+# rt18b: lock taken 20:38:55 wait_s=.002695501
+# rt18b: released 20:42:27
+FIELD_PART_RATES contacts_before=32 rate_bits=12 octaves w_new=0 a_new=0 b_new=0 enc_lane=0 before_lane=0 after_lane=0 q_lane=0 v_lane=0 probe_lane=0 out_lane=0 moment_face_lane=0 read_lane=0 face_biases_lane=0 a_lane=0 b_lane=0 carry=0
+FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.733189 foil_nats_a_place=1.866533 information_nats_a_place=0.133344 own_nats_a_word=13.023636 information_nats_a_word=1.001978
+FIELD_STOPPED lap=0 sections=365/1535 reason=lap sites=4000322 before=3.218 after=- deposited=365 halvings=0 next_halved=0 next_refused=0 lap_ms=201401 ms=210844
+MEASURE lap=rt18b rc=0 wall_s=211.3 peak_rss_kib=823868
+CODEC
+JOINT.tsv
+STATE.stopped
+MAIN rt18b exit 20:42:27
+grep: write error: Broken pipe
+REPRO_B sections_read=365 differing=0 opening_equal=true
+# (c) growth: lock taken 20:42:27
+GROW_EXIT 0 20:42:34
+FIELD_GROW_CARRY circles=32 from_contacts=64 to_contacts=128 width=64 lanes=2 heads=4 rate=12 drawn=175104 material=80182 ms=34
+FIELD_GROW_CARRY_KEPT states=1020 faces=174266 identical=true ms=3338
+FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.731382 foil_nats_a_place=1.866629 information_nats_a_place=0.135247 own_nats_a_word=13.010058 information_nats_a_word=1.016280
+FIELD_JOINT_NATS lap=0 places=43470 words=5785 own_nats_a_place=1.731382 foil_nats_a_place=1.866629 information_nats_a_place=0.135247 own_nats_a_word=13.010058 information_nats_a_word=1.016280
+FIELD_GROWN hnn-field-v14t 100 64 4 8 2 128 4 4 3771 2 0 32 rate=12 material=80182 ms=6605
+MEASURE lap=grow rc=0 wall_s=6.9 peak_rss_kib=323348
+GROWN 65f8e92439f7c2dd: hnn-field-v14t 100 64 4 8 2 128 4 4 3771 2 0 32; carry_bias last 64: 0 0 ... 16384 16384 ... (q_b then h_b)
+# grown_tf: state 65f8e92439f7c2dd; binary 837bc5887de82cda; asked 20:42:34
+# grown_tf: lock taken 20:42:34 wait_s=.013206479
+# grown_tf: run_s=9.889870319 rc=0 released 20:42:44
+  FIELD_HELD lap=-1 answer=5.703487 classes=43470 context=0.922518 context_classes=43470 foil=1.090844 question=0.168326 ms=3625
+  FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.731382 foil_nats_a_place=1.866629 information_nats_a_place=0.135247 own_nats_a_word=13.010058 information_nats_a_word=1.016280
+  FIELD_UNSEEN lap=-1 code=0.854 sites=43660 next=- ms=9476
+  FIELD_CARD reads=45 read_ms=8513 returns=0 return_ms=0 pairs=4434273792 batches=58 peak_store=8551938554 landmarks=0 landmark_ms=0 elapsed_ms=9482
+  MEASURE lap=held_grown_tf rc=0 wall_s=9.9 peak_rss_kib=851600
+READ grown_tf held=1.731382
+HELD_C 1.731382 1.866629
+FIELD_CARRY_GATES lap=-1 circles=32 reads=697064 modulus_sum=598773416306651/598773416307101/598773416308954/598773416309483/598773416311032/598773416309259/598773416314963/598773416313054/59877341631
+GATES_C circles=32 reads=697064 mean_min=858993458 mean_max=858993458 h_nonnegative_all=True ok=True
+# (d) hold: lock taken 20:42:44 wait_s=.002404982
+# dev_ctrl1: started 20:42:44 binary b8fe4ba838dd27a6
+# dev_ctrl1: ended rc=0 20:42:55
+FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.731382 foil_nats_a_place=1.866629 information_nats_a_place=0.135247 own_nats_a_word=13.010058 information_nats_a_word=1.016280
+FIELD_SECTION lap=0 n=0 sites=10173 before=3.372 after=- halvings=0 deposited=true next=- predicted_micro=-3654 change_micro=- transfer_micro=- external_micro=-36 curvature_micro=- rate=12 length=2924 regions_ms=1 deposit_ms=451 ms=956
+FIELD_STOPPED lap=0 sections=1/1535 reason=lap sites=10173 before=3.372 after=- deposited=1 halvings=0 next_halved=0 next_refused=0 lap_ms=2055 ms=11181
+FIELD_CARD reads=46 read_ms=9233 returns=2 return_ms=948 pairs=5106274542 batches=68 peak_store=8543512590 landmarks=0 landmark_ms=0 elapsed_ms=11188
+MEASURE lap=dev_ctrl1 rc=0 wall_s=11.6 peak_rss_kib=833616
+HOST_THREADS dev_ctrl1 samples=5 threads_max=28 last=HOST_SAMPLE 20:42:54 threads=28 cpu_s=3.08
+# dev_grown: started 20:42:56 binary 837bc5887de82cda
+# dev_grown: ended rc=0 20:43:09
+FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.731382 foil_nats_a_place=1.866629 information_nats_a_place=0.135247 own_nats_a_word=13.010058 information_nats_a_word=1.016280
+FIELD_SECTION lap=0 n=0 sites=10173 before=3.372 after=- halvings=0 deposited=true next=- predicted_micro=-8223 change_micro=- transfer_micro=- external_micro=-36 curvature_micro=- rate=12 length=2924 regions_ms=1 deposit_ms=777 ms=1645
+FIELD_STOPPED lap=0 sections=1/1535 reason=lap sites=10173 before=3.372 after=- deposited=1 halvings=0 next_halved=0 next_refused=0 lap_ms=2813 ms=12526
+FIELD_CARD reads=46 read_ms=9864 returns=2 return_ms=1636 pairs=5271379314 batches=68 peak_store=8551938554 landmarks=0 landmark_ms=0 elapsed_ms=12532
+MEASURE lap=dev_grown rc=0 wall_s=12.9 peak_rss_kib=789244
+HOST_THREADS dev_grown samples=6 threads_max=28 last=HOST_SAMPLE 20:43:08 threads=28 cpu_s=3.23
+# dev_ctrl2: started 20:43:10 binary b8fe4ba838dd27a6
+# dev_ctrl2: ended rc=0 20:43:22
+FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.731382 foil_nats_a_place=1.866629 information_nats_a_place=0.135247 own_nats_a_word=13.010058 information_nats_a_word=1.016280
+FIELD_SECTION lap=0 n=0 sites=10173 before=3.372 after=- halvings=0 deposited=true next=- predicted_micro=-3654 change_micro=- transfer_micro=- external_micro=-36 curvature_micro=- rate=12 length=2924 regions_ms=1 deposit_ms=472 ms=996
+FIELD_STOPPED lap=0 sections=1/1535 reason=lap sites=10173 before=3.372 after=- deposited=1 halvings=0 next_halved=0 next_refused=0 lap_ms=2090 ms=11580
+FIELD_CARD reads=46 read_ms=9588 returns=2 return_ms=988 pairs=5106274542 batches=68 peak_store=8543512590 landmarks=0 landmark_ms=0 elapsed_ms=11587
+MEASURE lap=dev_ctrl2 rc=0 wall_s=12.0 peak_rss_kib=877772
+HOST_THREADS dev_ctrl2 samples=5 threads_max=28 last=HOST_SAMPLE 20:43:20 threads=28 cpu_s=3.08
+# (d) hold: released 20:43:22
+DEV dev_ctrl1 predicted_micro=-3654 section_ms=956 deposit_ms=451 card_return_ms=948 card_peak_store=8543512590
+DEV dev_grown predicted_micro=-8223 section_ms=1645 deposit_ms=777 card_return_ms=1636 card_peak_store=8551938554
+DEV dev_ctrl2 predicted_micro=-3654 section_ms=996 deposit_ms=472 card_return_ms=988 card_peak_store=8543512590
+DEV_RATIO predicted 2.250 time 1.685 (control spread 0.041)
+TF_PROJECTION unit_ms=2413 lap_ms=3703955 lap_s=3703 outer_s=4063 peak_ok=True
+MAIN card_tf done 20:43:22
+RUN_EXIT 0 2026-11-11T20:43:22Z

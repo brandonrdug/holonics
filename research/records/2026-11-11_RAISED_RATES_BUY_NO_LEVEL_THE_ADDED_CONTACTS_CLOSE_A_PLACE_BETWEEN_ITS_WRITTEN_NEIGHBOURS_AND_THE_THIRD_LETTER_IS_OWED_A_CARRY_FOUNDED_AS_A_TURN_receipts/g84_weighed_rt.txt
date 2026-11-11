@@ -1,0 +1,315 @@
+# G84's ruler, rt: python3 tools/state_travel.py weighed 32 1535 16560945 on RUN/{rt17, rt18, rt19, rt20}/MEAN.0, on the PC's host (no card), 2026-11-11
+# 20:24 UTC, from the main checkout at origin/main (ac1069640, the ruler of 9ecbb94f8 that prices the fall two and three laps on; the run of
+# 20:15 UTC from the main checkout's older main, cb9cb634d, printed no lag fall and is not this receipt). Projection a minute, deadline 600 s;
+# measured under a second. The whole output follows.
+# declaration {'alphabet': 100, 'width': 64, 'heads': 4, 'modes': 8, 'still': 2, 'contacts': 64, 'ticks': 4, 'frames': 4, 'reach': 3771, 'lanes': 2, 'carry': False}; contacts 32 -> 64; lane width 32; 1535 sections and 16560945 sites a lap
+# state 0 RUN/rt17/MEAN.0 rate_bits=12 parts=0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+# state 1 RUN/rt18/MEAN.0 rate_bits=12 parts=0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+# state 2 RUN/rt19/MEAN.0 rate_bits=12 parts=0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+# state 3 RUN/rt20/MEAN.0 rate_bits=12 parts=0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+TRAVEL_WEIGHED_LAP lap=0 block=enc lane=1 contacts=all role=writes entries=3232 open=3232 travel_rms=332 heat_micro=163.8394 heat_base_micro=163.8394 own_micro=97.2080
+TRAVEL_WEIGHED_LAP lap=0 block=before lane=1 contacts=all role=writes entries=3232 open=3232 travel_rms=553.67 heat_micro=34.9919 heat_base_micro=34.9919 own_micro=76.3880
+TRAVEL_WEIGHED_LAP lap=0 block=after lane=1 contacts=all role=writes entries=3232 open=3232 travel_rms=560.44 heat_micro=34.1714 heat_base_micro=34.1714 own_micro=72.3199
+TRAVEL_WEIGHED_LAP lap=0 block=moment_face lane=1 contacts=all role=writes entries=2048 open=1024 travel_rms=43222 heat_micro=189.1384 heat_base_micro=189.1384 own_micro=90.5897
+TRAVEL_WEIGHED_LAP lap=0 block=out lane=1 contacts=all role=writes entries=2048 open=2048 travel_rms=68211 heat_micro=416.3718 heat_base_micro=416.3718 own_micro=166.8614
+TRAVEL_WEIGHED_LAP lap=0 block=w lane=1 contacts=new role=writes entries=1024 open=1024 travel_rms=73466 heat_micro=154.8298 heat_base_micro=154.8298 own_micro=122.9233
+TRAVEL_WEIGHED_LAP lap=0 block=w lane=1 contacts=old role=writes entries=1024 open=1024 travel_rms=36713 heat_micro=567.5127 heat_base_micro=567.5127 own_micro=97.8568
+TRAVEL_WEIGHED_LAP lap=0 block=out_bias lane=1 contacts=all role=writes entries=32 open=32 travel_rms=67.632 heat_micro=13.3351 heat_base_micro=13.3351 own_micro=0.5510
+TRAVEL_WEIGHED_LAP lap=0 block=w_bias lane=1 contacts=all role=writes entries=32 open=32 travel_rms=70.994 heat_micro=11.7795 heat_base_micro=11.7795 own_micro=0.5785
+TRAVEL_WEIGHED_LAP lap=0 block=moment_face_bias lane=1 contacts=all role=writes entries=32 open=32 travel_rms=162.53 heat_micro=6.9016 heat_base_micro=6.9016 own_micro=1.3040
+TRAVEL_WEIGHED_LAP lap=0 block=read_rows lane=1 contacts=all role=lifts entries=2048 open=2048 travel_rms=37586 heat_micro=897.3595 heat_base_micro=897.3595 own_micro=124.6422
+TRAVEL_WEIGHED_LAP lap=0 block=lift_bias lane=1 contacts=all role=lifts entries=32 open=32 travel_rms=42.003 heat_micro=29.2328 heat_base_micro=29.2328 own_micro=0.5355
+TRAVEL_WEIGHED_LAP lap=0 block=q lane=1 contacts=all role=reads entries=2048 open=2048 travel_rms=76963 heat_micro=244.3695 heat_base_micro=244.3695 own_micro=142.4614
+TRAVEL_WEIGHED_LAP lap=0 block=v lane=1 contacts=all role=reads entries=2048 open=2048 travel_rms=84417 heat_micro=301.2190 heat_base_micro=301.2190 own_micro=122.3270
+TRAVEL_WEIGHED_LAP lap=0 block=probe lane=1 contacts=all role=reads entries=2048 open=2048 travel_rms=96586 heat_micro=140.5936 heat_base_micro=140.5936 own_micro=118.1423
+TRAVEL_WEIGHED_LAP lap=0 block=a lane=1 contacts=new role=reads entries=1024 open=1024 travel_rms=82449 heat_micro=130.1130 heat_base_micro=130.1130 own_micro=94.0555
+TRAVEL_WEIGHED_LAP lap=0 block=a lane=1 contacts=old role=reads entries=1024 open=1024 travel_rms=57588 heat_micro=337.6288 heat_base_micro=337.6288 own_micro=119.5258
+TRAVEL_WEIGHED_LAP lap=0 block=b lane=1 contacts=new role=reads entries=1024 open=1024 travel_rms=79037 heat_micro=153.7018 heat_base_micro=153.7018 own_micro=97.4326
+TRAVEL_WEIGHED_LAP lap=0 block=b lane=1 contacts=old role=reads entries=1024 open=1024 travel_rms=50095 heat_micro=463.0907 heat_base_micro=463.0907 own_micro=117.7986
+TRAVEL_WEIGHED_LAP lap=0 block=enc lane=2 contacts=all role=writes entries=3232 open=3232 travel_rms=450.56 heat_micro=66.3290 heat_base_micro=66.3290 own_micro=76.6774
+TRAVEL_WEIGHED_LAP lap=0 block=before lane=2 contacts=all role=writes entries=3232 open=3232 travel_rms=514.3 heat_micro=46.2178 heat_base_micro=46.2178 own_micro=78.3510
+TRAVEL_WEIGHED_LAP lap=0 block=after lane=2 contacts=all role=writes entries=3232 open=3232 travel_rms=530.75 heat_micro=46.1017 heat_base_micro=46.1017 own_micro=81.2414
+TRAVEL_WEIGHED_LAP lap=0 block=moment_face lane=2 contacts=all role=writes entries=2048 open=1024 travel_rms=37615 heat_micro=301.7801 heat_base_micro=301.7801 own_micro=110.6087
+TRAVEL_WEIGHED_LAP lap=0 block=out lane=2 contacts=all role=writes entries=2048 open=2048 travel_rms=63044 heat_micro=808.6070 heat_base_micro=808.6070 own_micro=214.1482
+TRAVEL_WEIGHED_LAP lap=0 block=w lane=2 contacts=new role=writes entries=1024 open=1024 travel_rms=56309 heat_micro=263.2021 heat_base_micro=263.2021 own_micro=125.2949
+TRAVEL_WEIGHED_LAP lap=0 block=w lane=2 contacts=old role=writes entries=1024 open=1024 travel_rms=28567 heat_micro=1052.1627 heat_base_micro=1052.1627 own_micro=106.5210
+TRAVEL_WEIGHED_LAP lap=0 block=out_bias lane=2 contacts=all role=writes entries=32 open=32 travel_rms=60.352 heat_micro=28.5243 heat_base_micro=28.5243 own_micro=1.0298
+TRAVEL_WEIGHED_LAP lap=0 block=w_bias lane=2 contacts=all role=writes entries=32 open=32 travel_rms=106.1 heat_micro=24.0597 heat_base_micro=24.0597 own_micro=2.1317
+TRAVEL_WEIGHED_LAP lap=0 block=moment_face_bias lane=2 contacts=all role=writes entries=32 open=32 travel_rms=81.654 heat_micro=13.5381 heat_base_micro=13.5381 own_micro=0.8620
+TRAVEL_WEIGHED_LAP lap=0 block=read_rows lane=2 contacts=all role=lifts entries=2048 open=2048 travel_rms=36982 heat_micro=889.6339 heat_base_micro=889.6339 own_micro=127.2339
+TRAVEL_WEIGHED_LAP lap=0 block=lift_bias lane=2 contacts=all role=lifts entries=32 open=32 travel_rms=39.415 heat_micro=27.3827 heat_base_micro=27.3827 own_micro=0.4265
+TRAVEL_WEIGHED_LAP lap=0 block=q lane=2 contacts=all role=reads entries=2048 open=2048 travel_rms=76726 heat_micro=313.2274 heat_base_micro=313.2274 own_micro=239.2396
+TRAVEL_WEIGHED_LAP lap=0 block=v lane=2 contacts=all role=reads entries=2048 open=2048 travel_rms=84021 heat_micro=343.1238 heat_base_micro=343.1238 own_micro=195.4153
+TRAVEL_WEIGHED_LAP lap=0 block=probe lane=2 contacts=all role=reads entries=2048 open=2048 travel_rms=91684 heat_micro=210.9238 heat_base_micro=210.9238 own_micro=187.7574
+TRAVEL_WEIGHED_LAP lap=0 block=a lane=2 contacts=new role=reads entries=1024 open=1024 travel_rms=63951 heat_micro=216.0995 heat_base_micro=216.0995 own_micro=120.5554
+TRAVEL_WEIGHED_LAP lap=0 block=a lane=2 contacts=old role=reads entries=1024 open=1024 travel_rms=47873 heat_micro=541.2248 heat_base_micro=541.2248 own_micro=165.1326
+TRAVEL_WEIGHED_LAP lap=0 block=b lane=2 contacts=new role=reads entries=1024 open=1024 travel_rms=59814 heat_micro=250.5343 heat_base_micro=250.5343 own_micro=119.0582
+TRAVEL_WEIGHED_LAP lap=0 block=b lane=2 contacts=old role=reads entries=1024 open=1024 travel_rms=42159 heat_micro=741.7322 heat_base_micro=741.7322 own_micro=169.6095
+TRAVEL_WEIGHED_LAP lap=0 block=a_bias lane=0 contacts=new role=other entries=32 open=32 travel_rms=80.969 heat_micro=8.1381 heat_base_micro=8.1381 own_micro=0.5341
+TRAVEL_WEIGHED_LAP lap=0 block=a_bias lane=0 contacts=old role=other entries=32 open=32 travel_rms=76.893 heat_micro=19.8004 heat_base_micro=19.8004 own_micro=1.0422
+TRAVEL_WEIGHED_LAP lap=0 block=b_bias lane=0 contacts=new role=other entries=32 open=32 travel_rms=64.628 heat_micro=10.0004 heat_base_micro=10.0004 own_micro=0.4334
+TRAVEL_WEIGHED_LAP lap=0 block=b_bias lane=0 contacts=old role=other entries=32 open=32 travel_rms=63.226 heat_micro=29.2483 heat_base_micro=29.2483 own_micro=1.0813
+TRAVEL_WEIGHED_LAP lap=0 block=q_bias lane=0 contacts=all role=other entries=64 open=64 travel_rms=126.17 heat_micro=8.1263 heat_base_micro=8.1263 own_micro=1.0073
+TRAVEL_WEIGHED_LAP lap=0 block=v_bias lane=0 contacts=all role=other entries=64 open=64 travel_rms=144.28 heat_micro=23.4567 heat_base_micro=23.4567 own_micro=0.7793
+TRAVEL_WEIGHED_LAP lap=0 block=probe_bias lane=0 contacts=all role=other entries=64 open=64 travel_rms=144.55 heat_micro=8.3063 heat_base_micro=8.3063 own_micro=1.2970
+TRAVEL_WEIGHED_LAP lap=0 block=read_bias lane=0 contacts=all role=other entries=100 open=100 travel_rms=188.41 heat_micro=8.5170 heat_base_micro=8.5170 own_micro=1.1927
+TRAVEL_WEIGHED_LAP lap=0 block=moment_before lane=0 contacts=all role=other entries=3232 open=3200 travel_rms=382.17 heat_micro=436.3726 heat_base_micro=436.3726 own_micro=240.7123
+TRAVEL_WEIGHED_LAP lap=0 block=moment_after lane=0 contacts=all role=other entries=3232 open=3200 travel_rms=390.73 heat_micro=341.9135 heat_base_micro=341.9135 own_micro=212.3790
+TRAVEL_WEIGHED_LAP lap=0 block=temper lane=0 contacts=all role=other entries=8 open=8 travel_rms=59280 heat_micro=2.8605 heat_base_micro=2.8605 own_micro=2.2931
+TRAVEL_WEIGHED_LAP lap=0 block=pace lane=0 contacts=all role=other entries=202 open=200 travel_rms=1.4338e+05 heat_micro=9.3509 heat_base_micro=9.3509 own_micro=13.1121
+TRAVEL_WEIGHED_TOTAL lap=0 heat_micro=11380.6762 heat_base_micro=11380.6762 own_micro=4260.6594
+TRAVEL_WEIGHED_LAP lap=1 block=enc lane=1 contacts=all role=writes entries=3232 open=3232 travel_rms=309.2 heat_micro=162.0359 heat_base_micro=162.0359 own_micro=84.3071
+TRAVEL_WEIGHED_LAP lap=1 block=before lane=1 contacts=all role=writes entries=3232 open=3232 travel_rms=548.54 heat_micro=34.4928 heat_base_micro=34.4928 own_micro=73.3559
+TRAVEL_WEIGHED_LAP lap=1 block=after lane=1 contacts=all role=writes entries=3232 open=3232 travel_rms=556.38 heat_micro=33.4364 heat_base_micro=33.4364 own_micro=72.8181
+TRAVEL_WEIGHED_LAP lap=1 block=moment_face lane=1 contacts=all role=writes entries=2048 open=1024 travel_rms=42957 heat_micro=186.3322 heat_base_micro=186.3322 own_micro=89.1471
+TRAVEL_WEIGHED_LAP lap=1 block=out lane=1 contacts=all role=writes entries=2048 open=2048 travel_rms=69664 heat_micro=414.0286 heat_base_micro=414.0286 own_micro=165.3156
+TRAVEL_WEIGHED_LAP lap=1 block=w lane=1 contacts=new role=writes entries=1024 open=1024 travel_rms=73426 heat_micro=152.7955 heat_base_micro=152.7955 own_micro=124.3249
+TRAVEL_WEIGHED_LAP lap=1 block=w lane=1 contacts=old role=writes entries=1024 open=1024 travel_rms=37977 heat_micro=565.5280 heat_base_micro=565.5280 own_micro=104.4011
+TRAVEL_WEIGHED_LAP lap=1 block=out_bias lane=1 contacts=all role=writes entries=32 open=32 travel_rms=71.173 heat_micro=13.5498 heat_base_micro=13.5498 own_micro=0.6155
+TRAVEL_WEIGHED_LAP lap=1 block=w_bias lane=1 contacts=all role=writes entries=32 open=32 travel_rms=80.411 heat_micro=11.9063 heat_base_micro=11.9063 own_micro=0.7335
+TRAVEL_WEIGHED_LAP lap=1 block=moment_face_bias lane=1 contacts=all role=writes entries=32 open=32 travel_rms=169.96 heat_micro=6.9196 heat_base_micro=6.9196 own_micro=1.4471
+TRAVEL_WEIGHED_LAP lap=1 block=read_rows lane=1 contacts=all role=lifts entries=2048 open=2048 travel_rms=36583 heat_micro=860.7303 heat_base_micro=860.7303 own_micro=117.7482
+TRAVEL_WEIGHED_LAP lap=1 block=lift_bias lane=1 contacts=all role=lifts entries=32 open=32 travel_rms=37.145 heat_micro=27.8404 heat_base_micro=27.8404 own_micro=0.3922
+TRAVEL_WEIGHED_LAP lap=1 block=q lane=1 contacts=all role=reads entries=2048 open=2048 travel_rms=77178 heat_micro=240.1221 heat_base_micro=240.1221 own_micro=145.8024
+TRAVEL_WEIGHED_LAP lap=1 block=v lane=1 contacts=all role=reads entries=2048 open=2048 travel_rms=84508 heat_micro=300.1253 heat_base_micro=300.1253 own_micro=117.8804
+TRAVEL_WEIGHED_LAP lap=1 block=probe lane=1 contacts=all role=reads entries=2048 open=2048 travel_rms=1.0003e+05 heat_micro=136.9228 heat_base_micro=136.9228 own_micro=122.6221
+TRAVEL_WEIGHED_LAP lap=1 block=a lane=1 contacts=new role=reads entries=1024 open=1024 travel_rms=87403 heat_micro=130.0495 heat_base_micro=130.0495 own_micro=103.8191
+TRAVEL_WEIGHED_LAP lap=1 block=a lane=1 contacts=old role=reads entries=1024 open=1024 travel_rms=60734 heat_micro=339.5226 heat_base_micro=339.5226 own_micro=130.3766
+TRAVEL_WEIGHED_LAP lap=1 block=b lane=1 contacts=new role=reads entries=1024 open=1024 travel_rms=75949 heat_micro=153.3648 heat_base_micro=153.3648 own_micro=89.2872
+TRAVEL_WEIGHED_LAP lap=1 block=b lane=1 contacts=old role=reads entries=1024 open=1024 travel_rms=50940 heat_micro=463.5253 heat_base_micro=463.5253 own_micro=117.8744
+TRAVEL_WEIGHED_LAP lap=1 block=enc lane=2 contacts=all role=writes entries=3232 open=3232 travel_rms=466.67 heat_micro=66.2115 heat_base_micro=66.2115 own_micro=78.8329
+TRAVEL_WEIGHED_LAP lap=1 block=before lane=2 contacts=all role=writes entries=3232 open=3232 travel_rms=520.28 heat_micro=46.1363 heat_base_micro=46.1363 own_micro=77.3006
+TRAVEL_WEIGHED_LAP lap=1 block=after lane=2 contacts=all role=writes entries=3232 open=3232 travel_rms=520.21 heat_micro=45.7543 heat_base_micro=45.7543 own_micro=77.6879
+TRAVEL_WEIGHED_LAP lap=1 block=moment_face lane=2 contacts=all role=writes entries=2048 open=1024 travel_rms=39018 heat_micro=301.2342 heat_base_micro=301.2342 own_micro=115.6198
+TRAVEL_WEIGHED_LAP lap=1 block=out lane=2 contacts=all role=writes entries=2048 open=2048 travel_rms=64293 heat_micro=808.2130 heat_base_micro=808.2130 own_micro=217.7990
+TRAVEL_WEIGHED_LAP lap=1 block=w lane=2 contacts=new role=writes entries=1024 open=1024 travel_rms=55786 heat_micro=263.1711 heat_base_micro=263.1711 own_micro=120.1491
+TRAVEL_WEIGHED_LAP lap=1 block=w lane=2 contacts=old role=writes entries=1024 open=1024 travel_rms=27766 heat_micro=1066.4225 heat_base_micro=1066.4225 own_micro=101.4535
+TRAVEL_WEIGHED_LAP lap=1 block=out_bias lane=2 contacts=all role=writes entries=32 open=32 travel_rms=61.165 heat_micro=28.9890 heat_base_micro=28.9890 own_micro=1.0242
+TRAVEL_WEIGHED_LAP lap=1 block=w_bias lane=2 contacts=all role=writes entries=32 open=32 travel_rms=107.67 heat_micro=24.5616 heat_base_micro=24.5616 own_micro=2.0000
+TRAVEL_WEIGHED_LAP lap=1 block=moment_face_bias lane=2 contacts=all role=writes entries=32 open=32 travel_rms=89.97 heat_micro=14.0882 heat_base_micro=14.0882 own_micro=1.1862
+TRAVEL_WEIGHED_LAP lap=1 block=read_rows lane=2 contacts=all role=lifts entries=2048 open=2048 travel_rms=36440 heat_micro=881.7227 heat_base_micro=881.7227 own_micro=122.0741
+TRAVEL_WEIGHED_LAP lap=1 block=lift_bias lane=2 contacts=all role=lifts entries=32 open=32 travel_rms=29.627 heat_micro=27.6824 heat_base_micro=27.6824 own_micro=0.2482
+TRAVEL_WEIGHED_LAP lap=1 block=q lane=2 contacts=all role=reads entries=2048 open=2048 travel_rms=78500 heat_micro=307.5006 heat_base_micro=307.5006 own_micro=234.5891
+TRAVEL_WEIGHED_LAP lap=1 block=v lane=2 contacts=all role=reads entries=2048 open=2048 travel_rms=85234 heat_micro=338.5758 heat_base_micro=338.5758 own_micro=188.6336
+TRAVEL_WEIGHED_LAP lap=1 block=probe lane=2 contacts=all role=reads entries=2048 open=2048 travel_rms=93304 heat_micro=205.1988 heat_base_micro=205.1988 own_micro=194.8888
+TRAVEL_WEIGHED_LAP lap=1 block=a lane=2 contacts=new role=reads entries=1024 open=1024 travel_rms=63329 heat_micro=214.1924 heat_base_micro=214.1924 own_micro=116.1805
+TRAVEL_WEIGHED_LAP lap=1 block=a lane=2 contacts=old role=reads entries=1024 open=1024 travel_rms=48260 heat_micro=539.3947 heat_base_micro=539.3947 own_micro=164.5879
+TRAVEL_WEIGHED_LAP lap=1 block=b lane=2 contacts=new role=reads entries=1024 open=1024 travel_rms=58157 heat_micro=249.4559 heat_base_micro=249.4559 own_micro=111.7965
+TRAVEL_WEIGHED_LAP lap=1 block=b lane=2 contacts=old role=reads entries=1024 open=1024 travel_rms=38379 heat_micro=740.0404 heat_base_micro=740.0404 own_micro=138.1012
+TRAVEL_WEIGHED_LAP lap=1 block=a_bias lane=0 contacts=new role=other entries=32 open=32 travel_rms=89.957 heat_micro=8.2244 heat_base_micro=8.2244 own_micro=0.6553
+TRAVEL_WEIGHED_LAP lap=1 block=a_bias lane=0 contacts=old role=other entries=32 open=32 travel_rms=78.016 heat_micro=20.4692 heat_base_micro=20.4692 own_micro=1.0690
+TRAVEL_WEIGHED_LAP lap=1 block=b_bias lane=0 contacts=new role=other entries=32 open=32 travel_rms=73.194 heat_micro=10.0712 heat_base_micro=10.0712 own_micro=0.5278
+TRAVEL_WEIGHED_LAP lap=1 block=b_bias lane=0 contacts=old role=other entries=32 open=32 travel_rms=55.287 heat_micro=30.0072 heat_base_micro=30.0072 own_micro=0.8344
+TRAVEL_WEIGHED_LAP lap=1 block=q_bias lane=0 contacts=all role=other entries=64 open=64 travel_rms=124.01 heat_micro=7.9607 heat_base_micro=7.9607 own_micro=1.0115
+TRAVEL_WEIGHED_LAP lap=1 block=v_bias lane=0 contacts=all role=other entries=64 open=64 travel_rms=146.34 heat_micro=23.4484 heat_base_micro=23.4484 own_micro=0.8760
+TRAVEL_WEIGHED_LAP lap=1 block=probe_bias lane=0 contacts=all role=other entries=64 open=64 travel_rms=145.79 heat_micro=8.1674 heat_base_micro=8.1674 own_micro=1.2953
+TRAVEL_WEIGHED_LAP lap=1 block=read_bias lane=0 contacts=all role=other entries=100 open=100 travel_rms=173.56 heat_micro=8.4848 heat_base_micro=8.4848 own_micro=0.9997
+TRAVEL_WEIGHED_LAP lap=1 block=moment_before lane=0 contacts=all role=other entries=3232 open=3200 travel_rms=382.49 heat_micro=418.9691 heat_base_micro=418.9691 own_micro=209.7567
+TRAVEL_WEIGHED_LAP lap=1 block=moment_after lane=0 contacts=all role=other entries=3232 open=3200 travel_rms=394.94 heat_micro=332.3918 heat_base_micro=332.3918 own_micro=209.8769
+TRAVEL_WEIGHED_LAP lap=1 block=temper lane=0 contacts=all role=other entries=8 open=8 travel_rms=80911 heat_micro=2.8195 heat_base_micro=2.8195 own_micro=2.3394
+TRAVEL_WEIGHED_LAP lap=1 block=pace lane=0 contacts=all role=other entries=202 open=200 travel_rms=1.2793e+05 heat_micro=8.8865 heat_base_micro=8.8865 own_micro=9.5066
+TRAVEL_WEIGHED_TOTAL lap=1 heat_micro=11281.6741 heat_base_micro=11281.6741 own_micro=4165.1702
+TRAVEL_WEIGHED_LAP lap=2 block=enc lane=1 contacts=all role=writes entries=3232 open=3232 travel_rms=314.2 heat_micro=155.6452 heat_base_micro=155.6452 own_micro=82.7934
+TRAVEL_WEIGHED_LAP lap=2 block=before lane=1 contacts=all role=writes entries=3232 open=3232 travel_rms=553.36 heat_micro=33.3408 heat_base_micro=33.3408 own_micro=69.8064
+TRAVEL_WEIGHED_LAP lap=2 block=after lane=1 contacts=all role=writes entries=3232 open=3232 travel_rms=561.21 heat_micro=32.3910 heat_base_micro=32.3910 own_micro=71.2342
+TRAVEL_WEIGHED_LAP lap=2 block=moment_face lane=1 contacts=all role=writes entries=2048 open=1024 travel_rms=42918 heat_micro=179.3500 heat_base_micro=179.3500 own_micro=83.2510
+TRAVEL_WEIGHED_LAP lap=2 block=out lane=1 contacts=all role=writes entries=2048 open=2048 travel_rms=70595 heat_micro=392.9859 heat_base_micro=392.9859 own_micro=161.5254
+TRAVEL_WEIGHED_LAP lap=2 block=w lane=1 contacts=new role=writes entries=1024 open=1024 travel_rms=70544 heat_micro=150.5798 heat_base_micro=150.5798 own_micro=110.8446
+TRAVEL_WEIGHED_LAP lap=2 block=w lane=1 contacts=old role=writes entries=1024 open=1024 travel_rms=36308 heat_micro=538.7253 heat_base_micro=538.7253 own_micro=90.6248
+TRAVEL_WEIGHED_LAP lap=2 block=out_bias lane=1 contacts=all role=writes entries=32 open=32 travel_rms=62.308 heat_micro=12.5954 heat_base_micro=12.5954 own_micro=0.4017
+TRAVEL_WEIGHED_LAP lap=2 block=w_bias lane=1 contacts=all role=writes entries=32 open=32 travel_rms=65.823 heat_micro=11.0183 heat_base_micro=11.0183 own_micro=0.4286
+TRAVEL_WEIGHED_LAP lap=2 block=moment_face_bias lane=1 contacts=all role=writes entries=32 open=32 travel_rms=177.17 heat_micro=6.5181 heat_base_micro=6.5181 own_micro=1.4898
+TRAVEL_WEIGHED_LAP lap=2 block=read_rows lane=1 contacts=all role=lifts entries=2048 open=2048 travel_rms=37105 heat_micro=826.7071 heat_base_micro=826.7071 own_micro=113.1083
+TRAVEL_WEIGHED_LAP lap=2 block=lift_bias lane=1 contacts=all role=lifts entries=32 open=32 travel_rms=47.393 heat_micro=26.2437 heat_base_micro=26.2437 own_micro=0.5832
+TRAVEL_WEIGHED_LAP lap=2 block=q lane=1 contacts=all role=reads entries=2048 open=2048 travel_rms=74346 heat_micro=233.3581 heat_base_micro=233.3581 own_micro=132.9691
+TRAVEL_WEIGHED_LAP lap=2 block=v lane=1 contacts=all role=reads entries=2048 open=2048 travel_rms=81366 heat_micro=283.4513 heat_base_micro=283.4513 own_micro=107.1617
+TRAVEL_WEIGHED_LAP lap=2 block=probe lane=1 contacts=all role=reads entries=2048 open=2048 travel_rms=1.0052e+05 heat_micro=132.6363 heat_base_micro=132.6363 own_micro=120.4838
+TRAVEL_WEIGHED_LAP lap=2 block=a lane=1 contacts=new role=reads entries=1024 open=1024 travel_rms=79438 heat_micro=127.1276 heat_base_micro=127.1276 own_micro=85.4943
+TRAVEL_WEIGHED_LAP lap=2 block=a lane=1 contacts=old role=reads entries=1024 open=1024 travel_rms=56278 heat_micro=327.0809 heat_base_micro=327.0809 own_micro=107.0936
+TRAVEL_WEIGHED_LAP lap=2 block=b lane=1 contacts=new role=reads entries=1024 open=1024 travel_rms=75915 heat_micro=149.7699 heat_base_micro=149.7699 own_micro=88.3459
+TRAVEL_WEIGHED_LAP lap=2 block=b lane=1 contacts=old role=reads entries=1024 open=1024 travel_rms=51774 heat_micro=440.9103 heat_base_micro=440.9103 own_micro=114.1237
+TRAVEL_WEIGHED_LAP lap=2 block=enc lane=2 contacts=all role=writes entries=3232 open=3232 travel_rms=445.73 heat_micro=64.3957 heat_base_micro=64.3957 own_micro=73.3909
+TRAVEL_WEIGHED_LAP lap=2 block=before lane=2 contacts=all role=writes entries=3232 open=3232 travel_rms=522.34 heat_micro=44.9793 heat_base_micro=44.9793 own_micro=75.3006
+TRAVEL_WEIGHED_LAP lap=2 block=after lane=2 contacts=all role=writes entries=3232 open=3232 travel_rms=514.52 heat_micro=44.7404 heat_base_micro=44.7404 own_micro=74.6077
+TRAVEL_WEIGHED_LAP lap=2 block=moment_face lane=2 contacts=all role=writes entries=2048 open=1024 travel_rms=37198 heat_micro=290.7485 heat_base_micro=290.7485 own_micro=102.8446
+TRAVEL_WEIGHED_LAP lap=2 block=out lane=2 contacts=all role=writes entries=2048 open=2048 travel_rms=58100 heat_micro=779.2103 heat_base_micro=779.2103 own_micro=188.7822
+TRAVEL_WEIGHED_LAP lap=2 block=w lane=2 contacts=new role=writes entries=1024 open=1024 travel_rms=53017 heat_micro=260.1501 heat_base_micro=260.1501 own_micro=108.6591
+TRAVEL_WEIGHED_LAP lap=2 block=w lane=2 contacts=old role=writes entries=1024 open=1024 travel_rms=27712 heat_micro=1020.8390 heat_base_micro=1020.8390 own_micro=96.9363
+TRAVEL_WEIGHED_LAP lap=2 block=out_bias lane=2 contacts=all role=writes entries=32 open=32 travel_rms=54.896 heat_micro=27.2939 heat_base_micro=27.2939 own_micro=0.8075
+TRAVEL_WEIGHED_LAP lap=2 block=w_bias lane=2 contacts=all role=writes entries=32 open=32 travel_rms=91.844 heat_micro=22.9580 heat_base_micro=22.9580 own_micro=1.4847
+TRAVEL_WEIGHED_LAP lap=2 block=moment_face_bias lane=2 contacts=all role=writes entries=32 open=32 travel_rms=74.028 heat_micro=13.2797 heat_base_micro=13.2797 own_micro=0.7094
+TRAVEL_WEIGHED_LAP lap=2 block=read_rows lane=2 contacts=all role=lifts entries=2048 open=2048 travel_rms=37661 heat_micro=843.6778 heat_base_micro=843.6778 own_micro=124.5855
+TRAVEL_WEIGHED_LAP lap=2 block=lift_bias lane=2 contacts=all role=lifts entries=32 open=32 travel_rms=43.875 heat_micro=25.7188 heat_base_micro=25.7188 own_micro=0.5201
+TRAVEL_WEIGHED_LAP lap=2 block=q lane=2 contacts=all role=reads entries=2048 open=2048 travel_rms=76724 heat_micro=299.1656 heat_base_micro=299.1656 own_micro=218.3048
+TRAVEL_WEIGHED_LAP lap=2 block=v lane=2 contacts=all role=reads entries=2048 open=2048 travel_rms=82582 heat_micro=322.8902 heat_base_micro=322.8902 own_micro=169.9460
+TRAVEL_WEIGHED_LAP lap=2 block=probe lane=2 contacts=all role=reads entries=2048 open=2048 travel_rms=90892 heat_micro=199.6244 heat_base_micro=199.6244 own_micro=175.7245
+TRAVEL_WEIGHED_LAP lap=2 block=a lane=2 contacts=new role=reads entries=1024 open=1024 travel_rms=64586 heat_micro=209.4754 heat_base_micro=209.4754 own_micro=120.3651
+TRAVEL_WEIGHED_LAP lap=2 block=a lane=2 contacts=old role=reads entries=1024 open=1024 travel_rms=46933 heat_micro=519.3141 heat_base_micro=519.3141 own_micro=150.3258
+TRAVEL_WEIGHED_LAP lap=2 block=b lane=2 contacts=new role=reads entries=1024 open=1024 travel_rms=58028 heat_micro=242.8455 heat_base_micro=242.8455 own_micro=106.3905
+TRAVEL_WEIGHED_LAP lap=2 block=b lane=2 contacts=old role=reads entries=1024 open=1024 travel_rms=39822 heat_micro=707.3269 heat_base_micro=707.3269 own_micro=146.2066
+TRAVEL_WEIGHED_LAP lap=2 block=a_bias lane=0 contacts=new role=other entries=32 open=32 travel_rms=76.281 heat_micro=7.9936 heat_base_micro=7.9936 own_micro=0.4696
+TRAVEL_WEIGHED_LAP lap=2 block=a_bias lane=0 contacts=old role=other entries=32 open=32 travel_rms=66.722 heat_micro=19.5022 heat_base_micro=19.5022 own_micro=0.8787
+TRAVEL_WEIGHED_LAP lap=2 block=b_bias lane=0 contacts=new role=other entries=32 open=32 travel_rms=61.802 heat_micro=9.7177 heat_base_micro=9.7177 own_micro=0.3558
+TRAVEL_WEIGHED_LAP lap=2 block=b_bias lane=0 contacts=old role=other entries=32 open=32 travel_rms=51.666 heat_micro=28.1944 heat_base_micro=28.1944 own_micro=0.7428
+TRAVEL_WEIGHED_LAP lap=2 block=q_bias lane=0 contacts=all role=other entries=64 open=64 travel_rms=128 heat_micro=7.7836 heat_base_micro=7.7836 own_micro=1.1526
+TRAVEL_WEIGHED_LAP lap=2 block=v_bias lane=0 contacts=all role=other entries=64 open=64 travel_rms=92.143 heat_micro=22.1193 heat_base_micro=22.1193 own_micro=0.5799
+TRAVEL_WEIGHED_LAP lap=2 block=probe_bias lane=0 contacts=all role=other entries=64 open=64 travel_rms=134.82 heat_micro=7.8451 heat_base_micro=7.8451 own_micro=0.9392
+TRAVEL_WEIGHED_LAP lap=2 block=read_bias lane=0 contacts=all role=other entries=100 open=100 travel_rms=166.76 heat_micro=8.0671 heat_base_micro=8.0671 own_micro=0.8275
+TRAVEL_WEIGHED_LAP lap=2 block=moment_before lane=0 contacts=all role=other entries=3232 open=3200 travel_rms=383.9 heat_micro=396.9468 heat_base_micro=396.9468 own_micro=209.8681
+TRAVEL_WEIGHED_LAP lap=2 block=moment_after lane=0 contacts=all role=other entries=3232 open=3200 travel_rms=393.75 heat_micro=314.6409 heat_base_micro=314.6409 own_micro=199.8478
+TRAVEL_WEIGHED_LAP lap=2 block=temper lane=0 contacts=all role=other entries=8 open=8 travel_rms=1.0404e+05 heat_micro=2.6822 heat_base_micro=2.6822 own_micro=3.3202
+TRAVEL_WEIGHED_LAP lap=2 block=pace lane=0 contacts=all role=other entries=202 open=200 travel_rms=1.3536e+05 heat_micro=8.8581 heat_base_micro=8.8581 own_micro=12.8106
+TRAVEL_WEIGHED_TOTAL lap=2 heat_micro=10833.4198 heat_base_micro=10833.4198 own_micro=3909.4482
+TRAVEL_WEIGHED_PAIR laps=0,1 block=enc lane=1 contacts=all role=writes cos=+0.3755 cos_w=+0.3484 q1_n=202 q1_cos=+0.4103 q2_n=371 q2_cos=+0.2422 q3_n=665 q3_cos=+0.3730 q4_n=1994 q4_cos=+0.3801 fall_micro=+31.8608 eps_w=0.0201
+TRAVEL_WEIGHED_PAIR laps=0,1 block=before lane=1 contacts=all role=writes cos=+0.6328 cos_w=+0.6428 q1_n=81 q1_cos=+0.6271 q2_n=300 q2_cos=+0.6030 q3_n=583 q3_cos=+0.6889 q4_n=2268 q4_cos=+0.6232 fall_micro=+48.4307 eps_w=0.0300
+TRAVEL_WEIGHED_PAIR laps=0,1 block=after lane=1 contacts=all role=writes cos=+0.6263 cos_w=+0.6484 q1_n=78 q1_cos=+0.4826 q2_n=302 q2_cos=+0.6036 q3_n=579 q3_cos=+0.7055 q4_n=2273 q4_cos=+0.6129 fall_micro=+47.5112 eps_w=0.0288
+TRAVEL_WEIGHED_PAIR laps=0,1 block=moment_face lane=1 contacts=all role=writes cos=+0.2964 cos_w=+0.2824 q1_n=134 q1_cos=+0.2537 q2_n=209 q2_cos=+0.1980 q3_n=277 q3_cos=+0.2598 q4_n=1428 q4_cos=+0.3424 fall_micro=+25.5712 eps_w=0.0358
+TRAVEL_WEIGHED_PAIR laps=0,1 block=out lane=1 contacts=all role=writes cos=+0.4297 cos_w=+0.2727 q1_n=155 q1_cos=+0.3068 q2_n=313 q2_cos=+0.1271 q3_n=532 q3_cos=+0.1791 q4_n=1048 q4_cos=+0.5052 fall_micro=+45.2900 eps_w=0.0246
+TRAVEL_WEIGHED_PAIR laps=0,1 block=w lane=1 contacts=new role=writes cos=+0.2855 cos_w=+0.2789 q1_n=201 q1_cos=+0.2745 q2_n=239 q2_cos=+0.2715 q3_n=265 q3_cos=+0.1977 q4_n=319 q4_cos=+0.3539 fall_micro=+34.6765 eps_w=0.0339
+TRAVEL_WEIGHED_PAIR laps=0,1 block=w lane=1 contacts=old role=writes cos=+0.3106 cos_w=+0.3435 q1_n=121 q1_cos=+0.5655 q2_n=204 q2_cos=+0.3490 q3_n=293 q3_cos=+0.3748 q4_n=406 q4_cos=+0.2506 fall_micro=+34.7464 eps_w=0.0362
+TRAVEL_WEIGHED_PAIR laps=0,1 block=out_bias lane=1 contacts=all role=writes cos=+0.6987 cos_w=+0.6651 q1_n=6 q1_cos=+0.3480 q2_n=7 q2_cos=+0.6735 q3_n=9 q3_cos=+0.7558 q4_n=10 q4_cos=+0.7318 fall_micro=+0.3801 eps_w=0.2051
+TRAVEL_WEIGHED_PAIR laps=0,1 block=w_bias lane=1 contacts=all role=writes cos=+0.8187 cos_w=+0.8139 q1_n=6 q1_cos=+0.4678 q2_n=7 q2_cos=+0.9155 q3_n=9 q3_cos=+0.6739 q4_n=10 q4_cos=+0.8875 fall_micro=+0.5250 eps_w=0.2835
+TRAVEL_WEIGHED_PAIR laps=0,1 block=moment_face_bias lane=1 contacts=all role=writes cos=+0.9322 cos_w=+0.9138 q1_n=6 q1_cos=+0.8480 q2_n=7 q2_cos=+0.8056 q3_n=9 q3_cos=+0.9033 q4_n=10 q4_cos=+0.9487 fall_micro=+1.2521 eps_w=0.5723
+TRAVEL_WEIGHED_PAIR laps=0,1 block=read_rows lane=1 contacts=all role=lifts cos=+0.2427 cos_w=+0.2149 q1_n=42 q1_cos=+0.2563 q2_n=289 q2_cos=+0.1321 q3_n=619 q3_cos=+0.1374 q4_n=1098 q4_cos=+0.3092 fall_micro=+26.4630 eps_w=0.0237
+TRAVEL_WEIGHED_PAIR laps=0,1 block=lift_bias lane=1 contacts=all role=lifts cos=+0.5497 cos_w=+0.5680 q1_n=6 q1_cos=+0.9528 q2_n=7 q2_cos=+0.0221 q3_n=8 q3_cos=+0.1651 q4_n=11 q4_cos=+0.6695 fall_micro=+0.2649 eps_w=0.2553
+TRAVEL_WEIGHED_PAIR laps=0,1 block=q lane=1 contacts=all role=reads cos=+0.4871 cos_w=+0.3835 q1_n=122 q1_cos=+0.1031 q2_n=287 q2_cos=+0.1778 q3_n=472 q3_cos=+0.3401 q4_n=1167 q4_cos=+0.5548 fall_micro=+55.5552 eps_w=0.0255
+TRAVEL_WEIGHED_PAIR laps=0,1 block=v lane=1 contacts=all role=reads cos=+0.6190 cos_w=+0.4916 q1_n=27 q1_cos=+0.4692 q2_n=214 q2_cos=+0.3968 q3_n=508 q3_cos=+0.3650 q4_n=1299 q4_cos=+0.6544 fall_micro=+59.2231 eps_w=0.0293
+TRAVEL_WEIGHED_PAIR laps=0,1 block=probe lane=1 contacts=all role=reads cos=+0.5758 cos_w=+0.4766 q1_n=36 q1_cos=+0.5237 q2_n=287 q2_cos=+0.2522 q3_n=477 q3_cos=+0.3775 q4_n=1248 q4_cos=+0.6493 fall_micro=+57.8801 eps_w=0.0285
+TRAVEL_WEIGHED_PAIR laps=0,1 block=a lane=1 contacts=new role=reads cos=+0.2879 cos_w=+0.2907 q1_n=23 q1_cos=+0.4816 q2_n=193 q2_cos=+0.2656 q3_n=354 q3_cos=+0.3329 q4_n=454 q4_cos=+0.2656 fall_micro=+28.8366 eps_w=0.0360
+TRAVEL_WEIGHED_PAIR laps=0,1 block=a lane=1 contacts=old role=reads cos=+0.1201 cos_w=+0.1331 q1_n=23 q1_cos=-0.1878 q2_n=185 q2_cos=+0.1807 q3_n=339 q3_cos=+0.1184 q4_n=477 q4_cos=+0.1087 fall_micro=+16.6784 eps_w=0.0315
+TRAVEL_WEIGHED_PAIR laps=0,1 block=b lane=1 contacts=new role=reads cos=+0.3752 cos_w=+0.3772 q1_n=21 q1_cos=+0.4180 q2_n=175 q2_cos=+0.4615 q3_n=357 q3_cos=+0.3598 q4_n=471 q4_cos=+0.3699 fall_micro=+35.2850 eps_w=0.0356
+TRAVEL_WEIGHED_PAIR laps=0,1 block=b lane=1 contacts=old role=reads cos=+0.2661 cos_w=+0.2674 q1_n=21 q1_cos=+0.7099 q2_n=164 q2_cos=+0.1321 q3_n=333 q3_cos=+0.2885 q4_n=506 q4_cos=+0.2765 fall_micro=+31.7189 eps_w=0.0328
+TRAVEL_WEIGHED_PAIR laps=0,1 block=enc lane=2 contacts=all role=writes cos=+0.5705 cos_w=+0.5714 q1_n=83 q1_cos=+0.4797 q2_n=334 q2_cos=+0.5633 q3_n=634 q3_cos=+0.5981 q4_n=2181 q4_cos=+0.5671 fall_micro=+44.5875 eps_w=0.0259
+TRAVEL_WEIGHED_PAIR laps=0,1 block=before lane=2 contacts=all role=writes cos=+0.5911 cos_w=+0.5708 q1_n=35 q1_cos=+0.4903 q2_n=273 q2_cos=+0.4727 q3_n=586 q3_cos=+0.6119 q4_n=2338 q4_cos=+0.5931 fall_micro=+44.4977 eps_w=0.0278
+TRAVEL_WEIGHED_PAIR laps=0,1 block=after lane=2 contacts=all role=writes cos=+0.5786 cos_w=+0.5892 q1_n=32 q1_cos=+0.5622 q2_n=280 q2_cos=+0.5770 q3_n=599 q3_cos=+0.6004 q4_n=2321 q4_cos=+0.5744 fall_micro=+47.0196 eps_w=0.0270
+TRAVEL_WEIGHED_PAIR laps=0,1 block=moment_face lane=2 contacts=all role=writes cos=+0.2175 cos_w=+0.2479 q1_n=112 q1_cos=+0.4096 q2_n=214 q2_cos=+0.2465 q3_n=277 q3_cos=+0.2190 q4_n=1445 q4_cos=+0.1961 fall_micro=+28.0565 eps_w=0.0348
+TRAVEL_WEIGHED_PAIR laps=0,1 block=out lane=2 contacts=all role=writes cos=+0.3850 cos_w=+0.0934 q1_n=141 q1_cos=+0.0090 q2_n=295 q2_cos=-0.0545 q3_n=530 q3_cos=+0.0509 q4_n=1082 q4_cos=+0.4609 fall_micro=+20.1587 eps_w=0.0238
+TRAVEL_WEIGHED_PAIR laps=0,1 block=w lane=2 contacts=new role=writes cos=-0.0253 cos_w=-0.0143 q1_n=197 q1_cos=+0.1065 q2_n=239 q2_cos=+0.0785 q3_n=270 q3_cos=-0.0758 q4_n=318 q4_cos=-0.0871 fall_micro=-1.7510 eps_w=0.0325
+TRAVEL_WEIGHED_PAIR laps=0,1 block=w lane=2 contacts=old role=writes cos=+0.0973 cos_w=+0.1038 q1_n=118 q1_cos=+0.1688 q2_n=199 q2_cos=+0.0790 q3_n=295 q3_cos=+0.0932 q4_n=412 q4_cos=+0.0982 fall_micro=+10.7551 eps_w=0.0328
+TRAVEL_WEIGHED_PAIR laps=0,1 block=out_bias lane=2 contacts=all role=writes cos=+0.8008 cos_w=+0.7905 q1_n=6 q1_cos=+0.6576 q2_n=8 q2_cos=+0.6114 q3_n=8 q3_cos=+0.8919 q4_n=10 q4_cos=+0.8522 fall_micro=+0.7970 eps_w=0.2883
+TRAVEL_WEIGHED_PAIR laps=0,1 block=w_bias lane=2 contacts=all role=writes cos=+0.9067 cos_w=+0.8704 q1_n=6 q1_cos=+0.7982 q2_n=8 q2_cos=+0.1754 q3_n=8 q3_cos=+0.8992 q4_n=10 q4_cos=+0.9682 fall_micro=+1.8295 eps_w=0.4362
+TRAVEL_WEIGHED_PAIR laps=0,1 block=moment_face_bias lane=2 contacts=all role=writes cos=+0.6797 cos_w=+0.6545 q1_n=6 q1_cos=+0.5347 q2_n=8 q2_cos=+0.4982 q3_n=8 q3_cos=+0.7054 q4_n=10 q4_cos=+0.8703 fall_micro=+0.6429 eps_w=0.1969
+TRAVEL_WEIGHED_PAIR laps=0,1 block=read_rows lane=2 contacts=all role=lifts cos=+0.1530 cos_w=+0.1611 q1_n=49 q1_cos=+0.4634 q2_n=339 q2_cos=+0.1298 q3_n=614 q3_cos=+0.1302 q4_n=1046 q4_cos=+0.1678 fall_micro=+20.2457 eps_w=0.0231
+TRAVEL_WEIGHED_PAIR laps=0,1 block=lift_bias lane=2 contacts=all role=lifts cos=+0.4638 cos_w=+0.4709 q1_n=7 q1_cos=+0.1763 q2_n=7 q2_cos=+0.6067 q3_n=9 q3_cos=+0.6373 q4_n=9 q4_cos=+0.3308 fall_micro=+0.1502 eps_w=0.2361
+TRAVEL_WEIGHED_PAIR laps=0,1 block=q lane=2 contacts=all role=reads cos=+0.3143 cos_w=+0.2126 q1_n=220 q1_cos=+0.1151 q2_n=316 q2_cos=+0.0029 q3_n=500 q3_cos=+0.2345 q4_n=1012 q4_cos=+0.4173 fall_micro=+50.7610 eps_w=0.0249
+TRAVEL_WEIGHED_PAIR laps=0,1 block=v lane=2 contacts=all role=reads cos=+0.5058 cos_w=+0.3007 q1_n=188 q1_cos=+0.2958 q2_n=317 q2_cos=+0.1274 q3_n=452 q3_cos=+0.1726 q4_n=1091 q4_cos=+0.5858 fall_micro=+58.2713 eps_w=0.0256
+TRAVEL_WEIGHED_PAIR laps=0,1 block=probe lane=2 contacts=all role=reads cos=+0.4291 cos_w=+0.2578 q1_n=163 q1_cos=-0.0187 q2_n=299 q2_cos=+0.0800 q3_n=438 q3_cos=+0.1731 q4_n=1148 q4_cos=+0.5425 fall_micro=+49.9756 eps_w=0.0276
+TRAVEL_WEIGHED_PAIR laps=0,1 block=a lane=2 contacts=new role=reads cos=+0.0316 cos_w=+0.0368 q1_n=126 q1_cos=+0.1134 q2_n=248 q2_cos=-0.0604 q3_n=302 q3_cos=+0.1041 q4_n=348 q4_cos=+0.0102 fall_micro=+4.3756 eps_w=0.0314
+TRAVEL_WEIGHED_PAIR laps=0,1 block=a lane=2 contacts=old role=reads cos=-0.0961 cos_w=-0.0930 q1_n=112 q1_cos=+0.0412 q2_n=225 q2_cos=-0.2040 q3_n=299 q3_cos=-0.1006 q4_n=388 q4_cos=-0.0685 fall_micro=-15.4163 eps_w=0.0315
+TRAVEL_WEIGHED_PAIR laps=0,1 block=b lane=2 contacts=new role=reads cos=+0.0296 cos_w=+0.0505 q1_n=109 q1_cos=+0.2113 q2_n=242 q2_cos=+0.1216 q3_n=306 q3_cos=+0.0778 q4_n=367 q4_cos=-0.0604 fall_micro=+5.8600 eps_w=0.0315
+TRAVEL_WEIGHED_PAIR laps=0,1 block=b lane=2 contacts=old role=reads cos=-0.0835 cos_w=-0.0743 q1_n=103 q1_cos=+0.1604 q2_n=227 q2_cos=-0.1201 q3_n=285 q3_cos=-0.1324 q4_n=409 q4_cos=-0.0607 fall_micro=-11.3875 eps_w=0.0321
+TRAVEL_WEIGHED_PAIR laps=0,1 block=a_bias lane=0 contacts=new role=other cos=+0.4439 cos_w=+0.4428 q1_n=7 q1_cos=-0.4775 q2_n=7 q2_cos=+0.6146 q3_n=9 q3_cos=+0.6875 q4_n=9 q4_cos=+0.2079 fall_micro=+0.2606 eps_w=0.2786
+TRAVEL_WEIGHED_PAIR laps=0,1 block=a_bias lane=0 contacts=old role=other cos=+0.4953 cos_w=+0.4592 q1_n=4 q1_cos=+0.9269 q2_n=8 q2_cos=+0.3942 q3_n=8 q3_cos=-0.0334 q4_n=12 q4_cos=+0.7134 fall_micro=+0.4829 eps_w=0.1861
+TRAVEL_WEIGHED_PAIR laps=0,1 block=b_bias lane=0 contacts=new role=other cos=+0.5682 cos_w=+0.5299 q1_n=6 q1_cos=+0.4356 q2_n=8 q2_cos=+0.8255 q3_n=8 q3_cos=+0.3065 q4_n=10 q4_cos=+0.8631 fall_micro=+0.2586 eps_w=0.1695
+TRAVEL_WEIGHED_PAIR laps=0,1 block=b_bias lane=0 contacts=old role=other cos=+0.7718 cos_w=+0.7611 q1_n=5 q1_cos=+0.7788 q2_n=8 q2_cos=+0.6730 q3_n=8 q3_cos=+0.7490 q4_n=11 q4_cos=+0.8196 fall_micro=+0.7300 eps_w=0.2404
+TRAVEL_WEIGHED_PAIR laps=0,1 block=q_bias lane=0 contacts=all role=other cos=+0.4427 cos_w=+0.4106 q1_n=9 q1_cos=+0.3453 q2_n=11 q2_cos=+0.0476 q3_n=17 q3_cos=+0.6337 q4_n=27 q4_cos=+0.4285 fall_micro=+0.4195 eps_w=0.1417
+TRAVEL_WEIGHED_PAIR laps=0,1 block=v_bias lane=0 contacts=all role=other cos=+0.5341 cos_w=+0.5080 q1_n=7 q1_cos=+0.5396 q2_n=10 q2_cos=+0.6848 q3_n=11 q3_cos=+0.4751 q4_n=36 q4_cos=+0.5331 fall_micro=+0.4198 eps_w=0.1265
+TRAVEL_WEIGHED_PAIR laps=0,1 block=probe_bias lane=0 contacts=all role=other cos=+0.5109 cos_w=+0.5784 q1_n=8 q1_cos=+0.8912 q2_n=9 q2_cos=+0.2375 q3_n=13 q3_cos=+0.5754 q4_n=34 q4_cos=+0.4703 fall_micro=+0.7547 eps_w=0.1834
+TRAVEL_WEIGHED_PAIR laps=0,1 block=read_bias lane=0 contacts=all role=other cos=+0.3061 cos_w=+0.3573 q1_n=6 q1_cos=+0.9636 q2_n=11 q2_cos=+0.5862 q3_n=19 q3_cos=+0.7219 q4_n=64 q4_cos=+0.2785 fall_micro=+0.3929 eps_w=0.1168
+TRAVEL_WEIGHED_PAIR laps=0,1 block=moment_before lane=0 contacts=all role=other cos=+0.3158 cos_w=+0.0905 q1_n=39 q1_cos=-0.0584 q2_n=126 q2_cos=-0.1116 q3_n=414 q3_cos=-0.0153 q4_n=2653 q4_cos=+0.3353 fall_micro=+20.5443 eps_w=0.0227
+TRAVEL_WEIGHED_PAIR laps=0,1 block=moment_after lane=0 contacts=all role=other cos=+0.3223 cos_w=+0.1741 q1_n=51 q1_cos=-0.1918 q2_n=155 q2_cos=-0.1054 q3_n=432 q3_cos=+0.2012 q4_n=2594 q4_cos=+0.3356 fall_micro=+36.9910 eps_w=0.0231
+TRAVEL_WEIGHED_PAIR laps=0,1 block=temper lane=0 contacts=all role=other cos=+0.3853 cos_w=+0.5445 q1_n=1 q1_cos=+1.0000 q2_n=1 q2_cos=+1.0000 q3_n=1 q3_cos=+1.0000 q4_n=5 q4_cos=+0.3225 fall_micro=+1.2582 eps_w=0.3438
+TRAVEL_WEIGHED_PAIR laps=0,1 block=pace lane=0 contacts=all role=other cos=+0.5524 cos_w=+0.4188 q1_n=3 q1_cos=-0.6440 q2_n=11 q2_cos=+0.2560 q3_n=21 q3_cos=+0.2994 q4_n=167 q4_cos=+0.5695 fall_micro=+4.7498 eps_w=0.1142
+TRAVEL_WEIGHED_TOTAL laps=0,1 fall_micro=+1008.8405
+TRAVEL_WEIGHED_PAIR laps=1,2 block=enc lane=1 contacts=all role=writes cos=+0.3510 cos_w=+0.3270 q1_n=195 q1_cos=+0.3804 q2_n=366 q2_cos=+0.3020 q3_n=661 q3_cos=+0.2979 q4_n=2010 q4_cos=+0.3591 fall_micro=+27.7396 eps_w=0.0204
+TRAVEL_WEIGHED_PAIR laps=1,2 block=before lane=1 contacts=all role=writes cos=+0.6166 cos_w=+0.6386 q1_n=79 q1_cos=+0.6538 q2_n=303 q2_cos=+0.6988 q3_n=582 q3_cos=+0.6303 q4_n=2268 q4_cos=+0.6082 fall_micro=+46.4519 eps_w=0.0297
+TRAVEL_WEIGHED_PAIR laps=1,2 block=after lane=1 contacts=all role=writes cos=+0.6342 cos_w=+0.6411 q1_n=78 q1_cos=+0.5090 q2_n=300 q2_cos=+0.6491 q3_n=571 q3_cos=+0.6572 q4_n=2283 q4_cos=+0.6295 fall_micro=+46.8197 eps_w=0.0290
+TRAVEL_WEIGHED_PAIR laps=1,2 block=moment_face lane=1 contacts=all role=writes cos=+0.2864 cos_w=+0.2779 q1_n=131 q1_cos=+0.3690 q2_n=210 q2_cos=+0.1949 q3_n=279 q3_cos=+0.2787 q4_n=1428 q4_cos=+0.3024 fall_micro=+24.3549 eps_w=0.0330
+TRAVEL_WEIGHED_PAIR laps=1,2 block=out lane=1 contacts=all role=writes cos=+0.3896 cos_w=+0.1740 q1_n=153 q1_cos=+0.0272 q2_n=316 q2_cos=+0.0455 q3_n=533 q3_cos=+0.0842 q4_n=1046 q4_cos=+0.4817 fall_micro=+29.0269 eps_w=0.0242
+TRAVEL_WEIGHED_PAIR laps=1,2 block=w lane=1 contacts=new role=writes cos=+0.2611 cos_w=+0.2571 q1_n=201 q1_cos=+0.2803 q2_n=239 q2_cos=+0.1761 q3_n=264 q3_cos=+0.3062 q4_n=320 q4_cos=+0.2688 fall_micro=+30.3754 eps_w=0.0337
+TRAVEL_WEIGHED_PAIR laps=1,2 block=w lane=1 contacts=old role=writes cos=+0.3400 cos_w=+0.3657 q1_n=120 q1_cos=+0.6060 q2_n=204 q2_cos=+0.4491 q3_n=294 q3_cos=+0.2525 q4_n=406 q4_cos=+0.3347 fall_micro=+36.3545 eps_w=0.0361
+TRAVEL_WEIGHED_PAIR laps=1,2 block=out_bias lane=1 contacts=all role=writes cos=+0.7100 cos_w=+0.6823 q1_n=6 q1_cos=+0.8426 q2_n=7 q2_cos=+0.8028 q3_n=8 q3_cos=+0.4412 q4_n=11 q4_cos=+0.8317 fall_micro=+0.3507 eps_w=0.2294
+TRAVEL_WEIGHED_PAIR laps=1,2 block=w_bias lane=1 contacts=all role=writes cos=+0.8195 cos_w=+0.8053 q1_n=6 q1_cos=+0.6305 q2_n=7 q2_cos=+0.9428 q3_n=9 q3_cos=+0.5963 q4_n=10 q4_cos=+0.8740 fall_micro=+0.4680 eps_w=0.2437
+TRAVEL_WEIGHED_PAIR laps=1,2 block=moment_face_bias lane=1 contacts=all role=writes cos=+0.8665 cos_w=+0.8161 q1_n=6 q1_cos=+0.5151 q2_n=7 q2_cos=+0.3245 q3_n=9 q3_cos=+0.5778 q4_n=10 q4_cos=+0.9677 fall_micro=+1.2525 eps_w=0.5137
+TRAVEL_WEIGHED_PAIR laps=1,2 block=read_rows lane=1 contacts=all role=lifts cos=+0.2307 cos_w=+0.2166 q1_n=43 q1_cos=+0.3957 q2_n=297 q2_cos=+0.1507 q3_n=615 q3_cos=+0.1852 q4_n=1093 q4_cos=+0.2634 fall_micro=+25.4692 eps_w=0.0237
+TRAVEL_WEIGHED_PAIR laps=1,2 block=lift_bias lane=1 contacts=all role=lifts cos=+0.6299 cos_w=+0.6556 q1_n=6 q1_cos=+0.8074 q2_n=7 q2_cos=+0.8627 q3_n=8 q3_cos=+0.4892 q4_n=11 q4_cos=+0.6062 fall_micro=+0.3260 eps_w=0.2336
+TRAVEL_WEIGHED_PAIR laps=1,2 block=q lane=1 contacts=all role=reads cos=+0.4428 cos_w=+0.3389 q1_n=123 q1_cos=+0.1958 q2_n=288 q2_cos=+0.1909 q3_n=476 q3_cos=+0.2161 q4_n=1161 q4_cos=+0.5249 fall_micro=+47.8717 eps_w=0.0256
+TRAVEL_WEIGHED_PAIR laps=1,2 block=v lane=1 contacts=all role=reads cos=+0.6070 cos_w=+0.4465 q1_n=27 q1_cos=+0.4540 q2_n=209 q2_cos=+0.3094 q3_n=508 q3_cos=+0.2958 q4_n=1304 q4_cos=+0.6499 fall_micro=+51.2011 eps_w=0.0286
+TRAVEL_WEIGHED_PAIR laps=1,2 block=probe lane=1 contacts=all role=reads cos=+0.5545 cos_w=+0.4381 q1_n=35 q1_cos=+0.2853 q2_n=290 q2_cos=+0.2992 q3_n=478 q3_cos=+0.2718 q4_n=1245 q4_cos=+0.6431 fall_micro=+54.0309 eps_w=0.0267
+TRAVEL_WEIGHED_PAIR laps=1,2 block=a lane=1 contacts=new role=reads cos=+0.3376 cos_w=+0.3335 q1_n=23 q1_cos=+0.3870 q2_n=188 q2_cos=+0.3104 q3_n=356 q3_cos=+0.3001 q4_n=457 q4_cos=+0.3661 fall_micro=+31.7102 eps_w=0.0335
+TRAVEL_WEIGHED_PAIR laps=1,2 block=a lane=1 contacts=old role=reads cos=+0.1044 cos_w=+0.1161 q1_n=22 q1_cos=+0.2978 q2_n=177 q2_cos=+0.1795 q3_n=342 q3_cos=+0.0879 q4_n=483 q4_cos=+0.1005 fall_micro=+13.9416 eps_w=0.0318
+TRAVEL_WEIGHED_PAIR laps=1,2 block=b lane=1 contacts=new role=reads cos=+0.3495 cos_w=+0.3549 q1_n=21 q1_cos=+0.4797 q2_n=172 q2_cos=+0.4230 q3_n=357 q3_cos=+0.3281 q4_n=474 q4_cos=+0.3489 fall_micro=+31.7518 eps_w=0.0350
+TRAVEL_WEIGHED_PAIR laps=1,2 block=b lane=1 contacts=old role=reads cos=+0.2407 cos_w=+0.2491 q1_n=19 q1_cos=+0.6874 q2_n=158 q2_cos=+0.1776 q3_n=336 q3_cos=+0.2184 q4_n=511 q4_cos=+0.2595 fall_micro=+29.5205 eps_w=0.0323
+TRAVEL_WEIGHED_PAIR laps=1,2 block=enc lane=2 contacts=all role=writes cos=+0.5768 cos_w=+0.5703 q1_n=79 q1_cos=+0.5637 q2_n=331 q2_cos=+0.6145 q3_n=631 q3_cos=+0.5614 q4_n=2191 q4_cos=+0.5777 fall_micro=+43.6722 eps_w=0.0251
+TRAVEL_WEIGHED_PAIR laps=1,2 block=before lane=2 contacts=all role=writes cos=+0.5561 cos_w=+0.5643 q1_n=32 q1_cos=+0.5499 q2_n=270 q2_cos=+0.5328 q3_n=593 q3_cos=+0.5968 q4_n=2337 q4_cos=+0.5497 fall_micro=+43.4847 eps_w=0.0280
+TRAVEL_WEIGHED_PAIR laps=1,2 block=after lane=2 contacts=all role=writes cos=+0.5807 cos_w=+0.5938 q1_n=31 q1_cos=+0.4683 q2_n=275 q2_cos=+0.5832 q3_n=585 q3_cos=+0.6213 q4_n=2341 q4_cos=+0.5727 fall_micro=+45.5481 eps_w=0.0280
+TRAVEL_WEIGHED_PAIR laps=1,2 block=moment_face lane=2 contacts=all role=writes cos=+0.2925 cos_w=+0.3054 q1_n=110 q1_cos=+0.3695 q2_n=213 q2_cos=+0.3986 q3_n=280 q3_cos=+0.2989 q4_n=1445 q4_cos=+0.2598 fall_micro=+33.6945 eps_w=0.0355
+TRAVEL_WEIGHED_PAIR laps=1,2 block=out lane=2 contacts=all role=writes cos=+0.3340 cos_w=+0.0528 q1_n=138 q1_cos=-0.1533 q2_n=296 q2_cos=+0.0259 q3_n=531 q3_cos=-0.0063 q4_n=1083 q4_cos=+0.4113 fall_micro=+10.8784 eps_w=0.0237
+TRAVEL_WEIGHED_PAIR laps=1,2 block=w lane=2 contacts=new role=writes cos=+0.0571 cos_w=+0.0463 q1_n=197 q1_cos=-0.0478 q2_n=239 q2_cos=-0.0090 q3_n=269 q3_cos=-0.0185 q4_n=319 q4_cos=+0.1669 fall_micro=+5.3118 eps_w=0.0308
+TRAVEL_WEIGHED_PAIR laps=1,2 block=w lane=2 contacts=old role=writes cos=+0.1002 cos_w=+0.1177 q1_n=115 q1_cos=+0.2599 q2_n=198 q2_cos=+0.2969 q3_n=295 q3_cos=+0.0331 q4_n=416 q4_cos=+0.0868 fall_micro=+11.8948 eps_w=0.0314
+TRAVEL_WEIGHED_PAIR laps=1,2 block=out_bias lane=2 contacts=all role=writes cos=+0.7717 cos_w=+0.7748 q1_n=6 q1_cos=+0.7787 q2_n=8 q2_cos=+0.3599 q3_n=8 q3_cos=+0.9322 q4_n=10 q4_cos=+0.6543 fall_micro=+0.7260 eps_w=0.2894
+TRAVEL_WEIGHED_PAIR laps=1,2 block=w_bias lane=2 contacts=all role=writes cos=+0.9404 cos_w=+0.9289 q1_n=6 q1_cos=+0.8673 q2_n=7 q2_cos=+0.8405 q3_n=9 q3_cos=+0.7443 q4_n=10 q4_cos=+0.9606 fall_micro=+1.6209 eps_w=0.4392
+TRAVEL_WEIGHED_PAIR laps=1,2 block=moment_face_bias lane=2 contacts=all role=writes cos=+0.5925 cos_w=+0.5842 q1_n=6 q1_cos=+0.5750 q2_n=7 q2_cos=+0.4106 q3_n=9 q3_cos=+0.6655 q4_n=10 q4_cos=+0.6816 fall_micro=+0.5503 eps_w=0.1904
+TRAVEL_WEIGHED_PAIR laps=1,2 block=read_rows lane=2 contacts=all role=lifts cos=+0.1631 cos_w=+0.1717 q1_n=47 q1_cos=+0.3035 q2_n=333 q2_cos=+0.1226 q3_n=616 q3_cos=+0.1895 q4_n=1052 q4_cos=+0.1567 fall_micro=+21.5182 eps_w=0.0229
+TRAVEL_WEIGHED_PAIR laps=1,2 block=lift_bias lane=2 contacts=all role=lifts cos=+0.5022 cos_w=+0.5016 q1_n=7 q1_cos=+0.4218 q2_n=7 q2_cos=+0.7374 q3_n=8 q3_cos=+0.2913 q4_n=10 q4_cos=+0.6019 fall_micro=+0.1876 eps_w=0.2747
+TRAVEL_WEIGHED_PAIR laps=1,2 block=q lane=2 contacts=all role=reads cos=+0.2695 cos_w=+0.1696 q1_n=219 q1_cos=-0.0367 q2_n=317 q2_cos=+0.0042 q3_n=503 q3_cos=+0.1624 q4_n=1009 q4_cos=+0.3730 fall_micro=+38.7715 eps_w=0.0234
+TRAVEL_WEIGHED_PAIR laps=1,2 block=v lane=2 contacts=all role=reads cos=+0.5042 cos_w=+0.2853 q1_n=184 q1_cos=+0.2948 q2_n=317 q2_cos=+0.0932 q3_n=453 q3_cos=+0.2217 q4_n=1094 q4_cos=+0.5765 fall_micro=+52.1994 eps_w=0.0247
+TRAVEL_WEIGHED_PAIR laps=1,2 block=probe lane=2 contacts=all role=reads cos=+0.5172 cos_w=+0.3543 q1_n=165 q1_cos=+0.2008 q2_n=297 q2_cos=+0.1093 q3_n=442 q3_cos=+0.3048 q4_n=1144 q4_cos=+0.6238 fall_micro=+66.3449 eps_w=0.0260
+TRAVEL_WEIGHED_PAIR laps=1,2 block=a lane=2 contacts=new role=reads cos=+0.0184 cos_w=+0.0244 q1_n=123 q1_cos=+0.0656 q2_n=248 q2_cos=-0.0044 q3_n=303 q3_cos=-0.0040 q4_n=350 q4_cos=+0.0395 fall_micro=+2.9048 eps_w=0.0308
+TRAVEL_WEIGHED_PAIR laps=1,2 block=a lane=2 contacts=old role=reads cos=-0.0484 cos_w=-0.0316 q1_n=107 q1_cos=+0.0525 q2_n=223 q2_cos=+0.0338 q3_n=302 q3_cos=-0.0656 q4_n=392 q4_cos=-0.0742 fall_micro=-5.0434 eps_w=0.0314
+TRAVEL_WEIGHED_PAIR laps=1,2 block=b lane=2 contacts=new role=reads cos=+0.0022 cos_w=+0.0154 q1_n=104 q1_cos=+0.0606 q2_n=241 q2_cos=+0.0087 q3_n=310 q3_cos=+0.0791 q4_n=369 q4_cos=-0.0564 fall_micro=+1.6980 eps_w=0.0311
+TRAVEL_WEIGHED_PAIR laps=1,2 block=b lane=2 contacts=old role=reads cos=-0.0406 cos_w=-0.0298 q1_n=99 q1_cos=+0.1768 q2_n=223 q2_cos=-0.1152 q3_n=288 q3_cos=-0.0338 q4_n=414 q4_cos=-0.0347 fall_micro=-4.3094 eps_w=0.0334
+TRAVEL_WEIGHED_PAIR laps=1,2 block=a_bias lane=0 contacts=new role=other cos=+0.3293 cos_w=+0.3472 q1_n=7 q1_cos=+0.5790 q2_n=8 q2_cos=+0.7102 q3_n=8 q3_cos=-0.4357 q4_n=9 q4_cos=+0.2715 fall_micro=+0.1907 eps_w=0.2130
+TRAVEL_WEIGHED_PAIR laps=1,2 block=a_bias lane=0 contacts=old role=other cos=+0.5045 cos_w=+0.5501 q1_n=4 q1_cos=+0.8537 q2_n=7 q2_cos=+0.4008 q3_n=9 q3_cos=+0.6561 q4_n=12 q4_cos=+0.3627 fall_micro=+0.5426 eps_w=0.2274
+TRAVEL_WEIGHED_PAIR laps=1,2 block=b_bias lane=0 contacts=new role=other cos=+0.5216 cos_w=+0.4934 q1_n=6 q1_cos=+0.1319 q2_n=7 q2_cos=+0.2709 q3_n=9 q3_cos=+0.6992 q4_n=10 q4_cos=+0.7455 fall_micro=+0.2156 eps_w=0.2290
+TRAVEL_WEIGHED_PAIR laps=1,2 block=b_bias lane=0 contacts=old role=other cos=+0.7630 cos_w=+0.7777 q1_n=5 q1_cos=+0.9372 q2_n=7 q2_cos=+0.7564 q3_n=9 q3_cos=+0.6194 q4_n=11 q4_cos=+0.7936 fall_micro=+0.6280 eps_w=0.2402
+TRAVEL_WEIGHED_PAIR laps=1,2 block=q_bias lane=0 contacts=all role=other cos=+0.5108 cos_w=+0.5671 q1_n=9 q1_cos=+0.8137 q2_n=11 q2_cos=+0.7009 q3_n=17 q3_cos=+0.4343 q4_n=27 q4_cos=+0.4647 fall_micro=+0.6177 eps_w=0.1482
+TRAVEL_WEIGHED_PAIR laps=1,2 block=v_bias lane=0 contacts=all role=other cos=+0.3000 cos_w=+0.4275 q1_n=7 q1_cos=+0.7856 q2_n=10 q2_cos=+0.6364 q3_n=11 q3_cos=+0.4286 q4_n=36 q4_cos=+0.2877 fall_micro=+0.3114 eps_w=0.1480
+TRAVEL_WEIGHED_PAIR laps=1,2 block=probe_bias lane=0 contacts=all role=other cos=+0.5726 cos_w=+0.5592 q1_n=8 q1_cos=+0.7702 q2_n=9 q2_cos=+0.2090 q3_n=13 q3_cos=+0.4419 q4_n=34 q4_cos=+0.5918 fall_micro=+0.6275 eps_w=0.1709
+TRAVEL_WEIGHED_PAIR laps=1,2 block=read_bias lane=0 contacts=all role=other cos=+0.3717 cos_w=+0.4196 q1_n=6 q1_cos=+0.9016 q2_n=11 q2_cos=+0.5367 q3_n=19 q3_cos=+0.6035 q4_n=64 q4_cos=+0.3557 fall_micro=+0.3884 eps_w=0.1237
+TRAVEL_WEIGHED_PAIR laps=1,2 block=moment_before lane=0 contacts=all role=other cos=+0.3321 cos_w=+0.1882 q1_n=41 q1_cos=+0.0580 q2_n=130 q2_cos=-0.0768 q3_n=432 q3_cos=+0.1648 q4_n=2629 q4_cos=+0.3439 fall_micro=+40.2746 eps_w=0.0216
+TRAVEL_WEIGHED_PAIR laps=1,2 block=moment_after lane=0 contacts=all role=other cos=+0.3441 cos_w=+0.1754 q1_n=54 q1_cos=+0.1846 q2_n=157 q2_cos=-0.0189 q3_n=437 q3_cos=+0.0278 q4_n=2584 q4_cos=+0.3685 fall_micro=+36.7983 eps_w=0.0216
+TRAVEL_WEIGHED_PAIR laps=1,2 block=temper lane=0 contacts=all role=other cos=+0.6093 cos_w=+0.6244 q1_n=1 q1_cos=+1.0000 q2_n=1 q2_cos=+1.0000 q3_n=1 q3_cos=-1.0000 q4_n=5 q4_cos=+0.6561 fall_micro=+1.7493 eps_w=0.4936
+TRAVEL_WEIGHED_PAIR laps=1,2 block=pace lane=0 contacts=all role=other cos=+0.5061 cos_w=+0.4087 q1_n=4 q1_cos=+0.5779 q2_n=11 q2_cos=-0.2382 q3_n=21 q3_cos=+0.4806 q4_n=166 q4_cos=+0.5212 fall_micro=+4.5529 eps_w=0.1056
+TRAVEL_WEIGHED_TOTAL laps=1,2 fall_micro=+987.5675
+TRAVEL_WEIGHED_LAG laps=0,2 lag=2 block=enc lane=1 contacts=all role=writes cos=+0.3081 cos_w=+0.2947 fall_micro=+27.1992
+TRAVEL_WEIGHED_LAG laps=0,2 lag=2 block=before lane=1 contacts=all role=writes cos=+0.5292 cos_w=+0.5555 fall_micro=+41.5568
+TRAVEL_WEIGHED_LAG laps=0,2 lag=2 block=after lane=1 contacts=all role=writes cos=+0.5279 cos_w=+0.5478 fall_micro=+40.2884
+TRAVEL_WEIGHED_LAG laps=0,2 lag=2 block=moment_face lane=1 contacts=all role=writes cos=+0.2187 cos_w=+0.2262 fall_micro=+20.1649
+TRAVEL_WEIGHED_LAG laps=0,2 lag=2 block=out lane=1 contacts=all role=writes cos=+0.3462 cos_w=+0.1839 fall_micro=+30.9301
+TRAVEL_WEIGHED_LAG laps=0,2 lag=2 block=w lane=1 contacts=new role=writes cos=+0.1090 cos_w=+0.1040 fall_micro=+12.2900
+TRAVEL_WEIGHED_LAG laps=0,2 lag=2 block=w lane=1 contacts=old role=writes cos=+0.2848 cos_w=+0.3164 fall_micro=+30.5552
+TRAVEL_WEIGHED_LAG laps=0,2 lag=2 block=out_bias lane=1 contacts=all role=writes cos=+0.7683 cos_w=+0.7373 fall_micro=+0.3562
+TRAVEL_WEIGHED_LAG laps=0,2 lag=2 block=w_bias lane=1 contacts=all role=writes cos=+0.8130 cos_w=+0.8013 fall_micro=+0.4115
+TRAVEL_WEIGHED_LAG laps=0,2 lag=2 block=moment_face_bias lane=1 contacts=all role=writes cos=+0.8562 cos_w=+0.7917 fall_micro=+1.1494
+TRAVEL_WEIGHED_LAG laps=0,2 lag=2 block=read_rows lane=1 contacts=all role=lifts cos=+0.2749 cos_w=+0.2709 fall_micro=+33.3968
+TRAVEL_WEIGHED_LAG laps=0,2 lag=2 block=lift_bias lane=1 contacts=all role=lifts cos=+0.5446 cos_w=+0.5607 fall_micro=+0.3325
+TRAVEL_WEIGHED_LAG laps=0,2 lag=2 block=q lane=1 contacts=all role=reads cos=+0.3881 cos_w=+0.2932 fall_micro=+41.2260
+TRAVEL_WEIGHED_LAG laps=0,2 lag=2 block=v lane=1 contacts=all role=reads cos=+0.5594 cos_w=+0.4370 fall_micro=+51.3681
+TRAVEL_WEIGHED_LAG laps=0,2 lag=2 block=probe lane=1 contacts=all role=reads cos=+0.4606 cos_w=+0.3472 fall_micro=+42.5139
+TRAVEL_WEIGHED_LAG laps=0,2 lag=2 block=a lane=1 contacts=new role=reads cos=+0.2449 cos_w=+0.2474 fall_micro=+22.3930
+TRAVEL_WEIGHED_LAG laps=0,2 lag=2 block=a lane=1 contacts=old role=reads cos=+0.0307 cos_w=+0.0469 fall_micro=+5.4046
+TRAVEL_WEIGHED_LAG laps=0,2 lag=2 block=b lane=1 contacts=new role=reads cos=+0.3211 cos_w=+0.3230 fall_micro=+30.3198
+TRAVEL_WEIGHED_LAG laps=0,2 lag=2 block=b lane=1 contacts=old role=reads cos=+0.2123 cos_w=+0.2354 fall_micro=+28.0392
+TRAVEL_WEIGHED_LAG laps=0,2 lag=2 block=enc lane=2 contacts=all role=writes cos=+0.4666 cos_w=+0.4904 fall_micro=+37.3749
+TRAVEL_WEIGHED_LAG laps=0,2 lag=2 block=before lane=2 contacts=all role=writes cos=+0.4694 cos_w=+0.4886 fall_micro=+38.0565
+TRAVEL_WEIGHED_LAG laps=0,2 lag=2 block=after lane=2 contacts=all role=writes cos=+0.4570 cos_w=+0.4531 fall_micro=+35.7279
+TRAVEL_WEIGHED_LAG laps=0,2 lag=2 block=moment_face lane=2 contacts=all role=writes cos=+0.2007 cos_w=+0.2207 fall_micro=+23.9329
+TRAVEL_WEIGHED_LAG laps=0,2 lag=2 block=out lane=2 contacts=all role=writes cos=+0.3292 cos_w=+0.1343 fall_micro=+27.4805
+TRAVEL_WEIGHED_LAG laps=0,2 lag=2 block=w lane=2 contacts=new role=writes cos=-0.0115 cos_w=-0.0207 fall_micro=-2.4343
+TRAVEL_WEIGHED_LAG laps=0,2 lag=2 block=w lane=2 contacts=old role=writes cos=+0.1273 cos_w=+0.1291 fall_micro=+13.3547
+TRAVEL_WEIGHED_LAG laps=0,2 lag=2 block=out_bias lane=2 contacts=all role=writes cos=+0.8187 cos_w=+0.7998 fall_micro=+0.7420
+TRAVEL_WEIGHED_LAG laps=0,2 lag=2 block=w_bias lane=2 contacts=all role=writes cos=+0.9032 cos_w=+0.8727 fall_micro=+1.6012
+TRAVEL_WEIGHED_LAG laps=0,2 lag=2 block=moment_face_bias lane=2 contacts=all role=writes cos=+0.5879 cos_w=+0.5759 fall_micro=+0.4519
+TRAVEL_WEIGHED_LAG laps=0,2 lag=2 block=read_rows lane=2 contacts=all role=lifts cos=+0.1773 cos_w=+0.1827 fall_micro=+23.5691
+TRAVEL_WEIGHED_LAG laps=0,2 lag=2 block=lift_bias lane=2 contacts=all role=lifts cos=+0.6291 cos_w=+0.6333 fall_micro=+0.3057
+TRAVEL_WEIGHED_LAG laps=0,2 lag=2 block=q lane=2 contacts=all role=reads cos=+0.2435 cos_w=+0.1567 fall_micro=+36.6154
+TRAVEL_WEIGHED_LAG laps=0,2 lag=2 block=v lane=2 contacts=all role=reads cos=+0.4599 cos_w=+0.2759 fall_micro=+51.9117
+TRAVEL_WEIGHED_LAG laps=0,2 lag=2 block=probe lane=2 contacts=all role=reads cos=+0.4060 cos_w=+0.2451 fall_micro=+45.4974
+TRAVEL_WEIGHED_LAG laps=0,2 lag=2 block=a lane=2 contacts=new role=reads cos=-0.0242 cos_w=-0.0167 fall_micro=-2.0442
+TRAVEL_WEIGHED_LAG laps=0,2 lag=2 block=a lane=2 contacts=old role=reads cos=-0.0855 cos_w=-0.0768 fall_micro=-12.3505
+TRAVEL_WEIGHED_LAG laps=0,2 lag=2 block=b lane=2 contacts=new role=reads cos=+0.0175 cos_w=+0.0156 fall_micro=+1.7843
+TRAVEL_WEIGHED_LAG laps=0,2 lag=2 block=b lane=2 contacts=old role=reads cos=+0.0581 cos_w=+0.0738 fall_micro=+11.9040
+TRAVEL_WEIGHED_LAG laps=0,2 lag=2 block=a_bias lane=0 contacts=new role=other cos=+0.3315 cos_w=+0.3222 fall_micro=+0.1602
+TRAVEL_WEIGHED_LAG laps=0,2 lag=2 block=a_bias lane=0 contacts=old role=other cos=+0.4881 cos_w=+0.5189 fall_micro=+0.4993
+TRAVEL_WEIGHED_LAG laps=0,2 lag=2 block=b_bias lane=0 contacts=new role=other cos=+0.5130 cos_w=+0.5013 fall_micro=+0.2054
+TRAVEL_WEIGHED_LAG laps=0,2 lag=2 block=b_bias lane=0 contacts=old role=other cos=+0.6577 cos_w=+0.6624 fall_micro=+0.6088
+TRAVEL_WEIGHED_LAG laps=0,2 lag=2 block=q_bias lane=0 contacts=all role=other cos=+0.5744 cos_w=+0.5265 fall_micro=+0.5785
+TRAVEL_WEIGHED_LAG laps=0,2 lag=2 block=v_bias lane=0 contacts=all role=other cos=+0.5121 cos_w=+0.5783 fall_micro=+0.4018
+TRAVEL_WEIGHED_LAG laps=0,2 lag=2 block=probe_bias lane=0 contacts=all role=other cos=+0.6252 cos_w=+0.5752 fall_micro=+0.6463
+TRAVEL_WEIGHED_LAG laps=0,2 lag=2 block=read_bias lane=0 contacts=all role=other cos=+0.3040 cos_w=+0.3299 fall_micro=+0.3362
+TRAVEL_WEIGHED_LAG laps=0,2 lag=2 block=moment_before lane=0 contacts=all role=other cos=+0.1638 cos_w=-0.0103 fall_micro=-2.3774
+TRAVEL_WEIGHED_LAG laps=0,2 lag=2 block=moment_after lane=0 contacts=all role=other cos=+0.1643 cos_w=-0.0146 fall_micro=-3.1141
+TRAVEL_WEIGHED_LAG laps=0,2 lag=2 block=temper lane=0 contacts=all role=other cos=+0.4596 cos_w=+0.6203 fall_micro=+1.7574
+TRAVEL_WEIGHED_LAG laps=0,2 lag=2 block=pace lane=0 contacts=all role=other cos=+0.4384 cos_w=+0.3192 fall_micro=+4.2214
+TRAVEL_WEIGHED_LAG_TOTAL laps=0,2 lag=2 fall_micro=+797.3005

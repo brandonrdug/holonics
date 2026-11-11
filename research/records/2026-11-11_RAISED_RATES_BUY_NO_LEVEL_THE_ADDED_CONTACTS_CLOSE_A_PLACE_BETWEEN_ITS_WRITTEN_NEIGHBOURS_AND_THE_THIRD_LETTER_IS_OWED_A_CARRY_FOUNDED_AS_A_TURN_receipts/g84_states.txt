@@ -1,0 +1,27 @@
+# G84's start state (part P3), 2026-11-11 18:52 UTC, on the PC's host (no card): python3 tools/part_rates.py open RUN/rt18/STATE.0 32
+# 0,0,0,2,2,2,0,0,0,0,0,0,0,0,0,0 RUN/pl18/STATE.0 from the main checkout's tools (main at cb9cb634d), RUN the line's directory
+# (HOLONICS_ROOT/.local/wt/qgchgu-sampler/.local/run/2026-11-10-contacts): the second lane's letter rows (enc_lane, before_lane, after_lane) at
+# octave 2, every other part and the old entries at the floor. Checked before any lap trains from it: every line of pl18/STATE.0 equals rt18/STATE.0's
+# except the parts line, which reads parts 32 0 0 0 2 2 2 0 0 0 0 0 0 0 0 0 0. Projection under a second, measured under a second.
+## the tool's lines
+FIELD_PART_RATE part=w_new entries=2048 c=- rate_octaves=0 rate_bits=12
+FIELD_PART_RATE part=a_new entries=2080 c=- rate_octaves=0 rate_bits=12
+FIELD_PART_RATE part=b_new entries=2080 c=- rate_octaves=0 rate_bits=12
+FIELD_PART_RATE part=enc_lane entries=3232 c=- rate_octaves=2 rate_bits=10
+FIELD_PART_RATE part=before_lane entries=3232 c=- rate_octaves=2 rate_bits=10
+FIELD_PART_RATE part=after_lane entries=3232 c=- rate_octaves=2 rate_bits=10
+FIELD_PART_RATE part=q_lane entries=2048 c=- rate_octaves=0 rate_bits=12
+FIELD_PART_RATE part=v_lane entries=2048 c=- rate_octaves=0 rate_bits=12
+FIELD_PART_RATE part=probe_lane entries=2048 c=- rate_octaves=0 rate_bits=12
+FIELD_PART_RATE part=out_lane entries=2048 c=- rate_octaves=0 rate_bits=12
+FIELD_PART_RATE part=moment_face_lane entries=2048 c=- rate_octaves=0 rate_bits=12
+FIELD_PART_RATE part=read_lane entries=3072 c=- rate_octaves=0 rate_bits=12
+FIELD_PART_RATE part=face_biases_lane entries=128 c=- rate_octaves=0 rate_bits=12
+FIELD_PART_RATE part=a_lane entries=1024 c=- rate_octaves=0 rate_bits=12
+FIELD_PART_RATE part=b_lane entries=1024 c=- rate_octaves=0 rate_bits=12
+FIELD_PART_RATE part=g_chart entries=0 c=- rate_octaves=0 rate_bits=12
+## the check (line by line, Python on the host)
+P3 lines rt18 7 pl18 7
+P3 differing lines: [(5, 'parts 32 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0', 'parts 32 0 0 0 2 2 2 0 0 0 0 0 0 0 0 0 0')] length equal: True
+P3 sha256 rt18 e801cae90b4254cc
+P3 sha256 pl18 a24b6cb78a263e40

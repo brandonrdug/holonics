@@ -47,7 +47,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import numpy as np  # noqa: E402
 import state_travel  # noqa: E402
 
-D = {"alphabet": 5, "width": 16, "heads": 4, "modes": 2, "still": 2, "contacts": 16, "ticks": 4, "frames": 4, "reach": 16, "lanes": 2, "carry": False}
+D = {"alphabet": 5, "width": 16, "heads": 4, "modes": 2, "still": 2, "contacts": 16, "ticks": 4, "frames": 4, "reach": 16, "lanes": 2, "carry": 0}
 OLD_F = 8
 
 
@@ -404,7 +404,7 @@ def graft_part_controls():
     spans = {name: (at, int(np.prod(shape))) for name, at, shape, _ in fam}
     parts = [f"part:{name}" for i, name in enumerate(part_rates.PART_NAMES) if (founded == i).any()]
     olds = [f"{name}/old" for name, (at, k) in spans.items() if (founded[at:at + k] == part_rates.OLD).any()]
-    assert len(parts) == 15 and "part:g_chart" not in parts and "q_bias/old" in olds
+    assert len(parts) == 15 and "part:carry" not in parts and "q_bias/old" in olds
     with tempfile.TemporaryDirectory() as tmp:
         pa, pb, bare = os.path.join(tmp, "a"), os.path.join(tmp, "b"), os.path.join(tmp, "bare")
         write(pa, a, [7] * total, [OLD_F] + [0] * 16)
@@ -437,7 +437,7 @@ def graft_part_controls():
         assert (carried == agreed).all() and (carried == declared).all() and (carried != a).any()
         lines = quiet.getvalue().splitlines()
         assert sum(int(fields(line)["entries"]) for line in lines[:len(parts) + len(olds)]) == total
-        for bad, head in ((["q", "part:q_lane"], pa), (["q/old", "q"], pa), (["part:no_such_part"], pa), (["part:g_chart"], pa), (["contacts:12", "part:q_lane"], pa),
+        for bad, head in ((["q", "part:q_lane"], pa), (["q/old", "q"], pa), (["part:no_such_part"], pa), (["part:carry"], pa), (["contacts:12", "part:q_lane"], pa),
                           (["part:q_lane"], bare), (["v/old"], bare), (["contacts:8", "q"], pa), (["contacts:8", "contacts:8", "part:q_lane"], pa), (["no_such_family/old"], pa)):
             try:
                 with redirect_stdout(quiet):

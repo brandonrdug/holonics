@@ -1,0 +1,36 @@
+# The carry circles' card parity, 2026-11-11 18:35:42 to 18:45:45 UTC, on the card (RTX 4080 SUPER under HOLONICS_ROOT/.local/gpu.lock), host against
+# card on the retired carry's probes (parity.sh: lane44's sampled read, D 32 H 4 n 8 still 2 f 32 K 2, the paces drawn, grown by one lane and 32
+# contacts, the parts at octave 1, three sections and the withheld read, RAYON_NUM_THREADS=4), then grown by 16 carry circles (f 64 to 96): at
+# founding, and at a moved state (the circles' charts, biases and W columns drawn from the key file's tail, each word shifted 10 bits, the
+# biases 18). The binary is a1ac313c9's release field_pass (9076e97cafe3f0a2). Faces, the whole return (covector) and each section's step
+# (learner) host against card: faces_unequal=0 and covector_unequal=0 on every section of both; the learners differ at section 1 alone, where
+# the clocks do, as on the retired carry's parity and every laned parity read (learners_unequal=1 there too). Projection 400 s a parity,
+# deadline 900 s (parity.sh's own), measured 300.8 s and 292.3 s (rc=1 is the binary's exit with learners_unequal=1, as the retired carry's).
+## at founding (FIELD_PARITY_CARRY=16), the lock taken 18:35:42 UTC
+FIELD_PARITY_LANE lanes=2 width=64 material=63096
+FIELD_PARITY_CONTACTS contacts=64 width=64 material=69304
+FIELD_PARITY_PARTS octaves=1 contacts_before=32
+FIELD_PARITY_CARRY circles=16 contacts=96 material=77592
+FIELD_PARITY_DECLARATION width=64 heads=4 modes=8 still=2 contacts=96 ticks=2 frames=4 reach=2221 rate=8 material=77592 grow=1 withheld_read=2
+FIELD_PARITY section=1 withheld=false regions=26 length=1550 sites=15920 rows=161504 reads=1 faces_unequal=0 covector_unequal=0 first=- deposited=true halvings=0 next=- learner_equal=false near_equal=true clocks_equal=false rows_equal=true shares_equal=true currents_equal=true pace_nonzero=246 kappa=504..1478 host_ms=34366 card_ms=398
+FIELD_PARITY section=2 withheld=false regions=29 length=1653 sites=20456 rows=208880 reads=1 faces_unequal=0 covector_unequal=0 first=- deposited=true halvings=0 next=- learner_equal=true near_equal=true clocks_equal=true rows_equal=true shares_equal=true currents_equal=true pace_nonzero=246 kappa=524..1478 host_ms=56222 card_ms=411
+FIELD_PARITY section=3 withheld=false regions=30 length=1819 sites=25228 rows=269048 reads=1 faces_unequal=0 covector_unequal=0 first=- deposited=true halvings=0 next=- learner_equal=true near_equal=true clocks_equal=true rows_equal=true shares_equal=true currents_equal=true pace_nonzero=246 kappa=508..1477 host_ms=79244 card_ms=451
+FIELD_PARITY section=4 withheld=true regions=8 length=571 sites=0 rows=31680 reads=1 faces_unequal=0 covector_unequal=0 first=- deposited=false halvings=0 next=- learner_equal=true near_equal=true clocks_equal=true rows_equal=true shares_equal=true currents_equal=true pace_nonzero=246 kappa=512..1477 host_ms=2310 card_ms=29
+FIELD_PARITY_DONE sections=4 reads=4 reads_unequal=0 faces_unequal=0 covector_unequal=0 learners_unequal=1 releases=0 releases_unequal=0 card_release_ms=0 host_ms=172144 card_ms=1291 elapsed_ms=300242
+MEASURE lap=found rc=1 wall_s=300.8 peak_rss_kib=1635004
+## at a moved state (FIELD_PARITY_CARRY=16 FIELD_PARITY_CARRY_SHIFT=10), the lock taken 18:40:53 UTC
+FIELD_PARITY_LANE lanes=2 width=64 material=63096
+FIELD_PARITY_CONTACTS contacts=64 width=64 material=69304
+FIELD_PARITY_PARTS octaves=1 contacts_before=32
+FIELD_PARITY_CARRY circles=16 contacts=96 material=77592
+FIELD_PARITY_CARRY_SHIFT shift=10 entries=4128
+FIELD_PARITY_DECLARATION width=64 heads=4 modes=8 still=2 contacts=96 ticks=2 frames=4 reach=2221 rate=8 material=77592 grow=1 withheld_read=2
+FIELD_PARITY section=1 withheld=false regions=26 length=1550 sites=15920 rows=161504 reads=1 faces_unequal=0 covector_unequal=0 first=- deposited=true halvings=0 next=- learner_equal=false near_equal=true clocks_equal=false rows_equal=true shares_equal=true currents_equal=true pace_nonzero=246 kappa=504..1478 host_ms=35181 card_ms=354
+FIELD_PARITY section=2 withheld=false regions=29 length=1653 sites=20456 rows=208880 reads=1 faces_unequal=0 covector_unequal=0 first=- deposited=true halvings=0 next=- learner_equal=true near_equal=true clocks_equal=true rows_equal=true shares_equal=true currents_equal=true pace_nonzero=246 kappa=524..1478 host_ms=58391 card_ms=467
+FIELD_PARITY section=3 withheld=false regions=30 length=1819 sites=25228 rows=269048 reads=1 faces_unequal=0 covector_unequal=0 first=- deposited=true halvings=0 next=- learner_equal=true near_equal=true clocks_equal=true rows_equal=true shares_equal=true currents_equal=true pace_nonzero=246 kappa=508..1482 host_ms=66584 card_ms=591
+FIELD_PARITY section=4 withheld=true regions=8 length=571 sites=0 rows=31680 reads=1 faces_unequal=0 covector_unequal=0 first=- deposited=false halvings=0 next=- learner_equal=true near_equal=true clocks_equal=true rows_equal=true shares_equal=true currents_equal=true pace_nonzero=246 kappa=519..1482 host_ms=2343 card_ms=60
+FIELD_PARITY_DONE sections=4 reads=4 reads_unequal=0 faces_unequal=0 covector_unequal=0 learners_unequal=1 releases=0 releases_unequal=0 card_release_ms=0 host_ms=162501 card_ms=1473 elapsed_ms=291693
+MEASURE lap=moved rc=1 wall_s=292.3 peak_rss_kib=1706724
+## the retired carry's parity on the same probes (FIELD_PARITY_CARRY=10, its shift; November 11), for comparison
+FIELD_PARITY_DONE sections=4 reads=4 reads_unequal=0 faces_unequal=0 covector_unequal=0 learners_unequal=1 releases=0 releases_unequal=0 card_release_ms=0 host_ms=163098 card_ms=1490 elapsed_ms=288111
+MEASURE lap=m rc=1 wall_s=291.1 peak_rss_kib=1629976

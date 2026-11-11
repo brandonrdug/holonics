@@ -29,13 +29,14 @@ from contextlib import redirect_stdout
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import part_rates  # noqa: E402
 
-D = {"alphabet": 5, "width": 16, "heads": 4, "modes": 2, "still": 2, "contacts": 16, "ticks": 4, "frames": 4, "reach": 16, "lanes": 2, "carry": False}
+D = {"alphabet": 5, "width": 16, "heads": 4, "modes": 2, "still": 2, "contacts": 16, "ticks": 4, "frames": 4, "reach": 16, "lanes": 2, "carry": 0}
 OLD_F = 8
 KEYS = ("alphabet", "width", "heads", "modes", "still", "contacts", "ticks", "frames", "reach", "lanes")
 
 
 def write(path, theta, octaves, d=D, extra=None):
-    words = ["hnn-field-v14"] + [str(d[k]) for k in KEYS] + ["0"]
+    c = d.get("carry", 0)
+    words = (["hnn-field-v14t"] if c else ["hnn-field-v14"]) + [str(d[k]) for k in KEYS] + ["0"] + ([str(c)] if c else [])
     with open(path, "w") as f:
         f.write("hnn-field-learner-v3 12 0 0 -\n" + " ".join(words) + "\n" + " ".join(str(int(x)) for x in theta) + "\n")
         if extra is not None:
@@ -73,7 +74,7 @@ def main():
     assert q and v and len(pr) % 4 == 0 and pr
     base = draws(total, 7)
     step = draws(total, 11)
-    octaves = [0] * part_rates.PARTS
+    octaves = [0] * part_rates.PLAIN_PARTS
     octaves[part_rates.PART_NAMES.index("q_lane")] = 0
     octaves[part_rates.PART_NAMES.index("v_lane")] = 2
     octaves[part_rates.PART_NAMES.index("probe_lane")] = 1
@@ -174,7 +175,35 @@ def main():
         run("base", p("s2"), "4", p("b4"))
         assert open(p("b4")).read().startswith("hnn-field-learner-v3 4 0 0 -\n")
         print("part_rates base: the rate word alone moves; a rate under a part's octave, no bits and a standing file are refused")
-    print("part_rates: 5 lines, the controls hold")
+
+        # The carry circles (theory, November 11 17:25): two circles of eight complex contacts, their four parts over the new contacts' marks,
+        # nineteen parts written; a sixteen-part line reads with the circles' parts at octave 0; the retired carry's head is refused.
+        dc = dict(D, carry=2)
+        fam, total_c = part_rates.layout(dc)
+        assert total_c == total + 2 * 2 * 16 + 2 * 2 and fam["carry"] == total and fam["carry_bias"] == total + 2 * 2 * 16
+        parts_c = part_rates.founded_parts(dc, OLD_F)
+        count = lambda name: sum(1 for q in parts_c if q == part_rates.PART_NAMES.index(name))
+        assert (count("carry"), count("w_carry"), count("a_carry"), count("b_carry")) == (4 * 16 + 4, 4 * 16, 4 * 16 + 4, 4 * 16 + 4)
+        assert count("w_new") == 16 * (16 - OLD_F - 4), "the circles' columns are theirs, not the new contacts'"
+        write(p("c0"), draws(total_c, 3), octaves, d=dc)
+        run("open", p("c0"), str(OLD_F), ",".join(str(k) for k in [0] * part_rates.PARTS), p("c1"))
+        line = [l for l in open(p("c1")).read().split("\n") if l.startswith("parts ")][0]
+        assert len(line.split(" ")) == 2 + part_rates.PARTS, line
+        held = part_rates.parts_line(open(p("c0")).read().split("\n"))
+        assert held[1][part_rates.PLAIN_PARTS:] == [0, 0, 0], "a sixteen-part line reads the circles' parts at octave 0"
+        got_c = run("update", p("c0"), p("c0"), p("c0"), p("c2"))
+        assert set(got_c) == set(part_rates.PART_NAMES), "a state with carry circles prints all nineteen"
+        assert len([l for l in open(p("c2")).read().split("\n") if l.startswith("parts ")][0].split(" ")) == 2 + part_rates.PARTS
+        with open(p("k"), "w") as f:
+            f.write(open(p("s0")).read().replace("hnn-field-v14 ", "hnn-field-v14k ", 1).replace(" 0\n", " 0 1\n", 1))
+        try:
+            part_rates.load(p("k"))
+        except AssertionError:
+            pass
+        else:
+            raise AssertionError("the retired carry's head is not refused")
+        print("part_rates carry: the circles' four parts, nineteen written, sixteen read at octave 0, the retired head refused")
+    print("part_rates: 6 lines, the controls hold")
 
 
 if __name__ == "__main__":

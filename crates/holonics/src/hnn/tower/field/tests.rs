@@ -23,7 +23,7 @@ fn keys(n: usize) -> Vec<u8> {
 }
 
 fn tiny_declaration(still: usize) -> FieldDeclaration {
-    FieldDeclaration { alphabet: 5, width: 8, heads: 2, modes: 3, still, contacts: 4, ticks: 2, frames: 2, reach: 16, lanes: 1, depth: 0, carry: false }
+    FieldDeclaration { alphabet: 5, width: 8, heads: 2, modes: 3, still, contacts: 4, ticks: 2, frames: 2, reach: 16, lanes: 1, depth: 0, carry: 0 }
 }
 
 /// A tiny field with every family drawn from the keys (the founding holds the returns and the
@@ -34,7 +34,11 @@ fn shaped(still: usize) -> Field {
 
 /// [`shaped`] on a declaration of the caller's.
 fn shaped_with(d: FieldDeclaration) -> Field {
-    let mut field = Field::found(d, &keys(1 << 14)).unwrap();
+    drawn(Field::found(d, &keys(1 << 14)).unwrap())
+}
+
+/// Every family of `field` drawn from the keys, a uniform draw on `[−½, ½)` of its family's grain.
+fn drawn(mut field: Field) -> Field {
     let stream = keys(1 << 15);
     for (n, v) in field.theta.iter_mut().enumerate() {
         let word = &stream[4 * n..4 * n + 4];
@@ -809,7 +813,7 @@ fn no_site_meets_itself() {
 /// head's lock of an equal word (`n` at unit power, half its `2n` reals) reads `2⌈log₂ reach⌉` bits.
 #[test]
 fn the_contact_s_gain_covers_the_falloff() {
-    let at = |modes: usize, reach: usize| FieldDeclaration { alphabet: 5, width: 8, heads: 2, modes, still: 1, contacts: 4, ticks: 2, frames: 2, reach, lanes: 1, depth: 0, carry: false }.score_shift();
+    let at = |modes: usize, reach: usize| FieldDeclaration { alphabet: 5, width: 8, heads: 2, modes, still: 1, contacts: 4, ticks: 2, frames: 2, reach, lanes: 1, depth: 0, carry: 0 }.score_shift();
     assert_eq!(at(8, 2221), -2, "reading 8's declaration locks an equal word at 32 bits");
     assert_eq!(at(16, 16), 1);
     assert_eq!(at(3, 16), -2);
@@ -818,7 +822,7 @@ fn the_contact_s_gain_covers_the_falloff() {
         let gained = |b: i32| if b >= 0 { (modes as u128) >> b } else { (modes as u128) << -b };
         assert!(gained(beta) >= need && gained(beta + 1) < need, "the largest such shift: modes {modes} reach {reach}");
     }
-    let d = FieldDeclaration { alphabet: 5, width: 8, heads: 2, modes: 8, still: 1, contacts: 4, ticks: 2, frames: 2, reach: 2221, lanes: 1, depth: 0, carry: false };
+    let d = FieldDeclaration { alphabet: 5, width: 8, heads: 2, modes: 8, still: 1, contacts: 4, ticks: 2, frames: 2, reach: 2221, lanes: 1, depth: 0, carry: 0 };
     assert_eq!((d.class_trits(), d.classes()), (4, 81), "81 classes at reading 8's reach");
     assert_eq!(FieldDeclaration { modes: 3, ..d }.class_trits(), 3);
     assert_eq!((FieldDeclaration { reach: 81, ..d }.class_trits(), FieldDeclaration { reach: 82, ..d }.class_trits()), (2, 3));
@@ -873,7 +877,7 @@ fn the_skin_decay_is_an_e_fold_a_radian_and_vanishes_below_the_grain() {
 /// and a turned field. Probes across a sheet are left out and counted.
 #[test]
 fn the_covector_matches_the_code_across_the_far_support() {
-    let d = FieldDeclaration { alphabet: 5, width: 8, heads: 2, modes: 3, still: 1, contacts: 4, ticks: 2, frames: 2, reach: 32, lanes: 1, depth: 0, carry: false };
+    let d = FieldDeclaration { alphabet: 5, width: 8, heads: 2, modes: 3, still: 1, contacts: 4, ticks: 2, frames: 2, reach: 32, lanes: 1, depth: 0, carry: 0 };
     let classes: Vec<usize> = (0..26).map(|t| [1usize, 3, 2, 4, 0, 2, 1][t % 7]).collect();
     let open: Vec<bool> = (0..26).map(|t| t % 9 == 4 || t == 25).collect();
     let r = Region { classes: &classes, unresolved: &open, faces: &[], locked: &[], echo: &[], domain: None, port: None };
@@ -961,7 +965,7 @@ fn the_covector_matches_the_code_across_the_far_support() {
 /// of a row, the loudest far source 0.005.)
 #[test]
 fn a_listener_s_founding_row_keeps_its_near_field() {
-    let d = FieldDeclaration { alphabet: 44, width: 32, heads: 5, modes: 8, still: 2, contacts: 32, ticks: 2, frames: 5, reach: 484, lanes: 1, depth: 0, carry: false };
+    let d = FieldDeclaration { alphabet: 44, width: 32, heads: 5, modes: 8, still: 2, contacts: 32, ticks: 2, frames: 5, reach: 484, lanes: 1, depth: 0, carry: 0 };
     assert_eq!((d.score_shift(), d.listen_shift()), (-2, 2));
     let sites = 420;
     let classes = drawn_classes(7, sites, d.alphabet);
@@ -1770,7 +1774,7 @@ fn refinement_moves_the_end_one_place_a_read() {
 
 /// The packets' field of the tower fixtures: packets of three sites of the tiny field's reach of 16.
 fn coarse_declaration() -> FieldDeclaration {
-    FieldDeclaration { alphabet: 2, width: 8, heads: 2, modes: 3, still: 1, contacts: 4, ticks: 2, frames: 2, reach: 6, lanes: 1, depth: 0, carry: false }
+    FieldDeclaration { alphabet: 2, width: 8, heads: 2, modes: 3, still: 1, contacts: 4, ticks: 2, frames: 2, reach: 6, lanes: 1, depth: 0, carry: 0 }
 }
 
 /// A tower of scales on [`shaped`]`(still)`: packets of three sites after the first of its two ticks, founded from the
@@ -2196,124 +2200,226 @@ fn founded_parts_and_their_cosines_on_saved_states() {
     }
 }
 
-/// A tiny field with the carry, every family drawn (so the third chart `G` too), ticks two.
-fn carried_shaped(still: usize) -> Field {
-    shaped_with(FieldDeclaration { carry: true, ..tiny_declaration(still) })
+/// A tiny declaration with four complex contacts and no carry circle.
+fn four_contacts(still: usize) -> FieldDeclaration {
+    FieldDeclaration { contacts: 8, ..tiny_declaration(still) }
 }
 
-/// [definition; theory, November 11 00:22, ruling R5 amended] **`γ = g / √(1 + |g|²)` is attained exactly**: the radicand's integer square root is
-/// the floor (no iteration's residue), `γ` is `g` over the root to the nearest on `2^(−30)`, `|γ| < 1`, `s² + |γ|² = 1` to the grain, and
-/// `g = 0` gives `γ = 0` and `s = 1`.
+/// [`four_contacts`]'s founded field grown by two carry circles (complex contacts 4 and 5 of six: one scans from the left, one from the
+/// right), then every family drawn ([`drawn`]): the circles' charts, their biases and their `W` columns off zero, so the gate has friction
+/// on some sites and none on others.
+fn circled_shaped(still: usize) -> Field {
+    let plain = Field::found(four_contacts(still), &keys(1 << 14)).unwrap();
+    let (grown, _) = plain.with_carry(2, &keys(plain.declaration.carry_draws(2))).unwrap();
+    drawn(grown)
+}
+
+/// [definition; theory, November 11 17:25] **The carry circles' declaration**: `C` even and at most `f/2` is admitted; `C = 0` is the
+/// `hnn-field-v14` line exactly (twelve words), `C > 0` writes `hnn-field-v14t` with `C` its thirteenth word and round-trips; the retired carry's
+/// head (`hnn-field-v14k`) and a `v14t` head with no circle are refused.
 #[test]
-fn gamma_is_g_over_the_exact_root_of_one_plus_its_square() {
-    assert_eq!(gamma_of(0, 0).unwrap(), ((0, 0), 1 << 30));
-    for (gr, gi) in [(1i128 << 16, 0), (0, 3 << 15), (-(5 << 16), 12 << 16), (123_456, -78_901), (1 << 40, 1 << 40), (1, -1)] {
-        let ((yr, yi), s) = gamma_of(gr, gi).unwrap();
-        let radicand = ((1i128 << 32) + gr * gr + gi * gi) << 32;
-        let root = (radicand as u128).isqrt() as i128;
-        assert!(root * root <= radicand && (root + 1) * (root + 1) > radicand, "the root is the floor");
-        assert_eq!(i128::from(yr), div_nearest(gr << 46, root));
-        assert_eq!(i128::from(yi), div_nearest(gi << 46, root));
-        assert_eq!(i128::from(s), div_nearest(1 << 62, root));
-        let norm = i128::from(yr) * i128::from(yr) + i128::from(yi) * i128::from(yi) + i128::from(s) * i128::from(s);
-        assert!((norm - (1 << 60)).abs() < 1 << 33, "s² + |γ|² = 1 to the grain: {norm}");
-        assert!(i128::from(yr).abs() < 1 << 30 && i128::from(yi).abs() < 1 << 30);
+fn the_carry_circles_are_even_among_the_contacts_and_the_zero_friction_carry_is_retired() {
+    let d = four_contacts(1);
+    assert!(FieldDeclaration { carry: 2, ..d }.admit().is_ok() && FieldDeclaration { carry: 4, ..d }.admit().is_ok());
+    assert!(FieldDeclaration { carry: 1, ..d }.admit().is_err(), "an odd count of circles");
+    assert!(FieldDeclaration { carry: 6, ..d }.admit().is_err(), "more circles than complex contacts");
+    let plain = d.to_text();
+    assert!(plain.starts_with("hnn-field-v14 ") && plain.split(' ').count() == 12);
+    assert_eq!(FieldDeclaration::from_text(&plain).unwrap(), d);
+    let circled = FieldDeclaration { carry: 2, ..d }.to_text();
+    assert!(circled.starts_with("hnn-field-v14t ") && circled.split(' ').count() == 13 && circled.ends_with(" 2"));
+    assert_eq!(FieldDeclaration::from_text(&circled).unwrap(), FieldDeclaration { carry: 2, ..d });
+    let retired = format!("{} 1", plain.replacen("hnn-field-v14 ", "hnn-field-v14k ", 1));
+    assert!(matches!(FieldDeclaration::from_text(&retired), Err(TowerError::Refused(m)) if m.contains("zero friction is retired")));
+    assert!(FieldDeclaration::from_text(&format!("{} 0", plain.replacen("hnn-field-v14 ", "hnn-field-v14t ", 1))).is_err());
+}
+
+/// [definition; theory, November 11 17:25; `CarryGate.lean`] **The gate keeps its circle and its friction**: `(2^30, 0)` at `q = h = 0`; the turn
+/// alone is the Cayley tick (`q = 2` gives `i`, `q = −2` gives `−i`); `d = 1` halves it; `h` below zero is no friction; over a sweep of `q` and of
+/// `h` below, at and above zero `|γ|² ≤ 2^60` and `|γ|² (1 + d)² = 2^60`, each within the two releases' rounding; refused, typed, past the carriers.
+#[test]
+fn the_carry_gate_keeps_its_circle_and_its_friction() {
+    assert_eq!(carry_gate(0, 0).unwrap(), ((1 << 30, 0), 0));
+    assert_eq!(carry_gate(2 << 16, 0).unwrap().0, (0, 1 << 30), "the Cayley step of i at q = 2");
+    assert_eq!(carry_gate(-(2 << 16), 0).unwrap().0, (0, -(1 << 30)));
+    assert_eq!(carry_gate(0, 1 << 16).unwrap(), ((1 << 29, 0), 1 << 16), "a friction of one halves the gate");
+    for q in [0i128, 1 << 16, -(1 << 16), 3 << 15, 5 << 16, 123_456, -78_901, 1 << 30, -(1 << 38), 1]{
+        for h in [-(1i128 << 20), -1, 0, 1, 1 << 16, 7 << 16, 123_457, 1 << 30, (1 << 47) - 1] {
+            let ((re, im), d) = carry_gate(q, h).unwrap();
+            assert_eq!(d, h.max(0));
+            let norm = i128::from(re) * i128::from(re) + i128::from(im) * i128::from(im);
+            assert!(norm <= (1 << 60) + (1 << 32), "q {q} h {h}: |γ|² {norm}");
+            let one = (1i128 << 16) + d;
+            let expected = (1i128 << 92) / (one * one);
+            assert!((norm - expected).abs() <= 1 << 32, "q {q} h {h}: |γ|² {norm} against {expected}");
+            if h < 0 {
+                assert_eq!(carry_gate(q, h).unwrap(), carry_gate(q, 0).unwrap(), "no friction below zero");
+            }
+        }
     }
+    assert!(carry_gate(1 << 39, 0).is_err() && carry_gate(-(1 << 39), 0).is_err(), "the turn's carrier");
+    assert!(carry_gate(0, 1 << 47).is_err() && carry_gate(0, (1 << 47) - 1).is_ok(), "the friction's carrier");
 }
 
-/// [definition; theory, November 11 00:22, ruling R5 amended] **At `G = 0` the scan is the built contact**: the founding with the third chart reads every
-/// face of the field it was made from, bit for bit; one section's deposit moves every old entry as the plain learner's does (the same bits) and
-/// reaches `G` itself (`δγ = conj(Qm) u` is nonzero where the scan is); the text round-trips.
+/// [definition; theory, November 11 17:25] **A growth by carry circles keeps every face and returns through its circles**: on a field with every
+/// family drawn, [`Field::with_carry`] adds the circles as the last contacts (their `W` columns, leak rows and biases at zero, their turn rows
+/// drawn), reads every face bit for bit, and the circles' `W` columns have a covector; a lane keeps the faces again with the lane's columns of the
+/// circles' charts at zero; a second growth, a plain growth by contacts and a growth by copies are refused; the learner opens the circles' entries
+/// as a growth in contacts opens them, its charts' moments at zero, its draws past the contacts' and the turn rows', and its text (the parts
+/// line of nineteen) round-trips.
 #[test]
-fn with_g_at_zero_the_scan_is_the_built_contact() {
+fn a_growth_by_carry_circles_keeps_every_face_and_returns_through_its_circles() {
     for still in [0usize, 1, 2] {
-        let plain = shaped(still);
-        let carried = plain.with_carry().unwrap();
-        assert_eq!(carried.theta.len(), plain.theta.len() + plain.declaration.contacts * plain.declaration.width);
-        assert!(carried.theta[plain.theta.len()..].iter().all(|&v| v == 0), "G founded at zero");
-        assert_eq!(carried.faces(&region()).unwrap(), plain.faces(&region()).unwrap(), "still {still}: every face kept");
-        let back = Field::from_text(&carried.to_text()).unwrap();
-        assert_eq!(back.theta, carried.theta);
-        assert!(back.declaration.carry);
-        let (mut a, mut b) = (FieldLearner::new(plain.clone(), 6), FieldLearner::new(plain.clone(), 6).with_carry().unwrap());
-        a.section(&[region()]).unwrap();
-        b.section(&[region()]).unwrap();
-        assert_eq!(&b.field.theta[..a.field.theta.len()], &a.field.theta[..], "still {still}: the old entries deposit as the plain learner's");
-        assert!(b.field.theta[a.field.theta.len()..].iter().any(|&v| v != 0), "still {still}: the deposit reaches G");
+        let plain = shaped_with(four_contacts(still));
+        let (grown, from) = plain.with_carry(2, &keys(plain.declaration.carry_draws(2))).unwrap();
+        let (d, l) = (grown.declaration, grown.layout.clone());
+        assert_eq!((d.contacts, d.carry, d.carry_first()), (12, 2, 4));
+        assert_eq!(grown.faces(&region()).unwrap(), plain.faces(&region()).unwrap(), "still {still}: every face kept");
+        assert_eq!(from.iter().flatten().count(), plain.theta.len());
+        let (dw, f) = (d.width, d.contacts);
+        let circle_columns: Vec<usize> = (4..6).flat_map(|e| [e, f / 2 + e]).collect();
+        assert!(circle_columns.iter().all(|&e| (0..dw).all(|r| grown.theta[l.w + r * f + e] == 0)), "the circles' W columns at zero");
+        assert!(grown.theta[l.carry + 2 * dw..l.carry + 4 * dw].iter().all(|&v| v == 0) && grown.theta[l.carry_bias..l.carry_bias + 2].iter().all(|&v| v == 0), "the leak rows and the turn's biases at zero");
+        assert!(grown.theta[l.carry_bias + 2..l.carry_bias + 4].iter().all(|&v| v == CARRY_LEAK_FOUNDING) && CARRY_LEAK_FOUNDING == 1 << 14, "the leak's biases at the near field's friction, 1/4");
+        assert!(grown.theta[l.carry..l.carry + 2 * dw].iter().any(|&v| v != 0), "the turn rows drawn");
+        let g = covector_of(&grown, &region());
+        assert!(circle_columns.iter().any(|&e| (0..dw).any(|r| g[l.w + r * f + e] != 0)), "still {still}: the circles' W columns have a covector");
+        let (laned, _) = grown.laned(&keys(grown.declaration.lane_draws())).unwrap();
+        assert_eq!(laned.faces(&region()).unwrap(), plain.faces(&region()).unwrap());
+        let (ll, dw2) = (laned.layout.clone(), laned.declaration.width);
+        for row in 0..4 {
+            assert_eq!(laned.theta[ll.carry + row * dw2..ll.carry + row * dw2 + dw], grown.theta[l.carry + row * dw..l.carry + (row + 1) * dw]);
+            assert!(laned.theta[ll.carry + row * dw2 + dw..ll.carry + (row + 1) * dw2].iter().all(|&v| v == 0), "the lane's columns of the circles' charts at zero");
+        }
+        assert!(grown.with_carry(2, &keys(d.carry_draws(2))).is_err(), "a second growth by carry circles");
+        assert!(grown.contacted(4, &keys(d.contact_draws(4))).is_err(), "a plain growth in contacts with carry circles");
+        assert!(grown.grown(2, &keys(grown.growth_draws(2))).is_err(), "a growth by copies with carry circles");
     }
+    // The learner.
+    let mut learner = FieldLearner::new(shaped_with(four_contacts(1)), 6);
+    learner.section(&[region()]).unwrap();
+    learner.held = None;
+    learner.rate_parts = Some(RateParts { contacts_before: 8, octaves: [0; PARTS] });
+    let stream = keys(learner.drawn / 4 + learner.field.declaration.carry_draws(2) + 8);
+    let grown = learner.with_carry(2, &stream).unwrap();
+    assert_eq!(grown.drawn, learner.drawn + 4 * learner.field.declaration.carry_draws(2));
+    let l = grown.field.layout.clone();
+    let (dw, f) = (grown.field.declaration.width, grown.field.declaration.contacts);
+    assert!((l.carry..l.carry_bias + 4).all(|k| grown.first[k] == 0 && grown.second[k] == 0), "the circles' charts' moments at zero");
+    let old_a: Vec<i128> = (0..8).flat_map(|e| (0..dw).map(move |j| (e, j))).map(|(e, j)| learner.second[learner.field.layout.a + e * dw + j]).collect();
+    let n = old_a.len() as i128;
+    let mean = old_a.iter().map(|v| v / n).sum::<i128>() + old_a.iter().map(|v| v % n).sum::<i128>() / n;
+    assert!(mean > 0);
+    for e in (4..6).flat_map(|e| [e, f / 2 + e]) {
+        assert!((0..dw).all(|j| grown.second[l.a + e * dw + j] == mean && grown.first[l.a + e * dw + j] == 0), "a circle's a row opens on its family's mean");
+    }
+    assert_eq!(grown.rate_parts, Some(RateParts { contacts_before: 8, octaves: [0; PARTS] }));
+    let text = grown.to_text();
+    assert_eq!(text.lines().find(|l| l.starts_with("parts ")).unwrap().split(' ').count(), 2 + PARTS, "a field with carry circles writes all nineteen parts");
+    let back = FieldLearner::from_text(&text).unwrap();
+    assert_eq!((back.field.theta.clone(), back.first.clone(), back.second.clone(), back.rate_parts, back.drawn), (grown.field.theta.clone(), grown.first.clone(), grown.second.clone(), grown.rate_parts, grown.drawn));
+    assert_eq!(back.field.declaration, grown.field.declaration);
+    assert_eq!(learner.to_text().lines().find(|l| l.starts_with("parts ")).unwrap().split(' ').count(), 2 + PLAIN_PARTS, "a field without carry circles writes sixteen");
 }
 
-/// [definition; theory, November 11 00:22, ruling R5 amended] **With `G ≠ 0` the scan carries a site's `b` three or more away within one tick**: with the
-/// current, the pair's return and the moment's chart at zero (so the chart is the opening's), `p(t)` at an even contact reads `b(t−1)`, and through
-/// `Q`, `γ(t−1) b(t−2)` and `γ(t−1) γ(t−2) b(t−3)`: the openings of sites `t−4..t−2`. Changing the class of site `t − 4` leaves the first tick's pair at
-/// `t` as it was where `G = 0` and changes it where `G ≠ 0`; and the cell obeys the scan's law exactly, site by site in strand order.
+/// [definition; theory, November 11 17:25] **The carry circles' scan is the law, site by site in strand order**: on a drawn field with two
+/// circles, at every tick each plain contact is the built pair contact with its strand mate, each circle's gate is [`carry_gate`] of its charts'
+/// reads, and the circle's `p(t) = a(t) Qm(t)`, `Q(t) = b(t) + γ(t) Qm(t)` hold exactly in its strand order. With the current, the pair's
+/// return and the moment's chart at zero (so the pair chart is the opening's), a left circle's pair at `t` reads the class of site `t − 4`, a
+/// right circle's that of `t + 3` (`t + 4` is the region's open site, which carries no word), and a plain contact's reads neither.
 #[test]
-fn with_g_nonzero_the_scan_carries_b_three_or_more_sites_in_one_tick() {
-    let mut base = carried_shaped(1);
+fn the_carry_circles_scan_is_the_law_site_by_site() {
+    let mut base = circled_shaped(1);
     let l = base.layout.clone();
-    let (dw, f, m2) = (base.declaration.width, base.declaration.contacts, 2 * base.declaration.complex());
+    let d = base.declaration;
+    let (dw, f, m2, c) = (d.width, d.contacts, 2 * d.complex(), d.carry);
+    let (half, plain, c2) = (f / 2, d.carry_first(), 2 * c);
     for (start, len) in [(l.out, dw * m2), (l.out_bias, dw), (l.w, dw * f), (l.w_bias, dw), (l.moment_face, dw * m2), (l.moment_face_bias, dw)] {
         base.theta[start..start + len].fill(0);
     }
     let classes: Vec<usize> = vec![1, 3, 0, 2, 4, 1, 3, 2, 0, 4, 2, 1];
-    let mut moved = classes.clone();
-    let t = 7usize;
-    moved[t - 4] = (moved[t - 4] + 1) % 5;
     let unresolved = {
         let mut u = vec![false; classes.len()];
         u[11] = true;
         u
     };
-    let pass = |field: &Field, c: &[usize]| field.pass(&Region { classes: c, unresolved: &unresolved, faces: &[], locked: &[], echo: &[], domain: None, port: None }, true).unwrap();
-    let mut plain = base.clone();
-    plain.theta[l.gchart..l.gchart + f * dw].fill(0);
-    let half = f / 2;
-    let (p0, p1) = (pass(&plain, &classes), pass(&plain, &moved));
-    let (c0, c1) = (pass(&base, &classes), pass(&base, &moved));
-    for e in (0..half).filter(|e| e % 2 == 0) {
-        assert_eq!(p0.ticks[0].c[t * f + e], p1.ticks[0].c[t * f + e], "contact {e}: without the scan the pair at {t} does not read site {}", t - 4);
+    let pass = |c: &[usize]| base.pass(&Region { classes: c, unresolved: &unresolved, faces: &[], locked: &[], echo: &[], domain: None, port: None }, true).unwrap();
+    let t = 7usize;
+    let c0 = pass(&classes);
+    let mut left = classes.clone();
+    left[t - 4] = (left[t - 4] + 1) % 5;
+    let c1 = pass(&left);
+    let mut right = classes.clone();
+    right[t + 3] = (right[t + 3] + 1) % 5;
+    let c3 = pass(&right);
+    for e in 0..plain {
+        assert_eq!(c0.ticks[0].c[t * f + e], c1.ticks[0].c[t * f + e], "plain contact {e} does not read site {}", t - 4);
+        assert_eq!(c0.ticks[0].c[t * f + e], c3.ticks[0].c[t * f + e], "plain contact {e} does not read site {}", t + 3);
     }
-    assert!((0..half).filter(|e| e % 2 == 0).any(|e| c0.ticks[0].c[t * f + e] != c1.ticks[0].c[t * f + e]), "the scan reaches site {} within one tick", t - 4);
-    // The odd contacts scan from the right: the same reach the other way.
-    let mut moved_right = classes.clone();
-    moved_right[t + 4 - 1] = (moved_right[t + 4 - 1] + 1) % 5;
-    let c2 = pass(&base, &moved_right);
-    assert!((0..half).filter(|e| e % 2 == 1).any(|e| c0.ticks[0].c[t * f + e] != c2.ticks[0].c[t * f + e]), "an odd contact reaches site {} from the right", t + 3);
-    // The law, exactly, in strand order.
+    let even = plain + (plain % 2);
+    let odd = plain + 1 - (plain % 2);
+    assert!(c0.ticks[0].c[t * f + even] != c1.ticks[0].c[t * f + even] || c0.ticks[0].c[t * f + half + even] != c1.ticks[0].c[t * f + half + even], "the left circle reads site {} within one tick", t - 4);
+    assert!(c0.ticks[0].c[t * f + odd] != c3.ticks[0].c[t * f + odd] || c0.ticks[0].c[t * f + half + odd] != c3.ticks[0].c[t * f + half + odd], "the right circle reads site {} within one tick", t + 3);
+    // The law, in strand order.
     let sites = classes.len();
-    for tick in 0..2 {
-        let cell = &c0.ticks[tick];
-        for e in 0..half {
+    for (tick, cell) in c0.ticks.iter().enumerate() {
+        for tt in 0..sites {
+            for e in 0..plain {
+                let (ar, ai) = (cell.a[tt * f + e] as i128, cell.a[tt * f + half + e] as i128);
+                let (br, bi) = strand_mate(tt, e, sites).map_or((0, 0), |s| (cell.b[s * f + e] as i128, cell.b[s * f + half + e] as i128));
+                assert_eq!((cell.c[tt * f + e] as i128, cell.c[tt * f + half + e] as i128), (release(ar * br - ai * bi, FACE_BITS), release(ar * bi + ai * br, FACE_BITS)), "tick {tick} site {tt} plain contact {e}");
+            }
+            for k in 0..c {
+                let (gamma, _) = carry_gate(cell.qh[tt * c2 + k] as i128, cell.qh[tt * c2 + c + k] as i128).unwrap();
+                assert_eq!((cell.gam[tt * c2 + k], cell.gam[tt * c2 + c + k]), gamma, "tick {tick} site {tt} circle {k}'s gate");
+            }
+        }
+        for k in 0..c {
+            let e = plain + k;
             let (mut qr, mut qi) = (0i128, 0i128);
             for step in 0..sites {
                 let tt = if e % 2 == 0 { step } else { sites - 1 - step };
-                let ((yr, yi), _) = gamma_of(cell.g[tt * f + e] as i128, cell.g[tt * f + half + e] as i128).unwrap();
+                assert_eq!((cell.qm[tt * c2 + k] as i128, cell.qm[tt * c2 + c + k] as i128), (qr, qi));
                 let (ar, ai) = (cell.a[tt * f + e] as i128, cell.a[tt * f + half + e] as i128);
-                assert_eq!(cell.c[tt * f + e] as i128, release(ar * qr - ai * qi, FACE_BITS), "tick {tick} site {tt} contact {e} real");
-                assert_eq!(cell.c[tt * f + half + e] as i128, release(ar * qi + ai * qr, FACE_BITS), "tick {tick} site {tt} contact {e} imaginary");
-                assert_eq!((cell.qm[tt * f + e] as i128, cell.qm[tt * f + half + e] as i128), (qr, qi));
-                let (yr, yi) = (i128::from(yr), i128::from(yi));
-                let (nr, ni) = (cell.b[tt * f + e] as i128 + release(yr * qr - yi * qi, GAMMA_BITS), cell.b[tt * f + half + e] as i128 + release(yr * qi + yi * qr, GAMMA_BITS));
-                (qr, qi) = (nr, ni);
+                assert_eq!((cell.c[tt * f + e] as i128, cell.c[tt * f + half + e] as i128), (release(ar * qr - ai * qi, FACE_BITS), release(ar * qi + ai * qr, FACE_BITS)), "tick {tick} site {tt} circle {k}");
+                let (yr, yi) = (i128::from(cell.gam[tt * c2 + k]), i128::from(cell.gam[tt * c2 + c + k]));
+                (qr, qi) = (cell.b[tt * f + e] as i128 + release(yr * qr - yi * qi, GAMMA_BITS), cell.b[tt * f + half + e] as i128 + release(yr * qi + yi * qr, GAMMA_BITS));
             }
         }
     }
 }
 
-/// [definition; theory, November 11 00:22, ruling R5 amended] **The scan's adjoint agrees with its code's central difference** on a field with the carry
-/// (the third chart drawn, ticks two): each family's three entries with the largest covectors, `G`'s, `a`'s, `b`'s and `W`'s among them
-/// ([`the_laned_fields_covector_matches_its_codes_difference`]'s probe law), and `G`'s covector is read at least once.
+/// [definition; theory, November 11 17:25] **The carry circles' adjoint agrees with its code's central difference** on a drawn field with two
+/// circles (ticks two, three fixtures), their charts, biases and `W` columns off zero and `h` below zero on some sites and above on others: each family's three
+/// entries with the largest covectors (the circles' charts and biases, `a`, `b` and `W` among them) against the code's difference
+/// ([`the_laned_fields_covector_matches_its_codes_difference`]'s probe law), the circles' charts and biases read at least once each. The
+/// friction's `max(0, h)` is a seam like a class sheet: the covector is its right derivative at `0`, and a probe that carries an `h` across zero
+/// is halved off it (measured on this fixture: a site's `h` at `32` on `2^(−16)` read `−73` against `−74` predicted at a step of 16, and `−367`
+/// against `−590` at 128, where one side of the step loses its friction).
 #[test]
-fn the_scans_covector_matches_its_codes_difference() {
-    let sheets = |field: &Field, r: &Region| -> Vec<Vec<u32>> { field.pass(r, true).unwrap().ticks.iter().flat_map(|c| c.classes.iter().map(|l| l.off.iter().chain(&l.members).copied().chain(l.probes.iter().flat_map(|p| std::iter::once(u32::MAX).chain(p.iter().copied()))).collect())).collect() };
-    let (mut read, mut seams, mut g_read) = (0usize, 0usize, 0usize);
+fn the_carry_circles_covector_matches_its_codes_difference() {
+    // The seams: the class sheets, and the friction's `max(0, h)` (each site's and circle's `h ≥ 0` at every tick), whose one-sided slope the
+    // covector reads; a probe that moves an `h` across zero straddles a seam.
+    let sheets = |field: &Field, r: &Region| -> Vec<Vec<u32>> {
+        let pass = field.pass(r, true).unwrap();
+        let (c, c2) = (field.declaration.carry, 2 * field.declaration.carry);
+        let classes = pass.ticks.iter().flat_map(|c| c.classes.iter().map(|l| l.off.iter().chain(&l.members).copied().chain(l.probes.iter().flat_map(|p| std::iter::once(u32::MAX).chain(p.iter().copied()))).collect()));
+        let friction = pass.ticks.iter().map(|cell| (0..cell.qh.len() / c2.max(1)).flat_map(|t| (0..c).map(move |k| u32::from(cell.qh[t * c2 + c + k] >= 0))).collect());
+        classes.chain(friction).collect()
+    };
+    let (mut read, mut seams, mut charts_read, mut biases_read) = (0usize, 0usize, 0usize, 0usize);
+    let (mut below, mut above) = (0usize, 0usize);
     for still in [0usize, 1, 2] {
-        let field = carried_shaped(still);
+        let field = circled_shaped(still);
         let r = region();
+        let (c, c2) = (field.declaration.carry, 2 * field.declaration.carry);
+        let pass = field.pass(&r, true).unwrap();
+        let leaks: Vec<i64> = pass.ticks.iter().flat_map(|cell| (0..CLASSES.len()).flat_map(move |t| (0..c).map(move |k| cell.qh[t * c2 + c + k]))).collect();
+        below += leaks.iter().filter(|&&h| h < 0).count();
+        above += leaks.iter().filter(|&&h| h > 0).count();
         let g = covector_of(&field, &r);
         let l = field.layout.clone();
-        let glen = field.declaration.contacts * field.declaration.width;
-        assert!(g[l.gchart..l.gchart + glen].iter().any(|&v| v != 0), "still {still}: G has a covector");
+        assert!(g[l.carry..l.carry + c2 * field.declaration.width].iter().any(|&v| v != 0), "still {still}: the circles' charts have a covector");
         for &(start, len, grain) in field.families() {
             if start == l.temper {
                 continue;
@@ -2334,7 +2440,8 @@ fn the_scans_covector_matches_its_codes_difference() {
                     continue;
                 };
                 read += 1;
-                g_read += usize::from(start == l.gchart);
+                charts_read += usize::from(start == l.carry);
+                biases_read += usize::from(start == l.carry_bias);
                 let measured = moved(delta).code(&r).unwrap().0 - moved(-delta).code(&r).unwrap().0;
                 let predicted = (g[i] * 2 * delta as i128) >> shift;
                 let tolerance = predicted.abs() / 8 + (64 << h);
@@ -2342,38 +2449,26 @@ fn the_scans_covector_matches_its_codes_difference() {
             }
         }
     }
-    eprintln!("SCAN_COVECTOR_PROBES read={read} on_a_seam={seams} g={g_read}");
-    assert!(read > 0 && 16 * seams <= read && g_read > 0, "read {read} probes, {seams} on a seam, {g_read} of G");
+    eprintln!("CARRY_COVECTOR_PROBES read={read} on_a_seam={seams} charts={charts_read} biases={biases_read} h_below={below} h_above={above}");
+    assert!(below > 0 && above > 0, "friction on some sites and none on others: {below} below zero, {above} above");
+    assert!(read > 0 && 16 * seams <= read && charts_read > 0 && biases_read > 0, "read {read} probes, {seams} on a seam, {charts_read} of the charts, {biases_read} of the biases");
 }
 
-/// [definition; theory, November 11 00:22] **The carry survives the growths**: a lane and four more contacts on a field with `G` drawn keep every face
-/// (the lane's columns and the new contacts' rows of `G` open at zero), each old contact keeps its row of `G` at its own place in its half; growth by
-/// copies is refused.
+/// [definition; theory, November 11 17:25] **The carry circles are founded parts of their own**: the circles' charts and biases (part 15), their
+/// `W` columns (16) and their `a` and `b` rows with the drives' biases (17, 18), over the new contacts' marks, so a field grown by circles alone
+/// has no new plain contact.
 #[test]
-fn the_carry_survives_a_lane_and_a_growth_in_contacts() {
-    let field = carried_shaped(1);
-    let faces = field.faces(&region()).unwrap();
-    let (laned, _) = field.laned(&keys(field.declaration.lane_draws())).unwrap();
-    assert_eq!(laned.faces(&region()).unwrap(), faces);
-    let (dw, dw2) = (field.declaration.width, laned.declaration.width);
-    let fc = laned.declaration.contacts;
-    for e in 0..fc {
-        assert_eq!(laned.theta[laned.layout.gchart + e * dw2..laned.layout.gchart + e * dw2 + dw], field.theta[field.layout.gchart + e * dw..field.layout.gchart + (e + 1) * dw], "contact {e}'s row of G");
-        assert!(laned.theta[laned.layout.gchart + e * dw2 + dw..laned.layout.gchart + (e + 1) * dw2].iter().all(|&v| v == 0), "the lane's columns of G open at zero");
-    }
-    let (grown, from) = laned.contacted(4, &keys(laned.declaration.contact_draws(4))).unwrap();
-    assert_eq!(grown.faces(&region()).unwrap(), faces);
-    let f2 = grown.declaration.contacts;
-    let kept = |e: usize| if e < fc / 2 { e } else { f2 / 2 + e - fc / 2 };
-    for e in 0..fc {
-        assert_eq!(grown.theta[grown.layout.gchart + kept(e) * dw2..grown.layout.gchart + (kept(e) + 1) * dw2], laned.theta[laned.layout.gchart + e * dw2..laned.layout.gchart + (e + 1) * dw2], "contact {e}'s row of G");
-    }
-    for k in 0..4 {
-        let at = if k < 2 { fc / 2 + k } else { f2 / 2 + fc / 2 + k - 2 };
-        assert!(grown.theta[grown.layout.gchart + at * dw2..grown.layout.gchart + (at + 1) * dw2].iter().all(|&v| v == 0), "a new contact's row of G opens at zero");
-    }
-    assert_eq!(from.iter().flatten().count(), laned.theta.len());
-    assert!(field.grown(2, &keys(field.growth_draws(2))).is_err(), "no growth by copies with the carry");
+fn the_carry_circles_are_founded_parts_of_their_own() {
+    let plain = shaped_with(four_contacts(1));
+    let (grown, _) = plain.with_carry(2, &keys(plain.declaration.carry_draws(2))).unwrap();
+    let parts = grown.founded_parts(8);
+    let (dw, c2) = (grown.declaration.width, 2 * grown.declaration.carry);
+    let count = |p: u8| parts.iter().filter(|&&q| q == p).count();
+    assert_eq!((count(0), count(1), count(2)), (0, 0, 0), "the circles are the only new contacts");
+    assert_eq!(count(15), c2 * dw + c2, "the circles' charts and biases");
+    assert_eq!(count(16), c2 * dw, "the circles' W columns, real and imaginary");
+    assert_eq!((count(17), count(18)), (c2 * dw + c2, c2 * dw + c2), "the circles' a and b rows with their biases");
+    assert_eq!(PART_NAMES[15], "carry");
 }
 
 /// [definition; theory, November 10 05:30] **An answer's root charge is its letters' counts against its faces' summed shares**
@@ -2549,4 +2644,73 @@ fn the_parallel_settle_certifies_every_pass_and_rests() {
         }
     }
     assert!(kept_any, "the settle kept some exchange");
+}
+
+
+/// [measurement; theory, November 11 18:33, part P2; the founding of 19:56, G85] **The carry circles' gates, read**: on a drawn field grown by two
+/// carry circles (founded: the leak rows at zero and the leak's bias at `1/4`), every (open site, tick) read has `h = 1/4`, so `d = 1/4` and
+/// `|γ| = 4/5`, `2^32/5` on `2^(−30)` within the rounding of its two parts, and `h ≥ 0` counts every read; a moved leak row turns some reads
+/// below zero and closes their count; the read changes no face.
+#[test]
+fn the_carry_circles_gates_are_read_from_the_forwards_own_cells() {
+    let plain = shaped_with(four_contacts(1));
+    let (mut grown, _) = plain.with_carry(2, &keys(plain.declaration.carry_draws(2))).unwrap();
+    let r = region();
+    let faces = grown.faces(&r).unwrap();
+    let gates = grown.carry_gates_of(&r).unwrap();
+    let open = OPEN.iter().filter(|&&u| u).count() as u64;
+    assert_eq!(gates.reads, open * grown.declaration.ticks as u64);
+    for k in 0..2 {
+        assert_eq!(gates.friction[k], gates.reads, "founded, every leak read stands at 1/4");
+        let mean = gates.modulus[k] / u128::from(gates.reads);
+        assert!(mean.abs_diff(858_993_459) <= 2, "circle {k}: |γ| = 4/5 to the grain, {mean}");
+    }
+    assert_eq!(grown.faces(&r).unwrap(), faces, "the read changes no face");
+    // A leak row moved below zero at every coordinate's sign: some reads lose their friction count.
+    let (l, dw) = (grown.layout.clone(), grown.declaration.width);
+    for j in 0..dw {
+        grown.theta[l.carry + 2 * dw + j] = if j % 2 == 0 { -(1 << 24) } else { 1 << 24 };
+    }
+    let moved = grown.carry_gates_of(&r).unwrap();
+    assert_eq!(moved.reads, gates.reads);
+    assert!(moved.friction[0] < moved.reads, "a moved leak row closes some reads' friction");
+}
+
+/// [definition; theory, November 11 19:56, G83's second defect, G85] **A field with carry circles keeps every room whole**: with the circles' charts,
+/// biases and `W` columns drawn (so from the second tick a circle carries a place's state past any window), a region whose port cuts its room reads
+/// the same faces, the same port code and the same covector as the same region with the cut off, because [`FieldDeclaration::room_window`] admits
+/// no window where the field has circles; the same region on the field without circles still cuts.
+#[test]
+fn a_field_with_carry_circles_keeps_every_room_whole() {
+    for ticks in [2usize, 4] {
+        let plain = Field::found(FieldDeclaration { reach: 400, ticks, ..four_contacts(1) }, &keys(1 << 14)).unwrap();
+        let (grown, _) = plain.with_carry(2, &keys(plain.declaration.carry_draws(2))).unwrap();
+        let field = drawn(grown);
+        let q = [1usize, 4, 0, 2, 3, 1];
+        let sites = field.declaration.reach;
+        let mut classes: Vec<usize> = q.to_vec();
+        classes.resize(sites, 0);
+        let open: Vec<bool> = (0..sites).map(|t| t >= q.len()).collect();
+        let target = [3usize, 1, 2, 4, 1, 3, 2, 1, 4, 2, 3];
+        let heard: Vec<bool> = (0..sites).map(|t| [0usize, 1, 2, 5, 13, 22, 47, 90, 200, 330].iter().any(|&d| t == q.len() + d)).collect();
+        let region = |window: bool| Region {
+            classes: &classes,
+            unresolved: &open,
+            faces: &[],
+            locked: &[],
+            echo: &[],
+            domain: None,
+            port: Some(Port { start: q.len(), void: 0, target: &target, boundary: true, stop: None, heard: Some(&heard), window, letters: false }),
+        };
+        let (whole, cut) = (region(false), region(true));
+        assert!(cut.window(ticks).is_some() && field.declaration.room_window(&cut).is_none(), "ticks {ticks}: the region cuts, the field keeps it whole");
+        assert!(plain.declaration.room_window(&cut).is_some(), "ticks {ticks}: without circles the cut stands");
+        assert_eq!(field.faces(&whole).unwrap(), field.faces(&cut).unwrap(), "ticks {ticks}: every face");
+        assert_eq!(field.code(&whole).unwrap(), field.code(&cut).unwrap(), "ticks {ticks}: the port's code");
+        let (_, gw) = field.read_and_return(&[whole]).unwrap();
+        let (_, gc) = field.read_and_return(&[cut]).unwrap();
+        assert_eq!(gw, gc, "ticks {ticks}: the covector");
+        let l = field.layout.clone();
+        assert!(gw[l.carry..l.carry_bias].iter().any(|&v| v != 0), "ticks {ticks}: the circles' charts have a covector to compare");
+    }
 }

@@ -71,7 +71,7 @@ impl Passage {
     /// The founded learner of the declaration `D H n STILL f K` at `RATE`.
     fn learner(&self, args: &[String], rate: u32) -> Result<FieldLearner> {
         let (width, heads, modes, still, contacts, ticks) = (positive(&args[0])?, positive(&args[1])?, positive(&args[2])?, count(&args[3])?, positive(&args[4])?, positive(&args[5])?);
-        let declaration = FieldDeclaration { alphabet: self.codec.alphabet(), width, heads, modes, still, contacts, ticks, frames: heads, reach: self.reach, lanes: 1, depth: 0, carry: false };
+        let declaration = FieldDeclaration { alphabet: self.codec.alphabet(), width, heads, modes, still, contacts, ticks, frames: heads, reach: self.reach, lanes: 1, depth: 0, carry: 0 };
         let mut field = Field::found(declaration, &self.keys).map_err(|e| e.to_string())?;
         // The trainer's declared clock (`FIELD_CLOCK_PER_BLANK`, `Field::per_blank_clock`), so its parity reads that law.
         super::field_train::declared_clocks(&mut field);
@@ -271,19 +271,30 @@ pub(super) fn parity(args: &[String], card: &mut dyn FieldRealization) -> Result
         founded.rate_parts = Some(rp);
         println!("FIELD_PARITY_PARTS octaves={k} contacts_before={}", rp.contacts_before);
     }
-    // [definition; theory, November 11 00:22, ruling R5 amended] The carry along the strand (`FIELD_PARITY_CARRY=s`): the founded field (after its lanes and
-    // contacts) with the carry ([`FieldLearner::with_carry`]), the third chart `G` drawn from the key file's tail, each 32-bit word shifted down `s` bits, so both
-    // realizations read the scan and its adjoint with `G` off zero (a founding's `G` is zero, where only the first deposit reaches it).
-    if let Some(shift) = std::env::var("FIELD_PARITY_CARRY").ok().and_then(|v| v.parse::<u32>().ok()) {
-        founded = founded.with_carry().map_err(|e| e.to_string())?;
+    // [definition; theory, November 11 17:25] The carry circles (`FIELD_PARITY_CARRY=C`): the founded field (after its lanes and contacts) grown by
+    // `C` carry circles ([`FieldLearner::with_carry`]), so both realizations read the circles' scan, their gate and its adjoint. Founded, the circles'
+    // `W` columns are zero and their charts' leak rows and biases too; a moved state (`FIELD_PARITY_CARRY_SHIFT=s`) draws the circles' charts, their
+    // biases and their `W` columns from the key file's tail, each 32-bit word shifted down `s` bits, so the first section reads every carry term
+    // with friction on some sites and off on others (`h` of both signs).
+    if let Some(circles) = std::env::var("FIELD_PARITY_CARRY").ok().and_then(|v| v.parse::<usize>().ok()).filter(|&c| c > 0) {
+        founded = founded.with_carry(circles, &p.keys).map_err(|e| e.to_string())?;
         let d = founded.field.declaration;
-        let (start, len) = (founded.field.layout().gchart, d.contacts * d.width);
-        let tail = p.keys.len().checked_sub(4 * len + 8).ok_or("a key file too short for G's draws")?;
-        for k in 0..len {
-            let word = &p.keys[tail + 4 * k..tail + 4 * k + 4];
-            founded.field.theta[start + k] = i32::from_be_bytes([word[0], word[1], word[2], word[3]]) >> shift;
+        println!("FIELD_PARITY_CARRY circles={circles} contacts={} material={}", d.contacts, founded.field.material_len());
+        if let Some(shift) = std::env::var("FIELD_PARITY_CARRY_SHIFT").ok().and_then(|v| v.parse::<u32>().ok()) {
+            let l = founded.field.layout().clone();
+            let (dw, f) = (d.width, d.contacts);
+            // Each entry with its shift: the charts and `W` on the material's grain, the biases on the face's, eight bits coarser.
+            let mut entries: Vec<(usize, u32)> = (l.carry..l.carry + 2 * circles * dw).map(|i| (i, shift)).chain((l.carry_bias..l.carry_bias + 2 * circles).map(|i| (i, shift + 8))).collect();
+            for e in (d.carry_first()..f / 2).flat_map(|e| [e, f / 2 + e]) {
+                entries.extend((0..dw).map(|r| (l.w + r * f + e, shift)));
+            }
+            let tail = p.keys.len().checked_sub(4 * entries.len() + 8).ok_or("a key file too short for the carry circles' draws")?;
+            for (k, &(i, s)) in entries.iter().enumerate() {
+                let word = &p.keys[tail + 4 * k..tail + 4 * k + 4];
+                founded.field.theta[i] = i32::from_be_bytes([word[0], word[1], word[2], word[3]]) >> s.min(31);
+            }
+            println!("FIELD_PARITY_CARRY_SHIFT shift={shift} entries={}", entries.len());
         }
-        println!("FIELD_PARITY_CARRY shift={shift} entries={len} material={}", founded.field.material_len());
     }
     // [agent-inferred, November 2] A pace far from the founding (`FIELD_PARITY_PACE=s`, §16): every pace entry drawn from
     // the key file's tail, a 32-bit word shifted down `s` bits, so the clocks run off the byte place (fractional,
