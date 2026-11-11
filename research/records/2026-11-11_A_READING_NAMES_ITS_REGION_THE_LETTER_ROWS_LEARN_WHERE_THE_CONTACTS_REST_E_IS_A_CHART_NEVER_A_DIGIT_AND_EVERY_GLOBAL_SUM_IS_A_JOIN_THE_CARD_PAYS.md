@@ -1,6 +1,6 @@
 # A reading names its region: the letter rows learn where the contacts rest, e is a chart and never a digit, and every global sum is a join the card pays
 
-Status (2026-11-11, 19:05 UTC): derived, and measured on the host from receipts already committed. G84 is fixed before its laps
+Status (2026-11-11, 18:40 UTC): derived, and measured on the host from receipts already committed. G84 is fixed before its laps
 (`guess_capacity_44_55.txt` in the receipts of [the record of the places](2026-11-11_THE_PLACES_THE_FIELD_GIVES_PUSH_AGAINST_THE_PLACES_IT_MISSES_THE_DEPOSIT_IS_THEIR_DIFFERENCE_AND_TWO_BUILDS_ARE_TIMED_ONLY_INSIDE_ONE_HOLD_OF_THE_CARD.md)).
 The derivations of §4 and §5 are `agent-inferred` where marked.
 
