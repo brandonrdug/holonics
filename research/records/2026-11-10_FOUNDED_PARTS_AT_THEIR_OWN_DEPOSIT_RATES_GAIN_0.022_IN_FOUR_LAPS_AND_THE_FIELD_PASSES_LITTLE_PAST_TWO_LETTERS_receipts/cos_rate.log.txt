@@ -1,0 +1,8 @@
+c_s=0.5454 Hbar=1.9261 eta*=0.2832
+eta=0.0200 cos=+0.5206 predicted=+0.5069 fall=+23.383 predicted_fall=+23.393
+eta=0.0500 cos=+0.4769 predicted=+0.4491 fall=+55.291 predicted_fall=+55.271
+eta=0.1000 cos=+0.3959 predicted=+0.3528 fall=+99.878 predicted_fall=+99.836
+eta=0.2000 cos=+0.1934 predicted=+0.1602 fall=+156.913 predicted_fall=+156.852
+eta=0.2832 cos=-0.0017 predicted=+0.0000 fall=+171.567 predicted_fall=+171.655
+eta=0.4000 cos=-0.2682 predicted=-0.2251 fall=+142.586 predicted_fall=+142.422
+eta=0.6000 cos=-0.5871 predicted=-0.6103 fall=-43.872 predicted_fall=-43.289

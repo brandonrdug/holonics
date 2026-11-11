@@ -1,0 +1,31 @@
+FIELD_CARD_OPEN card=NVIDIA GeForce RTX 4080 SUPER free=15497953280 total=16802250752 batch_budget=10129244160
+FIELD_CARD reads=29 read_ms=91627 returns=0 return_ms=0 pairs=23511449429 batches=141 peak_store=8102765692 landmarks=0 landmark_ms=0 elapsed_ms=93374
+FIELD_PROFILE entry=field_affine_tiled_x32 launches=3384 ms=3841 us_a_launch=1135
+FIELD_PROFILE entry=field_affine_tiled_x64 launches=1269 ms=1536 us_a_launch=1210
+FIELD_PROFILE entry=field_blank_rates launches=423 ms=67 us_a_launch=158
+FIELD_PROFILE entry=field_chart launches=1692 ms=2333 us_a_launch=1379
+FIELD_PROFILE entry=field_classes launches=564 ms=386 us_a_launch=685
+FIELD_PROFILE entry=field_contact_l5 launches=554 ms=26427 us_a_launch=47702
+FIELD_PROFILE entry=field_contact_l6 launches=10 ms=483 us_a_launch=48363
+FIELD_PROFILE entry=field_exponential launches=29 ms=0 us_a_launch=27
+FIELD_PROFILE entry=field_exposure launches=564 ms=14601 us_a_launch=25888
+FIELD_PROFILE entry=field_face launches=564 ms=27 us_a_launch=48
+FIELD_PROFILE entry=field_frame launches=564 ms=468 us_a_launch=830
+FIELD_PROFILE entry=field_frame_probe launches=564 ms=281 us_a_launch=499
+FIELD_PROFILE entry=field_moment_add launches=564 ms=310 us_a_launch=550
+FIELD_PROFILE entry=field_moment_add_probe launches=564 ms=319 us_a_launch=565
+FIELD_PROFILE entry=field_moment_admit_paced_all launches=564 ms=148 us_a_launch=263
+FIELD_PROFILE entry=field_moment_paced_all launches=564 ms=12775 us_a_launch=22651
+FIELD_PROFILE entry=field_moment_prefix_paced_all launches=1128 ms=496 us_a_launch=439
+FIELD_PROFILE entry=field_moment_scatter_all launches=564 ms=623 us_a_launch=1105
+FIELD_PROFILE entry=field_moment_strands_all launches=564 ms=109 us_a_launch=193
+FIELD_PROFILE entry=field_open launches=141 ms=40 us_a_launch=286
+FIELD_PROFILE entry=field_paces launches=564 ms=333 us_a_launch=590
+FIELD_PROFILE entry=field_pair launches=564 ms=325 us_a_launch=576
+FIELD_PROFILE entry=field_pframes launches=564 ms=1602 us_a_launch=2840
+FIELD_PROFILE entry=field_sums launches=564 ms=882 us_a_launch=1564
+FIELD_PROFILE entry=field_tied_face launches=564 ms=74 us_a_launch=132
+FIELD_PROFILE entry=field_unit launches=564 ms=2291 us_a_launch=4062
+FIELD_PROFILE entry=field_unit_probe launches=564 ms=2300 us_a_launch=4079
+FIELD_PROFILE_SPLIT kernels_ms=73086 copies=2314 copies_ms=5782 allocations=15004 allocations_ms=11097 elapsed_ms=93374
+MEASURE lap=prof_rt9_redraw rc=0 wall_s=93.9 peak_rss_kib=765760
