@@ -27,6 +27,20 @@ width. For the new contacts and for the old, each family is read as a matrix of 
 The old contacts' rows are the reading's own control: they wander. A step is a moment over the root of its second moment, entry by
 entry, so a displacement is the drift over its noise and not the covector's sum; where the noise is even along a part the
 directions are kept. CONTACTS_BEFORE is the count before the growth (32 for the growth to 64). Numbers only.
+
+state_travel.py scale CONTACTS_BEFORE STATE STATE [STATE ...]: how much of each block's travel is along the block itself (theory,
+November 11), from two or more saved states of one line, in order. Every read of a site's face goes through the lane chart, a ratio
+to the lane's own power, and the classes are read through the encoding against the lift; so for each lane the code does not change
+when everything written into that lane's face coordinates (the letters' rows of enc, before and after, the rows of moment_face, out
+and W, the face biases) is scaled by one factor and the lift's rows of that lane by its inverse. Travel along that scale is travel
+the code does not read. For each block (a family's entries of one lane, the new contacts' or the old):
+  SCALE lap k   the block's rms and its travel's, rho the cosine of the travel with the block at the lap's start, and eps the
+                relative lengthening the lap gave it, <d, x> / |x|^2, in parts a thousand;
+  SCALE_PAIR    the cosine of two successive laps' travels, and cos_tan, the same cosine with each travel's component along its
+                own block removed.
+  GAUGE lap k   by lane: eps pooled over the blocks that write the lane's face and over the lift's rows that read it back.
+role names a block's place in that scale: writes (the lane's face), lifts (the lift's rows), reads (charts that read the lane's
+ratio), other. Numbers only.
 """
 import sys
 
@@ -179,9 +193,109 @@ def rank(old_f, paths):
             print(f"TRAVEL_PAIR laps={k},{k + 1} family={key[0]} contacts={key[1]} cos={cos:.4f} {held} pr_held={(float(h.sum()) ** 2 / sq if sq > 0 else float('nan')):.2f}")
 
 
+def scale_blocks(d, old_f):
+    """[(block, lane, contacts, role, family, mask)]: each family cut by lane and by new or old contacts, with its place in the
+    lane's scale (see the docstring)."""
+    fam, _ = layout(d)
+    shapes = {name: shape for name, _, shape, _ in fam}
+    dw, f, lanes = d["width"], d["contacts"], d["lanes"]
+    lw = dw // lanes if lanes > 1 else dw
+    new_c = np.zeros(f, dtype=bool)
+    new_c[old_f // 2:f // 2] = True
+    new_c[f // 2 + old_f // 2:] = True
+    lane_of = [np.arange(dw) // lw == k for k in range(lanes)]
+    out = []
+
+    def add(block, lane, contacts, role, family, mask):
+        if mask.any():
+            out.append((block, lane, contacts, role, family, mask))
+
+    for k, sel in enumerate(lane_of, 1):
+        for name in ("enc", "before", "after"):
+            m = np.zeros(shapes[name], dtype=bool); m[:, sel] = True
+            add(name, k, "all", "writes", name, m)
+        for name in ("moment_face", "out"):
+            m = np.zeros(shapes[name], dtype=bool); m[sel, :] = True
+            add(name, k, "all", "writes", name, m)
+        for sub, cols in (("new", new_c), ("old", ~new_c)):
+            m = np.zeros(shapes["w"], dtype=bool); m[np.ix_(sel, cols)] = True
+            add("w", k, sub, "writes", "w", m)
+        for name in ("out_bias", "w_bias", "moment_face_bias"):
+            m = np.zeros(shapes[name], dtype=bool); m[sel] = True
+            add(name, k, "all", "writes", name, m)
+        m = np.zeros(shapes["read"], dtype=bool); m[sel, :] = True
+        add("read_rows", k, "all", "lifts", "read", m)
+        m = np.zeros(shapes["lift_bias"], dtype=bool); m[sel] = True
+        add("lift_bias", k, "all", "lifts", "lift_bias", m)
+        for name in ("q", "v", "probe"):
+            m = np.zeros(shapes[name], dtype=bool); m[:, sel] = True
+            add(name, k, "all", "reads", name, m)
+        for name in ("a", "b"):
+            for sub, rows in (("new", new_c), ("old", ~new_c)):
+                m = np.zeros(shapes[name], dtype=bool); m[np.ix_(rows, sel)] = True
+                add(name, k, sub, "reads", name, m)
+    for name in ("a_bias", "b_bias"):
+        for sub, rows in (("new", new_c), ("old", ~new_c)):
+            m = np.zeros(shapes[name], dtype=bool); m[rows] = True
+            add(name, 0, sub, "other", name, m)
+    for name in ("q_bias", "v_bias", "probe_bias", "read_bias", "moment_before", "moment_after", "temper", "pace"):
+        add(name, 0, "all", "other", name, np.ones(shapes[name], dtype=bool))
+    return out
+
+
+def scale(old_f, paths):
+    states = [state(p) for p in paths]
+    d = states[0][0]
+    assert all(s[0] == d for s in states), "states of one declaration"
+    assert 0 < old_f <= d["contacts"] and old_f % 4 == 0, "the contacts before the growth, by fours"
+    fam, total = layout(d)
+    assert all(len(theta) == total for _, theta in states), "the material's length"
+    where = {name: (at, shape, grain) for name, at, shape, grain in fam}
+    blocks = scale_blocks(d, old_f)
+    print(f"# declaration {d}; contacts {old_f} -> {d['contacts']}; lane width {d['width'] // d['lanes']}")
+    for i, path in enumerate(paths):
+        print(f"# state {i} {path}")
+
+    def take(theta, family, mask):
+        at, shape, _ = where[family]
+        return theta[at:at + int(np.prod(shape))].reshape(shape)[mask].astype(np.float64)
+
+    forms = [[take(theta, family, mask) for (_, _, _, _, family, mask) in blocks] for _, theta in states]
+    rms = lambda x: float(np.sqrt((x ** 2).mean())) if x.size else 0.0
+    tans = []
+    for k in range(len(states) - 1):
+        lap_tan = []
+        pooled = {}
+        for j, (block, lane, contacts, role, family, mask) in enumerate(blocks):
+            x, dv = forms[k][j], forms[k + 1][j] - forms[k][j]
+            xx, dd, xd = float(x @ x), float(dv @ dv), float(x @ dv)
+            rho = xd / np.sqrt(xx * dd) if xx > 0 and dd > 0 else float("nan")
+            eps = xd / xx if xx > 0 else float("nan")
+            lap_tan.append((dv, dv - (xd / xx) * x if xx > 0 else dv))
+            print(f"TRAVEL_SCALE lap={k} block={block} lane={lane} contacts={contacts} role={role} entries={x.size} form_rms={rms(x):.5g} travel_rms={rms(dv):.5g} rho={rho:+.4f} eps_ppk={1000 * eps:+.4f}")
+            if role in ("writes", "lifts"):
+                unit = 4.0 ** -where[family][2]
+                got = pooled.setdefault((lane, role), [0.0, 0.0])
+                got[0] += xd * unit
+                got[1] += xx * unit
+        for lane in sorted({lane for (lane, _) in pooled}):
+            w, r = pooled.get((lane, "writes")), pooled.get((lane, "lifts"))
+            f3 = lambda g: f"{1000 * g[0] / g[1]:+.4f}" if g and g[1] > 0 else "nan"
+            print(f"TRAVEL_GAUGE lap={k} lane={lane} writes_eps_ppk={f3(w)} lifts_eps_ppk={f3(r)}")
+        tans.append(lap_tan)
+    for k in range(len(tans) - 1):
+        for j, (block, lane, contacts, role, _, _) in enumerate(blocks):
+            (d0, t0), (d1, t1) = tans[k][j], tans[k + 1][j]
+            cosine = lambda u, v: float(u @ v / np.sqrt((u @ u) * (v @ v))) if (u @ u) > 0 and (v @ v) > 0 else float("nan")
+            print(f"TRAVEL_SCALE_PAIR laps={k},{k + 1} block={block} lane={lane} contacts={contacts} role={role} cos={cosine(d0, d1):+.4f} cos_tan={cosine(t0, t1):+.4f}")
+
+
 def main():
     if len(sys.argv) >= 5 and sys.argv[1] == "rank":
         rank(int(sys.argv[2]), sys.argv[3:])
+        return
+    if len(sys.argv) >= 5 and sys.argv[1] == "scale":
+        scale(int(sys.argv[2]), sys.argv[3:])
         return
     if len(sys.argv) != 4:
         sys.exit(__doc__)

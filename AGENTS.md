@@ -394,7 +394,11 @@ here with their reasons so that no agent holds them as slogans.
 - **Theory picks, and a run tests a stated prediction** (November 4). Derive which law the theory
   gives, fix its guess as a number before the read, run that one law and score the guess, a miss
   included. Reason: arms cost card time and choose by a short reading, and a winner picked that way
-  carries no reason. A comparison is lawful when it tests a stated prediction.
+  carries no reason. A comparison is lawful when it tests a stated prediction. Before a guess is
+  fixed, what the logs and the records already print about its premise is read. Reason: on
+  November 11 a guess of four parts spent two on the rank of a travel whose end the record of the
+  day before had printed, and a guess on a premise a log has settled tests the guesser's memory
+  ([the record](research/records/2026-11-11_THE_ADDED_CONTACTS_TRAVEL_EACH_ITS_OWN_DIRECTION_SO_NO_FOUNDING_IS_BUILT_THEY_TOOK_THEIR_CHARGE_IN_FOUR_PART_RATE_LAPS_AND_A_GUESSES_PREMISE_IS_READ_FROM_THE_LOGS_FIRST.md)).
 - **A build is one attempt** (November 9). A realization is named as an attempt with its receipt,
   never as "the field" or "the law"; "law" names the theory's statements. When a build fails, first
   check whether the built object is the theory's object, then step back and abstract. Reason: from
