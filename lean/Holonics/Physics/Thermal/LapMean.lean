@@ -53,7 +53,8 @@ theorem six_mul_sum_mul_sub (n : ℕ) (k : ℤ) :
 
 /-- [proved-standard; formal-checked] `6 Σ_{m<n} m² = n (n − 1)(2n − 1)`. -/
 theorem six_mul_sum_sq (n : ℕ) :
-    6 * ∑ m ∈ range n, (m : ℤ) ^ 2 = n * (n - 1) * (2 * n - 1) := by
+    (6 : ℤ) * ∑ m ∈ range n, (m : ℤ) ^ 2
+      = (n : ℤ) * ((n : ℤ) - 1) * (2 * (n : ℤ) - 1) := by
   induction n with
   | zero => simp
   | succ n ih =>
@@ -63,7 +64,8 @@ theorem six_mul_sum_sq (n : ℕ) :
 
 /-- [proved-standard; formal-checked] `6 Σ_{m<n} (m + 1)² = n (n + 1)(2n + 1)`. -/
 theorem six_mul_sum_succ_sq (n : ℕ) :
-    6 * ∑ m ∈ range n, ((m : ℤ) + 1) ^ 2 = n * (n + 1) * (2 * n + 1) := by
+    (6 : ℤ) * ∑ m ∈ range n, ((m : ℤ) + 1) ^ 2
+      = (n : ℤ) * ((n : ℤ) + 1) * (2 * (n : ℤ) + 1) := by
   induction n with
   | zero => simp
   | succ n ih =>
@@ -80,24 +82,24 @@ theorem six_mul_shared (n : ℕ) :
 /-- [proved-derived; formal-checked] **The own weight** of a difference of two successive lap
 means, over the two laps it spans: `6 (Σ_{i<n} i² + Σ_{i<n} (i + 1)²) = n (4n² + 2)`. -/
 theorem six_mul_own (n : ℕ) :
-    6 * (∑ m ∈ range n, (m : ℤ) ^ 2 + ∑ m ∈ range n, ((m : ℤ) + 1) ^ 2)
-      = n * (4 * (n : ℤ) ^ 2 + 2) := by
+    (6 : ℤ) * (∑ m ∈ range n, (m : ℤ) ^ 2 + ∑ m ∈ range n, ((m : ℤ) + 1) ^ 2)
+      = (n : ℤ) * (4 * (n : ℤ) ^ 2 + 2) := by
   linear_combination six_mul_sum_sq n + six_mul_sum_succ_sq n
 
 /-- [proved-derived; formal-checked] **Own is four times shared and `n` more.** The lap cosine of
 a free walk's lap means, shared over own, is `(n² − 1)/(4n² + 2)`. -/
 theorem own_eq_four_mul_shared_add (n : ℕ) :
     ∑ m ∈ range n, (m : ℤ) ^ 2 + ∑ m ∈ range n, ((m : ℤ) + 1) ^ 2
-      = 4 * ∑ m ∈ range n, (m : ℤ) * ((n : ℤ) - m) + n := by
+      = (4 : ℤ) * ∑ m ∈ range n, (m : ℤ) * ((n : ℤ) - m) + (n : ℤ) := by
   have h : (6 : ℤ) * (∑ m ∈ range n, (m : ℤ) ^ 2 + ∑ m ∈ range n, ((m : ℤ) + 1) ^ 2)
-      = 6 * (4 * ∑ m ∈ range n, (m : ℤ) * ((n : ℤ) - m) + n) := by
+      = 6 * ((4 : ℤ) * ∑ m ∈ range n, (m : ℤ) * ((n : ℤ) - m) + (n : ℤ)) := by
     linear_combination six_mul_own n - 4 * six_mul_shared n
   exact mul_left_cancel₀ (by norm_num) h
 
 /-- [proved-derived; formal-checked] **The quarter floor:** between lap means a free walk's lap
 cosine is under one quarter at every lap length. -/
 theorem four_mul_shared_lt_own (n : ℕ) (hn : 0 < n) :
-    4 * ∑ m ∈ range n, (m : ℤ) * ((n : ℤ) - m)
+    (4 : ℤ) * ∑ m ∈ range n, (m : ℤ) * ((n : ℤ) - m)
       < ∑ m ∈ range n, (m : ℤ) ^ 2 + ∑ m ∈ range n, ((m : ℤ) + 1) ^ 2 := by
   have hn' : (0 : ℤ) < n := by exact_mod_cast hn
   have h := own_eq_four_mul_shared_add n
