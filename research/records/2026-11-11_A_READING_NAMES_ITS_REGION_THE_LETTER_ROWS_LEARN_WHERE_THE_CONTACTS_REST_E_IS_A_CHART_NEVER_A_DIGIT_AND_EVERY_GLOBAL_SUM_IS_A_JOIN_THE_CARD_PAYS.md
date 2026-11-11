@@ -99,6 +99,12 @@ fission are travels that align or part between blocks, readable by the weighed p
   its size, no reread certifies it, and every section line's halvings reads 0 by construction. This item was read from the
   field's module doc, which still describes the certificate of November 1 to 3 (its repair rides G86's build). "It halved or
   refused no step on laps 16 to 18" held by construction.
+  [added 20:59 UTC] Two objects have carried the name. The certificate retired on November 5 was a reread of the code that kept
+  a step only where its own section's regions coded strictly fewer bits, halving it until they did. The step's gain is a
+  different object and stands: `deposit_step` sets each entry's step from that entry's own moments, `m/(⌊√v⌋ + 1)` at
+  `2^(−rate)`, so the covector that reached the entry bounds it, at most about 4.2 times its rate (Cauchy–Schwarz on the two
+  moments' weights, `7/8` and `255/256`: `|m| ≤ √(4/(1 − r)) √v` with `r = (7/8)²/(255/256)`; agent-inferred). That is the
+  gain the lessons' law 6 of September 29 asks a step to read at its locus; the field realizes it per entry, with no reread.
 
 So one scalar of the deposit's law is global, the base rate word, an average over every old entry and the kind of reading §3
 shows to hide where the learning is. G84 tested whether a rate pays where a block is polarized (it does, by the rule's edge);

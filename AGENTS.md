@@ -354,10 +354,12 @@ an authored routine standing in for learning; recitation or an index of contexts
 generation (eight times, the last a key/value cache passed as a Holonics key); text run on its
 codec's grain as the exception (every design is checked against text,
 image, acoustic and motor input, and anything modality-specific lives only in a boundary codec); a
-located cause carried unrepaired into a new consumer; an uncertified deposition step; seen material
-graded as unseen; bits read as progress; a refusal answered with a larger limit; a design thought in
-the programming language (arrays, offsets, windows, tables) instead of in residues, modes and spectral
-placement.
+located cause carried unrepaired into a new consumer; a deposition step whose gain is not read from
+the covector reaching its locus (September 29, item 5; not the reread of November 1 to 3, a selection
+on the code that Brandon retired on November 5 because it discarded what an expansion measures); seen
+material graded as unseen; bits read as progress; a refusal answered with a larger limit; a design
+thought in the programming language (arrays, offsets, windows, tables) instead of in residues, modes
+and spectral placement.
 
 [project-postulate] **Decide from the mathematics.** Resolve routine choices from the mathematics,
 mark an inferred choice with its reason (`agent-inferred`), and proceed. Never hand Brandon a
