@@ -900,6 +900,7 @@ pub(super) fn run_field_realized(args: &[String], realization: &mut dyn holonics
         Some("stretch-field") => field_train::stretch_field(args, realization),
         Some("length-field") => field_train::length_field(args, realization),
         Some("order-field") => field_train::order_field(args, realization),
+        Some("gamma-field") => field_train::gamma_field(args, realization),
         Some("masks-field") => field_train::masks_field(args, realization),
         Some("ring-field") => field_train::ring_field(args),
         Some("depth-field") => field_train::depth_field(args),

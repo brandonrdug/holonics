@@ -3295,6 +3295,79 @@ mod tests {
 }
 
 
+/// A mean of `|γ|` (a sum on `2^(−30)` over `count` terms) as a decimal of six places, by integer arithmetic (a reading in a report); `-` where nothing was read.
+fn decimal_gamma(sum: u128, count: u128) -> String {
+    if count == 0 {
+        return "-".to_string();
+    }
+    let micro = sum * 1_000_000 / (count << 30);
+    format!("{}.{:06}", micro / 1_000_000, micro % 1_000_000)
+}
+
+/// [measurement; theory, November 11 00:22] **`gamma-field STATE STATE_SHA CODEC CODEC_SHA UNITS UNITS_SHA HELD HELD_SHA COUNT OUT`**: the carry's
+/// `|γ|` (`γ = g / √(1 + |g|²)`, `g = G r̂`, [`Field::carry_gammas`]) on the first `COUNT` held problems' opening regions (the context read's first part), the
+/// mean over the sites of each kind (a question's resolved site, an answer's open site) at each contact circle (a complex contact) and tick, from the
+/// chart the realization read (`read_ticks`). Writes `GAMMA.tsv` (tick, kind, circle, sites, mean `|γ|` as a decimal, a reading in a report) and prints the
+/// means over the circles at the first and last ticks. A reading only.
+pub(super) fn gamma_field(args: &[String], realization: &mut dyn FieldRealization) -> Result<()> {
+    if args.len() != 11 {
+        return Err("gamma-field STATE STATE_SHA CODEC CODEC_SHA UNITS UNITS_SHA HELD HELD_SHA COUNT OUT".into());
+    }
+    let started = std::time::Instant::now();
+    let learner = FieldLearner::from_text(std::str::from_utf8(&pinned_read(&args[1], &args[2], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
+    let field = &learner.field;
+    let units = units_of(&args[5], &args[6])?;
+    let codec = FieldCodec::from_text(std::str::from_utf8(&pinned_read(&args[3], &args[4], CODEC_BUDGET)?)?, units)?;
+    let held = problems_of(&pinned_read(&args[7], &args[8], READ_BUDGET as usize)?);
+    let count = positive(&args[9])?.min(held.len());
+    let out = Path::new(&args[10]);
+    std::fs::create_dir(out)?;
+    let mut owned: Vec<(Vec<usize>, Vec<bool>)> = Vec::new();
+    for (q, a) in held.iter().take(count) {
+        let (q, a) = (codec.encode(&question_text(q)).map_err(|e| e.to_string())?, codec.encode(a).map_err(|e| e.to_string())?);
+        owned.extend(context_regions(codec.void(), &q, &a, q.len() + a.len() + 1).into_iter().take(1));
+    }
+    let (d, half) = (field.declaration, field.declaration.contacts / 2);
+    // [tick][kind][circle]: the sum of |γ| on 2^(−30) (each an exact integer square root of |γ|² on 2^(−60)) and the sites.
+    let mut sum = vec![vec![vec![0u128; half]; 2]; d.ticks];
+    let mut sites = vec![vec![0usize; 2]; d.ticks];
+    for chunk in owned.chunks(16) {
+        let regions: Vec<Region> = chunk.iter().map(|(c, u)| Region { classes: c, unresolved: u, faces: &[], locked: &[], echo: &[], domain: None, port: None }).collect();
+        let reads = realization.read_ticks(field, &regions)?;
+        for ((_, open), ticks) in chunk.iter().zip(&reads) {
+            for (k, tick) in ticks.iter().enumerate() {
+                let gammas = field.carry_gammas(&tick.pair_read).map_err(|e| e.to_string())?;
+                for (t, &is_open) in open.iter().enumerate() {
+                    let kind = usize::from(is_open);
+                    sites[k][kind] += 1;
+                    for e in 0..half {
+                        let (yr, yi) = gammas[t * half + e];
+                        sum[k][kind][e] += ((yr as i128 * yr as i128 + yi as i128 * yi as i128) as u128).isqrt();
+                    }
+                }
+            }
+        }
+    }
+    use std::io::Write;
+    let mut rows = rows_file(&out.join("GAMMA.tsv"), "tick\tkind\tcircle\tsites\tmean_abs_gamma\n")?;
+    for k in 0..d.ticks {
+        for (kind, name) in ["question", "open"].iter().enumerate() {
+            for e in 0..half {
+                let mean = decimal_gamma(sum[k][kind][e], sites[k][kind] as u128);
+                writeln!(rows, "{}\t{name}\t{e}\t{}\t{mean}", k + 1, sites[k][kind])?;
+            }
+        }
+    }
+    for k in [0, d.ticks - 1] {
+        for (kind, name) in ["question", "open"].iter().enumerate() {
+            let mean = decimal_gamma(sum[k][kind].iter().sum::<u128>(), half as u128 * sites[k][kind] as u128);
+            println!("GAMMA tick={} kind={name} sites={} mean_abs_gamma_over_circles={mean}", k + 1, sites[k][kind]);
+        }
+    }
+    println!("GAMMA_DONE problems={count} regions={} circles={half} elapsed_ms={}", owned.len(), started.elapsed().as_millis());
+    Ok(())
+}
+
 /// [measurement; agent-inferred, November 4] **`expansion-field STATE STATE_SHA CODEC CODEC_SHA UNITS UNITS_SHA HELD HELD_SHA
 /// COUNT`**: the expansion and the volume of the field's state across its ticks (the lens record, §7: information expands
 /// and contracts in the geometry), on the first `COUNT` held problems read with their neighbours (the context read's first

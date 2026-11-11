@@ -2162,114 +2162,124 @@ fn founded_parts_and_their_cosines_on_saved_states() {
     }
 }
 
-/// A tiny field with the carry, every family drawn (so `κ` too), ticks two.
+/// A tiny field with the carry, every family drawn (so the third chart `G` too), ticks two.
 fn carried_shaped(still: usize) -> Field {
     shaped_with(FieldDeclaration { carry: true, ..tiny_declaration(still) })
 }
 
-/// [definition; theory, November 10 23:30, ruling R5] **With `κ` at zero the carry is the plain field**: the founding with the carry reads every face of
-/// the field it was made from, bit for bit; one section's deposit moves every old entry as the plain learner's does (the same bits),
-/// and reaches `κ` itself (its covector is `conj(p^0(m)) δb`, nonzero where the first tick's pair is); the text round-trips and a field
-/// without the carry still reads its line.
+/// [definition; theory, November 11 00:22, ruling R5 amended] **`γ = g / √(1 + |g|²)` is attained exactly**: the radicand's integer square root is
+/// the floor (no iteration's residue), `γ` is `g` over the root to the nearest on `2^(−30)`, `|γ| < 1`, `s² + |γ|² = 1` to the grain, and
+/// `g = 0` gives `γ = 0` and `s = 1`.
 #[test]
-fn with_kappa_at_zero_the_carry_is_the_plain_field() {
+fn gamma_is_g_over_the_exact_root_of_one_plus_its_square() {
+    assert_eq!(gamma_of(0, 0).unwrap(), ((0, 0), 1 << 30));
+    for (gr, gi) in [(1i128 << 16, 0), (0, 3 << 15), (-(5 << 16), 12 << 16), (123_456, -78_901), (1 << 40, 1 << 40), (1, -1)] {
+        let ((yr, yi), s) = gamma_of(gr, gi).unwrap();
+        let radicand = ((1i128 << 32) + gr * gr + gi * gi) << 32;
+        let root = (radicand as u128).isqrt() as i128;
+        assert!(root * root <= radicand && (root + 1) * (root + 1) > radicand, "the root is the floor");
+        assert_eq!(i128::from(yr), div_nearest(gr << 46, root));
+        assert_eq!(i128::from(yi), div_nearest(gi << 46, root));
+        assert_eq!(i128::from(s), div_nearest(1 << 62, root));
+        let norm = i128::from(yr) * i128::from(yr) + i128::from(yi) * i128::from(yi) + i128::from(s) * i128::from(s);
+        assert!((norm - (1 << 60)).abs() < 1 << 33, "s² + |γ|² = 1 to the grain: {norm}");
+        assert!(i128::from(yr).abs() < 1 << 30 && i128::from(yi).abs() < 1 << 30);
+    }
+}
+
+/// [definition; theory, November 11 00:22, ruling R5 amended] **At `G = 0` the scan is the built contact**: the founding with the third chart reads every
+/// face of the field it was made from, bit for bit; one section's deposit moves every old entry as the plain learner's does (the same bits) and
+/// reaches `G` itself (`δγ = conj(Qm) u` is nonzero where the scan is); the text round-trips.
+#[test]
+fn with_g_at_zero_the_scan_is_the_built_contact() {
     for still in [0usize, 1, 2] {
         let plain = shaped(still);
         let carried = plain.with_carry().unwrap();
-        assert_eq!(carried.theta.len(), plain.theta.len() + plain.declaration.contacts);
-        assert!(carried.theta[plain.theta.len()..].iter().all(|&v| v == 0), "κ founded at zero");
+        assert_eq!(carried.theta.len(), plain.theta.len() + plain.declaration.contacts * plain.declaration.width);
+        assert!(carried.theta[plain.theta.len()..].iter().all(|&v| v == 0), "G founded at zero");
         assert_eq!(carried.faces(&region()).unwrap(), plain.faces(&region()).unwrap(), "still {still}: every face kept");
         let back = Field::from_text(&carried.to_text()).unwrap();
         assert_eq!(back.theta, carried.theta);
         assert!(back.declaration.carry);
-        // One section.
         let (mut a, mut b) = (FieldLearner::new(plain.clone(), 6), FieldLearner::new(plain.clone(), 6).with_carry().unwrap());
         a.section(&[region()]).unwrap();
         b.section(&[region()]).unwrap();
         assert_eq!(&b.field.theta[..a.field.theta.len()], &a.field.theta[..], "still {still}: the old entries deposit as the plain learner's");
-        assert!(b.field.theta[a.field.theta.len()..].iter().any(|&v| v != 0), "still {still}: the deposit reaches κ");
+        assert!(b.field.theta[a.field.theta.len()..].iter().any(|&v| v != 0), "still {still}: the deposit reaches G");
     }
 }
 
-/// [definition; theory, November 10 23:30] **With `κ ≠ 0` the carry reaches a site three apart in two ticks**: with the current, the pair's
-/// return and the moment's chart at zero (so a tick's chart is the opening's), the second tick's pair at a site `t` reads, beside its
-/// mate's `b` (sites `t−2..t` through the openings' neighbours), the mate's first-tick pair, whose `b` is the mate's mate's: sites
-/// `t−3..t−1`. Changing the class of site `t − 3` leaves the second pair at `t` as it was where `κ = 0`, and changes it where `κ ≠ 0`; and
-/// the cell obeys the law exactly: `p^1 = release(a^1 (b^1(m) + release(κ p^0(m))))`.
+/// [definition; theory, November 11 00:22, ruling R5 amended] **With `G ≠ 0` the scan carries a site's `b` three or more away within one tick**: with the
+/// current, the pair's return and the moment's chart at zero (so the chart is the opening's), `p(t)` at an even contact reads `b(t−1)`, and through
+/// `Q`, `γ(t−1) b(t−2)` and `γ(t−1) γ(t−2) b(t−3)`: the openings of sites `t−4..t−2`. Changing the class of site `t − 4` leaves the first tick's pair at
+/// `t` as it was where `G = 0` and changes it where `G ≠ 0`; and the cell obeys the scan's law exactly, site by site in strand order.
 #[test]
-fn with_kappa_nonzero_the_carry_reaches_a_site_three_apart_in_two_ticks() {
+fn with_g_nonzero_the_scan_carries_b_three_or_more_sites_in_one_tick() {
     let mut base = carried_shaped(1);
     let l = base.layout.clone();
     let (dw, f, m2) = (base.declaration.width, base.declaration.contacts, 2 * base.declaration.complex());
     for (start, len) in [(l.out, dw * m2), (l.out_bias, dw), (l.w, dw * f), (l.w_bias, dw), (l.moment_face, dw * m2), (l.moment_face_bias, dw)] {
         base.theta[start..start + len].fill(0);
     }
-    let classes: Vec<usize> = vec![1, 3, 0, 2, 4, 1, 3, 2, 0, 4];
+    let classes: Vec<usize> = vec![1, 3, 0, 2, 4, 1, 3, 2, 0, 4, 2, 1];
     let mut moved = classes.clone();
-    let t = 6usize;
-    moved[t - 3] = (moved[t - 3] + 1) % 5;
-    let open = vec![false; classes.len()];
-    let read = |field: &Field, c: &[usize]| {
-        let r = Region { classes: c, unresolved: &open, faces: &[], locked: &[], echo: &[], domain: None, port: None };
-        field.pass(&r, true).unwrap_or_else(|_| field.pass(&Region { unresolved: &[true; 10], ..r }, true).unwrap())
-    };
-    let _ = read;
+    let t = 7usize;
+    moved[t - 4] = (moved[t - 4] + 1) % 5;
     let unresolved = {
         let mut u = vec![false; classes.len()];
-        u[9] = true;
+        u[11] = true;
         u
     };
     let pass = |field: &Field, c: &[usize]| field.pass(&Region { classes: c, unresolved: &unresolved, faces: &[], locked: &[], echo: &[], domain: None, port: None }, true).unwrap();
     let mut plain = base.clone();
-    plain.theta[l.kappa..l.kappa + f].fill(0);
-    let mut carried = base.clone();
-    for (e, v) in carried.theta[l.kappa..l.kappa + f].iter_mut().enumerate() {
-        *v = (1 << 22) + 977 * e as i32;
-    }
+    plain.theta[l.gchart..l.gchart + f * dw].fill(0);
     let half = f / 2;
-    for e in 0..half {
-        let at = |field: &Field, c: &[usize], tick: usize| pass(field, c).ticks[tick].c[t * f + e];
-        let (kept, changed) = (at(&carried, &classes, 1) != at(&carried, &moved, 1), at(&plain, &classes, 1) != at(&plain, &moved, 1));
-        // the plain field's second pair never sees t − 3; the carried field's sees it through the first tick's pair at the mate.
-        assert!(!changed, "contact {e}: without the carry the second pair at {t} does not read site {}", t - 3);
-        if e % 2 == 0 {
-            assert!(kept || carried.theta[l.kappa + e] == 0, "contact {e} (the site before): the carry reaches site {}", t - 3);
-        }
+    let (p0, p1) = (pass(&plain, &classes), pass(&plain, &moved));
+    let (c0, c1) = (pass(&base, &classes), pass(&base, &moved));
+    for e in (0..half).filter(|e| e % 2 == 0) {
+        assert_eq!(p0.ticks[0].c[t * f + e], p1.ticks[0].c[t * f + e], "contact {e}: without the scan the pair at {t} does not read site {}", t - 4);
     }
-    assert!((0..half).any(|e| e % 2 == 0 && pass(&carried, &classes).ticks[1].c[t * f + e] != pass(&carried, &moved).ticks[1].c[t * f + e]), "the carry reaches t − 3 in two ticks");
-    // The cell's law, exactly: p^1 = a^1 (b^1(m) + κ p^0(m)) at every site with a mate.
-    let p = pass(&carried, &classes);
+    assert!((0..half).filter(|e| e % 2 == 0).any(|e| c0.ticks[0].c[t * f + e] != c1.ticks[0].c[t * f + e]), "the scan reaches site {} within one tick", t - 4);
+    // The odd contacts scan from the right: the same reach the other way.
+    let mut moved_right = classes.clone();
+    moved_right[t + 4 - 1] = (moved_right[t + 4 - 1] + 1) % 5;
+    let c2 = pass(&base, &moved_right);
+    assert!((0..half).filter(|e| e % 2 == 1).any(|e| c0.ticks[0].c[t * f + e] != c2.ticks[0].c[t * f + e]), "an odd contact reaches site {} from the right", t + 3);
+    // The law, exactly, in strand order.
     let sites = classes.len();
-    for tt in 0..sites {
+    for tick in 0..2 {
+        let cell = &c0.ticks[tick];
         for e in 0..half {
-            let (ar, ai) = (p.ticks[1].a[tt * f + e] as i128, p.ticks[1].a[tt * f + half + e] as i128);
-            let (mut br, mut bi) = (0i128, 0i128);
-            if let Some(m) = strand_mate(tt, e, sites) {
-                let (kr, ki) = (carried.theta[l.kappa + e] as i128, carried.theta[l.kappa + half + e] as i128);
-                let (pr, pi) = (p.ticks[0].c[m * f + e] as i128, p.ticks[0].c[m * f + half + e] as i128);
-                br = p.ticks[1].b[m * f + e] as i128 + release(kr * pr - ki * pi, MATERIAL_BITS);
-                bi = p.ticks[1].b[m * f + half + e] as i128 + release(kr * pi + ki * pr, MATERIAL_BITS);
+            let (mut qr, mut qi) = (0i128, 0i128);
+            for step in 0..sites {
+                let tt = if e % 2 == 0 { step } else { sites - 1 - step };
+                let ((yr, yi), _) = gamma_of(cell.g[tt * f + e] as i128, cell.g[tt * f + half + e] as i128).unwrap();
+                let (ar, ai) = (cell.a[tt * f + e] as i128, cell.a[tt * f + half + e] as i128);
+                assert_eq!(cell.c[tt * f + e] as i128, release(ar * qr - ai * qi, FACE_BITS), "tick {tick} site {tt} contact {e} real");
+                assert_eq!(cell.c[tt * f + half + e] as i128, release(ar * qi + ai * qr, FACE_BITS), "tick {tick} site {tt} contact {e} imaginary");
+                assert_eq!((cell.qm[tt * f + e] as i128, cell.qm[tt * f + half + e] as i128), (qr, qi));
+                let (yr, yi) = (i128::from(yr), i128::from(yi));
+                let (nr, ni) = (cell.b[tt * f + e] as i128 + release(yr * qr - yi * qi, GAMMA_BITS), cell.b[tt * f + half + e] as i128 + release(yr * qi + yi * qr, GAMMA_BITS));
+                (qr, qi) = (nr, ni);
             }
-            assert_eq!(p.ticks[1].c[tt * f + e] as i128, release(ar * br - ai * bi, FACE_BITS), "site {tt} contact {e} real");
-            assert_eq!(p.ticks[1].c[tt * f + half + e] as i128, release(ar * bi + ai * br, FACE_BITS), "site {tt} contact {e} imaginary");
         }
     }
-    assert!(p.ticks[0].prev_c.is_empty() && p.ticks[1].prev_c == p.ticks[0].c, "the carry's operand is the tick before's pair");
 }
 
-/// [definition; theory, November 10 23:30] **The carry's adjoint agrees with its code's central difference** on a field with the carry (`κ`
-/// drawn, ticks two): each family's three entries with the largest covectors, `κ`'s, `a`'s, `b`'s and `W`'s among them
-/// ([`the_laned_fields_covector_matches_its_codes_difference`]'s probe law), and `κ`'s covector is read at least once.
+/// [definition; theory, November 11 00:22, ruling R5 amended] **The scan's adjoint agrees with its code's central difference** on a field with the carry
+/// (the third chart drawn, ticks two): each family's three entries with the largest covectors, `G`'s, `a`'s, `b`'s and `W`'s among them
+/// ([`the_laned_fields_covector_matches_its_codes_difference`]'s probe law), and `G`'s covector is read at least once.
 #[test]
-fn the_carried_fields_covector_matches_its_codes_difference() {
+fn the_scans_covector_matches_its_codes_difference() {
     let sheets = |field: &Field, r: &Region| -> Vec<Vec<u32>> { field.pass(r, true).unwrap().ticks.iter().flat_map(|c| c.classes.iter().map(|l| l.off.iter().chain(&l.members).copied().chain(l.probes.iter().flat_map(|p| std::iter::once(u32::MAX).chain(p.iter().copied()))).collect())).collect() };
-    let (mut read, mut seams, mut kappa_read) = (0usize, 0usize, 0usize);
+    let (mut read, mut seams, mut g_read) = (0usize, 0usize, 0usize);
     for still in [0usize, 1, 2] {
         let field = carried_shaped(still);
         let r = region();
         let g = covector_of(&field, &r);
         let l = field.layout.clone();
-        assert!(g[l.kappa..l.kappa + field.declaration.contacts].iter().any(|&v| v != 0), "still {still}: κ has a covector");
+        let glen = field.declaration.contacts * field.declaration.width;
+        assert!(g[l.gchart..l.gchart + glen].iter().any(|&v| v != 0), "still {still}: G has a covector");
         for &(start, len, grain) in field.families() {
             if start == l.temper {
                 continue;
@@ -2290,7 +2300,7 @@ fn the_carried_fields_covector_matches_its_codes_difference() {
                     continue;
                 };
                 read += 1;
-                kappa_read += usize::from(start == l.kappa);
+                g_read += usize::from(start == l.gchart);
                 let measured = moved(delta).code(&r).unwrap().0 - moved(-delta).code(&r).unwrap().0;
                 let predicted = (g[i] * 2 * delta as i128) >> shift;
                 let tolerance = predicted.abs() / 8 + (64 << h);
@@ -2298,29 +2308,35 @@ fn the_carried_fields_covector_matches_its_codes_difference() {
             }
         }
     }
-    eprintln!("CARRY_COVECTOR_PROBES read={read} on_a_seam={seams} kappa={kappa_read}");
-    assert!(read > 0 && 16 * seams <= read && kappa_read > 0, "read {read} probes, {seams} on a seam, {kappa_read} of κ");
+    eprintln!("SCAN_COVECTOR_PROBES read={read} on_a_seam={seams} g={g_read}");
+    assert!(read > 0 && 16 * seams <= read && g_read > 0, "read {read} probes, {seams} on a seam, {g_read} of G");
 }
 
-/// [definition; theory, November 10 23:30] **The carry survives the growths**: a lane and four more contacts on a field with `κ` drawn keep every
-/// face; each old contact keeps its `κ` at its own place in its half and the new contacts' open at zero; growth by copies is refused.
+/// [definition; theory, November 11 00:22] **The carry survives the growths**: a lane and four more contacts on a field with `G` drawn keep every face
+/// (the lane's columns and the new contacts' rows of `G` open at zero), each old contact keeps its row of `G` at its own place in its half; growth by
+/// copies is refused.
 #[test]
 fn the_carry_survives_a_lane_and_a_growth_in_contacts() {
     let field = carried_shaped(1);
     let faces = field.faces(&region()).unwrap();
     let (laned, _) = field.laned(&keys(field.declaration.lane_draws())).unwrap();
     assert_eq!(laned.faces(&region()).unwrap(), faces);
-    assert_eq!(laned.theta[laned.layout.kappa..], field.theta[field.layout.kappa..], "κ as it was");
+    let (dw, dw2) = (field.declaration.width, laned.declaration.width);
+    let fc = laned.declaration.contacts;
+    for e in 0..fc {
+        assert_eq!(laned.theta[laned.layout.gchart + e * dw2..laned.layout.gchart + e * dw2 + dw], field.theta[field.layout.gchart + e * dw..field.layout.gchart + (e + 1) * dw], "contact {e}'s row of G");
+        assert!(laned.theta[laned.layout.gchart + e * dw2 + dw..laned.layout.gchart + (e + 1) * dw2].iter().all(|&v| v == 0), "the lane's columns of G open at zero");
+    }
     let (grown, from) = laned.contacted(4, &keys(laned.declaration.contact_draws(4))).unwrap();
     assert_eq!(grown.faces(&region()).unwrap(), faces);
-    let (fc, f2) = (laned.declaration.contacts, grown.declaration.contacts);
+    let f2 = grown.declaration.contacts;
     let kept = |e: usize| if e < fc / 2 { e } else { f2 / 2 + e - fc / 2 };
     for e in 0..fc {
-        assert_eq!(grown.theta[grown.layout.kappa + kept(e)], laned.theta[laned.layout.kappa + e], "contact {e}'s κ");
+        assert_eq!(grown.theta[grown.layout.gchart + kept(e) * dw2..grown.layout.gchart + (kept(e) + 1) * dw2], laned.theta[laned.layout.gchart + e * dw2..laned.layout.gchart + (e + 1) * dw2], "contact {e}'s row of G");
     }
     for k in 0..4 {
         let at = if k < 2 { fc / 2 + k } else { f2 / 2 + fc / 2 + k - 2 };
-        assert_eq!(grown.theta[grown.layout.kappa + at], 0, "a new contact's κ opens at zero");
+        assert!(grown.theta[grown.layout.gchart + at * dw2..grown.layout.gchart + (at + 1) * dw2].iter().all(|&v| v == 0), "a new contact's row of G opens at zero");
     }
     assert_eq!(from.iter().flatten().count(), laned.theta.len());
     assert!(field.grown(2, &keys(field.growth_draws(2))).is_err(), "no growth by copies with the carry");

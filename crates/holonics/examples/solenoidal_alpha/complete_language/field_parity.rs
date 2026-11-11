@@ -271,18 +271,19 @@ pub(super) fn parity(args: &[String], card: &mut dyn FieldRealization) -> Result
         founded.rate_parts = Some(rp);
         println!("FIELD_PARITY_PARTS octaves={k} contacts_before={}", rp.contacts_before);
     }
-    // [definition; theory, November 10 23:30, ruling R5] The carry across ticks (`FIELD_PARITY_CARRY=s`): the founded field (after its lanes and contacts) with
-    // the carry ([`FieldLearner::with_carry`]), `κ` drawn from the key file's tail, each 32-bit word shifted down `s` bits, so both realizations
-    // read the carry's forward and its adjoint with `κ` off zero (a founding's `κ` is zero, where only the first deposit reaches it).
+    // [definition; theory, November 11 00:22, ruling R5 amended] The carry along the strand (`FIELD_PARITY_CARRY=s`): the founded field (after its lanes and
+    // contacts) with the carry ([`FieldLearner::with_carry`]), the third chart `G` drawn from the key file's tail, each 32-bit word shifted down `s` bits, so both
+    // realizations read the scan and its adjoint with `G` off zero (a founding's `G` is zero, where only the first deposit reaches it).
     if let Some(shift) = std::env::var("FIELD_PARITY_CARRY").ok().and_then(|v| v.parse::<u32>().ok()) {
         founded = founded.with_carry().map_err(|e| e.to_string())?;
-        let (start, len) = (founded.field.layout().kappa, founded.field.declaration.contacts);
-        let tail = p.keys.len().checked_sub(4 * len + 8).ok_or("a key file too short for κ's draws")?;
+        let d = founded.field.declaration;
+        let (start, len) = (founded.field.layout().gchart, d.contacts * d.width);
+        let tail = p.keys.len().checked_sub(4 * len + 8).ok_or("a key file too short for G's draws")?;
         for k in 0..len {
             let word = &p.keys[tail + 4 * k..tail + 4 * k + 4];
             founded.field.theta[start + k] = i32::from_be_bytes([word[0], word[1], word[2], word[3]]) >> shift;
         }
-        println!("FIELD_PARITY_CARRY shift={shift} contacts={len} material={}", founded.field.material_len());
+        println!("FIELD_PARITY_CARRY shift={shift} entries={len} material={}", founded.field.material_len());
     }
     // [agent-inferred, November 2] A pace far from the founding (`FIELD_PARITY_PACE=s`, §16): every pace entry drawn from
     // the key file's tail, a 32-bit word shifted down `s` bits, so the clocks run off the byte place (fractional,

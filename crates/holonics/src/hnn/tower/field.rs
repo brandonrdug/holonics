@@ -222,11 +222,12 @@ pub struct FieldDeclaration {
     /// carries no moment (without a skin its moment would sum the whole region). The ring `ρ ← μρ + r` with `μ = 1` and `r`
     /// keyed by the arriving class; `r` is located by deposition, never authored.
     pub depth: usize,
-    /// [definition; theory, November 10 23:30, ruling R5] **The carry across ticks**: within a tick each complex contact pairs a site with one
-    /// strand mate, so the field holds a part of two letters' joint term and nothing longer. With the carry, tick `k`'s pair is
-    /// `p_e^k(t) = a_e^k(t) (b_e^k(m) + κ_e p_e^(k−1)(m))`, `m` the site's mate at the contact, `p^0 = 0`, `κ_e` complex one a complex
-    /// contact (`f` reals, the `kappa` family, founded at zero so every face of the founding is unchanged); the pair's return `W` reads `p`
-    /// where it read `c`. Carried in the head line (`hnn-field-v14k`); a field without it is the line before.
+    /// [definition; theory, November 11 00:22, ruling R5 amended] **The carry along the strand, a unit running to its stop in one tick**: a third
+    /// chart `g = G r̂` (`f × D`, complex as `a` and `b` are, founded at zero) beside `A` and `B`, `γ_e(t) = g_e(t) / √(1 + |g_e(t)|²)` (`|γ| < 1`), and
+    /// within the tick a scan in strand order (`Q` zero before the region's first site): even `e` from the left, `Q_e(t) = b_e(t) + γ_e(t) Q_e(t−1)`,
+    /// `p_e(t) = a_e(t) Q_e(t−1)`; odd `e` from the right, `Q_e(t) = b_e(t) + γ_e(t) Q_e(t+1)`, `p_e(t) = a_e(t) Q_e(t+1)`; the pair's return `W`
+    /// reads `p` where it read `c`. At `G = 0` it is the built contact bit for bit. Carried in the head line (`hnn-field-v14k`); a field without it is
+    /// the line before.
     pub carry: bool,
 }
 
@@ -532,9 +533,9 @@ pub struct FieldLayout {
     pub moment_face_bias: usize,
     /// The lift's bias `b_R` (`D`, §16.26).
     pub lift_bias: usize,
-    /// [definition; theory, November 10 23:30] The carry's `κ` (`f`, the contacts' real parts then imaginary, on the material's grain), after
-    /// every other family; absent (at the end, zero long) in a field without the carry.
-    pub kappa: usize,
+    /// [definition; theory, November 11 00:22] The carry's third chart `G` (`f × D`, on the material's grain), after every other family; absent (at the
+    /// end, zero long) in a field without the carry.
+    pub gchart: usize,
     pub len: usize,
     pub families: Vec<(usize, usize, u32)>,
 }
@@ -576,8 +577,8 @@ impl FieldLayout {
         let moment_face = push(dw * m2, MATERIAL_BITS);
         let moment_face_bias = push(dw, FACE_BITS);
         let lift_bias = push(dw, FACE_BITS);
-        let kappa = if d.carry { push(f, MATERIAL_BITS) } else { at };
-        Self { enc, before, after, q, q_bias, v, v_bias, out, out_bias, a: a_, a_bias, b, b_bias, w, w_bias, read, read_bias, moment_before, moment_after, temper, probe, probe_bias, pace, moment_face, moment_face_bias, lift_bias, kappa, len: at, families }
+        let gchart = if d.carry { push(f * dw, MATERIAL_BITS) } else { at };
+        Self { enc, before, after, q, q_bias, v, v_bias, out, out_bias, a: a_, a_bias, b, b_bias, w, w_bias, read, read_bias, moment_before, moment_after, temper, probe, probe_bias, pace, moment_face, moment_face_bias, lift_bias, gchart, len: at, families }
     }
 }
 
@@ -1117,9 +1118,13 @@ struct TickCell {
     a: Vec<i64>,
     b: Vec<i64>,
     c: Vec<i64>,
-    /// [definition; theory, November 10 23:30] The carry's operand: the pair of the tick before, `p^(k−1)` (`[t][f]`, the previous cell's `c`),
-    /// empty at the first tick and in a field without the carry. The reverse reads it for `κ`'s covector and `u = b + κ p^(k−1)`.
-    prev_c: Vec<i64>,
+    /// [definition; theory, November 11 00:22] The carry's operands (empty without it), what the reverse reads beside `a`, `b` and `c`: the third
+    /// chart `g` and its `γ` (`[t][f]`, `γ` on `2^(−30)`), the scale `s = 1/√(1 + |g|²)` a complex contact (`[t][f/2]`, `2^(−30)`) and `Q`'s
+    /// operand `Q(t ∓ 1)` (`[t][f]`, the scan's value before the site, on `2^(−16)`).
+    g: Vec<i64>,
+    gam: Vec<i64>,
+    sroot: Vec<i64>,
+    qm: Vec<i64>,
 }
 
 /// [definition; agent-inferred, November 1] **A head's resonance classes over a region** (the
@@ -1572,6 +1577,21 @@ fn round_trips(before: &[Vec<Source>], after: &[Vec<Source>], sites: usize, trip
 }
 
 /// Each family's `max |w|`, read once a pass.
+/// [definition; theory, November 11 00:22] The carry's `γ` grain: `2^(−30)`, the frames' (`|γ| < 1`, so a value below `2^30`).
+const GAMMA_BITS: u32 = MOVE_BITS;
+
+/// [definition; theory, November 11 00:22] **`γ = g / √(1 + |g|²)`**, `g` complex on `2^(−16)`: `|g|²` on `2^(−32)`, the radicand `(1 + |g|²) 2^32`
+/// on `2^(−64)`, its root attained **exactly** (`⌊√·⌋`, an integer square root: no iteration's residue) on `2^(−32)`, so the root's grain is `2^(−32)`
+/// and its width the radicand's half (at most 48 bits for `|g| < 2^47` on `2^(−16)`, past it refused); `γ` is `g` over the root to the nearest on
+/// `2^(−30)` (`g 2^46 / root`, a ratio of two integers), and the scale `s = 1/√(1 + |g|²)` (`γ`'s own return reads it) `2^62 / root` to the nearest on
+/// `2^(−30)`. Returns `((γ_re, γ_im), s)`.
+fn gamma_of(gr: i128, gi: i128) -> Result<((i64, i64), i64)> {
+    let radicand = ((1i128 << 32) + gr * gr + gi * gi).checked_mul(1 << 32).filter(|&r| r > 0).ok_or(TowerError::Refused("a carry's chart past its 128-bit carrier"))?;
+    let root = i128::try_from((radicand as u128).isqrt()).map_err(|_| TowerError::Refused("a carry's root past its carrier"))?;
+    let part = |g: i128| -> Result<i64> { fit64(div_nearest(g.checked_shl(46).ok_or(TowerError::Refused("a carry's chart past its 128-bit carrier"))?, root)) };
+    Ok(((part(gr)?, part(gi)?), fit64(div_nearest(1i128 << 62, root))?))
+}
+
 struct Reaches {
     probe: u64,
     q: u64,
@@ -1580,6 +1600,7 @@ struct Reaches {
     a: u64,
     b: u64,
     w: u64,
+    g: u64,
     read: u64,
     moment_face: u64,
 }
@@ -1927,7 +1948,7 @@ impl Field {
         let (dw, m2, f) = (self.declaration.width, 2 * self.declaration.complex(), self.declaration.contacts);
         let l = &self.layout;
         let r = |start: usize, len: usize| reach(&self.theta[start..start + len]);
-        Reaches { probe: r(l.probe, m2 * dw), q: r(l.q, m2 * dw), v: r(l.v, m2 * dw), out: r(l.out, dw * m2), a: r(l.a, f * dw), b: r(l.b, f * dw), w: r(l.w, dw * f), read: r(l.read, dw * dw), moment_face: r(l.moment_face, dw * m2) }
+        Reaches { probe: r(l.probe, m2 * dw), q: r(l.q, m2 * dw), v: r(l.v, m2 * dw), out: r(l.out, dw * m2), a: r(l.a, f * dw), b: r(l.b, f * dw), w: r(l.w, dw * f), g: r(l.gchart, if self.declaration.carry { f * dw } else { 0 }), read: r(l.read, dw * dw), moment_face: r(l.moment_face, dw * m2) }
     }
 
     fn admit_region(&self, region: &Region) -> Result<()> {
@@ -2461,30 +2482,56 @@ impl Field {
             affine(&self.theta[l.a..l.a + f * dw], reaches.a, dw, rt, Some(&self.theta[l.a_bias..l.a_bias + f]), MATERIAL_BITS, MATERIAL_BITS, &mut cell.a[t * f..(t + 1) * f])?;
             affine(&self.theta[l.b..l.b + f * dw], reaches.b, dw, rt, Some(&self.theta[l.b_bias..l.b_bias + f]), MATERIAL_BITS, MATERIAL_BITS, &mut cell.b[t * f..(t + 1) * f])?;
         }
-        for t in 0..sites {
-            // [definition; agent-inferred, November 3, §16.34] The complex product a contact (§15.1) is a pair contact along
-            // the strand: contact `e < f/2` is `a_e + i a_(f/2+e)` at the site against its strand neighbour's `b`, the one
-            // before it at an even `e` and the one after at an odd ([`strand_mate`]), so two ring faces compose by adding
-            // their phases, `q(x + y) = q(x) q(y)`, across the strand's contact; none past the region's ends.
+        // [definition; theory, November 11 00:22, ruling R5 amended] **The carry's scan** (a unit running to its stop in one tick): the third chart
+        // `g = G r̂`, `γ = g / √(1 + |g|²)` ([`gamma_of`]), and along the strand, one release a step in strand order (never a parallel prefix,
+        // which would reorder the releases): even contacts from the left, odd from the right, `p(t) = a(t) Q(t∓1)` and `Q(t) = b(t) + γ(t) Q(t∓1)`,
+        // `Q` zero before the region's first site (past its last, for odd `e`); at `G = 0` `p(t) = a(t) b(mate)`, the built contact.
+        if d.carry {
             let half = f / 2;
+            cell.g = vec![0i64; sites * f];
+            cell.gam = vec![0i64; sites * f];
+            cell.sroot = vec![0i64; sites * half];
+            cell.qm = vec![0i64; sites * f];
+            for t in 0..sites {
+                let rt = &cell.read2[t * dw..(t + 1) * dw];
+                affine(&self.theta[l.gchart..l.gchart + f * dw], reaches.g, dw, rt, None, MATERIAL_BITS, MATERIAL_BITS, &mut cell.g[t * f..(t + 1) * f])?;
+            }
             for e in 0..half {
-                let (ar, ai) = (cell.a[t * f + e] as i128, cell.a[t * f + half + e] as i128);
-                let (mut br, mut bi) = match strand_mate(t, e, sites) {
-                    Some(s) => (cell.b[s * f + e] as i128, cell.b[s * f + half + e] as i128),
-                    None => (0, 0),
-                };
-                // [definition; theory, November 10 23:30] The carry: `u = b(m) + κ p^(k−1)(m)`, the complex product released from `κ`'s grain to
-                // the face's (`2^(−24)` over `2^(−16)`, as `b` is), the mate's pair of the tick before (none at the first tick).
-                if d.carry && !cell.prev_c.is_empty() {
-                    if let Some(s) = strand_mate(t, e, sites) {
-                        let (kr, ki) = (self.theta[l.kappa + e] as i128, self.theta[l.kappa + half + e] as i128);
-                        let (pr, pi) = (cell.prev_c[s * f + e] as i128, cell.prev_c[s * f + half + e] as i128);
-                        br += release(kr * pr - ki * pi, MATERIAL_BITS);
-                        bi += release(kr * pi + ki * pr, MATERIAL_BITS);
-                    }
+                let (mut qr, mut qi) = (0i128, 0i128);
+                for step in 0..sites {
+                    let t = if e % 2 == 0 { step } else { sites - 1 - step };
+                    let ((yr, yi), s) = gamma_of(cell.g[t * f + e] as i128, cell.g[t * f + half + e] as i128)?;
+                    cell.gam[t * f + e] = yr;
+                    cell.gam[t * f + half + e] = yi;
+                    cell.sroot[t * half + e] = s;
+                    cell.qm[t * f + e] = fit64(qr)?;
+                    cell.qm[t * f + half + e] = fit64(qi)?;
+                    let (ar, ai) = (cell.a[t * f + e] as i128, cell.a[t * f + half + e] as i128);
+                    cell.c[t * f + e] = fit64(release(ar * qr - ai * qi, FACE_BITS))?;
+                    cell.c[t * f + half + e] = fit64(release(ar * qi + ai * qr, FACE_BITS))?;
+                    let (yr, yi) = (i128::from(yr), i128::from(yi));
+                    let next_r = cell.b[t * f + e] as i128 + release(yr * qr - yi * qi, GAMMA_BITS);
+                    let next_i = cell.b[t * f + half + e] as i128 + release(yr * qi + yi * qr, GAMMA_BITS);
+                    (qr, qi) = (i128::from(fit64(next_r)?), i128::from(fit64(next_i)?));
                 }
-                cell.c[t * f + e] = fit64(release(ar * br - ai * bi, FACE_BITS))?;
-                cell.c[t * f + half + e] = fit64(release(ar * bi + ai * br, FACE_BITS))?;
+            }
+        }
+        for t in 0..sites {
+            if !d.carry {
+                // [definition; agent-inferred, November 3, §16.34] The complex product a contact (§15.1) is a pair contact along
+                // the strand: contact `e < f/2` is `a_e + i a_(f/2+e)` at the site against its strand neighbour's `b`, the one
+                // before it at an even `e` and the one after at an odd ([`strand_mate`]), so two ring faces compose by adding
+                // their phases, `q(x + y) = q(x) q(y)`, across the strand's contact; none past the region's ends.
+                let half = f / 2;
+                for e in 0..half {
+                    let (ar, ai) = (cell.a[t * f + e] as i128, cell.a[t * f + half + e] as i128);
+                    let (br, bi) = match strand_mate(t, e, sites) {
+                        Some(s) => (cell.b[s * f + e] as i128, cell.b[s * f + half + e] as i128),
+                        None => (0, 0),
+                    };
+                    cell.c[t * f + e] = fit64(release(ar * br - ai * bi, FACE_BITS))?;
+                    cell.c[t * f + half + e] = fit64(release(ar * bi + ai * br, FACE_BITS))?;
+                }
             }
             affine(&self.theta[l.w..l.w + dw * f], reaches.w, f, &cell.c[t * f..(t + 1) * f], Some(&self.theta[l.w_bias..l.w_bias + dw]), MATERIAL_BITS, MATERIAL_BITS, &mut o)?;
             for (xv, ov) in x[t * dw..(t + 1) * dw].iter_mut().zip(&o) {
@@ -2515,8 +2562,6 @@ impl Field {
         let blanks = !paces.kappa.is_empty() && (0..sites).any(|t| Self::silent(region, t));
         let window = region.window(d.ticks);
         let mut clock: Option<Box<TickClock>> = None;
-        // The carry's operand: the tick before's pair (empty at the first tick).
-        let mut carried_p: Vec<i64> = Vec::new();
         for k in 0..d.ticks {
             if let Some(s) = self.scale.as_deref().filter(|s| s.split == k) {
                 out.tower = Some(self.scale_forward(s, &mut x, &definite, &keyed, keep)?);
@@ -2524,13 +2569,7 @@ impl Field {
             let own = clock.take();
             let (tick_paces, tick_moment) = own.as_ref().map_or((&paces, &moment), |c| (&c.paces, &c.moment));
             let mut cell = TickCell::default();
-            if d.carry {
-                cell.prev_c = std::mem::take(&mut carried_p);
-            }
             self.tick(&mut x, &definite, &keyed, tick_paces, tick_moment, &reaches, window.as_deref(), &mut cell)?;
-            if d.carry {
-                carried_p = cell.c.clone();
-            }
             cell.clock = own;
             if blanks && k + 1 < d.ticks {
                 // [the unified-theory reading of November 6, 08:16] Only the blanks a clock reads are read: every silent place up
@@ -2888,7 +2927,7 @@ impl Field {
     /// shares and the currents' covectors where read). A region's reverse reads its ticks through it in reverse order; a
     /// tower of scales reads each level's ticks through it.
     #[allow(clippy::too_many_arguments)]
-    fn tick_return(&self, cell: &TickCell, dx: &mut [i64], carry: &mut Vec<i64>, g: &mut [i128], paces: &Paces, definite: &[bool], dm: &mut [i128], gtau: &mut [Vec<i128>], gsig: &mut [Vec<i128>], mut shares: Option<&mut [u128]>, mut currents: Option<&mut Vec<Vec<i64>>>) -> Result<()> {
+    fn tick_return(&self, cell: &TickCell, dx: &mut [i64], g: &mut [i128], paces: &Paces, definite: &[bool], dm: &mut [i128], gtau: &mut [Vec<i128>], gsig: &mut [Vec<i128>], mut shares: Option<&mut [u128]>, mut currents: Option<&mut Vec<Vec<i64>>>) -> Result<()> {
         let d = &self.declaration;
         let (dw, m, n, f, heads, lanes) = (d.width, d.complex(), d.modes, d.contacts, d.heads, d.lanes);
         let m2 = 2 * m;
@@ -2912,60 +2951,64 @@ impl Field {
         for t in 0..sites {
             transposed(&self.theta[l.w..l.w + dw * f], reaches.w, f, dxs[t], MATERIAL_BITS, &mut dc[t * f..(t + 1) * f])?;
         }
-        // [definition; theory, November 10 23:30] The carry's return: the covector of this tick's pair `p^k` is the pair's return's and the later
-        // tick's (`carry`, `conj(κ) δb^(k+1)` at each mate, the producing operands' adjoint), reaching `a^k`, `b^k(m)`, `κ` and `p^(k−1)(m)`.
-        let carried = d.carry;
-        if carried && !carry.is_empty() {
-            for (v, &c) in dc.iter_mut().zip(carry.iter()) {
-                *v = fit64(*v as i128 + c as i128)?;
-            }
-        }
-        // `δa_t = conj(u_s) δc_t`, `δb_s = conj(a_t) δc_t` for the complex product of site `t` and its strand mate `s`
-        // (§16.34), `u = b + κ p^(k−1)` (`b` where there is no carry); each site's `b` is one mate's, so each `δb_s` is one term.
         let half = f / 2;
-        let held = carried && !cell.prev_c.is_empty();
-        for t in 0..sites {
-            for e in 0..half {
-                let Some(s) = strand_mate(t, e, sites) else { continue };
-                let (gr, gi) = (dc[t * f + e] as i128, dc[t * f + half + e] as i128);
-                let (ar, ai) = (cell.a[t * f + e] as i128, cell.a[t * f + half + e] as i128);
-                let (mut br, mut bi) = (cell.b[s * f + e] as i128, cell.b[s * f + half + e] as i128);
-                if held {
-                    let (kr, ki) = (self.theta[l.kappa + e] as i128, self.theta[l.kappa + half + e] as i128);
-                    let (pr, pi) = (cell.prev_c[s * f + e] as i128, cell.prev_c[s * f + half + e] as i128);
-                    br += release(kr * pr - ki * pi, MATERIAL_BITS);
-                    bi += release(kr * pi + ki * pr, MATERIAL_BITS);
-                }
-                da[t * f + e] = fit64(release(br * gr + bi * gi, FACE_BITS))?;
-                da[t * f + half + e] = fit64(release(br * gi - bi * gr, FACE_BITS))?;
-                db[s * f + e] = fit64(release(ar * gr + ai * gi, FACE_BITS))?;
-                db[s * f + half + e] = fit64(release(ar * gi - ai * gr, FACE_BITS))?;
-            }
-        }
-        // `δκ += conj(p^(k−1)(m)) δu(t)` summed over the sites `t` of the mate `m = s` is `conj(p^(k−1)(s)) δb(s)`, and the earlier tick's
-        // pair at `s` receives `conj(κ) δb(s)`.
-        if carried {
-            let mut next = vec![0i64; sites * f];
-            for s in 0..sites {
+        let mut dg = vec![0i64; if d.carry { sites * f } else { 0 }];
+        if !d.carry {
+            // `δa_t = conj(b_s) δc_t`, `δb_s = conj(a_t) δc_t` for the complex product of site `t` and its strand mate `s`
+            // (§16.34); each site's `b` is one mate's, so each `δb_s` is one term.
+            for t in 0..sites {
                 for e in 0..half {
-                    let (dbr, dbi) = (db[s * f + e] as i128, db[s * f + half + e] as i128);
-                    if held {
-                        let (pr, pi) = (cell.prev_c[s * f + e] as i128, cell.prev_c[s * f + half + e] as i128);
-                        g[l.kappa + e] += pr * dbr + pi * dbi;
-                        g[l.kappa + half + e] += pr * dbi - pi * dbr;
-                    }
-                    let (kr, ki) = (self.theta[l.kappa + e] as i128, self.theta[l.kappa + half + e] as i128);
-                    next[s * f + e] = fit64(release(kr * dbr + ki * dbi, MATERIAL_BITS))?;
-                    next[s * f + half + e] = fit64(release(kr * dbi - ki * dbr, MATERIAL_BITS))?;
+                    let Some(s) = strand_mate(t, e, sites) else { continue };
+                    let (gr, gi) = (dc[t * f + e] as i128, dc[t * f + half + e] as i128);
+                    let (ar, ai) = (cell.a[t * f + e] as i128, cell.a[t * f + half + e] as i128);
+                    let (br, bi) = (cell.b[s * f + e] as i128, cell.b[s * f + half + e] as i128);
+                    da[t * f + e] = fit64(release(br * gr + bi * gi, FACE_BITS))?;
+                    da[t * f + half + e] = fit64(release(br * gi - bi * gr, FACE_BITS))?;
+                    db[s * f + e] = fit64(release(ar * gr + ai * gi, FACE_BITS))?;
+                    db[s * f + half + e] = fit64(release(ar * gi - ai * gr, FACE_BITS))?;
                 }
             }
-            *carry = next;
+        } else {
+            // [definition; theory, November 11 00:22, ruling R5 amended] **The scan's reverse**, with the producing operands (`a`, `b`, `γ`, `s` and
+            // `Q`'s operand `Qm(t) = Q(t ∓ 1)` of the forward), in the opposite strand order, one release a step. With `X(t)` the covector of
+            // `Qm(t)` and `u` the covector of `Q(t)` (`X(t ± 1)`, the next site of the reverse): `δa(t) = conj(Qm(t)) δp(t)`, `δb(t) = u`,
+            // `δγ(t) = conj(Qm(t)) u`, `X(t) = conj(a(t)) δp(t) + conj(γ(t)) u`; and through `γ = s g`, `δg = s (δγ − (γ·δγ) γ)`
+            // (the real dot, `s² = 1 − |γ|²`).
+            for e in 0..half {
+                let (mut xr, mut xi) = (0i128, 0i128);
+                for step in 0..sites {
+                    let t = if e % 2 == 0 { sites - 1 - step } else { step };
+                    let (gr, gi) = (dc[t * f + e] as i128, dc[t * f + half + e] as i128);
+                    let (ar, ai) = (cell.a[t * f + e] as i128, cell.a[t * f + half + e] as i128);
+                    let (qr, qi) = (cell.qm[t * f + e] as i128, cell.qm[t * f + half + e] as i128);
+                    let (yr, yi) = (cell.gam[t * f + e] as i128, cell.gam[t * f + half + e] as i128);
+                    let (ur, ui) = (xr, xi);
+                    db[t * f + e] = fit64(ur)?;
+                    db[t * f + half + e] = fit64(ui)?;
+                    da[t * f + e] = fit64(release(qr * gr + qi * gi, FACE_BITS))?;
+                    da[t * f + half + e] = fit64(release(qr * gi - qi * gr, FACE_BITS))?;
+                    let (dyr, dyi) = (release(qr * ur + qi * ui, FACE_BITS), release(qr * ui - qi * ur, FACE_BITS));
+                    xr = release(ar * gr + ai * gi, FACE_BITS) + release(yr * ur + yi * ui, GAMMA_BITS);
+                    xi = release(ar * gi - ai * gr, FACE_BITS) + release(yr * ui - yi * ur, GAMMA_BITS);
+                    xr = i128::from(fit64(xr)?);
+                    xi = i128::from(fit64(xi)?);
+                    let dot = release(yr * dyr + yi * dyi, GAMMA_BITS);
+                    let (tr, ti) = (dyr - release(dot * yr, GAMMA_BITS), dyi - release(dot * yi, GAMMA_BITS));
+                    let sc = cell.sroot[t * half + e] as i128;
+                    dg[t * f + e] = fit64(release(sc * tr, GAMMA_BITS))?;
+                    dg[t * f + half + e] = fit64(release(sc * ti, GAMMA_BITS))?;
+                }
+            }
         }
         let das: Vec<&[i64]> = da.chunks_exact(f).collect();
         let dbs: Vec<&[i64]> = db.chunks_exact(f).collect();
         let r2s: Vec<&[i32]> = cell.read2.chunks_exact(dw).collect();
         outer_sum(&mut g[l.a..l.a + f * dw], dw, &das, &r2s)?;
         outer_sum(&mut g[l.b..l.b + f * dw], dw, &dbs, &r2s)?;
+        if d.carry {
+            let dgs: Vec<&[i64]> = dg.chunks_exact(f).collect();
+            outer_sum(&mut g[l.gchart..l.gchart + f * dw], dw, &dgs, &r2s)?;
+        }
         for t in 0..sites {
             for e in 0..f {
                 g[l.a_bias + e] += das[t][e] as i128;
@@ -2975,10 +3018,14 @@ impl Field {
         let mut dmid = vec![0i64; sites * dw];
         let mut ra = vec![0i64; dw];
         let mut rb = vec![0i64; dw];
+        let mut rg = vec![0i64; dw];
         for t in 0..sites {
             transposed(&self.theta[l.a..l.a + f * dw], reaches.a, dw, das[t], MATERIAL_BITS, &mut ra)?;
             transposed(&self.theta[l.b..l.b + f * dw], reaches.b, dw, dbs[t], MATERIAL_BITS, &mut rb)?;
-            let dr: Vec<i64> = ra.iter().zip(&rb).map(|(&p, &q)| p + q).collect();
+            if d.carry {
+                transposed(&self.theta[l.gchart..l.gchart + f * dw], reaches.g, dw, &dg[t * f..(t + 1) * f], MATERIAL_BITS, &mut rg)?;
+            }
+            let dr: Vec<i64> = if d.carry { ra.iter().zip(&rb).zip(&rg).map(|((&p, &q), &r)| p + q + r).collect() } else { ra.iter().zip(&rb).map(|(&p, &q)| p + q).collect() };
             let back = lane_adjoint(r2s[t], &cell.scale2[t * lanes..(t + 1) * lanes], &dr)?;
             for i in 0..dw {
                 dmid[t * dw + i] = fit64(dx[t * dw + i] as i128 + back[i] as i128)?;
@@ -3396,11 +3443,10 @@ impl Field {
             }
             outer_sum(&mut g[l.read..l.read + dw * dw], dw, &ys, &xs)?;
         }
-        let mut carry: Vec<i64> = Vec::new();
         for (k, cell) in pass.ticks.iter().enumerate().rev() {
             let at = if cell.clock.is_some() { k + 1 } else { 0 };
             let r = returns[at].get_or_insert_with(|| ClockReturn::new(paced, sites, m2));
-            self.tick_return(cell, &mut dx, &mut carry, g, pass.paces_at(cell), &definite, &mut r.dm, &mut r.gtau, &mut r.gsig, shares.as_deref_mut(), currents.as_deref_mut())?;
+            self.tick_return(cell, &mut dx, g, pass.paces_at(cell), &definite, &mut r.dm, &mut r.gtau, &mut r.gsig, shares.as_deref_mut(), currents.as_deref_mut())?;
             if let Some(s) = self.scale.as_deref().filter(|s| s.split == k) {
                 let sp = pass.tower.as_ref().ok_or(TowerError::Refused("a tower's reverse reads a forward that held its scale"))?;
                 self.scale_return(s, sp, &mut dx, g)?;
@@ -4383,8 +4429,9 @@ impl Field {
         ] {
             place(o, n, 1, len, len);
         }
+        // [theory, November 11 00:22] The carry's third chart reads the face as `a` and `b` do (its columns the coordinates): the lane's columns at zero.
         if d.carry {
-            place(ol.kappa, layout.kappa, 1, fc, fc);
+            place(ol.gchart, layout.gchart, fc, dw, dw2);
         }
         // The lane's founding draws.
         let mut cursor = 0usize;
@@ -4431,7 +4478,7 @@ impl Field {
         }
         let d = FieldDeclaration { carry: true, ..self.declaration };
         let mut theta = self.theta.clone();
-        theta.extend(std::iter::repeat_n(0, d.contacts));
+        theta.extend(std::iter::repeat_n(0, d.contacts * d.width));
         let mut out = Self::with_theta(d, theta);
         (out.per_blank_clock, out.bare_stretch) = (self.per_blank_clock, self.bare_stretch);
         Ok(out)
@@ -4470,7 +4517,11 @@ impl Field {
         }
         // The families that read or write the face through a contact, by their old start: the pair drives (a contact a row),
         // their biases, the pair's return (a contact a column) and the energy's contraction.
-        let drives = [(ol.a, layout.a), (ol.b, layout.b)];
+        let mut drives = vec![(ol.a, layout.a), (ol.b, layout.b)];
+        if old.carry {
+            // [theory, November 11 00:22] The third chart's rows are contacts too: each old contact keeps its row, the new contacts' open at zero.
+            drives.push((ol.gchart, layout.gchart));
+        }
         for (&(os, ol_len, _), &(ns, nl_len, _)) in ol.families.iter().zip(&layout.families) {
             if let Some(&(_, ns)) = drives.iter().find(|&&(o, _)| o == os) {
                 for e in 0..fc {
@@ -4490,12 +4541,6 @@ impl Field {
                         new[ns + r * f2 + kept(e)] = self.theta[os + r * fc + e];
                         from[ns + r * f2 + kept(e)] = Some(os + r * fc + e);
                     }
-                }
-            } else if old.carry && os == ol.kappa {
-                // [theory, November 10 23:30] The carry's `κ`: each old contact keeps its own, the new contacts' open at zero.
-                for e in 0..fc {
-                    new[ns + kept(e)] = self.theta[os + e];
-                    from[ns + kept(e)] = Some(os + e);
                 }
             } else {
                 if ol_len != nl_len {
@@ -4545,6 +4590,27 @@ pub struct TickRead {
 }
 
 impl Field {
+    /// [measurement; theory, November 11 00:22] **The carry's `γ` over a read pair chart** (`TickRead::pair_read`, `[t][D]`): at every site and complex contact
+    /// the `γ = g / √(1 + |g|²)` of `g = G r̂` ([`gamma_of`]), `[t][f/2]` on `2^(−30)`, a reading (the forward's own arithmetic on the chart the realization read).
+    pub fn carry_gammas(&self, pair_read: &[i32]) -> Result<Vec<(i64, i64)>> {
+        let d = &self.declaration;
+        if !d.carry {
+            return refuse("a field without the carry has no γ");
+        }
+        let (dw, f) = (d.width, d.contacts);
+        let (l, reach) = (&self.layout, self.reaches().g);
+        let half = f / 2;
+        let mut g = vec![0i64; f];
+        let mut out = Vec::with_capacity(pair_read.len() / dw * half);
+        for rt in pair_read.chunks_exact(dw) {
+            affine(&self.theta[l.gchart..l.gchart + f * dw], reach, dw, rt, None, MATERIAL_BITS, MATERIAL_BITS, &mut g)?;
+            for e in 0..half {
+                out.push(gamma_of(g[e] as i128, g[half + e] as i128)?.0);
+            }
+        }
+        Ok(out)
+    }
+
     /// Each tick's read of `region` ([`TickRead`]), in tick order.
     pub fn tick_reads(&self, region: &Region) -> Result<Vec<TickRead>> {
         let pass = self.pass(region, true)?;
@@ -4778,7 +4844,7 @@ fn predicted_change(field: &Field, g: &[i128], step: &[i128], halvings: u32) -> 
 /// and each lane family on its own (the second lane's coordinates, [`Field::laned`], of the encodings `E`, `E₋`, `E₊`, the key,
 /// value and probe charts, the current's return, the moment's chart, the readout's lift, the face biases together, and the lane's
 /// columns of `a` and `b`). The old entries (and `W`'s lane rows) are no part.
-pub const PART_NAMES: [&str; 16] = ["w_new", "a_new", "b_new", "enc_lane", "before_lane", "after_lane", "q_lane", "v_lane", "probe_lane", "out_lane", "moment_face_lane", "read_lane", "face_biases_lane", "a_lane", "b_lane", "kappa"];
+pub const PART_NAMES: [&str; 16] = ["w_new", "a_new", "b_new", "enc_lane", "before_lane", "after_lane", "q_lane", "v_lane", "probe_lane", "out_lane", "moment_face_lane", "read_lane", "face_biases_lane", "a_lane", "b_lane", "g_chart"];
 
 /// The number of founded parts ([`PART_NAMES`]).
 pub const PARTS: usize = PART_NAMES.len();
@@ -4905,9 +4971,9 @@ impl Field {
                 parts[start + e * dw + lw..start + (e + 1) * dw].fill(part);
             }
         }
-        // [theory, November 10 23:30] The carry's `κ`, a part of its own.
+        // [theory, November 11 00:22] The carry's third chart `G`, a part of its own.
         if d.carry {
-            parts[l.kappa..l.kappa + f].fill(15);
+            parts[l.gchart..l.gchart + f * dw].fill(15);
         }
         // The new contacts', over the lane's.
         for e in (0..f).filter(|&e| new_contact(e)) {
