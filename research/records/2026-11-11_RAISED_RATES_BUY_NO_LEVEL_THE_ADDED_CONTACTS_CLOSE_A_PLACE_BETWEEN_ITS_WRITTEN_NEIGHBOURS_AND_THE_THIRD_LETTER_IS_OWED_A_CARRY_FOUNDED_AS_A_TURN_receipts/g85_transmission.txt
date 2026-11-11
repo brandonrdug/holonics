@@ -1,0 +1,54 @@
+# The transmission reads of the tf laps' means (K4's and M1's read with the binary as an argument, transmission_as.sh, open-0, the build that
+# trained each), 2026-11-11 UTC, on the card, projection 238 s, deadline 297 s, measured on the MEASURE lines. Their pairs' are in
+# g83_transmission.txt.
+## tf1_mean
+FIELD_TRANSMISSION mode=open-left l=0 r=0 spacing=0 regions=8760 places=8760 out=0 code_nats_a_place=3.189401 ms=13602
+FIELD_TRANSMISSION mode=open-left l=1 r=0 spacing=0 regions=8728 places=8728 out=32 code_nats_a_place=2.613818 ms=27096
+FIELD_TRANSMISSION mode=open-left l=2 r=0 spacing=0 regions=8696 places=8696 out=64 code_nats_a_place=2.167166 ms=40614
+FIELD_TRANSMISSION mode=open-left l=3 r=0 spacing=0 regions=8664 places=8664 out=96 code_nats_a_place=1.975350 ms=54087
+FIELD_TRANSMISSION mode=open-left l=4 r=0 spacing=0 regions=8632 places=8632 out=128 code_nats_a_place=1.940355 ms=67478
+FIELD_TRANSMISSION mode=open-left l=8 r=0 spacing=0 regions=8504 places=8504 out=256 code_nats_a_place=1.901299 ms=80674
+FIELD_TRANSMISSION mode=open-both l=1 r=1 spacing=0 regions=8696 places=8696 out=64 code_nats_a_place=1.847679 ms=94072
+FIELD_TRANSMISSION mode=open-both l=2 r=2 spacing=0 regions=8632 places=8632 out=128 code_nats_a_place=1.185645 ms=107554
+FIELD_TRANSMISSION mode=open-both l=3 r=3 spacing=0 regions=8568 places=8568 out=192 code_nats_a_place=1.016420 ms=120944
+FIELD_TRANSMISSION mode=open-both l=4 r=4 spacing=0 regions=8504 places=8504 out=256 code_nats_a_place=0.977335 ms=134404
+FIELD_TRANSMISSION mode=open-split l=3 r=1 spacing=0 regions=8632 places=8632 out=128 code_nats_a_place=1.330024 ms=147838
+FIELD_TRANSMISSION mode=open-split l=1 r=3 spacing=0 regions=8632 places=8632 out=128 code_nats_a_place=1.379548 ms=161271
+FIELD_TRANSMISSION mode=open-split l=2 r=1 spacing=0 regions=8664 places=8664 out=96 code_nats_a_place=1.468699 ms=174785
+FIELD_TRANSMISSION mode=open-split l=1 r=2 spacing=0 regions=8664 places=8664 out=96 code_nats_a_place=1.480877 ms=188284
+FIELD_TRANSMISSION_DONE ms=188286
+MEASURE lap=transmission_open_tf1_mean rc=0 wall_s=188.7 peak_rss_kib=367444
+## tf2_mean
+FIELD_TRANSMISSION mode=open-left l=0 r=0 spacing=0 regions=8760 places=8760 out=0 code_nats_a_place=3.184921 ms=14975
+FIELD_TRANSMISSION mode=open-left l=1 r=0 spacing=0 regions=8728 places=8728 out=32 code_nats_a_place=2.610604 ms=29876
+FIELD_TRANSMISSION mode=open-left l=2 r=0 spacing=0 regions=8696 places=8696 out=64 code_nats_a_place=2.162915 ms=44710
+FIELD_TRANSMISSION mode=open-left l=3 r=0 spacing=0 regions=8664 places=8664 out=96 code_nats_a_place=1.971195 ms=59480
+FIELD_TRANSMISSION mode=open-left l=4 r=0 spacing=0 regions=8632 places=8632 out=128 code_nats_a_place=1.935703 ms=74225
+FIELD_TRANSMISSION mode=open-left l=8 r=0 spacing=0 regions=8504 places=8504 out=256 code_nats_a_place=1.894957 ms=88869
+FIELD_TRANSMISSION mode=open-both l=1 r=1 spacing=0 regions=8696 places=8696 out=64 code_nats_a_place=1.841997 ms=103633
+FIELD_TRANSMISSION mode=open-both l=2 r=2 spacing=0 regions=8632 places=8632 out=128 code_nats_a_place=1.176267 ms=118343
+FIELD_TRANSMISSION mode=open-both l=3 r=3 spacing=0 regions=8568 places=8568 out=192 code_nats_a_place=1.008644 ms=133112
+FIELD_TRANSMISSION mode=open-both l=4 r=4 spacing=0 regions=8504 places=8504 out=256 code_nats_a_place=0.967900 ms=147817
+FIELD_TRANSMISSION mode=open-split l=3 r=1 spacing=0 regions=8632 places=8632 out=128 code_nats_a_place=1.321475 ms=162544
+FIELD_TRANSMISSION mode=open-split l=1 r=3 spacing=0 regions=8632 places=8632 out=128 code_nats_a_place=1.373499 ms=177191
+FIELD_TRANSMISSION mode=open-split l=2 r=1 spacing=0 regions=8664 places=8664 out=96 code_nats_a_place=1.459994 ms=192018
+FIELD_TRANSMISSION mode=open-split l=1 r=2 spacing=0 regions=8664 places=8664 out=96 code_nats_a_place=1.473660 ms=206789
+FIELD_TRANSMISSION_DONE ms=206791
+MEASURE lap=transmission_open_tf2_mean rc=0 wall_s=207.2 peak_rss_kib=368656
+## tf3_mean
+FIELD_TRANSMISSION mode=open-left l=0 r=0 spacing=0 regions=8760 places=8760 out=0 code_nats_a_place=3.184872 ms=12239
+FIELD_TRANSMISSION mode=open-left l=1 r=0 spacing=0 regions=8728 places=8728 out=32 code_nats_a_place=2.608655 ms=24455
+FIELD_TRANSMISSION mode=open-left l=2 r=0 spacing=0 regions=8696 places=8696 out=64 code_nats_a_place=2.162578 ms=36529
+FIELD_TRANSMISSION mode=open-left l=3 r=0 spacing=0 regions=8664 places=8664 out=96 code_nats_a_place=1.970334 ms=48601
+FIELD_TRANSMISSION mode=open-left l=4 r=0 spacing=0 regions=8632 places=8632 out=128 code_nats_a_place=1.932314 ms=60621
+FIELD_TRANSMISSION mode=open-left l=8 r=0 spacing=0 regions=8504 places=8504 out=256 code_nats_a_place=1.887172 ms=72624
+FIELD_TRANSMISSION mode=open-both l=1 r=1 spacing=0 regions=8696 places=8696 out=64 code_nats_a_place=1.836377 ms=84724
+FIELD_TRANSMISSION mode=open-both l=2 r=2 spacing=0 regions=8632 places=8632 out=128 code_nats_a_place=1.169907 ms=96772
+FIELD_TRANSMISSION mode=open-both l=3 r=3 spacing=0 regions=8568 places=8568 out=192 code_nats_a_place=1.001326 ms=108782
+FIELD_TRANSMISSION mode=open-both l=4 r=4 spacing=0 regions=8504 places=8504 out=256 code_nats_a_place=0.960656 ms=120770
+FIELD_TRANSMISSION mode=open-split l=3 r=1 spacing=0 regions=8632 places=8632 out=128 code_nats_a_place=1.315751 ms=132765
+FIELD_TRANSMISSION mode=open-split l=1 r=3 spacing=0 regions=8632 places=8632 out=128 code_nats_a_place=1.368788 ms=144801
+FIELD_TRANSMISSION mode=open-split l=2 r=1 spacing=0 regions=8664 places=8664 out=96 code_nats_a_place=1.455776 ms=156904
+FIELD_TRANSMISSION mode=open-split l=1 r=2 spacing=0 regions=8664 places=8664 out=96 code_nats_a_place=1.466522 ms=168991
+FIELD_TRANSMISSION_DONE ms=168993
+MEASURE lap=transmission_open_tf3_mean rc=0 wall_s=169.4 peak_rss_kib=367996

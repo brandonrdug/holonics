@@ -1,0 +1,41 @@
+# One development section of the grown state on the card, 2026-11-11 18:47:03 to 18:47:46 UTC, inside ONE hold of HOLONICS_ROOT/.local/gpu.lock
+# (RTX 4080 SUPER), nothing else running on the host: the C = 0 state's section (RUN/rt18/STATE.0, the control), the grown state's (rt18/STATE.0
+# grown by 32 carry circles), the control again, the same section each time (both states at lap 69: the walk's first section, 10,173 sites), each
+# the line's train-field (mean_lap.sh's exports, environment and arguments) with the lap bound at 1 ms (the opening held read, one section, the
+# stopped state's withheld read), with the new binary (9076e97cafe3f0a2). HOST_THREADS: the run's process threads and CPU seconds, read from /proc
+# every 2 s. Read: the control's section 1,019 and 1,026 ms (a spread of 0.7%), the grown state's 1,275 ms, 1.247 times their mean (deposit 483,
+# 490 and 583 ms; the card's returns 1,000, 1,018 and 1,266 ms for the run's two returns); the card's peak store over each whole run (its held
+# reads included) 8.54 GB for the control and 8.49 GB for the grown state, inside 12 GB; 28 host threads, about 3.5 CPU seconds a run. A lap of
+# the grown state projected at the largest measured section's card plus host time, (1,266 + 583) ms times 1,535 sections: 2,838 s, under 3,300 s.
+# The control's own lap ran 942 s (rt18) where the same rule projects (1,000 + 483) ms times 1,535, 2,276 s, from its first section, so the rule
+# stands above a lap's time. The status line counts this run itself.
+# Projection about 30 s a run, deadline 300 s a run; measured 12.4, 12.2 and 12.3 s.
+# dev: binary 9076e97cafe3f0a2; control e801cae90b4254cc, grown 69174ffcc58963fb 18:47:03
+# other runs on the host: 1 running
+# lock taken 18:47:03 wait_s=.001666802
+# ctrl1: started 18:47:03
+# ctrl1: ended rc=0 18:47:16
+FIELD_DECLARATION alphabet=100 width=32 heads=4 modes=8 still=2 contacts=32 ticks=4 frames=4 reach=3771 section=16 rate=12 answer=2062 train=24557 withheld=128 dev=128 sections=1535 laps_read=69 material=63606
+FIELD_SECTION lap=0 n=0 sites=10173 before=3.372 after=- halvings=0 deposited=true next=- predicted_micro=-3654 change_micro=- transfer_micro=- external_micro=-36 curvature_micro=- rate=12 length=2924 regions_ms=1 deposit_ms=483 ms=1019
+FIELD_STOPPED lap=0 sections=1/1535 reason=lap sites=10173 before=3.372 after=- deposited=1 halvings=0 next_halved=0 next_refused=0 lap_ms=2145 ms=11981
+FIELD_CARD reads=46 read_ms=9962 returns=2 return_ms=1000 pairs=5106274542 batches=68 peak_store=8543512590 landmarks=0 landmark_ms=0 elapsed_ms=11989
+MEASURE lap=ctrl1 rc=0 wall_s=12.4 peak_rss_kib=862796
+HOST_THREADS ctrl1 samples=6 threads_max=28 last=HOST_SAMPLE 18:47:15 threads=28 cpu_s=3.53
+# grown: started 18:47:17
+# grown: ended rc=0 18:47:30
+FIELD_DECLARATION alphabet=100 width=32 heads=4 modes=8 still=2 contacts=32 ticks=4 frames=4 reach=3771 section=16 rate=12 answer=2062 train=24557 withheld=128 dev=128 sections=1535 laps_read=69 material=80182
+FIELD_SECTION lap=0 n=0 sites=10173 before=3.372 after=- halvings=0 deposited=true next=- predicted_micro=-67845 change_micro=- transfer_micro=- external_micro=-36 curvature_micro=- rate=12 length=2924 regions_ms=1 deposit_ms=583 ms=1275
+FIELD_STOPPED lap=0 sections=1/1535 reason=lap sites=10173 before=3.372 after=- deposited=1 halvings=0 next_halved=0 next_refused=0 lap_ms=2516 ms=11698
+FIELD_CARD reads=46 read_ms=9438 returns=2 return_ms=1266 pairs=5106294527 batches=68 peak_store=8494672182 landmarks=0 landmark_ms=0 elapsed_ms=11704
+MEASURE lap=grown rc=0 wall_s=12.2 peak_rss_kib=818548
+HOST_THREADS grown samples=5 threads_max=28 last=HOST_SAMPLE 18:47:28 threads=28 cpu_s=3.13
+# ctrl2: started 18:47:32
+# ctrl2: ended rc=0 18:47:44
+FIELD_DECLARATION alphabet=100 width=32 heads=4 modes=8 still=2 contacts=32 ticks=4 frames=4 reach=3771 section=16 rate=12 answer=2062 train=24557 withheld=128 dev=128 sections=1535 laps_read=69 material=63606
+FIELD_SECTION lap=0 n=0 sites=10173 before=3.372 after=- halvings=0 deposited=true next=- predicted_micro=-3654 change_micro=- transfer_micro=- external_micro=-36 curvature_micro=- rate=12 length=2924 regions_ms=1 deposit_ms=490 ms=1026
+FIELD_STOPPED lap=0 sections=1/1535 reason=lap sites=10173 before=3.372 after=- deposited=1 halvings=0 next_halved=0 next_refused=0 lap_ms=2202 ms=11911
+FIELD_CARD reads=46 read_ms=9899 returns=2 return_ms=1018 pairs=5106274542 batches=68 peak_store=8543512590 landmarks=0 landmark_ms=0 elapsed_ms=11918
+MEASURE lap=ctrl2 rc=0 wall_s=12.3 peak_rss_kib=790744
+HOST_THREADS ctrl2 samples=6 threads_max=28 last=HOST_SAMPLE 18:47:44 threads=28 cpu_s=3.52
+# released 18:47:46
+MAIN dev done 18:47:46

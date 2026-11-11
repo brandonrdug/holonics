@@ -1,0 +1,81 @@
+# The print of tools/founding_strength.py on founding_strength.tsv beside it, 2026-11-11 UTC: arithmetic on the committed receipts' text
+# (Fractions, decimals printed); each row's sources follow it as file:line.
+# founding_strength.py: nats bought a place (control less arm), nats on the region, nats a founded entry
+FOUNDING_STRENGTH founding=contacts_32 laps=1 read=end region=all places=43470 entries=6208 arm=1.823373 control=1.826142 bought=0.002769 nats=120.37 strength=0.019389
+  from entries +2048@scan_line_gate_and_release.txt:15 +2080@scan_line_gate_and_release.txt:16 +2080@scan_line_gate_and_release.txt:17; arm 2026-11-10_GROWTH_IN_CONTACTS_BINDS_WEAKLY_THE_LANE_FIELD_WITH_64_CONTACTS_GAINS_0.013_IN_FOUR_LAPS.md:73; control 2026-11-10_GROWTH_IN_CONTACTS_BINDS_WEAKLY_THE_LANE_FIELD_WITH_64_CONTACTS_GAINS_0.013_IN_FOUR_LAPS.md:73; places 2026-11-10_GROWTH_IN_CONTACTS_BINDS_WEAKLY_THE_LANE_FIELD_WITH_64_CONTACTS_GAINS_0.013_IN_FOUR_LAPS.md:67
+FOUNDING_STRENGTH founding=contacts_32 laps=2 read=end region=all places=43470 entries=6208 arm=1.816549 control=1.822659 bought=0.006110 nats=265.60 strength=0.042784
+  from entries +2048@scan_line_gate_and_release.txt:15 +2080@scan_line_gate_and_release.txt:16 +2080@scan_line_gate_and_release.txt:17; arm 2026-11-10_GROWTH_IN_CONTACTS_BINDS_WEAKLY_THE_LANE_FIELD_WITH_64_CONTACTS_GAINS_0.013_IN_FOUR_LAPS.md:74; control 2026-11-10_GROWTH_IN_CONTACTS_BINDS_WEAKLY_THE_LANE_FIELD_WITH_64_CONTACTS_GAINS_0.013_IN_FOUR_LAPS.md:74; places 2026-11-10_GROWTH_IN_CONTACTS_BINDS_WEAKLY_THE_LANE_FIELD_WITH_64_CONTACTS_GAINS_0.013_IN_FOUR_LAPS.md:67
+FOUNDING_STRENGTH founding=contacts_32 laps=3 read=end region=all places=43470 entries=6208 arm=1.811575 control=1.822278 bought=0.010703 nats=465.26 strength=0.074945
+  from entries +2048@scan_line_gate_and_release.txt:15 +2080@scan_line_gate_and_release.txt:16 +2080@scan_line_gate_and_release.txt:17; arm 2026-11-10_GROWTH_IN_CONTACTS_BINDS_WEAKLY_THE_LANE_FIELD_WITH_64_CONTACTS_GAINS_0.013_IN_FOUR_LAPS.md:75; control 2026-11-10_GROWTH_IN_CONTACTS_BINDS_WEAKLY_THE_LANE_FIELD_WITH_64_CONTACTS_GAINS_0.013_IN_FOUR_LAPS.md:75; places 2026-11-10_GROWTH_IN_CONTACTS_BINDS_WEAKLY_THE_LANE_FIELD_WITH_64_CONTACTS_GAINS_0.013_IN_FOUR_LAPS.md:67
+FOUNDING_STRENGTH founding=contacts_32 laps=4 read=end region=all places=43470 entries=6208 arm=1.804295 control=1.817565 bought=0.013270 nats=576.85 strength=0.092920
+  from entries +2048@scan_line_gate_and_release.txt:15 +2080@scan_line_gate_and_release.txt:16 +2080@scan_line_gate_and_release.txt:17; arm 2026-11-10_GROWTH_IN_CONTACTS_BINDS_WEAKLY_THE_LANE_FIELD_WITH_64_CONTACTS_GAINS_0.013_IN_FOUR_LAPS.md:76; control 2026-11-10_GROWTH_IN_CONTACTS_BINDS_WEAKLY_THE_LANE_FIELD_WITH_64_CONTACTS_GAINS_0.013_IN_FOUR_LAPS.md:76; places 2026-11-10_GROWTH_IN_CONTACTS_BINDS_WEAKLY_THE_LANE_FIELD_WITH_64_CONTACTS_GAINS_0.013_IN_FOUR_LAPS.md:67
+FOUNDING_STRENGTH founding=carry_g laps=1 read=end region=all places=43470 entries=4096 arm=1.747693 control=1.754398 bought=0.006705 nats=291.47 strength=0.071159
+  from entries +67702@g62_reads.txt:11 -63606@g62_reads.txt:7; arm held_lap_lines.txt:31; control held_lap_lines.txt:9; places g65_reads.txt:7
+FOUNDING_STRENGTH founding=carry_g laps=2 read=end region=all places=43470 entries=4096 arm=1.744468 control=1.752441 bought=0.007973 nats=346.59 strength=0.084616
+  from entries +67702@g62_reads.txt:11 -63606@g62_reads.txt:7; arm held_lap_lines.txt:33; control held_lap_lines.txt:11; places g65_reads.txt:7
+FOUNDING_STRENGTH founding=carry_g laps=3 read=end region=all places=43470 entries=4096 arm=1.744995 control=1.750560 bought=0.005565 nats=241.91 strength=0.059060
+  from entries +67702@g62_reads.txt:11 -63606@g62_reads.txt:7; arm held_lap_lines.txt:35; control held_lap_lines.txt:13; places g65_reads.txt:7
+FOUNDING_STRENGTH founding=carry_g laps=4 read=end region=all places=43470 entries=4096 arm=1.744382 control=1.745851 bought=0.001469 nats=63.86 strength=0.015590
+  from entries +67702@g62_reads.txt:11 -63606@g62_reads.txt:7; arm held_lap_lines.txt:37; control held_lap_lines.txt:15; places g65_reads.txt:7
+FOUNDING_STRENGTH founding=carry_g laps=2+3 read=mean2 region=all places=43470 entries=4096 arm=1.739699 control=1.747044 bought=0.007345 nats=319.29 strength=0.077951
+  from entries +67702@g62_reads.txt:11 -63606@g62_reads.txt:7; arm g62_reads.txt:21; control g65_reads.txt:11; places g65_reads.txt:7
+FOUNDING_STRENGTH founding=carry_g laps=3+4 read=mean2 region=all places=43470 entries=4096 arm=1.737390 control=1.744201 bought=0.006811 nats=296.07 strength=0.072284
+  from entries +67702@g62_reads.txt:11 -63606@g62_reads.txt:7; arm g67_reads.txt:11; control g67_reads.txt:7; places g65_reads.txt:7
+FOUNDING_STRENGTH founding=circles_32 laps=1 read=mean region=all places=43470 entries=16576 arm=1.721878 control=1.725007 bought=0.003129 nats=136.02 strength=0.008206
+  from entries +80182@g85_lap_lines.txt:14 -63606@g83_lap_lines.txt:38; arm g85_held_reads.txt:6; control g83_held_reads.txt:5; places g85_held_reads.txt:6
+FOUNDING_STRENGTH founding=circles_32 laps=1 read=mean region=q1 places=10818 entries=16576 arm=0.665239 control=0.667096 bought=0.001857 nats=20.09 strength=0.001212
+  from entries +80182@g85_lap_lines.txt:14 -63606@g83_lap_lines.txt:38; arm g85_held_reads.txt:7; control g83_held_reads.txt:6; places g85_held_reads.txt:7
+FOUNDING_STRENGTH founding=circles_32 laps=1 read=mean region=q2 places=10881 entries=16576 arm=1.265605 control=1.268232 bought=0.002627 nats=28.58 strength=0.001724
+  from entries +80182@g85_lap_lines.txt:14 -63606@g83_lap_lines.txt:38; arm g85_held_reads.txt:7; control g83_held_reads.txt:6; places g85_held_reads.txt:7
+FOUNDING_STRENGTH founding=circles_32 laps=1 read=mean region=q3 places=10853 entries=16576 arm=2.021325 control=2.026825 bought=0.005500 nats=59.69 strength=0.003601
+  from entries +80182@g85_lap_lines.txt:14 -63606@g83_lap_lines.txt:38; arm g85_held_reads.txt:7; control g83_held_reads.txt:6; places g85_held_reads.txt:7
+FOUNDING_STRENGTH founding=circles_32 laps=1 read=mean region=q4 places=10918 entries=16576 arm=2.925903 control=2.928434 bought=0.002531 nats=27.63 strength=0.001667
+  from entries +80182@g85_lap_lines.txt:14 -63606@g83_lap_lines.txt:38; arm g85_held_reads.txt:7; control g83_held_reads.txt:6; places g85_held_reads.txt:7
+FOUNDING_STRENGTH founding=circles_32 laps=1 read=end region=all places=43470 entries=16576 arm=1.730347 control=1.732711 bought=0.002364 nats=102.76 strength=0.006200
+  from entries +80182@g85_lap_lines.txt:14 -63606@g83_lap_lines.txt:38; arm g85_lap_lines.txt:16; control g83_lap_lines.txt:40; places g85_lap_lines.txt:16
+FOUNDING_STRENGTH founding=circles_32 laps=2 read=mean region=all places=43470 entries=16576 arm=1.717012 control=1.723131 bought=0.006119 nats=265.99 strength=0.016047
+  from entries +80182@g85_lap_lines.txt:14 -63606@g83_lap_lines.txt:38; arm g85_held_reads.txt:14; control g83_held_reads.txt:12; places g85_held_reads.txt:14
+FOUNDING_STRENGTH founding=circles_32 laps=2 read=mean region=q1 places=10818 entries=16576 arm=0.657645 control=0.665667 bought=0.008022 nats=86.78 strength=0.005235
+  from entries +80182@g85_lap_lines.txt:14 -63606@g83_lap_lines.txt:38; arm g85_held_reads.txt:15; control g83_held_reads.txt:13; places g85_held_reads.txt:15
+FOUNDING_STRENGTH founding=circles_32 laps=2 read=mean region=q2 places=10881 entries=16576 arm=1.260397 control=1.267970 bought=0.007573 nats=82.40 strength=0.004971
+  from entries +80182@g85_lap_lines.txt:14 -63606@g83_lap_lines.txt:38; arm g85_held_reads.txt:15; control g83_held_reads.txt:13; places g85_held_reads.txt:15
+FOUNDING_STRENGTH founding=circles_32 laps=2 read=mean region=q3 places=10853 entries=16576 arm=2.015053 control=2.022982 bought=0.007929 nats=86.05 strength=0.005191
+  from entries +80182@g85_lap_lines.txt:14 -63606@g83_lap_lines.txt:38; arm g85_held_reads.txt:15; control g83_held_reads.txt:13; places g85_held_reads.txt:15
+FOUNDING_STRENGTH founding=circles_32 laps=2 read=mean region=q4 places=10918 entries=16576 arm=2.925477 control=2.926461 bought=0.000984 nats=10.74 strength=0.000648
+  from entries +80182@g85_lap_lines.txt:14 -63606@g83_lap_lines.txt:38; arm g85_held_reads.txt:15; control g83_held_reads.txt:13; places g85_held_reads.txt:15
+FOUNDING_STRENGTH founding=circles_32 laps=2 read=end region=all places=43470 entries=16576 arm=1.718801 control=1.727658 bought=0.008857 nats=385.01 strength=0.023227
+  from entries +80182@g85_lap_lines.txt:14 -63606@g83_lap_lines.txt:38; arm g85_lap_lines.txt:47; control g83_lap_lines.txt:69; places g85_lap_lines.txt:47
+FOUNDING_STRENGTH founding=circles_32 laps=3 read=mean region=all places=43470 entries=16576 arm=1.709969 control=1.722262 bought=0.012293 nats=534.38 strength=0.032238
+  from entries +80182@g85_lap_lines.txt:14 -63606@g83_lap_lines.txt:38; arm g85_held_reads.txt:22; control g83_held_reads.txt:19; places g85_held_reads.txt:22
+FOUNDING_STRENGTH founding=circles_32 laps=3 read=mean region=q1 places=10818 entries=16576 arm=0.651083 control=0.664185 bought=0.013102 nats=141.74 strength=0.008551
+  from entries +80182@g85_lap_lines.txt:14 -63606@g83_lap_lines.txt:38; arm g85_held_reads.txt:23; control g83_held_reads.txt:20; places g85_held_reads.txt:23
+FOUNDING_STRENGTH founding=circles_32 laps=3 read=mean region=q2 places=10881 entries=16576 arm=1.250406 control=1.265700 bought=0.015294 nats=166.41 strength=0.010039
+  from entries +80182@g85_lap_lines.txt:14 -63606@g83_lap_lines.txt:38; arm g85_held_reads.txt:23; control g83_held_reads.txt:20; places g85_held_reads.txt:23
+FOUNDING_STRENGTH founding=circles_32 laps=3 read=mean region=q3 places=10853 entries=16576 arm=2.006547 control=2.022761 bought=0.016214 nats=175.97 strength=0.010616
+  from entries +80182@g85_lap_lines.txt:14 -63606@g83_lap_lines.txt:38; arm g85_held_reads.txt:23; control g83_held_reads.txt:20; places g85_held_reads.txt:23
+FOUNDING_STRENGTH founding=circles_32 laps=3 read=mean region=q4 places=10918 entries=16576 arm=2.922348 control=2.926952 bought=0.004604 nats=50.27 strength=0.003032
+  from entries +80182@g85_lap_lines.txt:14 -63606@g83_lap_lines.txt:38; arm g85_held_reads.txt:23; control g83_held_reads.txt:20; places g85_held_reads.txt:23
+FOUNDING_STRENGTH founding=circles_32 laps=3 read=end region=all places=43470 entries=16576 arm=1.714448 control=1.729076 bought=0.014628 nats=635.88 strength=0.038361
+  from entries +80182@g85_lap_lines.txt:14 -63606@g83_lap_lines.txt:38; arm g85_lap_lines.txt:78; control g83_lap_lines.txt:98; places g85_lap_lines.txt:78
+# the partition: a lap's quarters against its whole
+FOUNDING_PARTITION founding=contacts_32 laps=1 read=end quarters=unread (read whole only)
+FOUNDING_PARTITION founding=contacts_32 laps=2 read=end quarters=unread (read whole only)
+FOUNDING_PARTITION founding=contacts_32 laps=3 read=end quarters=unread (read whole only)
+FOUNDING_PARTITION founding=contacts_32 laps=4 read=end quarters=unread (read whole only)
+FOUNDING_PARTITION founding=carry_g laps=1 read=end quarters=unread (read whole only)
+FOUNDING_PARTITION founding=carry_g laps=2 read=end quarters=unread (read whole only)
+FOUNDING_PARTITION founding=carry_g laps=3 read=end quarters=unread (read whole only)
+FOUNDING_PARTITION founding=carry_g laps=4 read=end quarters=unread (read whole only)
+FOUNDING_PARTITION founding=carry_g laps=2+3 read=mean2 quarters=unread (read whole only)
+FOUNDING_PARTITION founding=carry_g laps=3+4 read=mean2 quarters=unread (read whole only)
+FOUNDING_PARTITION founding=circles_32 laps=1 read=mean quarter_places=43470 quarter_nats=20.09/28.58/59.69/27.63 sum=136.00 strength_by_quarter=0.001212/0.001724/0.003601/0.001667 whole=136.02 whole_less_sum=0.02
+FOUNDING_PARTITION founding=circles_32 laps=1 read=end quarters=unread (read whole only)
+FOUNDING_PARTITION founding=circles_32 laps=2 read=mean quarter_places=43470 quarter_nats=86.78/82.40/86.05/10.74 sum=265.98 strength_by_quarter=0.005235/0.004971/0.005191/0.000648 whole=265.99 whole_less_sum=0.01
+FOUNDING_PARTITION founding=circles_32 laps=2 read=end quarters=unread (read whole only)
+FOUNDING_PARTITION founding=circles_32 laps=3 read=mean quarter_places=43470 quarter_nats=141.74/166.41/175.97/50.27 sum=534.39 strength_by_quarter=0.008551/0.010039/0.010616/0.003032 whole=534.38 whole_less_sum=-0.01
+FOUNDING_PARTITION founding=circles_32 laps=3 read=end quarters=unread (read whole only)
+# ranks: foundings read alike (same laps, read and region), strongest first
+FOUNDING_RANK laps=1 read=end region=all carry_g 0.071159 > contacts_32 0.019389 > circles_32 0.006200
+FOUNDING_RANK laps=2 read=end region=all carry_g 0.084616 > contacts_32 0.042784 > circles_32 0.023227
+FOUNDING_RANK laps=3 read=end region=all contacts_32 0.074945 > carry_g 0.059060 > circles_32 0.038361
+FOUNDING_RANK laps=4 read=end region=all contacts_32 0.092920 > carry_g 0.015590

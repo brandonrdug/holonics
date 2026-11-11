@@ -36,7 +36,8 @@ typedef unsigned __int128 uwide;
 
 #define FACE_BITS 16
 #define MATERIAL_BITS 24
-// [theory, November 11 00:22] The bias offset of an affine map with no bias (the carry's third chart `G r̂`): no bias is added.
+// [theory, November 11 00:22] The bias offset of an affine map with no bias: no bias is added. Since the carry circles' charts took their biases
+// (November 11 17:25) no driver passes it; the affine kernels keep the branch, which every plain map shares.
 #define NO_BIAS 0xFFFFFFFFFFFFFFFFull
 #define MOVE_BITS 30
 #define COVECTOR_BITS 24
@@ -430,16 +431,17 @@ struct FieldWords {
     // [the unified-theory reading of November 6, 10:31] Where set, past the last arrival a silent place runs at the bare rate
     // (`Field::bare_stretch`): no clamp to the stretch's first place, and no fold of its covector there.
     uint64_t bare_stretch;
-    // [definition; theory, November 11 00:22, ruling R5 amended] **The carry along the strand** (`FieldDeclaration::carry`): where set, the pair is the scan
-    // `Q(t) = b(t) + γ(t) Q(t∓1)`, `p(t) = a(t) Q(t∓1)` with `γ = g / √(1 + |g|²)`, `g = G r̂` the third chart. `wg` is `G`'s offset in the material and
-    // `rg` its reach; `pg` the chart's output `[t][f]`, `pgam` `γ` `[t][f]` (`2^(−30)`), `psr` the scale `s = 1/√(1 + |g|²)` `[t][f/2]` (`2^(−30)`) and
-    // `pqm` the scan's operand `Q(t∓1)` `[t][f]`, which the reverse reads.
-    uint64_t carry_on;
+    // [definition; theory, November 11 17:25] **The carry circles** (`FieldDeclaration::carry`): the last `carry` (`C`) of the `f/2` complex contacts
+    // carry the scan `Q(t) = b(t) + γ(t) Q(t∓1)`, `p(t) = a(t) Q(t∓1)` with the gate `γ = γ̂(q)/(1 + max(0, h))` (`carry_gate`). `wg` and `wgb` are the
+    // circles' charts' and biases' offsets in the material (`FieldLayout::carry`, `carry_bias`) and `rg` the charts' reach; `pg` the charts' reads
+    // `q`, `h` `[t][2C]` (`2^(−16)`), `pgam` the gate `[t][2C]` (real parts then imaginary, `2^(−30)`) and `pqm` the scan's operand `Q(t∓1)`
+    // `[t][2C]`, which the reverse reads.
+    uint64_t carry;
     uint64_t wg;
+    uint64_t wgb;
     uint64_t rg;
     int64_t *pg;
     int64_t *pgam;
-    int64_t *psr;
     int64_t *pqm;
     // [definition; theory, November 11 04:14, step S] **The skin's exponent from site addresses**: `2π σ_x = q_x k + r_x`, `0 ≤ r_x < k`, `k = (n ln 2) << 24` of the
     // slot, written once a (site, paced head, mode) in `field_paces` beside `σ`: `[p][l][t]` three words each, `q`, then `r`'s low and high 64 bits (`r < k` is held 128 bits wide
@@ -2656,12 +2658,13 @@ __device__ __forceinline__ uint64_t strand_mate(const FieldWords &w, uint64_t g,
     return i + 1 < sites ? g + 1 : UINT64_MAX;
 }
 
-// The pair contact along the strand (§16.34, the host's tick): `c_g = a_g · b_mate`, zero without a mate.
+// The pair contact along the strand (§16.34, the host's tick): `c_g = a_g · b_mate`, zero without a mate, on the plain contacts (the first
+// `f/2 − C`; the carry circles are the scan's).
 extern "C" __global__ void field_pair(FieldWords w) {
-    const uint32_t half = w.f / 2;
-    const uint64_t cells = (uint64_t)w.T * half;
+    const uint32_t half = w.f / 2, plain = half - (uint32_t)w.carry;
+    const uint64_t cells = (uint64_t)w.T * plain;
     for (uint64_t c = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; c < cells; c += (uint64_t)gridDim.x * blockDim.x) {
-        const uint64_t t = c / half, e = c % half;
+        const uint64_t t = c / plain, e = c % plain;
         const uint64_t re = t * w.f + e, im = re + half;
         const uint64_t s = strand_mate(w, t, e);
         const wide ar = w.pa[re], ai = w.pa[im];
@@ -2671,25 +2674,25 @@ extern "C" __global__ void field_pair(FieldWords w) {
     }
 }
 
-// [definition; theory, November 11 00:22, ruling R5 amended] **The carry's scan** (the host's `tick`, the pair contact under `FieldDeclaration::carry`): one thread a
-// (region, complex contact) scanning the region's sites in strand order, one release a step (a parallel prefix would reorder the releases): even `e` from the
-// left, odd from the right, `Q` zero before the first site (past the last), `p(t) = a(t) Q(t∓1)` and `Q(t) = b(t) + γ(t) Q(t∓1)` with `γ = g / √(1 + |g|²)`
-// attained by the radicand's exact integer square root (`gamma_of`): `g` on `2^(−16)`, the root on `2^(−32)`, `γ` and the scale `s` on `2^(−30)`.
-// Block: 256 threads, grid-stride over `R f/2` jobs; no shared memory (each thread owns a column `[t][e]` of the cells, the threads of a region reading
-// consecutive `e`). Keeps `γ`, `s` and `Q`'s operand per site for the reverse.
+// [definition; theory, November 11 17:25] **The carry circles' scan** (the host's `tick`): one thread a (region, carry circle) scanning the region's sites
+// in strand order, one release a step (a parallel prefix would reorder the releases). Circle `k` is complex contact `e = f/2 − C + k`: even `e` from the
+// left, odd from the right, `Q` zero before the first site (past the last), `p(t) = a(t) Q(t∓1)` and `Q(t) = b(t) + γ(t) Q(t∓1)` with the gate read from
+// `pgam` (`field_pair_gamma`). Block: 256 threads, grid-stride over `R C` jobs; no shared memory. Keeps `Q`'s operand per site and circle for the reverse.
 extern "C" __global__ void field_pair_scan(FieldWords w) {
     const uint32_t half = w.f / 2;
-    const uint64_t jobs = (uint64_t)w.R * half;
+    const uint64_t C = w.carry, c2 = 2 * C, plain = half - C;
+    const uint64_t jobs = (uint64_t)w.R * C;
     for (uint64_t j = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; j < jobs; j += (uint64_t)gridDim.x * blockDim.x) {
-        const uint32_t r = (uint32_t)(j / half), e = (uint32_t)(j % half);
+        const uint32_t r = (uint32_t)(j / C);
+        const uint64_t k = j % C, e = plain + k;
         const uint64_t first = w.region_off[r], sites = w.region_off[r + 1] - first;
         wide qr = 0, qi = 0;
         for (uint64_t step = 0; step < sites; ++step) {
             const uint64_t t = first + ((e % 2 == 0) ? step : sites - 1 - step);
-            const uint64_t re = t * w.f + e, im = re + half;
-            const wide yr = w.pgam[re], yi = w.pgam[im];
-            w.pqm[re] = fit64(qr, w.status);
-            w.pqm[im] = fit64(qi, w.status);
+            const uint64_t re = t * w.f + e, im = re + half, gr = t * c2 + k, gi = gr + C;
+            const wide yr = w.pgam[gr], yi = w.pgam[gi];
+            w.pqm[gr] = fit64(qr, w.status);
+            w.pqm[gi] = fit64(qi, w.status);
             const wide ar = w.pa[re], ai = w.pa[im];
             w.pc[re] = fit64(rel(ar * qr - ai * qi, FACE_BITS), w.status);
             w.pc[im] = fit64(rel(ar * qi + ai * qr, FACE_BITS), w.status);
@@ -2701,59 +2704,102 @@ extern "C" __global__ void field_pair_scan(FieldWords w) {
     }
 }
 
-// [definition; theory, November 11 04:48, step G] **The scan's pre-pass**: `γ = g / √(1 + |g|²)` and the scale `s` depend on (t, e) only through the third chart's output `pg`, so they are
-// attained off the chain, on `field_pair`'s grid (T f/2 cells, one thread a cell): the radicand's exact integer square root (the refusal where `(1 + |g|²) 2^32` passes the carrier),
-// `γ = g 2^46 / root` and `s = 2^62 / root`, each to the nearest, written to `pgam` (`|γ| < 2^30`, so `fit64` never binds) and `psr`. The chain (`field_pair_scan`) reads `pgam` and
-// keeps its two products a step; the reverse reads `pgam`, `psr` and `pqm` as before. Every bit is the scan's own.
+// [definition; theory, November 11 17:25; `lean/Holonics/HNN/CarryGate.lean`] **The carry circles' gate** (the host's `carry_gate`), off the chain on the
+// pair's grid (T C cells, one thread a site and circle; tower.field-scan-gate-once-a-site): from the charts' reads `q`, `h` on `2^(−16)`, `d = max(0, h)`,
+// refused (`REFUSED_CARRIER`) where `|q|` reaches `2^39`, `2^34 + q²` reaches `2^78` or `d` reaches `2^47`; else `den = (2^34 + q²)(2^16 + d)`,
+// `γ_re = (2^34 − q²) 2^46 / den` and `γ_im = q 2^64 / den` on `2^(−30)`, each one division to the nearest (`div_nearest`), written to `pgam`. That is
+// `γ̂(q)/(1 + d)`, `γ̂(q) = ((4 − q²) + 4iq)/(4 + q²)` the Cayley step of `iq/2`; every bit is the host's.
 extern "C" __global__ void field_pair_gamma(FieldWords w) {
-    const uint32_t half = w.f / 2;
-    const uint64_t cells = (uint64_t)w.T * half;
+    const uint64_t C = w.carry, c2 = 2 * C;
+    const uint64_t cells = (uint64_t)w.T * C;
     for (uint64_t c = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; c < cells; c += (uint64_t)gridDim.x * blockDim.x) {
-        const uint64_t t = c / half, e = c % half;
-        const uint64_t re = t * w.f + e, im = re + half;
-        const wide gr = w.pg[re], gi = w.pg[im];
-        const wide d = ((wide)1 << 32) + gr * gr + gi * gi;
-        if (d >= ((wide)1 << 95)) {
+        const uint64_t t = c / C, k = c % C;
+        const uint64_t gr = t * c2 + k, gi = gr + C;
+        const wide q = w.pg[gr], h = w.pg[gi];
+        const wide d = h > 0 ? h : 0;
+        const uwide aq = (uwide)(q >= 0 ? q : -q);
+        if (aq >= ((uwide)1 << 39) || ((wide)1 << 34) + q * q >= ((wide)1 << 78) || d >= ((wide)1 << 47)) {
             atomicOr(w.status, REFUSED_CARRIER);
             continue;
         }
-        const wide root = (wide)isqrt128((uwide)(d << 32));
-        w.pgam[re] = fit64(div_nearest(gr << 46, root), w.status);
-        w.pgam[im] = fit64(div_nearest(gi << 46, root), w.status);
-        w.psr[t * half + e] = fit64(div_nearest((wide)1 << 62, root), w.status);
+        const wide turn = ((wide)1 << 34) + q * q;
+        const wide den = turn * (((wide)1 << 16) + d);
+        w.pgam[gr] = fit64(div_nearest((((wide)1 << 34) - q * q) << 46, den), w.status);
+        w.pgam[gi] = fit64(div_nearest(q << 64, den), w.status);
     }
 }
 
-// The scan's reverse (the host's `tick_return`): the same jobs in the opposite strand order, with the producing operands. With `u` the covector of `Q(t)` (the
-// next site of the reverse) and `δp(t)` the pair's covector: `δa(t) = conj(Qm(t)) δp(t)`, `δb(t) = u`, `δγ(t) = conj(Qm(t)) u`,
-// `X(t) = conj(a(t)) δp(t) + conj(γ(t)) u` (the next `u`), and through `γ = s g`: `δg = s (δγ − (γ·δγ) γ)`.
+// The carry circles' reverse (the host's `tick_return`): the same (region, circle) jobs in the opposite strand order, with the producing operands. With `u` the
+// covector of `Q(t)` (the next site of the reverse) and `δp(t)` the pair's covector: `δa(t) = conj(Qm(t)) δp(t)`, `δb(t) = u`, `δγ(t) = conj(Qm(t)) u`
+// released at the face's grain and written to `dg` `[t][2C]` (real parts then imaginary), `X(t) = conj(a(t)) δp(t) + conj(γ(t)) u` (the next `u`). The
+// gate's covectors are formed off the chain (`field_pair_gate_back`).
 extern "C" __global__ void field_pair_scan_back(FieldWords w, const int64_t *dc, int64_t *da, int64_t *db, int64_t *dg) {
     const uint32_t half = w.f / 2;
-    const uint64_t jobs = (uint64_t)w.R * half;
+    const uint64_t C = w.carry, c2 = 2 * C, plain = half - C;
+    const uint64_t jobs = (uint64_t)w.R * C;
     for (uint64_t j = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; j < jobs; j += (uint64_t)gridDim.x * blockDim.x) {
-        const uint32_t r = (uint32_t)(j / half), e = (uint32_t)(j % half);
+        const uint32_t r = (uint32_t)(j / C);
+        const uint64_t k = j % C, e = plain + k;
         const uint64_t first = w.region_off[r], sites = w.region_off[r + 1] - first;
         wide xr = 0, xi = 0;
         for (uint64_t step = 0; step < sites; ++step) {
             const uint64_t t = first + ((e % 2 == 0) ? sites - 1 - step : step);
-            const uint64_t re = t * w.f + e, im = re + half;
-            const wide gr = dc[re], gi = dc[im];
+            const uint64_t re = t * w.f + e, im = re + half, gr = t * c2 + k, gi = gr + C;
+            const wide pr = dc[re], pi = dc[im];
             const wide ar = w.pa[re], ai = w.pa[im];
-            const wide qr = w.pqm[re], qi = w.pqm[im];
-            const wide yr = w.pgam[re], yi = w.pgam[im];
+            const wide qr = w.pqm[gr], qi = w.pqm[gi];
+            const wide yr = w.pgam[gr], yi = w.pgam[gi];
             const wide ur = xr, ui = xi;
             db[re] = fit64(ur, w.status);
             db[im] = fit64(ui, w.status);
-            da[re] = fit64(rel(qr * gr + qi * gi, FACE_BITS), w.status);
-            da[im] = fit64(rel(qr * gi - qi * gr, FACE_BITS), w.status);
-            const wide dyr = rel(qr * ur + qi * ui, FACE_BITS), dyi = rel(qr * ui - qi * ur, FACE_BITS);
-            xr = fit64(rel(ar * gr + ai * gi, FACE_BITS) + rel(yr * ur + yi * ui, MOVE_BITS), w.status);
-            xi = fit64(rel(ar * gi - ai * gr, FACE_BITS) + rel(yr * ui - yi * ur, MOVE_BITS), w.status);
-            const wide dot = rel(yr * dyr + yi * dyi, MOVE_BITS);
-            const wide tr = dyr - rel(dot * yr, MOVE_BITS), ti = dyi - rel(dot * yi, MOVE_BITS);
-            const wide sc = w.psr[t * half + e];
-            dg[re] = fit64(rel(sc * tr, MOVE_BITS), w.status);
-            dg[im] = fit64(rel(sc * ti, MOVE_BITS), w.status);
+            da[re] = fit64(rel(qr * pr + qi * pi, FACE_BITS), w.status);
+            da[im] = fit64(rel(qr * pi - qi * pr, FACE_BITS), w.status);
+            dg[gr] = fit64(rel(qr * ur + qi * ui, FACE_BITS), w.status);
+            dg[gi] = fit64(rel(qr * ui - qi * ur, FACE_BITS), w.status);
+            xr = fit64(rel(ar * pr + ai * pi, FACE_BITS) + rel(yr * ur + yi * ui, MOVE_BITS), w.status);
+            xi = fit64(rel(ar * pi - ai * pr, FACE_BITS) + rel(yr * ui - yi * ur, MOVE_BITS), w.status);
+        }
+    }
+}
+
+// [definition; theory, November 11 17:25; `CarryGate.lean`] **The gate's covectors** (the host's `carry_gate_return`), off the chain on the pair's grid
+// (T C cells): from `δγ` in `dg`, the gate and the charts' reads, `im = Im(conj(γ) δγ)` and `re = Re(conj(γ) δγ)` each released from `2^(−30)`, then
+// `δq = im 2^34 / (2^34 + q²)` and `δh = −re 2^16 / (2^16 + h)` where `h ≥ 0`, else `0`, each one division to the nearest, written over `δγ` in place
+// (`δq` at the real part's slot, `δh` at the imaginary's: the circles' charts' row order).
+extern "C" __global__ void field_pair_gate_back(FieldWords w, int64_t *dg) {
+    const uint64_t C = w.carry, c2 = 2 * C;
+    const uint64_t cells = (uint64_t)w.T * C;
+    for (uint64_t c = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; c < cells; c += (uint64_t)gridDim.x * blockDim.x) {
+        const uint64_t t = c / C, k = c % C;
+        const uint64_t gr = t * c2 + k, gi = gr + C;
+        const wide yr = w.pgam[gr], yi = w.pgam[gi], dr = dg[gr], di = dg[gi];
+        const wide im = rel(yr * di - yi * dr, MOVE_BITS), re = rel(yr * dr + yi * di, MOVE_BITS);
+        const wide q = w.pg[gr], h = w.pg[gi];
+        const wide dq = div_nearest(im << 34, ((wide)1 << 34) + q * q);
+        const wide dh = h >= 0 ? -div_nearest(re << 16, ((wide)1 << 16) + h) : 0;
+        dg[gr] = fit64(dq, w.status);
+        dg[gi] = fit64(dh, w.status);
+    }
+}
+
+// [measurement; theory, November 11 18:33, part P2] **The carry circles' gates, read** (the host's `Field::carry_gates_of`): at each open site and carry
+// circle of the tick just formed, `|γ|` on `2^(−30)` (the floor of the square root of `γ_re² + γ_im²`, at most `2^60`) added into `acc[k]`, the leak read
+// `h ≥ 0` counted into `acc[C + k]`, and the site counted once into `acc[2C]`. A reading: it writes only its accumulator.
+extern "C" __global__ void field_carry_gates_read(FieldWords w, unsigned long long *acc) {
+    const uint64_t C = w.carry, c2 = 2 * C;
+    const uint64_t cells = (uint64_t)w.T * C;
+    for (uint64_t c = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; c < cells; c += (uint64_t)gridDim.x * blockDim.x) {
+        const uint64_t t = c / C, k = c % C;
+        if (!w.unresolved[t]) {
+            continue;
+        }
+        const wide re = w.pgam[t * c2 + k], im = w.pgam[t * c2 + C + k];
+        atomicAdd(acc + k, (unsigned long long)isqrt128((uwide)(re * re + im * im)));
+        if (w.pg[t * c2 + C + k] >= 0) {
+            atomicAdd(acc + C + k, 1ull);
+        }
+        if (k == 0) {
+            atomicAdd(acc + c2, 1ull);
         }
     }
 }
@@ -2946,10 +2992,10 @@ extern "C" __global__ void field_ratio_adjoint(FieldWords w, const int32_t *read
 // [§16.34] Along the strand: `δa_g = conj(b_mate) δc_g`, and `δb_g = conj(a_p) δc_p` from the one site `p` whose mate `g` is
 // (the site after it at an even `e`, before it at an odd), each zero where there is none.
 extern "C" __global__ void field_pair_back(FieldWords w, const int64_t *dc, int64_t *da, int64_t *db) {
-    const uint32_t half = w.f / 2;
-    const uint64_t cells = (uint64_t)w.T * half;
+    const uint32_t half = w.f / 2, plain = half - (uint32_t)w.carry;
+    const uint64_t cells = (uint64_t)w.T * plain;
     for (uint64_t c = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; c < cells; c += (uint64_t)gridDim.x * blockDim.x) {
-        const uint64_t t = c / half, e = c % half;
+        const uint64_t t = c / plain, e = c % plain;
         const uint64_t re = t * w.f + e, im = re + half;
         const uint64_t s = strand_mate(w, t, e);
         if (s == UINT64_MAX) {

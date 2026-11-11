@@ -30,7 +30,7 @@
 use core::ffi::c_void;
 use std::time::Instant;
 
-use holonics::hnn::tower::field::{band_bits, landmarks_of, BlankClocks, Field, FieldDeclaration, FieldRead, FieldRealization, HeldRows, NearOffsets, RowCurrent, Region, Scale, TickRead, NEAR, SHARE_BITS, STATE_BITS};
+use holonics::hnn::tower::field::{band_bits, landmarks_of, BlankClocks, CarryGates, Field, FieldDeclaration, FieldRead, FieldRealization, HeldRows, NearOffsets, RowCurrent, Region, Scale, TickRead, NEAR, SHARE_BITS, STATE_BITS};
 use holonics::hnn::tower::{TowerError, TowerFace, MATERIAL_BITS};
 
 use crate::cuda::{Dim3, Module};
@@ -39,8 +39,6 @@ use crate::hnn::DeviceError;
 
 const IMAGE: &[u8] = include_bytes!(concat!(env!("OUT_DIR"), "/field.ptx"));
 const THREADS: u32 = 256;
-/// [theory, November 11 00:22] The bias offset of an affine map with no bias (`NO_BIAS` in `kernels/field.cu`): the carry's third chart `G r̂`.
-const NO_BIAS: u64 = u64::MAX;
 /// The dynamic shared memory a tiled affine map may take in a block, the default 48 KiB.
 const AFFINE_SHARED: usize = 48 * 1024;
 
@@ -231,14 +229,15 @@ struct Words {
     // [the unified-theory reading of November 6, 10:31] Past the last arrival a silent place runs at the bare rate (the host's
     // `Field::bare_stretch`).
     bare_stretch: u64,
-    // [definition; theory, November 11 00:22, ruling R5 amended] The carry along the strand (`FieldDeclaration::carry`): whether it is on, `G`'s offset in
-    // the material and its reach, and (set per tick) the third chart's output, `γ`, the scale and the scan's operand.
-    carry_on: u64,
+    // [definition; theory, November 11 17:25] The carry circles (`FieldDeclaration::carry`): their count `C`, their charts' and biases' offsets in the
+    // material (`FieldLayout::carry`, `carry_bias`) and the charts' reach, and (set per tick) the charts' reads `q`, `h` `[t][2C]`, the gate `γ` `[t][2C]`
+    // and the scan's operand `[t][2C]`.
+    carry: u64,
     wg: u64,
+    wgb: u64,
     rg: u64,
     pg: u64,
     pgam: u64,
-    psr: u64,
     pqm: u64,
     // [theory, November 11 04:14, step S] The skin's site addresses `[p][l][t]` three words each (`FieldWords::saddr`), the clock's own beside `sigma`.
     saddr: u64,
@@ -402,7 +401,6 @@ fn set_tick(w: &mut Words, tick: &Tick, returning: bool) {
     w.pa = tick.pa.device_ptr();
     w.pg = tick.pg.device_ptr();
     w.pgam = tick.pgam.device_ptr();
-    w.psr = tick.psr.device_ptr();
     w.pqm = tick.pqm.device_ptr();
     w.pb = tick.pb.device_ptr();
     w.pc = tick.pc.device_ptr();
@@ -449,7 +447,8 @@ struct Back<'c> {
     dc: Pooled<'c, i64>,
     da: Pooled<'c, i64>,
     db: Pooled<'c, i64>,
-    /// [theory, November 11 00:22] The scan's covector at the third chart's output `[t][f]` (one slot without the carry).
+    /// [theory, November 11 17:25] The carry circles' covector `[t][2C]` (one slot without them): the scan's reverse writes `δγ`, and the gate's
+    /// reverse writes `δq`, `δh` over it in place, the circles' charts' row order.
     dg: Pooled<'c, i64>,
     ra: Pooled<'c, i64>,
     rb: Pooled<'c, i64>,
@@ -532,10 +531,9 @@ struct Tick<'c> {
     read2: Pooled<'c, i32>,
     scale2: Pooled<'c, i128>,
     pa: Pooled<'c, i64>,
-    /// [theory, November 11 00:22] The carry's third chart's output `[t][f]`, its `γ` `[t][f]`, the scale `[t][f/2]` and the scan's operand `[t][f]` (one slot each without it).
+    /// [theory, November 11 17:25] The carry circles' charts' reads `q`, `h` `[t][2C]`, their gate `γ` `[t][2C]` and the scan's operand `[t][2C]` (one slot each without them).
     pg: Pooled<'c, i64>,
     pgam: Pooled<'c, i64>,
-    psr: Pooled<'c, i64>,
     pqm: Pooled<'c, i64>,
     pb: Pooled<'c, i64>,
     pc: Pooled<'c, i64>,
@@ -706,6 +704,9 @@ pub struct CardField<'c> {
     held_cells: std::cell::RefCell<Vec<i128>>,
     /// [measurement, November 4] While the ticks are read: each region's tick reads, region by region.
     tick_reads: std::cell::RefCell<Option<Vec<Vec<TickRead>>>>,
+    /// [measurement; theory, November 11 18:33, part P2] While the carry circles' gates are read: each circle's `|γ|` sum, then its `h ≥ 0` count,
+    /// then the reads (`2C + 1` words, [`CarryGates`]), summed over the batches from each tick's forward.
+    carry_gates: std::cell::RefCell<Option<Vec<u128>>>,
     /// [measurement, §16.42] While a near field is read: the named sites of the batch's one region, and each one's near field
     /// by offset at every kept tick and head.
     near_sites: std::cell::RefCell<Option<Vec<usize>>>,
@@ -728,7 +729,7 @@ impl<'c> CardField<'c> {
         let (free, total) = (memory.free_bytes as u64, memory.total_bytes as u64);
         let used = total.saturating_sub(free);
         let budget = free.min(BOARD_CEILING.saturating_sub(used)).saturating_sub(MARGIN);
-        Ok(Self { card, module, budget, times: FieldTimes::default(), profile: None, pools: Default::default(), held_questions: Default::default(), covector_shares: Default::default(), row_questions: Default::default(), row_out: Default::default(), row_cov: Default::default(), held_cells: Default::default(), tick_reads: Default::default(), near_sites: Default::default(), near_out: Default::default(), clock_sites: Default::default(), clock_out: Default::default(), phases: None })
+        Ok(Self { card, module, budget, times: FieldTimes::default(), profile: None, pools: Default::default(), held_questions: Default::default(), covector_shares: Default::default(), row_questions: Default::default(), row_out: Default::default(), row_cov: Default::default(), held_cells: Default::default(), tick_reads: Default::default(), carry_gates: Default::default(), near_sites: Default::default(), near_out: Default::default(), clock_sites: Default::default(), clock_out: Default::default(), phases: None })
     }
 
     /// The octets a batch's weight and contact stores may take.
@@ -1009,9 +1010,10 @@ impl<'c> CardField<'c> {
             rv: reach(l.v, m2 * dw),
             rout: reach(l.out, dw * m2),
             ra: reach(l.a, f * dw),
-            rg: reach(l.gchart, if d.carry { f * dw } else { 0 }),
-            wg: l.gchart as u64,
-            carry_on: u64::from(d.carry),
+            rg: reach(l.carry, 2 * d.carry * dw),
+            wg: l.carry as u64,
+            wgb: l.carry_bias as u64,
+            carry: d.carry as u64,
             rb: reach(l.b, f * dw),
             rw: reach(l.w, dw * f),
             rread: reach(l.read, dw * dw),
@@ -1203,10 +1205,9 @@ impl<'c> CardField<'c> {
             read2: self.timed(Kind::Alloc, || self.take::<i32>((sites * dw).max(1))).map_err(device)?,
             scale2: self.timed(Kind::Alloc, || self.take::<i128>((sites * lanes).max(1))).map_err(device)?,
             pa: alloc64(sites * f)?,
-            pg: alloc64(if field.declaration.carry { sites * f } else { 1 })?,
-            pgam: alloc64(if field.declaration.carry { sites * f } else { 1 })?,
-            psr: alloc64(if field.declaration.carry { sites * f / 2 } else { 1 })?,
-            pqm: alloc64(if field.declaration.carry { sites * f } else { 1 })?,
+            pg: alloc64(if field.declaration.carry > 0 { sites * 2 * field.declaration.carry } else { 1 })?,
+            pgam: alloc64(if field.declaration.carry > 0 { sites * 2 * field.declaration.carry } else { 1 })?,
+            pqm: alloc64(if field.declaration.carry > 0 { sites * 2 * field.declaration.carry } else { 1 })?,
             pb: alloc64(sites * f)?,
             pc: alloc64(sites * f)?,
             bits: self.timed(Kind::Alloc, || self.take_zeroed::<u32>(4)).map_err(device)?,
@@ -1215,7 +1216,8 @@ impl<'c> CardField<'c> {
 
     /// A batch's site and region tables uploaded in one transfer, its status word and its faces' buffer, and the words
     /// that read them (the host's tables kept beside them for the reverse and the readings).
-    fn stage(&self, regions: &[Region], a: usize, dw: usize, ticks: usize, words: &mut Words) -> Result<Staged<'c>> {
+    fn stage(&self, regions: &[Region], a: usize, dw: usize, declaration: &FieldDeclaration, words: &mut Words) -> Result<Staged<'c>> {
+        let ticks = declaration.ticks;
         // The batch's sites, region by region, and the carried mixtures as one list a site.
         let mut site_region = Vec::new();
         let mut site_pos = Vec::new();
@@ -1230,8 +1232,9 @@ impl<'c> CardField<'c> {
         let (mut mix_off, mut mix_class, mut mix_share) = (vec![0u32], Vec::new(), Vec::new());
         let mut pairs = 0usize;
         let any_echo = regions.iter().any(|r| r.echo.iter().any(Option::is_some));
-        // [E] The cut rooms' windows, each site's row computed or not (every site of an uncut region).
-        let windows: Vec<Option<Vec<bool>>> = regions.iter().map(|r| r.window(ticks)).collect();
+        // [E] The cut rooms' windows, each site's row computed or not (every site of an uncut region); kept whole where the field has carry
+        // circles (the host's `FieldDeclaration::room_window`, the one owner of the cut's admission).
+        let windows: Vec<Option<Vec<bool>>> = regions.iter().map(|r| declaration.room_window(r)).collect();
         let (per_blank, bare) = (words.per_blank != 0, words.bare_stretch != 0);
         let blank_read: Vec<u8> = regions
             .iter()
@@ -1423,14 +1426,18 @@ impl<'c> CardField<'c> {
         self.chart(words, words.x, &tick.read2, &tick.scale2, false)?;
         self.affine("field_affine_x32", words, words.wa, words.a_bias, words.ra, f, dw, tick.read2.device_ptr(), dw, tick.pa.device_ptr(), f, 0, false)?;
         self.affine("field_affine_x32", words, words.wb, words.b_bias, words.rb, f, dw, tick.read2.device_ptr(), dw, tick.pb.device_ptr(), f, 0, false)?;
-        if d.carry {
-            // [theory, November 11 00:22] The third chart, then the scan: one thread a (region, complex contact), sites in strand order.
-            self.affine("field_affine_x32", words, words.wg, NO_BIAS, words.rg, f, dw, tick.read2.device_ptr(), dw, tick.pg.device_ptr(), f, 0, false)?;
-            // [theory, November 11 04:48, step G] The root and the three divisions off the chain, on the pair's grid; then the chain.
-            self.launch("field_pair_gamma", Self::cells((sites * f / 2) as u64), THREADS, &mut [arg(words)])?;
-            self.launch("field_pair_scan", Self::cells((words.r as usize * f / 2) as u64), THREADS, &mut [arg(words)])?;
-        } else {
-            self.launch("field_pair", Self::cells((sites * f / 2) as u64), THREADS, &mut [arg(words)])?;
+        // The plain contacts, the first `f/2 − C`: one thread a site and contact.
+        let (plain, circles) = (d.carry_first(), d.carry);
+        if plain > 0 {
+            self.launch("field_pair", Self::cells((sites * plain) as u64), THREADS, &mut [arg(words)])?;
+        }
+        if circles > 0 {
+            // [theory, November 11 17:25] The carry circles: their charts' reads `q`, `h` (one affine with its bias), the gate's two divisions off
+            // the chain on the pair's grid (one thread a site and circle, as tower.field-scan-gate-once-a-site moved the root out), then the
+            // chain, one thread a (region, circle) in strand order.
+            self.affine("field_affine_x32", words, words.wg, words.wgb, words.rg, 2 * circles, dw, tick.read2.device_ptr(), dw, tick.pg.device_ptr(), 2 * circles, 0, false)?;
+            self.launch("field_pair_gamma", Self::cells((sites * circles) as u64), THREADS, &mut [arg(words)])?;
+            self.launch("field_pair_scan", Self::cells((words.r as usize * circles) as u64), THREADS, &mut [arg(words)])?;
         }
         self.affine("field_affine_x64", words, words.w, words.w_bias, words.rw, dw, f, tick.pc.device_ptr(), f, 0, dw, words.x, false)?;
         self.mark("tick_launch_post");
@@ -1477,7 +1484,7 @@ impl<'c> CardField<'c> {
             owned.push((vec![0usize; packets], unres, faces));
         }
         let pregions: Vec<Region> = owned.iter().map(|(c, u, f)| Region { classes: c, unresolved: u, faces: if f.iter().any(Option::is_some) { f } else { &[] }, locked: &[], echo: &[], domain: None, port: None }).collect();
-        let st = self.stage(&pregions, cd.alphabet, cd.width, cd.ticks, &mut tr.cwords)?;
+        let st = self.stage(&pregions, cd.alphabet, cd.width, &cd, &mut tr.cwords)?;
         let (sites, m2, n) = (st.sites, 2 * cd.complex(), cd.modes);
         let ticks: Vec<Tick> = (0..if kept { cd.ticks } else { 1 }).map(|_| self.tick(sites, st.pairs, regions, coarse, stored, returning)).collect::<Result<_>>()?;
         let trips = self.timed(Kind::Alloc, || self.take_zeroed::<i128>(sites.max(1))).map_err(device)?;
@@ -1589,7 +1596,7 @@ impl<'c> CardField<'c> {
         let (dw, m, n, f, a, heads) = (d.width, d.complex(), d.modes, d.contacts, d.alphabet, d.heads);
         let m2 = 2 * m;
         let span = 2 * n;
-        let st = self.stage(regions, a, dw, d.ticks, words)?;
+        let st = self.stage(regions, a, dw, &d, words)?;
         let (sites, pairs) = (st.sites, st.pairs);
         let (site_region, site_pos, region_off, classes, unresolved, definite) = (&st.site_region, &st.site_pos, &st.region_off, &st.classes, &st.unresolved, &st.definite);
         let (echo_has, mix_off, mix_class, mix_share, site_weight) = (&st.echo_has, &st.mix_off, &st.mix_class, &st.mix_share, &st.site_weight);
@@ -1646,6 +1653,9 @@ impl<'c> CardField<'c> {
         let base_clock = [words.kappa, words.tau, words.sigma, words.plain, words.pframe, words.moment, words.saddr];
         let blanks = paced > 0 && (0..sites).any(|t| unresolved[t] != 0 && st.mix_off[t] == st.mix_off[t + 1]);
         let mut clocks: Vec<Option<CardClock<'c>>> = vec![None];
+        // [measurement; part P2] The carry circles' gates, where read: one accumulator a batch, added into after each tick's forward from that tick's
+        // own gate and leak reads, fetched once the ticks end.
+        let gate_acc = if d.carry > 0 && self.carry_gates.borrow().is_some() { Some(self.timed(Kind::Alloc, || self.take_zeroed::<u64>(2 * d.carry + 1)).map_err(device)?) } else { None };
         for k in 0..d.ticks {
             set_clock(words, clocks[k].as_ref(), base_clock);
             if let (Some(tr), Some(tb)) = (tower.as_deref_mut(), tb.as_ref()) {
@@ -1654,12 +1664,26 @@ impl<'c> CardField<'c> {
                 }
             }
             self.tick_forward(field, words, &ticks, k, kept, stored, keep.is_some(), logits, returning, pr.device_ptr(), sites, pairs, regions.len())?;
+            if let Some(acc) = gate_acc.as_ref() {
+                let tick = &ticks[if kept { k } else { 0 }];
+                (words.pg, words.pgam) = (tick.pg.device_ptr(), tick.pgam.device_ptr());
+                let mut ap = acc.device_ptr();
+                self.launch("field_carry_gates_read", Self::cells((sites * d.carry) as u64), THREADS, &mut [arg(words), arg(&mut ap)])?;
+            }
             if k + 1 < d.ticks {
                 let next = if blanks { Some(self.blank_clock(field, words, regions.len(), sites)?) } else { None };
                 clocks.push(next);
             }
         }
         set_clock(words, None, base_clock);
+        if let Some(acc) = gate_acc.as_ref() {
+            let read = self.timed(Kind::Copy, || card.fetch(&**acc)).map_err(device)?;
+            if let Some(sum) = self.carry_gates.borrow_mut().as_mut() {
+                for (s, &v) in sum.iter_mut().zip(&read) {
+                    *s += u128::from(v);
+                }
+            }
+        }
         // Each named site's clocks by tick (a reading, §16.44), the batch's one region.
         if let Some(named) = self.clock_sites.borrow().as_ref() {
             let mut out = self.clock_out.borrow_mut();
@@ -2166,7 +2190,6 @@ impl<'c> CardField<'c> {
         words.pa = tick.pa.device_ptr();
         words.pg = tick.pg.device_ptr();
         words.pgam = tick.pgam.device_ptr();
-        words.psr = tick.psr.device_ptr();
         words.pqm = tick.pqm.device_ptr();
         words.pb = tick.pb.device_ptr();
         words.pc = tick.pc.device_ptr();
@@ -2175,24 +2198,30 @@ impl<'c> CardField<'c> {
         self.outer(words, g, words.w, dw, f, dx.device_ptr(), dw, tick.pc.device_ptr(), f, true, false)?;
         self.transposed(words, words.w, dw, f, dx.device_ptr(), dw, dc.device_ptr(), false, false)?;
         let (mut dcp, mut dap, mut dbp) = (dc.device_ptr(), da.device_ptr(), db.device_ptr());
-        if d.carry {
-            // [theory, November 11 00:22] The scan's reverse, the same (region, contact) jobs in the opposite strand order, with the forward's `γ`, `s` and `Q` operand.
+        let (plain, circles) = (d.carry_first(), d.carry);
+        if plain > 0 {
+            self.launch("field_pair_back", Self::cells((sites * plain) as u64), THREADS, &mut [arg(words), arg(&mut dcp), arg(&mut dap), arg(&mut dbp)])?;
+        }
+        if circles > 0 {
+            // [theory, November 11 17:25] The circles' reverse: the same (region, circle) jobs in the opposite strand order, with the forward's `γ` and `Q`
+            // operand, writing `δγ` a site and circle; then `δq` and `δh` off the chain on the pair's grid, the divisions out of the chain.
             let mut dgp = dg.device_ptr();
-            self.launch("field_pair_scan_back", Self::cells((words.r as usize * f / 2) as u64), THREADS, &mut [arg(words), arg(&mut dcp), arg(&mut dap), arg(&mut dbp), arg(&mut dgp)])?;
-        } else {
-            self.launch("field_pair_back", Self::cells((sites * f / 2) as u64), THREADS, &mut [arg(words), arg(&mut dcp), arg(&mut dap), arg(&mut dbp)])?;
+            self.launch("field_pair_scan_back", Self::cells((words.r as usize * circles) as u64), THREADS, &mut [arg(words), arg(&mut dcp), arg(&mut dap), arg(&mut dbp), arg(&mut dgp)])?;
+            let mut dgp = dg.device_ptr();
+            self.launch("field_pair_gate_back", Self::cells((sites * circles) as u64), THREADS, &mut [arg(words), arg(&mut dgp)])?;
         }
         self.outer(words, g, words.wa, f, dw, da.device_ptr(), f, tick.read2.device_ptr(), dw, false, false)?;
         self.outer(words, g, words.wb, f, dw, db.device_ptr(), f, tick.read2.device_ptr(), dw, false, false)?;
         self.outer(words, g, words.a_bias, f, 0, da.device_ptr(), f, 0, 0, false, false)?;
         self.outer(words, g, words.b_bias, f, 0, db.device_ptr(), f, 0, 0, false, false)?;
-        if d.carry {
-            self.outer(words, g, words.wg, f, dw, dg.device_ptr(), f, tick.read2.device_ptr(), dw, false, false)?;
+        if circles > 0 {
+            self.outer(words, g, words.wg, 2 * circles, dw, dg.device_ptr(), 2 * circles, tick.read2.device_ptr(), dw, false, false)?;
+            self.outer(words, g, words.wgb, 2 * circles, 0, dg.device_ptr(), 2 * circles, 0, 0, false, false)?;
         }
         self.transposed(words, words.wa, f, dw, da.device_ptr(), f, ra.device_ptr(), false, false)?;
         self.transposed(words, words.wb, f, dw, db.device_ptr(), f, rb.device_ptr(), false, false)?;
-        if d.carry {
-            self.transposed(words, words.wg, f, dw, dg.device_ptr(), f, rb.device_ptr(), true, false)?;
+        if circles > 0 {
+            self.transposed(words, words.wg, 2 * circles, dw, dg.device_ptr(), 2 * circles, rb.device_ptr(), true, false)?;
         }
         let (mut rap, mut rbp, mut cells) = (ra.device_ptr(), rb.device_ptr(), (sites * dw) as u64);
         self.launch("field_add", Self::cells(cells), THREADS, &mut [arg(words), arg(&mut rap), arg(&mut rbp), arg(&mut cells)])?;
@@ -2273,7 +2302,7 @@ impl<'c> CardField<'c> {
         let dc = alloc64(sites * f)?;
         let da = alloc64(sites * f)?;
         let db = alloc64(sites * f)?;
-        let dg = alloc64(if d.carry { sites * f } else { 1 })?;
+        let dg = alloc64(if d.carry > 0 { sites * 2 * d.carry } else { 1 })?;
         let ra = alloc64(sites * dw)?;
         let rb = alloc64(sites * dw)?;
         let dmid = alloc64(sites * dw)?;
@@ -2550,7 +2579,8 @@ pub fn read_octets(d: &FieldDeclaration, returning: bool, echo: bool, sites: usi
     let probe_site = 4 * h * (1 + 2 * (1u64 << d.class_trits()));
     // The chart's and the pair contact's scales are one a lane (§16.40).
     let lanes = d.lanes as u64;
-    let carry_site = if d.carry { 28 * f } else { 0 };
+    // [theory, November 11 17:25] The carry circles' charts' reads, gate and scan operand, `[t][2C]` each.
+    let carry_site = 48 * d.carry as u64;
     let tick_site = carry_site + 4 * dw + 16 * lanes + 8 * 2 * m2 + 2 * 8 * h * span + 16 * h + 8 * h + 4 * h + 4 * h + 8 * m2 + 4 * dw + 16 * lanes + 3 * 8 * f + (2 * 16 * span + 8) * h + 8 * h * slots + probe_site + 4 * h * span + 8 * h * span + 4 * h * span + 16 * h;
     let tick_fixed = tick_fixed_octets(d);
     // The face: its read, scale, logits, masses and total, and (§16.26) the lift and its covector.
@@ -2566,7 +2596,7 @@ pub fn read_octets(d: &FieldDeclaration, returning: bool, echo: bool, sites: usi
     let moment_site = moment_site + address_site;
     // The reverse adds its covectors, the values' sum over the ticks and the moments' return, and the
     // crowds' two difference arrays.
-    let reverse_site = if returning { (if d.carry { 8 * f } else { 0 }) + 8 * m2 + 8 * a + 5 * 8 * dw + 3 * 8 * f + 8 * m2 + 8 * h * span + 2 * 8 * m2 + 16 * m2 + 2 * 16 * span + 112 * tm } else { 0 };
+    let reverse_site = if returning { 16 * d.carry as u64 + 8 * m2 + 8 * a + 5 * 8 * dw + 3 * 8 * f + 8 * m2 + 8 * h * span + 2 * 8 * m2 + 16 * m2 + 2 * 16 * span + 112 * tm } else { 0 };
     let (s, pairs) = (sites as u64, (sites * sites) as u64);
     // The shares are kept for a return and an echo; the reverse holds one head's covector a pair on 64 bits.
     let weights = h * 8 * pairs * if returning { 2 } else { 1 };
@@ -2643,6 +2673,23 @@ impl FieldRealization for CardField<'_> {
 
     fn read_faces(&mut self, field: &Field, regions: &[Region]) -> Result<Vec<Vec<Option<TowerFace>>>> {
         Ok(self.run(field, regions, false, false, None)?.0)
+    }
+
+    /// [measurement; part P2] The faces and the carry circles' gates from the same pass: every tick's gate and leak reads are summed on the card
+    /// over the open sites (`field_carry_gates_read`), so no face and no other read changes.
+    fn read_faces_gated(&mut self, field: &Field, regions: &[Region]) -> Result<(Vec<Vec<Option<TowerFace>>>, CarryGates)> {
+        let c = field.declaration.carry;
+        *self.carry_gates.borrow_mut() = (c > 0).then(|| vec![0u128; 2 * c + 1]);
+        let read = self.run(field, regions, false, false, None);
+        let sum = self.carry_gates.borrow_mut().take();
+        let faces = read?.0;
+        let mut gates = CarryGates::new(c);
+        if let Some(sum) = sum {
+            gates.modulus = sum[..c].to_vec();
+            gates.friction = sum[c..2 * c].iter().map(|&v| v as u64).collect();
+            gates.reads = sum[2 * c] as u64;
+        }
+        Ok((faces, gates))
     }
 
     fn read_logits(&mut self, field: &Field, regions: &[Region]) -> Result<Vec<FieldRead>> {
@@ -2757,7 +2804,7 @@ mod tests {
     use super::*;
 
     fn declaration(width: usize, heads: usize, contacts: usize) -> FieldDeclaration {
-        FieldDeclaration { alphabet: 122, width, heads, modes: 8, still: 2, contacts, ticks: 2, frames: 4, reach: 2221, lanes: 1, depth: 0, carry: false }
+        FieldDeclaration { alphabet: 122, width, heads, modes: 8, still: 2, contacts, ticks: 2, frames: 4, reach: 2221, lanes: 1, depth: 0, carry: 0 }
     }
 
     /// [measurement; theory, November 10 20:34] **The card's footprint by growth route** (host arithmetic, no card read): from the
@@ -2773,7 +2820,7 @@ mod tests {
         // [theory, November 10 21:10] Contacts come in fours (f/2 even): each f from 68 by fours on the main line's declaration (width 64, two
         // lanes), its material, whether the contacts' two maps tile a block (`affine_tiling`: `(f, dw)` and `(dw, f)`) with the shared octets, and
         // the octets of the longest region; then the first f past 128 and the first refused, and the shared figure that refuses it.
-        let base = FieldDeclaration { alphabet: 100, width: 64, heads: 4, modes: 8, still: 2, contacts: 64, ticks: 4, frames: 4, reach: 3771, lanes: 2, depth: 0, carry: false };
+        let base = FieldDeclaration { alphabet: 100, width: 64, heads: 4, modes: 8, still: 2, contacts: 64, ticks: 4, frames: 4, reach: 3771, lanes: 2, depth: 0, carry: 0 };
         let mut first_refused = None;
         for f in (68..=512).step_by(4) {
             let d = FieldDeclaration { contacts: f, ..base };
@@ -2795,7 +2842,7 @@ mod tests {
     #[test]
     #[ignore]
     fn the_card_footprint_by_growth_route() {
-        let base = FieldDeclaration { alphabet: 100, width: 64, heads: 4, modes: 8, still: 2, contacts: 64, ticks: 4, frames: 4, reach: 3771, lanes: 2, depth: 0, carry: false };
+        let base = FieldDeclaration { alphabet: 100, width: 64, heads: 4, modes: 8, still: 2, contacts: 64, ticks: 4, frames: 4, reach: 3771, lanes: 2, depth: 0, carry: 0 };
         let describe = |name: &str, d: FieldDeclaration| {
             let draws = 4 * d.founding_draws();
             let field = holonics::hnn::tower::field::Field::found(d, &vec![7u8; draws]).expect("founded");

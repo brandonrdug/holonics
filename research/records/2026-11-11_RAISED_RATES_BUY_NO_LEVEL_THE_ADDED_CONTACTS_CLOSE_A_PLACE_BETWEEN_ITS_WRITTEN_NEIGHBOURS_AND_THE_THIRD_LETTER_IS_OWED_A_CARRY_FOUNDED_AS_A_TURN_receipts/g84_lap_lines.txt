@@ -1,0 +1,142 @@
+# G84's laps and their means' held reads, 2026-11-11 19:05 to 20:14 UTC, on the card (RTX 4080 SUPER under HOLONICS_ROOT/.local/gpu.lock, one lap at a
+# time, each with its own hold), dispatched one by one with tools/runs.py: rt19 from RUN/rt18/STATE.0 and pl19 from RUN/pl18/STATE.0 (lap 19's
+# sections), rt20 from rt19 and pl20 from pl19 (lap 20's), each by RUN/mean_lap.sh with the line's binary (bin-lap-mean b8fe4ba838dd27a6 at
+# 8368f084b; L 1,215,000 ms, the run's 1,515,000 ms, outer 1,575 s), then the held read of its MEAN.0 by bin-joint-strata (4bd56aa83f564d66) through
+# RUN/g61/held_group.sh (bound 24 s), and for rt laps the transmission read of the mean as K4 and M1 ran it (RUN/g74/transmission_open_lm.sh,
+# open-0; projection 190 s, deadline 237 s). RUN is HOLONICS_ROOT/.local/wt/qgchgu-sampler/.local/run/2026-11-10-contacts. Projection 960 s a lap
+# (deadline the lap's outer 1,575 s), 12 s a held read; measured walls 890.2, 916.6, 953.9 and 870.2 s, held reads 9.9 s, transmission reads 166 s.
+# The host ran nothing else beside rt19, pl19 and rt20; beside pl20 the host was quiet too (the friction build ran after pl20's lap, beside rt21).
+## rt19
+# rt lap rt19 from RUN/rt18/STATE.0 19:05:19
+# rt19 from STATE.0 e801cae90b4254cc08d5ade5821be0a81d80382dbbb20444913941fce38cf5da: hnn-field-learner-v3 12 134144 69 -; binary b8fe4ba838dd27a6 (8368f084b); lap bound 1215000 ms, the run's 1515000 ms, outer 1575 s 19:05:19
+# parts parts 32 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+# rt19: lock taken 19:05:19 wait_s=.003113523
+# rt19: released 19:20:09
+FIELD_PART_RATES contacts_before=32 rate_bits=12 octaves w_new=0 a_new=0 b_new=0 enc_lane=0 before_lane=0 after_lane=0 q_lane=0 v_lane=0 probe_lane=0 out_lane=0 moment_face_lane=0 read_lane=0 face_biases_lane=0 a_lane=0 b_lane=0 g_chart=0
+FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.731382 foil_nats_a_place=1.866629 information_nats_a_place=0.135247 own_nats_a_word=13.010058 information_nats_a_word=1.016280
+FIELD_MEAN lap=0 states=1535 entries=63606 moved=61444 square=93176227467149
+FIELD_LAP lap=0 read=70 sites=16553256 before=3.214 after=- deposited=1535/1535 halvings=0 next_halved=0 next_refused=0 ms=872354
+FIELD_JOINT_NATS lap=0 places=43470 words=5785 own_nats_a_place=1.732711 foil_nats_a_place=1.868939 information_nats_a_place=0.136229 own_nats_a_word=13.020039 information_nats_a_word=1.023658
+MEASURE lap=rt19 rc=0 wall_s=890.2 peak_rss_kib=831120
+MAIN rt19 exit 19:20:09
+SECTIONS 1535
+SECTION_STEPS rt19 halved_or_next=0
+# group P-rt19 19:20:09
+# mean_rt19: state rt19/MEAN.0 792030a1c2faa85e; binary field_pass 4bd56aa83f564d66; asked 19:20:09
+# mean_rt19: lock taken 19:20:09 wait_s=.019353085
+# mean_rt19: run_s=9.893420319 rc=0 released 19:20:19
+  FIELD_HELD lap=-1 answer=5.544979 classes=43470 context=0.917015 context_classes=43470 foil=1.083572 question=0.166558 ms=3621
+  FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.725007 foil_nats_a_place=1.858998 information_nats_a_place=0.133991 own_nats_a_word=12.962152 information_nats_a_word=1.006842
+  FIELD_UNSEEN lap=-1 code=0.848 sites=43660 next=- ms=9457
+  MEASURE lap=held_mean_rt19 rc=0 wall_s=9.9 peak_rss_kib=840832
+READ mean_rt19 held=1.725007
+MAIN group P-rt19 done 19:20:19
+FIELD_JOINT_STRATA lap=-1 open_quarters=1/2/3/4 own_nats_a_place=0.667096/1.268232/2.026825/2.928434 foil_nats_a_place=0.766173/1.407739/2.182201/3.070264 places=10818/10881/10853/10918 open_sites=5333/16153/26922/38725 terms_own=10917168291/20875745023/33276712374/48367423537 terms_foil=12538572460/23172097007/35827699419/50709966841
+# BUILD 8368f084b binary b8fe4ba838dd27a6d1eb89354dd93509199d1cbb64c708663ae0376f027467a6 state 792030a1c2faa85e15cdfa05f74aca1c94d5fce4c47abdce141a89d13383d0be: hnn-field-v14 100 64 4 8 2 64 4 4 3771 2 0; parts 32 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0; mode open-0; projected 190 s, deadline 237 s
+# lock taken 19:20:19
+MEASURE lap=transmission_open_rt19_mean rc=0 wall_s=166.4 peak_rss_kib=363220
+OPEN rt19_mean left d=0..4 field 3.190 2.617 2.169 1.979 1.944
+OPEN rt19_mean left d=0..4 text  3.481 2.710 1.898 1.423 1.224
+OPEN rt19_mean left (d-1 minus d) d=1..4 field 0.573 0.448 0.190 0.035
+OPEN rt19_mean left (d-1 minus d) d=1..4 text  0.71 0.73 0.51 0.23
+OPEN rt19_mean both d=1..4 field 1.853 1.189 1.019 0.981
+OPEN rt19_mean both d=1..4 text  1.564 0.569 0.419 0.397
+OPEN rt19_mean splits (3L,1R) (1L,3R) (2L,1R) (1L,2R) field 1.334 1.381 1.473 1.484
+OPEN rt19_mean splits text  0.690 0.714 0.923 0.938
+OPEN rt19_mean places a row (left d=0) 8760, regions 8760
+MAIN transmission_open exit 19:23:05
+MAIN rt19 done 19:23:05
+## pl19
+# pl lap pl19 from RUN/pl18/STATE.0 19:23:27
+# pl19 from STATE.0 a24b6cb78a263e40271f4e1b5f5268db4c078856e3d2d0d76592e4a9c3316f0b: hnn-field-learner-v3 12 134144 69 -; binary b8fe4ba838dd27a6 (8368f084b); lap bound 1215000 ms, the run's 1515000 ms, outer 1575 s 19:23:27
+# parts parts 32 0 0 0 2 2 2 0 0 0 0 0 0 0 0 0 0
+# pl19: lock taken 19:23:27 wait_s=.002388835
+# pl19: released 19:38:43
+FIELD_PART_RATES contacts_before=32 rate_bits=12 octaves w_new=0 a_new=0 b_new=0 enc_lane=2 before_lane=2 after_lane=2 q_lane=0 v_lane=0 probe_lane=0 out_lane=0 moment_face_lane=0 read_lane=0 face_biases_lane=0 a_lane=0 b_lane=0 g_chart=0
+FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.731382 foil_nats_a_place=1.866629 information_nats_a_place=0.135247 own_nats_a_word=13.010058 information_nats_a_word=1.016280
+FIELD_MEAN lap=0 states=1535 entries=63606 moved=61455 square=92313430962484
+FIELD_LAP lap=0 read=70 sites=16553256 before=3.215 after=- deposited=1535/1535 halvings=0 next_halved=0 next_refused=0 ms=898658
+FIELD_JOINT_NATS lap=0 places=43470 words=5785 own_nats_a_place=1.732291 foil_nats_a_place=1.868156 information_nats_a_place=0.135865 own_nats_a_word=13.016886 information_nats_a_word=1.020928
+MEASURE lap=pl19 rc=0 wall_s=916.6 peak_rss_kib=832988
+MAIN pl19 exit 19:38:43
+SECTIONS 1535
+SECTION_STEPS pl19 halved_or_next=0
+# group P-pl19 19:38:43
+# mean_pl19: state pl19/MEAN.0 61853e0ff2858713; binary field_pass 4bd56aa83f564d66; asked 19:38:43
+# mean_pl19: lock taken 19:38:43 wait_s=.021248208
+# mean_pl19: run_s=9.984133973 rc=0 released 19:38:53
+  FIELD_HELD lap=-1 answer=5.542358 classes=43470 context=0.916413 context_classes=43470 foil=1.082890 question=0.166478 ms=3551
+  FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.724879 foil_nats_a_place=1.858551 information_nats_a_place=0.133673 own_nats_a_word=12.961188 information_nats_a_word=1.004451
+  FIELD_UNSEEN lap=-1 code=0.847 sites=43660 next=- ms=9491
+  MEASURE lap=held_mean_pl19 rc=0 wall_s=9.9 peak_rss_kib=961180
+READ mean_pl19 held=1.724879
+MAIN group P-pl19 done 19:38:53
+FIELD_JOINT_STRATA lap=-1 open_quarters=1/2/3/4 own_nats_a_place=0.667078/1.267932/2.026904/2.928161 foil_nats_a_place=0.765770/1.406817/2.181901/3.070102 places=10818/10881/10853/10918 open_sites=5333/16153/26922/38725 terms_own=10916871949/20870808936/33278013078/48362923422 terms_foil=12531974700/23156922405/35822788855/50707285636
+MAIN pl19 done 19:38:53
+## rt20
+# rt lap rt20 from RUN/rt19/STATE.0 19:40:29
+# rt20 from STATE.0 d7210561265426c1f85fcab849c92548bb7e08ccae5760019b7ae1935df4e0c1: hnn-field-learner-v3 12 134144 70 -; binary b8fe4ba838dd27a6 (8368f084b); lap bound 1215000 ms, the run's 1515000 ms, outer 1575 s 19:40:29
+# parts parts 32 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+# rt20: lock taken 19:40:29 wait_s=.002312237
+# rt20: released 19:56:23
+FIELD_PART_RATES contacts_before=32 rate_bits=12 octaves w_new=0 a_new=0 b_new=0 enc_lane=0 before_lane=0 after_lane=0 q_lane=0 v_lane=0 probe_lane=0 out_lane=0 moment_face_lane=0 read_lane=0 face_biases_lane=0 a_lane=0 b_lane=0 g_chart=0
+FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.732711 foil_nats_a_place=1.868939 information_nats_a_place=0.136229 own_nats_a_word=13.020039 information_nats_a_word=1.023658
+FIELD_MEAN lap=0 states=1535 entries=63606 moved=61328 square=89903632816848
+FIELD_LAP lap=0 read=71 sites=16541481 before=3.227 after=- deposited=1535/1535 halvings=0 next_halved=0 next_refused=0 ms=934756
+FIELD_JOINT_NATS lap=0 places=43470 words=5785 own_nats_a_place=1.727658 foil_nats_a_place=1.861105 information_nats_a_place=0.133447 own_nats_a_word=12.982075 information_nats_a_word=1.002754
+MEASURE lap=rt20 rc=0 wall_s=953.9 peak_rss_kib=827816
+MAIN rt20 exit 19:56:23
+SECTIONS 1535
+SECTION_STEPS rt20 halved_or_next=0
+# group P-rt20 19:56:23
+# mean_rt20: state rt20/MEAN.0 34a57dee0c94e3be; binary field_pass 4bd56aa83f564d66; asked 19:56:23
+# mean_rt20: lock taken 19:56:23 wait_s=.020867796
+# mean_rt20: run_s=10.584241266 rc=0 released 19:56:34
+  FIELD_HELD lap=-1 answer=5.542437 classes=43470 context=0.916390 context_classes=43470 foil=1.082362 question=0.165972 ms=3797
+  FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.723131 foil_nats_a_place=1.857466 information_nats_a_place=0.134336 own_nats_a_word=12.948054 information_nats_a_word=1.009433
+  FIELD_UNSEEN lap=-1 code=0.848 sites=43660 next=- ms=10092
+  MEASURE lap=held_mean_rt20 rc=0 wall_s=10.5 peak_rss_kib=862852
+READ mean_rt20 held=1.723131
+MAIN group P-rt20 done 19:56:34
+FIELD_JOINT_STRATA lap=-1 open_quarters=1/2/3/4 own_nats_a_place=0.665667/1.267970/2.022982/2.926461 foil_nats_a_place=0.764235/1.405781/2.178170/3.072044 places=10818/10881/10853/10918 open_sites=5333/16153/26922/38725 terms_own=10893769656/20871439208/33213626251/48334834618 terms_foil=12506864123/23139876506/35761531746/50739354375
+# BUILD 8368f084b binary b8fe4ba838dd27a6d1eb89354dd93509199d1cbb64c708663ae0376f027467a6 state 34a57dee0c94e3be6575c8e0d8dfc5f2c6bb655196993b01a5f174c136ac7c77: hnn-field-v14 100 64 4 8 2 64 4 4 3771 2 0; parts 32 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0; mode open-0; projected 190 s, deadline 237 s
+# lock taken 19:56:34
+MEASURE lap=transmission_open_rt20_mean rc=0 wall_s=180.2 peak_rss_kib=363148
+OPEN rt20_mean left d=0..4 field 3.187 2.615 2.167 1.979 1.945
+OPEN rt20_mean left d=0..4 text  3.481 2.710 1.898 1.423 1.224
+OPEN rt20_mean left (d-1 minus d) d=1..4 field 0.573 0.447 0.188 0.035
+OPEN rt20_mean left (d-1 minus d) d=1..4 text  0.71 0.73 0.51 0.23
+OPEN rt20_mean both d=1..4 field 1.849 1.186 1.017 0.980
+OPEN rt20_mean both d=1..4 text  1.564 0.569 0.419 0.397
+OPEN rt20_mean splits (3L,1R) (1L,3R) (2L,1R) (1L,2R) field 1.331 1.380 1.468 1.481
+OPEN rt20_mean splits text  0.690 0.714 0.923 0.938
+OPEN rt20_mean places a row (left d=0) 8760, regions 8760
+MAIN transmission_open exit 19:59:34
+MAIN rt20 done 19:59:34
+## pl20
+# pl lap pl20 from RUN/pl19/STATE.0 20:00:13
+# pl20 from STATE.0 b89de57c3d48cd6f8d8457c736323dab2f9dd80bfb584c83aa5746754eb6d405: hnn-field-learner-v3 12 134144 70 -; binary b8fe4ba838dd27a6 (8368f084b); lap bound 1215000 ms, the run's 1515000 ms, outer 1575 s 20:00:13
+# parts parts 32 0 0 0 2 2 2 0 0 0 0 0 0 0 0 0 0
+# pl20: lock taken 20:00:13 wait_s=.002169562
+# pl20: released 20:14:43
+FIELD_PART_RATES contacts_before=32 rate_bits=12 octaves w_new=0 a_new=0 b_new=0 enc_lane=2 before_lane=2 after_lane=2 q_lane=0 v_lane=0 probe_lane=0 out_lane=0 moment_face_lane=0 read_lane=0 face_biases_lane=0 a_lane=0 b_lane=0 g_chart=0
+FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.732291 foil_nats_a_place=1.868156 information_nats_a_place=0.135865 own_nats_a_word=13.016886 information_nats_a_word=1.020928
+FIELD_MEAN lap=0 states=1535 entries=63606 moved=61347 square=89121158580441
+FIELD_LAP lap=0 read=71 sites=16541481 before=3.227 after=- deposited=1535/1535 halvings=0 next_halved=0 next_refused=0 ms=852131
+FIELD_JOINT_NATS lap=0 places=43470 words=5785 own_nats_a_place=1.727190 foil_nats_a_place=1.860844 information_nats_a_place=0.133654 own_nats_a_word=12.978558 information_nats_a_word=1.004309
+MEASURE lap=pl20 rc=0 wall_s=870.2 peak_rss_kib=833008
+MAIN pl20 exit 20:14:43
+SECTIONS 1535
+SECTION_STEPS pl20 halved_or_next=0
+# group P-pl20 20:14:44
+# mean_pl20: state pl20/MEAN.0 ec247527c2f80e2d; binary field_pass 4bd56aa83f564d66; asked 20:14:44
+# mean_pl20: lock taken 20:14:44 wait_s=.027648368
+# mean_pl20: run_s=9.754536547 rc=0 released 20:14:53
+  FIELD_HELD lap=-1 answer=5.541350 classes=43470 context=0.915416 context_classes=43470 foil=1.081715 question=0.166299 ms=3532
+  FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.722610 foil_nats_a_place=1.856900 information_nats_a_place=0.134290 own_nats_a_word=12.944142 information_nats_a_word=1.009086
+  FIELD_UNSEEN lap=-1 code=0.847 sites=43660 next=- ms=9328
+  MEASURE lap=held_mean_pl20 rc=0 wall_s=9.7 peak_rss_kib=833884
+READ mean_pl20 held=1.722610
+MAIN group P-pl20 done 20:14:53
+FIELD_JOINT_STRATA lap=-1 open_quarters=1/2/3/4 own_nats_a_place=0.664053/1.267049/2.023713/2.926178 foil_nats_a_place=0.763760/1.405282/2.177572/3.071350 places=10818/10881/10853/10918 open_sites=5333/16153/26922/38725 terms_own=10867369327/20856270825/33225626250/48330169601 terms_foil=12499082171/23131664686/35751709266/50727903975
+MAIN pl20 done 20:14:53
