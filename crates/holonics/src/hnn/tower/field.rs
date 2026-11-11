@@ -227,6 +227,13 @@ pub struct FieldDeclaration {
     /// force on its letter. The value chart `V`, the current's return `O` and its bias, and the pair's return `W_c` and its
     /// bias leave (founded at zero and never read); the pair contact is read through its own contraction `c`.
     pub energy: bool,
+    /// [definition; theory, November 11 00:22, ruling R5 amended] **The carry along the strand, a unit running to its stop in one tick**: a third
+    /// chart `g = G r̂` (`f × D`, complex as `a` and `b` are, founded at zero) beside `A` and `B`, `γ_e(t) = g_e(t) / √(1 + |g_e(t)|²)` (`|γ| < 1`), and
+    /// within the tick a scan in strand order (`Q` zero before the region's first site): even `e` from the left, `Q_e(t) = b_e(t) + γ_e(t) Q_e(t−1)`,
+    /// `p_e(t) = a_e(t) Q_e(t−1)`; odd `e` from the right, `Q_e(t) = b_e(t) + γ_e(t) Q_e(t+1)`, `p_e(t) = a_e(t) Q_e(t+1)`; the pair's return `W`
+    /// reads `p` where it read `c`. At `G = 0` it is the built contact bit for bit. Carried in the head line (`hnn-field-v14k`). This tree reads a
+    /// carrying state's faces (the readings of a state); its adjoint is on `claude/v14-face-line`, so a return is refused.
+    pub carry: bool,
 }
 
 impl FieldDeclaration {
@@ -456,6 +463,9 @@ impl FieldDeclaration {
         if self.depth > self.frames - self.still {
             return refuse("a field's depth rings are among its turned ring sets");
         }
+        if self.carry && self.energy {
+            return refuse("a field with the carry is not read as one energy's forces");
+        }
         // [agent-inferred, November 6] The energy's first build reads no depth ring: a depth ring's rate is read from the
         // arriving classes, so its letters would enter the energy through its frames, whose force is not built.
         if self.energy && self.depth > 0 {
@@ -470,6 +480,9 @@ impl FieldDeclaration {
     }
 
     fn to_text(self) -> String {
+        if self.carry {
+            return format!("hnn-field-v14k {} {} {} {} {} {} {} {} {} {} {} 1", self.alphabet, self.width, self.heads, self.modes, self.still, self.contacts, self.ticks, self.frames, self.reach, self.lanes, self.depth);
+        }
         format!("hnn-field-v15 {} {} {} {} {} {} {} {} {} {} {} {}", self.alphabet, self.width, self.heads, self.modes, self.still, self.contacts, self.ticks, self.frames, self.reach, self.lanes, self.depth, u8::from(self.energy))
     }
 
@@ -478,6 +491,7 @@ impl FieldDeclaration {
         // A v13 head line is a field with no depth ring (the line before the depth rings, its states the line's own), and a
         // v14 one a field whose faces are read through the readout (the line before the energy, its states the line's own).
         let (depth_word, energy_word) = match (words.first().copied(), words.len()) {
+            (Some("hnn-field-v14k"), 13) if words[12] == "1" => (Some(words[11]), None),
             (Some("hnn-field-v15"), 13) => (Some(words[11]), Some(words[12])),
             (Some("hnn-field-v14"), 12) => (Some(words[11]), None),
             (Some("hnn-field-v13"), 11) => (None, None),
@@ -489,7 +503,7 @@ impl FieldDeclaration {
             Some(_) => return refuse("a field's energy word that is not 0 or 1"),
         };
         let n = |w: &str| w.parse::<usize>().map_err(|_| TowerError::Refused("a field's declaration that is not a count"));
-        let d = Self { alphabet: n(words[1])?, width: n(words[2])?, heads: n(words[3])?, modes: n(words[4])?, still: n(words[5])?, contacts: n(words[6])?, ticks: n(words[7])?, frames: n(words[8])?, reach: n(words[9])?, lanes: n(words[10])?, depth: depth_word.map(n).transpose()?.unwrap_or(0), energy };
+        let d = Self { alphabet: n(words[1])?, width: n(words[2])?, heads: n(words[3])?, modes: n(words[4])?, still: n(words[5])?, contacts: n(words[6])?, ticks: n(words[7])?, frames: n(words[8])?, reach: n(words[9])?, lanes: n(words[10])?, depth: depth_word.map(n).transpose()?.unwrap_or(0), energy, carry: words.first().copied() == Some("hnn-field-v14k") };
         d.admit()?;
         Ok(d)
     }
@@ -548,6 +562,8 @@ pub struct FieldLayout {
     /// energy field's face is `z_t(a) = −(1/T) dG/de_t(a)`, one `T` for the whole field, held as `log₂ T` (one entry on the
     /// material's grain). Absent (zero long) otherwise.
     pub face_temper: usize,
+    /// [definition; theory, November 11 00:22] The carry's third chart `G` (`f × D`, on the material's grain), after every other family; absent in a field without the carry.
+    pub gchart: usize,
     pub len: usize,
     pub families: Vec<(usize, usize, u32)>,
 }
@@ -589,8 +605,11 @@ impl FieldLayout {
         let moment_face = push(dw * m2, MATERIAL_BITS);
         let moment_face_bias = push(dw, FACE_BITS);
         let lift_bias = push(dw, FACE_BITS);
-        let (pair_c, face_temper) = if d.energy { (push(f, MATERIAL_BITS), push(1, MATERIAL_BITS)) } else { (at, at) };
-        Self { enc, before, after, q, q_bias, v, v_bias, out, out_bias, a: a_, a_bias, b, b_bias, w, w_bias, read, read_bias, moment_before, moment_after, temper, probe, probe_bias, pace, moment_face, moment_face_bias, lift_bias, pair_c, face_temper, len: at, families }
+        let energetic = d.energy.then(|| (push(f, MATERIAL_BITS), push(1, MATERIAL_BITS)));
+        let gchart = d.carry.then(|| push(f * dw, MATERIAL_BITS));
+        let (pair_c, face_temper) = energetic.unwrap_or((at, at));
+        let gchart = gchart.unwrap_or(at);
+        Self { enc, before, after, q, q_bias, v, v_bias, out, out_bias, a: a_, a_bias, b, b_bias, w, w_bias, read, read_bias, moment_before, moment_after, temper, probe, probe_bias, pace, moment_face, moment_face_bias, lift_bias, pair_c, face_temper, gchart, len: at, families }
     }
 }
 
@@ -1987,6 +2006,21 @@ fn round_trips(before: &[Vec<Source>], after: &[Vec<Source>], sites: usize, trip
 }
 
 /// Each family's `max |w|`, read once a pass.
+/// [definition; theory, November 11 00:22] The carry's `γ` grain: `2^(−30)`, the frames' (`|γ| < 1`, so a value below `2^30`).
+const GAMMA_BITS: u32 = MOVE_BITS;
+
+/// [definition; theory, November 11 00:22] **`γ = g / √(1 + |g|²)`**, `g` complex on `2^(−16)`: `|g|²` on `2^(−32)`, the radicand `(1 + |g|²) 2^32`
+/// on `2^(−64)`, its root attained **exactly** (`⌊√·⌋`, an integer square root: no iteration's residue) on `2^(−32)`, so the root's grain is `2^(−32)`
+/// and its width the radicand's half (at most 48 bits for `|g| < 2^47` on `2^(−16)`, past it refused); `γ` is `g` over the root to the nearest on
+/// `2^(−30)` (`g 2^46 / root`, a ratio of two integers), and the scale `s = 1/√(1 + |g|²)` (`γ`'s own return reads it) `2^62 / root` to the nearest on
+/// `2^(−30)`. Returns `((γ_re, γ_im), s)`.
+fn gamma_of(gr: i128, gi: i128) -> Result<((i64, i64), i64)> {
+    let radicand = ((1i128 << 32) + gr * gr + gi * gi).checked_mul(1 << 32).filter(|&r| r > 0).ok_or(TowerError::Refused("a carry's chart past its 128-bit carrier"))?;
+    let root = i128::try_from((radicand as u128).isqrt()).map_err(|_| TowerError::Refused("a carry's root past its carrier"))?;
+    let part = |g: i128| -> Result<i64> { fit64(div_nearest(g.checked_shl(46).ok_or(TowerError::Refused("a carry's chart past its 128-bit carrier"))?, root)) };
+    Ok(((part(gr)?, part(gi)?), fit64(div_nearest(1i128 << 62, root))?))
+}
+
 struct Reaches {
     probe: u64,
     q: u64,
@@ -1995,6 +2029,7 @@ struct Reaches {
     a: u64,
     b: u64,
     w: u64,
+    g: u64,
     read: u64,
     moment_face: u64,
 }
@@ -2359,7 +2394,7 @@ impl Field {
         let (dw, m2, f) = (self.declaration.width, 2 * self.declaration.complex(), self.declaration.contacts);
         let l = &self.layout;
         let r = |start: usize, len: usize| reach(&self.theta[start..start + len]);
-        Reaches { probe: r(l.probe, m2 * dw), q: r(l.q, m2 * dw), v: r(l.v, m2 * dw), out: r(l.out, dw * m2), a: r(l.a, f * dw), b: r(l.b, f * dw), w: r(l.w, dw * f), read: r(l.read, dw * dw), moment_face: r(l.moment_face, dw * m2) }
+        Reaches { probe: r(l.probe, m2 * dw), q: r(l.q, m2 * dw), v: r(l.v, m2 * dw), out: r(l.out, dw * m2), a: r(l.a, f * dw), b: r(l.b, f * dw), w: r(l.w, dw * f), g: r(l.gchart, if self.declaration.carry { f * dw } else { 0 }), read: r(l.read, dw * dw), moment_face: r(l.moment_face, dw * m2) }
     }
 
     fn admit_region(&self, region: &Region) -> Result<()> {
@@ -2894,20 +2929,48 @@ impl Field {
             affine(&self.theta[l.a..l.a + f * dw], reaches.a, dw, rt, Some(&self.theta[l.a_bias..l.a_bias + f]), MATERIAL_BITS, MATERIAL_BITS, &mut cell.a[t * f..(t + 1) * f])?;
             affine(&self.theta[l.b..l.b + f * dw], reaches.b, dw, rt, Some(&self.theta[l.b_bias..l.b_bias + f]), MATERIAL_BITS, MATERIAL_BITS, &mut cell.b[t * f..(t + 1) * f])?;
         }
-        for t in 0..sites {
-            // [definition; agent-inferred, November 3, §16.34] The complex product a contact (§15.1) is a pair contact along
-            // the strand: contact `e < f/2` is `a_e + i a_(f/2+e)` at the site against its strand neighbour's `b`, the one
-            // before it at an even `e` and the one after at an odd ([`strand_mate`]), so two ring faces compose by adding
-            // their phases, `q(x + y) = q(x) q(y)`, across the strand's contact; none past the region's ends.
+        // [definition; theory, November 11 00:22, ruling R5 amended] **The carry's scan** (a unit running to its stop in one tick): the third chart
+        // `g = G r̂`, `γ = g / √(1 + |g|²)` ([`gamma_of`]), and along the strand, one release a step in strand order (never a parallel prefix,
+        // which would reorder the releases): even contacts from the left, odd from the right, `p(t) = a(t) Q(t∓1)` and `Q(t) = b(t) + γ(t) Q(t∓1)`,
+        // `Q` zero before the region's first site (past its last, for odd `e`); at `G = 0` `p(t) = a(t) b(mate)`, the built contact.
+        if d.carry {
             let half = f / 2;
+            let mut g = vec![0i64; sites * f];
+            for t in 0..sites {
+                let rt = &cell.read2[t * dw..(t + 1) * dw];
+                affine(&self.theta[l.gchart..l.gchart + f * dw], reaches.g, dw, rt, None, MATERIAL_BITS, MATERIAL_BITS, &mut g[t * f..(t + 1) * f])?;
+            }
             for e in 0..half {
-                let (ar, ai) = (cell.a[t * f + e] as i128, cell.a[t * f + half + e] as i128);
-                let (br, bi) = match strand_mate(t, e, sites) {
-                    Some(s) => (cell.b[s * f + e] as i128, cell.b[s * f + half + e] as i128),
-                    None => (0, 0),
-                };
-                cell.c[t * f + e] = fit64(release(ar * br - ai * bi, FACE_BITS))?;
-                cell.c[t * f + half + e] = fit64(release(ar * bi + ai * br, FACE_BITS))?;
+                let (mut qr, mut qi) = (0i128, 0i128);
+                for step in 0..sites {
+                    let t = if e % 2 == 0 { step } else { sites - 1 - step };
+                    let ((yr, yi), _) = gamma_of(g[t * f + e] as i128, g[t * f + half + e] as i128)?;
+                    let (ar, ai) = (cell.a[t * f + e] as i128, cell.a[t * f + half + e] as i128);
+                    cell.c[t * f + e] = fit64(release(ar * qr - ai * qi, FACE_BITS))?;
+                    cell.c[t * f + half + e] = fit64(release(ar * qi + ai * qr, FACE_BITS))?;
+                    let (yr, yi) = (i128::from(yr), i128::from(yi));
+                    let next_r = cell.b[t * f + e] as i128 + release(yr * qr - yi * qi, GAMMA_BITS);
+                    let next_i = cell.b[t * f + half + e] as i128 + release(yr * qi + yi * qr, GAMMA_BITS);
+                    (qr, qi) = (i128::from(fit64(next_r)?), i128::from(fit64(next_i)?));
+                }
+            }
+        }
+        for t in 0..sites {
+            if !d.carry {
+                // [definition; agent-inferred, November 3, §16.34] The complex product a contact (§15.1) is a pair contact along
+                // the strand: contact `e < f/2` is `a_e + i a_(f/2+e)` at the site against its strand neighbour's `b`, the one
+                // before it at an even `e` and the one after at an odd ([`strand_mate`]), so two ring faces compose by adding
+                // their phases, `q(x + y) = q(x) q(y)`, across the strand's contact; none past the region's ends.
+                let half = f / 2;
+                for e in 0..half {
+                    let (ar, ai) = (cell.a[t * f + e] as i128, cell.a[t * f + half + e] as i128);
+                    let (br, bi) = match strand_mate(t, e, sites) {
+                        Some(s) => (cell.b[s * f + e] as i128, cell.b[s * f + half + e] as i128),
+                        None => (0, 0),
+                    };
+                    cell.c[t * f + e] = fit64(release(ar * br - ai * bi, FACE_BITS))?;
+                    cell.c[t * f + half + e] = fit64(release(ar * bi + ai * br, FACE_BITS))?;
+                }
             }
             affine(&self.theta[l.w..l.w + dw * f], reaches.w, f, &cell.c[t * f..(t + 1) * f], Some(&self.theta[l.w_bias..l.w_bias + dw]), MATERIAL_BITS, MATERIAL_BITS, &mut o)?;
             for (xv, ov) in x[t * dw..(t + 1) * dw].iter_mut().zip(&o) {
@@ -3732,6 +3795,9 @@ impl Field {
         let reaches = self.reaches();
         if d.energy {
             return refuse("an energy field's return through its ticks is not built: it is read, not trained");
+        }
+        if d.carry {
+            return refuse("a return through the carry is on claude/v14-face-line (this line reads a carrying state's faces)");
         }
         if pass.ticks.len() != d.ticks {
             return refuse("a reverse reads a forward that held every tick");
@@ -5145,8 +5211,8 @@ impl Field {
         if factor < 2 {
             return refuse("a growth makes at least two copies");
         }
-        if self.scale.is_some() {
-            return refuse("a tower grows by its levels' lanes, not by copies (the tower record, D2)");
+        if self.scale.is_some() || self.declaration.carry {
+            return refuse("a tower grows by its levels' lanes, not by copies (the tower record, D2), and a field with the carry grows on claude/v14-face-line");
         }
         let old = self.declaration;
         let d = old.grown(factor)?;
@@ -5289,8 +5355,8 @@ impl Field {
     ///
     /// Returns the laned field and, for each entry, the old entry it carries (`None` for the lane's own).
     pub fn laned(&self, keys: &[u8]) -> Result<(Self, Vec<Option<usize>>)> {
-        if self.scale.is_some() {
-            return refuse("a tower's levels grow their lanes level by level, not through the fine field alone");
+        if self.scale.is_some() || self.declaration.carry {
+            return refuse("a tower's levels grow their lanes level by level, not through the fine field alone, and a field with the carry grows on claude/v14-face-line");
         }
         let old = self.declaration;
         let d = old.laned()?;
@@ -5382,8 +5448,8 @@ impl Field {
     ///
     /// Returns the grown field and, for each entry, the old entry it carries (`None` for a new contact's own).
     pub fn contacted(&self, added: usize, keys: &[u8]) -> Result<(Self, Vec<Option<usize>>)> {
-        if self.scale.is_some() {
-            return refuse("a tower's levels grow their contacts level by level, not through the fine field alone");
+        if self.scale.is_some() || self.declaration.carry {
+            return refuse("a tower's levels grow their contacts level by level, not through the fine field alone, and a field with the carry grows on claude/v14-face-line");
         }
         let old = self.declaration;
         let d = old.contacted(added)?;
@@ -5470,6 +5536,27 @@ pub struct TickRead {
 }
 
 impl Field {
+    /// [measurement; theory, November 11 00:22] **The carry's `γ` over a read pair chart** (`TickRead::pair_read`, `[t][D]`): at every site and complex contact
+    /// the `γ = g / √(1 + |g|²)` of `g = G r̂` ([`gamma_of`]), `[t][f/2]` on `2^(−30)`, a reading (the forward's own arithmetic on the chart the realization read).
+    pub fn carry_gammas(&self, pair_read: &[i32]) -> Result<Vec<(i64, i64)>> {
+        let d = &self.declaration;
+        if !d.carry {
+            return refuse("a field without the carry has no γ");
+        }
+        let (dw, f) = (d.width, d.contacts);
+        let (l, reach) = (&self.layout, self.reaches().g);
+        let half = f / 2;
+        let mut g = vec![0i64; f];
+        let mut out = Vec::with_capacity(pair_read.len() / dw * half);
+        for rt in pair_read.chunks_exact(dw) {
+            affine(&self.theta[l.gchart..l.gchart + f * dw], reach, dw, rt, None, MATERIAL_BITS, MATERIAL_BITS, &mut g)?;
+            for e in 0..half {
+                out.push(gamma_of(g[e] as i128, g[half + e] as i128)?.0);
+            }
+        }
+        Ok(out)
+    }
+
     /// Each tick's read of `region` ([`TickRead`]), in tick order.
     pub fn tick_reads(&self, region: &Region) -> Result<Vec<TickRead>> {
         let pass = self.pass(region, true)?;

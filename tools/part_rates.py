@@ -3,9 +3,10 @@
 
   part_rates.py open STATE CONTACTS_BEFORE OCTAVES OUT
   part_rates.py update OLDER OLD NOW OUT
+  part_rates.py trend OLDEST OLDER OLD NOW OUT   (theory, November 11 03:54: the slope-corrected rule; see trend())
 
-The learner's text carries each founded part's octaves in a trailing `parts CONTACTS_BEFORE k0 .. k14` line (holonics::hnn::tower::field::
-RateParts); the trainer steps part p at 2^-(rate - k_p). `open` writes STATE with the octaves OCTAVES (fifteen counts, comma separated, in
+The learner's text carries each founded part's octaves in a trailing `parts CONTACTS_BEFORE k0 .. k15` line (holonics::hnn::tower::field::
+RateParts); the trainer steps part p at 2^-(rate - k_p). `open` writes STATE with the octaves OCTAVES (sixteen counts, or fifteen with g_chart at the old rate, comma separated, in
 PART_NAMES order). `update` reads three saved states of one line and, for each part, the cosine c between its displacements OLD - OLDER and
 NOW - OLD over the entries it holds (exact integers): c > 1/2 one octave faster, c < 1/2 one slower, never under the old rate (octave 0) nor
 past rate - 1; c = 1/2 rests. It writes NOW with the moved octaves to OUT and prints FIELD_PART_RATE for every part. The parts are
@@ -14,7 +15,7 @@ Field::founded_parts' (checked against it by the ignored test founded_parts_and_
 import sys
 from math import isqrt
 
-PART_NAMES = ["w_new", "a_new", "b_new", "enc_lane", "before_lane", "after_lane", "q_lane", "v_lane", "probe_lane", "out_lane", "moment_face_lane", "read_lane", "face_biases_lane", "a_lane", "b_lane"]
+PART_NAMES = ["w_new", "a_new", "b_new", "enc_lane", "before_lane", "after_lane", "q_lane", "v_lane", "probe_lane", "out_lane", "moment_face_lane", "read_lane", "face_biases_lane", "a_lane", "b_lane", "g_chart"]
 PARTS = len(PART_NAMES)
 OLD = -1
 
@@ -42,6 +43,8 @@ def layout(d):
     push("probe", m2 * dw); push("probe_bias", m2)
     push("pace", paced * (a + 1))
     push("moment_face", dw * m2); push("moment_face_bias", dw); push("lift_bias", dw)
+    if d.get("carry"):
+        push("gchart", f * dw)
     return fam, at
 
 
@@ -53,6 +56,9 @@ def founded_parts(d, contacts_before):
     half_old, half_new = contacts_before // 2, f // 2
     new_contact = lambda e: half_old <= e < half_new or e >= half_new + half_old
     parts = [OLD] * total
+    if d.get("carry"):
+        for i in range(f * dw):
+            parts[fam["gchart"] + i] = 15
     for part, name in ((3, "enc"), (4, "before"), (5, "after")):
         for r in range(a1):
             for c in range(lw, dw):
@@ -91,6 +97,7 @@ def load(path):
     words = lines[1].split(" ")
     names = ["alphabet", "width", "heads", "modes", "still", "contacts", "ticks", "frames", "reach", "lanes"]
     d = {k: int(w) for k, w in zip(names, words[1:11])}
+    d["carry"] = words[0] == "hnn-field-v14k"
     rate = int(lines[0].split(" ")[1])
     theta = [int(x) for x in lines[2].split(" ")]
     return lines, d, rate, theta
@@ -100,7 +107,9 @@ def parts_line(lines):
     for l in lines:
         if l.startswith("parts "):
             v = [int(x) for x in l.split(" ")[1:]]
-            assert len(v) == 1 + PARTS
+            assert len(v) in (PARTS, 1 + PARTS), "a parts line of fifteen parts (before the carry) or sixteen"
+            if len(v) == PARTS:
+                v = v + [0]
             return v[0], v[1:]
     return None
 
@@ -125,7 +134,9 @@ def main():
     if len(args) == 5 and args[0] == "open":
         lines, d, rate, _ = load(args[1])
         contacts_before, octaves = int(args[2]), [int(k) for k in args[3].split(",")]
-        assert len(octaves) == PARTS and all(0 <= k < rate for k in octaves), "fifteen octave counts each under the rate's bits"
+        if len(octaves) == PARTS - 1:
+            octaves.append(0)
+        assert len(octaves) == PARTS and all(0 <= k < rate for k in octaves), "sixteen octave counts (fifteen, g_chart at the old rate) each under the rate's bits"
         assert 0 < contacts_before <= d["contacts"] and contacts_before % 4 == 0
         parts = founded_parts(d, contacts_before)
         for p, name in enumerate(PART_NAMES):
@@ -133,6 +144,13 @@ def main():
         write(lines, contacts_before, octaves, args[4])
     elif len(args) == 5 and args[0] == "update":
         (_, da, ra, older), (_, db, rb, old), (lines, dc, rate, now) = load(args[1]), load(args[2]), load(args[3])
+        # A state before the carry has no third chart: its entries read as zero (the founding), so the first lap of the carry reads the carry's own travel.
+        if dc.get("carry"):
+            if not da.get("carry"):
+                older = older + [0] * (len(now) - len(older))
+            if not db.get("carry"):
+                old = old + [0] * (len(now) - len(old))
+            da, db = {**da, "carry": True}, {**db, "carry": True}
         assert da == db == dc and len(older) == len(old) == len(now), "three states of one declaration"
         held = parts_line(lines)
         assert held is not None, "a state with no founded parts' rates (open sets them)"
@@ -163,8 +181,72 @@ def main():
             move = "faster" if k2 > k else "slower" if k2 < k else "hold"
             print(f"FIELD_PART_RATE part={name} entries={entries[p]} c={'-' if c < 0 else ''}{abs(c) // 1_000_000}.{abs(c) % 1_000_000:06d} rate_octaves={k2} was={k} move={move} rate_bits={rate - k2}")
         write(lines, contacts_before, nxt, args[4])
+    elif len(args) == 6 and args[0] == "trend":
+        trend(args[1:5], args[5])
     else:
         sys.exit(__doc__)
 
 
-main()
+GRAIN = 40  # the cosines, their slope and the noise term are released at 2^-40 (floor), a declared width; a tie at the grain rests
+
+
+def fixed(num, den):
+    """floor of num / den on 2^-GRAIN (den > 0)."""
+    return (num << GRAIN) // den
+
+
+def trend(paths, out):
+    """[theory, November 11 03:54] The trend rule from four saved states OLDEST, OLDER, OLD, NOW of one line, each carrying the octaves
+    its lap ran at (its `parts` line). Displacements da = OLDER - OLDEST (octave ka), db = OLD - OLDER (kb), dc = NOW - OLD (k, the present
+    octave). c' = cos(da, db), c = cos(db, dc): with the earlier lap of a pair at rate eta, c = c_s - eta Hbar, so where ka != kb the slope
+    h0 = (c' - c) / (2^kb - 2^ka), kept if positive, else 0. At the present octave: c^ = c + h0 (2^kb - 2^k), h = h0 2^k. Faster iff
+    c^ > h/2 + eps, slower iff c^ < -h/4 - eps (never under octave 0), else rest, with eps^2 = sum_i db_i^2 dc_i^2 / (|db|^2 |dc|^2); one
+    octave a lap at most, never past rate - 1. Every term is an integer on 2^-GRAIN."""
+    states = [load(p) for p in paths]
+    (_, d0, _, s0), (l1, d1, _, s1), (l2, d2, _, s2), (lines, d3, rate, s3) = states
+    assert d0 == d1 == d2 == d3 and len(s0) == len(s1) == len(s2) == len(s3), "four states of one declaration"
+    held = [parts_line(x[0]) for x in states[1:]]
+    assert all(h is not None for h in held), "OLDER, OLD and NOW each carry the octaves their lap ran at"
+    contacts_before = held[2][0]
+    ka, kb, kn = held[0][1], held[1][1], held[2][1]
+    parts = founded_parts(d3, contacts_before)
+    acc = [[0] * 6 for _ in range(PARTS)]  # dot(da,db), |da|^2, |db|^2, dot(db,dc), |dc|^2, sum db^2 dc^2
+    for i, p in enumerate(parts):
+        if p == OLD:
+            continue
+        a, b, c = s1[i] - s0[i], s2[i] - s1[i], s3[i] - s2[i]
+        q = acc[p]
+        q[0] += a * b; q[1] += a * a; q[2] += b * b; q[3] += b * c; q[4] += c * c; q[5] += b * b * c * c
+    one = 1 << GRAIN
+    nxt = []
+    for p, name in enumerate(PART_NAMES):
+        dab, naa, nbb, dbc, ncc, s4 = acc[p]
+        k = kn[p]
+        if naa == 0 or nbb == 0 or ncc == 0:
+            nxt.append(max(k - 1, 0))
+            print(f"FIELD_PART_RATE part={name} rule=trend c=- rate_octaves={nxt[-1]} was={k} move={'slower' if nxt[-1] < k else 'hold'} (a lap did not move it)")
+            continue
+        c1 = fixed(dab, isqrt(naa * nbb) or 1)   # c' on 2^-GRAIN
+        c0 = fixed(dbc, isqrt(nbb * ncc) or 1)   # c
+        eps = isqrt((s4 << (2 * GRAIN)) // (nbb * ncc))
+        span = (1 << kb[p]) - (1 << ka[p])
+        h0 = (c1 - c0) // span if span != 0 else 0
+        if h0 < 0 or (span != 0 and (c1 - c0) * span < 0):
+            h0 = 0
+        chat = c0 + h0 * ((1 << kb[p]) - (1 << k))
+        h = h0 * (1 << k)
+        if 2 * chat > h + 2 * eps:
+            k2 = min(k + 1, rate - 1)
+        elif 4 * chat < -h - 4 * eps:
+            k2 = max(k - 1, 0)
+        else:
+            k2 = k
+        nxt.append(k2)
+        r = lambda v: (lambda q: f"{'-' if v < 0 else ''}{q // 1_000_000}.{q % 1_000_000:06d}")(abs(v) * 1_000_000 >> GRAIN)
+        move = "faster" if k2 > k else "slower" if k2 < k else "rest"
+        print(f"FIELD_PART_RATE part={name} rule=trend c_prev={r(c1)} c={r(c0)} ka={ka[p]} kb={kb[p]} k={k} h0={r(h0)} c_hat={r(chat)} h={r(h)} eps={r(eps)} rate_octaves={k2} was={k} move={move} rate_bits={rate - k2}")
+    write(lines, contacts_before, nxt, out)
+
+
+if __name__ == "__main__":
+    main()

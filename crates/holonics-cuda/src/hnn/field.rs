@@ -239,6 +239,12 @@ struct Words {
     // [the unified-theory reading of November 6, 10:31] Past the last arrival a silent place runs at the bare rate (the host's
     // `Field::bare_stretch`).
     bare_stretch: u64,
+    // [definition; theory, November 11 00:22, ruling R5 amended] The carry along the strand, forward only here (`FieldDeclaration::carry`): whether it is on,
+    // the third chart `G`'s offset in the material and its reach, and (set per tick) the chart's output.
+    carry_on: u64,
+    wg: u64,
+    rg: u64,
+    pg: u64,
 }
 
 /// The moments' covector returned to the strands ([`CardField::moment_strands_back`]): each mode's 64-bit covector, the
@@ -409,6 +415,7 @@ fn set_tick(w: &mut Words, tick: &Tick, returning: bool) {
     w.ce = tick.ce.device_ptr();
     w.y = tick.y.device_ptr();
     w.pa = tick.pa.device_ptr();
+    w.pg = tick.pg.device_ptr();
     w.pb = tick.pb.device_ptr();
     w.pc = tick.pc.device_ptr();
     w.bits = tick.bits.device_ptr();
@@ -535,6 +542,8 @@ struct Tick<'c> {
     read2: Pooled<'c, i32>,
     scale2: Pooled<'c, i128>,
     pa: Pooled<'c, i64>,
+    /// [theory, November 11 00:22] The carry's third chart's output `[t][f]` (one slot without it).
+    pg: Pooled<'c, i64>,
     pb: Pooled<'c, i64>,
     pc: Pooled<'c, i64>,
     /// The tick's carrier width: the binary length of its largest unit word.
@@ -677,6 +686,8 @@ impl<T: Poolable> Drop for Pooled<'_, T> {
 #[derive(Clone, Debug, Default)]
 pub struct FieldProfile {
     pub kernels: std::collections::BTreeMap<&'static str, (u64, u128)>,
+    /// [measurement; theory, November 11] Each entry's blocks × block-threads summed over its launches (a reading of the launches' grids; the mean grid is this over the launches).
+    pub threads: std::collections::BTreeMap<&'static str, u128>,
     pub copies: (u64, u128),
     pub allocations: (u64, u128),
 }
@@ -1128,6 +1139,7 @@ impl<'c> CardField<'c> {
             let slot = p.kernels.entry(entry).or_insert((0, 0));
             slot.0 += 1;
             slot.1 += started.elapsed().as_nanos();
+            *p.threads.entry(entry).or_insert(0) += u128::from(grid.x) * u128::from(grid.y) * u128::from(grid.z) * u128::from(block);
         }
         Ok(())
     }
@@ -1299,6 +1311,9 @@ impl<'c> CardField<'c> {
             per_blank: u64::from(field.per_blank_clock),
             depth: d.depth as u64,
             bare_stretch: u64::from(field.bare_stretch),
+            carry_on: u64::from(d.carry),
+            wg: l.gchart as u64,
+            rg: reach(l.gchart, if d.carry { f * dw } else { 0 }),
             ..Words::default()
         };
         // The exponential's resident face, read once by its own loop on the card (a tower's packets read the fine field's).
@@ -1319,6 +1334,10 @@ impl<'c> CardField<'c> {
     /// region read ([`FieldRealization::read_landmarks`]).
     #[allow(clippy::type_complexity)]
     fn run(&mut self, field: &Field, regions: &[Region], returning: bool, logits: bool, keep: Option<&[usize]>) -> Result<(Vec<Vec<Option<TowerFace>>>, Vec<Vec<Option<Vec<i64>>>>, Vec<i128>, Rows, Vec<Vec<u64>>)> {
+        // [theory, November 10 23:30] The carry is read forward here; its adjoint is on claude/v14-face-line.
+        if returning && field.declaration.carry {
+            return Err(TowerError::Refused("a return through the carry is on claude/v14-face-line (this line reads a carrying state's faces)"));
+        }
         let d = field.declaration;
         // [agent-inferred, November 6] An energy field's faces and logits are its own forward's (`energy`); its return through
         // the ticks and its readings are not built, so every other read of it is refused.
@@ -1447,6 +1466,7 @@ impl<'c> CardField<'c> {
             read2: self.timed(Kind::Alloc, || self.take::<i32>((sites * dw).max(1))).map_err(device)?,
             scale2: self.timed(Kind::Alloc, || self.take::<i128>((sites * lanes).max(1))).map_err(device)?,
             pa: alloc64(sites * f)?,
+            pg: alloc64(if field.declaration.carry { sites * f } else { 1 })?,
             pb: alloc64(sites * f)?,
             pc: alloc64(sites * f)?,
             bits: self.timed(Kind::Alloc, || self.take_zeroed::<u32>(4)).map_err(device)?,
@@ -1663,7 +1683,13 @@ impl<'c> CardField<'c> {
         self.chart(words, words.x, &tick.read2, &tick.scale2, false)?;
         self.affine("field_affine_x32", words, words.wa, words.a_bias, words.ra, f, dw, tick.read2.device_ptr(), dw, tick.pa.device_ptr(), f, 0, false)?;
         self.affine("field_affine_x32", words, words.wb, words.b_bias, words.rb, f, dw, tick.read2.device_ptr(), dw, tick.pb.device_ptr(), f, 0, false)?;
-        self.launch("field_pair", Self::cells((sites * f / 2) as u64), THREADS, &mut [arg(words)])?;
+        if d.carry {
+            // [theory, November 11 00:22] The third chart, then the scan: one thread a (region, complex contact), sites in strand order.
+            self.affine("field_affine_x32", words, words.wg, NO_BIAS, words.rg, f, dw, tick.read2.device_ptr(), dw, tick.pg.device_ptr(), f, 0, false)?;
+            self.launch("field_pair_scan", Self::cells((words.r as usize * f / 2) as u64), THREADS, &mut [arg(words)])?;
+        } else {
+            self.launch("field_pair", Self::cells((sites * f / 2) as u64), THREADS, &mut [arg(words)])?;
+        }
         self.affine("field_affine_x64", words, words.w, words.w_bias, words.rw, dw, f, tick.pc.device_ptr(), f, 0, dw, words.x, false)?;
         self.mark("tick_launch_post");
         Ok(())
@@ -2819,7 +2845,9 @@ pub fn read_octets(d: &FieldDeclaration, returning: bool, echo: bool, sites: usi
     let probe_site = 4 * h * (1 + 2 * (1u64 << d.class_trits()));
     // The chart's and the pair contact's scales are one a lane (§16.40).
     let lanes = d.lanes as u64;
-    let tick_site = 4 * dw + 16 * lanes + 8 * 2 * m2 + 2 * 8 * h * span + 16 * h + 8 * h + 4 * h + 4 * h + 8 * m2 + 4 * dw + 16 * lanes + 3 * 8 * f + (2 * 16 * span + 8) * h + 8 * h * slots + probe_site + 4 * h * span + 8 * h * span + 4 * h * span + 16 * h;
+    // [theory, November 11 00:22] The carry's third chart's output, one word a contact a site.
+    let carry_site = if d.carry { 8 * f } else { 0 };
+    let tick_site = carry_site + 4 * dw + 16 * lanes + 8 * 2 * m2 + 2 * 8 * h * span + 16 * h + 8 * h + 4 * h + 4 * h + 8 * m2 + 4 * dw + 16 * lanes + 3 * 8 * f + (2 * 16 * span + 8) * h + 8 * h * slots + probe_site + 4 * h * span + 8 * h * span + 4 * h * span + 16 * h;
     let tick_fixed = tick_fixed_octets(d);
     // The face: its read, scale, logits, masses and total, and (§16.26) the lift and its covector.
     let face_site = 8 * dw + 4 * dw + 16 * lanes + 8 * a + 8 * a + 16 + 16 + 2 * 8 * dw;
@@ -3118,7 +3146,7 @@ mod tests {
     use super::*;
 
     fn declaration(width: usize, heads: usize, contacts: usize) -> FieldDeclaration {
-        FieldDeclaration { alphabet: 122, width, heads, modes: 8, still: 2, contacts, ticks: 2, frames: 4, reach: 2221, lanes: 1, depth: 0, energy: false }
+        FieldDeclaration { alphabet: 122, width, heads, modes: 8, still: 2, contacts, ticks: 2, frames: 4, reach: 2221, lanes: 1, depth: 0, energy: false, carry: false }
     }
 
     /// [measurement; theory, November 10 20:34] **The card's footprint by growth route** (host arithmetic, no card read): from the
@@ -3134,7 +3162,7 @@ mod tests {
         // [theory, November 10 21:10] Contacts come in fours (f/2 even): each f from 68 by fours on the main line's declaration (width 64, two
         // lanes), its material, whether the contacts' two maps tile a block (`affine_tiling`: `(f, dw)` and `(dw, f)`) with the shared octets, and
         // the octets of the longest region; then the first f past 128 and the first refused, and the shared figure that refuses it.
-        let base = FieldDeclaration { alphabet: 100, width: 64, heads: 4, modes: 8, still: 2, contacts: 64, ticks: 4, frames: 4, reach: 3771, lanes: 2, depth: 0, energy: false };
+        let base = FieldDeclaration { alphabet: 100, width: 64, heads: 4, modes: 8, still: 2, contacts: 64, ticks: 4, frames: 4, reach: 3771, lanes: 2, depth: 0, energy: false, carry: false };
         let mut first_refused = None;
         for f in (68..=512).step_by(4) {
             let d = FieldDeclaration { contacts: f, ..base };
@@ -3156,7 +3184,7 @@ mod tests {
     #[test]
     #[ignore]
     fn the_card_footprint_by_growth_route() {
-        let base = FieldDeclaration { alphabet: 100, width: 64, heads: 4, modes: 8, still: 2, contacts: 64, ticks: 4, frames: 4, reach: 3771, lanes: 2, depth: 0, energy: false };
+        let base = FieldDeclaration { alphabet: 100, width: 64, heads: 4, modes: 8, still: 2, contacts: 64, ticks: 4, frames: 4, reach: 3771, lanes: 2, depth: 0, energy: false, carry: false };
         let describe = |name: &str, d: FieldDeclaration| {
             let draws = 4 * d.founding_draws();
             let field = holonics::hnn::tower::field::Field::found(d, &vec![7u8; draws]).expect("founded");

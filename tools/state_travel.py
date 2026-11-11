@@ -46,6 +46,8 @@ def layout(d):
     push("probe", (m2, dw), MAT); push("probe_bias", (m2,), FACE)
     push("pace", (paced * (a + 1),), MAT)
     push("moment_face", (dw, m2), MAT); push("moment_face_bias", (dw,), FACE); push("lift_bias", (dw,), FACE)
+    if d.get("carry"):
+        push("gchart", (f, dw), MAT)
     return fam, at
 
 
@@ -54,6 +56,7 @@ def state(path):
     words = lines[1].split(" ")
     names = ["alphabet", "width", "heads", "modes", "still", "contacts", "ticks", "frames", "reach", "lanes"]
     d = {k: int(w) for k, w in zip(names, words[1:11])}
+    d["carry"] = words[0] == "hnn-field-v14k"
     theta = np.array([int(x) for x in lines[2].split(" ")], dtype=np.int64)
     return d, theta
 
