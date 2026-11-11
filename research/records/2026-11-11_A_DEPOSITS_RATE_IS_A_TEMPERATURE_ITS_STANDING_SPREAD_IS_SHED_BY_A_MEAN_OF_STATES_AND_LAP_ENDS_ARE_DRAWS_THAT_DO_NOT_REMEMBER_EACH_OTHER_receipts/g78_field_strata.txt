@@ -1,0 +1,14 @@
+# G78, K2: rt16/MEAN.0 (a400e81f7a0862c8) read held (laps 0) with bin-joint-strata field_pass 4bd56aa83f564d66 (cf4dd2495, the held joint read
+# also prints FIELD_JOINT_STRATA, a reading) exactly as mean_rt16 was read (held_group.sh: KEYS8, the same switches, L 1215000), 2026-11-11 16:24:26 to 16:24:39 UTC.
+CONTROL js_mean_rt16 held=1.726734 lap_line=1.726734
+K2_EQUAL the three held lines equal mean_rt16's, timings aside
+FIELD_HELD lap=-1 answer=5.507602 classes=43470 context=0.922491 context_classes=43470 foil=1.088968 question=0.166477 ms=4751
+FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.726734 foil_nats_a_place=1.860096 information_nats_a_place=0.133362 own_nats_a_word=12.975131 information_nats_a_word=1.002118
+FIELD_JOINT_STRATA lap=-1 open_quarters=1/2/3/4 own_nats_a_place=0.668675/1.269788/2.029184/2.929850 foil_nats_a_place=0.769827/1.409309/2.182878/3.068779 places=10818/10881/10853/10918 open_sites=5333/16153/26922/38725 terms_own=10943009092/20901353063/33315450086/48390819425 terms_foil=12598373230/23197942612/35838814593/50685439458
+FIELD_UNSEEN lap=-1 code=0.853 sites=43660 next=- ms=11729
+MEASURE lap=held_js_mean_rt16 rc=0 wall_s=12.5 peak_rss_kib=821624
+# mean_rt16's own lines (bin-lap-mean b8fe4ba838dd27a6, 15:03:51 UTC):
+mean_rt16 FIELD_HELD lap=-1 answer=5.507602 classes=43470 context=0.922491 context_classes=43470 foil=1.088968 question=0.166477 ms=3576
+mean_rt16 FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.726734 foil_nats_a_place=1.860096 information_nats_a_place=0.133362 own_nats_a_word=12.975131 information_nats_a_word=1.002118
+mean_rt16 FIELD_UNSEEN lap=-1 code=0.853 sites=43660 next=- ms=9395
+# the ruler's (cap_t.py depth 2, the field's draws): open_sites=5333/16153/26922/38725 places=10818/10881/10853/10918, equal to the field's four counts and places

@@ -1,0 +1,8 @@
+# G80, M2 (i): ctrl41 (64c06fe8bb7477ce) read held (laps 0) with bin-joint-strata 4bd56aa83f564d66 as its lap read it (lane_lap.sh's switches,
+# KEYS8, L 1700000), 2026-11-11 16:31:36 to 16:31:48 UTC; the control: its own joint against the logged 1.817565.
+CONTROL m2_ctrl41 held=1.817565 lap_line=1.817565
+FIELD_HELD lap=-1 answer=5.731122 classes=43470 context=1.068428 context_classes=43470 foil=1.261042 question=0.192613 ms=4443
+FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.817565 foil_nats_a_place=1.948017 information_nats_a_place=0.130452 own_nats_a_word=13.657659 information_nats_a_word=0.980247
+FIELD_JOINT_STRATA lap=-1 open_quarters=1/2/3/4 own_nats_a_place=0.778290/1.389184/2.120225/2.973393 foil_nats_a_place=0.883475/1.531558/2.268099/3.099679 places=10818/10881/10853/10918 open_sites=5333/16153/26922/38725 terms_own=12736872159/22866672825/34810180815/49109984434 terms_foil=14458243769/25210220430/37237995245/51195789430
+FIELD_UNSEEN lap=-1 code=0.999 sites=43660 next=- ms=10950
+MEASURE lap=held_m2_ctrl41 rc=0 wall_s=11.5 peak_rss_kib=962180

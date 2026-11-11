@@ -93,14 +93,16 @@ letter and the carry's gate. A build enters a line by reproducing the line's own
 included. An iteration between saved states stays within one hour on the card (Brandon,
 November 6); a run that would pass it is a design change, not a longer run.
 
-**Where it stands, by measurement (November 11).** The held answers' joint code is 1.7333 nats a
-place at the mean of the part-rate line's thirteenth lap (1.7388 at that lap's end; lap ends read
-0.022 under the plain rate at equal laps). A line's level is read at its lap's mean: a lap's end is
+**Where it stands, by measurement (November 11).** The held answers' joint code is 1.7248 nats a
+place at the mean of the part-rate line's eighteenth lap (1.7314 at that lap's end), and the line
+still cools at this law: its lap means fell 0.0008, 0.0033, 0.0020, 0.0013, 0.0003 and 0.0016 over
+laps 13 to 18. A line's level is read at its lap's mean: a lap's end is
 one draw of the spread its rates hold. Section to
 section the line is at rest (sections' deposits agree at a cosine of 0.08); lap over lap its young
 parts still charge: the second lane's reading charts and lift lengthen 1.5 to 2 percent a lap and
 the added contacts' columns 1.2 percent. The carry's four laps hold 0.005 to 0.007 under their
-controls and pass no letter past the second any better: as built it gives a term of three sites.
+controls and pass no letter past the second any better: as built, founded at zero, it gives a term
+of three sites. The added contacts carry the place's two-sided closure and not the third letter.
 The field lacks 0.233 nats a place of the joint law of two letters each side and passes little past
 two written letters. The release rests above the
 references and no write is yet ordered text.
@@ -117,10 +119,18 @@ references and no write is yet ordered text.
    ([the heat record](../../research/records/2026-11-11_A_DEPOSITS_RATE_IS_A_TEMPERATURE_ITS_STANDING_SPREAD_IS_SHED_BY_A_MEAN_OF_STATES_AND_LAP_ENDS_ARE_DRAWS_THAT_DO_NOT_REMEMBER_EACH_OTHER.md)):
    a rate is a temperature, its spread is shed by a lap's mean, and one pair of laps read at their
    means puts the raised lap 0.0009 under the lap at the old rate, where their ends put it 0.0041
-   above. So levels are read at lap means, and the rate rule is rebuilt there: a second raised lap
-   beside a second lap at the old rate (G68), the lap cosine between means (G69), and the release
-   read from a mean (G70) are fixed and on the card. The carry's failed acceptance (no third or
-   fourth letter) makes its founding the next loop's subject for that law, never its rate.
+   above. So levels are read at lap means. Read there, the raised pair ended (G68), a rate rule on means
+   has no rest position (G69), the release reads at lap ends (G70), and the whole machine at four
+   times the rate travelled 4.7 times as far for no level (G76): no rate is the subject, while the
+   line still cools at its base rate (G82)
+   ([the follow-up record](../../research/records/2026-11-11_RAISED_RATES_BUY_NO_LEVEL_THE_ADDED_CONTACTS_CLOSE_A_PLACE_BETWEEN_ITS_WRITTEN_NEIGHBOURS_AND_THE_THIRD_LETTER_IS_OWED_A_CARRY_FOUNDED_AS_A_TURN.md)).
+   The added contacts carry the place's two-sided closure and not the third letter (G80). The
+   carry's failed acceptance (no third or fourth letter) makes its founding the next loop's subject
+   for that law, never its rate: founded as a turn, on circles of its own whose return is founded
+   at zero, its gate charted as a turn and a friction apart (Lean `HNN/CarryGate`). The stride
+   ruler passes the third letter at 0.136 to 0.363 on 8 to 64 circles, its gain a doubling still
+   rising at 64 (G81); the first attempt is at 16 circles a mate, its laps paired with the line's
+   on the same sections (G83).
    Growth follows where a reading certifies it, with its guess fixed first.
 2. On the card, a region's share store takes its stride from the pairs that meet (atlas
    `tower.field-support-stride`), so a return rides one batch; then the next section's tables are

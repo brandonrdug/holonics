@@ -1,0 +1,10 @@
+# G78: the host ruler cap_t.py (cf4dd2495, sha256 27c2b56569db6f87), a chain of count tables that sums out its open letters; never machinery. Read 2026-11-11 UTC on the PC's host, niced 19.
+# python3 -I cap_t.py selftest (15:48 UTC; 13.5 s wall, peak 52472 KiB)
+cap_t selftest depth 1, forward sums kept every 64 sites: states 6; enumeration of 68 sites within 7.5e-15; one order's sum within 7.1e-15 of the left-to-right code less the told; strata, nats a place: given 0.9336 against 0.9294; free 1.3286 against 1.3276
+cap_t selftest depth 2, forward sums kept every 3 sites: states 27; enumeration of 62 sites within 6.7e-15; one order's sum within 5.3e-15 of the left-to-right code less the told; strata, nats a place: given 0.6132 against 0.6074; free 1.0042 against 1.0019
+cap_t selftest depth 3, forward sums kept every 5 sites: states 105; enumeration of 54 sites within 2.2e-15; one order's sum within 3.6e-15 of the left-to-right code less the told; strata, nats a place: given 0.6179 against 0.6117; free 1.0097 against 1.0064
+cap_t: 3 depths, the controls hold
+# nice -n 19 python3 -I cap_t.py 2 6 given SEED (SEED: the last eight bytes of the held reads' key file; 15:48 to 15:51 UTC; 201.0 s wall, peak resident 587136 KiB of the largest process)
+CHAIN depth=2 states=6758 answers=128 places=43470 longest=1147 length=given draws=the field's processes=6 built_s=2
+CHAIN_STRATA depth=2 open_quarters=1/2/3/4 nats_a_place=1.107310/1.554855/2.172100/2.996697 places=10818/10881/10853/10918 open_sites=5333/16153/26922/38725
+CHAIN_JOINT depth=2 order_averaged_nats_a_place=1.959719 left_to_right_nats_a_place=1.981518 length_nats_a_place=0.021807 every_fourth_open_nats_a_place=0.917457 every_site_open_nats_a_place=3.310590 places=43470 s=201

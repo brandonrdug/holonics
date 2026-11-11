@@ -1,0 +1,56 @@
+# G81: the stride ruler by circles, 2026-11-11 17:05:15 to 17:30:17 UTC on the host (the PC, 24 hardware threads), a ruler and never
+# machinery: twelve fresh fits of cap_o.py G R 1500 (the word of shared strides, the grip record's receipts copy, sha256 3cbbd795cb247323),
+# G = 2, 3, 4 left letters and R = 8, 16, 32, 64 circles, all twelve started together, one compute thread each
+# (OMP_NUM_THREADS=OPENBLAS_NUM_THREADS=MKL_NUM_THREADS=1), each under timeout 1800, beside the card's lap rt18 (17:05:15 to 17:21:31).
+# Inputs: yard.py (1264479881f2ebc6) and train.npz (ec89faa059b0e819) of G78's directory, HOLONICS_ROOT/.local/theory/2026-11-11/ruler_t,
+# linked; HELD128.txt (ed5d743c1c031cca) read through yard.py's root from HOLONICS_ROOT/.local/data/python-codes-25k/passage. No passage
+# text is copied here. The fits ran in one directory with no cap_o_g*_r*.npz in it at start; each fit's state carries its own G and R
+# in its name, so every fit started fresh and none continued another's state. Dispatched as runs.py g81-stride-ruler.
+# GNU time is not installed on the PC, so each fit was measured by meter.py (getrusage of the waited-for tree: exit status, wall, user and
+# system CPU, peak resident set) in place of /usr/bin/time -v.
+# Projection: 1,500 s of fit plus up to 120 s of reading (1,620 s). Deadline 1,800 s a fit. Measured wall 1,500.3 to 1,502.6 s a fit
+# (0.93 of the projection; the reads took under 3 s); the run 1,502 s. Peak resident set 580,976 to 801,040 KiB a fit. No fit passed its
+# deadline; every exit status is 0.
+# The READ line is cap_o.py's final line as printed (held: nats a place on HELD128's places with G letters before them), then its METER line.
+## G=2 R=8
+READ word g=2 r=8 step 39750 | contexts 6584 | train 2.0916 | held places 43214 | held 2.1419 | mean |alpha| 1.311 | 1500s
+METER fit_g2_r8 rc=0 started=17:05:15Z ended=17:30:15Z wall_s=1500.3 user_s=1489.2 sys_s=2.9 peak_rss_kib=583248
+## G=2 R=16
+READ word g=2 r=16 step 29523 | contexts 6584 | train 2.0200 | held places 43214 | held 2.0695 | mean |alpha| 1.255 | 1500s
+METER fit_g2_r16 rc=0 started=17:05:15Z ended=17:30:15Z wall_s=1500.3 user_s=1489.1 sys_s=2.7 peak_rss_kib=584216
+## G=2 R=32
+READ word g=2 r=32 step 18577 | contexts 6584 | train 1.9729 | held places 43214 | held 2.0156 | mean |alpha| 1.271 | 1500s
+METER fit_g2_r32 rc=0 started=17:05:15Z ended=17:30:15Z wall_s=1500.4 user_s=1488.4 sys_s=2.1 peak_rss_kib=583828
+## G=2 R=64
+READ word g=2 r=64 step 8075 | contexts 6584 | train 1.9511 | held places 43214 | held 1.9943 | mean |alpha| 1.540 | 1501s
+METER fit_g2_r64 rc=0 started=17:05:15Z ended=17:30:16Z wall_s=1500.7 user_s=1486.4 sys_s=2.9 peak_rss_kib=584272
+## G=3 R=8
+READ word g=3 r=8 step 23732 | contexts 67083 | train 1.9439 | held places 43087 | held 2.0063 | mean |alpha| 0.576 | 1500s
+METER fit_g3_r8 rc=0 started=17:05:15Z ended=17:30:15Z wall_s=1500.4 user_s=1486.4 sys_s=3.0 peak_rss_kib=582796
+## G=3 R=16
+READ word g=3 r=16 step 18307 | contexts 67083 | train 1.8115 | held places 43087 | held 1.8723 | mean |alpha| 0.599 | 1500s
+METER fit_g3_r16 rc=0 started=17:05:15Z ended=17:30:15Z wall_s=1500.6 user_s=1487.4 sys_s=3.4 peak_rss_kib=582320
+## G=3 R=32
+READ word g=3 r=32 step 12052 | contexts 67083 | train 1.6759 | held places 43087 | held 1.7422 | mean |alpha| 0.722 | 1501s
+METER fit_g3_r32 rc=0 started=17:05:15Z ended=17:30:16Z wall_s=1500.8 user_s=1489.4 sys_s=3.2 peak_rss_kib=582628
+## G=3 R=64
+READ word g=3 r=64 step 6856 | contexts 67083 | train 1.5635 | held places 43087 | held 1.6311 | mean |alpha| 0.765 | 1501s
+METER fit_g3_r64 rc=0 started=17:05:15Z ended=17:30:16Z wall_s=1501.3 user_s=1486.8 sys_s=4.9 peak_rss_kib=663036
+## G=4 R=8
+READ word g=4 r=8 step 19410 | contexts 242724 | train 1.8939 | held places 42960 | held 1.9543 | mean |alpha| 0.439 | 1501s
+METER fit_g4_r8 rc=0 started=17:05:15Z ended=17:30:16Z wall_s=1500.8 user_s=1487.0 sys_s=3.6 peak_rss_kib=581208
+## G=4 R=16
+READ word g=4 r=16 step 15276 | contexts 242724 | train 1.7637 | held places 42960 | held 1.8312 | mean |alpha| 0.505 | 1501s
+METER fit_g4_r16 rc=0 started=17:05:15Z ended=17:30:16Z wall_s=1501.0 user_s=1487.8 sys_s=3.9 peak_rss_kib=580976
+## G=4 R=32
+READ word g=4 r=32 step 10266 | contexts 242724 | train 1.6182 | held places 42960 | held 1.6862 | mean |alpha| 0.578 | 1501s
+METER fit_g4_r32 rc=0 started=17:05:15Z ended=17:30:16Z wall_s=1501.5 user_s=1488.5 sys_s=3.7 peak_rss_kib=629152
+## G=4 R=64
+READ word g=4 r=64 step 5886 | contexts 242724 | train 1.4805 | held places 42960 | held 1.5517 | mean |alpha| 0.638 | 1502s
+METER fit_g4_r64 rc=0 started=17:05:15Z ended=17:30:17Z wall_s=1502.6 user_s=1484.2 sys_s=7.6 peak_rss_kib=801040
+## Read from the lines above (arithmetic, nats a place; the place sets differ by G as in the grip record: 43214, 43087, 42960)
+# held by circles 8, 16, 32, 64:   two letters 2.1419 2.0695 2.0156 1.9943 | three 2.0063 1.8723 1.7422 1.6311 | four 1.9543 1.8312 1.6862 1.5517
+# the third letter's pass (two less three): 0.1356 0.1972 0.2734 0.3632
+# the fourth letter's pass (three less four): 0.0520 0.0411 0.0560 0.0794
+# mean |alpha| at three letters: 0.576 0.599 0.722 0.765; at two 1.311 1.255 1.271 1.540; at four 0.439 0.505 0.578 0.638
+# steps in the budget: two letters 39750 29523 18577 8075 | three 23732 18307 12052 6856 | four 19410 15276 10266 5886

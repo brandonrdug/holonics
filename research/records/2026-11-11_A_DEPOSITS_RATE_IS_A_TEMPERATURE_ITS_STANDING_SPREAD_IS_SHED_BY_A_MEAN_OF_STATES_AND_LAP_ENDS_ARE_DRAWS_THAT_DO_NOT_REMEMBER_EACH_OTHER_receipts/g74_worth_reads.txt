@@ -1,0 +1,479 @@
+# G74: g74_reads.txt whole (sha256 c00f775da7edd4f74d62f29ae2e5d4ed779e275096c5e74c160461a01bc04893), read 2026-11-11 14:29:40 to 14:49:00 UTC:
+# the grafts by rate part of S1 to S4 and the held read of each of the 116 states, the control rt13/MEAN.0 first.
+# G74: the split of a lap's fall by rate part. The STATE_GRAFT lines of S1 to S4 (tools/state_travel.py graft, contacts:32), then
+# each held read (laps 0) on bin-lap-mean/field_pass b8fe4ba838dd27a6 (8368f084b), L 1215000, its three lines; the control first.
+table=S1 group=g01 direction=fwd head=rt13/MEAN.0 donor=rt14/MEAN.0 STATE_GRAFT families=part:w_new,part:a_new,part:b_new entries=6208 of=63606 moved=6208 rms_from_head=22257
+table=S1 group=g02 direction=fwd head=rt13/MEAN.0 donor=rt14/MEAN.0 STATE_GRAFT families=part:enc_lane,part:before_lane,part:after_lane entries=9696 of=63606 moved=9689 rms_from_head=198.15
+table=S1 group=g03 direction=fwd head=rt13/MEAN.0 donor=rt14/MEAN.0 STATE_GRAFT families=part:q_lane entries=2048 of=63606 moved=2048 rms_from_head=14531
+table=S1 group=g04 direction=fwd head=rt13/MEAN.0 donor=rt14/MEAN.0 STATE_GRAFT families=part:v_lane entries=2048 of=63606 moved=2048 rms_from_head=15282
+table=S1 group=g05 direction=fwd head=rt13/MEAN.0 donor=rt14/MEAN.0 STATE_GRAFT families=part:probe_lane entries=2048 of=63606 moved=2048 rms_from_head=17260
+table=S1 group=g06 direction=fwd head=rt13/MEAN.0 donor=rt14/MEAN.0 STATE_GRAFT families=part:out_lane entries=2048 of=63606 moved=2048 rms_from_head=11319
+table=S1 group=g07 direction=fwd head=rt13/MEAN.0 donor=rt14/MEAN.0 STATE_GRAFT families=part:moment_face_lane entries=2048 of=63606 moved=1024 rms_from_head=7324.3
+table=S1 group=g08 direction=fwd head=rt13/MEAN.0 donor=rt14/MEAN.0 STATE_GRAFT families=part:read_lane entries=3072 of=63606 moved=3072 rms_from_head=8585.5
+table=S1 group=g09 direction=fwd head=rt13/MEAN.0 donor=rt14/MEAN.0 STATE_GRAFT families=part:face_biases_lane entries=128 of=63606 moved=128 rms_from_head=3.4334
+table=S1 group=g10 direction=fwd head=rt13/MEAN.0 donor=rt14/MEAN.0 STATE_GRAFT families=part:a_lane,part:b_lane entries=2048 of=63606 moved=2048 rms_from_head=7961.4
+table=S1 group=g11 direction=fwd head=rt13/MEAN.0 donor=rt14/MEAN.0 STATE_GRAFT families=enc/old,before/old,after/old entries=9696 of=63606 moved=9690 rms_from_head=197.23
+table=S1 group=g12 direction=fwd head=rt13/MEAN.0 donor=rt14/MEAN.0 STATE_GRAFT families=q/old entries=2048 of=63606 moved=2048 rms_from_head=14066
+table=S1 group=g13 direction=fwd head=rt13/MEAN.0 donor=rt14/MEAN.0 STATE_GRAFT families=v/old entries=2048 of=63606 moved=2048 rms_from_head=15471
+table=S1 group=g14 direction=fwd head=rt13/MEAN.0 donor=rt14/MEAN.0 STATE_GRAFT families=probe/old entries=2048 of=63606 moved=2048 rms_from_head=17958
+table=S1 group=g15 direction=fwd head=rt13/MEAN.0 donor=rt14/MEAN.0 STATE_GRAFT families=out/old entries=2048 of=63606 moved=2048 rms_from_head=13232
+table=S1 group=g16 direction=fwd head=rt13/MEAN.0 donor=rt14/MEAN.0 STATE_GRAFT families=moment_face/old entries=2048 of=63606 moved=1024 rms_from_head=7752.6
+table=S1 group=g17 direction=fwd head=rt13/MEAN.0 donor=rt14/MEAN.0 STATE_GRAFT families=w/old entries=2048 of=63606 moved=2048 rms_from_head=6285.6
+table=S1 group=g18 direction=fwd head=rt13/MEAN.0 donor=rt14/MEAN.0 STATE_GRAFT families=a/old,b/old entries=2048 of=63606 moved=2048 rms_from_head=10146
+table=S1 group=g19 direction=fwd head=rt13/MEAN.0 donor=rt14/MEAN.0 STATE_GRAFT families=read/old entries=1024 of=63606 moved=1024 rms_from_head=5229.9
+table=S1 group=g20 direction=fwd head=rt13/MEAN.0 donor=rt14/MEAN.0 STATE_GRAFT families=q_bias/old,v_bias/old,probe_bias/old,read_bias/old,out_bias/old,w_bias/old,moment_face_bias/old,lift_bias/old,a_bias/old,b_bias/old entries=484 of=63606 moved=482 rms_from_head=11.535
+table=S1 group=g21 direction=fwd head=rt13/MEAN.0 donor=rt14/MEAN.0 STATE_GRAFT families=moment_before/old,moment_after/old entries=6464 of=63606 moved=6389 rms_from_head=125.15
+table=S1 group=g22 direction=fwd head=rt13/MEAN.0 donor=rt14/MEAN.0 STATE_GRAFT families=temper/old,pace/old entries=210 of=63606 moved=208 rms_from_head=9399.1
+# S1 fwd: the entries of the 22 groups sum to 63606 = of=63606
+table=S1 group=g01 direction=rev head=rt14/MEAN.0 donor=rt13/MEAN.0 STATE_GRAFT families=part:w_new,part:a_new,part:b_new entries=6208 of=63606 moved=6208 rms_from_head=22257
+table=S1 group=g02 direction=rev head=rt14/MEAN.0 donor=rt13/MEAN.0 STATE_GRAFT families=part:enc_lane,part:before_lane,part:after_lane entries=9696 of=63606 moved=9689 rms_from_head=198.15
+table=S1 group=g03 direction=rev head=rt14/MEAN.0 donor=rt13/MEAN.0 STATE_GRAFT families=part:q_lane entries=2048 of=63606 moved=2048 rms_from_head=14531
+table=S1 group=g04 direction=rev head=rt14/MEAN.0 donor=rt13/MEAN.0 STATE_GRAFT families=part:v_lane entries=2048 of=63606 moved=2048 rms_from_head=15282
+table=S1 group=g05 direction=rev head=rt14/MEAN.0 donor=rt13/MEAN.0 STATE_GRAFT families=part:probe_lane entries=2048 of=63606 moved=2048 rms_from_head=17260
+table=S1 group=g06 direction=rev head=rt14/MEAN.0 donor=rt13/MEAN.0 STATE_GRAFT families=part:out_lane entries=2048 of=63606 moved=2048 rms_from_head=11319
+table=S1 group=g07 direction=rev head=rt14/MEAN.0 donor=rt13/MEAN.0 STATE_GRAFT families=part:moment_face_lane entries=2048 of=63606 moved=1024 rms_from_head=7324.3
+table=S1 group=g08 direction=rev head=rt14/MEAN.0 donor=rt13/MEAN.0 STATE_GRAFT families=part:read_lane entries=3072 of=63606 moved=3072 rms_from_head=8585.5
+table=S1 group=g09 direction=rev head=rt14/MEAN.0 donor=rt13/MEAN.0 STATE_GRAFT families=part:face_biases_lane entries=128 of=63606 moved=128 rms_from_head=3.4334
+table=S1 group=g10 direction=rev head=rt14/MEAN.0 donor=rt13/MEAN.0 STATE_GRAFT families=part:a_lane,part:b_lane entries=2048 of=63606 moved=2048 rms_from_head=7961.4
+table=S1 group=g11 direction=rev head=rt14/MEAN.0 donor=rt13/MEAN.0 STATE_GRAFT families=enc/old,before/old,after/old entries=9696 of=63606 moved=9690 rms_from_head=197.23
+table=S1 group=g12 direction=rev head=rt14/MEAN.0 donor=rt13/MEAN.0 STATE_GRAFT families=q/old entries=2048 of=63606 moved=2048 rms_from_head=14066
+table=S1 group=g13 direction=rev head=rt14/MEAN.0 donor=rt13/MEAN.0 STATE_GRAFT families=v/old entries=2048 of=63606 moved=2048 rms_from_head=15471
+table=S1 group=g14 direction=rev head=rt14/MEAN.0 donor=rt13/MEAN.0 STATE_GRAFT families=probe/old entries=2048 of=63606 moved=2048 rms_from_head=17958
+table=S1 group=g15 direction=rev head=rt14/MEAN.0 donor=rt13/MEAN.0 STATE_GRAFT families=out/old entries=2048 of=63606 moved=2048 rms_from_head=13232
+table=S1 group=g16 direction=rev head=rt14/MEAN.0 donor=rt13/MEAN.0 STATE_GRAFT families=moment_face/old entries=2048 of=63606 moved=1024 rms_from_head=7752.6
+table=S1 group=g17 direction=rev head=rt14/MEAN.0 donor=rt13/MEAN.0 STATE_GRAFT families=w/old entries=2048 of=63606 moved=2048 rms_from_head=6285.6
+table=S1 group=g18 direction=rev head=rt14/MEAN.0 donor=rt13/MEAN.0 STATE_GRAFT families=a/old,b/old entries=2048 of=63606 moved=2048 rms_from_head=10146
+table=S1 group=g19 direction=rev head=rt14/MEAN.0 donor=rt13/MEAN.0 STATE_GRAFT families=read/old entries=1024 of=63606 moved=1024 rms_from_head=5229.9
+table=S1 group=g20 direction=rev head=rt14/MEAN.0 donor=rt13/MEAN.0 STATE_GRAFT families=q_bias/old,v_bias/old,probe_bias/old,read_bias/old,out_bias/old,w_bias/old,moment_face_bias/old,lift_bias/old,a_bias/old,b_bias/old entries=484 of=63606 moved=482 rms_from_head=11.535
+table=S1 group=g21 direction=rev head=rt14/MEAN.0 donor=rt13/MEAN.0 STATE_GRAFT families=moment_before/old,moment_after/old entries=6464 of=63606 moved=6389 rms_from_head=125.15
+table=S1 group=g22 direction=rev head=rt14/MEAN.0 donor=rt13/MEAN.0 STATE_GRAFT families=temper/old,pace/old entries=210 of=63606 moved=208 rms_from_head=9399.1
+# S1 rev: the entries of the 22 groups sum to 63606 = of=63606
+table=S2 group=g01 direction=fwd head=rt14/MEAN.0 donor=rt15/MEAN.0 STATE_GRAFT families=part:w_new,part:a_new,part:b_new entries=6208 of=63606 moved=6207 rms_from_head=22707
+table=S2 group=g02 direction=fwd head=rt14/MEAN.0 donor=rt15/MEAN.0 STATE_GRAFT families=part:enc_lane,part:before_lane,part:after_lane entries=9696 of=63606 moved=9690 rms_from_head=198
+table=S2 group=g03 direction=fwd head=rt14/MEAN.0 donor=rt15/MEAN.0 STATE_GRAFT families=part:q_lane entries=2048 of=63606 moved=2048 rms_from_head=14039
+table=S2 group=g04 direction=fwd head=rt14/MEAN.0 donor=rt15/MEAN.0 STATE_GRAFT families=part:v_lane entries=2048 of=63606 moved=2048 rms_from_head=15140
+table=S2 group=g05 direction=fwd head=rt14/MEAN.0 donor=rt15/MEAN.0 STATE_GRAFT families=part:probe_lane entries=2048 of=63606 moved=2048 rms_from_head=17093
+table=S2 group=g06 direction=fwd head=rt14/MEAN.0 donor=rt15/MEAN.0 STATE_GRAFT families=part:out_lane entries=2048 of=63606 moved=2048 rms_from_head=11633
+table=S2 group=g07 direction=fwd head=rt14/MEAN.0 donor=rt15/MEAN.0 STATE_GRAFT families=part:moment_face_lane entries=2048 of=63606 moved=1024 rms_from_head=7173.2
+table=S2 group=g08 direction=fwd head=rt14/MEAN.0 donor=rt15/MEAN.0 STATE_GRAFT families=part:read_lane entries=3072 of=63606 moved=3072 rms_from_head=8479.2
+table=S2 group=g09 direction=fwd head=rt14/MEAN.0 donor=rt15/MEAN.0 STATE_GRAFT families=part:face_biases_lane entries=128 of=63606 moved=126 rms_from_head=3.3469
+table=S2 group=g10 direction=fwd head=rt14/MEAN.0 donor=rt15/MEAN.0 STATE_GRAFT families=part:a_lane,part:b_lane entries=2048 of=63606 moved=2048 rms_from_head=8082.9
+table=S2 group=g11 direction=fwd head=rt14/MEAN.0 donor=rt15/MEAN.0 STATE_GRAFT families=enc/old,before/old,after/old entries=9696 of=63606 moved=9686 rms_from_head=195.39
+table=S2 group=g12 direction=fwd head=rt14/MEAN.0 donor=rt15/MEAN.0 STATE_GRAFT families=q/old entries=2048 of=63606 moved=2048 rms_from_head=14187
+table=S2 group=g13 direction=fwd head=rt14/MEAN.0 donor=rt15/MEAN.0 STATE_GRAFT families=v/old entries=2048 of=63606 moved=2048 rms_from_head=15373
+table=S2 group=g14 direction=fwd head=rt14/MEAN.0 donor=rt15/MEAN.0 STATE_GRAFT families=probe/old entries=2048 of=63606 moved=2048 rms_from_head=17621
+table=S2 group=g15 direction=fwd head=rt14/MEAN.0 donor=rt15/MEAN.0 STATE_GRAFT families=out/old entries=2048 of=63606 moved=2048 rms_from_head=13176
+table=S2 group=g16 direction=fwd head=rt14/MEAN.0 donor=rt15/MEAN.0 STATE_GRAFT families=moment_face/old entries=2048 of=63606 moved=1024 rms_from_head=7817.3
+table=S2 group=g17 direction=fwd head=rt14/MEAN.0 donor=rt15/MEAN.0 STATE_GRAFT families=w/old entries=2048 of=63606 moved=2048 rms_from_head=6212.4
+table=S2 group=g18 direction=fwd head=rt14/MEAN.0 donor=rt15/MEAN.0 STATE_GRAFT families=a/old,b/old entries=2048 of=63606 moved=2048 rms_from_head=10026
+table=S2 group=g19 direction=fwd head=rt14/MEAN.0 donor=rt15/MEAN.0 STATE_GRAFT families=read/old entries=1024 of=63606 moved=1024 rms_from_head=5157.2
+table=S2 group=g20 direction=fwd head=rt14/MEAN.0 donor=rt15/MEAN.0 STATE_GRAFT families=q_bias/old,v_bias/old,probe_bias/old,read_bias/old,out_bias/old,w_bias/old,moment_face_bias/old,lift_bias/old,a_bias/old,b_bias/old entries=484 of=63606 moved=480 rms_from_head=10.1
+table=S2 group=g21 direction=fwd head=rt14/MEAN.0 donor=rt15/MEAN.0 STATE_GRAFT families=moment_before/old,moment_after/old entries=6464 of=63606 moved=6392 rms_from_head=126.13
+table=S2 group=g22 direction=fwd head=rt14/MEAN.0 donor=rt15/MEAN.0 STATE_GRAFT families=temper/old,pace/old entries=210 of=63606 moved=208 rms_from_head=8850.7
+# S2 fwd: the entries of the 22 groups sum to 63606 = of=63606
+table=S2 group=g01 direction=rev head=rt15/MEAN.0 donor=rt14/MEAN.0 STATE_GRAFT families=part:w_new,part:a_new,part:b_new entries=6208 of=63606 moved=6207 rms_from_head=22707
+table=S2 group=g02 direction=rev head=rt15/MEAN.0 donor=rt14/MEAN.0 STATE_GRAFT families=part:enc_lane,part:before_lane,part:after_lane entries=9696 of=63606 moved=9690 rms_from_head=198
+table=S2 group=g03 direction=rev head=rt15/MEAN.0 donor=rt14/MEAN.0 STATE_GRAFT families=part:q_lane entries=2048 of=63606 moved=2048 rms_from_head=14039
+table=S2 group=g04 direction=rev head=rt15/MEAN.0 donor=rt14/MEAN.0 STATE_GRAFT families=part:v_lane entries=2048 of=63606 moved=2048 rms_from_head=15140
+table=S2 group=g05 direction=rev head=rt15/MEAN.0 donor=rt14/MEAN.0 STATE_GRAFT families=part:probe_lane entries=2048 of=63606 moved=2048 rms_from_head=17093
+table=S2 group=g06 direction=rev head=rt15/MEAN.0 donor=rt14/MEAN.0 STATE_GRAFT families=part:out_lane entries=2048 of=63606 moved=2048 rms_from_head=11633
+table=S2 group=g07 direction=rev head=rt15/MEAN.0 donor=rt14/MEAN.0 STATE_GRAFT families=part:moment_face_lane entries=2048 of=63606 moved=1024 rms_from_head=7173.2
+table=S2 group=g08 direction=rev head=rt15/MEAN.0 donor=rt14/MEAN.0 STATE_GRAFT families=part:read_lane entries=3072 of=63606 moved=3072 rms_from_head=8479.2
+table=S2 group=g09 direction=rev head=rt15/MEAN.0 donor=rt14/MEAN.0 STATE_GRAFT families=part:face_biases_lane entries=128 of=63606 moved=126 rms_from_head=3.3469
+table=S2 group=g10 direction=rev head=rt15/MEAN.0 donor=rt14/MEAN.0 STATE_GRAFT families=part:a_lane,part:b_lane entries=2048 of=63606 moved=2048 rms_from_head=8082.9
+table=S2 group=g11 direction=rev head=rt15/MEAN.0 donor=rt14/MEAN.0 STATE_GRAFT families=enc/old,before/old,after/old entries=9696 of=63606 moved=9686 rms_from_head=195.39
+table=S2 group=g12 direction=rev head=rt15/MEAN.0 donor=rt14/MEAN.0 STATE_GRAFT families=q/old entries=2048 of=63606 moved=2048 rms_from_head=14187
+table=S2 group=g13 direction=rev head=rt15/MEAN.0 donor=rt14/MEAN.0 STATE_GRAFT families=v/old entries=2048 of=63606 moved=2048 rms_from_head=15373
+table=S2 group=g14 direction=rev head=rt15/MEAN.0 donor=rt14/MEAN.0 STATE_GRAFT families=probe/old entries=2048 of=63606 moved=2048 rms_from_head=17621
+table=S2 group=g15 direction=rev head=rt15/MEAN.0 donor=rt14/MEAN.0 STATE_GRAFT families=out/old entries=2048 of=63606 moved=2048 rms_from_head=13176
+table=S2 group=g16 direction=rev head=rt15/MEAN.0 donor=rt14/MEAN.0 STATE_GRAFT families=moment_face/old entries=2048 of=63606 moved=1024 rms_from_head=7817.3
+table=S2 group=g17 direction=rev head=rt15/MEAN.0 donor=rt14/MEAN.0 STATE_GRAFT families=w/old entries=2048 of=63606 moved=2048 rms_from_head=6212.4
+table=S2 group=g18 direction=rev head=rt15/MEAN.0 donor=rt14/MEAN.0 STATE_GRAFT families=a/old,b/old entries=2048 of=63606 moved=2048 rms_from_head=10026
+table=S2 group=g19 direction=rev head=rt15/MEAN.0 donor=rt14/MEAN.0 STATE_GRAFT families=read/old entries=1024 of=63606 moved=1024 rms_from_head=5157.2
+table=S2 group=g20 direction=rev head=rt15/MEAN.0 donor=rt14/MEAN.0 STATE_GRAFT families=q_bias/old,v_bias/old,probe_bias/old,read_bias/old,out_bias/old,w_bias/old,moment_face_bias/old,lift_bias/old,a_bias/old,b_bias/old entries=484 of=63606 moved=480 rms_from_head=10.1
+table=S2 group=g21 direction=rev head=rt15/MEAN.0 donor=rt14/MEAN.0 STATE_GRAFT families=moment_before/old,moment_after/old entries=6464 of=63606 moved=6392 rms_from_head=126.13
+table=S2 group=g22 direction=rev head=rt15/MEAN.0 donor=rt14/MEAN.0 STATE_GRAFT families=temper/old,pace/old entries=210 of=63606 moved=208 rms_from_head=8850.7
+# S2 rev: the entries of the 22 groups sum to 63606 = of=63606
+table=S3 group=FIVE direction=fwd head=rt14/MEAN.0 donor=wm14/MEAN.0 STATE_GRAFT families=part:q_lane,part:v_lane,part:probe_lane,part:out_lane,part:moment_face_lane entries=10240 of=63606 moved=9216 rms_from_head=1.9851e+05
+table=S3 group=REST direction=fwd head=rt14/MEAN.0 donor=wm14/MEAN.0 STATE_GRAFT families=part:w_new,part:a_new,part:b_new,part:enc_lane,part:before_lane,part:after_lane,part:read_lane,part:face_biases_lane,part:a_lane,part:b_lane,enc/old,before/old,after/old,q/old,v/old,probe/old,out/old,moment_face/old,w/old,a/old,b/old,read/old,q_bias/old,v_bias/old,probe_bias/old,read_bias/old,out_bias/old,w_bias/old,moment_face_bias/old,lift_bias/old,a_bias/old,b_bias/old,moment_before/old,moment_after/old,temper/old,pace/old entries=53366 of=63606 moved=52072 rms_from_head=26141
+table=S3 group=g03 direction=fwd head=rt14/MEAN.0 donor=wm14/MEAN.0 STATE_GRAFT families=part:q_lane entries=2048 of=63606 moved=2048 rms_from_head=42510
+table=S3 group=g04 direction=fwd head=rt14/MEAN.0 donor=wm14/MEAN.0 STATE_GRAFT families=part:v_lane entries=2048 of=63606 moved=2048 rms_from_head=1.7886e+05
+table=S3 group=g05 direction=fwd head=rt14/MEAN.0 donor=wm14/MEAN.0 STATE_GRAFT families=part:probe_lane entries=2048 of=63606 moved=2048 rms_from_head=57808
+table=S3 group=g06 direction=fwd head=rt14/MEAN.0 donor=wm14/MEAN.0 STATE_GRAFT families=part:out_lane entries=2048 of=63606 moved=2048 rms_from_head=41651
+table=S3 group=g07 direction=fwd head=rt14/MEAN.0 donor=wm14/MEAN.0 STATE_GRAFT families=part:moment_face_lane entries=2048 of=63606 moved=1024 rms_from_head=23040
+# S3 fwd: the entries of the FIVE and REST sum to 63606 = of=63606
+table=S3 group=FIVE direction=rev head=wm14/MEAN.0 donor=rt14/MEAN.0 STATE_GRAFT families=part:q_lane,part:v_lane,part:probe_lane,part:out_lane,part:moment_face_lane entries=10240 of=63606 moved=9216 rms_from_head=1.9851e+05
+table=S3 group=REST direction=rev head=wm14/MEAN.0 donor=rt14/MEAN.0 STATE_GRAFT families=part:w_new,part:a_new,part:b_new,part:enc_lane,part:before_lane,part:after_lane,part:read_lane,part:face_biases_lane,part:a_lane,part:b_lane,enc/old,before/old,after/old,q/old,v/old,probe/old,out/old,moment_face/old,w/old,a/old,b/old,read/old,q_bias/old,v_bias/old,probe_bias/old,read_bias/old,out_bias/old,w_bias/old,moment_face_bias/old,lift_bias/old,a_bias/old,b_bias/old,moment_before/old,moment_after/old,temper/old,pace/old entries=53366 of=63606 moved=52072 rms_from_head=26141
+table=S3 group=g03 direction=rev head=wm14/MEAN.0 donor=rt14/MEAN.0 STATE_GRAFT families=part:q_lane entries=2048 of=63606 moved=2048 rms_from_head=42510
+table=S3 group=g04 direction=rev head=wm14/MEAN.0 donor=rt14/MEAN.0 STATE_GRAFT families=part:v_lane entries=2048 of=63606 moved=2048 rms_from_head=1.7886e+05
+table=S3 group=g05 direction=rev head=wm14/MEAN.0 donor=rt14/MEAN.0 STATE_GRAFT families=part:probe_lane entries=2048 of=63606 moved=2048 rms_from_head=57808
+table=S3 group=g06 direction=rev head=wm14/MEAN.0 donor=rt14/MEAN.0 STATE_GRAFT families=part:out_lane entries=2048 of=63606 moved=2048 rms_from_head=41651
+table=S3 group=g07 direction=rev head=wm14/MEAN.0 donor=rt14/MEAN.0 STATE_GRAFT families=part:moment_face_lane entries=2048 of=63606 moved=1024 rms_from_head=23040
+# S3 rev: the entries of the FIVE and REST sum to 63606 = of=63606
+table=S4 group=FIVE direction=fwd head=rt15/MEAN.0 donor=wm15/MEAN.0 STATE_GRAFT families=part:q_lane,part:v_lane,part:probe_lane,part:out_lane,part:moment_face_lane entries=10240 of=63606 moved=9216 rms_from_head=2.7606e+05
+table=S4 group=REST direction=fwd head=rt15/MEAN.0 donor=wm15/MEAN.0 STATE_GRAFT families=part:w_new,part:a_new,part:b_new,part:enc_lane,part:before_lane,part:after_lane,part:read_lane,part:face_biases_lane,part:a_lane,part:b_lane,enc/old,before/old,after/old,q/old,v/old,probe/old,out/old,moment_face/old,w/old,a/old,b/old,read/old,q_bias/old,v_bias/old,probe_bias/old,read_bias/old,out_bias/old,w_bias/old,moment_face_bias/old,lift_bias/old,a_bias/old,b_bias/old,moment_before/old,moment_after/old,temper/old,pace/old entries=53366 of=63606 moved=52100 rms_from_head=38031
+table=S4 group=g03 direction=fwd head=rt15/MEAN.0 donor=wm15/MEAN.0 STATE_GRAFT families=part:q_lane entries=2048 of=63606 moved=2048 rms_from_head=58308
+table=S4 group=g04 direction=fwd head=rt15/MEAN.0 donor=wm15/MEAN.0 STATE_GRAFT families=part:v_lane entries=2048 of=63606 moved=2048 rms_from_head=2.4738e+05
+table=S4 group=g05 direction=fwd head=rt15/MEAN.0 donor=wm15/MEAN.0 STATE_GRAFT families=part:probe_lane entries=2048 of=63606 moved=2048 rms_from_head=83873
+table=S4 group=g06 direction=fwd head=rt15/MEAN.0 donor=wm15/MEAN.0 STATE_GRAFT families=part:out_lane entries=2048 of=63606 moved=2048 rms_from_head=60272
+table=S4 group=g07 direction=fwd head=rt15/MEAN.0 donor=wm15/MEAN.0 STATE_GRAFT families=part:moment_face_lane entries=2048 of=63606 moved=1024 rms_from_head=30817
+# S4 fwd: the entries of the FIVE and REST sum to 63606 = of=63606
+table=S4 group=FIVE direction=rev head=wm15/MEAN.0 donor=rt15/MEAN.0 STATE_GRAFT families=part:q_lane,part:v_lane,part:probe_lane,part:out_lane,part:moment_face_lane entries=10240 of=63606 moved=9216 rms_from_head=2.7606e+05
+table=S4 group=REST direction=rev head=wm15/MEAN.0 donor=rt15/MEAN.0 STATE_GRAFT families=part:w_new,part:a_new,part:b_new,part:enc_lane,part:before_lane,part:after_lane,part:read_lane,part:face_biases_lane,part:a_lane,part:b_lane,enc/old,before/old,after/old,q/old,v/old,probe/old,out/old,moment_face/old,w/old,a/old,b/old,read/old,q_bias/old,v_bias/old,probe_bias/old,read_bias/old,out_bias/old,w_bias/old,moment_face_bias/old,lift_bias/old,a_bias/old,b_bias/old,moment_before/old,moment_after/old,temper/old,pace/old entries=53366 of=63606 moved=52100 rms_from_head=38031
+table=S4 group=g03 direction=rev head=wm15/MEAN.0 donor=rt15/MEAN.0 STATE_GRAFT families=part:q_lane entries=2048 of=63606 moved=2048 rms_from_head=58308
+table=S4 group=g04 direction=rev head=wm15/MEAN.0 donor=rt15/MEAN.0 STATE_GRAFT families=part:v_lane entries=2048 of=63606 moved=2048 rms_from_head=2.4738e+05
+table=S4 group=g05 direction=rev head=wm15/MEAN.0 donor=rt15/MEAN.0 STATE_GRAFT families=part:probe_lane entries=2048 of=63606 moved=2048 rms_from_head=83873
+table=S4 group=g06 direction=rev head=wm15/MEAN.0 donor=rt15/MEAN.0 STATE_GRAFT families=part:out_lane entries=2048 of=63606 moved=2048 rms_from_head=60272
+table=S4 group=g07 direction=rev head=wm15/MEAN.0 donor=rt15/MEAN.0 STATE_GRAFT families=part:moment_face_lane entries=2048 of=63606 moved=1024 rms_from_head=30817
+# S4 rev: the entries of the FIVE and REST sum to 63606 = of=63606
+s_control_rt13_mean FIELD_HELD lap=-1 answer=5.500395 classes=43470 context=0.928722 context_classes=43470 foil=1.098111 question=0.169389 ms=4011
+s_control_rt13_mean FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.733318 foil_nats_a_place=1.864378 information_nats_a_place=0.131060 own_nats_a_word=13.024606 information_nats_a_word=0.984818
+s_control_rt13_mean FIELD_UNSEEN lap=-1 code=0.861 sites=43660 next=- ms=9893
+S1_g01_fwd FIELD_HELD lap=-1 answer=5.505636 classes=43470 context=0.927885 context_classes=43470 foil=1.096711 question=0.168826 ms=3674
+S1_g01_fwd FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.732922 foil_nats_a_place=1.864163 information_nats_a_place=0.131241 own_nats_a_word=13.021630 information_nats_a_word=0.986181
+S1_g01_fwd FIELD_UNSEEN lap=-1 code=0.861 sites=43660 next=- ms=9475
+S1_g02_fwd FIELD_HELD lap=-1 answer=5.494124 classes=43470 context=0.928298 context_classes=43470 foil=1.097574 question=0.169276 ms=3632
+S1_g02_fwd FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.733065 foil_nats_a_place=1.864124 information_nats_a_place=0.131058 own_nats_a_word=13.022706 information_nats_a_word=0.984805
+S1_g02_fwd FIELD_UNSEEN lap=-1 code=0.861 sites=43660 next=- ms=9426
+S1_g03_fwd FIELD_HELD lap=-1 answer=5.516842 classes=43470 context=0.929299 context_classes=43470 foil=1.097906 question=0.168607 ms=3585
+S1_g03_fwd FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.732992 foil_nats_a_place=1.863598 information_nats_a_place=0.130606 own_nats_a_word=13.022154 information_nats_a_word=0.981407
+S1_g03_fwd FIELD_UNSEEN lap=-1 code=0.861 sites=43660 next=- ms=9451
+S1_g04_fwd FIELD_HELD lap=-1 answer=5.521167 classes=43470 context=0.928633 context_classes=43470 foil=1.098019 question=0.169386 ms=3676
+S1_g04_fwd FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.733344 foil_nats_a_place=1.865351 information_nats_a_place=0.132008 own_nats_a_word=13.024798 information_nats_a_word=0.991940
+S1_g04_fwd FIELD_UNSEEN lap=-1 code=0.862 sites=43660 next=- ms=9604
+S1_g05_fwd FIELD_HELD lap=-1 answer=5.497586 classes=43470 context=0.928998 context_classes=43470 foil=1.097900 question=0.168902 ms=3656
+S1_g05_fwd FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.733037 foil_nats_a_place=1.864432 information_nats_a_place=0.131395 own_nats_a_word=13.022494 information_nats_a_word=0.987334
+S1_g05_fwd FIELD_UNSEEN lap=-1 code=0.861 sites=43660 next=- ms=9559
+S1_g06_fwd FIELD_HELD lap=-1 answer=5.514460 classes=43470 context=0.929077 context_classes=43470 foil=1.098002 question=0.168924 ms=3603
+S1_g06_fwd FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.732871 foil_nats_a_place=1.865090 information_nats_a_place=0.132219 own_nats_a_word=13.021244 information_nats_a_word=0.993532
+S1_g06_fwd FIELD_UNSEEN lap=-1 code=0.861 sites=43660 next=- ms=9412
+S1_g07_fwd FIELD_HELD lap=-1 answer=5.503656 classes=43470 context=0.928699 context_classes=43470 foil=1.097824 question=0.169125 ms=3629
+S1_g07_fwd FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.733080 foil_nats_a_place=1.864027 information_nats_a_place=0.130947 own_nats_a_word=13.022816 information_nats_a_word=0.983968
+S1_g07_fwd FIELD_UNSEEN lap=-1 code=0.861 sites=43660 next=- ms=9548
+S1_g08_fwd FIELD_HELD lap=-1 answer=5.536968 classes=43470 context=0.928743 context_classes=43470 foil=1.098197 question=0.169453 ms=3685
+S1_g08_fwd FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.733634 foil_nats_a_place=1.864846 information_nats_a_place=0.131211 own_nats_a_word=13.026981 information_nats_a_word=0.985955
+S1_g08_fwd FIELD_UNSEEN lap=-1 code=0.861 sites=43660 next=- ms=9563
+S1_g09_fwd FIELD_HELD lap=-1 answer=5.492530 classes=43470 context=0.928844 context_classes=43470 foil=1.098264 question=0.169419 ms=3661
+S1_g09_fwd FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.733262 foil_nats_a_place=1.864511 information_nats_a_place=0.131249 own_nats_a_word=13.024180 information_nats_a_word=0.986240
+S1_g09_fwd FIELD_UNSEEN lap=-1 code=0.861 sites=43660 next=- ms=9492
+S1_g10_fwd FIELD_HELD lap=-1 answer=5.518674 classes=43470 context=0.930084 context_classes=43470 foil=1.098828 question=0.168744 ms=3618
+S1_g10_fwd FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.732925 foil_nats_a_place=1.865247 information_nats_a_place=0.132322 own_nats_a_word=13.021650 information_nats_a_word=0.994301
+S1_g10_fwd FIELD_UNSEEN lap=-1 code=0.862 sites=43660 next=- ms=9446
+S1_g11_fwd FIELD_HELD lap=-1 answer=5.491260 classes=43470 context=0.928665 context_classes=43470 foil=1.097755 question=0.169090 ms=3676
+S1_g11_fwd FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.733078 foil_nats_a_place=1.864371 information_nats_a_place=0.131292 own_nats_a_word=13.022802 information_nats_a_word=0.986566
+S1_g11_fwd FIELD_UNSEEN lap=-1 code=0.861 sites=43660 next=- ms=9537
+S1_g12_fwd FIELD_HELD lap=-1 answer=5.507708 classes=43470 context=0.928971 context_classes=43470 foil=1.098121 question=0.169150 ms=3760
+S1_g12_fwd FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.733215 foil_nats_a_place=1.865104 information_nats_a_place=0.131889 own_nats_a_word=13.023829 information_nats_a_word=0.991048
+S1_g12_fwd FIELD_UNSEEN lap=-1 code=0.861 sites=43660 next=- ms=9582
+S1_g13_fwd FIELD_HELD lap=-1 answer=5.485693 classes=43470 context=0.928877 context_classes=43470 foil=1.097612 question=0.168736 ms=3698
+S1_g13_fwd FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.732968 foil_nats_a_place=1.864261 information_nats_a_place=0.131293 own_nats_a_word=13.021971 information_nats_a_word=0.986570
+S1_g13_fwd FIELD_UNSEEN lap=-1 code=0.861 sites=43660 next=- ms=9522
+S1_g14_fwd FIELD_HELD lap=-1 answer=5.510011 classes=43470 context=0.928896 context_classes=43470 foil=1.097982 question=0.169086 ms=3694
+S1_g14_fwd FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.733293 foil_nats_a_place=1.864235 information_nats_a_place=0.130942 own_nats_a_word=13.024413 information_nats_a_word=0.983933
+S1_g14_fwd FIELD_UNSEEN lap=-1 code=0.861 sites=43660 next=- ms=9526
+S1_g15_fwd FIELD_HELD lap=-1 answer=5.505699 classes=43470 context=0.929281 context_classes=43470 foil=1.098036 question=0.168755 ms=3628
+S1_g15_fwd FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.733126 foil_nats_a_place=1.864439 information_nats_a_place=0.131313 own_nats_a_word=13.023163 information_nats_a_word=0.986721
+S1_g15_fwd FIELD_UNSEEN lap=-1 code=0.861 sites=43660 next=- ms=9456
+S1_g16_fwd FIELD_HELD lap=-1 answer=5.503249 classes=43470 context=0.929667 context_classes=43470 foil=1.098226 question=0.168559 ms=3623
+S1_g16_fwd FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.733337 foil_nats_a_place=1.864787 information_nats_a_place=0.131450 own_nats_a_word=13.024750 information_nats_a_word=0.987750
+S1_g16_fwd FIELD_UNSEEN lap=-1 code=0.861 sites=43660 next=- ms=9507
+S1_g17_fwd FIELD_HELD lap=-1 answer=5.486532 classes=43470 context=0.929510 context_classes=43470 foil=1.097619 question=0.168109 ms=3687
+S1_g17_fwd FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.733648 foil_nats_a_place=1.864418 information_nats_a_place=0.130770 own_nats_a_word=13.027085 information_nats_a_word=0.982641
+S1_g17_fwd FIELD_UNSEEN lap=-1 code=0.861 sites=43660 next=- ms=9598
+S1_g18_fwd FIELD_HELD lap=-1 answer=5.471158 classes=43470 context=0.928496 context_classes=43470 foil=1.097831 question=0.169335 ms=3685
+S1_g18_fwd FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.732788 foil_nats_a_place=1.863986 information_nats_a_place=0.131198 own_nats_a_word=13.020621 information_nats_a_word=0.985854
+S1_g18_fwd FIELD_UNSEEN lap=-1 code=0.861 sites=43660 next=- ms=9521
+S1_g19_fwd FIELD_HELD lap=-1 answer=5.500107 classes=43470 context=0.929234 context_classes=43470 foil=1.098576 question=0.169342 ms=3588
+S1_g19_fwd FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.733665 foil_nats_a_place=1.864629 information_nats_a_place=0.130964 own_nats_a_word=13.027209 information_nats_a_word=0.984099
+S1_g19_fwd FIELD_UNSEEN lap=-1 code=0.861 sites=43660 next=- ms=9563
+S1_g20_fwd FIELD_HELD lap=-1 answer=5.485652 classes=43470 context=0.928858 context_classes=43470 foil=1.098071 question=0.169213 ms=4609
+S1_g20_fwd FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.733241 foil_nats_a_place=1.863918 information_nats_a_place=0.130677 own_nats_a_word=13.024025 information_nats_a_word=0.981942
+S1_g20_fwd FIELD_UNSEEN lap=-1 code=0.861 sites=43660 next=- ms=11080
+S1_g21_fwd FIELD_HELD lap=-1 answer=5.478521 classes=43470 context=0.929123 context_classes=43470 foil=1.097482 question=0.168360 ms=4399
+S1_g21_fwd FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.733451 foil_nats_a_place=1.864135 information_nats_a_place=0.130684 own_nats_a_word=13.025604 information_nats_a_word=0.981996
+S1_g21_fwd FIELD_UNSEEN lap=-1 code=0.861 sites=43660 next=- ms=10456
+S1_g22_fwd FIELD_HELD lap=-1 answer=5.503037 classes=43470 context=0.928593 context_classes=43470 foil=1.097884 question=0.169291 ms=4126
+S1_g22_fwd FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.733327 foil_nats_a_place=1.864381 information_nats_a_place=0.131053 own_nats_a_word=13.024675 information_nats_a_word=0.984767
+S1_g22_fwd FIELD_UNSEEN lap=-1 code=0.861 sites=43660 next=- ms=10066
+S1_g01_rev FIELD_HELD lap=-1 answer=5.489852 classes=43470 context=0.928883 context_classes=43470 foil=1.097383 question=0.168500 ms=3755
+S1_g01_rev FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.730981 foil_nats_a_place=1.862690 information_nats_a_place=0.131710 own_nats_a_word=13.007041 information_nats_a_word=0.989700
+S1_g01_rev FIELD_UNSEEN lap=-1 code=0.860 sites=43660 next=- ms=9607
+S1_g02_rev FIELD_HELD lap=-1 answer=5.505365 classes=43470 context=0.928030 context_classes=43470 foil=1.095630 question=0.167600 ms=3846
+S1_g02_rev FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.730321 foil_nats_a_place=1.862351 information_nats_a_place=0.132030 own_nats_a_word=13.002081 information_nats_a_word=0.992111
+S1_g02_rev FIELD_UNSEEN lap=-1 code=0.859 sites=43660 next=- ms=9702
+S1_g03_rev FIELD_HELD lap=-1 answer=5.502084 classes=43470 context=0.926864 context_classes=43470 foil=1.095438 question=0.168574 ms=4065
+S1_g03_rev FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.730690 foil_nats_a_place=1.862771 information_nats_a_place=0.132080 own_nats_a_word=13.004859 information_nats_a_word=0.992487
+S1_g03_rev FIELD_UNSEEN lap=-1 code=0.859 sites=43660 next=- ms=10062
+S1_g04_rev FIELD_HELD lap=-1 answer=5.479971 classes=43470 context=0.927754 context_classes=43470 foil=1.096063 question=0.168309 ms=3959
+S1_g04_rev FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.729890 foil_nats_a_place=1.861852 information_nats_a_place=0.131963 own_nats_a_word=12.998841 information_nats_a_word=0.991603
+S1_g04_rev FIELD_UNSEEN lap=-1 code=0.859 sites=43660 next=- ms=9843
+S1_g05_rev FIELD_HELD lap=-1 answer=5.499530 classes=43470 context=0.927825 context_classes=43470 foil=1.095626 question=0.167802 ms=3625
+S1_g05_rev FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.730037 foil_nats_a_place=1.862187 information_nats_a_place=0.132150 own_nats_a_word=12.999947 information_nats_a_word=0.993011
+S1_g05_rev FIELD_UNSEEN lap=-1 code=0.859 sites=43660 next=- ms=9444
+S1_g06_rev FIELD_HELD lap=-1 answer=5.481597 classes=43470 context=0.927690 context_classes=43470 foil=1.095278 question=0.167589 ms=3596
+S1_g06_rev FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.730288 foil_nats_a_place=1.862217 information_nats_a_place=0.131930 own_nats_a_word=13.001834 information_nats_a_word=0.991354
+S1_g06_rev FIELD_UNSEEN lap=-1 code=0.859 sites=43660 next=- ms=9427
+S1_g07_rev FIELD_HELD lap=-1 answer=5.499996 classes=43470 context=0.927694 context_classes=43470 foil=1.095472 question=0.167777 ms=3601
+S1_g07_rev FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.730372 foil_nats_a_place=1.862679 information_nats_a_place=0.132307 own_nats_a_word=13.002470 information_nats_a_word=0.994187
+S1_g07_rev FIELD_UNSEEN lap=-1 code=0.859 sites=43660 next=- ms=9441
+S1_g08_rev FIELD_HELD lap=-1 answer=5.458276 classes=43470 context=0.927942 context_classes=43470 foil=1.095526 question=0.167584 ms=3588
+S1_g08_rev FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.730026 foil_nats_a_place=1.862110 information_nats_a_place=0.132083 own_nats_a_word=12.999868 information_nats_a_word=0.992509
+S1_g08_rev FIELD_UNSEEN lap=-1 code=0.859 sites=43660 next=- ms=9412
+S1_g09_rev FIELD_HELD lap=-1 answer=5.504709 classes=43470 context=0.927624 context_classes=43470 foil=1.095317 question=0.167693 ms=3597
+S1_g09_rev FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.729897 foil_nats_a_place=1.862286 information_nats_a_place=0.132389 own_nats_a_word=12.998895 information_nats_a_word=0.994806
+S1_g09_rev FIELD_UNSEEN lap=-1 code=0.859 sites=43660 next=- ms=9448
+S1_g10_rev FIELD_HELD lap=-1 answer=5.485538 classes=43470 context=0.926637 context_classes=43470 foil=1.095062 question=0.168425 ms=3600
+S1_g10_rev FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.730130 foil_nats_a_place=1.862443 information_nats_a_place=0.132313 own_nats_a_word=13.000647 information_nats_a_word=0.994237
+S1_g10_rev FIELD_UNSEEN lap=-1 code=0.859 sites=43660 next=- ms=9453
+S1_g11_rev FIELD_HELD lap=-1 answer=5.510435 classes=43470 context=0.927790 context_classes=43470 foil=1.095342 question=0.167551 ms=3622
+S1_g11_rev FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.730334 foil_nats_a_place=1.862511 information_nats_a_place=0.132177 own_nats_a_word=13.002182 information_nats_a_word=0.993215
+S1_g11_rev FIELD_UNSEEN lap=-1 code=0.859 sites=43660 next=- ms=9471
+S1_g12_rev FIELD_HELD lap=-1 answer=5.501171 classes=43470 context=0.926751 context_classes=43470 foil=1.095621 question=0.168870 ms=3573
+S1_g12_rev FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.730300 foil_nats_a_place=1.861306 information_nats_a_place=0.131005 own_nats_a_word=13.001929 information_nats_a_word=0.984408
+S1_g12_rev FIELD_UNSEEN lap=-1 code=0.859 sites=43660 next=- ms=9412
+S1_g13_rev FIELD_HELD lap=-1 answer=5.516817 classes=43470 context=0.927832 context_classes=43470 foil=1.095709 question=0.167876 ms=3569
+S1_g13_rev FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.730243 foil_nats_a_place=1.862652 information_nats_a_place=0.132409 own_nats_a_word=13.001500 information_nats_a_word=0.994954
+S1_g13_rev FIELD_UNSEEN lap=-1 code=0.859 sites=43660 next=- ms=9402
+S1_g14_rev FIELD_HELD lap=-1 answer=5.487904 classes=43470 context=0.927669 context_classes=43470 foil=1.095295 question=0.167626 ms=3594
+S1_g14_rev FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.730090 foil_nats_a_place=1.862276 information_nats_a_place=0.132186 own_nats_a_word=13.000350 information_nats_a_word=0.993277
+S1_g14_rev FIELD_UNSEEN lap=-1 code=0.859 sites=43660 next=- ms=9433
+S1_g15_rev FIELD_HELD lap=-1 answer=5.492605 classes=43470 context=0.927437 context_classes=43470 foil=1.095326 question=0.167890 ms=3568
+S1_g15_rev FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.730297 foil_nats_a_place=1.862508 information_nats_a_place=0.132211 own_nats_a_word=13.001901 information_nats_a_word=0.993467
+S1_g15_rev FIELD_UNSEEN lap=-1 code=0.859 sites=43660 next=- ms=9397
+S1_g16_rev FIELD_HELD lap=-1 answer=5.499969 classes=43470 context=0.926750 context_classes=43470 foil=1.094785 question=0.168035 ms=3598
+S1_g16_rev FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.730137 foil_nats_a_place=1.862392 information_nats_a_place=0.132255 own_nats_a_word=13.000699 information_nats_a_word=0.993801
+S1_g16_rev FIELD_UNSEEN lap=-1 code=0.859 sites=43660 next=- ms=9448
+S1_g17_rev FIELD_HELD lap=-1 answer=5.519349 classes=43470 context=0.927967 context_classes=43470 foil=1.096493 question=0.168526 ms=3654
+S1_g17_rev FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.730517 foil_nats_a_place=1.862717 information_nats_a_place=0.132200 own_nats_a_word=13.003554 information_nats_a_word=0.993385
+S1_g17_rev FIELD_UNSEEN lap=-1 code=0.860 sites=43660 next=- ms=9510
+S1_g18_rev FIELD_HELD lap=-1 answer=5.543825 classes=43470 context=0.928119 context_classes=43470 foil=1.095895 question=0.167776 ms=3569
+S1_g18_rev FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.730827 foil_nats_a_place=1.862921 information_nats_a_place=0.132094 own_nats_a_word=13.005887 information_nats_a_word=0.992585
+S1_g18_rev FIELD_UNSEEN lap=-1 code=0.859 sites=43660 next=- ms=9404
+S1_g19_rev FIELD_HELD lap=-1 answer=5.498044 classes=43470 context=0.927250 context_classes=43470 foil=1.094894 question=0.167644 ms=3573
+S1_g19_rev FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.729682 foil_nats_a_place=1.862042 information_nats_a_place=0.132361 own_nats_a_word=12.997279 information_nats_a_word=0.994593
+S1_g19_rev FIELD_UNSEEN lap=-1 code=0.859 sites=43660 next=- ms=9398
+S1_g20_rev FIELD_HELD lap=-1 answer=5.511672 classes=43470 context=0.927611 context_classes=43470 foil=1.095411 question=0.167800 ms=3571
+S1_g20_rev FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.730181 foil_nats_a_place=1.862399 information_nats_a_place=0.132218 own_nats_a_word=13.001031 information_nats_a_word=0.993522
+S1_g20_rev FIELD_UNSEEN lap=-1 code=0.859 sites=43660 next=- ms=9412
+S1_g21_rev FIELD_HELD lap=-1 answer=5.518700 classes=43470 context=0.927744 context_classes=43470 foil=1.095541 question=0.167797 ms=3583
+S1_g21_rev FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.730142 foil_nats_a_place=1.862714 information_nats_a_place=0.132572 own_nats_a_word=13.000741 information_nats_a_word=0.996177
+S1_g21_rev FIELD_UNSEEN lap=-1 code=0.859 sites=43660 next=- ms=9401
+S1_g22_rev FIELD_HELD lap=-1 answer=5.499404 classes=43470 context=0.927615 context_classes=43470 foil=1.095484 question=0.167868 ms=3584
+S1_g22_rev FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.730114 foil_nats_a_place=1.862135 information_nats_a_place=0.132020 own_nats_a_word=13.000531 information_nats_a_word=0.992036
+S1_g22_rev FIELD_UNSEEN lap=-1 code=0.859 sites=43660 next=- ms=9379
+S2_g01_fwd FIELD_HELD lap=-1 answer=5.519878 classes=43470 context=0.927029 context_classes=43470 foil=1.094563 question=0.167534 ms=3575
+S2_g01_fwd FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.729839 foil_nats_a_place=1.861920 information_nats_a_place=0.132081 own_nats_a_word=12.998464 information_nats_a_word=0.992493
+S2_g01_fwd FIELD_UNSEEN lap=-1 code=0.860 sites=43660 next=- ms=9380
+S2_g02_fwd FIELD_HELD lap=-1 answer=5.498713 classes=43470 context=0.927082 context_classes=43470 foil=1.095102 question=0.168020 ms=3556
+S2_g02_fwd FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.729971 foil_nats_a_place=1.862050 information_nats_a_place=0.132079 own_nats_a_word=12.999457 information_nats_a_word=0.992474
+S2_g02_fwd FIELD_UNSEEN lap=-1 code=0.859 sites=43660 next=- ms=9360
+S2_g03_fwd FIELD_HELD lap=-1 answer=5.503764 classes=43470 context=0.928061 context_classes=43470 foil=1.095554 question=0.167493 ms=3575
+S2_g03_fwd FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.730117 foil_nats_a_place=1.861320 information_nats_a_place=0.131203 own_nats_a_word=13.000547 information_nats_a_word=0.985895
+S2_g03_fwd FIELD_UNSEEN lap=-1 code=0.859 sites=43660 next=- ms=9370
+S2_g04_fwd FIELD_HELD lap=-1 answer=5.514907 classes=43470 context=0.927418 context_classes=43470 foil=1.095260 question=0.167843 ms=3588
+S2_g04_fwd FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.729891 foil_nats_a_place=1.862350 information_nats_a_place=0.132458 own_nats_a_word=12.998855 information_nats_a_word=0.995326
+S2_g04_fwd FIELD_UNSEEN lap=-1 code=0.859 sites=43660 next=- ms=9405
+S2_g05_fwd FIELD_HELD lap=-1 answer=5.507929 classes=43470 context=0.927590 context_classes=43470 foil=1.095236 question=0.167646 ms=3584
+S2_g05_fwd FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.730166 foil_nats_a_place=1.862598 information_nats_a_place=0.132432 own_nats_a_word=13.000917 information_nats_a_word=0.995132
+S2_g05_fwd FIELD_UNSEEN lap=-1 code=0.859 sites=43660 next=- ms=9390
+S2_g06_fwd FIELD_HELD lap=-1 answer=5.506306 classes=43470 context=0.927717 context_classes=43470 foil=1.094988 question=0.167271 ms=3546
+S2_g06_fwd FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.730254 foil_nats_a_place=1.862309 information_nats_a_place=0.132055 own_nats_a_word=13.001584 information_nats_a_word=0.992293
+S2_g06_fwd FIELD_UNSEEN lap=-1 code=0.859 sites=43660 next=- ms=9369
+S2_g07_fwd FIELD_HELD lap=-1 answer=5.514444 classes=43470 context=0.927656 context_classes=43470 foil=1.095584 question=0.167927 ms=3549
+S2_g07_fwd FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.730289 foil_nats_a_place=1.862200 information_nats_a_place=0.131911 own_nats_a_word=13.001845 information_nats_a_word=0.991211
+S2_g07_fwd FIELD_UNSEEN lap=-1 code=0.859 sites=43660 next=- ms=9352
+S2_g08_fwd FIELD_HELD lap=-1 answer=5.502446 classes=43470 context=0.927219 context_classes=43470 foil=1.095141 question=0.167922 ms=3559
+S2_g08_fwd FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.730273 foil_nats_a_place=1.862937 information_nats_a_place=0.132664 own_nats_a_word=13.001725 information_nats_a_word=0.996874
+S2_g08_fwd FIELD_UNSEEN lap=-1 code=0.859 sites=43660 next=- ms=9386
+S2_g09_fwd FIELD_HELD lap=-1 answer=5.494929 classes=43470 context=0.927658 context_classes=43470 foil=1.095347 question=0.167688 ms=3610
+S2_g09_fwd FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.730029 foil_nats_a_place=1.862150 information_nats_a_place=0.132121 own_nats_a_word=12.999888 information_nats_a_word=0.992794
+S2_g09_fwd FIELD_UNSEEN lap=-1 code=0.859 sites=43660 next=- ms=9476
+S2_g10_fwd FIELD_HELD lap=-1 answer=5.527853 classes=43470 context=0.927847 context_classes=43470 foil=1.095735 question=0.167888 ms=3551
+S2_g10_fwd FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.729607 foil_nats_a_place=1.862442 information_nats_a_place=0.132835 own_nats_a_word=12.996718 information_nats_a_word=0.998159
+S2_g10_fwd FIELD_UNSEEN lap=-1 code=0.859 sites=43660 next=- ms=9393
+S2_g11_fwd FIELD_HELD lap=-1 answer=5.490557 classes=43470 context=0.927310 context_classes=43470 foil=1.095240 question=0.167930 ms=3561
+S2_g11_fwd FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.730021 foil_nats_a_place=1.861971 information_nats_a_place=0.131950 own_nats_a_word=12.999827 information_nats_a_word=0.991508
+S2_g11_fwd FIELD_UNSEEN lap=-1 code=0.859 sites=43660 next=- ms=9375
+S2_g12_fwd FIELD_HELD lap=-1 answer=5.507383 classes=43470 context=0.927196 context_classes=43470 foil=1.095690 question=0.168494 ms=3557
+S2_g12_fwd FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.730081 foil_nats_a_place=1.861729 information_nats_a_place=0.131647 own_nats_a_word=13.000281 information_nats_a_word=0.989234
+S2_g12_fwd FIELD_UNSEEN lap=-1 code=0.859 sites=43660 next=- ms=9369
+S2_g13_fwd FIELD_HELD lap=-1 answer=5.493476 classes=43470 context=0.927582 context_classes=43470 foil=1.095382 question=0.167800 ms=3561
+S2_g13_fwd FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.730038 foil_nats_a_place=1.862360 information_nats_a_place=0.132322 own_nats_a_word=12.999956 information_nats_a_word=0.994302
+S2_g13_fwd FIELD_UNSEEN lap=-1 code=0.859 sites=43660 next=- ms=9382
+S2_g14_fwd FIELD_HELD lap=-1 answer=5.501090 classes=43470 context=0.927773 context_classes=43470 foil=1.095291 question=0.167518 ms=3565
+S2_g14_fwd FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.729990 foil_nats_a_place=1.862086 information_nats_a_place=0.132096 own_nats_a_word=12.999593 information_nats_a_word=0.992607
+S2_g14_fwd FIELD_UNSEEN lap=-1 code=0.859 sites=43660 next=- ms=9366
+S2_g15_fwd FIELD_HELD lap=-1 answer=5.525549 classes=43470 context=0.927676 context_classes=43470 foil=1.095001 question=0.167326 ms=3575
+S2_g15_fwd FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.729766 foil_nats_a_place=1.862073 information_nats_a_place=0.132307 own_nats_a_word=12.997915 information_nats_a_word=0.994190
+S2_g15_fwd FIELD_UNSEEN lap=-1 code=0.859 sites=43660 next=- ms=9374
+S2_g16_fwd FIELD_HELD lap=-1 answer=5.491470 classes=43470 context=0.927425 context_classes=43470 foil=1.095650 question=0.168225 ms=3567
+S2_g16_fwd FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.730632 foil_nats_a_place=1.862067 information_nats_a_place=0.131435 own_nats_a_word=13.004422 information_nats_a_word=0.987638
+S2_g16_fwd FIELD_UNSEEN lap=-1 code=0.859 sites=43660 next=- ms=9369
+S2_g17_fwd FIELD_HELD lap=-1 answer=5.482469 classes=43470 context=0.927436 context_classes=43470 foil=1.095567 question=0.168131 ms=3582
+S2_g17_fwd FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.730184 foil_nats_a_place=1.862030 information_nats_a_place=0.131846 own_nats_a_word=13.001052 information_nats_a_word=0.990726
+S2_g17_fwd FIELD_UNSEEN lap=-1 code=0.859 sites=43660 next=- ms=9345
+S2_g18_fwd FIELD_HELD lap=-1 answer=5.493347 classes=43470 context=0.927925 context_classes=43470 foil=1.096169 question=0.168244 ms=3562
+S2_g18_fwd FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.730260 foil_nats_a_place=1.861762 information_nats_a_place=0.131503 own_nats_a_word=13.001622 information_nats_a_word=0.988146
+S2_g18_fwd FIELD_UNSEEN lap=-1 code=0.860 sites=43660 next=- ms=9357
+S2_g19_fwd FIELD_HELD lap=-1 answer=5.481864 classes=43470 context=0.927483 context_classes=43470 foil=1.095160 question=0.167677 ms=3551
+S2_g19_fwd FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.729739 foil_nats_a_place=1.861962 information_nats_a_place=0.132224 own_nats_a_word=12.997709 information_nats_a_word=0.993563
+S2_g19_fwd FIELD_UNSEEN lap=-1 code=0.859 sites=43660 next=- ms=9341
+S2_g20_fwd FIELD_HELD lap=-1 answer=5.487557 classes=43470 context=0.927581 context_classes=43470 foil=1.095133 question=0.167552 ms=3555
+S2_g20_fwd FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.730020 foil_nats_a_place=1.861591 information_nats_a_place=0.131571 own_nats_a_word=12.999824 information_nats_a_word=0.988659
+S2_g20_fwd FIELD_UNSEEN lap=-1 code=0.859 sites=43660 next=- ms=9367
+S2_g21_fwd FIELD_HELD lap=-1 answer=5.508422 classes=43470 context=0.926822 context_classes=43470 foil=1.094942 question=0.168119 ms=3578
+S2_g21_fwd FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.729989 foil_nats_a_place=1.862314 information_nats_a_place=0.132326 own_nats_a_word=12.999585 information_nats_a_word=0.994329
+S2_g21_fwd FIELD_UNSEEN lap=-1 code=0.859 sites=43660 next=- ms=9366
+S2_g22_fwd FIELD_HELD lap=-1 answer=5.501724 classes=43470 context=0.927669 context_classes=43470 foil=1.095122 question=0.167453 ms=3560
+S2_g22_fwd FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.730060 foil_nats_a_place=1.862405 information_nats_a_place=0.132346 own_nats_a_word=13.000119 information_nats_a_word=0.994480
+S2_g22_fwd FIELD_UNSEEN lap=-1 code=0.859 sites=43660 next=- ms=9362
+S2_g01_rev FIELD_HELD lap=-1 answer=5.528686 classes=43470 context=0.924597 context_classes=43470 foil=1.093279 question=0.168681 ms=3579
+S2_g01_rev FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.728501 foil_nats_a_place=1.861417 information_nats_a_place=0.132916 own_nats_a_word=12.988410 information_nats_a_word=0.998765
+S2_g01_rev FIELD_UNSEEN lap=-1 code=0.857 sites=43660 next=- ms=9382
+S2_g02_rev FIELD_HELD lap=-1 answer=5.527011 classes=43470 context=0.923571 context_classes=43470 foil=1.091996 question=0.168425 ms=3560
+S2_g02_rev FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.728243 foil_nats_a_place=1.860825 information_nats_a_place=0.132582 own_nats_a_word=12.986468 information_nats_a_word=0.996254
+S2_g02_rev FIELD_UNSEEN lap=-1 code=0.858 sites=43660 next=- ms=9365
+S2_g03_rev FIELD_HELD lap=-1 answer=5.521398 classes=43470 context=0.923509 context_classes=43470 foil=1.091803 question=0.168294 ms=3560
+S2_g03_rev FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.728246 foil_nats_a_place=1.861573 information_nats_a_place=0.133328 own_nats_a_word=12.986489 information_nats_a_word=1.001859
+S2_g03_rev FIELD_UNSEEN lap=-1 code=0.858 sites=43660 next=- ms=9375
+S2_g04_rev FIELD_HELD lap=-1 answer=5.517376 classes=43470 context=0.923981 context_classes=43470 foil=1.091919 question=0.167938 ms=3566
+S2_g04_rev FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.728341 foil_nats_a_place=1.860664 information_nats_a_place=0.132323 own_nats_a_word=12.987205 information_nats_a_word=0.994312
+S2_g04_rev FIELD_UNSEEN lap=-1 code=0.858 sites=43660 next=- ms=9370
+S2_g05_rev FIELD_HELD lap=-1 answer=5.521998 classes=43470 context=0.923591 context_classes=43470 foil=1.092187 question=0.168596 ms=3562
+S2_g05_rev FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.727902 foil_nats_a_place=1.860681 information_nats_a_place=0.132779 own_nats_a_word=12.983905 information_nats_a_word=0.997736
+S2_g05_rev FIELD_UNSEEN lap=-1 code=0.858 sites=43660 next=- ms=9375
+S2_g06_rev FIELD_HELD lap=-1 answer=5.527904 classes=43470 context=0.923560 context_classes=43470 foil=1.092287 question=0.168726 ms=3548
+S2_g06_rev FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.728044 foil_nats_a_place=1.860971 information_nats_a_place=0.132927 own_nats_a_word=12.984970 information_nats_a_word=0.998848
+S2_g06_rev FIELD_UNSEEN lap=-1 code=0.857 sites=43660 next=- ms=9335
+S2_g07_rev FIELD_HELD lap=-1 answer=5.518364 classes=43470 context=0.923779 context_classes=43470 foil=1.091909 question=0.168130 ms=3588
+S2_g07_rev FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.728237 foil_nats_a_place=1.860547 information_nats_a_place=0.132310 own_nats_a_word=12.986426 information_nats_a_word=0.994212
+S2_g07_rev FIELD_UNSEEN lap=-1 code=0.858 sites=43660 next=- ms=9391
+S2_g08_rev FIELD_HELD lap=-1 answer=5.525452 classes=43470 context=0.924169 context_classes=43470 foil=1.092644 question=0.168475 ms=3569
+S2_g08_rev FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.727995 foil_nats_a_place=1.860329 information_nats_a_place=0.132335 own_nats_a_word=12.984603 information_nats_a_word=0.994396
+S2_g08_rev FIELD_UNSEEN lap=-1 code=0.858 sites=43660 next=- ms=9387
+S2_g09_rev FIELD_HELD lap=-1 answer=5.533515 classes=43470 context=0.923313 context_classes=43470 foil=1.092005 question=0.168692 ms=3567
+S2_g09_rev FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.727911 foil_nats_a_place=1.860858 information_nats_a_place=0.132947 own_nats_a_word=12.983974 information_nats_a_word=0.999000
+S2_g09_rev FIELD_UNSEEN lap=-1 code=0.857 sites=43660 next=- ms=9382
+S2_g10_rev FIELD_HELD lap=-1 answer=5.503379 classes=43470 context=0.924177 context_classes=43470 foil=1.092021 question=0.167844 ms=3563
+S2_g10_rev FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.728778 foil_nats_a_place=1.860847 information_nats_a_place=0.132069 own_nats_a_word=12.990490 information_nats_a_word=0.992401
+S2_g10_rev FIELD_UNSEEN lap=-1 code=0.857 sites=43660 next=- ms=9364
+S2_g11_rev FIELD_HELD lap=-1 answer=5.544356 classes=43470 context=0.924041 context_classes=43470 foil=1.092269 question=0.168228 ms=3554
+S2_g11_rev FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.728239 foil_nats_a_place=1.861104 information_nats_a_place=0.132865 own_nats_a_word=12.986442 information_nats_a_word=0.998379
+S2_g11_rev FIELD_UNSEEN lap=-1 code=0.858 sites=43660 next=- ms=9358
+S2_g12_rev FIELD_HELD lap=-1 answer=5.531193 classes=43470 context=0.924412 context_classes=43470 foil=1.092135 question=0.167723 ms=3562
+S2_g12_rev FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.728272 foil_nats_a_place=1.860866 information_nats_a_place=0.132594 own_nats_a_word=12.986688 information_nats_a_word=0.996346
+S2_g12_rev FIELD_UNSEEN lap=-1 code=0.857 sites=43660 next=- ms=9374
+S2_g13_rev FIELD_HELD lap=-1 answer=5.534685 classes=43470 context=0.923660 context_classes=43470 foil=1.092176 question=0.168517 ms=3585
+S2_g13_rev FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.728026 foil_nats_a_place=1.860958 information_nats_a_place=0.132933 own_nats_a_word=12.984835 information_nats_a_word=0.998890
+S2_g13_rev FIELD_UNSEEN lap=-1 code=0.858 sites=43660 next=- ms=9428
+S2_g14_rev FIELD_HELD lap=-1 answer=5.525806 classes=43470 context=0.923255 context_classes=43470 foil=1.091933 question=0.168678 ms=3558
+S2_g14_rev FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.728272 foil_nats_a_place=1.860928 information_nats_a_place=0.132656 own_nats_a_word=12.986690 information_nats_a_word=0.996811
+S2_g14_rev FIELD_UNSEEN lap=-1 code=0.857 sites=43660 next=- ms=9368
+S2_g15_rev FIELD_HELD lap=-1 answer=5.509638 classes=43470 context=0.923754 context_classes=43470 foil=1.091993 question=0.168239 ms=3574
+S2_g15_rev FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.728365 foil_nats_a_place=1.860969 information_nats_a_place=0.132604 own_nats_a_word=12.987382 information_nats_a_word=0.996421
+S2_g15_rev FIELD_UNSEEN lap=-1 code=0.858 sites=43660 next=- ms=9386
+S2_g16_rev FIELD_HELD lap=-1 answer=5.548873 classes=43470 context=0.923674 context_classes=43470 foil=1.092078 question=0.168403 ms=3572
+S2_g16_rev FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.728153 foil_nats_a_place=1.860871 information_nats_a_place=0.132718 own_nats_a_word=12.985795 information_nats_a_word=0.997277
+S2_g16_rev FIELD_UNSEEN lap=-1 code=0.857 sites=43660 next=- ms=9390
+S2_g17_rev FIELD_HELD lap=-1 answer=5.553162 classes=43470 context=0.924773 context_classes=43470 foil=1.092178 question=0.167406 ms=3583
+S2_g17_rev FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.728751 foil_nats_a_place=1.861897 information_nats_a_place=0.133145 own_nats_a_word=12.990289 information_nats_a_word=1.000489
+S2_g17_rev FIELD_UNSEEN lap=-1 code=0.858 sites=43660 next=- ms=9419
+S2_g18_rev FIELD_HELD lap=-1 answer=5.537091 classes=43470 context=0.923230 context_classes=43470 foil=1.091636 question=0.168406 ms=3575
+S2_g18_rev FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.728340 foil_nats_a_place=1.861067 information_nats_a_place=0.132726 own_nats_a_word=12.987199 information_nats_a_word=0.997340
+S2_g18_rev FIELD_UNSEEN lap=-1 code=0.857 sites=43660 next=- ms=9407
+S2_g19_rev FIELD_HELD lap=-1 answer=5.547901 classes=43470 context=0.923662 context_classes=43470 foil=1.092302 question=0.168640 ms=3583
+S2_g19_rev FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.728290 foil_nats_a_place=1.861108 information_nats_a_place=0.132817 own_nats_a_word=12.986825 information_nats_a_word=0.998025
+S2_g19_rev FIELD_UNSEEN lap=-1 code=0.858 sites=43660 next=- ms=9411
+S2_g20_rev FIELD_HELD lap=-1 answer=5.540915 classes=43470 context=0.923436 context_classes=43470 foil=1.092167 question=0.168730 ms=3589
+S2_g20_rev FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.728101 foil_nats_a_place=1.861399 information_nats_a_place=0.133298 own_nats_a_word=12.985399 information_nats_a_word=1.001636
+S2_g20_rev FIELD_UNSEEN lap=-1 code=0.858 sites=43660 next=- ms=9404
+S2_g21_rev FIELD_HELD lap=-1 answer=5.522858 classes=43470 context=0.924061 context_classes=43470 foil=1.092320 question=0.168259 ms=3570
+S2_g21_rev FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.728218 foil_nats_a_place=1.861057 information_nats_a_place=0.132839 own_nats_a_word=12.986280 information_nats_a_word=0.998188
+S2_g21_rev FIELD_UNSEEN lap=-1 code=0.858 sites=43660 next=- ms=9359
+S2_g22_rev FIELD_HELD lap=-1 answer=5.527272 classes=43470 context=0.923373 context_classes=43470 foil=1.091922 question=0.168549 ms=3564
+S2_g22_rev FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.728065 foil_nats_a_place=1.860720 information_nats_a_place=0.132655 own_nats_a_word=12.985134 information_nats_a_word=0.996804
+S2_g22_rev FIELD_UNSEEN lap=-1 code=0.857 sites=43660 next=- ms=9375
+S3_FIVE_fwd FIELD_HELD lap=-1 answer=5.445851 classes=43470 context=0.930249 context_classes=43470 foil=1.100049 question=0.169800 ms=3582
+S3_FIVE_fwd FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.732886 foil_nats_a_place=1.866095 information_nats_a_place=0.133209 own_nats_a_word=13.021359 information_nats_a_word=1.000964
+S3_FIVE_fwd FIELD_UNSEEN lap=-1 code=0.863 sites=43660 next=- ms=9385
+S3_REST_fwd FIELD_HELD lap=-1 answer=5.428375 classes=43470 context=0.929053 context_classes=43470 foil=1.097352 question=0.168300 ms=3595
+S3_REST_fwd FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.730493 foil_nats_a_place=1.860001 information_nats_a_place=0.129508 own_nats_a_word=13.003379 information_nats_a_word=0.973158
+S3_REST_fwd FIELD_UNSEEN lap=-1 code=0.860 sites=43660 next=- ms=9425
+S3_g03_fwd FIELD_HELD lap=-1 answer=5.503832 classes=43470 context=0.928432 context_classes=43470 foil=1.096716 question=0.168284 ms=3567
+S3_g03_fwd FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.730759 foil_nats_a_place=1.862581 information_nats_a_place=0.131822 own_nats_a_word=13.005372 information_nats_a_word=0.990546
+S3_g03_fwd FIELD_UNSEEN lap=-1 code=0.860 sites=43660 next=- ms=9387
+S3_g04_fwd FIELD_HELD lap=-1 answer=5.496235 classes=43470 context=0.928743 context_classes=43470 foil=1.097320 question=0.168577 ms=3585
+S3_g04_fwd FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.731908 foil_nats_a_place=1.867227 information_nats_a_place=0.135319 own_nats_a_word=13.014010 information_nats_a_word=1.016824
+S3_g04_fwd FIELD_UNSEEN lap=-1 code=0.862 sites=43660 next=- ms=9418
+S3_g05_fwd FIELD_HELD lap=-1 answer=5.491199 classes=43470 context=0.927314 context_classes=43470 foil=1.095428 question=0.168113 ms=3578
+S3_g05_fwd FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.730176 foil_nats_a_place=1.862785 information_nats_a_place=0.132609 own_nats_a_word=13.000994 information_nats_a_word=0.996458
+S3_g05_fwd FIELD_UNSEEN lap=-1 code=0.859 sites=43660 next=- ms=9390
+S3_g06_fwd FIELD_HELD lap=-1 answer=5.476577 classes=43470 context=0.927398 context_classes=43470 foil=1.095834 question=0.168437 ms=3580
+S3_g06_fwd FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.731284 foil_nats_a_place=1.862825 information_nats_a_place=0.131541 own_nats_a_word=13.009317 information_nats_a_word=0.988434
+S3_g06_fwd FIELD_UNSEEN lap=-1 code=0.860 sites=43660 next=- ms=9394
+S3_g07_fwd FIELD_HELD lap=-1 answer=5.431944 classes=43470 context=0.930503 context_classes=43470 foil=1.100566 question=0.170064 ms=3594
+S3_g07_fwd FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.733354 foil_nats_a_place=1.864574 information_nats_a_place=0.131219 own_nats_a_word=13.024876 information_nats_a_word=0.986016
+S3_g07_fwd FIELD_UNSEEN lap=-1 code=0.863 sites=43660 next=- ms=9396
+S3_FIVE_rev FIELD_HELD lap=-1 answer=5.428375 classes=43470 context=0.929053 context_classes=43470 foil=1.097352 question=0.168300 ms=3582
+S3_FIVE_rev FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.730493 foil_nats_a_place=1.860001 information_nats_a_place=0.129508 own_nats_a_word=13.003379 information_nats_a_word=0.973158
+S3_FIVE_rev FIELD_UNSEEN lap=-1 code=0.860 sites=43660 next=- ms=9401
+S3_REST_rev FIELD_HELD lap=-1 answer=5.445851 classes=43470 context=0.930249 context_classes=43470 foil=1.100049 question=0.169800 ms=3568
+S3_REST_rev FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.732886 foil_nats_a_place=1.866095 information_nats_a_place=0.133209 own_nats_a_word=13.021359 information_nats_a_word=1.000964
+S3_REST_rev FIELD_UNSEEN lap=-1 code=0.863 sites=43660 next=- ms=9395
+S3_g03_rev FIELD_HELD lap=-1 answer=5.410876 classes=43470 context=0.925559 context_classes=43470 foil=1.094801 question=0.169242 ms=3566
+S3_g03_rev FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.729895 foil_nats_a_place=1.861597 information_nats_a_place=0.131701 own_nats_a_word=12.998884 information_nats_a_word=0.989639
+S3_g03_rev FIELD_UNSEEN lap=-1 code=0.860 sites=43660 next=- ms=9369
+S3_g04_rev FIELD_HELD lap=-1 answer=5.371040 classes=43470 context=0.927638 context_classes=43470 foil=1.096073 question=0.168435 ms=3558
+S3_g04_rev FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.730404 foil_nats_a_place=1.859235 information_nats_a_place=0.128830 own_nats_a_word=13.002710 information_nats_a_word=0.968065
+S3_g04_rev FIELD_UNSEEN lap=-1 code=0.860 sites=43660 next=- ms=9369
+S3_g05_rev FIELD_HELD lap=-1 answer=5.418047 classes=43470 context=0.927035 context_classes=43470 foil=1.095462 question=0.168427 ms=3567
+S3_g05_rev FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.730042 foil_nats_a_place=1.861109 information_nats_a_place=0.131067 own_nats_a_word=12.999986 information_nats_a_word=0.984870
+S3_g05_rev FIELD_UNSEEN lap=-1 code=0.861 sites=43660 next=- ms=9381
+S3_g06_rev FIELD_HELD lap=-1 answer=5.417603 classes=43470 context=0.929569 context_classes=43470 foil=1.097523 question=0.167954 ms=3570
+S3_g06_rev FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.731017 foil_nats_a_place=1.863525 information_nats_a_place=0.132509 own_nats_a_word=13.007310 information_nats_a_word=0.995706
+S3_g06_rev FIELD_UNSEEN lap=-1 code=0.862 sites=43660 next=- ms=9419
+S3_g07_rev FIELD_HELD lap=-1 answer=5.457818 classes=43470 context=0.928429 context_classes=43470 foil=1.097751 question=0.169322 ms=3550
+S3_g07_rev FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.731122 foil_nats_a_place=1.863521 information_nats_a_place=0.132399 own_nats_a_word=13.008104 information_nats_a_word=0.994881
+S3_g07_rev FIELD_UNSEEN lap=-1 code=0.863 sites=43660 next=- ms=9268
+S4_FIVE_fwd FIELD_HELD lap=-1 answer=5.533018 classes=43470 context=0.927377 context_classes=43470 foil=1.097714 question=0.170336 ms=3557
+S4_FIVE_fwd FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.733913 foil_nats_a_place=1.870726 information_nats_a_place=0.136814 own_nats_a_word=13.029073 information_nats_a_word=1.028053
+S4_FIVE_fwd FIELD_UNSEEN lap=-1 code=0.862 sites=43660 next=- ms=9262
+S4_REST_fwd FIELD_HELD lap=-1 answer=5.501321 classes=43470 context=0.925158 context_classes=43470 foil=1.093952 question=0.168793 ms=3548
+S4_REST_fwd FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.729052 foil_nats_a_place=1.858751 information_nats_a_place=0.129699 own_nats_a_word=12.992550 information_nats_a_word=0.974594
+S4_REST_fwd FIELD_UNSEEN lap=-1 code=0.860 sites=43660 next=- ms=9334
+S4_g03_fwd FIELD_HELD lap=-1 answer=5.566338 classes=43470 context=0.924615 context_classes=43470 foil=1.093933 question=0.169318 ms=3549
+S4_g03_fwd FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.729867 foil_nats_a_place=1.862598 information_nats_a_place=0.132731 own_nats_a_word=12.998669 information_nats_a_word=0.997379
+S4_g03_fwd FIELD_UNSEEN lap=-1 code=0.858 sites=43660 next=- ms=9342
+S4_g04_fwd FIELD_HELD lap=-1 answer=5.585449 classes=43470 context=0.925177 context_classes=43470 foil=1.094592 question=0.169414 ms=3571
+S4_g04_fwd FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.731833 foil_nats_a_place=1.869208 information_nats_a_place=0.137375 own_nats_a_word=13.013448 information_nats_a_word=1.032268
+S4_g04_fwd FIELD_UNSEEN lap=-1 code=0.860 sites=43660 next=- ms=9366
+S4_g05_fwd FIELD_HELD lap=-1 answer=5.537142 classes=43470 context=0.924219 context_classes=43470 foil=1.092646 question=0.168427 ms=3548
+S4_g05_fwd FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.728234 foil_nats_a_place=1.863204 information_nats_a_place=0.134970 own_nats_a_word=12.986404 information_nats_a_word=1.014198
+S4_g05_fwd FIELD_UNSEEN lap=-1 code=0.857 sites=43660 next=- ms=9308
+S4_g06_fwd FIELD_HELD lap=-1 answer=5.498715 classes=43470 context=0.924702 context_classes=43470 foil=1.092824 question=0.168122 ms=3565
+S4_g06_fwd FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.730053 foil_nats_a_place=1.862036 information_nats_a_place=0.131984 own_nats_a_word=13.000068 information_nats_a_word=0.991759
+S4_g06_fwd FIELD_UNSEEN lap=-1 code=0.860 sites=43660 next=- ms=9362
+S4_g07_fwd FIELD_HELD lap=-1 answer=5.492971 classes=43470 context=0.932118 context_classes=43470 foil=1.101383 question=0.169265 ms=3589
+S4_g07_fwd FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.733716 foil_nats_a_place=1.865280 information_nats_a_place=0.131564 own_nats_a_word=13.027598 information_nats_a_word=0.988604
+S4_g07_fwd FIELD_UNSEEN lap=-1 code=0.865 sites=43660 next=- ms=9374
+S4_FIVE_rev FIELD_HELD lap=-1 answer=5.501321 classes=43470 context=0.925158 context_classes=43470 foil=1.093952 question=0.168793 ms=3557
+S4_FIVE_rev FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.729052 foil_nats_a_place=1.858751 information_nats_a_place=0.129699 own_nats_a_word=12.992550 information_nats_a_word=0.974594
+S4_FIVE_rev FIELD_UNSEEN lap=-1 code=0.860 sites=43660 next=- ms=9354
+S4_REST_rev FIELD_HELD lap=-1 answer=5.533018 classes=43470 context=0.927377 context_classes=43470 foil=1.097714 question=0.170336 ms=3552
+S4_REST_rev FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.733913 foil_nats_a_place=1.870726 information_nats_a_place=0.136814 own_nats_a_word=13.029073 information_nats_a_word=1.028053
+S4_REST_rev FIELD_UNSEEN lap=-1 code=0.862 sites=43660 next=- ms=9362
+S4_g03_rev FIELD_HELD lap=-1 answer=5.492914 classes=43470 context=0.921804 context_classes=43470 foil=1.091053 question=0.169249 ms=3556
+S4_g03_rev FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.727686 foil_nats_a_place=1.860398 information_nats_a_place=0.132711 own_nats_a_word=12.982285 information_nats_a_word=0.997228
+S4_g03_rev FIELD_UNSEEN lap=-1 code=0.859 sites=43660 next=- ms=9346
+S4_g04_rev FIELD_HELD lap=-1 answer=5.468542 classes=43470 context=0.924073 context_classes=43470 foil=1.093681 question=0.169607 ms=3572
+S4_g04_rev FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.729048 foil_nats_a_place=1.858551 information_nats_a_place=0.129503 own_nats_a_word=12.992520 information_nats_a_word=0.973119
+S4_g04_rev FIELD_UNSEEN lap=-1 code=0.859 sites=43660 next=- ms=9349
+S4_g05_rev FIELD_HELD lap=-1 answer=5.516729 classes=43470 context=0.921917 context_classes=43470 foil=1.090527 question=0.168610 ms=3572
+S4_g05_rev FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.728255 foil_nats_a_place=1.860561 information_nats_a_place=0.132306 own_nats_a_word=12.986558 information_nats_a_word=0.994185
+S4_g05_rev FIELD_UNSEEN lap=-1 code=0.859 sites=43660 next=- ms=9371
+S4_g06_rev FIELD_HELD lap=-1 answer=5.528411 classes=43470 context=0.925422 context_classes=43470 foil=1.094799 question=0.169377 ms=3565
+S4_g06_rev FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.729790 foil_nats_a_place=1.864254 information_nats_a_place=0.134464 own_nats_a_word=12.998097 information_nats_a_word=1.010397
+S4_g06_rev FIELD_UNSEEN lap=-1 code=0.862 sites=43660 next=- ms=9346
+S4_g07_rev FIELD_HELD lap=-1 answer=5.576812 classes=43470 context=0.925137 context_classes=43470 foil=1.094472 question=0.169335 ms=3550
+S4_g07_rev FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.730817 foil_nats_a_place=1.865377 information_nats_a_place=0.134561 own_nats_a_word=13.005809 information_nats_a_word=1.011125
+S4_g07_rev FIELD_UNSEEN lap=-1 code=0.863 sites=43660 next=- ms=9343

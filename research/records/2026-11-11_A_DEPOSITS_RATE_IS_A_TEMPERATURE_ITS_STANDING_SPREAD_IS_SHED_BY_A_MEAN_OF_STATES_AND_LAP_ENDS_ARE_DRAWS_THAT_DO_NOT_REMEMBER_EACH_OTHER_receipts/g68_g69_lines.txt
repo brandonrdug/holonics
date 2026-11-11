@@ -1,0 +1,116 @@
+# G68 and G69: the second lap of the pair (rt14 at the floor from rt13's end state; wm14 with five of the second lane's parts raised, from
+# wm13's end state), each lap's mean read as a state, and the rate rule's cosines on lap means and on lap ends. Written 2026-11-11T13:43Z from the
+# PC's report of 13:39 UTC. Card: RTX 4080 SUPER under the card lock, the lap-mean build (main at 8368f084b with MaterialMean), trainer only,
+# read 65; laps 866,977 ms and 859,151 ms under a bound of 1,215,000 ms; each held read of a mean 9.8 s. The cosines are host arithmetic
+# (tools/part_rates.py update; the written files are ruler states, never trained from). Numbers only.
+
+== rt14 (from rt13/STATE.0, every octave 0); card lock 13:09:36 to 13:24:21 UTC
+FIELD_LAP lap=0 read=65 sites=16547602 before=3.222 after=- deposited=1535/1535 halvings=0 next_halved=0 next_refused=0 ms=866977
+FIELD_HELD lap=0 answer=5.662255 classes=43470 context=0.932815 context_classes=43470 foil=1.102574 question=0.169760
+FIELD_JOINT_NATS lap=0 places=43470 words=5785 own_nats_a_place=1.737480 foil_nats_a_place=1.868268 information_nats_a_place=0.130788 own_nats_a_word=13.055877 information_nats_a_word=0.982776
+FIELD_UNSEEN lap=0 code=0.863 sites=43660 next=-
+FIELD_MEAN lap=0 states=1535 entries=63606 moved=61262 square=92362928786087
+== rt14/MEAN.0 held
+FIELD_HELD lap=-1 answer=5.498872 classes=43470 context=0.927665 context_classes=43470 foil=1.095271 question=0.167606 ms=3544
+FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.729997 foil_nats_a_place=1.862250 information_nats_a_place=0.132253 own_nats_a_word=12.999648 information_nats_a_word=0.993784
+FIELD_UNSEEN lap=-1 code=0.859 sites=43660 next=- ms=9395
+sha256 heads: STATE.0 1344914044cde3ee, MEAN.0 1f52e1345a2ae3d9
+
+== wm14 (from wm13/STATE.0; parts 32 0 0 0 0 0 0 2 4 2 2 2 0 0 0 0 0); card lock 13:24:30 to 13:39:06 UTC
+FIELD_LAP lap=0 read=65 sites=16547602 before=3.230 after=- deposited=1535/1535 halvings=0 next_halved=0 next_refused=0 ms=859151
+FIELD_HELD lap=0 answer=5.635468 classes=43470 context=0.938064 context_classes=43470 foil=1.108614 question=0.170550
+FIELD_JOINT_NATS lap=0 places=43470 words=5785 own_nats_a_place=1.742997 foil_nats_a_place=1.875769 information_nats_a_place=0.132772 own_nats_a_word=13.097333 information_nats_a_word=0.997682
+FIELD_UNSEEN lap=0 code=0.872 sites=43660 next=-
+FIELD_MEAN lap=0 states=1535 entries=63606 moved=61259 square=889445708351913
+== wm14/MEAN.0 held
+FIELD_HELD lap=-1 answer=5.418758 classes=43470 context=0.926695 context_classes=43470 foil=1.095105 question=0.168410 ms=3550
+FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.729678 foil_nats_a_place=1.861243 information_nats_a_place=0.131565 own_nats_a_word=12.997255 information_nats_a_word=0.988613
+FIELD_UNSEEN lap=-1 code=0.860 sites=43660 next=- ms=9356
+sha256 heads: STATE.0 397c55d655c9b809, MEAN.0 9470823d41d2d6cb
+
+== the pair's section lines (wm14 less rt14; bits a site on the trained sections; sha256 head of the extract c87af42c984a21a4)
+G63D_LAP wm14 sections=1535 before=3.290160 predicted=-8235.943 external=444.672 external_n=1535 N=8625.031
+G63D_LAP rt14 sections=1535 before=3.282216 predicted=-4607.956 external=178.786 external_n=1535 N=4764.393
+G63D_PAIRED before_d=+0.007944 se=0.000144 n=1535 predicted_d=-3627.988 se=164.888 n=1535 external_d=+265.886 se=28.847 n=1535 twice_N_excess=+7721.276 se=321.593 n=1535
+G63D_BEFORE first_blocks_of_8 +0.005331 +0.008138 +0.009910 +0.009861 twentieth_1 +0.008111 twentieth_20 +0.007365 slope_3_20 -0.000896 se 0.000585 (bits a lap)
+G64_TWENTIETHS before (wm14 - rt14), site-weighted: +0.008111 +0.007568 +0.007248 +0.007420 +0.006297 +0.006722 +0.007783 +0.007490 +0.016314 +0.011352 +0.009116 +0.007287 +0.008218 +0.006618 +0.007211 +0.007380 +0.007217 +0.007783 +0.007450 +0.007365
+G64_TWENTIETHS_2_3 positions 77..230 sections=154 before_d=+0.007273 se=0.000362 weighted=+0.007408 twice_N_excess=+7457.552 se=227.927
+G64_TWENTIETHS_N twice the paired excess of N, plain mean a twentieth: +7664.2 +7237.9 +7677.2 +7753.6 +7355.3 +7655.9 +8065.2 +8012.9 +13045.6 +6792.5 +7036.2 +6512.6 +8101.2 +6865.9 +7489.6 +7601.7 +7571.8 +7033.8 +7118.8 +7900.1
+
+== I1 update mean-gate12/MEAN.0 rt13/MEAN.0 rt14/MEAN.0 (the floor line's lap means, laps 12, 13, 14)
+FIELD_PART_RATE part=w_new entries=2048 c=0.238340 rate_octaves=0 was=0 move=hold rate_bits=12
+FIELD_PART_RATE part=a_new entries=2080 c=0.267708 rate_octaves=0 was=0 move=hold rate_bits=12
+FIELD_PART_RATE part=b_new entries=2080 c=0.280280 rate_octaves=0 was=0 move=hold rate_bits=12
+FIELD_PART_RATE part=enc_lane entries=3232 c=0.591244 rate_octaves=1 was=0 move=faster rate_bits=11
+FIELD_PART_RATE part=before_lane entries=3232 c=0.585747 rate_octaves=1 was=0 move=faster rate_bits=11
+FIELD_PART_RATE part=after_lane entries=3232 c=0.579829 rate_octaves=1 was=0 move=faster rate_bits=11
+FIELD_PART_RATE part=q_lane entries=2048 c=0.355299 rate_octaves=0 was=0 move=hold rate_bits=12
+FIELD_PART_RATE part=v_lane entries=2048 c=0.535913 rate_octaves=1 was=0 move=faster rate_bits=11
+FIELD_PART_RATE part=probe_lane entries=2048 c=0.499378 rate_octaves=0 was=0 move=hold rate_bits=12
+FIELD_PART_RATE part=out_lane entries=2048 c=0.444130 rate_octaves=0 was=0 move=hold rate_bits=12
+FIELD_PART_RATE part=moment_face_lane entries=2048 c=0.343428 rate_octaves=0 was=0 move=hold rate_bits=12
+FIELD_PART_RATE part=read_lane entries=3072 c=0.264734 rate_octaves=0 was=0 move=hold rate_bits=12
+FIELD_PART_RATE part=face_biases_lane entries=128 c=0.796273 rate_octaves=1 was=0 move=faster rate_bits=11
+FIELD_PART_RATE part=a_lane entries=1024 c=-0.049343 rate_octaves=0 was=0 move=hold rate_bits=12
+FIELD_PART_RATE part=b_lane entries=1024 c=0.067755 rate_octaves=0 was=0 move=hold rate_bits=12
+FIELD_PART_RATE part=g_chart entries=0 c=0.000000 rate_octaves=0 was=0 move=hold rate_bits=12
+== I2 update rt12/STATE.0 rt13/STATE.0 rt14/STATE.0 (the floor line's lap ends)
+FIELD_PART_RATE part=w_new entries=2048 c=-0.074297 rate_octaves=0 was=0 move=hold rate_bits=12
+FIELD_PART_RATE part=a_new entries=2080 c=-0.050049 rate_octaves=0 was=0 move=hold rate_bits=12
+FIELD_PART_RATE part=b_new entries=2080 c=-0.025782 rate_octaves=0 was=0 move=hold rate_bits=12
+FIELD_PART_RATE part=enc_lane entries=3232 c=0.360062 rate_octaves=0 was=0 move=hold rate_bits=12
+FIELD_PART_RATE part=before_lane entries=3232 c=0.361009 rate_octaves=0 was=0 move=hold rate_bits=12
+FIELD_PART_RATE part=after_lane entries=3232 c=0.335429 rate_octaves=0 was=0 move=hold rate_bits=12
+FIELD_PART_RATE part=q_lane entries=2048 c=0.055543 rate_octaves=0 was=0 move=hold rate_bits=12
+FIELD_PART_RATE part=v_lane entries=2048 c=0.248803 rate_octaves=0 was=0 move=hold rate_bits=12
+FIELD_PART_RATE part=probe_lane entries=2048 c=0.196769 rate_octaves=0 was=0 move=hold rate_bits=12
+FIELD_PART_RATE part=out_lane entries=2048 c=0.085191 rate_octaves=0 was=0 move=hold rate_bits=12
+FIELD_PART_RATE part=moment_face_lane entries=2048 c=0.014321 rate_octaves=0 was=0 move=hold rate_bits=12
+FIELD_PART_RATE part=read_lane entries=3072 c=-0.102325 rate_octaves=0 was=0 move=hold rate_bits=12
+FIELD_PART_RATE part=face_biases_lane entries=128 c=0.333011 rate_octaves=0 was=0 move=hold rate_bits=12
+FIELD_PART_RATE part=a_lane entries=1024 c=-0.275243 rate_octaves=0 was=0 move=hold rate_bits=12
+FIELD_PART_RATE part=b_lane entries=1024 c=-0.269719 rate_octaves=0 was=0 move=hold rate_bits=12
+FIELD_PART_RATE part=g_chart entries=0 c=0.000000 rate_octaves=0 was=0 move=hold rate_bits=12
+== I3 update mean-gate12/MEAN.0 wm13/MEAN.0 wm14/MEAN.0 (the raised line's lap means)
+FIELD_PART_RATE part=w_new entries=2048 c=0.274569 rate_octaves=0 was=0 move=hold rate_bits=12
+FIELD_PART_RATE part=a_new entries=2080 c=0.322955 rate_octaves=0 was=0 move=hold rate_bits=12
+FIELD_PART_RATE part=b_new entries=2080 c=0.323617 rate_octaves=0 was=0 move=hold rate_bits=12
+FIELD_PART_RATE part=enc_lane entries=3232 c=0.600749 rate_octaves=1 was=0 move=faster rate_bits=11
+FIELD_PART_RATE part=before_lane entries=3232 c=0.591298 rate_octaves=1 was=0 move=faster rate_bits=11
+FIELD_PART_RATE part=after_lane entries=3232 c=0.588090 rate_octaves=1 was=0 move=faster rate_bits=11
+FIELD_PART_RATE part=q_lane entries=2048 c=0.331131 rate_octaves=1 was=2 move=slower rate_bits=11
+FIELD_PART_RATE part=v_lane entries=2048 c=0.538423 rate_octaves=5 was=4 move=faster rate_bits=7
+FIELD_PART_RATE part=probe_lane entries=2048 c=0.518791 rate_octaves=3 was=2 move=faster rate_bits=9
+FIELD_PART_RATE part=out_lane entries=2048 c=0.546901 rate_octaves=3 was=2 move=faster rate_bits=9
+FIELD_PART_RATE part=moment_face_lane entries=2048 c=0.397797 rate_octaves=1 was=2 move=slower rate_bits=11
+FIELD_PART_RATE part=read_lane entries=3072 c=0.289747 rate_octaves=0 was=0 move=hold rate_bits=12
+FIELD_PART_RATE part=face_biases_lane entries=128 c=0.817140 rate_octaves=1 was=0 move=faster rate_bits=11
+FIELD_PART_RATE part=a_lane entries=1024 c=-0.014981 rate_octaves=0 was=0 move=hold rate_bits=12
+FIELD_PART_RATE part=b_lane entries=1024 c=0.133261 rate_octaves=0 was=0 move=hold rate_bits=12
+FIELD_PART_RATE part=g_chart entries=0 c=0.000000 rate_octaves=0 was=0 move=hold rate_bits=12
+== I4 update rt12/STATE.0 wm13/STATE.0 wm14/STATE.0 (the raised line's lap ends)
+FIELD_PART_RATE part=w_new entries=2048 c=-0.034802 rate_octaves=0 was=0 move=hold rate_bits=12
+FIELD_PART_RATE part=a_new entries=2080 c=0.044022 rate_octaves=0 was=0 move=hold rate_bits=12
+FIELD_PART_RATE part=b_new entries=2080 c=0.047197 rate_octaves=0 was=0 move=hold rate_bits=12
+FIELD_PART_RATE part=enc_lane entries=3232 c=0.382128 rate_octaves=0 was=0 move=hold rate_bits=12
+FIELD_PART_RATE part=before_lane entries=3232 c=0.390351 rate_octaves=0 was=0 move=hold rate_bits=12
+FIELD_PART_RATE part=after_lane entries=3232 c=0.363920 rate_octaves=0 was=0 move=hold rate_bits=12
+FIELD_PART_RATE part=q_lane entries=2048 c=-0.012589 rate_octaves=1 was=2 move=slower rate_bits=11
+FIELD_PART_RATE part=v_lane entries=2048 c=0.193520 rate_octaves=3 was=4 move=slower rate_bits=9
+FIELD_PART_RATE part=probe_lane entries=2048 c=0.187528 rate_octaves=1 was=2 move=slower rate_bits=11
+FIELD_PART_RATE part=out_lane entries=2048 c=0.180807 rate_octaves=1 was=2 move=slower rate_bits=11
+FIELD_PART_RATE part=moment_face_lane entries=2048 c=-0.017412 rate_octaves=1 was=2 move=slower rate_bits=11
+FIELD_PART_RATE part=read_lane entries=3072 c=-0.059430 rate_octaves=0 was=0 move=hold rate_bits=12
+FIELD_PART_RATE part=face_biases_lane entries=128 c=0.591830 rate_octaves=1 was=0 move=faster rate_bits=11
+FIELD_PART_RATE part=a_lane entries=1024 c=-0.227725 rate_octaves=0 was=0 move=hold rate_bits=12
+FIELD_PART_RATE part=b_lane entries=1024 c=-0.193693 rate_octaves=0 was=0 move=hold rate_bits=12
+FIELD_PART_RATE part=g_chart entries=0 c=0.000000 rate_octaves=0 was=0 move=hold rate_bits=12
+
+== J0: the rate line's lap 12, its own release reads (from its lap log; the control for the release read from a lap's mean)
+LAP rt12 joint=1.741950 locks=1.825595/1.028917 v2=0.197260 rest=1.200386/0.889172 v2=0.114155 redraw=0.723552/0.746991 neutral=24 rested=8 redraw_v2=0.048744 ref=[] 05:16:31
+REFREAD rt12 problems=128 places=43342 code=0.511427 entropy=0.477617 root_share=1.278415 v1=0.065363 v2=0.042752
+FIELD_SETTLE_DONE problems=32 at_rest=32 h_millinats=1000 passes_bound=1000 kept=850 undone=1361 letters=8760 code_keyed_nats_a_place=1.825595 code_end_nats_a_place=1.200386 fall_nats=5476.824269 keyed_ms=18094 ms=417077
+FIELD_REDRAW_DONE problems=32 neutral=24 rested=8 h_millinats=1000 passes_bound=1000 kept=845 undone=992 letters=8760 code_start_nats_a_place=1.200386 code_end_nats_a_place=0.723552 entropy_end_nats_a_place=0.746991 root_end_nats=535.964675 ms=192192
+FIELD_CHARGE_STATE state=rest [fields between elided in the extract] code_nats_a_place=1.200386 entropy_nats_a_place=0.889172 excess_nats=2726.241079 root_nats=778.541509 root_share_of_excess=0.285573 v_over_1_share=0.168378 v_over_2_share=0.114155
+FIELD_CHARGE_STATE state=keyed [fields between elided in the extract] code_nats_a_place=1.825595 entropy_nats_a_place=1.028917 excess_nats=6978.895371 root_nats=834.307678 root_share_of_excess=0.119547 v_over_1_share=0.266780 v_over_2_share=0.197260
+FIELD_CHARGE_STATE state=reference [fields between elided in the extract] code_nats_a_place=0.436996 entropy_nats_a_place=0.419112 excess_nats=156.658327 root_nats=416.226802 root_share_of_excess=2.656908 v_over_1_share=0.054794 v_over_2_share=0.036301

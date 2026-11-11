@@ -3,6 +3,7 @@ import Holonics.Physics.Thermal.ViscousPort
 import Holonics.Physics.Thermal.Schnakenberg
 import Holonics.Physics.Thermal.ChainAxes
 import Holonics.Physics.Thermal.LinearDiffusion
+import Holonics.Physics.Thermal.LapMean
 
 /-!
 # The thermal instance of the Holon law
@@ -30,6 +31,10 @@ contract, "Physical instances" (`thermal exchange/diffuse/entropy_production`). 
   the turn free; the turn is the stationary current (the housekeeping part), which circulates; the
   diffusion is reversible exactly when the turn vanishes, and one stationary law carries both a
   reversible and an irreversible drift.
+- `Thermal/LapMean`: a walk read at its laps' means: the weights of the difference of two
+  successive lap means, their shared and own sums, and the floor of one quarter under a free
+  walk's lap cosine between lap means; a cosine there is the steady share and a quarter of the
+  rest.
 
 The retired `holonics-cuda` diffusion receipt: its energy balance is carried by
 `Thermal/Exchange.first_law` (two cells); many-cell diffusion is owed (#62).
