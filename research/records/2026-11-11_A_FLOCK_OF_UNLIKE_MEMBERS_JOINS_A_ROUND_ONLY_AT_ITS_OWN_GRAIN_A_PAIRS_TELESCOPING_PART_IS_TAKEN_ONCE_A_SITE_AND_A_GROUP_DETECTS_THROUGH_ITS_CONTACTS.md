@@ -81,6 +81,8 @@ The realization keeps every bit. One launch on the pair's own grid (a thread a s
 
 **G45** (fixed 04:47 UTC, unread). With STEP G alone, the scan entries' kernel time a section (the new launch, the forward scan and the reverse scan) falls to 0.18 of the forward and reverse scan's present sum (0.07 to 0.40), and the 188-section ratio against the same control falls from 1.3894 to 1.07 (1.03 to 1.15). Above 1.25 the chain's own depth is the cost: the next read takes the forward and reverse launches' grid sums apart, and a telescoped form of the carry becomes a question of law after G30′'s read. Basis: about 2,400 instructions a step now against about 100 for the recurrence, counted from source and unmeasured.
 
+[added 08:24 UTC: read and scored] STEP G was built on the training line (5a8e9e475) under S and S′, and the three were read together. *Bytes:* from the state the first clean scan lap opened from, with the carry on, the line's head reproduces that lap on 320 of 320 section lines (the lap's own binary carries none of the three), so all three keep the scan line's bytes. *Time:* one hold of the lap's binary, the line's head and the lap's binary again (639 s; [the guess file](2026-11-11_THE_PLACES_THE_FIELD_GIVES_PUSH_AGAINST_THE_PLACES_IT_MISSES_THE_DEPOSIT_IS_THEIR_DIFFERENCE_AND_TWO_BUILDS_ARE_TIMED_ONLY_INSIDE_ONE_HOLD_OF_THE_CARD_receipts/guess_capacity_44_55.txt)). The scan's own entries read 222.9 ms a section before (forward 177.3, reverse 45.7) and 68.7 after (the new launch 1.8, forward 22.0, reverse 44.9): 0.308 of the sum, inside the band, **held**. The forward chain fell to 0.134 of itself and the reverse did not move, since G takes the root and the divisions off the forward chain and the reverse reads the kept operands; the reverse is now twice the forward. The ratio against a control without the carry is **unread** by this hold (it has no read with the carry off), and nothing waits on it. Together the three steps take a scan-line section to 0.714 of its time (142,517 against 199,563 ms over 223 common sections; the two controls agree to 0.5%), kernel time a section from 754.6 to 479.6 ms.
+
 **5.4 What does not telescope.** The chain itself. Each step releases at a declared width, so the steps do not associate, and a parallel prefix would reorder the releases (design's note in the kernel). The chain stays sequential, as deep as the region.
 
 ## 6. Unlike members: the cut lies at carries
@@ -149,7 +151,7 @@ No Lean obligation is added: the share is a counting identity checked by its scr
 From 05:04 UTC the theory thread is the one thread and holds the PC's work (Brandon's direction), so these are its own, in order:
 
 - S: locate the difference of §5.2, then its acceptance (card parity, the tenth state's bytes after a lap from the ninth, the profile before and after for G44). [added 06:02 UTC] Located and repaired; G44 is scored and S's address moves to its own grid ([the line-entry record](2026-11-11_A_BUILD_ENTERS_A_LINE_BY_REPRODUCING_THE_LINES_OWN_LAP_A_COMMIT_CALLED_A_READING_HAD_CHANGED_THE_TRAINING_COMPARISON_AND_A_ONCE_A_SITE_PART_NEEDS_ITS_OWN_GRID.md)).
-- G with G45, then the support stride with G42.
+- G with G45, then the support stride with G42. [G: done 08:24 UTC, §5.3]
 - G39 on the host under the reading manifest, whose wall time and threads read G47.
 - The port of §8.5.
 - The scan laps (G30′, G46) and the trend laps (G43), which are running; each guess is scored as it is read.
