@@ -131,11 +131,17 @@
 //! targets the classes that arrived there, and a region drawn as a state of `K` open sites among `m` codes
 //! `(m/K) Σ −log₂ p̂_t(u_t)` (§16.23, [`Region::weight`]); an answer port is compared through its coupling (§16.24,
 //! [`Region::port`]). The covector (`p̂ − q` weighed, or `p̂ − r` at a port) returns exactly through the `K` ticks (the
-//! operands that produced each carrier, held from the forward). The deposit is the tower's: the covector's two moments,
-//! the step `m/(√v + 2^(−32))` at `2^(−k)`, certified on the section's own regions (by the products of their faces where
-//! every weight is one, by partition of their readings where one is not, on the codes' grain where a port is read),
-//! halved until it is certified or moves nothing; then held and read on the next section's regions, which it was not fit
-//! on, and halved again or refused where it codes them higher (the tower's acceptance 77, [`FieldLearner`]).
+//! operands that produced each carrier, held from the forward). The deposit is the tower's two moments of the covector,
+//! and the step deposits at its size, `m/(⌊√v⌋ + 1)` at `2^(−rate)`: at most about 4.2 times its rate, by Cauchy–Schwarz
+//! over the moments' rates `2^(−3)` and `2^(−8)` (agent-inferred). No reread decides it (Brandon, November 5: the step
+//! fluxes). What a step does is priced, never certified: predicted on its own section (`FieldReceipt::predicted`), at
+//! first order on the next section's covector (`FieldReceipt::transfer`), and before this section's covector moves the
+//! moments (`FieldReceipt::external`). History, kept as history ([`FieldLearner`]): from November 1 the step was
+//! certified on the section's own regions (by the products of their faces where every weight is one, by partition of
+//! their readings where one is not, on the codes' grain where a port is read) and halved until it was certified or moved
+//! nothing, then held and read on the next section's regions, which it was not fit on, and halved again or refused where
+//! it coded them higher (the tower's acceptance 77); the held read was set aside on November 3 and stands since as a
+//! declared comparison only (`read_held`, `false`); the certificate itself was retired on November 5.
 //!
 //! [definition; agent-inferred, November 3, §16.27] **The writer is the training clock run backwards**
 //! ([`Field::sample_realized`]): training reads a region whose open sites are a uniform state of a random reading
@@ -1209,9 +1215,11 @@ struct TickCell {
 /// bands `2^(−3)`, `2^(−5)`, `2^(−8)` and `2^(−12)`, where the sharp address passes both bars; and
 /// §15.2's `½(1 ± λ)` everywhere would give every site a share of the all-bridge class (the bridge
 /// borders both plates), so every far row would be dense. §14.2's least hold had coded the cue at 2.12
-/// bits. A seam is crossed at a jump; the held step's certificate reads the code exactly, so a step
-/// across one is certified or refused on what it does. (The cue and recall fixtures these reads used are
-/// retired as copy-shaped acceptances, §16.19; the reads stand as history.)
+/// bits. A seam is crossed at a jump. Under the law of November 1 to 3 the held step's certificate read the
+/// code itself, so a step across a seam was certified or refused on what it did; since November 5 the step
+/// fluxes, and what a step across a seam does is priced by the next section's covector like any other. (The
+/// cue and recall fixtures these reads used are retired as copy-shaped acceptances, §16.19; the reads stand
+/// as history.)
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
 pub struct ClassLists {
     /// Each site's class as a source, read from its key word: the class whose run lists it.
@@ -5268,7 +5276,8 @@ impl FieldRealization for HostField {
 /// ([`FieldLearner::read_step_on`]): its change to those regions' code (the stepped material's
 /// code less the material's before the step, on `2^(−20)` bits), the further halvings of the last
 /// size read ([`FieldLearner::next_scale`]: the step stands at them unless refused), and whether
-/// it refused the step.
+/// it refused the step. Read only under [`FieldLearner::read_held`], `false` since November 3: a
+/// declared comparison, never the law.
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
 pub struct FieldNext {
     pub change: i64,
@@ -5276,9 +5285,10 @@ pub struct FieldNext {
     pub refused: bool,
 }
 
-/// A section's receipt: its unresolved sites, its code before and after (on `2^(−20)` bits), the
-/// halvings the certificate took, whether a step was deposited, and the read of the step the
-/// section before deposited on this section's regions.
+/// A section's receipt: its unresolved sites, its code before and after (on `2^(−20)` bits), its
+/// halvings (`0` since the step fluxes, November 5, and still printed), whether a step was deposited,
+/// and the held read of the step the section before deposited on this section's regions (only under
+/// [`FieldLearner::read_held`]).
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
 pub struct FieldReceipt {
     /// The sites the codes are of: each region's domain where it read an open site (§16.23).
@@ -5309,15 +5319,15 @@ pub struct FieldReceipt {
 }
 
 /// A deposited step held for the next regions' read: the proposed step on each family's grain and
-/// the halvings it was certified at. The material before it is the material less nothing: the
-/// deposit subtracted `release(step, halvings)` from each entry, so adding it back is exact.
+/// the halvings it stood at. The material before it is the material less nothing: the deposit
+/// subtracted `release(step, halvings)` from each entry, so adding it back restores every bit.
 #[derive(Clone, Debug, PartialEq, Eq)]
 struct HeldStep {
     step: Vec<i128>,
     halvings: u32,
 }
 
-/// Each unresolved site's face read at its class, the faces the certificates compare.
+/// Each unresolved site's face read at its class, the faces the section's code and the held read compare.
 /// [definition; agent-inferred, November 3, §16.24] **A section's compared reading**: each open site's face at its
 /// class before its region's port (`(mass, total)`), and the ports' coupling codes summed on `2^(−20)` bits.
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -5374,7 +5384,7 @@ fn code_of(c: &Compared, spans: &[(usize, u64, u64)]) -> i64 {
 }
 
 /// Whether `new` codes strictly fewer bits than `old`. Where a port is read, its coupling code has no product form, so
-/// the decision is the codes' on their grain (`2^(−20)` bits, §16.24); otherwise it is the weighed certificate's.
+/// the decision is the codes' on their grain (`2^(−20)` bits, §16.24); otherwise it is the held read's weighed comparison.
 fn fewer(old: &Compared, new: &Compared, spans: &[(usize, u64, u64)]) -> bool {
     if old.ported || new.ported {
         code_of(new, spans) < code_of(old, spans)
@@ -5387,8 +5397,9 @@ fn fewer(old: &Compared, new: &Compared, spans: &[(usize, u64, u64)]) -> bool {
 /// with `Δθ = −step` at its full size and `g` the section's covector as its return gives it, on the codes' `2^(−20)` bits, a
 /// unit of `g Δθ` standing at `2^(−(40 + grain − 20))` bits on the material's families and `2^(−(24 + grain − 20))` on the
 /// faces' (the covector's grains, as `covector_matches_the_codes_difference` reads them); `None` where a product or the sum
-/// passes its carrier. With the change the certificate reads at the full step it is the section's own parabola; with the next
-/// section's covector and the step at the halvings it stood at, the step's transfer ([`FieldReceipt::transfer`]).
+/// passes its carrier. At the full step it is the first coefficient `a` of the section's own parabola `e(μ) = aμ + bμ²`; no
+/// reread reads the second since the step fluxes (November 5), so `b` is unread on the section itself. With the next
+/// section's covector and the step at the halvings it stood at, it is the step's transfer ([`FieldReceipt::transfer`]).
 fn predicted_change(field: &Field, g: &[i128], step: &[i128], halvings: u32) -> Option<i64> {
     let mut total = 0i128;
     for &(start, len, grain) in &field.families_all() {
@@ -5412,10 +5423,33 @@ fn predicted_change(field: &Field, g: &[i128], step: &[i128], halvings: u32) -> 
 /// `carry` their charts `Q`, `H` and both biases (part 15, which was the retired carry's third chart, `g_chart`), `w_carry` their columns of `W`,
 /// `a_carry` and `b_carry` their rows of the pair drives with the drives' biases. A parts line carries the three circle parts only where the field
 /// has carry circles ([`RateParts`]).
-pub const PART_NAMES: [&str; 19] = ["w_new", "a_new", "b_new", "enc_lane", "before_lane", "after_lane", "q_lane", "v_lane", "probe_lane", "out_lane", "moment_face_lane", "read_lane", "face_biases_lane", "a_lane", "b_lane", "carry", "w_carry", "a_carry", "b_carry"];
+///
+/// [definition; theory, November 11 21:15, G86] The first lane's letter rows are parts of their own: `enc_first`, `before_first` and
+/// `after_first`, the encodings' rows (each class as itself, as the neighbour before and after) over the first lane's columns, old entries
+/// at the base rate until then. Why: a part's rate follows its polarization (its fall two laps on over its heat, read at lap means), and
+/// these rows are the field's most polarized blocks (G84, G86's premise), so they need a rate of their own.
+pub const PART_NAMES: [&str; 22] = ["w_new", "a_new", "b_new", "enc_lane", "before_lane", "after_lane", "q_lane", "v_lane", "probe_lane", "out_lane", "moment_face_lane", "read_lane", "face_biases_lane", "a_lane", "b_lane", "carry", "w_carry", "a_carry", "b_carry", "enc_first", "before_first", "after_first"];
 
-/// The founded parts a field without carry circles writes and prints: every part but the three circle parts ([`PART_NAMES`]).
+/// The plain founded parts (the first sixteen of [`PART_NAMES`]): every field writes them.
 pub const PLAIN_PARTS: usize = 16;
+
+/// The carry circles' three parts after the plain ones (`w_carry`, `a_carry`, `b_carry`), written only where the field has circles.
+pub const CIRCLE_PARTS: std::ops::Range<usize> = 16..19;
+
+/// The first lane's letter rows' three parts (`enc_first`, `before_first`, `after_first`), written by every field.
+pub const FIRST_PARTS: std::ops::Range<usize> = 19..22;
+
+/// [definition; theory, November 11 21:15] **The parts a parts line carries, in its order**: the plain sixteen, the circles' three where the
+/// field has circles, then the first lane's letter rows' three. A line read is matched against this by its length, and an older line (fifteen
+/// or sixteen, or nineteen with circles: the lines before the letter rows' parts) reads with the parts it lacks at octave 0.
+pub fn written_parts(carry: usize) -> Vec<usize> {
+    let mut out: Vec<usize> = (0..PLAIN_PARTS).collect();
+    if carry > 0 {
+        out.extend(CIRCLE_PARTS);
+    }
+    out.extend(FIRST_PARTS);
+    out
+}
 
 /// The number of founded parts ([`PART_NAMES`]).
 pub const PARTS: usize = PART_NAMES.len();
@@ -5537,6 +5571,12 @@ impl Field {
         for start in [l.out_bias, l.w_bias, l.moment_face_bias, l.lift_bias] {
             parts[start + lw..start + dw].fill(12);
         }
+        // [theory, November 11 21:15, G86] The first lane's letter rows: the encodings' columns over the first lane.
+        for (part, start) in [(FIRST_PARTS.start as u8, l.enc), (FIRST_PARTS.start as u8 + 1, l.before), (FIRST_PARTS.start as u8 + 2, l.after)] {
+            for r in 0..a1 {
+                parts[start + r * dw..start + r * dw + lw].fill(part);
+            }
+        }
         for (part, start) in [(13u8, l.a), (14, l.b)] {
             for e in 0..f {
                 parts[start + e * dw + lw..start + (e + 1) * dw].fill(part);
@@ -5594,10 +5634,12 @@ struct Scaled {
     standing: Option<(Field, Vec<Vec<Option<TowerFace>>>)>,
 }
 
-/// [definition; agent-inferred, November 1] **A step's size read in at most three reads**, the one
-/// law of the certificate ([`FieldLearner::section_realized`], `strict`: the stepped material must
-/// code the regions strictly fewer bits than `old`) and of the held step's read on the next
-/// regions ([`FieldLearner::next_scale`]: no more bits). The step `base − release(step, h0)` is
+/// [definition; agent-inferred, November 1] **A step's size read in at most three reads**: the held
+/// step's read on the next regions ([`FieldLearner::next_scale`]: no more bits), a declared
+/// comparison under [`FieldLearner::read_held`] only. From November 1 to 5 it was also the
+/// certificate's law ([`FieldLearner::section_realized`], `strict`: the stepped material had to code
+/// the regions strictly fewer bits than `old`); the step fluxes since November 5, and `strict` has had
+/// no caller since (history, kept with its reading below). The step `base − release(step, h0)` is
 /// read; where it stands, it stands. Otherwise it is read at half its size; where that stands, it
 /// stands halved. Otherwise the excess `e(μ)` of the regions' code over `old`'s at the step's
 /// fraction `μ` is read at `μ = 1` and `μ = ½`, and the parabola `e(μ) = aμ + bμ²` through them
@@ -5725,16 +5767,26 @@ impl MaterialMean {
 /// two to four times the declared rate until the second moment caught up (the review of
 /// November 1).
 ///
-/// **A step is held and read on the next regions** (the tower's acceptance 77,
-/// [`super::TowerLearner::next_section`], always declared here): a step certified on its own
-/// section is held, and the next section's regions are read under the material before it and its
-/// size read on them by the one bounded law of a step's size ([`scaled`]): it stands at its size,
-/// at half, or at the parabola's halving where it codes them no higher, or is refused (the
-/// material before it stands). The moments stay as they moved. Why
-/// (the first reading on the card, November 1): the certificate read only its own section, and
-/// the held-out answer code rose at the second lap and the third (5.38, 5.49, 6.18 bits a class)
-/// while the passage's own code fell every section; the tower had recorded this failure and its
-/// repair, and the field was built without it.
+/// **The step deposits at its size** (Brandon, November 5: the step fluxes): `m/(⌊√v⌋ + 1)` at
+/// `2^(−rate)`, at most about 4.2 times its rate by Cauchy–Schwarz over the moments' rates
+/// (agent-inferred), and no reread decides it. What it does is priced as the learner passes:
+/// predicted on its own section, transferred onto the next section's covector, and external before
+/// the covector moves the moments ([`FieldReceipt`]); the moments carry every covector, a
+/// contraction's and an expansion's alike.
+///
+/// History, kept as history. *November 1*: **a step was held and read on the next regions** (the
+/// tower's acceptance 77, [`super::TowerLearner::next_section`]): a step certified on its own
+/// section was held, and the next section's regions were read under the material before it and its
+/// size read on them by the one bounded law of a step's size ([`scaled`]): it stood at its size, at
+/// half, or at the parabola's halving where it coded them no higher, or was refused (the material
+/// before it stood). The moments stayed as they moved. Why (the first reading on the card,
+/// November 1): the certificate read only its own section, and the held-out answer code rose at the
+/// second lap and the third (5.38, 5.49, 6.18 bits a class) while the passage's own code fell every
+/// section; the tower had recorded this failure and its repair, and the field had been built without
+/// it. *November 3*: the held read was set aside ([`FieldLearner::read_held`], `false`, with its
+/// reason there) and stands since as a declared comparison only. *November 5*: the certificate
+/// itself was retired, because it kept a step only where its own section reread lower, a selection
+/// on the code that discarded what an expansion measures ([`FieldLearner::section_realized`]).
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct FieldLearner {
     pub field: Field,
@@ -5748,8 +5800,10 @@ pub struct FieldLearner {
     pub laps: u64,
     held: Option<HeldStep>,
     /// [definition; agent-inferred, November 3, §16.30] Whether a deposited step is held and read on the next regions
-    /// before it stands (the tower's acceptance 77). The field's law is `false`: a step stands at the size its own
-    /// section certified (strictly fewer bits there, [`scaled`]), and the next regions are read under it as they come.
+    /// before it stands (the tower's acceptance 77). The field's law is `false`: a step stands at its size (certified
+    /// on its own section, strictly fewer bits there, [`scaled`], until November 5; since then the step fluxes), and the
+    /// next regions are read under it as they come. The reason below is the November 3 reading, when the certificate
+    /// still stood.
     /// Why: from the same trained state, two laps read the held answers' joint code at 3.200 and 3.160 bits a byte with
     /// the steps standing unread against 3.204 and 3.174 with the next-section read, in 171 s a lap against 280 s (the
     /// read refused 30% of the steps and halved 55%: a step that lowers its own section's code raises another
@@ -5969,17 +6023,17 @@ impl FieldLearner {
         rates
     }
 
-    /// One section: the step the section before deposited read on its regions, then its regions
-    /// read and returned on the material that stands, the moments moved, and the step deposited
-    /// at the size where the regions reread under it code strictly fewer bits ([`scaled`]: its
-    /// size, half, or the parabola's halving; none of them, no deposit) and held for the next
-    /// section.
+    /// One section: the step the section before deposited read on its regions (only under
+    /// [`FieldLearner::read_held`]), then its regions read and returned on the material that stands,
+    /// the moments moved, and the step deposited at its size (the step fluxes, November 5; a step that
+    /// moves no entry deposits nothing), priced by its prediction, transfer and external price
+    /// ([`FieldReceipt`]) and kept for the next section's transfer.
     pub fn section(&mut self, regions: &[Region]) -> Result<FieldReceipt> {
         self.section_realized(regions, &mut HostField)
     }
 
-    /// [`FieldLearner::section`] on a declared realization of the field's read and return; the
-    /// moments, the step and the certificates' decisions stay on the host.
+    /// [`FieldLearner::section`] on a declared realization of the field's read and return; the step
+    /// is deposited at its size, and the moments and the step stay on the host.
     pub fn section_realized(&mut self, regions: &[Region], realization: &mut dyn FieldRealization) -> Result<FieldReceipt> {
         let (faces, g, next) = self.open(regions, realization, true)?;
         let mut g = g.ok_or(TowerError::Refused("a section's opening read returned no covector"))?;
@@ -6084,9 +6138,8 @@ impl FieldLearner {
         };
         {
             // [definition; theory, November 10 19:05] The founded parts' rates, a trailing line a binary without them never reads.
-            // A field without carry circles writes the parts it has, sixteen; one with them writes all nineteen ([`PLAIN_PARTS`]).
-            let written = if self.field.declaration.carry > 0 { PARTS } else { PLAIN_PARTS };
-            let parts = self.rate_parts.map_or(String::new(), |rp| format!("parts {} {}\n", rp.contacts_before, rp.octaves[..written].iter().map(u32::to_string).collect::<Vec<_>>().join(" ")));
+            // The parts the field has, in the line's order ([`written_parts`]): nineteen without carry circles, twenty-two with them.
+            let parts = self.rate_parts.map_or(String::new(), |rp| format!("parts {} {}\n", rp.contacts_before, written_parts(self.field.declaration.carry).iter().map(|&p| rp.octaves[p].to_string()).collect::<Vec<_>>().join(" ")));
             format!("hnn-field-learner-v3 {} {} {} {held}\n{}{}\n{}\n{step}{parts}", self.rate_bits, self.drawn, self.laps, self.field.to_text(), join(&self.first), join(&self.second))
         }
     }
@@ -6122,14 +6175,21 @@ impl FieldLearner {
         let rate_parts = match lines.peek() {
             Some(l) if l.starts_with("parts ") => {
                 let v = read_numbers::<usize>(lines.next().and_then(|l| l.strip_prefix("parts ")))?;
-                // A line of fifteen parts (written before part 15) or sixteen (a field without carry circles) reads with the parts it lacks at
-                // the old rate; a field with carry circles writes all nineteen.
-                if v.is_empty() || ![PLAIN_PARTS - 1, PLAIN_PARTS, PARTS].contains(&(v.len() - 1)) {
+                // The line's parts in its order ([`written_parts`]); an older line (fifteen or sixteen parts, or nineteen with carry
+                // circles) reads its parts in order with the ones it lacks at the old rate.
+                let order = written_parts(field.declaration.carry);
+                let older: Vec<usize> = if field.declaration.carry > 0 { (0..PLAIN_PARTS).chain(CIRCLE_PARTS).collect() } else { (0..PLAIN_PARTS).collect() };
+                let n = v.len().saturating_sub(1);
+                let slots: Vec<usize> = if n == order.len() {
+                    order
+                } else if n == older.len() || n == PLAIN_PARTS || n == PLAIN_PARTS - 1 {
+                    older[..n].to_vec()
+                } else {
                     return refuse("a learner's founded parts' rates that are not one a part");
-                }
+                };
                 let mut octaves = [0u32; PARTS];
-                for (slot, &k) in octaves.iter_mut().zip(&v[1..]) {
-                    *slot = u32::try_from(k).map_err(|_| TowerError::Refused("a part's octaves past a count"))?;
+                for (&slot, &k) in slots.iter().zip(&v[1..]) {
+                    octaves[slot] = u32::try_from(k).map_err(|_| TowerError::Refused("a part's octaves past a count"))?;
                 }
                 Some(RateParts { contacts_before: v[0], octaves })
             }

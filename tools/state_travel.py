@@ -87,7 +87,8 @@ moment_face_bias, lift_bias, and carry and carry_bias with carry circles). Every
 HEAD's and DONOR's tells how much of a reading's difference between two states those families carry; where a reading is first order
 in the states' difference, the shifts of grafts that partition the material add up to the whole difference, and what the sum leaves
 is the reading's curvature between them. A name may also be `part:NAME`, the entries of one founded part as the rate law names
-them (tools/part_rates.py: w_new .. b_lane and carry, and w_carry, a_carry, b_carry with carry circles), or `FAMILY/old`, a family's entries of no part (the base
+them (tools/part_rates.py: w_new .. b_lane, carry and the first lane's letter rows enc_first, before_first, after_first, and w_carry,
+a_carry, b_carry with carry circles), or `FAMILY/old`, a family's entries of no part (the base
 rate's); the parts and the families' old entries partition the material, so a lap's difference between two lap means is split by the
 rate each entry trains at. Both read the count of contacts before the growth from HEAD's `parts` line, or from a name
 `contacts:N` where HEAD carries none (where it carries one the two agree). No entry is named twice. OUT is a ruler's state: it is
@@ -377,7 +378,7 @@ def entry_rates(d, total, rate_bits, parts):
         contacts_before, octaves = parts
         founded = np.array(part_rates.founded_parts(d, contacts_before))
         assert len(founded) == total
-        for p, k in enumerate(octaves):
+        for p, k in enumerate(part_rates.expand(d, octaves)):
             rates[founded == p] = max(rate_bits - k, 1)
     return rates
 
@@ -489,7 +490,7 @@ def graft(out, head, donor, names):
         sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
         import part_rates
 
-        carried = part_rates.parts_line(lines)
+        carried = part_rates.parts_line(lines, d)
         before = int(declared[0].split(":", 1)[1]) if declared else None
         assert carried is not None or before is not None, "a part or a family's old entries need HEAD's parts line or contacts:N"
         assert carried is None or before is None or carried[0] == before, "contacts:N is HEAD's parts line's count"

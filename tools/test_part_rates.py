@@ -41,7 +41,9 @@ def write(path, theta, octaves, d=D, extra=None):
         f.write("hnn-field-learner-v3 12 0 0 -\n" + " ".join(words) + "\n" + " ".join(str(int(x)) for x in theta) + "\n")
         if extra is not None:
             f.write(extra + "\n")
-        f.write("parts " + " ".join(str(k) for k in [OLD_F] + octaves) + "\n")
+        # A full list of PARTS octaves is written in the line's order for d (part_rates.written); any other list as it stands (an older line).
+        line = [octaves[p] for p in part_rates.written(d)] if len(octaves) == part_rates.PARTS else octaves
+        f.write("parts " + " ".join(str(k) for k in [OLD_F] + line) + "\n")
 
 
 def run(*args):
@@ -74,7 +76,7 @@ def main():
     assert q and v and len(pr) % 4 == 0 and pr
     base = draws(total, 7)
     step = draws(total, 11)
-    octaves = [0] * part_rates.PLAIN_PARTS
+    octaves = [0] * part_rates.PARTS
     octaves[part_rates.PART_NAMES.index("q_lane")] = 0
     octaves[part_rates.PART_NAMES.index("v_lane")] = 2
     octaves[part_rates.PART_NAMES.index("probe_lane")] = 1
@@ -104,7 +106,7 @@ def main():
             moved[part_rates.PART_NAMES.index(name)] = k
         text = open(p("u")).read().split("\n")
         assert text[2] == " ".join(str(x) for x in s2) and text[3] == "a line the tool keeps"
-        assert text[-2] == "parts " + " ".join(str(k) for k in [OLD_F] + moved) and text[-1] == ""
+        assert text[-2] == "parts " + " ".join(str(k) for k in [OLD_F] + [moved[p] for p in part_rates.written(D)]) and text[-1] == ""
         print("part_rates update: the planted moves and the written state hold")
 
         # The same three materials, the last as the state: what update writes.
@@ -185,12 +187,12 @@ def main():
         count = lambda name: sum(1 for q in parts_c if q == part_rates.PART_NAMES.index(name))
         assert (count("carry"), count("w_carry"), count("a_carry"), count("b_carry")) == (4 * 16 + 4, 4 * 16, 4 * 16 + 4, 4 * 16 + 4)
         assert count("w_new") == 16 * (16 - OLD_F - 4), "the circles' columns are theirs, not the new contacts'"
-        write(p("c0"), draws(total_c, 3), octaves, d=dc)
+        write(p("c0"), draws(total_c, 3), octaves[:part_rates.PLAIN_PARTS], d=dc)
         run("open", p("c0"), str(OLD_F), ",".join(str(k) for k in [0] * part_rates.PARTS), p("c1"))
         line = [l for l in open(p("c1")).read().split("\n") if l.startswith("parts ")][0]
         assert len(line.split(" ")) == 2 + part_rates.PARTS, line
-        held = part_rates.parts_line(open(p("c0")).read().split("\n"))
-        assert held[1][part_rates.PLAIN_PARTS:] == [0, 0, 0], "a sixteen-part line reads the circles' parts at octave 0"
+        held = part_rates.parts_line(open(p("c0")).read().split("\n"), dc)
+        assert held[1][part_rates.PLAIN_PARTS:] == [0] * 6, "a sixteen-part line reads the circles' and the letter rows' parts at octave 0"
         got_c = run("update", p("c0"), p("c0"), p("c0"), p("c2"))
         assert set(got_c) == set(part_rates.PART_NAMES), "a state with carry circles prints all nineteen"
         assert len([l for l in open(p("c2")).read().split("\n") if l.startswith("parts ")][0].split(" ")) == 2 + part_rates.PARTS
@@ -202,8 +204,88 @@ def main():
             pass
         else:
             raise AssertionError("the retired carry's head is not refused")
-        print("part_rates carry: the circles' four parts, nineteen written, sixteen read at octave 0, the retired head refused")
-    print("part_rates: 6 lines, the controls hold")
+        print("part_rates carry: the circles' four parts, twenty-two written, sixteen read at octave 0, the retired head refused")
+
+        # The first lane's letter rows (theory, November 11 21:15, G86): three parts of their own, the encodings' columns over the first lane;
+        # a field without circles writes nineteen (sixteen and these three), with circles twenty-two; an older line reads them at octave 0.
+        first = {n: sum(1 for q in parts if q == part_rates.PART_NAMES.index(n)) for n in ("enc_first", "before_first", "after_first")}
+        assert first == {"enc_first": 6 * 8, "before_first": 6 * 8, "after_first": 6 * 8}, first
+        assert part_rates.written(D) == list(range(16)) + [19, 20, 21] and part_rates.written(dc) == list(range(22))
+        raised = [0] * part_rates.PARTS
+        raised[part_rates.PART_NAMES.index("before_first")] = 3
+        write(p("f0"), base, raised)
+        assert len([l for l in open(p("f0")).read().split("\n") if l.startswith("parts ")][0].split(" ")) == 2 + 19
+        assert part_rates.parts_line(open(p("f0")).read().split("\n"), D)[1] == raised, "nineteen parts read back by the line's order"
+        assert part_rates.expand(D, [0] * 16)[19:] == [0, 0, 0] and part_rates.expand(dc, [0] * 19)[19:] == [0, 0, 0]
+        got_f = run("update", p("f0"), p("f0"), p("f0"), p("f1"))
+        assert set(got_f) == set(part_rates.PART_NAMES[p] for p in part_rates.written(D)), "a field without circles prints its nineteen"
+        print("part_rates first: the letter rows' three parts, nineteen written without circles, older lines read at octave 0")
+        polar_controls(p)
+    print("part_rates: 9 lines, the controls hold")
+
+
+def learner_text(path, theta, second, octaves, d=D, rate=12):
+    """A learner's text with its moments' lines (first moments zero), for the law's controls."""
+    c = d.get("carry", 0)
+    words = (["hnn-field-v14t"] if c else ["hnn-field-v14"]) + [str(d[k]) for k in KEYS] + ["0"] + ([str(c)] if c else [])
+    line = [octaves[p] for p in part_rates.written(d)]
+    with open(path, "w") as f:
+        f.write(f"hnn-field-learner-v3 {rate} 0 0 -\n" + " ".join(words) + "\n" + " ".join(str(int(x)) for x in theta) + "\n"
+                + " ".join("0" for _ in theta) + "\n" + " ".join(str(int(x)) for x in second) + "\n" + "parts " + " ".join(str(k) for k in [OLD_F] + line) + "\n")
+
+
+def polar_controls(p):
+    """[theory, November 11 21:15, G86] The law: a part's rate follows its polarization, decided in rationals."""
+    from fractions import Fraction as Fr
+    OLD = part_rates.OLD
+    # The decision alone: octaves known from the ratio, the edges on either side, a part with no fall, the clamps.
+    # The old entries hold the field's pi_F at 1 to within 10^-11, so each part's ratio is its own pi: 4 is two octaves, 2^20 is clamped at
+    # rate_bits - 1, no fall and a fall below zero are the floor.
+    heat = {0: Fr(1), 3: Fr(1), 4: Fr(1, 10**6), 5: Fr(1), OLD: Fr(10**12)}
+    fall = {0: Fr(4), 3: Fr(0), 4: Fr(2**20, 10**6), 5: Fr(-1), OLD: Fr(10**12)}
+    pi, pi_f, octaves = part_rates.polar_octaves(heat, dict(heat), fall, 12)
+    assert abs(pi_f - 1) < Fr(1, 10**11) and pi[0] == 4 and pi[4] == 2**20
+    assert octaves == {0: 2, 3: 0, 4: 11, 5: 0}, octaves
+    assert [part_rates.octave_of(Fr(x)) for x in ("1.41", "1.42", "2.82", "2.83", "0.70", "0.71")] == [0, 1, 1, 2, -1, 0], "the edges at 2^(o +- 1/2)"
+    _, _, at_floor = part_rates.polar_octaves({0: Fr(1), OLD: Fr(1)}, {0: Fr(1), OLD: Fr(1)}, {0: Fr(-1), OLD: Fr(1)}, 12)
+    assert at_floor == {0: 0}, "a part whose fall is below zero stays at the floor"
+    # On four synthetic means: every entry's travel set so its fall two laps on is one unit (d = 2^(grain - 16)) gives every part the same
+    # polarization, the fixed point (every octave 0); doubling one part's two travels makes its fall four times, two octaves above the floor.
+    import state_travel
+    fam, total = state_travel.layout(D)
+    grain = [0] * total
+    for _, at, shape, g in fam:
+        n = 1
+        for x in shape: n *= x
+        for i in range(at, at + n): grain[i] = g
+    parts = part_rates.founded_parts(D, OLD_F)
+    second = [1 << 20] * total
+    zero = [0] * part_rates.PARTS
+    for name, scale_part, expect in (("flat", None, None), ("raised", part_rates.PART_NAMES.index("q_lane"), 2)):
+        theta = [[0] * total for _ in range(4)]
+        for i in range(total):
+            unit = 1 << (grain[i] - 16)
+            k = 2 if scale_part is not None and parts[i] == scale_part else 1
+            theta[1][i] = k * unit
+            theta[2][i] = k * unit
+            theta[3][i] = 2 * k * unit
+        paths = []
+        for j in range(4):
+            path = p(f"{name}_m{j}")
+            learner_text(path, theta[j], second, zero)
+            paths.append(path)
+        out = io.StringIO()
+        with redirect_stdout(out):
+            part_rates.polar(paths, paths[3], p(f"{name}_out"))
+        got = {f["part"]: int(f["octave"]) for f in ({k: v for k, v in (w.split("=", 1) for w in l.split(" ")[1:])} for l in out.getvalue().split("\n") if l.startswith("FIELD_PART_POLAR "))}
+        if scale_part is None:
+            assert all(o == 0 for o in got.values()), got
+        else:
+            assert got["q_lane"] == expect and all(o == 0 for n, o in got.items() if n != "q_lane"), got
+            written = part_rates.parts_line(open(p(f"{name}_out")).read().split("\n"), D)[1]
+            assert written[scale_part] == expect and sum(written) == expect, written
+    print("part_rates polar: octaves known from their ratio, the edges, the clamps, a part with no fall at 0")
+    print("part_rates polar: equal polarization is the fixed point; a part's doubled travel stands two octaves above the floor")
 
 
 if __name__ == "__main__":

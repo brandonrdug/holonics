@@ -1146,9 +1146,8 @@ pub(super) fn train(args: &[String], realization: &mut dyn FieldRealization) -> 
     // one-rate stretch, a declared comparison.
     declared_clocks(&mut learner.field);
     if let Some(rp) = learner.rate_parts {
-        // A field without carry circles prints the sixteen parts it has; one with them all nineteen.
-        let printed = if learner.field.declaration.carry > 0 { holonics::hnn::tower::field::PARTS } else { holonics::hnn::tower::field::PLAIN_PARTS };
-        let octaves: Vec<String> = holonics::hnn::tower::field::PART_NAMES.iter().zip(rp.octaves).take(printed).map(|(n, k)| format!("{n}={k}")).collect();
+        // The parts the field has, in the line's order (`written_parts`).
+        let octaves: Vec<String> = holonics::hnn::tower::field::written_parts(learner.field.declaration.carry).iter().map(|&p| format!("{}={}", holonics::hnn::tower::field::PART_NAMES[p], rp.octaves[p])).collect();
         println!("FIELD_PART_RATES contacts_before={} rate_bits={} octaves {}", rp.contacts_before, learner.rate_bits, octaves.join(" "));
     }
     if learner.field.declaration.alphabet != codec.alphabet() {

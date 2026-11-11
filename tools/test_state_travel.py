@@ -404,7 +404,7 @@ def graft_part_controls():
     spans = {name: (at, int(np.prod(shape))) for name, at, shape, _ in fam}
     parts = [f"part:{name}" for i, name in enumerate(part_rates.PART_NAMES) if (founded == i).any()]
     olds = [f"{name}/old" for name, (at, k) in spans.items() if (founded[at:at + k] == part_rates.OLD).any()]
-    assert len(parts) == 15 and "part:carry" not in parts and "q_bias/old" in olds
+    assert len(parts) == 18 and "part:carry" not in parts and "part:before_first" in parts and "q_bias/old" in olds
     with tempfile.TemporaryDirectory() as tmp:
         pa, pb, bare = os.path.join(tmp, "a"), os.path.join(tmp, "b"), os.path.join(tmp, "bare")
         write(pa, a, [7] * total, [OLD_F] + [0] * 16)
