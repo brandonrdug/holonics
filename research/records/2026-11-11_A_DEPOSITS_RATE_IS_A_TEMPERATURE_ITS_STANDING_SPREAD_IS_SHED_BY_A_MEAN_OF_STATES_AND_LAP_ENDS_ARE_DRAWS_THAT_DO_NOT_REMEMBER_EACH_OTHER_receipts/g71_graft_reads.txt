@@ -1,0 +1,46 @@
+# G71: nine one-family grafts of donor rt5/STATE.0 (4cfde14e215e83ce) into head rt6/STATE.0 (48a091ef25d99504), tools/state_travel.py graft lines, then each graft held (laps 0) on field_pass.rate sha256 97cc6654989cf2cd (0b2ba0bad); head control own 1.752441; read 2026-11-11 13:57:49 to 13:59:34 UTC
+STATE_GRAFT families=q entries=4096 of=63606 moved=4096 rms_from_head=28236
+STATE_GRAFT families=v entries=4096 of=63606 moved=4096 rms_from_head=71697
+STATE_GRAFT families=out entries=4096 of=63606 moved=4096 rms_from_head=25986
+STATE_GRAFT families=a entries=4096 of=63606 moved=4096 rms_from_head=25907
+STATE_GRAFT families=b entries=4096 of=63606 moved=4096 rms_from_head=24248
+STATE_GRAFT families=w entries=4096 of=63606 moved=4096 rms_from_head=21973
+STATE_GRAFT families=read entries=4096 of=63606 moved=4096 rms_from_head=15720
+STATE_GRAFT families=probe entries=4096 of=63606 moved=4096 rms_from_head=33314
+STATE_GRAFT families=moment_face entries=4096 of=63606 moved=2048 rms_from_head=15647
+STATE_GRAFT families=q entries=4096 of=63606 moved=4096 rms_from_head=28236
+STATE_GRAFT families=v entries=4096 of=63606 moved=4096 rms_from_head=71697
+STATE_GRAFT families=out entries=4096 of=63606 moved=4096 rms_from_head=25986
+STATE_GRAFT families=a entries=4096 of=63606 moved=4096 rms_from_head=25907
+STATE_GRAFT families=b entries=4096 of=63606 moved=4096 rms_from_head=24248
+STATE_GRAFT families=w entries=4096 of=63606 moved=4096 rms_from_head=21973
+STATE_GRAFT families=read entries=4096 of=63606 moved=4096 rms_from_head=15720
+STATE_GRAFT families=probe entries=4096 of=63606 moved=4096 rms_from_head=33314
+STATE_GRAFT families=moment_face entries=4096 of=63606 moved=2048 rms_from_head=15647
+k_q FIELD_HELD lap=-1 answer=5.747919 classes=43470 context=0.954235 context_classes=43470 foil=1.128054 question=0.173819 ms=4224
+k_q FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.752422 foil_nats_a_place=1.879843 information_nats_a_place=0.127422 own_nats_a_word=13.168156 information_nats_a_word=0.957478
+k_q FIELD_UNSEEN lap=-1 code=0.890 sites=43660 next=- ms=11364
+k_v FIELD_HELD lap=-1 answer=5.735375 classes=43470 context=0.955782 context_classes=43470 foil=1.128926 question=0.173144 ms=4218
+k_v FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.751311 foil_nats_a_place=1.879078 information_nats_a_place=0.127767 own_nats_a_word=13.159809 information_nats_a_word=0.960073
+k_v FIELD_UNSEEN lap=-1 code=0.891 sites=43660 next=- ms=11350
+k_out FIELD_HELD lap=-1 answer=5.616378 classes=43470 context=0.956167 context_classes=43470 foil=1.130769 question=0.174601 ms=4184
+k_out FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.751915 foil_nats_a_place=1.881048 information_nats_a_place=0.129133 own_nats_a_word=13.164347 information_nats_a_word=0.970338
+k_out FIELD_UNSEEN lap=-1 code=0.893 sites=43660 next=- ms=11292
+k_a FIELD_HELD lap=-1 answer=5.681439 classes=43470 context=0.955741 context_classes=43470 foil=1.130393 question=0.174652 ms=4195
+k_a FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.751735 foil_nats_a_place=1.880845 information_nats_a_place=0.129111 own_nats_a_word=13.162991 information_nats_a_word=0.970173
+k_a FIELD_UNSEEN lap=-1 code=0.891 sites=43660 next=- ms=11316
+k_b FIELD_HELD lap=-1 answer=5.615362 classes=43470 context=0.955868 context_classes=43470 foil=1.129520 question=0.173651 ms=4194
+k_b FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.752094 foil_nats_a_place=1.882371 information_nats_a_place=0.130277 own_nats_a_word=13.165691 information_nats_a_word=0.978934
+k_b FIELD_UNSEEN lap=-1 code=0.890 sites=43660 next=- ms=11341
+k_w FIELD_HELD lap=-1 answer=5.651383 classes=43470 context=0.954866 context_classes=43470 foil=1.128387 question=0.173521 ms=4172
+k_w FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.750725 foil_nats_a_place=1.879993 information_nats_a_place=0.129268 own_nats_a_word=13.155401 information_nats_a_word=0.971356
+k_w FIELD_UNSEEN lap=-1 code=0.890 sites=43660 next=- ms=11288
+k_read FIELD_HELD lap=-1 answer=5.671003 classes=43470 context=0.955628 context_classes=43470 foil=1.129336 question=0.173707 ms=4184
+k_read FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.750800 foil_nats_a_place=1.879696 information_nats_a_place=0.128896 own_nats_a_word=13.155968 information_nats_a_word=0.968559
+k_read FIELD_UNSEEN lap=-1 code=0.892 sites=43660 next=- ms=11316
+k_probe FIELD_HELD lap=-1 answer=5.739616 classes=43470 context=0.955739 context_classes=43470 foil=1.129988 question=0.174249 ms=4189
+k_probe FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.752443 foil_nats_a_place=1.881282 information_nats_a_place=0.128839 own_nats_a_word=13.168317 information_nats_a_word=0.968127
+k_probe FIELD_UNSEEN lap=-1 code=0.892 sites=43660 next=- ms=11330
+k_moment_face FIELD_HELD lap=-1 answer=5.754730 classes=43470 context=0.955189 context_classes=43470 foil=1.128659 question=0.173469 ms=4210
+k_moment_face FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.752855 foil_nats_a_place=1.881645 information_nats_a_place=0.128790 own_nats_a_word=13.171410 information_nats_a_word=0.967759
+k_moment_face FIELD_UNSEEN lap=-1 code=0.891 sites=43660 next=- ms=11356
