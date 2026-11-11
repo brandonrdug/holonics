@@ -119,6 +119,15 @@ impl Field {
         out
     }
 
+    /// The material entry `i` of [`Field::material_len`].
+    pub fn material(&self) -> impl Iterator<Item = &i32> {
+        let (coarse, glue): (&[i32], &[i32]) = match self.scale.as_deref() {
+            Some(s) => (&s.coarse.theta[..], &s.glue[..]),
+            None => (&[], &[]),
+        };
+        self.theta.iter().chain(coarse.iter()).chain(glue.iter())
+    }
+
     /// The material entry `i` of [`Field::material_len`], mutable.
     pub fn material_mut(&mut self) -> impl Iterator<Item = &mut i32> {
         let (coarse, glue): (&mut [i32], &mut [i32]) = match self.scale.as_deref_mut() {

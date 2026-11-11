@@ -1,0 +1,45 @@
+# G65: held reads on the PC, the card, 2026-11-11. Each is the lap's own opening read run alone (the trainer with a lap
+# count of 0: it prints the held lines at lap -1, trains nothing, writes no state), each under its own hold of the card lock.
+# Part (c), reported 12:10Z: the rate line's binary and arguments. m67 is the ruler's state
+#   STATE_MEAN states=2 entries=63606 moved=61457 rms_from_head=39791   (head rt7, the mean of rt6 and rt7)
+control_rt7 (run 11.8 s, lock wait 773 s)
+FIELD_HELD lap=-1 answer=5.707546 classes=43470 context=0.951840 context_classes=43470 foil=1.124509 question=0.172669 ms=4190
+FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.750560 foil_nats_a_place=1.881904 information_nats_a_place=0.131345 own_nats_a_word=13.154163 information_nats_a_word=0.986957
+FIELD_UNSEEN lap=-1 code=0.885 sites=43660 next=- ms=11311
+m67 (run 11.7 s, lock wait 364 s)
+FIELD_HELD lap=-1 answer=5.722405 classes=43470 context=0.948923 context_classes=43470 foil=1.121682 question=0.172759 ms=4183
+FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.747044 foil_nats_a_place=1.878042 information_nats_a_place=0.130999 own_nats_a_word=13.127741 information_nats_a_word=0.984358
+FIELD_UNSEEN lap=-1 code=0.884 sites=43660 next=- ms=11298
+# Parts (a), (b), (f), reported 12:45Z. The rate line's older binary refuses a state with main's sixteen-count parts line
+# ("a learner's founded parts' rates that are not one a part"; 1.1 s, nothing read), so the lap's mean is read by the build
+# that wrote it (the build of 8368f084b), after the control printed the rate line's own lap line on both binaries.
+control rt12/STATE.0, the rate line's binary (run 11.7 s, lock wait 217 s)
+FIELD_HELD lap=-1 answer=5.536622 classes=43470 context=0.939588 context_classes=43470 foil=1.111489 question=0.171902 ms=4187
+FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.741950 foil_nats_a_place=1.874073 information_nats_a_place=0.132123 own_nats_a_word=13.089469 information_nats_a_word=0.992808
+FIELD_UNSEEN lap=-1 code=0.869 sites=43660 next=- ms=11293
+control rt12/STATE.0, the build that writes the lap's mean (run 9.8 s, lock wait 871 s)
+FIELD_HELD lap=-1 answer=5.536622 classes=43470 context=0.939588 context_classes=43470 foil=1.111489 question=0.171902 ms=3585
+FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.741950 foil_nats_a_place=1.874073 information_nats_a_place=0.132123 own_nats_a_word=13.089469 information_nats_a_word=0.992808
+FIELD_UNSEEN lap=-1 code=0.869 sites=43660 next=- ms=9416
+the mean of lap 12 (mean-gate12/MEAN.0), the build that writes the lap's mean (run 9.9 s, lock wait 151 s)
+FIELD_HELD lap=-1 answer=5.579052 classes=43470 context=0.930608 context_classes=43470 foil=1.099873 question=0.169265 ms=3587
+FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.734148 foil_nats_a_place=1.865500 information_nats_a_place=0.131351 own_nats_a_word=13.030841 information_nats_a_word=0.987009
+FIELD_UNSEEN lap=-1 code=0.862 sites=43660 next=- ms=9392
+# Parts (d), (e), reported 12:50Z: the pair's end states and lap means, read by the build that wrote them (the rate line's older
+# binary refuses their sixteen-count parts line). Each control printed its lap line's figure: rt13 1.738791, wm13 1.742902.
+control rt13/STATE.0 (run 9.8 s, wait 881 s)
+FIELD_HELD lap=-1 answer=5.735918 classes=43470 context=0.936825 context_classes=43470 foil=1.108995 question=0.172170 ms=3573
+FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.738791 foil_nats_a_place=1.874886 information_nats_a_place=0.136095 own_nats_a_word=13.065727 information_nats_a_word=1.022656
+FIELD_UNSEEN lap=-1 code=0.870 sites=43660 next=- ms=9425
+rt13/MEAN.0 (run 9.9 s, wait 151 s)
+FIELD_HELD lap=-1 answer=5.500395 classes=43470 context=0.928722 context_classes=43470 foil=1.098111 question=0.169389 ms=3604
+FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.733318 foil_nats_a_place=1.864378 information_nats_a_place=0.131060 own_nats_a_word=13.024606 information_nats_a_word=0.984818
+FIELD_UNSEEN lap=-1 code=0.861 sites=43660 next=- ms=9433
+control wm13/STATE.0 (run 9.9 s, wait 241 s)
+FIELD_HELD lap=-1 answer=5.701424 classes=43470 context=0.943478 context_classes=43470 foil=1.114416 question=0.170938 ms=3609
+FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.742902 foil_nats_a_place=1.876787 information_nats_a_place=0.133885 own_nats_a_word=13.096622 information_nats_a_word=1.006047
+FIELD_UNSEEN lap=-1 code=0.879 sites=43660 next=- ms=9482
+wm13/MEAN.0 (run 9.9 s, wait 12 s)
+FIELD_HELD lap=-1 answer=5.437908 classes=43470 context=0.928770 context_classes=43470 foil=1.097067 question=0.168297 ms=3621
+FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.732455 foil_nats_a_place=1.864118 information_nats_a_place=0.131663 own_nats_a_word=13.018121 information_nats_a_word=0.989350
+FIELD_UNSEEN lap=-1 code=0.862 sites=43660 next=- ms=9494

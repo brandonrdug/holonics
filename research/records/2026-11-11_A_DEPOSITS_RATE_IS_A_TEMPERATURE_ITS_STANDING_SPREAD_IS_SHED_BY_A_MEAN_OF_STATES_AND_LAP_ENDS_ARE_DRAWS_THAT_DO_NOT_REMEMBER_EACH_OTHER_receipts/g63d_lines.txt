@@ -1,0 +1,17 @@
+# Trend laps beside the part-rate line's laps of the same lap count, from the section lines (before in bits a site; predicted, external, N in millionths of a bit a site).
+# N = (7/8) external - predicted. The line slope_3_20 is fitted on twentieths 3 to 20 of the lap. Whole output on the PC: sha256 ae0390dfd2abed79....
+G63D_PAIR tr1/rt10 sections=1535
+      G63D_LAP tr1 sections=1535 before=3.303235 predicted=-6591.934 external=307.731 external_n=1535 N=6861.198
+      G63D_LAP rt10 sections=1535 before=3.300227 predicted=-4677.788 external=164.892 external_n=1535 N=4822.069
+      G63D_PAIRED before_d=+0.003008 se=0.000086 n=1535 predicted_d=-1914.145 se=60.700 n=1535 external_d=+142.839 se=15.933 n=1535 twice_N_excess=+4078.259 se=117.384 n=1535
+      G63D_BEFORE first_blocks_of_8 +0.000879 +0.000608 +0.004086 +0.004425 twentieth_1 +0.002927 twentieth_20 +0.003141 slope_3_20 -0.000064 se 0.000352 (bits a lap)
+    G63D_PAIR tr2/rt11 sections=1535
+      G63D_LAP tr2 sections=1535 before=3.302152 predicted=-8884.305 external=541.677 external_n=1535 N=9358.272
+      G63D_LAP rt11 sections=1535 before=3.295406 predicted=-4497.021 external=200.549 external_n=1535 N=4672.501
+      G63D_PAIRED before_d=+0.006747 se=0.000127 n=1535 predicted_d=-4387.283 se=73.387 n=1535 external_d=+341.128 se=26.748 n=1535 twice_N_excess=+9371.541 se=138.467 n=1535
+      G63D_BEFORE first_blocks_of_8 +0.005001 +0.007201 +0.006701 +0.005287 twentieth_1 +0.005402 twentieth_20 +0.006047 slope_3_20 -0.000638 se 0.000512 (bits a lap)
+    G63D_PAIR tr3/rt12 sections=1535
+      G63D_LAP tr3 sections=1535 before=3.299623 predicted=-11275.137 external=769.481 external_n=1535 N=11948.433
+      G63D_LAP rt12 sections=1535 before=3.288975 predicted=-4580.346 external=201.348 external_n=1535 N=4756.525
+      G63D_PAIRED before_d=+0.010648 se=0.000184 n=1535 predicted_d=-6694.791 se=149.354 n=1535 external_d=+568.134 se=43.219 n=1535 twice_N_excess=+14383.815 se=291.726 n=1535
+      G63D_BEFORE first_blocks_of_8 +0.007845 +0.006254 +0.009419 +0.009723 twentieth_1 +0.010063 twentieth_20 +0.009583 slope_3_20 -0.003301 se 0.000705 (bits a lap)

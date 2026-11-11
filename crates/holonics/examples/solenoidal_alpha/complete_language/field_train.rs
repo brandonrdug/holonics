@@ -24,7 +24,7 @@
 
 use super::tower_train::{count, positive, STATE_BUDGET};
 use super::*;
-use holonics::hnn::tower::field::{Echo, Field, FieldDeclaration, FieldLearner, FieldNext, FieldRealization, FieldReceipt, HeldRows, HostField, Port, Region, Shares};
+use holonics::hnn::tower::field::{Echo, Field, FieldDeclaration, FieldLearner, FieldNext, FieldRealization, FieldReceipt, HeldRows, HostField, MaterialMean, Port, Region, Shares};
 use holonics::hnn::units::Units;
 use rayon::prelude::*;
 use std::collections::HashMap;
@@ -1201,6 +1201,9 @@ pub(super) fn train(args: &[String], realization: &mut dyn FieldRealization) -> 
         // steps that stood at full size.
         let (mut transfers, mut externals, mut curvatures, mut priced) = (0i128, 0i128, 0i128, 0usize);
         let lap_start = std::time::Instant::now();
+        // [measurement; theory, November 11] The lap's mean of the material ([`MaterialMean`]): the material joins it after each
+        // section's deposit, and the mean is written beside the lap's state. A reading; no deposit reads it.
+        let mut mean = MaterialMean::new(learner.field.material_len());
         let paths = paths_of(seed, read, &sections);
         for (n, &s) in walk(seed, read, sections.len()).iter().enumerate() {
             let section_start = std::time::Instant::now();
@@ -1226,6 +1229,7 @@ pub(super) fn train(args: &[String], realization: &mut dyn FieldRealization) -> 
             let deposit_start = std::time::Instant::now();
             let receipt = learner.section_realized(&views, realization).map_err(|e| e.to_string())?;
             let deposit_ms = deposit_start.elapsed().as_millis();
+            mean.take(&learner.field).map_err(|e| e.to_string())?;
             let receipt = FieldReceipt { next: next.or(receipt.next), ..receipt };
             code_before += receipt.code_before;
             if let Some(after) = receipt.code_after {
@@ -1300,6 +1304,14 @@ pub(super) fn train(args: &[String], realization: &mut dyn FieldRealization) -> 
             learner.rate_bits = learner.rate_bits.saturating_add_signed(-octave).max(1);
         }
         write_new(&out.join(format!("STATE.{lap}")), learner.to_text().as_bytes())?;
+        // The lap's mean as a learner's text (the state's moments and rates, the material at the mean): what a held read or a
+        // release opens to read the line at its rest position. `moved` the entries where the lap's end stands off the mean and
+        // `square` their squared distance, on the material's integers.
+        let (rest, moved, square) = mean.released(&learner.field).map_err(|e| e.to_string())?;
+        let mut resting = learner.clone();
+        resting.field = rest;
+        write_new(&out.join(format!("MEAN.{lap}")), resting.to_text().as_bytes())?;
+        println!("FIELD_MEAN lap={lap} states={} entries={} moved={moved} square={square}", mean.states(), learner.field.material_len());
         println!(
             "FIELD_LAP lap={lap} read={} sites={sites} before={} after={} deposited={deposited}/{} halvings={halvings} next_halved={held_down} next_refused={refused} ms={}",
             learner.laps,

@@ -1,0 +1,32 @@
+# G66: held reads on the PC, the card, 2026-11-11 (reported 12:50Z), the rate line's binary and arguments, a lap count of 0, each under its
+# own hold of the lock. Ruler states written by tools/state_travel.py graft: rt6's state with families of its material replaced by rt5's.
+# The control printed rt6's lap line; the graft of every family (pall) is byte-equal to rt5's material and printed rt5's lap line.
+# p1 to p5 cover the material (63606 of 63606 entries). Run s / lock wait s: control 11.6/15, pall 11.7/364, p1 10.7/991, p2 11.7/879,
+# p3 11.7/150, p4 10.6/264, p5 11.7/10. The PC's file: g66_reads.txt, sha256 bfbde9597fe27b20....
+STATE_GRAFT families=read_bias entries=100 of=63606 moved=100 rms_from_head=8.8827
+STATE_GRAFT families=q_bias,v_bias,out_bias,a_bias,b_bias,w_bias,probe_bias,moment_face_bias,lift_bias entries=576 of=63606 moved=574 rms_from_head=61.471
+STATE_GRAFT families=enc,before,after entries=19392 of=63606 moved=19382 rms_from_head=930.46
+STATE_GRAFT families=moment_before,moment_after,pace,temper entries=6674 of=63606 moved=6602 rms_from_head=10120
+STATE_GRAFT families=q,v,out,a,b,w,read,probe,moment_face entries=36864 of=63606 moved=34816 rms_from_head=99783
+STATE_GRAFT families=read_bias,q_bias,v_bias,out_bias,a_bias,b_bias,w_bias,probe_bias,moment_face_bias,lift_bias,enc,before,after,moment_before,moment_after,pace,temper,q,v,out,a,b,w,read,probe,moment_face entries=63606 of=63606 moved=61474 rms_from_head=1.003e+05
+control_rt6 FIELD_HELD lap=-1 answer=5.767364 classes=43470 context=0.955672 context_classes=43470 foil=1.129905 question=0.174234 ms=4136
+control_rt6 FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.752441 foil_nats_a_place=1.881662 information_nats_a_place=0.129221 own_nats_a_word=13.168302 information_nats_a_word=0.970997
+control_rt6 FIELD_UNSEEN lap=-1 code=0.892 sites=43660 next=- ms=11222
+pall FIELD_HELD lap=-1 answer=5.251122 classes=43470 context=0.961475 context_classes=43470 foil=1.132112 question=0.170637 ms=4168
+pall FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.754398 foil_nats_a_place=1.879525 information_nats_a_place=0.125128 own_nats_a_word=13.183001 information_nats_a_word=0.940244
+pall FIELD_UNSEEN lap=-1 code=0.896 sites=43660 next=- ms=11311
+p1 FIELD_HELD lap=-1 answer=5.768325 classes=43470 context=0.955663 context_classes=43470 foil=1.129898 question=0.174235 ms=3867
+p1 FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.752432 foil_nats_a_place=1.881658 information_nats_a_place=0.129226 own_nats_a_word=13.168230 information_nats_a_word=0.971040
+p1 FIELD_UNSEEN lap=-1 code=0.892 sites=43660 next=- ms=10309
+p2 FIELD_HELD lap=-1 answer=5.671306 classes=43470 context=0.954435 context_classes=43470 foil=1.128493 question=0.174057 ms=4206
+p2 FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.751410 foil_nats_a_place=1.880407 information_nats_a_place=0.128997 own_nats_a_word=13.160552 information_nats_a_word=0.969314
+p2 FIELD_UNSEEN lap=-1 code=0.891 sites=43660 next=- ms=11370
+p3 FIELD_HELD lap=-1 answer=5.769549 classes=43470 context=0.956327 context_classes=43470 foil=1.130548 question=0.174221 ms=4178
+p3 FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.751881 foil_nats_a_place=1.881439 information_nats_a_place=0.129558 own_nats_a_word=13.164094 information_nats_a_word=0.973532
+p3 FIELD_UNSEEN lap=-1 code=0.892 sites=43660 next=- ms=11301
+p4 FIELD_HELD lap=-1 answer=5.813901 classes=43470 context=0.956625 context_classes=43470 foil=1.130114 question=0.173489 ms=3846
+p4 FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.752600 foil_nats_a_place=1.882259 information_nats_a_place=0.129659 own_nats_a_word=13.169492 information_nats_a_word=0.974290
+p4 FIELD_UNSEEN lap=-1 code=0.892 sites=43660 next=- ms=10290
+p5 FIELD_HELD lap=-1 answer=5.264568 classes=43470 context=0.958377 context_classes=43470 foil=1.129913 question=0.171536 ms=4198
+p5 FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.752635 foil_nats_a_place=1.877648 information_nats_a_place=0.125012 own_nats_a_word=13.169760 information_nats_a_word=0.939374
+p5 FIELD_UNSEEN lap=-1 code=0.893 sites=43660 next=- ms=11344

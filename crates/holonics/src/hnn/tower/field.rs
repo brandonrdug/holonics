@@ -5441,6 +5441,63 @@ fn scaled(base: &Field, step: &[i128], h0: u32, old: &Compared, strict: bool, re
     Ok(nowhere(h))
 }
 
+/// [measurement; theory, November 11] **The lap's mean of the material**: the sum, entry by entry, of the material as it stands after
+/// each section's deposit over one lap, released to the grain (`Σ_s θ_s / n` to the nearest, a half away from zero). A reading: no
+/// deposit reads it and the learner's state is the same with it. Why (the readings of November 11): a deposit at rate `2^(−k)`
+/// holds each entry in a standing spread about a rest position (its cost `2^(−k) σ/4` an entry, in place within about a fifth of a
+/// lap at the old rate), a saved state is one draw of that spread, and lap ends a lap apart do not remember each other; the mean
+/// over the cycle the passage makes, every section once, sheds what reverses inside the lap, so a line's level and a rate's worth
+/// are read at it. The sums are `i64`: an entry is under `2^31` and at most `2^31` states join.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct MaterialMean {
+    sum: Vec<i64>,
+    states: i64,
+}
+
+impl MaterialMean {
+    /// No state joined, over a material of `entries` ([`Field::material_len`]).
+    pub fn new(entries: usize) -> Self {
+        Self { sum: vec![0; entries], states: 0 }
+    }
+
+    /// The field's material joins the sum; refused on a material of another length and past `2^31` states.
+    pub fn take(&mut self, field: &Field) -> Result<()> {
+        if field.material_len() != self.sum.len() || self.states >= 1 << 31 {
+            return refuse("a material joined to a mean of another length, or past the states its sums hold");
+        }
+        for (sum, &v) in self.sum.iter_mut().zip(field.material()) {
+            *sum += i64::from(v);
+        }
+        self.states += 1;
+        Ok(())
+    }
+
+    /// The states joined.
+    pub fn states(&self) -> i64 {
+        self.states
+    }
+
+    /// `field` with its material at the mean, the entries that differ from `field`'s own and `Σ (mean − θ)²` over them; refused
+    /// before a state joined and onto a material of another length.
+    pub fn released(&self, field: &Field) -> Result<(Field, usize, i128)> {
+        if self.states == 0 || field.material_len() != self.sum.len() {
+            return refuse("a mean released before a state joined, or onto a material of another length");
+        }
+        let mut out = field.clone();
+        let (mut moved, mut square) = (0usize, 0i128);
+        for (slot, &sum) in out.material_mut().zip(&self.sum) {
+            let mean = fit32(div_nearest(i128::from(sum), i128::from(self.states)), "a material's mean outgrew its 32-bit carrier")?;
+            let d = i128::from(mean) - i128::from(*slot);
+            if d != 0 {
+                moved += 1;
+                square += d * d;
+            }
+            *slot = mean;
+        }
+        Ok((out, moved, square))
+    }
+}
+
 /// [definition; agent-inferred, November 1] **The field's learner**: the field, the covector's two
 /// moments and the step's rate `2^(−k)`. The deposit is the tower's ([`super::TowerLearner`]),
 /// with one difference: a coordinate's moments open at its own first nonzero covector (`m = g`,

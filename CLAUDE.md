@@ -389,8 +389,8 @@ Athena text milestone claimed before a test of use was retracted or retired.
   by its measurement ("the predictor codes above flat on unseen families"), not as a missing part.
 
 [project-postulate] **Method, each rule with its reason.** These were given in conversation between
-October 29 and November 10; the last was derived from a failure of November 11. They are written
-here with their reasons so that no agent holds them as slogans.
+October 29 and November 10; the last two were derived from a failure and from readings of
+November 11. They are written here with their reasons so that no agent holds them as slogans.
 - **Theory picks, and a run tests a stated prediction** (November 4). Derive which law the theory
   gives, fix its guess as a number before the read, run that one law and score the guess, a miss
   included. Reason: arms cost card time and choose by a short reading, and a winner picked that way
@@ -454,6 +454,19 @@ here with their reasons so that no agent holds them as slogans.
   lines was scored by three of them (the settle, the re-draw and the charge) from a separately
   staged binary
   ([the port's record](research/records/2026-11-11_THE_TRAINING_LINE_BECOMES_THE_TRUNKS_FIELD_THE_ENERGY_ATTEMPT_LEAVES_THE_TREE_AND_A_READING_A_LINE_IS_SCORED_BY_IS_CONSUMED_CODE.md)).
+- **A line's level is read at its lap's mean** (November 11; theory's, from that day's readings).
+  A held code, an opening code or an information a place quoted for a line is read from the mean
+  of the lap's states (`MEAN.{lap}`, atlas `tower.field-lap-mean`), and a figure read from a lap's
+  end state says that it is one. Two lines, or two laps of one line, are compared at lap means.
+  Reason: a deposit's rate holds a standing spread (a quarter of the step times the noise, atlas
+  `deposition.rate-temperature-standing-spread`), and a lap's end state is one draw of it. On
+  November 11 lap ends at the old rate read 0.0055 to 0.0078 nats a place above their laps' means
+  and scattered 0.003 from lap to lap, where two laps' means stood 0.0008 apart; a lap with raised
+  rates read 0.0041 above its control at lap ends and 0.0009 under it at lap means; and a line's
+  lead read as closed at one lap's end where means of states held it at 0.0068. Scope: every
+  level, every comparison of lines and every score of a guess on a held read. A lap-end read stays
+  the state's own reading, and a build still enters a line by reproducing the line's lap-end lines
+  ([the record](research/records/2026-11-11_A_DEPOSITS_RATE_IS_A_TEMPERATURE_ITS_STANDING_SPREAD_IS_SHED_BY_A_MEAN_OF_STATES_AND_LAP_ENDS_ARE_DRAWS_THAT_DO_NOT_REMEMBER_EACH_OTHER.md)).
 
 [project-postulate] **GPU first, and the design fixes the workload** (Brandon, October 27;
 [the record](research/records/2026-10-27_THE_LEARNER_RUNS_ON_THE_CARD_AND_ITS_WORKLOAD_IS_NEVER_TRADED_FOR_TIME.md)). The RTX 4080 SUPER is a consumer card, and

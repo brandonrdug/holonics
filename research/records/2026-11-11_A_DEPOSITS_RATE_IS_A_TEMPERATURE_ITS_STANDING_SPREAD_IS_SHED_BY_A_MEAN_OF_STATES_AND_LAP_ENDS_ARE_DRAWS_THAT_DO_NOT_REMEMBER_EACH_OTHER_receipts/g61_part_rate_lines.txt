@@ -1,0 +1,64 @@
+# FIELD_PART_RATE lines of the rate line's and the trend chain's updates, as their logs hold them (2026-11-11T10:34Z; no update rerun).
+== trend opening (open: rt9's end state, octaves 0,1,1,4,4,4,0,2,0,0,0,0,3,0,0, the state tr1 trained from)
+FIELD_PART_RATE part=w_new entries=2048 c=- rate_octaves=0 rate_bits=12
+FIELD_PART_RATE part=a_new entries=2080 c=- rate_octaves=1 rate_bits=11
+FIELD_PART_RATE part=b_new entries=2080 c=- rate_octaves=1 rate_bits=11
+FIELD_PART_RATE part=enc_lane entries=3232 c=- rate_octaves=4 rate_bits=8
+FIELD_PART_RATE part=before_lane entries=3232 c=- rate_octaves=4 rate_bits=8
+FIELD_PART_RATE part=after_lane entries=3232 c=- rate_octaves=4 rate_bits=8
+FIELD_PART_RATE part=v_lane entries=2048 c=- rate_octaves=2 rate_bits=10
+FIELD_PART_RATE part=face_biases_lane entries=128 c=- rate_octaves=3 rate_bits=9
+== trend update after tr1 (trend rt7 rt8 rt9 tr1, writes the state tr2 trained from)
+FIELD_PART_RATE part=w_new rule=trend c_prev=-0.010620 c=-0.015007 ka=0 kb=0 k=0 h0=0.000000 c_hat=-0.015007 h=0.000000 eps=0.022888 rate_octaves=0 was=0 move=rest rate_bits=12
+FIELD_PART_RATE part=a_new rule=trend c_prev=0.052457 c=0.116992 ka=0 kb=0 k=1 h0=0.000000 c_hat=0.116992 h=0.000000 eps=0.024969 rate_octaves=2 was=1 move=faster rate_bits=10
+FIELD_PART_RATE part=b_new rule=trend c_prev=0.062224 c=0.152274 ka=0 kb=0 k=1 h0=0.000000 c_hat=0.152274 h=0.000000 eps=0.023849 rate_octaves=2 was=1 move=faster rate_bits=10
+FIELD_PART_RATE part=enc_lane rule=trend c_prev=0.303998 c=0.355512 ka=0 kb=0 k=4 h0=0.000000 c_hat=0.355512 h=0.000000 eps=0.022104 rate_octaves=5 was=4 move=faster rate_bits=7
+FIELD_PART_RATE part=before_lane rule=trend c_prev=0.295948 c=0.339482 ka=0 kb=0 k=4 h0=0.000000 c_hat=0.339482 h=0.000000 eps=0.020760 rate_octaves=5 was=4 move=faster rate_bits=7
+FIELD_PART_RATE part=after_lane rule=trend c_prev=0.301837 c=0.333305 ka=0 kb=0 k=4 h0=0.000000 c_hat=0.333305 h=0.000000 eps=0.020127 rate_octaves=5 was=4 move=faster rate_bits=7
+FIELD_PART_RATE part=v_lane rule=trend c_prev=0.212703 c=0.357982 ka=0 kb=0 k=2 h0=0.000000 c_hat=0.357982 h=0.000000 eps=0.040696 rate_octaves=3 was=2 move=faster rate_bits=9
+FIELD_PART_RATE part=face_biases_lane rule=trend c_prev=0.309307 c=0.542270 ka=2 kb=1 k=3 h0=0.116481 c_hat=-0.156617 h=0.931850 eps=0.196973 rate_octaves=3 was=3 move=rest rate_bits=9
+== trend update after tr2 (trend rt8 rt9 tr1 tr2, writes the state tr3 trains from)
+FIELD_PART_RATE part=w_new rule=trend c_prev=-0.015007 c=0.021334 ka=0 kb=0 k=0 h0=0.000000 c_hat=0.021334 h=0.000000 eps=0.022739 rate_octaves=0 was=0 move=rest rate_bits=12
+FIELD_PART_RATE part=a_new rule=trend c_prev=0.116992 c=0.075840 ka=0 kb=1 k=2 h0=0.041151 c_hat=-0.006462 h=0.164606 eps=0.024710 rate_octaves=2 was=2 move=rest rate_bits=10
+FIELD_PART_RATE part=b_new rule=trend c_prev=0.152274 c=0.098570 ka=0 kb=1 k=2 h0=0.053704 c_hat=-0.008838 h=0.214817 eps=0.024383 rate_octaves=2 was=2 move=rest rate_bits=10
+FIELD_PART_RATE part=enc_lane rule=trend c_prev=0.355512 c=0.182321 ka=0 kb=4 k=5 h0=0.011546 c_hat=-0.002414 h=0.369472 eps=0.020497 rate_octaves=5 was=5 move=rest rate_bits=7
+FIELD_PART_RATE part=before_lane rule=trend c_prev=0.339482 c=0.146568 ka=0 kb=4 k=5 h0=0.012860 c_hat=-0.059206 h=0.411549 eps=0.019947 rate_octaves=5 was=5 move=rest rate_bits=7
+FIELD_PART_RATE part=after_lane rule=trend c_prev=0.333305 c=0.105350 ka=0 kb=4 k=5 h0=0.015197 c_hat=-0.137802 h=0.486305 eps=0.018793 rate_octaves=5 was=5 move=rest rate_bits=7
+FIELD_PART_RATE part=v_lane rule=trend c_prev=0.357982 c=0.321511 ka=0 kb=2 k=3 h0=0.012157 c_hat=0.272883 h=0.097256 eps=0.047392 rate_octaves=4 was=3 move=faster rate_bits=8
+FIELD_PART_RATE part=face_biases_lane rule=trend c_prev=0.542270 c=0.670987 ka=1 kb=3 k=3 h0=0.000000 c_hat=0.670987 h=0.000000 eps=0.311361 rate_octaves=4 was=3 move=faster rate_bits=8
+== rate update after rt9 (update rt7 rt8 rt9)
+FIELD_PART_RATE part=w_new entries=2048 c=-0.010620 rate_octaves=0 was=0 move=hold rate_bits=12
+FIELD_PART_RATE part=a_new entries=2080 c=0.052457 rate_octaves=0 was=0 move=hold rate_bits=12
+FIELD_PART_RATE part=b_new entries=2080 c=0.062224 rate_octaves=0 was=0 move=hold rate_bits=12
+FIELD_PART_RATE part=enc_lane entries=3232 c=0.303998 rate_octaves=0 was=0 move=hold rate_bits=12
+FIELD_PART_RATE part=before_lane entries=3232 c=0.295948 rate_octaves=0 was=0 move=hold rate_bits=12
+FIELD_PART_RATE part=after_lane entries=3232 c=0.301837 rate_octaves=0 was=0 move=hold rate_bits=12
+FIELD_PART_RATE part=v_lane entries=2048 c=0.212703 rate_octaves=0 was=0 move=hold rate_bits=12
+FIELD_PART_RATE part=face_biases_lane entries=128 c=0.309307 rate_octaves=0 was=1 move=slower rate_bits=12
+== rate update after rt10 (update rt8 rt9 rt10)
+FIELD_PART_RATE part=w_new entries=2048 c=-0.033450 rate_octaves=0 was=0 move=hold rate_bits=12
+FIELD_PART_RATE part=a_new entries=2080 c=0.046982 rate_octaves=0 was=0 move=hold rate_bits=12
+FIELD_PART_RATE part=b_new entries=2080 c=0.072289 rate_octaves=0 was=0 move=hold rate_bits=12
+FIELD_PART_RATE part=enc_lane entries=3232 c=0.325521 rate_octaves=0 was=0 move=hold rate_bits=12
+FIELD_PART_RATE part=before_lane entries=3232 c=0.324345 rate_octaves=0 was=0 move=hold rate_bits=12
+FIELD_PART_RATE part=after_lane entries=3232 c=0.321970 rate_octaves=0 was=0 move=hold rate_bits=12
+FIELD_PART_RATE part=v_lane entries=2048 c=0.296740 rate_octaves=0 was=0 move=hold rate_bits=12
+FIELD_PART_RATE part=face_biases_lane entries=128 c=0.417289 rate_octaves=0 was=0 move=hold rate_bits=12
+== rate update after rt11 (update rt9 rt10 rt11)
+FIELD_PART_RATE part=w_new entries=2048 c=-0.038938 rate_octaves=0 was=0 move=hold rate_bits=12
+FIELD_PART_RATE part=a_new entries=2080 c=0.038170 rate_octaves=0 was=0 move=hold rate_bits=12
+FIELD_PART_RATE part=b_new entries=2080 c=0.021116 rate_octaves=0 was=0 move=hold rate_bits=12
+FIELD_PART_RATE part=enc_lane entries=3232 c=0.292804 rate_octaves=0 was=0 move=hold rate_bits=12
+FIELD_PART_RATE part=before_lane entries=3232 c=0.326388 rate_octaves=0 was=0 move=hold rate_bits=12
+FIELD_PART_RATE part=after_lane entries=3232 c=0.325956 rate_octaves=0 was=0 move=hold rate_bits=12
+FIELD_PART_RATE part=v_lane entries=2048 c=0.286380 rate_octaves=0 was=0 move=hold rate_bits=12
+FIELD_PART_RATE part=face_biases_lane entries=128 c=0.332574 rate_octaves=0 was=0 move=hold rate_bits=12
+== rate update after rt12 (update rt10 rt11 rt12)
+FIELD_PART_RATE part=w_new entries=2048 c=-0.081194 rate_octaves=0 was=0 move=hold rate_bits=12
+FIELD_PART_RATE part=a_new entries=2080 c=-0.009177 rate_octaves=0 was=0 move=hold rate_bits=12
+FIELD_PART_RATE part=b_new entries=2080 c=0.006551 rate_octaves=0 was=0 move=hold rate_bits=12
+FIELD_PART_RATE part=enc_lane entries=3232 c=0.347446 rate_octaves=0 was=0 move=hold rate_bits=12
+FIELD_PART_RATE part=before_lane entries=3232 c=0.360566 rate_octaves=0 was=0 move=hold rate_bits=12
+FIELD_PART_RATE part=after_lane entries=3232 c=0.324864 rate_octaves=0 was=0 move=hold rate_bits=12
+FIELD_PART_RATE part=v_lane entries=2048 c=0.261594 rate_octaves=0 was=0 move=hold rate_bits=12
+FIELD_PART_RATE part=face_biases_lane entries=128 c=0.348330 rate_octaves=0 was=0 move=hold rate_bits=12

@@ -1,0 +1,23 @@
+# G64: the pair of laps from the rate line's twelfth state, the card, 2026-11-11: rt13 at the floor (lock 12:10:37Z to
+# 12:24:28Z) and wm13 with the second lane's q, v, probe, out and moment-face parts at octaves 2, 4, 2, 2, 2 (lock
+# 12:27:20Z to 12:41:00Z), both with the build that writes the lap's mean, both drawing lap 13's paths and masks.
+# The lines of g63d.py on the pair with the twentieths; whole output on the PC, sha256 062888c4806e45fe....
+# before in bits a site; predicted, external, N in millionths of a bit a site; N = (7/8) external - predicted.
+FIELD_PART_RATES contacts_before=32 rate_bits=12 octaves w_new=0 a_new=0 b_new=0 enc_lane=0 before_lane=0 after_lane=0 q_lane=2 v_lane=4 probe_lane=2 out_lane=2 moment_face_lane=2 read_lane=0 face_biases_lane=0 a_lane=0 b_lane=0 g_chart=0
+G63D_PAIR wm13/rt13 sections=1535
+  G63D_LAP wm13 sections=1535 before=3.295827 predicted=-8745.319 external=515.567 external_n=1535 N=9196.441
+  G63D_LAP rt13 sections=1535 before=3.287380 predicted=-4672.282 external=189.936 external_n=1535 N=4838.476
+  G63D_PAIRED before_d=+0.008448 se=0.000154 n=1535 predicted_d=-4073.037 se=190.382 n=1535 external_d=+325.631 se=32.486 n=1535 twice_N_excess=+8715.929 se=382.974 n=1535
+  G63D_BEFORE first_blocks_of_8 +0.001383 +0.006779 +0.010101 +0.009373 twentieth_1 +0.008563 twentieth_20 +0.007768 slope_3_20 -0.002025 se 0.000594 (bits a lap)
+  G64_TWENTIETHS d=before(A)-before(B) site-weighted: +0.008563 +0.008760 +0.007983 +0.008429 +0.009193 +0.011673 +0.011591 +0.006655 +0.009284 +0.007762 +0.007822 +0.007239 +0.008486 +0.012173 +0.007642 +0.008345 +0.007549 +0.007649 +0.006950 +0.007768
+  G64_TWENTIETHS_2_3 positions 77..230 sections=154 before_d=+0.008045 se=0.000397 weighted=+0.008364 twice_N_excess=+9308.950 se=477.020
+  G64_LINE wm13 FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.741950 foil_nats_a_place=1.874073 information_nats_a_place=0.132123 own_nats_a_word=13.089469 information_nats_a_word=0.992808
+  G64_LINE wm13 FIELD_MEAN lap=0 states=1535 entries=63606 moved=61444 square=943553972104733
+  G64_LINE wm13 FIELD_LAP lap=0 read=64 sites=16582230 before=3.240 after=- deposited=1535/1535 halvings=0 next_halved=0 next_refused=0 ms=802588
+  G64_LINE wm13 FIELD_JOINT_NATS lap=0 places=43470 words=5785 own_nats_a_place=1.742902 foil_nats_a_place=1.876787 information_nats_a_place=0.133885 own_nats_a_word=13.096622 information_nats_a_word=1.006047
+  G64_FILES wm13 STATE.0=70bc6f0ce6c54820 MEAN.0=9038155513a1658d
+  G64_LINE rt13 FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.741950 foil_nats_a_place=1.874073 information_nats_a_place=0.132123 own_nats_a_word=13.089469 information_nats_a_word=0.992808
+  G64_LINE rt13 FIELD_MEAN lap=0 states=1535 entries=63606 moved=61438 square=92589378809125
+  G64_LINE rt13 FIELD_LAP lap=0 read=64 sites=16582230 before=3.231 after=- deposited=1535/1535 halvings=0 next_halved=0 next_refused=0 ms=814181
+  G64_LINE rt13 FIELD_JOINT_NATS lap=0 places=43470 words=5785 own_nats_a_place=1.738791 foil_nats_a_place=1.874886 information_nats_a_place=0.136095 own_nats_a_word=13.065727 information_nats_a_word=1.022656
+  G64_FILES rt13 STATE.0=37ce4464199b301f MEAN.0=80c698585fea32ab
