@@ -50,6 +50,12 @@ invertible symmetric `G`.
    any resistance `M` positive on nonzero vectors (`M = (½D)⁻¹` in the chart), the housekeeping
    density `(T x)·M(T x)` is nonnegative (`housekeeping_nonneg`) and vanishes everywhere exactly
    when the turn does (`reversible_iff_no_housekeeping`).
+8. **The standing energy of a stepped descent** (`two_mul_trace_stiffness_covariance`): a drift
+   `−P H` (a symmetric invertible step `P` against a symmetric stiffness `H`) with the noise
+   `P C P` holds `2 tr(H Σ) = tr(C P)` at its stationary law. The mean potential is `¼ tr(P C)`
+   and the stiffness is not in it.
+9. **Half a step in every direction** (`stationary_half_step_of_noise_eq_stiffness`): where the
+   noise is the stiffness, `C = H`, the covariance `Σ = ½ P` is stationary.
 
 [counterexample; formal-checked] **The stationary law does not decide the arrow**
 (`same_law_two_arrows`). Over `ℚ` with `G = 1` and `D = 2`, the drifts `[[−1, −1], [1, −1]]` and
@@ -232,6 +238,51 @@ theorem reversible_iff {G A D : Matrix n n K} (hG : IsUnit G.det) (h : Stationar
     · exact adjointIn_eq_self_of_symm hG
   · rw [turn_of_stationary hG h, add_eq_zero_iff_eq_neg]
 
+/-! ### The standing energy of a stepped descent
+
+A descent that steps by a symmetric `P` against a symmetric stiffness `H`, on covectors whose
+noise has the covariance rate `C`, is the linear diffusion with the drift `A = −P H` and the noise
+`D = P C P`. Its stationary covariance `Σ` solves `A Σ + Σ Aᵀ + D = 0`. -/
+
+omit [Invertible (2 : K)] in
+/-- [proved-derived; formal-checked] **The standing energy is a quarter of the trace of step times
+noise, whatever the stiffness:** `2 tr(H Σ) = tr(C P)`, so the mean potential `½ tr(H Σ)` is
+`¼ tr(P C)`. The stiffness sets how fast a direction relaxes and has left what it holds at rest.
+`Q` is the step's inverse. -/
+theorem two_mul_trace_stiffness_covariance {P Q H C S : Matrix n n K} (hQ : Q * P = 1)
+    (hP : Pᵀ = P) (hH : Hᵀ = H)
+    (h : -(P * H) * S + S * (-(P * H))ᵀ + P * C * P = 0) :
+    2 * (H * S).trace = (C * P).trace := by
+  have hPQ : P * Q = 1 := Matrix.mul_eq_one_comm.mp hQ
+  have h0 : Q * (-(P * H) * S + S * (-(P * H))ᵀ + P * C * P) = 0 := by
+    rw [h, Matrix.mul_zero]
+  rw [Matrix.transpose_neg, Matrix.transpose_mul, hP, hH] at h0
+  have hexp : -(H * S) + -(Q * S * H * P) + C * P = 0 := by
+    simpa only [Matrix.mul_add, Matrix.mul_neg, Matrix.neg_mul, ← Matrix.mul_assoc, hQ,
+      Matrix.one_mul] using h0
+  have hcyc : (Q * S * H * P).trace = (H * S).trace := by
+    rw [Matrix.trace_mul_comm (Q * S * H) P, ← Matrix.mul_assoc, ← Matrix.mul_assoc, hPQ,
+      Matrix.one_mul, Matrix.trace_mul_comm S H]
+  have htr := congrArg Matrix.trace hexp
+  rw [Matrix.trace_add, Matrix.trace_add, Matrix.trace_neg, Matrix.trace_neg, Matrix.trace_zero,
+    hcyc, ← neg_add, neg_add_eq_zero] at htr
+  rw [two_mul, htr]
+
+/-- [proved-derived; formal-checked] **Where the noise is the stiffness, every direction stands at
+half its step:** with `C = H` the covariance `Σ = ½ P` is stationary, whatever `H` is. For a
+diagonal step the entries are then uncorrelated and each holds half its own step. The hypothesis
+`C = H` is the information equality of a code read at its own law; a code read off its law owes
+the comparison of its covectors' covariance with its curvature. -/
+theorem stationary_half_step_of_noise_eq_stiffness {P H : Matrix n n K} (hP : Pᵀ = P)
+    (hH : Hᵀ = H) :
+    -(P * H) * ((⅟2 : K) • P) + ((⅟2 : K) • P) * (-(P * H))ᵀ + P * H * P = 0 := by
+  have h1 : -(P * H) * ((⅟2 : K) • P) = -((⅟2 : K) • (P * H * P)) := by
+    rw [Matrix.neg_mul, Matrix.mul_smul]
+  have h2 : ((⅟2 : K) • P) * (-(P * H))ᵀ = -((⅟2 : K) • (P * H * P)) := by
+    rw [Matrix.transpose_neg, Matrix.transpose_mul, hP, hH, Matrix.mul_neg, Matrix.smul_mul,
+      ← Matrix.mul_assoc]
+  rw [h1, h2, ← neg_add, half_add_half, neg_add_cancel]
+
 end Split
 
 /-! ## The housekeeping production -/
@@ -327,6 +378,8 @@ section Audit
 #print axioms current_tangent
 #print axioms stationary_current_circulates
 #print axioms reversible_iff
+#print axioms two_mul_trace_stiffness_covariance
+#print axioms stationary_half_step_of_noise_eq_stiffness
 #print axioms housekeeping_nonneg
 #print axioms housekeeping_eq_zero_iff
 #print axioms reversible_iff_no_housekeeping
