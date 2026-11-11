@@ -1,0 +1,39 @@
+# g86_part_octaves.py on the region record's polar_map_means_rt.txt (rt14 to rt17's means) and on g86_polar_map_means_rt17_20.txt, on the host, 2026-11-11 UTC.
+# polar_map_means_rt.txt: blocks 50 heat 10698.4 fall2 +753.5 pi_F 0.0704
+w_new              heat    392.8 fall2   +10.9 pi +0.028 log2(pi/piF) -1.34 octave 0
+a_new              heat    334.9 fall2   +29.9 pi +0.089 log2(pi/piF) +0.34 octave 0
+b_new              heat    384.4 fall2   +24.7 pi +0.064 log2(pi/piF) -0.13 octave 0
+enc_lane           heat     62.6 fall2   +34.9 pi +0.558 log2(pi/piF) +2.98 octave 3
+before_lane        heat     43.1 fall2   +36.3 pi +0.842 log2(pi/piF) +3.58 octave 4
+after_lane         heat     43.1 fall2   +31.9 pi +0.740 log2(pi/piF) +3.39 octave 3
+q_lane             heat    296.3 fall2   +25.3 pi +0.085 log2(pi/piF) +0.28 octave 0
+v_lane             heat    319.2 fall2   +46.4 pi +0.145 log2(pi/piF) +1.05 octave 1
+probe_lane         heat    199.5 fall2   +37.7 pi +0.189 log2(pi/piF) +1.42 octave 1
+out_lane           heat    756.8 fall2   +13.6 pi +0.018 log2(pi/piF) -1.97 octave 0
+moment_face_lane   heat    283.6 fall2   +21.1 pi +0.074 log2(pi/piF) +0.08 octave 0
+face_biases_lane   heat     87.4 fall2    +2.7 pi +0.031 log2(pi/piF) -1.19 octave 0
+a_lane             heat    516.7 fall2   -21.0 pi -0.041 log2(pi/piF) -inf octave 0
+b_lane             heat    697.0 fall2    -1.8 pi -0.003 log2(pi/piF) -inf octave 0
+enc_first          heat    157.5 fall2   +29.2 pi +0.185 log2(pi/piF) +1.40 octave 1
+before_first       heat     33.3 fall2   +41.8 pi +1.255 log2(pi/piF) +4.16 octave 4
+after_first        heat     32.6 fall2   +45.5 pi +1.396 log2(pi/piF) +4.31 octave 4
+# added heat 3051 (+28.5%), added fall2 at 0.944 +2083 (+276.5%)
+# g86_polar_map_means_rt17_20.txt: blocks 50 heat 11165.1 fall2 +797.4 pi_F 0.0714
+w_new              heat    414.9 fall2    +9.9 pi +0.024 log2(pi/piF) -1.58 octave 0
+a_new              heat    350.5 fall2   +20.6 pi +0.059 log2(pi/piF) -0.28 octave 0
+b_new              heat    409.8 fall2   +32.3 pi +0.079 log2(pi/piF) +0.14 octave 0
+enc_lane           heat     65.6 fall2   +37.4 pi +0.570 log2(pi/piF) +3.00 octave 3
+before_lane        heat     45.8 fall2   +38.1 pi +0.832 log2(pi/piF) +3.54 octave 4
+after_lane         heat     45.5 fall2   +35.7 pi +0.785 log2(pi/piF) +3.46 octave 3
+q_lane             heat    306.6 fall2   +36.6 pi +0.119 log2(pi/piF) +0.74 octave 1
+v_lane             heat    334.9 fall2   +51.9 pi +0.155 log2(pi/piF) +1.12 octave 1
+probe_lane         heat    205.2 fall2   +45.5 pi +0.222 log2(pi/piF) +1.63 octave 2
+out_lane           heat    798.7 fall2   +27.5 pi +0.034 log2(pi/piF) -1.05 octave 0
+moment_face_lane   heat    297.9 fall2   +23.9 pi +0.080 log2(pi/piF) +0.17 octave 0
+face_biases_lane   heat     92.7 fall2    +3.1 pi +0.033 log2(pi/piF) -1.09 octave 0
+a_lane             heat    533.3 fall2   -12.4 pi -0.023 log2(pi/piF) -inf octave 0
+b_lane             heat    729.7 fall2   +11.9 pi +0.016 log2(pi/piF) -2.13 octave 0
+enc_first          heat    160.5 fall2   +27.2 pi +0.169 log2(pi/piF) +1.25 octave 1
+before_first       heat     34.3 fall2   +41.6 pi +1.213 log2(pi/piF) +4.09 octave 4
+after_first        heat     33.3 fall2   +40.3 pi +1.210 log2(pi/piF) +4.08 octave 4
+# added heat 3896 (+34.9%), added fall2 at 0.944 +2201 (+276.0%)
