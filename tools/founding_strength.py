@@ -29,7 +29,7 @@ Printed for each row: bought = control - arm (nats a place), nats = bought x pla
 strength = nats / entries (nats a founded entry). A lap's quarters are checked to partition its places, and their nats are summed
 beside the whole; a founding read only whole says so. Integers and rationals only (`fractions`).
 
-The kernel (theory, November 11 23:05; the Einstein record §14.8: a founding's entries are counted net of the re-chartings that change
+The kernel (theory, November 11 22:56; the Einstein record §14.8: a founding's entries are counted net of the re-chartings that change
 no face at the reader; the count is agent-inferred). A complex contact's entries carry four real re-chartings that change no face: its
 a by a complex lambda, its b by a complex mu, and W's two columns by (lambda mu)^-1, for a pair contact (c = a b at the strand mate)
 and a carry circle alike (Q = b + gamma Q is linear in b, p = a Q, and the gate reads the face, never Q), up to the releases' grain.
