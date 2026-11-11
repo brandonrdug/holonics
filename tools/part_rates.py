@@ -3,6 +3,7 @@
 
   part_rates.py open STATE CONTACTS_BEFORE OCTAVES OUT
   part_rates.py update OLDER OLD NOW OUT
+  part_rates.py means OLDER OLD NOW STATE OUT    (theory, November 11: the same rule read on lap means; see below)
   part_rates.py trend OLDEST OLDER OLD NOW OUT   (theory, November 11 03:54: the slope-corrected rule; see trend())
 
 The learner's text carries each founded part's octaves in a trailing `parts CONTACTS_BEFORE k0 .. k15` line (holonics::hnn::tower::field::
@@ -11,6 +12,14 @@ PART_NAMES order). `update` reads three saved states of one line and, for each p
 NOW - OLD over the entries it holds (exact integers): c > 1/2 one octave faster, c < 1/2 one slower, never under the old rate (octave 0) nor
 past rate - 1; c = 1/2 rests. It writes NOW with the moved octaves to OUT and prints FIELD_PART_RATE for every part. The parts are
 Field::founded_parts' (checked against it by the ignored test founded_parts_and_their_cosines_on_saved_states). Numbers only.
+
+`means` reads the cosines from three lap means of one line (the trainer's MEAN.{lap}, or any three materials of one declaration) and
+moves the octaves that STATE carries, the lap's end state the next lap trains from: it writes STATE, every line and its material, with
+the moved octaves to OUT. Reason (the record of November 11 on a deposit's rate as a temperature): a lap's end state is one draw of the
+rate's standing spread, so between lap ends a part's cosine is (d^2 - s^2) / (d^2 + 2 s^2) for a lap's travel d and end draws of
+variance s^2, and a part that travels steadily under a large spread reads as one at rest; a lap's mean sheds the spread of every
+direction that relaxes inside the lap. The three materials are read only; OUT is a state a tool wrote, checked before a lap trains
+from it. Controls: tools/test_part_rates.py.
 """
 import sys
 from math import isqrt
@@ -142,8 +151,12 @@ def main():
         for p, name in enumerate(PART_NAMES):
             print(f"FIELD_PART_RATE part={name} entries={parts.count(p)} c=- rate_octaves={octaves[p]} rate_bits={rate - octaves[p]}")
         write(lines, contacts_before, octaves, args[4])
-    elif len(args) == 5 and args[0] == "update":
+    elif (len(args) == 5 and args[0] == "update") or (len(args) == 6 and args[0] == "means"):
         (_, da, ra, older), (_, db, rb, old), (lines, dc, rate, now) = load(args[1]), load(args[2]), load(args[3])
+        if args[0] == "means":
+            # The octaves moved, and every line written, are the lap's end state's; the three materials above give the cosines alone.
+            lines, dt, rate, target = load(args[4])
+            assert dt == dc and len(target) == len(now), "the state the octaves move in is of the means' declaration"
         # A state before the carry has no third chart: its entries read as zero (the founding), so the first lap of the carry reads the carry's own travel.
         if dc.get("carry"):
             if not da.get("carry"):
@@ -180,7 +193,7 @@ def main():
             c = micro(dot[p], root) if root > 0 else 0
             move = "faster" if k2 > k else "slower" if k2 < k else "hold"
             print(f"FIELD_PART_RATE part={name} entries={entries[p]} c={'-' if c < 0 else ''}{abs(c) // 1_000_000}.{abs(c) % 1_000_000:06d} rate_octaves={k2} was={k} move={move} rate_bits={rate - k2}")
-        write(lines, contacts_before, nxt, args[4])
+        write(lines, contacts_before, nxt, args[-1])
     elif len(args) == 6 and args[0] == "trend":
         trend(args[1:5], args[5])
     else:
