@@ -54,6 +54,10 @@ line). For each block of `scale` (and the carry's chart by lane):
                 standing spread's cost if every entry rests in its own noise (an entry at rest under this step holds a variance
                 2^-rate s / 2H at curvature H, a cost 2^-rate s / 4 whatever H), at the rates the lap ran at (the `parts` line of
                 the state the lap ended in) and at the base rate, in millionths of a bit a site as a section line prices a step;
+                and own, the lap's travel priced at the covector that would have moved it alone, sum s_i d_i^2 2^(rate - 32 -
+                2 grain) / SITES in the same unit. A walk of free steps holds 4 heat there between lap ends and two thirds of
+                that between lap means, and a part at rest in a well holds less by its relaxation time over the lap; a travel
+                that repeats holds the same in own, in fall one lap on and in fall two laps on;
   WEIGHED_PAIR  cos, the plain cosine of two successive laps' travels; cos_w, the cosine with every product weighed by s_i; q1 .. q4,
                 the entries in order of falling s cut into four groups of equal summed s, each with its count and its plain cosine
                 (q1 the few entries of the largest covectors, q4 the many of the smallest); and fall, the first-order fall of the
@@ -61,9 +65,12 @@ line). For each block of `scale` (and the carry's chart by lane):
                 2 grain) / SITES, in the same unit (below zero: the later lap went back); eps_w, the weighed cosine's own spread
                 if the entries' products had no common sign, the root of sum (s_i d1_i d2_i)^2 over the same norm.
   WEIGHED_LAG   with four states or more: the plain and the weighed cosine of a lap's travel with the travel two laps on, and
-                three (weighed by the root after the first). A block at rest about a fixed position, its lap ends related by r^k
-                at k laps, reads -(1 - r)/2 at one lap, -r(1 - r)/2 at two and -r^2 (1 - r)/2 at three; a drift adds its share of
-                the squared travel to each. So the three cosines read a block's memory and its drift apart.
+                three (weighed by the root after the first), and fall, that product priced as WEIGHED_PAIR's. A block at rest
+                about a fixed position, its lap ends related by r^k at k laps, reads -(1 - r)/2 at one lap, -r(1 - r)/2 at two
+                and -r^2 (1 - r)/2 at three; a drift adds its share of the squared travel to each. So the three cosines read a
+                block's memory and its drift apart. Between lap means a free walk's two successive travels share a sixth of a
+                lap's variance (atlas `deposition.lap-mean-quarter-floor`) and travels two laps apart share none, so the fall
+                two laps on is the first that holds only what repeats; WEIGHED_LAG_TOTAL sums it over every block.
   WEIGHED_TOTAL the heats and the falls summed over every block. Numbers only.
 
 state_travel.py mean OUT HEAD STATE [STATE ...]: writes OUT, a new file: HEAD's learner text with its material replaced by the mean,
@@ -79,7 +86,12 @@ a_bias, b, b_bias, w, w_bias, read, read_bias, moment_before, moment_after, temp
 moment_face_bias, lift_bias, and gchart with the carry). Every other entry and every other line is HEAD's. A read of OUT beside
 HEAD's and DONOR's tells how much of a reading's difference between two states those families carry; where a reading is first order
 in the states' difference, the shifts of grafts that partition the material add up to the whole difference, and what the sum leaves
-is the reading's curvature between them. OUT is a ruler's state: it is read, and no lap trains from it. Numbers only.
+is the reading's curvature between them. A name may also be `part:NAME`, the entries of one founded part as the rate law names
+them (tools/part_rates.py: w_new .. b_lane, and g_chart with the carry), or `FAMILY/old`, a family's entries of no part (the base
+rate's); the parts and the families' old entries partition the material, so a lap's difference between two lap means is split by the
+rate each entry trains at. Both read the count of contacts before the growth from HEAD's `parts` line, or from a name
+`contacts:N` where HEAD carries none (where it carries one the two agree). No entry is named twice. OUT is a ruler's state: it is
+read, and no lap trains from it. Numbers only.
 """
 import os
 import sys
@@ -399,10 +411,11 @@ def weighed(old_f, sections, sites, paths):
         rate = entry_rates(d, total, rate_bits, parts)
         heat = np.exp2(-rate.astype(np.float64) - 32) * s1 / (4 * per_section) * micro
         heat_base = np.exp2(-float(rate_bits) - 32) * s1 / (4 * per_section) * micro
+        own = s1 * dv * dv * np.exp2(rate.astype(np.float64) - 32 - 2 * grain_of) / sites * micro
         for block, lane, contacts, role, idx in blocks:
             x = dv[idx]
-            print(f"TRAVEL_WEIGHED_LAP lap={k} block={block} lane={lane} contacts={contacts} role={role} entries={idx.size} open={int((s1[idx] > 0).sum())} travel_rms={float(np.sqrt((x ** 2).mean())):.5g} heat_micro={float(heat[idx].sum()):.4f} heat_base_micro={float(heat_base[idx].sum()):.4f}")
-        print(f"TRAVEL_WEIGHED_TOTAL lap={k} heat_micro={float(heat.sum()):.4f} heat_base_micro={float(heat_base.sum()):.4f}")
+            print(f"TRAVEL_WEIGHED_LAP lap={k} block={block} lane={lane} contacts={contacts} role={role} entries={idx.size} open={int((s1[idx] > 0).sum())} travel_rms={float(np.sqrt((x ** 2).mean())):.5g} heat_micro={float(heat[idx].sum()):.4f} heat_base_micro={float(heat_base[idx].sum()):.4f} own_micro={float(own[idx].sum()):.4f}")
+        print(f"TRAVEL_WEIGHED_TOTAL lap={k} heat_micro={float(heat.sum()):.4f} heat_base_micro={float(heat_base.sum()):.4f} own_micro={float(own.sum()):.4f}")
         travels.append(dv)
         rates.append(rate)
     cosine = lambda u, v, w: float((w * u * v).sum() / np.sqrt((w * u * u).sum() * (w * v * v).sum())) if (w * u * u).sum() > 0 and (w * v * v).sum() > 0 else float("nan")
@@ -429,9 +442,11 @@ def weighed(old_f, sections, sites, paths):
         for k in range(len(travels) - lag):
             s_after = states[k + 1][2]
             d1, d2 = travels[k], travels[k + lag]
+            fall = s_after * d1 * d2 * np.exp2(rates[k].astype(np.float64) - 32 - 2 * grain_of) / sites * micro
             for block, lane, contacts, role, idx in blocks:
                 u, v, w = d1[idx], d2[idx], s_after[idx]
-                print(f"TRAVEL_WEIGHED_LAG laps={k},{k + lag} lag={lag} block={block} lane={lane} contacts={contacts} role={role} cos={cosine(u, v, np.ones(idx.size)):+.4f} cos_w={cosine(u, v, w):+.4f}")
+                print(f"TRAVEL_WEIGHED_LAG laps={k},{k + lag} lag={lag} block={block} lane={lane} contacts={contacts} role={role} cos={cosine(u, v, np.ones(idx.size)):+.4f} cos_w={cosine(u, v, w):+.4f} fall_micro={float(fall[idx].sum()):+.4f}")
+            print(f"TRAVEL_WEIGHED_LAG_TOTAL laps={k},{k + lag} lag={lag} fall_micro={float(fall.sum()):+.4f}")
 
 
 def mean(out, head, paths):
@@ -462,17 +477,47 @@ def graft(out, head, donor, names):
     fam, total = layout(d)
     assert dd == d and total == len(theta) == len(other), "states of one declaration"
     spans = {name: (at, int(np.prod(shape))) for name, at, shape, _ in fam}
-    assert names and all(n in spans for n in names) and len(set(names)) == len(names), f"families of the layout, each once: {' '.join(spans)}"
-    material = theta.copy()
+    declared = [n for n in names if n.startswith("contacts:")]
+    names = [n for n in names if not n.startswith("contacts:")]
+    assert len(declared) <= 1 and names and len(set(names)) == len(names), "names of the layout, each once, and at most one contacts:N"
+    founded = None
+    if any(n.startswith("part:") or n.endswith("/old") for n in names):
+        sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+        import part_rates
+
+        carried = part_rates.parts_line(lines)
+        before = int(declared[0].split(":", 1)[1]) if declared else None
+        assert carried is not None or before is not None, "a part or a family's old entries need HEAD's parts line or contacts:N"
+        assert carried is None or before is None or carried[0] == before, "contacts:N is HEAD's parts line's count"
+        before = carried[0] if carried is not None else before
+        assert 0 < before <= d["contacts"] and before % 4 == 0, "the contacts before the growth, by fours"
+        founded = np.array(part_rates.founded_parts(d, before))
+        assert len(founded) == total
+    else:
+        assert not declared, "contacts:N goes with a part or a family's old entries"
+    named = np.zeros(total, dtype=np.int64)
     for n in names:
-        at, k = spans[n]
-        material[at:at + k] = other[at:at + k]
+        chosen = np.zeros(total, dtype=bool)
+        if n.startswith("part:"):
+            assert n[5:] in part_rates.PART_NAMES, f"parts of the rate law: {' '.join(part_rates.PART_NAMES)}"
+            chosen = founded == part_rates.PART_NAMES.index(n[5:])
+        elif n.endswith("/old"):
+            assert n[:-4] in spans, f"families of the layout: {' '.join(spans)}"
+            at, k = spans[n[:-4]]
+            chosen[at:at + k] = founded[at:at + k] == part_rates.OLD
+        else:
+            assert n in spans, f"families of the layout, each once: {' '.join(spans)}"
+            at, k = spans[n]
+            chosen[at:at + k] = True
+        assert chosen.any(), f"{n} names no entry of this declaration"
+        named += chosen
+    assert (named <= 1).all(), "no entry is named twice"
+    material = np.where(named == 1, other, theta)
     lines[2] = " ".join(str(int(x)) for x in material)
     with open(out, "x") as f:
         f.write("\n".join(lines))
     moved = (material - theta).astype(np.float64)
-    entries = sum(spans[n][1] for n in names)
-    print(f"STATE_GRAFT families={','.join(names)} entries={entries} of={total} moved={int((moved != 0).sum())} rms_from_head={float(np.sqrt((moved ** 2).mean())):.5g}")
+    print(f"STATE_GRAFT families={','.join(names)} entries={int(named.sum())} of={total} moved={int((moved != 0).sum())} rms_from_head={float(np.sqrt((moved ** 2).mean())):.5g}")
 
 
 def main():

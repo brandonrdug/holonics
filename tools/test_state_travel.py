@@ -31,6 +31,11 @@ head's, one state under another head is its own material, and a file that stands
 Controls of its graft: the named families' entries are the donor's and every other entry and line the head's; grafts of two parts
 that partition the layout's families move, between them, every entry the two states differ in, once; every family grafted gives the
 donor's material under the head's other lines; an unknown family, a family named twice and a standing file are refused.
+A graft by rate part: `part:NAME` takes the entries Field::founded_parts gives that part and `FAMILY/old` a family's entries of
+no part; the fifteen parts and every family's old entries, each grafted alone, move every entry once between them (a partition of
+the material); the count before the growth is the head's `parts` line's, or `contacts:N` on a head that carries none, and the two
+give one file; an entry named twice (a family beside one of its parts), a part of another law, a count that is not the head's, and
+a part named on a head with no count are refused.
 """
 import io
 import os
@@ -238,18 +243,22 @@ def weighed_controls():
     assert abs(float(pair["cos"]) - 0.5) < 1e-3 and abs(float(pair["cos_w"]) - 0.75) < 1e-3, pair
     assert abs(float(pair["q4_cos"])) < 1e-3 and all(float(pair[f"q{i}_cos"]) > 0.999 for i in (1, 2, 3)), pair
     assert abs(float(pair["fall_micro"]) - 3.0) < 1e-3, pair
-    # Heat.
+    # Heat, and the lap's own travel priced: every entry moves one step a lap, so own is the summed roots at the block's rate,
+    # four times the fall of the half that repeats where that half holds the small roots (q) and four thirds where the large (v).
     for lap in pick("TRAVEL_WEIGHED_LAP", block="q", lane="2"):
         assert int(lap["entries"]) == n and int(lap["open"]) == n, lap
         assert abs(float(lap["heat_base_micro"]) - 0.2441) < 1e-3 and abs(float(lap["heat_micro"]) - 4 * 0.2441) < 2e-3, lap
+        assert abs(float(lap["own_micro"]) - 1.0) < 1e-3, lap
     for lap in pick("TRAVEL_WEIGHED_LAP", block="v", lane="2"):
         assert abs(float(lap["heat_micro"]) - 0.2441) < 1e-3 and lap["heat_micro"] == lap["heat_base_micro"], lap
+        assert abs(float(lap["own_micro"]) - 4.0) < 1e-3, lap
     for lap in pick("TRAVEL_WEIGHED_LAP", block="q", lane="1"):
         assert int(lap["open"]) == 0 and float(lap["heat_micro"]) == 0.0 and float(lap["travel_rms"]) == 0.0, lap
     totals = [fields(l) for l in lines if l.startswith("TRAVEL_WEIGHED_TOTAL ")]
     heats = [t for t in totals if "heat_micro" in t]
     falls = [t for t in totals if "fall_micro" in t]
     assert len(heats) == 2 and all(abs(float(t["heat_micro"]) - 5 * 0.2441) < 2e-3 and abs(float(t["heat_base_micro"]) - 2 * 0.2441) < 1e-3 for t in heats), heats
+    assert all(abs(float(t["own_micro"]) - 5.0) < 2e-3 for t in heats), heats
     assert len(falls) == 1 and abs(float(falls[0]["fall_micro"]) - 3.25) < 1e-3, falls
     print(f"state_travel weighed: {len(lines)} lines, three controls hold")
 
@@ -293,6 +302,12 @@ def lag_controls():
     rows_of = [fields(l) for l in lines if fields(l)["block"] == "probe" and fields(l)["lane"] == "2"]
     assert [r["lag"] for r in rows_of] == ["2"], rows_of
     assert abs(float(rows_of[0]["cos"])) < 1e-3 and abs(float(rows_of[0]["cos_w"]) - 0.5) < 1e-3, rows_of
+    # The product priced: the large roots repeat (3 root) and the small reverse (root), each on half the entries, at the base rate
+    # of 12 bits and the charts' grain of 24: (3 root - root) step^2 2^(12 - 32 - 48) a half's entries, over the sites.
+    priced = 2 * root * step ** 2 * rows * int(lane.sum()) * 2.0 ** (12 - 32 - 48) / 16_000_000 * 1e6
+    assert abs(float(rows_of[0]["fall_micro"]) - priced) < 1e-3 * priced, (rows_of, priced)
+    (whole,) = [fields(l) for l in out_text.getvalue().split("\n") if l.startswith("TRAVEL_WEIGHED_LAG_TOTAL ")]
+    assert whole["lag"] == "2" and abs(float(whole["fall_micro"]) - priced) < 1e-3 * priced, (whole, priced)
     assert not any(fields(l)["lag"] == "3" for l in lines), "four states hold one pair two laps apart and none three apart"
     print(f"state_travel lag: {len(lines)} lines, the control holds")
 
@@ -378,6 +393,61 @@ def graft_controls():
     print(f"state_travel graft: {len(lines)} lines, the controls hold")
 
 
+def graft_part_controls():
+    import part_rates
+
+    rng = np.random.default_rng(20261116)
+    fam, total = state_travel.layout(D)
+    a = rng.integers(-100000, 100000, size=total).astype(np.int64)
+    b = a + rng.integers(1, 10, size=total)
+    founded = np.array(part_rates.founded_parts(D, OLD_F))
+    spans = {name: (at, int(np.prod(shape))) for name, at, shape, _ in fam}
+    parts = [f"part:{name}" for i, name in enumerate(part_rates.PART_NAMES) if (founded == i).any()]
+    olds = [f"{name}/old" for name, (at, k) in spans.items() if (founded[at:at + k] == part_rates.OLD).any()]
+    assert len(parts) == 15 and "part:g_chart" not in parts and "q_bias/old" in olds
+    with tempfile.TemporaryDirectory() as tmp:
+        pa, pb, bare = os.path.join(tmp, "a"), os.path.join(tmp, "b"), os.path.join(tmp, "bare")
+        write(pa, a, [7] * total, [OLD_F] + [0] * 16)
+        write(pb, b, [9] * total, [OLD_F] + [2] * 16)
+        write(bare, a)
+        quiet = io.StringIO()
+        moved = np.zeros(total, dtype=np.int64)
+        with redirect_stdout(quiet):
+            for i, name in enumerate(parts + olds):
+                state_travel.graft(os.path.join(tmp, f"g{i}"), pa, pb, [name])
+                _, got = state_travel.state(os.path.join(tmp, f"g{i}"))
+                moved += got != a
+                if name.startswith("part:"):
+                    assert ((got != a) == (founded == part_rates.PART_NAMES.index(name[5:]))).all(), name
+                else:
+                    at, k = spans[name[:-4]]
+                    inside = np.zeros(total, dtype=bool)
+                    inside[at:at + k] = founded[at:at + k] == part_rates.OLD
+                    assert ((got != a) == inside).all(), name
+                assert (got[got != a] == b[got != a]).all()
+            # One graft of every part and every family's old entries is the donor's material.
+            state_travel.graft(os.path.join(tmp, "whole"), pa, pb, parts + olds)
+            # The count from the head's line, and declared on a head that carries none: one file.
+            state_travel.graft(os.path.join(tmp, "carried"), pa, pb, ["part:q_lane", "v/old"])
+            state_travel.graft(os.path.join(tmp, "agreed"), pa, pb, ["contacts:8", "part:q_lane", "v/old"])
+            state_travel.graft(os.path.join(tmp, "declared"), bare, pb, ["contacts:8", "part:q_lane", "v/old"])
+        assert (moved == 1).all(), "the parts and the families' old entries hold every entry once"
+        assert (state_travel.state(os.path.join(tmp, "whole"))[1] == b).all()
+        carried, agreed, declared = (state_travel.state(os.path.join(tmp, name))[1] for name in ("carried", "agreed", "declared"))
+        assert (carried == agreed).all() and (carried == declared).all() and (carried != a).any()
+        lines = quiet.getvalue().splitlines()
+        assert sum(int(fields(line)["entries"]) for line in lines[:len(parts) + len(olds)]) == total
+        for bad, head in ((["q", "part:q_lane"], pa), (["q/old", "q"], pa), (["part:no_such_part"], pa), (["part:g_chart"], pa), (["contacts:12", "part:q_lane"], pa),
+                          (["part:q_lane"], bare), (["v/old"], bare), (["contacts:8", "q"], pa), (["contacts:8", "contacts:8", "part:q_lane"], pa), (["no_such_family/old"], pa)):
+            try:
+                with redirect_stdout(quiet):
+                    state_travel.graft(os.path.join(tmp, "bad"), head, pb, bad)
+                raise RuntimeError(f"a graft that names {bad} was written")
+            except AssertionError:
+                assert not os.path.exists(os.path.join(tmp, "bad"))
+    print(f"state_travel graft by part: {len(lines)} lines, the controls hold")
+
+
 def main():
     rank_controls()
     scale_controls()
@@ -385,6 +455,7 @@ def main():
     lag_controls()
     mean_controls()
     graft_controls()
+    graft_part_controls()
 
 
 if __name__ == "__main__":
