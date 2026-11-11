@@ -1,0 +1,12 @@
+# pi_cuts.py (a host ruler on the cloud container, numbers only: Python integers reproducing tower.rs half_turn, exp_series and field.rs turn_phasor and skin_of at main 202c11d4, against pi and ln 2 attained at 400 bits; the faces of the line's declaration, 16 turned slots at reach 3,771), read 2026-11-11 from 19:24:23 UTC, 3 s, rc=0.
+RING_PERIODS 2 3 4 9 16 27 32 81 128 243 256 729 1024 2187 4096 6561
+PI_CUT: the face of pi on 2^-bits, its fraction above the integer, its distance from the half, the run of
+        equal bits after the cut, and the smallest guard (of 0 to 24) from which every guard returns the nearest
+PI_CUT bits=30 fraction=0.1305 from_half=0.3695 run=2 guard_from=5 guard16_nearest=True
+PI_CUT bits=46 fraction=0.7586 from_half=0.2586 run=2 guard_from=6 guard16_nearest=True
+PI_CUT bits=60 fraction=0.1922 from_half=0.3078 run=2 guard_from=5 guard16_nearest=True
+FIELD_FACES pi_guard=16 pi46_nearest=True angles=12245 angles_not_nearest=0 where=[] skins_above_grain=20334 skins_not_nearest=0
+FIELD_FACES pi_guard=10 pi46_nearest=True angles=12245 angles_not_nearest=0 where=[] skins_above_grain=20334 skins_not_nearest=0
+FIELD_FACES pi_guard=8 pi46_nearest=True angles=12245 angles_not_nearest=0 where=[] skins_above_grain=20334 skins_not_nearest=0
+FIELD_FACES pi_guard=6 pi46_nearest=True angles=12245 angles_not_nearest=0 where=[] skins_above_grain=20334 skins_not_nearest=0
+FIELD_FACES pi_guard=4 pi46_nearest=False angles=12245 angles_not_nearest=0 where=[] skins_above_grain=20334 skins_not_nearest=0

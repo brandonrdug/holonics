@@ -1,6 +1,7 @@
 # A reading names its region: the letter rows learn where the contacts rest, e is a chart and never a digit, and every global sum is a join the card pays
 
-Status (2026-11-11, 18:40 UTC): derived, and measured on the host from receipts already committed. G84 is fixed before its laps
+Status (2026-11-11, 18:40 UTC; §5c added 19:35 UTC): derived, and measured on the host from receipts already committed
+and from four rulers of the code's faces (§5c). G84 is fixed before its laps
 (`guess_capacity_44_55.txt` in the receipts of [the record of the places](2026-11-11_THE_PLACES_THE_FIELD_GIVES_PUSH_AGAINST_THE_PLACES_IT_MISSES_THE_DEPOSIT_IS_THEIR_DIFFERENCE_AND_TWO_BUILDS_ARE_TIMED_ONLY_INSIDE_ONE_HOLD_OF_THE_CARD.md)).
 The derivations of §4 and §5 are `agent-inferred` where marked.
 
@@ -145,8 +146,9 @@ treating a continuum as inherently there.
 - **A width picked by hand, found.** `half_turn` computes sixteen grains finer and releases once. The series' floor divisions
   err at most `16(n₅ + 1) + 4(n₂₃₉ + 1)` units of the finer grain (`n₅ = 13`, `n₂₃₉ = 4` terms at 62 bits): 244, so eight guard
   bits keep the error under one unit of `2^(−46)`, and ten make the nearest certain where `2^46 π` falls (0.2414 under the next
-  integer). Read on the host: every guard from 6 bits up returns the same `2^(−46)` face, the nearest. The guard of 16 is owed
-  its derived width (ten); the face's bits do not change, so no state does. Owed with the next change to the tower's owner.
+  integer). Read on the host: every guard from 6 bits up returns the same `2^(−46)` face, the nearest. §5c reads the guard
+  against π's readers: no face the field reads changes for any guard from 4 to 16, so no derived guard is owed. What is owed is
+  a route that reads each face's cut (§5c).
 
 [derivation; standard results, the reading agent-inferred]
 - **Computable is attainable.** Turing's computable reals are those with a program that attains any declared width: a
@@ -168,15 +170,118 @@ treating a continuum as inherently there.
   many points the continuum has, so the continuum is a chart choice. Infinite depth bites in the ultraviolet of field theory:
   renormalization declares a grain and carries the remainder into the couplings (Wilson), and lattice QCD computes on a declared
   spacing. Gravity is the theory whose remainder does not close: perturbatively, each finer grain needs new couplings without end.
-  That is the precise form of the lens's point about general relativity and quantum mechanics. Whether spacetime itself is
-  discrete is open.
+  That is the precise form of the lens's point about general relativity and quantum mechanics. Spacetime is read
+  relationally in §5c, as the lens meant it: neither cells nor a continuum.
 - **The Holon as its views** (agent-inferred). A Holon described by infinitely many unique perspectives is the Yoneda lemma: an
   object of a category is determined by the morphisms into it from every other object, its views. A Holon is the functor of its
   receivers' views, and the ratio `Ĝ_(T←H)` is a morphism. A prime is an object with no factorization; cryptanalysis identifies
   an object (a key) from enough views by loop closure over the menu (the guide's keys and navigation).
 
-What follows for the machine, as a test: every width that attains a constraint's face is derived from the reading it serves, as
-`half_turn`'s guard is above; the next change to the tower's owner carries that guard's derivation.
+What follows for the machine, as a test: every width that attains a constraint's face is read at the cuts of the faces it
+serves (§5c).
+
+## 5c. π's width belongs to its readers, the ring faces are roots, and the mantissa has windows
+
+Brandon's follow-up (19:08 UTC), in this record's words. He doubts that π needs a width of its own: a transcendental is used
+through the constraint that defines it (`y′ = y` for `e`, the ratio of a circle's circumference to its diameter for π), and its
+partitions are relative. He asked which comes first, the circle or its ratio, as between a lens and a retina. No perfect circle
+is attained in nature, yet many points interpolating one another show π as the face of the geometry's classification. He asked
+whether a window deep in the mantissa can be continued by a series of its own (coarse-grained sub-series of π or `e`, as the
+spigot suggests), and what stops grouping a series' terms into classes and using the classes as information. On spacetime he
+corrected §5b: he means neither cells (a Planck lattice) nor a continuum. Fields relate to one another, a contact has finite
+width, motion pushes off a medium (a wing on air, a fin on water, a foot on a floor), and the gaps between things are emergent.
+What can be present is constrained by the configurations the ecology already holds, within holarchies across aeons: tools,
+words, music, escape velocity, the stars that make heavy atoms. Learning is not as costly as it is made to be: biology shows
+it, his card is likely enough, and he is against hacks (distillation, reinforcement learning) in favour of an ontology that
+scales.
+
+[measurement; four host rulers in this record's receipts: Python integers reproducing the code at `main` 202c11d4, against π
+and `ln 2` attained at 400 bits, on the line's declaration (16 turned slots, reach 3,771)]
+
+- **π has no width of its own; its readers decide one.** The field reads π in two kinds of face: the ring angles `2πc/n` on
+  `2^(−30)` (`turn_phasor`, from π on `2^(−46)`) and the skins' exponents `2πd/(n ln 2)` on `2^(−16)` (`skin_of`). The rings'
+  periods are 2, 3, 4, 9, 16, 27, 32, 81, 128, 243, 256, 729, 1,024, 2,187, 4,096 and 6,561, which make 12,245 angle faces off
+  the quarter points and 20,334 live skin exponents.
+  - Every one of the 32,579 faces is the same for Machin's guard anywhere from 4 to 16 bits, and each is the nearest of its
+    grain. At guards 4 and 5 π's own face on `2^(−46)` is one unit under its nearest, and no reader sees it.
+  - Held at its nearest on `2^(−(30 + k))` and released once to `2^(−30)`, π leaves 805 angle faces off their nearest at
+    `k = 0`, 2,243 at `k = 1` (the double release's ties), 730 at 3, 158 at 5, 23 at 8, 3 at 11 and none at 12. The last to
+    settle is the closest cut: at ring 1,024, residue 30, the angle falls 1.66·10^(−4) of a unit from its half, 12.6 bits
+    down. The field holds π 16 bits beyond its faces, 4 to spare.
+  - Another set of rings or another reach moves the closest cut, and the width with it. §5b's "owed its derived width (ten)"
+    is withdrawn: no face depends on the guard from 4 bits up, and a width is read at the cuts of the faces it feeds.
+- **The error is in the route to a face** (the precision law's clause of September 22: error enters in how a face is attained).
+  The field rounds the angle on `2^(−30)` and sums the exponential's series at that grain, releasing each term (`exp_series`).
+  Against each root of unity's nearest face (the cosine and sine of `2πc/n` at 400 bits, rounded once):
+  - 2,769 of the 12,245 faces agree; 8,106 are one unit of `2^(−30)` off, 1,319 two and 51 three.
+  - The rounded angle's own exponential, rounded once, would still leave 3,327 off: the angle's rounding moves a face before the
+    series' term roundings add theirs.
+  - 5,414 faces (44%) stand outside the unit disk (`|z|² > 2^60`), so their turn also boosts slightly. The tower rounds its ring
+    faces into the closed disk (`ring_face_at`: "a turn keeps the passivity bound"); the field's `turn_phasor` does not. A face is
+    read at its clock and never raised to a power (the moments read each face from the resident ring, or from `turn_phasor` at
+    a paced clock), so the excess does not compound.
+
+[derivation; standard results, the reading agent-inferred]
+
+- **The root comes first.** A ring's face `ζ = e^(2πir/n)` is algebraic: a root of `ζ^n = 1`, whose cyclotomic factor is at
+  once its constraint and its carry (§5: an algebraic base carries by its polynomial). The dyadic rings come from the quarter
+  points by half angles alone, `cos(θ/2) = √((1 + cos θ)/2)`, and the tower's turned ladder (`turn_ladder_faces`) already works
+  this way, without π. The triadic rings come by trisection from the third of a turn, `ζ₃ = (−1 + i√3)/2`, through
+  `cos 3θ = 4cos³θ − 3cos θ`. The turn is first, and π is the flat chart's measure of the angle between roots.
+- **C/d = π is a flat chart's reading.** On a sphere of radius `R` a circle of geodesic radius `r` has `C = 2πR sin(r/R)`, under
+  `2πr`, and on a saddle more. A ring of `n` contacts carries π to about `2 log₂ n` bits: its perimeter over its diameter is
+  `n sin(π/n) = π − π³/(6n²) + …` (Archimedes' polygons). The circles of nature approach π as their contacts multiply, and only
+  as far as their surface is flat at their scale.
+- **Among the ring faces only the skin is transcendental.** `e^(−2πd/n) = (e^π)^(−2d/n)`, and `e^π = (−1)^(−i)` is transcendental
+  (Gelfond 1929; Gelfond–Schneider 1934). Each of a ring's distances reads an integer power of the ring's one face `e^(−2π/n)`.
+- **The mantissa has windows.**
+  - BBP (Bailey, Borwein and Plouffe 1995): `π = Σ_(k≥0) 16^(−k) (4/(8k+1) − 2/(8k+4) − 1/(8k+5) − 1/(8k+6))`. The hexadecimal
+    digits from depth `n` are the fraction of `16^n π`: the first `n` terms reduce to the integers `16^(n−k) mod (8k + j)`, and
+    the tail falls sixteen-fold a term. So any depth of the mantissa is reached without the digits before it, in about
+    `n log n` operations on words of `O(log n)` bits.
+  - The base comes from the turn: `π = ∫_0^(1/√2) (4√2 − 8x³ − 4√2x⁴ − 8x⁵)/(1 − x⁸) dx`, a series over the eighth roots of
+    unity taken to `1/√2`, and `(1/√2)⁸ = 1/16`. π has no Machin-type formula of this kind in any base that is not a power of 2
+    (Borwein, Borwein and Galway 2004). `ln 2 = Σ_(k≥1) 1/(k 2^k)` is the base-2 case, and the field attains `ln 2` by that sum
+    (`ln2_face`).
+  - A spigot holds a constant as a constant word in its own chart: in the mixed radix whose place `k` weighs `k/(2k+1)`, π is
+    `2.2222…` (Rabinowitz and Wagon 1995), and in the factorial radix `e` is `2.1111…` (Sale 1968). The decimal digits are the
+    carries out of that chart: each pass multiplies every place by 10 and carries from the deepest place up, and the carry out
+    of the whole place is the next digit. The mantissa is navigated by carries, never held.
+  - Normality becomes a navigator's property: π is normal in base 16 if and only if the orbit `x_0 = 0`,
+    `x_n = (16x_(n−1) + r(n)) mod 1`, `r(n) = (120n² − 89n + 16)/(512n⁴ − 1024n³ + 712n² − 206n + 21)`, is equidistributed
+    (Bailey and Crandall 2001): one integer-driven orbit, `radix.normal-shift-equidistribution` read through the series.
+- **What stops grouping a series' terms is only its convergence.** Where a series converges absolutely, its terms may be grouped
+  into any classes and each class summed apart: BBP's four classes (denominators 1, 4, 5 and 6 mod 8) each converge, as `16^(−k)`
+  does. A series that converges only conditionally owes its order: Leibniz's `π/4 = 1 − 1/3 + 1/5 − …` split by sign gives two
+  divergent classes, and by Riemann's rearrangement theorem a reordering reaches any sum. The exponential's terms grouped by
+  `k mod 4` are the cosine and the sine, the four classes of the quarter points (`i^k = 1, i, −1, −i`; `ring_route.py` attains
+  the roots so). The precision law's "numerators grouped over the denominators they share" is the same move, and a class's
+  partial sum is a register of the value (a word partitioned across registers, November 5). In the field it splits a section's
+  summed code, the step's certificate, into its regions' partial sums: the certificate per region that §4 owes.
+- **Spacetime is relational** (correcting §5b). Under general covariance the manifold's points carry no physical identity: what
+  is physical is coincidences, the meetings of worldlines and the values fields take there (Einstein's point-coincidence
+  argument, 1916, his answer to the hole argument). A contact has finite width and length, and motion is momentum exchanged
+  with a medium through contacts: a wing turns air down, a fin pushes water back, a foot holds the floor by friction. The gaps
+  are what the contacts leave.
+- **What can appear is what is adjacent.** The configurations one step from the present one are its adjacent possible
+  (Kauffman 2000), and the time to reach a configuration grows as `e^(ΔF/k_BT)` with its distance in free energy (Arrhenius
+  1889; Kramers 1940). That is why tools, or the word "CUDA", had no path from where those ecologies stood. In the objects a
+  configuration appears in its holarchy at a crossing of its aeon, once the configurations before it make it adjacent.
+- **The machine founds only what is adjacent** (§3 measured; the reading agent-inferred). The letter rows learn while the
+  contacts between letters stand in their own noise or turn back, and the third letter stays out of reach until something
+  carries it: the carry founded as a turn tests that adjacency (G83, laps tc1 to tc3). The cost the lens names is measured
+  where the heat goes: the thermal blocks take 61.8% of the heat for 29.1% of the fall two laps on (§3), and G84 tests placing
+  the rate where a block is polarized. A reward is a scalar over a whole passage, the global reading §7 bars, while the field's
+  covector is a site's own `p̃ − q` through the operands that produced it (§2); neither test adds a reward or a teacher.
+
+What follows for the machine, as a test:
+- The ring faces attained from their roots (half angles for the dyadic rings, trisection for the triadic, each face rounded once
+  into the closed unit disk) change the bits of 9,476 of the 12,245 faces, so they enter at the next line's founding and never
+  in a running line (a build enters a line by reproducing it). Their guess is fixed before that founding's order.
+- A width that attains a constraint's face is read at the cuts of the faces it feeds and widened only where a face's cut falls
+  inside its route's error (the table-maker's dilemma; Ziv 1991 widens a route only when its error straddles the cut). The
+  field's fixed widths pass on today's declaration with 4 bits to spare, and nothing in them would see a declaration whose
+  closest cut fell nearer.
 
 ## 6. The card: associative sums are flat, and every harmonic class is a join
 
@@ -217,9 +322,19 @@ Written into CLAUDE.md and AGENTS.md under the method rules.
 `radix.finite-carry-algebraic`, `radix.log-chart-carry`, `radix.beta-shift-entropy-nat`,
 `radix.normal-shift-equidistribution` (arithmetic);
 `holarchy.associative-schedule-contractible`, `holarchy.harmonic-class-join`, `deposition.block-polarization` (objects); the
-charts "Number, radix, places", "Computer architecture" and "Hodge" name them.
+charts "Number, radix, places", "Computer architecture" and "Hodge" name them. From §5c: `radix.bbp-digit-extraction`,
+`radix.spigot-own-chart`, `radix.face-width-from-readers`, `series.term-class-grouping` (arithmetic); `winding.ring-face-root`
+(geometry); `tower.field-ring-face-route` (objects); `gr.point-coincidence`, `heat.adjacent-configuration-activation` (physics);
+named by the charts "Number, radix, places", "Relativity, refraction" and "Heat, information".
 
 ## 9. Receipts
 
 `polar_map.py` (the ruler, host, numbers only) and its four outputs `polar_map_{means_rt,ends_rt,means_hot1,means_hot2}.txt`,
 each read from the heat record's committed `g76_weighed_4_*.txt`, on the cloud host in under a second each.
+
+For §5c, four rulers (host, numbers only: Python integers reproducing `half_turn`, `exp_series`, `turn_phasor` and `skin_of` at
+`main` 202c11d4, against π and `ln 2` attained at 400 bits), each with its output, headed by its start time, its wall time and
+its exit code: `pi_cuts.py` (π's faces on `2^(−30)`, `2^(−46)` and `2^(−60)`, and the field's faces for Machin's guards 16, 10,
+8, 6 and 4; 3 s), `pi_readers.py` (the closest cut and the width of π each extra bit buys; under a second), `ring_route.py` (the
+route's faces against the roots' nearest, ring by ring; 111 s) and `ring_route_err.py` (the error by its source and the faces
+outside the unit disk; 130 s). They need no state and no private material; each reads only the line's declaration.
