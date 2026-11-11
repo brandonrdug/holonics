@@ -1,0 +1,4 @@
+TRAIN places 8096768 in 24685 passages (328.0 places a passage)
+  space-class 0.2052; word letters 0.6699; other (punctuation and the rest) 0.1249; separators (all but word letters) 0.3301
+  unit starts (a word letter after a non-word letter) 0.1390 of places: 1125322 units, 4.82 word letters a unit
+  newlines 0.0342 of places: 277282 lines, 29.2 places a line
