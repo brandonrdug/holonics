@@ -1,0 +1,7 @@
+# G80, M3 (i): the ruler state rt16/MEAN.0 with W's added columns from g0 (6f4eda3310e5f0d2) read held (laps 0) with bin-joint-strata
+# 4bd56aa83f564d66 (held_group.sh, KEYS8, L 1215000), 2026-11-11 16:35:04 to 16:35:16 UTC.
+FIELD_HELD lap=-1 answer=5.385414 classes=43470 context=1.134489 context_classes=43470 foil=1.335019 question=0.200531 ms=4479
+FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.858604 foil_nats_a_place=1.991534 information_nats_a_place=0.132930 own_nats_a_word=13.966034 information_nats_a_word=0.998872
+FIELD_JOINT_STRATA lap=-1 open_quarters=1/2/3/4 own_nats_a_place=0.815256/1.434528/2.176695/2.998836 foil_nats_a_place=0.921374/1.582725/2.332886/3.119996 places=10818/10881/10853/10918 open_sites=5333/16153/26922/38725 terms_own=13341833011/23613068489/35737312421/49530217920 terms_foil=15078473839/26052456890/38301670181/51531363521
+FIELD_UNSEEN lap=-1 code=1.052 sites=43660 next=- ms=11245
+MEASURE lap=held_m3_w_new_zero rc=0 wall_s=11.8 peak_rss_kib=839156

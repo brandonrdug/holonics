@@ -1,0 +1,9 @@
+# G80, M0 (2026-11-11 16:06 to 16:08 UTC, host):
+# a. ctrl41 = ${RUN}/2026-11-09-nov6-field-resumes/lap41/STATE.0 (the 32-contact control arm's fourth plain lap from lane lap 37): sha256 64c06fe8bb7477ce;
+#    declaration hnn-field-v14 100 64 4 8 2 32 4 4 3771 2 0 (contacts 32); no parts line; its lap end's held joint FIELD_JOINT_NATS lap=0 own_nats_a_place=1.817565 (logged 1.8176)
+#    ct8 = ct8/STATE.0: sha256 74895832d2ff3e43; declaration hnn-field-v14 100 64 4 8 2 64 4 4 3771 2 0 (contacts 64); no parts line; its lap end's held joint own_nats_a_place=1.783804 (logged 1.7838)
+# b. g0 = g0/STATE.0 (the 64-contact line's founding state): sha256 7036a1ffad3be3c9; no parts line; part:w_new with contacts:32: entries=2048 nonzero=0
+#    (rt16/MEAN.0's part:w_new: entries=2048 nonzero=2048)
+# c. tools/state_travel.py graft g80/rt16_mean_w_new_zero rt16/MEAN.0 g0/STATE.0 part:w_new (rt16/MEAN.0 carries its parts line, so no contacts:32):
+STATE_GRAFT families=part:w_new entries=2048 of=63606 moved=2048 rms_from_head=3.5051e+05
+#    OUT sha256 6f4eda3310e5f0d2; it differs from rt16/MEAN.0 in the material line only. A ruler's state: read, never trained from.
