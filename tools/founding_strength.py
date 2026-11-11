@@ -29,7 +29,8 @@ Printed for each row: bought = control - arm (nats a place), nats = bought x pla
 strength = nats / entries (nats a founded entry). A lap's quarters are checked to partition its places, and their nats are summed
 beside the whole; a founding read only whole says so. Integers and rationals only (`fractions`).
 
-A ruler (CLAUDE.md, a ruler is an instrument): it reads text, opens no state, trains nothing, and is never machinery.
+A ruler (CLAUDE.md, a ruler is an instrument): it reads text, opens no state, trains nothing, and is never machinery. Its controls
+are tools/test_founding_strength.py (gate 1).
 """
 import re
 import sys
@@ -171,4 +172,5 @@ def main():
         print(f"FOUNDING_RANK laps={laps} read={read} region={region} {ranked}")
 
 
-main()
+if __name__ == "__main__":
+    main()
