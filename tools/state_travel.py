@@ -54,6 +54,10 @@ line). For each block of `scale` (and the carry's chart by lane):
                 standing spread's cost if every entry rests in its own noise (an entry at rest under this step holds a variance
                 2^-rate s / 2H at curvature H, a cost 2^-rate s / 4 whatever H), at the rates the lap ran at (the `parts` line of
                 the state the lap ended in) and at the base rate, in millionths of a bit a site as a section line prices a step;
+                and own, the lap's travel priced at the covector that would have moved it alone, sum s_i d_i^2 2^(rate - 32 -
+                2 grain) / SITES in the same unit. A walk of free steps holds 4 heat there between lap ends and two thirds of
+                that between lap means, and a part at rest in a well holds less by its relaxation time over the lap; a travel
+                that repeats holds the same in own, in fall one lap on and in fall two laps on;
   WEIGHED_PAIR  cos, the plain cosine of two successive laps' travels; cos_w, the cosine with every product weighed by s_i; q1 .. q4,
                 the entries in order of falling s cut into four groups of equal summed s, each with its count and its plain cosine
                 (q1 the few entries of the largest covectors, q4 the many of the smallest); and fall, the first-order fall of the
@@ -61,9 +65,12 @@ line). For each block of `scale` (and the carry's chart by lane):
                 2 grain) / SITES, in the same unit (below zero: the later lap went back); eps_w, the weighed cosine's own spread
                 if the entries' products had no common sign, the root of sum (s_i d1_i d2_i)^2 over the same norm.
   WEIGHED_LAG   with four states or more: the plain and the weighed cosine of a lap's travel with the travel two laps on, and
-                three (weighed by the root after the first). A block at rest about a fixed position, its lap ends related by r^k
-                at k laps, reads -(1 - r)/2 at one lap, -r(1 - r)/2 at two and -r^2 (1 - r)/2 at three; a drift adds its share of
-                the squared travel to each. So the three cosines read a block's memory and its drift apart.
+                three (weighed by the root after the first), and fall, that product priced as WEIGHED_PAIR's. A block at rest
+                about a fixed position, its lap ends related by r^k at k laps, reads -(1 - r)/2 at one lap, -r(1 - r)/2 at two
+                and -r^2 (1 - r)/2 at three; a drift adds its share of the squared travel to each. So the three cosines read a
+                block's memory and its drift apart. Between lap means a free walk's two successive travels share a sixth of a
+                lap's variance (atlas `deposition.lap-mean-quarter-floor`) and travels two laps apart share none, so the fall
+                two laps on is the first that holds only what repeats; WEIGHED_LAG_TOTAL sums it over every block.
   WEIGHED_TOTAL the heats and the falls summed over every block. Numbers only.
 
 state_travel.py mean OUT HEAD STATE [STATE ...]: writes OUT, a new file: HEAD's learner text with its material replaced by the mean,
@@ -404,10 +411,11 @@ def weighed(old_f, sections, sites, paths):
         rate = entry_rates(d, total, rate_bits, parts)
         heat = np.exp2(-rate.astype(np.float64) - 32) * s1 / (4 * per_section) * micro
         heat_base = np.exp2(-float(rate_bits) - 32) * s1 / (4 * per_section) * micro
+        own = s1 * dv * dv * np.exp2(rate.astype(np.float64) - 32 - 2 * grain_of) / sites * micro
         for block, lane, contacts, role, idx in blocks:
             x = dv[idx]
-            print(f"TRAVEL_WEIGHED_LAP lap={k} block={block} lane={lane} contacts={contacts} role={role} entries={idx.size} open={int((s1[idx] > 0).sum())} travel_rms={float(np.sqrt((x ** 2).mean())):.5g} heat_micro={float(heat[idx].sum()):.4f} heat_base_micro={float(heat_base[idx].sum()):.4f}")
-        print(f"TRAVEL_WEIGHED_TOTAL lap={k} heat_micro={float(heat.sum()):.4f} heat_base_micro={float(heat_base.sum()):.4f}")
+            print(f"TRAVEL_WEIGHED_LAP lap={k} block={block} lane={lane} contacts={contacts} role={role} entries={idx.size} open={int((s1[idx] > 0).sum())} travel_rms={float(np.sqrt((x ** 2).mean())):.5g} heat_micro={float(heat[idx].sum()):.4f} heat_base_micro={float(heat_base[idx].sum()):.4f} own_micro={float(own[idx].sum()):.4f}")
+        print(f"TRAVEL_WEIGHED_TOTAL lap={k} heat_micro={float(heat.sum()):.4f} heat_base_micro={float(heat_base.sum()):.4f} own_micro={float(own.sum()):.4f}")
         travels.append(dv)
         rates.append(rate)
     cosine = lambda u, v, w: float((w * u * v).sum() / np.sqrt((w * u * u).sum() * (w * v * v).sum())) if (w * u * u).sum() > 0 and (w * v * v).sum() > 0 else float("nan")
@@ -434,9 +442,11 @@ def weighed(old_f, sections, sites, paths):
         for k in range(len(travels) - lag):
             s_after = states[k + 1][2]
             d1, d2 = travels[k], travels[k + lag]
+            fall = s_after * d1 * d2 * np.exp2(rates[k].astype(np.float64) - 32 - 2 * grain_of) / sites * micro
             for block, lane, contacts, role, idx in blocks:
                 u, v, w = d1[idx], d2[idx], s_after[idx]
-                print(f"TRAVEL_WEIGHED_LAG laps={k},{k + lag} lag={lag} block={block} lane={lane} contacts={contacts} role={role} cos={cosine(u, v, np.ones(idx.size)):+.4f} cos_w={cosine(u, v, w):+.4f}")
+                print(f"TRAVEL_WEIGHED_LAG laps={k},{k + lag} lag={lag} block={block} lane={lane} contacts={contacts} role={role} cos={cosine(u, v, np.ones(idx.size)):+.4f} cos_w={cosine(u, v, w):+.4f} fall_micro={float(fall[idx].sum()):+.4f}")
+            print(f"TRAVEL_WEIGHED_LAG_TOTAL laps={k},{k + lag} lag={lag} fall_micro={float(fall.sum()):+.4f}")
 
 
 def mean(out, head, paths):

@@ -243,18 +243,22 @@ def weighed_controls():
     assert abs(float(pair["cos"]) - 0.5) < 1e-3 and abs(float(pair["cos_w"]) - 0.75) < 1e-3, pair
     assert abs(float(pair["q4_cos"])) < 1e-3 and all(float(pair[f"q{i}_cos"]) > 0.999 for i in (1, 2, 3)), pair
     assert abs(float(pair["fall_micro"]) - 3.0) < 1e-3, pair
-    # Heat.
+    # Heat, and the lap's own travel priced: every entry moves one step a lap, so own is the summed roots at the block's rate,
+    # four times the fall of the half that repeats where that half holds the small roots (q) and four thirds where the large (v).
     for lap in pick("TRAVEL_WEIGHED_LAP", block="q", lane="2"):
         assert int(lap["entries"]) == n and int(lap["open"]) == n, lap
         assert abs(float(lap["heat_base_micro"]) - 0.2441) < 1e-3 and abs(float(lap["heat_micro"]) - 4 * 0.2441) < 2e-3, lap
+        assert abs(float(lap["own_micro"]) - 1.0) < 1e-3, lap
     for lap in pick("TRAVEL_WEIGHED_LAP", block="v", lane="2"):
         assert abs(float(lap["heat_micro"]) - 0.2441) < 1e-3 and lap["heat_micro"] == lap["heat_base_micro"], lap
+        assert abs(float(lap["own_micro"]) - 4.0) < 1e-3, lap
     for lap in pick("TRAVEL_WEIGHED_LAP", block="q", lane="1"):
         assert int(lap["open"]) == 0 and float(lap["heat_micro"]) == 0.0 and float(lap["travel_rms"]) == 0.0, lap
     totals = [fields(l) for l in lines if l.startswith("TRAVEL_WEIGHED_TOTAL ")]
     heats = [t for t in totals if "heat_micro" in t]
     falls = [t for t in totals if "fall_micro" in t]
     assert len(heats) == 2 and all(abs(float(t["heat_micro"]) - 5 * 0.2441) < 2e-3 and abs(float(t["heat_base_micro"]) - 2 * 0.2441) < 1e-3 for t in heats), heats
+    assert all(abs(float(t["own_micro"]) - 5.0) < 2e-3 for t in heats), heats
     assert len(falls) == 1 and abs(float(falls[0]["fall_micro"]) - 3.25) < 1e-3, falls
     print(f"state_travel weighed: {len(lines)} lines, three controls hold")
 
@@ -298,6 +302,12 @@ def lag_controls():
     rows_of = [fields(l) for l in lines if fields(l)["block"] == "probe" and fields(l)["lane"] == "2"]
     assert [r["lag"] for r in rows_of] == ["2"], rows_of
     assert abs(float(rows_of[0]["cos"])) < 1e-3 and abs(float(rows_of[0]["cos_w"]) - 0.5) < 1e-3, rows_of
+    # The product priced: the large roots repeat (3 root) and the small reverse (root), each on half the entries, at the base rate
+    # of 12 bits and the charts' grain of 24: (3 root - root) step^2 2^(12 - 32 - 48) a half's entries, over the sites.
+    priced = 2 * root * step ** 2 * rows * int(lane.sum()) * 2.0 ** (12 - 32 - 48) / 16_000_000 * 1e6
+    assert abs(float(rows_of[0]["fall_micro"]) - priced) < 1e-3 * priced, (rows_of, priced)
+    (whole,) = [fields(l) for l in out_text.getvalue().split("\n") if l.startswith("TRAVEL_WEIGHED_LAG_TOTAL ")]
+    assert whole["lag"] == "2" and abs(float(whole["fall_micro"]) - priced) < 1e-3 * priced, (whole, priced)
     assert not any(fields(l)["lag"] == "3" for l in lines), "four states hold one pair two laps apart and none three apart"
     print(f"state_travel lag: {len(lines)} lines, the control holds")
 
