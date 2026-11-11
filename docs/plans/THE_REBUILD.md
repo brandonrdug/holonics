@@ -93,13 +93,16 @@ letter and the carry's gate. A build enters a line by reproducing the line's own
 included. An iteration between saved states stays within one hour on the card (Brandon,
 November 6); a run that would pass it is a design change, not a longer run.
 
-**Where it stands, by measurement (November 11).** The held answers' joint code is 1.742 nats a
-place after twelve laps of the part-rate line, 0.022 under the plain rate at equal laps. Section to
+**Where it stands, by measurement (November 11).** The held answers' joint code is 1.7333 nats a
+place at the mean of the part-rate line's thirteenth lap (1.7388 at that lap's end; lap ends read
+0.022 under the plain rate at equal laps). A line's level is read at its lap's mean: a lap's end is
+one draw of the spread its rates hold. Section to
 section the line is at rest (sections' deposits agree at a cosine of 0.08); lap over lap its young
 parts still charge: the second lane's reading charts and lift lengthen 1.5 to 2 percent a lap and
-the added contacts' columns 1.2 percent. The carry's first two laps read 1.7477 and 1.7445 where
-their controls read 1.7544 and 1.7524. The field lacks 0.233 nats a place of the joint law
-of two letters each side and passes little past two written letters. The release rests above the
+the added contacts' columns 1.2 percent. The carry's four laps hold 0.005 to 0.007 under their
+controls and pass no letter past the second any better: as built it gives a term of three sites.
+The field lacks 0.233 nats a place of the joint law of two letters each side and passes little past
+two written letters. The release rests above the
 references and no write is yet ordered text.
 [CONSTRUCTION_STATE](../../CONSTRUCTION_STATE.md) holds the table and the records.
 
@@ -110,9 +113,14 @@ references and no write is yet ordered text.
    rule's raised rates sped up travel that is real and across its parts, and its laps read hotter,
    on the trained sections as on the held ones (`tools/state_travel.py scale`; guesses G58 and G59,
    both missed and scored). A lap cosine reads only the travel that survives a lap, never the
-   spread a rate costs within it. So the next reading is a lap from the trend line's state with
-   every part cooled back to the base rate, against the part-rate line's lap of the same count: if
-   it reads under, rates are raised by the cosine and read cool; if it does not, rates only fall.
+   spread a rate costs within it. The spread is now read
+   ([the heat record](../../research/records/2026-11-11_A_DEPOSITS_RATE_IS_A_TEMPERATURE_ITS_STANDING_SPREAD_IS_SHED_BY_A_MEAN_OF_STATES_AND_LAP_ENDS_ARE_DRAWS_THAT_DO_NOT_REMEMBER_EACH_OTHER.md)):
+   a rate is a temperature, its spread is shed by a lap's mean, and one pair of laps read at their
+   means puts the raised lap 0.0009 under the lap at the old rate, where their ends put it 0.0041
+   above. So levels are read at lap means, and the rate rule is rebuilt there: a second raised lap
+   beside a second lap at the old rate (G68), the lap cosine between means (G69), and the release
+   read from a mean (G70) are fixed and on the card. The carry's failed acceptance (no third or
+   fourth letter) makes its founding the next loop's subject for that law, never its rate.
    Growth follows where a reading certifies it, with its guess fixed first.
 2. On the card, a region's share store takes its stride from the pairs that meet (atlas
    `tower.field-support-stride`), so a return rides one batch; then the next section's tables are

@@ -1,0 +1,21 @@
+# G62: eight held reads on the PC, the card, 2026-11-11 (reported 11:46Z). Each is the lap's own opening read run alone
+# (the trainer with a lap count of 0: it prints the held lines at lap -1, trains nothing, writes no state), each under its own
+# hold of the card lock. Rate-line states with the rate line's binary and pass; the scan control and g2 with the scan line's.
+# Every read covers 43,470 places, 5,785 words, 128 answers, and 43,660 unseen sites.
+# Ruler states (STATE_MEAN lines of tools/state_travel.py mean):
+m3 (rt10 rt11 rt12, head rt12): states=3 entries=63606 moved=61459 rms_from_head=52701
+m2 (rt11 rt12):                 states=2 entries=63606 moved=61418 rms_from_head=33644
+m4 (rt9..rt12):                 states=4 entries=63606 moved=61472 rms_from_head=71241
+s11 (rt11):                     states=1 entries=63606 moved=61444 rms_from_head=67289
+s10 (rt10):                     states=1 entries=63606 moved=61477 rms_from_head=1.0106e+05
+g2 (gc2 gc3, head gc3):         states=2 entries=67702 moved=65551 rms_from_head=45004
+# Columns: name; held joint own (nats a place); foil; information a place; own a word / information a word; run s; lock wait s;
+# (the held answer's opening code, bits a byte; the unseen code).
+control_rt12  1.741950 foil 1.874073 info 0.132123 word 13.089469/0.992808  run 11.9 wait 583  (5.536622; 0.869)
+m3            1.738277 foil 1.868192 info 0.129915 word 13.061864/0.976217  run 11.8 wait 105  (5.601246; 0.864)
+m2            1.739429 foil 1.870482 info 0.131053 word 13.070523/0.984770  run 11.8 wait 127  (5.568071; 0.864)
+s11           1.742148 foil 1.872538 info 0.130390 word 13.090957/0.979781  run 11.8 wait 231  (5.601820; 0.869)
+s10           1.742788 foil 1.871926 info 0.129138 word 13.095767/0.970376  run 11.7 wait 56   (5.743272; 0.872)
+m4            1.738286 foil 1.868051 info 0.129764 word 13.061938/0.975082  run 12.4 wait 1451 (5.645168; 0.865)
+control_gc3   1.744995 foil 1.874667 info 0.129672 word 13.112348/0.974386  run 14.0 wait 452  (5.743791; 0.873)
+g2            1.739699 foil 1.869138 info 0.129440 word 13.072550/0.972643  run 13.9 wait 172  (5.747595; 0.869)

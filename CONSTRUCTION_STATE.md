@@ -65,22 +65,27 @@ repository was reset on September 24; the pre-reset tree is
   64-contact lane field's state at which the lines part, and the plain and part-rate lines' fourth
   laps are their first reads here):
 
-| Line | Law | Laps read | Held joint |
-|---|---|---|---|
-| plain | one deposit rate | 4, 5, 6 | 1.7838, 1.7751, 1.7748 |
-| part rates | a rate per founded part | 4 to 12 | 1.7622, 1.7544, 1.7524, 1.7506, 1.7459, 1.7472, 1.7428, 1.7421, 1.7420 |
-| scan | part rates and the carry, from the part-rate line's fourth state | 5, 6 | 1.7477, 1.7445 |
-| trend | each part's rate sought from its own lap displacements, from the part-rate line's ninth state | 10, 11 | 1.7443, 1.7477 |
+| Line | Law | Laps read | Held joint at lap ends | At the lap's mean |
+|---|---|---|---|---|
+| plain | one deposit rate | 4, 5, 6 | 1.7838, 1.7751, 1.7748 | |
+| part rates | a rate per founded part; every part at the old rate from lap 10 | 4 to 13 | 1.7622, 1.7544, 1.7524, 1.7506, 1.7459, 1.7472, 1.7428, 1.7421, 1.7420, 1.7388 | 1.7341 (lap 12), 1.7333 (lap 13) |
+| scan | part rates and the carry, from the part-rate line's fourth state | 5 to 8 | 1.7477, 1.7445, 1.7450, 1.7444 | |
+| trend | each part's rate sought from its own lap displacements, from the part-rate line's ninth state | 10, 11, 12 | 1.7443, 1.7477, 1.7453 | |
+| raised | the second lane's key, value, probe, out and moment-face parts at 4, 16, 4, 4 and 4 times the old rate, one lap from the part-rate line's twelfth state | 13 | 1.7429 | 1.7325 |
 
-  The scan's second lap reads 0.0079 under the part-rate line's lap of the same count, and its gate
-  has opened to a mean size of 0.14 to 0.15; its third and fourth laps are on the card. The trend
-  rule raised the rates of the parts whose lap displacements agreed, and its two laps read above
-  the part-rate line's (by 0.0015 and 0.0056). The code on the sections those laps train is higher
-  as well (by 0.0022 and 0.0048 nats a site), so the raised rates cost as spread within the lap;
-  what their faster travel is worth is read only from a state cooled back to the base rates, which
-  is the next reading
-  ([the travel record](research/records/2026-11-11_THE_ADDED_CONTACTS_TRAVEL_EACH_ITS_OWN_DIRECTION_SO_NO_FOUNDING_IS_BUILT_THEY_TOOK_THEIR_CHARGE_IN_FOUR_PART_RATE_LAPS_AND_A_GUESSES_PREMISE_IS_READ_FROM_THE_LOGS_FIRST.md)
-  §8; the guesses G58 and G59 beside the record of the two pushes).
+  **A line's level is read at its lap's mean.** A deposit's rate is a temperature: the spread a
+  rate holds at rest costs a quarter of the step times the noise, whatever the stiffness, and a
+  lap's end state is one draw of it. At the old rate a lap's end reads 0.0055 to 0.0078 nats a
+  place above its lap's mean and scatters 0.003 from lap to lap, where two laps' means stand 0.0008
+  apart; the opening code and the information a place swing with the lap's end and are steady at
+  the mean. The lap's mean is written beside the lap's state (`MaterialMean`, a reading; atlas
+  `tower.field-lap-mean`, `deposition.rate-temperature-standing-spread`). One pair of laps holds
+  that a raised rate is rent on a read: with five of the second lane's parts raised, the lap's end
+  reads 0.0041 above the old rate's lap and its mean 0.0009 under. The trend rule's laps read above
+  the part-rate line's by their spread, and the rate rule is rebuilt on lap means. The scan's line
+  holds 0.005 to 0.007 under the part-rate line's from its first lap to its fourth (0.0068 at means
+  of two states on laps 7 and 8, where the lap ends showed 0.0015)
+  ([the heat record](research/records/2026-11-11_A_DEPOSITS_RATE_IS_A_TEMPERATURE_ITS_STANDING_SPREAD_IS_SHED_BY_A_MEAN_OF_STATES_AND_LAP_ENDS_ARE_DRAWS_THAT_DO_NOT_REMEMBER_EACH_OTHER.md)).
 - **Open, by measurement.**
   - Section to section the line is at rest. Sections' deposits agree at a cosine of 0.08; the
     places the field already gives (0.07 to 0.09 of the places) push one common covector, about half
@@ -90,7 +95,11 @@ repository was reset on September 24; the pre-reset tree is
     lengthen along themselves 1.5 to 2 percent a lap, at a seventh to a quarter of the first lane's
     size, and the added contacts' columns 1.2 percent, while the first lane's parts move under 0.15
     percent (`tools/state_travel.py scale`, laps 9 to 12 of the part-rate line). The held joint
-    falls 0.0002 to 0.0006 a lap there.
+    falls 0.0008 a lap there, read at the means of laps 12 and 13.
+  - The rate rule is at rest at the old rate. Between lap ends a part's lap cosine carries both
+    ends' draws and reads under one half for every part, so the rule walked each part down; what
+    the cosine reads between lap means is fixed as a guess and unread (G69), with a second raised
+    lap beside a second lap at the old rate (G68).
   - The added contacts travel each its own direction: over the growth laps their common travel
     fills 16 to 20 of the 21 directions that independent contacts fill, in the columns and in both
     rows (`tools/state_travel.py rank`; atlas `tower.contact-travel-rank`). So no founding from the
@@ -98,12 +107,18 @@ repository was reset on September 24; the pre-reset tree is
     ([the travel record](research/records/2026-11-11_THE_ADDED_CONTACTS_TRAVEL_EACH_ITS_OWN_DIRECTION_SO_NO_FOUNDING_IS_BUILT_THEY_TOOK_THEIR_CHARGE_IN_FOUR_PART_RATE_LAPS_AND_A_GUESSES_PREMISE_IS_READ_FROM_THE_LOGS_FIRST.md)).
   - The field lacks 0.233 nats a place of the joint law of two letters each side and passes little
     past two written letters (0.57, 0.46, 0.17 and 0.03 nats for the first four); growth from 32 to
-    64 contacts gained 0.013 in four laps
-    ([the chain record](research/records/2026-11-10_A_CHAIN_OF_JOINTS_IS_THE_CHART_OF_FRICTION_A_REGISTERS_WIDTH_EXISTS_ONLY_GIVEN_THE_NEARER_ONES_AND_THE_LETTERS_LAW_IS_PRICED_IN_CELLS.md),
+    64 contacts gained 0.013 in four laps. The carry's four laps left the third and fourth letters
+    at 0.175 and 0.030: its gate, founded at zero, opened to a mean of 0.24 while the pull on it
+    halved lap over lap, and a letter `d` sites back enters the scan at the product of `d − 1`
+    gates. The carry as built gives a term of three sites; its founding is the next loop's subject
+    for that law ([the heat record](research/records/2026-11-11_A_DEPOSITS_RATE_IS_A_TEMPERATURE_ITS_STANDING_SPREAD_IS_SHED_BY_A_MEAN_OF_STATES_AND_LAP_ENDS_ARE_DRAWS_THAT_DO_NOT_REMEMBER_EACH_OTHER.md) §5.6;
+    [the chain record](research/records/2026-11-10_A_CHAIN_OF_JOINTS_IS_THE_CHART_OF_FRICTION_A_REGISTERS_WIDTH_EXISTS_ONLY_GIVEN_THE_NEARER_ONES_AND_THE_LETTERS_LAW_IS_PRICED_IN_CELLS.md),
     [the growth record](research/records/2026-11-10_GROWTH_IN_CONTACTS_BINDS_WEAKLY_THE_LANE_FIELD_WITH_64_CONTACTS_GAINS_0.013_IN_FOUR_LAPS.md)).
   - The release rests above the references: on the scan's first lap its stages code 1.98, 1.34 and
     0.82 nats a place at the locks, at rest and after the re-draw, inside or just above the rate
-    line's range. No write is yet ordered text.
+    line's range, and on its fourth 1.74, 1.16 and 0.71, where the reference's own state codes
+    0.44. These are reads of lap ends; the release read from a lap's mean is fixed as a guess and
+    unread (G70). No write is yet ordered text.
   - A return is cut into about four batches because the share store reserves a region's square; the
     row stride by region (atlas `tower.field-support-stride`) is ordered and unbuilt.
   - #404's boxes (online learning of real text, retention, a question answered from the retained

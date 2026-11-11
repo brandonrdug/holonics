@@ -1,0 +1,146 @@
+# The scan line (gc1 to gc4, four laps from rt4 with the carry's chart): its parts lines, its part-rate updates, the gate's sizes by circle,
+# its transmission by written letter, its lap times, gc4's release reads, and one held read of gc4's state by the lap-mean build.
+# From the scan line's logs and states (2026-11-11T12:49Z and 12:53Z; host, with one card read of 10.0 s; nothing trained). Numbers only.
+
+== parts lines (the count of contacts before, then sixteen octaves in PART_NAMES order; g_chart last)
+gc1 from gc0.state  parts 32 1 1 1 3 3 3 0 1 0 1 0 0 3 0 0 0 | end STATE.0 the same
+gc2 from gc1.next   parts 32 0 0 0 2 2 2 0 0 0 0 0 0 4 0 0 0 | end the same
+gc3 from gc2.next   parts 32 0 0 0 1 1 1 0 0 0 0 0 0 3 0 0 1 | end the same
+gc4 from gc3.next   parts 32 0 0 0 0 0 0 0 0 0 0 0 0 4 0 0 2 | end the same
+g_chart's octave by lap: gc1 0, gc2 0, gc3 1, gc4 2. Its cosine in the update after each lap: gc1 0.000000 (hold), gc2 0.611200 (0 to 1),
+gc3 0.535491 (1 to 2), gc4 0.340561 (2 to 1).
+
+== part-rate updates (gcN.rates.log)
+== after gc1
+FIELD_PART_RATE part=w_new entries=2048 c=-0.041111 rate_octaves=0 was=1 move=slower rate_bits=12
+FIELD_PART_RATE part=a_new entries=2080 c=0.052929 rate_octaves=0 was=1 move=slower rate_bits=12
+FIELD_PART_RATE part=b_new entries=2080 c=0.035500 rate_octaves=0 was=1 move=slower rate_bits=12
+FIELD_PART_RATE part=enc_lane entries=3232 c=0.171438 rate_octaves=2 was=3 move=slower rate_bits=10
+FIELD_PART_RATE part=before_lane entries=3232 c=0.195281 rate_octaves=2 was=3 move=slower rate_bits=10
+FIELD_PART_RATE part=after_lane entries=3232 c=0.166131 rate_octaves=2 was=3 move=slower rate_bits=10
+FIELD_PART_RATE part=q_lane entries=2048 c=0.305086 rate_octaves=0 was=0 move=hold rate_bits=12
+FIELD_PART_RATE part=v_lane entries=2048 c=0.493937 rate_octaves=0 was=1 move=slower rate_bits=12
+FIELD_PART_RATE part=probe_lane entries=2048 c=0.386135 rate_octaves=0 was=0 move=hold rate_bits=12
+FIELD_PART_RATE part=out_lane entries=2048 c=0.455856 rate_octaves=0 was=1 move=slower rate_bits=12
+FIELD_PART_RATE part=moment_face_lane entries=2048 c=0.335027 rate_octaves=0 was=0 move=hold rate_bits=12
+FIELD_PART_RATE part=read_lane entries=3072 c=0.208836 rate_octaves=0 was=0 move=hold rate_bits=12
+FIELD_PART_RATE part=face_biases_lane entries=128 c=0.633282 rate_octaves=4 was=3 move=faster rate_bits=8
+FIELD_PART_RATE part=a_lane entries=1024 c=-0.045187 rate_octaves=0 was=0 move=hold rate_bits=12
+FIELD_PART_RATE part=b_lane entries=1024 c=0.056064 rate_octaves=0 was=0 move=hold rate_bits=12
+FIELD_PART_RATE part=g_chart entries=4096 c=0.000000 rate_octaves=0 was=0 move=hold rate_bits=12
+== after gc2
+FIELD_PART_RATE part=w_new entries=2048 c=0.045975 rate_octaves=0 was=0 move=hold rate_bits=12
+FIELD_PART_RATE part=a_new entries=2080 c=0.122959 rate_octaves=0 was=0 move=hold rate_bits=12
+FIELD_PART_RATE part=b_new entries=2080 c=0.208703 rate_octaves=0 was=0 move=hold rate_bits=12
+FIELD_PART_RATE part=enc_lane entries=3232 c=0.214712 rate_octaves=1 was=2 move=slower rate_bits=11
+FIELD_PART_RATE part=before_lane entries=3232 c=0.274396 rate_octaves=1 was=2 move=slower rate_bits=11
+FIELD_PART_RATE part=after_lane entries=3232 c=0.270896 rate_octaves=1 was=2 move=slower rate_bits=11
+FIELD_PART_RATE part=q_lane entries=2048 c=0.288807 rate_octaves=0 was=0 move=hold rate_bits=12
+FIELD_PART_RATE part=v_lane entries=2048 c=0.384538 rate_octaves=0 was=0 move=hold rate_bits=12
+FIELD_PART_RATE part=probe_lane entries=2048 c=0.404547 rate_octaves=0 was=0 move=hold rate_bits=12
+FIELD_PART_RATE part=out_lane entries=2048 c=0.320189 rate_octaves=0 was=0 move=hold rate_bits=12
+FIELD_PART_RATE part=moment_face_lane entries=2048 c=0.314362 rate_octaves=0 was=0 move=hold rate_bits=12
+FIELD_PART_RATE part=read_lane entries=3072 c=0.187365 rate_octaves=0 was=0 move=hold rate_bits=12
+FIELD_PART_RATE part=face_biases_lane entries=128 c=0.474056 rate_octaves=3 was=4 move=slower rate_bits=9
+FIELD_PART_RATE part=a_lane entries=1024 c=-0.044196 rate_octaves=0 was=0 move=hold rate_bits=12
+FIELD_PART_RATE part=b_lane entries=1024 c=0.268962 rate_octaves=0 was=0 move=hold rate_bits=12
+FIELD_PART_RATE part=g_chart entries=4096 c=0.611200 rate_octaves=1 was=0 move=faster rate_bits=11
+== after gc3
+FIELD_PART_RATE part=w_new entries=2048 c=0.183762 rate_octaves=0 was=0 move=hold rate_bits=12
+FIELD_PART_RATE part=a_new entries=2080 c=0.256617 rate_octaves=0 was=0 move=hold rate_bits=12
+FIELD_PART_RATE part=b_new entries=2080 c=0.347361 rate_octaves=0 was=0 move=hold rate_bits=12
+FIELD_PART_RATE part=enc_lane entries=3232 c=0.263921 rate_octaves=0 was=1 move=slower rate_bits=12
+FIELD_PART_RATE part=before_lane entries=3232 c=0.353789 rate_octaves=0 was=1 move=slower rate_bits=12
+FIELD_PART_RATE part=after_lane entries=3232 c=0.304157 rate_octaves=0 was=1 move=slower rate_bits=12
+FIELD_PART_RATE part=q_lane entries=2048 c=0.258451 rate_octaves=0 was=0 move=hold rate_bits=12
+FIELD_PART_RATE part=v_lane entries=2048 c=0.441720 rate_octaves=0 was=0 move=hold rate_bits=12
+FIELD_PART_RATE part=probe_lane entries=2048 c=0.404139 rate_octaves=0 was=0 move=hold rate_bits=12
+FIELD_PART_RATE part=out_lane entries=2048 c=0.385092 rate_octaves=0 was=0 move=hold rate_bits=12
+FIELD_PART_RATE part=moment_face_lane entries=2048 c=0.320624 rate_octaves=0 was=0 move=hold rate_bits=12
+FIELD_PART_RATE part=read_lane entries=3072 c=0.140723 rate_octaves=0 was=0 move=hold rate_bits=12
+FIELD_PART_RATE part=face_biases_lane entries=128 c=0.524949 rate_octaves=4 was=3 move=faster rate_bits=8
+FIELD_PART_RATE part=a_lane entries=1024 c=-0.082058 rate_octaves=0 was=0 move=hold rate_bits=12
+FIELD_PART_RATE part=b_lane entries=1024 c=0.204086 rate_octaves=0 was=0 move=hold rate_bits=12
+FIELD_PART_RATE part=g_chart entries=4096 c=0.535491 rate_octaves=2 was=1 move=faster rate_bits=10
+== after gc4
+FIELD_PART_RATE part=w_new entries=2048 c=0.123657 rate_octaves=0 was=0 move=hold rate_bits=12
+FIELD_PART_RATE part=a_new entries=2080 c=0.254752 rate_octaves=0 was=0 move=hold rate_bits=12
+FIELD_PART_RATE part=b_new entries=2080 c=0.336065 rate_octaves=0 was=0 move=hold rate_bits=12
+FIELD_PART_RATE part=enc_lane entries=3232 c=0.338185 rate_octaves=0 was=0 move=hold rate_bits=12
+FIELD_PART_RATE part=before_lane entries=3232 c=0.424238 rate_octaves=0 was=0 move=hold rate_bits=12
+FIELD_PART_RATE part=after_lane entries=3232 c=0.345484 rate_octaves=0 was=0 move=hold rate_bits=12
+FIELD_PART_RATE part=q_lane entries=2048 c=0.265335 rate_octaves=0 was=0 move=hold rate_bits=12
+FIELD_PART_RATE part=v_lane entries=2048 c=0.391267 rate_octaves=0 was=0 move=hold rate_bits=12
+FIELD_PART_RATE part=probe_lane entries=2048 c=0.423229 rate_octaves=0 was=0 move=hold rate_bits=12
+FIELD_PART_RATE part=out_lane entries=2048 c=0.346297 rate_octaves=0 was=0 move=hold rate_bits=12
+FIELD_PART_RATE part=moment_face_lane entries=2048 c=0.253675 rate_octaves=0 was=0 move=hold rate_bits=12
+FIELD_PART_RATE part=read_lane entries=3072 c=0.107891 rate_octaves=0 was=0 move=hold rate_bits=12
+FIELD_PART_RATE part=face_biases_lane entries=128 c=0.468144 rate_octaves=3 was=4 move=slower rate_bits=9
+FIELD_PART_RATE part=a_lane entries=1024 c=-0.108712 rate_octaves=0 was=0 move=hold rate_bits=12
+FIELD_PART_RATE part=b_lane entries=1024 c=0.164597 rate_octaves=0 was=0 move=hold rate_bits=12
+FIELD_PART_RATE part=g_chart entries=4096 c=0.340561 rate_octaves=1 was=2 move=slower rate_bits=11
+
+== the gate (the gamma read: 32 problems, 32 regions, 32 circles; it prints two kinds of site, question (10132 sites) and open (2211), and
+== no class of word letters or separators; the 32 circle-means of every tick and kind are in GAMMA.tsv)
+mean |gamma| over circles:
+gc1 tick1 question 0.109570 open 0.103937 | tick4 question 0.110985 open 0.110111
+gc2 tick1 question 0.138451 open 0.129755 | tick4 question 0.152502 open 0.150679
+gc3 tick1 question 0.173544 open 0.164799 | tick4 question 0.193709 open 0.192233
+gc4 tick1 question 0.211501 open 0.203610 | tick4 question 0.237757 open 0.236449
+tick 4, the 32 circle-means, circles 0 to 31:
+gc1 question max 0.204975 (circle 20); at 0.2 or more: 1; at 0.5 or more: 0
+  0.0833 0.0810 0.0702 0.0696 0.0728 0.0885 0.0720 0.0552 0.0751 0.0623 0.0831 0.0666 0.0554 0.0487 0.0934 0.0582 0.1424 0.1287 0.1729 0.1843 0.2050 0.1566 0.1465 0.1483 0.1285 0.1413 0.1806 0.1284 0.1135 0.1525 0.1825 0.1041
+gc1 open max 0.210981 (20); at 0.2 or more: 1; at 0.5 or more: 0
+  0.0885 0.0856 0.0693 0.0641 0.0701 0.0931 0.0688 0.0565 0.0687 0.0575 0.0855 0.0639 0.0564 0.0567 0.0837 0.0566 0.1342 0.1388 0.1515 0.1739 0.2110 0.1423 0.1584 0.1429 0.1217 0.1363 0.1841 0.1445 0.1145 0.1464 0.1879 0.1099
+gc2 question max 0.286338 (20); at 0.2 or more: 10; at 0.5 or more: 0
+  0.1243 0.1082 0.0844 0.0908 0.1001 0.1162 0.1050 0.0946 0.0986 0.0884 0.1147 0.1011 0.0749 0.0695 0.1151 0.0685 0.1949 0.1982 0.2305 0.2274 0.2863 0.2105 0.2149 0.2049 0.1712 0.2040 0.2270 0.1668 0.1693 0.2028 0.2629 0.1542
+gc2 open max 0.297554 (20); at 0.2 or more: 7; at 0.5 or more: 0
+  0.1303 0.1078 0.0862 0.0819 0.0990 0.1172 0.0982 0.0941 0.0932 0.0868 0.1181 0.0963 0.0748 0.0787 0.1086 0.0684 0.1894 0.1921 0.2094 0.2098 0.2976 0.1923 0.2198 0.2000 0.1674 0.1991 0.2245 0.1881 0.1619 0.1966 0.2757 0.1585
+gc3 question max 0.354815 (20); at 0.2 or more: 15; at 0.5 or more: 0
+  0.1551 0.1365 0.1046 0.1171 0.1196 0.1429 0.1380 0.1346 0.1270 0.1144 0.1382 0.1272 0.1051 0.0970 0.1424 0.0841 0.2456 0.2398 0.2982 0.2867 0.3548 0.2723 0.2513 0.2487 0.2243 0.2684 0.3018 0.1922 0.2327 0.2570 0.3348 0.2064
+gc3 open max 0.362035 (20); at 0.2 or more: 16; at 0.5 or more: 0
+  0.1605 0.1408 0.1047 0.1120 0.1239 0.1485 0.1226 0.1377 0.1128 0.1146 0.1492 0.1163 0.1028 0.1042 0.1429 0.0842 0.2399 0.2395 0.2720 0.2764 0.3620 0.2545 0.2734 0.2359 0.2185 0.2620 0.2976 0.2145 0.2267 0.2542 0.3429 0.2037
+gc4 question max 0.425461 (20); at 0.2 or more: 16; at 0.5 or more: 0
+  0.1788 0.1553 0.1222 0.1412 0.1400 0.1626 0.1560 0.1813 0.1520 0.1528 0.1765 0.1596 0.1355 0.1212 0.1662 0.1134 0.2911 0.2918 0.3444 0.3711 0.4255 0.3042 0.3233 0.3052 0.2776 0.3367 0.3533 0.2798 0.2868 0.3147 0.4137 0.2743
+gc4 open max 0.452785 (20); at 0.2 or more: 16; at 0.5 or more: 0
+  0.1810 0.1464 0.1147 0.1240 0.1478 0.1754 0.1494 0.1990 0.1321 0.1592 0.1837 0.1462 0.1346 0.1247 0.1664 0.1107 0.2759 0.2904 0.3295 0.3644 0.4528 0.2920 0.3397 0.2767 0.2772 0.3234 0.3650 0.3040 0.2743 0.3089 0.4238 0.2731
+
+== transmission by written letter (FIELD_TRANSMISSION code_nats_a_place)
+mode l r places out | gc1 gc2 gc3 gc4
+open-left 0 0 8760 0 | 3.216192 3.210155 3.206378 3.211668
+open-left 1 0 8728 32 | 2.647750 2.648847 2.640643 2.647977
+open-left 2 0 8696 64 | 2.190146 2.192410 2.181621 2.187092
+open-left 3 0 8664 96 | 2.018496 2.017462 2.009298 2.012296
+open-left 4 0 8632 128 | 1.986252 1.989627 1.978958 1.982755
+open-left 8 0 8504 256 | 1.947926 1.946714 1.941368 1.942278
+open-both 1 1 8696 64 | 1.877844 1.888792 1.880002 1.892164
+open-both 2 2 8632 128 | 1.222709 1.226799 1.226038 1.226963
+open-both 3 3 8568 192 | 1.065411 1.060210 1.064110 1.061632
+open-both 4 4 8504 256 | 1.022215 1.015763 1.019051 1.014651
+open-split 3 1 8632 128 | 1.371539 1.379381 1.368012 1.372086
+open-split 1 3 8632 128 | 1.425048 1.415348 1.421850 1.430413
+open-split 2 1 8664 96 | 1.489470 1.502959 1.490589 1.493170
+open-split 1 2 8664 96 | 1.525761 1.525213 1.526668 1.534193
+The "text" rows the transmission script prints beside these are constants written into the script, the same for every lap, not read by the
+binary: left d=0..4 3.481 2.710 1.898 1.423 1.224; (d-1 minus d) 0.71 0.73 0.51 0.23; both d=1..4 1.564 0.569 0.419 0.397; splits 0.690
+0.714 0.923 0.938.
+
+== lap times (every gc lap on the scan build; the lock taken and the log's last write, UTC)
+gc1 05:48:43 to 06:13:19 ms 1,450,361 (wall 1476.1 s)
+gc2 07:49:28 to 08:11:38 ms 1,305,344 (wall 1329.4 s)
+gc3 09:53:46 to 10:17:29 ms 1,398,361 (wall 1422.9 s)
+gc4 11:09:30 to 11:33:21 ms 1,406,335 (wall 1431.5 s)
+
+== gc4's release reads (lap line 12:49:24 UTC)
+LAP gc4 joint=1.744382 locks=1.742811/0.975607 v2=0.186187 rest=1.158985/0.860713 v2=0.108219 redraw=0.710446/0.721784 neutral=22 rested=10 redraw_v2=0.048630
+REFREAD gc4 problems=128 places=43342 code=0.515443 entropy=0.476277 root_share=1.118571 v1=0.066009 v2=0.043952
+FIELD_SETTLE_DONE problems=32 at_rest=32 h_millinats=1000 passes_bound=1000 kept=749 undone=1280 letters=8760 code_keyed_nats_a_place=1.742811 code_end_nats_a_place=1.158985 fall_nats=5114.314941 keyed_ms=27836 ms=351714
+FIELD_REDRAW_DONE problems=32 neutral=22 rested=10 h_millinats=1000 passes_bound=1000 kept=815 undone=903 letters=8760 code_start_nats_a_place=1.158985 code_end_nats_a_place=0.710446 entropy_end_nats_a_place=0.721784 root_end_nats=526.153108 ms=148341
+FIELD_CHARGE_STATE state=rest problems=32 letters=8760 cut_to_room=0 code_nats=10152.714272 entropy_nats=7539.848578 code_nats_a_place=1.158985 entropy_nats_a_place=0.860713 excess_nats=2612.865694 root_nats=760.017290 root_share_of_excess=0.290874 v_over_1_share=0.163127 v_over_2_share=0.108219
+FIELD_CHARGE_STATE state=keyed problems=32 letters=8760 cut_to_room=0 code_nats=15267.029213 entropy_nats=8546.317215 code_nats_a_place=1.742811 entropy_nats_a_place=0.975607 excess_nats=6720.711998 root_nats=797.569005 root_share_of_excess=0.118672 v_over_1_share=0.251712 v_over_2_share=0.186187
+FIELD_CHARGE_STATE state=reference problems=32 letters=8760 cut_to_room=0 code_nats=3884.448962 entropy_nats=3650.523752 code_nats_a_place=0.443430 entropy_nats_a_place=0.416726 excess_nats=233.925210 root_nats=437.949290 root_share_of_excess=1.872176 v_over_1_share=0.055022 v_over_2_share=0.037899
+
+== one held read of gc4's end state by the lap-mean build (the scan line's arguments, lap count 0, 10.0 s): it prints gc4's lap-end lines
+FIELD_HELD lap=-1 answer=5.595934 classes=43470 context=0.940720 context_classes=43470 foil=1.111751 question=0.171031 ms=3675
+FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.744382 foil_nats_a_place=1.879345 information_nats_a_place=0.134964 own_nats_a_word=13.107739 information_nats_a_word=1.014152
+FIELD_UNSEEN lap=-1 code=0.875 sites=43660 next=- ms=9500

@@ -1,0 +1,16 @@
+# The lap that reproduces the rate line's lap 12 with the build that writes the lap's mean (run mean-gate12, the card,
+# 2026-11-11 11:48:24Z to 12:03:17Z; lap 872,189 ms). The compare's output on the PC: mean_gate_compare.out, sha256
+# 27c5a66271d67844...; the run's own output mean-gate12.out, sha256 05362ec5beb4fc96....
+GATE_SECTIONS equal=1535 of 1535 (new lap printed 1535)
+GATE_STATE rt12 ed3a4ad5c50d3c6f new 9a67a278b1237277 bytes_equal=False
+GATE_PARTS rt12: parts 32 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+GATE_PARTS new:  parts 32 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+GATE_STATE_VERDICT other_lines_differing=none parts_equal_by_named_octaves=True equal=True
+# The lap's lines of the new run:
+FIELD_JOINT_NATS lap=0 ... own_nats_a_place=1.741950 foil_nats_a_place=1.874073 information_nats_a_place=0.132123 own_nats_a_word=13.089469 information_nats_a_word=0.992808
+FIELD_LAP read=63 sites=16554952 before=3.229 ... deposited=1535/1535
+FIELD_MEAN lap=0 states=1535 entries=63606 moved=61460 square=98777612556136
+# MEAN.0: sha256 bd1d75d0ab81adbd..., 2,584,117 bytes.
+# The pair's opening states: wm13.from written by tools/part_rates.py open from rt12.next; its parts line
+#   parts 32 0 0 0 0 0 0 2 4 2 2 2 0 0 0 0 0
+# and its six other lines byte-equal to rt12.next's (sha256 ed3a4ad5..., byte-equal to rt12/STATE.0).

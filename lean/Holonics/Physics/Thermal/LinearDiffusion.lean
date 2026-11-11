@@ -63,8 +63,10 @@ invertible symmetric `G`.
 second has no turn and is reversible.
 
 This is the linear-diffusion face of `ChainAxes`: there a stationary arrow lives on a ring's cycle
-current, here on the turn. Rust owner: none. No machinery consumes a continuous diffusion; this is
-a physical instance stated for the thermal law.
+current, here on the turn. Rust owner: none for the continuous diffusion; no machinery consumes
+one. Items 8 and 9 are read on the field's deposit, a stepped descent whose first order in the step
+is this diffusion (atlas `deposition.rate-temperature-standing-spread`); the reading that sheds the
+standing spread is `holonics::hnn::tower::field::MaterialMean`.
 -/
 
 namespace Holonics.Physics.Thermal.LinearDiffusion

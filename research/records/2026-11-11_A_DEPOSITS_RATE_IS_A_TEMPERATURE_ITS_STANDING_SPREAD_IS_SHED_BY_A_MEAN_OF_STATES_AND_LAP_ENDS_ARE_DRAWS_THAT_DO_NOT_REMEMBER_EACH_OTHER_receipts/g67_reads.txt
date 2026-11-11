@@ -1,0 +1,16 @@
+# G67: held reads on the PC, the card, 2026-11-11 (reported 12:45Z), a lap count of 0, each under its own hold of the lock.
+# Ruler states (tools/state_travel.py mean):
+#   m78 (head rt8; rt7 rt8): STATE_MEAN states=2 entries=63606 moved=61443 rms_from_head=35874   the rate line's binary
+#   g34 (head gc4; gc3 gc4): STATE_MEAN states=2 entries=67702 moved=65536 rms_from_head=51230   the scan line's binary
+m78 (run 11.9 s, lock wait 844 s)
+FIELD_HELD lap=-1 answer=5.590075 classes=43470 context=0.944021 context_classes=43470 foil=1.116278 question=0.172257 ms=4329
+FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.744201 foil_nats_a_place=1.876778 information_nats_a_place=0.132577 own_nats_a_word=13.106378 information_nats_a_word=0.996220
+FIELD_UNSEEN lap=-1 code=0.877 sites=43660 next=- ms=11485
+g34 (run 13.7 s, lock wait 877 s)
+FIELD_HELD lap=-1 answer=5.568747 classes=43470 context=0.929735 context_classes=43470 foil=1.097599 question=0.167864 ms=4844
+FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.737390 foil_nats_a_place=1.869852 information_nats_a_place=0.132462 own_nats_a_word=13.055205 information_nats_a_word=0.995351
+FIELD_UNSEEN lap=-1 code=0.864 sites=43660 next=- ms=13251
+control: the scan line's fourth state, gc4/STATE.0 (run 13.7 s, lock wait 148 s); it prints its lap line
+FIELD_HELD lap=-1 answer=5.595934 classes=43470 context=0.940720 context_classes=43470 foil=1.111751 question=0.171031 ms=4848
+FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.744382 foil_nats_a_place=1.879345 information_nats_a_place=0.134964 own_nats_a_word=13.107739 information_nats_a_word=1.014152
+FIELD_UNSEEN lap=-1 code=0.875 sites=43660 next=- ms=13229
