@@ -1,0 +1,79 @@
+# The carry circles' gates, 2026-11-11 UTC, on the PC (24 hardware threads; the card an RTX 4080 SUPER under HOLONICS_ROOT/.local/gpu.lock), the
+# build of claude/turn-carry a1ac313c9 (its working tree for gates 1 and 2, the commit itself for the suite and the release binary).
+# Projection (agent-inferred): gate 1 600 s (deadline 1,200 s), measured 211.5 s; the field's tests 300 s (deadline 900 s), measured 139.8 s; the
+# suite's run 400 s (the largest measured before, 364.7 s; deadline 1,800 s), measured 376.1 s, its test build 44.4 s outside the lock; the
+# release build 64.6 s, rebuilt from the commit in 50.5 s. Peak resident sets on the METER lines. Every gate passed.
+## gate 1 (bash tools/gate.sh) on the build's tree, 18:05:26 to 18:08:57 UTC
+gate check: ok (828 ms)
+gate guard-lints: ok (38978 ms)
+gate guard-doctests: ok (44402 ms)
+gate diagnostic-timing-controls: ok (51280 ms)
+gate diagnostic-supervisor-controls: ok (1562 ms)
+gate diagnostic-receipt-controls: ok (247 ms)
+gate trunk-census-controls: ok (6350 ms)
+gate travel-rank-controls: ok (241 ms)
+gate part-rate-controls: ok (50 ms)
+gate listener-continuation-controls: ok (54475 ms)
+gate projected-statistics-controls: ok (10248 ms)
+gate native-class-advance-controls: ok (113 ms)
+gate native-gram-carry-conservation: ok (52 ms)
+gate finite-solenoidal-controls: ok (64 ms)
+gate rational-place-controls: ok (48 ms)
+gate plural-coupling-controls: ok (235 ms)
+gate grouped-tube-controls: ok (119 ms)
+gate observed-tube-controls: ok (900 ms)
+gate source-refinement-controls: ok (51 ms)
+gate actual-source-alignment: ok (51 ms)
+gate actual-ray-joint-controls: ok (59 ms)
+gate actual-factor-refusal: ok (54 ms)
+gate refined-source-native-restore: ok (105 ms)
+gate solenoidal-listener-controls: ok (69 ms)
+gate offline-coupling-controls: ok (879 ms)
+METER gate rc=0 started=18:05:26Z ended=18:08:57Z wall_s=211.5 user_s=513.6 sys_s=39.5 peak_rss_kib=3435468
+## gate 2: the field's tests (cargo test -p holonics --lib hnn::tower::field), 18:08:57 to 18:11:17 UTC
+test hnn::tower::field::tests::a_growth_by_carry_circles_keeps_every_face_and_returns_through_its_circles ... ok
+test hnn::tower::field::tests::founded_parts_and_their_cosines_on_saved_states ... ignored
+test hnn::tower::field::tests::the_carry_circles_are_even_among_the_contacts_and_the_zero_friction_carry_is_retired ... ok
+test hnn::tower::field::tests::the_carry_circles_are_founded_parts_of_their_own ... ok
+test hnn::tower::field::tests::the_carry_gate_keeps_its_circle_and_its_friction ... ok
+test hnn::tower::field::tests::the_carry_circles_scan_is_the_law_site_by_site ... ok
+test hnn::tower::field::tests::the_carry_circles_covector_matches_its_codes_difference ... ok
+test result: ok. 91 passed; 0 failed; 1 ignored; 0 measured; 2004 filtered out; finished in 139.75s
+METER field_tests rc=0 started=18:08:57Z ended=18:11:17Z wall_s=139.8 user_s=292.4 sys_s=1.2 peak_rss_kib=95236
+## the tools' controls (tools/test_part_rates.py, tools/test_state_travel.py), 18:11:17 UTC
+part_rates update: the planted moves and the written state hold
+part_rates means: the same three write what update writes; another state keeps its material and moves its own octaves
+part_rates means: a steady travel under a reversing draw reads at rest between lap ends and steady between lap means
+part_rates means: a state of another declaration and a standing file are refused
+part_rates base: the rate word alone moves; a rate under a part's octave, no bits and a standing file are refused
+part_rates carry: the circles' four parts, nineteen written, sixteen read at octave 0, the retired head refused
+part_rates: 6 lines, the controls hold
+METER tools rc=0 started=18:11:17Z ended=18:11:17Z wall_s=0.1 user_s=0.0 sys_s=0.0 peak_rss_kib=15816
+state_travel rank: 36 lines, three controls hold
+state_travel scale: 154 lines, three controls hold
+state_travel weighed: 153 lines, three controls hold
+state_travel lag: 50 lines, the control holds
+state_travel mean: 3 lines, the controls hold
+state_travel graft: 3 lines, the controls hold
+state_travel graft by part: 45 lines, the controls hold
+METER tools2 rc=0 started=18:11:17Z ended=18:11:18Z wall_s=0.2 user_s=0.1 sys_s=0.0 peak_rss_kib=41192
+## gate 3: the GPU suite alone on the idle card (flock HOLONICS_ROOT/.local/gpu.lock cargo test -p holonics-cuda -- --include-ignored --test-threads=1), lock taken 18:29:15, released 18:35:32 UTC
+     Running unittests src/lib.rs (target/debug/deps/holonics_cuda-f55523d22218cfe3)
+test result: ok. 83 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 328.66s
+     Running unittests src/bin/mount-smoke.rs (target/debug/deps/mount_smoke-e923a193152a835d)
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+     Running tests/located_ingest.rs (target/debug/deps/located_ingest-ee541de26585fe05)
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.14s
+     Running tests/number_parity.rs (target/debug/deps/number_parity-608d1b9cbb9b0185)
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.41s
+     Running tests/occurrence_placement.rs (target/debug/deps/occurrence_placement-b4edb23732a4067c)
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.34s
+     Running tests/tower_pass.rs (target/debug/deps/tower_pass-9ce6cafff9aa1ff2)
+test result: ok. 46 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 32.13s
+     Running tests/v92_retained_stream.rs (target/debug/deps/v92_retained_stream-fab636b457783921)
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 5.14s
+   Doc-tests holonics_cuda
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+METER suite rc=0 started=18:29:15Z ended=18:35:32Z wall_s=376.1 user_s=906.9 sys_s=59.7 peak_rss_kib=1768816
+## the release binary the card runs use
+a1ac313c9 9076e97cafe3f0a260f3d89662e2b40f14adc811fc2fb650bb195930656e0c9a (cargo build --release -p holonics-cuda --example field_pass), staged as HOLONICS_ROOT/.local/wt/turn-carry/.local/run/bin-turn-carry/field_pass

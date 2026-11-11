@@ -1,0 +1,14 @@
+# The carry circles' host laws and adjoint, 2026-11-11 18:08:57 to 18:11:17 UTC, on the PC's host (the field's tests at a1ac313c9's tree; no card).
+# the_carry_circles_covector_matches_its_codes_difference: on three drawn fields with two carry circles (four complex contacts, one circle each
+# side; ticks two), the circles' charts, biases and W columns off zero, each family's three largest covector entries against the code's central
+# difference at the probe law's step and tolerance; the friction's max(0, h) is a seam like a class sheet (a probe that moves an h across zero
+# is halved off it). read = probes read, on_a_seam = probes with no step off every seam, charts and biases = probes of the circles' charts and
+# biases, h_below and h_above = the fixtures' (site, tick, circle) leak reads below and above zero. The gate's sweep, the declaration, the
+# growth, the scan's law and the parts are the other tests named below. Projection 300 s, deadline 900 s, measured 139.8 s (the whole module).
+test hnn::tower::field::tests::a_growth_by_carry_circles_keeps_every_face_and_returns_through_its_circles ... ok
+test hnn::tower::field::tests::the_carry_circles_are_even_among_the_contacts_and_the_zero_friction_carry_is_retired ... ok
+test hnn::tower::field::tests::the_carry_circles_are_founded_parts_of_their_own ... ok
+test hnn::tower::field::tests::the_carry_gate_keeps_its_circle_and_its_friction ... ok
+test hnn::tower::field::tests::the_carry_circles_scan_is_the_law_site_by_site ... ok
+CARRY_COVECTOR_PROBES read=230 on_a_seam=0 charts=9 biases=8 h_below=60 h_above=24
+test hnn::tower::field::tests::the_carry_circles_covector_matches_its_codes_difference ... ok
