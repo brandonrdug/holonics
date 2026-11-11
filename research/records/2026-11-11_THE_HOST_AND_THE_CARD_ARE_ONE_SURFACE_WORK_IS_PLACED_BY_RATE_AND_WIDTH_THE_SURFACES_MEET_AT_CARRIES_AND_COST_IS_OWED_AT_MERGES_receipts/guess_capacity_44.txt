@@ -1,0 +1,22 @@
+Read 2026-11-11T04:14Z from design's v14 kernels (field.cu), for the wide-row step: on a paced head whose pace is not plain, skin_ij calls
+ skin_dev, which runs div_nearest(2 pi |s|, (n ln2) << 24) with s = sigma_i - sigma_j, a 128-bit software division (the file's own note: "a long
+ software routine on the card"), then the exponential's face. It is called anew at every use: a pair of a paced head and tick pays 8 in the
+ exposure, 16 in the contact's numerators (a lane an entry; a mode's two entries repeat it), 8 + 16 in the rows' return, 16 or more in the
+ columns', 8 in pace_skin_back; the paced moments call it through paced_between. Nine entries that hold 0.66 of training kernel time read it.
+ [derived; checked on 1.27e6 integer pairs, ties included, skin_address.py] with 2 pi sigma_x = q_x k + r_x (0 <= r_x < k) once a site, and
+ sigma_i >= sigma_j: Q = q_i - q_j, R = r_i - r_j; R < 0: Q -= 1, R += k; bits = Q + (R + k/2 >= k). The same integer as div_nearest.
+G44 FIXED 2026-11-11T04:14Z (unread; STEP S alone: the skin's exponent from site addresses; the same profiled 300 training sections from rt9):
+ a) the nine entries that read paced skins (contact_columns, contact_rows, contact_l5 and l6, exposure, pace_skin_back, moment_skinned_all,
+    moment_paced_all, moment_pace_back_all, moment_return_paced_all) fall together by 0.38 of their kernel time (0.20 to 0.60);
+ b) kernel time a section falls by 0.25 (0.12 to 0.40; now 0.524 s);
+ c) forward contact (exposure + limb rows) 0.80 ns a pair met (0.55 to 1.05; now 1.30); the re-draw read's 1.0 (0.7 to 1.4; now 1.77).
+ Rule: a under 0.10: the division was not the cost; the limbs and the gathers are, and the next reads are the mean grid by entry and the contact
+ split by pass. a at 0.20 or more: a pair's deep chain was the wide word; next in the vein, the eight skins once a pair (after A) and the face read.
+ Basis, stated as an estimate: instruction counts read from source and unmeasured (a paced skin about 250 a call against about 80 for the rest of
+ a term and entry); the exposure-to-contact time ratio (0.40 to 0.84 ns a pair) does not discriminate (non-skin work alone could give 2).
+G42c restated 2026-11-11T04:14Z, before any read: A removes 190 s a lap (110 to 270), so the clause holds whether S or A lands first.
+Note 2026-11-11T04:20Z, two corrections to the 04:14Z read, neither touching G44's numbers: the columns' return runs the skin 32 times a pair
+ (two calls a pair and entry-lane, 16 lanes), so a pair of a paced head and tick pays 88 in all (the line above says "16 or more"); and my
+ order to design said k = (n ln2) << 24 passes 64 bits where n >= 724: a slip. With ln2 on 2^-30 (744261118) k passes INT64_MAX at
+ n >= 739 and 64 unsigned bits at n >= 1478. Sent to design 04:19Z. The identity is two uses of the carry law proved in
+ lean Geometry/PhaseCarry (winding_add for the pair's borrow, winding_add_right for the rounding carry).
