@@ -1091,7 +1091,7 @@ pub(super) fn train(args: &[String], realization: &mut dyn FieldRealization) -> 
         Some([path, sha]) => FieldLearner::from_text(std::str::from_utf8(&pinned_read(path, sha, STATE_BUDGET)?)?).map_err(|e| e.to_string())?,
         _ => {
             // The founding's heads are its ring sets; the reach is the passages'.
-            let declaration = FieldDeclaration { alphabet: codec.alphabet(), width, heads, modes, still, contacts, ticks, frames: heads, reach, lanes: 1, depth: 0, carry: false };
+            let declaration = FieldDeclaration { alphabet: codec.alphabet(), width, heads, modes, still, contacts, ticks, frames: heads, reach, lanes: 1, depth: 0, carry: 0 };
             let mut field = Field::found(declaration, &keys).map_err(|e| e.to_string())?;
             // [measurement; agent-inferred, November 3, §16.31] `FIELD_FOUND_RETURNS` (`returns`, or `lift` for the readout's
             // lift as well): the founding's zero families drawn instead, uniform on `±√(3/fan-in)` from a block of the key
@@ -1125,7 +1125,9 @@ pub(super) fn train(args: &[String], realization: &mut dyn FieldRealization) -> 
     // one-rate stretch, a declared comparison.
     declared_clocks(&mut learner.field);
     if let Some(rp) = learner.rate_parts {
-        let octaves: Vec<String> = holonics::hnn::tower::field::PART_NAMES.iter().zip(rp.octaves).map(|(n, k)| format!("{n}={k}")).collect();
+        // A field without carry circles prints the sixteen parts it has; one with them all nineteen.
+        let printed = if learner.field.declaration.carry > 0 { holonics::hnn::tower::field::PARTS } else { holonics::hnn::tower::field::PLAIN_PARTS };
+        let octaves: Vec<String> = holonics::hnn::tower::field::PART_NAMES.iter().zip(rp.octaves).take(printed).map(|(n, k)| format!("{n}={k}")).collect();
         println!("FIELD_PART_RATES contacts_before={} rate_bits={} octaves {}", rp.contacts_before, learner.rate_bits, octaves.join(" "));
     }
     if learner.field.declaration.alphabet != codec.alphabet() {
@@ -1538,6 +1540,78 @@ pub(super) fn grow_contacts_field(args: &[String], realization: &mut dyn FieldRe
         compared += was.iter().flatten().flatten().count();
     }
     println!("FIELD_GROW_CONTACTS_KEPT states={} faces={compared} identical=true ms={}", states.len(), started.elapsed().as_millis());
+    let mut rows = rows_file(Path::new(&format!("{}.JOINT.tsv", args[12])), "lap\tproblem\tanswer_sites\town_bits\tfoil_bits\tinformation_bits\tinformation_millibits_by_site\n")?;
+    joint_read(&learner.field, &codec, &held, seed, realization, -1, &mut rows)?;
+    joint_read(&grown.field, &codec, &held, seed, realization, 0, &mut rows)?;
+    write_new(out, grown.to_text().as_bytes())?;
+    println!("FIELD_GROWN {} rate={} material={} ms={}", grown.field.to_text().lines().next().unwrap_or(""), grown.rate_bits, grown.field.theta.len(), started.elapsed().as_millis());
+    Ok(())
+}
+
+/// [definition; theory, November 11 17:25] **`grow-carry-field STATE STATE_SHA KEYS KEYS_SHA CIRCLES CODEC CODEC_SHA UNITS UNITS_SHA HELD HELD_SHA
+/// OUT`**: the growth by carry circles ([`FieldLearner::with_carry`]). Reads the learner `STATE`, adds `CIRCLES` carry circles (their contacts'
+/// drives and their turn rows drawn from `KEYS` past every draw the state has read), and writes the grown learner to the file `OUT`, with its held
+/// joint read as `train-field`'s lap -1 reads it (`FIELD_JOINT_NATS`) before the growth (`lap=-1`) and after it (`lap=0`), and the faces of every
+/// one of those states compared bit for bit through the declared realization (`FIELD_GROW_CARRY_KEPT`), as `grow-contacts-field` checks its
+/// growth: a growth that moved a face is refused and nothing is written. The held joint's rows go to `OUT.JOINT.tsv`. The clocks are the run's
+/// declaration ([`declared_clocks`]), read alike before and after.
+pub(super) fn grow_carry_field(args: &[String], realization: &mut dyn FieldRealization) -> Result<()> {
+    if args.len() != 13 {
+        return Err("grow-carry-field STATE STATE_SHA KEYS KEYS_SHA CIRCLES CODEC CODEC_SHA UNITS UNITS_SHA HELD HELD_SHA OUT".into());
+    }
+    let started = std::time::Instant::now();
+    let mut learner = FieldLearner::from_text(std::str::from_utf8(&pinned_read(&args[1], &args[2], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
+    declared_clocks(&mut learner.field);
+    let keys = pinned_read(&args[3], &args[4], READ_BUDGET as usize)?;
+    let seed = u64::from_be_bytes(keys.get(keys.len().saturating_sub(8)..).filter(|w| w.len() == 8).ok_or("a key file of fewer than eight bytes")?.try_into()?);
+    let circles = positive(&args[5])?;
+    let units = units_of(&args[8], &args[9])?;
+    let codec = FieldCodec::from_text(std::str::from_utf8(&pinned_read(&args[6], &args[7], CODEC_BUDGET)?)?, units)?;
+    let held_text = pinned_read(&args[10], &args[11], READ_BUDGET as usize)?;
+    if learner.field.declaration.alphabet != codec.alphabet() {
+        return Err("a learner whose alphabet is not the codec's".into());
+    }
+    // The key file's last word is the masks' seed and no growth may reach it.
+    let drawn = learner.drawn + 4 * learner.field.declaration.carry_draws(circles);
+    if drawn + 8 > keys.len() {
+        return Err(format!("a key file of {} bytes, and the growth would read {drawn} before its last word", keys.len()).into());
+    }
+    let out = Path::new(&args[12]);
+    if out.exists() {
+        return Err("a grown state's path that exists".into());
+    }
+    let held: Problems = {
+        let dev = problems_of(&held_text);
+        let encoded = dev.par_iter().map(|(q, a)| Ok((codec.encode(&question_text(q)).map_err(|e| e.to_string())?, codec.encode(a).map_err(|e| e.to_string())?, a.len()))).collect::<std::result::Result<Vec<_>, String>>()?;
+        encoded.into_iter().filter(|(_, a, _)| a.len() < codec.answer).collect()
+    };
+    let before = learner.field.declaration;
+    let mut grown = learner.with_carry(circles, &keys).map_err(|e| e.to_string())?;
+    declared_clocks(&mut grown.field);
+    let after = grown.field.declaration;
+    println!("FIELD_GROW_CARRY circles={} from_contacts={} to_contacts={} width={} lanes={} heads={} rate={} drawn={} material={} ms={}", after.carry, before.contacts, after.contacts, after.width, after.lanes, after.heads, grown.rate_bits, grown.drawn, grown.field.theta.len(), started.elapsed().as_millis());
+    // The faces of the held joint's states, bit for bit.
+    let n = held.len();
+    let mut states: Vec<(Vec<usize>, Vec<bool>)> = Vec::new();
+    for i in 0..n {
+        let ((q, a, _), (fq, _, _)) = (&held[i], &held[(i + 1) % n]);
+        for question in [q, fq] {
+            for (c, u, _) in joint_states(codec.void(), question, a, seed, i as u64) {
+                states.push((c, u));
+            }
+        }
+    }
+    let mut compared = 0usize;
+    for chunk in states.chunks(64) {
+        let views: Vec<Region> = chunk.iter().map(|(c, u)| Region { classes: c, unresolved: u, faces: &[], locked: &[], echo: &[], domain: None, port: None }).collect();
+        let was = realization.read_faces(&learner.field, &views).map_err(|e| e.to_string())?;
+        let now = realization.read_faces(&grown.field, &views).map_err(|e| e.to_string())?;
+        if was != now {
+            return Err("a growth by carry circles that moved a face (the grown field is not written)".into());
+        }
+        compared += was.iter().flatten().flatten().count();
+    }
+    println!("FIELD_GROW_CARRY_KEPT states={} faces={compared} identical=true ms={}", states.len(), started.elapsed().as_millis());
     let mut rows = rows_file(Path::new(&format!("{}.JOINT.tsv", args[12])), "lap\tproblem\tanswer_sites\town_bits\tfoil_bits\tinformation_bits\tinformation_millibits_by_site\n")?;
     joint_read(&learner.field, &codec, &held, seed, realization, -1, &mut rows)?;
     joint_read(&grown.field, &codec, &held, seed, realization, 0, &mut rows)?;
@@ -3725,7 +3799,7 @@ mod tests {
 
     fn toy_learner(codec: &FieldCodec, problems: &Problems) -> FieldLearner {
         let reach = problems.iter().map(|(q, _, _)| q.len() + codec.answer).max().unwrap();
-        let d = FieldDeclaration { alphabet: codec.alphabet(), width: 8, heads: 2, modes: 3, still: 1, contacts: 4, ticks: 2, frames: 2, reach, lanes: 1, depth: 0, carry: false };
+        let d = FieldDeclaration { alphabet: codec.alphabet(), width: 8, heads: 2, modes: 3, still: 1, contacts: 4, ticks: 2, frames: 2, reach, lanes: 1, depth: 0, carry: 0 };
         let keys: Vec<u8> = (0..1u64 << 13).flat_map(|i| mix(0x5EED, i).to_be_bytes()).collect();
         FieldLearner::new(Field::found(d, &keys).unwrap(), 4)
     }
@@ -4278,9 +4352,9 @@ fn decimal_gamma(sum: u128, count: u128) -> String {
     format!("{}.{:06}", micro / 1_000_000, micro % 1_000_000)
 }
 
-/// [measurement; theory, November 11 00:22] **`gamma-field STATE STATE_SHA CODEC CODEC_SHA UNITS UNITS_SHA HELD HELD_SHA COUNT OUT`**: the carry's
-/// `|γ|` (`γ = g / √(1 + |g|²)`, `g = G r̂`, [`Field::carry_gammas`]) on the first `COUNT` held problems' opening regions (the context read's first part), the
-/// mean over the sites of each kind (a question's resolved site, an answer's open site) at each contact circle (a complex contact) and tick, from the
+/// [measurement; theory, November 11 17:25] **`gamma-field STATE STATE_SHA CODEC CODEC_SHA UNITS UNITS_SHA HELD HELD_SHA COUNT OUT`**: the carry
+/// circles' `|γ|` (`γ = γ̂(q)/(1 + max(0, h))`, [`Field::carry_gammas`]) on the first `COUNT` held problems' opening regions (the context read's first part), the
+/// mean over the sites of each kind (a question's resolved site, an answer's open site) at each carry circle and tick, from the
 /// chart the realization read (`read_ticks`). Writes `GAMMA.tsv` (tick, kind, circle, sites, mean `|γ|` as a decimal, a reading in a report) and prints the
 /// means over the circles at the first and last ticks. A reading only.
 pub(super) fn gamma_field(args: &[String], realization: &mut dyn FieldRealization) -> Result<()> {
@@ -4301,7 +4375,7 @@ pub(super) fn gamma_field(args: &[String], realization: &mut dyn FieldRealizatio
         let (q, a) = (codec.encode(&question_text(q)).map_err(|e| e.to_string())?, codec.encode(a).map_err(|e| e.to_string())?);
         owned.extend(context_regions(codec.void(), &q, &a, q.len() + a.len() + 1).into_iter().take(1));
     }
-    let (d, half) = (field.declaration, field.declaration.contacts / 2);
+    let (d, half) = (field.declaration, field.declaration.carry);
     // [tick][kind][circle]: the sum of |γ| on 2^(−30) (each an exact integer square root of |γ|² on 2^(−60)) and the sites.
     let mut sum = vec![vec![vec![0u128; half]; 2]; d.ticks];
     let mut sites = vec![vec![0usize; 2]; d.ticks];

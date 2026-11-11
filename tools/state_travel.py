@@ -83,11 +83,11 @@ trains from it. HEAD must hold no held step (a step is of one material). Numbers
 state_travel.py graft OUT HEAD DONOR FAMILY [FAMILY ...]: writes OUT, a new file: HEAD's learner text with the named families' entries
 of its material replaced by DONOR's (the families as `layout` names them: enc, before, after, q, q_bias, v, v_bias, out, out_bias, a,
 a_bias, b, b_bias, w, w_bias, read, read_bias, moment_before, moment_after, temper, probe, probe_bias, pace, moment_face,
-moment_face_bias, lift_bias, and gchart with the carry). Every other entry and every other line is HEAD's. A read of OUT beside
+moment_face_bias, lift_bias, and carry and carry_bias with carry circles). Every other entry and every other line is HEAD's. A read of OUT beside
 HEAD's and DONOR's tells how much of a reading's difference between two states those families carry; where a reading is first order
 in the states' difference, the shifts of grafts that partition the material add up to the whole difference, and what the sum leaves
 is the reading's curvature between them. A name may also be `part:NAME`, the entries of one founded part as the rate law names
-them (tools/part_rates.py: w_new .. b_lane, and g_chart with the carry), or `FAMILY/old`, a family's entries of no part (the base
+them (tools/part_rates.py: w_new .. b_lane and carry, and w_carry, a_carry, b_carry with carry circles), or `FAMILY/old`, a family's entries of no part (the base
 rate's); the parts and the families' old entries partition the material, so a lap's difference between two lap means is split by the
 rate each entry trains at. Both read the count of contacts before the growth from HEAD's `parts` line, or from a name
 `contacts:N` where HEAD carries none (where it carries one the two agree). No entry is named twice. OUT is a ruler's state: it is
@@ -125,8 +125,10 @@ def layout(d):
     push("probe", (m2, dw), MAT); push("probe_bias", (m2,), FACE)
     push("pace", (paced * (a + 1),), MAT)
     push("moment_face", (dw, m2), MAT); push("moment_face_bias", (dw,), FACE); push("lift_bias", (dw,), FACE)
-    if d.get("carry"):
-        push("gchart", (f, dw), MAT)
+    c = d.get("carry", 0)
+    if c > 0:
+        # [theory, November 11 17:25] The carry circles' charts (turn rows then leak rows) and their biases.
+        push("carry", (2 * c, dw), MAT); push("carry_bias", (2 * c,), FACE)
     return fam, at
 
 
@@ -135,7 +137,8 @@ def state(path):
     words = lines[1].split(" ")
     names = ["alphabet", "width", "heads", "modes", "still", "contacts", "ticks", "frames", "reach", "lanes"]
     d = {k: int(w) for k, w in zip(names, words[1:11])}
-    d["carry"] = words[0] == "hnn-field-v14k"
+    assert words[0] != "hnn-field-v14k", "the carry founded at zero friction is retired (hnn-field-v14k): its states are receipts only"
+    d["carry"] = int(words[12]) if words[0] == "hnn-field-v14t" else 0
     theta = np.array([int(x) for x in lines[2].split(" ")], dtype=np.int64)
     return d, theta
 
@@ -292,10 +295,11 @@ def scale_blocks(d, old_f):
             add(name, 0, sub, "other", name, m)
     for name in ("q_bias", "v_bias", "probe_bias", "read_bias", "moment_before", "moment_after", "temper", "pace"):
         add(name, 0, "all", "other", name, np.ones(shapes[name], dtype=bool))
-    if "gchart" in shapes:
+    if "carry" in shapes:
         for k, sel in enumerate(lane_of, 1):
-            m = np.zeros(shapes["gchart"], dtype=bool); m[:, sel] = True
-            add("gchart", k, "all", "reads", "gchart", m)
+            m = np.zeros(shapes["carry"], dtype=bool); m[:, sel] = True
+            add("carry", k, "all", "reads", "carry", m)
+        add("carry_bias", 0, "all", "other", "carry_bias", np.ones(shapes["carry_bias"], dtype=bool))
     return out
 
 
