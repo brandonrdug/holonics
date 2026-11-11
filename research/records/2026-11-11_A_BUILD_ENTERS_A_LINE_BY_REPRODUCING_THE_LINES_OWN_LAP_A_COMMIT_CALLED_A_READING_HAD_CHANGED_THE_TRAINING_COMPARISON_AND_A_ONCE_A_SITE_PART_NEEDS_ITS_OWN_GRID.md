@@ -71,6 +71,8 @@ The largest falls: the contact's columns 19,665 to 10,825 ms, its rows 16,866 to
 
 **G49** (fixed 05:27 UTC, unread). Against its parent on the same profile: (a) kernel time a section falls by 0.20 of the parent's (0.14 to 0.26); (b) `field_paces` and the new launch together take 25 ms a section or less; (c) the nine entries stay within 0.05 of 270.6 ms a section. Rule: (a) at 0.14 or more with every section line equal, S′ is accepted on a lap's bytes and enters the lines at a lap boundary; (b) over 60 ms, the division is itself the cost at this grid and the next read is the launch's grid sum against its cell count. The count of divisions a section is unmeasured.
 
+[added 07:27 UTC: read in one hold of control, S′, control, and held on all three parts ([the record of the two pushes, §10](2026-11-11_THE_PLACES_THE_FIELD_GIVES_PUSH_AGAINST_THE_PLACES_IT_MISSES_THE_DEPOSIT_IS_THEIR_DIFFERENCE_AND_TWO_BUILDS_ARE_TIMED_ONLY_INSIDE_ONE_HOLD_OF_THE_CARD.md)). Kernel time a section 609.9, 458.5 and 609.3 ms (a fall of 0.248; the two controls agree to 0.1%); the clocks' launch 15.6 ms and the address's own launch 1.98 ms a section; the nine entries 257.4 ms; 316 of 316 section lines equal the tenth lap's. S′ is accepted on the rate line's bytes. Its entry to the scan line is the same read with the carry on, against the first clean scan lap.]
+
 ## 6. G50: the repaired build ran slower than the tenth lap, and the cause is not yet placed
 
 **G50** (fixed 05:51 UTC; logs only). Over sections 0 to 273 the repaired scan build's section time is within 3% of the tenth lap's on the same sections: yes, 0.70. **Missed.** [measurement, 05:53 UTC; from the two runs' logs] 200,039 against 174,464 ms, a ratio of 1.147. The regions' time is 346 against 387 ms; the deposit's is 195,959 against 170,916 ms, the same ratio, so the difference is in the deposit. A gate was building on the host during the first half minute of the repaired build's run. Past it (sections 60 to 273) the ratio is 1.151, and by blocks of fifty sections 1.129, 1.166, 1.109, 1.162, 1.201 and 1.081, so the build's contention is ruled out.
@@ -122,7 +124,7 @@ The recorded failures checked: a located cause carried unrepaired into a new con
 
 - G51's read (one bounded run of the rate build on the card, with the card's and the host's samples), and then G50's cause.
 - G52's read: the split at the coarser thresholds (host, eight threads, between the card's timing reads).
-- S′'s build and G49's read; then its acceptance on a lap's bytes.
+- S′'s build and G49's read; then its acceptance on a lap's bytes. [done 07:27 UTC, on the rate line; the scan line's entry is owed with the carry on]
 - G's acceptance (scan parity on four sections, a clean scan lap's bytes, the 188-section ratio; G45).
 - The support stride with G42.
 - The port (flock record §8.5), with the declaration of the part rates and the writer state's comparison decided as a law.
