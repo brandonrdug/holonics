@@ -27,6 +27,10 @@ octaves fast). In each of two blocks half the entries hold a second moment's roo
 Controls of its mean, on the same kind of states: the mean of two materials that differ by one in an entry lies a half away from
 zero (1 and 2 give 2, -1 and -2 give -2, 3 and -3 give 0), the mean of three is their third, every line but the material is the
 head's, one state under another head is its own material, and a file that stands is not overwritten.
+
+Controls of its graft: the named families' entries are the donor's and every other entry and line the head's; grafts of two parts
+that partition the layout's families move, between them, every entry the two states differ in, once; every family grafted gives the
+donor's material under the head's other lines; an unknown family, a family named twice and a standing file are refused.
 """
 import io
 import os
@@ -328,12 +332,59 @@ def mean_controls():
     print(f"state_travel mean: {len(quiet.getvalue().splitlines())} lines, the controls hold")
 
 
+def graft_controls():
+    rng = np.random.default_rng(20261115)
+    fam, total = state_travel.layout(D)
+    a = rng.integers(-100000, 100000, size=total).astype(np.int64)
+    b = a + rng.integers(1, 10, size=total)
+    names = [name for name, _, _, _ in fam]
+    spans = {name: (at, int(np.prod(shape))) for name, at, shape, _ in fam}
+    some, rest = ["read_bias", "enc", "w"], [n for n in names if n not in ("read_bias", "enc", "w")]
+    with tempfile.TemporaryDirectory() as tmp:
+        pa, pb = os.path.join(tmp, "a"), os.path.join(tmp, "b")
+        write(pa, a, [7] * total, [OLD_F] + [0] * 16)
+        write(pb, b, [9] * total, [OLD_F] + [2] * 16)
+        quiet = io.StringIO()
+        with redirect_stdout(quiet):
+            state_travel.graft(os.path.join(tmp, "some"), pa, pb, some)
+            state_travel.graft(os.path.join(tmp, "rest"), pa, pb, rest)
+            state_travel.graft(os.path.join(tmp, "all"), pa, pb, names)
+        lines = [fields(line) for line in quiet.getvalue().splitlines()]
+        (_, got_some), (_, got_rest), (_, got_all) = (state_travel.state(os.path.join(tmp, name)) for name in ("some", "rest", "all"))
+        inside = np.zeros(total, dtype=bool)
+        for n in some:
+            at, k = spans[n]
+            inside[at:at + k] = True
+        assert (got_some[inside] == b[inside]).all() and (got_some[~inside] == a[~inside]).all()
+        assert (got_rest[~inside] == b[~inside]).all() and (got_rest[inside] == a[inside]).all()
+        assert ((got_some - a) + (got_rest - a) == b - a).all() and (got_all == b).all()
+        assert int(lines[0]["entries"]) == int(inside.sum()) == int(lines[0]["moved"]) and int(lines[0]["entries"]) + int(lines[1]["entries"]) == total == int(lines[2]["moved"])
+        for name in ("some", "rest", "all"):
+            got, kept = open(os.path.join(tmp, name)).read().split("\n"), open(pa).read().split("\n")
+            assert len(got) == len(kept) and all(g == k for i, (g, k) in enumerate(zip(got, kept)) if i != 2), name
+        for bad, error in ((["no_such_family"], AssertionError), (["enc", "enc"], AssertionError), ([], AssertionError)):
+            try:
+                with redirect_stdout(quiet):
+                    state_travel.graft(os.path.join(tmp, "bad"), pa, pb, bad)
+                raise RuntimeError("a graft of a family the layout does not hold was written")
+            except error:
+                assert not os.path.exists(os.path.join(tmp, "bad"))
+        try:
+            with redirect_stdout(quiet):
+                state_travel.graft(os.path.join(tmp, "some"), pa, pb, some)
+            raise AssertionError("a standing file was overwritten")
+        except FileExistsError:
+            pass
+    print(f"state_travel graft: {len(lines)} lines, the controls hold")
+
+
 def main():
     rank_controls()
     scale_controls()
     weighed_controls()
     lag_controls()
     mean_controls()
+    graft_controls()
 
 
 if __name__ == "__main__":

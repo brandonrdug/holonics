@@ -268,6 +268,7 @@ theorem two_mul_trace_stiffness_covariance {P Q H C S : Matrix n n K} (hQ : Q * 
     hcyc, ← neg_add, neg_add_eq_zero] at htr
   rw [two_mul, htr]
 
+omit [DecidableEq n] in
 /-- [proved-derived; formal-checked] **Where the noise is the stiffness, every direction stands at
 half its step:** with `C = H` the covariance `Σ = ½ P` is stationary, whatever `H` is. For a
 diagonal step the entries are then uncorrelated and each holds half its own step. The hypothesis

@@ -72,6 +72,14 @@ head line with its lap count, the moments, the `parts` line) is HEAD's, so a rea
 draws. With one STATE it is that state's material under HEAD's lap count. A state under a deposit at rest is a draw about its rest
 position; the mean of draws taken a lap apart lies nearer to it than any of them. OUT is a ruler's state: it is read, and no lap
 trains from it. HEAD must hold no held step (a step is of one material). Numbers only.
+
+state_travel.py graft OUT HEAD DONOR FAMILY [FAMILY ...]: writes OUT, a new file: HEAD's learner text with the named families' entries
+of its material replaced by DONOR's (the families as `layout` names them: enc, before, after, q, q_bias, v, v_bias, out, out_bias, a,
+a_bias, b, b_bias, w, w_bias, read, read_bias, moment_before, moment_after, temper, probe, probe_bias, pace, moment_face,
+moment_face_bias, lift_bias, and gchart with the carry). Every other entry and every other line is HEAD's. A read of OUT beside
+HEAD's and DONOR's tells how much of a reading's difference between two states those families carry; where a reading is first order
+in the states' difference, the shifts of grafts that partition the material add up to the whole difference, and what the sum leaves
+is the reading's curvature between them. OUT is a ruler's state: it is read, and no lap trains from it. Numbers only.
 """
 import os
 import sys
@@ -446,9 +454,33 @@ def mean(out, head, paths):
     print(f"STATE_MEAN states={n} entries={len(material)} moved={int((moved != 0).sum())} rms_from_head={float(np.sqrt((moved ** 2).mean())):.5g}")
 
 
+def graft(out, head, donor, names):
+    lines = open(head).read().split("\n")
+    d, theta = state(head)
+    dd, other = state(donor)
+    assert lines[0].split(" ")[0] == "hnn-field-learner-v3" and lines[0].split(" ")[4] == "-", "a learner's text with no held step"
+    fam, total = layout(d)
+    assert dd == d and total == len(theta) == len(other), "states of one declaration"
+    spans = {name: (at, int(np.prod(shape))) for name, at, shape, _ in fam}
+    assert names and all(n in spans for n in names) and len(set(names)) == len(names), f"families of the layout, each once: {' '.join(spans)}"
+    material = theta.copy()
+    for n in names:
+        at, k = spans[n]
+        material[at:at + k] = other[at:at + k]
+    lines[2] = " ".join(str(int(x)) for x in material)
+    with open(out, "x") as f:
+        f.write("\n".join(lines))
+    moved = (material - theta).astype(np.float64)
+    entries = sum(spans[n][1] for n in names)
+    print(f"STATE_GRAFT families={','.join(names)} entries={entries} of={total} moved={int((moved != 0).sum())} rms_from_head={float(np.sqrt((moved ** 2).mean())):.5g}")
+
+
 def main():
     if len(sys.argv) >= 5 and sys.argv[1] == "mean":
         mean(sys.argv[2], sys.argv[3], sys.argv[4:])
+        return
+    if len(sys.argv) >= 6 and sys.argv[1] == "graft":
+        graft(sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5:])
         return
     if len(sys.argv) >= 8 and sys.argv[1] == "weighed":
         weighed(int(sys.argv[2]), int(sys.argv[3]), int(sys.argv[4]), sys.argv[5:])
