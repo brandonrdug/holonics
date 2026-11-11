@@ -1,0 +1,24 @@
+rt4: records 43470; same places and letters as HELD128: True; face sums mean 0.9997; mean code 0.5289; mean covector mass 0.1982
+   covector mass: the share of places that holds a share of the total, largest first: 50%:0.070 80%:0.134 90%:0.170 99%:0.271
+   code: the share of places that holds a share of the total, largest first: 50%:0.054 80%:0.129 90%:0.182 99%:0.396
+   places with covector mass under 2^-4: 0.7427 (they hold 0.01359 of the mass)
+   places with covector mass under 2^-6: 0.6845 (they hold 0.00382 of the mass)
+   places with covector mass under 2^-8: 0.6196 (they hold 0.00106 of the mass)
+   places with covector mass under 2^-10: 0.5462 (they hold 0.00030 of the mass)
+   places with the face on the reference letter at 0.950 or more: 0.6123
+   places with the face on the reference letter at 0.990 or more: 0.4267
+   places with the face on the reference letter at 0.999 or more: 0.1592
+   unit starts 0.4078 of places: mean mass 0.2409, share of the mass 0.4955; inside units mean mass 0.1688; ratio 1.427
+   mean mass by kind of the letter: space-class 0.0910, word 0.2111, other 0.3047
+ct8: records 43470; same places and letters as HELD128: True; face sums mean 0.9997; mean code 0.5516; mean covector mass 0.2052
+   covector mass: the share of places that holds a share of the total, largest first: 50%:0.072 80%:0.138 90%:0.175 99%:0.279
+   code: the share of places that holds a share of the total, largest first: 50%:0.056 80%:0.133 90%:0.187 99%:0.406
+   places with covector mass under 2^-4: 0.7352 (they hold 0.01370 of the mass)
+   places with covector mass under 2^-6: 0.6748 (they hold 0.00371 of the mass)
+   places with covector mass under 2^-8: 0.6098 (they hold 0.00107 of the mass)
+   places with covector mass under 2^-10: 0.5343 (they hold 0.00029 of the mass)
+   places with the face on the reference letter at 0.950 or more: 0.6015
+   places with the face on the reference letter at 0.990 or more: 0.4093
+   places with the face on the reference letter at 0.999 or more: 0.1451
+   unit starts 0.4078 of places: mean mass 0.2464, share of the mass 0.4895; inside units mean mass 0.1769; ratio 1.393
+   mean mass by kind of the letter: space-class 0.0944, word 0.2191, other 0.3121

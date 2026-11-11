@@ -438,9 +438,10 @@ From October 23 to 27 the Athena tower training runs went through the host reali
 threads (the card ran only the October 25 pass of the gated tower, a narrower law), while the learner
 stayed at two levels of 64 modes, eight streams and three passes of 3.5 MB under deadlines of tens to
 hundreds of CPU seconds: the run rules were kept and the architecture and data were given up.
-- **Learning runs on the card.** Every training pass, lap and measurement of an HNN learner runs
-  through its card realization. The host realization is the reference that checks the card's bits,
-  not where learning runs.
+- **Learning runs on the card.** Every training pass and lap of an HNN learner runs through its
+  card realization, and so does a measurement that a lap waits for. The host realization is the
+  reference that checks the card's bits, not where learning runs. The host beside the card is a
+  second surface (below).
 - **A part enters a run with its card realization.** A new face, contact, ring, pump or step enters a
   learner run only with its card realization and its parity against the host. Learning on the host
   needs Brandon's own exception, in his words, naming the workload, its purpose and its limits; a
@@ -450,6 +451,28 @@ hundreds of CPU seconds: the run rules were kept and the architecture and data w
 - **Host work inside a card run is measured.** Each receipt names the device and states the card's
   time, the host's time and the host threads. When the host's share dominates (the certificate held
   the card to 3.9 times the host on October 25), that host work is the next loop's subject.
+- **The host is a second surface beside the card** (Brandon, October 31, November 7 and
+  November 11; [the record](research/records/2026-11-11_THE_HOST_AND_THE_CARD_ARE_ONE_SURFACE_WORK_IS_PLACED_BY_RATE_AND_WIDTH_THE_SURFACES_MEET_AT_CARRIES_AND_COST_IS_OWED_AT_MERGES.md)).
+  The clauses above bar the host standing in for the card, because the failure they answer is a
+  learner shrunk to fit CPU time. That reason does not reach the host working beside the card in a
+  card run, and no exception is needed for it. Three kinds of host work are lawful there:
+  - a reading (a held or locked visit, a structure measure, a ruler) run from a saved state while
+    the card trains: it leaves the state's bytes the same and no lap waits for it;
+  - a term or a kind of event placed on the host as a realization: every bit kept, its parity on
+    record once for that kind, and the placement chosen by measured times (its count of co-present
+    terms against the launch latency, with the crossings priced);
+  - a slow variable carried on the host: it reads at a named crossing of the machine's own clock (a
+    section, a lap, a carry) and joins at a named later one. That delay is part of the law and is
+    carried in the learner's state.
+
+  A join on wall time is barred, because the bits would then follow the schedule. A receipt that
+  shows one surface waiting on the other names the wait, and a standing wait is the next loop's
+  subject. The same work split across both surfaces is measured at no gain (November 7, 0.998 times
+  at a 2.3% share), so the split is by kind of work. Reason for the scope (the direction is
+  Brandon's; the wording is `agent-inferred`): integer series give the same bits on any partition
+  of any device, so placement is a realization, and a rule that keeps a kind of work off a device
+  makes partials of the dynamics close in partitions the transport drew (his correction of
+  October 31).
 - **The workload is not a limit's variable.** The design fixes the data, the passes and the
   learner's levels and modes; time and memory are projected from that workload on the card. A run
   that does not fit gets the card, a better partition of the work, or a stated long run scheduled
