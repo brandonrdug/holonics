@@ -17,6 +17,10 @@
 #                                         states (`joint_states`: the same K a stratum, the same open sites), so the two reads pair
 #                                         state by state; `open_sites` then prints the field's four counts. Without it, own draws.
 #
+#   cap_t.py DEPTH left                    the left-to-right code alone (seconds): on every place, and on the places with at least 1, 2,
+#                                         3 and 4 of the answer's letters before them, which are the places the grip record's count
+#                                         tables were read on (43,214 at two letters, 43,087 at three, 42,960 at four)
+#
 # numpy alone. A forward sum is held on its support (a written run of DEPTH letters brings it back to one state), so a state of the
 # answer costs its open sites times the support times the alphabet; the forward sums are kept every STRIDE sites and walked again a
 # stretch at a time, so the memory is a stretch of them.
@@ -147,12 +151,17 @@ def conditionals(chain, a, is_open, given):
     return out, told
 
 
-def left_to_right(chain, a):
-    s, total = chain["start"], 0.0
-    for y in a:
-        total -= np.log(chain["P"][s, y])
+def left_codes(chain, a):
+    """Each place's code read left to right, nothing told."""
+    s, out = chain["start"], np.zeros(len(a))
+    for t, y in enumerate(a):
+        out[t] = -np.log(chain["P"][s, y])
         s = chain["nxt"][s, y]
-    return total
+    return out
+
+
+def left_to_right(chain, a):
+    return left_codes(chain, a).sum()
 
 
 def strata_of(m):
@@ -310,7 +319,8 @@ def main():
     if sys.argv[1] == "selftest":
         return selftest()
     depth = int(sys.argv[1])
-    procs = int(sys.argv[2]) if len(sys.argv) > 2 else 8
+    left = len(sys.argv) > 2 and sys.argv[2] == "left"
+    procs = 1 if left else int(sys.argv[2]) if len(sys.argv) > 2 else 8
     given = (sys.argv[3] if len(sys.argv) > 3 else "given") == "given"
     seed = int(sys.argv[4], 16) if len(sys.argv) > 4 else None
     t0 = time.time()
@@ -328,6 +338,12 @@ def main():
     print("CHAIN depth=%d states=%d answers=%d places=%d longest=%d length=%s draws=%s processes=%d built_s=%.0f"
           % (depth, chain["S"], len(answers), len(xH), max(len(a) for a in answers), "given" if given else "free",
              "own" if seed is None else "the field's", procs, time.time() - t0), flush=True)
+    if left:
+        codes = [left_codes(chain, a) for a in answers]
+        rows = [(sum(c[g:].sum() for c in codes), sum(max(len(c) - g, 0) for c in codes)) for g in range(5)]
+        print("CHAIN_LEFT depth=%d states=%d letters_before_at_least=0/1/2/3/4 nats_a_place=%s places=%s"
+              % (depth, chain["S"], "/".join("%.6f" % (t / n) for t, n in rows), "/".join("%d" % n for _, n in rows)))
+        return
     GLOBAL.update(chain=chain, answers=answers, given=given, seed=seed)
     # The longest answers first, so the processes end together; a problem's key is its place in the held file, as the field's.
     jobs = sorted(((i, i) for i in range(len(answers))), key=lambda j: -len(answers[j[0]]))
