@@ -23,7 +23,7 @@ fn keys(n: usize) -> Vec<u8> {
 }
 
 fn tiny_declaration(still: usize) -> FieldDeclaration {
-    FieldDeclaration { alphabet: 5, width: 8, heads: 2, modes: 3, still, contacts: 4, ticks: 2, frames: 2, reach: 16, lanes: 1, depth: 0, energy: false }
+    FieldDeclaration { alphabet: 5, width: 8, heads: 2, modes: 3, still, contacts: 4, ticks: 2, frames: 2, reach: 16, lanes: 1, depth: 0, energy: false, carry: false }
 }
 
 /// A tiny field with every family drawn from the keys (the founding holds the returns and the
@@ -836,7 +836,7 @@ fn no_site_meets_itself() {
 /// head's lock of an equal word (`n` at unit power, half its `2n` reals) reads `2⌈log₂ reach⌉` bits.
 #[test]
 fn the_contact_s_gain_covers_the_falloff() {
-    let at = |modes: usize, reach: usize| FieldDeclaration { alphabet: 5, width: 8, heads: 2, modes, still: 1, contacts: 4, ticks: 2, frames: 2, reach, lanes: 1, depth: 0, energy: false }.score_shift();
+    let at = |modes: usize, reach: usize| FieldDeclaration { alphabet: 5, width: 8, heads: 2, modes, still: 1, contacts: 4, ticks: 2, frames: 2, reach, lanes: 1, depth: 0, energy: false, carry: false }.score_shift();
     assert_eq!(at(8, 2221), -2, "reading 8's declaration locks an equal word at 32 bits");
     assert_eq!(at(16, 16), 1);
     assert_eq!(at(3, 16), -2);
@@ -845,7 +845,7 @@ fn the_contact_s_gain_covers_the_falloff() {
         let gained = |b: i32| if b >= 0 { (modes as u128) >> b } else { (modes as u128) << -b };
         assert!(gained(beta) >= need && gained(beta + 1) < need, "the largest such shift: modes {modes} reach {reach}");
     }
-    let d = FieldDeclaration { alphabet: 5, width: 8, heads: 2, modes: 8, still: 1, contacts: 4, ticks: 2, frames: 2, reach: 2221, lanes: 1, depth: 0, energy: false };
+    let d = FieldDeclaration { alphabet: 5, width: 8, heads: 2, modes: 8, still: 1, contacts: 4, ticks: 2, frames: 2, reach: 2221, lanes: 1, depth: 0, energy: false, carry: false };
     assert_eq!((d.class_trits(), d.classes()), (4, 81), "81 classes at reading 8's reach");
     assert_eq!(FieldDeclaration { modes: 3, ..d }.class_trits(), 3);
     assert_eq!((FieldDeclaration { reach: 81, ..d }.class_trits(), FieldDeclaration { reach: 82, ..d }.class_trits()), (2, 3));
@@ -900,7 +900,7 @@ fn the_skin_decay_is_an_e_fold_a_radian_and_vanishes_below_the_grain() {
 /// and a turned field. Probes across a sheet are left out and counted.
 #[test]
 fn the_covector_matches_the_code_across_the_far_support() {
-    let d = FieldDeclaration { alphabet: 5, width: 8, heads: 2, modes: 3, still: 1, contacts: 4, ticks: 2, frames: 2, reach: 32, lanes: 1, depth: 0, energy: false };
+    let d = FieldDeclaration { alphabet: 5, width: 8, heads: 2, modes: 3, still: 1, contacts: 4, ticks: 2, frames: 2, reach: 32, lanes: 1, depth: 0, energy: false, carry: false };
     let classes: Vec<usize> = (0..26).map(|t| [1usize, 3, 2, 4, 0, 2, 1][t % 7]).collect();
     let open: Vec<bool> = (0..26).map(|t| t % 9 == 4 || t == 25).collect();
     let r = Region { classes: &classes, unresolved: &open, faces: &[], locked: &[], echo: &[], domain: None, port: None };
@@ -988,7 +988,7 @@ fn the_covector_matches_the_code_across_the_far_support() {
 /// of a row, the loudest far source 0.005.)
 #[test]
 fn a_listener_s_founding_row_keeps_its_near_field() {
-    let d = FieldDeclaration { alphabet: 44, width: 32, heads: 5, modes: 8, still: 2, contacts: 32, ticks: 2, frames: 5, reach: 484, lanes: 1, depth: 0, energy: false };
+    let d = FieldDeclaration { alphabet: 44, width: 32, heads: 5, modes: 8, still: 2, contacts: 32, ticks: 2, frames: 5, reach: 484, lanes: 1, depth: 0, energy: false, carry: false };
     assert_eq!((d.score_shift(), d.listen_shift()), (-2, 2));
     let sites = 420;
     let classes = drawn_classes(7, sites, d.alphabet);
@@ -1998,7 +1998,7 @@ fn refinement_moves_the_end_one_place_a_read() {
 
 /// The packets' field of the tower fixtures: packets of three sites of the tiny field's reach of 16.
 fn coarse_declaration() -> FieldDeclaration {
-    FieldDeclaration { alphabet: 2, width: 8, heads: 2, modes: 3, still: 1, contacts: 4, ticks: 2, frames: 2, reach: 6, lanes: 1, depth: 0, energy: false }
+    FieldDeclaration { alphabet: 2, width: 8, heads: 2, modes: 3, still: 1, contacts: 4, ticks: 2, frames: 2, reach: 6, lanes: 1, depth: 0, energy: false, carry: false }
 }
 
 /// A tower of scales on [`shaped`]`(still)`: packets of three sites after the first of its two ticks, founded from the
@@ -2585,7 +2585,7 @@ fn the_letters_read_the_energy_at_one_temperature() {
 /// An energy field shaped as the line's (four heads on four ring sets, two still, four ticks) on a small width, every family
 /// drawn as [`shaped`]'s, its clocks plain, the families the energy does not read at zero and its letters at `T = 1`.
 fn energetic_line() -> Field {
-    let d = FieldDeclaration { alphabet: 5, width: 8, heads: 4, modes: 3, still: 2, contacts: 4, ticks: 4, frames: 4, reach: 64, lanes: 1, depth: 0, energy: true };
+    let d = FieldDeclaration { alphabet: 5, width: 8, heads: 4, modes: 3, still: 2, contacts: 4, ticks: 4, frames: 4, reach: 64, lanes: 1, depth: 0, energy: true, carry: false };
     let mut field = shaped_with(d);
     let (l, d) = (field.layout.clone(), field.declaration);
     let (dw, m2) = (d.width, 2 * d.complex());
@@ -4090,4 +4090,32 @@ fn a_sites_words_are_its_last_ticks_and_its_seam_octave_its_least_margin() {
     assert_eq!(seam_octave(&word, &d), Some(3));
     (word[n], word[m + n]) = (-4, 4);
     assert_eq!(seam_octave(&word, &d), None);
+}
+
+/// [definition; theory, November 11 00:22, ruling R5 amended] **This line reads a carrying state forward**: a field whose head line is `hnn-field-v14k` (the
+/// carry, the third chart `G` after every other family) restores from its text, reads every face the same field with `G` at zero reads (the scan at `G = 0` is
+/// the plain pair), and its return is refused (the adjoint is on `claude/v14-face-line`).
+#[test]
+fn a_carrying_state_is_read_forward_and_its_return_is_refused() {
+    let plain = shaped(1);
+    let d = FieldDeclaration { carry: true, ..plain.declaration };
+    let mut theta = plain.theta.clone();
+    theta.extend(std::iter::repeat_n(0, d.contacts * d.width));
+    let carried = Field::with_theta(d, theta);
+    assert_eq!(carried.faces(&region()).unwrap(), plain.faces(&region()).unwrap());
+    let back = Field::from_text(&carried.to_text()).unwrap();
+    assert!(back.declaration.carry && back.theta == carried.theta);
+    assert!(carried.to_text().starts_with("hnn-field-v14k "));
+    let pass = carried.pass(&region(), true).unwrap();
+    let mut g = vec![0i128; carried.theta.len()];
+    assert!(carried.returned(&region(), &pass, &mut g).is_err(), "a return through the carry is refused");
+    // G off zero moves the pair (and so the faces): the forward is the law's scan.
+    let mut live = carried.clone();
+    let at = live.layout.gchart;
+    for e in 0..d.contacts {
+        for c in 0..d.width {
+            live.theta[at + e * d.width + c] = if (e + c) % 2 == 0 { 3 << 20 } else { -(1 << 20) };
+        }
+    }
+    assert_ne!(live.faces(&region()).unwrap(), plain.faces(&region()).unwrap());
 }

@@ -493,6 +493,13 @@ struct FieldWords {
     // [the unified-theory reading of November 6, 10:31] Where set, past the last arrival a silent place runs at the bare rate
     // (`Field::bare_stretch`): no clamp to the stretch's first place, and no fold of its covector there.
     uint64_t bare_stretch;
+    // [definition; theory, November 11 00:22, ruling R5 amended] The carry along the strand, forward only here (`FieldDeclaration::carry`): where set, the
+    // pair is the scan `Q(t) = b(t) + γ(t) Q(t∓1)`, `p(t) = a(t) Q(t∓1)` with `γ = g / √(1 + |g|²)`, `g = G r̂` the third chart; `wg` is `G`'s offset in
+    // the material, `rg` its reach and `pg` the chart's output `[t][f]`.
+    uint64_t carry_on;
+    uint64_t wg;
+    uint64_t rg;
+    int64_t *pg;
 };
 
 // [definition; agent-inferred, November 2] **A head's pace index** (§16, `Field::paces`): the heads that carry a moment
@@ -2702,6 +2709,40 @@ extern "C" __global__ void field_pair(FieldWords w) {
         const wide br = s == UINT64_MAX ? 0 : w.pb[s * w.f + e], bi = s == UINT64_MAX ? 0 : w.pb[s * w.f + half + e];
         w.pc[re] = fit64(rel(ar * br - ai * bi, FACE_BITS), w.status);
         w.pc[im] = fit64(rel(ar * bi + ai * br, FACE_BITS), w.status);
+    }
+}
+
+// [definition; theory, November 11 00:22, ruling R5 amended] **The carry's scan, forward only** (the host's `tick`, the pair contact under `FieldDeclaration::carry`): one
+// thread a (region, complex contact) scanning the region's sites in strand order, one release a step (a parallel prefix would reorder the releases): even `e` from
+// the left, odd from the right, `Q` zero before the first site (past the last), `p(t) = a(t) Q(t∓1)` and `Q(t) = b(t) + γ(t) Q(t∓1)` with `γ = g / √(1 + |g|²)`
+// attained by the radicand's exact integer square root: `g` on `2^(−16)`, the root on `2^(−32)`, `γ` on `2^(−30)`. Block: 256 threads, grid-stride over `R f/2`
+// jobs; no shared memory. The adjoint is on `claude/v14-face-line`.
+extern "C" __global__ void field_pair_scan(FieldWords w) {
+    const uint32_t half = w.f / 2;
+    const uint64_t jobs = (uint64_t)w.R * half;
+    for (uint64_t j = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; j < jobs; j += (uint64_t)gridDim.x * blockDim.x) {
+        const uint32_t r = (uint32_t)(j / half), e = (uint32_t)(j % half);
+        const uint64_t first = w.region_off[r], sites = w.region_off[r + 1] - first;
+        wide qr = 0, qi = 0;
+        for (uint64_t step = 0; step < sites; ++step) {
+            const uint64_t t = first + ((e % 2 == 0) ? step : sites - 1 - step);
+            const uint64_t re = t * w.f + e, im = re + half;
+            const wide gr = w.pg[re], gi = w.pg[im];
+            const wide d = ((wide)1 << 32) + gr * gr + gi * gi;
+            if (d >= ((wide)1 << 95)) {
+                atomicOr(w.status, REFUSED_CARRIER);
+                return;
+            }
+            const wide root = (wide)isqrt128((uwide)(d << 32));
+            const wide yr = div_nearest(gr << 46, root), yi = div_nearest(gi << 46, root);
+            const wide ar = w.pa[re], ai = w.pa[im];
+            w.pc[re] = fit64(rel(ar * qr - ai * qi, FACE_BITS), w.status);
+            w.pc[im] = fit64(rel(ar * qi + ai * qr, FACE_BITS), w.status);
+            const wide nr = (wide)w.pb[re] + rel(yr * qr - yi * qi, MOVE_BITS);
+            const wide ni = (wide)w.pb[im] + rel(yr * qi + yi * qr, MOVE_BITS);
+            qr = fit64(nr, w.status);
+            qi = fit64(ni, w.status);
+        }
     }
 }
 

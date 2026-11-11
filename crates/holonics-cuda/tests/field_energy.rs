@@ -31,7 +31,7 @@ fn keys(n: usize) -> Vec<u8> {
 }
 
 fn tiny_declaration(still: usize) -> FieldDeclaration {
-    FieldDeclaration { alphabet: 5, width: 8, heads: 2, modes: 3, still, contacts: 4, ticks: 2, frames: 2, reach: 16, lanes: 1, depth: 0, energy: true }
+    FieldDeclaration { alphabet: 5, width: 8, heads: 2, modes: 3, still, contacts: 4, ticks: 2, frames: 2, reach: 16, lanes: 1, depth: 0, energy: true, carry: false }
 }
 
 /// The host's `energetic` fixture rebuilt: every family drawn from the fixture key stream as `shaped` draws it (a uniform
@@ -270,7 +270,7 @@ fn the_tiny_fields_return_on_the_card_is_still_the_hosts() {
 
 /// The line's declaration (`hnn-field-v15 100 32 4 8 2 32 4 4 3771 1 0 1`).
 fn line_declaration() -> FieldDeclaration {
-    FieldDeclaration { alphabet: 100, width: 32, heads: 4, modes: 8, still: 2, contacts: 32, ticks: 4, frames: 4, reach: 3771, lanes: 1, depth: 0, energy: true }
+    FieldDeclaration { alphabet: 100, width: 32, heads: 4, modes: 8, still: 2, contacts: 32, ticks: 4, frames: 4, reach: 3771, lanes: 1, depth: 0, energy: true, carry: false }
 }
 
 /// A synthetic region of `sites` sites over the alphabet: the first two thirds known (classes from the key stream), the

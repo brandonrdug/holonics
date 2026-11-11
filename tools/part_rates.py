@@ -5,8 +5,8 @@
   part_rates.py update OLDER OLD NOW OUT
   part_rates.py trend OLDEST OLDER OLD NOW OUT   (theory, November 11 03:54: the slope-corrected rule; see trend())
 
-The learner's text carries each founded part's octaves in a trailing `parts CONTACTS_BEFORE k0 .. k14` line (holonics::hnn::tower::field::
-RateParts); the trainer steps part p at 2^-(rate - k_p). `open` writes STATE with the octaves OCTAVES (fifteen counts, comma separated, in
+The learner's text carries each founded part's octaves in a trailing `parts CONTACTS_BEFORE k0 .. k15` line (holonics::hnn::tower::field::
+RateParts); the trainer steps part p at 2^-(rate - k_p). `open` writes STATE with the octaves OCTAVES (sixteen counts, or fifteen with g_chart at the old rate, comma separated, in
 PART_NAMES order). `update` reads three saved states of one line and, for each part, the cosine c between its displacements OLD - OLDER and
 NOW - OLD over the entries it holds (exact integers): c > 1/2 one octave faster, c < 1/2 one slower, never under the old rate (octave 0) nor
 past rate - 1; c = 1/2 rests. It writes NOW with the moved octaves to OUT and prints FIELD_PART_RATE for every part. The parts are
@@ -15,7 +15,7 @@ Field::founded_parts' (checked against it by the ignored test founded_parts_and_
 import sys
 from math import isqrt
 
-PART_NAMES = ["w_new", "a_new", "b_new", "enc_lane", "before_lane", "after_lane", "q_lane", "v_lane", "probe_lane", "out_lane", "moment_face_lane", "read_lane", "face_biases_lane", "a_lane", "b_lane"]
+PART_NAMES = ["w_new", "a_new", "b_new", "enc_lane", "before_lane", "after_lane", "q_lane", "v_lane", "probe_lane", "out_lane", "moment_face_lane", "read_lane", "face_biases_lane", "a_lane", "b_lane", "g_chart"]
 PARTS = len(PART_NAMES)
 OLD = -1
 
@@ -43,6 +43,8 @@ def layout(d):
     push("probe", m2 * dw); push("probe_bias", m2)
     push("pace", paced * (a + 1))
     push("moment_face", dw * m2); push("moment_face_bias", dw); push("lift_bias", dw)
+    if d.get("carry"):
+        push("gchart", f * dw)
     return fam, at
 
 
@@ -54,6 +56,9 @@ def founded_parts(d, contacts_before):
     half_old, half_new = contacts_before // 2, f // 2
     new_contact = lambda e: half_old <= e < half_new or e >= half_new + half_old
     parts = [OLD] * total
+    if d.get("carry"):
+        for i in range(f * dw):
+            parts[fam["gchart"] + i] = 15
     for part, name in ((3, "enc"), (4, "before"), (5, "after")):
         for r in range(a1):
             for c in range(lw, dw):
@@ -92,6 +97,7 @@ def load(path):
     words = lines[1].split(" ")
     names = ["alphabet", "width", "heads", "modes", "still", "contacts", "ticks", "frames", "reach", "lanes"]
     d = {k: int(w) for k, w in zip(names, words[1:11])}
+    d["carry"] = words[0] == "hnn-field-v14k"
     rate = int(lines[0].split(" ")[1])
     theta = [int(x) for x in lines[2].split(" ")]
     return lines, d, rate, theta
@@ -101,7 +107,9 @@ def parts_line(lines):
     for l in lines:
         if l.startswith("parts "):
             v = [int(x) for x in l.split(" ")[1:]]
-            assert len(v) == 1 + PARTS
+            assert len(v) in (PARTS, 1 + PARTS), "a parts line of fifteen parts (before the carry) or sixteen"
+            if len(v) == PARTS:
+                v = v + [0]
             return v[0], v[1:]
     return None
 
@@ -126,7 +134,9 @@ def main():
     if len(args) == 5 and args[0] == "open":
         lines, d, rate, _ = load(args[1])
         contacts_before, octaves = int(args[2]), [int(k) for k in args[3].split(",")]
-        assert len(octaves) == PARTS and all(0 <= k < rate for k in octaves), "fifteen octave counts each under the rate's bits"
+        if len(octaves) == PARTS - 1:
+            octaves.append(0)
+        assert len(octaves) == PARTS and all(0 <= k < rate for k in octaves), "sixteen octave counts (fifteen, g_chart at the old rate) each under the rate's bits"
         assert 0 < contacts_before <= d["contacts"] and contacts_before % 4 == 0
         parts = founded_parts(d, contacts_before)
         for p, name in enumerate(PART_NAMES):
@@ -134,6 +144,13 @@ def main():
         write(lines, contacts_before, octaves, args[4])
     elif len(args) == 5 and args[0] == "update":
         (_, da, ra, older), (_, db, rb, old), (lines, dc, rate, now) = load(args[1]), load(args[2]), load(args[3])
+        # A state before the carry has no third chart: its entries read as zero (the founding), so the first lap of the carry reads the carry's own travel.
+        if dc.get("carry"):
+            if not da.get("carry"):
+                older = older + [0] * (len(now) - len(older))
+            if not db.get("carry"):
+                old = old + [0] * (len(now) - len(old))
+            da, db = {**da, "carry": True}, {**db, "carry": True}
         assert da == db == dc and len(older) == len(old) == len(now), "three states of one declaration"
         held = parts_line(lines)
         assert held is not None, "a state with no founded parts' rates (open sets them)"
@@ -231,4 +248,5 @@ def trend(paths, out):
     write(lines, contacts_before, nxt, out)
 
 
-main()
+if __name__ == "__main__":
+    main()
