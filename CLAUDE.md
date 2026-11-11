@@ -389,8 +389,8 @@ Athena text milestone claimed before a test of use was retracted or retired.
   by its measurement ("the predictor codes above flat on unseen families"), not as a missing part.
 
 [project-postulate] **Method, each rule with its reason.** These were given in conversation between
-October 29 and November 10. They are written here with their reasons so that no agent holds them as
-slogans.
+October 29 and November 10; the last was derived from a failure of November 11. They are written
+here with their reasons so that no agent holds them as slogans.
 - **Theory picks, and a run tests a stated prediction** (November 4). Derive which law the theory
   gives, fix its guess as a number before the read, run that one law and score the guess, a miss
   included. Reason: arms cost card time and choose by a short reading, and a winner picked that way
@@ -430,6 +430,18 @@ slogans.
   needs something outside the machine, and the refusal of authored routines is of machinery. Equal
   codes do not mean equal knowledge: before saying the field "holds" a ruler's law, multiply the
   faces into the ruler and read the product.
+- **A build enters a line by reproducing it** (November 11; theory's, from that day's failure).
+  Before a new build trains or reads for a running line, it trains from the line's last saved state
+  with its new law off, and its section lines (timings aside) equal the line's own lap's on every
+  section read. A commit described as a reading or a realization carries that receipt in the same
+  change. A state that a tool wrote is checked for every line the law reads before a lap trains
+  from it. Reason: on November 11 the scan's first lap differed from its control three ways: by
+  the scan, by a November 6 commit described as a reading that had changed a path state's training
+  comparison (main had held that change the same day, and the line took the commit without its
+  hold), and by a state tool that left the part rates behind an empty line, so that every part
+  trained at the base rate. A tree's parity of card against host cannot see a difference of law
+  between two trees. Scope: every build whose laps or reads enter a line's score; a first build of
+  a new line has no lap to reproduce ([the record](research/records/2026-11-11_A_BUILD_ENTERS_A_LINE_BY_REPRODUCING_THE_LINES_OWN_LAP_A_COMMIT_CALLED_A_READING_HAD_CHANGED_THE_TRAINING_COMPARISON_AND_A_ONCE_A_SITE_PART_NEEDS_ITS_OWN_GRID.md)).
 
 [project-postulate] **GPU first, and the design fixes the workload** (Brandon, October 27;
 [the record](research/records/2026-10-27_THE_LEARNER_RUNS_ON_THE_CARD_AND_ITS_WORKLOAD_IS_NEVER_TRADED_FOR_TIME.md)). The RTX 4080 SUPER is a consumer card, and

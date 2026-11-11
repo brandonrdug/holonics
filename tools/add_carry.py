@@ -28,11 +28,15 @@ def main():
     lines[3] = lines[3] + " " + zeros
     lines[4] = lines[4] + " " + zeros
     kept = [l for l in lines if not l.startswith("parts ")]
+    # The empty lines at the end go before the parts line is appended. Reason: the field's reader takes the parts line as the line after the
+    # two moment lines; on November 11 this tool stripped after appending, the state's last newline left an empty sixth line, and a lap
+    # trained every part at the base rate without a refusal.
+    while kept and kept[-1] == "":
+        kept.pop()
     held = parts_line(lines)
     if held is not None:
         kept.append("parts " + " ".join(str(x) for x in [held[0]] + held[1]))
-    while kept and kept[-1] == "":
-        kept.pop()
+    assert all(kept), "an empty line inside the state"
     with open(out, "x") as fh:
         fh.write("\n".join(kept) + "\n")
     print(f"ADD_CARRY entries={f} material={len(theta)} -> {len(theta) + f}")
