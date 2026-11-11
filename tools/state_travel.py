@@ -41,7 +41,34 @@ the code does not read. For each block (a family's entries of one lane, the new 
   GAUGE lap k   by lane: eps pooled over the blocks that write the lane's face and over the lift's rows that read it back.
 role names a block's place in that scale: writes (the lane's face), lifts (the lift's rows), reads (charts that read the lane's
 ratio), other. Numbers only.
+
+state_travel.py weighed CONTACTS_BEFORE SECTIONS SITES STATE STATE STATE [STATE ...]: the lap cosine in the deposit's own metric (theory,
+November 11), from three or more saved states of one line, in order; SECTIONS a lap and SITES a lap are the line's (they only set the
+unit of the two prices). The deposit steps entry i by 2^-rate m_i / s_i, its first moment over the root s_i of its second, so every
+entry's noise travels alike whatever its covector's size, and an entry whose covector is small and of one sign travels as far as any.
+A step d changes the section's code by -sum g_i d_i at first order, and a lap's travel reads the mean covector as
+g_i = s_i d_i 2^rate / SECTIONS; so the code two laps' common travel is worth weighs each entry's product d1_i d2_i by s_i. s is read
+from the state between the two laps (the learner's text: the field's two lines, then the first moments and the second, each on one
+line). For each block of `scale` (and the carry's chart by lane):
+  WEIGHED_LAP   the block's entries and how many have opened (s above 0), its travel's rms, and heat: 2^-rate s_i / 4 summed, the
+                standing spread's cost if every entry rests in its own noise (an entry at rest under this step holds a variance
+                2^-rate s / 2H at curvature H, a cost 2^-rate s / 4 whatever H), at the rates the lap ran at (the `parts` line of
+                the state the lap ended in) and at the base rate, in millionths of a bit a site as a section line prices a step;
+  WEIGHED_PAIR  cos, the plain cosine of two successive laps' travels; cos_w, the cosine with every product weighed by s_i; q1 .. q4,
+                the entries in order of falling s cut into four groups of equal summed s, each with its count and its plain cosine
+                (q1 the few entries of the largest covectors, q4 the many of the smallest); and fall, the first-order fall of the
+                code the later lap's travel made along the drift the earlier lap's travel read, sum s_i d1_i d2_i 2^(rate - 32 -
+                2 grain) / SITES, in the same unit (below zero: the later lap went back).
+  WEIGHED_TOTAL the heats and the falls summed over every block. Numbers only.
+
+state_travel.py mean OUT HEAD STATE [STATE ...]: writes OUT, a new file: HEAD's learner text with its material replaced by the mean,
+entry by entry, of the STATEs' materials, each mean released to the nearest integer (a half away from zero). Everything else (the
+head line with its lap count, the moments, the `parts` line) is HEAD's, so a read of OUT draws the paths and masks a read of HEAD
+draws. With one STATE it is that state's material under HEAD's lap count. A state under a deposit at rest is a draw about its rest
+position; the mean of draws taken a lap apart lies nearer to it than any of them. OUT is a ruler's state: it is read, and no lap
+trains from it. HEAD must hold no held step (a step is of one material). Numbers only.
 """
+import os
 import sys
 
 import numpy as np
@@ -240,6 +267,10 @@ def scale_blocks(d, old_f):
             add(name, 0, sub, "other", name, m)
     for name in ("q_bias", "v_bias", "probe_bias", "read_bias", "moment_before", "moment_after", "temper", "pace"):
         add(name, 0, "all", "other", name, np.ones(shapes[name], dtype=bool))
+    if "gchart" in shapes:
+        for k, sel in enumerate(lane_of, 1):
+            m = np.zeros(shapes["gchart"], dtype=bool); m[:, sel] = True
+            add("gchart", k, "all", "reads", "gchart", m)
     return out
 
 
@@ -290,7 +321,123 @@ def scale(old_f, paths):
             print(f"TRAVEL_SCALE_PAIR laps={k},{k + 1} block={block} lane={lane} contacts={contacts} role={role} cos={cosine(d0, d1):+.4f} cos_tan={cosine(t0, t1):+.4f}")
 
 
+def learner(path):
+    """A saved learner's declaration, material, the roots of its second moments, its base rate's bits and its `parts` line (None
+    without one): `(d, theta, s, rate_bits, (contacts_before, octaves))`."""
+    lines = open(path).read().split("\n")
+    d, theta = state(path)
+    assert len(lines) > 4, "a learner's text with its two moments' lines"
+    first_len = lines[3].count(" ") + 1
+    second = np.array(lines[4].split(" "), dtype=np.float64)
+    assert first_len == len(theta) == len(second), "each moment's line is the material's length"
+    parts = None
+    for line in lines[5:]:
+        if line.startswith("parts "):
+            v = [int(x) for x in line.split(" ")[1:]]
+            parts = (v[0], v[1:])
+    return d, theta, np.sqrt(np.maximum(second, 0.0)), int(lines[0].split(" ")[1]), parts
+
+
+def entry_rates(d, total, rate_bits, parts):
+    """Each entry's deposit rate in bits (FieldLearner::entry_rates): the base rate, less its founded part's octaves, never under one."""
+    rates = np.full(total, rate_bits, dtype=np.int64)
+    if parts is not None:
+        sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+        import part_rates
+
+        contacts_before, octaves = parts
+        founded = np.array(part_rates.founded_parts(d, contacts_before))
+        assert len(founded) == total
+        for p, k in enumerate(octaves):
+            rates[founded == p] = max(rate_bits - k, 1)
+    return rates
+
+
+def weighed(old_f, sections, sites, paths):
+    states = [learner(p) for p in paths]
+    d = states[0][0]
+    assert all(s[0] == d for s in states), "states of one declaration"
+    assert len(states) >= 3, "two laps, three states"
+    assert 0 < old_f <= d["contacts"] and old_f % 4 == 0, "the contacts before the growth, by fours"
+    assert sections > 0 and sites > 0
+    fam, total = layout(d)
+    assert all(len(s[1]) == total for s in states), "the material's length"
+    where = {name: (at, shape, grain) for name, at, shape, grain in fam}
+    blocks = []
+    grain_of = np.zeros(total, dtype=np.int64)
+    seen = np.zeros(total, dtype=np.int64)
+    for block, lane, contacts, role, family, mask in scale_blocks(d, old_f):
+        at, shape, grain = where[family]
+        idx = at + np.flatnonzero(mask.ravel())
+        grain_of[idx] = grain
+        seen[idx] += 1
+        blocks.append((block, lane, contacts, role, idx))
+    assert (seen == 1).all(), "the blocks hold every entry once"
+    print(f"# declaration {d}; contacts {old_f} -> {d['contacts']}; lane width {d['width'] // d['lanes']}; {sections} sections and {sites} sites a lap")
+    for i, path in enumerate(paths):
+        print(f"# state {i} {path} rate_bits={states[i][3]} parts={'-' if states[i][4] is None else ','.join(str(k) for k in states[i][4][1])}")
+    micro = 1e6
+    per_section = sites / sections
+    travels, rates = [], []
+    for k in range(len(states) - 1):
+        _, theta0, _, _, _ = states[k]
+        _, theta1, s1, rate_bits, parts = states[k + 1]
+        dv = (theta1 - theta0).astype(np.float64)
+        rate = entry_rates(d, total, rate_bits, parts)
+        heat = np.exp2(-rate.astype(np.float64) - 32) * s1 / (4 * per_section) * micro
+        heat_base = np.exp2(-float(rate_bits) - 32) * s1 / (4 * per_section) * micro
+        for block, lane, contacts, role, idx in blocks:
+            x = dv[idx]
+            print(f"TRAVEL_WEIGHED_LAP lap={k} block={block} lane={lane} contacts={contacts} role={role} entries={idx.size} open={int((s1[idx] > 0).sum())} travel_rms={float(np.sqrt((x ** 2).mean())):.5g} heat_micro={float(heat[idx].sum()):.4f} heat_base_micro={float(heat_base[idx].sum()):.4f}")
+        print(f"TRAVEL_WEIGHED_TOTAL lap={k} heat_micro={float(heat.sum()):.4f} heat_base_micro={float(heat_base.sum()):.4f}")
+        travels.append(dv)
+        rates.append(rate)
+    cosine = lambda u, v, w: float((w * u * v).sum() / np.sqrt((w * u * u).sum() * (w * v * v).sum())) if (w * u * u).sum() > 0 and (w * v * v).sum() > 0 else float("nan")
+    for k in range(len(travels) - 1):
+        s_mid = states[k + 1][2]
+        d1, d2 = travels[k], travels[k + 1]
+        fall = s_mid * d1 * d2 * np.exp2(rates[k].astype(np.float64) - 32 - 2 * grain_of) / sites * micro
+        for block, lane, contacts, role, idx in blocks:
+            u, v, w = d1[idx], d2[idx], s_mid[idx]
+            order = np.argsort(-w, kind="stable")
+            ws = w[order]
+            whole = float(ws.sum())
+            groups = np.minimum((4 * (np.cumsum(ws) - ws / 2) / whole).astype(np.int64), 3) if whole > 0 else np.zeros(len(ws), dtype=np.int64)
+            quarters = []
+            for q in range(4):
+                sel = order[groups == q]
+                quarters.append(f"q{q + 1}_n={sel.size} q{q + 1}_cos={cosine(u[sel], v[sel], np.ones(sel.size)):+.4f}")
+            print(f"TRAVEL_WEIGHED_PAIR laps={k},{k + 1} block={block} lane={lane} contacts={contacts} role={role} cos={cosine(u, v, np.ones(idx.size)):+.4f} cos_w={cosine(u, v, w):+.4f} {' '.join(quarters)} fall_micro={float(fall[idx].sum()):+.4f}")
+        print(f"TRAVEL_WEIGHED_TOTAL laps={k},{k + 1} fall_micro={float(fall.sum()):+.4f}")
+
+
+def mean(out, head, paths):
+    lines = open(head).read().split("\n")
+    d, theta_head = state(head)
+    assert lines[0].split(" ")[0] == "hnn-field-learner-v3" and lines[0].split(" ")[4] == "-", "a learner's text with no held step"
+    total = [0] * len(theta_head)
+    for p in paths:
+        dp, theta = state(p)
+        assert dp == d and len(theta) == len(total), "states of one declaration"
+        total = [t + int(x) for t, x in zip(total, theta)]
+    n = len(paths)
+    near = lambda t: (2 * abs(t) + n) // (2 * n) * (1 if t >= 0 else -1)
+    material = [near(t) for t in total]
+    assert all(-(1 << 31) <= x < (1 << 31) for x in material), "the material's 32-bit carrier"
+    lines[2] = " ".join(str(x) for x in material)
+    with open(out, "x") as f:
+        f.write("\n".join(lines))
+    moved = np.array(material, dtype=np.float64) - theta_head.astype(np.float64)
+    print(f"STATE_MEAN states={n} entries={len(material)} moved={int((moved != 0).sum())} rms_from_head={float(np.sqrt((moved ** 2).mean())):.5g}")
+
+
 def main():
+    if len(sys.argv) >= 5 and sys.argv[1] == "mean":
+        mean(sys.argv[2], sys.argv[3], sys.argv[4:])
+        return
+    if len(sys.argv) >= 8 and sys.argv[1] == "weighed":
+        weighed(int(sys.argv[2]), int(sys.argv[3]), int(sys.argv[4]), sys.argv[5:])
+        return
     if len(sys.argv) >= 5 and sys.argv[1] == "rank":
         rank(int(sys.argv[2]), sys.argv[3:])
         return

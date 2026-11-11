@@ -13,6 +13,20 @@ Controls of its scale reading, on three more drawn states with a planted travel 
   across itself   `q`'s lane columns move by one vector orthogonal to them on both laps: rho near 0, both cosines near 1;
   both            `out`'s lane rows lengthen by one part in 64 and move across by a vector of the same length that reverses on the
                   second lap: rho near 0.71, the cosine near 0 and the cosine across near -1.
+
+Controls of its weighed reading, on three more drawn states that carry second moments and a `parts` line (the key chart's lane two
+octaves fast). In each of two blocks half the entries hold a second moment's root three times the other half's:
+  small covectors travel   in `q`'s lane columns the entries of the small root move the same way on both laps and the others reverse
+                           entry by entry: the plain cosine 1/2, the weighed cosine 1/4, the last quarter's cosine 1 and the first
+                           three near 0; the fall is that of the small entries alone at the lane's rate (1/4 of a millionth);
+  large covectors travel   in `v`'s lane columns the reverse: the plain cosine 1/2 again, the weighed 3/4, the first three quarters'
+                           cosines 1 and the last 0; the fall 3 millionths;
+  heat                     the key chart's lane, two octaves fast, holds four times its base heat (0.2441 of a millionth); the totals
+                           are the blocks' sums, and a block that never opened holds none.
+
+Controls of its mean, on the same kind of states: the mean of two materials that differ by one in an entry lies a half away from
+zero (1 and 2 give 2, -1 and -2 give -2, 3 and -3 give 0), the mean of three is their third, every line but the material is the
+head's, one state under another head is its own material, and a file that stands is not overwritten.
 """
 import io
 import os
@@ -28,10 +42,14 @@ D = {"alphabet": 5, "width": 16, "heads": 4, "modes": 2, "still": 2, "contacts":
 OLD_F = 8
 
 
-def write(path, theta):
+def write(path, theta, second=None, parts=None):
     words = ["hnn-field-v14"] + [str(D[k]) for k in ("alphabet", "width", "heads", "modes", "still", "contacts", "ticks", "frames", "reach", "lanes")] + ["0"]
     with open(path, "w") as f:
-        f.write("hnn-field-learner-v3 12\n" + " ".join(words) + "\n" + " ".join(str(int(x)) for x in theta) + "\n")
+        f.write("hnn-field-learner-v3 12 0 0 -\n" + " ".join(words) + "\n" + " ".join(str(int(x)) for x in theta) + "\n")
+        if second is not None:
+            f.write(" ".join("0" for _ in theta) + "\n" + " ".join(str(int(x)) for x in second) + "\n")
+        if parts is not None:
+            f.write("parts " + " ".join(str(k) for k in parts) + "\n")
 
 
 def fields(line):
@@ -156,9 +174,121 @@ def scale_controls():
     print(f"state_travel scale: {len(rows)} lines, three controls hold")
 
 
+def weighed_controls():
+    rng = np.random.default_rng(20261113)
+    fam, total = state_travel.layout(D)
+    where = {name: (a, shape) for name, a, shape, _ in fam}
+    dw = D["width"]
+    lane = np.arange(dw) >= dw // D["lanes"]
+    rows = D["heads"] * D["modes"]  # half the charts' rows
+
+    def view(x, name):
+        a, shape = where[name]
+        return x[a:a + int(np.prod(shape))].reshape(shape)
+
+    base = rng.integers(-100000, 100000, size=total).astype(np.int64)
+    root, step = 1 << 30, 1 << 18
+    second = [0] * total  # integers past 64 bits: a second moment is a square on the step's grain
+
+    def set_second(name, r, value):
+        a, (_, cols) = where[name]
+        for c in np.flatnonzero(lane):
+            second[a + r * cols + c] = value
+
+    for name, top in (("q", 3 * root), ("v", 3 * root)):
+        for r in range(2 * rows):
+            set_second(name, r, (top if r < rows else root) ** 2)
+    flip = np.where(np.arange(rows * int(lane.sum())) % 2 == 0, 1, -1).reshape(rows, int(lane.sum()))
+    states = [base]
+    for lap in range(2):
+        theta = states[-1].copy()
+        q, v = view(theta, "q"), view(theta, "v")
+        turn = flip if lap == 1 else 1
+        q[:rows, lane] += step * turn      # the large roots reverse entry by entry
+        q[rows:, lane] += step             # the small roots travel
+        v[:rows, lane] += step             # the large roots travel
+        v[rows:, lane] += step * turn      # the small roots reverse
+        states.append(theta)
+    sections, sites = 1000, 16_000_000
+    octaves = [0] * 16
+    octaves[6] = 2  # q_lane
+    with tempfile.TemporaryDirectory() as tmp:
+        paths = [os.path.join(tmp, f"s{i}") for i in range(3)]
+        for p, theta in zip(paths, states):
+            write(p, theta, second, [OLD_F] + octaves)
+        out_text = io.StringIO()
+        with redirect_stdout(out_text):
+            state_travel.weighed(OLD_F, sections, sites, paths)
+    lines = [l for l in out_text.getvalue().split("\n") if l.startswith("TRAVEL_")]
+    pick = lambda kind, **want: [fields(l) for l in lines if l.startswith(kind + " ") and all(fields(l).get(k) == v for k, v in want.items())]
+    n = 2 * rows * int(lane.sum())
+    # Small covectors travel.
+    (pair,) = pick("TRAVEL_WEIGHED_PAIR", block="q", lane="2")
+    assert abs(float(pair["cos"]) - 0.5) < 1e-3 and abs(float(pair["cos_w"]) - 0.25) < 1e-3, pair
+    assert float(pair["q4_cos"]) > 0.999 and all(abs(float(pair[f"q{i}_cos"])) < 0.06 for i in (1, 2, 3)), pair
+    assert int(pair["q4_n"]) == n // 2 and sum(int(pair[f"q{i}_n"]) for i in (1, 2, 3)) == n // 2, pair
+    assert abs(float(pair["fall_micro"]) - 0.25) < 1e-3, pair
+    # Large covectors travel.
+    (pair,) = pick("TRAVEL_WEIGHED_PAIR", block="v", lane="2")
+    assert abs(float(pair["cos"]) - 0.5) < 1e-3 and abs(float(pair["cos_w"]) - 0.75) < 1e-3, pair
+    assert abs(float(pair["q4_cos"])) < 1e-3 and all(float(pair[f"q{i}_cos"]) > 0.999 for i in (1, 2, 3)), pair
+    assert abs(float(pair["fall_micro"]) - 3.0) < 1e-3, pair
+    # Heat.
+    for lap in pick("TRAVEL_WEIGHED_LAP", block="q", lane="2"):
+        assert int(lap["entries"]) == n and int(lap["open"]) == n, lap
+        assert abs(float(lap["heat_base_micro"]) - 0.2441) < 1e-3 and abs(float(lap["heat_micro"]) - 4 * 0.2441) < 2e-3, lap
+    for lap in pick("TRAVEL_WEIGHED_LAP", block="v", lane="2"):
+        assert abs(float(lap["heat_micro"]) - 0.2441) < 1e-3 and lap["heat_micro"] == lap["heat_base_micro"], lap
+    for lap in pick("TRAVEL_WEIGHED_LAP", block="q", lane="1"):
+        assert int(lap["open"]) == 0 and float(lap["heat_micro"]) == 0.0 and float(lap["travel_rms"]) == 0.0, lap
+    totals = [fields(l) for l in lines if l.startswith("TRAVEL_WEIGHED_TOTAL ")]
+    heats = [t for t in totals if "heat_micro" in t]
+    falls = [t for t in totals if "fall_micro" in t]
+    assert len(heats) == 2 and all(abs(float(t["heat_micro"]) - 5 * 0.2441) < 2e-3 and abs(float(t["heat_base_micro"]) - 2 * 0.2441) < 1e-3 for t in heats), heats
+    assert len(falls) == 1 and abs(float(falls[0]["fall_micro"]) - 3.25) < 1e-3, falls
+    print(f"state_travel weighed: {len(lines)} lines, three controls hold")
+
+
+def mean_controls():
+    rng = np.random.default_rng(20261114)
+    _, total = state_travel.layout(D)
+    a = rng.integers(-100000, 100000, size=total).astype(np.int64)
+    b = a + rng.integers(-9, 10, size=total)
+    c = a + rng.integers(-9, 10, size=total)
+    a[:3], b[:3], c[:3] = (1, -1, 3), (2, -2, -3), (2, -2, -3)
+    second = [7] * total
+    with tempfile.TemporaryDirectory() as tmp:
+        pa, pb, pc = (os.path.join(tmp, name) for name in "abc")
+        write(pa, a, second, [OLD_F] + [0] * 16)
+        write(pb, b, second, [OLD_F] + [1] * 16)
+        write(pc, c, [9] * total, [OLD_F] + [2] * 16)
+        quiet = io.StringIO()
+        with redirect_stdout(quiet):
+            state_travel.mean(os.path.join(tmp, "two"), pb, [pa, pb])
+            state_travel.mean(os.path.join(tmp, "three"), pc, [pa, pb, pc])
+            state_travel.mean(os.path.join(tmp, "one"), pc, [pa])
+        (_, two), (_, three), (_, one) = (state_travel.state(os.path.join(tmp, name)) for name in ("two", "three", "one"))
+        assert list(two[:3]) == [2, -2, 0], two[:3]
+        want = [int(np.floor((2 * abs(t) + 3) / 6)) * (1 if t >= 0 else -1) for t in (a + b + c)]
+        assert list(three) == want and list(one) == list(a)
+        assert abs(two - (a + b) / 2).max() <= 0.5
+        for name, head in (("two", pb), ("three", pc), ("one", pc)):
+            got, kept = open(os.path.join(tmp, name)).read().split("\n"), open(head).read().split("\n")
+            assert len(got) == len(kept) and all(g == k for i, (g, k) in enumerate(zip(got, kept)) if i != 2), name
+        try:
+            with redirect_stdout(quiet):
+                state_travel.mean(os.path.join(tmp, "two"), pb, [pa, pb])
+            raise AssertionError("a standing file was overwritten")
+        except FileExistsError:
+            pass
+    print(f"state_travel mean: {len(quiet.getvalue().splitlines())} lines, the controls hold")
+
+
 def main():
     rank_controls()
     scale_controls()
+    weighed_controls()
+    mean_controls()
 
 
 if __name__ == "__main__":
