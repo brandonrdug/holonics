@@ -228,6 +228,7 @@ def weighed_controls():
     assert float(pair["q4_cos"]) > 0.999 and all(abs(float(pair[f"q{i}_cos"])) < 0.06 for i in (1, 2, 3)), pair
     assert int(pair["q4_n"]) == n // 2 and sum(int(pair[f"q{i}_n"]) for i in (1, 2, 3)) == n // 2, pair
     assert abs(float(pair["fall_micro"]) - 0.25) < 1e-3, pair
+    assert abs(float(pair["eps_w"]) - (5 * n) ** 0.5 / (2 * n)) < 1e-3, pair
     # Large covectors travel.
     (pair,) = pick("TRAVEL_WEIGHED_PAIR", block="v", lane="2")
     assert abs(float(pair["cos"]) - 0.5) < 1e-3 and abs(float(pair["cos_w"]) - 0.75) < 1e-3, pair
@@ -247,6 +248,49 @@ def weighed_controls():
     assert len(heats) == 2 and all(abs(float(t["heat_micro"]) - 5 * 0.2441) < 2e-3 and abs(float(t["heat_base_micro"]) - 2 * 0.2441) < 1e-3 for t in heats), heats
     assert len(falls) == 1 and abs(float(falls[0]["fall_micro"]) - 3.25) < 1e-3, falls
     print(f"state_travel weighed: {len(lines)} lines, three controls hold")
+
+
+def lag_controls():
+    """Four states: the probe chart's lane columns travel one way on the first lap, wander on the second, and on the third the large
+    roots repeat the first lap and the small roots reverse it. Two laps on, the plain cosine is 0 and the weighed one 1/2."""
+    rng = np.random.default_rng(20261114)
+    fam, total = state_travel.layout(D)
+    where = {name: (a, shape) for name, a, shape, _ in fam}
+    dw = D["width"]
+    lane = np.arange(dw) >= dw // D["lanes"]
+    rows = D["heads"] * D["modes"]
+    a, (_, cols) = where["probe"]
+    root, step = 1 << 30, 1 << 18
+    second = [0] * total
+    for r in range(2 * rows):
+        for c in np.flatnonzero(lane):
+            second[a + r * cols + c] = ((3 * root) if r < rows else root) ** 2
+    base = rng.integers(-100000, 100000, size=total).astype(np.int64)
+    states = [base]
+    for lap in range(3):
+        theta = states[-1].copy()
+        probe = theta[a:a + 2 * rows * cols].reshape(2 * rows, cols)
+        if lap == 0:
+            probe[:, lane] += step
+        elif lap == 1:
+            probe[:, lane] += step * rng.choice([-1, 1], size=(2 * rows, int(lane.sum())))
+        else:
+            probe[:rows, lane] += step
+            probe[rows:, lane] -= step
+        states.append(theta)
+    with tempfile.TemporaryDirectory() as tmp:
+        paths = [os.path.join(tmp, f"s{i}") for i in range(4)]
+        for p, theta in zip(paths, states):
+            write(p, theta, second, [OLD_F] + [0] * 16)
+        out_text = io.StringIO()
+        with redirect_stdout(out_text):
+            state_travel.weighed(OLD_F, 1000, 16_000_000, paths)
+    lines = [l for l in out_text.getvalue().split("\n") if l.startswith("TRAVEL_WEIGHED_LAG ")]
+    rows_of = [fields(l) for l in lines if fields(l)["block"] == "probe" and fields(l)["lane"] == "2"]
+    assert [r["lag"] for r in rows_of] == ["2"], rows_of
+    assert abs(float(rows_of[0]["cos"])) < 1e-3 and abs(float(rows_of[0]["cos_w"]) - 0.5) < 1e-3, rows_of
+    assert not any(fields(l)["lag"] == "3" for l in lines), "four states hold one pair two laps apart and none three apart"
+    print(f"state_travel lag: {len(lines)} lines, the control holds")
 
 
 def mean_controls():
@@ -288,6 +332,7 @@ def main():
     rank_controls()
     scale_controls()
     weighed_controls()
+    lag_controls()
     mean_controls()
 
 

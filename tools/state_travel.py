@@ -58,7 +58,12 @@ line). For each block of `scale` (and the carry's chart by lane):
                 the entries in order of falling s cut into four groups of equal summed s, each with its count and its plain cosine
                 (q1 the few entries of the largest covectors, q4 the many of the smallest); and fall, the first-order fall of the
                 code the later lap's travel made along the drift the earlier lap's travel read, sum s_i d1_i d2_i 2^(rate - 32 -
-                2 grain) / SITES, in the same unit (below zero: the later lap went back).
+                2 grain) / SITES, in the same unit (below zero: the later lap went back); eps_w, the weighed cosine's own spread
+                if the entries' products had no common sign, the root of sum (s_i d1_i d2_i)^2 over the same norm.
+  WEIGHED_LAG   with four states or more: the plain and the weighed cosine of a lap's travel with the travel two laps on, and
+                three (weighed by the root after the first). A block at rest about a fixed position, its lap ends related by r^k
+                at k laps, reads -(1 - r)/2 at one lap, -r(1 - r)/2 at two and -r^2 (1 - r)/2 at three; a drift adds its share of
+                the squared travel to each. So the three cosines read a block's memory and its drift apart.
   WEIGHED_TOTAL the heats and the falls summed over every block. Numbers only.
 
 state_travel.py mean OUT HEAD STATE [STATE ...]: writes OUT, a new file: HEAD's learner text with its material replaced by the mean,
@@ -407,8 +412,18 @@ def weighed(old_f, sections, sites, paths):
             for q in range(4):
                 sel = order[groups == q]
                 quarters.append(f"q{q + 1}_n={sel.size} q{q + 1}_cos={cosine(u[sel], v[sel], np.ones(sel.size)):+.4f}")
-            print(f"TRAVEL_WEIGHED_PAIR laps={k},{k + 1} block={block} lane={lane} contacts={contacts} role={role} cos={cosine(u, v, np.ones(idx.size)):+.4f} cos_w={cosine(u, v, w):+.4f} {' '.join(quarters)} fall_micro={float(fall[idx].sum()):+.4f}")
+            norm = float(np.sqrt((w * u * u).sum() * (w * v * v).sum()))
+            spread = float(np.sqrt(((w * u * v) ** 2).sum()) / norm) if norm > 0 else float("nan")
+            print(f"TRAVEL_WEIGHED_PAIR laps={k},{k + 1} block={block} lane={lane} contacts={contacts} role={role} cos={cosine(u, v, np.ones(idx.size)):+.4f} cos_w={cosine(u, v, w):+.4f} {' '.join(quarters)} fall_micro={float(fall[idx].sum()):+.4f} eps_w={spread:.4f}")
         print(f"TRAVEL_WEIGHED_TOTAL laps={k},{k + 1} fall_micro={float(fall.sum()):+.4f}")
+    # The travel's memory: a lap's travel with the travel two and three laps on (weighed by the root after the first of them).
+    for lag in (2, 3):
+        for k in range(len(travels) - lag):
+            s_after = states[k + 1][2]
+            d1, d2 = travels[k], travels[k + lag]
+            for block, lane, contacts, role, idx in blocks:
+                u, v, w = d1[idx], d2[idx], s_after[idx]
+                print(f"TRAVEL_WEIGHED_LAG laps={k},{k + lag} lag={lag} block={block} lane={lane} contacts={contacts} role={role} cos={cosine(u, v, np.ones(idx.size)):+.4f} cos_w={cosine(u, v, w):+.4f}")
 
 
 def mean(out, head, paths):
