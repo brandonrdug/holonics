@@ -157,8 +157,10 @@ repository was reset on September 24; the pre-reset tree is
     `hnn.field-square-affinity`, retired at the port), because local ratios are one law's only
     where every cycle closes; it enters the law only if its curl sits where the release fails.
   - A founding is judged by its strength: the held code it buys over the entries it founds, by
-    region (`tools/founding_strength.py`, atlas `tower.founding-strength-by-region`). Owed to it:
-    the entries counted net of the kernel, the re-chartings that change no face (the record §14.8).
+    region (`tools/founding_strength.py`, atlas `tower.founding-strength-by-region`). Its entries
+    are read net of the kernel, the re-chartings that change no face (the record §14.8): four real
+    ones a complex contact, a percent of the entries at most on the three foundings read, so their
+    ranks stand.
   - The residual at half rank (the record §14.9, U6): where the field holds a region's law the
     summed residual grows as the root of the count, and where it lacks one it grows as the count; a
     host ruler on a saved state's held read. Not run.

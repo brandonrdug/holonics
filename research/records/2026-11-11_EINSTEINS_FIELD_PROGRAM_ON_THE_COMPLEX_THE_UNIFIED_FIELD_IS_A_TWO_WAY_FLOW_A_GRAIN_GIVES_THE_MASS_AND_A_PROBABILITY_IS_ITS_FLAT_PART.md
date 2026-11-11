@@ -828,6 +828,12 @@ region's free data which buys nothing at that reader. U4's strength counts a fou
 that kernel, the re-chartings that change no face, or a founding with a large kernel reads as weak for a reason that is not
 its own.
 
+Counted the same day by the line (main `1e413ef`, the ruler's declaration; the count is the line's, agent-inferred there). A
+complex contact carries four real re-chartings that change no face. The kernel therefore holds 64 of the 6,208 entries of
+the contacts of November 10, 128 of the circles' 16,576 and none of the gate chart's 4,096: a percent at most. The ranks
+stand as printed, and the circles' last place per entry is their own. A founding whose kernel passes a percent or so of its
+entries owes a kernel term before it is ranked.
+
 ### 14.9 "The spectrum" is a gap law (corrects §10's item)
 
 [owned and standard, ruler 13; the restatement agent-inferred]
@@ -893,7 +899,7 @@ this section leaves it: the equation from the heat balance (§14.7), the criteri
 
 - U1 gains its reason (§14.3): a face outside the unit disk is a turn that boosts.
 - U2 gains a name (§14.6): a part's polarization is its quality, and a part of quality under one belongs under the floor.
-- U4 is refined (§14.8): a founding's entries are counted net of the kernel.
+- U4 is refined (§14.8): a founding's entries are counted net of the kernel. Counted: a percent at most, and the ranks stand.
 - **U6. The residual at half rank** (§14.9) [agent-inferred].
   - Found: the structural measure "counts of counts of surprise" (the method's rule of November 7) has no stated law.
   - Law: where the field holds a region's law, what is left is a hand that cancels, and the region's summed residual grows
