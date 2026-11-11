@@ -229,6 +229,11 @@ struct Words {
     // [the unified-theory reading of November 6, 10:31] Past the last arrival a silent place runs at the bare rate (the host's
     // `Field::bare_stretch`).
     bare_stretch: u64,
+    // [definition; theory, November 10 23:30, ruling R5] The carry across ticks (`FieldDeclaration::carry`): whether it is on, `κ`'s offset in
+    // the material, and the tick before's pair (zero at the first tick).
+    carry_on: u64,
+    carry_at: u64,
+    carry_prev: u64,
 }
 
 /// The moment kernels' words (`MomentWords` in `kernels/field_moment.cuh`, field for field): the batch's
@@ -1003,6 +1008,8 @@ impl<'c> CardField<'c> {
             per_blank: u64::from(field.per_blank_clock),
             depth: d.depth as u64,
             bare_stretch: u64::from(field.bare_stretch),
+            carry_on: u64::from(d.carry),
+            carry_at: l.kappa as u64,
             ..Words::default()
         };
         // The exponential's resident face, read once by its own loop on the card (a tower's packets read the fine field's).
@@ -1334,6 +1341,8 @@ impl<'c> CardField<'c> {
         let buckets = 4 * 3 * d.classes() as u32;
         let tick = &ticks[if kept { k } else { 0 }];
         set_tick(words, tick, returning);
+        // The carry's operand: the tick before's pair (every tick is kept under the carry).
+        words.carry_prev = if d.carry && k > 0 { ticks[k - 1].pc.device_ptr() } else { 0 };
         self.chart(words, words.x, &tick.read, &tick.scale, false)?;
         for (part, weight, bias, wmax) in [(0usize, words.q, words.q_bias, words.rq), (1, words.v, words.v_bias, words.rv)] {
             let out = tick.qkv.device_ptr() + (part * m2 * 8) as u64;
@@ -1517,7 +1526,7 @@ impl<'c> CardField<'c> {
         self.ratio_adjoint(&mut tr.cwords, tb.read1.device_ptr(), tb.scale1.device_ptr(), cb.dr.device_ptr(), 0, cb.dx.device_ptr(), false)?;
         // The packets' ticks, in reverse.
         for (at, tick) in tb.ticks.iter().enumerate().rev() {
-            self.tick_back(&s.coarse, &mut tr.cwords, tick, at, cg, cb, cb.dm.device_ptr(), packets, false)?;
+            self.tick_back(&s.coarse, &mut tr.cwords, tick, at, 0, (0, 0), cg, cb, cb.dm.device_ptr(), packets, false)?;
         }
         // The restriction: `δb_A`, `δA` and `δ[r̂] = Aᵀ δs`, each place's part through its read's adjoint into `δx`.
         self.outer(&mut tr.cwords, gg, ab as u64, d1, 0, cb.dx.device_ptr(), d1, 0, 0, false, false)?;
@@ -1554,7 +1563,9 @@ impl<'c> CardField<'c> {
         // echo (§15.3: the round trips of consecutive ticks, so every tick is kept).
         let stored = returning || keep.is_some() || logits;
         let kept = returning || logits;
-        let ticks: Vec<Tick> = (0..if kept { d.ticks } else { 1 }).map(|_| self.tick(sites, pairs, regions.len(), field, stored, returning)).collect::<Result<_>>()?;
+        // [theory, November 10 23:30] Under the carry every tick is kept: a tick reads the tick before's pair.
+        let hold = kept || d.carry;
+        let ticks: Vec<Tick> = (0..if hold { d.ticks } else { 1 }).map(|_| self.tick(sites, pairs, regions.len(), field, stored, returning)).collect::<Result<_>>()?;
         // The round trips a site's echo sums (128 bits a site), over the heads and the ticks.
         let trips = self.timed(Kind::Alloc, || self.take_zeroed::<i128>(sites.max(1))).map_err(device)?;
         words.trips = trips.device_ptr();
@@ -1605,7 +1616,7 @@ impl<'c> CardField<'c> {
                     self.tower_forward(field, words, tr, tb, regions.len(), stored, returning, kept)?;
                 }
             }
-            self.tick_forward(field, words, &ticks, k, kept, stored, keep.is_some(), logits, returning, pr.device_ptr(), sites, pairs, regions.len())?;
+            self.tick_forward(field, words, &ticks, k, hold, stored, keep.is_some(), logits, returning, pr.device_ptr(), sites, pairs, regions.len())?;
             if k + 1 < d.ticks {
                 let next = if blanks { Some(self.blank_clock(field, words, regions.len(), sites)?) } else { None };
                 clocks.push(next);
@@ -2083,7 +2094,7 @@ impl<'c> CardField<'c> {
     /// carried back to the covector of its input faces, the level's material covector added into `g`.
     #[allow(clippy::too_many_arguments)]
     #[allow(clippy::too_many_arguments)]
-    fn tick_back(&self, field: &Field, words: &mut Words, tick: &Tick<'c>, at: usize, g: &CardBuffer<'c, i128>, b: &Back<'c>, dm: u64, sites: usize, readings: bool) -> Result<()> {
+    fn tick_back(&self, field: &Field, words: &mut Words, tick: &Tick<'c>, at: usize, prev_pc: u64, carry: (u64, u64), g: &CardBuffer<'c, i128>, b: &Back<'c>, dm: u64, sites: usize, readings: bool) -> Result<()> {
         let card = self.card;
         let d = field.declaration;
         let (dw, m, n, f, heads) = (d.width, d.complex(), d.modes, d.contacts, d.heads);
@@ -2121,7 +2132,15 @@ impl<'c> CardField<'c> {
         self.outer(words, g, words.w, dw, f, dx.device_ptr(), dw, tick.pc.device_ptr(), f, true, false)?;
         self.transposed(words, words.w, dw, f, dx.device_ptr(), dw, dc.device_ptr(), false, false)?;
         let (mut dcp, mut dap, mut dbp) = (dc.device_ptr(), da.device_ptr(), db.device_ptr());
-        self.launch("field_pair_back", Self::cells((sites * f / 2) as u64), THREADS, &mut [arg(words), arg(&mut dcp), arg(&mut dap), arg(&mut dbp)])?;
+        // The carry's reverse (the host's `tick_return`): the pair's covector joins the later tick's (`carry.0`, zero at the last tick), `a`'s
+        // and `b`'s use `u = b + κ p^(k−1)`, `κ`'s covector sums `conj(p^(k−1)) δb`, and `conj(κ) δb` returns to the tick before (`carry.1`).
+        words.carry_prev = if d.carry { prev_pc } else { 0 };
+        let (mut cin, mut cout) = if d.carry { carry } else { (0, 0) };
+        self.launch("field_pair_back", Self::cells((sites * f / 2) as u64), THREADS, &mut [arg(words), arg(&mut dcp), arg(&mut dap), arg(&mut dbp), arg(&mut cin), arg(&mut cout)])?;
+        if d.carry && prev_pc != 0 {
+            let mut gp = g.device_ptr();
+            self.launch("field_kappa_grad", Self::cells((f / 2) as u64), THREADS, &mut [arg(words), arg(&mut dbp), arg(&mut gp)])?;
+        }
         self.outer(words, g, words.wa, f, dw, da.device_ptr(), f, tick.read2.device_ptr(), dw, false, false)?;
         self.outer(words, g, words.wb, f, dw, db.device_ptr(), f, tick.read2.device_ptr(), dw, false, false)?;
         self.outer(words, g, words.a_bias, f, 0, da.device_ptr(), f, 0, 0, false, false)?;
@@ -2311,11 +2330,21 @@ impl<'c> CardField<'c> {
             })
             .collect::<Result<_>>()?;
         let covectors = |at: usize| -> [u64; 3] { own.get(at).and_then(Option::as_ref).map_or([dm.device_ptr(), gtau.device_ptr(), gsig.device_ptr()], |b| [b[0].device_ptr(), b[1].device_ptr(), b[2].device_ptr()]) };
+        // The carry's two covector buffers (`[t][f]`, zero at the last tick), the later tick's and this tick's.
+        let carry_len = if d.carry { sites * d.contacts } else { 0 };
+        let carry_bufs = [self.timed(Kind::Alloc, || self.take_zeroed::<i64>(carry_len.max(1))).map_err(device)?, self.timed(Kind::Alloc, || self.take_zeroed::<i64>(carry_len.max(1))).map_err(device)?];
         for (at, tick) in ticks.iter().enumerate().rev() {
             set_clock(words, clocks.get(at).and_then(Option::as_ref), base_clock);
             let [dmp, gtp, gsp] = covectors(at);
             (words.gtau, words.gsig) = (gtp, gsp);
-            self.tick_back(field, words, tick, at, g, &back, dmp, sites, true)?;
+            let carry = if d.carry {
+                // Ping-pong: tick `at` reads the later tick's carry from `carry_bufs[(at + 1) % 2]` (zero for the last) and writes `[at % 2]`.
+                (carry_bufs[(at + 1) % 2].device_ptr(), carry_bufs[at % 2].device_ptr())
+            } else {
+                (0, 0)
+            };
+            let prev_pc = if d.carry && at > 0 { ticks[at - 1].pc.device_ptr() } else { 0 };
+            self.tick_back(field, words, tick, at, prev_pc, carry, g, &back, dmp, sites, true)?;
             if let (Some((tr, tb)), Some(cb)) = (tower.as_mut(), cback.as_ref()) {
                 if at == tr.split {
                     self.tower_back(field, words, tr, tb, &back, cb)?;
@@ -2474,7 +2503,7 @@ pub fn region_octets(d: &FieldDeclaration, returning: bool, sites: usize) -> u64
 /// round trips of consecutive ticks, §15.3), as a return does.
 pub fn read_octets(d: &FieldDeclaration, returning: bool, echo: bool, sites: usize) -> u64 {
     let (dw, m2, f, a, h, span) = (d.width as u64, 2 * d.complex() as u64, d.contacts as u64, d.alphabet as u64, d.heads as u64, 2 * d.modes as u64);
-    let kept = returning || echo;
+    let kept = returning || echo || d.carry;
     let ticks_kept = if kept { d.ticks as u64 } else { 1 };
     // Per site a kept tick adds the row's least bit, its class and its place in the lists, its prefix sums'
     // row (words and values on 128 bits, a count) and its crowd shares (`crowd_slots` words a head).
@@ -2686,7 +2715,7 @@ mod tests {
     use super::*;
 
     fn declaration(width: usize, heads: usize, contacts: usize) -> FieldDeclaration {
-        FieldDeclaration { alphabet: 122, width, heads, modes: 8, still: 2, contacts, ticks: 2, frames: 4, reach: 2221, lanes: 1, depth: 0 }
+        FieldDeclaration { alphabet: 122, width, heads, modes: 8, still: 2, contacts, ticks: 2, frames: 4, reach: 2221, lanes: 1, depth: 0, carry: false }
     }
 
     /// Every region is in one batch, in order, each batch within the budget; a region past the budget

@@ -243,7 +243,7 @@ impl Field {
         let (mut gtau, mut gsig) = (vec![vec![0i128; packets]; paced], vec![vec![0i128; packets]; paced]);
         let mut dm = vec![0i128; packets * 2 * s.coarse.declaration.complex()];
         for cell in pass.ticks.iter().rev() {
-            s.coarse.tick_return(cell, &mut dx1, gc, &pass.paces, &pass.definite, &mut dm, &mut gtau, &mut gsig, None, None)?;
+            s.coarse.tick_return(cell, &mut dx1, &mut Vec::new(), gc, &pass.paces, &pass.definite, &mut dm, &mut gtau, &mut gsig, None, None)?;
         }
         // The restriction: `δb_A += Σ_j δs_j`, `δA += δs_j [r̂]_jᵀ` and `δ[r̂]_j = Aᵀ δs_j`, each place's part through its
         // read's adjoint into `δx_t`.

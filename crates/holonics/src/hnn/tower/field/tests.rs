@@ -23,7 +23,7 @@ fn keys(n: usize) -> Vec<u8> {
 }
 
 fn tiny_declaration(still: usize) -> FieldDeclaration {
-    FieldDeclaration { alphabet: 5, width: 8, heads: 2, modes: 3, still, contacts: 4, ticks: 2, frames: 2, reach: 16, lanes: 1, depth: 0 }
+    FieldDeclaration { alphabet: 5, width: 8, heads: 2, modes: 3, still, contacts: 4, ticks: 2, frames: 2, reach: 16, lanes: 1, depth: 0, carry: false }
 }
 
 /// A tiny field with every family drawn from the keys (the founding holds the returns and the
@@ -809,7 +809,7 @@ fn no_site_meets_itself() {
 /// head's lock of an equal word (`n` at unit power, half its `2n` reals) reads `2⌈log₂ reach⌉` bits.
 #[test]
 fn the_contact_s_gain_covers_the_falloff() {
-    let at = |modes: usize, reach: usize| FieldDeclaration { alphabet: 5, width: 8, heads: 2, modes, still: 1, contacts: 4, ticks: 2, frames: 2, reach, lanes: 1, depth: 0 }.score_shift();
+    let at = |modes: usize, reach: usize| FieldDeclaration { alphabet: 5, width: 8, heads: 2, modes, still: 1, contacts: 4, ticks: 2, frames: 2, reach, lanes: 1, depth: 0, carry: false }.score_shift();
     assert_eq!(at(8, 2221), -2, "reading 8's declaration locks an equal word at 32 bits");
     assert_eq!(at(16, 16), 1);
     assert_eq!(at(3, 16), -2);
@@ -818,7 +818,7 @@ fn the_contact_s_gain_covers_the_falloff() {
         let gained = |b: i32| if b >= 0 { (modes as u128) >> b } else { (modes as u128) << -b };
         assert!(gained(beta) >= need && gained(beta + 1) < need, "the largest such shift: modes {modes} reach {reach}");
     }
-    let d = FieldDeclaration { alphabet: 5, width: 8, heads: 2, modes: 8, still: 1, contacts: 4, ticks: 2, frames: 2, reach: 2221, lanes: 1, depth: 0 };
+    let d = FieldDeclaration { alphabet: 5, width: 8, heads: 2, modes: 8, still: 1, contacts: 4, ticks: 2, frames: 2, reach: 2221, lanes: 1, depth: 0, carry: false };
     assert_eq!((d.class_trits(), d.classes()), (4, 81), "81 classes at reading 8's reach");
     assert_eq!(FieldDeclaration { modes: 3, ..d }.class_trits(), 3);
     assert_eq!((FieldDeclaration { reach: 81, ..d }.class_trits(), FieldDeclaration { reach: 82, ..d }.class_trits()), (2, 3));
@@ -873,7 +873,7 @@ fn the_skin_decay_is_an_e_fold_a_radian_and_vanishes_below_the_grain() {
 /// and a turned field. Probes across a sheet are left out and counted.
 #[test]
 fn the_covector_matches_the_code_across_the_far_support() {
-    let d = FieldDeclaration { alphabet: 5, width: 8, heads: 2, modes: 3, still: 1, contacts: 4, ticks: 2, frames: 2, reach: 32, lanes: 1, depth: 0 };
+    let d = FieldDeclaration { alphabet: 5, width: 8, heads: 2, modes: 3, still: 1, contacts: 4, ticks: 2, frames: 2, reach: 32, lanes: 1, depth: 0, carry: false };
     let classes: Vec<usize> = (0..26).map(|t| [1usize, 3, 2, 4, 0, 2, 1][t % 7]).collect();
     let open: Vec<bool> = (0..26).map(|t| t % 9 == 4 || t == 25).collect();
     let r = Region { classes: &classes, unresolved: &open, faces: &[], locked: &[], echo: &[], domain: None, port: None };
@@ -961,7 +961,7 @@ fn the_covector_matches_the_code_across_the_far_support() {
 /// of a row, the loudest far source 0.005.)
 #[test]
 fn a_listener_s_founding_row_keeps_its_near_field() {
-    let d = FieldDeclaration { alphabet: 44, width: 32, heads: 5, modes: 8, still: 2, contacts: 32, ticks: 2, frames: 5, reach: 484, lanes: 1, depth: 0 };
+    let d = FieldDeclaration { alphabet: 44, width: 32, heads: 5, modes: 8, still: 2, contacts: 32, ticks: 2, frames: 5, reach: 484, lanes: 1, depth: 0, carry: false };
     assert_eq!((d.score_shift(), d.listen_shift()), (-2, 2));
     let sites = 420;
     let classes = drawn_classes(7, sites, d.alphabet);
@@ -1770,7 +1770,7 @@ fn refinement_moves_the_end_one_place_a_read() {
 
 /// The packets' field of the tower fixtures: packets of three sites of the tiny field's reach of 16.
 fn coarse_declaration() -> FieldDeclaration {
-    FieldDeclaration { alphabet: 2, width: 8, heads: 2, modes: 3, still: 1, contacts: 4, ticks: 2, frames: 2, reach: 6, lanes: 1, depth: 0 }
+    FieldDeclaration { alphabet: 2, width: 8, heads: 2, modes: 3, still: 1, contacts: 4, ticks: 2, frames: 2, reach: 6, lanes: 1, depth: 0, carry: false }
 }
 
 /// A tower of scales on [`shaped`]`(still)`: packets of three sites after the first of its two ticks, founded from the
@@ -2160,4 +2160,168 @@ fn founded_parts_and_their_cosines_on_saved_states() {
     for (name, t) in PART_NAMES.iter().zip(&travel) {
         println!("PART {name} {} {} {:?}", t.entries, t.cosine_micro(), t.against_half());
     }
+}
+
+/// A tiny field with the carry, every family drawn (so `κ` too), ticks two.
+fn carried_shaped(still: usize) -> Field {
+    shaped_with(FieldDeclaration { carry: true, ..tiny_declaration(still) })
+}
+
+/// [definition; theory, November 10 23:30, ruling R5] **With `κ` at zero the carry is the plain field**: the founding with the carry reads every face of
+/// the field it was made from, bit for bit; one section's deposit moves every old entry as the plain learner's does (the same bits),
+/// and reaches `κ` itself (its covector is `conj(p^0(m)) δb`, nonzero where the first tick's pair is); the text round-trips and a field
+/// without the carry still reads its line.
+#[test]
+fn with_kappa_at_zero_the_carry_is_the_plain_field() {
+    for still in [0usize, 1, 2] {
+        let plain = shaped(still);
+        let carried = plain.with_carry().unwrap();
+        assert_eq!(carried.theta.len(), plain.theta.len() + plain.declaration.contacts);
+        assert!(carried.theta[plain.theta.len()..].iter().all(|&v| v == 0), "κ founded at zero");
+        assert_eq!(carried.faces(&region()).unwrap(), plain.faces(&region()).unwrap(), "still {still}: every face kept");
+        let back = Field::from_text(&carried.to_text()).unwrap();
+        assert_eq!(back.theta, carried.theta);
+        assert!(back.declaration.carry);
+        // One section.
+        let (mut a, mut b) = (FieldLearner::new(plain.clone(), 6), FieldLearner::new(plain.clone(), 6).with_carry().unwrap());
+        a.section(&[region()]).unwrap();
+        b.section(&[region()]).unwrap();
+        assert_eq!(&b.field.theta[..a.field.theta.len()], &a.field.theta[..], "still {still}: the old entries deposit as the plain learner's");
+        assert!(b.field.theta[a.field.theta.len()..].iter().any(|&v| v != 0), "still {still}: the deposit reaches κ");
+    }
+}
+
+/// [definition; theory, November 10 23:30] **With `κ ≠ 0` the carry reaches a site three apart in two ticks**: with the current, the pair's
+/// return and the moment's chart at zero (so a tick's chart is the opening's), the second tick's pair at a site `t` reads, beside its
+/// mate's `b` (sites `t−2..t` through the openings' neighbours), the mate's first-tick pair, whose `b` is the mate's mate's: sites
+/// `t−3..t−1`. Changing the class of site `t − 3` leaves the second pair at `t` as it was where `κ = 0`, and changes it where `κ ≠ 0`; and
+/// the cell obeys the law exactly: `p^1 = release(a^1 (b^1(m) + release(κ p^0(m))))`.
+#[test]
+fn with_kappa_nonzero_the_carry_reaches_a_site_three_apart_in_two_ticks() {
+    let mut base = carried_shaped(1);
+    let l = base.layout.clone();
+    let (dw, f, m2) = (base.declaration.width, base.declaration.contacts, 2 * base.declaration.complex());
+    for (start, len) in [(l.out, dw * m2), (l.out_bias, dw), (l.w, dw * f), (l.w_bias, dw), (l.moment_face, dw * m2), (l.moment_face_bias, dw)] {
+        base.theta[start..start + len].fill(0);
+    }
+    let classes: Vec<usize> = vec![1, 3, 0, 2, 4, 1, 3, 2, 0, 4];
+    let mut moved = classes.clone();
+    let t = 6usize;
+    moved[t - 3] = (moved[t - 3] + 1) % 5;
+    let open = vec![false; classes.len()];
+    let read = |field: &Field, c: &[usize]| {
+        let r = Region { classes: c, unresolved: &open, faces: &[], locked: &[], echo: &[], domain: None, port: None };
+        field.pass(&r, true).unwrap_or_else(|_| field.pass(&Region { unresolved: &[true; 10], ..r }, true).unwrap())
+    };
+    let _ = read;
+    let unresolved = {
+        let mut u = vec![false; classes.len()];
+        u[9] = true;
+        u
+    };
+    let pass = |field: &Field, c: &[usize]| field.pass(&Region { classes: c, unresolved: &unresolved, faces: &[], locked: &[], echo: &[], domain: None, port: None }, true).unwrap();
+    let mut plain = base.clone();
+    plain.theta[l.kappa..l.kappa + f].fill(0);
+    let mut carried = base.clone();
+    for (e, v) in carried.theta[l.kappa..l.kappa + f].iter_mut().enumerate() {
+        *v = (1 << 22) + 977 * e as i32;
+    }
+    let half = f / 2;
+    for e in 0..half {
+        let at = |field: &Field, c: &[usize], tick: usize| pass(field, c).ticks[tick].c[t * f + e];
+        let (kept, changed) = (at(&carried, &classes, 1) != at(&carried, &moved, 1), at(&plain, &classes, 1) != at(&plain, &moved, 1));
+        // the plain field's second pair never sees t − 3; the carried field's sees it through the first tick's pair at the mate.
+        assert!(!changed, "contact {e}: without the carry the second pair at {t} does not read site {}", t - 3);
+        if e % 2 == 0 {
+            assert!(kept || carried.theta[l.kappa + e] == 0, "contact {e} (the site before): the carry reaches site {}", t - 3);
+        }
+    }
+    assert!((0..half).any(|e| e % 2 == 0 && pass(&carried, &classes).ticks[1].c[t * f + e] != pass(&carried, &moved).ticks[1].c[t * f + e]), "the carry reaches t − 3 in two ticks");
+    // The cell's law, exactly: p^1 = a^1 (b^1(m) + κ p^0(m)) at every site with a mate.
+    let p = pass(&carried, &classes);
+    let sites = classes.len();
+    for tt in 0..sites {
+        for e in 0..half {
+            let (ar, ai) = (p.ticks[1].a[tt * f + e] as i128, p.ticks[1].a[tt * f + half + e] as i128);
+            let (mut br, mut bi) = (0i128, 0i128);
+            if let Some(m) = strand_mate(tt, e, sites) {
+                let (kr, ki) = (carried.theta[l.kappa + e] as i128, carried.theta[l.kappa + half + e] as i128);
+                let (pr, pi) = (p.ticks[0].c[m * f + e] as i128, p.ticks[0].c[m * f + half + e] as i128);
+                br = p.ticks[1].b[m * f + e] as i128 + release(kr * pr - ki * pi, MATERIAL_BITS);
+                bi = p.ticks[1].b[m * f + half + e] as i128 + release(kr * pi + ki * pr, MATERIAL_BITS);
+            }
+            assert_eq!(p.ticks[1].c[tt * f + e] as i128, release(ar * br - ai * bi, FACE_BITS), "site {tt} contact {e} real");
+            assert_eq!(p.ticks[1].c[tt * f + half + e] as i128, release(ar * bi + ai * br, FACE_BITS), "site {tt} contact {e} imaginary");
+        }
+    }
+    assert!(p.ticks[0].prev_c.is_empty() && p.ticks[1].prev_c == p.ticks[0].c, "the carry's operand is the tick before's pair");
+}
+
+/// [definition; theory, November 10 23:30] **The carry's adjoint agrees with its code's central difference** on a field with the carry (`κ`
+/// drawn, ticks two): each family's three entries with the largest covectors, `κ`'s, `a`'s, `b`'s and `W`'s among them
+/// ([`the_laned_fields_covector_matches_its_codes_difference`]'s probe law), and `κ`'s covector is read at least once.
+#[test]
+fn the_carried_fields_covector_matches_its_codes_difference() {
+    let sheets = |field: &Field, r: &Region| -> Vec<Vec<u32>> { field.pass(r, true).unwrap().ticks.iter().flat_map(|c| c.classes.iter().map(|l| l.off.iter().chain(&l.members).copied().chain(l.probes.iter().flat_map(|p| std::iter::once(u32::MAX).chain(p.iter().copied()))).collect())).collect() };
+    let (mut read, mut seams, mut kappa_read) = (0usize, 0usize, 0usize);
+    for still in [0usize, 1, 2] {
+        let field = carried_shaped(still);
+        let r = region();
+        let g = covector_of(&field, &r);
+        let l = field.layout.clone();
+        assert!(g[l.kappa..l.kappa + field.declaration.contacts].iter().any(|&v| v != 0), "still {still}: κ has a covector");
+        for &(start, len, grain) in field.families() {
+            if start == l.temper {
+                continue;
+            }
+            let natural: u32 = if grain == MATERIAL_BITS { 40 } else { 24 };
+            let mut entries: Vec<usize> = (start..start + len).collect();
+            entries.sort_by_key(|&i| std::cmp::Reverse(g[i].unsigned_abs()));
+            for i in entries.into_iter().take(3).filter(|&i| g[i] != 0) {
+                let moved = |delta: i32| {
+                    let mut f = field.clone();
+                    f.theta[i] += delta;
+                    f
+                };
+                let straddles = |delta: i32| sheets(&moved(delta), &r) != sheets(&field, &r) || sheets(&moved(-delta), &r) != sheets(&field, &r);
+                let shift = natural + grain - 20;
+                let Some((delta, h)) = probe_step(grain, &|delta: i32| (g[i] * 2 * delta as i128) >> shift, &straddles) else {
+                    seams += 1;
+                    continue;
+                };
+                read += 1;
+                kappa_read += usize::from(start == l.kappa);
+                let measured = moved(delta).code(&r).unwrap().0 - moved(-delta).code(&r).unwrap().0;
+                let predicted = (g[i] * 2 * delta as i128) >> shift;
+                let tolerance = predicted.abs() / 8 + (64 << h);
+                assert!((measured as i128 - predicted).abs() <= tolerance, "still {still} family at {start} (grain {grain}) entry {i} at {h} halvings: measured {measured}, predicted {predicted}");
+            }
+        }
+    }
+    eprintln!("CARRY_COVECTOR_PROBES read={read} on_a_seam={seams} kappa={kappa_read}");
+    assert!(read > 0 && 16 * seams <= read && kappa_read > 0, "read {read} probes, {seams} on a seam, {kappa_read} of κ");
+}
+
+/// [definition; theory, November 10 23:30] **The carry survives the growths**: a lane and four more contacts on a field with `κ` drawn keep every
+/// face; each old contact keeps its `κ` at its own place in its half and the new contacts' open at zero; growth by copies is refused.
+#[test]
+fn the_carry_survives_a_lane_and_a_growth_in_contacts() {
+    let field = carried_shaped(1);
+    let faces = field.faces(&region()).unwrap();
+    let (laned, _) = field.laned(&keys(field.declaration.lane_draws())).unwrap();
+    assert_eq!(laned.faces(&region()).unwrap(), faces);
+    assert_eq!(laned.theta[laned.layout.kappa..], field.theta[field.layout.kappa..], "κ as it was");
+    let (grown, from) = laned.contacted(4, &keys(laned.declaration.contact_draws(4))).unwrap();
+    assert_eq!(grown.faces(&region()).unwrap(), faces);
+    let (fc, f2) = (laned.declaration.contacts, grown.declaration.contacts);
+    let kept = |e: usize| if e < fc / 2 { e } else { f2 / 2 + e - fc / 2 };
+    for e in 0..fc {
+        assert_eq!(grown.theta[grown.layout.kappa + kept(e)], laned.theta[laned.layout.kappa + e], "contact {e}'s κ");
+    }
+    for k in 0..4 {
+        let at = if k < 2 { fc / 2 + k } else { f2 / 2 + fc / 2 + k - 2 };
+        assert_eq!(grown.theta[grown.layout.kappa + at], 0, "a new contact's κ opens at zero");
+    }
+    assert_eq!(from.iter().flatten().count(), laned.theta.len());
+    assert!(field.grown(2, &keys(field.growth_draws(2))).is_err(), "no growth by copies with the carry");
 }

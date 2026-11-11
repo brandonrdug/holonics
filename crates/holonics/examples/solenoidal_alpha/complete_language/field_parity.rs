@@ -71,7 +71,7 @@ impl Passage {
     /// The founded learner of the declaration `D H n STILL f K` at `RATE`.
     fn learner(&self, args: &[String], rate: u32) -> Result<FieldLearner> {
         let (width, heads, modes, still, contacts, ticks) = (positive(&args[0])?, positive(&args[1])?, positive(&args[2])?, count(&args[3])?, positive(&args[4])?, positive(&args[5])?);
-        let declaration = FieldDeclaration { alphabet: self.codec.alphabet(), width, heads, modes, still, contacts, ticks, frames: heads, reach: self.reach, lanes: 1, depth: 0 };
+        let declaration = FieldDeclaration { alphabet: self.codec.alphabet(), width, heads, modes, still, contacts, ticks, frames: heads, reach: self.reach, lanes: 1, depth: 0, carry: false };
         let mut field = Field::found(declaration, &self.keys).map_err(|e| e.to_string())?;
         // The trainer's declared clock (`FIELD_CLOCK_PER_BLANK`, `Field::per_blank_clock`), so its parity reads that law.
         super::field_train::declared_clocks(&mut field);
@@ -270,6 +270,19 @@ pub(super) fn parity(args: &[String], card: &mut dyn FieldRealization) -> Result
         let rp = holonics::hnn::tower::field::RateParts { contacts_before: contacts_before.unwrap_or(founded.field.declaration.contacts), octaves: [k; holonics::hnn::tower::field::PARTS] };
         founded.rate_parts = Some(rp);
         println!("FIELD_PARITY_PARTS octaves={k} contacts_before={}", rp.contacts_before);
+    }
+    // [definition; theory, November 10 23:30, ruling R5] The carry across ticks (`FIELD_PARITY_CARRY=s`): the founded field (after its lanes and contacts) with
+    // the carry ([`FieldLearner::with_carry`]), `κ` drawn from the key file's tail, each 32-bit word shifted down `s` bits, so both realizations
+    // read the carry's forward and its adjoint with `κ` off zero (a founding's `κ` is zero, where only the first deposit reaches it).
+    if let Some(shift) = std::env::var("FIELD_PARITY_CARRY").ok().and_then(|v| v.parse::<u32>().ok()) {
+        founded = founded.with_carry().map_err(|e| e.to_string())?;
+        let (start, len) = (founded.field.layout().kappa, founded.field.declaration.contacts);
+        let tail = p.keys.len().checked_sub(4 * len + 8).ok_or("a key file too short for κ's draws")?;
+        for k in 0..len {
+            let word = &p.keys[tail + 4 * k..tail + 4 * k + 4];
+            founded.field.theta[start + k] = i32::from_be_bytes([word[0], word[1], word[2], word[3]]) >> shift;
+        }
+        println!("FIELD_PARITY_CARRY shift={shift} contacts={len} material={}", founded.field.material_len());
     }
     // [agent-inferred, November 2] A pace far from the founding (`FIELD_PARITY_PACE=s`, §16): every pace entry drawn from
     // the key file's tail, a 32-bit word shifted down `s` bits, so the clocks run off the byte place (fractional,

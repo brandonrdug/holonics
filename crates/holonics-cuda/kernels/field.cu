@@ -428,6 +428,12 @@ struct FieldWords {
     // [the unified-theory reading of November 6, 10:31] Where set, past the last arrival a silent place runs at the bare rate
     // (`Field::bare_stretch`): no clamp to the stretch's first place, and no fold of its covector there.
     uint64_t bare_stretch;
+    // [definition; theory, November 10 23:30, ruling R5] **The carry across ticks** (`FieldDeclaration::carry`): where set, the pair
+    // `p^k = a^k (b^k(m) + κ p^(k-1)(m))`; `carry_at` is `κ`'s offset in the material (`f` words, the real parts then the imaginary), and
+    // `carry_prev` the tick before's pair `[t][f]` (null at the first tick).
+    uint64_t carry_on;
+    uint64_t carry_at;
+    const int64_t *carry_prev;
 };
 
 // [definition; agent-inferred, November 2] **A head's pace index** (§16, `Field::paces`): the heads that carry a moment
@@ -2616,7 +2622,14 @@ extern "C" __global__ void field_pair(FieldWords w) {
         const uint64_t re = t * w.f + e, im = re + half;
         const uint64_t s = strand_mate(w, t, e);
         const wide ar = w.pa[re], ai = w.pa[im];
-        const wide br = s == UINT64_MAX ? 0 : w.pb[s * w.f + e], bi = s == UINT64_MAX ? 0 : w.pb[s * w.f + half + e];
+        wide br = s == UINT64_MAX ? 0 : w.pb[s * w.f + e], bi = s == UINT64_MAX ? 0 : w.pb[s * w.f + half + e];
+        // The carry: `u = b(m) + κ p^(k-1)(m)`, the complex product released from `κ`'s grain to the face's.
+        if (w.carry_on && w.carry_prev != nullptr && s != UINT64_MAX) {
+            const wide kr = w.theta[w.carry_at + e], ki = w.theta[w.carry_at + half + e];
+            const wide pr = w.carry_prev[s * w.f + e], pi = w.carry_prev[s * w.f + half + e];
+            br += rel(kr * pr - ki * pi, MATERIAL_BITS);
+            bi += rel(kr * pi + ki * pr, MATERIAL_BITS);
+        }
         w.pc[re] = fit64(rel(ar * br - ai * bi, FACE_BITS), w.status);
         w.pc[im] = fit64(rel(ar * bi + ai * br, FACE_BITS), w.status);
     }
@@ -2809,7 +2822,7 @@ extern "C" __global__ void field_ratio_adjoint(FieldWords w, const int32_t *read
 // for `δb` against `a`.
 // [§16.34] Along the strand: `δa_g = conj(b_mate) δc_g`, and `δb_g = conj(a_p) δc_p` from the one site `p` whose mate `g` is
 // (the site after it at an even `e`, before it at an odd), each zero where there is none.
-extern "C" __global__ void field_pair_back(FieldWords w, const int64_t *dc, int64_t *da, int64_t *db) {
+extern "C" __global__ void field_pair_back(FieldWords w, const int64_t *dc, int64_t *da, int64_t *db, const int64_t *cin, int64_t *cout) {
     const uint32_t half = w.f / 2;
     const uint64_t cells = (uint64_t)w.T * half;
     for (uint64_t c = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; c < cells; c += (uint64_t)gridDim.x * blockDim.x) {
@@ -2820,8 +2833,16 @@ extern "C" __global__ void field_pair_back(FieldWords w, const int64_t *dc, int6
             da[re] = 0;
             da[im] = 0;
         } else {
-            const wide gr = dc[re], gi = dc[im];
-            const wide br = w.pb[s * w.f + e], bi = w.pb[s * w.f + half + e];
+            // The covector of this tick's pair: the pair's return and the later tick's carry (`cin`, null at the last tick).
+            const wide gr = cin ? fit64((wide)dc[re] + (wide)cin[re], w.status) : (wide)dc[re];
+            const wide gi = cin ? fit64((wide)dc[im] + (wide)cin[im], w.status) : (wide)dc[im];
+            wide br = w.pb[s * w.f + e], bi = w.pb[s * w.f + half + e];
+            if (w.carry_on && w.carry_prev != nullptr) {
+                const wide kr = w.theta[w.carry_at + e], ki = w.theta[w.carry_at + half + e];
+                const wide pr = w.carry_prev[s * w.f + e], pi = w.carry_prev[s * w.f + half + e];
+                br += rel(kr * pr - ki * pi, MATERIAL_BITS);
+                bi += rel(kr * pi + ki * pr, MATERIAL_BITS);
+            }
             da[re] = fit64(rel(br * gr + bi * gi, FACE_BITS), w.status);
             da[im] = fit64(rel(br * gi - bi * gr, FACE_BITS), w.status);
         }
@@ -2832,11 +2853,39 @@ extern "C" __global__ void field_pair_back(FieldWords w, const int64_t *dc, int6
             db[im] = 0;
         } else {
             const uint64_t pre = p * w.f + e, pim = pre + half;
-            const wide gr = dc[pre], gi = dc[pim];
+            const wide gr = cin ? fit64((wide)dc[pre] + (wide)cin[pre], w.status) : (wide)dc[pre];
+            const wide gi = cin ? fit64((wide)dc[pim] + (wide)cin[pim], w.status) : (wide)dc[pim];
             const wide ar = w.pa[pre], ai = w.pa[pim];
             db[re] = fit64(rel(ar * gr + ai * gi, FACE_BITS), w.status);
             db[im] = fit64(rel(ar * gi - ai * gr, FACE_BITS), w.status);
         }
+        // The carry's return to the tick before: `conj(κ) δb` at this site's pair (zero where `δb` is).
+        if (cout != nullptr) {
+            const wide kr = w.theta[w.carry_at + e], ki = w.theta[w.carry_at + half + e];
+            const wide dbr = db[re], dbi = db[im];
+            cout[re] = fit64(rel(kr * dbr + ki * dbi, MATERIAL_BITS), w.status);
+            cout[im] = fit64(rel(kr * dbi - ki * dbr, MATERIAL_BITS), w.status);
+        }
+    }
+}
+
+// [definition; theory, November 10 23:30] **`κ`'s covector** (the host's `tick_return`): `δκ_e += Σ_s conj(p^(k-1)(s)) δb(s)`, the real part
+// `Σ (pr δbr + pi δbi)` and the imaginary `Σ (pr δbi − pi δbr)`, each a sum of integers (any order the same bits), added into the
+// material's covector at `κ`'s offset. One thread a complex contact, looping the batch's sites.
+extern "C" __global__ void field_kappa_grad(FieldWords w, const int64_t *db, wide *g) {
+    const uint32_t half = w.f / 2;
+    for (uint32_t e = blockIdx.x * blockDim.x + threadIdx.x; e < half; e += gridDim.x * blockDim.x) {
+        wide sr = 0, si = 0;
+        if (w.carry_prev != nullptr) {
+            for (uint64_t s = 0; s < w.T; ++s) {
+                const wide pr = w.carry_prev[s * w.f + e], pi = w.carry_prev[s * w.f + half + e];
+                const wide dbr = db[s * w.f + e], dbi = db[s * w.f + half + e];
+                sr += pr * dbr + pi * dbi;
+                si += pr * dbi - pi * dbr;
+            }
+        }
+        g[w.carry_at + e] += sr;
+        g[w.carry_at + half + e] += si;
     }
 }
 

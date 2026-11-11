@@ -222,6 +222,12 @@ pub struct FieldDeclaration {
     /// carries no moment (without a skin its moment would sum the whole region). The ring `ρ ← μρ + r` with `μ = 1` and `r`
     /// keyed by the arriving class; `r` is located by deposition, never authored.
     pub depth: usize,
+    /// [definition; theory, November 10 23:30, ruling R5] **The carry across ticks**: within a tick each complex contact pairs a site with one
+    /// strand mate, so the field holds a part of two letters' joint term and nothing longer. With the carry, tick `k`'s pair is
+    /// `p_e^k(t) = a_e^k(t) (b_e^k(m) + κ_e p_e^(k−1)(m))`, `m` the site's mate at the contact, `p^0 = 0`, `κ_e` complex one a complex
+    /// contact (`f` reals, the `kappa` family, founded at zero so every face of the founding is unchanged); the pair's return `W` reads `p`
+    /// where it read `c`. Carried in the head line (`hnn-field-v14k`); a field without it is the line before.
+    pub carry: bool,
 }
 
 impl FieldDeclaration {
@@ -460,19 +466,22 @@ impl FieldDeclaration {
     }
 
     fn to_text(self) -> String {
-        format!("hnn-field-v14 {} {} {} {} {} {} {} {} {} {} {}", self.alphabet, self.width, self.heads, self.modes, self.still, self.contacts, self.ticks, self.frames, self.reach, self.lanes, self.depth)
+        let head = if self.carry { "hnn-field-v14k" } else { "hnn-field-v14" };
+        let tail = if self.carry { " 1" } else { "" };
+        format!("{head} {} {} {} {} {} {} {} {} {} {} {}{tail}", self.alphabet, self.width, self.heads, self.modes, self.still, self.contacts, self.ticks, self.frames, self.reach, self.lanes, self.depth)
     }
 
     fn from_text(line: &str) -> Result<Self> {
         let words: Vec<&str> = line.split(' ').collect();
         // A v13 head line is a field with no depth ring (the line before the depth rings, its states the line's own).
-        let depth_word = match (words.first().copied(), words.len()) {
-            (Some("hnn-field-v14"), 12) => Some(words[11]),
-            (Some("hnn-field-v13"), 11) => None,
+        let (depth_word, carry) = match (words.first().copied(), words.len()) {
+            (Some("hnn-field-v14"), 12) => (Some(words[11]), false),
+            (Some("hnn-field-v14k"), 13) if words[12] == "1" => (Some(words[11]), true),
+            (Some("hnn-field-v13"), 11) => (None, false),
             _ => return refuse("a field's head line that is not hnn-field-v14"),
         };
         let n = |w: &str| w.parse::<usize>().map_err(|_| TowerError::Refused("a field's declaration that is not a count"));
-        let d = Self { alphabet: n(words[1])?, width: n(words[2])?, heads: n(words[3])?, modes: n(words[4])?, still: n(words[5])?, contacts: n(words[6])?, ticks: n(words[7])?, frames: n(words[8])?, reach: n(words[9])?, lanes: n(words[10])?, depth: depth_word.map(n).transpose()?.unwrap_or(0) };
+        let d = Self { alphabet: n(words[1])?, width: n(words[2])?, heads: n(words[3])?, modes: n(words[4])?, still: n(words[5])?, contacts: n(words[6])?, ticks: n(words[7])?, frames: n(words[8])?, reach: n(words[9])?, lanes: n(words[10])?, depth: depth_word.map(n).transpose()?.unwrap_or(0), carry };
         d.admit()?;
         Ok(d)
     }
@@ -523,6 +532,9 @@ pub struct FieldLayout {
     pub moment_face_bias: usize,
     /// The lift's bias `b_R` (`D`, §16.26).
     pub lift_bias: usize,
+    /// [definition; theory, November 10 23:30] The carry's `κ` (`f`, the contacts' real parts then imaginary, on the material's grain), after
+    /// every other family; absent (at the end, zero long) in a field without the carry.
+    pub kappa: usize,
     pub len: usize,
     pub families: Vec<(usize, usize, u32)>,
 }
@@ -564,7 +576,8 @@ impl FieldLayout {
         let moment_face = push(dw * m2, MATERIAL_BITS);
         let moment_face_bias = push(dw, FACE_BITS);
         let lift_bias = push(dw, FACE_BITS);
-        Self { enc, before, after, q, q_bias, v, v_bias, out, out_bias, a: a_, a_bias, b, b_bias, w, w_bias, read, read_bias, moment_before, moment_after, temper, probe, probe_bias, pace, moment_face, moment_face_bias, lift_bias, len: at, families }
+        let kappa = if d.carry { push(f, MATERIAL_BITS) } else { at };
+        Self { enc, before, after, q, q_bias, v, v_bias, out, out_bias, a: a_, a_bias, b, b_bias, w, w_bias, read, read_bias, moment_before, moment_after, temper, probe, probe_bias, pace, moment_face, moment_face_bias, lift_bias, kappa, len: at, families }
     }
 }
 
@@ -1104,6 +1117,9 @@ struct TickCell {
     a: Vec<i64>,
     b: Vec<i64>,
     c: Vec<i64>,
+    /// [definition; theory, November 10 23:30] The carry's operand: the pair of the tick before, `p^(k−1)` (`[t][f]`, the previous cell's `c`),
+    /// empty at the first tick and in a field without the carry. The reverse reads it for `κ`'s covector and `u = b + κ p^(k−1)`.
+    prev_c: Vec<i64>,
 }
 
 /// [definition; agent-inferred, November 1] **A head's resonance classes over a region** (the
@@ -2453,10 +2469,20 @@ impl Field {
             let half = f / 2;
             for e in 0..half {
                 let (ar, ai) = (cell.a[t * f + e] as i128, cell.a[t * f + half + e] as i128);
-                let (br, bi) = match strand_mate(t, e, sites) {
+                let (mut br, mut bi) = match strand_mate(t, e, sites) {
                     Some(s) => (cell.b[s * f + e] as i128, cell.b[s * f + half + e] as i128),
                     None => (0, 0),
                 };
+                // [definition; theory, November 10 23:30] The carry: `u = b(m) + κ p^(k−1)(m)`, the complex product released from `κ`'s grain to
+                // the face's (`2^(−24)` over `2^(−16)`, as `b` is), the mate's pair of the tick before (none at the first tick).
+                if d.carry && !cell.prev_c.is_empty() {
+                    if let Some(s) = strand_mate(t, e, sites) {
+                        let (kr, ki) = (self.theta[l.kappa + e] as i128, self.theta[l.kappa + half + e] as i128);
+                        let (pr, pi) = (cell.prev_c[s * f + e] as i128, cell.prev_c[s * f + half + e] as i128);
+                        br += release(kr * pr - ki * pi, MATERIAL_BITS);
+                        bi += release(kr * pi + ki * pr, MATERIAL_BITS);
+                    }
+                }
                 cell.c[t * f + e] = fit64(release(ar * br - ai * bi, FACE_BITS))?;
                 cell.c[t * f + half + e] = fit64(release(ar * bi + ai * br, FACE_BITS))?;
             }
@@ -2489,6 +2515,8 @@ impl Field {
         let blanks = !paces.kappa.is_empty() && (0..sites).any(|t| Self::silent(region, t));
         let window = region.window(d.ticks);
         let mut clock: Option<Box<TickClock>> = None;
+        // The carry's operand: the tick before's pair (empty at the first tick).
+        let mut carried_p: Vec<i64> = Vec::new();
         for k in 0..d.ticks {
             if let Some(s) = self.scale.as_deref().filter(|s| s.split == k) {
                 out.tower = Some(self.scale_forward(s, &mut x, &definite, &keyed, keep)?);
@@ -2496,7 +2524,13 @@ impl Field {
             let own = clock.take();
             let (tick_paces, tick_moment) = own.as_ref().map_or((&paces, &moment), |c| (&c.paces, &c.moment));
             let mut cell = TickCell::default();
+            if d.carry {
+                cell.prev_c = std::mem::take(&mut carried_p);
+            }
             self.tick(&mut x, &definite, &keyed, tick_paces, tick_moment, &reaches, window.as_deref(), &mut cell)?;
+            if d.carry {
+                carried_p = cell.c.clone();
+            }
             cell.clock = own;
             if blanks && k + 1 < d.ticks {
                 // [the unified-theory reading of November 6, 08:16] Only the blanks a clock reads are read: every silent place up
@@ -2854,7 +2888,7 @@ impl Field {
     /// shares and the currents' covectors where read). A region's reverse reads its ticks through it in reverse order; a
     /// tower of scales reads each level's ticks through it.
     #[allow(clippy::too_many_arguments)]
-    fn tick_return(&self, cell: &TickCell, dx: &mut [i64], g: &mut [i128], paces: &Paces, definite: &[bool], dm: &mut [i128], gtau: &mut [Vec<i128>], gsig: &mut [Vec<i128>], mut shares: Option<&mut [u128]>, mut currents: Option<&mut Vec<Vec<i64>>>) -> Result<()> {
+    fn tick_return(&self, cell: &TickCell, dx: &mut [i64], carry: &mut Vec<i64>, g: &mut [i128], paces: &Paces, definite: &[bool], dm: &mut [i128], gtau: &mut [Vec<i128>], gsig: &mut [Vec<i128>], mut shares: Option<&mut [u128]>, mut currents: Option<&mut Vec<Vec<i64>>>) -> Result<()> {
         let d = &self.declaration;
         let (dw, m, n, f, heads, lanes) = (d.width, d.complex(), d.modes, d.contacts, d.heads, d.lanes);
         let m2 = 2 * m;
@@ -2878,20 +2912,54 @@ impl Field {
         for t in 0..sites {
             transposed(&self.theta[l.w..l.w + dw * f], reaches.w, f, dxs[t], MATERIAL_BITS, &mut dc[t * f..(t + 1) * f])?;
         }
-        // `δa_t = conj(b_s) δc_t`, `δb_s = conj(a_t) δc_t` for the complex product of site `t` and its strand mate `s`
-        // (§16.34); each site's `b` is one mate's, so each `δb_s` is one term.
+        // [definition; theory, November 10 23:30] The carry's return: the covector of this tick's pair `p^k` is the pair's return's and the later
+        // tick's (`carry`, `conj(κ) δb^(k+1)` at each mate, the producing operands' adjoint), reaching `a^k`, `b^k(m)`, `κ` and `p^(k−1)(m)`.
+        let carried = d.carry;
+        if carried && !carry.is_empty() {
+            for (v, &c) in dc.iter_mut().zip(carry.iter()) {
+                *v = fit64(*v as i128 + c as i128)?;
+            }
+        }
+        // `δa_t = conj(u_s) δc_t`, `δb_s = conj(a_t) δc_t` for the complex product of site `t` and its strand mate `s`
+        // (§16.34), `u = b + κ p^(k−1)` (`b` where there is no carry); each site's `b` is one mate's, so each `δb_s` is one term.
         let half = f / 2;
+        let held = carried && !cell.prev_c.is_empty();
         for t in 0..sites {
             for e in 0..half {
                 let Some(s) = strand_mate(t, e, sites) else { continue };
                 let (gr, gi) = (dc[t * f + e] as i128, dc[t * f + half + e] as i128);
                 let (ar, ai) = (cell.a[t * f + e] as i128, cell.a[t * f + half + e] as i128);
-                let (br, bi) = (cell.b[s * f + e] as i128, cell.b[s * f + half + e] as i128);
+                let (mut br, mut bi) = (cell.b[s * f + e] as i128, cell.b[s * f + half + e] as i128);
+                if held {
+                    let (kr, ki) = (self.theta[l.kappa + e] as i128, self.theta[l.kappa + half + e] as i128);
+                    let (pr, pi) = (cell.prev_c[s * f + e] as i128, cell.prev_c[s * f + half + e] as i128);
+                    br += release(kr * pr - ki * pi, MATERIAL_BITS);
+                    bi += release(kr * pi + ki * pr, MATERIAL_BITS);
+                }
                 da[t * f + e] = fit64(release(br * gr + bi * gi, FACE_BITS))?;
                 da[t * f + half + e] = fit64(release(br * gi - bi * gr, FACE_BITS))?;
                 db[s * f + e] = fit64(release(ar * gr + ai * gi, FACE_BITS))?;
                 db[s * f + half + e] = fit64(release(ar * gi - ai * gr, FACE_BITS))?;
             }
+        }
+        // `δκ += conj(p^(k−1)(m)) δu(t)` summed over the sites `t` of the mate `m = s` is `conj(p^(k−1)(s)) δb(s)`, and the earlier tick's
+        // pair at `s` receives `conj(κ) δb(s)`.
+        if carried {
+            let mut next = vec![0i64; sites * f];
+            for s in 0..sites {
+                for e in 0..half {
+                    let (dbr, dbi) = (db[s * f + e] as i128, db[s * f + half + e] as i128);
+                    if held {
+                        let (pr, pi) = (cell.prev_c[s * f + e] as i128, cell.prev_c[s * f + half + e] as i128);
+                        g[l.kappa + e] += pr * dbr + pi * dbi;
+                        g[l.kappa + half + e] += pr * dbi - pi * dbr;
+                    }
+                    let (kr, ki) = (self.theta[l.kappa + e] as i128, self.theta[l.kappa + half + e] as i128);
+                    next[s * f + e] = fit64(release(kr * dbr + ki * dbi, MATERIAL_BITS))?;
+                    next[s * f + half + e] = fit64(release(kr * dbi - ki * dbr, MATERIAL_BITS))?;
+                }
+            }
+            *carry = next;
         }
         let das: Vec<&[i64]> = da.chunks_exact(f).collect();
         let dbs: Vec<&[i64]> = db.chunks_exact(f).collect();
@@ -3328,10 +3396,11 @@ impl Field {
             }
             outer_sum(&mut g[l.read..l.read + dw * dw], dw, &ys, &xs)?;
         }
+        let mut carry: Vec<i64> = Vec::new();
         for (k, cell) in pass.ticks.iter().enumerate().rev() {
             let at = if cell.clock.is_some() { k + 1 } else { 0 };
             let r = returns[at].get_or_insert_with(|| ClockReturn::new(paced, sites, m2));
-            self.tick_return(cell, &mut dx, g, pass.paces_at(cell), &definite, &mut r.dm, &mut r.gtau, &mut r.gsig, shares.as_deref_mut(), currents.as_deref_mut())?;
+            self.tick_return(cell, &mut dx, &mut carry, g, pass.paces_at(cell), &definite, &mut r.dm, &mut r.gtau, &mut r.gsig, shares.as_deref_mut(), currents.as_deref_mut())?;
             if let Some(s) = self.scale.as_deref().filter(|s| s.split == k) {
                 let sp = pass.tower.as_ref().ok_or(TowerError::Refused("a tower's reverse reads a forward that held its scale"))?;
                 self.scale_return(s, sp, &mut dx, g)?;
@@ -4124,6 +4193,9 @@ impl Field {
         if self.scale.is_some() {
             return refuse("a tower grows by its levels' lanes, not by copies (the tower record, D2)");
         }
+        if self.declaration.carry {
+            return refuse("a field with the carry grows by lanes and contacts, not by copies");
+        }
         let old = self.declaration;
         let d = old.grown(factor)?;
         let layout = FieldLayout::new(&d);
@@ -4311,6 +4383,9 @@ impl Field {
         ] {
             place(o, n, 1, len, len);
         }
+        if d.carry {
+            place(ol.kappa, layout.kappa, 1, fc, fc);
+        }
         // The lane's founding draws.
         let mut cursor = 0usize;
         let mut draw = |num: u128, den: u128, bits: u32| -> Result<i32> {
@@ -4344,6 +4419,24 @@ impl Field {
 }
 
 impl Field {
+    /// [definition; theory, November 10 23:30, ruling R5] **The field with the carry** ([`FieldDeclaration::carry`]): the same material and
+    /// `κ` (`f` entries, a part of its own) founded at zero after every family, so every sum the forward forms is the old sum and every
+    /// face is kept bit for bit.
+    pub fn with_carry(&self) -> Result<Self> {
+        if self.scale.is_some() {
+            return refuse("a tower's levels carry level by level, not through the fine field alone");
+        }
+        if self.declaration.carry {
+            return refuse("a field that already carries");
+        }
+        let d = FieldDeclaration { carry: true, ..self.declaration };
+        let mut theta = self.theta.clone();
+        theta.extend(std::iter::repeat_n(0, d.contacts));
+        let mut out = Self::with_theta(d, theta);
+        (out.per_blank_clock, out.bare_stretch) = (self.per_blank_clock, self.bare_stretch);
+        Ok(out)
+    }
+
     /// [definition; theory, November 10 09:55] **The field with `added` more pair contacts** (the merge's `c = (aᵀs)(bᵀx)`
     /// joined to the face by `W`): the new contacts' `a` and `b` rows are the pair drives, drawn as a founding of this
     /// declaration draws them, uniform on `±√(3/D)` at the material's grain, read from `keys` four bytes a draw (the new set's
@@ -4397,6 +4490,12 @@ impl Field {
                         new[ns + r * f2 + kept(e)] = self.theta[os + r * fc + e];
                         from[ns + r * f2 + kept(e)] = Some(os + r * fc + e);
                     }
+                }
+            } else if old.carry && os == ol.kappa {
+                // [theory, November 10 23:30] The carry's `κ`: each old contact keeps its own, the new contacts' open at zero.
+                for e in 0..fc {
+                    new[ns + kept(e)] = self.theta[os + e];
+                    from[ns + kept(e)] = Some(os + e);
                 }
             } else {
                 if ol_len != nl_len {
@@ -4679,7 +4778,7 @@ fn predicted_change(field: &Field, g: &[i128], step: &[i128], halvings: u32) -> 
 /// and each lane family on its own (the second lane's coordinates, [`Field::laned`], of the encodings `E`, `E₋`, `E₊`, the key,
 /// value and probe charts, the current's return, the moment's chart, the readout's lift, the face biases together, and the lane's
 /// columns of `a` and `b`). The old entries (and `W`'s lane rows) are no part.
-pub const PART_NAMES: [&str; 15] = ["w_new", "a_new", "b_new", "enc_lane", "before_lane", "after_lane", "q_lane", "v_lane", "probe_lane", "out_lane", "moment_face_lane", "read_lane", "face_biases_lane", "a_lane", "b_lane"];
+pub const PART_NAMES: [&str; 16] = ["w_new", "a_new", "b_new", "enc_lane", "before_lane", "after_lane", "q_lane", "v_lane", "probe_lane", "out_lane", "moment_face_lane", "read_lane", "face_biases_lane", "a_lane", "b_lane", "kappa"];
 
 /// The number of founded parts ([`PART_NAMES`]).
 pub const PARTS: usize = PART_NAMES.len();
@@ -4805,6 +4904,10 @@ impl Field {
             for e in 0..f {
                 parts[start + e * dw + lw..start + (e + 1) * dw].fill(part);
             }
+        }
+        // [theory, November 10 23:30] The carry's `κ`, a part of its own.
+        if d.carry {
+            parts[l.kappa..l.kappa + f].fill(15);
         }
         // The new contacts', over the lane's.
         for e in (0..f).filter(|&e| new_contact(e)) {
@@ -5031,6 +5134,21 @@ impl FieldLearner {
         }
         let drawn = self.drawn + 4 * self.field.declaration.lane_draws();
         Ok(Self { field, first, second, rate_bits: self.rate_bits, drawn, laps: self.laps, held: None, read_held: self.read_held, rate_parts: None, last: None })
+    }
+
+    /// [definition; theory, November 10 23:30, ruling R5] **The learner with the carry** ([`Field::with_carry`]): every old entry keeps its
+    /// moments, `κ`'s open at zero (an entry opens at its own first nonzero covector), the parts' rates keep their octaves (`κ` at the old rate).
+    pub fn with_carry(&self) -> Result<Self> {
+        if self.held.is_some() {
+            return refuse("a learner takes the carry after its held step is read");
+        }
+        let field = self.field.with_carry()?;
+        let extra = field.theta.len() - self.field.theta.len();
+        let mut first = self.first.clone();
+        let mut second = self.second.clone();
+        first.extend(std::iter::repeat_n(0, extra));
+        second.extend(std::iter::repeat_n(0, extra));
+        Ok(Self { field, first, second, rate_bits: self.rate_bits, drawn: self.drawn, laps: self.laps, held: None, read_held: self.read_held, rate_parts: self.rate_parts, last: None })
     }
 
     /// [definition; theory, November 10 09:55] **The learner with `added` more pair contacts** ([`Field::contacted`]), the
@@ -5282,7 +5400,8 @@ impl FieldLearner {
         let rate_parts = match lines.peek() {
             Some(l) if l.starts_with("parts ") => {
                 let v = read_numbers::<usize>(lines.next().and_then(|l| l.strip_prefix("parts ")))?;
-                if v.len() != 1 + PARTS {
+                // A line written before the carry's `κ` holds fifteen parts; `κ` opens at the old rate.
+                if v.len() != 1 + PARTS && v.len() != PARTS {
                     return refuse("a learner's founded parts' rates that are not one a part");
                 }
                 let mut octaves = [0u32; PARTS];
