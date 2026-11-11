@@ -1,0 +1,22 @@
+WHEEL p=10000019 states=10000020 mean=31.7457 farthest=45 floor_mean=31.1545 floor_radius=33 mean/floor=1.0190 farthest/mean=1.4175 ln_p=16.1181 mean/ln_p=1.9696 s=41.5
+  free shells 1 1 2 2 4 6 10 16 26 42 68 110 178 288 ... last growth ratios 1.6180 1.6180 1.6180 1.6180 1.6180
+  wheel shells 1 1 2 2 4 6 10 16 26 42 68 110 178 288 466 754 1220 1974 3194 5168 8362 13530 21892 35422 57314 92736 150050 242786 392834 634928 995402 1390360 1671234 1710142 1393082 803136 286736 63530 15010 4988 1846 748 272 110 36 4
+  STRAIGHT samples=5000 shortest_mean=31.7782 straight_mean=40.1658 ratio_of_means=1.2639 mean_ratio=1.2491 best_pair_mean=34.8502 best/shortest=1.0967 share_straight_is_shortest=0.4612 divisions_on_the_walk=5.386 worst_ratio=31.75
+  EUCLID divisions mean over sample 14.0596 theorem 15.0508
+  CLOSED WALKS k | (|A^k v|/|A^(k-1) v|) | with the k^(3/2) correction
+      2 2.23611 3.76067
+      4 2.58254 3.20443
+      6 2.69849 3.09390
+      8 2.75322 3.04323
+     10 2.78529 3.01432
+     12 2.80665 2.99592
+     14 2.82204 2.98334
+     16 2.83373 2.97426
+     18 2.84294 2.96746
+     20 2.85041 2.96220
+     22 2.85660 2.95803
+     24 2.86183 2.95465
+     26 2.86630 2.95187
+     28 2.87019 2.94955
+     30 2.87359 2.94759
+DONE p=10000019 s=48.0

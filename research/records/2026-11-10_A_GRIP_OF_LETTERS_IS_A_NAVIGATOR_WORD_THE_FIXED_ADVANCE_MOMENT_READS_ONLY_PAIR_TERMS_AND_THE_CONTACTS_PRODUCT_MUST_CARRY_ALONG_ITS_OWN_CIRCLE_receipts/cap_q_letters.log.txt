@@ -1,0 +1,18 @@
+letters level 0: contexts 100 cells 6708  4s
+letters level 1: contexts 6657 cells 67760  5s
+letters level 2: contexts 67427 cells 244378  6s
+letters level 3: contexts 243477 cells 542182  7s
+letters level 4: contexts 540729 cells 925764  7s
+letters level 5: contexts 923852 cells 1351427  8s
+letters level 6: contexts 1348633 cells 1793333  9s
+letters level 7: contexts 1788752 cells 2234943  10s
+letters level 8: contexts 2227987 cells 2660027  11s
+letters level 9: contexts 2651023 cells 3061575  13s
+letters level 10: contexts 3051101 cells 3435776  14s
+letters level 11: contexts 3423965 cells 3778957  15s
+letters level 12: contexts 3766047 cells 4090528  16s
+letters level 13: contexts 4076779 cells 4373287  17s
+letters level 14: contexts 4358866 cells 4629038  19s
+letters level 15: contexts 4614006 cells 4858392  20s
+20s
+done-L

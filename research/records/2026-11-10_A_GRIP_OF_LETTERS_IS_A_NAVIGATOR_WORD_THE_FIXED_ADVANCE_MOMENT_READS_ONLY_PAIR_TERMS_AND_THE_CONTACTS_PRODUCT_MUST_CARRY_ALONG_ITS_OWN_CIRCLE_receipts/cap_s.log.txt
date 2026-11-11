@@ -1,0 +1,11 @@
+ruler, two letters each side: mean 0.5758; at unit starts 0.8253 (share 0.584), inside units 0.4040   5s
+   rt4: field 0.5290 | field x ruler^0.5 0.3610 (at unit starts 0.5296, inside units 0.2449) | half-and-half mixture 0.3901
+   rt4: field 0.5290 | field x ruler^1.0 0.3886 (at unit starts 0.6089, inside units 0.2369) | half-and-half mixture 0.3901
+   ct8: field 0.5517 | field x ruler^0.5 0.3678 (at unit starts 0.5359, inside units 0.2521) | half-and-half mixture 0.3953
+   ct8: field 0.5517 | field x ruler^1.0 0.3912 (at unit starts 0.6104, inside units 0.2403) | half-and-half mixture 0.3953
+ruler, four letters on the left: mean 1.2392; at unit starts 1.8637 (share 0.613), inside units 0.8093   10s
+   rt4: field 0.5290 | field x ruler^0.5 0.3898 (at unit starts 0.5840, inside units 0.2562) | half-and-half mixture 0.5764
+   rt4: field 0.5290 | field x ruler^1.0 0.4634 (at unit starts 0.7171, inside units 0.2888) | half-and-half mixture 0.5764
+   ct8: field 0.5517 | field x ruler^0.5 0.4008 (at unit starts 0.5972, inside units 0.2656) | half-and-half mixture 0.5854
+   ct8: field 0.5517 | field x ruler^1.0 0.4729 (at unit starts 0.7288, inside units 0.2968) | half-and-half mixture 0.5854
+10s
