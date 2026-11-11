@@ -29,6 +29,15 @@ Printed for each row: bought = control - arm (nats a place), nats = bought x pla
 strength = nats / entries (nats a founded entry). A lap's quarters are checked to partition its places, and their nats are summed
 beside the whole; a founding read only whole says so. Integers and rationals only (`fractions`).
 
+The kernel (theory, November 11 23:05; the Einstein record §14.8: a founding's entries are counted net of the re-chartings that change
+no face at the reader; the count is agent-inferred). A complex contact's entries carry four real re-chartings that change no face: its
+a by a complex lambda, its b by a complex mu, and W's two columns by (lambda mu)^-1, for a pair contact (c = a b at the strand mate)
+and a carry circle alike (Q = b + gamma Q is linear in b, p = a Q, and the gate reads the face, never Q), up to the releases' grain.
+So the November 10 growth's 16 complex contacts hold 64 of their 6,208 entries in the kernel, the 32 carry circles 128 of their
+16,576, and the gate chart's founding (carry_g, read through g/sqrt(1 + |g|^2)) none: a percent at most, so strengths net of the
+kernel rank as printed, and the circles' last place is their own. A founding whose kernel is more than a percent or so of its
+entries owes a kernel term in its declaration before it is ranked.
+
 A ruler (CLAUDE.md, a ruler is an instrument): it reads text, opens no state, trains nothing, and is never machinery. Its controls
 are tools/test_founding_strength.py (gate 1).
 """
