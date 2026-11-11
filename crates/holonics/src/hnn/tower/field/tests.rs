@@ -2098,6 +2098,40 @@ fn the_cosine_rule_moves_a_part_one_octave_by_its_travel() {
     assert_eq!(t[0].entries, 64);
 }
 
+/// [measurement; theory, November 11] **The lap's mean of the material** ([`MaterialMean`]): each entry's sum over the states joined,
+/// released to the nearest with a half away from zero; the field it is released onto keeps its own material, and the entries that
+/// differ are counted with their squared distance; refused before a state joined and on a material of another length.
+#[test]
+fn the_laps_mean_is_each_entrys_sum_released_to_the_nearest() {
+    let base = shaped(1);
+    let with = |values: [i32; 4]| {
+        let mut field = base.clone();
+        field.theta[..4].copy_from_slice(&values);
+        field
+    };
+    let (a, b) = (with([1, -1, 1, -1]), with([2, -2, 0, 0]));
+    let mut mean = MaterialMean::new(base.material_len());
+    assert!(mean.released(&base).is_err(), "no state joined");
+    // Thirds: 5/3 and −5/3 release to 2 and −2, 1/3 and −1/3 to 0; every other entry is the same in the three states.
+    for field in [&a, &b, &b] {
+        mean.take(field).unwrap();
+    }
+    assert_eq!(mean.states(), 3);
+    let (rest, moved, square) = mean.released(&b).unwrap();
+    assert_eq!((rest == b, moved, square), (true, 0, 0), "the mean of these three is the second's material");
+    let (rest, moved, square) = mean.released(&a).unwrap();
+    assert_eq!((&rest.theta[..4], moved, square), (&[2, -2, 0, 0][..], 4, 4));
+    assert_eq!((&rest.theta[4..], &a.theta[..4]), (&base.theta[4..], &[1, -1, 1, -1][..]), "the others stand, and the field it was released onto keeps its own");
+    // Halves go away from zero: 3/2 to 2 and −3/2 to −2.
+    let mut halves = MaterialMean::new(base.material_len());
+    for field in [&with([1, -1, 3, -3]), &b] {
+        halves.take(field).unwrap();
+    }
+    assert_eq!(&halves.released(&base).unwrap().0.theta[..4], &[2, -2, 2, -2][..]);
+    assert!(MaterialMean::new(base.material_len() + 1).take(&base).is_err(), "another length");
+    assert!(MaterialMean::new(base.material_len() + 1).released(&base).is_err());
+}
+
 /// [definition; theory, November 10 19:05] **A part steps at its own rate, and every part at the old rate is the plain deposit**: with
 /// the parts' octaves zero, three sections give the plain learner's material and moments bit for bit; with a part at `k` octaves its
 /// entries' step is the deposit's at `rate − k` and the old entries' the plain rate's; and the parts' rates round-trip through the
