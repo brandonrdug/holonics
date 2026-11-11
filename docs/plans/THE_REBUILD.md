@@ -1,13 +1,18 @@
 # The rebuild
 
-**Status: November 7.** This plan is the construction's one order: the steps with their issues and
+**Status: November 11.** This plan is the construction's one order: the steps with their issues and
 done conditions, the campaign under way, and the rules every step keeps. The laws live in their
 guides and owners ([the elementary objects](../ELEMENTARY_OBJECTS.md), [THE_MACHINE](../THE_MACHINE.md)),
 [CONSTRUCTION_STATE](../../CONSTRUCTION_STATE.md) is the position, and dated records hold the
 derivations and the measurements.
 
 The plan was rewritten on November 7 as the current order, at Brandon's word that the construction
-documents are the agents' to redo. What it replaced is history:
+documents are the agents' to redo. Section 3 was rewritten on November 11, when the training line
+became `main`'s field and the energy field of November 6 to 9 left the tree
+([the record](../../research/records/2026-11-11_THE_TRAINING_LINE_BECOMES_THE_TRUNKS_FIELD_THE_ENERGY_ATTEMPT_LEAVES_THE_TREE_AND_A_READING_A_LINE_IS_SCORED_BY_IS_CONSUMED_CODE.md)).
+What it replaced is history:
+- section 3 as it stood from November 7 to 11 (the energy field as the campaign under way) is at
+  [`b6ff1f795`](https://github.com/brandonrdug/holonics/blob/b6ff1f795/docs/plans/THE_REBUILD.md);
 - the plan of September 28 to November 7 (the unified plan U0 to U8, the issue order of October 9,
   the October text-chart lanes, the gates F0 to F6 word for word, the protocol and the Decisions
   index) is at [`0a051ae5`](https://github.com/brandonrdug/holonics/blob/0a051ae5/docs/plans/THE_REBUILD.md);
@@ -50,46 +55,70 @@ instruction and output stand in no other row, so no held question or answer is m
 problem is one field: the question's sites are known, the answer's sites are open, and the answer is
 refined and released whole ([the one-field record](../../research/records/2026-11-01_THE_PROBLEM_IS_ONE_FIELD_EVERY_SITE_READS_EVERY_OTHER_AND_THE_ANSWER_IS_REFINED_NOT_SPOKEN.md)).
 
-**The field's law.** The faces are the forces of one stored energy.
-- Each tick descends one energy `Φ` of the region's state and letters: the receivers' lock
-  partitions, the strand pair's contraction and the letters' rows read against the sites they reach.
-- A letter's face is the total derivative `z_t(a) = −dG/de_t(a)` of `G(e) = Φ(x^K(e); e)`, read
-  through the opening and the `K` declared ticks, so its Hessian is symmetric.
-- Owners: `hnn::tower::field` and `hnn::tower::field::energy` (the host reference) and
-  `holonics-cuda`'s `hnn::field` (the card), equal bit for bit on the energy parity suite. The
-  derivations and every lap's receipt are in the running record, the
+**The field's law** (`hnn::tower::field`, whose module text states it; the card's realization is
+`holonics-cuda`'s `hnn::field`, at parity with the host).
+- One constitution is iterated four ticks over all of a problem's sites. In a tick each head gathers
+  a current through its lock: a receiver's probe meets the sources whose key sits in its class of
+  shells or in its near field, at the octave falloff; a still head's modes read content at any
+  distance its class reaches, and a turned head's modes carry the ring phasors, their skin and the
+  site's moment.
+- The strand's pair contact then multiplies a site's read by its strand mate's. With the carry its
+  second operand is a running sum along the strand with its own gate, so a unit runs to its stop
+  inside one tick.
+- A place's face is read from its state after the last tick through the encoding.
+- The derivations are in the
   [dispersing field record](../../research/records/2026-11-01_THE_FIELD_DISPERSES_A_SITE_MEETS_ITS_RESONANCE_CLASS_AT_ITS_FALLOFF_AND_THE_ANSWER_LOCKS_UNDER_THE_PUMP.md)
-  from its §16.47.
+  through the reading of November 6 at 10:31 inside its §16.47, and the records of November 10 and
+  11. That record's later parts, from the stored-energy reading of November 6 at 22:52, are the
+  energy field's: one attempt of November 6 to 9 that left the tree on November 11
+  ([the port's record](../../research/records/2026-11-11_THE_TRAINING_LINE_BECOMES_THE_TRUNKS_FIELD_THE_ENERGY_ATTEMPT_LEAVES_THE_TREE_AND_A_READING_A_LINE_IS_SCORED_BY_IS_CONSUMED_CODE.md)).
 
-**The learner** (`FieldLearner` in `crates/holonics/examples/solenoidal_alpha/complete_language/field_train.rs`).
-- A section deposits the contrast of the truth against one kernel step from it:
-  `(1/T) Σ min(1, A)[∂G/∂θ(truth) − ∂G/∂θ(e′)]`. The proposal `e′` draws a block of answer places
-  from their faces, and `A = 2^((G − G′)/T) Π face′(truth)/face(a)` weighs the move, so by detailed
-  balance the expected deposit vanishes at the true distribution.
-- Each problem's residue class is cut into blocks of at most `k*` places, each its own kernel step,
-  with `k*` read again each section.
-- Each family steps at `2^(−ρ_f)`, its length read from its own transfer to the next section, and the
-  letters' temperature `T` learns from the energies already read.
+**The learner** (`FieldLearner`; the trainer is `crates/holonics/examples/solenoidal_alpha/complete_language/field_train.rs`).
+- The comparison is completion read as a joint code: a region is drawn as a state of open places
+  among the answer's, and its covector returns through the ticks by the operands that produced each
+  carrier.
+- A section's step is the covector's first moment over the root of its second. It deposits at its
+  size with no reread of its own section (it fluxes: a reread that keeps only the steps that lower
+  the code discards what an expansion measures, November 5), and the next section's covector prices
+  it at first order, a printed reading. The read of a held step on the next section stays as a
+  declared comparison.
+- Each founded part of the material steps at its own rate, carried in the state and set from the
+  part's own displacements between laps (atlas `deposition.lap-cosine-drift-over-noise`).
 
-**The loop.** A lap walks the training passage's 1,543 sections on the RTX 4080 SUPER in seven to
-eight minutes. Each lap's law is fixed before launch, the theory thread's guesses are written down
-blind, and the lap ends in its receipt in the running record. An iteration between saved states stays
-within one hour on the card (Brandon, November 6); a run that would pass it is a design change, not a
-longer run.
+**The loop.** A lap walks the training passage's 1,535 sections on the RTX 4080 SUPER. Each lap's
+law is fixed before launch, the guesses are written down as numbers before the read and scored, a
+miss included, and the lap ends in its receipt. A lap is read by its held joint code and by its
+structure: the release's stages on held problems, the locked code, the transmission by written
+letter and the carry's gate. A build enters a line by reproducing the line's own lap, its reads
+included. An iteration between saved states stays within one hour on the card (Brandon,
+November 6); a run that would pass it is a design change, not a longer run.
 
-**Where it stands, by measurement (lap 9).** The held answers' enumerated code (every letter's `G`
-read, at 64 held places) fell from 6.639 bits a place at founding to 4.786, against 4.93 for the
-letters' own frequencies: a paired change of −0.178 at lap 9 with standard error 0.135. The faces
-propose worse as the energy sharpens (`KL(enumerated ‖ face)` from 0.25 to 0.52), so a writer that
-releases on the faces misses the context the energy carries.
+**Where it stands, by measurement (November 11).** The held answers' joint code is 1.742 nats a
+place after twelve laps of the part-rate line, 0.022 under the plain rate at equal laps. Section to
+section the line is at rest (sections' deposits agree at a cosine of 0.08); lap over lap its young
+parts still charge: the second lane's reading charts and lift lengthen 1.5 to 2 percent a lap and
+the added contacts' columns 1.2 percent. The carry's first two laps read 1.7477 and 1.7445 where
+their controls read 1.7544 and 1.7524. The field lacks 0.233 nats a place of the joint law
+of two letters each side and passes little past two written letters. The release rests above the
+references and no write is yet ordered text.
+[CONSTRUCTION_STATE](../../CONSTRUCTION_STATE.md) holds the table and the records.
 
 **The order within step 8.**
-1. The learner takes the held code past the letters' frequencies by more than its error, and keeps
-   it falling, lap by lap.
-2. The writer releases from the energy itself (its own kernel), not from the faces' mean field, and
-   its writes are shown whole as they come out.
-3. The card realization moves the lock scores, words and rows onto the tensor cores as limb products:
-   every term keeps its declared width and integer sums are associative, so the bits are unchanged.
+1. Read what the present body still learns, from its saved states. Two readings are done
+   (November 11). The added contacts travel each its own direction, so no founding from the
+   deposit's pair tensor is built (`tools/state_travel.py rank`; guess G57, scored). The trend
+   rule's raised rates sped up travel that is real and across its parts, and its laps read hotter,
+   on the trained sections as on the held ones (`tools/state_travel.py scale`; guesses G58 and G59,
+   both missed and scored). A lap cosine reads only the travel that survives a lap, never the
+   spread a rate costs within it. So the next reading is a lap from the trend line's state with
+   every part cooled back to the base rate, against the part-rate line's lap of the same count: if
+   it reads under, rates are raised by the cosine and read cool; if it does not, rates only fall.
+   Growth follows where a reading certifies it, with its guess fixed first.
+2. On the card, a region's share store takes its stride from the pairs that meet (atlas
+   `tower.field-support-stride`), so a return rides one batch; then the next section's tables are
+   staged on the host under the card's stroke. The tensor cores are not used yet, and a limb
+   realization is ordered only from a profile that names its entries.
+3. The release writes ordered text, judged by its structure and shown whole as it comes out.
 4. #404's remaining boxes follow on that learner: retention across passages, a cold restart on the
    card, and a question answered from the retained state with its sources.
 

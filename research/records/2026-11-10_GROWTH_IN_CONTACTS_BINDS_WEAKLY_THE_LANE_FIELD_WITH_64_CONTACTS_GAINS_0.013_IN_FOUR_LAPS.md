@@ -5,6 +5,8 @@ latest lane state, and run four laps against the lane-only chain from the same s
 the locked-visit instrument, which is now built and run. The code is on the line: 24b686bd9, 8a0d34672, 9d097c134 and ab82a0cb0.
 Refs #73, #406.
 
+> **Note of November 11.** The locked visit of §3 (`locked-visit-field`) was set aside when the training line became `main`'s field: no lap script calls it, and it needs a forward pass that keeps the plates, the words and the probes, which the field that trains does not keep. Its measurements here stand, and its code is at [`b6ff1f795`](https://github.com/brandonrdug/holonics/tree/b6ff1f795). The growth command and the state charge are on `main` ([the port's record](2026-11-11_THE_TRAINING_LINE_BECOMES_THE_TRUNKS_FIELD_THE_ENERGY_ATTEMPT_LEAVES_THE_TREE_AND_A_READING_A_LINE_IS_SCORED_BY_IS_CONSUMED_CODE.md)).
+
 ## 1. The lever and its test
 
 [definition; theory, November 10 09:55] Count tables read on TRAIN put the locked field's code beside a joint table of the

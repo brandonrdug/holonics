@@ -1,5 +1,7 @@
 # Reafference: a write is read back through several coupled sections, and a word is an arc of the motor chart
 
+> **Note of November 11.** The fresh-writes law, the melt from the truth and the contrast switches this record names (`FIELD_CONTRAST_FRESH`, `FIELD_CONTRAST_SECTIONS`, `FIELD_MELT`) belong to the energy field, one attempt of November 6 to 9. Their code left the tree on November 11 and is at [`b6ff1f795`](https://github.com/brandonrdug/holonics/tree/b6ff1f795); the lens and its join in §3 stand ([the port's record](2026-11-11_THE_TRAINING_LINE_BECOMES_THE_TRUNKS_FIELD_THE_ENERGY_ATTEMPT_LEAVES_THE_TREE_AND_A_READING_A_LINE_IS_SCORED_BY_IS_CONSUMED_CODE.md)).
+
 Status (2026-11-08): a lens from Brandon, recorded on the day it was given, beside the fresh-writes law it bears on
 (`FIELD_CONTRAST_FRESH`, commits 3bffcfc0f and fb37b33de). The join in §3 is agent-inferred and open to theory's
 derivation; no law is changed by this record. Refs #73, #406.

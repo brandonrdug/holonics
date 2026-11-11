@@ -1,5 +1,7 @@
 # The width census: every grain the field reads is picked, the material's grain carries four quantities, and the card copies the widths by hand
 
+> **Note of November 11.** The census was read at a tip that held the energy field. Its rows for the energy field's host owner, card owner and kernel header name code that left the tree on November 11 and is at [`b6ff1f795`](https://github.com/brandonrdug/holonics/tree/b6ff1f795); the rows for the face field, the material's grain and the number owner stand ([the port's record](2026-11-11_THE_TRAINING_LINE_BECOMES_THE_TRUNKS_FIELD_THE_ENERGY_ATTEMPT_LEAVES_THE_TREE_AND_A_READING_A_LINE_IS_SCORED_BY_IS_CONSUMED_CODE.md)).
+
 Status (2026-11-08): step 0's static half of the number owner's build order
 ([the number-graph record](2026-11-08_A_NUMBER_IS_A_CLASS_ON_A_GRAPH_OF_PLACES_AND_EVERY_METHOD_IS_A_BRACKETING_A_CHART_OR_AN_END.md),
 §10): every declared width at the design branch's tip `bbe6d6a0` (`claude/project-thread-nclk1x`), with its

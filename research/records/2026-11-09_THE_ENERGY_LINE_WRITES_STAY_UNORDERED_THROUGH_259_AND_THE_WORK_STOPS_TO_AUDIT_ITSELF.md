@@ -1,5 +1,7 @@
 # The energy line's writes stay unordered through 259, and the work stops to audit itself
 
+> **Note of November 11.** The energy field this record measures is one attempt of November 6 to 9. Its measurements stand as measurements of that attempt. Its code left the tree on November 11, when the training line became `main`'s field, and is at [`b6ff1f795`](https://github.com/brandonrdug/holonics/tree/b6ff1f795) ([the port's record](2026-11-11_THE_TRAINING_LINE_BECOMES_THE_TRUNKS_FIELD_THE_ENERGY_ATTEMPT_LEAVES_THE_TREE_AND_A_READING_A_LINE_IS_SCORED_BY_IS_CONSUMED_CODE.md)).
+
 Status (2026-11-09): measurement and decision. Brandon asked for Colab to stop, for housekeeping, and for a critical
 look at what the agents inferred and built in the past week. This record keeps the day's measured results, the runs
 stopped, and the audit's conclusions that bear on the line. No law changes here. Refs #73, #404, #406.

@@ -8,6 +8,8 @@ Status (2026-11-10): measurement and decision. This record covers the night's re
 
 Refs #73, #406.
 
+> **Note of November 11.** When the training line became `main`'s field, the settle, the point re-draw with its ring tilts, and the state charge were carried onto it (`settle-field`, `redraw-field`, `charge-field`), because the lines' laps are read with them. The exchange walk on its own, the ring census, the reach census, the ring re-draw's own command and the pair read (`exchange-field`, `ring-census-field`, `reach-census-field`, `redraw-ring-field`, `pair-field`) were set aside: no live line is read with them, their measurements here stand, and their code is at [`b6ff1f795`](https://github.com/brandonrdug/holonics/tree/b6ff1f795) ([the port's record](2026-11-11_THE_TRAINING_LINE_BECOMES_THE_TRUNKS_FIELD_THE_ENERGY_ATTEMPT_LEAVES_THE_TREE_AND_A_READING_A_LINE_IS_SCORED_BY_IS_CONSUMED_CODE.md)).
+
 ## 1. The moves navigate each answer region to a neutral rest
 
 Each region starts from the keyed locks given held's lengths. Two moves then work on it:
