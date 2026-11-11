@@ -103,9 +103,10 @@ theorem carryTurn_re_hasDerivAt (q : ℝ) :
     simpa using (hasDerivAt_pow 2 q).const_sub (4 : ℝ)
   have hd : HasDerivAt (fun x : ℝ => 4 + x ^ 2) (2 * q) q := by
     simpa using (hasDerivAt_pow 2 q).const_add (4 : ℝ)
-  have h := hn.div hd (four_add_sq_ne_zero q)
-  convert h using 1
-  have := four_add_sq_ne_zero q
+  have h0 := four_add_sq_ne_zero q
+  have h : HasDerivAt (fun x : ℝ => (4 - x ^ 2) / (4 + x ^ 2))
+      ((-(2 * q) * (4 + q ^ 2) - (4 - q ^ 2) * (2 * q)) / (4 + q ^ 2) ^ 2) q := hn.div hd h0
+  refine h.congr_deriv ?_
   field_simp
   ring
 
@@ -117,9 +118,10 @@ theorem carryTurn_im_hasDerivAt (q : ℝ) :
     simpa using (hasDerivAt_id q).const_mul (4 : ℝ)
   have hd : HasDerivAt (fun x : ℝ => 4 + x ^ 2) (2 * q) q := by
     simpa using (hasDerivAt_pow 2 q).const_add (4 : ℝ)
-  have h := hn.div hd (four_add_sq_ne_zero q)
-  convert h using 1
-  have := four_add_sq_ne_zero q
+  have h0 := four_add_sq_ne_zero q
+  have h : HasDerivAt (fun x : ℝ => 4 * x / (4 + x ^ 2))
+      ((4 * (4 + q ^ 2) - 4 * q * (2 * q)) / (4 + q ^ 2) ^ 2) q := hn.div hd h0
+  refine h.congr_deriv ?_
   field_simp
   ring
 
@@ -129,8 +131,9 @@ theorem friction_hasDerivAt (a b d : ℝ) (hb : b ≠ 0) (hd : 1 + d ≠ 0) :
     HasDerivAt (fun x : ℝ => a / (b * (1 + x))) (-(a / (b * (1 + d))) / (1 + d)) d := by
   have hden : HasDerivAt (fun x : ℝ => b * (1 + x)) b d := by
     simpa using ((hasDerivAt_id d).const_add (1 : ℝ)).const_mul b
-  have h := (hasDerivAt_const d a).div hden (mul_ne_zero hb hd)
-  convert h using 1
+  have h : HasDerivAt (fun x : ℝ => a / (b * (1 + x)))
+      ((0 * (b * (1 + d)) - a * b) / (b * (1 + d)) ^ 2) d := (hasDerivAt_const d a).div hden (mul_ne_zero hb hd)
+  refine h.congr_deriv ?_
   field_simp
   ring
 
