@@ -561,6 +561,18 @@ foreground shell time went to wait loops.
   name.
 - **Receipts carry time.** Each run's receipt states its projection, deadline, measured wall time
   and peak resident set, and the record keeps the ratio of measured to projected.
+- **A timing difference is read inside one hold, against a repeated control** (November 11;
+  theory's, from that day's failure). Two builds are timed against each other only inside one hold
+  of the card lock, on the same sections, interleaved with a control that runs at least twice
+  (control, the builds, control), with every other build on the host paused. The control's own
+  spread is the read's resolution, and a difference inside it is no difference. Reason: on
+  November 11 a repaired build read 1.147 times its control's time on the same sections, hours
+  apart; a rerun of the control 50 minutes later read 1.050, and three guesses were spent placing
+  the rest in the tree. In one hold the three trees agreed within 2% while one binary read 5.5%
+  apart, eleven minutes apart. Scope: every statement that one build is slower or faster than
+  another, a profile's entries included; an entry that changes by a multiple stands without it. A
+  run's time against its own projection is the standard above
+  ([the record](research/records/2026-11-11_THE_PLACES_THE_FIELD_GIVES_PUSH_AGAINST_THE_PLACES_IT_MISSES_THE_DEPOSIT_IS_THEIR_DIFFERENCE_AND_TWO_BUILDS_ARE_TIMED_ONLY_INSIDE_ONE_HOLD_OF_THE_CARD.md)).
 - **The orchestrator waits on notifications** (task notifications, a Monitor on the mailbox), never
   by sleeping.
 
