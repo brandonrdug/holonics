@@ -29,3 +29,25 @@ G39 fixed 2026-11-11T01:31Z, unread (design, one section at rt7's state: the sec
   |G_quiet| / |G| is 0.30 (held 0.15 to 0.45); the cosine of G_loud with G is 0.93 (held 0.85 or more).
   Rule: quiet ratio 0.2 or less and cosine 0.95 or more: cost may follow news (a visit clock counted in news is a candidate law).
         quiet ratio 0.5 or more: the quiet places carry a coherent push; the covector mass is the wrong count for a clock.
+
+G38 read 2026-11-11T01:39Z (design's coarse profile of rt7: nvidia-smi and ps every 5 s; no stamps in the v14 card driver yet).
+  a) held: training 1,069.8 s, 209 samples: card time share mean 0.94, median 0.95, least 0.26; the host training process 0.15 of one core.
+  b) on the proxy only, above the band: the time share with a kernel resident is 0.94 against the guessed 0.80 (0.70 to 0.90); the stamps'
+     kernel time over wall is unread.
+  c) missed on what was sampled: the re-draw stage's last 82 s (14 samples) read 0.89 (median 0.99); the 0.44 was one sample at its start.
+  Rule (b 0.70 or more): placing today's events on the host adds at most 1/0.94 - 1 = 0.06. The lever is inside the launches: the card
+  drew 186 W of 320 in training with a kernel resident 0.94 of the time.
+
+G40 fixed 2026-11-11T01:48Z, unread (design: a FIELD_PROFILE card read of training sections from rt7's state; the instrument is built,
+  field_pass.rs). Read before fixing: two older profiles in design's run directory (November 5, another declaration, training: launches
+  under 200 us hold 0.027 of kernel time, the contact family 0.385, the affine maps 0.357; November 6, this passage, a release read:
+  0.160, 0.637, 0.022; least launch 22 us), and the source (sections are cut from problems sorted by length; a contact row is summed
+  whole in 5 to 20 limbs of 64 bits a lane and divided once).
+  a) kernels are 0.85 or more of the profiled elapsed time; allocations 0.03 or less.
+  b) entries under 200 us a launch hold 0.10 of kernel time (held 0.05 to 0.16).
+  c) the contact family (exposure, contact_l*, contact rows and columns, pair, echo, skin back, spread) holds 0.60 (held 0.50 to 0.75);
+     the affine maps 0.08 or less.
+  d) the five heaviest entries hold 0.55 or more, each in the contact or the moment family.
+  Rule: c 0.50 or more: the card's lever is the wide row (one word of 5 to 20 limbs a lane and a long division a row); the digit
+        partition applies inside the card first (limbs across lanes, carries deferred, the carry and the division once a row).
+        b 0.15 or more: those entries are the first candidates for the host by n*.
