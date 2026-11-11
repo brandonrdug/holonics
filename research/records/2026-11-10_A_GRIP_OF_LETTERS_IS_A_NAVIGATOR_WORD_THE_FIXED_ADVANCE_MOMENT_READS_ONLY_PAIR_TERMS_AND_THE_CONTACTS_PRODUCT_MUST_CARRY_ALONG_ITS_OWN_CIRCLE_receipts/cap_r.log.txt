@@ -1,0 +1,28 @@
+ct8: records 43470; the same places and letters as the ruler's HELD128: True; mean locked code 0.5516, variance 1.6583; faces at zero on the letter 26
+   k | pairs | correlation | in standard errors
+    1   43342 +0.3874 +80.7
+    2   43214 +0.2990 +62.2
+    4   42960 +0.1810 +37.5
+    8   42452 +0.1050 +21.6
+   16   41451 +0.0715 +14.6
+   32   39460 +0.0441 +8.8
+   64   35528 +0.0306 +5.8
+  128   28340 +0.0067 +1.1
+  256   17959 +0.0137 +1.8
+   at unit starts (0.4078 of places) mean 0.6772, share of the code 0.5006; inside units mean 0.4652
+   by kind of the letter: space-class 0.2239, word 0.5918, other 0.8719
+   correlation with the ruler of two letters each side (mean 0.5758): 0.3674
+rt4: records 43470; the same places and letters as the ruler's HELD128: True; mean locked code 0.5289, variance 1.5914; faces at zero on the letter 24
+   k | pairs | correlation | in standard errors
+    1   43342 +0.3774 +78.6
+    2   43214 +0.2920 +60.7
+    4   42960 +0.1795 +37.2
+    8   42452 +0.1023 +21.1
+   16   41451 +0.0703 +14.3
+   32   39460 +0.0427 +8.5
+   64   35528 +0.0286 +5.4
+  128   28340 +0.0071 +1.2
+  256   17959 +0.0161 +2.2
+   at unit starts (0.4078 of places) mean 0.6556, share of the code 0.5054; inside units mean 0.4417
+   by kind of the letter: space-class 0.2156, word 0.5652, other 0.8472
+   correlation with the ruler of two letters each side (mean 0.5758): 0.3804

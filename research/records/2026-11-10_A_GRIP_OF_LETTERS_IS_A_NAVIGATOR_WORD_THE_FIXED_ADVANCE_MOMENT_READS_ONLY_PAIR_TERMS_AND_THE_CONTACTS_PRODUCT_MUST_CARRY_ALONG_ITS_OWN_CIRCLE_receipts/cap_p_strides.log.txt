@@ -1,0 +1,33 @@
+g=3 r=16 step 947 | frequency-weighted mean |alpha| 0.763 | plain mean 0.679
+   space  letters   4 share of places 0.205 weighted |alpha| 0.393
+   punct  letters  31 share of places 0.122 weighted |alpha| 0.543
+   word   letters  63 share of places 0.670 weighted |alpha| 0.915
+   other  letters   3 share of places 0.003 weighted |alpha| 1.000
+   separators (space and punct) 0.449
+   the 20 most frequent letters by |alpha|: \n:0.34 SP:0.40 ):0.41 c:0.67 d:0.72 h:0.72 s:0.73 l:0.86 a:0.86 p:0.91 `:0.92 m:0.96 o:0.96 t:0.99 e:1.00 f:1.05 r:1.07 i:1.09 n:1.10 u:1.21
+   share of circles with |alpha| < 0.5: \n:0.81 SP:0.75 ):0.69 c:0.38 d:0.31 h:0.44 s:0.25 l:0.31 a:0.19 p:0.19 `:0.44 m:0.06 o:0.12 t:0.19 e:0.12 f:0.19 r:0.19 i:0.06 n:0.06 u:0.06
+g=3 r=64 step 750 | frequency-weighted mean |alpha| 0.861 | plain mean 0.762
+   space  letters   4 share of places 0.205 weighted |alpha| 0.461
+   punct  letters  31 share of places 0.122 weighted |alpha| 0.603
+   word   letters  63 share of places 0.670 weighted |alpha| 1.030
+   other  letters   3 share of places 0.003 weighted |alpha| 1.000
+   separators (space and punct) 0.514
+   the 20 most frequent letters by |alpha|: \n:0.40 SP:0.47 ):0.52 d:0.75 `:0.84 s:0.85 h:0.90 c:0.91 p:0.93 m:0.95 f:1.01 l:1.04 t:1.07 o:1.13 a:1.13 n:1.16 e:1.17 r:1.19 i:1.28 u:1.30
+   share of circles with |alpha| < 0.5: \n:0.72 SP:0.64 ):0.58 d:0.39 `:0.23 s:0.17 h:0.22 c:0.19 p:0.20 m:0.19 f:0.22 l:0.12 t:0.05 o:0.09 a:0.12 n:0.08 e:0.06 r:0.09 i:0.12 u:0.12
+g=4 r=16 step 801 | frequency-weighted mean |alpha| 0.626 | plain mean 0.582
+   space  letters   4 share of places 0.205 weighted |alpha| 0.314
+   punct  letters  31 share of places 0.122 weighted |alpha| 0.488
+   word   letters  63 share of places 0.670 weighted |alpha| 0.745
+   other  letters   3 share of places 0.003 weighted |alpha| 1.000
+   separators (space and punct) 0.379
+   the 20 most frequent letters by |alpha|: \n:0.28 ):0.32 SP:0.32 c:0.49 s:0.55 m:0.65 d:0.67 a:0.68 l:0.73 p:0.76 e:0.77 i:0.78 o:0.78 f:0.82 `:0.83 h:0.86 n:0.87 t:0.88 r:0.97 u:1.03
+   share of circles with |alpha| < 0.5: \n:0.88 ):0.88 SP:0.75 c:0.62 s:0.50 m:0.38 d:0.31 a:0.38 l:0.25 p:0.19 e:0.19 i:0.25 o:0.31 f:0.12 `:0.25 h:0.19 n:0.31 t:0.31 r:0.06 u:0.25
+g=4 r=64 step 632 | frequency-weighted mean |alpha| 0.720 | plain mean 0.669
+   space  letters   4 share of places 0.205 weighted |alpha| 0.365
+   punct  letters  31 share of places 0.122 weighted |alpha| 0.528
+   word   letters  63 share of places 0.670 weighted |alpha| 0.862
+   other  letters   3 share of places 0.003 weighted |alpha| 1.000
+   separators (space and punct) 0.426
+   the 20 most frequent letters by |alpha|: \n:0.34 SP:0.37 ):0.41 d:0.72 c:0.74 s:0.74 `:0.79 m:0.80 p:0.81 h:0.82 l:0.83 f:0.85 t:0.90 a:0.92 o:0.92 i:0.96 e:0.97 n:0.99 u:1.03 r:1.05
+   share of circles with |alpha| < 0.5: \n:0.84 SP:0.77 ):0.72 d:0.33 c:0.31 s:0.30 `:0.27 m:0.22 p:0.27 h:0.27 l:0.31 f:0.20 t:0.20 a:0.22 o:0.22 i:0.19 e:0.11 n:0.06 u:0.19 r:0.12
+0s

@@ -1,0 +1,48 @@
+G32 fixed 2026-11-10 23:55Z, before its reads (lens of 2026-11-10 23:49Z: a longer word is a larger founded unit built from the other
+    grains of elements; coarse graining, telescoping; the tokenizer's concept).
+G32a the strides the word ruler fitted (cap_o, g = 4 and g = 3, 64 circles): the modulus |alpha(u)| of a letter's stride, averaged over the
+    circles and weighted by the letter's frequency. Guess: the newline is among the three lowest of the 20 most frequent letters; the
+    separators (space, newline, punctuation) read 0.15 or more under the letters, digits and underscore (guess 0.50 against 0.75).
+    Rule: 0.15 or more under: THE FITTED STRIDES STOP AT SEPARATORS (the ruler found unit boundaries from the code alone).
+    Under 0.05 apart: the strides do not segment; a unit's boundary is not a letter's property.
+G32b founded units by count (cap_p): the contexts of 2 to 4 left letters met c times or more on TRAIN are founded (a pruned context
+    tree; Witten-Bell down the founded suffixes), read on the 42,960 HELD128 places of g = 4.
+    Guess: the founded units needed to read the carried word's code (1.608 nats, 64 circles): 1,500 (rule: 4,096 or fewer: A STORE NO
+    LARGER THAN THE FIELD'S, SPENT ON FOUNDED UNITS, HOLDS THE GRIP THE CARRY HOLDS; over 16,384: the grip is spread, composition is needed).
+    At c = 64: 8,000 units, 1.33 nats. With units up to 8 letters at c = 64: 1.15 nats, mean unit matched 4.5 letters; all units (c = 1) 1.05.
+
+G34 fixed 2026-11-11T00:10Z, before cap_q.py's reads (the lens of 23:49Z: reach at the unit grain; host ruler; HELD128, 42,960 places).
+  The ruler's cut: a unit is a run of word letters, a run of one repeated space-class letter, or one other letter.
+  Letter chain = contexts of 1..n letters. Unit chain = the unit so far, then one more whole unit a level. Witten-Bell down each chain.
+  a) Census: units a place 0.41 on HELD (read before fixing: 0.408, not a guess). Share of the letter-chain-to-4 code that falls on unit starts: 0.62
+     (mean code at unit starts 1.90 nats, inside units 0.80).
+  b) Unit chain at 4 levels (the unit so far and three whole units): 1.20, against the letter chain's 1.2485 at 4 levels. At 8 levels: 1.14, against 1.1661.
+  c) Letters to 4, then units (the carry's interior, then the coarse strand to four units): 1.16, which is 0.09 under letters to 4.
+  d) Letter chain to 12 letters 1.155, to 16 letters 1.150.
+  Rule: c) under letters-to-4 by 0.06 or more: the coarse strand is worth its build after the carry (it holds over half of what four more letters hold, 0.082).
+        Under 0.03: on this passage units past the interior add little and the coarse strand waits.
+        b) at 4 levels under 1.21: at the field's four ticks, mates at unit boundaries read more than mates at the next letter.
+
+G35 fixed 2026-11-11T00:18Z, before cap_r.py reads design's locked visits (ct8 and rt4 held.bin; every other place locked; 43,470 places).
+  The field's locked code falls on unit starts (0.40 of places, the ruler's cut) by a share of 0.62; mean at unit starts 0.82 nats, inside units 0.34.
+  Its place-by-place correlation with the ruler of two letters each side: 0.75.
+  (G31, fixed 23:46Z in the navigation record, is read by the same script: correlation with itself at k = 64 of 0.03 or more and at k = 256 of 0.02 or more.)
+
+G36 fixed 2026-11-11T00:19Z, before cap_s.py (the field's stored locked faces multiplied into the ruler of two letters each side, renormalized, read on the letter; rt4 and ct8).
+  The product reads 0.40 nats (the field alone 0.529 and 0.552, the ruler alone 0.576).
+  Rule: 0.45 or under: the field does not hold the local joint law of two letters each side (it adds 0.08 or more when multiplied in).
+        0.50 or over: the field holds it.
+  Also: the ruler alone at unit starts 0.80, inside units 0.42.
+
+G30' fixed 2026-11-11T00:20Z, unread (replaces G30's reads for the amended law: the carry as a scan to its stop inside one tick, the stride its own chart G founded at zero).
+  Four laps from rt4, beside the part-rate line's laps 5 to 8:
+  third letter passes 0.21 or more (now 0.169); fourth 0.06 or more (now 0.029); letters five to eight together 0.03 or more;
+  held joint 0.02 or more under the line's at lap 8; locked code inside units (the ruler's cut, read by theory from the locked visit) 0.02 or more under the line's (rt4: 0.4417);
+  mean |gamma| over sites and circles 0.08 (0.05 or more: opened; under 0.02: did not open, travel);
+  on 6 of 32 circles the mean |gamma| at separator sites is 0.7 or less of that at word-letter sites (4 or more: the strides are locating units;
+  none with the strides open: place strides, units not located).
+
+G33 fixed 2026-11-11T00:20Z, unread (the built field's own clocks, Law 1: each paced head's rate kappa = 1 + c_h[u] by class on rt4).
+  Separators' frequency-weighted mean rate over word letters' is 1.3 on the stronger head.
+  Rule: 1.5 or more (or 0.67 or less) on a head: that clock already stops or idles at separators (the opening moment is cut into units there).
+        0.8 to 1.25 on both heads: the clocks are place clocks in effect and the opening moment is a fixed-advance moment.

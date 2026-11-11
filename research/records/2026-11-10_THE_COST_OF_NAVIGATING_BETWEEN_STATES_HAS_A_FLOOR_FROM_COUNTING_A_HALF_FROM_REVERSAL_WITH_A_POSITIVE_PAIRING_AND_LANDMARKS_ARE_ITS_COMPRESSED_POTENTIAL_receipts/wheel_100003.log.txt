@@ -1,0 +1,7 @@
+WHEEL p=100003 states=100004 mean=22.0205 farthest=30 floor_mean=21.5723 floor_radius=24 mean/floor=1.0208 farthest/mean=1.3624 ln_p=11.5130 mean/ln_p=1.9127 s=0.1
+  free shells 1 1 2 2 4 6 10 16 26 42 68 110 178 288 ... last growth ratios 1.6180 1.6180 1.6180 1.6180 1.6180
+  wheel shells 1 1 2 2 4 6 10 16 26 42 68 110 178 288 466 754 1220 1974 3194 5168 8362 13388 18058 18388 14738 8892 3490 892 190 62 14
+  STRAIGHT samples=5000 shortest_mean=21.9788 straight_mean=26.0506 ratio_of_means=1.1853 mean_ratio=1.1704 best_pair_mean=23.4256 best/shortest=1.0658 share_straight_is_shortest=0.5898 divisions_on_the_walk=3.951 worst_ratio=14.33
+  EUCLID divisions mean over sample 10.1310 over all x 10.1704 theorem 11.1697
+  MODES top 2.92884 2.92674 2.92321 bottom -2.92833 -2.92627 s=4.1
+DONE p=100003 s=4.1

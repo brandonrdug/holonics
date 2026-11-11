@@ -1,0 +1,19 @@
+HELD places 43470 read 43214 | next letter given the letter two back 3.0516, given both 1.9888, mean gain 1.0628 | mean surprise of the pin 2.7154
+ by quartile of the pin's surprise: surprise of the pin | gain to the next letter | gain / surprise | share of the whole gain
+    1  1.130  0.492  0.435  0.115
+    2  2.074  0.819  0.395  0.192
+    3  2.965  1.243  0.419  0.294
+    4  4.657  1.685  0.362  0.400
+ by tenth of the pin's surprise: surprise of the pin | gain to the next letter | gain / surprise | share of the whole gain
+    1  0.628  0.324  0.515  0.024
+    2  1.250  0.566  0.453  0.062
+    3  1.702  0.662  0.389  0.064
+    4  1.984  0.843  0.425  0.080
+    5  2.330  0.834  0.358  0.076
+    6  2.715  1.172  0.432  0.114
+    7  3.041  1.373  0.451  0.128
+    8  3.481  1.295  0.372  0.123
+    9  4.134  1.497  0.362  0.139
+   10  5.703  1.989  0.349  0.190
+ correlation of gain with the pin's surprise 0.384 ; share of places where the gain exceeds the pin's surprise by 0.05: 0.0000
+2s

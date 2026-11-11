@@ -1,0 +1,11 @@
+TRAIN units a place 0.4093; word runs: mean length 4.82; HELD units a place 0.4078
+units level 0: contexts 167865 cells 252951  8s
+units level 1: contexts 438891 cells 653797  9s
+units level 2: contexts 1332197 cells 1663816  10s
+units level 3: contexts 2027973 cells 2430197  11s
+units level 4: contexts 3166229 cells 3545646  12s
+units level 5: contexts 3886244 cells 4210576  13s
+units level 6: contexts 4641445 cells 4898238  14s
+units level 7: contexts 5120826 cells 5320310  15s
+units level 8: contexts 5536446 cells 5695218  16s
+16s

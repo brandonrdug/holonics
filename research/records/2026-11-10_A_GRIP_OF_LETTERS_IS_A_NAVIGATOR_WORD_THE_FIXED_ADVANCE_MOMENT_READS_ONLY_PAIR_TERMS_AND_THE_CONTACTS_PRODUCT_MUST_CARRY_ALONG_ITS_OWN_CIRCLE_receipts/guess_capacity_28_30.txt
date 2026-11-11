@@ -1,0 +1,34 @@
+G28 fixed 2026-11-10 22:55Z, before the read (after reading the tick's source: a product of two strand neighbours forms each tick, and a
+    further body joins only at the next tick, through the face). Fitted readers on TRAIN, read on HELD128, the target from g written letters
+    on its left, every reader on the same places (those with g letters before them in the passage):
+    (a) the fitted pair-only reader (one table a letter, logits added): g = 2: 2.25; g = 3: 2.10; g = 4: 2.03 (the joint tables read
+        1.90, 1.42, 1.22 by design's count; the field's open-left reads were 2.239, 2.069, 2.040).
+        Rule: the field's three reads sit within 0.06 of the pair-only reader: THE FIELD'S OPEN READ IS THE TWO-BODY READER.
+    (b) the pair-only reader plus r complex products of one factor a letter (a word of content turns, one channel each):
+        share of the gap from pair-only to the joint table that it recovers:
+        g = 2: r = 4: 0.20; r = 16: 0.50; r = 64: 0.75.   g = 3: r = 16: 0.35; r = 64: 0.55.   g = 4: r = 16: 0.30; r = 64: 0.45.
+        Rule at g = 2, r = 16 (the built contact's count toward one mate): half or more: THE THIRD BODY'S TERM IS EXPRESSIBLE BY THE BUILT
+        CONTACT, and the field's lack at two letters is of location, not of form; under a quarter: THE FORM IS THE LIMIT.
+        Rule at g = 3 and 4, r = 64: half or more: A WORD OF CONTENT TURNS HOLDS THE FURTHER BODIES; under a quarter: it does not.
+
+G29 (fixed 2026-11-10 23:18Z, before any of these reads). cap_o.py: the WORD OF SHARED STRIDES. One move a letter on each of r circles,
+z -> alpha_e[u] z + beta_e[u] (alpha, beta complex; one table for every offset), composed along the strand in passage order from the far
+letter to the near one; the target reads Re sum_e gamma_e[x] m_e beside the same pair tables as G28. No factor knows its offset: order
+comes from composition alone. Recovery = (pair-only code - this code) / (pair-only code - joint count table's code), on HELD128.
+  Read before this guess (G28, free factors by offset): r = 64: 0.98, 0.85, 0.70 at g = 2, 3, 4; r = 16: 0.81, 0.57, 0.48.
+  Guess, r = 64: g = 2: 0.97 (the same form as the free factors); g = 3: 0.65; g = 4: 0.50.
+  Guess, r = 16: g = 2: 0.80; g = 3: 0.45; g = 4: 0.35.
+  Rule at r = 64: three quarters or more of the free factors' recovery at g = 3 and at g = 4 (0.64 and 0.53): THE CARRY ALONG THE CIRCLE
+  HOLDS THE GRIP (one stride a letter; the contact's product carried along its own circle is the growth step, with no new numbers).
+  Under half (0.42, 0.35): A STRIDE MUST KNOW MORE THAN ITS LETTER (read from the face, or moves that do not commute). Between: unruled.
+
+G29 READ (23:19Z to 23:29Z): word of shared strides, r = 64: g = 3: 0.79 (step 750), g = 4: 0.65 (step 632); r = 16: g = 3: 0.49 (step 947), g = 4: 0.40 (step 801).
+  Free factors beside: r = 64: 0.85 (step 823), 0.70 (step 331); r = 16: 0.57, 0.48. Guesses 0.65, 0.50, 0.45, 0.35: all read higher. Rule HELD:
+  THE CARRY ALONG THE CIRCLE HOLDS THE GRIP.
+
+G30 (fixed 2026-11-10 23:26Z, before any card read; sent to design). The carried contact: p_e^k(t) = a_e^k(t) (b_e^k(m) + kappa_e p_e^(k-1)(m)),
+m = strand_mate(t, e), p^0 = 0, W reads p; kappa_e complex, one a circle, founded at zero. Four laps from the line's last state beside the
+same line's laps without it. G12's left reads now: the third letter passes 0.169, the fourth 0.029 (the pair-only reader 0.12, 0.058).
+  Guess after four laps: the third letter passes 0.21 or more; the fourth 0.06 or more; held joint 0.02 or more under the laps without it.
+  Rule: mean |kappa| under 0.05: THE CARRY DID NOT OPEN (travel; read kappa's displacement cosines before more laps).
+        mean |kappa| over 0.2 and the fourth letter still under 0.04: THE CARRY OPENED AND THE GRIP DID NOT USE IT (the attempt fails here).

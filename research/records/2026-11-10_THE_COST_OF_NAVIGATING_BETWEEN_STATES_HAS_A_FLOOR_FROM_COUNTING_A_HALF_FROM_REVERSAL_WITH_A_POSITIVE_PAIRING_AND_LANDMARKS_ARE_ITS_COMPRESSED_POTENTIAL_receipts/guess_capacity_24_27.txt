@@ -1,0 +1,21 @@
+G24-G27 fixed 2026-11-10 22:28Z, before any of these reads (lens of 22:15Z: landmarks, the prime wheel, gaps as the cost of navigation).
+G24 the prime wheel: the projective line over F_p (p+1 states) under the unit step x+1, x-1 and the inversion -1/x, from the point at
+    infinity; p = 10007, 100003, 1000003, 10000019. The floor is the free count: the same moves on the rationals, which no wheel can outrun.
+    (a) mean shortest distance over all states / the floor's mean: 1.06 (rule: 1.10 or under at every p of 100003 and up: TYPICAL COST MEETS THE CAUSAL FLOOR).
+    (b) farthest state / mean: 1.35 (rule: 1.5 or under).
+    (c) the straight walk at the wall (Euclid's divisions on the shortest pair of the state's lattice, nearest quotients, unit steps counted)
+        over the shortest distance, mean of 5,000 states: 1.10, 1.20, 1.30, 1.40 at the four primes
+        (rule: a rise of 0.05 or more a decade: THE STRAIGHT WALK PAYS THE SQUARE OF THE LOG; flat within 0.03: it does not, at this range).
+    (d) the largest nontrivial mode of the wheel's adjacency: 2.88 +- 0.06, and within 0.03 of the free walk's radius read from closed
+        walks (rule: within 0.03 at every p: THE WHEEL'S MODES ARE NO LOUDER THAN THE FREE WALK'S).
+    (e) instrument check (known theorem): Euclid's division count on (p, x), mean over x, = (12 ln 2 / pi^2) ln p + 1.467 within 0.05.
+G25 the text's own information between two letters s places apart (TRAIN, both in one passage, shuffle floor subtracted), nats:
+    s = 1: 1.10; 2: 0.60; 4: 0.25; 8: 0.10; 16: 0.04; 64: 0.010; 256: 0.003.
+    Rule: I(256)/I(128) of 0.30 or more: A POWER LAW (no gap: the text has no one reach); 0.10 or under: a gap. Guess: power law, slope -1.0 +- 0.3
+    between s = 8 and s = 512. Landmarks: at multiples of four from 8 to 64, I(s) stands 10% or more over the mean of its two neighbours.
+G26 the surprise of the reader of two letters each side, place by place on HELD128: its correlation with itself k places on:
+    k = 1: 0.15; 2: 0.08; 4: 0.05; 16: 0.02; 64: 0.01. Rule: every k of 8 and up within three standard errors of zero: the remainder is
+    FLAT beyond the reader's reach; else landmarks remain. Guess: they remain (k = 64 stands over three standard errors).
+G27 a written letter's worth to its neighbour, by the letter's own surprise (HELD128; target the next letter, the letter before the pin
+    known in both readings): mean gain in nats by quartile of the pin's surprise: 0.03, 0.30, 1.00, 2.30; the share of its own surprise a
+    pin passes on falls from 0.8 to 0.5. Identity (no guess): a pin passes on at most its own surprise, pointwise.

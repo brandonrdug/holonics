@@ -1,0 +1,18 @@
+# cap_n.py: the pair-only reader (r = 0) and free factors by offset (r > 0). Final line of each fit, as printed. nats a place.
+READ g=2 r=0 step 16799 | contexts 6584 | train 2.4207 | held places 43214 | held 2.4680 | count tables on the same places, depth 1..g: 2.7202 1.9890 | 4s
+READ g=2 r=4 step 3393 | contexts 6584 | train 2.1807 | held places 43214 | held 2.2304 | count tables on the same places, depth 1..g: 2.7202 1.9890 | 71s
+READ g=2 r=16 step 933 | contexts 6584 | train 2.0385 | held places 43214 | held 2.0778 | count tables on the same places, depth 1..g: 2.7202 1.9890 | 71s
+READ g=2 r=64 step 853 | contexts 6584 | train 1.9594 | held places 43214 | held 1.9984 | count tables on the same places, depth 1..g: 2.7202 1.9890 | 132s
+READ g=3 r=0 step 1503 | contexts 67083 | train 2.3009 | held places 43087 | held 2.3484 | count tables on the same places, depth 1..g: 2.7257 1.9927 1.4752 | 132s
+READ g=3 r=16 step 931 | contexts 67083 | train 1.7864 | held places 43087 | held 1.8484 | count tables on the same places, depth 1..g: 2.7257 1.9927 1.4752 | 103s
+READ g=3 r=64 step 823 | contexts 67083 | train 1.5468 | held places 43087 | held 1.6075 | count tables on the same places, depth 1..g: 2.7257 1.9927 1.4752 | 103s
+READ g=4 r=0 step 3155 | contexts 242724 | train 2.2392 | held places 42960 | held 2.2899 | count tables on the same places, depth 1..g: 2.7277 1.9943 1.4776 1.2485 | 99s
+READ g=4 r=16 step 848 | contexts 242724 | train 1.7231 | held places 42960 | held 1.7872 | count tables on the same places, depth 1..g: 2.7277 1.9943 1.4776 1.2485 | 100s
+READ g=4 r=64 step 692 | contexts 242724 | train 1.4446 | held places 42960 | held 1.5074 | count tables on the same places, depth 1..g: 2.7277 1.9943 1.4776 1.2485 | 105s
+# cap_o.py: the word of shared strides (one move a letter, composed in passage order). Final line of each fit, as printed.
+READ word g=2 r=16 step 506 | contexts 6584 | train 2.0565 | held places 43214 | held 2.0994 | mean |alpha| 0.985 | 40s
+READ word g=2 r=64 step 213 | contexts 6584 | train 1.9853 | held places 43214 | held 2.0256 | mean |alpha| 0.974 | 46s
+READ word g=3 r=16 step 947 | contexts 67083 | train 1.8534 | held places 43087 | held 1.9164 | mean |alpha| 0.679 | 100s
+READ word g=3 r=64 step 750 | contexts 67083 | train 1.6022 | held places 43087 | held 1.6589 | mean |alpha| 0.762 | 102s
+READ word g=4 r=16 step 801 | contexts 242724 | train 1.8123 | held places 42960 | held 1.8743 | mean |alpha| 0.582 | 101s
+READ word g=4 r=64 step 632 | contexts 242724 | train 1.5415 | held places 42960 | held 1.6084 | mean |alpha| 0.669 | 103s

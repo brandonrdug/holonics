@@ -1,0 +1,13 @@
+HELD places read 42960; unit starts 0.4020 of them
+letter chain (levels = letters): 1:2.7277 2:1.9943 3:1.4776 4:1.2485 5:1.1652 6:1.1405 7:1.1467 8:1.1661 9:1.1930 10:1.2268 11:1.2612 12:1.2965 13:1.3306 14:1.3642 15:1.3954 16:1.4247
+unit chain (level 1 = the last unit before the place, whole or begun; then one more whole unit a level): 1:1.5972 2:1.2804 3:1.0861 4:1.0505 5:1.0470 6:1.0642 7:1.0841 8:1.1016 9:1.1172
+   its mean reach in letters: 1:3.28 2:5.09 3:8.06 4:10.10 5:12.99 6:15.20 7:17.93 8:20.17 9:22.79
+letters to 4, then the unit chain from its second level: +0:1.2485 +1:1.2750 +2:1.0889 +3:1.0538 +4:1.0504 +5:1.0676 +6:1.0875 +7:1.1050 +8:1.1206
+letters to 8, then the unit chain from its second level: +0:1.1661 +1:1.3348 +2:1.1628 +3:1.1291 +4:1.1259 +5:1.1431 +6:1.1631 +7:1.1806 +8:1.1962
+   letters to 4             at unit starts 1.9023 (share of the code 0.613), inside units 0.8089
+   letters to 8             at unit starts 1.8399 (share of the code 0.634), inside units 0.7130
+   unit chain, 4 levels     at unit starts 1.5862 (share of the code 0.607), inside units 0.6904
+   unit chain, all levels   at unit starts 1.7330 (share of the code 0.624), inside units 0.7032
+   letters to 4             by kind of the letter read: space-class 0.6073, word 1.3061, other 2.0386
+   unit chain, all levels   by kind of the letter read: space-class 0.4755, word 1.2071, other 1.7188
+0s
