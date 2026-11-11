@@ -2341,3 +2341,178 @@ fn the_carry_survives_a_lane_and_a_growth_in_contacts() {
     assert_eq!(from.iter().flatten().count(), laned.theta.len());
     assert!(field.grown(2, &keys(field.growth_draws(2))).is_err(), "no growth by copies with the carry");
 }
+
+/// [definition; theory, November 10 05:30] **An answer's root charge is its letters' counts against its faces' summed shares**
+/// ([`root_charge`]): faces that share their mass evenly between letters 1 and 2 under an answer of three 1s and one 2 hold
+/// `F = (2, 2)` against `N = (3, 1)`, so the charge is `3 log₂(3/2) + log₂(1/2)` bits, positive, at the counts' `2^72`; and
+/// faces whose shares match the counts read none.
+#[test]
+fn an_answers_root_charge_is_its_counts_against_its_summed_shares() {
+    let face = |m1: u128, m2: u128| TowerFace { masses: vec![0, m1, m2], total: m1 + m2 };
+    let x = [1usize, 1, 1, 2];
+    let even = vec![face(1 << 60, 1 << 60); 4];
+    // 3 log₂ 1.5 − 1 = 0.754887… bits on 2^(−20): 791,557.
+    let r = root_charge(&x, &even);
+    assert!((r - 791_557).abs() < 64, "the root charge {r}");
+    let matched = vec![face(3 << 58, 1 << 58); 4];
+    assert!(root_charge(&x, &matched).abs() < 64);
+}
+
+/// [definition; theory, November 10 04:40] **The re-draws through a lens code the stop place and certify every pass**
+/// ([`Field::redraw_lensed`]): with a lens that weighs the void four times at the stop place, each answer's code at the start is
+/// its lensed locked faces' code, the stop place at the void among them, and every pass that keeps changes lowers the pooled
+/// code by more than `h` for each one; every answer keeps its length and stops neutral or at rest.
+#[test]
+fn the_lensed_redraw_codes_its_stop_place_and_certifies_every_pass() {
+    let field = shaped_with(FieldDeclaration { reach: 40, ..tiny_declaration(1) });
+    let (q1, q2) = ([1usize, 4, 0, 2, 2, 3], [3usize, 3, 1, 0]);
+    let problems: Vec<(&[usize], usize)> = vec![(&q1, 24), (&q2, 22)];
+    let letters = |seed: usize, n: usize, room: usize| -> Vec<usize> { (0..room).map(|t| if t < n { 1 + (t * 7 + t / 3 + seed) % 4 } else { 0 }).collect() };
+    let written = vec![letters(0, 20, 24), letters(3, 20, 22)];
+    let lens = |x: &[usize], faces: &mut [TowerFace]| {
+        if let Some(stop) = faces.get_mut(x.len()) {
+            stop.masses[0] *= 4;
+            stop.total = stop.masses.iter().sum();
+        }
+    };
+    let answers0: Vec<Vec<usize>> = written.iter().map(|w| w[..20].to_vec()).collect();
+    let mut locked = field.locked_faces(&problems, &answers0, &[0, 1], 0, true, &mut HostField).unwrap();
+    for (x, f) in answers0.iter().zip(locked.iter_mut()) {
+        assert_eq!(f.len(), x.len() + 1, "the stop place is read");
+        lens(x, f);
+    }
+    for h in [0i128, 1 << 18] {
+        let mut passes: Vec<(usize, usize, i128)> = Vec::new();
+        let (answers, records) = field.redraw_lensed(&problems, &written, 0, h, &lens, &mut HostField, &mut |p| {
+            passes.push((p.pass, p.kept, p.code));
+            true
+        }).unwrap();
+        for (k, r) in records.iter().enumerate() {
+            let expected: i128 = locked[k].iter().enumerate().map(|(t, f)| f.code(answers0[k].get(t).copied().unwrap_or(0)) as i128).sum();
+            assert_eq!(r.start, expected, "problem {k}: the start is the lensed code, the stop place's among it");
+            assert!(r.neutral || r.rested, "h={h} problem {k} stops");
+            assert!(answers[k][..20].iter().all(|&c| c != 0) && answers[k][20..].iter().all(|&c| c == 0));
+        }
+        for w in passes.windows(2) {
+            let ((_, _, before), (pass, kept, after)) = (w[0], w[1]);
+            if kept > 0 {
+                assert!(before - after > h * kept as i128, "h={h} pass {pass}");
+            } else {
+                assert_eq!(before, after, "h={h} pass {pass} kept nothing");
+            }
+        }
+    }
+}
+
+/// [definition; theory, November 10 04:15] **A point re-draw proposal** ([`redraw_proposals`]): a place more than a nat past its
+/// face's entropy is re-drawn to its face's top letter, never the void, only where that letter's price is at least a nat; the
+/// most surprised first, and no two claims within `NEAR − 1` of each other.
+#[test]
+fn a_point_redraw_takes_the_top_letter_of_a_surprised_place() {
+    // Five letters, the void 0: a face sure of letter `top` (the void heavier still where `void_heavy`).
+    let face = |top: usize, void_heavy: bool| {
+        let masses: Vec<u128> = (0..5).map(|c| if c == top { 1u128 << 60 } else if c == 0 && void_heavy { 1 << 61 } else { 1 << 40 }).collect();
+        let total = masses.iter().sum();
+        TowerFace { masses, total }
+    };
+    let n = 2 * NEAR + 2;
+    // Every place holds letter 1; place 0 is sure of 2, place 1 (inside its claim) sure of 3, the last sure of 4 behind a
+    // heavier void, and the rest sure of 1.
+    let x = vec![1usize; n];
+    let faces: Vec<TowerFace> = (0..n).map(|t| match t { 0 => face(2, false), 1 => face(3, false), t if t == n - 1 => face(4, true), _ => face(1, false) }).collect();
+    let out = redraw_proposals(&x, &faces, 0);
+    let at: Vec<Vec<(usize, usize)>> = out.iter().map(|(at, _)| at.clone()).collect();
+    assert!(at.iter().all(|a| a.len() == 1 && a[0].1 != 0), "never the void");
+    assert!(at.contains(&vec![(n - 1, 4)]), "the top letter behind the void: {at:?}");
+    assert_eq!(at.iter().filter(|a| a[0].0 < NEAR).count(), 1, "one claim among the first places: {at:?}");
+    assert!(out.iter().all(|(_, g)| *g > 0));
+}
+
+/// [definition; theory, November 10 04:15] **Point re-draws alternate with exchanges, certify every pass and stop** ([`Field::redraw`]):
+/// on the settle's two answers, at `h` zero and at a quarter of a bit, each answer keeps its length and its void, the passes
+/// alternate re-draw (odd) and exchange (even), every pass that keeps changes lowers the pooled code by more than `h` for each
+/// one, a pass that keeps none leaves it as it was, and every answer stops neutral (its code at or under its entropy) or at
+/// rest; its end is its final answer's code read again.
+#[test]
+fn point_redraws_alternate_with_exchanges_certify_every_pass_and_stop() {
+    let field = shaped_with(FieldDeclaration { reach: 40, ..tiny_declaration(1) });
+    let (q1, q2) = ([1usize, 4, 0, 2, 2, 3], [3usize, 3, 1, 0]);
+    let problems: Vec<(&[usize], usize)> = vec![(&q1, 24), (&q2, 22)];
+    let letters = |seed: usize, n: usize, room: usize| -> Vec<usize> { (0..room).map(|t| if t < n { 1 + (t * 7 + t / 3 + seed) % 4 } else { 0 }).collect() };
+    let written = vec![letters(0, 20, 24), letters(3, 20, 22)];
+    for h in [0i128, 1 << 18] {
+        let mut passes: Vec<(usize, usize, usize, i128)> = Vec::new();
+        let (answers, records) = field.redraw(&problems, &written, 0, h, &mut HostField, &mut |p| {
+            passes.push((p.pass, p.kind, p.kept, p.code));
+            true
+        }).unwrap();
+        for w in passes.windows(2) {
+            let ((_, _, _, before), (pass, kind, kept, after)) = (w[0], w[1]);
+            assert_eq!(kind, pass % 2, "pass {pass} alternates");
+            if kept > 0 {
+                assert!(before - after > h * kept as i128, "h={h} pass {pass}: {kept} kept, the code fell {}", before - after);
+            } else {
+                assert_eq!(before, after, "h={h} pass {pass} kept nothing");
+            }
+        }
+        for (k, (a, w)) in answers.iter().zip(&written).enumerate() {
+            assert_eq!(a.len(), w.len());
+            assert!(a[..20].iter().all(|&c| c != 0) && a[20..].iter().all(|&c| c == 0), "problem {k} keeps its length and its void");
+            let r = &records[k];
+            assert!(r.neutral || r.rested, "h={h} problem {k} stops");
+            assert!(!r.neutral || r.end <= r.entropy, "h={h} problem {k}: neutral at or under its entropy");
+            eprintln!("REDRAW h={h} problem={k} kept={} undone={} start={} end={} entropy={} neutral={} passes={}", r.kept.len(), r.undone, r.start, r.end, r.entropy, r.neutral, passes.len() - 1);
+        }
+        let (_, check) = field.redraw(&problems, &answers, 0, i128::MAX, &mut HostField, &mut |_| false).unwrap();
+        for (k, r) in records.iter().enumerate() {
+            assert_eq!(check[k].start, r.end, "the end is the final answer's code read again");
+        }
+    }
+}
+
+/// [definition; theory, November 10 01:36] **The parallel certified settle holds composition, certifies every pass and rests**
+/// ([`Field::settle`]): on two answers of twenty letters, at `h` zero and at a quarter of a bit, each answer keeps its letters
+/// and its void, every pass that keeps exchanges lowers the pooled code by more than `h` for each one (each problem's kept set
+/// is certified whole), a pass that keeps none leaves it as it was, every problem rests, and its end is its final
+/// answer's code read again; some exchange is kept.
+#[test]
+fn the_parallel_settle_certifies_every_pass_and_rests() {
+    let field = shaped_with(FieldDeclaration { reach: 40, ..tiny_declaration(1) });
+    let (q1, q2) = ([1usize, 4, 0, 2, 2, 3], [3usize, 3, 1, 0]);
+    let problems: Vec<(&[usize], usize)> = vec![(&q1, 24), (&q2, 22)];
+    let letters = |seed: usize, n: usize, room: usize| -> Vec<usize> { (0..room).map(|t| if t < n { 1 + (t * 7 + t / 3 + seed) % 4 } else { 0 }).collect() };
+    let written = vec![letters(0, 20, 24), letters(3, 20, 22)];
+    let mut kept_any = false;
+    for h in [0i128, 1 << 18] {
+        let mut passes: Vec<(usize, usize, i128)> = Vec::new();
+        let (answers, records) = field.settle(&problems, &written, 0, h, &mut HostField, &mut |p| {
+            passes.push((p.pass, p.kept, p.code));
+            true
+        }).unwrap();
+        for w in passes.windows(2) {
+            let ((_, _, before), (pass, kept, after)) = (w[0], w[1]);
+            if kept > 0 {
+                assert!(before - after > h * kept as i128, "h={h} pass {pass}: {kept} kept, the code fell {}", before - after);
+            } else {
+                assert_eq!(before, after, "h={h} pass {pass} kept nothing");
+            }
+        }
+        for (k, (a, w)) in answers.iter().zip(&written).enumerate() {
+            let (mut x, mut y) = (a.clone(), w.clone());
+            x.sort_unstable();
+            y.sort_unstable();
+            assert_eq!(x, y, "problem {k}: composition held");
+            assert!(a[20..].iter().all(|&c| c == 0), "the void past the letters stays");
+            let r = &records[k];
+            assert!(r.rested, "h={h} problem {k} rests");
+            kept_any |= !r.kept.is_empty();
+            eprintln!("SETTLE h={h} problem={k} kept={} undone={} start={} end={} passes={}", r.kept.len(), r.undone, r.start, r.end, passes.len() - 1);
+        }
+        let (again, check) = field.settle(&problems, &answers, 0, i128::MAX, &mut HostField, &mut |_| true).unwrap();
+        assert_eq!(again, answers);
+        for (k, r) in records.iter().enumerate() {
+            assert_eq!(check[k].start, r.end, "the end is the final answer's code read again");
+        }
+    }
+    assert!(kept_any, "the settle kept some exchange");
+}
