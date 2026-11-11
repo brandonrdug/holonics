@@ -30,7 +30,7 @@
 use core::ffi::c_void;
 use std::time::Instant;
 
-use holonics::hnn::tower::field::{band_bits, landmarks_of, BlankClocks, Field, FieldDeclaration, FieldRead, FieldRealization, HeldRows, NearOffsets, RowCurrent, Region, Scale, TickRead, NEAR, SHARE_BITS, STATE_BITS};
+use holonics::hnn::tower::field::{band_bits, landmarks_of, BlankClocks, CarryGates, Field, FieldDeclaration, FieldRead, FieldRealization, HeldRows, NearOffsets, RowCurrent, Region, Scale, TickRead, NEAR, SHARE_BITS, STATE_BITS};
 use holonics::hnn::tower::{TowerError, TowerFace, MATERIAL_BITS};
 
 use crate::cuda::{Dim3, Module};
@@ -704,6 +704,9 @@ pub struct CardField<'c> {
     held_cells: std::cell::RefCell<Vec<i128>>,
     /// [measurement, November 4] While the ticks are read: each region's tick reads, region by region.
     tick_reads: std::cell::RefCell<Option<Vec<Vec<TickRead>>>>,
+    /// [measurement; theory, November 11 18:33, part P2] While the carry circles' gates are read: each circle's `|γ|` sum, then its `h ≥ 0` count,
+    /// then the reads (`2C + 1` words, [`CarryGates`]), summed over the batches from each tick's forward.
+    carry_gates: std::cell::RefCell<Option<Vec<u128>>>,
     /// [measurement, §16.42] While a near field is read: the named sites of the batch's one region, and each one's near field
     /// by offset at every kept tick and head.
     near_sites: std::cell::RefCell<Option<Vec<usize>>>,
@@ -726,7 +729,7 @@ impl<'c> CardField<'c> {
         let (free, total) = (memory.free_bytes as u64, memory.total_bytes as u64);
         let used = total.saturating_sub(free);
         let budget = free.min(BOARD_CEILING.saturating_sub(used)).saturating_sub(MARGIN);
-        Ok(Self { card, module, budget, times: FieldTimes::default(), profile: None, pools: Default::default(), held_questions: Default::default(), covector_shares: Default::default(), row_questions: Default::default(), row_out: Default::default(), row_cov: Default::default(), held_cells: Default::default(), tick_reads: Default::default(), near_sites: Default::default(), near_out: Default::default(), clock_sites: Default::default(), clock_out: Default::default(), phases: None })
+        Ok(Self { card, module, budget, times: FieldTimes::default(), profile: None, pools: Default::default(), held_questions: Default::default(), covector_shares: Default::default(), row_questions: Default::default(), row_out: Default::default(), row_cov: Default::default(), held_cells: Default::default(), tick_reads: Default::default(), carry_gates: Default::default(), near_sites: Default::default(), near_out: Default::default(), clock_sites: Default::default(), clock_out: Default::default(), phases: None })
     }
 
     /// The octets a batch's weight and contact stores may take.
@@ -1648,6 +1651,9 @@ impl<'c> CardField<'c> {
         let base_clock = [words.kappa, words.tau, words.sigma, words.plain, words.pframe, words.moment, words.saddr];
         let blanks = paced > 0 && (0..sites).any(|t| unresolved[t] != 0 && st.mix_off[t] == st.mix_off[t + 1]);
         let mut clocks: Vec<Option<CardClock<'c>>> = vec![None];
+        // [measurement; part P2] The carry circles' gates, where read: one accumulator a batch, added into after each tick's forward from that tick's
+        // own gate and leak reads, fetched once the ticks end.
+        let gate_acc = if d.carry > 0 && self.carry_gates.borrow().is_some() { Some(self.timed(Kind::Alloc, || self.take_zeroed::<u64>(2 * d.carry + 1)).map_err(device)?) } else { None };
         for k in 0..d.ticks {
             set_clock(words, clocks[k].as_ref(), base_clock);
             if let (Some(tr), Some(tb)) = (tower.as_deref_mut(), tb.as_ref()) {
@@ -1656,12 +1662,26 @@ impl<'c> CardField<'c> {
                 }
             }
             self.tick_forward(field, words, &ticks, k, kept, stored, keep.is_some(), logits, returning, pr.device_ptr(), sites, pairs, regions.len())?;
+            if let Some(acc) = gate_acc.as_ref() {
+                let tick = &ticks[if kept { k } else { 0 }];
+                (words.pg, words.pgam) = (tick.pg.device_ptr(), tick.pgam.device_ptr());
+                let mut ap = acc.device_ptr();
+                self.launch("field_carry_gates_read", Self::cells((sites * d.carry) as u64), THREADS, &mut [arg(words), arg(&mut ap)])?;
+            }
             if k + 1 < d.ticks {
                 let next = if blanks { Some(self.blank_clock(field, words, regions.len(), sites)?) } else { None };
                 clocks.push(next);
             }
         }
         set_clock(words, None, base_clock);
+        if let Some(acc) = gate_acc.as_ref() {
+            let read = self.timed(Kind::Copy, || card.fetch(&**acc)).map_err(device)?;
+            if let Some(sum) = self.carry_gates.borrow_mut().as_mut() {
+                for (s, &v) in sum.iter_mut().zip(&read) {
+                    *s += u128::from(v);
+                }
+            }
+        }
         // Each named site's clocks by tick (a reading, §16.44), the batch's one region.
         if let Some(named) = self.clock_sites.borrow().as_ref() {
             let mut out = self.clock_out.borrow_mut();
@@ -2651,6 +2671,23 @@ impl FieldRealization for CardField<'_> {
 
     fn read_faces(&mut self, field: &Field, regions: &[Region]) -> Result<Vec<Vec<Option<TowerFace>>>> {
         Ok(self.run(field, regions, false, false, None)?.0)
+    }
+
+    /// [measurement; part P2] The faces and the carry circles' gates from the same pass: every tick's gate and leak reads are summed on the card
+    /// over the open sites (`field_carry_gates_read`), so no face and no other read changes.
+    fn read_faces_gated(&mut self, field: &Field, regions: &[Region]) -> Result<(Vec<Vec<Option<TowerFace>>>, CarryGates)> {
+        let c = field.declaration.carry;
+        *self.carry_gates.borrow_mut() = (c > 0).then(|| vec![0u128; 2 * c + 1]);
+        let read = self.run(field, regions, false, false, None);
+        let sum = self.carry_gates.borrow_mut().take();
+        let faces = read?.0;
+        let mut gates = CarryGates::new(c);
+        if let Some(sum) = sum {
+            gates.modulus = sum[..c].to_vec();
+            gates.friction = sum[c..2 * c].iter().map(|&v| v as u64).collect();
+            gates.reads = sum[2 * c] as u64;
+        }
+        Ok((faces, gates))
     }
 
     fn read_logits(&mut self, field: &Field, regions: &[Region]) -> Result<Vec<FieldRead>> {

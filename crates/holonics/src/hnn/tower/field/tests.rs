@@ -2645,3 +2645,31 @@ fn the_parallel_settle_certifies_every_pass_and_rests() {
     assert!(kept_any, "the settle kept some exchange");
 }
 
+
+/// [measurement; theory, November 11 18:33, part P2] **The carry circles' gates, read**: on a drawn field grown by two carry circles (founded: the leak
+/// rows and biases at zero), every (open site, tick) read has `h = 0`, so `|γ| = |γ̂(q)|`, one to the grain (`2^30` less the rounding of its two
+/// parts), and `h ≥ 0` counts every read; a moved leak row turns some reads below zero and closes their friction count; the read changes no face.
+#[test]
+fn the_carry_circles_gates_are_read_from_the_forwards_own_cells() {
+    let plain = shaped_with(four_contacts(1));
+    let (mut grown, _) = plain.with_carry(2, &keys(plain.declaration.carry_draws(2))).unwrap();
+    let r = region();
+    let faces = grown.faces(&r).unwrap();
+    let gates = grown.carry_gates_of(&r).unwrap();
+    let open = OPEN.iter().filter(|&&u| u).count() as u64;
+    assert_eq!(gates.reads, open * grown.declaration.ticks as u64);
+    for k in 0..2 {
+        assert_eq!(gates.friction[k], gates.reads, "at rest every leak read stands at zero");
+        let low = u128::from(gates.reads) * ((1u128 << 30) - 2);
+        assert!(gates.modulus[k] >= low && gates.modulus[k] <= u128::from(gates.reads) << 30, "circle {k}: |γ| one to the grain");
+    }
+    assert_eq!(grown.faces(&r).unwrap(), faces, "the read changes no face");
+    // A leak row moved below zero at every coordinate's sign: some reads lose their friction count.
+    let (l, dw) = (grown.layout.clone(), grown.declaration.width);
+    for j in 0..dw {
+        grown.theta[l.carry + 2 * dw + j] = if j % 2 == 0 { -(1 << 22) } else { 1 << 21 };
+    }
+    let moved = grown.carry_gates_of(&r).unwrap();
+    assert_eq!(moved.reads, gates.reads);
+    assert!(moved.friction[0] < moved.reads, "a moved leak row closes some reads' friction");
+}

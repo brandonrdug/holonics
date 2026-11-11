@@ -2782,6 +2782,28 @@ extern "C" __global__ void field_pair_gate_back(FieldWords w, int64_t *dg) {
     }
 }
 
+// [measurement; theory, November 11 18:33, part P2] **The carry circles' gates, read** (the host's `Field::carry_gates_of`): at each open site and carry
+// circle of the tick just formed, `|γ|` on `2^(−30)` (the floor of the square root of `γ_re² + γ_im²`, at most `2^60`) added into `acc[k]`, the leak read
+// `h ≥ 0` counted into `acc[C + k]`, and the site counted once into `acc[2C]`. A reading: it writes only its accumulator.
+extern "C" __global__ void field_carry_gates_read(FieldWords w, unsigned long long *acc) {
+    const uint64_t C = w.carry, c2 = 2 * C;
+    const uint64_t cells = (uint64_t)w.T * C;
+    for (uint64_t c = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; c < cells; c += (uint64_t)gridDim.x * blockDim.x) {
+        const uint64_t t = c / C, k = c % C;
+        if (!w.unresolved[t]) {
+            continue;
+        }
+        const wide re = w.pgam[t * c2 + k], im = w.pgam[t * c2 + C + k];
+        atomicAdd(acc + k, (unsigned long long)isqrt128((uwide)(re * re + im * im)));
+        if (w.pg[t * c2 + C + k] >= 0) {
+            atomicAdd(acc + C + k, 1ull);
+        }
+        if (k == 0) {
+            atomicAdd(acc + c2, 1ull);
+        }
+    }
+}
+
 // Each unresolved site's face from its readout `z` (`[t][A]`): the masses `2^(z − peak)` on `2^(−62)`
 // and their total.
 extern "C" __global__ void field_face(FieldWords w, const int64_t *z, uint64_t *masses, uwide *totals) {

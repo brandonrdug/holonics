@@ -5082,10 +5082,62 @@ impl Field {
         Ok(out)
     }
 
+    /// [measurement; theory, November 11 18:33, part P2] **The carry circles' gates over a region's open sites** ([`CarryGates`]): from the forward's
+    /// own cells (every tick's gate and leak read, [`carry_gate`]), at each unresolved site and every tick, each circle's `|γ|` on `2^(−30)` (the
+    /// floor of the square root of `γ_re² + γ_im²`) added into its sum, its `h ≥ 0` counted, and the reads counted. A reading: the field is not
+    /// changed and no other read is.
+    pub fn carry_gates_of(&self, region: &Region) -> Result<CarryGates> {
+        let circles = self.declaration.carry;
+        let mut out = CarryGates::new(circles);
+        if circles == 0 {
+            return Ok(out);
+        }
+        let c2 = 2 * circles;
+        let pass = self.pass(region, true)?;
+        for cell in &pass.ticks {
+            for t in (0..region.classes.len()).filter(|&t| region.unresolved[t]) {
+                out.reads += 1;
+                for k in 0..circles {
+                    let (re, im) = (i128::from(cell.gam[t * c2 + k]), i128::from(cell.gam[t * c2 + circles + k]));
+                    out.modulus[k] += ((re * re + im * im) as u128).isqrt();
+                    out.friction[k] += u64::from(cell.qh[t * c2 + circles + k] >= 0);
+                }
+            }
+        }
+        Ok(out)
+    }
+
     /// Each tick's read of `region` ([`TickRead`]), in tick order.
     pub fn tick_reads(&self, region: &Region) -> Result<Vec<TickRead>> {
         let pass = self.pass(region, true)?;
         Ok(pass.ticks.iter().map(|c| TickRead { read: c.read.clone(), scale: c.scale.clone(), pair_read: c.read2.clone(), pair_scale: c.scale2.clone() }).collect())
+    }
+}
+
+/// [measurement; theory, November 11 18:33, part P2] **The carry circles' gates over a read's open sites** ([`Field::carry_gates_of`],
+/// [`FieldRealization::read_faces_gated`]): `reads` the (open site, tick) pairs read, and for each carry circle `k` the sum of `|γ|` on `2^(−30)`
+/// over them and the count of them whose leak read `h` stands at `0` or above (the friction on). Integers; a mean is `modulus[k] / reads`.
+#[derive(Clone, Debug, Default, PartialEq, Eq)]
+pub struct CarryGates {
+    pub reads: u64,
+    pub modulus: Vec<u128>,
+    pub friction: Vec<u64>,
+}
+
+impl CarryGates {
+    pub fn new(circles: usize) -> Self {
+        Self { reads: 0, modulus: vec![0; circles], friction: vec![0; circles] }
+    }
+
+    /// The sums of another read added in (the same circles).
+    pub fn add(&mut self, other: &CarryGates) {
+        self.reads += other.reads;
+        for (a, b) in self.modulus.iter_mut().zip(&other.modulus) {
+            *a += b;
+        }
+        for (a, b) in self.friction.iter_mut().zip(&other.friction) {
+            *a += b;
+        }
     }
 }
 
@@ -5121,6 +5173,17 @@ pub trait FieldRealization {
     /// Each region's tick reads ([`Field::tick_reads`]), a reading.
     fn read_ticks(&mut self, _field: &Field, _regions: &[Region]) -> Result<Vec<Vec<TickRead>>> {
         refuse("a realization that cannot read its ticks")
+    }
+    /// [measurement; theory, November 11 18:33, part P2] The faces of `regions` ([`FieldRealization::read_faces`]) and the carry circles' gates
+    /// over their open sites ([`CarryGates`]), a reading. By default the faces are the realization's own read and the gates the host's
+    /// ([`Field::carry_gates_of`]); a realization that holds the gates in its forward reads them from the same pass.
+    fn read_faces_gated(&mut self, field: &Field, regions: &[Region]) -> Result<(Vec<Vec<Option<TowerFace>>>, CarryGates)> {
+        let faces = self.read_faces(field, regions)?;
+        let mut gates = CarryGates::new(field.declaration.carry);
+        for region in regions {
+            gates.add(&field.carry_gates_of(region)?);
+        }
+        Ok((faces, gates))
     }
     /// Each of `sites`' near field by offset in `region` ([`Field::near_offsets`]), a reading.
     fn read_near_offsets(&mut self, _field: &Field, _region: &Region, _sites: &[usize]) -> Result<Vec<NearOffsets>> {

@@ -833,9 +833,18 @@ fn joint_read(field: &Field, codec: &FieldCodec, problems: &Problems, seed: u64,
     let mut foil: Vec<Vec<i64>> = own.clone();
     // Each stratum's terms beside the own question and the foil's, and its `Σ |S_s|` and `Σ K_s` over the problems.
     let mut strata = [(0i128, 0i128, 0i128, 0i128); CONTEXT];
+    // [measurement; theory, November 11 18:33, part P2] With carry circles the same pass also reads their gates over its open sites ([`CarryGates`]).
+    let circles = field.declaration.carry;
+    let mut gates = holonics::hnn::tower::field::CarryGates::new(circles);
     for chunk in states.chunks(64) {
         let views: Vec<Region> = chunk.iter().map(|(_, _, _, c, u)| Region { classes: c, unresolved: u, faces: &[], locked: &[], echo: &[], domain: None, port: None }).collect();
-        let faces = realization.read_faces(field, &views).map_err(|e| e.to_string())?;
+        let faces = if circles > 0 {
+            let (faces, read) = realization.read_faces_gated(field, &views).map_err(|e| e.to_string())?;
+            gates.add(&read);
+            faces
+        } else {
+            realization.read_faces(field, &views).map_err(|e| e.to_string())?
+        };
         for ((i, is_foil, (size, k), c, _), faces) in chunk.iter().zip(faces) {
             let m = problems[*i].1.len() + 1;
             let q_len = c.len() - m;
@@ -912,6 +921,17 @@ fn joint_read(field: &Field, codec: &FieldCodec, problems: &Problems, seed: u64,
         strata.iter().map(|&(o, _, _, _)| o.to_string()).collect::<Vec<_>>().join("/"),
         strata.iter().map(|&(_, f, _, _)| f.to_string()).collect::<Vec<_>>().join("/")
     );
+    if circles > 0 {
+        // Integers: each circle's `|γ|` sum on 2^(−30) over the (open site, tick) reads, its mean on 2^(−30) to the floor, and its reads with `h ≥ 0`.
+        let join = |v: Vec<String>| v.join("/");
+        println!(
+            "FIELD_CARRY_GATES lap={lap} circles={circles} reads={} modulus_sum={} modulus_mean={} h_nonnegative={}",
+            gates.reads,
+            join(gates.modulus.iter().map(|m| m.to_string()).collect()),
+            join(gates.modulus.iter().map(|&m| if gates.reads == 0 { "-".to_string() } else { (m / u128::from(gates.reads)).to_string() }).collect()),
+            join(gates.friction.iter().map(|f| f.to_string()).collect())
+        );
+    }
     per.sort_unstable();
     let q = |f: usize| per.get((f * per.len()) / 4).copied().unwrap_or(0) as i128;
     println!(
