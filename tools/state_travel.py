@@ -14,6 +14,19 @@ For each (family, subset): the rms of the entries at G, L2 and L4; the rms displ
 disp(L4)/disp(L2); the cosine of the displacements L2-G and L4-L2 (1: one straight line, 0: wandering). Raw integers and in the
 family's own unit (an entry over 2^grain: 2^-16 for the face's grain, 2^-24 the material's). Then W's new columns' rms at L4
 against the old columns'. Numbers only.
+
+state_travel.py rank CONTACTS_BEFORE STATE STATE [STATE ...]: the rank of the contacts' travel (theory, November 11), from two or
+more saved states of one line, in order. A contact's return column of W and its a and b rows are each one direction of the face's
+width. For the new contacts and for the old, each family is read as a matrix of one column a contact:
+  FORM  a state's own matrix; LAP k the displacement between states k and k+1: its rms, the participation ratio of its squared
+        singular values pr = (sum s^2)^2 / sum s^4 (1: every contact moves along one direction; the count of contacts: every
+        contact its own), and the shares of the first and the first four;
+  PAIR  k laps k and k+1: the cosine of the two displacements, and how much of lap k+1's squared length lies in the first 1, 2, 4,
+        8 and 16 directions of lap k's (f1 .. f16; a drawn subspace holds r / width), with the participation ratio of those held
+        shares. Noise that two laps do not share adds only its chance share, so the held shares read the travel the laps have in common.
+The old contacts' rows are the reading's own control: they wander. A step is a moment over the root of its second moment, entry by
+entry, so a displacement is the drift over its noise and not the covector's sum; where the noise is even along a part the
+directions are kept. CONTACTS_BEFORE is the count before the growth (32 for the growth to 64). Numbers only.
 """
 import sys
 
@@ -95,7 +108,83 @@ def masks(name, shape, d, old_f, new_f):
     return new, lane
 
 
+def spectrum(m):
+    """The squared singular values' shares of a matrix, largest first, and its left singular vectors."""
+    u, sv, _ = np.linalg.svd(m, full_matrices=False)
+    total = float((sv ** 2).sum())
+    return (sv ** 2 / total if total > 0 else sv * 0.0), u
+
+
+def shape_line(p):
+    """pr, the first share and the first four's, of shares that sum to one."""
+    sq = float((p ** 2).sum())
+    return (1.0 / sq if sq > 0 else float("nan")), float(p[:1].sum()), float(p[:4].sum())
+
+
+def held_shares(u, m):
+    """How much of m's squared length lies along each column of u (lap k's directions, largest first)."""
+    total = float((m ** 2).sum())
+    return ((u.T @ m) ** 2).sum(axis=1) / total if total > 0 else np.zeros(u.shape[1])
+
+
+def contact_forms(d, theta, old_f):
+    """{(family, subset): matrix of one column a contact} for W's columns and the a and b rows, new contacts and old."""
+    fam, total = layout(d)
+    assert total == len(theta), (total, len(theta))
+    at = {name: a for name, a, _, _ in fam}
+    dw, f = d["width"], d["contacts"]
+    new_c = np.zeros(f, dtype=bool)
+    new_c[old_f // 2:f // 2] = True
+    new_c[f // 2 + old_f // 2:] = True
+    w = theta[at["w"]:at["w"] + dw * f].reshape(dw, f).astype(np.float64)
+    a = theta[at["a"]:at["a"] + f * dw].reshape(f, dw).astype(np.float64)
+    b = theta[at["b"]:at["b"] + f * dw].reshape(f, dw).astype(np.float64)
+    out = {}
+    for sub, sel in (("new", new_c), ("old", ~new_c)):
+        if sel.any():
+            out[("w", sub)], out[("a", sub)], out[("b", sub)] = w[:, sel], a[sel].T, b[sel].T
+    return out
+
+
+def rank(old_f, paths):
+    states = [state(p) for p in paths]
+    d = states[0][0]
+    assert all(s[0] == d for s in states), "states of one declaration"
+    assert 0 < old_f <= d["contacts"] and old_f % 4 == 0, "the contacts before the growth, by fours"
+    forms = [contact_forms(d, theta, old_f) for _, theta in states]
+    rms = lambda m: float(np.sqrt((m ** 2).mean())) if m.size else 0.0
+    print(f"# declaration {d}; contacts {old_f} -> {d['contacts']}; a drawn subspace of r directions holds r/{d['width']}")
+    for i, path in enumerate(paths):
+        print(f"# state {i} {path}")
+    keys = sorted(forms[0])
+    for i in range(len(states)):
+        for key in keys:
+            m = forms[i][key]
+            pr, top1, top4 = shape_line(spectrum(m)[0])
+            print(f"TRAVEL_FORM state={i} family={key[0]} contacts={key[1]} columns={m.shape[1]} rms={rms(m):.5g} pr={pr:.2f} top1={top1:.4f} top4={top4:.4f}")
+    laps = [{key: forms[i + 1][key] - forms[i][key] for key in keys} for i in range(len(states) - 1)]
+    spectra = [{key: spectrum(lap[key]) for key in keys} for lap in laps]
+    for k, lap in enumerate(laps):
+        for key in keys:
+            pr, top1, top4 = shape_line(spectra[k][key][0])
+            print(f"TRAVEL_LAP lap={k} family={key[0]} contacts={key[1]} rms={rms(lap[key]):.5g} pr={pr:.2f} top1={top1:.4f} top4={top4:.4f}")
+    for k in range(len(laps) - 1):
+        for key in keys:
+            m0, m1 = laps[k][key], laps[k + 1][key]
+            denom = float(np.linalg.norm(m0) * np.linalg.norm(m1))
+            cos = float((m0 * m1).sum() / denom) if denom > 0 else float("nan")
+            h = held_shares(spectra[k][key][1], m1)
+            sq = float((h ** 2).sum())
+            held = " ".join(f"f{r}={float(h[:r].sum()):.4f}" for r in (1, 2, 4, 8, 16) if r <= len(h))
+            print(f"TRAVEL_PAIR laps={k},{k + 1} family={key[0]} contacts={key[1]} cos={cos:.4f} {held} pr_held={(float(h.sum()) ** 2 / sq if sq > 0 else float('nan')):.2f}")
+
+
 def main():
+    if len(sys.argv) >= 5 and sys.argv[1] == "rank":
+        rank(int(sys.argv[2]), sys.argv[3:])
+        return
+    if len(sys.argv) != 4:
+        sys.exit(__doc__)
     g_path, l2_path, l4_path = sys.argv[1:4]
     (dg, g), (d2, l2), (d4, l4) = state(g_path), state(l2_path), state(l4_path)
     assert dg == d2 == d4, (dg, d2, d4)
