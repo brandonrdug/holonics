@@ -1500,6 +1500,7 @@ impl<'c> CardField<'c> {
         // fine field's own laws on the packets' strand.
         if paced > 0 {
             self.launch("field_paces", Self::cells((paced * regions) as u64), THREADS, &mut [arg(&mut tr.cwords)])?;
+            self.launch("field_skin_addresses", Self::cells((paced * n * sites) as u64), THREADS, &mut [arg(&mut tr.cwords)])?;
             self.launch("field_pframes", Self::cells((paced * sites * n) as u64), THREADS, &mut [arg(&mut tr.cwords)])?;
         }
         let d0 = field.declaration.width;
@@ -1628,6 +1629,7 @@ impl<'c> CardField<'c> {
         self.launch("field_open", Self::cells(t64 * dw as u64), THREADS, &mut [arg(words)])?;
         if paced > 0 {
             self.launch("field_paces", Self::cells((paced * regions.len()) as u64), THREADS, &mut [arg(words)])?;
+            self.launch("field_skin_addresses", Self::cells((paced * n * sites) as u64), THREADS, &mut [arg(words)])?;
             self.launch("field_pframes", Self::cells((paced * sites * n) as u64), THREADS, &mut [arg(words)])?;
         }
         self.moments(field, words, regions.len(), sites)?;
@@ -2073,6 +2075,7 @@ impl<'c> CardField<'c> {
         words.unresolved = unresolved;
         set_clock(words, Some(&clock), [0; 7]);
         self.launch("field_paces", Self::cells((paced * regions) as u64), THREADS, &mut [arg(words)])?;
+        self.launch("field_skin_addresses", Self::cells((paced * n * sites) as u64), THREADS, &mut [arg(words)])?;
         self.launch("field_pframes", Self::cells((paced * sites * n) as u64), THREADS, &mut [arg(words)])?;
         self.moments(field, words, regions, sites)?;
         Ok(clock)

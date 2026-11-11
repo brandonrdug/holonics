@@ -3919,25 +3919,38 @@ extern "C" __global__ void field_paces(FieldWords w) {
             w.kappa[at] = fit64(k, w.status);
             w.tau[at] = fit64(clock, w.status);
             w.sigma[at] = fit64(variation, w.status);
-            // [theory, November 11 04:14, step S] The skin's address of this site for each mode: `2π σ = q k + r` (`σ ≥ 0`), once here, not once a pair.
-            {
-                const wide pi = (wide)(((uwide)w.pi_hi << 64) | (uwide)w.pi_lo);
-                const wide x = 2 * pi * variation;
-                const uint32_t hrel = paced_head(w, p) % w.frames - w.still;
-                for (uint32_t l = 0; l < w.n; l++) {
-                    const wide k = skin_k(w, l * (w.frames - w.still) + hrel);
-                    if (k <= 0) {
-                        continue;
-                    }
-                    const wide q = x / k, r = x - q * k;
-                    const uint64_t a = 3 * (((uint64_t)p * w.n + l) * w.T + g);
-                    w.saddr[a] = fit64(q, w.status);
-                    w.saddr[a + 1] = (int64_t)(uint64_t)((uwide)r);
-                    w.saddr[a + 2] = (int64_t)(uint64_t)((uwide)r >> 64);
-                }
-            }
         }
         w.plain[(uint64_t)p * w.R + r] = plain ? 1 : 0;
+    }
+}
+
+// [definition; theory, November 11 06:02 UTC, step S on its own grid; a realization only, every bit kept] **The skin's site addresses**, one
+// cell a (paced head `p`, mode `l`, site `g`), launched directly after `field_paces`: `2π σ = q k + r` with `0 ≤ r < k`, `k` the slot's
+// `skin_k`, three words at `saddr[3 ((p n + l) T + g)]` (`q` through `fit64`, then `r`'s low and high 64 bits). `σ` is read as `field_paces`
+// stored it; where the status is clean the stored `σ` is the variation itself, so `q` and `r` are the integers step S wrote inside
+// `field_paces`, where `n` divisions of 128 bits a site ran in one thread a paced head and region over its sites in order. The sites are
+// `[region_off[0], region_off[R])`, the union of the regions `[region_off[r], region_off[r + 1])` that `field_paces` walks (its offsets are a
+// prefix, so the union is that one interval): no cell is written, and no status raised, at a site no region holds.
+extern "C" __global__ void field_skin_addresses(FieldWords w) {
+    const uint64_t first = w.region_off[0];
+    const uint64_t span = (uint64_t)w.region_off[w.R] - first;
+    const uint64_t cells = (uint64_t)w.paced * w.n * span;
+    const wide pi = (wide)(((uwide)w.pi_hi << 64) | (uwide)w.pi_lo);
+    for (uint64_t c = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; c < cells; c += (uint64_t)gridDim.x * blockDim.x) {
+        const uint64_t g = first + c % span;
+        const uint32_t l = (uint32_t)((c / span) % w.n);
+        const uint32_t p = (uint32_t)(c / (span * w.n));
+        const uint32_t hrel = paced_head(w, p) % w.frames - w.still;
+        const wide k = skin_k(w, l * (w.frames - w.still) + hrel);
+        if (k <= 0) {
+            continue;
+        }
+        const wide x = 2 * pi * (wide)w.sigma[(uint64_t)p * w.T + g];
+        const wide q = x / k, r = x - q * k;
+        const uint64_t a = 3 * (((uint64_t)p * w.n + l) * w.T + g);
+        w.saddr[a] = fit64(q, w.status);
+        w.saddr[a + 1] = (int64_t)(uint64_t)((uwide)r);
+        w.saddr[a + 2] = (int64_t)(uint64_t)((uwide)r >> 64);
     }
 }
 
