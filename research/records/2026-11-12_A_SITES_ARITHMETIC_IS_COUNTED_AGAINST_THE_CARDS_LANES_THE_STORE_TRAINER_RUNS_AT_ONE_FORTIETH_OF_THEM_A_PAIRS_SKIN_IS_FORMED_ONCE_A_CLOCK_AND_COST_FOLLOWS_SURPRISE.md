@@ -134,7 +134,28 @@ phase 2).
 **The site's maps are separate launches a map**, each loading its weights into shared memory and
 reading its input again: three maps read one chart (`q`, `v`, the probe), three the other (the
 pair contacts' two and the carry's gate), and each return runs an outer and a transposed launch a
-map.
+map. Read further at source the same day (after G116 was fixed; step 4's subject, its guess fixed
+once step 0's yardstick is read):
+- *The forward map* (`affine_tiled`, 22.6 ms a profiled section, 80 lane-steps a counted
+  product). A block is 256 threads, one a cell (site, output), so it passes 4 sites of a map of
+  64 outputs and 2 of a map of 128. The driver's grid is the sites over that count (`affine`:
+  10,186 or 20,371 blocks at 40,741 sites), so every block makes one pass and loads the whole map
+  for it: a launch reads 41.7 million words of weights for 2.6 million words of input (166.9
+  million for a pair contact's map). The kernel's loop already lets a block make many passes; only
+  the grid forbids it. A site's carrier bound is then scanned by one thread a site over the
+  map's 64 or 128 inputs while the block's other threads wait.
+- *The return's transposed product* (`field_transposed`, 17.4 ms). One thread a cell (site,
+  input) sums over the outputs with every product on 128-bit words, the weight read from the
+  card's memory at the map's stride and the site's covector row read again by each of the row's
+  threads. It has no 64-bit path under a bound, where the forward has one.
+- *The return's outer product* (`outer`, 22.7 ms; its bound 8.1 ms). One thread an entry and a
+  tile of 64 sites reads both operands from the card's memory at their rows' strides, a word a
+  site, multiplies on 128-bit words and adds once to the entry.
+
+Each is a realization (the same integers): a block that keeps a map through many passes, the
+bound read in parallel or carried from the chart's producer, the return's operands a tile in
+shared memory and its products on 64-bit words wherever the bound that is already read proves
+them.
 
 ## 5. The lens: cost follows surprise (Brandon, November 12, 20:31Z)
 
