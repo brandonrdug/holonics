@@ -236,6 +236,40 @@ repository was reset on September 24; the pre-reset tree is
     0.91 to 0.98, so what composition adds is the rare symbols'. The line's first reading is
     G118: the store's trained paces by class, and whether their carries cut held text where it
     is bright.
+  - The trained strides are read, the clock of news is recovered, and the engine's third repair
+    is in (November 12;
+    [the record of the symbol's length](research/records/2026-11-12_A_SYMBOL_IS_A_LENGTH_A_BYTE_IS_A_DIGIT_OF_THE_PASSAGE_A_TEXTS_PRIMES_ARE_ITS_PRIMITIVE_CYCLES_AND_A_STRIDE_IS_READ_AT_ITS_PLACE_AS_THE_NEWS_CLOCK_OF_OCTOBER_HELD.md)).
+    A symbol is a length: an occurrence multiplies the carried moment by `exp(−s ℓ)`, the cycle
+    machine's weight, so a byte is a digit of the passage and a text's primes are its primitive
+    cycles. The trained paces hold a newline at 14.5 against a letter's 2.7 on one paced head
+    (G118 (a) held), and their carries fall nearly blind to where held text is bright (the place
+    that opens an epoch codes at 1.018 of the rest where 1.10 was guessed: (b) missed). A count
+    ruler sized the alternative (G119): one constant a symbol lifts the place that carries to
+    1.18 to 1.28 of the rest, the place's own code length to 1.72, and the own length evens the
+    news an epoch holds (a spread of 0.17 against 0.38 for fixed packets). That clock is the
+    October tower's clock of news (`hnn.tower-news-clock`, its carry law formal-checked), found
+    by the search after it had been called unbuilt in a message; the guides' rule now puts the
+    search before the statement. So the symbol's line joins the November tower to that clock,
+    and its acceptance is an invariance (atlas `code.news-clock-proper-time`): a held passage
+    and its re-timed copy open the same epochs, where fixed packets privilege the count of
+    places. A stretch itself is the step in time of October 26: it keeps the count and
+    exchanges the rate, a unit of a ring permutes each orbit of its colours, and a factor that
+    shares the ring's prime merges them, which is the acceptance's predicted failure (atlas
+    `code.stretch-unit-orbit`). The engine's steps 2 and 3 (one clock store; the turn's series on the words its
+    bounds prove) keep every bit, and each step read 0.948, 0.959 and 0.936 of its own control
+    inside its own hold: 387.9 ms a section, 9.52 µs a computed site. G116 (b) held (18.5 ms
+    against 18) and (c) missed (318 ms guessed). Counted from source against the card's
+    yardsticks, the contact family's distinct words brought once a launch already cost 129 ms a
+    section against a bar of 40.7, so no step that keeps a pair's words and their order reaches
+    the bar. Two readings then placed the next loops. An ablation of the rows' entry (every load
+    and store kept, its products and quotients dropped) read 0.507 of the entry's own time in
+    one hold, against a guess of 0.85 (G120, missed low): half the entry is its 128-bit
+    arithmetic, the larger half on the paced clocks. And a forecast from source of the pair
+    store's layout (a pair's words as one record in the order its support is walked, the
+    forward's entries as one launch and the return's as one) puts the family's once-a-word floor
+    at 27.5 ms a section against today's 129, the columns' transposed walk the largest part of
+    it (agent-inferred from source). By G120's rule the rows' products at the widths their
+    bounds prove come first, the layout second, each with its guess fixed before its build.
   - Every extent of the built declaration is given the part it sizes, how it was reached and what
     sizes it (the same record, §5), with ten findings by file and line and the build that closes
     each. The departures that stand: the face's 64 coordinates are two lanes of 32, the second a

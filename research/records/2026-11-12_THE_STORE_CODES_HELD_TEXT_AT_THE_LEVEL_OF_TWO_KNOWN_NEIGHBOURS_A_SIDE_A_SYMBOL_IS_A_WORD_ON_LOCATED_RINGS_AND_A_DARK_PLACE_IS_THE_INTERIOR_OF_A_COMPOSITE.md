@@ -662,6 +662,9 @@ not hold for the build that fits, and (b) is scored as fixed with that stated.
   the newline strode 13.5 against a word letter's 2.7 on one head, "the line is the grain the
   built clocks already cut". G118's rule decides whether the level above is first built on the
   clocks as deposition moves them or on a stride that reads a place's own surprise.
+  *Read the same day* ([the record](2026-11-12_A_SYMBOL_IS_A_LENGTH_A_BYTE_IS_A_DIGIT_OF_THE_PASSAGE_A_TEXTS_PRIMES_ARE_ITS_PRIMITIVE_CYCLES_AND_A_STRIDE_IS_READ_AT_ITS_PLACE_AS_THE_NEWS_CLOCK_OF_OCTOBER_HELD.md) §4 to §6): (a) held, (b) missed (1.018 pooled where
+  1.10 was fixed), and the rule gives the stride that reads the place. G119 sized it: one
+  constant a symbol lifts under half of what the place's own length lifts.
 - **Whether the contact family runs at the card's gather rate** (§10.4, amended): each entry's
   gathered octets a pair counted from source against the two yardsticks, and an ablation timed in
   one hold, before step 3.
@@ -682,3 +685,6 @@ not hold for the build that fits, and (b) is scored as fixed with that stated.
   acceptance (the writes by slice from held prompts, with the held code by slice and kind at lap
   means, and the addresses and strides read by a ruler) and its guess fixed in its order, before
   it is read. It is ordered beside the engine's steps and ahead of any long pass.
+  *Restated the same day:* the stride that reads the place and the level above on its epochs are
+  the news clock of October 27, built for the earlier tower with its carry law proved in Lean
+  (the same record, §7 and §8). The design joins the November tower to it.

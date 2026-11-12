@@ -1887,3 +1887,143 @@ codes held text at the level of two known neighbours a side", its sections 8.4, 
   replaced by that series: the control of this date (the 41 commonest bytes a row each keep 0.76 to 0.94 of a free row's content, a located
   address 0.91 to 0.98) says a share kept on the state's rows would read high for rows of any structure, and tying the byte alphabet is not
   expected to lower the held code (the record's section 8.8). The reading that decides the design is the epoch's.
+
+G118 scored 2026-11-12T22:58Z (the same thread), from R1 (store_paces.txt, read at its source on claude/carry-reads b9e18a367) and R2
+(epoch_cut_ruler.txt, the cloud count ruler on the public held shard, 330,000 places a slice).
+  (a) HELD, both parts. The head of larger spread at state C is paced head 3 (the spread of the code line's rates 1.687 against 1.167 on head
+      2). There the newline reads 14.456 (14.247 at A), the largest of the code line's classes, 5.38 times the ASCII letters' mean of 2.689
+      (guess 4.5, bound 3 or more). On head 2 the newline reads 4.396, 1.82 times its letters' 2.414, and the largest class is '[' at 6.613.
+      The classes the open text added: the median of |rate - 1| is 0.035 on head 2 and 0.017 on head 3, against 1.856 and 1.843 among the code
+      line's; none of the 144 still reads 1 to six decimals, and the largest reads 1.121 and 1.230. The second part held, so R2 was read on
+      both states; they agree within 0.012 of a ratio on every slice.
+  (b) MISSED. Head 3, state C, the mean code of an epoch's opening place over its other places: code 0.961, web 1.020, science 1.033, books
+      0.996, wikidata 1.071; pooled 1.018 (guess 1.10, 1.03 to 1.25). Code reads the least, where the guess had it the largest. The controls
+      held: fixed packets 0.997 to 1.007 (pooled 1.002), the cut by the code 2.76 to 3.50 (pooled 2.94). Head 2 beside: 0.978, 1.088, 1.087,
+      1.072, 1.080; pooled 1.061. The share of the read places' nats that the opening places hold: 0.169 on head 3, 0.175 on head 2, 0.167
+      under the blind cut, 0.370 under the cut by the code.
+  Why the derivation missed. It took the place after a newline as bright. In code it is dark (1.61 nats against 2.23 for the other places:
+  an indent follows a line's end); in prose it is bright (1.24 to 1.60 of the rest) and rare (a place in 71 to 104; the books' pieces hold
+  almost none). And 0.086 of head 3's openings follow a newline: the rest fall wherever the summed strides' phase happens to stand.
+  Rule applied: (b) is under 1.05 in four of five slices (all but wikidata). A class's one trained rate does not cut the strand where it is
+  bright; the design's stride reads the place's own surprise, the class rate its founding. G119 sizes that before the design is written.
+
+G119 fixed 2026-11-12T22:58Z (the same thread), before its read: how far a length that is one constant a class can reach, against a clock
+whose stride is the place's own code. From the abstraction named this hour (a symbol is a length: an occurrence multiplies the carried moment
+by exp(-s l), the atlas's cycle machine; a code's lengths are code lengths; a carry of the summed length is a digit of the passage read as
+one number), and from G118 (b)'s miss.
+  The read: the same ruler on the same places, mean epoch 6, the period fitted by slice. For every cut both ends of an epoch are read, the
+  place that carries (the epoch's last) and the place after it (its first): the mean code of those places over the mean code of the other read
+  places. Beside them the spread of an epoch's summed nats (standard deviation over mean, over the epochs). Cuts added: `unigram` (a symbol's
+  stride is its order-zero code length on the counts stream), `class mean` (its stride is the mean two-back code of its held places, one
+  constant a symbol), `own` (the stride is the place's own two-back code). And the rank correlation, over the code line's classes with 100 or
+  more held places, of the trained rate with the unigram length and with the class mean.
+  Derivation. A place carries with a chance near its stride over the period, so the carrying places' mean code is E[code x stride] / E[stride].
+  With a code of mean 2.3 and deviation 2.2: own gives 2.3 + 4.84 / 2.3 = 4.4 against 1.9 for the rest; a class constant gives the mean plus
+  the variance of the class means over the mean, with about 0.3 of the variance between classes.
+  (a) Trained strides, head 3, state C, carrying place, pooled: 1.12 (1.00 to 1.30): capitals, digits and punctuation hold the longer rates
+      and are rarer. Head 2: 1.15.
+  (b) Carrying place, pooled: unigram 1.25 (1.10 to 1.45); class mean 1.33 (1.15 to 1.55).
+  (c) Own, carrying place, pooled: 2.3 (2.0 to 2.7), under the cut by the code's 2.94; the carrying places hold 0.32 of the nats. Own,
+      opening place: 1.25 (1.10 to 1.40), since surprises cluster.
+  (d) The spread of an epoch's nats: fixed packets 0.45 (0.35 to 0.60); the trained strides no less than the fixed packets'; unigram 0.40;
+      own 0.25 (0.15 to 0.35).
+  (e) Rank correlation of the trained rate with the unigram length, on the code slice: head 2 0.45 (0.25 to 0.65), head 3 0.30 (0.10 to 0.50).
+  Rule. The class mean's lift over a blind cut (its carrying ratio less 1) under half of own's: one length a class is a founding only, and
+  the stride reads the place (the face the tick before gave it); the design record builds that. At half or more: a located class length is
+  the first build, since it needs no face, and the place's surprise is the comparison its acceptance names.
+
+G119 scored 2026-11-12T23:19Z (the same thread; epoch_cut_ruler.txt, the same places, the cuts of its fixing).
+  (a) HELD. Trained strides, the carrying place over the other read places, pooled: head 3 at state C 1.089 (guess 1.12, 1.00 to 1.30); by
+      slice 1.074, 1.096, 1.105, 1.072, 1.094. Head 2 reads 1.057 (guess 1.15, no range set).
+  (b) HELD, both. Unigram 1.180 (1.25, 1.10 to 1.45); class mean 1.277 (1.33, 1.15 to 1.55).
+  (c) MISSED, both. Own, the carrying place: 1.720 (2.3, 2.0 to 2.7); code 2.025, web 1.688, science 1.659, books 1.623, wikidata 1.636. The
+      carrying places hold 0.256 of the nats (guess 0.32), where a blind cut's hold 0.166. Own, the opening place: 1.059 (1.25, 1.10 to 1.40).
+  (d) HELD. The spread of an epoch's nats, pooled: fixed packets 0.379 (0.45, 0.35 to 0.60); the trained strides 0.446 and 0.452, no less than
+      the fixed packets'; unigram 0.348 (0.40); class mean 0.306; own 0.166 (0.25, 0.15 to 0.35).
+  (e) HELD. Rank correlation of the trained rate with the unigram length on the code slice: head 2 0.33 (0.45, 0.25 to 0.65), head 3 0.20
+      (0.30, 0.10 to 0.50).
+  Why (c) missed. The derivation took the code's deviation as 2.2 nats on a mean of 2.3 and did not read it: a carrying share of 0.256 on a
+  sixth of the places gives a deviation near 0.73 of the mean, about 1.7. And a surprise is followed by little more than the mean (1.059):
+  the two-back code's surprises do not cluster as the guess had them.
+  Rule applied. The class mean's lift over a blind cut is 0.277, own's 0.720: 0.38 of it (0.33 to 0.44 by slice), under half. One length a
+  class is a founding only, and the stride reads the place. The search made before the design was written found that clock in the tree: the
+  clock of news of October 27 (atlas hnn.tower-news-clock, its carry law formal-checked). The design joins the November tower to it; it is
+  not a new clock (the record of this date, "A symbol is a length", its sections 7 and 8).
+
+G116 (b) and (c) scored 2026-11-12T23:19Z (the same thread; the PC's P50 step 3, PR #734 merged at 60fece148; receipt p50_step3.txt in the receipts of
+the record of this date, "A site's arithmetic is counted against the card's lanes"; the build entered the line with 600 of 600 section lines
+equal and STATE.600 and MEAN.600 equal byte for byte; the narrow series equals the wide one on 823,565 arguments):
+  (b) HELD. The three paced moment entries with their fill read 18.5 ms a profiled section (fixed 18, 10 to 25): field_moment_paced_all 2.06,
+      field_moment_return_paced_all 3.31, field_moment_pace_back_all 4.29, the clock's fill 8.84. They read 54.6 before step 2.
+  (c) MISSED. One hold, sections 2,001 to 2,100: control 413.6, step 3 387.9, control 415.2 ms a section (the control's spread 1.6): 0.936 of
+      its control, 9.52 us a computed site at 40,741, against 318 ms and 7.8 us (7.2 to 8.6). Each step is read inside its own hold against
+      its own control: 0.948 (step 1), 0.959 (step 2), 0.936 (step 3), a product of 0.851 where the guess had 0.756 (318 over 420.8). Figures
+      of different holds are not set against each other.
+  Where the derivation failed: (a)'s score said it. The units counted instructions and the contact's entries are paced by the octets they
+  bring; the moments' part held because there the arithmetic was the cost. The realization stands at about 16 times the sum of the count's
+  two floors (24.0 ms a section).
+  The forecast read before the next guess (p52_contact_forecast.txt, the PC's P52 item 3 (i) and (ii), terms from source at 3f4d86baa):
+  counted access by access at the gather yardstick the contact's family would take 73,552 ms on the hundred sections and it takes 16,388
+  (0.22), so most of a pair's gathered words are met in the card's cache; counted once a distinct word a launch it would take 12,932 against
+  16,388 (1.27): field_contact_rows 4,410 against 4,018 (0.91), the columns 1.08, the row sums 1.49, the skin's return 3.43, the skin's fill
+  3.58. Against the bar of 1 us a computed site (40.7 ms a section) the family's distinct words alone are 129 ms a section: no step that
+  keeps a pair's words and their order reaches the bar.
+
+G120 fixed 2026-11-12T23:19Z (the same thread), before its read: what an ablation of field_contact_rows reads. The read: a ruler's copy of the entry
+that keeps every load, every store and every atomic at its address and in its order, and replaces the products and the sums between them by
+an exclusive-or of the loaded words into the word each store writes (so no load is dropped by the compiler, checked by the count of loads
+in the entry's compiled code against the control's). It trains nothing and enters no line. Profiled on sections 2,001 to 2,100 inside one
+hold: control, the ablation, control.
+  Derivation. By count (mine, from source and the yardsticks, not measured): a pair's arithmetic in the rows is some hundreds of lane
+  instructions on 64- and 128-bit words, under a tenth of a nanosecond a pair at the card's lanes; a pair's row takes 0.60 to 1.16 ns; the
+  entry stands at 0.91 of its once-a-word floor. So the entry is paced by what it brings.
+  (a) The ablation's entry reads 0.85 (0.70 to 0.97) of field_contact_rows' own time in the same hold (40.2 ms a profiled section at step 3).
+  Rule. At 0.70 or more the entry is bound by its memory traffic, and the next engine loop is the pair store's layout: a pair's own words as
+  one record in the order its support is walked, a tick's entries of one order as one launch, value rows at their occupied bits; its
+  forecast (the PC's item (iv)) is read and its guess fixed before any of it is built. Under 0.70 the arithmetic's share is material and
+  the rows' products go to the words their bounds prove first, as step 3 did for the turn. Over 0.97 or inside the control's spread: the
+  entry is traffic alone, the same branch as 0.70 or more.
+
+G121 fixed 2026-11-12T23:21Z (the same thread), before its read: how short a frame of text locates its source, by count. From the lens of 23:11Z
+(a source one has met is recognized from a tenth of a second of it, by the curvature of its spectral lines) read on the objects: a short
+frame locates a key in a family the receiver already holds, the readings needed are the key's size over what a reading tells (atlas
+unicity.residue-chain, infer.excitation-identifies; no prefix identifies anything in an unrestricted family, infer.finite-prefix-
+alternatives), and after the key is located the readings are null (unicity.null-reading) and the clock of news stops.
+  The read (recognition_ruler.py, a cloud count ruler on the public shards of epoch_cut_ruler.py: each slice's first 32 MB counted, the held
+  role's first 330,000 places a slice read; a symbol's code is its two-back count code under a slice's counts):
+  (a) The kind located. From a held piece's opening, the first place where the summed code under every other slice's counts stands ln 100
+      nats or more above the sum under one slice's counts (a sequential test at 100 to 1). Median places to that decision: code 12 (5 to 30),
+      wikidata 10 (4 to 25), web, science and books 30 each (12 to 75). Pieces decided for the wrong slice: 0.05 pooled (0.01 to 0.15).
+  (b) The wrong kind's price. A prose slice read under the nearest other slice's counts codes 0.35 nats a place above its own (0.15 to 0.8);
+      the code slice under the nearest prose slice's 1.2 (0.7 to 2.0).
+  (c) A seen place located. The least length at which half of a slice's counted places open a run that stands once in its 32 MB: web,
+      science and books 12 bytes (10 to 14), since ln 32e6 = 17.3 nats over about 1.5 nats a byte at long reach; code 16 (12 to 24);
+      wikidata 24 (14 to 48).
+  (d) Held text already seen. The share of held places whose last 16 bytes stand somewhere in the slice's counted 32 MB: prose 0.06 (0.02
+      to 0.15), code 0.25 (0.10 to 0.45), wikidata 0.35 (0.15 to 0.60). At 32 bytes: 0.01, 0.12, 0.15.
+  (e) The piece's own key. The share of held places whose 8 bytes before stood earlier in the same piece: code 0.35 (0.20 to 0.50), prose 0.10
+      (0.04 to 0.20), wikidata 0.40 (0.20 to 0.60); where they did, the byte that followed then follows now in 0.80 of cases (0.65 to 0.92).
+  Rule. (e)'s share times its agreement on the prose slices at 0.05 or more: a piece's own earlier text is a part of its news no reader of
+  two neighbours can have, and the design's acceptance for the level above names the fall of a place's code with the count of known places
+  of its piece (the partition ordered in P53, item 4) as a structural measure. Under 0.05: on prose the level above is judged on the kind
+  first (rows shared across pieces), and the piece's own key is a reading on the code slice only.
+
+G121 withdrawn 2026-11-12T23:23Z (the same thread), before its ruler was written or run: no part of it is scored. It measured how long a frame of text
+locates its source on the plain clock (places, bytes). The lens it was drawn from does not privilege a frame's length: a source is
+recognized at any rate (a uniform change of rate is a change of the receiver's clock, atlas spectro.clock-gauge), and what is recognized is
+the pattern of ratios and relative phases that a change of clock leaves. The reading that replaces it is an invariance, stated in the record
+of this date, "A symbol is a length", its section 10: a held passage and its re-timed copy open the same epochs. Its guess is fixed with
+the design's.
+
+G120 scored 2026-11-12T23:35Z (the same thread). Receipt p53_rows_ablation.txt (the engine record's receipts, on claude/carry-reads). One hold, sections
+2,001 to 2,100 from STATE.1900, the three runs ending on the same state and mean as the line's own leg, 100 of 100 section lines equal.
+  Read: the copy 20.98 ms a profiled section against the entry's 41.26 and 41.58 in the two controls (spread 0.32): 0.507. MISSED low
+  (fixed 0.85, 0.70 to 0.97). By clock: 0.567 and 0.618 on the two still clocks, 0.448 and 0.458 on the two paced clocks.
+  Why it missed (agent-inferred): the guess took the entry's cost for its octets because the forecast's once-a-word floor stood at 0.91 of
+  the measured time. The floor counts words at the gathered yardstick, and most of the entry's loads hit words already in the cache, so
+  its memory is half its time and the other half is its products and quotients on 128-bit words (the true entry holds 425 multiply
+  instructions against the copy's 107, a 128-octet stack and 58 local loads and stores the copy has none of).
+  Rule applied (under 0.70): the rows' products go to the words their bounds prove first; the pair store's layout follows, with its own
+  guess. The layout's forecast from source (p53_pair_layout_forecast.txt, agent-inferred): the family's once-a-word floor at 3,733 ms
+  over the 100 sections with a pair's words as one record in its support walk's order, 2,754 ms with the forward's entries as one launch
+  and the return's as one (27.5 ms a section against today's 129 and a bar of 40.7), the columns' transposed walk 1,577 of it.
