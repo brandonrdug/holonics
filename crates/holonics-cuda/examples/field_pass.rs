@@ -27,6 +27,9 @@ fn run(args: &[String]) -> Result<()> {
     if mode == "yardstick" {
         return yardstick(rest);
     }
+    if mode == "reserve" {
+        return reserve(rest);
+    }
     if rest.first().map(String::as_str) != Some("complete-language") {
         return Err("field_pass parity|time|train complete-language COMMAND ARGS…".into());
     }
@@ -62,6 +65,12 @@ fn run(args: &[String]) -> Result<()> {
         t.landmarks,
         t.landmark_ns / 1_000_000,
         started.elapsed().as_millis()
+    );
+    // [measurement; theory, November 12, P50 step 1 and P51] The clock's skin store: octets a reserved entry and a site, the support entries beside the
+    // dense pairs, the largest batch's, and the reservation's peak.
+    println!(
+        "FIELD_SKIN octets_a_entry={} octets_a_site={} entries={} dense_pairs={} peak_batch_entries={} peak_batch_dense_pairs={} peak_skin_store={} peak_store={} batch_cut={}",
+        t.skin_entry_octets, t.skin_site_octets, t.skin_entries, t.skin_dense_pairs, t.skin_peak_entries, t.skin_peak_pairs, t.skin_store, t.peak_store, t.batch_cut
     );
     if let Some(phases) = card.phased() {
         for (name, marks, ns) in phases {
@@ -119,6 +128,27 @@ fn yardstick(args: &[String]) -> Result<()> {
     }
     let (rate, count, took) = y.gather;
     println!("YARDSTICK reading=gather_eight_words rows={} entries={} octets_a_gather=32 octets={count} seconds={took:.4} octets_a_second={rate:.4e} gathers_a_second={:.4e}", y.gather_rows, y.gather_entries, rate / 32.0);
+    Ok(())
+}
+
+/// [measurement; theory, November 12, P51] `field_pass reserve KEY=VALUE…` (a STORE_DECLARATION line's fields: alphabet, lanes, lane_width, heads,
+/// still, modes, contacts, carry, triads, ticks, frames, reach): the reservation of a training region (a return) as its coefficients, a region of `S`
+/// sites, `D` definite, needing `pair S² + site S + region + entry S (near_slots + D) + crowd_site S` octets ([`holonics_cuda::hnn::field::read_octets`],
+/// [`holonics_cuda::hnn::field::skin_octets`]). Host arithmetic, no card.
+fn reserve(args: &[String]) -> Result<()> {
+    use holonics::hnn::tower::field::FieldDeclaration;
+    use holonics_cuda::hnn::field::{read_octets, skin_octets};
+    let kv: std::collections::HashMap<&str, usize> = args.iter().filter_map(|a| a.split_once('=')).filter_map(|(k, v)| v.parse().ok().map(|v| (k, v))).collect();
+    let get = |k: &str| kv.get(k).copied().ok_or_else(|| format!("reserve: {k}= is owed"));
+    let d = FieldDeclaration { alphabet: get("alphabet")?, width: get("lanes")? * get("lane_width")?, heads: get("heads")?, modes: get("modes")?, still: get("still")?, contacts: get("contacts")?, ticks: get("ticks")?, frames: get("frames")?, reach: get("reach")?, lanes: get("lanes")?, depth: kv.get("depth").copied().unwrap_or(0), carry: get("carry")?, triads: get("triads")? };
+    let f = |s: usize| read_octets(&d, true, false, s);
+    let (f1, f2, f3) = (f(1), f(2), f(3));
+    let pair = (f3 + f1 - 2 * f2) / 2;
+    let site = f2 - f1 - 3 * pair;
+    let region = f1 - pair - site;
+    assert_eq!(f(1000), pair * 1_000_000 + site * 1000 + region, "the reservation is quadratic in a region's sites");
+    let (_, entry, crowd_site) = skin_octets(&d, 0, 0);
+    println!("RESERVE pair={pair} site={site} region={region} entry={entry} crowd_site={crowd_site} near_slots={}", 2 * (holonics::hnn::tower::field::NEAR - 1));
     Ok(())
 }
 
