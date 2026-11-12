@@ -3221,6 +3221,285 @@ pub(super) fn charge_field(args: &[String], realization: &mut dyn FieldRealizati
     Ok(())
 }
 
+/// The bands of distance between a square's two places ([`square_field`]): 1, 2–3, 4–7, 8–15, 16 and past. The first two lie
+/// inside the near field (`NEAR`, six places), the third crosses its edge, and the last two stand past it, where the far
+/// sources are heard by octave.
+const SQUARE_BANDS: [(usize, usize); 5] = [(1, 1), (2, 3), (4, 7), (8, 15), (16, usize::MAX)];
+
+/// The square reading's key space, apart from every other draw of the run (the squares-agree law's own at `b6ff1f795`).
+const SQUARE_KEY: u64 = 0x5C0A_4E00_0000_0000;
+
+/// One class of squares' sums ([`square_field`]), each reading on the codes' `2^(−20)` bits: the count; the squares whose two
+/// readings are both zero (`flat`); `Σ s`, `Σ s²`, `Σ l`, `Σ l²`, `Σ |s|` and `Σ |l|`, with `s = λ_i + λ_j` and the curl
+/// `l = λ_i − λ_j`; the per-square disagreement `κ_s = 2 l²/(s² + l²)` summed on `2^(−20)` over the squares that read; the
+/// squares whose two readings share a sign; and the two places' charge `v` and entropy, summed.
+#[derive(Clone, Copy, Default)]
+struct SquareSums {
+    n: i128,
+    flat: i128,
+    s: i128,
+    ss: i128,
+    l: i128,
+    ll: i128,
+    s_abs: i128,
+    l_abs: i128,
+    kappa: i128,
+    agree: i128,
+    v: i128,
+    h: i128,
+}
+
+impl SquareSums {
+    fn add(&mut self, lambda_i: i64, lambda_j: i64, v: i128, h: i128) {
+        let (li, lj) = (i128::from(lambda_i), i128::from(lambda_j));
+        let (s, l) = (li + lj, li - lj);
+        self.n += 1;
+        self.s += s;
+        self.ss += s * s;
+        self.l += l;
+        self.ll += l * l;
+        self.s_abs += s.abs();
+        self.l_abs += l.abs();
+        let r = s * s + l * l;
+        if r == 0 {
+            self.flat += 1;
+        } else {
+            self.kappa += ((2 * l * l) << 20) / r;
+        }
+        self.agree += i128::from(li * lj > 0);
+        self.v += v;
+        self.h += h;
+    }
+
+    /// The class's line: the mean reading `|λ_i + λ_j|/2` and the mean curl `|l|`, in nats; `κ` centered,
+    /// `2 var(l)/(var(s) + var(l))` (`1 − ρ` for two readings of one spread and correlation `ρ`; November 6's
+    /// `curl_sd²/(2 λ_sd² + curl_sd²/2)`), raw, `2 Σ l²/(Σ s² + Σ l²)`, and the per-square mean; the share of squares whose
+    /// two readings share a sign; and the two places' mean charge and entropy, in nats.
+    fn text(&self) -> String {
+        let n = self.n;
+        if n == 0 {
+            return "squares=0".to_string();
+        }
+        let q20 = |num: i128, den: i128| if den <= 0 { "-".to_string() } else { decimal_q20((num << 20) / den) };
+        let (var_l, var_s) = (n * self.ll - self.l * self.l, n * self.ss - self.s * self.s);
+        format!(
+            "squares={n} flat={} lambda_nats={} curl_nats={} kappa_centered={} kappa_raw={} kappa_mean={} sign_agree={} v_nats={} entropy_nats={}",
+            self.flat,
+            decimal_q20(nats_q20(self.s_abs) / (2 * n)),
+            decimal_q20(nats_q20(self.l_abs) / n),
+            q20(2 * var_l, var_s + var_l),
+            q20(2 * self.ll, self.ss + self.ll),
+            if n > self.flat { decimal_q20(self.kappa / (n - self.flat)) } else { "-".to_string() },
+            q20(self.agree, n),
+            decimal_q20(nats_q20(self.v) / (2 * n)),
+            decimal_q20(nats_q20(self.h) / (2 * n)),
+        )
+    }
+}
+
+/// A square's two readings from its four faces, `[i | j standing, i | j runner-up, j | i standing, j | i runner-up]`, on its
+/// letters `[a, a′, b, b′]`: `λ_i = c_i(a′|b) + c_i(a|b′) − c_i(a|b) − c_i(a′|b′)`, the log odds ratio of `i`'s face across
+/// `j`'s two letters, and `λ_j` alike, on the codes' `2^(−20)` bits.
+fn square_lambdas(faces: [&holonics::hnn::tower::TowerFace; 4], letters: [usize; 4]) -> (i64, i64) {
+    let ([fi, ci, fj, cj], [a, a2, b, b2]) = (faces, letters);
+    (fi.code(a2) + ci.code(a) - fi.code(a) - ci.code(a2), fj.code(b2) + cj.code(b) - fj.code(b) - cj.code(b2))
+}
+
+/// [measurement; theory, November 12 01:48] `square-field STATE STATE_SHA CODEC CODEC_SHA UNITS UNITS_SHA HELD HELD_SHA COUNT
+/// SQUARES OUT [NAME WRITTEN WRITTEN_SHA]…`: **the square of two places** (the Einstein record's U3; the atlas's
+/// `hnn.field-square-affinity`, ported from `b6ff1f795` as a reading), on the first `COUNT` held problems, for the reference
+/// (the held file's own answers) and each named written state (a `SAMPLE.tsv`: the keyed write, the settle's rest, the
+/// re-draw's end), each cut to its room.
+/// - Each state is first read with every place locked ([`Field::locked_faces`], the charge census's read: every face once,
+///   that place alone open, the rest given), and its line prints the census's own figures (the code and the entropy, summed
+///   and a place, and the shares of places whose charge `v = c(x_t) − H(f_t)` exceeds one and two nats), so a build that
+///   reads a state as the census did prints the census's numbers.
+/// - Then at keyed squares: for each answer and each band of [`SQUARE_BANDS`] its length reaches, `SQUARES` pairs of places
+///   `i` and `j = i + d` (`d` keyed in the band, `i` in the answer, the key the held file's digest's, so the states of one held
+///   file draw alike where their answers' lengths agree). With `a`, `b` the standing letters at `i`, `j` and `a′`, `b′` the
+///   runner-ups on their locked faces (the most mass after the standing letter's among the letters, the void left out, the
+///   lowest class on a tie), two faces more are read: `i` with `j` set to `b′`, and `j` with `i` set to `a′`
+///   ([`square_lambdas`]). Where the faces are one joint's conditionals the two readings are that joint's log odds ratio on
+///   the four letters and agree; the curl `l = λ_i − λ_j` is minus the cycle affinity of the one-place walk round the square
+///   (atlas `aeon.kolmogorov-converse`), the slip of the pair contact between the two places. A square whose face holds no
+///   runner-up is unread.
+/// - The codes are read on the whole face, the void with its mass: within a face the void's share cancels from each
+///   difference, so a reading is the letters' face's to the codes' rounding (at `b6ff1f795` the faces were cut to their
+///   letters first).
+/// - Classes of place: a square is `charged` where either place's charge exceeds one nat (the census's mark of a letter its
+///   own face does not hold), `quiet` where neither does, `flat` where either face's entropy exceeds one nat. Printed a state
+///   (`FIELD_SQUARE_STATE`), and a band, a class and a half (`FIELD_SQUARE`, the band `all` every band; the half `all` every
+///   problem, `even` and `odd` the problems of that parity, so a figure's resolution is read beside it as half the gap between
+///   its halves): the squares, the mean reading and curl in nats, `κ` centered, raw and by square, the sign agreement, and the
+///   places' mean charge and entropy. `SQUARES.tsv` (private) holds every square: its places, letters, charges, entropies and
+///   readings.
+///
+/// Why (the Einstein record §6.2): an ordered write needs faces that glue, and where a square's curl stands the release's
+/// order of locks changes what is written. The release rests above the reference's own state; if the curl sits where the
+/// release fails, the squares-agree comparison enters the law with its card realization and parity. [agent-inferred,
+/// November 12] Every state the field trains on gives its places the passage's own letters: a written state's wrong letter
+/// is a given place no training state held, as is the runner-up a square's cross read sets. A reading only: it writes no
+/// state.
+pub(super) fn square_field(args: &[String], realization: &mut dyn FieldRealization) -> Result<()> {
+    if args.len() < 12 || (args.len() - 12) % 3 != 0 {
+        return Err("square-field STATE STATE_SHA CODEC CODEC_SHA UNITS UNITS_SHA HELD HELD_SHA COUNT SQUARES OUT [NAME WRITTEN WRITTEN_SHA]...".into());
+    }
+    let started = std::time::Instant::now();
+    let mut learner = FieldLearner::from_text(std::str::from_utf8(&pinned_read(&args[1], &args[2], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
+    declared_clocks(&mut learner.field);
+    let field = &learner.field;
+    let units = units_of(&args[5], &args[6])?;
+    let codec = FieldCodec::from_text(std::str::from_utf8(&pinned_read(&args[3], &args[4], CODEC_BUDGET)?)?, units)?;
+    let held = problems_of(&pinned_read(&args[7], &args[8], READ_BUDGET as usize)?);
+    let (limit, per_band) = (count(&args[9])?, positive(&args[10])?);
+    let out = Path::new(&args[11]);
+    std::fs::create_dir(out)?;
+    let held = &held[..limit.min(held.len())];
+    let seed = u64::from_str_radix(args[8].get(..16).ok_or("a held file's digest of fewer than sixteen hex digits")?, 16).map_err(|_| "a held file's digest that is not hexadecimal")?;
+    let requests: Vec<(Vec<usize>, usize)> = held.iter().map(|(question, _)| opening(&codec, field, question, b"")).collect::<std::result::Result<_, String>>()?;
+    let problems: Vec<(&[usize], usize)> = requests.iter().map(|(q, n)| (q.as_slice(), *n)).collect();
+    let void = codec.void();
+    let near = holonics::hnn::tower::field::NEAR;
+    let references: Vec<Vec<usize>> = held.iter().map(|(_, ans)| codec.encode(ans)).collect::<Result<_>>()?;
+    let mut states: Vec<(String, Vec<Vec<usize>>)> = vec![("reference".to_string(), references)];
+    for named in args[12..].chunks(3) {
+        states.push((named[0].clone(), written_answers(&codec, &named[1], &named[2], held.len())?));
+    }
+    let mut rows = rows_file(&out.join("SQUARES.tsv"), "state\tproblem\tband\ti\tj\ta\ta_runner\tb\tb_runner\tv_i\tv_j\th_i\th_j\tlambda_i\tlambda_j\n")?;
+    let nats = |v: i128| decimal_q20(nats_q20(v));
+    let share = |n: usize, of: usize| if of == 0 { "-".to_string() } else { format!("{}.{:06}", n * 1_000_000 / of / 1_000_000, n * 1_000_000 / of % 1_000_000) };
+    let one_nat = 1i128 << 20;
+    // The runner-up beside the standing letter: the most mass after it among the letters, the void left out, the lowest class on a tie.
+    let runner_up = |f: &holonics::hnn::tower::TowerFace, standing: usize| (0..f.masses.len()).filter(|&c| c != standing && c != void && f.masses[c] > 0).max_by_key(|&c| (f.masses[c], std::cmp::Reverse(c)));
+    // A locked read's region (as [`Field::locked_faces`] builds it): the question, the answer and its near tail of voids within the room.
+    let region_of = |k: usize, answer: &[usize]| -> Vec<usize> {
+        let (q, room) = problems[k];
+        let mut classes: Vec<usize> = q.iter().chain(answer).copied().collect();
+        classes.extend(std::iter::repeat_n(void, near.min(room.saturating_sub(answer.len()))));
+        classes
+    };
+    let band_names = ["1", "2-3", "4-7", "8-15", "16+", "all"];
+    let class_names = ["all", "quiet", "charged", "flat"];
+    let half_names = ["all", "even", "odd"];
+    // The cross reads go to the realization in rounds of this many regions (the census hands it every place at once; a round
+    // bounds the faces held on the host, and the card batches each round by its own budget).
+    const CHUNK: usize = 1024;
+    for (name, mut answers) in states {
+        let state_start = std::time::Instant::now();
+        let mut cut = 0usize;
+        for (x, &(_, room)) in answers.iter_mut().zip(&problems) {
+            cut += usize::from(x.len() > room);
+            x.truncate(room);
+        }
+        let ks: Vec<usize> = (0..problems.len()).filter(|&k| !answers[k].is_empty()).collect();
+        let faces = field.locked_faces(&problems, &answers, &ks, void, false, realization).map_err(|e| e.to_string())?;
+        // The census's own figures, so the state's line reads as its charge census did.
+        let (mut places, mut over1, mut over2, mut code, mut entropy) = (0usize, 0usize, 0usize, 0i128, 0i128);
+        for (&k, f) in ks.iter().zip(&faces) {
+            for (t, face) in f.iter().enumerate().take(answers[k].len()) {
+                let (c, h) = (face.code(answers[k][t]) as i128, holonics::hnn::tower::field::entropy(face));
+                let v = nats_q20(c - h);
+                (places, code, entropy) = (places + 1, code + c, entropy + h);
+                over1 += usize::from(v > one_nat);
+                over2 += usize::from(v > 2 * one_nat);
+            }
+        }
+        // The squares: per answer and band, `per_band` keyed draws of `d` in the band and `i` in the answer, `j = i + d`.
+        let mut squares: Vec<(usize, usize, usize, usize)> = Vec::new();
+        for (slot, &k) in ks.iter().enumerate() {
+            let n = answers[k].len();
+            for (band, &(lo, hi)) in SQUARE_BANDS.iter().enumerate() {
+                let top = hi.min(n - 1);
+                if lo > top {
+                    continue;
+                }
+                for s in 0..per_band {
+                    let key = mix(mix(seed ^ SQUARE_KEY, ((k as u64) << 8) | band as u64), s as u64);
+                    let d = lo + (mix(key, 1) % (top - lo + 1) as u64) as usize;
+                    let i = (mix(key, 2) % (n - d) as u64) as usize;
+                    squares.push((slot, band, i, i + d));
+                }
+            }
+        }
+        // Each square's runner-ups on its locked faces, and its two cross reads: `i` beside `b′`, `j` beside `a′`.
+        let mut readable: Vec<(usize, [usize; 4])> = Vec::new();
+        for (s, &(slot, _, i, j)) in squares.iter().enumerate() {
+            let x = &answers[ks[slot]];
+            if let (Some(a2), Some(b2)) = (runner_up(&faces[slot][i], x[i]), runner_up(&faces[slot][j], x[j])) {
+                readable.push((s, [x[i], a2, x[j], b2]));
+            }
+        }
+        let mut owned: Vec<(Vec<usize>, Vec<bool>, usize)> = Vec::with_capacity(2 * readable.len());
+        for &(s, [_, a2, _, b2]) in &readable {
+            let (slot, _, i, j) = squares[s];
+            let k = ks[slot];
+            for (at, set, letter) in [(i, j, b2), (j, i, a2)] {
+                let mut x = answers[k].clone();
+                x[set] = letter;
+                let region = region_of(k, &x);
+                let site = problems[k].0.len() + at;
+                let open: Vec<bool> = (0..region.len()).map(|t| t == site).collect();
+                owned.push((region, open, site));
+            }
+        }
+        let mut cross: Vec<holonics::hnn::tower::TowerFace> = Vec::with_capacity(owned.len());
+        for chunk in owned.chunks(CHUNK) {
+            let views: Vec<Region> = chunk.iter().map(|(c, u, _)| Region { classes: c, unresolved: u, faces: &[], locked: &[], echo: &[], domain: None, port: None }).collect();
+            for (read, (_, _, site)) in realization.read_faces(field, &views).map_err(|e| e.to_string())?.into_iter().zip(chunk) {
+                cross.push(read.get(*site).cloned().flatten().ok_or("a square's open place without a face")?);
+            }
+        }
+        // The readings, by band (and every band), by class of place, and by half (every problem, the even problems, the odd).
+        let mut sums = vec![[[SquareSums::default(); 3]; 4]; SQUARE_BANDS.len() + 1];
+        for (r, &(s, letters)) in readable.iter().enumerate() {
+            let (slot, band, i, j) = squares[s];
+            let [a, a2, b, b2] = letters;
+            let (fi, fj) = (&faces[slot][i], &faces[slot][j]);
+            let (lambda_i, lambda_j) = square_lambdas([fi, &cross[2 * r], fj, &cross[2 * r + 1]], letters);
+            let (h_i, h_j) = (holonics::hnn::tower::field::entropy(fi), holonics::hnn::tower::field::entropy(fj));
+            let (v_i, v_j) = (fi.code(a) as i128 - h_i, fj.code(b) as i128 - h_j);
+            let charged = nats_q20(v_i) > one_nat || nats_q20(v_j) > one_nat;
+            let flat = nats_q20(h_i) > one_nat || nats_q20(h_j) > one_nat;
+            for line in [band, SQUARE_BANDS.len()] {
+                for (class, member) in [true, !charged, charged, flat].into_iter().enumerate() {
+                    if member {
+                        for half in [0, 1 + ks[slot] % 2] {
+                            sums[line][class][half].add(lambda_i, lambda_j, v_i + v_j, h_i + h_j);
+                        }
+                    }
+                }
+            }
+            let letter = |c: usize| escaped(&codec.decode(&[c]));
+            row(&mut rows, &format!("{name}\t{}\t{band}\t{i}\t{j}\t{}\t{}\t{}\t{}\t{v_i}\t{v_j}\t{h_i}\t{h_j}\t{lambda_i}\t{lambda_j}\n", ks[slot], letter(a), letter(a2), letter(b), letter(b2)))?;
+        }
+        let a_place = |v: i128| if places == 0 { "-".to_string() } else { decimal_q20(nats_q20(v) / places as i128) };
+        println!(
+            "FIELD_SQUARE_STATE state={name} problems={} letters={places} cut_to_room={cut} code_nats={} entropy_nats={} code_nats_a_place={} entropy_nats_a_place={} v_over_1_share={} v_over_2_share={} squares={} unread={} cross_reads={} ms={}",
+            ks.len(),
+            nats(code),
+            nats(entropy),
+            a_place(code),
+            a_place(entropy),
+            share(over1, places),
+            share(over2, places),
+            squares.len(),
+            squares.len() - readable.len(),
+            owned.len(),
+            state_start.elapsed().as_millis()
+        );
+        for (line, by_class) in sums.iter().enumerate() {
+            for (class, by_half) in by_class.iter().enumerate() {
+                for (half, sum) in by_half.iter().enumerate() {
+                    println!("FIELD_SQUARE state={name} band={} class={} half={} {}", band_names[line], class_names[class], half_names[half], sum.text());
+                }
+            }
+        }
+        let _ = std::io::Write::flush(&mut std::io::stdout());
+    }
+    println!("FIELD_SQUARE_DONE ms={}", started.elapsed().as_millis());
+    Ok(())
+}
+
 /// The answers a written file holds (`SAMPLE.tsv`'s format: a line a problem, its index and its escaped letters), encoded.
 fn written_answers(codec: &FieldCodec, path: &str, sha: &str, problems: usize) -> Result<Vec<Vec<usize>>> {
     let text = pinned_read(path, sha, READ_BUDGET as usize)?;
@@ -4309,6 +4588,64 @@ mod tests {
         let args: Vec<String> = ["charge-field", &state, &state_sha, &codec_path, &codec_sha, &units, &units_sha, &held, &held_sha, "4", &rest, &rest_sha, &keyed, &keyed_sha, &out].iter().map(|s| s.to_string()).collect();
         charge_field(&args, &mut HostField).unwrap();
         assert_eq!(written_answers(&codec, &rest, &rest_sha, 4).unwrap(), problems.iter().map(|p| p.1.clone()).collect::<Vec<_>>());
+        let _ = std::fs::remove_dir_all(&dir);
+    }
+
+    /// [theory, November 12] **A square on one joint reads the same from both ends**: where the four faces are one joint's
+    /// conditionals, `λ_i` and `λ_j` agree, and each is the joint's own log odds ratio on the four letters to the codes'
+    /// rounding (each code is within one step of `2^(−20)` bits, so eight steps bound the eight codes); a face that is not the
+    /// joint's moves its own reading alone.
+    #[test]
+    fn a_square_on_one_joint_reads_the_same_from_both_ends() {
+        let joint: [[u128; 3]; 3] = [[40, 7, 3], [5, 30, 11], [2, 9, 25]];
+        let face_of = |masses: Vec<u128>| {
+            let masses: Vec<u128> = masses.into_iter().map(|m| m << 40).collect();
+            holonics::hnn::tower::TowerFace { total: masses.iter().sum(), masses }
+        };
+        let (a, a2, b, b2) = (0usize, 1usize, 2usize, 0usize);
+        // `i`'s face given `j`'s letter is the joint's column; `j`'s given `i`'s is its row.
+        let given_j = |b: usize| face_of((0..3).map(|x| joint[x][b]).collect());
+        let given_i = |a: usize| face_of(joint[a].to_vec());
+        let (fi, ci, fj, cj) = (given_j(b), given_j(b2), given_i(a), given_i(a2));
+        let (lambda_i, lambda_j) = square_lambdas([&fi, &ci, &fj, &cj], [a, a2, b, b2]);
+        let whole = face_of(joint.iter().flatten().copied().collect());
+        let odds = whole.code(3 * a2 + b) + whole.code(3 * a + b2) - whole.code(3 * a + b) - whole.code(3 * a2 + b2);
+        assert!((lambda_i - lambda_j).abs() <= 8 && (lambda_i - odds).abs() <= 8 && (lambda_j - odds).abs() <= 8, "{lambda_i} {lambda_j} {odds}");
+        assert!(odds < -(4 << 20), "the four letters lean apart: the odds 15/440 are past four bits");
+        let mut other = joint;
+        other[a2][b] = 44;
+        let (_, lambda_j2) = square_lambdas([&fi, &ci, &fj, &face_of(other[a2].to_vec())], [a, a2, b, b2]);
+        assert!((lambda_i - lambda_j2).abs() > 1 << 20, "a face that is not the joint's moves its own reading by two bits");
+    }
+
+    /// [theory, November 12] `square-field` end to end on the host: a written state that holds the reference's own answers
+    /// draws the reference's squares and reads its faces, so its rows are the reference's but for the state's name.
+    #[test]
+    fn the_square_reading_draws_alike_for_the_same_answers() {
+        let dir = std::env::temp_dir().join(format!("holonics-square-{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&dir);
+        std::fs::create_dir_all(&dir).expect("dir");
+        let put = |name: &str, bytes: &[u8]| {
+            std::fs::write(dir.join(name), bytes).expect("write");
+            (dir.join(name).to_string_lossy().into_owned(), sha256(bytes).expect("sha"))
+        };
+        let (codec, problems) = toy();
+        let learner = toy_learner(&codec, &problems);
+        let written: String = problems_of(TOY).iter().enumerate().map(|(k, (_, ans))| format!("{k}\t{}\n", escaped(ans))).collect();
+        let (state, state_sha) = put("STATE", learner.to_text().as_bytes());
+        let (codec_path, codec_sha) = put("CODEC", codec.to_text().as_bytes());
+        let (units, units_sha) = put("UNITS", b"founded-units-v1 0\n");
+        let (held, held_sha) = put("HELD", TOY);
+        let (rest, rest_sha) = put("REST", written.as_bytes());
+        let out = dir.join("OUT").to_string_lossy().into_owned();
+        let args: Vec<String> = ["square-field", &state, &state_sha, &codec_path, &codec_sha, &units, &units_sha, &held, &held_sha, "4", "2", &out, "rest", &rest, &rest_sha].iter().map(|s| s.to_string()).collect();
+        square_field(&args, &mut HostField).unwrap();
+        let text = std::fs::read_to_string(dir.join("OUT").join("SQUARES.tsv")).unwrap();
+        let rows: Vec<&str> = text.lines().skip(1).collect();
+        let of = |state: &str| -> Vec<String> { rows.iter().filter_map(|r| r.strip_prefix(&format!("{state}\t")).map(str::to_string)).collect() };
+        let (reference, rest) = (of("reference"), of("rest"));
+        assert!(!reference.is_empty() && reference.len() <= 4 * SQUARE_BANDS.len() * 2, "the squares the toy's answers reach");
+        assert_eq!(reference, rest, "the same answers draw the same squares and read the same faces");
         let _ = std::fs::remove_dir_all(&dir);
     }
 }

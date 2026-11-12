@@ -39,6 +39,11 @@ the material); the count before the growth is the head's `parts` line's, or `con
 give one file; an entry named twice (a family beside one of its parts), a part of another law, a count that is not the head's, and
 a part named on a head with no count are refused.
 
+A graft by block (theory, November 12, G92): `block:BLOCK/LANE/CONTACTS` takes the entries scale's block of that name gives; every
+block grafted alone moves its own entries and no other, every entry once over the blocks, and the blocks together give the donor's
+material; the count is the head's `parts` line's or `contacts:N`, and the two give one file; a block beside its family, a block scale
+does not hold, and a block named on a head with no count are refused.
+
 Controls of the carry circles' halves (theory, November 11 22:40, G87), on drawn states of a declaration with two circles:
   blocks   scale's blocks read the turn rows Q and the leak rows H apart by lane, and q_b and h_b apart, each entry once;
   weighed  a travel planted in the second lane's leak rows alone, the same on both laps: the leak block of that lane travels with
@@ -474,6 +479,49 @@ def graft_part_controls():
 DC = dict(D, carry=2)
 
 
+def graft_block_controls():
+    rng = np.random.default_rng(20261112)
+    fam, total = state_travel.layout(D)
+    a = rng.integers(-100000, 100000, size=total).astype(np.int64)
+    b = a + rng.integers(1, 10, size=total)
+    at = {name: k for name, k, _, _ in fam}
+    blocks = [(f"block:{block}/{lane}/{contacts}", at[family] + np.flatnonzero(mask.ravel())) for block, lane, contacts, _, family, mask in state_travel.scale_blocks(D, OLD_F)]
+    assert len(blocks) == len(set(name for name, _ in blocks)) > 40 and "block:w/2/old" in dict(blocks) and "block:moment_before/0/all" in dict(blocks)
+    with tempfile.TemporaryDirectory() as tmp:
+        pa, pb, bare = os.path.join(tmp, "a"), os.path.join(tmp, "b"), os.path.join(tmp, "bare")
+        write(pa, a, [7] * total, [OLD_F] + [0] * 16)
+        write(pb, b, [9] * total, [OLD_F] + [2] * 16)
+        write(bare, a)
+        quiet = io.StringIO()
+        moved = np.zeros(total, dtype=np.int64)
+        with redirect_stdout(quiet):
+            for i, (name, idx) in enumerate(blocks):
+                state_travel.graft(os.path.join(tmp, f"g{i}"), pa, pb, [name])
+                _, got = state_travel.state(os.path.join(tmp, f"g{i}"))
+                inside = np.zeros(total, dtype=bool)
+                inside[idx] = True
+                assert ((got != a) == inside).all() and (got[inside] == b[inside]).all(), name
+                moved += inside
+            state_travel.graft(os.path.join(tmp, "whole"), pa, pb, [name for name, _ in blocks])
+            state_travel.graft(os.path.join(tmp, "carried"), pa, pb, ["block:w/2/old", "block:moment_before/0/all"])
+            state_travel.graft(os.path.join(tmp, "declared"), bare, pb, ["contacts:8", "block:w/2/old", "block:moment_before/0/all"])
+        assert (moved == 1).all(), "the blocks hold every entry once"
+        assert (state_travel.state(os.path.join(tmp, "whole"))[1] == b).all()
+        carried, declared = (state_travel.state(os.path.join(tmp, name))[1] for name in ("carried", "declared"))
+        assert (carried == declared).all() and (carried != a).any()
+        lines = quiet.getvalue().splitlines()
+        assert sum(int(fields(line)["entries"]) for line in lines[:len(blocks)]) == total
+        for bad, head in ((["w", "block:w/2/old"], pa), (["block:w/3/old"], pa), (["block:no_such_block/1/all"], pa), (["block:w/2/old"], bare),
+                          (["block:w/2/old", "block:w/2/old"], pa), (["part:w_new", "block:w/1/new"], pa)):
+            try:
+                with redirect_stdout(quiet):
+                    state_travel.graft(os.path.join(tmp, "bad"), head, pb, bad)
+                raise RuntimeError(f"a graft that names {bad} was written")
+            except AssertionError:
+                assert not os.path.exists(os.path.join(tmp, "bad"))
+    print(f"state_travel graft by block: {len(blocks)} blocks, the controls hold")
+
+
 def write_carry(path, theta, second=None):
     words = ["hnn-field-v14t"] + [str(DC[k]) for k in ("alphabet", "width", "heads", "modes", "still", "contacts", "ticks", "frames", "reach", "lanes")] + ["0", str(DC["carry"])]
     with open(path, "w") as f:
@@ -563,6 +611,7 @@ def main():
     mean_controls()
     graft_controls()
     graft_part_controls()
+    graft_block_controls()
     carry_controls()
 
 

@@ -92,9 +92,13 @@ is the reading's curvature between them. A name may also be `part:NAME`, the ent
 them (tools/part_rates.py: w_new .. b_lane, carry and the first lane's letter rows enc_first, before_first, after_first, and w_carry,
 a_carry, b_carry with carry circles), or `FAMILY/old`, a family's entries of no part (the base
 rate's); the parts and the families' old entries partition the material, so a lap's difference between two lap means is split by the
-rate each entry trains at. Both read the count of contacts before the growth from HEAD's `parts` line, or from a name
-`contacts:N` where HEAD carries none (where it carries one the two agree). No entry is named twice. OUT is a ruler's state: it is
-read, and no lap trains from it. Numbers only.
+rate each entry trains at. A name may also be `block:BLOCK/LANE/CONTACTS`, one block of `scale` as its lines name it (block,
+lane and contacts: block:w/2/old, block:moment_before/0/all), the unit the block law of part_rates.py moves (theory, November 12,
+G92): the blocks partition the material, so a lap's end against its mean is split by block, each block's shift the code its own
+part of the end's displacement costs with every other block at the mean. The parts, the families' old entries and the blocks
+read the count of contacts before the growth from HEAD's `parts` line, or from a name `contacts:N` where HEAD carries none (where
+it carries one the two agree). No entry is named twice. OUT is a ruler's state: it is read, and no lap trains from it. Numbers
+only.
 """
 import os
 import sys
@@ -504,24 +508,29 @@ def graft(out, head, donor, names):
     names = [n for n in names if not n.startswith("contacts:")]
     assert len(declared) <= 1 and names and len(set(names)) == len(names), "names of the layout, each once, and at most one contacts:N"
     founded = None
-    if any(n.startswith("part:") or n.endswith("/old") for n in names):
+    if any(n.startswith("part:") or n.startswith("block:") or n.endswith("/old") for n in names):
         sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
         import part_rates
 
         carried = part_rates.parts_line(lines, d)
         before = int(declared[0].split(":", 1)[1]) if declared else None
-        assert carried is not None or before is not None, "a part or a family's old entries need HEAD's parts line or contacts:N"
+        assert carried is not None or before is not None, "a part, a block or a family's old entries need HEAD's parts line or contacts:N"
         assert carried is None or before is None or carried[0] == before, "contacts:N is HEAD's parts line's count"
         before = carried[0] if carried is not None else before
         assert 0 < before <= d["contacts"] and before % 4 == 0, "the contacts before the growth, by fours"
         founded = np.array(part_rates.founded_parts(d, before))
         assert len(founded) == total
+        blocks = {f"block:{block}/{lane}/{contacts}": (family, mask) for block, lane, contacts, _, family, mask in scale_blocks(d, before)}
     else:
-        assert not declared, "contacts:N goes with a part or a family's old entries"
+        assert not declared, "contacts:N goes with a part, a block or a family's old entries"
     named = np.zeros(total, dtype=np.int64)
     for n in names:
         chosen = np.zeros(total, dtype=bool)
-        if n.startswith("part:"):
+        if n.startswith("block:"):
+            assert n in blocks, f"blocks of scale: {' '.join(blocks)}"
+            family, mask = blocks[n]
+            chosen[spans[family][0] + np.flatnonzero(mask.ravel())] = True
+        elif n.startswith("part:"):
             assert n[5:] in part_rates.PART_NAMES, f"parts of the rate law: {' '.join(part_rates.PART_NAMES)}"
             chosen = founded == part_rates.PART_NAMES.index(n[5:])
         elif n.endswith("/old"):
