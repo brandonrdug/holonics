@@ -30,7 +30,7 @@
 use core::ffi::c_void;
 use std::time::Instant;
 
-use holonics::hnn::tower::field::{band_bits, landmarks_of, BlankClocks, CarryGates, Field, FieldDeclaration, FieldRead, FieldRealization, HeldRows, NearOffsets, RowCurrent, Region, Scale, TickRead, NEAR, SHARE_BITS, STATE_BITS};
+use holonics::hnn::tower::field::{band_bits, landmarks_of, BlankClocks, CarryGates, Field, FieldDeclaration, FieldRead, FieldRealization, HeldRows, NearOffsets, RealizationCounters, RowCurrent, Region, Scale, TickRead, NEAR, SHARE_BITS, STATE_BITS};
 use holonics::hnn::tower::{TowerError, TowerFace, MATERIAL_BITS};
 
 use crate::cuda::{Dim3, Module};
@@ -2833,6 +2833,11 @@ impl FieldRealization for CardField<'_> {
         Some(self.times.pairs)
     }
 
+    fn counters(&self) -> Option<RealizationCounters> {
+        let t = self.times;
+        Some(RealizationCounters { reads: t.reads, returns: t.returns, pairs: t.pairs, batches: t.batches, peak_store: t.peak_store })
+    }
+
     fn read_row_currents(&mut self, field: &Field, regions: &[Region], questions: &[usize], returning: bool) -> Result<Vec<Vec<RowCurrent>>> {
         if regions.len() != questions.len() {
             return Err(TowerError::Refused("a held read's answer starts that are not one a region"));
@@ -3146,5 +3151,67 @@ mod tests {
         for (name, start, len) in [("w_triad", l.w_triad, dw * 2 * triads), ("triad", l.triad, 6 * triads * dw), ("triad_bias", l.triad_bias, 6 * triads)] {
             assert!(host_g[start..start + len].iter().any(|&v| v != 0), "the triads' {name} takes no covector");
         }
+    }
+
+    /// [measurement; theory, November 12 (the record of the opening's room, §4 items 2 and 4)] **A lettered learner's section on the card
+    /// reads the host's bits** (needs the card): a learner of 100 classes with two carry circles grown by five fresh letters
+    /// ([`holonics::hnn::tower::field::FieldLearner::lettered`]), its readout, current and pair returns moved off zero from a keyed stream's tail, takes
+    /// one section of stretches as the store's trainer forms them (mask states over a whole stretch and past its context with their weighed
+    /// domains, and writer's states with the first of their run resolved, a true end's near tail of voids, plain regions with no port) whose
+    /// classes hold the void and fresh letters, through the host and through the card: the receipt, the material and the moments after the
+    /// deposit equal, and the read and return of the same regions on the learner's field equal face for face and entry for entry, with a
+    /// covector reaching the fresh letters' encoding rows.
+    #[test]
+    #[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
+    fn a_lettered_learners_section_on_the_card_reads_the_hosts_bits() {
+        use holonics::hnn::tower::field::{FieldLearner, HostField};
+        let keys: Vec<u8> = (0..1u64 << 18).flat_map(|i| (i.wrapping_add(1).wrapping_mul(0x9E37_79B9_7F4A_7C15) ^ (i << 17)).to_be_bytes()).collect();
+        let founded = Field::found(FieldDeclaration { alphabet: 100, ..declaration(32, 4, 32) }, &keys).unwrap();
+        let fresh = 5usize;
+        let mut learner = FieldLearner::new(founded, 12).with_carry(2, &keys).unwrap().lettered(fresh).unwrap();
+        let d = learner.field.declaration;
+        assert_eq!((d.alphabet, d.carry), (100 + fresh, 2));
+        let (l, dw, f, m2) = (learner.field.layout().clone(), d.width, d.contacts, 2 * d.complex());
+        let moved: Vec<usize> = (l.read..l.read + dw * dw).chain(l.out..l.out + dw * m2).chain(l.w..l.w + dw * f).collect();
+        let tail = keys.len() - 4 * moved.len() - 8;
+        for (k, &i) in moved.iter().enumerate() {
+            let word = &keys[tail + 4 * k..tail + 4 * k + 4];
+            learner.field.theta[i] = i32::from_be_bytes([word[0], word[1], word[2], word[3]]) >> 14;
+        }
+        let void = 99usize;
+        // Stretches: (context, run, a true end), each one state.
+        let stretches = [(7usize, 33usize, true), (12, 61, false), (4, 9, true), (30, 90, false), (5, 17, true)];
+        let mut classes: Vec<Vec<usize>> = Vec::new();
+        let mut open: Vec<Vec<bool>> = Vec::new();
+        let mut domains: Vec<Option<usize>> = Vec::new();
+        for (s, &(q, a, ends)) in stretches.iter().enumerate() {
+            let n = q + a + if ends { NEAR } else { 0 };
+            classes.push((0..n).map(|t| if t >= q + a { void } else if (t * 7 + s) % 11 == 0 { 100 + (t + s) % fresh } else { (t * 37 + 11 * s) % 99 }).collect());
+            let (u, dom) = match s % 3 {
+                // A mask state over the whole stretch, and one past its context.
+                0 => ((0..n).map(|t| t % 3 == 1).collect::<Vec<_>>(), Some(((4 * n * (0..n).filter(|t| t % 3 == 1).count()) as u128).isqrt() as usize)),
+                1 => ((0..n).map(|t| t >= q && t % 2 == 0).collect::<Vec<_>>(), Some(((4 * (n - q) * (q..n).filter(|t| t % 2 == 0).count()) as u128).isqrt() as usize)),
+                // The writer's state: the context known, the run's first places resolved, the end's voids given.
+                _ => ((0..n).map(|t| t >= q + a / 4 && t < q + a).collect::<Vec<_>>(), None),
+            };
+            open.push(u);
+            domains.push(dom);
+        }
+        let regions: Vec<Region> = classes.iter().zip(&open).zip(&domains).map(|((c, u), &dom)| Region { classes: c, unresolved: u, faces: &[], locked: &[], echo: &[], domain: dom, port: None }).collect();
+        assert!(classes.iter().flatten().any(|&c| c >= 100) && classes.iter().flatten().any(|&c| c == void));
+        let card = Card::open(0).expect("a CUDA card with the field's kernels built");
+        let mut card_field = CardField::open(&card).unwrap();
+        let (host_faces, host_g) = learner.field.read_and_return(&regions).unwrap();
+        let (card_faces, card_g) = card_field.read_and_return(&learner.field, &regions).unwrap();
+        assert_eq!(host_faces, card_faces);
+        let unequal: Vec<usize> = (0..host_g.len()).filter(|&i| host_g[i] != card_g[i]).collect();
+        assert!(unequal.is_empty() && host_g.len() == card_g.len(), "{} covector entries differ, the first at {:?}", unequal.len(), unequal.first());
+        assert!(host_g[l.enc + 100 * dw..l.enc + (100 + fresh) * dw].iter().any(|&v| v != 0), "a covector reaches the fresh letters' encoding rows");
+        let (mut on_host, mut on_card) = (learner.clone(), learner.clone());
+        let host_receipt = on_host.section_realized(&regions, &mut HostField).unwrap();
+        let card_receipt = on_card.section_realized(&regions, &mut card_field).unwrap();
+        assert_eq!(host_receipt, card_receipt);
+        assert!(host_receipt.deposited);
+        assert_eq!(on_host.to_text(), on_card.to_text(), "the material and the moments after the deposit");
     }
 }

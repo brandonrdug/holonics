@@ -29,6 +29,8 @@ mod tower_body;
 mod written_coupling;
 #[path = "complete_language/field_train.rs"]
 mod field_train;
+#[path = "complete_language/store_train.rs"]
+mod store_train;
 #[path = "complete_language/field_parity.rs"]
 mod field_parity;
 
@@ -900,6 +902,7 @@ pub(super) fn run_with_execution(
 pub(super) fn run_field_realized(args: &[String], realization: &mut dyn holonics::hnn::tower::field::FieldRealization) -> Result<()> {
     match args.first().map(String::as_str) {
         Some("train-field") => field_train::train(args, realization),
+        Some("train-store") => store_train::train(args, realization),
         Some("grow-contacts-field") => field_train::grow_contacts_field(args, realization),
         Some("grow-carry-field") => field_train::grow_carry_field(args, realization),
         Some("grow-triad-field") => field_train::grow_triad_field(args, realization),
