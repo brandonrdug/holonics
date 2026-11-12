@@ -404,7 +404,7 @@ Athena text milestone claimed before a test of use was retracted or retired.
 
 [project-postulate] **Method, each rule with its reason.** These were given in conversation between
 October 29 and November 12; the three before the last were derived from a failure, from readings of
-November 11 and from Brandon's lens of that day, and the last from his corrections of November 12. They are written here with their reasons so that no agent holds them as slogans.
+November 11 and from Brandon's lens of that day, and the last two from his corrections of November 12. They are written here with their reasons so that no agent holds them as slogans.
 - **Theory picks, and a run tests a stated prediction** (November 4). Derive which law the theory
   gives, fix its guess as a number before the read, run that one law and score the guess, a miss
   included. Reason: arms cost card time and choose by a short reading, and a winner picked that way
@@ -514,6 +514,23 @@ November 11 and from Brandon's lens of that day, and the last from his correctio
   every message, record, brief and guess, and every design that sizes a part. The module's name
   `hnn::tower::field` stays the code's where the code is cited
   ([the record](research/records/2026-11-12_THE_PASSAGE_WIDENS_TO_FIVE_REGISTERS_OF_OPEN_TEXT_THE_CONSTITUTIONS_SIZE_AND_THE_ENGINES_RATE_BIND_BEFORE_THE_DATA_A_WIDTH_BELONGS_TO_ITS_PART_AND_A_REGION_DECLARES_THE_PERIODS_OF_ITS_OWN_HELIX.md) §4.1).
+- **A rate is judged against the card, and a long projection is the realization's defect first**
+  (Brandon, October 29 to November 5 and November 12). A projection of an hour or more for a learner
+  run is read, before the run is ordered, against a count of the law's arithmetic a unit (the terms
+  a site computes, at the widths their information needs) over the lanes the card has, and the
+  ratio is stated beside the projection. Where the realization stands well under that count, the
+  realization is the next loop and the long run waits. A guess of a rate is fixed from that count,
+  never from the rate of the build before it. Reason: on November 12 the store trainer's rate was
+  guessed at 15 millionths of a second a site from the code line's fit and read 10.4; the guess's
+  rule then sent a three-hour pass over 1 GB ahead of the kernels' repair, with 8 GB at a day and
+  his ceiling of 50 GB at six days. The profile of that morning already showed a batch of 472
+  launches, scan entries of a few hundred threads holding the card for milliseconds, and pair and
+  scan kernels on 128-bit words over material held in 32 bits, the realization the precision law
+  rules out (narrow terms dispersed across lanes). He had named a long estimate as a sign of poor
+  use of the card on earlier days, and the flag stood only in project memory. The count as the
+  yardstick is `agent-inferred`; the direction is his. Scope: every projection of a learner run and
+  every guess of a rate. The workload is still never cut to fit (GPU first, below), and a long run
+  stays lawful once the realization stands near its count.
 
 [project-postulate] **GPU first, and the design fixes the workload** (Brandon, October 27;
 [the record](research/records/2026-10-27_THE_LEARNER_RUNS_ON_THE_CARD_AND_ITS_WORKLOAD_IS_NEVER_TRADED_FOR_TIME.md)). The RTX 4080 SUPER is a consumer card, and
@@ -569,7 +586,8 @@ hundreds of CPU seconds: the run rules were kept and the architecture and data w
 - **The workload is not a limit's variable.** The design fixes the data, the passes and the
   learner's levels and modes; time and memory are projected from that workload on the card. A run
   that does not fit gets the card, a better partition of the work, or a stated long run scheduled
-  beside the others. It never gets less data, fewer passes or a smaller learner: that trades the law
+  beside the others, the long run only once its projection has been read against the card (Method,
+  above: a rate is judged against the card). It never gets less data, fewer passes or a smaller learner: that trades the law
   for the clock, and the waiting standard below never licenses it.
 - **Whoever launches owns the device line.** A brief names its device, the card lock
   (`.local/gpu.lock`) and the card's memory beside the host's threads and memory. The reviewer and
