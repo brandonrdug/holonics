@@ -139,6 +139,21 @@ references and no write is yet ordered text.
 3. The release writes ordered text, judged by its structure and shown whole as it comes out.
 4. #404's remaining boxes follow on that learner: retention across passages, a cold restart on the
    card, and a question answered from the retained state with its sources.
+5. **The passage widens, and a width belongs to its part** (Brandon, November 12;
+   [the passage record](../../research/records/2026-11-12_THE_PASSAGE_WIDENS_TO_FIVE_REGISTERS_OF_OPEN_TEXT_THE_CONSTITUTIONS_SIZE_AND_THE_ENGINES_RATE_BIND_BEFORE_THE_DATA_A_WIDTH_BELONGS_TO_ITS_PART_AND_A_REGION_DECLARES_THE_PERIODS_OF_ITS_OWN_HELIX.md)).
+   In order, each step with its receipt: the census of directions by block from the line's saved
+   lap means, scored against its fixed guess; the face as a composition of lanes, each block
+   reading its own, entering the line by reproducing its lap at `(32, 32)`; the pair store on its
+   support (item 2), since the card holds 280 octets a pair of sites against 71,486 a site; the
+   conversion of tier A (1 GB of five slices of Common Corpus, 256-byte windows, held windows from
+   the far end of the shard order) and one continuous pass over it from the line's state, judged by
+   what it writes from held prompts by slice; then growth by one lane of the width the census
+   names. No extent is sized by a factor or padded to a power of two. Tier B (8 GB) is trained when
+   a pass over it takes under two days.
+6. **More than one medium** (the same record, §6 to §11): the region's helix in
+   `hnn::tower::field` and on the card, a text region reproducing the line's lap; the rank page and
+   MNIST's sections paired both ways with their labels; the acoustic chart with its remainder; then
+   the test at equal text bytes with and without the other media's sections.
 
 ## 4. Rules of the rebuild
 

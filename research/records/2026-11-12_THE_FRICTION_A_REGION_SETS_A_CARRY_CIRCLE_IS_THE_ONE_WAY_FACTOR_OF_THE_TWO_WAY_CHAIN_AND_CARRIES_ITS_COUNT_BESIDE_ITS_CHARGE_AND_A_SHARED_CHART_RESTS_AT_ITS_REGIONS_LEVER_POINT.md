@@ -147,18 +147,37 @@ start the gap to the rest falls at every step (ruler 1, from `R = 1` and `R = 10
 circle is the derived circle at its rest on a uniform strand.** At the founding `q₀ = 1/20`,
 `j = 1`, `m₀ = 1/20`, `R = N₀ = 5`, `d = 1/4`.
 
-### 3.4 On the built chart
+### 3.4 The chart of the mass
 
-The built chart needs no second chart beside it. Read `d̂(t) = d₀ 2^ℓ(t)` as the site's own rest
-friction, the friction a strand of such sites rests at, and take
+[corrected November 12, 16:20Z, before any build; this section first gave the first chart below as
+the only one]
 
-`m(t) = d̂(t)²/(1 + d̂(t))`,  `d(t) = m(t) R(t)`,  `R` at the region's edge the first site's own
-rest `(1 + d̂)/d̂`.
+The law fixes `d = m R` and the count's move. It does not fix how a site's read sets its mass, and
+the built chart reads a friction, `d̂(t) = d₀ 2^ℓ(t)`. Two charts of the mass equal the built circle
+on a strand whose sites read one `ℓ`, the first site included (ruler 9), and they part on a grown
+state.
 
-Then on a strand whose sites read one `ℓ` the derived circle is the built circle at every site, the
-first included, at any friction from one grain up (ruler 9, six uniform strands). The two differ
-only where `ℓ` varies along a strand. The log chart, its floor of one grain and its covector stand
-as they are.
+- **The site's own rest**: `m(t) = d̂(t)²/(1 + d̂(t))`, `R` at the edge the first site's rest
+  `(1 + d̂)/d̂`. It keeps the built friction wherever `ℓ` is level over a range. Where `ℓ` varies
+  from site to site inside a range, `R` stays near the region's rest and `d` follows `m`, so the
+  contrast of `ℓ` between neighbouring sites is multiplied by `d log m / d log d̂ = (2 + d̂)/(1 + d̂)`,
+  1.8 at `d̂ = 1/4`, and the level falls. On 40,000 sites of independent spread (`entry_probe.txt`,
+  floats, a reading): the contrast times 1.68 to 1.90, the level down 0.07 to 0.45 units of `ℓ`, a
+  site's shift spread 0.40 to 0.95 units. On a grown state that is a move the size of the circle
+  line's travel from te3 to te6, along directions the chart already rests on, so a first read under
+  it would test the conversion and not the law.
+- **The log of the count**: `m(t) = q₀ 2^ℓ(t)`, `q₀ = 1/20`, each circle's bias moved once by
+  `s_c = log₂(μ²(d_c)/q₀) − ℓ_c`, `μ²(d) = d²/(1 + d)`, `d_c = d₀ 2^ℓ_c` at the circle's mean `ℓ_c`.
+  Then `d(t) = d̂(t) R(t)/R_c` and `ℓ_eff = ℓ + log₂(R/R_c)`: the strand's history alone. The same
+  probe reads the contrast times 1.00, a site's shift spread 0.08 to 0.24 units, and both kinds of
+  site in a region shifted alike. The closed form leaves the level 0.02 to 0.14 units low, since the
+  count hears the arithmetic mean of a region's mass; one step on the circle's gate line removes it.
+
+The first keeps contrast slower than the range and nearly doubles faster contrast; the second keeps
+faster contrast and halves slower contrast, which is the law's own content (§3.5: friction follows
+the root of a region's mass). A grown chart varies mostly from site to site, by kind and letter, so a
+line is entered on the log of the count. At `ℓ = 0` both are the founding. The log chart, its floor
+of one grain and its covector stand as they are.
 
 ### 3.5 What a region sets
 
@@ -355,15 +374,33 @@ founded on this line.
 - **Widths** follow from `1 ≤ R ≤ R_edge + (sites passed)` and the friction's floor of one grain
   (an edge at one grain has `R = 2^16 + 1`).
 - **The founding** is the built one (§3.6), so a field founded with the count keeps every face.
-- **Entering the line.** By §3.4 the law reads a grown state's chart as it stands, so it can be
-  tested as one attempt from the line's end beside the line's own lap, the build with the law off
-  reproducing that lap first (CLAUDE.md, "A build enters a line by reproducing it"). A grown
-  state's faces change at the law's first read wherever its chart varies along a strand.
-- **What the first read does** depends on reading 3. If open and given sites stand at one friction
-  the law changes little at first and the lap must find the split. If they stand apart, the first
-  read already differs, and its sign in quarter 4 is a test with no lap spent.
-- **What would refuse it:** the leak's covector unable to part the kinds of site under the count
-  (the chart's read `r̂` does not tell an open site from a given one), or reading 1's fitting.
+- **Entering the line** [corrected with §3.4]. A grown state enters on the log of the count, its
+  circles' biases moved once by a state tool whose output is checked on every line the law reads,
+  the build with the law off reproducing the line's lap first (CLAUDE.md, "A build enters a line by
+  reproducing it"). The count changes the weights of the turned drives and never a turn, and its
+  first-order part is the built adjoint's covector on `ℓ` paired site by site with `log₂(R/R_c)`,
+  which a read can print before the first read.
+- **What the first read does.** Pooled over the circles it has no sign from the law: every quarter
+  should stand within about 0.003 nats a place of the built read, and a larger move convicts the
+  conversion. On a frozen chart the friction follows the root of a region's mass. On a circle that
+  holds its open sites (their mass the lower), a strand with most sites open gets more friction at
+  both kinds past a run's first sites, and a strand with most sites given gets less; on a circle
+  that relays, the reverse (`entry_probe.txt`: +0.10 and −0.17, −0.13 and +0.07 units of `ℓ`). G108
+  has quarter 4 wanting less friction and quarter 1 more, so the first-order part goes against both
+  quarters on a holder and with both on a relay: quarters 1 and 4 move the same way on a circle,
+  where a shift of the chart moves them opposite ways.
+- **What would refuse it, with no lap:** G108's shift read by kind (open sites alone, given sites
+  alone) by quarter. The count's premise on this line is that a site of one kind should take more
+  where its strand carries less mass. If quarter 4's open sites want less friction than quarter 1's
+  open sites and its given sites less than quarter 1's given sites, the root response opposes the
+  line on every holder.
+- **What the lap tests:** quarter 4's turn smaller than the built lap's by the leak chart's share,
+  a third to a half, with quarter 1 not paying for it. The joint cannot decide in one lap, since
+  the most a region friction buys is §5.6's one-chart cost.
+- **Where it stands** (the circle line's thread, 16:35Z): te7's quarter 4 stopped rising (+0.0002 at
+  lap means, G112), so the lap's test has no turn to shrink on this line, and the shift by kind is
+  not a state (the leak's bias is one entry a circle). The count's lap is set aside on the circle
+  line and is owed one attempt on the next line, with its card realization and the log-count chart.
 
 ## 8. Owed to #410
 
@@ -382,7 +419,8 @@ One box: **the carry circle's count** (`lean/Holonics/HNN/CarryGate.lean`, besid
 
 ## 9. Receipts
 
-`region_rulers.py` and its output `region_rulers.txt`, in this record's receipts: ten rulers, 33
+`entry_probe.py` and `entry_probe.txt` (the two charts of the mass on 40,000 sites; floats, a
+reading). `region_rulers.py` and its output `region_rulers.txt`, in this record's receipts: ten rulers, 33
 checks on rationals (decimals only in printed readings and in rulers 7 and 10, which do arithmetic
 on readings printed in receipts on main). Run on the host, one thread, under a second; a ruler
 measures and is never machinery.

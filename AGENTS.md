@@ -403,8 +403,8 @@ Athena text milestone claimed before a test of use was retracted or retired.
   by its measurement ("the predictor codes above flat on unseen families"), not as a missing part.
 
 [project-postulate] **Method, each rule with its reason.** These were given in conversation between
-October 29 and November 11; the last three were derived from a failure, from readings of
-November 11 and from Brandon's lens of that day. They are written here with their reasons so that no agent holds them as slogans.
+October 29 and November 12; the three before the last were derived from a failure, from readings of
+November 11 and from Brandon's lens of that day, and the last from his corrections of November 12. They are written here with their reasons so that no agent holds them as slogans.
 - **Theory picks, and a run tests a stated prediction** (November 4). Derive which law the theory
   gives, fix its guess as a number before the read, run that one law and score the guess, a miss
   included. Reason: arms cost card time and choose by a short reading, and a winner picked that way
@@ -495,6 +495,25 @@ November 11 and from Brandon's lens of that day. They are written here with thei
   lane 2's pair contacts were turning back (atlas `deposition.block-polarization`). Brandon named the
   fault the same day. Scope: every reading in a message, a record or a guess; a guess on a total
   keeps the partition beside it ([the record](research/records/2026-11-11_A_READING_NAMES_ITS_REGION_THE_LETTER_ROWS_LEARN_WHERE_THE_CONTACTS_REST_E_IS_A_CHART_NEVER_A_DIGIT_AND_EVERY_GLOBAL_SUM_IS_A_JOIN_THE_CARD_PAYS.md)).
+- **A size belongs to its part, and the store is not "the field"** (Brandon, November 12). No
+  extent of a realization (a width, a reach, a count of contacts, heads or ticks) is reported or
+  reasoned from as a property of the machine. It is stated with the part it sizes and the reading
+  that sized it, and a constitution's entries are given by block. An extent is a composition sized
+  from its part's need (atlas `radix.register-composition`): never a copy, a factor or a pad to a
+  power of two. The words keep three things apart: the constitution (the store and its loci), a
+  region's current, and a receiver's locale (its support, frame, clock and width). "The field"
+  names none of them, and the batch a card computes together is a schedule. A figure taken from
+  another thread or from a summary line is read at its source or its receipt before it is
+  repeated. Reason: on November 12 a plan said the machine had "width 64" and that this width took
+  10.6 of the card's 12 GB. The width is one integer that is every block's row length, reached by
+  copies (32, then a second lane of 32; the contacts 32, 64, 128), after Brandon's corrections of
+  October 31 and November 3, 5 and 10 had been written into the guides and the atlas and never
+  applied to the declaration. The card's memory follows pairs of sites in a region, the width's
+  share 2.5%. The state's 175,104 was its count of key draws, its entries 80,182. He had raised
+  these on several days, and they fell out between context windows and between threads. Scope:
+  every message, record, brief and guess, and every design that sizes a part. The module's name
+  `hnn::tower::field` stays the code's where the code is cited
+  ([the record](research/records/2026-11-12_THE_PASSAGE_WIDENS_TO_FIVE_REGISTERS_OF_OPEN_TEXT_THE_CONSTITUTIONS_SIZE_AND_THE_ENGINES_RATE_BIND_BEFORE_THE_DATA_A_WIDTH_BELONGS_TO_ITS_PART_AND_A_REGION_DECLARES_THE_PERIODS_OF_ITS_OWN_HELIX.md) §4.1).
 
 [project-postulate] **GPU first, and the design fixes the workload** (Brandon, October 27;
 [the record](research/records/2026-10-27_THE_LEARNER_RUNS_ON_THE_CARD_AND_ITS_WORKLOAD_IS_NEVER_TRADED_FOR_TIME.md)). The RTX 4080 SUPER is a consumer card, and

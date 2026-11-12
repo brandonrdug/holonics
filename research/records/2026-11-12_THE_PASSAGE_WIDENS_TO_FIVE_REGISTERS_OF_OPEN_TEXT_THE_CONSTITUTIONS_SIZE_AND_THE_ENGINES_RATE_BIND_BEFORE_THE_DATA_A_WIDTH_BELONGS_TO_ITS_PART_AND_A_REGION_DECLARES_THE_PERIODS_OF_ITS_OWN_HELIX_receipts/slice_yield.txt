@@ -1,0 +1,7 @@
+code      documents  20284  bytes    89.2 MB  windows of 256:   353696  under 25 bytes a line:  24.2%  kept    89.2 MB  shards for 1 GB of the mix: 4.5
+web       documents   4199  bytes    16.7 MB  windows of 256:    66426  under 25 bytes a line:   8.3%  kept    16.7 MB  shards for 1 GB of the mix: 11.9
+science   documents   1244  bytes    71.7 MB  windows of 256:   280485  under 25 bytes a line:   7.6%  kept    66.3 MB  shards for 1 GB of the mix: 3.0
+books     documents   2219  bytes    89.3 MB  windows of 256:   349397  under 25 bytes a line:   0.0%  kept    89.3 MB  shards for 1 GB of the mix: 1.3
+wikidata  documents   3120  bytes    18.8 MB  windows of 256:    74174  under 25 bytes a line:   6.7%  kept    18.8 MB  shards for 1 GB of the mix: 4.3
+by collection: books/English-PD 68.7; books/US-PD-Books 20.6; code/Github Open Source 89.2; science/French-Science-Pile 6.2; science/German-Science-Pile 0.4; science/Open-Science-Pile 1.9; science/OpenAlex 60.6; science/Spanish-Science-Pile 0.7; science/arXiv 1.9; web/Creative Commons Common Crawl (CCC) 6.0; web/StackExchange 8.7; web/Wikipedia 2.0; wikidata/Wikidata 18.8
+binding slice needs 11.9 shards a GB; 8 GB: 96 shards, 41 GB of transfer; 50 GB: 597 shards, 259 GB

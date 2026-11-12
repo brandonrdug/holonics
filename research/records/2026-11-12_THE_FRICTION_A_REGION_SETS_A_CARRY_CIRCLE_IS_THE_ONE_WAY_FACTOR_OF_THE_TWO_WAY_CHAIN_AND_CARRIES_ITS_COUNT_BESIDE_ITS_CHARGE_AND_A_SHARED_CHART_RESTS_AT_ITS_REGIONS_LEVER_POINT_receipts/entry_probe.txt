@@ -1,0 +1,36 @@
+level d_c=0.11, iid site spread sigma=0.5 units of l
+  alpha  mean shift of l -0.130; slope of the shift on the site's own x +0.897 (log-contrast x1.90); sd of shift 0.476; mean take w 0.106 (built 0.104)
+  gamma  mean shift of l -0.038; slope of the shift on the site's own x +0.000 (log-contrast x1.00); sd of shift 0.079; mean take w 0.101 (built 0.104)
+level d_c=0.11, iid site spread sigma=1.0 units of l
+  alpha  mean shift of l -0.447; slope of the shift on the site's own x +0.886 (log-contrast x1.89); sd of shift 0.953; mean take w 0.124 (built 0.116)
+  gamma  mean shift of l -0.138; slope of the shift on the site's own x -0.000 (log-contrast x1.00); sd of shift 0.171; mean take w 0.107 (built 0.116)
+level d_c=0.25, iid site spread sigma=0.5 units of l
+  alpha  mean shift of l -0.096; slope of the shift on the site's own x +0.794 (log-contrast x1.79); sd of shift 0.442; mean take w 0.208 (built 0.206)
+  gamma  mean shift of l -0.031; slope of the shift on the site's own x -0.000 (log-contrast x1.00); sd of shift 0.106; mean take w 0.203 (built 0.206)
+level d_c=0.25, iid site spread sigma=1.0 units of l
+  alpha  mean shift of l -0.322; slope of the shift on the site's own x +0.778 (log-contrast x1.78); sd of shift 0.870; mean take w 0.224 (built 0.221)
+  gamma  mean shift of l -0.109; slope of the shift on the site's own x -0.001 (log-contrast x1.00); sd of shift 0.220; mean take w 0.210 (built 0.221)
+level d_c=0.43, iid site spread sigma=0.5 units of l
+  alpha  mean shift of l -0.069; slope of the shift on the site's own x +0.696 (log-contrast x1.70); sd of shift 0.402; mean take w 0.305 (built 0.305)
+  gamma  mean shift of l -0.020; slope of the shift on the site's own x +0.000 (log-contrast x1.00); sd of shift 0.121; mean take w 0.303 (built 0.305)
+level d_c=0.43, iid site spread sigma=1.0 units of l
+  alpha  mean shift of l -0.232; slope of the shift on the site's own x +0.683 (log-contrast x1.68); sd of shift 0.784; mean take w 0.316 (built 0.319)
+  gamma  mean shift of l -0.081; slope of the shift on the site's own x +0.000 (log-contrast x1.00); sd of shift 0.240; mean take w 0.309 (built 0.319)
+holder (open -0.4, given +0.4); quarter 4 like, 7/8 open; sigma 0.5
+  alpha  mean shift of l -0.136; slope of the shift on the site's own x +0.817 (log-contrast x1.82); sd of shift 0.514; mean take w 0.178 (built 0.176); given: +0.423; open: -0.217
+  gamma  mean shift of l +0.096; slope of the shift on the site's own x -0.000 (log-contrast x1.00); sd of shift 0.121; mean take w 0.185 (built 0.176); given: +0.096; open: +0.096
+holder (open -0.4, given +0.4); quarter 1 like, 1/8 open; sigma 0.5
+  alpha  mean shift of l -0.108; slope of the shift on the site's own x +0.766 (log-contrast x1.77); sd of shift 0.486; mean take w 0.244 (built 0.243); given: -0.029; open: -0.663
+  gamma  mean shift of l -0.169; slope of the shift on the site's own x +0.001 (log-contrast x1.00); sd of shift 0.121; mean take w 0.223 (built 0.243); given: -0.169; open: -0.169
+relay (open +0.3, given -0.3); quarter 4 like, 7/8 open; sigma 0.5
+  alpha  mean shift of l -0.099; slope of the shift on the site's own x +0.772 (log-contrast x1.77); sd of shift 0.458; mean take w 0.233 (built 0.232); given: -0.507; open: -0.041
+  gamma  mean shift of l -0.129; slope of the shift on the site's own x +0.000 (log-contrast x1.00); sd of shift 0.114; mean take w 0.217 (built 0.232); given: -0.128; open: -0.130
+relay (open +0.3, given -0.3); quarter 1 like, 1/8 open; sigma 0.5
+  alpha  mean shift of l -0.119; slope of the shift on the site's own x +0.813 (log-contrast x1.81); sd of shift 0.484; mean take w 0.185 (built 0.182); given: -0.178; open: +0.290
+  gamma  mean shift of l +0.066; slope of the shift on the site's own x -0.001 (log-contrast x1.00); sd of shift 0.114; mean take w 0.190 (built 0.182); given: +0.067; open: +0.064
+clean holder (open -3, given 0); quarter 4 like, 7/8 open; sigma 0.5
+  alpha  mean shift of l -0.976; slope of the shift on the site's own x +0.914 (log-contrast x1.91); sd of shift 1.145; mean take w 0.065 (built 0.053); given: +1.397; open: -1.311
+  gamma  mean shift of l +0.989; slope of the shift on the site's own x +0.001 (log-contrast x1.00); sd of shift 0.277; mean take w 0.096 (built 0.053); given: +0.992; open: +0.989
+clean holder (open -3, given 0); quarter 1 like, 1/8 open; sigma 0.5
+  alpha  mean shift of l -0.340; slope of the shift on the site's own x +0.886 (log-contrast x1.89); sd of shift 1.017; mean take w 0.192 (built 0.184); given: +0.002; open: -2.707
+  gamma  mean shift of l +0.053; slope of the shift on the site's own x -0.000 (log-contrast x1.00); sd of shift 0.153; mean take w 0.190 (built 0.184); given: +0.053; open: +0.054
