@@ -229,9 +229,9 @@ struct Words {
     // [the unified-theory reading of November 6, 10:31] Past the last arrival a silent place runs at the bare rate (the host's
     // `Field::bare_stretch`).
     bare_stretch: u64,
-    // [definition; theory, November 11 17:25] The carry circles (`FieldDeclaration::carry`): their count `C`, their charts' and biases' offsets in the
-    // material (`FieldLayout::carry`, `carry_bias`) and the charts' reach, and (set per tick) the charts' reads `q`, `h` `[t][2C]`, the gate `γ` `[t][2C]`
-    // and the scan's operand `[t][2C]`.
+    // [definition; theory, November 11 17:25 and November 12 (G98)] The carry circles (`FieldDeclaration::carry`): their count `C`, their charts' and
+    // biases' offsets in the material (`FieldLayout::carry`, `carry_bias`) and the charts' reach, and (set per tick) the charts' reads `q`, `ℓ` `[t][2C]`,
+    // the gate `γ` `[t][2C]`, the scan's operand `[t][2C]` and the drive coupled through the leak `[t][2C]`.
     carry: u64,
     wg: u64,
     wgb: u64,
@@ -239,6 +239,7 @@ struct Words {
     pg: u64,
     pgam: u64,
     pqm: u64,
+    pkb: u64,
     // [theory, November 11 04:14, step S] The skin's site addresses `[p][l][t]` three words each (`FieldWords::saddr`), the clock's own beside `sigma`.
     saddr: u64,
 }
@@ -402,6 +403,7 @@ fn set_tick(w: &mut Words, tick: &Tick, returning: bool) {
     w.pg = tick.pg.device_ptr();
     w.pgam = tick.pgam.device_ptr();
     w.pqm = tick.pqm.device_ptr();
+    w.pkb = tick.pkb.device_ptr();
     w.pb = tick.pb.device_ptr();
     w.pc = tick.pc.device_ptr();
     w.bits = tick.bits.device_ptr();
@@ -448,7 +450,7 @@ struct Back<'c> {
     da: Pooled<'c, i64>,
     db: Pooled<'c, i64>,
     /// [theory, November 11 17:25] The carry circles' covector `[t][2C]` (one slot without them): the scan's reverse writes `δγ`, and the gate's
-    /// reverse writes `δq`, `δh` over it in place, the circles' charts' row order.
+    /// reverse writes `δq`, `δℓ` over it in place, the circles' charts' row order.
     dg: Pooled<'c, i64>,
     ra: Pooled<'c, i64>,
     rb: Pooled<'c, i64>,
@@ -531,10 +533,12 @@ struct Tick<'c> {
     read2: Pooled<'c, i32>,
     scale2: Pooled<'c, i128>,
     pa: Pooled<'c, i64>,
-    /// [theory, November 11 17:25] The carry circles' charts' reads `q`, `h` `[t][2C]`, their gate `γ` `[t][2C]` and the scan's operand `[t][2C]` (one slot each without them).
+    /// [theory, November 11 17:25 and November 12 (G98)] The carry circles' charts' reads `q`, `ℓ` `[t][2C]`, their gate `γ` `[t][2C]`, the scan's operand
+    /// `[t][2C]` and the coupled drive `κ b` `[t][2C]` (one slot each without them).
     pg: Pooled<'c, i64>,
     pgam: Pooled<'c, i64>,
     pqm: Pooled<'c, i64>,
+    pkb: Pooled<'c, i64>,
     pb: Pooled<'c, i64>,
     pc: Pooled<'c, i64>,
     /// The tick's carrier width: the binary length of its largest unit word.
@@ -704,7 +708,7 @@ pub struct CardField<'c> {
     held_cells: std::cell::RefCell<Vec<i128>>,
     /// [measurement, November 4] While the ticks are read: each region's tick reads, region by region.
     tick_reads: std::cell::RefCell<Option<Vec<Vec<TickRead>>>>,
-    /// [measurement; theory, November 11 18:33, part P2] While the carry circles' gates are read: each circle's `|γ|` sum, then its `h ≥ 0` count,
+    /// [measurement; theory, November 11 18:33, part P2] While the carry circles' gates are read: each circle's `|γ|` sum, then its `ℓ ≥ 0` count,
     /// then the reads (`2C + 1` words, [`CarryGates`]), summed over the batches from each tick's forward.
     carry_gates: std::cell::RefCell<Option<Vec<u128>>>,
     /// [measurement, §16.42] While a near field is read: the named sites of the batch's one region, and each one's near field
@@ -1208,6 +1212,7 @@ impl<'c> CardField<'c> {
             pg: alloc64(if field.declaration.carry > 0 { sites * 2 * field.declaration.carry } else { 1 })?,
             pgam: alloc64(if field.declaration.carry > 0 { sites * 2 * field.declaration.carry } else { 1 })?,
             pqm: alloc64(if field.declaration.carry > 0 { sites * 2 * field.declaration.carry } else { 1 })?,
+            pkb: alloc64(if field.declaration.carry > 0 { sites * 2 * field.declaration.carry } else { 1 })?,
             pb: alloc64(sites * f)?,
             pc: alloc64(sites * f)?,
             bits: self.timed(Kind::Alloc, || self.take_zeroed::<u32>(4)).map_err(device)?,
@@ -1432,9 +1437,9 @@ impl<'c> CardField<'c> {
             self.launch("field_pair", Self::cells((sites * plain) as u64), THREADS, &mut [arg(words)])?;
         }
         if circles > 0 {
-            // [theory, November 11 17:25] The carry circles: their charts' reads `q`, `h` (one affine with its bias), the gate's two divisions off
-            // the chain on the pair's grid (one thread a site and circle, as tower.field-scan-gate-once-a-site moved the root out), then the
-            // chain, one thread a (region, circle) in strand order.
+            // [theory, November 11 17:25 and November 12 (G98)] The carry circles: their charts' reads `q`, `ℓ` (one affine with its bias), the gate's
+            // two divisions and the drive's coupling through the leak off the chain on the pair's grid (one thread a site and circle, as
+            // tower.field-scan-gate-once-a-site moved the root out), then the chain, one thread a (region, circle) in strand order.
             self.affine("field_affine_x32", words, words.wg, words.wgb, words.rg, 2 * circles, dw, tick.read2.device_ptr(), dw, tick.pg.device_ptr(), 2 * circles, 0, false)?;
             self.launch("field_pair_gamma", Self::cells((sites * circles) as u64), THREADS, &mut [arg(words)])?;
             self.launch("field_pair_scan", Self::cells((words.r as usize * circles) as u64), THREADS, &mut [arg(words)])?;
@@ -2191,6 +2196,7 @@ impl<'c> CardField<'c> {
         words.pg = tick.pg.device_ptr();
         words.pgam = tick.pgam.device_ptr();
         words.pqm = tick.pqm.device_ptr();
+        words.pkb = tick.pkb.device_ptr();
         words.pb = tick.pb.device_ptr();
         words.pc = tick.pc.device_ptr();
         // The pair contact: x_out = x_mid + W_c c + b_c.
@@ -2203,12 +2209,13 @@ impl<'c> CardField<'c> {
             self.launch("field_pair_back", Self::cells((sites * plain) as u64), THREADS, &mut [arg(words), arg(&mut dcp), arg(&mut dap), arg(&mut dbp)])?;
         }
         if circles > 0 {
-            // [theory, November 11 17:25] The circles' reverse: the same (region, circle) jobs in the opposite strand order, with the forward's `γ` and `Q`
-            // operand, writing `δγ` a site and circle; then `δq` and `δh` off the chain on the pair's grid, the divisions out of the chain.
+            // [theory, November 11 17:25 and November 12 (G98)] The circles' reverse: the same (region, circle) jobs in the opposite strand order, with the
+            // forward's `γ`, coupled drive and `Q` operand, writing `δγ` and `u` a site and circle; then `δq`, `δℓ` and the drive's `δb = κ u` off the chain
+            // on the pair's grid, the divisions out of the chain.
             let mut dgp = dg.device_ptr();
             self.launch("field_pair_scan_back", Self::cells((words.r as usize * circles) as u64), THREADS, &mut [arg(words), arg(&mut dcp), arg(&mut dap), arg(&mut dbp), arg(&mut dgp)])?;
-            let mut dgp = dg.device_ptr();
-            self.launch("field_pair_gate_back", Self::cells((sites * circles) as u64), THREADS, &mut [arg(words), arg(&mut dgp)])?;
+            let (mut dgp, mut dbp) = (dg.device_ptr(), db.device_ptr());
+            self.launch("field_pair_gate_back", Self::cells((sites * circles) as u64), THREADS, &mut [arg(words), arg(&mut dgp), arg(&mut dbp)])?;
         }
         self.outer(words, g, words.wa, f, dw, da.device_ptr(), f, tick.read2.device_ptr(), dw, false, false)?;
         self.outer(words, g, words.wb, f, dw, db.device_ptr(), f, tick.read2.device_ptr(), dw, false, false)?;

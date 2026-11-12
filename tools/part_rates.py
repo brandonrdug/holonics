@@ -174,8 +174,10 @@ def load(path):
     names = ["alphabet", "width", "heads", "modes", "still", "contacts", "ticks", "frames", "reach", "lanes"]
     d = {k: int(w) for k, w in zip(names, words[1:11])}
     assert words[0] != "hnn-field-v14k", "the carry founded at zero friction is retired (hnn-field-v14k): its states are receipts only"
-    assert (words[0], len(words)) in (("hnn-field-v14", 12), ("hnn-field-v14t", 13), ("hnn-field-v13", 11)), "a field's head line that is not hnn-field-v14"
-    d["carry"] = int(words[12]) if words[0] == "hnn-field-v14t" else 0
+    assert (words[0], len(words)) in (("hnn-field-v14", 12), ("hnn-field-v14e", 13), ("hnn-field-v14t", 13), ("hnn-field-v13", 11)), "a field's head line that is not hnn-field-v14"
+    # The carry circles' count, the head's thirteenth word: hnn-field-v14e (the leak's log chart, November 12) and the retired hnn-field-v14t (its
+    # linear chart), whose states the field refuses and this ruler still reads as receipts: the layout is the same, only the leak's chart differs.
+    d["carry"] = int(words[12]) if words[0] in ("hnn-field-v14e", "hnn-field-v14t") else 0
     rate = int(lines[0].split(" ")[1])
     theta = [int(x) for x in lines[2].split(" ")]
     return lines, d, rate, theta

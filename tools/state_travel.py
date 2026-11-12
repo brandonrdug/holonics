@@ -145,7 +145,9 @@ def state(path):
     names = ["alphabet", "width", "heads", "modes", "still", "contacts", "ticks", "frames", "reach", "lanes"]
     d = {k: int(w) for k, w in zip(names, words[1:11])}
     assert words[0] != "hnn-field-v14k", "the carry founded at zero friction is retired (hnn-field-v14k): its states are receipts only"
-    d["carry"] = int(words[12]) if words[0] == "hnn-field-v14t" else 0
+    # The carry circles' count: hnn-field-v14e (the leak's log chart) and the retired hnn-field-v14t (its linear chart), read here as receipts
+    # (the same layout; only the leak's chart differs).
+    d["carry"] = int(words[12]) if words[0] in ("hnn-field-v14e", "hnn-field-v14t") else 0
     theta = np.array([int(x) for x in lines[2].split(" ")], dtype=np.int64)
     return d, theta
 

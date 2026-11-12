@@ -522,8 +522,8 @@ def graft_block_controls():
     print(f"state_travel graft by block: {len(blocks)} blocks, the controls hold")
 
 
-def write_carry(path, theta, second=None):
-    words = ["hnn-field-v14t"] + [str(DC[k]) for k in ("alphabet", "width", "heads", "modes", "still", "contacts", "ticks", "frames", "reach", "lanes")] + ["0", str(DC["carry"])]
+def write_carry(path, theta, second=None, head="hnn-field-v14e"):
+    words = [head] + [str(DC[k]) for k in ("alphabet", "width", "heads", "modes", "still", "contacts", "ticks", "frames", "reach", "lanes")] + ["0", str(DC["carry"])]
     with open(path, "w") as f:
         f.write("hnn-field-learner-v3 12 0 0 -\n" + " ".join(words) + "\n" + " ".join(str(int(x)) for x in theta) + "\n")
         if second is not None:
@@ -571,6 +571,11 @@ def carry_controls():
         (pair,) = [r for r in rows if "laps" in r and r["block"] == "carry_leak" and r["lane"] == "2"]
         assert laps[("carry_leak", "2")] > 0 and float(pair["cos"]) > 0.9999, (laps, pair)
         assert all(laps[k] == 0 for k in (("carry_leak", "1"), ("carry_turn", "1"), ("carry_turn", "2"), ("carry_bias_turn", "0"), ("carry_bias_leak", "0")))
+        # The leak's linear chart (hnn-field-v14t, retired November 12) reads as a receipt with the log chart's layout.
+        receipt = os.path.join(tmp, "receipt")
+        write_carry(receipt, base, second, head="hnn-field-v14t")
+        (d_t, theta_t), (d_e, theta_e) = state_travel.state(receipt), state_travel.state(paths[0])
+        assert d_t == d_e and (theta_t == theta_e).all(), "a linear chart's receipt reads with the same layout"
         # Graft: each half alone, and the four with every other family give the donor's material.
         b = base + rng.integers(1, 10, size=total)
         pa, pb, plain = os.path.join(tmp, "a"), os.path.join(tmp, "b"), os.path.join(tmp, "plain")

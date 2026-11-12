@@ -2177,6 +2177,49 @@ fn a_part_steps_at_its_own_rate_and_the_plain_rate_is_the_plain_deposit() {
     assert_eq!(stripped, grown_learner_text_of(&fast), "the state's other lines are a plain state's");
 }
 
+/// [measurement; theory, November 12, G96's third branch] **The predicted change by part is the total's partition**: a covector and a
+/// step on one part's entries alone give that part the total and every other part zero; on the grown learner with its parts at their
+/// own rates, each section's parts sum to its predicted change less at most one unit a family and part (the releases' floors), and a
+/// part that holds no entry reads zero; without parts' rates the reading still partitions, no contact new.
+#[test]
+fn the_predicted_change_by_part_is_its_totals_partition() {
+    let mut learner = grown_learner();
+    let mut octaves = [0u32; PARTS];
+    (octaves[0], octaves[1]) = (2, 3);
+    learner.rate_parts = Some(RateParts { contacts_before: 4, octaves });
+    let parts = learner.reading_parts();
+    assert_eq!(parts, learner.field.founded_parts(4));
+    // One part's entries alone: part 1 (the new a rows).
+    let n = parts.len();
+    let (mut g, mut step) = (vec![0i128; n], vec![0i128; n]);
+    for (i, &p) in parts.iter().enumerate() {
+        if p == 1 {
+            (g[i], step[i]) = (-(1i128 << 50) - i as i128, 3 << 20);
+        }
+    }
+    let total = predicted_change(&learner.field, &g, &step, 0).unwrap();
+    let by = predicted_parts(&learner.field, &g, &step, 0, &parts).unwrap();
+    assert!(total > 0, "a positive step (subtracted) on a negative covector raises the code at first order");
+    assert_eq!(by[1], total, "the one part holds the total");
+    assert!(by.iter().enumerate().all(|(p, &v)| p == 1 || v == 0), "every other part reads zero");
+    let families = learner.field.families_all().len() as i64;
+    let holds = |p: usize| parts.iter().any(|&q| if p == PARTS { q == OLD_PART } else { usize::from(q) == p });
+    for _ in 0..3 {
+        let receipt = learner.section(&[region()]).unwrap();
+        let (total, by) = (receipt.predicted.unwrap(), receipt.predicted_parts.unwrap());
+        let sum: i64 = by.iter().sum();
+        assert!(sum <= total && total - sum <= families * (PARTS as i64 + 1), "parts {sum} against the total {total}");
+        for (p, &v) in by.iter().enumerate() {
+            assert!(holds(p) || v == 0, "part {p} holds no entry and reads {v}");
+        }
+    }
+    let mut plain = grown_learner();
+    assert_eq!(plain.reading_parts(), plain.field.founded_parts(plain.field.declaration.contacts), "no parts' rates: no contact is new");
+    let receipt = plain.section(&[region()]).unwrap();
+    let (total, sum) = (receipt.predicted.unwrap(), receipt.predicted_parts.unwrap().iter().sum::<i64>());
+    assert!(sum <= total && total - sum <= families * (PARTS as i64 + 1));
+}
+
 /// The learner's text without its parts' rates (what a binary without them writes).
 fn grown_learner_text_of(learner: &FieldLearner) -> String {
     let mut plain = learner.clone();
@@ -2258,11 +2301,12 @@ fn circled_shaped(still: usize) -> Field {
     drawn(grown)
 }
 
-/// [definition; theory, November 11 17:25] **The carry circles' declaration**: `C` even and at most `f/2` is admitted; `C = 0` is the
-/// `hnn-field-v14` line exactly (twelve words), `C > 0` writes `hnn-field-v14t` with `C` its thirteenth word and round-trips; the retired carry's
-/// head (`hnn-field-v14k`) and a `v14t` head with no circle are refused.
+/// [definition; theory, November 11 17:25 and November 12] **The carry circles' declaration**: `C` even and at most `f/2` is admitted; `C = 0` is
+/// the `hnn-field-v14` line exactly (twelve words), `C > 0` writes `hnn-field-v14e` with `C` its thirteenth word and round-trips; the retired
+/// carries' heads (`hnn-field-v14k`, founded at zero friction, and `hnn-field-v14t`, the leak's linear chart) and a `v14e` head with no circle are
+/// refused.
 #[test]
-fn the_carry_circles_are_even_among_the_contacts_and_the_zero_friction_carry_is_retired() {
+fn the_carry_circles_are_even_among_the_contacts_and_the_retired_carries_are_refused() {
     let d = four_contacts(1);
     assert!(FieldDeclaration { carry: 2, ..d }.admit().is_ok() && FieldDeclaration { carry: 4, ..d }.admit().is_ok());
     assert!(FieldDeclaration { carry: 1, ..d }.admit().is_err(), "an odd count of circles");
@@ -2271,38 +2315,168 @@ fn the_carry_circles_are_even_among_the_contacts_and_the_zero_friction_carry_is_
     assert!(plain.starts_with("hnn-field-v14 ") && plain.split(' ').count() == 12);
     assert_eq!(FieldDeclaration::from_text(&plain).unwrap(), d);
     let circled = FieldDeclaration { carry: 2, ..d }.to_text();
-    assert!(circled.starts_with("hnn-field-v14t ") && circled.split(' ').count() == 13 && circled.ends_with(" 2"));
+    assert!(circled.starts_with("hnn-field-v14e ") && circled.split(' ').count() == 13 && circled.ends_with(" 2"));
     assert_eq!(FieldDeclaration::from_text(&circled).unwrap(), FieldDeclaration { carry: 2, ..d });
     let retired = format!("{} 1", plain.replacen("hnn-field-v14 ", "hnn-field-v14k ", 1));
     assert!(matches!(FieldDeclaration::from_text(&retired), Err(TowerError::Refused(m)) if m.contains("zero friction is retired")));
-    assert!(FieldDeclaration::from_text(&format!("{} 0", plain.replacen("hnn-field-v14 ", "hnn-field-v14t ", 1))).is_err());
+    let linear = circled.replacen("hnn-field-v14e ", "hnn-field-v14t ", 1);
+    assert!(matches!(FieldDeclaration::from_text(&linear), Err(TowerError::Refused(m)) if m.contains("linear chart is retired")));
+    assert!(FieldDeclaration::from_text(&format!("{} 0", plain.replacen("hnn-field-v14 ", "hnn-field-v14e ", 1))).is_err());
 }
 
-/// [definition; theory, November 11 17:25; `CarryGate.lean`] **The gate keeps its circle and its friction**: `(2^30, 0)` at `q = h = 0`; the turn
-/// alone is the Cayley tick (`q = 2` gives `i`, `q = −2` gives `−i`); `d = 1` halves it; `h` below zero is no friction; over a sweep of `q` and of
-/// `h` below, at and above zero `|γ|² ≤ 2^60` and `|γ|² (1 + d)² = 2^60`, each within the two releases' rounding; refused, typed, past the carriers.
+/// [definition; theory, November 11 17:25 and November 12, G96's third branch; `CarryGate.lean`] **The gate keeps its circle and its friction on
+/// the leak's log chart**: at `q = ℓ = 0` the founded friction `d = 2^14` (`1/4`) and the gate `2^32/5` to the nearest (`|γ| = 4/5`); the turn
+/// alone is the Cayley tick at that friction (`q = 2` gives `4i/5`); `ℓ = 2` gives `d = 1`, which halves the turn; each whole step of `ℓ` doubles
+/// the friction, and from `ℓ = −14` down it keeps one grain; over a sweep of `q` and `ℓ` the friction is monotone in `ℓ`, stands between
+/// `d₀ 2^⌊ℓ⌋` and `d₀ 2^(⌊ℓ⌋+1)`, a step of `ℓ` by one doubles it within a grain, and `|γ|² (1 + d)² = 2^60` within the releases' rounding;
+/// refused, typed, past the carriers.
 #[test]
 fn the_carry_gate_keeps_its_circle_and_its_friction() {
-    assert_eq!(carry_gate(0, 0).unwrap(), ((1 << 30, 0), 0));
-    assert_eq!(carry_gate(2 << 16, 0).unwrap().0, (0, 1 << 30), "the Cayley step of i at q = 2");
-    assert_eq!(carry_gate(-(2 << 16), 0).unwrap().0, (0, -(1 << 30)));
-    assert_eq!(carry_gate(0, 1 << 16).unwrap(), ((1 << 29, 0), 1 << 16), "a friction of one halves the gate");
-    for q in [0i128, 1 << 16, -(1 << 16), 3 << 15, 5 << 16, 123_456, -78_901, 1 << 30, -(1 << 38), 1]{
-        for h in [-(1i128 << 20), -1, 0, 1, 1 << 16, 7 << 16, 123_457, 1 << 30, (1 << 47) - 1] {
-            let ((re, im), d) = carry_gate(q, h).unwrap();
-            assert_eq!(d, h.max(0));
+    let exp = Exponential::new(FACE_BITS);
+    let gate = |q: i128, l: i128| carry_gate(&exp, q, l);
+    assert_eq!(gate(0, 0).unwrap(), ((858_993_459, 0), 1 << 14), "founded: the near field's friction, 1/4");
+    assert_eq!(gate(2 << 16, 0).unwrap().0, (0, 858_993_459), "the Cayley step of i at q = 2, at the founded friction");
+    assert_eq!(gate(-(2 << 16), 0).unwrap().0, (0, -858_993_459));
+    assert_eq!(gate(0, 2 << 16).unwrap(), ((1 << 29, 0), 1 << 16), "ℓ = 2: a friction of one halves the turn");
+    for k in -40i128..=32 {
+        assert_eq!(gate(0, k << 16).unwrap().1, if k >= -14 { 1 << (14 + k) } else { 1 }, "ℓ = {k}: each whole step doubles the friction, and one grain is its floor");
+    }
+    let friction = |l: i128| gate(0, l).unwrap().1;
+    let mut previous = friction(-(40 << 16));
+    for l in (-(40i128 << 16)..(32 << 16)).step_by(4_099) {
+        let d = friction(l);
+        assert!(d >= previous, "ℓ {l}: the friction is monotone in its chart");
+        previous = d;
+        let a = l >> 16;
+        let (low, high) = if a >= -14 { (1i128 << (14 + a), 1i128 << (15 + a)) } else { (1, 1) };
+        assert!(low <= d && d <= high.max(1), "ℓ {l}: d {d} between d₀ 2^⌊ℓ⌋ and d₀ 2^(⌊ℓ⌋+1)");
+        if a >= -14 && a < 31 {
+            assert!((friction(l + (1 << 16)) - 2 * d).abs() <= 1, "ℓ {l}: one more step doubles the friction within a grain");
+        }
+    }
+    for q in [0i128, 1 << 16, -(1 << 16), 3 << 15, 5 << 16, 123_456, -78_901, 1 << 30, -(1 << 38), 1] {
+        for l in [-(1i128 << 22), -(15 << 16), -1, 0, 1, 1 << 16, 7 << 16, 123_457, (32 << 16) + 65_535] {
+            let ((re, im), d) = gate(q, l).unwrap();
+            assert!(d >= 1 && d < 1 << 47, "q {q} ℓ {l}: d {d} keeps its grain and its carrier");
             let norm = i128::from(re) * i128::from(re) + i128::from(im) * i128::from(im);
-            assert!(norm <= (1 << 60) + (1 << 32), "q {q} h {h}: |γ|² {norm}");
+            assert!(norm < 1 << 60, "q {q} ℓ {l}: |γ|² {norm} under one, strictly");
             let one = (1i128 << 16) + d;
             let expected = (1i128 << 92) / (one * one);
-            assert!((norm - expected).abs() <= 1 << 32, "q {q} h {h}: |γ|² {norm} against {expected}");
-            if h < 0 {
-                assert_eq!(carry_gate(q, h).unwrap(), carry_gate(q, 0).unwrap(), "no friction below zero");
+            assert!((norm - expected).abs() <= 1 << 32, "q {q} ℓ {l}: |γ|² {norm} against {expected}");
+        }
+    }
+    assert!(gate(1 << 39, 0).is_err() && gate(-(1 << 39), 0).is_err(), "the turn's carrier");
+    assert!(gate(0, 33 << 16).is_err() && gate(0, (33 << 16) - 1).is_ok(), "the friction's carrier, 2^47 at ℓ = 33");
+    assert!(gate(0, i128::from(i64::MAX) + 1).is_err(), "a leak read past 64 bits");
+}
+
+/// [definition; theory, November 12, G96's third branch; `CarryGate.lean`, `leak_hasDerivAt`] **The gate's return reads the leak chart's
+/// derivative at every read**: with a fixed `δγ`, `δℓ = ln 2 · d · δd` where `δd = −Re(conj(γ) δγ)/(1 + d)`: against that product read at the
+/// friction's word, within a part in `2^10` wherever the word holds at least 64 grains; below the floor the chart's own derivative stands,
+/// nonzero and under the floor's (`2^ℓ` smaller).
+#[test]
+fn the_gates_return_reads_the_leak_charts_derivative() {
+    let exp = Exponential::new(FACE_BITS);
+    let dgamma = (-(3i64 << 40), 5i64 << 38);
+    let ln2 = ln2_face();
+    for l in [-(20i128 << 16), -(16 << 16), -(8 << 16), -(3 << 16) - 4_321, -1, 0, 1, 12_345, 1 << 16, (5 << 16) + 777, 20 << 16] {
+        let q = 3 << 15;
+        let (gamma, d) = carry_gate(&exp, q, l).unwrap();
+        let ((_, dl), db) = carry_gate_return(&exp, gamma, dgamma, (0, 0), (0, 0), q, l).unwrap();
+        assert_eq!(db, (0, 0), "ℓ {l}: no charge's covector, no drive's");
+        let (yr, yi, dr, di) = (i128::from(gamma.0), i128::from(gamma.1), i128::from(dgamma.0), i128::from(dgamma.1));
+        let re = release(yr * dr + yi * di, GAMMA_BITS);
+        let dd = -div_nearest(re << 16, (1i128 << 16) + d);
+        let at_word = release(release(dd * ln2, LN2_FACE_BITS) * d, 16);
+        assert!(dl != 0, "ℓ {l}: the covector stands at every read");
+        assert_eq!(dl.signum() as i128, at_word.signum(), "ℓ {l}: the covector's sign is the friction's");
+        if d >= 64 {
+            assert!((i128::from(dl) - at_word).abs() <= at_word.abs() / 1024 + 1, "ℓ {l}: δℓ {dl} against ln 2 · d · δd {at_word}");
+        } else if l < -(14 << 16) {
+            assert!(i128::from(dl).abs() < at_word.abs(), "ℓ {l}: below the floor the chart's own derivative, under the floor's");
+        }
+    }
+}
+
+/// [definition; theory, November 12, G98; `CarryGate.lean`, `coupling_leak_zero`, `gate_and_coupling`, `charge_le`, `coupling_hasDerivAt`]
+/// **The drive is charged through the leak**: the coupling `κ = N₀ d/(1 + d)` is `2^30` at the founded friction, so there the coupled drive is
+/// the drive bit for bit and the coupled scan is the sum form's; `κ` is monotone in the friction and under `N₀`, and with the gate `|γ| + κ/N₀`
+/// is one within two grains; along a strand of the reach's sites under a constant drive (a turn of zero and of one), the coupled charge stays
+/// within `N₀` places' drive and a grain a place of the circle's group, at the friction's floor, its founding and far above it, where the sum
+/// form's charge at the floor passes 3,000 places' drive. With no `δγ` the gate's return carries the coupling alone: `δb = κ u`; `∂κ/∂d =
+/// N₀/(1 + d)²` against the coupling's central difference within a part in `2^6`; and `δℓ = ln 2 · d · δd_κ` against that product read at the
+/// friction's word within a part in `2^10` wherever the word holds at least 64 grains, of `Re(conj(b) u)`'s sign.
+#[test]
+fn the_drive_is_charged_through_the_leak() {
+    let exp = Exponential::new(FACE_BITS);
+    assert_eq!(CARRY_GROUP_FOUNDING, 5);
+    let founded = carry_coupling(i128::from(CARRY_LEAK_FOUNDING));
+    assert_eq!(founded, 1 << 30, "the coupling is one at the founding");
+    for b in [0i64, 1, -1, 12_345, -98_765, 1 << 40, -(1 << 40) + 7, i64::MAX >> 3] {
+        assert_eq!(carry_drive(founded, b).unwrap(), b, "founded, the coupled drive is the drive bit for bit");
+    }
+    let mut previous = 0i128;
+    for l in (-(40i128 << 16)..(32 << 16)).step_by(4_099) {
+        let ((re, im), d) = carry_gate(&exp, 0, l).unwrap();
+        let kappa = carry_coupling(d);
+        assert!(kappa >= previous && kappa < 5 << 30, "ℓ {l}: κ {kappa} monotone in the friction and under N₀");
+        previous = kappa;
+        assert_eq!(im, 0, "ℓ {l}: no turn");
+        assert!((i128::from(re) + kappa / 5 - (1 << 30)).abs() <= 2, "ℓ {l}: |γ| {re} and κ/N₀ {} sum to one", kappa / 5);
+    }
+    // A strand of the reach's sites under a constant drive.
+    let b = 1i64 << 20;
+    let strand = |q: i128, l: i128, coupled: bool| -> i128 {
+        let ((yr, yi), d) = carry_gate(&exp, q, l).unwrap();
+        let (yr, yi) = (i128::from(yr), i128::from(yi));
+        let drive = i128::from(if coupled { carry_drive(carry_coupling(d), b).unwrap() } else { b });
+        let (mut qr, mut qi, mut most) = (0i128, 0i128, 0i128);
+        for _ in 0..3_771 {
+            (qr, qi) = (drive + release(yr * qr - yi * qi, GAMMA_BITS), release(yr * qi + yi * qr, GAMMA_BITS));
+            most = most.max(((qr * qr + qi * qi) as u128).isqrt() as i128);
+        }
+        most
+    };
+    for q in [0i128, 1 << 16] {
+        for l in [-(20i128 << 16), -(14 << 16), -(3 << 16), 0, 3 << 16, 10 << 16, 30 << 16] {
+            let most = strand(q, l, true);
+            assert!(most <= 5 * i128::from(b) + (1 << 16) + 1, "q {q} ℓ {l}: the coupled charge {most} within N₀ places' drive");
+        }
+        assert_eq!(strand(q, 0, true), strand(q, 0, false), "q {q}: founded, the coupled scan is the sum form's");
+    }
+    assert!(strand(0, -(20 << 16), false) > 3_000 * i128::from(b), "the sum form's charge at the floor passes 3,000 places' drive");
+    // The coupling's derivative in the friction.
+    for d in [64i128, 1 << 10, 1 << 14, 1 << 16, 1 << 20, 1 << 30] {
+        let step = (d / 64).max(1);
+        let difference = (carry_coupling(d + step) - carry_coupling(d - step)) / (2 * step);
+        let one = (1i128 << 16) + d;
+        let expected = div_nearest(5i128 << 46, one * one);
+        assert!((difference - expected).abs() <= expected / 64 + 1, "d {d}: ∂κ/∂d {difference} against N₀/(1 + d)² {expected}");
+    }
+    // The gate's return with no δγ: the coupling alone.
+    let ln2 = ln2_face();
+    let drive = (7i64 << 30, -(3i64 << 30));
+    for du in [(5i64 << 36, 11i64 << 34), (-(9i64 << 33), 2i64 << 37)] {
+        for l in [-(20i128 << 16), -(10 << 16) - 321, -(3 << 16), -1, 0, 7_777, 4 << 16, (12 << 16) + 99] {
+            let q = 3 << 15;
+            let (gamma, d) = carry_gate(&exp, q, l).unwrap();
+            let kappa = carry_coupling(d);
+            let ((dq, dl), db) = carry_gate_return(&exp, gamma, (0, 0), drive, du, q, l).unwrap();
+            assert_eq!(dq, 0, "ℓ {l}: with no δγ the turn has no covector");
+            assert_eq!(db, (carry_drive(kappa, du.0).unwrap(), carry_drive(kappa, du.1).unwrap()), "ℓ {l}: δb = κ u");
+            let w = release(i128::from(drive.0) * i128::from(du.0) + i128::from(drive.1) * i128::from(du.1), FACE_BITS);
+            let one = (1i128 << 16) + d;
+            let ddk = div_nearest((5 * w) << 32, one * one);
+            let at_word = release(release(ddk * ln2, LN2_FACE_BITS) * d, 16);
+            assert!(dl != 0, "ℓ {l}: the coupling's covector stands at every read");
+            assert_eq!(dl.signum() as i128, w.signum(), "ℓ {l}: the drive's covector pulls the leak its own way");
+            if d >= 64 {
+                assert!((i128::from(dl) - at_word).abs() <= at_word.abs() / 1024 + 1, "ℓ {l}: δℓ {dl} against ln 2 · d · δd_κ {at_word}");
+            } else if l < -(14 << 16) {
+                assert!(i128::from(dl).abs() < at_word.abs(), "ℓ {l}: below the floor the chart's own derivative, under the floor's");
             }
         }
     }
-    assert!(carry_gate(1 << 39, 0).is_err() && carry_gate(-(1 << 39), 0).is_err(), "the turn's carrier");
-    assert!(carry_gate(0, 1 << 47).is_err() && carry_gate(0, (1 << 47) - 1).is_ok(), "the friction's carrier");
 }
 
 /// [definition; theory, November 11 17:25] **A growth by carry circles keeps every face and returns through its circles**: on a field with every
@@ -2323,8 +2497,8 @@ fn a_growth_by_carry_circles_keeps_every_face_and_returns_through_its_circles() 
         let (dw, f) = (d.width, d.contacts);
         let circle_columns: Vec<usize> = (4..6).flat_map(|e| [e, f / 2 + e]).collect();
         assert!(circle_columns.iter().all(|&e| (0..dw).all(|r| grown.theta[l.w + r * f + e] == 0)), "the circles' W columns at zero");
-        assert!(grown.theta[l.carry + 2 * dw..l.carry + 4 * dw].iter().all(|&v| v == 0) && grown.theta[l.carry_bias..l.carry_bias + 2].iter().all(|&v| v == 0), "the leak rows and the turn's biases at zero");
-        assert!(grown.theta[l.carry_bias + 2..l.carry_bias + 4].iter().all(|&v| v == CARRY_LEAK_FOUNDING) && CARRY_LEAK_FOUNDING == 1 << 14, "the leak's biases at the near field's friction, 1/4");
+        assert!(grown.theta[l.carry + 2 * dw..l.carry + 4 * dw].iter().all(|&v| v == 0) && grown.theta[l.carry_bias..l.carry_bias + 4].iter().all(|&v| v == 0), "the leak rows and both biases at zero: the leak's chart founded at its zero");
+        assert_eq!(CARRY_LEAK_FOUNDING, 1 << 14, "the chart's zero is the near field's friction, 1/4");
         assert!(grown.theta[l.carry..l.carry + 2 * dw].iter().any(|&v| v != 0), "the turn rows drawn");
         let g = covector_of(&grown, &region());
         assert!(circle_columns.iter().any(|&e| (0..dw).any(|r| g[l.w + r * f + e] != 0)), "still {still}: the circles' W columns have a covector");
@@ -2366,9 +2540,10 @@ fn a_growth_by_carry_circles_keeps_every_face_and_returns_through_its_circles() 
     assert_eq!(learner.to_text().lines().find(|l| l.starts_with("parts ")).unwrap().split(' ').count(), 2 + written_parts(0).len(), "a field without carry circles writes nineteen: the plain sixteen and the first lane's letter rows");
 }
 
-/// [definition; theory, November 11 17:25] **The carry circles' scan is the law, site by site in strand order**: on a drawn field with two
-/// circles, at every tick each plain contact is the built pair contact with its strand mate, each circle's gate is [`carry_gate`] of its charts'
-/// reads, and the circle's `p(t) = a(t) Qm(t)`, `Q(t) = b(t) + γ(t) Qm(t)` hold exactly in its strand order. With the current, the pair's
+/// [definition; theory, November 11 17:25 and November 12 (G98)] **The carry circles' scan is the law, site by site in strand order**: on a drawn
+/// field with two circles, at every tick each plain contact is the built pair contact with its strand mate, each circle's gate is [`carry_gate`] of
+/// its charts' reads and its drive the pair's `b` coupled through the same leak ([`carry_coupling`]), and the circle's `p(t) = a(t) Qm(t)`,
+/// `Q(t) = κ(t) b(t) + γ(t) Qm(t)` hold in its strand order. With the current, the pair's
 /// return and the moment's chart at zero (so the pair chart is the opening's), a left circle's pair at `t` reads the class of site `t − 4`, a
 /// right circle's that of `t + 3` (`t + 4` is the region's open site, which carries no word), and a plain contact's reads neither.
 #[test]
@@ -2414,8 +2589,11 @@ fn the_carry_circles_scan_is_the_law_site_by_site() {
                 assert_eq!((cell.c[tt * f + e] as i128, cell.c[tt * f + half + e] as i128), (release(ar * br - ai * bi, FACE_BITS), release(ar * bi + ai * br, FACE_BITS)), "tick {tick} site {tt} plain contact {e}");
             }
             for k in 0..c {
-                let (gamma, _) = carry_gate(cell.qh[tt * c2 + k] as i128, cell.qh[tt * c2 + c + k] as i128).unwrap();
+                let (gamma, friction) = carry_gate(&base.exponential, cell.qh[tt * c2 + k] as i128, cell.qh[tt * c2 + c + k] as i128).unwrap();
                 assert_eq!((cell.gam[tt * c2 + k], cell.gam[tt * c2 + c + k]), gamma, "tick {tick} site {tt} circle {k}'s gate");
+                let (kappa, e) = (carry_coupling(friction), plain + k);
+                let drive = (carry_drive(kappa, cell.b[tt * f + e]).unwrap(), carry_drive(kappa, cell.b[tt * f + half + e]).unwrap());
+                assert_eq!((cell.kb[tt * c2 + k], cell.kb[tt * c2 + c + k]), drive, "tick {tick} site {tt} circle {k}'s drive, coupled through its leak");
             }
         }
         for k in 0..c {
@@ -2427,29 +2605,25 @@ fn the_carry_circles_scan_is_the_law_site_by_site() {
                 let (ar, ai) = (cell.a[tt * f + e] as i128, cell.a[tt * f + half + e] as i128);
                 assert_eq!((cell.c[tt * f + e] as i128, cell.c[tt * f + half + e] as i128), (release(ar * qr - ai * qi, FACE_BITS), release(ar * qi + ai * qr, FACE_BITS)), "tick {tick} site {tt} circle {k}");
                 let (yr, yi) = (i128::from(cell.gam[tt * c2 + k]), i128::from(cell.gam[tt * c2 + c + k]));
-                (qr, qi) = (cell.b[tt * f + e] as i128 + release(yr * qr - yi * qi, GAMMA_BITS), cell.b[tt * f + half + e] as i128 + release(yr * qi + yi * qr, GAMMA_BITS));
+                (qr, qi) = (cell.kb[tt * c2 + k] as i128 + release(yr * qr - yi * qi, GAMMA_BITS), cell.kb[tt * c2 + c + k] as i128 + release(yr * qi + yi * qr, GAMMA_BITS));
             }
         }
     }
 }
 
-/// [definition; theory, November 11 17:25] **The carry circles' adjoint agrees with its code's central difference** on a drawn field with two
-/// circles (ticks two, three fixtures), their charts, biases and `W` columns off zero and `h` below zero on some sites and above on others: each family's three
-/// entries with the largest covectors (the circles' charts and biases, `a`, `b` and `W` among them) against the code's difference
-/// ([`the_laned_fields_covector_matches_its_codes_difference`]'s probe law), the circles' charts and biases read at least once each. The
-/// friction's `max(0, h)` is a seam like a class sheet: the covector is its right derivative at `0`, and a probe that carries an `h` across zero
-/// is halved off it (measured on this fixture: a site's `h` at `32` on `2^(−16)` read `−73` against `−74` predicted at a step of 16, and `−367`
-/// against `−590` at 128, where one side of the step loses its friction).
+/// [definition; theory, November 11 17:25 and November 12 (G98)] **The carry circles' adjoint agrees with its code's central difference** on a
+/// drawn field with two circles (ticks two, three fixtures), their charts, biases and `W` columns off zero and the leak `ℓ` below zero on some sites
+/// and above on others (so the drive's coupling `κ` stands off one and its covector is read through `b` and `ℓ`): each family's three entries with
+/// the largest covectors (the circles' charts and biases, `a`, `b` and `W` among them) against
+/// the code's difference ([`the_laned_fields_covector_matches_its_codes_difference`]'s probe law), the circles' charts and biases read at least
+/// once each. On the leak's log chart the friction has no seam where it moves (the linear chart's `max(0, h)` had one at zero); the friction's
+/// floor of one grain stands at `ℓ < −14`, which no read of this fixture reaches.
 #[test]
 fn the_carry_circles_covector_matches_its_codes_difference() {
-    // The seams: the class sheets, and the friction's `max(0, h)` (each site's and circle's `h ≥ 0` at every tick), whose one-sided slope the
-    // covector reads; a probe that moves an `h` across zero straddles a seam.
+    // The seams: the class sheets.
     let sheets = |field: &Field, r: &Region| -> Vec<Vec<u32>> {
         let pass = field.pass(r, true).unwrap();
-        let (c, c2) = (field.declaration.carry, 2 * field.declaration.carry);
-        let classes = pass.ticks.iter().flat_map(|c| c.classes.iter().map(|l| l.off.iter().chain(&l.members).copied().chain(l.probes.iter().flat_map(|p| std::iter::once(u32::MAX).chain(p.iter().copied()))).collect()));
-        let friction = pass.ticks.iter().map(|cell| (0..cell.qh.len() / c2.max(1)).flat_map(|t| (0..c).map(move |k| u32::from(cell.qh[t * c2 + c + k] >= 0))).collect());
-        classes.chain(friction).collect()
+        pass.ticks.iter().flat_map(|c| c.classes.iter().map(|l| l.off.iter().chain(&l.members).copied().chain(l.probes.iter().flat_map(|p| std::iter::once(u32::MAX).chain(p.iter().copied()))).collect())).collect()
     };
     let (mut read, mut seams, mut charts_read, mut biases_read) = (0usize, 0usize, 0usize, 0usize);
     let (mut below, mut above) = (0usize, 0usize);
@@ -2459,8 +2633,9 @@ fn the_carry_circles_covector_matches_its_codes_difference() {
         let (c, c2) = (field.declaration.carry, 2 * field.declaration.carry);
         let pass = field.pass(&r, true).unwrap();
         let leaks: Vec<i64> = pass.ticks.iter().flat_map(|cell| (0..CLASSES.len()).flat_map(move |t| (0..c).map(move |k| cell.qh[t * c2 + c + k]))).collect();
-        below += leaks.iter().filter(|&&h| h < 0).count();
-        above += leaks.iter().filter(|&&h| h > 0).count();
+        below += leaks.iter().filter(|&&l| l < 0).count();
+        above += leaks.iter().filter(|&&l| l > 0).count();
+        assert!(leaks.iter().all(|&l| l >= -(14 << 16)), "still {still}: no read at the friction's floor, so the chart is smooth over the fixture");
         let g = covector_of(&field, &r);
         let l = field.layout.clone();
         assert!(g[l.carry..l.carry + c2 * field.declaration.width].iter().any(|&v| v != 0), "still {still}: the circles' charts have a covector");
@@ -2493,8 +2668,8 @@ fn the_carry_circles_covector_matches_its_codes_difference() {
             }
         }
     }
-    eprintln!("CARRY_COVECTOR_PROBES read={read} on_a_seam={seams} charts={charts_read} biases={biases_read} h_below={below} h_above={above}");
-    assert!(below > 0 && above > 0, "friction on some sites and none on others: {below} below zero, {above} above");
+    eprintln!("CARRY_COVECTOR_PROBES read={read} on_a_seam={seams} charts={charts_read} biases={biases_read} leak_below={below} leak_above={above}");
+    assert!(below > 0 && above > 0, "the friction below its founding on some sites and above on others: {below} below zero, {above} above");
     assert!(read > 0 && 16 * seams <= read && charts_read > 0 && biases_read > 0, "read {read} probes, {seams} on a seam, {charts_read} of the charts, {biases_read} of the biases");
 }
 
@@ -2692,9 +2867,9 @@ fn the_parallel_settle_certifies_every_pass_and_rests() {
 
 
 /// [measurement; theory, November 11 18:33, part P2; the founding of 19:56, G85] **The carry circles' gates, read**: on a drawn field grown by two
-/// carry circles (founded: the leak rows at zero and the leak's bias at `1/4`), every (open site, tick) read has `h = 1/4`, so `d = 1/4` and
-/// `|γ| = 4/5`, `2^32/5` on `2^(−30)` within the rounding of its two parts, and `h ≥ 0` counts every read; a moved leak row turns some reads
-/// below zero and closes their count; the read changes no face.
+/// carry circles (founded: the leak rows and the leak's bias at zero), every (open site, tick) read has `ℓ = 0`, so `d = 1/4` and `|γ| = 4/5`,
+/// `2^32/5` on `2^(−30)` within the rounding of its two parts, and `ℓ ≥ 0` (the friction at its founding or above) counts every read; a moved
+/// leak row turns some reads below zero and closes their count; the read changes no face.
 #[test]
 fn the_carry_circles_gates_are_read_from_the_forwards_own_cells() {
     let plain = shaped_with(four_contacts(1));
@@ -2705,25 +2880,26 @@ fn the_carry_circles_gates_are_read_from_the_forwards_own_cells() {
     let open = OPEN.iter().filter(|&&u| u).count() as u64;
     assert_eq!(gates.reads, open * grown.declaration.ticks as u64);
     for k in 0..2 {
-        assert_eq!(gates.friction[k], gates.reads, "founded, every leak read stands at 1/4");
+        assert_eq!(gates.friction[k], gates.reads, "founded, every leak read stands at its zero, the friction at 1/4");
         let mean = gates.modulus[k] / u128::from(gates.reads);
         assert!(mean.abs_diff(858_993_459) <= 2, "circle {k}: |γ| = 4/5 to the grain, {mean}");
     }
     assert_eq!(grown.faces(&r).unwrap(), faces, "the read changes no face");
-    // A leak row moved below zero at every coordinate's sign: some reads lose their friction count.
+    // A leak row moved at every coordinate's sign: some reads fall below the founding and leave the count.
     let (l, dw) = (grown.layout.clone(), grown.declaration.width);
     for j in 0..dw {
         grown.theta[l.carry + 2 * dw + j] = if j % 2 == 0 { -(1 << 24) } else { 1 << 24 };
     }
     let moved = grown.carry_gates_of(&r).unwrap();
     assert_eq!(moved.reads, gates.reads);
-    assert!(moved.friction[0] < moved.reads, "a moved leak row closes some reads' friction");
+    assert!(moved.friction[0] < moved.reads, "a moved leak row takes some reads below the founded friction");
 }
 
-/// [measurement; theory, November 12, G90's first branch] **The carry circles' leaks and charges, read**: on a drawn field grown by two carry
-/// circles ([`circled_shaped`]), with circle 0's leak row moved so that some reads fall below zero, [`Field::carry_leaks`] over each tick's pair chart gives every
-/// site's leak read as the forward's own cell holds it (`qh`), and its charge after the site as the scan's value before the next site in scan
-/// order (`qm`, even contacts from the left and odd from the right); a field without circles refuses.
+/// [measurement; theory, November 12, G90's first branch and G96's third] **The carry circles' leaks and charges, read**: on a drawn field
+/// grown by two carry circles ([`circled_shaped`]), with circle 0's leak row moved so that some reads fall below zero (the friction below its
+/// founding on the leak's log chart), [`Field::carry_leaks`] over each tick's pair chart gives every site's leak read `ℓ` as the forward's own
+/// cell holds it (`qh`), and its charge after the site as the scan's value before the next site in scan order (`qm`, even contacts from the
+/// left and odd from the right); a field without circles refuses.
 #[test]
 fn the_carry_circles_leaks_and_charges_are_the_forwards_own() {
     let mut field = circled_shaped(1);
@@ -2737,13 +2913,13 @@ fn the_carry_circles_leaks_and_charges_are_the_forwards_own() {
     let c2 = 2 * circles;
     let (mut below, mut charged) = (0usize, 0usize);
     for cell in &pass.ticks {
-        let (h, charge) = field.carry_leaks(&cell.read2).unwrap();
+        let (leak, charge) = field.carry_leaks(&cell.read2).unwrap();
         let sites = cell.read2.len() / dw;
-        assert_eq!((h.len(), charge.len()), (sites * circles, sites * circles));
+        assert_eq!((leak.len(), charge.len()), (sites * circles, sites * circles));
         for t in 0..sites {
             for k in 0..circles {
-                assert_eq!(h[t * circles + k], cell.qh[t * c2 + circles + k], "site {t} circle {k}: the leak read is the forward's");
-                below += usize::from(h[t * circles + k] < 0);
+                assert_eq!(leak[t * circles + k], cell.qh[t * c2 + circles + k], "site {t} circle {k}: the leak read is the forward's");
+                below += usize::from(leak[t * circles + k] < 0);
                 let next = if (first + k) % 2 == 0 { t + 1 } else { t.wrapping_sub(1) };
                 if next < sites {
                     let (qr, qi) = (i128::from(cell.qm[next * c2 + k]), i128::from(cell.qm[next * c2 + circles + k]));
