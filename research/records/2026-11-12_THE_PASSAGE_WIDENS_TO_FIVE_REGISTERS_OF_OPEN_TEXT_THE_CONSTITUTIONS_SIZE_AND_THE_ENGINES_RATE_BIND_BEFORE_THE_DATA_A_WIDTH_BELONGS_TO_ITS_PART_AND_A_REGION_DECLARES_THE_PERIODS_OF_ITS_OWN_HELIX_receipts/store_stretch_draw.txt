@@ -1,0 +1,11 @@
+# store_stretch_draw, 2026-11-12 UTC: store_stretch_census.py --draw 100000 --bound 7596293261 --site-octets 77766 (a cloud host, one thread, 4.5 s;
+# arithmetic on drawn integers, no passage, no card). The bound is nine tenths of te7's peak store (8,440,325,846 octets, one batch of its card);
+# the octets a site are read_octets' at 257 classes (71,486 at 100 classes and 40 a class more), the most an alphabet of bytes and the void takes.
+STRETCH_BOUND octets=7596293261 pair_octets=280 site_octets=77766 pairs=15606223 sites=41490
+STRETCH_LAW octaves=7 least=4 mean_sites_millis=216714 mean_squared=81515 pairs_a_site_millis=376144
+STRETCH_KIND kind=mask_run regions=25061 sites=5428082 domain=2746559 squared=2039006636 open=922017 pairs_open=197595126 pairs_near=40743680
+STRETCH_KIND kind=mask_whole regions=24989 sites=5446005 domain=5428858 squared=2054937855 open=1805517 pairs_open=271727191 pairs_near=28756156
+STRETCH_KIND kind=writer regions=49950 sites=10805610 domain=4327536 squared=4050070134 open=4327536 pairs_open=574198805 pairs_near=62387018
+STRETCH_DRAW stretches=100000 regions=100000 sites=21679697 domain=12502953 squared=8144014625 open=7055070 pairs_open=1043521122 pairs_near=131886854 mean_sites_millis=216796 mean_squared=81440 open_ppm=325422 pairs_least_a_site_millis=54216
+STRETCH_PRICE at_the_code_lines_rates site_us=8.746 pairs_us=3.251 sum_us=11.997 bytes_a_second=83354
+STRETCH_SECTIONS pairs_bound=15606223 sites_bound=41490 sections=537 regions_a_section_millis=186219 sites_a_section=40371

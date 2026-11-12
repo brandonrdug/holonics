@@ -53,7 +53,10 @@ Read before any guess is fixed on this plan (the method's rule).
 - **The passage now.** `flytech/python-codes-25k`: 24,557 trained problems, about 11.6 MB, read as
   16.5 million sites a lap; 128 held problems, 43,470 places. te7's lap on the card took 1,268 s:
   about 13,000 sites, or 9.2 KB of passage, a second (the circle line's thread, 16:20Z and 16:35Z;
-  G112, PR #714). The state holds 80,182 entries of material (`FIELD_GROW_CARRY … drawn=175104
+  G112, PR #714). [Corrected November 12, 18:30Z: these sites are the lap lines' weighed domains.
+  The card computes 76.3 million sites a lap, 60,180 a second, 0.704 of them in the openings'
+  whole rooms ([the record on the opening's room](2026-11-12_A_LAPS_CARD_TIME_STANDS_IN_THE_OPENINGS_EMPTY_ROOM_A_LAP_LINES_SITES_ARE_WEIGHED_DOMAINS_A_STRETCH_OF_A_DOCUMENT_TAKES_ONE_KEYED_STATE_AND_EVERY_EXTENT_OF_THE_DECLARATION_IS_GIVEN_ITS_PART.md)).
+  The rate in bytes stands.] The state holds 80,182 entries of material (`FIELD_GROW_CARRY … drawn=175104
   material=80182`, the turn carry's receipts; by block in §4.1). The card stands at 10.6 GB of the
   12 GB it is allowed, which is its allocator's budget and no measure of the constitution (§4.1).
 - **Trained against unseen.** At te6's lap mean the attempt codes 128 trained problems at 1.621620
@@ -139,7 +142,8 @@ Two readings of §2 decide the amount.
   more material of the same kind can buy at the same size] So more code of this kind buys about
   0.05 nats a place at most. The level is set by the constitution's size and the built law.
 - **Rate.** At 9.2 KB of passage a second, one pass over 1 GB takes about 30 hours and one over
-  50 GB about two months.
+  50 GB about two months. [This is the code line's trainer, whose openings compute their whole
+  rooms; the store's trainer holds no room, and its rate is fixed as G115 before its build.]
 
 So the widened passage buys breadth and a legible read at once, and it buys level only where the
 field grows, part by part, at the parts whose lack a reading names (§4.1). The card's memory does
@@ -208,7 +212,10 @@ modes), 128 pair contacts of which 32 complex contacts are carry circles, four t
 - 71,486 octets a site in carriers. Of these 6,400 follow the width `D` (100 a coordinate) and
   15,360 follow the contacts.
 - At a mean problem (672 sites) the pairs are 188,160 octets a site, 0.725 of the whole, and the
-  width's share is 0.025. A region at the reach takes 4.25 GB, 0.937 of it pairs. A 514-site window
+  width's share is 0.025. [Corrected November 12, 18:30Z: 672 is the lap lines' count over a lap's
+  problems, and no region has that mean. A mask's or a writer's region is 458 sites on the mean
+  and an opening 2,188; over a lap's regions as the card computes them the pairs hold 0.872 of the
+  reservation, the openings' rooms 0.886 of the pairs.] A region at the reach takes 4.25 GB, 0.937 of it pairs. A 514-site window
   of §5 takes 143,920 a site in pairs.
 - The board's 10.6 GB is the budget: the allocator opens with 12 GiB less what the desktop holds
   and a 1 GiB margin, cuts batches at four fifths of it, and keeps freed buffers until the budget

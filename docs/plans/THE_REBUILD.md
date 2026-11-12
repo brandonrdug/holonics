@@ -143,17 +143,22 @@ references and no write is yet ordered text.
    [the passage record](../../research/records/2026-11-12_THE_PASSAGE_WIDENS_TO_FIVE_REGISTERS_OF_OPEN_TEXT_THE_CONSTITUTIONS_SIZE_AND_THE_ENGINES_RATE_BIND_BEFORE_THE_DATA_A_WIDTH_BELONGS_TO_ITS_PART_AND_A_REGION_DECLARES_THE_PERIODS_OF_ITS_OWN_HELIX.md)).
    In order, each step with its receipt: the census of directions by block from the line's saved
    lap means (scored November 12: both parts missed, every block's travel fills the directions it
-   has, and it sizes no lane); the contact's arithmetic read term by term for the widths its terms
-   need, and what a row meets read at the contact's law (the timing read's rule: the contact
-   family holds 0.547 of kernel time, and the card meets about 11,700 pairs a site); the face as a
-   composition of lanes, each block reading its own, entering the line by reproducing its lap at
-   `(32, 32)`; the pair store on its support (item 2), since the card holds 280 octets a pair of
-   sites against 71,486 a site; the fetch of the wider passage as a store of whole documents (five
-   slices of Common Corpus, held documents from the far end of the shard order); the trainer's read
-   of a store by stretches with its keyed cut, and the growth of the chart's letters by arrival,
-   each reproducing the line's lap; one continuous pass over tier A (1 GB) from the line's state,
-   judged by what it writes from held prompts by slice; then a lane whose width is derived from
-   the partition its readers hold, fixed as a guess before its build. No extent is sized by a
+   has, and it sizes no lane); the fetch of the wider passage as a store of whole documents (done
+   November 12: five slices of Common Corpus, 8 GB with a prefix of 1 GB, held documents from the
+   far end of the shard order); the count of a lap's regions by kind of state (done November 12,
+   [the record on the opening's room](../../research/records/2026-11-12_A_LAPS_CARD_TIME_STANDS_IN_THE_OPENINGS_EMPTY_ROOM_A_LAP_LINES_SITES_ARE_WEIGHED_DOMAINS_A_STRETCH_OF_A_DOCUMENT_TAKES_ONE_KEYED_STATE_AND_EVERY_EXTENT_OF_THE_DECLARATION_IS_GIVEN_ITS_PART.md)):
+   0.704 of the sites the card computes on the code line stand in the openings' whole rooms, so
+   the trainer's regions come before the contact's arithmetic; the store's trainer (a read by
+   stretches, one keyed state a stretch, a section bounded in the learner's state to one batch of
+   the card, the letters founded at the crossing, no law read from the environment), a new line
+   whose binary reproduces te7's lap with the old trainer untouched and whose lines are held to
+   the cut's reference port, its rate fixed as G115 before its build; one continuous pass over
+   tier A (1 GB) from the line's state, judged by what it writes from held prompts by slice; from
+   that pass's profile, the contact's and the site kernels' terms at the widths they need, the
+   pair store on its support (item 2; the card holds 280 octets a pair of sites against 71,486 a
+   site) and the batch's tables staged under the card's stroke; the face as a composition of
+   lanes, each block reading its own, entering at `(32, 32)`; then a lane whose width is derived
+   from the partition its readers hold, fixed as a guess before its build. No extent is sized by a
    factor or padded to a power of two. Tier B (8 GB) is trained when a pass over it takes under two
    days.
 6. **More than one medium** (the same record, §6 to §11): the region's helix in

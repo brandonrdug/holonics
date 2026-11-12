@@ -1,0 +1,29 @@
+# te7_regions_census (P47), 2026-11-12 UTC: section_regions_census.py from origin/claude/project-thread-5y2nvb at commit dddae7eaf (written without a checkout),
+# run on te7's log with te7's train-field files (UNITS0, TRAIN.txt, HELD128.txt, KEYS8; their SHA-256 prefixes b438ff77a9eb70d7, 096503ec868ea94c, ed5d743c1c031cca,
+# 633ddcd64a096e33 as te7's command gives them) under FIELD_PATH_FAR_KEYED=1 FIELD_PATH_OPENING=1 FIELD_PATH_WRITER=1 FIELD_ROOM_CUT=1. Self-test first: CENSUS_SELF_TEST cases=4000 mixer=1 opening=1 writer=1 pairs=1.
+# Device line: host only, one thread, no card, no lock. wall_s=4.6 peak_rss_kib=54652 (measure.py's resource count; /usr/bin/time is not installed on this host). Its standard output follows.
+CENSUS_SWITCHES tail_keyed=0 front_cut=0 far_keyed=1 opening=1 writer=1 prefix=0 room_cut=1
+CENSUS_DECLARATION answer=2062 train=24557 withheld=128 dev=128 sections=1535 passages_reach=3771 declared_reach=3771 section=16 heads=4 ticks=4 laps_read=80 equal=1
+CENSUS_PASSAGE question_classes least=6 q10=56 q25=75 q50=102 q75=143 q90=198 q99=621 most=1709 mean=126
+CENSUS_PASSAGE answer_classes least=1 q10=86 q25=144 q50=247 q75=419 q90=688 q99=1272 most=2061 mean=327
+CENSUS_CHECK lap=0 sections=1535 lines=1535 length_equal=1535 sites_equal=1535 first_miss=-
+CENSUS_KIND lap=0 kind=mask_whole regions=12312 sites=5709014 sites_share_ppm=74826 sites_squared=3886466244 squared_share_ppm=29217 open=1907261 definite=3801753 pairs_open_rows=519275082 open_pairs_share_ppm=59409 pairs_definite_near=30175836 pairs_definite_most=2064374836 longest=2235 mean_sites=463 line_sites=5713063
+CENSUS_KIND lap=0 kind=mask_answer regions=12245 sites=5569543 sites_share_ppm=72998 sites_squared=3692970697 squared_share_ppm=27762 open=1355513 definite=4214030 pairs_open_rows=494821306 open_pairs_share_ppm=56611 pairs_definite_near=36383020 pairs_definite_most=2259439932 longest=2393 mean_sites=454 line_sites=4064567
+CENSUS_KIND lap=0 kind=path_room regions=24557 sites=53739203 sites_share_ppm=704348 sites_squared=117861353501 squared_share_ppm=886040 open=50636534 definite=3102669 pairs_open_rows=6397703478 open_pairs_share_ppm=731952 pairs_definite_near=30289980 pairs_definite_most=650310768 longest=3771 mean_sites=2188 line_sites=294684
+CENSUS_KIND lap=0 kind=writer regions=24557 sites=11278557 sites_share_ppm=147825 sites_squared=7579436941 squared_share_ppm=56979 open=6516735 definite=4761822 pairs_open_rows=1328797015 open_pairs_share_ppm=152025 pairs_definite_near=44939498 pairs_definite_most=1628644502 longest=2393 mean_sites=459 line_sites=6516735
+CENSUS_LAP lap=0 sites_computed=76296317 pair_store_octets=37245663667240 site_octets=5454118517062 pairs_least_a_head_tick=8882385215 pairs_most_a_head_tick=15343366919 pairs_least_a_lap=142118163440 pairs_most_a_lap=245493870704
+CENSUS_CARD_LINE reads=90 returns=1540 pairs=160100331669 batches=6447 peak_store=8440325846
+CENSUS_GROUP lap=0 group=0 sections=153 mask_sites=2319 room_sites=35028 other_sites=7309 pairs_least=82588284 pair_store_octets=22983362910 deposit_ms=753 regions_ms=1
+CENSUS_GROUP lap=0 group=1 sections=154 mask_sites=3258 room_sites=35022 other_sites=7369 pairs_least=83566488 pair_store_octets=23107338069 deposit_ms=752 regions_ms=1
+CENSUS_GROUP lap=0 group=2 sections=153 mask_sites=4001 room_sites=35006 other_sites=7343 pairs_least=83629946 pair_store_octets=23151281026 deposit_ms=767 regions_ms=1
+CENSUS_GROUP lap=0 group=3 sections=154 mask_sites=4730 room_sites=34991 other_sites=7340 pairs_least=83978383 pair_store_octets=23254635261 deposit_ms=793 regions_ms=1
+CENSUS_GROUP lap=0 group=4 sections=153 mask_sites=5472 room_sites=34980 other_sites=7401 pairs_least=84911087 pair_store_octets=23373322516 deposit_ms=787 regions_ms=1
+CENSUS_GROUP lap=0 group=5 sections=154 mask_sites=6304 room_sites=34996 other_sites=7329 pairs_least=86849791 pair_store_octets=23575867700 deposit_ms=785 regions_ms=1
+CENSUS_GROUP lap=0 group=6 sections=153 mask_sites=7376 room_sites=35002 other_sites=7277 pairs_least=88561750 pair_store_octets=23812670710 deposit_ms=766 regions_ms=1
+CENSUS_GROUP lap=0 group=7 sections=154 mask_sites=8928 room_sites=35026 other_sites=7331 pairs_least=93187734 pair_store_octets=24276169787 deposit_ms=810 regions_ms=1
+CENSUS_GROUP lap=0 group=8 sections=153 mask_sites=11739 room_sites=35015 other_sites=7287 pairs_least=100968880 pair_store_octets=25282989053 deposit_ms=853 regions_ms=1
+CENSUS_GROUP lap=0 group=9 sections=154 mask_sites=19306 room_sites=35022 other_sites=7484 pairs_least=137464299 pair_store_octets=29807475260 deposit_ms=1130 regions_ms=1
+CENSUS_FIT lap=0 terms=sites_pairs sections=1535 ms_fixed_and_per_unit c0=38.4405 c1=0.00874612 c2=3.7474e-06 ms_of_a_mean_section ms0=38.44 ms1=434.7 ms2=347 explained_ppm=745184
+CENSUS_FIT lap=0 terms=sites_pairs_squared sections=1535 ms_fixed_and_per_unit c0=-218.719 c1=-0.00153934 c2=2.24615e-06 c3=1.04709e-05 ms_of_a_mean_section ms0=-218.7 ms1=-76.51 ms2=208 ms3=907.4 explained_ppm=761618
+CENSUS_FIT lap=0 terms=pairs sections=1535 ms_fixed_and_per_unit c0=338.282 c1=5.20421e-06 ms_of_a_mean_section ms0=338.3 ms1=481.8 explained_ppm=714814
+CENSUS_FIT lap=0 terms=sites sections=1535 ms_fixed_and_per_unit c0=-339.708 c1=0.0233344 ms_of_a_mean_section ms0=-339.7 ms1=1160 explained_ppm=614881
