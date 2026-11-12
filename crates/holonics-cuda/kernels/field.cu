@@ -455,6 +455,22 @@ struct FieldWords {
     // slot, written once a (site, paced head, mode) in `field_paces` beside `σ`: `[p][l][t]` three words each, `q`, then `r`'s low and high 64 bits (`r < k` is held 128 bits wide
     // from the start: `k` passes `INT64_MAX` at `n ≥ 739` and 64 unsigned bits at `n ≥ 1478`, and the pair's compare is made on 128 bits from `k` itself).
     int64_t *saddr;
+    // [definition; theory, November 12; the triad record (`2026-11-12_THE_LAW_ACROSS_A_PLACE_IS_HELD_BY_A_PUMPED_CONTACT…`) §3 and §4] **The triads**
+    // (`FieldDeclaration::triads`): `triads` (`J`) complex triads, each the plain pair contact with one operand more, the word of two contacts through a
+    // place: `p_k(t) = α_k(t) β_k(t − 1)`, `c^T_k(t) = p_k(t) γ_k(t + 1)`, and the return `W c + W_T c^T` summed whole with the bias before its one release.
+    // `wt` and `wtb` are the chart's and its biases' offsets in the material (`FieldLayout::triad`, `triad_bias`: `6J` rows of `D`, `A` then `B` then `G`,
+    // row `k` the real part and row `J + k` the imaginary part within each) and `rt` the chart's reach; `wtr` the return's offset (`FieldLayout::w_triad`,
+    // `D` rows of `2J` columns, no bias of its own) and `rwt` its reach; `pabg` the chart's read `[t][6J]` (`2^(−16)`), `ptp` the products `p` and `pct`
+    // the products `c^T` `[t][2J]` (real parts then imaginary, `2^(−16)`), which the reverse reads. Zero (and no kernel reads them) where `J = 0`.
+    uint64_t triads;
+    uint64_t wt;
+    uint64_t wtb;
+    uint64_t rt;
+    uint64_t wtr;
+    uint64_t rwt;
+    int64_t *pabg;
+    int64_t *ptp;
+    int64_t *pct;
 };
 
 // [definition; agent-inferred, November 2] **A head's pace index** (§16, `Field::paces`): the heads that carry a moment
@@ -941,6 +957,164 @@ extern "C" __global__ void field_affine_x32(FieldWords w, uint64_t weight, uint6
 
 extern "C" __global__ void field_affine_x64(FieldWords w, uint64_t weight, uint64_t bias, uint64_t wmax, uint32_t rows, uint32_t cols, const int64_t *x, uint64_t x_stride, int64_t *out, uint64_t out_stride, int64_t *add, uint32_t only_unresolved) {
     affine<int64_t>(w, weight, bias, wmax, rows, cols, x, x_stride, out, out_stride, add, only_unresolved);
+}
+
+// [definition; theory, November 12; the triad record §3 and §4] **The return of two blocks** (the host's `tick`, the pair's return where
+// `FieldDeclaration::triads` is set): `out[t][o] = release(Σ_i W[o][i] x[t][i] + Σ_j W₂[o][j] x₂[t][j] + bias[o] 2^24, 24)`, the plain contacts' and
+// circles' `W c` and the triads' `W_T c^T` summed whole in one wide sum with the bias before the one release, so the triads' term is never released
+// apart. The carrier bound is read over both blocks together, the sum of each block's bound as `affine` reads it,
+// `wmax · xmax · (cols + 1) + wmax₂ · x₂max · (cols₂ + 1)` (each at most `2^126`, so their sum never wraps 128 bits), refused at `2^126`; the sum in 64
+// bits below `2^62` and in 128 otherwise (the same integer either way). With `add`, the result is added to `add[t][o]` (the residual). One thread a
+// `(site, output)` cell.
+__device__ void affine_two(const FieldWords &w, uint64_t weight, uint64_t bias, uint64_t wmax, uint32_t rows, uint32_t cols, const int64_t *x, uint64_t x_stride, uint64_t weight2, uint64_t wmax2, uint32_t cols2, const int64_t *x2, uint64_t x2_stride, int64_t *out, uint64_t out_stride, int64_t *add) {
+    const uint64_t cells = (uint64_t)w.T * rows;
+    for (uint64_t c = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; c < cells; c += (uint64_t)gridDim.x * blockDim.x) {
+        const uint64_t t = c / rows, o = c % rows;
+        const int64_t *xt = x + t * x_stride, *x2t = x2 + t * x2_stride;
+        uint64_t xmax = 0, x2max = 0;
+        for (uint32_t i = 0; i < cols; i++) {
+            const uint64_t m = mag64(xt[i]);
+            xmax = m > xmax ? m : xmax;
+        }
+        for (uint32_t j = 0; j < cols2; j++) {
+            const uint64_t m = mag64(x2t[j]);
+            x2max = m > x2max ? m : x2max;
+        }
+        const uwide terms = (uwide)wmax * (uwide)xmax * (uwide)(cols + 1) + (uwide)wmax2 * (uwide)x2max * (uwide)(cols2 + 1);
+        if (terms >= ((uwide)1 << 126)) {
+            atomicOr(w.status, REFUSED_CARRIER);
+            continue;
+        }
+        const int32_t *row = w.theta + weight + o * cols;
+        const int32_t *row2 = w.theta + weight2 + o * cols2;
+        wide sum;
+        if (terms < ((uwide)1 << 62)) {
+            int64_t s = 0;
+            for (uint32_t i = 0; i < cols; i++) {
+                s += (int64_t)row[i] * xt[i];
+            }
+            for (uint32_t j = 0; j < cols2; j++) {
+                s += (int64_t)row2[j] * x2t[j];
+            }
+            sum = s;
+        } else {
+            sum = 0;
+            for (uint32_t i = 0; i < cols; i++) {
+                sum += (wide)row[i] * (wide)xt[i];
+            }
+            for (uint32_t j = 0; j < cols2; j++) {
+                sum += (wide)row2[j] * (wide)x2t[j];
+            }
+        }
+        if (bias != NO_BIAS) {
+            sum += (wide)w.theta[bias + o] << MATERIAL_BITS;
+        }
+        const int64_t v = fit64(rel(sum, MATERIAL_BITS), w.status);
+        if (add) {
+            add[t * out_stride + o] = fit64((wide)add[t * out_stride + o] + (wide)v, w.status);
+        } else {
+            out[t * out_stride + o] = v;
+        }
+    }
+}
+
+// [definition; theory, November 12; the triad record §4] **The return of two blocks by tiles** (`affine_tiled`'s layout with a second block): a block
+// holds `W` at the stride `cols + 1`, `W₂` at the stride `cols₂ + 1` (odd wherever `cols₂ = 2J`, so coprime to the 32 banks) and the bias in shared
+// memory, then each pass's joint carrier bound a site (`per` of them, 128 bits each) and the pass's site rows of both blocks, and each thread forms one
+// `(site, output)` cell. The same integers as `affine_two`: the joint bound, the sum in 64 bits below `2^62` and in 128 otherwise, the bias at the
+// material's grain, the one release and the residual.
+__device__ void affine_two_tiled(const FieldWords &w, uint64_t weight, uint64_t bias, uint64_t wmax, uint32_t rows, uint32_t cols, const int64_t *x, uint64_t x_stride, uint64_t weight2, uint64_t wmax2, uint32_t cols2, const int64_t *x2, uint64_t x2_stride, int64_t *out, uint64_t out_stride, int64_t *add) {
+    extern __shared__ __align__(16) unsigned char affine_two_shared[];
+    const uint32_t stride = cols + 1, stride2 = cols2 + 1;
+    int32_t *ws = (int32_t *)affine_two_shared;
+    int32_t *ws2 = ws + (uint64_t)rows * stride;
+    int32_t *bs = ws2 + (uint64_t)rows * stride2;
+    uwide *terms_at = (uwide *)(affine_two_shared + ((((uint64_t)rows * stride + (uint64_t)rows * stride2 + rows) * sizeof(int32_t) + 15) & ~(uint64_t)15));
+    const uint32_t per = blockDim.x / rows;
+    int64_t *xs = (int64_t *)(terms_at + per);
+    int64_t *x2s = xs + (uint64_t)per * cols;
+    for (uint32_t i = threadIdx.x; i < rows * cols; i += blockDim.x) {
+        ws[(i / cols) * stride + i % cols] = w.theta[weight + i];
+    }
+    for (uint32_t i = threadIdx.x; i < rows * cols2; i += blockDim.x) {
+        ws2[(i / cols2) * stride2 + i % cols2] = w.theta[weight2 + i];
+    }
+    for (uint32_t i = threadIdx.x; i < rows; i += blockDim.x) {
+        bs[i] = bias == NO_BIAS ? 0 : w.theta[bias + i];
+    }
+    const uint32_t p = threadIdx.x / rows, o = threadIdx.x % rows;
+    for (uint64_t t0 = (uint64_t)blockIdx.x * per; t0 < w.T; t0 += (uint64_t)gridDim.x * per) {
+        __syncthreads();
+        for (uint32_t i = threadIdx.x; i < per * cols; i += blockDim.x) {
+            const uint64_t t = t0 + i / cols;
+            xs[i] = t < w.T ? x[t * x_stride + i % cols] : 0;
+        }
+        for (uint32_t i = threadIdx.x; i < per * cols2; i += blockDim.x) {
+            const uint64_t t = t0 + i / cols2;
+            x2s[i] = t < w.T ? x2[t * x2_stride + i % cols2] : 0;
+        }
+        __syncthreads();
+        // Each site's joint carrier bound read once, by its first output's thread.
+        if (o == 0 && p < per) {
+            const int64_t *xt = xs + (uint64_t)p * cols, *x2t = x2s + (uint64_t)p * cols2;
+            uint64_t xmax = 0, x2max = 0;
+            for (uint32_t i = 0; i < cols; i++) {
+                const uint64_t m = mag64(xt[i]);
+                xmax = m > xmax ? m : xmax;
+            }
+            for (uint32_t j = 0; j < cols2; j++) {
+                const uint64_t m = mag64(x2t[j]);
+                x2max = m > x2max ? m : x2max;
+            }
+            terms_at[p] = (uwide)wmax * (uwide)xmax * (uwide)(cols + 1) + (uwide)wmax2 * (uwide)x2max * (uwide)(cols2 + 1);
+        }
+        __syncthreads();
+        const uint64_t t = t0 + p;
+        if (p >= per || t >= w.T) {
+            continue;
+        }
+        const int64_t *xt = xs + (uint64_t)p * cols, *x2t = x2s + (uint64_t)p * cols2;
+        const uwide terms = terms_at[p];
+        if (terms >= ((uwide)1 << 126)) {
+            atomicOr(w.status, REFUSED_CARRIER);
+            continue;
+        }
+        const int32_t *row = ws + (uint64_t)o * stride, *row2 = ws2 + (uint64_t)o * stride2;
+        wide sum;
+        if (terms < ((uwide)1 << 62)) {
+            int64_t s = 0;
+            for (uint32_t i = 0; i < cols; i++) {
+                s += (int64_t)row[i] * xt[i];
+            }
+            for (uint32_t j = 0; j < cols2; j++) {
+                s += (int64_t)row2[j] * x2t[j];
+            }
+            sum = s;
+        } else {
+            sum = 0;
+            for (uint32_t i = 0; i < cols; i++) {
+                sum += (wide)row[i] * (wide)xt[i];
+            }
+            for (uint32_t j = 0; j < cols2; j++) {
+                sum += (wide)row2[j] * (wide)x2t[j];
+            }
+        }
+        sum += (wide)bs[o] << MATERIAL_BITS;
+        const int64_t v = fit64(rel(sum, MATERIAL_BITS), w.status);
+        if (add) {
+            add[t * out_stride + o] = fit64((wide)add[t * out_stride + o] + (wide)v, w.status);
+        } else {
+            out[t * out_stride + o] = v;
+        }
+    }
+}
+
+extern "C" __global__ void field_affine_two_x64(FieldWords w, uint64_t weight, uint64_t bias, uint64_t wmax, uint32_t rows, uint32_t cols, const int64_t *x, uint64_t x_stride, uint64_t weight2, uint64_t wmax2, uint32_t cols2, const int64_t *x2, uint64_t x2_stride, int64_t *out, uint64_t out_stride, int64_t *add) {
+    affine_two(w, weight, bias, wmax, rows, cols, x, x_stride, weight2, wmax2, cols2, x2, x2_stride, out, out_stride, add);
+}
+
+extern "C" __global__ void field_affine_two_tiled_x64(FieldWords w, uint64_t weight, uint64_t bias, uint64_t wmax, uint32_t rows, uint32_t cols, const int64_t *x, uint64_t x_stride, uint64_t weight2, uint64_t wmax2, uint32_t cols2, const int64_t *x2, uint64_t x2_stride, int64_t *out, uint64_t out_stride, int64_t *add) {
+    affine_two_tiled(w, weight, bias, wmax, rows, cols, x, x_stride, weight2, wmax2, cols2, x2, x2_stride, out, out_stride, add);
 }
 
 // The frame, by head: `w̃ = U ⊙ w` and so for the values, `[h][t][2n]` real parts then imaginary,
@@ -2870,6 +3044,42 @@ extern "C" __global__ void field_carry_gates_read(FieldWords w, unsigned long lo
     }
 }
 
+// [definition; theory, November 12; the triad record §3 and §4] **The triads** (the host's `tick`, `FieldDeclaration::triads`), after the carry scan and
+// before the return: at each site `t` with both strand mates in its region (its place `i` with `0 < i < S − 1`) and triad `k`, from the chart's read
+// `abg` (`pabg` `[t][6J]` on `2^(−16)`: α's real parts then imaginary, then β's, then γ's; `field_affine_x32` over the pair chart, as `a` and `b` are
+// read), `p = release(α_k(t) β_k(t − 1), 16)` and `c^T = release(p γ_k(t + 1), 16)`, each a complex product as the plain contact forms it
+// (`re = ar br − ai bi`, `im = ar bi + ai br`) and fitted to 64 bits as `c` is; `p` written to `ptp` and `c^T` to `pct` `[t][2J]` (real parts then
+// imaginary), both zero at a region's first and last sites. The left mate's contact with the place, then the place's with the right mate: a word of
+// two contacts whose phase is the sum of its three legs' (`cell.word-holonomy`). One thread a site and triad (T J cells, grid-stride); no shared
+// memory; each thread writes only its own slots, so nothing is summed and no order is chosen. Every bit is the host's.
+extern "C" __global__ void field_triad(FieldWords w) {
+    const uint64_t J = w.triads, j2 = 2 * J, j6 = 6 * J;
+    const uint64_t cells = (uint64_t)w.T * J;
+    for (uint64_t c = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; c < cells; c += (uint64_t)gridDim.x * blockDim.x) {
+        const uint64_t t = c / J, k = c % J;
+        const uint32_t r = w.site_region[t];
+        const uint32_t sites = w.region_off[r + 1] - w.region_off[r], i = w.site_pos[t];
+        const uint64_t pr = t * j2 + k, pi = pr + J;
+        if (i == 0 || i + 1 >= sites) {
+            w.ptp[pr] = 0;
+            w.ptp[pi] = 0;
+            w.pct[pr] = 0;
+            w.pct[pi] = 0;
+            continue;
+        }
+        const int64_t *at = w.pabg + t * j6, *before = at - j6, *after = at + j6;
+        const wide ar = at[k], ai = at[J + k];
+        const wide br = before[2 * J + k], bi = before[3 * J + k];
+        const wide gr = after[4 * J + k], gi = after[5 * J + k];
+        const int64_t qr = fit64(rel(ar * br - ai * bi, FACE_BITS), w.status);
+        const int64_t qi = fit64(rel(ar * bi + ai * br, FACE_BITS), w.status);
+        w.ptp[pr] = qr;
+        w.ptp[pi] = qi;
+        w.pct[pr] = fit64(rel((wide)qr * gr - (wide)qi * gi, FACE_BITS), w.status);
+        w.pct[pi] = fit64(rel((wide)qr * gi + (wide)qi * gr, FACE_BITS), w.status);
+    }
+}
+
 // Each unresolved site's face from its readout `z` (`[t][A]`): the masses `2^(z − peak)` on `2^(−62)`
 // and their total.
 extern "C" __global__ void field_face(FieldWords w, const int64_t *z, uint64_t *masses, uwide *totals) {
@@ -3085,6 +3295,62 @@ extern "C" __global__ void field_pair_back(FieldWords w, const int64_t *dc, int6
             db[re] = fit64(rel(ar * gr + ai * gi, FACE_BITS), w.status);
             db[im] = fit64(rel(ar * gi - ai * gr, FACE_BITS), w.status);
         }
+    }
+}
+
+// `conj(z) u` released at the face's grain, `re = zr ur + zi ui`, `im = zr ui − zi ur` (the plain contact's `δa`), each fitted to 64 bits.
+__device__ __forceinline__ void triad_conj_product(const FieldWords &w, wide zr, wide zi, wide ur, wide ui, int64_t *re, int64_t *im) {
+    *re = fit64(rel(zr * ur + zi * ui, FACE_BITS), w.status);
+    *im = fit64(rel(zr * ui - zi * ur, FACE_BITS), w.status);
+}
+
+// [definition; theory, November 12; the triad record §4] **The triads' reverse** (the host's `tick_return`), by the product rule through the producing
+// operands: at each place `t` with both strand mates and triad `k`, with `u = δc^T_k(t)` (`dct` `[t][2J]`, `W_Tᵀ δx_t` by `field_transposed`),
+// `δγ_k(t + 1) = release(conj(p_k(t)) u, 16)`, `δp = release(conj(γ_k(t + 1)) u, 16)`, `δα_k(t) = release(conj(β_k(t − 1)) δp, 16)` and
+// `δβ_k(t − 1) = release(conj(α_k(t)) δp, 16)`, written to `dabg` `[t][6J]` in the chart's row order. A site's α is read by its own place, its β by the
+// place after it and its γ by the place before it, so each slot is one term: one thread a site and triad (T J cells) gathers its own three legs from the
+// one place that read each (`δp` formed by each thread that needs it, the same integer each time), every slot written by its own thread (zero where no
+// place read it: α at a region's two ends, β at its last two sites, γ at its first two). Nothing is summed and no order is chosen; every bit is the
+// host's.
+extern "C" __global__ void field_triad_back(FieldWords w, const int64_t *dct, int64_t *dabg) {
+    const uint64_t J = w.triads, j2 = 2 * J, j6 = 6 * J;
+    const uint64_t cells = (uint64_t)w.T * J;
+    for (uint64_t c = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; c < cells; c += (uint64_t)gridDim.x * blockDim.x) {
+        const uint64_t s = c / J, k = c % J;
+        const uint32_t r = w.site_region[s];
+        const uint32_t sites = w.region_off[r + 1] - w.region_off[r], i = w.site_pos[s];
+        int64_t *out = dabg + s * j6;
+        // `δp` at place `t` (interior): `release(conj(γ_k(t + 1)) δc^T_k(t), 16)`.
+        const auto dp_at = [&](uint64_t t, int64_t *dpr, int64_t *dpi) {
+            const int64_t *after = w.pabg + (t + 1) * j6;
+            triad_conj_product(w, after[4 * J + k], after[5 * J + k], dct[t * j2 + k], dct[t * j2 + J + k], dpr, dpi);
+        };
+        int64_t ar = 0, ai = 0, br = 0, bi = 0, gr = 0, gi = 0;
+        // α_k(s), read by place `s` itself.
+        if (i > 0 && i + 1 < sites) {
+            int64_t dpr, dpi;
+            dp_at(s, &dpr, &dpi);
+            const int64_t *before = w.pabg + (s - 1) * j6;
+            triad_conj_product(w, before[2 * J + k], before[3 * J + k], dpr, dpi, &ar, &ai);
+        }
+        // β_k(s), read by place `s + 1` (interior where `i + 2 < S`).
+        if (i + 2 < sites) {
+            int64_t dpr, dpi;
+            dp_at(s + 1, &dpr, &dpi);
+            const int64_t *next = w.pabg + (s + 1) * j6;
+            triad_conj_product(w, next[k], next[J + k], dpr, dpi, &br, &bi);
+        }
+        // γ_k(s), read by place `s − 1` (interior where `i ≥ 2`): `conj(p_k(s − 1)) δc^T_k(s − 1)`.
+        if (i >= 2) {
+            const uint64_t t = s - 1;
+            triad_conj_product(w, w.ptp[t * j2 + k], w.ptp[t * j2 + J + k], dct[t * j2 + k], dct[t * j2 + J + k], &gr, &gi);
+        }
+        out[k] = ar;
+        out[J + k] = ai;
+        out[2 * J + k] = br;
+        out[3 * J + k] = bi;
+        out[4 * J + k] = gr;
+        out[5 * J + k] = gi;
     }
 }
 

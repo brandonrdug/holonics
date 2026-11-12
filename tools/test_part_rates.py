@@ -19,6 +19,14 @@ Three small states of one declaration are written with a planted travel of three
 `base`, the learner's own rate word: the written file is the state's with the second word of its first line changed and nothing else
 (every other word, line and the material byte for byte, with or without a parts line); a rate at or under a part's octave, a rate of
 no bits and a file that stands are refused.
+
+The triads (theory, November 12; the triad record §4), on drawn states of declarations with two triads, without and with carry circles:
+  layout     the head hnn-field-v14f (C written even at 0, then J); the charts, their biases and the return after every other family, every
+             old offset unchanged; one part over the three, written after the first lane's letter rows; a v14f head with no triads refused;
+  lines      a line of the written count reads back by its order, and a line without the triad's octave reads it at 0;
+  update     a steady travel planted in the triad's entries moves its octave one faster and prints it beside the others;
+  blocks     under the block law the triad's blocks are one unit at one rate: a travel twice the field's in all three families raises
+             every triad entry two octaves, and no leg is printed alone.
 """
 import io
 import os
@@ -34,9 +42,15 @@ OLD_F = 8
 KEYS = ("alphabet", "width", "heads", "modes", "still", "contacts", "ticks", "frames", "reach", "lanes")
 
 
+def head_words(d):
+    """The field's head line for d: hnn-field-v14, hnn-field-v14e with carry circles, hnn-field-v14f with triads (C written even at 0, then J)."""
+    c, j = d.get("carry", 0), d.get("triads", 0)
+    kind = "hnn-field-v14f" if j else "hnn-field-v14e" if c else "hnn-field-v14"
+    return [kind] + [str(d[k]) for k in KEYS] + ["0"] + ([str(c)] if c or j else []) + ([str(j)] if j else [])
+
+
 def write(path, theta, octaves, d=D, extra=None):
-    c = d.get("carry", 0)
-    words = (["hnn-field-v14e"] if c else ["hnn-field-v14"]) + [str(d[k]) for k in KEYS] + ["0"] + ([str(c)] if c else [])
+    words = head_words(d)
     with open(path, "w") as f:
         f.write("hnn-field-learner-v3 12 0 0 -\n" + " ".join(words) + "\n" + " ".join(str(int(x)) for x in theta) + "\n")
         if extra is not None:
@@ -188,14 +202,14 @@ def main():
         assert (count("carry"), count("w_carry"), count("a_carry"), count("b_carry")) == (4 * 16 + 4, 4 * 16, 4 * 16 + 4, 4 * 16 + 4)
         assert count("w_new") == 16 * (16 - OLD_F - 4), "the circles' columns are theirs, not the new contacts'"
         write(p("c0"), draws(total_c, 3), octaves[:part_rates.PLAIN_PARTS], d=dc)
-        run("open", p("c0"), str(OLD_F), ",".join(str(k) for k in [0] * part_rates.PARTS), p("c1"))
+        run("open", p("c0"), str(OLD_F), ",".join(str(k) for k in [0] * len(part_rates.written(dc))), p("c1"))
         line = [l for l in open(p("c1")).read().split("\n") if l.startswith("parts ")][0]
-        assert len(line.split(" ")) == 2 + part_rates.PARTS, line
+        assert len(line.split(" ")) == 2 + len(part_rates.written(dc)) == 2 + 22, line
         held = part_rates.parts_line(open(p("c0")).read().split("\n"), dc)
-        assert held[1][part_rates.PLAIN_PARTS:] == [0] * 6, "a sixteen-part line reads the circles' and the letter rows' parts at octave 0"
+        assert held[1][part_rates.PLAIN_PARTS:] == [0] * (part_rates.PARTS - part_rates.PLAIN_PARTS), "a sixteen-part line reads the circles' and the letter rows' parts at octave 0"
         got_c = run("update", p("c0"), p("c0"), p("c0"), p("c2"))
-        assert set(got_c) == set(part_rates.PART_NAMES), "a state with carry circles prints all nineteen"
-        assert len([l for l in open(p("c2")).read().split("\n") if l.startswith("parts ")][0].split(" ")) == 2 + part_rates.PARTS
+        assert set(got_c) == set(part_rates.PART_NAMES[q] for q in part_rates.written(dc)) and "triad" not in got_c, "a state with carry circles prints its twenty-two"
+        assert len([l for l in open(p("c2")).read().split("\n") if l.startswith("parts ")][0].split(" ")) == 2 + len(part_rates.written(dc))
         with open(p("k"), "w") as f:
             f.write(open(p("s0")).read().replace("hnn-field-v14 ", "hnn-field-v14k ", 1).replace(" 0\n", " 0 1\n", 1))
         try:
@@ -222,19 +236,19 @@ def main():
         write(p("f0"), base, raised)
         assert len([l for l in open(p("f0")).read().split("\n") if l.startswith("parts ")][0].split(" ")) == 2 + 19
         assert part_rates.parts_line(open(p("f0")).read().split("\n"), D)[1] == raised, "nineteen parts read back by the line's order"
-        assert part_rates.expand(D, [0] * 16)[19:] == [0, 0, 0] and part_rates.expand(dc, [0] * 19)[19:] == [0, 0, 0]
+        assert part_rates.expand(D, [0] * 16)[19:22] == [0, 0, 0] and part_rates.expand(dc, [0] * 19)[19:22] == [0, 0, 0]
         got_f = run("update", p("f0"), p("f0"), p("f0"), p("f1"))
         assert set(got_f) == set(part_rates.PART_NAMES[p] for p in part_rates.written(D)), "a field without circles prints its nineteen"
         print("part_rates first: the letter rows' three parts, nineteen written without circles, older lines read at octave 0")
         polar_controls(p)
         blocks_controls(p)
-    print("part_rates: 15 lines, the controls hold")
+        triad_controls(p)
+    print("part_rates: 17 lines, the controls hold")
 
 
 def learner_text(path, theta, second, octaves, d=D, rate=12, own=None):
     """A learner's text with its moments' lines (first moments zero), for the law's controls; own, each entry's rate, a trailing rates line."""
-    c = d.get("carry", 0)
-    words = (["hnn-field-v14e"] if c else ["hnn-field-v14"]) + [str(d[k]) for k in KEYS] + ["0"] + ([str(c)] if c else [])
+    words = head_words(d)
     line = [octaves[p] for p in part_rates.written(d)]
     with open(path, "w") as f:
         f.write(f"hnn-field-learner-v3 {rate} 0 0 -\n" + " ".join(words) + "\n" + " ".join(str(int(x)) for x in theta) + "\n"
@@ -427,6 +441,96 @@ def blocks_controls(p):
             raise AssertionError(f"not refused: blocks writing {os.path.basename(args[2])}")
     assert not any(os.path.exists(p(f"blk_x{j}")) for j in range(1, 8))
     print("part_rates blocks: the octave verbs and the base word refuse a state with its own rates; another base word and a standing file are refused")
+
+
+def triad_controls(p):
+    """[theory, November 12; the triad record §4] The triads: the head, the layout, the one part, the lines and the block law's one unit."""
+    import state_travel
+    J, dw, T = 2, D["width"], part_rates.TRIAD_PART
+    assert part_rates.PART_NAMES[T] == "triad" and part_rates.PARTS == 23
+    for c in (0, 2):
+        dp, dt = dict(D, carry=c), dict(D, carry=c, triads=J)
+        fam0, total0 = part_rates.layout(dp)
+        fam, total = part_rates.layout(dt)
+        assert all(fam[k] == v for k, v in fam0.items()), "every old offset is unchanged"
+        assert (fam["triad"], fam["triad_bias"], fam["w_triad"], total) == (total0, total0 + 6 * J * dw, total0 + 6 * J * dw + 6 * J, total0 + 6 * J * dw + 6 * J + dw * 2 * J)
+        parts = part_rates.founded_parts(dt, OLD_F)
+        assert parts[:total0] == part_rates.founded_parts(dp, OLD_F) and parts[total0:] == [T] * (total - total0), "the triad's three families are its one part"
+        assert part_rates.written(dt) == part_rates.written(dp) + [T]
+        # The head: C written even at 0, then J; the ruler reads it back, and the state_travel ruler reads the same declaration and layout.
+        octaves = [0] * part_rates.PARTS
+        octaves[T], octaves[part_rates.PART_NAMES.index("q_lane")] = 3, 1
+        write(p(f"t{c}"), draws(total, 31), octaves, d=dt)
+        text = open(p(f"t{c}")).read().split("\n")
+        assert text[1].split(" ")[0] == "hnn-field-v14f" and text[1].split(" ")[-2:] == [str(c), str(J)], text[1]
+        lines, d_read, _, theta = part_rates.load(p(f"t{c}"))
+        assert d_read == dt and len(theta) == total
+        assert state_travel.state(p(f"t{c}"))[0] == dt and state_travel.layout(dt)[1] == total
+        # A line of the written count reads back by its order; one without the triad's octave reads it at 0.
+        assert len(text[-2].split(" ")) == 2 + len(part_rates.written(dt)) and part_rates.parts_line(lines, dt)[1] == octaves
+        short = [octaves[q] for q in part_rates.written(dp)]
+        assert part_rates.expand(dt, short) == [0 if q == T else octaves[q] for q in range(part_rates.PARTS)], "a line without the triad's octave reads it at 0"
+        assert part_rates.expand(dt, [0] * 16) == [0] * part_rates.PARTS
+        # update: a steady travel in the triad's entries alone.
+        base, step = draws(total, 41), draws(total, 43)
+        states = [list(base), list(base), list(base)]
+        for i in range(total0, total):
+            states[1][i] += step[i]
+            states[2][i] += 2 * step[i]
+        for k, th in enumerate(states):
+            write(p(f"t{c}_{k}"), th, octaves, d=dt)
+        got = run("update", p(f"t{c}_0"), p(f"t{c}_1"), p(f"t{c}_2"), p(f"t{c}_u"))
+        assert set(got) == set(part_rates.PART_NAMES[q] for q in part_rates.written(dt)), "a field with triads prints the triad beside the others"
+        assert got["triad"]["c"] == "1.000000" and got["triad"]["move"] == "faster" and got["triad"]["rate_octaves"] == "4" and got["triad"]["entries"] == str(total - total0), got["triad"]
+        moved = part_rates.parts_line(open(p(f"t{c}_u")).read().split("\n"), dt)[1]
+        assert moved[T] == 4 and moved[part_rates.PART_NAMES.index("q_lane")] == 0
+    # A v14f head with no triads is refused, by both rulers.
+    with open(p("t_zero"), "w") as f:
+        f.write(open(p("t0")).read().replace(f" 0 0 {J}\n", " 0 0 0\n", 1))
+    for reader in (part_rates.load, state_travel.state):
+        try:
+            reader(p("t_zero"))
+        except AssertionError:
+            pass
+        else:
+            raise AssertionError("an hnn-field-v14f head with no triads is not refused")
+    print("part_rates triad: the v14f head, the layout after every family, one part written last, lines without its octave read at 0, a head of no triads refused")
+
+    # The block law: the triad's blocks are one unit at one rate.
+    dt = dict(D, triads=J)
+    fam, total = state_travel.layout(dt)
+    grain, at_of = [0] * total, {name: at for name, at, _, _ in fam}
+    for _, at, shape, g in fam:
+        n = 1
+        for x in shape:
+            n *= x
+        for i in range(at, at + n):
+            grain[i] = g
+    legs, units = set(), set()
+    for block, lane, contacts, _, family, mask in state_travel.scale_blocks(dt, OLD_F):
+        if state_travel.rate_unit(block, lane, contacts) == ("triad", 0, "all"):
+            legs.add((block, lane))
+            units.update(at_of[family] + j for j, m in enumerate(mask.ravel()) if m)
+    assert units == set(range(at_of["triad"], total)), "the triad's unit is its three families whole"
+    assert {b for b, _ in legs} == set(state_travel.TRIAD_BLOCKS)
+    paths = []
+    for j in range(4):
+        theta = []
+        for i in range(total):
+            unit, k = 1 << (grain[i] - 16), (4 if i in units else 2)
+            theta.append(unit * (0 if j == 0 else k if j < 3 else 2 * k))
+        paths.append(p(f"tb_m{j}"))
+        learner_text(paths[-1], theta, [1 << 20] * total, [0] * part_rates.PARTS, d=dt)
+    out = io.StringIO()
+    with redirect_stdout(out):
+        part_rates.blocks(paths, paths[3], p("tb_out"))
+    got = {(f["block"], f["lane"], f["contacts"]): f for f in fields_of(out.getvalue(), "FIELD_BLOCK_RATE")}
+    assert not any(b in state_travel.TRIAD_BLOCKS for b, _, _ in got), "no leg of the triad is moved alone"
+    assert (got[("triad", "0", "all")]["octave"], got[("triad", "0", "all")]["move"], got[("triad", "0", "all")]["entries"]) == ("2", "raise", str(len(units))), got[("triad", "0", "all")]
+    assert all(f["octave"] == "0" for key, f in got.items() if key[0] != "triad")
+    rates = [int(x) for x in open(p("tb_out")).read().split("\n")[-2].split(" ")[1:]]
+    assert all(rates[i] == 10 for i in units) and all(rates[i] == 12 for i in range(total) if i not in units)
+    print("part_rates triad blocks: the triad's legs, biases and return are one unit of the block law, raised together at one rate")
 
 
 if __name__ == "__main__":

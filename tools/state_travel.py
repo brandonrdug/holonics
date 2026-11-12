@@ -50,7 +50,8 @@ A step d changes the section's code by -sum g_i d_i at first order, and a lap's 
 g_i = s_i d_i 2^rate / SECTIONS; so the code two laps' common travel is worth weighs each entry's product d1_i d2_i by s_i. s is read
 from the state between the two laps (the learner's text: the field's two lines, then the first moments and the second, each on one
 line). For each block of `scale` (with carry circles their charts by lane, the turn rows Q and the leak rows H apart, and their
-biases q_b and h_b apart: the turn is a phase and the leak a modulus, so one block would mix two laws):
+biases q_b and h_b apart: the turn is a phase and the leak a modulus, so one block would mix two laws; with triads their three legs
+apart, the charts A, B and G by lane, the biases by leg and the return W_T by lane, so each leg's travel is read beside the others'):
   WEIGHED_LAP   the block's entries and how many have opened (s above 0), its travel's rms, and heat: 2^-rate s_i / 4 summed, the
                 standing spread's cost if every entry rests in its own noise (an entry at rest under this step holds a variance
                 2^-rate s / 2H at curvature H, a cost 2^-rate s / 4 whatever H), at the rates the lap ran at (the `rates` line of
@@ -85,16 +86,16 @@ state_travel.py graft OUT HEAD DONOR FAMILY [FAMILY ...]: writes OUT, a new file
 of its material replaced by DONOR's (the families as `layout` names them: enc, before, after, q, q_bias, v, v_bias, out, out_bias, a,
 a_bias, b, b_bias, w, w_bias, read, read_bias, moment_before, moment_after, temper, probe, probe_bias, pace, moment_face,
 moment_face_bias, lift_bias, and carry and carry_bias with carry circles, whose turn and leak halves are also named apart: carry/turn,
-carry/leak, carry_bias/turn, carry_bias/leak). Every other entry and every other line is HEAD's. A read of OUT beside
+carry/leak, carry_bias/turn, carry_bias/leak, and triad, triad_bias and w_triad with triads). Every other entry and every other line is HEAD's. A read of OUT beside
 HEAD's and DONOR's tells how much of a reading's difference between two states those families carry; where a reading is first order
 in the states' difference, the shifts of grafts that partition the material add up to the whole difference, and what the sum leaves
 is the reading's curvature between them. A name may also be `part:NAME`, the entries of one founded part as the rate law names
-them (tools/part_rates.py: w_new .. b_lane, carry and the first lane's letter rows enc_first, before_first, after_first, and w_carry,
-a_carry, b_carry with carry circles), or `FAMILY/old`, a family's entries of no part (the base
+them (tools/part_rates.py: w_new .. b_lane, carry and the first lane's letter rows enc_first, before_first, after_first, w_carry,
+a_carry, b_carry with carry circles, and triad with triads), or `FAMILY/old`, a family's entries of no part (the base
 rate's); the parts and the families' old entries partition the material, so a lap's difference between two lap means is split by the
 rate each entry trains at. A name may also be `block:BLOCK/LANE/CONTACTS`, one block of `scale` as its lines name it (block,
 lane and contacts: block:w/2/old, block:moment_before/0/all), the unit the block law of part_rates.py moves (theory, November 12,
-G92): the blocks partition the material, so a lap's end against its mean is split by block, each block's shift the code its own
+G92), or the one unit that law moves the triad's blocks as (block:triad/0/all, rate_unit): the blocks partition the material, so a lap's end against its mean is split by block, each block's shift the code its own
 part of the end's displacement costs with every other block at the mean. The parts, the families' old entries and the blocks
 read the count of contacts before the growth from HEAD's `parts` line, or from a name `contacts:N` where HEAD carries none (where
 it carries one the two agree). No entry is named twice. OUT is a ruler's state: it is read, and no lap trains from it. Numbers
@@ -136,6 +137,11 @@ def layout(d):
     if c > 0:
         # [theory, November 11 17:25] The carry circles' charts (turn rows then leak rows) and their biases.
         push("carry", (2 * c, dw), MAT); push("carry_bias", (2 * c,), FACE)
+    j = d.get("triads", 0)
+    if j > 0:
+        # [theory, November 12; the triad record §4] The triads' charts (rows 0..2J A, 2J..4J B, 4J..6J G; within each, row k triad k's real
+        # part and row J + k its imaginary part), their biases in the same order, and their return W_T, D rows of 2J columns.
+        push("triad", (6 * j, dw), MAT); push("triad_bias", (6 * j,), FACE); push("w_triad", (dw, 2 * j), MAT)
     return fam, at
 
 
@@ -146,8 +152,12 @@ def state(path):
     d = {k: int(w) for k, w in zip(names, words[1:11])}
     assert words[0] != "hnn-field-v14k", "the carry founded at zero friction is retired (hnn-field-v14k): its states are receipts only"
     # The carry circles' count: hnn-field-v14e (the leak's log chart) and the retired hnn-field-v14t (its linear chart), read here as receipts
-    # (the same layout; only the leak's chart differs).
-    d["carry"] = int(words[12]) if words[0] in ("hnn-field-v14e", "hnn-field-v14t") else 0
+    # (the same layout; only the leak's chart differs). hnn-field-v14f (theory, November 12; the triad record §4) writes C even at 0, then the
+    # triads' count J >= 1.
+    assert (words[0], len(words)) in (("hnn-field-v14", 12), ("hnn-field-v14e", 13), ("hnn-field-v14t", 13), ("hnn-field-v14f", 14), ("hnn-field-v13", 11)), "a field's head line that is not hnn-field-v14"
+    d["carry"] = int(words[12]) if words[0] in ("hnn-field-v14e", "hnn-field-v14t", "hnn-field-v14f") else 0
+    d["triads"] = int(words[13]) if words[0] == "hnn-field-v14f" else 0
+    assert words[0] != "hnn-field-v14f" or d["triads"] >= 1, "an hnn-field-v14f head line with no triads (a field without them is hnn-field-v14 or hnn-field-v14e)"
     theta = np.array([int(x) for x in lines[2].split(" ")], dtype=np.int64)
     return d, theta
 
@@ -314,7 +324,33 @@ def scale_blocks(d, old_f):
         for block, rows in (("carry_bias_turn", slice(0, c)), ("carry_bias_leak", slice(c, 2 * c))):
             m = np.zeros(shapes["carry_bias"], dtype=bool); m[rows] = True
             add(block, 0, "all", "other", "carry_bias", m)
+    if "triad" in shapes:
+        # [theory, November 12; the triad record §3.2 and §4] The triads' three legs apart: the charts A, B and G by lane (each reads the pair
+        # chart's lane columns, as a and b do), their biases by leg, and the return W_T by lane (it writes the lane's face rows, as W does).
+        j = shapes["triad"][0] // 6
+        legs = (("a", slice(0, 2 * j)), ("b", slice(2 * j, 4 * j)), ("g", slice(4 * j, 6 * j)))
+        for k, sel in enumerate(lane_of, 1):
+            for leg, rows in legs:
+                m = np.zeros(shapes["triad"], dtype=bool); m[rows, sel] = True
+                add(f"triad_{leg}", k, "all", "reads", "triad", m)
+            m = np.zeros(shapes["w_triad"], dtype=bool); m[sel, :] = True
+            add("w_triad", k, "all", "writes", "w_triad", m)
+        for leg, rows in legs:
+            m = np.zeros(shapes["triad_bias"], dtype=bool); m[rows] = True
+            add(f"triad_bias_{leg}", 0, "all", "other", "triad_bias", m)
     return out
+
+
+TRIAD_BLOCKS = ("triad_a", "triad_b", "triad_g", "triad_bias_a", "triad_bias_b", "triad_bias_g", "w_triad")
+
+
+def rate_unit(block, lane, contacts):
+    """[definition; theory, November 12; the triad record §3.2] The unit a block's rate moves with under the block law
+    (tools/part_rates.py blocks): the block itself, except the triads' blocks, which are one unit (triad, lane 0, all). Reason: the triad's
+    legs and return share a gauge of three complex scales, so a step at one rate gives each leg the same squared norm (the Manley-Rowe
+    relation), and at unequal rates one leg grows faster than the others for no reason in the law; the record rules that the triad's parts
+    train at one rate, and the block law would otherwise give each of its blocks its own."""
+    return ("triad", 0, "all") if block in TRIAD_BLOCKS else (block, lane, contacts)
 
 
 def scale(old_f, paths):
@@ -522,7 +558,14 @@ def graft(out, head, donor, names):
         assert 0 < before <= d["contacts"] and before % 4 == 0, "the contacts before the growth, by fours"
         founded = np.array(part_rates.founded_parts(d, before))
         assert len(founded) == total
-        blocks = {f"block:{block}/{lane}/{contacts}": (family, mask) for block, lane, contacts, _, family, mask in scale_blocks(d, before)}
+        # Each block of scale by its entries, and each unit of the block law that joins several (rate_unit: the triad's) by theirs.
+        blocks = {}
+        for block, lane, contacts, _, family, mask in scale_blocks(d, before):
+            idx = spans[family][0] + np.flatnonzero(mask.ravel())
+            blocks[f"block:{block}/{lane}/{contacts}"] = idx
+            unit = "block:{}/{}/{}".format(*rate_unit(block, lane, contacts))
+            if unit != f"block:{block}/{lane}/{contacts}":
+                blocks[unit] = np.concatenate([blocks.get(unit, np.zeros(0, dtype=np.int64)), idx])
     else:
         assert not declared, "contacts:N goes with a part, a block or a family's old entries"
     named = np.zeros(total, dtype=np.int64)
@@ -530,8 +573,7 @@ def graft(out, head, donor, names):
         chosen = np.zeros(total, dtype=bool)
         if n.startswith("block:"):
             assert n in blocks, f"blocks of scale: {' '.join(blocks)}"
-            family, mask = blocks[n]
-            chosen[spans[family][0] + np.flatnonzero(mask.ravel())] = True
+            chosen[blocks[n]] = True
         elif n.startswith("part:"):
             assert n[5:] in part_rates.PART_NAMES, f"parts of the rate law: {' '.join(part_rates.PART_NAMES)}"
             chosen = founded == part_rates.PART_NAMES.index(n[5:])

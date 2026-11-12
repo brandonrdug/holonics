@@ -1113,7 +1113,7 @@ pub(super) fn train(args: &[String], realization: &mut dyn FieldRealization) -> 
         Some([path, sha]) => FieldLearner::from_text(std::str::from_utf8(&pinned_read(path, sha, STATE_BUDGET)?)?).map_err(|e| e.to_string())?,
         _ => {
             // The founding's heads are its ring sets; the reach is the passages'.
-            let declaration = FieldDeclaration { alphabet: codec.alphabet(), width, heads, modes, still, contacts, ticks, frames: heads, reach, lanes: 1, depth: 0, carry: 0 };
+            let declaration = FieldDeclaration { alphabet: codec.alphabet(), width, heads, modes, still, contacts, ticks, frames: heads, reach, lanes: 1, depth: 0, carry: 0, triads: 0 };
             let mut field = Field::found(declaration, &keys).map_err(|e| e.to_string())?;
             // [measurement; agent-inferred, November 3, §16.31] `FIELD_FOUND_RETURNS` (`returns`, or `lift` for the readout's
             // lift as well): the founding's zero families drawn instead, uniform on `±√(3/fan-in)` from a block of the key
@@ -1148,7 +1148,7 @@ pub(super) fn train(args: &[String], realization: &mut dyn FieldRealization) -> 
     declared_clocks(&mut learner.field);
     if let Some(rp) = learner.rate_parts {
         // The parts the field has, in the line's order (`written_parts`).
-        let octaves: Vec<String> = holonics::hnn::tower::field::written_parts(learner.field.declaration.carry).iter().map(|&p| format!("{}={}", holonics::hnn::tower::field::PART_NAMES[p], rp.octaves[p])).collect();
+        let octaves: Vec<String> = holonics::hnn::tower::field::written_parts(learner.field.declaration.carry, learner.field.declaration.triads).iter().map(|&p| format!("{}={}", holonics::hnn::tower::field::PART_NAMES[p], rp.octaves[p])).collect();
         println!("FIELD_PART_RATES contacts_before={} rate_bits={} octaves {}", rp.contacts_before, learner.rate_bits, octaves.join(" "));
     }
     if let Some(own) = &learner.own_rates {
@@ -1204,7 +1204,7 @@ pub(super) fn train(args: &[String], realization: &mut dyn FieldRealization) -> 
     let scaled_first = std::env::var("FIELD_SCALE_FIRST").ok().and_then(|v| v.parse::<usize>().ok()).filter(|&p| p > 1 && args.len() == 24);
     if let Some(period) = scaled_first {
         let d = learner.field.declaration;
-        let coarse = FieldDeclaration { alphabet: 2, heads: 2 * d.heads, frames: 2 * d.heads, still: d.heads, reach: d.reach.div_ceil(period), ..d };
+        let coarse = FieldDeclaration { alphabet: 2, heads: 2 * d.heads, frames: 2 * d.heads, still: d.heads, reach: d.reach.div_ceil(period), triads: 0, ..d };
         learner = learner.scaled_up(period, (d.ticks / 2).max(1), coarse, &keys).map_err(|e| e.to_string())?;
         println!("FIELD_SCALE lap=-1 period={period} split={} coarse_width={} coarse_heads={} material={} ms={}", (d.ticks / 2).max(1), coarse.width, coarse.heads, learner.field.material_len(), started.elapsed().as_millis());
     }
@@ -1364,7 +1364,9 @@ pub(super) fn train(args: &[String], realization: &mut dyn FieldRealization) -> 
             if let (Some(p), Some(by)) = (receipt.predicted, receipt.predicted_parts) {
                 let parts: Vec<i128> = by.iter().map(|&v| micro(v)).collect();
                 let rest = micro(p) - parts.iter().sum::<i128>();
-                let named: Vec<String> = PART_NAMES.iter().zip(&parts).map(|(name, v)| format!("{name}={v}")).collect();
+                // The triad's part is printed only where the field has triads (`FieldDeclaration::triads`), so a line at J = 0 reads as before.
+                let shown = if learner.field.declaration.triads > 0 { PART_NAMES.len() } else { PART_NAMES.len() - 1 };
+                let named: Vec<String> = PART_NAMES[..shown].iter().zip(&parts).map(|(name, v)| format!("{name}={v}")).collect();
                 println!("FIELD_SECTION_PARTS lap={lap} n={n} predicted_micro={} {} old={} rest={rest}", micro(p), named.join(" "), parts[PARTS]);
             }
             if let (Some(t), Some(e)) = (receipt.transfer, prior) {
@@ -1677,6 +1679,79 @@ pub(super) fn grow_carry_field(args: &[String], realization: &mut dyn FieldReali
         compared += was.iter().flatten().flatten().count();
     }
     println!("FIELD_GROW_CARRY_KEPT states={} faces={compared} identical=true ms={}", states.len(), started.elapsed().as_millis());
+    let mut rows = rows_file(Path::new(&format!("{}.JOINT.tsv", args[12])), "lap\tproblem\tanswer_sites\town_bits\tfoil_bits\tinformation_bits\tinformation_millibits_by_site\n")?;
+    joint_read(&learner.field, &codec, &held, seed, realization, -1, &mut rows)?;
+    joint_read(&grown.field, &codec, &held, seed, realization, 0, &mut rows)?;
+    write_new(out, grown.to_text().as_bytes())?;
+    println!("FIELD_GROWN {} rate={} material={} ms={}", grown.field.to_text().lines().next().unwrap_or(""), grown.rate_bits, grown.field.theta.len(), started.elapsed().as_millis());
+    Ok(())
+}
+
+/// [definition; theory, November 12; the triad record (`2026-11-12_THE_LAW_ACROSS_A_PLACE_IS_HELD_BY_A_PUMPED_CONTACT…`) §4] **`grow-triad-field
+/// STATE STATE_SHA KEYS KEYS_SHA TRIADS CODEC CODEC_SHA UNITS UNITS_SHA HELD HELD_SHA OUT`**: the growth by triads ([`FieldLearner::with_triads`]).
+/// Reads the learner `STATE`, adds `TRIADS` complex triads (their charts `A`, `B` and `G`, `6 TRIADS` rows of `D`, drawn from `KEYS` past every
+/// draw the state has read; their biases and their return `W_T` at zero), and writes the grown learner to the file `OUT`, with its held joint read
+/// as `train-field`'s lap -1 reads it (`FIELD_JOINT_NATS`) before the growth (`lap=-1`) and after it (`lap=0`), and the faces of every one of
+/// those states compared bit for bit through the declared realization (`FIELD_GROW_TRIAD_KEPT`), as `grow-carry-field` checks its growth: a
+/// growth that moved a face is refused and nothing is written. The held joint's rows go to `OUT.JOINT.tsv`. The clocks are the run's declaration
+/// ([`declared_clocks`]), read alike before and after. Why the faces are kept: founded with `W_T = 0`, the return's second block adds nothing to
+/// the one sum it is released in, so every face is its source's (the record §4: the grown field is the trained field bit for bit).
+pub(super) fn grow_triad_field(args: &[String], realization: &mut dyn FieldRealization) -> Result<()> {
+    if args.len() != 13 {
+        return Err("grow-triad-field STATE STATE_SHA KEYS KEYS_SHA TRIADS CODEC CODEC_SHA UNITS UNITS_SHA HELD HELD_SHA OUT".into());
+    }
+    let started = std::time::Instant::now();
+    let mut learner = FieldLearner::from_text(std::str::from_utf8(&pinned_read(&args[1], &args[2], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
+    declared_clocks(&mut learner.field);
+    let keys = pinned_read(&args[3], &args[4], READ_BUDGET as usize)?;
+    let seed = u64::from_be_bytes(keys.get(keys.len().saturating_sub(8)..).filter(|w| w.len() == 8).ok_or("a key file of fewer than eight bytes")?.try_into()?);
+    let triads = positive(&args[5])?;
+    let units = units_of(&args[8], &args[9])?;
+    let codec = FieldCodec::from_text(std::str::from_utf8(&pinned_read(&args[6], &args[7], CODEC_BUDGET)?)?, units)?;
+    let held_text = pinned_read(&args[10], &args[11], READ_BUDGET as usize)?;
+    if learner.field.declaration.alphabet != codec.alphabet() {
+        return Err("a learner whose alphabet is not the codec's".into());
+    }
+    // The key file's last word is the masks' seed and no growth may reach it.
+    let drawn = learner.drawn + 4 * learner.field.declaration.triad_draws(triads);
+    if drawn + 8 > keys.len() {
+        return Err(format!("a key file of {} bytes, and the growth would read {drawn} before its last word", keys.len()).into());
+    }
+    let out = Path::new(&args[12]);
+    if out.exists() {
+        return Err("a grown state's path that exists".into());
+    }
+    let held: Problems = {
+        let dev = problems_of(&held_text);
+        let encoded = dev.par_iter().map(|(q, a)| Ok((codec.encode(&question_text(q)).map_err(|e| e.to_string())?, codec.encode(a).map_err(|e| e.to_string())?, a.len()))).collect::<std::result::Result<Vec<_>, String>>()?;
+        encoded.into_iter().filter(|(_, a, _)| a.len() < codec.answer).collect()
+    };
+    let mut grown = learner.with_triads(triads, &keys).map_err(|e| e.to_string())?;
+    declared_clocks(&mut grown.field);
+    let after = grown.field.declaration;
+    println!("FIELD_GROW_TRIAD triads={} contacts={} width={} lanes={} heads={} rate={} drawn={} material={} ms={}", after.triads, after.contacts, after.width, after.lanes, after.heads, grown.rate_bits, grown.drawn, grown.field.theta.len(), started.elapsed().as_millis());
+    // The faces of the held joint's states, bit for bit.
+    let n = held.len();
+    let mut states: Vec<(Vec<usize>, Vec<bool>)> = Vec::new();
+    for i in 0..n {
+        let ((q, a, _), (fq, _, _)) = (&held[i], &held[(i + 1) % n]);
+        for question in [q, fq] {
+            for (c, u, _) in joint_states(codec.void(), question, a, seed, i as u64) {
+                states.push((c, u));
+            }
+        }
+    }
+    let mut compared = 0usize;
+    for chunk in states.chunks(64) {
+        let views: Vec<Region> = chunk.iter().map(|(c, u)| Region { classes: c, unresolved: u, faces: &[], locked: &[], echo: &[], domain: None, port: None }).collect();
+        let was = realization.read_faces(&learner.field, &views).map_err(|e| e.to_string())?;
+        let now = realization.read_faces(&grown.field, &views).map_err(|e| e.to_string())?;
+        if was != now {
+            return Err("a growth by triads that moved a face (the grown field is not written)".into());
+        }
+        compared += was.iter().flatten().flatten().count();
+    }
+    println!("FIELD_GROW_TRIAD_KEPT states={} faces={compared} identical=true ms={}", states.len(), started.elapsed().as_millis());
     let mut rows = rows_file(Path::new(&format!("{}.JOINT.tsv", args[12])), "lap\tproblem\tanswer_sites\town_bits\tfoil_bits\tinformation_bits\tinformation_millibits_by_site\n")?;
     joint_read(&learner.field, &codec, &held, seed, realization, -1, &mut rows)?;
     joint_read(&grown.field, &codec, &held, seed, realization, 0, &mut rows)?;
@@ -4235,7 +4310,7 @@ mod tests {
 
     fn toy_learner(codec: &FieldCodec, problems: &Problems) -> FieldLearner {
         let reach = problems.iter().map(|(q, _, _)| q.len() + codec.answer).max().unwrap();
-        let d = FieldDeclaration { alphabet: codec.alphabet(), width: 8, heads: 2, modes: 3, still: 1, contacts: 4, ticks: 2, frames: 2, reach, lanes: 1, depth: 0, carry: 0 };
+        let d = FieldDeclaration { alphabet: codec.alphabet(), width: 8, heads: 2, modes: 3, still: 1, contacts: 4, ticks: 2, frames: 2, reach, lanes: 1, depth: 0, carry: 0, triads: 0 };
         let keys: Vec<u8> = (0..1u64 << 13).flat_map(|i| mix(0x5EED, i).to_be_bytes()).collect();
         FieldLearner::new(Field::found(d, &keys).unwrap(), 4)
     }
