@@ -4790,6 +4790,53 @@ mod tests {
         assert!(read > 0, "the toy's answers reach a square");
         let _ = std::fs::remove_dir_all(&dir);
     }
+
+    /// [theory, November 12, G90's first branch] `leak-field`'s sums on the host, on the toy grown by two carry circles with circle 0's leak
+    /// row moved so that some of its reads fall below zero: over the held joint's own and foil states its open reads and their `h ≥ 0` counts
+    /// are the carry gates' on the same states ([`Field::carry_gates_of`], what a lap's `FIELD_CARRY_GATES` counts); every site of every
+    /// state is read once a tick in one kind and one band; the reads below zero are the three lowest bands' and lie in runs no longer than
+    /// the longest; and circle 1, founded (`H = 0`, `h_b = 1/4`), reads none below zero.
+    #[test]
+    fn the_leak_reading_counts_what_the_gates_count() {
+        let (codec, problems) = toy();
+        let learner = toy_learner(&codec, &problems);
+        let keys: Vec<u8> = (0..1u64 << 14).flat_map(|i| mix(0x1EAC, i).to_be_bytes()).collect();
+        let mut grown = learner.with_carry(2, &keys).unwrap();
+        let (dw, carry) = (grown.field.declaration.width, grown.field.layout().carry);
+        for j in 0..dw {
+            grown.field.theta[carry + 2 * dw + j] = if j % 2 == 0 { -(1 << 24) } else { 1 << 24 };
+        }
+        let field = &grown.field;
+        let seed = 0x5EED;
+        let (leaks, states) = leak_sums(field, &codec, &problems, seed, &mut HostField).unwrap();
+        let (n, ticks) = (problems.len(), field.declaration.ticks as u64);
+        let mut gates = holonics::hnn::tower::field::CarryGates::new(2);
+        let (mut drawn, mut sites) = (0usize, 0u64);
+        for i in 0..n {
+            let ((q, a, _), (fq, _, _)) = (&problems[i], &problems[(i + 1) % n]);
+            for question in [q, fq] {
+                for (c, u, _) in joint_states(codec.void(), question, a, seed, i as u64) {
+                    let region = Region { classes: &c, unresolved: &u, faces: &[], locked: &[], echo: &[], domain: None, port: None };
+                    gates.add(&field.carry_gates_of(&region).unwrap());
+                    (drawn, sites) = (drawn + 1, sites + c.len() as u64 * ticks);
+                }
+            }
+        }
+        assert_eq!(states, drawn, "the joint's own and foil states");
+        for (k, leak) in leaks.iter().enumerate() {
+            assert_eq!((leak.reads, leak.nonnegative), (gates.reads, gates.friction[k]), "circle {k}: the gates' counts on the same states");
+            assert_eq!(leak.kind.iter().map(|p| p.1).sum::<u64>(), sites, "circle {k}: every site once a tick in one kind");
+            assert_eq!(leak.bands.iter().sum::<u64>(), sites, "circle {k}: every site once a tick in one band");
+            let below: u64 = leak.kind.iter().map(|p| p.0).sum();
+            assert_eq!(leak.bands[..3].iter().sum::<u64>(), below, "circle {k}: the reads below zero are the lowest bands'");
+            assert_eq!((leak.first.1 + leak.last.1, leak.charge_below.1 + leak.charge_rest.1), (2 * sites / ticks, sites), "circle {k}");
+            assert_eq!(leak.charge_below.1, below);
+            let runs: u64 = leak.runs.iter().sum();
+            assert!(runs <= below && below <= runs * leak.longest as u64, "circle {k}: the runs hold the reads below zero");
+        }
+        assert!(leaks[0].kind.iter().map(|p| p.0).sum::<u64>() > 0, "the moved leak row turns some reads below zero");
+        assert_eq!(leaks[1].kind.iter().map(|p| p.0).sum::<u64>(), 0, "a founded circle reads no leak below zero");
+    }
 }
 
 
@@ -4923,6 +4970,230 @@ pub(super) fn gamma_field(args: &[String], realization: &mut dyn FieldRealizatio
     }
     println!("GAMMA_DONE problems={count} regions={} circles={half} elapsed_ms={}", owned.len(), started.elapsed().as_millis());
     Ok(())
+}
+
+/// [measurement; theory, November 12, G90's first branch] **`leak-field STATE STATE_SHA CODEC CODEC_SHA UNITS UNITS_SHA HELD HELD_SHA KEYS
+/// KEYS_SHA`**: where the carry circles' leak reads below zero, so that their friction is off, on the held joint's own states (the held problems'
+/// own and foil states of [`joint_states`], the key file's last word the seed, as `joint-field` reads them), from each tick's pair chart the
+/// realization read (`read_ticks`) and the forward's own arithmetic on it ([`Field::carry_leaks`]). For each circle:
+/// - `FIELD_LEAK`: the (open site, tick) reads and those with `h ≥ 0` (the lap's `FIELD_CARRY_GATES` on the same state counts the same, the
+///   build's receipt); then over every site of every state, which the scan runs over, the reads with `h < 0` by kind (a question's site, an
+///   answer's open site, an answer's given site) beside the kind's reads; the reads by band of `h` in units of the founded leak `1/4` (below
+///   `−1/2`, `−1/2` to `−1/4`, `−1/4` to `0`, `0` to `1/4`, `1/4` to `1/2`, `1/2` to `1`, `1` and over); the open reads with `h < 0` by the
+///   state's stratum (the quarter of its answer that is open, [`joint_states`]) beside the stratum's open reads; and the reads with `h < 0` at
+///   the first tick and at the last, beside each tick's reads.
+/// - `FIELD_LEAK_RUNS`: the runs of sites with `h < 0` along the strand in the circle's scan order, at each tick (a stretch without loss:
+///   `|γ| = 1` there, so the scan sums `b` over it), counted by length (1, 2 to 3, 4 to 7, 8 to 15, 16 to 31, 32 to 63, 64 and over), the
+///   longest, and the sites in runs of 16 or more; and the circle's charge `|Q(t)|` on `2^(−16)` (the scan's value after a site): its largest
+///   over every site and over the sites with `h < 0`, and its mean over each.
+///
+/// Integers; a reading: it writes no state and no file.
+///
+/// Why (G90's rule; agent-inferred): the gate's `d = max(0, h)` switches a circle's friction off where its leak reads below zero and gives
+/// such a read no covector, so nothing at that site pulls it back; a run of such sites is a store with no loss (atlas `store.finite-quality`),
+/// whose sum and covector grow with the run. Where the runs stand, how long they are and what charge they carry decides whether the leak's
+/// chart owes a friction positive by its form, and shows where the field locates its longer carry.
+pub(super) fn leak_field(args: &[String], realization: &mut dyn FieldRealization) -> Result<()> {
+    if args.len() != 11 {
+        return Err("leak-field STATE STATE_SHA CODEC CODEC_SHA UNITS UNITS_SHA HELD HELD_SHA KEYS KEYS_SHA".into());
+    }
+    let started = std::time::Instant::now();
+    let mut learner = FieldLearner::from_text(std::str::from_utf8(&pinned_read(&args[1], &args[2], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
+    declared_clocks(&mut learner.field);
+    let field = &learner.field;
+    let (circles, ticks, plain) = (field.declaration.carry, field.declaration.ticks, field.declaration.carry_first());
+    if circles == 0 {
+        return Err("leak-field reads a field with carry circles".into());
+    }
+    let units = units_of(&args[5], &args[6])?;
+    let codec = FieldCodec::from_text(std::str::from_utf8(&pinned_read(&args[3], &args[4], CODEC_BUDGET)?)?, units)?;
+    let held_text = pinned_read(&args[7], &args[8], READ_BUDGET as usize)?;
+    let keys = pinned_read(&args[9], &args[10], READ_BUDGET as usize)?;
+    let seed = u64::from_be_bytes(keys.get(keys.len().saturating_sub(8)..).filter(|w| w.len() == 8).ok_or("a key file of fewer than eight bytes")?.try_into()?);
+    if field.declaration.alphabet != codec.alphabet() {
+        return Err("a learner whose alphabet is not the codec's".into());
+    }
+    // The held problems as `joint-field` reads them, so the states are the lap's own.
+    let held: Problems = {
+        let dev = problems_of(&held_text);
+        let encoded = dev.par_iter().map(|(q, a)| Ok((codec.encode(&question_text(q)).map_err(|e| e.to_string())?, codec.encode(a).map_err(|e| e.to_string())?, a.len()))).collect::<std::result::Result<Vec<_>, String>>()?;
+        encoded.into_iter().filter(|(_, a, _)| a.len() < codec.answer).collect()
+    };
+    let (leaks, states) = leak_sums(field, &codec, &held, seed, realization)?;
+    let join = |v: &[u64]| v.iter().map(|x| x.to_string()).collect::<Vec<_>>().join("/");
+    let pair = |p: (u64, u64)| format!("{}/{}", p.0, p.1);
+    let mean = |p: (u128, u64)| if p.1 == 0 { "-".to_string() } else { (p.0 / u128::from(p.1)).to_string() };
+    for (k, leak) in leaks.iter().enumerate() {
+        let e = plain + k;
+        println!(
+            "FIELD_LEAK circle={k} contact={e} side={} reads={} h_nonnegative={} below_question={} below_open={} below_given={} bands={} strata_below={} strata_open={} below_first_tick={} below_last_tick={}",
+            if e % 2 == 0 { "left" } else { "right" },
+            leak.reads,
+            leak.nonnegative,
+            pair(leak.kind[0]),
+            pair(leak.kind[1]),
+            pair(leak.kind[2]),
+            join(&leak.bands),
+            join(&leak.strata.map(|s| s.0)),
+            join(&leak.strata.map(|s| s.1)),
+            pair(leak.first),
+            pair(leak.last)
+        );
+        println!(
+            "FIELD_LEAK_RUNS circle={k} runs_1/2-3/4-7/8-15/16-31/32-63/64+={} longest={} sites_in_runs_of_16={} charge_max={} charge_max_below={} charge_mean_below={} charge_mean_rest={}",
+            join(&leak.runs),
+            leak.longest,
+            leak.long_sites,
+            leak.charge_max,
+            leak.charge_max_below,
+            mean(leak.charge_below),
+            mean(leak.charge_rest)
+        );
+    }
+    // In `FIELD_CARRY_GATES`'s own words, so a lap's line on the same state reads the same.
+    println!("FIELD_LEAK_GATES circles={circles} reads={} h_nonnegative={}", leaks[0].reads, leaks.iter().map(|l| l.nonnegative.to_string()).collect::<Vec<_>>().join("/"));
+    println!("FIELD_LEAK_DONE problems={} states={states} ticks={ticks} circles={circles} ms={}", held.len(), started.elapsed().as_millis());
+    Ok(())
+}
+
+/// One carry circle's sums for [`leak_field`]: the open reads and those with `h ≥ 0`; the reads with `h < 0` and all reads by kind (a
+/// question's site, an answer's open site, an answer's given site); the reads by band of `h`; the open reads with `h < 0` and all open
+/// reads by stratum; the reads with `h < 0` and all reads at the first tick and the last; the runs by length band, the longest and the
+/// sites in runs of 16 or more; the largest charge over every site and over the sites with `h < 0`; and the charge's sum and count over the
+/// sites with `h < 0` and over the rest.
+#[derive(Clone, Debug, Default)]
+struct Leak {
+    reads: u64,
+    nonnegative: u64,
+    kind: [(u64, u64); 3],
+    bands: [u64; 7],
+    strata: [(u64, u64); CONTEXT],
+    first: (u64, u64),
+    last: (u64, u64),
+    runs: [u64; 7],
+    longest: usize,
+    long_sites: u64,
+    charge_max: u64,
+    charge_max_below: u64,
+    charge_below: (u128, u64),
+    charge_rest: (u128, u64),
+}
+
+impl Leak {
+    /// A run of `run` sites with `h < 0` ends.
+    fn close(&mut self, run: usize) {
+        let band = match run {
+            1 => 0,
+            2..=3 => 1,
+            4..=7 => 2,
+            8..=15 => 3,
+            16..=31 => 4,
+            32..=63 => 5,
+            _ => 6,
+        };
+        self.runs[band] += 1;
+        self.longest = self.longest.max(run);
+        if run >= 16 {
+            self.long_sites += run as u64;
+        }
+    }
+}
+
+/// [`leak_field`]'s sums over `held`'s joint states, own and foil, as [`joint_read`] draws them on `seed`, a carry circle each, and the
+/// count of states.
+fn leak_sums(field: &Field, codec: &FieldCodec, held: &Problems, seed: u64, realization: &mut dyn FieldRealization) -> Result<(Vec<Leak>, usize)> {
+    let (circles, ticks, plain) = (field.declaration.carry, field.declaration.ticks, field.declaration.carry_first());
+    let n = held.len();
+    // (stratum, classes, open, the question's sites).
+    let mut states: Vec<(usize, Vec<usize>, Vec<bool>, usize)> = Vec::new();
+    for i in 0..n {
+        let ((q, a, _), (fq, _, _)) = (&held[i], &held[(i + 1) % n]);
+        for question in [q, fq] {
+            for (c, u, (_, k)) in joint_states(codec.void(), question, a, seed, i as u64) {
+                let m = a.len() + 1;
+                let stratum = (0..CONTEXT).find(|&s| (k as usize) < 1 + (s + 1) * m / CONTEXT).unwrap_or(CONTEXT - 1);
+                states.push((stratum, c, u, question.len()));
+            }
+        }
+    }
+    // The bands of `h` in units of the founded leak `1/4` on `2^(−16)`.
+    let quarter = i64::from(holonics::hnn::tower::field::CARRY_LEAK_FOUNDING);
+    let band_of = |h: i64| -> usize {
+        match h {
+            h if h < -2 * quarter => 0,
+            h if h < -quarter => 1,
+            h if h < 0 => 2,
+            h if h < quarter => 3,
+            h if h < 2 * quarter => 4,
+            h if h < 4 * quarter => 5,
+            _ => 6,
+        }
+    };
+    let mut leaks = vec![Leak::default(); circles];
+    for chunk in states.chunks(64) {
+        let views: Vec<Region> = chunk.iter().map(|(_, c, u, _)| Region { classes: c, unresolved: u, faces: &[], locked: &[], echo: &[], domain: None, port: None }).collect();
+        let reads = realization.read_ticks(field, &views).map_err(|e| e.to_string())?;
+        if reads.len() != chunk.len() {
+            return Err("a tick read of other than its regions".into());
+        }
+        for ((stratum, c, open, q_len), state_ticks) in chunk.iter().zip(&reads) {
+            if state_ticks.len() != ticks {
+                return Err("a tick read of other than the field's ticks".into());
+            }
+            let sites = c.len();
+            for (tick, read) in state_ticks.iter().enumerate() {
+                let (h, charge) = field.carry_leaks(&read.pair_read).map_err(|e| e.to_string())?;
+                if h.len() != sites * circles {
+                    return Err("a pair chart of other than the region's sites".into());
+                }
+                for (k, leak) in leaks.iter_mut().enumerate() {
+                    let left = (plain + k) % 2 == 0;
+                    let mut run = 0usize;
+                    for step in 0..sites {
+                        let t = if left { step } else { sites - 1 - step };
+                        let (hv, qv) = (h[t * circles + k], charge[t * circles + k]);
+                        let below = hv < 0;
+                        let kind = if t < *q_len { 0 } else if open[t] { 1 } else { 2 };
+                        leak.kind[kind].0 += u64::from(below);
+                        leak.kind[kind].1 += 1;
+                        leak.bands[band_of(hv)] += 1;
+                        if open[t] {
+                            leak.reads += 1;
+                            leak.nonnegative += u64::from(!below);
+                            leak.strata[*stratum].0 += u64::from(below);
+                            leak.strata[*stratum].1 += 1;
+                        }
+                        if tick == 0 {
+                            leak.first.0 += u64::from(below);
+                            leak.first.1 += 1;
+                        }
+                        if tick + 1 == ticks {
+                            leak.last.0 += u64::from(below);
+                            leak.last.1 += 1;
+                        }
+                        leak.charge_max = leak.charge_max.max(qv);
+                        if below {
+                            run += 1;
+                            leak.charge_max_below = leak.charge_max_below.max(qv);
+                            leak.charge_below.0 += u128::from(qv);
+                            leak.charge_below.1 += 1;
+                        } else {
+                            if run > 0 {
+                                leak.close(run);
+                            }
+                            run = 0;
+                            leak.charge_rest.0 += u128::from(qv);
+                            leak.charge_rest.1 += 1;
+                        }
+                    }
+                    if run > 0 {
+                        leak.close(run);
+                    }
+                }
+            }
+        }
+    }
+    Ok((leaks, states.len()))
 }
 
 /// [measurement; agent-inferred, November 4] **`expansion-field STATE STATE_SHA CODEC CODEC_SHA UNITS UNITS_SHA HELD HELD_SHA

@@ -2720,6 +2720,43 @@ fn the_carry_circles_gates_are_read_from_the_forwards_own_cells() {
     assert!(moved.friction[0] < moved.reads, "a moved leak row closes some reads' friction");
 }
 
+/// [measurement; theory, November 12, G90's first branch] **The carry circles' leaks and charges, read**: on a drawn field grown by two carry
+/// circles ([`circled_shaped`]), with circle 0's leak row moved so that some reads fall below zero, [`Field::carry_leaks`] over each tick's pair chart gives every
+/// site's leak read as the forward's own cell holds it (`qh`), and its charge after the site as the scan's value before the next site in scan
+/// order (`qm`, even contacts from the left and odd from the right); a field without circles refuses.
+#[test]
+fn the_carry_circles_leaks_and_charges_are_the_forwards_own() {
+    let mut field = circled_shaped(1);
+    let (l, dw) = (field.layout.clone(), field.declaration.width);
+    for j in 0..dw {
+        field.theta[l.carry + 2 * dw + j] = if j % 2 == 0 { -(1 << 24) } else { 1 << 24 };
+    }
+    let r = region();
+    let pass = field.pass(&r, true).unwrap();
+    let (circles, first) = (field.declaration.carry, field.declaration.carry_first());
+    let c2 = 2 * circles;
+    let (mut below, mut charged) = (0usize, 0usize);
+    for cell in &pass.ticks {
+        let (h, charge) = field.carry_leaks(&cell.read2).unwrap();
+        let sites = cell.read2.len() / dw;
+        assert_eq!((h.len(), charge.len()), (sites * circles, sites * circles));
+        for t in 0..sites {
+            for k in 0..circles {
+                assert_eq!(h[t * circles + k], cell.qh[t * c2 + circles + k], "site {t} circle {k}: the leak read is the forward's");
+                below += usize::from(h[t * circles + k] < 0);
+                let next = if (first + k) % 2 == 0 { t + 1 } else { t.wrapping_sub(1) };
+                if next < sites {
+                    let (qr, qi) = (i128::from(cell.qm[next * c2 + k]), i128::from(cell.qm[next * c2 + circles + k]));
+                    assert_eq!(charge[t * circles + k], ((qr * qr + qi * qi) as u128).isqrt() as u64, "site {t} circle {k}: the charge is the scan's");
+                    charged += 1;
+                }
+            }
+        }
+    }
+    assert!(below > 0 && charged > 0, "the moved leak row turns some reads below zero, and the charges are read");
+    assert!(shaped_with(four_contacts(1)).carry_leaks(&pass.ticks[0].read2).is_err(), "a field without circles refuses");
+}
+
 /// [definition; theory, November 11 19:56, G83's second defect, G85] **A field with carry circles keeps every room whole**: with the circles' charts,
 /// biases and `W` columns drawn (so from the second tick a circle carries a place's state past any window), a region whose port cuts its room reads
 /// the same faces, the same port code and the same covector as the same region with the cut off, because [`FieldDeclaration::room_window`] admits
