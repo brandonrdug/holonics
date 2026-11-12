@@ -537,18 +537,28 @@ that day. They are written here with their reasons so that no agent holds them a
   rows its rings hold, shared by every symbol at a residue; and its code length, the rings that
   tell it apart. A codec, an encoding or a growth of an alphabet states that word and what its
   rows share, its periods are read by a ruler before a chart is built, and a composite (a
-  character of several bytes, a frequent run) is its factors' strand with a remainder. No design
-  indexes a table of free rows by a symbol, and an encoding's bytes are not called "the letters".
+  character of several bytes, a frequent run) is its factors' strand with a remainder, composed
+  by the machine and never read from a table of merges at the input. No design indexes a table
+  of free rows by a symbol, and an encoding's bytes are not called "the letters".
   Reason: the store's alphabet of November 12 gave each of 244 byte classes 259 entries of its
   own, 0.54 of the constitution's 117,478, the class a byte's rank among the bytes met, so no two
   symbols shared an entry, a rare byte learned only from its own occurrences, and the writes drew
   bytes of characters without their partners. He named it the same day: a code length is the
   width the precision law gives an arithmetic symbol, and a character mapping whose arithmetic no
-  receiver reads is only a character map. The precision law and the atlas held the word for
-  values and had never applied it to the alphabet. That the key is located and never read off a
-  code table is `agent-inferred`, from the day's rulers: a code point's coprime residues keep no
-  more than a scramble keeps, and an address located from counts keeps 0.90 to 0.96 of a free
-  row's content on 33 rows. Scope: every codec, encoding, alphabet and chart, for text, image,
+  receiver reads is only a character map. The repository already held the word: the precision
+  law for values, and for the alphabet the located transport of October 5 with guard 9 of
+  THE_MACHINE (an occurrence steps the rings by its symbol's located advance; a class is a port
+  of a ring and its advance the lift's digits, never an index into a table; the located code
+  length does not see the labels). The tower of November took its classes on the codec's sheet
+  beside them, unread against them, and this rule's first writing repeated the miss by calling
+  the word new (corrected the same day; the record's §8.8). That the key is located and never
+  read off a code table is October's law, and the day's rulers read it on open text: a code
+  point's coprime residues keep no more than a scramble keeps, and an address located from
+  counts keeps 0.91 to 0.98 of a free row's content on 43 rows of the helix's own rings, of
+  which the 41 commonest bytes keeping a row each give 0.76 to 0.94, the rest being what rare
+  symbols gain from shared rows. That a composite is the machine's own composition is
+  `agent-inferred` from the founded units' recorded defect and the atlas's chart of tokenizers.
+  Scope: every codec, encoding, alphabet and chart, for text, image,
   acoustic and motor input, and every message, record and brief that describes one. The built
   line's class names stay the code's where the code is cited
   ([the record](research/records/2026-11-12_THE_STORE_CODES_HELD_TEXT_AT_THE_LEVEL_OF_TWO_KNOWN_NEIGHBOURS_A_SIDE_A_SYMBOL_IS_A_WORD_ON_LOCATED_RINGS_AND_A_DARK_PLACE_IS_THE_INTERIOR_OF_A_COMPOSITE.md) §5 to §9).

@@ -13,7 +13,15 @@ The read: nats a place of a class given the byte before it, on the held role's f
 symbol_word_ruler.py (order0 and the full map of 256 rows beside). `cells` is the count of distinct addresses the met bytes
 hold (bytes that share every residue are one symbol to a neighbour).
 
-usage: python3 -I symbol_located_ruler.py COUNT_SHARD HELD_SHARD REPO_TOOLS COUNT_MB READ_PLACES
+usage: python3 -I symbol_located_ruler.py COUNT_SHARD HELD_SHARD REPO_TOOLS COUNT_MB READ_PLACES [RING_SETS]
+RING_SETS, when given, replaces the ring sets read: sets apart by ";", a set's sizes by "," ("16,27;9,32;4,7,9").
+The helix's own towers at the alphabet (dyadic 2, 4, 8, ... and triadic 3, 9, 27, ...; `ring_periods`) were read with
+"16,27;9,32;4,7,9;5,7,8;3,4,5,7;2,3,5,7,11" (symbol_located_ruler_towers.txt).
+With RING_SETS given, a set of two rings also prints `cross`, a control with no location: the m_1 + m_2 - 2 most frequent
+bytes each alone on a cell of the cross (a residue 0 on one ring), where a cell's row is free, and every other byte on the
+cross's last cell, one row for all of them; `cross_bytes` is their count and `cross_mass` their share of the counts' places.
+It says how much of a located address's share is a frequent byte keeping a row of its own (symbol_located_ruler.txt was
+written before the control existed and has no such column).
 Output: numbers only.
 """
 import sys
@@ -79,6 +87,8 @@ print("# symbol_located_ruler counts<=%d MB a slice (common_corpus_1/subset_1_1.
 
 ROUNDS = 40
 RINGS = ((8, 32), (16, 17), (5, 7), (7, 9), (3, 5, 7), (5, 7, 9), (11, 13))
+if len(sys.argv) > 6:
+    RINGS = tuple(tuple(int(m) for m in ring_set.split(",")) for ring_set in sys.argv[6].split(";"))
 
 
 def nats(p, h):
@@ -166,4 +176,13 @@ for name in cp.NAMES:
             groups, logf, rounds, moved = locate(n, met, start, sizes)
             cells = len({tuple(int(g[x]) for g in groups) for x in met})
             out.append("%s: given=%.4f located=%.4f (rounds=%d, last_moved=%d, cells=%d)" % (label, given, nats(table_of(logf, groups), h), rounds, moved, cells))
+        if len(sys.argv) > 6 and len(sizes) == 2:
+            cells_of_cross = [(0, 0)] + [(i, 0) for i in range(1, sizes[0])] + [(0, j) for j in range(1, sizes[1])]
+            by_count = met[np.argsort(-raw.sum(1)[met], kind="stable")]
+            own = len(cells_of_cross) - 1
+            cross = [np.full(256, cells_of_cross[-1][k], dtype=np.int64) for k in range(2)]
+            for rank, x in enumerate(by_count[:own]):
+                cross[0][x], cross[1][x] = cells_of_cross[rank]
+            out.append("cross: given=%.4f (cross_bytes=%d, cross_mass=%.4f)" % (
+                nats(table_of(rows_of_address(n, cross, sizes), cross), h), own, raw.sum(1)[by_count[:own]].sum() / raw.sum()))
         print("  ".join(out), " s=%.0f" % (time.time() - t0), flush=True)

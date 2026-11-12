@@ -710,6 +710,19 @@ tests can comb through anything valuable").
      `holarchy::terrain::known`) and the entries, which accept only `Encoded`. The residue chart,
      `one_hot` and `codes` are deleted. #375's validation listings on the terrains reproduce byte for
      byte through the declared identity, and the located route reaches the field on the host.
+   - **Status (November 12): the tower's codec stands outside this guard.** The tower built in
+     November (`hnn::tower::field`) takes its classes on the codec's sheet (the field record
+     §16.16): `FieldCodec` ranks the units a passage uses, and each class holds a row of its own in
+     every family the layout declares for a class. No entry of the tower takes `Encoded`, so the
+     tests above do not reach it. It keeps this guard's blindness to labels (no code's arithmetic
+     is read) and not its word: a code becomes a class by the codec's rank and a class indexes
+     tables of rows, the two forms the located transport's record names in its §10. Only the pace
+     keeps the located advance's form (a class's own advance of a paced clock, located by
+     deposition). The repair is the symbol's line
+     ([the record](../research/records/2026-11-12_THE_STORE_CODES_HELD_TEXT_AT_THE_LEVEL_OF_TWO_KNOWN_NEIGHBOURS_A_SIDE_A_SYMBOL_IS_A_WORD_ON_LOCATED_RINGS_AND_A_DARK_PLACE_IS_THE_INTERIOR_OF_A_COMPOSITE.md)
+     §8.8 and §11): a symbol's entries as a series on a located address, with this guard's tests
+     extended to the tower's entries. Until it is built, a description of the tower's alphabet
+     says that it is the codec's sheet.
    - **What is structural.** The type and its constructors: `compile_fail` doctests on `Encoded`
      and `PortCell` show a forged one (`E0451`), an exterior code list, one-hot cells or a code
      where they go (`E0308`), and `From<usize>`, `From<Vec<_>>`, `From<Faces>` and `From<Released>`
