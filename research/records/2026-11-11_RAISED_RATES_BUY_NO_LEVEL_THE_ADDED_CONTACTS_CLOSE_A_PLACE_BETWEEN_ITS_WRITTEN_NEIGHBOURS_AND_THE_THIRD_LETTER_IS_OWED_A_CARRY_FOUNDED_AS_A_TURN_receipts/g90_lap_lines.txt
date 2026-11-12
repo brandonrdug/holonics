@@ -1,0 +1,64 @@
+# G90's laps tp4 and tp5 (tp4 from tp3/STATE.0, tp5 from tp4/STATE.0), tf1 to tf3's build (bin-turn-carry-tf, 837bc5887de82cda) with lap_tf.sh's
+# exports, arguments and bounds as tf1 had (L 3,703,955 ms, the run's 4,003,955 ms, outer 4,063 s), so on tf1 to tf3's sections; projection
+# 1,340 s a lap on the lap lines; early stop past 2,413 ms a section over the first hundred. Pairs: tp4 with rt22 and tp5 with rt23, the line's
+# own laps on the same sections (g90_rt_reads.txt).
+# Device line: the card, the RTX 4080 SUPER under HOLONICS_ROOT/.local/gpu.lock, each lap and each read its own hold, one chain dispatched with
+# tools/runs.py (the P13 chain, its step 3) from 02:35:38 UTC on 2026-11-12; the host's part as the card's lap runs it; the rulers on the host, one thread each.
+## tp4 (the chain's output)
+# tp4 from tp3/STATE.0 14625d5efce64009: hnn-field-v14t 100 64 4 8 2 128 4 4 3771 2 0 32; parts 32 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 3 3 3 3; lap bound 3703955 ms, the run's 4003955 ms, outer 4063 s 02:35:38
+# tp4: lock taken 02:35:38 wait_s=.001901680
+PART_RATES_SEEN tp4 FIELD_PART_RATES contacts_before=32 rate_bits=12 octaves w_new=0 a_new=0 b_new=0 enc_lane=0 before_lane=0 after_lane=0 q_lane=0 v_lane=0 probe_lane=0 out_lane=0 moment_face_lane=0 read_lane=0 face_biases_lane=0 a_lane=0 b_lane=0 carry=3 w_carry=3 a_carry=3 b_carry=3
+GATE_RATES tp4 ok
+EARLY_RATE tp4 sections=100 mean_section_ms=897 bound_ms=2413 02:37:18
+# tp4: lap exit 0 released 02:57:45
+FIELD_PART_RATES contacts_before=32 rate_bits=12 octaves w_new=0 a_new=0 b_new=0 enc_lane=0 before_lane=0 after_lane=0 q_lane=0 v_lane=0 probe_lane=0 out_lane=0 moment_face_lane=0 read_lane=0 face_biases_lane=0 a_lane=0 b_lane=0 carry=3 w_carry=3 a_carry=3 b_carry=3
+FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.700969 foil_nats_a_place=1.832676 information_nats_a_place=0.131707 own_nats_a_word=12.781527 information_nats_a_word=0.989680
+FIELD_JOINT_STRATA lap=-1 open_quarters=1/2/3/4 own_nats_a_place=0.638571/1.231887/1.997581/2.926284 foil_nats_a_place=0.731823/1.363105/2.151296/3.074704 places=10818/10881/10853/10918 open_sites=5333/16153/26922/38725 terms_own=10450337778/20277495142/32796582954/48331913787 terms_foil=11976425056/22437402513/35320297710/50783293621
+FIELD_MEAN lap=0 states=1535 entries=80182 moved=77830 square=3164921983802533
+FIELD_LAP lap=0 read=73 sites=16522561 before=3.182 after=- deposited=1535/1535 halvings=0 next_halved=0 next_refused=0 ms=1309566
+FIELD_JOINT_NATS lap=0 places=43470 words=5785 own_nats_a_place=1.694863 foil_nats_a_place=1.828094 information_nats_a_place=0.133231 own_nats_a_word=12.735646 information_nats_a_word=1.001130
+FIELD_JOINT_STRATA lap=0 open_quarters=1/2/3/4 own_nats_a_place=0.635979/1.217308/1.987078/2.929511 foil_nats_a_place=0.727518/1.347771/2.142205/3.085043 places=10818/10881/10853/10918 open_sites=5333/16153/26922/38725 terms_own=10407930090/20037509287/32624146033/48385221791 terms_foil=11905984075/22185002065/35171050115/50954061591
+MEASURE lap=tp4 rc=0 wall_s=1327.0 peak_rss_kib=824648
+SECTION_STEPS tp4 sections=1535 halved_or_next=0
+CODEC
+JOINT.tsv
+MEAN.0
+STATE.0
+FIELD_JOINT_STRATA lap=-1 open_quarters=1/2/3/4 own_nats_a_place=0.627975/1.209038/1.975641/2.912079 foil_nats_a_place=0.718434/1.339693/2.126725/3.054431 places=10818/10881/10853/10918 open_sites=5333/16153/26922/38725 terms_own=10276931319/19901386188/32436379071/48097300396 terms_foil=11757326166
+MEASURE lap=transmission_open_tp4_mean rc=0 wall_s=186.1 peak_rss_kib=369188
+FIELD_JOINT_STRATA lap=-1 open_quarters=1/2/3/4 own_nats_a_place=0.635979/1.217308/1.987078/2.929511 foil_nats_a_place=0.727518/1.347771/2.142205/3.085043 places=10818/10881/10853/10918 open_sites=5333/16153/26922/38725 terms_own=10407930090/20037509287/32624146033/48385221791 terms_foil=11905984075
+MEASURE lap=transmission_open_tp4_end rc=0 wall_s=188.4 peak_rss_kib=366480
+MAIN tp4 done 03:04:21
+## tp4's first five sections and its last (its log)
+FIELD_SECTION lap=0 n=0 sites=7386 before=3.628 after=- halvings=0 deposited=true next=- predicted_micro=-6845 change_micro=- transfer_micro=- external_micro=-1161 curvature_micro=- rate=12 length=2292 regions_ms=1 deposit_ms=721 ms=1540
+FIELD_SECTION lap=0 n=1 sites=6214 before=3.012 after=- halvings=0 deposited=true next=- predicted_micro=-10272 change_micro=- transfer_micro=2064 external_micro=2064 curvature_micro=3444 rate=12 length=2262 regions_ms=1 deposit_ms=707 ms=1367
+FIELD_SECTION lap=0 n=2 sites=14086 before=3.244 after=- halvings=0 deposited=true next=- predicted_micro=-19640 change_micro=- transfer_micro=831 external_micro=831 curvature_micro=-79 rate=12 length=2392 regions_ms=1 deposit_ms=825 ms=827
+FIELD_SECTION lap=0 n=3 sites=8178 before=3.392 after=- halvings=0 deposited=true next=- predicted_micro=-7723 change_micro=- transfer_micro=-154 external_micro=-154 curvature_micro=-1586 rate=12 length=2638 regions_ms=2 deposit_ms=712 ms=1423
+FIELD_SECTION lap=0 n=4 sites=17770 before=2.837 after=- halvings=0 deposited=true next=- predicted_micro=-15322 change_micro=- transfer_micro=134 external_micro=134 curvature_micro=205 rate=12 length=2825 regions_ms=1 deposit_ms=1189 ms=1191
+FIELD_SECTION lap=0 n=1534 sites=7037 before=3.581 after=- halvings=0 deposited=true next=- predicted_micro=-7328 change_micro=- transfer_micro=-235 external_micro=-235 curvature_micro=-809 rate=12 length=2389 regions_ms=1 deposit_ms=702 ms=704
+## tp4's sections refused or past a carrier (its log)
+FIELD_LAP lap=0 read=73 sites=16522561 before=3.182 after=- deposited=1535/1535 halvings=0 next_halved=0 next_refused=0 ms=1309566
+## tp5 (the chain's output)
+# tp5 from tp4/STATE.0 92debb63c6c42b24: hnn-field-v14t 100 64 4 8 2 128 4 4 3771 2 0 32; parts 32 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 3 3 3 3; lap bound 3703955 ms, the run's 4003955 ms, outer 4063 s 03:04:21
+# tp5: lock taken 03:04:21 wait_s=.001973383
+PART_RATES_SEEN tp5 FIELD_PART_RATES contacts_before=32 rate_bits=12 octaves w_new=0 a_new=0 b_new=0 enc_lane=0 before_lane=0 after_lane=0 q_lane=0 v_lane=0 probe_lane=0 out_lane=0 moment_face_lane=0 read_lane=0 face_biases_lane=0 a_lane=0 b_lane=0 carry=3 w_carry=3 a_carry=3 b_carry=3
+GATE_RATES tp5 ok
+EARLY_RATE tp5 sections=100 mean_section_ms=874 bound_ms=2413 03:06:01
+# tp5: lap exit 1 released 03:25:43
+FIELD_PART_RATES contacts_before=32 rate_bits=12 octaves w_new=0 a_new=0 b_new=0 enc_lane=0 before_lane=0 after_lane=0 q_lane=0 v_lane=0 probe_lane=0 out_lane=0 moment_face_lane=0 read_lane=0 face_biases_lane=0 a_lane=0 b_lane=0 carry=3 w_carry=3 a_carry=3 b_carry=3
+FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.694863 foil_nats_a_place=1.828094 information_nats_a_place=0.133231 own_nats_a_word=12.735646 information_nats_a_word=1.001130
+FIELD_JOINT_STRATA lap=-1 open_quarters=1/2/3/4 own_nats_a_place=0.635979/1.217308/1.987078/2.929511 foil_nats_a_place=0.727518/1.347771/2.142205/3.085043 places=10818/10881/10853/10918 open_sites=5333/16153/26922/38725 terms_own=10407930090/20037509287/32624146033/48385221791 terms_foil=11905984075/22185002065/35171050115/50954061591
+MEASURE lap=tp5 rc=1 wall_s=1281.8 peak_rss_kib=957204
+SECTION_STEPS tp5 sections=1501 halved_or_next=0
+CODEC
+JOINT.tsv
+MAIN tp_chain stopped 03:25:43
+MAIN p13_chain done 03:25:43
+## tp5's first five sections and its last (its log)
+FIELD_SECTION lap=0 n=0 sites=17643 before=3.138 after=- halvings=0 deposited=true next=- predicted_micro=-10551 change_micro=- transfer_micro=- external_micro=2262 curvature_micro=- rate=12 length=2670 regions_ms=2 deposit_ms=977 ms=2190
+FIELD_SECTION lap=0 n=1 sites=21197 before=3.174 after=- halvings=0 deposited=true next=- predicted_micro=-108686 change_micro=- transfer_micro=-1004 external_micro=-1004 curvature_micro=-2887 rate=12 length=2363 regions_ms=1 deposit_ms=1109 ms=2220
+FIELD_SECTION lap=0 n=2 sites=9936 before=3.006 after=- halvings=0 deposited=true next=- predicted_micro=-8475 change_micro=- transfer_micro=254 external_micro=254 curvature_micro=2396 rate=12 length=2483 regions_ms=1 deposit_ms=809 ms=811
+FIELD_SECTION lap=0 n=3 sites=23109 before=2.350 after=- halvings=0 deposited=true next=- predicted_micro=-17342 change_micro=- transfer_micro=1150 external_micro=1150 curvature_micro=1040 rate=12 length=2223 regions_ms=2 deposit_ms=1175 ms=2347
+FIELD_SECTION lap=0 n=4 sites=13751 before=3.166 after=- halvings=0 deposited=true next=- predicted_micro=-12178 change_micro=- transfer_micro=-840 external_micro=-840 curvature_micro=-2773 rate=12 length=2445 regions_ms=1 deposit_ms=826 ms=828
+## tp5's sections refused or past a carrier (its log)
+field_pass: tower realization refused: the card refused the field: a sum outgrew its 128-bit carrier
