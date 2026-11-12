@@ -250,6 +250,14 @@ struct Words {
     pgam: u64,
     pqm: u64,
     pkb: u64,
+    // [definition; theory, November 12, the friction record §7] The carry circle's count (`FieldDeclaration::count`), one where the field carries it,
+    // and (set per tick, zero without it) the chart's rest friction `d̂` `[t][C]`, the friction the count applied `d = m R` `[t][C]`, the range the
+    // site met `R` `[t][C]` and the reverse's covector of `d̂` `[t][2C]` (each a 128-bit word as two: low, then high).
+    count: u64,
+    pch: u64,
+    pcd: u64,
+    pcr: u64,
+    pcw: u64,
     // [theory, November 11 04:14, step S] The skin's site addresses `[p][l][t]` three words each (`FieldWords::saddr`), the clock's own beside `sigma`.
     saddr: u64,
     // [definition; theory, November 12; the triad record (`2026-11-12_THE_LAW_ACROSS_A_PLACE_IS_HELD_BY_A_PUMPED_CONTACT…`) §3 and §4] The triads
@@ -433,9 +441,11 @@ fn set_tick(w: &mut Words, tick: &Tick, returning: bool) {
     w.bits = tick.bits.device_ptr();
 }
 
-/// [theory, November 12; the triad record §4] Point the words at a tick's triads' carriers (`abg`, `p`, `c^T`), none where the field has no triads.
+/// [theory, November 12; the triad record §4] Point the words at a tick's triads' carriers (`abg`, `p`, `c^T`), none where the field has no triads;
+/// and (the friction record §7) at the count's carriers, none where the field does not carry it.
 fn set_triads(w: &mut Words, tick: &Tick) {
     (w.pabg, w.ptp, w.pct) = (held_at(&tick.pabg), held_at(&tick.ptp), held_at(&tick.pct));
+    (w.pch, w.pcd, w.pcr, w.pcw) = (held_at(&tick.pch), held_at(&tick.pcd), held_at(&tick.pcr), held_at(&tick.pcw));
 }
 
 /// A held buffer's address, zero where none is held.
@@ -584,6 +594,12 @@ struct Tick<'c> {
     pabg: Option<Pooled<'c, i64>>,
     ptp: Option<Pooled<'c, i64>>,
     pct: Option<Pooled<'c, i64>>,
+    /// [theory, November 12; the friction record §7] With the count, the chart's rest friction `d̂` `[t][C]`, the friction applied `[t][C]` and the range
+    /// met `[t][C]`, kept for the reverse, and the reverse's covector of `d̂` `[t][2C]`; none without the count.
+    pch: Option<Pooled<'c, i64>>,
+    pcd: Option<Pooled<'c, i64>>,
+    pcr: Option<Pooled<'c, i64>>,
+    pcw: Option<Pooled<'c, i64>>,
     /// The tick's carrier width: the binary length of its largest unit word.
     bits: Pooled<'c, u32>,
 }
@@ -1061,6 +1077,7 @@ impl<'c> CardField<'c> {
             wg: l.carry as u64,
             wgb: l.carry_bias as u64,
             carry: d.carry as u64,
+            count: u64::from(d.count),
             // [theory, November 12; the triad record §4] The triads' chart (`6J` rows of `D`) and return (`D` rows of `2J`), their reaches over the
             // families as the host's `Reaches` reads them (zero long, and so zero, where `J = 0`).
             triads: d.triads as u64,
@@ -1231,6 +1248,8 @@ impl<'c> CardField<'c> {
         // [theory, November 12; the triad record §4] A triads' carrier `[t][rows J]`, none where the field has no triads.
         let triads = d.triads;
         let triad = |rows: usize| if triads > 0 { alloc64(sites * rows * triads).map(Some) } else { Ok(None) };
+        // [theory, November 12; the friction record §7] The count's carriers `[t][words C]`, none where the field does not carry it.
+        let counted = |words: usize| if d.count { alloc64(sites * words * d.carry).map(Some) } else { Ok(None) };
         Ok(Tick {
             read: self.timed(Kind::Alloc, || self.take::<i32>((sites * dw).max(1))).map_err(device)?,
             scale: self.timed(Kind::Alloc, || self.take::<i128>((sites * lanes).max(1))).map_err(device)?,
@@ -1272,6 +1291,10 @@ impl<'c> CardField<'c> {
             pabg: triad(6)?,
             ptp: triad(2)?,
             pct: triad(2)?,
+            pch: counted(1)?,
+            pcd: counted(1)?,
+            pcr: counted(1)?,
+            pcw: counted(2)?,
             bits: self.timed(Kind::Alloc, || self.take_zeroed::<u32>(4)).map_err(device)?,
         })
     }
@@ -2928,7 +2951,7 @@ mod tests {
     use super::*;
 
     fn declaration(width: usize, heads: usize, contacts: usize) -> FieldDeclaration {
-        FieldDeclaration { alphabet: 122, width, heads, modes: 8, still: 2, contacts, ticks: 2, frames: 4, reach: 2221, lanes: 1, depth: 0, carry: 0, triads: 0 }
+        FieldDeclaration { alphabet: 122, width, heads, modes: 8, still: 2, contacts, ticks: 2, frames: 4, reach: 2221, lanes: 1, depth: 0, carry: 0, triads: 0, count: false }
     }
 
     /// [measurement; theory, November 10 20:34] **The card's footprint by growth route** (host arithmetic, no card read): from the
@@ -2944,7 +2967,7 @@ mod tests {
         // [theory, November 10 21:10] Contacts come in fours (f/2 even): each f from 68 by fours on the main line's declaration (width 64, two
         // lanes), its material, whether the contacts' two maps tile a block (`affine_tiling`: `(f, dw)` and `(dw, f)`) with the shared octets, and
         // the octets of the longest region; then the first f past 128 and the first refused, and the shared figure that refuses it.
-        let base = FieldDeclaration { alphabet: 100, width: 64, heads: 4, modes: 8, still: 2, contacts: 64, ticks: 4, frames: 4, reach: 3771, lanes: 2, depth: 0, carry: 0, triads: 0 };
+        let base = FieldDeclaration { alphabet: 100, width: 64, heads: 4, modes: 8, still: 2, contacts: 64, ticks: 4, frames: 4, reach: 3771, lanes: 2, depth: 0, carry: 0, triads: 0, count: false };
         let mut first_refused = None;
         for f in (68..=512).step_by(4) {
             let d = FieldDeclaration { contacts: f, ..base };
@@ -2966,7 +2989,7 @@ mod tests {
     #[test]
     #[ignore]
     fn the_card_footprint_by_growth_route() {
-        let base = FieldDeclaration { alphabet: 100, width: 64, heads: 4, modes: 8, still: 2, contacts: 64, ticks: 4, frames: 4, reach: 3771, lanes: 2, depth: 0, carry: 0, triads: 0 };
+        let base = FieldDeclaration { alphabet: 100, width: 64, heads: 4, modes: 8, still: 2, contacts: 64, ticks: 4, frames: 4, reach: 3771, lanes: 2, depth: 0, carry: 0, triads: 0, count: false };
         let describe = |name: &str, d: FieldDeclaration| {
             let draws = 4 * d.founding_draws();
             let field = holonics::hnn::tower::field::Field::found(d, &vec![7u8; draws]).expect("founded");

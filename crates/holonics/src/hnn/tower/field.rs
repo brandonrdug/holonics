@@ -290,6 +290,21 @@ pub struct FieldDeclaration {
     /// `hnn-field-v14e` exactly as before and every path is the one before it; `J > 0` writes `hnn-field-v14f`, the thirteen words of `v14e` with
     /// `C` written even where it is zero, then `J`.
     pub triads: usize,
+    /// [definition; theory, November 12 (the friction record,
+    /// `2026-11-12_THE_FRICTION_A_REGION_SETS_A_CARRY_CIRCLE_IS_THE_ONE_WAY_FACTOR_OF_THE_TWO_WAY_CHAIN_AND_CARRIES_ITS_COUNT_BESIDE_ITS_CHARGE_AND_A_SHARED_CHART_RESTS_AT_ITS_REGIONS_LEVER_POINT`,
+    /// §3.3 to §3.6 and §7)] **The carry circle's count** (R3): each circle carries, beside its charge, its back range `R` (the arriving count
+    /// `n` written as `R = 1/(q₀ n)`, in places) along its own scan order, and its friction at a site is what the site brings over what the
+    /// circle holds, `d = m R`. A site's chart reads its rest friction `d̂ = d₀ 2^ℓ` ([`carry_friction`]) and its mass is
+    /// `m = d̂²/(1 + d̂)`; at the region's first site `R` is that site's own rest `(1 + d̂)/d̂`; after each site `R ← 1 + R/(1 + d)`. The move,
+    /// its coupling and its bound are the built ones read at the applied `d` ([`count_gates`]). On a strand whose sites read one `ℓ` the derived
+    /// circle is the built circle at every site, the first included (§3.4), so a field founded with the count forms every face of the built
+    /// founding; the two differ only where `ℓ` varies along a strand. Why (§3.2, §3.5): the built circle reads its friction from the site alone,
+    /// so one friction a site sets both how far it reaches across the unwritten and how sharply it takes the written, and it dilutes or goes
+    /// stale; the two-way chain's one-way factor carries its count, whose range grows a place a site across sites of no mass and is divided by
+    /// `1 + d` at a site of mass, so reach is set by the open sites' mass and sharpness by the letters'. A law carried in the state: `hnn-field-v14g`
+    /// writes `v14f`'s fourteen words (`C` and `J` even where `J` is zero) and then the count's word, `1`; without the count the head line is the
+    /// line before, exactly, and every path is the one before it. A count with no carry circles is refused.
+    pub count: bool,
 }
 
 impl FieldDeclaration {
@@ -559,6 +574,10 @@ impl FieldDeclaration {
         if self.carry % 2 != 0 || self.carry > self.contacts / 2 {
             return refuse("a field's carry circles are even in count (as many scan from each side) and among its complex contacts");
         }
+        // [theory, November 12, the friction record §7] The count is a law of the carry circle.
+        if self.count && self.carry == 0 {
+            return refuse("a carry circle's count on a field with no carry circles");
+        }
         // The triads' families, `6J` rows of `D`, `6J` biases and `D × 2J`, are laid within the carrier their offsets are counted in.
         if self.triads.checked_mul(6).and_then(|r| r.checked_mul(self.width.saturating_add(1))).is_none() {
             return refuse("a field's triads past the carrier their families are laid in");
@@ -574,8 +593,18 @@ impl FieldDeclaration {
     fn to_text(self) -> String {
         // [theory, November 12, the triad record §4] With triads the head is `v14f`: `v14e`'s words with `C` written even at zero, then `J`; without
         // them the line before, exactly.
-        let head = if self.triads > 0 { "hnn-field-v14f" } else if self.carry > 0 { "hnn-field-v14e" } else { "hnn-field-v14" };
-        let tail = if self.triads > 0 { format!(" {} {}", self.carry, self.triads) } else if self.carry > 0 { format!(" {}", self.carry) } else { String::new() };
+        // [theory, November 12, the friction record §7] With the count the head is `v14g`: `v14f`'s words with `C` and `J` written even where `J`
+        // is zero, then the count's word `1`; without it the line before, exactly.
+        let head = if self.count { "hnn-field-v14g" } else if self.triads > 0 { "hnn-field-v14f" } else if self.carry > 0 { "hnn-field-v14e" } else { "hnn-field-v14" };
+        let tail = if self.count {
+            format!(" {} {} 1", self.carry, self.triads)
+        } else if self.triads > 0 {
+            format!(" {} {}", self.carry, self.triads)
+        } else if self.carry > 0 {
+            format!(" {}", self.carry)
+        } else {
+            String::new()
+        };
         format!("{head} {} {} {} {} {} {} {} {} {} {} {}{tail}", self.alphabet, self.width, self.heads, self.modes, self.still, self.contacts, self.ticks, self.frames, self.reach, self.lanes, self.depth)
     }
 
@@ -583,23 +612,29 @@ impl FieldDeclaration {
         let words: Vec<&str> = line.split(' ').collect();
         // A v13 head line is a field with no depth ring (the line before the depth rings, its states the line's own).
         let n = |w: &str| w.parse::<usize>().map_err(|_| TowerError::Refused("a field's declaration that is not a count"));
-        let (depth_word, carry, triads) = match (words.first().copied(), words.len()) {
-            (Some("hnn-field-v14"), 12) => (Some(words[11]), 0, 0),
+        let (depth_word, carry, triads, count) = match (words.first().copied(), words.len()) {
+            (Some("hnn-field-v14"), 12) => (Some(words[11]), 0, 0, false),
             (Some("hnn-field-v14e"), 13) => match n(words[12])? {
                 0 => return refuse("an hnn-field-v14e head line with no carry circles (a field without them is hnn-field-v14)"),
-                c => (Some(words[11]), c, 0),
+                c => (Some(words[11]), c, 0, false),
             },
             // [theory, November 12, the triad record §4] `C` may be zero here, `J` may not, as `v14e` refuses `C = 0`.
             (Some("hnn-field-v14f"), 14) => match n(words[13])? {
                 0 => return refuse("an hnn-field-v14f head line with no triads (a field without them is hnn-field-v14 or hnn-field-v14e)"),
-                j => (Some(words[11]), n(words[12])?, j),
+                j => (Some(words[11]), n(words[12])?, j, false),
+            },
+            // [theory, November 12, the friction record §7] `J` may be zero here; the count's word is `1` (a head without the count is the line
+            // before), and `admit` refuses a count with no circles.
+            (Some("hnn-field-v14g"), 15) => match n(words[14])? {
+                1 => (Some(words[11]), n(words[12])?, n(words[13])?, true),
+                _ => return refuse("an hnn-field-v14g head line whose count word is not 1 (a field without the count is the line before)"),
             },
             (Some("hnn-field-v14k"), _) => return refuse("the carry founded at zero friction is retired (hnn-field-v14k): its states are receipts only"),
             (Some("hnn-field-v14t"), _) => return refuse("the carry's leak on its linear chart is retired (hnn-field-v14t): its states are receipts only"),
             (Some("hnn-field-v13"), 11) => (None, 0, 0),
             _ => return refuse("a field's head line that is not hnn-field-v14"),
         };
-        let d = Self { alphabet: n(words[1])?, width: n(words[2])?, heads: n(words[3])?, modes: n(words[4])?, still: n(words[5])?, contacts: n(words[6])?, ticks: n(words[7])?, frames: n(words[8])?, reach: n(words[9])?, lanes: n(words[10])?, depth: depth_word.map(n).transpose()?.unwrap_or(0), carry, triads };
+        let d = Self { alphabet: n(words[1])?, width: n(words[2])?, heads: n(words[3])?, modes: n(words[4])?, still: n(words[5])?, contacts: n(words[6])?, ticks: n(words[7])?, frames: n(words[8])?, reach: n(words[9])?, lanes: n(words[10])?, depth: depth_word.map(n).transpose()?.unwrap_or(0), carry, triads, count };
         d.admit()?;
         Ok(d)
     }
@@ -1270,6 +1305,10 @@ struct TickCell {
     gam: Vec<i64>,
     kb: Vec<i64>,
     qm: Vec<i64>,
+    /// [definition; theory, November 12, the friction record §7] With the count (empty without it), what the reverse reads, each `[t][C]`: `cd` the
+    /// friction the count applied, `d = m R` on `2^(−16)`, and `cr` the back range the site met, `R` on `2^(−30)` ([`count_gates`]).
+    cd: Vec<i64>,
+    cr: Vec<i64>,
     /// [definition; theory, November 12, the triad record §4] The triads' operands (empty without them), what the reverse reads: `abg` the charts'
     /// reads `[t][6J]` on `2^(−16)` (`α`'s real parts, then imaginary, then `β`'s, then `γ`'s), `tp` the product `p = α(t) β(t − 1)` and `ct` the
     /// triad `c^T = p γ(t + 1)`, each `[t][2J]`, real parts then imaginary, on `2^(−16)`, zero at the region's two ends.
@@ -1815,15 +1854,128 @@ fn carry_friction(exponential: &Exponential, l: i128) -> Result<(i128, i64, u128
 /// reaches `2^47`; below those every numerator and the denominator stay within 128 bits (`den < 2^125`). At `q = ℓ = 0` the gate is
 /// `(858,993,459, 0)`, `2^32/5` to the nearest: a turn without work at the founded friction, `|γ| = 4/5`. Returns `(γ_re, γ_im)` and `d`.
 fn carry_gate(exponential: &Exponential, q: i128, l: i128) -> Result<((i64, i64), i128)> {
+    carry_turn_admit(q)?;
+    let (d, _, _) = carry_friction(exponential, l)?;
+    Ok((carry_gate_at(q, d)?, d))
+}
+
+/// The turn's carrier ([`carry_gate`]): `|q| < 2^39` and `2^34 + q² < 2^78`, read first, so `q²` is formed only within 128 bits.
+fn carry_turn_admit(q: i128) -> Result<()> {
     if q.unsigned_abs() >= CARRY_TURN_ROOT || (1i128 << 34) + q * q >= CARRY_TURN_BOUND {
         return refuse("a carry circle's turn or friction past its 128-bit carrier");
     }
-    let (d, _, _) = carry_friction(exponential, l)?;
+    Ok(())
+}
+
+/// [definition; theory, November 12, the friction record §7] **The gate at a turn and a friction**: `γ = γ̂(q)/(1 + d)` from `q` on `2^(−16)` (its
+/// carrier admitted, [`carry_turn_admit`]) and the friction `d` on `2^(−16)` (one grain to under `2^47`), each part one division to the nearest
+/// ([`carry_gate`]'s formula). The built gate is this at the chart's friction ([`carry_friction`]); with the count it is this at the friction the
+/// count applied, `d = m R` ([`count_gates`]). One function, so the built path keeps every bit.
+fn carry_gate_at(q: i128, d: i128) -> Result<(i64, i64)> {
+    carry_turn_admit(q)?;
     let turn = (1i128 << 34) + q * q;
     let den = turn * ((1i128 << 16) + d);
     let re = div_nearest(((1i128 << 34) - q * q) << 46, den);
     let im = div_nearest(q << 64, den);
-    Ok(((fit64(re)?, fit64(im)?), d))
+    Ok((fit64(re)?, fit64(im)?))
+}
+
+/// [definition; theory, November 12, the friction record §3.3, §3.6 and §7 (agent-inferred)] **The count's carriers**, each derived from three facts:
+/// the back range stands between one and the region's edge range plus the sites passed, `1 ≤ R ≤ R_edge + s` (§3.6: `R ← 1 + R/(1 + d)` never
+/// falls under one and grows at most a place a site); the edge range is the first site's rest `(1 + d̂)/d̂`, at most `2^16 + 1` places, since the
+/// chart's friction keeps its floor of one grain ([`carry_friction`]); and so the mass `m = d̂²/(1 + d̂)` stands at least
+/// `2^(−32)/(1 + 2^(−16))` and, as `R ≥ 1`, under the friction it applies, `m ≤ d = m R < 2^31`.
+/// - `R` on `2^(−30)`, the gate's own grain ([`GAMMA_BITS`]): the applied friction's error relative to `1 + d` is at most `R`'s relative error,
+///   `δd/(1 + d) = m δR/(1 + m R) ≤ δR/R`, so a range read to the gate's grain moves the gate by under its grain. `R < 2^17` while a region
+///   holds fewer than `2^16 − 1` sites, so its carrier stands under `2^48` ([`COUNT_RANGE_BOUND`]).
+/// - `m` on `2^(−62)`: its least value, about `2^(−32)`, carried to the gate's 30 relative bits; under `2^31`, so its carrier stands under `2^93`.
+/// - `d` on `2^(−16)`, the friction's own grain and carrier (one grain to under `2^47`): `d = release(m R, 62 + 30 − 16)`, one release of a
+///   product under `2^127` wherever the friction stands within its carrier (a product whose two factors' bit lengths pass 126 is past `2^125`,
+///   so its friction is past `2^49`, refused as the carrier refuses it).
+///
+/// Each formed quantity is one division to the nearest ([`div_nearest`], or a release, the card's own rounding), on integers, with the same
+/// bits on the card.
+#[cfg(test)]
+thread_local! {
+    /// [measurement; tests only] A declared change of one site's leak read in every tick's forward, `(site, circle, δ)` on `2^(−16)`, so a test
+    /// reads the code's change under a change of that site's `ℓ` (the friction record's test (d)).
+    pub(crate) static LEAK_PROBE: std::cell::Cell<Option<(usize, usize, i64)>> = const { std::cell::Cell::new(None) };
+    /// [measurement; tests only] Each tick's reverse covectors of the circles' charts' reads, `[t][2C]` (`δq` then `δℓ`), in the order the reverse
+    /// forms them (the last tick first), collected while set.
+    pub(crate) static LEAK_COVECTORS: std::cell::RefCell<Option<Vec<Vec<i64>>>> = const { std::cell::RefCell::new(None) };
+}
+
+const COUNT_RANGE_BITS: u32 = GAMMA_BITS;
+const COUNT_MASS_BITS: u32 = 62;
+const COUNT_RANGE_BOUND: i128 = 1 << 48;
+const _: () = assert!(COUNT_MASS_BITS + COUNT_RANGE_BITS > FACE_BITS);
+
+/// The mass on `2^(−62)` from the chart's friction `d̂` on `2^(−16)` (one grain to under `2^47`): `m = d̂²/(1 + d̂) = d̂ − 1 + 1/(1 + d̂)`, so
+/// `m 2^62 = d̂ 2^46 − 2^62 + 2^78/(2^16 + d̂)`, one division to the nearest and the rest whole (`d̂ 2^46 < 2^93`). The identity keeps `d̂²` from
+/// being formed past 128 bits.
+fn count_mass(dh: i128) -> i128 {
+    (dh << (COUNT_MASS_BITS - FACE_BITS)) - (1i128 << COUNT_MASS_BITS) + div_nearest(1i128 << (COUNT_MASS_BITS + FACE_BITS), (1i128 << FACE_BITS) + dh)
+}
+
+/// The edge range on `2^(−30)` from the first site's chart friction `d̂`: its own rest, `R = (1 + d̂)/d̂ = 1 + 1/d̂`, one division to the nearest
+/// (`2^30 + 2^46/d̂`; at the founding, `d̂ = 2^14`, exactly `5 · 2^30`).
+fn count_edge(dh: i128) -> i128 {
+    (1i128 << COUNT_RANGE_BITS) + div_nearest(1i128 << (COUNT_RANGE_BITS + FACE_BITS), dh)
+}
+
+/// The friction a site applies, `d = m R` on `2^(−16)`, one release of the product ([`COUNT_MASS_BITS`]): at least one grain, as the chart's friction is
+/// never released to zero (a circle's quality stays finite, atlas `store.finite-quality`), and refused, typed, where it reaches the friction's carrier
+/// `2^47` (where the factors' bit lengths pass 126 the product is past `2^125`, so its friction is past the carrier, refused without forming it).
+fn count_friction(mass: i128, range: i128) -> Result<i128> {
+    let bits = |x: i128| 128 - x.unsigned_abs().leading_zeros();
+    if bits(mass) + bits(range) > 126 {
+        return refuse("a carry circle's turn or friction past its 128-bit carrier");
+    }
+    let d = release(mass * range, COUNT_MASS_BITS + COUNT_RANGE_BITS - FACE_BITS).max(1);
+    if d >= CARRY_FRICTION_BOUND {
+        return refuse("a carry circle's turn or friction past its 128-bit carrier");
+    }
+    Ok(d)
+}
+
+/// The next site's range, `R ← 1 + R/(1 + d)` on `2^(−30)` from the friction applied (`2^30 + R 2^16/(2^16 + d)`, one division to the nearest),
+/// refused, typed, at its carrier (`2^48`, never reached while a region holds fewer than `2^16 − 1` sites).
+fn count_next(range: i128, d: i128) -> Result<i128> {
+    let next = (1i128 << COUNT_RANGE_BITS) + div_nearest(range << FACE_BITS, (1i128 << FACE_BITS) + d);
+    if next >= COUNT_RANGE_BOUND {
+        return refuse("a carry circle's back range past its carrier");
+    }
+    Ok(next)
+}
+
+/// [definition; theory, November 12, the friction record §3.3, §3.4 and §7] **The carry circles' gates with the count**, from the charts' reads `qh`
+/// (`[t][2C]` on `2^(−16)`: `q` then `ℓ`, as [`carry_gate`] reads them) over a region's `sites`: each circle `k` (contact `e = plain + k`) in its own
+/// scan order, even `e` from the left and odd from the right; at each site the chart's rest friction `d̂ = d₀ 2^ℓ` ([`carry_friction`]) and its mass
+/// ([`count_mass`]); at the region's first site in that order `R` is that site's own rest ([`count_edge`]); then `d = m R` ([`count_friction`]), the gate
+/// at `q` and `d` ([`carry_gate_at`]) and the next site's range ([`count_next`]). Returns the gate `[t][2C]` (real parts then imaginary, `2^(−30)`), the
+/// friction applied `[t][C]` (`2^(−16)`) and the range the site met `[t][C]` (`2^(−30)`), which the coupling and the reverse read. On a strand whose
+/// sites read one `ℓ`, `R` rests at `(1 + d̂)/d̂` and `d = d̂` to within its rounding: at the founding (`ℓ = 0`, `d̂ = 2^14`) `R = 5 · 2^30` and `d = 2^14`
+/// at every site, the built gate bit for bit.
+fn count_gates(exponential: &Exponential, qh: &[i64], sites: usize, circles: usize, plain: usize) -> Result<(Vec<i64>, Vec<i64>, Vec<i64>)> {
+    let c2 = 2 * circles;
+    let (mut gam, mut applied, mut ranges) = (vec![0i64; sites * c2], vec![0i64; sites * circles], vec![0i64; sites * circles]);
+    for k in 0..circles {
+        let e = plain + k;
+        let mut range = 0i128;
+        for step in 0..sites {
+            let t = if e % 2 == 0 { step } else { sites - 1 - step };
+            let (q, l) = (i128::from(qh[t * c2 + k]), i128::from(qh[t * c2 + circles + k]));
+            let (dh, _, _) = carry_friction(exponential, l)?;
+            if step == 0 {
+                range = count_edge(dh);
+            }
+            let d = count_friction(count_mass(dh), range)?;
+            (gam[t * c2 + k], gam[t * c2 + circles + k]) = carry_gate_at(q, d)?;
+            (applied[t * circles + k], ranges[t * circles + k]) = (fit64(d)?, fit64(range)?);
+            range = count_next(range, d)?;
+        }
+    }
+    Ok((gam, applied, ranges))
 }
 
 /// [definition; theory, November 11 17:25 and November 12 (G96's third branch, G98); `CarryGate.lean`, `carryTurn_re_hasDerivAt`,
@@ -1863,6 +2015,63 @@ fn carry_gate_return(exponential: &Exponential, gamma: (i64, i64), dgamma: (i64,
     let dl = lift(dd) + lift(i128::from(ddk));
     let kappa = carry_coupling(d);
     Ok(((fit64(dq)?, fit64(dl)?), (carry_drive(kappa, du.0)?, carry_drive(kappa, du.1)?)))
+}
+
+/// [definition; theory, November 12, the friction record §7 and P42's equations; `CarryGate.lean`, `backRange`] **The carry circles' reverse
+/// with the count**, at one site of the circle's reverse scan: from `δγ`, `u` (`δQ(t)`), the drive `b` before its coupling and the producing `γ`, `q`,
+/// `ℓ`, the friction applied `d` and the range met `R`, and `ρ'`, the covector of the next site's range (zero past the scan's last site):
+///
+/// ```text
+/// δd = δd_γ + δd_κ − ρ' R/(1 + d)²,   ρ = ρ'/(1 + d) + δd m,   δm = δd R,
+/// δd̂ = δm d̂ (2 + d̂)/(1 + d̂)² = δm − δm/(1 + d̂)²  (and at the region's first site, through its edge rest R = 1 + 1/d̂, − ρ/d̂²),
+/// ```
+///
+/// with `δd_γ = −Re(conj(γ) δγ)/(1 + d)` and `δd_κ = N₀ Re(conj(b) u)/(1 + d)²` the built gate's and coupling's covectors of `d`, taken at the `d`
+/// the forward applied ([`carry_gate_return`]'s), and `δd̂` lifted into `δℓ` through the chart's derivative `ln 2 · d̂` as built. `δq` and the drive's
+/// covector `δb = κ u` are the built ones at the applied `d`. Each formed quantity is one division to the nearest or one release: `ρ' R/(1 + d)²`
+/// is `ρ' R 2^2/(2^16 + d)²` (`R` on `2^(−30)`, `(1 + d)²` on `2^(−32)`); `δd m` is `δd m_hi + release(δd m_lo, 62)` with `m = m_hi 2^62 + m_lo`
+/// (the release of `δd m` itself, kept under 128 bits); `δm = release(δd R, 30)`; `δm/(1 + d̂)² = δm 2^32/(2^16 + d̂)²`; `ρ/d̂² = ρ 2^32/d̂²`.
+/// `δd` and `δd̂` are refused past `2^65`, the lift's carrier ([`carry_gate_return`]); `ρ` within 64 bits, as the chain's covectors are.
+/// Returns `(δq, δℓ)`, `δb` and `ρ`. Why: `R(t + 1) = 1 + R/(1 + d)` and `d = m R`, so `∂R'/∂R = 1/(1 + d)` at a held `d`, `∂R'/∂d = −R/(1 + d)²`,
+/// `∂d/∂m = R`, `∂d/∂R = m`, and `∂m/∂d̂ = d̂(2 + d̂)/(1 + d̂)²`; `ρ` carries each later site's gate covector back into this one's range, so it is
+/// formed along the chain.
+#[allow(clippy::too_many_arguments)]
+fn count_gate_return(exponential: &Exponential, gamma: (i64, i64), dgamma: (i64, i64), drive: (i64, i64), du: (i64, i64), q: i128, l: i128, applied: i64, range: i64, rho_next: i128, edge: bool) -> Result<((i64, i64), (i64, i64), i128)> {
+    let ((yr, yi), (dr, di)) = ((i128::from(gamma.0), i128::from(gamma.1)), (i128::from(dgamma.0), i128::from(dgamma.1)));
+    let im = release(yr * di - yi * dr, GAMMA_BITS);
+    let re = release(yr * dr + yi * di, GAMMA_BITS);
+    let dq = div_nearest(im << 34, (1i128 << 34) + q * q);
+    let (dh, whole, v) = carry_friction(exponential, l)?;
+    let (d, range) = (i128::from(applied), i128::from(range));
+    let one = (1i128 << FACE_BITS) + d;
+    let dd_gamma = -div_nearest(re << FACE_BITS, one);
+    let w = fit64(release(i128::from(drive.0) * i128::from(du.0) + i128::from(drive.1) * i128::from(du.1), FACE_BITS))?;
+    let dd_kappa = fit64(div_nearest((i128::from(CARRY_GROUP_FOUNDING) * i128::from(w)) << (2 * FACE_BITS), one * one))?;
+    // `ρ'` within 64 bits and `R < 2^48`: under `2^113`; `(2^16 + d)² < 2^95`.
+    let pull = div_nearest((rho_next * range) << (2 * FACE_BITS - COUNT_RANGE_BITS), one * one);
+    let dd = dd_gamma + i128::from(dd_kappa) - pull;
+    if dd.unsigned_abs() >= 1 << 65 {
+        return refuse("a carry circle's covector past its carrier");
+    }
+    let mass = count_mass(dh);
+    let (mass_hi, mass_lo) = (mass >> COUNT_MASS_BITS, mass & ((1i128 << COUNT_MASS_BITS) - 1));
+    // `|δd| < 2^65`, `m_lo < 2^62` and `m_hi < 2^31`: each product within 128 bits.
+    let rho = i128::from(fit64(div_nearest(rho_next << FACE_BITS, one) + dd * mass_hi + release(dd * mass_lo, COUNT_MASS_BITS))?);
+    let dm = release(dd * range, COUNT_RANGE_BITS);
+    let rest = (1i128 << FACE_BITS) + dh;
+    let mut ddh = dm - div_nearest(dm << (2 * FACE_BITS), rest * rest);
+    if edge {
+        ddh -= div_nearest(rho << (2 * FACE_BITS), dh * dh);
+    }
+    if ddh.unsigned_abs() >= 1 << 65 {
+        return refuse("a carry circle's covector past its carrier");
+    }
+    // The built lift ([`carry_gate_return`]): under `2^126` before its release, nothing past a release of 126 bits.
+    let shift = 62 - whole;
+    let product = release(ddh * ln2_face(), LN2_FACE_BITS) * i128::from(CARRY_LEAK_FOUNDING) * release(v as i128, 15);
+    let dl = if shift > 126 { 0 } else { release(product, shift as u32) };
+    let kappa = carry_coupling(d);
+    Ok(((fit64(dq)?, fit64(dl)?), (carry_drive(kappa, du.0)?, carry_drive(kappa, du.1)?), rho))
 }
 
 /// [definition; theory, November 12, the triad record §3 and §4] **The triads' products** ([`FieldDeclaration::triads`]): from the charts' reads
@@ -2895,6 +3104,17 @@ impl Field {
             for t in 0..sites {
                 let rt = &cell.read2[t * dw..(t + 1) * dw];
                 affine(&self.theta[l.carry..l.carry + c2 * dw], reaches.carry, dw, rt, Some(&self.theta[l.carry_bias..l.carry_bias + c2]), MATERIAL_BITS, MATERIAL_BITS, &mut cell.qh[t * c2..(t + 1) * c2])?;
+                #[cfg(test)]
+                LEAK_PROBE.with(|p| {
+                    if let Some((site, k, delta)) = p.get() {
+                        if site == t {
+                            cell.qh[t * c2 + circles + k] += delta;
+                        }
+                    }
+                });
+                if d.count {
+                    continue;
+                }
                 for k in 0..circles {
                     let ((yr, yi), friction) = carry_gate(&self.exponential, cell.qh[t * c2 + k] as i128, cell.qh[t * c2 + circles + k] as i128)?;
                     cell.gam[t * c2 + k] = yr;
@@ -2903,6 +3123,19 @@ impl Field {
                     cell.kb[t * c2 + k] = carry_drive(kappa, cell.b[t * f + e])?;
                     cell.kb[t * c2 + circles + k] = carry_drive(kappa, cell.b[t * f + half + e])?;
                 }
+            }
+            // [definition; theory, November 12, the friction record §7] With the count the gate is formed along each circle's scan order, at the
+            // friction the count applies ([`count_gates`]), and the drive is coupled through that friction; the scan below reads them as before.
+            if d.count {
+                let (gam, applied, ranges) = count_gates(&self.exponential, &cell.qh, sites, circles, plain)?;
+                for t in 0..sites {
+                    for k in 0..circles {
+                        let (kappa, e) = (carry_coupling(i128::from(applied[t * circles + k])), plain + k);
+                        cell.kb[t * c2 + k] = carry_drive(kappa, cell.b[t * f + e])?;
+                        cell.kb[t * c2 + circles + k] = carry_drive(kappa, cell.b[t * f + half + e])?;
+                    }
+                }
+                (cell.gam, cell.cd, cell.cr) = (gam, applied, ranges);
             }
             for k in 0..circles {
                 let e = plain + k;
@@ -3396,10 +3629,13 @@ impl Field {
         // `X(t)` the covector of `Qm(t)` and `u` the covector of `Q(t)` (`X(t ± 1)`, the next site of the reverse): `δa(t) = conj(Qm(t)) δp(t)`,
         // `δγ(t) = conj(Qm(t)) u` released at the face's grain, `X(t) = conj(a(t)) δp(t) + conj(γ(t)) u`; then off the chain the gate's and the
         // coupling's covectors `δq`, `δℓ` and the drive's `δb(t) = κ(t) u` ([`carry_gate_return`]).
+        // [definition; theory, November 12, the friction record §7] With the count the chain also carries `ρ`, the covector of the next site's range,
+        // zero past the scan's last site ([`count_gate_return`]); the region's first site in the circle's scan order is the reverse's last.
         let mut dqh = vec![0i64; sites * c2];
         for k in 0..circles {
             let e = plain + k;
             let (mut xr, mut xi) = (0i128, 0i128);
+            let mut rho = 0i128;
             for step in 0..sites {
                 let t = if e % 2 == 0 { sites - 1 - step } else { step };
                 let (gr, gi) = (dc[t * f + e] as i128, dc[t * f + half + e] as i128);
@@ -3414,13 +3650,27 @@ impl Field {
                 xr = i128::from(fit64(release(ar * gr + ai * gi, FACE_BITS) + release(yr * ur + yi * ui, GAMMA_BITS))?);
                 xi = i128::from(fit64(release(ar * gi - ai * gr, FACE_BITS) + release(yr * ui - yi * ur, GAMMA_BITS))?);
                 let drive = (cell.b[t * f + e], cell.b[t * f + half + e]);
-                let ((dq, dl), (dbr, dbi)) = carry_gate_return(&self.exponential, (cell.gam[t * c2 + k], cell.gam[t * c2 + circles + k]), dgamma, drive, du, cell.qh[t * c2 + k] as i128, cell.qh[t * c2 + circles + k] as i128)?;
+                let gamma = (cell.gam[t * c2 + k], cell.gam[t * c2 + circles + k]);
+                let (q, lk) = (cell.qh[t * c2 + k] as i128, cell.qh[t * c2 + circles + k] as i128);
+                let ((dq, dl), (dbr, dbi)) = if d.count {
+                    let (dql, dbs, back) = count_gate_return(&self.exponential, gamma, dgamma, drive, du, q, lk, cell.cd[t * circles + k], cell.cr[t * circles + k], rho, step + 1 == sites)?;
+                    rho = back;
+                    (dql, dbs)
+                } else {
+                    carry_gate_return(&self.exponential, gamma, dgamma, drive, du, q, lk)?
+                };
                 db[t * f + e] = dbr;
                 db[t * f + half + e] = dbi;
                 dqh[t * c2 + k] = dq;
                 dqh[t * c2 + circles + k] = dl;
             }
         }
+        #[cfg(test)]
+        LEAK_COVECTORS.with(|c| {
+            if let Some(all) = c.borrow_mut().as_mut() {
+                all.push(dqh.clone());
+            }
+        });
         let das: Vec<&[i64]> = da.chunks_exact(f).collect();
         let dbs: Vec<&[i64]> = db.chunks_exact(f).collect();
         let r2s: Vec<&[i32]> = cell.read2.chunks_exact(dw).collect();
@@ -5269,6 +5519,20 @@ impl Field {
         Ok((out, from))
     }
 
+    /// [definition; theory, November 12, the friction record §7] **The field with its circles' count** ([`FieldDeclaration::count`]): the
+    /// declaration's count set and nothing else changed (no entry is added or moved, the layout is the field's own). Refused on a field with no carry
+    /// circles and on a field already counted. By §3.4 the count reads a grown state's chart as it stands, so a state takes the law where it is; its
+    /// faces change at the count's first read wherever its chart varies along a strand.
+    pub fn with_count(&self) -> Result<Self> {
+        if self.declaration.count {
+            return refuse("a field whose carry circles already carry their count");
+        }
+        let mut out = self.clone();
+        out.declaration.count = true;
+        out.declaration.admit()?;
+        Ok(out)
+    }
+
     /// [definition; theory, November 12, the triad record §4] **The field with `triads` triads** ([`FieldDeclaration::triads`]): the triads'
     /// families after every other ([`FieldLayout::triad`]), every old entry kept at its offset; the charts' rows `A`, `B` and `G` drawn uniform on
     /// `±√(3/D)` at the material's grain from `keys`, four bytes a draw, the rows in order (`A`, then `B`, then `G`), as a growth in contacts draws
@@ -5496,6 +5760,22 @@ impl Field {
         let (l, reach) = (&self.layout, self.reaches().carry);
         let mut qh = vec![0i64; 2 * circles];
         let mut out = Vec::with_capacity(pair_read.len() / dw * circles);
+        // [theory, November 12, the friction record §7] With the count the gate is the one the count applied along each circle's scan order
+        // ([`count_gates`]), the region's sites read whole.
+        if d.count {
+            let sites = pair_read.len() / dw;
+            let mut all = vec![0i64; sites * 2 * circles];
+            for (t, rt) in pair_read.chunks_exact(dw).enumerate() {
+                affine(&self.theta[l.carry..l.carry + 2 * circles * dw], reach, dw, rt, Some(&self.theta[l.carry_bias..l.carry_bias + 2 * circles]), MATERIAL_BITS, MATERIAL_BITS, &mut all[t * 2 * circles..(t + 1) * 2 * circles])?;
+            }
+            let (gam, _, _) = count_gates(&self.exponential, &all, sites, circles, d.carry_first())?;
+            for t in 0..sites {
+                for k in 0..circles {
+                    out.push((gam[t * 2 * circles + k], gam[t * 2 * circles + circles + k]));
+                }
+            }
+            return Ok(out);
+        }
         for rt in pair_read.chunks_exact(dw) {
             affine(&self.theta[l.carry..l.carry + 2 * circles * dw], reach, dw, rt, Some(&self.theta[l.carry_bias..l.carry_bias + 2 * circles]), MATERIAL_BITS, MATERIAL_BITS, &mut qh)?;
             for k in 0..circles {
@@ -5513,8 +5793,10 @@ impl Field {
     /// contacts from the left and odd from the right. Each `[t][C]`. Where `ℓ < 0` the friction stands below its founding (`d = d₀ 2^ℓ < d₀`), so
     /// a run of such sites along the strand carries the charge further than the near field, and its drive is admitted by as much less (the
     /// charge stays within `N₀` places' drive); deep below (`ℓ < −14`) the friction holds its floor of one grain, a circle's longest reach. A
-    /// reading; a sum past its carrier is refused as the forward refuses it.
-    pub fn carry_leaks(&self, pair_read: &[i32]) -> Result<(Vec<i64>, Vec<u64>)> {
+    /// reading; a sum past its carrier is refused as the forward refuses it. Third, the friction applied at each site and circle `[t][C]` on
+    /// `2^(−16)`: the chart's `d₀ 2^ℓ` ([`carry_friction`]), and with the count the friction the count applied, `d = m R` ([`count_gates`]), whose
+    /// drive is coupled through it.
+    pub fn carry_leaks(&self, pair_read: &[i32]) -> Result<(Vec<i64>, Vec<u64>, Vec<i64>)> {
         let d = &self.declaration;
         if d.carry == 0 {
             return refuse("a field without carry circles has no leak");
@@ -5523,18 +5805,34 @@ impl Field {
         let (half, plain, c2) = (f / 2, d.carry_first(), 2 * circles);
         let (l, reaches) = (&self.layout, self.reaches());
         let sites = pair_read.len() / dw;
-        let mut qh = vec![0i64; c2];
+        let mut qh = vec![0i64; sites * c2];
         let mut b = vec![0i64; sites * f];
         let mut gam = vec![(0i64, 0i64); sites * circles];
+        let mut applied = vec![0i64; sites * circles];
         let mut leak = Vec::with_capacity(sites * circles);
         for (t, rt) in pair_read.chunks_exact(dw).enumerate() {
-            affine(&self.theta[l.carry..l.carry + c2 * dw], reaches.carry, dw, rt, Some(&self.theta[l.carry_bias..l.carry_bias + c2]), MATERIAL_BITS, MATERIAL_BITS, &mut qh)?;
+            affine(&self.theta[l.carry..l.carry + c2 * dw], reaches.carry, dw, rt, Some(&self.theta[l.carry_bias..l.carry_bias + c2]), MATERIAL_BITS, MATERIAL_BITS, &mut qh[t * c2..(t + 1) * c2])?;
             affine(&self.theta[l.b..l.b + f * dw], reaches.b, dw, rt, Some(&self.theta[l.b_bias..l.b_bias + f]), MATERIAL_BITS, MATERIAL_BITS, &mut b[t * f..(t + 1) * f])?;
             for k in 0..circles {
-                let (gate, friction) = carry_gate(&self.exponential, qh[k] as i128, qh[circles + k] as i128)?;
-                gam[t * circles + k] = gate;
-                leak.push(qh[circles + k]);
-                let (kappa, e) = (carry_coupling(friction), plain + k);
+                leak.push(qh[t * c2 + circles + k]);
+                if !d.count {
+                    let (gate, friction) = carry_gate(&self.exponential, qh[t * c2 + k] as i128, qh[t * c2 + circles + k] as i128)?;
+                    (gam[t * circles + k], applied[t * circles + k]) = (gate, fit64(friction)?);
+                }
+            }
+        }
+        if d.count {
+            let (g, a, _) = count_gates(&self.exponential, &qh, sites, circles, plain)?;
+            for t in 0..sites {
+                for k in 0..circles {
+                    gam[t * circles + k] = (g[t * c2 + k], g[t * c2 + circles + k]);
+                }
+            }
+            applied = a;
+        }
+        for t in 0..sites {
+            for k in 0..circles {
+                let (kappa, e) = (carry_coupling(i128::from(applied[t * circles + k])), plain + k);
                 b[t * f + e] = carry_drive(kappa, b[t * f + e])?;
                 b[t * f + half + e] = carry_drive(kappa, b[t * f + half + e])?;
             }
@@ -5553,7 +5851,7 @@ impl Field {
                 charge[t * circles + k] = ((qr * qr + qi * qi) as u128).isqrt() as u64;
             }
         }
-        Ok((leak, charge))
+        Ok((leak, charge, applied))
     }
 
     /// [measurement; theory, November 11 18:33, part P2] **The carry circles' gates over a region's open sites** ([`CarryGates`]): from the forward's
@@ -6425,6 +6723,15 @@ impl FieldLearner {
         }
         let drawn = self.drawn + 4 * self.field.declaration.carry_draws(circles);
         Ok(Self { field, first, second, rate_bits: self.rate_bits, drawn, laps: self.laps, held: None, read_held: self.read_held, rate_parts: self.rate_parts, own_rates: None, last: None })
+    }
+
+    /// [definition; theory, November 12, the friction record §7] **The learner with its circles' count** ([`Field::with_count`]): the field's
+    /// declaration takes the count and everything else is kept, every entry, moment, remainder, rate, the held step and the draws, so the state's
+    /// text changes in its field's head line alone (`hnn-field-v14g`, [`FieldDeclaration::count`]).
+    pub fn with_count(&self) -> Result<Self> {
+        let mut out = self.clone();
+        out.field = self.field.with_count()?;
+        Ok(out)
     }
 
     /// [definition; theory, November 12, the triad record §4] **The learner with `triads` triads** ([`Field::with_triads`]), the triads' draws read

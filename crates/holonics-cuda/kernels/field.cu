@@ -451,6 +451,16 @@ struct FieldWords {
     int64_t *pgam;
     int64_t *pqm;
     int64_t *pkb;
+    // [definition; theory, November 12, the friction record §7] **The carry circle's count** (`FieldDeclaration::count`): one where the field carries it.
+    // Set per tick (zero without it): `pch` the chart's rest friction `d̂ = d₀ 2^ℓ` `[t][C]` (`2^(−16)`, written by `field_pair_gamma`), `pcd` the
+    // friction the count applied `d = m R` `[t][C]` (`2^(−16)`) and `pcr` the range the site met `R` `[t][C]` (`2^(−30)`), both written by
+    // `field_pair_scan` and read by the reverse, and `pcw` the reverse's covector of `d̂` `[t][2C]` (a 128-bit word as two, the low 64 bits at the real
+    // part's slot and the high at the imaginary's), written by `field_pair_scan_back` and lifted by `field_pair_gate_back`.
+    uint64_t count;
+    int64_t *pch;
+    int64_t *pcd;
+    int64_t *pcr;
+    int64_t *pcw;
     // [definition; theory, November 11 04:14, step S] **The skin's exponent from site addresses**: `2π σ_x = q_x k + r_x`, `0 ≤ r_x < k`, `k = (n ln 2) << 24` of the
     // slot, written once a (site, paced head, mode) in `field_paces` beside `σ`: `[p][l][t]` three words each, `q`, then `r`'s low and high 64 bits (`r < k` is held 128 bits wide
     // from the start: `k` passes `INT64_MAX` at `n ≥ 739` and 64 unsigned bits at `n ≥ 1478`, and the pair's compare is made on 128 bits from `k` itself).
@@ -2870,9 +2880,43 @@ extern "C" __global__ void field_pair_scan(FieldWords w) {
         const uint64_t k = j % C, e = plain + k;
         const uint64_t first = w.region_off[r], sites = w.region_off[r + 1] - first;
         wide qr = 0, qi = 0;
+        wide range = 0;
         for (uint64_t step = 0; step < sites; ++step) {
             const uint64_t t = first + ((e % 2 == 0) ? step : sites - 1 - step);
             const uint64_t re = t * w.f + e, im = re + half, gr = t * c2 + k, gi = gr + C;
+            // [definition; theory, November 12, the friction record §3.3, §3.4 and §7] **With the count** (the host's `count_gates`): at the region's
+            // first site in the circle's order `R` is that site's rest (`count_edge`), `d = m R` (`count_friction`), the gate `γ̂(q)/(1 + d)` and the
+            // coupled drive `rel(κ b, 30)` at that `d` (`field_pair_gamma`'s formulas), `d` and `R` kept for the reverse, then `R ← 1 + R/(1 + d)`.
+            if (w.count) {
+                const uint64_t ck = t * C + k;
+                const wide dh = w.pch[ck];
+                if (dh < 1) {
+                    atomicOr(w.status, REFUSED_CARRIER);
+                    break;
+                }
+                if (step == 0) {
+                    range = count_edge(dh);
+                }
+                wide d, next;
+                if (!count_friction(count_mass(dh), range, &d)) {
+                    atomicOr(w.status, REFUSED_CARRIER);
+                    break;
+                }
+                const wide q = w.pg[gr];
+                const wide den = (((wide)1 << 34) + q * q) * (((wide)1 << 16) + d);
+                w.pgam[gr] = fit64(div_nearest((((wide)1 << 34) - q * q) << 46, den), w.status);
+                w.pgam[gi] = fit64(div_nearest(q << 64, den), w.status);
+                const wide kappa = div_nearest((CARRY_GROUP_FOUNDING * d) << MOVE_BITS, ((wide)1 << FACE_BITS) + d);
+                w.pkb[gr] = fit64(rel(kappa * (wide)w.pb[re], MOVE_BITS), w.status);
+                w.pkb[gi] = fit64(rel(kappa * (wide)w.pb[im], MOVE_BITS), w.status);
+                w.pcd[ck] = (int64_t)d;
+                w.pcr[ck] = (int64_t)range;
+                if (!count_next(range, d, &next)) {
+                    atomicOr(w.status, REFUSED_CARRIER);
+                    break;
+                }
+                range = next;
+            }
             const wide yr = w.pgam[gr], yi = w.pgam[gi];
             w.pqm[gr] = fit64(qr, w.status);
             w.pqm[gi] = fit64(qi, w.status);
@@ -2900,6 +2944,40 @@ __device__ __forceinline__ bool carry_friction(const FieldWords &w, int64_t l, w
     const wide x = shift > 77 ? 0 : rel(CARRY_LEAK_FOUNDING * (wide)*v, (unsigned)shift);
     *d = x > 1 ? x : 1;
     return *d < ((wide)1 << 47);
+}
+
+// [definition; theory, November 12, the friction record §3.3, §3.6 and §7] **The count's carriers** (the host's `count_mass`, `count_edge`,
+// `count_friction` and `count_next`, every bit the host's): the mass on `2^(−62)` from the chart's friction `d̂` on `2^(−16)`,
+// `m 2^62 = d̂ 2^46 − 2^62 + 2^78/(2^16 + d̂)` (`m = d̂ − 1 + 1/(1 + d̂)`, one division to the nearest); the edge range on `2^(−30)`, the first site's
+// rest `R = 1 + 1/d̂` (`2^30 + 2^46/d̂`); the friction applied, `d = max(1, rel(m R, 76))` on `2^(−16)`, false (refused) where the factors' bit lengths
+// pass 126 (a product past `2^125`, so a friction past `2^49`) or `d` reaches `2^47`; and the next site's range `R ← 2^30 + R 2^16/(2^16 + d)`, false at
+// its carrier `2^48`. The carriers' derivation stands beside the host's.
+__device__ __forceinline__ unsigned count_bits(wide x) {
+    const uwide u = (uwide)(x >= 0 ? x : -x);
+    const uint64_t hi = (uint64_t)(u >> 64), lo = (uint64_t)u;
+    return hi ? 128 - __clzll((long long)hi) : (lo ? 64 - __clzll((long long)lo) : 0);
+}
+
+__device__ __forceinline__ wide count_mass(wide dh) {
+    return (dh << 46) - ((wide)1 << 62) + div_nearest((wide)1 << 78, ((wide)1 << FACE_BITS) + dh);
+}
+
+__device__ __forceinline__ wide count_edge(wide dh) {
+    return ((wide)1 << 30) + div_nearest((wide)1 << 46, dh);
+}
+
+__device__ __forceinline__ bool count_friction(wide mass, wide range, wide *d) {
+    if (count_bits(mass) + count_bits(range) > 126) {
+        return false;
+    }
+    const wide x = rel(mass * range, 76);
+    *d = x > 1 ? x : 1;
+    return *d < ((wide)1 << 47);
+}
+
+__device__ __forceinline__ bool count_next(wide range, wide d, wide *next) {
+    *next = ((wide)1 << 30) + div_nearest(range << FACE_BITS, ((wide)1 << FACE_BITS) + d);
+    return *next < ((wide)1 << 48);
 }
 
 // [definition; theory, November 11 17:25 and November 12 (G96's third branch); `lean/Holonics/HNN/CarryGate.lean`] **The carry circles' gate** (the host's
@@ -2930,6 +3008,12 @@ extern "C" __global__ void field_pair_gamma(FieldWords w) {
             atomicOr(w.status, REFUSED_CARRIER);
             continue;
         }
+        // [theory, November 12, the friction record §7] With the count the gate and the coupling are formed along the circle's scan order at the
+        // friction the count applies (`field_pair_scan`); here only the chart's rest friction `d̂`, off the chain.
+        if (w.count) {
+            w.pch[t * C + k] = (int64_t)d;
+            continue;
+        }
         const wide turn = ((wide)1 << 34) + q * q;
         const wide den = turn * (((wide)1 << 16) + d);
         w.pgam[gr] = fit64(div_nearest((((wide)1 << 34) - q * q) << 46, den), w.status);
@@ -2955,6 +3039,7 @@ extern "C" __global__ void field_pair_scan_back(FieldWords w, const int64_t *dc,
         const uint64_t k = j % C, e = plain + k;
         const uint64_t first = w.region_off[r], sites = w.region_off[r + 1] - first;
         wide xr = 0, xi = 0;
+        wide rho = 0;
         for (uint64_t step = 0; step < sites; ++step) {
             const uint64_t t = first + ((e % 2 == 0) ? sites - 1 - step : step);
             const uint64_t re = t * w.f + e, im = re + half, gr = t * c2 + k, gi = gr + C;
@@ -2967,10 +3052,53 @@ extern "C" __global__ void field_pair_scan_back(FieldWords w, const int64_t *dc,
             db[im] = fit64(ui, w.status);
             da[re] = fit64(rel(qr * pr + qi * pi, FACE_BITS), w.status);
             da[im] = fit64(rel(qr * pi - qi * pr, FACE_BITS), w.status);
-            dg[gr] = fit64(rel(qr * ur + qi * ui, FACE_BITS), w.status);
-            dg[gi] = fit64(rel(qr * ui - qi * ur, FACE_BITS), w.status);
+            const wide dgr = fit64(rel(qr * ur + qi * ui, FACE_BITS), w.status), dgi = fit64(rel(qr * ui - qi * ur, FACE_BITS), w.status);
+            dg[gr] = dgr;
+            dg[gi] = dgi;
             xr = fit64(rel(ar * pr + ai * pi, FACE_BITS) + rel(yr * ur + yi * ui, MOVE_BITS), w.status);
             xi = fit64(rel(ar * pi - ai * pr, FACE_BITS) + rel(yr * ui - yi * ur, MOVE_BITS), w.status);
+            // [definition; theory, November 12, the friction record §7 and P42's equations] **With the count** (the host's `count_gate_return`): the
+            // chain also carries `ρ`, the covector of the next site's range, zero past the scan's last site. At the friction applied `d` and the range
+            // met `R`: the gate's and the coupling's covectors of `d`, `δd = δd_γ + δd_κ − ρ' R/(1 + d)²` (`|δd| < 2^65`), `ρ = ρ'/(1 + d) + δd m`
+            // (`m = m_hi 2^62 + m_lo`), `δm = rel(δd R, 30)` and `δd̂ = δm − δm/(1 + d̂)²`, at the region's first site `− ρ/d̂²` (`|δd̂| < 2^65`); `δq`
+            // over `δγ`'s real slot, and `δd̂` to `pcw` for `field_pair_gate_back`'s lift.
+            if (w.count) {
+                const uint64_t ck = t * C + k;
+                const wide gim = rel(yr * dgi - yi * dgr, MOVE_BITS), rr = rel(yr * dgr + yi * dgi, MOVE_BITS);
+                const wide q = w.pg[gr];
+                const wide dq = div_nearest(gim << 34, ((wide)1 << 34) + q * q);
+                const wide d = w.pcd[ck], range = w.pcr[ck], dh = w.pch[ck];
+                const wide one = ((wide)1 << FACE_BITS) + d;
+                const wide ddg = -div_nearest(rr << FACE_BITS, one);
+                const wide cw = fit64(rel((wide)w.pb[re] * ur + (wide)w.pb[im] * ui, FACE_BITS), w.status);
+                const wide ddk = fit64(div_nearest((CARRY_GROUP_FOUNDING * cw) << (2 * FACE_BITS), one * one), w.status);
+                const wide pull = div_nearest((rho * range) << 2, one * one);
+                const wide dd = ddg + ddk - pull;
+                const uwide add = (uwide)(dd >= 0 ? dd : -dd);
+                if (add >= ((uwide)1 << 65) || dh < 1) {
+                    atomicOr(w.status, REFUSED_CARRIER);
+                    break;
+                }
+                const wide mass = count_mass(dh);
+                const wide mhi = mass >> 62, mlo = mass & (((wide)1 << 62) - 1);
+                const wide back = fit64(div_nearest(rho << FACE_BITS, one) + dd * mhi + rel(dd * mlo, 62), w.status);
+                const wide dm = rel(dd * range, 30);
+                const wide rest = ((wide)1 << FACE_BITS) + dh;
+                wide ddh = dm - div_nearest(dm << (2 * FACE_BITS), rest * rest);
+                if (step + 1 == sites) {
+                    ddh -= div_nearest(back << (2 * FACE_BITS), dh * dh);
+                }
+                const uwide adh = (uwide)(ddh >= 0 ? ddh : -ddh);
+                if (adh >= ((uwide)1 << 65)) {
+                    atomicOr(w.status, REFUSED_CARRIER);
+                    break;
+                }
+                dg[gr] = fit64(dq, w.status);
+                dg[gi] = 0;
+                w.pcw[gr] = (int64_t)(uint64_t)(uwide)ddh;
+                w.pcw[gi] = (int64_t)(uint64_t)((uwide)ddh >> 64);
+                rho = back;
+            }
         }
     }
 }
@@ -2992,6 +3120,29 @@ extern "C" __global__ void field_pair_gate_back(FieldWords w, int64_t *dg, int64
     for (uint64_t c = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; c < cells; c += (uint64_t)gridDim.x * blockDim.x) {
         const uint64_t t = c / C, k = c % C;
         const uint64_t gr = t * c2 + k, gi = gr + C;
+        // [theory, November 12, the friction record §7] With the count `δq` is the scan's reverse's (over `δγ`'s real slot) and `δd̂` is in `pcw`:
+        // here its lift through the chart's derivative `ln 2 · d̂` as built, and the drive's covector at the friction applied.
+        if (w.count) {
+            wide dh;
+            int64_t a;
+            uint64_t v;
+            if (!carry_friction(w, w.pg[gi], &dh, &a, &v)) {
+                atomicOr(w.status, REFUSED_CARRIER);
+                continue;
+            }
+            const wide ddh = (wide)(((uwide)(uint64_t)w.pcw[gi] << 64) | (uwide)(uint64_t)w.pcw[gr]);
+            const int64_t shift = 62 - a;
+            const wide lift = rel(ddh * ln2, LN2_FACE_BITS) * CARRY_LEAK_FOUNDING * rel((wide)v, 15);
+            const wide dl = shift > 126 ? 0 : rel(lift, (unsigned)shift);
+            const wide d = w.pcd[t * C + k];
+            const wide kappa = div_nearest((CARRY_GROUP_FOUNDING * d) << MOVE_BITS, ((wide)1 << FACE_BITS) + d);
+            const uint64_t bre = t * w.f + plain + k, bim = bre + half;
+            const wide ur = db[bre], ui = db[bim];
+            dg[gi] = fit64(dl, w.status);
+            db[bre] = fit64(rel(kappa * ur, MOVE_BITS), w.status);
+            db[bim] = fit64(rel(kappa * ui, MOVE_BITS), w.status);
+            continue;
+        }
         const wide yr = w.pgam[gr], yi = w.pgam[gi], dr = dg[gr], di = dg[gi];
         const wide im = rel(yr * di - yi * dr, MOVE_BITS), re = rel(yr * dr + yi * di, MOVE_BITS);
         const wide q = w.pg[gr];

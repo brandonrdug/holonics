@@ -1113,7 +1113,7 @@ pub(super) fn train(args: &[String], realization: &mut dyn FieldRealization) -> 
         Some([path, sha]) => FieldLearner::from_text(std::str::from_utf8(&pinned_read(path, sha, STATE_BUDGET)?)?).map_err(|e| e.to_string())?,
         _ => {
             // The founding's heads are its ring sets; the reach is the passages'.
-            let declaration = FieldDeclaration { alphabet: codec.alphabet(), width, heads, modes, still, contacts, ticks, frames: heads, reach, lanes: 1, depth: 0, carry: 0, triads: 0 };
+            let declaration = FieldDeclaration { alphabet: codec.alphabet(), width, heads, modes, still, contacts, ticks, frames: heads, reach, lanes: 1, depth: 0, carry: 0, triads: 0, count: false };
             let mut field = Field::found(declaration, &keys).map_err(|e| e.to_string())?;
             // [measurement; agent-inferred, November 3, §16.31] `FIELD_FOUND_RETURNS` (`returns`, or `lift` for the readout's
             // lift as well): the founding's zero families drawn instead, uniform on `±√(3/fan-in)` from a block of the key
@@ -1684,6 +1684,35 @@ pub(super) fn grow_carry_field(args: &[String], realization: &mut dyn FieldReali
     joint_read(&grown.field, &codec, &held, seed, realization, 0, &mut rows)?;
     write_new(out, grown.to_text().as_bytes())?;
     println!("FIELD_GROWN {} rate={} material={} ms={}", grown.field.to_text().lines().next().unwrap_or(""), grown.rate_bits, grown.field.theta.len(), started.elapsed().as_millis());
+    Ok(())
+}
+
+/// [definition; theory, November 12; the friction record (`2026-11-12_THE_FRICTION_A_REGION_SETS_A_CARRY_CIRCLE…`) §7] **`count-field STATE
+/// STATE_SHA OUT`**: the state tool for the carry circle's count ([`FieldLearner::with_count`]). Reads the learner `STATE` and writes it to the file
+/// `OUT` with the count's word in its field's head line (`hnn-field-v14g`) and nothing else changed; refused on a state with no carry circles or one
+/// already counted, and where `OUT` stands. Prints `FIELD_COUNT` with the head lines before and after and the lines of the two texts that differ,
+/// which must be the head alone. Why a tool and no switch: the count is a law carried in the state (no run switch for core behaviour), and §3.4
+/// reads a grown state's chart as it stands, so the law enters a line from its saved state.
+pub(super) fn count_field(args: &[String]) -> Result<()> {
+    if args.len() != 4 {
+        return Err("count-field STATE STATE_SHA OUT".into());
+    }
+    let text = String::from_utf8(pinned_read(&args[1], &args[2], STATE_BUDGET)?)?;
+    let learner = FieldLearner::from_text(&text).map_err(|e| e.to_string())?;
+    let out = Path::new(&args[3]);
+    if out.exists() {
+        return Err("a counted state's path that exists".into());
+    }
+    let counted = learner.with_count().map_err(|e| e.to_string())?;
+    let written = counted.to_text();
+    let (old, new): (Vec<&str>, Vec<&str>) = (text.split('\n').collect(), written.split('\n').collect());
+    let differing: Vec<usize> = (0..old.len().max(new.len())).filter(|&i| old.get(i) != new.get(i)).collect();
+    let head = |s: &str| s.split(' ').take(15).collect::<Vec<_>>().join(" ");
+    if differing.len() != 1 || !new[differing[0]].starts_with("hnn-field-v14g ") {
+        return Err(format!("the counted state differs from its source in lines {differing:?}, not its field's head alone").into());
+    }
+    write_new(out, written.as_bytes())?;
+    println!("FIELD_COUNT line={} from={} to={} lines={} differing=1", differing[0] + 1, head(old[differing[0]]), head(new[differing[0]]), new.len());
     Ok(())
 }
 
@@ -4310,7 +4339,7 @@ mod tests {
 
     fn toy_learner(codec: &FieldCodec, problems: &Problems) -> FieldLearner {
         let reach = problems.iter().map(|(q, _, _)| q.len() + codec.answer).max().unwrap();
-        let d = FieldDeclaration { alphabet: codec.alphabet(), width: 8, heads: 2, modes: 3, still: 1, contacts: 4, ticks: 2, frames: 2, reach, lanes: 1, depth: 0, carry: 0, triads: 0 };
+        let d = FieldDeclaration { alphabet: codec.alphabet(), width: 8, heads: 2, modes: 3, still: 1, contacts: 4, ticks: 2, frames: 2, reach, lanes: 1, depth: 0, carry: 0, triads: 0, count: false };
         let keys: Vec<u8> = (0..1u64 << 13).flat_map(|i| mix(0x5EED, i).to_be_bytes()).collect();
         FieldLearner::new(Field::found(d, &keys).unwrap(), 4)
     }
@@ -5193,6 +5222,19 @@ pub(super) fn leak_field(args: &[String], realization: &mut dyn FieldRealization
             pair(leak.first),
             pair(leak.last)
         );
+        // [measurement; theory, November 12, the friction record §7] With the count only: the applied friction's share under `d₀` by kind, beside
+        // the chart's `ℓ < 0` share (FIELD_LEAK's `below_*`).
+        if field.declaration.count {
+            println!(
+                "FIELD_LEAK_COUNT circle={k} applied_below_question={} applied_below_open={} applied_below_given={} chart_below_question={} chart_below_open={} chart_below_given={}",
+                pair(leak.applied[0]),
+                pair(leak.applied[1]),
+                pair(leak.applied[2]),
+                pair(leak.kind[0]),
+                pair(leak.kind[1]),
+                pair(leak.kind[2])
+            );
+        }
         println!(
             "FIELD_LEAK_RUNS circle={k} runs_1/2-3/4-7/8-15/16-31/32-63/64+={} sites_in_runs={} longest={} charge_max={} charge_max_below={} charge_mean_below={} charge_mean_rest={}",
             join(&leak.runs),
@@ -5231,6 +5273,9 @@ struct Leak {
     charge_max_below: u64,
     charge_below: (u128, u64),
     charge_rest: (u128, u64),
+    /// [measurement; theory, November 12, the friction record §7] With the count, the reads whose applied friction `d = m R` stands under the
+    /// founded `d₀` (the friction in effect under its rest), by kind as `kind` counts the chart's `ℓ < 0`, beside the kind's reads.
+    applied: [(u64, u64); 3],
 }
 
 impl Leak {
@@ -5280,6 +5325,9 @@ impl Leak {
         self.charge_max_below = self.charge_max_below.max(o.charge_max_below);
         (self.charge_below.0, self.charge_below.1) = (self.charge_below.0 + o.charge_below.0, self.charge_below.1 + o.charge_below.1);
         (self.charge_rest.0, self.charge_rest.1) = (self.charge_rest.0 + o.charge_rest.0, self.charge_rest.1 + o.charge_rest.1);
+        for (a, &b) in self.applied.iter_mut().zip(&o.applied) {
+            add(a, b);
+        }
     }
 }
 
@@ -5315,7 +5363,7 @@ fn leak_add(field: &Field, leaks: &mut [Leak], stratum: Option<usize>, open: &[b
     }
     let sites = open.len();
     for (tick, read) in state_ticks.iter().enumerate() {
-        let (leak_reads, charge) = field.carry_leaks(&read.pair_read).map_err(|e| e.to_string())?;
+        let (leak_reads, charge, applied) = field.carry_leaks(&read.pair_read).map_err(|e| e.to_string())?;
         if leak_reads.len() != sites * circles {
             return Err("a pair chart of other than the region's sites".into());
         }
@@ -5329,6 +5377,8 @@ fn leak_add(field: &Field, leaks: &mut [Leak], stratum: Option<usize>, open: &[b
                 let kind = if t < q_len { 0 } else if open[t] { 1 } else { 2 };
                 leak.kind[kind].0 += u64::from(below);
                 leak.kind[kind].1 += 1;
+                leak.applied[kind].0 += u64::from(applied[t * circles + k] < i64::from(holonics::hnn::tower::field::CARRY_LEAK_FOUNDING));
+                leak.applied[kind].1 += 1;
                 leak.bands[leak_band(lv)] += 1;
                 if open[t] {
                     leak.reads += 1;

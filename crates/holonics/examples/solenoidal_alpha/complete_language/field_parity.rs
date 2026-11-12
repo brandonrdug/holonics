@@ -71,7 +71,7 @@ impl Passage {
     /// The founded learner of the declaration `D H n STILL f K` at `RATE`.
     fn learner(&self, args: &[String], rate: u32) -> Result<FieldLearner> {
         let (width, heads, modes, still, contacts, ticks) = (positive(&args[0])?, positive(&args[1])?, positive(&args[2])?, count(&args[3])?, positive(&args[4])?, positive(&args[5])?);
-        let declaration = FieldDeclaration { alphabet: self.codec.alphabet(), width, heads, modes, still, contacts, ticks, frames: heads, reach: self.reach, lanes: 1, depth: 0, carry: 0, triads: 0 };
+        let declaration = FieldDeclaration { alphabet: self.codec.alphabet(), width, heads, modes, still, contacts, ticks, frames: heads, reach: self.reach, lanes: 1, depth: 0, carry: 0, triads: 0, count: false };
         let mut field = Field::found(declaration, &self.keys).map_err(|e| e.to_string())?;
         // The trainer's declared clock (`FIELD_CLOCK_PER_BLANK`, `Field::per_blank_clock`), so its parity reads that law.
         super::field_train::declared_clocks(&mut field);
@@ -320,6 +320,17 @@ pub(super) fn parity(args: &[String], card: &mut dyn FieldRealization) -> Result
             }
             println!("FIELD_PARITY_TRIAD_SHIFT shift={shift} entries={}", entries.len());
         }
+    }
+    // [definition; theory, November 12; the friction record §7] The carry circle's count (`FIELD_PARITY_COUNT=1`, agent-inferred name, after the
+    // carry's and the triads'): the field (after its circles, their shift and its triads) takes the count ([`FieldLearner::with_count`]), so both
+    // realizations read the count's scan (`d = m R` along each circle's order), its gate and coupling at the applied friction, and the reverse's chain
+    // of the range's covector `ρ` with the edge's term. At the founding every site reads `ℓ = 0` and the count's faces are the built ones; a moved state
+    // (`FIELD_PARITY_CARRY_SHIFT=s`) draws the leak chart from the key file, so `ℓ` varies along every strand and the count's `d` differs from the
+    // chart's at most sites.
+    if std::env::var("FIELD_PARITY_COUNT").ok().as_deref() == Some("1") {
+        founded = founded.with_count().map_err(|e| e.to_string())?;
+        let d = founded.field.declaration;
+        println!("FIELD_PARITY_COUNT circles={} triads={} head={}", d.carry, d.triads, founded.field.to_text().lines().next().unwrap_or("").split(' ').next().unwrap_or(""));
     }
     // [agent-inferred, November 2] A pace far from the founding (`FIELD_PARITY_PACE=s`, §16): every pace entry drawn from
     // the key file's tail, a 32-bit word shifted down `s` bits, so the clocks run off the byte place (fractional,
