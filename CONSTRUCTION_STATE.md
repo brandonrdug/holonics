@@ -77,10 +77,11 @@ repository was reset on September 24; the pre-reset tree is
   word of two contacts through the place, the mates' contact pumped by the place, a junction's three.
   It is founded for the part of the joint law of two letters each side that no pair contact holds,
   0.455 nats a place on the held passage (an abelian law of composition is a sum of such triads, its
-  characters, and text's part is read by the ruler, G102). Its
-  three legs and return share a gauge of three complex scales, so its parts train at one rate. Its
-  count `J` is sized by a ruler on the host (G102); its build enters the line by reproducing te4's
-  lap with no triads, and its first lap pairs with te5.
+  characters). Its three legs and return share a gauge of three complex scales, so the triad is one
+  part at one rate. The ruler on the host (G102) read that 8, 16, 32 and 64 triads with free factors
+  over the contexts hold 0.604, 0.745, 0.826 and 0.877 of the part, the remainder falling about as
+  `R^(−0.56)`, so `J = 16` (8,288 entries). The build is under way on the PC; it enters the line by
+  reproducing te4's lap with no triads, and the founding's first lap pairs with te5.
 - **The learner** (`FieldLearner`; the trainer is
   `crates/holonics/examples/solenoidal_alpha/complete_language/field_train.rs`). The comparison is
   completion read as a joint code: a region is drawn as a state of open places among the answer's,

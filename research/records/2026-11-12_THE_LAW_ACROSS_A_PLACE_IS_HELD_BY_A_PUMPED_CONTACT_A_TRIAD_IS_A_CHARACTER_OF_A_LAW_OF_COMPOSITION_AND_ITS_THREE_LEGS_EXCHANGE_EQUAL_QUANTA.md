@@ -177,7 +177,11 @@ triad's reach reads short at three to five letters each side.
   grain; `w_triad`, `D × 2J` on the material's grain, the return, with no bias of its own.
 - **Founding** (`grow-triad-field`): `A`, `B` and `G` drawn as the growth by contacts draws `a` and
   `b` (uniform on `±√(3/D)` on the material's grain), the biases and `W_T` at zero. The grown field
-  is the trained field bit for bit.
+  is the trained field bit for bit. The learner's moments open as a growth in contacts opens a new
+  contact's: the first at zero, the second at the mean of the counterparts' old second moments (`A`,
+  `B` and `G` at the pair drives', the biases at the drives' biases', `W_T` at `W`'s). So a triad's
+  first step is its covector over its counterpart's scale, the step a trained entry takes, and never
+  the largest normalized step of a fresh entry [agent-inferred, from the growth in contacts' law].
 - **Parts.** One part, `triad`: the three charts, their biases and the return, appended after the
   parts the line has and written only where `J > 0`. A part is a family of entries that steps at
   one rate, and the gauge (section 3.2) makes the triad's charts and return one such family, so the
@@ -241,6 +245,17 @@ section 3, item 2); a doubling whose gain falls under half the one before binds 
 is the count before it; otherwise `J = 16`, the plain contacts' count toward each mate, and the
 founding's own laps size what follows, as G83 did for the circles.
 
+[measurement; the guess file, G102 scored] The ruler read 1.0304 nats a place with no triad, then
+0.7559, 0.6916, 0.6550 and 0.6317 at 8, 16, 32 and 64 triads, so `s` = 0.604, 0.745, 0.826 and 0.877.
+Every share stood over its guessed range, and the gain a doubling fell (0.141, 0.081 and 0.051) where
+the guess had it level. The part left over, `1 − s`, falls to 0.64 to 0.71 of itself a doubling,
+about `R^(−0.56)`: at two letters each side a few characters hold most of the three-body part, as
+section 3.1 says a law of composition is held (the drawn law by its four). From 16 triads on, the
+free factors fit TRAIN past what holds, so each share is its count's best held read; the 8 triads
+were still falling when their budget ended. No doubling's gain fell under half the one before
+(0.081 against 0.071, then 0.051 against 0.040), so the rule's third branch fires: **`J = 16`**,
+8,288 entries.
+
 ## 6. Navigators, terrain, kernel, cokernel, landmarks
 
 The navigators are the place and its two strand mates, each a chart of its read; the terrain is the
@@ -262,8 +277,8 @@ lock, so that `arg α + arg β + arg γ` stands still across the places that sha
 
 ## 8. Owed
 
-- The ruler's read (G102) and the sizing it fires.
-- The build (section 4) with its parity, the reproduction lap, the founding's guess and its laps.
+- The build (section 4) at `J = 16` with its parity, the reproduction lap, the founding's guess and
+  its laps.
 - Lean, for #410: the character decomposition of the cyclic law (3.1) and the triad's gauge identity
   with its conserved differences under a step at equal rates (3.2).
 
@@ -271,5 +286,6 @@ lock, so that `arg α + arg β + arg γ` stands still across the places that sha
 
 In [`…_receipts/`](2026-11-12_THE_LAW_ACROSS_A_PLACE_IS_HELD_BY_A_PUMPED_CONTACT_A_TRIAD_IS_A_CHARACTER_OF_A_LAW_OF_COMPOSITION_AND_ITS_THREE_LEGS_EXCHANGE_EQUAL_QUANTA_receipts/README.md):
 `cap_t.py`, its control `cap_t_synth.log.txt`, its gradient check `cap_t_fd.py` and
-`cap_t_fd.log.txt`. G102 is in `guess_capacity_44_55.txt` in the receipts of
+`cap_t_fd.log.txt`, and G102's six runs `cap_t_2_0.log.txt` to `cap_t_2_64.log.txt` and
+`cap_t_2_0_repeat.log.txt`. G102, fixed and scored, is in `guess_capacity_44_55.txt` in the receipts of
 [the record of the places](2026-11-11_THE_PLACES_THE_FIELD_GIVES_PUSH_AGAINST_THE_PLACES_IT_MISSES_THE_DEPOSIT_IS_THEIR_DIFFERENCE_AND_TWO_BUILDS_ARE_TIMED_ONLY_INSIDE_ONE_HOLD_OF_THE_CARD.md).
