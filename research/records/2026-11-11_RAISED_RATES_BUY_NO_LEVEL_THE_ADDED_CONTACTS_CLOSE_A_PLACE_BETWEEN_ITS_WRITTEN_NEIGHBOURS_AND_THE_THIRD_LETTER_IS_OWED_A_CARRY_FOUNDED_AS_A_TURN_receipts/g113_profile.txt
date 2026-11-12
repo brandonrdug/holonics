@@ -1,0 +1,29 @@
+# G113 (P43), 2026-11-12 UTC: where te7's lap spends its time, read by the line's own binary with its two readings on. te7p: te7's lap from
+# te6/STATE.0 by bin-carry-coupled (87994ea23's release field_pass, sha256 54f9cb36459453d2) with lap_tf.sh's exports and arguments as te7 had,
+# FIELD_PROFILE=1 (every launch, transfer and allocation timed alone after the stream drains) and FIELD_PHASES=1 (the host's phases marked without a
+# sync), the lap bound 300,000 ms and the run's 600,000 ms, in a fresh run directory te7p (RUN is P24's run directory); its state STATE.stopped is a
+# ruler's and trains nothing.
+# Device line: the card, the RTX 4080 SUPER under HOLONICS_ROOT/.local/gpu.lock, its own hold, alone on the card with nothing else on the host; outer
+# timeout 420 s, at most 12 GB (11,444 MiB) of the card's memory read by nvidia-smi every 5 s, a 12 GiB ceiling on the host's resident set; stopped
+# past 1,100 ms a section over n=0..99. Dispatched with tools/runs.py (p43). The gate and the ruler on the host, one thread, after it.
+## the run
+# p43 chain at main 8854c9693 16:37:36
+# te7p from te6/STATE.0 2109252566736ded; binary 54f9cb36459453d2 (87994ea23); FIELD_PROFILE=1 FIELD_PHASES=1; lap bound 300000 ms, the run's 600000 ms, outer 420 s 16:37:36
+# te7p: lock taken 16:37:36 wait_s=.002476163
+EARLY_RATE te7p sections=100 mean_section_ms=1138 bound_ms=1100 16:39:43
+STOPPED_EARLY te7p: the first 100 sections ran 1138 ms a section, past 1100 16:39:43
+# te7p: run exit 143 released 16:39:43
+CARD_PEAK te7p used_memory_mib=10554 (nvidia-smi, sampled every 5 s)
+STOP_P43 te7p was stopped: incomplete
+## the phases (FIELD_PHASE)
+PHASES_SUM (none)
+## the profile (FIELD_PROFILE, FIELD_PROFILE_SPLIT)
+CIRCLES_ENTRIES (no kernels)
+MOMENT_ENTRIES (no kernels)
+## the sections run, the gate (its FIELD_SECTION lines against te7's lap log for the same sections, timings aside) and the ruler
+SECTIONS te7p sections=100 mean_section_ms=1138.3 (te7's same 100 sections: 839.1 ms, ratio 1.357)
+SECTION_PARTS te7p first100 regions_ms=1.1 deposit_ms=1086.1 ms=1138.3; te7 first100 regions_ms=1.2 deposit_ms=800.5 ms=839.1
+GATE_SECTIONS compared=100 te7_lines=100 differing_lines=0 EQUAL (read on the host, one thread, after the stop)
+RULER not run: the run was stopped before its end, where field_pass prints FIELD_PROFILE, FIELD_PROFILE_SPLIT and FIELD_PHASE, so the log holds none of them
+STATE none written: the run directory holds CODEC and JOINT.tsv only (no STATE.stopped)
+MAIN p43 chain stopped 16:39:43
