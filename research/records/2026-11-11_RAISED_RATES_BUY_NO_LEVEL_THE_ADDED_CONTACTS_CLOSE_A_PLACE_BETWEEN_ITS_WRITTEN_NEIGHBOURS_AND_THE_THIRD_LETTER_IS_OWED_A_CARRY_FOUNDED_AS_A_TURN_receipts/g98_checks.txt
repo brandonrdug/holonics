@@ -1,0 +1,87 @@
+# G98's gates before te1 (P24 steps 2 and 3), 2026-11-12 UTC. The build: 87994ea23 (the commit under test b27acb392 merged, with 87994ea's merge of
+# b533b46cc), its release example field_pass staged as bin-carry-coupled, sha256 54f9cb36459453d2cb8f7d4bd61fc8eaefa627b40d0f660e0a9843ced80dfd85.
+# The line's binary bin-lap-mean b8fe4ba838dd27a6. Device line: step 2 on the host only (8 build jobs, 8 test threads, pinned to hardware threads 0-7,
+# never the card) while rt25 trained, 06:40:48 to 06:49:04 UTC; step 3 on the card, the RTX 4080 SUPER under HOLONICS_ROOT/.local/gpu.lock, each step
+# its own hold (the development section one hold for its three runs), 06:57:42 to 07:21:38 UTC, after rt25's reads; the suite's test build on the host
+# outside the lock. Lock waits: suite 0.004 s, repro 0.002 s, held read 0.015 s, growth 0.002 s, TE0's held read 0.013 s, the development hold 0.002 s.
+# Projections and deadlines: the suite 400 s (deadline 900 s), measured 373.6 s; each parity 300 s (deadline 900 s), measured 308.8 s and 300.6 s
+# (rc=1 is the binary's exit with learners_unequal=1, as before); the reproduction its 200,000 ms bound (outer 560 s), measured 211.1 s; the held
+# reads about 10 s (bound 24 s), measured 9.7 s and 10.2 s; the transmission read 190 s (deadline 297 s), measured 163.7 s; the growth 10 s
+# (deadline 120 s), measured 7.1 s. Peak resident sets are on each MEASURE or METER line.
+## step 2 (host, at 87994ea23), one line each
+cargo build --workspace: BUILD_EXIT 0, warnings only; p24_build: rc=0 wall_s=31.1 peak_rss_kib=3128948
+bash tools/gate.sh: 28 of 28 gates ok; p24_gate: rc=0 wall_s=202.6 peak_rss_kib=4095180
+cargo test -p holonics --lib hnn::tower::field: test result: ok. 99 passed; 0 failed; 1 ignored; 0 measured; 2004 filtered out; finished in 147.51s; the_drive_is_charged_through_the_leak ok; p24_field: rc=0 wall_s=147.6 peak_rss_kib=88932
+cargo test -p holonics --example solenoidal_alpha leak: test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 95 filtered out; finished in 1.87s; p24_leak: rc=0 wall_s=8.2 peak_rss_kib=1699844
+the train test the_field_trains_rests_continues_and_writes: test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 96 filtered out; finished in 12.23s; p24_train: rc=0 wall_s=12.3 peak_rss_kib=48680
+bash tools/lean_check.sh: Build completed successfully (9153 jobs). (Holonics.HNN.CarryGate built, no sorry); p24_lean: rc=0 wall_s=29.8 peak_rss_kib=7086184
+cargo build --release -p holonics-cuda --example field_pass: RELEASE_EXIT 0; p24_release: rc=0 wall_s=64.3 peak_rss_kib=3238592
+RESULTS build 0 gate 0 field 0 leak 0 train 0 lean 0 release 0
+## (a) the card suite alone on the idle card
+SUITE_EXIT 0 07:04:09
+METER p24_suite rc=0 started=06:57:56Z ended=07:04:09Z wall_s=373.6 user_s=899.6 sys_s=60.5 peak_rss_kib=1778688
+SUITE_COUNT passed=134 failed=0 ignored=0
+test result: ok. 83 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 326.77s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.08s
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.40s
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.31s
+test result: ok. 46 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 32.01s
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 5.12s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+## (b) parity at founding (FIELD_PARITY_CARRY=16)
+FIELD_PARITY_CARRY circles=16 contacts=96 material=77592
+FIELD_PARITY section=1 withheld=false regions=26 length=1550 sites=15920 rows=161504 reads=1 faces_unequal=0 covector_unequal=0 first=- deposited=true halvings=0 next=- learner_equal=false near_equal=true clocks_equal=false rows_equal=true shares_equal=true currents_equal=true pace_nonzero=246 kappa=504..1478 host_ms=35821 card_ms=372
+FIELD_PARITY section=2 withheld=false regions=29 length=1653 sites=20456 rows=208880 reads=1 faces_unequal=0 covector_unequal=0 first=- deposited=true halvings=0 next=- learner_equal=true near_equal=true clocks_equal=true rows_equal=true shares_equal=true currents_equal=true pace_nonzero=246 kappa=524..1478 host_ms=56388 card_ms=392
+FIELD_PARITY section=3 withheld=false regions=30 length=1819 sites=25228 rows=269048 reads=1 faces_unequal=0 covector_unequal=0 first=- deposited=true halvings=0 next=- learner_equal=true near_equal=true clocks_equal=true rows_equal=true shares_equal=true currents_equal=true pace_nonzero=246 kappa=508..1482 host_ms=75666 card_ms=379
+FIELD_PARITY section=4 withheld=true regions=8 length=571 sites=0 rows=31680 reads=1 faces_unequal=0 covector_unequal=0 first=- deposited=false halvings=0 next=- learner_equal=true near_equal=true clocks_equal=true rows_equal=true shares_equal=true currents_equal=true pace_nonzero=246 kappa=519..1482 host_ms=2331 card_ms=75
+FIELD_PARITY_DONE sections=4 reads=4 reads_unequal=0 faces_unequal=0 covector_unequal=0 learners_unequal=1 releases=0 releases_unequal=0 card_release_ms=0 host_ms=170208 card_ms=1218 elapsed_ms=297649
+MEASURE lap=found rc=1 wall_s=308.8 peak_rss_kib=2028416
+PARITY_CHECK found.log sections=4 faces_or_covector_unequal_at=- learners_unequal_at=['section=1'] done=yes ok=True
+## (b) parity at a moved state (FIELD_PARITY_CARRY=16 FIELD_PARITY_CARRY_SHIFT=10)
+FIELD_PARITY_CARRY circles=16 contacts=96 material=77592
+FIELD_PARITY_CARRY_SHIFT shift=10 entries=4128
+FIELD_PARITY section=1 withheld=false regions=26 length=1550 sites=15920 rows=161504 reads=1 faces_unequal=0 covector_unequal=0 first=- deposited=true halvings=0 next=- learner_equal=false near_equal=true clocks_equal=false rows_equal=true shares_equal=true currents_equal=true pace_nonzero=246 kappa=504..1478 host_ms=34723 card_ms=421
+FIELD_PARITY section=2 withheld=false regions=29 length=1653 sites=20456 rows=208880 reads=1 faces_unequal=0 covector_unequal=0 first=- deposited=true halvings=0 next=- learner_equal=true near_equal=true clocks_equal=true rows_equal=true shares_equal=true currents_equal=true pace_nonzero=246 kappa=524..1478 host_ms=55474 card_ms=371
+FIELD_PARITY section=3 withheld=false regions=30 length=1819 sites=25228 rows=269048 reads=1 faces_unequal=0 covector_unequal=0 first=- deposited=true halvings=0 next=- learner_equal=true near_equal=true clocks_equal=true rows_equal=true shares_equal=true currents_equal=true pace_nonzero=246 kappa=508..1477 host_ms=78045 card_ms=568
+FIELD_PARITY section=4 withheld=true regions=8 length=571 sites=0 rows=31680 reads=1 faces_unequal=0 covector_unequal=0 first=- deposited=false halvings=0 next=- learner_equal=true near_equal=true clocks_equal=true rows_equal=true shares_equal=true currents_equal=true pace_nonzero=246 kappa=519..1477 host_ms=2358 card_ms=29
+FIELD_PARITY_DONE sections=4 reads=4 reads_unequal=0 faces_unequal=0 covector_unequal=0 learners_unequal=1 releases=0 releases_unequal=0 card_release_ms=0 host_ms=170601 card_ms=1390 elapsed_ms=300039
+MEASURE lap=moved rc=1 wall_s=300.6 peak_rss_kib=1712644
+PARITY_CHECK moved.log sections=4 faces_or_covector_unequal_at=- learners_unequal_at=['section=1'] done=yes ok=True
+## (c) the reproduction, bin-carry-coupled at C = 0 from rt23/STATE.0 with rt24's exports and arguments, lap bound 200,000 ms
+FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.727140 foil_nats_a_place=1.861204 information_nats_a_place=0.134064 own_nats_a_word=12.978184 information_nats_a_word=1.007388
+FIELD_STOPPED lap=0 sections=371/1535 reason=lap sites=3962064 before=3.219 after=- deposited=371 halvings=0 next_halved=0 next_refused=0 lap_ms=201363 ms=210700
+MEASURE lap=repro rc=0 wall_s=211.1 peak_rss_kib=822224
+REPRO EQUAL 371 sections, timings aside; joint lap=-1 1.727140 1.861204
+## (d) the reads held on rt24/MEAN.0 by bin-carry-coupled
+FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.720398 foil_nats_a_place=1.854345 information_nats_a_place=0.133947 own_nats_a_word=12.927518 information_nats_a_word=1.006513
+HELD_READ EQUAL 4 lines, timings aside
+MEASURE lap=transmission_open_rt24_mean_b rc=0 wall_s=163.7 peak_rss_kib=365592
+TRANSMISSION_READ EQUAL 14 lines, timings aside
+## (e) TE0, rt23/STATE.0 grown by 32 carry circles with bin-carry-coupled (grow-carry-field, G85's command and keys)
+FIELD_GROW_CARRY circles=32 from_contacts=64 to_contacts=128 width=64 lanes=2 heads=4 rate=12 drawn=175104 material=80182 ms=34
+FIELD_GROW_CARRY_KEPT states=1020 faces=174266 identical=true ms=3396
+FIELD_GROWN hnn-field-v14e 100 64 4 8 2 128 4 4 3771 2 0 32 rate=12 material=80182 ms=6752
+MEASURE lap=grow rc=0 wall_s=7.1 peak_rss_kib=324336
+TE0 06fc906cd8c2c87a: hnn-field-v14e 100 64 4 8 2 128 4 4 3771 2 0 32; parts 32 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+TE0 sha256 06fc906cd8c2c87af5996e041c59e7476f161afda74e47f1f3140e3aca08092d
+FIELD_HELD lap=-1 answer=5.704882 classes=43470 context=0.918071 context_classes=43470 foil=1.084887 question=0.166816 ms=3787
+FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.727140 foil_nats_a_place=1.861204 information_nats_a_place=0.134064 own_nats_a_word=12.978184 information_nats_a_word=1.007388
+FIELD_JOINT_STRATA lap=-1 open_quarters=1/2/3/4 own_nats_a_place=0.667177/1.268064/2.029734/2.934125 foil_nats_a_place=0.767872/1.403817/2.185883/3.077613 places=10818/10881/10853/10918 open_sites=5333/16153/26922/38725 terms_own=10918480625/20872973507/33324474545/48461427910 terms_foil=12566377956/23107546828/35888157973/50831339137
+FIELD_CARRY_GATES lap=-1 circles=32 reads=697064 modulus_sum=598773416306013/598773416306724/598773416309635/598773416309656/598773416311032/598773416309095/598773416314688/598773416314129/598773416311858/598773416312086/598773416305115/598773416308695/598773416313222/598773416312353/598773416313505/598773416307790/598773416311414/598773416309186/598773416309708/598773416305266/598773416311595/598773416307767/598773416306558/598773416308629/598773416310791/598773416315159/598773416309562/598773416310636/598773416307509/598773416311168/598773416308289/598773416314506 modulus_mean=858993458/858993458/858993458/858993458/858993458/858993458/858993458/858993458/858993458/858993458/858993458/858993458/858993458/858993458/858993458/858993458/858993458/858993458/858993458/858993458/858993458/858993458/858993458/858993458/858993458/858993458/858993458/858993458/858993458/858993458/858993458/858993458 leak_nonnegative=697064/697064/697064/697064/697064/697064/697064/697064/697064/697064/697064/697064/697064/697064/697064/697064/697064/697064/697064/697064/697064/697064/697064/697064/697064/697064/697064/697064/697064/697064/697064/697064
+FIELD_UNSEEN lap=-1 code=0.849 sites=43660 next=- ms=9772
+MEASURE lap=held_te0 rc=0 wall_s=10.2 peak_rss_kib=823156
+HELD_TE0 1.727140 1.861204
+GATES_TE0 circles=32 reads=697064 modulus_mean_min=858993458 modulus_mean_max=858993458 leak_nonnegative_all=True ok=True
+## (f) the development section in one hold: the line's binary on rt23/STATE.0 (rt24's section 0), bin-carry-coupled on TE0 (te1's section 0), the line's binary again
+FIELD_SECTION lap=0 n=0 sites=10156 before=2.967 after=- halvings=0 deposited=true next=- predicted_micro=-4261 change_micro=- transfer_micro=- external_micro=-212 curvature_micro=- rate=12 length=3030 regions_ms=1 deposit_ms=590 ms=1163
+MEASURE lap=dev_ctrl1 rc=0 wall_s=11.9 peak_rss_kib=834120
+FIELD_SECTION lap=0 n=0 sites=10156 before=2.967 after=- halvings=0 deposited=true next=- predicted_micro=-8785 change_micro=- transfer_micro=- external_micro=-212 curvature_micro=- rate=12 length=3030 regions_ms=2 deposit_ms=767 ms=1631
+MEASURE lap=dev_coupled rc=0 wall_s=12.9 peak_rss_kib=819832
+FIELD_SECTION lap=0 n=0 sites=10156 before=2.967 after=- halvings=0 deposited=true next=- predicted_micro=-4261 change_micro=- transfer_micro=- external_micro=-212 curvature_micro=- rate=12 length=3030 regions_ms=1 deposit_ms=599 ms=1175
+MEASURE lap=dev_ctrl2 rc=0 wall_s=12.0 peak_rss_kib=834404
+DEV dev_ctrl1 predicted_micro=-4261 section_ms=1163 deposit_ms=590 card_return_ms=1155 card_peak_store=8543512590
+DEV dev_coupled predicted_micro=-8785 section_ms=1631 deposit_ms=767 card_return_ms=1622 card_peak_store=8551938554
+DEV dev_ctrl2 predicted_micro=-4261 section_ms=1175 deposit_ms=599 card_return_ms=1167 card_peak_store=8543512590
+DEV_RATIO predicted 2.062 time 1.395 (control spread 0.010) card 8.55 GB
+MAIN p24 card done 07:21:38
