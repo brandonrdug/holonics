@@ -100,10 +100,21 @@ repository was reset on September 24; the pre-reset tree is
   friction. A lap's balance between regions is a lever rule (atlas
   `deposition.shared-entry-lever-point`): te5's chart stood at its held quarters' lever point, te6's
   lap took it a quarter of a unit of `ℓ` past, and neither the draw's weights nor a rate puts it
-  there, so the premise is read before any founding (G111: a seen passage beside the held one, and
-  the friction by kind of site). tt1's circles drifted as te5's did
-  with the triads beside them (their friction 0.8242 at tt1's mean against te5's 0.8251). With
-  `C = 0` the field is the plain line bit for bit.
+  there. tt1's circles drifted as te5's did with the triads beside them (their friction 0.8242 at
+  tt1's mean against te5's 0.8251). With `C = 0` the field is the plain line bit for bit. G111 read
+  the premise:
+  - On 128 trained problems matched to the held ones by length, quarter 4 rose from te3's mean to
+    te6's as it did on the held and the withheld passages (+0.065, +0.063 and +0.067 nats a place),
+    and the trained problems' lead of 0.055 over the withheld has stood since te4. So the turn is
+    the lap's trade between its regions on every problem, never a fitting of trained answers. What
+    a lap meets that the held read does not is its own families of states.
+  - The circles part the kinds of site one by one, and the pool hides it (open sites 0.580 of
+    reads under the founding, given ones 0.560). At te6's mean 17 of the 32 hold more at open sites
+    than at given ones; six of them part by 0.14 to 0.23 and hold most where the region is most
+    open, and six relay the field's guesses. The lap moves circles from holding to relaying (21
+    holders at te5's mean).
+  - The count is built next as one attempt from te6's end, beside te7, the line's own lap, which
+    the build with its law off reproduces first (G112).
 - **The triad** (founded on te4's end, its first lap read; atlas `contact.triad-manley-rowe-gauge`,
   `code.triad-character-of-composition`;
   [the triad record](research/records/2026-11-12_THE_LAW_ACROSS_A_PLACE_IS_HELD_BY_A_PUMPED_CONTACT_A_TRIAD_IS_A_CHARACTER_OF_A_LAW_OF_COMPOSITION_AND_ITS_THREE_LEGS_EXCHANGE_EQUAL_QUANTA.md)).
