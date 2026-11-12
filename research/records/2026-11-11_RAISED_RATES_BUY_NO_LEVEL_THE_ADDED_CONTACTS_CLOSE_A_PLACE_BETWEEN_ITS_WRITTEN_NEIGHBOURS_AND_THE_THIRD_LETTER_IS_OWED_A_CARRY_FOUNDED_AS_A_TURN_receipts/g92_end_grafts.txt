@@ -12,9 +12,9 @@
 ## The grafts (STATE_GRAFT lines, whole, with seconds)
 # g92_host at 5ea091cd5: cooled 23, raised 20, held 7, deep 4, letters 4 02:20:05
 GRAFT rt21_cooled rc=0 s=.10550
-STATE_GRAFT families=block:w/1/old,block:out_bias/1/all,block:w_bias/1/all,block:read_rows/1/all,block:lift_bias/1/all,block:a/1/old,block:out/2/all,block:w/2/new,block:w/2/old,block:out_bias/2/all,block:moment_face_bias/2/all,block:read_rows/2/all,block:lift_bias/2/all,block:a/2/new,block:a/2/old,block:b/2/new,block:b/2/old,block:a_bias/0/old,block:b_bias/0/new,block:b_bias/0/old,block:v_bias/0/a
+STATE_GRAFT families=block:w/1/old,block:out_bias/1/all,block:w_bias/1/all,block:read_rows/1/all,block:lift_bias/1/all,block:a/1/old,block:out/2/all,block:w/2/new,block:w/2/old,block:out_bias/2/all,block:moment_face_bias/2/all,block:read_rows/2/all,block:lift_bias/2/all,block:a/2/new,block:a/2/old,block:b/2/new,block:b/2/old,block:a_bias/0/old,block:b_bias/0/new,block:b_bias/0/old,block:v_bias/0/all,block:moment_before/0/all,block:moment_after/0/all entries=21152 of=63606 moved=21007 rms_from_head=19912
 GRAFT rt21_raised rc=0 s=.09875
-STATE_GRAFT families=block:enc/1/all,block:before/1/all,block:after/1/all,block:moment_face/1/all,block:w/1/new,block:moment_face_bias/1/all,block:q/1/all,block:v/1/all,block:probe/1/all,block:a/1/new,block:b/1/new,block:enc/2/all,block:before/2/all,block:after/2/all,block:q/2/all,block:v/2/all,block:probe/2/all,block:probe_bias/0/all,block:temper/0/all,block:pace/0/all entries=37106 of=63606 move
+STATE_GRAFT families=block:enc/1/all,block:before/1/all,block:after/1/all,block:moment_face/1/all,block:w/1/new,block:moment_face_bias/1/all,block:q/1/all,block:v/1/all,block:probe/1/all,block:a/1/new,block:b/1/new,block:enc/2/all,block:before/2/all,block:after/2/all,block:q/2/all,block:v/2/all,block:probe/2/all,block:probe_bias/0/all,block:temper/0/all,block:pace/0/all entries=37106 of=63606 moved=35935 rms_from_head=29772
 GRAFT rt21_held rc=0 s=.09580
 STATE_GRAFT families=block:out/1/all,block:b/1/old,block:moment_face/2/all,block:w_bias/2/all,block:a_bias/0/new,block:q_bias/0/all,block:read_bias/0/all entries=5348 of=63606 moved=4321 rms_from_head=12000
 GRAFT rt21_deep rc=0 s=.09955
@@ -22,9 +22,9 @@ STATE_GRAFT families=block:w/2/new,block:w/2/old,block:b/2/old,block:moment_befo
 GRAFT rt21_letters rc=0 s=.09775
 STATE_GRAFT families=block:before/1/all,block:after/1/all,block:before/2/all,block:after/2/all entries=12928 of=63606 moved=12791 rms_from_head=150.14
 GRAFT g3_cooled rc=0 s=.10236
-STATE_GRAFT families=block:w/1/old,block:out_bias/1/all,block:w_bias/1/all,block:read_rows/1/all,block:lift_bias/1/all,block:a/1/old,block:out/2/all,block:w/2/new,block:w/2/old,block:out_bias/2/all,block:moment_face_bias/2/all,block:read_rows/2/all,block:lift_bias/2/all,block:a/2/new,block:a/2/old,block:b/2/new,block:b/2/old,block:a_bias/0/old,block:b_bias/0/new,block:b_bias/0/old,block:v_bias/0/a
+STATE_GRAFT families=block:w/1/old,block:out_bias/1/all,block:w_bias/1/all,block:read_rows/1/all,block:lift_bias/1/all,block:a/1/old,block:out/2/all,block:w/2/new,block:w/2/old,block:out_bias/2/all,block:moment_face_bias/2/all,block:read_rows/2/all,block:lift_bias/2/all,block:a/2/new,block:a/2/old,block:b/2/new,block:b/2/old,block:a_bias/0/old,block:b_bias/0/new,block:b_bias/0/old,block:v_bias/0/all,block:moment_before/0/all,block:moment_after/0/all entries=21152 of=63606 moved=21013 rms_from_head=19904
 GRAFT g3_raised rc=0 s=.10122
-STATE_GRAFT families=block:enc/1/all,block:before/1/all,block:after/1/all,block:moment_face/1/all,block:w/1/new,block:moment_face_bias/1/all,block:q/1/all,block:v/1/all,block:probe/1/all,block:a/1/new,block:b/1/new,block:enc/2/all,block:before/2/all,block:after/2/all,block:q/2/all,block:v/2/all,block:probe/2/all,block:probe_bias/0/all,block:temper/0/all,block:pace/0/all entries=37106 of=63606 move
+STATE_GRAFT families=block:enc/1/all,block:before/1/all,block:after/1/all,block:moment_face/1/all,block:w/1/new,block:moment_face_bias/1/all,block:q/1/all,block:v/1/all,block:probe/1/all,block:a/1/new,block:b/1/new,block:enc/2/all,block:before/2/all,block:after/2/all,block:q/2/all,block:v/2/all,block:probe/2/all,block:probe_bias/0/all,block:temper/0/all,block:pace/0/all entries=37106 of=63606 moved=35941 rms_from_head=51136
 GRAFT g3_held rc=0 s=.10108
 STATE_GRAFT families=block:out/1/all,block:b/1/old,block:moment_face/2/all,block:w_bias/2/all,block:a_bias/0/new,block:q_bias/0/all,block:read_bias/0/all entries=5348 of=63606 moved=4324 rms_from_head=12049
 GRAFT g3_deep rc=0 s=.10302
@@ -32,9 +32,9 @@ STATE_GRAFT families=block:w/2/new,block:w/2/old,block:b/2/old,block:moment_befo
 GRAFT g3_letters rc=0 s=.09970
 STATE_GRAFT families=block:before/1/all,block:after/1/all,block:before/2/all,block:after/2/all entries=12928 of=63606 moved=12799 rms_from_head=1727.1
 GRAFT b3_cooled rc=0 s=.11393
-STATE_GRAFT families=block:w/1/old,block:out_bias/1/all,block:w_bias/1/all,block:read_rows/1/all,block:lift_bias/1/all,block:a/1/old,block:out/2/all,block:w/2/new,block:w/2/old,block:out_bias/2/all,block:moment_face_bias/2/all,block:read_rows/2/all,block:lift_bias/2/all,block:a/2/new,block:a/2/old,block:b/2/new,block:b/2/old,block:a_bias/0/old,block:b_bias/0/new,block:b_bias/0/old,block:v_bias/0/a
+STATE_GRAFT families=block:w/1/old,block:out_bias/1/all,block:w_bias/1/all,block:read_rows/1/all,block:lift_bias/1/all,block:a/1/old,block:out/2/all,block:w/2/new,block:w/2/old,block:out_bias/2/all,block:moment_face_bias/2/all,block:read_rows/2/all,block:lift_bias/2/all,block:a/2/new,block:a/2/old,block:b/2/new,block:b/2/old,block:a_bias/0/old,block:b_bias/0/new,block:b_bias/0/old,block:v_bias/0/all,block:moment_before/0/all,block:moment_after/0/all entries=21152 of=63606 moved=19408 rms_from_head=8970.1
 GRAFT b3_raised rc=0 s=.09714
-STATE_GRAFT families=block:enc/1/all,block:before/1/all,block:after/1/all,block:moment_face/1/all,block:w/1/new,block:moment_face_bias/1/all,block:q/1/all,block:v/1/all,block:probe/1/all,block:a/1/new,block:b/1/new,block:enc/2/all,block:before/2/all,block:after/2/all,block:q/2/all,block:v/2/all,block:probe/2/all,block:probe_bias/0/all,block:temper/0/all,block:pace/0/all entries=37106 of=63606 move
+STATE_GRAFT families=block:enc/1/all,block:before/1/all,block:after/1/all,block:moment_face/1/all,block:w/1/new,block:moment_face_bias/1/all,block:q/1/all,block:v/1/all,block:probe/1/all,block:a/1/new,block:b/1/new,block:enc/2/all,block:before/2/all,block:after/2/all,block:q/2/all,block:v/2/all,block:probe/2/all,block:probe_bias/0/all,block:temper/0/all,block:pace/0/all entries=37106 of=63606 moved=35950 rms_from_head=82640
 GRAFT b3_held rc=0 s=.09864
 STATE_GRAFT families=block:out/1/all,block:b/1/old,block:moment_face/2/all,block:w_bias/2/all,block:a_bias/0/new,block:q_bias/0/all,block:read_bias/0/all entries=5348 of=63606 moved=4320 rms_from_head=12214
 GRAFT b3_deep rc=0 s=.09831
