@@ -113,8 +113,26 @@ repository was reset on September 24; the pre-reset tree is
     than at given ones; six of them part by 0.14 to 0.23 and hold most where the region is most
     open, and six relay the field's guesses. The lap moves circles from holding to relaying (21
     holders at te5's mean).
-  - The count is built next as one attempt from te6's end, beside te7, the line's own lap, which
-    the build with its law off reproduces first (G112).
+  - te7, the line's own next lap from te6's end, coded the held passage 0.0027 nats a place under
+    te6's at lap means (quarters 1 to 4: -0.0012, -0.0051, -0.0045 and +0.0002), so quarter 4's
+    rise stopped (+0.027, +0.019 and +0.017 over the three laps before) while the circles' gates
+    still travel (0.785 at te7's mean). The count's lap is set aside on this line (G112 scored):
+    te7 left no turn for it to shrink, its premise by kind of site is not a state (the leak bias is
+    one entry a circle), and its reach on the held quarters, 0.002 to 0.006 nats a place, is small
+    against the line's binding measure, its rate. The count stays the circle's law and is owed one
+    attempt on the next line; its first source, uncompiled and untested, is at the tag
+    `archive/claude/carry-count`.
+  - The rate. te7 read 11.6 MB of passage (16,589,049 sites) in 1,268 s, about 9.2 KB and 13,000
+    sites a second, so a gigabyte of passage takes about 30 hours a pass. Where a lap spends its time
+    is read next (G113): a run with every launch timed alone cost 1,138 ms a section against te7's
+    839 and stopped at its own bound before it printed, so the read is cut into a phases run and a
+    profile run, each ending by its own lap bound.
+  - The next line's passage is the wider one asked for on November 12: Common Corpus without its
+    government collection, in five slices of code, web, science, books and wikidata, each answer
+    256 bytes with the 256 before it as its question (`tools/corpus_passage.py`; its controls pass on
+    the PC). It is not fetched yet. Before the trainer can read it, it needs a passage read in parts
+    (it reads a passage whole under a 64 MiB budget) and a codec that founds a letter its first
+    passage never used (it refuses one now).
 - **The triad** (founded on te4's end, its first lap read; atlas `contact.triad-manley-rowe-gauge`,
   `code.triad-character-of-composition`;
   [the triad record](research/records/2026-11-12_THE_LAW_ACROSS_A_PLACE_IS_HELD_BY_A_PUMPED_CONTACT_A_TRIAD_IS_A_CHARACTER_OF_A_LAW_OF_COMPOSITION_AND_ITS_THREE_LEGS_EXCHANGE_EQUAL_QUANTA.md)).
