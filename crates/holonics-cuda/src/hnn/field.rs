@@ -2943,6 +2943,17 @@ impl<'c> CardField<'c> {
         self.launch_grid("field_clock_fill", Dim3 { x: Self::cells(sites as u64), y: tm as u32, z: 1 }, THREADS, 0, &mut [arg(&mut fw)])
     }
 
+    /// [measurement; theory, November 12, P50 step 3] The turn's series against the wide one on the card (`field_series_check`): for each argument
+    /// `b`, the narrow series' face and `exp_series_dev(0, b)`'s, `[narrow re, narrow im, wide re, wide im]`.
+    pub fn series_check(&self, bs: &[i64]) -> Result<Vec<i64>> {
+        let card = self.card;
+        let up = self.timed(Kind::Copy, || self.take_up(bs)).map_err(device)?;
+        let out = self.timed(Kind::Alloc, || self.take::<i64>((4 * bs.len()).max(1))).map_err(device)?;
+        let (mut bp, mut count, mut op) = (up.device_ptr(), bs.len() as u64, out.device_ptr());
+        self.launch("field_series_check", Self::cells(bs.len() as u64), THREADS, &mut [arg(&mut bp), arg(&mut count), arg(&mut op)])?;
+        card.fetch_range(&out, 0, 4 * bs.len()).map_err(device)
+    }
+
     /// The batch's refusals, read off the card.
     fn status(&self, status: &CardBuffer<'c, u32>) -> Result<()> {
         let bits = self.timed(Kind::Copy, || self.card.fetch(status)).map_err(device)?[0];
@@ -3517,6 +3528,29 @@ mod tests {
         assert_eq!(host_receipt, card_receipt);
         assert!(host_receipt.deposited);
         assert_eq!(on_host.to_text(), on_card.to_text(), "the material and the moments after the deposit");
+    }
+
+    /// [theory, November 12, P50 step 3] **The turn's series on its narrow words is the wide series** (needs the card): on a sweep of the turn's
+    /// arguments with its edges (zero, the least step, the faces just under a whole clock at the half turn, the largest admitted `⌊π 2^30⌉`, and every
+    /// 2^13-th argument between), `turn_series_dev` and `exp_series_dev(0, b)` give the same integers on the card.
+    #[test]
+    #[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
+    fn the_turns_series_on_narrow_words_is_the_wide_series() {
+        let top = 3_373_259_426i64;
+        let mut bs: Vec<i64> = vec![0, 1, -1, 2, -2, top, -top, top - 1, -(top - 1), top - 2, -(top - 2), 1 << 31, -(1 << 31), (1 << 30) - 1, 1 << 30];
+        bs.extend((-top..=top).step_by(1 << 13));
+        let card = Card::open(0).expect("a CUDA card with the field's kernels built");
+        let card_field = CardField::open(&card).unwrap();
+        let out = card_field.series_check(&bs).unwrap();
+        let differ: Vec<i64> = bs.iter().enumerate().filter(|(c, _)| out[4 * c] != out[4 * c + 2] || out[4 * c + 1] != out[4 * c + 3]).map(|(_, &b)| b).collect();
+        assert!(differ.is_empty(), "{} of {} arguments differ, the first {:?}", differ.len(), bs.len(), differ.first());
+        let (b0, bt) = (0usize, 5usize);
+        assert_eq!((out[4 * b0], out[4 * b0 + 1]), (1 << 30, 0), "the zero argument's face is one");
+        assert!((out[4 * bt] + (1 << 30)).abs() < 1 << 10 && out[4 * bt + 1].abs() < 1 << 10, "the largest argument turns to the half turn within the series' rounding");
+        // The bound the clock's store holds a phase's parts by (P50 step 2): under `2^30 + 2^10` at every argument.
+        let peak = out.iter().map(|v| v.unsigned_abs()).max().unwrap_or(0);
+        assert!(peak < (1 << 30) + (1 << 10), "a face's part {peak} past 2^30 + 2^10");
+        println!("SERIES_CHECK arguments={} equal={} peak_part={peak} half_turn=({}, {})", bs.len(), bs.len() - differ.len(), out[4 * bt], out[4 * bt + 1]);
     }
 
     /// [theory, November 12, P50 step 1] **A skin no fill formed is refused**: the lettered learner's read and return with the clock's fill withheld
