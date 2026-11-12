@@ -1,0 +1,59 @@
+# G89's premise (P11 step 3), 2026-11-12 00:35:12 UTC, the host only, no card, one thread (taskset to one core, OMP_NUM_THREADS=1), 0.3 s.
+# The block law's build at f396f5207 (claude/project-thread-ixf4in: ddf7e6784, the block law, and the one fix of part_rates.py's two
+# `import state_travel` sites under python3 -I), in its worktree: python3 -I tools/part_rates.py blocks RUN/rt15/MEAN.0 RUN/rt16/MEAN.0
+# RUN/rt17/MEAN.0 RUN/rt18/MEAN.0 RUN/rt18/STATE.0 b0.STATE 1535 16560945 (RUN the line's run directory; SECTIONS 1,535 and SITES 16,560,945,
+# the g line's polar read's, set only the printed unit, millionths of a bit a site). b0.STATE is rt18/STATE.0 with one rates line added (every
+# other line equal); no lap has trained from it. Each FIELD_BLOCK_RATE line: a block of state_travel.scale_blocks, its entries, its heat at its
+# own rates and at the base, its fall two laps on, pi = fall/heat, its octave before and after, the move, and the rate word it stands at.
+FIELD_BLOCK_RATE block=enc lane=1 contacts=all entries=3232 open=3232 heat=159.906 heat_base=159.906 fall2=23.9992 pi=0.150083 window=one octave_was=0 octave=1 move=raise rate_bits=11
+FIELD_BLOCK_RATE block=before lane=1 contacts=all entries=3232 open=3232 heat=33.8028 heat_base=33.8028 fall2=42.6984 pi=1.26316 window=one octave_was=0 octave=4 move=raise rate_bits=8
+FIELD_BLOCK_RATE block=after lane=1 contacts=all entries=3232 open=3232 heat=33.085 heat_base=33.085 fall2=40.3762 pi=1.22038 window=one octave_was=0 octave=4 move=raise rate_bits=8
+FIELD_BLOCK_RATE block=moment_face lane=1 contacts=all entries=2048 open=1024 heat=183.802 heat_base=183.802 fall2=20.8492 pi=0.113433 window=one octave_was=0 octave=1 move=raise rate_bits=11
+FIELD_BLOCK_RATE block=out lane=1 contacts=all entries=2048 open=2048 heat=402.482 heat_base=402.482 fall2=35.1106 pi=0.0872352 window=one octave_was=0 octave=0 move=hold rate_bits=12
+FIELD_BLOCK_RATE block=w lane=1 contacts=new entries=1024 open=1024 heat=149.604 heat_base=149.604 fall2=17.3133 pi=0.115727 window=one octave_was=0 octave=1 move=raise rate_bits=11
+FIELD_BLOCK_RATE block=w lane=1 contacts=old entries=1024 open=1024 heat=547.946 heat_base=547.946 fall2=23.0725 pi=0.0421073 window=one octave_was=0 octave=-1 move=cool rate_bits=13
+FIELD_BLOCK_RATE block=out_bias lane=1 contacts=all entries=32 open=32 heat=12.7115 heat_base=12.7115 fall2=0.357273 pi=0.0281062 window=one octave_was=0 octave=-1 move=cool rate_bits=13
+FIELD_BLOCK_RATE block=w_bias lane=1 contacts=all entries=32 open=32 heat=11.2362 heat_base=11.2362 fall2=0.417322 pi=0.0371408 window=one octave_was=0 octave=-1 move=cool rate_bits=13
+FIELD_BLOCK_RATE block=moment_face_bias lane=1 contacts=all entries=32 open=32 heat=6.56782 heat_base=6.56782 fall2=1.11212 pi=0.169329 window=one octave_was=0 octave=1 move=raise rate_bits=11
+FIELD_BLOCK_RATE block=read_rows lane=1 contacts=all entries=2048 open=2048 heat=858.245 heat_base=858.245 fall2=18.3668 pi=0.0214004 window=one octave_was=0 octave=-2 move=cool rate_bits=14
+FIELD_BLOCK_RATE block=lift_bias lane=1 contacts=all entries=32 open=32 heat=27.5797 heat_base=27.5797 fall2=0.285042 pi=0.0103352 window=one octave_was=0 octave=-3 move=cool rate_bits=15
+FIELD_BLOCK_RATE block=q lane=1 contacts=all entries=2048 open=2048 heat=235.87 heat_base=235.87 fall2=41.9561 pi=0.177878 window=one octave_was=0 octave=2 move=raise rate_bits=10
+FIELD_BLOCK_RATE block=v lane=1 contacts=all entries=2048 open=2048 heat=288.686 heat_base=288.686 fall2=47.354 pi=0.164033 window=one octave_was=0 octave=1 move=raise rate_bits=11
+FIELD_BLOCK_RATE block=probe lane=1 contacts=all entries=2048 open=2048 heat=134.711 heat_base=134.711 fall2=37.671 pi=0.279643 window=one octave_was=0 octave=2 move=raise rate_bits=10
+FIELD_BLOCK_RATE block=a lane=1 contacts=new entries=1024 open=1024 heat=125.738 heat_base=125.738 fall2=21.051 pi=0.167419 window=one octave_was=0 octave=1 move=raise rate_bits=11
+FIELD_BLOCK_RATE block=a lane=1 contacts=old entries=1024 open=1024 heat=328.247 heat_base=328.247 fall2=12.6948 pi=0.0386746 window=one octave_was=0 octave=-1 move=cool rate_bits=13
+FIELD_BLOCK_RATE block=b lane=1 contacts=new entries=1024 open=1024 heat=146.864 heat_base=146.864 fall2=22.9987 pi=0.156599 window=one octave_was=0 octave=1 move=raise rate_bits=11
+FIELD_BLOCK_RATE block=b lane=1 contacts=old entries=1024 open=1024 heat=444.608 heat_base=444.608 fall2=24.7534 pi=0.0556746 window=one octave_was=0 octave=0 move=hold rate_bits=12
+FIELD_BLOCK_RATE block=enc lane=2 contacts=all entries=3232 open=3232 heat=64.0273 heat_base=64.0273 fall2=35.0404 pi=0.547273 window=one octave_was=0 octave=3 move=raise rate_bits=9
+FIELD_BLOCK_RATE block=before lane=2 contacts=all entries=3232 open=3232 heat=44.1674 heat_base=44.1674 fall2=32.7423 pi=0.741322 window=one octave_was=0 octave=4 move=raise rate_bits=8
+FIELD_BLOCK_RATE block=after lane=2 contacts=all entries=3232 open=3232 heat=44.1892 heat_base=44.1892 fall2=33.4807 pi=0.757667 window=one octave_was=0 octave=4 move=raise rate_bits=8
+FIELD_BLOCK_RATE block=moment_face lane=2 contacts=all entries=2048 open=1024 heat=290.477 heat_base=290.477 fall2=17.5604 pi=0.0604538 window=one octave_was=0 octave=0 move=hold rate_bits=12
+FIELD_BLOCK_RATE block=out lane=2 contacts=all entries=2048 open=2048 heat=778.455 heat_base=778.455 fall2=9.19308 pi=0.0118094 window=one octave_was=0 octave=-2 move=cool rate_bits=14
+FIELD_BLOCK_RATE block=w lane=2 contacts=new entries=1024 open=1024 heat=252.817 heat_base=252.817 fall2=1.27469 pi=0.00504196 window=one octave_was=0 octave=-4 move=cool rate_bits=16
+FIELD_BLOCK_RATE block=w lane=2 contacts=old entries=1024 open=1024 heat=1018.11 heat_base=1018.11 fall2=4.69788 pi=0.00461432 window=one octave_was=0 octave=-4 move=cool rate_bits=16
+FIELD_BLOCK_RATE block=out_bias lane=2 contacts=all entries=32 open=32 heat=27.2393 heat_base=27.2393 fall2=0.338778 pi=0.0124371 window=one octave_was=0 octave=-2 move=cool rate_bits=14
+FIELD_BLOCK_RATE block=w_bias lane=2 contacts=all entries=32 open=32 heat=23.2098 heat_base=23.2098 fall2=1.54587 pi=0.0666041 window=one octave_was=0 octave=0 move=hold rate_bits=12
+FIELD_BLOCK_RATE block=moment_face_bias lane=2 contacts=all entries=32 open=32 heat=12.9279 heat_base=12.9279 fall2=0.341671 pi=0.0264289 window=one octave_was=0 octave=-1 move=cool rate_bits=13
+FIELD_BLOCK_RATE block=read_rows lane=2 contacts=all entries=2048 open=2048 heat=870.992 heat_base=870.992 fall2=22.5362 pi=0.0258742 window=one octave_was=0 octave=-1 move=cool rate_bits=13
+FIELD_BLOCK_RATE block=lift_bias lane=2 contacts=all entries=32 open=32 heat=26.7322 heat_base=26.7322 fall2=0.246891 pi=0.00923573 window=one octave_was=0 octave=-3 move=cool rate_bits=15
+FIELD_BLOCK_RATE block=q lane=2 contacts=all entries=2048 open=2048 heat=302.293 heat_base=302.293 fall2=34.8224 pi=0.115194 window=one octave_was=0 octave=1 move=raise rate_bits=11
+FIELD_BLOCK_RATE block=v lane=2 contacts=all entries=2048 open=2048 heat=328.604 heat_base=328.604 fall2=37.7417 pi=0.114855 window=one octave_was=0 octave=1 move=raise rate_bits=11
+FIELD_BLOCK_RATE block=probe lane=2 contacts=all entries=2048 open=2048 heat=203.17 heat_base=203.17 fall2=36.5093 pi=0.179699 window=one octave_was=0 octave=2 move=raise rate_bits=10
+FIELD_BLOCK_RATE block=a lane=2 contacts=new entries=1024 open=1024 heat=208.461 heat_base=208.461 fall2=-2.71574 pi=-0.0130276 window=one octave_was=0 octave=-1 move=cool rate_bits=13
+FIELD_BLOCK_RATE block=a lane=2 contacts=old entries=1024 open=1024 heat=525.077 heat_base=525.077 fall2=-15.1311 pi=-0.0288168 window=one octave_was=0 octave=-1 move=cool rate_bits=13
+FIELD_BLOCK_RATE block=b lane=2 contacts=new entries=1024 open=1024 heat=239.391 heat_base=239.391 fall2=-7.35773 pi=-0.0307353 window=one octave_was=0 octave=-1 move=cool rate_bits=13
+FIELD_BLOCK_RATE block=b lane=2 contacts=old entries=1024 open=1024 heat=712.797 heat_base=712.797 fall2=1.33025 pi=0.00186624 window=one octave_was=0 octave=-5 move=cool rate_bits=17
+FIELD_BLOCK_RATE block=a_bias lane=0 contacts=new entries=32 open=32 heat=7.86507 heat_base=7.86507 fall2=0.360008 pi=0.045773 window=one octave_was=0 octave=0 move=hold rate_bits=12
+FIELD_BLOCK_RATE block=a_bias lane=0 contacts=old entries=32 open=32 heat=19.2133 heat_base=19.2133 fall2=0.464192 pi=0.02416 window=one octave_was=0 octave=-1 move=cool rate_bits=13
+FIELD_BLOCK_RATE block=b_bias lane=0 contacts=new entries=32 open=32 heat=9.4491 heat_base=9.4491 fall2=0.164918 pi=0.0174533 window=one octave_was=0 octave=-2 move=cool rate_bits=14
+FIELD_BLOCK_RATE block=b_bias lane=0 contacts=old entries=32 open=32 heat=27.7963 heat_base=27.7963 fall2=0.577224 pi=0.0207663 window=one octave_was=0 octave=-2 move=cool rate_bits=14
+FIELD_BLOCK_RATE block=q_bias lane=0 contacts=all entries=64 open=64 heat=7.82646 heat_base=7.82646 fall2=0.345483 pi=0.0441429 window=one octave_was=0 octave=0 move=hold rate_bits=12
+FIELD_BLOCK_RATE block=v_bias lane=0 contacts=all entries=64 open=64 heat=22.4506 heat_base=22.4506 fall2=0.260094 pi=0.0115852 window=one octave_was=0 octave=-2 move=cool rate_bits=14
+FIELD_BLOCK_RATE block=probe_bias lane=0 contacts=all entries=64 open=64 heat=7.89676 heat_base=7.89676 fall2=0.75777 pi=0.0959597 window=one octave_was=0 octave=1 move=raise rate_bits=11
+FIELD_BLOCK_RATE block=read_bias lane=0 contacts=all entries=100 open=100 heat=8.33014 heat_base=8.33014 fall2=0.436615 pi=0.0524139 window=one octave_was=0 octave=0 move=hold rate_bits=12
+FIELD_BLOCK_RATE block=moment_before lane=0 contacts=all entries=3232 open=3200 heat=409.064 heat_base=409.064 fall2=1.14959 pi=0.00281028 window=one octave_was=0 octave=-4 move=cool rate_bits=16
+FIELD_BLOCK_RATE block=moment_after lane=0 contacts=all entries=3232 open=3200 heat=323.579 heat_base=323.579 fall2=-4.59687 pi=-0.0142063 window=one octave_was=0 octave=-1 move=cool rate_bits=13
+FIELD_BLOCK_RATE block=temper lane=0 contacts=all entries=8 open=8 heat=2.71534 heat_base=2.71534 fall2=1.56731 pi=0.577205 window=one octave_was=0 octave=3 move=raise rate_bits=9
+FIELD_BLOCK_RATE block=pace lane=0 contacts=all entries=202 open=200 heat=8.97359 heat_base=8.97359 fall2=3.87026 pi=0.431294 window=one octave_was=0 octave=3 move=raise rate_bits=9
+FIELD_BLOCK_FLOOR pi_F=0.0622256 blocks=50 entries=63606 heat=10960 fall2=681.991 rate_bits=12 units=millionths of a bit a site
+FIELD_BLOCK_RATES entries=63606 rate_bits=12 at 8:12928 9:3442 10:6144 11:14592 12:5348 13:10528 14:4256 15:64 16:5280 17:1024
