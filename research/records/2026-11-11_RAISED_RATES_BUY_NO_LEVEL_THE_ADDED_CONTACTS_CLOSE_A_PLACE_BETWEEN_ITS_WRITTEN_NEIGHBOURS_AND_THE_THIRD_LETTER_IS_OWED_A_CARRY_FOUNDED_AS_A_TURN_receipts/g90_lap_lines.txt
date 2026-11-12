@@ -62,3 +62,21 @@ FIELD_SECTION lap=0 n=3 sites=23109 before=2.350 after=- halvings=0 deposited=tr
 FIELD_SECTION lap=0 n=4 sites=13751 before=3.166 after=- halvings=0 deposited=true next=- predicted_micro=-12178 change_micro=- transfer_micro=-840 external_micro=-840 curvature_micro=-2773 rate=12 length=2445 regions_ms=1 deposit_ms=826 ms=828
 ## tp5's sections refused or past a carrier (its log)
 field_pass: tower realization refused: the card refused the field: a sum outgrew its 128-bit carrier
+
+## Every section of tp1 to tp5 whose predicted price stands past 200,000 millionths either way (P19), from the laps' own logs: its section line whole (the predicted, transfer, external and curvature words with it)
+### tp1
+FIELD_SECTION lap=0 n=280 sites=10117 before=3.573 after=- halvings=0 deposited=true next=- predicted_micro=-231298 change_micro=- transfer_micro=-379 external_micro=-379 curvature_micro=-1006 rate=12 length=2369 regions_ms=1 deposit_ms=749 ms=751
+### tp2
+FIELD_SECTION lap=0 n=119 sites=8766 before=3.619 after=- halvings=0 deposited=true next=- predicted_micro=-374286 change_micro=- transfer_micro=-8393 external_micro=-8393 curvature_micro=-14856 rate=12 length=2285 regions_ms=1 deposit_ms=697 ms=699
+FIELD_SECTION lap=0 n=122 sites=5329 before=3.277 after=- halvings=0 deposited=true next=- predicted_micro=-2363326 change_micro=- transfer_micro=813443 external_micro=813443 curvature_micro=826624 rate=12 length=2289 regions_ms=1 deposit_ms=593 ms=595
+### tp3
+FIELD_SECTION lap=0 n=121 sites=17568 before=3.389 after=- halvings=0 deposited=true next=- predicted_micro=-208040 change_micro=- transfer_micro=2594 external_micro=2594 curvature_micro=2484 rate=12 length=2492 regions_ms=2 deposit_ms=871 ms=873
+### tp4
+FIELD_SECTION lap=0 n=646 sites=25557 before=3.477 after=- halvings=0 deposited=true next=- predicted_micro=-441760 change_micro=- transfer_micro=2163 external_micro=2163 curvature_micro=2211 rate=12 length=2389 regions_ms=1 deposit_ms=1194 ms=1196
+### tp5
+FIELD_SECTION lap=0 n=617 sites=13857 before=3.013 after=- halvings=0 deposited=true next=- predicted_micro=-396037 change_micro=- transfer_micro=1551 external_micro=1551 curvature_micro=4502 rate=12 length=2391 regions_ms=1 deposit_ms=743 ms=745
+FIELD_SECTION lap=0 n=619 sites=6238 before=2.975 after=- halvings=0 deposited=true next=- predicted_micro=-958595 change_micro=- transfer_micro=-60407 external_micro=-60407 curvature_micro=-62999 rate=12 length=2222 regions_ms=1 deposit_ms=621 ms=623
+FIELD_SECTION lap=0 n=635 sites=6921 before=3.854 after=- halvings=0 deposited=true next=- predicted_micro=-1037138 change_micro=- transfer_micro=2691 external_micro=2691 curvature_micro=5289 rate=12 length=2263 regions_ms=1 deposit_ms=670 ms=672
+FIELD_SECTION lap=0 n=1493 sites=12404 before=2.707 after=- halvings=0 deposited=true next=- predicted_micro=-6714894 change_micro=- transfer_micro=-202517 external_micro=-202517 curvature_micro=-203639 rate=12 length=2304 regions_ms=1 deposit_ms=711 ms=713
+FIELD_SECTION lap=0 n=1497 sites=9478 before=3.469 after=- halvings=0 deposited=true next=- predicted_micro=-871380 change_micro=- transfer_micro=92807 external_micro=92807 curvature_micro=61670 rate=12 length=2421 regions_ms=2 deposit_ms=931 ms=933
+FIELD_SECTION lap=0 n=1500 sites=6499 before=3.692 after=- halvings=0 deposited=true next=- predicted_micro=-4502633 change_micro=- transfer_micro=950903 external_micro=950903 curvature_micro=949373 rate=12 length=2272 regions_ms=1 deposit_ms=590 ms=592
