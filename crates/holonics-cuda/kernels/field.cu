@@ -327,7 +327,7 @@ struct FieldWords {
     const uint32_t *mix_class;
     const uint32_t *mix_share;
     uint32_t *status;
-    // The site pairs the contact met (`Σ |S_i^h|` over every row and tick).
+    // The site pairs the contact met, a word a head (`Σ_i |S_i^h|` over every row and tick).
     unsigned long long *met;
     // The tick's carriers the frame, the contact and the pair contact read and write (the charts'
     // reads and scales are passed to their own launches).
@@ -2516,7 +2516,7 @@ __device__ void contact_body(const FieldWords &w, uint32_t store) {
         }
         const int64_t yi = __shfl_sync(0xFFFFFFFFu, y, (lane + n) % 32);
         if (lane == 0) {
-            atomicAdd(w.met, (unsigned long long)met);
+            atomicAdd(w.met + h, (unsigned long long)met);
         }
         if (lane < n) {
             wide ur, ui;
@@ -5011,4 +5011,117 @@ extern "C" __global__ void field_scale_scatter(FieldWords w, const int64_t *src,
         const int64_t v = src[(p * period + local % period) * width + i];
         dst[c] = add ? fit64((wide)dst[c] + (wide)v, w.status) : v;
     }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+// [measurement; theory, November 12, P50 step 0b] **The card's yardsticks**: two readings of the card itself, no law and no
+// state (the engine's record, §2 and §6 step 0). They replace the published ceilings in the count of a site's arithmetic.
+//
+// Narrow products: a site's map at its shape (64 outputs by 64 inputs) held in a block's shared memory, `table[i][o]`, each
+// product two 32-bit words into a 64-bit sum (`mad.wide.u32`). The block's 64 sites' inputs `x[i][s]` stand beside it; after
+// each pass over the inputs every sum's low word becomes the next pass's input (the map iterated), so no pass can be read
+// from the one before. `cell`: one thread a cell (site, output), the shape of `affine_tiled` (4 sites a block of 256).
+// `tile`: one thread four outputs of four sites (64 sites a block), each pair of words read once for sixteen products.
+#define YARD_N 64
+extern "C" __global__ void field_yard_products_cell(const uint32_t *table, const uint32_t *input, uint64_t *out, uint32_t passes) {
+    __shared__ uint32_t t[YARD_N * YARD_N];
+    __shared__ uint32_t x[YARD_N * 4];
+    for (uint32_t c = threadIdx.x; c < YARD_N * YARD_N; c += blockDim.x) {
+        t[c] = table[c];
+    }
+    const uint32_t o = threadIdx.x % YARD_N, s = threadIdx.x / YARD_N;
+    for (uint32_t c = threadIdx.x; c < YARD_N * 4; c += blockDim.x) {
+        x[c] = input[((uint64_t)blockIdx.x * YARD_N * 4 + c) % (YARD_N * YARD_N)] ^ blockIdx.x;
+    }
+    __syncthreads();
+    uint64_t acc = 0;
+    for (uint32_t pass = 0; pass < passes; ++pass) {
+#pragma unroll 16
+        for (uint32_t i = 0; i < YARD_N; ++i) {
+            acc += (uint64_t)t[i * YARD_N + o] * (uint64_t)x[i * 4 + s];
+        }
+        __syncthreads();
+        x[o * 4 + s] = (uint32_t)acc;
+        __syncthreads();
+    }
+    out[(uint64_t)blockIdx.x * blockDim.x + threadIdx.x] = acc;
+}
+
+extern "C" __global__ void field_yard_products_tile(const uint32_t *table, const uint32_t *input, uint64_t *out, uint32_t passes) {
+    __shared__ __align__(16) uint32_t t[YARD_N * YARD_N];
+    __shared__ __align__(16) uint32_t x[YARD_N * YARD_N];
+    for (uint32_t c = threadIdx.x; c < YARD_N * YARD_N; c += blockDim.x) {
+        t[c] = table[c];
+        x[c] = input[c] ^ blockIdx.x;
+    }
+    __syncthreads();
+    const uint32_t to = threadIdx.x % 16, ts = threadIdx.x / 16;
+    uint64_t acc[4][4] = {};
+    for (uint32_t pass = 0; pass < passes; ++pass) {
+#pragma unroll 4
+        for (uint32_t i = 0; i < YARD_N; ++i) {
+            const uint4 tv = *reinterpret_cast<const uint4 *>(&t[i * YARD_N + 4 * to]);
+            const uint4 xv = *reinterpret_cast<const uint4 *>(&x[i * YARD_N + 4 * ts]);
+            const uint32_t ta[4] = {tv.x, tv.y, tv.z, tv.w}, xa[4] = {xv.x, xv.y, xv.z, xv.w};
+#pragma unroll
+            for (int a = 0; a < 4; ++a) {
+#pragma unroll
+                for (int b = 0; b < 4; ++b) {
+                    acc[a][b] += (uint64_t)ta[a] * (uint64_t)xa[b];
+                }
+            }
+        }
+        __syncthreads();
+#pragma unroll
+        for (int a = 0; a < 4; ++a) {
+#pragma unroll
+            for (int b = 0; b < 4; ++b) {
+                x[(4 * to + a) * YARD_N + 4 * ts + b] = (uint32_t)acc[a][b];
+            }
+        }
+        __syncthreads();
+    }
+    uint64_t sum = 0;
+#pragma unroll
+    for (int a = 0; a < 4; ++a) {
+#pragma unroll
+        for (int b = 0; b < 4; ++b) {
+            sum ^= acc[a][b];
+        }
+    }
+    out[(uint64_t)blockIdx.x * blockDim.x + threadIdx.x] = sum;
+}
+
+// Octets: a store of 32-bit words read in order (sixteen octets a thread a step, the grid striding the store), written in order,
+// and gathered eight words at a time at a random entry of a random row (rows of `entries` entries of eight words, the shape of a
+// skin row: a pair's eight modes), each gather thirty-two octets at their own sector. The sums are written so no read is idle.
+extern "C" __global__ void field_yard_read(const uint4 *store, uint64_t quads, uint64_t *out) {
+    uint32_t acc = 0;
+    for (uint64_t c = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; c < quads; c += (uint64_t)gridDim.x * blockDim.x) {
+        const uint4 v = store[c];
+        acc ^= v.x ^ v.y ^ v.z ^ v.w;
+    }
+    out[(uint64_t)blockIdx.x * blockDim.x + threadIdx.x] = acc;
+}
+
+extern "C" __global__ void field_yard_write(uint4 *store, uint64_t quads, uint32_t seed) {
+    for (uint64_t c = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; c < quads; c += (uint64_t)gridDim.x * blockDim.x) {
+        const uint32_t v = (uint32_t)c ^ seed;
+        store[c] = make_uint4(v, v + 1, v + 2, v + 3);
+    }
+}
+
+extern "C" __global__ void field_yard_gather(const uint4 *store, uint32_t rows, uint32_t entries, uint32_t gathers, uint32_t seed, uint64_t *out) {
+    const uint64_t thread = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x;
+    uint64_t state = (thread + 1) * 0x9E3779B97F4A7C15ull ^ seed;
+    uint32_t acc = 0;
+    for (uint32_t k = 0; k < gathers; ++k) {
+        state = state * 6364136223846793005ull + 1442695040888963407ull;
+        const uint32_t hi = (uint32_t)(state >> 32), lo = (uint32_t)state;
+        const uint32_t row = __umulhi(hi, rows), col = __umulhi(lo, entries);
+        const uint64_t quad = ((uint64_t)row * entries + col) * 2;
+        const uint4 a = store[quad], b = store[quad + 1];
+        acc ^= a.x ^ a.y ^ a.z ^ a.w ^ b.x ^ b.y ^ b.z ^ b.w;
+    }
+    out[thread] = acc;
 }

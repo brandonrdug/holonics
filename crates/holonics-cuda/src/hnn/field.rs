@@ -728,6 +728,34 @@ pub struct FieldProfile {
     pub threads: std::collections::BTreeMap<&'static str, u128>,
     pub copies: (u64, u128),
     pub allocations: (u64, u128),
+    /// [measurement; theory, November 12, P50 step 0] The launches made a head at a time (the contact's return: its rows, its
+    /// columns, the skin's return, the spread), by entry and head: launches and ns.
+    pub by_head: std::collections::BTreeMap<(&'static str, u32), (u64, u128)>,
+    /// The site pairs the forward contact met a head, `Σ_i |S_i^h|` over every row and tick of the runs counted in `FieldTimes::pairs`.
+    pub pairs_by_head: Vec<u128>,
+    /// Each head's kind as the declaration reads it: `still`, `paced` (a turned ring set that is no depth ring, whose skin reads its
+    /// own clock) or `depth`.
+    pub head_kinds: Vec<&'static str>,
+}
+
+/// [measurement; theory, November 12, P50 step 0b] The card's yardsticks ([`CardField::yardsticks`]): each reading as (rate a
+/// second, count, seconds).
+#[derive(Clone, Debug)]
+pub struct Yardsticks {
+    pub multiprocessors: u32,
+    pub product_blocks: u32,
+    pub stream_blocks: u32,
+    /// Narrow products, one thread a cell (site, output) of a 64 by 64 map.
+    pub cell: (f64, u64, f64),
+    /// Narrow products, one thread a tile of four outputs by four sites.
+    pub tile: (f64, u64, f64),
+    pub store_octets: u64,
+    pub read: (f64, u64, f64),
+    pub write: (f64, u64, f64),
+    pub gather_rows: u32,
+    pub gather_entries: u32,
+    /// Eight words (32 octets) a gather at a random entry of a random row.
+    pub gather: (f64, u64, f64),
 }
 
 /// **The field on the card**: its image, the card it runs on and the octets a batch may take.
@@ -737,6 +765,8 @@ pub struct CardField<'c> {
     budget: u64,
     times: FieldTimes,
     profile: Option<std::cell::RefCell<FieldProfile>>,
+    /// The head a launch is made for, where the launches go a head at a time (a profile's reading by head).
+    head: std::cell::Cell<Option<u32>>,
     pools: std::rc::Rc<std::cell::RefCell<Pools<'c>>>,
     /// A held read's rows by where their mass lies (a reading for the receipts): the regions' answer starts
     /// while it is read, and the cells `[tick · heads + head][rows, question, soft_near, other, current, question_far, far_effective, far_rows]` summed.
@@ -776,7 +806,7 @@ impl<'c> CardField<'c> {
         let (free, total) = (memory.free_bytes as u64, memory.total_bytes as u64);
         let used = total.saturating_sub(free);
         let budget = free.min(BOARD_CEILING.saturating_sub(used)).saturating_sub(MARGIN);
-        Ok(Self { card, module, budget, times: FieldTimes::default(), profile: None, pools: Default::default(), held_questions: Default::default(), covector_shares: Default::default(), row_questions: Default::default(), row_out: Default::default(), row_cov: Default::default(), held_cells: Default::default(), tick_reads: Default::default(), carry_gates: Default::default(), near_sites: Default::default(), near_out: Default::default(), clock_sites: Default::default(), clock_out: Default::default(), phases: None })
+        Ok(Self { card, module, budget, times: FieldTimes::default(), profile: None, head: Default::default(), pools: Default::default(), held_questions: Default::default(), covector_shares: Default::default(), row_questions: Default::default(), row_out: Default::default(), row_cov: Default::default(), held_cells: Default::default(), tick_reads: Default::default(), carry_gates: Default::default(), near_sites: Default::default(), near_out: Default::default(), clock_sites: Default::default(), clock_out: Default::default(), phases: None })
     }
 
     /// The octets a batch's weight and contact stores may take.
@@ -864,6 +894,72 @@ impl<'c> CardField<'c> {
         self.profile.as_ref().map(|p| p.borrow().clone())
     }
 
+    /// [measurement; theory, November 12, P50 step 0b] **The card's yardsticks** (`kernels/field.cu`, `field_yard_*`): narrow
+    /// products a second from a site's map held in shared memory (one thread a cell, and one thread a tile of four outputs by
+    /// four sites), and octets a second on a store of 2^28 words of 32 bits read in order, written in order, and gathered eight
+    /// words at a random entry of a random row of `entries` entries. Each reading is timed alone, after a calibrating launch,
+    /// to at least `seconds` of the card's time. No law and no state: the field's buffers are not touched.
+    pub fn yardsticks(&self, entries: u32, seconds: f64) -> std::result::Result<Yardsticks, DeviceError> {
+        let card = self.card;
+        card.current()?;
+        let sms = card.census().multiprocessors.max(1);
+        let timed = |entry: &'static str, grid: u32, params: &mut [*mut c_void], launches: u32| -> std::result::Result<f64, DeviceError> {
+            let function = self.module.function(entry)?;
+            card.synchronize()?;
+            let started = Instant::now();
+            for _ in 0..launches {
+                function.launch_on_shared(card.stream(), Dim3::x(grid), Dim3 { x: 256, y: 1, z: 1 }, 0, params)?;
+            }
+            card.synchronize()?;
+            Ok(started.elapsed().as_secs_f64())
+        };
+        // A calibrating run at `trial`, then the count that takes `seconds` at its rate (at least the trial's).
+        let scaled = |trial: u32, took: f64| -> u32 { ((f64::from(trial) * seconds / took.max(1e-9)).ceil() as u64).clamp(u64::from(trial), u64::from(u32::MAX)) as u32 };
+        let n = 64u64;
+        let table: Vec<u32> = (0..n * n).map(|c| (c as u32).wrapping_mul(0x9E37_79B9) ^ 0x7F4A_7C15).collect();
+        let (table, input) = (card.upload(&table)?, card.upload(&table.iter().rev().copied().collect::<Vec<u32>>())?);
+        let blocks = sms * 64;
+        let out = card.alloc::<u64>(blocks as usize * 256)?;
+        let (mut tp, mut ip, mut op) = (table.device_ptr(), input.device_ptr(), out.device_ptr());
+        let mut products = |entry: &'static str, per_pass: u64| -> std::result::Result<(f64, u64, f64), DeviceError> {
+            let mut passes = 64u32;
+            let took = timed(entry, blocks, &mut [arg(&mut tp), arg(&mut ip), arg(&mut op), arg(&mut passes)], 1)?;
+            let mut passes = scaled(passes, took);
+            let took = timed(entry, blocks, &mut [arg(&mut tp), arg(&mut ip), arg(&mut op), arg(&mut passes)], 1)?;
+            let count = u64::from(blocks) * per_pass * u64::from(passes);
+            Ok((count as f64 / took, count, took))
+        };
+        let cell = products("field_yard_products_cell", 256 * n)?;
+        let tile = products("field_yard_products_tile", 256 * n * 16)?;
+        // The store: 2^28 words, every word written before it is read.
+        let words = 1usize << 28;
+        let store = card.alloc::<u32>(words)?;
+        let (mut sp, mut quads, mut seed) = (store.device_ptr(), (words / 4) as u64, 0x5EED_u32);
+        let stride_blocks = sms * 32;
+        let sums = card.alloc::<u64>(stride_blocks as usize * 256)?;
+        let mut sum_p = sums.device_ptr();
+        let octets = (words * 4) as u64;
+        let streamed = |entry: &'static str, params: &mut [*mut c_void]| -> std::result::Result<(f64, u64, f64), DeviceError> {
+            let took = timed(entry, stride_blocks, params, 4)?;
+            let launches = scaled(4, took);
+            let took = timed(entry, stride_blocks, params, launches)?;
+            let moved = octets * u64::from(launches);
+            Ok((moved as f64 / took, moved, took))
+        };
+        let write = streamed("field_yard_write", &mut [arg(&mut sp), arg(&mut quads), arg(&mut seed)])?;
+        let read = streamed("field_yard_read", &mut [arg(&mut sp), arg(&mut quads), arg(&mut sum_p)])?;
+        let entries = entries.max(1);
+        let mut rows = (words as u64 / (u64::from(entries) * 8)) as u32;
+        let mut entries_a = entries;
+        let mut gathers = 64u32;
+        let took = timed("field_yard_gather", stride_blocks, &mut [arg(&mut sp), arg(&mut rows), arg(&mut entries_a), arg(&mut gathers), arg(&mut seed), arg(&mut sum_p)], 1)?;
+        let mut gathers = scaled(gathers, took);
+        let took = timed("field_yard_gather", stride_blocks, &mut [arg(&mut sp), arg(&mut rows), arg(&mut entries_a), arg(&mut gathers), arg(&mut seed), arg(&mut sum_p)], 1)?;
+        let moved = u64::from(stride_blocks) * 256 * u64::from(gathers) * 32;
+        let gather = (moved as f64 / took, moved, took);
+        Ok(Yardsticks { multiprocessors: sms, product_blocks: blocks, stream_blocks: stride_blocks, cell, tile, store_octets: octets, read, write, gather_rows: rows, gather_entries: entries, gather })
+    }
+
     /// A transfer or an allocation, timed after the stream drains when profiled.
     fn timed<T>(&self, kind: Kind, f: impl FnOnce() -> T) -> T {
         let Some(profile) = &self.profile else { return f() };
@@ -909,6 +1005,11 @@ impl<'c> CardField<'c> {
             slot.0 += 1;
             slot.1 += started.elapsed().as_nanos();
             *p.threads.entry(entry).or_insert(0) += u128::from(grid.x) * u128::from(grid.y) * u128::from(grid.z) * u128::from(block);
+            if let Some(h) = self.head.get() {
+                let slot = p.by_head.entry((entry, h)).or_insert((0, 0));
+                slot.0 += 1;
+                slot.1 += started.elapsed().as_nanos();
+            }
         }
         Ok(())
     }
@@ -1009,7 +1110,8 @@ impl<'c> CardField<'c> {
             Some(_) => None,
             None => Some(self.timed(Kind::Alloc, || self.take::<u64>(1usize << roots.len())).map_err(device)?),
         };
-        let met = self.timed(Kind::Alloc, || self.take_zeroed::<u64>(1)).map_err(device)?;
+        // The pairs met, one word a head (a reading: their sum is the run's count, each the head's own).
+        let met = self.timed(Kind::Alloc, || self.take_zeroed::<u64>(d.heads)).map_err(device)?;
         let reach = |start: usize, len: usize| field.theta[start..start + len].iter().map(|v| v.unsigned_abs() as u64).max().unwrap_or(0);
         let (dw, m, n, f, a, heads) = (d.width, d.complex(), d.modes, d.contacts, d.alphabet, d.heads);
         let m2 = 2 * m;
@@ -1199,7 +1301,8 @@ impl<'c> CardField<'c> {
                 g.extend(self.timed(Kind::Copy, || card.fetch_range(gg, 0, s.glue.len())).map_err(device)?);
             }
         }
-        let met = self.timed(Kind::Copy, || card.fetch(met)).map_err(device)?[0] as u128;
+        let met_by_head = self.timed(Kind::Copy, || card.fetch_range(met, 0, heads)).map_err(device)?;
+        let met = met_by_head.iter().map(|&m| u128::from(m)).sum::<u128>();
         if keep.is_some() {
             // A landmark read is a reading of a release's last state, counted apart.
             self.times.landmarks += 1;
@@ -1207,6 +1310,15 @@ impl<'c> CardField<'c> {
             return Ok((faces, read_logits, g, rows, echoes));
         }
         self.times.pairs += met;
+        if let Some(profile) = &self.profile {
+            let mut p = profile.borrow_mut();
+            if p.pairs_by_head.len() < heads {
+                p.pairs_by_head.resize(heads, 0);
+            }
+            for (h, &m) in met_by_head.iter().enumerate() {
+                p.pairs_by_head[h] += u128::from(m);
+            }
+        }
         if returning {
             self.times.returns += 1;
             self.times.return_ns += started.elapsed().as_nanos();
@@ -2362,7 +2474,14 @@ impl<'c> CardField<'c> {
             self.launch("field_pace_current_back", Self::cells((paced * sites) as u64), THREADS, &mut [arg(words), arg(&mut dyp), arg(&mut yp)])?;
         }
         card.zero_octets(&dp, 0, 8 * sites * m2).map_err(device)?;
+        if let Some(profile) = &self.profile {
+            let mut p = profile.borrow_mut();
+            if p.head_kinds.len() < heads {
+                p.head_kinds = (0..heads).map(|h| if !d.carries_moment(h) { "still" } else if d.is_depth(h) { "depth" } else { "paced" }).collect();
+            }
+        }
         for h in 0..heads {
+            self.head.set(Some(h as u32));
             // The crowds' difference arrays start empty a head (§14.10).
             card.zero_octets(&cv, 0, 16 * rows * span).map_err(device)?;
             card.zero_octets(&cw, 0, 16 * rows * span).map_err(device)?;
@@ -2378,6 +2497,7 @@ impl<'c> CardField<'c> {
             let (mut hh, mut dqp, mut dvp) = (h as u32, dq.device_ptr(), dv.device_ptr());
             self.launch("field_spread", (regions as u32).clamp(1, 65_535), THREADS, &mut [arg(words), arg(&mut hh), arg(&mut dqp), arg(&mut dvp)])?;
         }
+        self.head.set(None);
         let (mut qs, mut dqp) = (tick.qscale.device_ptr(), dq.device_ptr());
         self.launch("field_unit_back", Self::warps((heads * sites) as u64), THREADS, &mut [arg(words), arg(&mut qs), arg(&mut dqp)])?;
         // The probe's return through its own power, alike (§16.19).
