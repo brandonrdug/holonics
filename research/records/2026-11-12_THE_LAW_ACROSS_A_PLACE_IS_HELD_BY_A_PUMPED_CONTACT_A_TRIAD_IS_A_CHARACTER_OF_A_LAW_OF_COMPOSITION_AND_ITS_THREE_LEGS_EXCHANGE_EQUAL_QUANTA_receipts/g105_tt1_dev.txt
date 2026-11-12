@@ -1,0 +1,68 @@
+# tt1's opening (G105), 2026-11-12 UTC: TT0 and its gates (the build's tools/part_rates.py; main's at 6b55d7218 has no v14f head and refuses), the
+# development section in one hold of the card lock (the RTX 4080 SUPER), nothing else on the host (the control bin-carry-coupled 54f9cb36459453d2 on TE4B's
+# section 0, the build bin-triad 48ab0d52c2291b6f on TT0's section 0, the control again, each with lap_tf.sh's exports and arguments and a lap bound of 1 ms),
+# and the bounds fixed from it before launch (G105 (e)).
+GATE_TTG_PARTS parts 32 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 3 3 3 3 0 0 0 0
+TE4_PARTS parts 32 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 3 3 3 3 0 0 0
+MAIN_TOOL_EXIT 1 AssertionError: a field's head line that is not hnn-field-v14
+OPEN_EXIT 0
+GATE_OPEN rows=23 ok=True
+GATE_TT0_PARTS parts 32 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 3
+GATE_TT0_DIFF lines_other_than_parts=0
+TTG sha256 3f7befca29be105e1d8391df64b791b009ac2c87117b5c9cc400915b8c26eda2
+TT0 sha256 9a58bd86de16188e4a4195a677075f7b8199ed86235ad9fdb7eed29744ecb62a
+# development hold: lock taken 12:15:18 wait_s=.002360230
+# dev_ctrl1: started 12:15:18 binary 54f9cb36459453d2 state 679855e3cd8b687b
+# dev_ctrl1: ended rc=0 12:15:31
+# dev_tt: started 12:15:31 binary 48ab0d52c2291b6f state 9a58bd86de16188e
+# dev_tt: ended rc=0 12:15:44
+# dev_ctrl2: started 12:15:44 binary 54f9cb36459453d2 state 679855e3cd8b687b
+# dev_ctrl2: ended rc=0 12:15:56
+# development hold: released 12:15:56
+DEV dev_ctrl1 predicted_micro=-6084 section_ms=1600 deposit_ms=753 card_return_ms=1591 card_peak_store=8584670286
+DEV dev_tt predicted_micro=-12942 section_ms=1657 deposit_ms=767 card_return_ms=1647 card_peak_store=8603808558
+DEV dev_ctrl2 predicted_micro=-6084 section_ms=1607 deposit_ms=758 card_return_ms=1597 card_peak_store=8584670286
+DEV_RATIO predicted 2.127 time 1.033 (control spread 0.004) card 8.604 GB against the controls' 8.585 GB
+TT1_BOUNDS te5_lap_s=1282.1 te5_first100_ms=886 time_ratio=1.0334 projection_s=1324.9 deadline_s=1524 early_stop_ms=1008
+## TT0: the build's part_rates.py open
+FIELD_PART_RATE part=w_new entries=2048 c=- rate_octaves=0 rate_bits=12
+FIELD_PART_RATE part=a_new entries=2080 c=- rate_octaves=0 rate_bits=12
+FIELD_PART_RATE part=b_new entries=2080 c=- rate_octaves=0 rate_bits=12
+FIELD_PART_RATE part=enc_lane entries=3232 c=- rate_octaves=0 rate_bits=12
+FIELD_PART_RATE part=before_lane entries=3232 c=- rate_octaves=0 rate_bits=12
+FIELD_PART_RATE part=after_lane entries=3232 c=- rate_octaves=0 rate_bits=12
+FIELD_PART_RATE part=q_lane entries=2048 c=- rate_octaves=0 rate_bits=12
+FIELD_PART_RATE part=v_lane entries=2048 c=- rate_octaves=0 rate_bits=12
+FIELD_PART_RATE part=probe_lane entries=2048 c=- rate_octaves=0 rate_bits=12
+FIELD_PART_RATE part=out_lane entries=2048 c=- rate_octaves=0 rate_bits=12
+FIELD_PART_RATE part=moment_face_lane entries=2048 c=- rate_octaves=0 rate_bits=12
+FIELD_PART_RATE part=read_lane entries=3072 c=- rate_octaves=0 rate_bits=12
+FIELD_PART_RATE part=face_biases_lane entries=128 c=- rate_octaves=0 rate_bits=12
+FIELD_PART_RATE part=a_lane entries=1024 c=- rate_octaves=0 rate_bits=12
+FIELD_PART_RATE part=b_lane entries=1024 c=- rate_octaves=0 rate_bits=12
+FIELD_PART_RATE part=carry entries=4160 c=- rate_octaves=0 rate_bits=12
+FIELD_PART_RATE part=w_carry entries=4096 c=- rate_octaves=0 rate_bits=12
+FIELD_PART_RATE part=a_carry entries=4160 c=- rate_octaves=0 rate_bits=12
+FIELD_PART_RATE part=b_carry entries=4160 c=- rate_octaves=0 rate_bits=12
+FIELD_PART_RATE part=enc_first entries=3232 c=- rate_octaves=0 rate_bits=12
+FIELD_PART_RATE part=before_first entries=3232 c=- rate_octaves=0 rate_bits=12
+FIELD_PART_RATE part=after_first entries=3232 c=- rate_octaves=0 rate_bits=12
+FIELD_PART_RATE part=triad entries=8288 c=- rate_octaves=3 rate_bits=9
+## dev_ctrl1
+FIELD_PART_RATES contacts_before=32 rate_bits=12 octaves w_new=0 a_new=0 b_new=0 enc_lane=0 before_lane=0 after_lane=0 q_lane=0 v_lane=0 probe_lane=0 out_lane=0 moment_face_lane=0 read_lane=0 face_biases_lane=0 a_lane=0 b_lane=0 carry=0 w_carry=0 a_carry=0 b_carry=0 enc_first=0 before_first=0 after_first=0
+FIELD_SECTION lap=0 n=0 sites=12015 before=3.135 after=- halvings=0 deposited=true next=- predicted_micro=-6084 change_micro=- transfer_micro=- external_micro=162 curvature_micro=- rate=12 length=2697 regions_ms=1 deposit_ms=753 ms=1600
+FIELD_SECTION_PARTS lap=0 n=0 predicted_micro=-6084 w_new=-199 a_new=-162 b_new=-155 enc_lane=-30 before_lane=-17 after_lane=-23 q_lane=-159 v_lane=-163 probe_lane=-98 out_lane=-337 moment_face_lane=-170 read_lane=-583 face_biases_lane=-28 a_lane=-218 b_lane=-349 carry=-153 w_carry=-232 a_carry=-183 b_carry=-177 enc_first=-72 before_first=-14 after_first=-16 old=-2536 rest=-10
+FIELD_CARD reads=46 read_ms=9837 returns=2 return_ms=1591 pairs=5270937410 batches=68 peak_store=8584670286 landmarks=0 landmark_ms=0 elapsed_ms=12404
+MEASURE lap=dev_ctrl1 rc=0 wall_s=12.9 peak_rss_kib=822420
+## dev_tt
+FIELD_PART_RATES contacts_before=32 rate_bits=12 octaves w_new=0 a_new=0 b_new=0 enc_lane=0 before_lane=0 after_lane=0 q_lane=0 v_lane=0 probe_lane=0 out_lane=0 moment_face_lane=0 read_lane=0 face_biases_lane=0 a_lane=0 b_lane=0 carry=0 w_carry=0 a_carry=0 b_carry=0 enc_first=0 before_first=0 after_first=0 triad=3
+FIELD_SECTION lap=0 n=0 sites=12015 before=3.135 after=- halvings=0 deposited=true next=- predicted_micro=-12942 change_micro=- transfer_micro=- external_micro=162 curvature_micro=- rate=12 length=2697 regions_ms=1 deposit_ms=767 ms=1657
+FIELD_SECTION_PARTS lap=0 n=0 predicted_micro=-12942 w_new=-199 a_new=-162 b_new=-155 enc_lane=-30 before_lane=-17 after_lane=-23 q_lane=-159 v_lane=-163 probe_lane=-98 out_lane=-337 moment_face_lane=-170 read_lane=-583 face_biases_lane=-28 a_lane=-218 b_lane=-349 carry=-153 w_carry=-232 a_carry=-183 b_carry=-177 enc_first=-72 before_first=-14 after_first=-16 triad=-6858 old=-2536 rest=-10
+FIELD_CARD reads=46 read_ms=9669 returns=2 return_ms=1647 pairs=5270952240 batches=68 peak_store=8603808558 landmarks=0 landmark_ms=0 elapsed_ms=12342
+MEASURE lap=dev_tt rc=0 wall_s=12.7 peak_rss_kib=952920
+## dev_ctrl2
+FIELD_PART_RATES contacts_before=32 rate_bits=12 octaves w_new=0 a_new=0 b_new=0 enc_lane=0 before_lane=0 after_lane=0 q_lane=0 v_lane=0 probe_lane=0 out_lane=0 moment_face_lane=0 read_lane=0 face_biases_lane=0 a_lane=0 b_lane=0 carry=0 w_carry=0 a_carry=0 b_carry=0 enc_first=0 before_first=0 after_first=0
+FIELD_SECTION lap=0 n=0 sites=12015 before=3.135 after=- halvings=0 deposited=true next=- predicted_micro=-6084 change_micro=- transfer_micro=- external_micro=162 curvature_micro=- rate=12 length=2697 regions_ms=1 deposit_ms=758 ms=1607
+FIELD_SECTION_PARTS lap=0 n=0 predicted_micro=-6084 w_new=-199 a_new=-162 b_new=-155 enc_lane=-30 before_lane=-17 after_lane=-23 q_lane=-159 v_lane=-163 probe_lane=-98 out_lane=-337 moment_face_lane=-170 read_lane=-583 face_biases_lane=-28 a_lane=-218 b_lane=-349 carry=-153 w_carry=-232 a_carry=-183 b_carry=-177 enc_first=-72 before_first=-14 after_first=-16 old=-2536 rest=-10
+FIELD_CARD reads=46 read_ms=9520 returns=2 return_ms=1597 pairs=5270937410 batches=68 peak_store=8584670286 landmarks=0 landmark_ms=0 elapsed_ms=12105
+MEASURE lap=dev_ctrl2 rc=0 wall_s=12.5 peak_rss_kib=823696
