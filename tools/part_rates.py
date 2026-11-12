@@ -15,8 +15,12 @@
 The learner's text carries each founded part's octaves in a trailing `parts CONTACTS_BEFORE k0 .. k15` line (holonics::hnn::tower::field::
 RateParts), and `.. k18` where the field has carry circles (theory, November 11 17:25: the circles' charts `carry`, their W columns
 `w_carry`, their a and b rows `a_carry`, `b_carry`); the trainer steps part p at 2^-(rate - k_p). A line of fifteen or sixteen reads with the
-parts it lacks at octave 0, and a state without carry circles writes and prints sixteen. `open` writes STATE with the octaves OCTAVES
-(sixteen counts, fifteen with `carry` at the old rate, or nineteen, comma separated, in PART_NAMES order). `update` reads three saved states of one line and, for each part, the cosine c between its displacements OLD - OLDER and
+parts it lacks at octave 0, and a state without carry circles writes and prints sixteen. The triads (theory, November 12; the triad record
+2026-11-12_THE_LAW_ACROSS_A_PLACE_IS_HELD_BY_A_PUMPED_CONTACT..., §4) are one part, `triad` (PART_NAMES' twenty-third): their charts A, B and G
+(`triad`, 6J rows of D), the charts' biases (`triad_bias`, 6J) and their return (`w_triad`, D rows of 2J), after the carry circles' families,
+written after the first lane's letter rows only where the head line hnn-field-v14f declares J >= 1 triads; a parts line without the triad's
+octave reads it at 0. `open` writes STATE with the octaves OCTAVES
+(sixteen counts, fifteen with `carry` at the old rate, nineteen, or the written count, comma separated, in the line's order). `update` reads three saved states of one line and, for each part, the cosine c between its displacements OLD - OLDER and
 NOW - OLD over the entries it holds (exact integers): c > 1/2 one octave faster, c < 1/2 one slower, never under the old rate (octave 0) nor
 past rate - 1; c = 1/2 rests. It writes NOW with the moved octaves to OUT and prints FIELD_PART_RATE for every part. The parts are
 Field::founded_parts' (checked against it by the ignored test founded_parts_and_their_cosines_on_saved_states). Numbers only.
@@ -46,27 +50,32 @@ of the line trains from to show that the line changes no bit where the rates are
 import sys
 from math import isqrt
 
-PART_NAMES = ["w_new", "a_new", "b_new", "enc_lane", "before_lane", "after_lane", "q_lane", "v_lane", "probe_lane", "out_lane", "moment_face_lane", "read_lane", "face_biases_lane", "a_lane", "b_lane", "carry", "w_carry", "a_carry", "b_carry", "enc_first", "before_first", "after_first"]
+PART_NAMES = ["w_new", "a_new", "b_new", "enc_lane", "before_lane", "after_lane", "q_lane", "v_lane", "probe_lane", "out_lane", "moment_face_lane", "read_lane", "face_biases_lane", "a_lane", "b_lane", "carry", "w_carry", "a_carry", "b_carry", "enc_first", "before_first", "after_first", "triad"]
 PARTS = len(PART_NAMES)
 PLAIN_PARTS = 16  # the plain parts every field writes
 CIRCLE_PARTS = list(range(16, 19))  # the carry circles' three, written only where the field has circles
 FIRST_PARTS = list(range(19, 22))  # the first lane's letter rows' three (theory, November 11 21:15, G86), written by every field
+TRIAD_PART = 22  # the triads' one part (theory, November 12; the triad record §4), written only where the field has triads
 
 
 def written(d):
     """The parts a state of declaration d writes and prints, in the line's order (holonics::hnn::tower::field::written_parts): the plain
-    sixteen, the circles' three where it has circles, then the first lane's letter rows' three."""
-    return list(range(PLAIN_PARTS)) + (CIRCLE_PARTS if d.get("carry", 0) > 0 else []) + FIRST_PARTS
+    sixteen, the circles' three where it has circles, the first lane's letter rows' three, then the triad's one where it has triads."""
+    return list(range(PLAIN_PARTS)) + (CIRCLE_PARTS if d.get("carry", 0) > 0 else []) + FIRST_PARTS + ([TRIAD_PART] if d.get("triads", 0) > 0 else [])
 
 
 def expand(d, v):
     """A parts line's octaves (without its contacts count) as all PARTS, by the line's order for d: a line of the written length is the
-    written parts in order; an older one (fifteen or sixteen, or nineteen with carry circles) is the parts before the letter rows', the
-    ones it lacks at octave 0."""
+    written parts in order; with triads, a line one shorter is the parts before the triad's (the line a state wrote before its triads were
+    founded, or a tool that left them out), the triad's at octave 0; an older one (fifteen or sixteen, or nineteen with carry circles) is the
+    parts before the letter rows', the ones it lacks at octave 0."""
     order = written(d)
+    before_triad = [p for p in order if p != TRIAD_PART]
     older = list(range(PLAIN_PARTS)) + (CIRCLE_PARTS if d.get("carry", 0) > 0 else [])
     if len(v) == len(order):
         slots = order
+    elif len(before_triad) < len(order) and len(v) == len(before_triad):
+        slots = before_triad
     elif len(v) in (len(older), PLAIN_PARTS, PLAIN_PARTS - 1):
         slots = older[:len(v)]
     else:
@@ -104,6 +113,10 @@ def layout(d):
     c = d.get("carry", 0)
     if c > 0:
         push("carry", 2 * c * dw); push("carry_bias", 2 * c)
+    j = d.get("triads", 0)
+    if j > 0:
+        # [theory, November 12; the triad record §4] The triads' charts A, B, G (6J rows of D), their biases (6J) and their return (D rows of 2J).
+        push("triad", 6 * j * dw); push("triad_bias", 6 * j); push("w_triad", dw * 2 * j)
     return fam, at
 
 
@@ -165,6 +178,12 @@ def founded_parts(d, contacts_before):
                     for j in range(dw):
                         parts[fam[name] + e * dw + j] = part
                     parts[fam[bias] + e] = part
+    # The triads' (theory, November 12; the triad record §4): their charts, the charts' biases and their return, one part.
+    j = d.get("triads", 0)
+    if j > 0:
+        for name, n in (("triad", 6 * j * dw), ("triad_bias", 6 * j), ("w_triad", dw * 2 * j)):
+            for i in range(n):
+                parts[fam[name] + i] = TRIAD_PART
     return parts
 
 
@@ -174,10 +193,13 @@ def load(path):
     names = ["alphabet", "width", "heads", "modes", "still", "contacts", "ticks", "frames", "reach", "lanes"]
     d = {k: int(w) for k, w in zip(names, words[1:11])}
     assert words[0] != "hnn-field-v14k", "the carry founded at zero friction is retired (hnn-field-v14k): its states are receipts only"
-    assert (words[0], len(words)) in (("hnn-field-v14", 12), ("hnn-field-v14e", 13), ("hnn-field-v14t", 13), ("hnn-field-v13", 11)), "a field's head line that is not hnn-field-v14"
+    assert (words[0], len(words)) in (("hnn-field-v14", 12), ("hnn-field-v14e", 13), ("hnn-field-v14t", 13), ("hnn-field-v14f", 14), ("hnn-field-v13", 11)), "a field's head line that is not hnn-field-v14"
     # The carry circles' count, the head's thirteenth word: hnn-field-v14e (the leak's log chart, November 12) and the retired hnn-field-v14t (its
     # linear chart), whose states the field refuses and this ruler still reads as receipts: the layout is the same, only the leak's chart differs.
-    d["carry"] = int(words[12]) if words[0] in ("hnn-field-v14e", "hnn-field-v14t") else 0
+    # hnn-field-v14f (theory, November 12; the triad record §4) writes C even at 0, then the triads' count J, its fourteenth word, J >= 1.
+    d["carry"] = int(words[12]) if words[0] in ("hnn-field-v14e", "hnn-field-v14t", "hnn-field-v14f") else 0
+    d["triads"] = int(words[13]) if words[0] == "hnn-field-v14f" else 0
+    assert words[0] != "hnn-field-v14f" or d["triads"] >= 1, "an hnn-field-v14f head line with no triads (a field without them is hnn-field-v14 or hnn-field-v14e)"
     rate = int(lines[0].split(" ")[1])
     theta = [int(x) for x in lines[2].split(" ")]
     return lines, d, rate, theta
@@ -485,7 +507,12 @@ def block_octave(pi, pi_f, present, rate_bits):
 def blocks(paths, state, out, sections=None, sites=None):
     """[definition; theory, November 12 00:20: G86's rule, branch 1, and the Einstein record's U2] **Every block a part of its own.** The
     blocks are tools/state_travel.py's scale_blocks (each family by lane and by new or old contacts; with carry circles the turn rows and
-    the leak rows apart, and their biases apart), the partition G86's polarization was read on and every entry in one of them. From the
+    the leak rows apart, and their biases apart), the partition G86's polarization was read on and every entry in one of them, except
+    that a field's triads are one block (triad, lane 0, all; state_travel.rate_unit). Reason (the triad record §3.2): the gauge leaves the
+    return unchanged, so the legs and the return are one family that no receiver tells apart, and their covectors keep the scale identity
+    at every state; under a plain step at one rate that identity gives each leg the same squared norm to first order (Manley-Rowe), but
+    this learner divides each entry's step by its own isqrt(v) + 1, and its divisors move with what reaches each entry, so equal leg gains
+    are no prediction for it; the part's one octave stands because an octave between the legs would be a rate set by hand. From the
     means of four consecutive laps A, B, C, D (in order) and for each block b: its heat H_b and its fall two laps on F_b at its entries'
     own rates, priced as polar() prices a part's (the heat averaged over the three travels at the rates of the state each ends in, the
     fall at the rates of B), pi_b = F_b / H_b, in rationals of the means' integers.
@@ -531,12 +558,17 @@ def blocks(paths, state, out, sections=None, sites=None):
             n *= x
         for i in range(at, at + n):
             grain[i] = g
-    blk, seen = [], [0] * total
+    blk, seen, unit_at = [], [0] * total, {}
     for block, lane, contacts, _, family, mask in state_travel.scale_blocks(d, contacts_before):
         idx = [at_of[family] + int(j) for j in np.flatnonzero(mask.ravel())]
         for i in idx:
             seen[i] += 1
-        blk.append((block, lane, contacts, idx))
+        # The triad's blocks are one unit at one rate (state_travel.rate_unit: the gauge's ruling); every other block its own.
+        unit = state_travel.rate_unit(block, lane, contacts)
+        if unit not in unit_at:
+            unit_at[unit] = len(blk)
+            blk.append((*unit, []))
+        blk[unit_at[unit]][3].extend(idx)
     assert all(x == 1 for x in seen), "the blocks hold every entry once"
     now = learner_rates(d, rate, held, own_t, total)
     rates = [learner_rates(d, rate, m[5], m[6], total) for m in means]

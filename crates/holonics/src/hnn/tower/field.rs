@@ -39,6 +39,8 @@
 //! current    y_i = conj(U_i) ⊙ Σ_(j∈S_i) e_ij D(|i−j|) ṽ_j / Σ_(j∈S_i) e_ij (one exact series, released once),   x ← x + O y + b_o
 //! pair       r̂'_t = x_t / ‖x_t‖_rms,   a_t = W_a r̂'_t + b_a,   b_t = W_b r̂'_t + b_b,   x_t ← x_t + W_c (a_t · b_(s(t))) + b_c
 //!            s(t) the site's strand mate, t − 1 at an even contact and t + 1 at an odd (§16.34)   complex pairs along the strand
+//! triad      α_t, β_t, γ_t = (A, B, G) r̂'_t + biases,   p_k(t) = α_k(t) β_k(t−1),   c^T_k(t) = p_k(t) γ_k(t+1),   x_t ← x_t + W_c c_t + W_T c^T_t + b_c
+//!            at a site with both strand mates, one sum released once (J triads, the triad record §3)   the junction's three
 //! face       z_t(a) = ⟨E(a), R r̂(x^K_t) + b_R⟩ + c_a,   p̂_t(a) = 2^(z_a) / Σ_b 2^(z_b)   at the unresolved sites; read through the encoding (§16.26)
 //! ```
 //!
@@ -271,6 +273,23 @@ pub struct FieldDeclaration {
     /// with `C` its thirteenth word (the log chart and the coupling, together from the head's first state). The retired carries are refused, their
     /// states receipts only: `hnn-field-v14k` (founded at zero friction) and `hnn-field-v14t` (the leak's linear chart, its drive summed).
     pub carry: usize,
+    /// [definition; theory, November 12 (the triad record,
+    /// `2026-11-12_THE_LAW_ACROSS_A_PLACE_IS_HELD_BY_A_PUMPED_CONTACT_A_TRIAD_IS_A_CHARACTER_OF_A_LAW_OF_COMPOSITION_AND_ITS_THREE_LEGS_EXCHANGE_EQUAL_QUANTA`,
+    /// §3 and §4)] **The triads**: `J` complex triads, each the plain pair contact with one operand more, the word of two contacts through a place.
+    /// At a site `t` with both strand mates in the region, triad `k` reads `α = A r̂ + α_b`, `β = B r̂ + β_b` and `γ = G r̂ + γ_b` from the site's pair
+    /// chart ([`FieldLayout::triad`]) and forms `p_k(t) = α_k(t) β_k(t − 1)` and `c^T_k(t) = p_k(t) γ_k(t + 1)`, each released at the face's grain as
+    /// the plain contact's product is ([`triad_products`]); `c^T = 0` at the region's two ends; the return `W_T` ([`FieldLayout::w_triad`]) joins
+    /// the pair's `W` in one sum released once ([`affine_joint`]). One object read three ways (§3): a word of two contacts through the place (its
+    /// phase the sum of its three legs'), the mates' contact pumped by the place's own read (the parametron's reading: the mates' relative phase is
+    /// even under the half-turn and enters only through the pump), and the junction's three beside its pairs. Why (§1 to §3): nothing else in the
+    /// field reads a place with both of its strand mates in one product (the carry's terms of three sites lie on one side of the place), and an
+    /// abelian law of composition across a place, `x = L + R`, is held by characters, each a complex triad, where every pair term reads nothing of
+    /// it. The triads are grown onto a field as its last families, the charts drawn and `W_T` and the biases at zero ([`Field::with_triads`]), so
+    /// every face is kept bit for bit. A triad reads its two strand mates, one place on each side a tick, as far as the plain pair contact reads,
+    /// so it keeps a cut room wherever the plain contacts keep it ([`FieldDeclaration::room_window`]). `J = 0` writes `hnn-field-v14` or
+    /// `hnn-field-v14e` exactly as before and every path is the one before it; `J > 0` writes `hnn-field-v14f`, the thirteen words of `v14e` with
+    /// `C` written even where it is zero, then `J`.
+    pub triads: usize,
 }
 
 impl FieldDeclaration {
@@ -445,6 +464,9 @@ impl FieldDeclaration {
         if self.carry > 0 {
             return refuse("a plain growth in contacts of a field with carry circles (the carry circles stay the last contacts)");
         }
+        if self.triads > 0 {
+            return refuse("a plain growth in contacts of a field with triads (the triads are founded last; a growth after them is not built)");
+        }
         if added == 0 || added % 4 != 0 {
             return refuse("a growth in contacts adds complex pairs, even at each strand side (a count divisible by four)");
         }
@@ -466,6 +488,12 @@ impl FieldDeclaration {
         self.contact_draws(2 * circles) + circles * self.width
     }
 
+    /// The key draws a growth by `triads` triads reads ([`Field::with_triads`]): the triads' charts, `6 J` rows of `D` (`A`, then `B`, then `G`),
+    /// as a growth in contacts draws its drives' rows.
+    pub fn triad_draws(&self, triads: usize) -> usize {
+        6 * triads * self.width
+    }
+
     /// The first complex contact that is a carry circle, `f/2 − C` ([`FieldDeclaration::carry`]).
     pub fn carry_first(&self) -> usize {
         self.contacts / 2 - self.carry
@@ -475,7 +503,9 @@ impl FieldDeclaration {
     /// card's region upload: the region's windows ([`Region::window`]) where the field has no carry circle, and none (the room whole) where
     /// it has. Why: the cut reads the whole room's bits only because the near field and the strand's pair contact carry a place's state at
     /// most `NEAR − 1` places a tick; a carry circle's scan carries it the whole strand inside one tick, over every site, computed or not, so
-    /// from the second tick a cut room's heard faces would read, through the circles, receivers that met no source.
+    /// from the second tick a cut room's heard faces would read, through the circles, receivers that met no source. A triad
+    /// ([`FieldDeclaration::triads`]) reads its two strand mates, one place on each side a tick, as far as the plain pair contact reads, so triads
+    /// keep the cut wherever the plain contacts keep it.
     pub fn room_window(&self, region: &Region) -> Option<Vec<bool>> {
         if self.carry > 0 {
             return None;
@@ -529,6 +559,10 @@ impl FieldDeclaration {
         if self.carry % 2 != 0 || self.carry > self.contacts / 2 {
             return refuse("a field's carry circles are even in count (as many scan from each side) and among its complex contacts");
         }
+        // The triads' families, `6J` rows of `D`, `6J` biases and `D × 2J`, are laid within the carrier their offsets are counted in.
+        if self.triads.checked_mul(6).and_then(|r| r.checked_mul(self.width.saturating_add(1))).is_none() {
+            return refuse("a field's triads past the carrier their families are laid in");
+        }
         // The score is released `16 + β` bits from its products' grain, and a head's classes are
         // listed on the card in at most `2^12` buckets.
         if (FACE_BITS as i32) + self.score_shift() < 0 || self.class_trits() > MAX_CLASS_TRITS {
@@ -538,8 +572,10 @@ impl FieldDeclaration {
     }
 
     fn to_text(self) -> String {
-        let head = if self.carry > 0 { "hnn-field-v14e" } else { "hnn-field-v14" };
-        let tail = if self.carry > 0 { format!(" {}", self.carry) } else { String::new() };
+        // [theory, November 12, the triad record §4] With triads the head is `v14f`: `v14e`'s words with `C` written even at zero, then `J`; without
+        // them the line before, exactly.
+        let head = if self.triads > 0 { "hnn-field-v14f" } else if self.carry > 0 { "hnn-field-v14e" } else { "hnn-field-v14" };
+        let tail = if self.triads > 0 { format!(" {} {}", self.carry, self.triads) } else if self.carry > 0 { format!(" {}", self.carry) } else { String::new() };
         format!("{head} {} {} {} {} {} {} {} {} {} {} {}{tail}", self.alphabet, self.width, self.heads, self.modes, self.still, self.contacts, self.ticks, self.frames, self.reach, self.lanes, self.depth)
     }
 
@@ -547,18 +583,23 @@ impl FieldDeclaration {
         let words: Vec<&str> = line.split(' ').collect();
         // A v13 head line is a field with no depth ring (the line before the depth rings, its states the line's own).
         let n = |w: &str| w.parse::<usize>().map_err(|_| TowerError::Refused("a field's declaration that is not a count"));
-        let (depth_word, carry) = match (words.first().copied(), words.len()) {
-            (Some("hnn-field-v14"), 12) => (Some(words[11]), 0),
+        let (depth_word, carry, triads) = match (words.first().copied(), words.len()) {
+            (Some("hnn-field-v14"), 12) => (Some(words[11]), 0, 0),
             (Some("hnn-field-v14e"), 13) => match n(words[12])? {
                 0 => return refuse("an hnn-field-v14e head line with no carry circles (a field without them is hnn-field-v14)"),
-                c => (Some(words[11]), c),
+                c => (Some(words[11]), c, 0),
+            },
+            // [theory, November 12, the triad record §4] `C` may be zero here, `J` may not, as `v14e` refuses `C = 0`.
+            (Some("hnn-field-v14f"), 14) => match n(words[13])? {
+                0 => return refuse("an hnn-field-v14f head line with no triads (a field without them is hnn-field-v14 or hnn-field-v14e)"),
+                j => (Some(words[11]), n(words[12])?, j),
             },
             (Some("hnn-field-v14k"), _) => return refuse("the carry founded at zero friction is retired (hnn-field-v14k): its states are receipts only"),
             (Some("hnn-field-v14t"), _) => return refuse("the carry's leak on its linear chart is retired (hnn-field-v14t): its states are receipts only"),
-            (Some("hnn-field-v13"), 11) => (None, 0),
+            (Some("hnn-field-v13"), 11) => (None, 0, 0),
             _ => return refuse("a field's head line that is not hnn-field-v14"),
         };
-        let d = Self { alphabet: n(words[1])?, width: n(words[2])?, heads: n(words[3])?, modes: n(words[4])?, still: n(words[5])?, contacts: n(words[6])?, ticks: n(words[7])?, frames: n(words[8])?, reach: n(words[9])?, lanes: n(words[10])?, depth: depth_word.map(n).transpose()?.unwrap_or(0), carry };
+        let d = Self { alphabet: n(words[1])?, width: n(words[2])?, heads: n(words[3])?, modes: n(words[4])?, still: n(words[5])?, contacts: n(words[6])?, ticks: n(words[7])?, frames: n(words[8])?, reach: n(words[9])?, lanes: n(words[10])?, depth: depth_word.map(n).transpose()?.unwrap_or(0), carry, triads };
         d.admit()?;
         Ok(d)
     }
@@ -617,6 +658,15 @@ pub struct FieldLayout {
     /// and its chart a logarithm.
     pub carry: usize,
     pub carry_bias: usize,
+    /// [definition; theory, November 12, the triad record §4] **The triads' families** ([`FieldDeclaration::triads`]), after the carry circles' and
+    /// present only where `J > 0` (else each at the end, zero long, and in no family, as the circles' are; every other offset is unchanged):
+    /// `triad`, `6J` rows of `D` on the material's grain, rows `0..2J` the chart `A`, `2J..4J` the chart `B` and `4J..6J` the chart `G`, within each
+    /// row `k` the real part and row `J + k` the imaginary part of triad `k`; `triad_bias`, `6J` on the face's grain, in the rows' order; `w_triad`,
+    /// the return `W_T`, `D` rows of `2J` columns on the material's grain, entry `(o, j)` at `w_triad + o·2J + j` as `W`'s are, column `k` reading
+    /// `c^T_k`'s real part and `J + k` its imaginary part, with no bias of its own (the pair's `b_c` is the one sum's).
+    pub triad: usize,
+    pub triad_bias: usize,
+    pub w_triad: usize,
     pub len: usize,
     pub families: Vec<(usize, usize, u32)>,
 }
@@ -658,8 +708,18 @@ impl FieldLayout {
         let moment_face = push(dw * m2, MATERIAL_BITS);
         let moment_face_bias = push(dw, FACE_BITS);
         let lift_bias = push(dw, FACE_BITS);
-        let (carry, carry_bias) = if d.carry > 0 { (push(2 * d.carry * dw, MATERIAL_BITS), push(2 * d.carry, FACE_BITS)) } else { (at, at) };
-        Self { enc, before, after, q, q_bias, v, v_bias, out, out_bias, a: a_, a_bias, b, b_bias, w, w_bias, read, read_bias, moment_before, moment_after, temper, probe, probe_bias, pace, moment_face, moment_face_bias, lift_bias, carry, carry_bias, len: at, families }
+        // The families present only where their count is not zero (the carry circles', then the triads'): where it is zero each stands at the end,
+        // zero long and in no family, so the families before it, their offsets and the family list are the line's without it.
+        let mut tail = |len: usize, grain: u32| -> usize {
+            if len > 0 {
+                families.push((at, len, grain));
+            }
+            at += len;
+            at - len
+        };
+        let (carry, carry_bias) = (tail(2 * d.carry * dw, MATERIAL_BITS), tail(2 * d.carry, FACE_BITS));
+        let (triad, triad_bias, w_triad) = (tail(6 * d.triads * dw, MATERIAL_BITS), tail(6 * d.triads, FACE_BITS), tail(dw * 2 * d.triads, MATERIAL_BITS));
+        Self { enc, before, after, q, q_bias, v, v_bias, out, out_bias, a: a_, a_bias, b, b_bias, w, w_bias, read, read_bias, moment_before, moment_after, temper, probe, probe_bias, pace, moment_face, moment_face_bias, lift_bias, carry, carry_bias, triad, triad_bias, w_triad, len: at, families }
     }
 }
 
@@ -1210,6 +1270,12 @@ struct TickCell {
     gam: Vec<i64>,
     kb: Vec<i64>,
     qm: Vec<i64>,
+    /// [definition; theory, November 12, the triad record §4] The triads' operands (empty without them), what the reverse reads: `abg` the charts'
+    /// reads `[t][6J]` on `2^(−16)` (`α`'s real parts, then imaginary, then `β`'s, then `γ`'s), `tp` the product `p = α(t) β(t − 1)` and `ct` the
+    /// triad `c^T = p γ(t + 1)`, each `[t][2J]`, real parts then imaginary, on `2^(−16)`, zero at the region's two ends.
+    abg: Vec<i64>,
+    tp: Vec<i64>,
+    ct: Vec<i64>,
 }
 
 /// [definition; agent-inferred, November 1] **A head's resonance classes over a region** (the
@@ -1799,6 +1865,101 @@ fn carry_gate_return(exponential: &Exponential, gamma: (i64, i64), dgamma: (i64,
     Ok(((fit64(dq)?, fit64(dl)?), (carry_drive(kappa, du.0)?, carry_drive(kappa, du.1)?)))
 }
 
+/// [definition; theory, November 12, the triad record §3 and §4] **The triads' products** ([`FieldDeclaration::triads`]): from the charts' reads
+/// `abg` (`[t][6J]` on `2^(−16)`: `α`'s real parts, then imaginary, then `β`'s, then `γ`'s), at each site with both strand mates in the region
+/// (`1 ≤ t ≤ sites − 2`) and each triad `k`,
+///
+/// ```text
+/// p = release(α_k(t) β_k(t − 1), 16),   c^T = release(p γ_k(t + 1), 16),
+/// ```
+///
+/// each a complex product as the plain contact forms it (`re = a_r b_r − a_i b_i`, `im = a_r b_i + a_i b_r`) and fitted to 64 bits as its `c` is;
+/// `p` and `c^T` are zero at the region's first and last sites, where a mate is missing. Returns `(p, c^T)`, each `[t][2J]`, real parts then
+/// imaginary. Why two releases: the triad is the plain contact with one operand more, a word of two contacts through the place, and each contact
+/// of the word is released at the face's grain as a plain contact is; each product is one site's, so no sum is formed and no order chosen, and
+/// the card's per-site products give the same bits.
+fn triad_products(triads: usize, sites: usize, abg: &[i64]) -> Result<(Vec<i64>, Vec<i64>)> {
+    let (j2, j6) = (2 * triads, 6 * triads);
+    let (mut p, mut c) = (vec![0i64; sites * j2], vec![0i64; sites * j2]);
+    for t in 1..sites.saturating_sub(1) {
+        for k in 0..triads {
+            let (ar, ai) = (i128::from(abg[t * j6 + k]), i128::from(abg[t * j6 + triads + k]));
+            let (br, bi) = (i128::from(abg[(t - 1) * j6 + j2 + k]), i128::from(abg[(t - 1) * j6 + j2 + triads + k]));
+            let (gr, gi) = (i128::from(abg[(t + 1) * j6 + 2 * j2 + k]), i128::from(abg[(t + 1) * j6 + 2 * j2 + triads + k]));
+            let (pr, pi) = (fit64(release(ar * br - ai * bi, FACE_BITS))?, fit64(release(ar * bi + ai * br, FACE_BITS))?);
+            (p[t * j2 + k], p[t * j2 + triads + k]) = (pr, pi);
+            let (pr, pi) = (i128::from(pr), i128::from(pi));
+            c[t * j2 + k] = fit64(release(pr * gr - pi * gi, FACE_BITS))?;
+            c[t * j2 + triads + k] = fit64(release(pr * gi + pi * gr, FACE_BITS))?;
+        }
+    }
+    Ok((p, c))
+}
+
+/// [definition; theory, November 12, the triad record §4] **The triads' reverse**, by the product rule through the producing operands: with
+/// `u = δc^T_k(t)` (`dct`, `[t][2J]` on the covector's grain) at each site with both strand mates and each triad `k`,
+///
+/// ```text
+/// δγ_k(t + 1) = release(conj(p) u, 16),   δp = release(conj(γ_k(t + 1)) u, 16),
+/// δα_k(t) = release(conj(β_k(t − 1)) δp, 16),   δβ_k(t − 1) = release(conj(α_k(t)) δp, 16),
+/// ```
+///
+/// with `conj(z) u` as the plain contact's `δa` forms it (`re = z_r u_r + z_i u_i`, `im = z_r u_i − z_i u_r`), each fitted to 64 bits. Returns
+/// `δ(α, β, γ)`, `[t][6J]` as `abg` is laid. Each site's `α` is read by its own place alone, its `β` by the place after it and its `γ` by the place
+/// before it, so each slot is written by one place: nothing is summed and no order is chosen. `δα` is zero at the region's two ends, `δβ` at its
+/// last two sites and `δγ` at its first two.
+fn triad_back(triads: usize, sites: usize, abg: &[i64], p: &[i64], dct: &[i64]) -> Result<Vec<i64>> {
+    let (j2, j6) = (2 * triads, 6 * triads);
+    let mut out = vec![0i64; sites * j6];
+    let conj = |(zr, zi): (i128, i128), (ur, ui): (i128, i128)| -> Result<(i64, i64)> { Ok((fit64(release(zr * ur + zi * ui, FACE_BITS))?, fit64(release(zr * ui - zi * ur, FACE_BITS))?)) };
+    for t in 1..sites.saturating_sub(1) {
+        for k in 0..triads {
+            let u = (i128::from(dct[t * j2 + k]), i128::from(dct[t * j2 + triads + k]));
+            let pt = (i128::from(p[t * j2 + k]), i128::from(p[t * j2 + triads + k]));
+            let alpha = (i128::from(abg[t * j6 + k]), i128::from(abg[t * j6 + triads + k]));
+            let beta = (i128::from(abg[(t - 1) * j6 + j2 + k]), i128::from(abg[(t - 1) * j6 + j2 + triads + k]));
+            let gamma = (i128::from(abg[(t + 1) * j6 + 2 * j2 + k]), i128::from(abg[(t + 1) * j6 + 2 * j2 + triads + k]));
+            let dgamma = conj(pt, u)?;
+            let (dpr, dpi) = conj(gamma, u)?;
+            let dp = (i128::from(dpr), i128::from(dpi));
+            let dalpha = conj(beta, dp)?;
+            let dbeta = conj(alpha, dp)?;
+            (out[(t + 1) * j6 + 2 * j2 + k], out[(t + 1) * j6 + 2 * j2 + triads + k]) = dgamma;
+            (out[t * j6 + k], out[t * j6 + triads + k]) = dalpha;
+            (out[(t - 1) * j6 + j2 + k], out[(t - 1) * j6 + j2 + triads + k]) = dbeta;
+        }
+    }
+    Ok(out)
+}
+
+/// [definition; theory, November 12, the triad record §3 and §4] **The pair's return with the triads' beside it, one sum released once**:
+/// `out[o] = release(Σ_i w[o·cols + i] x[i] + Σ_j wt[o·cols_t + j] xt[j] + bias[o] 2^bias_shift, shift)`, `W c + W_T c^T + b_c` at a site. The
+/// carrier bound and its refusal are read over both blocks together, as the sum of each block's bound as [`affine`] reads it
+/// (`max|w| max|x| (cols + 1)`), refused at `2^126`; the sum runs in `i64` only where that joint bound is under `2^62`, and the integer is the
+/// same either way. Why one sum: a release per block would round twice where the law rounds once, and the card sums both blocks whole with
+/// the bias before its one release, so host and card release the same sum (integer addition being associative, any order of its terms gives
+/// the same bits). At `J = 0` the forward calls [`affine`] itself, so every bit is as before.
+#[allow(clippy::too_many_arguments)]
+fn affine_joint(w: &[i32], wmax: u64, cols: usize, x: &[i64], wt: &[i32], wtmax: u64, cols_t: usize, xt: &[i64], bias: &[i32], bias_shift: u32, shift: u32, out: &mut [i64]) -> Result<()> {
+    let bound = |wmax: u64, x: &[i64], cols: usize| (wmax as u128) * (x.iter().map(|v| v.unsigned_abs()).max().unwrap_or(0) as u128) * (cols as u128 + 1);
+    let terms = bound(wmax, x, cols).saturating_add(bound(wtmax, xt, cols_t));
+    if terms >= 1u128 << 126 {
+        return refuse("an affine sum outgrew its 128-bit carrier");
+    }
+    let narrow = terms < (1u128 << 62);
+    for (o, slot) in out.iter_mut().enumerate() {
+        let (row, row_t) = (&w[o * cols..(o + 1) * cols], &wt[o * cols_t..(o + 1) * cols_t]);
+        let mut sum: i128 = if narrow {
+            (row.iter().zip(x).map(|(a, &b)| *a as i64 * b).sum::<i64>() + row_t.iter().zip(xt).map(|(a, &b)| *a as i64 * b).sum::<i64>()) as i128
+        } else {
+            row.iter().zip(x).map(|(a, &b)| *a as i128 * b as i128).sum::<i128>() + row_t.iter().zip(xt).map(|(a, &b)| *a as i128 * b as i128).sum::<i128>()
+        };
+        sum += (bias[o] as i128) << bias_shift;
+        *slot = fit64(release(sum, shift))?;
+    }
+    Ok(())
+}
+
 struct Reaches {
     probe: u64,
     q: u64,
@@ -1808,6 +1969,8 @@ struct Reaches {
     b: u64,
     w: u64,
     carry: u64,
+    triad: u64,
+    w_triad: u64,
     read: u64,
     moment_face: u64,
 }
@@ -1828,6 +1991,10 @@ impl Field {
         if declaration.carry > 0 {
             // [theory, November 11 17:25] The circles are grown onto a founded field, their `W` columns at zero ([`Field::with_carry`]).
             return refuse("a founding with carry circles (they are grown onto a founded field, Field::with_carry)");
+        }
+        if declaration.triads > 0 {
+            // [theory, November 12, the triad record §4] The triads are grown onto a field, their return at zero ([`Field::with_triads`]).
+            return refuse("a founding with triads (they are grown onto a founded field, Field::with_triads)");
         }
         let layout = FieldLayout::new(&declaration);
         let mut theta = vec![0i32; layout.len];
@@ -2159,7 +2326,8 @@ impl Field {
         let (dw, m2, f) = (self.declaration.width, 2 * self.declaration.complex(), self.declaration.contacts);
         let l = &self.layout;
         let r = |start: usize, len: usize| reach(&self.theta[start..start + len]);
-        Reaches { probe: r(l.probe, m2 * dw), q: r(l.q, m2 * dw), v: r(l.v, m2 * dw), out: r(l.out, dw * m2), a: r(l.a, f * dw), b: r(l.b, f * dw), w: r(l.w, dw * f), carry: r(l.carry, 2 * self.declaration.carry * dw), read: r(l.read, dw * dw), moment_face: r(l.moment_face, dw * m2) }
+        let j = self.declaration.triads;
+        Reaches { probe: r(l.probe, m2 * dw), q: r(l.q, m2 * dw), v: r(l.v, m2 * dw), out: r(l.out, dw * m2), a: r(l.a, f * dw), b: r(l.b, f * dw), w: r(l.w, dw * f), carry: r(l.carry, 2 * self.declaration.carry * dw), triad: r(l.triad, 6 * j * dw), w_triad: r(l.w_triad, dw * 2 * j), read: r(l.read, dw * dw), moment_face: r(l.moment_face, dw * m2) }
     }
 
     fn admit_region(&self, region: &Region) -> Result<()> {
@@ -2753,8 +2921,27 @@ impl Field {
                 }
             }
         }
+        // [definition; theory, November 12, the triad record §3 and §4] **The triads** ([`FieldDeclaration::triads`]): at each site the charts'
+        // reads `α, β, γ` (one affine of the pair chart with the charts' biases, at the grains `a` and `b` are read at, `[t][6J]`), then at each
+        // site with both strand mates `p = α(t) β(t − 1)` and `c^T = p γ(t + 1)`, each released at the face's grain ([`triad_products`]); none at
+        // the region's two ends. Kept in the cell for the reverse.
+        let (triads, j2, j6) = (d.triads, 2 * d.triads, 6 * d.triads);
+        if triads > 0 {
+            cell.abg = vec![0i64; sites * j6];
+            for t in 0..sites {
+                let rt = &cell.read2[t * dw..(t + 1) * dw];
+                affine(&self.theta[l.triad..l.triad + j6 * dw], reaches.triad, dw, rt, Some(&self.theta[l.triad_bias..l.triad_bias + j6]), MATERIAL_BITS, MATERIAL_BITS, &mut cell.abg[t * j6..(t + 1) * j6])?;
+            }
+            (cell.tp, cell.ct) = triad_products(triads, sites, &cell.abg)?;
+        }
+        // The pair's return, `x ← x + release(W c + b_c 2^M, M)`; with triads `W c + W_T c^T + b_c 2^M` is one sum released once
+        // ([`affine_joint`]), and at `J = 0` the plain affine is the one called, so every bit is as before.
         for t in 0..sites {
-            affine(&self.theta[l.w..l.w + dw * f], reaches.w, f, &cell.c[t * f..(t + 1) * f], Some(&self.theta[l.w_bias..l.w_bias + dw]), MATERIAL_BITS, MATERIAL_BITS, &mut o)?;
+            if triads == 0 {
+                affine(&self.theta[l.w..l.w + dw * f], reaches.w, f, &cell.c[t * f..(t + 1) * f], Some(&self.theta[l.w_bias..l.w_bias + dw]), MATERIAL_BITS, MATERIAL_BITS, &mut o)?;
+            } else {
+                affine_joint(&self.theta[l.w..l.w + dw * f], reaches.w, f, &cell.c[t * f..(t + 1) * f], &self.theta[l.w_triad..l.w_triad + dw * j2], reaches.w_triad, j2, &cell.ct[t * j2..(t + 1) * j2], &self.theta[l.w_bias..l.w_bias + dw], MATERIAL_BITS, MATERIAL_BITS, &mut o)?;
+            }
             for (xv, ov) in x[t * dw..(t + 1) * dw].iter_mut().zip(&o) {
                 *xv = fit64(*xv as i128 + *ov as i128)?;
             }
@@ -3172,6 +3359,21 @@ impl Field {
         for t in 0..sites {
             transposed(&self.theta[l.w..l.w + dw * f], reaches.w, f, dxs[t], MATERIAL_BITS, &mut dc[t * f..(t + 1) * f])?;
         }
+        // [definition; theory, November 12, the triad record §4] **The triads' reverse** ([`FieldDeclaration::triads`]): `W_T`'s covector the outer
+        // sum over sites of `δx(t)` against `c^T(t)` (unreleased, as `W`'s); `δc^T(t) = W_Tᵀ δx(t)` released to the covector's grain; then the
+        // products' covectors through their producing operands ([`triad_back`]), each slot one place's. Their charts' covectors follow below.
+        let (triads, j2, j6) = (d.triads, 2 * d.triads, 6 * d.triads);
+        let dabg = if triads > 0 {
+            let cts: Vec<&[i64]> = cell.ct.chunks_exact(j2).collect();
+            outer_sum(&mut g[l.w_triad..l.w_triad + dw * j2], j2, &dxs, &cts)?;
+            let mut dct = vec![0i64; sites * j2];
+            for t in 0..sites {
+                transposed(&self.theta[l.w_triad..l.w_triad + dw * j2], reaches.w_triad, j2, dxs[t], MATERIAL_BITS, &mut dct[t * j2..(t + 1) * j2])?;
+            }
+            triad_back(triads, sites, &cell.abg, &cell.tp, &dct)?
+        } else {
+            Vec::new()
+        };
         let half = f / 2;
         let (plain, circles) = (d.carry_first(), d.carry);
         let c2 = 2 * circles;
@@ -3234,6 +3436,17 @@ impl Field {
                 }
             }
         }
+        if triads > 0 {
+            // [theory, November 12, the triad record §4] The triads' charts: `Σ_t δ(α, β, γ)(t) r̂(t)ᵀ` into `A`, `B` and `G`, and `Σ_t δ(α, β, γ)(t)`
+            // into their biases.
+            let dabgs: Vec<&[i64]> = dabg.chunks_exact(j6).collect();
+            outer_sum(&mut g[l.triad..l.triad + j6 * dw], dw, &dabgs, &r2s)?;
+            for row in &dabgs {
+                for (j, &v) in row.iter().enumerate() {
+                    g[l.triad_bias + j] += v as i128;
+                }
+            }
+        }
         for t in 0..sites {
             for e in 0..f {
                 g[l.a_bias + e] += das[t][e] as i128;
@@ -3244,6 +3457,7 @@ impl Field {
         let mut ra = vec![0i64; dw];
         let mut rb = vec![0i64; dw];
         let mut rg = vec![0i64; dw];
+        let mut rt = vec![0i64; dw];
         for t in 0..sites {
             transposed(&self.theta[l.a..l.a + f * dw], reaches.a, dw, das[t], MATERIAL_BITS, &mut ra)?;
             transposed(&self.theta[l.b..l.b + f * dw], reaches.b, dw, dbs[t], MATERIAL_BITS, &mut rb)?;
@@ -3251,7 +3465,15 @@ impl Field {
                 // The carry circles' charts read the pair chart as `a` and `b` do, so their transposed product joins the read's covector.
                 transposed(&self.theta[l.carry..l.carry + c2 * dw], reaches.carry, dw, &dqh[t * c2..(t + 1) * c2], MATERIAL_BITS, &mut rg)?;
             }
-            let dr: Vec<i64> = if circles > 0 { ra.iter().zip(&rb).zip(&rg).map(|((&p, &q), &r)| p + q + r).collect() } else { ra.iter().zip(&rb).map(|(&p, &q)| p + q).collect() };
+            let mut dr: Vec<i64> = if circles > 0 { ra.iter().zip(&rb).zip(&rg).map(|((&p, &q), &r)| p + q + r).collect() } else { ra.iter().zip(&rb).map(|(&p, &q)| p + q).collect() };
+            if triads > 0 {
+                // [theory, November 12] The triads' charts read the pair chart as `a` and `b` do, so their transposed product joins the read's covector
+                // beside the drives' and the circles'.
+                transposed(&self.theta[l.triad..l.triad + j6 * dw], reaches.triad, dw, &dabg[t * j6..(t + 1) * j6], MATERIAL_BITS, &mut rt)?;
+                for (slot, &v) in dr.iter_mut().zip(&rt) {
+                    *slot += v;
+                }
+            }
             let back = lane_adjoint(r2s[t], &cell.scale2[t * lanes..(t + 1) * lanes], &dr)?;
             for i in 0..dw {
                 dmid[t * dw + i] = fit64(dx[t * dw + i] as i128 + back[i] as i128)?;
@@ -4761,6 +4983,10 @@ impl Field {
         if self.declaration.carry > 0 {
             return refuse("a field with carry circles grows by lanes, not by copies (a copy would split a circle's scan)");
         }
+        if self.declaration.triads > 0 {
+            // [theory, November 12, the triad record §4] The triads are founded last; a copy of their charts and return is not built.
+            return refuse("a field with triads grows by no copies (the triads are founded last; their copies are not built)");
+        }
         let old = self.declaration;
         let d = old.grown(factor)?;
         let layout = FieldLayout::new(&d);
@@ -4905,6 +5131,10 @@ impl Field {
         if self.scale.is_some() {
             return refuse("a tower's levels grow their lanes level by level, not through the fine field alone");
         }
+        if self.declaration.triads > 0 {
+            // [theory, November 12, the triad record §4] The triads are founded last; the lane's columns of their charts are not built.
+            return refuse("a growth in lanes of a field with triads (the triads are founded last; a growth after them is not built)");
+        }
         let old = self.declaration;
         let d = old.laned()?;
         let layout = FieldLayout::new(&d);
@@ -5009,6 +5239,10 @@ impl Field {
         if self.declaration.carry > 0 {
             return refuse("a field that already has carry circles");
         }
+        if self.declaration.triads > 0 {
+            // [theory, November 12, the triad record §4] The triads' families stand after the circles'; circles grown after them are not built.
+            return refuse("a growth in carry circles of a field with triads (the triads are founded last; a growth after them is not built)");
+        }
         if circles == 0 {
             return refuse("a growth by no carry circles");
         }
@@ -5030,6 +5264,51 @@ impl Field {
             *v = fit32((draw * ((num << MATERIAL_BITS) / den) as i128) >> 31, "a carry circle's founded turn row outgrew its 32-bit carrier")?;
         }
         debug_assert_eq!(cursor, 4 * self.declaration.carry_draws(circles));
+        let mut out = Self::with_theta(d, theta);
+        (out.per_blank_clock, out.bare_stretch) = (self.per_blank_clock, self.bare_stretch);
+        Ok((out, from))
+    }
+
+    /// [definition; theory, November 12, the triad record §4] **The field with `triads` triads** ([`FieldDeclaration::triads`]): the triads'
+    /// families after every other ([`FieldLayout::triad`]), every old entry kept at its offset; the charts' rows `A`, `B` and `G` drawn uniform on
+    /// `±√(3/D)` at the material's grain from `keys`, four bytes a draw, the rows in order (`A`, then `B`, then `G`), as a growth in contacts draws
+    /// the drives `a` and `b` ([`Field::contacted`]), so each leg's read opens at unit power; the charts' biases and the return `W_T` at zero. Every
+    /// sum the forward forms into the face is then the old sum (`W_T` is zero, so the one sum `W c + W_T c^T + b_c` is `W c + b_c`), and every face
+    /// is kept bit for bit; at the founding only `W_T` has a covector at first order (`∇_α ℓ = 0` while `W_T = 0`, §3.2), and as `W_T` opens the
+    /// three legs open with it.
+    ///
+    /// Refused for a tower's levels, for a field that already has triads and for none. A growth in contacts, in circles, in lanes or by copies of a
+    /// field with triads is refused too ([`FieldDeclaration::contacted`], [`Field::with_carry`], [`Field::laned`], [`Field::grown`]): the triads
+    /// are founded last, and a growth after them is not built. Returns the grown field and, for each entry, the old entry it carries (`None` for
+    /// the triads' own).
+    pub fn with_triads(&self, triads: usize, keys: &[u8]) -> Result<(Self, Vec<Option<usize>>)> {
+        if self.scale.is_some() {
+            return refuse("a tower's levels take triads level by level, not through the fine field alone");
+        }
+        if self.declaration.triads > 0 {
+            return refuse("a field that already has triads");
+        }
+        if triads == 0 {
+            return refuse("a growth by no triads");
+        }
+        let d = FieldDeclaration { triads, ..self.declaration };
+        d.admit()?;
+        let layout = FieldLayout::new(&d);
+        let dw = d.width;
+        let mut theta = self.theta.clone();
+        debug_assert_eq!(theta.len(), layout.triad);
+        theta.resize(layout.len, 0);
+        let mut from: Vec<Option<usize>> = (0..self.theta.len()).map(Some).collect();
+        from.resize(layout.len, None);
+        let (num, den) = chart_scale(dw);
+        let mut cursor = 0usize;
+        for v in theta[layout.triad..layout.triad + 6 * triads * dw].iter_mut() {
+            let word = keys.get(cursor..cursor + 4).ok_or(TowerError::Refused("fewer key bytes than the triads' founding reads"))?;
+            cursor += 4;
+            let draw = i32::from_be_bytes([word[0], word[1], word[2], word[3]]) as i128;
+            *v = fit32((draw * ((num << MATERIAL_BITS) / den) as i128) >> 31, "a triad's founded chart row outgrew its 32-bit carrier")?;
+        }
+        debug_assert_eq!(cursor, 4 * self.declaration.triad_draws(triads));
         let mut out = Self::with_theta(d, theta);
         (out.per_blank_clock, out.bare_stretch) = (self.per_blank_clock, self.bare_stretch);
         Ok((out, from))
@@ -5619,7 +5898,18 @@ fn predicted_parts(field: &Field, g: &[i128], step: &[i128], halvings: u32, part
 /// `after_first`, the encodings' rows (each class as itself, as the neighbour before and after) over the first lane's columns, old entries
 /// at the base rate until then. Why: a part's rate follows its polarization (its fall two laps on over its heat, read at lap means), and
 /// these rows are the field's most polarized blocks (G84, G86's premise), so they need a rate of their own.
-pub const PART_NAMES: [&str; 22] = ["w_new", "a_new", "b_new", "enc_lane", "before_lane", "after_lane", "q_lane", "v_lane", "probe_lane", "out_lane", "moment_face_lane", "read_lane", "face_biases_lane", "a_lane", "b_lane", "carry", "w_carry", "a_carry", "b_carry", "enc_first", "before_first", "after_first"];
+///
+/// [definition; theory, November 12, the triad record §3.2 and §4] The triads are one part, `triad` (index 22, [`TRIAD_PART`]): their charts `A`,
+/// `B`, `G`, the charts' biases and their return `W_T`. Why one: the gauge `(α, β, γ, w) → (λα, μβ, νγ, (λμν)⁻¹ w)` leaves the return
+/// unchanged, so the legs and the return are one family that no receiver tells apart, and their covectors keep the scale identity at every
+/// state. Under a plain step at one rate that identity gives each leg the same squared norm to first order (the Manley–Rowe relation); this
+/// learner divides each entry's step by its own `⌊√v⌋ + 1` (`deposit_step`), and its divisors move with what reaches each entry, so equal gains
+/// of the legs are no prediction for it. The part's one octave stands because an octave between the legs would be a rate set by hand. A parts
+/// line carries it only where the field has triads ([`written_parts`]).
+pub const PART_NAMES: [&str; 23] = ["w_new", "a_new", "b_new", "enc_lane", "before_lane", "after_lane", "q_lane", "v_lane", "probe_lane", "out_lane", "moment_face_lane", "read_lane", "face_biases_lane", "a_lane", "b_lane", "carry", "w_carry", "a_carry", "b_carry", "enc_first", "before_first", "after_first", "triad"];
+
+/// The triads' one part ([`PART_NAMES`] index 22), written after the first lane's letter rows only where the field has triads.
+pub const TRIAD_PART: usize = 22;
 
 /// The plain founded parts (the first sixteen of [`PART_NAMES`]): every field writes them.
 pub const PLAIN_PARTS: usize = 16;
@@ -5631,14 +5921,20 @@ pub const CIRCLE_PARTS: std::ops::Range<usize> = 16..19;
 pub const FIRST_PARTS: std::ops::Range<usize> = 19..22;
 
 /// [definition; theory, November 11 21:15] **The parts a parts line carries, in its order**: the plain sixteen, the circles' three where the
-/// field has circles, then the first lane's letter rows' three. A line read is matched against this by its length, and an older line (fifteen
-/// or sixteen, or nineteen with circles: the lines before the letter rows' parts) reads with the parts it lacks at octave 0.
-pub fn written_parts(carry: usize) -> Vec<usize> {
+/// field has circles, then the first lane's letter rows' three, then (November 12, the triad record §4) the triad's one where the field has
+/// triads. A line read is matched against this by its length, and an older line (fifteen or sixteen, or nineteen with circles: the lines before
+/// the letter rows' parts; or a triad field's line without the triad's octave) reads with the parts it lacks at octave 0. Why the triad's comes
+/// last and only with triads: at `J = 0` every line the field writes is the line before, so a build reproduces a line's lap and compares like
+/// with like.
+pub fn written_parts(carry: usize, triads: usize) -> Vec<usize> {
     let mut out: Vec<usize> = (0..PLAIN_PARTS).collect();
     if carry > 0 {
         out.extend(CIRCLE_PARTS);
     }
     out.extend(FIRST_PARTS);
+    if triads > 0 {
+        out.push(TRIAD_PART);
+    }
     out
 }
 
@@ -5797,6 +6093,14 @@ impl Field {
                     parts[bias + e] = part;
                 }
             }
+        }
+        // [theory, November 12, the triad record §4] The triads', one part over the lane's: their charts `A`, `B`, `G`, the charts' biases and
+        // their return `W_T` ([`TRIAD_PART`]).
+        if d.triads > 0 {
+            let (j2, j6) = (2 * d.triads, 6 * d.triads);
+            parts[l.triad..l.triad + j6 * dw].fill(TRIAD_PART as u8);
+            parts[l.triad_bias..l.triad_bias + j6].fill(TRIAD_PART as u8);
+            parts[l.w_triad..l.w_triad + dw * j2].fill(TRIAD_PART as u8);
         }
         parts
     }
@@ -6008,7 +6312,8 @@ pub struct FieldLearner {
     /// `2^(−rate)`), set between laps by the host law (`tools/part_rates.py blocks`: every block of the material a part of its own, its
     /// rate following its polarization, under the base word where that stands under the floor's) and carried in the learner's text as a
     /// trailing `rates` line, one count an entry. Where it stands it is every entry's rate ([`FieldLearner::entry_rates`]); the parts'
-    /// line is kept beside it for its contacts count. None in a state without the line, and after every growth (the law sets it again).
+    /// line is kept beside it for its contacts count. None in a state without the line, and after every growth (the law sets it again) but the
+    /// triads' ([`FieldLearner::with_triads`]), which keeps each old entry's own rate and opens the triads' entries at the base rate.
     pub own_rates: Option<Vec<u32>>,
     /// [measurement; §16.41] The step the last section stood at, the operand of the next section's
     /// [`FieldReceipt::transfer`]; a reading's operand, not carried in the learner's text, cleared by every growth, and not
@@ -6120,6 +6425,55 @@ impl FieldLearner {
         }
         let drawn = self.drawn + 4 * self.field.declaration.carry_draws(circles);
         Ok(Self { field, first, second, rate_bits: self.rate_bits, drawn, laps: self.laps, held: None, read_held: self.read_held, rate_parts: self.rate_parts, own_rates: None, last: None })
+    }
+
+    /// [definition; theory, November 12, the triad record §4] **The learner with `triads` triads** ([`Field::with_triads`]), the triads' draws read
+    /// from the founding key stream past every draw read before (`6 J D` draws, four bytes a draw). Every old entry keeps its moments and its
+    /// remainder. The triads' first moments open at zero, and their second moments at the mean of their counterparts' old second moments: the
+    /// charts `A`, `B` and `G` at the mean over the pair drives `a` and `b`, the charts' biases at the mean over the drives' biases, and `W_T` at the
+    /// mean over `W`. Reason (`agent-inferred`, from the growth in contacts' law, [`FieldLearner::contacted`]): a new entry's first step is then its
+    /// covector over its family's scale, the step a trained entry takes, and never the largest normalized step of a fresh entry; the triad's charts
+    /// and return are the drives' and `W`'s counterparts with one operand more. The draws advance by `4 · 6 J D` bytes. The founded parts' rates are
+    /// kept, the triad's part at octave 0 (the base rate), and where the learner carries each entry's own rate ([`FieldLearner::own_rates`]) every
+    /// old entry keeps it and the triads' entries take the base rate, the rate their part's octave 0 gives. Reason for keeping them
+    /// (`agent-inferred`, from the record of November 11 on a build entering a line): a growth that keeps every face and every moment keeps every
+    /// old entry's rate too, since a state tool that left the part rates behind once made every part train at the base rate with nothing refused.
+    /// The held step and the last section's step, of the old layout, are dropped. Refused while a step is held.
+    pub fn with_triads(&self, triads: usize, keys: &[u8]) -> Result<Self> {
+        if self.held.is_some() {
+            return refuse("a learner takes triads after its held step is read");
+        }
+        let rest = keys.get(self.drawn..).ok_or(TowerError::Refused("fewer key bytes than the triads' draws"))?;
+        let (field, from) = self.field.with_triads(triads, rest)?;
+        let first = from.iter().map(|o| o.map_or(0, |i| self.first[i])).collect();
+        let mut second: Vec<i128> = from.iter().map(|o| o.map_or(0, |i| self.second[i])).collect();
+        let (old, new) = (&self.field.layout, &field.layout);
+        let (dw, f, j2, j6) = (self.field.declaration.width, self.field.declaration.contacts, 2 * triads, 6 * triads);
+        // The mean term by term over the counterparts' old second moments (each under `2^126`, so a family's sum is not formed); zero where no
+        // covector has reached them, as a founding's entries open.
+        let mean = |ranges: &[(usize, usize)]| -> i128 {
+            let values: Vec<i128> = ranges.iter().flat_map(|&(start, len)| self.second[start..start + len].iter().copied()).collect();
+            if values.is_empty() {
+                return 0;
+            }
+            let n = values.len() as i128;
+            values.iter().map(|v| v / n).sum::<i128>() + values.iter().map(|v| v % n).sum::<i128>() / n
+        };
+        second[new.triad..new.triad + j6 * dw].fill(mean(&[(old.a, f * dw), (old.b, f * dw)]));
+        second[new.triad_bias..new.triad_bias + j6].fill(mean(&[(old.a_bias, f), (old.b_bias, f)]));
+        second[new.w_triad..new.w_triad + dw * j2].fill(mean(&[(old.w, dw * f)]));
+        let rate_parts = self.rate_parts.map(|rp| {
+            let mut octaves = rp.octaves;
+            octaves[TRIAD_PART] = 0;
+            RateParts { octaves, ..rp }
+        });
+        let own_rates = self.own_rates.as_ref().map(|own| {
+            let mut rates = own.clone();
+            rates.resize(field.material_len(), self.rate_bits);
+            rates
+        });
+        let drawn = self.drawn + 4 * self.field.declaration.triad_draws(triads);
+        Ok(Self { field, first, second, rate_bits: self.rate_bits, drawn, laps: self.laps, held: None, read_held: self.read_held, rate_parts, own_rates, last: None })
     }
 
     /// [definition; theory, November 10 09:55] **The learner with `added` more pair contacts** ([`Field::contacted`]), the
@@ -6348,8 +6702,10 @@ impl FieldLearner {
         };
         {
             // [definition; theory, November 10 19:05] The founded parts' rates, a trailing line a binary without them never reads.
-            // The parts the field has, in the line's order ([`written_parts`]): nineteen without carry circles, twenty-two with them.
-            let parts = self.rate_parts.map_or(String::new(), |rp| format!("parts {} {}\n", rp.contacts_before, written_parts(self.field.declaration.carry).iter().map(|&p| rp.octaves[p].to_string()).collect::<Vec<_>>().join(" ")));
+            // The parts the field has, in the line's order ([`written_parts`]): nineteen without carry circles, twenty-two with them, and the
+            // triad's one more where the field has triads.
+            let d = &self.field.declaration;
+            let parts = self.rate_parts.map_or(String::new(), |rp| format!("parts {} {}\n", rp.contacts_before, written_parts(d.carry, d.triads).iter().map(|&p| rp.octaves[p].to_string()).collect::<Vec<_>>().join(" ")));
             // [definition; theory, November 12 00:20] Each entry's own rate, a trailing line after the parts' (`rates r₀ … r_(n−1)`).
             let own = self.own_rates.as_ref().map_or(String::new(), |r| format!("rates {}\n", r.iter().map(u32::to_string).collect::<Vec<_>>().join(" ")));
             format!("hnn-field-learner-v3 {} {} {} {held}\n{}{}\n{}\n{step}{parts}{own}", self.rate_bits, self.drawn, self.laps, self.field.to_text(), join(&self.first), join(&self.second))
@@ -6388,12 +6744,17 @@ impl FieldLearner {
             Some(l) if l.starts_with("parts ") => {
                 let v = read_numbers::<usize>(lines.next().and_then(|l| l.strip_prefix("parts ")))?;
                 // The line's parts in its order ([`written_parts`]); an older line (fifteen or sixteen parts, or nineteen with carry
-                // circles) reads its parts in order with the ones it lacks at the old rate.
-                let order = written_parts(field.declaration.carry);
-                let older: Vec<usize> = if field.declaration.carry > 0 { (0..PLAIN_PARTS).chain(CIRCLE_PARTS).collect() } else { (0..PLAIN_PARTS).collect() };
+                // circles, or a triad field's line without the triad's octave: the line before its growth) reads its parts in order with the
+                // ones it lacks at the old rate.
+                let (carry, triads) = (field.declaration.carry, field.declaration.triads);
+                let order = written_parts(carry, triads);
+                let before = written_parts(carry, 0);
+                let older: Vec<usize> = if carry > 0 { (0..PLAIN_PARTS).chain(CIRCLE_PARTS).collect() } else { (0..PLAIN_PARTS).collect() };
                 let n = v.len().saturating_sub(1);
                 let slots: Vec<usize> = if n == order.len() {
                     order
+                } else if triads > 0 && n == before.len() {
+                    before
                 } else if n == older.len() || n == PLAIN_PARTS || n == PLAIN_PARTS - 1 {
                     older[..n].to_vec()
                 } else {

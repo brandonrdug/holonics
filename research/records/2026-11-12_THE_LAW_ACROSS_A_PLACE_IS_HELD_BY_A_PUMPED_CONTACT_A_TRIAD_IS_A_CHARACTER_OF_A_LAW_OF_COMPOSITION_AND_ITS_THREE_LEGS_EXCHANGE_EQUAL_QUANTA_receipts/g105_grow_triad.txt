@@ -1,0 +1,14 @@
+# The growth by triads (G105's build gate vi, P28), 2026-11-12 UTC: grow-triad-field on te4/STATE.0 with TRIADS 16 and the line's KEYS, CODEC, UNITS
+# and HELD, by bin-triad (48ab0d52c2291b6f), its own hold of the card lock (the RTX 4080 SUPER): TTG, which trains nothing until G105's lap.
+FIELD_GROW_TRIAD triads=16 contacts=128 width=64 lanes=2 heads=4 rate=12 drawn=199680 material=88470 ms=32
+FIELD_GROW_TRIAD_KEPT states=1020 faces=174266 identical=true ms=3425
+FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.700677 foil_nats_a_place=1.831139 information_nats_a_place=0.130461 own_nats_a_word=12.779334 information_nats_a_word=0.980321
+FIELD_JOINT_STRATA lap=-1 open_quarters=1/2/3/4 own_nats_a_place=0.620079/1.215887/1.988175/2.968740 foil_nats_a_place=0.713012/1.346909/2.142519/3.112086 places=10818/10881/10853/10918 open_sites=5333/16153/26922/38725 terms_own=10147719260/20014116241/32642156510/49033140440 terms_foil=11668584269/22170814322/35176201190/51400718924
+FIELD_JOINT_NATS lap=0 places=43470 words=5785 own_nats_a_place=1.700677 foil_nats_a_place=1.831139 information_nats_a_place=0.130461 own_nats_a_word=12.779334 information_nats_a_word=0.980321
+FIELD_JOINT_STRATA lap=0 open_quarters=1/2/3/4 own_nats_a_place=0.620079/1.215887/1.988175/2.968740 foil_nats_a_place=0.713012/1.346909/2.142519/3.112086 places=10818/10881/10853/10918 open_sites=5333/16153/26922/38725 terms_own=10147719260/20014116241/32642156510/49033140440 terms_foil=11668584269/22170814322/35176201190/51400718924
+FIELD_GROWN hnn-field-v14f 100 64 4 8 2 128 4 4 3771 2 0 32 16 rate=12 material=88470 ms=6779
+MEASURE lap=grow_triad rc=0 wall_s=7.1 peak_rss_kib=324824
+GROW_EXIT 0 12:05:11
+GROWN 3f7befca29be105e: hnn-field-v14f 100 64 4 8 2 128 4 4 3771 2 0 32 16; parts 32 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 3 3 3 3 0 0 0 0
+TE4_PARTS parts 32 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 3 3 3 3 0 0 0
+TTG sha256 3f7befca29be105e1d8391df64b791b009ac2c87117b5c9cc400915b8c26eda2

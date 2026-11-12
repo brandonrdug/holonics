@@ -49,6 +49,16 @@ fn affine_tiling(rows: usize, cols: usize, x64: bool) -> Option<(usize, usize)> 
     let shared = ((rows * (cols + 1) + rows) * 4).div_ceil(16) * 16 + per * 8 + per * cols * if x64 { 8 } else { 4 };
     (shared <= AFFINE_SHARED).then_some((per, shared))
 }
+
+/// [agent-inferred, November 12; the triad record §4] The return of two blocks' tiling (`affine_two_tiled` in `kernels/field.cu`): a block passes
+/// `256/rows` sites, holding `W` at the stride `cols + 1`, `W₂` at the stride `cols₂ + 1` and the bias in 32-bit words, each site's joint carrier bound
+/// on 128 bits, then a pass's site rows of both blocks on 64 bits, where they fit a block's shared memory (the main line's `D = 64`, `f = 128`,
+/// `J = 16`: 46,912 of 49,152 octets).
+fn affine_two_tiling(rows: usize, cols: usize, cols2: usize) -> Option<(usize, usize)> {
+    let per = (THREADS as usize).checked_div(rows).filter(|&p| p > 0)?;
+    let shared = ((rows * (cols + 1) + rows * (cols2 + 1) + rows) * 4).div_ceil(16) * 16 + per * 16 + per * (cols + cols2) * 8;
+    (shared <= AFFINE_SHARED).then_some((per, shared))
+}
 /// The widest span the contact's lanes carry (a lane an entry of the span).
 const CONTACT_SPAN: u32 = 32;
 /// The series row's carrier, in limbs of 64 bits: at least five (a term's product with a wide value), at
@@ -242,6 +252,19 @@ struct Words {
     pkb: u64,
     // [theory, November 11 04:14, step S] The skin's site addresses `[p][l][t]` three words each (`FieldWords::saddr`), the clock's own beside `sigma`.
     saddr: u64,
+    // [definition; theory, November 12; the triad record (`2026-11-12_THE_LAW_ACROSS_A_PLACE_IS_HELD_BY_A_PUMPED_CONTACT…`) §3 and §4] The triads
+    // (`FieldDeclaration::triads`): their count `J`, the chart's and its biases' offsets in the material (`FieldLayout::triad`, `triad_bias`) and the
+    // chart's reach, the return's offset (`FieldLayout::w_triad`) and reach, and (set per tick) the chart's read `abg` `[t][6J]` and the products `p`
+    // and `c^T` `[t][2J]`. Zero where `J = 0`, where no kernel reads them.
+    triads: u64,
+    wt: u64,
+    wtb: u64,
+    rt: u64,
+    wtr: u64,
+    rwt: u64,
+    pabg: u64,
+    ptp: u64,
+    pct: u64,
 }
 
 /// The moment kernels' words (`MomentWords` in `kernels/field_moment.cuh`, field for field): the batch's
@@ -406,7 +429,18 @@ fn set_tick(w: &mut Words, tick: &Tick, returning: bool) {
     w.pkb = tick.pkb.device_ptr();
     w.pb = tick.pb.device_ptr();
     w.pc = tick.pc.device_ptr();
+    set_triads(w, tick);
     w.bits = tick.bits.device_ptr();
+}
+
+/// [theory, November 12; the triad record §4] Point the words at a tick's triads' carriers (`abg`, `p`, `c^T`), none where the field has no triads.
+fn set_triads(w: &mut Words, tick: &Tick) {
+    (w.pabg, w.ptp, w.pct) = (held_at(&tick.pabg), held_at(&tick.ptp), held_at(&tick.pct));
+}
+
+/// A held buffer's address, zero where none is held.
+fn held_at(b: &Option<Pooled<'_, i64>>) -> u64 {
+    b.as_ref().map_or(0, |b| b.device_ptr())
 }
 
 /// A tower's packets' level for a run ([`CardField::tower_run`]): the packets' field's words and buffers, the glue's
@@ -452,6 +486,10 @@ struct Back<'c> {
     /// [theory, November 11 17:25] The carry circles' covector `[t][2C]` (one slot without them): the scan's reverse writes `δγ`, and the gate's
     /// reverse writes `δq`, `δℓ` over it in place, the circles' charts' row order.
     dg: Pooled<'c, i64>,
+    /// [theory, November 12; the triad record §4] The triads' covectors (none without them): the products' `δc^T = W_Tᵀ δx` `[t][2J]`, and the legs'
+    /// `δα`, `δβ`, `δγ` `[t][6J]` in the chart's row order.
+    dct: Option<Pooled<'c, i64>>,
+    dabg: Option<Pooled<'c, i64>>,
     ra: Pooled<'c, i64>,
     rb: Pooled<'c, i64>,
     dmid: Pooled<'c, i64>,
@@ -541,6 +579,11 @@ struct Tick<'c> {
     pkb: Pooled<'c, i64>,
     pb: Pooled<'c, i64>,
     pc: Pooled<'c, i64>,
+    /// [theory, November 12; the triad record §3 and §4] The triads' chart read `abg` `[t][6J]`, their products `p` `[t][2J]` and `c^T` `[t][2J]`, kept
+    /// for the reverse; none where the field has no triads, so a field without them takes nothing more.
+    pabg: Option<Pooled<'c, i64>>,
+    ptp: Option<Pooled<'c, i64>>,
+    pct: Option<Pooled<'c, i64>>,
     /// The tick's carrier width: the binary length of its largest unit word.
     bits: Pooled<'c, u32>,
 }
@@ -1018,6 +1061,14 @@ impl<'c> CardField<'c> {
             wg: l.carry as u64,
             wgb: l.carry_bias as u64,
             carry: d.carry as u64,
+            // [theory, November 12; the triad record §4] The triads' chart (`6J` rows of `D`) and return (`D` rows of `2J`), their reaches over the
+            // families as the host's `Reaches` reads them (zero long, and so zero, where `J = 0`).
+            triads: d.triads as u64,
+            wt: l.triad as u64,
+            wtb: l.triad_bias as u64,
+            rt: reach(l.triad, 6 * d.triads * dw),
+            wtr: l.w_triad as u64,
+            rwt: reach(l.w_triad, dw * 2 * d.triads),
             rb: reach(l.b, f * dw),
             rw: reach(l.w, dw * f),
             rread: reach(l.read, dw * dw),
@@ -1177,6 +1228,9 @@ impl<'c> CardField<'c> {
         let card = self.card;
         let alloc64 = |len: usize| self.timed(Kind::Alloc, || self.take::<i64>(len.max(1))).map_err(device);
         let alloc32 = |len: usize| self.timed(Kind::Alloc, || self.take::<u32>(len.max(1))).map_err(device);
+        // [theory, November 12; the triad record §4] A triads' carrier `[t][rows J]`, none where the field has no triads.
+        let triads = d.triads;
+        let triad = |rows: usize| if triads > 0 { alloc64(sites * rows * triads).map(Some) } else { Ok(None) };
         Ok(Tick {
             read: self.timed(Kind::Alloc, || self.take::<i32>((sites * dw).max(1))).map_err(device)?,
             scale: self.timed(Kind::Alloc, || self.take::<i128>((sites * lanes).max(1))).map_err(device)?,
@@ -1215,6 +1269,9 @@ impl<'c> CardField<'c> {
             pkb: alloc64(if field.declaration.carry > 0 { sites * 2 * field.declaration.carry } else { 1 })?,
             pb: alloc64(sites * f)?,
             pc: alloc64(sites * f)?,
+            pabg: triad(6)?,
+            ptp: triad(2)?,
+            pct: triad(2)?,
             bits: self.timed(Kind::Alloc, || self.take_zeroed::<u32>(4)).map_err(device)?,
         })
     }
@@ -1444,7 +1501,18 @@ impl<'c> CardField<'c> {
             self.launch("field_pair_gamma", Self::cells((sites * circles) as u64), THREADS, &mut [arg(words)])?;
             self.launch("field_pair_scan", Self::cells((words.r as usize * circles) as u64), THREADS, &mut [arg(words)])?;
         }
-        self.affine("field_affine_x64", words, words.w, words.w_bias, words.rw, dw, f, tick.pc.device_ptr(), f, 0, dw, words.x, false)?;
+        let triads = d.triads;
+        if triads > 0 {
+            // [definition; theory, November 12; the triad record §3 and §4] The triads, after the carry scan and before the return: their chart's read
+            // `abg` (one affine with its bias over the pair chart, at the grains `a` and `b` are read at), then the products `p` and `c^T` a site and
+            // triad on the pair's grid (zero at a region's two ends); then the return's two blocks, `W c` and `W_T c^T`, summed whole in one wide sum
+            // with the bias before its one release and added into `x`, the joint carrier bound read over both blocks.
+            self.affine("field_affine_x32", words, words.wt, words.wtb, words.rt, 6 * triads, dw, tick.read2.device_ptr(), dw, words.pabg, 6 * triads, 0, false)?;
+            self.launch("field_triad", Self::cells((sites * triads) as u64), THREADS, &mut [arg(words)])?;
+            self.affine_two(words, (words.w, words.w_bias, words.rw, dw, f, tick.pc.device_ptr(), f), (words.wtr, words.rwt, 2 * triads, words.pct, 2 * triads), words.x)?;
+        } else {
+            self.affine("field_affine_x64", words, words.w, words.w_bias, words.rw, dw, f, tick.pc.device_ptr(), f, 0, dw, words.x, false)?;
+        }
         self.mark("tick_launch_post");
         Ok(())
     }
@@ -2133,6 +2201,29 @@ impl<'c> CardField<'c> {
         self.launch(entry, Self::cells(cells), THREADS, &mut [arg(words), arg(&mut weight), arg(&mut bias), arg(&mut wmax), arg(&mut rows32), arg(&mut cols32), arg(&mut x), arg(&mut xs), arg(&mut out), arg(&mut os), arg(&mut add), arg(&mut u)])
     }
 
+    /// [definition; theory, November 12; the triad record §3 and §4] **The return of two blocks** (`field_affine_two_x64`; tiled,
+    /// `field_affine_two_tiled_x64`, where both blocks' weights, the bias and a pass's site rows fit a block's shared memory, the same integers either
+    /// way): `add[t][o] += release(Σ_i W[o][i] x_t[i] + Σ_j W₂[o][j] x₂_t[j] + bias[o] 2^24, 24)`, both blocks summed whole in one wide sum with the bias
+    /// before the one release, the carrier bound read over both blocks together (the sum of each block's bound as [`Self::affine`] reads it) and refused
+    /// at `2^126`. The first block is `(weight, bias, wmax, rows, cols, x, x_stride)` (the pair's return `W` over `c`), the second `(weight₂, wmax₂,
+    /// cols₂, x₂, x₂_stride)` (the triads' `W_T` over `c^T`, no bias of its own), both on 64-bit faces.
+    #[allow(clippy::type_complexity)]
+    fn affine_two(&self, words: &mut Words, (weight, bias, wmax, rows, cols, x, x_stride): (u64, u64, u64, usize, usize, u64, usize), (weight2, wmax2, cols2, x2, x2_stride): (u64, u64, usize, u64, usize), add: u64) -> Result<()> {
+        let (mut weight, mut bias, mut wmax, mut rows32, mut cols32, mut x, mut xs) = (weight, bias, wmax, rows as u32, cols as u32, x, x_stride as u64);
+        let (mut weight2, mut wmax2, mut cols2_32, mut x2, mut x2s) = (weight2, wmax2, cols2 as u32, x2, x2_stride as u64);
+        let (mut out, mut os, mut add) = (0u64, rows as u64, add);
+        let tiling = affine_two_tiling(rows, cols, cols2);
+        if std::env::var_os("FIELD_AFFINE_TRACE").is_some() {
+            eprintln!("FIELD_AFFINE_TRACE entry=field_affine_two_x64 rows={rows} cols={cols} cols2={cols2} tiling={tiling:?}");
+        }
+        if let Some((per, shared)) = tiling {
+            let grid = (words.t as u64).div_ceil(per as u64).clamp(1, 65_535) as u32;
+            return self.launch_shared("field_affine_two_tiled_x64", grid, THREADS, shared as u32, &mut [arg(words), arg(&mut weight), arg(&mut bias), arg(&mut wmax), arg(&mut rows32), arg(&mut cols32), arg(&mut x), arg(&mut xs), arg(&mut weight2), arg(&mut wmax2), arg(&mut cols2_32), arg(&mut x2), arg(&mut x2s), arg(&mut out), arg(&mut os), arg(&mut add)]);
+        }
+        let cells = words.t as u64 * rows as u64;
+        self.launch("field_affine_two_x64", Self::cells(cells), THREADS, &mut [arg(words), arg(&mut weight), arg(&mut bias), arg(&mut wmax), arg(&mut rows32), arg(&mut cols32), arg(&mut x), arg(&mut xs), arg(&mut weight2), arg(&mut wmax2), arg(&mut cols2_32), arg(&mut x2), arg(&mut x2s), arg(&mut out), arg(&mut os), arg(&mut add)])
+    }
+
     #[allow(clippy::too_many_arguments)]
     fn transposed(&self, words: &mut Words, weight: u64, rows: usize, cols: usize, y: u64, y_stride: usize, out: u64, accumulate: bool, only_unresolved: bool) -> Result<()> {
         let (mut weight, mut rows32, mut cols32, mut y, mut ys, mut out, mut acc, mut u) = (weight, rows as u32, cols as u32, y, y_stride as u64, out, u32::from(accumulate), u32::from(only_unresolved));
@@ -2170,7 +2261,7 @@ impl<'c> CardField<'c> {
         let regions = words.r as usize;
         let rows = sites + regions;
         let paced = d.paced_heads();
-        let Back { dx, dr, dc, da, db, dg, ra, rb, dmid, dy, dyh, dq, dv, dp, ds, cv, cw, pr_back, .. } = b;
+        let Back { dx, dr, dc, da, db, dg, dct, dabg, ra, rb, dmid, dy, dyh, dq, dv, dp, ds, cv, cw, pr_back, .. } = b;
         words.qf = tick.qf.device_ptr();
         words.qf32 = tick.qf32.device_ptr();
         words.pq = tick.pq.device_ptr();
@@ -2199,10 +2290,22 @@ impl<'c> CardField<'c> {
         words.pkb = tick.pkb.device_ptr();
         words.pb = tick.pb.device_ptr();
         words.pc = tick.pc.device_ptr();
+        set_triads(words, tick);
         // The pair contact: x_out = x_mid + W_c c + b_c.
         self.outer(words, g, words.w_bias, dw, 0, dx.device_ptr(), dw, 0, 0, false, false)?;
         self.outer(words, g, words.w, dw, f, dx.device_ptr(), dw, tick.pc.device_ptr(), f, true, false)?;
         self.transposed(words, words.w, dw, f, dx.device_ptr(), dw, dc.device_ptr(), false, false)?;
+        // [definition; theory, November 12; the triad record §4] The triads' reverse, by the product rule through the producing operands: `W_T`'s
+        // covector `Σ_t δx_t c^T_tᵀ`, the products' covector `δc^T = W_Tᵀ δx` a site, then the legs' covectors `δα`, `δβ`, `δγ` (`field_triad_back`), each
+        // slot written by the one place that read it. Their chart's outer sums and transposed read follow the plain contacts' and the circles' below.
+        let triads = d.triads;
+        let (dctp, dabgp) = (held_at(dct), held_at(dabg));
+        if triads > 0 {
+            self.outer(words, g, words.wtr, dw, 2 * triads, dx.device_ptr(), dw, words.pct, 2 * triads, true, false)?;
+            self.transposed(words, words.wtr, dw, 2 * triads, dx.device_ptr(), dw, dctp, false, false)?;
+            let (mut dctp, mut dabgp) = (dctp, dabgp);
+            self.launch("field_triad_back", Self::cells((sites * triads) as u64), THREADS, &mut [arg(words), arg(&mut dctp), arg(&mut dabgp)])?;
+        }
         let (mut dcp, mut dap, mut dbp) = (dc.device_ptr(), da.device_ptr(), db.device_ptr());
         let (plain, circles) = (d.carry_first(), d.carry);
         if plain > 0 {
@@ -2225,10 +2328,19 @@ impl<'c> CardField<'c> {
             self.outer(words, g, words.wg, 2 * circles, dw, dg.device_ptr(), 2 * circles, tick.read2.device_ptr(), dw, false, false)?;
             self.outer(words, g, words.wgb, 2 * circles, 0, dg.device_ptr(), 2 * circles, 0, 0, false, false)?;
         }
+        if triads > 0 {
+            // The triads' chart: `Σ_t δabg(t) r̂(t)ᵀ` into `A`, `B` and `G`, and `Σ_t δabg(t)` into their biases.
+            self.outer(words, g, words.wt, 6 * triads, dw, dabgp, 6 * triads, tick.read2.device_ptr(), dw, false, false)?;
+            self.outer(words, g, words.wtb, 6 * triads, 0, dabgp, 6 * triads, 0, 0, false, false)?;
+        }
         self.transposed(words, words.wa, f, dw, da.device_ptr(), f, ra.device_ptr(), false, false)?;
         self.transposed(words, words.wb, f, dw, db.device_ptr(), f, rb.device_ptr(), false, false)?;
         if circles > 0 {
             self.transposed(words, words.wg, 2 * circles, dw, dg.device_ptr(), 2 * circles, rb.device_ptr(), true, false)?;
+        }
+        if triads > 0 {
+            // The triads' chart reads the pair chart as `a`, `b` and the circles' do, so its transposed product joins the read's covector.
+            self.transposed(words, words.wt, 6 * triads, dw, dabgp, 6 * triads, rb.device_ptr(), true, false)?;
         }
         let (mut rap, mut rbp, mut cells) = (ra.device_ptr(), rb.device_ptr(), (sites * dw) as u64);
         self.launch("field_add", Self::cells(cells), THREADS, &mut [arg(words), arg(&mut rap), arg(&mut rbp), arg(&mut cells)])?;
@@ -2310,6 +2422,9 @@ impl<'c> CardField<'c> {
         let da = alloc64(sites * f)?;
         let db = alloc64(sites * f)?;
         let dg = alloc64(if d.carry > 0 { sites * 2 * d.carry } else { 1 })?;
+        // [theory, November 12; the triad record §4] The triads' covectors, `δc^T` `[t][2J]` and `δabg` `[t][6J]`, none without triads.
+        let triad = |rows: usize| if d.triads > 0 { alloc64(sites * rows * d.triads).map(Some) } else { Ok(None) };
+        let (dct, dabg) = (triad(2)?, triad(6)?);
         let ra = alloc64(sites * dw)?;
         let rb = alloc64(sites * dw)?;
         let dmid = alloc64(sites * dw)?;
@@ -2345,7 +2460,7 @@ impl<'c> CardField<'c> {
         words.gtau = gtau.device_ptr();
         words.gsig = gsig.device_ptr();
         words.cds = cds.device_ptr();
-        Ok(Back { dx, dr, dc, da, db, dg, ra, rb, dmid, dy, dyh, dq, dv, dp, ds, dpb, cv, cw, dm, gtau, gsig, cds, pr_back })
+        Ok(Back { dx, dr, dc, da, db, dg, dct, dabg, ra, rb, dmid, dy, dyh, dq, dv, dp, ds, dpb, cv, cw, dm, gtau, gsig, cds, pr_back })
     }
 
     #[allow(clippy::too_many_arguments)]
@@ -2588,7 +2703,9 @@ pub fn read_octets(d: &FieldDeclaration, returning: bool, echo: bool, sites: usi
     let lanes = d.lanes as u64;
     // [theory, November 11 17:25] The carry circles' charts' reads, gate and scan operand, `[t][2C]` each.
     let carry_site = 48 * d.carry as u64;
-    let tick_site = carry_site + 4 * dw + 16 * lanes + 8 * 2 * m2 + 2 * 8 * h * span + 16 * h + 8 * h + 4 * h + 4 * h + 8 * m2 + 4 * dw + 16 * lanes + 3 * 8 * f + (2 * 16 * span + 8) * h + 8 * h * slots + probe_site + 4 * h * span + 8 * h * span + 4 * h * span + 16 * h;
+    // [theory, November 12; the triad record §4] The triads' chart read `[t][6J]` and their products `p` and `c^T` `[t][2J]` each, kept a tick.
+    let triad_site = 8 * 10 * d.triads as u64;
+    let tick_site = triad_site + carry_site + 4 * dw + 16 * lanes + 8 * 2 * m2 + 2 * 8 * h * span + 16 * h + 8 * h + 4 * h + 4 * h + 8 * m2 + 4 * dw + 16 * lanes + 3 * 8 * f + (2 * 16 * span + 8) * h + 8 * h * slots + probe_site + 4 * h * span + 8 * h * span + 4 * h * span + 16 * h;
     let tick_fixed = tick_fixed_octets(d);
     // The face: its read, scale, logits, masses and total, and (§16.26) the lift and its covector.
     let face_site = 8 * dw + 4 * dw + 16 * lanes + 8 * a + 8 * a + 16 + 16 + 2 * 8 * dw;
@@ -2601,9 +2718,9 @@ pub fn read_octets(d: &FieldDeclaration, returning: bool, echo: bool, sites: usi
     let address_site = 24 * d.paced_heads() as u64 * d.modes as u64 * (ticks_kept + 1);
     let moment_site = if tm > 0 { 8 * m2 + 112 * tm } else { 0 };
     let moment_site = moment_site + address_site;
-    // The reverse adds its covectors, the values' sum over the ticks and the moments' return, and the
-    // crowds' two difference arrays.
-    let reverse_site = if returning { 16 * d.carry as u64 + 8 * m2 + 8 * a + 5 * 8 * dw + 3 * 8 * f + 8 * m2 + 8 * h * span + 2 * 8 * m2 + 16 * m2 + 2 * 16 * span + 112 * tm } else { 0 };
+    // The reverse adds its covectors (the triads' `δc^T` `[t][2J]` and `δabg` `[t][6J]` among them), the values' sum over the ticks and the
+    // moments' return, and the crowds' two difference arrays.
+    let reverse_site = if returning { 8 * 8 * d.triads as u64 + 16 * d.carry as u64 + 8 * m2 + 8 * a + 5 * 8 * dw + 3 * 8 * f + 8 * m2 + 8 * h * span + 2 * 8 * m2 + 16 * m2 + 2 * 16 * span + 112 * tm } else { 0 };
     let (s, pairs) = (sites as u64, (sites * sites) as u64);
     // The shares are kept for a return and an echo; the reverse holds one head's covector a pair on 64 bits.
     let weights = h * 8 * pairs * if returning { 2 } else { 1 };
@@ -2811,7 +2928,7 @@ mod tests {
     use super::*;
 
     fn declaration(width: usize, heads: usize, contacts: usize) -> FieldDeclaration {
-        FieldDeclaration { alphabet: 122, width, heads, modes: 8, still: 2, contacts, ticks: 2, frames: 4, reach: 2221, lanes: 1, depth: 0, carry: 0 }
+        FieldDeclaration { alphabet: 122, width, heads, modes: 8, still: 2, contacts, ticks: 2, frames: 4, reach: 2221, lanes: 1, depth: 0, carry: 0, triads: 0 }
     }
 
     /// [measurement; theory, November 10 20:34] **The card's footprint by growth route** (host arithmetic, no card read): from the
@@ -2827,7 +2944,7 @@ mod tests {
         // [theory, November 10 21:10] Contacts come in fours (f/2 even): each f from 68 by fours on the main line's declaration (width 64, two
         // lanes), its material, whether the contacts' two maps tile a block (`affine_tiling`: `(f, dw)` and `(dw, f)`) with the shared octets, and
         // the octets of the longest region; then the first f past 128 and the first refused, and the shared figure that refuses it.
-        let base = FieldDeclaration { alphabet: 100, width: 64, heads: 4, modes: 8, still: 2, contacts: 64, ticks: 4, frames: 4, reach: 3771, lanes: 2, depth: 0, carry: 0 };
+        let base = FieldDeclaration { alphabet: 100, width: 64, heads: 4, modes: 8, still: 2, contacts: 64, ticks: 4, frames: 4, reach: 3771, lanes: 2, depth: 0, carry: 0, triads: 0 };
         let mut first_refused = None;
         for f in (68..=512).step_by(4) {
             let d = FieldDeclaration { contacts: f, ..base };
@@ -2849,7 +2966,7 @@ mod tests {
     #[test]
     #[ignore]
     fn the_card_footprint_by_growth_route() {
-        let base = FieldDeclaration { alphabet: 100, width: 64, heads: 4, modes: 8, still: 2, contacts: 64, ticks: 4, frames: 4, reach: 3771, lanes: 2, depth: 0, carry: 0 };
+        let base = FieldDeclaration { alphabet: 100, width: 64, heads: 4, modes: 8, still: 2, contacts: 64, ticks: 4, frames: 4, reach: 3771, lanes: 2, depth: 0, carry: 0, triads: 0 };
         let describe = |name: &str, d: FieldDeclaration| {
             let draws = 4 * d.founding_draws();
             let field = holonics::hnn::tower::field::Field::found(d, &vec![7u8; draws]).expect("founded");
@@ -2948,5 +3065,86 @@ mod tests {
         let grown = declaration(64, 8, 64);
         let carriers = 128 * 1504 * (region_octets(&grown, false, 1) - tick_fixed_octets(&grown));
         assert!(carriers > 1 << 30, "{carriers}");
+    }
+
+    /// [theory, November 12; the triad record §4] **The triads' maps tile on the main line's declaration** (host arithmetic, no card read): at
+    /// `D = 64`, `f = 128` and `J = 16`, the triads' chart (`6J × D` over the pair chart's 32-bit read) tiles as every chart does, and the return of two
+    /// blocks (`D × f` over `c` beside `D × 2J` over `c^T`, 64-bit faces) tiles a block of four sites in 46,912 of the 49,152 shared octets, the weights
+    /// at their odd strides (`f + 1`, `2J + 1`), the bias, the joint bounds on 128 bits and a pass's rows; a return past a block's shared memory is
+    /// refused the tiles and read by the cell map, the same integers.
+    #[test]
+    fn the_triads_maps_tile_on_the_main_lines_declaration() {
+        let (dw, f, triads) = (64usize, 128usize, 16usize);
+        let (per, shared) = affine_tiling(6 * triads, dw, false).expect("the triads' chart tiles");
+        assert_eq!((per, shared <= AFFINE_SHARED), (256 / (6 * triads), true));
+        assert_eq!(affine_two_tiling(dw, f, 2 * triads), Some((4, 46_912)));
+        let need = ((dw * (f + 1) + dw * (2 * triads + 1) + dw) * 4).div_ceil(16) * 16 + 4 * 16 + 4 * (f + 2 * triads) * 8;
+        assert_eq!(need, 46_912);
+        assert!(affine_two_tiling(dw, 4 * f, 2 * triads).is_none(), "a return past the shared memory reads by cells");
+        assert!(affine_two_tiling(512, f, 2 * triads).is_none(), "more rows than a block's threads");
+    }
+
+    /// [theory, November 12; the triad record §4] **A region's octets count the triads' carriers, and none at `J = 0`**: a kept tick holds `abg`
+    /// `[t][6J]`, `p` and `c^T` `[t][2J]` (80 J octets a site) and a return adds `δc^T` and `δabg` (64 J a site); at `J = 0` the count is the
+    /// declaration's as before, term for term.
+    #[test]
+    fn a_regions_octets_count_the_triads_carriers() {
+        let base = FieldDeclaration { carry: 32, ..declaration(64, 4, 128) };
+        let triads = 16u64;
+        let d = FieldDeclaration { triads: triads as usize, ..base };
+        for n in [2usize, 1504, 3771] {
+            let s = n as u64;
+            assert_eq!(region_octets(&d, false, n) - region_octets(&base, false, n), s * 80 * triads);
+            assert_eq!(region_octets(&d, true, n) - region_octets(&base, true, n), s * (base.ticks as u64 * 80 * triads + 64 * triads));
+            assert_eq!(read_octets(&d, false, true, n) - read_octets(&base, false, true, n), s * base.ticks as u64 * 80 * triads);
+        }
+    }
+
+    /// [measurement; theory, November 12; the triad record §4] **The triads on the card read the host's bits** (needs the card): a field of
+    /// `declaration(32, 4, 32)` grown by two carry circles and sixteen triads ([`holonics::hnn::tower::field::FieldLearner::with_triads`]), its
+    /// readout, current and pair returns, `W_T` and the triads' chart biases moved off zero from a keyed stream's tail (so the faces have a
+    /// covector and every triad term, forward and reverse, is read), read and returned on regions of 2, 3, 5, 64 and 257 sites through the host and
+    /// through the card: every face and every covector entry equal, and the covector nonzero on `W_T`, the triads' chart and their biases. The
+    /// ends are read with them: a region of two sites has no place with both strand mates, one of three a single one, and one of five reads each
+    /// leg's covector at one place only.
+    #[test]
+    #[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
+    fn the_triads_on_the_card_read_the_hosts_bits() {
+        use holonics::hnn::tower::field::FieldLearner;
+        let keys: Vec<u8> = (0..1u64 << 18).flat_map(|i| (i.wrapping_add(1).wrapping_mul(0x9E37_79B9_7F4A_7C15) ^ (i << 17)).to_be_bytes()).collect();
+        let founded = Field::found(declaration(32, 4, 32), &keys).unwrap();
+        let triads = 16usize;
+        let mut field = FieldLearner::new(founded, 12).with_carry(2, &keys).unwrap().with_triads(triads, &keys).unwrap().field;
+        let d = field.declaration;
+        let (l, dw, f, m2) = (field.layout().clone(), d.width, d.contacts, 2 * d.complex());
+        assert_eq!((d.triads, d.carry), (triads, 2));
+        // Each moved entry with its shift: the material's families on `2^(−24)`, the triads' biases on the face's grain, eight bits coarser.
+        let moved: Vec<(usize, u32)> = (l.read..l.read + dw * dw)
+            .map(|i| (i, 14))
+            .chain((l.out..l.out + dw * m2).map(|i| (i, 14)))
+            .chain((l.w..l.w + dw * f).map(|i| (i, 14)))
+            .chain((l.w_triad..l.w_triad + dw * 2 * triads).map(|i| (i, 12)))
+            .chain((l.triad_bias..l.triad_bias + 6 * triads).map(|i| (i, 20)))
+            .collect();
+        let tail = keys.len() - 4 * moved.len() - 8;
+        for (k, &(i, shift)) in moved.iter().enumerate() {
+            let word = &keys[tail + 4 * k..tail + 4 * k + 4];
+            field.theta[i] = i32::from_be_bytes([word[0], word[1], word[2], word[3]]) >> shift;
+        }
+        let lengths = [2usize, 3, 5, 64, 257];
+        let classes: Vec<Vec<usize>> = lengths.iter().map(|&n| (0..n).map(|t| (t * 37 + 11) % 120).collect()).collect();
+        let open: Vec<Vec<bool>> = lengths.iter().map(|&n| (0..n).map(|t| t % 3 == 1 || t + 1 == n).collect()).collect();
+        let regions: Vec<Region> = classes.iter().zip(&open).map(|(c, u)| Region { classes: c, unresolved: u, faces: &[], locked: &[], echo: &[], domain: None, port: None }).collect();
+        let (host_faces, host_g) = field.read_and_return(&regions).unwrap();
+        let card = Card::open(0).expect("a CUDA card with the field's kernels built");
+        let mut card_field = CardField::open(&card).unwrap();
+        let (card_faces, card_g) = card_field.read_and_return(&field, &regions).unwrap();
+        assert_eq!(host_faces, card_faces);
+        assert_eq!(host_g.len(), card_g.len());
+        let unequal: Vec<usize> = (0..host_g.len()).filter(|&i| host_g[i] != card_g[i]).collect();
+        assert!(unequal.is_empty(), "{} covector entries differ, the first at {:?} (triad at {}, triad_bias at {}, w_triad at {})", unequal.len(), unequal.first(), l.triad, l.triad_bias, l.w_triad);
+        for (name, start, len) in [("w_triad", l.w_triad, dw * 2 * triads), ("triad", l.triad, 6 * triads * dw), ("triad_bias", l.triad_bias, 6 * triads)] {
+            assert!(host_g[start..start + len].iter().any(|&v| v != 0), "the triads' {name} takes no covector");
+        }
     }
 }
