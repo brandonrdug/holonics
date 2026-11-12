@@ -82,11 +82,19 @@ repository was reset on September 24; the pre-reset tree is
   1 0.006), so the one friction chart is pulled apart by its regions, and the reach is derived next
   as a friction the region sets. The drift is the leak chart's own: te4's mean with te5's leak half
   stands 93% of the way to te5's gates, and te5's mean with te4's leak half codes the held passage
-  0.0007 under te5's own (0.0088 under in quarter 4). So the leak half's rate is read before any
-  founding (G110, fixed), as the cooled blocks' was: te6, the line's next lap at the base, beside
-  te6c, the same lap from te5's end with the leak half at an eighth of the base rate. tt1's circles
-  drifted as te5's did with the triads beside them (their friction 0.8242 at tt1's mean against
-  te5's 0.8251). With `C = 0` the field is the plain line bit for bit.
+  0.0007 under te5's own (0.0088 under in quarter 4). So the leak half's rate was read before any
+  founding (G110 scored), as the cooled blocks' was. The sixth lap, te6, at the base, coded the held
+  passage 0.0008 nats a place over te5's at lap means, quarter 4 a further 0.017 back and quarters 1
+  to 3 forward by 0.004, 0.008 and 0.002: the circle line at the base no longer gains on the joint,
+  and each lap moves its gain from the most open regions to the most written ones. Its sibling te6c,
+  the same lap with the leak half at an eighth of the base rate, held its friction behind te6's
+  (|gamma| 0.8079 against 0.8002 at the means, the leak biases running at their top speed) and coded
+  quarter 4 as te6 did. The lag is real and buys nothing, so there is no rate law: the trade between
+  the regions is the lap's, and the friction is one of its carriers, which the other parts replace
+  when it is held back. The line goes on from te6's end, and the friction the region sets is derived
+  next, from how a lap draws its places against the held strata. tt1's circles drifted as te5's did
+  with the triads beside them (their friction 0.8242 at tt1's mean against te5's 0.8251). With
+  `C = 0` the field is the plain line bit for bit.
 - **The triad** (founded on te4's end, its first lap read; atlas `contact.triad-manley-rowe-gauge`,
   `code.triad-character-of-composition`;
   [the triad record](research/records/2026-11-12_THE_LAW_ACROSS_A_PLACE_IS_HELD_BY_A_PUMPED_CONTACT_A_TRIAD_IS_A_CHARACTER_OF_A_LAW_OF_COMPOSITION_AND_ITS_THREE_LEGS_EXCHANGE_EQUAL_QUANTA.md)).
