@@ -1,0 +1,82 @@
+# corpus_store (P46 step 5), 2026-11-12 UTC: the wider passage's store of whole documents, written by tools/corpus_passage.py (main 8f9edb018)
+# with its defaults (revision 307910e4, 8,000,000,000 text bytes, prefix 1,000,000,000, 128 held documents a slice, at most 120 training and 4 held
+# shards, early stop past 40,000 ms a shard over the first 8), into a store under .local/corpus (store-2026-11-12; the name stood free). Device line:
+# the host only, OMP_NUM_THREADS=1, network and disk; no card, no lock. Projection: 96 to 100 training shards and 1 to 4 held, at most 124 shards and
+# 83 minutes; outer timeout 5,400 s; host ceiling 8 GiB resident. Controls before it: test_corpus_passage.py printed "corpus_passage controls: 199
+# passed". Dispatched with tools/runs.py (p46-corpus-store). The IDS files and the store stay under .local. Counts, public shard names and SHA-256 only.
+## the run
+# p46 fetch at main 8f9edb018 17:42:09; free_bytes=155421188096
+# p46 fetch exit 0 18:00:03; free_bytes=152348020736
+CORPUS_REVISION PleIAs/common_corpus 307910e4c5d040d6f318e6edf2a2b97849155771 files=10020 shards=10000
+## the shards (the first eight and the last three)
+CORPUS_SHARD role=train k=1 path=common_corpus_1/subset_1_1.parquet octets=432733426 rows=70697 code=85852343 web=16177015 science=65164980 books=88825332 wikidata=19836650 shard_ms=8301 ms=8301
+CORPUS_SHARD role=train k=2 path=common_corpus_1/subset_1_2.parquet octets=426102031 rows=70286 code=171145663 web=32120204 science=124992504 books=176435284 wikidata=38529128 shard_ms=16552 ms=24853
+CORPUS_SHARD role=train k=3 path=common_corpus_1/subset_1_3.parquet octets=430287297 rows=70434 code=256765174 web=48749700 science=190634045 books=267469371 wikidata=57109509 shard_ms=22438 ms=47291
+CORPUS_SHARD role=train k=4 path=common_corpus_1/subset_1_4.parquet octets=447402234 rows=70558 code=345742727 web=65659762 science=256488689 books=357973424 wikidata=77187698 shard_ms=20354 ms=67645
+CORPUS_SHARD role=train k=5 path=common_corpus_1/subset_1_5.parquet octets=430065988 rows=70581 code=436122958 web=81619758 science=319380525 books=449083297 wikidata=97449555 shard_ms=9411 ms=77056
+CORPUS_SHARD role=train k=6 path=common_corpus_1/subset_1_6.parquet octets=433304747 rows=70600 code=522810389 web=97727878 science=379743943 books=539173794 wikidata=115619837 shard_ms=9416 ms=86472
+CORPUS_SHARD role=train k=7 path=common_corpus_1/subset_1_7.parquet octets=434481610 rows=70369 code=608377903 web=114869814 science=442430017 books=631228906 wikidata=134494232 shard_ms=12233 ms=98705
+CORPUS_SHARD role=train k=8 path=common_corpus_1/subset_1_8.parquet octets=442602457 rows=70375 code=695724482 web=130855086 science=505170963 books=722335110 wikidata=152553361 shard_ms=9689 ms=108394
+...
+CORPUS_SHARD role=train k=97 path=common_corpus_1/subset_10_7.parquet octets=425932277 rows=70494 code=3200001085 web=1598953954 science=1600050099 books=960020082 wikidata=640001408 shard_ms=9217 ms=1045585
+CORPUS_SHARD role=train k=98 path=common_corpus_1/subset_10_8.parquet octets=441620600 rows=70546 code=3200001085 web=1600002779 science=1600050099 books=960020082 wikidata=640001408 shard_ms=8385 ms=1053970
+CORPUS_SHARD role=held k=1 path=common_corpus_10/subset_100_10.parquet octets=481423942 rows=75698 code=128 web=128 science=128 books=128 wikidata=128 shard_ms=10234 ms=1064214
+SHARD_MEANS shards=99 train=98 held=1 mean_ms_a_shard=10749 train_mean_ms=10754 first8_mean_ms=13549 max_ms=24481 min_ms=7472
+## the store
+CORPUS_STORE role=train slice=code documents=746057 pieces=746057 text_bytes=3200001085 octets=3209202538 sha256=b7a97f5f7d94aa0ad78d141cdd7c68d11b65ebfeaa3cfc16b19d38971a256d1a
+CORPUS_STORE role=train slice=web documents=410538 pieces=410538 text_bytes=1600002779 octets=1605186468 sha256=a4e9e3443e5a857d655881a6a238e43c3fca6d34bbcf5639033977624fc60359
+CORPUS_STORE role=train slice=science documents=30714 pieces=261795 text_bytes=1600050099 octets=1603320241 sha256=3bee4ef9408b311b52addb9732ec6b80d6c534fe511c663f858036f394953e76
+CORPUS_STORE role=train slice=books documents=23750 pieces=23750 text_bytes=960020082 octets=961761341 sha256=dbe23bbba9e87edf74d6e4ab3c5d36102774c86c0bc829db54b4a0a2144a82bb
+CORPUS_STORE role=train slice=wikidata documents=101833 pieces=101833 text_bytes=640001408 octets=642494958 sha256=87ab4bdc16fada7d2d3f08032447c6a21ceff60062fdd861312f51539a0ddc26
+CORPUS_STORE role=prefix slice=code documents=93724 pieces=93724 text_bytes=400001692 octets=401158660 sha256=7437eb340176ec1fe67943f746e12c5a9852b9ae5f3bef39b4ded072fef5b0e8
+CORPUS_STORE role=prefix slice=web documents=51617 pieces=51617 text_bytes=200002083 octets=200653499 sha256=d7fb659dd75815d196e7b9726e6fdccfb6f35b145a4e520ac1e3495dd1450b06
+CORPUS_STORE role=prefix slice=science documents=3832 pieces=32808 text_bytes=200056495 octets=200467646 sha256=37f632ad90fade8238b632468e674fbb136bf647c6a3e1ed97d1cf024ae495d9
+CORPUS_STORE role=prefix slice=books documents=2960 pieces=2960 text_bytes=120028584 octets=120243915 sha256=33c9aec189eef2924baa67688881a260edd1ad43e971d5c7a77135cbe7bcb304
+CORPUS_STORE role=prefix slice=wikidata documents=12446 pieces=12446 text_bytes=80040504 octets=80349708 sha256=167c078cbd11194dc75040ca6ef8ef6c2c2ee51216d837665ee6e1d51af2c297
+CORPUS_STORE role=held slice=code documents=128 pieces=128 text_bytes=468625 octets=470224 sha256=9ba7c96215841074fc55879f4bce51e5115519009a5b4b293cf7388ee4172844
+CORPUS_STORE role=held slice=web documents=128 pieces=128 text_bytes=489187 octets=490738 sha256=68fd8825f4c6daaad56c38c75d03d7adf4f40284351cae81532030bef2fff8e1
+CORPUS_STORE role=held slice=science documents=128 pieces=912 text_bytes=6627976 octets=6642020 sha256=1d11393713fe05476ff48a1482886b30174e81a93462486815777c1da4cb7f61
+CORPUS_STORE role=held slice=books documents=128 pieces=128 text_bytes=5105860 octets=5113955 sha256=d1a69701ab170590ffb3d7f033cbfa472db1814641deb9973e118f6235c69b80
+CORPUS_STORE role=held slice=wikidata documents=128 pieces=128 text_bytes=615734 octets=618915 sha256=527dfd0db7f6a2c25af538e31c521d7dd8cd17fbf9c2826918778db125b36921
+CORPUS_SLICE code quota=3200000000 text_bytes=3200001085 documents=746057 pieces=746057 windows_left_out=0 bytes_left_out=0 documents_emptied=0 documents_repeated=271
+CORPUS_SLICE web quota=1600000000 text_bytes=1600002779 documents=410538 pieces=410538 windows_left_out=0 bytes_left_out=0 documents_emptied=0 documents_repeated=3
+CORPUS_SLICE science quota=1600000000 text_bytes=1600050099 documents=30714 pieces=261795 windows_left_out=555651 bytes_left_out=142422233 documents_emptied=160 documents_repeated=101
+CORPUS_SLICE books quota=960000000 text_bytes=960020082 documents=23750 pieces=23750 windows_left_out=0 bytes_left_out=0 documents_emptied=0 documents_repeated=0
+CORPUS_SLICE wikidata quota=640000000 text_bytes=640001408 documents=101833 pieces=101833 windows_left_out=0 bytes_left_out=0 documents_emptied=0 documents_repeated=3
+CORPUS_HELD documents=128 a slice; documents skipped as shared with training or an earlier held one 1
+## the files
+CORPUS_FILE STORE.tsv octets=1755 sha256=72e05a476c914c22b199885a5d1211ff844753973160f5a9b9f8236bfd80cbcb
+CORPUS_FILE MANIFEST.tsv octets=16407 sha256=056525703b6a8565a70473dbcf0f7f2eab539575cded35cce031b0f674ea5c47
+CORPUS_FILE DOCS_code.bin octets=3209202538 sha256=b7a97f5f7d94aa0ad78d141cdd7c68d11b65ebfeaa3cfc16b19d38971a256d1a
+CORPUS_FILE DOCS_code.tsv octets=13508648 sha256=0379a1a5f27e436c2e5f8f7e0cb7fba5ee9991831cc25712ae997f8234a82376
+CORPUS_FILE IDS_code.txt octets=75856507 sha256=d48bea3dbf9890d3a852333ac5db72acdf2d57793f7b98a44cdc685346b11d5c
+CORPUS_FILE DOCS_web.bin octets=1605186468 sha256=a4e9e3443e5a857d655881a6a238e43c3fca6d34bbcf5639033977624fc60359
+CORPUS_FILE DOCS_web.tsv octets=7554518 sha256=2994adc15ee349d108865c231e70030876a9190ac07c49ad90e16ffff69de1ff
+CORPUS_FILE IDS_web.txt octets=20438759 sha256=9147c20d5a3c469d74d13e1010b33ba9c31674117aa2fd8476b4c9a78a32cfc7
+CORPUS_FILE DOCS_science.bin octets=1603320241 sha256=3bee4ef9408b311b52addb9732ec6b80d6c534fe511c663f858036f394953e76
+CORPUS_FILE DOCS_science.tsv octets=4368869 sha256=eae97978761bc878ec61a38d81b0edaa617035bfc4914d030817eaf6ba8ad5d9
+CORPUS_FILE IDS_science.txt octets=1035105 sha256=8edc758ed8a2e9d7255c1672f51814d09e2b8abdac8abbfa974d334ed314ab66
+CORPUS_FILE DOCS_books.bin octets=961761341 sha256=dbe23bbba9e87edf74d6e4ab3c5d36102774c86c0bc829db54b4a0a2144a82bb
+CORPUS_FILE DOCS_books.tsv octets=441905 sha256=04ed70b646f1192bba46fd69eae7631b718b3562cf0dc5deae1142cf0632500c
+CORPUS_FILE IDS_books.txt octets=696441 sha256=893efbf541c5a36cd5562ab0312193c361d75690f51c9c9610ee815d3013372b
+CORPUS_FILE DOCS_wikidata.bin octets=642494958 sha256=87ab4bdc16fada7d2d3f08032447c6a21ceff60062fdd861312f51539a0ddc26
+CORPUS_FILE DOCS_wikidata.tsv octets=1781209 sha256=bc2059359cc8a72304fab943455e0f824b302ac21bc8e02c41e4c66a927fc05a
+CORPUS_FILE IDS_wikidata.txt octets=4055635 sha256=e00b24b5ab8d8400d1e8ee0e9846392c0db1ea9538b8cdca25928f1a21caf322
+CORPUS_FILE HELD_code.bin octets=470224 sha256=9ba7c96215841074fc55879f4bce51e5115519009a5b4b293cf7388ee4172844
+CORPUS_FILE HELD_code.tsv octets=1890 sha256=383f0be62d51e9259f6583f19478a5cffd7aa0aec42769cbdad130948a7b48d9
+CORPUS_FILE HELD_IDS_code.txt octets=13535 sha256=a73ea78fcc789d883fe14237ed3c2fa1371d16ce5318f4ed8610da8dbcf47dfc
+CORPUS_FILE HELD_web.bin octets=490738 sha256=68fd8825f4c6daaad56c38c75d03d7adf4f40284351cae81532030bef2fff8e1
+CORPUS_FILE HELD_web.tsv octets=1923 sha256=1955088400ef322c2f6a86b8ff55c2f3f44938753ef94eb39695e11add78c06f
+CORPUS_FILE HELD_IDS_web.txt octets=6403 sha256=1a252680a6c0314b027977b6a3c42173ae64a03af8b950a5fb0b71deb0630d09
+CORPUS_FILE HELD_science.bin octets=6642020 sha256=1d11393713fe05476ff48a1482886b30174e81a93462486815777c1da4cb7f61
+CORPUS_FILE HELD_science.tsv octets=13112 sha256=a96f514124828158135b3421573864877776db5a50c1bf7d20c82ba7d72bb4b0
+CORPUS_FILE HELD_IDS_science.txt octets=4373 sha256=6c7988d063b995ea7b62aafa50063c6efc3742e93e4a9c2465a395cacc7d8c35
+CORPUS_FILE HELD_books.bin octets=5113955 sha256=d1a69701ab170590ffb3d7f033cbfa472db1814641deb9973e118f6235c69b80
+CORPUS_FILE HELD_books.tsv octets=2114 sha256=006adde2e6aabdc8ffe08fd48000459adb88251e83a85c23e9af68a3072efcab
+CORPUS_FILE HELD_IDS_books.txt octets=3977 sha256=bde68b598caa1ad159658dc5917d3abfe8fd50cd3fab0b683c6cda668f4061d8
+CORPUS_FILE HELD_wikidata.bin octets=618915 sha256=527dfd0db7f6a2c25af538e31c521d7dd8cd17fbf9c2826918778db125b36921
+CORPUS_FILE HELD_wikidata.tsv octets=1930 sha256=c375040a5dbd9354570740150dbe136c8f5fcf9209c8e5bac30121006fd6a36c
+CORPUS_FILE HELD_IDS_wikidata.txt octets=5122 sha256=8eb788c1c6db2f5b2d16ddfaadd1b028cb9fced9cba5035eb54da382f1f41d90
+CORPUS_DONE shards_train=98 shards_held=1 ms=1070575
+MEASURE lap=p46 rc=0 wall_s=1074.2 peak_rss_kib=1307216
+STORE_OCTETS 8165472838 (the files above and LISTING.tsv; the cache directory holds 200 files)
