@@ -44,6 +44,7 @@ const READINGS: [&str; 2] = ["FIELD_PROFILE", "FIELD_PHASES"];
 /// A piece of a slice's index: its offset in the slice's file, its title's and its text's octets, and whether it opens and closes its document.
 #[derive(Clone, Copy, Debug)]
 struct Piece {
+    document: u64,
     offset: u64,
     title: u64,
     text: u64,
@@ -162,8 +163,9 @@ enum Kind {
 /// writer's state (the context known, the run's places in the writer's octave order of their distance from the context, keyed within an
 /// octave, its first `k` resolved, `k` by octaves of reads, `k = 0` among them, and a true end's voids given); clear, a mask state (`shape`'s
 /// law over the whole stretch or past the context, the density `τ = u²`, weighed back by its domain `⌊2√(mK)⌋`). Regions are plain: no port.
-/// Returns the region, its kind, and the sites its code is a code of (its weighed domain, or its open places for the writer's state).
-fn state_of(seed: u64, d: u64, classes: Vec<usize>, q: usize, a: usize) -> (TrainRegion, Kind, usize) {
+/// Returns the region, its kind, the sites its code is a code of (its weighed domain, or its open places for the writer's state), and
+/// for the writer's state its `k` and its front (the first open place of its order, the place the release draws next).
+fn state_of(seed: u64, d: u64, classes: Vec<usize>, q: usize, a: usize) -> Stretch {
     let n = classes.len();
     let head = mix(seed, d);
     if (head >> 17) & 1 == 1 {
@@ -183,14 +185,24 @@ fn state_of(seed: u64, d: u64, classes: Vec<usize>, q: usize, a: usize) -> (Trai
         for &t in &order[..k] {
             unresolved[t] = false;
         }
-        return (TrainRegion::plain(classes, unresolved), Kind::Writer, a - k);
+        return Stretch { region: TrainRegion::plain(classes, unresolved), kind: Kind::Writer, counted: a - k, q, writer: Some((k, order[k])) };
     }
     let (mask, kind, from) = match shape(seed, d, q, n) {
         Shape::Masked(mask) => (mask, Kind::MaskWhole, 0),
         Shape::Answer(mask) => (mask, Kind::MaskRun, q),
     };
     let domain = weighed_domain(n - from, &mask);
-    (TrainRegion { domain: Some(domain), ..TrainRegion::plain(classes, mask) }, kind, domain)
+    Stretch { region: TrainRegion { domain: Some(domain), ..TrainRegion::plain(classes, mask) }, kind, counted: domain, q, writer: None }
+}
+
+/// A stretch's one keyed state ([`state_of`]): its region, its kind, the sites its code is a code of, its context, and for the writer's
+/// state its `k` and its front place.
+struct Stretch {
+    region: TrainRegion,
+    kind: Kind,
+    counted: usize,
+    q: usize,
+    writer: Option<(usize, usize)>,
 }
 
 /// [definition; the record §4 items 1 and 5; the port's `store`] **The cut over a role of the store**: the slices interleaved by least progress
@@ -221,7 +233,7 @@ impl Cut {
     }
 
     /// The drawn stretch taken: its region read from its slice's file, and the pass moved past it.
-    fn take(&mut self, drawn: Drawn, codec: &FieldCodec) -> Result<(TrainRegion, Kind, usize)> {
+    fn take(&mut self, drawn: Drawn, codec: &FieldCodec) -> Result<Stretch> {
         let at = self.pass.slices[drawn.slice].clone();
         let bytes = self.slices[drawn.slice].bytes(at.piece as usize, at.cursor, drawn.q + drawn.a)?;
         let mut classes = codec.encode(&bytes)?;
@@ -300,8 +312,13 @@ fn pieces_of(path: &Path, count: u64) -> Result<Vec<Piece>> {
         }
         let line = line?;
         let w: Vec<u64> = line.split('\t').map(|v| v.parse::<u64>()).collect::<std::result::Result<_, _>>()?;
-        let [_, title, text, opens, closes] = w[..] else { return Err("a slice's index row that is not five counts".into()) };
-        out.push(Piece { offset, title, text, opens: opens == 1, closes: closes == 1 });
+        let [document, title, text, opens, closes] = w[..] else { return Err("a slice's index row that is not five counts".into()) };
+        let piece = Piece { document, offset, title, text, opens: opens == 1, closes: closes == 1 };
+        // [theory, November 12, P49] A piece of no places would wrap the cut's `rest − 1`; `tools/corpus_passage.py` writes none.
+        if piece.places() == 0 {
+            return Err("a piece of zero places (tools/corpus_passage.py writes none)".into());
+        }
+        out.push(piece);
         offset += title + text;
     }
     if out.len() as u64 != count {
@@ -500,7 +517,7 @@ pub(super) fn train(args: &[String], realization: &mut dyn FieldRealization) -> 
             if in_sites > 0 && (in_pairs + n * n > cut.pass.pairs || in_sites + n > cut.pass.sites) {
                 break;
             }
-            let (region, _, counted) = cut.take(drawn, &codec)?;
+            let Stretch { region, counted, .. } = cut.take(drawn, &codec)?;
             tally.take(&region, counted);
             by_slice[drawn.slice] += 1;
             (in_pairs, in_sites) = (in_pairs + n * n, in_sites + n);
@@ -580,6 +597,245 @@ pub(super) fn train(args: &[String], realization: &mut dyn FieldRealization) -> 
     Ok(())
 }
 
+/// The variables a store command refuses: every one named `FIELD_…` but the card driver's two readings ([`READINGS`]).
+fn refuse_variables(command: &str) -> Result<()> {
+    let set: Vec<String> = std::env::vars_os().filter_map(|(k, _)| k.into_string().ok()).filter(|k| k.starts_with("FIELD_") && !READINGS.contains(&k.as_str())).collect();
+    if !set.is_empty() {
+        return Err(format!("{command} reads no variable for its law, and {} set", set.join(", ")).into());
+    }
+    Ok(())
+}
+
+/// The slices of `role` the store holds, in the store's order.
+fn role_names(counts: &HashMap<(String, String), (u64, u128)>, role: &str) -> Vec<&'static str> {
+    SLICES.iter().copied().filter(|n| counts.contains_key(&(role.to_string(), n.to_string()))).collect()
+}
+
+/// A slice of `role` opened: its index's pieces and its file.
+fn open_slice(store: &Path, role: &str, name: &str, counts: &HashMap<(String, String), (u64, u128)>) -> Result<Slice> {
+    let stem = if role == "held" { "HELD" } else { "DOCS" };
+    let (count, quota) = counts[&(role.to_string(), name.to_string())];
+    Ok(Slice { name: name.to_string(), quota, pieces: pieces_of(&store.join(format!("{stem}_{name}.tsv")), count)?, file: std::fs::File::open(store.join(format!("{stem}_{name}.bin")))? })
+}
+
+/// A region's code over its unresolved places on the codes' own grain (`2^(−20)` bits), beside the count of those places: the sum of
+/// `face.code(class)`, as [`held_out`] reads a face.
+fn region_code(faces: &[Option<holonics::hnn::tower::TowerFace>], region: &TrainRegion) -> Result<(i64, usize)> {
+    let (mut code, mut places) = (0i64, 0usize);
+    for (t, &open) in region.unresolved.iter().enumerate() {
+        if open {
+            let face = faces.get(t).and_then(Option::as_ref).ok_or("an unresolved place without a face")?;
+            code += face.code(region.classes[t]);
+            places += 1;
+        }
+    }
+    Ok((code, places))
+}
+
+/// The four kinds a read gathers by: a mask over the whole stretch, a mask past the context, the writer's state at `k = 0`, at `k > 0`.
+const READ_KINDS: [&str; 4] = ["mask_whole", "mask_run", "writer_k0", "writer_k"];
+
+fn read_kind(stretch: &Stretch) -> usize {
+    match (stretch.kind, stretch.writer) {
+        (Kind::MaskWhole, _) => 0,
+        (Kind::MaskRun, _) => 1,
+        (Kind::Writer, Some((0, _))) => 2,
+        (Kind::Writer, _) => 3,
+    }
+}
+
+/// The octaves the surprise census reads: a place's code on the codes' `2^(−20)` bits has bit length `b`, so it codes `[2^(b−21), 2^(b−20))`
+/// bits (`b = 0`: a code of zero); 40 lengths hold every code a face of `2^(−16)` shares can give.
+const SURPRISE_OCTAVES: usize = 40;
+
+/// The octaves the writer's partitions read (octave 8 holds the farthest place a run of at most 511 places draws; a run that ends a piece
+/// may reach one octave more).
+const READ_OCTAVES: usize = 10;
+
+/// [measurement; theory, November 12, P49 item 3] `read-store UNITS UNITS_SHA STORE STORE_SHA ROLE KEYS KEYS_SHA CODEC CODEC_SHA HELD HELD_SHA
+/// SECTIONS STATE STATE_SHA`: **the pass's cut over a role, read and never deposited**. `STATE` is a state or a mean of the line; the read takes
+/// the law of its pass line (the least context, the octaves, the section's two bounds) and none of its place, and writes nothing. Each slice
+/// of the role, in the store's order and alone, is cut afresh from stretch 1 with the key file's seed, so every slice meets the same draws,
+/// for `SECTIONS` sections under the bounds (fewer where the slice ends), its regions training's own ([`state_of`]); each section's regions
+/// are read on the realization by `read_faces`, as [`held_out`] reads, and a region's code is the sum of `face.code(class)` over its
+/// unresolved places beside their count. One line a section (`STORE_READ`: the port's fields, then each kind's regions, places and code);
+/// a closing line a slice (`STORE_READ_WRITER`) with two partitions of its writer's states: at `k = 0` the places and code by the octave of
+/// an open place's distance from the context, and over every writer's state the code at its front place (the first open place of its
+/// order, the place the release draws next) and the count, by that place's octave. Last, once, the code line's yardstick on `HELD`
+/// (`STORE_YARDSTICK at=read`). A reading: the state's bytes are not touched.
+pub(super) fn read(args: &[String], realization: &mut dyn FieldRealization) -> Result<()> {
+    if args.len() != 15 {
+        return Err("read-store UNITS UNITS_SHA STORE STORE_SHA ROLE KEYS KEYS_SHA CODEC CODEC_SHA HELD HELD_SHA SECTIONS STATE STATE_SHA".into());
+    }
+    let started = std::time::Instant::now();
+    refuse_variables("read-store")?;
+    let units = units_of(&args[1], &args[2])?;
+    if !units.merges().is_empty() {
+        return Err("the store's cut is on bytes: a units file of merges is refused".into());
+    }
+    let store = Path::new(&args[3]);
+    let counts = store_counts(std::str::from_utf8(&pinned_read(&store.join("STORE.tsv").to_string_lossy(), &args[4], READ_BUDGET as usize)?)?)?;
+    let role = args[5].as_str();
+    let keys = pinned_read(&args[6], &args[7], READ_BUDGET as usize)?;
+    let seed = u64::from_be_bytes(keys.get(keys.len().saturating_sub(8)..).filter(|w| w.len() == 8).ok_or("a key file of fewer than eight bytes")?.try_into()?);
+    let codec = FieldCodec::from_text(&String::from_utf8(pinned_read(&args[8], &args[9], READ_BUDGET as usize)?)?, units)?;
+    let held_bytes = pinned_read(&args[10], &args[11], READ_BUDGET as usize)?;
+    let sections = positive(&args[12])?;
+    let learner = FieldLearner::from_text(std::str::from_utf8(&pinned_read(&args[13], &args[14], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
+    let law = learner.pass.clone().ok_or("a state with no pass line: read-store reads a state of the store's line")?;
+    if learner.field.declaration.alphabet != codec.alphabet() {
+        return Err("a state whose alphabet is not its codec's".into());
+    }
+    let names = role_names(&counts, role);
+    if names.is_empty() {
+        return Err(format!("a store with no slice of the role {role}").into());
+    }
+    println!("STORE_READ_LAW role={role} least={} octaves={} pairs_bound={} sites_bound={} sections={sections} alphabet={} void={} ms={}", law.least, law.octaves, law.pairs, law.sites, codec.alphabet(), codec.void(), started.elapsed().as_millis());
+    for &name in &names {
+        let slice = open_slice(store, role, name, &counts)?;
+        let pass = StorePass { role: role.to_string(), store: args[4].clone(), stretches: 0, least: law.least, octaves: law.octaves, pairs: law.pairs, sites: law.sites, slices: vec![PassSlice { name: name.to_string(), piece: 0, cursor: 0, taken: 0 }] };
+        let mut cut = Cut { seed, slices: vec![slice], pass };
+        let (mut k0, mut front) = (vec![(0u64, 0i64); READ_OCTAVES], vec![(0u64, 0i64); READ_OCTAVES]);
+        // [measurement; theory, the counts of counts of surprise (CLAUDE.md's structural measures; Brandon's lens of November 12, 20:31Z, on
+        // information the line already predicts)] Every compared place's code by its octave: the bit length of its code on the codes' grain.
+        let mut surprise = vec![(0u64, 0i64); SURPRISE_OCTAVES];
+        let mut read_sections = 0usize;
+        for n in 0..sections {
+            let section_start = std::time::Instant::now();
+            let mut stretches: Vec<Stretch> = Vec::new();
+            let (mut tally, mut in_pairs, mut in_sites) = (Tally::default(), 0u64, 0u64);
+            while let Some(drawn) = cut.next() {
+                let s = drawn.sites();
+                if in_sites > 0 && (in_pairs + s * s > cut.pass.pairs || in_sites + s > cut.pass.sites) {
+                    break;
+                }
+                let stretch = cut.take(drawn, &codec)?;
+                tally.take(&stretch.region, stretch.counted);
+                (in_pairs, in_sites) = (in_pairs + s * s, in_sites + s);
+                stretches.push(stretch);
+            }
+            if stretches.is_empty() {
+                break;
+            }
+            let regions: Vec<TrainRegion> = stretches.iter().map(|s| s.region.clone()).collect();
+            let faces = realization.read_faces(&learner.field, &views_of(&regions)).map_err(|e| e.to_string())?;
+            let mut by_kind = [(0u64, 0u64, 0i64); 4];
+            for (stretch, faces) in stretches.iter().zip(&faces) {
+                let (code, places) = region_code(faces, &stretch.region)?;
+                for (t, _) in stretch.region.unresolved.iter().enumerate().filter(|&(_, &u)| u) {
+                    let c = faces[t].as_ref().ok_or("an unresolved place without a face")?.code(stretch.region.classes[t]);
+                    let b = ((i64::BITS - c.max(0).leading_zeros()) as usize).min(SURPRISE_OCTAVES - 1);
+                    (surprise[b].0, surprise[b].1) = (surprise[b].0 + 1, surprise[b].1 + c);
+                }
+                let k = read_kind(stretch);
+                by_kind[k] = (by_kind[k].0 + 1, by_kind[k].1 + places as u64, by_kind[k].2 + code);
+                if let Some((k, at)) = stretch.writer {
+                    let q = stretch.q;
+                    if k == 0 {
+                        for (t, &open) in stretch.region.unresolved.iter().enumerate().filter(|&(_, &u)| u) {
+                            let _ = open;
+                            let o = (octave_of(t + 1 - q) as usize).min(READ_OCTAVES - 1);
+                            let face = faces[t].as_ref().ok_or("an unresolved place without a face")?;
+                            (k0[o].0, k0[o].1) = (k0[o].0 + 1, k0[o].1 + face.code(stretch.region.classes[t]));
+                        }
+                    }
+                    let o = (octave_of(at + 1 - q) as usize).min(READ_OCTAVES - 1);
+                    let face = faces[at].as_ref().ok_or("a writer's front without a face")?;
+                    (front[o].0, front[o].1) = (front[o].0 + 1, front[o].1 + face.code(stretch.region.classes[at]));
+                }
+            }
+            let kinds: Vec<String> = READ_KINDS.iter().zip(&by_kind).map(|(name, (r, p, c))| format!("{name}_regions={r} {name}_places={p} {name}_code={c}")).collect();
+            println!("STORE_READ slice={name} n={n} {} stretches={} {} ms={}", tally.text(), cut.pass.stretches, kinds.join(" "), section_start.elapsed().as_millis());
+            read_sections += 1;
+        }
+        let shown = if k0[READ_OCTAVES - 1].0 + front[READ_OCTAVES - 1].0 > 0 { READ_OCTAVES } else { READ_OCTAVES - 1 };
+        let list = |v: &[(u64, i64)], what: &str| (0..shown).map(|o| format!("{what}{o}={}/{}", v[o].0, v[o].1)).collect::<Vec<_>>().join(" ");
+        println!("STORE_READ_SURPRISE slice={name} places={} by_bit_length(count/code) {} ms={}", surprise.iter().map(|v| v.0).sum::<u64>(), (0..SURPRISE_OCTAVES).filter(|&b| surprise[b].0 > 0).map(|b| format!("b{b}={}/{}", surprise[b].0, surprise[b].1)).collect::<Vec<_>>().join(" "), started.elapsed().as_millis());
+        println!("STORE_READ_WRITER slice={name} sections={read_sections} stretches={} k0_by_octave(places/code) {} front_by_octave(count/code) {} ms={}", cut.pass.stretches, list(&k0, "o"), list(&front, "o"), started.elapsed().as_millis());
+    }
+    let held = held_out(&learner.field, &codec, &held_set(&codec, &held_bytes)?, realization)?;
+    println!("STORE_YARDSTICK at=read {} ms={}", held_text(&held), started.elapsed().as_millis());
+    println!("STORE_READ_DONE {} ms={}", counters_text(realization), started.elapsed().as_millis());
+    Ok(())
+}
+
+/// [measurement; theory, November 12, P49 item 4] `write-store UNITS UNITS_SHA STORE STORE_SHA KEYS KEYS_SHA CODEC CODEC_SHA DOCUMENTS PROMPT RUN
+/// OUT STATE STATE_SHA`: **the release from held prompts**. On the store's held role, for each slice in the store's order, its first
+/// `DOCUMENTS` pieces that open their document and hold at least `PROMPT + RUN` places; a problem is the piece's first `PROMPT` places and
+/// `RUN` open places. The release is the tower's as it stands, its law fixed here: [`holonics::hnn::tower::field::Field::sample_runs`] over
+/// every problem at once with `sweeps = RUN` (one place a read), `refine = 0`, the codec's void, the key file's seed, `run_bound = 0`, the
+/// near tail, the keyed order within an octave, no given lengths, no one-end draw, a sweep that always goes on and no observer: the store's
+/// writer state run from `k = 0` upward, by octaves of distance from the prompt. `OUT` is created new; each problem writes three files of
+/// raw bytes (`SLICE_NN.prompt`, `SLICE_NN.written`, the codec's decode up to the first void, and `SLICE_NN.reference`, the piece's next
+/// `RUN` places), and one line (`STORE_WRITE`: its slice, its document, the places written before a void and the release's reads); a closing
+/// line holds the card's counters and the time. A reading: the state is not touched.
+pub(super) fn write(args: &[String], realization: &mut dyn FieldRealization) -> Result<()> {
+    if args.len() != 15 {
+        return Err("write-store UNITS UNITS_SHA STORE STORE_SHA KEYS KEYS_SHA CODEC CODEC_SHA DOCUMENTS PROMPT RUN OUT STATE STATE_SHA".into());
+    }
+    let started = std::time::Instant::now();
+    refuse_variables("write-store")?;
+    let units = units_of(&args[1], &args[2])?;
+    if !units.merges().is_empty() {
+        return Err("the store's cut is on bytes: a units file of merges is refused".into());
+    }
+    let store = Path::new(&args[3]);
+    let counts = store_counts(std::str::from_utf8(&pinned_read(&store.join("STORE.tsv").to_string_lossy(), &args[4], READ_BUDGET as usize)?)?)?;
+    let keys = pinned_read(&args[5], &args[6], READ_BUDGET as usize)?;
+    let seed = u64::from_be_bytes(keys.get(keys.len().saturating_sub(8)..).filter(|w| w.len() == 8).ok_or("a key file of fewer than eight bytes")?.try_into()?);
+    let codec = FieldCodec::from_text(&String::from_utf8(pinned_read(&args[7], &args[8], READ_BUDGET as usize)?)?, units)?;
+    let (documents, prompt, run) = (positive(&args[9])?, positive(&args[10])?, positive(&args[11])?);
+    let out = Path::new(&args[12]);
+    let learner = FieldLearner::from_text(std::str::from_utf8(&pinned_read(&args[13], &args[14], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
+    if learner.field.declaration.alphabet != codec.alphabet() {
+        return Err("a state whose alphabet is not its codec's".into());
+    }
+    let role = "held";
+    let names = role_names(&counts, role);
+    // Each problem: its slice, its document, its prompt's classes, its prompt's bytes and its reference continuation's bytes.
+    let mut problems: Vec<(&str, u64, Vec<usize>, Vec<u8>, Vec<u8>)> = Vec::new();
+    for &name in &names {
+        let mut slice = open_slice(store, role, name, &counts)?;
+        let chosen: Vec<usize> = (0..slice.pieces.len()).filter(|&k| slice.pieces[k].opens && slice.pieces[k].places() >= (prompt + run) as u64).take(documents).collect();
+        for k in chosen {
+            let bytes = slice.bytes(k, 0, (prompt + run) as u64)?;
+            let classes = codec.encode(&bytes[..prompt])?;
+            if classes.len() != prompt {
+                return Err("a prompt whose bytes are not one class each".into());
+            }
+            problems.push((name, slice.pieces[k].document, classes, bytes[..prompt].to_vec(), bytes[prompt..].to_vec()));
+        }
+    }
+    if problems.is_empty() {
+        return Err("no held piece holds the prompt and the run".into());
+    }
+    std::fs::create_dir(out)?;
+    println!("STORE_WRITE_LAW problems={} documents={documents} prompt={prompt} run={run} sweeps={run} refine=0 run_bound=0 near_tail=true place_order=false lengths=none one_end=false alphabet={} void={} ms={}", problems.len(), codec.alphabet(), codec.void(), started.elapsed().as_millis());
+    let release: Vec<(&[usize], usize)> = problems.iter().map(|p| (p.2.as_slice(), run)).collect();
+    let mut reads = 0usize;
+    let written = learner
+        .field
+        .sample_runs(&release, run, 0, codec.void(), seed, 0, true, false, None, false, realization, &mut |_, _| {
+            reads += 1;
+            true
+        }, &mut |_| {})
+        .map_err(|e| e.to_string())?;
+    let mut index: HashMap<&str, usize> = HashMap::new();
+    for ((name, document, _, prompt_bytes, reference), written) in problems.iter().zip(&written) {
+        let i = index.entry(name).or_insert(0);
+        let stem = format!("{name}_{:02}", *i);
+        *i += 1;
+        let before_void = written.iter().position(|&c| c == codec.void()).unwrap_or(written.len());
+        let text = codec.decode(written);
+        write_new(&out.join(format!("{stem}.prompt")), prompt_bytes)?;
+        write_new(&out.join(format!("{stem}.written")), &text)?;
+        write_new(&out.join(format!("{stem}.reference")), reference)?;
+        println!("STORE_WRITE slice={name} problem={stem} document={document} written_places={before_void} written_octets={} reads={reads}", text.len());
+    }
+    println!("STORE_WRITE_DONE problems={} reads={reads} {} ms={}", problems.len(), counters_text(realization), started.elapsed().as_millis());
+    Ok(())
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -602,7 +858,7 @@ mod tests {
             let (q4, a4, _, done) = cut_of(0x5EED, d, 1, true, LEAST, OCTAVES);
             assert_eq!((q4, a4, done), (0, 1, true), "a piece of one place");
         }
-        let p = Piece { offset: 0, title: 5, text: 9, opens: true, closes: true };
+        let p = Piece { document: 0, offset: 0, title: 5, text: 9, opens: true, closes: true };
         assert_eq!(p.places(), 15);
         assert_eq!(Piece { opens: false, title: 0, ..p }.places(), 9);
         assert_eq!(Piece { title: 0, ..p }.places(), 9, "a piece that opens with no title has no line feed");
@@ -617,7 +873,7 @@ mod tests {
         for d in 1..400u64 {
             let (q, a) = (7usize, 30usize);
             let classes: Vec<usize> = (0..q + a + NEAR).map(|t| t % 5).collect();
-            let (region, kind, counted) = state_of(0xABCD, d, classes, q, a);
+            let Stretch { region, kind, counted, .. } = state_of(0xABCD, d, classes, q, a);
             let open = region.unresolved.iter().filter(|&&u| u).count();
             match kind {
                 Kind::Writer => {
@@ -636,5 +892,52 @@ mod tests {
             }
         }
         assert!(writers > 100 && masks > 100, "{writers} {masks}");
+    }
+
+    /// [measurement; theory, November 12, P49 item 3g] **A region's code from the read's sum is the field's code**: on a small store written to a
+    /// scratch directory (pieces that open with a title and close, and one that opens with none), the cut's stretches read through the host
+    /// realization give, region by region, the same code and count from [`region_code`] as [`holonics::hnn::tower::field::Field::code`] reads
+    /// for the same plain region, and both kinds of state are met.
+    #[test]
+    fn a_regions_code_from_the_reads_sum_is_the_fields_code() {
+        use holonics::hnn::tower::field::{Field, FieldDeclaration, HostField};
+        use holonics::hnn::units::Units;
+        let dir = std::env::temp_dir().join(format!("store_read_test_{}_{}", std::process::id(), line!()));
+        let _ = std::fs::remove_dir_all(&dir);
+        std::fs::create_dir_all(&dir).unwrap();
+        let docs: Vec<(Vec<u8>, Vec<u8>)> = (0..12u8)
+            .map(|k| (if k % 4 == 3 { Vec::new() } else { format!("Title {k}").into_bytes() }, (0..40 + 7 * k as usize).map(|t| b"abcdefghij klmnop,."[(t * 7 + k as usize) % 19]).collect()))
+            .collect();
+        let (mut bin, mut tsv) = (Vec::new(), String::from(INDEX_HEAD) + "\n");
+        for (k, (title, text)) in docs.iter().enumerate() {
+            bin.extend_from_slice(title);
+            bin.extend_from_slice(text);
+            tsv.push_str(&format!("{k}\t{}\t{}\t1\t1\n", title.len(), text.len()));
+        }
+        std::fs::write(dir.join("DOCS_code.bin"), &bin).unwrap();
+        std::fs::write(dir.join("DOCS_code.tsv"), &tsv).unwrap();
+        let counts: HashMap<(String, String), (u64, u128)> = [(("prefix".to_string(), "code".to_string()), (docs.len() as u64, bin.len() as u128))].into_iter().collect();
+        let slice = open_slice(&dir, "prefix", "code", &counts).unwrap();
+        let every: Vec<u8> = docs.iter().flat_map(|(a, b)| a.iter().chain(b).copied()).collect();
+        let codec = FieldCodec::found(Units::bytes(), &[(b"q".to_vec(), every)]).unwrap();
+        let d = FieldDeclaration { alphabet: codec.alphabet(), width: 8, heads: 2, modes: 3, still: 1, contacts: 4, ticks: 2, frames: 2, reach: 160, lanes: 1, depth: 0, carry: 0, triads: 0 };
+        let keys: Vec<u8> = (0..1u64 << 14).flat_map(|i| (i.wrapping_add(1).wrapping_mul(0x9E37_79B9_7F4A_7C15) ^ (i << 17)).to_be_bytes()).collect();
+        let field = Field::found(d, &keys).unwrap();
+        let pass = StorePass { role: "prefix".into(), store: "ab".repeat(32), stretches: 0, least: LEAST, octaves: OCTAVES, pairs: PAIRS_BOUND, sites: SITES_BOUND, slices: vec![PassSlice { name: "code".into(), piece: 0, cursor: 0, taken: 0 }] };
+        let mut cut = Cut { seed: 0x5EED, slices: vec![slice], pass };
+        let mut stretches = Vec::new();
+        while let Some(drawn) = cut.next() {
+            stretches.push(cut.take(drawn, &codec).unwrap());
+        }
+        assert!(stretches.len() >= 12, "{}", stretches.len());
+        assert!(stretches.iter().any(|s| s.writer.is_some()) && stretches.iter().any(|s| s.writer.is_none()), "both kinds of state");
+        let regions: Vec<TrainRegion> = stretches.iter().map(|s| s.region.clone()).collect();
+        let views = views_of(&regions);
+        let faces = HostField.read_faces(&field, &views).unwrap();
+        for ((region, view), faces) in regions.iter().zip(&views).zip(&faces) {
+            let (code, places) = region_code(faces, region).unwrap();
+            assert_eq!((code, places), field.code(view).unwrap());
+        }
+        let _ = std::fs::remove_dir_all(&dir);
     }
 }

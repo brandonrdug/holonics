@@ -35,7 +35,8 @@ The cut (the record of November 12 on the opening's room, section 4; agent-infer
 What it prints. `--draw N`: N stretches of a piece with no end, the cut's means and its price at the code line's own
 fitted rates. `--bound OCTETS`: the two bounds a reservation gives at a declaration's octets a pair and a site.
 `--store DIR --role prefix --keys K --sections M`: the first M sections of the pass over a store, one line a section
-(regions, sites, domain, sites squared, open rows' pairs, by kind), which the trainer's own lines are held to.
+(regions, sites, domain, sites squared, open rows' pairs, by kind), which the trainer's own lines are held to. `--slice NAME`: that
+slice of the role read alone from stretch 1 (the cut `read-store` reads each slice by, P49 of November 12).
 Numbers only: no path, no text, no key.
 
   python3 -I store_stretch_census.py --draw 100000
@@ -198,6 +199,10 @@ def store(args):
             role, name, _, _, _, count, _, octets, _ = line.rstrip("\n").split("\t")
             roles[(role, name)] = (int(count), int(octets))
     names = [n for n in SLICES if (args.role, n) in roles]
+    if args.slice is not None:
+        if args.slice not in names:
+            sys.exit("a slice the role does not hold")
+        names = [args.slice]
     pieces = {n: pieces_of(args.store, args.role, n, roles[(args.role, n)][0]) for n in names}
     quota = {n: roles[(args.role, n)][1] for n in names}
     at = {n: [0, 0] for n in names}  # the piece and the cursor in it
@@ -251,6 +256,7 @@ def main():
     ap.add_argument("--role", default="prefix")
     ap.add_argument("--keys")
     ap.add_argument("--sections", type=int, default=64)
+    ap.add_argument("--slice", help="read this slice of the role alone, from stretch 1")
     args = ap.parse_args()
     if args.bound is not None:
         pairs, sites = bounds(args.bound, args.pair_octets, args.site_octets)
