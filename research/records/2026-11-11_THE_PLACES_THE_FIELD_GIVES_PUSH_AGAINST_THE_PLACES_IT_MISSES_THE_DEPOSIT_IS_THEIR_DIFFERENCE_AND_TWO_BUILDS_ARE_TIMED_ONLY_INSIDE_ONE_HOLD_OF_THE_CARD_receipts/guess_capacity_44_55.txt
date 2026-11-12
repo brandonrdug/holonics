@@ -1581,3 +1581,37 @@ G113 fixed 2026-11-12T16:33Z (the commit's time), before its run: where te7's la
   - batch setup over 0.10 of elapsed with the card idle: the next section's tables staged on the host under the card's stroke, joined at the section's crossing (November 11's second step);
   - short launches over 0.15 of kernel time: the chain's launches joined where their reads and writes commute.
   The rate it is read against: te7's 9.2 KB of passage a second, about 30 hours a pass over a gigabyte.
+G113 read 2026-11-12T16:39Z (te7p, the PC's P43): INCOMPLETE. The run's first hundred sections ran at 1,138 ms a section against te7's 839.1 ms on the
+same sections (1.357 times; deposit_ms 1,086.1 against 800.5, regions_ms 1.1 against 1.2), past the bound of 1,100 ms, and the watcher stopped it at
+16:39:43Z, its lock held from 16:37:36. Card peak 10,554 MiB. Gate held: 100 of 100 FIELD_SECTION lines equal te7's for the same sections, timings
+aside. field_pass prints FIELD_PROFILE, FIELD_PROFILE_SPLIT and FIELD_PHASE only at the run's end, so the stopped run printed none, wrote no state and
+no MEASURE line. Receipt: commit 594c422fe on claude/carry-reads.
+  (e) MISSED: 1,138 ms against 850 (820 to 950). Its premise was the record of the host and the card as one surface: on November 11 a profiled
+  training section took 0.670 s against 0.683 s unprofiled, because the host and the card took strict turns, so a wait at every launch cost nothing.
+  On this line it costs 299 ms a section, so the line now runs part of its work while the card computes, or launches many more and shorter kernels a
+  section, or both. (a) to (d) are unread.
+G113 re-declared 2026-11-12T16:58Z (the guess file's time), before either run: the read is cut in two so that each run ends by its own lap bound and
+prints. It is not relaunched with a larger bound: te7p's bound came from guess (e), which the read missed, and each new bound comes from a measured
+unit, as the projection standard requires. Both from te6/STATE.0 by bin-carry-coupled 54f9cb36459453d2 with lap_tf.sh's exports and arguments as te7
+had, each in a fresh run directory and its own hold of the card lock, alone on the card with nothing else on the host, at most 12 GB of the card's
+memory and a 12 GiB ceiling on the host's resident set. Gate for each: its FIELD_SECTION lines equal te7's for the same sections, timings aside. The
+states they leave are rulers' and train nothing.
+  - tp1, FIELD_PHASES alone (the host's marks, no synchronization): lap bound 120,000 ms (about 140 sections), the run's 300,000 ms, outer timeout
+    240 s; stopped if its first hundred sections' mean passes 950 ms, te7's own bound for the same unit, an unprofiled section. It scores (d).
+  - tp2, FIELD_PROFILE alone: lap bound 240,000 ms (about 210 sections at the measured 1,138 ms), the run's 400,000 ms, outer timeout 420 s;
+    stopped if its first hundred sections' mean passes 1,290 ms (the measured profiled section with te7's own margin, 950 over 839). It scores (a)
+    to (c). Its totals include the run's opening reads and the stopped lap's withheld read; te7's wall stood 18 s outside its sections, under a
+    tenth of tp2's, and the receipt names it beside the shares.
+  The card's memory (the Fable thread's read of read_octets at te7's declaration, November 12): 280 bytes a pair of a region's sites (the dense pair
+  table of each head and kept tick, both ways, with its deltas) and 71,486 bytes a site, of which 6,400 follow the face width; at te7's 672 sites a
+  region the pairs hold 188 KB a site, 72 % of it. The pool keeps freed buffers up to its batch budget, so a peak near 10.5 GB is the budget held, not
+  the need: tp2's FIELD_CARD peak_store is the need, and the receipt prints it beside the budget.
+  (f), fixed now, on where the 299 ms go. The derivation (agent-inferred): November 11's profile launched about 1,900 kernels a section (575,104
+  over 301 sections and the reads), and a launch timed alone pays its latency before and after it (its least launch took 23 us), so the launches'
+  own latency explains about a sixth of 299 ms, and the rest is host work the unprofiled lap now runs under the card's.
+  (f1) tp2's launches a section 2,400 (1,800 to 3,500).
+  (f2) tp2's host time between its timed calls (elapsed less kernels, copies and allocations) 0.25 of elapsed (0.17 to 0.35).
+  (f3) tp1's sections at te7's rate: their mean within 3 % of 839 ms.
+  Rule, beside G113's: launches a section past 3,500 say the 299 ms are launch latency, the profile's shares overstate the short entries, and joining
+  launches comes before the contact's widths; (f1) and (f2) inside their ranges say the host's stroke already runs under the card's and the card's
+  own time sets the section, so the next loop is the largest family of the card's entries, read by (c).
