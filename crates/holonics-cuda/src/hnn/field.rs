@@ -272,6 +272,11 @@ struct Words {
     // [theory, November 12, P51] The skins' support stride: each region's prefix of `S_r K_r` (`FieldWords::region_soff`) and their sum `E2`.
     region_soff: u64,
     skin_entries: u64,
+    // [theory, November 12, P50 step 2] A clock's near phases and skins (`FieldWords::mphase`, `mskin`), the moment modes' map and their count.
+    mphase: u64,
+    mskin: u64,
+    mcmap: u64,
+    tm: u64,
 }
 
 /// The moment kernels' words (`MomentWords` in `kernels/field_moment.cuh`, field for field): the batch's
@@ -365,6 +370,8 @@ pub struct FieldTimes {
     pub skin_dense_pairs: u128,
     pub skin_peak_entries: u64,
     pub skin_peak_pairs: u64,
+    /// [measurement; theory, November 12, P50 step 2] A clock's near phases and skins: octets a site.
+    pub clock_site_octets: u64,
     /// The batches' cut: four fifths of the batch budget less the exponential's face, the last run's.
     pub batch_cut: u64,
 }
@@ -372,13 +379,18 @@ pub struct FieldTimes {
 /// [theory, November 12, P50 step 1 and P51] The clock's skin store of a region of `sites` sites, `definite` of them definite
 /// ([`CardField::skin_fill`]): 32 bits a paced head, support entry and mode over the row's support stride `K = NEAR_SLOTS + definite` (atlas
 /// `tower.field-support-stride`: every row's support fits it), and a paced head, site, crowd slot and mode. Returns (the region's octets, octets a
-/// reserved entry, octets a site's crowd edges).
-pub fn skin_octets(d: &FieldDeclaration, sites: usize, definite: usize) -> (u64, u64, u64) {
+/// reserved entry, octets a site's crowd edges, octets a site's near phases and skins).
+pub fn skin_octets(d: &FieldDeclaration, sites: usize, definite: usize) -> (u64, u64, u64, u64) {
     let per = 4 * d.paced_heads() as u64 * d.modes as u64;
     let (entry, site) = (per, per * crowd_slots(d.reach) as u64);
     let stride = (2 * (NEAR - 1) + definite) as u64;
-    (entry * sites as u64 * stride + site * sites as u64, entry, site)
+    // [theory, November 12, P50 step 2] A clock's near phases (two words) and skins (one), a moment mode and near offset of each site.
+    let moment = if d.paced_heads() > 0 { 12 * (d.moment_modes() * CLOCK_NEAR) as u64 } else { 0 };
+    (entry * sites as u64 * stride + (site + moment) * sites as u64, entry, site, moment)
 }
+
+/// The near offsets a moment mode reads about a site, `2(NEAR − 1)` (the clock's store, `near_slot`).
+const CLOCK_NEAR: usize = 2 * (NEAR - 1);
 
 /// A region's definite sites (the stage's `definite`: known and carrying no face, or locked).
 fn definite_sites(region: &Region) -> usize {
@@ -1332,7 +1344,7 @@ impl<'c> CardField<'c> {
             let entries = batch.clone().map(|r| (lengths[r] * (2 * (NEAR - 1) + definite[r])) as u64).sum::<u64>();
             let dense = lengths[batch.clone()].iter().map(|&n| (n * n) as u64).sum::<u64>();
             let t = &mut self.times;
-            (t.skin_entry_octets, t.skin_site_octets) = (skin_octets(&d, 0, 0).1, skin_octets(&d, 0, 0).2);
+            (t.skin_entry_octets, t.skin_site_octets, t.clock_site_octets) = (skin_octets(&d, 0, 0).1, skin_octets(&d, 0, 0).2, skin_octets(&d, 0, 0).3);
             t.skin_store = t.skin_store.max(store);
             (t.skin_entries, t.skin_dense_pairs) = (t.skin_entries + u128::from(entries), t.skin_dense_pairs + u128::from(dense));
             if entries > t.skin_peak_entries {
@@ -1569,6 +1581,10 @@ impl<'c> CardField<'c> {
         let mix_share_at = pack.put(&mix_share_up);
         let (dlist_at, dstart_at, olist_at, ostart_at) = (pack.put(&dlist), pack.put(&dstart), pack.put(&olist), pack.put(&ostart));
         let region_soff_at = pack.put(&region_soff);
+        // [theory, November 12, P50 step 2] The moment modes' map (the moment kernels' `cmap`, `moment_modes`), for the clock's fill.
+        let d = declaration;
+        let mcmap: Vec<u32> = (0..d.heads).filter(|&h| d.carries_moment(h)).flat_map(|h| (0..d.modes).map(move |li| (h * d.modes + li) as u32 | if d.is_depth(h) { 1 << 31 } else { 0 })).collect();
+        let mcmap_at = pack.put(if mcmap.is_empty() { &[0u32][..] } else { &mcmap[..] });
         let tables = self.timed(Kind::Copy, || self.take_up(&pack.bytes)).map_err(device)?;
         let base = tables.device_ptr();
         let status = self.timed(Kind::Alloc, || self.take_zeroed::<u32>(1)).map_err(device)?;
@@ -1592,6 +1608,7 @@ impl<'c> CardField<'c> {
         words.mix_class = base + mix_class_at;
         words.mix_share = base + mix_share_at;
         words.region_soff = base + region_soff_at;
+        (words.mcmap, words.tm) = (base + mcmap_at, mcmap.len() as u64);
         words.skin_entries = skin_entries as u64;
         words.dlist = base + dlist_at;
         words.dstart = base + dstart_at;
@@ -1887,6 +1904,16 @@ impl<'c> CardField<'c> {
             None
         };
         (words.skin, words.cskin) = skins.as_ref().map_or((0, 0), |(a, b)| (a.device_ptr(), b.device_ptr()));
+        // [theory, November 12, P50 step 2] A clock's near phases (two words) and skins (one) a moment mode, site and near offset; one store, formed
+        // again for each clock where its moments are read (`clock_fill`).
+        let tm = d.moment_modes();
+        let clock_store = if paced > 0 && tm > 0 {
+            let near = tm * sites * CLOCK_NEAR;
+            Some((self.timed(Kind::Alloc, || self.take::<u32>(2 * near)).map_err(device)?, self.timed(Kind::Alloc, || self.take::<u32>(near)).map_err(device)?))
+        } else {
+            None
+        };
+        (words.mphase, words.mskin) = clock_store.as_ref().map_or((0, 0), |(a, b)| (a.device_ptr(), b.device_ptr()));
         words.kappa = kappa.device_ptr();
         words.tau = tau.device_ptr();
         words.sigma = sigma.device_ptr();
@@ -2222,6 +2249,8 @@ impl<'c> CardField<'c> {
         let (mut bp, mut ap, mut sp, mut upp, mut dnp, mut none) = (before.device_ptr(), after.device_ptr(), s.device_ptr(), up.device_ptr(), down.device_ptr(), 0u64);
         let (mut w2, mut base_b, mut base_a, mut tm32) = (*words, l.moment_before as u64, l.moment_after as u64, tm as u32);
         let (mut zero32, mut stride, mut pre_stride) = (0u32, strand, prefix);
+        // The clock's phases and skins, once, for its moments (the return forms them again for its own).
+        self.clock_fill(field, words, sites)?;
         let grid = |x: usize| Dim3 { x: x.max(1) as u32, y: tm as u32, z: 1 };
         let _ = n;
         self.launch("field_moment_strands_all", Self::cells((sites * tm) as u64), THREADS, &mut [arg(&mut w2), arg(&mut base_b), arg(&mut base_a), arg(&mut tm32), arg(&mut bp), arg(&mut ap)])?;
@@ -2552,7 +2581,9 @@ impl<'c> CardField<'c> {
             self.launch("field_pace_current_back", Self::cells((paced * sites) as u64), THREADS, &mut [arg(words), arg(&mut dyp), arg(&mut yp)])?;
         }
         card.zero_octets(&dp, 0, 8 * sites * m2).map_err(device)?;
-        // The tick's clock's skins, formed again for its return (the forward's store holds a later tick's).
+        // The tick's clock's phases and skins and its pairs' skins, formed again for its return (the forward's stores hold a later tick's): the crowd
+        // edges and the moments' return read the clock's.
+        self.clock_fill(field, words, sites)?;
         self.skin_fill(field, words, sites)?;
         if let Some(profile) = &self.profile {
             let mut p = profile.borrow_mut();
@@ -2876,10 +2907,8 @@ impl<'c> CardField<'c> {
         if cfg!(debug_assertions) {
             let n = d.modes;
             let pair_words = paced * words.skin_entries as usize * n;
-            let crowd_words = paced * sites * words.slots as usize * n;
             let stream = self.card.stream();
             stream.memset_u32_async(words.skin, u32::MAX, pair_words.max(1)).map_err(|e| device(e.into()))?;
-            stream.memset_u32_async(words.cskin, u32::MAX, crowd_words.max(1)).map_err(|e| device(e.into()))?;
         }
         #[cfg(test)]
         if self.unfilled.get() {
@@ -2887,6 +2916,31 @@ impl<'c> CardField<'c> {
         }
         let mut pc = paced as u32;
         self.launch("field_skin_fill", Self::rows_grid((paced * sites) as u64, CONTACT_ROWS), (CONTACT_ROWS * 32) as u32, &mut [arg(words), arg(&mut pc)])
+    }
+
+    /// [definition; theory, November 12, P50 step 2 (G116 b)] **The clock's phases and skins, formed once** (`field_clock_fill`): after a clock is set,
+    /// every moment mode's near phases and skins at every site of a paced head, and its far skins into the crowd edges' store, read by the moments, the
+    /// skinned prefixes, the moments' return and the clocks' covector, and by the contact's crowds. The test build first writes `PHASE_UNFILLED` and
+    /// `SKIN_UNFILLED` over the stores, so a reader of a word no fill formed is refused (`REFUSED_UNFILLED`).
+    fn clock_fill(&self, field: &Field, words: &Words, sites: usize) -> Result<()> {
+        let d = field.declaration;
+        let tm = words.tm as usize;
+        if tm == 0 || words.mphase == 0 || words.cskin == 0 {
+            return Ok(());
+        }
+        if cfg!(debug_assertions) {
+            let stream = self.card.stream();
+            let near = tm * sites * CLOCK_NEAR;
+            stream.memset_u32_async(words.mphase, 0x8000_0000, 2 * near).map_err(|e| device(e.into()))?;
+            stream.memset_u32_async(words.mskin, u32::MAX, near).map_err(|e| device(e.into()))?;
+            stream.memset_u32_async(words.cskin, u32::MAX, (d.paced_heads() * sites * words.slots as usize * d.modes).max(1)).map_err(|e| device(e.into()))?;
+        }
+        #[cfg(test)]
+        if self.unfilled.get() {
+            return Ok(());
+        }
+        let mut fw = *words;
+        self.launch_grid("field_clock_fill", Dim3 { x: Self::cells(sites as u64), y: tm as u32, z: 1 }, THREADS, 0, &mut [arg(&mut fw)])
     }
 
     /// The batch's refusals, read off the card.
