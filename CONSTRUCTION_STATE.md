@@ -78,7 +78,7 @@ repository was reset on September 24; the pre-reset tree is
   0.019 back, to 0.032 above rt28's. So the turn is the friction's chart itself and not its heat,
   and the circles' reach where a region is mostly open is the circle line's next subject, after the
   triads' first lap. With `C = 0` the field is the plain line bit for bit.
-- **The triad** (founded on te4's end, its first lap training; atlas `contact.triad-manley-rowe-gauge`,
+- **The triad** (founded on te4's end, its first lap read; atlas `contact.triad-manley-rowe-gauge`,
   `code.triad-character-of-composition`;
   [the triad record](research/records/2026-11-12_THE_LAW_ACROSS_A_PLACE_IS_HELD_BY_A_PUMPED_CONTACT_A_TRIAD_IS_A_CHARACTER_OF_A_LAW_OF_COMPOSITION_AND_ITS_THREE_LEGS_EXCHANGE_EQUAL_QUANTA.md)).
   A place's projection times its two strand mates', `c(t) = α(t) β(t − 1) γ(t + 1)`, each a complex
@@ -92,9 +92,16 @@ repository was reset on September 24; the pre-reset tree is
   `R^(−0.56)`, so `J = 16` (8,288 entries). The build passed its host gate, its review and its card
   gates and is on `main` (PR #701): with no triads it reproduces te4's lap line for line and byte for
   byte and reads te4's mean as te4's binary did, its growth on te4's end keeps every face, and its
-  triads read the host's bits on the card. The founding's first lap, tt1, trains at eight times on
-  the triad part beside te5 (G105); its development section priced a change 2.13 times its
-  control's at 1.03 times the time. The
+  triads read the host's bits on the card. The founding's first lap, tt1, at eight times on the
+  triad part, led te5 by 0.0025 nats a place over the held passage at lap means (G105 scored),
+  where the derivation had put 0.006, with its return charged to 0.060 of the plain contacts'. On
+  the first 32 held problems' 8,760 places its gain stands where exactly two letters are written
+  within two places of the open place: 0.008 with both mates alone written, 0.007 with two on the
+  left, 0.001 to 0.002 with none or one, and less again where more are written. So the triads hold a
+  law of the place and two near letters, about a hundredth of what the field lacks there, at half
+  the gain for their charge that the circles' first raised lap took, and no second triad lap trains. The cut of their return
+  (G107) reads whether that law is the triads' own before the next founding: the circles' triad
+  (the record's form (ii)) if it is, the mates' letters on the legs if it is not. The
   field's learner steps each entry at its own divisor, so the gauge's equal gains of the legs are no
   prediction for it; its covectors keep the scale identity at every state (the record, 3.2).
 - **The learner** (`FieldLearner`; the trainer is

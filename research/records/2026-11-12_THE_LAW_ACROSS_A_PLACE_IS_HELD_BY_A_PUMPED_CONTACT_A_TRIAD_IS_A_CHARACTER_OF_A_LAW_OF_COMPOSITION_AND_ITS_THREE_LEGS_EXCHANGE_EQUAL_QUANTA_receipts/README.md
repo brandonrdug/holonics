@@ -23,4 +23,20 @@ written here. None of it uses the card.
   1.0914`. The repeat reads 1.0474 again and equals the first run on every step line through step 225, under the
   NumPy the November 10 ruler ran under (2.5.4). Every held line and the best are equal, so no figure the guess reads
   moved. G102's score is in the guess file.
-- The guess G102 is in `guess_capacity_44_55.txt` in the receipts of the record of the places (2026-11-11).
+- The build's gates (G105's premise), from the PC, on the card (the RTX 4080 SUPER under the card lock):
+  - `g105_triad_gates.txt`: gates (i) to (vi) on the triad build, the binary `bin-triad` (sha256 48ab0d52c2291b6f): gate 1,
+    the GPU suite alone on the idle card, the Lean build, and the three below;
+  - `g105_te4r_lines.txt`: the reproduction, one lap at `J = 0` from te3's end, every line against te4's, timings aside, and its
+    states against te4's byte for byte;
+  - `g105_te4_reads_bin_triad.txt`: te4's lap mean read by the triad build, the held read and the transmission read, each line
+    against te4's own read's;
+  - `g105_grow_triad.txt`: the founding of 16 triads on te4's end, every face of its 1,020 states kept.
+- tt1, the founding's first lap (G105), from the PC, each its own hold of the card lock:
+  - `g105_tt1_dev.txt`: TT0's opening and its gates, and the development section, the build between two controls;
+  - `g105_tt1_lines.txt`: the lap's lines, its sections past 200,000 millionths with their parts, and its errors, refusals
+    and stops (no refusal; the three stops are the development sections' at their 1 ms bound);
+  - `g105_tt1_reads.txt`: the held reads of tt1's lap mean and end, the transmission read of its mean, and the charge.
+- `charge_t.py STATE...`: the return's charge, `W_T`'s rms over all its rows against the rms of `W`'s plain contacts' columns
+  on the first lane's rows, read through `tools/state_travel.py`'s layout; one thread, writes nothing.
+- The guesses G102, G105, G106 and G107 are in `guess_capacity_44_55.txt` in the receipts of the record of the places
+  (2026-11-11).

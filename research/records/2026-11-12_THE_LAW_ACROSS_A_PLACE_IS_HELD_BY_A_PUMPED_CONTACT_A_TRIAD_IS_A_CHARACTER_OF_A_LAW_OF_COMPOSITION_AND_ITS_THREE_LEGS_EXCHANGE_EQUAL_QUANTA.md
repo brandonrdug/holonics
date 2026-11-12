@@ -294,14 +294,56 @@ lock, so that `arg α + arg β + arg γ` stands still across the places that sha
 ## 8. Owed
 
 - The build (section 4) at `J = 16` with its parity, the reproduction lap, the founding's guess and
-  its laps.
-- Lean, for #410: the character decomposition of the cyclic law (3.1) and the triad's gauge identity
-  with its conserved differences under a step at equal rates (3.2).
+  its first lap: done (PRs #701 and #702; G105, section 9).
+- Lean, for #410: the character decomposition of the cyclic law (3.1), and the triad's gauge
+  identity with its conserved differences under a step at equal rates (3.2, written with the build
+  as `HNN/TriadGauge`; its box ticked from the PC).
+- The check of the built object (G107, section 9) and the founding it sends the line to.
+
+## 9. The first lap (G105) and the check of the built object (G107)
+
+November 12, 12:15 to 12:51 UTC. tt1 is one lap from TT0 (te4's end with the triads founded and
+`W_T` at zero), at eight times on the triad part and the base on every other part, on te5's
+sections. It was read at its lap mean beside te5's. G105 was fixed before it trained and scored after,
+misses included, in the guess file.
+
+- The held joint stands 0.0025 nats a place under te5's over the held passage's 43,470 places, where
+  the derivation put 0.006. By quarter of open sites the gain is none in quarter 1 and 0.003 in each
+  of quarters 2 to 4. The derivation put the most in quarter 2 and the least in quarter 4.
+- The transmission rows cover the first 32 held problems' 8,760 places, sorted by how many written
+  letters stand within two places of the open place.
+  - With none or one, the gain is 0.001 to 0.002.
+  - With two, it is the most: 0.0080 with both mates alone written (both sides at d = 1), 0.0071 with
+    two on the left, and 0.0076 for the split (2,1).
+  - With more, it is less: 0.0056, 0.0027 and 0.0029 for both sides at d = 2, 3 and 4.
+- The return's charge, `W_T`'s rms over the plain contacts' columns of `W`, is 0.060. The circles'
+  first raised lap (tp1) was charged to 0.0615 and bought about twice as much a unit of charge (0.078
+  against 0.042 nats a place).
+
+[measurement; the reading agent-inferred] The triads hold a law of the place and two written
+letters near it. Across the place it is the object of section 3. On one side it acts through each
+mate's read of its own near field (3.3). Its increment falls where more letters are written, since
+the field's other parts hold the near law there. At both sides d = 2 the field lacks 0.556 nats a
+place against the joint table, and the triads bought 0.0056 of it, about a hundredth. So no second
+lap trains on this founding. A first reading, at 12:45, was that the legs read context rather than
+letters. It was withdrawn at 12:51, before any further read, because the rows with none or one near
+letter count against it.
+
+G107, fixed before its read, checks whether that law is the triads' own. It cuts the return `W_T`
+from tt1's lap mean, and the triad build reads the cut state as it read tt1's, row by row.
+- If the rows with two near letters rise at least two and a half times as much as the rows with one
+  (the guess is four), and both mates' row rises at least 0.004, then the object is the theory's and
+  its reach is short. The circles' triad (ii) is the next founding, by a derivation fixed first.
+- If they rise less than one and a half times as much, or both mates' row under 0.002, then the
+  legs are given their mates' letters before any founding.
 
 ## Receipts
 
 In [`…_receipts/`](2026-11-12_THE_LAW_ACROSS_A_PLACE_IS_HELD_BY_A_PUMPED_CONTACT_A_TRIAD_IS_A_CHARACTER_OF_A_LAW_OF_COMPOSITION_AND_ITS_THREE_LEGS_EXCHANGE_EQUAL_QUANTA_receipts/README.md):
 `cap_t.py`, its control `cap_t_synth.log.txt`, its gradient check `cap_t_fd.py` and
 `cap_t_fd.log.txt`, and G102's six runs `cap_t_2_0.log.txt` to `cap_t_2_64.log.txt` and
-`cap_t_2_0_repeat.log.txt`. G102, fixed and scored, is in `guess_capacity_44_55.txt` in the receipts of
+`cap_t_2_0_repeat.log.txt`; the build's gates `g105_triad_gates.txt`, `g105_te4r_lines.txt`,
+`g105_te4_reads_bin_triad.txt` and `g105_grow_triad.txt`; tt1's `g105_tt1_dev.txt`,
+`g105_tt1_lines.txt` and `g105_tt1_reads.txt`, with the charge's ruler `charge_t.py`. G102 and
+G105, fixed and scored, and G106 and G107, fixed, are in `guess_capacity_44_55.txt` in the receipts of
 [the record of the places](2026-11-11_THE_PLACES_THE_FIELD_GIVES_PUSH_AGAINST_THE_PLACES_IT_MISSES_THE_DEPOSIT_IS_THEIR_DIFFERENCE_AND_TWO_BUILDS_ARE_TIMED_ONLY_INSIDE_ONE_HOLD_OF_THE_CARD.md).
