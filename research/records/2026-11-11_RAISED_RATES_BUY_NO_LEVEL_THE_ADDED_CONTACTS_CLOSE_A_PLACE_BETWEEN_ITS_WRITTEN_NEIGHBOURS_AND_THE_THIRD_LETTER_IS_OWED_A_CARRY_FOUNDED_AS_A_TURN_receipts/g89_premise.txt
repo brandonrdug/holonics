@@ -1,4 +1,4 @@
-# G89's premise (P11 step 3), 2026-11-12 00:35:12 UTC, the host only, no card, one thread (taskset to one core, OMP_NUM_THREADS=1), 0.3 s.
+# G89's premise (P12 step 3, the order sent 00:26Z), 2026-11-12 00:35:12 UTC, the host only, no card, one thread (taskset to one core, OMP_NUM_THREADS=1), 0.3 s.
 # The block law's build at f396f5207 (claude/project-thread-ixf4in: ddf7e6784, the block law, and the one fix of part_rates.py's two
 # `import state_travel` sites under python3 -I), in its worktree: python3 -I tools/part_rates.py blocks RUN/rt15/MEAN.0 RUN/rt16/MEAN.0
 # RUN/rt17/MEAN.0 RUN/rt18/MEAN.0 RUN/rt18/STATE.0 b0.STATE 1535 16560945 (RUN the line's run directory; SECTIONS 1,535 and SITES 16,560,945,
