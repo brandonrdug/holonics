@@ -67,10 +67,11 @@ fn run(args: &[String]) -> Result<()> {
         started.elapsed().as_millis()
     );
     // [measurement; theory, November 12, P50 step 1 and P51] The clock's skin store: octets a reserved entry and a site, the support entries beside the
-    // dense pairs, the largest batch's, and the reservation's peak.
+    // dense pairs, the largest batch's, the reservation's peak and its cut, and the card's free memory at the open (P52: a split is read as the
+    // desktop's use of the card, never the build's).
     println!(
-        "FIELD_SKIN octets_a_entry={} octets_a_site={} clock_octets_a_site={} entries={} dense_pairs={} peak_batch_entries={} peak_batch_dense_pairs={} peak_skin_store={} peak_store={} batch_cut={}",
-        t.skin_entry_octets, t.skin_site_octets, t.clock_site_octets, t.skin_entries, t.skin_dense_pairs, t.skin_peak_entries, t.skin_peak_pairs, t.skin_store, t.peak_store, t.batch_cut
+        "FIELD_SKIN octets_a_entry={} octets_a_site={} clock_octets_a_site={} entries={} dense_pairs={} peak_batch_entries={} peak_batch_dense_pairs={} peak_skin_store={} peak_store={} batch_cut={} free_at_open={}",
+        t.skin_entry_octets, t.skin_site_octets, t.clock_site_octets, t.skin_entries, t.skin_dense_pairs, t.skin_peak_entries, t.skin_peak_pairs, t.skin_store, t.peak_store, t.batch_cut, memory.free_bytes
     );
     if let Some(phases) = card.phased() {
         for (name, marks, ns) in phases {
