@@ -17,9 +17,15 @@ c^T_k(t) = α_k(t) β_k(t − 1) γ_k(t + 1),   x_t ← x_t + release(W c_t + W_
 scaling the three legs by `λ, μ, ν ∈ ℂˣ` and the column by `(λ μ ν)⁻¹` leaves it: six real directions
 a triad that no receiver distinguishes. Differentiating that invariance at the identity, a loss read
 through the return has `Re⟨α_k, ∇_α ℓ⟩ = Re⟨w_k, ∇_w ℓ⟩` (and the same for `β` and `γ`, and for each
-leg's turn), so a step at one rate gives each leg the same squared norm to first order: the
-Manley–Rowe relation of three-wave mixing, each wave gaining or losing the same count of quanta. This
-is why the triad's charts and return are one part at one rate.
+leg's turn): the legs and the return are one family that no receiver tells apart, and their
+covectors keep this scale identity at every state. Under a plain step at one rate it gives each leg
+the same squared norm to first order: the Manley–Rowe relation of three-wave mixing, each wave
+gaining or losing the same count of quanta. The field's learner divides each entry's step by its own
+`⌊√v⌋ + 1` (`deposit_step` in `crates/holonics/src/hnn/tower.rs`): at fixed divisors `s` its step keeps
+`Σ s_i |a_i|² − Σ s_j |w_j|²` to first order instead (`conserved_weighted_rows`), and its divisors
+move with what reaches each entry, so equal gains of the legs are no prediction for it. The triad's
+charts and return stay one part at one octave because an octave between the legs would be a rate set
+by hand.
 
 [proved-derived; formal-checked] What is proved.
 
@@ -41,6 +47,10 @@ is why the triad's charts and return are one part at one rate.
    `|α|² − |w|²` by `−2η (Re(conj(g_α) α) − Re(conj(g_w) w)) + η² (|g_α|² − |g_w|²)`, so under the
    scale identity by `η² (|g_α|² − |g_w|²)` with no first-order term; and the same for a leg's whole row
    and its return's column (finite families of entries, the identity summed over the row).
+5. **The learner's form at fixed divisors** (`conserved_weighted_rows`): with a nonzero real divisor
+   `s_i` on each entry, the step `a_i − (η / s_i) g_a,i`, `w_j − (η / s_j) g_w,j` changes
+   `Σ s_i |a_i|² − Σ s_j |w_j|²` by `η² (Σ |g_a,i|² / s_i − Σ |g_w,j|² / s_j)` under the summed scale
+   identity, with no first-order term. It is a form of the legs only while the divisors stand.
 
 The host's tests read the realization's integers (the quarter-turn on `A`'s and `B`'s rows and biases
 leaves every face bit for bit; the reverse against the code's change along a direction).
@@ -144,7 +154,7 @@ theorem scale_identity (ℓ : ℂ → ℂ → ℝ) (a w ga gw : ℂ)
     (hderiv : HasDerivAt (fun s : ℝ => ℓ ((s : ℂ) * a) (w / (s : ℂ)))
       ((conj ga * a).re - (conj gw * w).re) 1) :
     (conj ga * a).re = (conj gw * w).re := by
-  have hev : ∀ᶠ s in nhds (1 : ℝ), ℓ ((s : ℂ) * a) (w / (s : ℂ)) = ℓ a w :=
+  have hev : (fun s : ℝ => ℓ ((s : ℂ) * a) (w / (s : ℂ))) =ᶠ[nhds (1 : ℝ)] fun _ => ℓ a w :=
     (eventually_ne_nhds (one_ne_zero : (1 : ℝ) ≠ 0)).mono fun s hs => hconst s hs
   have h0 : HasDerivAt (fun s : ℝ => ℓ ((s : ℂ) * a) (w / (s : ℂ))) 0 1 :=
     (hasDerivAt_const (1 : ℝ) (ℓ a w)).congr_of_eventuallyEq hev
@@ -161,8 +171,8 @@ theorem turn_identity (ℓ : ℂ → ℂ → ℝ) (a w ga gw : ℂ)
     (hderiv : HasDerivAt (fun θ : ℝ => ℓ (Complex.exp ((θ : ℂ) * I) * a) (Complex.exp (-((θ : ℂ) * I)) * w))
       ((conj gw * w).im - (conj ga * a).im) 0) :
     (conj ga * a).im = (conj gw * w).im := by
-  have hev : ∀ᶠ θ in nhds (0 : ℝ),
-      ℓ (Complex.exp ((θ : ℂ) * I) * a) (Complex.exp (-((θ : ℂ) * I)) * w) = ℓ a w :=
+  have hev : (fun θ : ℝ => ℓ (Complex.exp ((θ : ℂ) * I) * a) (Complex.exp (-((θ : ℂ) * I)) * w))
+      =ᶠ[nhds (0 : ℝ)] fun _ => ℓ a w :=
     Filter.Eventually.of_forall hconst
   have h0 : HasDerivAt (fun θ : ℝ => ℓ (Complex.exp ((θ : ℂ) * I) * a) (Complex.exp (-((θ : ℂ) * I)) * w))
       0 0 :=
@@ -220,6 +230,49 @@ theorem conserved_rows {n m : ℕ} (a ga : Fin n → ℂ) (w gw : Fin m → ℂ)
         - ((∑ i, Complex.normSq (a i)) - (∑ j, Complex.normSq (w j)))
       = η ^ 2 * ((∑ i, Complex.normSq (ga i)) - (∑ j, Complex.normSq (gw j))) := by
   rw [normSq_step_sum, normSq_step_sum]
+  linear_combination (-2 * η) * h
+
+/-- [proved-derived; formal-checked] **The learner's own form at fixed divisors, to first order**: with a nonzero real
+divisor `s_i` on each of a leg's entries `a_i` and `s_j` on each of its return's entries `w_j`, and the
+scale identity summed over the leg's entries and the column's, `Σ Re(conj(g_a,i) a_i) =
+Σ Re(conj(g_w,j) w_j)`, the learner's step `a_i − (η / s_i) g_a,i`, `w_j − (η / s_j) g_w,j` changes
+`Σ s_i |a_i|² − Σ s_j |w_j|²` by `η² (Σ |g_a,i|² / s_i − Σ |g_w,j|² / s_j)`, with no first-order term.
+Each entry's term is `s |x − (η / s) g|² = s |x|² − 2η Re(conj(g) x) + η² |g|² / s`, whose first-order
+part carries no divisor, so the scale identity cancels it whatever the divisors. The form weighs each
+entry by its own divisor: it is not the difference of plain squared norms, and it is a form of the
+legs only while the divisors stand. -/
+theorem conserved_weighted_rows {n m : ℕ} (a ga : Fin n → ℂ) (sa : Fin n → ℝ) (w gw : Fin m → ℂ)
+    (sw : Fin m → ℝ) (η : ℝ) (hsa : ∀ i, sa i ≠ 0) (hsw : ∀ j, sw j ≠ 0)
+    (h : ∑ i, (conj (ga i) * a i).re = ∑ j, (conj (gw j) * w j).re) :
+    (∑ i, sa i * Complex.normSq (a i - ((η / sa i : ℝ) : ℂ) * ga i))
+        - (∑ j, sw j * Complex.normSq (w j - ((η / sw j : ℝ) : ℂ) * gw j))
+        - ((∑ i, sa i * Complex.normSq (a i)) - (∑ j, sw j * Complex.normSq (w j)))
+      = η ^ 2 * ((∑ i, Complex.normSq (ga i) / sa i) - (∑ j, Complex.normSq (gw j) / sw j)) := by
+  -- One entry: `s |x − (η / s) g|² = s |x|² − 2η Re(conj(g) x) + η² (|g|² / s)` for `s ≠ 0`.
+  have hentry : ∀ (x g : ℂ) (c : ℝ), c ≠ 0 →
+      c * Complex.normSq (x - ((η / c : ℝ) : ℂ) * g)
+        = c * Complex.normSq x - 2 * η * (conj g * x).re + η ^ 2 * (Complex.normSq g / c) := by
+    intro x g c hc
+    rw [normSq_step]
+    have hinv : c * c⁻¹ = 1 := by
+      first
+        | exact mul_inv_cancel₀ hc
+        | field_simp
+    first
+      | linear_combination (-2 * η * (conj g * x).re + η ^ 2 * Complex.normSq g * c⁻¹) * hinv
+      | (field_simp; ring)
+  -- A row: the entries' terms summed over a finite family.
+  have hrow : ∀ (k : ℕ) (x g : Fin k → ℂ) (c : Fin k → ℝ), (∀ i, c i ≠ 0) →
+      ∑ i, c i * Complex.normSq (x i - ((η / c i : ℝ) : ℂ) * g i)
+        = (∑ i, c i * Complex.normSq (x i)) - 2 * η * (∑ i, (conj (g i) * x i).re)
+          + η ^ 2 * (∑ i, Complex.normSq (g i) / c i) := by
+    intro k x g c hc
+    first
+      | (rw [Finset.mul_sum, Finset.mul_sum, ← Finset.sum_sub_distrib, ← Finset.sum_add_distrib]
+         exact Finset.sum_congr rfl fun i _ => hentry (x i) (g i) (c i) (hc i))
+      | (rw [Finset.sum_congr rfl fun i _ => hentry (x i) (g i) (c i) (hc i)]
+         simp only [Finset.sum_add_distrib, Finset.sum_sub_distrib, Finset.mul_sum])
+  rw [hrow n a ga sa hsa, hrow m w gw sw hsw]
   linear_combination (-2 * η) * h
 
 end Holonics.HNN.TriadGauge

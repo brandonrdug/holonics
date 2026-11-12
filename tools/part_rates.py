@@ -508,8 +508,11 @@ def blocks(paths, state, out, sections=None, sites=None):
     """[definition; theory, November 12 00:20: G86's rule, branch 1, and the Einstein record's U2] **Every block a part of its own.** The
     blocks are tools/state_travel.py's scale_blocks (each family by lane and by new or old contacts; with carry circles the turn rows and
     the leak rows apart, and their biases apart), the partition G86's polarization was read on and every entry in one of them, except
-    that a field's triads are one block (triad, lane 0, all; state_travel.rate_unit), since the triad record rules that the triad's parts
-    train at one rate (its legs and return share a gauge, and at unequal rates one leg grows faster than the others). From the
+    that a field's triads are one block (triad, lane 0, all; state_travel.rate_unit). Reason (the triad record §3.2): the gauge leaves the
+    return unchanged, so the legs and the return are one family that no receiver tells apart, and their covectors keep the scale identity
+    at every state; under a plain step at one rate that identity gives each leg the same squared norm to first order (Manley-Rowe), but
+    this learner divides each entry's step by its own isqrt(v) + 1, and its divisors move with what reaches each entry, so equal leg gains
+    are no prediction for it; the part's one octave stands because an octave between the legs would be a rate set by hand. From the
     means of four consecutive laps A, B, C, D (in order) and for each block b: its heat H_b and its fall two laps on F_b at its entries'
     own rates, priced as polar() prices a part's (the heat averaged over the three travels at the rates of the state each ends in, the
     fall at the rates of B), pi_b = F_b / H_b, in rationals of the means' integers.

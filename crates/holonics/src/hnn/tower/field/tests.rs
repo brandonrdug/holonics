@@ -3258,8 +3258,11 @@ fn the_triads_covector_matches_its_codes_difference() {
 /// carry one scale covector**: the return is unchanged under `(α_k, w_k) → (s α_k, w_k/s)` for real `s` (and so for `β_k` and for `γ_k`), so the
 /// code's derivative along that direction is zero at `s = 1` and the reverse gives `Re⟨α_k, ∇_α ℓ⟩ = Re⟨w_k, ∇_w ℓ⟩`, and likewise for `β_k` and
 /// `γ_k`: on drawn fields with triads, each triad's three legs (their two rows and two biases each) and its two columns of `W_T` read `Σ θ g` on
-/// the codes' `2^(−20)` bits (the probes' shifts) equal within an eighth and the releases' floor. Why it is read: under a step at one rate it is
-/// what conserves the legs' squared norms against the return's to first order (Manley–Rowe), the reason the triad is one part.
+/// the codes' `2^(−20)` bits (the probes' shifts) equal within an eighth and the releases' floor. Why it is read: the legs and the return are
+/// one family that no receiver tells apart, and this identity is what their covectors keep at every state. Under a plain step at one rate it
+/// gives each leg the same squared norm to first order (Manley–Rowe); this learner divides each entry's step by its own `⌊√v⌋ + 1`, and its
+/// divisors move with what reaches each entry, so equal gains of the legs are no prediction for it. The triad's one octave stands because an
+/// octave between the legs would be a rate set by hand.
 #[test]
 fn each_triads_legs_and_return_carry_one_scale_covector() {
     for (still, circled) in [(0usize, false), (1, false), (2, false), (1, true)] {

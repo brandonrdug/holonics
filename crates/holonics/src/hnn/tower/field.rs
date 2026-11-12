@@ -5900,10 +5900,12 @@ fn predicted_parts(field: &Field, g: &[i128], step: &[i128], halvings: u32, part
 /// these rows are the field's most polarized blocks (G84, G86's premise), so they need a rate of their own.
 ///
 /// [definition; theory, November 12, the triad record §3.2 and §4] The triads are one part, `triad` (index 22, [`TRIAD_PART`]): their charts `A`,
-/// `B`, `G`, the charts' biases and their return `W_T`. Why one: a part is a family of entries that steps at one rate, and the gauge
-/// `(α, β, γ, w) → (λα, μβ, νγ, (λμν)⁻¹ w)` leaves the return unchanged, so each leg gains the same squared norm under a step at one rate (the
-/// Manley–Rowe relation) and at unequal rates one leg grows faster than the others for no reason in the law. A parts line carries it only where
-/// the field has triads ([`written_parts`]).
+/// `B`, `G`, the charts' biases and their return `W_T`. Why one: the gauge `(α, β, γ, w) → (λα, μβ, νγ, (λμν)⁻¹ w)` leaves the return
+/// unchanged, so the legs and the return are one family that no receiver tells apart, and their covectors keep the scale identity at every
+/// state. Under a plain step at one rate that identity gives each leg the same squared norm to first order (the Manley–Rowe relation); this
+/// learner divides each entry's step by its own `⌊√v⌋ + 1` (`deposit_step`), and its divisors move with what reaches each entry, so equal gains
+/// of the legs are no prediction for it. The part's one octave stands because an octave between the legs would be a rate set by hand. A parts
+/// line carries it only where the field has triads ([`written_parts`]).
 pub const PART_NAMES: [&str; 23] = ["w_new", "a_new", "b_new", "enc_lane", "before_lane", "after_lane", "q_lane", "v_lane", "probe_lane", "out_lane", "moment_face_lane", "read_lane", "face_biases_lane", "a_lane", "b_lane", "carry", "w_carry", "a_carry", "b_carry", "enc_first", "before_first", "after_first", "triad"];
 
 /// The triads' one part ([`PART_NAMES`] index 22), written after the first lane's letter rows only where the field has triads.

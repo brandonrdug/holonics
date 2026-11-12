@@ -347,9 +347,11 @@ TRIAD_BLOCKS = ("triad_a", "triad_b", "triad_g", "triad_bias_a", "triad_bias_b",
 def rate_unit(block, lane, contacts):
     """[definition; theory, November 12; the triad record §3.2] The unit a block's rate moves with under the block law
     (tools/part_rates.py blocks): the block itself, except the triads' blocks, which are one unit (triad, lane 0, all). Reason: the triad's
-    legs and return share a gauge of three complex scales, so a step at one rate gives each leg the same squared norm (the Manley-Rowe
-    relation), and at unequal rates one leg grows faster than the others for no reason in the law; the record rules that the triad's parts
-    train at one rate, and the block law would otherwise give each of its blocks its own."""
+    legs and return share a gauge of three complex scales that leaves the return unchanged, so they are one family that no receiver tells
+    apart, and their covectors keep the scale identity at every state. Under a plain step at one rate that identity gives each leg the same
+    squared norm to first order (the Manley-Rowe relation), but this learner divides each entry's step by its own isqrt(v) + 1, and its
+    divisors move with what reaches each entry, so equal leg gains are no prediction for it. The part's one octave stands because an octave
+    between the legs would be a rate set by hand, and the block law would otherwise give each of its blocks its own."""
     return ("triad", 0, "all") if block in TRIAD_BLOCKS else (block, lane, contacts)
 
 
