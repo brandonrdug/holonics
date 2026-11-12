@@ -176,8 +176,9 @@ the trainer's own lines are held to, as te7's were held to the first ruler:
    constitution does not are founded once, in byte order after the classes that stand: every class
    that stands keeps its index, the void its own, and the open row moves to the end of each letter
    family. A fresh letter's every row opens at zero (its row of the encoding, its rows of the two
-   strand encodings and its rows of the moment encodings), and its class bias opens at the least
-   class bias the constitution holds. Reason: the face reads a class through the encoding that
+   strand encodings, its rows of the moment encodings and its rate in each paced head's clock,
+   which is the bare rate), and its class bias opens at the least class bias the constitution
+   holds. Reason: the face reads a class through the encoding that
    encodes it, `z(a) = ⟨E(a), R r̂ + b_R⟩ + c_a`, and a site's opening face is a sum of rows,
    `x⁰_t = E(u_t) + E₋(u_(t−1)) + E₊(u_(t+1))` and its moment's term (`Field::open`). A founding
    draws these rows because what reads them stands at zero and every class reads flat; here every
@@ -189,7 +190,12 @@ the trainer's own lines are held to, as te7's were held to the first ruler:
    founding reads no key. [Corrected November 12, 18:44Z, before any build: this item first drew
    the two strand rows from the key stream, by the founding's habit and with no reason of its own.]
    No founding of a letter leaves every face's bits, so its
-   price is read on the code line's held passage before and after it. The fresh entries' moments
+   price is read on the code line's held passage before and after it. It moves a standing face by
+   two routes: the fresh classes' share at the face itself, and, on a paced head, a blank's clock,
+   which runs at its own face's expected rate, `κ_h = 1 + Σ_a p(a) c_h[a]` (`Field::paces_with`),
+   so the fresh share moves the clock and through it the standing logits. The readout's map is
+   kept entry for entry, and the whole read is kept where no head is paced (found in the build of
+   November 12; the growth's test is stated that way). The fresh entries' moments
    and rates open as the growths of November 10 to 12 open theirs (the first moment at zero, the
    second at its family's mean, the base rate). A byte no document of the store holds gets no
    class.
