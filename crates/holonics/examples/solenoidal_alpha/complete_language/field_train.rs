@@ -3500,6 +3500,98 @@ pub(super) fn square_field(args: &[String], realization: &mut dyn FieldRealizati
     Ok(())
 }
 
+/// [measurement; theory, November 12, U6] `residual-field STATE STATE_SHA CODEC CODEC_SHA UNITS UNITS_SHA HELD HELD_SHA COUNT
+/// OUT`: **the residual at half rank** (the Einstein record §14.11, U6), a reading of the first `COUNT` held problems' own
+/// references, each cut to its room, with every place locked ([`Field::locked_faces`], the charge census's read: every face
+/// once, that place alone open, the rest given).
+/// - At each place the charge `v = c(x_t) − H(f_t)`: the letter's surprise less its face's entropy, the field's own expectation
+///   of that surprise. It is the face's temperature covector, `d/dτ (−ln p_τ(x))` at `τ = 1` for `p_τ ∝ p^τ`, whose mean is
+///   zero under the true conditional (atlas `ratio.face-temperature-covector`), so its sum over a stretch of places is what one
+///   common temperature of their faces would move their code by.
+/// - The state's line (`FIELD_RESIDUAL_STATE`) prints the census's reference figures (`FIELD_CHARGE_STATE state=reference`
+///   under `FIELD_CHARGE_REFERENCE_ONLY`, a lap's `REFREAD`): the code and the entropy, summed and a place, the excess, the
+///   root charge and its share of the excess, and the shares of places whose charge exceeds one and two nats. A build that
+///   reads a state as the census did prints the census's numbers.
+/// - `RESIDUAL.tsv` (private) holds every place in the passage's order: its problem, its place, its answer's letters, and its
+///   code and entropy on the codes' `2^(−20)` bits. The host ruler `tools/residual_blocks.py` reads it by region.
+///
+/// Why (U6; agent-inferred, November 12): where the field holds a region's law, what is left of the charge is a hand that
+/// cancels, and a stretch's summed charge less the region's mean grows as the root of the stretch's count: its second moment
+/// doubles with each doubling of the stretch. Where the field lacks a law the charge keeps a sign over the stretch, and the
+/// second moment quadruples. The entropy is subtracted, not the region's mean surprise alone, because the passage's own
+/// entropy varies along an answer (code against prose, a name against its uses), and that variation grows as the count
+/// whether or not the field holds the law. Numbers only; a reading: it writes no state.
+pub(super) fn residual_field(args: &[String], realization: &mut dyn FieldRealization) -> Result<()> {
+    if args.len() != 11 {
+        return Err("residual-field STATE STATE_SHA CODEC CODEC_SHA UNITS UNITS_SHA HELD HELD_SHA COUNT OUT".into());
+    }
+    let started = std::time::Instant::now();
+    let mut learner = FieldLearner::from_text(std::str::from_utf8(&pinned_read(&args[1], &args[2], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
+    declared_clocks(&mut learner.field);
+    let field = &learner.field;
+    let units = units_of(&args[5], &args[6])?;
+    let codec = FieldCodec::from_text(std::str::from_utf8(&pinned_read(&args[3], &args[4], CODEC_BUDGET)?)?, units)?;
+    let held = problems_of(&pinned_read(&args[7], &args[8], READ_BUDGET as usize)?);
+    let limit = count(&args[9])?;
+    let out = Path::new(&args[10]);
+    std::fs::create_dir(out)?;
+    let held = &held[..limit.min(held.len())];
+    let requests: Vec<(Vec<usize>, usize)> = held.iter().map(|(question, _)| opening(&codec, field, question, b"")).collect::<std::result::Result<_, String>>()?;
+    let problems: Vec<(&[usize], usize)> = requests.iter().map(|(q, n)| (q.as_slice(), *n)).collect();
+    let void = codec.void();
+    let a = field.declaration.alphabet;
+    let mut answers: Vec<Vec<usize>> = held.iter().map(|(_, ans)| codec.encode(ans)).collect::<Result<_>>()?;
+    let mut cut = 0usize;
+    for (x, &(_, room)) in answers.iter_mut().zip(&problems) {
+        cut += usize::from(x.len() > room);
+        x.truncate(room);
+    }
+    let ks: Vec<usize> = (0..problems.len()).filter(|&k| !answers[k].is_empty()).collect();
+    let faces = field.locked_faces(&problems, &answers, &ks, void, false, realization).map_err(|e| e.to_string())?;
+    let mut rows = rows_file(&out.join("RESIDUAL.tsv"), "problem\tplace\tletters\tcode_bits_q20\tentropy_bits_q20\n")?;
+    let nats = |v: i128| decimal_q20(nats_q20(v));
+    let share = |n: usize, of: usize| if of == 0 { "-".to_string() } else { format!("{}.{:06}", n * 1_000_000 / of / 1_000_000, n * 1_000_000 / of % 1_000_000) };
+    // The census's own sums (`charge_field`), so the state's line reads as its charge census did.
+    let (mut places, mut over1, mut over2) = (0usize, 0usize, 0usize);
+    let (mut code, mut entropy, mut root) = (0i128, 0i128, 0i128);
+    let mut text = String::new();
+    for (&k, f) in ks.iter().zip(&faces) {
+        let x = &answers[k];
+        let n = x.len();
+        let (mut c_k, mut h_k) = (0i128, 0i128);
+        let mut counts = PlateCounts::new(a);
+        for (t, face) in f.iter().enumerate().take(n) {
+            let (c, h) = (face.code(x[t]) as i128, holonics::hnn::tower::field::entropy(face));
+            (c_k, h_k) = (c_k + c, h_k + h);
+            counts.add(face, x[t]);
+            let v = nats_q20(c - h);
+            over1 += usize::from(v > 1 << 20);
+            over2 += usize::from(v > 2 << 20);
+            text.push_str(&format!("{k}\t{t}\t{n}\t{c}\t{h}\n"));
+        }
+        let r_k: i128 = (0..a).filter(|&l| counts.n[l] > 0).map(|l| counts.n[l] as i128 * log2_ratio(counts.n[l], counts.expected(l))).sum();
+        (places, code, entropy, root) = (places + n, code + c_k, entropy + h_k, root + r_k);
+    }
+    row(&mut rows, &text)?;
+    let excess = code - entropy;
+    let a_place = |v: i128| if places == 0 { "-".to_string() } else { decimal_q20(nats_q20(v) / places as i128) };
+    println!(
+        "FIELD_RESIDUAL_STATE problems={} letters={places} cut_to_room={cut} code_nats={} entropy_nats={} code_nats_a_place={} entropy_nats_a_place={} excess_nats={} root_nats={} root_share_of_excess={} v_over_1_share={} v_over_2_share={} ms={}",
+        ks.len(),
+        nats(code),
+        nats(entropy),
+        a_place(code),
+        a_place(entropy),
+        nats(excess),
+        nats(root),
+        if excess <= 0 { "-".to_string() } else { decimal_q20((root << 20) / excess) },
+        share(over1, places),
+        share(over2, places),
+        started.elapsed().as_millis()
+    );
+    Ok(())
+}
+
 /// The answers a written file holds (`SAMPLE.tsv`'s format: a line a problem, its index and its escaped letters), encoded.
 fn written_answers(codec: &FieldCodec, path: &str, sha: &str, problems: usize) -> Result<Vec<Vec<usize>>> {
     let text = pinned_read(path, sha, READ_BUDGET as usize)?;
@@ -4646,6 +4738,56 @@ mod tests {
         let (reference, rest) = (of("reference"), of("rest"));
         assert!(!reference.is_empty() && reference.len() <= 4 * SQUARE_BANDS.len() * 2, "the squares the toy's answers reach");
         assert_eq!(reference, rest, "the same answers draw the same squares and read the same faces");
+        let _ = std::fs::remove_dir_all(&dir);
+    }
+
+    /// [theory, November 12, U6] `residual-field` end to end on the host: one row a letter of every answer, in the passage's
+    /// order, and at each square of `square-field` on the same state its two places' rows hold the square's own charges and
+    /// entropies, since both readings take the census's locked visit.
+    #[test]
+    fn the_residual_reading_holds_every_place_of_the_locked_visit() {
+        let dir = std::env::temp_dir().join(format!("holonics-residual-{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&dir);
+        std::fs::create_dir_all(&dir).expect("dir");
+        let put = |name: &str, bytes: &[u8]| {
+            std::fs::write(dir.join(name), bytes).expect("write");
+            (dir.join(name).to_string_lossy().into_owned(), sha256(bytes).expect("sha"))
+        };
+        let (codec, problems) = toy();
+        let learner = toy_learner(&codec, &problems);
+        let (state, state_sha) = put("STATE", learner.to_text().as_bytes());
+        let (codec_path, codec_sha) = put("CODEC", codec.to_text().as_bytes());
+        let (units, units_sha) = put("UNITS", b"founded-units-v1 0\n");
+        let (held, held_sha) = put("HELD", TOY);
+        let (residual_out, square_out) = (dir.join("RESIDUAL").to_string_lossy().into_owned(), dir.join("SQUARE").to_string_lossy().into_owned());
+        let args: Vec<String> = ["residual-field", &state, &state_sha, &codec_path, &codec_sha, &units, &units_sha, &held, &held_sha, "4", &residual_out].iter().map(|s| s.to_string()).collect();
+        residual_field(&args, &mut HostField).unwrap();
+        let args: Vec<String> = ["square-field", &state, &state_sha, &codec_path, &codec_sha, &units, &units_sha, &held, &held_sha, "4", "2", &square_out].iter().map(|s| s.to_string()).collect();
+        square_field(&args, &mut HostField).unwrap();
+        let text = std::fs::read_to_string(dir.join("RESIDUAL").join("RESIDUAL.tsv")).unwrap();
+        let mut lines = text.lines();
+        assert_eq!(lines.next(), Some("problem\tplace\tletters\tcode_bits_q20\tentropy_bits_q20"));
+        let places: Vec<[i128; 5]> = lines.map(|l| l.split('\t').map(|v| v.parse::<i128>().unwrap()).collect::<Vec<_>>().try_into().unwrap()).collect();
+        let lengths: Vec<i128> = problems_of(TOY).iter().take(4).map(|(_, a)| codec.encode(a).unwrap().len() as i128).collect();
+        assert!(places.windows(2).all(|w| (w[0][0], w[0][1]) < (w[1][0], w[1][1])), "the passage's order: problem, then place");
+        for (k, &whole) in lengths.iter().enumerate() {
+            let rows: Vec<&[i128; 5]> = places.iter().filter(|p| p[0] == k as i128).collect();
+            let n = rows.len() as i128;
+            assert!(n <= whole && rows.iter().enumerate().all(|(t, p)| p[1] == t as i128 && p[2] == n && p[3] >= 0 && p[4] >= 0), "one row a letter of the answer cut to its room");
+        }
+        assert!(places.iter().all(|p| (p[0] as usize) < lengths.len()));
+        let at = |k: i128, t: i128| places.iter().find(|p| p[0] == k && p[1] == t).expect("a square's place has its row");
+        let squares = std::fs::read_to_string(dir.join("SQUARE").join("SQUARES.tsv")).unwrap();
+        let mut read = 0usize;
+        for r in squares.lines().skip(1).filter(|r| r.starts_with("reference\t")) {
+            let f: Vec<&str> = r.split('\t').collect();
+            let (k, i, j) = (f[1].parse::<i128>().unwrap(), f[3].parse::<i128>().unwrap(), f[4].parse::<i128>().unwrap());
+            let [v_i, v_j, h_i, h_j] = [f[9], f[10], f[11], f[12]].map(|v| v.parse::<i128>().unwrap());
+            let (pi, pj) = (at(k, i), at(k, j));
+            assert_eq!((pi[3] - pi[4], pi[4], pj[3] - pj[4], pj[4]), (v_i, h_i, v_j, h_j), "the square's charges and entropies are the locked visit's");
+            read += 1;
+        }
+        assert!(read > 0, "the toy's answers reach a square");
         let _ = std::fs::remove_dir_all(&dir);
     }
 }

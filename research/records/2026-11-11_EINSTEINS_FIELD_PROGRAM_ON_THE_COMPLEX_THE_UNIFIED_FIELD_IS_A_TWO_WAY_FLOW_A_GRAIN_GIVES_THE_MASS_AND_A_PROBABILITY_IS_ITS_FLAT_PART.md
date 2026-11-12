@@ -923,7 +923,10 @@ this section leaves it: the equation from the heat balance (§14.7), the criteri
     and quadruples where a law is missing, and the blocks whose sign holds name where. The guess is fixed before the read,
     from the regions the day's records already rank.
   - Could repeat: one scalar of progress; a mean over the whole field; bits read as progress.
-  - Device: the host, from saved states. It joins the line's queue behind G85's reading of the built circles and G86.
+  - Device (built November 12): the card reads every place locked from a saved state (`residual-field`, a reading verb
+    beside `square-field`, whose state line prints the charge census's reference figures), in a slot that times no lap,
+    and the host ruler `tools/residual_blocks.py` reads its private rows by region, numbers only (atlas
+    `hnn.field-residual-half-rank`, its controls in gate 1). Not yet read on a line's state.
 
 ### 14.12 Owed (#410), added by this section
 
