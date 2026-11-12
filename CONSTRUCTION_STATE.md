@@ -143,19 +143,25 @@ repository was reset on September 24; the pre-reset tree is
   [the Einstein record](research/records/2026-11-11_EINSTEINS_FIELD_PROGRAM_ON_THE_COMPLEX_THE_UNIFIED_FIELD_IS_A_TWO_WAY_FLOW_A_GRAIN_GIVES_THE_MASS_AND_A_PROBABILITY_IS_ITS_FLAT_PART.md) §9).
   Einstein's unified-field program is read on the objects as one two-way flow on a complex, and six
   items join the library to it, each with its guess fixed before its read. The first's instance is
-  scored (G85), the second's first test is fixed (G86), the fourth's ruler is built, and the rest
-  have not run.
+  scored (G85); the second's tests are scored (G86, then the block law's, G89 and G92); the third's
+  reading is scored (G91); the fourth's ruler is built; the fifth's statements are boxes in #410;
+  and the sixth's reading is being built.
   - A turn is a unit and a friction is declared in every gate: a friction is a range and its
     inverse a mass (atlas `contact.friction-range-mass`). The carry's friction, founded at `1/4`
     after the card refused the frictionless carry (G83, G85), is its first instance; the ring faces outside the
     unit disk are repaired at the next founding. Such a face is a turn that also boosts (the record
     §14.3).
-  - No global word in the law: a part's rate is its own temperature. G86 is its first test; an
-    octave under the floor for a part whose travel returns is the next. A part's polarization is
-    its quality as a store (atlas `store.finite-quality`).
-  - The square of two places returns from history as a host reading on saved states (atlas
-    `hnn.field-square-affinity`, retired at the port), because local ratios are one law's only
-    where every cycle closes; it enters the law only if its curl sits where the release fails.
+  - No global word in the law: a part's rate is its own temperature. G86's polar law by part stands
+    as the line's rate law. The block law, every block a part at its own rate with octaves under
+    the floor (G89), bought no level at the lap means and is retired (G92, November 12): a class's
+    own part is most of an end's excess and cooling sheds it, but a mean of states sheds the spread
+    already, so the next law on rates prices what a rate buys at a lap's mean, its drift. A part's
+    polarization is its quality as a store (atlas `store.finite-quality`).
+  - The square of two places returns from history as a reading on saved states (`square-field`,
+    atlas `hnn.field-square-affinity`), because local ratios are one law's only where every cycle
+    closes. Read on rt13's end and mean (G91, November 12), the writes' charged squares glue as well
+    as the reference's: the release's failure is the field's lack, and the square stays an
+    instrument beside the charge census.
   - A founding is judged by its strength: the held code it buys over the entries it founds, by
     region (`tools/founding_strength.py`, atlas `tower.founding-strength-by-region`). Its entries
     are read net of the kernel, the re-chartings that change no face (the record §14.8): four real

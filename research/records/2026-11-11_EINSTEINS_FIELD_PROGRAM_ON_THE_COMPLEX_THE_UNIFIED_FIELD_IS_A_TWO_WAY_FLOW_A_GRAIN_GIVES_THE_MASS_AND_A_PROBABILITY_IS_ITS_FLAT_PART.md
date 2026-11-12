@@ -505,6 +505,14 @@ tests one of these.
 - Could repeat: a step whose gain is not read from the covector reaching its locus; a refusal answered with a larger limit;
   one scalar of progress.
 - Device: readings on the host from saved states; laps on the card.
+- Read (November 12, G89 and G92, scored in [the guess file](2026-11-11_THE_PLACES_THE_FIELD_GIVES_PUSH_AGAINST_THE_PLACES_IT_MISSES_THE_DEPOSIT_IS_THEIR_DIFFERENCE_AND_TWO_BUILDS_ARE_TIMED_ONLY_INSIDE_ONE_HOLD_OF_THE_CARD_receipts/guess_capacity_44_55.txt)):
+  the block law, every block a part at its own rate, trained three laps from G86's line and bought no level at the lap
+  means over G86's polar law (b3 0.0007 over g3). Read by block at the end, a class's own part is two-thirds to
+  four-fifths of an end's excess and cooling a class sheds it, but a mean of states sheds the spread already
+  (`deposition.rate-temperature-standing-spread`): the rent the law priced is paid at an end's read and never where a
+  line's level is read. The prediction above, that cooling lowers the lap-mean level by the rent, missed for that reason.
+  The block law is retired as the line's rate law and G86's polar law stands; the next law on rates prices what a rate
+  buys at a lap's mean, its drift, and the carrier of each entry's own rate stands for it.
 
 **U3. The square of two places returns, first as a reading.** (§6.2.)
 - Found: the faces are one joint's conditionals only where every square of two places closes; the field lacks 0.233 nats a
@@ -518,6 +526,12 @@ tests one of these.
   law with its card realization and its parity, and its guess is fixed before its first lap.
 - Could repeat: a reading that a line is scored by set aside as a reading; a located cause carried unrepaired.
 - Device: the host from saved states while the card trains.
+- Read (November 12, G91, on the card from rt13's end and mean, scored in [the guess file](2026-11-11_THE_PLACES_THE_FIELD_GIVES_PUSH_AGAINST_THE_PLACES_IT_MISSES_THE_DEPOSIT_IS_THEIR_DIFFERENCE_AND_TWO_BUILDS_ARE_TIMED_ONLY_INSIDE_ONE_HOLD_OF_THE_CARD_receipts/guess_capacity_44_55.txt)):
+  the writes' charged squares glue as well as the reference's, or better. At d = 1 the keyed write's charged squares read
+  kappa 0.12 under the reference's charged squares, past the two resolutions, their readings larger (3.52 nats against
+  2.54) and sharing a sign more often (0.80 against 0.73). The curl does not sit where the release fails: the release's
+  failure is the field's lack, the square stays an instrument beside the charge census, and the squares-agree comparison
+  does not enter the law.
 
 **U4. A founding is judged by its strength.** (§5.6.)
 - Law: a founding buys held code at the price of the free data it adds; strength is the first over the second, by region.
