@@ -67,8 +67,12 @@ repository was reset on September 24; the pre-reset tree is
   Its gain stands in letters 1 to 4, rising with the letter's distance, and in the face of a place
   with no letter written; letters 5 to 8 took none, and its friction turned back to a look-back of
   9.3 places at its mean. Its end stood 0.0196 over its mean, a draw of the wider spread at eight
-  times. The fourth lap, te4, trains at eight times (G103), and its end is the ground of the next
-  founding. With `C = 0` the field is the plain line bit for bit.
+  times. The fourth lap, te4, at eight times, led rt27 by 0.0304 at lap means, its growth 0.0025
+  (G103 scored): quarters 1 to 3 of open sites gained as on te3 and quarter 4, the places whose
+  regions are mostly open, turned 0.027 back and stands above rt27's, while the friction rose on
+  more reads, the look-back fell to 7.5 places and letters 5 to 8 turned under rt27. So the raise
+  ends: te5 trains at the base rate (G104), and te4's end is the ground of the next founding. With
+  `C = 0` the field is the plain line bit for bit.
 - **The triad** (to be founded; atlas `contact.triad-manley-rowe-gauge`,
   `code.triad-character-of-composition`;
   [the triad record](research/records/2026-11-12_THE_LAW_ACROSS_A_PLACE_IS_HELD_BY_A_PUMPED_CONTACT_A_TRIAD_IS_A_CHARACTER_OF_A_LAW_OF_COMPOSITION_AND_ITS_THREE_LEGS_EXCHANGE_EQUAL_QUANTA.md)).
@@ -81,7 +85,9 @@ repository was reset on September 24; the pre-reset tree is
   part at one rate. The ruler on the host (G102) read that 8, 16, 32 and 64 triads with free factors
   over the contexts hold 0.604, 0.745, 0.826 and 0.877 of the part, the remainder falling about as
   `R^(−0.56)`, so `J = 16` (8,288 entries). The build is under way on the PC; it enters the line by
-  reproducing te4's lap with no triads, and the founding's first lap pairs with te5.
+  reproducing te4's lap with no triads, and the founding's first lap pairs with te5 (G105). The
+  field's learner steps each entry at its own divisor, so the gauge's equal gains of the legs are no
+  prediction for it; its covectors keep the scale identity at every state (the record, 3.2).
 - **The learner** (`FieldLearner`; the trainer is
   `crates/holonics/examples/solenoidal_alpha/complete_language/field_train.rs`). The comparison is
   completion read as a joint code: a region is drawn as a state of open places among the answer's,
