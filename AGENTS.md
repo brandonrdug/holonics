@@ -292,6 +292,18 @@ reason). The machine is made of stores, and a cache is refused.
   it, it leaks or emits by its own dynamics, it is reached by propagation, and what it holds is
   shared by every mode that couples to it. A capacitor's charge, a ring's winding, a resonator's
   amplitude, a contact's deposit and a constitution are stores.
+- **No store is at rest** (Brandon, November 11). A store holds by upkeep. It is a resonance whose
+  steady state stands while flux passes through it, and it relaxes and jitters through the one
+  coupling (atlas `store.finite-quality`; the machine's instance is
+  `deposition.rate-temperature-standing-spread`). Its quality, the energy it holds over the energy
+  it loses in a turn, is finite. "Stored" and "deposited" say that a mode is slow against its
+  reader's clock. They never say that a configuration is frozen at a place. A deposit is a
+  displacement of such a steady state by what crossed it. Reason: a mass, a lattice, a memory cell
+  and a drive are each in motion and each costs upkeep, and a word that privileges a state at rest
+  invites a design that treats a parameter as a fact set down, with no rate, no leak and no bath
+  ([the record](research/records/2026-11-11_EINSTEINS_FIELD_PROGRAM_ON_THE_COMPLEX_THE_UNIFIED_FIELD_IS_A_TWO_WAY_FLOW_A_GRAIN_GIVES_THE_MASS_AND_A_PROBABILITY_IS_ITS_FLAT_PART.md) §14.6).
+  Scope: the words in guides, records and briefs, and any design that reasons from them. The
+  objects (store, deposition, retention) keep their laws.
 - A **cache** is a table addressed by a content key or a named subject, with no dynamics of its own
   and no coupling between its entries. Its memory grows with the items seen, and a lookup stands in
   for propagation.
@@ -354,10 +366,12 @@ an authored routine standing in for learning; recitation or an index of contexts
 generation (eight times, the last a key/value cache passed as a Holonics key); text run on its
 codec's grain as the exception (every design is checked against text,
 image, acoustic and motor input, and anything modality-specific lives only in a boundary codec); a
-located cause carried unrepaired into a new consumer; an uncertified deposition step; seen material
-graded as unseen; bits read as progress; a refusal answered with a larger limit; a design thought in
-the programming language (arrays, offsets, windows, tables) instead of in residues, modes and spectral
-placement.
+located cause carried unrepaired into a new consumer; a deposition step whose gain is not read from
+the covector reaching its locus (September 29, item 5; not the reread of November 1 to 3, a selection
+on the code that Brandon retired on November 5 because it discarded what an expansion measures); seen
+material graded as unseen; bits read as progress; a refusal answered with a larger limit; a design
+thought in the programming language (arrays, offsets, windows, tables) instead of in residues, modes
+and spectral placement.
 
 [project-postulate] **Decide from the mathematics.** Resolve routine choices from the mathematics,
 mark an inferred choice with its reason (`agent-inferred`), and proceed. Never hand Brandon a
@@ -389,8 +403,8 @@ Athena text milestone claimed before a test of use was retracted or retired.
   by its measurement ("the predictor codes above flat on unseen families"), not as a missing part.
 
 [project-postulate] **Method, each rule with its reason.** These were given in conversation between
-October 29 and November 10; the last two were derived from a failure and from readings of
-November 11. They are written here with their reasons so that no agent holds them as slogans.
+October 29 and November 11; the last three were derived from a failure, from readings of
+November 11 and from Brandon's lens of that day. They are written here with their reasons so that no agent holds them as slogans.
 - **Theory picks, and a run tests a stated prediction** (November 4). Derive which law the theory
   gives, fix its guess as a number before the read, run that one law and score the guess, a miss
   included. Reason: arms cost card time and choose by a short reading, and a winner picked that way
@@ -471,6 +485,16 @@ November 11. They are written here with their reasons so that no agent holds the
   (G70, November 11; the reason is `agent-inferred`;
   [the follow-up record](research/records/2026-11-11_RAISED_RATES_BUY_NO_LEVEL_THE_ADDED_CONTACTS_CLOSE_A_PLACE_BETWEEN_ITS_WRITTEN_NEIGHBOURS_AND_THE_THIRD_LETTER_IS_OWED_A_CARRY_FOUNDED_AS_A_TURN.md) §4).
   ([the record](research/records/2026-11-11_A_DEPOSITS_RATE_IS_A_TEMPERATURE_ITS_STANDING_SPREAD_IS_SHED_BY_A_MEAN_OF_STATES_AND_LAP_ENDS_ARE_DRAWS_THAT_DO_NOT_REMEMBER_EACH_OTHER.md)).
+- **A reading names its region** (Brandon, November 11). A reading of the machine is reported over its
+  partition: the region it belongs to, its scale as a count over a named set (nats over the held
+  passage's 43,470 places, millionths of a bit over a lap's sites) and the partition beside any total.
+  A mean over the whole field is never reported alone as the field's learning, and a figure is
+  written with the digits its reads support. Reason: the field learns locally, and a whole-field
+  mean hides where. On November 11 "raised rates buy no level" was read from whole-field means,
+  while a quarter of the field's lasting fall stood on 2% of its heat, all in the letter rows, and
+  lane 2's pair contacts were turning back (atlas `deposition.block-polarization`). Brandon named the
+  fault the same day. Scope: every reading in a message, a record or a guess; a guess on a total
+  keeps the partition beside it ([the record](research/records/2026-11-11_A_READING_NAMES_ITS_REGION_THE_LETTER_ROWS_LEARN_WHERE_THE_CONTACTS_REST_E_IS_A_CHART_NEVER_A_DIGIT_AND_EVERY_GLOBAL_SUM_IS_A_JOIN_THE_CARD_PAYS.md)).
 
 [project-postulate] **GPU first, and the design fixes the workload** (Brandon, October 27;
 [the record](research/records/2026-10-27_THE_LEARNER_RUNS_ON_THE_CARD_AND_ITS_WORKLOAD_IS_NEVER_TRADED_FOR_TIME.md)). The RTX 4080 SUPER is a consumer card, and

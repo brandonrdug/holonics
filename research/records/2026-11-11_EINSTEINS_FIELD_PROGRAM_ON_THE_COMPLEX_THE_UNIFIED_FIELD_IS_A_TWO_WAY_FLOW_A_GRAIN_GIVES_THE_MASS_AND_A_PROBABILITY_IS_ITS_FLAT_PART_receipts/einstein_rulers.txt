@@ -1,0 +1,103 @@
+start 2026-11-11T21:11:40Z (cloud host, Python 3.13.18, numbers only)
+1. Strength: the free Taylor data of a system of field equations, order by order
+   (Einstein's definition, Appendix II of The Meaning of Relativity, 5th ed.: the fewer
+   free data, the stronger the system). In four variables a function has C(n+3, 3)
+   coefficients of order n. A term (m, s) below counts m functions whose order is
+   shifted by s: an equation of order k binds data at shift -k, a gauge function whose
+   derivative of order n+1 moves the field counts at shift +1, an identity of order k
+   among the equations returns data at shift -k.
+   scalar wave equation (1 field; 1 equation of order 2)
+     z(10), z(100), z(1000) = 121, 10201, 1002001;  leading share 0,  z1 = 6,  free functions of three variables z1/3 = 2
+   Maxwell, field strengths (6; 8 equations of order 1; 2 identities of order 2)
+     z(10), z(100), z(1000) = 286, 20806, 2008006;  leading share 0,  z1 = 12,  free functions of three variables z1/3 = 4
+   Maxwell, potentials (4; 1 gauge function; 4 equations of order 2; 1 identity of order 3)
+     z(10), z(100), z(1000) = 240, 20400, 2004000;  leading share 0,  z1 = 12,  free functions of three variables z1/3 = 4
+   vacuum gravitation (10; 4 coordinate functions; 10 equations of order 2; 4 identities of order 3)
+     z(10), z(100), z(1000) = 234, 20394, 2003994;  leading share 0,  z1 = 12,  free functions of three variables z1/3 = 4
+  [ok] each system is determined at leading order (the n^3 share is zero)
+  [ok] Maxwell reads the same strength through field strengths and through potentials
+  [ok] z1 = 3 x (free functions of three variables): wave 6 = 3*2, Maxwell 12 = 3*4, vacuum gravitation 12 = 3*4
+   (The figures are this ruler's, under the convention printed above. Einstein's own table is
+    in Appendix II and is not in the gathered folder, so none of his figures is quoted.)
+
+2. A grain gives the range: the carry's friction is the mass of what it carries
+   Q(t) = b(t) + g Q(t-1), |g| = 1/(1+d): a unit at distance k enters at g^k, the reach is
+   sum_k g^k = (1+d)/d, and the two-sided kernel g^|t| solves the screened chain equation
+   -g f(t-1) + (1+g^2) f(t) - g f(t+1) = (1-g^2) [t = 0], whose mass is mu^2 = (1-g)^2/g = d^2/(1+d).
+   d = 1/16: |g| = 16/17, reach (1+d)/d = 17, mu^2 = 1/272 = d^2/(1+d) = 1/272, a letter 2, 3, 4 sites back enters at 16/17, 256/289, 4096/4913; kernel identity holds
+  [ok] screened chain identity at d = 1/16
+   d = 1/4: |g| = 4/5, reach (1+d)/d = 5, mu^2 = 1/20 = d^2/(1+d) = 1/20, a letter 2, 3, 4 sites back enters at 4/5, 16/25, 64/125; kernel identity holds
+  [ok] screened chain identity at d = 1/4
+   d = 1/2: |g| = 2/3, reach (1+d)/d = 3, mu^2 = 1/6 = d^2/(1+d) = 1/6, a letter 2, 3, 4 sites back enters at 2/3, 4/9, 8/27; kernel identity holds
+  [ok] screened chain identity at d = 1/2
+   d = 1: |g| = 1/2, reach (1+d)/d = 2, mu^2 = 1/2 = d^2/(1+d) = 1/2, a letter 2, 3, 4 sites back enters at 1/2, 1/4, 1/8; kernel identity holds
+  [ok] screened chain identity at d = 1
+   d = 2: |g| = 1/3, reach (1+d)/d = 3/2, mu^2 = 4/3 = d^2/(1+d) = 4/3, a letter 2, 3, 4 sites back enters at 1/3, 1/9, 1/27; kernel identity holds
+  [ok] screened chain identity at d = 2
+   d = 0: |g| = 1, the reach over N sites is N (no limit): a carry founded without friction sums its whole region.
+  [ok] |gamma(q=0, d=0)|^2 = 1/(1+d)^2 = 1
+  [ok] |gamma(q=0, d=1/4)|^2 = 1/(1+d)^2 = 16/25
+  [ok] |gamma(q=1/3, d=0)|^2 = 1/(1+d)^2 = 1
+  [ok] |gamma(q=1/3, d=1/4)|^2 = 1/(1+d)^2 = 16/25
+  [ok] |gamma(q=-7/5, d=0)|^2 = 1/(1+d)^2 = 1
+  [ok] |gamma(q=-7/5, d=1/4)|^2 = 1/(1+d)^2 = 16/25
+  [ok] |gamma(q=9, d=0)|^2 = 1/(1+d)^2 = 1
+  [ok] |gamma(q=9, d=1/4)|^2 = 1/(1+d)^2 = 16/25
+
+3. Four pair readings on a cycle of contexts: where one joint table exists and where it cannot
+   Settings a, a' on one side and b, b' on the other; the contexts (a,b), (a,b'), (a',b), (a',b')
+   form the 4-cycle a - b - a' - b' - a. S = E(a,b) + E(a,b') + E(a',b) - E(a',b').
+  [ok] every one of the 16 assignments of a value to each setting reads |S| <= 2 (max 2)
+   faces as rational unit vectors a=(1,0), a'=(0,1), b=(4/5,3/5), b'=(4/5,-3/5): E = {('a', 'b'): '4/5', ('a', "b'"): '4/5', ("a'", 'b'): '3/5', ("a'", "b'"): '-3/5'}
+  [ok] their Gram readings give S = 14/5 > 2, with S^2 = 196/25 <= 8
+  [ok] the three contexts on the path b' - a - b - a' glue to one joint table (nonnegative, total 1)
+  [ok] that table returns the three path contexts
+   the glued table reads the closing context (a',b') at E = 48/125; the faces read -3/5; the defect on the closing edge is -123/125
+  [ok] the closing edge of the cycle carries the whole defect (48/125 against -3/5)
+   settings on a ring of six (sixths of a turn): the largest S is 5/2 at places (a, a', b, b') = (5, 4, 5, 0)
+  [ok] four settings at sixths of a turn read S = 5/2 > 2 with every reading in {1, 1/2, -1/2, -1}
+  [ok] over 50625 quadruples of rational unit vectors S^2 <= 8 (largest read 196/25)
+
+4. The two-way flow: its symmetric part, its antisymmetric part, and reversal as transposition
+   stationary law ['411/1624', '465/1624', '495/1624', '253/1624']
+  [ok] the stationary law is stationary
+  [ok] the antisymmetric part is divergence-free at every cell (sum_j J_ij = 0)
+  [ok] the reversed passage's flow is the transpose: S stays, J changes sign
+  [ok] beta = J/S lies strictly inside (-1, 1) on every contact, and (1+beta)/(1-beta) = F_ij/F_ji
+   beta on the contacts: {(0, 1): '667/977', (0, 2): '-344/481', (0, 3): '21/527', (1, 2): '51/73', (1, 3): '-49/204', (2, 3): '7/53'}
+  [ok] a cycle's ratio product is free of the stationary law (the potential cancels around a cycle)
+   cycle ratio products on the four triangles: {(0, 1, 2): '180', (0, 1, 3): '3', (0, 2, 3): '1/5', (1, 2, 3): '12'}
+  [ok] this flow has circulation: some cycle product differs from 1, so no potential (no reversible law) exists
+  [ok] a symmetric flow (J = 0) closes every cycle: its rates are a potential's differences
+
+5. A field of two points: far comparison that composes is a coboundary
+  [ok] identity at coincidence, and there-and-back restores
+  [ok] g(a,b) = h(a)^-1 h(b) closes every triangle
+  [ok] one contact slipped by a shear keeps there-and-back and opens exactly the triangles through it
+   triangles opened by the slipped contact (1,3): [(0, 1, 3), (1, 2, 3), (1, 3, 4)]
+  [ok] when every triangle closes the frames are recovered from one base point: g(a,b) = g(o,a)^-1 g(o,b)
+
+6. A source-free field carries a charge only around a hole
+   a 3 x 3 sheet of cells, whole: 16 points, 24 contacts, 9 cells; boundary of a boundary zero: True; harmonic classes: 0
+  [ok] a 3 x 3 sheet of cells, whole: harmonic classes = holes (0)
+   the same sheet with its middle cell removed: 16 points, 24 contacts, 8 cells; boundary of a boundary zero: True; harmonic classes: 1
+  [ok] the same sheet with its middle cell removed: harmonic classes = holes (1)
+   the same sheet with two cells removed: 16 points, 24 contacts, 7 cells; boundary of a boundary zero: True; harmonic classes: 2
+  [ok] the same sheet with two cells removed: harmonic classes = holes (2)
+
+7. The tower of rings holds each ring's whole windings as the next ring's residue
+  [ok] the two largest rings (4096, 6561) close together only at 26873856 > the reach 3771: every place has its own residue pair
+  [ok] along each chain (2, 4, 16, ... and 3, 9, 27, ...) the windings of a ring, counted modulo the step, are the next ring's residue over the ring
+   so a ring's face keeps the residue and the next ring keeps the winding: the helix is the circle and its carry.
+
+8. An undivided complex pair reads four dimensions, three of one sign and one of the other
+   A ratio carried undivided is a pair (xi : eta) of Gaussian integers. Its Hermitian forms are
+   X = [[t+z, x-iy], [x+iy, t-z]], det X = t^2 - x^2 - y^2 - z^2, and a move A of determinant one
+   acts by X -> A X A^*, keeping det X.
+  [ok] the composed move has determinant one
+  [ok] X -> A X A^* keeps X Hermitian and keeps det X = t^2 - x^2 - y^2 - z^2 on five forms
+  [ok] one pair (xi : eta) = (2+i : 1-3i) is a null direction: (t, x, y, z) = (15/2, -1, -7, -5/2), t^2 = x^2 + y^2 + z^2
+  [ok] a real pair has y = 0: real ratios read three dimensions (two and one), complex ratios four (three and one)
+
+rulers failed: 0; wall time 1.7 s
+exit 0

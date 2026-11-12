@@ -845,6 +845,14 @@ sufficient retention for every solver while the last flux is not, and that the c
 future-sufficient **quotient of the constitution** (`Standing.standingLaw_exists_iff_future_factors`),
 never a record of the fluxes that shaped it.
 
+[definition; Brandon, November 11] **A deposit is a displacement of a steady state, never a thing set
+down.** The constitution a deposit changes is itself held by upkeep: each store in it is a resonance
+of finite quality, which relaxes and jitters through the coupling that charges it (atlas
+`store.finite-quality`; `deposition.rate-temperature-standing-spread` is the machine's instance).
+"Deposited" and "stored" say that a mode is slow against its reader's clock, and never that a
+configuration is frozen at a place
+([the record](../research/records/2026-11-11_EINSTEINS_FIELD_PROGRAM_ON_THE_COMPLEX_THE_UNIFIED_FIELD_IS_A_TWO_WAY_FLOW_A_GRAIN_GIVES_THE_MASS_AND_A_PROBABILITY_IS_ITS_FLAT_PART.md), §14.6).
+
 [formal-checked; GPT-6 Astra, September 27, [record](../research/records/2026-09-27_THE_LEARNER_MUST_MOVE_A_CHASE_TERRAIN_DATA_AS_PARTICLES_WITH_FLUX_AND_RELEASE_AS_A_THRESHOLD_COMMIT.md#14-gpt-6-astras-review)]
 **For an acting receiver, the admitted future includes its actions.** A passive quotient can merge
 two constitutions that emit alike under every action taken so far and differ under a probe. Where

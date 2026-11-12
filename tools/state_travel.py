@@ -49,7 +49,8 @@ entry's noise travels alike whatever its covector's size, and an entry whose cov
 A step d changes the section's code by -sum g_i d_i at first order, and a lap's travel reads the mean covector as
 g_i = s_i d_i 2^rate / SECTIONS; so the code two laps' common travel is worth weighs each entry's product d1_i d2_i by s_i. s is read
 from the state between the two laps (the learner's text: the field's two lines, then the first moments and the second, each on one
-line). For each block of `scale` (and the carry's chart by lane):
+line). For each block of `scale` (with carry circles their charts by lane, the turn rows Q and the leak rows H apart, and their
+biases q_b and h_b apart: the turn is a phase and the leak a modulus, so one block would mix two laws):
   WEIGHED_LAP   the block's entries and how many have opened (s above 0), its travel's rms, and heat: 2^-rate s_i / 4 summed, the
                 standing spread's cost if every entry rests in its own noise (an entry at rest under this step holds a variance
                 2^-rate s / 2H at curvature H, a cost 2^-rate s / 4 whatever H), at the rates the lap ran at (the `parts` line of
@@ -83,7 +84,8 @@ trains from it. HEAD must hold no held step (a step is of one material). Numbers
 state_travel.py graft OUT HEAD DONOR FAMILY [FAMILY ...]: writes OUT, a new file: HEAD's learner text with the named families' entries
 of its material replaced by DONOR's (the families as `layout` names them: enc, before, after, q, q_bias, v, v_bias, out, out_bias, a,
 a_bias, b, b_bias, w, w_bias, read, read_bias, moment_before, moment_after, temper, probe, probe_bias, pace, moment_face,
-moment_face_bias, lift_bias, and carry and carry_bias with carry circles). Every other entry and every other line is HEAD's. A read of OUT beside
+moment_face_bias, lift_bias, and carry and carry_bias with carry circles, whose turn and leak halves are also named apart: carry/turn,
+carry/leak, carry_bias/turn, carry_bias/leak). Every other entry and every other line is HEAD's. A read of OUT beside
 HEAD's and DONOR's tells how much of a reading's difference between two states those families carry; where a reading is first order
 in the states' difference, the shifts of grafts that partition the material add up to the whole difference, and what the sum leaves
 is the reading's curvature between them. A name may also be `part:NAME`, the entries of one founded part as the rate law names
@@ -297,10 +299,15 @@ def scale_blocks(d, old_f):
     for name in ("q_bias", "v_bias", "probe_bias", "read_bias", "moment_before", "moment_after", "temper", "pace"):
         add(name, 0, "all", "other", name, np.ones(shapes[name], dtype=bool))
     if "carry" in shapes:
+        # [theory, November 11 22:40, G87] The circles' turn rows Q (0..C) and leak rows H (C..2C) by lane, and q_b and h_b, apart.
+        c = shapes["carry"][0] // 2
         for k, sel in enumerate(lane_of, 1):
-            m = np.zeros(shapes["carry"], dtype=bool); m[:, sel] = True
-            add("carry", k, "all", "reads", "carry", m)
-        add("carry_bias", 0, "all", "other", "carry_bias", np.ones(shapes["carry_bias"], dtype=bool))
+            for block, rows in (("carry_turn", slice(0, c)), ("carry_leak", slice(c, 2 * c))):
+                m = np.zeros(shapes["carry"], dtype=bool); m[rows, sel] = True
+                add(block, k, "all", "reads", "carry", m)
+        for block, rows in (("carry_bias_turn", slice(0, c)), ("carry_bias_leak", slice(c, 2 * c))):
+            m = np.zeros(shapes["carry_bias"], dtype=bool); m[rows] = True
+            add(block, 0, "all", "other", "carry_bias", m)
     return out
 
 
@@ -474,6 +481,9 @@ def mean(out, head, paths):
     print(f"STATE_MEAN states={n} entries={len(material)} moved={int((moved != 0).sum())} rms_from_head={float(np.sqrt((moved ** 2).mean())):.5g}")
 
 
+CARRY_HALVES = ("carry/turn", "carry/leak", "carry_bias/turn", "carry_bias/leak")
+
+
 def graft(out, head, donor, names):
     lines = open(head).read().split("\n")
     d, theta = state(head)
@@ -510,6 +520,13 @@ def graft(out, head, donor, names):
             assert n[:-4] in spans, f"families of the layout: {' '.join(spans)}"
             at, k = spans[n[:-4]]
             chosen[at:at + k] = founded[at:at + k] == part_rates.OLD
+        elif n in CARRY_HALVES:
+            family, half = n.split("/")
+            assert d["carry"] > 0, f"{n} names a carry circles' half, and this declaration has no circles"
+            at, k = spans[family]
+            row = k // (2 * d["carry"])  # D entries a row of the charts, one of the biases
+            start = at + (0 if half == "turn" else d["carry"] * row)
+            chosen[start:start + d["carry"] * row] = True
         else:
             assert n in spans, f"families of the layout, each once: {' '.join(spans)}"
             at, k = spans[n]

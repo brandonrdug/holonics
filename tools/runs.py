@@ -35,6 +35,14 @@ def _main_checkout():
 REG = _main_checkout() / ".local" / "dispatch"
 COLAB = os.path.expanduser("~/.local/bin/colab")
 FAILURE = re.compile(r"error|panic|Killed|refused|Traceback|LOCK_BUSY", re.I)
+# [November 11 22:58] A count that reads zero reports no failure: every FIELD_LAP line prints next_refused=0, and the watch
+# flagged each lap line of the P8 laps as a failure. A count above zero still reads as one.
+ZERO_COUNT = re.compile(r"\b\w+=0+(?:\.0+)?(?![\w.])")
+
+
+def failure(text):
+    """Whether a log line reports a failure: a failure word outside the counts that read zero."""
+    return FAILURE.search(ZERO_COUNT.sub("", text)) is not None
 DEFAULT_PROGRESS = r"^FIELD_\w+ lap="
 
 
@@ -96,7 +104,7 @@ def state(e):
         lines = [l for l in rest.splitlines() if l.strip()]
         ext = ex.group(1).strip() if ex else "-"
         st = "running" if alive else ("exited" if ext != "-" else ("gone" if ex else "unreachable"))
-        return (st, ext, lines[0] if lines else None, [l for l in lines[1:] if FAILURE.search(l)])
+        return (st, ext, lines[0] if lines else None, [l for l in lines[1:] if failure(l)])
     xf = REG / f"{e['name']}.exit"
     ext = xf.read_text().strip() if xf.exists() else "-"
     if e.get("adopted") and ext == "-" and not unit_active(e["unit"]):
@@ -106,7 +114,7 @@ def state(e):
     fails = []
     try:
         with open(e["log"], errors="replace") as f:
-            fails = [l.rstrip()[:200] for l in f if FAILURE.search(l) and not l.startswith(("FIELD_COMMAND", "#"))][-3:]
+            fails = [l.rstrip()[:200] for l in f if failure(l) and not l.startswith(("FIELD_COMMAND", "#"))][-3:]
     except OSError:
         pass
     return (st, ext, tail_match(e["log"], e["progress"]), fails)

@@ -1,0 +1,56 @@
+# polar_map.py on g76_weighed_4_means_hot2.txt of the heat record's receipts (host, read 2026-11-11 UTC; millionths of a bit a site of the lap's 16,560,945).
+POLAR_BLOCK class=polar block=after lane=1 contacts=all entries=3232 heat_micro=97.6 fall2_micro=+171.5 polarization=+1.758 cos_w=+0.587
+POLAR_BLOCK class=polar block=before lane=1 contacts=all entries=3232 heat_micro=99.3 fall2_micro=+161.1 polarization=+1.623 cos_w=+0.546
+POLAR_BLOCK class=polar block=before lane=2 contacts=all entries=3232 heat_micro=122.7 fall2_micro=+142.0 polarization=+1.157 cos_w=+0.443
+POLAR_BLOCK class=polar block=after lane=2 contacts=all entries=3232 heat_micro=123.0 fall2_micro=+132.3 polarization=+1.076 cos_w=+0.428
+POLAR_BLOCK class=polar block=enc lane=2 contacts=all entries=3232 heat_micro=186.1 fall2_micro=+129.3 polarization=+0.695 cos_w=+0.443
+POLAR_BLOCK class=polar block=pace lane=0 contacts=all entries=202 heat_micro=26.8 fall2_micro=+18.4 polarization=+0.688 cos_w=+0.418
+POLAR_BLOCK class=middle block=probe lane=1 contacts=all entries=2048 heat_micro=392.1 fall2_micro=+155.3 polarization=+0.396 cos_w=+0.393
+POLAR_BLOCK class=middle block=probe lane=2 contacts=all entries=2048 heat_micro=572.8 fall2_micro=+191.6 polarization=+0.334 cos_w=+0.307
+POLAR_BLOCK class=middle block=a lane=1 contacts=new entries=1024 heat_micro=369.2 fall2_micro=+94.9 polarization=+0.257 cos_w=+0.290
+POLAR_BLOCK class=middle block=q lane=1 contacts=all entries=2048 heat_micro=693.2 fall2_micro=+173.8 polarization=+0.251 cos_w=+0.369
+POLAR_BLOCK class=middle block=b lane=1 contacts=new entries=1024 heat_micro=432.7 fall2_micro=+103.4 polarization=+0.239 cos_w=+0.331
+POLAR_BLOCK class=middle block=v lane=2 contacts=all entries=2048 heat_micro=978.3 fall2_micro=+207.7 polarization=+0.212 cos_w=+0.326
+POLAR_BLOCK class=middle block=v lane=1 contacts=all entries=2048 heat_micro=885.0 fall2_micro=+174.0 polarization=+0.197 cos_w=+0.421
+POLAR_BLOCK class=middle block=enc lane=1 contacts=all entries=3232 heat_micro=493.4 fall2_micro=+95.6 polarization=+0.194 cos_w=+0.310
+POLAR_BLOCK class=middle block=moment_face_bias lane=1 contacts=all entries=32 heat_micro=20.4 fall2_micro=+3.9 polarization=+0.191 cos_w=+0.824
+POLAR_BLOCK class=middle block=w_bias lane=2 contacts=all entries=32 heat_micro=63.7 fall2_micro=+11.9 polarization=+0.187 cos_w=+0.820
+POLAR_BLOCK class=middle block=q lane=2 contacts=all entries=2048 heat_micro=865.5 fall2_micro=+146.5 polarization=+0.169 cos_w=+0.210
+POLAR_BLOCK class=middle block=w lane=1 contacts=new entries=1024 heat_micro=440.5 fall2_micro=+60.5 polarization=+0.137 cos_w=+0.172
+POLAR_BLOCK class=middle block=moment_face lane=2 contacts=all entries=2048 heat_micro=849.6 fall2_micro=+106.4 polarization=+0.125 cos_w=+0.277
+POLAR_BLOCK class=middle block=probe_bias lane=0 contacts=all entries=64 heat_micro=23.3 fall2_micro=+2.8 polarization=+0.120 cos_w=+0.665
+POLAR_BLOCK class=middle block=out lane=1 contacts=all entries=2048 heat_micro=1203.1 fall2_micro=+141.4 polarization=+0.118 cos_w=+0.256
+POLAR_BLOCK class=middle block=a lane=2 contacts=new entries=1024 heat_micro=582.8 fall2_micro=+63.4 polarization=+0.109 cos_w=+0.185
+POLAR_BLOCK class=middle block=moment_face lane=1 contacts=all entries=2048 heat_micro=567.5 fall2_micro=+60.9 polarization=+0.107 cos_w=+0.229
+POLAR_BLOCK class=thermal block=b lane=2 contacts=new entries=1024 heat_micro=670.3 fall2_micro=+59.0 polarization=+0.088 cos_w=+0.161
+POLAR_BLOCK class=thermal block=out lane=2 contacts=all entries=2048 heat_micro=2033.1 fall2_micro=+135.2 polarization=+0.067 cos_w=+0.176
+POLAR_BLOCK class=thermal block=w lane=1 contacts=old entries=1024 heat_micro=1580.9 fall2_micro=+103.5 polarization=+0.065 cos_w=+0.304
+POLAR_BLOCK class=thermal block=q_bias lane=0 contacts=all entries=64 heat_micro=23.3 fall2_micro=+1.5 polarization=+0.062 cos_w=+0.328
+POLAR_BLOCK class=thermal block=b lane=1 contacts=old entries=1024 heat_micro=1302.3 fall2_micro=+77.6 polarization=+0.060 cos_w=+0.206
+POLAR_BLOCK class=thermal block=moment_face_bias lane=2 contacts=all entries=32 heat_micro=36.5 fall2_micro=+2.0 polarization=+0.055 cos_w=+0.460
+POLAR_BLOCK class=thermal block=moment_after lane=0 contacts=all entries=3232 heat_micro=971.9 fall2_micro=+50.2 polarization=+0.052 cos_w=+0.079
+POLAR_BLOCK class=thermal block=w_bias lane=1 contacts=all entries=32 heat_micro=36.9 fall2_micro=+1.9 polarization=+0.052 cos_w=+0.678
+POLAR_BLOCK class=thermal block=w lane=2 contacts=new entries=1024 heat_micro=671.6 fall2_micro=+34.5 polarization=+0.051 cos_w=+0.089
+POLAR_BLOCK class=thermal block=moment_before lane=0 contacts=all entries=3232 heat_micro=1176.7 fall2_micro=+55.6 polarization=+0.047 cos_w=+0.085
+POLAR_BLOCK class=thermal block=out_bias lane=1 contacts=all entries=32 heat_micro=41.2 fall2_micro=+1.9 polarization=+0.047 cos_w=+0.744
+POLAR_BLOCK class=thermal block=read_rows lane=2 contacts=all entries=2048 heat_micro=2663.0 fall2_micro=+123.0 polarization=+0.046 cos_w=+0.297
+POLAR_BLOCK class=thermal block=a_bias lane=0 contacts=new entries=32 heat_micro=23.2 fall2_micro=+1.0 polarization=+0.045 cos_w=+0.510
+POLAR_BLOCK class=thermal block=read_rows lane=1 contacts=all entries=2048 heat_micro=2592.3 fall2_micro=+115.2 polarization=+0.044 cos_w=+0.297
+POLAR_BLOCK class=thermal block=out_bias lane=2 contacts=all entries=32 heat_micro=74.5 fall2_micro=+3.0 polarization=+0.041 cos_w=+0.653
+POLAR_BLOCK class=thermal block=a lane=1 contacts=old entries=1024 heat_micro=956.8 fall2_micro=+37.9 polarization=+0.040 cos_w=+0.111
+POLAR_BLOCK class=thermal block=v_bias lane=0 contacts=all entries=64 heat_micro=71.7 fall2_micro=+2.4 polarization=+0.034 cos_w=+0.557
+POLAR_BLOCK class=thermal block=w lane=2 contacts=old entries=1024 heat_micro=2562.1 fall2_micro=+84.3 polarization=+0.033 cos_w=+0.209
+POLAR_BLOCK class=thermal block=b lane=2 contacts=old entries=1024 heat_micro=1963.2 fall2_micro=+56.7 polarization=+0.029 cos_w=+0.127
+POLAR_BLOCK class=thermal block=a_bias lane=0 contacts=old entries=32 heat_micro=58.1 fall2_micro=+1.5 polarization=+0.026 cos_w=+0.350
+POLAR_BLOCK class=thermal block=b_bias lane=0 contacts=new entries=32 heat_micro=28.4 fall2_micro=+0.3 polarization=+0.011 cos_w=+0.174
+POLAR_BLOCK class=thermal block=b_bias lane=0 contacts=old entries=32 heat_micro=85.3 fall2_micro=+0.9 polarization=+0.010 cos_w=+0.245
+POLAR_BLOCK class=thermal block=read_bias lane=0 contacts=all entries=100 heat_micro=28.1 fall2_micro=+0.3 polarization=+0.010 cos_w=+0.098
+POLAR_BLOCK class=thermal block=a lane=2 contacts=old entries=1024 heat_micro=1451.3 fall2_micro=+11.1 polarization=+0.008 cos_w=+0.028
+POLAR_BLOCK class=thermal block=lift_bias lane=1 contacts=all entries=32 heat_micro=94.2 fall2_micro=+0.6 polarization=+0.006 cos_w=+0.372
+POLAR_BLOCK class=thermal block=lift_bias lane=2 contacts=all entries=32 heat_micro=93.6 fall2_micro=+0.2 polarization=+0.002 cos_w=+0.182
+POLAR_BLOCK class=reversing block=temper lane=0 contacts=all entries=8 heat_micro=8.7 fall2_micro=-0.5 polarization=-0.063 cos_w=-0.154
+POLAR_CLASS class=polar blocks=6 entries=16362 heat_micro=655.4 heat_share=0.021 fall2_micro=+754.6 fall2_share=+0.215
+POLAR_CLASS class=middle blocks=17 entries=25888 heat_micro=9433.1 heat_share=0.301 fall2_micro=+1794.1 fall2_share=+0.511
+POLAR_CLASS class=thermal blocks=26 entries=21348 heat_micro=21290.5 heat_share=0.678 fall2_micro=+961.4 fall2_share=+0.274
+POLAR_CLASS class=reversing blocks=1 entries=8 heat_micro=8.7 heat_share=0.000 fall2_micro=-0.5 fall2_share=-0.000
+POLAR_TOTAL blocks=50 entries=63606 heat_micro=31387.8 fall2_micro=+3509.5

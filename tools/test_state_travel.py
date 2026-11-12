@@ -36,6 +36,13 @@ no part; the fifteen parts and every family's old entries, each grafted alone, m
 the material); the count before the growth is the head's `parts` line's, or `contacts:N` on a head that carries none, and the two
 give one file; an entry named twice (a family beside one of its parts), a part of another law, a count that is not the head's, and
 a part named on a head with no count are refused.
+
+Controls of the carry circles' halves (theory, November 11 22:40, G87), on drawn states of a declaration with two circles:
+  blocks   scale's blocks read the turn rows Q and the leak rows H apart by lane, and q_b and h_b apart, each entry once;
+  weighed  a travel planted in the second lane's leak rows alone, the same on both laps: the leak block of that lane travels with
+           the cosine 1, and the turn blocks, the first lane's leak block and the biases do not travel;
+  graft    carry/turn, carry/leak, carry_bias/turn and carry_bias/leak take only their half; the four with every other family give
+           the donor's material; a half beside its family, and a half on a declaration with no circles, are refused.
 """
 import io
 import os
@@ -448,6 +455,90 @@ def graft_part_controls():
     print(f"state_travel graft by part: {len(lines)} lines, the controls hold")
 
 
+DC = dict(D, carry=2)
+
+
+def write_carry(path, theta, second=None):
+    words = ["hnn-field-v14t"] + [str(DC[k]) for k in ("alphabet", "width", "heads", "modes", "still", "contacts", "ticks", "frames", "reach", "lanes")] + ["0", str(DC["carry"])]
+    with open(path, "w") as f:
+        f.write("hnn-field-learner-v3 12 0 0 -\n" + " ".join(words) + "\n" + " ".join(str(int(x)) for x in theta) + "\n")
+        if second is not None:
+            f.write(" ".join("0" for _ in theta) + "\n" + " ".join(str(int(x)) for x in second) + "\n")
+
+
+def carry_controls():
+    c, dw = DC["carry"], DC["width"]
+    fam, total = state_travel.layout(DC)
+    where = {name: (at, shape) for name, at, shape, _ in fam}
+    # Blocks: the halves apart, by lane, each entry once.
+    blocks = {(b, lane): (family, m) for b, lane, _, _, family, m in state_travel.scale_blocks(DC, OLD_F)}
+    assert ("carry", 1) not in blocks and ("carry_bias", 0) not in blocks
+    lw = dw // DC["lanes"]
+    for lane in (1, 2):
+        cols = slice((lane - 1) * lw, lane * lw)
+        for block, rows in (("carry_turn", slice(0, c)), ("carry_leak", slice(c, 2 * c))):
+            family, m = blocks[(block, lane)]
+            want = np.zeros(where["carry"][1], dtype=bool); want[rows, cols] = True
+            assert family == "carry" and (m == want).all(), (block, lane)
+    for block, rows in (("carry_bias_turn", slice(0, c)), ("carry_bias_leak", slice(c, 2 * c))):
+        family, m = blocks[(block, 0)]
+        want = np.zeros(2 * c, dtype=bool); want[rows] = True
+        assert family == "carry_bias" and (m == want).all(), block
+    cover = sum(m.astype(np.int64) for (b, _), (family, m) in blocks.items() if family == "carry")
+    assert (cover == 1).all(), "the charts' halves hold every entry once"
+    # Weighed: a travel in the second lane's leak rows alone.
+    rng = np.random.default_rng(20261117)
+    at, shape = where["carry"]
+    base = rng.integers(-100000, 100000, size=total).astype(np.int64)
+    step = np.zeros(total, dtype=np.int64)
+    leak = np.zeros(shape, dtype=bool); leak[c:2 * c, lw:] = True
+    step[at + np.flatnonzero(leak.ravel())] = rng.integers(200, 400, size=int(leak.sum()))
+    states = [base, base + step, base + 2 * step]
+    second = np.full(total, 1 << 20, dtype=np.int64)
+    with tempfile.TemporaryDirectory() as tmp:
+        paths = [os.path.join(tmp, f"s{i}") for i in range(3)]
+        for path, theta in zip(paths, states):
+            write_carry(path, theta, second)
+        out = io.StringIO()
+        with redirect_stdout(out):
+            state_travel.weighed(OLD_F, 4, 64, paths)
+        rows = [fields(l) for l in out.getvalue().split("\n") if l.startswith("TRAVEL_WEIGHED_LAP ") or l.startswith("TRAVEL_WEIGHED_PAIR ")]
+        laps = {(r["block"], r["lane"]): float(r["travel_rms"]) for r in rows if "lap" in r and r["lap"] == "0"}
+        (pair,) = [r for r in rows if "laps" in r and r["block"] == "carry_leak" and r["lane"] == "2"]
+        assert laps[("carry_leak", "2")] > 0 and float(pair["cos"]) > 0.9999, (laps, pair)
+        assert all(laps[k] == 0 for k in (("carry_leak", "1"), ("carry_turn", "1"), ("carry_turn", "2"), ("carry_bias_turn", "0"), ("carry_bias_leak", "0")))
+        # Graft: each half alone, and the four with every other family give the donor's material.
+        b = base + rng.integers(1, 10, size=total)
+        pa, pb, plain = os.path.join(tmp, "a"), os.path.join(tmp, "b"), os.path.join(tmp, "plain")
+        write_carry(pa, base, second)
+        write_carry(pb, b, second)
+        write(plain, rng.integers(-100, 100, size=state_travel.layout(D)[1]))
+        spans = {name: (at, int(np.prod(shape))) for name, at, shape, _ in fam}
+        quiet = io.StringIO()
+        halves = list(state_travel.CARRY_HALVES)
+        with redirect_stdout(quiet):
+            for i, name in enumerate(halves):
+                state_travel.graft(os.path.join(tmp, f"h{i}"), pa, pb, [name])
+                _, got = state_travel.state(os.path.join(tmp, f"h{i}"))
+                family, half = name.split("/")
+                fat, k = spans[family]
+                row = k // (2 * c)
+                start = fat + (0 if half == "turn" else c * row)
+                inside = np.zeros(total, dtype=bool); inside[start:start + c * row] = True
+                assert (got[inside] == b[inside]).all() and (got[~inside] == base[~inside]).all(), name
+            others = [n for n in spans if n not in ("carry", "carry_bias")]
+            state_travel.graft(os.path.join(tmp, "whole"), pa, pb, halves + others)
+        assert (state_travel.state(os.path.join(tmp, "whole"))[1] == b).all()
+        for bad, head, donor in ((["carry", "carry/leak"], pa, pb), (["carry_bias/turn", "carry_bias"], pa, pb), (["carry/leak"], plain, plain), (["carry/phase"], pa, pb)):
+            try:
+                with redirect_stdout(quiet):
+                    state_travel.graft(os.path.join(tmp, "bad"), head, donor, bad)
+                raise RuntimeError(f"a graft that names {bad} was written")
+            except AssertionError:
+                assert not os.path.exists(os.path.join(tmp, "bad"))
+    print(f"state_travel carry halves: {len(rows)} weighed lines, the controls hold")
+
+
 def main():
     rank_controls()
     scale_controls()
@@ -456,6 +547,7 @@ def main():
     mean_controls()
     graft_controls()
     graft_part_controls()
+    carry_controls()
 
 
 if __name__ == "__main__":

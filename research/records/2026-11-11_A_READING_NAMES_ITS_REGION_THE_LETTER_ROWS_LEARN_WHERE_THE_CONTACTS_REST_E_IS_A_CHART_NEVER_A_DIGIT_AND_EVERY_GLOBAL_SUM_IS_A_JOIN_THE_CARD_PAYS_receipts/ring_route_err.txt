@@ -1,0 +1,4 @@
+# ring_route_err.py (a host ruler on the cloud container, numbers only: Python integers reproducing tower.rs half_turn, exp_series and field.rs turn_phasor and skin_of at main 202c11d4, against pi and ln 2 attained at 400 bits; the faces of the line's declaration, 16 turned slots at reach 3,771), read 2026-11-11 from 19:26:17 UTC, 130 s, rc=0.
+RING_PERIODS 2 3 4 9 16 27 32 81 128 243 256 729 1024 2187 4096 6561
+RING_ERR units_off:count 0:2769 1:8106 2:1319 3:51 largest=3
+RING_ERR off_by_the_angle_rounding_alone=3327 outside_the_unit_disk=5414

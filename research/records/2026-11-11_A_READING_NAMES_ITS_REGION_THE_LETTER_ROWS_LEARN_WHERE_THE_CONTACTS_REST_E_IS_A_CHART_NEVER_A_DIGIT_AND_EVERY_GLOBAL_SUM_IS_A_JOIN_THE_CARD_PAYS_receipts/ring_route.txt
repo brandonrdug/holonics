@@ -1,0 +1,4 @@
+# ring_route.py (a host ruler on the cloud container, numbers only: Python integers reproducing tower.rs half_turn, exp_series and field.rs turn_phasor and skin_of at main 202c11d4, against pi and ln 2 attained at 400 bits; the faces of the line's declaration, 16 turned slots at reach 3,771), read 2026-11-11 from 19:24:26 UTC, 111 s, rc=0.
+RING_PERIODS 2 3 4 9 16 27 32 81 128 243 256 729 1024 2187 4096 6561
+RING_ROUTE faces=12245 equal_to_the_roots_nearest=2769 one_unit_off=8106 two_or_more_off=1370
+RING_ROUTE_BY_RING 2:0/2 3:0/3 4:0/4 9:4/9 16:8/16 27:20/27 32:20/32 81:64/81 128:94/128 243:196/243 256:192/256 729:554/729 1024:770/1024 2187:1682/2187 4096:2931/3771 6561:2941/3771
