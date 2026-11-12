@@ -3379,3 +3379,157 @@ fn the_triad_is_one_founded_part_written_only_where_the_field_has_triads() {
         assert_eq!(parts[..l.triad], before.founded_parts(contacts)[..], "circled {circled}: every old entry's part as before");
     }
 }
+
+/// [definition; theory, November 12 (the record of the opening's room, §4 item 4)] **A growth by letters keeps every standing entry and reads
+/// each fresh letter at the least class bias**: on drawn fields (still heads or turned, plain, with carry circles, with triads), [`Field::lettered`]
+/// at no fresh class returns the field as it stands (its text byte for byte, every entry its own); at one and three fresh classes every standing
+/// entry keeps its value (the open rows at the end of their families), each fresh class's rows of the encodings, the moment encodings and the
+/// paces stand at zero and its class bias at the least the standing classes hold, the text round-trips, and on a region of standing classes each
+/// face's standing logits are equal entry for entry before and after and each fresh logit is the least bias. A tower's levels are refused. The
+/// learner reads no key (its draws stand), keeps every standing entry's moments, opens a fresh entry's first moment at zero and its second at
+/// its family's standing mean, keeps the parts' rates and each standing entry's own rate (a fresh one at `rate_bits`), keeps its pass, and is
+/// refused while a step is held.
+#[test]
+fn a_growth_by_letters_keeps_every_standing_entry_and_reads_fresh_letters_at_the_least_bias() {
+    let fields: Vec<(&str, Field)> = (0..3usize)
+        .flat_map(|still| [(format!("plain {still}"), shaped_with(four_contacts(still))), (format!("circled {still}"), circled_shaped(still)), (format!("triads {still}"), circled_triad_shaped(still, TRIADS))])
+        .map(|(n, f)| (Box::leak(n.into_boxed_str()) as &str, f))
+        .collect();
+    let mut forward_kept = 0usize;
+    for (name, plain) in &fields {
+        let (same, from) = plain.lettered(0).unwrap();
+        assert_eq!((&same, same.to_text()), (plain, plain.to_text()), "{name}: no fresh class leaves the field as it stands");
+        assert!(from.iter().enumerate().all(|(i, &o)| o == Some(i)), "{name}: every entry its own");
+        let (a, dw) = (plain.declaration.alphabet, plain.declaration.width);
+        let (ol, tm2, paced) = (plain.layout.clone(), 2 * plain.declaration.moment_modes(), plain.declaration.paced_heads());
+        let least = plain.theta[ol.read_bias..ol.read_bias + a].iter().copied().min().unwrap();
+        let before = plain.logits(&region()).unwrap();
+        for fresh in [1usize, 3] {
+            let (grown, from) = plain.lettered(fresh).unwrap();
+            let (d, l, a2) = (grown.declaration, grown.layout.clone(), a + fresh);
+            assert_eq!(d, FieldDeclaration { alphabet: a2, ..plain.declaration }, "{name}: the alphabet grows and nothing else");
+            assert_eq!(from.len(), grown.theta.len());
+            assert_eq!(from.iter().filter(|o| o.is_some()).count(), plain.theta.len(), "{name}: every standing entry is carried once");
+            for (k, &o) in from.iter().enumerate() {
+                if let Some(i) = o {
+                    assert_eq!(grown.theta[k], plain.theta[i], "{name} +{fresh}: entry {k} keeps its value");
+                }
+            }
+            for (o, n, width) in [(ol.enc, l.enc, dw), (ol.before, l.before, dw), (ol.after, l.after, dw), (ol.moment_before, l.moment_before, tm2), (ol.moment_after, l.moment_after, tm2)] {
+                assert_eq!(grown.theta[n..n + a * width], plain.theta[o..o + a * width], "{name} +{fresh}: the standing classes' rows at their indices");
+                assert!(grown.theta[n + a * width..n + a2 * width].iter().all(|&v| v == 0), "{name} +{fresh}: a fresh class's rows at zero");
+                assert_eq!(grown.theta[n + a2 * width..n + (a2 + 1) * width], plain.theta[o + a * width..o + (a + 1) * width], "{name} +{fresh}: the open row at the end");
+            }
+            for p in 0..paced {
+                let (o, n) = (ol.pace + p * (a + 1), l.pace + p * (a2 + 1));
+                assert_eq!(grown.theta[n..n + a], plain.theta[o..o + a]);
+                assert!(grown.theta[n + a..n + a2].iter().all(|&v| v == 0), "{name} +{fresh}: a fresh pace at zero");
+                assert_eq!(grown.theta[n + a2], plain.theta[o + a], "{name} +{fresh}: the open row's pace at the end");
+            }
+            assert_eq!(grown.theta[l.read_bias..l.read_bias + a], plain.theta[ol.read_bias..ol.read_bias + a]);
+            assert!(grown.theta[l.read_bias + a..l.read_bias + a2].iter().all(|&v| v == least), "{name} +{fresh}: a fresh class bias at the least standing one");
+            assert!(from[l.read_bias + a..l.read_bias + a2].iter().all(Option::is_none));
+            assert_eq!(Field::from_text(&grown.to_text()).unwrap(), grown, "{name} +{fresh}: the text round-trips");
+            // The face read through the encoding, at any lift: every standing logit as before, every fresh one the least bias.
+            let mut next = mixer(0x1E77 + fresh as u64);
+            for _ in 0..16 {
+                let y: Vec<i64> = (0..dw).map(|_| (next() as i64) >> 40).collect();
+                let (mut zp, mut zg) = (vec![0i64; a], vec![0i64; a2]);
+                plain.tied(&y, &mut zp).unwrap();
+                grown.tied(&y, &mut zg).unwrap();
+                assert_eq!(zg[..a], zp[..], "{name} +{fresh}: the standing logits of a lift kept entry for entry");
+                assert!(zg[a..].iter().all(|&z| z == i64::from(least)), "{name} +{fresh}: a fresh logit at the least bias");
+            }
+            // The whole forward on a region of standing classes. Where no head is paced no blank's clock reads a face, so each face's
+            // standing logits are its logits before, entry for entry, and each fresh logit is the least bias. Where a head is paced, a blank
+            // between arrivals runs at `κ = 1 + Σ_a p_a c[a]` over its own face, which a fresh class's share at the least bias moves; there the
+            // faces move by the founding's price, read on a held passage before and after it (owed to #410).
+            let after = grown.logits(&region()).unwrap();
+            assert_eq!(before.len(), after.len());
+            for (t, (b, g)) in before.iter().zip(&after).enumerate() {
+                match (b, g) {
+                    (None, None) => {}
+                    (Some(b), Some(g)) if paced == 0 => {
+                        assert_eq!(g[..a], b[..], "{name} +{fresh}: site {t}'s standing logits kept entry for entry");
+                        assert!(g[a..].iter().all(|&z| z == i64::from(least)), "{name} +{fresh}: site {t}'s fresh logits at the least bias");
+                        forward_kept += 1;
+                    }
+                    (Some(_), Some(g)) => assert_eq!(g.len(), a2),
+                    _ => panic!("{name} +{fresh}: site {t} read before and not after, or after and not before"),
+                }
+            }
+        }
+    }
+    assert!(forward_kept > 0, "a field with no paced head read the whole forward");
+    let tower = towered(1);
+    assert!(tower.lettered(1).is_err(), "a tower's levels take letters level by level");
+    // The learner.
+    let mut learner = FieldLearner::new(shaped_with(four_contacts(1)), 6);
+    learner.section(&[region()]).unwrap();
+    learner.held = None;
+    let mut octaves = [0u32; PARTS];
+    (octaves[3], octaves[19]) = (2, 1);
+    learner.rate_parts = Some(RateParts { contacts_before: 8, octaves });
+    learner.own_rates = Some((0..learner.field.material_len()).map(|i| 3 + (i % 5) as u32).collect());
+    learner.pass = Some(StorePass { role: "prefix".into(), store: "ab".repeat(32), stretches: 7, least: 4, octaves: 7, pairs: 15_606_223, sites: 41_490, slices: vec![PassSlice { name: "code".into(), piece: 2, cursor: 17, taken: 900 }] });
+    let same = learner.lettered(0).unwrap();
+    assert_eq!(same.to_text(), learner.to_text(), "no fresh class leaves the learner's text byte for byte");
+    let fresh = 2usize;
+    let grown = learner.lettered(fresh).unwrap();
+    let (_, from) = learner.field.lettered(fresh).unwrap();
+    assert_eq!((grown.drawn, grown.rate_bits, grown.laps), (learner.drawn, learner.rate_bits, learner.laps), "no key is read");
+    assert_eq!((grown.rate_parts, &grown.pass), (learner.rate_parts, &learner.pass));
+    let own = grown.own_rates.as_ref().unwrap();
+    for (k, &o) in from.iter().enumerate() {
+        match o {
+            Some(i) => {
+                assert_eq!((grown.first[k], grown.second[k], own[k]), (learner.first[i], learner.second[i], learner.own_rates.as_ref().unwrap()[i]), "entry {k} keeps its moments and rate");
+            }
+            None => {
+                assert_eq!((grown.first[k], own[k]), (0, learner.rate_bits), "a fresh entry's first moment at zero and its rate at rate_bits");
+                let &(start, len, _) = grown.field.families_all().iter().find(|&&(s, l, _)| (s..s + l).contains(&k)).unwrap();
+                let old: Vec<i128> = (start..start + len).filter_map(|j| from[j].map(|i| learner.second[i])).collect();
+                let n = old.len() as i128;
+                assert_eq!(grown.second[k], old.iter().map(|v| v / n).sum::<i128>() + old.iter().map(|v| v % n).sum::<i128>() / n, "a fresh entry's second moment at its family's standing mean");
+            }
+        }
+    }
+    assert_eq!(FieldLearner::from_text(&grown.to_text()).unwrap(), grown);
+    let mut holding = learner.clone();
+    holding.held = Some(HeldStep { step: vec![0; learner.field.material_len()], halvings: 0 });
+    assert!(holding.lettered(1).is_err(), "refused while a step is held");
+}
+
+/// [definition; theory, November 12 (the record of the opening's room, §4 item 5)] **The pass's place is the learner's last line, written only
+/// where present**: a learner with no pass writes no pass line and reads back as it was; with one, its text is the text without it and the pass
+/// line after, and it reads back with it; a malformed pass line is refused.
+#[test]
+fn the_pass_line_is_the_learners_last_line_and_only_where_present() {
+    let mut learner = FieldLearner::new(shaped_with(four_contacts(1)), 6);
+    learner.section(&[region()]).unwrap();
+    learner.held = None;
+    let plain = learner.to_text();
+    assert!(!plain.lines().any(|l| l.starts_with("pass ")));
+    assert_eq!(FieldLearner::from_text(&plain).unwrap().to_text(), plain, "a learner with no pass reads and writes byte for byte");
+    let pass = StorePass {
+        role: "prefix".into(),
+        store: "0123456789abcdef".repeat(4),
+        stretches: 1234,
+        least: 4,
+        octaves: 7,
+        pairs: 15_606_223,
+        sites: 41_490,
+        slices: ["code", "web", "science", "books", "wikidata"].iter().enumerate().map(|(k, n)| PassSlice { name: n.to_string(), piece: k as u64, cursor: 3 * k as u64, taken: 100 * k as u64 }).collect(),
+    };
+    learner.pass = Some(pass.clone());
+    let text = learner.to_text();
+    assert_eq!(text, format!("{plain}{}\n", pass.to_line()), "the pass line follows every other line");
+    let back = FieldLearner::from_text(&text).unwrap();
+    assert_eq!((back.pass.as_ref(), back.to_text()), (Some(&pass), text.clone()));
+    assert_eq!(StorePass::from_line(&pass.to_line()).unwrap(), pass);
+    for bad in ["pass prefix", "pass prefix nothex 1 4 7 1 1", "pass prefix 0123 1 4 7 1 1 code 1 2"] {
+        assert!(StorePass::from_line(bad).is_err(), "{bad}");
+    }
+    let short = format!("{plain}pass prefix {} 1 4 7 1 1 code 1 2\n", "ab".repeat(32));
+    assert!(FieldLearner::from_text(&short).is_err(), "a slice of three words is refused");
+}

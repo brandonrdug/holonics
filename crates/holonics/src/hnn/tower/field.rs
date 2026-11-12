@@ -476,6 +476,15 @@ impl FieldDeclaration {
         Ok(d)
     }
 
+    /// [definition; theory, November 12 (the record of the opening's room, §4 item 4)] The declaration with `fresh` more letters
+    /// ([`Field::lettered`]): the alphabet grows and nothing else. No key is read.
+    pub fn lettered(&self, fresh: usize) -> Result<Self> {
+        let alphabet = self.alphabet.checked_add(fresh).ok_or(TowerError::Refused("an alphabet outgrew its carrier"))?;
+        let d = Self { alphabet, ..*self };
+        d.admit()?;
+        Ok(d)
+    }
+
     /// The key draws a growth in contacts by `added` reads ([`Field::contacted`]): the new contacts' rows of both pair drives
     /// over the whole width, as the founding draws them (`a` then `b`).
     pub fn contact_draws(&self, added: usize) -> usize {
@@ -5314,6 +5323,75 @@ impl Field {
         Ok((out, from))
     }
 
+    /// [definition; theory, November 12 (the record of the opening's room, §4 item 4; corrected 18:44Z: the founding reads no key)]
+    /// **The field with `fresh` more letters**, founded at a passage's crossing: the fresh classes follow the standing ones, so every
+    /// standing class keeps its index (the void's included, wherever the codec holds it), and the open row (the unresolved operand,
+    /// row `A` of each family with one) moves to the end of its family, row `A + F`. A fresh class's rows of the encoding `E`, of the two
+    /// strand encodings `E₋` and `E₊`, of the two moment encodings and of each paced head's pace open at zero, and its class bias `c_a` at the
+    /// least class bias the standing classes hold. Every other family is copied as it stands.
+    ///
+    /// Why at zero (the record, §4 item 4): the face reads a class through the encoding that encodes it, `z(a) = ⟨E(a), R r̂ + b_R⟩ + c_a`,
+    /// and a site's opening face is a sum of rows, `x⁰_t = E(u_t) + E₋(u_(t−1)) + E₊(u_(t+1))` and its moment's term. Every reader here is
+    /// trained, so a drawn row would read each fresh letter at a random height at every face and be heard beside it as a letter it is not.
+    /// At zero a fresh letter reads `c_a` at every face, the share the least-favoured standing letter is given, and its rows take their
+    /// covector from the first face compared and the first place the letter stands at or beside; the sum has no product of two fresh rows.
+    /// A fresh pace row at zero is the founding's pace, the strand's own clock (agent-inferred: the paces are founded at zero, and the
+    /// record names no other opening for them). On a region of standing classes each face's standing logits are its logits before, entry
+    /// for entry, and each fresh logit is the least bias; the codes move, by the fresh classes' share at the least bias (owed to #410).
+    ///
+    /// No key is read. Refused for a tower's levels. `fresh = 0` returns the field as it stands. Returns the grown field and, for each
+    /// entry, the old entry it carries (`None` for a fresh class's own).
+    pub fn lettered(&self, fresh: usize) -> Result<(Self, Vec<Option<usize>>)> {
+        if self.scale.is_some() {
+            return refuse("a tower's levels take letters level by level, not through the fine field alone");
+        }
+        let old = self.declaration;
+        let d = old.lettered(fresh)?;
+        let layout = FieldLayout::new(&d);
+        let ol = &self.layout;
+        let (a, a2, dw, tm2, paced) = (old.alphabet, d.alphabet, old.width, 2 * old.moment_modes(), old.paced_heads());
+        let mut new = vec![0i32; layout.len];
+        let mut from: Vec<Option<usize>> = vec![None; layout.len];
+        // Where an old row of a family with one row a class lands: a class keeps its index, the open row (index `A`) moves to `A + F`.
+        let row = |r: usize| if r < a { r } else { a2 };
+        let mut place = |o: usize, n: usize| {
+            new[n] = self.theta[o];
+            from[n] = Some(o);
+        };
+        // The families with a row a class and the open row: the encodings, the moment encodings.
+        for (o, n, width) in [(ol.enc, layout.enc, dw), (ol.before, layout.before, dw), (ol.after, layout.after, dw), (ol.moment_before, layout.moment_before, tm2), (ol.moment_after, layout.moment_after, tm2)] {
+            for r in 0..=a {
+                for j in 0..width {
+                    place(o + r * width + j, n + row(r) * width + j);
+                }
+            }
+        }
+        // The paces: each paced head's rate a class and the open row.
+        for p in 0..paced {
+            for r in 0..=a {
+                place(ol.pace + p * (a + 1) + r, layout.pace + p * (a2 + 1) + row(r));
+            }
+        }
+        // The class biases: each standing class at its index; the fresh at the least the standing hold.
+        for c in 0..a {
+            place(ol.read_bias + c, layout.read_bias + c);
+        }
+        // The families no class indexes, in their three stretches of the layout: the charts from `q` to the lift, the temperatures and the
+        // probe chart, and the moment's chart into the face with every family after it.
+        for (o_from, o_to, n_from) in [(ol.q, ol.read_bias, layout.q), (ol.temper, ol.pace, layout.temper), (ol.moment_face, ol.len, layout.moment_face)] {
+            for k in 0..o_to - o_from {
+                place(o_from + k, n_from + k);
+            }
+        }
+        let least = self.theta[ol.read_bias..ol.read_bias + a].iter().copied().min().unwrap_or(0);
+        new[layout.read_bias + a..layout.read_bias + a2].fill(least);
+        debug_assert_eq!((layout.read_bias - layout.q, layout.pace - layout.temper, layout.len - layout.moment_face), (ol.read_bias - ol.q, ol.pace - ol.temper, ol.len - ol.moment_face));
+        debug_assert_eq!(from.iter().filter(|o| o.is_some()).count(), self.theta.len());
+        let mut out = Self::with_theta(d, new);
+        (out.per_blank_clock, out.bare_stretch) = (self.per_blank_clock, self.bare_stretch);
+        Ok((out, from))
+    }
+
     /// [definition; theory, November 10 09:55] **The field with `added` more pair contacts** (the merge's `c = (aᵀs)(bᵀx)`
     /// joined to the face by `W`): the new contacts' `a` and `b` rows are the pair drives, drawn as a founding of this
     /// declaration draws them, uniform on `±√(3/D)` at the material's grain, read from `keys` four bytes a draw (the new set's
@@ -5631,6 +5709,11 @@ pub trait FieldRealization {
     fn met_pairs(&self) -> Option<u128> {
         None
     }
+    /// [measurement; theory, November 12] The realization's counters so far ([`RealizationCounters`]), where it keeps them: a reading for
+    /// the receipts, which no law reads.
+    fn counters(&self) -> Option<RealizationCounters> {
+        None
+    }
     /// A held read's rows by where their mass lies, summed over `regions` ([`Field::held_rows_all`]; each region's
     /// answer start in `questions`), a reading for the receipts.
     fn read_row_shares(&mut self, _field: &Field, _regions: &[Region], _questions: &[usize]) -> Result<Vec<HeldRows>> {
@@ -5668,6 +5751,17 @@ pub trait FieldRealization {
     fn read_blank_clocks(&mut self, _field: &Field, _region: &Region, _sites: &[usize]) -> Result<Vec<BlankClocks>> {
         refuse("a realization that cannot read its blanks' clocks")
     }
+}
+
+/// [measurement; theory, November 12] **A realization's counters** ([`FieldRealization::counters`]): its forward reads and returns, the site
+/// pairs its contact met, the batches it split its reads into, and its largest batch's store in octets. A reading only.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub struct RealizationCounters {
+    pub reads: u64,
+    pub returns: u64,
+    pub pairs: u128,
+    pub batches: u64,
+    pub peak_store: u64,
 }
 
 /// The host's realization: the regions on the host's cores, each region's forward and reverse on
@@ -6319,6 +6413,66 @@ pub struct FieldLearner {
     /// [`FieldReceipt::transfer`]; a reading's operand, not carried in the learner's text, cleared by every growth, and not
     /// kept under the held read (whose next section moves the step before pricing it).
     last: Option<HeldStep>,
+    /// [definition; theory, November 12 (the record of the opening's room, §4 item 5)] **The pass's place** over a store of documents
+    /// ([`StorePass`]), carried as the learner's text's last line and only where present, so every state of the code line reads and
+    /// writes byte for byte as before; none on a learner that has not crossed to a store. Kept by every growth.
+    pub pass: Option<StorePass>,
+}
+
+/// [definition; theory, November 12 (the record of the opening's room, §4 items 1, 3 and 5)] **A pass's place over a store of
+/// documents**: the store's role read (its prefix, its training store) and the SHA-256 of its `STORE.tsv`, the stretches taken, the law
+/// of a stretch's two draws (contexts and runs each on an octave uniform over `least·[2^0, 2^1)` to `least·[2^(octaves−1), 2^octaves)`),
+/// the section's two declared bounds (its regions' pairs of sites and its sites), and each slice's place, in the store's order: its piece,
+/// its cursor in the piece and the places taken from it. The cut itself (the trainer's, `train-store`) reads only this line and the store.
+/// Why in the learner's state (the record §4 items 3 and 5): a section is the unit a deposit consumes, so its extent is law and is carried
+/// in the state, never read from the device or a run's argument; the pass's place is what a continued run reads on from.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct StorePass {
+    pub role: String,
+    pub store: String,
+    pub stretches: u64,
+    pub least: u64,
+    pub octaves: u64,
+    pub pairs: u64,
+    pub sites: u64,
+    pub slices: Vec<PassSlice>,
+}
+
+/// A slice's place in a pass ([`StorePass`]): its name, the piece it stands in, its cursor in that piece and its places taken.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct PassSlice {
+    pub name: String,
+    pub piece: u64,
+    pub cursor: u64,
+    pub taken: u64,
+}
+
+impl StorePass {
+    /// The pass as its line: `pass ROLE STORE_SHA256 STRETCHES LEAST OCTAVES PAIRS SITES` and, for each slice in order, `NAME PIECE CURSOR
+    /// TAKEN`.
+    pub fn to_line(&self) -> String {
+        let slices: String = self.slices.iter().map(|s| format!(" {} {} {} {}", s.name, s.piece, s.cursor, s.taken)).collect();
+        format!("pass {} {} {} {} {} {} {}{slices}", self.role, self.store, self.stretches, self.least, self.octaves, self.pairs, self.sites)
+    }
+
+    /// The pass read from its line ([`StorePass::to_line`]).
+    pub fn from_line(line: &str) -> Result<Self> {
+        let words: Vec<&str> = line.split(' ').collect();
+        if words.len() < 8 || words[0] != "pass" || (words.len() - 8) % 4 != 0 {
+            return refuse("a pass line that is not `pass ROLE STORE STRETCHES LEAST OCTAVES PAIRS SITES` and four words a slice");
+        }
+        let n = |w: &str| w.parse::<u64>().map_err(|_| TowerError::Refused("a pass's count that is not a count"));
+        let word = |w: &str| if !w.is_empty() && w.bytes().all(|b| b.is_ascii_alphanumeric() || b == b'_') { Ok(w.to_string()) } else { refuse("a pass's name that is not a word") };
+        if words[2].len() != 64 || !words[2].bytes().all(|b| b.is_ascii_hexdigit()) {
+            return refuse("a pass's store that is not a SHA-256");
+        }
+        let slices = words[8..].chunks(4).map(|c| Ok(PassSlice { name: word(c[0])?, piece: n(c[1])?, cursor: n(c[2])?, taken: n(c[3])? })).collect::<Result<Vec<_>>>()?;
+        let pass = Self { role: word(words[1])?, store: words[2].to_string(), stretches: n(words[3])?, least: n(words[4])?, octaves: n(words[5])?, pairs: n(words[6])?, sites: n(words[7])?, slices };
+        if pass.least == 0 || pass.octaves == 0 || pass.pairs == 0 || pass.sites == 0 {
+            return refuse("a pass whose least context, octaves or bounds are zero");
+        }
+        Ok(pass)
+    }
 }
 
 impl FieldLearner {
@@ -6327,7 +6481,7 @@ impl FieldLearner {
     pub fn new(field: Field, rate_bits: u32) -> Self {
         let len = field.material_len();
         let drawn = 4 * field.declaration.founding_draws();
-        Self { field, first: vec![0; len], second: vec![0; len], rate_bits, drawn, laps: 0, held: None, read_held: false, rate_parts: None, own_rates: None, last: None }
+        Self { field, first: vec![0; len], second: vec![0; len], rate_bits, drawn, laps: 0, held: None, read_held: false, rate_parts: None, own_rates: None, last: None, pass: None }
     }
 
     /// Whether a deposited step is held for the next regions' read.
@@ -6354,7 +6508,7 @@ impl FieldLearner {
         let second = from.iter().map(|&(i, divided)| if divided { div_nearest(self.second[i], f2) } else { self.second[i] }).collect();
         let drawn = self.drawn + 4 * self.field.growth_draws(factor);
         let rate_bits = self.rate_bits + (usize::BITS - (factor - 1).leading_zeros());
-        Ok(Self { field, first, second, rate_bits, drawn, laps: self.laps, held: None, read_held: self.read_held, rate_parts: None, own_rates: None, last: None })
+        Ok(Self { field, first, second, rate_bits, drawn, laps: self.laps, held: None, read_held: self.read_held, rate_parts: None, own_rates: None, last: None, pass: self.pass.clone() })
     }
 
     /// [definition; agent-inferred, November 4, §16.40] **The learner with one more lane** ([`Field::laned`]), the lane's
@@ -6394,7 +6548,7 @@ impl FieldLearner {
             }
         }
         let drawn = self.drawn + 4 * self.field.declaration.lane_draws();
-        Ok(Self { field, first, second, rate_bits: self.rate_bits, drawn, laps: self.laps, held: None, read_held: self.read_held, rate_parts: None, own_rates: None, last: None })
+        Ok(Self { field, first, second, rate_bits: self.rate_bits, drawn, laps: self.laps, held: None, read_held: self.read_held, rate_parts: None, own_rates: None, last: None, pass: self.pass.clone() })
     }
 
     /// [definition; theory, November 11 17:25] **The learner with `circles` carry circles** ([`Field::with_carry`]), the circles' draws read from
@@ -6424,7 +6578,7 @@ impl FieldLearner {
             }
         }
         let drawn = self.drawn + 4 * self.field.declaration.carry_draws(circles);
-        Ok(Self { field, first, second, rate_bits: self.rate_bits, drawn, laps: self.laps, held: None, read_held: self.read_held, rate_parts: self.rate_parts, own_rates: None, last: None })
+        Ok(Self { field, first, second, rate_bits: self.rate_bits, drawn, laps: self.laps, held: None, read_held: self.read_held, rate_parts: self.rate_parts, own_rates: None, last: None, pass: self.pass.clone() })
     }
 
     /// [definition; theory, November 12, the triad record §4] **The learner with `triads` triads** ([`Field::with_triads`]), the triads' draws read
@@ -6473,7 +6627,38 @@ impl FieldLearner {
             rates
         });
         let drawn = self.drawn + 4 * self.field.declaration.triad_draws(triads);
-        Ok(Self { field, first, second, rate_bits: self.rate_bits, drawn, laps: self.laps, held: None, read_held: self.read_held, rate_parts, own_rates, last: None })
+        Ok(Self { field, first, second, rate_bits: self.rate_bits, drawn, laps: self.laps, held: None, read_held: self.read_held, rate_parts, own_rates, last: None, pass: self.pass.clone() })
+    }
+
+    /// [definition; theory, November 12 (the record of the opening's room, §4 item 4)] **The learner with `fresh` more letters**
+    /// ([`Field::lettered`]), founded at a passage's crossing. No key is read and the draws do not move. Every standing entry keeps its
+    /// moments and its remainder (the open rows' with them, at their new place); a fresh entry's first moment opens at zero and its second
+    /// at the mean of its family's standing second moments, as a growth in contacts opens a new contact's ([`FieldLearner::contacted`]), so its
+    /// first step is its covector over its family's own scale and never the largest normalized step of a fresh entry. The founded parts'
+    /// rates are kept, and where the learner carries each entry's own rate ([`FieldLearner::own_rates`]) every standing entry keeps it and a
+    /// fresh one takes `rate_bits`. The held step and the last section's step, of the old layout, are dropped; the pass is kept. Refused while
+    /// a step is held.
+    pub fn lettered(&self, fresh: usize) -> Result<Self> {
+        if self.held.is_some() {
+            return refuse("a learner takes letters after its held step is read");
+        }
+        let (field, from) = self.field.lettered(fresh)?;
+        let first = from.iter().map(|o| o.map_or(0, |i| self.first[i])).collect();
+        let mut second: Vec<i128> = from.iter().map(|o| o.map_or(0, |i| self.second[i])).collect();
+        for &(start, len, _) in field.families_all().iter() {
+            let old: Vec<i128> = (start..start + len).filter_map(|k| from[k].map(|i| self.second[i])).collect();
+            if old.len() == len || old.is_empty() {
+                continue;
+            }
+            // The mean term by term (each second moment is under `2^126`, so a family's sum is not formed).
+            let n = old.len() as i128;
+            let mean = old.iter().map(|v| v / n).sum::<i128>() + old.iter().map(|v| v % n).sum::<i128>() / n;
+            for k in (start..start + len).filter(|&k| from[k].is_none()) {
+                second[k] = mean;
+            }
+        }
+        let own_rates = self.own_rates.as_ref().map(|own| from.iter().map(|o| o.map_or(self.rate_bits, |i| own[i])).collect());
+        Ok(Self { field, first, second, rate_bits: self.rate_bits, drawn: self.drawn, laps: self.laps, held: None, read_held: self.read_held, rate_parts: self.rate_parts, own_rates, last: None, pass: self.pass.clone() })
     }
 
     /// [definition; theory, November 10 09:55] **The learner with `added` more pair contacts** ([`Field::contacted`]), the
@@ -6504,7 +6689,7 @@ impl FieldLearner {
             }
         }
         let drawn = self.drawn + 4 * self.field.declaration.contact_draws(added);
-        Ok(Self { field, first, second, rate_bits: self.rate_bits, drawn, laps: self.laps, held: None, read_held: self.read_held, rate_parts: None, own_rates: None, last: None })
+        Ok(Self { field, first, second, rate_bits: self.rate_bits, drawn, laps: self.laps, held: None, read_held: self.read_held, rate_parts: None, own_rates: None, last: None, pass: self.pass.clone() })
     }
 
     /// The held step read on `regions` without a deposit: the faces of `regions` under the
@@ -6674,7 +6859,7 @@ impl FieldLearner {
         let (mut first, mut second) = (self.first.clone(), self.second.clone());
         first.resize(len, 0);
         second.resize(len, 0);
-        Ok(Self { field, first, second, rate_bits: self.rate_bits, drawn, laps: self.laps, held: None, read_held: self.read_held, rate_parts: None, own_rates: None, last: None })
+        Ok(Self { field, first, second, rate_bits: self.rate_bits, drawn, laps: self.laps, held: None, read_held: self.read_held, rate_parts: None, own_rates: None, last: None, pass: self.pass.clone() })
     }
 
     /// [measurement; agent-inferred, November 3, §16.31] **Each family's step coherence**: over the family's entries, `Σ |m|`
@@ -6708,7 +6893,9 @@ impl FieldLearner {
             let parts = self.rate_parts.map_or(String::new(), |rp| format!("parts {} {}\n", rp.contacts_before, written_parts(d.carry, d.triads).iter().map(|&p| rp.octaves[p].to_string()).collect::<Vec<_>>().join(" ")));
             // [definition; theory, November 12 00:20] Each entry's own rate, a trailing line after the parts' (`rates r₀ … r_(n−1)`).
             let own = self.own_rates.as_ref().map_or(String::new(), |r| format!("rates {}\n", r.iter().map(u32::to_string).collect::<Vec<_>>().join(" ")));
-            format!("hnn-field-learner-v3 {} {} {} {held}\n{}{}\n{}\n{step}{parts}{own}", self.rate_bits, self.drawn, self.laps, self.field.to_text(), join(&self.first), join(&self.second))
+            // [definition; theory, November 12] The pass's place over a store, the text's last line and only where present ([`StorePass`]).
+            let pass = self.pass.as_ref().map_or(String::new(), |p| format!("{}\n", p.to_line()));
+            format!("hnn-field-learner-v3 {} {} {} {held}\n{}{}\n{}\n{step}{parts}{own}{pass}", self.rate_bits, self.drawn, self.laps, self.field.to_text(), join(&self.first), join(&self.second))
         }
     }
 
@@ -6783,7 +6970,12 @@ impl FieldLearner {
             }
             _ => None,
         };
-        Ok(Self { field, first, second, rate_bits, read_held: held.is_some(), drawn, laps, held, rate_parts, own_rates, last: None })
+        // [definition; theory, November 12] The pass's place over a store, the text's last line where present ([`StorePass`]).
+        let pass = match lines.peek() {
+            Some(l) if l.starts_with("pass ") => Some(StorePass::from_line(lines.next().unwrap_or(""))?),
+            _ => None,
+        };
+        Ok(Self { field, first, second, rate_bits, read_held: held.is_some(), drawn, laps, held, rate_parts, own_rates, last: None, pass })
     }
 }
 

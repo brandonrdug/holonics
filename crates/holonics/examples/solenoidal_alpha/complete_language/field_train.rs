@@ -34,12 +34,22 @@ const CODEC_BUDGET: usize = 1 << 24;
 
 /// The GSM8K boundary codec: the founded units, the units the passage uses (each one class, in
 /// unit order) and the answer's longest extent in classes.
+///
+/// [definition; theory, November 12 (the record of the opening's room, §4 item 4)] **The void at a kept index**
+/// (`field-codec-v3`): a codec founded on one passage holds the void as its last class (`field-codec-v2`, read and written
+/// as before); extended at a crossing to a store ([`FieldCodec::extended`]) it keeps every class where it stood, the void
+/// among them, and takes the fresh units after them, so `used` lists the units in class order with the void's index
+/// skipped. Decoding stops at the void by equality.
 pub(super) struct FieldCodec {
     units: Units,
     used: Vec<u32>,
     class_of_unit: HashMap<u32, usize>,
     /// The longest training answer in classes, plus its void: the answer sites a release opens.
     pub answer: usize,
+    /// The void's class: `used.len()` (the last) on a `field-codec-v2`, kept where it stood on a `field-codec-v3`.
+    void: usize,
+    /// Whether the codec is written as `field-codec-v3` (its void at a kept index).
+    kept_void: bool,
 }
 
 /// A units file (`founded-units-v1 0`, a founding of no merges, is the bytes).
@@ -57,23 +67,52 @@ impl FieldCodec {
         }
         used.sort_unstable();
         used.dedup();
-        let mut codec = Self::with(units, used, 0);
+        let void = used.len();
+        let mut codec = Self::with(units, used, 0, void, false);
         codec.answer = problems.iter().map(|(_, a)| codec.encode(a).map(|c| c.len())).collect::<Result<Vec<_>>>()?.into_iter().max().unwrap_or(0) + 1;
         Ok(codec)
     }
 
-    fn with(units: Units, used: Vec<u32>, answer: usize) -> Self {
-        let class_of_unit = used.iter().enumerate().map(|(c, &u)| (u, c)).collect();
-        Self { units, used, class_of_unit, answer }
+    fn with(units: Units, used: Vec<u32>, answer: usize, void: usize, kept_void: bool) -> Self {
+        let class_of_unit = used.iter().enumerate().map(|(i, &u)| (u, if i < void { i } else { i + 1 })).collect();
+        Self { units, used, class_of_unit, answer, void, kept_void }
     }
 
-    /// The void class, the last.
+    /// [definition; theory, November 12] **The codec extended by fresh units** at a crossing (`field-codec-v3`): every class keeps its
+    /// index, the void its own, and the fresh units take the classes after the last, in the order given. A unit the codec holds is refused.
+    pub(super) fn extended(&self, fresh: &[u32]) -> Result<Self> {
+        if let Some(u) = fresh.iter().find(|u| self.class_of_unit.contains_key(u)) {
+            return Err(format!("unit {u} is already in the codec").into());
+        }
+        if fresh.iter().any(|&u| u as usize >= self.units.len()) {
+            return Err("a fresh unit outside the units".into());
+        }
+        let mut used = self.used.clone();
+        used.extend_from_slice(fresh);
+        Ok(Self::with(self.units.clone(), used, self.answer, self.void, true))
+    }
+
+    /// The void class: the last on a codec founded on one passage, kept where it stood on an extended one.
     pub(super) fn void(&self) -> usize {
-        self.used.len()
+        self.void
     }
 
     pub(super) fn alphabet(&self) -> usize {
-        self.void() + 1
+        self.used.len() + 1
+    }
+
+    /// The units the codec holds, in class order with the void's index skipped.
+    pub(super) fn used(&self) -> &[u32] {
+        &self.used
+    }
+
+    /// A class's unit (none for the void).
+    fn unit_of(&self, class: usize) -> Option<u32> {
+        match class.cmp(&self.void) {
+            std::cmp::Ordering::Less => self.used.get(class).copied(),
+            std::cmp::Ordering::Equal => None,
+            std::cmp::Ordering::Greater => self.used.get(class - 1).copied(),
+        }
     }
 
     /// A text's classes; a unit the training passage never used is refused.
@@ -84,29 +123,49 @@ impl FieldCodec {
     /// Classes back to bytes, up to the first void.
     pub(super) fn decode(&self, classes: &[usize]) -> Vec<u8> {
         let mut out = Vec::new();
-        for &c in classes.iter().take_while(|&&c| c < self.void()) {
-            out.extend_from_slice(self.units.piece(self.used[c] as usize));
+        for &c in classes.iter().take_while(|&&c| c != self.void) {
+            if let Some(u) = self.unit_of(c) {
+                out.extend_from_slice(self.units.piece(u as usize));
+            }
         }
         out
     }
 
-    /// The codec as text: its head line, then the used units on one line.
+    /// The codec as text: its head line, then the used units on one line (`field-codec-v2 ANSWER`, or `field-codec-v3 ANSWER VOID`).
     pub(super) fn to_text(&self) -> String {
         let used: Vec<String> = self.used.iter().map(u32::to_string).collect();
+        if self.kept_void {
+            return format!("field-codec-v3 {} {}\n{}\n", self.answer, self.void, used.join(" "));
+        }
         format!("field-codec-v2 {}\n{}\n", self.answer, used.join(" "))
     }
 
     pub(super) fn from_text(text: &str, units: Units) -> Result<Self> {
         let mut lines = text.lines();
         let head: Vec<&str> = lines.next().unwrap_or("").split(' ').collect();
-        if head.len() != 2 || head[0] != "field-codec-v2" {
-            return Err("a codec that is not field-codec-v2".into());
-        }
+        let (answer, void) = match (head.first().copied(), head.len()) {
+            (Some("field-codec-v2"), 2) => (count(head[1])?, None),
+            (Some("field-codec-v3"), 3) => (count(head[1])?, Some(count(head[2])?)),
+            _ => return Err("a codec that is not field-codec-v2 or field-codec-v3".into()),
+        };
         let used = lines.next().unwrap_or("").split(' ').map(|w| w.parse::<u32>()).collect::<std::result::Result<Vec<_>, _>>()?;
         if used.iter().any(|&u| u as usize >= units.len()) {
             return Err("a codec's unit outside the units".into());
         }
-        Ok(Self::with(units, used, count(head[1])?))
+        let mut seen = used.clone();
+        seen.sort_unstable();
+        seen.dedup();
+        if seen.len() != used.len() {
+            return Err("a codec that holds a unit twice".into());
+        }
+        match void {
+            None => {
+                let void = used.len();
+                Ok(Self::with(units, used, answer, void, false))
+            }
+            Some(v) if v <= used.len() => Ok(Self::with(units, used, answer, v, true)),
+            Some(_) => Err("a codec's void past its classes".into()),
+        }
     }
 }
 
@@ -627,7 +686,7 @@ pub(super) const UNSEEN_DRAW: u64 = 1 << 61;
 /// context, foil]`. A reading of completion only (§16.23): no decision of the run reads it.
 /// [retired, November 2, §16.19] The split of each into its digits and its text: a class sorted by
 /// the codec's own byte kind was the numeral matcher's partition, read beside the field's own.
-fn held_out(field: &Field, codec: &FieldCodec, problems: &Problems, realization: &mut dyn FieldRealization) -> Result<[(i64, usize); 3]> {
+pub(super) fn held_out(field: &Field, codec: &FieldCodec, problems: &Problems, realization: &mut dyn FieldRealization) -> Result<[(i64, usize); 3]> {
     let regions = held_regions(codec, problems);
     let views: Vec<Region> = regions.iter().map(|(c, u, _)| Region { classes: c, unresolved: u, faces: &[], locked: &[], echo: &[], domain: None, port: None }).collect();
     let mut out = [(0i64, 0usize); 3];
@@ -1002,7 +1061,7 @@ fn unseen_read(learner: &mut FieldLearner, codec: &FieldCodec, problems: &Proble
 /// foil's, equal at the printed thousandth, so a question effect below a thousandth of a bit could
 /// not be seen; the effect is the difference of the two rates and is printed as such, not left to
 /// the reader's subtraction of two rounded numbers. One formatter for every `FIELD_HELD` line.
-fn held_text(held: &[(i64, usize); 3]) -> String {
+pub(super) fn held_text(held: &[(i64, usize); 3]) -> String {
     let rate = |k: usize| micro_bits(held[k].0 as i128, held[k].1 as i128);
     let effect = match (held[2], held[1]) {
         ((_, 0), _) | (_, (_, 0)) => "-".to_string(),
@@ -4100,6 +4159,38 @@ mod tests {
         let back = FieldCodec::from_text(&codec.to_text(), Units::bytes()).unwrap();
         assert_eq!((back.used.clone(), back.answer), (codec.used.clone(), codec.answer));
         assert_eq!(codec.answer, codec.encode(&problems[0].1).unwrap().len() + 1);
+    }
+
+    /// [definition; theory, November 12] **The codec extended at a crossing keeps every class and the void where they stood**: te7's
+    /// `field-codec-v2` (99 bytes, the void at 99, the answer extent 2,062) reads and writes byte for byte; extended by fresh bytes in byte order
+    /// it is a `field-codec-v3` with its void at 99, the 99 bytes at classes 0 to 98, the fresh bytes from class 100, the same extent, and it
+    /// round-trips; a text decodes up to its first void by equality; a byte the codec holds, or one past the units, is refused as fresh.
+    #[test]
+    fn the_extended_codec_keeps_every_class_and_the_void_where_they_stood() {
+        let standing: Vec<u32> = [9u32, 10, 13, 19].into_iter().chain(32..=126).collect();
+        let v2 = format!("field-codec-v2 2062\n{}\n", standing.iter().map(u32::to_string).collect::<Vec<_>>().join(" "));
+        let codec = FieldCodec::from_text(&v2, Units::bytes()).unwrap();
+        assert_eq!((codec.to_text(), codec.void(), codec.alphabet(), codec.answer), (v2.clone(), 99, 100, 2062));
+        let fresh: Vec<u32> = [0u32, 7, 127, 200, 255].to_vec();
+        let wide = codec.extended(&fresh).unwrap();
+        assert_eq!((wide.void(), wide.alphabet(), wide.answer), (99, 105, 2062));
+        for (c, &u) in standing.iter().enumerate() {
+            assert_eq!(wide.encode(&[u as u8]).unwrap(), vec![c], "a standing byte keeps its class");
+            assert_eq!(wide.encode(&[u as u8]).unwrap(), codec.encode(&[u as u8]).unwrap());
+        }
+        for (k, &u) in fresh.iter().enumerate() {
+            assert_eq!(wide.encode(&[u as u8]).unwrap(), vec![100 + k], "a fresh byte from class 100 in byte order");
+        }
+        let text = wide.to_text();
+        assert!(text.starts_with("field-codec-v3 2062 99\n"));
+        let back = FieldCodec::from_text(&text, Units::bytes()).unwrap();
+        assert_eq!((back.to_text(), back.void(), back.alphabet()), (text, 99, 105));
+        let classes = [wide.encode(b"a\x07b").unwrap(), vec![99, 100]].concat();
+        assert_eq!(wide.decode(&classes), b"a\x07b".to_vec(), "a text decodes up to its void");
+        assert_eq!(wide.decode(&[100, 104, 0]), vec![0u8, 255, 9], "classes past the void decode");
+        assert!(codec.extended(&[10]).is_err(), "a byte the codec holds");
+        assert!(codec.extended(&[256]).is_err(), "a unit past the units");
+        assert!(FieldCodec::from_text("field-codec-v3 2062 100\n9 10\n", Units::bytes()).is_err(), "a void past the classes");
     }
 
     /// A flat lap widens once the code has fallen at this width; a second growth is held and the laps go on;
