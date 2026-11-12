@@ -55,8 +55,12 @@ repository was reset on September 24; the pre-reset tree is
   past 200,000 millionths, and led rt24 by 0.0031 nats a place on the held passage's 43,470 places
   at lap means, as the sum form's first lap had. Its friction fell where the sum form's rose, to a
   mean look-back `1/(1 − |γ|)` of 7.9 places (6.2 to 10.6 by circle), reached in the lap's opening
-  and held, near the held passage's 7.5 places a word. The second lap, te2, trains the circles at
-  eight times the base rate (G99). With `C = 0` the field is the plain line bit for bit.
+  and held, near the held passage's 7.5 places a word. The second lap, te2, at eight times the base
+  rate, refused no step and led rt25 by 0.0099 nats a place at lap means (G99 scored). Its gain
+  stands in the four nearest letters, with 0.0004 more over letters 5 to 8 together, while its
+  friction lengthened the look-back to 10.9 places at its end and 12.4 at its mean. The release is
+  read on te2's end (G101), then the third lap, te3, trains at eight times (G100). With `C = 0` the
+  field is the plain line bit for bit.
 - **The learner** (`FieldLearner`; the trainer is
   `crates/holonics/examples/solenoidal_alpha/complete_language/field_train.rs`). The comparison is
   completion read as a joint code: a region is drawn as a state of open places among the answer's,
@@ -178,7 +182,9 @@ repository was reset on September 24; the pre-reset tree is
     after the card refused the frictionless carry (G83, G85) and charted on its logarithm after its
     linear chart became a switch at eight times (G96), is its first instance; the ring faces outside the
     unit disk are repaired at the next founding. Such a face is a turn that also boosts (the record
-    §14.3).
+    §14.3). The reach ruler (November 12) lists every reach on one scale of ranges beside each part's
+    turn defect: no read of the line boosts by more than `3·10^(−9)` nats, because a skin or the unit
+    power covers every ring face's excess, so the repair enters as the next founding's form.
   - No global word in the law: a part's rate is its own temperature. G86's polar law by part stands
     as the line's rate law. The block law, every block a part at its own rate with octaves under
     the floor (G89), bought no level at the lap means and is retired (G92, November 12): a class's
