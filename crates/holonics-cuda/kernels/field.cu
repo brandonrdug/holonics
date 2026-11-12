@@ -5535,3 +5535,204 @@ extern "C" __global__ void field_yard_gather(const uint4 *store, uint32_t rows, 
     }
     out[thread] = acc;
 }
+
+// [measurement; theory, November 12, P53 item 1 (G120)] **The rows' memory without their arithmetic** (a ruler; only the ruler build of the
+// profile example launches it): `field_contact_rows` with every load, store and atomic at its offset and in its order, and every product, release,
+// quotient and the sums between them replaced by an exclusive-or of the loaded words into the word each store writes, so no load is dropped.
+// Its stores and atomics go to scratch arrays of the layouts the entry writes (`dp`, `dq`, `ds`, the block covector `dpb`, `cds`, the difference
+// arrays `cw`, `cv`, and the material covector's temperature words), so the state's bytes are the law's. It runs immediately before the entry at
+// each launch, reading what the entry reads (and its own scratch `dpb` where the entry reads its own). The covector's near and far magnitudes,
+// a reading, are left out as the entry leaves them out in a learner's run.
+__device__ __forceinline__ uint64_t xw(wide v) {
+    return (uint64_t)v ^ (uint64_t)((uwide)v >> 64);
+}
+
+extern "C" __global__ void __launch_bounds__(REV_ROWS * 32, 6) field_yard_rows(FieldWords w, uint32_t h, const int64_t *dyh, int64_t *ds, int64_t *dq, int64_t *dps, wide *dpbs, int64_t *cdss, wide *cws, wide *cvs, wide *gcovs) {
+    __shared__ uint32_t stj[REV_ROWS][32], stk[REV_ROWS][32];
+    __shared__ int64_t dss[REV_ROWS][32];
+    __shared__ uint64_t dpcs[REV_ROWS][MAX_CROWD_SLOTS];
+    __shared__ int64_t dsks[REV_ROWS][MAX_CROWD_SLOTS];
+    __shared__ uint64_t cnts[REV_ROWS][32];
+    __shared__ uint32_t crlo[REV_ROWS][32], crhi[REV_ROWS][32], crlv[REV_ROWS][32];
+    __shared__ RowCls rcs[REV_ROWS];
+    const uint32_t warp = threadIdx.x >> 5, lane = threadIdx.x & 31;
+    const uint32_t S = w.span, n = w.n, classes = w.nclasses;
+    const uint32_t parts = span_parts(S);
+    const bool active = lane < S * parts;
+    const uint32_t entry = lane % S, part = lane / S, m = entry % n;
+    const bool still = skinless(w, h);
+    const uint64_t rows1 = (uint64_t)w.T + w.R;
+    for (uint64_t g = ((uint64_t)blockIdx.x * blockDim.x + threadIdx.x) >> 5; g < w.T; g += (uint64_t)gridDim.x * (blockDim.x >> 5)) {
+        const uint64_t hg = (uint64_t)h * w.T + g;
+        if (skipped_row(w, g)) {
+            if (lane < S) {
+                const uint32_t mc = h * n + lane % n;
+                const uint64_t slot = g * w.M2 + (lane < n ? mc : w.M + mc);
+                dps[slot] = 0;
+                dq[slot] = 0;
+            }
+            continue;
+        }
+        const uint32_t r = w.site_region[g];
+        const uint32_t i = w.site_pos[g];
+        const uint64_t first = w.region_off[r];
+        const uint32_t sites = w.region_off[r + 1] - (uint32_t)first;
+        const uint32_t *members = w.members + (uint64_t)h * w.T + first;
+        const uint32_t *off = w.class_off + ((uint64_t)h * w.R + r) * (2 * classes + 1);
+        const uint32_t K = row_prepare(w, hg, off, rcs[warp], lane);
+        const uint64_t *e = w.e + (uint64_t)h * w.E + w.region_eoff[r] + (uint64_t)i * sites;
+        int64_t *dsr = ds + w.region_eoff[r] + (uint64_t)i * sites;
+        wide *dpr = dpbs + w.region_eoff[r] + (uint64_t)i * sites;
+        const uint64_t srow = support_row(w, r, i);
+        const int64_t *dyi = dyh + hg * S;
+        const int64_t *values = w.vf + ((uint64_t)h * w.T + first) * S;
+        const int64_t *words = w.qf + ((uint64_t)h * w.T + first) * S;
+        const uint64_t prow0 = (uint64_t)h * rows1 + first + r;
+        const wide *swp = w.sw + prow0 * S;
+        const wide *svp = w.sv + prow0 * S;
+        const uint64_t *scp = w.sc + prow0;
+        const uint32_t nslots = rcs[warp].open ? 0 : crowd_slots(sites);
+        const int64_t *sbr = w.sb + (uint64_t)h * w.E + w.region_eoff[r] + (uint64_t)i * sites;
+        const bool still_h = skinless(w, h), paced_h = paced_at(w, h, g);
+        // The pair's value row and its skins (pair_dp8's loads), folded.
+        const auto pair_dp8 = [&](uint32_t j, uint32_t k, uint32_t gap) -> uint64_t {
+            const longlong2 *v2 = reinterpret_cast<const longlong2 *>(values + (uint64_t)j * S);
+            uint64_t x = 0;
+            if (!still_h) {
+                if (paced_h) {
+                    uint32_t dec[8];
+                    pair_skins8(w, paced_index(w, h), srow + k, dec);
+#pragma unroll
+                    for (int l = 0; l < 8; l++) {
+                        x ^= dec[l];
+                    }
+                } else {
+                    const uint4 *d4 = reinterpret_cast<const uint4 *>(w.decay_t + ((uint64_t)h * w.dreach + gap) * 8);
+                    const uint4 d0 = d4[0], d1 = d4[1];
+                    x ^= d0.x ^ d0.y ^ d0.z ^ d0.w ^ d1.x ^ d1.y ^ d1.z ^ d1.w;
+                }
+            }
+#pragma unroll
+            for (int q = 0; q < 8; q++) {
+                const longlong2 t = v2[q];
+                x ^= (uint64_t)dyi[2 * q] ^ (uint64_t)t.x ^ (uint64_t)dyi[2 * q + 1] ^ (uint64_t)t.y;
+            }
+            return x;
+        };
+        {
+            uint64_t count = 0;
+            uint32_t lo = 0, hi_ = 0, lv = 0;
+            if (lane < nslots && crowd_at(i, sites, lane, &lo, &hi_, &lv)) {
+                count = scp[hi_ + 1] ^ scp[lo];
+            }
+            cnts[warp][lane] = count;
+            crlo[warp][lane] = lo;
+            crhi[warp][lane] = hi_;
+            crlv[warp][lane] = lv;
+        }
+        __syncwarp();
+        // Pass A.
+        uint64_t weighted = 0;
+        for (uint32_t k = lane; k < K; k += 32) {
+            const uint32_t j = support_at(members, off, rcs[warp], i, sites, k);
+            if (j == UINT32_MAX) {
+                continue;
+            }
+            const uint64_t p = e[j];
+            const uint32_t gap = j > i ? j - i : i - j;
+            const uint64_t dpj = pair_dp8(j, k, gap);
+            dpr[j] = (wide)(dpj ^ p);
+            weighted ^= p ^ dpj;
+        }
+        if (cnts[warp][lane] != 0) {
+            const uint32_t lo = crlo[warp][lane], hi_ = crhi[warp][lane], lv = crlv[warp][lane];
+            uint64_t x = 0;
+            for (uint32_t s = 0; s < S; s++) {
+                const wide d = still_h ? (wide)1 : crowd_skin_ij(w, h, s % n, g, lv, lo > i);
+                x ^= (uint64_t)dyi[s] ^ xw(svp[(uint64_t)(hi_ + 1) * S + s]) ^ xw(svp[(uint64_t)lo * S + s]) ^ (uint64_t)d;
+            }
+            dpcs[warp][lane] = x;
+            weighted ^= w.ce[hg * w.slots + lane] ^ x;
+        }
+        uint64_t mean = weighted;
+        for (int o = 16; o > 0; o >>= 1) {
+            mean ^= __shfl_xor_sync(0xFFFFFFFFu, mean, o);
+        }
+        // Pass B.
+        uint64_t sum = 0, tacc = 0;
+        for (uint32_t k0 = 0; k0 < K; k0 += 32) {
+            const uint32_t k = k0 + lane;
+            const uint32_t j = k < K ? support_at(members, off, rcs[warp], i, sites, k) : UINT32_MAX;
+            int64_t dsv = 0;
+            if (j != UINT32_MAX) {
+                const uint64_t x = e[j] ^ xw(dpr[j]) ^ mean;
+                tacc ^= x ^ (uint64_t)sbr[j];
+                dsv = (int64_t)x;
+                dsr[j] = dsv;
+            }
+            dss[warp][lane] = dsv;
+            stj[warp][lane] = j;
+            stk[warp][lane] = k;
+            __syncwarp();
+            if (active) {
+                for (uint32_t jj = part; jj < 32; jj += parts) {
+                    const uint32_t jx = stj[warp][jj];
+                    if (jx != UINT32_MAX) {
+                        sum ^= (uint64_t)dss[warp][jj] ^ (uint64_t)skin_raw_at(w, h, m, g, srow + stk[warp][jj], jx > i ? jx - i : i - jx) ^ (uint64_t)words[(uint64_t)jx * S + entry];
+                    }
+                }
+            }
+            __syncwarp();
+        }
+        // The crowds' lock and dz.
+        if (cnts[warp][lane] != 0) {
+            const uint32_t clo = crlo[warp][lane], chi = crhi[warp][lane], clv = crlv[warp][lane];
+            const int64_t *wi = w.pq + ((uint64_t)h * w.T + g) * S;
+            uint64_t x = w.ce[hg * w.slots + lane] ^ dpcs[warp][lane];
+            for (uint32_t l = 0; l < n; l++) {
+                x ^= (uint64_t)wi[l] ^ (uint64_t)wi[n + l] ^ xw(swp[(uint64_t)(chi + 1) * S + l]) ^ xw(swp[(uint64_t)clo * S + l]) ^ xw(swp[(uint64_t)(chi + 1) * S + n + l]) ^ xw(swp[(uint64_t)clo * S + n + l]) ^ (uint64_t)crowd_skin_raw(w, h, l, g, clv, clo > i);
+            }
+            tacc ^= x;
+            dsks[warp][lane] = (int64_t)x;
+            if (w.cds != nullptr) {
+                cdss[hg * w.slots + lane] = (int64_t)x;
+            }
+        }
+        for (int o = 16; o > 0; o >>= 1) {
+            tacc ^= __shfl_xor_sync(0xFFFFFFFFu, tacc, o);
+        }
+        if (lane == 0 && tacc != 0) {
+            add_wide(gcovs + w.temper_at + 2 * h + (rcs[warp].open ? 1 : 0), (wide)tacc);
+        }
+        __syncwarp();
+        if (active) {
+            for (uint32_t jj = part; jj < nslots; jj += parts) {
+                const uint64_t count = cnts[warp][jj];
+                if (count == 0) {
+                    continue;
+                }
+                const uint32_t lo = crlo[warp][jj], hi_ = crhi[warp][jj], lv = crlv[warp][jj];
+                const uint64_t d = (uint64_t)crowd_skin_raw(w, h, m, g, lv, lo > i);
+                const uint64_t wsum = xw(swp[(uint64_t)(hi_ + 1) * S + entry]) ^ xw(swp[(uint64_t)lo * S + entry]);
+                const uint64_t pw = (uint64_t)dsks[warp][jj] ^ d ^ wsum ^ (uint64_t)w.pq[((uint64_t)h * w.T + g) * S + entry] ^ count;
+                sum ^= pw;
+                add_wide(cws + (first + r + lo) * S + entry, (wide)pw);
+                add_wide(cws + (first + r + hi_ + 1) * S + entry, -(wide)pw);
+                const uint64_t pv = w.ce[hg * w.slots + jj] ^ (still ? (uint64_t)dyi[entry] : (uint64_t)crowd_carried_ij(w, h, m, g, lv, lo > i, dyi[entry]));
+                add_wide(cvs + (first + r + lo) * S + entry, (wide)pv);
+                add_wide(cvs + (first + r + hi_ + 1) * S + entry, -(wide)pv);
+            }
+        }
+        uint64_t folded = active ? sum : 0;
+        for (uint32_t o = S; parts > 1 && o < 32; o <<= 1) {
+            folded ^= __shfl_xor_sync(0xFFFFFFFFu, folded, (int)o);
+        }
+        if (lane < S) {
+            const uint32_t mc = h * n + lane % n;
+            const uint64_t slot = g * w.M2 + (lane < n ? mc : w.M + mc);
+            dps[slot] = (int64_t)folded;
+            dq[slot] = 0;
+        }
+        __syncwarp();
+    }
+}

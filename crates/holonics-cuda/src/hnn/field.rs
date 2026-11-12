@@ -2597,6 +2597,25 @@ impl<'c> CardField<'c> {
             card.zero_octets(&cv, 0, 16 * rows * span).map_err(device)?;
             card.zero_octets(&cw, 0, 16 * rows * span).map_err(device)?;
             let (mut hh, mut dyhp, mut dsp, mut dqp) = (h as u32, dyh.device_ptr(), ds.device_ptr(), dq.device_ptr());
+            // [measurement; theory, November 12, P53 item 1 (G120)] The ruler build alone: the rows' memory without their arithmetic, immediately
+            // before the entry, its stores and atomics into scratch arrays of the layouts the entry writes, so the state's bytes are the law's.
+            #[cfg(feature = "ruler-rows-reads")]
+            {
+                let pairs = words.pairs as usize;
+                let scratch64 = |len: usize| self.timed(Kind::Alloc, || self.take::<i64>(len.max(1))).map_err(device);
+                let scratch128 = |len: usize| self.timed(Kind::Alloc, || self.take::<i128>(len.max(1))).map_err(device);
+                let (ds_s, dq_s, dp_s) = (scratch64(pairs)?, scratch64(sites * m2)?, scratch64(sites * m2)?);
+                let (dpb_s, cds_s) = (scratch128(pairs)?, scratch64(heads * sites * words.slots as usize)?);
+                let (cw_s, cv_s, gcov_s) = (scratch128(rows * span)?, scratch128(rows * span)?, scratch128(field.layout().len)?);
+                let (mut dsp_s, mut dqp_s, mut dpp_s, mut dpbp_s) = (ds_s.device_ptr(), dq_s.device_ptr(), dp_s.device_ptr(), dpb_s.device_ptr());
+                let (mut cdsp_s, mut cwp_s, mut cvp_s, mut gcp_s) = (cds_s.device_ptr(), cw_s.device_ptr(), cv_s.device_ptr(), gcov_s.device_ptr());
+                self.launch(
+                    "field_yard_rows",
+                    Self::rows_grid(sites as u64, REV_ROWS),
+                    (REV_ROWS * 32) as u32,
+                    &mut [arg(words), arg(&mut hh), arg(&mut dyhp), arg(&mut dsp_s), arg(&mut dqp_s), arg(&mut dpp_s), arg(&mut dpbp_s), arg(&mut cdsp_s), arg(&mut cwp_s), arg(&mut cvp_s), arg(&mut gcp_s)],
+                )?;
+            }
             self.launch("field_contact_rows", Self::rows_grid(sites as u64, REV_ROWS), (REV_ROWS * 32) as u32, &mut [arg(words), arg(&mut hh), arg(&mut dyhp), arg(&mut dsp), arg(&mut dqp)])?;
             if d.carries_moment(h) && !d.is_depth(h) {
                 // The head's skins return to its variation (§16), from the pairs' and crowds' covectors just formed.

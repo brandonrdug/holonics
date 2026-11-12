@@ -17,6 +17,11 @@ num-traits = { workspace = true }
 rayon = "1.12"
 thiserror = { workspace = true }
 
+# [measurement; theory, November 12, P53 item 1 (G120)] A ruler build of the profile example: the contact's rows with their memory and without
+# their arithmetic (`field_yard_rows`), immediately before the entry, its stores into scratch. No learner's build enables it.
+[features]
+ruler-rows-reads = []
+
 [[bin]]
 name = "mount-smoke"
 path = "src/bin/mount-smoke.rs"

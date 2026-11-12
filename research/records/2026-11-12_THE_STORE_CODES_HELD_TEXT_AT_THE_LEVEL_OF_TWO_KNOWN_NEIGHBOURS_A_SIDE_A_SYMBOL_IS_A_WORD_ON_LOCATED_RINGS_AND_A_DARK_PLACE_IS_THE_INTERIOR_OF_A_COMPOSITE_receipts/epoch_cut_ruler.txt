@@ -1,0 +1,151 @@
+# epoch_cut_ruler: paces of 244 symbols the codec holds, 99 of them the code line's bytes; columns rate_A_head2 rate_C_head2 rate_A_head3 rate_C_head3
+PACES rate_A_head2 code_line: mean=2.718 spread=1.187 letters_mean=2.369 newline=4.362 space=2.744 | all bytes met later take their own
+PACES rate_C_head2 code_line: mean=2.755 spread=1.167 letters_mean=2.414 newline=4.396 space=2.856 | all bytes met later take their own
+PACES rate_A_head3 code_line: mean=3.093 spread=1.674 letters_mean=2.640 newline=14.247 space=2.021 | all bytes met later take their own
+PACES rate_C_head3 code_line: mean=3.152 spread=1.687 letters_mean=2.689 newline=14.456 space=2.196 | all bytes met later take their own
+# counts<=32 MB a slice, read: the held role's first 330000 places a slice; load_s=6
+EPOCH slice=code counts_places=32010303 held_places=329450 read_places=329339 mean_code=2.2104 newline_share_of_bytes=0.03305  s=8
+  KIND newline=1.816(0.0331) space=0.616(0.2239) lower=2.257(0.5117) upper=4.586(0.0554) digit=3.905(0.0217) punct=3.519(0.1341) high=3.644(0.0069)
+  RANK rate_A_head2 over 90 bytes: with unigram=0.335 with class_mean=0.431
+  RANK rate_C_head2 over 90 bytes: with unigram=0.325 with class_mean=0.428
+  RANK rate_A_head3 over 90 bytes: with unigram=0.196 with class_mean=0.267
+  RANK rate_C_head3 over 90 bytes: with unigram=0.203 with class_mean=0.273
+  stride rate_A_head2    period=13.241 mean_epoch=6.000 open=0.1664 first=2.1832 rest=2.2158 ratio=0.9853 share=0.1643 | carry=1.0535 carry_share=0.1738 | epoch_nats=13.247 spread=0.6083 | after newline=0.066 space=0.278 punct=0.221
+  stride rate_C_head2    period=13.593 mean_epoch=6.000 open=0.1664 first=2.1691 rest=2.2187 ratio=0.9777 share=0.1633 | carry=1.0437 carry_share=0.1725 | epoch_nats=13.246 spread=0.6069 | after newline=0.063 space=0.283 punct=0.217
+  stride rate_A_head3    period=16.375 mean_epoch=6.000 open=0.1664 first=2.1394 rest=2.2246 ratio=0.9617 share=0.1610 | carry=1.0788 carry_share=0.1774 | epoch_nats=13.241 spread=0.6237 | after newline=0.172 space=0.168 punct=0.190
+  stride rate_C_head3    period=16.851 mean_epoch=6.000 open=0.1664 first=2.1388 rest=2.2247 ratio=0.9614 share=0.1610 | carry=1.0744 carry_share=0.1768 | epoch_nats=13.242 spread=0.6267 | after newline=0.169 space=0.176 punct=0.185
+  unigram                period=21.278 mean_epoch=6.000 open=0.1664 first=2.2929 rest=2.1939 ratio=1.0451 share=0.1726 | carry=1.2550 carry_share=0.2004 | epoch_nats=13.264 spread=0.3701 | after newline=0.035 space=0.098 punct=0.192
+  class                  period=13.273 mean_epoch=6.000 open=0.1664 first=2.3517 rest=2.1822 ratio=1.0777 share=0.1770 | carry=1.3924 carry_share=0.2175 | epoch_nats=13.268 spread=0.3456 | after newline=0.027 space=0.063 punct=0.212
+  own                    period=13.270 mean_epoch=6.000 open=0.1664 first=2.5427 rest=2.1441 ratio=1.1859 share=0.1914 | carry=2.0249 carry_share=0.2879 | epoch_nats=13.275 spread=0.1710 | after newline=0.028 space=0.063 punct=0.212
+  fixed 6                 mean_epoch=5.995 open=0.1665 first=2.2072 rest=2.2111 ratio=0.9982 share=0.1663 | carry=0.9950 carry_share=0.1659 | epoch_nats=13.251 spread=0.4737 | after newline=0.033 space=0.225 punct=0.134
+  code                    mean_epoch=5.990 open=0.1667 first=5.4571 rest=1.5611 ratio=3.4957 share=0.4115 | carry=1.1236 carry_share=0.1836 | epoch_nats=13.255 spread=0.7434 | after newline=0.019 space=0.267 punct=0.134
+  newline                 mean_epoch=30.192 open=0.0328 first=1.6130 rest=2.2307 ratio=0.7231 share=0.0239 | carry=0.8165 carry_share=0.0272 | epoch_nats=67.024 spread=1.0532 | after newline=1.000 space=0.000 punct=0.000
+  stride rate_A_head2    by position: 2.183 2.058 2.095 2.128 2.238 2.476 2.440 2.511 2.513 | 10+: 2.702 (2308)
+  stride rate_C_head2    by position: 2.169 2.063 2.101 2.119 2.246 2.465 2.455 2.544 2.562 | 10+: 2.648 (1959)
+  stride rate_A_head3    by position: 2.139 2.029 2.195 2.219 2.343 2.288 2.306 2.272 2.434 | 10+: 2.935 (930)
+  stride rate_C_head3    by position: 2.139 2.026 2.167 2.212 2.340 2.305 2.306 2.352 2.460 | 10+: 2.992 (915)
+  unigram                by position: 2.293 2.339 2.333 2.279 2.271 2.164 1.795 1.257 1.255 | 10+: 1.162 (7572)
+  class                  by position: 2.352 2.355 2.366 2.321 2.283 2.157 1.849 1.373 1.301 | 10+: 1.201 (15887)
+  own                    by position: 2.543 2.426 2.418 2.356 2.232 2.103 1.929 1.580 1.303 | 10+: 1.118 (27716)
+  fixed 6                by position: 2.207 2.212 2.218 2.218 2.207 2.201 0.000 0.000 0.000 | 10+: 0.000 (0)
+  code                   by position: 5.457 1.811 1.694 1.751 1.634 1.592 1.496 1.568 1.451 | 10+: 1.248 (71050)
+EPOCH slice=web counts_places=16256712 held_places=329535 read_places=329441 mean_code=2.3501 newline_share_of_bytes=0.01399  s=10
+  KIND newline=2.512(0.0140) space=1.034(0.1628) lower=2.247(0.6688) upper=4.395(0.0566) digit=3.877(0.0270) punct=4.118(0.0668) high=3.846(0.0040)
+  RANK rate_A_head2 over 86 bytes: with unigram=0.440 with class_mean=0.404
+  RANK rate_C_head2 over 86 bytes: with unigram=0.428 with class_mean=0.391
+  RANK rate_A_head3 over 86 bytes: with unigram=0.369 with class_mean=0.362
+  RANK rate_C_head3 over 86 bytes: with unigram=0.389 with class_mean=0.383
+  stride rate_A_head2    period=11.340 mean_epoch=6.000 open=0.1664 first=2.5097 rest=2.3182 ratio=1.0826 share=0.1777 | carry=1.0907 carry_share=0.1789 | epoch_nats=14.112 spread=0.4016 | after newline=0.031 space=0.238 punct=0.132
+  stride rate_C_head2    period=11.700 mean_epoch=6.000 open=0.1664 first=2.5196 rest=2.3162 ratio=1.0878 share=0.1784 | carry=1.0782 carry_share=0.1772 | epoch_nats=14.113 spread=0.3990 | after newline=0.031 space=0.240 punct=0.127
+  stride rate_A_head3    period=13.881 mean_epoch=6.000 open=0.1664 first=2.3979 rest=2.3405 ratio=1.0245 share=0.1698 | carry=1.1001 carry_share=0.1803 | epoch_nats=14.106 spread=0.4057 | after newline=0.083 space=0.144 punct=0.100
+  stride rate_C_head3    period=14.298 mean_epoch=6.000 open=0.1664 first=2.3900 rest=2.3421 ratio=1.0204 share=0.1693 | carry=1.0958 carry_share=0.1797 | epoch_nats=14.106 spread=0.4061 | after newline=0.083 space=0.150 punct=0.101
+  unigram                period=20.742 mean_epoch=6.000 open=0.1664 first=2.2996 rest=2.3602 ratio=0.9744 share=0.1629 | carry=1.2025 carry_share=0.1937 | epoch_nats=14.115 spread=0.3002 | after newline=0.016 space=0.087 punct=0.108
+  class                  period=14.111 mean_epoch=6.000 open=0.1664 first=2.2797 rest=2.3641 ratio=0.9643 share=0.1614 | carry=1.2710 carry_share=0.2025 | epoch_nats=14.117 spread=0.2878 | after newline=0.014 space=0.071 punct=0.118
+  own                    period=14.102 mean_epoch=6.000 open=0.1664 first=2.4250 rest=2.3351 ratio=1.0385 share=0.1717 | carry=1.6877 carry_share=0.2521 | epoch_nats=14.107 spread=0.1532 | after newline=0.015 space=0.071 punct=0.117
+  fixed 6                 mean_epoch=5.995 open=0.1666 first=2.3558 rest=2.3489 ratio=1.0029 share=0.1670 | carry=1.0004 carry_share=0.1666 | epoch_nats=14.103 spread=0.3525 | after newline=0.014 space=0.163 punct=0.065
+  code                    mean_epoch=5.991 open=0.1667 first=5.1695 rest=1.7862 ratio=2.8942 share=0.3666 | carry=1.0556 carry_share=0.1745 | epoch_nats=14.063 spread=0.9055 | after newline=0.029 space=0.340 punct=0.077
+  newline                 mean_epoch=70.929 open=0.0138 first=2.8935 rest=2.3425 ratio=1.2352 share=0.0170 | carry=1.0699 carry_share=0.0150 | epoch_nats=168.768 spread=1.9831 | after newline=1.000 space=0.000 punct=0.000
+  stride rate_A_head2    by position: 2.510 2.339 2.376 2.353 2.353 2.286 2.211 2.134 1.974 | 10+: 1.843 (366)
+  stride rate_C_head2    by position: 2.520 2.346 2.357 2.360 2.347 2.278 2.205 2.124 2.031 | 10+: 1.868 (300)
+  stride rate_A_head3    by position: 2.398 2.359 2.386 2.353 2.346 2.319 2.269 2.157 2.275 | 10+: 5.645 (30)
+  stride rate_C_head3    by position: 2.390 2.354 2.372 2.370 2.365 2.314 2.259 2.165 2.466 | 10+: 5.164 (34)
+  unigram                by position: 2.300 2.407 2.414 2.389 2.348 2.281 2.234 2.287 1.947 | 10+: 1.271 (245)
+  class                  by position: 2.280 2.423 2.421 2.370 2.340 2.298 2.272 2.266 2.305 | 10+: 1.390 (475)
+  own                    by position: 2.425 2.455 2.438 2.386 2.297 2.217 2.168 2.141 2.186 | 10+: 1.784 (4545)
+  fixed 6                by position: 2.356 2.340 2.359 2.343 2.352 2.351 0.000 0.000 0.000 | 10+: 0.000 (0)
+  code                   by position: 5.170 1.791 1.837 1.918 1.823 1.800 1.743 1.678 1.725 | 10+: 1.742 (87415)
+EPOCH slice=science counts_places=32012147 held_places=329965 read_places=329929 mean_code=2.3547 newline_share_of_bytes=0.00956  s=13
+  KIND newline=3.820(0.0096) space=1.044(0.1383) lower=2.232(0.6676) upper=4.331(0.0608) digit=3.025(0.0475) punct=3.551(0.0660) high=4.167(0.0101)
+  RANK rate_A_head2 over 81 bytes: with unigram=0.434 with class_mean=0.364
+  RANK rate_C_head2 over 81 bytes: with unigram=0.419 with class_mean=0.364
+  RANK rate_A_head3 over 81 bytes: with unigram=0.294 with class_mean=0.195
+  RANK rate_C_head3 over 81 bytes: with unigram=0.310 with class_mean=0.207
+  stride rate_A_head2    period=11.244 mean_epoch=6.000 open=0.1666 first=2.5108 rest=2.3236 ratio=1.0806 share=0.1776 | carry=1.0820 carry_share=0.1778 | epoch_nats=14.132 spread=0.4094 | after newline=0.022 space=0.201 punct=0.135
+  stride rate_C_head2    period=11.590 mean_epoch=6.000 open=0.1666 first=2.5226 rest=2.3212 ratio=1.0868 share=0.1784 | carry=1.0751 carry_share=0.1769 | epoch_nats=14.132 spread=0.4048 | after newline=0.022 space=0.208 punct=0.131
+  stride rate_A_head3    period=13.579 mean_epoch=6.000 open=0.1666 first=2.4151 rest=2.3427 ratio=1.0309 share=0.1708 | carry=1.1036 carry_share=0.1807 | epoch_nats=14.132 spread=0.3859 | after newline=0.057 space=0.124 punct=0.095
+  stride rate_C_head3    period=13.989 mean_epoch=6.000 open=0.1666 first=2.4190 rest=2.3419 ratio=1.0329 share=0.1711 | carry=1.1053 carry_share=0.1810 | epoch_nats=14.131 spread=0.3881 | after newline=0.057 space=0.130 punct=0.096
+  unigram                period=21.196 mean_epoch=6.000 open=0.1666 first=2.3177 rest=2.3622 ratio=0.9812 share=0.1640 | carry=1.1840 carry_share=0.1914 | epoch_nats=14.132 spread=0.3105 | after newline=0.012 space=0.077 punct=0.100
+  class                  period=14.128 mean_epoch=6.000 open=0.1666 first=2.2898 rest=2.3677 ratio=0.9671 share=0.1620 | carry=1.2541 carry_share=0.2004 | epoch_nats=14.133 spread=0.2948 | after newline=0.015 space=0.061 punct=0.100
+  own                    period=14.114 mean_epoch=6.000 open=0.1666 first=2.4250 rest=2.3407 ratio=1.0360 share=0.1715 | carry=1.6588 carry_share=0.2490 | epoch_nats=14.133 spread=0.1559 | after newline=0.016 space=0.061 punct=0.100
+  fixed 6                 mean_epoch=5.998 open=0.1666 first=2.3639 rest=2.3529 ratio=1.0047 share=0.1673 | carry=1.0004 carry_share=0.1667 | epoch_nats=14.128 spread=0.3499 | after newline=0.010 space=0.141 punct=0.066
+  code                    mean_epoch=5.988 open=0.1669 first=5.0639 rest=1.8120 ratio=2.7947 share=0.3589 | carry=1.0647 carry_share=0.1759 | epoch_nats=14.101 spread=0.9185 | after newline=0.025 space=0.346 punct=0.062
+  newline                 mean_epoch=103.535 open=0.0096 first=3.7044 rest=2.3417 ratio=1.5819 share=0.0150 | carry=1.6321 carry_share=0.0155 | epoch_nats=224.775 spread=2.6381 | after newline=1.000 space=0.000 punct=0.000
+  stride rate_A_head2    by position: 2.511 2.374 2.379 2.377 2.346 2.309 2.180 2.091 1.870 | 10+: 1.983 (598)
+  stride rate_C_head2    by position: 2.523 2.373 2.365 2.369 2.357 2.302 2.171 2.084 1.901 | 10+: 1.873 (484)
+  stride rate_A_head3    by position: 2.415 2.371 2.368 2.363 2.353 2.313 2.255 2.171 2.211 | 10+: 3.068 (11)
+  stride rate_C_head3    by position: 2.419 2.366 2.369 2.363 2.357 2.318 2.245 2.150 1.934 | 10+: 3.700 (18)
+  unigram                by position: 2.318 2.410 2.412 2.393 2.320 2.299 2.245 2.362 2.822 | 10+: 0.000 (0)
+  class                  by position: 2.290 2.407 2.414 2.380 2.344 2.300 2.289 2.344 2.736 | 10+: 2.731 (2)
+  own                    by position: 2.425 2.461 2.461 2.390 2.283 2.240 2.134 2.106 2.093 | 10+: 2.007 (4146)
+  fixed 6                by position: 2.364 2.348 2.346 2.359 2.355 2.355 0.000 0.000 0.000 | 10+: 0.000 (0)
+  code                   by position: 5.064 1.836 1.899 2.008 1.887 1.821 1.792 1.663 1.705 | 10+: 1.725 (89126)
+EPOCH slice=books counts_places=32020827 held_places=329960 read_places=329951 mean_code=2.1083 newline_share_of_bytes=0.00003  s=15
+  KIND newline=10.043(0.0000) space=0.829(0.1767) lower=2.198(0.7420) upper=4.223(0.0350) digit=3.882(0.0064) punct=4.192(0.0338) high=2.661(0.0060)
+  RANK rate_A_head2 over 68 bytes: with unigram=0.502 with class_mean=0.501
+  RANK rate_C_head2 over 68 bytes: with unigram=0.487 with class_mean=0.490
+  RANK rate_A_head3 over 68 bytes: with unigram=0.476 with class_mean=0.440
+  RANK rate_C_head3 over 68 bytes: with unigram=0.509 with class_mean=0.465
+  stride rate_A_head2    period=10.258 mean_epoch=6.000 open=0.1666 first=2.2178 rest=2.0864 ratio=1.0630 share=0.1753 | carry=1.0168 carry_share=0.1690 | epoch_nats=12.651 spread=0.3631 | after newline=0.000 space=0.284 punct=0.065
+  stride rate_C_head2    period=10.643 mean_epoch=6.000 open=0.1666 first=2.2325 rest=2.0835 ratio=1.0715 share=0.1765 | carry=1.0093 carry_share=0.1679 | epoch_nats=12.651 spread=0.3606 | after newline=0.000 space=0.286 punct=0.064
+  stride rate_A_head3    period=12.203 mean_epoch=6.000 open=0.1666 first=2.0794 rest=2.1141 ratio=0.9836 share=0.1644 | carry=1.0780 carry_share=0.1773 | epoch_nats=12.651 spread=0.3009 | after newline=0.000 space=0.175 punct=0.058
+  stride rate_C_head3    period=12.573 mean_epoch=6.000 open=0.1666 first=2.1005 rest=2.1099 ratio=0.9955 share=0.1660 | carry=1.0716 carry_share=0.1765 | epoch_nats=12.650 spread=0.3003 | after newline=0.000 space=0.185 punct=0.058
+  unigram                period=18.989 mean_epoch=6.000 open=0.1666 first=1.9774 rest=2.1345 ratio=0.9264 share=0.1563 | carry=1.1894 carry_share=0.1922 | epoch_nats=12.651 spread=0.2709 | after newline=0.000 space=0.099 punct=0.054
+  class                  period=12.651 mean_epoch=6.000 open=0.1666 first=1.9483 rest=2.1403 ratio=0.9103 share=0.1540 | carry=1.2722 carry_share=0.2028 | epoch_nats=12.651 spread=0.2574 | after newline=0.000 space=0.069 punct=0.066
+  own                    period=12.646 mean_epoch=6.000 open=0.1666 first=2.0374 rest=2.1225 ratio=0.9599 share=0.1610 | carry=1.6234 carry_share=0.2451 | epoch_nats=12.651 spread=0.1442 | after newline=0.000 space=0.070 punct=0.067
+  fixed 6                 mean_epoch=6.000 open=0.1667 first=2.1037 rest=2.1092 ratio=0.9974 share=0.1663 | carry=0.9921 carry_share=0.1656 | epoch_nats=12.650 spread=0.2963 | after newline=0.000 space=0.177 punct=0.033
+  code                    mean_epoch=5.988 open=0.1670 first=4.4987 rest=1.6292 ratio=2.7613 share=0.3563 | carry=0.8641 carry_share=0.1476 | epoch_nats=12.627 spread=0.7615 | after newline=0.000 space=0.400 punct=0.022
+  newline                 mean_epoch=18331.111 open=0.0000 first=3.3628 rest=2.1083 ratio=1.5950 share=0.0000 | carry=4.7641 carry_share=0.0001 | epoch_nats=0.000 spread=0.0000 | after newline=1.000 space=0.000 punct=0.000
+  stride rate_A_head2    by position: 2.218 2.089 2.083 2.116 2.135 2.067 2.006 1.905 1.770 | 10+: 1.479 (10)
+  stride rate_C_head2    by position: 2.232 2.081 2.078 2.115 2.134 2.071 2.009 1.844 1.725 | 10+: 1.779 (8)
+  stride rate_A_head3    by position: 2.079 2.147 2.108 2.112 2.106 2.122 2.039 1.982 1.849 | 10+: 3.159 (1)
+  stride rate_C_head3    by position: 2.100 2.132 2.116 2.104 2.111 2.116 2.022 1.874 2.668 | 10+: 2.306 (3)
+  unigram                by position: 1.977 2.159 2.169 2.115 2.085 2.109 2.186 2.489 0.000 | 10+: 0.000 (0)
+  class                  by position: 1.948 2.176 2.166 2.116 2.091 2.111 2.175 2.267 3.131 | 10+: 2.562 (3)
+  own                    by position: 2.037 2.193 2.180 2.115 2.067 2.035 2.058 2.054 2.190 | 10+: 2.318 (2402)
+  fixed 6                by position: 2.104 2.122 2.107 2.115 2.108 2.094 0.000 0.000 0.000 | 10+: 0.000 (0)
+  code                   by position: 4.499 1.533 1.794 1.807 1.685 1.604 1.562 1.502 1.489 | 10+: 1.584 (67673)
+EPOCH slice=wikidata counts_places=19930144 held_places=329705 read_places=329645 mean_code=2.4812 newline_share_of_bytes=0.02005  s=18
+  KIND newline=2.911(0.0201) space=1.473(0.0947) lower=2.591(0.5774) upper=3.735(0.0617) digit=2.832(0.0524) punct=4.931(0.0132) high=1.900(0.1805)
+  RANK rate_A_head2 over 69 bytes: with unigram=0.559 with class_mean=0.270
+  RANK rate_C_head2 over 69 bytes: with unigram=0.561 with class_mean=0.265
+  RANK rate_A_head3 over 69 bytes: with unigram=0.394 with class_mean=0.229
+  RANK rate_C_head3 over 69 bytes: with unigram=0.421 with class_mean=0.241
+  stride rate_A_head2    period=10.040 mean_epoch=6.000 open=0.1665 first=2.6465 rest=2.4482 ratio=1.0810 share=0.1776 | carry=1.0747 carry_share=0.1768 | epoch_nats=14.888 spread=0.4132 | after newline=0.052 space=0.156 punct=0.028
+  stride rate_C_head2    period=10.312 mean_epoch=6.000 open=0.1665 first=2.6440 rest=2.4487 ratio=1.0798 share=0.1774 | carry=1.0728 carry_share=0.1765 | epoch_nats=14.888 spread=0.4067 | after newline=0.052 space=0.160 punct=0.027
+  stride rate_A_head3    period=12.893 mean_epoch=6.000 open=0.1665 first=2.6213 rest=2.4532 ratio=1.0685 share=0.1759 | carry=1.0996 carry_share=0.1802 | epoch_nats=14.886 spread=0.4511 | after newline=0.120 space=0.088 punct=0.019
+  stride rate_C_head3    period=13.296 mean_epoch=6.000 open=0.1665 first=2.6260 rest=2.4522 ratio=1.0709 share=0.1762 | carry=1.0942 carry_share=0.1794 | epoch_nats=14.887 spread=0.4517 | after newline=0.120 space=0.092 punct=0.017
+  unigram                period=24.079 mean_epoch=6.000 open=0.1665 first=2.3800 rest=2.5014 ratio=0.9515 share=0.1597 | carry=1.0817 carry_share=0.1777 | epoch_nats=14.892 spread=0.4229 | after newline=0.019 space=0.057 punct=0.020
+  class                  period=14.887 mean_epoch=6.000 open=0.1665 first=2.4739 rest=2.4826 ratio=0.9965 share=0.1660 | carry=1.2091 carry_share=0.1946 | epoch_nats=14.890 spread=0.3059 | after newline=0.023 space=0.057 punct=0.026
+  own                    period=14.880 mean_epoch=6.000 open=0.1665 first=2.6346 rest=2.4505 ratio=1.0751 share=0.1768 | carry=1.6363 carry_share=0.2464 | epoch_nats=14.892 spread=0.1548 | after newline=0.024 space=0.054 punct=0.026
+  fixed 6                 mean_epoch=5.997 open=0.1666 first=2.4961 rest=2.4782 ratio=1.0072 share=0.1676 | carry=0.9966 carry_share=0.1661 | epoch_nats=14.884 spread=0.3769 | after newline=0.021 space=0.096 punct=0.013
+  code                    mean_epoch=5.996 open=0.1666 first=5.3450 rest=1.9086 ratio=2.8005 share=0.3590 | carry=1.1598 carry_share=0.1884 | epoch_nats=14.878 spread=0.8905 | after newline=0.034 space=0.234 punct=0.021
+  newline                 mean_epoch=49.431 open=0.0201 first=3.4280 rest=2.4618 ratio=1.3925 share=0.0277 | carry=1.1776 carry_share=0.0235 | epoch_nats=123.035 spread=0.5527 | after newline=1.000 space=0.000 punct=0.000
+  stride rate_A_head2    by position: 2.646 2.529 2.573 2.536 2.447 2.430 2.242 2.022 1.671 | 10+: 1.550 (2401)
+  stride rate_C_head2    by position: 2.644 2.538 2.577 2.547 2.457 2.415 2.220 1.986 1.660 | 10+: 1.576 (3040)
+  stride rate_A_head3    by position: 2.621 2.547 2.597 2.545 2.480 2.468 2.362 2.021 1.668 | 10+: 1.636 (11709)
+  stride rate_C_head3    by position: 2.626 2.540 2.612 2.544 2.470 2.452 2.359 2.023 1.670 | 10+: 1.619 (10849)
+  unigram                by position: 2.380 2.457 2.444 2.480 2.522 2.603 2.564 2.610 3.819 | 10+: 0.000 (0)
+  class                  by position: 2.474 2.579 2.561 2.571 2.512 2.448 2.189 1.639 1.687 | 10+: 1.606 (3894)
+  own                    by position: 2.635 2.679 2.569 2.552 2.457 2.399 2.211 1.868 1.788 | 10+: 1.632 (9841)
+  fixed 6                by position: 2.496 2.479 2.472 2.479 2.487 2.474 0.000 0.000 0.000 | 10+: 0.000 (0)
+  code                   by position: 5.345 1.784 2.066 2.111 1.985 2.014 2.003 2.017 1.955 | 10+: 1.777 (92090)
+EPOCH pooled over the five slices (each its own period)
+  stride rate_A_head2     mean_epoch=6.000 open=0.1665 first=2.4136 rest=2.2784 ratio=1.0593 share=0.1747 | carry=1.0646 carry_share=0.1754 | epoch_nats=13.805 spread=0.4493 | after newline=0.034 space=0.232 punct=0.116
+  stride rate_C_head2     mean_epoch=6.000 open=0.1665 first=2.4176 rest=2.2776 ratio=1.0614 share=0.1749 | carry=1.0570 carry_share=0.1744 | epoch_nats=13.806 spread=0.4459 | after newline=0.034 space=0.235 punct=0.113
+  stride rate_A_head3     mean_epoch=6.000 open=0.1665 first=2.3306 rest=2.2950 ratio=1.0155 share=0.1687 | carry=1.0925 carry_share=0.1793 | epoch_nats=13.803 spread=0.4504 | after newline=0.087 space=0.140 punct=0.092
+  stride rate_C_head3     mean_epoch=6.000 open=0.1665 first=2.3348 rest=2.2942 ratio=1.0177 share=0.1690 | carry=1.0888 carry_share=0.1788 | epoch_nats=13.803 spread=0.4516 | after newline=0.086 space=0.147 punct=0.092
+  unigram                 mean_epoch=6.000 open=0.1665 first=2.2534 rest=2.3104 ratio=0.9753 share=0.1631 | carry=1.1798 carry_share=0.1908 | epoch_nats=13.811 spread=0.3483 | after newline=0.017 space=0.084 punct=0.095
+  class                   mean_epoch=6.000 open=0.1665 first=2.2685 rest=2.3074 ratio=0.9832 share=0.1642 | carry=1.2771 carry_share=0.2033 | epoch_nats=13.812 spread=0.3059 | after newline=0.016 space=0.064 punct=0.105
+  own                     mean_epoch=6.000 open=0.1665 first=2.4128 rest=2.2786 ratio=1.0589 share=0.1746 | carry=1.7204 carry_share=0.2558 | epoch_nats=13.811 spread=0.1661 | after newline=0.016 space=0.064 punct=0.104
+  fixed 6                 mean_epoch=5.997 open=0.1666 first=2.3053 rest=2.3001 ratio=1.0023 share=0.1669 | carry=0.9970 carry_share=0.1662 | epoch_nats=13.803 spread=0.3793 | after newline=0.015 space=0.160 punct=0.062
+  code                    mean_epoch=5.991 open=0.1668 first=5.1064 rest=1.7394 ratio=2.9357 share=0.3701 | carry=1.0561 carry_share=0.1746 | epoch_nats=13.785 spread=0.8571 | after newline=0.021 space=0.318 punct=0.063
+  newline                 mean_epoch=64.822 open=0.0152 first=2.5855 rest=2.2965 ratio=1.1258 share=0.0171 | carry=1.0802 carry_share=0.0165 | epoch_nats=119.833 spread=2.2168 | after newline=1.000 space=0.000 punct=0.000
+  stride rate_A_head2    by position: 2.414 2.278 2.301 2.297 2.299 2.302 2.214 2.164 2.051 | 10+: 2.082 (5683)
+  stride rate_C_head2    by position: 2.418 2.280 2.295 2.297 2.304 2.295 2.211 2.160 2.069 | 10+: 1.979 (5791)
+  stride rate_A_head3    by position: 2.331 2.289 2.328 2.315 2.317 2.298 2.263 2.179 2.063 | 10+: 1.742 (12681)
+  stride rate_C_head3    by position: 2.335 2.282 2.325 2.315 2.321 2.296 2.256 2.209 2.053 | 10+: 1.739 (11819)
+  unigram                by position: 2.253 2.354 2.355 2.331 2.307 2.288 2.243 2.092 1.382 | 10+: 1.165 (7817)
+  class                  by position: 2.269 2.388 2.386 2.352 2.315 2.264 2.177 1.934 1.634 | 10+: 1.283 (20261)
+  own                    by position: 2.413 2.442 2.412 2.358 2.266 2.200 2.107 1.967 1.884 | 10+: 1.419 (48650)
+  fixed 6                by position: 2.305 2.300 2.300 2.303 2.302 2.295 0.000 0.000 0.000 | 10+: 0.000 (0)
+  code                   by position: 5.106 1.747 1.853 1.912 1.794 1.757 1.708 1.676 1.658 | 10+: 1.634 (407354)

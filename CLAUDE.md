@@ -347,10 +347,21 @@ something is absent, search for the subject **and** its operations in:
 Read the matched record and its actual owner or caller. A search hit is not a join. Name the
 existing owner and the concrete missing term. A change that adds, moves or retires an owner updates
 its atlas rows in the same commit.
+The search names the operation under each discipline's name for it, and it is made before the
+statement, in a message as in a record (November 12; theory's, from that day's failures). Reason:
+on November 12 two designs were presented as new in one day, a symbol's word and a clock whose
+stride is a place's code length, and the tree held both under other names (the located transport
+of October 5, the news clock of October 27); the second was called unbuilt in a message before the
+atlas was searched for a clock of surprise
+([the record](research/records/2026-11-12_A_SYMBOL_IS_A_LENGTH_A_BYTE_IS_A_DIGIT_OF_THE_PASSAGE_A_TEXTS_PRIMES_ARE_ITS_PRIMITIVE_CYCLES_AND_A_STRIDE_IS_READ_AT_ITS_PLACE_AS_THE_NEWS_CLOCK_OF_OCTOBER_HELD.md) §7, §9).
 
 [project-postulate] **A discipline is a chart** ([charts](docs/atlas/CHARTS.md); Brandon,
 November 10). Brandon's lenses arrive in the language of a discipline: music, lightning, a vortex
-ring, a cipher, a packing, a zeta function. Each is a boundary chart of the objects. To use one:
+ring, a cipher, a packing, a zeta function. Each is a boundary chart of the objects. A unification is the
+recognition that two methods are one computation under two notations; a list of existing parts to
+connect is the weaker reading, and physics is leaned on because its laws are the ones information
+propagates by (Brandon, November 12; the weaker reading keeps each part's notation and misses the
+owner that already states the abstraction, `agent-inferred`). To use one:
 name the object and the operation that its nouns and verbs are; recover what the atlas already
 holds for that operation; take the discipline's theorem with its hypotheses restated on the
 objects; leave the discipline's application behind; and state what follows for the machine as a
