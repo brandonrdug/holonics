@@ -1,0 +1,40 @@
+# G95 (P19, sent 03:32Z): the release reads (settle with its keyed write and rest, re-draw, charge census on keyed, rest and re-draw's start, refread on 128) of tp4's end and its pair rt22's end, then rt23's end, as G70's j_run.sh ran them; 2026-11-12 UTC. Device line: the card, the RTX 4080 SUPER (16.8 GB), each stage its own hold of HOLONICS_ROOT/.local/gpu.lock; the host part as each stage runs it; each state within 900 s by its stages' timeouts. G70's exports, codec, units, held passage, ends and bounds; the first 32 held problems (the refread on 128). Projection about 10 minutes a state.
+# tp4_state: state tp4/STATE.0 sha256 92debb63c6c42b24; binary bin-turn-carry-tf 837bc5887de82cda (ccc28b5cd); read 03:32:56 to 03:42:55 UTC; 599 s
+REFREAD tp4_state problems=128 places=43342 code=0.462784 entropy=0.430371 root_share=1.291133 v1=0.058903 v2=0.038115 03:42:55
+LAP tp4_state locks=1.842704/1.009109 v2=0.195319 rest=1.183265/0.863302 v2=0.112328 redraw=0.697839/0.710352 neutral=26 rested=6 redraw_v2=0.047260 03:42:55
+FIELD_SETTLE_DONE problems=32 at_rest=32 h_millinats=1000 passes_bound=1000 kept=836 undone=1203 letters=8760 code_keyed_nats_a_place=1.842704 code_end_nats_a_place=1.183265 fall_nats=5776.689506 keyed_ms=17507 ms=307930
+MEASURE lap=tp4_state_settle rc=0 wall_s=308.5 peak_rss_kib=751900
+FIELD_REDRAW_DONE problems=32 neutral=26 rested=6 h_millinats=1000 passes_bound=1000 kept=804 undone=885 letters=8760 code_start_nats_a_place=1.183265 code_end_nats_a_place=0.697839 entropy_end_nats_a_place=0.710352 root_end_nats=503.075037 ms=142095
+MEASURE lap=tp4_state_redraw rc=0 wall_s=142.6 peak_rss_kib=756316
+FIELD_CHARGE_STATE state=rest problems=32 letters=8760 cut_to_room=0 code_nats=10365.403238 entropy_nats=7562.528915 code_nats_a_place=1.183265 entropy_nats_a_place=0.863302 excess_nats=2802.874323 root_nats=777.873831 root_share_of_excess=0.277527 v_over_1_share=0.169292 v_over_2_share=0.112328 ms=13742
+FIELD_CHARGE_STATE state=keyed problems=32 letters=8760 cut_to_room=0 code_nats=16142.092744 entropy_nats=8839.800139 code_nats_a_place=1.842704 entropy_nats_a_place=1.009109 excess_nats=7302.292604 root_nats=828.807273 root_share_of_excess=0.113499 v_over_1_share=0.265410 v_over_2_share=0.195319 ms=13776
+FIELD_CHARGE_STATE state=reference problems=32 letters=8760 cut_to_room=0 code_nats=3601.904387 entropy_nats=3351.904722 code_nats_a_place=0.411176 entropy_nats_a_place=0.382637 excess_nats=249.999663 root_nats=419.362958 root_share_of_excess=1.677454 v_over_1_share=0.051369 v_over_2_share=0.035958 ms=13809
+MEASURE lap=tp4_state_charge rc=0 wall_s=41.7 peak_rss_kib=732268
+refread FIELD_CHARGE_STATE state=reference problems=128 letters=43342 cut_to_room=0 code_nats=20058.002572 entropy_nats=18653.156110 code_nats_a_place=0.462784 entropy_nats_a_place=0.430371 excess_nats=1404.846462 root_nats=1813.843990 root_share_of_excess=1.291133 v_over_1_share=0.058903 v_over_2_share=0.038115 ms=105620
+refread MEASURE lap=tp4_state_refread rc=0 wall_s=106.2 peak_rss_kib=2099488
+# rt22_state: state rt22/STATE.0 sha256 9375d86b00f67861; binary bin-lap-mean b8fe4ba838dd27a6 (8368f084b); read 03:42:55 to 03:52:42 UTC; 587 s
+REFREAD rt22_state problems=128 places=43342 code=0.501262 entropy=0.461299 root_share=1.064668 v1=0.064464 v2=0.041899 03:52:42
+LAP rt22_state locks=1.868170/1.024760 v2=0.201255 rest=1.247844/0.900784 v2=0.121118 redraw=0.726810/0.736970 neutral=27 rested=5 redraw_v2=0.051027 03:52:42
+FIELD_SETTLE_DONE problems=32 at_rest=32 h_millinats=1000 passes_bound=1000 kept=800 undone=1187 letters=8760 code_keyed_nats_a_place=1.868170 code_end_nats_a_place=1.247844 fall_nats=5434.052108 keyed_ms=15154 ms=280063
+MEASURE lap=rt22_state_settle rc=0 wall_s=280.5 peak_rss_kib=787360
+FIELD_REDRAW_DONE problems=32 neutral=27 rested=5 h_millinats=1000 passes_bound=1000 kept=911 undone=1085 letters=8760 code_start_nats_a_place=1.247844 code_end_nats_a_place=0.726810 entropy_end_nats_a_place=0.736970 root_end_nats=507.080314 ms=174361
+MEASURE lap=rt22_state_redraw rc=0 wall_s=174.7 peak_rss_kib=770412
+FIELD_CHARGE_STATE state=rest problems=32 letters=8760 cut_to_room=0 code_nats=10931.117971 entropy_nats=7890.866937 code_nats_a_place=1.247844 entropy_nats_a_place=0.900784 excess_nats=3040.251035 root_nats=723.237119 root_share_of_excess=0.237886 v_over_1_share=0.178538 v_over_2_share=0.121118 ms=12568
+FIELD_CHARGE_STATE state=keyed problems=32 letters=8760 cut_to_room=0 code_nats=16365.170079 entropy_nats=8976.905733 code_nats_a_place=1.868170 entropy_nats_a_place=1.024760 excess_nats=7388.264346 root_nats=754.614613 root_share_of_excess=0.102137 v_over_1_share=0.272488 v_over_2_share=0.201255 ms=12840
+FIELD_CHARGE_STATE state=reference problems=32 letters=8760 cut_to_room=0 code_nats=3763.905020 entropy_nats=3556.256655 code_nats_a_place=0.429669 entropy_nats_a_place=0.405965 excess_nats=207.648365 root_nats=409.897041 root_share_of_excess=1.973995 v_over_1_share=0.053881 v_over_2_share=0.035844 ms=12435
+MEASURE lap=rt22_state_charge rc=0 wall_s=38.3 peak_rss_kib=750432
+refread FIELD_CHARGE_STATE state=reference problems=128 letters=43342 cut_to_room=0 code_nats=21725.690965 entropy_nats=19993.628234 code_nats_a_place=0.501262 entropy_nats_a_place=0.461299 excess_nats=1732.062731 root_nats=1844.072217 root_share_of_excess=1.064668 v_over_1_share=0.064464 v_over_2_share=0.041899 ms=92533
+refread MEASURE lap=rt22_state_refread rc=0 wall_s=93.0 peak_rss_kib=2347188
+# rt23_state: state rt23/STATE.0 sha256 743880fb7bc857f4; binary bin-lap-mean b8fe4ba838dd27a6 (8368f084b); read 03:52:42 to 04:02:09 UTC; 567 s
+REFREAD rt23_state problems=128 places=43342 code=0.499032 entropy=0.467348 root_share=1.359649 v1=0.063864 v2=0.040561 04:02:09
+LAP rt23_state locks=1.867949/1.050879 v2=0.200000 rest=1.152236/0.889964 v2=0.103424 redraw=0.727818/0.754509 neutral=29 rested=3 redraw_v2=0.047831 04:02:09
+FIELD_SETTLE_DONE problems=32 at_rest=32 h_millinats=1000 passes_bound=1000 kept=950 undone=1286 letters=8760 code_keyed_nats_a_place=1.867949 code_end_nats_a_place=1.152236 fall_nats=6269.652025 keyed_ms=14911 ms=308435
+MEASURE lap=rt23_state_settle rc=0 wall_s=308.8 peak_rss_kib=772960
+FIELD_REDRAW_DONE problems=32 neutral=29 rested=3 h_millinats=1000 passes_bound=1000 kept=792 undone=812 letters=8760 code_start_nats_a_place=1.152236 code_end_nats_a_place=0.727818 entropy_end_nats_a_place=0.754509 root_end_nats=537.252732 ms=128705
+MEASURE lap=rt23_state_redraw rc=0 wall_s=129.1 peak_rss_kib=776984
+FIELD_CHARGE_STATE state=rest problems=32 letters=8760 cut_to_room=0 code_nats=10093.591285 entropy_nats=7796.091343 code_nats_a_place=1.152236 entropy_nats_a_place=0.889964 excess_nats=2297.499943 root_nats=768.156877 root_share_of_excess=0.334344 v_over_1_share=0.161187 v_over_2_share=0.103424 ms=12309
+FIELD_CHARGE_STATE state=keyed problems=32 letters=8760 cut_to_room=0 code_nats=16363.243310 entropy_nats=9205.708214 code_nats_a_place=1.867949 entropy_nats_a_place=1.050879 excess_nats=7157.535096 root_nats=804.597868 root_share_of_excess=0.112412 v_over_1_share=0.272945 v_over_2_share=0.200000 ms=12406
+FIELD_CHARGE_STATE state=reference problems=32 letters=8760 cut_to_room=0 code_nats=3731.078812 entropy_nats=3582.624849 code_nats_a_place=0.425921 entropy_nats_a_place=0.408975 excess_nats=148.453962 root_nats=417.911426 root_share_of_excess=2.815090 v_over_1_share=0.053767 v_over_2_share=0.034246 ms=12358
+MEASURE lap=rt23_state_charge rc=0 wall_s=37.5 peak_rss_kib=753308
+refread FIELD_CHARGE_STATE state=reference problems=128 letters=43342 cut_to_room=0 code_nats=21629.074950 entropy_nats=20255.814562 code_nats_a_place=0.499032 entropy_nats_a_place=0.467348 excess_nats=1373.260388 root_nats=1867.152202 root_share_of_excess=1.359649 v_over_1_share=0.063864 v_over_2_share=0.040561 ms=91462
+refread MEASURE lap=rt23_state_refread rc=0 wall_s=91.9 peak_rss_kib=2361628
