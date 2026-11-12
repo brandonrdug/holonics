@@ -265,6 +265,13 @@ struct Words {
     pabg: u64,
     ptp: u64,
     pct: u64,
+    // [theory, November 12, P50 step 1] The clock's skins (`FieldWords::skin`, `cskin`): a paced head's skin of each support pair `[p][pair][l]` and
+    // of each crowd edge `[p][t][slot][l]`, 32 bits each, formed once a clock by `field_skin_fill`. Zero where the batch keeps none.
+    skin: u64,
+    cskin: u64,
+    // [theory, November 12, P51] The skins' support stride: each region's prefix of `S_r K_r` (`FieldWords::region_soff`) and their sum `E2`.
+    region_soff: u64,
+    skin_entries: u64,
 }
 
 /// The moment kernels' words (`MomentWords` in `kernels/field_moment.cuh`, field for field): the batch's
@@ -348,6 +355,34 @@ pub struct FieldTimes {
     /// reads and pairs above.
     pub landmarks: u64,
     pub landmark_ns: u128,
+    /// [measurement; theory, November 12, P50 step 1 and P51] The clock's skins ([`skin_octets`]): the largest batch's store, the octets a reserved
+    /// support entry and a site (zero where no head is paced), the support entries `E2` and the dense pairs summed over the batches, and the largest
+    /// batch's `E2` beside its dense pairs.
+    pub skin_store: u64,
+    pub skin_entry_octets: u64,
+    pub skin_site_octets: u64,
+    pub skin_entries: u128,
+    pub skin_dense_pairs: u128,
+    pub skin_peak_entries: u64,
+    pub skin_peak_pairs: u64,
+    /// The batches' cut: four fifths of the batch budget less the exponential's face, the last run's.
+    pub batch_cut: u64,
+}
+
+/// [theory, November 12, P50 step 1 and P51] The clock's skin store of a region of `sites` sites, `definite` of them definite
+/// ([`CardField::skin_fill`]): 32 bits a paced head, support entry and mode over the row's support stride `K = NEAR_SLOTS + definite` (atlas
+/// `tower.field-support-stride`: every row's support fits it), and a paced head, site, crowd slot and mode. Returns (the region's octets, octets a
+/// reserved entry, octets a site's crowd edges).
+pub fn skin_octets(d: &FieldDeclaration, sites: usize, definite: usize) -> (u64, u64, u64) {
+    let per = 4 * d.paced_heads() as u64 * d.modes as u64;
+    let (entry, site) = (per, per * crowd_slots(d.reach) as u64);
+    let stride = (2 * (NEAR - 1) + definite) as u64;
+    (entry * sites as u64 * stride + site * sites as u64, entry, site)
+}
+
+/// A region's definite sites (the stage's `definite`: known and carrying no face, or locked).
+fn definite_sites(region: &Region) -> usize {
+    (0..region.classes.len()).filter(|&t| (!region.unresolved[t] && region.faces.get(t).and_then(Option::as_ref).is_none()) || region.locked.get(t).copied().unwrap_or(false)).count()
 }
 
 /// One tick's carriers on the card.
@@ -523,6 +558,8 @@ struct Staged<'c> {
     mix_share: Vec<u32>,
     site_weight: Vec<(u64, u64)>,
     pairs: usize,
+    /// [theory, November 12, P51] The skins' support entries `E2 = Σ_r S_r K_r`.
+    skin_entries: usize,
     sites: usize,
     _tables: Pooled<'c, u8>,
     status: Pooled<'c, u32>,
@@ -767,6 +804,9 @@ pub struct CardField<'c> {
     profile: Option<std::cell::RefCell<FieldProfile>>,
     /// The head a launch is made for, where the launches go a head at a time (a profile's reading by head).
     head: std::cell::Cell<Option<u32>>,
+    /// [theory, November 12, P50 step 1] The test build's negative control: the clock's fill withheld, its store left at `SKIN_UNFILLED`.
+    #[cfg(test)]
+    unfilled: std::cell::Cell<bool>,
     pools: std::rc::Rc<std::cell::RefCell<Pools<'c>>>,
     /// A held read's rows by where their mass lies (a reading for the receipts): the regions' answer starts
     /// while it is read, and the cells `[tick · heads + head][rows, question, soft_near, other, current, question_far, far_effective, far_rows]` summed.
@@ -806,7 +846,7 @@ impl<'c> CardField<'c> {
         let (free, total) = (memory.free_bytes as u64, memory.total_bytes as u64);
         let used = total.saturating_sub(free);
         let budget = free.min(BOARD_CEILING.saturating_sub(used)).saturating_sub(MARGIN);
-        Ok(Self { card, module, budget, times: FieldTimes::default(), profile: None, head: Default::default(), pools: Default::default(), held_questions: Default::default(), covector_shares: Default::default(), row_questions: Default::default(), row_out: Default::default(), row_cov: Default::default(), held_cells: Default::default(), tick_reads: Default::default(), carry_gates: Default::default(), near_sites: Default::default(), near_out: Default::default(), clock_sites: Default::default(), clock_out: Default::default(), phases: None })
+        Ok(Self { card, module, budget, times: FieldTimes::default(), profile: None, head: Default::default(), #[cfg(test)] unfilled: Default::default(), pools: Default::default(), held_questions: Default::default(), covector_shares: Default::default(), row_questions: Default::default(), row_out: Default::default(), row_cov: Default::default(), held_cells: Default::default(), tick_reads: Default::default(), carry_gates: Default::default(), near_sites: Default::default(), near_out: Default::default(), clock_sites: Default::default(), clock_out: Default::default(), phases: None })
     }
 
     /// The octets a batch's weight and contact stores may take.
@@ -1265,9 +1305,16 @@ impl<'c> CardField<'c> {
                 + towered.map_or(0, |(cd, period)| read_octets(&cd, returning, false, sites.div_ceil(period)) + 16 * (sites * d.width) as u64 + 16 * (sites.div_ceil(period) * period * d.width) as u64)
         };
         let lengths: Vec<usize> = regions.iter().map(|r| r.classes.len()).collect();
+        // [theory, November 12, P51] The clock's skins at the support stride: each region's own need, its definite sites read (the fine level only;
+        // the tower's packets keep no store).
+        let definite: Vec<usize> = regions.iter().map(definite_sites).collect();
+        let skins: Vec<u64> = lengths.iter().zip(&definite).map(|(&n, &dd)| skin_octets(&d, n, dd).0).collect();
+        let needs: Vec<u64> = lengths.iter().zip(&skins).map(|(&n, &sk)| octets(n) + sk).collect();
         // A pooled buffer is at most a quarter longer than asked (its size class), so the batches are cut at four
         // fifths of the budget.
-        let batches = batches(&lengths, &octets, (self.budget - face_octets) / 5 * 4)?;
+        let cut = (self.budget - face_octets) / 5 * 4;
+        self.times.batch_cut = cut;
+        let batches = batches_of(&lengths, &needs, cut)?;
         if keep.is_some() && (regions.len() != 1 || returning) {
             return Err(TowerError::Refused("the weight rows are read from one region's forward"));
         }
@@ -1279,8 +1326,18 @@ impl<'c> CardField<'c> {
             if batch.is_empty() {
                 continue;
             }
-            let peak = lengths[batch.clone()].iter().map(|&n| octets(n)).sum::<u64>();
+            let peak = needs[batch.clone()].iter().sum::<u64>();
             self.times.peak_store = self.times.peak_store.max(peak);
+            let store = skins[batch.clone()].iter().sum::<u64>();
+            let entries = batch.clone().map(|r| (lengths[r] * (2 * (NEAR - 1) + definite[r])) as u64).sum::<u64>();
+            let dense = lengths[batch.clone()].iter().map(|&n| (n * n) as u64).sum::<u64>();
+            let t = &mut self.times;
+            (t.skin_entry_octets, t.skin_site_octets) = (skin_octets(&d, 0, 0).1, skin_octets(&d, 0, 0).2);
+            t.skin_store = t.skin_store.max(store);
+            (t.skin_entries, t.skin_dense_pairs) = (t.skin_entries + u128::from(entries), t.skin_dense_pairs + u128::from(dense));
+            if entries > t.skin_peak_entries {
+                (t.skin_peak_entries, t.skin_peak_pairs) = (entries, dense);
+            }
             self.times.batches += 1;
             self.mark("run_setup");
             let (f, z, r, e) = self.batch(field, &regions[batch.clone()], batch.start, &mut words, g.as_deref(), logits, keep, tower.as_mut())?;
@@ -1397,6 +1454,8 @@ impl<'c> CardField<'c> {
         let mut site_pos = Vec::new();
         let mut region_off = vec![0u32];
         let mut region_eoff = Vec::new();
+        // [theory, November 12, P51] The skins' support stride: each region's prefix of `S_r K_r`, and their sum.
+        let (mut region_soff, mut skin_entries) = (Vec::<u64>::new(), 0usize);
         let mut classes = Vec::new();
         let mut unresolved = Vec::new();
         // A definite site (§14.1): known (resolved, carrying no mixture) or locked (a foil).
@@ -1433,6 +1492,7 @@ impl<'c> CardField<'c> {
             site_weight.extend(std::iter::repeat_n(weight, s));
             region_eoff.push(pairs as u64);
             pairs += s * s;
+            region_soff.push(skin_entries as u64);
             dstart.push(dlist.len() as u32);
             ostart.push(olist.len() as u32);
             for t in 0..s {
@@ -1472,7 +1532,10 @@ impl<'c> CardField<'c> {
                 mix_off.push(mix_class.len() as u32);
             }
             region_off.push(site_region.len() as u32);
+            // [theory, November 12, P51] The region's support stride `K_r = NEAR_SLOTS + D_r` a row (the clock's skins).
+            skin_entries += s * (2 * (NEAR - 1) + dlist.len() - *dstart.last().expect("the region's definite list opened") as usize);
         }
+        region_soff.push(skin_entries as u64);
         let sites = site_region.len();
         dstart.push(dlist.len() as u32);
         ostart.push(olist.len() as u32);
@@ -1505,6 +1568,7 @@ impl<'c> CardField<'c> {
         let mix_class_at = pack.put(&mix_class_up);
         let mix_share_at = pack.put(&mix_share_up);
         let (dlist_at, dstart_at, olist_at, ostart_at) = (pack.put(&dlist), pack.put(&dstart), pack.put(&olist), pack.put(&ostart));
+        let region_soff_at = pack.put(&region_soff);
         let tables = self.timed(Kind::Copy, || self.take_up(&pack.bytes)).map_err(device)?;
         let base = tables.device_ptr();
         let status = self.timed(Kind::Alloc, || self.take_zeroed::<u32>(1)).map_err(device)?;
@@ -1527,13 +1591,15 @@ impl<'c> CardField<'c> {
         words.mix_off = base + mix_off_at;
         words.mix_class = base + mix_class_at;
         words.mix_share = base + mix_share_at;
+        words.region_soff = base + region_soff_at;
+        words.skin_entries = skin_entries as u64;
         words.dlist = base + dlist_at;
         words.dstart = base + dstart_at;
         words.olist = base + olist_at;
         words.ostart = base + ostart_at;
         words.status = status.device_ptr();
         words.x = x.device_ptr();
-        Ok(Staged { site_region, site_pos, region_off, classes, unresolved, definite, echo_has, mix_off, mix_class, mix_share, site_weight, pairs, sites, _tables: tables, status, x })
+        Ok(Staged { site_region, site_pos, region_off, classes, unresolved, definite, echo_has, mix_off, mix_class, mix_share, site_weight, pairs, skin_entries, sites, _tables: tables, status, x })
     }
 
     /// One tick of the constitution on the card over the staged sites of `words` (the host's `Field::tick`), its temporaries in
@@ -1569,6 +1635,8 @@ impl<'c> CardField<'c> {
         self.launch("field_unit_probe", Self::warps((heads * sites) as u64), THREADS, &mut [arg(words), arg(&mut ps)])?;
         // The definite sites' prefix sums (§14.10), read by the contact's crowds.
         self.launch("field_sums", Self::cells((heads * regions * (2 * span + 1)) as u64), THREADS, &mut [arg(words)])?;
+        // The clock's skins, formed once for the exposure and the contact (the return forms them again for this tick's clock).
+        self.skin_fill(field, words, sites)?;
         let mut store = u32::from(stored);
         if keep_last && k + 1 == d.ticks {
             // The last tick's rows are read whole: the entries outside its support read zero.
@@ -1809,6 +1877,16 @@ impl<'c> CardField<'c> {
         let saddr = self.timed(Kind::Alloc, || self.take::<i64>((3 * paced * n * sites).max(1))).map_err(device)?;
         let plain = self.timed(Kind::Alloc, || self.take::<u8>((paced * regions.len()).max(1))).map_err(device)?;
         let pframe = self.timed(Kind::Alloc, || self.take::<i64>((2 * paced * sites * n).max(1))).map_err(device)?;
+        // [theory, November 12, P50 step 1 and P51] The clock's skins (`skin_fill`): a word a paced head, support entry and mode at the row's support
+        // stride (`E2` entries), and a word a paced head, site, crowd slot and mode; one store for the batch, formed again at each clock.
+        let skins = if paced > 0 {
+            let pair_words = paced * st.skin_entries * n;
+            let crowd_words = paced * sites * words.slots as usize * n;
+            Some((self.timed(Kind::Alloc, || self.take::<u32>(pair_words.max(1))).map_err(device)?, self.timed(Kind::Alloc, || self.take::<u32>(crowd_words.max(1))).map_err(device)?))
+        } else {
+            None
+        };
+        (words.skin, words.cskin) = skins.as_ref().map_or((0, 0), |(a, b)| (a.device_ptr(), b.device_ptr()));
         words.kappa = kappa.device_ptr();
         words.tau = tau.device_ptr();
         words.sigma = sigma.device_ptr();
@@ -2474,6 +2552,8 @@ impl<'c> CardField<'c> {
             self.launch("field_pace_current_back", Self::cells((paced * sites) as u64), THREADS, &mut [arg(words), arg(&mut dyp), arg(&mut yp)])?;
         }
         card.zero_octets(&dp, 0, 8 * sites * m2).map_err(device)?;
+        // The tick's clock's skins, formed again for its return (the forward's store holds a later tick's).
+        self.skin_fill(field, words, sites)?;
         if let Some(profile) = &self.profile {
             let mut p = profile.borrow_mut();
             if p.head_kinds.len() < heads {
@@ -2783,13 +2863,39 @@ impl<'c> CardField<'c> {
         Ok(())
     }
 
+    /// [definition; theory, November 12, P50 step 1 (G116 a)] **The clock's skins, formed once** (`field_skin_fill`): after the clock is set, every
+    /// support pair's and crowd edge's skin of the paced heads where their pace is not plain, read by the lock, the numerators, the rows, the columns
+    /// and the skin's return. The test build first writes `SKIN_UNFILLED` over the store, so a reader of a word no fill formed is refused
+    /// (`REFUSED_UNFILLED`); a level with no store (no paced head, the packets' plain clocks) forms none.
+    fn skin_fill(&self, field: &Field, words: &mut Words, sites: usize) -> Result<()> {
+        let d = field.declaration;
+        let paced = d.paced_heads();
+        if paced == 0 || words.skin == 0 {
+            return Ok(());
+        }
+        if cfg!(debug_assertions) {
+            let n = d.modes;
+            let pair_words = paced * words.skin_entries as usize * n;
+            let crowd_words = paced * sites * words.slots as usize * n;
+            let stream = self.card.stream();
+            stream.memset_u32_async(words.skin, u32::MAX, pair_words.max(1)).map_err(|e| device(e.into()))?;
+            stream.memset_u32_async(words.cskin, u32::MAX, crowd_words.max(1)).map_err(|e| device(e.into()))?;
+        }
+        #[cfg(test)]
+        if self.unfilled.get() {
+            return Ok(());
+        }
+        let mut pc = paced as u32;
+        self.launch("field_skin_fill", Self::rows_grid((paced * sites) as u64, CONTACT_ROWS), (CONTACT_ROWS * 32) as u32, &mut [arg(words), arg(&mut pc)])
+    }
+
     /// The batch's refusals, read off the card.
     fn status(&self, status: &CardBuffer<'c, u32>) -> Result<()> {
         let bits = self.timed(Kind::Copy, || self.card.fetch(status)).map_err(device)?[0];
         if bits == 0 {
             return Ok(());
         }
-        let names = [(1, "a sum outgrew its 128-bit carrier"), (2, "a released value outgrew its 64-bit carrier"), (4, "a released value outgrew its 32-bit carrier"), (8, "a current's covector outgrew its 128-bit carrier"), (16, "a moment's strand outruns its resident ring or skin"), (32, "a contact's key return outgrew its carrier"), (64, "a temperature past its carrier (2^(−23) to 2^7)")];
+        let names = [(1, "a sum outgrew its 128-bit carrier"), (2, "a released value outgrew its 64-bit carrier"), (4, "a released value outgrew its 32-bit carrier"), (8, "a current's covector outgrew its 128-bit carrier"), (16, "a moment's strand outruns its resident ring or skin"), (32, "a contact's key return outgrew its carrier"), (64, "a temperature past its carrier (2^(−23) to 2^7)"), (128, "a skin read from the clock's store where its fill formed none")];
         let named: Vec<&str> = names.iter().filter(|(b, _)| bits & b != 0).map(|(_, n)| *n).collect();
         Err(TowerError::Realization(format!("the card refused the field: {}", named.join("; "))))
     }
@@ -2804,8 +2910,8 @@ impl<'c> CardField<'c> {
 /// (`S²` on 128 bits). Measured November 1: sized by the weights and the contact's return alone, a
 /// batched release's per-site carriers took the board to 13,372 MiB; sized by its carriers too, the
 /// same release peaked at 11,256 MiB.
-pub fn region_octets(d: &FieldDeclaration, returning: bool, sites: usize) -> u64 {
-    read_octets(d, returning, false, sites)
+pub fn region_octets(d: &FieldDeclaration, returning: bool, sites: usize, definite: usize) -> u64 {
+    read_octets(d, returning, false, sites) + skin_octets(d, sites, definite).0
 }
 
 /// [`region_octets`] for a read of `logits` too: a logits read keeps every tick and its shares (the echo's
@@ -2889,10 +2995,15 @@ fn encoding_partition(rows: &[(usize, u32, u32)], rows_n: usize) -> (Vec<u32>, V
 /// The batches of whole regions, in order, each batch's allocations within `budget`; a region whose
 /// allocations alone pass the budget is refused.
 pub fn batches(lengths: &[usize], octets: &dyn Fn(usize) -> u64, budget: u64) -> Result<Vec<std::ops::Range<usize>>> {
+    batches_of(lengths, &lengths.iter().map(|&n| octets(n)).collect::<Vec<_>>(), budget)
+}
+
+/// [`batches`] from each region's own need (`needs[i]` for region `i` of `lengths[i]` sites).
+pub fn batches_of(lengths: &[usize], needs: &[u64], budget: u64) -> Result<Vec<std::ops::Range<usize>>> {
     let mut out = Vec::new();
     let (mut from, mut taken) = (0usize, 0u64);
     for (i, &n) in lengths.iter().enumerate() {
-        let need = octets(n);
+        let need = needs[i];
         if need > budget {
             return Err(TowerError::Realization(format!("a region of {n} sites needs {need} octets, past the card's batch budget of {budget}")));
         }
@@ -3079,7 +3190,7 @@ mod tests {
             if f <= 132 || (a.is_some() && b.is_some() && f % 16 == 0) || (first_refused.is_none() && (a.is_none() || b.is_none())) {
                 // The shared octets a refused map would need: `((rows (cols + 1) + rows) 4 rounded to 16) + per 8 + per cols (4 or 8)`.
                 let need = |rows: usize, cols: usize, x64: bool| ((rows * (cols + 1) + rows) * 4).div_ceil(16) * 16 + (256usize.checked_div(rows).unwrap_or(0)) * 8 + (256usize.checked_div(rows).unwrap_or(0)) * cols * if x64 { 8 } else { 4 };
-                println!("CONTACTS f={f} material={} (f,dw) {} needs {} (dw,f) {} needs {} limit {} region_3771_octets={}", field.material_len(), shared(a), need(f, dw, false), shared(b), need(dw, f, true), AFFINE_SHARED, region_octets(&d, true, 3771));
+                println!("CONTACTS f={f} material={} (f,dw) {} needs {} (dw,f) {} needs {} limit {} region_3771_octets={}", field.material_len(), shared(a), need(f, dw, false), shared(b), need(dw, f, true), AFFINE_SHARED, region_octets(&d, true, 3771, 3771));
             }
             if first_refused.is_none() && (a.is_none() || b.is_none()) {
                 first_refused = Some(f);
@@ -3097,7 +3208,7 @@ mod tests {
             let field = holonics::hnn::tower::field::Field::found(d, &vec![7u8; draws]).expect("founded");
             let (m2, dw, f) = (2 * d.complex(), d.width, d.contacts);
             let tiled: Vec<String> = [(m2, dw, false), (dw, m2, true), (f, dw, false), (dw, f, true), (dw, dw, false)].iter().map(|&(r, c, x)| affine_tiling(r, c, x).map_or(format!("{r}x{c}:NO"), |(per, sh)| format!("{r}x{c}:{per}/{sh}"))).collect();
-            println!("ROUTE {name} width={dw} lanes={} contacts={f} material={} tiles[{}] region_3771_octets={} region_1000_octets={} site_octets={}", d.lanes, field.material_len(), tiled.join(" "), region_octets(&d, true, 3771), region_octets(&d, true, 1000), (region_octets(&d, true, 1001) - region_octets(&d, true, 1000)));
+            println!("ROUTE {name} width={dw} lanes={} contacts={f} material={} tiles[{}] region_3771_octets={} region_1000_octets={} site_octets={}", d.lanes, field.material_len(), tiled.join(" "), region_octets(&d, true, 3771, 3771), region_octets(&d, true, 1000, 1000), (region_octets(&d, true, 1001, 1001) - region_octets(&d, true, 1000, 1000)));
         };
         describe("base", base);
         for k in [2usize, 4] {
@@ -3118,7 +3229,7 @@ mod tests {
         let d = declaration(32, 4, 32);
         let lengths = [1412, 300, 2221, 64, 900, 1229, 1229, 77];
         for returning in [false, true] {
-            let octets = |n: usize| region_octets(&d, returning, n);
+            let octets = |n: usize| region_octets(&d, returning, n, n);
             let budget = octets(2221) + octets(900);
             let plan = batches(&lengths, &octets, budget).unwrap();
             assert_eq!(plan.first().unwrap().start, 0);
@@ -3176,19 +3287,22 @@ mod tests {
         for d in [declaration(32, 4, 32), declaration(64, 8, 64)] {
             let n = 1504u64;
             // The scores and shares (a word a pair) are kept a tick for a return, with the reverse's covector a
-            // pair on 64 bits, and one tick's otherwise; each kept tick adds its carrier widths and class offsets.
-            let weights = |returning: bool| if returning { d.ticks as u64 * d.heads as u64 * 16 * n * n + 24 * n * n } else { d.heads as u64 * 8 * n * n };
+            // pair on 64 bits, and one tick's otherwise; each kept tick adds its carrier widths and class offsets. The clock's skins
+            // (P50 step 1, P51) are one store a batch, 32 bits a paced head, support entry and mode, `K = NEAR_SLOTS + definite` entries a row:
+            // with every site definite, `n²` entries grow by pair and the near slots and the crowd edges by site.
+            let skins = 4 * d.paced_heads() as u64 * d.modes as u64 * n * n;
+            let weights = |returning: bool| skins + if returning { d.ticks as u64 * d.heads as u64 * 16 * n * n + 24 * n * n } else { d.heads as u64 * 8 * n * n };
             let fixed = |returning: bool| tick_fixed_octets(&d) * if returning { d.ticks as u64 } else { 1 };
             for returning in [false, true] {
-                let all = region_octets(&d, returning, n as usize);
+                let all = region_octets(&d, returning, n as usize, n as usize);
                 assert!(all > weights(returning) + fixed(returning));
                 // The carriers grow by site, the weights by pair.
                 let carriers = all - weights(returning) - fixed(returning);
-                assert_eq!(region_octets(&d, returning, 2 * n as usize) - 4 * weights(returning) - fixed(returning), 2 * carriers);
+                assert_eq!(region_octets(&d, returning, 2 * n as usize, 2 * n as usize) - 4 * weights(returning) - fixed(returning), 2 * carriers);
             }
         }
         let grown = declaration(64, 8, 64);
-        let carriers = 128 * 1504 * (region_octets(&grown, false, 1) - tick_fixed_octets(&grown));
+        let carriers = 128 * 1504 * (region_octets(&grown, false, 1, 1) - tick_fixed_octets(&grown));
         assert!(carriers > 1 << 30, "{carriers}");
     }
 
@@ -3219,8 +3333,8 @@ mod tests {
         let d = FieldDeclaration { triads: triads as usize, ..base };
         for n in [2usize, 1504, 3771] {
             let s = n as u64;
-            assert_eq!(region_octets(&d, false, n) - region_octets(&base, false, n), s * 80 * triads);
-            assert_eq!(region_octets(&d, true, n) - region_octets(&base, true, n), s * (base.ticks as u64 * 80 * triads + 64 * triads));
+            assert_eq!(region_octets(&d, false, n, n) - region_octets(&base, false, n, n), s * 80 * triads);
+            assert_eq!(region_octets(&d, true, n, n) - region_octets(&base, true, n, n), s * (base.ticks as u64 * 80 * triads + 64 * triads));
             assert_eq!(read_octets(&d, false, true, n) - read_octets(&base, false, true, n), s * base.ticks as u64 * 80 * triads);
         }
     }
@@ -3273,18 +3387,10 @@ mod tests {
         }
     }
 
-    /// [measurement; theory, November 12 (the record of the opening's room, §4 items 2 and 4)] **A lettered learner's section on the card
-    /// reads the host's bits** (needs the card): a learner of 100 classes with two carry circles grown by five fresh letters
-    /// ([`holonics::hnn::tower::field::FieldLearner::lettered`]), its readout, current and pair returns moved off zero from a keyed stream's tail, takes
-    /// one section of stretches as the store's trainer forms them (mask states over a whole stretch and past its context with their weighed
-    /// domains, and writer's states with the first of their run resolved, a true end's near tail of voids, plain regions with no port) whose
-    /// classes hold the void and fresh letters, through the host and through the card: the receipt, the material and the moments after the
-    /// deposit equal, and the read and return of the same regions on the learner's field equal face for face and entry for entry, with a
-    /// covector reaching the fresh letters' encoding rows.
-    #[test]
-    #[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
-    fn a_lettered_learners_section_on_the_card_reads_the_hosts_bits() {
-        use holonics::hnn::tower::field::{FieldLearner, HostField};
+    /// The lettered learner's case ([`a_lettered_learners_section_on_the_card_reads_the_hosts_bits`]): the learner, its layout and width, the
+    /// fresh letters' count, and the stretches' classes, open sites and domains.
+    fn lettered_case() -> (holonics::hnn::tower::field::FieldLearner, holonics::hnn::tower::field::FieldLayout, usize, usize, Vec<Vec<usize>>, Vec<Vec<bool>>, Vec<Option<usize>>) {
+        use holonics::hnn::tower::field::FieldLearner;
         let keys: Vec<u8> = (0..1u64 << 18).flat_map(|i| (i.wrapping_add(1).wrapping_mul(0x9E37_79B9_7F4A_7C15) ^ (i << 17)).to_be_bytes()).collect();
         let founded = Field::found(FieldDeclaration { alphabet: 100, ..declaration(32, 4, 32) }, &keys).unwrap();
         let fresh = 5usize;
@@ -3297,6 +3403,14 @@ mod tests {
         for (k, &i) in moved.iter().enumerate() {
             let word = &keys[tail + 4 * k..tail + 4 * k + 4];
             learner.field.theta[i] = i32::from_be_bytes([word[0], word[1], word[2], word[3]]) >> 14;
+        }
+        // [theory, November 12, P50 step 1] The paces moved off zero from the words before the tail (a rate a class on `2^(−24)`, within `±2^(−5)`), so
+        // the paced heads' clocks are not plain: their skins are formed by the clock's fill and read from its store.
+        let paces = d.paced_heads() * (d.alphabet + 1);
+        let before = tail - 4 * paces;
+        for k in 0..paces {
+            let word = &keys[before + 4 * k..before + 4 * k + 4];
+            learner.field.theta[l.pace + k] = i32::from_be_bytes([word[0], word[1], word[2], word[3]]) >> 12;
         }
         let void = 99usize;
         // Stretches: (context, run, a true end), each one state.
@@ -3317,8 +3431,24 @@ mod tests {
             open.push(u);
             domains.push(dom);
         }
+        assert!(classes.iter().flatten().any(|&c| c >= 100) && classes.iter().flatten().any(|&c| c == 99));
+        (learner, l, dw, fresh, classes, open, domains)
+    }
+
+    /// [measurement; theory, November 12 (the record of the opening's room, §4 items 2 and 4)] **A lettered learner's section on the card
+    /// reads the host's bits** (needs the card): a learner of 100 classes with two carry circles grown by five fresh letters
+    /// ([`holonics::hnn::tower::field::FieldLearner::lettered`]), its readout, current and pair returns moved off zero from a keyed stream's tail, takes
+    /// one section of stretches as the store's trainer forms them (mask states over a whole stretch and past its context with their weighed
+    /// domains, and writer's states with the first of their run resolved, a true end's near tail of voids, plain regions with no port) whose
+    /// classes hold the void and fresh letters, through the host and through the card: the receipt, the material and the moments after the
+    /// deposit equal, and the read and return of the same regions on the learner's field equal face for face and entry for entry, with a
+    /// covector reaching the fresh letters' encoding rows.
+    #[test]
+    #[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
+    fn a_lettered_learners_section_on_the_card_reads_the_hosts_bits() {
+        use holonics::hnn::tower::field::HostField;
+        let (learner, l, dw, fresh, classes, open, domains) = lettered_case();
         let regions: Vec<Region> = classes.iter().zip(&open).zip(&domains).map(|((c, u), &dom)| Region { classes: c, unresolved: u, faces: &[], locked: &[], echo: &[], domain: dom, port: None }).collect();
-        assert!(classes.iter().flatten().any(|&c| c >= 100) && classes.iter().flatten().any(|&c| c == void));
         let card = Card::open(0).expect("a CUDA card with the field's kernels built");
         let mut card_field = CardField::open(&card).unwrap();
         let (host_faces, host_g) = learner.field.read_and_return(&regions).unwrap();
@@ -3333,5 +3463,20 @@ mod tests {
         assert_eq!(host_receipt, card_receipt);
         assert!(host_receipt.deposited);
         assert_eq!(on_host.to_text(), on_card.to_text(), "the material and the moments after the deposit");
+    }
+
+    /// [theory, November 12, P50 step 1] **A skin no fill formed is refused**: the lettered learner's read and return with the clock's fill withheld
+    /// (the test build writes `SKIN_UNFILLED` over the store before each fill) is refused by the card. So its readers read the clock's store, and a word
+    /// no fill formed never enters a sum.
+    #[test]
+    #[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
+    fn a_skin_no_fill_formed_is_refused() {
+        let (learner, _, _, _, classes, open, domains) = lettered_case();
+        let regions: Vec<Region> = classes.iter().zip(&open).zip(&domains).map(|((c, u), &dom)| Region { classes: c, unresolved: u, faces: &[], locked: &[], echo: &[], domain: dom, port: None }).collect();
+        let card = Card::open(0).expect("a CUDA card with the field's kernels built");
+        let mut card_field = CardField::open(&card).unwrap();
+        card_field.unfilled.set(true);
+        let refused = card_field.read_and_return(&learner.field, &regions).map(|_| ()).expect_err("a read of a store no fill formed is refused");
+        assert!(refused.to_string().contains("a skin read from the clock's store where its fill formed none"), "{refused}");
     }
 }
