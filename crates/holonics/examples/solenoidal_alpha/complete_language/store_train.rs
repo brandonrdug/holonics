@@ -699,6 +699,10 @@ pub(super) fn read(args: &[String], realization: &mut dyn FieldRealization) -> R
         // [measurement; theory, the counts of counts of surprise (CLAUDE.md's structural measures; Brandon's lens of November 12, 20:31Z, on
         // information the line already predicts)] Every compared place's code by its octave: the bit length of its code on the codes' grain.
         let mut surprise = vec![(0u64, 0i64); SURPRISE_OCTAVES];
+        // [measurement; theory, November 12, P53 item 4; the store record's §11, first item] The partition the held read owes: a release's compared
+        // places by their distance to the nearest known place of the region (1, 2, 3, 4 to 7, 8 to 15, 16 and more, or none) and by the region's count of
+        // known places (0, 1 to 15, 16 to 63, 64 and more), a mask's by how many of its two neighbours are known (0, 1, 2); a count and a code sum each.
+        let (mut by_distance, mut by_known, mut by_neighbours) = ([(0u64, 0i64); 7], [(0u64, 0i64); 4], [(0u64, 0i64); 3]);
         let mut read_sections = 0usize;
         for n in 0..sections {
             let section_start = std::time::Instant::now();
@@ -729,6 +733,55 @@ pub(super) fn read(args: &[String], realization: &mut dyn FieldRealization) -> R
                 }
                 let k = read_kind(stretch);
                 by_kind[k] = (by_kind[k].0 + 1, by_kind[k].1 + places as u64, by_kind[k].2 + code);
+                {
+                    let u = &stretch.region.unresolved;
+                    let n = u.len();
+                    let known = u.iter().filter(|&&open| !open).count();
+                    if stretch.writer.is_some() {
+                        // The nearest known place on each side, in one pass each way.
+                        let (mut before, mut after) = (vec![usize::MAX; n], vec![usize::MAX; n]);
+                        let mut last = usize::MAX;
+                        for t in 0..n {
+                            if !u[t] {
+                                last = t;
+                            }
+                            before[t] = if last == usize::MAX { usize::MAX } else { t - last };
+                        }
+                        last = usize::MAX;
+                        for t in (0..n).rev() {
+                            if !u[t] {
+                                last = t;
+                            }
+                            after[t] = if last == usize::MAX { usize::MAX } else { last - t };
+                        }
+                        let kb = match known {
+                            0 => 0,
+                            1..=15 => 1,
+                            16..=63 => 2,
+                            _ => 3,
+                        };
+                        for t in (0..n).filter(|&t| u[t]) {
+                            let c = faces[t].as_ref().ok_or("an unresolved place without a face")?.code(stretch.region.classes[t]);
+                            let db = match before[t].min(after[t]) {
+                                1 => 0,
+                                2 => 1,
+                                3 => 2,
+                                4..=7 => 3,
+                                8..=15 => 4,
+                                usize::MAX => 6,
+                                _ => 5,
+                            };
+                            (by_distance[db].0, by_distance[db].1) = (by_distance[db].0 + 1, by_distance[db].1 + c);
+                            (by_known[kb].0, by_known[kb].1) = (by_known[kb].0 + 1, by_known[kb].1 + c);
+                        }
+                    } else {
+                        for t in (0..n).filter(|&t| u[t]) {
+                            let c = faces[t].as_ref().ok_or("an unresolved place without a face")?.code(stretch.region.classes[t]);
+                            let nb = usize::from(t > 0 && !u[t - 1]) + usize::from(t + 1 < n && !u[t + 1]);
+                            (by_neighbours[nb].0, by_neighbours[nb].1) = (by_neighbours[nb].0 + 1, by_neighbours[nb].1 + c);
+                        }
+                    }
+                }
                 if let Some((k, at)) = stretch.writer {
                     let q = stretch.q;
                     if k == 0 {
@@ -752,6 +805,13 @@ pub(super) fn read(args: &[String], realization: &mut dyn FieldRealization) -> R
         let list = |v: &[(u64, i64)], what: &str| (0..shown).map(|o| format!("{what}{o}={}/{}", v[o].0, v[o].1)).collect::<Vec<_>>().join(" ");
         println!("STORE_READ_SURPRISE slice={name} places={} by_bit_length(count/code) {} ms={}", surprise.iter().map(|v| v.0).sum::<u64>(), (0..SURPRISE_OCTAVES).filter(|&b| surprise[b].0 > 0).map(|b| format!("b{b}={}/{}", surprise[b].0, surprise[b].1)).collect::<Vec<_>>().join(" "), started.elapsed().as_millis());
         println!("STORE_READ_WRITER slice={name} sections={read_sections} stretches={} k0_by_octave(places/code) {} front_by_octave(count/code) {} ms={}", cut.pass.stretches, list(&k0, "o"), list(&front, "o"), started.elapsed().as_millis());
+        let cells = |v: &[(u64, i64)], names: &[&str]| v.iter().zip(names).map(|((c, s), n)| format!("{n}={c}/{s}")).collect::<Vec<_>>().join(" ");
+        println!(
+            "STORE_READ_PARTITION slice={name} release_by_distance(count/code) {} release_by_known(count/code) {} mask_by_neighbours(count/code) {}",
+            cells(&by_distance, &["d1", "d2", "d3", "d4_7", "d8_15", "d16_", "none"]),
+            cells(&by_known, &["k0", "k1_15", "k16_63", "k64_"]),
+            cells(&by_neighbours, &["n0", "n1", "n2"])
+        );
     }
     let held = held_out(&learner.field, &codec, &held_set(&codec, &held_bytes)?, realization)?;
     println!("STORE_YARDSTICK at=read {} ms={}", held_text(&held), started.elapsed().as_millis());
