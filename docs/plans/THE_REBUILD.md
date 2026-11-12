@@ -161,7 +161,9 @@ references and no write is yet ordered text.
    yardsticks, 19 on published figures): first the realizations that
    keep every bit, each entering by reproducing the line and timed inside one hold (a profile by
    head and two measured yardsticks of the card, done November 12; a pair's skin once a clock,
-   its store on the row's support; a turn's phases and
+   its store on the row's support, done November 12 at 0.948 of its control with its time guess
+   missed, the contact family read as bound by the octets it gathers and that reading's test
+   ordered before the series; a turn's phases and
    the moments' skins once a clock; the phase series on narrow words; the site's maps fused by
    chart; a batch's launches fused), their rates fixed as G116, then the laws at declared widths
    (a covector released under a declared grain so that the return's cost follows surprise; a row's
@@ -175,9 +177,12 @@ references and no write is yet ordered text.
    of places under a sixteenth of a bit is 0.009 to 0.041 and does not move, and no state writes
    language); **the symbol's word** (the same record, §8; atlas `code.symbol-word-located-rings`):
    a symbol's rows as a series on a key of coprime rings that the machine locates, composites
-   founded where a place is dark given its neighbour, the codec's release the identity on bytes,
-   a new line whose design, acceptance and guess are fixed before its build and which comes
-   ahead of any long pass; one
+   composed by the machine where a place is dark given its neighbour (epochs of a paced clock as
+   the sites of the level above, never a table of merges), the codec's release the identity on
+   bytes; a repair of the located transport of October 5 and guard 9, beside which the tower's
+   codec entered (the record's §8.8); its first reading G118 (the store's trained paces by class
+   and where their carries fall on held text), then its design record, acceptance and guess,
+   fixed before its build, which comes ahead of any long pass; one
    continuous pass over tier A (1 GB), ordered once the engine stands near its count and judged by
    what it writes from held prompts by slice; the face as a composition of
    lanes, each block reading its own, entering at `(32, 32)`; then a lane whose width is derived

@@ -1,0 +1,111 @@
+# P50 step 1 at P51's address (the clock's skins at the row's support stride), 2026-11-12 UTC. Build b1a3dbe4b (claude/engine), field_pass sha256
+# 717c511f30586ad7; control main 66a3369a4, field_pass sha256 055aa87bc7ca7cf6. Nothing else on the card or the host. Numbers only.
+# (i) gate.sh; (ii) the GPU suite for holonics-cuda alone under the lock; (iii)-(iv) the reproduction: train-store from run 1's STATE.101 for 600
+# sections (projection 257 s, stop 327,600 ms, outer 390 s), its lines against run 2's first 600, timings aside; (v) one hold: the pass's sections
+# 2,001 to 2,100 from run 2's STATE.1900 unprofiled as control, step 1, control (each projected 43 s, stop 54,600 ms, outer 100 s), then one profiled
+# read of step 1 (projection 50 s, stop 72,618 ms, outer 136 s).
+## (i) and (ii)
+GATE_EXIT 0 21:55:29
+MEASURE lap=step1_gate rc=0 wall_s=201.0 peak_rss_kib=3251584
+SUITE_EXIT 0 22:02:01
+test result: ok. 88 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 337.74s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.11s
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.35s
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.33s
+test result: ok. 46 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 30.50s
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 4.98s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+MEASURE lap=step1_suite rc=0 wall_s=383.0 peak_rss_kib=1786992
+SUITE_TESTS_OK 139
+## (iii) and (iv), the reproduction
+GATE_EXIT 0 21:55:29
+STORE_SAVE k=600 sections=600 states=600 moved=106716 square=715909979972340 priced=599 transfer=-39755342747 external=-39771192152 curvature=15849405 octave=1 rate=12 reads=0 returns=600 pairs=27340062811 batches=600 peak_store=8376727632 ms=261107
+FIELD_CARD reads=0 read_ms=0 returns=600 return_ms=251468 pairs=27340062811 batches=600 peak_store=8376727632 landmarks=0 landmark_ms=0 elapsed_ms=261109
+FIELD_SKIN octets_a_entry=64 octets_a_site=1280 entries=6295201510 dense_pairs=8970533523 peak_batch_entries=12200622 peak_batch_dense_pairs=15371207 peak_skin_store=833817728 peak_store=8376727632 batch_cut=8553601432
+MEASURE lap=repro1 rc=0 wall_s=261.7 peak_rss_kib=386836
+GATE_REPRO sections=600 run2_lines=600 equal=600 EQUAL
+GATE_SAVE k=600 equal_timings_and_peak_store_aside=True peak_store=8376727632 run2_peak_store=7577906356
+GATE_BYTES STATE.600 equal repro=a5b222844ffcbb71 run2=a5b222844ffcbb71
+GATE_BYTES MEAN.600 equal repro=a12e0da79e525ae9 run2=a12e0da79e525ae9
+## (v), the timing in one hold
+TIMING tc1 sections=100 equal_to_leg1=100/100 mean_section_ms=451.0
+TIMING ts1 sections=100 equal_to_leg1=100/100 mean_section_ms=427.5
+TIMING tc2 sections=100 equal_to_leg1=100/100 mean_section_ms=450.8
+TIMING tp1 sections=100 equal_to_leg1=100/100 mean_section_ms=480.0
+TIMING controls_spread_ms=0.2 controls_mean_ms=450.9 step_ms=427.5 step_over_controls=0.948 us_a_computed_site_at_40741=10.49
+STATE_SHA tc1 81377dbeaf26d65e 64954161619deda4
+STATE_SHA ts1 81377dbeaf26d65e 64954161619deda4
+STATE_SHA tc2 81377dbeaf26d65e 64954161619deda4
+STATE_SHA tp1 81377dbeaf26d65e 64954161619deda4
+tp1.log:FIELD_CARD reads=0 read_ms=0 returns=100 return_ms=46532 pairs=4566615773 batches=100 peak_store=8331635956 landmarks=0 landmark_ms=0 elapsed_ms=48245
+tp1.log:FIELD_SKIN octets_a_entry=64 octets_a_site=1280 entries=1049010242 dense_pairs=1487925442 peak_batch_entries=12264156 peak_batch_dense_pairs=15521024 peak_skin_store=836374784 peak_store=8331635956 batch_cut=8554230576
+ts1.log:FIELD_CARD reads=0 read_ms=0 returns=100 return_ms=41319 pairs=4566615773 batches=100 peak_store=8331635956 landmarks=0 landmark_ms=0 elapsed_ms=42985
+ts1.log:FIELD_SKIN octets_a_entry=64 octets_a_site=1280 entries=1049010242 dense_pairs=1487925442 peak_batch_entries=12264156 peak_batch_dense_pairs=15521024 peak_skin_store=836374784 peak_store=8331635956 batch_cut=8558424880
+## the profiled read: the contact family by entry (step 1 against step 0's profiled read, a different hold)
+field_contact_rows step1_ms_a_section=39.79 step0_ms_a_section=57.68
+field_pace_skin_back step1_ms_a_section=37.09 step0_ms_a_section=39.77
+field_contact_l5 step1_ms_a_section=28.56 step0_ms_a_section=39.47
+field_contact_columns step1_ms_a_section=27.59 step0_ms_a_section=33.66
+field_skin_fill step1_ms_a_section=10.12 step0_ms_a_section=0.00
+field_exposure step1_ms_a_section=9.20 step0_ms_a_section=15.37
+field_spread step1_ms_a_section=6.32 step0_ms_a_section=5.64
+field_contact_l6 step1_ms_a_section=4.29 step0_ms_a_section=5.84
+field_sums step1_ms_a_section=2.23 step0_ms_a_section=2.24
+field_classes step1_ms_a_section=1.02 step0_ms_a_section=1.02
+CONTACT_FAMILY step1=166.2 step0=200.7 ms_a_profiled_section
+## head_profile.py on the profiled read
+sections=100 heads=4 kinds=0:still,1:still,2:paced,3:paced
+pairs head=0 kind=still pairs=1478325193 a_section=14783252 share=0.324
+pairs head=1 kind=still pairs=994152016 a_section=9941520 share=0.218
+pairs head=2 kind=paced pairs=1001476447 a_section=10014764 share=0.219
+pairs head=3 kind=paced pairs=1092662117 a_section=10926621 share=0.239
+field_contact_rows       head=0 kind=still launches=  400 ms=    887.1 ms_a_section=   8.87 pairs=1478325193 ns_a_pair=0.600
+field_contact_rows       head=1 kind=still launches=  400 ms=    709.2 ms_a_section=   7.09 pairs=994152016 ns_a_pair=0.713
+field_contact_rows       head=2 kind=paced launches=  400 ms=   1164.0 ms_a_section=  11.64 pairs=1001476447 ns_a_pair=1.162
+field_contact_rows       head=3 kind=paced launches=  400 ms=   1220.2 ms_a_section=  12.20 pairs=1092662117 ns_a_pair=1.117
+field_contact_rows       all ms=   3980.6 ms_a_section=  39.81 paced_share=0.599
+field_pace_skin_back     head=2 kind=paced launches=  400 ms=   1815.7 ms_a_section=  18.16 pairs=1001476447 ns_a_pair=1.813
+field_pace_skin_back     head=3 kind=paced launches=  400 ms=   1894.1 ms_a_section=  18.94 pairs=1092662117 ns_a_pair=1.733
+field_pace_skin_back     all ms=   3709.8 ms_a_section=  37.10 paced_share=1.000
+field_contact_columns    head=0 kind=still launches=  400 ms=    537.3 ms_a_section=   5.37 pairs=1478325193 ns_a_pair=0.363
+field_contact_columns    head=1 kind=still launches=  400 ms=    427.2 ms_a_section=   4.27 pairs=994152016 ns_a_pair=0.430
+field_contact_columns    head=2 kind=paced launches=  400 ms=    849.0 ms_a_section=   8.49 pairs=1001476447 ns_a_pair=0.848
+field_contact_columns    head=3 kind=paced launches=  400 ms=    946.7 ms_a_section=   9.47 pairs=1092662117 ns_a_pair=0.866
+field_contact_columns    all ms=   2760.2 ms_a_section=  27.60 paced_share=0.651
+field_spread             head=0 kind=still launches=  400 ms=    152.5 ms_a_section=   1.52 pairs=1478325193 ns_a_pair=0.103
+field_spread             head=1 kind=still launches=  400 ms=    154.5 ms_a_section=   1.54 pairs=994152016 ns_a_pair=0.155
+field_spread             head=2 kind=paced launches=  400 ms=    170.1 ms_a_section=   1.70 pairs=1001476447 ns_a_pair=0.170
+field_spread             head=3 kind=paced launches=  400 ms=    156.0 ms_a_section=   1.56 pairs=1092662117 ns_a_pair=0.143
+field_spread             all ms=    633.1 ms_a_section=   6.33 paced_share=0.515
+## profile_budget.py on the profiled read
+elapsed_ms=48245 kernels_ms=39354 entries_ms=39323 launches=50100 entries=69
+share_of_elapsed kernels=0.816 wide=0.801 short=0.015 allocations=0.026 copies=0.063 host=0.096
+short_launches=4900 mean_us=146 share_of_kernel=0.018 least_us_a_launch=82
+allocation_us=41.5 copy_us=795.3
+share_of_kernel contact=0.422 affine=0.059 top_five=0.395
+reads=0 returns=100 batches=100 batches_a_run=1.00 pairs_met=4566615773 pairs_a_run=4.567e+07 peak_store=8331635956
+a_batch launches=501 allocations=302 copies=38
+field_contact_rows                 launches=   1600 ms=  3979 us_a_launch=  2487 share_of_kernel=0.101
+field_pace_skin_back               launches=    800 ms=  3709 us_a_launch=  4636 share_of_kernel=0.094
+field_contact_l5                   launches=    351 ms=  2856 us_a_launch=  8138 share_of_kernel=0.073
+field_contact_columns              launches=   1600 ms=  2759 us_a_launch=  1724 share_of_kernel=0.070
+field_moment_pace_back_all         launches=    400 ms=  2240 us_a_launch=  5600 share_of_kernel=0.057
+field_outer_x32                    launches=   6000 ms=  1898 us_a_launch=   316 share_of_kernel=0.048
+field_transposed                   launches=   3700 ms=  1799 us_a_launch=   486 share_of_kernel=0.046
+field_affine_tiled_x32             launches=   3200 ms=  1762 us_a_launch=   550 share_of_kernel=0.045
+field_moment_return_paced_all      launches=    400 ms=  1676 us_a_launch=  4191 share_of_kernel=0.043
+field_moment_paced_all             launches=    400 ms=  1635 us_a_launch=  4088 share_of_kernel=0.042
+field_skin_fill                    launches=    800 ms=  1012 us_a_launch=  1265 share_of_kernel=0.026
+field_exposure                     launches=    400 ms=   920 us_a_launch=  2301 share_of_kernel=0.023
+field_moment_skinned_all           launches=    400 ms=   737 us_a_launch=  1844 share_of_kernel=0.019
+field_outer_bound_x32              launches=   2500 ms=   659 us_a_launch=   263 share_of_kernel=0.017
+field_spread                       launches=   1600 ms=   632 us_a_launch=   395 share_of_kernel=0.016
+field_affine_tiled_x64             launches=    900 ms=   572 us_a_launch=   635 share_of_kernel=0.015
+## the reservation (field_pass reserve on the line's declaration) and leg 1's 3,000 sections by reservation_census.py
+RESERVE pair=280 site=77246 region=26064 entry=64 crowd_site=1280 near_slots=10
+LEG1_RESERVATION sections=3000 census_from=2001 cut=8489376152 max_base=7574201370 max_support=8380173670 over_cut_support=0 max_dense=8625200730 over_cut_dense=765
+LEG1_RESERVATION sections=3000 census_from=2001 cut=8553601432 max_base=7574201370 max_support=8380173670 over_cut_support=0 max_dense=8625200730 over_cut_dense=317
+LEG1_RESERVATION sections=3000 census_from=2001 cut=8554230576 max_base=7574201370 max_support=8380173670 over_cut_support=0 max_dense=8625200730 over_cut_dense=314
+LEG1_RESERVATION sections=3000 census_from=2001 cut=8558424880 max_base=7574201370 max_support=8380173670 over_cut_support=0 max_dense=8625200730 over_cut_dense=287
+LEG1_ENTRIES entries=31402903827 dense_pairs=44837538875 share=0.7004

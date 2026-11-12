@@ -7,11 +7,21 @@ and four count rulers on a cloud host over public shards. The symbol's law of §
 agent-inferred, and nothing of it is built. Its guess is fixed when its build is ordered, before
 any read of that build.
 
+Amended November 12 near 22:50Z, after the first deposit (PR #730) and after the repository's
+encoding owners were read at source, which the first deposit had not done: §7.2 gains the read on
+the helix's own rings with a control, §8.4 composes a composite where the first deposit founded it by a table,
+§8.8 is new (what the repository already held), §10.4 is new (the first repair's read) and §11 is
+restated. Each amended passage says so.
+
 Owners named: the store's trainer and its reads (`store_train.rs`: `read`, `write`, `state_of`),
 the codec and the layout (`field_train.rs`: `FieldCodec::found`, `FieldCodec::extended`,
 `FieldCodec::encode`; `crates/holonics/src/hnn/tower/field.rs`: `FieldLayout`, `Field::lettered`),
 the card realization (`crates/holonics-cuda/src/hnn/field.rs`: `CardField::yardsticks`,
-`FieldProfile`; `kernels/field.cu`: `field_yard_*`, `contact_body`). Atlas: three rows enter with
+`FieldProfile`; `kernels/field.cu`: `field_yard_*`, `contact_body`, and from PR #731
+`field_skin_fill`), and the located encoding of October 5 that §8.8 reads
+(`crates/holonics/src/compression/keys/transport.rs`: `CarryHelix`, `TransportLocation`,
+`LocatedTransport`; `crates/holonics/src/hnn/encoding.rs`: `Encoded`, `PortCell`,
+`LocatedAdvances`). Atlas: three rows enter with
 this record, `code.neighbour-count-level`, `code.symbol-word-located-rings` and
 `code.composite-reach`; `tower.field-engine-count` and `deposition.cost-follows-surprise` are
 amended; read with them `radix.register-composition`, `radix.residue-address`,
@@ -25,9 +35,10 @@ lengths" enters the atlas's [charts](../../docs/atlas/CHARTS.md).
 
 Receipts (`..._receipts/`): `neighbour_ruler.py`, `neighbour_ruler.txt`, `symbol_word_ruler.py`,
 `symbol_word_ruler.txt`, `symbol_located_ruler.py`, `symbol_located_ruler.txt`,
-`composite_ruler.py`, `composite_ruler.txt`; in the passage record's receipts `store_reads.txt`
-(P49's reads, writes' rulers and reproduction); in the engine record's receipts `p50_step0.txt`
-and `head_profile.py`. The writes themselves are private text and are in no repository.
+`symbol_located_ruler_towers.txt`, `composite_ruler.py`, `composite_ruler.txt`; in the passage
+record's receipts `store_reads.txt` (P49's reads, writes' rulers and reproduction); in the engine
+record's receipts `p50_step0.txt`, `head_profile.py`, `p50_step1.txt` and `reservation_census.py`.
+The writes themselves are private text and are in no repository.
 
 ## 1. Why this record exists
 
@@ -290,6 +301,40 @@ bytes share addresses: 178 to 230 met bytes hold 30 to 34 of the 35 cells of
 rings (5, 7), 86 to 125 of the 272 of rings (16, 17). To a neighbour most rare bytes are one
 symbol.
 
+*The helix's own rings (amended; `symbol_located_ruler_towers.txt`, the same ruler with its ring
+sets given as an argument).* The tower's rings are the dyadic and the triadic towers
+(`ring_periods`: 2, 4, 8, … and 3, 9, 27, …). Six sets whose product covers the 257 classes, two
+of them the towers' own members; each cell is the share kept from the code point's residues and
+from a scramble:
+
+| share kept, located | rows | code | web | science | books | wikidata |
+|---|---|---|---|---|---|---|
+| rings (16, 27) | 43 | 0.91 / 0.93 | 0.92 / 0.93 | 0.96 / 0.95 | 0.98 / 0.98 | 0.92 / 0.92 |
+| rings (9, 32) | 41 | 0.91 / 0.89 | 0.93 / 0.90 | 0.96 / 0.95 | 0.98 / 0.96 | 0.92 / 0.92 |
+| rings (2, 3, 5, 7, 11) | 28 | 0.85 / 0.87 | 0.89 / 0.89 | 0.91 / 0.90 | 0.95 / 0.95 | 0.90 / 0.90 |
+| rings (5, 7, 8) | 20 | 0.84 / 0.84 | 0.85 / 0.86 | 0.87 / 0.86 | 0.91 / 0.90 | 0.87 / 0.88 |
+| rings (4, 7, 9) | 20 | 0.82 / 0.82 | 0.85 / 0.85 | 0.87 / 0.85 | 0.91 / 0.90 | 0.88 / 0.89 |
+| rings (3, 4, 5, 7) | 19 | 0.83 / 0.82 | 0.83 / 0.84 | 0.85 / 0.86 | 0.91 / 0.91 | 0.87 / 0.89 |
+| control, no location: the 41 commonest bytes a row each on (16, 27), every other byte one row | 43 | 0.84 | 0.89 | 0.88 | 0.94 | 0.76 |
+| the places those 41 bytes hold | | 0.87 | 0.93 | 0.93 | 0.96 | 0.79 |
+
+The count of rows governs and the choice of rings at a count does not. The helix's own two towers
+at the alphabet, (16, 27), keep 0.91 to 0.98 on 43 rows, 0.014 to 0.096 nats a place over the
+free map by slice (books least, wikidata most); three or four rings of 19 or 20 rows keep 0.82 to
+0.91, and the two sets of 20 rows agree within 0.03. Every location ended with no byte moving, in
+5 to 16 rounds, and the two starts end within 0.021 nats of each other on every set. On (16, 27)
+the 178 to 230 met bytes hold 103 to 132 of the 432 cells from the code point and 115 to 145 from
+a scramble. So the build's rings need no ring the helix lacks.
+
+The control reads how much of that share is a common byte keeping a row of its own. A cell on
+the cross of two rings (a residue 0 on one of them) has a free row, so 43 rows give the 41
+commonest bytes a row each with one row left for all the others; that alone keeps 0.76 to 0.94.
+Location's own part is the difference: 0.04 to 0.16 of the content, which is 0.35 (web) to 0.70
+(science) of what the one shared row loses, 0.18 nats a place on wikidata. So most of §7.2's
+share is the law of frequencies, and what the composition adds is the rare symbols', which open
+on rows their cell's commoner symbols already learned. §7.3's first sentence is read with this
+beside it.
+
 **7.3 What the three say together.** A symbol's rows compose from a few rings' rows and keep
 nine tenths of a free row's content on an eighth of the rows, when the symbol's address is
 located from the text. The Unicode number contributes its columns of 32 and nothing coprime. The
@@ -344,15 +389,42 @@ the face the helical code already forms for a run, with a remainder `ρ(c)` foun
 kept only where the factors miss (the three-body part, atlas `code.pair-contact-conditional`).
 Its key is located like any symbol's and its length is its own.
 
-A composite is founded where a place is dark given its neighbour. A continuation byte is fully
+A composite stands where a place is dark given its neighbour. A continuation byte is fully
 predicted by its lead, the second letter of a frequent pair nearly so: those are the places whose
-covector the lens of 20:31Z releases. Founded, the pair is one site. So the lens's law takes its
-structural form: **a site is a symbol, and a symbol is as long as it is predictable**; the dark
-place is not skipped under a grain, it is inside a word. The cost follows: the sites a byte fall
-as the bytes a symbol rise (§9: 1.6 to 2.1 bytes a symbol at 256 composites, 2.0 to 2.7 at
-1,024). The founding's own law (which crossing of which reading founds a pair, and what is
-released when a composite stops recurring) is owed with the build; the ruler of §9 founds by
-count, a ruler's rule.
+covector the lens of 20:31Z releases.
+
+*Amended.* The first deposit said here "Founded, the pair is one site" and left the founding to a
+count of pairs. A table of pairs at the input is barred, and the repository already says why: the
+atlas's chart of tokenizers leaves behind "units as the input codec"; the founded units of
+October joined a mark to a digit and spelled one number two ways (atlas `hnn.founded-units`); the
+input has been raw bytes since; and in the machine "a unit is a store (a carried state charged by
+deposits, leaking by its strides, read through a port), never a table addressed by letters"
+(atlas `navigator.unit-composite-move`). So the composite is composed, and the machine holds no
+list of composites (agent-inferred, unbuilt):
+
+- A symbol has a stride on a paced clock (§8.8: the pace, a class's own advance). The stride is
+  the symbol's width on the place helix. A place the strand predicts advances the clock little
+  and keeps what the moment carries; a boundary advances it far and contracts the moment. A host
+  ruler on the code passage read the fitted move's multiplier at a modulus of 0.43 for separators
+  against 0.86 for the letters of a word (the record of November 10, G32a).
+- An **epoch** of that clock is the places between two carries of the accumulated stride `σ` on
+  a declared ring. An epoch is a composite: many dark places or one bright one.
+- A site of the level above is an epoch. It opens on the moment its epoch composed (the affine
+  moves of its places, §8.8, through the chart a site's opening already reads), so `E(c)` above
+  is the face the moments already form, and `ρ(c)` is what the level above learns in its own
+  rows.
+
+The built tower of scales (atlas `tower.field-scale-packets`) is the plain clock's case: a packet
+of a fixed six places, whose first reading missed its acceptance and whose record deferred
+"packets cut at landmarks". So the lens's law takes its structural form: **a site of the next
+rank is an epoch, and an epoch is as long as its places are predicted**; the dark place is not
+skipped under a grain, it is inside an epoch, and an epoch of epochs is the lens's higher rank
+of crossing classes. The cost follows: the sites of the level above fall as the bytes an epoch
+rise (§9: 1.6 to 2.1 bytes a symbol at 256 composites, 2.0 to 2.7 at 1,024). Two things are
+open and are the build's first questions. A class's one rate can follow a place's surprise only
+in the class's mean, and a blank's stride already reads the face the tick before gave it (the
+field record §16.44): whether the stride reads the place's own surprise is not settled. And what
+the trained paces hold now is unread (§11). The ruler of §9 founds by count, a ruler's rule.
 
 **8.5 Text, image, acoustic, motor.** A byte of text is a name: its key is located. A pixel's or
 a sample's value is an order: its word by rank registers (atlas
@@ -374,7 +446,66 @@ charts are checked before the build). A width as a dial (the rings' periods are 
 on the state the build opens from, and a ring is added where a remainder is read, never by
 doubling). Bits read as progress (the build is judged by what it writes by slice, with the held
 code as one reading). A design thought in the programming language (the address is a residue on
-rings, never an index into a table).
+rings, never an index into a table). A located cause carried unrepaired into a new consumer
+(amended: §8.8; this record's first deposit repeated it).
+
+**8.8 What the repository already held** (amended; read at source after the first deposit). The
+first deposit presented §8.1 to §8.3 as new, and the rule it wrote into the guides gave as its
+reason that the word had been held for values and never applied to the alphabet. That reason was
+wrong. The miss is of "recover before implementing": I searched the atlas for the alphabet's rows
+and did not read the encoding's owners.
+
+*October 5* ([the located transport](2026-10-05_THE_LOCATED_TRANSPORT_EACH_OCCURRENCE_STEPS_THE_RINGS_BY_ITS_LOCATED_ADVANCE.md);
+`compression::keys::transport`, `hnn::encoding`; atlas `compression.transport-relabelling`,
+`compression.code-relabelling-invariance`, `hnn.encoded-located-relabelling`; Lean
+`Compression/Relabelling`; [THE_MACHINE](../../docs/THE_MACHINE.md) guard 9). An occurrence of a
+symbol steps the rings' one lift by the symbol's located transport,
+
+`ℓ(k+1) = ℓ(k) + A(u_k)`,  `A(u) ∈ ℤ/D`,  `D = Π d_g`, the `d_g` pairwise coprime.
+
+The odometer chart (digits with a carry) and the residue chart (no carry) are two charts of that
+one address. `A` is located by loop closure from the equality of occurrences and from nothing a
+code table says. The located code length is the same under every relabelling of the exterior
+alphabet, and a chart that reads a code's residues breaks that. Its §10: "an exterior code never
+becomes a class", and a class is "a port of the receiving ring, its advance the lift's digits,
+not an index into a table". `Encoded::through` refuses the byte chart. So §8.1's key is the
+residues of `A(u)`, §8.3's "located, never read off a code table" is that record's law, and
+§7.1's reading (a code point's coprime residues keep a scramble's share) is its relabelling
+theorem seen on open text. Its locator branches an advance over `ℤ/D` (a helix period of at most
+2¹² and twelve labels): a small terrain's method, read on rings (2, 3, 5).
+
+*November, the tower* (`hnn::tower::field`; the field record §16.16). The tower takes its classes
+on the class sheet: a codec's cell is a class, each its own port. `FieldCodec` ranks the units a
+passage uses, and each class holds a row of its own in every family the layout declares for a
+class (`FieldLayout::new`: `enc`, `before`, `after`, `read_bias`, `moment_before`,
+`moment_after`, `pace`). None of `Encoded`, `LocatedAdvances`, `LocatedTransport` or `PortCell`
+is named under `hnn/tower/` or in the trainers. The tower kept October's blindness to labels:
+nothing reads a code's arithmetic, so a relabelling changes its code only through the founding's
+draws. It dropped the word: a code becomes a class by the codec's rank, and a class indexes
+tables of rows, the two forms October's §10 names. Guard 9's tests stand on `hnn::encoding`'s
+entries and do not reach the tower.
+
+*What descends.* One family kept October's form, the pace (atlas `tower.field-pace`):
+`κ_h(t) = 1 + c_h[u_t]`, a class's own advance of a paced head's clock, located by deposition.
+Through it a symbol is already a move. On a paced mode the moment obeys
+`s_t = α(u_t) s_(t−1) + β(u_t)`, `α(u) = ζ^(−κ(u)) e^(−2π|κ(u)|/n)`, `β(u) = E±(u)` (atlas
+`navigator.content-stride-moment`, whose restricted case the built clocks are), and a run of
+symbols is the composed move (atlas `navigator.unit-composite-move`).
+
+*Two readings of one word* (agent-inferred). October's lift carried two things the tower holds
+apart: **which** symbol stands (its address, from which its rows compose, §8.1) and **how long**
+it is (its stride on the place helix, the pace). A symbol's word is both, an address and a
+width; §8.2 reads the second as the first's prefix. The build's law states what locates the
+address and what the stride reads.
+
+*What §7's rulers add.* October's reads were small terrains. On open text at the byte alphabet a
+first-order series on a located address keeps 0.88 to 0.99 of a free row's first-order content
+on 33 to 43 rows, from either start. And they warn: tied at first order, the byte alphabet keeps
+less than free rows keep (0.014 to 0.096 nats a place at one byte back on rings (16, 27)), so a
+tied byte alphabet is not expected to code better than the store does today. What it buys is
+entries (the alphabet's share of the constitution's 117,478 falls from 0.54 to 0.17 on 43 rows
+and to 0.09 on 20, an address a symbol beside) and, with them, alphabets that free rows cannot
+hold: epochs, samples of 16 bits, pixels.
 
 ## 9. A ruler on composites
 
@@ -463,6 +594,51 @@ pass the cut printed and held to zero. G116 (a)'s own rule named the support as 
 address; it is now its first. G116 (a), (b) and (c)'s rates stand as fixed and are scored on the
 support's build.
 
+**10.4 The first repair's read: every bit kept, a twentieth off a section, and G116 (a) missed**
+(amended; P50 step 1 at P51's address, PR #731, merged at `c04b4e68c`; `p50_step1.txt`). A paced
+head's skin is formed once a clock by `field_skin_fill` and held at the row's support stride, a
+word of 32 bits an entry. The build entered the line by reproducing it: from run 1's state at
+section 101, 600 of 600 section lines equal run 2's, and the state and the mean of states at
+section 600 equal byte for byte. Batches stay 600 in 600; of leg 1's 3,000 sections none passes
+the batch's cut on the support (the largest 8,380,173,670 octets against cuts of 8,489,376,152 to
+8,558,424,880), where the dense store would have sent 287 to 765 over it. The skins hold 0.70
+of the dense pairs' entries.
+
+In one hold on sections 2,001 to 2,100: control 451.0, the build 427.5, control 450.8 ms a
+section, so 0.948 of the control and 10.49 millionths of a second a computed site.
+
+| contact family, ms a profiled section | step 1 | step 0 |
+|---|---|---|
+| `field_contact_rows` | 39.79 | 57.68 |
+| `field_pace_skin_back` | 37.09 | 39.77 |
+| `field_contact_l5` and `_l6` | 32.85 | 45.31 |
+| `field_contact_columns` | 27.59 | 33.66 |
+| `field_skin_fill` | 10.12 | new |
+| `field_exposure` | 9.20 | 15.37 |
+| `field_spread`, `field_sums`, `field_classes` | 9.57 | 8.90 |
+| the family | 166.2 | 200.7 |
+
+**G116 (a) fixed 130 (110 to 155) and read 166.2: missed.** A paced pair's row fell from 2.0 to
+1.16 and 1.12 ns, so forming the skin was about 0.87 ns of it where the guess's units put 1.45;
+the skin's return keeps 1.7 to 1.8 ns a pair and the columns 0.85. The rule's remedy for a miss
+above 155 (the store on its support) is already spent. The reading (agent-inferred, untested):
+a still pair's row costs 0.60 and 0.71 ns, at or under the 0.886 ns the gather yardstick gives
+the 128 octets of a source's value row, so the still rows already run at the card's gather rate
+and the family as a whole, 3.6 ns a pair met, is bound by the octets it gathers. If that holds,
+no repair that keeps a pair's octets takes much more from it, phase 1's remaining steps are
+worth about a twentieth each, and the levers are the ones the count named for phase 2: fewer
+octets a pair (rows at the widths their information needs), a region's rows staged in a block's
+shared memory (read in order at 5.7 × 10¹¹ octets a second against 1.4 × 10¹¹ gathered), and
+fewer pairs. It is tested before step 3 by a count of each entry's gathered octets a pair from
+source against the two yardsticks, with an ablation timed in one hold (§11).
+
+Step 2 (a turn's phases and the moments' skins once a clock) is being built on a forecast read
+first: four kept clocks do not fit a batch (12,800 octets a site more: 1,840 to 2,180 of leg 1's
+sections would pass the cut), so one store holds the clock in use and the far skins stand in
+step 1's store, 1,920 octets a site more and no section over the cut. A value is then formed
+twice a clock, where G116 (b)'s derivation said once in place of three times: (b)'s premise does
+not hold for the build that fits, and (b) is scored as fixed with that stated.
+
 ## 11. What this record does not read, and what is owed
 
 - **Where the store stands against the ruler by pattern.** `read-store` does not partition a
@@ -475,15 +651,34 @@ support's build.
 - **The both-sides and located rulers on the constitution's own rows.** §7 reads counts. Whether
   state C's 244 free rows are near a first-order series on a few rings is a ruler on the state
   (spectral placement of the rows the contacts read), owed before the build's rings are fixed.
+  *Amended:* not ordered. §7.2's control says why: a share kept on the state's rows would read
+  high for rows of any structure (the commonest bytes keep rows of their own on the cross), and
+  §8.8 does not expect a tied byte alphabet to lower the held code.
+- **What the trained strides hold, and where their carries fall** (amended; the guess G118, fixed
+  before its reads). The store's paces by class and paced head, read on the PC's host; then, in
+  the cloud on the public held shard, the epochs those paces cut at a mean of six places: the
+  code of an epoch's first place over the code of its other places, beside packets of a fixed
+  six places and a cut by the code itself. The code line's paces were read on November 11 (G33):
+  the newline strode 13.5 against a word letter's 2.7 on one head, "the line is the grain the
+  built clocks already cut". G118's rule decides whether the level above is first built on the
+  clocks as deposition moves them or on a stride that reads a place's own surprise.
+- **Whether the contact family runs at the card's gather rate** (§10.4, amended): each entry's
+  gathered octets a pair counted from source against the two yardsticks, and an ablation timed in
+  one hold, before step 3.
 - **The image and acoustic checks of §8.5**, on MNIST and the chosen acoustic set, by the same
   located ruler on values.
 - **Lean.** Owed in #410: the tensor decomposition of functions on `ℤ/M` by the rings a term
   reads, with the count of rows a term; Kraft's inequality for the lengths of §8.2; the first-order
   identity of §8.3 (the sum `g_j(u, v)` is the derivative of the code under moving `u` to `v`
   with the rows held).
-- **The build.** A new line (its first build has no lap to reproduce): the symbol's entries as a
-  series on a located key, composites founded where a place is dark given its neighbour, the
-  codec's release proved the identity on bytes. Its design, its device line, its acceptance (the
-  writes by slice from held prompts, with the held code by slice and kind at lap means and the
-  keys read by a ruler) and its guess are fixed in its order, before it is read. It is ordered
-  beside the engine's steps and ahead of any long pass.
+- **The build** (amended). A new line (its first build has no lap to reproduce), in this order.
+  First G118's readings, which fix what the design may assume of the trained strides. Then the
+  design, as its own record with the recorded failures each choice could repeat: the symbol's
+  entries as a series on a located address, with October's located transport as its owner's
+  ancestor and guard 9's tests extended to the tower's entries; what locates the address (a
+  priced move from the covectors that reach a symbol's rows, or a founding by factoring a trained
+  state's rows); what the stride reads; and the level above, whose sites are the stride clock's
+  epochs, as the successor of the fixed packets. Then the build on the PC, its device line, its
+  acceptance (the writes by slice from held prompts, with the held code by slice and kind at lap
+  means, and the addresses and strides read by a ruler) and its guess fixed in its order, before
+  it is read. It is ordered beside the engine's steps and ahead of any long pass.
