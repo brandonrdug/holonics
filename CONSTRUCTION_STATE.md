@@ -58,8 +58,11 @@ repository was reset on September 24; the pre-reset tree is
   and held, near the held passage's 7.5 places a word. The second lap, te2, at eight times the base
   rate, refused no step and led rt25 by 0.0099 nats a place at lap means (G99 scored). Its gain
   stands in the four nearest letters, with 0.0004 more over letters 5 to 8 together, while its
-  friction lengthened the look-back to 10.9 places at its end and 12.4 at its mean. The release is
-  read on te2's end (G101), then the third lap, te3, trains at eight times (G100). With `C = 0` the
+  friction lengthened the look-back to 10.9 places at its end and 12.4 at its mean. On the release
+  (G101) te2's reference answers code 0.005 nats a place under rt25's on the 32 held problems and
+  its settle 0.054 under, while its re-draw's end stands 0.0015 over: the circles' gain reaches
+  the held passage and the settle, and not the write, so the next founding is for the joint law of
+  two letters each side (G91). The third lap, te3, trains at eight times (G100). With `C = 0` the
   field is the plain line bit for bit.
 - **The learner** (`FieldLearner`; the trainer is
   `crates/holonics/examples/solenoidal_alpha/complete_language/field_train.rs`). The comparison is
