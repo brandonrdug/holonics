@@ -812,14 +812,20 @@ pub(super) fn write(args: &[String], realization: &mut dyn FieldRealization) -> 
     std::fs::create_dir(out)?;
     println!("STORE_WRITE_LAW problems={} documents={documents} prompt={prompt} run={run} sweeps={run} refine=0 run_bound=0 near_tail=true place_order=false lengths=none one_end=false alphabet={} void={} ms={}", problems.len(), codec.alphabet(), codec.void(), started.elapsed().as_millis());
     let release: Vec<(&[usize], usize)> = problems.iter().map(|p| (p.2.as_slice(), run)).collect();
-    let mut reads = 0usize;
+    // The release's reads, from the realization's own count (the sweep is not asked on the release's last read, so its calls fall one short).
+    let reads_before = realization.counters().map(|c| c.reads);
+    let mut asked = 0usize;
     let written = learner
         .field
         .sample_runs(&release, run, 0, codec.void(), seed, 0, true, false, None, false, realization, &mut |_, _| {
-            reads += 1;
+            asked += 1;
             true
         }, &mut |_| {})
         .map_err(|e| e.to_string())?;
+    let reads = match (reads_before, realization.counters()) {
+        (Some(b), Some(a)) => (a.reads - b) as usize,
+        _ => asked + 1,
+    };
     let mut index: HashMap<&str, usize> = HashMap::new();
     for ((name, document, _, prompt_bytes, reference), written) in problems.iter().zip(&written) {
         let i = index.entry(name).or_insert(0);
