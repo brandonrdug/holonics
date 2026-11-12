@@ -2027,3 +2027,20 @@ G120 scored 2026-11-12T23:35Z (the same thread). Receipt p53_rows_ablation.txt (
   guess. The layout's forecast from source (p53_pair_layout_forecast.txt, agent-inferred): the family's once-a-word floor at 3,733 ms
   over the 100 sections with a pair's words as one record in its support walk's order, 2,754 ms with the forward's entries as one launch
   and the return's as one (27.5 ms a section against today's 129 and a bar of 40.7), the columns' transposed walk 1,577 of it.
+
+G122 fixed 2026-11-12T23:38Z (the same thread), before its read: step 4 of the engine, the products, quotients and releases of field_contact_rows and
+field_pace_skin_back (the return's two largest entries, 40.2 and 37.4 ms of step 3's 354 ms of kernels a profiled section) computed in the
+words their declared bounds prove, every bit kept, nothing else changed. Read first: G120's receipt (the rows' entry without its arithmetic
+at 0.507 of its time, 0.45 on the paced clocks; 425 multiply instructions against the copy's 107, a 128-octet stack and 58 local loads
+and stores the copy has none of) and step 3's profile. The copy keeps the skins' own arithmetic, so the entry's arithmetic is at least
+0.49 of it. Premise not yet read: the table of each product's proved bound (ordered in P54 ahead of the build, which stops if under half
+the products narrow by proof).
+  (a) field_contact_rows reads 0.72 of its own time at step 3 in the same hold (0.60 to 0.85): a little over half of its arithmetic goes
+      with the wide words and their spills.
+  (b) field_pace_skin_back reads 0.75 of its own (0.60 to 0.92); no ablation of it exists.
+  (c) The section reads 0.951 of its control in the hold (0.925 to 0.98), about 369 ms from 387.9.
+  Rule. (a) and (b) inside their bands: the same narrowing enters field_contact_l5 and field_contact_columns inside the layout's build,
+  never as a step of its own, and the layout (a region's source rows resident for its block, a pair's words as one record in the walk's
+  order) is the next build, with its own guess. (a) above 0.85: the entry's arithmetic is not its word widths, and the entry's assembly
+  is read by line before anything else is built. Either way step 4 alone leaves the section near nine times its bar of 40.7 ms: the bar
+  is reached by the layout, the site maps and the launches, never by narrowing.
