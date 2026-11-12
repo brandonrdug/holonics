@@ -62,8 +62,25 @@ repository was reset on September 24; the pre-reset tree is
   (G101) te2's reference answers code 0.005 nats a place under rt25's on the 32 held problems and
   its settle 0.054 under, while its re-draw's end stands 0.0015 over: the circles' gain reaches
   the held passage and the settle, and not the write, so the next founding is for the joint law of
-  two letters each side (G91). The third lap, te3, trains at eight times (G100). With `C = 0` the
-  field is the plain line bit for bit.
+  two letters each side (G91). The third lap, te3, at eight times, led rt26 by 0.0279 nats a place
+  at lap means, its growth 2.6 times te2's, as the sum form's second raised lap's was (G100 scored).
+  Its gain stands in letters 1 to 4, rising with the letter's distance, and in the face of a place
+  with no letter written; letters 5 to 8 took none, and its friction turned back to a look-back of
+  9.3 places at its mean. Its end stood 0.0196 over its mean, a draw of the wider spread at eight
+  times. The fourth lap, te4, trains at eight times (G103), and its end is the ground of the next
+  founding. With `C = 0` the field is the plain line bit for bit.
+- **The triad** (to be founded; atlas `contact.triad-manley-rowe-gauge`,
+  `code.triad-character-of-composition`;
+  [the triad record](research/records/2026-11-12_THE_LAW_ACROSS_A_PLACE_IS_HELD_BY_A_PUMPED_CONTACT_A_TRIAD_IS_A_CHARACTER_OF_A_LAW_OF_COMPOSITION_AND_ITS_THREE_LEGS_EXCHANGE_EQUAL_QUANTA.md)).
+  A place's projection times its two strand mates', `c(t) = α(t) β(t − 1) γ(t + 1)`, each a complex
+  chart of the read after the heads, returned to the place in the plain contacts' one release: a
+  word of two contacts through the place, the mates' contact pumped by the place, a junction's three.
+  It is founded for the part of the joint law of two letters each side that no pair contact holds,
+  0.455 nats a place on the held passage (an abelian law of composition is a sum of such triads, its
+  characters, and text's part is read by the ruler, G102). Its
+  three legs and return share a gauge of three complex scales, so its parts train at one rate. Its
+  count `J` is sized by a ruler on the host (G102); its build enters the line by reproducing te4's
+  lap with no triads, and its first lap pairs with te5.
 - **The learner** (`FieldLearner`; the trainer is
   `crates/holonics/examples/solenoidal_alpha/complete_language/field_train.rs`). The comparison is
   completion read as a joint code: a region is drawn as a state of open places among the answer's,
@@ -98,9 +115,10 @@ repository was reset on September 24; the pre-reset tree is
 | Line | Law | Laps read | Held joint at lap ends | At the lap's mean |
 |---|---|---|---|---|
 | plain | one deposit rate | 4, 5, 6 | 1.7838, 1.7751, 1.7748 | |
-| part rates | a rate per founded part; every part at the old rate from lap 10 | 4 to 23 | 1.7622, 1.7544, 1.7524, 1.7506, 1.7459, 1.7472, 1.7428, 1.7421, 1.7420, 1.7388, 1.7375, 1.7338, 1.7374, 1.7332, 1.7314, 1.7327, 1.7277, 1.7291, 1.7293, 1.7271 | 1.7341 (lap 12), 1.7333, 1.7300, 1.7280, 1.7267, 1.7265, 1.7248 (lap 18), 1.7250, 1.7231, 1.7223, 1.7215, 1.7217 (lap 23) |
+| part rates | a rate per founded part; every part at the old rate from lap 10 | 4 to 26 | 1.7622, 1.7544, 1.7524, 1.7506, 1.7459, 1.7472, 1.7428, 1.7421, 1.7420, 1.7388, 1.7375, 1.7338, 1.7374, 1.7332, 1.7314, 1.7327, 1.7277, 1.7291, 1.7293, 1.7271, 1.7241, 1.7238, 1.7268 | 1.7341 (lap 12), 1.7333, 1.7300, 1.7280, 1.7267, 1.7265, 1.7248 (lap 18), 1.7250, 1.7231, 1.7223, 1.7215, 1.7217 (lap 23), 1.7204, 1.7196, 1.7185 (lap 26) |
 | carry circles | 32 circles (`C = 32` of `f = 128`) founded on lap 18's state with the turn and the near field's friction, the leak on its linear chart (retired), the line's own law otherwise | 19, 20, 21 | 1.7303, 1.7188, 1.7144 | 1.7219, 1.7170, 1.7100 |
 | circles at eight times | the circles' four parts at eight times the old rate, from the same grown state; lap 23 refused at its section 1,501 of 1,535 | 19 to 22 | 1.7268, 1.7090, 1.7010, 1.6949 | 1.7202, 1.7064, 1.6912, 1.6836 |
+| coupled circles | 32 circles on the leak's log chart with the drive charged through the friction (G98), founded on lap 23's state; lap 24 at the old rate, laps 25 and 26 with the circles' four parts at eight times | 24, 25, 26 | 1.7214, 1.7089, 1.7102 | 1.7173, 1.7096, 1.6906 |
 | scan | part rates and the carry, from the part-rate line's fourth state | 5 to 8 | 1.7477, 1.7445, 1.7450, 1.7444 | |
 | trend | each part's rate sought from its own lap displacements, from the part-rate line's ninth state | 10, 11, 12 | 1.7443, 1.7477, 1.7453 | |
 | raised | the second lane's key, value, probe, out and moment-face parts at 4, 16, 4, 4 and 4 times the old rate, from the part-rate line's twelfth state; ended | 13, 14, 15 | 1.7429, 1.7430, 1.7380 | 1.7325, 1.7297, 1.7279 |
