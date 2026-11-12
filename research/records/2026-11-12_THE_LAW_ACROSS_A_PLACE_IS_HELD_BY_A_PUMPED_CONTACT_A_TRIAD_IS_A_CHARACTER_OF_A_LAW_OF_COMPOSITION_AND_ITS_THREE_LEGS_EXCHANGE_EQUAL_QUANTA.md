@@ -298,7 +298,8 @@ lock, so that `arg α + arg β + arg γ` stands still across the places that sha
 - Lean, for #410: the character decomposition of the cyclic law (3.1), and the triad's gauge
   identity with its conserved differences under a step at equal rates (3.2, written with the build
   as `HNN/TriadGauge`; its box ticked from the PC).
-- The check of the built object (G107, section 9) and the founding it sends the line to.
+- The check of the built object: done (G107, section 9). The release on tt1's end with the return cut
+  (G109), and form (ii)'s derivation after the circles' leak half's rate is read (G108's rule).
 
 ## 9. The first lap (G105) and the check of the built object (G107)
 
@@ -336,6 +337,30 @@ from tt1's lap mean, and the triad build reads the cut state as it read tt1's, r
   its reach is short. The circles' triad (ii) is the next founding, by a derivation fixed first.
 - If they rise less than one and a half times as much, or both mates' row under 0.002, then the
   legs are given their mates' letters before any founding.
+
+### G106 and G107, scored
+
+[measurement; the reading agent-inferred] The cut stands within 0.0025 nats a place of te5's lap mean
+on every transmission row, and the rows with two near letters rose 3.9 times as much as the rows
+with one; both mates' row rose 0.0104. So the first branch holds: the law is the triads' own, the
+object is the theory's, and its reach is short at three and four letters each side, where the rises
+are under a third of both mates' row. Form (ii) is the next founding, by a derivation fixed first,
+after the circles' leak half's rate is read (G108).
+
+The release (G106) compared tt1's end with te5's on the first 32 held problems' 8,760 places. The
+keyed write coded 0.123 nats a place lower, the rest 0.041 and the re-draw's end 0.058, while the
+reference answers' code moved 0.001 and the locked read on 128 problems 0.003. The excess of the
+re-draw's end over the reference fell by a fifth, from 0.276 to 0.220. The faces' entropy fell with
+the code at each stage of the write and stood on the reference.
+- In the field's own write, every place's near letters were drawn from the faces the triads
+  sharpen. Their law of a place and two near letters is met at every place by letters drawn from it,
+  so the write's fixed point moves.
+- In a real answer the other parts already hold the near law, and the triads add little.
+- The circles had four times the triads' held gain and did not move the re-draw's end (G101).
+
+The ruler passes 39 of tt1's 250 written code lines against 24 of te5's 223. No answer yet does what
+its question asks. G109 reads the release on tt1's end with the return cut, to tell the triads' own
+forward from their mark on the other parts.
 
 ## Receipts
 

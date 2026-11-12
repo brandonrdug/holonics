@@ -1,6 +1,6 @@
-# tt1's reads (G105), 2026-11-12 UTC, both by bin-carry-coupled (sha256 54f9cb36459453d2), each its own hold of the card lock (the RTX 4080 SUPER
+# tt1's reads (G105), 2026-11-12 UTC, both by bin-triad (sha256 48ab0d52c2291b6f), each its own hold of the card lock (the RTX 4080 SUPER
 # under HOLONICS_ROOT/.local/gpu.lock): the held read of tt1/MEAN.0 (held_as.sh, bound 24 s, projection about 10 s) and its transmission read
-# (transmission_as.sh, open-0, projection 190 s, deadline 297 s).
+# (transmission_as.sh, open-0, projection 238 s, deadline 297 s).
 ## the held read of tt1/MEAN.0
 # mean_tt1: state 0ee78758d44c1ee8; binary 48ab0d52c2291b6f; asked 12:37:22
 # mean_tt1: lock taken 12:37:23 wait_s=1.020172474

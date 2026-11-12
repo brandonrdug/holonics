@@ -1,0 +1,94 @@
+# G106 (P31 step 8 and P34 step 9), 2026-11-12 UTC: the release reads (G70's j_run.sh as G101 ran it: the settle with its keyed write and rest, the
+# re-draw, the charge census on keyed, rest and the reference, the reference's locked read on 128; the first 32 held problems' 8,760 places) of te5's end
+# by bin-carry-coupled, of te5's end again by bin-triad (the gate: its lines and its three writes against the first read's), and of tt1's end by bin-triad.
+# Device line: the card, the RTX 4080 SUPER under HOLONICS_ROOT/.local/gpu.lock, each state its own hold, nothing else on the card; projection 10 minutes
+# a state, deadline 900 s a state by the outer timeouts; dispatched with tools/runs.py (p31_release, p34_tt1_release). The ruler on the host after them,
+# one thread: Python's compile of each written code line alone, as G101 counted (every non-blank line of a re-draw end answer that is neither a fence nor
+# a comment, its indentation stripped). The decoded writes are never committed.
+# te5_coupled: state te5/STATE.0 sha256 bbe420b5011d1255; binary bin-carry-coupled 54f9cb36459453d2 (87994ea23), the line's own release; read 12:42:03 to 12:52:18 UTC; 615 s; the lock's wait 0.002 s
+REFREAD te5_coupled problems=128 places=43342 code=0.457640 entropy=0.426023 root_share=1.310869 v1=0.058419 v2=0.037953 12:52:18
+LAP te5_coupled locks=1.837137/0.994812 v2=0.195433 rest=1.091052/0.823899 v2=0.099086 redraw=0.673757/0.702560 neutral=31 rested=1 redraw_v2=0.045547 12:52:18
+FIELD_SETTLE_DONE problems=32 at_rest=32 h_millinats=1000 passes_bound=1000 kept=938 undone=1328 letters=8760 code_keyed_nats_a_place=1.837137 code_end_nats_a_place=1.091052 fall_nats=6535.707197 keyed_ms=17110 ms=339146
+MEASURE lap=te5_coupled_settle rc=0 wall_s=339.6 peak_rss_kib=747104
+FIELD_REDRAW_DONE problems=32 neutral=31 rested=1 h_millinats=1000 passes_bound=1000 kept=725 undone=641 letters=8760 code_start_nats_a_place=1.091052 code_end_nats_a_place=0.673757 entropy_end_nats_a_place=0.702560 root_end_nats=483.585561 ms=127398
+MEASURE lap=te5_coupled_redraw rc=0 wall_s=127.8 peak_rss_kib=751612
+FIELD_CHARGE_STATE state=rest problems=32 letters=8760 cut_to_room=0 code_nats=9557.617763 entropy_nats=7217.357973 code_nats_a_place=1.091052 entropy_nats_a_place=0.823899 excess_nats=2340.259789 root_nats=714.177505 root_share_of_excess=0.305170 v_over_1_share=0.153196 v_over_2_share=0.099086 ms=13703
+FIELD_CHARGE_STATE state=keyed problems=32 letters=8760 cut_to_room=0 code_nats=16093.324960 entropy_nats=8714.553593 code_nats_a_place=1.837137 entropy_nats_a_place=0.994812 excess_nats=7378.771368 root_nats=805.315950 root_share_of_excess=0.109139 v_over_1_share=0.268721 v_over_2_share=0.195433 ms=13802
+FIELD_CHARGE_STATE state=reference problems=32 letters=8760 cut_to_room=0 code_nats=3483.587161 entropy_nats=3283.829656 code_nats_a_place=0.397669 entropy_nats_a_place=0.374866 excess_nats=199.757505 root_nats=412.788335 root_share_of_excess=2.066446 v_over_1_share=0.050228 v_over_2_share=0.033447 ms=13836
+MEASURE lap=te5_coupled_charge rc=0 wall_s=41.7 peak_rss_kib=700816
+refread FIELD_CHARGE_STATE state=reference problems=128 letters=43342 cut_to_room=0 code_nats=19835.028726 entropy_nats=18464.743506 code_nats_a_place=0.457640 entropy_nats_a_place=0.426023 excess_nats=1370.285219 root_nats=1796.265627 root_share_of_excess=1.310869 v_over_1_share=0.058419 v_over_2_share=0.037953 ms=105178
+refread MEASURE lap=te5_coupled_refread rc=0 wall_s=105.7 peak_rss_kib=2078520
+# te5_triad: state te5/STATE.0 sha256 bbe420b5011d1255; binary bin-triad 48ab0d52c2291b6f (111490c01), the gate; read 12:52:18 to 13:02:32 UTC; 614 s; the lock's wait 0.004 s
+REFREAD te5_triad problems=128 places=43342 code=0.457640 entropy=0.426023 root_share=1.310869 v1=0.058419 v2=0.037953 13:02:32
+LAP te5_triad locks=1.837137/0.994812 v2=0.195433 rest=1.091052/0.823899 v2=0.099086 redraw=0.673757/0.702560 neutral=31 rested=1 redraw_v2=0.045547 13:02:32
+FIELD_SETTLE_DONE problems=32 at_rest=32 h_millinats=1000 passes_bound=1000 kept=938 undone=1328 letters=8760 code_keyed_nats_a_place=1.837137 code_end_nats_a_place=1.091052 fall_nats=6535.707197 keyed_ms=17206 ms=338128
+MEASURE lap=te5_triad_settle rc=0 wall_s=338.6 peak_rss_kib=749984
+FIELD_REDRAW_DONE problems=32 neutral=31 rested=1 h_millinats=1000 passes_bound=1000 kept=725 undone=641 letters=8760 code_start_nats_a_place=1.091052 code_end_nats_a_place=0.673757 entropy_end_nats_a_place=0.702560 root_end_nats=483.585561 ms=127599
+MEASURE lap=te5_triad_redraw rc=0 wall_s=128.0 peak_rss_kib=751380
+FIELD_CHARGE_STATE state=rest problems=32 letters=8760 cut_to_room=0 code_nats=9557.617763 entropy_nats=7217.357973 code_nats_a_place=1.091052 entropy_nats_a_place=0.823899 excess_nats=2340.259789 root_nats=714.177505 root_share_of_excess=0.305170 v_over_1_share=0.153196 v_over_2_share=0.099086 ms=13621
+FIELD_CHARGE_STATE state=keyed problems=32 letters=8760 cut_to_room=0 code_nats=16093.324960 entropy_nats=8714.553593 code_nats_a_place=1.837137 entropy_nats_a_place=0.994812 excess_nats=7378.771368 root_nats=805.315950 root_share_of_excess=0.109139 v_over_1_share=0.268721 v_over_2_share=0.195433 ms=13645
+FIELD_CHARGE_STATE state=reference problems=32 letters=8760 cut_to_room=0 code_nats=3483.587161 entropy_nats=3283.829656 code_nats_a_place=0.397669 entropy_nats_a_place=0.374866 excess_nats=199.757505 root_nats=412.788335 root_share_of_excess=2.066446 v_over_1_share=0.050228 v_over_2_share=0.033447 ms=13660
+MEASURE lap=te5_triad_charge rc=0 wall_s=41.3 peak_rss_kib=734824
+refread FIELD_CHARGE_STATE state=reference problems=128 letters=43342 cut_to_room=0 code_nats=19835.028726 entropy_nats=18464.743506 code_nats_a_place=0.457640 entropy_nats_a_place=0.426023 excess_nats=1370.285219 root_nats=1796.265627 root_share_of_excess=1.310869 v_over_1_share=0.058419 v_over_2_share=0.037953 ms=105235
+refread MEASURE lap=te5_triad_refread rc=0 wall_s=105.8 peak_rss_kib=2135264
+# tt1: state tt1/STATE.0 sha256 50f36252909dd47e; binary bin-triad 48ab0d52c2291b6f (111490c01); read 13:02:48 to 13:13:14 UTC; 625 s; the lock's wait 0.004 s
+REFREAD tt1 problems=128 places=43342 code=0.454946 entropy=0.426347 root_share=1.441566 v1=0.057357 v2=0.037423 13:13:14
+LAP tt1 locks=1.714333/0.902471 v2=0.188926 rest=1.050485/0.766903 v2=0.101598 redraw=0.616224/0.635812 neutral=27 rested=5 redraw_v2=0.041666 13:13:14
+FIELD_SETTLE_DONE problems=32 at_rest=32 h_millinats=1000 passes_bound=1000 kept=810 undone=1231 letters=8760 code_keyed_nats_a_place=1.714333 code_end_nats_a_place=1.050485 fall_nats=5815.308014 keyed_ms=17189 ms=325555
+MEASURE lap=tt1_settle rc=0 wall_s=326.1 peak_rss_kib=741440
+FIELD_REDRAW_DONE problems=32 neutral=27 rested=5 h_millinats=1000 passes_bound=1000 kept=773 undone=843 letters=8760 code_start_nats_a_place=1.050485 code_end_nats_a_place=0.616224 entropy_end_nats_a_place=0.635812 root_end_nats=476.352968 ms=151645
+MEASURE lap=tt1_redraw rc=0 wall_s=152.1 peak_rss_kib=752424
+FIELD_CHARGE_STATE state=rest problems=32 letters=8760 cut_to_room=0 code_nats=9202.251719 entropy_nats=6718.071975 code_nats_a_place=1.050485 entropy_nats_a_place=0.766903 excess_nats=2484.179745 root_nats=726.841125 root_share_of_excess=0.292587 v_over_1_share=0.154794 v_over_2_share=0.101598 ms=13094
+FIELD_CHARGE_STATE state=keyed problems=32 letters=8760 cut_to_room=0 code_nats=15017.559734 entropy_nats=7905.645679 code_nats_a_place=1.714333 entropy_nats_a_place=0.902471 excess_nats=7111.914055 root_nats=773.887821 root_share_of_excess=0.108815 v_over_1_share=0.251027 v_over_2_share=0.188926 ms=13266
+FIELD_CHARGE_STATE state=reference problems=32 letters=8760 cut_to_room=0 code_nats=3474.322820 entropy_nats=3282.881123 code_nats_a_place=0.396612 entropy_nats_a_place=0.374758 excess_nats=191.441696 root_nats=411.816310 root_share_of_excess=2.151132 v_over_1_share=0.050000 v_over_2_share=0.033447 ms=13140
+MEASURE lap=tt1_charge rc=0 wall_s=39.9 peak_rss_kib=723680
+refread FIELD_CHARGE_STATE state=reference problems=128 letters=43342 cut_to_room=0 code_nats=19718.284483 entropy_nats=18478.754807 code_nats_a_place=0.454946 entropy_nats_a_place=0.426347 excess_nats=1239.529676 root_nats=1786.865420 root_share_of_excess=1.441566 v_over_1_share=0.057357 v_over_2_share=0.037423 ms=106634
+refread MEASURE lap=tt1_refread rc=0 wall_s=107.2 peak_rss_kib=1991176
+## the gate (bin-triad on te5/STATE.0 against bin-carry-coupled)
+LINE CHARGE keyed: equal
+LINE CHARGE reference: equal
+LINE CHARGE rest: equal
+LINE FIELD_REDRAW_DONE: equal
+LINE FIELD_SETTLE_DONE: equal
+LINE LAP: equal
+LINE REFREAD: equal
+LINE REFREAD_CHARGE 0: equal
+WRITE settle/KEYED.tsv: byte-equal
+WRITE settle/SAMPLE.tsv: byte-equal
+WRITE redraw/SAMPLE.tsv: byte-equal
+GATE EQUAL: 8 lines, timings and ms fields aside, and the three writes
+## the ruler on the re-draw end answers
+te5_coupled RULER 24 of 223 code lines compile alone
+te5_triad RULER 24 of 223 code lines compile alone
+tt1 RULER 39 of 250 code lines compile alone
+## the warning text of TriadGauge's Lean build (P28 gate iii at 2840a7a91, from its log)
+⚠ [9150/9154] Built Holonics.HNN.TriadGauge (16s)
+warning: Holonics/HNN/TriadGauge.lean:81:6: this tactic is never executed
+warning: Holonics/HNN/TriadGauge.lean:82:6: this tactic is never executed
+warning: Holonics/HNN/TriadGauge.lean:81:6: Unused tactic linter: `(simp; ring)` does nothing
+warning: Holonics/HNN/TriadGauge.lean:82:6: Unused tactic linter: `simp [sub_eq_add_neg]` does nothing
+warning: Holonics/HNN/TriadGauge.lean:89:6: this tactic is never executed
+warning: Holonics/HNN/TriadGauge.lean:89:6: Unused tactic linter: `simp` does nothing
+warning: Holonics/HNN/TriadGauge.lean:96:6: this tactic is never executed
+warning: Holonics/HNN/TriadGauge.lean:96:6: Unused tactic linter: `simp` does nothing
+warning: Holonics/HNN/TriadGauge.lean:103:6: this tactic is never executed
+warning: Holonics/HNN/TriadGauge.lean:103:6: Unused tactic linter: `simp` does nothing
+warning: Holonics/HNN/TriadGauge.lean:110:6: this tactic is never executed
+warning: Holonics/HNN/TriadGauge.lean:110:6: Unused tactic linter: `simp` does nothing
+warning: Holonics/HNN/TriadGauge.lean:117:6: this tactic is never executed
+warning: Holonics/HNN/TriadGauge.lean:117:6: Unused tactic linter: `simp` does nothing
+warning: Holonics/HNN/TriadGauge.lean:125:8: this tactic is never executed
+warning: Holonics/HNN/TriadGauge.lean:128:8: this tactic is never executed
+warning: Holonics/HNN/TriadGauge.lean:125:8: Unused tactic linter: `simp` does nothing
+warning: Holonics/HNN/TriadGauge.lean:128:8: Unused tactic linter: `simp` does nothing
+warning: Holonics/HNN/TriadGauge.lean:136:6: this tactic is never executed
+warning: Holonics/HNN/TriadGauge.lean:135:60: Unused tactic linter: `done` does nothing
+warning: Holonics/HNN/TriadGauge.lean:136:6: Unused tactic linter: `(apply Zsqrtd.ext <;> simp <;> ring)` does nothing
+warning: Holonics/HNN/TriadGauge.lean:220:6: this tactic is never executed
+warning: Holonics/HNN/TriadGauge.lean:220:6: Unused tactic linter: `simp only [normSq_step, Finset.sum_add_distrib, Finset.sum_sub_distrib,
+warning: Holonics/HNN/TriadGauge.lean:260:10: this tactic is never executed
+warning: Holonics/HNN/TriadGauge.lean:263:8: this tactic is never executed
+warning: Holonics/HNN/TriadGauge.lean:273:8: this tactic is never executed
+warning: Holonics/HNN/TriadGauge.lean:260:10: Unused tactic linter: `field_simp` does nothing
+warning: Holonics/HNN/TriadGauge.lean:263:8: Unused tactic linter: `(field_simp; ring)` does nothing
+warning: Holonics/HNN/TriadGauge.lean:273:8: Unused tactic linter: `(
