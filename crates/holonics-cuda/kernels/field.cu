@@ -483,6 +483,14 @@ struct FieldWords {
     uint32_t *cskin;
     const uint64_t *region_soff;
     uint64_t E2;
+    // [definition; theory, November 12, P50 step 2] **A clock's near phases and skins** (`field_clock_fill`): for each moment mode `u` (`mcmap[u]`, the
+    // moment kernels' map, `tm` of them) and site `g`, at the near offsets `d = ±1..±5` (`near_slot`), `ζ^(τ_(g+d) − τ_g)` as two 32-bit words
+    // `mphase[u][g][slot][2]` and the skin `e^(−2π|σ_g − σ_(g+d)|/n)` as one `mskin[u][g][slot]`; the far skins stand in the crowd edges' store
+    // `cskin`. One store, formed again for each clock where its moments are read. Null where the batch keeps none.
+    int32_t *mphase;
+    uint32_t *mskin;
+    const uint32_t *mcmap;
+    uint64_t tm;
 };
 
 // [definition; agent-inferred, November 2] **A head's pace index** (§16, `Field::paces`): the heads that carry a moment
@@ -2348,7 +2356,7 @@ extern "C" __global__ void __launch_bounds__(CONTACT_ROWS * 32, 8) field_exposur
 
 // [definition; theory, November 12, P50 step 1 (G116 a) and P51] **The clock's skins, formed once**: `skin_pair` for each support pair and each crowd
 // edge of a paced head, one warp a (paced head, receiving site), a lane a support entry and then a crowd slot, each mode's skin written at the entry's
-// address `[p][region_soff[r] + i K_r + k][l]` and the edge's `[p][t][slot][l]` (the readers' `skin_ij_at`, `crowd_skin_ij`). An entry that meets no
+// address `[p][region_soff[r] + i K_r + k][l]` (the readers' `skin_ij_at`; the crowd edges `[p][t][slot][l]` are the clock's, `field_clock_fill`). An entry that meets no
 // site (a near place outside the region or unkeyed, a member inside the near field) is never read and never formed. Launched after the
 // clock is set: at each tick's forward before the exposure, and at each tick's return for that tick's clock. A row the cut room skipped, and a row whose
 // region's pace is plain, read no store word and form none; the support and the crowds are the readers' own (`row_prepare`, `support_at`, `crowd_at`).
@@ -2397,15 +2405,7 @@ extern "C" __global__ void __launch_bounds__(CONTACT_ROWS * 32) field_skin_fill(
                 }
             }
         }
-        const uint32_t nslots = rcs[warp].open ? 0 : crowd_slots(sites);
-        uint32_t lo, hi_, lv;
-        if (lane < nslots && crowd_at(i, sites, lane, &lo, &hi_, &lv)) {
-            const bool right = lo > i;
-            uint32_t *at = w.cskin + (((uint64_t)p * w.T + g) * w.slots + crowd_slot_of(lv, right)) * n;
-            for (uint32_t l = 0; l < n; l++) {
-                at[l] = (uint32_t)skin_pair(w, l * sets + set, l, p, g, octave_edge(g, lv, right));
-            }
-        }
+        // (the crowd edges are the clock's, formed by `field_clock_fill` at every site of the head)
     }
 }
 
@@ -4626,6 +4626,108 @@ __device__ __forceinline__ wide paced_between(const FieldWords &w, const PacedMo
     return skin_pair(w, pm.slot, pm.l, pm.p, gt, gk);
 }
 
+// [definition; theory, November 12, P50 step 2 (G116 b)] **A clock's phases and skins are formed once where its moments are read.** A moment
+// mode's near phase `ζ^(τ_(g+d) − τ_g)` and skin across `d` places, and its far skins to the places `2^ℓ` away, depend on the mode, the site,
+// the offset and the clock alone (`paced_phase`, `paced_between`), so `field_clock_fill` forms each once for the clock (where its forward moments
+// are read, and again at each tick's return for that tick's clock) and the moments, their return, the skinned prefixes and the clocks' covector
+// read them: the same integers. The offset zero is the resident ring's and the resident decay's first entry, read where it stands. Width: a phase's
+// parts are a unit Gaussian's on `2^(−30)`, read through the resident ring (at most `2^30`) or summed by the series to the face's grain (the exact
+// value at most `2^30`, each of its at most 23 steps released once and divided once to the nearest, the rounding carried forward by at most
+// `π/k`, so `|re|, |im| < 2^30 + 2^10`): two 32-bit words hold it, the fill refusing one past them (`REFUSED_WORD32`), and `INT32_MIN` is the
+// word no fill formed (`PHASE_UNFILLED`, the test build's fill before each clock's). A skin is at most `2^30` (step 1).
+#define PHASE_UNFILLED ((int32_t)0x80000000)
+#define CLOCK_NEAR (2 * (NEAR - 1))
+
+// A near offset's slot: `d = −1..−5` at `0..4`, `d = 1..5` at `5..9`.
+__device__ __forceinline__ uint32_t near_slot(int32_t d) {
+    return d < 0 ? (uint32_t)(-d - 1) : (uint32_t)(NEAR - 2 + d);
+}
+
+__device__ __forceinline__ uint64_t clock_at(const FieldWords &fw, uint32_t u, uint64_t g, int32_t d) {
+    return ((uint64_t)u * fw.T + g) * CLOCK_NEAR + near_slot(d);
+}
+
+// `ζ^(τ_(g+d) − τ_g)` of moment mode `u` at site `g` (`paced_phase(g, g + d)`), the clock's.
+__device__ __forceinline__ MomentGauss clock_phase(const FieldWords &fw, const PacedMode &pm, uint32_t u, uint64_t g, int32_t d) {
+    if (d == 0) {
+        const uint64_t at = fw.ring_off[pm.slot];
+        return mg_make((wide)fw.phasor[2 * at], (wide)fw.phasor[2 * at + 1]);
+    }
+    if (fw.mphase == nullptr) {
+        atomicOr(fw.status, REFUSED_UNFILLED);
+        return mg_make(0, 0);
+    }
+    const int32_t *v = fw.mphase + 2 * clock_at(fw, u, g, d);
+    if (v[0] == PHASE_UNFILLED || v[1] == PHASE_UNFILLED) {
+        atomicOr(fw.status, REFUSED_UNFILLED);
+        return mg_make(0, 0);
+    }
+    return mg_make((wide)v[0], (wide)v[1]);
+}
+
+// `e^(−2π|σ_g − σ_(g+d)|/n)` of moment mode `u` at site `g` (`paced_between(g, g + d)`), the clock's.
+__device__ __forceinline__ wide clock_skin(const FieldWords &fw, const PacedMode &pm, uint32_t u, uint64_t g, int32_t d) {
+    if (d == 0) {
+        return (wide)fw.decay[(uint64_t)pm.slot * fw.dreach];
+    }
+    if (fw.mskin == nullptr) {
+        atomicOr(fw.status, REFUSED_UNFILLED);
+        return 0;
+    }
+    return skin_word(fw, fw.mskin[clock_at(fw, u, g, d)]);
+}
+
+// The skin from site `g` to the place `2^level` away on its side (`paced_between(g, g ± 2^level)`), the clock's, from the crowd edges' store.
+__device__ __forceinline__ wide clock_far(const FieldWords &fw, const PacedMode &pm, uint64_t g, uint32_t level, bool right) {
+    return crowd_skin_word(fw, pm.p, g, level, right, pm.l);
+}
+
+// [definition; theory, November 12, P50 step 2] **The clock's phases and skins, formed once** (`field_clock_fill`): one thread a site and moment mode of
+// a paced head (every region, plain or not: the clocks' covector reads the paced law on both), its near offsets' phases and skins within its region,
+// and its far skins to the places `2^ℓ` away on each side where `2^ℓ` is within the region (the skinned prefixes' rule, which holds the crowd
+// edges' at every level), each the integer `paced_phase` and `paced_between` form. A depth ring's mode carries no moment and forms none.
+extern "C" __global__ void field_clock_fill(FieldWords fw) {
+    const uint32_t u = blockIdx.y;
+    const uint32_t cm = fw.mcmap[u];
+    for (uint64_t g = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; g < fw.T; g += (uint64_t)gridDim.x * blockDim.x) {
+        const uint32_t r = fw.site_region[g], t = fw.site_pos[g];
+        PacedMode pm = paced_mode(fw, cm, r);
+        if (pm.p < 0 || (cm >> 31) != 0) {
+            continue;
+        }
+        const uint64_t first = fw.region_off[r];
+        const uint32_t sites = fw.region_off[r + 1] - (uint32_t)first;
+        for (int32_t d = -(int32_t)(NEAR - 1); d <= (int32_t)(NEAR - 1); ++d) {
+            if (d == 0 || (int64_t)t + d < 0 || (int64_t)t + d >= (int64_t)sites) {
+                continue;
+            }
+            const uint64_t gk = (uint64_t)((int64_t)g + d);
+            const MomentGauss ph = paced_phase(fw, pm, g, gk);
+            const uint64_t at = clock_at(fw, u, g, d);
+            if (ph.re <= (wide)INT32_MIN || ph.re > (wide)INT32_MAX || ph.im <= (wide)INT32_MIN || ph.im > (wide)INT32_MAX) {
+                atomicOr(fw.status, REFUSED_WORD32);
+                fw.mphase[2 * at] = PHASE_UNFILLED;
+                fw.mphase[2 * at + 1] = PHASE_UNFILLED;
+            } else {
+                fw.mphase[2 * at] = (int32_t)ph.re;
+                fw.mphase[2 * at + 1] = (int32_t)ph.im;
+            }
+            fw.mskin[at] = (uint32_t)paced_between(fw, pm, g, gk);
+        }
+        for (uint32_t level = 2; ((uint64_t)1 << level) < sites; ++level) {
+            const uint32_t pow = (uint32_t)1 << level;
+            for (uint32_t side = 0; side < 2; side++) {
+                const bool right = side == 1;
+                if (right ? t + pow >= sites : t < pow) {
+                    continue;
+                }
+                const uint64_t edge = right ? g + pow : g - pow;
+                fw.cskin[(((uint64_t)pm.p * fw.T + g) * fw.slots + crowd_slot_of(level, right)) * fw.n + pm.l] = (uint32_t)paced_between(fw, pm, g, edge);
+            }
+        }
+    }
+}
+
 // The paced region's admission (`Law::new` with a pace): the forward's or the return's certificate with the faces'
 // l1 at least `2^31` (`PACED_L1`); a plain region's is the slot's own. Grid `(regions, modes)`, dynamic shared
 // memory `3 · blockDim.x · 16`.
@@ -4733,29 +4835,29 @@ extern "C" __global__ void field_moment_prefix_paced_all(const MomentWords *ws, 
 
 // The paced moment of site `g` (place `t`) on `2^(−106)` (`moment_exact` with a pace): near `ζ^(τ_k − τ_t) D(σ)`, far
 // `conj(ζ^(τ_t))` at the receiver's skin to the place `2^ℓ` away on each side.
-__device__ MomentGauss moment_site_paced(const FieldWords &fw, const PacedMode &pm, const int64_t *before, const int64_t *after, const wide *up, const wide *down, uint64_t first, uint32_t sites, uint32_t t, const MomentWords &w) {
+__device__ MomentGauss moment_site_paced(const FieldWords &fw, const PacedMode &pm, uint32_t u, const int64_t *before, const int64_t *after, const wide *up, const wide *down, uint64_t first, uint32_t sites, uint32_t t, const MomentWords &w) {
     MomentGauss s = mg_make(0, 0);
     const uint64_t gt = first + t;
     const uint32_t forward = t + 1 < (uint32_t)NEAR ? t + 1 : (uint32_t)NEAR;
     for (uint32_t d = 0; d < forward; ++d) {
         const uint64_t gk = gt - d;
-        s = mg_add(s, moment_near(paced_phase(fw, pm, gt, gk), paced_between(fw, pm, gt, gk), mg_load(before, gk)));
+        s = mg_add(s, moment_near(clock_phase(fw, pm, u, gt, -(int32_t)d), clock_skin(fw, pm, u, gt, -(int32_t)d), mg_load(before, gk)));
     }
     const uint32_t backward = sites - t < (uint32_t)NEAR ? sites - t : (uint32_t)NEAR;
     for (uint32_t d = 0; d < backward; ++d) {
         const uint64_t gk = gt + d;
-        s = mg_add(s, moment_near(paced_phase(fw, pm, gt, gk), paced_between(fw, pm, gt, gk), mg_load(after, gk)));
+        s = mg_add(s, moment_near(clock_phase(fw, pm, u, gt, (int32_t)d), clock_skin(fw, pm, u, gt, (int32_t)d), mg_load(after, gk)));
     }
     const MomentGauss home = mg_conj(paced_absolute(fw, w, pm, gt));
     for (uint32_t level = 2; ((uint64_t)1 << level) < sites; ++level) {
         uint32_t lo, hi;
         if (moment_octave(t, sites, level, false, &lo, &hi)) {
             const MomentGauss sum = mg_sub(mg_load_wide(up, hi + 1), mg_load_wide(up, lo));
-            s = mg_add(s, mg_scale(mg_mul(home, sum), paced_between(fw, pm, gt, gt - ((uint64_t)1 << level))));
+            s = mg_add(s, mg_scale(mg_mul(home, sum), clock_far(fw, pm, gt, level, false)));
         }
         if (moment_octave(t, sites, level, true, &lo, &hi)) {
             const MomentGauss sum = mg_sub(mg_load_wide(down, hi + 1), mg_load_wide(down, lo));
-            s = mg_add(s, mg_scale(mg_mul(home, sum), paced_between(fw, pm, gt, gt + ((uint64_t)1 << level))));
+            s = mg_add(s, mg_scale(mg_mul(home, sum), clock_far(fw, pm, gt, level, true)));
         }
     }
     return s;
@@ -4786,7 +4888,7 @@ extern "C" __global__ void field_moment_paced_all(const MomentWords *ws, const u
                 atomicOr(w.status, MOMENT_REFUSED_SHAPE);
             }
         } else {
-            v = moment_site_paced(fw, pm, before, after, up + 2 * (first + r), down + 2 * (first + r), first, sites, t, w);
+            v = moment_site_paced(fw, pm, u, before, after, up + 2 * (first + r), down + 2 * (first + r), first, sites, t, w);
         }
         s[2 * g] = fit64(rel(v.re, MOMENT_COEFFICIENT_BITS), w.status);
         s[2 * g + 1] = fit64(rel(v.im, MOMENT_COEFFICIENT_BITS), w.status);
@@ -4822,8 +4924,7 @@ extern "C" __global__ void field_moment_skinned_all(const MomentWords *ws, const
             const bool reads = ((uint64_t)1 << level) < sites && (left ? t >= ((uint32_t)1 << level) : (uint64_t)t + ((uint64_t)1 << level) < sites);
             if (reads) {
                 const MomentGauss turned = mg_mul(paced_absolute(fw, w, pm, gt), mg_load(ds, gt));
-                const uint64_t edge = left ? gt - ((uint64_t)1 << level) : gt + ((uint64_t)1 << level);
-                sum = mg_add(sum, mg_scale(mg_make(rel(turned.re, MOVE_BITS), rel(turned.im, MOVE_BITS)), paced_between(fw, pm, gt, edge)));
+                sum = mg_add(sum, mg_scale(mg_make(rel(turned.re, MOVE_BITS), rel(turned.im, MOVE_BITS)), clock_far(fw, pm, gt, level, !left)));
             }
             out[2 * (uint64_t)(t + 1)] = sum.re;
             out[2 * (uint64_t)(t + 1) + 1] = sum.im;
@@ -4858,11 +4959,11 @@ extern "C" __global__ void field_moment_return_paced_all(const MomentWords *ws, 
         } else {
             const uint32_t forward = sites - k < (uint32_t)NEAR ? sites - k : (uint32_t)NEAR;
             for (uint32_t d = 0; d < forward; ++d) {
-                plus = mg_add(plus, moment_near_back(paced_phase(fw, pm, g + d, g), paced_between(fw, pm, g + d, g), mg_load(ds, g + d)));
+                plus = mg_add(plus, moment_near_back(clock_phase(fw, pm, u, g + d, -(int32_t)d), clock_skin(fw, pm, u, g + d, -(int32_t)d), mg_load(ds, g + d)));
             }
             const uint32_t backward = k + 1 < (uint32_t)NEAR ? k + 1 : (uint32_t)NEAR;
             for (uint32_t d = 0; d < backward; ++d) {
-                minus = mg_add(minus, moment_near_back(paced_phase(fw, pm, g - d, g), paced_between(fw, pm, g - d, g), mg_load(ds, g - d)));
+                minus = mg_add(minus, moment_near_back(clock_phase(fw, pm, u, g - d, (int32_t)d), clock_skin(fw, pm, u, g - d, (int32_t)d), mg_load(ds, g - d)));
             }
             const MomentGauss home = mg_conj(paced_absolute(fw, w, pm, g));
             for (uint32_t level = 2; ((uint64_t)1 << level) < sites; ++level) {
@@ -4960,12 +5061,12 @@ extern "C" __global__ void field_moment_pace_back_all(const MomentWords *ws, con
         const uint32_t forward = t + 1 < (uint32_t)NEAR ? t + 1 : (uint32_t)NEAR;
         for (uint32_t d = 0; d < forward; ++d) {
             const uint64_t gk = g - d;
-            moment_skin_back(fw, pm, g, gk, paced_between(fw, pm, g, gk), re_pair(fw, dr, di, mg_mul(paced_phase(fw, pm, g, gk), mg_load(before, gk))), b);
+            moment_skin_back(fw, pm, g, gk, clock_skin(fw, pm, u, g, -(int32_t)d), re_pair(fw, dr, di, mg_mul(clock_phase(fw, pm, u, g, -(int32_t)d), mg_load(before, gk))), b);
         }
         const uint32_t backward = sites - t < (uint32_t)NEAR ? sites - t : (uint32_t)NEAR;
         for (uint32_t d = 0; d < backward; ++d) {
             const uint64_t gk = g + d;
-            moment_skin_back(fw, pm, g, gk, paced_between(fw, pm, g, gk), re_pair(fw, dr, di, mg_mul(paced_phase(fw, pm, g, gk), mg_load(after, gk))), b);
+            moment_skin_back(fw, pm, g, gk, clock_skin(fw, pm, u, g, (int32_t)d), re_pair(fw, dr, di, mg_mul(clock_phase(fw, pm, u, g, (int32_t)d), mg_load(after, gk))), b);
         }
         PacedMode own = paced_mode(fw, cm, r);
         const MomentGauss home = mg_conj(paced_absolute(fw, w, own, g));
@@ -4980,7 +5081,7 @@ extern "C" __global__ void field_moment_pace_back_all(const MomentWords *ws, con
                 const MomentGauss f = mg_mul(home, mg_sub(mg_load_wide(pre, hi + 1), mg_load_wide(pre, lo)));
                 const MomentGauss face = mg_make(rel(f.re, MOVE_BITS), rel(f.im, MOVE_BITS));
                 const uint64_t edge = right ? g + ((uint64_t)1 << level) : g - ((uint64_t)1 << level);
-                moment_skin_back(fw, pm, g, edge, paced_between(fw, pm, g, edge), re_pair(fw, dr, di, face), b);
+                moment_skin_back(fw, pm, g, edge, clock_far(fw, pm, g, level, right), re_pair(fw, dr, di, face), b);
             }
         }
     }

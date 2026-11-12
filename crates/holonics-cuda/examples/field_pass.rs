@@ -69,8 +69,8 @@ fn run(args: &[String]) -> Result<()> {
     // [measurement; theory, November 12, P50 step 1 and P51] The clock's skin store: octets a reserved entry and a site, the support entries beside the
     // dense pairs, the largest batch's, and the reservation's peak.
     println!(
-        "FIELD_SKIN octets_a_entry={} octets_a_site={} entries={} dense_pairs={} peak_batch_entries={} peak_batch_dense_pairs={} peak_skin_store={} peak_store={} batch_cut={}",
-        t.skin_entry_octets, t.skin_site_octets, t.skin_entries, t.skin_dense_pairs, t.skin_peak_entries, t.skin_peak_pairs, t.skin_store, t.peak_store, t.batch_cut
+        "FIELD_SKIN octets_a_entry={} octets_a_site={} clock_octets_a_site={} entries={} dense_pairs={} peak_batch_entries={} peak_batch_dense_pairs={} peak_skin_store={} peak_store={} batch_cut={}",
+        t.skin_entry_octets, t.skin_site_octets, t.clock_site_octets, t.skin_entries, t.skin_dense_pairs, t.skin_peak_entries, t.skin_peak_pairs, t.skin_store, t.peak_store, t.batch_cut
     );
     if let Some(phases) = card.phased() {
         for (name, marks, ns) in phases {
@@ -147,8 +147,8 @@ fn reserve(args: &[String]) -> Result<()> {
     let site = f2 - f1 - 3 * pair;
     let region = f1 - pair - site;
     assert_eq!(f(1000), pair * 1_000_000 + site * 1000 + region, "the reservation is quadratic in a region's sites");
-    let (_, entry, crowd_site) = skin_octets(&d, 0, 0);
-    println!("RESERVE pair={pair} site={site} region={region} entry={entry} crowd_site={crowd_site} near_slots={}", 2 * (holonics::hnn::tower::field::NEAR - 1));
+    let (_, entry, crowd_site, clock_site) = skin_octets(&d, 0, 0);
+    println!("RESERVE pair={pair} site={site} region={region} entry={entry} crowd_site={crowd_site} clock_site={clock_site} near_slots={}", 2 * (holonics::hnn::tower::field::NEAR - 1));
     Ok(())
 }
 
