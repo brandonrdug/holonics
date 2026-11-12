@@ -1,0 +1,27 @@
+rows 69907 row groups 1 columns ['identifier', 'collection', 'open_type', 'curator', 'license', 'date', 'title', 'creator', 'language', 'language_type', 'word_count', 'token_count', 'text']
+text bytes in the shard: 798.3 MB
+first 60 rows open_type: OG Sd OW OG OS OG OS OG OS OW OG OC OW OG OG OG OW OS Sd OG OW OS OS OS OW Sd OS OS OW OS OC OW OC OG OG OC OW OG OW OG OS OC OS OG OS OS OG OG OG OG OG OC OS OW OG OG OC OC OG OC
+
+Open Culture     rows  11626  bytes   324.7 MB (40.7%)  tokens   88.9 M  bytes/token 3.65  median 32145  p90 50243
+   languages by bytes: English 148.1 MB; French 74.7 MB; German 55.1 MB; Latin 11.5 MB; Japanese 8.1 MB; Italian 6.6 MB; Spanish 6.2 MB; Portugueuse 4.2 MB; Greek 2.4 MB; Polish 2.2 MB; Arabic 1.9 MB; Swedish 0.8 MB
+   collections by bytes: English-PD 69.8 MB (1738); US-PD-Newspapers 49.8 MB (2229); French-PD-Newspapers 38.0 MB (826); French-PD-diverse 25.5 MB (595); German-PD 24.4 MB (506); US-PD-Books 21.1 MB (519); Deutsches Zeitungsportal 11.2 MB (803); Latin-PD 10.2 MB (210); French-PD-Books 9.4 MB (216); German-PD-Newspapers 9.2 MB (194); Japanese-PD 8.0 MB (112); Europeana 7.8 MB (157)
+
+Open Government  rows  21732  bytes   233.2 MB (29.2%)  tokens   56.5 M  bytes/token 4.13  median 2144  p90 38934
+   languages by bytes: English 150.8 MB; Chinese 33.0 MB; French 16.1 MB; Portuguese 3.1 MB; Spanish 2.6 MB; Greek 2.4 MB; German 2.4 MB; Italian 1.9 MB; Bulgarian 1.7 MB; Portugueuse 1.6 MB; Finnish 1.5 MB; Romanian 1.5 MB
+   collections by bytes: USPTO 87.5 MB (2891); Chinese-Court-Decisions 32.9 MB (7438); French Open Data 19.6 MB (1566); Eurlex 18.3 MB (500); Court Listener 13.8 MB (1600); Eurovoc 12.6 MB (160); dotgov 7.9 MB (302); SEC 6.3 MB (156); Caselaw Access Project 5.5 MB (596); govinfo 4.1 MB (147); Marianne-Europe 2.6 MB (86); Superior Tribunal de Justiça 2.4 MB (269)
+
+Open Science     rows   1912  bytes   100.9 MB (12.6%)  tokens   28.5 M  bytes/token 3.54  median 46431  p90 84942
+   languages by bytes: English 71.7 MB; French 8.4 MB; Spanish 8.0 MB; German 3.3 MB; Unknown 2.3 MB; Portuguese 1.9 MB; Russian 1.3 MB; Indonesian 0.7 MB; Latin 0.6 MB; Turkish 0.4 MB; Ukrainian 0.4 MB; Spanish; Castilian 0.3 MB
+   collections by bytes: OpenAlex 69.0 MB (1076); French-Science-Pile 15.7 MB (401); Spanish-Science-Pile 9.2 MB (264); Open-Science-Pile 2.7 MB (78); German-Science-Pile 2.3 MB (67); arXiv 1.9 MB (26)
+
+Open Source      rows  20284  bytes    89.2 MB (11.2%)  tokens   28.6 M  bytes/token 3.13  median 1544  p90 8965
+   languages by bytes: Java 13.9 MB; Python 10.3 MB; JavaScript 9.7 MB; C# 7.8 MB; PHP 6.7 MB; C++ 6.3 MB; C 4.8 MB; TypeScript 3.2 MB; Go 2.5 MB; Vue 2.1 MB; Unity3D Asset 1.8 MB; Rust 1.7 MB
+   collections by bytes: Github Open Source 89.2 MB (20284)
+
+Open Web         rows  11233  bytes    31.4 MB (3.9%)  tokens    8.7 M  bytes/token 3.60  median 1179  p90 5615
+   languages by bytes: English 18.2 MB; German 1.5 MB; Russian 1.2 MB; French 0.8 MB; Japanese 0.7 MB; Spanish 0.6 MB; Ukrainian 0.5 MB; Portuguese 0.4 MB; Cebuano 0.4 MB; Danish 0.4 MB; Arabic 0.3 MB; Norwegian Nynorsk 0.3 MB
+   collections by bytes: Wikipedia 13.1 MB (6200); StackExchange 10.4 MB (3307); Creative Commons Common Crawl (CCC) 6.0 MB (673); Youtube-Commons 1.6 MB (117); Wiki Discussions 0.3 MB (832); One Million Posts 0.0 MB (104)
+
+Semantic data    rows   3120  bytes    18.8 MB (2.4%)  tokens    6.2 M  bytes/token 3.03  median 1080  p90 14604
+   languages by bytes: Multilingual 18.8 MB
+   collections by bytes: Wikidata 18.8 MB (3120)

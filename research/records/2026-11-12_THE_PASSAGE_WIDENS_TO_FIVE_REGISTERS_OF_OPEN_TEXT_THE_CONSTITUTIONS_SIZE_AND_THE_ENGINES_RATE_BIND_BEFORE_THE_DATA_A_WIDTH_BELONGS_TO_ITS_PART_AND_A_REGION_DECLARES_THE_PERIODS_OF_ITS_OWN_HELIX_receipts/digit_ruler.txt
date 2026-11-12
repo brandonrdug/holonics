@@ -1,0 +1,21 @@
+radix  cut          no mate  fill    four mates both sides
+    2  equal steps  0.3782   0.546   0.0669
+    2  located      0.4806   0.693   0.0561
+    3  equal steps  0.4845   0.441   0.0993
+    3  located      0.6096   0.555   0.0908
+    4  equal steps  0.5544   0.400   0.1235
+    4  located      0.6850   0.494   0.1214
+    5  equal steps  0.6041   0.375   0.1432
+    5  located      0.7362   0.457   0.1494
+    6  equal steps  0.6450   0.360   0.1598
+    6  located      0.7687   0.429   0.1604
+    8  equal steps  0.7055   0.339   0.1869
+    8  located      0.8043   0.387   0.1854
+   16  equal steps  0.8464   0.305   0.2638
+   16  located      0.9451   0.341   0.2693
+ink share: counted images 0.1914, read images 0.1861
+levels of ink  nats an inked pixel  fill
+            2  0.6932               1.000
+            3  1.0987               1.000
+            4  1.3741               0.991
+            7  1.8547               0.953

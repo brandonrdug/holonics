@@ -20,6 +20,18 @@ repository was reset on September 24; the pre-reset tree is
   and output appear in no other row; the answers' bytes are the places
   ([record](research/records/2026-11-05_THE_FIELD_MOVES_TO_A_CODE_PASSAGE_WHOSE_CLOSURES_ARE_BRACKETS_STRINGS_AND_BLOCKS.md)).
   The passages stay under `.local/` and are never published.
+- **Planned, not built** (November 12, at Brandon's direction;
+  [the passage record](research/records/2026-11-12_THE_PASSAGE_WIDENS_TO_FIVE_REGISTERS_OF_OPEN_TEXT_THE_CONSTITUTIONS_SIZE_AND_THE_ENGINES_RATE_BIND_BEFORE_THE_DATA_A_WIDTH_BELONGS_TO_ITS_PART_AND_A_REGION_DECLARES_THE_PERIODS_OF_ITS_OWN_HELIX.md)).
+  The passage widens to five slices of Common Corpus read by rulers on one shard (code 40, English
+  web 20, science 20, books 12, Wikidata 8 of the bytes; never its government slice), as one
+  continuous pass over 1 GB first, with 8 GB and 50 GB as tiers the engine's rate must earn. A
+  medium becomes a boundary chart: a region declares the periods of its own helix, and a value's
+  word is its registers by rank. A width belongs to its part: the declaration below holds one count
+  as every block's row length, reached by copies, and the record's §4.1 states the constitution by
+  part (80,182 entries with the carry's charts), the card's memory by term (280 octets a pair of
+  sites in a region against 71,486 a site, the width's share 2.5% at a mean problem) and the face as
+  a composition of lanes that each block reads its own of. The learner header's second word is its
+  count of key draws (175,104), never its entries.
 - **The field** (`hnn::tower::field`; its module text states the law). One field per problem: the
   question's sites are known and the answer's are open. One constitution is iterated over all sites
   for four ticks. In a tick each head gathers a current through its lock: a receiver's probe meets
