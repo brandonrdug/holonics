@@ -22,7 +22,9 @@ octaves fast). In each of two blocks half the entries hold a second moment's roo
   large covectors travel   in `v`'s lane columns the reverse: the plain cosine 1/2 again, the weighed 3/4, the first three quarters'
                            cosines 1 and the last 0; the fall 3 millionths;
   heat                     the key chart's lane, two octaves fast, holds four times its base heat (0.2441 of a millionth); the totals
-                           are the blocks' sums, and a block that never opened holds none.
+                           are the blocks' sums, and a block that never opened holds none;
+  own rates                the same states with a rates line holding every entry at the base word (theory, November 12): the key
+                           chart's lane holds its base heat, whatever its parts line says.
 
 Controls of its mean, on the same kind of states: the mean of two materials that differ by one in an entry lies a half away from
 zero (1 and 2 give 2, -1 and -2 give -2, 3 and -3 give 0), the mean of three is their third, every line but the material is the
@@ -267,7 +269,21 @@ def weighed_controls():
     assert len(heats) == 2 and all(abs(float(t["heat_micro"]) - 5 * 0.2441) < 2e-3 and abs(float(t["heat_base_micro"]) - 2 * 0.2441) < 1e-3 for t in heats), heats
     assert all(abs(float(t["own_micro"]) - 5.0) < 2e-3 for t in heats), heats
     assert len(falls) == 1 and abs(float(falls[0]["fall_micro"]) - 3.25) < 1e-3, falls
-    print(f"state_travel weighed: {len(lines)} lines, three controls hold")
+    # Each entry's own rate (theory, November 12): a rates line governs every entry over the parts line.
+    with tempfile.TemporaryDirectory() as tmp:
+        paths = [os.path.join(tmp, f"o{i}") for i in range(3)]
+        for p, theta in zip(paths, states):
+            write(p, theta, second, [OLD_F] + octaves)
+            with open(p, "a") as f:
+                f.write("rates " + " ".join("12" for _ in range(total)) + "\n")
+        own_text = io.StringIO()
+        with redirect_stdout(own_text):
+            state_travel.weighed(OLD_F, sections, sites, paths)
+    heads = [l for l in own_text.getvalue().split("\n") if l.startswith("# state ")]
+    assert len(heads) == 3 and all(l.endswith(" rates=own") for l in heads), heads
+    own_laps = [fields(l) for l in own_text.getvalue().split("\n") if l.startswith("TRAVEL_WEIGHED_LAP ") and " block=q lane=2 " in l]
+    assert len(own_laps) == 2 and all(f["heat_micro"] == f["heat_base_micro"] and abs(float(f["heat_micro"]) - 0.2441) < 1e-3 for f in own_laps), own_laps
+    print(f"state_travel weighed: {len(lines)} lines, four controls hold")
 
 
 def lag_controls():

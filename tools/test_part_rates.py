@@ -221,17 +221,19 @@ def main():
         assert set(got_f) == set(part_rates.PART_NAMES[p] for p in part_rates.written(D)), "a field without circles prints its nineteen"
         print("part_rates first: the letter rows' three parts, nineteen written without circles, older lines read at octave 0")
         polar_controls(p)
-    print("part_rates: 9 lines, the controls hold")
+        blocks_controls(p)
+    print("part_rates: 15 lines, the controls hold")
 
 
-def learner_text(path, theta, second, octaves, d=D, rate=12):
-    """A learner's text with its moments' lines (first moments zero), for the law's controls."""
+def learner_text(path, theta, second, octaves, d=D, rate=12, own=None):
+    """A learner's text with its moments' lines (first moments zero), for the law's controls; own, each entry's rate, a trailing rates line."""
     c = d.get("carry", 0)
     words = (["hnn-field-v14t"] if c else ["hnn-field-v14"]) + [str(d[k]) for k in KEYS] + ["0"] + ([str(c)] if c else [])
     line = [octaves[p] for p in part_rates.written(d)]
     with open(path, "w") as f:
         f.write(f"hnn-field-learner-v3 {rate} 0 0 -\n" + " ".join(words) + "\n" + " ".join(str(int(x)) for x in theta) + "\n"
-                + " ".join("0" for _ in theta) + "\n" + " ".join(str(int(x)) for x in second) + "\n" + "parts " + " ".join(str(k) for k in [OLD_F] + line) + "\n")
+                + " ".join("0" for _ in theta) + "\n" + " ".join(str(int(x)) for x in second) + "\n" + "parts " + " ".join(str(k) for k in [OLD_F] + line) + "\n"
+                + ("" if own is None else "rates " + " ".join(str(r) for r in own) + "\n"))
 
 
 def polar_controls(p):
@@ -286,6 +288,139 @@ def polar_controls(p):
             assert written[scale_part] == expect and sum(written) == expect, written
     print("part_rates polar: octaves known from their ratio, the edges, the clamps, a part with no fall at 0")
     print("part_rates polar: equal polarization is the fixed point; a part's doubled travel stands two octaves above the floor")
+
+
+
+def fields_of(text, head):
+    """The key=value words of the printed lines that begin with head, a dict a line."""
+    return [{k: v for k, v in (w.split("=", 1) for w in l.split(" ")[1:] if "=" in w)} for l in text.split("\n") if l.startswith(head + " ")]
+
+
+def blocks_controls(p):
+    """[theory, November 12 00:20] The block law: every block a part of its own at its own rate, decided in rationals."""
+    from fractions import Fraction as Fr
+    import state_travel
+    # The decision alone: signed octaves, a block with no fall one under its coolest, the bounds of an entry's rate, no floor.
+    oc = part_rates.block_octave
+    assert (oc(Fr(4), Fr(1), [0], 12), oc(Fr(1, 4), Fr(1), [0], 12), oc(Fr(1, 2), Fr(1), [3], 12)) == (2, -2, -1)
+    assert oc(Fr(2**20), Fr(1), [0], 12) == 11 and oc(Fr(1, 2**300), Fr(1), [0], 12) == 12 - part_rates.WIDEST_RATE
+    assert oc(Fr(-1), Fr(1), [-2, 0], 12) == -3 and oc(Fr(0), Fr(1), [3], 12) == 2
+    assert oc(None, Fr(1), [0], 12) is None and oc(Fr(1), None, [0], 12) is None and oc(Fr(1), Fr(0), [0], 12) is None
+    print("part_rates blocks: signed octaves from the ratio, no fall one under the coolest, an entry's rate from one bit to the carrier")
+
+    fam, total = state_travel.layout(D)
+    grain = [0] * total
+    for _, at, shape, g in fam:
+        n = 1
+        for x in shape:
+            n *= x
+        for i in range(at, at + n):
+            grain[i] = g
+    at_of = {name: at for name, at, _, _ in fam}
+    idx = {}
+    for block, lane, contacts, _, family, mask in state_travel.scale_blocks(D, OLD_F):
+        idx[(block, lane, contacts)] = [at_of[family] + j for j, m in enumerate(mask.ravel()) if m]
+    q2, v2, pr2, temper = idx[("q", 2, "all")], idx[("v", 2, "all")], idx[("probe", 2, "all")], idx[("temper", 0, "all")]
+    r1, r2 = idx[("read_rows", 1, "all")], idx[("read_rows", 2, "all")]
+    zero = [0] * part_rates.PARTS
+
+    def means(name, k=None, back=None, second=None, octaves=zero, own=None):
+        """Four means: every entry travels k units on the first and the third travel (2 where k does not name it) and none between,
+        back its third travel's sign; own[j] the rates line of mean j (None: none)."""
+        k, back = k or {}, back or {}
+        paths = []
+        for j in range(4):
+            theta = []
+            for i in range(total):
+                unit, ki = 1 << (grain[i] - 16), k.get(i, 2)
+                theta.append(unit * (0 if j == 0 else ki if j < 3 else ki + back.get(i, 1) * ki))
+            path = p(f"{name}_m{j}")
+            learner_text(path, theta, second or [1 << 20] * total, octaves, own=None if own is None else own[j])
+            paths.append(path)
+        return paths
+
+    def blocks(paths, state, out):
+        text = io.StringIO()
+        with redirect_stdout(text):
+            part_rates.blocks(paths, state, out)
+        got = {(f["block"], f["lane"], f["contacts"]): f for f in fields_of(text.getvalue(), "FIELD_BLOCK_RATE")}
+        lines = open(out).read().split("\n")
+        return got, fields_of(text.getvalue(), "FIELD_BLOCK_FLOOR")[0], lines, [int(x) for x in lines[-2].split(" ")[1:]]
+
+    # Equal polarization everywhere is the floor itself: every block holds at the base word.
+    paths = means("blk_flat")
+    got, floor, lines, rates = blocks(paths, paths[3], p("blk_flat_out"))
+    assert len(got) == len(idx) and all(f["octave"] == "0" and f["move"] == "hold" and f["window"] == "one" for f in got.values()), got
+    assert floor["blocks"] == str(len(idx)) and rates == [12] * total
+    assert lines[-2].startswith("rates ") and lines[-3] == open(paths[3]).read().split("\n")[-2] and lines[-1] == ""
+    assert lines[:-2] == open(paths[3]).read().split("\n")[:-1], "every line of the state as it stands, the rates line after the parts line"
+    print("part_rates blocks: equal polarization is the floor; the state is written whole with its rates line after its parts line")
+
+    # A block that travels twice as far stands two octaves above the floor, half as far two under, one whose third travel goes back one
+    # under, and one without heat (no second moment) holds.
+    second = [0 if i in temper else 1 << 20 for i in range(total)]
+    k = {**{i: 4 for i in q2}, **{i: 1 for i in v2}}
+    paths = means("blk_moved", k=k, back={i: -1 for i in pr2}, second=second)
+    got, floor, _, rates = blocks(paths, paths[3], p("blk_moved_out"))
+    want = {("q", "2", "all"): ("2", "raise"), ("v", "2", "all"): ("-2", "cool"), ("probe", "2", "all"): ("-1", "cool"), ("temper", "0", "all"): ("0", "hold")}
+    for key, f in got.items():
+        assert (f["octave"], f["move"]) == want.get(key, ("0", "hold")), (key, f)
+    assert got[("temper", "0", "all")]["heat"] == "0" and got[("temper", "0", "all")]["pi"] == "-"
+    assert all(rates[i] == 10 for i in q2) and all(rates[i] == 14 for i in v2) and all(rates[i] == 13 for i in pr2)
+    assert sum(1 for r in rates if r == 12) == total - len(q2) - len(v2) - len(pr2)
+    print("part_rates blocks: twice the travel two octaves above, half two under, a travel that goes back one under, no heat holds")
+
+    # The window: a block whose rate changed inside the four means holds and leaves the floor; a block four laps at one octave under the
+    # base word whose polarization at that rate is the floor's comes back to it.
+    own_a = [11 if i in q2 else 13 if i in v2 else 12 for i in range(total)]
+    own_b = [13 if i in v2 else 12 for i in range(total)]
+    paths = means("blk_window", k={i: 1 for i in v2}, own=[own_a, own_b, own_b, own_b])
+    got, floor, _, rates = blocks(paths, paths[3], p("blk_window_out"))
+    assert got[("q", "2", "all")]["window"] == "two" and got[("q", "2", "all")]["move"] == "window" and all(rates[i] == 12 for i in q2)
+    assert got[("v", "2", "all")]["octave_was"] == "-1" and (got[("v", "2", "all")]["octave"], got[("v", "2", "all")]["move"]) == ("0", "raise")
+    assert all(rates[i] == 12 for i in v2) and floor["blocks"] == str(len(idx) - 2)
+    print("part_rates blocks: a window across a change of rate holds; a block at its own rate a window long is read at it")
+
+    # A block that mixed parts under a parts line (the first lane's read rows: their columns past the lane are read_lane's) becomes one.
+    raised = list(zero)
+    raised[part_rates.PART_NAMES.index("read_lane")] = 1
+    paths = means("blk_mixed", octaves=raised)
+    got, floor, _, rates = blocks(paths, paths[3], p("blk_mixed_out"))
+    assert got[("read_rows", "1", "all")]["octave_was"] == "0..1" and got[("read_rows", "1", "all")]["octave"] == "-1", got[("read_rows", "1", "all")]
+    assert got[("read_rows", "2", "all")]["octave_was"] == "1" and got[("read_rows", "2", "all")]["octave"] == "-2"
+    assert all(rates[i] == 13 for i in r1) and all(rates[i] == 14 for i in r2) and floor["blocks"] == str(len(idx) - 2)
+    # The same rates carried as each entry's own (`own`) read the same.
+    for j, path in enumerate(paths):
+        run("own", path, p(f"blk_own{j}"))
+    assert part_rates.own_line(open(p("blk_own3")).read().split("\n"), total) == part_rates.learner_rates(D, 12, (OLD_F, raised), None, total)
+    again = blocks([p(f"blk_own{j}") for j in range(4)], p("blk_own3"), p("blk_own_out"))
+    assert again[0] == got and again[3] == rates
+    print("part_rates blocks: a block of two parts' rates is read at both and set at one; the parts' rates carried as each entry's own read the same")
+
+    # Refusals: the octave verbs and the base word on a state with its own rates, four means at another base word, a standing file.
+    state = p("blk_own3")
+    for args in (("update", state, state, state, p("blk_x1")), ("means", state, state, state, state, p("blk_x2")),
+                 ("open", state, str(OLD_F), ",".join("0" for _ in range(19)), p("blk_x3")), ("base", state, "11", p("blk_x4")),
+                 ("own", state, p("blk_x5")), ("polar", state, state, state, state, state, p("blk_x6"))):
+        try:
+            run(*args)
+        except AssertionError:
+            pass
+        else:
+            raise AssertionError(f"not refused: {args[0]} on a state with its own rates")
+    hot = p("blk_hot_m0")
+    with open(hot, "w") as f:
+        f.write(open(paths[0]).read().replace("hnn-field-learner-v3 12 ", "hnn-field-learner-v3 11 ", 1))
+    for args in (([hot] + paths[1:], paths[3], p("blk_x7")), (paths, paths[3], p("blk_mixed_out"))):
+        try:
+            with redirect_stdout(io.StringIO()):
+                part_rates.blocks(*args)
+        except (AssertionError, FileExistsError):
+            pass
+        else:
+            raise AssertionError(f"not refused: blocks writing {os.path.basename(args[2])}")
+    assert not any(os.path.exists(p(f"blk_x{j}")) for j in range(1, 8))
+    print("part_rates blocks: the octave verbs and the base word refuse a state with its own rates; another base word and a standing file are refused")
 
 
 if __name__ == "__main__":

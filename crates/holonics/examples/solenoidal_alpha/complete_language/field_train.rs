@@ -1150,6 +1150,16 @@ pub(super) fn train(args: &[String], realization: &mut dyn FieldRealization) -> 
         let octaves: Vec<String> = holonics::hnn::tower::field::written_parts(learner.field.declaration.carry).iter().map(|&p| format!("{}={}", holonics::hnn::tower::field::PART_NAMES[p], rp.octaves[p])).collect();
         println!("FIELD_PART_RATES contacts_before={} rate_bits={} octaves {}", rp.contacts_before, learner.rate_bits, octaves.join(" "));
     }
+    if let Some(own) = &learner.own_rates {
+        // [definition; theory, November 12 00:20] Each entry's own rate (`FieldLearner::own_rates`), which governs where it stands: the
+        // entries at each rate, fastest first.
+        let mut at = std::collections::BTreeMap::new();
+        for &r in own {
+            *at.entry(r).or_insert(0usize) += 1;
+        }
+        let counts: Vec<String> = at.iter().map(|(r, n)| format!("{r}:{n}")).collect();
+        println!("FIELD_OWN_RATES entries={} rate_bits={} at {}", own.len(), learner.rate_bits, counts.join(" "));
+    }
     if learner.field.declaration.alphabet != codec.alphabet() {
         return Err("a continued learner whose alphabet is not the codec's".into());
     }

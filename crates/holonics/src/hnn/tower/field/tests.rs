@@ -2184,6 +2184,48 @@ fn grown_learner_text_of(learner: &FieldLearner) -> String {
     plain.to_text()
 }
 
+/// [definition; theory, November 12 00:20] **An entry steps at its own rate where the learner carries it**: own rates equal to the parts'
+/// give the parts' deposit bit for bit over three sections; rates of their own (some entries under the base word, some over it) step each
+/// entry at its own rate; the line trails the state and round-trips through the learner's text, a state without it reads as none, and a
+/// line that is not one count an entry, or that holds a rate of zero or one past the step's carrier, is refused.
+#[test]
+fn an_entry_steps_at_its_own_rate_where_the_learner_carries_it() {
+    let mut octaves = [0u32; PARTS];
+    (octaves[0], octaves[1]) = (2, 3);
+    let mut parts = grown_learner();
+    parts.rate_parts = Some(RateParts { contacts_before: 4, octaves });
+    let mut own = parts.clone();
+    own.own_rates = Some(parts.entry_rates());
+    for _ in 0..3 {
+        parts.section(&[region()]).unwrap();
+        own.section(&[region()]).unwrap();
+    }
+    assert_eq!((parts.field.theta.clone(), parts.first.clone(), parts.second.clone()), (own.field.theta.clone(), own.first.clone(), own.second.clone()), "own rates equal to the parts': the parts' deposit");
+    // Rates of their own about the base 6: every third entry two bits slower, every other fifth one bit faster.
+    let mut free = grown_learner();
+    let rates: Vec<u32> = (0..free.field.material_len()).map(|i| if i % 3 == 0 { 8 } else if i % 5 == 0 { 5 } else { 6 }).collect();
+    free.own_rates = Some(rates.clone());
+    assert_eq!(free.entry_rates(), rates);
+    free.section(&[region()]).unwrap();
+    let step = free.last.as_ref().unwrap().step.clone();
+    for &(start, len, grain) in &free.field.families_all() {
+        for i in start..start + len {
+            assert_eq!(step[i], deposit_step(free.first[i], free.second[i], grain, rates[i]), "entry {i} steps at its own rate");
+        }
+    }
+    let text = free.to_text();
+    assert!(text.lines().last().unwrap().starts_with("rates "), "the line trails the state");
+    assert_eq!(FieldLearner::from_text(&text).unwrap().own_rates, free.own_rates);
+    let stripped: String = text.lines().filter(|l| !l.starts_with("rates ")).map(|l| format!("{l}\n")).collect();
+    assert_eq!(FieldLearner::from_text(&stripped).unwrap().own_rates, None, "a state without the line has no own rates");
+    let short: String = text.lines().map(|l| if l.starts_with("rates ") { format!("{}\n", l.rsplit_once(' ').unwrap().0) } else { format!("{l}\n") }).collect();
+    assert!(FieldLearner::from_text(&short).is_err(), "a line that is not one count an entry is refused");
+    for bad in ["0", "128"] {
+        let wrong: String = text.lines().map(|l| if l.starts_with("rates ") { format!("{} {bad}\n", l.rsplit_once(' ').unwrap().0) } else { format!("{l}\n") }).collect();
+        assert!(FieldLearner::from_text(&wrong).is_err(), "a rate of {bad} is refused");
+    }
+}
+
 /// [measurement; theory, November 10 19:05] The founded parts and their travel read from saved states (`HOLONICS_PARTS_OLDER`,
 /// `HOLONICS_PARTS_OLD`, `HOLONICS_PARTS_NOW`, `HOLONICS_PARTS_BEFORE`: the paths of three learner states of one line and the contact
 /// count before the growth): the entries each part holds and its travel's cosine in millionths, printed as `PART name entries c`, the

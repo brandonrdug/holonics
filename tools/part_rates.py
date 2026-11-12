@@ -8,6 +8,9 @@
   part_rates.py base STATE RATE_BITS OUT         (theory, November 11: the learner's own rate word; see below)
   part_rates.py polar MEAN_A MEAN_B MEAN_C MEAN_D STATE OUT [SECTIONS SITES]   (theory, November 11 21:15, G86: a part's rate follows its
                                                  polarization; see polar())
+  part_rates.py blocks MEAN_A MEAN_B MEAN_C MEAN_D STATE OUT [SECTIONS SITES]  (theory, November 12 00:20, G86's branch 1: every block a
+                                                 part of its own, each entry's own rate; see blocks())
+  part_rates.py own STATE OUT                    (theory, November 12: the state with each entry's rate written as its own; see below)
 
 The learner's text carries each founded part's octaves in a trailing `parts CONTACTS_BEFORE k0 .. k15` line (holonics::hnn::tower::field::
 RateParts), and `.. k18` where the field has carry circles (theory, November 11 17:25: the circles' charts `carry`, their W columns
@@ -31,6 +34,14 @@ steps every entry of no founded part at, 2^-RATE_BITS; a founded part steps at 2
 word, line and the material as they stand. One bit fewer is the whole machine one octave hotter, parts and old entries alike, which no
 octave line can say (an octave is never under 0). It refuses a rate that leaves a part's octave at or past it. OUT is a state a tool
 wrote, checked before a lap trains from it.
+
+Each entry's own rate (theory, November 12 00:20, the Einstein record's U2): a state may carry a trailing `rates r0 .. r(n-1)` line after its
+parts line, one count an entry (holonics::hnn::tower::field::FieldLearner::own_rates), and where it stands it is every entry's rate: the
+parts' octaves and the base word then govern none (the parts line is kept for its contacts count). `blocks` writes it; the octave verbs
+(open, update, means, trend, polar) and `base` refuse a state that carries it, since an octave they moved would move no entry. Every reader
+here and in tools/state_travel.py takes an entry's rate from it where it stands. `own` writes STATE with the line set to the rates its
+parts and base word give (FieldLearner::entry_rates), every other line as it stands: the same rates carried the new way, a state a build
+of the line trains from to show that the line changes no bit where the rates are the parts'.
 """
 import sys
 from math import isqrt
@@ -179,7 +190,57 @@ def parts_line(lines, d):
     return None
 
 
+WIDEST_RATE = 127  # an entry's rate is under the step's carrier: the deposit shifts an i128 (holonics::hnn::tower::deposit_step)
+
+
+def own_line(lines, total=None):
+    """A state's `rates` line, each entry's own deposit rate in bits (theory, November 12; FieldLearner::own_rates), as a list; None
+    without one."""
+    for l in lines:
+        if l.startswith("rates "):
+            v = [int(x) for x in l.split(" ")[1:]]
+            assert total is None or len(v) == total, "a learner's own rates, one an entry"
+            assert all(0 < r <= WIDEST_RATE for r in v), "an entry's own rate under one bit or past the step's carrier"
+            return v
+    return None
+
+
+def learner_rates(d, rate, held, own, total):
+    """Each entry's deposit rate in bits (FieldLearner::entry_rates): its own where the state carries the `rates` line; otherwise the
+    base word, less its founded part's octaves (held, a parts line as parts_line reads it, or None), never under one bit."""
+    if own is not None:
+        assert len(own) == total, "a learner's own rates, one an entry"
+        return list(own)
+    if held is None:
+        return [rate] * total
+    parts = founded_parts(d, held[0])
+    assert len(parts) == total
+    return [max(rate - (held[1][p] if p != OLD else 0), 1) for p in parts]
+
+
+def write_rates(lines, rates, out):
+    """A state's lines with its `rates` line set to RATES (one count an entry), after its parts line (FieldLearner::from_text reads the
+    line where the parts line ends), every other line as it stands."""
+    kept = [l for l in lines if not l.startswith("rates ")]
+    while kept and kept[-1] == "":
+        kept.pop()
+    assert not any(l.startswith("parts ") for l in kept) or kept[-1].startswith("parts "), "a learner's text whose parts line is its last"
+    assert all(0 < r <= WIDEST_RATE for r in rates), "an entry's own rate under one bit or past the step's carrier"
+    kept.append("rates " + " ".join(str(r) for r in rates))
+    with open(out, "x") as f:
+        f.write("\n".join(kept) + "\n")
+
+
+def census(rates):
+    """The entries at each rate, fastest first, as the trainer's FIELD_OWN_RATES prints them."""
+    at = {}
+    for r in rates:
+        at[r] = at.get(r, 0) + 1
+    return " ".join(f"{r}:{at[r]}" for r in sorted(at))
+
+
 def write(lines, d, contacts_before, octaves, out):
+    assert own_line(lines) is None, "a state whose entries carry their own rates (its rates line): a part's octave moves none of them"
     kept = [l for l in lines if not l.startswith("parts ")]
     while kept and kept[-1] == "":
         kept.pop()
@@ -247,8 +308,17 @@ def main():
         trend(args[1:5], args[5])
     elif len(args) in (7, 9) and args[0] == "polar":
         polar(args[1:5], args[5], args[6], *(int(x) for x in args[7:9]))
+    elif len(args) in (7, 9) and args[0] == "blocks":
+        blocks(args[1:5], args[5], args[6], *(int(x) for x in args[7:9]))
+    elif len(args) == 3 and args[0] == "own":
+        lines, d, rate, theta = load(args[1])
+        assert own_line(lines) is None, "a state that carries its own rates already"
+        rates = learner_rates(d, rate, parts_line(lines, d), None, len(theta))
+        print(f"FIELD_OWN_RATES entries={len(rates)} rate_bits={rate} at {census(rates)}")
+        write_rates(lines, rates, args[2])
     elif len(args) == 4 and args[0] == "base":
         lines, d, rate, _ = load(args[1])
+        assert own_line(lines) is None, "a state whose entries carry their own rates (its rates line): the base word moves none of them"
         bits = int(args[2])
         head = lines[0].split(" ")
         assert head[0] == "hnn-field-learner-v3" and len(head) == 5 and head[4] == "-", "a learner's text with no held step"
@@ -306,14 +376,15 @@ def polar_octaves(heat, heat_base, fall, rate_bits):
 
 
 def rational_learner(path):
-    """A saved learner read for the law's prices in rationals: (lines, d, rate_bits, theta, s, parts), s each entry's floor root of its second
-    moment (the deposit's own root, within one unit of the ruler's float root), parts the expanded octaves line or None."""
+    """A saved learner read for the law's prices in rationals: (lines, d, rate_bits, theta, s, parts, own), s each entry's floor root of its
+    second moment (the deposit's own root, within one unit of the ruler's float root), parts the expanded octaves line or None, own its
+    rates line (each entry's own rate, theory, November 12) or None."""
     from math import isqrt
     lines, d, rate, theta = load(path)
     second = [int(x) for x in lines[4].split(" ")]
     assert len(second) == len(theta), "a learner's text with its moments' lines"
     s = [isqrt(v) if v > 0 else 0 for v in second]
-    return lines, d, rate, theta, s, parts_line(lines, d)
+    return lines, d, rate, theta, s, parts_line(lines, d), own_line(lines, len(theta))
 
 
 def polar(paths, state, out, sections=None, sites=None):
@@ -330,8 +401,9 @@ def polar(paths, state, out, sections=None, sites=None):
     pi_F is that share against the floor's, so its rate stands log2(pi_p / pi_F) octaves above the floor's."""
     from fractions import Fraction
     import state_travel
-    lines, d, rate, theta_t, _, held = rational_learner(state)
+    lines, d, rate, theta_t, _, held, own_t = rational_learner(state)
     assert held is not None, "a state with no founded parts' rates (open sets them)"
+    assert own_t is None, "a state whose entries carry their own rates (its rates line): a part's octave moves none of them"
     contacts_before, old_octaves = held
     means = [rational_learner(pth) for pth in paths]
     assert all(m[1] == d and len(m[3]) == len(theta_t) for m in means), "four means of the state's declaration"
@@ -347,6 +419,8 @@ def polar(paths, state, out, sections=None, sites=None):
     keys = sorted(set(parts))
 
     def rates_of(m):
+        if m[6] is not None:  # a mean whose entries carried their own rates (theory, November 12)
+            return list(m[6])
         r, oc = m[2], (m[5][1] if m[5] is not None else [0] * PARTS)
         return [max(r - (oc[p] if p != OLD else 0), 1) for p in parts]
 
@@ -389,6 +463,117 @@ def polar(paths, state, out, sections=None, sites=None):
     for p in written(d):
         new_octaves[p] = octaves.get(p, 0)
     write(lines, d, contacts_before, new_octaves, out)
+
+
+def block_octave(pi, pi_f, present, rate_bits):
+    """[definition; theory, November 12 00:20] A block's octave under the block law, in rationals (Fraction), with no float; None where it
+    holds. pi the block's polarization at its own rates (None where it holds no heat), pi_f the floor's (None where there is no floor),
+    present its octaves in STATE (one, or the several a parts line gave a block that mixes parts). The octave nearest log2(pi / pi_f)
+    (octave_of), signed: under 0 where its polarization stands under the floor's, a rate above the base word. Where pi is 0 or under, one
+    octave under the coolest of its present ones. Bounded by an entry's rate of one bit (rate_bits - 1) and of WIDEST_RATE."""
+    if pi is None or pi_f is None or pi_f <= 0:
+        return None
+    lo, hi = rate_bits - WIDEST_RATE, rate_bits - 1
+    o = min(present) - 1 if pi <= 0 else octave_of(pi / pi_f)
+    return min(max(o, lo), hi)
+
+
+def blocks(paths, state, out, sections=None, sites=None):
+    """[definition; theory, November 12 00:20: G86's rule, branch 1, and the Einstein record's U2] **Every block a part of its own.** The
+    blocks are tools/state_travel.py's scale_blocks (each family by lane and by new or old contacts; with carry circles the turn rows and
+    the leak rows apart, and their biases apart), the partition G86's polarization was read on and every entry in one of them. From the
+    means of four consecutive laps A, B, C, D (in order) and for each block b: its heat H_b and its fall two laps on F_b at its entries'
+    own rates, priced as polar() prices a part's (the heat averaged over the three travels at the rates of the state each ends in, the
+    fall at the rates of B), pi_b = F_b / H_b, in rationals of the means' integers.
+    - A block moves only where its window stands at one rate: every entry's rate the same in the four means as in STATE (the lap's end
+      state the next lap trains from). Reason: G86 (c) missed because its window straddled a change of rates (one raised travel at g2,
+      two at g3), and a fall two laps on read across a change mixes the travel of two rates (the guess file's G86 score). So a block
+      that moves holds through its next four laps.
+    - The floor pi_F = sum F_b / sum H_b over the blocks whose every entry stood at the base word in all four means.
+    - A block in its window takes block_octave: the octave nearest log2(pi_b / pi_F), signed, so a block whose polarization stands under
+      the floor's steps under the base word. Reason (U2): a part whose travel returns two laps on buys nothing and holds rent, so its rate
+      belongs under the floor, and pi_b / pi_F is its drift's share over its noise against the floor's (atlas
+      deposition.block-polarization). Where F_b is 0 or under, one octave under its present. Every entry of the block takes the block's
+      rate, so a block that mixed parts (the first lane's read rows under a parts line) becomes one.
+    - A block without heat holds, and every block holds where no block stood at the floor.
+    STATE is written to OUT with its rates line (one count an entry, after its parts line, which is kept for its contacts count and no
+    longer governs; FieldLearner::own_rates), every other line as it stands. One FIELD_BLOCK_RATE line a block (its entries, the open ones
+    in D, heat, base heat, fall, pi in the ruler's units, millionths of a bit a site, where SECTIONS and SITES are given; whether its
+    window stands at one rate; its octave in STATE and the new), FIELD_BLOCK_FLOOR, and FIELD_BLOCK_RATES, the entries at each rate.
+    Owed, each with its guess before it acts (agent-inferred): on a line with a founding inside the window, the floor leaves out the blocks
+    that charge, whose fall is their charging; and at a moved block's fourth lap at its new rate, the step between two windows at two
+    octaves, where a raise that paid (its marginal dF/dH above pi_F) takes one more octave and one that did not steps back."""
+    from fractions import Fraction
+    import numpy as np
+    import state_travel
+    lines, d, rate, theta_t, _, held, own_t = rational_learner(state)
+    assert held is not None, "a state with its count of contacts before the growth (its parts line; open sets it)"
+    contacts_before = held[0]
+    total = len(theta_t)
+    assert len(paths) == 4, "four means"
+    means = [rational_learner(pth) for pth in paths]
+    assert all(m[1] == d and len(m[3]) == total for m in means), "four means of the state's declaration"
+    assert all(m[2] == rate for m in means), "four means at the state's base word (a move of the base word is a window of two rates)"
+    assert all(m[5] is None or m[5][0] == contacts_before for m in means), "four means of the state's contacts"
+    fam, length = state_travel.layout(d)
+    assert length == total, "the material's length"
+    at_of = {name: at for name, at, _, _ in fam}
+    grain = [0] * total
+    for _, at, shape, g in fam:
+        n = 1
+        for x in shape:
+            n *= x
+        for i in range(at, at + n):
+            grain[i] = g
+    blk, seen = [], [0] * total
+    for block, lane, contacts, _, family, mask in state_travel.scale_blocks(d, contacts_before):
+        idx = [at_of[family] + int(j) for j in np.flatnonzero(mask.ravel())]
+        for i in idx:
+            seen[i] += 1
+        blk.append((block, lane, contacts, idx))
+    assert all(x == 1 for x in seen), "the blocks hold every entry once"
+    now = learner_rates(d, rate, held, own_t, total)
+    rates = [learner_rates(d, rate, m[5], m[6], total) for m in means]
+    big = max(max(r) for r in rates)
+    unit_h = Fraction(sections * 10**6, 4 * sites) if sections and sites else Fraction(1)
+    unit_f = Fraction(10**6, sites) if sections and sites else Fraction(1)
+    A, B, C, D = (m[3] for m in means)
+    sB, rB = means[1][4], rates[1]
+    rows = []
+    for block, lane, contacts, idx in blk:
+        h = sum(means[k + 1][4][i] << (big - rates[k + 1][i]) for k in range(3) for i in idx)
+        h0 = sum(means[k + 1][4][i] for k in range(3) for i in idx)
+        f = sum((sB[i] * (B[i] - A[i]) * (D[i] - C[i])) << (rB[i] + 48 - 2 * grain[i]) for i in idx)
+        heat = Fraction(h, 2 ** (big + 32)) / 3 * unit_h
+        rows.append({
+            "block": block, "lane": lane, "contacts": contacts, "idx": idx,
+            "heat": heat, "heat_base": Fraction(h0, 2 ** (rate + 32)) / 3 * unit_h, "fall": Fraction(f, 2**80) * unit_f,
+            "open": sum(1 for i in idx if means[3][4][i] > 0),
+            "one": all(r[i] == now[i] for r in rates for i in idx),
+            "floor": all(r[i] == rate for r in rates for i in idx),
+            "present": sorted({rate - now[i] for i in idx}),
+        })
+    floor = [r for r in rows if r["floor"] and r["heat"] > 0]
+    floor_heat = sum((r["heat"] for r in floor), Fraction(0))
+    floor_fall = sum((r["fall"] for r in floor), Fraction(0))
+    pi_f = floor_fall / floor_heat if floor_heat > 0 else None
+    new = list(now)
+    show = lambda q: f"{float(q):.6g}" if q is not None else "-"
+    for r in rows:
+        pi = r["fall"] / r["heat"] if r["heat"] > 0 else None
+        o = block_octave(pi, pi_f, r["present"], rate) if r["one"] else None
+        was = "..".join(str(k) for k in (r["present"] if len(r["present"]) == 1 else (r["present"][0], r["present"][-1])))
+        if o is None:
+            move, octave = ("hold" if r["one"] else "window"), was
+        else:
+            for i in r["idx"]:
+                new[i] = rate - o
+            octave = str(o)
+            move = "hold" if r["present"] == [o] else ("raise" if o > r["present"][-1] else "cool" if o < r["present"][0] else "join")
+        print(f"FIELD_BLOCK_RATE block={r['block']} lane={r['lane']} contacts={r['contacts']} entries={len(r['idx'])} open={r['open']} heat={show(r['heat'])} heat_base={show(r['heat_base'])} fall2={show(r['fall'])} pi={show(pi)} window={'one' if r['one'] else 'two'} octave_was={was} octave={octave} move={move} rate_bits={rate - int(octave) if o is not None or len(r['present']) == 1 else '-'}")
+    print(f"FIELD_BLOCK_FLOOR pi_F={show(pi_f)} blocks={len(floor)} entries={sum(len(r['idx']) for r in floor)} heat={show(floor_heat)} fall2={show(floor_fall)} rate_bits={rate} units={'millionths of a bit a site' if sections and sites else 'the means integers (no SECTIONS and SITES given)'}")
+    print(f"FIELD_BLOCK_RATES entries={total} rate_bits={rate} at {census(new)}")
+    write_rates(lines, new, out)
 
 
 def fixed(num, den):

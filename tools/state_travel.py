@@ -53,8 +53,8 @@ line). For each block of `scale` (with carry circles their charts by lane, the t
 biases q_b and h_b apart: the turn is a phase and the leak a modulus, so one block would mix two laws):
   WEIGHED_LAP   the block's entries and how many have opened (s above 0), its travel's rms, and heat: 2^-rate s_i / 4 summed, the
                 standing spread's cost if every entry rests in its own noise (an entry at rest under this step holds a variance
-                2^-rate s / 2H at curvature H, a cost 2^-rate s / 4 whatever H), at the rates the lap ran at (the `parts` line of
-                the state the lap ended in) and at the base rate, in millionths of a bit a site as a section line prices a step;
+                2^-rate s / 2H at curvature H, a cost 2^-rate s / 4 whatever H), at the rates the lap ran at (the `rates` line of
+                the state the lap ended in, each entry's own, or else its `parts` line) and at the base rate, in millionths of a bit a site as a section line prices a step;
                 and own, the lap's travel priced at the covector that would have moved it alone, sum s_i d_i^2 2^(rate - 32 -
                 2 grain) / SITES in the same unit. A walk of free steps holds 4 heat there between lap ends and two thirds of
                 that between lap means, and a part at rest in a well holds less by its relaxation time over the lap; a travel
@@ -359,24 +359,32 @@ def scale(old_f, paths):
 
 
 def learner(path):
-    """A saved learner's declaration, material, the roots of its second moments, its base rate's bits and its `parts` line (None
-    without one): `(d, theta, s, rate_bits, (contacts_before, octaves))`."""
+    """A saved learner's declaration, material, the roots of its second moments, its base rate's bits, its `parts` line (None
+    without one) and its `rates` line, each entry's own rate (None without one; theory, November 12):
+    `(d, theta, s, rate_bits, (contacts_before, octaves), own)`."""
     lines = open(path).read().split("\n")
     d, theta = state(path)
     assert len(lines) > 4, "a learner's text with its two moments' lines"
     first_len = lines[3].count(" ") + 1
     second = np.array(lines[4].split(" "), dtype=np.float64)
     assert first_len == len(theta) == len(second), "each moment's line is the material's length"
-    parts = None
+    parts, own = None, None
     for line in lines[5:]:
         if line.startswith("parts "):
             v = [int(x) for x in line.split(" ")[1:]]
             parts = (v[0], v[1:])
-    return d, theta, np.sqrt(np.maximum(second, 0.0)), int(lines[0].split(" ")[1]), parts
+        elif line.startswith("rates "):
+            own = np.array(line.split(" ")[1:], dtype=np.int64)
+            assert len(own) == len(theta), "a learner's own rates, one an entry"
+    return d, theta, np.sqrt(np.maximum(second, 0.0)), int(lines[0].split(" ")[1]), parts, own
 
 
-def entry_rates(d, total, rate_bits, parts):
-    """Each entry's deposit rate in bits (FieldLearner::entry_rates): the base rate, less its founded part's octaves, never under one."""
+def entry_rates(d, total, rate_bits, parts, own=None):
+    """Each entry's deposit rate in bits (FieldLearner::entry_rates): where the state carries each entry's own rate (its `rates` line,
+    the block law's; theory, November 12), that rate; otherwise the base rate, less its founded part's octaves, never under one."""
+    if own is not None:
+        assert len(own) == total, "a learner's own rates, one an entry"
+        return np.array(own, dtype=np.int64)
     rates = np.full(total, rate_bits, dtype=np.int64)
     if parts is not None:
         sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -412,15 +420,15 @@ def weighed(old_f, sections, sites, paths):
     assert (seen == 1).all(), "the blocks hold every entry once"
     print(f"# declaration {d}; contacts {old_f} -> {d['contacts']}; lane width {d['width'] // d['lanes']}; {sections} sections and {sites} sites a lap")
     for i, path in enumerate(paths):
-        print(f"# state {i} {path} rate_bits={states[i][3]} parts={'-' if states[i][4] is None else ','.join(str(k) for k in states[i][4][1])}")
+        print(f"# state {i} {path} rate_bits={states[i][3]} parts={'-' if states[i][4] is None else ','.join(str(k) for k in states[i][4][1])} rates={'-' if states[i][5] is None else 'own'}")
     micro = 1e6
     per_section = sites / sections
     travels, rates = [], []
     for k in range(len(states) - 1):
-        _, theta0, _, _, _ = states[k]
-        _, theta1, s1, rate_bits, parts = states[k + 1]
+        theta0 = states[k][1]
+        _, theta1, s1, rate_bits, parts, own = states[k + 1]
         dv = (theta1 - theta0).astype(np.float64)
-        rate = entry_rates(d, total, rate_bits, parts)
+        rate = entry_rates(d, total, rate_bits, parts, own)
         heat = np.exp2(-rate.astype(np.float64) - 32) * s1 / (4 * per_section) * micro
         heat_base = np.exp2(-float(rate_bits) - 32) * s1 / (4 * per_section) * micro
         own = s1 * dv * dv * np.exp2(rate.astype(np.float64) - 32 - 2 * grain_of) / sites * micro

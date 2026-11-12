@@ -5813,6 +5813,12 @@ pub struct FieldLearner {
     /// [definition; theory, November 10 19:05] The founded parts' deposit rates ([`RateParts`]), carried in the learner's text; none
     /// (every entry at `rate_bits`) in a state without them.
     pub rate_parts: Option<RateParts>,
+    /// [definition; theory, November 12 00:20, the Einstein record's U2] **Each entry's own deposit rate**, in bits (the entry steps at
+    /// `2^(−rate)`), set between laps by the host law (`tools/part_rates.py blocks`: every block of the material a part of its own, its
+    /// rate following its polarization, under the base word where that stands under the floor's) and carried in the learner's text as a
+    /// trailing `rates` line, one count an entry. Where it stands it is every entry's rate ([`FieldLearner::entry_rates`]); the parts'
+    /// line is kept beside it for its contacts count. None in a state without the line, and after every growth (the law sets it again).
+    pub own_rates: Option<Vec<u32>>,
     /// [measurement; §16.41] The step the last section stood at, the operand of the next section's
     /// [`FieldReceipt::transfer`]; a reading's operand, not carried in the learner's text, cleared by every growth, and not
     /// kept under the held read (whose next section moves the step before pricing it).
@@ -5825,7 +5831,7 @@ impl FieldLearner {
     pub fn new(field: Field, rate_bits: u32) -> Self {
         let len = field.material_len();
         let drawn = 4 * field.declaration.founding_draws();
-        Self { field, first: vec![0; len], second: vec![0; len], rate_bits, drawn, laps: 0, held: None, read_held: false, rate_parts: None, last: None }
+        Self { field, first: vec![0; len], second: vec![0; len], rate_bits, drawn, laps: 0, held: None, read_held: false, rate_parts: None, own_rates: None, last: None }
     }
 
     /// Whether a deposited step is held for the next regions' read.
@@ -5852,7 +5858,7 @@ impl FieldLearner {
         let second = from.iter().map(|&(i, divided)| if divided { div_nearest(self.second[i], f2) } else { self.second[i] }).collect();
         let drawn = self.drawn + 4 * self.field.growth_draws(factor);
         let rate_bits = self.rate_bits + (usize::BITS - (factor - 1).leading_zeros());
-        Ok(Self { field, first, second, rate_bits, drawn, laps: self.laps, held: None, read_held: self.read_held, rate_parts: None, last: None })
+        Ok(Self { field, first, second, rate_bits, drawn, laps: self.laps, held: None, read_held: self.read_held, rate_parts: None, own_rates: None, last: None })
     }
 
     /// [definition; agent-inferred, November 4, §16.40] **The learner with one more lane** ([`Field::laned`]), the lane's
@@ -5892,7 +5898,7 @@ impl FieldLearner {
             }
         }
         let drawn = self.drawn + 4 * self.field.declaration.lane_draws();
-        Ok(Self { field, first, second, rate_bits: self.rate_bits, drawn, laps: self.laps, held: None, read_held: self.read_held, rate_parts: None, last: None })
+        Ok(Self { field, first, second, rate_bits: self.rate_bits, drawn, laps: self.laps, held: None, read_held: self.read_held, rate_parts: None, own_rates: None, last: None })
     }
 
     /// [definition; theory, November 11 17:25] **The learner with `circles` carry circles** ([`Field::with_carry`]), the circles' draws read from
@@ -5922,7 +5928,7 @@ impl FieldLearner {
             }
         }
         let drawn = self.drawn + 4 * self.field.declaration.carry_draws(circles);
-        Ok(Self { field, first, second, rate_bits: self.rate_bits, drawn, laps: self.laps, held: None, read_held: self.read_held, rate_parts: self.rate_parts, last: None })
+        Ok(Self { field, first, second, rate_bits: self.rate_bits, drawn, laps: self.laps, held: None, read_held: self.read_held, rate_parts: self.rate_parts, own_rates: None, last: None })
     }
 
     /// [definition; theory, November 10 09:55] **The learner with `added` more pair contacts** ([`Field::contacted`]), the
@@ -5953,7 +5959,7 @@ impl FieldLearner {
             }
         }
         let drawn = self.drawn + 4 * self.field.declaration.contact_draws(added);
-        Ok(Self { field, first, second, rate_bits: self.rate_bits, drawn, laps: self.laps, held: None, read_held: self.read_held, rate_parts: None, last: None })
+        Ok(Self { field, first, second, rate_bits: self.rate_bits, drawn, laps: self.laps, held: None, read_held: self.read_held, rate_parts: None, own_rates: None, last: None })
     }
 
     /// The held step read on `regions` without a deposit: the faces of `regions` under the
@@ -6010,8 +6016,13 @@ impl FieldLearner {
     }
 
     /// [definition; theory, November 10 19:05] **Each entry's deposit rate**: the learner's `rate_bits`, and for an entry of a founded
-    /// part ([`Field::founded_parts`]) that many bits less its part's octaves ([`RateParts`]), never under one bit.
+    /// part ([`Field::founded_parts`]) that many bits less its part's octaves ([`RateParts`]), never under one bit; where the learner
+    /// carries each entry's own rate ([`FieldLearner::own_rates`], November 12), that rate.
     pub fn entry_rates(&self) -> Vec<u32> {
+        // [theory, November 12 00:20] An entry's own rate, where the learner carries the line, is its rate.
+        if let Some(own) = &self.own_rates {
+            return own.clone();
+        }
         let mut rates = vec![self.rate_bits; self.field.material_len()];
         if let Some(rp) = self.rate_parts {
             for (rate, &p) in rates.iter_mut().zip(&self.field.founded_parts(rp.contacts_before)) {
@@ -6110,7 +6121,7 @@ impl FieldLearner {
         let (mut first, mut second) = (self.first.clone(), self.second.clone());
         first.resize(len, 0);
         second.resize(len, 0);
-        Ok(Self { field, first, second, rate_bits: self.rate_bits, drawn, laps: self.laps, held: None, read_held: self.read_held, rate_parts: None, last: None })
+        Ok(Self { field, first, second, rate_bits: self.rate_bits, drawn, laps: self.laps, held: None, read_held: self.read_held, rate_parts: None, own_rates: None, last: None })
     }
 
     /// [measurement; agent-inferred, November 3, §16.31] **Each family's step coherence**: over the family's entries, `Σ |m|`
@@ -6140,7 +6151,9 @@ impl FieldLearner {
             // [definition; theory, November 10 19:05] The founded parts' rates, a trailing line a binary without them never reads.
             // The parts the field has, in the line's order ([`written_parts`]): nineteen without carry circles, twenty-two with them.
             let parts = self.rate_parts.map_or(String::new(), |rp| format!("parts {} {}\n", rp.contacts_before, written_parts(self.field.declaration.carry).iter().map(|&p| rp.octaves[p].to_string()).collect::<Vec<_>>().join(" ")));
-            format!("hnn-field-learner-v3 {} {} {} {held}\n{}{}\n{}\n{step}{parts}", self.rate_bits, self.drawn, self.laps, self.field.to_text(), join(&self.first), join(&self.second))
+            // [definition; theory, November 12 00:20] Each entry's own rate, a trailing line after the parts' (`rates r₀ … r_(n−1)`).
+            let own = self.own_rates.as_ref().map_or(String::new(), |r| format!("rates {}\n", r.iter().map(u32::to_string).collect::<Vec<_>>().join(" ")));
+            format!("hnn-field-learner-v3 {} {} {} {held}\n{}{}\n{}\n{step}{parts}{own}", self.rate_bits, self.drawn, self.laps, self.field.to_text(), join(&self.first), join(&self.second))
         }
     }
 
@@ -6195,7 +6208,22 @@ impl FieldLearner {
             }
             _ => None,
         };
-        Ok(Self { field, first, second, rate_bits, read_held: held.is_some(), drawn, laps, held, rate_parts, last: None })
+        // [definition; theory, November 12 00:20] Each entry's own rate, a trailing line after the parts' (`rates r₀ … r_(n−1)`): one count
+        // an entry, each at least one bit and under the step's carrier (the deposit shifts an `i128`, [`deposit_step`]).
+        let own_rates = match lines.peek() {
+            Some(l) if l.starts_with("rates ") => {
+                let v = read_numbers::<u32>(lines.next().and_then(|l| l.strip_prefix("rates ")))?;
+                if v.len() != field.material_len() {
+                    return refuse("a learner's own rates that are not one an entry");
+                }
+                if v.iter().any(|&r| r == 0 || r >= i128::BITS) {
+                    return refuse("an entry's own rate under one bit or past the step's carrier");
+                }
+                Some(v)
+            }
+            _ => None,
+        };
+        Ok(Self { field, first, second, rate_bits, read_held: held.is_some(), drawn, laps, held, rate_parts, own_rates, last: None })
     }
 }
 
