@@ -1,0 +1,74 @@
+# G88's gates before tp1 (not guesses), 2026-11-11 UTC. TP0 = tools/part_rates.py open GROWN 32 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,3,3,3 TP0
+# (main's tools at 06663d2cf), GROWN the grown state 65f8e92439f7c2dd. TP0 equals GROWN on every line but its parts line (parts 32, fifteen
+# 0s and four 3s); open's FIELD_PART_RATE lines print carry, w_carry, a_carry and b_carry at rate_bits 9 with 4,160, 4,096, 4,160 and 4,160
+# entries and every other part at rate_bits 12; tp1's own FIELD_PART_RATES prints the same octaves. Gate 1 (tools/gate.sh) at 06663d2cf, the
+# receipt of PRs 679 and 681 to 685, ran in a detached worktree on the host 23:18:23 to 23:23:02 before the chain.
+# Device line: the card, the RTX 4080 SUPER under HOLONICS_ROOT/.local/gpu.lock, each lap and each read its own hold, one chain dispatched with
+# tools/runs.py from 23:23:09 UTC on 2026-11-11; the host's part as the card's lap runs it; the rulers on the host, one thread each.
+# tp_chain: binary 837bc5887de82cda, GROWN 65f8e92439f7c2dd, tools 06663d2cf 23:23:09
+OPEN_EXIT 0
+FIELD_PART_RATE part=w_new entries=2048 c=- rate_octaves=0 rate_bits=12
+FIELD_PART_RATE part=a_new entries=2080 c=- rate_octaves=0 rate_bits=12
+FIELD_PART_RATE part=b_new entries=2080 c=- rate_octaves=0 rate_bits=12
+FIELD_PART_RATE part=enc_lane entries=3232 c=- rate_octaves=0 rate_bits=12
+FIELD_PART_RATE part=before_lane entries=3232 c=- rate_octaves=0 rate_bits=12
+FIELD_PART_RATE part=after_lane entries=3232 c=- rate_octaves=0 rate_bits=12
+FIELD_PART_RATE part=q_lane entries=2048 c=- rate_octaves=0 rate_bits=12
+FIELD_PART_RATE part=v_lane entries=2048 c=- rate_octaves=0 rate_bits=12
+FIELD_PART_RATE part=probe_lane entries=2048 c=- rate_octaves=0 rate_bits=12
+FIELD_PART_RATE part=out_lane entries=2048 c=- rate_octaves=0 rate_bits=12
+FIELD_PART_RATE part=moment_face_lane entries=2048 c=- rate_octaves=0 rate_bits=12
+FIELD_PART_RATE part=read_lane entries=3072 c=- rate_octaves=0 rate_bits=12
+FIELD_PART_RATE part=face_biases_lane entries=128 c=- rate_octaves=0 rate_bits=12
+FIELD_PART_RATE part=a_lane entries=1024 c=- rate_octaves=0 rate_bits=12
+FIELD_PART_RATE part=b_lane entries=1024 c=- rate_octaves=0 rate_bits=12
+FIELD_PART_RATE part=carry entries=4160 c=- rate_octaves=3 rate_bits=9
+FIELD_PART_RATE part=w_carry entries=4096 c=- rate_octaves=3 rate_bits=9
+FIELD_PART_RATE part=a_carry entries=4160 c=- rate_octaves=3 rate_bits=9
+FIELD_PART_RATE part=b_carry entries=4160 c=- rate_octaves=3 rate_bits=9
+SHA GROWN 65f8e92439f7c2dd9cf6256ca798b59aaf1a118b872e1d64d9b4851f16f00c13
+SHA TP0 c74d62e682d1a907d3d3a7e8d21b248b0161bfbca060844d0f90df0fe23174b7
+DIFF GROWN TP0:
+6c6
+< parts 32 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+---
+> parts 32 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 3 3 3 3
+GATE_OPEN rows=19 ok=True
+PART_RATES_SEEN tp1 FIELD_PART_RATES contacts_before=32 rate_bits=12 octaves w_new=0 a_new=0 b_new=0 enc_lane=0 before_lane=0 after_lane=0 q_lane=0 v_lane=0 probe_lane=0 out_lane=0 moment_face_lane=0 read_lane=0 face_biases_lane=0 a_lane=0 b_lane=0 carry=3 w_carry=3 a_carry=3 b_carry=3
+GATE_RATES tp1 ok
+PART_RATES_SEEN tp2 FIELD_PART_RATES contacts_before=32 rate_bits=12 octaves w_new=0 a_new=0 b_new=0 enc_lane=0 before_lane=0 after_lane=0 q_lane=0 v_lane=0 probe_lane=0 out_lane=0 moment_face_lane=0 read_lane=0 face_biases_lane=0 a_lane=0 b_lane=0 carry=3 w_carry=3 a_carry=3 b_carry=3
+GATE_RATES tp2 ok
+PART_RATES_SEEN tp3 FIELD_PART_RATES contacts_before=32 rate_bits=12 octaves w_new=0 a_new=0 b_new=0 enc_lane=0 before_lane=0 after_lane=0 q_lane=0 v_lane=0 probe_lane=0 out_lane=0 moment_face_lane=0 read_lane=0 face_biases_lane=0 a_lane=0 b_lane=0 carry=3 w_carry=3 a_carry=3 b_carry=3
+GATE_RATES tp3 ok
+## gate 1 at 06663d2cf
+# gate 1 at 06663d2cf (status: 0 changed) 23:18:23
+GATE_EXIT 0 23:23:02
+gate check: ok (25600 ms)
+gate guard-lints: ok (36112 ms)
+gate guard-doctests: ok (40474 ms)
+gate diagnostic-timing-controls: ok (47799 ms)
+gate diagnostic-supervisor-controls: ok (1507 ms)
+gate diagnostic-receipt-controls: ok (244 ms)
+gate trunk-census-controls: ok (6187 ms)
+gate travel-rank-controls: ok (251 ms)
+gate part-rate-controls: ok (40 ms)
+gate founding-strength-controls: ok (26 ms)
+gate run-watch-controls: ok (25 ms)
+gate listener-continuation-controls: ok (55593 ms)
+gate projected-statistics-controls: ok (62887 ms)
+gate native-class-advance-controls: ok (112 ms)
+gate native-gram-carry-conservation: ok (51 ms)
+gate finite-solenoidal-controls: ok (66 ms)
+gate rational-place-controls: ok (50 ms)
+gate plural-coupling-controls: ok (237 ms)
+gate grouped-tube-controls: ok (114 ms)
+gate observed-tube-controls: ok (874 ms)
+gate source-refinement-controls: ok (51 ms)
+gate actual-source-alignment: ok (49 ms)
+gate actual-ray-joint-controls: ok (60 ms)
+gate actual-factor-refusal: ok (53 ms)
+gate refined-source-native-restore: ok (107 ms)
+gate solenoidal-listener-controls: ok (71 ms)
+gate offline-coupling-controls: ok (856 ms)
+METER gate_685 rc=0 started=23:18:23Z ended=23:23:02Z wall_s=279.5 user_s=653.1 sys_s=51.6 peak_rss_kib=4337844
+MAIN gate done 23:23:02
