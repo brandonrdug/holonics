@@ -57,6 +57,9 @@ typedef unsigned __int128 uwide;
 // their classes, the `2(NEAR − 1)` nearest a site's first support entries.
 #define NEAR 6
 #define NEAR_SLOTS (2 * (NEAR - 1))
+// A carry circle's founded friction `d₀ = 1/(NEAR − 2)` on `2^(−16)` (the host's `CARRY_LEAK_FOUNDING`): the leak's log chart reads
+// `d = d₀ 2^ℓ`, so a circle founded at `ℓ = 0` holds a group of `NEAR − 1` places.
+#define CARRY_LEAK_FOUNDING (((wide)1 << FACE_BITS) / (NEAR - 2))
 
 #define REFUSED_CARRIER 1u
 #define REFUSED_WORD64 2u
@@ -431,11 +434,11 @@ struct FieldWords {
     // [the unified-theory reading of November 6, 10:31] Where set, past the last arrival a silent place runs at the bare rate
     // (`Field::bare_stretch`): no clamp to the stretch's first place, and no fold of its covector there.
     uint64_t bare_stretch;
-    // [definition; theory, November 11 17:25] **The carry circles** (`FieldDeclaration::carry`): the last `carry` (`C`) of the `f/2` complex contacts
-    // carry the scan `Q(t) = b(t) + γ(t) Q(t∓1)`, `p(t) = a(t) Q(t∓1)` with the gate `γ = γ̂(q)/(1 + max(0, h))` (`carry_gate`). `wg` and `wgb` are the
-    // circles' charts' and biases' offsets in the material (`FieldLayout::carry`, `carry_bias`) and `rg` the charts' reach; `pg` the charts' reads
-    // `q`, `h` `[t][2C]` (`2^(−16)`), `pgam` the gate `[t][2C]` (real parts then imaginary, `2^(−30)`) and `pqm` the scan's operand `Q(t∓1)`
-    // `[t][2C]`, which the reverse reads.
+    // [definition; theory, November 11 17:25 and November 12] **The carry circles** (`FieldDeclaration::carry`): the last `carry` (`C`) of the `f/2`
+    // complex contacts carry the scan `Q(t) = b(t) + γ(t) Q(t∓1)`, `p(t) = a(t) Q(t∓1)` with the gate `γ = γ̂(q)/(1 + d₀ 2^ℓ)` (`carry_gate`, the leak
+    // on its log chart). `wg` and `wgb` are the circles' charts' and biases' offsets in the material (`FieldLayout::carry`, `carry_bias`) and `rg` the
+    // charts' reach; `pg` the charts' reads `q`, `ℓ` `[t][2C]` (`2^(−16)`), `pgam` the gate `[t][2C]` (real parts then imaginary, `2^(−30)`) and `pqm`
+    // the scan's operand `Q(t∓1)` `[t][2C]`, which the reverse reads.
     uint64_t carry;
     uint64_t wg;
     uint64_t wgb;
@@ -2704,21 +2707,43 @@ extern "C" __global__ void field_pair_scan(FieldWords w) {
     }
 }
 
-// [definition; theory, November 11 17:25; `lean/Holonics/HNN/CarryGate.lean`] **The carry circles' gate** (the host's `carry_gate`), off the chain on the
-// pair's grid (T C cells, one thread a site and circle; tower.field-scan-gate-once-a-site): from the charts' reads `q`, `h` on `2^(−16)`, `d = max(0, h)`,
-// refused (`REFUSED_CARRIER`) where `|q|` reaches `2^39`, `2^34 + q²` reaches `2^78` or `d` reaches `2^47`; else `den = (2^34 + q²)(2^16 + d)`,
-// `γ_re = (2^34 − q²) 2^46 / den` and `γ_im = q 2^64 / den` on `2^(−30)`, each one division to the nearest (`div_nearest`), written to `pgam`. That is
-// `γ̂(q)/(1 + d)`, `γ̂(q) = ((4 − q²) + 4iq)/(4 + q²)` the Cayley step of `iq/2`; every bit is the host's.
+// [definition; theory, November 12, G96's third branch; `CarryGate.lean`, `leak`] **The leak's log chart** (the host's `carry_friction`): from `ℓ` on
+// `2^(−16)` (a site's leak read), `2^ℓ` read as a score's term (`term_of`: `a = ⌊ℓ⌋` and the face `v` in `[2^61, 2^62)`, so `2^ℓ = v 2^(a − 61)`) and the
+// friction `d = max(1, rel(d₀ v, 61 − a))` on `2^(−16)`, at least one grain (a circle's quality is finite). False (refused) where `a` passes 61 or `d`
+// reaches `2^47`, the friction's carrier; `d₀ v < 2^76`, so a release past 77 bits leaves nothing and the floor keeps one grain. Every bit is the host's.
+__device__ __forceinline__ bool carry_friction(const FieldWords &w, int64_t l, wide *d, int64_t *a, uint64_t *v) {
+    term_of(w, l, a, v);
+    if (*a > 61) {
+        return false;
+    }
+    const int64_t shift = 61 - *a;
+    const wide x = shift > 77 ? 0 : rel(CARRY_LEAK_FOUNDING * (wide)*v, (unsigned)shift);
+    *d = x > 1 ? x : 1;
+    return *d < ((wide)1 << 47);
+}
+
+// [definition; theory, November 11 17:25 and November 12 (G96's third branch); `lean/Holonics/HNN/CarryGate.lean`] **The carry circles' gate** (the host's
+// `carry_gate`), off the chain on the pair's grid (T C cells, one thread a site and circle; tower.field-scan-gate-once-a-site): from the charts' reads
+// `q`, `ℓ` on `2^(−16)` and the friction `d` on the leak's log chart (`carry_friction`), refused (`REFUSED_CARRIER`) where `|q|` reaches `2^39`,
+// `2^34 + q²` reaches `2^78` or the chart refuses; else `den = (2^34 + q²)(2^16 + d)`, `γ_re = (2^34 − q²) 2^46 / den` and `γ_im = q 2^64 / den` on
+// `2^(−30)`, each one division to the nearest (`div_nearest`), written to `pgam`. That is `γ̂(q)/(1 + d)`, `γ̂(q) = ((4 − q²) + 4iq)/(4 + q²)` the
+// Cayley step of `iq/2`; every bit is the host's.
 extern "C" __global__ void field_pair_gamma(FieldWords w) {
     const uint64_t C = w.carry, c2 = 2 * C;
     const uint64_t cells = (uint64_t)w.T * C;
     for (uint64_t c = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; c < cells; c += (uint64_t)gridDim.x * blockDim.x) {
         const uint64_t t = c / C, k = c % C;
         const uint64_t gr = t * c2 + k, gi = gr + C;
-        const wide q = w.pg[gr], h = w.pg[gi];
-        const wide d = h > 0 ? h : 0;
+        const wide q = w.pg[gr];
         const uwide aq = (uwide)(q >= 0 ? q : -q);
-        if (aq >= ((uwide)1 << 39) || ((wide)1 << 34) + q * q >= ((wide)1 << 78) || d >= ((wide)1 << 47)) {
+        if (aq >= ((uwide)1 << 39) || ((wide)1 << 34) + q * q >= ((wide)1 << 78)) {
+            atomicOr(w.status, REFUSED_CARRIER);
+            continue;
+        }
+        wide d;
+        int64_t a;
+        uint64_t v;
+        if (!carry_friction(w, w.pg[gi], &d, &a, &v)) {
             atomicOr(w.status, REFUSED_CARRIER);
             continue;
         }
@@ -2762,29 +2787,43 @@ extern "C" __global__ void field_pair_scan_back(FieldWords w, const int64_t *dc,
     }
 }
 
-// [definition; theory, November 11 17:25; `CarryGate.lean`] **The gate's covectors** (the host's `carry_gate_return`), off the chain on the pair's grid
-// (T C cells): from `δγ` in `dg`, the gate and the charts' reads, `im = Im(conj(γ) δγ)` and `re = Re(conj(γ) δγ)` each released from `2^(−30)`, then
-// `δq = im 2^34 / (2^34 + q²)` and `δh = −re 2^16 / (2^16 + h)` where `h ≥ 0`, else `0`, each one division to the nearest, written over `δγ` in place
-// (`δq` at the real part's slot, `δh` at the imaginary's: the circles' charts' row order).
+// [definition; theory, November 11 17:25 and November 12 (G96's third branch); `CarryGate.lean`, `leak_hasDerivAt`] **The gate's covectors** (the host's
+// `carry_gate_return`), off the chain on the pair's grid (T C cells): from `δγ` in `dg`, the gate and the charts' reads, `im = Im(conj(γ) δγ)` and
+// `re = Re(conj(γ) δγ)` each released from `2^(−30)`, then `δq = im 2^34 / (2^34 + q²)` and `δd = −re 2^16 / (2^16 + d)` at the friction the forward
+// applied (`carry_friction`), each one division to the nearest, and the leak chart's derivative `δℓ = ln 2 · d₀ 2^ℓ · δd` read at the chart's face
+// (`v` released 15 bits): `rel(rel(δd ln 2, 30) d₀ rel(v, 15), 62 − a)`, under `2^126` before the release, nothing past a release of 126 bits. Written
+// over `δγ` in place (`δq` at the real part's slot, `δℓ` at the imaginary's: the circles' charts' row order).
 extern "C" __global__ void field_pair_gate_back(FieldWords w, int64_t *dg) {
     const uint64_t C = w.carry, c2 = 2 * C;
     const uint64_t cells = (uint64_t)w.T * C;
+    const wide ln2 = (wide)(((uwide)w.ln2_hi << 64) | (uwide)w.ln2_lo);
     for (uint64_t c = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; c < cells; c += (uint64_t)gridDim.x * blockDim.x) {
         const uint64_t t = c / C, k = c % C;
         const uint64_t gr = t * c2 + k, gi = gr + C;
         const wide yr = w.pgam[gr], yi = w.pgam[gi], dr = dg[gr], di = dg[gi];
         const wide im = rel(yr * di - yi * dr, MOVE_BITS), re = rel(yr * dr + yi * di, MOVE_BITS);
-        const wide q = w.pg[gr], h = w.pg[gi];
+        const wide q = w.pg[gr];
         const wide dq = div_nearest(im << 34, ((wide)1 << 34) + q * q);
-        const wide dh = h >= 0 ? -div_nearest(re << 16, ((wide)1 << 16) + h) : 0;
+        wide d;
+        int64_t a;
+        uint64_t v;
+        if (!carry_friction(w, w.pg[gi], &d, &a, &v)) {
+            atomicOr(w.status, REFUSED_CARRIER);
+            continue;
+        }
+        const wide dd = -div_nearest(re << 16, ((wide)1 << 16) + d);
+        const wide lift = rel(dd * ln2, LN2_FACE_BITS) * CARRY_LEAK_FOUNDING * rel((wide)v, 15);
+        const int64_t shift = 62 - a;
+        const wide dl = shift > 126 ? 0 : rel(lift, (unsigned)shift);
         dg[gr] = fit64(dq, w.status);
-        dg[gi] = fit64(dh, w.status);
+        dg[gi] = fit64(dl, w.status);
     }
 }
 
-// [measurement; theory, November 11 18:33, part P2] **The carry circles' gates, read** (the host's `Field::carry_gates_of`): at each open site and carry
-// circle of the tick just formed, `|γ|` on `2^(−30)` (the floor of the square root of `γ_re² + γ_im²`, at most `2^60`) added into `acc[k]`, the leak read
-// `h ≥ 0` counted into `acc[C + k]`, and the site counted once into `acc[2C]`. A reading: it writes only its accumulator.
+// [measurement; theory, November 11 18:33, part P2, and November 12] **The carry circles' gates, read** (the host's `Field::carry_gates_of`): at each
+// open site and carry circle of the tick just formed, `|γ|` on `2^(−30)` (the floor of the square root of `γ_re² + γ_im²`, at most `2^60`) added into
+// `acc[k]`, the leak read `ℓ ≥ 0` (the friction at its founding or above) counted into `acc[C + k]`, and the site counted once into `acc[2C]`. A
+// reading: it writes only its accumulator.
 extern "C" __global__ void field_carry_gates_read(FieldWords w, unsigned long long *acc) {
     const uint64_t C = w.carry, c2 = 2 * C;
     const uint64_t cells = (uint64_t)w.T * C;

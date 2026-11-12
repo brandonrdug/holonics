@@ -1,6 +1,6 @@
 # Construction state
 
-**November 11.** Where the construction stands: what runs, what is built and lawful, and what is
+**November 12.** Where the construction stands: what runs, what is built and lawful, and what is
 open, each named by its measurement. [THE_REBUILD](docs/plans/THE_REBUILD.md) is the order, the laws
 live in their guides and owners, and dated records hold the derivations and receipts.
 
@@ -30,10 +30,21 @@ repository was reset on September 24; the pre-reset tree is
   lanes, four heads of eight modes (two still ring sets, two turned and paced), 64 pair contacts
   (grown from 32, every face kept), reach 3,771; 63,606 entries of material without the carry's
   chart.
-- **The carry** (the state head `hnn-field-v14k`). Along the strand a contact's second operand is a
-  running sum with its own gate, `Q(t) = b(t) + γ(t) Q(t ∓ 1)` with `|γ| < 1` read from a third
-  chart founded at zero, so a unit runs to its stop inside one tick; its reverse returns through the
-  producing operands. With the gate at zero it is the contact before it, bit for bit.
+- **The carry circles** (the state head `hnn-field-v14e`, `C` its thirteenth word; atlas
+  `contact.carry-gate-turn-and-friction`). The last `C` of the `f/2` complex contacts carry the move
+  `z → γ(t) z + b(t)` along the strand inside one tick, each on a circle of its own, and the pair's
+  return reads the scan where it reads the contact; the reverse returns through the producing
+  operands. The gate is a turn and a friction charted apart, `γ = γ̂(q)/(1 + d)`: the turn a Cayley
+  step that keeps the circle, the friction on the leak's log chart `d = d₀ 2^ℓ` with
+  `d₀ = 1/(NEAR − 2)` and at least one grain, so `|γ| < 1` at every site and a circle holds at most
+  `2^16 + 1` places (Lean `HNN/CarryGate`). Founded at `ℓ = 0` a circle is a turn with the near
+  field's friction, `d = 1/4`, a group of five places. Two foundings are retired and their states
+  are receipts only: zero friction (`hnn-field-v14k`, refused at its sixth section with a sum past
+  its 128-bit carrier, G83) and the leak's linear chart `d = max(0, h)` (`hnn-field-v14t`), which at
+  eight times the base rate became a switch, 0.685 of tp4's reads at a friction of one or more and
+  0.104 with none and no covector, before tp5 was refused at its section 1,501 of 1,535 (G90, G96).
+  The log chart is the third attempt (G98): written, and owed its gates and its first lap. With
+  `C = 0` the field is the plain line bit for bit.
 - **The learner** (`FieldLearner`; the trainer is
   `crates/holonics/examples/solenoidal_alpha/complete_language/field_train.rs`). The comparison is
   completion read as a joint code: a region is drawn as a state of open places among the answer's,
@@ -68,7 +79,9 @@ repository was reset on September 24; the pre-reset tree is
 | Line | Law | Laps read | Held joint at lap ends | At the lap's mean |
 |---|---|---|---|---|
 | plain | one deposit rate | 4, 5, 6 | 1.7838, 1.7751, 1.7748 | |
-| part rates | a rate per founded part; every part at the old rate from lap 10 | 4 to 18 | 1.7622, 1.7544, 1.7524, 1.7506, 1.7459, 1.7472, 1.7428, 1.7421, 1.7420, 1.7388, 1.7375, 1.7338, 1.7374, 1.7332, 1.7314 | 1.7341 (lap 12), 1.7333, 1.7300, 1.7280, 1.7267, 1.7265, 1.7248 (lap 18) |
+| part rates | a rate per founded part; every part at the old rate from lap 10 | 4 to 23 | 1.7622, 1.7544, 1.7524, 1.7506, 1.7459, 1.7472, 1.7428, 1.7421, 1.7420, 1.7388, 1.7375, 1.7338, 1.7374, 1.7332, 1.7314, 1.7327, 1.7277, 1.7291, 1.7293, 1.7271 | 1.7341 (lap 12), 1.7333, 1.7300, 1.7280, 1.7267, 1.7265, 1.7248 (lap 18), 1.7250, 1.7231, 1.7223, 1.7215, 1.7217 (lap 23) |
+| carry circles | 32 circles (`C = 32` of `f = 128`) founded on lap 18's state with the turn and the near field's friction, the leak on its linear chart (retired), the line's own law otherwise | 19, 20, 21 | 1.7303, 1.7188, 1.7144 | 1.7219, 1.7170, 1.7100 |
+| circles at eight times | the circles' four parts at eight times the old rate, from the same grown state; lap 23 refused at its section 1,501 of 1,535 | 19 to 22 | 1.7268, 1.7090, 1.7010, 1.6949 | 1.7202, 1.7064, 1.6912, 1.6836 |
 | scan | part rates and the carry, from the part-rate line's fourth state | 5 to 8 | 1.7477, 1.7445, 1.7450, 1.7444 | |
 | trend | each part's rate sought from its own lap displacements, from the part-rate line's ninth state | 10, 11, 12 | 1.7443, 1.7477, 1.7453 | |
 | raised | the second lane's key, value, probe, out and moment-face parts at 4, 16, 4, 4 and 4 times the old rate, from the part-rate line's twelfth state; ended | 13, 14, 15 | 1.7429, 1.7430, 1.7380 | 1.7325, 1.7297, 1.7279 |
@@ -116,14 +129,16 @@ repository was reset on September 24; the pre-reset tree is
     ([the travel record](research/records/2026-11-11_THE_ADDED_CONTACTS_TRAVEL_EACH_ITS_OWN_DIRECTION_SO_NO_FOUNDING_IS_BUILT_THEY_TOOK_THEIR_CHARGE_IN_FOUR_PART_RATE_LAPS_AND_A_GUESSES_PREMISE_IS_READ_FROM_THE_LOGS_FIRST.md)).
   - The field lacks 0.233 nats a place of the joint law of two letters each side and passes little
     past two written letters (0.57, 0.46, 0.17 and 0.03 nats for the first four); growth from 32 to
-    64 contacts gained 0.013 in four laps. The carry's four laps left the third and fourth letters
-    at 0.175 and 0.030: its gate, founded at zero, opened to a mean of 0.24 while the pull on it
-    halved lap over lap, and a letter `d` sites back enters the scan at the product of `d − 1`
-    gates. The carry as built gives a term of three sites; its founding is the next loop's subject
-    for that law: a turn, on circles of its own whose return is founded at zero, its gate charted as a
-    turn and a friction apart (Lean `HNN/CarryGate`), its first attempt at 16 circles a mate
-    (G83); the stride ruler on 8 to 64 circles passes the third letter at 0.136 to 0.363, its gain
-    a doubling of circles still rising at 64 (G81). At the sixteenth lap mean the four letters pass 0.571,
+    64 contacts gained 0.013 in four laps. The scan's carry (retired) left the third and fourth
+    letters at 0.175 and 0.030: its gate, founded at zero, opened to a mean of 0.24 while the pull on
+    it halved lap over lap, and a letter `d` sites back entered the scan at the product of `d − 1`
+    gates. The carry circles, a turn with friction, coded the held joint 0.0123 nats a place under
+    their pair at the base rate's third lap mean (by quarter of open sites, from the fewest open,
+    0.0131, 0.0153, 0.0162 and 0.0046) and 0.0380 under with their parts at eight times at the
+    fourth (0.0358, 0.0562, 0.0458 and 0.0141), where the third letter passed 0.0089 above its
+    pair's; the lap after it was refused (G85, G88, G90). The stride ruler on 8 to 64 circles
+    passes the third letter at 0.136 to 0.363, its gain a doubling of circles still rising at 64
+    (G81). At the sixteenth lap mean the four letters pass 0.571,
     0.450, 0.182 and 0.033 and both sides at two letters read 1.194; the added contacts carry the
     place's two-sided closure (0.207 of it, read by setting their return to zero) and not the third
     letter (0.015) ([the follow-up record](research/records/2026-11-11_RAISED_RATES_BUY_NO_LEVEL_THE_ADDED_CONTACTS_CLOSE_A_PLACE_BETWEEN_ITS_WRITTEN_NEIGHBOURS_AND_THE_THIRD_LETTER_IS_OWED_A_CARRY_FOUNDED_AS_A_TURN.md) §8;
@@ -148,7 +163,8 @@ repository was reset on September 24; the pre-reset tree is
   and the sixth's reading is being built.
   - A turn is a unit and a friction is declared in every gate: a friction is a range and its
     inverse a mass (atlas `contact.friction-range-mass`). The carry's friction, founded at `1/4`
-    after the card refused the frictionless carry (G83, G85), is its first instance; the ring faces outside the
+    after the card refused the frictionless carry (G83, G85) and charted on its logarithm after its
+    linear chart became a switch at eight times (G96), is its first instance; the ring faces outside the
     unit disk are repaired at the next founding. Such a face is a turn that also boosts (the record
     §14.3).
   - No global word in the law: a part's rate is its own temperature. G86's polar law by part stands

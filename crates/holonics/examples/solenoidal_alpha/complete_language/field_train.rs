@@ -923,10 +923,11 @@ fn joint_read(field: &Field, codec: &FieldCodec, problems: &Problems, seed: u64,
         strata.iter().map(|&(_, f, _, _)| f.to_string()).collect::<Vec<_>>().join("/")
     );
     if circles > 0 {
-        // Integers: each circle's `|γ|` sum on 2^(−30) over the (open site, tick) reads, its mean on 2^(−30) to the floor, and its reads with `h ≥ 0`.
+        // Integers: each circle's `|γ|` sum on 2^(−30) over the (open site, tick) reads, its mean on 2^(−30) to the floor, and its reads with `ℓ ≥ 0`
+        // (the friction at its founding or above, the leak's log chart; `leak_nonnegative`, where the retired linear chart printed `h_nonnegative`).
         let join = |v: Vec<String>| v.join("/");
         println!(
-            "FIELD_CARRY_GATES lap={lap} circles={circles} reads={} modulus_sum={} modulus_mean={} h_nonnegative={}",
+            "FIELD_CARRY_GATES lap={lap} circles={circles} reads={} modulus_sum={} modulus_mean={} leak_nonnegative={}",
             gates.reads,
             join(gates.modulus.iter().map(|m| m.to_string()).collect()),
             join(gates.modulus.iter().map(|&m| if gates.reads == 0 { "-".to_string() } else { (m / u128::from(gates.reads)).to_string() }).collect()),
@@ -4825,11 +4826,11 @@ mod tests {
         let _ = std::fs::remove_dir_all(&dir);
     }
 
-    /// [theory, November 12, G90's first branch] `leak-field`'s sums on the host, on the toy grown by two carry circles with circle 0's leak
-    /// row moved so that some of its reads fall below zero: over the held joint's own and foil states its open reads and their `h ≥ 0` counts
-    /// are the carry gates' on the same states ([`Field::carry_gates_of`], what a lap's `FIELD_CARRY_GATES` counts); every site of every
-    /// state is read once a tick in one kind and one band; the reads below zero are the three lowest bands' and lie in runs no longer than
-    /// the longest; and circle 1, founded (`H = 0`, `h_b = 1/4`), reads none below zero.
+    /// [theory, November 12, G90's first branch and G96's third] `leak-field`'s sums on the host, on the toy grown by two carry circles with
+    /// circle 0's leak row moved so that some of its reads fall below zero (the friction below its founding): over the held joint's own and
+    /// foil states its open reads and their `ℓ ≥ 0` counts are the carry gates' on the same states ([`Field::carry_gates_of`], what a lap's
+    /// `FIELD_CARRY_GATES` counts); every site of every state is read once a tick in one kind and one band; the reads below zero are the five
+    /// lowest bands' and lie in runs no longer than the longest; and circle 1, founded (`L = 0`, `ℓ_b = 0`), reads none below zero.
     #[test]
     fn the_leak_reading_counts_what_the_gates_count() {
         let (codec, problems) = toy();
@@ -4862,7 +4863,7 @@ mod tests {
             assert_eq!(leak.kind.iter().map(|p| p.1).sum::<u64>(), sites, "circle {k}: every site once a tick in one kind");
             assert_eq!(leak.bands.iter().sum::<u64>(), sites, "circle {k}: every site once a tick in one band");
             let below: u64 = leak.kind.iter().map(|p| p.0).sum();
-            assert_eq!(leak.bands[..3].iter().sum::<u64>(), below, "circle {k}: the reads below zero are the lowest bands'");
+            assert_eq!(leak.bands[..5].iter().sum::<u64>(), below, "circle {k}: the reads below zero are the lowest bands'");
             assert_eq!((leak.first.1 + leak.last.1, leak.charge_below.1 + leak.charge_rest.1), (2 * sites / ticks, sites), "circle {k}");
             assert_eq!(leak.charge_below.1, below);
             let runs: u64 = leak.runs.iter().sum();
@@ -4875,7 +4876,7 @@ mod tests {
 
     /// [theory, November 12, G96's third branch] **A training section's leak read is its regions' sums merged**: [`section_leaks`] on regions
     /// read through the realization's tick reads gives, circle by circle, what [`leak_add`] gives region by region in order (a run closes at
-    /// its region's end, so the merge is the serial pass's); its open reads and their `h ≥ 0` counts are the carry gates' on the same
+    /// its region's end, so the merge is the serial pass's); its open reads and their `ℓ ≥ 0` counts are the carry gates' on the same
     /// regions; no site is a question's (a section's region has no split); and its line names each circle's longest run.
     #[test]
     fn a_sections_leak_read_is_its_regions_sums_merged() {
@@ -4985,7 +4986,7 @@ fn decimal_gamma(sum: u128, count: u128) -> String {
 }
 
 /// [measurement; theory, November 11 17:25] **`gamma-field STATE STATE_SHA CODEC CODEC_SHA UNITS UNITS_SHA HELD HELD_SHA COUNT OUT`**: the carry
-/// circles' `|γ|` (`γ = γ̂(q)/(1 + max(0, h))`, [`Field::carry_gammas`]) on the first `COUNT` held problems' opening regions (the context read's first part), the
+/// circles' `|γ|` (`γ = γ̂(q)/(1 + d₀ 2^ℓ)`, [`Field::carry_gammas`]) on the first `COUNT` held problems' opening regions (the context read's first part), the
 /// mean over the sites of each kind (a question's resolved site, an answer's open site) at each carry circle and tick, from the
 /// chart the realization read (`read_ticks`). Writes `GAMMA.tsv` (tick, kind, circle, sites, mean `|γ|` as a decimal, a reading in a report) and prints the
 /// means over the circles at the first and last ticks. A reading only.
@@ -5048,27 +5049,29 @@ pub(super) fn gamma_field(args: &[String], realization: &mut dyn FieldRealizatio
     Ok(())
 }
 
-/// [measurement; theory, November 12, G90's first branch] **`leak-field STATE STATE_SHA CODEC CODEC_SHA UNITS UNITS_SHA HELD HELD_SHA KEYS
-/// KEYS_SHA`**: where the carry circles' leak reads below zero, so that their friction is off, on the held joint's own states (the held problems'
-/// own and foil states of [`joint_states`], the key file's last word the seed, as `joint-field` reads them), from each tick's pair chart the
-/// realization read (`read_ticks`) and the forward's own arithmetic on it ([`Field::carry_leaks`]). For each circle:
-/// - `FIELD_LEAK`: the (open site, tick) reads and those with `h ≥ 0` (the lap's `FIELD_CARRY_GATES` on the same state counts the same, the
-///   build's receipt); then over every site of every state, which the scan runs over, the reads with `h < 0` by kind (a question's site, an
-///   answer's open site, an answer's given site) beside the kind's reads; the reads by band of `h` in units of the founded leak `1/4` (below
-///   `−1/2`, `−1/2` to `−1/4`, `−1/4` to `0`, `0` to `1/4`, `1/4` to `1/2`, `1/2` to `1`, `1` and over); the open reads with `h < 0` by the
-///   state's stratum (the quarter of its answer that is open, [`joint_states`]) beside the stratum's open reads; and the reads with `h < 0` at
-///   the first tick and at the last, beside each tick's reads.
-/// - `FIELD_LEAK_RUNS`: the runs of sites with `h < 0` along the strand in the circle's scan order, at each tick (a stretch without loss:
-///   `|γ| = 1` there, so the scan sums `b` over it), counted by length (1, 2 to 3, 4 to 7, 8 to 15, 16 to 31, 32 to 63, 64 and over) with
-///   the sites they hold, and the longest; and the circle's charge `|Q(t)|` on `2^(−16)` (the scan's value after a site): its largest
-///   over every site and over the sites with `h < 0`, and its mean over each.
+/// [measurement; theory, November 12, G90's first branch and G96's third] **`leak-field STATE STATE_SHA CODEC CODEC_SHA UNITS UNITS_SHA HELD
+/// HELD_SHA KEYS KEYS_SHA`**: where the carry circles' leak reads below zero, so that their friction stands below its founding (the leak's log
+/// chart, `d = d₀ 2^ℓ < d₀`), on the held joint's own states (the held problems' own and foil states of [`joint_states`], the key file's last
+/// word the seed, as `joint-field` reads them), from each tick's pair chart the realization read (`read_ticks`) and the forward's own
+/// arithmetic on it ([`Field::carry_leaks`]). For each circle:
+/// - `FIELD_LEAK`: the (open site, tick) reads and those with `ℓ ≥ 0` (`leak_nonnegative`: the lap's `FIELD_CARRY_GATES` on the same state
+///   counts the same, the build's receipt); then over every site of every state, which the scan runs over, the reads with `ℓ < 0` by kind (a
+///   question's site, an answer's open site, an answer's given site) beside the kind's reads; the reads by band of `ℓ` in doublings of the
+///   friction from its founding ([`leak_band`]: the floor below `−14`, `−14` to `−8`, `−8` to `−4`, `−4` to `−2`, `−2` to `0`, `0` to `2`,
+///   `2` and over); the open reads with `ℓ < 0` by the state's stratum (the quarter of its answer that is open, [`joint_states`]) beside the
+///   stratum's open reads; and the reads with `ℓ < 0` at the first tick and at the last, beside each tick's reads.
+/// - `FIELD_LEAK_RUNS`: the runs of sites with `ℓ < 0` along the strand in the circle's scan order, at each tick (a stretch that carries `b`
+///   further than the near field: `|γ| = 1/(1 + d)` stands above `4/5` there), counted by length (1, 2 to 3, 4 to 7, 8 to 15, 16 to 31, 32 to
+///   63, 64 and over) with the sites they hold, and the longest; and the circle's charge `|Q(t)|` on `2^(−16)` (the scan's value after a site):
+///   its largest over every site and over the sites with `ℓ < 0`, and its mean over each.
 ///
 /// Integers; a reading: it writes no state and no file.
 ///
-/// Why (G90's rule; agent-inferred): the gate's `d = max(0, h)` switches a circle's friction off where its leak reads below zero and gives
-/// such a read no covector, so nothing at that site pulls it back; a run of such sites is a store with no loss (atlas `store.finite-quality`),
-/// whose sum and covector grow with the run. Where the runs stand, how long they are and what charge they carry decides whether the leak's
-/// chart owes a friction positive by its form, and shows where the field locates its longer carry.
+/// Why (G90's rule and G96's score; agent-inferred): on the retired linear chart the gate's `d = max(0, h)` switched a circle's friction off
+/// where its leak read below zero and gave such a read no covector, so nothing at that site pulled it back; a run of such sites was a store
+/// with no loss (atlas `store.finite-quality`), whose sum and covector grew with the run (0.104 of tp4's reads stood there). On the log chart
+/// a read below zero keeps a friction and a covector, and where the runs stand, how long they are and what charge they carry shows where the
+/// field locates its longer carry.
 pub(super) fn leak_field(args: &[String], realization: &mut dyn FieldRealization) -> Result<()> {
     if args.len() != 11 {
         return Err("leak-field STATE STATE_SHA CODEC CODEC_SHA UNITS UNITS_SHA HELD HELD_SHA KEYS KEYS_SHA".into());
@@ -5102,7 +5105,7 @@ pub(super) fn leak_field(args: &[String], realization: &mut dyn FieldRealization
     for (k, leak) in leaks.iter().enumerate() {
         let e = plain + k;
         println!(
-            "FIELD_LEAK circle={k} contact={e} side={} reads={} h_nonnegative={} below_question={} below_open={} below_given={} bands={} strata_below={} strata_open={} below_first_tick={} below_last_tick={}",
+            "FIELD_LEAK circle={k} contact={e} side={} reads={} leak_nonnegative={} below_question={} below_open={} below_given={} bands={} strata_below={} strata_open={} below_first_tick={} below_last_tick={}",
             if e % 2 == 0 { "left" } else { "right" },
             leak.reads,
             leak.nonnegative,
@@ -5127,16 +5130,16 @@ pub(super) fn leak_field(args: &[String], realization: &mut dyn FieldRealization
         );
     }
     // In `FIELD_CARRY_GATES`'s own words, so a lap's line on the same state reads the same.
-    println!("FIELD_LEAK_GATES circles={circles} reads={} h_nonnegative={}", leaks[0].reads, leaks.iter().map(|l| l.nonnegative.to_string()).collect::<Vec<_>>().join("/"));
+    println!("FIELD_LEAK_GATES circles={circles} reads={} leak_nonnegative={}", leaks[0].reads, leaks.iter().map(|l| l.nonnegative.to_string()).collect::<Vec<_>>().join("/"));
     println!("FIELD_LEAK_DONE problems={} states={states} ticks={ticks} circles={circles} ms={}", held.len(), started.elapsed().as_millis());
     Ok(())
 }
 
-/// One carry circle's sums for [`leak_field`]: the open reads and those with `h ≥ 0`; the reads with `h < 0` and all reads by kind (a
-/// question's site, an answer's open site, an answer's given site); the reads by band of `h`; the open reads with `h < 0` and all open
-/// reads by stratum; the reads with `h < 0` and all reads at the first tick and the last; the runs and their sites by length band, and the
-/// longest; the largest charge over every site and over the sites with `h < 0`; and the charge's sum and count over the
-/// sites with `h < 0` and over the rest.
+/// One carry circle's sums for [`leak_field`]: the open reads and those with `ℓ ≥ 0`; the reads with `ℓ < 0` and all reads by kind (a
+/// question's site, an answer's open site, an answer's given site); the reads by band of `ℓ` ([`leak_band`]); the open reads with `ℓ < 0` and
+/// all open reads by stratum; the reads with `ℓ < 0` and all reads at the first tick and the last; the runs and their sites by length band,
+/// and the longest; the largest charge over every site and over the sites with `ℓ < 0`; and the charge's sum and count over the sites with
+/// `ℓ < 0` and over the rest.
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
 struct Leak {
     reads: u64,
@@ -5156,7 +5159,7 @@ struct Leak {
 }
 
 impl Leak {
-    /// A run of `run` sites with `h < 0` ends.
+    /// A run of `run` sites with `ℓ < 0` ends.
     fn close(&mut self, run: usize) {
         let band = match run {
             1 => 0,
@@ -5205,24 +5208,30 @@ impl Leak {
     }
 }
 
-/// The band of a leak read `h` on `2^(−16)`, in units of the founded leak `1/4`: below `−1/2`, `−1/2` to `−1/4`, `−1/4` to `0`, `0` to
-/// `1/4`, `1/4` to `1/2`, `1/2` to `1`, and `1` or more.
-fn leak_band(h: i64) -> usize {
-    let quarter = i64::from(holonics::hnn::tower::field::CARRY_LEAK_FOUNDING);
-    match h {
-        h if h < -2 * quarter => 0,
-        h if h < -quarter => 1,
-        h if h < 0 => 2,
-        h if h < quarter => 3,
-        h if h < 2 * quarter => 4,
-        h if h < 4 * quarter => 5,
+/// The band of a leak read `ℓ` on `2^(−16)`, in doublings of the friction from its founding (the leak's log chart, `d = d₀ 2^ℓ`, `d₀ = 2^(−2)`):
+/// below `−14` (the floor: the friction's word is one grain, a group of `2^16 + 1` places), `−14` to `−8`, `−8` to `−4`, `−4` to `−2`, `−2` to
+/// `0`, `0` to `2`, and `2` or more (a friction of one or more, forgotten within a place). A ruler's partition (agent-inferred): at its edges a
+/// circle's group `N = (1 + d)/d` holds about 65,537, 1,025, 65, 17, 5 (the founding) and 2 places, octaves of the reach from the near field's
+/// group down to the floor's; the floor's edge is the founding's own, where `d₀ 2^ℓ` reaches one grain.
+fn leak_band(l: i64) -> usize {
+    // One doubling of the friction, `ℓ = 1` on the face's grain `2^(−16)`.
+    let doubling = 1i64 << 16;
+    // The floor: `d₀ 2^ℓ` reaches one grain where `ℓ = −log₂` of the founding's word (`2^14` on `2^(−16)`, so `−14`).
+    let floor = -i64::from(holonics::hnn::tower::field::CARRY_LEAK_FOUNDING.ilog2()) * doubling;
+    match l {
+        l if l < floor => 0,
+        l if l < -8 * doubling => 1,
+        l if l < -4 * doubling => 2,
+        l if l < -2 * doubling => 3,
+        l if l < 0 => 4,
+        l if l < 2 * doubling => 5,
         _ => 6,
     }
 }
 
 /// One region's reads added into `leaks` (a carry circle each): at every tick its leaks and charges ([`Field::carry_leaks`]), each site
 /// counted by kind (before `q_len` a question's, then open or given by `open`), by band, at the first and last tick, by `stratum` where
-/// the region has one (its open sites), and its runs of `h < 0` along the strand as the circle's scan runs (even contacts from the left,
+/// the region has one (its open sites), and its runs of `ℓ < 0` along the strand as the circle's scan runs (even contacts from the left,
 /// odd from the right), a run closing at the region's end.
 fn leak_add(field: &Field, leaks: &mut [Leak], stratum: Option<usize>, open: &[bool], q_len: usize, state_ticks: &[holonics::hnn::tower::field::TickRead]) -> Result<()> {
     let (circles, ticks, plain) = (field.declaration.carry, field.declaration.ticks, field.declaration.carry_first());
@@ -5231,8 +5240,8 @@ fn leak_add(field: &Field, leaks: &mut [Leak], stratum: Option<usize>, open: &[b
     }
     let sites = open.len();
     for (tick, read) in state_ticks.iter().enumerate() {
-        let (h, charge) = field.carry_leaks(&read.pair_read).map_err(|e| e.to_string())?;
-        if h.len() != sites * circles {
+        let (leak_reads, charge) = field.carry_leaks(&read.pair_read).map_err(|e| e.to_string())?;
+        if leak_reads.len() != sites * circles {
             return Err("a pair chart of other than the region's sites".into());
         }
         for (k, leak) in leaks.iter_mut().enumerate() {
@@ -5240,12 +5249,12 @@ fn leak_add(field: &Field, leaks: &mut [Leak], stratum: Option<usize>, open: &[b
             let mut run = 0usize;
             for step in 0..sites {
                 let t = if left { step } else { sites - 1 - step };
-                let (hv, qv) = (h[t * circles + k], charge[t * circles + k]);
-                let below = hv < 0;
+                let (lv, qv) = (leak_reads[t * circles + k], charge[t * circles + k]);
+                let below = lv < 0;
                 let kind = if t < q_len { 0 } else if open[t] { 1 } else { 2 };
                 leak.kind[kind].0 += u64::from(below);
                 leak.kind[kind].1 += 1;
-                leak.bands[leak_band(hv)] += 1;
+                leak.bands[leak_band(lv)] += 1;
                 if open[t] {
                     leak.reads += 1;
                     leak.nonnegative += u64::from(!below);
@@ -5314,7 +5323,7 @@ fn section_leaks(field: &Field, views: &[Region], realization: &mut dyn FieldRea
 }
 
 /// A section's `FIELD_SECTION_LEAK` line ([`section_leaks`]): the circles pooled (the open reads, the reads below zero at open and given
-/// sites, the bands of `h`, the runs below zero and their sites by length band), the longest run and each circle's longest, and the
+/// sites, the bands of `ℓ` ([`leak_band`]), the runs below zero and their sites by length band), the longest run and each circle's longest, and the
 /// largest charge over every site and over the sites below zero.
 fn section_leak_text(lap: usize, n: usize, leaks: &[Leak]) -> String {
     let mut pooled = Leak::default();

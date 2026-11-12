@@ -230,7 +230,7 @@ struct Words {
     // `Field::bare_stretch`).
     bare_stretch: u64,
     // [definition; theory, November 11 17:25] The carry circles (`FieldDeclaration::carry`): their count `C`, their charts' and biases' offsets in the
-    // material (`FieldLayout::carry`, `carry_bias`) and the charts' reach, and (set per tick) the charts' reads `q`, `h` `[t][2C]`, the gate `γ` `[t][2C]`
+    // material (`FieldLayout::carry`, `carry_bias`) and the charts' reach, and (set per tick) the charts' reads `q`, `ℓ` `[t][2C]`, the gate `γ` `[t][2C]`
     // and the scan's operand `[t][2C]`.
     carry: u64,
     wg: u64,
@@ -448,7 +448,7 @@ struct Back<'c> {
     da: Pooled<'c, i64>,
     db: Pooled<'c, i64>,
     /// [theory, November 11 17:25] The carry circles' covector `[t][2C]` (one slot without them): the scan's reverse writes `δγ`, and the gate's
-    /// reverse writes `δq`, `δh` over it in place, the circles' charts' row order.
+    /// reverse writes `δq`, `δℓ` over it in place, the circles' charts' row order.
     dg: Pooled<'c, i64>,
     ra: Pooled<'c, i64>,
     rb: Pooled<'c, i64>,
@@ -531,7 +531,7 @@ struct Tick<'c> {
     read2: Pooled<'c, i32>,
     scale2: Pooled<'c, i128>,
     pa: Pooled<'c, i64>,
-    /// [theory, November 11 17:25] The carry circles' charts' reads `q`, `h` `[t][2C]`, their gate `γ` `[t][2C]` and the scan's operand `[t][2C]` (one slot each without them).
+    /// [theory, November 11 17:25] The carry circles' charts' reads `q`, `ℓ` `[t][2C]`, their gate `γ` `[t][2C]` and the scan's operand `[t][2C]` (one slot each without them).
     pg: Pooled<'c, i64>,
     pgam: Pooled<'c, i64>,
     pqm: Pooled<'c, i64>,
@@ -704,7 +704,7 @@ pub struct CardField<'c> {
     held_cells: std::cell::RefCell<Vec<i128>>,
     /// [measurement, November 4] While the ticks are read: each region's tick reads, region by region.
     tick_reads: std::cell::RefCell<Option<Vec<Vec<TickRead>>>>,
-    /// [measurement; theory, November 11 18:33, part P2] While the carry circles' gates are read: each circle's `|γ|` sum, then its `h ≥ 0` count,
+    /// [measurement; theory, November 11 18:33, part P2] While the carry circles' gates are read: each circle's `|γ|` sum, then its `ℓ ≥ 0` count,
     /// then the reads (`2C + 1` words, [`CarryGates`]), summed over the batches from each tick's forward.
     carry_gates: std::cell::RefCell<Option<Vec<u128>>>,
     /// [measurement, §16.42] While a near field is read: the named sites of the batch's one region, and each one's near field
@@ -1432,7 +1432,7 @@ impl<'c> CardField<'c> {
             self.launch("field_pair", Self::cells((sites * plain) as u64), THREADS, &mut [arg(words)])?;
         }
         if circles > 0 {
-            // [theory, November 11 17:25] The carry circles: their charts' reads `q`, `h` (one affine with its bias), the gate's two divisions off
+            // [theory, November 11 17:25] The carry circles: their charts' reads `q`, `ℓ` (one affine with its bias), the gate's two divisions off
             // the chain on the pair's grid (one thread a site and circle, as tower.field-scan-gate-once-a-site moved the root out), then the
             // chain, one thread a (region, circle) in strand order.
             self.affine("field_affine_x32", words, words.wg, words.wgb, words.rg, 2 * circles, dw, tick.read2.device_ptr(), dw, tick.pg.device_ptr(), 2 * circles, 0, false)?;
@@ -2204,7 +2204,7 @@ impl<'c> CardField<'c> {
         }
         if circles > 0 {
             // [theory, November 11 17:25] The circles' reverse: the same (region, circle) jobs in the opposite strand order, with the forward's `γ` and `Q`
-            // operand, writing `δγ` a site and circle; then `δq` and `δh` off the chain on the pair's grid, the divisions out of the chain.
+            // operand, writing `δγ` a site and circle; then `δq` and `δℓ` off the chain on the pair's grid, the divisions out of the chain.
             let mut dgp = dg.device_ptr();
             self.launch("field_pair_scan_back", Self::cells((words.r as usize * circles) as u64), THREADS, &mut [arg(words), arg(&mut dcp), arg(&mut dap), arg(&mut dbp), arg(&mut dgp)])?;
             let mut dgp = dg.device_ptr();

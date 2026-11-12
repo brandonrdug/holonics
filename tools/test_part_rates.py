@@ -36,7 +36,7 @@ KEYS = ("alphabet", "width", "heads", "modes", "still", "contacts", "ticks", "fr
 
 def write(path, theta, octaves, d=D, extra=None):
     c = d.get("carry", 0)
-    words = (["hnn-field-v14t"] if c else ["hnn-field-v14"]) + [str(d[k]) for k in KEYS] + ["0"] + ([str(c)] if c else [])
+    words = (["hnn-field-v14e"] if c else ["hnn-field-v14"]) + [str(d[k]) for k in KEYS] + ["0"] + ([str(c)] if c else [])
     with open(path, "w") as f:
         f.write("hnn-field-learner-v3 12 0 0 -\n" + " ".join(words) + "\n" + " ".join(str(int(x)) for x in theta) + "\n")
         if extra is not None:
@@ -204,7 +204,13 @@ def main():
             pass
         else:
             raise AssertionError("the retired carry's head is not refused")
-        print("part_rates carry: the circles' four parts, twenty-two written, sixteen read at octave 0, the retired head refused")
+        # The leak's linear chart (hnn-field-v14t, retired November 12) is refused by the field; its states stay receipts this ruler reads, the
+        # layout the same as the log chart's (hnn-field-v14e).
+        with open(p("t"), "w") as f:
+            f.write(open(p("c0")).read().replace("hnn-field-v14e ", "hnn-field-v14t ", 1))
+        assert open(p("t")).read() != open(p("c0")).read()
+        assert part_rates.load(p("t"))[1] == part_rates.load(p("c0"))[1], "a linear chart's receipt reads with the log chart's layout"
+        print("part_rates carry: the circles' four parts, twenty-two written, sixteen read at octave 0, the retired head refused, the linear chart's receipts read")
 
         # The first lane's letter rows (theory, November 11 21:15, G86): three parts of their own, the encodings' columns over the first lane;
         # a field without circles writes nineteen (sixteen and these three), with circles twenty-two; an older line reads them at octave 0.
@@ -228,7 +234,7 @@ def main():
 def learner_text(path, theta, second, octaves, d=D, rate=12, own=None):
     """A learner's text with its moments' lines (first moments zero), for the law's controls; own, each entry's rate, a trailing rates line."""
     c = d.get("carry", 0)
-    words = (["hnn-field-v14t"] if c else ["hnn-field-v14"]) + [str(d[k]) for k in KEYS] + ["0"] + ([str(c)] if c else [])
+    words = (["hnn-field-v14e"] if c else ["hnn-field-v14"]) + [str(d[k]) for k in KEYS] + ["0"] + ([str(c)] if c else [])
     line = [octaves[p] for p in part_rates.written(d)]
     with open(path, "w") as f:
         f.write(f"hnn-field-learner-v3 {rate} 0 0 -\n" + " ".join(words) + "\n" + " ".join(str(int(x)) for x in theta) + "\n"

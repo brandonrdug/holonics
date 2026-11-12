@@ -273,9 +273,10 @@ pub(super) fn parity(args: &[String], card: &mut dyn FieldRealization) -> Result
     }
     // [definition; theory, November 11 17:25] The carry circles (`FIELD_PARITY_CARRY=C`): the founded field (after its lanes and contacts) grown by
     // `C` carry circles ([`FieldLearner::with_carry`]), so both realizations read the circles' scan, their gate and its adjoint. Founded, the circles'
-    // `W` columns are zero and their charts' leak rows and biases too; a moved state (`FIELD_PARITY_CARRY_SHIFT=s`) draws the circles' charts, their
-    // biases and their `W` columns from the key file's tail, each 32-bit word shifted down `s` bits, so the first section reads every carry term
-    // with friction on some sites and off on others (`h` of both signs).
+    // `W` columns are zero and their charts' leak rows and biases too (`ℓ = 0`, the founded friction); a moved state (`FIELD_PARITY_CARRY_SHIFT=s`)
+    // draws the circles' charts, their biases and their `W` columns from the key file's tail, each 32-bit word shifted down `s` bits, so the first
+    // section reads every carry term with the friction above its founding on some sites and below it on others (`ℓ` of both signs, the leak's log
+    // chart).
     if let Some(circles) = std::env::var("FIELD_PARITY_CARRY").ok().and_then(|v| v.parse::<usize>().ok()).filter(|&c| c > 0) {
         founded = founded.with_carry(circles, &p.keys).map_err(|e| e.to_string())?;
         let d = founded.field.declaration;
