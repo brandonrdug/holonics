@@ -1,0 +1,67 @@
+Ruler 1. A uniform strand: the back range rests at the group, and the mass formula is its rest.
+  [ok] the founding: q0 N0 = d0, (1 + d0)/d0 = N0 = 5, d0^2/(1 + d0) = q0 = 1/20
+  [ok] d = 1/16: mass 1/272, the rest R = (1 + d)/d = 17, with d = m R; from R = 1 and R = 1000 the gap falls at every step, under 10^-6 after 400
+  [ok] d = 1/4: mass 1/20, the rest R = (1 + d)/d = 5, with d = m R; from R = 1 and R = 1000 the gap falls at every step, under 10^-6 after 400
+  [ok] d = 1/2: mass 1/6, the rest R = (1 + d)/d = 3, with d = m R; from R = 1 and R = 1000 the gap falls at every step, under 10^-6 after 400
+  [ok] d = 1: mass 1/2, the rest R = (1 + d)/d = 2, with d = m R; from R = 1 and R = 1000 the gap falls at every step, under 10^-6 after 400
+  [ok] d = 2: mass 4/3, the rest R = (1 + d)/d = 3/2, with d = m R; from R = 1 and R = 1000 the gap falls at every step, under 10^-6 after 400
+  [ok] the back range's move is the Mobius move of [[1 + m, 1], [m, 1]] = [[1, 1], [0, 1]] [[1, 0], [m, 1]], two shears of determinant one; its trace gives (2 + m)^2 = K + 1/K + 2 at K = (1 + d)^2, which is m = d^2/(1 + d), and its fixed range solves m R^2 - m R - 1 = 0
+Ruler 2. The pair form and the gate form are one scan.
+  [ok] 1920 sites of 40 random strands (masses 0 to 5, eight turns): the charge eta/n of the pair form equals the gate form's Q at every site
+  [ok] at every site the arriving count is n = 1/(q0 R) and the friction is d = j/n = m R: what the site brings over what the circle holds
+  [ok] the move stays the built one: |gamma| + kappa/N0 = 1 at every site, and |Q| <= N0 max|b| on every strand
+Ruler 3. The scan is the one-way factor of the two-way chain, and the two arrivals with the site make the two-way field.
+  [ok] 12 strands of 14 sites: for every length the dense solve of the half strand's energy gives the scan's charge at its last site
+  [ok] and that energy's stiffness in the last site's value is the scan's count there (a unit of mass added at the site moves the minimizer by n/(n + 1))
+  [ok] 168 sites: the two-way solve equals (n_L Q_L + n_R Q_R + j N0 b)/(n_L + n_R + j), the two arrivals and the site weighed by their counts
+Ruler 4. Across sites that bring nothing the ratio holds and the pair leaks.
+  [ok] a site of no mass turns the charge and keeps its modulus (d = 0 there), for gaps of 0 to 75 sites
+  [ok] the back range grows one place a site across the gap, and the count falls at every site of it
+  [ok] the letter after a gap of g such sites has d = (g + 5)/20 and takes (g + 5)/(g + 25) of the charge; by gap 0: 1/5, 1: 3/13, 5: 1/3, 15: 1/2, 35: 2/3, 75: 4/5
+Ruler 5. A region sets its friction by how thinly it is written: letters one site in g, the sites between bringing nothing.
+  [ok] the rest at the letters solves d^2/(1 + d) = g q0: d = 1/4 at g = 1 (five letters, five sites) and d = 1 at g = 10 (two letters, twenty sites)
+  [ok] 400 periods of the gate form land on that rest for g = 1, 2, 4, 8, 10 and 16 (within 10^-6)
+     g   friction at a letter   letters heard   sites heard   built law: letters' share of the charge
+     1   0.2500                 5.00            5.0          1 = 1.000
+     2   0.3702                 3.70            7.4          5/9 = 0.556
+     4   0.5583                 2.79            11.2          125/369 = 0.339
+     8   0.8633                 2.16            17.3          78125/325089 = 0.240
+    10   1.0000                 2.00            20.0          1953125/8717049 = 0.224
+    16   1.3798                 1.72            27.6          30517578125/148292923329 = 0.206
+  [ok] the built law's share of the charge at the letters is w/(1 - (1 - w)^g) at w = 1/5 (one at g = 1, 5^9/(5^10 - 4^10) at g = 10): the rest is the drive of the sites between
+Ruler 6. The back range is bounded and forgets.
+  [ok] on 40 random strands 1 <= R <= N0 + (sites passed) at every site
+  [ok] R' = 1 + R/(1 + m R) has difference quotient 1/((1 + m R)(1 + m (R + h))): its slope is |gamma|^2 at a site of mass, one at a site of none
+Ruler 7. Arithmetic on G108's receipt (g108_reach_reads.txt on main): what one friction chart costs its regions at te5's mean.
+  [ok] each read's quarters, weighed by their places, sum to its joint (within 2 millionths)
+     quarter   slope per unit of l   curvature   own zero from te5's (units of l)   gain at it   best shift read   gain there
+     1         -0.0061               0.0046      +1.33                              0.0041       P+4 (+0.25)     0.0014
+     2         -0.0058               0.0132      +0.44                              0.0013       P+4 (+0.25)     0.0010
+     3         +0.0010               0.0235      -0.04                              0.0000       control (+0.00)     0.0000
+     4         +0.0131               0.0042      -3.10                              0.0203       P-8 (-0.50)     0.0069
+     the joint's slope +0.00058 nats a place a unit of l; a friction of its own for each quarter, among the four shifts read: 0.0023 nats a place; at each quarter's quadratic zero: 0.0064
+  [ok] the joint stands near its own zero in the shared chart (slope under 0.001) while its quarters do not: one chart costs the joint at least 0.002 nats a place among the shifts read
+  [ok] te4's and te3's quarters, rebuilt from the differences G108's premise prints, sum to their printed joints (within 3 millionths): te3 0.635444, 1.221234, 1.984523, 2.911691; te4 0.619586, 1.204618, 1.976124, 2.938257
+     the lever point of the four quarters, from te5's mean in units of l: weighed by their places (the held joint) -0.051; weighed by the masks' counts of states (ruler 8) +0.250
+  [ok] te5's chart stands within a tenth of a unit of l of its held quarters' lever point, and quarter 3, the stiffest (over five times quarter 4's curvature), holds it
+     te6's mean less te5's by quarter: -0.0039, -0.0082, -0.0017, +0.0169; the shift P+4 less te5's: -0.0014, -0.0010, +0.0010, +0.0034
+  [ok] over te6's lap quarter 4 rose 0.017 nats a place, quarters 1 to 3 fell, and the joint rose 0.0008: the lap's rest stands past the held joint's
+Ruler 8. How a lap weighs its states, from the draw's own laws (field_train.rs: shape, weighed_domain, writer_region).
+     mask states by quarter of tau (1 the fewest open): states 0.5000, 0.2071, 0.1589, 0.1340; summed weight 0.2500, 0.2500, 0.2500, 0.2500; summed square weight 0.1250, 0.2286, 0.2960, 0.3505
+  [ok] the masks weigh the four quarters alike, a quarter of the weight each (the importance weight 2 sqrt(tau) against the draw tau = u^2)
+  [ok] half of the mask states stand in quarter 1 and 0.134 in quarter 4, each quarter 4 state at 3.7 times a quarter 1 state's weight, so quarter 4 holds 0.35 of the summed square weight and quarter 1 0.125
+     the writer's state, weight one an open place: its summed weight over the answer's length, and its share in states at least 3/4 open
+       answer of   64 places: 0.796 of its length a state, 0.849 of that in states at least 3/4 open; beside the masks' quarter 4, 0.675 against 0.250
+       answer of  128 places: 0.817 of its length a state, 0.869 of that in states at least 3/4 open; beside the masks' quarter 4, 0.710 against 0.250
+       answer of  340 places: 0.801 of its length a state, 0.874 of that in states at least 3/4 open; beside the masks' quarter 4, 0.700 against 0.250
+       answer of 1024 places: 0.864 of its length a state, 0.908 of that in states at least 3/4 open; beside the masks' quarter 4, 0.785 against 0.250
+  [ok] a writer state weighs over 3/4 of its answer's length, over 4/5 of it in states at least 3/4 open: more than twice the masks' quarter 4, on states of another kind (a written front, the rest open)
+Ruler 9. On the built chart: a strand of one friction is the built circle at every site, and the two differ only where the friction varies along a strand.
+  [ok] 240 sites of six uniform strands (frictions from one grain, 2^-16, to 3): the charge, the friction and the back range equal the built circle's at every site, the first included
+  [ok] a letter after a gap of sites charted at d^ = 2^-10 takes more of the charge the longer the gap, where the built circle gives it 1/5 at every gap; by gap 1: 0.231 (massless 0.231), 5: 0.333 (massless 0.333), 15: 0.500 (massless 0.500), 35: 0.667 (massless 0.667), 75: 0.800 (massless 0.800)
+Ruler 10. The ladder is standing: the 32 circles' mean moduli over open sites at te6's and te5's lap means (g110_te6_reads.txt, g108_reach_reads.txt; on 2^-30).
+     te6: mean |gamma| 0.8002; the circles from 0.6988 to 0.8993, groups of 3.32 to 9.93 places
+     te5: mean |gamma| 0.8251; the circles from 0.7324 to 0.9095, groups of 3.74 to 11.05 places
+  [ok] at te6's mean the circles' groups run from 3.3 to 9.9 places, a ladder of over an octave and a half, and G108's trade was read with it standing
+  [ok] from te5's mean to te6's every one of the 32 circles' moduli fell: the whole ladder travelled toward the near letters
+rulers failed: 0

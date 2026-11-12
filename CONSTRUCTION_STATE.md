@@ -91,8 +91,17 @@ repository was reset on September 24; the pre-reset tree is
   (|gamma| 0.8079 against 0.8002 at the means, the leak biases running at their top speed) and coded
   quarter 4 as te6 did. The lag is real and buys nothing, so there is no rate law: the trade between
   the regions is the lap's, and the friction is one of its carriers, which the other parts replace
-  when it is held back. The line goes on from te6's end, and the friction the region sets is derived
-  next, from how a lap draws its places against the held strata. tt1's circles drifted as te5's did
+  when it is held back. The line goes on from te6's end. The friction the region sets is derived
+  ([the record](research/records/2026-11-12_THE_FRICTION_A_REGION_SETS_A_CARRY_CIRCLE_IS_THE_ONE_WAY_FACTOR_OF_THE_TWO_WAY_CHAIN_AND_CARRIES_ITS_COUNT_BESIDE_ITS_CHARGE_AND_A_SHARED_CHART_RESTS_AT_ITS_REGIONS_LEVER_POINT.md);
+  atlas `contact.circle-count-pair`, `contact.region-friction-sparse-rest`) and not built: a circle
+  is the one-way factor of the two-way chain, so it carries its count beside its charge, the
+  friction at a site is what the site brings over what the circle holds (`d = m R`, the back range
+  moving as `R' = 1 + R/(1 + d)`), and the built circle is that law at rest on a strand of one
+  friction. A lap's balance between regions is a lever rule (atlas
+  `deposition.shared-entry-lever-point`): te5's chart stood at its held quarters' lever point, te6's
+  lap took it a quarter of a unit of `ℓ` past, and neither the draw's weights nor a rate puts it
+  there, so the premise is read before any founding (G111: a seen passage beside the held one, and
+  the friction by kind of site). tt1's circles drifted as te5's did
   with the triads beside them (their friction 0.8242 at tt1's mean against te5's 0.8251). With
   `C = 0` the field is the plain line bit for bit.
 - **The triad** (founded on te4's end, its first lap read; atlas `contact.triad-manley-rowe-gauge`,
