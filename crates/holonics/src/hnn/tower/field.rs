@@ -5361,6 +5361,10 @@ pub struct FieldReceipt {
     /// step before on the next section, with no self-alignment. `transfer − external` of the section before reads the
     /// step's curvature `ΔθᵀHΔθ` from the pass alone, with no reread. `None` past its carrier.
     pub external: Option<i64>,
+    /// [measurement; theory, November 12, G96's third branch] **The predicted change by founded part** ([`predicted_parts`]):
+    /// `predicted`'s terms gathered by part, [`PART_NAMES`] in order and the old entries last, each on the codes' grain; their sum
+    /// stands within one unit a family and part under `predicted`. `None` past its carrier. A reading.
+    pub predicted_parts: Option<[i64; PARTS + 1]>,
 }
 
 /// A deposited step held for the next regions' read: the proposed step on each family's grain and
@@ -5456,6 +5460,34 @@ fn predicted_change(field: &Field, g: &[i128], step: &[i128], halvings: u32) -> 
         total = total.checked_add(family >> shift)?;
     }
     i64::try_from(total).ok()
+}
+
+/// [measurement; theory, November 12, G96's third branch] **A step's first-order change by founded part**: [`predicted_change`]'s
+/// sum with each family's terms gathered by the part each entry belongs to (`parts`, [`Field::founded_parts`]; index [`PARTS`] the
+/// old entries, which no part holds), each gathered family sum released onto the codes' `2^(−20)` bits as the total releases it.
+/// So the parts sum to the total less the releases' floors, at most one unit a family and part, which a reader keeps as the
+/// total's rest. `None` where a product or a sum passes its carrier. A reading: the step is not changed. Why: a section's
+/// predicted price is a total over every part, and a reading names its partition beside its total (the guide's rule of November
+/// 11); on tp5 that price burst a hundredfold before the card refused a sum, and which part's covector burst is the question
+/// G96's rule asks before eight times returns.
+fn predicted_parts(field: &Field, g: &[i128], step: &[i128], halvings: u32, parts: &[u8]) -> Option<[i64; PARTS + 1]> {
+    let mut by = [0i128; PARTS + 1];
+    for &(start, len, grain) in &field.families_all() {
+        let shift = if grain == MATERIAL_BITS { 40 + grain - 20 } else { 24 + grain - 20 };
+        let mut family = [0i128; PARTS + 1];
+        for i in start..start + len {
+            let p = parts.get(i).map_or(PARTS, |&p| if p == OLD_PART { PARTS } else { usize::from(p) });
+            family[p] = family[p].checked_add(g[i].checked_mul(-release(step[i], halvings))?)?;
+        }
+        for (b, f) in by.iter_mut().zip(family) {
+            *b = b.checked_add(f >> shift)?;
+        }
+    }
+    let mut out = [0i64; PARTS + 1];
+    for (o, b) in out.iter_mut().zip(by) {
+        *o = i64::try_from(b).ok()?;
+    }
+    Some(out)
 }
 
 /// [definition; theory, November 10 19:05] **The founded parts**: a part is a family of entries founded together, and steps at a rate
@@ -6079,6 +6111,13 @@ impl FieldLearner {
         rates
     }
 
+    /// [measurement; theory, November 12] **The founded parts a reading gathers by** ([`Field::founded_parts`]): the new contacts
+    /// told from the contact count the learner's parts' rates carry, and from the field's own count where it carries none (so no
+    /// contact is new). A reading's partition; no rate is read from it.
+    pub fn reading_parts(&self) -> Vec<u8> {
+        self.field.founded_parts(self.rate_parts.map_or(self.field.declaration.contacts, |rp| rp.contacts_before))
+    }
+
     /// One section: the step the section before deposited read on its regions (only under
     /// [`FieldLearner::read_held`]), then its regions read and returned on the material that stands,
     /// the moments moved, and the step deposited at its size (the step fluxes, November 5; a step that
@@ -6136,6 +6175,7 @@ impl FieldLearner {
             }
         }
         let predicted = predicted_change(&self.field, &raw, &step, 0);
+        let predicted_parts = predicted_parts(&self.field, &raw, &step, 0, &self.reading_parts());
         // [definition; Brandon, November 5 17:29 and 17:32] **The step fluxes**: it deposits at its size, and no reread of the
         // section certifies it. The reread kept a step only where the regions reread under it coded strictly fewer bits, a
         // selection on the code (a maximum in effect) that discarded what an expansion measures ("you can't discard failure
@@ -6145,7 +6185,7 @@ impl FieldLearner {
         // alike, and the moments carry every covector.
         let (candidate, moved) = stepped(&self.field, &step, 0)?;
         if !moved {
-            return Ok(FieldReceipt { sites, code_before, code_after: None, halvings: 0, deposited: false, next, predicted, change: None, transfer, external });
+            return Ok(FieldReceipt { sites, code_before, code_after: None, halvings: 0, deposited: false, next, predicted, change: None, transfer, external, predicted_parts });
         }
         self.field = candidate;
         if self.read_held {
@@ -6153,7 +6193,7 @@ impl FieldLearner {
         } else {
             self.last = Some(HeldStep { step, halvings: 0 });
         }
-        Ok(FieldReceipt { sites, code_before, code_after: None, halvings: 0, deposited: true, next, predicted, change: None, transfer, external })
+        Ok(FieldReceipt { sites, code_before, code_after: None, halvings: 0, deposited: true, next, predicted, change: None, transfer, external, predicted_parts })
     }
 
     /// [definition; agent-inferred, November 3, the tower record] **The learner grown in scale**: its field grown in scale

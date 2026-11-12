@@ -2177,6 +2177,49 @@ fn a_part_steps_at_its_own_rate_and_the_plain_rate_is_the_plain_deposit() {
     assert_eq!(stripped, grown_learner_text_of(&fast), "the state's other lines are a plain state's");
 }
 
+/// [measurement; theory, November 12, G96's third branch] **The predicted change by part is the total's partition**: a covector and a
+/// step on one part's entries alone give that part the total and every other part zero; on the grown learner with its parts at their
+/// own rates, each section's parts sum to its predicted change less at most one unit a family and part (the releases' floors), and a
+/// part that holds no entry reads zero; without parts' rates the reading still partitions, no contact new.
+#[test]
+fn the_predicted_change_by_part_is_its_totals_partition() {
+    let mut learner = grown_learner();
+    let mut octaves = [0u32; PARTS];
+    (octaves[0], octaves[1]) = (2, 3);
+    learner.rate_parts = Some(RateParts { contacts_before: 4, octaves });
+    let parts = learner.reading_parts();
+    assert_eq!(parts, learner.field.founded_parts(4));
+    // One part's entries alone: part 1 (the new a rows).
+    let n = parts.len();
+    let (mut g, mut step) = (vec![0i128; n], vec![0i128; n]);
+    for (i, &p) in parts.iter().enumerate() {
+        if p == 1 {
+            (g[i], step[i]) = (-(1i128 << 50) - i as i128, 3 << 20);
+        }
+    }
+    let total = predicted_change(&learner.field, &g, &step, 0).unwrap();
+    let by = predicted_parts(&learner.field, &g, &step, 0, &parts).unwrap();
+    assert!(total > 0, "a positive step (subtracted) on a negative covector raises the code at first order");
+    assert_eq!(by[1], total, "the one part holds the total");
+    assert!(by.iter().enumerate().all(|(p, &v)| p == 1 || v == 0), "every other part reads zero");
+    let families = learner.field.families_all().len() as i64;
+    let holds = |p: usize| parts.iter().any(|&q| if p == PARTS { q == OLD_PART } else { usize::from(q) == p });
+    for _ in 0..3 {
+        let receipt = learner.section(&[region()]).unwrap();
+        let (total, by) = (receipt.predicted.unwrap(), receipt.predicted_parts.unwrap());
+        let sum: i64 = by.iter().sum();
+        assert!(sum <= total && total - sum <= families * (PARTS as i64 + 1), "parts {sum} against the total {total}");
+        for (p, &v) in by.iter().enumerate() {
+            assert!(holds(p) || v == 0, "part {p} holds no entry and reads {v}");
+        }
+    }
+    let mut plain = grown_learner();
+    assert_eq!(plain.reading_parts(), plain.field.founded_parts(plain.field.declaration.contacts), "no parts' rates: no contact is new");
+    let receipt = plain.section(&[region()]).unwrap();
+    let (total, sum) = (receipt.predicted.unwrap(), receipt.predicted_parts.unwrap().iter().sum::<i64>());
+    assert!(sum <= total && total - sum <= families * (PARTS as i64 + 1));
+}
+
 /// The learner's text without its parts' rates (what a binary without them writes).
 fn grown_learner_text_of(learner: &FieldLearner) -> String {
     let mut plain = learner.clone();

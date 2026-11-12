@@ -24,7 +24,7 @@
 
 use super::tower_train::{count, positive, STATE_BUDGET};
 use super::*;
-use holonics::hnn::tower::field::{Echo, Field, FieldDeclaration, FieldLearner, FieldNext, FieldRealization, FieldReceipt, HeldRows, HostField, MaterialMean, Port, Region, Shares};
+use holonics::hnn::tower::field::{Echo, Field, FieldDeclaration, FieldLearner, FieldNext, FieldRealization, FieldReceipt, HeldRows, HostField, MaterialMean, Port, Region, Shares, PARTS, PART_NAMES};
 use holonics::hnn::units::Units;
 use rayon::prelude::*;
 use std::collections::HashMap;
@@ -1253,6 +1253,14 @@ pub(super) fn train(args: &[String], realization: &mut dyn FieldRealization) -> 
     // [the unified-theory reading of November 6, 08:54] The external price `p_ext` of the step the last section stood at full
     // size, which the next section's transfer pairs with.
     let mut prior: Option<i128> = None;
+    // [measurement; theory, November 12, G96's third branch] `FIELD_SECTION_LEAK`: each section's carry leaks read on its regions before
+    // its step ([`section_leaks`]), and a section the realization refuses read once more on the host, whose arithmetic names the sum that
+    // outgrew its carrier. A reading: the material, the moments and every other line are the run's without it (the variable's only
+    // effect is its lines and its time, printed on them).
+    let section_leak = std::env::var_os("FIELD_SECTION_LEAK").is_some() && learner.field.declaration.carry > 0;
+    if section_leak {
+        println!("FIELD_SECTION_LEAK_READ circles={} threads={}", learner.field.declaration.carry, rayon::current_num_threads());
+    }
     for lap in 0..laps {
         // A lap starts only where the time left holds its bound: no lap is begun that its own
         // projection says could pass the run's deadline.
@@ -1296,8 +1304,26 @@ pub(super) fn train(args: &[String], realization: &mut dyn FieldRealization) -> 
                     println!("FIELD_COVECTOR_SHARE lap={lap} section={run_section} head={head} near={near} far={far} far_share={far_share} ms={}", read_start.elapsed().as_millis());
                 }
             }
+            if section_leak {
+                let leak_start = std::time::Instant::now();
+                match section_leaks(&learner.field, &views, realization) {
+                    Ok(leaks) => println!("{} ms={}", section_leak_text(lap, n, &leaks), leak_start.elapsed().as_millis()),
+                    Err(e) => println!("FIELD_SECTION_LEAK lap={lap} n={n} refused={e} ms={}", leak_start.elapsed().as_millis()),
+                }
+            }
             let deposit_start = std::time::Instant::now();
-            let receipt = learner.section_realized(&views, realization).map_err(|e| e.to_string())?;
+            let receipt = match learner.section_realized(&views, realization) {
+                Ok(receipt) => receipt,
+                Err(e) => {
+                    if section_leak {
+                        // The refused section's regions read and returned on the host, from the material the realization refused.
+                        let host_start = std::time::Instant::now();
+                        let host_read = host().read_and_return(&learner.field, &views).map(|(_, g)| g.len());
+                        println!("FIELD_SECTION_HOST lap={lap} n={n} realization_refused={e} host={} ms={}", host_read.map_or_else(|h| format!("refused:{h}"), |len| format!("read:{len}")), host_start.elapsed().as_millis());
+                    }
+                    return Err(e.to_string().into());
+                }
+            };
             let deposit_ms = deposit_start.elapsed().as_millis();
             mean.take(&learner.field).map_err(|e| e.to_string())?;
             let receipt = FieldReceipt { next: next.or(receipt.next), ..receipt };
@@ -1332,6 +1358,14 @@ pub(super) fn train(args: &[String], realization: &mut dyn FieldRealization) -> 
                 receipt.transfer.zip(prior).map_or("-".to_string(), |(t, e)| if receipt.sites == 0 { "0".to_string() } else { ((t as i128 - e) * 1_000_000 / ((receipt.sites as i128) << 20)).to_string() }),
                 section_start.elapsed().as_millis()
             );
+            // [measurement; theory, November 12, G96's third branch] The predicted price by founded part ([`FieldReceipt::predicted_parts`]),
+            // in the section line's millionths of a bit a site, with the rest the releases' floors leave, so the words sum to its price.
+            if let (Some(p), Some(by)) = (receipt.predicted, receipt.predicted_parts) {
+                let parts: Vec<i128> = by.iter().map(|&v| micro(v)).collect();
+                let rest = micro(p) - parts.iter().sum::<i128>();
+                let named: Vec<String> = PART_NAMES.iter().zip(&parts).map(|(name, v)| format!("{name}={v}")).collect();
+                println!("FIELD_SECTION_PARTS lap={lap} n={n} predicted_micro={} {} old={} rest={rest}", micro(p), named.join(" "), parts[PARTS]);
+            }
             if let (Some(t), Some(e)) = (receipt.transfer, prior) {
                 (transfers, externals, curvatures, priced) = (transfers + t as i128, externals + e, curvatures + (t as i128 - e), priced + 1);
             }
@@ -5096,12 +5130,179 @@ impl Leak {
         self.run_sites[band] += run as u64;
         self.longest = self.longest.max(run);
     }
+
+    /// Another read's sums added in (the same circle).
+    fn merge(&mut self, o: &Leak) {
+        let add = |a: &mut (u64, u64), b: (u64, u64)| {
+            a.0 += b.0;
+            a.1 += b.1;
+        };
+        self.reads += o.reads;
+        self.nonnegative += o.nonnegative;
+        for (a, &b) in self.kind.iter_mut().zip(&o.kind) {
+            add(a, b);
+        }
+        for (a, b) in self.bands.iter_mut().zip(o.bands) {
+            *a += b;
+        }
+        for (a, &b) in self.strata.iter_mut().zip(&o.strata) {
+            add(a, b);
+        }
+        add(&mut self.first, o.first);
+        add(&mut self.last, o.last);
+        for (a, b) in self.runs.iter_mut().zip(o.runs) {
+            *a += b;
+        }
+        for (a, b) in self.run_sites.iter_mut().zip(o.run_sites) {
+            *a += b;
+        }
+        self.longest = self.longest.max(o.longest);
+        self.charge_max = self.charge_max.max(o.charge_max);
+        self.charge_max_below = self.charge_max_below.max(o.charge_max_below);
+        (self.charge_below.0, self.charge_below.1) = (self.charge_below.0 + o.charge_below.0, self.charge_below.1 + o.charge_below.1);
+        (self.charge_rest.0, self.charge_rest.1) = (self.charge_rest.0 + o.charge_rest.0, self.charge_rest.1 + o.charge_rest.1);
+    }
+}
+
+/// The band of a leak read `h` on `2^(−16)`, in units of the founded leak `1/4`: below `−1/2`, `−1/2` to `−1/4`, `−1/4` to `0`, `0` to
+/// `1/4`, `1/4` to `1/2`, `1/2` to `1`, and `1` or more.
+fn leak_band(h: i64) -> usize {
+    let quarter = i64::from(holonics::hnn::tower::field::CARRY_LEAK_FOUNDING);
+    match h {
+        h if h < -2 * quarter => 0,
+        h if h < -quarter => 1,
+        h if h < 0 => 2,
+        h if h < quarter => 3,
+        h if h < 2 * quarter => 4,
+        h if h < 4 * quarter => 5,
+        _ => 6,
+    }
+}
+
+/// One region's reads added into `leaks` (a carry circle each): at every tick its leaks and charges ([`Field::carry_leaks`]), each site
+/// counted by kind (before `q_len` a question's, then open or given by `open`), by band, at the first and last tick, by `stratum` where
+/// the region has one (its open sites), and its runs of `h < 0` along the strand as the circle's scan runs (even contacts from the left,
+/// odd from the right), a run closing at the region's end.
+fn leak_add(field: &Field, leaks: &mut [Leak], stratum: Option<usize>, open: &[bool], q_len: usize, state_ticks: &[holonics::hnn::tower::field::TickRead]) -> Result<()> {
+    let (circles, ticks, plain) = (field.declaration.carry, field.declaration.ticks, field.declaration.carry_first());
+    if state_ticks.len() != ticks {
+        return Err("a tick read of other than the field's ticks".into());
+    }
+    let sites = open.len();
+    for (tick, read) in state_ticks.iter().enumerate() {
+        let (h, charge) = field.carry_leaks(&read.pair_read).map_err(|e| e.to_string())?;
+        if h.len() != sites * circles {
+            return Err("a pair chart of other than the region's sites".into());
+        }
+        for (k, leak) in leaks.iter_mut().enumerate() {
+            let left = (plain + k) % 2 == 0;
+            let mut run = 0usize;
+            for step in 0..sites {
+                let t = if left { step } else { sites - 1 - step };
+                let (hv, qv) = (h[t * circles + k], charge[t * circles + k]);
+                let below = hv < 0;
+                let kind = if t < q_len { 0 } else if open[t] { 1 } else { 2 };
+                leak.kind[kind].0 += u64::from(below);
+                leak.kind[kind].1 += 1;
+                leak.bands[leak_band(hv)] += 1;
+                if open[t] {
+                    leak.reads += 1;
+                    leak.nonnegative += u64::from(!below);
+                    if let Some(s) = stratum {
+                        leak.strata[s].0 += u64::from(below);
+                        leak.strata[s].1 += 1;
+                    }
+                }
+                if tick == 0 {
+                    leak.first.0 += u64::from(below);
+                    leak.first.1 += 1;
+                }
+                if tick + 1 == ticks {
+                    leak.last.0 += u64::from(below);
+                    leak.last.1 += 1;
+                }
+                leak.charge_max = leak.charge_max.max(qv);
+                if below {
+                    run += 1;
+                    leak.charge_max_below = leak.charge_max_below.max(qv);
+                    leak.charge_below.0 += u128::from(qv);
+                    leak.charge_below.1 += 1;
+                } else {
+                    if run > 0 {
+                        leak.close(run);
+                    }
+                    run = 0;
+                    leak.charge_rest.0 += u128::from(qv);
+                    leak.charge_rest.1 += 1;
+                }
+            }
+            if run > 0 {
+                leak.close(run);
+            }
+        }
+    }
+    Ok(())
+}
+
+/// [measurement; theory, November 12, G96's third branch] **A training section's carry leaks**, read before its step on the regions the
+/// section reads ([`leak_add`], no stratum and no question split: a region's sites are open or given): the card reads the ticks, and the
+/// host's arithmetic on them runs a region a task. A reading; the section's own read and step are not changed.
+fn section_leaks(field: &Field, views: &[Region], realization: &mut dyn FieldRealization) -> Result<Vec<Leak>> {
+    let circles = field.declaration.carry;
+    let mut leaks = vec![Leak::default(); circles];
+    for chunk in views.chunks(64) {
+        let reads = realization.read_ticks(field, chunk).map_err(|e| e.to_string())?;
+        if reads.len() != chunk.len() {
+            return Err("a tick read of other than its regions".into());
+        }
+        let parts = chunk
+            .par_iter()
+            .zip(&reads)
+            .map(|(view, state_ticks)| {
+                let mut part = vec![Leak::default(); circles];
+                leak_add(field, &mut part, None, view.unresolved, 0, state_ticks).map(|_| part).map_err(|e| e.to_string())
+            })
+            .collect::<std::result::Result<Vec<_>, String>>()?;
+        for part in &parts {
+            for (leak, p) in leaks.iter_mut().zip(part) {
+                leak.merge(p);
+            }
+        }
+    }
+    Ok(leaks)
+}
+
+/// A section's `FIELD_SECTION_LEAK` line ([`section_leaks`]): the circles pooled (the open reads, the reads below zero at open and given
+/// sites, the bands of `h`, the runs below zero and their sites by length band), the longest run and each circle's longest, and the
+/// largest charge over every site and over the sites below zero.
+fn section_leak_text(lap: usize, n: usize, leaks: &[Leak]) -> String {
+    let mut pooled = Leak::default();
+    for leak in leaks {
+        pooled.merge(leak);
+    }
+    let join = |v: &[u64]| v.iter().map(|x| x.to_string()).collect::<Vec<_>>().join("/");
+    format!(
+        "FIELD_SECTION_LEAK lap={lap} n={n} circles={} reads={} below_open={}/{} below_given={}/{} bands={} runs_1/2-3/4-7/8-15/16-31/32-63/64+={} sites_in_runs={} longest={} longest_by_circle={} charge_max={} charge_max_below={}",
+        leaks.len(),
+        pooled.reads,
+        pooled.kind[1].0,
+        pooled.kind[1].1,
+        pooled.kind[2].0,
+        pooled.kind[2].1,
+        join(&pooled.bands),
+        join(&pooled.runs),
+        join(&pooled.run_sites),
+        pooled.longest,
+        leaks.iter().map(|l| l.longest.to_string()).collect::<Vec<_>>().join("/"),
+        pooled.charge_max,
+        pooled.charge_max_below
+    )
 }
 
 /// [`leak_field`]'s sums over `held`'s joint states, own and foil, as [`joint_read`] draws them on `seed`, a carry circle each, and the
 /// count of states.
 fn leak_sums(field: &Field, codec: &FieldCodec, held: &Problems, seed: u64, realization: &mut dyn FieldRealization) -> Result<(Vec<Leak>, usize)> {
-    let (circles, ticks, plain) = (field.declaration.carry, field.declaration.ticks, field.declaration.carry_first());
+    let circles = field.declaration.carry;
     let n = held.len();
     // (stratum, classes, open, the question's sites).
     let mut states: Vec<(usize, Vec<usize>, Vec<bool>, usize)> = Vec::new();
@@ -5115,19 +5316,6 @@ fn leak_sums(field: &Field, codec: &FieldCodec, held: &Problems, seed: u64, real
             }
         }
     }
-    // The bands of `h` in units of the founded leak `1/4` on `2^(−16)`.
-    let quarter = i64::from(holonics::hnn::tower::field::CARRY_LEAK_FOUNDING);
-    let band_of = |h: i64| -> usize {
-        match h {
-            h if h < -2 * quarter => 0,
-            h if h < -quarter => 1,
-            h if h < 0 => 2,
-            h if h < quarter => 3,
-            h if h < 2 * quarter => 4,
-            h if h < 4 * quarter => 5,
-            _ => 6,
-        }
-    };
     let mut leaks = vec![Leak::default(); circles];
     for chunk in states.chunks(64) {
         let views: Vec<Region> = chunk.iter().map(|(_, c, u, _)| Region { classes: c, unresolved: u, faces: &[], locked: &[], echo: &[], domain: None, port: None }).collect();
@@ -5135,61 +5323,8 @@ fn leak_sums(field: &Field, codec: &FieldCodec, held: &Problems, seed: u64, real
         if reads.len() != chunk.len() {
             return Err("a tick read of other than its regions".into());
         }
-        for ((stratum, c, open, q_len), state_ticks) in chunk.iter().zip(&reads) {
-            if state_ticks.len() != ticks {
-                return Err("a tick read of other than the field's ticks".into());
-            }
-            let sites = c.len();
-            for (tick, read) in state_ticks.iter().enumerate() {
-                let (h, charge) = field.carry_leaks(&read.pair_read).map_err(|e| e.to_string())?;
-                if h.len() != sites * circles {
-                    return Err("a pair chart of other than the region's sites".into());
-                }
-                for (k, leak) in leaks.iter_mut().enumerate() {
-                    let left = (plain + k) % 2 == 0;
-                    let mut run = 0usize;
-                    for step in 0..sites {
-                        let t = if left { step } else { sites - 1 - step };
-                        let (hv, qv) = (h[t * circles + k], charge[t * circles + k]);
-                        let below = hv < 0;
-                        let kind = if t < *q_len { 0 } else if open[t] { 1 } else { 2 };
-                        leak.kind[kind].0 += u64::from(below);
-                        leak.kind[kind].1 += 1;
-                        leak.bands[band_of(hv)] += 1;
-                        if open[t] {
-                            leak.reads += 1;
-                            leak.nonnegative += u64::from(!below);
-                            leak.strata[*stratum].0 += u64::from(below);
-                            leak.strata[*stratum].1 += 1;
-                        }
-                        if tick == 0 {
-                            leak.first.0 += u64::from(below);
-                            leak.first.1 += 1;
-                        }
-                        if tick + 1 == ticks {
-                            leak.last.0 += u64::from(below);
-                            leak.last.1 += 1;
-                        }
-                        leak.charge_max = leak.charge_max.max(qv);
-                        if below {
-                            run += 1;
-                            leak.charge_max_below = leak.charge_max_below.max(qv);
-                            leak.charge_below.0 += u128::from(qv);
-                            leak.charge_below.1 += 1;
-                        } else {
-                            if run > 0 {
-                                leak.close(run);
-                            }
-                            run = 0;
-                            leak.charge_rest.0 += u128::from(qv);
-                            leak.charge_rest.1 += 1;
-                        }
-                    }
-                    if run > 0 {
-                        leak.close(run);
-                    }
-                }
-            }
+        for ((stratum, _, open, q_len), state_ticks) in chunk.iter().zip(&reads) {
+            leak_add(field, &mut leaks, Some(*stratum), open, *q_len, state_ticks)?;
         }
     }
     Ok((leaks, states.len()))
