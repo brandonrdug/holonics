@@ -1,0 +1,163 @@
+# P53 item 4, 2026-11-12 UTC: read-store's partition (the store record's section 11, first item), outside any timing. The held role, 8 sections a slice
+# (P49's reads), on state A (run 1's STATE.0, the crossing, sha256 1ab9484c4e310a89) and state C (leg 1's MEAN.3000, the mean of states at pass
+# section 5,001, sha256 04f29aa40b468081), with main's binary (60fece148) and the partition's (main with STORE_READ_PARTITION, claude/read-partition).
+# A release is a writer state's compared places; a mask's its open places. Codes on 2^-20 bits; read_store_partition.py's means in nats. Numbers only.
+CHECK state=A main_lines=54 partition_build_lines_without_its_new_ones=54 equal=54 EQUAL
+CHECK state=C main_lines=54 partition_build_lines_without_its_new_ones=54 equal=54 EQUAL
+STATE_A STORE_READ_PARTITION slice=code release_by_distance(count/code) d1=3238/11749509140 d2=1391/6940256771 d3=985/5792539949 d4_7=2817/17409133691 d8_15=4247/25887415216 d16_=52287/332631160173 none=0/0 release_by_known(count/code) k0=0/0 k1_15=10759/73564961218 k16_63=17588/114252101044 k64_=36618/212592952678 mask_by_neighbours(count/code) n0=17134/90805086824 n1=14756/58046061829 n2=10001/25315934858
+STATE_A STORE_READ_PARTITION slice=web release_by_distance(count/code) d1=3239/12259990901 d2=1375/7053191660 d3=973/5245976687 d4_7=2758/16034675812 d8_15=4147/24096447323 d16_=51563/312511121309 none=0/0 release_by_known(count/code) k0=0/0 k1_15=10300/66423722979 k16_63=18212/110404547327 k64_=35543/200373133386 mask_by_neighbours(count/code) n0=17568/93690996175 n1=14946/60956548150 n2=10022/28188990311
+STATE_A STORE_READ_PARTITION slice=science release_by_distance(count/code) d1=3260/13188721477 d2=1373/7168342263 d3=948/5651937754 d4_7=2642/16261687429 d8_15=3942/24734407262 d16_=51720/328818741597 none=0/0 release_by_known(count/code) k0=0/0 k1_15=10630/72417608994 k16_63=18491/116106788462 k64_=34764/207299440326 mask_by_neighbours(count/code) n0=16692/92564976179 n1=14602/63102262408 n2=9919/32056104478
+STATE_A STORE_READ_PARTITION slice=books release_by_distance(count/code) d1=3268/12187828650 d2=1386/6675256381 d3=954/4880411309 d4_7=2655/14736983626 d8_15=3978/21883275331 d16_=54079/313908267759 none=0/0 release_by_known(count/code) k0=0/0 k1_15=10746/63698766870 k16_63=19003/109127255323 k64_=36571/201446000863 mask_by_neighbours(count/code) n0=16707/82771597857 n1=14514/57105562828 n2=9795/28319926486
+STATE_A STORE_READ_PARTITION slice=wikidata release_by_distance(count/code) d1=3109/24206370004 d2=1357/11869202749 d3=954/8616914370 d4_7=2703/24110469767 d8_15=4060/35535314114 d16_=52108/440922415848 none=0/0 release_by_known(count/code) k0=0/0 k1_15=10107/86092894029 k16_63=18542/167738691154 k64_=35642/291429101669 mask_by_neighbours(count/code) n0=17174/143465802342 n1=14360/106498870219 n2=9888/66309631389
+STATE_C STORE_READ_PARTITION slice=code release_by_distance(count/code) d1=3238/9243269225 d2=1391/5673864783 d3=985/4746930027 d4_7=2817/14468779720 d8_15=4247/21893478580 d16_=52287/270920130923 none=0/0 release_by_known(count/code) k0=0/0 k1_15=10759/58502099301 k16_63=17588/88446300473 k64_=36618/179998053484 mask_by_neighbours(count/code) n0=17134/82059866547 n1=14756/49750714557 n2=10001/19661520904
+STATE_C STORE_READ_PARTITION slice=web release_by_distance(count/code) d1=3239/10521152864 d2=1375/6332501387 d3=973/4734704126 d4_7=2758/13956198327 d8_15=4147/21166045632 d16_=51563/268343862934 none=0/0 release_by_known(count/code) k0=0/0 k1_15=10300/54050704694 k16_63=18212/93132723255 k64_=35543/177871037321 mask_by_neighbours(count/code) n0=17568/85748417378 n1=14946/53709037097 n2=10022/23291535822
+STATE_C STORE_READ_PARTITION slice=science release_by_distance(count/code) d1=3260/11177117769 d2=1373/6369110801 d3=948/4948923114 d4_7=2642/14087329617 d8_15=3942/21389686184 d16_=51720/277845528271 none=0/0 release_by_known(count/code) k0=0/0 k1_15=10630/57027039300 k16_63=18491/97192359967 k64_=34764/181598296489 mask_by_neighbours(count/code) n0=16692/83947747423 n1=14602/54855640382 n2=9919/25446338413
+STATE_C STORE_READ_PARTITION slice=books release_by_distance(count/code) d1=3268/10499590767 d2=1386/6080311193 d3=954/4431470912 d4_7=2655/12775178250 d8_15=3978/18907219593 d16_=54079/260534532567 none=0/0 release_by_known(count/code) k0=0/0 k1_15=10746/50766511210 k16_63=19003/91041841425 k64_=36571/171419950647 mask_by_neighbours(count/code) n0=16707/76026228204 n1=14514/50225294035 n2=9795/22977537470
+STATE_C STORE_READ_PARTITION slice=wikidata release_by_distance(count/code) d1=3109/12230770127 d2=1357/6759039914 d3=954/5122583451 d4_7=2703/15334324827 d8_15=4060/23296503319 d16_=52108/303928384681 none=0/0 release_by_known(count/code) k0=0/0 k1_15=10107/57604003258 k16_63=18542/109553028959 k64_=35642/199514574102 mask_by_neighbours(count/code) n0=17174/92188603149 n1=14360/58679054413 n2=9888/30907907230
+PARTITION state=A slice=code group=release_by_distance cell=d1 places=3238 mean_code_nats=2.3987
+PARTITION state=A slice=code group=release_by_distance cell=d2 places=1391 mean_code_nats=3.2982
+PARTITION state=A slice=code group=release_by_distance cell=d3 places=985 mean_code_nats=3.8874
+PARTITION state=A slice=code group=release_by_distance cell=d4_7 places=2817 mean_code_nats=4.0852
+PARTITION state=A slice=code group=release_by_distance cell=d8_15 places=4247 mean_code_nats=4.0293
+PARTITION state=A slice=code group=release_by_distance cell=d16_ places=52287 mean_code_nats=4.2053
+PARTITION state=A slice=code group=release_by_distance cell=none places=0 mean_code_nats=nan
+PARTITION state=A slice=code group=release_by_known cell=k0 places=0 mean_code_nats=nan
+PARTITION state=A slice=code group=release_by_known cell=k1_15 places=10759 mean_code_nats=4.5199
+PARTITION state=A slice=code group=release_by_known cell=k16_63 places=17588 mean_code_nats=4.2941
+PARTITION state=A slice=code group=release_by_known cell=k64_ places=36618 mean_code_nats=3.8378
+PARTITION state=A slice=code group=mask_by_neighbours cell=n0 places=17134 mean_code_nats=3.5033
+PARTITION state=A slice=code group=mask_by_neighbours cell=n1 places=14756 mean_code_nats=2.6003
+PARTITION state=A slice=code group=mask_by_neighbours cell=n2 places=10001 mean_code_nats=1.6733
+PARTITION state=A slice=web group=release_by_distance cell=d1 places=3239 mean_code_nats=2.5021
+PARTITION state=A slice=web group=release_by_distance cell=d2 places=1375 mean_code_nats=3.3908
+PARTITION state=A slice=web group=release_by_distance cell=d3 places=973 mean_code_nats=3.5640
+PARTITION state=A slice=web group=release_by_distance cell=d4_7 places=2758 mean_code_nats=3.8432
+PARTITION state=A slice=web group=release_by_distance cell=d8_15 places=4147 mean_code_nats=3.8410
+PARTITION state=A slice=web group=release_by_distance cell=d16_ places=51563 mean_code_nats=4.0064
+PARTITION state=A slice=web group=release_by_distance cell=none places=0 mean_code_nats=nan
+PARTITION state=A slice=web group=release_by_known cell=k0 places=0 mean_code_nats=nan
+PARTITION state=A slice=web group=release_by_known cell=k1_15 places=10300 mean_code_nats=4.2630
+PARTITION state=A slice=web group=release_by_known cell=k16_63 places=18212 mean_code_nats=4.0073
+PARTITION state=A slice=web group=release_by_known cell=k64_ places=35543 mean_code_nats=3.7266
+PARTITION state=A slice=web group=mask_by_neighbours cell=n0 places=17568 mean_code_nats=3.5253
+PARTITION state=A slice=web group=mask_by_neighbours cell=n1 places=14946 mean_code_nats=2.6960
+PARTITION state=A slice=web group=mask_by_neighbours cell=n2 places=10022 mean_code_nats=1.8593
+PARTITION state=A slice=science group=release_by_distance cell=d1 places=3260 mean_code_nats=2.6743
+PARTITION state=A slice=science group=release_by_distance cell=d2 places=1373 mean_code_nats=3.4512
+PARTITION state=A slice=science group=release_by_distance cell=d3 places=948 mean_code_nats=3.9411
+PARTITION state=A slice=science group=release_by_distance cell=d4_7 places=2642 mean_code_nats=4.0687
+PARTITION state=A slice=science group=release_by_distance cell=d8_15 places=3942 mean_code_nats=4.1477
+PARTITION state=A slice=science group=release_by_distance cell=d16_ places=51720 mean_code_nats=4.2027
+PARTITION state=A slice=science group=release_by_distance cell=none places=0 mean_code_nats=nan
+PARTITION state=A slice=science group=release_by_known cell=k0 places=0 mean_code_nats=nan
+PARTITION state=A slice=science group=release_by_known cell=k1_15 places=10630 mean_code_nats=4.5034
+PARTITION state=A slice=science group=release_by_known cell=k16_63 places=18491 mean_code_nats=4.1507
+PARTITION state=A slice=science group=release_by_known cell=k64_ places=34764 mean_code_nats=3.9418
+PARTITION state=A slice=science group=mask_by_neighbours cell=n0 places=16692 mean_code_nats=3.6658
+PARTITION state=A slice=science group=mask_by_neighbours cell=n1 places=14602 mean_code_nats=2.8567
+PARTITION state=A slice=science group=mask_by_neighbours cell=n2 places=9919 mean_code_nats=2.1363
+PARTITION state=A slice=books group=release_by_distance cell=d1 places=3268 mean_code_nats=2.4653
+PARTITION state=A slice=books group=release_by_distance cell=d2 places=1386 mean_code_nats=3.1837
+PARTITION state=A slice=books group=release_by_distance cell=d3 places=954 mean_code_nats=3.3817
+PARTITION state=A slice=books group=release_by_distance cell=d4_7 places=2655 mean_code_nats=3.6692
+PARTITION state=A slice=books group=release_by_distance cell=d8_15 places=3978 mean_code_nats=3.6364
+PARTITION state=A slice=books group=release_by_distance cell=d16_ places=54079 mean_code_nats=3.8371
+PARTITION state=A slice=books group=release_by_distance cell=none places=0 mean_code_nats=nan
+PARTITION state=A slice=books group=release_by_known cell=k0 places=0 mean_code_nats=nan
+PARTITION state=A slice=books group=release_by_known cell=k1_15 places=10746 mean_code_nats=3.9184
+PARTITION state=A slice=books group=release_by_known cell=k16_63 places=19003 mean_code_nats=3.7961
+PARTITION state=A slice=books group=release_by_known cell=k64_ places=36571 mean_code_nats=3.6412
+PARTITION state=A slice=books group=mask_by_neighbours cell=n0 places=16707 mean_code_nats=3.2750
+PARTITION state=A slice=books group=mask_by_neighbours cell=n1 places=14514 mean_code_nats=2.6009
+PARTITION state=A slice=books group=mask_by_neighbours cell=n2 places=9795 mean_code_nats=1.9112
+PARTITION state=A slice=wikidata group=release_by_distance cell=d1 places=3109 mean_code_nats=5.1468
+PARTITION state=A slice=wikidata group=release_by_distance cell=d2 places=1357 mean_code_nats=5.7819
+PARTITION state=A slice=wikidata group=release_by_distance cell=d3 places=954 mean_code_nats=5.9708
+PARTITION state=A slice=wikidata group=release_by_distance cell=d4_7 places=2703 mean_code_nats=5.8964
+PARTITION state=A slice=wikidata group=release_by_distance cell=d8_15 places=4060 mean_code_nats=5.7858
+PARTITION state=A slice=wikidata group=release_by_distance cell=d16_ places=52108 mean_code_nats=5.5935
+PARTITION state=A slice=wikidata group=release_by_distance cell=none places=0 mean_code_nats=nan
+PARTITION state=A slice=wikidata group=release_by_known cell=k0 places=0 mean_code_nats=nan
+PARTITION state=A slice=wikidata group=release_by_known cell=k1_15 places=10107 mean_code_nats=5.6308
+PARTITION state=A slice=wikidata group=release_by_known cell=k16_63 places=18542 mean_code_nats=5.9800
+PARTITION state=A slice=wikidata group=release_by_known cell=k64_ places=35642 mean_code_nats=5.4050
+PARTITION state=A slice=wikidata group=mask_by_neighbours cell=n0 places=17174 mean_code_nats=5.5221
+PARTITION state=A slice=wikidata group=mask_by_neighbours cell=n1 places=14360 mean_code_nats=4.9025
+PARTITION state=A slice=wikidata group=mask_by_neighbours cell=n2 places=9888 mean_code_nats=4.4330
+PARTITION state=C slice=code group=release_by_distance cell=d1 places=3238 mean_code_nats=1.8870
+PARTITION state=C slice=code group=release_by_distance cell=d2 places=1391 mean_code_nats=2.6964
+PARTITION state=C slice=code group=release_by_distance cell=d3 places=985 mean_code_nats=3.1857
+PARTITION state=C slice=code group=release_by_distance cell=d4_7 places=2817 mean_code_nats=3.3952
+PARTITION state=C slice=code group=release_by_distance cell=d8_15 places=4247 mean_code_nats=3.4077
+PARTITION state=C slice=code group=release_by_distance cell=d16_ places=52287 mean_code_nats=3.4251
+PARTITION state=C slice=code group=release_by_distance cell=none places=0 mean_code_nats=nan
+PARTITION state=C slice=code group=release_by_known cell=k0 places=0 mean_code_nats=nan
+PARTITION state=C slice=code group=release_by_known cell=k1_15 places=10759 mean_code_nats=3.5944
+PARTITION state=C slice=code group=release_by_known cell=k16_63 places=17588 mean_code_nats=3.3242
+PARTITION state=C slice=code group=release_by_known cell=k64_ places=36618 mean_code_nats=3.2494
+PARTITION state=C slice=code group=mask_by_neighbours cell=n0 places=17134 mean_code_nats=3.1659
+PARTITION state=C slice=code group=mask_by_neighbours cell=n1 places=14756 mean_code_nats=2.2287
+PARTITION state=C slice=code group=mask_by_neighbours cell=n2 places=10001 mean_code_nats=1.2996
+PARTITION state=C slice=web group=release_by_distance cell=d1 places=3239 mean_code_nats=2.1472
+PARTITION state=C slice=web group=release_by_distance cell=d2 places=1375 mean_code_nats=3.0444
+PARTITION state=C slice=web group=release_by_distance cell=d3 places=973 mean_code_nats=3.2167
+PARTITION state=C slice=web group=release_by_distance cell=d4_7 places=2758 mean_code_nats=3.3450
+PARTITION state=C slice=web group=release_by_distance cell=d8_15 places=4147 mean_code_nats=3.3739
+PARTITION state=C slice=web group=release_by_distance cell=d16_ places=51563 mean_code_nats=3.4402
+PARTITION state=C slice=web group=release_by_distance cell=none places=0 mean_code_nats=nan
+PARTITION state=C slice=web group=release_by_known cell=k0 places=0 mean_code_nats=nan
+PARTITION state=C slice=web group=release_by_known cell=k1_15 places=10300 mean_code_nats=3.4689
+PARTITION state=C slice=web group=release_by_known cell=k16_63 places=18212 mean_code_nats=3.3804
+PARTITION state=C slice=web group=release_by_known cell=k64_ places=35543 mean_code_nats=3.3081
+PARTITION state=C slice=web group=mask_by_neighbours cell=n0 places=17568 mean_code_nats=3.2265
+PARTITION state=C slice=web group=mask_by_neighbours cell=n1 places=14946 mean_code_nats=2.3755
+PARTITION state=C slice=web group=mask_by_neighbours cell=n2 places=10022 mean_code_nats=1.5363
+PARTITION state=C slice=science group=release_by_distance cell=d1 places=3260 mean_code_nats=2.2664
+PARTITION state=C slice=science group=release_by_distance cell=d2 places=1373 mean_code_nats=3.0664
+PARTITION state=C slice=science group=release_by_distance cell=d3 places=948 mean_code_nats=3.4509
+PARTITION state=C slice=science group=release_by_distance cell=d4_7 places=2642 mean_code_nats=3.5247
+PARTITION state=C slice=science group=release_by_distance cell=d8_15 places=3942 mean_code_nats=3.5869
+PARTITION state=C slice=science group=release_by_distance cell=d16_ places=51720 mean_code_nats=3.5512
+PARTITION state=C slice=science group=release_by_distance cell=none places=0 mean_code_nats=nan
+PARTITION state=C slice=science group=release_by_known cell=k0 places=0 mean_code_nats=nan
+PARTITION state=C slice=science group=release_by_known cell=k1_15 places=10630 mean_code_nats=3.5463
+PARTITION state=C slice=science group=release_by_known cell=k16_63 places=18491 mean_code_nats=3.4745
+PARTITION state=C slice=science group=release_by_known cell=k64_ places=34764 mean_code_nats=3.4531
+PARTITION state=C slice=science group=mask_by_neighbours cell=n0 places=16692 mean_code_nats=3.3245
+PARTITION state=C slice=science group=mask_by_neighbours cell=n1 places=14602 mean_code_nats=2.4833
+PARTITION state=C slice=science group=mask_by_neighbours cell=n2 places=9919 mean_code_nats=1.6958
+PARTITION state=C slice=books group=release_by_distance cell=d1 places=3268 mean_code_nats=2.1238
+PARTITION state=C slice=books group=release_by_distance cell=d2 places=1386 mean_code_nats=2.8999
+PARTITION state=C slice=books group=release_by_distance cell=d3 places=954 mean_code_nats=3.0706
+PARTITION state=C slice=books group=release_by_distance cell=d4_7 places=2655 mean_code_nats=3.1807
+PARTITION state=C slice=books group=release_by_distance cell=d8_15 places=3978 mean_code_nats=3.1419
+PARTITION state=C slice=books group=release_by_distance cell=d16_ places=54079 mean_code_nats=3.1847
+PARTITION state=C slice=books group=release_by_distance cell=none places=0 mean_code_nats=nan
+PARTITION state=C slice=books group=release_by_known cell=k0 places=0 mean_code_nats=nan
+PARTITION state=C slice=books group=release_by_known cell=k1_15 places=10746 mean_code_nats=3.1229
+PARTITION state=C slice=books group=release_by_known cell=k16_63 places=19003 mean_code_nats=3.1670
+PARTITION state=C slice=books group=release_by_known cell=k64_ places=36571 mean_code_nats=3.0985
+PARTITION state=C slice=books group=mask_by_neighbours cell=n0 places=16707 mean_code_nats=3.0081
+PARTITION state=C slice=books group=mask_by_neighbours cell=n1 places=14514 mean_code_nats=2.2875
+PARTITION state=C slice=books group=mask_by_neighbours cell=n2 places=9795 mean_code_nats=1.5507
+PARTITION state=C slice=wikidata group=release_by_distance cell=d1 places=3109 mean_code_nats=2.6005
+PARTITION state=C slice=wikidata group=release_by_distance cell=d2 places=1357 mean_code_nats=3.2925
+PARTITION state=C slice=wikidata group=release_by_distance cell=d3 places=954 mean_code_nats=3.5495
+PARTITION state=C slice=wikidata group=release_by_distance cell=d4_7 places=2703 mean_code_nats=3.7501
+PARTITION state=C slice=wikidata group=release_by_distance cell=d8_15 places=4060 mean_code_nats=3.7931
+PARTITION state=C slice=wikidata group=release_by_distance cell=d16_ places=52108 mean_code_nats=3.8556
+PARTITION state=C slice=wikidata group=release_by_distance cell=none places=0 mean_code_nats=nan
+PARTITION state=C slice=wikidata group=release_by_known cell=k0 places=0 mean_code_nats=nan
+PARTITION state=C slice=wikidata group=release_by_known cell=k1_15 places=10107 mean_code_nats=3.7675
+PARTITION state=C slice=wikidata group=release_by_known cell=k16_63 places=18542 mean_code_nats=3.9057
+PARTITION state=C slice=wikidata group=release_by_known cell=k64_ places=35642 mean_code_nats=3.7003
+PARTITION state=C slice=wikidata group=mask_by_neighbours cell=n0 places=17174 mean_code_nats=3.5484
+PARTITION state=C slice=wikidata group=mask_by_neighbours cell=n1 places=14360 mean_code_nats=2.7012
+PARTITION state=C slice=wikidata group=mask_by_neighbours cell=n2 places=9888 mean_code_nats=2.0663
+## pooled over the five slices (places-weighted means)
+POOLED state=A group=release_by_distance (places/mean_code_nats) d1=16114/3.0190 d2=6882/3.8139 d3=4814/4.1453 d4_7=13575/4.3121 d8_15=20374/4.2872 d16_=261757/4.3659
+POOLED state=C group=release_by_distance (places/mean_code_nats) d1=16114/2.2017 d2=6882/2.9983 d3=4814/3.2935 d4_7=13575/3.4389 d8_15=20374/3.4604 d16_=261757/3.4890
+POOLED state=A group=release_by_known (places/mean_code_nats) k1_15=52542/4.5569 k16_63=91836/4.4457 k64_=179138/4.1076
+POOLED state=C group=release_by_known (places/mean_code_nats) k1_15=52542/3.4969 k16_63=91836/3.4505 k64_=179138/3.3595
+POOLED state=A group=mask_by_neighbours (places/mean_code_nats) n0=85275/3.9015 n1=73178/3.1229 n2=49625/2.4002
+POOLED state=C group=mask_by_neighbours (places/mean_code_nats) n0=85275/3.2555 n1=73178/2.4139 n2=49625/1.6289
