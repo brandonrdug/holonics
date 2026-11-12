@@ -1,0 +1,96 @@
+# G90's host rulers after tp5, from main's tools (ab7023590 or later), one thread each (taskset to one core, OMP_NUM_THREADS=1), on GMC (84fc1c7192252cb7,
+# byte-equal to GM, the grown rt18 mean) and the tp means (the W line at tp4 and tp5; scale 64 and weighed on tp2 to tp5's means); projection about a minute, deadline 600 s each.
+## state_travel.py GMC tp4/MEAN.0 tp5/MEAN.0
+(no ruler45_w.txt)
+## state_travel.py scale 64 tp2 tp3 tp4 tp5 means
+(no ruler45_scale.txt)
+## state_travel.py weighed 64 1535 16560945 tp2 tp3 tp4 tp5 means
+(no ruler45_weighed.txt)
+METER law_b2 rc=0 started=01:19:32Z ended=01:19:32Z wall_s=0.3 user_s=0.2 sys_s=0.0 peak_rss_kib=87876
+METER law_b3 rc=0 started=01:34:24Z ended=01:34:24Z wall_s=0.3 user_s=0.2 sys_s=0.0 peak_rss_kib=87220
+
+## The W line at tp4's mean (P19, 2026-11-12 03:33 UTC, the host, one thread): state_travel.py GMC tp3/MEAN.0 tp4/MEAN.0 (the tool wants two later means) from the main checkout's tools at ab7023590, 0.10 s
+# G .local/run/p9/GMC
+# L2 .local/run/tp/tp3/MEAN.0
+# L4 .local/run/tp/tp4/MEAN.0
+# declaration {'alphabet': 100, 'width': 64, 'heads': 4, 'modes': 8, 'still': 2, 'contacts': 128, 'ticks': 4, 'frames': 4, 'reach': 3771, 'lanes': 2, 'carry': 32}; contacts 64 -> 128; lane coordinates from 32
+family	subset	entries	grain	rms_G	rms_L2	rms_L4	disp_L2	disp_L4	ratio_L4_L2	cos_L2G_L4L2	(rms in raw integers; units are the same over 2^grain)
+enc	old	3232	16	5.77e+04	5.772e+04	5.772e+04	753.2	961.5	1.2766	0.425
+enc	lane	3232	16	5.289e+04	5.318e+04	5.328e+04	1201	1569	1.3066	0.601
+before	old	3232	16	1.371e+05	1.371e+05	1.37e+05	1396	1816	1.3006	0.627
+before	lane	3232	16	5.313e+04	5.332e+04	5.34e+04	1331	1755	1.3186	0.597
+after	old	3232	16	1.304e+05	1.304e+05	1.304e+05	1438	1840	1.2799	0.614
+after	lane	3232	16	5.06e+04	5.074e+04	5.078e+04	1324	1711	1.2923	0.547
+q	old	2048	24	1.275e+07	1.274e+07	1.273e+07	1.862e+05	2.373e+05	1.2745	0.497
+q	lane	2048	24	1.872e+06	1.952e+06	1.979e+06	1.776e+05	2.243e+05	1.2631	0.380
+q_bias	old	64	16	5.077e+04	5.087e+04	5.09e+04	335.8	398	1.1853	0.291
+v	old	2048	24	1.884e+07	1.885e+07	1.884e+07	2.164e+05	2.847e+05	1.3157	0.637
+v	lane	2048	24	2.674e+06	2.799e+06	2.84e+06	2.154e+05	2.795e+05	1.2978	0.564
+v_bias	old	64	16	4.943e+04	4.951e+04	4.956e+04	292.2	380.3	1.3015	0.686
+out	old	2048	24	1.135e+07	1.135e+07	1.135e+07	1.752e+05	2.335e+05	1.3329	0.538
+out	lane	2048	24	1.977e+06	2.038e+06	2.061e+06	1.723e+05	2.203e+05	1.2787	0.445
+out_bias	old	32	16	6.353e+04	6.369e+04	6.376e+04	230.9	329.5	1.4271	0.787
+out_bias	lane	32	16	3333	3555	3616	298.1	380.8	1.2774	0.451
+a	old	2048	24	3.823e+06	3.843e+06	3.85e+06	1.834e+05	2.389e+05	1.3022	0.422
+a	new	4096	24	2.082e+06	1.989e+06	2.116e+06	1.826e+06	2.109e+06	1.1554	0.335
+a	lane	2048	24	1.266e+06	1.306e+06	1.319e+06	1.373e+05	1.729e+05	1.2598	0.292
+a_bias	old	64	16	2.051e+04	2.062e+04	2.064e+04	254.1	343.2	1.3508	0.655
+a_bias	new	64	16	0	2072	2410	2072	2410	1.1631	0.382
+b	old	2048	24	5.257e+06	5.271e+06	5.276e+06	1.67e+05	2.185e+05	1.3083	0.459
+b	new	4096	24	2.095e+06	2.007e+06	2.119e+06	1.741e+06	2.045e+06	1.1749	0.376
+b	lane	2048	24	1.382e+06	1.423e+06	1.437e+06	1.263e+05	1.643e+05	1.3008	0.349
+b_bias	old	64	16	1.727e+04	1.737e+04	1.741e+04	228.4	305.1	1.3357	0.724
+b_bias	new	64	16	0	2216	2651	2216	2651	1.1964	0.434
+w	old	2048	24	4.358e+06	4.381e+06	4.388e+06	1.385e+05	1.766e+05	1.2749	0.395
+w	new	4096	24	0	1.137e+06	1.371e+06	1.137e+06	1.371e+06	1.2053	0.395
+w	lane	2048	24	1.132e+06	1.167e+06	1.179e+06	1.183e+05	1.492e+05	1.2605	0.317
+w_bias	old	32	16	4.447e+04	4.469e+04	4.476e+04	260.5	341	1.3090	0.874
+w_bias	lane	32	16	7155	7454	7561	334.1	446.2	1.3357	0.847
+read	old	1024	24	8.263e+06	8.265e+06	8.263e+06	1.022e+05	1.351e+05	1.3227	0.493
+read	lane	3072	24	1.046e+06	1.088e+06	1.103e+06	1.002e+05	1.282e+05	1.2799	0.399
+read_bias	old	100	16	1.172e+05	1.172e+05	1.171e+05	327	440.4	1.3469	0.318
+moment_before	old	3232	16	4.026e+04	4.031e+04	4.031e+04	850.3	1055	1.2403	0.338
+moment_after	old	3232	16	4.585e+04	4.586e+04	4.587e+04	870.2	1079	1.2398	0.334
+temper	old	8	24	2.211e+07	2.213e+07	2.213e+07	1.925e+05	2.016e+05	1.0475	-0.044
+probe	old	2048	24	1.829e+07	1.829e+07	1.828e+07	2.523e+05	3.285e+05	1.3020	0.587
+probe	lane	2048	24	2.525e+06	2.654e+06	2.692e+06	2.309e+05	2.979e+05	1.2903	0.519
+probe_bias	old	64	16	7.403e+04	7.42e+04	7.428e+04	464.1	611.8	1.3182	0.717
+pace	old	202	24	3.976e+07	3.979e+07	3.978e+07	3.233e+05	4.333e+05	1.3401	0.579
+moment_face	old	2048	24	8.041e+06	8.049e+06	8.052e+06	9.705e+04	1.249e+05	1.2872	0.383
+moment_face	lane	2048	24	1.78e+06	1.779e+06	1.777e+06	1.019e+05	1.286e+05	1.2624	0.411
+moment_face_bias	old	32	16	9.933e+04	9.972e+04	9.986e+04	503.9	712.1	1.4133	0.896
+moment_face_bias	lane	32	16	5400	5452	5524	273	332.1	1.2164	0.091
+lift_bias	old	32	16	2.76e+04	2.766e+04	2.769e+04	118.7	156.9	1.3222	0.628
+lift_bias	lane	32	16	2026	2087	2093	133.1	169.3	1.2721	0.552
+carry	old	4096	24	1.475e+06	2.98e+06	3.316e+06	2.7e+06	3.12e+06	1.1555	0.277
+carry_bias	old	64	16	1.159e+04	2.016e+04	2.134e+04	1.099e+04	1.212e+04	1.1028	0.729
+# in the family's own unit (entry / 2^grain): family subset rms_G rms_L4 disp_L2 disp_L4
+enc	lane	0.80708	0.81297	0.018319	0.023935
+before	lane	0.81077	0.81478	0.020311	0.026783
+after	lane	0.77208	0.77484	0.020205	0.026111
+q	lane	0.11156	0.11794	0.010585	0.013369
+v	lane	0.1594	0.16925	0.012836	0.016658
+out	lane	0.11786	0.12282	0.010268	0.01313
+out_bias	lane	0.050852	0.055183	0.0045484	0.00581
+a	old	0.22784	0.22945	0.010933	0.014237
+a	new	0.12411	0.12614	0.10882	0.12573
+a	lane	0.075485	0.078621	0.0081814	0.010307
+a_bias	old	0.31289	0.31497	0.0038774	0.0052374
+a_bias	new	0	0.036772	0.031616	0.036772
+b	old	0.31336	0.31448	0.0099544	0.013024
+b	new	0.12486	0.12631	0.10377	0.12192
+b	lane	0.082392	0.085646	0.0075281	0.0097924
+b_bias	old	0.26352	0.26571	0.0034857	0.004656
+b_bias	new	0	0.040452	0.033812	0.040452
+w	old	0.25978	0.26153	0.0082544	0.010523
+w	new	0	0.081708	0.067791	0.081708
+w	lane	0.067474	0.070298	0.0070527	0.0088903
+w_bias	lane	0.10917	0.11538	0.0050973	0.0068087
+read	lane	0.062319	0.06576	0.0059717	0.0076431
+probe	lane	0.15052	0.16046	0.013763	0.017759
+moment_face	lane	0.10607	0.10593	0.0060732	0.0076666
+moment_face_bias	lane	0.082394	0.084287	0.0041661	0.0050675
+lift_bias	lane	0.030921	0.031934	0.0020305	0.002583
+W columns new (64): rms at L4 min/median/max 1.064e+06/1.392e+06/1.599e+06; disp(L2) 8.702e+05/1.142e+06/1.397e+06; disp(L4) 1.064e+06/1.392e+06/1.599e+06; ratio L4/L2 1.03/1.198/1.32
+W columns old (64): rms at L4 min/median/max 1.619e+06/2.54e+06/5.37e+06; disp(L2) 5.723e+04/1.168e+05/1.962e+05; disp(L4) 7.784e+04/1.439e+05/2.487e+05; ratio L4/L2 1.123/1.278/1.459
+W: new columns' rms at L4 1.371e+06 against the old columns' 4.388e+06: ratio 0.312 (at G: new 0, old 4.358e+06; at L2: new 1.137e+06, old 4.381e+06)

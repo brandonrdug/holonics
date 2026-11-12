@@ -168,8 +168,10 @@ repository was reset on September 24; the pre-reset tree is
     ones a complex contact, a percent of the entries at most on the three foundings read, so their
     ranks stand.
   - The residual at half rank (the record §14.9, U6): where the field holds a region's law the
-    summed residual grows as the root of the count, and where it lacks one it grows as the count; a
-    host ruler on a saved state's held read. Not run.
+    summed residual grows as the root of the count, and where it lacks one it grows as the count.
+    Built on November 12: the card reads every place locked from a saved state (`residual-field`)
+    and a host ruler reads the rows by region (`tools/residual_blocks.py`, atlas
+    `hnn.field-residual-half-rank`). Not yet read on a line's state.
   - The formal joins are thirteen boxes in #410 (eight, and five from the record's §14.12).
 
 ## Built and lawful

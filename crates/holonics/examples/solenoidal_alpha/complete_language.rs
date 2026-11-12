@@ -805,7 +805,9 @@ pub(super) fn run_with_execution(
         Some("order-field") if backend == CompleteLanguageTrainingBackend::HostReference => field_train::order_field(args, &mut field_train::host()),
         Some("settle-field") if backend == CompleteLanguageTrainingBackend::HostReference => field_train::settle_field(args, &mut field_train::host()),
         Some("gamma-field") if backend == CompleteLanguageTrainingBackend::HostReference => field_train::gamma_field(args, &mut field_train::host()),
+        Some("leak-field") if backend == CompleteLanguageTrainingBackend::HostReference => field_train::leak_field(args, &mut field_train::host()),
         Some("square-field") if backend == CompleteLanguageTrainingBackend::HostReference => field_train::square_field(args, &mut field_train::host()),
+        Some("residual-field") if backend == CompleteLanguageTrainingBackend::HostReference => field_train::residual_field(args, &mut field_train::host()),
         Some("expansion-field") if backend == CompleteLanguageTrainingBackend::HostReference => field_train::expansion_field(args, &mut field_train::host()),
         Some("rows-field") if backend == CompleteLanguageTrainingBackend::HostReference => field_train::rows_field(args),
         Some("ring-field") if backend == CompleteLanguageTrainingBackend::HostReference => field_train::ring_field(args),
@@ -904,6 +906,7 @@ pub(super) fn run_field_realized(args: &[String], realization: &mut dyn holonics
         Some("settle-field") => field_train::settle_field(args, realization),
         Some("charge-field") => field_train::charge_field(args, realization),
         Some("square-field") => field_train::square_field(args, realization),
+        Some("residual-field") => field_train::residual_field(args, realization),
         Some("redraw-field") => field_train::redraw_field(args, realization),
         Some("sample-field") => field_train::sample(args, realization),
         Some("currents-field") => field_train::currents_field(args, realization),
@@ -915,6 +918,7 @@ pub(super) fn run_field_realized(args: &[String], realization: &mut dyn holonics
         Some("length-field") => field_train::length_field(args, realization),
         Some("order-field") => field_train::order_field(args, realization),
         Some("gamma-field") => field_train::gamma_field(args, realization),
+        Some("leak-field") => field_train::leak_field(args, realization),
         Some("masks-field") => field_train::masks_field(args, realization),
         Some("ring-field") => field_train::ring_field(args),
         Some("depth-field") => field_train::depth_field(args),
@@ -1021,10 +1025,10 @@ pub(super) fn run(args: &[String]) -> Result<()> {
 
 /// [theory, November 11 04:49] **The verbs a `reading` manifest passes**: each opens a saved state read-only and writes none (its output is a table of numbers under its own new output
 /// directory). The held and locked visits (`joint-field` the held joint of a state as a lap reads it), the structure measures (`order-field` the keyed order's codes, `expansion-field` the
-/// expansion and volume, `gamma-field` the carry's `|γ|`, `square-field` the square of two places, November 12) and the covector split (`split-field`). Everything else stays refused without Brandon's exception or a parity manifest: `train-field` and every
+/// expansion and volume, `gamma-field` the carry's `|γ|`, `leak-field` where the carry's leak reads below zero (November 12), `square-field` the square of two places and `residual-field` the residual at half rank, November 12) and the covector split (`split-field`). Everything else stays refused without Brandon's exception or a parity manifest: `train-field` and every
 /// `train-*`, `grow-contacts-field`, `grow-carry-field`, `sample-field`, `rows-field`, `ring-field`, `depth-field`, `restate-field`, `reach-field`, `opening-field` and `length-field` (these release or found), `found-*`,
 /// `grow-*`, `release-*`, and every verb of the tower, native and class routes. A new reading verb enters this list only where it writes no state.
-const READING_VERBS: [&str; 6] = ["joint-field", "order-field", "expansion-field", "gamma-field", "split-field", "square-field"];
+const READING_VERBS: [&str; 8] = ["joint-field", "order-field", "expansion-field", "gamma-field", "leak-field", "split-field", "square-field", "residual-field"];
 
 /// The digest of the state a `reading` manifest names, before the run and after it: the manifest's `state_sha256` and the file's own now.
 fn reading_digests(manifest: &str) -> Result<(String, String)> {

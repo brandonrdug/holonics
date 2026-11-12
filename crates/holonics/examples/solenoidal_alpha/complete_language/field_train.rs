@@ -3500,6 +3500,98 @@ pub(super) fn square_field(args: &[String], realization: &mut dyn FieldRealizati
     Ok(())
 }
 
+/// [measurement; theory, November 12, U6] `residual-field STATE STATE_SHA CODEC CODEC_SHA UNITS UNITS_SHA HELD HELD_SHA COUNT
+/// OUT`: **the residual at half rank** (the Einstein record §14.11, U6), a reading of the first `COUNT` held problems' own
+/// references, each cut to its room, with every place locked ([`Field::locked_faces`], the charge census's read: every face
+/// once, that place alone open, the rest given).
+/// - At each place the charge `v = c(x_t) − H(f_t)`: the letter's surprise less its face's entropy, the field's own expectation
+///   of that surprise. It is the face's temperature covector, `d/dτ (−ln p_τ(x))` at `τ = 1` for `p_τ ∝ p^τ`, whose mean is
+///   zero under the true conditional (atlas `ratio.face-temperature-covector`), so its sum over a stretch of places is what one
+///   common temperature of their faces would move their code by.
+/// - The state's line (`FIELD_RESIDUAL_STATE`) prints the census's reference figures (`FIELD_CHARGE_STATE state=reference`
+///   under `FIELD_CHARGE_REFERENCE_ONLY`, a lap's `REFREAD`): the code and the entropy, summed and a place, the excess, the
+///   root charge and its share of the excess, and the shares of places whose charge exceeds one and two nats. A build that
+///   reads a state as the census did prints the census's numbers.
+/// - `RESIDUAL.tsv` (private) holds every place in the passage's order: its problem, its place, its answer's letters, and its
+///   code and entropy on the codes' `2^(−20)` bits. The host ruler `tools/residual_blocks.py` reads it by region.
+///
+/// Why (U6; agent-inferred, November 12): where the field holds a region's law, what is left of the charge is a hand that
+/// cancels, and a stretch's summed charge less the region's mean grows as the root of the stretch's count: its second moment
+/// doubles with each doubling of the stretch. Where the field lacks a law the charge keeps a sign over the stretch, and the
+/// second moment quadruples. The entropy is subtracted, not the region's mean surprise alone, because the passage's own
+/// entropy varies along an answer (code against prose, a name against its uses), and that variation grows as the count
+/// whether or not the field holds the law. Numbers only; a reading: it writes no state.
+pub(super) fn residual_field(args: &[String], realization: &mut dyn FieldRealization) -> Result<()> {
+    if args.len() != 11 {
+        return Err("residual-field STATE STATE_SHA CODEC CODEC_SHA UNITS UNITS_SHA HELD HELD_SHA COUNT OUT".into());
+    }
+    let started = std::time::Instant::now();
+    let mut learner = FieldLearner::from_text(std::str::from_utf8(&pinned_read(&args[1], &args[2], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
+    declared_clocks(&mut learner.field);
+    let field = &learner.field;
+    let units = units_of(&args[5], &args[6])?;
+    let codec = FieldCodec::from_text(std::str::from_utf8(&pinned_read(&args[3], &args[4], CODEC_BUDGET)?)?, units)?;
+    let held = problems_of(&pinned_read(&args[7], &args[8], READ_BUDGET as usize)?);
+    let limit = count(&args[9])?;
+    let out = Path::new(&args[10]);
+    std::fs::create_dir(out)?;
+    let held = &held[..limit.min(held.len())];
+    let requests: Vec<(Vec<usize>, usize)> = held.iter().map(|(question, _)| opening(&codec, field, question, b"")).collect::<std::result::Result<_, String>>()?;
+    let problems: Vec<(&[usize], usize)> = requests.iter().map(|(q, n)| (q.as_slice(), *n)).collect();
+    let void = codec.void();
+    let a = field.declaration.alphabet;
+    let mut answers: Vec<Vec<usize>> = held.iter().map(|(_, ans)| codec.encode(ans)).collect::<Result<_>>()?;
+    let mut cut = 0usize;
+    for (x, &(_, room)) in answers.iter_mut().zip(&problems) {
+        cut += usize::from(x.len() > room);
+        x.truncate(room);
+    }
+    let ks: Vec<usize> = (0..problems.len()).filter(|&k| !answers[k].is_empty()).collect();
+    let faces = field.locked_faces(&problems, &answers, &ks, void, false, realization).map_err(|e| e.to_string())?;
+    let mut rows = rows_file(&out.join("RESIDUAL.tsv"), "problem\tplace\tletters\tcode_bits_q20\tentropy_bits_q20\n")?;
+    let nats = |v: i128| decimal_q20(nats_q20(v));
+    let share = |n: usize, of: usize| if of == 0 { "-".to_string() } else { format!("{}.{:06}", n * 1_000_000 / of / 1_000_000, n * 1_000_000 / of % 1_000_000) };
+    // The census's own sums (`charge_field`), so the state's line reads as its charge census did.
+    let (mut places, mut over1, mut over2) = (0usize, 0usize, 0usize);
+    let (mut code, mut entropy, mut root) = (0i128, 0i128, 0i128);
+    let mut text = String::new();
+    for (&k, f) in ks.iter().zip(&faces) {
+        let x = &answers[k];
+        let n = x.len();
+        let (mut c_k, mut h_k) = (0i128, 0i128);
+        let mut counts = PlateCounts::new(a);
+        for (t, face) in f.iter().enumerate().take(n) {
+            let (c, h) = (face.code(x[t]) as i128, holonics::hnn::tower::field::entropy(face));
+            (c_k, h_k) = (c_k + c, h_k + h);
+            counts.add(face, x[t]);
+            let v = nats_q20(c - h);
+            over1 += usize::from(v > 1 << 20);
+            over2 += usize::from(v > 2 << 20);
+            text.push_str(&format!("{k}\t{t}\t{n}\t{c}\t{h}\n"));
+        }
+        let r_k: i128 = (0..a).filter(|&l| counts.n[l] > 0).map(|l| counts.n[l] as i128 * log2_ratio(counts.n[l], counts.expected(l))).sum();
+        (places, code, entropy, root) = (places + n, code + c_k, entropy + h_k, root + r_k);
+    }
+    row(&mut rows, &text)?;
+    let excess = code - entropy;
+    let a_place = |v: i128| if places == 0 { "-".to_string() } else { decimal_q20(nats_q20(v) / places as i128) };
+    println!(
+        "FIELD_RESIDUAL_STATE problems={} letters={places} cut_to_room={cut} code_nats={} entropy_nats={} code_nats_a_place={} entropy_nats_a_place={} excess_nats={} root_nats={} root_share_of_excess={} v_over_1_share={} v_over_2_share={} ms={}",
+        ks.len(),
+        nats(code),
+        nats(entropy),
+        a_place(code),
+        a_place(entropy),
+        nats(excess),
+        nats(root),
+        if excess <= 0 { "-".to_string() } else { decimal_q20((root << 20) / excess) },
+        share(over1, places),
+        share(over2, places),
+        started.elapsed().as_millis()
+    );
+    Ok(())
+}
+
 /// The answers a written file holds (`SAMPLE.tsv`'s format: a line a problem, its index and its escaped letters), encoded.
 fn written_answers(codec: &FieldCodec, path: &str, sha: &str, problems: usize) -> Result<Vec<Vec<usize>>> {
     let text = pinned_read(path, sha, READ_BUDGET as usize)?;
@@ -4648,6 +4740,104 @@ mod tests {
         assert_eq!(reference, rest, "the same answers draw the same squares and read the same faces");
         let _ = std::fs::remove_dir_all(&dir);
     }
+
+    /// [theory, November 12, U6] `residual-field` end to end on the host: one row a letter of every answer, in the passage's
+    /// order, and at each square of `square-field` on the same state its two places' rows hold the square's own charges and
+    /// entropies, since both readings take the census's locked visit.
+    #[test]
+    fn the_residual_reading_holds_every_place_of_the_locked_visit() {
+        let dir = std::env::temp_dir().join(format!("holonics-residual-{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&dir);
+        std::fs::create_dir_all(&dir).expect("dir");
+        let put = |name: &str, bytes: &[u8]| {
+            std::fs::write(dir.join(name), bytes).expect("write");
+            (dir.join(name).to_string_lossy().into_owned(), sha256(bytes).expect("sha"))
+        };
+        let (codec, problems) = toy();
+        let learner = toy_learner(&codec, &problems);
+        let (state, state_sha) = put("STATE", learner.to_text().as_bytes());
+        let (codec_path, codec_sha) = put("CODEC", codec.to_text().as_bytes());
+        let (units, units_sha) = put("UNITS", b"founded-units-v1 0\n");
+        let (held, held_sha) = put("HELD", TOY);
+        let (residual_out, square_out) = (dir.join("RESIDUAL").to_string_lossy().into_owned(), dir.join("SQUARE").to_string_lossy().into_owned());
+        let args: Vec<String> = ["residual-field", &state, &state_sha, &codec_path, &codec_sha, &units, &units_sha, &held, &held_sha, "4", &residual_out].iter().map(|s| s.to_string()).collect();
+        residual_field(&args, &mut HostField).unwrap();
+        let args: Vec<String> = ["square-field", &state, &state_sha, &codec_path, &codec_sha, &units, &units_sha, &held, &held_sha, "4", "2", &square_out].iter().map(|s| s.to_string()).collect();
+        square_field(&args, &mut HostField).unwrap();
+        let text = std::fs::read_to_string(dir.join("RESIDUAL").join("RESIDUAL.tsv")).unwrap();
+        let mut lines = text.lines();
+        assert_eq!(lines.next(), Some("problem\tplace\tletters\tcode_bits_q20\tentropy_bits_q20"));
+        let places: Vec<[i128; 5]> = lines.map(|l| l.split('\t').map(|v| v.parse::<i128>().unwrap()).collect::<Vec<_>>().try_into().unwrap()).collect();
+        let lengths: Vec<i128> = problems_of(TOY).iter().take(4).map(|(_, a)| codec.encode(a).unwrap().len() as i128).collect();
+        assert!(places.windows(2).all(|w| (w[0][0], w[0][1]) < (w[1][0], w[1][1])), "the passage's order: problem, then place");
+        for (k, &whole) in lengths.iter().enumerate() {
+            let rows: Vec<&[i128; 5]> = places.iter().filter(|p| p[0] == k as i128).collect();
+            let n = rows.len() as i128;
+            assert!(n <= whole && rows.iter().enumerate().all(|(t, p)| p[1] == t as i128 && p[2] == n && p[3] >= 0 && p[4] >= 0), "one row a letter of the answer cut to its room");
+        }
+        assert!(places.iter().all(|p| (p[0] as usize) < lengths.len()));
+        let at = |k: i128, t: i128| places.iter().find(|p| p[0] == k && p[1] == t).expect("a square's place has its row");
+        let squares = std::fs::read_to_string(dir.join("SQUARE").join("SQUARES.tsv")).unwrap();
+        let mut read = 0usize;
+        for r in squares.lines().skip(1).filter(|r| r.starts_with("reference\t")) {
+            let f: Vec<&str> = r.split('\t').collect();
+            let (k, i, j) = (f[1].parse::<i128>().unwrap(), f[3].parse::<i128>().unwrap(), f[4].parse::<i128>().unwrap());
+            let [v_i, v_j, h_i, h_j] = [f[9], f[10], f[11], f[12]].map(|v| v.parse::<i128>().unwrap());
+            let (pi, pj) = (at(k, i), at(k, j));
+            assert_eq!((pi[3] - pi[4], pi[4], pj[3] - pj[4], pj[4]), (v_i, h_i, v_j, h_j), "the square's charges and entropies are the locked visit's");
+            read += 1;
+        }
+        assert!(read > 0, "the toy's answers reach a square");
+        let _ = std::fs::remove_dir_all(&dir);
+    }
+
+    /// [theory, November 12, G90's first branch] `leak-field`'s sums on the host, on the toy grown by two carry circles with circle 0's leak
+    /// row moved so that some of its reads fall below zero: over the held joint's own and foil states its open reads and their `h ≥ 0` counts
+    /// are the carry gates' on the same states ([`Field::carry_gates_of`], what a lap's `FIELD_CARRY_GATES` counts); every site of every
+    /// state is read once a tick in one kind and one band; the reads below zero are the three lowest bands' and lie in runs no longer than
+    /// the longest; and circle 1, founded (`H = 0`, `h_b = 1/4`), reads none below zero.
+    #[test]
+    fn the_leak_reading_counts_what_the_gates_count() {
+        let (codec, problems) = toy();
+        let learner = toy_learner(&codec, &problems);
+        let keys: Vec<u8> = (0..1u64 << 14).flat_map(|i| mix(0x1EAC, i).to_be_bytes()).collect();
+        let mut grown = learner.with_carry(2, &keys).unwrap();
+        let (dw, carry) = (grown.field.declaration.width, grown.field.layout().carry);
+        for j in 0..dw {
+            grown.field.theta[carry + 2 * dw + j] = if j % 2 == 0 { -(1 << 24) } else { 1 << 24 };
+        }
+        let field = &grown.field;
+        let seed = 0x5EED;
+        let (leaks, states) = leak_sums(field, &codec, &problems, seed, &mut HostField).unwrap();
+        let (n, ticks) = (problems.len(), field.declaration.ticks as u64);
+        let mut gates = holonics::hnn::tower::field::CarryGates::new(2);
+        let (mut drawn, mut sites) = (0usize, 0u64);
+        for i in 0..n {
+            let ((q, a, _), (fq, _, _)) = (&problems[i], &problems[(i + 1) % n]);
+            for question in [q, fq] {
+                for (c, u, _) in joint_states(codec.void(), question, a, seed, i as u64) {
+                    let region = Region { classes: &c, unresolved: &u, faces: &[], locked: &[], echo: &[], domain: None, port: None };
+                    gates.add(&field.carry_gates_of(&region).unwrap());
+                    (drawn, sites) = (drawn + 1, sites + c.len() as u64 * ticks);
+                }
+            }
+        }
+        assert_eq!(states, drawn, "the joint's own and foil states");
+        for (k, leak) in leaks.iter().enumerate() {
+            assert_eq!((leak.reads, leak.nonnegative), (gates.reads, gates.friction[k]), "circle {k}: the gates' counts on the same states");
+            assert_eq!(leak.kind.iter().map(|p| p.1).sum::<u64>(), sites, "circle {k}: every site once a tick in one kind");
+            assert_eq!(leak.bands.iter().sum::<u64>(), sites, "circle {k}: every site once a tick in one band");
+            let below: u64 = leak.kind.iter().map(|p| p.0).sum();
+            assert_eq!(leak.bands[..3].iter().sum::<u64>(), below, "circle {k}: the reads below zero are the lowest bands'");
+            assert_eq!((leak.first.1 + leak.last.1, leak.charge_below.1 + leak.charge_rest.1), (2 * sites / ticks, sites), "circle {k}");
+            assert_eq!(leak.charge_below.1, below);
+            let runs: u64 = leak.runs.iter().sum();
+            assert_eq!(leak.run_sites.iter().sum::<u64>(), below, "circle {k}: the runs hold every read below zero");
+            assert!(runs <= below && below <= runs * leak.longest as u64, "circle {k}: no run past the longest");
+        }
+        assert!(leaks[0].kind.iter().map(|p| p.0).sum::<u64>() > 0, "the moved leak row turns some reads below zero");
+        assert_eq!(leaks[1].kind.iter().map(|p| p.0).sum::<u64>(), 0, "a founded circle reads no leak below zero");
+    }
 }
 
 
@@ -4781,6 +4971,228 @@ pub(super) fn gamma_field(args: &[String], realization: &mut dyn FieldRealizatio
     }
     println!("GAMMA_DONE problems={count} regions={} circles={half} elapsed_ms={}", owned.len(), started.elapsed().as_millis());
     Ok(())
+}
+
+/// [measurement; theory, November 12, G90's first branch] **`leak-field STATE STATE_SHA CODEC CODEC_SHA UNITS UNITS_SHA HELD HELD_SHA KEYS
+/// KEYS_SHA`**: where the carry circles' leak reads below zero, so that their friction is off, on the held joint's own states (the held problems'
+/// own and foil states of [`joint_states`], the key file's last word the seed, as `joint-field` reads them), from each tick's pair chart the
+/// realization read (`read_ticks`) and the forward's own arithmetic on it ([`Field::carry_leaks`]). For each circle:
+/// - `FIELD_LEAK`: the (open site, tick) reads and those with `h ≥ 0` (the lap's `FIELD_CARRY_GATES` on the same state counts the same, the
+///   build's receipt); then over every site of every state, which the scan runs over, the reads with `h < 0` by kind (a question's site, an
+///   answer's open site, an answer's given site) beside the kind's reads; the reads by band of `h` in units of the founded leak `1/4` (below
+///   `−1/2`, `−1/2` to `−1/4`, `−1/4` to `0`, `0` to `1/4`, `1/4` to `1/2`, `1/2` to `1`, `1` and over); the open reads with `h < 0` by the
+///   state's stratum (the quarter of its answer that is open, [`joint_states`]) beside the stratum's open reads; and the reads with `h < 0` at
+///   the first tick and at the last, beside each tick's reads.
+/// - `FIELD_LEAK_RUNS`: the runs of sites with `h < 0` along the strand in the circle's scan order, at each tick (a stretch without loss:
+///   `|γ| = 1` there, so the scan sums `b` over it), counted by length (1, 2 to 3, 4 to 7, 8 to 15, 16 to 31, 32 to 63, 64 and over) with
+///   the sites they hold, and the longest; and the circle's charge `|Q(t)|` on `2^(−16)` (the scan's value after a site): its largest
+///   over every site and over the sites with `h < 0`, and its mean over each.
+///
+/// Integers; a reading: it writes no state and no file.
+///
+/// Why (G90's rule; agent-inferred): the gate's `d = max(0, h)` switches a circle's friction off where its leak reads below zero and gives
+/// such a read no covector, so nothing at that site pulls it back; a run of such sites is a store with no loss (atlas `store.finite-quality`),
+/// whose sum and covector grow with the run. Where the runs stand, how long they are and what charge they carry decides whether the leak's
+/// chart owes a friction positive by its form, and shows where the field locates its longer carry.
+pub(super) fn leak_field(args: &[String], realization: &mut dyn FieldRealization) -> Result<()> {
+    if args.len() != 11 {
+        return Err("leak-field STATE STATE_SHA CODEC CODEC_SHA UNITS UNITS_SHA HELD HELD_SHA KEYS KEYS_SHA".into());
+    }
+    let started = std::time::Instant::now();
+    let mut learner = FieldLearner::from_text(std::str::from_utf8(&pinned_read(&args[1], &args[2], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
+    declared_clocks(&mut learner.field);
+    let field = &learner.field;
+    let (circles, ticks, plain) = (field.declaration.carry, field.declaration.ticks, field.declaration.carry_first());
+    if circles == 0 {
+        return Err("leak-field reads a field with carry circles".into());
+    }
+    let units = units_of(&args[5], &args[6])?;
+    let codec = FieldCodec::from_text(std::str::from_utf8(&pinned_read(&args[3], &args[4], CODEC_BUDGET)?)?, units)?;
+    let held_text = pinned_read(&args[7], &args[8], READ_BUDGET as usize)?;
+    let keys = pinned_read(&args[9], &args[10], READ_BUDGET as usize)?;
+    let seed = u64::from_be_bytes(keys.get(keys.len().saturating_sub(8)..).filter(|w| w.len() == 8).ok_or("a key file of fewer than eight bytes")?.try_into()?);
+    if field.declaration.alphabet != codec.alphabet() {
+        return Err("a learner whose alphabet is not the codec's".into());
+    }
+    // The held problems as `joint-field` reads them, so the states are the lap's own.
+    let held: Problems = {
+        let dev = problems_of(&held_text);
+        let encoded = dev.par_iter().map(|(q, a)| Ok((codec.encode(&question_text(q)).map_err(|e| e.to_string())?, codec.encode(a).map_err(|e| e.to_string())?, a.len()))).collect::<std::result::Result<Vec<_>, String>>()?;
+        encoded.into_iter().filter(|(_, a, _)| a.len() < codec.answer).collect()
+    };
+    let (leaks, states) = leak_sums(field, &codec, &held, seed, realization)?;
+    let join = |v: &[u64]| v.iter().map(|x| x.to_string()).collect::<Vec<_>>().join("/");
+    let pair = |p: (u64, u64)| format!("{}/{}", p.0, p.1);
+    let mean = |p: (u128, u64)| if p.1 == 0 { "-".to_string() } else { (p.0 / u128::from(p.1)).to_string() };
+    for (k, leak) in leaks.iter().enumerate() {
+        let e = plain + k;
+        println!(
+            "FIELD_LEAK circle={k} contact={e} side={} reads={} h_nonnegative={} below_question={} below_open={} below_given={} bands={} strata_below={} strata_open={} below_first_tick={} below_last_tick={}",
+            if e % 2 == 0 { "left" } else { "right" },
+            leak.reads,
+            leak.nonnegative,
+            pair(leak.kind[0]),
+            pair(leak.kind[1]),
+            pair(leak.kind[2]),
+            join(&leak.bands),
+            join(&leak.strata.map(|s| s.0)),
+            join(&leak.strata.map(|s| s.1)),
+            pair(leak.first),
+            pair(leak.last)
+        );
+        println!(
+            "FIELD_LEAK_RUNS circle={k} runs_1/2-3/4-7/8-15/16-31/32-63/64+={} sites_in_runs={} longest={} charge_max={} charge_max_below={} charge_mean_below={} charge_mean_rest={}",
+            join(&leak.runs),
+            join(&leak.run_sites),
+            leak.longest,
+            leak.charge_max,
+            leak.charge_max_below,
+            mean(leak.charge_below),
+            mean(leak.charge_rest)
+        );
+    }
+    // In `FIELD_CARRY_GATES`'s own words, so a lap's line on the same state reads the same.
+    println!("FIELD_LEAK_GATES circles={circles} reads={} h_nonnegative={}", leaks[0].reads, leaks.iter().map(|l| l.nonnegative.to_string()).collect::<Vec<_>>().join("/"));
+    println!("FIELD_LEAK_DONE problems={} states={states} ticks={ticks} circles={circles} ms={}", held.len(), started.elapsed().as_millis());
+    Ok(())
+}
+
+/// One carry circle's sums for [`leak_field`]: the open reads and those with `h ≥ 0`; the reads with `h < 0` and all reads by kind (a
+/// question's site, an answer's open site, an answer's given site); the reads by band of `h`; the open reads with `h < 0` and all open
+/// reads by stratum; the reads with `h < 0` and all reads at the first tick and the last; the runs and their sites by length band, and the
+/// longest; the largest charge over every site and over the sites with `h < 0`; and the charge's sum and count over the
+/// sites with `h < 0` and over the rest.
+#[derive(Clone, Debug, Default)]
+struct Leak {
+    reads: u64,
+    nonnegative: u64,
+    kind: [(u64, u64); 3],
+    bands: [u64; 7],
+    strata: [(u64, u64); CONTEXT],
+    first: (u64, u64),
+    last: (u64, u64),
+    runs: [u64; 7],
+    run_sites: [u64; 7],
+    longest: usize,
+    charge_max: u64,
+    charge_max_below: u64,
+    charge_below: (u128, u64),
+    charge_rest: (u128, u64),
+}
+
+impl Leak {
+    /// A run of `run` sites with `h < 0` ends.
+    fn close(&mut self, run: usize) {
+        let band = match run {
+            1 => 0,
+            2..=3 => 1,
+            4..=7 => 2,
+            8..=15 => 3,
+            16..=31 => 4,
+            32..=63 => 5,
+            _ => 6,
+        };
+        self.runs[band] += 1;
+        self.run_sites[band] += run as u64;
+        self.longest = self.longest.max(run);
+    }
+}
+
+/// [`leak_field`]'s sums over `held`'s joint states, own and foil, as [`joint_read`] draws them on `seed`, a carry circle each, and the
+/// count of states.
+fn leak_sums(field: &Field, codec: &FieldCodec, held: &Problems, seed: u64, realization: &mut dyn FieldRealization) -> Result<(Vec<Leak>, usize)> {
+    let (circles, ticks, plain) = (field.declaration.carry, field.declaration.ticks, field.declaration.carry_first());
+    let n = held.len();
+    // (stratum, classes, open, the question's sites).
+    let mut states: Vec<(usize, Vec<usize>, Vec<bool>, usize)> = Vec::new();
+    for i in 0..n {
+        let ((q, a, _), (fq, _, _)) = (&held[i], &held[(i + 1) % n]);
+        for question in [q, fq] {
+            for (c, u, (_, k)) in joint_states(codec.void(), question, a, seed, i as u64) {
+                let m = a.len() + 1;
+                let stratum = (0..CONTEXT).find(|&s| (k as usize) < 1 + (s + 1) * m / CONTEXT).unwrap_or(CONTEXT - 1);
+                states.push((stratum, c, u, question.len()));
+            }
+        }
+    }
+    // The bands of `h` in units of the founded leak `1/4` on `2^(−16)`.
+    let quarter = i64::from(holonics::hnn::tower::field::CARRY_LEAK_FOUNDING);
+    let band_of = |h: i64| -> usize {
+        match h {
+            h if h < -2 * quarter => 0,
+            h if h < -quarter => 1,
+            h if h < 0 => 2,
+            h if h < quarter => 3,
+            h if h < 2 * quarter => 4,
+            h if h < 4 * quarter => 5,
+            _ => 6,
+        }
+    };
+    let mut leaks = vec![Leak::default(); circles];
+    for chunk in states.chunks(64) {
+        let views: Vec<Region> = chunk.iter().map(|(_, c, u, _)| Region { classes: c, unresolved: u, faces: &[], locked: &[], echo: &[], domain: None, port: None }).collect();
+        let reads = realization.read_ticks(field, &views).map_err(|e| e.to_string())?;
+        if reads.len() != chunk.len() {
+            return Err("a tick read of other than its regions".into());
+        }
+        for ((stratum, c, open, q_len), state_ticks) in chunk.iter().zip(&reads) {
+            if state_ticks.len() != ticks {
+                return Err("a tick read of other than the field's ticks".into());
+            }
+            let sites = c.len();
+            for (tick, read) in state_ticks.iter().enumerate() {
+                let (h, charge) = field.carry_leaks(&read.pair_read).map_err(|e| e.to_string())?;
+                if h.len() != sites * circles {
+                    return Err("a pair chart of other than the region's sites".into());
+                }
+                for (k, leak) in leaks.iter_mut().enumerate() {
+                    let left = (plain + k) % 2 == 0;
+                    let mut run = 0usize;
+                    for step in 0..sites {
+                        let t = if left { step } else { sites - 1 - step };
+                        let (hv, qv) = (h[t * circles + k], charge[t * circles + k]);
+                        let below = hv < 0;
+                        let kind = if t < *q_len { 0 } else if open[t] { 1 } else { 2 };
+                        leak.kind[kind].0 += u64::from(below);
+                        leak.kind[kind].1 += 1;
+                        leak.bands[band_of(hv)] += 1;
+                        if open[t] {
+                            leak.reads += 1;
+                            leak.nonnegative += u64::from(!below);
+                            leak.strata[*stratum].0 += u64::from(below);
+                            leak.strata[*stratum].1 += 1;
+                        }
+                        if tick == 0 {
+                            leak.first.0 += u64::from(below);
+                            leak.first.1 += 1;
+                        }
+                        if tick + 1 == ticks {
+                            leak.last.0 += u64::from(below);
+                            leak.last.1 += 1;
+                        }
+                        leak.charge_max = leak.charge_max.max(qv);
+                        if below {
+                            run += 1;
+                            leak.charge_max_below = leak.charge_max_below.max(qv);
+                            leak.charge_below.0 += u128::from(qv);
+                            leak.charge_below.1 += 1;
+                        } else {
+                            if run > 0 {
+                                leak.close(run);
+                            }
+                            run = 0;
+                            leak.charge_rest.0 += u128::from(qv);
+                            leak.charge_rest.1 += 1;
+                        }
+                    }
+                    if run > 0 {
+                        leak.close(run);
+                    }
+                }
+            }
+        }
+    }
+    Ok((leaks, states.len()))
 }
 
 /// [measurement; agent-inferred, November 4] **`expansion-field STATE STATE_SHA CODEC CODEC_SHA UNITS UNITS_SHA HELD HELD_SHA

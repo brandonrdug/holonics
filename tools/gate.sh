@@ -23,6 +23,7 @@ run trunk-census-controls python3 tools/test_repo_census.py
 run travel-rank-controls python3 tools/test_state_travel.py
 run part-rate-controls python3 tools/test_part_rates.py
 run founding-strength-controls python3 tools/test_founding_strength.py
+run residual-block-controls python3 tools/test_residual_blocks.py
 run run-watch-controls python3 tools/test_runs.py
 run listener-continuation-controls cargo test -p holonics --example listener continuing::tests::
 run projected-statistics-controls cargo test -p holonics --lib projected_statistics_tests

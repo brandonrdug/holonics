@@ -5119,6 +5119,51 @@ impl Field {
         Ok(out)
     }
 
+    /// [measurement; theory, November 12, G90's first branch] **The carry circles' leaks and charges over a read pair chart**
+    /// (`TickRead::pair_read`, `[t][D]`), from the forward's own arithmetic on the chart the realization read: at every site and carry circle
+    /// the leak read `h = H r̂ + h_b` on `2^(−16)` (the `h` of [`carry_gate`]), and the circle's charge after the site, `|Q(t)|` on `2^(−16)`
+    /// (the floor of the square root of `Q_re² + Q_im²`), the scan run as the forward runs it ([`FieldDeclaration::carry`]): `Q(t) = b(t) +
+    /// release(γ(t) Q(t ∓ 1), 30)`, `Q` zero before the region's first site, even contacts from the left and odd from the right. Each `[t][C]`.
+    /// Where `h < 0` the friction is off (`d = max(0, h)`), so a run of such sites along the strand sums `b` over the run. A reading; a sum
+    /// past its carrier is refused as the forward refuses it.
+    pub fn carry_leaks(&self, pair_read: &[i32]) -> Result<(Vec<i64>, Vec<u64>)> {
+        let d = &self.declaration;
+        if d.carry == 0 {
+            return refuse("a field without carry circles has no leak");
+        }
+        let (dw, f, circles) = (d.width, d.contacts, d.carry);
+        let (half, plain, c2) = (f / 2, d.carry_first(), 2 * circles);
+        let (l, reaches) = (&self.layout, self.reaches());
+        let sites = pair_read.len() / dw;
+        let mut qh = vec![0i64; c2];
+        let mut b = vec![0i64; sites * f];
+        let mut gam = vec![(0i64, 0i64); sites * circles];
+        let mut h = Vec::with_capacity(sites * circles);
+        for (t, rt) in pair_read.chunks_exact(dw).enumerate() {
+            affine(&self.theta[l.carry..l.carry + c2 * dw], reaches.carry, dw, rt, Some(&self.theta[l.carry_bias..l.carry_bias + c2]), MATERIAL_BITS, MATERIAL_BITS, &mut qh)?;
+            affine(&self.theta[l.b..l.b + f * dw], reaches.b, dw, rt, Some(&self.theta[l.b_bias..l.b_bias + f]), MATERIAL_BITS, MATERIAL_BITS, &mut b[t * f..(t + 1) * f])?;
+            for k in 0..circles {
+                gam[t * circles + k] = carry_gate(qh[k] as i128, qh[circles + k] as i128)?.0;
+                h.push(qh[circles + k]);
+            }
+        }
+        let mut charge = vec![0u64; sites * circles];
+        for k in 0..circles {
+            let e = plain + k;
+            let (mut qr, mut qi) = (0i128, 0i128);
+            for step in 0..sites {
+                let t = if e % 2 == 0 { step } else { sites - 1 - step };
+                let (yr, yi) = (i128::from(gam[t * circles + k].0), i128::from(gam[t * circles + k].1));
+                let next_r = b[t * f + e] as i128 + release(yr * qr - yi * qi, GAMMA_BITS);
+                let next_i = b[t * f + half + e] as i128 + release(yr * qi + yi * qr, GAMMA_BITS);
+                (qr, qi) = (i128::from(fit64(next_r)?), i128::from(fit64(next_i)?));
+                // Each part within 64 bits, so the square sum stays under 2^127.
+                charge[t * circles + k] = ((qr * qr + qi * qi) as u128).isqrt() as u64;
+            }
+        }
+        Ok((h, charge))
+    }
+
     /// [measurement; theory, November 11 18:33, part P2] **The carry circles' gates over a region's open sites** ([`CarryGates`]): from the forward's
     /// own cells (every tick's gate and leak read, [`carry_gate`]), at each unresolved site and every tick, each circle's `|γ|` on `2^(−30)` (the
     /// floor of the square root of `γ_re² + γ_im²`) added into its sum, its `h ≥ 0` counted, and the reads counted. A reading: the field is not
