@@ -49,9 +49,9 @@ repository was reset on September 24; the pre-reset tree is
   hears and never its level, and a circle's charge stays within `5 max |b|` at every friction. The
   sum form held `(1 + d)/d` places' drive, and tp5's bursts were its carried charge's (G97 scored:
   a circle's largest charge at 2.6 to 20 times the median section's). Founded, `κ = 1`, the sum
-  form's bit for bit. The log chart and the coupling are the third attempt (G98): the log chart's
-  host gates and Lean passed on the PC; the coupling is written, and both are owed the card suite,
-  parity and their first lap. With `C = 0` the field is the plain line bit for bit.
+  form's bit for bit. The log chart and the coupling are the third attempt (G98): both passed their
+  host gates and Lean on the PC, and are owed the card suite, parity and their first lap. With
+  `C = 0` the field is the plain line bit for bit.
 - **The learner** (`FieldLearner`; the trainer is
   `crates/holonics/examples/solenoidal_alpha/complete_language/field_train.rs`). The comparison is
   completion read as a joint code: a region is drawn as a state of open places among the answer's,
