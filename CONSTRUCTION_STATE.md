@@ -177,6 +177,25 @@ repository was reset on September 24; the pre-reset tree is
     to. At the code line's own fitted rates a computed site of that cut costs 12 µs and a pass
     meets one computed site a byte; G115 fixes 15 µs (11 to 19) before the build, a gigabyte in
     about 4 hours.
+  - G115 read 10.4 µs a computed site (missed under its range; the pairs' fitted share 0.133), the
+    pass stopped after one leg of 3,000 sections, and the engine comes before any more of it
+    (November 12;
+    [the engine's record](research/records/2026-11-12_A_SITES_ARITHMETIC_IS_COUNTED_AGAINST_THE_CARDS_LANES_THE_STORE_TRAINER_RUNS_AT_ONE_FORTIETH_OF_THEM_A_PAIRS_SKIN_IS_FORMED_ONCE_A_CLOCK_AND_COST_FOLLOWS_SURPRISE.md)).
+    A count of a section's arithmetic in narrow products, a host ruler, reads 4.356 × 10¹⁰ a
+    section; against published figures for the card's lanes and memory the trainer stands at 42
+    times the arithmetic's floor and 19 times the sum of the arithmetic's and the octets' floors.
+    Its profile by entry: the contact 0.47 of kernel time, the paced moments and clocks 0.21, the
+    site's maps 0.17, with launches, allocations and copies under 0.04 together. At source a paced
+    head forms a pair's skin again at every use and a moment forms its turn's phases by a series
+    three times a clock. The engine's order: realizations that keep every bit first (a pair's skin
+    and a turn's phases once a clock, the series on narrow words, the site's maps and a batch's
+    launches fused), their rates fixed as G116 (7.8 µs a site after the first three, which earns no
+    pass), then laws at declared widths. One of those laws is Brandon's lens of that day: a place
+    the constitution already codes releases its covector under a declared grain with the remainder
+    counted, so the return's cost follows surprise and no one rate speaks for every byte (atlas
+    `deposition.cost-follows-surprise`, open; its premise is the count of compared places by
+    octave of surprise, by slice, on the three states the line has). The states: the crossing,
+    2,001 sections and 5,001 sections.
   - Every extent of the built declaration is given the part it sizes, how it was reached and what
     sizes it (the same record, §5), with ten findings by file and line and the build that closes
     each. The departures that stand: the face's 64 coordinates are two lanes of 32, the second a
