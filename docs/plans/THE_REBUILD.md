@@ -164,7 +164,15 @@ references and no write is yet ordered text.
    its store on the row's support, done November 12 at 0.948 of its control with its time guess
    missed, the contact family read as bound by the octets it gathers and that reading's test
    ordered before the series; a turn's phases and
-   the moments' skins once a clock; the phase series on narrow words; the site's maps fused by
+   the moments' skins once a clock, done November 12 at 0.959 of its control; the phase series
+   on narrow words, done November 12 at 0.936 of its control, 387.9 ms a section, G116 (b) held
+   and (c) missed; then, since the contact family's distinct words brought once a launch cost
+   129 ms a section against a bar of 40.7, two loops ahead of any further step of this kind:
+   the rows' products at the widths their bounds prove (the ablation of G120 read the entry's
+   memory alone at 0.507 of its time, so half is 128-bit arithmetic), then the pair store's
+   layout (a pair's words as one record in the order its support is walked, the forward's
+   entries as one launch and the return's as one; forecast from source at 27.5 ms a section
+   for the family's floor), each with its guess fixed first; the site's maps fused by
    chart; a batch's launches fused), their rates fixed as G116, then the laws at declared widths
    (a covector released under a declared grain so that the return's cost follows surprise; a row's
    carrier anchored at its peak; the pair store on its support, item 2, where the card holds 280
@@ -181,7 +189,14 @@ references and no write is yet ordered text.
    the sites of the level above, never a table of merges), the codec's release the identity on
    bytes; a repair of the located transport of October 5 and guard 9, beside which the tower's
    codec entered (the record's §8.8); its first reading G118 (the store's trained paces by class
-   and where their carries fall on held text), then its design record, acceptance and guess,
+   and where their carries fall on held text; read November 12,
+   [the record of the symbol's length](../../research/records/2026-11-12_A_SYMBOL_IS_A_LENGTH_A_BYTE_IS_A_DIGIT_OF_THE_PASSAGE_A_TEXTS_PRIMES_ARE_ITS_PRIMITIVE_CYCLES_AND_A_STRIDE_IS_READ_AT_ITS_PLACE_AS_THE_NEWS_CLOCK_OF_OCTOBER_HELD.md):
+   the trained carries fall nearly blind to the text's news, a place's own code length puts the
+   news on the places that carry, and that clock is the October tower's clock of news), then its
+   design record, which joins the November tower to that clock and takes as its acceptance an
+   invariance (a held passage and its re-timed copy open the same epochs, atlas
+   `code.news-clock-proper-time`; no loss under a stretch by a unit of a ring and the merged
+   residues under a factor sharing its prime, `code.stretch-unit-orbit`), with its guess
    fixed before its build, which comes ahead of any long pass; one
    continuous pass over tier A (1 GB), ordered once the engine stands near its count and judged by
    what it writes from held prompts by slice; the face as a composition of
