@@ -1768,3 +1768,42 @@ G115 scored 2026-11-12T20:10Z (the same thread; receipts g115_run1.txt and g115_
   reads octave +1, its curvature within 3% of the transfer on either sign (0.04% to 0.12% over the saves of 600 sections). [agent-inferred] A
   section continues the documents the section before it read (each slice's piece is read on from its cursor), so a step's price on the next
   section includes what the step fitted of those documents; it is no reading of learning on documents not yet met. The held read by slice is.
+G116 fixed 2026-11-12T20:50Z (the same thread), before any of the builds it reads exists and before the profile by head is run: what the first three
+realizations of the engine's order take from the store trainer's section (the record of this date, "A site's arithmetic is counted against the card's
+lanes", its section 6, steps 0 to 3). Every step keeps every bit; none changes a law.
+  Premise, read from the logs and the source first. The profiled read (store_profile.txt, 100 sections, 467.5 ms a profiled section against 420.8
+  unprofiled, kernels 414.2 ms): the contact's family 195.9 ms a section (field_contact_rows 56.7, field_pace_skin_back 38.8, field_contact_l5 and
+  _l6 44.2, field_contact_columns 32.7, field_exposure 15.1, the rest 8.3); the three paced moment entries 54.6 ms (field_moment_pace_back_all 22.0,
+  field_moment_return_paced_all 16.4, field_moment_paced_all 16.2). G115's rule sent the site kernels first on a pairs' share of 0.133; the profile
+  by entry replaces that reading (the fit explained 0.641 of the sections' variance and could place no entry): the contact holds 0.473 of kernel
+  time, so a pair's quantities come first. At source (c1c3e5b62) a paced head whose pace is not plain forms a pair's skin by skin_pair at every use
+  (about 150 instructions and 9 gathers a run; about 2.5 runs a pair over a tick's forward and return in warp time: the exposure 0.25, the row sums
+  0.5, the rows 0.75, the columns 1.0), where the rest of a pair's return is about 40 instructions and 3 gathers in the rows and in the columns; a
+  still head reads eight skins as two loads. The moment's phases are formed three times a clock, each off a whole clock by a series of about twenty
+  steps of 128-bit products whose first argument is zero. These counts are mine from the source and are not measured; (d) is their test.
+  Derivation. Rows: a paced head costs 152 units a pair and a still one 42, so two paced of four heads hold 304 of 388, and with the skin read as a
+  still head reads it the rows fall from 56.7 to about 24.6 ms. Columns: 190 against 40 units, 32.7 to about 11.4. The row sums lose about a tenth
+  (44.2 to 40.0), the skin's return about three tenths (38.8 to 27.2), the exposure keeps its time and becomes the forward's fill (15.1), a second
+  fill at each tick's return adds about 3.7, the rest stays 8.3: 130 ms. Moments: the phases formed once a clock in place of three times and each
+  series on 64-bit products without its zero half, with the phase about 0.85 of those entries: 54.6 to about 18 ms, the fill included. The profile's
+  kernel time is taken as the card's own (the profiled run's extra 46.7 ms a section is the host's wait at 493 launches), so the unprofiled section
+  falls by the same milliseconds: 420.8 - 65.9 - 36.6 = 318 ms.
+  (d) The premise's test, read first from a profile by head on the same hundred sections: the two paced heads' share of field_contact_rows' time is
+      0.78 (0.70 to 0.86).
+  (a) After step 1 (a pair's skin once a clock) the contact's family, the fill's launches included, reads 130 ms a profiled section (110 to 155),
+      where it read 195.9.
+  (b) After steps 2 and 3 (a turn's phases and the moments' skins once a clock; the series on the words its bounds prove) the three paced moment
+      entries with their fill read 18 ms a profiled section (10 to 25), where they read 54.6.
+  (c) After steps 1 to 3 the unprofiled section, timed inside one hold against a control run twice, reads 318 ms: 7.8 us a computed site (7.2 to
+      8.6), where it read 10.3. Batches a section stay 1.00 with the skin's store added to region_octets (about 0.99 GB on a peak of 7.54).
+  Against the card. At 7.8 us a site the realization stands at 14 times the sum of the count's two floors (0.542 us) and 32 times the arithmetic's
+  alone, where it stands at 19 and 42 now: these three steps are a part of phase 1 (about 1.3 times of a distance of about 20), and no pass over
+  the prefix is ordered on them.
+  Rule. (d) under 0.65: the skin is not the rows' cost, step 1 is not built and the rows' kernel is read again at source against the profile by
+  head. (a) above 155 with (d) held: the store's reads cost what the skin's forming did, and the store goes on its support before anything else is
+  built on it. (b) above 25: the moments' entries are profiled by part (phases, near skins, far skins) before step 3 is extended. (c) is scored only
+  inside one hold; a difference inside the control's own spread is no difference. Whatever the scores, the next profile names the next entry, and
+  steps 4 and 5 (the site's maps fused by chart, a batch's launches fused) follow from it.
+  What it does not read. The level: nothing here changes a bit of any state. The dark share (the count of compared places by octave of surprise,
+  by slice, on the states at the crossing, 2,001 and 5,001 sections) is read-store's, and the law that releases a covector under a declared grain
+  gets its own guess after that read.
