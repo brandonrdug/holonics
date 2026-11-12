@@ -5336,8 +5336,11 @@ impl Field {
     /// At zero a fresh letter reads `c_a` at every face, the share the least-favoured standing letter is given, and its rows take their
     /// covector from the first face compared and the first place the letter stands at or beside; the sum has no product of two fresh rows.
     /// A fresh pace row at zero is the founding's pace, the strand's own clock (agent-inferred: the paces are founded at zero, and the
-    /// record names no other opening for them). On a region of standing classes each face's standing logits are its logits before, entry
-    /// for entry, and each fresh logit is the least bias; the codes move, by the fresh classes' share at the least bias (owed to #410).
+    /// record names no other opening for them). The readout's map is kept for every lift: `z(a)` at a standing class is its value before,
+    /// entry for entry, and at a fresh class it is the least bias. The whole forward on a region of standing classes keeps every face's
+    /// standing logits only where no head is paced: on a paced head a blank between arrivals runs at `κ = 1 + Σ_a p_a c[a]` over its own
+    /// face, which the fresh classes' share at the least bias moves, so there the faces move by the founding's price (the record §4 item 4;
+    /// the price at a face owed to #410).
     ///
     /// No key is read. Refused for a tower's levels. `fresh = 0` returns the field as it stands. Returns the grown field and, for each
     /// entry, the old entry it carries (`None` for a fresh class's own).
@@ -5385,8 +5388,14 @@ impl Field {
         }
         let least = self.theta[ol.read_bias..ol.read_bias + a].iter().copied().min().unwrap_or(0);
         new[layout.read_bias + a..layout.read_bias + a2].fill(least);
-        debug_assert_eq!((layout.read_bias - layout.q, layout.pace - layout.temper, layout.len - layout.moment_face), (ol.read_bias - ol.q, ol.pace - ol.temper, ol.len - ol.moment_face));
-        debug_assert_eq!(from.iter().filter(|o| o.is_some()).count(), self.theta.len());
+        // [theory, November 12, P49] The two coverage checks are refusals: a growth is rare, and a release build must not pass a family it
+        // missed (the stretches no class indexes keep their lengths, and every standing entry is carried once).
+        if (layout.read_bias - layout.q, layout.pace - layout.temper, layout.len - layout.moment_face) != (ol.read_bias - ol.q, ol.pace - ol.temper, ol.len - ol.moment_face) {
+            return refuse("a growth by letters whose families no class indexes changed their lengths");
+        }
+        if from.iter().filter(|o| o.is_some()).count() != self.theta.len() {
+            return refuse("a growth by letters that did not carry every standing entry once");
+        }
         let mut out = Self::with_theta(d, new);
         (out.per_blank_clock, out.bare_stretch) = (self.per_blank_clock, self.bare_stretch);
         Ok((out, from))
