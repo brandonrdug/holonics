@@ -1,0 +1,62 @@
+# G111's premise (P39), 2026-11-12 UTC: every FIELD_UNSEEN line and the FIELD_LAP line of each lap log of the circle line (te1 to te6, te6c), of tt1 and of the rt line (rt24 to rt28), with the lap's own partition of the training passage.
+# Device line: the host, one thread, logs only (no card, no build, no state written). FIELD_UNSEEN's code is bits a site (2^-20-bit integers read to three places) over the withheld problems' sites; lap=-1 is the read before the lap, lap=0 after it.
+## te1
+FIELD_UNSEEN lap=-1 code=0.849 sites=43660 next=- ms=9724
+FIELD_UNSEEN lap=0 code=0.844 sites=43660 next=- ms=1268558
+FIELD_LAP lap=0 read=75 sites=16573465 before=3.209 after=- deposited=1535/1535 halvings=0 next_halved=0 next_refused=0 ms=1258834
+## te2
+FIELD_UNSEEN lap=-1 code=0.844 sites=43660 next=- ms=9854
+FIELD_UNSEEN lap=0 code=0.833 sites=43660 next=- ms=1255753
+FIELD_LAP lap=0 read=76 sites=16596069 before=3.213 after=- deposited=1535/1535 halvings=0 next_halved=0 next_refused=0 ms=1245899
+## te3
+FIELD_UNSEEN lap=-1 code=0.833 sites=43660 next=- ms=9756
+FIELD_UNSEEN lap=0 code=0.815 sites=43660 next=- ms=1303374
+FIELD_LAP lap=0 read=77 sites=16434353 before=3.185 after=- deposited=1535/1535 halvings=0 next_halved=0 next_refused=0 ms=1293618
+## te4
+FIELD_UNSEEN lap=-1 code=0.815 sites=43660 next=- ms=9650
+FIELD_UNSEEN lap=0 code=0.801 sites=43660 next=- ms=1299825
+FIELD_LAP lap=0 read=78 sites=16472700 before=3.167 after=- deposited=1535/1535 halvings=0 next_halved=0 next_refused=0 ms=1290174
+## te5
+FIELD_UNSEEN lap=-1 code=0.801 sites=43660 next=- ms=10025
+FIELD_UNSEEN lap=0 code=0.786 sites=43660 next=- ms=1292134
+FIELD_LAP lap=0 read=79 sites=16467309 before=3.157 after=- deposited=1535/1535 halvings=0 next_halved=0 next_refused=0 ms=1282109
+## te6
+FIELD_UNSEEN lap=-1 code=0.786 sites=43660 next=- ms=10034
+FIELD_UNSEEN lap=0 code=0.778 sites=43660 next=- ms=1257227
+FIELD_LAP lap=0 read=80 sites=16538549 before=3.148 after=- deposited=1535/1535 halvings=0 next_halved=0 next_refused=0 ms=1247193
+## te6c
+FIELD_UNSEEN lap=-1 code=0.786 sites=43660 next=- ms=10077
+FIELD_UNSEEN lap=0 code=0.779 sites=43660 next=- ms=1199850
+FIELD_LAP lap=0 read=80 sites=16538549 before=3.148 after=- deposited=1535/1535 halvings=0 next_halved=0 next_refused=0 ms=1189773
+## tt1
+FIELD_UNSEEN lap=-1 code=0.801 sites=43660 next=- ms=9459
+FIELD_UNSEEN lap=0 code=0.782 sites=43660 next=- ms=1278010
+FIELD_LAP lap=0 read=79 sites=16467309 before=3.157 after=- deposited=1535/1535 halvings=0 next_halved=0 next_refused=0 ms=1268550
+## rt24
+FIELD_UNSEEN lap=-1 code=0.849 sites=43660 next=- ms=9426
+FIELD_UNSEEN lap=0 code=0.847 sites=43660 next=- ms=858567
+FIELD_LAP lap=0 read=75 sites=16573465 before=3.210 after=- deposited=1535/1535 halvings=0 next_halved=0 next_refused=0 ms=849140
+## rt25
+FIELD_UNSEEN lap=-1 code=0.847 sites=43660 next=- ms=9343
+FIELD_UNSEEN lap=0 code=0.847 sites=43660 next=- ms=854732
+FIELD_LAP lap=0 read=76 sites=16596069 before=3.220 after=- deposited=1535/1535 halvings=0 next_halved=0 next_refused=0 ms=845388
+## rt26
+FIELD_UNSEEN lap=-1 code=0.847 sites=43660 next=- ms=9303
+FIELD_UNSEEN lap=0 code=0.846 sites=43660 next=- ms=859330
+FIELD_LAP lap=0 read=77 sites=16434353 before=3.207 after=- deposited=1535/1535 halvings=0 next_halved=0 next_refused=0 ms=850027
+## rt27
+FIELD_UNSEEN lap=-1 code=0.846 sites=43660 next=- ms=9586
+FIELD_UNSEEN lap=0 code=0.843 sites=43660 next=- ms=867027
+FIELD_LAP lap=0 read=78 sites=16472700 before=3.200 after=- deposited=1535/1535 halvings=0 next_halved=0 next_refused=0 ms=857441
+## rt28
+FIELD_UNSEEN lap=-1 code=0.843 sites=43660 next=- ms=9341
+FIELD_UNSEEN lap=0 code=0.844 sites=43660 next=- ms=875872
+FIELD_LAP lap=0 read=79 sites=16467309 before=3.205 after=- deposited=1535/1535 halvings=0 next_halved=0 next_refused=0 ms=866530
+## the training passage's partition as lap_tf.sh passes it
+lap_tf.sh's call: train-field TRAIN TRAIN_SHA DEV DEV_SHA KEYS KEYS_SHA D=32 H=4 n=8 STILL=2 f=32 K=4 SECTION=16 LAPS=1 RATE=8 LAP_MS GROWN_LAP_MS STOP_MS OUT FROM FROM_SHA (train-field's usage, field_train.rs at 87994ea23), with LAP_MS=GROWN_LAP_MS=3703955 and STOP_MS=4003955 for te1 to te6, te6c and tt1.
+The rt laps ran by the line's own lap script (mean_lap.sh, binary bin-lap-mean), whose FIELD_COMMAND lines pass the same D H n STILL f K SECTION LAPS RATE (32 4 8 2 32 4 16 1 8) with LAP_MS=GROWN_LAP_MS=1215000 and STOP_MS=1515000.
+Every one of the thirteen runs' FIELD_COMMAND lines names the same TRAIN, DEV and KEYS files by their sha256 (one value each across the thirteen).
+training problems in the passage: TRAIN's problems, 24,685 (FIELD_DECLARATION train=24557, the problems the laps train, plus withheld=128).
+withheld: not an argument of its own; as many training problems as DEV holds (FIELD_DECLARATION dev=128: DEV's problems whose answer is shorter than the codec's answer extent, answer=2062), drawn from the training passage by the key file's last word (sections_of), the same 128 at every lap of every run here (all thirteen read the same key file), never in a section; FIELD_UNSEEN reads them before and after each lap, over their 43,660 sites.
+section size: SECTION=16 problems a section, the trained problems sorted by length (sections_of); FIELD_DECLARATION sections=1535 (24,557 over 16 a section, the last section short).
+FIELD_DECLARATION across the thirteen runs: section=16 train=24557 withheld=128 dev=128 sections=1535 answer=2062 (one value each: the same partition in every run); laps_read te1=74 te2=75 te3=76 te4=77 te5=78 te6=79 te6c=79 tt1=78 rt24=74 rt25=75 rt26=76 rt27=77 rt28=78
