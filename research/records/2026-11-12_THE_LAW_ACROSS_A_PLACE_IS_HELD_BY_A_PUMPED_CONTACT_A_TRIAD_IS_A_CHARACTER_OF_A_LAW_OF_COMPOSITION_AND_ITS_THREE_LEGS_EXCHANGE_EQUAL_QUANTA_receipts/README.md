@@ -41,5 +41,9 @@ written here. None of it uses the card.
 - `g107_cut_reads.txt`: the cut of tt1's lap mean (TT1C, `w_triad` grafted from TT0) with its gate, and the triad build's
   held and transmission reads of it (G107), each its own hold of the card lock. tt1's release (G106) is
   `g106_release_lines.txt` in the receipts of the record of raised rates (2026-11-11), beside te5's.
+- `g109_cut_release.txt`: the cut of tt1's end (TT1EC, `w_triad` grafted from TT0) with its gate, the triad build's held
+  read of it, and G70's release run on it as G106 ran it on tt1's end (the settle with its keyed write and rest, the
+  re-draw, the charge census and the reference's locked read on 128, on the first 32 held problems' 8,760 places), each its
+  own hold of the card lock, with G101's ruler on the re-draw end's answers (G109). The decoded writes are not here.
 - The guesses G102 and G105 to G109 are in `guess_capacity_44_55.txt` in the receipts of the record of the places
   (2026-11-11).
