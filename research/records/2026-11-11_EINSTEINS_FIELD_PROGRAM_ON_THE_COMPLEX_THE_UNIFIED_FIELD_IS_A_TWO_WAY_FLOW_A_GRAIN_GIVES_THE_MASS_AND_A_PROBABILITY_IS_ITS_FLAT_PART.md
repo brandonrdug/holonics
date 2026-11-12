@@ -529,6 +529,13 @@ tests one of these.
   line's level is read. The prediction above, that cooling lowers the lap-mean level by the rent, missed for that reason.
   The block law is retired as the line's rate law and G86's polar law stands; the next law on rates prices what a rate
   buys at a lap's mean, its drift, and the carrier of each entry's own rate stands for it.
+- Read (November 12, G110, scored in the guess file): that carrier set the circles' leak half (its rows and biases, 2,080
+  entries) at an eighth of the base rate for one lap beside the line's own lap at the base. The friction lagged (|gamma| at
+  open sites 0.8079 against 0.8002 at the lap means, the biases at their top speed) and the held passage took nothing from
+  it: 0.0004 nats a place over the control on the whole, 0.0002 in quarter 4, where the friction's one move trades quarter 4
+  against quarters 1 to 3 (G108). So no part's rate is the lever there: the trade between the regions is the lap's, and the
+  friction is one of its carriers, which the other parts replace when it is held back. What remains global in that part is
+  its chart, one leak chart a circle for every region (agent-inferred); the friction the region sets is derived next.
 
 **U3. The square of two places returns, first as a reading.** (§6.2.)
 - Found: the faces are one joint's conditionals only where every square of two places closes; the field lacks 0.233 nats a
@@ -556,6 +563,12 @@ tests one of these.
   founded next.
 - Could repeat: bits read as progress, which is why it is read per founding and per region and never as one total.
 - Device: the host, numbers only. No run.
+- Read (November 12, `founding_strength.py` on its declaration in the receipts of the record of the places): the circles
+  founded on rt18's state bought 0.032 nats a founded entry on the held passage after three laps at lap means (16,576 entries;
+  0.0086, 0.0100, 0.0106 and 0.0030 by quarter of open sites), and the 16 complex triads founded on te4's end bought 0.0131
+  after one lap (8,288 entries, 96 of them a gauge that changes no face; 0.0005, 0.0040, 0.0041 and 0.0046 by quarter),
+  over the circles' first lap (0.0082). The triads are the stronger founding where a region is mostly open and the weaker
+  where it is mostly written, where the near law is already held (G105).
 
 **U5. The formal joins.** The statements of §11, one box each in #410, beside the owners they extend. No Rust is added:
 nothing here has a consumer in the learner until U1 to U3 give it one.

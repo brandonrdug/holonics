@@ -1,5 +1,5 @@
-# The print of tools/founding_strength.py on founding_strength.tsv beside it, 2026-11-11 UTC: arithmetic on the committed receipts' text
-# (Fractions, decimals printed); each row's sources follow it as file:line.
+# The print of tools/founding_strength.py on founding_strength.tsv beside it, 2026-11-11 UTC, the triads' rows added 2026-11-12 UTC: arithmetic
+# on the committed receipts' text (Fractions, decimals printed); each row's sources follow it as file:line.
 # founding_strength.py: nats bought a place (control less arm), nats on the region, nats a founded entry
 FOUNDING_STRENGTH founding=contacts_32 laps=1 read=end region=all places=43470 entries=6208 arm=1.823373 control=1.826142 bought=0.002769 nats=120.37 strength=0.019389
   from entries +2048@scan_line_gate_and_release.txt:15 +2080@scan_line_gate_and_release.txt:16 +2080@scan_line_gate_and_release.txt:17; arm 2026-11-10_GROWTH_IN_CONTACTS_BINDS_WEAKLY_THE_LANE_FIELD_WITH_64_CONTACTS_GAINS_0.013_IN_FOUR_LAPS.md:73; control 2026-11-10_GROWTH_IN_CONTACTS_BINDS_WEAKLY_THE_LANE_FIELD_WITH_64_CONTACTS_GAINS_0.013_IN_FOUR_LAPS.md:73; places 2026-11-10_GROWTH_IN_CONTACTS_BINDS_WEAKLY_THE_LANE_FIELD_WITH_64_CONTACTS_GAINS_0.013_IN_FOUR_LAPS.md:67
@@ -57,6 +57,18 @@ FOUNDING_STRENGTH founding=circles_32 laps=3 read=mean region=q4 places=10918 en
   from entries +80182@g85_lap_lines.txt:14 -63606@g83_lap_lines.txt:38; arm g85_held_reads.txt:23; control g83_held_reads.txt:20; places g85_held_reads.txt:23
 FOUNDING_STRENGTH founding=circles_32 laps=3 read=end region=all places=43470 entries=16576 arm=1.714448 control=1.729076 bought=0.014628 nats=635.88 strength=0.038361
   from entries +80182@g85_lap_lines.txt:14 -63606@g83_lap_lines.txt:38; arm g85_lap_lines.txt:78; control g83_lap_lines.txt:98; places g85_lap_lines.txt:78
+FOUNDING_STRENGTH founding=triads_16 laps=1 read=mean region=all places=43470 entries=8288 arm=1.684517 control=1.687019 bought=0.002502 nats=108.76 strength=0.013123
+  from entries +88470@g105_tt1_lines.txt:22 -80182@g104_te5_lines.txt:53; arm g105_tt1_reads.txt:11; control g104_te5_reads.txt:11; places g105_tt1_reads.txt:11
+FOUNDING_STRENGTH founding=triads_16 laps=1 read=mean region=q1 places=10818 entries=8288 arm=0.608745 control=0.609122 bought=0.000377 nats=4.08 strength=0.000492
+  from entries +88470@g105_tt1_lines.txt:22 -80182@g104_te5_lines.txt:53; arm g105_tt1_reads.txt:12; control g104_te5_reads.txt:12; places g105_tt1_reads.txt:12
+FOUNDING_STRENGTH founding=triads_16 laps=1 read=mean region=q2 places=10881 entries=8288 arm=1.194858 control=1.197870 bought=0.003012 nats=32.77 strength=0.003954
+  from entries +88470@g105_tt1_lines.txt:22 -80182@g104_te5_lines.txt:53; arm g105_tt1_reads.txt:12; control g104_te5_reads.txt:12; places g105_tt1_reads.txt:12
+FOUNDING_STRENGTH founding=triads_16 laps=1 read=mean region=q3 places=10853 entries=8288 arm=1.970784 control=1.973933 bought=0.003149 nats=34.18 strength=0.004124
+  from entries +88470@g105_tt1_lines.txt:22 -80182@g104_te5_lines.txt:53; arm g105_tt1_reads.txt:12; control g104_te5_reads.txt:12; places g105_tt1_reads.txt:12
+FOUNDING_STRENGTH founding=triads_16 laps=1 read=mean region=q4 places=10918 entries=8288 arm=2.953872 control=2.957331 bought=0.003459 nats=37.77 strength=0.004557
+  from entries +88470@g105_tt1_lines.txt:22 -80182@g104_te5_lines.txt:53; arm g105_tt1_reads.txt:12; control g104_te5_reads.txt:12; places g105_tt1_reads.txt:12
+FOUNDING_STRENGTH founding=triads_16 laps=1 read=end region=all places=43470 entries=8288 arm=1.690352 control=1.693761 bought=0.003409 nats=148.19 strength=0.017880
+  from entries +88470@g105_tt1_lines.txt:22 -80182@g104_te5_lines.txt:53; arm g105_tt1_reads.txt:23; control g104_te5_lines.txt:55; places g105_tt1_reads.txt:23
 # the partition: a lap's quarters against its whole
 FOUNDING_PARTITION founding=contacts_32 laps=1 read=end quarters=unread (read whole only)
 FOUNDING_PARTITION founding=contacts_32 laps=2 read=end quarters=unread (read whole only)
@@ -74,8 +86,15 @@ FOUNDING_PARTITION founding=circles_32 laps=2 read=mean quarter_places=43470 qua
 FOUNDING_PARTITION founding=circles_32 laps=2 read=end quarters=unread (read whole only)
 FOUNDING_PARTITION founding=circles_32 laps=3 read=mean quarter_places=43470 quarter_nats=141.74/166.41/175.97/50.27 sum=534.39 strength_by_quarter=0.008551/0.010039/0.010616/0.003032 whole=534.38 whole_less_sum=-0.01
 FOUNDING_PARTITION founding=circles_32 laps=3 read=end quarters=unread (read whole only)
+FOUNDING_PARTITION founding=triads_16 laps=1 read=mean quarter_places=43470 quarter_nats=4.08/32.77/34.18/37.77 sum=108.79 strength_by_quarter=0.000492/0.003954/0.004124/0.004557 whole=108.76 whole_less_sum=-0.03
+FOUNDING_PARTITION founding=triads_16 laps=1 read=end quarters=unread (read whole only)
 # ranks: foundings read alike (same laps, read and region), strongest first
-FOUNDING_RANK laps=1 read=end region=all carry_g 0.071159 > contacts_32 0.019389 > circles_32 0.006200
+FOUNDING_RANK laps=1 read=end region=all carry_g 0.071159 > contacts_32 0.019389 > triads_16 0.017880 > circles_32 0.006200
 FOUNDING_RANK laps=2 read=end region=all carry_g 0.084616 > contacts_32 0.042784 > circles_32 0.023227
 FOUNDING_RANK laps=3 read=end region=all contacts_32 0.074945 > carry_g 0.059060 > circles_32 0.038361
 FOUNDING_RANK laps=4 read=end region=all contacts_32 0.092920 > carry_g 0.015590
+FOUNDING_RANK laps=1 read=mean region=all triads_16 0.013123 > circles_32 0.008206
+FOUNDING_RANK laps=1 read=mean region=q1 circles_32 0.001212 > triads_16 0.000492
+FOUNDING_RANK laps=1 read=mean region=q2 triads_16 0.003954 > circles_32 0.001724
+FOUNDING_RANK laps=1 read=mean region=q3 triads_16 0.004124 > circles_32 0.003601
+FOUNDING_RANK laps=1 read=mean region=q4 triads_16 0.004557 > circles_32 0.001667
