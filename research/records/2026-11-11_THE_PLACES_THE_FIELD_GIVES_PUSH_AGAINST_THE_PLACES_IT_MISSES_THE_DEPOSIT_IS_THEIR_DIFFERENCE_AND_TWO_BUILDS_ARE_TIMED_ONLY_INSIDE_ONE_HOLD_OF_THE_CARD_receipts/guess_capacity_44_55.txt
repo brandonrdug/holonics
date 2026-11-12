@@ -1618,3 +1618,25 @@ states they leave are rulers' and train nothing.
 Correction 2026-11-12T17:09Z to G112's score: the count's first source is kept at the tag archive/claude/carry-count (75bce9b6c), the name that
 tools/repo_census.py --archive gives a branch claude/carry-count, not archive/carry-count. G113's re-declared reads, tp1 and tp2, are not run yet; the
 PC's host ran PR #715's controls only (P44), and the card stays free.
+Hand-off 2026-11-12T17:13Z: the PC's runs and the engineering pass from the theory-lead thread to the Fable thread (Brandon's order of 16:59Z). The
+orders continue at P45. G113's guesses (a) to (f) stand as fixed above and are scored by the Fable thread.
+G114 fixed 2026-11-12T16:52Z (the passage record's §4.1, on main at 56cf3553a; entered here at 17:20Z by the clock, before its read): the census of
+directions by block, on the host from four lap means of the circle line by tools/block_directions.py (no card, no learning). The spans share no lap:
+D1 = te4/MEAN.0 less te2/MEAN.0 and D2 = te7/MEAN.0 less te5/MEAN.0 where te2/MEAN.0 stands on the PC, and D1 = te5/MEAN.0 less te4/MEAN.0 and
+D2 = te7/MEAN.0 less te6/MEAN.0 where it does not; the receipt names the four states by name and SHA-256. It runs after G113's two timing reads have
+released the card and the host, never beside them. k is the least count of directions holding 15/16 of the singular values' sum of D1^T D2, by block
+with the face side as its 64 columns, whole and by lane.
+  The premise, from the logs. The letter rows held a quarter of the line's lasting fall on 2 % of its heat (atlas deposition.block-polarization, the
+  region record's polar map of November 11), a consistent travel in few directions. The count rulers of November 10 read the law of a letter given
+  two letters back as a lexicon priced in product cells, which no small set of classes compresses, so the pair contacts' travel has no reason to be
+  low in rank. One integer, 64, is every block's row length, reached by a copy of a lane of 32 (FieldDeclaration::laned), never sized from any block.
+  (a) The three letter rows (enc, before, after) each read k of 16 or less over the whole width.
+  (b) The widest block's k is at least twice the narrowest's, among the blocks that moved (the DIRECTIONS_RANGE line).
+  Refused: every block's k within a factor 1.5 of every other's. Then the deposit uses one width across the blocks, and an unequal need lies by lane
+  or by class of letter and is read there next.
+  What k does and does not say. k counts the directions a block's travel held across two disjoint spans. A block whose k stands near 15/16 of its
+  columns (60 of 64 whole, 30 of 32 a lane) travels in every direction it has, which is what a block bound by its row length does; a block whose k
+  stands far under it is not bound by its row length. k does not say how many directions a block would use at another length.
+  Rule. The face becomes a composition of lanes that each block declares it reads (atlas tower.face-lane-composition), entering the line at (32, 32)
+  read by every block, by reproducing te7's lap. The first lane founded after that is read by the blocks the census names as bound, and its width
+  and its readers are a guess fixed before its build, from this read. No block's rows are cut: a trained row is never narrowed.
