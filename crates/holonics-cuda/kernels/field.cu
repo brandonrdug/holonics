@@ -612,6 +612,80 @@ __device__ void exp_series_dev(wide a, wide b, wide *re_out, wide *im_out) {
     *im_out = si;
 }
 
+// [definition; theory, November 12, P50 step 3] **The turn's series on the words its bounds prove** (`exp_series_dev(0, b)`'s integers, every
+// bit kept). The turn's argument is a centred phase `b = release(θ, 16)` on `2^(−30)`, `|θ| < π`: `|b| ≤ ⌊π 2^30⌉ = 3,373,259,426 < 2^32`.
+// - The first argument is zero at every call (the turn), so its products are dropped: `re = release(−t_i b, 30)`, `im = release(t_r b, 30)`.
+// - A term is at most `max_k π^k/k! 2^30 ≈ 5.17 · 2^30` exactly (at `k = 3`) and carries at most one unit of rounding a step forward by `|θ|/k`,
+//   so `|t| < 6 · 2^30 < 2^33`; a product `t b` is under `2^65` and is formed on 64 bits only where the two magnitudes' binary lengths sum to at
+//   most 62 (then under `2^62`, its release's half added without carry), on 128 bits otherwise (no 64-bit bound is proved for every step: the
+//   first steps near a half turn pass `2^63`).
+// - A released product is under `2^33 · 2^32 / 2^30 + 1 < 2^35` and the sums under `e^π · 2^30 + 2^10 < 2^35`: 64-bit words.
+// - The quotient by the step `k` (`div_nearest(x, k)`, half away from zero) is `⌊n/k⌋` of `n = |x| + ⌊k/2⌋ < 2^36`, read as the high word of
+//   `n · m_k`, `m_k = ⌈2^64/k⌉` (`SERIES_MAGIC`, the reciprocals' resident face at the grain `2^(−64)`): with `m_k k = 2^64 + e`, `0 ≤ e < k`,
+//   `n m_k / 2^64 = n/k + n e/(k 2^64)` and `n e < 2^36 · 2^6 < 2^64`, so the floor is `⌊n/k⌋`. Past `SERIES_STEPS` (never reached under the
+//   argument's bound: the terms release to zero by the 25th step) the quotient is the 64-bit division, the same integer.
+#define SERIES_STEPS 64
+struct SeriesMagic {
+    uint64_t m[SERIES_STEPS + 1];
+};
+constexpr SeriesMagic series_magic_of() {
+    SeriesMagic t{};
+    for (uint32_t k = 2; k <= SERIES_STEPS; ++k) {
+        t.m[k] = UINT64_MAX / k + 1;
+    }
+    return t;
+}
+__constant__ SeriesMagic SERIES_MAGIC = series_magic_of();
+
+// `div_nearest(x, k)` for `|x| < 2^35`, `1 ≤ k`.
+__device__ __forceinline__ int64_t series_quotient(int64_t x, uint32_t k) {
+    const uint64_t n = (uint64_t)(x >= 0 ? x : -x) + (k >> 1);
+    const uint64_t q = k == 1 ? n : k <= SERIES_STEPS ? __umul64hi(n, SERIES_MAGIC.m[k]) : n / k;
+    return x >= 0 ? (int64_t)q : -(int64_t)q;
+}
+
+// `release(t b, 30)` for `|t| < 2^33`, `|b| < 2^32`: on 64 bits where the magnitudes' lengths prove the product under `2^62`.
+__device__ __forceinline__ int64_t series_product(int64_t t, int64_t b) {
+    if (bit_length(mag64(t)) + bit_length(mag64(b)) <= 62) {
+        const int64_t x = t * b;
+        const int64_t half = (int64_t)1 << (MOVE_BITS - 1);
+        return x >= 0 ? (x + half) >> MOVE_BITS : -((-x + half) >> MOVE_BITS);
+    }
+    return (int64_t)rel((wide)t * (wide)b, MOVE_BITS);
+}
+
+// `e^(i b)` on `2^(−30)` for the turn's argument `b` (`exp_series_dev(0, b)`, the same integers).
+__device__ void turn_series_dev(int64_t b, wide *re_out, wide *im_out) {
+    int64_t tr = (int64_t)1 << MOVE_BITS, ti = 0, sr = tr, si = 0;
+    for (uint32_t k = 1;; ++k) {
+        const int64_t re = series_product(-ti, b);
+        const int64_t im = series_product(tr, b);
+        tr = series_quotient(re, k);
+        ti = series_quotient(im, k);
+        if (tr == 0 && ti == 0) {
+            break;
+        }
+        sr += tr;
+        si += ti;
+    }
+    *re_out = sr;
+    *im_out = si;
+}
+
+// [measurement; theory, November 12, P50 step 3] The turn's series against the wide one on a sweep of arguments (`exp_series_dev(0, b)`, the
+// reference the narrow series keeps every bit of): each argument's two faces, the narrow's then the wide's.
+extern "C" __global__ void field_series_check(const int64_t *bs, uint64_t count, int64_t *out) {
+    for (uint64_t c = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; c < count; c += (uint64_t)gridDim.x * blockDim.x) {
+        wide nr, ni, wr, wi;
+        turn_series_dev(bs[c], &nr, &ni);
+        exp_series_dev(0, (wide)bs[c], &wr, &wi);
+        out[4 * c] = (int64_t)nr;
+        out[4 * c + 1] = (int64_t)ni;
+        out[4 * c + 2] = (int64_t)wr;
+        out[4 * c + 3] = (int64_t)wi;
+    }
+}
+
 // [definition; agent-inferred, November 2] **The turn's face at a clock** `ρ` on `2^(−24)` (the host's
 // `turn_phasor`): `e^(2πi ρ/n)`, `ρ` in `(−n/2, n/2]`, its four quarter points exact.
 __device__ void turn_phasor_dev(const FieldWords &w, wide rho, uint64_t n, wide *re, wide *im) {
@@ -644,7 +718,7 @@ __device__ void turn_phasor_dev(const FieldWords &w, wide rho, uint64_t n, wide 
     }
     const wide pi = (wide)(((uwide)w.pi_hi << 64) | (uwide)w.pi_lo);
     const wide theta = div_nearest(2 * pi * c, period);
-    exp_series_dev(0, rel(theta, 16), re, im);
+    turn_series_dev((int64_t)rel(theta, 16), re, im);
 }
 
 // The face of turned slot `slot` at a clock `ρ` (the host's `Field::turn`): the resident ring at a whole place it
