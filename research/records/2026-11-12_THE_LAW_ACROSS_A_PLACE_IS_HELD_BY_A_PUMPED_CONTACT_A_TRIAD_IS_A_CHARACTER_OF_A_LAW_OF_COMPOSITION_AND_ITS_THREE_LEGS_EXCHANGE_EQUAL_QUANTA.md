@@ -143,9 +143,25 @@ or loses the same count of quanta). At unequal rates the conserved quantity is `
 one leg grows faster than the others for no reason in the law. [ruling] The triad's parts train at
 one rate.
 
-Founded with `W_T = 0`, the conserved difference is the drawn rows' own norm, so as `w_k` opens the
-three legs open with it, each by what `w_k` gains. At founding only `W_T` moves at first order
-(`∇_α ℓ = 0` while `W_T = 0`), as the growth by contacts' new columns do.
+Founded with `W_T = 0`, the conserved difference is the drawn rows' own norm, so under a step at one
+rate, as `w_k` opens, the three legs open with it, each by what `w_k` gains. At founding only `W_T`
+moves at first order (`∇_α ℓ = 0` while `W_T = 0`), as the growth by contacts' new columns do.
+
+[derivation; agent-inferred, November 12, from the learner's source] The field's learner does not
+step at one rate an entry. It deposits `((m ≪ grain) ≫ rate)/(⌊√v⌋ + 1)` (`deposit_step` in
+`hnn/tower.rs`, the field's learner in `hnn/tower/field.rs`), so entry `i` steps at `2^(−rate)/s_i`
+with `s_i = ⌊√v_i⌋ + 1`, and the form a step keeps at first order is `Σ_i s_i θ_i²` over a leg's
+entries less the same over `w_k`'s. The first moment's lag enters only at second order: each past
+covector pairs equally with the state it was read at, and the state has moved since by a few steps,
+each of the rate's order. The divisors do not stand. The legs' second moments open at the pair
+drives' and decay at `2^(−8)` a step while their covectors are zero, and they then follow their own
+covectors' squares. So over a lap the learner keeps no form of the legs' norms. Its step does not
+keep the differences of plain squared norms either, so equal gains of the legs are not a prediction
+for it. What the gauge still gives the learner at every state is the scale identity on its
+covectors: the four families' covectors pair equally with their own values. The six real directions
+of each triad's gauge are travel that no receiver reads, as a lane's scale is (`state_travel.py
+scale`). The part's one octave stands: the divisors are each entry's own, read from what reached it,
+where an octave between the legs would be a rate set by hand.
 
 ### 3.3 Which triad
 
