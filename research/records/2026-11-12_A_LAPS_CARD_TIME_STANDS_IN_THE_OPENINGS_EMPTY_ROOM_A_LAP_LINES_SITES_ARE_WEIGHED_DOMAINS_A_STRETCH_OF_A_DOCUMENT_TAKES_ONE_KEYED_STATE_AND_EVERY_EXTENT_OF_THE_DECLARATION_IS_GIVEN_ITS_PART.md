@@ -175,15 +175,20 @@ the trainer's own lines are held to, as te7's were held to the first ruler:
    (`field_train.rs:79-82`). At the crossing to a store the bytes the store holds and the
    constitution does not are founded once, in byte order after the classes that stand: every class
    that stands keeps its index, the void its own, and the open row moves to the end of each letter
-   family. A fresh letter's row of the encoding and its rows of the moment encodings open at zero,
-   its two strand contacts' rows are drawn from the key stream as a founding draws them, and its
-   class bias opens at the least class bias the constitution holds. Reason: the face reads a class
-   through the encoding that encodes it, `z(a) = ⟨E(a), R r̂ + b_R⟩ + c_a`. A founding draws `E`
-   because its readout stands at zero and every class reads flat; here the readout is trained, and
-   a drawn row would read each fresh letter at a random height at every face. At zero a fresh
-   letter reads the same at every face, at the share the least-favoured letter the constitution
-   knows is given, and its row has a covector from the first face compared and its own from the
-   first place the letter stands at. No founding of a letter leaves every face's bits, so its
+   family. A fresh letter's every row opens at zero (its row of the encoding, its rows of the two
+   strand encodings and its rows of the moment encodings), and its class bias opens at the least
+   class bias the constitution holds. Reason: the face reads a class through the encoding that
+   encodes it, `z(a) = ⟨E(a), R r̂ + b_R⟩ + c_a`, and a site's opening face is a sum of rows,
+   `x⁰_t = E(u_t) + E₋(u_(t−1)) + E₊(u_(t+1))` and its moment's term (`Field::open`). A founding
+   draws these rows because what reads them stands at zero and every class reads flat; here every
+   reader is trained, and a drawn row would read each fresh letter at a random height at every
+   face and would be heard beside it as a letter it is not. At zero a fresh letter reads the same
+   at every face, at the share the least-favoured letter the constitution knows is given, and each
+   of its rows takes its covector from the first face compared and from the first place the letter
+   stands at or beside; the sum has no product of two fresh rows, so none waits on another. The
+   founding reads no key. [Corrected November 12, 18:44Z, before any build: this item first drew
+   the two strand rows from the key stream, by the founding's habit and with no reason of its own.]
+   No founding of a letter leaves every face's bits, so its
    price is read on the code line's held passage before and after it. The fresh entries' moments
    and rates open as the growths of November 10 to 12 open theirs (the first moment at zero, the
    second at its family's mean, the base rate). A byte no document of the store holds gets no
