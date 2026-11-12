@@ -24,6 +24,9 @@ type Result<T> = std::result::Result<T, Box<dyn Error>>;
 
 fn run(args: &[String]) -> Result<()> {
     let (mode, rest) = args.split_first().ok_or("field_pass parity|time|train complete-language COMMAND ARGS…")?;
+    if mode == "yardstick" {
+        return yardstick(rest);
+    }
     if rest.first().map(String::as_str) != Some("complete-language") {
         return Err("field_pass parity|time|train complete-language COMMAND ARGS…".into());
     }
@@ -71,6 +74,20 @@ fn run(args: &[String]) -> Result<()> {
             let threads = p.threads.get(entry).copied().unwrap_or(0);
             println!("FIELD_PROFILE entry={entry} launches={calls} ms={} us_a_launch={} grid_threads={threads} mean_grid_threads={}", ns / 1_000_000, ns / 1_000 / (*calls as u128).max(1), threads / (*calls as u128).max(1));
         }
+        // [measurement; theory, November 12, P50 step 0] The launches made a head at a time, by head, with the head's kind and
+        // the pairs its forward contact met.
+        for (h, pairs) in p.pairs_by_head.iter().enumerate() {
+            println!("FIELD_PROFILE_PAIRS head={h} kind={} pairs={pairs}", p.head_kinds.get(h).copied().unwrap_or("-"));
+        }
+        for ((entry, h), (calls, ns)) in &p.by_head {
+            let pairs = p.pairs_by_head.get(*h as usize).copied().unwrap_or(0);
+            println!(
+                "FIELD_PROFILE_HEAD entry={entry} head={h} kind={} launches={calls} us={} pairs={pairs} ns_a_pair_milli={}",
+                p.head_kinds.get(*h as usize).copied().unwrap_or("-"),
+                ns / 1_000,
+                ns * 1_000 / pairs.max(1)
+            );
+        }
         println!(
             "FIELD_PROFILE_SPLIT kernels_ms={} copies={} copies_ms={} allocations={} allocations_ms={} elapsed_ms={}",
             kernels / 1_000_000,
@@ -82,6 +99,27 @@ fn run(args: &[String]) -> Result<()> {
         );
     }
     result
+}
+
+/// [measurement; theory, November 12, P50 step 0b] `field_pass yardstick [ENTRIES] [SECONDS]`: the card's yardsticks
+/// ([`CardField::yardsticks`]), narrow products a second and octets a second, each timed alone to at least SECONDS (default 1.5)
+/// of the card's time; ENTRIES (default 209) is a gathered row's count of entries of eight words.
+fn yardstick(args: &[String]) -> Result<()> {
+    let entries: u32 = args.first().map(|a| a.parse()).transpose()?.unwrap_or(209);
+    let seconds: f64 = args.get(1).map(|a| a.parse()).transpose()?.unwrap_or(1.5);
+    let opened = Card::open(0)?;
+    let card = CardField::open(&opened)?;
+    let y = card.yardsticks(entries, seconds)?;
+    println!("YARDSTICK card={} multiprocessors={} product_blocks={} stream_blocks={} threads_a_block=256", opened.census().name, y.multiprocessors, y.product_blocks, y.stream_blocks);
+    for (name, (rate, count, took)) in [("products_cell", y.cell), ("products_tile", y.tile)] {
+        println!("YARDSTICK reading={name} map=64x64 products={count} seconds={took:.4} products_a_second={rate:.4e}");
+    }
+    for (name, (rate, count, took)) in [("read_in_order", y.read), ("write_in_order", y.write)] {
+        println!("YARDSTICK reading={name} store_octets={} octets={count} seconds={took:.4} octets_a_second={rate:.4e}", y.store_octets);
+    }
+    let (rate, count, took) = y.gather;
+    println!("YARDSTICK reading=gather_eight_words rows={} entries={} octets_a_gather=32 octets={count} seconds={took:.4} octets_a_second={rate:.4e} gathers_a_second={:.4e}", y.gather_rows, y.gather_entries, rate / 32.0);
+    Ok(())
 }
 
 fn main() {
