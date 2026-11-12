@@ -38,3 +38,35 @@ rt18/STATE.0: parts 32 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
 rt18r/STATE.0: parts 32 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
 rt18/MEAN.0: parts 32 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
 rt18r/MEAN.0: parts 32 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+## The ruling (P14, the theory lead, sent 01:04 UTC November 12): the reproduction passed
+The rule that a build enters a line by reproducing it asks that every section line, timings aside, equal the line's own lap's; this one
+did on 1,535 of 1,535 sections, with every read line equal and lines 1 to 5 of both saved states byte for byte. Line 6 is the parts line:
+the same rates written in the letter-rates build's form, nineteen parts, the first lane's three letter-row parts after the sixteen plain
+ones, each at octave 0 (rt18's "parts 32" and sixteen 0s against the reproduction's "parts 32" and nineteen 0s, above). Every build since
+7464c528f reads a sixteen-part line with those three at octave 0, so the two lines carry the same rate for every entry, and the 1,535 equal
+sections show it. The rule guards against a difference of law between two trees that a parity of card against host cannot see; a
+difference of form whose law the sections prove equal is not one. The b line then trained (P13 steps 1 and 2).
+
+## Step 1: b0.STATE read by bin-joint-strata (4bd56aa83f564d66) and by the letter-rates binary (88bf7343806e4b78), the binary that
+## reads b's laps; each prints rt18/STATE.0's held read (1.731382, 1.866629), the rates line unread (both parsers stop at the parts line)
+# b_chain: trainer 0394ba92eac51a4c, read binary 88bf7343806e4b78, bin-joint-strata 4bd56aa83f564d66, tools f396f5207 01:04:51
+READ b0_js held=1.731382
+CHECK_B0 js held=1.731382 1.866629 (rt18/STATE.0's 1.731382 1.866629: equal)
+READ b0_lr held=1.731382
+CHECK_B0 lr held=1.731382 1.866629 (rt18/STATE.0's 1.731382 1.866629: equal)
+
+## The rates checks: each lap's FIELD_OWN_RATES against the census of the state it trains from, and the law's state against
+## its input end state (only the rates line differs)
+CENSUS b1 entries=63606 rate_bits=12 at 8:12928 9:3442 10:6144 11:14592 12:5348 13:10528 14:4256 15:64 16:5280 17:1024
+OWN_RATES_SEEN b1 entries=63606 rate_bits=12 at 8:12928 9:3442 10:6144 11:14592 12:5348 13:10528 14:4256 15:64 16:5280 17:1024
+GATE_OWN b1 ok
+LAW_EXIT b2 0 01:19:32
+LAW_STATE b2 other_lines_differing=0 rates_lines=1
+CENSUS b2 entries=63606 rate_bits=12 at 8:12928 9:3442 10:6144 11:14592 12:5248 13:10628 14:4256 15:64 16:5280 17:1024
+OWN_RATES_SEEN b2 entries=63606 rate_bits=12 at 8:12928 9:3442 10:6144 11:14592 12:5248 13:10628 14:4256 15:64 16:5280 17:1024
+GATE_OWN b2 ok
+LAW_EXIT b3 0 01:34:24
+LAW_STATE b3 other_lines_differing=0 rates_lines=1
+CENSUS b3 entries=63606 rate_bits=12 at 8:12928 9:3442 10:6144 11:14592 12:5184 13:10660 14:4288 15:64 16:5280 17:1024
+OWN_RATES_SEEN b3 entries=63606 rate_bits=12 at 8:12928 9:3442 10:6144 11:14592 12:5184 13:10660 14:4288 15:64 16:5280 17:1024
+GATE_OWN b3 ok
