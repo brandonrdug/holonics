@@ -1,0 +1,79 @@
+# P50 step 2 (one clock store; the order's four kept clocks did not fit the batch cut), 2026-11-12 UTC. Build 27ef8cfd4 (claude/engine), field_pass
+# sha256 256bc923b7d55155; control main c04b4e68c, field_pass sha256 3b9b8347bb8cf36a. Nothing else on the card or the host. Numbers only.
+# The acceptance as step 1's: gates, the GPU suite, the reproduction from run 1's STATE.101 for 600 sections, and one hold (control, step 2, control,
+# then the profiled step 2) on the pass's sections 2,001 to 2,100 from run 2's STATE.1900; projections, stops and outer timeouts as step 1's.
+## (i) and (ii)
+GATE_EXIT 0 22:27:47
+MEASURE lap=step2_gate rc=0 wall_s=197.8 peak_rss_kib=3356872
+SUITE_EXIT 0 22:34:24
+test result: ok. 88 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 342.92s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.13s
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.36s
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.32s
+test result: ok. 46 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 31.00s
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 5.07s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+MEASURE lap=step2_suite rc=0 wall_s=389.9 peak_rss_kib=1786076
+SUITE_TESTS_OK 139
+## (iii) and (iv), the reproduction
+GATE_EXIT 0 22:27:47
+STORE_SAVE k=600 sections=600 states=600 moved=106716 square=715909979972340 priced=599 transfer=-39755342747 external=-39771192152 curvature=15849405 octave=1 rate=12 reads=0 returns=600 pairs=27340062811 batches=600 peak_store=8456338512 ms=257404
+FIELD_CARD reads=0 read_ms=0 returns=600 return_ms=247864 pairs=27340062811 batches=600 peak_store=8456338512 landmarks=0 landmark_ms=0 elapsed_ms=257407
+FIELD_SKIN octets_a_entry=64 octets_a_site=1280 clock_octets_a_site=1920 entries=6295201510 dense_pairs=8970533523 peak_batch_entries=12200622 peak_batch_dense_pairs=15371207 peak_skin_store=913284608 peak_store=8456338512 batch_cut=8483975984
+MEASURE lap=repro2 rc=0 wall_s=258.0 peak_rss_kib=382832
+GATE_REPRO sections=600 run2_lines=600 equal=600 EQUAL
+GATE_SAVE k=600 equal_timings_and_peak_store_aside=True peak_store=8456338512 run2_peak_store=7577906356
+GATE_BYTES STATE.600 equal repro=a5b222844ffcbb71 run2=a5b222844ffcbb71
+GATE_BYTES MEAN.600 equal repro=a12e0da79e525ae9 run2=a12e0da79e525ae9
+## (v), the timing in one hold
+TIMING tc3 sections=100 equal_to_leg1=100/100 mean_section_ms=433.5
+TIMING ts2 sections=100 equal_to_leg1=100/100 mean_section_ms=413.8
+TIMING tc4 sections=100 equal_to_leg1=100/100 mean_section_ms=429.9
+TIMING tp2 sections=100 equal_to_leg1=100/100 mean_section_ms=468.9
+TIMING controls_spread_ms=3.6 controls_mean_ms=431.7 step_ms=413.8 step_over_controls=0.959 us_a_computed_site_at_40741=10.16
+STATE_SHA tc3 81377dbeaf26d65e 64954161619deda4
+STATE_SHA ts2 81377dbeaf26d65e 64954161619deda4
+STATE_SHA tc4 81377dbeaf26d65e 64954161619deda4
+STATE_SHA tp2 81377dbeaf26d65e 64954161619deda4
+ts2.log:FIELD_CARD reads=0 read_ms=0 returns=100 return_ms=39839 pairs=4566615773 batches=100 peak_store=8410613236 landmarks=0 landmark_ms=0 elapsed_ms=41634
+ts2.log:FIELD_SKIN octets_a_entry=64 octets_a_site=1280 clock_octets_a_site=1920 entries=1049010242 dense_pairs=1487925442 peak_batch_entries=12264156 peak_batch_dense_pairs=15521024 peak_skin_store=913577984 peak_store=8410613236 batch_cut=8533835776
+tp2.log:FIELD_CARD reads=0 read_ms=0 returns=100 return_ms=45394 pairs=4566615773 batches=100 peak_store=8410613236 landmarks=0 landmark_ms=0 elapsed_ms=47149
+tp2.log:FIELD_SKIN octets_a_entry=64 octets_a_site=1280 clock_octets_a_site=1920 entries=1049010242 dense_pairs=1487925442 peak_batch_entries=12264156 peak_batch_dense_pairs=15521024 peak_skin_store=913577984 peak_store=8410613236 batch_cut=8546366256
+## the profiled read: the moment entries and the fill (step 2 against step 1's and step 0's profiled reads, other holds)
+field_moment_paced_all step2_ms_a_section=2.28 launches=400 step1=16.35 step0=16.41
+field_moment_return_paced_all step2_ms_a_section=3.39 launches=400 step1=16.76 step0=16.87
+field_moment_pace_back_all step2_ms_a_section=4.29 launches=400 step1=22.40 step0=22.50
+field_clock_fill step2_ms_a_section=30.35 launches=800 step1=0.00 step0=0.00
+field_moment_skinned_all step2_ms_a_section=6.20 launches=400 step1=7.37 step0=7.18
+PACED_MOMENTS_WITH_FILL step2=40.3 step1=55.5 step0=55.8 ms_a_profiled_section
+## profile_budget.py on the profiled read
+elapsed_ms=47152 kernels_ms=38169 entries_ms=38132 launches=50900 entries=70
+share_of_elapsed kernels=0.809 wide=0.795 short=0.015 allocations=0.027 copies=0.063 host=0.100
+short_launches=4500 mean_us=156 share_of_kernel=0.018 least_us_a_launch=73
+allocation_us=42.1 copy_us=780.0
+share_of_kernel contact=0.444 affine=0.061 top_five=0.434
+reads=0 returns=100 batches=100 batches_a_run=1.00 pairs_met=4566615773 pairs_a_run=4.567e+07 peak_store=8410613236
+a_batch launches=509 allocations=304 copies=38
+field_contact_rows                 launches=   1600 ms=  4043 us_a_launch=  2527 share_of_kernel=0.106
+field_pace_skin_back               launches=    800 ms=  3757 us_a_launch=  4697 share_of_kernel=0.099
+field_clock_fill                   launches=    800 ms=  3035 us_a_launch=  3794 share_of_kernel=0.080
+field_contact_l5                   launches=    351 ms=  2881 us_a_launch=  8210 share_of_kernel=0.076
+field_contact_columns              launches=   1600 ms=  2836 us_a_launch=  1773 share_of_kernel=0.074
+field_outer_x32                    launches=   6000 ms=  1919 us_a_launch=   319 share_of_kernel=0.050
+field_transposed                   launches=   3700 ms=  1830 us_a_launch=   494 share_of_kernel=0.048
+field_affine_tiled_x32             launches=   3200 ms=  1746 us_a_launch=   545 share_of_kernel=0.046
+field_skin_fill                    launches=    800 ms=   968 us_a_launch=  1210 share_of_kernel=0.025
+field_exposure                     launches=    400 ms=   919 us_a_launch=  2298 share_of_kernel=0.024
+field_spread                       launches=   1600 ms=   683 us_a_launch=   426 share_of_kernel=0.018
+field_outer_bound_x32              launches=   2500 ms=   670 us_a_launch=   268 share_of_kernel=0.018
+field_moment_skinned_all           launches=    400 ms=   620 us_a_launch=  1550 share_of_kernel=0.016
+field_affine_tiled_x64             launches=    900 ms=   584 us_a_launch=   649 share_of_kernel=0.015
+field_blank_bias_enc               launches=    300 ms=   567 us_a_launch=  1893 share_of_kernel=0.015
+field_chart                        launches=   1200 ms=   541 us_a_launch=   451 share_of_kernel=0.014
+## the forecast before the build: leg 1's 3,000 sections, reservation_census.py's support reservation plus each variant's octets a site
+STEP2_FORECAST variant=A_four_clocks_kept octets_a_site=12800 cut=8489376152 max=8910516070 over_cut=2180
+STEP2_FORECAST variant=A2_four_clocks_far_in_crowd_store octets_a_site=11520 cut=8489376152 max=8857481830 over_cut=1916
+STEP2_FORECAST variant=B_one_store_far_in_crowd_store octets_a_site=1920 cut=8489376152 max=8459725030 over_cut=0
+STEP2_FORECAST variant=B2_one_store_own_far octets_a_site=3200 cut=8489376152 max=8512759270 over_cut=11
+STEP2_FORECAST variant=B_one_store_far_in_crowd_store octets_a_site=1920 cut=8483975984 max=8459725030 over_cut=0
