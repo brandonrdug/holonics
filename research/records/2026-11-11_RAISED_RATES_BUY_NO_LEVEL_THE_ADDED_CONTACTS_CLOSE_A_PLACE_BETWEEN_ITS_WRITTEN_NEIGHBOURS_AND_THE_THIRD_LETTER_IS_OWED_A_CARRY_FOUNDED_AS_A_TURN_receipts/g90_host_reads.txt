@@ -1,0 +1,10 @@
+# G90's host rulers after tp5, from main's tools (ab7023590 or later), one thread each (taskset to one core, OMP_NUM_THREADS=1), on GMC (84fc1c7192252cb7,
+# byte-equal to GM, the grown rt18 mean) and the tp means (the W line at tp4 and tp5; scale 64 and weighed on tp2 to tp5's means); projection about a minute, deadline 600 s each.
+## state_travel.py GMC tp4/MEAN.0 tp5/MEAN.0
+(no ruler45_w.txt)
+## state_travel.py scale 64 tp2 tp3 tp4 tp5 means
+(no ruler45_scale.txt)
+## state_travel.py weighed 64 1535 16560945 tp2 tp3 tp4 tp5 means
+(no ruler45_weighed.txt)
+METER law_b2 rc=0 started=01:19:32Z ended=01:19:32Z wall_s=0.3 user_s=0.2 sys_s=0.0 peak_rss_kib=87876
+METER law_b3 rc=0 started=01:34:24Z ended=01:34:24Z wall_s=0.3 user_s=0.2 sys_s=0.0 peak_rss_kib=87220
