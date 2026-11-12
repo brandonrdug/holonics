@@ -1,0 +1,53 @@
+# G109 (P37), 2026-11-12 UTC: the release on tt1's end with the triads' return cut. TT1EC = tt1/STATE.0 with w_triad grafted from TT0 (where it
+# reads 0), by main's tools/state_travel.py graft at c4bb88dd0, on the host, one thread; its gate (charge_t.py, and a comparison of every line and entry
+# through state_travel.state and layout). Then, by bin-triad (sha256 48ab0d52c2291b6f, built at 111490c01), each its own hold of
+# HOLONICS_ROOT/.local/gpu.lock (the RTX 4080 SUPER), alone on the card with nothing else on the host: the held read (held_as.sh, outer 24 s), and G70's
+# j_run.sh exactly as G106 ran it on tt1/STATE.0 (the settle with its keyed write and rest, the re-draw, the charge census on keyed, rest and the
+# reference, the reference's locked read on 128; the first 32 held problems' 8,760 places), dispatched with tools/runs.py (p37), projected 10.5 minutes
+# (630 s), deadline 900 s by the outer timeouts. Its early stop: the settle's share of the projection by G106's tt1 stages (326.1 s of 625 s) is 328.7 s,
+# and past it by a quarter (411 s) the settle's timeout stops it. After it, on the host, one thread, G101's ruler on the re-draw end answers: Python's
+# compile of each written code line alone (every non-blank line of an answer that is neither a fence nor a comment, its indentation stripped), as G106
+# counted. TT1EC trains nothing. The decoded writes are never committed.
+## the cut
+# p37 chain at main c4bb88dd0 13:35:28
+tt1/STATE.0 sha256 50f36252909dd47e27e86f5be7a6d6e3a94b58fd7902464eca67493fa55cef2c
+GRAFT_EXIT 0
+STATE_GRAFT families=w_triad entries=2048 of=88470 moved=2048 rms_from_head=85621
+TT1EC sha256 35b5b6a614edec9425617c07031a24b3eccb2814d7e856504a31cd8358268ac8
+## the gate
+CHARGE p31/TT1EC triads=16 circles=32 w_triad_entries=2048 w_triad_rms=0 (0 in its unit) w_plain_entries=2048 w_plain_rms=4.4315e+06 (0.264138 in its unit) ratio=0.0000
+GATE_CUT lines_other_than_2_differing=0 w_triad_start=86422 w_triad_length=2048 entries_differing=2048 outside_span=0
+## the held read of TT1EC
+# tt1ec: state 35b5b6a614edec94; binary 48ab0d52c2291b6f; asked 13:35:28
+# tt1ec: lock taken 13:35:28 wait_s=.012893380
+# tt1ec: run_s=10.478217517 rc=0 released 13:35:39
+READ tt1ec held=1.692641
+FIELD_HELD lap=-1 answer=5.413750 classes=43470 context=0.844492 context_classes=43470 foil=0.995358 question=0.150866 ms=3812
+FIELD_JOINT lap=-1 answers=128 sites=43470 own_bits_a_byte=2.441965 foil_bits_a_byte=2.628557 information_bits_a_byte=0.186592 ms=1769
+FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.692641 foil_nats_a_place=1.821977 information_nats_a_place=0.129336 own_nats_a_word=12.718947 information_nats_a_word=0.971864
+FIELD_JOINT_STRATA lap=-1 open_quarters=1/2/3/4 own_nats_a_place=0.613524/1.202408/1.981489/2.963317 foil_nats_a_place=0.704780/1.330759/2.133772/3.108556 places=10818/10881/10853/10918 open_sites=5333/16153/26922/38725 terms_own=10040449869/19792250793/32532388698/48943574292 terms_foil=11533867162/21904962775/35032593690/51342414019
+FIELD_CARRY_GATES lap=-1 circles=32 reads=697064 modulus_sum=648147474863091/618015863330979/536333038815074/651415477359064/526837769711735/673792547920357/644678920635929/621213773529809/619603867654274/674557395095243/553635983403722/620144835843577/603758878753093/604024541543807/575717468196780/584609610348271/565998168382185/572068952002022/634910966552007/619636288757038/629893283769774/559472865179701/580581995356896/652837970441917/612430653297272/660053212832911/560305077712765/550183809049330/549677131354698/636588639745216/624982414231174/595047512379592 modulus_mean=929824915/886598451/769417211/934513154/755795407/966615042/924848967/891186137/888876584/967712283/794239816/889652651/866145545/866526662/825917660/838674225/811974464/820683541/910835972/888923095/903637662/802613339/832896255/936553846/878585973/946904750/803807222/789287366/788560492/913242743/896592585/853648319 leak_nonnegative=109845/235227/616020/108005/562941/41752/71787/244909/216974/32551/418931/192152/231328/298726/461154/370349/432540/409261/147773/196592/226436/349362/368210/84535/225948/37187/397435/486812/444029/106952/261481/361558
+FIELD_JOINT_SERIES lap=-1 by_quarter_bits_a_byte=0.235898/0.186546/0.162618/0.160992 problems_quartiles_bits_a_byte=0.130762/0.209815/0.322943
+FIELD_UNSEEN lap=-1 code=0.786 sites=43660 next=- ms=9944
+FIELD_CARD reads=45 read_ms=8976 returns=0 return_ms=0 pairs=4440988451 batches=58 peak_store=8581532068 landmarks=0 landmark_ms=0 elapsed_ms=9953
+MEASURE lap=held_tt1ec rc=0 wall_s=10.5 peak_rss_kib=796576
+## the release of TT1EC
+# tt1ec: state 35b5b6a614edec94 (hnn-field-v14f 100 64 4 8 2 128 4 4 3771 2 0 32 16); binary 48ab0d52c2291b6f asked 13:35:39
+# tt1ec: lock taken 13:35:39 wait_s=.002120604
+# tt1ec: settle rc=0 after 321 s
+# tt1ec: released 13:46:09 in 630 s
+REFREAD tt1ec problems=128 places=43342 code=0.457777 entropy=0.428211 root_share=1.399602 v1=0.057934 v2=0.037538 13:46:09
+LAP tt1ec locks=1.684200/0.919219 v2=0.177625 rest=1.089790/0.788503 v2=0.108105 redraw=0.636299/0.649887 neutral=25 rested=7 redraw_v2=0.044977 13:46:09
+FIELD_SETTLE_DONE problems=32 at_rest=32 h_millinats=1000 passes_bound=1000 kept=794 undone=1175 letters=8760 code_keyed_nats_a_place=1.684200 code_end_nats_a_place=1.089790 fall_nats=5207.035032 keyed_ms=17050 ms=320263
+MEASURE lap=tt1ec_settle rc=0 wall_s=320.7 peak_rss_kib=737756
+FIELD_REDRAW_DONE problems=32 neutral=25 rested=7 h_millinats=1000 passes_bound=1000 kept=840 undone=961 letters=8760 code_start_nats_a_place=1.089790 code_end_nats_a_place=0.636299 entropy_end_nats_a_place=0.649887 root_end_nats=488.751281 ms=156331
+MEASURE lap=tt1ec_redraw rc=0 wall_s=156.8 peak_rss_kib=736624
+FIELD_CHARGE_STATE state=rest problems=32 letters=8760 cut_to_room=0 code_nats=9546.566843 entropy_nats=6907.286213 code_nats_a_place=1.089790 entropy_nats_a_place=0.788503 excess_nats=2639.280630 root_nats=786.321683 root_share_of_excess=0.297930 v_over_1_share=0.157876 v_over_2_share=0.108105 ms=13537
+FIELD_CHARGE_STATE state=keyed problems=32 letters=8760 cut_to_room=0 code_nats=14753.601875 entropy_nats=8052.359787 code_nats_a_place=1.684200 entropy_nats_a_place=0.919219 excess_nats=6701.242088 root_nats=806.131964 root_share_of_excess=0.120296 v_over_1_share=0.245662 v_over_2_share=0.177625 ms=13736
+FIELD_CHARGE_STATE state=reference problems=32 letters=8760 cut_to_room=0 code_nats=3486.776866 entropy_nats=3303.306144 code_nats_a_place=0.398033 entropy_nats_a_place=0.377090 excess_nats=183.470722 root_nats=412.786806 root_share_of_excess=2.249878 v_over_1_share=0.049885 v_over_2_share=0.032762 ms=13749
+MEASURE lap=tt1ec_charge rc=0 wall_s=41.5 peak_rss_kib=724852
+refread FIELD_CHARGE_STATE state=reference problems=128 letters=43342 cut_to_room=0 code_nats=19841.008789 entropy_nats=18559.531638 code_nats_a_place=0.457777 entropy_nats_a_place=0.428211 excess_nats=1281.477151 root_nats=1793.558208 root_share_of_excess=1.399602 v_over_1_share=0.057934 v_over_2_share=0.037538 ms=110302
+refread MEASURE lap=tt1ec_refread rc=0 wall_s=110.9 peak_rss_kib=2009680
+## the ruler on the re-draw end answers
+tt1ec RULER 30 of 223 code lines compile alone
+MAIN p37 chain done 13:46:09
