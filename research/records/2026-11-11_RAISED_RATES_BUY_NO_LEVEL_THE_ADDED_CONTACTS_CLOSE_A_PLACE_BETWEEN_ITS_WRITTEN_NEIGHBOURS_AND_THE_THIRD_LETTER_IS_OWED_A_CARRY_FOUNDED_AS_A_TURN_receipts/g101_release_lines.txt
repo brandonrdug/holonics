@@ -1,0 +1,63 @@
+# G101 (P26 steps 1 to 4), 2026-11-12 UTC: the release reads (G70's j_run.sh as G95 ran it: the settle with its keyed write and rest, the re-draw, the
+# charge census on keyed, rest and the reference, the reference's locked read on 128; the first 32 held problems' 8,760 places) of rt25's end by the
+# plain line's binary, of rt25's end again by bin-carry-coupled (the gate), and of te2's end by bin-carry-coupled. Device line: the card, the RTX 4080
+# SUPER under HOLONICS_ROOT/.local/gpu.lock, each state its own hold; the host part as the stages run it; nothing else on the card or the host.
+# Projection 10 minutes a state (G95: 599, 587 and 567 s), deadline 900 s a state by the outer timeouts; dispatched with tools/runs.py (p26_g101) at
+# 08:51:53 UTC after rt26's reads and P25's census. The ruler on the host after them, one thread: Python's compile of each written code line alone
+# (every non-blank line of a re-draw end answer that is neither a fence nor a comment, its indentation stripped), the ruler that read G95's writes
+# (it reproduces G95's counts on G95's writes: tp4 19 of 217, rt22 36 of 231, rt23 37 of 226). The decoded writes are never committed.
+# rt25_line: state rt25/STATE.0 sha256 add734309e9f86ed; binary bin-lap-mean b8fe4ba838dd27a6 (8368f084b); read 08:51:53 to 09:01:37 UTC; 584 s; the lock's wait 0.003 s
+REFREAD rt25_line problems=128 places=43342 code=0.497587 entropy=0.474312 root_share=1.850031 v1=0.063033 v2=0.040099 09:01:37
+LAP rt25_line locks=1.924026/1.086626 v2=0.199543 rest=1.268598/0.936037 v2=0.116210 redraw=0.746011/0.766051 neutral=27 rested=5 redraw_v2=0.046803 09:01:37
+FIELD_SETTLE_DONE problems=32 at_rest=32 h_millinats=1000 passes_bound=1000 kept=875 undone=1245 letters=8760 code_keyed_nats_a_place=1.924026 code_end_nats_a_place=1.268598 fall_nats=5741.550347 keyed_ms=15007 ms=289046
+MEASURE lap=rt25_line_settle rc=0 wall_s=289.6 peak_rss_kib=765876
+FIELD_REDRAW_DONE problems=32 neutral=27 rested=5 h_millinats=1000 passes_bound=1000 kept=908 undone=1076 letters=8760 code_start_nats_a_place=1.268598 code_end_nats_a_place=0.746011 entropy_end_nats_a_place=0.766051 root_end_nats=533.140740 ms=155762
+MEASURE lap=rt25_line_redraw rc=0 wall_s=156.3 peak_rss_kib=786520
+FIELD_CHARGE_STATE state=rest problems=32 letters=8760 cut_to_room=0 code_nats=11112.922507 entropy_nats=8199.685990 code_nats_a_place=1.268598 entropy_nats_a_place=0.936037 excess_nats=2913.236517 root_nats=806.248688 root_share_of_excess=0.276753 v_over_1_share=0.179566 v_over_2_share=0.116210 ms=12429
+FIELD_CHARGE_STATE state=keyed problems=32 letters=8760 cut_to_room=0 code_nats=16854.472855 entropy_nats=9518.847684 code_nats_a_place=1.924026 entropy_nats_a_place=1.086626 excess_nats=7335.625171 root_nats=842.940886 root_share_of_excess=0.114910 v_over_1_share=0.278538 v_over_2_share=0.199543 ms=12489
+FIELD_CHARGE_STATE state=reference problems=32 letters=8760 cut_to_room=0 code_nats=3745.764177 entropy_nats=3609.251395 code_nats_a_place=0.427598 entropy_nats_a_place=0.412015 excess_nats=136.512782 root_nats=421.012940 root_share_of_excess=3.084055 v_over_1_share=0.052853 v_over_2_share=0.035273 ms=12493
+MEASURE lap=rt25_line_charge rc=0 wall_s=37.9 peak_rss_kib=750236
+refread FIELD_CHARGE_STATE state=reference problems=128 letters=43342 cut_to_room=0 code_nats=21566.455058 entropy_nats=20557.661322 code_nats_a_place=0.497587 entropy_nats_a_place=0.474312 excess_nats=1008.793736 root_nats=1866.300307 root_share_of_excess=1.850031 v_over_1_share=0.063033 v_over_2_share=0.040099 ms=99716
+refread MEASURE lap=rt25_line_refread rc=0 wall_s=100.3 peak_rss_kib=2004304
+# rt25_coupled: state rt25/STATE.0 sha256 add734309e9f86ed; binary bin-carry-coupled 54f9cb36459453d2 (87994ea23), the reproduction gate; read 09:01:37 to 09:11:25 UTC; 588 s; the lock's wait 0.004 s
+REFREAD rt25_coupled problems=128 places=43342 code=0.497587 entropy=0.474312 root_share=1.850031 v1=0.063033 v2=0.040099 09:11:25
+LAP rt25_coupled locks=1.924026/1.086626 v2=0.199543 rest=1.268598/0.936037 v2=0.116210 redraw=0.746011/0.766051 neutral=27 rested=5 redraw_v2=0.046803 09:11:25
+FIELD_SETTLE_DONE problems=32 at_rest=32 h_millinats=1000 passes_bound=1000 kept=875 undone=1245 letters=8760 code_keyed_nats_a_place=1.924026 code_end_nats_a_place=1.268598 fall_nats=5741.550347 keyed_ms=14964 ms=297705
+MEASURE lap=rt25_coupled_settle rc=0 wall_s=298.2 peak_rss_kib=760692
+FIELD_REDRAW_DONE problems=32 neutral=27 rested=5 h_millinats=1000 passes_bound=1000 kept=908 undone=1076 letters=8760 code_start_nats_a_place=1.268598 code_end_nats_a_place=0.746011 entropy_end_nats_a_place=0.766051 root_end_nats=533.140740 ms=154163
+MEASURE lap=rt25_coupled_redraw rc=0 wall_s=154.7 peak_rss_kib=765072
+FIELD_CHARGE_STATE state=rest problems=32 letters=8760 cut_to_room=0 code_nats=11112.922507 entropy_nats=8199.685990 code_nats_a_place=1.268598 entropy_nats_a_place=0.936037 excess_nats=2913.236517 root_nats=806.248688 root_share_of_excess=0.276753 v_over_1_share=0.179566 v_over_2_share=0.116210 ms=12079
+FIELD_CHARGE_STATE state=keyed problems=32 letters=8760 cut_to_room=0 code_nats=16854.472855 entropy_nats=9518.847684 code_nats_a_place=1.924026 entropy_nats_a_place=1.086626 excess_nats=7335.625171 root_nats=842.940886 root_share_of_excess=0.114910 v_over_1_share=0.278538 v_over_2_share=0.199543 ms=12386
+FIELD_CHARGE_STATE state=reference problems=32 letters=8760 cut_to_room=0 code_nats=3745.764177 entropy_nats=3609.251395 code_nats_a_place=0.427598 entropy_nats_a_place=0.412015 excess_nats=136.512782 root_nats=421.012940 root_share_of_excess=3.084055 v_over_1_share=0.052853 v_over_2_share=0.035273 ms=12568
+MEASURE lap=rt25_coupled_charge rc=0 wall_s=37.5 peak_rss_kib=746612
+refread FIELD_CHARGE_STATE state=reference problems=128 letters=43342 cut_to_room=0 code_nats=21566.455058 entropy_nats=20557.661322 code_nats_a_place=0.497587 entropy_nats_a_place=0.474312 excess_nats=1008.793736 root_nats=1866.300307 root_share_of_excess=1.850031 v_over_1_share=0.063033 v_over_2_share=0.040099 ms=96551
+refread MEASURE lap=rt25_coupled_refread rc=0 wall_s=97.1 peak_rss_kib=1977936
+# te2: state te2/STATE.0 sha256 0d5be10da8cba881; binary bin-carry-coupled 54f9cb36459453d2 (87994ea23); read 09:11:25 to 09:21:26 UTC; 601 s; the lock's wait 0.003 s
+REFREAD te2 problems=128 places=43342 code=0.487597 entropy=0.466750 root_share=2.054009 v1=0.061510 v2=0.039269 09:21:26
+LAP te2 locks=1.902499/1.095979 v2=0.199885 rest=1.214152/0.927812 v2=0.110045 redraw=0.747471/0.775339 neutral=29 rested=3 redraw_v2=0.047031 09:21:26
+FIELD_SETTLE_DONE problems=32 at_rest=32 h_millinats=1000 passes_bound=1000 kept=881 undone=1154 letters=8760 code_keyed_nats_a_place=1.902499 code_end_nats_a_place=1.214152 fall_nats=6029.914078 keyed_ms=17551 ms=307778
+MEASURE lap=te2_settle rc=0 wall_s=308.2 peak_rss_kib=727352
+FIELD_REDRAW_DONE problems=32 neutral=29 rested=3 h_millinats=1000 passes_bound=1000 kept=867 undone=842 letters=8760 code_start_nats_a_place=1.214152 code_end_nats_a_place=0.747471 entropy_end_nats_a_place=0.775339 root_end_nats=530.068061 ms=146085
+MEASURE lap=te2_redraw rc=0 wall_s=146.5 peak_rss_kib=746076
+FIELD_CHARGE_STATE state=rest problems=32 letters=8760 cut_to_room=0 code_nats=10635.980519 entropy_nats=8127.634427 code_nats_a_place=1.214152 entropy_nats_a_place=0.927812 excess_nats=2508.346092 root_nats=779.758884 root_share_of_excess=0.310865 v_over_1_share=0.172031 v_over_2_share=0.110045 ms=13254
+FIELD_CHARGE_STATE state=keyed problems=32 letters=8760 cut_to_room=0 code_nats=16665.894597 entropy_nats=9600.774642 code_nats_a_place=1.902499 entropy_nats_a_place=1.095979 excess_nats=7065.119955 root_nats=819.249398 root_share_of_excess=0.115956 v_over_1_share=0.274885 v_over_2_share=0.199885 ms=13363
+FIELD_CHARGE_STATE state=reference problems=32 letters=8760 cut_to_room=0 code_nats=3699.976342 entropy_nats=3521.294367 code_nats_a_place=0.422371 entropy_nats_a_place=0.401974 excess_nats=178.681975 root_nats=421.150446 root_share_of_excess=2.356983 v_over_1_share=0.052739 v_over_2_share=0.035502 ms=13352
+MEASURE lap=te2_charge rc=0 wall_s=40.4 peak_rss_kib=728024
+refread FIELD_CHARGE_STATE state=reference problems=128 letters=43342 cut_to_room=0 code_nats=21133.462164 entropy_nats=20229.917765 code_nats_a_place=0.487597 entropy_nats_a_place=0.466750 excess_nats=903.544399 root_nats=1855.889448 root_share_of_excess=2.054009 v_over_1_share=0.061510 v_over_2_share=0.039269 ms=105144
+refread MEASURE lap=te2_refread rc=0 wall_s=105.7 peak_rss_kib=1973528
+## the reproduction gate (bin-carry-coupled at C = 0 on rt25/STATE.0 against the plain binary)
+LINE CHARGE keyed: equal
+LINE CHARGE reference: equal
+LINE CHARGE rest: equal
+LINE FIELD_REDRAW_DONE: equal
+LINE FIELD_SETTLE_DONE: equal
+LINE LAP: equal
+LINE REFREAD: equal
+LINE REFREAD_CHARGE 0: equal
+WRITE settle/KEYED.tsv: byte-equal
+WRITE settle/SAMPLE.tsv: byte-equal
+WRITE redraw/SAMPLE.tsv: byte-equal
+GATE EQUAL: 8 lines, timings and ms fields aside, and the three writes
+## the ruler on the re-draw end answers
+rt25 (the plain binary) RULER 48 of 237 code lines compile alone
+te2 (bin-carry-coupled) RULER 37 of 243 code lines compile alone
