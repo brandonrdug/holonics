@@ -287,6 +287,17 @@ lap to reproduce, and its binary reproduces te7's lap with the old trainer untou
 4. The face as a composition of lanes, and a lane whose width a reading of the pass names (R4),
    fixed as its own guess.
 
+*Amended the same day (20:50Z), after G115's score and the trainer's profile.* Item 1 is built and
+merged. Items 2 and 3 exchange places: the pass stopped after one leg of 3,000 sections, and the
+engine comes before any more of it, ordered from the trainer's own profile by entry with its rates
+fixed first as G116
+([the engine's record](2026-11-12_A_SITES_ARITHMETIC_IS_COUNTED_AGAINST_THE_CARDS_LANES_THE_STORE_TRAINER_RUNS_AT_ONE_FORTIETH_OF_THEM_A_PAIRS_SKIN_IS_FORMED_ONCE_A_CLOCK_AND_COST_FOLLOWS_SURPRISE.md),
+§6). Its first steps are realizations that keep every bit (a pair's skin and a turn's phases
+formed once a clock, the phase series on narrow words, the site's maps and a batch's launches
+fused); R9's terms at their widths and R8's store on its support follow as laws at declared
+widths, with the release of a covector under a declared grain. Short reads that show writes from
+held prompts by slice go on from the three states the line has.
+
 ## 6. What this review did not read
 
 The reverse's host code and the moments (`hnn/tower/field/moment.rs`) beyond their entry points;

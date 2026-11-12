@@ -1,0 +1,10 @@
+# profile_families.py on store_profile.txt (P49a's profiled read, 100 sections) and engine_count.txt, 2026-11-12 UTC, on the host. Numbers only.
+PROFILE_FAMILIES sections=100 kernels_ms_a_section=414.2
+family | ms a section | share of kernels | launches a section | counted products a section | products a second | lane-steps a product
+contact | 195.9 | 0.473 | 72 | 1.732e+10 | 8.844e+10 | 295
+moments and clocks | 87.2 | 0.211 | 113 | 6.258e+08 | 7.172e+09 | 3641
+site maps | 70.8 | 0.171 | 181 | 2.269e+10 | 3.207e+11 | 81
+blank clocks | 18.2 | 0.044 | 18 | 1.663e+09 | 9.152e+10 | 285
+faces | 5.9 | 0.014 | 17 | 8.134e+08 | 1.388e+11 | 188
+carry circles | 12.8 | 0.031 | 24 | 0 | 0 | 0
+site kernels, small | 23.6 | 0.057 | 68 | 4.381e+08 | 1.86e+10 | 1404

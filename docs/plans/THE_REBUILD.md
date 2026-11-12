@@ -152,15 +152,30 @@ references and no write is yet ordered text.
    stretches, one keyed state a stretch, a section bounded in the learner's state to one batch of
    the card, the letters founded at the crossing, no law read from the environment), a new line
    whose binary reproduces te7's lap with the old trainer untouched and whose lines are held to
-   the cut's reference port, its rate fixed as G115 before its build; one continuous pass over
-   tier A (1 GB) from the line's state, judged by what it writes from held prompts by slice; from
-   that pass's profile, the contact's and the site kernels' terms at the widths they need, the
-   pair store on its support (item 2; the card holds 280 octets a pair of sites against 71,486 a
-   site) and the batch's tables staged under the card's stroke; the face as a composition of
+   the cut's reference port, its rate fixed as G115 before its build (done November 12: built and
+   merged, 10.4 µs a computed site, the pass stopped after one leg of 3,000 sections); **the
+   engine**, ordered from the trainer's own profile by entry against a count of a section's
+   arithmetic on the card's lanes
+   ([the engine's record](../../research/records/2026-11-12_A_SITES_ARITHMETIC_IS_COUNTED_AGAINST_THE_CARDS_LANES_THE_STORE_TRAINER_RUNS_AT_ONE_FORTIETH_OF_THEM_A_PAIRS_SKIN_IS_FORMED_ONCE_A_CLOCK_AND_COST_FOLLOWS_SURPRISE.md),
+   §6; the trainer stands at 19 times the sum of the count's floors): first the realizations that
+   keep every bit, each entering by reproducing the line and timed inside one hold (a profile by
+   head and two measured yardsticks of the card; a pair's skin once a clock; a turn's phases and
+   the moments' skins once a clock; the phase series on narrow words; the site's maps fused by
+   chart; a batch's launches fused), their rates fixed as G116, then the laws at declared widths
+   (a covector released under a declared grain so that the return's cost follows surprise; a row's
+   carrier anchored at its peak; the pair store on its support, item 2, where the card holds 280
+   octets a pair of sites against 71,486 a site); beside the engine, short reads of the three
+   states the line has (the crossing, 2,001 and 5,001 sections): the held code by slice and kind,
+   the count of compared places by octave of surprise, and writes from held prompts by slice; one
+   continuous pass over tier A (1 GB), ordered once the engine stands near its count and judged by
+   what it writes from held prompts by slice; the face as a composition of
    lanes, each block reading its own, entering at `(32, 32)`; then a lane whose width is derived
    from the partition its readers hold, fixed as a guess before its build. No extent is sized by a
-   factor or padded to a power of two. Tier B (8 GB) is trained when a pass over it takes under two
-   days.
+   factor or padded to a power of two. A tier's pass is ordered only after its projection is read
+   against the count (the guides' method rule of November 12); the rate is stated in two parts,
+   the forward a site and the return a unit of surprise, by slice, and never as one mean a byte.
+   The bar before tier B (8 GB) is 1 µs a computed site, a guess until the card's measured
+   yardsticks replace the published ceilings.
 6. **More than one medium** (the same record, §6 to §11): the region's helix in
    `hnn::tower::field` and on the card, a text region reproducing the line's lap; the rank page and
    MNIST's sections paired both ways with their labels; the acoustic chart with its remainder; then
