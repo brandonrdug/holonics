@@ -1,5 +1,6 @@
 #!/usr/bin/env -S python3 -I
-"""Controls of corpus_passage.py on drawn shards (parquet files written here with pyarrow; nothing is fetched).
+"""Controls of corpus_passage.py on drawn shards (parquet files written here with pyarrow; nothing is fetched). They run under
+a python that holds pyarrow (on the PC, .local/venv-corpus), so they stand outside tools/gate.sh, whose python has none.
 
   order      the shards sort by (d, n, m) as integers, and the listing's other files are left out;
   slices     each slice's filter, and 'Open Government', other languages and other collections in none;

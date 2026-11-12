@@ -21,6 +21,7 @@ run diagnostic-supervisor-controls python3 tools/test_listener_diagnostic_stage.
 run diagnostic-receipt-controls python3 tools/test_listener_diagnostic_receipts.py
 run trunk-census-controls python3 tools/test_repo_census.py
 run travel-rank-controls python3 tools/test_state_travel.py
+run block-direction-controls python3 tools/test_block_directions.py
 run part-rate-controls python3 tools/test_part_rates.py
 run founding-strength-controls python3 tools/test_founding_strength.py
 run residual-block-controls python3 tools/test_residual_blocks.py
