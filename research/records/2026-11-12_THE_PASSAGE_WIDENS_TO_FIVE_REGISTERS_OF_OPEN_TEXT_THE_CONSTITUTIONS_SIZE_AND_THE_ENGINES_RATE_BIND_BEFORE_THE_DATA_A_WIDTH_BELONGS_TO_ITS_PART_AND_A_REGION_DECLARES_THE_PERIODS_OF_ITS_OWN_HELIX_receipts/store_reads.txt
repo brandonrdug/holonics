@@ -1,0 +1,940 @@
+# store_reads (P49 steps 3g, 6 and 7), 2026-11-12 UTC: the store's reads with the binary of claude/store-reads commit f121828d6 (field_pass sha256
+# 2fed38f2a7f4f144). Device line: the RTX 4080 SUPER under HOLONICS_ROOT/.local/gpu.lock, each read and write in its own hold, alone on the card with
+# nothing else on the host; the port, the rulers and the summary on the host, one thread. States: A run 1's STATE.0 (the crossing), B run 2's
+# STATE.1900 and MEAN.1900 (2,001 sections; the mean over its last 100 states), C leg 1's STATE.3000 and MEAN.3000 (5,001 sections; the mean over
+# 1,000 states). read-store on role held, SECTIONS 8; write-store DOCUMENTS 16, PROMPT 256, RUN 256. Numbers only: no document text, no path, no key.
+## step 6: the new binary enters the line (train-store from run 1's STATE.101, 600 sections, against run 2's first 600)
+# p49 repro600: build f121828d6 (claude/store-reads) field_pass; from d1fb1d446b0336d2; sections 600, stop 327600 ms, outer 390 s 20:45:07
+# repro600: lock taken 20:45:07 wait_s=.003737605
+# repro600: run exit 0 released 20:49:40
+STORE_SAVE k=600 sections=600 states=600 moved=106716 square=715909979972340 priced=599 transfer=-39755342747 external=-39771192152 curvature=15849405 octave=1 rate=12 reads=0 returns=600 pairs=27340062811 batches=600 peak_store=7577906356 ms=271594
+STORE_PASS role=prefix sections=600 stretches_read=136406 ended=false code_pieces=2535 web_pieces=1447 science_pieces=882 books_pieces=83 wikidata_pieces=301 ms=271594
+FIELD_CARD reads=0 read_ms=0 returns=600 return_ms=262514 pairs=27340062811 batches=600 peak_store=7577906356 landmarks=0 landmark_ms=0 elapsed_ms=271596
+MEASURE lap=repro600 rc=0 wall_s=272.2 peak_rss_kib=386304
+GATE_REPRO sections=600 run2_lines=600 equal=600 EQUAL
+GATE_BYTES STATE.600 equal a5b222844ffcbb71
+GATE_BYTES MEAN.600 equal a12e0da79e525ae9
+GPU_SUITE not rerun: no kernel and no law of the realization changed (Field::lettered's doc and two refusals, the trainer's example code)
+## step 3g: the port's --slice lines against read-store's (state A's read) and store_stretch_draw.txt reproduced
+DRAW_REPRODUCED lines=8 EQUAL
+GATE_PORT_SLICE slice=code read_lines=8 port_lines=8 equal=8
+GATE_PORT_SLICE slice=web read_lines=8 port_lines=8 equal=8
+GATE_PORT_SLICE slice=science read_lines=8 port_lines=8 equal=8
+GATE_PORT_SLICE slice=books read_lines=8 port_lines=8 equal=8
+GATE_PORT_SLICE slice=wikidata read_lines=8 port_lines=8 equal=8
+GATE_PORT_SLICES lines=40 equal=40 EQUAL
+## state A: read-store
+FIELD_CARD_OPEN card=NVIDIA GeForce RTX 4080 SUPER free=15661793280 total=16802250752 batch_budget=10670702592
+STORE_READ_LAW role=held least=4 octaves=7 pairs_bound=15606223 sites_bound=41490 sections=8 alphabet=244 void=99 ms=27
+STORE_READ slice=code n=0 regions=218 sites=41319 domain=23500 squared=14112483 open=13831 stretches=218 mask_whole_regions=48 mask_whole_places=2513 mask_whole_code=9196585977 mask_run_regions=52 mask_run_places=1920 mask_run_code=8284593345 writer_k0_regions=20 writer_k0_places=1391 writer_k0_code=9162708493 writer_k_regions=98 writer_k_places=8007 writer_k_code=48456390410 ms=183
+STORE_READ slice=code n=1 regions=169 sites=38748 domain=19992 squared=15415908 open=12978 stretches=387 mask_whole_regions=36 mask_whole_places=2250 mask_whole_code=8642868551 mask_run_regions=39 mask_run_places=1150 mask_run_code=4303657068 writer_k0_regions=21 writer_k0_places=1937 writer_k0_code=11937664014 writer_k_regions=73 writer_k_places=7641 writer_k_code=42424451330 ms=144
+STORE_READ slice=code n=2 regions=198 sites=41415 domain=23151 squared=14632095 open=12608 stretches=585 mask_whole_regions=47 mask_whole_places=4258 mask_whole_code=17555639149 mask_run_regions=40 mask_run_places=840 mask_run_code=3151917158 writer_k0_regions=20 writer_k0_places=680 writer_k0_code=4122022404 writer_k_regions=91 writer_k_places=6830 writer_k_code=39111715179 ms=157
+STORE_READ slice=code n=3 regions=180 sites=41422 domain=20935 squared=15504752 open=11555 stretches=765 mask_whole_regions=41 mask_whole_places=2479 mask_whole_code=9105548618 mask_run_regions=42 mask_run_places=1598 mask_run_code=5271644857 writer_k0_regions=19 writer_k0_places=509 writer_k0_code=3258994308 writer_k_regions=78 writer_k_places=6969 writer_k_code=40100779772 ms=158
+STORE_READ slice=code n=4 regions=197 sites=41185 domain=24119 squared=14688889 open=13919 stretches=962 mask_whole_regions=38 mask_whole_places=2560 mask_whole_code=10710832019 mask_run_regions=51 mask_run_places=2776 mask_run_code=12871773745 writer_k0_regions=24 writer_k0_places=1585 writer_k0_code=10362541780 writer_k_regions=84 writer_k_places=6998 writer_k_code=47059567877 ms=154
+STORE_READ slice=code n=5 regions=176 sites=41138 domain=30748 squared=15438568 open=15869 stretches=1138 mask_whole_regions=50 mask_whole_places=5414 mask_whole_code=24719104621 mask_run_regions=45 mask_run_places=3028 mask_run_code=14882781666 writer_k0_regions=19 writer_k0_places=760 writer_k0_code=5289659069 writer_k_regions=62 writer_k_places=6667 writer_k_code=45570301596 ms=161
+STORE_READ slice=code n=6 regions=202 sites=41479 domain=25094 squared=14185913 open=14411 stretches=1340 mask_whole_regions=48 mask_whole_places=3727 mask_whole_code=15086659703 mask_run_regions=46 mask_run_places=1702 mask_run_code=6383741298 writer_k0_regions=15 writer_k0_places=1141 writer_k0_code=7159106158 writer_k_regions=93 writer_k_places=7841 writer_k_code=48817772849 ms=150
+STORE_READ slice=code n=7 regions=204 sites=40995 domain=22855 squared=14315757 open=11685 stretches=1544 mask_whole_regions=62 mask_whole_places=4286 mask_whole_code=19185241459 mask_run_regions=36 mask_run_places=1390 mask_run_code=4814494277 writer_k0_regions=23 writer_k0_places=1056 writer_k0_code=6635935412 writer_k_regions=83 writer_k_places=4953 writer_k_code=30940404289 ms=151
+STORE_READ_SURPRISE slice=code places=106856 by_bit_length(count/code) b1=42/42 b2=10/26 b3=9/46 b4=10/107 b5=10/228 b6=17/765 b7=29/2684 b8=30/5482 b9=54/20460 b10=117/89748 b11=200/301637 b12=339/1024374 b13=511/3048093 b14=703/8421254 b15=897/21337051 b16=1096/52717195 b17=1362/130508699 b18=1457/279522054 b19=1856/711238275 b20=2932/2271717020 b21=7858/12964463843 b22=21662/67773084093 b23=48706/287268050632 b24=15044/161852035002 b25=1870/39970987645 b26=35/1268521996 ms=1292
+STORE_READ_WRITER slice=code sections=8 stretches=1544 k0_by_octave(places/code) o0=161/949852234 o1=269/1738252463 o2=497/3427176626 o3=721/4562179438 o4=1029/6284271190 o5=1471/8881034188 o6=2077/13116048872 o7=1622/9731326629 o8=1212/9238489998 front_by_octave(count/code) o0=161/949852234 o1=186/827719674 o2=149/709901409 o3=129/687006760 o4=77/315283017 o5=53/197674188 o6=29/81828200 o7=27/97267082 o8=12/66978450 ms=1292
+STORE_READ slice=web n=0 regions=215 sites=40903 domain=23094 squared=13914883 open=13856 stretches=215 mask_whole_regions=48 mask_whole_places=2541 mask_whole_code=10401744288 mask_run_regions=51 mask_run_places=1742 mask_run_code=7896006643 writer_k0_regions=17 writer_k0_places=1022 writer_k0_code=6413102522 writer_k_regions=99 writer_k_places=8551 writer_k_code=50972950197 ms=148
+STORE_READ slice=web n=1 regions=177 sites=39418 domain=20772 squared=15366430 open=13323 stretches=392 mask_whole_regions=37 mask_whole_places=2369 mask_whole_code=9045817148 mask_run_regions=40 mask_run_places=1177 mask_run_code=4596027664 writer_k0_regions=23 writer_k0_places=1939 writer_k0_code=11825043171 writer_k_regions=77 writer_k_places=7838 writer_k_code=44457326031 ms=157
+STORE_READ slice=web n=2 regions=189 sites=41115 domain=23919 squared=15058937 open=13349 stretches=581 mask_whole_regions=44 mask_whole_places=4477 mask_whole_code=18706497641 mask_run_regions=40 mask_run_places=1015 mask_run_code=3991293884 writer_k0_regions=16 writer_k0_places=692 writer_k0_code=4347004699 writer_k_regions=89 writer_k_places=7165 writer_k_code=41121793597 ms=153
+STORE_READ slice=web n=3 regions=172 sites=40281 domain=19597 squared=15167991 open=10912 stretches=753 mask_whole_regions=40 mask_whole_places=2196 mask_whole_code=7709899406 mask_run_regions=37 mask_run_places=1492 mask_run_code=5328844183 writer_k0_regions=21 writer_k0_places=550 writer_k0_code=3090446864 writer_k_regions=74 writer_k_places=6674 writer_k_code=38513898232 ms=147
+STORE_READ slice=web n=4 regions=185 sites=40972 domain=23936 squared=15199434 open=13565 stretches=938 mask_whole_regions=36 mask_whole_places=2471 mask_whole_code=11625691821 mask_run_regions=51 mask_run_places=3065 mask_run_code=15831199231 writer_k0_regions=17 writer_k0_places=966 writer_k0_code=6456974681 writer_k_regions=81 writer_k_places=7063 writer_k_code=43746497656 ms=150
+STORE_READ slice=web n=5 regions=163 sites=40317 domain=31312 squared=15574137 open=15651 stretches=1101 mask_whole_regions=47 mask_whole_places=5113 mask_whole_code=22799202715 mask_run_regions=38 mask_run_places=3484 mask_run_code=16285323123 writer_k0_regions=22 writer_k0_places=1719 writer_k0_code=10831435228 writer_k_regions=56 writer_k_places=5335 writer_k_code=31372063873 ms=156
+STORE_READ slice=web n=6 regions=206 sites=41307 domain=24556 squared=13817399 open=13566 stretches=1307 mask_whole_regions=49 mask_whole_places=4337 mask_whole_code=19011525617 mask_run_regions=50 mask_run_places=1317 mask_run_code=5238113586 writer_k0_regions=16 writer_k0_places=748 writer_k0_code=4659364623 writer_k_regions=91 writer_k_places=7164 writer_k_code=41810666368 ms=147
+STORE_READ slice=web n=7 regions=206 sites=41304 domain=23680 squared=14499132 open=12369 stretches=1513 mask_whole_regions=62 mask_whole_places=3979 mask_whole_code=17192394206 mask_run_regions=39 mask_run_places=1761 mask_run_code=7176953480 writer_k0_regions=23 writer_k0_places=925 writer_k0_code=5672054991 writer_k_regions=82 writer_k_places=5704 writer_k_code=31910780959 ms=155
+STORE_READ_SURPRISE slice=web places=106591 by_bit_length(count/code) b1=26/26 b2=3/7 b3=3/16 b4=4/44 b5=5/100 b6=7/307 b7=8/750 b8=8/1627 b9=15/5848 b10=49/36638 b11=62/95290 b12=140/424844 b13=187/1139867 b14=298/3585271 b15=462/11157708 b16=616/30060562 b17=809/78334654 b18=1104/211185831 b19=1488/571428979 b20=2293/1785647609 b21=4777/7635780465 b22=28471/93904102235 b23=52496/299152266639 b24=11881/127172692387 b25=1367/29033226952 b26=12/446763672 ms=2512
+STORE_READ_WRITER slice=web sections=8 stretches=1513 k0_by_octave(places/code) o0=155/730310745 o1=264/1551732649 o2=490/3064416229 o3=719/4543735118 o4=1020/5816817709 o5=1410/8532082557 o6=1806/11187008604 o7=1547/9920022065 o8=1150/7949301103 front_by_octave(count/code) o0=155/730310745 o1=181/821363855 o2=147/682068106 o3=123/504013550 o4=76/348606775 o5=48/175817952 o6=32/117063777 o7=28/89641556 o8=14/49739820 ms=2512
+STORE_READ slice=science n=0 regions=215 sites=41091 domain=23004 squared=14198079 open=13761 stretches=215 mask_whole_regions=48 mask_whole_places=2509 mask_whole_code=9616920037 mask_run_regions=51 mask_run_places=1805 mask_run_code=7400909590 writer_k0_regions=17 writer_k0_places=1034 writer_k0_code=6083175841 writer_k_regions=99 writer_k_places=8413 writer_k_code=48845095150 ms=152
+STORE_READ slice=science n=1 regions=161 sites=37445 domain=19419 squared=15522835 open=12721 stretches=376 mask_whole_regions=32 mask_whole_places=2081 mask_whole_code=9181648755 mask_run_regions=39 mask_run_places=1034 mask_run_code=4600168286 writer_k0_regions=21 writer_k0_places=1549 writer_k0_code=9320437393 writer_k_regions=69 writer_k_places=8057 writer_k_code=48061634713 ms=137
+STORE_READ slice=science n=2 regions=184 sites=41115 domain=24441 squared=14930409 open=13565 stretches=560 mask_whole_regions=46 mask_whole_places=4489 mask_whole_code=22765965266 mask_run_regions=36 mask_run_places=1213 mask_run_code=6125859197 writer_k0_regions=15 writer_k0_places=925 writer_k0_code=5839426953 writer_k_regions=87 writer_k_places=6938 writer_k_code=45579549666 ms=148
+STORE_READ slice=science n=3 regions=180 sites=41124 domain=20131 squared=15392062 open=11058 stretches=740 mask_whole_regions=42 mask_whole_places=2595 mask_whole_code=11098562649 mask_run_regions=35 mask_run_places=1228 mask_run_code=5299070701 writer_k0_regions=22 writer_k0_places=611 writer_k0_code=4047505596 writer_k_regions=81 writer_k_places=6624 writer_k_code=40871874565 ms=148
+STORE_READ slice=science n=4 regions=186 sites=41449 domain=23229 squared=15153803 open=12891 stretches=926 mask_whole_regions=37 mask_whole_places=2493 mask_whole_code=12234318574 mask_run_regions=53 mask_run_places=2766 mask_run_code=13683931890 writer_k0_regions=15 writer_k0_places=883 writer_k0_code=6528909556 writer_k_regions=81 writer_k_places=6749 writer_k_code=44051367897 ms=153
+STORE_READ slice=science n=5 regions=151 sites=38671 domain=30640 squared=15487121 open=15016 stretches=1077 mask_whole_regions=40 mask_whole_places=4763 mask_whole_code=20572502405 mask_run_regions=40 mask_run_places=4061 mask_run_code=18814906195 writer_k0_regions=19 writer_k0_places=1368 writer_k0_code=8480327110 writer_k_regions=52 writer_k_places=4824 writer_k_code=29825409520 ms=149
+STORE_READ slice=science n=6 regions=187 sites=41260 domain=22711 squared=14959972 open=13285 stretches=1264 mask_whole_regions=47 mask_whole_places=4009 mask_whole_code=17996927691 mask_run_regions=39 mask_run_places=694 mask_run_code=2775387631 writer_k0_regions=14 writer_k0_places=960 writer_k0_code=5493378365 writer_k_regions=87 writer_k_places=7622 writer_k_code=48022939889 ms=147
+STORE_READ slice=science n=7 regions=198 sites=41478 domain=24095 squared=15041902 open=12801 stretches=1462 mask_whole_regions=56 mask_whole_places=3086 mask_whole_code=14890140007 mask_run_regions=49 mask_run_places=2387 mask_run_code=10666124191 writer_k0_regions=14 writer_k0_places=886 writer_k0_code=5394986041 writer_k_regions=79 writer_k_places=6442 writer_k_code=39377819527 ms=153
+STORE_READ_SURPRISE slice=science places=105098 by_bit_length(count/code) b4=1/11 b5=2/46 b7=4/418 b8=8/1487 b9=13/5037 b10=23/18407 b11=47/70442 b12=86/260511 b13=137/829179 b14=227/2739446 b15=372/8967354 b16=483/23366247 b17=581/56477557 b18=910/174438389 b19=1205/462859448 b20=1961/1532965115 b21=4020/6415798017 b22=26289/87751602113 b23=53707/307012906419 b24=13086/138825352183 b25=1925/40884313758 b26=11/394209263 ms=3713
+STORE_READ_WRITER slice=science sections=8 stretches=1462 k0_by_octave(places/code) o0=137/608909055 o1=252/1459907236 o2=468/3122645690 o3=676/4423015458 o4=942/5649667213 o5=1327/7866217051 o6=1773/11230130723 o7=1559/9483985322 o8=1082/7343669107 front_by_octave(count/code) o0=137/608909055 o1=183/992961840 o2=140/617653433 o3=116/564077401 o4=75/316068519 o5=48/192852159 o6=31/129047294 o7=28/96668538 o8=14/33733842 ms=3713
+STORE_READ slice=books n=0 regions=204 sites=41419 domain=23840 squared=15181617 open=14636 stretches=204 mask_whole_regions=46 mask_whole_places=2417 mask_whole_code=9013277491 mask_run_regions=49 mask_run_places=1800 mask_run_code=7135396933 writer_k0_regions=11 writer_k0_places=1389 writer_k0_code=7993440330 writer_k_regions=98 writer_k_places=9030 writer_k_code=50234234802 ms=151
+STORE_READ slice=books n=1 regions=169 sites=38838 domain=19959 squared=15382036 open=12991 stretches=373 mask_whole_regions=34 mask_whole_places=2222 mask_whole_code=10156648904 mask_run_regions=39 mask_run_places=1014 mask_run_code=4941011184 writer_k0_regions=24 writer_k0_places=1899 writer_k0_code=12061204208 writer_k_regions=72 writer_k_places=7856 writer_k_code=47436648333 ms=142
+STORE_READ slice=books n=2 regions=185 sites=41478 domain=24478 squared=15225738 open=13655 stretches=558 mask_whole_regions=45 mask_whole_places=4450 mask_whole_code=19073320086 mask_run_regions=38 mask_run_places=1239 mask_run_code=5396619986 writer_k0_regions=14 writer_k0_places=672 writer_k0_code=3778978473 writer_k_regions=88 writer_k_places=7294 writer_k_code=39696375704 ms=152
+STORE_READ slice=books n=3 regions=174 sites=41283 domain=20452 squared=15559913 open=11268 stretches=732 mask_whole_regions=43 mask_whole_places=2634 mask_whole_code=9853061763 mask_run_regions=33 mask_run_places=1227 mask_run_code=4260126899 writer_k0_regions=17 writer_k0_places=606 writer_k0_code=3970239046 writer_k_regions=81 writer_k_places=6801 writer_k_code=37252610263 ms=150
+STORE_READ slice=books n=4 regions=183 sites=40951 domain=22280 squared=15381367 open=12835 stretches=915 mask_whole_regions=33 mask_whole_places=2066 mask_whole_code=8211922037 mask_run_regions=52 mask_run_places=2626 mask_run_code=10849768663 writer_k0_regions=14 writer_k0_places=351 writer_k0_code=2140822374 writer_k_regions=84 writer_k_places=7792 writer_k_code=43430824633 ms=150
+STORE_READ slice=books n=5 regions=150 sites=38631 domain=31517 squared=15514943 open=15399 stretches=1065 mask_whole_regions=41 mask_whole_places=4986 mask_whole_code=20222334168 mask_run_regions=41 mask_run_places=4201 mask_run_code=17883282253 writer_k0_regions=20 writer_k0_places=1855 writer_k0_code=11057520627 writer_k_regions=48 writer_k_places=4357 writer_k_code=23840120813 ms=155
+STORE_READ slice=books n=6 regions=183 sites=41369 domain=22821 squared=15170877 open=13282 stretches=1248 mask_whole_regions=46 mask_whole_places=4093 mask_whole_code=16122998876 mask_run_regions=38 mask_run_places=695 mask_run_code=2722852607 writer_k0_regions=13 writer_k0_places=940 writer_k0_code=5351178842 writer_k_regions=86 writer_k_places=7554 writer_k_code=42520190896 ms=146
+STORE_READ slice=books n=7 regions=196 sites=41194 domain=24077 squared=14970988 open=13270 stretches=1444 mask_whole_regions=55 mask_whole_places=3272 mask_whole_code=13425104500 mask_run_regions=47 mask_run_places=2074 mask_run_code=8929360821 writer_k0_regions=13 writer_k0_places=887 writer_k0_code=5326087270 writer_k_regions=81 writer_k_places=7037 writer_k_code=38181546442 ms=146
+STORE_READ_SURPRISE slice=books places=107336 by_bit_length(count/code) b1=3/3 b4=1/15 b6=1/44 b7=5/550 b8=7/1318 b9=33/13585 b10=39/30231 b11=83/130714 b12=135/399845 b13=204/1233494 b14=283/3471414 b15=405/9756335 b16=577/27722858 b17=757/72784508 b18=1018/195989566 b19=1429/558276603 b20=2179/1705253645 b21=4384/6957245532 b22=32225/106247489053 b23=53601/301526124232 b24=8294/89649143780 b25=1667/35302939644 b26=6/211103258 ms=4912
+STORE_READ_WRITER slice=books sections=8 stretches=1444 k0_by_octave(places/code) o0=126/614712106 o1=246/1182518793 o2=458/2745951232 o3=671/3928037006 o4=942/5612391609 o5=1344/7576701235 o6=1837/11076367198 o7=1689/10237743388 o8=1286/8705048603 front_by_octave(count/code) o0=126/614712106 o1=183/753832899 o2=138/548135764 o3=122/593138627 o4=73/268107648 o5=49/167555365 o6=31/144153024 o7=28/109198622 o8=14/42387169 ms=4912
+STORE_READ slice=wikidata n=0 regions=216 sites=41450 domain=23391 squared=14455448 open=14170 stretches=216 mask_whole_regions=48 mask_whole_places=2434 mask_whole_code=17212300233 mask_run_regions=52 mask_run_places=1727 mask_run_code=12677686150 writer_k0_regions=16 writer_k0_places=1025 writer_k0_code=9373198345 writer_k_regions=100 writer_k_places=8984 writer_k_code=75562257483 ms=155
+STORE_READ slice=wikidata n=1 regions=161 sites=37652 domain=19323 squared=15503140 open=13070 stretches=377 mask_whole_regions=32 mask_whole_places=1816 mask_whole_code=17124817848 mask_run_regions=39 mask_run_places=1150 mask_run_code=8978763551 writer_k0_regions=19 writer_k0_places=1865 writer_k0_code=18787261961 writer_k_regions=71 writer_k_places=8239 writer_k_code=68849896483 ms=135
+STORE_READ slice=wikidata n=2 regions=193 sites=41206 domain=24619 squared=14615808 open=13451 stretches=570 mask_whole_regions=49 mask_whole_places=4729 mask_whole_code=37062209068 mask_run_regions=37 mask_run_places=1003 mask_run_code=5377789055 writer_k0_regions=17 writer_k0_places=552 writer_k0_code=4119039420 writer_k_regions=90 writer_k_places=7167 writer_k_code=47344904008 ms=147
+STORE_READ slice=wikidata n=3 regions=166 sites=40425 domain=19646 squared=15465787 open=11400 stretches=736 mask_whole_regions=39 mask_whole_places=2187 mask_whole_code=23221865589 mask_run_regions=32 mask_run_places=1222 mask_run_code=7648064519 writer_k0_regions=17 writer_k0_places=606 writer_k0_code=4894612236 writer_k_regions=78 writer_k_places=7385 writer_k_code=64210100892 ms=146
+STORE_READ slice=wikidata n=4 regions=192 sites=41483 domain=22976 squared=15130237 open=12615 stretches=928 mask_whole_regions=37 mask_whole_places=2493 mask_whole_code=24165004181 mask_run_regions=56 mask_run_places=2782 mask_run_code=26903532457 writer_k0_regions=15 writer_k0_places=403 writer_k0_code=3536329280 writer_k_regions=84 writer_k_places=6937 writer_k_code=67071464297 ms=159
+STORE_READ slice=wikidata n=5 regions=153 sites=39014 domain=30835 squared=15600402 open=15592 stretches=1081 mask_whole_regions=41 mask_whole_places=4620 mask_whole_code=29070984295 mask_run_regions=38 mask_run_places=4026 mask_run_code=24593898355 writer_k0_regions=20 writer_k0_places=1369 writer_k0_code=12677070435 writer_k_regions=54 writer_k_places=5577 writer_k_code=46174054152 ms=154
+STORE_READ slice=wikidata n=6 regions=202 sites=41468 domain=22967 squared=14142954 open=12556 stretches=1283 mask_whole_regions=49 mask_whole_places=4154 mask_whole_code=29383492152 mask_run_regions=46 mask_run_places=959 mask_run_code=9674590026 writer_k0_regions=20 writer_k0_places=1252 writer_k0_code=9380801758 writer_k_regions=87 writer_k_places=6191 writer_k_code=50681645927 ms=150
+STORE_READ slice=wikidata n=7 regions=202 sites=41442 domain=24756 squared=14793580 open=12859 stretches=1485 mask_whole_regions=60 mask_whole_places=4148 mask_whole_code=29471131174 mask_run_regions=44 mask_run_places=1972 mask_run_code=13708175297 writer_k0_regions=18 writer_k0_places=1100 writer_k0_code=12550047689 writer_k_regions=80 writer_k_places=5639 writer_k_code=50048002486 ms=150
+STORE_READ_SURPRISE slice=wikidata places=105713 by_bit_length(count/code) b1=18/18 b2=3/6 b3=4/23 b4=2/20 b5=1/26 b6=1/46 b7=1/125 b8=3/497 b9=5/2158 b10=8/5904 b11=24/36960 b12=42/132046 b13=85/522185 b14=205/2526677 b15=307/7492864 b16=492/23758752 b17=617/59761433 b18=880/169588752 b19=1126/433642411 b20=1642/1275031042 b21=3115/4925988468 b22=21380/72804235654 b23=46040/257214847559 b24=11236/118474811016 b25=18334/400768622809 b26=142/5373983351 ms=6117
+STORE_READ_WRITER slice=wikidata sections=8 stretches=1485 k0_by_octave(places/code) o0=142/1258701609 o1=258/2135382689 o2=482/4488252765 o3=702/6711385783 o4=974/9137465955 o5=1369/11994551353 o6=1827/17689474447 o7=1500/13398580442 o8=918/8504566081 front_by_octave(count/code) o0=142/1258701609 o1=186/1535212789 o2=138/1249681313 o3=124/814970107 o4=78/648279954 o5=52/325877770 o6=29/232615233 o7=25/208736655 o8=12/67009291 ms=6117
+STORE_YARDSTICK at=read answer=5.368080 classes=43470 context=0.829083 context_classes=43470 foil=0.975829 question=0.146747 ms=9883
+STORE_READ_DONE reads=58 returns=0 pairs=3567516862 batches=60 peak_store=8423184452 ms=9884
+FIELD_CARD reads=58 read_ms=9505 returns=0 return_ms=0 pairs=3567516862 batches=60 peak_store=8423184452 landmarks=0 landmark_ms=0 elapsed_ms=9884
+MEASURE lap=read_A rc=0 wall_s=10.4 peak_rss_kib=841220
+## state A: write-store (one line a problem: its slice, its document's ordinal, the places written before a void; reads= is the sweep callback's count, one short of the release's reads, which FIELD_CARD gives)
+FIELD_CARD_OPEN card=NVIDIA GeForce RTX 4080 SUPER free=15622602752 total=16802250752 batch_budget=10631512064
+STORE_WRITE_LAW problems=80 documents=16 prompt=256 run=256 sweeps=256 refine=0 run_bound=0 near_tail=true place_order=false lengths=none one_end=false alphabet=244 void=99 ms=41
+STORE_WRITE slice=code problem=code_00 document=0 written_places=250 written_octets=250 reads=255
+STORE_WRITE slice=code problem=code_01 document=1 written_places=250 written_octets=250 reads=255
+STORE_WRITE slice=code problem=code_02 document=4 written_places=250 written_octets=250 reads=255
+STORE_WRITE slice=code problem=code_03 document=6 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=code problem=code_04 document=7 written_places=250 written_octets=250 reads=255
+STORE_WRITE slice=code problem=code_05 document=8 written_places=250 written_octets=250 reads=255
+STORE_WRITE slice=code problem=code_06 document=9 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=code problem=code_07 document=10 written_places=250 written_octets=250 reads=255
+STORE_WRITE slice=code problem=code_08 document=11 written_places=250 written_octets=250 reads=255
+STORE_WRITE slice=code problem=code_09 document=12 written_places=250 written_octets=250 reads=255
+STORE_WRITE slice=code problem=code_10 document=13 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=code problem=code_11 document=14 written_places=250 written_octets=250 reads=255
+STORE_WRITE slice=code problem=code_12 document=15 written_places=250 written_octets=250 reads=255
+STORE_WRITE slice=code problem=code_13 document=16 written_places=14 written_octets=14 reads=255
+STORE_WRITE slice=code problem=code_14 document=17 written_places=250 written_octets=250 reads=255
+STORE_WRITE slice=code problem=code_15 document=18 written_places=250 written_octets=250 reads=255
+STORE_WRITE slice=web problem=web_00 document=1 written_places=250 written_octets=250 reads=255
+STORE_WRITE slice=web problem=web_01 document=2 written_places=250 written_octets=250 reads=255
+STORE_WRITE slice=web problem=web_02 document=3 written_places=250 written_octets=250 reads=255
+STORE_WRITE slice=web problem=web_03 document=5 written_places=250 written_octets=250 reads=255
+STORE_WRITE slice=web problem=web_04 document=7 written_places=250 written_octets=250 reads=255
+STORE_WRITE slice=web problem=web_05 document=9 written_places=250 written_octets=250 reads=255
+STORE_WRITE slice=web problem=web_06 document=10 written_places=250 written_octets=250 reads=255
+STORE_WRITE slice=web problem=web_07 document=13 written_places=250 written_octets=250 reads=255
+STORE_WRITE slice=web problem=web_08 document=14 written_places=250 written_octets=250 reads=255
+STORE_WRITE slice=web problem=web_09 document=15 written_places=250 written_octets=250 reads=255
+STORE_WRITE slice=web problem=web_10 document=16 written_places=250 written_octets=250 reads=255
+STORE_WRITE slice=web problem=web_11 document=17 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=web problem=web_12 document=18 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=web problem=web_13 document=20 written_places=250 written_octets=250 reads=255
+STORE_WRITE slice=web problem=web_14 document=21 written_places=250 written_octets=250 reads=255
+STORE_WRITE slice=web problem=web_15 document=22 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=science problem=science_00 document=0 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=science problem=science_01 document=1 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=science problem=science_02 document=2 written_places=250 written_octets=250 reads=255
+STORE_WRITE slice=science problem=science_03 document=4 written_places=250 written_octets=250 reads=255
+STORE_WRITE slice=science problem=science_04 document=5 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=science problem=science_05 document=6 written_places=250 written_octets=250 reads=255
+STORE_WRITE slice=science problem=science_06 document=7 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=science problem=science_07 document=8 written_places=39 written_octets=39 reads=255
+STORE_WRITE slice=science problem=science_08 document=9 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=science problem=science_09 document=10 written_places=250 written_octets=250 reads=255
+STORE_WRITE slice=science problem=science_10 document=11 written_places=250 written_octets=250 reads=255
+STORE_WRITE slice=science problem=science_11 document=12 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=science problem=science_12 document=13 written_places=250 written_octets=250 reads=255
+STORE_WRITE slice=science problem=science_13 document=14 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=science problem=science_14 document=15 written_places=250 written_octets=250 reads=255
+STORE_WRITE slice=science problem=science_15 document=16 written_places=250 written_octets=250 reads=255
+STORE_WRITE slice=books problem=books_00 document=0 written_places=250 written_octets=250 reads=255
+STORE_WRITE slice=books problem=books_01 document=1 written_places=103 written_octets=103 reads=255
+STORE_WRITE slice=books problem=books_02 document=2 written_places=250 written_octets=250 reads=255
+STORE_WRITE slice=books problem=books_03 document=3 written_places=250 written_octets=250 reads=255
+STORE_WRITE slice=books problem=books_04 document=4 written_places=250 written_octets=250 reads=255
+STORE_WRITE slice=books problem=books_05 document=5 written_places=250 written_octets=250 reads=255
+STORE_WRITE slice=books problem=books_06 document=6 written_places=250 written_octets=250 reads=255
+STORE_WRITE slice=books problem=books_07 document=7 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=books problem=books_08 document=8 written_places=250 written_octets=250 reads=255
+STORE_WRITE slice=books problem=books_09 document=9 written_places=30 written_octets=30 reads=255
+STORE_WRITE slice=books problem=books_10 document=10 written_places=250 written_octets=250 reads=255
+STORE_WRITE slice=books problem=books_11 document=11 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=books problem=books_12 document=12 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=books problem=books_13 document=13 written_places=250 written_octets=250 reads=255
+STORE_WRITE slice=books problem=books_14 document=14 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=books problem=books_15 document=15 written_places=250 written_octets=250 reads=255
+STORE_WRITE slice=wikidata problem=wikidata_00 document=0 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=wikidata problem=wikidata_01 document=1 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=wikidata problem=wikidata_02 document=3 written_places=250 written_octets=250 reads=255
+STORE_WRITE slice=wikidata problem=wikidata_03 document=4 written_places=250 written_octets=250 reads=255
+STORE_WRITE slice=wikidata problem=wikidata_04 document=6 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=wikidata problem=wikidata_05 document=7 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=wikidata problem=wikidata_06 document=9 written_places=29 written_octets=29 reads=255
+STORE_WRITE slice=wikidata problem=wikidata_07 document=11 written_places=250 written_octets=250 reads=255
+STORE_WRITE slice=wikidata problem=wikidata_08 document=12 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=wikidata problem=wikidata_09 document=13 written_places=255 written_octets=255 reads=255
+STORE_WRITE slice=wikidata problem=wikidata_10 document=15 written_places=250 written_octets=250 reads=255
+STORE_WRITE slice=wikidata problem=wikidata_11 document=16 written_places=250 written_octets=250 reads=255
+STORE_WRITE slice=wikidata problem=wikidata_12 document=17 written_places=250 written_octets=250 reads=255
+STORE_WRITE slice=wikidata problem=wikidata_13 document=19 written_places=250 written_octets=250 reads=255
+STORE_WRITE slice=wikidata problem=wikidata_14 document=20 written_places=250 written_octets=250 reads=255
+STORE_WRITE slice=wikidata problem=wikidata_15 document=21 written_places=256 written_octets=256 reads=255
+STORE_WRITE_DONE problems=80 reads=255 reads=256 returns=0 pairs=18717845234 batches=256 peak_store=1715516480 ms=39579
+FIELD_CARD reads=256 read_ms=38654 returns=0 return_ms=0 pairs=18717845234 batches=256 peak_store=1715516480 landmarks=0 landmark_ms=0 elapsed_ms=39580
+MEASURE lap=write_A rc=0 wall_s=39.9 peak_rss_kib=379924
+## state A: the rulers on the write
+RULERS columns: slice text writes octets utf8_share balance_nats words words_found_share match_share
+RULERS_VOCABULARY slice=code extent=100000000 words=369101
+RULERS slice=code text=written writes=16 octets=3782 utf8_share=1.0000 balance_nats=0.2204 words=391 words_found_share=0.3274 match_share=0.0461
+RULERS slice=code text=reference writes=16 octets=4096 utf8_share=1.0000 balance_nats=0.1382 words=405 words_found_share=0.9235 match_share=1.0000
+RULERS slice=code text=foil writes=16 octets=3782 utf8_share=0.9968 balance_nats=0.0581 words=326 words_found_share=0.3620 match_share=0.0508
+RULERS_VOCABULARY slice=web extent=100000000 words=311579
+RULERS slice=web text=written writes=16 octets=4018 utf8_share=1.0000 balance_nats=0.1862 words=467 words_found_share=0.3597 match_share=0.0510
+RULERS slice=web text=reference writes=16 octets=4096 utf8_share=1.0000 balance_nats=0.0926 words=494 words_found_share=0.9717 match_share=1.0000
+RULERS slice=web text=foil writes=16 octets=4018 utf8_share=0.9943 balance_nats=0.0712 words=409 words_found_share=0.2665 match_share=0.0515
+RULERS_VOCABULARY slice=science extent=100000000 words=266748
+RULERS slice=science text=written writes=16 octets=3831 utf8_share=1.0000 balance_nats=0.3401 words=436 words_found_share=0.3739 match_share=0.0486
+RULERS slice=science text=reference writes=16 octets=4096 utf8_share=1.0000 balance_nats=0.0879 words=468 words_found_share=0.8889 match_share=1.0000
+RULERS slice=science text=foil writes=16 octets=3831 utf8_share=0.9862 balance_nats=0.0748 words=399 words_found_share=0.2506 match_share=0.0537
+RULERS_VOCABULARY slice=books extent=100000000 words=560251
+RULERS slice=books text=written writes=16 octets=3657 utf8_share=1.0000 balance_nats=0.5791 words=446 words_found_share=0.5269 match_share=0.0586
+RULERS slice=books text=reference writes=16 octets=4096 utf8_share=1.0000 balance_nats=0.1164 words=500 words_found_share=0.9660 match_share=1.0000
+RULERS slice=books text=foil writes=16 octets=3657 utf8_share=0.9893 balance_nats=0.1027 words=372 words_found_share=0.2903 match_share=0.0620
+RULERS_VOCABULARY slice=wikidata extent=100000000 words=133483
+RULERS slice=wikidata text=written writes=16 octets=3820 utf8_share=1.0000 balance_nats=0.4710 words=430 words_found_share=0.2395 match_share=0.0439
+RULERS slice=wikidata text=reference writes=16 octets=4096 utf8_share=0.9995 balance_nats=0.1298 words=430 words_found_share=0.7488 match_share=1.0000
+RULERS slice=wikidata text=foil writes=16 octets=3820 utf8_share=0.8277 balance_nats=0.0599 words=370 words_found_share=0.2081 match_share=0.0315
+WRITE_FILES 240 sha_of_shas 3f1e7654c3edeb60
+## state B_state: read-store
+FIELD_CARD_OPEN card=NVIDIA GeForce RTX 4080 SUPER free=15705309184 total=16802250752 batch_budget=10714218496
+STORE_READ_LAW role=held least=4 octaves=7 pairs_bound=15606223 sites_bound=41490 sections=8 alphabet=244 void=99 ms=36
+STORE_READ slice=code n=0 regions=218 sites=41319 domain=23500 squared=14112483 open=13831 stretches=218 mask_whole_regions=48 mask_whole_places=2513 mask_whole_code=7739828459 mask_run_regions=52 mask_run_places=1920 mask_run_code=7445811156 writer_k0_regions=20 writer_k0_places=1391 writer_k0_code=7127500479 writer_k_regions=98 writer_k_places=8007 writer_k_code=41089484388 ms=180
+STORE_READ slice=code n=1 regions=169 sites=38748 domain=19992 squared=15415908 open=12978 stretches=387 mask_whole_regions=36 mask_whole_places=2250 mask_whole_code=7852128451 mask_run_regions=39 mask_run_places=1150 mask_run_code=4015398616 writer_k0_regions=21 writer_k0_places=1937 writer_k0_code=9222255857 writer_k_regions=73 writer_k_places=7641 writer_k_code=34841574093 ms=152
+STORE_READ slice=code n=2 regions=198 sites=41415 domain=23151 squared=14632095 open=12608 stretches=585 mask_whole_regions=47 mask_whole_places=4258 mask_whole_code=15058268003 mask_run_regions=40 mask_run_places=840 mask_run_code=2786436764 writer_k0_regions=20 writer_k0_places=680 writer_k0_code=3169728869 writer_k_regions=91 writer_k_places=6830 writer_k_code=32493215433 ms=163
+STORE_READ slice=code n=3 regions=180 sites=41422 domain=20935 squared=15504752 open=11555 stretches=765 mask_whole_regions=41 mask_whole_places=2479 mask_whole_code=7563122660 mask_run_regions=42 mask_run_places=1598 mask_run_code=4625337600 writer_k0_regions=19 writer_k0_places=509 writer_k0_code=2417639468 writer_k_regions=78 writer_k_places=6969 writer_k_code=33020100636 ms=162
+STORE_READ slice=code n=4 regions=197 sites=41185 domain=24119 squared=14688889 open=13919 stretches=962 mask_whole_regions=38 mask_whole_places=2560 mask_whole_code=9309893019 mask_run_regions=51 mask_run_places=2776 mask_run_code=11422593099 writer_k0_regions=24 writer_k0_places=1585 writer_k0_code=8551692008 writer_k_regions=84 writer_k_places=6998 writer_k_code=37337992844 ms=163
+STORE_READ slice=code n=5 regions=176 sites=41138 domain=30748 squared=15438568 open=15869 stretches=1138 mask_whole_regions=50 mask_whole_places=5414 mask_whole_code=22431598311 mask_run_regions=45 mask_run_places=3028 mask_run_code=12886569041 writer_k0_regions=19 writer_k0_places=760 writer_k0_code=4229641928 writer_k_regions=62 writer_k_places=6667 writer_k_code=36448020015 ms=170
+STORE_READ slice=code n=6 regions=202 sites=41479 domain=25094 squared=14185913 open=14411 stretches=1340 mask_whole_regions=48 mask_whole_places=3727 mask_whole_code=13278334908 mask_run_regions=46 mask_run_places=1702 mask_run_code=5483796366 writer_k0_regions=15 writer_k0_places=1141 writer_k0_code=6075846897 writer_k_regions=93 writer_k_places=7841 writer_k_code=40121768021 ms=161
+STORE_READ slice=code n=7 regions=204 sites=40995 domain=22855 squared=14315757 open=11685 stretches=1544 mask_whole_regions=62 mask_whole_places=4286 mask_whole_code=17422501130 mask_run_regions=36 mask_run_places=1390 mask_run_code=4302295793 writer_k0_regions=23 writer_k0_places=1056 writer_k0_code=5672529274 writer_k_regions=83 writer_k_places=4953 writer_k_code=26520625785 ms=161
+STORE_READ_SURPRISE slice=code places=106856 by_bit_length(count/code) b1=32/32 b2=8/20 b3=7/40 b4=10/107 b5=4/93 b6=3/121 b7=5/481 b8=14/2689 b9=20/7520 b10=39/31834 b11=92/138883 b12=230/691444 b13=474/2911645 b14=707/8599996 b15=1069/25660553 b16=1308/62905912 b17=1542/146879740 b18=1792/342742494 b19=2200/841845847 b20=3112/2436224741 b21=12356/20015604486 b22=19192/60088240036 b23=54129/313799472345 b24=8480/83608533909 b25=31/583034403 ms=1356
+STORE_READ_WRITER slice=code sections=8 stretches=1544 k0_by_octave(places/code) o0=161/598786426 o1=269/1346854776 o2=497/2662673755 o3=721/3785387933 o4=1029/5320253059 o5=1471/7693792249 o6=2077/10798743521 o7=1622/8165330610 o8=1212/6095012451 front_by_octave(count/code) o0=161/598786426 o1=186/650877369 o2=149/581482292 o3=129/528014606 o4=77/254954052 o5=53/167764321 o6=29/76290258 o7=27/92706303 o8=12/52010957 ms=1356
+STORE_READ slice=web n=0 regions=215 sites=40903 domain=23094 squared=13914883 open=13856 stretches=215 mask_whole_regions=48 mask_whole_places=2541 mask_whole_code=9132516575 mask_run_regions=51 mask_run_places=1742 mask_run_code=7414613480 writer_k0_regions=17 writer_k0_places=1022 writer_k0_code=5602991925 writer_k_regions=99 writer_k_places=8551 writer_k_code=44426134281 ms=155
+STORE_READ slice=web n=1 regions=177 sites=39418 domain=20772 squared=15366430 open=13323 stretches=392 mask_whole_regions=37 mask_whole_places=2369 mask_whole_code=8021887900 mask_run_regions=40 mask_run_places=1177 mask_run_code=3863833362 writer_k0_regions=23 writer_k0_places=1939 writer_k0_code=9782515987 writer_k_regions=77 writer_k_places=7838 writer_k_code=38843370563 ms=154
+STORE_READ slice=web n=2 regions=189 sites=41115 domain=23919 squared=15058937 open=13349 stretches=581 mask_whole_regions=44 mask_whole_places=4477 mask_whole_code=17306873444 mask_run_regions=40 mask_run_places=1015 mask_run_code=3658229346 writer_k0_regions=16 writer_k0_places=692 writer_k0_code=3730583706 writer_k_regions=89 writer_k_places=7165 writer_k_code=35398390129 ms=161
+STORE_READ slice=web n=3 regions=172 sites=40281 domain=19597 squared=15167991 open=10912 stretches=753 mask_whole_regions=40 mask_whole_places=2196 mask_whole_code=7133687536 mask_run_regions=37 mask_run_places=1492 mask_run_code=4897100467 writer_k0_regions=21 writer_k0_places=550 writer_k0_code=2692986960 writer_k_regions=74 writer_k_places=6674 writer_k_code=33884282363 ms=158
+STORE_READ slice=web n=4 regions=185 sites=40972 domain=23936 squared=15199434 open=13565 stretches=938 mask_whole_regions=36 mask_whole_places=2471 mask_whole_code=10199526356 mask_run_regions=51 mask_run_places=3065 mask_run_code=14059367035 writer_k0_regions=17 writer_k0_places=966 writer_k0_code=5508734834 writer_k_regions=81 writer_k_places=7063 writer_k_code=37672951608 ms=163
+STORE_READ slice=web n=5 regions=163 sites=40317 domain=31312 squared=15574137 open=15651 stretches=1101 mask_whole_regions=47 mask_whole_places=5113 mask_whole_code=20696106517 mask_run_regions=38 mask_run_places=3484 mask_run_code=14777982671 writer_k0_regions=22 writer_k0_places=1719 writer_k0_code=9345586904 writer_k_regions=56 writer_k_places=5335 writer_k_code=27469844647 ms=166
+STORE_READ slice=web n=6 regions=206 sites=41307 domain=24556 squared=13817399 open=13566 stretches=1307 mask_whole_regions=49 mask_whole_places=4337 mask_whole_code=17097585617 mask_run_regions=50 mask_run_places=1317 mask_run_code=4577589928 writer_k0_regions=16 writer_k0_places=748 writer_k0_code=3905370523 writer_k_regions=91 writer_k_places=7164 writer_k_code=35886109649 ms=158
+STORE_READ slice=web n=7 regions=206 sites=41304 domain=23680 squared=14499132 open=12369 stretches=1513 mask_whole_regions=62 mask_whole_places=3979 mask_whole_code=15967822231 mask_run_regions=39 mask_run_places=1761 mask_run_code=6703577613 writer_k0_regions=23 writer_k0_places=925 writer_k0_code=4683954093 writer_k_regions=82 writer_k_places=5704 writer_k_code=27798991160 ms=161
+STORE_READ_SURPRISE slice=web places=106591 by_bit_length(count/code) b1=17/17 b2=9/25 b3=5/25 b4=3/32 b5=2/41 b6=1/59 b7=2/140 b9=5/1468 b10=15/10772 b11=41/61814 b12=74/231168 b13=142/874896 b14=233/2766008 b15=407/9828605 b16=604/29230857 b17=870/84154254 b18=1182/230291282 b19=1600/624079625 b20=2472/1937676493 b21=5338/8648270757 b22=30471/97253955868 b23=54840/301071520567 b24=8244/81999861910 b25=14/248282727 ms=2640
+STORE_READ_WRITER slice=web sections=8 stretches=1513 k0_by_octave(places/code) o0=155/559081995 o1=264/1356049935 o2=490/2492030605 o3=719/3808229047 o4=1020/5219154364 o5=1410/7623763918 o6=1806/9480096131 o7=1547/8441976310 o8=1150/6272342627 front_by_octave(count/code) o0=155/559081995 o1=181/712567401 o2=147/575428689 o3=123/409335484 o4=76/297913269 o5=48/175023448 o6=32/116386483 o7=28/91554672 o8=14/50108727 ms=2640
+STORE_READ slice=science n=0 regions=215 sites=41091 domain=23004 squared=14198079 open=13761 stretches=215 mask_whole_regions=48 mask_whole_places=2509 mask_whole_code=8451463909 mask_run_regions=51 mask_run_places=1805 mask_run_code=6724647327 writer_k0_regions=17 writer_k0_places=1034 writer_k0_code=5265029010 writer_k_regions=99 writer_k_places=8413 writer_k_code=41580167748 ms=158
+STORE_READ slice=science n=1 regions=161 sites=37445 domain=19419 squared=15522835 open=12721 stretches=376 mask_whole_regions=32 mask_whole_places=2081 mask_whole_code=7938875432 mask_run_regions=39 mask_run_places=1034 mask_run_code=4144227946 writer_k0_regions=21 writer_k0_places=1549 writer_k0_code=7787842753 writer_k_regions=69 writer_k_places=8057 writer_k_code=41980349234 ms=152
+STORE_READ slice=science n=2 regions=184 sites=41115 domain=24441 squared=14930409 open=13565 stretches=560 mask_whole_regions=46 mask_whole_places=4489 mask_whole_code=19935350786 mask_run_regions=36 mask_run_places=1213 mask_run_code=5281350450 writer_k0_regions=15 writer_k0_places=925 writer_k0_code=5089670060 writer_k_regions=87 writer_k_places=6938 writer_k_code=39456230340 ms=168
+STORE_READ slice=science n=3 regions=180 sites=41124 domain=20131 squared=15392062 open=11058 stretches=740 mask_whole_regions=42 mask_whole_places=2595 mask_whole_code=9909987010 mask_run_regions=35 mask_run_places=1228 mask_run_code=4628594937 writer_k0_regions=22 writer_k0_places=611 writer_k0_code=3373122709 writer_k_regions=81 writer_k_places=6624 writer_k_code=35171760025 ms=161
+STORE_READ slice=science n=4 regions=186 sites=41449 domain=23229 squared=15153803 open=12891 stretches=926 mask_whole_regions=37 mask_whole_places=2493 mask_whole_code=10792884212 mask_run_regions=53 mask_run_places=2766 mask_run_code=12279750760 writer_k0_regions=15 writer_k0_places=883 writer_k0_code=4488919265 writer_k_regions=81 writer_k_places=6749 writer_k_code=36667346131 ms=163
+STORE_READ slice=science n=5 regions=151 sites=38671 domain=30640 squared=15487121 open=15016 stretches=1077 mask_whole_regions=40 mask_whole_places=4763 mask_whole_code=18889528920 mask_run_regions=40 mask_run_places=4061 mask_run_code=17182545076 writer_k0_regions=19 writer_k0_places=1368 writer_k0_code=7309448762 writer_k_regions=52 writer_k_places=4824 writer_k_code=25987780540 ms=162
+STORE_READ slice=science n=6 regions=187 sites=41260 domain=22711 squared=14959972 open=13285 stretches=1264 mask_whole_regions=47 mask_whole_places=4009 mask_whole_code=16097867570 mask_run_regions=39 mask_run_places=694 mask_run_code=2429821485 writer_k0_regions=14 writer_k0_places=960 writer_k0_code=4879374547 writer_k_regions=87 writer_k_places=7622 writer_k_code=39650631745 ms=159
+STORE_READ slice=science n=7 regions=198 sites=41478 domain=24095 squared=15041902 open=12801 stretches=1462 mask_whole_regions=56 mask_whole_places=3086 mask_whole_code=13006244857 mask_run_regions=49 mask_run_places=2387 mask_run_code=9567385339 writer_k0_regions=14 writer_k0_places=886 writer_k0_code=4575826708 writer_k_regions=79 writer_k_places=6442 writer_k_code=34507302856 ms=162
+STORE_READ_SURPRISE slice=science places=105098 by_bit_length(count/code) b8=4/820 b9=2/971 b10=8/6685 b11=31/50509 b12=49/147781 b13=96/618239 b14=186/2265851 b15=270/6691279 b16=471/22156160 b17=684/65331706 b18=971/189875519 b19=1301/499701533 b20=2132/1667797526 b21=4380/6961138740 b22=29302/95373955803 b23=55751/305637133862 b24=9409/93658587426 b25=51/945868039 ms=3943
+STORE_READ_WRITER slice=science sections=8 stretches=1462 k0_by_octave(places/code) o0=137/489971500 o1=252/1239827009 o2=468/2456618410 o3=676/3648015851 o4=942/4980437174 o5=1327/6952470869 o6=1773/9610945753 o7=1559/8099220560 o8=1082/5291726688 front_by_octave(count/code) o0=137/489971500 o1=183/796811442 o2=140/545257165 o3=116/494891181 o4=75/268328797 o5=48/185299392 o6=31/133065803 o7=28/80176137 o8=14/31678845 ms=3943
+STORE_READ slice=books n=0 regions=204 sites=41419 domain=23840 squared=15181617 open=14636 stretches=204 mask_whole_regions=46 mask_whole_places=2417 mask_whole_code=7919093770 mask_run_regions=49 mask_run_places=1800 mask_run_code=6520825547 writer_k0_regions=11 writer_k0_places=1389 writer_k0_code=6597577940 writer_k_regions=98 writer_k_places=9030 writer_k_code=42322443201 ms=157
+STORE_READ slice=books n=1 regions=169 sites=38838 domain=19959 squared=15382036 open=12991 stretches=373 mask_whole_regions=34 mask_whole_places=2222 mask_whole_code=8782936482 mask_run_regions=39 mask_run_places=1014 mask_run_code=4123879997 writer_k0_regions=24 writer_k0_places=1899 writer_k0_code=9722231980 writer_k_regions=72 writer_k_places=7856 writer_k_code=39365130230 ms=150
+STORE_READ slice=books n=2 regions=185 sites=41478 domain=24478 squared=15225738 open=13655 stretches=558 mask_whole_regions=45 mask_whole_places=4450 mask_whole_code=17336523542 mask_run_regions=38 mask_run_places=1239 mask_run_code=4771824135 writer_k0_regions=14 writer_k0_places=672 writer_k0_code=3134834206 writer_k_regions=88 writer_k_places=7294 writer_k_code=34125288231 ms=160
+STORE_READ slice=books n=3 regions=174 sites=41283 domain=20452 squared=15559913 open=11268 stretches=732 mask_whole_regions=43 mask_whole_places=2634 mask_whole_code=8898323311 mask_run_regions=33 mask_run_places=1227 mask_run_code=3901497713 writer_k0_regions=17 writer_k0_places=606 writer_k0_code=3160071702 writer_k_regions=81 writer_k_places=6801 writer_k_code=32028271198 ms=157
+STORE_READ slice=books n=4 regions=183 sites=40951 domain=22280 squared=15381367 open=12835 stretches=915 mask_whole_regions=33 mask_whole_places=2066 mask_whole_code=7343320774 mask_run_regions=52 mask_run_places=2626 mask_run_code=9779609507 writer_k0_regions=14 writer_k0_places=351 writer_k0_code=1688701472 writer_k_regions=84 writer_k_places=7792 writer_k_code=36767658771 ms=160
+STORE_READ slice=books n=5 regions=150 sites=38631 domain=31517 squared=15514943 open=15399 stretches=1065 mask_whole_regions=41 mask_whole_places=4986 mask_whole_code=18630978831 mask_run_regions=41 mask_run_places=4201 mask_run_code=16522952414 writer_k0_regions=20 writer_k0_places=1855 writer_k0_code=8739918796 writer_k_regions=48 writer_k_places=4357 writer_k_code=20406204016 ms=160
+STORE_READ slice=books n=6 regions=183 sites=41369 domain=22821 squared=15170877 open=13282 stretches=1248 mask_whole_regions=46 mask_whole_places=4093 mask_whole_code=14804823110 mask_run_regions=38 mask_run_places=695 mask_run_code=2423551725 writer_k0_regions=13 writer_k0_places=940 writer_k0_code=4433856678 writer_k_regions=86 writer_k_places=7554 writer_k_code=35074061759 ms=161
+STORE_READ slice=books n=7 regions=196 sites=41194 domain=24077 squared=14970988 open=13270 stretches=1444 mask_whole_regions=55 mask_whole_places=3272 mask_whole_code=11841328382 mask_run_regions=47 mask_run_places=2074 mask_run_code=7861722401 writer_k0_regions=13 writer_k0_places=887 writer_k0_code=4285579432 writer_k_regions=81 writer_k_places=7037 writer_k_code=32608307457 ms=162
+STORE_READ_SURPRISE slice=books places=107336 by_bit_length(count/code) b1=1/1 b2=2/4 b8=1/246 b9=6/2600 b10=12/9110 b11=42/63427 b12=100/298632 b13=143/876755 b14=263/3134058 b15=431/10552904 b16=563/27140077 b17=724/69858931 b18=1034/198009433 b19=1467/567990829 b20=2375/1854468058 b21=4858/7743787803 b22=36195/115816277688 b23=53877/285885036637 b24=5218/53302565787 b25=24/443255730 ms=5216
+STORE_READ_WRITER slice=books sections=8 stretches=1444 k0_by_octave(places/code) o0=126/497487507 o1=246/1065048624 o2=458/2214276042 o3=671/3201806895 o4=942/4620517807 o5=1344/6586792284 o6=1837/9021193383 o7=1689/8326608472 o8=1286/6229041192 front_by_octave(count/code) o0=126/497487507 o1=183/653955211 o2=138/469800470 o3=122/466726776 o4=73/238697848 o5=49/161021641 o6=31/129744268 o7=28/99720775 o8=14/36624292 ms=5216
+STORE_READ slice=wikidata n=0 regions=216 sites=41450 domain=23391 squared=14455448 open=14170 stretches=216 mask_whole_regions=48 mask_whole_places=2434 mask_whole_code=10259179875 mask_run_regions=52 mask_run_places=1727 mask_run_code=7944600157 writer_k0_regions=16 writer_k0_places=1025 writer_k0_code=5681438963 writer_k_regions=100 writer_k_places=8984 writer_k_code=50469829254 ms=163
+STORE_READ slice=wikidata n=1 regions=161 sites=37652 domain=19323 squared=15503140 open=13070 stretches=377 mask_whole_regions=32 mask_whole_places=1816 mask_whole_code=10108891035 mask_run_regions=39 mask_run_places=1150 mask_run_code=5136658575 writer_k0_regions=19 writer_k0_places=1865 writer_k0_code=13492645207 writer_k_regions=71 writer_k_places=8239 writer_k_code=49389811847 ms=148
+STORE_READ slice=wikidata n=2 regions=193 sites=41206 domain=24619 squared=14615808 open=13451 stretches=570 mask_whole_regions=49 mask_whole_places=4729 mask_whole_code=21349962408 mask_run_regions=37 mask_run_places=1003 mask_run_code=4147482427 writer_k0_regions=17 writer_k0_places=552 writer_k0_code=3038274420 writer_k_regions=90 writer_k_places=7167 writer_k_code=38445942425 ms=156
+STORE_READ slice=wikidata n=3 regions=166 sites=40425 domain=19646 squared=15465787 open=11400 stretches=736 mask_whole_regions=39 mask_whole_places=2187 mask_whole_code=10399655847 mask_run_regions=32 mask_run_places=1222 mask_run_code=5090393624 writer_k0_regions=17 writer_k0_places=606 writer_k0_code=3435218267 writer_k_regions=78 writer_k_places=7385 writer_k_code=43055836758 ms=155
+STORE_READ slice=wikidata n=4 regions=192 sites=41483 domain=22976 squared=15130237 open=12615 stretches=928 mask_whole_regions=37 mask_whole_places=2493 mask_whole_code=11309769779 mask_run_regions=56 mask_run_places=2782 mask_run_code=13293987175 writer_k0_regions=15 writer_k0_places=403 writer_k0_code=2170772591 writer_k_regions=84 writer_k_places=6937 writer_k_code=40317533211 ms=162
+STORE_READ slice=wikidata n=5 regions=153 sites=39014 domain=30835 squared=15600402 open=15592 stretches=1081 mask_whole_regions=41 mask_whole_places=4620 mask_whole_code=20621865848 mask_run_regions=38 mask_run_places=4026 mask_run_code=18792520070 writer_k0_regions=20 writer_k0_places=1369 writer_k0_code=7712290346 writer_k_regions=54 writer_k_places=5577 writer_k_code=32602046824 ms=163
+STORE_READ slice=wikidata n=6 regions=202 sites=41468 domain=22967 squared=14142954 open=12556 stretches=1283 mask_whole_regions=49 mask_whole_places=4154 mask_whole_code=18789489324 mask_run_regions=46 mask_run_places=959 mask_run_code=4009020691 writer_k0_regions=20 writer_k0_places=1252 writer_k0_code=7134336863 writer_k_regions=87 writer_k_places=6191 writer_k_code=35782067781 ms=161
+STORE_READ slice=wikidata n=7 regions=202 sites=41442 domain=24756 squared=14793580 open=12859 stretches=1485 mask_whole_regions=60 mask_whole_places=4148 mask_whole_code=18989670312 mask_run_regions=44 mask_run_places=1972 mask_run_code=7869240150 writer_k0_regions=18 writer_k0_places=1100 writer_k0_code=6377774689 writer_k_regions=80 writer_k_places=5639 writer_k_code=31622481782 ms=163
+STORE_READ_SURPRISE slice=wikidata places=105713 by_bit_length(count/code) b1=6/6 b2=4/9 b3=4/24 b4=4/38 b6=4/188 b7=3/243 b8=3/555 b9=1/298 b10=5/4016 b11=6/9726 b12=21/64677 b13=35/214315 b14=111/1355935 b15=279/7020661 b16=478/23486239 b17=767/73051798 b18=1090/209810970 b19=1400/534515384 b20=1822/1412168176 b21=3202/5094673936 b22=26749/91681313533 b23=56190/320843756090 b24=13510/138623500515 b25=19/335741193 ms=6496
+STORE_READ_WRITER slice=wikidata sections=8 stretches=1485 k0_by_octave(places/code) o0=142/690103561 o1=258/1337789940 o2=482/2786840987 o3=702/4217792443 o4=974/5949210370 o5=1369/8033714199 o6=1827/10871664815 o7=1500/9002049613 o8=918/6153585418 front_by_octave(count/code) o0=142/690103561 o1=186/805292052 o2=138/661400059 o3=124/512611638 o4=78/328960845 o5=52/246490067 o6=29/122603223 o7=25/103452949 o8=12/36209179 ms=6496
+STORE_YARDSTICK at=read answer=5.096040 classes=43470 context=1.009504 context_classes=43470 foil=1.164432 question=0.154929 ms=10452
+STORE_READ_DONE reads=58 returns=0 pairs=3577444227 batches=60 peak_store=8565644186 ms=10452
+FIELD_CARD reads=58 read_ms=10086 returns=0 return_ms=0 pairs=3577444227 batches=60 peak_store=8565644186 landmarks=0 landmark_ms=0 elapsed_ms=10452
+MEASURE lap=read_B_state rc=0 wall_s=11.0 peak_rss_kib=793536
+## state B_state: write-store (one line a problem: its slice, its document's ordinal, the places written before a void; reads= is the sweep callback's count, one short of the release's reads, which FIELD_CARD gives)
+FIELD_CARD_OPEN card=NVIDIA GeForce RTX 4080 SUPER free=15705899008 total=16802250752 batch_budget=10714808320
+STORE_WRITE_LAW problems=80 documents=16 prompt=256 run=256 sweeps=256 refine=0 run_bound=0 near_tail=true place_order=false lengths=none one_end=false alphabet=244 void=99 ms=38
+STORE_WRITE slice=code problem=code_00 document=0 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=code problem=code_01 document=1 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=code problem=code_02 document=4 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=code problem=code_03 document=6 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=code problem=code_04 document=7 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=code problem=code_05 document=8 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=code problem=code_06 document=9 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=code problem=code_07 document=10 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=code problem=code_08 document=11 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=code problem=code_09 document=12 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=code problem=code_10 document=13 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=code problem=code_11 document=14 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=code problem=code_12 document=15 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=code problem=code_13 document=16 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=code problem=code_14 document=17 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=code problem=code_15 document=18 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=web problem=web_00 document=1 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=web problem=web_01 document=2 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=web problem=web_02 document=3 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=web problem=web_03 document=5 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=web problem=web_04 document=7 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=web problem=web_05 document=9 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=web problem=web_06 document=10 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=web problem=web_07 document=13 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=web problem=web_08 document=14 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=web problem=web_09 document=15 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=web problem=web_10 document=16 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=web problem=web_11 document=17 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=web problem=web_12 document=18 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=web problem=web_13 document=20 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=web problem=web_14 document=21 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=web problem=web_15 document=22 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=science problem=science_00 document=0 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=science problem=science_01 document=1 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=science problem=science_02 document=2 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=science problem=science_03 document=4 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=science problem=science_04 document=5 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=science problem=science_05 document=6 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=science problem=science_06 document=7 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=science problem=science_07 document=8 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=science problem=science_08 document=9 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=science problem=science_09 document=10 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=science problem=science_10 document=11 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=science problem=science_11 document=12 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=science problem=science_12 document=13 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=science problem=science_13 document=14 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=science problem=science_14 document=15 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=science problem=science_15 document=16 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=books problem=books_00 document=0 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=books problem=books_01 document=1 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=books problem=books_02 document=2 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=books problem=books_03 document=3 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=books problem=books_04 document=4 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=books problem=books_05 document=5 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=books problem=books_06 document=6 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=books problem=books_07 document=7 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=books problem=books_08 document=8 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=books problem=books_09 document=9 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=books problem=books_10 document=10 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=books problem=books_11 document=11 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=books problem=books_12 document=12 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=books problem=books_13 document=13 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=books problem=books_14 document=14 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=books problem=books_15 document=15 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=wikidata problem=wikidata_00 document=0 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=wikidata problem=wikidata_01 document=1 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=wikidata problem=wikidata_02 document=3 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=wikidata problem=wikidata_03 document=4 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=wikidata problem=wikidata_04 document=6 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=wikidata problem=wikidata_05 document=7 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=wikidata problem=wikidata_06 document=9 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=wikidata problem=wikidata_07 document=11 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=wikidata problem=wikidata_08 document=12 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=wikidata problem=wikidata_09 document=13 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=wikidata problem=wikidata_10 document=15 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=wikidata problem=wikidata_11 document=16 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=wikidata problem=wikidata_12 document=17 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=wikidata problem=wikidata_13 document=19 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=wikidata problem=wikidata_14 document=20 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=wikidata problem=wikidata_15 document=21 written_places=256 written_octets=256 reads=255
+STORE_WRITE_DONE problems=80 reads=255 reads=256 returns=0 pairs=20059980737 batches=256 peak_store=1715516480 ms=45580
+FIELD_CARD reads=256 read_ms=44606 returns=0 return_ms=0 pairs=20059980737 batches=256 peak_store=1715516480 landmarks=0 landmark_ms=0 elapsed_ms=45582
+MEASURE lap=write_B_state rc=0 wall_s=45.9 peak_rss_kib=376656
+## state B_state: the rulers on the write
+RULERS columns: slice text writes octets utf8_share balance_nats words words_found_share match_share
+RULERS_VOCABULARY slice=code extent=100000000 words=369101
+RULERS slice=code text=written writes=16 octets=4096 utf8_share=0.9932 balance_nats=0.1202 words=411 words_found_share=0.2944 match_share=0.0488
+RULERS slice=code text=reference writes=16 octets=4096 utf8_share=1.0000 balance_nats=0.1382 words=405 words_found_share=0.9235 match_share=1.0000
+RULERS slice=code text=foil writes=16 octets=4096 utf8_share=0.9963 balance_nats=0.0525 words=348 words_found_share=0.3649 match_share=0.0535
+RULERS_VOCABULARY slice=web extent=100000000 words=311579
+RULERS slice=web text=written writes=16 octets=4096 utf8_share=0.9893 balance_nats=0.1299 words=490 words_found_share=0.3898 match_share=0.0552
+RULERS slice=web text=reference writes=16 octets=4096 utf8_share=1.0000 balance_nats=0.0926 words=494 words_found_share=0.9717 match_share=1.0000
+RULERS slice=web text=foil writes=16 octets=4096 utf8_share=0.9944 balance_nats=0.0695 words=417 words_found_share=0.2638 match_share=0.0520
+RULERS_VOCABULARY slice=science extent=100000000 words=266748
+RULERS slice=science text=written writes=16 octets=4096 utf8_share=0.9739 balance_nats=0.2276 words=440 words_found_share=0.3091 match_share=0.0518
+RULERS slice=science text=reference writes=16 octets=4096 utf8_share=1.0000 balance_nats=0.0879 words=468 words_found_share=0.8889 match_share=1.0000
+RULERS slice=science text=foil writes=16 octets=4096 utf8_share=0.9868 balance_nats=0.0692 words=429 words_found_share=0.2494 match_share=0.0564
+RULERS_VOCABULARY slice=books extent=100000000 words=560251
+RULERS slice=books text=written writes=16 octets=4096 utf8_share=0.9917 balance_nats=0.2179 words=512 words_found_share=0.5117 match_share=0.0613
+RULERS slice=books text=reference writes=16 octets=4096 utf8_share=1.0000 balance_nats=0.1164 words=500 words_found_share=0.9660 match_share=1.0000
+RULERS slice=books text=foil writes=16 octets=4096 utf8_share=0.9895 balance_nats=0.0898 words=418 words_found_share=0.2895 match_share=0.0708
+RULERS_VOCABULARY slice=wikidata extent=100000000 words=133483
+RULERS slice=wikidata text=written writes=16 octets=4096 utf8_share=0.8552 balance_nats=0.1662 words=331 words_found_share=0.2115 match_share=0.0398
+RULERS slice=wikidata text=reference writes=16 octets=4096 utf8_share=0.9995 balance_nats=0.1298 words=430 words_found_share=0.7488 match_share=1.0000
+RULERS slice=wikidata text=foil writes=16 octets=4096 utf8_share=0.8271 balance_nats=0.0551 words=396 words_found_share=0.2096 match_share=0.0349
+## state B_mean: read-store
+FIELD_CARD_OPEN card=NVIDIA GeForce RTX 4080 SUPER free=15705899008 total=16802250752 batch_budget=10714808320
+STORE_READ_LAW role=held least=4 octaves=7 pairs_bound=15606223 sites_bound=41490 sections=8 alphabet=244 void=99 ms=30
+STORE_READ slice=code n=0 regions=218 sites=41319 domain=23500 squared=14112483 open=13831 stretches=218 mask_whole_regions=48 mask_whole_places=2513 mask_whole_code=7744640060 mask_run_regions=52 mask_run_places=1920 mask_run_code=7447536895 writer_k0_regions=20 writer_k0_places=1391 writer_k0_code=7137775910 writer_k_regions=98 writer_k_places=8007 writer_k_code=41085685201 ms=179
+STORE_READ slice=code n=1 regions=169 sites=38748 domain=19992 squared=15415908 open=12978 stretches=387 mask_whole_regions=36 mask_whole_places=2250 mask_whole_code=7861869746 mask_run_regions=39 mask_run_places=1150 mask_run_code=4001217516 writer_k0_regions=21 writer_k0_places=1937 writer_k0_code=9204352560 writer_k_regions=73 writer_k_places=7641 writer_k_code=34761621033 ms=150
+STORE_READ slice=code n=2 regions=198 sites=41415 domain=23151 squared=14632095 open=12608 stretches=585 mask_whole_regions=47 mask_whole_places=4258 mask_whole_code=15092792818 mask_run_regions=40 mask_run_places=840 mask_run_code=2797897442 writer_k0_regions=20 writer_k0_places=680 writer_k0_code=3189126637 writer_k_regions=91 writer_k_places=6830 writer_k_code=32576094795 ms=163
+STORE_READ slice=code n=3 regions=180 sites=41422 domain=20935 squared=15504752 open=11555 stretches=765 mask_whole_regions=41 mask_whole_places=2479 mask_whole_code=7551549276 mask_run_regions=42 mask_run_places=1598 mask_run_code=4609379915 writer_k0_regions=19 writer_k0_places=509 writer_k0_code=2414411797 writer_k_regions=78 writer_k_places=6969 writer_k_code=33049598021 ms=163
+STORE_READ slice=code n=4 regions=197 sites=41185 domain=24119 squared=14688889 open=13919 stretches=962 mask_whole_regions=38 mask_whole_places=2560 mask_whole_code=9296816722 mask_run_regions=51 mask_run_places=2776 mask_run_code=11450425947 writer_k0_regions=24 writer_k0_places=1585 writer_k0_code=8557430782 writer_k_regions=84 writer_k_places=6998 writer_k_code=37262607433 ms=162
+STORE_READ slice=code n=5 regions=176 sites=41138 domain=30748 squared=15438568 open=15869 stretches=1138 mask_whole_regions=50 mask_whole_places=5414 mask_whole_code=22461197261 mask_run_regions=45 mask_run_places=3028 mask_run_code=12919879691 writer_k0_regions=19 writer_k0_places=760 writer_k0_code=4228600473 writer_k_regions=62 writer_k_places=6667 writer_k_code=36464149943 ms=168
+STORE_READ slice=code n=6 regions=202 sites=41479 domain=25094 squared=14185913 open=14411 stretches=1340 mask_whole_regions=48 mask_whole_places=3727 mask_whole_code=13317428618 mask_run_regions=46 mask_run_places=1702 mask_run_code=5507103479 writer_k0_regions=15 writer_k0_places=1141 writer_k0_code=6106000692 writer_k_regions=93 writer_k_places=7841 writer_k_code=40210307202 ms=156
+STORE_READ slice=code n=7 regions=204 sites=40995 domain=22855 squared=14315757 open=11685 stretches=1544 mask_whole_regions=62 mask_whole_places=4286 mask_whole_code=17423298548 mask_run_regions=36 mask_run_places=1390 mask_run_code=4298924519 writer_k0_regions=23 writer_k0_places=1056 writer_k0_code=5658839566 writer_k_regions=83 writer_k_places=4953 writer_k_code=26474333488 ms=162
+STORE_READ_SURPRISE slice=code places=106856 by_bit_length(count/code) b1=34/34 b2=5/13 b3=9/45 b4=9/97 b5=4/87 b6=4/187 b7=6/599 b8=7/1198 b9=25/9584 b10=37/30383 b11=140/216622 b12=257/786983 b13=508/3104339 b14=712/8629707 b15=1057/25323011 b16=1252/60037731 b17=1509/142713146 b18=1758/336207097 b19=2141/820846886 b20=3050/2379581248 b21=12061/19486800471 b22=20077/63551968867 b23=53700/311450908291 b24=8464/83330517127 b25=30/565210233 ms=1342
+STORE_READ_WRITER slice=code sections=8 stretches=1544 k0_by_octave(places/code) o0=161/598947971 o1=269/1348468346 o2=497/2665569904 o3=721/3786340713 o4=1029/5323060515 o5=1471/7706828532 o6=2077/10806947262 o7=1622/8165434934 o8=1212/6094940240 front_by_octave(count/code) o0=161/598947971 o1=186/652478721 o2=149/577705118 o3=129/528675719 o4=77/254639811 o5=53/165430114 o6=29/74855010 o7=27/94323455 o8=12/52144885 ms=1342
+STORE_READ slice=web n=0 regions=215 sites=40903 domain=23094 squared=13914883 open=13856 stretches=215 mask_whole_regions=48 mask_whole_places=2541 mask_whole_code=9142996027 mask_run_regions=51 mask_run_places=1742 mask_run_code=7408931540 writer_k0_regions=17 writer_k0_places=1022 writer_k0_code=5603734271 writer_k_regions=99 writer_k_places=8551 writer_k_code=44424473981 ms=159
+STORE_READ slice=web n=1 regions=177 sites=39418 domain=20772 squared=15366430 open=13323 stretches=392 mask_whole_regions=37 mask_whole_places=2369 mask_whole_code=8003354700 mask_run_regions=40 mask_run_places=1177 mask_run_code=3862394897 writer_k0_regions=23 writer_k0_places=1939 writer_k0_code=9789633410 writer_k_regions=77 writer_k_places=7838 writer_k_code=38787496929 ms=153
+STORE_READ slice=web n=2 regions=189 sites=41115 domain=23919 squared=15058937 open=13349 stretches=581 mask_whole_regions=44 mask_whole_places=4477 mask_whole_code=17247410519 mask_run_regions=40 mask_run_places=1015 mask_run_code=3654550898 writer_k0_regions=16 writer_k0_places=692 writer_k0_code=3714356792 writer_k_regions=89 writer_k_places=7165 writer_k_code=35315199369 ms=160
+STORE_READ slice=web n=3 regions=172 sites=40281 domain=19597 squared=15167991 open=10912 stretches=753 mask_whole_regions=40 mask_whole_places=2196 mask_whole_code=7127048738 mask_run_regions=37 mask_run_places=1492 mask_run_code=4884092079 writer_k0_regions=21 writer_k0_places=550 writer_k0_code=2683939032 writer_k_regions=74 writer_k_places=6674 writer_k_code=33850061746 ms=154
+STORE_READ slice=web n=4 regions=185 sites=40972 domain=23936 squared=15199434 open=13565 stretches=938 mask_whole_regions=36 mask_whole_places=2471 mask_whole_code=10186039093 mask_run_regions=51 mask_run_places=3065 mask_run_code=14038740246 writer_k0_regions=17 writer_k0_places=966 writer_k0_code=5508599003 writer_k_regions=81 writer_k_places=7063 writer_k_code=37605407076 ms=159
+STORE_READ slice=web n=5 regions=163 sites=40317 domain=31312 squared=15574137 open=15651 stretches=1101 mask_whole_regions=47 mask_whole_places=5113 mask_whole_code=20641827980 mask_run_regions=38 mask_run_places=3484 mask_run_code=14753136549 writer_k0_regions=22 writer_k0_places=1719 writer_k0_code=9334272828 writer_k_regions=56 writer_k_places=5335 writer_k_code=27445442675 ms=166
+STORE_READ slice=web n=6 regions=206 sites=41307 domain=24556 squared=13817399 open=13566 stretches=1307 mask_whole_regions=49 mask_whole_places=4337 mask_whole_code=17081660641 mask_run_regions=50 mask_run_places=1317 mask_run_code=4558066070 writer_k0_regions=16 writer_k0_places=748 writer_k0_code=3901786478 writer_k_regions=91 writer_k_places=7164 writer_k_code=35848437229 ms=157
+STORE_READ slice=web n=7 regions=206 sites=41304 domain=23680 squared=14499132 open=12369 stretches=1513 mask_whole_regions=62 mask_whole_places=3979 mask_whole_code=15924872857 mask_run_regions=39 mask_run_places=1761 mask_run_code=6706715075 writer_k0_regions=23 writer_k0_places=925 writer_k0_code=4678814445 writer_k_regions=82 writer_k_places=5704 writer_k_code=27754069946 ms=160
+STORE_READ_SURPRISE slice=web places=106591 by_bit_length(count/code) b1=17/17 b2=7/19 b3=8/45 b4=1/9 b5=3/53 b6=3/162 b8=3/658 b9=4/1573 b10=14/11095 b11=48/72711 b12=67/203651 b13=141/839149 b14=230/2795295 b15=398/9654890 b16=588/28552514 b17=812/78423276 b18=1151/221759228 b19=1574/609494648 b20=2434/1895845698 b21=5261/8474612335 b22=32180/104602991652 b23=53493/294397503944 b24=8142/80928139275 b25=12/216661222 ms=2617
+STORE_READ_WRITER slice=web sections=8 stretches=1513 k0_by_octave(places/code) o0=155/556972327 o1=264/1356607492 o2=490/2488485806 o3=719/3803369290 o4=1020/5216376552 o5=1410/7624617652 o6=1806/9470344760 o7=1547/8436479216 o8=1150/6261883164 front_by_octave(count/code) o0=155/556972327 o1=181/714005336 o2=147/574129483 o3=123/410192644 o4=76/298571530 o5=48/174036018 o6=32/114192808 o7=28/91711397 o8=14/51272718 ms=2617
+STORE_READ slice=science n=0 regions=215 sites=41091 domain=23004 squared=14198079 open=13761 stretches=215 mask_whole_regions=48 mask_whole_places=2509 mask_whole_code=8433495852 mask_run_regions=51 mask_run_places=1805 mask_run_code=6700444346 writer_k0_regions=17 writer_k0_places=1034 writer_k0_code=5244580716 writer_k_regions=99 writer_k_places=8413 writer_k_code=41465887935 ms=156
+STORE_READ slice=science n=1 regions=161 sites=37445 domain=19419 squared=15522835 open=12721 stretches=376 mask_whole_regions=32 mask_whole_places=2081 mask_whole_code=7914761452 mask_run_regions=39 mask_run_places=1034 mask_run_code=4131911105 writer_k0_regions=21 writer_k0_places=1549 writer_k0_code=7769458415 writer_k_regions=69 writer_k_places=8057 writer_k_code=41908692493 ms=147
+STORE_READ slice=science n=2 regions=184 sites=41115 domain=24441 squared=14930409 open=13565 stretches=560 mask_whole_regions=46 mask_whole_places=4489 mask_whole_code=19957133574 mask_run_regions=36 mask_run_places=1213 mask_run_code=5264635147 writer_k0_regions=15 writer_k0_places=925 writer_k0_code=5083253695 writer_k_regions=87 writer_k_places=6938 writer_k_code=39481828775 ms=161
+STORE_READ slice=science n=3 regions=180 sites=41124 domain=20131 squared=15392062 open=11058 stretches=740 mask_whole_regions=42 mask_whole_places=2595 mask_whole_code=9889787803 mask_run_regions=35 mask_run_places=1228 mask_run_code=4616836494 writer_k0_regions=22 writer_k0_places=611 writer_k0_code=3369879700 writer_k_regions=81 writer_k_places=6624 writer_k_code=35101063152 ms=169
+STORE_READ slice=science n=4 regions=186 sites=41449 domain=23229 squared=15153803 open=12891 stretches=926 mask_whole_regions=37 mask_whole_places=2493 mask_whole_code=10774255230 mask_run_regions=53 mask_run_places=2766 mask_run_code=12248541785 writer_k0_regions=15 writer_k0_places=883 writer_k0_code=4473996391 writer_k_regions=81 writer_k_places=6749 writer_k_code=36601903453 ms=163
+STORE_READ slice=science n=5 regions=151 sites=38671 domain=30640 squared=15487121 open=15016 stretches=1077 mask_whole_regions=40 mask_whole_places=4763 mask_whole_code=18843157470 mask_run_regions=40 mask_run_places=4061 mask_run_code=17138396468 writer_k0_regions=19 writer_k0_places=1368 writer_k0_code=7303514981 writer_k_regions=52 writer_k_places=4824 writer_k_code=25992791120 ms=161
+STORE_READ slice=science n=6 regions=187 sites=41260 domain=22711 squared=14959972 open=13285 stretches=1264 mask_whole_regions=47 mask_whole_places=4009 mask_whole_code=16070984677 mask_run_regions=39 mask_run_places=694 mask_run_code=2428919664 writer_k0_regions=14 writer_k0_places=960 writer_k0_code=4872911271 writer_k_regions=87 writer_k_places=7622 writer_k_code=39577339386 ms=161
+STORE_READ slice=science n=7 regions=198 sites=41478 domain=24095 squared=15041902 open=12801 stretches=1462 mask_whole_regions=56 mask_whole_places=3086 mask_whole_code=13002293448 mask_run_regions=49 mask_run_places=2387 mask_run_code=9570149081 writer_k0_regions=14 writer_k0_places=886 writer_k0_code=4573035048 writer_k_regions=79 writer_k_places=6442 writer_k_code=34464726412 ms=164
+STORE_READ_SURPRISE slice=science places=105098 by_bit_length(count/code) b8=3/565 b9=1/314 b10=6/4099 b11=33/51493 b12=51/151596 b13=93/608354 b14=179/2197410 b15=267/6548966 b16=465/22711596 b17=644/62093265 b18=948/183703956 b19=1281/495926805 b20=2094/1637400892 b21=4350/6903775181 b22=31358/104220478600 b23=54050/297837861998 b24=9224/91956056675 b25=51/940994774 ms=3908
+STORE_READ_WRITER slice=science sections=8 stretches=1462 k0_by_octave(places/code) o0=137/491386264 o1=252/1238169788 o2=468/2449818999 o3=676/3640865703 o4=942/4973021805 o5=1327/6933774861 o6=1773/9599873325 o7=1559/8089731442 o8=1082/5273988030 front_by_octave(count/code) o0=137/491386264 o1=183/796621705 o2=140/545723562 o3=116/492964531 o4=75/268650236 o5=48/184043463 o6=31/133974423 o7=28/80268942 o8=14/31234344 ms=3908
+STORE_READ slice=books n=0 regions=204 sites=41419 domain=23840 squared=15181617 open=14636 stretches=204 mask_whole_regions=46 mask_whole_places=2417 mask_whole_code=7899954926 mask_run_regions=49 mask_run_places=1800 mask_run_code=6509574957 writer_k0_regions=11 writer_k0_places=1389 writer_k0_code=6589171525 writer_k_regions=98 writer_k_places=9030 writer_k_code=42295361831 ms=160
+STORE_READ slice=books n=1 regions=169 sites=38838 domain=19959 squared=15382036 open=12991 stretches=373 mask_whole_regions=34 mask_whole_places=2222 mask_whole_code=8767366466 mask_run_regions=39 mask_run_places=1014 mask_run_code=4130321427 writer_k0_regions=24 writer_k0_places=1899 writer_k0_code=9732718776 writer_k_regions=72 writer_k_places=7856 writer_k_code=39399325238 ms=149
+STORE_READ slice=books n=2 regions=185 sites=41478 domain=24478 squared=15225738 open=13655 stretches=558 mask_whole_regions=45 mask_whole_places=4450 mask_whole_code=17285790832 mask_run_regions=38 mask_run_places=1239 mask_run_code=4777058001 writer_k0_regions=14 writer_k0_places=672 writer_k0_code=3128420988 writer_k_regions=88 writer_k_places=7294 writer_k_code=34117548162 ms=161
+STORE_READ slice=books n=3 regions=174 sites=41283 domain=20452 squared=15559913 open=11268 stretches=732 mask_whole_regions=43 mask_whole_places=2634 mask_whole_code=8887175110 mask_run_regions=33 mask_run_places=1227 mask_run_code=3887012215 writer_k0_regions=17 writer_k0_places=606 writer_k0_code=3160268813 writer_k_regions=81 writer_k_places=6801 writer_k_code=31972556227 ms=159
+STORE_READ slice=books n=4 regions=183 sites=40951 domain=22280 squared=15381367 open=12835 stretches=915 mask_whole_regions=33 mask_whole_places=2066 mask_whole_code=7326568052 mask_run_regions=52 mask_run_places=2626 mask_run_code=9765507227 writer_k0_regions=14 writer_k0_places=351 writer_k0_code=1685788739 writer_k_regions=84 writer_k_places=7792 writer_k_code=36711846606 ms=160
+STORE_READ slice=books n=5 regions=150 sites=38631 domain=31517 squared=15514943 open=15399 stretches=1065 mask_whole_regions=41 mask_whole_places=4986 mask_whole_code=18599949446 mask_run_regions=41 mask_run_places=4201 mask_run_code=16477790334 writer_k0_regions=20 writer_k0_places=1855 writer_k0_code=8732576082 writer_k_regions=48 writer_k_places=4357 writer_k_code=20380209290 ms=159
+STORE_READ slice=books n=6 regions=183 sites=41369 domain=22821 squared=15170877 open=13282 stretches=1248 mask_whole_regions=46 mask_whole_places=4093 mask_whole_code=14773484978 mask_run_regions=38 mask_run_places=695 mask_run_code=2421718903 writer_k0_regions=13 writer_k0_places=940 writer_k0_code=4433733318 writer_k_regions=86 writer_k_places=7554 writer_k_code=35033367138 ms=151
+STORE_READ slice=books n=7 regions=196 sites=41194 domain=24077 squared=14970988 open=13270 stretches=1444 mask_whole_regions=55 mask_whole_places=3272 mask_whole_code=11808707743 mask_run_regions=47 mask_run_places=2074 mask_run_code=7840014314 writer_k0_regions=13 writer_k0_places=887 writer_k0_code=4277394647 writer_k_regions=81 writer_k_places=7037 writer_k_code=32547703969 ms=161
+STORE_READ_SURPRISE slice=books places=107336 by_bit_length(count/code) b1=1/1 b2=2/4 b8=1/255 b9=5/2114 b10=15/11264 b11=47/72107 b12=97/293666 b13=127/782650 b14=260/3180562 b15=402/9882303 b16=531/25425259 b17=732/70664468 b18=1022/198333175 b19=1377/534300451 b20=2381/1853911161 b21=4812/7651876979 b22=38132/124239946395 b23=52275/278142305264 b24=5095/52220453690 b25=22/404544512 ms=5175
+STORE_READ_WRITER slice=books sections=8 stretches=1444 k0_by_octave(places/code) o0=126/502346519 o1=246/1065154861 o2=458/2214449967 o3=671/3198691673 o4=942/4611759549 o5=1344/6583625962 o6=1837/9023537600 o7=1689/8316166306 o8=1286/6224340451 front_by_octave(count/code) o0=126/502346519 o1=183/654956869 o2=138/472419172 o3=122/466025610 o4=73/237926417 o5=49/160319609 o6=31/129527555 o7=28/100426605 o8=14/36683085 ms=5175
+STORE_READ slice=wikidata n=0 regions=216 sites=41450 domain=23391 squared=14455448 open=14170 stretches=216 mask_whole_regions=48 mask_whole_places=2434 mask_whole_code=10212610094 mask_run_regions=52 mask_run_places=1727 mask_run_code=7901877029 writer_k0_regions=16 writer_k0_places=1025 writer_k0_code=5665555103 writer_k_regions=100 writer_k_places=8984 writer_k_code=50209759309 ms=173
+STORE_READ slice=wikidata n=1 regions=161 sites=37652 domain=19323 squared=15503140 open=13070 stretches=377 mask_whole_regions=32 mask_whole_places=1816 mask_whole_code=10098467332 mask_run_regions=39 mask_run_places=1150 mask_run_code=5120529162 writer_k0_regions=19 writer_k0_places=1865 writer_k0_code=13487925180 writer_k_regions=71 writer_k_places=8239 writer_k_code=49317785019 ms=149
+STORE_READ slice=wikidata n=2 regions=193 sites=41206 domain=24619 squared=14615808 open=13451 stretches=570 mask_whole_regions=49 mask_whole_places=4729 mask_whole_code=21458904110 mask_run_regions=37 mask_run_places=1003 mask_run_code=4140349930 writer_k0_regions=17 writer_k0_places=552 writer_k0_code=3029318688 writer_k_regions=90 writer_k_places=7167 writer_k_code=38366952979 ms=158
+STORE_READ slice=wikidata n=3 regions=166 sites=40425 domain=19646 squared=15465787 open=11400 stretches=736 mask_whole_regions=39 mask_whole_places=2187 mask_whole_code=10420191433 mask_run_regions=32 mask_run_places=1222 mask_run_code=5085436216 writer_k0_regions=17 writer_k0_places=606 writer_k0_code=3425474948 writer_k_regions=78 writer_k_places=7385 writer_k_code=43130577377 ms=158
+STORE_READ slice=wikidata n=4 regions=192 sites=41483 domain=22976 squared=15130237 open=12615 stretches=928 mask_whole_regions=37 mask_whole_places=2493 mask_whole_code=11325801340 mask_run_regions=56 mask_run_places=2782 mask_run_code=13250121578 writer_k0_regions=15 writer_k0_places=403 writer_k0_code=2176979248 writer_k_regions=84 writer_k_places=6937 writer_k_code=40198310483 ms=160
+STORE_READ slice=wikidata n=5 regions=153 sites=39014 domain=30835 squared=15600402 open=15592 stretches=1081 mask_whole_regions=41 mask_whole_places=4620 mask_whole_code=20446196854 mask_run_regions=38 mask_run_places=4026 mask_run_code=18713496476 writer_k0_regions=20 writer_k0_places=1369 writer_k0_code=7813916275 writer_k_regions=54 writer_k_places=5577 writer_k_code=32628537292 ms=162
+STORE_READ slice=wikidata n=6 regions=202 sites=41468 domain=22967 squared=14142954 open=12556 stretches=1283 mask_whole_regions=49 mask_whole_places=4154 mask_whole_code=18756879384 mask_run_regions=46 mask_run_places=959 mask_run_code=4010445588 writer_k0_regions=20 writer_k0_places=1252 writer_k0_code=7067533370 writer_k_regions=87 writer_k_places=6191 writer_k_code=35727997553 ms=161
+STORE_READ slice=wikidata n=7 regions=202 sites=41442 domain=24756 squared=14793580 open=12859 stretches=1485 mask_whole_regions=60 mask_whole_places=4148 mask_whole_code=18908265077 mask_run_regions=44 mask_run_places=1972 mask_run_code=7792136634 writer_k0_regions=18 writer_k0_places=1100 writer_k0_code=6327200290 writer_k_regions=80 writer_k_places=5639 writer_k_code=31604055254 ms=161
+STORE_READ_SURPRISE slice=wikidata places=105713 by_bit_length(count/code) b1=7/7 b2=3/8 b3=2/9 b4=6/61 b5=1/29 b6=4/187 b7=2/154 b8=2/406 b9=2/621 b10=2/1604 b11=9/13502 b12=18/53586 b13=37/233989 b14=110/1381703 b15=248/6126732 b16=478/23487968 b17=740/71690428 b18=1089/210528762 b19=1394/530858766 b20=1831/1428694527 b21=3166/5019574855 b22=28215/98290874282 b23=55404/318375633767 b24=12924/133525574267 b25=19/334856385 ms=6463
+STORE_READ_WRITER slice=wikidata sections=8 stretches=1485 k0_by_octave(places/code) o0=142/683226017 o1=258/1321693722 o2=482/2777994962 o3=702/4213093552 o4=974/5930074418 o5=1369/8000866134 o6=1827/10915773228 o7=1500/9022336794 o8=918/6128844275 front_by_octave(count/code) o0=142/683226017 o1=186/808599382 o2=138/659053185 o3=124/515197829 o4=78/330321740 o5=52/244260223 o6=29/122520852 o7=25/101432610 o8=12/36046457 ms=6463
+STORE_YARDSTICK at=read answer=5.103682 classes=43470 context=1.001478 context_classes=43470 foil=1.155772 question=0.154294 ms=10391
+STORE_READ_DONE reads=58 returns=0 pairs=3574536437 batches=60 peak_store=8565644186 ms=10391
+FIELD_CARD reads=58 read_ms=10016 returns=0 return_ms=0 pairs=3574536437 batches=60 peak_store=8565644186 landmarks=0 landmark_ms=0 elapsed_ms=10394
+MEASURE lap=read_B_mean rc=0 wall_s=10.9 peak_rss_kib=828736
+## state B_mean: write-store (one line a problem: its slice, its document's ordinal, the places written before a void; reads= is the sweep callback's count, one short of the release's reads, which FIELD_CARD gives)
+FIELD_CARD_OPEN card=NVIDIA GeForce RTX 4080 SUPER free=15705899008 total=16802250752 batch_budget=10714808320
+STORE_WRITE_LAW problems=80 documents=16 prompt=256 run=256 sweeps=256 refine=0 run_bound=0 near_tail=true place_order=false lengths=none one_end=false alphabet=244 void=99 ms=39
+STORE_WRITE slice=code problem=code_00 document=0 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=code problem=code_01 document=1 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=code problem=code_02 document=4 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=code problem=code_03 document=6 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=code problem=code_04 document=7 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=code problem=code_05 document=8 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=code problem=code_06 document=9 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=code problem=code_07 document=10 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=code problem=code_08 document=11 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=code problem=code_09 document=12 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=code problem=code_10 document=13 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=code problem=code_11 document=14 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=code problem=code_12 document=15 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=code problem=code_13 document=16 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=code problem=code_14 document=17 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=code problem=code_15 document=18 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=web problem=web_00 document=1 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=web problem=web_01 document=2 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=web problem=web_02 document=3 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=web problem=web_03 document=5 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=web problem=web_04 document=7 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=web problem=web_05 document=9 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=web problem=web_06 document=10 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=web problem=web_07 document=13 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=web problem=web_08 document=14 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=web problem=web_09 document=15 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=web problem=web_10 document=16 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=web problem=web_11 document=17 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=web problem=web_12 document=18 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=web problem=web_13 document=20 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=web problem=web_14 document=21 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=web problem=web_15 document=22 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=science problem=science_00 document=0 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=science problem=science_01 document=1 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=science problem=science_02 document=2 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=science problem=science_03 document=4 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=science problem=science_04 document=5 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=science problem=science_05 document=6 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=science problem=science_06 document=7 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=science problem=science_07 document=8 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=science problem=science_08 document=9 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=science problem=science_09 document=10 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=science problem=science_10 document=11 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=science problem=science_11 document=12 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=science problem=science_12 document=13 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=science problem=science_13 document=14 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=science problem=science_14 document=15 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=science problem=science_15 document=16 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=books problem=books_00 document=0 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=books problem=books_01 document=1 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=books problem=books_02 document=2 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=books problem=books_03 document=3 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=books problem=books_04 document=4 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=books problem=books_05 document=5 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=books problem=books_06 document=6 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=books problem=books_07 document=7 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=books problem=books_08 document=8 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=books problem=books_09 document=9 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=books problem=books_10 document=10 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=books problem=books_11 document=11 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=books problem=books_12 document=12 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=books problem=books_13 document=13 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=books problem=books_14 document=14 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=books problem=books_15 document=15 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=wikidata problem=wikidata_00 document=0 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=wikidata problem=wikidata_01 document=1 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=wikidata problem=wikidata_02 document=3 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=wikidata problem=wikidata_03 document=4 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=wikidata problem=wikidata_04 document=6 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=wikidata problem=wikidata_05 document=7 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=wikidata problem=wikidata_06 document=9 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=wikidata problem=wikidata_07 document=11 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=wikidata problem=wikidata_08 document=12 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=wikidata problem=wikidata_09 document=13 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=wikidata problem=wikidata_10 document=15 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=wikidata problem=wikidata_11 document=16 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=wikidata problem=wikidata_12 document=17 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=wikidata problem=wikidata_13 document=19 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=wikidata problem=wikidata_14 document=20 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=wikidata problem=wikidata_15 document=21 written_places=256 written_octets=256 reads=255
+STORE_WRITE_DONE problems=80 reads=255 reads=256 returns=0 pairs=20032082079 batches=256 peak_store=1715516480 ms=45535
+FIELD_CARD reads=256 read_ms=44510 returns=0 return_ms=0 pairs=20032082079 batches=256 peak_store=1715516480 landmarks=0 landmark_ms=0 elapsed_ms=45538
+MEASURE lap=write_B_mean rc=0 wall_s=45.9 peak_rss_kib=377236
+## state B_mean: the rulers on the write
+RULERS columns: slice text writes octets utf8_share balance_nats words words_found_share match_share
+RULERS_VOCABULARY slice=code extent=100000000 words=369101
+RULERS slice=code text=written writes=16 octets=4096 utf8_share=0.9915 balance_nats=0.1416 words=422 words_found_share=0.2583 match_share=0.0518
+RULERS slice=code text=reference writes=16 octets=4096 utf8_share=1.0000 balance_nats=0.1382 words=405 words_found_share=0.9235 match_share=1.0000
+RULERS slice=code text=foil writes=16 octets=4096 utf8_share=0.9963 balance_nats=0.0525 words=348 words_found_share=0.3649 match_share=0.0535
+RULERS_VOCABULARY slice=web extent=100000000 words=311579
+RULERS slice=web text=written writes=16 octets=4096 utf8_share=0.9951 balance_nats=0.1003 words=494 words_found_share=0.3583 match_share=0.0569
+RULERS slice=web text=reference writes=16 octets=4096 utf8_share=1.0000 balance_nats=0.0926 words=494 words_found_share=0.9717 match_share=1.0000
+RULERS slice=web text=foil writes=16 octets=4096 utf8_share=0.9944 balance_nats=0.0695 words=417 words_found_share=0.2638 match_share=0.0520
+RULERS_VOCABULARY slice=science extent=100000000 words=266748
+RULERS slice=science text=written writes=16 octets=4096 utf8_share=0.9878 balance_nats=0.1362 words=480 words_found_share=0.3604 match_share=0.0518
+RULERS slice=science text=reference writes=16 octets=4096 utf8_share=1.0000 balance_nats=0.0879 words=468 words_found_share=0.8889 match_share=1.0000
+RULERS slice=science text=foil writes=16 octets=4096 utf8_share=0.9868 balance_nats=0.0692 words=429 words_found_share=0.2494 match_share=0.0564
+RULERS_VOCABULARY slice=books extent=100000000 words=560251
+RULERS slice=books text=written writes=16 octets=4096 utf8_share=0.9907 balance_nats=0.2105 words=494 words_found_share=0.4453 match_share=0.0654
+RULERS slice=books text=reference writes=16 octets=4096 utf8_share=1.0000 balance_nats=0.1164 words=500 words_found_share=0.9660 match_share=1.0000
+RULERS slice=books text=foil writes=16 octets=4096 utf8_share=0.9895 balance_nats=0.0898 words=418 words_found_share=0.2895 match_share=0.0708
+RULERS_VOCABULARY slice=wikidata extent=100000000 words=133483
+RULERS slice=wikidata text=written writes=16 octets=4096 utf8_share=0.8994 balance_nats=0.1962 words=345 words_found_share=0.2290 match_share=0.0459
+RULERS slice=wikidata text=reference writes=16 octets=4096 utf8_share=0.9995 balance_nats=0.1298 words=430 words_found_share=0.7488 match_share=1.0000
+RULERS slice=wikidata text=foil writes=16 octets=4096 utf8_share=0.8271 balance_nats=0.0551 words=396 words_found_share=0.2096 match_share=0.0349
+## state C_state: read-store
+FIELD_CARD_OPEN card=NVIDIA GeForce RTX 4080 SUPER free=15657205760 total=16802250752 batch_budget=10666115072
+STORE_READ_LAW role=held least=4 octaves=7 pairs_bound=15606223 sites_bound=41490 sections=8 alphabet=244 void=99 ms=29
+STORE_READ slice=code n=0 regions=218 sites=41319 domain=23500 squared=14112483 open=13831 stretches=218 mask_whole_regions=48 mask_whole_places=2513 mask_whole_code=7615998750 mask_run_regions=52 mask_run_places=1920 mask_run_code=7310838399 writer_k0_regions=20 writer_k0_places=1391 writer_k0_code=7170430199 writer_k_regions=98 writer_k_places=8007 writer_k_code=41015021698 ms=182
+STORE_READ slice=code n=1 regions=169 sites=38748 domain=19992 squared=15415908 open=12978 stretches=387 mask_whole_regions=36 mask_whole_places=2250 mask_whole_code=7795916452 mask_run_regions=39 mask_run_places=1150 mask_run_code=3983281252 writer_k0_regions=21 writer_k0_places=1937 writer_k0_code=9216582971 writer_k_regions=73 writer_k_places=7641 writer_k_code=34678348435 ms=145
+STORE_READ slice=code n=2 regions=198 sites=41415 domain=23151 squared=14632095 open=12608 stretches=585 mask_whole_regions=47 mask_whole_places=4258 mask_whole_code=14892897617 mask_run_regions=40 mask_run_places=840 mask_run_code=2722732562 writer_k0_regions=20 writer_k0_places=680 writer_k0_code=3184776928 writer_k_regions=91 writer_k_places=6830 writer_k_code=32408027139 ms=158
+STORE_READ slice=code n=3 regions=180 sites=41422 domain=20935 squared=15504752 open=11555 stretches=765 mask_whole_regions=41 mask_whole_places=2479 mask_whole_code=7353092280 mask_run_regions=42 mask_run_places=1598 mask_run_code=4561758290 writer_k0_regions=19 writer_k0_places=509 writer_k0_code=2407046398 writer_k_regions=78 writer_k_places=6969 writer_k_code=33069901804 ms=153
+STORE_READ slice=code n=4 regions=197 sites=41185 domain=24119 squared=14688889 open=13919 stretches=962 mask_whole_regions=38 mask_whole_places=2560 mask_whole_code=9184159869 mask_run_regions=51 mask_run_places=2776 mask_run_code=11328773299 writer_k0_regions=24 writer_k0_places=1585 writer_k0_code=8530735672 writer_k_regions=84 writer_k_places=6998 writer_k_code=37174287378 ms=154
+STORE_READ slice=code n=5 regions=176 sites=41138 domain=30748 squared=15438568 open=15869 stretches=1138 mask_whole_regions=50 mask_whole_places=5414 mask_whole_code=22179399043 mask_run_regions=45 mask_run_places=3028 mask_run_code=12799077122 writer_k0_regions=19 writer_k0_places=760 writer_k0_code=4221641893 writer_k_regions=62 writer_k_places=6667 writer_k_code=36442141965 ms=160
+STORE_READ slice=code n=6 regions=202 sites=41479 domain=25094 squared=14185913 open=14411 stretches=1340 mask_whole_regions=48 mask_whole_places=3727 mask_whole_code=13101088202 mask_run_regions=46 mask_run_places=1702 mask_run_code=5459544625 writer_k0_regions=15 writer_k0_places=1141 writer_k0_code=6070279579 writer_k_regions=93 writer_k_places=7841 writer_k_code=40234876147 ms=155
+STORE_READ slice=code n=7 regions=204 sites=40995 domain=22855 squared=14315757 open=11685 stretches=1544 mask_whole_regions=62 mask_whole_places=4286 mask_whole_code=17234695133 mask_run_regions=36 mask_run_places=1390 mask_run_code=4223388876 writer_k0_regions=23 writer_k0_places=1056 writer_k0_code=5646274471 writer_k_regions=83 writer_k_places=4953 writer_k_code=26312315933 ms=155
+STORE_READ_SURPRISE slice=code places=106856 by_bit_length(count/code) b1=40/40 b2=8/19 b3=9/49 b4=8/80 b5=2/42 b6=4/186 b7=4/357 b8=10/1966 b9=23/9337 b10=65/50631 b11=131/204380 b12=303/918503 b13=533/3197896 b14=768/9213925 b15=1058/25463588 b16=1374/65806368 b17=1493/143323702 b18=1867/355210686 b19=2252/863164981 b20=3035/2353181948 b21=11664/18990469823 b22=19997/62709381136 b23=54139/314485317749 b24=8039/78922812047 b25=30/601600942 ms=1298
+STORE_READ_WRITER slice=code sections=8 stretches=1544 k0_by_octave(places/code) o0=161/574933413 o1=269/1327297480 o2=497/2653745532 o3=721/3779175442 o4=1029/5314139195 o5=1471/7709916125 o6=2077/10800597874 o7=1622/8145925268 o8=1212/6142037782 front_by_octave(count/code) o0=161/574933413 o1=186/633803504 o2=149/572417566 o3=129/515571603 o4=77/259023419 o5=53/161217334 o6=29/76805407 o7=27/92989312 o8=12/46297426 ms=1298
+STORE_READ slice=web n=0 regions=215 sites=40903 domain=23094 squared=13914883 open=13856 stretches=215 mask_whole_regions=48 mask_whole_places=2541 mask_whole_code=8993653655 mask_run_regions=51 mask_run_places=1742 mask_run_code=7369346721 writer_k0_regions=17 writer_k0_places=1022 writer_k0_code=5582795291 writer_k_regions=99 writer_k_places=8551 writer_k_code=44429637863 ms=146
+STORE_READ slice=web n=1 regions=177 sites=39418 domain=20772 squared=15366430 open=13323 stretches=392 mask_whole_regions=37 mask_whole_places=2369 mask_whole_code=7831365745 mask_run_regions=40 mask_run_places=1177 mask_run_code=3856588712 writer_k0_regions=23 writer_k0_places=1939 writer_k0_code=9778117063 writer_k_regions=77 writer_k_places=7838 writer_k_code=38762143452 ms=147
+STORE_READ slice=web n=2 regions=189 sites=41115 domain=23919 squared=15058937 open=13349 stretches=581 mask_whole_regions=44 mask_whole_places=4477 mask_whole_code=17111865859 mask_run_regions=40 mask_run_places=1015 mask_run_code=3618789928 writer_k0_regions=16 writer_k0_places=692 writer_k0_code=3697642058 writer_k_regions=89 writer_k_places=7165 writer_k_code=35262225680 ms=160
+STORE_READ slice=web n=3 regions=172 sites=40281 domain=19597 squared=15167991 open=10912 stretches=753 mask_whole_regions=40 mask_whole_places=2196 mask_whole_code=7049091095 mask_run_regions=37 mask_run_places=1492 mask_run_code=4817321290 writer_k0_regions=21 writer_k0_places=550 writer_k0_code=2673664513 writer_k_regions=74 writer_k_places=6674 writer_k_code=33743260107 ms=147
+STORE_READ slice=web n=4 regions=185 sites=40972 domain=23936 squared=15199434 open=13565 stretches=938 mask_whole_regions=36 mask_whole_places=2471 mask_whole_code=9915122934 mask_run_regions=51 mask_run_places=3065 mask_run_code=13751381708 writer_k0_regions=17 writer_k0_places=966 writer_k0_code=5483431396 writer_k_regions=81 writer_k_places=7063 writer_k_code=37363979123 ms=150
+STORE_READ slice=web n=5 regions=163 sites=40317 domain=31312 squared=15574137 open=15651 stretches=1101 mask_whole_regions=47 mask_whole_places=5113 mask_whole_code=20303531479 mask_run_regions=38 mask_run_places=3484 mask_run_code=14498436959 writer_k0_regions=22 writer_k0_places=1719 writer_k0_code=9257326695 writer_k_regions=56 writer_k_places=5335 writer_k_code=27371730572 ms=157
+STORE_READ slice=web n=6 regions=206 sites=41307 domain=24556 squared=13817399 open=13566 stretches=1307 mask_whole_regions=49 mask_whole_places=4337 mask_whole_code=16961184317 mask_run_regions=50 mask_run_places=1317 mask_run_code=4495940334 writer_k0_regions=16 writer_k0_places=748 writer_k0_code=3885345628 writer_k_regions=91 writer_k_places=7164 writer_k_code=35787539899 ms=151
+STORE_READ slice=web n=7 regions=206 sites=41304 domain=23680 squared=14499132 open=12369 stretches=1513 mask_whole_regions=62 mask_whole_places=3979 mask_whole_code=15757662340 mask_run_regions=39 mask_run_places=1761 mask_run_code=6663492943 writer_k0_regions=23 writer_k0_places=925 writer_k0_code=4663520627 writer_k_regions=82 writer_k_places=5704 writer_k_code=27791237973 ms=154
+STORE_READ_SURPRISE slice=web places=106591 by_bit_length(count/code) b1=25/25 b2=5/11 b3=6/33 b4=1/8 b5=1/20 b6=1/58 b7=2/200 b8=4/765 b9=5/1935 b10=17/13649 b11=42/64241 b12=78/239309 b13=178/1082628 b14=284/3455427 b15=441/10633392 b16=633/30049250 b17=823/78963148 b18=1230/234333963 b19=1668/645703248 b20=2444/1899633561 b21=5243/8379011988 b22=32072/104811944708 b23=53645/295781115945 b24=7718/76193016757 b25=25/459109690 ms=2518
+STORE_READ_WRITER slice=web sections=8 stretches=1513 k0_by_octave(places/code) o0=155/543606627 o1=264/1338360711 o2=490/2477451390 o3=719/3767900734 o4=1020/5178919370 o5=1410/7599146651 o6=1806/9453739725 o7=1547/8388820609 o8=1150/6273897454 front_by_octave(count/code) o0=155/543606627 o1=181/699474707 o2=147/552618759 o3=123/404042795 o4=76/294043872 o5=48/171454767 o6=32/109809475 o7=28/92672253 o8=14/49197748 ms=2518
+STORE_READ slice=science n=0 regions=215 sites=41091 domain=23004 squared=14198079 open=13761 stretches=215 mask_whole_regions=48 mask_whole_places=2509 mask_whole_code=8284551188 mask_run_regions=51 mask_run_places=1805 mask_run_code=6652988902 writer_k0_regions=17 writer_k0_places=1034 writer_k0_code=5237126409 writer_k_regions=99 writer_k_places=8413 writer_k_code=41358909174 ms=152
+STORE_READ slice=science n=1 regions=161 sites=37445 domain=19419 squared=15522835 open=12721 stretches=376 mask_whole_regions=32 mask_whole_places=2081 mask_whole_code=7766563001 mask_run_regions=39 mask_run_places=1034 mask_run_code=4014072335 writer_k0_regions=21 writer_k0_places=1549 writer_k0_code=7805941487 writer_k_regions=69 writer_k_places=8057 writer_k_code=41756005280 ms=141
+STORE_READ slice=science n=2 regions=184 sites=41115 domain=24441 squared=14930409 open=13565 stretches=560 mask_whole_regions=46 mask_whole_places=4489 mask_whole_code=19510850848 mask_run_regions=36 mask_run_places=1213 mask_run_code=5163294510 writer_k0_regions=15 writer_k0_places=925 writer_k0_code=5081058428 writer_k_regions=87 writer_k_places=6938 writer_k_code=38932552463 ms=154
+STORE_READ slice=science n=3 regions=180 sites=41124 domain=20131 squared=15392062 open=11058 stretches=740 mask_whole_regions=42 mask_whole_places=2595 mask_whole_code=9673575490 mask_run_regions=35 mask_run_places=1228 mask_run_code=4553824152 writer_k0_regions=22 writer_k0_places=611 writer_k0_code=3321397092 writer_k_regions=81 writer_k_places=6624 writer_k_code=34913282512 ms=154
+STORE_READ slice=science n=4 regions=186 sites=41449 domain=23229 squared=15153803 open=12891 stretches=926 mask_whole_regions=37 mask_whole_places=2493 mask_whole_code=10587273735 mask_run_regions=53 mask_run_places=2766 mask_run_code=12056588395 writer_k0_regions=15 writer_k0_places=883 writer_k0_code=4454780192 writer_k_regions=81 writer_k_places=6749 writer_k_code=36391744048 ms=159
+STORE_READ slice=science n=5 regions=151 sites=38671 domain=30640 squared=15487121 open=15016 stretches=1077 mask_whole_regions=40 mask_whole_places=4763 mask_whole_code=18600839049 mask_run_regions=40 mask_run_places=4061 mask_run_code=16973148391 writer_k0_regions=19 writer_k0_places=1368 writer_k0_code=7233697712 writer_k_regions=52 writer_k_places=4824 writer_k_code=25827321764 ms=160
+STORE_READ slice=science n=6 regions=187 sites=41260 domain=22711 squared=14959972 open=13285 stretches=1264 mask_whole_regions=47 mask_whole_places=4009 mask_whole_code=15795752550 mask_run_regions=39 mask_run_places=694 mask_run_code=2400671621 writer_k0_regions=14 writer_k0_places=960 writer_k0_code=4869069361 writer_k_regions=87 writer_k_places=7622 writer_k_code=39466405403 ms=161
+STORE_READ slice=science n=7 regions=198 sites=41478 domain=24095 squared=15041902 open=12801 stretches=1462 mask_whole_regions=56 mask_whole_places=3086 mask_whole_code=12748659462 mask_run_regions=49 mask_run_places=2387 mask_run_code=9421220138 writer_k0_regions=14 writer_k0_places=886 writer_k0_code=4573061564 writer_k_regions=79 writer_k_places=6442 writer_k_code=34376965509 ms=161
+STORE_READ_SURPRISE slice=science places=105098 by_bit_length(count/code) b7=1/115 b8=2/402 b9=2/714 b10=6/5114 b11=25/39865 b12=63/184864 b13=115/692002 b14=187/2268978 b15=377/9098039 b16=529/25880329 b17=677/65146660 b18=985/188668653 b19=1360/527748249 b20=2175/1680714585 b21=4375/6957447461 b22=30580/101360289934 b23=55123/304401703956 b24=8462/83543809715 b25=54/1039492530 ms=3768
+STORE_READ_WRITER slice=science sections=8 stretches=1462 k0_by_octave(places/code) o0=137/474492263 o1=252/1224050421 o2=468/2443788244 o3=676/3625194651 o4=942/4944254943 o5=1327/6940793067 o6=1773/9586536093 o7=1559/8058439529 o8=1082/5278583034 front_by_octave(count/code) o0=137/474492263 o1=183/770760260 o2=140/539477032 o3=116/483645024 o4=75/258299117 o5=48/180067998 o6=31/132665255 o7=28/81613288 o8=14/29912194 ms=3768
+STORE_READ slice=books n=0 regions=204 sites=41419 domain=23840 squared=15181617 open=14636 stretches=204 mask_whole_regions=46 mask_whole_places=2417 mask_whole_code=7729425401 mask_run_regions=49 mask_run_places=1800 mask_run_code=6454813888 writer_k0_regions=11 writer_k0_places=1389 writer_k0_code=6592988684 writer_k_regions=98 writer_k_places=9030 writer_k_code=42220746742 ms=155
+STORE_READ slice=books n=1 regions=169 sites=38838 domain=19959 squared=15382036 open=12991 stretches=373 mask_whole_regions=34 mask_whole_places=2222 mask_whole_code=8702440848 mask_run_regions=39 mask_run_places=1014 mask_run_code=4080918895 writer_k0_regions=24 writer_k0_places=1899 writer_k0_code=9736067336 writer_k_regions=72 writer_k_places=7856 writer_k_code=39399103392 ms=144
+STORE_READ slice=books n=2 regions=185 sites=41478 domain=24478 squared=15225738 open=13655 stretches=558 mask_whole_regions=45 mask_whole_places=4450 mask_whole_code=17162280992 mask_run_regions=38 mask_run_places=1239 mask_run_code=4750075060 writer_k0_regions=14 writer_k0_places=672 writer_k0_code=3128167546 writer_k_regions=88 writer_k_places=7294 writer_k_code=34178305807 ms=152
+STORE_READ slice=books n=3 regions=174 sites=41283 domain=20452 squared=15559913 open=11268 stretches=732 mask_whole_regions=43 mask_whole_places=2634 mask_whole_code=8798655397 mask_run_regions=33 mask_run_places=1227 mask_run_code=3808125749 writer_k0_regions=17 writer_k0_places=606 writer_k0_code=3149483324 writer_k_regions=81 writer_k_places=6801 writer_k_code=31930140976 ms=151
+STORE_READ slice=books n=4 regions=183 sites=40951 domain=22280 squared=15381367 open=12835 stretches=915 mask_whole_regions=33 mask_whole_places=2066 mask_whole_code=7247346951 mask_run_regions=52 mask_run_places=2626 mask_run_code=9654196689 writer_k0_regions=14 writer_k0_places=351 writer_k0_code=1688386421 writer_k_regions=84 writer_k_places=7792 writer_k_code=36657808168 ms=153
+STORE_READ slice=books n=5 regions=150 sites=38631 domain=31517 squared=15514943 open=15399 stretches=1065 mask_whole_regions=41 mask_whole_places=4986 mask_whole_code=18452929568 mask_run_regions=41 mask_run_places=4201 mask_run_code=16347221566 writer_k0_regions=20 writer_k0_places=1855 writer_k0_code=8748994775 writer_k_regions=48 writer_k_places=4357 writer_k_code=20419373441 ms=153
+STORE_READ slice=books n=6 regions=183 sites=41369 domain=22821 squared=15170877 open=13282 stretches=1248 mask_whole_regions=46 mask_whole_places=4093 mask_whole_code=14636595809 mask_run_regions=38 mask_run_places=695 mask_run_code=2401636472 writer_k0_regions=13 writer_k0_places=940 writer_k0_code=4448142131 writer_k_regions=86 writer_k_places=7554 writer_k_code=35028673989 ms=158
+STORE_READ slice=books n=7 regions=196 sites=41194 domain=24077 squared=14970988 open=13270 stretches=1444 mask_whole_regions=55 mask_whole_places=3272 mask_whole_code=11614823062 mask_run_regions=47 mask_run_places=2074 mask_run_code=7735308597 writer_k0_regions=13 writer_k0_places=887 writer_k0_code=4274312722 writer_k_regions=81 writer_k_places=7037 writer_k_code=32543521905 ms=154
+STORE_READ_SURPRISE slice=books places=107336 by_bit_length(count/code) b1=1/1 b2=2/4 b8=1/166 b9=9/3084 b10=19/14328 b11=41/63997 b12=97/304800 b13=189/1171075 b14=288/3501879 b15=443/10672795 b16=558/27053161 b17=762/73169256 b18=1052/202604148 b19=1459/564672989 b20=2425/1889973011 b21=4697/7506386140 b22=38483/126752721957 b23=51731/274892204915 b24=5054/51333994013 b25=25/462500584 ms=4997
+STORE_READ_WRITER slice=books sections=8 stretches=1444 k0_by_octave(places/code) o0=126/487108610 o1=246/1063773483 o2=458/2217275486 o3=671/3205695317 o4=942/4615199006 o5=1344/6591717361 o6=1837/9037772739 o7=1689/8324290236 o8=1286/6223710701 front_by_octave(count/code) o0=126/487108610 o1=183/630161778 o2=138/464942360 o3=122/463934650 o4=73/241565213 o5=49/163529350 o6=31/130418530 o7=28/97911111 o8=14/36172047 ms=4997
+STORE_READ slice=wikidata n=0 regions=216 sites=41450 domain=23391 squared=14455448 open=14170 stretches=216 mask_whole_regions=48 mask_whole_places=2434 mask_whole_code=9899299264 mask_run_regions=52 mask_run_places=1727 mask_run_code=7805446941 writer_k0_regions=16 writer_k0_places=1025 writer_k0_code=5603834221 writer_k_regions=100 writer_k_places=8984 writer_k_code=50234619824 ms=159
+STORE_READ slice=wikidata n=1 regions=161 sites=37652 domain=19323 squared=15503140 open=13070 stretches=377 mask_whole_regions=32 mask_whole_places=1816 mask_whole_code=9620327937 mask_run_regions=39 mask_run_places=1150 mask_run_code=4908934401 writer_k0_regions=19 writer_k0_places=1865 writer_k0_code=12907219173 writer_k_regions=71 writer_k_places=8239 writer_k_code=48389067566 ms=141
+STORE_READ slice=wikidata n=2 regions=193 sites=41206 domain=24619 squared=14615808 open=13451 stretches=570 mask_whole_regions=49 mask_whole_places=4729 mask_whole_code=20791482426 mask_run_regions=37 mask_run_places=1003 mask_run_code=4061221630 writer_k0_regions=17 writer_k0_places=552 writer_k0_code=3025106054 writer_k_regions=90 writer_k_places=7167 writer_k_code=38255853388 ms=153
+STORE_READ slice=wikidata n=3 regions=166 sites=40425 domain=19646 squared=15465787 open=11400 stretches=736 mask_whole_regions=39 mask_whole_places=2187 mask_whole_code=10056500403 mask_run_regions=32 mask_run_places=1222 mask_run_code=4889337855 writer_k0_regions=17 writer_k0_places=606 writer_k0_code=3420235430 writer_k_regions=78 writer_k_places=7385 writer_k_code=42696550958 ms=152
+STORE_READ slice=wikidata n=4 regions=192 sites=41483 domain=22976 squared=15130237 open=12615 stretches=928 mask_whole_regions=37 mask_whole_places=2493 mask_whole_code=11003498810 mask_run_regions=56 mask_run_places=2782 mask_run_code=13029891750 writer_k0_regions=15 writer_k0_places=403 writer_k0_code=2147202965 writer_k_regions=84 writer_k_places=6937 writer_k_code=39563782147 ms=156
+STORE_READ slice=wikidata n=5 regions=153 sites=39014 domain=30835 squared=15600402 open=15592 stretches=1081 mask_whole_regions=41 mask_whole_places=4620 mask_whole_code=19902992610 mask_run_regions=38 mask_run_places=4026 mask_run_code=18125452716 writer_k0_regions=20 writer_k0_places=1369 writer_k0_code=7739815746 writer_k_regions=54 writer_k_places=5577 writer_k_code=32169739526 ms=157
+STORE_READ slice=wikidata n=6 regions=202 sites=41468 domain=22967 squared=14142954 open=12556 stretches=1283 mask_whole_regions=49 mask_whole_places=4154 mask_whole_code=18223143532 mask_run_regions=46 mask_run_places=959 mask_run_code=3845990789 writer_k0_regions=20 writer_k0_places=1252 writer_k0_code=7072632381 writer_k_regions=87 writer_k_places=6191 writer_k_code=35583344652 ms=159
+STORE_READ slice=wikidata n=7 regions=202 sites=41442 domain=24756 squared=14793580 open=12859 stretches=1485 mask_whole_regions=60 mask_whole_places=4148 mask_whole_code=18358624991 mask_run_regions=44 mask_run_places=1972 mask_run_code=7480680795 writer_k0_regions=18 writer_k0_places=1100 writer_k0_code=6183466238 writer_k_regions=80 writer_k_places=5639 writer_k_code=31615278300 ms=156
+STORE_READ_SURPRISE slice=wikidata places=105713 by_bit_length(count/code) b1=11/11 b2=5/12 b3=2/10 b4=4/47 b5=2/51 b6=3/119 b7=2/199 b8=3/575 b9=2/837 b10=5/3613 b11=11/17175 b12=24/74611 b13=79/507188 b14=144/1744866 b15=284/7138473 b16=576/27938920 b17=865/83189406 b18=1119/216253233 b19=1410/539502826 b20=1818/1408094779 b21=3539/5739975045 b22=26683/91459465603 b23=57956/334997803272 b24=11139/113646736037 b25=27/482128511 ms=6235
+STORE_READ_WRITER slice=wikidata sections=8 stretches=1485 k0_by_octave(places/code) o0=142/662427856 o1=258/1293843133 o2=482/2733565669 o3=702/4171053415 o4=974/5910322049 o5=1369/7877099131 o6=1827/10731230658 o7=1500/8840881186 o8=918/5879089111 front_by_octave(count/code) o0=142/662427856 o1=186/775430461 o2=138/644407304 o3=124/498217610 o4=78/313785896 o5=52/232928003 o6=29/114486270 o7=25/99086251 o8=12/30858481 ms=6235
+STORE_YARDSTICK at=read answer=5.180604 classes=43470 context=1.070509 context_classes=43470 foil=1.223524 question=0.153015 ms=10024
+STORE_READ_DONE reads=58 returns=0 pairs=3599716338 batches=60 peak_store=8423184452 ms=10024
+FIELD_CARD reads=58 read_ms=9663 returns=0 return_ms=0 pairs=3599716338 batches=60 peak_store=8423184452 landmarks=0 landmark_ms=0 elapsed_ms=10025
+MEASURE lap=read_C_state rc=0 wall_s=10.5 peak_rss_kib=831440
+## state C_state: write-store (one line a problem: its slice, its document's ordinal, the places written before a void; reads= is the sweep callback's count, one short of the release's reads, which FIELD_CARD gives)
+FIELD_CARD_OPEN card=NVIDIA GeForce RTX 4080 SUPER free=15657336832 total=16802250752 batch_budget=10666246144
+STORE_WRITE_LAW problems=80 documents=16 prompt=256 run=256 sweeps=256 refine=0 run_bound=0 near_tail=true place_order=false lengths=none one_end=false alphabet=244 void=99 ms=37
+STORE_WRITE slice=code problem=code_00 document=0 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=code problem=code_01 document=1 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=code problem=code_02 document=4 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=code problem=code_03 document=6 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=code problem=code_04 document=7 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=code problem=code_05 document=8 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=code problem=code_06 document=9 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=code problem=code_07 document=10 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=code problem=code_08 document=11 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=code problem=code_09 document=12 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=code problem=code_10 document=13 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=code problem=code_11 document=14 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=code problem=code_12 document=15 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=code problem=code_13 document=16 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=code problem=code_14 document=17 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=code problem=code_15 document=18 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=web problem=web_00 document=1 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=web problem=web_01 document=2 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=web problem=web_02 document=3 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=web problem=web_03 document=5 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=web problem=web_04 document=7 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=web problem=web_05 document=9 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=web problem=web_06 document=10 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=web problem=web_07 document=13 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=web problem=web_08 document=14 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=web problem=web_09 document=15 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=web problem=web_10 document=16 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=web problem=web_11 document=17 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=web problem=web_12 document=18 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=web problem=web_13 document=20 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=web problem=web_14 document=21 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=web problem=web_15 document=22 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=science problem=science_00 document=0 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=science problem=science_01 document=1 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=science problem=science_02 document=2 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=science problem=science_03 document=4 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=science problem=science_04 document=5 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=science problem=science_05 document=6 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=science problem=science_06 document=7 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=science problem=science_07 document=8 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=science problem=science_08 document=9 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=science problem=science_09 document=10 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=science problem=science_10 document=11 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=science problem=science_11 document=12 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=science problem=science_12 document=13 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=science problem=science_13 document=14 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=science problem=science_14 document=15 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=science problem=science_15 document=16 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=books problem=books_00 document=0 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=books problem=books_01 document=1 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=books problem=books_02 document=2 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=books problem=books_03 document=3 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=books problem=books_04 document=4 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=books problem=books_05 document=5 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=books problem=books_06 document=6 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=books problem=books_07 document=7 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=books problem=books_08 document=8 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=books problem=books_09 document=9 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=books problem=books_10 document=10 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=books problem=books_11 document=11 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=books problem=books_12 document=12 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=books problem=books_13 document=13 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=books problem=books_14 document=14 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=books problem=books_15 document=15 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=wikidata problem=wikidata_00 document=0 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=wikidata problem=wikidata_01 document=1 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=wikidata problem=wikidata_02 document=3 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=wikidata problem=wikidata_03 document=4 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=wikidata problem=wikidata_04 document=6 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=wikidata problem=wikidata_05 document=7 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=wikidata problem=wikidata_06 document=9 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=wikidata problem=wikidata_07 document=11 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=wikidata problem=wikidata_08 document=12 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=wikidata problem=wikidata_09 document=13 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=wikidata problem=wikidata_10 document=15 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=wikidata problem=wikidata_11 document=16 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=wikidata problem=wikidata_12 document=17 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=wikidata problem=wikidata_13 document=19 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=wikidata problem=wikidata_14 document=20 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=wikidata problem=wikidata_15 document=21 written_places=256 written_octets=256 reads=255
+STORE_WRITE_DONE problems=80 reads=255 reads=256 returns=0 pairs=20134860463 batches=256 peak_store=1715516480 ms=44605
+FIELD_CARD reads=256 read_ms=43608 returns=0 return_ms=0 pairs=20134860463 batches=256 peak_store=1715516480 landmarks=0 landmark_ms=0 elapsed_ms=44608
+MEASURE lap=write_C_state rc=0 wall_s=45.0 peak_rss_kib=377080
+## state C_state: the rulers on the write
+RULERS columns: slice text writes octets utf8_share balance_nats words words_found_share match_share
+RULERS_VOCABULARY slice=code extent=100000000 words=369101
+RULERS slice=code text=written writes=16 octets=4096 utf8_share=0.9976 balance_nats=0.1050 words=392 words_found_share=0.2985 match_share=0.0605
+RULERS slice=code text=reference writes=16 octets=4096 utf8_share=1.0000 balance_nats=0.1382 words=405 words_found_share=0.9235 match_share=1.0000
+RULERS slice=code text=foil writes=16 octets=4096 utf8_share=0.9963 balance_nats=0.0525 words=348 words_found_share=0.3649 match_share=0.0535
+RULERS_VOCABULARY slice=web extent=100000000 words=311579
+RULERS slice=web text=written writes=16 octets=4096 utf8_share=0.9944 balance_nats=0.0969 words=443 words_found_share=0.3115 match_share=0.0586
+RULERS slice=web text=reference writes=16 octets=4096 utf8_share=1.0000 balance_nats=0.0926 words=494 words_found_share=0.9717 match_share=1.0000
+RULERS slice=web text=foil writes=16 octets=4096 utf8_share=0.9944 balance_nats=0.0695 words=417 words_found_share=0.2638 match_share=0.0520
+RULERS_VOCABULARY slice=science extent=100000000 words=266748
+RULERS slice=science text=written writes=16 octets=4096 utf8_share=0.9641 balance_nats=0.3453 words=382 words_found_share=0.3115 match_share=0.0449
+RULERS slice=science text=reference writes=16 octets=4096 utf8_share=1.0000 balance_nats=0.0879 words=468 words_found_share=0.8889 match_share=1.0000
+RULERS slice=science text=foil writes=16 octets=4096 utf8_share=0.9868 balance_nats=0.0692 words=429 words_found_share=0.2494 match_share=0.0564
+RULERS_VOCABULARY slice=books extent=100000000 words=560251
+RULERS slice=books text=written writes=16 octets=4096 utf8_share=0.9927 balance_nats=0.2425 words=468 words_found_share=0.4466 match_share=0.0632
+RULERS slice=books text=reference writes=16 octets=4096 utf8_share=1.0000 balance_nats=0.1164 words=500 words_found_share=0.9660 match_share=1.0000
+RULERS slice=books text=foil writes=16 octets=4096 utf8_share=0.9895 balance_nats=0.0898 words=418 words_found_share=0.2895 match_share=0.0708
+RULERS_VOCABULARY slice=wikidata extent=100000000 words=133483
+RULERS slice=wikidata text=written writes=16 octets=4096 utf8_share=0.8818 balance_nats=0.1424 words=357 words_found_share=0.3081 match_share=0.0549
+RULERS slice=wikidata text=reference writes=16 octets=4096 utf8_share=0.9995 balance_nats=0.1298 words=430 words_found_share=0.7488 match_share=1.0000
+RULERS slice=wikidata text=foil writes=16 octets=4096 utf8_share=0.8271 balance_nats=0.0551 words=396 words_found_share=0.2096 match_share=0.0349
+## state C_mean: read-store
+FIELD_CARD_OPEN card=NVIDIA GeForce RTX 4080 SUPER free=15661596672 total=16802250752 batch_budget=10670505984
+STORE_READ_LAW role=held least=4 octaves=7 pairs_bound=15606223 sites_bound=41490 sections=8 alphabet=244 void=99 ms=29
+STORE_READ slice=code n=0 regions=218 sites=41319 domain=23500 squared=14112483 open=13831 stretches=218 mask_whole_regions=48 mask_whole_places=2513 mask_whole_code=7586876312 mask_run_regions=52 mask_run_places=1920 mask_run_code=7312678743 writer_k0_regions=20 writer_k0_places=1391 writer_k0_code=7124967814 writer_k_regions=98 writer_k_places=8007 writer_k_code=40893142122 ms=178
+STORE_READ slice=code n=1 regions=169 sites=38748 domain=19992 squared=15415908 open=12978 stretches=387 mask_whole_regions=36 mask_whole_places=2250 mask_whole_code=7796801336 mask_run_regions=39 mask_run_places=1150 mask_run_code=3993675248 writer_k0_regions=21 writer_k0_places=1937 writer_k0_code=9206076853 writer_k_regions=73 writer_k_places=7641 writer_k_code=34629259710 ms=147
+STORE_READ slice=code n=2 regions=198 sites=41415 domain=23151 squared=14632095 open=12608 stretches=585 mask_whole_regions=47 mask_whole_places=4258 mask_whole_code=14844044962 mask_run_regions=40 mask_run_places=840 mask_run_code=2728893669 writer_k0_regions=20 writer_k0_places=680 writer_k0_code=3167428367 writer_k_regions=91 writer_k_places=6830 writer_k_code=32296274137 ms=155
+STORE_READ slice=code n=3 regions=180 sites=41422 domain=20935 squared=15504752 open=11555 stretches=765 mask_whole_regions=41 mask_whole_places=2479 mask_whole_code=7338384010 mask_run_regions=42 mask_run_places=1598 mask_run_code=4564337740 writer_k0_regions=19 writer_k0_places=509 writer_k0_code=2400125833 writer_k_regions=78 writer_k_places=6969 writer_k_code=32936078790 ms=155
+STORE_READ slice=code n=4 regions=197 sites=41185 domain=24119 squared=14688889 open=13919 stretches=962 mask_whole_regions=38 mask_whole_places=2560 mask_whole_code=9189089286 mask_run_regions=51 mask_run_places=2776 mask_run_code=11297360230 writer_k0_regions=24 writer_k0_places=1585 writer_k0_code=8512880984 writer_k_regions=84 writer_k_places=6998 writer_k_code=37057533655 ms=155
+STORE_READ slice=code n=5 regions=176 sites=41138 domain=30748 squared=15438568 open=15869 stretches=1138 mask_whole_regions=50 mask_whole_places=5414 mask_whole_code=22127403620 mask_run_regions=45 mask_run_places=3028 mask_run_code=12752856926 writer_k0_regions=19 writer_k0_places=760 writer_k0_code=4221264578 writer_k_regions=62 writer_k_places=6667 writer_k_code=36425062424 ms=159
+STORE_READ slice=code n=6 regions=202 sites=41479 domain=25094 squared=14185913 open=14411 stretches=1340 mask_whole_regions=48 mask_whole_places=3727 mask_whole_code=13094872483 mask_run_regions=46 mask_run_places=1702 mask_run_code=5437447379 writer_k0_regions=15 writer_k0_places=1141 writer_k0_code=6043235253 writer_k_regions=93 writer_k_places=7841 writer_k_code=40121153454 ms=150
+STORE_READ slice=code n=7 regions=204 sites=40995 domain=22855 squared=14315757 open=11685 stretches=1544 mask_whole_regions=62 mask_whole_places=4286 mask_whole_code=17191922995 mask_run_regions=36 mask_run_places=1390 mask_run_code=4215457069 writer_k0_regions=23 writer_k0_places=1056 writer_k0_code=5639057839 writer_k_regions=83 writer_k_places=4953 writer_k_code=26272911445 ms=155
+STORE_READ_SURPRISE slice=code places=106856 by_bit_length(count/code) b1=35/35 b2=10/24 b3=6/31 b4=9/101 b5=5/106 b6=6/287 b7=4/392 b8=8/1697 b9=36/14417 b10=54/41330 b11=174/274246 b12=347/1059783 b13=552/3298905 b14=804/9632818 b15=988/23617675 b16=1377/65454205 b17=1481/140932863 b18=1748/332116809 b19=2189/838264608 b20=2978/2321647666 b21=11695/19204346005 b22=20794/65816728446 b23=53465/309931501995 b24=8063/79174810745 b25=28/554810077 ms=1291
+STORE_READ_WRITER slice=code sections=8 stretches=1544 k0_by_octave(places/code) o0=161/575330996 o1=269/1327246779 o2=497/2646204623 o3=721/3772979272 o4=1029/5300610051 o5=1471/7687896588 o6=2077/10775117991 o7=1622/8126410509 o8=1212/6103240712 front_by_octave(count/code) o0=161/575330996 o1=186/638259237 o2=149/568585250 o3=129/514596868 o4=77/254451610 o5=53/161942443 o6=29/73922823 o7=27/91698391 o8=12/48728511 ms=1291
+STORE_READ slice=web n=0 regions=215 sites=40903 domain=23094 squared=13914883 open=13856 stretches=215 mask_whole_regions=48 mask_whole_places=2541 mask_whole_code=8949779928 mask_run_regions=51 mask_run_places=1742 mask_run_code=7339075284 writer_k0_regions=17 writer_k0_places=1022 writer_k0_code=5570990953 writer_k_regions=99 writer_k_places=8551 writer_k_code=44351114127 ms=152
+STORE_READ slice=web n=1 regions=177 sites=39418 domain=20772 squared=15366430 open=13323 stretches=392 mask_whole_regions=37 mask_whole_places=2369 mask_whole_code=7829126737 mask_run_regions=40 mask_run_places=1177 mask_run_code=3881845853 writer_k0_regions=23 writer_k0_places=1939 writer_k0_code=9814791627 writer_k_regions=77 writer_k_places=7838 writer_k_code=38651007642 ms=151
+STORE_READ slice=web n=2 regions=189 sites=41115 domain=23919 squared=15058937 open=13349 stretches=581 mask_whole_regions=44 mask_whole_places=4477 mask_whole_code=17069448940 mask_run_regions=40 mask_run_places=1015 mask_run_code=3596189706 writer_k0_regions=16 writer_k0_places=692 writer_k0_code=3688203801 writer_k_regions=89 writer_k_places=7165 writer_k_code=35184291066 ms=155
+STORE_READ slice=web n=3 regions=172 sites=40281 domain=19597 squared=15167991 open=10912 stretches=753 mask_whole_regions=40 mask_whole_places=2196 mask_whole_code=7021220095 mask_run_regions=37 mask_run_places=1492 mask_run_code=4798089547 writer_k0_regions=21 writer_k0_places=550 writer_k0_code=2666579919 writer_k_regions=74 writer_k_places=6674 writer_k_code=33704576966 ms=156
+STORE_READ slice=web n=4 regions=185 sites=40972 domain=23936 squared=15199434 open=13565 stretches=938 mask_whole_regions=36 mask_whole_places=2471 mask_whole_code=9961552126 mask_run_regions=51 mask_run_places=3065 mask_run_code=13745388800 writer_k0_regions=17 writer_k0_places=966 writer_k0_code=5491441894 writer_k_regions=81 writer_k_places=7063 writer_k_code=37356499584 ms=154
+STORE_READ slice=web n=5 regions=163 sites=40317 domain=31312 squared=15574137 open=15651 stretches=1101 mask_whole_regions=47 mask_whole_places=5113 mask_whole_code=20276145054 mask_run_regions=38 mask_run_places=3484 mask_run_code=14503647772 writer_k0_regions=22 writer_k0_places=1719 writer_k0_code=9271814161 writer_k_regions=56 writer_k_places=5335 writer_k_code=27325669742 ms=159
+STORE_READ slice=web n=6 regions=206 sites=41307 domain=24556 squared=13817399 open=13566 stretches=1307 mask_whole_regions=49 mask_whole_places=4337 mask_whole_code=16943375022 mask_run_regions=50 mask_run_places=1317 mask_run_code=4480419606 writer_k0_regions=16 writer_k0_places=748 writer_k0_code=3882177547 writer_k_regions=91 writer_k_places=7164 writer_k_code=35755490551 ms=151
+STORE_READ slice=web n=7 regions=206 sites=41304 domain=23680 squared=14499132 open=12369 stretches=1513 mask_whole_regions=62 mask_whole_places=3979 mask_whole_code=15731466927 mask_run_regions=39 mask_run_places=1761 mask_run_code=6622218900 writer_k0_regions=23 writer_k0_places=925 writer_k0_code=4642466784 writer_k_regions=82 writer_k_places=5704 writer_k_code=27697348906 ms=151
+STORE_READ_SURPRISE slice=web places=106591 by_bit_length(count/code) b1=23/23 b2=6/14 b3=6/39 b4=2/22 b6=2/87 b8=3/663 b9=8/3022 b10=17/12294 b11=42/65453 b12=88/272262 b13=180/1086769 b14=276/3384801 b15=403/9772019 b16=631/30637242 b17=873/84181763 b18=1159/223977753 b19=1655/635376732 b20=2475/1925884548 b21=5282/8500436196 b22=31950/103601799359 b23=53610/294488515300 b24=7881/77950110536 b25=19/347938670 ms=2529
+STORE_READ_WRITER slice=web sections=8 stretches=1513 k0_by_octave(places/code) o0=155/541496895 o1=264/1336294344 o2=490/2466210935 o3=719/3782009772 o4=1020/5207701697 o5=1410/7615537565 o6=1806/9439363611 o7=1547/8387342314 o8=1150/6252509553 front_by_octave(count/code) o0=155/541496895 o1=181/701518060 o2=147/555409886 o3=123/403456693 o4=76/295731711 o5=48/173521702 o6=32/110503371 o7=28/90442364 o8=14/50274218 ms=2529
+STORE_READ slice=science n=0 regions=215 sites=41091 domain=23004 squared=14198079 open=13761 stretches=215 mask_whole_regions=48 mask_whole_places=2509 mask_whole_code=8273605505 mask_run_regions=51 mask_run_places=1805 mask_run_code=6624097495 writer_k0_regions=17 writer_k0_places=1034 writer_k0_code=5240913704 writer_k_regions=99 writer_k_places=8413 writer_k_code=41309634024 ms=149
+STORE_READ slice=science n=1 regions=161 sites=37445 domain=19419 squared=15522835 open=12721 stretches=376 mask_whole_regions=32 mask_whole_places=2081 mask_whole_code=7781665716 mask_run_regions=39 mask_run_places=1034 mask_run_code=4037817094 writer_k0_regions=21 writer_k0_places=1549 writer_k0_code=7764052277 writer_k_regions=69 writer_k_places=8057 writer_k_code=41743597915 ms=141
+STORE_READ slice=science n=2 regions=184 sites=41115 domain=24441 squared=14930409 open=13565 stretches=560 mask_whole_regions=46 mask_whole_places=4489 mask_whole_code=19552607316 mask_run_regions=36 mask_run_places=1213 mask_run_code=5180572227 writer_k0_regions=15 writer_k0_places=925 writer_k0_code=5072100484 writer_k_regions=87 writer_k_places=6938 writer_k_code=39160863251 ms=152
+STORE_READ slice=science n=3 regions=180 sites=41124 domain=20131 squared=15392062 open=11058 stretches=740 mask_whole_regions=42 mask_whole_places=2595 mask_whole_code=9675760467 mask_run_regions=35 mask_run_places=1228 mask_run_code=4535785641 writer_k0_regions=22 writer_k0_places=611 writer_k0_code=3333592646 writer_k_regions=81 writer_k_places=6624 writer_k_code=34941087835 ms=150
+STORE_READ slice=science n=4 regions=186 sites=41449 domain=23229 squared=15153803 open=12891 stretches=926 mask_whole_regions=37 mask_whole_places=2493 mask_whole_code=10597644472 mask_run_regions=53 mask_run_places=2766 mask_run_code=12049480155 writer_k0_regions=15 writer_k0_places=883 writer_k0_code=4451230269 writer_k_regions=81 writer_k_places=6749 writer_k_code=36421952519 ms=153
+STORE_READ slice=science n=5 regions=151 sites=38671 domain=30640 squared=15487121 open=15016 stretches=1077 mask_whole_regions=40 mask_whole_places=4763 mask_whole_code=18598964633 mask_run_regions=40 mask_run_places=4061 mask_run_code=16960999859 writer_k0_regions=19 writer_k0_places=1368 writer_k0_code=7254345098 writer_k_regions=52 writer_k_places=4824 writer_k_code=25877521456 ms=155
+STORE_READ slice=science n=6 regions=187 sites=41260 domain=22711 squared=14959972 open=13285 stretches=1264 mask_whole_regions=47 mask_whole_places=4009 mask_whole_code=15801818187 mask_run_regions=39 mask_run_places=694 mask_run_code=2403920771 writer_k0_regions=14 writer_k0_places=960 writer_k0_code=4855135601 writer_k_regions=87 writer_k_places=7622 writer_k_code=39449242672 ms=151
+STORE_READ slice=science n=7 regions=198 sites=41478 domain=24095 squared=15041902 open=12801 stretches=1462 mask_whole_regions=56 mask_whole_places=3086 mask_whole_code=12756120454 mask_run_regions=49 mask_run_places=2387 mask_run_code=9418866226 writer_k0_regions=14 writer_k0_places=886 writer_k0_code=4561619755 writer_k_regions=79 writer_k_places=6442 writer_k_code=34380806250 ms=158
+STORE_READ_SURPRISE slice=science places=105098 by_bit_length(count/code) b7=1/93 b8=1/135 b9=3/978 b10=6/5504 b11=28/42527 b12=67/197948 b13=97/603067 b14=217/2606668 b15=319/7752364 b16=513/24962060 b17=691/66027729 b18=998/190501948 b19=1326/512487332 b20=2187/1690929128 b21=4384/6969098514 b22=30721/101556285635 b23=54569/299920927797 b24=8918/88116017699 b25=52/1008974848 ms=3755
+STORE_READ_WRITER slice=science sections=8 stretches=1462 k0_by_octave(places/code) o0=137/478508272 o1=252/1228398544 o2=468/2443036765 o3=676/3627372598 o4=942/4947718792 o5=1327/6921782978 o6=1773/9566969179 o7=1559/8061324587 o8=1082/5257878119 front_by_octave(count/code) o0=137/478508272 o1=183/772688049 o2=140/542619276 o3=116/480270065 o4=75/259926495 o5=48/178357409 o6=31/133218110 o7=28/81214971 o8=14/30270619 ms=3755
+STORE_READ slice=books n=0 regions=204 sites=41419 domain=23840 squared=15181617 open=14636 stretches=204 mask_whole_regions=46 mask_whole_places=2417 mask_whole_code=7721966615 mask_run_regions=49 mask_run_places=1800 mask_run_code=6432282804 writer_k0_regions=11 writer_k0_places=1389 writer_k0_code=6565894370 writer_k_regions=98 writer_k_places=9030 writer_k_code=42061725512 ms=154
+STORE_READ slice=books n=1 regions=169 sites=38838 domain=19959 squared=15382036 open=12991 stretches=373 mask_whole_regions=34 mask_whole_places=2222 mask_whole_code=8644653365 mask_run_regions=39 mask_run_places=1014 mask_run_code=4073692775 writer_k0_regions=24 writer_k0_places=1899 writer_k0_code=9704926648 writer_k_regions=72 writer_k_places=7856 writer_k_code=39290366430 ms=146
+STORE_READ slice=books n=2 regions=185 sites=41478 domain=24478 squared=15225738 open=13655 stretches=558 mask_whole_regions=45 mask_whole_places=4450 mask_whole_code=17099088398 mask_run_regions=38 mask_run_places=1239 mask_run_code=4752702064 writer_k0_regions=14 writer_k0_places=672 writer_k0_code=3124567144 writer_k_regions=88 writer_k_places=7294 writer_k_code=34061456348 ms=155
+STORE_READ slice=books n=3 regions=174 sites=41283 domain=20452 squared=15559913 open=11268 stretches=732 mask_whole_regions=43 mask_whole_places=2634 mask_whole_code=8769543210 mask_run_regions=33 mask_run_places=1227 mask_run_code=3797301214 writer_k0_regions=17 writer_k0_places=606 writer_k0_code=3153996245 writer_k_regions=81 writer_k_places=6801 writer_k_code=31859314546 ms=154
+STORE_READ slice=books n=4 regions=183 sites=40951 domain=22280 squared=15381367 open=12835 stretches=915 mask_whole_regions=33 mask_whole_places=2066 mask_whole_code=7246136239 mask_run_regions=52 mask_run_places=2626 mask_run_code=9641510370 writer_k0_regions=14 writer_k0_places=351 writer_k0_code=1682975307 writer_k_regions=84 writer_k_places=7792 writer_k_code=36576769719 ms=154
+STORE_READ slice=books n=5 regions=150 sites=38631 domain=31517 squared=15514943 open=15399 stretches=1065 mask_whole_regions=41 mask_whole_places=4986 mask_whole_code=18406216596 mask_run_regions=41 mask_run_places=4201 mask_run_code=16313238443 writer_k0_regions=20 writer_k0_places=1855 writer_k0_code=8731968287 writer_k_regions=48 writer_k_places=4357 writer_k_code=20339914315 ms=155
+STORE_READ slice=books n=6 regions=183 sites=41369 domain=22821 squared=15170877 open=13282 stretches=1248 mask_whole_regions=46 mask_whole_places=4093 mask_whole_code=14585031597 mask_run_regions=38 mask_run_places=695 mask_run_code=2392506887 writer_k0_regions=13 writer_k0_places=940 writer_k0_code=4426537676 writer_k_regions=86 writer_k_places=7554 writer_k_code=34927204926 ms=151
+STORE_READ slice=books n=7 regions=196 sites=41194 domain=24077 squared=14970988 open=13270 stretches=1444 mask_whole_regions=55 mask_whole_places=3272 mask_whole_code=11617044866 mask_run_regions=47 mask_run_places=2074 mask_run_code=7736144266 writer_k0_regions=13 writer_k0_places=887 writer_k0_code=4268301507 writer_k_regions=81 writer_k_places=7037 writer_k_code=32452384302 ms=155
+STORE_READ_SURPRISE slice=books places=107336 by_bit_length(count/code) b1=1/1 b2=2/5 b8=1/194 b9=8/3027 b10=16/11303 b11=42/65337 b12=101/303191 b13=186/1145596 b14=289/3543051 b15=444/10695864 b16=574/27570780 b17=783/75538781 b18=1065/206060164 b19=1419/549299279 b20=2438/1885873488 b21=4793/7641353547 b22=37649/122087279719 b23=52451/277994786651 b24=5053/51584615946 b25=21/389217067 ms=4986
+STORE_READ_WRITER slice=books sections=8 stretches=1444 k0_by_octave(places/code) o0=126/486251197 o1=246/1059904134 o2=458/2207702638 o3=671/3196050939 o4=942/4611763676 o5=1344/6579100855 o6=1837/9011360891 o7=1689/8296286131 o8=1286/6210746723 front_by_octave(count/code) o0=126/486251197 o1=183/634987979 o2=138/460696659 o3=122/463969372 o4=73/237984059 o5=49/160127500 o6=31/128788741 o7=28/97947375 o8=14/36844469 ms=4986
+STORE_READ slice=wikidata n=0 regions=216 sites=41450 domain=23391 squared=14455448 open=14170 stretches=216 mask_whole_regions=48 mask_whole_places=2434 mask_whole_code=9847851378 mask_run_regions=52 mask_run_places=1727 mask_run_code=7765069674 writer_k0_regions=16 writer_k0_places=1025 writer_k0_code=5613825442 writer_k_regions=100 writer_k_places=8984 writer_k_code=50040293680 ms=155
+STORE_READ slice=wikidata n=1 regions=161 sites=37652 domain=19323 squared=15503140 open=13070 stretches=377 mask_whole_regions=32 mask_whole_places=1816 mask_whole_code=9699631985 mask_run_regions=39 mask_run_places=1150 mask_run_code=4929107361 writer_k0_regions=19 writer_k0_places=1865 writer_k0_code=13124550474 writer_k_regions=71 writer_k_places=8239 writer_k_code=48373147435 ms=143
+STORE_READ slice=wikidata n=2 regions=193 sites=41206 domain=24619 squared=14615808 open=13451 stretches=570 mask_whole_regions=49 mask_whole_places=4729 mask_whole_code=20881911062 mask_run_regions=37 mask_run_places=1003 mask_run_code=4036876165 writer_k0_regions=17 writer_k0_places=552 writer_k0_code=3015236350 writer_k_regions=90 writer_k_places=7167 writer_k_code=38106078660 ms=154
+STORE_READ slice=wikidata n=3 regions=166 sites=40425 domain=19646 squared=15465787 open=11400 stretches=736 mask_whole_regions=39 mask_whole_places=2187 mask_whole_code=10062216901 mask_run_regions=32 mask_run_places=1222 mask_run_code=4875890366 writer_k0_regions=17 writer_k0_places=606 writer_k0_code=3380934269 writer_k_regions=78 writer_k_places=7385 writer_k_code=42688400876 ms=156
+STORE_READ slice=wikidata n=4 regions=192 sites=41483 domain=22976 squared=15130237 open=12615 stretches=928 mask_whole_regions=37 mask_whole_places=2493 mask_whole_code=11011302941 mask_run_regions=56 mask_run_places=2782 mask_run_code=12947429504 writer_k0_regions=15 writer_k0_places=403 writer_k0_code=2161398251 writer_k_regions=84 writer_k_places=6937 writer_k_code=39674768864 ms=157
+STORE_READ slice=wikidata n=5 regions=153 sites=39014 domain=30835 squared=15600402 open=15592 stretches=1081 mask_whole_regions=41 mask_whole_places=4620 mask_whole_code=19757388037 mask_run_regions=38 mask_run_places=4026 mask_run_code=18112669508 writer_k0_regions=20 writer_k0_places=1369 writer_k0_code=7841139772 writer_k_regions=54 writer_k_places=5577 writer_k_code=32217458556 ms=150
+STORE_READ slice=wikidata n=6 regions=202 sites=41468 domain=22967 squared=14142954 open=12556 stretches=1283 mask_whole_regions=49 mask_whole_places=4154 mask_whole_code=18192533638 mask_run_regions=46 mask_run_places=959 mask_run_code=3857901237 writer_k0_regions=20 writer_k0_places=1252 writer_k0_code=7043084603 writer_k_regions=87 writer_k_places=6191 writer_k_code=35629769513 ms=151
+STORE_READ slice=wikidata n=7 regions=202 sites=41442 domain=24756 squared=14793580 open=12859 stretches=1485 mask_whole_regions=60 mask_whole_places=4148 mask_whole_code=18302073066 mask_run_regions=44 mask_run_places=1972 mask_run_code=7495711969 writer_k0_regions=18 writer_k0_places=1100 writer_k0_code=6196718978 writer_k_regions=80 writer_k_places=5639 writer_k_code=31564800596 ms=152
+STORE_READ_SURPRISE slice=wikidata places=105713 by_bit_length(count/code) b1=9/9 b2=5/13 b3=2/9 b4=2/26 b5=4/86 b6=2/91 b7=3/241 b8=2/411 b9=4/1277 b10=5/4179 b11=13/21285 b12=30/94303 b13=74/469524 b14=137/1652280 b15=342/8433989 b16=597/28929926 b17=860/82484171 b18=1145/218016496 b19=1425/546733548 b20=1783/1382886522 b21=3202/5050082014 b22=27764/96159791855 b23=56537/324941271079 b24=11749/119724179651 b25=17/302118126 ms=6211
+STORE_READ_WRITER slice=wikidata sections=8 stretches=1485 k0_by_octave(places/code) o0=142/665694096 o1=258/1297385827 o2=482/2732713712 o3=702/4179996053 o4=974/5881941400 o5=1369/7901605522 o6=1827/10807977013 o7=1500/8919874895 o8=918/5989699621 front_by_octave(count/code) o0=142/665694096 o1=186/780962127 o2=138/641745080 o3=124/495869191 o4=78/316650544 o5=52/235545851 o6=29/114450634 o7=25/100274852 o8=12/32771952 ms=6211
+STORE_YARDSTICK at=read answer=5.157973 classes=43470 context=1.052843 context_classes=43470 foil=1.206311 question=0.153468 ms=10043
+STORE_READ_DONE reads=58 returns=0 pairs=3594067018 batches=60 peak_store=8423184452 ms=10043
+FIELD_CARD reads=58 read_ms=9687 returns=0 return_ms=0 pairs=3594067018 batches=60 peak_store=8423184452 landmarks=0 landmark_ms=0 elapsed_ms=10043
+MEASURE lap=read_C_mean rc=0 wall_s=10.5 peak_rss_kib=842252
+## state C_mean: write-store (one line a problem: its slice, its document's ordinal, the places written before a void; reads= is the sweep callback's count, one short of the release's reads, which FIELD_CARD gives)
+FIELD_CARD_OPEN card=NVIDIA GeForce RTX 4080 SUPER free=15661531136 total=16802250752 batch_budget=10670440448
+STORE_WRITE_LAW problems=80 documents=16 prompt=256 run=256 sweeps=256 refine=0 run_bound=0 near_tail=true place_order=false lengths=none one_end=false alphabet=244 void=99 ms=34
+STORE_WRITE slice=code problem=code_00 document=0 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=code problem=code_01 document=1 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=code problem=code_02 document=4 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=code problem=code_03 document=6 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=code problem=code_04 document=7 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=code problem=code_05 document=8 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=code problem=code_06 document=9 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=code problem=code_07 document=10 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=code problem=code_08 document=11 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=code problem=code_09 document=12 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=code problem=code_10 document=13 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=code problem=code_11 document=14 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=code problem=code_12 document=15 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=code problem=code_13 document=16 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=code problem=code_14 document=17 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=code problem=code_15 document=18 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=web problem=web_00 document=1 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=web problem=web_01 document=2 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=web problem=web_02 document=3 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=web problem=web_03 document=5 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=web problem=web_04 document=7 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=web problem=web_05 document=9 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=web problem=web_06 document=10 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=web problem=web_07 document=13 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=web problem=web_08 document=14 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=web problem=web_09 document=15 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=web problem=web_10 document=16 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=web problem=web_11 document=17 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=web problem=web_12 document=18 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=web problem=web_13 document=20 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=web problem=web_14 document=21 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=web problem=web_15 document=22 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=science problem=science_00 document=0 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=science problem=science_01 document=1 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=science problem=science_02 document=2 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=science problem=science_03 document=4 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=science problem=science_04 document=5 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=science problem=science_05 document=6 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=science problem=science_06 document=7 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=science problem=science_07 document=8 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=science problem=science_08 document=9 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=science problem=science_09 document=10 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=science problem=science_10 document=11 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=science problem=science_11 document=12 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=science problem=science_12 document=13 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=science problem=science_13 document=14 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=science problem=science_14 document=15 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=science problem=science_15 document=16 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=books problem=books_00 document=0 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=books problem=books_01 document=1 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=books problem=books_02 document=2 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=books problem=books_03 document=3 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=books problem=books_04 document=4 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=books problem=books_05 document=5 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=books problem=books_06 document=6 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=books problem=books_07 document=7 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=books problem=books_08 document=8 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=books problem=books_09 document=9 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=books problem=books_10 document=10 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=books problem=books_11 document=11 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=books problem=books_12 document=12 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=books problem=books_13 document=13 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=books problem=books_14 document=14 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=books problem=books_15 document=15 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=wikidata problem=wikidata_00 document=0 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=wikidata problem=wikidata_01 document=1 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=wikidata problem=wikidata_02 document=3 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=wikidata problem=wikidata_03 document=4 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=wikidata problem=wikidata_04 document=6 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=wikidata problem=wikidata_05 document=7 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=wikidata problem=wikidata_06 document=9 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=wikidata problem=wikidata_07 document=11 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=wikidata problem=wikidata_08 document=12 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=wikidata problem=wikidata_09 document=13 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=wikidata problem=wikidata_10 document=15 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=wikidata problem=wikidata_11 document=16 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=wikidata problem=wikidata_12 document=17 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=wikidata problem=wikidata_13 document=19 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=wikidata problem=wikidata_14 document=20 written_places=256 written_octets=256 reads=255
+STORE_WRITE slice=wikidata problem=wikidata_15 document=21 written_places=256 written_octets=256 reads=255
+STORE_WRITE_DONE problems=80 reads=255 reads=256 returns=0 pairs=20131823185 batches=256 peak_store=1715516480 ms=45577
+FIELD_CARD reads=256 read_ms=44557 returns=0 return_ms=0 pairs=20131823185 batches=256 peak_store=1715516480 landmarks=0 landmark_ms=0 elapsed_ms=45580
+MEASURE lap=write_C_mean rc=0 wall_s=45.9 peak_rss_kib=378488
+## state C_mean: the rulers on the write
+RULERS columns: slice text writes octets utf8_share balance_nats words words_found_share match_share
+RULERS_VOCABULARY slice=code extent=100000000 words=369101
+RULERS slice=code text=written writes=16 octets=4096 utf8_share=0.9951 balance_nats=0.1238 words=439 words_found_share=0.2665 match_share=0.0549
+RULERS slice=code text=reference writes=16 octets=4096 utf8_share=1.0000 balance_nats=0.1382 words=405 words_found_share=0.9235 match_share=1.0000
+RULERS slice=code text=foil writes=16 octets=4096 utf8_share=0.9963 balance_nats=0.0525 words=348 words_found_share=0.3649 match_share=0.0535
+RULERS_VOCABULARY slice=web extent=100000000 words=311579
+RULERS slice=web text=written writes=16 octets=4096 utf8_share=0.9890 balance_nats=0.1045 words=514 words_found_share=0.3891 match_share=0.0637
+RULERS slice=web text=reference writes=16 octets=4096 utf8_share=1.0000 balance_nats=0.0926 words=494 words_found_share=0.9717 match_share=1.0000
+RULERS slice=web text=foil writes=16 octets=4096 utf8_share=0.9944 balance_nats=0.0695 words=417 words_found_share=0.2638 match_share=0.0520
+RULERS_VOCABULARY slice=science extent=100000000 words=266748
+RULERS slice=science text=written writes=16 octets=4096 utf8_share=0.9893 balance_nats=0.1156 words=442 words_found_share=0.2986 match_share=0.0518
+RULERS slice=science text=reference writes=16 octets=4096 utf8_share=1.0000 balance_nats=0.0879 words=468 words_found_share=0.8889 match_share=1.0000
+RULERS slice=science text=foil writes=16 octets=4096 utf8_share=0.9868 balance_nats=0.0692 words=429 words_found_share=0.2494 match_share=0.0564
+RULERS_VOCABULARY slice=books extent=100000000 words=560251
+RULERS slice=books text=written writes=16 octets=4096 utf8_share=0.9905 balance_nats=0.1957 words=491 words_found_share=0.4807 match_share=0.0618
+RULERS slice=books text=reference writes=16 octets=4096 utf8_share=1.0000 balance_nats=0.1164 words=500 words_found_share=0.9660 match_share=1.0000
+RULERS slice=books text=foil writes=16 octets=4096 utf8_share=0.9895 balance_nats=0.0898 words=418 words_found_share=0.2895 match_share=0.0708
+RULERS_VOCABULARY slice=wikidata extent=100000000 words=133483
+RULERS slice=wikidata text=written writes=16 octets=4096 utf8_share=0.9016 balance_nats=0.1393 words=394 words_found_share=0.2208 match_share=0.0491
+RULERS slice=wikidata text=reference writes=16 octets=4096 utf8_share=0.9995 balance_nats=0.1298 words=430 words_found_share=0.7488 match_share=1.0000
+RULERS slice=wikidata text=foil writes=16 octets=4096 utf8_share=0.8271 balance_nats=0.0551 words=396 words_found_share=0.2096 match_share=0.0349
+## the written files' digests (states B_state, B_mean, C_state, C_mean and A once more, in order) and the determinism checks (state A read and written once more)
+WRITE_FILES 240 sha_of_shas 03f7e12801e9bd3c
+WRITE_FILES 240 sha_of_shas 85e300b8b9e4a852
+WRITE_FILES 240 sha_of_shas 4bd344664becfb23
+WRITE_FILES 240 sha_of_shas c6c529dfdab472eb
+WRITE_FILES 240 sha_of_shas 3f1e7654c3edeb60
+DETERMINISM_READ equal 53 lines
+DETERMINISM_WRITE equal 240 files
+## the summary by state and slice (summarize.py: nats a compared place by kind / places; the writer's partitions in nats a place / places; the counts of surprise as shares; the yardstick)
+READ state=A slice=code all=3.5545/106856 mask_whole=2.7465/27487 mask_run=2.7519/14404 writer_k0=4.2271/9059 writer_k=4.0495/55906
+READ state=A slice=web all=3.4731/106591 mask_whole=2.8020/27483 mask_run=2.9134/15053 writer_k0=4.1152/8561 writer_k=3.8583/55494
+READ state=A slice=science all=3.6703/105098 mask_whole=3.0063/26025 mask_run=3.0191/15188 writer_k0=4.1185/8216 writer_k=4.0923/55669
+READ state=A slice=books all=3.3408/107336 mask_whole=2.6826/26140 mask_run=2.7603/14876 writer_k0=3.9728/8599 writer_k=3.6944/57721
+READ state=A slice=wikidata all=5.3873/105713 mask_whole=5.1407/26581 mask_run=4.8801/14841 writer_k0=6.0925/8172 writer_k=5.5355/56119
+SURPRISE state=A slice=code places=106856 under_1/16_bit=0.0381 under_1/4_bit=0.0645 under_1_bit=0.1093 under_4_bits=0.3856 at_or_over_8_bits=0.1586
+WRITER state=A slice=code k0_nats_by_octave o0=3.900/161 o1=4.272/269 o2=4.558/497 o3=4.183/721 o4=4.037/1029 o5=3.991/1471 o6=4.174/2077 o7=3.966/1622 o8=5.039/1212 | front_nats_by_octave o0=3.900/161 o1=2.942/186 o2=3.149/149 o3=3.520/129 o4=2.707/77 o5=2.465/53 o6=1.865/29 o7=2.381/27 o8=3.690/12
+SURPRISE state=A slice=web places=106591 under_1/16_bit=0.0178 under_1/4_bit=0.0357 under_1_bit=0.0712 under_4_bits=0.3831 at_or_over_8_bits=0.1244
+WRITER state=A slice=web k0_nats_by_octave o0=3.115/155 o1=3.885/264 o2=4.134/490 o3=4.177/719 o4=3.770/1020 o5=4.000/1410 o6=4.095/1806 o7=4.239/1547 o8=4.569/1150 | front_nats_by_octave o0=3.115/155 o1=3.000/181 o2=3.067/147 o3=2.709/123 o4=3.032/76 o5=2.421/48 o6=2.418/32 o7=2.116/28 o8=2.349/14
+SURPRISE state=A slice=science places=105098 under_1/16_bit=0.0133 under_1/4_bit=0.0275 under_1_bit=0.0577 under_4_bits=0.3460 at_or_over_8_bits=0.1429
+WRITER state=A slice=science k0_nats_by_octave o0=2.938/137 o1=3.830/252 o2=4.411/468 o3=4.325/676 o4=3.965/942 o5=3.919/1327 o6=4.187/1773 o7=4.021/1559 o8=4.487/1082 | front_nats_by_octave o0=2.938/137 o1=3.587/183 o2=2.916/140 o3=3.214/116 o4=2.786/75 o5=2.656/48 o6=2.752/31 o7=2.282/28 o8=1.593/14
+SURPRISE state=A slice=books places=107336 under_1/16_bit=0.0165 under_1/4_bit=0.0331 under_1_bit=0.0667 under_4_bits=0.4078 at_or_over_8_bits=0.0929
+WRITER state=A slice=books k0_nats_by_octave o0=3.225/126 o1=3.178/246 o2=3.963/458 o3=3.870/671 o4=3.938/942 o5=3.727/1344 o6=3.986/1837 o7=4.007/1689 o8=4.475/1286 | front_nats_by_octave o0=3.225/126 o1=2.723/183 o2=2.626/138 o3=3.214/122 o4=2.428/73 o5=2.260/49 o6=3.074/31 o7=2.578/28 o8=2.001/14
+SURPRISE state=A slice=wikidata places=105713 under_1/16_bit=0.0114 under_1/4_bit=0.0255 under_1_bit=0.0517 under_4_bits=0.2834 at_or_over_8_bits=0.2811
+WRITER state=A slice=wikidata k0_nats_by_octave o0=5.859/142 o1=5.471/258 o2=6.155/482 o3=6.320/702 o4=6.201/974 o5=5.792/1369 o6=6.400/1827 o7=5.905/1500 o8=6.124/918 | front_nats_by_octave o0=5.859/142 o1=5.456/186 o2=5.986/138 o3=4.345/124 o4=5.494/78 o5=4.143/52 o6=5.302/29 o7=5.519/25 o8=3.691/12
+YARDSTICK state=A answer=5.368080 classes=43470 context=0.829083 context_classes=43470 foil=0.975829 question=0.146747
+READ state=B_state slice=code all=2.9815/106856 mask_whole=2.4207/27487 mask_run=2.4308/14404 writer_k0=3.3907/9059 writer_k=3.3329/55906
+READ state=B_state slice=web all=3.0521/106591 mask_whole=2.5389/27483 mask_run=2.6327/15053 writer_k0=3.4942/8561 writer_k=3.3518/55494
+READ state=B_state slice=science all=3.1765/105098 mask_whole=2.6676/26025 mask_run=2.7088/15188 writer_k0=3.4411/8216 writer_k=3.5030/55669
+READ state=B_state slice=books all=2.8694/107336 mask_whole=2.4165/26140 mask_run=2.4843/14876 writer_k0=3.2105/8599 writer_k=3.1230/57721
+READ state=B_state slice=wikidata all=3.4945/105713 mask_whole=3.0297/26581 mask_run=2.9524/14841 writer_k0=3.9671/8172 writer_k=3.7892/56119
+SURPRISE state=B_state slice=code places=106856 under_1/16_bit=0.0376 under_1/4_bit=0.0688 under_1_bit=0.1186 under_4_bits=0.4138 at_or_over_8_bits=0.0796
+WRITER state=B_state slice=code k0_nats_by_octave o0=2.459/161 o1=3.310/269 o2=3.541/497 o3=3.471/721 o4=3.418/1029 o5=3.457/1471 o6=3.437/2077 o7=3.328/1622 o8=3.324/1212 | front_nats_by_octave o0=2.459/161 o1=2.313/186 o2=2.580/149 o3=2.706/129 o4=2.189/77 o5=2.092/53 o6=1.739/29 o7=2.270/27 o8=2.865/12
+SURPRISE state=B_state slice=web places=106591 under_1/16_bit=0.0146 under_1/4_bit=0.0339 under_1_bit=0.0721 under_4_bits=0.4080 at_or_over_8_bits=0.0775
+WRITER state=B_state slice=web k0_nats_by_octave o0=2.384/155 o1=3.395/264 o2=3.362/490 o3=3.501/719 o4=3.382/1020 o5=3.574/1410 o6=3.470/1806 o7=3.607/1547 o8=3.605/1150 | front_nats_by_octave o0=2.384/155 o1=2.602/181 o2=2.588/147 o3=2.200/123 o4=2.591/76 o5=2.410/48 o6=2.404/32 o7=2.161/28 o8=2.366/14
+SURPRISE state=B_state slice=science places=105098 under_1/16_bit=0.0106 under_1/4_bit=0.0264 under_1_bit=0.0590 under_4_bits=0.3795 at_or_over_8_bits=0.0900
+WRITER state=B_state slice=science k0_nats_by_octave o0=2.364/137 o1=3.252/252 o2=3.470/468 o3=3.567/676 o4=3.495/942 o5=3.463/1327 o6=3.583/1773 o7=3.434/1559 o8=3.233/1082 | front_nats_by_octave o0=2.364/137 o1=2.878/183 o2=2.575/140 o3=2.820/116 o4=2.365/75 o5=2.552/48 o6=2.837/31 o7=1.893/28 o8=1.496/14
+SURPRISE state=B_state slice=books places=107336 under_1/16_bit=0.0146 under_1/4_bit=0.0309 under_1_bit=0.0667 under_4_bits=0.4492 at_or_over_8_bits=0.0488
+WRITER state=B_state slice=books k0_nats_by_octave o0=2.610/126 o1=2.862/246 o2=3.196/458 o3=3.154/671 o4=3.242/942 o5=3.240/1344 o6=3.246/1837 o7=3.259/1689 o8=3.202/1286 | front_nats_by_octave o0=2.610/126 o1=2.362/183 o2=2.250/138 o3=2.529/122 o4=2.161/73 o5=2.172/49 o6=2.767/31 o7=2.354/28 o8=1.729/14
+SURPRISE state=B_state slice=wikidata places=105713 under_1/16_bit=0.0091 under_1/4_bit=0.0267 under_1_bit=0.0572 under_4_bits=0.3405 at_or_over_8_bits=0.1280
+WRITER state=B_state slice=wikidata k0_nats_by_octave o0=3.213/142 o1=3.428/258 o2=3.822/482 o3=3.972/702 o4=4.038/974 o5=3.879/1369 o6=3.934/1827 o7=3.967/1500 o8=4.431/918 | front_nats_by_octave o0=3.213/142 o1=2.862/186 o2=3.168/138 o3=2.733/124 o4=2.788/78 o5=3.133/52 o6=2.795/29 o7=2.735/25 o8=1.995/12
+YARDSTICK state=B_state answer=5.096040 classes=43470 context=1.009504 context_classes=43470 foil=1.164432 question=0.154929
+READ state=B_mean slice=code all=2.9828/106856 mask_whole=2.4229/27487 mask_run=2.4338/14404 writer_k0=3.3929/9059 writer_k=3.3330/55906
+READ state=B_mean slice=web all=3.0479/106591 mask_whole=2.5341/27483 mask_run=2.6290/15053 writer_k0=3.4913/8561 writer_k=3.3476/55494
+READ state=B_mean slice=science all=3.1717/105098 mask_whole=2.6641/26025 mask_run=2.7028/15188 writer_k0=3.4348/8216 writer_k=3.4981/55669
+READ state=B_mean slice=books all=2.8659/107336 mask_whole=2.4112/26140 mask_run=2.4800/14876 writer_k0=3.2087/8599 writer_k=3.1203/57721
+READ state=B_mean slice=wikidata all=3.4881/105713 mask_whole=3.0247/26581 mask_run=2.9404/14841 writer_k0=3.9631/8172 writer_k=3.7833/56119
+SURPRISE state=B_mean slice=code places=106856 under_1/16_bit=0.0381 under_1/4_bit=0.0686 under_1_bit=0.1172 under_4_bits=0.4180 at_or_over_8_bits=0.0795
+WRITER state=B_mean slice=code k0_nats_by_octave o0=2.459/161 o1=3.314/269 o2=3.545/497 o3=3.471/721 o4=3.420/1029 o5=3.463/1471 o6=3.439/2077 o7=3.328/1622 o8=3.324/1212 | front_nats_by_octave o0=2.459/161 o1=2.319/186 o2=2.563/149 o3=2.709/129 o4=2.186/77 o5=2.063/53 o6=1.706/29 o7=2.309/27 o8=2.872/12
+SURPRISE state=B_mean slice=web places=106591 under_1/16_bit=0.0144 under_1/4_bit=0.0328 under_1_bit=0.0704 under_4_bits=0.4216 at_or_over_8_bits=0.0765
+WRITER state=B_mean slice=web k0_nats_by_octave o0=2.375/155 o1=3.397/264 o2=3.357/490 o3=3.497/719 o4=3.381/1020 o5=3.575/1410 o6=3.466/1806 o7=3.605/1547 o8=3.599/1150 | front_nats_by_octave o0=2.375/155 o1=2.608/181 o2=2.582/147 o3=2.204/123 o4=2.597/76 o5=2.397/48 o6=2.359/32 o7=2.165/28 o8=2.421/14
+SURPRISE state=B_mean slice=science places=105098 under_1/16_bit=0.0104 under_1/4_bit=0.0256 under_1_bit=0.0577 under_4_bits=0.3975 at_or_over_8_bits=0.0883
+WRITER state=B_mean slice=science k0_nats_by_octave o0=2.371/137 o1=3.248/252 o2=3.460/468 o3=3.560/676 o4=3.490/942 o5=3.454/1327 o6=3.579/1773 o7=3.430/1559 o8=3.222/1082 | front_nats_by_octave o0=2.371/137 o1=2.878/183 o2=2.577/140 o3=2.809/116 o4=2.368/75 o5=2.535/48 o6=2.857/31 o7=1.895/28 o8=1.475/14
+SURPRISE state=B_mean slice=books places=107336 under_1/16_bit=0.0139 under_1/4_bit=0.0302 under_1_bit=0.0652 under_4_bits=0.4653 at_or_over_8_bits=0.0477
+WRITER state=B_mean slice=books k0_nats_by_octave o0=2.635/126 o1=2.862/246 o2=3.196/458 o3=3.151/671 o4=3.236/942 o5=3.238/1344 o6=3.247/1837 o7=3.255/1689 o8=3.199/1286 | front_nats_by_octave o0=2.635/126 o1=2.366/183 o2=2.263/138 o3=2.525/122 o4=2.154/73 o5=2.163/49 o6=2.762/31 o7=2.371/28 o8=1.732/14
+SURPRISE state=B_mean slice=wikidata places=105713 under_1/16_bit=0.0088 under_1/4_bit=0.0261 under_1_bit=0.0566 under_4_bits=0.3535 at_or_over_8_bits=0.1224
+WRITER state=B_mean slice=wikidata k0_nats_by_octave o0=3.181/142 o1=3.386/258 o2=3.810/482 o3=3.967/702 o4=4.025/974 o5=3.863/1369 o6=3.949/1827 o7=3.976/1500 o8=4.413/918 | front_nats_by_octave o0=3.181/142 o1=2.874/186 o2=3.157/138 o3=2.746/124 o4=2.799/78 o5=3.105/52 o6=2.793/29 o7=2.682/25 o8=1.986/12
+YARDSTICK state=B_mean answer=5.103682 classes=43470 context=1.001478 context_classes=43470 foil=1.155772 question=0.154294
+READ state=C_state slice=code all=2.9665/106856 mask_whole=2.3894/27487 mask_run=2.4043/14404 writer_k0=3.3893/9059 writer_k=3.3265/55906
+READ state=C_state slice=web all=3.0297/106591 mask_whole=2.4996/27483 mask_run=2.5941/15053 writer_k0=3.4764/8561 writer_k=3.3414/55494
+READ state=C_state slice=science all=3.1436/105098 mask_whole=2.6154/26025 mask_run=2.6652/15188 writer_k0=3.4256/8216 writer_k=3.4795/55669
+READ state=C_state slice=books all=2.8559/107336 mask_whole=2.3858/26140 mask_run=2.4543/14876 writer_k0=3.2107/8599 writer_k=3.1193/57721
+READ state=C_state slice=wikidata all=3.4305/105713 mask_whole=2.9309/26581 mask_run=2.8572/14841 writer_k0=3.8908/8172 writer_k=3.7518/56119
+SURPRISE state=C_state slice=code places=106856 under_1/16_bit=0.0406 under_1/4_bit=0.0721 under_1_bit=0.1215 under_4_bits=0.4178 at_or_over_8_bits=0.0755
+WRITER state=C_state slice=code k0_nats_by_octave o0=2.361/161 o1=3.262/269 o2=3.530/497 o3=3.465/721 o4=3.414/1029 o5=3.465/1471 o6=3.437/2077 o7=3.320/1622 o8=3.350/1212 | front_nats_by_octave o0=2.361/161 o1=2.253/186 o2=2.540/149 o3=2.642/129 o4=2.224/77 o5=2.011/53 o6=1.751/29 o7=2.277/27 o8=2.550/12
+SURPRISE state=C_state slice=web places=106591 under_1/16_bit=0.0162 under_1/4_bit=0.0354 under_1_bit=0.0740 under_4_bits=0.4241 at_or_over_8_bits=0.0726
+WRITER state=C_state slice=web k0_nats_by_octave o0=2.318/155 o1=3.351/264 o2=3.342/490 o3=3.464/719 o4=3.356/1020 o5=3.563/1410 o6=3.460/1806 o7=3.585/1547 o8=3.606/1150 | front_nats_by_octave o0=2.318/155 o1=2.555/181 o2=2.485/147 o3=2.171/123 o4=2.558/76 o5=2.361/48 o6=2.268/32 o7=2.188/28 o8=2.323/14
+SURPRISE state=C_state slice=science places=105098 under_1/16_bit=0.0124 under_1/4_bit=0.0282 under_1_bit=0.0619 under_4_bits=0.3945 at_or_over_8_bits=0.0810
+WRITER state=C_state slice=science k0_nats_by_octave o0=2.289/137 o1=3.211/252 o2=3.452/468 o3=3.545/676 o4=3.470/942 o5=3.458/1327 o6=3.574/1773 o7=3.417/1559 o8=3.225/1082 | front_nats_by_octave o0=2.289/137 o1=2.784/183 o2=2.547/140 o3=2.756/116 o4=2.277/75 o5=2.480/48 o6=2.829/31 o7=1.927/28 o8=1.412/14
+SURPRISE state=C_state slice=books places=107336 under_1/16_bit=0.0154 under_1/4_bit=0.0323 under_1_bit=0.0684 under_4_bits=0.4707 at_or_over_8_bits=0.0473
+WRITER state=C_state slice=books k0_nats_by_octave o0=2.556/126 o1=2.859/246 o2=3.200/458 o3=3.158/671 o4=3.239/942 o5=3.242/1344 o6=3.252/1837 o7=3.258/1689 o8=3.199/1286 | front_nats_by_octave o0=2.556/126 o1=2.276/183 o2=2.227/138 o3=2.514/122 o4=2.187/73 o5=2.206/49 o6=2.781/31 o7=2.312/28 o8=1.708/14
+SURPRISE state=C_state slice=wikidata places=105713 under_1/16_bit=0.0109 under_1/4_bit=0.0297 under_1_bit=0.0602 under_4_bits=0.3461 at_or_over_8_bits=0.1056
+WRITER state=C_state slice=wikidata k0_nats_by_octave o0=3.084/142 o1=3.315/258 o2=3.749/482 o3=3.928/702 o4=4.011/974 o5=3.804/1369 o6=3.883/1827 o7=3.896/1500 o8=4.233/918 | front_nats_by_octave o0=3.084/142 o1=2.756/186 o2=3.087/138 o3=2.656/124 o4=2.659/78 o5=2.961/52 o6=2.610/29 o7=2.620/25 o8=1.700/12
+YARDSTICK state=C_state answer=5.180604 classes=43470 context=1.070509 context_classes=43470 foil=1.223524 question=0.153015
+READ state=C_mean slice=code all=2.9596/106856 mask_whole=2.3849/27487 mask_run=2.4003/14404 writer_k0=3.3796/9059 writer_k=3.3182/55906
+READ state=C_mean slice=web all=3.0252/106591 mask_whole=2.4962/27483 mask_run=2.5895/15053 writer_k0=3.4769/8561 writer_k=3.3356/55494
+READ state=C_mean slice=science all=3.1453/105098 mask_whole=2.6172/26025 mask_run=2.6641/15188 writer_k0=3.4221/8216 writer_k=3.4826/55669
+READ state=C_mean slice=books all=2.8481/107336 mask_whole=2.3794/26140 mask_run=2.4502/14876 writer_k0=3.2025/8599 writer_k=3.1101/57721
+READ state=C_mean slice=wikidata all=3.4295/105713 mask_whole=2.9284/26581 mask_run=2.8516/14841 writer_k0=3.9132/8172 writer_k=3.7493/56119
+SURPRISE state=C_mean slice=code places=106856 under_1/16_bit=0.0413 under_1/4_bit=0.0715 under_1_bit=0.1199 under_4_bits=0.4239 at_or_over_8_bits=0.0757
+WRITER state=C_mean slice=code k0_nats_by_octave o0=2.362/161 o1=3.262/269 o2=3.520/497 o3=3.459/721 o4=3.405/1029 o5=3.455/1471 o6=3.429/2077 o7=3.312/1622 o8=3.329/1212 | front_nats_by_octave o0=2.362/161 o1=2.268/186 o2=2.523/149 o3=2.637/129 o4=2.184/77 o5=2.020/53 o6=1.685/29 o7=2.245/27 o8=2.684/12
+SURPRISE state=C_mean slice=web places=106591 under_1/16_bit=0.0158 under_1/4_bit=0.0349 under_1_bit=0.0736 under_4_bits=0.4229 at_or_over_8_bits=0.0741
+WRITER state=C_mean slice=web k0_nats_by_octave o0=2.309/155 o1=3.346/264 o2=3.327/490 o3=3.477/719 o4=3.375/1020 o5=3.570/1410 o6=3.455/1806 o7=3.584/1547 o8=3.594/1150 | front_nats_by_octave o0=2.309/155 o1=2.562/181 o2=2.498/147 o3=2.168/123 o4=2.572/76 o5=2.390/48 o6=2.283/32 o7=2.135/28 o8=2.374/14
+SURPRISE state=C_mean slice=science places=105098 under_1/16_bit=0.0119 under_1/4_bit=0.0280 under_1_bit=0.0614 under_4_bits=0.3954 at_or_over_8_bits=0.0853
+WRITER state=C_mean slice=science k0_nats_by_octave o0=2.309/137 o1=3.222/252 o2=3.451/468 o3=3.547/676 o4=3.472/942 o5=3.448/1327 o6=3.567/1773 o7=3.418/1559 o8=3.212/1082 | front_nats_by_octave o0=2.309/137 o1=2.791/183 o2=2.562/140 o3=2.737/116 o4=2.291/75 o5=2.456/48 o6=2.841/31 o7=1.917/28 o8=1.429/14
+SURPRISE state=C_mean slice=books places=107336 under_1/16_bit=0.0155 under_1/4_bit=0.0327 under_1_bit=0.0687 under_4_bits=0.4641 at_or_over_8_bits=0.0473
+WRITER state=C_mean slice=books k0_nats_by_octave o0=2.551/126 o1=2.848/246 o2=3.186/458 o3=3.149/671 o4=3.236/942 o5=3.236/1344 o6=3.243/1837 o7=3.247/1689 o8=3.192/1286 | front_nats_by_octave o0=2.551/126 o1=2.294/183 o2=2.207/138 o3=2.514/122 o4=2.155/73 o5=2.160/49 o6=2.746/31 o7=2.312/28 o8=1.740/14
+SURPRISE state=C_mean slice=wikidata places=105713 under_1/16_bit=0.0116 under_1/4_bit=0.0306 under_1_bit=0.0610 under_4_bits=0.3539 at_or_over_8_bits=0.1113
+WRITER state=C_mean slice=wikidata k0_nats_by_octave o0=3.099/142 o1=3.324/258 o2=3.748/482 o3=3.936/702 o4=3.992/974 o5=3.815/1369 o6=3.910/1827 o7=3.931/1500 o8=4.313/918 | front_nats_by_octave o0=3.099/142 o1=2.776/186 o2=3.074/138 o3=2.643/124 o4=2.684/78 o5=2.994/52 o6=2.609/29 o7=2.651/25 o8=1.805/12
+YARDSTICK state=C_mean answer=5.157973 classes=43470 context=1.052843 context_classes=43470 foil=1.206311 question=0.153468

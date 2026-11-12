@@ -196,6 +196,27 @@ repository was reset on September 24; the pre-reset tree is
     `deposition.cost-follows-surprise`, open; its premise is the count of compared places by
     octave of surprise, by slice, on the three states the line has). The states: the crossing,
     2,001 sections and 5,001 sections.
+  - The three states are read, and the symbol's word is designed (November 12;
+    [the record](research/records/2026-11-12_THE_STORE_CODES_HELD_TEXT_AT_THE_LEVEL_OF_TWO_KNOWN_NEIGHBOURS_A_SIDE_A_SYMBOL_IS_A_WORD_ON_LOCATED_RINGS_AND_A_DARK_PLACE_IS_THE_INTERIOR_OF_A_COMPOSITE.md)).
+    Held, the state after 5,001 sections codes a whole mask at 2.39, 2.50, 2.62, 2.38 and 2.93
+    nats a compared place on code, web, science, books and wikidata: within 0.13 of a count
+    ruler's reading with two known neighbours a side on the same text, and over the count of
+    three on every slice. A release reads its first places, and from its fourth place on it reads
+    the slice's count of bytes; no state writes language. The share of compared places under a
+    sixteenth of a bit is 0.009 to 0.041 by slice and does not move with the pass, so the grain
+    of `deposition.cost-follows-surprise` is owed on the excess over a reader of the same
+    knowledge. The built alphabet is 244 byte classes with 259 entries each of their own, 0.54 of
+    the constitution. Rulers on a symbol's word: a code point's coprime residues keep no more
+    than a scramble keeps; an address located from counts keeps 0.90 to 0.96 of a free row's
+    content on 33 rows; 64 composites founded by count read at two symbols back what bytes read
+    three back. The design (not built; atlas `code.symbol-word-located-rings`,
+    `code.composite-reach`, `code.neighbour-count-level`): a symbol's rows are a series on a key
+    of coprime rings that the machine locates, and a composite is its factors' strand with a
+    remainder, founded where a place is dark given its neighbour. The engine's step 0 is in: on
+    the card's measured yardsticks the trainer stands at 17.8 times the sum of its floors (0.587
+    µs a site), the paced heads hold 0.731 of the forward contact's rows (G116 (d), inside its
+    range), and the first repair's skin store is ordered on the row's support, the dense address
+    having missed the batch's cut on about a quarter of the sections.
   - Every extent of the built declaration is given the part it sizes, how it was reached and what
     sizes it (the same record, §5), with ten findings by file and line and the build that closes
     each. The departures that stand: the face's 64 coordinates are two lanes of 32, the second a

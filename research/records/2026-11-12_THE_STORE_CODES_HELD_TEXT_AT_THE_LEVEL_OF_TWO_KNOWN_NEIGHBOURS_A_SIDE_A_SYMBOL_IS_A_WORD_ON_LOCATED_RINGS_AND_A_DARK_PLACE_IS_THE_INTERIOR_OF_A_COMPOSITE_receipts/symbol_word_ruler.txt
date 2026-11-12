@@ -1,0 +1,191 @@
+# symbol_word_ruler counts<=32 MB a slice (common_corpus_1/subset_1_1.parquet), read: the held role's first 330000 places a slice; load_s=7
+WORD slice=code counts_pairs=31971778 held_pairs=329449 bytes_met=225 order0=3.5441 map=2.7443(256 rows)
+  bits=3.0602(16 rows) foil_bits=3.2459(3.2186..3.2848) foil256_bits=3.2448
+  m=2   rows=130 word=2.8540 foil=2.8030(2.7846..2.8430) foil256=2.8093 residue=3.4506 winding=2.8869
+  m=3   rows=89  word=2.9040 foil=2.8628(2.8438..2.8745) foil256=2.8322 residue=3.4548 winding=2.9370
+  m=4   rows=68  word=2.9406 foil=2.8668(2.8373..2.8935) foil256=2.8587 residue=3.4005 winding=3.0101
+  m=5   rows=57  word=2.9485 foil=2.9092(2.8887..2.9211) foil256=2.9059 residue=3.3944 winding=3.0260
+  m=6   rows=49  word=2.9598 foil=2.9187(2.8982..2.9311) foil256=2.8998 residue=3.3512 winding=3.0532
+  m=7   rows=44  word=2.9726 foil=2.9318(2.9125..2.9437) foil256=2.8946 residue=3.3646 winding=3.0566
+  m=8   rows=40  word=2.9446 foil=2.9288(2.9141..2.9416) foil256=2.9313 residue=3.2791 winding=3.0724
+  m=10  rows=36  word=2.9607 foil=2.9465(2.9359..2.9656) foil256=2.9468 residue=3.2609 winding=3.1067
+  m=12  rows=34  word=2.9445 foil=2.9476(2.9374..2.9577) foil256=2.9600 residue=3.2509 winding=3.1136
+  m=16  rows=32  word=2.9022 foil=2.9606(2.9494..2.9734) foil256=2.9840 residue=3.1243 winding=3.1567
+  m=20  rows=33  word=2.8920 foil=2.9486(2.9364..2.9699) foil256=2.9727 residue=3.1360 winding=3.1555
+  m=24  rows=35  word=2.8673 foil=2.9336(2.9309..2.9370) foil256=2.9715 residue=3.0790 winding=3.1872
+  m=26  rows=36  word=2.9112 foil=2.9311(2.9138..2.9528) foil256=2.9271 residue=3.0948 winding=3.2295
+  m=32  rows=40  word=2.8262 foil=2.9275(2.9165..2.9375) foil256=2.9502 residue=2.9909 winding=3.2144
+  m=40  rows=47  word=2.8421 foil=2.9097(2.9029..2.9195) foil256=2.9341 residue=2.9623 winding=3.2258
+  m=48  rows=54  word=2.8186 foil=2.8925(2.8630..2.9089) foil256=2.8966 residue=2.9199 winding=3.2634
+  m=64  rows=68  word=2.8028 foil=2.8644(2.8500..2.8734) foil256=2.8791 residue=2.9192 winding=3.2709
+  m=96  rows=99  word=2.7492 foil=2.8082(2.7949..2.8189) foil256=2.8291 residue=2.7936 winding=3.3381
+  m=128 rows=130 word=2.7452 foil=2.7982(2.7868..2.8151) foil256=2.8178 residue=2.7683 winding=3.5083
+  crt(16,17)          rows=33  word=2.9536 foil=2.9489(2.9324..2.9640)
+  crt(13,20)          rows=33  word=2.9865 foil=2.9430(2.9173..2.9560)
+  crt(11,24)          rows=35  word=2.9678 foil=2.9461(2.9321..2.9612)
+  crt(9,29)           rows=38  word=2.9500 foil=2.9320(2.9097..2.9476)
+  crt(7,37)           rows=44  word=2.9199 foil=2.9104(2.8971..2.9324)
+  crt(5,7,8)          rows=20  word=3.1177 foil=3.0866(3.0719..3.1006)
+  crt(5,7,9)          rows=21  word=3.1153 foil=3.0779(3.0585..3.0957)
+  crt(3,7,13)         rows=23  word=3.1225 foil=3.0698(3.0590..3.0774)
+  crt(3,5,7,11)       rows=26  word=3.0705 foil=3.0243(3.0155..3.0307)
+  crt(2,3,5,7,11)     rows=28  word=3.0474 foil=3.0118(3.0058..3.0200)
+  radix(4,8,8)        rows=20  word=2.9715 foil=3.0747(3.0604..3.0819)
+  radix(2,4,32)       rows=38  word=2.8263 foil=2.9601(2.9385..2.9750)
+  radix(4,4,16)       rows=24  word=2.9133 foil=3.0491(3.0384..3.0641)
+  both m=16  cells=1056  word=3.0380 foil=3.1115(3.0995..3.1252)
+  both m=32  cells=1640  word=2.9179 foil=3.0746(3.0580..3.0973)
+  both bits cells=288   word=3.2485 foil=3.4229(3.4036..3.4453) 
+  s=43
+WORD slice=web counts_pairs=16235097 held_pairs=329534 bytes_met=204 order0=3.4546 map=2.8298(256 rows)
+  bits=3.1221(16 rows) foil_bits=3.2406(3.2239..3.2557) foil256_bits=3.2858
+  m=2   rows=130 word=2.9299 foil=2.8703(2.8557..2.8809) foil256=2.8712 residue=3.3920 winding=2.9773
+  m=3   rows=89  word=2.9952 foil=2.9040(2.8951..2.9086) foil256=2.8981 residue=3.4077 winding=3.0170
+  m=4   rows=68  word=2.9894 foil=2.9476(2.9374..2.9547) foil256=2.9009 residue=3.3409 winding=3.0806
+  m=5   rows=57  word=3.0015 foil=2.9513(2.9387..2.9628) foil256=2.9460 residue=3.3283 winding=3.1102
+  m=6   rows=49  word=3.0318 foil=2.9670(2.9402..2.9974) foil256=2.9326 residue=3.3200 winding=3.1272
+  m=7   rows=44  word=3.0285 foil=2.9756(2.9643..3.0005) foil256=2.9530 residue=3.3151 winding=3.1241
+  m=8   rows=40  word=2.9961 foil=2.9850(2.9753..2.9976) foil256=2.9453 residue=3.2477 winding=3.1413
+  m=10  rows=36  word=3.0062 foil=3.0002(2.9933..3.0110) foil256=2.9805 residue=3.2152 winding=3.1845
+  m=12  rows=34  word=2.9967 foil=3.0057(2.9945..3.0190) foil256=2.9915 residue=3.2334 winding=3.1861
+  m=16  rows=32  word=2.9498 foil=3.0041(2.9858..3.0168) foil256=3.0218 residue=3.1279 winding=3.2046
+  m=20  rows=33  word=2.9283 foil=3.0090(2.9827..3.0431) foil256=2.9937 residue=3.0991 winding=3.2224
+  m=24  rows=35  word=2.9317 foil=2.9907(2.9814..3.0063) foil256=3.0016 residue=3.0891 winding=3.2544
+  m=26  rows=36  word=2.9481 foil=2.9675(2.9608..2.9705) foil256=2.9569 residue=3.0767 winding=3.2993
+  m=32  rows=40  word=2.8873 foil=2.9669(2.9540..2.9900) foil256=3.0026 residue=3.0242 winding=3.2818
+  m=40  rows=47  word=2.8993 foil=2.9684(2.9372..3.0168) foil256=2.9611 residue=2.9595 winding=3.2843
+  m=48  rows=54  word=2.8865 foil=2.9272(2.9081..2.9469) foil256=2.9443 residue=2.9532 winding=3.2897
+  m=64  rows=68  word=2.8678 foil=2.9159(2.8889..2.9474) foil256=2.9371 residue=2.9548 winding=3.3405
+  m=96  rows=99  word=2.8330 foil=2.8677(2.8598..2.8871) foil256=2.9014 residue=2.8455 winding=3.3221
+  m=128 rows=130 word=2.8308 foil=2.8741(2.8554..2.9013) foil256=2.8818 residue=2.8372 winding=3.4381
+  crt(16,17)          rows=33  word=2.9998 foil=2.9753(2.9612..2.9895)
+  crt(13,20)          rows=33  word=2.9817 foil=2.9864(2.9658..3.0062)
+  crt(11,24)          rows=35  word=2.9881 foil=2.9917(2.9740..3.0064)
+  crt(9,29)           rows=38  word=2.9803 foil=2.9854(2.9711..3.0158)
+  crt(7,37)           rows=44  word=2.9384 foil=2.9676(2.9540..2.9915)
+  crt(5,7,8)          rows=20  word=3.0972 foil=3.0948(3.0714..3.1109)
+  crt(5,7,9)          rows=21  word=3.0848 foil=3.0845(3.0777..3.0965)
+  crt(3,7,13)         rows=23  word=3.0954 foil=3.0647(3.0553..3.0801)
+  crt(3,5,7,11)       rows=26  word=3.0743 foil=3.0344(3.0241..3.0399)
+  crt(2,3,5,7,11)     rows=28  word=3.0548 foil=3.0255(3.0147..3.0319)
+  radix(4,8,8)        rows=20  word=3.0236 foil=3.1037(3.0845..3.1179)
+  radix(2,4,32)       rows=38  word=2.8878 foil=2.9885(2.9615..3.0222)
+  radix(4,4,16)       rows=24  word=2.9590 foil=3.0653(3.0377..3.0931)
+  both m=16  cells=1056  word=3.0536 foil=3.1548(3.1395..3.1661)
+  both m=32  cells=1640  word=2.9474 foil=3.0942(3.0659..3.1219)
+  both bits cells=288   word=3.2652 foil=3.3997(3.3888..3.4141) 
+  s=79
+WORD slice=science counts_pairs=32004700 held_pairs=329936 bytes_met=230 order0=3.5319 map=2.7715(256 rows)
+  bits=3.1010(16 rows) foil_bits=3.2428(3.2296..3.2657) foil256_bits=3.3064
+  m=2   rows=130 word=2.8729 foil=2.8279(2.8188..2.8473) foil256=2.8239 residue=3.4529 winding=2.9273
+  m=3   rows=89  word=2.9313 foil=2.8643(2.8515..2.8857) foil256=2.8404 residue=3.4794 winding=2.9579
+  m=4   rows=68  word=2.9313 foil=2.8926(2.8623..2.9168) foil256=2.8533 residue=3.3975 winding=3.0322
+  m=5   rows=57  word=2.9566 foil=2.9047(2.8928..2.9313) foil256=2.9068 residue=3.3783 winding=3.0670
+  m=6   rows=49  word=2.9720 foil=2.9290(2.9037..2.9421) foil256=2.8835 residue=3.3783 winding=3.0755
+  m=7   rows=44  word=2.9583 foil=2.9345(2.9033..2.9636) foil256=2.9237 residue=3.3515 winding=3.0673
+  m=8   rows=40  word=2.9332 foil=2.9384(2.9057..2.9711) foil256=2.9072 residue=3.2713 winding=3.0976
+  m=10  rows=36  word=2.9405 foil=2.9454(2.9119..2.9621) foil256=2.9469 residue=3.2433 winding=3.1422
+  m=12  rows=34  word=2.9375 foil=2.9475(2.9362..2.9649) foil256=2.9548 residue=3.2824 winding=3.1374
+  m=16  rows=32  word=2.8820 foil=2.9543(2.9327..2.9827) foil256=2.9798 residue=3.1527 winding=3.1878
+  m=20  rows=33  word=2.8559 foil=2.9557(2.9397..2.9896) foil256=2.9734 residue=3.0983 winding=3.1818
+  m=24  rows=35  word=2.8689 foil=2.9452(2.9312..2.9609) foil256=2.9486 residue=3.0914 winding=3.2480
+  m=26  rows=36  word=2.9037 foil=2.9680(2.9525..2.9806) foil256=2.9187 residue=3.0880 winding=3.3061
+  m=32  rows=40  word=2.8154 foil=2.9276(2.9056..2.9398) foil256=2.9509 residue=3.0240 winding=3.2871
+  m=40  rows=47  word=2.8375 foil=2.9053(2.8734..2.9250) foil256=2.9347 residue=2.9307 winding=3.2477
+  m=48  rows=54  word=2.8216 foil=2.8937(2.8781..2.9060) foil256=2.8898 residue=2.9433 winding=3.2875
+  m=64  rows=68  word=2.8022 foil=2.8661(2.8337..2.8906) foil256=2.8822 residue=2.9505 winding=3.3502
+  m=96  rows=99  word=2.7752 foil=2.8250(2.8096..2.8402) foil256=2.8490 residue=2.7988 winding=3.3339
+  m=128 rows=130 word=2.7729 foil=2.8144(2.7989..2.8314) foil256=2.8334 residue=2.7880 winding=3.4998
+  crt(16,17)          rows=33  word=2.9683 foil=2.9419(2.9321..2.9527)
+  crt(13,20)          rows=33  word=2.9577 foil=2.9471(2.9284..2.9775)
+  crt(11,24)          rows=35  word=2.9550 foil=2.9250(2.9121..2.9391)
+  crt(9,29)           rows=38  word=2.9632 foil=2.9290(2.9206..2.9437)
+  crt(7,37)           rows=44  word=2.8926 foil=2.9245(2.9128..2.9308)
+  crt(5,7,8)          rows=20  word=3.0818 foil=3.0792(3.0755..3.0824)
+  crt(5,7,9)          rows=21  word=3.0905 foil=3.0436(3.0320..3.0608)
+  crt(3,7,13)         rows=23  word=3.0944 foil=3.0447(3.0362..3.0557)
+  crt(3,5,7,11)       rows=26  word=3.0456 foil=2.9906(2.9695..3.0036)
+  crt(2,3,5,7,11)     rows=28  word=3.0279 foil=2.9775(2.9556..2.9896)
+  radix(4,8,8)        rows=20  word=2.9773 foil=3.0926(3.0854..3.1055)
+  radix(2,4,32)       rows=38  word=2.8173 foil=2.9558(2.9464..2.9727)
+  radix(4,4,16)       rows=24  word=2.9029 foil=3.0408(3.0351..3.0468)
+  both m=16  cells=1056  word=3.0130 foil=3.1357(3.1047..3.1616)
+  both m=32  cells=1640  word=2.8986 foil=3.0875(3.0715..3.1198)
+  both bits cells=288   word=3.2870 foil=3.4471(3.4196..3.4611) 
+  s=115
+WORD slice=books counts_pairs=32016902 held_pairs=329959 bytes_met=178 order0=3.1646 map=2.5121(256 rows)
+  bits=2.8264(16 rows) foil_bits=2.8435(2.8006..2.9074) foil256_bits=2.8920
+  m=2   rows=130 word=2.6037 foil=2.5519(2.5327..2.5830) foil256=2.5344 residue=3.0908 winding=2.6658
+  m=3   rows=89  word=2.6701 foil=2.5616(2.5572..2.5666) foil256=2.5540 residue=3.1023 winding=2.7007
+  m=4   rows=68  word=2.6613 foil=2.5980(2.5870..2.6107) foil256=2.5534 residue=3.0150 winding=2.7782
+  m=5   rows=57  word=2.6754 foil=2.5898(2.5805..2.6031) foil256=2.5738 residue=2.9757 winding=2.8124
+  m=6   rows=49  word=2.7114 foil=2.6069(2.6029..2.6087) foil256=2.5622 residue=2.9966 winding=2.8372
+  m=7   rows=44  word=2.6891 foil=2.6224(2.6073..2.6441) foil256=2.5819 residue=2.9589 winding=2.8185
+  m=8   rows=40  word=2.6631 foil=2.6239(2.6116..2.6470) foil256=2.5728 residue=2.8770 winding=2.8567
+  m=10  rows=36  word=2.6640 foil=2.6317(2.6213..2.6454) foil256=2.5914 residue=2.8370 winding=2.8905
+  m=12  rows=34  word=2.6620 foil=2.6318(2.6223..2.6368) foil256=2.5853 residue=2.8930 winding=2.9060
+  m=16  rows=32  word=2.6115 foil=2.6359(2.6182..2.6492) foil256=2.6136 residue=2.7401 winding=2.9519
+  m=20  rows=33  word=2.5686 foil=2.6226(2.6117..2.6314) foil256=2.6066 residue=2.6928 winding=2.9283
+  m=24  rows=35  word=2.5813 foil=2.6086(2.5912..2.6156) foil256=2.6156 residue=2.7246 winding=3.0013
+  m=26  rows=36  word=2.5948 foil=2.6072(2.5882..2.6162) foil256=2.5700 residue=2.6885 winding=3.0186
+  m=32  rows=40  word=2.5334 foil=2.5995(2.5926..2.6069) foil256=2.6090 residue=2.6309 winding=3.0188
+  m=40  rows=47  word=2.5569 foil=2.5878(2.5784..2.6073) foil256=2.5826 residue=2.6045 winding=2.9778
+  m=48  rows=54  word=2.5336 foil=2.5781(2.5562..2.5883) foil256=2.5697 residue=2.5813 winding=3.0236
+  m=64  rows=68  word=2.5234 foil=2.5563(2.5471..2.5696) foil256=2.5685 residue=2.5805 winding=3.0527
+  m=96  rows=99  word=2.5135 foil=2.5371(2.5253..2.5451) foil256=2.5483 residue=2.5305 winding=3.0450
+  m=128 rows=130 word=2.5124 foil=2.5282(2.5250..2.5306) foil256=2.5456 residue=2.5198 winding=3.1438
+  crt(16,17)          rows=33  word=2.5856 foil=2.5979(2.5912..2.6077)
+  crt(13,20)          rows=33  word=2.5904 foil=2.6027(2.5904..2.6223)
+  crt(11,24)          rows=35  word=2.5915 foil=2.5913(2.5828..2.6047)
+  crt(9,29)           rows=38  word=2.5915 foil=2.5880(2.5714..2.5982)
+  crt(7,37)           rows=44  word=2.5733 foil=2.5774(2.5743..2.5846)
+  crt(5,7,8)          rows=20  word=2.6750 foil=2.7031(2.7021..2.7039)
+  crt(5,7,9)          rows=21  word=2.6835 foil=2.6922(2.6829..2.7037)
+  crt(3,7,13)         rows=23  word=2.7002 foil=2.6754(2.6561..2.6929)
+  crt(3,5,7,11)       rows=26  word=2.6466 foil=2.6476(2.6270..2.6589)
+  crt(2,3,5,7,11)     rows=28  word=2.6342 foil=2.6344(2.6228..2.6424)
+  radix(4,8,8)        rows=20  word=2.6905 foil=2.6975(2.6786..2.7123)
+  radix(2,4,32)       rows=38  word=2.5335 foil=2.6126(2.6039..2.6237)
+  radix(4,4,16)       rows=24  word=2.6161 foil=2.6791(2.6640..2.6882)
+  both m=16  cells=1056  word=2.7017 foil=2.7560(2.7301..2.7718)
+  both m=32  cells=1640  word=2.5570 foil=2.6845(2.6678..2.7019)
+  both bits cells=288   word=2.9919 foil=3.0515(3.0176..3.0829) 
+  s=151
+WORD slice=wikidata counts_pairs=19915149 held_pairs=329704 bytes_met=201 order0=4.0116 map=2.8576(256 rows)
+  bits=3.1501(16 rows) foil_bits=3.6077(3.5645..3.6957) foil256_bits=3.6844
+  m=2   rows=130 word=2.9585 foil=2.9957(2.9800..3.0100) foil256=2.9578 residue=3.9148 winding=3.0193
+  m=3   rows=89  word=3.0257 foil=3.0738(3.0622..3.0965) foil256=3.0143 residue=3.9372 winding=3.0651
+  m=4   rows=68  word=3.0113 foil=3.1286(3.1080..3.1510) foil256=3.0804 residue=3.8660 winding=3.1154
+  m=5   rows=57  word=3.0425 foil=3.1709(3.1631..3.1798) foil256=3.1286 residue=3.8455 winding=3.1319
+  m=6   rows=49  word=3.0363 foil=3.1902(3.1765..3.2102) foil256=3.1556 residue=3.7933 winding=3.1475
+  m=7   rows=44  word=3.0541 foil=3.2190(3.1987..3.2336) foil256=3.1860 residue=3.8043 winding=3.1662
+  m=8   rows=40  word=3.0115 foil=3.2272(3.1933..3.2636) foil256=3.1906 residue=3.7402 winding=3.1716
+  m=10  rows=36  word=3.0259 foil=3.2588(3.2400..3.2746) foil256=3.2272 residue=3.6987 winding=3.2149
+  m=12  rows=34  word=3.0205 foil=3.2495(3.2309..3.2686) foil256=3.2529 residue=3.6831 winding=3.2088
+  m=16  rows=32  word=2.9855 foil=3.2478(3.2258..3.2783) foil256=3.3065 residue=3.6164 winding=3.2118
+  m=20  rows=33  word=2.9871 foil=3.2544(3.2223..3.3087) foil256=3.2526 residue=3.5434 winding=3.2858
+  m=24  rows=35  word=2.9815 foil=3.2254(3.2171..3.2386) foil256=3.2570 residue=3.4671 winding=3.2851
+  m=26  rows=36  word=3.0021 foil=3.2145(3.1911..3.2586) foil256=3.2165 residue=3.5039 winding=3.3795
+  m=32  rows=40  word=2.9498 foil=3.1965(3.1774..3.2233) foil256=3.2599 residue=3.3895 winding=3.3228
+  m=40  rows=47  word=2.9534 foil=3.1681(3.1482..3.1945) foil256=3.1866 residue=3.3224 winding=3.3758
+  m=48  rows=54  word=2.9592 foil=3.1239(3.1018..3.1454) foil256=3.1416 residue=3.2787 winding=3.4228
+  m=64  rows=68  word=2.9033 foil=3.0849(3.0632..3.1039) foil256=3.1395 residue=3.2145 winding=3.3902
+  m=96  rows=99  word=2.8870 foil=2.9845(2.9748..2.9970) foil256=3.0528 residue=3.0773 winding=3.5901
+  m=128 rows=130 word=2.8679 foil=2.9556(2.9375..2.9725) foil256=2.9901 residue=2.9837 winding=3.6716
+  crt(16,17)          rows=33  word=3.2817 foil=3.2240(3.2002..3.2457)
+  crt(13,20)          rows=33  word=3.2950 foil=3.2531(3.2412..3.2694)
+  crt(11,24)          rows=35  word=3.2915 foil=3.2059(3.1914..3.2137)
+  crt(9,29)           rows=38  word=3.3008 foil=3.2029(3.1589..3.2249)
+  crt(7,37)           rows=44  word=3.2404 foil=3.1800(3.1369..3.2058)
+  crt(5,7,8)          rows=20  word=3.4632 foil=3.4128(3.3849..3.4375)
+  crt(5,7,9)          rows=21  word=3.4650 foil=3.4037(3.3806..3.4230)
+  crt(3,7,13)         rows=23  word=3.4649 foil=3.3607(3.3381..3.4103)
+  crt(3,5,7,11)       rows=26  word=3.4356 foil=3.3313(3.2814..3.3878)
+  crt(2,3,5,7,11)     rows=28  word=3.4075 foil=3.3148(3.2645..3.3697)
+  radix(4,8,8)        rows=20  word=3.0483 foil=3.3849(3.3622..3.4208)
+  radix(2,4,32)       rows=38  word=2.9520 foil=3.2404(3.2263..3.2762)
+  radix(4,4,16)       rows=24  word=3.0040 foil=3.3380(3.3227..3.3583)
+  both m=16  cells=1056  word=3.1109 foil=3.6582(3.6442..3.6766)
+  both m=32  cells=1640  word=3.0796 foil=3.5688(3.5191..3.5999)
+  both bits cells=288   word=3.5075 foil=3.9710(3.9588..3.9867) 
+  s=186

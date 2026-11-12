@@ -1,0 +1,88 @@
+# P50 step 0 (readings only), 2026-11-12 UTC: the card's yardsticks and one profiled read with the profile by head. Build 846151804 (claude/engine),
+# field_pass sha256 e70be67f2c45ddb6. One hold of the card lock, nothing else on the card or the host. 0b: field_pass yardstick 209 1.5 (each reading a
+# calibrating launch, then at least 1.5 s; 256 threads a block). 0a: train-store from run 2's STATE.1900 (sha256 cda6ac8a1129f147) on the prefix for
+# 100 sections with FIELD_PROFILE=1, the pass's sections 2,001 to 2,100 as P49a read them. Projection 47.5 s; stop 72,618 ms; outer 136 s. Numbers only.
+## 0b, the yardsticks
+YARDSTICK card=RTX_4080_SUPER multiprocessors=80 product_blocks=5120 stream_blocks=2560 threads_a_block=256
+YARDSTICK reading=products_cell map=64x64 products=2195047055360 seconds=1.5009 products_a_second=1.4625e12
+YARDSTICK reading=products_tile map=64x64 products=8081249402880 seconds=1.5567 products_a_second=5.1914e12
+YARDSTICK reading=read_in_order store_octets=1073741824 octets=871878361088 seconds=1.5230 octets_a_second=5.7247e11
+YARDSTICK reading=write_in_order store_octets=1073741824 octets=809601335296 seconds=1.5764 octets_a_second=5.1359e11
+YARDSTICK reading=gather_eight_words rows=160547 entries=209 octets_a_gather=32 octets=219236270080 seconds=1.5171 octets_a_second=1.4451e11 gathers_a_second=4.5160e9
+MEASURE lap=yard rc=0 wall_s=21.0 peak_rss_kib=636264
+## 0a, the profiled read
+STORE_SAVE k=100 sections=100 states=100 moved=108353 square=21209822268929 priced=99 transfer=-2413833820 external=-2392690345 curvature=-21143475 octave=1 rate=12 reads=0 returns=100 pairs=4566615773 batches=100 peak_store=7543813190 ms=49722
+FIELD_CARD reads=0 read_ms=0 returns=100 return_ms=48104 pairs=4566615773 batches=100 peak_store=7543813190 landmarks=0 landmark_ms=0 elapsed_ms=49724
+FIELD_PROFILE_PAIRS head=0 kind=still pairs=1478325193
+FIELD_PROFILE_PAIRS head=1 kind=still pairs=994152016
+FIELD_PROFILE_PAIRS head=2 kind=paced pairs=1001476447
+FIELD_PROFILE_PAIRS head=3 kind=paced pairs=1092662117
+FIELD_PROFILE_HEAD entry=field_contact_columns head=0 kind=still launches=400 us=542113 pairs=1478325193 ns_a_pair_milli=366
+FIELD_PROFILE_HEAD entry=field_contact_columns head=1 kind=still launches=400 us=446456 pairs=994152016 ns_a_pair_milli=449
+FIELD_PROFILE_HEAD entry=field_contact_columns head=2 kind=paced launches=400 us=1147653 pairs=1001476447 ns_a_pair_milli=1145
+FIELD_PROFILE_HEAD entry=field_contact_columns head=3 kind=paced launches=400 us=1230532 pairs=1092662117 ns_a_pair_milli=1126
+FIELD_PROFILE_HEAD entry=field_contact_rows head=0 kind=still launches=400 us=861575 pairs=1478325193 ns_a_pair_milli=582
+FIELD_PROFILE_HEAD entry=field_contact_rows head=1 kind=still launches=400 us=690268 pairs=994152016 ns_a_pair_milli=694
+FIELD_PROFILE_HEAD entry=field_contact_rows head=2 kind=paced launches=400 us=2044770 pairs=1001476447 ns_a_pair_milli=2041
+FIELD_PROFILE_HEAD entry=field_contact_rows head=3 kind=paced launches=400 us=2172164 pairs=1092662117 ns_a_pair_milli=1987
+FIELD_PROFILE_HEAD entry=field_pace_skin_back head=2 kind=paced launches=400 us=1942415 pairs=1001476447 ns_a_pair_milli=1939
+FIELD_PROFILE_HEAD entry=field_pace_skin_back head=3 kind=paced launches=400 us=2035518 pairs=1092662117 ns_a_pair_milli=1862
+FIELD_PROFILE_HEAD entry=field_spread head=0 kind=still launches=400 us=141199 pairs=1478325193 ns_a_pair_milli=95
+FIELD_PROFILE_HEAD entry=field_spread head=1 kind=still launches=400 us=156749 pairs=994152016 ns_a_pair_milli=157
+FIELD_PROFILE_HEAD entry=field_spread head=2 kind=paced launches=400 us=133010 pairs=1001476447 ns_a_pair_milli=132
+FIELD_PROFILE_HEAD entry=field_spread head=3 kind=paced launches=400 us=134532 pairs=1092662117 ns_a_pair_milli=123
+FIELD_PROFILE_SPLIT kernels_ms=42509 copies=3800 copies_ms=2807 allocations=30000 allocations_ms=167 elapsed_ms=49724
+MEASURE lap=prof0 rc=0 wall_s=50.2 peak_rss_kib=383428
+PROFILED_SECTIONS read=100 equal_to_leg1s_same_sections=100/100 (timings aside)
+SECTION_MS profiled_mean=494.8 leg1_same_sections_mean=420.8
+GATE_BYTES STATE.100 equal_to_p49a_prof100 81377dbeaf26d65e
+GATE_BYTES MEAN.100 equal_to_p49a_prof100 64954161619deda4
+## head_profile.py on the read's log
+sections=100 heads=4 kinds=0:still,1:still,2:paced,3:paced
+pairs head=0 kind=still pairs=1478325193 a_section=14783252 share=0.324
+pairs head=1 kind=still pairs=994152016 a_section=9941520 share=0.218
+pairs head=2 kind=paced pairs=1001476447 a_section=10014764 share=0.219
+pairs head=3 kind=paced pairs=1092662117 a_section=10926621 share=0.239
+field_contact_rows       head=0 kind=still launches=  400 ms=    861.6 ms_a_section=   8.62 pairs=1478325193 ns_a_pair=0.583
+field_contact_rows       head=1 kind=still launches=  400 ms=    690.3 ms_a_section=   6.90 pairs=994152016 ns_a_pair=0.694
+field_contact_rows       head=2 kind=paced launches=  400 ms=   2044.8 ms_a_section=  20.45 pairs=1001476447 ns_a_pair=2.042
+field_contact_rows       head=3 kind=paced launches=  400 ms=   2172.2 ms_a_section=  21.72 pairs=1092662117 ns_a_pair=1.988
+field_contact_rows       all ms=   5768.8 ms_a_section=  57.69 paced_share=0.731
+field_pace_skin_back     head=2 kind=paced launches=  400 ms=   1942.4 ms_a_section=  19.42 pairs=1001476447 ns_a_pair=1.940
+field_pace_skin_back     head=3 kind=paced launches=  400 ms=   2035.5 ms_a_section=  20.36 pairs=1092662117 ns_a_pair=1.863
+field_pace_skin_back     all ms=   3977.9 ms_a_section=  39.78 paced_share=1.000
+field_contact_columns    head=0 kind=still launches=  400 ms=    542.1 ms_a_section=   5.42 pairs=1478325193 ns_a_pair=0.367
+field_contact_columns    head=1 kind=still launches=  400 ms=    446.5 ms_a_section=   4.46 pairs=994152016 ns_a_pair=0.449
+field_contact_columns    head=2 kind=paced launches=  400 ms=   1147.7 ms_a_section=  11.48 pairs=1001476447 ns_a_pair=1.146
+field_contact_columns    head=3 kind=paced launches=  400 ms=   1230.5 ms_a_section=  12.31 pairs=1092662117 ns_a_pair=1.126
+field_contact_columns    all ms=   3366.8 ms_a_section=  33.67 paced_share=0.706
+field_spread             head=0 kind=still launches=  400 ms=    141.2 ms_a_section=   1.41 pairs=1478325193 ns_a_pair=0.096
+field_spread             head=1 kind=still launches=  400 ms=    156.7 ms_a_section=   1.57 pairs=994152016 ns_a_pair=0.158
+field_spread             head=2 kind=paced launches=  400 ms=    133.0 ms_a_section=   1.33 pairs=1001476447 ns_a_pair=0.133
+field_spread             head=3 kind=paced launches=  400 ms=    134.5 ms_a_section=   1.35 pairs=1092662117 ns_a_pair=0.123
+field_spread             all ms=    565.5 ms_a_section=   5.65 paced_share=0.473
+G116_d paced_share_of_field_contact_rows=0.731 fixed=0.78 range=0.70..0.86 IN stop_rule_under_0.65=held
+## profile_budget.py on the read's log
+elapsed_ms=49724 kernels_ms=42509 entries_ms=42479 launches=49300 entries=68
+share_of_elapsed kernels=0.855 wide=0.835 short=0.020 allocations=0.003 copies=0.056 host=0.085
+short_launches=6500 mean_us=151 share_of_kernel=0.023 least_us_a_launch=81
+allocation_us=5.6 copy_us=738.7
+share_of_kernel contact=0.496 affine=0.055 top_five=0.455
+reads=0 returns=100 batches=100 batches_a_run=1.00 pairs_met=4566615773 pairs_a_run=4.567e+07 peak_store=7543813190
+a_batch launches=493 allocations=300 copies=38
+field_contact_rows                 launches=   1600 ms=  5768 us_a_launch=  3605 share_of_kernel=0.136
+field_pace_skin_back               launches=    800 ms=  3977 us_a_launch=  4971 share_of_kernel=0.094
+field_contact_l5                   launches=    351 ms=  3947 us_a_launch= 11247 share_of_kernel=0.093
+field_contact_columns              launches=   1600 ms=  3366 us_a_launch=  2103 share_of_kernel=0.079
+field_moment_pace_back_all         launches=    400 ms=  2250 us_a_launch=  5627 share_of_kernel=0.053
+field_outer_x32                    launches=   6000 ms=  1849 us_a_launch=   308 share_of_kernel=0.044
+field_transposed                   launches=   3700 ms=  1785 us_a_launch=   482 share_of_kernel=0.042
+field_affine_tiled_x32             launches=   3200 ms=  1754 us_a_launch=   548 share_of_kernel=0.041
+field_moment_return_paced_all      launches=    400 ms=  1687 us_a_launch=  4219 share_of_kernel=0.040
+field_moment_paced_all             launches=    400 ms=  1641 us_a_launch=  4103 share_of_kernel=0.039
+field_exposure                     launches=    400 ms=  1537 us_a_launch=  3842 share_of_kernel=0.036
+field_moment_skinned_all           launches=    400 ms=   718 us_a_launch=  1796 share_of_kernel=0.017
+field_outer_bound_x32              launches=   2500 ms=   630 us_a_launch=   252 share_of_kernel=0.015
+field_contact_l6                   launches=     49 ms=   584 us_a_launch= 11919 share_of_kernel=0.014
+field_blank_bias_enc               launches=    300 ms=   573 us_a_launch=  1910 share_of_kernel=0.013
+field_affine_tiled_x64             launches=    900 ms=   567 us_a_launch=   630 share_of_kernel=0.013
