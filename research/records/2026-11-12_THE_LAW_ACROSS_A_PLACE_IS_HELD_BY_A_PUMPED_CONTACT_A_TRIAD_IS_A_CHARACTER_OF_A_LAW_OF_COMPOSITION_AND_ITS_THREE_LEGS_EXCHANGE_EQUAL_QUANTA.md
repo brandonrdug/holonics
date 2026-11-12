@@ -178,8 +178,12 @@ triad's reach reads short at three to five letters each side.
 - **Founding** (`grow-triad-field`): `A`, `B` and `G` drawn as the growth by contacts draws `a` and
   `b` (uniform on `±√(3/D)` on the material's grain), the biases and `W_T` at zero. The grown field
   is the trained field bit for bit.
-- **Parts.** `triad` (the three charts with their biases) and `w_triad` (the return), appended after
-  the parts the line has, at one rate (section 3.2).
+- **Parts.** One part, `triad`: the three charts, their biases and the return, appended after the
+  parts the line has and written only where `J > 0`. A part is a family of entries that steps at
+  one rate, and the gauge (section 3.2) makes the triad's charts and return one such family, so the
+  one rate holds by the part and needs no rule beside it.
+- **At `J = 0`** every line the build prints is the line as now: the parts lines and the section
+  parts print the parts the field writes, so a reproduction compares like with like.
 - **Reverse**, by the product rule through the producing operands, each product released at the
   face's grain as the plain contact's are: with `u = δc_k(t) = (W_Tᵀ δx_t)_k`,
 
@@ -194,6 +198,11 @@ triad's reach reads short at three to five letters each side.
   covector is one term, and the reverse has no order to choose.
 - **The card** realizes the forward per site beside the plain contact and the reverse by the same
   rule, the return's two blocks summed whole before its release; host against card parity first.
+- **Tests of the law** beside the field's: at `J = 0` the head line, the layout and every face as
+  now; a grown field reads every face of its source bit for bit; the quarter-turn gauge
+  `(α_k, β_k) → (i α_k, −i β_k)`, exact on integers, leaves every face bit for bit; the reverse
+  against the code's change along a direction, as the contacts' and the circles' tests read it; no
+  triad and no covector at a region's two ends.
 - **The line.** The build enters the line by reproducing it: one lap at `J = 0` from the line's last
   saved state, whose section lines, timings aside, and states equal the line's own lap's. Then the
   triads are founded on the circle line's newest end and trained beside the circle line's own lap on
