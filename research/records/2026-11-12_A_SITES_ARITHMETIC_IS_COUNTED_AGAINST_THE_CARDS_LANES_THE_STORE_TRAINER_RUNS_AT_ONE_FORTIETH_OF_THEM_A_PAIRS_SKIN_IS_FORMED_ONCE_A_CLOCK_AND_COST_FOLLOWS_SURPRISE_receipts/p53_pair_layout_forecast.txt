@@ -1,0 +1,44 @@
+# P53 item 2, 2026-11-12 UTC: the pair store's layout, a forecast from source at main 60fece148 (no build), on step 3's profiled read (the pass's
+# sections 2,001 to 2,100) and the census of the same sections; pair_layout_forecast.py beside contact_forecast.py. Numbers only.
+GEOMETRY sections=100 rows_a_tick=4078042 pairs_by_head=[1478325193, 994152016, 1001476447, 1092662117] kinds=['still', 'still', 'paced', 'paced']
+## (a) a pair's words
+WORD word='score then share' array=e octets=8 heads=all index='dense block [h][E]: receiver i, source j (region_eoff + i S + j)' walks=field_exposure:not its order, field_contact_l5:not its order, field_contact_rows:not its order, field_pace_skin_back:not its order, field_contact_columns:not its order
+WORD word='lock at unit gain' array=sb octets=8 heads=all index='dense block [h][E] (a return)' walks=field_exposure:not its order, field_contact_rows:not its order
+WORD word='ds' array=ds octets=8 heads=all index='dense block [E], one head at a time (a return)' walks=field_contact_rows:not its order, field_pace_skin_back:not its order, field_contact_columns:not its order
+WORD word='covector dp' array=dpb octets=16 heads=all index='dense block [E], one head at a time (a return)' walks=field_contact_rows:not its order
+WORD word='skins (8 modes)' array=skin octets=32 heads=paced index='support stride [p][E2]: receiver i, entry k (region_soff + i K_r + k)' walks=field_exposure:own order, field_skin_fill:own order, field_contact_l5:own order, field_contact_rows:own order, field_pace_skin_back:own order, field_contact_columns:not its order
+WORD bits_by_head_at_state_C=owed (the largest magnitude's and the 0.999 quantile's bits need a reading of the words on the card; not built under this order)
+## (b) the walks
+WALK entry=field_exposure pass=forward launches_a_tick='1 (every head)' list="receiver i's support" order="near slots, then the probed classes' runs (or the region's definite list)"
+WALK entry=field_skin_fill pass=forward and return launches_a_tick='1 each (paced heads)' list="receiver i's support" order='the same'
+WALK entry=field_contact_l5 pass=forward launches_a_tick='1 (every head)' list="receiver i's support, twice" order='the same'
+WALK entry=field_contact_rows pass=return launches_a_tick='1 a head' list="receiver i's support, twice" order='the same'
+WALK entry=field_pace_skin_back pass=return launches_a_tick='1 a paced head' list="receiver i's support" order='the same'
+WALK entry=field_contact_columns pass=return launches_a_tick='1 a head' list="source j's receivers" order="near slots, then the probers of j's class (their order an atomic's), then the open receivers"
+WALK entry=field_spread pass=return launches_a_tick='1 a head' list="a region's sites" order='in place order (no pair)'
+WALK same_list_same_order=field_exposure,field_skin_fill,field_contact_l5,field_contact_rows,field_pace_skin_back (the receiver's support); field_contact_columns walks the transpose
+## (c) the rows a pair reads through its source
+SOURCE row='value row vf' octets=128 distinct_a_head_a_tick=4078042 octets_a_head_a_tick=5219893_a_section
+SOURCE row='word row qf' octets=128 distinct_a_head_a_tick=4078042 octets_a_head_a_tick=5219893_a_section
+SOURCE row='probe row pq' octets=128 distinct_a_head_a_tick=4078042 octets_a_head_a_tick=5219893_a_section
+SOURCE row='key row qf32' octets=64 distinct_a_head_a_tick=4078042 octets_a_head_a_tick=2609946_a_section
+SOURCE row='probe row pq32' octets=64 distinct_a_head_a_tick=4078042 octets_a_head_a_tick=2609946_a_section
+SOURCE head=0 kind=still mean_receivers_a_source=90.6
+SOURCE head=1 kind=still mean_receivers_a_source=60.9
+SOURCE head=2 kind=paced mean_receivers_a_source=61.4
+SOURCE head=3 kind=paced mean_receivers_a_source=67.0
+SOURCE card_L2_octets=67108864 shared_octets_a_multiprocessor=102400 (the driver's cuDeviceGetAttribute: L2_CACHE_SIZE, MAX_SHARED_MEMORY_PER_MULTIPROCESSOR)
+SOURCE a_section_a_head_rows_read_through_sources=18269440 octets (vf, qf, pq, qf32; a region's of some 200 sites about 90 KB a head)
+## (d) the family's once-a-word floor, ms over the read's sections, by entry
+FLOOR layout=1 entry=field_contact_columns today_ms=2588 record_in_order_ms=1577 measured_ms=2807
+FLOOR layout=1 entry=field_contact_l5 today_ms=2227 record_in_order_ms=332 measured_ms=3326
+FLOOR layout=1 entry=field_contact_rows today_ms=4410 record_in_order_ms=812 measured_ms=4018
+FLOOR layout=1 entry=field_exposure today_ms=2185 record_in_order_ms=290 measured_ms=911
+FLOOR layout=1 entry=field_pace_skin_back today_ms=1090 record_in_order_ms=290 measured_ms=3741
+FLOOR layout=1 entry=field_skin_fill today_ms=257 record_in_order_ms=257 measured_ms=920
+FLOOR layout=1 entry=field_spread today_ms=175 record_in_order_ms=175 measured_ms=665
+FLOOR layout=1 family today_ms=12932 record_in_order_ms=3733
+FLOOR layout=2 forward_launch_ms=389 return_launch_ms=613 columns_ms=1577 spread_ms=175 family_ms=2754 (today 12,932 by the compulsory count)
+FLOOR layout=3 owed: the records and the source rows at their occupied bits need the bits' reading (a)
+COLUMNS second_copy_octets_written_gathered=146131704736 read_in_order=140078286416 floor_ms=1358
+COLUMNS through_an_index_octets_gathered=213144138784 index_in_order=18266463092 floor_ms=1609

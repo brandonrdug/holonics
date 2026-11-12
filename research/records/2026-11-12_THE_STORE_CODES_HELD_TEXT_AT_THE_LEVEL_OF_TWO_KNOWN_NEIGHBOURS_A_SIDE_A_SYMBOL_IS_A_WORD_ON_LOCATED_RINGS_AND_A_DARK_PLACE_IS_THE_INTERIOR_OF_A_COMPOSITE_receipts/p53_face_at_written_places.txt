@@ -1,0 +1,19 @@
+# P53 item 3, 2026-11-12 UTC: a reading of source at main 60fece148, no run. Entry names and numbers only.
+## Where a face is formed (crates/holonics-cuda/src/hnn/field.rs; kernels/field.cu)
+FACE where=after_the_last_tick sites=unresolved entries=field_chart(only_unresolved),field_affine_x32_or_tiled(the lift, only_unresolved),field_tied_face(skips a resolved site),field_echo_apply(carried sites),field_face(skips a resolved site)
+FACE where=between_ticks(blank_clock) sites=blank_read(the silent open sites a clock reads; unresolved is set to blank_read for these launches) entries=field_chart,field_affine(the lift),field_tied_face,field_face,field_blank_rates
+FACE where=written_place formed=no (no entry forms z, masses or totals at a resolved site, in a tick or after the last)
+FACE where=tick_forward formed=no (a tick forms its current and contact; the face is read only by the blank clock between ticks and after the last tick)
+ANSWER written_place_code_under_the_tick_befores_face_available_without_a_further_launch=no
+## What read-store would need to print every place's code under the face the tick before gave it (a held piece; D=64, A=244, lanes=2)
+NEED a_face_a_tick=ticks_0_to_2_for_ticks_1_to_3 (the face after tick k read at every place, before tick k+1) plus the final face (after tick 3) at every place
+NEED launches_a_face=5 (field_chart over every site; the lift, one affine; field_tied_face over every site; field_face over every site; one new reading launch: the place's own class's code, -log2(masses[class]/total), at every place)
+NEED launches_a_read=20 (4 faces x 5), beside the read's own launches
+NEED octets_a_place_a_face=4720 (fread 4D=256, fscale 16 lanes=32, lift 8D=512, z 8A=1952, masses 8A=1952, totals 16), each written once and read once by the next launch; the code out 8
+NEED today read-store prints STORE_READ_SURPRISE: the compared places' codes by bit length, from the final face at the mask's open places only
+## NewsClock and join_news
+NEWS owner=hnn::tower (the gated tower, crates/holonics/src/hnn/tower.rs): struct NewsClock, Tower::join_news, TowerLearner::join_news; Tower::news
+NEWS not_in=hnn::tower::field (the store trainer's machine): no news clock; its host holds Field::read_and_return_split (G39, November 11, a reading: a place loud where its news mass 1/2 |p - q|_1 is at or above 2^-bits)
+NEWS callers_examples=holonics-cuda/examples/tower_pass.rs (a clock from its arguments, then join_news), holonics/examples/solenoidal_alpha/complete_language/tower_train.rs (learner.join_news), holonics/examples/solenoidal_alpha/complete_language/tower_classes.rs (NewsClock::new(8, 2), NewsClock::above(8, 2, 4))
+NEWS callers_tests=holonics-cuda/tests/tower_pass.rs (the card against the host in lockstep with news clocks, NewsClock::new(2, 2), new(3, 2), above(2, 2, 2), above(2, 2, 4)); holonics src/hnn/tower.rs unit tests the_levels_tick_on_their_own_news_as_an_epoch_tower, one_level_on_the_news_clock_is_the_tower_without_it, a_news_clock_tower_restores_exactly, the_news_clock_covector_matches_the_code_difference
+NEWS card_realization=yes for the gated tower (crates/holonics-cuda/src/hnn/tower.rs and kernels/tower.cu: each level's modes step once a tick of its own clock); none in the field's (src/hnn/field.rs and kernels/field.cu name no news clock)
