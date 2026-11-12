@@ -182,7 +182,9 @@ repository was reset on September 24; the pre-reset tree is
     after the card refused the frictionless carry (G83, G85) and charted on its logarithm after its
     linear chart became a switch at eight times (G96), is its first instance; the ring faces outside the
     unit disk are repaired at the next founding. Such a face is a turn that also boosts (the record
-    §14.3).
+    §14.3). The reach ruler (November 12) lists every reach on one scale of ranges beside each part's
+    turn defect: no read of the line boosts by more than `3·10^(−9)` nats, because a skin or the unit
+    power covers every ring face's excess, so the repair enters as the next founding's form.
   - No global word in the law: a part's rate is its own temperature. G86's polar law by part stands
     as the line's rate law. The block law, every block a part at its own rate with octaves under
     the floor (G89), bought no level at the lap means and is retired (G92, November 12): a class's

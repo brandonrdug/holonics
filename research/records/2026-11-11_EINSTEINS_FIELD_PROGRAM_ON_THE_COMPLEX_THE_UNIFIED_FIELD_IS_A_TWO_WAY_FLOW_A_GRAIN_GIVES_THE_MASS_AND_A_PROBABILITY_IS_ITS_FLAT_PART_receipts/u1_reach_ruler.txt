@@ -1,0 +1,33 @@
+# u1_reach_ruler.py (a host ruler on the cloud container, numbers only: Python integers reproducing field.rs turn_phasor, skin_of up to its exponent, carry_gate and carry_coupling, and tower.rs half_turn and exp_series, at b50f837; the line's declaration hnn-field-v14e 100 64 4 8 2 128 4 4 3771 2 0 32; the carry gates read from te2's receipt g99_te2_lines.txt, lap -1 (te1's end, the lap's start) and lap 0 (te2's end)), read 2026-11-12 from 08:51:50 UTC.
+# the declaration: hnn-field-v14e 100 64 4 8 2 128 4 4 3771 2 0 32; turned slots 16, ring periods 2 3 4 9 16 27 32 81 128 243 256 729 1024 2187 4096 6561
+# REACH part= range= (places, R = 1/(1 - |mu|) for a one-place multiplier mu, a window's count, or the region) turn_defect=
+REACH part=strand range=1 what=the_pair_contact's_strand_mate_(t-1_even,_t+1_odd)_and_the_opening's_E-_E+_rows turn_defect=none_(a_product_of_two_sites'_reads,_no_turn)
+REACH part=near range=5 window=0<|i-j|<6 weights_at_the_address_cost_sum=2.50 turn_defect=its_heads'_(a_still_head's_none,_a_turned_head's_its_rings')
+REACH part=ticks range=20 what=4_ticks_of_the_near_field_each_side,_hop_by_hop turn_defect=-
+REACH part=carry state=founded d=16384/2^16 range=5.0000 gamma=858993459/2^30 kappa=1073741824/2^30 (kappa_at_the_founding_is_2^30:True)
+REACH part=carry state=friction_floor d=1/2^16 range=65537 what=the_most_a_circle_holds
+REACH part=carry state=friction_carrier d<2^47/2^16 range=1.000000 what=the_least_before_refusal
+REACH part=carry turn_defect: over 2611 gates (q from 0 to 2^39 either sign, frictions from the floor to the carrier) the largest |gamma|^2 - 2^60 = -35182206754390 (inside the disk: True, by 3.05e-05 of it at the floor); the turn alone at the floor, |gamma|^2 (1 + d)^2 - 2^60 = 1360085963.3 units of 2^-60 (the Cayley step keeps the circle, so its rounding is all its defect, and the friction covers it 2.59e+04 times)
+REACH part=carry state=read:te1_end circles=32 mean_|gamma|=0.8705 range_at_the_mean_|gamma|=7.72 range_by_circle_min/mean/max=6.2/7.9/10.6
+REACH part=carry state=read:te2_end circles=32 mean_|gamma|=0.9019 range_at_the_mean_|gamma|=10.19 range_by_circle_min/mean/max=6.4/10.9/18.2
+REACH part=still heads=2_of_4_ring_sets range=3771 what=no_skin:_the_word_at_any_distance_in_the_region,_far_sources_met_by_class_at_floor(log2_d)_bits turn_defect=0_(U_=_1_held_exactly)
+REACH part=skin ring=2 range=1.05 n/2pi=0.32 heard_to=7 turn_defect: none_(every_face_a_quarter_point,_held_exactly)
+REACH part=skin ring=3 range=1.14 n/2pi=0.48 heard_to=10 turn_defect: faces_outside_the_disk=2/2 largest_excess=576828577/2^60 boost_a_read=2.50e-10_nats with_the_skin_at_d=1_inside_the_disk=True by=0.985
+REACH part=skin ring=4 range=1.26 n/2pi=0.64 heard_to=14 turn_defect: none_(every_face_a_quarter_point,_held_exactly)
+REACH part=skin ring=9 range=1.99 n/2pi=1.43 heard_to=31 turn_defect: faces_outside_the_disk=4/8 largest_excess=576828577/2^60 boost_a_read=2.50e-10_nats with_the_skin_at_d=1_inside_the_disk=True by=0.752
+REACH part=skin ring=16 range=3.08 n/2pi=2.55 heard_to=56 turn_defect: faces_outside_the_disk=6/12 largest_excess=1536684525/2^60 boost_a_read=6.66e-10_nats with_the_skin_at_d=1_inside_the_disk=True by=0.544
+REACH part=skin ring=27 range=4.82 n/2pi=4.30 heard_to=95 turn_defect: faces_outside_the_disk=14/26 largest_excess=2236598002/2^60 boost_a_read=9.70e-10_nats with_the_skin_at_d=1_inside_the_disk=True by=0.372
+REACH part=skin ring=32 range=5.61 n/2pi=5.09 heard_to=112 turn_defect: faces_outside_the_disk=12/28 largest_excess=2580860674/2^60 boost_a_read=1.12e-09_nats with_the_skin_at_d=1_inside_the_disk=True by=0.325
+REACH part=skin ring=81 range=13.40 n/2pi=12.89 heard_to=285 turn_defect: faces_outside_the_disk=26/80 largest_excess=2845861989/2^60 boost_a_read=1.23e-09_nats with_the_skin_at_d=1_inside_the_disk=True by=0.144
+REACH part=skin ring=128 range=20.88 n/2pi=20.37 heard_to=451 turn_defect: faces_outside_the_disk=52/124 largest_excess=4491414098/2^60 boost_a_read=1.95e-09_nats with_the_skin_at_d=1_inside_the_disk=True by=0.0935
+REACH part=skin ring=243 range=39.17 n/2pi=38.67 heard_to=857 turn_defect: faces_outside_the_disk=90/242 largest_excess=4173293721/2^60 boost_a_read=1.81e-09_nats with_the_skin_at_d=1_inside_the_disk=True by=0.0504
+REACH part=skin ring=256 range=41.24 n/2pi=40.74 heard_to=903 turn_defect: faces_outside_the_disk=128/252 largest_excess=4491414098/2^60 boost_a_read=1.95e-09_nats with_the_skin_at_d=1_inside_the_disk=True by=0.0479
+REACH part=skin ring=729 range=116.51 n/2pi=116.02 heard_to=2573 turn_defect: faces_outside_the_disk=320/728 largest_excess=4173293721/2^60 boost_a_read=1.81e-09_nats with_the_skin_at_d=1_inside_the_disk=True by=0.0171
+REACH part=skin ring=1024 range=163.52 n/2pi=162.97 heard_to=3614 turn_defect: faces_outside_the_disk=458/1020 largest_excess=4532517328/2^60 boost_a_read=1.97e-09_nats with_the_skin_at_d=1_inside_the_disk=True by=0.0122
+REACH part=skin ring=2187 range=348.10 n/2pi=348.07 heard_to=3771 turn_defect: faces_outside_the_disk=932/2186 largest_excess=4959566349/2^60 boost_a_read=2.15e-09_nats with_the_skin_at_d=1_inside_the_disk=True by=0.00574
+REACH part=skin ring=4096 range=652.56 n/2pi=651.90 heard_to=3771 turn_defect: faces_outside_the_disk=1676/3767 largest_excess=6568263818/2^60 boost_a_read=2.85e-09_nats with_the_skin_at_d=1_inside_the_disk=True by=0.00306
+REACH part=skin ring=6561 range=1039.49 n/2pi=1044.22 heard_to=3771 turn_defect: faces_outside_the_disk=1694/3770 largest_excess=5200276701/2^60 boost_a_read=2.26e-09_nats with_the_skin_at_d=1_inside_the_disk=True by=0.00192
+REACH part=rings faces=12245 outside_the_disk=5414
+REACH part=shells trits_a_head=4 range=none what=an_address_by_octave,_not_a_reach turn_defect=-
+REACH part=region range=3771 what=the_most_sites_a_region_spans
+# rc=0

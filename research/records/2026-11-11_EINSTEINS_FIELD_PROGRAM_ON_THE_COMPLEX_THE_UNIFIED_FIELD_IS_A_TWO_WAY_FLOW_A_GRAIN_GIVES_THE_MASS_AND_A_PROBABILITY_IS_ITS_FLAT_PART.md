@@ -486,6 +486,22 @@ tests one of these.
   have none) beside each part's turn defect.
 - Could repeat: a width tuned to a reading; a build entering a line without reproducing it.
 - Device: the ruler on the host, numbers only; the founding on the card with parity.
+- Read (November 12, the ruler `u1_reach_ruler.py` in this record's receipts, on the carry line's declaration, with the carry
+  gates of te1's and te2's ends from G99's receipt). On one scale of ranges, `R = 1/(1 − |μ|)` places for a one-place
+  multiplier `μ`: the strand 1 (the pair contact's strand mate and the opening's two contact rows); the near field 5 (2.5 at
+  its address cost of `⌊log₂ d⌋` bits a source), 20 over the four ticks; the carry 5 at its founding, 6.4 to 18.2 by circle at
+  te2's end (10.9 their mean), 65,537 at its friction's floor; the skins from 1.05 places (ring 2) to 1,039 (ring 6561); the
+  still heads and the region 3,771; the shells none. The turn defects: 5,414 of the 12,245 ring faces stand outside the disk,
+  by at most `6.6·10⁹` units of `2^(−60)` (a boost of `2.8·10^(−9)` nats a read at most), and every read multiplies a ring
+  face by its skin at `d ≥ 1` (inside the disk by 0.19% at ring 6561 to 98% at ring 3) or reads it at unit power (the
+  frames), so no read boosts; the carry's gate stands inside the disk at every turn and friction tried (2,611 gates, by
+  `3·10^(−5)` at the floor), its turn's rounding covered 26,000 times by the friction's least grain; the still heads and the
+  strand carry no turn. So U1's law changes no reading of the line by more than `3·10^(−9)` nats a read: it enters the next
+  founding as its form, not as the repair of a measured loss. The scale also places the joint law of two letters each side
+  (G91) at a range of 2 places each side, inside the near field, the carry's founded group and the skins of rings 16 to 32
+  (3.1 to 5.6 places): the field reaches those places, and what it lacks there is the pair's law, not reach
+  (agent-inferred). The coarsest skins are attained at a few hundred units of their exponent's grain, which shortens ring
+  6561's range from its `n/2π + 1/2 = 1,044.7` to 1,039.5 places, a cut at the exponent's width that no read decides.
 
 **U2. No global word in the law.** (§4's covariance, §7.)
 - Found: one scalar of the deposit's law is global, the base rate word, which steps every entry that no growth founded, the
@@ -959,3 +975,7 @@ rationals, no float, no state, no private material; five rulers, 24 checks, none
 12. A leaking circle at four frictions: resting power, reach and their ratio; no resting value without a leak.
 13. Prime cycles of two finite complexes with three contacts a cell: the Petersen graph inside half rank to length 40, a
     ladder of two rings of 21 outside it at length 10 and from 12 on.
+
+U1's ruler (November 12): `u1_reach_ruler.py` and its output `u1_reach_ruler.txt` (the host on the cloud container, Python
+integers reproducing the code's routes at the commit its header names, numbers only, no state and no private material: the
+declaration's head line and the carry gates of a committed receipt; floats only to print a range; under one second).
