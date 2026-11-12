@@ -23,7 +23,7 @@ fn keys(n: usize) -> Vec<u8> {
 }
 
 fn tiny_declaration(still: usize) -> FieldDeclaration {
-    FieldDeclaration { alphabet: 5, width: 8, heads: 2, modes: 3, still, contacts: 4, ticks: 2, frames: 2, reach: 16, lanes: 1, depth: 0, carry: 0 }
+    FieldDeclaration { alphabet: 5, width: 8, heads: 2, modes: 3, still, contacts: 4, ticks: 2, frames: 2, reach: 16, lanes: 1, depth: 0, carry: 0, triads: 0 }
 }
 
 /// A tiny field with every family drawn from the keys (the founding holds the returns and the
@@ -813,7 +813,7 @@ fn no_site_meets_itself() {
 /// head's lock of an equal word (`n` at unit power, half its `2n` reals) reads `2⌈log₂ reach⌉` bits.
 #[test]
 fn the_contact_s_gain_covers_the_falloff() {
-    let at = |modes: usize, reach: usize| FieldDeclaration { alphabet: 5, width: 8, heads: 2, modes, still: 1, contacts: 4, ticks: 2, frames: 2, reach, lanes: 1, depth: 0, carry: 0 }.score_shift();
+    let at = |modes: usize, reach: usize| FieldDeclaration { alphabet: 5, width: 8, heads: 2, modes, still: 1, contacts: 4, ticks: 2, frames: 2, reach, lanes: 1, depth: 0, carry: 0, triads: 0 }.score_shift();
     assert_eq!(at(8, 2221), -2, "reading 8's declaration locks an equal word at 32 bits");
     assert_eq!(at(16, 16), 1);
     assert_eq!(at(3, 16), -2);
@@ -822,7 +822,7 @@ fn the_contact_s_gain_covers_the_falloff() {
         let gained = |b: i32| if b >= 0 { (modes as u128) >> b } else { (modes as u128) << -b };
         assert!(gained(beta) >= need && gained(beta + 1) < need, "the largest such shift: modes {modes} reach {reach}");
     }
-    let d = FieldDeclaration { alphabet: 5, width: 8, heads: 2, modes: 8, still: 1, contacts: 4, ticks: 2, frames: 2, reach: 2221, lanes: 1, depth: 0, carry: 0 };
+    let d = FieldDeclaration { alphabet: 5, width: 8, heads: 2, modes: 8, still: 1, contacts: 4, ticks: 2, frames: 2, reach: 2221, lanes: 1, depth: 0, carry: 0, triads: 0 };
     assert_eq!((d.class_trits(), d.classes()), (4, 81), "81 classes at reading 8's reach");
     assert_eq!(FieldDeclaration { modes: 3, ..d }.class_trits(), 3);
     assert_eq!((FieldDeclaration { reach: 81, ..d }.class_trits(), FieldDeclaration { reach: 82, ..d }.class_trits()), (2, 3));
@@ -877,7 +877,7 @@ fn the_skin_decay_is_an_e_fold_a_radian_and_vanishes_below_the_grain() {
 /// and a turned field. Probes across a sheet are left out and counted.
 #[test]
 fn the_covector_matches_the_code_across_the_far_support() {
-    let d = FieldDeclaration { alphabet: 5, width: 8, heads: 2, modes: 3, still: 1, contacts: 4, ticks: 2, frames: 2, reach: 32, lanes: 1, depth: 0, carry: 0 };
+    let d = FieldDeclaration { alphabet: 5, width: 8, heads: 2, modes: 3, still: 1, contacts: 4, ticks: 2, frames: 2, reach: 32, lanes: 1, depth: 0, carry: 0, triads: 0 };
     let classes: Vec<usize> = (0..26).map(|t| [1usize, 3, 2, 4, 0, 2, 1][t % 7]).collect();
     let open: Vec<bool> = (0..26).map(|t| t % 9 == 4 || t == 25).collect();
     let r = Region { classes: &classes, unresolved: &open, faces: &[], locked: &[], echo: &[], domain: None, port: None };
@@ -965,7 +965,7 @@ fn the_covector_matches_the_code_across_the_far_support() {
 /// of a row, the loudest far source 0.005.)
 #[test]
 fn a_listener_s_founding_row_keeps_its_near_field() {
-    let d = FieldDeclaration { alphabet: 44, width: 32, heads: 5, modes: 8, still: 2, contacts: 32, ticks: 2, frames: 5, reach: 484, lanes: 1, depth: 0, carry: 0 };
+    let d = FieldDeclaration { alphabet: 44, width: 32, heads: 5, modes: 8, still: 2, contacts: 32, ticks: 2, frames: 5, reach: 484, lanes: 1, depth: 0, carry: 0, triads: 0 };
     assert_eq!((d.score_shift(), d.listen_shift()), (-2, 2));
     let sites = 420;
     let classes = drawn_classes(7, sites, d.alphabet);
@@ -1774,7 +1774,7 @@ fn refinement_moves_the_end_one_place_a_read() {
 
 /// The packets' field of the tower fixtures: packets of three sites of the tiny field's reach of 16.
 fn coarse_declaration() -> FieldDeclaration {
-    FieldDeclaration { alphabet: 2, width: 8, heads: 2, modes: 3, still: 1, contacts: 4, ticks: 2, frames: 2, reach: 6, lanes: 1, depth: 0, carry: 0 }
+    FieldDeclaration { alphabet: 2, width: 8, heads: 2, modes: 3, still: 1, contacts: 4, ticks: 2, frames: 2, reach: 6, lanes: 1, depth: 0, carry: 0, triads: 0 }
 }
 
 /// A tower of scales on [`shaped`]`(still)`: packets of three sites after the first of its two ticks, founded from the
@@ -2533,11 +2533,13 @@ fn a_growth_by_carry_circles_keeps_every_face_and_returns_through_its_circles() 
     }
     assert_eq!(grown.rate_parts, Some(RateParts { contacts_before: 8, octaves: [0; PARTS] }));
     let text = grown.to_text();
-    assert_eq!(text.lines().find(|l| l.starts_with("parts ")).unwrap().split(' ').count(), 2 + PARTS, "a field with carry circles writes all nineteen parts");
+    // The parts a field with circles and no triads writes: every part before the triad's (twenty-two), the line as before the triads.
+    assert_eq!(text.lines().find(|l| l.starts_with("parts ")).unwrap().split(' ').count(), 2 + written_parts(2, 0).len(), "a field with carry circles writes all twenty-two parts before the triad's");
+    assert_eq!(written_parts(2, 0).len(), TRIAD_PART);
     let back = FieldLearner::from_text(&text).unwrap();
     assert_eq!((back.field.theta.clone(), back.first.clone(), back.second.clone(), back.rate_parts, back.drawn), (grown.field.theta.clone(), grown.first.clone(), grown.second.clone(), grown.rate_parts, grown.drawn));
     assert_eq!(back.field.declaration, grown.field.declaration);
-    assert_eq!(learner.to_text().lines().find(|l| l.starts_with("parts ")).unwrap().split(' ').count(), 2 + written_parts(0).len(), "a field without carry circles writes nineteen: the plain sixteen and the first lane's letter rows");
+    assert_eq!(learner.to_text().lines().find(|l| l.starts_with("parts ")).unwrap().split(' ').count(), 2 + written_parts(0, 0).len(), "a field without carry circles writes nineteen: the plain sixteen and the first lane's letter rows");
 }
 
 /// [definition; theory, November 11 17:25 and November 12 (G98)] **The carry circles' scan is the law, site by site in strand order**: on a drawn
@@ -2989,6 +2991,391 @@ fn the_parts_line_reads_its_own_order_and_every_older_one() {
     let older: String = text.lines().map(|l| if l.starts_with("parts ") { format!("{}\n", l.split(' ').take(2 + PLAIN_PARTS).collect::<Vec<_>>().join(" ")) } else { format!("{l}\n") }).collect();
     let read = FieldLearner::from_text(&older).unwrap().rate_parts.unwrap();
     assert_eq!((read.octaves[3], read.octaves[19], read.octaves[20], read.octaves[21]), (1, 0, 0, 0), "a sixteen-part line reads the letter rows at octave 0");
-    assert_eq!(written_parts(0), (0..16).chain(19..22).collect::<Vec<_>>());
-    assert_eq!(written_parts(2), (0..22).collect::<Vec<_>>());
+    assert_eq!(written_parts(0, 0), (0..16).chain(19..22).collect::<Vec<_>>());
+    assert_eq!(written_parts(2, 0), (0..22).collect::<Vec<_>>());
+}
+
+/// The triads the drawn fixtures carry: four (the founding counts its triads in fours, the triad record §4).
+const TRIADS: usize = 4;
+
+/// [`four_contacts`]'s founded field grown by `triads` triads ([`Field::with_triads`]), then every family drawn ([`drawn`]): the triads' charts,
+/// their biases and their return `W_T` off zero, so every triad's product reaches the face and every leg has a covector.
+fn triad_shaped(still: usize, triads: usize) -> Field {
+    let plain = Field::found(four_contacts(still), &keys(1 << 14)).unwrap();
+    let (grown, _) = plain.with_triads(triads, &keys(plain.declaration.triad_draws(triads))).unwrap();
+    drawn(grown)
+}
+
+/// [`four_contacts`]'s founded field grown by two carry circles and then by `triads` triads (the line's order: the triads are founded on a
+/// circle line's end), every family drawn, with the circles' leak rows and leak biases set back to zero (`ℓ = 0`, the friction at its founding at
+/// every site, far from its floor of one grain).
+fn circled_triad_shaped(still: usize, triads: usize) -> Field {
+    let plain = Field::found(four_contacts(still), &keys(1 << 14)).unwrap();
+    let (circled, _) = plain.with_carry(2, &keys(plain.declaration.carry_draws(2))).unwrap();
+    let (grown, _) = circled.with_triads(triads, &keys(circled.declaration.triad_draws(triads))).unwrap();
+    let mut field = drawn(grown);
+    let (l, dw, c) = (field.layout.clone(), field.declaration.width, field.declaration.carry);
+    field.theta[l.carry + c * dw..l.carry + 2 * c * dw].fill(0);
+    field.theta[l.carry_bias + c..l.carry_bias + 2 * c].fill(0);
+    field
+}
+
+/// [definition; theory, November 12, the triad record §4] **The triads' head line, and every line at `J = 0` as before**: at `J = 0` the head is
+/// `hnn-field-v14` (twelve words) or `hnn-field-v14e` (thirteen), exactly the lines before, and the triads' three families stand zero long at the
+/// end; at `J = 16` it is `hnn-field-v14f`, the thirteen words of `v14e` with `C` written (also where it is zero), then `J`, and it round-trips;
+/// the triads' families follow every other (`6J` rows of `D`, `6J` biases and `D × 2J`), every old offset and family unchanged; a `v14f` line with
+/// no triads is refused, as a `v14e` line with no circles is, and so is a `v14f` line of thirteen words.
+#[test]
+fn the_triads_head_line_is_v14f_and_at_no_triads_every_line_is_as_before() {
+    let d = four_contacts(1);
+    let dw = d.width;
+    let plain = d.to_text();
+    assert!(plain.starts_with("hnn-field-v14 ") && plain.split(' ').count() == 12);
+    assert_eq!(FieldDeclaration::from_text(&plain).unwrap(), d);
+    let circled = FieldDeclaration { carry: 2, ..d };
+    let line = circled.to_text();
+    assert!(line.starts_with("hnn-field-v14e ") && line.split(' ').count() == 13 && line.ends_with(" 2"));
+    assert_eq!(FieldDeclaration::from_text(&line).unwrap(), circled);
+    let counts: Vec<String> = plain.split(' ').skip(1).map(str::to_string).collect();
+    let j = 16usize;
+    for base in [d, circled] {
+        let tri = FieldDeclaration { triads: j, ..base };
+        assert!(tri.admit().is_ok());
+        let text = tri.to_text();
+        let words: Vec<&str> = text.split(' ').collect();
+        let c = base.carry.to_string();
+        assert_eq!((words[0], words.len(), words[12], words[13]), ("hnn-field-v14f", 14, c.as_str(), "16"), "C {c}: the thirteen words of v14e with C written, then J");
+        assert_eq!(words[1..12], counts.iter().map(String::as_str).collect::<Vec<_>>()[..], "C {c}: the declaration's eleven counts as before");
+        assert_eq!(FieldDeclaration::from_text(&text).unwrap(), tri, "C {c}: the v14f line round-trips");
+        let none = format!("{} 0", words[..13].join(" "));
+        assert!(matches!(FieldDeclaration::from_text(&none), Err(TowerError::Refused(m)) if m.contains("no triads")), "C {c}: a v14f line with no triads is refused");
+        assert!(FieldDeclaration::from_text(&words[..13].join(" ")).is_err(), "C {c}: a v14f line of thirteen words is refused");
+        let (old, new) = (FieldLayout::new(&base), FieldLayout::new(&tri));
+        assert_eq!((old.triad, old.triad_bias, old.w_triad), (old.len, old.len, old.len), "C {c}: at J = 0 the triads' families are zero long at the end");
+        assert_eq!(new.families.len(), old.families.len() + 3);
+        assert_eq!(new.families[..old.families.len()], old.families[..], "C {c}: every old family as before");
+        assert_eq!(new.families[old.families.len()..], [(old.len, 6 * j * dw, MATERIAL_BITS), (old.len + 6 * j * dw, 6 * j, FACE_BITS), (old.len + 6 * j * dw + 6 * j, dw * 2 * j, MATERIAL_BITS)]);
+        assert_eq!((new.triad, new.triad_bias, new.w_triad, new.len), (old.len, old.len + 6 * j * dw, old.len + 6 * j * dw + 6 * j, old.len + 6 * j * dw + 6 * j + dw * 2 * j));
+        assert_eq!(FieldLayout { triad: old.triad, triad_bias: old.triad_bias, w_triad: old.w_triad, len: old.len, families: old.families.clone(), ..new.clone() }, old, "C {c}: every old offset unchanged");
+    }
+}
+
+/// [definition; theory, November 12, the triad record §4] **A growth by triads keeps every face, and its return has a covector**: on a drawn
+/// field, with carry circles and without, [`Field::with_triads`] lays the triads' families after every other (the charts' rows drawn, their biases
+/// and `W_T` at zero), keeps every old entry at its offset, reads every face and the code bit for bit and restores from its text, and `W_T` has a
+/// covector while none yet reaches the charts (`∇_α ℓ = 0` while `W_T = 0`, §3.2); the draws counted are the draws read; a second growth, a growth
+/// in contacts, in circles, in lanes or by copies of a field with triads, a growth by none, a founding with triads and a tower's growth are
+/// refused. The learner keeps every old entry's moments, opens the triads' first moments at zero and their second at the means of their
+/// counterparts' (the charts the pair drives', the biases the drives' biases', `W_T` `W`'s), keeps the parts' rates with the triad's at octave 0
+/// and each entry's own rate with the triads' at the base rate, advances its draws by the triads', and its text round-trips with the written
+/// parts; a parts line without the triad's octave (the line before the growth) reads it at 0.
+#[test]
+fn a_growth_by_triads_keeps_every_face_and_its_return_has_a_covector() {
+    let j = 16usize;
+    for still in [0usize, 1, 2] {
+        for circled in [false, true] {
+            let plain = if circled { circled_shaped(still) } else { shaped_with(four_contacts(still)) };
+            let draws = plain.declaration.triad_draws(j);
+            assert_eq!(draws, 6 * j * plain.declaration.width);
+            assert!(plain.with_triads(j, &keys(draws)[..4 * draws - 1]).is_err(), "the draws counted are the draws read");
+            let (grown, from) = plain.with_triads(j, &keys(draws)).unwrap();
+            let (d, l, dw) = (grown.declaration, grown.layout.clone(), grown.declaration.width);
+            assert_eq!(d, FieldDeclaration { triads: j, ..plain.declaration });
+            let old = plain.theta.len();
+            assert_eq!(grown.theta[..old], plain.theta[..], "still {still} circled {circled}: every old entry at its offset");
+            assert!(from.len() == grown.theta.len() && from[..old].iter().enumerate().all(|(i, &o)| o == Some(i)) && from[old..].iter().all(Option::is_none));
+            assert_eq!(grown.faces(&region()).unwrap(), plain.faces(&region()).unwrap(), "still {still} circled {circled}: every face kept");
+            assert_eq!(grown.code(&region()).unwrap(), plain.code(&region()).unwrap(), "still {still} circled {circled}: the code kept");
+            assert_eq!(Field::from_text(&grown.to_text()).unwrap(), grown);
+            assert_eq!(l.len, l.w_triad + dw * 2 * j);
+            assert!(grown.theta[l.triad..l.triad_bias].iter().any(|&v| v != 0), "the charts' rows drawn");
+            assert!(grown.theta[l.triad_bias..l.len].iter().all(|&v| v == 0), "the charts' biases and W_T at zero");
+            let g = covector_of(&grown, &region());
+            assert!(g[l.w_triad..l.len].iter().any(|&v| v != 0), "still {still} circled {circled}: W_T has a covector");
+            assert!(g[l.triad..l.w_triad].iter().all(|&v| v == 0), "still {still} circled {circled}: while W_T is zero no covector reaches the charts");
+            assert!(grown.with_triads(4, &keys(d.triad_draws(4))).is_err(), "a second growth by triads");
+            assert!(grown.contacted(4, &keys(d.contact_draws(4))).is_err(), "a growth in contacts of a field with triads");
+            assert!(grown.with_carry(2, &keys(d.carry_draws(2))).is_err(), "a growth in circles of a field with triads");
+            assert!(grown.laned(&keys(d.lane_draws())).is_err(), "a growth in lanes of a field with triads");
+            assert!(grown.grown(2, &keys(grown.growth_draws(2))).is_err(), "a growth by copies of a field with triads");
+        }
+    }
+    assert!(shaped_with(four_contacts(1)).with_triads(0, &keys(1)).is_err(), "a growth by no triads");
+    assert!(Field::found(FieldDeclaration { triads: 4, ..four_contacts(1) }, &keys(1 << 14)).is_err(), "a founding with triads");
+    let tower = towered(1);
+    assert!(tower.with_triads(4, &keys(tower.declaration.triad_draws(4))).is_err(), "a tower's levels take triads level by level");
+    // The learner.
+    let mut learner = FieldLearner::new(shaped_with(four_contacts(1)), 6);
+    learner.section(&[region()]).unwrap();
+    learner.held = None;
+    let mut octaves = [0u32; PARTS];
+    (octaves[3], octaves[19], octaves[TRIAD_PART]) = (2, 1, 5);
+    learner.rate_parts = Some(RateParts { contacts_before: 8, octaves });
+    let j = TRIADS;
+    let stream = keys(learner.drawn / 4 + learner.field.declaration.triad_draws(j) + 8);
+    let grown = learner.with_triads(j, &stream).unwrap();
+    assert_eq!(grown.drawn, learner.drawn + 4 * learner.field.declaration.triad_draws(j));
+    let old = learner.field.theta.len();
+    assert_eq!((&grown.first[..old], &grown.second[..old]), (&learner.first[..], &learner.second[..]), "every old entry keeps its moments");
+    let (l, ol) = (grown.field.layout.clone(), learner.field.layout.clone());
+    let (dw, f) = (learner.field.declaration.width, learner.field.declaration.contacts);
+    let mean = |ranges: &[(usize, usize)]| -> i128 {
+        let v: Vec<i128> = ranges.iter().flat_map(|&(s, n)| learner.second[s..s + n].iter().copied()).collect();
+        let n = v.len() as i128;
+        v.iter().map(|x| x / n).sum::<i128>() + v.iter().map(|x| x % n).sum::<i128>() / n
+    };
+    let (drives, biases, ret) = (mean(&[(ol.a, f * dw), (ol.b, f * dw)]), mean(&[(ol.a_bias, f), (ol.b_bias, f)]), mean(&[(ol.w, dw * f)]));
+    assert!(drives > 0 && ret > 0, "the counterparts' second moments are open");
+    assert!(grown.first[old..].iter().all(|&v| v == 0), "the triads' first moments open at zero");
+    assert!(grown.second[l.triad..l.triad_bias].iter().all(|&v| v == drives), "A, B and G open at the pair drives' mean");
+    assert!(grown.second[l.triad_bias..l.w_triad].iter().all(|&v| v == biases), "the charts' biases at the drives' biases' mean");
+    assert!(grown.second[l.w_triad..l.len].iter().all(|&v| v == ret), "W_T at W's mean");
+    let mut kept = octaves;
+    kept[TRIAD_PART] = 0;
+    assert_eq!(grown.rate_parts, Some(RateParts { contacts_before: 8, octaves: kept }), "the parts' rates kept, the triad's at octave 0");
+    assert_eq!(grown.own_rates, None);
+    assert_eq!(grown.field.faces(&region()).unwrap(), learner.field.faces(&region()).unwrap(), "the grown learner reads every face");
+    // The text: the parts line of the written parts, the triad's last, round-tripping.
+    let mut fast = grown.clone();
+    fast.rate_parts.as_mut().unwrap().octaves[TRIAD_PART] = 3;
+    let text = fast.to_text();
+    let line = text.lines().find(|l| l.starts_with("parts ")).unwrap().to_string();
+    assert_eq!(line.split(' ').count(), 2 + written_parts(0, j).len());
+    assert_eq!(line.rsplit_once(' ').unwrap().1, "3", "the triad's octave written last");
+    let back = FieldLearner::from_text(&text).unwrap();
+    assert_eq!((back.field.clone(), back.first.clone(), back.second.clone(), back.rate_parts, back.drawn), (fast.field.clone(), fast.first.clone(), fast.second.clone(), fast.rate_parts, fast.drawn));
+    let before: String = text.lines().map(|l| if l.starts_with("parts ") { format!("{}\n", l.rsplit_once(' ').unwrap().0) } else { format!("{l}\n") }).collect();
+    assert_eq!(FieldLearner::from_text(&before).unwrap().rate_parts, grown.rate_parts, "a line without the triad's octave reads it at 0 and every other part as written");
+    // Each entry's own rate, where the learner carries it.
+    let mut own = learner.clone();
+    own.own_rates = Some((0..own.field.material_len()).map(|i| if i % 3 == 0 { 8 } else { 5 }).collect());
+    let grown_own = own.with_triads(j, &stream).unwrap();
+    let rates = grown_own.own_rates.clone().unwrap();
+    assert_eq!(rates.len(), grown_own.field.material_len());
+    assert_eq!(rates[..old], own.own_rates.as_ref().unwrap()[..], "every old entry keeps its own rate");
+    assert!(rates[old..].iter().all(|&r| r == own.rate_bits), "the triads' entries at the base rate");
+    assert_eq!(grown_own.entry_rates(), rates);
+}
+
+/// [proved-derived; theory, November 12, the triad record §3.2; `lean/Holonics/HNN/TriadGauge.lean`] **The quarter-turn gauge leaves every face and
+/// the code**: on a drawn field with triads and a nonzero `W_T`, with carry circles and without, turning every triad's `α` by `i` and its `β` by
+/// `−i` on `A`'s and `B`'s rows and their biases (`α_r ← −α_i`, `α_i ← α_r`; `β_r ← β_i`, `β_i ← −β_r`) changes every read of the two legs and leaves
+/// every product `p`, every `c^T`, every face and the code bit for bit, since `(iα)(−iβ) = αβ` holds on Gaussian integers and each read is one
+/// affine whose release is odd; a turn of `α` alone moves the faces, so the reads do see the triads.
+#[test]
+fn the_quarter_turn_gauge_leaves_every_face_and_the_code() {
+    // A leg turned `by` `i` (`1`) or `−i` (`−1`), or left (`0`): `(r, i) → (−by·i, by·r)` on its rows' entries and its biases.
+    let gauge = |field: &Field, alpha: i32, beta: i32| -> Field {
+        let mut out = field.clone();
+        let (l, dw, j) = (field.layout.clone(), field.declaration.width, field.declaration.triads);
+        for k in 0..j {
+            for (by, re, im) in [(alpha, k, j + k), (beta, 2 * j + k, 3 * j + k)] {
+                if by == 0 {
+                    continue;
+                }
+                for (rr, ii) in (0..dw).map(|c| (l.triad + re * dw + c, l.triad + im * dw + c)).chain([(l.triad_bias + re, l.triad_bias + im)]) {
+                    (out.theta[rr], out.theta[ii]) = (-by * field.theta[ii], by * field.theta[rr]);
+                }
+            }
+        }
+        out
+    };
+    let mut carried: Vec<Option<Shares>> = vec![None; CLASSES.len()];
+    carried[0] = Some(vec![(1, 40_000), (3, 25_536)]);
+    carried[4] = Some(vec![(2, 30_000), (4, 20_000), (0, 15_536)]);
+    for (still, circled) in [(0usize, false), (1, false), (2, false), (1, true)] {
+        let field = if circled { circled_triad_shaped(still, TRIADS) } else { triad_shaped(still, TRIADS) };
+        let l = field.layout.clone();
+        assert!(field.theta[l.w_triad..l.len].iter().any(|&v| v != 0), "a nonzero W_T");
+        let turned = gauge(&field, 1, -1);
+        assert_ne!(turned.theta, field.theta);
+        for r in [region(), Region { classes: &CLASSES, unresolved: &OPEN, faces: &carried, locked: &[], echo: &[], domain: None, port: None }] {
+            assert_eq!(turned.faces(&r).unwrap(), field.faces(&r).unwrap(), "still {still} circled {circled}: every face");
+            assert_eq!(turned.code(&r).unwrap(), field.code(&r).unwrap(), "still {still} circled {circled}: the code");
+            let (a, b) = (field.pass(&r, true).unwrap(), turned.pass(&r, true).unwrap());
+            for (x, y) in a.ticks.iter().zip(&b.ticks) {
+                assert_ne!(x.abg, y.abg, "still {still} circled {circled}: the legs' reads turn");
+                assert_eq!((&x.tp, &x.ct), (&y.tp, &y.ct), "still {still} circled {circled}: every product and every triad as before");
+            }
+        }
+        assert_ne!(gauge(&field, 1, 0).faces(&region()).unwrap(), field.faces(&region()).unwrap(), "still {still} circled {circled}: a turn of α alone moves the faces");
+    }
+}
+
+/// [definition; theory, November 12, the triad record §4] **The triads' reverse agrees with the code's change along a direction**: on drawn fields
+/// with triads (three ring sets' stills, and one with carry circles beside the triads), each family's three entries with the largest covectors
+/// (the triads' charts, biases and `W_T` among them) are moved by `±δ` and the code's change is read against the covector's prediction by the
+/// probe law of [`the_carry_circles_covector_matches_its_codes_difference`] (a probe whose step moves a site across a sheet is left out and
+/// counted); the triads' charts, biases and return are each read at least once.
+#[test]
+fn the_triads_covector_matches_its_codes_difference() {
+    let sheets = |field: &Field, r: &Region| -> Vec<Vec<u32>> {
+        let pass = field.pass(r, true).unwrap();
+        pass.ticks.iter().flat_map(|c| c.classes.iter().map(|l| l.off.iter().chain(&l.members).copied().chain(l.probes.iter().flat_map(|p| std::iter::once(u32::MAX).chain(p.iter().copied()))).collect())).collect()
+    };
+    let (mut read, mut seams, mut charts, mut biases, mut returns) = (0usize, 0usize, 0usize, 0usize, 0usize);
+    for (still, circled) in [(0usize, false), (1, false), (2, false), (1, true)] {
+        let field = if circled { circled_triad_shaped(still, TRIADS) } else { triad_shaped(still, TRIADS) };
+        let r = region();
+        let g = covector_of(&field, &r);
+        let l = field.layout.clone();
+        assert!(g[l.triad..l.triad_bias].iter().any(|&v| v != 0) && g[l.w_triad..l.len].iter().any(|&v| v != 0), "still {still} circled {circled}: the charts and W_T have a covector");
+        for &(start, len, grain) in field.families() {
+            if start == l.temper {
+                continue;
+            }
+            let natural: u32 = if grain == MATERIAL_BITS { 40 } else { 24 };
+            let mut entries: Vec<usize> = (start..start + len).collect();
+            entries.sort_by_key(|&i| std::cmp::Reverse(g[i].unsigned_abs()));
+            for i in entries.into_iter().take(3).filter(|&i| g[i] != 0) {
+                let moved = |delta: i32| {
+                    let mut f = field.clone();
+                    f.theta[i] += delta;
+                    f
+                };
+                let straddles = |delta: i32| sheets(&moved(delta), &r) != sheets(&field, &r) || sheets(&moved(-delta), &r) != sheets(&field, &r);
+                let shift = natural + grain - 20;
+                let Some((delta, h)) = probe_step(grain, &|delta: i32| (g[i] * 2 * delta as i128) >> shift, &straddles) else {
+                    seams += 1;
+                    continue;
+                };
+                read += 1;
+                charts += usize::from(start == l.triad);
+                biases += usize::from(start == l.triad_bias);
+                returns += usize::from(start == l.w_triad);
+                let measured = moved(delta).code(&r).unwrap().0 - moved(-delta).code(&r).unwrap().0;
+                let predicted = (g[i] * 2 * delta as i128) >> shift;
+                let tolerance = predicted.abs() / 8 + (64 << h);
+                assert!((measured as i128 - predicted).abs() <= tolerance, "still {still} circled {circled} family at {start} (grain {grain}) entry {i} at {h} halvings: measured {measured}, predicted {predicted}");
+            }
+        }
+    }
+    eprintln!("TRIAD_COVECTOR_PROBES read={read} on_a_seam={seams} charts={charts} biases={biases} returns={returns}");
+    assert!(read > 0 && 16 * seams <= read && charts > 0 && biases > 0 && returns > 0, "read {read} probes, {seams} on a seam, {charts} of the charts, {biases} of the biases, {returns} of the return");
+}
+
+/// [proved-derived; theory, November 12, the triad record §3.2 (the legs exchange equal quanta); `TriadGauge.lean`] **Each leg and the return
+/// carry one scale covector**: the return is unchanged under `(α_k, w_k) → (s α_k, w_k/s)` for real `s` (and so for `β_k` and for `γ_k`), so the
+/// code's derivative along that direction is zero at `s = 1` and the reverse gives `Re⟨α_k, ∇_α ℓ⟩ = Re⟨w_k, ∇_w ℓ⟩`, and likewise for `β_k` and
+/// `γ_k`: on drawn fields with triads, each triad's three legs (their two rows and two biases each) and its two columns of `W_T` read `Σ θ g` on
+/// the codes' `2^(−20)` bits (the probes' shifts) equal within an eighth and the releases' floor. Why it is read: the legs and the return are
+/// one family that no receiver tells apart, and this identity is what their covectors keep at every state. Under a plain step at one rate it
+/// gives each leg the same squared norm to first order (Manley–Rowe); this learner divides each entry's step by its own `⌊√v⌋ + 1`, and its
+/// divisors move with what reaches each entry, so equal gains of the legs are no prediction for it. The triad's one octave stands because an
+/// octave between the legs would be a rate set by hand.
+#[test]
+fn each_triads_legs_and_return_carry_one_scale_covector() {
+    for (still, circled) in [(0usize, false), (1, false), (2, false), (1, true)] {
+        let field = if circled { circled_triad_shaped(still, TRIADS) } else { triad_shaped(still, TRIADS) };
+        let g = covector_of(&field, &region());
+        let (l, dw, j) = (field.layout.clone(), field.declaration.width, field.declaration.triads);
+        // `Σ θ g` over a set of entries on the codes' grain: shifted 44 bits on the material's grain and 20 on the face's.
+        let scale = |entries: &[usize], shift: u32| -> i128 { entries.iter().map(|&i| i128::from(field.theta[i]) * g[i]).sum::<i128>() >> shift };
+        let mut standing = 0usize;
+        for k in 0..j {
+            let columns: Vec<usize> = (0..dw).flat_map(|o| [l.w_triad + o * 2 * j + k, l.w_triad + o * 2 * j + j + k]).collect();
+            let ret = scale(&columns, 44);
+            standing += usize::from(ret.abs() > 64);
+            for (leg, (re, im)) in [(k, j + k), (2 * j + k, 3 * j + k), (4 * j + k, 5 * j + k)].into_iter().enumerate() {
+                let rows: Vec<usize> = (0..dw).flat_map(|c| [l.triad + re * dw + c, l.triad + im * dw + c]).collect();
+                let along = scale(&rows, 44) + scale(&[l.triad_bias + re, l.triad_bias + im], 20);
+                assert!((along - ret).abs() <= ret.abs() / 8 + 64, "still {still} circled {circled} triad {k} leg {leg}: Re⟨leg, ∇⟩ {along} against Re⟨w, ∇_w⟩ {ret}");
+            }
+        }
+        assert!(standing > 0, "still {still} circled {circled}: some triad's scale covector stands above the floor");
+    }
+}
+
+/// [definition; theory, November 12, the triad record §3 and §4] **The triads are the law site by site, with no triad and no covector at a
+/// region's two ends**: on a drawn field with triads, at every tick each site's reads `α, β, γ` are the charts' affine of its pair chart, and at
+/// every site with both strand mates `p = release(α(t) β(t − 1), 16)` and `c^T = release(p γ(t + 1), 16)`, while `p` and `c^T` are zero at the first
+/// and last sites; the reverse ([`triad_back`]) is each slot's one product (`δγ(t + 1) = conj(p) u`, `δp = conj(γ(t + 1)) u`,
+/// `δα(t) = conj(β(t − 1)) δp`, `δβ(t − 1) = conj(α(t)) δp`) and writes nothing to `δα` at the two ends, to `δβ` at the last two sites or to `δγ` at
+/// the first two; a region of two sites holds no triad, and no covector reaches the triads' families from it.
+#[test]
+fn the_triads_are_the_law_site_by_site_with_none_at_a_regions_two_ends() {
+    let field = triad_shaped(1, TRIADS);
+    let (l, dw, j) = (field.layout.clone(), field.declaration.width, field.declaration.triads);
+    let (j2, j6) = (2 * j, 6 * j);
+    let sites = CLASSES.len();
+    let reaches = field.reaches();
+    let pass = field.pass(&region(), true).unwrap();
+    let conj = |(zr, zi): (i128, i128), (ur, ui): (i128, i128)| (release(zr * ur + zi * ui, FACE_BITS), release(zr * ui - zi * ur, FACE_BITS));
+    // A leg's complex value `[t][6J]` (its base `0`, `2J` or `4J`), and a product's `[t][2J]`.
+    let leg = |v: &[i64], s: usize, base: usize, k: usize| (i128::from(v[s * j6 + base + k]), i128::from(v[s * j6 + base + j + k]));
+    let pair = |v: &[i64], s: usize, k: usize| (i128::from(v[s * j2 + k]), i128::from(v[s * j2 + j + k]));
+    for (tick, cell) in pass.ticks.iter().enumerate() {
+        let mut abg = vec![0i64; j6];
+        for t in 0..sites {
+            affine(&field.theta[l.triad..l.triad + j6 * dw], reaches.triad, dw, &cell.read2[t * dw..(t + 1) * dw], Some(&field.theta[l.triad_bias..l.triad_bias + j6]), MATERIAL_BITS, MATERIAL_BITS, &mut abg).unwrap();
+            assert_eq!(cell.abg[t * j6..(t + 1) * j6], abg[..], "tick {tick} site {t}: the charts' reads of the pair chart");
+        }
+        for t in [0, sites - 1] {
+            assert!(cell.tp[t * j2..(t + 1) * j2].iter().chain(&cell.ct[t * j2..(t + 1) * j2]).all(|&v| v == 0), "tick {tick}: no triad at the region's end {t}");
+        }
+        for t in 1..sites - 1 {
+            for k in 0..j {
+                let ((ar, ai), (br, bi), (gr, gi)) = (leg(&cell.abg, t, 0, k), leg(&cell.abg, t - 1, j2, k), leg(&cell.abg, t + 1, 2 * j2, k));
+                let (pr, pi) = (release(ar * br - ai * bi, FACE_BITS), release(ar * bi + ai * br, FACE_BITS));
+                assert_eq!(pair(&cell.tp, t, k), (pr, pi), "tick {tick} site {t} triad {k}: p = α(t) β(t − 1)");
+                assert_eq!(pair(&cell.ct, t, k), (release(pr * gr - pi * gi, FACE_BITS), release(pr * gi + pi * gr, FACE_BITS)), "tick {tick} site {t} triad {k}: c^T = p γ(t + 1)");
+            }
+        }
+        assert!(cell.ct.iter().any(|&v| v != 0), "tick {tick}: the triads stand inside the region");
+        // The reverse against a covector standing at every site.
+        let dct: Vec<i64> = (0..sites * j2).map(|i| ((i % 7) as i64 - 3) << 30).collect();
+        let dabg = triad_back(j, sites, &cell.abg, &cell.tp, &dct).unwrap();
+        for k in 0..j {
+            for t in [0, sites - 1] {
+                assert_eq!(leg(&dabg, t, 0, k), (0, 0), "tick {tick} triad {k}: no δα at the end {t}");
+            }
+            for t in [sites - 2, sites - 1] {
+                assert_eq!(leg(&dabg, t, j2, k), (0, 0), "tick {tick} triad {k}: no δβ at {t}, which no place after it reads");
+            }
+            for t in [0, 1] {
+                assert_eq!(leg(&dabg, t, 2 * j2, k), (0, 0), "tick {tick} triad {k}: no δγ at {t}, which no place before it reads");
+            }
+            for t in 1..sites - 1 {
+                let u = pair(&dct, t, k);
+                let dp = conj(leg(&cell.abg, t + 1, 2 * j2, k), u);
+                assert_eq!(leg(&dabg, t + 1, 2 * j2, k), conj(pair(&cell.tp, t, k), u), "tick {tick} site {t} triad {k}: δγ(t + 1) = conj(p) u");
+                assert_eq!(leg(&dabg, t, 0, k), conj(leg(&cell.abg, t - 1, j2, k), dp), "tick {tick} site {t} triad {k}: δα(t) = conj(β(t − 1)) δp");
+                assert_eq!(leg(&dabg, t - 1, j2, k), conj(leg(&cell.abg, t, 0, k), dp), "tick {tick} site {t} triad {k}: δβ(t − 1) = conj(α(t)) δp");
+            }
+        }
+        assert!(dabg.iter().any(|&v| v != 0), "tick {tick}: the reverse reaches the legs inside the region");
+    }
+    // A region of two sites: no place has both of its strand mates.
+    let (two, open) = ([1usize, 3], [false, true]);
+    let small = Region { classes: &two, unresolved: &open, faces: &[], locked: &[], echo: &[], domain: None, port: None };
+    let pass = field.pass(&small, true).unwrap();
+    assert!(pass.ticks.iter().all(|c| c.tp.iter().chain(&c.ct).all(|&v| v == 0)), "no triad in a region of two sites");
+    let g = covector_of(&field, &small);
+    assert!(g[l.triad..l.len].iter().all(|&v| v == 0), "no covector reaches the triads' families from a region of two sites");
+    assert!(g[..l.triad].iter().any(|&v| v != 0), "the region's covector stands elsewhere");
+}
+
+/// [definition; theory, November 12, the triad record §4] **The triad is one founded part, written only where the field has triads**: its charts,
+/// their biases and its return hold part 22, `triad`, and every old entry's part is as before; the parts line writes it after the first lane's
+/// letter rows only where the field has triads, so at `J = 0` the written parts are the lines before.
+#[test]
+fn the_triad_is_one_founded_part_written_only_where_the_field_has_triads() {
+    assert_eq!((PART_NAMES[TRIAD_PART], TRIAD_PART, PARTS), ("triad", 22, 23));
+    assert_eq!(written_parts(0, 0), (0..16).chain(19..22).collect::<Vec<_>>());
+    assert_eq!(written_parts(2, 0), (0..22).collect::<Vec<_>>());
+    assert_eq!(written_parts(0, TRIADS), (0..16).chain(19..23).collect::<Vec<_>>());
+    assert_eq!(written_parts(2, TRIADS), (0..23).collect::<Vec<_>>());
+    for circled in [false, true] {
+        let field = if circled { circled_triad_shaped(1, TRIADS) } else { triad_shaped(1, TRIADS) };
+        let (l, dw, j) = (field.layout.clone(), field.declaration.width, field.declaration.triads);
+        let contacts = field.declaration.contacts;
+        let parts = field.founded_parts(contacts);
+        assert!(parts[l.triad..l.len].iter().all(|&p| usize::from(p) == TRIAD_PART), "circled {circled}: the charts, their biases and W_T");
+        assert_eq!(parts.iter().filter(|&&p| usize::from(p) == TRIAD_PART).count(), 6 * j * dw + 6 * j + dw * 2 * j, "circled {circled}: and nothing else");
+        let mut before = field.clone();
+        before.declaration.triads = 0;
+        before.theta.truncate(l.triad);
+        before.layout = FieldLayout::new(&before.declaration);
+        assert_eq!(parts[..l.triad], before.founded_parts(contacts)[..], "circled {circled}: every old entry's part as before");
+    }
 }

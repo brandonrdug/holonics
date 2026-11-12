@@ -71,7 +71,7 @@ impl Passage {
     /// The founded learner of the declaration `D H n STILL f K` at `RATE`.
     fn learner(&self, args: &[String], rate: u32) -> Result<FieldLearner> {
         let (width, heads, modes, still, contacts, ticks) = (positive(&args[0])?, positive(&args[1])?, positive(&args[2])?, count(&args[3])?, positive(&args[4])?, positive(&args[5])?);
-        let declaration = FieldDeclaration { alphabet: self.codec.alphabet(), width, heads, modes, still, contacts, ticks, frames: heads, reach: self.reach, lanes: 1, depth: 0, carry: 0 };
+        let declaration = FieldDeclaration { alphabet: self.codec.alphabet(), width, heads, modes, still, contacts, ticks, frames: heads, reach: self.reach, lanes: 1, depth: 0, carry: 0, triads: 0 };
         let mut field = Field::found(declaration, &self.keys).map_err(|e| e.to_string())?;
         // The trainer's declared clock (`FIELD_CLOCK_PER_BLANK`, `Field::per_blank_clock`), so its parity reads that law.
         super::field_train::declared_clocks(&mut field);
@@ -297,6 +297,30 @@ pub(super) fn parity(args: &[String], card: &mut dyn FieldRealization) -> Result
             println!("FIELD_PARITY_CARRY_SHIFT shift={shift} entries={}", entries.len());
         }
     }
+    // [definition; theory, November 12; the triad record §4] The triads (`FIELD_PARITY_TRIAD=J`, agent-inferred name, after the carry's): the founded
+    // field (after its lanes, contacts and circles) grown by `J` complex triads ([`FieldLearner::with_triads`]), so both realizations read the triads'
+    // chart, their products, the return's two blocks summed whole before its release, and the triads' reverse. Founded, `W_T` and the chart's biases
+    // are zero, so the first section moves `W_T` alone and every later section reads every triad term; a moved state (`FIELD_PARITY_TRIAD_SHIFT=s`)
+    // draws the chart, its biases and `W_T` from the key file's tail, each 32-bit word shifted down `s` bits (the biases eight bits coarser, on the
+    // face's grain), so the first section reads every term.
+    let mut triads_grown = 0;
+    if let Some(triads) = std::env::var("FIELD_PARITY_TRIAD").ok().and_then(|v| v.parse::<usize>().ok()).filter(|&j| j > 0) {
+        founded = founded.with_triads(triads, &p.keys).map_err(|e| e.to_string())?;
+        triads_grown = triads;
+        let d = founded.field.declaration;
+        println!("FIELD_PARITY_TRIAD triads={triads} contacts={} circles={} material={}", d.contacts, d.carry, founded.field.material_len());
+        if let Some(shift) = std::env::var("FIELD_PARITY_TRIAD_SHIFT").ok().and_then(|v| v.parse::<u32>().ok()) {
+            let l = founded.field.layout().clone();
+            let dw = d.width;
+            let entries: Vec<(usize, u32)> = (l.triad..l.triad + 6 * triads * dw).map(|i| (i, shift)).chain((l.triad_bias..l.triad_bias + 6 * triads).map(|i| (i, shift + 8))).chain((l.w_triad..l.w_triad + dw * 2 * triads).map(|i| (i, shift))).collect();
+            let tail = p.keys.len().checked_sub(4 * entries.len() + 8).ok_or("a key file too short for the triads' draws")?;
+            for (k, &(i, s)) in entries.iter().enumerate() {
+                let word = &p.keys[tail + 4 * k..tail + 4 * k + 4];
+                founded.field.theta[i] = i32::from_be_bytes([word[0], word[1], word[2], word[3]]) >> s.min(31);
+            }
+            println!("FIELD_PARITY_TRIAD_SHIFT shift={shift} entries={}", entries.len());
+        }
+    }
     // [agent-inferred, November 2] A pace far from the founding (`FIELD_PARITY_PACE=s`, §16): every pace entry drawn from
     // the key file's tail, a 32-bit word shifted down `s` bits, so the clocks run off the byte place (fractional,
     // fast, stopping and backward rates) and the parity reads the series between whole places on both realizations.
@@ -315,7 +339,7 @@ pub(super) fn parity(args: &[String], card: &mut dyn FieldRealization) -> Result
     // the packets), so the parity reads every path of the tower on both realizations.
     if let Some(period) = std::env::var("FIELD_PARITY_SCALE").ok().and_then(|v| v.parse::<usize>().ok()).filter(|&p| p > 1) {
         let d = founded.field.declaration;
-        let coarse = holonics::hnn::tower::field::FieldDeclaration { alphabet: 2, reach: d.reach.div_ceil(period), ..d };
+        let coarse = holonics::hnn::tower::field::FieldDeclaration { alphabet: 2, reach: d.reach.div_ceil(period), triads: 0, ..d };
         let (tower, read) = founded.field.scaled_up(period, (d.ticks / 2).max(1), coarse, &p.keys, founded.drawn).map_err(|e| e.to_string())?;
         founded = holonics::hnn::tower::field::FieldLearner::new(tower, founded.rate_bits);
         founded.drawn = read;
@@ -330,6 +354,13 @@ pub(super) fn parity(args: &[String], card: &mut dyn FieldRealization) -> Result
     }
     let d = founded.field.declaration;
     println!("FIELD_PARITY_DECLARATION width={} heads={} modes={} still={} contacts={} ticks={} frames={} reach={} rate={} material={} grow={grow} withheld_read={}", d.width, d.heads, d.modes, d.still, d.contacts, d.ticks, d.frames, d.reach, founded.rate_bits, founded.field.material_len(), withheld.len());
+    // The triads' chart as grown, which `FIELD_PARITY_TRIAD_MOVED` reads each section's deposits against.
+    let triad_chart: Vec<i32> = if triads_grown > 0 {
+        let l = founded.field.layout();
+        founded.field.theta[l.triad..l.triad + 6 * triads_grown * d.width].to_vec()
+    } else {
+        Vec::new()
+    };
     let mut host_learner = founded.clone();
     let mut card_learner = founded;
     let order = walk(p.seed, host_learner.laps, p.sections.len());
@@ -465,6 +496,15 @@ pub(super) fn parity(args: &[String], card: &mut dyn FieldRealization) -> Result
             ms((t1 - t0).as_nanos()),
             ms((t2 - t1).as_nanos())
         );
+        if triads_grown > 0 {
+            // [measurement; theory, November 12] A reading of the triads' families after the section's deposit (the host learner's, which the
+            // card's equals where `learner_equal`): `W_T`'s and the chart's biases' entries off zero and the chart's entries moved from the growth, so
+            // the receipt shows which triad terms the parity's sections reached (founded, the first section moves `W_T` alone).
+            let (l, theta) = (host_learner.field.layout(), &host_learner.field.theta);
+            let nonzero = |start: usize, len: usize| theta[start..start + len].iter().filter(|&&v| v != 0).count();
+            let moved = theta[l.triad..l.triad + 6 * triads_grown * d.width].iter().zip(&triad_chart).filter(|(a, b)| a != b).count();
+            println!("FIELD_PARITY_TRIAD_MOVED section={} w_triad_nonzero={} triad_bias_nonzero={} chart_moved={moved}", k + 1, nonzero(l.w_triad, d.width * 2 * triads_grown), nonzero(l.triad_bias, 6 * triads_grown));
+        }
     }
     // [agent-inferred, November 3, §16.27] The writer through both: the same keyed draws on faces that must agree, so
     // each answer's places agree class for class.

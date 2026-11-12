@@ -1,0 +1,162 @@
+# G105's build gates (P28, with P33's commit), 2026-11-12 UTC. The build: claude/triad-contacts at 111490c01 (the triad contact written), its
+# release example field_pass staged as bin-triad, sha256 48ab0d52c2291b6fd3e64998c22c239d4de08663837b2e2a7e807753c73948ee; then 2840a7a91 (P33:
+# the triad's one part for the record's reason, conserved_weighted_rows, and the scale and turn identities' paths stated as eventual equalities of
+# real functions, which the Lean build needed: TriadGauge did not build at 111490c01). git diff 111490c01 2840a7a91 touches only comments,
+# docstrings, the Lean module and the atlas (the seven files below); bin-triad stays the build at 111490c01 for te4r, its reads, the growth, the
+# parity, tt1 and the release. Projections and deadlines from the PC's last run of each command: the build 31 s (outer 2,400 s), gate 1 203 s
+# (1,800 s), the field's tests 148 s (1,200 s), the suite 400 s (900 s), Lean 30 s (1,800 s), te4r te4's 1,290.2 s (outer 1,600 s), each parity
+# 300 s (900 s); peak resident sets on each METER or MEASURE line.
+# Device line: gate (i) on the host only (8 build jobs, 8 test threads, pinned to hardware threads 0-7, never the card) beside rt28's lap; the
+# builds of bin-triad and of the suite's tests on the host the same way beside rt28's reads; P33's gate 1 and the suite's test build on the host with
+# the card idle; gates (ii) to (vi) on the card, the RTX 4080 SUPER under HOLONICS_ROOT/.local/gpu.lock, each its own hold, nothing else on the card or
+# the host, after te5's lap and reads. Each step dispatched with tools/runs.py.
+## gate (i) at 111490c01, beside rt28's lap
+# gate (i) at 111490c01 10:52:58
+BUILD_EXIT 0 10:53:40
+METER p28_build rc=0 started=10:52:58Z ended=10:53:40Z wall_s=42.2 user_s=107.5 sys_s=7.1 peak_rss_kib=3740900
+BUILD_ERRORS 0
+GATE_EXIT 0 10:58:40
+METER p28_gate rc=0 started=10:53:40Z ended=10:58:40Z wall_s=300.0 user_s=572.8 sys_s=42.7 peak_rss_kib=4009328
+GATES_OK 28
+FIELD_TESTS_EXIT 0 11:01:11
+METER p28_field rc=0 started=10:58:40Z ended=11:01:11Z wall_s=151.0 user_s=293.6 sys_s=0.3 peak_rss_kib=90244
+TOOLS_TESTS_EXIT 0 11:01:12
+METER p28_tools rc=0 started=11:01:11Z ended=11:01:12Z wall_s=0.6 user_s=0.5 sys_s=0.0 peak_rss_kib=42948
+RESULTS build 0 gate 0 field 0 tools 0
+RUN_EXIT 0 2026-11-12T11:01:12Z
+test hnn::tower::field::tests::a_growth_by_triads_keeps_every_face_and_its_return_has_a_covector ... ok
+test hnn::tower::field::tests::each_triads_legs_and_return_carry_one_scale_covector ... ok
+test hnn::tower::field::tests::the_quarter_turn_gauge_leaves_every_face_and_the_code ... ok
+test hnn::tower::field::tests::the_triad_is_one_founded_part_written_only_where_the_field_has_triads ... ok
+test hnn::tower::field::tests::the_triads_are_the_law_site_by_site_with_none_at_a_regions_two_ends ... ok
+test hnn::tower::field::tests::the_triads_head_line_is_v14f_and_at_no_triads_every_line_is_as_before ... ok
+test hnn::tower::field::tests::the_triads_covector_matches_its_codes_difference ... ok
+test result: ok. 106 passed; 0 failed; 1 ignored; 0 measured; 2004 filtered out; finished in 150.92s
+tools: part_rates update: the planted moves and the written state hold
+tools: part_rates means: the same three write what update writes; another state keeps its material and moves its own octaves
+tools: part_rates means: a steady travel under a reversing draw reads at rest between lap ends and steady between lap means
+tools: part_rates means: a state of another declaration and a standing file are refused
+tools: part_rates base: the rate word alone moves; a rate under a part's octave, no bits and a standing file are refused
+tools: part_rates carry: the circles' four parts, twenty-two written, sixteen read at octave 0, the retired head refused, the linear chart's receipts read
+tools: part_rates first: the letter rows' three parts, nineteen written without circles, older lines read at octave 0
+tools: part_rates polar: octaves known from their ratio, the edges, the clamps, a part with no fall at 0
+tools: part_rates polar: equal polarization is the fixed point; a part's doubled travel stands two octaves above the floor
+tools: part_rates blocks: signed octaves from the ratio, no fall one under the coolest, an entry's rate from one bit to the carrier
+tools: part_rates blocks: equal polarization is the floor; the state is written whole with its rates line after its parts line
+tools: part_rates blocks: twice the travel two octaves above, half two under, a travel that goes back one under, no heat holds
+## the builds of bin-triad and of the suite's tests at 111490c01
+RELEASE_EXIT 0 11:02:25
+METER p28_release rc=0 started=11:01:14Z ended=11:02:25Z wall_s=71.0 user_s=184.1 sys_s=6.6 peak_rss_kib=2856400
+STAGED 111490c01586b17007e7ee707d957ac3c6199876 111490c01 release field_pass 48ab0d52c2291b6fd3e64998c22c239d4de08663837b2e2a7e807753c73948ee
+SUITE_BUILD_EXIT 0 11:02:40
+METER p28_suite_build rc=0 started=11:02:25Z ended=11:02:40Z wall_s=14.9 user_s=71.4 sys_s=12.5 peak_rss_kib=1785712
+RESULTS release 0 suite_build 0
+RUN_EXIT 0 2026-11-12T11:02:40Z
+## P33's commit: gate 1 and the suite's test build on it
+# at 2840a7a91; B 48ab0d52c2291b6f 11:31:08
+P33_DIFF from 111490c01 to 2840a7a91: crates/holonics/src/hnn/tower/field.rs crates/holonics/src/hnn/tower/field/tests.rs docs/atlas/objects.tsv lean/Holonics/HNN.lean lean/Holonics/HNN/TriadGauge.lean tools/part_rates.py tools/state_travel.py 
+GATE_P33_EXIT 0 11:34:20
+METER p33_gate rc=0 started=11:31:08Z ended=11:34:20Z wall_s=192.6 user_s=491.5 sys_s=39.0 peak_rss_kib=3651816
+GATES_OK 28
+SUITE_BUILD_EXIT 0 11:34:28
+METER p33_suite_build rc=0 started=11:34:20Z ended=11:34:28Z wall_s=7.9 user_s=34.4 sys_s=12.4 peak_rss_kib=1785688
+## (ii) the GPU suite alone on the idle card
+# (ii) suite: lock taken 11:34:28 wait_s=.003389379
+SUITE_EXIT 0 11:40:58
+# (ii) suite: released 11:40:58
+METER p28_suite rc=0 started=11:34:28Z ended=11:40:58Z wall_s=389.4 user_s=901.0 sys_s=60.8 peak_rss_kib=1791128
+SUITE_COUNT passed=137 failed=0 ignored=0
+test hnn::field::tests::a_regions_octets_count_the_triads_carriers ... ok
+test hnn::field::tests::the_triads_maps_tile_on_the_main_lines_declaration ... ok
+test hnn::field::tests::the_triads_on_the_card_read_the_hosts_bits ... ok
+test result: ok. 86 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 341.50s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.10s
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.41s
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.32s
+test result: ok. 46 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 32.92s
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 5.05s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+## (iii) bash tools/lean_check.sh
+LEAN_EXIT 0 11:41:28
+⚠ [9150/9154] Built Holonics.HNN.TriadGauge (16s)
+Build completed successfully (9154 jobs).
+METER p28_lean rc=0 started=11:40:58Z ended=11:41:28Z wall_s=30.4 user_s=11.3 sys_s=8.8 peak_rss_kib=7082220
+## (iv) the reproduction, te4r (its lines in g105_te4r_lines.txt)
+# (iv) te4r from te3/STATE.0 0b77bf8e5f6ef456: parts 32 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 3 3 3 3 0 0 0; binary 48ab0d52c2291b6f; lap bound 3703955 ms, the run's 4003955 ms, outer 1600 s 11:41:28
+# te4r: lock taken 11:41:28 wait_s=.003226578
+EARLY_RATE te4r sections=100 mean_section_ms=843 bound_ms=950 11:43:04
+# te4r: lap exit 0 released 12:02:02
+REPRO_LINES te4 3182 te4r 3182 differing 0 (timings and the run name aside)
+REPRO_BYTES STATE.0 te4 0d01d2c044bac80ab3682baabae1c8ec0e00af7833d5b5692c0f14b360a80108 te4r 0d01d2c044bac80ab3682baabae1c8ec0e00af7833d5b5692c0f14b360a80108 equal
+REPRO_BYTES MEAN.0 te4 cab58dae5eba5a80350c9660c38bc5916627157954ca76d68fc6150390d4952b te4r cab58dae5eba5a80350c9660c38bc5916627157954ca76d68fc6150390d4952b equal
+## (v) bin-triad's reads of te4/MEAN.0 (their lines in g105_te4_reads_bin_triad.txt)
+HELD_READ lines=41 differing=0 EQUAL
+TRANSMISSION_READ lines=14 differing=0 EQUAL
+## (vi) the growth (its lines in g105_grow_triad.txt) and the parity, host against card, on parity.sh's probes grown by 16 circles and 16 triads
+# parity-field founds its own field from the key file (it reads no saved state), so the parity reads the triads on its own grown field: at founding
+# (FIELD_PARITY_CARRY=16 FIELD_PARITY_TRIAD=16) and at a moved state (both shifts 10).
+GROW_EXIT 0 12:05:11
+GROWN 3f7befca29be105e: hnn-field-v14f 100 64 4 8 2 128 4 4 3771 2 0 32 16; parts 32 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 3 3 3 3 0 0 0 0
+TE4_PARTS parts 32 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 3 3 3 3 0 0 0
+PARITY_FOUND_EXIT 0 12:10:05
+PARITY_MOVED_EXIT 0 12:14:56
+FIELD_PARITY_CARRY circles=16 contacts=96 material=77592
+FIELD_PARITY_TRIAD triads=16 contacts=96 circles=16 material=85880
+FIELD_PARITY_TRIAD_MOVED section=1 w_triad_nonzero=0 triad_bias_nonzero=0 chart_moved=0
+FIELD_PARITY_TRIAD_MOVED section=2 w_triad_nonzero=2048 triad_bias_nonzero=0 chart_moved=0
+FIELD_PARITY_TRIAD_MOVED section=3 w_triad_nonzero=2048 triad_bias_nonzero=96 chart_moved=6144
+FIELD_PARITY_TRIAD_MOVED section=4 w_triad_nonzero=2048 triad_bias_nonzero=96 chart_moved=6144
+FIELD_PARITY_CARRY circles=16 contacts=96 material=77592
+FIELD_PARITY_CARRY_SHIFT shift=10 entries=4128
+FIELD_PARITY_TRIAD triads=16 contacts=96 circles=16 material=85880
+FIELD_PARITY_TRIAD_SHIFT shift=10 entries=8288
+FIELD_PARITY_TRIAD_MOVED section=1 w_triad_nonzero=2048 triad_bias_nonzero=96 chart_moved=0
+FIELD_PARITY_TRIAD_MOVED section=2 w_triad_nonzero=2048 triad_bias_nonzero=96 chart_moved=6144
+FIELD_PARITY_TRIAD_MOVED section=3 w_triad_nonzero=2048 triad_bias_nonzero=96 chart_moved=6144
+FIELD_PARITY_TRIAD_MOVED section=4 w_triad_nonzero=2048 triad_bias_nonzero=96 chart_moved=6144
+PARITY_CHECK found.log sections=4 faces_or_covector_unequal_at=- learners_unequal_at=['section=1'] done=yes ok=True
+  FIELD_PARITY_DONE sections=4 reads=4 reads_unequal=0 faces_unequal=0 covector_unequal=0 learners_unequal=1 releases=0 releases_unequal=0 card_release_ms=0 host_ms=167221 card_ms=1609 elapsed_ms=292851
+PARITY_CHECK moved.log sections=4 faces_or_covector_unequal_at=- learners_unequal_at=['section=1'] done=yes ok=True
+  FIELD_PARITY_DONE sections=4 reads=4 reads_unequal=0 faces_unequal=0 covector_unequal=0 learners_unequal=1 releases=0 releases_unequal=0 card_release_ms=0 host_ms=162074 card_ms=1596 elapsed_ms=291206
+MAIN p28 card done 12:14:56
+## the parity found: its lines
+FIELD_PARITY_LANE lanes=2 width=64 material=63096
+FIELD_PARITY_CONTACTS contacts=64 width=64 material=69304
+FIELD_PARITY_PARTS octaves=1 contacts_before=32
+FIELD_PARITY_CARRY circles=16 contacts=96 material=77592
+FIELD_PARITY_TRIAD triads=16 contacts=96 circles=16 material=85880
+FIELD_PARITY_PACE shift=8 entries=246
+FIELD_PARITY_DECLARATION width=64 heads=4 modes=8 still=2 contacts=96 ticks=2 frames=4 reach=2221 rate=8 material=85880 grow=1 withheld_read=2
+FIELD_PARITY section=1 withheld=false regions=26 length=1550 sites=15920 rows=161504 reads=1 faces_unequal=0 covector_unequal=0 first=- deposited=true halvings=0 next=- learner_equal=false near_equal=true clocks_equal=false rows_equal=true shares_equal=true currents_equal=true pace_nonzero=246 kappa=504..1478 host_ms=37452 card_ms=393
+FIELD_PARITY_TRIAD_MOVED section=1 w_triad_nonzero=0 triad_bias_nonzero=0 chart_moved=0
+FIELD_PARITY section=2 withheld=false regions=29 length=1653 sites=20456 rows=208880 reads=1 faces_unequal=0 covector_unequal=0 first=- deposited=true halvings=0 next=- learner_equal=true near_equal=true clocks_equal=true rows_equal=true shares_equal=true currents_equal=true pace_nonzero=246 kappa=524..1478 host_ms=57470 card_ms=560
+FIELD_PARITY_TRIAD_MOVED section=2 w_triad_nonzero=2048 triad_bias_nonzero=0 chart_moved=0
+FIELD_PARITY section=3 withheld=false regions=30 length=1819 sites=25228 rows=269048 reads=1 faces_unequal=0 covector_unequal=0 first=- deposited=true halvings=0 next=- learner_equal=true near_equal=true clocks_equal=true rows_equal=true shares_equal=true currents_equal=true pace_nonzero=246 kappa=508..1482 host_ms=70040 card_ms=619
+FIELD_PARITY_TRIAD_MOVED section=3 w_triad_nonzero=2048 triad_bias_nonzero=96 chart_moved=6144
+FIELD_PARITY section=4 withheld=true regions=8 length=571 sites=0 rows=31680 reads=1 faces_unequal=0 covector_unequal=0 first=- deposited=false halvings=0 next=- learner_equal=true near_equal=true clocks_equal=true rows_equal=true shares_equal=true currents_equal=true pace_nonzero=246 kappa=519..1482 host_ms=2257 card_ms=36
+FIELD_PARITY_TRIAD_MOVED section=4 w_triad_nonzero=2048 triad_bias_nonzero=96 chart_moved=6144
+FIELD_PARITY_WRITES problems=0 sweeps=8 host_ms=0
+FIELD_PARITY_DONE sections=4 reads=4 reads_unequal=0 faces_unequal=0 covector_unequal=0 learners_unequal=1 releases=0 releases_unequal=0 card_release_ms=0 host_ms=167221 card_ms=1609 elapsed_ms=292851
+MEASURE lap=found rc=1 wall_s=293.4 peak_rss_kib=1805280
+## the parity moved: its lines
+FIELD_PARITY_LANE lanes=2 width=64 material=63096
+FIELD_PARITY_CONTACTS contacts=64 width=64 material=69304
+FIELD_PARITY_PARTS octaves=1 contacts_before=32
+FIELD_PARITY_CARRY circles=16 contacts=96 material=77592
+FIELD_PARITY_CARRY_SHIFT shift=10 entries=4128
+FIELD_PARITY_TRIAD triads=16 contacts=96 circles=16 material=85880
+FIELD_PARITY_TRIAD_SHIFT shift=10 entries=8288
+FIELD_PARITY_PACE shift=8 entries=246
+FIELD_PARITY_DECLARATION width=64 heads=4 modes=8 still=2 contacts=96 ticks=2 frames=4 reach=2221 rate=8 material=85880 grow=1 withheld_read=2
+FIELD_PARITY section=1 withheld=false regions=26 length=1550 sites=15920 rows=161504 reads=1 faces_unequal=0 covector_unequal=0 first=- deposited=true halvings=0 next=- learner_equal=false near_equal=true clocks_equal=false rows_equal=true shares_equal=true currents_equal=true pace_nonzero=246 kappa=504..1478 host_ms=35089 card_ms=510
+FIELD_PARITY_TRIAD_MOVED section=1 w_triad_nonzero=2048 triad_bias_nonzero=96 chart_moved=0
+FIELD_PARITY section=2 withheld=false regions=29 length=1653 sites=20456 rows=208880 reads=1 faces_unequal=0 covector_unequal=0 first=- deposited=true halvings=0 next=- learner_equal=true near_equal=true clocks_equal=true rows_equal=true shares_equal=true currents_equal=true pace_nonzero=246 kappa=524..1478 host_ms=48026 card_ms=402
+FIELD_PARITY_TRIAD_MOVED section=2 w_triad_nonzero=2048 triad_bias_nonzero=96 chart_moved=6144
+FIELD_PARITY section=3 withheld=false regions=30 length=1819 sites=25228 rows=269048 reads=1 faces_unequal=0 covector_unequal=0 first=- deposited=true halvings=0 next=- learner_equal=true near_equal=true clocks_equal=true rows_equal=true shares_equal=true currents_equal=true pace_nonzero=246 kappa=508..1477 host_ms=76657 card_ms=647
+FIELD_PARITY_TRIAD_MOVED section=3 w_triad_nonzero=2048 triad_bias_nonzero=96 chart_moved=6144
+FIELD_PARITY section=4 withheld=true regions=8 length=571 sites=0 rows=31680 reads=1 faces_unequal=0 covector_unequal=0 first=- deposited=false halvings=0 next=- learner_equal=true near_equal=true clocks_equal=true rows_equal=true shares_equal=true currents_equal=true pace_nonzero=246 kappa=519..1477 host_ms=2300 card_ms=36
+FIELD_PARITY_TRIAD_MOVED section=4 w_triad_nonzero=2048 triad_bias_nonzero=96 chart_moved=6144
+FIELD_PARITY_WRITES problems=0 sweeps=8 host_ms=0
+FIELD_PARITY_DONE sections=4 reads=4 reads_unequal=0 faces_unequal=0 covector_unequal=0 learners_unequal=1 releases=0 releases_unequal=0 card_release_ms=0 host_ms=162074 card_ms=1596 elapsed_ms=291206
+MEASURE lap=moved rc=1 wall_s=291.7 peak_rss_kib=1678696

@@ -799,6 +799,7 @@ pub(super) fn run_with_execution(
         Some("train-field") if backend == CompleteLanguageTrainingBackend::HostReference => field_train::train(args, &mut field_train::host()),
         Some("grow-contacts-field") if backend == CompleteLanguageTrainingBackend::HostReference => field_train::grow_contacts_field(args, &mut field_train::host()),
         Some("grow-carry-field") if backend == CompleteLanguageTrainingBackend::HostReference => field_train::grow_carry_field(args, &mut field_train::host()),
+        Some("grow-triad-field") if backend == CompleteLanguageTrainingBackend::HostReference => field_train::grow_triad_field(args, &mut field_train::host()),
         Some("sample-field") if backend == CompleteLanguageTrainingBackend::HostReference => field_train::sample(args, &mut field_train::host()),
         Some("split-field") if backend == CompleteLanguageTrainingBackend::HostReference => field_train::split_field(args, &mut field_train::host()),
         Some("joint-field") if backend == CompleteLanguageTrainingBackend::HostReference => field_train::joint_field(args, &mut field_train::host()),
@@ -901,6 +902,7 @@ pub(super) fn run_field_realized(args: &[String], realization: &mut dyn holonics
         Some("train-field") => field_train::train(args, realization),
         Some("grow-contacts-field") => field_train::grow_contacts_field(args, realization),
         Some("grow-carry-field") => field_train::grow_carry_field(args, realization),
+        Some("grow-triad-field") => field_train::grow_triad_field(args, realization),
         Some("joint-field") => field_train::joint_field(args, realization),
         Some("transmission-field") => field_train::transmission_field(args, realization),
         Some("settle-field") => field_train::settle_field(args, realization),
@@ -1026,7 +1028,7 @@ pub(super) fn run(args: &[String]) -> Result<()> {
 /// [theory, November 11 04:49] **The verbs a `reading` manifest passes**: each opens a saved state read-only and writes none (its output is a table of numbers under its own new output
 /// directory). The held and locked visits (`joint-field` the held joint of a state as a lap reads it), the structure measures (`order-field` the keyed order's codes, `expansion-field` the
 /// expansion and volume, `gamma-field` the carry's `|γ|`, `leak-field` where the carry's leak reads below zero (November 12), `square-field` the square of two places and `residual-field` the residual at half rank, November 12) and the covector split (`split-field`). Everything else stays refused without Brandon's exception or a parity manifest: `train-field` and every
-/// `train-*`, `grow-contacts-field`, `grow-carry-field`, `sample-field`, `rows-field`, `ring-field`, `depth-field`, `restate-field`, `reach-field`, `opening-field` and `length-field` (these release or found), `found-*`,
+/// `train-*`, `grow-contacts-field`, `grow-carry-field`, `grow-triad-field`, `sample-field`, `rows-field`, `ring-field`, `depth-field`, `restate-field`, `reach-field`, `opening-field` and `length-field` (these release or found), `found-*`,
 /// `grow-*`, `release-*`, and every verb of the tower, native and class routes. A new reading verb enters this list only where it writes no state.
 const READING_VERBS: [&str; 8] = ["joint-field", "order-field", "expansion-field", "gamma-field", "leak-field", "split-field", "square-field", "residual-field"];
 
@@ -1173,7 +1175,7 @@ mod tests {
         let train: Vec<String> = ["train-field", &state, &digest, "OUT"].iter().map(|s| s.to_string()).collect();
         let on_train = write("train", &train.join(" "), &digest);
         assert!(host_exception(&on_train, &train).is_err(), "a training verb is refused under a reading manifest");
-        for verb in ["grow-contacts-field", "grow-carry-field", "sample-field", "release-tower-classes", "found-units", "length-field", "opening-field"] {
+        for verb in ["grow-contacts-field", "grow-carry-field", "grow-triad-field", "sample-field", "release-tower-classes", "found-units", "length-field", "opening-field"] {
             let args: Vec<String> = [verb, &state, &digest].iter().map(|s| s.to_string()).collect();
             assert!(host_exception(&write("other", &args.join(" "), &digest), &args).is_err(), "{verb}");
         }

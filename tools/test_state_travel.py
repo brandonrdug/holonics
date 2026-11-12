@@ -50,6 +50,15 @@ Controls of the carry circles' halves (theory, November 11 22:40, G87), on drawn
            the cosine 1, and the turn blocks, the first lane's leak block and the biases do not travel;
   graft    carry/turn, carry/leak, carry_bias/turn and carry_bias/leak take only their half; the four with every other family give
            the donor's material; a half beside its family, and a half on a declaration with no circles, are refused.
+
+Controls of the triads (theory, November 12; the triad record §4), on drawn states of declarations with two triads, without and with
+carry circles (the head hnn-field-v14f, C written even at 0, then J):
+  blocks   scale's blocks read the triad's three legs apart (the charts A, B and G by lane, their biases by leg, the return W_T by lane),
+           each entry once, and the block law's rate_unit joins them all into one unit, triad/0/all;
+  weighed  a travel planted in the second lane's rows of W_T alone, the same on both laps: that block travels with the cosine 1, and the
+           legs, the biases and the first lane's rows do not travel;
+  graft    part:triad and block:triad/0/all take the three families whole and alike, block:triad_b/2/all only its leg's lane, and the
+           families triad, triad_bias and w_triad with every other family give the donor's material; a leg beside its unit is refused.
 """
 import io
 import os
@@ -608,6 +617,112 @@ def carry_controls():
     print(f"state_travel carry halves: {len(rows)} weighed lines, the controls hold")
 
 
+DT = dict(D, triads=2)
+
+
+def write_d(path, d, theta, second=None, parts=None):
+    """A learner's text of declaration d: hnn-field-v14, hnn-field-v14e with carry circles, hnn-field-v14f with triads (C even at 0, then J)."""
+    c, j = d.get("carry", 0), d.get("triads", 0)
+    kind = "hnn-field-v14f" if j else "hnn-field-v14e" if c else "hnn-field-v14"
+    words = [kind] + [str(d[k]) for k in ("alphabet", "width", "heads", "modes", "still", "contacts", "ticks", "frames", "reach", "lanes")] + ["0"] + ([str(c)] if c or j else []) + ([str(j)] if j else [])
+    with open(path, "w") as f:
+        f.write("hnn-field-learner-v3 12 0 0 -\n" + " ".join(words) + "\n" + " ".join(str(int(x)) for x in theta) + "\n")
+        if second is not None:
+            f.write(" ".join("0" for _ in theta) + "\n" + " ".join(str(int(x)) for x in second) + "\n")
+        if parts is not None:
+            f.write("parts " + " ".join(str(k) for k in parts) + "\n")
+
+
+def triad_controls():
+    import part_rates
+
+    j, dw, lw = DT["triads"], DT["width"], DT["width"] // DT["lanes"]
+    for d in (DT, dict(DT, carry=2)):
+        fam, total = state_travel.layout(d)
+        plain_total = state_travel.layout(dict(d, triads=0))[1]
+        where = {name: (at, shape) for name, at, shape, _ in fam}
+        assert where["triad"] == (plain_total, (6 * j, dw)) and where["triad_bias"][1] == (6 * j,) and where["w_triad"][1] == (dw, 2 * j)
+        assert total == plain_total + 6 * j * dw + 6 * j + 2 * j * dw
+        cut = state_travel.scale_blocks(d, OLD_F)
+        cover = np.zeros(total, dtype=np.int64)
+        for _, _, _, _, family, m in cut:
+            cover[where[family][0] + np.flatnonzero(m.ravel())] += 1
+        assert (cover == 1).all(), "the blocks hold every entry once"
+        blocks = {(b, lane): (family, m) for b, lane, contacts, _, family, m in cut if contacts == "all"}
+        for lane in (1, 2):
+            cols = slice((lane - 1) * lw, lane * lw)
+            for leg, rows in (("a", slice(0, 2 * j)), ("b", slice(2 * j, 4 * j)), ("g", slice(4 * j, 6 * j))):
+                family, m = blocks[(f"triad_{leg}", lane)]
+                want = np.zeros((6 * j, dw), dtype=bool); want[rows, cols] = True
+                assert family == "triad" and (m == want).all(), (leg, lane)
+            family, m = blocks[("w_triad", lane)]
+            want = np.zeros((dw, 2 * j), dtype=bool); want[cols, :] = True
+            assert family == "w_triad" and (m == want).all(), lane
+        for leg, rows in (("a", slice(0, 2 * j)), ("b", slice(2 * j, 4 * j)), ("g", slice(4 * j, 6 * j))):
+            family, m = blocks[(f"triad_bias_{leg}", 0)]
+            want = np.zeros(6 * j, dtype=bool); want[rows] = True
+            assert family == "triad_bias" and (m == want).all(), leg
+        joined = {b for b, lane, contacts, _, _, _ in cut if state_travel.rate_unit(b, lane, contacts) == ("triad", 0, "all")}
+        assert joined == set(state_travel.TRIAD_BLOCKS)
+        assert all(state_travel.rate_unit(b, lane, contacts) == (b, lane, contacts) for b, lane, contacts, _, _, _ in cut if b not in state_travel.TRIAD_BLOCKS)
+    print("state_travel triad blocks: the legs apart by lane, the biases by leg, the return by lane, each entry once, one unit of the block law")
+
+    # Weighed: a travel in the second lane's rows of W_T alone.
+    fam, total = state_travel.layout(DT)
+    where = {name: (at, shape) for name, at, shape, _ in fam}
+    rng = np.random.default_rng(20261118)
+    base = rng.integers(-100000, 100000, size=total).astype(np.int64)
+    step = np.zeros(total, dtype=np.int64)
+    at, shape = where["w_triad"]
+    rows = np.zeros(shape, dtype=bool); rows[lw:, :] = True
+    step[at + np.flatnonzero(rows.ravel())] = rng.integers(200, 400, size=int(rows.sum()))
+    states = [base, base + step, base + 2 * step]
+    second = np.full(total, 1 << 20, dtype=np.int64)
+    with tempfile.TemporaryDirectory() as tmp:
+        paths = [os.path.join(tmp, f"s{i}") for i in range(3)]
+        for path, theta in zip(paths, states):
+            write_d(path, DT, theta, second, [OLD_F] + [0] * len(part_rates.written(DT)))
+        assert state_travel.state(paths[0])[0] == DT
+        out = io.StringIO()
+        with redirect_stdout(out):
+            state_travel.weighed(OLD_F, 4, 64, paths)
+        lines = [fields(l) for l in out.getvalue().split("\n") if l.startswith("TRAVEL_WEIGHED_LAP ") or l.startswith("TRAVEL_WEIGHED_PAIR ")]
+        laps = {(r["block"], r["lane"]): float(r["travel_rms"]) for r in lines if "lap" in r and r["lap"] == "0"}
+        (pair,) = [r for r in lines if "laps" in r and r["block"] == "w_triad" and r["lane"] == "2"]
+        assert laps[("w_triad", "2")] > 0 and float(pair["cos"]) > 0.9999, (laps, pair)
+        assert all(laps[k] == 0 for k in laps if k != ("w_triad", "2")), laps
+        print(f"state_travel triad weighed: {len(lines)} weighed lines, a travel of the return's second lane read alone")
+
+        # Graft: the part, the unit, a leg, and the families.
+        b = base + rng.integers(1, 10, size=total)
+        pa, pb = os.path.join(tmp, "a"), os.path.join(tmp, "b")
+        write_d(pa, DT, base, second, [OLD_F] + [0] * len(part_rates.written(DT)))
+        write_d(pb, DT, b, second, [OLD_F] + [0] * len(part_rates.written(DT)))
+        spans = {name: (at, int(np.prod(shape))) for name, at, shape, _ in fam}
+        whole = np.zeros(total, dtype=bool); whole[spans["triad"][0]:] = True
+        quiet = io.StringIO()
+        with redirect_stdout(quiet):
+            for i, name in enumerate(["part:triad", "block:triad/0/all"]):
+                state_travel.graft(os.path.join(tmp, f"g{i}"), pa, pb, [name])
+                _, got = state_travel.state(os.path.join(tmp, f"g{i}"))
+                assert (got[whole] == b[whole]).all() and (got[~whole] == base[~whole]).all(), name
+            state_travel.graft(os.path.join(tmp, "leg"), pa, pb, ["block:triad_b/2/all"])
+            _, got = state_travel.state(os.path.join(tmp, "leg"))
+            leg = np.zeros((6 * j, dw), dtype=bool); leg[2 * j:4 * j, lw:] = True
+            inside = np.zeros(total, dtype=bool); inside[spans["triad"][0] + np.flatnonzero(leg.ravel())] = True
+            assert (got[inside] == b[inside]).all() and (got[~inside] == base[~inside]).all()
+            state_travel.graft(os.path.join(tmp, "all"), pa, pb, list(spans))
+        assert (state_travel.state(os.path.join(tmp, "all"))[1] == b).all()
+        for bad in (["block:triad/0/all", "block:triad_a/1/all"], ["part:triad", "w_triad"], ["triad/old"]):
+            try:
+                with redirect_stdout(quiet):
+                    state_travel.graft(os.path.join(tmp, "bad"), pa, pb, bad)
+                raise RuntimeError(f"a graft that names {bad} was written")
+            except AssertionError:
+                assert not os.path.exists(os.path.join(tmp, "bad"))
+    print("state_travel triad graft: the part and the unit alike, a leg alone, the families whole; a leg beside its unit refused")
+
+
 def main():
     rank_controls()
     scale_controls()
@@ -618,6 +733,7 @@ def main():
     graft_part_controls()
     graft_block_controls()
     carry_controls()
+    triad_controls()
 
 
 if __name__ == "__main__":
