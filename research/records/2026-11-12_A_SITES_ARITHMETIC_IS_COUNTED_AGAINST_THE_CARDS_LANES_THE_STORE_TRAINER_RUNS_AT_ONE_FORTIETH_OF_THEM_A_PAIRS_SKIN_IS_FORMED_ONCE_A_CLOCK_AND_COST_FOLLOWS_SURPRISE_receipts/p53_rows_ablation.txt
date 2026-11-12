@@ -1,0 +1,41 @@
+# P53 item 1 (G120), 2026-11-12 UTC: the ablation of field_contact_rows. One hold of the card lock, nothing else on the card or the host: the pass's
+# sections 2,001 to 2,100 from run 2's STATE.1900 (sha256 cda6ac8a1129f147), every run profiled: control (the shipped build), the run with the copy
+# (the ruler build, feature ruler-rows-reads: field_yard_rows immediately before each launch of the entry, its stores and atomics into scratch arrays of
+# the entry's layouts), control. Both builds from main 60fece148 with the ruler's source (claude/engine-ruler). Numbers only.
+## the builds
+60fece148 with the ruler source (ctl) field_pass aaad125f845bd2ba1981ce49bfa170697c670ca2e69a5011bdbc3056f280029c
+60fece148 with the ruler source (ruler) field_pass 6c4c9d1e58341b51dd50172eba57601675d1103f7ab9877817cbc2fe56c56836
+## the compiled copies: load and store instructions (the ruler build's PTX, field.ptx; its SASS by ptxas -O3 for sm_89 and cuobjdump -sass; the
+## driver lowers the PTX itself at the card's open, so the card's SASS may differ in detail)
+PTX entry=field_contact_rows ld_global=112 ld_shared=50 st_global=7 st_shared=25 atom_red=37 mul_mad=425 div_rem=27
+PTX entry=field_yard_rows ld_global=96 ld_shared=38 st_global=7 st_shared=17 atom_red=22 mul_mad=107 div_rem=25
+SASS entry=field_contact_rows instructions=4096 LDG=99 STG=4 ATOMG=0 RED=12 LDS=35 STS=22 LDL=20 STL=38 IMAD=1427 IMAD_WIDE=379 SHFL=20
+SASS entry=field_yard_rows instructions=2240 LDG=96 STG=7 ATOMG=5 RED=17 LDS=38 STS=17 LDL=0 STL=0 IMAD=728 IMAD_WIDE=99 SHFL=23
+RESOURCES entry=field_contact_rows registers=80 stack_octets=128 shared_octets=20128
+RESOURCES entry=field_yard_rows registers=80 stack_octets=0 shared_octets=10912
+## the hold
+HOLD hold: lock taken 23:26:02 wait_s=.003076395
+HOLD ac1: exit 0 23:27:00
+HOLD ar: exit 0 23:27:52
+HOLD ac2: exit 0 23:28:40
+HOLD hold: released 23:28:40
+FIELD_CARD reads=0 read_ms=0 returns=100 return_ms=44646 pairs=4566615773 batches=100 peak_store=8410613236 landmarks=0 landmark_ms=0 elapsed_ms=46293
+FIELD_SKIN octets_a_entry=64 octets_a_site=1280 clock_octets_a_site=1920 entries=1049010242 dense_pairs=1487925442 peak_batch_entries=12264156 peak_batch_dense_pairs=15521024 peak_skin_store=913577984 peak_store=8410613236 batch_cut=8490057728 free_at_open=156
+MEASURE lap=ac1 rc=0 wall_s=57.6 peak_rss_kib=627612
+STATE_SHA ac1 81377dbeaf26d65e 64954161619deda4
+FIELD_CARD reads=0 read_ms=0 returns=100 return_ms=50344 pairs=4566615773 batches=100 peak_store=8410613236 landmarks=0 landmark_ms=0 elapsed_ms=52133
+FIELD_SKIN octets_a_entry=64 octets_a_site=1280 clock_octets_a_site=1920 entries=1049010242 dense_pairs=1487925442 peak_batch_entries=12264156 peak_batch_dense_pairs=15521024 peak_skin_store=913577984 peak_store=8410613236 batch_cut=8492784024 free_at_open=156
+MEASURE lap=ar rc=0 wall_s=52.7 peak_rss_kib=379496
+STATE_SHA ar 81377dbeaf26d65e 64954161619deda4
+FIELD_CARD reads=0 read_ms=0 returns=100 return_ms=45208 pairs=4566615773 batches=100 peak_store=8410613236 landmarks=0 landmark_ms=0 elapsed_ms=46950
+FIELD_SKIN octets_a_entry=64 octets_a_site=1280 clock_octets_a_site=1920 entries=1049010242 dense_pairs=1487925442 peak_batch_entries=12264156 peak_batch_dense_pairs=15521024 peak_skin_store=913577984 peak_store=8410613236 batch_cut=8524975308 free_at_open=156
+MEASURE lap=ac2 rc=0 wall_s=47.5 peak_rss_kib=383672
+STATE_SHA ac2 81377dbeaf26d65e 64954161619deda4
+LINES ac1 sections=100 equal_to_leg1=100/100
+LINES ar sections=100 equal_to_leg1=100/100
+LINES ac2 sections=100 equal_to_leg1=100/100
+ABLATION head=0 copy_ms_a_profiled_section=5.21 entry_control1=9.19 entry_control2=9.20 controls_spread=0.00 copy_over_controls=0.567 entry_after_the_copy_not_a_reading=9.71
+ABLATION head=1 copy_ms_a_profiled_section=4.43 entry_control1=7.19 entry_control2=7.14 controls_spread=0.04 copy_over_controls=0.618 entry_after_the_copy_not_a_reading=8.13
+ABLATION head=2 copy_ms_a_profiled_section=5.51 entry_control1=12.18 entry_control2=12.43 controls_spread=0.26 copy_over_controls=0.448 entry_after_the_copy_not_a_reading=13.42
+ABLATION head=3 copy_ms_a_profiled_section=5.84 entry_control1=12.72 entry_control2=12.82 controls_spread=0.10 copy_over_controls=0.458 entry_after_the_copy_not_a_reading=13.81
+ABLATION head=all copy_ms_a_profiled_section=20.98 entry_control1=41.26 entry_control2=41.58 controls_spread=0.32 copy_over_controls=0.507 entry_after_the_copy_not_a_reading=45.06
