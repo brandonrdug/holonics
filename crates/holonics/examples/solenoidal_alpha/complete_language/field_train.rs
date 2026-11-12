@@ -4872,6 +4872,47 @@ mod tests {
         assert!(leaks[0].kind.iter().map(|p| p.0).sum::<u64>() > 0, "the moved leak row turns some reads below zero");
         assert_eq!(leaks[1].kind.iter().map(|p| p.0).sum::<u64>(), 0, "a founded circle reads no leak below zero");
     }
+
+    /// [theory, November 12, G96's third branch] **A training section's leak read is its regions' sums merged**: [`section_leaks`] on regions
+    /// read through the realization's tick reads gives, circle by circle, what [`leak_add`] gives region by region in order (a run closes at
+    /// its region's end, so the merge is the serial pass's); its open reads and their `h ≥ 0` counts are the carry gates' on the same
+    /// regions; no site is a question's (a section's region has no split); and its line names each circle's longest run.
+    #[test]
+    fn a_sections_leak_read_is_its_regions_sums_merged() {
+        let (codec, problems) = toy();
+        let learner = toy_learner(&codec, &problems);
+        let keys: Vec<u8> = (0..1u64 << 14).flat_map(|i| mix(0x1EAC, i).to_be_bytes()).collect();
+        let mut grown = learner.with_carry(2, &keys).unwrap();
+        let (dw, carry) = (grown.field.declaration.width, grown.field.layout().carry);
+        for j in 0..dw {
+            grown.field.theta[carry + 2 * dw + j] = if j % 2 == 0 { -(1 << 24) } else { 1 << 24 };
+        }
+        let field = &grown.field;
+        let states: Vec<(Vec<usize>, Vec<bool>)> = (0..problems.len())
+            .flat_map(|i| {
+                let (q, a, _) = &problems[i];
+                joint_states(codec.void(), q, a, 0x5EED, i as u64).into_iter().map(|(c, u, _)| (c, u))
+            })
+            .collect();
+        let views: Vec<Region> = states.iter().map(|(c, u)| Region { classes: c, unresolved: u, faces: &[], locked: &[], echo: &[], domain: None, port: None }).collect();
+        let leaks = section_leaks(field, &views, &mut HostField).unwrap();
+        let reads = HostField.read_ticks(field, &views).unwrap();
+        let mut serial = vec![Leak::default(); 2];
+        let mut gates = holonics::hnn::tower::field::CarryGates::new(2);
+        for (view, ticks) in views.iter().zip(&reads) {
+            leak_add(field, &mut serial, None, view.unresolved, 0, ticks).unwrap();
+            gates.add(&field.carry_gates_of(view).unwrap());
+        }
+        assert_eq!(leaks, serial, "the merged sums are the serial pass's");
+        for (k, leak) in leaks.iter().enumerate() {
+            assert_eq!((leak.reads, leak.nonnegative), (gates.reads, gates.friction[k]), "circle {k}: the gates' counts on the same regions");
+            assert_eq!(leak.kind[0].1, 0, "circle {k}: no site is a question's");
+        }
+        assert!(leaks[0].kind.iter().map(|p| p.0).sum::<u64>() > 0, "the moved leak row turns some reads below zero");
+        let line = section_leak_text(0, 3, &leaks);
+        assert!(line.starts_with("FIELD_SECTION_LEAK lap=0 n=3 circles=2 "), "{line}");
+        assert!(line.contains(&format!(" longest_by_circle={}/{} ", leaks[0].longest, leaks[1].longest)), "{line}");
+    }
 }
 
 
@@ -5096,7 +5137,7 @@ pub(super) fn leak_field(args: &[String], realization: &mut dyn FieldRealization
 /// reads by stratum; the reads with `h < 0` and all reads at the first tick and the last; the runs and their sites by length band, and the
 /// longest; the largest charge over every site and over the sites with `h < 0`; and the charge's sum and count over the
 /// sites with `h < 0` and over the rest.
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Debug, Default, PartialEq, Eq)]
 struct Leak {
     reads: u64,
     nonnegative: u64,
