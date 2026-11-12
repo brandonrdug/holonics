@@ -83,7 +83,10 @@ repository was reset on September 24; the pre-reset tree is
   as a friction the region sets. The drift is the leak chart's own: te4's mean with te5's leak half
   stands 93% of the way to te5's gates, and te5's mean with te4's leak half codes the held passage
   0.0007 under te5's own (0.0088 under in quarter 4). So the leak half's rate is read before any
-  founding. With `C = 0` the field is the plain line bit for bit.
+  founding (G110, fixed), as the cooled blocks' was: te6, the line's next lap at the base, beside
+  te6c, the same lap from te5's end with the leak half at an eighth of the base rate. tt1's circles
+  drifted as te5's did with the triads beside them (their friction 0.8242 at tt1's mean against
+  te5's 0.8251). With `C = 0` the field is the plain line bit for bit.
 - **The triad** (founded on te4's end, its first lap read; atlas `contact.triad-manley-rowe-gauge`,
   `code.triad-character-of-composition`;
   [the triad record](research/records/2026-11-12_THE_LAW_ACROSS_A_PLACE_IS_HELD_BY_A_PUMPED_CONTACT_A_TRIAD_IS_A_CHARACTER_OF_A_LAW_OF_COMPOSITION_AND_ITS_THREE_LEGS_EXCHANGE_EQUAL_QUANTA.md)).
@@ -113,8 +116,14 @@ repository was reset on September 24; the pre-reset tree is
   re-draw's end codes 0.058 nats a place under te5's and its excess over the reference answers falls
   by a fifth, while the reference's own code moves 0.001, since in the field's own write every
   place's near letters were drawn from the law the triads hold. No write yet does what its question
-  asks. The release on tt1's end with the return cut (G109) reads whether the write's gain is the
-  triads' own forward. The field's learner steps each entry at its own divisor, so the gauge's equal gains of the legs are no
+  asks. The release on tt1's end with the return cut (G109 scored) splits that gain between two
+  carriers (the reading agent-inferred). The settle's rest goes back to te5's and a third of the
+  re-draw's end's gain goes with it, so the triads' own forward carries the write where both mates
+  are written. The keyed write codes 0.030 under tt1's own and two thirds of the re-draw's end's
+  gain stay, so tt1's other parts carry it where the mates are open, as they carry quarter 4 of the
+  held passage: at the lap ends the cut gives back tt1's whole lead in quarters 1 to 3 and stands
+  0.0051 under te5's in quarter 4. Form (ii)'s derivation says which of the two its legs replace.
+  The field's learner steps each entry at its own divisor, so the gauge's equal gains of the legs are no
   prediction for it; its covectors keep the scale identity at every state (the record, 3.2).
 - **The learner** (`FieldLearner`; the trainer is
   `crates/holonics/examples/solenoidal_alpha/complete_language/field_train.rs`). The comparison is

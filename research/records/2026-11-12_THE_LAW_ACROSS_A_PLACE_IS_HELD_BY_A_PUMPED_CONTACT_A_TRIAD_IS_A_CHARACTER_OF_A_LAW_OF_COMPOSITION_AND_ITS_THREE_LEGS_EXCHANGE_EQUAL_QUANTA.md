@@ -298,8 +298,9 @@ lock, so that `arg α + arg β + arg γ` stands still across the places that sha
 - Lean, for #410: the character decomposition of the cyclic law (3.1), and the triad's gauge
   identity with its conserved differences under a step at equal rates (3.2, written with the build
   as `HNN/TriadGauge`; its box ticked from the PC).
-- The check of the built object: done (G107, section 9). The release on tt1's end with the return cut
-  (G109), and form (ii)'s derivation after the circles' leak half's rate is read (G108's rule).
+- The check of the built object: done (G107, section 9). The release on tt1's end with the return
+  cut: done (G109, section 9). Form (ii)'s derivation, after the circles' leak half's rate is read
+  (G110, by G108's rule), says which of the write's two carriers its legs replace.
 
 ## 9. The first lap (G105) and the check of the built object (G107)
 
@@ -362,6 +363,37 @@ The ruler passes 39 of tt1's 250 written code lines against 24 of te5's 223. No 
 its question asks. G109 reads the release on tt1's end with the return cut, to tell the triads' own
 forward from their mark on the other parts.
 
+### G109, scored
+
+[measurement; the reading agent-inferred] G109 cut the return `W_T` from tt1's end (TT1EC, `w_triad`
+grafted from TT0, 2,048 entries) and ran the release on it as G106 ran it on tt1's end, on the first
+32 held problems' 8,760 places. Every figure here is read on lap ends, as the release's stages are.
+- The held joint over the held passage's 43,470 places: the cut stands 0.0023 nats a place over
+  tt1's end and 0.0011 under te5's, so it takes back two thirds of tt1's lead. By quarter of open
+  sites it takes back the whole lead in quarters 1 to 3 (1.27, 1.10 and 0.99 of it) and a sixteenth
+  of it in quarter 4, where the cut stands 0.0051 under te5's.
+- The settle's rest goes back to te5's: 0.0013 under it, where tt1's stood 0.041 under. Each place
+  of the rest is drawn with its neighbours written, as in the transmission rows with both mates
+  written, which G107's cut also put back to te5's.
+- The keyed write codes 0.153 nats a place under te5's, 0.030 under tt1's own. The re-draw's end
+  codes 0.037 under te5's and 0.020 over tt1's, and its excess over the reference answers likewise,
+  so the cut keeps two thirds of tt1's gain there. The reference and the locked read on 128 stand
+  within 0.0004 of te5's.
+- Read whole, the cut's answers are the passage's words and identifiers in local order, and none
+  does what its question asks. The ruler passes 30 of 223 written code lines (tt1 39 of 250, te5 24
+  of 223). The answers carry more of their questions' words, 59 of 327 words of four letters or more
+  against tt1's 46 and te5's 48, the mark of a law read from far places.
+
+So both carry the write, and G106's why is withdrawn in part. The triads' own forward carries it
+where both mates are written: the rest, and a third of the re-draw's end. tt1's other parts carry it
+where the mates are open: the keyed write, which draws one place at a time in a keyed order with most
+mates open, and two thirds of the re-draw's end. They are the parts that code quarter 4, the most
+open regions, under te5's. Where the mates are open the triads' forward costs the keyed write 0.030
+nats a place; why is not read here. Form (ii)'s derivation says which of the two its legs replace,
+after the circles' leak half's rate is read (G110). Beside it, tt1's circles drifted as te5's did
+with the triads at eight times beside them: their friction at open sites reads 0.8242 at tt1's mean
+and 0.8086 at its end, against te5's 0.8251 and 0.8098.
+
 ## Receipts
 
 In [`…_receipts/`](2026-11-12_THE_LAW_ACROSS_A_PLACE_IS_HELD_BY_A_PUMPED_CONTACT_A_TRIAD_IS_A_CHARACTER_OF_A_LAW_OF_COMPOSITION_AND_ITS_THREE_LEGS_EXCHANGE_EQUAL_QUANTA_receipts/README.md):
@@ -369,6 +401,7 @@ In [`…_receipts/`](2026-11-12_THE_LAW_ACROSS_A_PLACE_IS_HELD_BY_A_PUMPED_CONTA
 `cap_t_fd.log.txt`, and G102's six runs `cap_t_2_0.log.txt` to `cap_t_2_64.log.txt` and
 `cap_t_2_0_repeat.log.txt`; the build's gates `g105_triad_gates.txt`, `g105_te4r_lines.txt`,
 `g105_te4_reads_bin_triad.txt` and `g105_grow_triad.txt`; tt1's `g105_tt1_dev.txt`,
-`g105_tt1_lines.txt` and `g105_tt1_reads.txt`, with the charge's ruler `charge_t.py`. G102 and
-G105, fixed and scored, and G106 and G107, fixed, are in `guess_capacity_44_55.txt` in the receipts of
+`g105_tt1_lines.txt` and `g105_tt1_reads.txt`, with the charge's ruler `charge_t.py`; the cut's
+reads `g107_cut_reads.txt` (G107) and its release `g109_cut_release.txt` (G109). G102 and G105 to
+G109, fixed and scored, are in `guess_capacity_44_55.txt` in the receipts of
 [the record of the places](2026-11-11_THE_PLACES_THE_FIELD_GIVES_PUSH_AGAINST_THE_PLACES_IT_MISSES_THE_DEPOSIT_IS_THEIR_DIFFERENCE_AND_TWO_BUILDS_ARE_TIMED_ONLY_INSIDE_ONE_HOLD_OF_THE_CARD.md).

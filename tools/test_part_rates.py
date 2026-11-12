@@ -27,12 +27,17 @@ The triads (theory, November 12; the triad record §4), on drawn states of decla
   update     a steady travel planted in the triad's entries moves its octave one faster and prints it beside the others;
   blocks     under the block law the triad's blocks are one unit at one rate: a travel twice the field's in all three families raises
              every triad entry two octaves, and no leg is printed alone.
+
+`own` with BITS and NAMEs (theory, November 12, G110), on a drawn state with two carry circles: the leak half (carry/leak and
+carry_bias/leak) set at 15 bits names the entries a graft of the same halves moves, and only those; every other entry keeps the rate
+plain `own` writes, and every other line stands; a family by its name is set whole; a half where the field has no circles, a name twice,
+an entry named twice, a name of no family, BITS of 0 or 128 and BITS without a name are refused, and no file is written.
 """
 import io
 import os
 import sys
 import tempfile
-from contextlib import redirect_stdout
+from contextlib import redirect_stderr, redirect_stdout
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import part_rates  # noqa: E402
@@ -243,7 +248,8 @@ def main():
         polar_controls(p)
         blocks_controls(p)
         triad_controls(p)
-    print("part_rates: 17 lines, the controls hold")
+        own_controls(p)
+    print("part_rates: 18 lines, the controls hold")
 
 
 def learner_text(path, theta, second, octaves, d=D, rate=12, own=None):
@@ -531,6 +537,55 @@ def triad_controls(p):
     rates = [int(x) for x in open(p("tb_out")).read().split("\n")[-2].split(" ")[1:]]
     assert all(rates[i] == 10 for i in units) and all(rates[i] == 12 for i in range(total) if i not in units)
     print("part_rates triad blocks: the triad's legs, biases and return are one unit of the block law, raised together at one rate")
+
+
+def own_controls(p):
+    """[theory, November 12, G110] `own` with BITS and NAMEs: the named entries at BITS, every other entry at the rate its parts give."""
+    import state_travel
+    dc = dict(D, carry=2)
+    fam, total = part_rates.layout(dc)
+    octaves = [0] * part_rates.PARTS
+    octaves[part_rates.PART_NAMES.index("q_lane")] = 1
+    theta = draws(total, 53)
+    write(p("o0"), theta, octaves, d=dc, extra="a line the tool keeps")
+    run("own", p("o0"), p("o_plain"))
+    plain_text = open(p("o_plain")).read().split("\n")
+    plain = part_rates.own_line(plain_text, total)
+    assert plain == part_rates.learner_rates(dc, 12, part_rates.parts_line(plain_text, dc), None, total) and set(plain) == {11, 12}
+    run("own", p("o0"), p("o_leak"), "15", "carry/leak", "carry_bias/leak")
+    text = open(p("o_leak")).read().split("\n")
+    leak = part_rates.own_line(text, total)
+    assert text[:-2] == plain_text[:-2] and text[-1] == "" and text[-2].startswith("rates "), "every other line as it stands, the rates line last"
+    # The named entries are the graft's: a graft of the same two halves from a donor that differs at every entry moves exactly them.
+    write(p("o_donor"), [x + 1 for x in theta], octaves, d=dc)
+    with redirect_stdout(io.StringIO()):
+        state_travel.graft(p("o_graft"), p("o0"), p("o_donor"), ["carry/leak", "carry_bias/leak"])
+    grafted = state_travel.state(p("o_graft"))[1]
+    moved = {i for i in range(total) if grafted[i] != theta[i]}
+    assert moved == set(part_rates.named(dc, ["carry/leak", "carry_bias/leak"])) and len(moved) == dc["carry"] * (dc["width"] + 1)
+    at_c, at_b = fam["carry"], fam["carry_bias"]
+    assert moved == set(range(at_c + dc["carry"] * dc["width"], at_c + 2 * dc["carry"] * dc["width"])) | set(range(at_b + dc["carry"], at_b + 2 * dc["carry"]))
+    assert all(leak[i] == 15 for i in moved) and all(leak[i] == plain[i] for i in range(total) if i not in moved)
+    # A family by its name, whole.
+    run("own", p("o0"), p("o_fam"), "14", "carry_bias")
+    whole = part_rates.own_line(open(p("o_fam")).read().split("\n"), total)
+    bias = set(range(at_b, at_b + 2 * dc["carry"]))
+    assert all(whole[i] == 14 for i in bias) and all(whole[i] == plain[i] for i in range(total) if i not in bias)
+    # Refusals, and no file written.
+    write(p("o_nc"), draws(part_rates.layout(D)[1], 59), octaves)
+    refused = (("own", p("o_nc"), p("o_x1"), "15", "carry/leak"), ("own", p("o0"), p("o_x2"), "15", "carry/leak", "carry/leak"),
+               ("own", p("o0"), p("o_x3"), "15", "carry", "carry/leak"), ("own", p("o0"), p("o_x4"), "15", "no_family"),
+               ("own", p("o0"), p("o_x5"), "0", "carry/leak"), ("own", p("o0"), p("o_x6"), "128", "carry/leak"), ("own", p("o0"), p("o_x7"), "15"))
+    for args in refused:
+        try:
+            with redirect_stderr(io.StringIO()):
+                run(*args)
+        except (AssertionError, SystemExit):
+            pass
+        else:
+            raise AssertionError(f"not refused: {' '.join(os.path.basename(a) for a in args)}")
+    assert not any(os.path.exists(p(f"o_x{j}")) for j in range(1, 8))
+    print("part_rates own: the leak half at its own rate names the graft's entries and only those, a family whole, every other entry at its parts' rate; refusals hold")
 
 
 if __name__ == "__main__":

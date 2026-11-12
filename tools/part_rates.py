@@ -10,7 +10,8 @@
                                                  polarization; see polar())
   part_rates.py blocks MEAN_A MEAN_B MEAN_C MEAN_D STATE OUT [SECTIONS SITES]  (theory, November 12 00:20, G86's branch 1: every block a
                                                  part of its own, each entry's own rate; see blocks())
-  part_rates.py own STATE OUT                    (theory, November 12: the state with each entry's rate written as its own; see below)
+  part_rates.py own STATE OUT [BITS NAME ...]    (theory, November 12: the state with each entry's rate written as its own, the named
+                                                 entries' at BITS (G110); see below)
 
 The learner's text carries each founded part's octaves in a trailing `parts CONTACTS_BEFORE k0 .. k15` line (holonics::hnn::tower::field::
 RateParts), and `.. k18` where the field has carry circles (theory, November 11 17:25: the circles' charts `carry`, their W columns
@@ -45,7 +46,12 @@ parts' octaves and the base word then govern none (the parts line is kept for it
 (open, update, means, trend, polar) and `base` refuse a state that carries it, since an octave they moved would move no entry. Every reader
 here and in tools/state_travel.py takes an entry's rate from it where it stands. `own` writes STATE with the line set to the rates its
 parts and base word give (FieldLearner::entry_rates), every other line as it stands: the same rates carried the new way, a state a build
-of the line trains from to show that the line changes no bit where the rates are the parts'.
+of the line trains from to show that the line changes no bit where the rates are the parts'. With BITS and one or more NAMEs, each a family
+of the layout whole or a carry circles' half as tools/state_travel.py's graft names it (carry/turn and carry/leak, the turn rows Q and the
+leak rows L of `carry`; carry_bias/turn and carry_bias/leak, q_b and the leak's l_b), the named entries' rates are BITS and every other
+entry's the one its parts and base word give (theory, November 12, G110: one store's rate read apart from the rest, the leak chart's
+friction cooled alone). It refuses a name of no entry, a half where the field has no circles, an entry named twice, and BITS under one
+bit or past the step's carrier. OUT is a state a tool wrote, checked before a lap trains from it.
 """
 import sys
 from math import isqrt
@@ -255,6 +261,39 @@ def write_rates(lines, rates, out):
         f.write("\n".join(kept) + "\n")
 
 
+CARRY_HALVES = ("carry/turn", "carry/leak", "carry_bias/turn", "carry_bias/leak")
+
+
+def spans(d):
+    """Each family of d's layout as (start, length), in the layout's order, and the material's length."""
+    fam, total = layout(d)
+    items = list(fam.items())
+    return {name: (at, (items[k + 1][1] if k + 1 < len(items) else total) - at) for k, (name, at) in enumerate(items)}, total
+
+
+def named(d, names):
+    """The entries NAMES name, in order (theory, November 12, G110): a family of d's layout whole, or a carry circles' half as
+    tools/state_travel.py's graft names it (carry/turn and carry/leak, the turn rows Q and the leak rows L of `carry`, C rows of D each;
+    carry_bias/turn and carry_bias/leak, q_b and l_b, C each). Each name once and naming an entry, and no entry named twice."""
+    sp, _ = spans(d)
+    assert names and len(set(names)) == len(names), "names of the layout, each once"
+    chosen = []
+    for n in names:
+        if n in CARRY_HALVES:
+            family, half = n.split("/")
+            assert d.get("carry", 0) > 0, f"{n} names a carry circles' half, and this declaration has no circles"
+            at, k = sp[family]
+            start = at + (0 if half == "turn" else k // 2)
+            chosen.extend(range(start, start + k // 2))
+        else:
+            assert n in sp, f"families of the layout: {' '.join(sp)}"
+            at, k = sp[n]
+            assert k > 0, f"{n} names no entry of this declaration"
+            chosen.extend(range(at, at + k))
+    assert len(set(chosen)) == len(chosen), "no entry is named twice"
+    return chosen
+
+
 def census(rates):
     """The entries at each rate, fastest first, as the trainer's FIELD_OWN_RATES prints them."""
     at = {}
@@ -334,10 +373,20 @@ def main():
         polar(args[1:5], args[5], args[6], *(int(x) for x in args[7:9]))
     elif len(args) in (7, 9) and args[0] == "blocks":
         blocks(args[1:5], args[5], args[6], *(int(x) for x in args[7:9]))
-    elif len(args) == 3 and args[0] == "own":
+    elif args[:1] == ["own"] and (len(args) == 3 or len(args) >= 5):
         lines, d, rate, theta = load(args[1])
         assert own_line(lines) is None, "a state that carries its own rates already"
+        assert spans(d)[1] == len(theta), "a state of its declaration"
         rates = learner_rates(d, rate, parts_line(lines, d), None, len(theta))
+        if len(args) >= 5:
+            # [theory, November 12, G110] The named entries at their own rate, every other entry at the one its parts and base word give.
+            bits, names = int(args[3]), args[4:]
+            assert 0 < bits <= WIDEST_RATE, "an entry's own rate under one bit or past the step's carrier"
+            chosen = named(d, names)
+            was = sorted(set(rates[i] for i in chosen))
+            for i in chosen:
+                rates[i] = bits
+            print(f"FIELD_OWN_RATE_SET names={','.join(names)} entries={len(chosen)} first={chosen[0]} last={chosen[-1]} rate_bits={bits} was={'/'.join(str(r) for r in was)}")
         print(f"FIELD_OWN_RATES entries={len(rates)} rate_bits={rate} at {census(rates)}")
         write_rates(lines, rates, args[2])
     elif len(args) == 4 and args[0] == "base":
