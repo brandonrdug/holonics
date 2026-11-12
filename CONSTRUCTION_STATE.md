@@ -51,8 +51,12 @@ repository was reset on September 24; the pre-reset tree is
   a circle's largest charge at 2.6 to 20 times the median section's). Founded, `κ = 1`, the sum
   form's bit for bit. The log chart and the coupling are the third attempt (G98): both passed their
   host gates, Lean, the card suite and parity on the PC, and the build at `C = 0` reproduces the
-  plain line's lap rt24; their first lap, te1, is owed. With `C = 0` the field is the plain line
-  bit for bit.
+  plain line's lap rt24. Their first lap, te1, at the base rate, refused no step and held no section
+  past 200,000 millionths, and led rt24 by 0.0031 nats a place on the held passage's 43,470 places
+  at lap means, as the sum form's first lap had. Its friction fell where the sum form's rose, to a
+  mean look-back `1/(1 − |γ|)` of 7.9 places (6.2 to 10.6 by circle), reached in the lap's opening
+  and held, near the held passage's 7.5 places a word. The second lap, te2, trains the circles at
+  eight times the base rate (G99). With `C = 0` the field is the plain line bit for bit.
 - **The learner** (`FieldLearner`; the trainer is
   `crates/holonics/examples/solenoidal_alpha/complete_language/field_train.rs`). The comparison is
   completion read as a joint code: a region is drawn as a state of open places among the answer's,
