@@ -1,0 +1,10 @@
+K=1 R=3 left contexts 6 right contexts 6 joint contexts 36; pair tables from the count tables  0s
+  step   0  HELD128 (seen contexts, share 1.0000) 1.7868
+K=1 R=3 best HELD128 1.7868 at step 0 of 0
+a re fd -0.000634 analytic -0.000635
+U re fd -0.000469 analytic -0.000469
+U im fd 0.000739 analytic 0.000739
+V re fd -0.000532 analytic -0.000532
+V im fd -0.000407 analytic -0.000407
+W re fd 0.000132 analytic 0.000132
+W im fd -0.000292 analytic -0.000292

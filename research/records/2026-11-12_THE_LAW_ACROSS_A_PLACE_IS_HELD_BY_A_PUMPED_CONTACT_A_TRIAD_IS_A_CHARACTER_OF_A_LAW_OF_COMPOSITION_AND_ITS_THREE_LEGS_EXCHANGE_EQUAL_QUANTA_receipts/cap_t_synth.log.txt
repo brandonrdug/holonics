@@ -1,0 +1,15 @@
+K=1 R=0 left contexts 6 right contexts 6 joint contexts 36; pair tables from the count tables  0s
+  step   0  HELD128 (seen contexts, share 1.0000) 1.7866
+K=1 R=0 best HELD128 1.7858 at step 11315 of 28445
+K=1 R=1 left contexts 6 right contexts 6 joint contexts 36; pair tables from the count tables  0s
+  step   0  HELD128 (seen contexts, share 1.0000) 1.7865
+K=1 R=1 best HELD128 1.2764 at step 22960 of 25777
+K=1 R=2 left contexts 6 right contexts 6 joint contexts 36; pair tables from the count tables  0s
+  step   0  HELD128 (seen contexts, share 1.0000) 1.7866
+K=1 R=2 best HELD128 0.8518 at step 23065 of 26075
+K=1 R=4 left contexts 6 right contexts 6 joint contexts 36; pair tables from the count tables  0s
+  step   0  HELD128 (seen contexts, share 1.0000) 1.7866
+K=1 R=4 best HELD128 0.7952 at step 2405 of 27065
+K=1 R=8 left contexts 6 right contexts 6 joint contexts 36; pair tables from the count tables  0s
+  step   0  HELD128 (seen contexts, share 1.0000) 1.7868
+K=1 R=8 best HELD128 0.7957 at step 105 of 25875
