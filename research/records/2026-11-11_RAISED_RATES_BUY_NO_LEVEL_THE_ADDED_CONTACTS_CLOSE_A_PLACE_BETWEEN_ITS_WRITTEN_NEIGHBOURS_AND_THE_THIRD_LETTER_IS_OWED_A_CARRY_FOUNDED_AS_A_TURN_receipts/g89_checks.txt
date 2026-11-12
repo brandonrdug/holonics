@@ -1,0 +1,40 @@
+# G89's checks, P13 (sent 00:55Z) step 0 = P12 (sent 00:26Z) step 4: the reproduction of rt18 from rt17/STATE.0 with the staged block-law
+# trainer (bin-block-rates 0394ba92eac51a4c, the Rust of ddf7e6784; f396f5207), rt18's own command, exports and arguments (RUN/mean_lap.sh:
+# L 1,215,000 ms, the run's 1,515,000 ms, outer 1,575 s), 2026-11-12 00:45:46 to 01:00:11 UTC. Device line: the card, the RTX 4080 SUPER, its
+# own hold of HOLONICS_ROOT/.local/gpu.lock (wait 0.002 s), peak resident 816,984 KiB on the host; the host's part as the card's lap runs it;
+# wall 865.3 s against a projection of 960 s.
+# Result: every section line equal to rt18's (1,535 of 1,535, timings aside), the lap -1 read, the lap's held joint (own, foil, information,
+# both a-word figures), FIELD_JOINT at both, FIELD_MEAN and FIELD_LAP equal; STATE.0 and MEAN.0 NOT byte-equal: lines 1 to 5 (the head, the
+# field, the material and both moments) are equal, and line 6, the parts line, differs: rt18's reads "parts 32" and sixteen 0s, the
+# reproduction's "parts 32" and nineteen 0s. The block-law build carries the letter-rates build (7464c528f), which writes the first lane's
+# letter rows' three parts (enc_first, before_first, after_first) after the sixteen plain ones for every field; an older line of sixteen reads
+# them at octave 0, which is what the reproduction wrote. By the order's rule (byte for byte, stop on any difference) the chain stopped here:
+# b1 to b3 and step 3 have not trained.
+## the run's output
+# rt18r from rt17/STATE.0 b6117e5fabfb907f; binary 0394ba92eac51a4c (f396f5207); lap bound 1215000 ms, the run's 1515000 ms, outer 1575 s 00:45:46
+# rt18r: lock taken 00:45:46 wait_s=.002171138
+# rt18r: released 01:00:11
+FIELD_PART_RATES contacts_before=32 rate_bits=12 octaves w_new=0 a_new=0 b_new=0 enc_lane=0 before_lane=0 after_lane=0 q_lane=0 v_lane=0 probe_lane=0 out_lane=0 moment_face_lane=0 read_lane=0 face_biases_lane=0 a_lane=0 b_lane=0 carry=0 enc_first=0 before_first=0 after_first=0
+FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.733189 foil_nats_a_place=1.866533 information_nats_a_place=0.133344 own_nats_a_word=13.023636 information_nats_a_word=1.001978
+FIELD_MEAN lap=0 states=1535 entries=63606 moved=61450 square=95109773613274
+FIELD_LAP lap=0 read=69 sites=16542162 before=3.217 after=- deposited=1535/1535 halvings=0 next_halved=0 next_refused=0 ms=848000
+FIELD_JOINT_NATS lap=0 places=43470 words=5785 own_nats_a_place=1.731382 foil_nats_a_place=1.866629 information_nats_a_place=0.135247 own_nats_a_word=13.010058 information_nats_a_word=1.016280
+MEASURE lap=rt18r rc=0 wall_s=865.3 peak_rss_kib=816984
+SECTIONS rt18=1535 rt18r=1535 equal=1535
+EQUAL FIELD_JOINT_NATS lap=-1
+EQUAL FIELD_JOINT_NATS lap=0
+EQUAL FIELD_JOINT lap=-1
+EQUAL FIELD_JOINT lap=0
+EQUAL FIELD_MEAN lap=0
+EQUAL FIELD_LAP lap=0
+BYTES STATE.0 DIFFER: STATE.0 differ: byte 2583673, line 6
+BYTES MEAN.0 DIFFER: MEAN.0 differ: byte 2583695, line 6
+STATE.0:0
+MEAN.0:0
+MAIN rt18r done 01:00:11
+RUN_EXIT 0 2026-11-12T01:00:11Z
+## the saved states' line 6
+rt18/STATE.0: parts 32 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+rt18r/STATE.0: parts 32 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+rt18/MEAN.0: parts 32 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+rt18r/MEAN.0: parts 32 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
