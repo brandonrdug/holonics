@@ -162,7 +162,11 @@ repository was reset on September 24; the pre-reset tree is
     is the trainer's, by keyed draws, with the void only at a document's true end. It is fetched
     and stands on the PC (November 12: 8,000,075,453 text bytes in 1,074 s; code 3.2 GB, web 1.6,
     science 1.6, books 0.96, wikidata 0.64; a prefix of 1 GB; 128 held documents a slice).
-  - The store's trainer is designed and not built (the same record, §4). A stretch is a keyed run
+  - The store's trainer is built (`train-store`, branch `claude/store-trainer`, November 12; the same record, §4) and passed its
+    checks before any timed read: the code line's lap reproduced on every one of its 1,535 sections and 3,178 lines, its first 128
+    sections equal the reference port's on every shared field, a lettered section reads the host's bits on the card, and the
+    crossing's yardstick before the letters equals te7's own held read. At the crossing the store held 243 byte values, 144 of them
+    fresh, so the alphabet grew from 100 classes to 244 with the void at 99. A stretch is a keyed run
     of a document: a context and a run, each on an octave from `[4, 8)` to `[256, 512)`. A stretch
     takes one keyed state, a mask state or the writer's state, and no opening and no room. A
     section is a bound carried in the learner's state (15,606,223 pairs of sites and 41,490 sites,
