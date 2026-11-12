@@ -1,0 +1,28 @@
+# P21: the reproduction of G70's release on rt13/STATE.0 (sha256 37ce4464199b301f) with the plain line's binary bin-lap-mean b8fe4ba838dd27a6 (8368f084b), as P19 ran its states (G70's j_run.sh stages, exports, codec, units, held passage, ends and bounds; the first 32 held problems, the refread on 128); 2026-11-12 04:09:31 to 04:18:33 UTC, 542 s against a projection of 10 minutes and a deadline of 15. Device line: the card, the RTX 4080 SUPER, each stage its own hold of HOLONICS_ROOT/.local/gpu.lock; the host part as each stage runs it.
+## the comparison against g70_release_lines.txt's J1 block (and J1's refread log for the refread's census line), timings and ms fields aside, and of the writes, byte for byte
+LINE REFREAD: equal
+LINE LAP: equal
+LINE FIELD_SETTLE_DONE: equal
+LINE FIELD_REDRAW_DONE: equal
+LINE CHARGE rest: equal
+LINE CHARGE keyed: equal
+LINE CHARGE reference: equal
+LINE refread FIELD_CHARGE_STATE (J1's refread.log): equal
+ALL 8 lines equal (timings and ms fields aside)
+WRITE settle/KEYED.tsv: byte-equal to G70's
+WRITE settle/SAMPLE.tsv: byte-equal to G70's
+WRITE redraw/SAMPLE.tsv: byte-equal to G70's
+## the release's lines
+REFREAD rt13_state problems=128 places=43342 code=0.513038 entropy=0.454957 root_share=0.740102 v1=0.067717 v2=0.044714 04:18:33
+LAP rt13_state locks=1.767473/0.975566 v2=0.189840 rest=1.123701/0.835187 v2=0.105707 redraw=0.677443/0.695484 neutral=26 rested=6 redraw_v2=0.047945 04:18:33
+STATE_DONE rt13_state in 542 s
+FIELD_REDRAW_DONE problems=32 neutral=26 rested=6 h_millinats=1000 passes_bound=1000 kept=810 undone=916 letters=8760 code_start_nats_a_place=1.123701 code_end_nats_a_place=0.677443 entropy_end_nats_a_place=0.695484 root_end_nats=489.305816 ms=138394
+MEASURE lap=rt13_state_redraw rc=0 wall_s=138.8 peak_rss_kib=770732
+FIELD_CHARGE_STATE state=rest problems=32 letters=8760 cut_to_room=0 code_nats=9843.628942 entropy_nats=7316.244668 code_nats_a_place=1.123701 entropy_nats_a_place=0.835187 excess_nats=2527.384274 root_nats=717.317438 root_share_of_excess=0.283817 v_over_1_share=0.157191 v_over_2_share=0.105707 ms=11801
+FIELD_CHARGE_STATE state=keyed problems=32 letters=8760 cut_to_room=0 code_nats=15483.070086 entropy_nats=8545.964188 code_nats_a_place=1.767473 entropy_nats_a_place=0.975566 excess_nats=6937.105899 root_nats=772.402225 root_share_of_excess=0.111343 v_over_1_share=0.258904 v_over_2_share=0.189840 ms=11914
+FIELD_CHARGE_STATE state=reference problems=32 letters=8760 cut_to_room=0 code_nats=3866.552793 entropy_nats=3486.215776 code_nats_a_place=0.441387 entropy_nats_a_place=0.397969 excess_nats=380.337015 root_nats=419.272069 root_share_of_excess=1.102369 v_over_1_share=0.056849 v_over_2_share=0.039383 ms=11899
+MEASURE lap=rt13_state_charge rc=0 wall_s=36.0 peak_rss_kib=751688
+FIELD_SETTLE_DONE problems=32 at_rest=32 h_millinats=1000 passes_bound=1000 kept=837 undone=1247 letters=8760 code_keyed_nats_a_place=1.767473 code_end_nats_a_place=1.123701 fall_nats=5639.441145 keyed_ms=13912 ms=278266
+MEASURE lap=rt13_state_settle rc=0 wall_s=278.7 peak_rss_kib=780876
+refread FIELD_CHARGE_STATE state=reference problems=128 letters=43342 cut_to_room=0 code_nats=22236.108008 entropy_nats=19718.776135 code_nats_a_place=0.513038 entropy_nats_a_place=0.454957 excess_nats=2517.331873 root_nats=1863.083779 root_share_of_excess=0.740102 v_over_1_share=0.067717 v_over_2_share=0.044714 ms=87619
+refread MEASURE lap=rt13_state_refread rc=0 wall_s=88.1 peak_rss_kib=2372900
