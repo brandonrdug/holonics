@@ -1738,3 +1738,10 @@ PC's P46). The cut is stated draw by draw in store_stretch_census.py (the passag
   on its support (atlas tower.field-support-stride) comes before the terms' widths; under 0.20: the site kernels' entries come first.
   What it does not read. The level: a new line's first sections say nothing of what the pass will write, and the pass is judged by what it writes
   from held prompts by slice and by its structure measures, never by this rate.
+  The resolution of (c)'s read, declared 2026-11-12T18:41Z before any read exists (the guess's numbers stand as fixed). The ruler's draw cut into
+  its 537 sections under the bounds: a section's computed sites spread 0.034 of their mean (40,303) and its pairs on the least count 0.095 of
+  theirs (2,185,704), the two correlated at -0.37; at te7's rates the pairs' term is 131 ms of 522 with a spread of 12 ms a section. A hundred
+  sections cannot place a term of that spread inside a tenth of itself against a section's own scatter, so (a) and (b) are scored on the first
+  hundred timed sections past the first and (c) on as many sections as bring the fit's own standard error of the pairs' share under 0.03, the
+  error printed beside the share; the pairs a section meets are the ruler's own lines for the same sections (the least count by 16 head-ticks).
+  Until that error is reached (c) is not scored, and the rule's branches on (c) wait for it.
