@@ -38,3 +38,11 @@ rt18/STATE.0: parts 32 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
 rt18r/STATE.0: parts 32 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
 rt18/MEAN.0: parts 32 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
 rt18r/MEAN.0: parts 32 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+## The ruling (P14, the theory lead, sent 01:04 UTC November 12): the reproduction passed
+The rule that a build enters a line by reproducing it asks that every section line, timings aside, equal the line's own lap's; this one
+did on 1,535 of 1,535 sections, with every read line equal and lines 1 to 5 of both saved states byte for byte. Line 6 is the parts line:
+the same rates written in the letter-rates build's form, nineteen parts, the first lane's three letter-row parts after the sixteen plain
+ones, each at octave 0 (rt18's "parts 32" and sixteen 0s against the reproduction's "parts 32" and nineteen 0s, above). Every build since
+7464c528f reads a sixteen-part line with those three at octave 0, so the two lines carry the same rate for every entry, and the 1,535 equal
+sections show it. The rule guards against a difference of law between two trees that a parity of card against host cannot see; a
+difference of form whose law the sections prove equal is not one. The b line then trained (P13 steps 1 and 2).
