@@ -4832,7 +4832,8 @@ mod tests {
             assert_eq!((leak.first.1 + leak.last.1, leak.charge_below.1 + leak.charge_rest.1), (2 * sites / ticks, sites), "circle {k}");
             assert_eq!(leak.charge_below.1, below);
             let runs: u64 = leak.runs.iter().sum();
-            assert!(runs <= below && below <= runs * leak.longest as u64, "circle {k}: the runs hold the reads below zero");
+            assert_eq!(leak.run_sites.iter().sum::<u64>(), below, "circle {k}: the runs hold every read below zero");
+            assert!(runs <= below && below <= runs * leak.longest as u64, "circle {k}: no run past the longest");
         }
         assert!(leaks[0].kind.iter().map(|p| p.0).sum::<u64>() > 0, "the moved leak row turns some reads below zero");
         assert_eq!(leaks[1].kind.iter().map(|p| p.0).sum::<u64>(), 0, "a founded circle reads no leak below zero");
@@ -4983,8 +4984,8 @@ pub(super) fn gamma_field(args: &[String], realization: &mut dyn FieldRealizatio
 ///   state's stratum (the quarter of its answer that is open, [`joint_states`]) beside the stratum's open reads; and the reads with `h < 0` at
 ///   the first tick and at the last, beside each tick's reads.
 /// - `FIELD_LEAK_RUNS`: the runs of sites with `h < 0` along the strand in the circle's scan order, at each tick (a stretch without loss:
-///   `|γ| = 1` there, so the scan sums `b` over it), counted by length (1, 2 to 3, 4 to 7, 8 to 15, 16 to 31, 32 to 63, 64 and over), the
-///   longest, and the sites in runs of 16 or more; and the circle's charge `|Q(t)|` on `2^(−16)` (the scan's value after a site): its largest
+///   `|γ| = 1` there, so the scan sums `b` over it), counted by length (1, 2 to 3, 4 to 7, 8 to 15, 16 to 31, 32 to 63, 64 and over) with
+///   the sites they hold, and the longest; and the circle's charge `|Q(t)|` on `2^(−16)` (the scan's value after a site): its largest
 ///   over every site and over the sites with `h < 0`, and its mean over each.
 ///
 /// Integers; a reading: it writes no state and no file.
@@ -5040,10 +5041,10 @@ pub(super) fn leak_field(args: &[String], realization: &mut dyn FieldRealization
             pair(leak.last)
         );
         println!(
-            "FIELD_LEAK_RUNS circle={k} runs_1/2-3/4-7/8-15/16-31/32-63/64+={} longest={} sites_in_runs_of_16={} charge_max={} charge_max_below={} charge_mean_below={} charge_mean_rest={}",
+            "FIELD_LEAK_RUNS circle={k} runs_1/2-3/4-7/8-15/16-31/32-63/64+={} sites_in_runs={} longest={} charge_max={} charge_max_below={} charge_mean_below={} charge_mean_rest={}",
             join(&leak.runs),
+            join(&leak.run_sites),
             leak.longest,
-            leak.long_sites,
             leak.charge_max,
             leak.charge_max_below,
             mean(leak.charge_below),
@@ -5058,8 +5059,8 @@ pub(super) fn leak_field(args: &[String], realization: &mut dyn FieldRealization
 
 /// One carry circle's sums for [`leak_field`]: the open reads and those with `h ≥ 0`; the reads with `h < 0` and all reads by kind (a
 /// question's site, an answer's open site, an answer's given site); the reads by band of `h`; the open reads with `h < 0` and all open
-/// reads by stratum; the reads with `h < 0` and all reads at the first tick and the last; the runs by length band, the longest and the
-/// sites in runs of 16 or more; the largest charge over every site and over the sites with `h < 0`; and the charge's sum and count over the
+/// reads by stratum; the reads with `h < 0` and all reads at the first tick and the last; the runs and their sites by length band, and the
+/// longest; the largest charge over every site and over the sites with `h < 0`; and the charge's sum and count over the
 /// sites with `h < 0` and over the rest.
 #[derive(Clone, Debug, Default)]
 struct Leak {
@@ -5071,8 +5072,8 @@ struct Leak {
     first: (u64, u64),
     last: (u64, u64),
     runs: [u64; 7],
+    run_sites: [u64; 7],
     longest: usize,
-    long_sites: u64,
     charge_max: u64,
     charge_max_below: u64,
     charge_below: (u128, u64),
@@ -5092,10 +5093,8 @@ impl Leak {
             _ => 6,
         };
         self.runs[band] += 1;
+        self.run_sites[band] += run as u64;
         self.longest = self.longest.max(run);
-        if run >= 16 {
-            self.long_sites += run as u64;
-        }
     }
 }
 
