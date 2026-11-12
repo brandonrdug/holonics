@@ -1745,3 +1745,26 @@ PC's P46). The cut is stated draw by draw in store_stretch_census.py (the passag
   hundred timed sections past the first and (c) on as many sections as bring the fit's own standard error of the pairs' share under 0.03, the
   error printed beside the share; the pairs a section meets are the ruler's own lines for the same sections (the least count by 16 head-ticks).
   Until that error is reached (c) is not scored, and the rule's branches on (c) wait for it.
+G115 scored 2026-11-12T20:10Z (the same thread; receipts g115_run1.txt and g115_run2.txt, commit 73e391fdc on claude/carry-reads; the store's trainer at
+1e46440c4 on the card, alone in its hold, from te7/STATE.0 on the 1 GB prefix: run 1 of 101 sections, run 2 of 1,900 more).
+  (a) MISSED, under its range: 10.730 us a computed site over sections 2 to 101 (least 10.000, most 11.694) against 15 (11 to 19); 10.427 pooled
+      over run 2's 1,900 sections.
+  (b) HELD: 101 batches for 101 returns and 1,900 for 1,900, 1.00 a section.
+  (c) MISSED, under its range: the pairs' term is 0.133 of a mean section's time over run 2's 1,900 sections (the fit's standard error 0.0046;
+      0.137 and 0.0050 over the pass's 2,001), against 0.20 to 0.35. The fit reads 9.162 us a computed site, 1.638 ns a pair and a constant of
+      -4.9 ms, explaining 0.641 of the sections' variance, where te7's read 8.746 us, 3.747 ns and 38.4 ms.
+  Where the derivation failed. The site's rate held (9.16 against 8.75, at 244 classes for 100). The pair's rate reads 0.44 of te7's and the
+  section's fixed cost did not arrive; the terms the derivation added above te7's rates (the fixed 38 ms, the alphabet's families, the compared
+  rows' share) are not in the read. Why the pair's rate fell is not read.
+  The rule, and why its first branch is not taken. (a) under its range sends the pass over the prefix. Brandon read the rate the same hour (20:04Z)
+  and it does not stand: the guess was fixed from te7's fit, so a miss on the fast side read as good news, while at 10.4 us a byte his ceiling of
+  50 GB is six days and the kernels' known repairs were queued behind the pass. A rate is judged against the card (the guides' method rule of this
+  date). One leg of 3,000 sections launched before his reading runs to its end and nothing of the pass follows it. (c) under 0.20 stands as the
+  rule says: the site kernels' entries come first, before the pair store on its support. A profiled read of this trainer's own sections names the
+  entries, and the engine's build is ordered from it with its rate fixed first from a count of the law's arithmetic on the card's lanes.
+  The level beside it (a reading; no part of this guess). STORE_SECTION's code before the deposit on fresh sections, all slices and kinds of state
+  together, bits a weighed site by hundreds of sections: 4.362, 4.114, 4.384, 4.114, 4.078, 4.062, 3.941, 4.007, 3.921, 3.902, 4.039, 3.902, 3.925,
+  4.049, 3.897, 3.964, 3.932, 3.998, 3.918, 3.918 (sections 0 to 1,999): between 3.90 and 4.05 from section 600 on. The price printed at each save
+  reads octave +1, its curvature within 3% of the transfer on either sign (0.04% to 0.12% over the saves of 600 sections). [agent-inferred] A
+  section continues the documents the section before it read (each slice's piece is read on from its cursor), so a step's price on the next
+  section includes what the step fitted of those documents; it is no reading of learning on documents not yet met. The held read by slice is.
