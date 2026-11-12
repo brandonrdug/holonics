@@ -1,0 +1,212 @@
+# store_profile (P49a item 2), 2026-11-12 UTC: one profiled read of the store's trainer, the binary of runs 1 and 2 (commit 1e46440c4, field_pass sha256
+# 8c35f040a820a676). train-store from run 2's STATE.1900 (sha256 cda6ac8a1129f147) on the prefix for 100 sections with FIELD_PROFILE=1 alone (every
+# launch, transfer and allocation timed alone after the stream drains), a fresh run directory, its own hold of HOLONICS_ROOT/.local/gpu.lock, nothing
+# else on the card or the host. Its states are a ruler's and are never continued. Projection 57.0 s (100 x 428.6 ms x 1.33); stop 72,618 ms (100 x
+# 546 ms x 1.33); outer 136 s. Its sections are the pass's sections 2,001 to 2,100, which leg 1 trained from the same state. Numbers only.
+# p49a prof100: binary 8c35f040a820a676; from cda6ac8a1129f147; sections 100, stop 72618 ms, outer 136 s 20:27:52
+# prof100: lock taken 20:27:52 wait_s=.004237618
+# prof100: run exit 0 released 20:28:39
+STORE_SAVE k=100 sections=100 states=100 moved=108353 square=21209822268929 priced=99 transfer=-2413833820 external=-2392690345 curvature=-21143475 octave=1 rate=12 reads=0 returns=100 pairs=4566615773 batches=100 peak_store=7543813190 ms=46991
+STORE_PASS role=prefix sections=100 stretches_read=409044 ended=false code_pieces=8205 web_pieces=4528 science_pieces=2610 books_pieces=248 wikidata_pieces=986 ms=46991
+FIELD_CARD reads=0 read_ms=0 returns=100 return_ms=45257 pairs=4566615773 batches=100 peak_store=7543813190 landmarks=0 landmark_ms=0 elapsed_ms=46992
+FIELD_PROFILE_SPLIT kernels_ms=41459 copies=3800 copies_ms=1325 allocations=30000 allocations_ms=183 elapsed_ms=46992
+MEASURE lap=prof100 rc=0 wall_s=47.5 peak_rss_kib=383512
+PROFILED_SECTIONS read=100 equal_to_leg1s_same_sections=100/100 (timings aside)
+SECTION_MS profiled_mean=467.5 leg1_same_sections_mean=420.8 run2_mean=428.6 ratio_to_leg1=1.111
+RULER_EXIT 0
+## a section: launches, allocations and copies (100 sections, one batch each)
+PER_SECTION launches=493 allocations=300 copies=38
+## profile_budget.py on the read's log
+elapsed_ms=46992 kernels_ms=41459 entries_ms=41425 launches=49300 entries=68
+share_of_elapsed kernels=0.882 wide=0.857 short=0.025 allocations=0.004 copies=0.028 host=0.086
+short_launches=7700 mean_us=155 share_of_kernel=0.029 least_us_a_launch=60
+allocation_us=6.1 copy_us=348.7
+share_of_kernel contact=0.496 affine=0.055 top_five=0.456
+reads=0 returns=100 batches=100 batches_a_run=1.00 pairs_met=4566615773 pairs_a_run=4.567e+07 peak_store=7543813190
+a_batch launches=493 allocations=300 copies=38
+field_contact_rows                 launches=   1600 ms=  5671 us_a_launch=  3544 share_of_kernel=0.137
+field_pace_skin_back               launches=    800 ms=  3879 us_a_launch=  4849 share_of_kernel=0.094
+field_contact_l5                   launches=    351 ms=  3855 us_a_launch= 10984 share_of_kernel=0.093
+field_contact_columns              launches=   1600 ms=  3273 us_a_launch=  2046 share_of_kernel=0.079
+field_moment_pace_back_all         launches=    400 ms=  2204 us_a_launch=  5512 share_of_kernel=0.053
+field_outer_x32                    launches=   6000 ms=  1785 us_a_launch=   297 share_of_kernel=0.043
+field_transposed                   launches=   3700 ms=  1741 us_a_launch=   470 share_of_kernel=0.042
+field_affine_tiled_x32             launches=   3200 ms=  1715 us_a_launch=   536 share_of_kernel=0.041
+field_moment_return_paced_all      launches=    400 ms=  1642 us_a_launch=  4106 share_of_kernel=0.040
+field_moment_paced_all             launches=    400 ms=  1616 us_a_launch=  4042 share_of_kernel=0.039
+field_exposure                     launches=    400 ms=  1512 us_a_launch=  3782 share_of_kernel=0.036
+field_moment_skinned_all           launches=    400 ms=   713 us_a_launch=  1783 share_of_kernel=0.017
+field_outer_bound_x32              launches=   2500 ms=   604 us_a_launch=   241 share_of_kernel=0.015
+field_contact_l6                   launches=     49 ms=   562 us_a_launch= 11472 share_of_kernel=0.014
+field_blank_bias_enc               launches=    300 ms=   559 us_a_launch=  1864 share_of_kernel=0.013
+field_affine_tiled_x64             launches=    900 ms=   543 us_a_launch=   603 share_of_kernel=0.013
+## every FIELD_PROFILE entry
+FIELD_PROFILE entry=field_add launches=400 ms=75 us_a_launch=188 grid_threads=1044016128 mean_grid_threads=2610040
+FIELD_PROFILE entry=field_affine_tiled_x32 launches=3200 ms=1715 us_a_launch=536 grid_threads=10440062976 mean_grid_threads=3262519
+FIELD_PROFILE entry=field_affine_tiled_x64 launches=900 ms=543 us_a_launch=603 grid_threads=2349036288 mean_grid_threads=2610040
+FIELD_PROFILE entry=field_blank_bias_enc launches=300 ms=559 us_a_launch=1864 grid_threads=3034111488 mean_grid_threads=10113704
+FIELD_PROFILE entry=field_blank_dx launches=300 ms=37 us_a_launch=125 grid_threads=783012096 mean_grid_threads=2610040
+FIELD_PROFILE entry=field_blank_dy launches=300 ms=457 us_a_launch=1524 grid_threads=783012096 mean_grid_threads=2610040
+FIELD_PROFILE entry=field_blank_dz launches=300 ms=457 us_a_launch=1524 grid_threads=2985166848 mean_grid_threads=9950556
+FIELD_PROFILE entry=field_blank_lift_read launches=300 ms=198 us_a_launch=662 grid_threads=795849984 mean_grid_threads=2652833
+FIELD_PROFILE entry=field_blank_rates launches=300 ms=109 us_a_launch=365 grid_threads=24505344 mean_grid_threads=81684
+FIELD_PROFILE entry=field_chart launches=1200 ms=514 us_a_launch=428 grid_threads=1566087168 mean_grid_threads=1305072
+FIELD_PROFILE entry=field_classes launches=400 ms=98 us_a_launch=245 grid_threads=9981952 mean_grid_threads=24954
+FIELD_PROFILE entry=field_contact_columns launches=1600 ms=3273 us_a_launch=2046 grid_threads=2088032256 mean_grid_threads=1305020
+FIELD_PROFILE entry=field_contact_l5 launches=351 ms=3855 us_a_launch=10984 grid_threads=1831297920 mean_grid_threads=5217372
+FIELD_PROFILE entry=field_contact_l6 launches=49 ms=562 us_a_launch=11472 grid_threads=256659584 mean_grid_threads=5237950
+FIELD_PROFILE entry=field_contact_rows launches=1600 ms=5671 us_a_launch=3544 grid_threads=2088032256 mean_grid_threads=1305020
+FIELD_PROFILE entry=field_current_back launches=400 ms=63 us_a_launch=159 grid_threads=522029056 mean_grid_threads=1305072
+FIELD_PROFILE entry=field_encoding launches=300 ms=28 us_a_launch=94 grid_threads=13982720 mean_grid_threads=46609
+FIELD_PROFILE entry=field_exponential launches=100 ms=6 us_a_launch=60 grid_threads=6553600 mean_grid_threads=65536
+FIELD_PROFILE entry=field_exposure launches=400 ms=1512 us_a_launch=3782 grid_threads=2087957504 mean_grid_threads=5219893
+FIELD_PROFILE entry=field_face launches=400 ms=59 us_a_launch=148 grid_threads=522029056 mean_grid_threads=1305072
+FIELD_PROFILE entry=field_face_covector launches=100 ms=22 us_a_launch=226 grid_threads=995055616 mean_grid_threads=9950556
+FIELD_PROFILE entry=field_face_weigh launches=100 ms=14 us_a_launch=147 grid_threads=995055616 mean_grid_threads=9950556
+FIELD_PROFILE entry=field_frame launches=400 ms=96 us_a_launch=241 grid_threads=522029056 mean_grid_threads=1305072
+FIELD_PROFILE entry=field_frame_probe launches=400 ms=88 us_a_launch=222 grid_threads=522029056 mean_grid_threads=1305072
+FIELD_PROFILE entry=field_moment_accumulate launches=900 ms=217 us_a_launch=241 grid_threads=2349036288 mean_grid_threads=2610040
+FIELD_PROFILE entry=field_moment_add launches=400 ms=90 us_a_launch=226 grid_threads=1044016128 mean_grid_threads=2610040
+FIELD_PROFILE entry=field_moment_add_probe launches=800 ms=159 us_a_launch=199 grid_threads=2088032256 mean_grid_threads=2610040
+FIELD_PROFILE entry=field_moment_admit_paced_all launches=800 ms=74 us_a_launch=92 grid_threads=638844928 mean_grid_threads=798556
+FIELD_PROFILE entry=field_moment_ds_all launches=400 ms=46 us_a_launch=116 grid_threads=261041152 mean_grid_threads=652602
+FIELD_PROFILE entry=field_moment_pace_back_all launches=400 ms=2204 us_a_launch=5512 grid_threads=261734400 mean_grid_threads=654336
+FIELD_PROFILE entry=field_moment_paced_all launches=400 ms=1616 us_a_launch=4042 grid_threads=261734400 mean_grid_threads=654336
+FIELD_PROFILE entry=field_moment_prefix_paced_all launches=2000 ms=383 us_a_launch=191 grid_threads=1597112320 mean_grid_threads=798556
+FIELD_PROFILE entry=field_moment_return_paced_all launches=400 ms=1642 us_a_launch=4106 grid_threads=261734400 mean_grid_threads=654336
+FIELD_PROFILE entry=field_moment_scatter_all launches=400 ms=125 us_a_launch=313 grid_threads=261041152 mean_grid_threads=652602
+FIELD_PROFILE entry=field_moment_skinned_all launches=400 ms=713 us_a_launch=1783 grid_threads=24989696 mean_grid_threads=62474
+FIELD_PROFILE entry=field_moment_strand_return_all launches=400 ms=197 us_a_launch=493 grid_threads=261041152 mean_grid_threads=652602
+FIELD_PROFILE entry=field_moment_strands_all launches=800 ms=120 us_a_launch=150 grid_threads=522082304 mean_grid_threads=652602
+FIELD_PROFILE entry=field_open launches=100 ms=11 us_a_launch=113 grid_threads=261004032 mean_grid_threads=2610040
+FIELD_PROFILE entry=field_outer_bound_x32 launches=2500 ms=604 us_a_launch=241 grid_threads=124774400 mean_grid_threads=49909
+FIELD_PROFILE entry=field_outer_bound_x64 launches=900 ms=203 us_a_launch=226 grid_threads=44918784 mean_grid_threads=49909
+FIELD_PROFILE entry=field_outer_x32 launches=6000 ms=1785 us_a_launch=297 grid_threads=8806639616 mean_grid_threads=1467773
+FIELD_PROFILE entry=field_outer_x64 launches=900 ms=484 us_a_launch=538 grid_threads=3395518464 mean_grid_threads=3772798
+FIELD_PROFILE entry=field_pace_c_back launches=400 ms=214 us_a_launch=536 grid_threads=32673792 mean_grid_threads=81684
+FIELD_PROFILE entry=field_pace_current_back launches=400 ms=50 us_a_launch=125 grid_threads=32673792 mean_grid_threads=81684
+FIELD_PROFILE entry=field_pace_frame_back launches=400 ms=141 us_a_launch=353 grid_threads=32673792 mean_grid_threads=81684
+FIELD_PROFILE entry=field_pace_kappa_back launches=400 ms=190 us_a_launch=477 grid_threads=204800 mean_grid_threads=512
+FIELD_PROFILE entry=field_pace_skin_back launches=800 ms=3879 us_a_launch=4849 grid_threads=1044016128 mean_grid_threads=1305020
+FIELD_PROFILE entry=field_paces launches=400 ms=230 us_a_launch=575 grid_threads=204800 mean_grid_threads=512
+FIELD_PROFILE entry=field_pair launches=400 ms=129 us_a_launch=324 grid_threads=522029056 mean_grid_threads=1305072
+FIELD_PROFILE entry=field_pair_back launches=400 ms=137 us_a_launch=342 grid_threads=522029056 mean_grid_threads=1305072
+FIELD_PROFILE entry=field_pair_gamma launches=400 ms=123 us_a_launch=309 grid_threads=522029056 mean_grid_threads=1305072
+FIELD_PROFILE entry=field_pair_gate_back launches=400 ms=156 us_a_launch=391 grid_threads=522029056 mean_grid_threads=1305072
+FIELD_PROFILE entry=field_pair_scan launches=400 ms=350 us_a_launch=875 grid_threads=2545664 mean_grid_threads=6364
+FIELD_PROFILE entry=field_pair_scan_back launches=400 ms=384 us_a_launch=961 grid_threads=2545664 mean_grid_threads=6364
+FIELD_PROFILE entry=field_pframes launches=400 ms=244 us_a_launch=611 grid_threads=261041152 mean_grid_threads=652602
+FIELD_PROFILE entry=field_ratio_adjoint launches=1200 ms=248 us_a_launch=206 grid_threads=1566087168 mean_grid_threads=1305072
+FIELD_PROFILE entry=field_skin_addresses launches=400 ms=70 us_a_launch=177 grid_threads=261041152 mean_grid_threads=652602
+FIELD_PROFILE entry=field_spread launches=1600 ms=530 us_a_launch=331 grid_threads=79855616 mean_grid_threads=49909
+FIELD_PROFILE entry=field_sums launches=400 ms=208 us_a_launch=522 grid_threads=10343424 mean_grid_threads=25858
+FIELD_PROFILE entry=field_tied_back_e launches=100 ms=105 us_a_launch=1054 grid_threads=995801088 mean_grid_threads=9958010
+FIELD_PROFILE entry=field_tied_back_y launches=100 ms=53 us_a_launch=539 grid_threads=261004032 mean_grid_threads=2610040
+FIELD_PROFILE entry=field_tied_face launches=400 ms=288 us_a_launch=720 grid_threads=3980222464 mean_grid_threads=9950556
+FIELD_PROFILE entry=field_transposed launches=3700 ms=1741 us_a_launch=470 grid_threads=10701116160 mean_grid_threads=2892193
+FIELD_PROFILE entry=field_unframe launches=1200 ms=253 us_a_launch=211 grid_threads=1566087168 mean_grid_threads=1305072
+FIELD_PROFILE entry=field_unit launches=400 ms=338 us_a_launch=847 grid_threads=2087983104 mean_grid_threads=5219957
+FIELD_PROFILE entry=field_unit_back launches=400 ms=161 us_a_launch=403 grid_threads=2087983104 mean_grid_threads=5219957
+FIELD_PROFILE entry=field_unit_back_probe launches=400 ms=176 us_a_launch=441 grid_threads=2087983104 mean_grid_threads=5219957
+FIELD_PROFILE entry=field_unit_probe launches=400 ms=343 us_a_launch=858 grid_threads=2087983104 mean_grid_threads=5219957
+## the read's 100 STORE_SECTION lines
+STORE_SECTION n=0 regions=198 sites=41138 domain=22852 squared=14559890 open=11746 code=78 web=43 science=44 books=22 wikidata=11 stretches=389746 before=3371040 after=- deposited=true transfer=- external=1042 rate=12 regions_ms=5 deposit_ms=499 ms=505
+STORE_SECTION n=1 regions=218 sites=41462 domain=22858 squared=14002424 open=13381 code=89 web=43 science=51 books=22 wikidata=13 stretches=389964 before=3885187 after=- deposited=true transfer=-500 external=-500 rate=12 regions_ms=14 deposit_ms=449 ms=463
+STORE_SECTION n=2 regions=199 sites=41352 domain=24307 squared=14681152 open=13159 code=67 web=42 science=47 books=29 wikidata=14 stretches=390163 before=3676581 after=- deposited=true transfer=-733 external=-733 rate=12 regions_ms=2 deposit_ms=516 ms=519
+STORE_SECTION n=3 regions=185 sites=41453 domain=25730 squared=14839721 open=14046 code=81 web=36 science=37 books=21 wikidata=10 stretches=390348 before=3445247 after=- deposited=true transfer=-1503 external=-1503 rate=12 regions_ms=2 deposit_ms=465 ms=468
+STORE_SECTION n=4 regions=175 sites=39479 domain=17938 squared=14867033 open=9453 code=73 web=42 science=28 books=21 wikidata=11 stretches=390523 before=3340425 after=- deposited=true transfer=-1975 external=-1975 rate=12 regions_ms=2 deposit_ms=454 ms=457
+STORE_SECTION n=5 regions=177 sites=39032 domain=22537 squared=15471424 open=13286 code=57 web=38 science=38 books=27 wikidata=17 stretches=390700 before=3375371 after=- deposited=true transfer=-3069 external=-3069 rate=12 regions_ms=2 deposit_ms=463 ms=466
+STORE_SECTION n=6 regions=186 sites=41251 domain=23858 squared=14659549 open=13296 code=75 web=42 science=29 books=22 wikidata=18 stretches=390886 before=3471798 after=- deposited=true transfer=-2002 external=-2002 rate=12 regions_ms=3 deposit_ms=465 ms=469
+STORE_SECTION n=7 regions=170 sites=39471 domain=25845 squared=15590249 open=14547 code=65 web=37 science=38 books=16 wikidata=14 stretches=391056 before=3663383 after=- deposited=true transfer=-496 external=-496 rate=12 regions_ms=3 deposit_ms=468 ms=472
+STORE_SECTION n=8 regions=211 sites=41347 domain=23043 squared=14459477 open=12863 code=82 web=37 science=52 books=22 wikidata=18 stretches=391267 before=3642591 after=- deposited=true transfer=-241 external=-241 rate=12 regions_ms=3 deposit_ms=466 ms=470
+STORE_SECTION n=9 regions=192 sites=40887 domain=23428 squared=15584091 open=11976 code=69 web=42 science=43 books=22 wikidata=16 stretches=391459 before=3819997 after=- deposited=true transfer=-2662 external=-2662 rate=12 regions_ms=2 deposit_ms=483 ms=485
+STORE_SECTION n=10 regions=175 sites=40884 domain=24419 squared=15539096 open=14323 code=66 web=41 science=38 books=16 wikidata=14 stretches=391634 before=4105302 after=- deposited=true transfer=-627 external=-627 rate=12 regions_ms=2 deposit_ms=457 ms=460
+STORE_SECTION n=11 regions=214 sites=41286 domain=20425 squared=13712298 open=11081 code=86 web=39 science=50 books=27 wikidata=12 stretches=391848 before=3709821 after=- deposited=true transfer=1166 external=1166 rate=12 regions_ms=3 deposit_ms=449 ms=452
+STORE_SECTION n=12 regions=188 sites=41296 domain=20562 squared=15367198 open=11795 code=83 web=37 science=29 books=25 wikidata=14 stretches=392036 before=3855713 after=- deposited=true transfer=-800 external=-800 rate=12 regions_ms=2 deposit_ms=462 ms=465
+STORE_SECTION n=13 regions=196 sites=41489 domain=25573 squared=13618371 open=14551 code=74 web=41 science=43 books=22 wikidata=16 stretches=392232 before=3774823 after=- deposited=true transfer=772 external=772 rate=12 regions_ms=14 deposit_ms=441 ms=455
+STORE_SECTION n=14 regions=172 sites=38343 domain=23610 squared=15559645 open=12884 code=65 web=43 science=29 books=20 wikidata=15 stretches=392404 before=3669244 after=- deposited=true transfer=230 external=230 rate=12 regions_ms=17 deposit_ms=449 ms=466
+STORE_SECTION n=15 regions=155 sites=35992 domain=18263 squared=15028336 open=10394 code=69 web=26 science=28 books=19 wikidata=13 stretches=392559 before=3760205 after=- deposited=true transfer=-1134 external=-1134 rate=12 regions_ms=13 deposit_ms=428 ms=442
+STORE_SECTION n=16 regions=180 sites=40262 domain=25752 squared=15556236 open=14011 code=70 web=31 science=43 books=20 wikidata=16 stretches=392739 before=3787989 after=- deposited=true transfer=-109 external=-109 rate=12 regions_ms=2 deposit_ms=477 ms=480
+STORE_SECTION n=17 regions=209 sites=41341 domain=22824 squared=14115077 open=13608 code=76 web=44 science=48 books=25 wikidata=16 stretches=392948 before=3783802 after=- deposited=true transfer=-545 external=-545 rate=12 regions_ms=3 deposit_ms=478 ms=481
+STORE_SECTION n=18 regions=193 sites=41391 domain=21856 squared=14876799 open=12494 code=74 web=45 science=39 books=22 wikidata=13 stretches=393141 before=3945349 after=- deposited=true transfer=-1390 external=-1390 rate=12 regions_ms=3 deposit_ms=466 ms=469
+STORE_SECTION n=19 regions=220 sites=41243 domain=23089 squared=13637305 open=13033 code=89 web=48 science=47 books=23 wikidata=13 stretches=393361 before=3894449 after=- deposited=true transfer=-786 external=-786 rate=12 regions_ms=2 deposit_ms=453 ms=456
+STORE_SECTION n=20 regions=193 sites=41488 domain=23770 squared=15114876 open=13020 code=72 web=50 science=29 books=25 wikidata=17 stretches=393554 before=3816313 after=- deposited=true transfer=-1134 external=-1134 rate=12 regions_ms=2 deposit_ms=465 ms=468
+STORE_SECTION n=21 regions=211 sites=41166 domain=20699 squared=13045550 open=11882 code=79 web=44 science=46 books=24 wikidata=18 stretches=393765 before=4323932 after=- deposited=true transfer=-355 external=-355 rate=12 regions_ms=3 deposit_ms=434 ms=437
+STORE_SECTION n=22 regions=195 sites=40869 domain=19126 squared=15220385 open=11133 code=77 web=38 science=42 books=27 wikidata=11 stretches=393960 before=4087573 after=- deposited=true transfer=-804 external=-804 rate=12 regions_ms=2 deposit_ms=459 ms=462
+STORE_SECTION n=23 regions=198 sites=41428 domain=22924 squared=14881748 open=13866 code=76 web=52 science=38 books=22 wikidata=10 stretches=394158 before=3878267 after=- deposited=true transfer=788 external=788 rate=12 regions_ms=3 deposit_ms=463 ms=467
+STORE_SECTION n=24 regions=200 sites=41077 domain=25038 squared=14689395 open=14396 code=84 web=37 science=34 books=24 wikidata=21 stretches=394358 before=4107430 after=- deposited=true transfer=-150 external=-150 rate=12 regions_ms=3 deposit_ms=467 ms=470
+STORE_SECTION n=25 regions=181 sites=40397 domain=23506 squared=15593089 open=14536 code=61 web=44 science=36 books=23 wikidata=17 stretches=394539 before=4094318 after=- deposited=true transfer=278 external=278 rate=12 regions_ms=2 deposit_ms=448 ms=451
+STORE_SECTION n=26 regions=214 sites=41263 domain=22749 squared=14237677 open=12330 code=87 web=36 science=42 books=28 wikidata=21 stretches=394753 before=3806596 after=- deposited=true transfer=-1280 external=-1280 rate=12 regions_ms=2 deposit_ms=465 ms=468
+STORE_SECTION n=27 regions=218 sites=41399 domain=24089 squared=13612321 open=12659 code=89 web=38 science=54 books=21 wikidata=16 stretches=394971 before=3585907 after=- deposited=true transfer=303 external=303 rate=12 regions_ms=2 deposit_ms=455 ms=458
+STORE_SECTION n=28 regions=145 sites=38109 domain=19909 squared=15471145 open=11949 code=53 web=29 science=29 books=21 wikidata=13 stretches=395116 before=3691346 after=- deposited=true transfer=-1000 external=-1000 rate=12 regions_ms=2 deposit_ms=444 ms=447
+STORE_SECTION n=29 regions=215 sites=41457 domain=21248 squared=13720845 open=11935 code=88 web=42 science=44 books=21 wikidata=20 stretches=395331 before=3734219 after=- deposited=true transfer=-133 external=-133 rate=12 regions_ms=2 deposit_ms=451 ms=454
+STORE_SECTION n=30 regions=195 sites=41124 domain=20551 squared=14528326 open=12049 code=73 web=32 science=44 books=28 wikidata=18 stretches=395526 before=4001452 after=- deposited=true transfer=881 external=881 rate=12 regions_ms=2 deposit_ms=463 ms=466
+STORE_SECTION n=31 regions=176 sites=39838 domain=18582 squared=15567496 open=10581 code=63 web=45 science=24 books=19 wikidata=25 stretches=395702 before=3643612 after=- deposited=true transfer=-511 external=-511 rate=12 regions_ms=2 deposit_ms=463 ms=465
+STORE_SECTION n=32 regions=218 sites=41462 domain=23247 squared=14172922 open=13254 code=91 web=40 science=44 books=25 wikidata=18 stretches=395920 before=3924129 after=- deposited=true transfer=-1032 external=-1032 rate=12 regions_ms=13 deposit_ms=452 ms=466
+STORE_SECTION n=33 regions=195 sites=41391 domain=25062 squared=14654631 open=14635 code=73 web=40 science=43 books=21 wikidata=18 stretches=396115 before=4024169 after=- deposited=true transfer=827 external=827 rate=12 regions_ms=2 deposit_ms=460 ms=463
+STORE_SECTION n=34 regions=193 sites=41448 domain=21349 squared=15267128 open=12234 code=70 web=46 science=42 books=16 wikidata=19 stretches=396308 before=4110278 after=- deposited=true transfer=-1668 external=-1668 rate=12 regions_ms=2 deposit_ms=475 ms=478
+STORE_SECTION n=35 regions=185 sites=41432 domain=23896 squared=14956440 open=13990 code=71 web=38 science=43 books=22 wikidata=11 stretches=396493 before=4135404 after=- deposited=true transfer=388 external=388 rate=12 regions_ms=2 deposit_ms=456 ms=459
+STORE_SECTION n=36 regions=193 sites=41462 domain=21735 squared=15408772 open=12032 code=83 web=39 science=37 books=20 wikidata=14 stretches=396686 before=3943164 after=- deposited=true transfer=-1079 external=-1079 rate=12 regions_ms=2 deposit_ms=472 ms=475
+STORE_SECTION n=37 regions=159 sites=37629 domain=24210 squared=15601425 open=14305 code=67 web=27 science=29 books=26 wikidata=10 stretches=396845 before=3964838 after=- deposited=true transfer=1522 external=1522 rate=12 regions_ms=2 deposit_ms=443 ms=445
+STORE_SECTION n=38 regions=161 sites=36216 domain=19800 squared=15571582 open=11364 code=61 web=32 science=34 books=26 wikidata=8 stretches=397006 before=3899131 after=- deposited=true transfer=-836 external=-836 rate=12 regions_ms=13 deposit_ms=442 ms=455
+STORE_SECTION n=39 regions=156 sites=37187 domain=20515 squared=15558717 open=10479 code=67 web=27 science=24 books=17 wikidata=21 stretches=397162 before=3541830 after=- deposited=true transfer=-908 external=-908 rate=12 regions_ms=2 deposit_ms=449 ms=452
+STORE_SECTION n=40 regions=212 sites=41277 domain=25977 squared=14779709 open=14257 code=88 web=34 science=53 books=24 wikidata=13 stretches=397374 before=4013439 after=- deposited=true transfer=-462 external=-462 rate=12 regions_ms=4 deposit_ms=467 ms=471
+STORE_SECTION n=41 regions=205 sites=41383 domain=25111 squared=14963091 open=14511 code=74 web=46 science=42 books=27 wikidata=16 stretches=397579 before=4137768 after=- deposited=true transfer=-68 external=-68 rate=12 regions_ms=2 deposit_ms=473 ms=477
+STORE_SECTION n=42 regions=194 sites=41399 domain=24129 squared=15172381 open=13658 code=75 web=39 science=37 books=22 wikidata=21 stretches=397773 before=4641473 after=- deposited=true transfer=-2806 external=-2806 rate=12 regions_ms=2 deposit_ms=469 ms=472
+STORE_SECTION n=43 regions=214 sites=41482 domain=23444 squared=15078636 open=13215 code=80 web=39 science=48 books=28 wikidata=19 stretches=397987 before=4156948 after=- deposited=true transfer=-4279 external=-4279 rate=12 regions_ms=2 deposit_ms=482 ms=485
+STORE_SECTION n=44 regions=180 sites=40141 domain=25737 squared=15519113 open=13118 code=76 web=38 science=37 books=16 wikidata=13 stretches=398167 before=3940636 after=- deposited=true transfer=-3683 external=-3683 rate=12 regions_ms=2 deposit_ms=472 ms=475
+STORE_SECTION n=45 regions=210 sites=41167 domain=25150 squared=14674549 open=14303 code=80 web=44 science=49 books=26 wikidata=11 stretches=398377 before=4352462 after=- deposited=true transfer=-5774 external=-5774 rate=12 regions_ms=2 deposit_ms=466 ms=469
+STORE_SECTION n=46 regions=207 sites=41070 domain=24000 squared=14593430 open=13916 code=88 web=44 science=36 books=21 wikidata=18 stretches=398584 before=4219683 after=- deposited=true transfer=-5726 external=-5726 rate=12 regions_ms=2 deposit_ms=453 ms=456
+STORE_SECTION n=47 regions=201 sites=41444 domain=23514 squared=15034488 open=14371 code=80 web=44 science=41 books=20 wikidata=16 stretches=398785 before=4409248 after=- deposited=true transfer=-3714 external=-3714 rate=12 regions_ms=2 deposit_ms=462 ms=464
+STORE_SECTION n=48 regions=245 sites=41471 domain=25765 squared=12724201 open=14171 code=96 web=52 science=45 books=30 wikidata=22 stretches=399030 before=4411356 after=- deposited=true transfer=-5079 external=-5079 rate=12 regions_ms=3 deposit_ms=456 ms=459
+STORE_SECTION n=49 regions=187 sites=40210 domain=20237 squared=15521024 open=10129 code=79 web=38 science=26 books=28 wikidata=16 stretches=399217 before=3880432 after=- deposited=true transfer=-5333 external=-5333 rate=12 regions_ms=2 deposit_ms=472 ms=475
+STORE_SECTION n=50 regions=182 sites=39181 domain=23832 squared=15256381 open=12764 code=64 web=38 science=44 books=20 wikidata=16 stretches=399399 before=4154880 after=- deposited=true transfer=-1305 external=-1305 rate=12 regions_ms=2 deposit_ms=463 ms=466
+STORE_SECTION n=51 regions=191 sites=41302 domain=23296 squared=15473762 open=12392 code=65 web=46 science=34 books=26 wikidata=20 stretches=399590 before=4117463 after=- deposited=true transfer=-2468 external=-2468 rate=12 regions_ms=2 deposit_ms=479 ms=482
+STORE_SECTION n=52 regions=176 sites=41364 domain=26357 squared=15505450 open=13585 code=68 web=37 science=38 books=19 wikidata=14 stretches=399766 before=4104766 after=- deposited=true transfer=-2635 external=-2635 rate=12 regions_ms=2 deposit_ms=484 ms=487
+STORE_SECTION n=53 regions=173 sites=39501 domain=22392 squared=15579421 open=13489 code=70 web=40 science=34 books=17 wikidata=12 stretches=399939 before=4225695 after=- deposited=true transfer=-1525 external=-1525 rate=12 regions_ms=2 deposit_ms=465 ms=467
+STORE_SECTION n=54 regions=218 sites=41283 domain=25113 squared=13836465 open=15564 code=83 web=54 science=42 books=25 wikidata=14 stretches=400157 before=4182795 after=- deposited=true transfer=-1025 external=-1025 rate=12 regions_ms=2 deposit_ms=451 ms=454
+STORE_SECTION n=55 regions=204 sites=41332 domain=25192 squared=15230140 open=13190 code=82 web=39 science=41 books=27 wikidata=15 stretches=400361 before=3917232 after=- deposited=true transfer=-931 external=-931 rate=12 regions_ms=2 deposit_ms=473 ms=476
+STORE_SECTION n=56 regions=192 sites=41134 domain=22460 squared=15550774 open=11633 code=75 web=49 science=35 books=22 wikidata=11 stretches=400553 before=3855326 after=- deposited=true transfer=-93 external=-93 rate=12 regions_ms=2 deposit_ms=487 ms=490
+STORE_SECTION n=57 regions=195 sites=41104 domain=23075 squared=14219728 open=12261 code=67 web=43 science=47 books=24 wikidata=14 stretches=400748 before=3789756 after=- deposited=true transfer=1344 external=1344 rate=12 regions_ms=2 deposit_ms=465 ms=467
+STORE_SECTION n=58 regions=193 sites=41313 domain=24022 squared=15359339 open=14134 code=82 web=31 science=44 books=22 wikidata=14 stretches=400941 before=4075761 after=- deposited=true transfer=398 external=398 rate=12 regions_ms=2 deposit_ms=471 ms=474
+STORE_SECTION n=59 regions=168 sites=39204 domain=22266 squared=15455600 open=12257 code=60 web=34 science=43 books=21 wikidata=10 stretches=401109 before=4176413 after=- deposited=true transfer=-538 external=-538 rate=12 regions_ms=2 deposit_ms=455 ms=458
+STORE_SECTION n=60 regions=190 sites=40039 domain=24013 squared=14678725 open=13178 code=79 web=38 science=42 books=20 wikidata=11 stretches=401299 before=4165812 after=- deposited=true transfer=-175 external=-175 rate=12 regions_ms=2 deposit_ms=457 ms=460
+STORE_SECTION n=61 regions=217 sites=41380 domain=22815 squared=14656236 open=12815 code=80 web=40 science=46 books=28 wikidata=23 stretches=401516 before=4071464 after=- deposited=true transfer=-3324 external=-3324 rate=12 regions_ms=2 deposit_ms=472 ms=475
+STORE_SECTION n=62 regions=187 sites=40022 domain=21290 squared=15108154 open=12394 code=73 web=33 science=42 books=26 wikidata=13 stretches=401703 before=4087945 after=- deposited=true transfer=-1937 external=-1937 rate=12 regions_ms=4 deposit_ms=463 ms=467
+STORE_SECTION n=63 regions=194 sites=41352 domain=24827 squared=15380652 open=14642 code=80 web=38 science=38 books=23 wikidata=15 stretches=401897 before=4142823 after=- deposited=true transfer=-1766 external=-1766 rate=12 regions_ms=14 deposit_ms=470 ms=485
+STORE_SECTION n=64 regions=203 sites=41322 domain=23448 squared=15079638 open=14384 code=99 web=31 science=39 books=20 wikidata=14 stretches=402100 before=4451037 after=- deposited=true transfer=-2784 external=-2784 rate=12 regions_ms=16 deposit_ms=463 ms=479
+STORE_SECTION n=65 regions=218 sites=41482 domain=20456 squared=14335818 open=13112 code=86 web=48 science=47 books=25 wikidata=12 stretches=402318 before=4640401 after=- deposited=true transfer=-1628 external=-1628 rate=12 regions_ms=2 deposit_ms=494 ms=497
+STORE_SECTION n=66 regions=196 sites=41211 domain=24414 squared=14425333 open=13905 code=82 web=39 science=37 books=23 wikidata=15 stretches=402514 before=3966444 after=- deposited=true transfer=-1511 external=-1511 rate=12 regions_ms=2 deposit_ms=520 ms=523
+STORE_SECTION n=67 regions=209 sites=41438 domain=22948 squared=15138256 open=12950 code=90 web=46 science=34 books=18 wikidata=21 stretches=402723 before=4025227 after=- deposited=true transfer=151 external=151 rate=12 regions_ms=2 deposit_ms=470 ms=473
+STORE_SECTION n=68 regions=210 sites=41349 domain=22781 squared=14324547 open=11391 code=80 web=49 science=36 books=21 wikidata=24 stretches=402933 before=3456569 after=- deposited=true transfer=-993 external=-993 rate=12 regions_ms=2 deposit_ms=468 ms=471
+STORE_SECTION n=69 regions=208 sites=41154 domain=23954 squared=14705018 open=13473 code=90 web=39 science=44 books=23 wikidata=12 stretches=403141 before=3893302 after=- deposited=true transfer=1172 external=1172 rate=12 regions_ms=2 deposit_ms=462 ms=465
+STORE_SECTION n=70 regions=208 sites=41405 domain=24692 squared=14577951 open=14089 code=87 web=37 science=34 books=29 wikidata=21 stretches=403349 before=3785281 after=- deposited=true transfer=-481 external=-481 rate=12 regions_ms=2 deposit_ms=465 ms=468
+STORE_SECTION n=71 regions=207 sites=41020 domain=22876 squared=14383014 open=12942 code=89 web=41 science=36 books=25 wikidata=16 stretches=403556 before=3974664 after=- deposited=true transfer=-650 external=-650 rate=12 regions_ms=4 deposit_ms=463 ms=467
+STORE_SECTION n=72 regions=191 sites=41225 domain=21646 squared=15441657 open=11169 code=82 web=35 science=40 books=17 wikidata=17 stretches=403747 before=3902579 after=- deposited=true transfer=-1848 external=-1848 rate=12 regions_ms=2 deposit_ms=465 ms=467
+STORE_SECTION n=73 regions=188 sites=40670 domain=25820 squared=15601292 open=13276 code=70 web=39 science=38 books=24 wikidata=17 stretches=403935 before=3794689 after=- deposited=true transfer=-1863 external=-1863 rate=12 regions_ms=2 deposit_ms=480 ms=482
+STORE_SECTION n=74 regions=188 sites=41331 domain=24273 squared=14480225 open=12434 code=70 web=41 science=36 books=24 wikidata=17 stretches=404123 before=3521632 after=- deposited=true transfer=-637 external=-637 rate=12 regions_ms=2 deposit_ms=467 ms=470
+STORE_SECTION n=75 regions=196 sites=41053 domain=26575 squared=14699187 open=15433 code=81 web=41 science=34 books=23 wikidata=17 stretches=404319 before=3931933 after=- deposited=true transfer=-510 external=-510 rate=12 regions_ms=2 deposit_ms=463 ms=466
+STORE_SECTION n=76 regions=201 sites=41483 domain=22533 squared=14796653 open=14073 code=87 web=36 science=39 books=26 wikidata=13 stretches=404520 before=3935468 after=- deposited=true transfer=-481 external=-481 rate=12 regions_ms=2 deposit_ms=451 ms=454
+STORE_SECTION n=77 regions=204 sites=41406 domain=25085 squared=14256252 open=15019 code=92 web=34 science=40 books=23 wikidata=15 stretches=404724 before=3878604 after=- deposited=true transfer=-723 external=-723 rate=12 regions_ms=2 deposit_ms=455 ms=458
+STORE_SECTION n=78 regions=209 sites=41480 domain=21107 squared=14752166 open=12793 code=89 web=41 science=44 books=23 wikidata=12 stretches=404933 before=4387562 after=- deposited=true transfer=-655 external=-655 rate=12 regions_ms=3 deposit_ms=449 ms=453
+STORE_SECTION n=79 regions=202 sites=41394 domain=24724 squared=14358844 open=13940 code=89 web=29 science=41 books=24 wikidata=19 stretches=405135 before=4103701 after=- deposited=true transfer=-22 external=-22 rate=12 regions_ms=2 deposit_ms=459 ms=462
+STORE_SECTION n=80 regions=204 sites=41385 domain=23568 squared=15047445 open=13097 code=88 web=37 science=47 books=21 wikidata=11 stretches=405339 before=3934160 after=- deposited=true transfer=-612 external=-612 rate=12 regions_ms=2 deposit_ms=462 ms=465
+STORE_SECTION n=81 regions=203 sites=41428 domain=24186 squared=14172458 open=12447 code=82 web=44 science=41 books=26 wikidata=10 stretches=405542 before=3772134 after=- deposited=true transfer=-624 external=-624 rate=12 regions_ms=3 deposit_ms=460 ms=464
+STORE_SECTION n=82 regions=187 sites=40843 domain=26486 squared=15515731 open=15328 code=81 web=36 science=39 books=18 wikidata=13 stretches=405729 before=4204103 after=- deposited=true transfer=751 external=751 rate=12 regions_ms=2 deposit_ms=470 ms=473
+STORE_SECTION n=83 regions=214 sites=41296 domain=23546 squared=14486794 open=13688 code=85 web=48 science=45 books=17 wikidata=19 stretches=405943 before=3991082 after=- deposited=true transfer=225 external=225 rate=12 regions_ms=2 deposit_ms=472 ms=475
+STORE_SECTION n=84 regions=180 sites=40663 domain=23232 squared=15568475 open=12680 code=70 web=42 science=35 books=17 wikidata=16 stretches=406123 before=3673238 after=- deposited=true transfer=-777 external=-777 rate=12 regions_ms=2 deposit_ms=473 ms=475
+STORE_SECTION n=85 regions=196 sites=41364 domain=28157 squared=15394642 open=14776 code=84 web=39 science=37 books=26 wikidata=10 stretches=406319 before=3675898 after=- deposited=true transfer=-1361 external=-1361 rate=12 regions_ms=2 deposit_ms=478 ms=481
+STORE_SECTION n=86 regions=216 sites=41292 domain=20325 squared=14352432 open=11409 code=78 web=52 science=42 books=29 wikidata=15 stretches=406535 before=3984075 after=- deposited=true transfer=-382 external=-382 rate=12 regions_ms=2 deposit_ms=455 ms=458
+STORE_SECTION n=87 regions=192 sites=41406 domain=24104 squared=15102244 open=14323 code=83 web=37 science=34 books=19 wikidata=19 stretches=406727 before=4065111 after=- deposited=true transfer=-1519 external=-1519 rate=12 regions_ms=2 deposit_ms=467 ms=470
+STORE_SECTION n=88 regions=188 sites=41433 domain=23593 squared=15494213 open=13574 code=82 web=36 science=29 books=22 wikidata=19 stretches=406915 before=4025097 after=- deposited=true transfer=-1191 external=-1191 rate=12 regions_ms=2 deposit_ms=468 ms=471
+STORE_SECTION n=89 regions=216 sites=41141 domain=24687 squared=14086399 open=13654 code=90 web=43 science=37 books=29 wikidata=17 stretches=407131 before=4021922 after=- deposited=true transfer=-320 external=-320 rate=12 regions_ms=2 deposit_ms=453 ms=456
+STORE_SECTION n=90 regions=199 sites=41164 domain=19166 squared=15289010 open=12161 code=85 web=40 science=35 books=21 wikidata=18 stretches=407330 before=4159032 after=- deposited=true transfer=-1356 external=-1356 rate=12 regions_ms=2 deposit_ms=466 ms=469
+STORE_SECTION n=91 regions=208 sites=41266 domain=23335 squared=14781482 open=12398 code=90 web=34 science=49 books=22 wikidata=13 stretches=407538 before=4033390 after=- deposited=true transfer=-1297 external=-1297 rate=12 regions_ms=3 deposit_ms=462 ms=465
+STORE_SECTION n=92 regions=188 sites=41328 domain=25385 squared=14887864 open=14136 code=81 web=37 science=31 books=23 wikidata=16 stretches=407726 before=3974560 after=- deposited=true transfer=-1060 external=-1060 rate=12 regions_ms=2 deposit_ms=455 ms=458
+STORE_SECTION n=93 regions=156 sites=38307 domain=23748 squared=15578823 open=13820 code=65 web=33 science=29 books=17 wikidata=12 stretches=407882 before=4514345 after=- deposited=true transfer=-182 external=-182 rate=12 regions_ms=2 deposit_ms=446 ms=449
+STORE_SECTION n=94 regions=200 sites=41438 domain=26213 squared=14969570 open=13918 code=82 web=35 science=44 books=27 wikidata=12 stretches=408082 before=3979336 after=- deposited=true transfer=-1200 external=-1200 rate=12 regions_ms=2 deposit_ms=463 ms=466
+STORE_SECTION n=95 regions=185 sites=39419 domain=22395 squared=15430037 open=12005 code=79 web=38 science=38 books=18 wikidata=12 stretches=408267 before=3468075 after=- deposited=true transfer=683 external=683 rate=12 regions_ms=2 deposit_ms=453 ms=456
+STORE_SECTION n=96 regions=193 sites=41311 domain=22735 squared=15058967 open=13767 code=82 web=40 science=37 books=21 wikidata=13 stretches=408460 before=3977048 after=- deposited=true transfer=711 external=711 rate=12 regions_ms=2 deposit_ms=451 ms=454
+STORE_SECTION n=97 regions=186 sites=40409 domain=23079 squared=15600305 open=13159 code=65 web=44 science=36 books=22 wikidata=19 stretches=408646 before=4003340 after=- deposited=true transfer=41 external=41 rate=12 regions_ms=2 deposit_ms=452 ms=455
+STORE_SECTION n=98 regions=197 sites=40849 domain=21951 squared=15288845 open=12391 code=71 web=38 science=43 books=27 wikidata=18 stretches=408843 before=3870636 after=- deposited=true transfer=-634 external=-634 rate=12 regions_ms=2 deposit_ms=463 ms=466
+STORE_SECTION n=99 regions=201 sites=41081 domain=25579 squared=14512565 open=14320 code=82 web=42 science=39 books=25 wikidata=13 stretches=409044 before=3775148 after=- deposited=true transfer=142 external=142 rate=12 regions_ms=2 deposit_ms=452 ms=455
