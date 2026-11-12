@@ -400,6 +400,8 @@ def polar(paths, state, out, sections=None, sites=None):
     deposition.block-polarization): a part's lap fall is greatest at a rate of its drift's share over its noise, and pi_p over the field's
     pi_F is that share against the floor's, so its rate stands log2(pi_p / pi_F) octaves above the floor's."""
     from fractions import Fraction
+    import os
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
     import state_travel
     lines, d, rate, theta_t, _, held, own_t = rational_learner(state)
     assert held is not None, "a state with no founded parts' rates (open sets them)"
@@ -505,6 +507,8 @@ def blocks(paths, state, out, sections=None, sites=None):
     octaves, where a raise that paid (its marginal dF/dH above pi_F) takes one more octave and one that did not steps back."""
     from fractions import Fraction
     import numpy as np
+    import os
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
     import state_travel
     lines, d, rate, theta_t, _, held, own_t = rational_learner(state)
     assert held is not None, "a state with its count of contacts before the growth (its parts line; open sets it)"
