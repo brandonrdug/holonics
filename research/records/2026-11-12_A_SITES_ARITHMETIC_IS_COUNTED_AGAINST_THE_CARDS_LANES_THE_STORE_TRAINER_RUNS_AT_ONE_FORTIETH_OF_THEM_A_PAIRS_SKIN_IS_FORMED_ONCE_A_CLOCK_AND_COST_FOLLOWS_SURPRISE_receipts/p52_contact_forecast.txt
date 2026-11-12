@@ -1,0 +1,96 @@
+# P52 item 3 (i) and (ii), 2026-11-12 UTC: the contact family's octets a pair from source and its floors at P50 step 0's yardsticks, on step 3's
+# profiled read (the pass's sections 2,001 to 2,100 from run 2's STATE.1900) and the census's rows and crowd slots of the same sections.
+# contact_forecast.py; every TERM is a reading of kernels/field.cu at 3f4d86baa [agent-inferred], none measured. Numbers only.
+GEOMETRY sections=100 rows_a_tick=4078042 definite_rows_a_tick=2768105 active_crowd_slots_a_tick=29269670 ticks=4 pairs_by_head=[1478325193, 994152016, 1001476447, 1092662117] kinds=['still', 'still', 'paced', 'paced']
+## (i) octets a unit, by entry and store (G: gathered, its sectors; O: in order)
+TERM entry=field_exposure unit=pair heads=all kind=O octets=4 sectors=- store='support list (members, near keys)'
+TERM entry=field_exposure unit=pair heads=all kind=G octets=64 sectors=2 store='source key row (qf32, 64 octets)'
+TERM entry=field_exposure unit=pair heads=all kind=G octets=8 sectors=1 store='score e[i][j], written'
+TERM entry=field_exposure unit=pair heads=all kind=G octets=8 sectors=1 store='lock sb[i][j], written (a return)'
+TERM entry=field_exposure unit=pair heads=still kind=G octets=4 sectors=1 store="source class (cls, a still head's falloff)"
+TERM entry=field_exposure unit=pair heads=paced kind=O octets=32 sectors=- store="skins, the clock's store (8 words)"
+TERM entry=field_exposure unit=row heads=all kind=O octets=64 sectors=- store='receiver probe row (pq32)'
+TERM entry=field_exposure unit=slot heads=all kind=G octets=512 sectors=16 store='crowd prefix sums sw at lo and hi+1 (2 x 16 x 16 octets)'
+TERM entry=field_exposure unit=slot heads=all kind=G octets=16 sectors=2 store='crowd count sc at lo and hi+1'
+TERM entry=field_exposure unit=slot heads=paced kind=O octets=32 sectors=- store='crowd edge skins (8 words)'
+TERM entry=field_contact_l5 unit=pair heads=all kind=O octets=8 sectors=- store='support list, twice'
+TERM entry=field_contact_l5 unit=pair heads=all kind=G octets=16 sectors=2 store='score e[i][j], read twice'
+TERM entry=field_contact_l5 unit=pair heads=all kind=G octets=128 sectors=4 store='source value row (vf)'
+TERM entry=field_contact_l5 unit=pair heads=all kind=G octets=8 sectors=1 store='share e[i][j], written'
+TERM entry=field_contact_l5 unit=pair heads=paced kind=O octets=32 sectors=- store="skins, the clock's store"
+TERM entry=field_contact_l5 unit=row heads=all kind=O octets=128 sectors=- store='current y, written'
+TERM entry=field_contact_l5 unit=slot heads=all kind=G octets=1024 sectors=32 store='crowd score (sw at lo, hi+1), twice'
+TERM entry=field_contact_l5 unit=slot heads=all kind=G octets=512 sectors=16 store='crowd values (sv at lo, hi+1)'
+TERM entry=field_contact_l5 unit=slot heads=all kind=G octets=8 sectors=1 store='crowd share ce, written'
+TERM entry=field_contact_l5 unit=slot heads=paced kind=O octets=32 sectors=- store='crowd edge skins'
+TERM entry=field_contact_rows unit=pair heads=all kind=O octets=8 sectors=- store='support list, twice'
+TERM entry=field_contact_rows unit=pair heads=all kind=G octets=16 sectors=2 store='share e[i][j], twice'
+TERM entry=field_contact_rows unit=pair heads=all kind=G octets=128 sectors=4 store='source value row (vf)'
+TERM entry=field_contact_rows unit=pair heads=all kind=G octets=32 sectors=2 store='covector dp[i][j] (128 bits), written then read'
+TERM entry=field_contact_rows unit=pair heads=all kind=G octets=8 sectors=1 store='lock sb[i][j]'
+TERM entry=field_contact_rows unit=pair heads=all kind=G octets=8 sectors=1 store='ds[i][j], written'
+TERM entry=field_contact_rows unit=pair heads=all kind=G octets=128 sectors=4 store='source word row (qf), the probe role'
+TERM entry=field_contact_rows unit=pair heads=paced kind=O octets=64 sectors=- store="skins, the clock's store, twice"
+TERM entry=field_contact_rows unit=row heads=all kind=O octets=128 sectors=- store='receiver covector row dyh'
+TERM entry=field_contact_rows unit=row heads=all kind=O octets=256 sectors=- store='dp and dq, written'
+TERM entry=field_contact_rows unit=slot heads=all kind=G octets=512 sectors=16 store='crowd values sv (pass A)'
+TERM entry=field_contact_rows unit=slot heads=all kind=G octets=1024 sectors=32 store="crowd lock sw (pass B) and the probe role's sw"
+TERM entry=field_contact_rows unit=slot heads=all kind=G octets=1024 sectors=32 store='crowd difference arrays cv, cw (128-bit atomics, 4 a lane)'
+TERM entry=field_contact_rows unit=slot heads=all kind=G octets=16 sectors=2 store='crowd share ce and dz cds'
+TERM entry=field_contact_rows unit=slot heads=paced kind=O octets=64 sectors=- store='crowd edge skins, twice'
+TERM entry=field_contact_columns unit=pair heads=all kind=O octets=4 sectors=- store='receiver list (pmem, olist, near)'
+TERM entry=field_contact_columns unit=pair heads=all kind=G octets=16 sectors=2 store="ds[i][j] and e[i][j] (a column: a row's stride apart)"
+TERM entry=field_contact_columns unit=pair heads=all kind=G octets=128 sectors=4 store='receiver probe row (pq)'
+TERM entry=field_contact_columns unit=pair heads=all kind=G octets=128 sectors=4 store='receiver covector row (dyh)'
+TERM entry=field_contact_columns unit=pair heads=paced kind=G octets=40 sectors=2 store="the pair's support entry (pn, pcls, off, members by bisection, sc)"
+TERM entry=field_contact_columns unit=pair heads=paced kind=G octets=32 sectors=1 store="skins, the clock's store (the receiver's row)"
+TERM entry=field_contact_columns unit=row heads=all kind=O octets=640 sectors=- store='source word row, and dq, dv read and written'
+TERM entry=field_pace_skin_back unit=pair heads=paced kind=O octets=4 sectors=- store='support list'
+TERM entry=field_pace_skin_back unit=pair heads=paced kind=G octets=8 sectors=1 store='source clock sigma'
+TERM entry=field_pace_skin_back unit=pair heads=paced kind=O octets=32 sectors=- store="skins, the clock's store"
+TERM entry=field_pace_skin_back unit=pair heads=paced kind=G octets=128 sectors=4 store='source value row (16 words over the 8 modes)'
+TERM entry=field_pace_skin_back unit=pair heads=paced kind=G octets=128 sectors=4 store='source word row'
+TERM entry=field_pace_skin_back unit=pair heads=paced kind=G octets=16 sectors=2 store='e[i][j] and ds[i][j]'
+TERM entry=field_pace_skin_back unit=pair heads=paced kind=G octets=128 sectors=8 store="the source's clock covector gsig (128-bit atomics, one a mode)"
+TERM entry=field_pace_skin_back unit=slot heads=paced kind=G octets=1024 sectors=32 store='crowd sv and sw at lo, hi+1 (8 modes)'
+TERM entry=field_pace_skin_back unit=slot heads=paced kind=G octets=144 sectors=10 store="crowd ce, cds, and the edge's gsig atomics (8)"
+TERM entry=field_pace_skin_back unit=slot heads=paced kind=O octets=32 sectors=- store='crowd edge skins'
+TERM entry=field_skin_fill unit=pair heads=paced kind=O octets=4 sectors=- store='support list'
+TERM entry=field_skin_fill unit=pair heads=paced kind=G octets=8 sectors=1 store='source clock sigma'
+TERM entry=field_skin_fill unit=pair heads=paced kind=G octets=192 sectors=8 store='source site addresses (3 words a mode, 8 modes)'
+TERM entry=field_skin_fill unit=pair heads=paced kind=O octets=32 sectors=- store='skins, written to the store'
+TERM entry=field_spread unit=site heads=all kind=O octets=1024 sectors=- store='cv, cw read twice (16 entries of 128 bits each)'
+TERM entry=field_spread unit=site heads=all kind=O octets=512 sectors=- store='dq, dv read and written (a definite site)'
+## a pair's octets by entry and head kind (pair terms only; G as sectors x 32)
+PAIR entry=field_contact_rows head=still gathered_octets=448 in_order_octets=8
+PAIR entry=field_contact_rows head=paced gathered_octets=448 in_order_octets=72
+PAIR entry=field_pace_skin_back head=still gathered_octets=0 in_order_octets=0
+PAIR entry=field_pace_skin_back head=paced gathered_octets=608 in_order_octets=36
+PAIR entry=field_contact_l5 head=still gathered_octets=224 in_order_octets=8
+PAIR entry=field_contact_l5 head=paced gathered_octets=224 in_order_octets=40
+PAIR entry=field_contact_columns head=still gathered_octets=320 in_order_octets=4
+PAIR entry=field_contact_columns head=paced gathered_octets=416 in_order_octets=4
+PAIR entry=field_skin_fill head=still gathered_octets=0 in_order_octets=0
+PAIR entry=field_skin_fill head=paced gathered_octets=288 in_order_octets=36
+PAIR entry=field_exposure head=still gathered_octets=160 in_order_octets=4
+PAIR entry=field_exposure head=paced gathered_octets=128 in_order_octets=36
+PAIR entry=field_spread head=still gathered_octets=0 in_order_octets=0
+PAIR entry=field_spread head=paced gathered_octets=0 in_order_octets=0
+## (ii) the floor at the yardsticks beside the measured time (ms over the read's sections)
+FLOOR entry=field_contact_rows gathered_GB=3274.702 in_order_GB=210.599 floor_ms=23029 measured_ms=4018 measured_over_floor=0.17
+FLOOR entry=field_pace_skin_back gathered_GB=1587.944 in_order_GB=82.882 floor_ms=11133 measured_ms=3741 measured_over_floor=0.34
+FLOOR entry=field_contact_l5 gathered_GB=1757.239 in_order_GB=119.390 floor_ms=12369 measured_ms=3326 measured_over_floor=0.27
+FLOOR entry=field_contact_columns gathered_GB=1662.354 in_order_GB=60.026 floor_ms=11608 measured_ms=2807 measured_over_floor=0.24
+FLOOR entry=field_skin_fill gathered_GB=1206.224 in_order_GB=150.778 floor_ms=8610 measured_ms=920 measured_over_floor=0.11
+FLOOR entry=field_exposure gathered_GB=933.395 in_order_GB=96.948 floor_ms=6628 measured_ms=911 measured_over_floor=0.14
+FLOOR entry=field_spread gathered_GB=0.000 in_order_GB=100.222 floor_ms=175 measured_ms=665 measured_over_floor=3.80
+FLOOR family floor_ms=73552 measured_ms=16388 measured_over_floor=0.22 (the read's 100 sections)
+## (ii) the compulsory floor: each distinct word touched once a launch (a lower bound on the card's memory traffic)
+COMPULSORY entry=field_contact_rows gathered_GB=584.527 in_order_GB=208.994 floor_ms=4410 measured_ms=4018 measured_over_floor=0.91
+COMPULSORY entry=field_pace_skin_back gathered_GB=134.025 in_order_GB=92.851 floor_ms=1090 measured_ms=3741 measured_over_floor=3.43
+COMPULSORY entry=field_contact_l5 gathered_GB=292.263 in_order_GB=117.123 floor_ms=2227 measured_ms=3326 measured_over_floor=1.49
+COMPULSORY entry=field_contact_columns gathered_GB=359.276 in_order_GB=58.463 floor_ms=2588 measured_ms=2807 measured_over_floor=1.08
+COMPULSORY entry=field_skin_fill gathered_GB=0.000 in_order_GB=147.075 floor_ms=257 measured_ms=920 measured_over_floor=3.58
+COMPULSORY entry=field_exposure gathered_GB=292.263 in_order_GB=92.851 floor_ms=2185 measured_ms=911 measured_over_floor=0.42
+COMPULSORY entry=field_spread gathered_GB=0.000 in_order_GB=100.222 floor_ms=175 measured_ms=665 measured_over_floor=3.80
+COMPULSORY family floor_ms=12932 measured_ms=16388 measured_over_floor=1.27
