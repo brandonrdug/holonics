@@ -77,7 +77,13 @@ repository was reset on September 24; the pre-reset tree is
   the look-back fell to 6.25 places at the mean and 5.74 at the end, and quarter 4 turned a further
   0.019 back, to 0.032 above rt28's. So the turn is the friction's chart itself and not its heat,
   and the circles' reach where a region is mostly open is the circle line's next subject, after the
-  triads' first lap. With `C = 0` the field is the plain line bit for bit.
+  triads' first lap. Read on te5's mean (G108 scored), one move of every circle's friction trades
+  quarter 4 against quarters 1 to 3 (doubling it costs quarter 4 0.013 nats a place and buys quarter
+  1 0.006), so the one friction chart is pulled apart by its regions, and the reach is derived next
+  as a friction the region sets. The drift is the leak chart's own: te4's mean with te5's leak half
+  stands 93% of the way to te5's gates, and te5's mean with te4's leak half codes the held passage
+  0.0007 under te5's own (0.0088 under in quarter 4). So the leak half's rate is read before any
+  founding. With `C = 0` the field is the plain line bit for bit.
 - **The triad** (founded on te4's end, its first lap read; atlas `contact.triad-manley-rowe-gauge`,
   `code.triad-character-of-composition`;
   [the triad record](research/records/2026-11-12_THE_LAW_ACROSS_A_PLACE_IS_HELD_BY_A_PUMPED_CONTACT_A_TRIAD_IS_A_CHARACTER_OF_A_LAW_OF_COMPOSITION_AND_ITS_THREE_LEGS_EXCHANGE_EQUAL_QUANTA.md)).
@@ -100,9 +106,15 @@ repository was reset on September 24; the pre-reset tree is
   left, 0.001 to 0.002 with none or one, and less again where more are written. So the triads hold a
   law of the place and two near letters, about a hundredth of what the field lacks there, at half
   the gain for their charge that the circles' first raised lap took, and no second triad lap trains. The cut of their return
-  (G107) reads whether that law is the triads' own before the next founding: the circles' triad
-  (the record's form (ii)) if it is, the mates' letters on the legs if it is not. The
-  field's learner steps each entry at its own divisor, so the gauge's equal gains of the legs are no
+  (G107 scored) puts every transmission row back within 0.0025 of te5's, so the law is the triads'
+  own and the built object is the theory's; its reach is short at three and four letters each side,
+  so the circles' triad (the record's form (ii)) is the next founding. On the release (G106 scored)
+  the triads reach the write where the circles did not: on the first 32 held problems tt1's
+  re-draw's end codes 0.058 nats a place under te5's and its excess over the reference answers falls
+  by a fifth, while the reference's own code moves 0.001, since in the field's own write every
+  place's near letters were drawn from the law the triads hold. No write yet does what its question
+  asks. The release on tt1's end with the return cut (G109) reads whether the write's gain is the
+  triads' own forward. The field's learner steps each entry at its own divisor, so the gauge's equal gains of the legs are no
   prediction for it; its covectors keep the scale identity at every state (the record, 3.2).
 - **The learner** (`FieldLearner`; the trainer is
   `crates/holonics/examples/solenoidal_alpha/complete_language/field_train.rs`). The comparison is

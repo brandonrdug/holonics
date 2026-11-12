@@ -38,5 +38,8 @@ written here. None of it uses the card.
   - `g105_tt1_reads.txt`: the held reads of tt1's lap mean and end, the transmission read of its mean, and the charge.
 - `charge_t.py STATE...`: the return's charge, `W_T`'s rms over all its rows against the rms of `W`'s plain contacts' columns
   on the first lane's rows, read through `tools/state_travel.py`'s layout; one thread, writes nothing.
-- The guesses G102, G105, G106 and G107 are in `guess_capacity_44_55.txt` in the receipts of the record of the places
+- `g107_cut_reads.txt`: the cut of tt1's lap mean (TT1C, `w_triad` grafted from TT0) with its gate, and the triad build's
+  held and transmission reads of it (G107), each its own hold of the card lock. tt1's release (G106) is
+  `g106_release_lines.txt` in the receipts of the record of raised rates (2026-11-11), beside te5's.
+- The guesses G102 and G105 to G109 are in `guess_capacity_44_55.txt` in the receipts of the record of the places
   (2026-11-11).
