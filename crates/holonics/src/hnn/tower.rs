@@ -6176,7 +6176,8 @@ fn on_step_grain(grain: u32, v: i128) -> i128 {
 
 /// The deposit's step for one entry: its first moment `m` (on `2^(−32)`) over the root of its
 /// second `v`, at the rate `2^(−rate)`, on its family's own grain:
-/// `((m ≪ grain) ≫ rate) / (⌊√v⌋ + 1)`, before the certificate halves it.
+/// `((m ≪ grain) ≫ rate) / (⌊√v⌋ + 1)`. The tower's certificate halves it; the field deposits it
+/// at this size (the step fluxes, Brandon, November 5).
 fn deposit_step(m: i128, v: i128, grain: u32, rate: u32) -> i128 {
     deposit_over(m, deposit_root(v), grain, rate)
 }

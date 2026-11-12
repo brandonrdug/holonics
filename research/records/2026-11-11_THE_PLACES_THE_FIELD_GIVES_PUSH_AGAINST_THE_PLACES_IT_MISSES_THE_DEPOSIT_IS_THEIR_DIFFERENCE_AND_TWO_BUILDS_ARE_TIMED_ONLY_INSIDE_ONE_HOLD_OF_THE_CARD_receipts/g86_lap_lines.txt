@@ -1,0 +1,116 @@
+# G86's laps, 2026-11-11 UTC, on the card (RTX 4080 SUPER under HOLONICS_ROOT/.local/gpu.lock, each lap its own hold), one chain dispatched with
+# tools/runs.py (LR/g/g_chain.sh): each lap the line's lap (RUN/mean_lap.sh's exports, arguments and bounds, L 1,215,000 ms, the run's
+# 1,515,000 ms) with the letter-rates binary (88bf7343806e4b78, 7464c528f) from its polar-written start; projection 960 s, deadline 1,300 s by
+# the outer timeout, early stop past 846 ms a section over the first hundred. Pairs: g1 with rt19, g2 with rt20, g3 with rt21 (G84's receipts).
+## g1 (the chain's output)
+# g1: polar on rt15 rt16 rt17 rt18 means onto rt18/STATE.0 22:25:30
+POLAR_EXIT g1 0 22:25:30
+POLAR_STATE g1 other_lines_differing=0 parts_before=parts 32 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 parts_after=parts 32 0 0 0 3 4 4 1 1 2 0 0 0 0 0 0 0 1 4 4
+POLAR_G1 equals the gate's state
+# g1 from g1.from/STATE.0 b2ba5adf11bfc53c: hnn-field-learner-v3 12 134144 69 -; lap bound 1215000 ms, the run's 1515000 ms, deadline 1300 s 22:25:30
+# g1: lock taken 22:25:30 wait_s=.002124008
+EARLY_RATE g1 sections=100 mean_section_ms=542 bound_ms=846 22:26:40
+# g1: lap exit 0 released 22:39:48
+FIELD_PART_RATES contacts_before=32 rate_bits=12 octaves w_new=0 a_new=0 b_new=0 enc_lane=3 before_lane=4 after_lane=4 q_lane=1 v_lane=1 probe_lane=2 out_lane=0 moment_face_lane=0 read_lane=0 face_biases_lane=0 a_lane=0 b_lane=0 carry=0 enc_first=1 before_first=4 after_first=4
+FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.731382 foil_nats_a_place=1.866629 information_nats_a_place=0.135247 own_nats_a_word=13.010058 information_nats_a_word=1.016280
+FIELD_JOINT_STRATA lap=-1 open_quarters=1/2/3/4 own_nats_a_place=0.672826/1.274348/2.033245/2.935662 foil_nats_a_place=0.774221/1.414280/2.188505/3.079888 places=10818/10881/10853/10918 open_sites=5333/16153/26922/38725 terms_own=11010941657/20976409595/33382132233/48486811174 terms_foil=12670284726/23279774148/35931210889/50868906015
+FIELD_MEAN lap=0 states=1535 entries=63606 moved=61466 square=206642746943668
+FIELD_LAP lap=0 read=70 sites=16553256 before=3.216 after=- deposited=1535/1535 halvings=0 next_halved=0 next_refused=0 ms=841197
+FIELD_JOINT_NATS lap=0 places=43470 words=5785 own_nats_a_place=1.732257 foil_nats_a_place=1.868644 information_nats_a_place=0.136387 own_nats_a_word=13.016630 information_nats_a_word=1.024846
+FIELD_JOINT_STRATA lap=0 open_quarters=1/2/3/4 own_nats_a_place=0.665753/1.273787/2.035091/2.944877 foil_nats_a_place=0.764832/1.412913/2.192465/3.094638 places=10818/10881/10853/10918 open_sites=5333/16153/26922/38725 terms_own=10895179916/20967187948/33412430022/48639011868 terms_foil=12516636053/23257271933/35996215530/51112531626
+MEASURE lap=g1 rc=0 wall_s=858.2 peak_rss_kib=834036
+SECTION_STEPS g1 sections=1535 halved_or_next=0
+CODEC
+JOINT.tsv
+MEAN.0
+STATE.0
+# mean_g1: state 5e90e343e228e4cc; binary 88bf7343806e4b78; asked 22:39:48
+# mean_g1: lock taken 22:39:48 wait_s=.012341905
+# mean_g1: run_s=10.209859071 rc=0 released 22:39:58
+FIELD_JOINT_STRATA lap=-1 open_quarters=1/2/3/4 own_nats_a_place=0.667630/1.266349/2.025143/2.928508 foil_nats_a_place=0.765888/1.406684/2.180848/3.066810 places=10818/10881/10853/10918 open_sites=5333/16153/26922/38725 terms_own=10925906397/20844742846/33249110933/48368653716 terms_foil=12533907419
+# end_g1: state bfa141df4c714f4d; binary 88bf7343806e4b78; asked 22:39:58
+# end_g1: lock taken 22:39:58 wait_s=.013323584
+# end_g1: run_s=10.155175048 rc=0 released 22:40:09
+FIELD_JOINT_STRATA lap=-1 open_quarters=1/2/3/4 own_nats_a_place=0.665753/1.273787/2.035091/2.944877 foil_nats_a_place=0.764832/1.412913/2.192465/3.094638 places=10818/10881/10853/10918 open_sites=5333/16153/26922/38725 terms_own=10895179916/20967187948/33412430022/48639011868 terms_foil=12516636053
+MAIN g1 done 22:40:09
+## g1's first five sections and its last (its log)
+FIELD_SECTION lap=0 n=0 sites=10173 before=3.372 after=- halvings=0 deposited=true next=- predicted_micro=-5023 change_micro=- transfer_micro=- external_micro=-142 curvature_micro=- rate=12 length=2924 regions_ms=1 deposit_ms=425 ms=901
+FIELD_SECTION lap=0 n=1 sites=8258 before=3.937 after=- halvings=0 deposited=true next=- predicted_micro=-5019 change_micro=- transfer_micro=217 external_micro=217 curvature_micro=392 rate=12 length=2502 regions_ms=2 deposit_ms=632 ms=1204
+FIELD_SECTION lap=0 n=2 sites=4607 before=3.054 after=- halvings=0 deposited=true next=- predicted_micro=-4021 change_micro=- transfer_micro=-888 external_micro=-888 curvature_micro=-1277 rate=12 length=2238 regions_ms=1 deposit_ms=412 ms=414
+FIELD_SECTION lap=0 n=3 sites=4639 before=3.541 after=- halvings=0 deposited=true next=- predicted_micro=-3958 change_micro=- transfer_micro=669 external_micro=669 curvature_micro=1551 rate=12 length=2416 regions_ms=1 deposit_ms=346 ms=679
+FIELD_SECTION lap=0 n=4 sites=6299 before=3.632 after=- halvings=0 deposited=true next=- predicted_micro=-4900 change_micro=- transfer_micro=345 external_micro=345 curvature_micro=-147 rate=12 length=2302 regions_ms=1 deposit_ms=354 ms=356
+FIELD_SECTION lap=0 n=1534 sites=9191 before=3.179 after=- halvings=0 deposited=true next=- predicted_micro=-6480 change_micro=- transfer_micro=-285 external_micro=-285 curvature_micro=-1143 rate=12 length=2295 regions_ms=1 deposit_ms=550 ms=552
+## g2 (the chain's output)
+# g2: polar on rt16 rt17 rt18 g1 means onto g1/STATE.0 22:40:09
+POLAR_EXIT g2 0 22:40:09
+POLAR_STATE g2 other_lines_differing=0 parts_before=parts 32 0 0 0 3 4 4 1 1 2 0 0 0 0 0 0 0 1 4 4 parts_after=parts 32 0 0 0 3 4 4 1 1 2 0 0 0 0 0 0 0 1 4 5
+# g2 from g2.from/STATE.0 50dcf24bcf13ea23: hnn-field-learner-v3 12 134144 70 -; lap bound 1215000 ms, the run's 1515000 ms, deadline 1300 s 22:40:09
+# g2: lock taken 22:40:09 wait_s=.002415213
+EARLY_RATE g2 sections=100 mean_section_ms=586 bound_ms=846 22:41:19
+# g2: lap exit 0 released 22:54:58
+FIELD_PART_RATES contacts_before=32 rate_bits=12 octaves w_new=0 a_new=0 b_new=0 enc_lane=3 before_lane=4 after_lane=4 q_lane=1 v_lane=1 probe_lane=2 out_lane=0 moment_face_lane=0 read_lane=0 face_biases_lane=0 a_lane=0 b_lane=0 carry=0 enc_first=1 before_first=4 after_first=5
+FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.732257 foil_nats_a_place=1.868644 information_nats_a_place=0.136387 own_nats_a_word=13.016630 information_nats_a_word=1.024846
+FIELD_JOINT_STRATA lap=-1 open_quarters=1/2/3/4 own_nats_a_place=0.665753/1.273787/2.035091/2.944877 foil_nats_a_place=0.764832/1.412913/2.192465/3.094638 places=10818/10881/10853/10918 open_sites=5333/16153/26922/38725 terms_own=10895179916/20967187948/33412430022/48639011868 terms_foil=12516636053/23257271933/35996215530/51112531626
+FIELD_MEAN lap=0 states=1535 entries=63606 moved=61425 square=198263923028743
+FIELD_LAP lap=0 read=71 sites=16541481 before=3.228 after=- deposited=1535/1535 halvings=0 next_halved=0 next_refused=0 ms=871600
+FIELD_JOINT_NATS lap=0 places=43470 words=5785 own_nats_a_place=1.726526 foil_nats_a_place=1.860454 information_nats_a_place=0.133928 own_nats_a_word=12.973570 information_nats_a_word=1.006368
+FIELD_JOINT_STRATA lap=0 open_quarters=1/2/3/4 own_nats_a_place=0.668871/1.272268/2.030666/2.924885 foil_nats_a_place=0.772342/1.410447/2.187184/3.062297 places=10818/10881/10853/10918 open_sites=5333/16153/26922/38725 terms_own=10946208023/20942183898/33339781076/48308804076 terms_foil=12639535594/23216679689/35909522713/50578370666
+MEASURE lap=g2 rc=0 wall_s=889.2 peak_rss_kib=833992
+SECTION_STEPS g2 sections=1535 halved_or_next=0
+CODEC
+JOINT.tsv
+MEAN.0
+STATE.0
+# mean_g2: state 4e9a00c98dbae713; binary 88bf7343806e4b78; asked 22:54:58
+# mean_g2: lock taken 22:55:05 wait_s=7.092628692
+# mean_g2: run_s=9.660315358 rc=0 released 22:55:15
+FIELD_JOINT_STRATA lap=-1 open_quarters=1/2/3/4 own_nats_a_place=0.663573/1.263913/2.019335/2.927342 foil_nats_a_place=0.764226/1.402576/2.175307/3.072113 places=10818/10881/10853/10918 open_sites=5333/16153/26922/38725 terms_own=10859510616/20804644856/33153755626/48349386564 terms_foil=12506710141
+# end_g2: state ce06f8cfbd0a7b14; binary 88bf7343806e4b78; asked 22:55:15
+# end_g2: lock taken 22:55:15 wait_s=.012752403
+# end_g2: run_s=9.467690109 rc=0 released 22:55:24
+FIELD_JOINT_STRATA lap=-1 open_quarters=1/2/3/4 own_nats_a_place=0.668871/1.272268/2.030666/2.924885 foil_nats_a_place=0.772342/1.410447/2.187184/3.062297 places=10818/10881/10853/10918 open_sites=5333/16153/26922/38725 terms_own=10946208023/20942183898/33339781076/48308804076 terms_foil=12639535594
+MAIN g2 done 22:55:24
+## g2's first five sections and its last (its log)
+FIELD_SECTION lap=0 n=0 sites=10942 before=3.056 after=- halvings=0 deposited=true next=- predicted_micro=-6150 change_micro=- transfer_micro=- external_micro=15 curvature_micro=- rate=12 length=2255 regions_ms=1 deposit_ms=625 ms=1295
+FIELD_SECTION lap=0 n=1 sites=6377 before=3.552 after=- halvings=0 deposited=true next=- predicted_micro=-4909 change_micro=- transfer_micro=351 external_micro=351 curvature_micro=323 rate=12 length=2252 regions_ms=1 deposit_ms=452 ms=990
+FIELD_SECTION lap=0 n=2 sites=10793 before=3.628 after=- halvings=0 deposited=true next=- predicted_micro=-5647 change_micro=- transfer_micro=171 external_micro=171 curvature_micro=-36 rate=12 length=2277 regions_ms=1 deposit_ms=506 ms=508
+FIELD_SECTION lap=0 n=3 sites=13601 before=3.296 after=- halvings=0 deposited=true next=- predicted_micro=-5363 change_micro=- transfer_micro=-128 external_micro=-128 curvature_micro=-263 rate=12 length=2274 regions_ms=1 deposit_ms=474 ms=1033
+FIELD_SECTION lap=0 n=4 sites=30799 before=3.343 after=- halvings=0 deposited=true next=- predicted_micro=-10054 change_micro=- transfer_micro=326 external_micro=326 curvature_micro=382 rate=12 length=2363 regions_ms=1 deposit_ms=957 ms=959
+FIELD_SECTION lap=0 n=1534 sites=10002 before=3.548 after=- halvings=0 deposited=true next=- predicted_micro=-4222 change_micro=- transfer_micro=1033 external_micro=1033 curvature_micro=-1295 rate=12 length=2358 regions_ms=2 deposit_ms=557 ms=559
+## g3 (the chain's output)
+# g3: polar on rt17 rt18 g1 g2 means onto g2/STATE.0 22:55:24
+POLAR_EXIT g3 0 22:55:25
+POLAR_STATE g3 other_lines_differing=0 parts_before=parts 32 0 0 0 3 4 4 1 1 2 0 0 0 0 0 0 0 1 4 5 parts_after=parts 32 0 0 0 3 3 3 1 1 2 0 0 0 0 0 0 0 1 4 4
+# g3 from g3.from/STATE.0 b9f1682d9ca14f13: hnn-field-learner-v3 12 134144 71 -; lap bound 1215000 ms, the run's 1515000 ms, deadline 1300 s 22:55:25
+# g3: lock taken 22:55:25 wait_s=.002257984
+EARLY_RATE g3 sections=100 mean_section_ms=552 bound_ms=846 22:56:35
+# g3: lap exit 0 released 23:09:40
+FIELD_PART_RATES contacts_before=32 rate_bits=12 octaves w_new=0 a_new=0 b_new=0 enc_lane=3 before_lane=3 after_lane=3 q_lane=1 v_lane=1 probe_lane=2 out_lane=0 moment_face_lane=0 read_lane=0 face_biases_lane=0 a_lane=0 b_lane=0 carry=0 enc_first=1 before_first=4 after_first=4
+FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.726526 foil_nats_a_place=1.860454 information_nats_a_place=0.133928 own_nats_a_word=12.973570 information_nats_a_word=1.006368
+FIELD_JOINT_STRATA lap=-1 open_quarters=1/2/3/4 own_nats_a_place=0.668871/1.272268/2.030666/2.924885 foil_nats_a_place=0.772342/1.410447/2.187184/3.062297 places=10818/10881/10853/10918 open_sites=5333/16153/26922/38725 terms_own=10946208023/20942183898/33339781076/48308804076 terms_foil=12639535594/23216679689/35909522713/50578370666
+FIELD_MEAN lap=0 states=1535 entries=63606 moved=61278 square=200758190329763
+FIELD_LAP lap=0 read=72 sites=16528287 before=3.214 after=- deposited=1535/1535 halvings=0 next_halved=0 next_refused=0 ms=838055
+FIELD_JOINT_NATS lap=0 places=43470 words=5785 own_nats_a_place=1.724790 foil_nats_a_place=1.862680 information_nats_a_place=0.137890 own_nats_a_word=12.960522 information_nats_a_word=1.036142
+FIELD_JOINT_STRATA lap=0 open_quarters=1/2/3/4 own_nats_a_place=0.663526/1.266933/2.025586/2.933634 foil_nats_a_place=0.768508/1.406237/2.185991/3.080340 places=10818/10881/10853/10918 open_sites=5333/16153/26922/38725 terms_own=10858730723/20854357897/33256380076/48453318761 terms_foil=12576783186/23147379561/35889937683/50876384563
+MEASURE lap=g3 rc=0 wall_s=855.1 peak_rss_kib=830292
+SECTION_STEPS g3 sections=1535 halved_or_next=0
+CODEC
+JOINT.tsv
+MEAN.0
+STATE.0
+# mean_g3: state a6b09e2c5ed5e31a; binary 88bf7343806e4b78; asked 23:09:40
+# mean_g3: lock taken 23:09:40 wait_s=.011946964
+# mean_g3: run_s=9.573957090 rc=0 released 23:09:49
+FIELD_JOINT_STRATA lap=-1 open_quarters=1/2/3/4 own_nats_a_place=0.658199/1.258877/2.017392/2.925878 foil_nats_a_place=0.761582/1.396638/2.174618/3.068382 places=10818/10881/10853/10918 open_sites=5333/16153/26922/38725 terms_own=10771557055/20721756287/33121853300/48325217455 terms_foil=12463447050
+# end_g3: state d6c8b69ce8f4eebd; binary 88bf7343806e4b78; asked 23:09:49
+# end_g3: lock taken 23:09:49 wait_s=.012975862
+# end_g3: run_s=9.625373289 rc=0 released 23:09:59
+FIELD_JOINT_STRATA lap=-1 open_quarters=1/2/3/4 own_nats_a_place=0.663526/1.266933/2.025586/2.933634 foil_nats_a_place=0.768508/1.406237/2.185991/3.080340 places=10818/10881/10853/10918 open_sites=5333/16153/26922/38725 terms_own=10858730723/20854357897/33256380076/48453318761 terms_foil=12576783186
+MAIN g3 done 23:09:59
+## g3's first five sections and its last (its log)
+FIELD_SECTION lap=0 n=0 sites=8217 before=3.449 after=- halvings=0 deposited=true next=- predicted_micro=-3087 change_micro=- transfer_micro=- external_micro=1335 curvature_micro=- rate=12 length=2270 regions_ms=1 deposit_ms=376 ms=803
+FIELD_SECTION lap=0 n=1 sites=6403 before=3.310 after=- halvings=0 deposited=true next=- predicted_micro=-3888 change_micro=- transfer_micro=1362 external_micro=1362 curvature_micro=-350 rate=12 length=2241 regions_ms=1 deposit_ms=290 ms=780
+FIELD_SECTION lap=0 n=2 sites=7003 before=3.692 after=- halvings=0 deposited=true next=- predicted_micro=-3941 change_micro=- transfer_micro=386 external_micro=386 curvature_micro=-859 rate=12 length=2215 regions_ms=1 deposit_ms=406 ms=408
+FIELD_SECTION lap=0 n=3 sites=6297 before=3.317 after=- halvings=0 deposited=true next=- predicted_micro=-5809 change_micro=- transfer_micro=-669 external_micro=-669 curvature_micro=-1099 rate=12 length=2208 regions_ms=1 deposit_ms=296 ms=628
+FIELD_SECTION lap=0 n=4 sites=20946 before=2.526 after=- halvings=0 deposited=true next=- predicted_micro=-8944 change_micro=- transfer_micro=-226 external_micro=-226 curvature_micro=-24 rate=12 length=2762 regions_ms=1 deposit_ms=891 ms=893
+FIELD_SECTION lap=0 n=1534 sites=24140 before=3.146 after=- halvings=0 deposited=true next=- predicted_micro=-9720 change_micro=- transfer_micro=1 external_micro=1 curvature_micro=-326 rate=12 length=2247 regions_ms=2 deposit_ms=863 ms=865

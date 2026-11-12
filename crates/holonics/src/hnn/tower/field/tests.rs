@@ -2052,6 +2052,8 @@ fn the_founded_parts_hold_the_lane_and_the_new_contacts() {
     assert_eq!(count(11), 16 * 16 - 8 * 8, "the lift's rows and columns of the lane");
     assert_eq!(count(12), 4 * 8, "the face biases' lane entries");
     assert_eq!((count(13), count(14)), (4 * 8, 4 * 8), "the lane's columns of a and b over the old contacts");
+    assert_eq!((count(19), count(20), count(21)), (a1 * 8, a1 * 8, a1 * 8), "the first lane's letter rows: each class as itself, before and after, over the first lane");
+    assert!((0..a1).all(|r| (0..8).all(|c| parts[l.enc + r * 16 + c] == 19 && parts[l.before + r * 16 + c] == 20 && parts[l.after + r * 16 + c] == 21)));
     for &e in &new_contacts {
         assert!((0..16).all(|r| parts[l.w + r * 8 + e] == 0));
         assert!((0..16).all(|j| parts[l.a + e * 16 + j] == 1 && parts[l.b + e * 16 + j] == 2));
@@ -2180,6 +2182,48 @@ fn grown_learner_text_of(learner: &FieldLearner) -> String {
     let mut plain = learner.clone();
     plain.rate_parts = None;
     plain.to_text()
+}
+
+/// [definition; theory, November 12 00:20] **An entry steps at its own rate where the learner carries it**: own rates equal to the parts'
+/// give the parts' deposit bit for bit over three sections; rates of their own (some entries under the base word, some over it) step each
+/// entry at its own rate; the line trails the state and round-trips through the learner's text, a state without it reads as none, and a
+/// line that is not one count an entry, or that holds a rate of zero or one past the step's carrier, is refused.
+#[test]
+fn an_entry_steps_at_its_own_rate_where_the_learner_carries_it() {
+    let mut octaves = [0u32; PARTS];
+    (octaves[0], octaves[1]) = (2, 3);
+    let mut parts = grown_learner();
+    parts.rate_parts = Some(RateParts { contacts_before: 4, octaves });
+    let mut own = parts.clone();
+    own.own_rates = Some(parts.entry_rates());
+    for _ in 0..3 {
+        parts.section(&[region()]).unwrap();
+        own.section(&[region()]).unwrap();
+    }
+    assert_eq!((parts.field.theta.clone(), parts.first.clone(), parts.second.clone()), (own.field.theta.clone(), own.first.clone(), own.second.clone()), "own rates equal to the parts': the parts' deposit");
+    // Rates of their own about the base 6: every third entry two bits slower, every other fifth one bit faster.
+    let mut free = grown_learner();
+    let rates: Vec<u32> = (0..free.field.material_len()).map(|i| if i % 3 == 0 { 8 } else if i % 5 == 0 { 5 } else { 6 }).collect();
+    free.own_rates = Some(rates.clone());
+    assert_eq!(free.entry_rates(), rates);
+    free.section(&[region()]).unwrap();
+    let step = free.last.as_ref().unwrap().step.clone();
+    for &(start, len, grain) in &free.field.families_all() {
+        for i in start..start + len {
+            assert_eq!(step[i], deposit_step(free.first[i], free.second[i], grain, rates[i]), "entry {i} steps at its own rate");
+        }
+    }
+    let text = free.to_text();
+    assert!(text.lines().last().unwrap().starts_with("rates "), "the line trails the state");
+    assert_eq!(FieldLearner::from_text(&text).unwrap().own_rates, free.own_rates);
+    let stripped: String = text.lines().filter(|l| !l.starts_with("rates ")).map(|l| format!("{l}\n")).collect();
+    assert_eq!(FieldLearner::from_text(&stripped).unwrap().own_rates, None, "a state without the line has no own rates");
+    let short: String = text.lines().map(|l| if l.starts_with("rates ") { format!("{}\n", l.rsplit_once(' ').unwrap().0) } else { format!("{l}\n") }).collect();
+    assert!(FieldLearner::from_text(&short).is_err(), "a line that is not one count an entry is refused");
+    for bad in ["0", "128"] {
+        let wrong: String = text.lines().map(|l| if l.starts_with("rates ") { format!("{} {bad}\n", l.rsplit_once(' ').unwrap().0) } else { format!("{l}\n") }).collect();
+        assert!(FieldLearner::from_text(&wrong).is_err(), "a rate of {bad} is refused");
+    }
 }
 
 /// [measurement; theory, November 10 19:05] The founded parts and their travel read from saved states (`HOLONICS_PARTS_OLDER`,
@@ -2319,7 +2363,7 @@ fn a_growth_by_carry_circles_keeps_every_face_and_returns_through_its_circles() 
     let back = FieldLearner::from_text(&text).unwrap();
     assert_eq!((back.field.theta.clone(), back.first.clone(), back.second.clone(), back.rate_parts, back.drawn), (grown.field.theta.clone(), grown.first.clone(), grown.second.clone(), grown.rate_parts, grown.drawn));
     assert_eq!(back.field.declaration, grown.field.declaration);
-    assert_eq!(learner.to_text().lines().find(|l| l.starts_with("parts ")).unwrap().split(' ').count(), 2 + PLAIN_PARTS, "a field without carry circles writes sixteen");
+    assert_eq!(learner.to_text().lines().find(|l| l.starts_with("parts ")).unwrap().split(' ').count(), 2 + written_parts(0).len(), "a field without carry circles writes nineteen: the plain sixteen and the first lane's letter rows");
 }
 
 /// [definition; theory, November 11 17:25] **The carry circles' scan is the law, site by site in strand order**: on a drawn field with two
@@ -2713,4 +2757,25 @@ fn a_field_with_carry_circles_keeps_every_room_whole() {
         let l = field.layout.clone();
         assert!(gw[l.carry..l.carry_bias].iter().any(|&v| v != 0), "ticks {ticks}: the circles' charts have a covector to compare");
     }
+}
+
+/// [definition; theory, November 11 21:15, G86] **The parts line reads its own order and every older one**: a field without carry circles
+/// writes nineteen parts (the plain sixteen, then the first lane's letter rows), one with circles twenty-two; a line of sixteen (before the
+/// letter rows' parts) reads with them at octave 0, and so does a circled field's line of nineteen (the turn-carry line); a learner's octaves
+/// round-trip through the text.
+#[test]
+fn the_parts_line_reads_its_own_order_and_every_older_one() {
+    let mut learner = grown_learner();
+    let mut octaves = [0u32; PARTS];
+    (octaves[3], octaves[19], octaves[20], octaves[21]) = (1, 2, 3, 4);
+    learner.rate_parts = Some(RateParts { contacts_before: 4, octaves });
+    let text = learner.to_text();
+    let line = text.lines().find(|l| l.starts_with("parts ")).unwrap().to_string();
+    assert_eq!(line.split(' ').count(), 2 + 19);
+    assert_eq!(FieldLearner::from_text(&text).unwrap().rate_parts, learner.rate_parts, "the line's own order round-trips");
+    let older: String = text.lines().map(|l| if l.starts_with("parts ") { format!("{}\n", l.split(' ').take(2 + PLAIN_PARTS).collect::<Vec<_>>().join(" ")) } else { format!("{l}\n") }).collect();
+    let read = FieldLearner::from_text(&older).unwrap().rate_parts.unwrap();
+    assert_eq!((read.octaves[3], read.octaves[19], read.octaves[20], read.octaves[21]), (1, 0, 0, 0), "a sixteen-part line reads the letter rows at octave 0");
+    assert_eq!(written_parts(0), (0..16).chain(19..22).collect::<Vec<_>>());
+    assert_eq!(written_parts(2), (0..22).collect::<Vec<_>>());
 }
