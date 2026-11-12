@@ -1,0 +1,105 @@
+# The transmission reads of each tp lap's mean and end (the carry branch's transmission_as.sh, open-0, as tf3's mean was read: projection
+# 238 s, deadline 297 s, its own hold), binary 837bc5887de82cda. Rows: written on the left d = 0..4 and 8, on both sides d = 1..4, the uneven
+# splits; code in nats a place on held 0 to 31.
+## tp1_mean
+FIELD_TRANSMISSION mode=open-left l=0 r=0 spacing=0 regions=8760 places=8760 out=0 code_nats_a_place=3.192488 ms=12309
+FIELD_TRANSMISSION mode=open-left l=1 r=0 spacing=0 regions=8728 places=8728 out=32 code_nats_a_place=2.616243 ms=24289
+FIELD_TRANSMISSION mode=open-left l=2 r=0 spacing=0 regions=8696 places=8696 out=64 code_nats_a_place=2.165751 ms=36579
+FIELD_TRANSMISSION mode=open-left l=3 r=0 spacing=0 regions=8664 places=8664 out=96 code_nats_a_place=1.974988 ms=48846
+FIELD_TRANSMISSION mode=open-left l=4 r=0 spacing=0 regions=8632 places=8632 out=128 code_nats_a_place=1.939498 ms=60726
+FIELD_TRANSMISSION mode=open-left l=8 r=0 spacing=0 regions=8504 places=8504 out=256 code_nats_a_place=1.897826 ms=72572
+FIELD_TRANSMISSION mode=open-both l=1 r=1 spacing=0 regions=8696 places=8696 out=64 code_nats_a_place=1.848535 ms=84574
+FIELD_TRANSMISSION mode=open-both l=2 r=2 spacing=0 regions=8632 places=8632 out=128 code_nats_a_place=1.183041 ms=96472
+FIELD_TRANSMISSION mode=open-both l=3 r=3 spacing=0 regions=8568 places=8568 out=192 code_nats_a_place=1.012831 ms=108315
+FIELD_TRANSMISSION mode=open-both l=4 r=4 spacing=0 regions=8504 places=8504 out=256 code_nats_a_place=0.973351 ms=120209
+FIELD_TRANSMISSION mode=open-split l=3 r=1 spacing=0 regions=8632 places=8632 out=128 code_nats_a_place=1.325426 ms=132105
+FIELD_TRANSMISSION mode=open-split l=1 r=3 spacing=0 regions=8632 places=8632 out=128 code_nats_a_place=1.377709 ms=144009
+FIELD_TRANSMISSION mode=open-split l=2 r=1 spacing=0 regions=8664 places=8664 out=96 code_nats_a_place=1.464682 ms=156013
+FIELD_TRANSMISSION mode=open-split l=1 r=2 spacing=0 regions=8664 places=8664 out=96 code_nats_a_place=1.477416 ms=168003
+FIELD_TRANSMISSION_DONE ms=168005
+MEASURE lap=transmission_open_tp1_mean rc=0 wall_s=168.4 peak_rss_kib=366088
+## tp1_end
+FIELD_TRANSMISSION mode=open-left l=0 r=0 spacing=0 regions=8760 places=8760 out=0 code_nats_a_place=3.194752 ms=12167
+FIELD_TRANSMISSION mode=open-left l=1 r=0 spacing=0 regions=8728 places=8728 out=32 code_nats_a_place=2.637004 ms=24354
+FIELD_TRANSMISSION mode=open-left l=2 r=0 spacing=0 regions=8696 places=8696 out=64 code_nats_a_place=2.176269 ms=36377
+FIELD_TRANSMISSION mode=open-left l=3 r=0 spacing=0 regions=8664 places=8664 out=96 code_nats_a_place=1.985355 ms=48419
+FIELD_TRANSMISSION mode=open-left l=4 r=0 spacing=0 regions=8632 places=8632 out=128 code_nats_a_place=1.949595 ms=60384
+FIELD_TRANSMISSION mode=open-left l=8 r=0 spacing=0 regions=8504 places=8504 out=256 code_nats_a_place=1.910793 ms=72312
+FIELD_TRANSMISSION mode=open-both l=1 r=1 spacing=0 regions=8696 places=8696 out=64 code_nats_a_place=1.871446 ms=84340
+FIELD_TRANSMISSION mode=open-both l=2 r=2 spacing=0 regions=8632 places=8632 out=128 code_nats_a_place=1.185462 ms=96289
+FIELD_TRANSMISSION mode=open-both l=3 r=3 spacing=0 regions=8568 places=8568 out=192 code_nats_a_place=1.012440 ms=108275
+FIELD_TRANSMISSION mode=open-both l=4 r=4 spacing=0 regions=8504 places=8504 out=256 code_nats_a_place=0.971911 ms=120197
+FIELD_TRANSMISSION mode=open-split l=3 r=1 spacing=0 regions=8632 places=8632 out=128 code_nats_a_place=1.326473 ms=132159
+FIELD_TRANSMISSION mode=open-split l=1 r=3 spacing=0 regions=8632 places=8632 out=128 code_nats_a_place=1.386343 ms=144128
+FIELD_TRANSMISSION mode=open-split l=2 r=1 spacing=0 regions=8664 places=8664 out=96 code_nats_a_place=1.466990 ms=156135
+FIELD_TRANSMISSION mode=open-split l=1 r=2 spacing=0 regions=8664 places=8664 out=96 code_nats_a_place=1.489976 ms=168173
+FIELD_TRANSMISSION_DONE ms=168175
+MEASURE lap=transmission_open_tp1_end rc=0 wall_s=168.6 peak_rss_kib=365808
+## tp2_mean
+FIELD_TRANSMISSION mode=open-left l=0 r=0 spacing=0 regions=8760 places=8760 out=0 code_nats_a_place=3.180038 ms=12613
+FIELD_TRANSMISSION mode=open-left l=1 r=0 spacing=0 regions=8728 places=8728 out=32 code_nats_a_place=2.607092 ms=25192
+FIELD_TRANSMISSION mode=open-left l=2 r=0 spacing=0 regions=8696 places=8696 out=64 code_nats_a_place=2.144795 ms=37673
+FIELD_TRANSMISSION mode=open-left l=3 r=0 spacing=0 regions=8664 places=8664 out=96 code_nats_a_place=1.953258 ms=50146
+FIELD_TRANSMISSION mode=open-left l=4 r=0 spacing=0 regions=8632 places=8632 out=128 code_nats_a_place=1.916061 ms=62609
+FIELD_TRANSMISSION mode=open-left l=8 r=0 spacing=0 regions=8504 places=8504 out=256 code_nats_a_place=1.871583 ms=75025
+FIELD_TRANSMISSION mode=open-both l=1 r=1 spacing=0 regions=8696 places=8696 out=64 code_nats_a_place=1.831242 ms=87528
+FIELD_TRANSMISSION mode=open-both l=2 r=2 spacing=0 regions=8632 places=8632 out=128 code_nats_a_place=1.155105 ms=100012
+FIELD_TRANSMISSION mode=open-both l=3 r=3 spacing=0 regions=8568 places=8568 out=192 code_nats_a_place=0.987781 ms=112521
+FIELD_TRANSMISSION mode=open-both l=4 r=4 spacing=0 regions=8504 places=8504 out=256 code_nats_a_place=0.944787 ms=124920
+FIELD_TRANSMISSION mode=open-split l=3 r=1 spacing=0 regions=8632 places=8632 out=128 code_nats_a_place=1.296036 ms=137416
+FIELD_TRANSMISSION mode=open-split l=1 r=3 spacing=0 regions=8632 places=8632 out=128 code_nats_a_place=1.357128 ms=149867
+FIELD_TRANSMISSION mode=open-split l=2 r=1 spacing=0 regions=8664 places=8664 out=96 code_nats_a_place=1.435087 ms=162366
+FIELD_TRANSMISSION mode=open-split l=1 r=2 spacing=0 regions=8664 places=8664 out=96 code_nats_a_place=1.458120 ms=174867
+FIELD_TRANSMISSION_DONE ms=174868
+MEASURE lap=transmission_open_tp2_mean rc=0 wall_s=175.3 peak_rss_kib=366176
+## tp2_end
+FIELD_TRANSMISSION mode=open-left l=0 r=0 spacing=0 regions=8760 places=8760 out=0 code_nats_a_place=3.190291 ms=12667
+FIELD_TRANSMISSION mode=open-left l=1 r=0 spacing=0 regions=8728 places=8728 out=32 code_nats_a_place=2.615640 ms=25358
+FIELD_TRANSMISSION mode=open-left l=2 r=0 spacing=0 regions=8696 places=8696 out=64 code_nats_a_place=2.167906 ms=37885
+FIELD_TRANSMISSION mode=open-left l=3 r=0 spacing=0 regions=8664 places=8664 out=96 code_nats_a_place=1.968541 ms=50435
+FIELD_TRANSMISSION mode=open-left l=4 r=0 spacing=0 regions=8632 places=8632 out=128 code_nats_a_place=1.928451 ms=62967
+FIELD_TRANSMISSION mode=open-left l=8 r=0 spacing=0 regions=8504 places=8504 out=256 code_nats_a_place=1.883110 ms=75451
+FIELD_TRANSMISSION mode=open-both l=1 r=1 spacing=0 regions=8696 places=8696 out=64 code_nats_a_place=1.858356 ms=87971
+FIELD_TRANSMISSION mode=open-both l=2 r=2 spacing=0 regions=8632 places=8632 out=128 code_nats_a_place=1.169914 ms=100530
+FIELD_TRANSMISSION mode=open-both l=3 r=3 spacing=0 regions=8568 places=8568 out=192 code_nats_a_place=0.996546 ms=113074
+FIELD_TRANSMISSION mode=open-both l=4 r=4 spacing=0 regions=8504 places=8504 out=256 code_nats_a_place=0.950968 ms=125522
+FIELD_TRANSMISSION mode=open-split l=3 r=1 spacing=0 regions=8632 places=8632 out=128 code_nats_a_place=1.312081 ms=138059
+FIELD_TRANSMISSION mode=open-split l=1 r=3 spacing=0 regions=8632 places=8632 out=128 code_nats_a_place=1.368823 ms=150579
+FIELD_TRANSMISSION mode=open-split l=2 r=1 spacing=0 regions=8664 places=8664 out=96 code_nats_a_place=1.454336 ms=163153
+FIELD_TRANSMISSION mode=open-split l=1 r=2 spacing=0 regions=8664 places=8664 out=96 code_nats_a_place=1.472990 ms=175707
+FIELD_TRANSMISSION_DONE ms=175709
+MEASURE lap=transmission_open_tp2_end rc=0 wall_s=176.1 peak_rss_kib=365480
+## tp3_mean
+FIELD_TRANSMISSION mode=open-left l=0 r=0 spacing=0 regions=8760 places=8760 out=0 code_nats_a_place=3.178245 ms=13152
+FIELD_TRANSMISSION mode=open-left l=1 r=0 spacing=0 regions=8728 places=8728 out=32 code_nats_a_place=2.599276 ms=26240
+FIELD_TRANSMISSION mode=open-left l=2 r=0 spacing=0 regions=8696 places=8696 out=64 code_nats_a_place=2.138251 ms=39293
+FIELD_TRANSMISSION mode=open-left l=3 r=0 spacing=0 regions=8664 places=8664 out=96 code_nats_a_place=1.942043 ms=52275
+FIELD_TRANSMISSION mode=open-left l=4 r=0 spacing=0 regions=8632 places=8632 out=128 code_nats_a_place=1.901328 ms=65261
+FIELD_TRANSMISSION mode=open-left l=8 r=0 spacing=0 regions=8504 places=8504 out=256 code_nats_a_place=1.854535 ms=78201
+FIELD_TRANSMISSION mode=open-both l=1 r=1 spacing=0 regions=8696 places=8696 out=64 code_nats_a_place=1.822252 ms=91562
+FIELD_TRANSMISSION mode=open-both l=2 r=2 spacing=0 regions=8632 places=8632 out=128 code_nats_a_place=1.139998 ms=104663
+FIELD_TRANSMISSION mode=open-both l=3 r=3 spacing=0 regions=8568 places=8568 out=192 code_nats_a_place=0.969538 ms=117566
+FIELD_TRANSMISSION mode=open-both l=4 r=4 spacing=0 regions=8504 places=8504 out=256 code_nats_a_place=0.926155 ms=130502
+FIELD_TRANSMISSION mode=open-split l=3 r=1 spacing=0 regions=8632 places=8632 out=128 code_nats_a_place=1.281090 ms=143481
+FIELD_TRANSMISSION mode=open-split l=1 r=3 spacing=0 regions=8632 places=8632 out=128 code_nats_a_place=1.344197 ms=156508
+FIELD_TRANSMISSION mode=open-split l=2 r=1 spacing=0 regions=8664 places=8664 out=96 code_nats_a_place=1.421887 ms=169533
+FIELD_TRANSMISSION mode=open-split l=1 r=2 spacing=0 regions=8664 places=8664 out=96 code_nats_a_place=1.446282 ms=182488
+FIELD_TRANSMISSION_DONE ms=182490
+MEASURE lap=transmission_open_tp3_mean rc=0 wall_s=182.9 peak_rss_kib=365584
+## tp3_end
+FIELD_TRANSMISSION mode=open-left l=0 r=0 spacing=0 regions=8760 places=8760 out=0 code_nats_a_place=3.182020 ms=13264
+FIELD_TRANSMISSION mode=open-left l=1 r=0 spacing=0 regions=8728 places=8728 out=32 code_nats_a_place=2.613994 ms=26627
+FIELD_TRANSMISSION mode=open-left l=2 r=0 spacing=0 regions=8696 places=8696 out=64 code_nats_a_place=2.152278 ms=39709
+FIELD_TRANSMISSION mode=open-left l=3 r=0 spacing=0 regions=8664 places=8664 out=96 code_nats_a_place=1.957344 ms=52986
+FIELD_TRANSMISSION mode=open-left l=4 r=0 spacing=0 regions=8632 places=8632 out=128 code_nats_a_place=1.918444 ms=66240
+FIELD_TRANSMISSION mode=open-left l=8 r=0 spacing=0 regions=8504 places=8504 out=256 code_nats_a_place=1.869965 ms=79297
+FIELD_TRANSMISSION mode=open-both l=1 r=1 spacing=0 regions=8696 places=8696 out=64 code_nats_a_place=1.841199 ms=92452
+FIELD_TRANSMISSION mode=open-both l=2 r=2 spacing=0 regions=8632 places=8632 out=128 code_nats_a_place=1.151091 ms=105560
+FIELD_TRANSMISSION mode=open-both l=3 r=3 spacing=0 regions=8568 places=8568 out=192 code_nats_a_place=0.984931 ms=118689
+FIELD_TRANSMISSION mode=open-both l=4 r=4 spacing=0 regions=8504 places=8504 out=256 code_nats_a_place=0.941648 ms=131729
+FIELD_TRANSMISSION mode=open-split l=3 r=1 spacing=0 regions=8632 places=8632 out=128 code_nats_a_place=1.298464 ms=144921
+FIELD_TRANSMISSION mode=open-split l=1 r=3 spacing=0 regions=8632 places=8632 out=128 code_nats_a_place=1.363194 ms=157413
+FIELD_TRANSMISSION mode=open-split l=2 r=1 spacing=0 regions=8664 places=8664 out=96 code_nats_a_place=1.437531 ms=170326
+FIELD_TRANSMISSION mode=open-split l=1 r=2 spacing=0 regions=8664 places=8664 out=96 code_nats_a_place=1.460450 ms=183436
+FIELD_TRANSMISSION_DONE ms=183437
+MEASURE lap=transmission_open_tp3_end rc=0 wall_s=183.9 peak_rss_kib=366324
