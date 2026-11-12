@@ -228,11 +228,12 @@ pub struct FieldDeclaration {
     /// carries no moment (without a skin its moment would sum the whole region). The ring `ρ ← μρ + r` with `μ = 1` and `r`
     /// keyed by the arriving class; `r` is located by deposition, never authored.
     pub depth: usize,
-    /// [definition; theory, November 11 17:25 (the follow-up record §9 item 4) and November 12 (G96's third branch), `lean/Holonics/HNN/CarryGate.lean`]
-    /// **The carry circles**: the last `C` of the `f/2` complex contacts carry the move `z → γ(t) z + b(t)` along the strand inside one tick, each on a
-    /// circle of its own; the first `f/2 − C` stay the built pair contact with their strand mate. On circle `k` (complex contact `e = f/2 − C + k`) the
-    /// scan runs in strand order (`Q` zero before the region's first site): even `e` from the left, `p_e(t) = a_e(t) Q_e(t−1)` and `Q_e(t) = b_e(t) +
-    /// γ_e(t) Q_e(t−1)`; odd `e` from the right, the same with `t+1`; the pair's return `W` reads `p` where it reads `c`. The gate is a turn and a
+    /// [definition; theory, November 11 17:25 (the follow-up record §9 item 4) and November 12 (G96's third branch, G98), `lean/Holonics/HNN/CarryGate.lean`]
+    /// **The carry circles**: the last `C` of the `f/2` complex contacts carry the move `z → γ(t) z + κ(t) b(t)` along the strand inside one tick, each on
+    /// a circle of its own; the first `f/2 − C` stay the built pair contact with their strand mate. On circle `k` (complex contact `e = f/2 − C + k`) the
+    /// scan runs in strand order (`Q` zero before the region's first site): even `e` from the left, `p_e(t) = a_e(t) Q_e(t−1)` and `Q_e(t) = κ_e(t) b_e(t) +
+    /// γ_e(t) Q_e(t−1)`; odd `e` from the right, the same with `t+1`; the pair's return `W` reads `p` where it reads `c`. The drive is charged through the
+    /// circle's own leak, `κ = N₀ d/(1 + d)` with `N₀ = NEAR − 1` ([`carry_coupling`], [`CARRY_GROUP_FOUNDING`]), so `|γ| + κ/N₀ = 1`. The gate is a turn and a
     /// friction charted apart ([`carry_gate`]): `γ = γ̂(q)/(1 + d)`, `γ̂(q) = ((4 − q²) + 4iq)/(4 + q²)` the Cayley step of `iq/2` on one circle
     /// (`carryTurn_eq_cayley`: it keeps the circle, so a site's turn does no work), and `d = d₀ 2^ℓ` the friction on the leak's log chart
     /// ([`carry_friction`], `leak`), `d₀ = 1/(NEAR − 2)` ([`CARRY_LEAK_FOUNDING`]), a pure dissipation's implicit step (monotone, never past a sign
@@ -256,11 +257,19 @@ pub struct FieldDeclaration {
     /// refused at its section 1,501 of 1,535 with a sum past its carrier. On the log chart a step of `ℓ` moves the friction by a ratio and never
     /// past zero; its covector `δℓ = ln 2 · d · δd` stands at every read (`leak_hasDerivAt`), and the gate's covector per unit `δγ`,
     /// `ln 2 · d/(1 + d)²`, is at most `ln 2/4` (`leak_sensitivity_le`); the friction keeps at least one grain, so a circle holds at most `2^16 + 1`
-    /// places. A field with carry circles keeps every room whole ([`FieldDeclaration::room_window`]). The circles are the last contacts, grown with
+    /// places. Why the drive is charged through the leak (theory, November 12, G97 scored, G98): G97 read the bursts as the carried charge's (all six
+    /// burst sections stood among the 18 of 1,501 with the largest charge, and the host refused section 1,501 in the return at a head's lock covector,
+    /// a contact's covector past its return's carrier). In the sum form `Q = b + γ Qm` a circle held `(1 + d)/d` places' drive, which the log chart
+    /// lets reach `2^16 + 1` places, longer than any region (at most the reach), and its covector `δγ = conj(Qm) u` grew as the group behind the site
+    /// times the group ahead. Charged through the resistor it leaks by (atlas `store.finite-quality`: a store is shaken through the coupling by which
+    /// it leaks), the move is the implicit step of a dissipation relaxing the turned charge toward `N₀ b`, so the charge is a turned mean of `N₀ b`
+    /// and stays within `N₀ max |b|` at every friction (`charge_le`); `Q`, `p = a Q`, `δa`, `δb` and `δℓ` then stand at a plain contact's scale,
+    /// and `δq` and `δd` grow only with the group ahead. At the founding `κ = 1` (`coupling_leak_zero`), so a grown state reads every face of its
+    /// source bit for bit. A field with carry circles keeps every room whole ([`FieldDeclaration::room_window`]). The circles are the last contacts, grown with
     /// `W`'s columns at zero ([`Field::with_carry`]), so a trained field continues bit for bit. `C` is even (a carry circle's side is its contact's
     /// parity, so as many scan from each side) and at most `f/2`; `C = 0` is the `hnn-field-v14` line exactly, and `C > 0` writes `hnn-field-v14e`
-    /// with `C` its thirteenth word. The retired carries are refused, their states receipts only: `hnn-field-v14k` (founded at zero friction) and
-    /// `hnn-field-v14t` (the leak's linear chart).
+    /// with `C` its thirteenth word (the log chart and the coupling, together from the head's first state). The retired carries are refused, their
+    /// states receipts only: `hnn-field-v14k` (founded at zero friction) and `hnn-field-v14t` (the leak's linear chart, its drive summed).
     pub carry: usize,
 }
 
@@ -1193,11 +1202,13 @@ struct TickCell {
     a: Vec<i64>,
     b: Vec<i64>,
     c: Vec<i64>,
-    /// [definition; theory, November 11 17:25] The carry circles' operands (empty without them), what the reverse reads beside `a`, `b` and `c`,
-    /// each `[t][2C]`: `qh` the turn and leak charts' reads `q` (`0..C`) and `ℓ` (`C..2C`) on `2^(−16)`, `gam` the gate `γ` (real parts then
-    /// imaginary, `2^(−30)`) and `qm` `Q`'s operand `Q(t ∓ 1)` (the scan's value before the site, real parts then imaginary, `2^(−16)`).
+    /// [definition; theory, November 11 17:25 and November 12 (G98)] The carry circles' operands (empty without them), what the reverse reads
+    /// beside `a`, `b` and `c`, each `[t][2C]`: `qh` the turn and leak charts' reads `q` (`0..C`) and `ℓ` (`C..2C`) on `2^(−16)`, `gam` the gate
+    /// `γ` (real parts then imaginary, `2^(−30)`), `kb` the drive coupled through the leak, `κ b` ([`carry_coupling`], real parts then imaginary,
+    /// `2^(−16)`), the scan's operand, and `qm` `Q`'s operand `Q(t ∓ 1)` (the scan's value before the site, real parts then imaginary, `2^(−16)`).
     qh: Vec<i64>,
     gam: Vec<i64>,
+    kb: Vec<i64>,
     qm: Vec<i64>,
 }
 
@@ -1674,6 +1685,32 @@ pub const CARRY_LEAK_FOUNDING: i32 = ((1usize << FACE_BITS) / (NEAR - 2)) as i32
 // The leak's return forms `δd ln 2 · d₀ · v` with `v` released to 47 bits: under `2^65 · 2^14 · 2^47 = 2^126` while `d₀` stays within `2^14`.
 const _: () = assert!(CARRY_LEAK_FOUNDING <= 1 << 14 && CARRY_LEAK_FOUNDING > 0);
 
+/// [definition; theory, November 12, G98; `CarryGate.lean`, `coupling_leak_zero`] **A circle's founded group** `N₀ = (1 + d₀)/d₀ = NEAR − 1`
+/// places: the charge a circle founded at `d₀` holds under a constant drive, and the level its drive charges it toward at every friction
+/// ([`carry_coupling`]).
+pub const CARRY_GROUP_FOUNDING: i32 = (NEAR - 1) as i32;
+
+// `N₀ d₀ = 1 + d₀` on the face's grain, so the coupling is one at the founding and a founded circle's forward is the sum form's bit for bit.
+const _: () = assert!((1i64 << FACE_BITS) + CARRY_LEAK_FOUNDING as i64 == CARRY_GROUP_FOUNDING as i64 * CARRY_LEAK_FOUNDING as i64);
+
+/// [definition; theory, November 12, G98 (G97 (f)'s carrier); `CarryGate.lean`, `coupling`, `charge_step_le`, `charge_le`] **The drive is charged
+/// through the leak**: a circle's charge is `Q(t) = γ(t) Qm(t) + κ(t) b(t)` with the coupling `κ = N₀ d/(1 + d)` ([`CARRY_GROUP_FOUNDING`]), the
+/// friction `d` the gate's ([`carry_friction`]), on `2^(−30)` from `d` on `2^(−16)` by one division to the nearest:
+/// `κ = (N₀ d) 2^30 / (2^16 + d)`, under `N₀ 2^30`. Why: `|γ| + κ/N₀ = 1/(1 + d) + d/(1 + d) = 1`, so the move is the implicit step of a
+/// dissipation that relaxes the turned charge toward the level `N₀ b` (a capacitor charged through the resistor it leaks by), never toward zero
+/// with the drive added on top; the charge is a turned mean of `N₀ b` and stays within `N₀ max |b|` at every friction and every run of sites
+/// (`charge_le`), where the sum form's grew with its group, to `2^16 + 1` places at the friction's floor (G97 scored: at the six bursts a
+/// circle's largest charge stood at 2.6 to 20 times the median section's, at the refused section 54 times). At the founding `κ = 2^30` (`N₀ d₀ = 1 + d₀`), so `release(κ b, 30) = b`: a founded circle is the sum form's bit
+/// for bit, and `C = 0` is the plain line's.
+fn carry_coupling(d: i128) -> i128 {
+    div_nearest((i128::from(CARRY_GROUP_FOUNDING) * d) << GAMMA_BITS, (1i128 << FACE_BITS) + d)
+}
+
+/// The drive coupled through the leak, `release(κ b, 30)` ([`carry_coupling`]), refused past 64 bits.
+fn carry_drive(kappa: i128, b: i64) -> Result<i64> {
+    fit64(release(kappa * i128::from(b), GAMMA_BITS))
+}
+
 /// [definition; theory, November 12, G96's third branch; `CarryGate.lean`, `leak`] **The leak's log chart**: from `ℓ` on `2^(−16)` (a site's leak
 /// read), the friction `d = d₀ 2^ℓ` on `2^(−16)`, `d₀` the founded friction ([`CARRY_LEAK_FOUNDING`]). `2^ℓ` is read through the field's exponential
 /// navigator as [`Field::face`] reads a score's term, `2^ℓ = v 2^(a − 61)` with `a = ⌊ℓ⌋` and `v` in `[2^61, 2^62)`, and the friction is that face
@@ -1723,30 +1760,43 @@ fn carry_gate(exponential: &Exponential, q: i128, l: i128) -> Result<((i64, i64)
     Ok(((fit64(re)?, fit64(im)?), d))
 }
 
-/// [definition; theory, November 11 17:25 and November 12 (G96's third branch); `CarryGate.lean`, `carryTurn_re_hasDerivAt`,
-/// `carryTurn_im_hasDerivAt`, `friction_hasDerivAt`, `leak_hasDerivAt`] **The gate's covectors**: from `δγ` (on its covector's grain, each part
-/// within 64 bits as the scan's reverse writes it) and the producing `γ`, `q`, `ℓ`: `im = Im(conj(γ) δγ)` and `re = Re(conj(γ) δγ)`, each one
-/// release from `2^(−30)` to `δγ`'s grain; `δq = (4/(4 + q²)) im = im 2^34 / (2^34 + q²)` and `δd = −re/(1 + d) = −re 2^16 / (2^16 + d)` at the
-/// friction the forward applied, each one division to the nearest; then `δℓ = ln 2 · d₀ 2^ℓ · δd`, the leak chart's derivative at the producing
-/// `ℓ` read at the chart's face ([`carry_friction`]'s `(a, v)`, `v` released to 47 bits): `release(release(δd ln 2, 30) · d₀ · release(v, 15),
-/// 62 − a)`, which stands at every read (where the friction keeps its floor of one grain it is the chart's own, `2^ℓ` smaller). Why:
-/// `∂γ/∂q = i γ 4/(4 + q²)`, `∂γ/∂d = −γ/(1 + d)` and `∂d/∂ℓ = ln 2 · d`, so `δq = Re(conj(δγ) ∂γ/∂q) = (4/(4 + q²)) Im(conj(γ) δγ)` and
-/// `δℓ = ln 2 · d · δd` with `δd = −Re(conj(γ) δγ)/(1 + d)`.
-fn carry_gate_return(exponential: &Exponential, gamma: (i64, i64), dgamma: (i64, i64), q: i128, l: i128) -> Result<(i64, i64)> {
+/// [definition; theory, November 11 17:25 and November 12 (G96's third branch, G98); `CarryGate.lean`, `carryTurn_re_hasDerivAt`,
+/// `carryTurn_im_hasDerivAt`, `friction_hasDerivAt`, `leak_hasDerivAt`, `coupling_hasDerivAt`] **The gate's and the coupling's covectors**:
+/// from `δγ` (on its covector's grain, each part within 64 bits as the scan's reverse writes it), the covector `u` of the circle's charge at the
+/// site (`δQ(t)`, on the same grain), the drive `b` the pair's affine produced (before its coupling) and the producing `γ`, `q`, `ℓ`:
+/// `im = Im(conj(γ) δγ)` and `re = Re(conj(γ) δγ)`, each one release from `2^(−30)` to `δγ`'s grain; `δq = (4/(4 + q²)) im = im 2^34 / (2^34 + q²)`;
+/// the friction's two covectors at the friction the forward applied, the gate's `δd = −re/(1 + d) = −re 2^16 / (2^16 + d)` and the coupling's
+/// `δd_κ = N₀ Re(conj(b) u)/(1 + d)² = N₀ w 2^32 / (2^16 + d)²` with `w = Re(conj(b) u)` released from the face's grain to the covector's, each
+/// one division to the nearest (`δd_κ` within 64 bits); then each lifted through the leak chart's derivative at the producing `ℓ`,
+/// `ln 2 · d₀ 2^ℓ · δd` read at the chart's face ([`carry_friction`]'s `(a, v)`, `v` released to 47 bits):
+/// `release(release(δd ln 2, 30) · d₀ · release(v, 15), 62 − a)`, the two added into `δℓ`. Both stand at every read and both read the chart's own
+/// derivative (where the friction keeps its floor of one grain, `2^ℓ` smaller than the floor's). The drive's own covector is `δb = κ u`, each
+/// part `release(κ u, 30)`. Returns `(δq, δℓ)` and `δb`. Why: `∂γ/∂q = i γ 4/(4 + q²)`, `∂γ/∂d = −γ/(1 + d)`, `∂κ/∂d = N₀/(1 + d)²` and
+/// `∂d/∂ℓ = ln 2 · d`, so `δq = Re(conj(δγ) ∂γ/∂q) = (4/(4 + q²)) Im(conj(γ) δγ)`, `δℓ = ln 2 · d · (δd + δd_κ)` with
+/// `δd = −Re(conj(γ) δγ)/(1 + d)` and `δd_κ = Re(conj(u) b) ∂κ/∂d`, and `∂Q/∂b = κ` (real).
+fn carry_gate_return(exponential: &Exponential, gamma: (i64, i64), dgamma: (i64, i64), drive: (i64, i64), du: (i64, i64), q: i128, l: i128) -> Result<((i64, i64), (i64, i64))> {
     let ((yr, yi), (dr, di)) = ((i128::from(gamma.0), i128::from(gamma.1)), (i128::from(dgamma.0), i128::from(dgamma.1)));
     // `|γ| ≤ 2^30` and `δγ` within 64 bits: each product under `2^94`, `im` and `re` under `2^65`, so `im 2^34` and `re 2^16` fit.
     let im = release(yr * di - yi * dr, GAMMA_BITS);
     let re = release(yr * dr + yi * di, GAMMA_BITS);
     let dq = div_nearest(im << 34, (1i128 << 34) + q * q);
     let (d, whole, v) = carry_friction(exponential, l)?;
-    let dd = -div_nearest(re << 16, (1i128 << 16) + d);
-    // `|δd| ≤ |re| < 2^65` and `ln 2 < 2^30`, so `δd ln 2 < 2^65`; `d₀ ≤ 2^14`; and `v` on `2^(−62)` released 15 bits, to under `2^47`
-    // (`2^ℓ = v′ 2^(a − 46)`): the product stays under `2^126`. A shift past 126 leaves nothing (`a` far below zero, where the chart's
-    // derivative is under one grain of the covector).
-    let lift = release(dd * ln2_face(), LN2_FACE_BITS) * i128::from(CARRY_LEAK_FOUNDING) * release(v as i128, 15);
+    let one = (1i128 << FACE_BITS) + d;
+    let dd = -div_nearest(re << 16, one);
+    // `w` within 64 bits, so `N₀ w 2^32` stays under `2^99`, and `(2^16 + d)² < 2^95`.
+    let w = fit64(release(i128::from(drive.0) * i128::from(du.0) + i128::from(drive.1) * i128::from(du.1), FACE_BITS))?;
+    let ddk = fit64(div_nearest((i128::from(CARRY_GROUP_FOUNDING) * i128::from(w)) << (2 * FACE_BITS), one * one))?;
+    // `|δd| ≤ |re| < 2^65` (and `δd_κ` within 64 bits) and `ln 2 < 2^30`, so `δd ln 2 < 2^95`, released to under `2^65`; `d₀ ≤ 2^14`; and `v` on
+    // `2^(−62)` released 15 bits, to under `2^47` (`2^ℓ = v′ 2^(a − 46)`): the product stays under `2^126`. A shift past 126 leaves nothing (`a`
+    // far below zero, where the chart's derivative is under one grain of the covector).
     let shift = 62 - whole;
-    let dl = if shift > 126 { 0 } else { release(lift, shift as u32) };
-    Ok((fit64(dq)?, fit64(dl)?))
+    let lift = |x: i128| -> i128 {
+        let product = release(x * ln2_face(), LN2_FACE_BITS) * i128::from(CARRY_LEAK_FOUNDING) * release(v as i128, 15);
+        if shift > 126 { 0 } else { release(product, shift as u32) }
+    };
+    let dl = lift(dd) + lift(i128::from(ddk));
+    let kappa = carry_coupling(d);
+    Ok(((fit64(dq)?, fit64(dl)?), (carry_drive(kappa, du.0)?, carry_drive(kappa, du.1)?)))
 }
 
 struct Reaches {
@@ -2660,25 +2710,30 @@ impl Field {
                 cell.c[t * f + half + e] = fit64(release(ar * bi + ai * br, FACE_BITS))?;
             }
         }
-        // [definition; theory, November 11 17:25 and November 12] **The carry circles' scan** ([`FieldDeclaration::carry`]): at each site the
-        // circles' charts `q = Q r̂ + q_b`, `ℓ = L r̂ + ℓ_b` (one affine, at the grains `a` and `b` are read at) and the gate `γ = γ̂(q)/(1 + d₀ 2^ℓ)`
-        // ([`carry_gate`]); then along the strand, one release a step in strand order (never a parallel prefix, which would reorder the
-        // releases): circle `k` is contact `e = f/2 − C + k`, even `e` from the left and odd from the right, `p(t) = a(t) Qm(t)` released at the
-        // face's grain and `Q(t) = b(t) + release(γ(t) Qm(t), 30)` with `Qm(t) = Q(t ∓ 1)`, `Q` zero before the region's first site (past its last,
-        // for odd `e`).
+        // [definition; theory, November 11 17:25 and November 12 (G98)] **The carry circles' scan** ([`FieldDeclaration::carry`]): at each site
+        // the circles' charts `q = Q r̂ + q_b`, `ℓ = L r̂ + ℓ_b` (one affine, at the grains `a` and `b` are read at), the gate
+        // `γ = γ̂(q)/(1 + d₀ 2^ℓ)` ([`carry_gate`]) and the drive coupled through the same leak, `κ b` with `κ = N₀ d/(1 + d)` ([`carry_coupling`]);
+        // then along the strand, one release a step in strand order (never a parallel prefix, which would reorder the releases): circle `k` is
+        // contact `e = f/2 − C + k`, even `e` from the left and odd from the right, `p(t) = a(t) Qm(t)` released at the face's grain and
+        // `Q(t) = κ(t) b(t) + release(γ(t) Qm(t), 30)` with `Qm(t) = Q(t ∓ 1)`, `Q` zero before the region's first site (past its last, for odd
+        // `e`).
         let circles = d.carry;
         if circles > 0 {
             let c2 = 2 * circles;
             cell.qh = vec![0i64; sites * c2];
             cell.gam = vec![0i64; sites * c2];
+            cell.kb = vec![0i64; sites * c2];
             cell.qm = vec![0i64; sites * c2];
             for t in 0..sites {
                 let rt = &cell.read2[t * dw..(t + 1) * dw];
                 affine(&self.theta[l.carry..l.carry + c2 * dw], reaches.carry, dw, rt, Some(&self.theta[l.carry_bias..l.carry_bias + c2]), MATERIAL_BITS, MATERIAL_BITS, &mut cell.qh[t * c2..(t + 1) * c2])?;
                 for k in 0..circles {
-                    let ((yr, yi), _) = carry_gate(&self.exponential, cell.qh[t * c2 + k] as i128, cell.qh[t * c2 + circles + k] as i128)?;
+                    let ((yr, yi), friction) = carry_gate(&self.exponential, cell.qh[t * c2 + k] as i128, cell.qh[t * c2 + circles + k] as i128)?;
                     cell.gam[t * c2 + k] = yr;
                     cell.gam[t * c2 + circles + k] = yi;
+                    let (kappa, e) = (carry_coupling(friction), plain + k);
+                    cell.kb[t * c2 + k] = carry_drive(kappa, cell.b[t * f + e])?;
+                    cell.kb[t * c2 + circles + k] = carry_drive(kappa, cell.b[t * f + half + e])?;
                 }
             }
             for k in 0..circles {
@@ -2692,8 +2747,8 @@ impl Field {
                     cell.c[t * f + e] = fit64(release(ar * qr - ai * qi, FACE_BITS))?;
                     cell.c[t * f + half + e] = fit64(release(ar * qi + ai * qr, FACE_BITS))?;
                     let (yr, yi) = (i128::from(cell.gam[t * c2 + k]), i128::from(cell.gam[t * c2 + circles + k]));
-                    let next_r = cell.b[t * f + e] as i128 + release(yr * qr - yi * qi, GAMMA_BITS);
-                    let next_i = cell.b[t * f + half + e] as i128 + release(yr * qi + yi * qr, GAMMA_BITS);
+                    let next_r = cell.kb[t * c2 + k] as i128 + release(yr * qr - yi * qi, GAMMA_BITS);
+                    let next_i = cell.kb[t * c2 + circles + k] as i128 + release(yr * qi + yi * qr, GAMMA_BITS);
                     (qr, qi) = (i128::from(fit64(next_r)?), i128::from(fit64(next_i)?));
                 }
             }
@@ -3134,11 +3189,11 @@ impl Field {
                 db[s * f + half + e] = fit64(release(ar * gi - ai * gr, FACE_BITS))?;
             }
         }
-        // [definition; theory, November 11 17:25] **The carry circles' reverse**, with the producing operands (`a`, `b`, `γ`, `q`, `ℓ` and `Q`'s
-        // operand `Qm(t) = Q(t ∓ 1)` of the forward), each circle in the opposite strand order, one release a step. With `X(t)` the covector of
-        // `Qm(t)` and `u` the covector of `Q(t)` (`X(t ± 1)`, the next site of the reverse): `δa(t) = conj(Qm(t)) δp(t)`, `δb(t) = u`,
-        // `δγ(t) = conj(Qm(t)) u` released at the face's grain, `X(t) = conj(a(t)) δp(t) + conj(γ(t)) u`; then off the chain the gate's covectors
-        // `δq` and `δℓ` ([`carry_gate_return`]).
+        // [definition; theory, November 11 17:25 and November 12 (G98)] **The carry circles' reverse**, with the producing operands (`a`, `b`,
+        // `γ`, `q`, `ℓ` and `Q`'s operand `Qm(t) = Q(t ∓ 1)` of the forward), each circle in the opposite strand order, one release a step. With
+        // `X(t)` the covector of `Qm(t)` and `u` the covector of `Q(t)` (`X(t ± 1)`, the next site of the reverse): `δa(t) = conj(Qm(t)) δp(t)`,
+        // `δγ(t) = conj(Qm(t)) u` released at the face's grain, `X(t) = conj(a(t)) δp(t) + conj(γ(t)) u`; then off the chain the gate's and the
+        // coupling's covectors `δq`, `δℓ` and the drive's `δb(t) = κ(t) u` ([`carry_gate_return`]).
         let mut dqh = vec![0i64; sites * c2];
         for k in 0..circles {
             let e = plain + k;
@@ -3150,14 +3205,16 @@ impl Field {
                 let (qr, qi) = (cell.qm[t * c2 + k] as i128, cell.qm[t * c2 + circles + k] as i128);
                 let (yr, yi) = (cell.gam[t * c2 + k] as i128, cell.gam[t * c2 + circles + k] as i128);
                 let (ur, ui) = (xr, xi);
-                db[t * f + e] = fit64(ur)?;
-                db[t * f + half + e] = fit64(ui)?;
+                let du = (fit64(ur)?, fit64(ui)?);
                 da[t * f + e] = fit64(release(qr * gr + qi * gi, FACE_BITS))?;
                 da[t * f + half + e] = fit64(release(qr * gi - qi * gr, FACE_BITS))?;
                 let dgamma = (fit64(release(qr * ur + qi * ui, FACE_BITS))?, fit64(release(qr * ui - qi * ur, FACE_BITS))?);
                 xr = i128::from(fit64(release(ar * gr + ai * gi, FACE_BITS) + release(yr * ur + yi * ui, GAMMA_BITS))?);
                 xi = i128::from(fit64(release(ar * gi - ai * gr, FACE_BITS) + release(yr * ui - yi * ur, GAMMA_BITS))?);
-                let (dq, dl) = carry_gate_return(&self.exponential, (cell.gam[t * c2 + k], cell.gam[t * c2 + circles + k]), dgamma, cell.qh[t * c2 + k] as i128, cell.qh[t * c2 + circles + k] as i128)?;
+                let drive = (cell.b[t * f + e], cell.b[t * f + half + e]);
+                let ((dq, dl), (dbr, dbi)) = carry_gate_return(&self.exponential, (cell.gam[t * c2 + k], cell.gam[t * c2 + circles + k]), dgamma, drive, du, cell.qh[t * c2 + k] as i128, cell.qh[t * c2 + circles + k] as i128)?;
+                db[t * f + e] = dbr;
+                db[t * f + half + e] = dbi;
                 dqh[t * c2 + k] = dq;
                 dqh[t * c2 + circles + k] = dl;
             }
@@ -4937,8 +4994,8 @@ impl Field {
     /// the rows in order, as the contacts' drives are drawn), so `q` opens at unit power and a site's turn is a phase of about a radian set by its
     /// own read; the leak rows `L` and both biases `q_b`, `ℓ_b` at zero, so the leak's log chart reads `ℓ = 0` and `d = d₀ = 1/4` at every site
     /// ([`carry_friction`], [`CARRY_LEAK_FOUNDING`]) and each circle is founded as a turn with the near field's friction, `|γ| = 4/5`, a group of
-    /// `NEAR − 1` places (founded at `d = 0` the group was unbounded and the first carry lap was refused, [`FieldDeclaration::carry`]): the
-    /// chart's zero is the founded friction. Every sum the forward forms into the face is
+    /// `NEAR − 1` places (founded at `d = 0` the group was unbounded and the first carry lap was refused, [`FieldDeclaration::carry`]), its drive
+    /// coupled at one ([`carry_coupling`]): the chart's zero is the founded friction. Every sum the forward forms into the face is
     /// then the old sum (the circles' `W` columns are zero), so every face is kept bit for bit; the circles' return has a covector from the
     /// first section on.
     ///
@@ -5172,11 +5229,12 @@ impl Field {
     /// [measurement; theory, November 12, G90's first branch] **The carry circles' leaks and charges over a read pair chart**
     /// (`TickRead::pair_read`, `[t][D]`), from the forward's own arithmetic on the chart the realization read: at every site and carry circle
     /// the leak read `ℓ = L r̂ + ℓ_b` on `2^(−16)` (the `ℓ` of [`carry_gate`]), and the circle's charge after the site, `|Q(t)|` on `2^(−16)`
-    /// (the floor of the square root of `Q_re² + Q_im²`), the scan run as the forward runs it ([`FieldDeclaration::carry`]): `Q(t) = b(t) +
-    /// release(γ(t) Q(t ∓ 1), 30)`, `Q` zero before the region's first site, even contacts from the left and odd from the right. Each `[t][C]`.
-    /// Where `ℓ < 0` the friction stands below its founding (`d = d₀ 2^ℓ < d₀`), so a run of such sites along the strand carries `b` further than
-    /// the near field; deep below (`ℓ < −14`) the friction holds its floor of one grain, a circle's longest reach. A reading; a sum
-    /// past its carrier is refused as the forward refuses it.
+    /// (the floor of the square root of `Q_re² + Q_im²`), the scan run as the forward runs it ([`FieldDeclaration::carry`]): `Q(t) = κ(t) b(t) +
+    /// release(γ(t) Q(t ∓ 1), 30)` with the drive coupled through the leak ([`carry_coupling`]), `Q` zero before the region's first site, even
+    /// contacts from the left and odd from the right. Each `[t][C]`. Where `ℓ < 0` the friction stands below its founding (`d = d₀ 2^ℓ < d₀`), so
+    /// a run of such sites along the strand carries the charge further than the near field, and its drive is admitted by as much less (the
+    /// charge stays within `N₀` places' drive); deep below (`ℓ < −14`) the friction holds its floor of one grain, a circle's longest reach. A
+    /// reading; a sum past its carrier is refused as the forward refuses it.
     pub fn carry_leaks(&self, pair_read: &[i32]) -> Result<(Vec<i64>, Vec<u64>)> {
         let d = &self.declaration;
         if d.carry == 0 {
@@ -5194,8 +5252,12 @@ impl Field {
             affine(&self.theta[l.carry..l.carry + c2 * dw], reaches.carry, dw, rt, Some(&self.theta[l.carry_bias..l.carry_bias + c2]), MATERIAL_BITS, MATERIAL_BITS, &mut qh)?;
             affine(&self.theta[l.b..l.b + f * dw], reaches.b, dw, rt, Some(&self.theta[l.b_bias..l.b_bias + f]), MATERIAL_BITS, MATERIAL_BITS, &mut b[t * f..(t + 1) * f])?;
             for k in 0..circles {
-                gam[t * circles + k] = carry_gate(&self.exponential, qh[k] as i128, qh[circles + k] as i128)?.0;
+                let (gate, friction) = carry_gate(&self.exponential, qh[k] as i128, qh[circles + k] as i128)?;
+                gam[t * circles + k] = gate;
                 leak.push(qh[circles + k]);
+                let (kappa, e) = (carry_coupling(friction), plain + k);
+                b[t * f + e] = carry_drive(kappa, b[t * f + e])?;
+                b[t * f + half + e] = carry_drive(kappa, b[t * f + half + e])?;
             }
         }
         let mut charge = vec![0u64; sites * circles];

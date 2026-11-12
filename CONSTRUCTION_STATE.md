@@ -32,7 +32,7 @@ repository was reset on September 24; the pre-reset tree is
   chart.
 - **The carry circles** (the state head `hnn-field-v14e`, `C` its thirteenth word; atlas
   `contact.carry-gate-turn-and-friction`). The last `C` of the `f/2` complex contacts carry the move
-  `z → γ(t) z + b(t)` along the strand inside one tick, each on a circle of its own, and the pair's
+  `z → γ(t) z + κ(t) b(t)` along the strand inside one tick, each on a circle of its own, and the pair's
   return reads the scan where it reads the contact; the reverse returns through the producing
   operands. The gate is a turn and a friction charted apart, `γ = γ̂(q)/(1 + d)`: the turn a Cayley
   step that keeps the circle, the friction on the leak's log chart `d = d₀ 2^ℓ` with
@@ -43,8 +43,15 @@ repository was reset on September 24; the pre-reset tree is
   its 128-bit carrier, G83) and the leak's linear chart `d = max(0, h)` (`hnn-field-v14t`), which at
   eight times the base rate became a switch, 0.685 of tp4's reads at a friction of one or more and
   0.104 with none and no covector, before tp5 was refused at its section 1,501 of 1,535 (G90, G96).
-  The log chart is the third attempt (G98): written, and owed its gates and its first lap. With
-  `C = 0` the field is the plain line bit for bit.
+  The drive is charged through the same friction, `κ = 5d/(1 + d)` (atlas
+  `contact.carry-coupling-through-the-leak`): the move is the implicit step of a dissipation that
+  relaxes the turned charge toward five places' drive, so the friction sets how far back a circle
+  hears and never its level, and a circle's charge stays within `5 max |b|` at every friction. The
+  sum form held `(1 + d)/d` places' drive, and tp5's bursts were its carried charge's (G97 scored:
+  a circle's largest charge at 2.6 to 20 times the median section's). Founded, `κ = 1`, the sum
+  form's bit for bit. The log chart and the coupling are the third attempt (G98): the log chart's
+  host gates and Lean passed on the PC; the coupling is written, and both are owed the card suite,
+  parity and their first lap. With `C = 0` the field is the plain line bit for bit.
 - **The learner** (`FieldLearner`; the trainer is
   `crates/holonics/examples/solenoidal_alpha/complete_language/field_train.rs`). The comparison is
   completion read as a joint code: a region is drawn as a state of open places among the answer's,

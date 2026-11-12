@@ -4,8 +4,9 @@ import Mathlib
 # HNN.CarryGate: the carry's gate is a turn and a friction, charted apart
 
 [definition] The carry along the strand (`contact.carried-product`, `Field`'s scan in
-`crates/holonics/src/hnn/tower/field.rs`) composes the move `z ↦ γ(t) z + b(t)` inside one tick.
-Its gate is charted as a turn and a friction apart, the friction on the leak's log chart:
+`crates/holonics/src/hnn/tower/field.rs`) composes the move `z ↦ γ(t) z + κ(t) b(t)` inside one
+tick. Its gate is charted as a turn and a friction apart, the friction on the leak's log chart, and
+the drive is admitted through the same friction (`κ`, below):
 
 ```text
 γ(q, d) = γ̂(q) / (1 + d),   γ̂(q) = ((4 − q²) + 4 i q) / (4 + q²),   d = leak ℓ = 2^ℓ / 4 > 0
@@ -48,6 +49,17 @@ carry lap was refused, G83); on the linear chart `d = max(0, h)` the friction sw
 7. **The gate's sensitivity to the chart is bounded** (`leak_sensitivity_le`):
    `d/(1 + d)² ≤ 1/4`, so per unit covector the gate's modulus `1/(1 + d)` moves with `ℓ` by at
    most `ln 2/4`.
+8. **The drive is charged through the leak** (`coupling`, `coupling_leak_zero`, `coupling_eq`,
+   `gate_and_coupling`, `coupling_nonneg`, `coupling_steady`; November 12, G98): the coupling
+   `κ(d) = 5 d/(1 + d)` is one at the founding, `1/(1 + d) + κ/5 = 1`, and a constant drive's
+   level is `5 b` at every friction: the friction moves how far back the charge reaches, never its
+   level.
+9. **The charge stays within five places' drive** (`charge_step_le`, `charge`, `charge_le`):
+   `‖Q n‖ ≤ 5 max ‖b‖` at every site, whatever the turns and however long a run of low friction,
+   where the sum form's charge grew with its group.
+10. **The coupling's derivatives** (`coupling_hasDerivAt`, `coupling_leak_hasDerivAt`):
+   `∂κ/∂d = 5/(1 + d)²`, and on the leak's chart `∂κ/∂ℓ = ln 2 · κ/(1 + d)`, the second part of
+   the leak's covector beside the gate's.
 
 The host's adjoint probes check the realization's integers.
 -/
@@ -206,5 +218,134 @@ theorem group_le_of_grain (g d : ℝ) (hg : 0 < g) (hd : g ≤ d) : (1 + d) / d 
 theorem leak_sensitivity_le (d : ℝ) (hd : 0 ≤ d) : d / (1 + d) ^ 2 ≤ 1 / 4 := by
   rw [div_le_iff₀ (by positivity)]
   nlinarith [sq_nonneg (1 - d)]
+
+/-! ## The drive charged through the leak (G98)
+
+[definition] The scan's move is `z ↦ γ(q, d) z + κ(d) b`, the drive `b` admitted through the
+friction it leaks by: `κ(d) = 5 d/(1 + d)`, `5 = (1 + d₀)/d₀` the founded group. So the move keeps
+`1/(1 + d)` of the turned charge and admits `d/(1 + d)` of the level `5 b`: it is the implicit
+step of a dissipation relaxing toward `5 b` (a capacitor charged through its resistor), and the
+charge is a turned mean of `5 b`, within `5 max |b|` at every friction. The sum form `z ↦ γ z + b`
+held `(1 + d)/d` places' drive instead (G97 scored: at the six bursts a circle's largest charge
+stood at 2.6 to 20 times the median section's, at the refused section 54 times). -/
+
+/-- [definition] **The drive's coupling through the leak** `κ(d) = 5 d/(1 + d)`. -/
+noncomputable def coupling (d : ℝ) : ℝ := 5 * d / (1 + d)
+
+/-- [proved-derived; formal-checked] **Founded, the coupling is one** (`κ(1/4) = 1`), so a founded
+circle's move is the sum form's. -/
+theorem coupling_leak_zero : coupling (leak 0) = 1 := by
+  rw [coupling, leak_zero]
+  norm_num
+
+/-- [proved-derived; formal-checked] **The coupling is what the move does not keep, five times**:
+`κ(d) = 5 (1 − 1/(1 + d))` for `d ≥ 0`. -/
+theorem coupling_eq (d : ℝ) (hd : 0 ≤ d) : coupling d = (1 - 1 / (1 + d)) * 5 := by
+  have h1 : (1 + d : ℝ) ≠ 0 := ne_of_gt (by linarith)
+  have e1 : 5 * d / (1 + d) * (1 + d) = 5 * d := div_mul_cancel₀ _ h1
+  have e2 : 1 / (1 + d) * (1 + d) = 1 := one_div_mul_cancel h1
+  apply mul_right_cancel₀ h1
+  unfold coupling
+  linear_combination e1 + 5 * e2
+
+/-- [proved-derived; formal-checked] **What the move keeps and what it admits sum to one**:
+`1/(1 + d) + κ(d)/5 = 1`. -/
+theorem gate_and_coupling (d : ℝ) (hd : 0 ≤ d) : 1 / (1 + d) + coupling d / 5 = 1 := by
+  rw [coupling_eq d hd]
+  ring
+
+/-- [proved-derived; formal-checked] **The coupling is never negative**. -/
+theorem coupling_nonneg (d : ℝ) (hd : 0 ≤ d) : 0 ≤ coupling d := by
+  unfold coupling
+  positivity
+
+/-- [proved-derived; formal-checked] **The driven level is the founded group's at every
+friction**: a constant drive's fixed point `κ b/(1 − 1/(1 + d))` is `5 b`, since
+`κ(d) (1 + d)/d = 5` for `d > 0`. -/
+theorem coupling_steady (d : ℝ) (hd : 0 < d) : coupling d * ((1 + d) / d) = 5 := by
+  have h0 : d ≠ 0 := hd.ne'
+  have h1 : (1 + d : ℝ) ≠ 0 := ne_of_gt (by linarith)
+  have e1 : d * d⁻¹ = 1 := mul_inv_cancel₀ h0
+  have e2 : (1 + d) * (1 + d)⁻¹ = 1 := mul_inv_cancel₀ h1
+  unfold coupling
+  linear_combination (5 * (d * d⁻¹)) * e2 + 5 * e1
+
+/-- [proved-derived; formal-checked] **One step keeps the charge within the level**: if
+`‖z‖ ≤ M` and `5 ‖b‖ ≤ M`, then `‖γ(q, d) z + κ(d) b‖ ≤ M` for every turn `q` and friction
+`d ≥ 0`. -/
+theorem charge_step_le (q d M : ℝ) (z b : ℂ) (hd : 0 ≤ d) (hz : ‖z‖ ≤ M) (hb : 5 * ‖b‖ ≤ M) :
+    ‖carryGate q d * z + (coupling d : ℂ) * b‖ ≤ M := by
+  have h1 : (0 : ℝ) < 1 + d := by linarith
+  have hg0 : (0 : ℝ) < 1 / (1 + d) := by positivity
+  have hg1 : 1 / (1 + d) ≤ 1 := by
+    rw [div_le_one h1]
+    linarith
+  have hg : ‖carryGate q d‖ ≤ 1 / (1 + d) := by
+    have hsq := carryGate_normSq q d hd
+    rw [Complex.normSq_eq_norm_sq] at hsq
+    have hn := norm_nonneg (carryGate q d)
+    have h2 : ‖carryGate q d‖ ^ 2 = (1 / (1 + d)) ^ 2 := by
+      rw [hsq, div_pow, one_pow]
+    nlinarith
+  have hk : ‖(coupling d : ℂ)‖ = coupling d := by
+    rw [Complex.norm_real, Real.norm_of_nonneg (coupling_nonneg d hd)]
+  have hstep : ‖carryGate q d * z + (coupling d : ℂ) * b‖ ≤
+      ‖carryGate q d‖ * ‖z‖ + coupling d * ‖b‖ := by
+    calc ‖carryGate q d * z + (coupling d : ℂ) * b‖
+        ≤ ‖carryGate q d * z‖ + ‖(coupling d : ℂ) * b‖ := norm_add_le _ _
+      _ = ‖carryGate q d‖ * ‖z‖ + coupling d * ‖b‖ := by rw [norm_mul, norm_mul, hk]
+  have ha : ‖carryGate q d‖ * ‖z‖ ≤ 1 / (1 + d) * M :=
+    (mul_le_mul_of_nonneg_right hg (norm_nonneg z)).trans
+      (mul_le_mul_of_nonneg_left hz hg0.le)
+  have hc : coupling d * ‖b‖ ≤ (1 - 1 / (1 + d)) * M := by
+    rw [coupling_eq d hd, mul_assoc]
+    exact mul_le_mul_of_nonneg_left hb (by linarith)
+  linarith
+
+/-- [definition] **A circle's charge along its strand**: `Q 0 = 0` and
+`Q (n + 1) = γ(q n, d n) Q n + κ(d n) b n`. -/
+noncomputable def charge (q d : ℕ → ℝ) (b : ℕ → ℂ) : ℕ → ℂ
+  | 0 => 0
+  | n + 1 => carryGate (q n) (d n) * charge q d b n + (coupling (d n) : ℂ) * b n
+
+/-- [proved-derived; formal-checked] **The charge stays within five places' drive**: with every
+friction `d n ≥ 0` and every drive `‖b n‖ ≤ B`, `‖Q n‖ ≤ 5 B` at every site, whatever the turns
+and however long a run of low friction. -/
+theorem charge_le (q d : ℕ → ℝ) (b : ℕ → ℂ) (B : ℝ) (hd : ∀ n, 0 ≤ d n) (hb : ∀ n, ‖b n‖ ≤ B)
+    (hB : 0 ≤ B) : ∀ n, ‖charge q d b n‖ ≤ 5 * B := by
+  intro n
+  induction n with
+  | zero =>
+    simp only [charge, norm_zero]
+    linarith
+  | succ n ih =>
+    simp only [charge]
+    exact charge_step_le (q n) (d n) (5 * B) (charge q d b n) (b n) (hd n) ih
+      (by linarith [hb n])
+
+/-- [proved-derived; formal-checked] **The coupling moves with the friction as `5/(1 + d)²`**. -/
+theorem coupling_hasDerivAt (d : ℝ) (hd : 1 + d ≠ 0) :
+    HasDerivAt coupling (5 / (1 + d) ^ 2) d := by
+  have hn : HasDerivAt (fun x : ℝ => 5 * x) 5 d := by
+    simpa using (hasDerivAt_id d).const_mul (5 : ℝ)
+  have hden : HasDerivAt (fun x : ℝ => 1 + x) 1 d := by
+    simpa using (hasDerivAt_id d).const_add (1 : ℝ)
+  have h : HasDerivAt (fun x : ℝ => 5 * x / (1 + x)) ((5 * (1 + d) - 5 * d * 1) / (1 + d) ^ 2) d :=
+    hn.div hden hd
+  refine h.congr_deriv ?_
+  ring
+
+/-- [proved-derived; formal-checked] **On the leak's chart the coupling moves as
+`ln 2 · κ/(1 + d)`**: `∂κ(d₀ 2^ℓ)/∂ℓ = ln 2 · κ/(1 + d)`, the covector the return adds to `δℓ`
+beside the gate's. -/
+theorem coupling_leak_hasDerivAt (l : ℝ) :
+    HasDerivAt (fun x => coupling (leak x)) (Real.log 2 * coupling (leak l) / (1 + leak l)) l := by
+  have h1 := leak_hasDerivAt l
+  have hne : (1 + leak l : ℝ) ≠ 0 := ne_of_gt (by linarith [leak_pos l])
+  have h := (h1.const_mul (5 : ℝ)).div (h1.const_add (1 : ℝ)) hne
+  refine h.congr_deriv ?_
+  unfold coupling
+  field_simp
+  ring
 
 end Holonics.HNN.CarryGate

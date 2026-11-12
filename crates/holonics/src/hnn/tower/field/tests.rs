@@ -2382,7 +2382,8 @@ fn the_gates_return_reads_the_leak_charts_derivative() {
     for l in [-(20i128 << 16), -(16 << 16), -(8 << 16), -(3 << 16) - 4_321, -1, 0, 1, 12_345, 1 << 16, (5 << 16) + 777, 20 << 16] {
         let q = 3 << 15;
         let (gamma, d) = carry_gate(&exp, q, l).unwrap();
-        let (_, dl) = carry_gate_return(&exp, gamma, dgamma, q, l).unwrap();
+        let ((_, dl), db) = carry_gate_return(&exp, gamma, dgamma, (0, 0), (0, 0), q, l).unwrap();
+        assert_eq!(db, (0, 0), "ℓ {l}: no charge's covector, no drive's");
         let (yr, yi, dr, di) = (i128::from(gamma.0), i128::from(gamma.1), i128::from(dgamma.0), i128::from(dgamma.1));
         let re = release(yr * dr + yi * di, GAMMA_BITS);
         let dd = -div_nearest(re << 16, (1i128 << 16) + d);
@@ -2393,6 +2394,87 @@ fn the_gates_return_reads_the_leak_charts_derivative() {
             assert!((i128::from(dl) - at_word).abs() <= at_word.abs() / 1024 + 1, "ℓ {l}: δℓ {dl} against ln 2 · d · δd {at_word}");
         } else if l < -(14 << 16) {
             assert!(i128::from(dl).abs() < at_word.abs(), "ℓ {l}: below the floor the chart's own derivative, under the floor's");
+        }
+    }
+}
+
+/// [definition; theory, November 12, G98; `CarryGate.lean`, `coupling_leak_zero`, `gate_and_coupling`, `charge_le`, `coupling_hasDerivAt`]
+/// **The drive is charged through the leak**: the coupling `κ = N₀ d/(1 + d)` is `2^30` at the founded friction, so there the coupled drive is
+/// the drive bit for bit and the coupled scan is the sum form's; `κ` is monotone in the friction and under `N₀`, and with the gate `|γ| + κ/N₀`
+/// is one within two grains; along a strand of the reach's sites under a constant drive (a turn of zero and of one), the coupled charge stays
+/// within `N₀` places' drive and a grain a place of the circle's group, at the friction's floor, its founding and far above it, where the sum
+/// form's charge at the floor passes 3,000 places' drive. With no `δγ` the gate's return carries the coupling alone: `δb = κ u`; `∂κ/∂d =
+/// N₀/(1 + d)²` against the coupling's central difference within a part in `2^6`; and `δℓ = ln 2 · d · δd_κ` against that product read at the
+/// friction's word within a part in `2^10` wherever the word holds at least 64 grains, of `Re(conj(b) u)`'s sign.
+#[test]
+fn the_drive_is_charged_through_the_leak() {
+    let exp = Exponential::new(FACE_BITS);
+    assert_eq!(CARRY_GROUP_FOUNDING, 5);
+    let founded = carry_coupling(i128::from(CARRY_LEAK_FOUNDING));
+    assert_eq!(founded, 1 << 30, "the coupling is one at the founding");
+    for b in [0i64, 1, -1, 12_345, -98_765, 1 << 40, -(1 << 40) + 7, i64::MAX >> 3] {
+        assert_eq!(carry_drive(founded, b).unwrap(), b, "founded, the coupled drive is the drive bit for bit");
+    }
+    let mut previous = 0i128;
+    for l in (-(40i128 << 16)..(32 << 16)).step_by(4_099) {
+        let ((re, im), d) = carry_gate(&exp, 0, l).unwrap();
+        let kappa = carry_coupling(d);
+        assert!(kappa >= previous && kappa < 5 << 30, "ℓ {l}: κ {kappa} monotone in the friction and under N₀");
+        previous = kappa;
+        assert_eq!(im, 0, "ℓ {l}: no turn");
+        assert!((i128::from(re) + kappa / 5 - (1 << 30)).abs() <= 2, "ℓ {l}: |γ| {re} and κ/N₀ {} sum to one", kappa / 5);
+    }
+    // A strand of the reach's sites under a constant drive.
+    let b = 1i64 << 20;
+    let strand = |q: i128, l: i128, coupled: bool| -> i128 {
+        let ((yr, yi), d) = carry_gate(&exp, q, l).unwrap();
+        let (yr, yi) = (i128::from(yr), i128::from(yi));
+        let drive = i128::from(if coupled { carry_drive(carry_coupling(d), b).unwrap() } else { b });
+        let (mut qr, mut qi, mut most) = (0i128, 0i128, 0i128);
+        for _ in 0..3_771 {
+            (qr, qi) = (drive + release(yr * qr - yi * qi, GAMMA_BITS), release(yr * qi + yi * qr, GAMMA_BITS));
+            most = most.max(((qr * qr + qi * qi) as u128).isqrt() as i128);
+        }
+        most
+    };
+    for q in [0i128, 1 << 16] {
+        for l in [-(20i128 << 16), -(14 << 16), -(3 << 16), 0, 3 << 16, 10 << 16, 30 << 16] {
+            let most = strand(q, l, true);
+            assert!(most <= 5 * i128::from(b) + (1 << 16) + 1, "q {q} ℓ {l}: the coupled charge {most} within N₀ places' drive");
+        }
+        assert_eq!(strand(q, 0, true), strand(q, 0, false), "q {q}: founded, the coupled scan is the sum form's");
+    }
+    assert!(strand(0, -(20 << 16), false) > 3_000 * i128::from(b), "the sum form's charge at the floor passes 3,000 places' drive");
+    // The coupling's derivative in the friction.
+    for d in [64i128, 1 << 10, 1 << 14, 1 << 16, 1 << 20, 1 << 30] {
+        let step = (d / 64).max(1);
+        let difference = (carry_coupling(d + step) - carry_coupling(d - step)) / (2 * step);
+        let one = (1i128 << 16) + d;
+        let expected = div_nearest(5i128 << 46, one * one);
+        assert!((difference - expected).abs() <= expected / 64 + 1, "d {d}: ∂κ/∂d {difference} against N₀/(1 + d)² {expected}");
+    }
+    // The gate's return with no δγ: the coupling alone.
+    let ln2 = ln2_face();
+    let drive = (7i64 << 30, -(3i64 << 30));
+    for du in [(5i64 << 36, 11i64 << 34), (-(9i64 << 33), 2i64 << 37)] {
+        for l in [-(20i128 << 16), -(10 << 16) - 321, -(3 << 16), -1, 0, 7_777, 4 << 16, (12 << 16) + 99] {
+            let q = 3 << 15;
+            let (gamma, d) = carry_gate(&exp, q, l).unwrap();
+            let kappa = carry_coupling(d);
+            let ((dq, dl), db) = carry_gate_return(&exp, gamma, (0, 0), drive, du, q, l).unwrap();
+            assert_eq!(dq, 0, "ℓ {l}: with no δγ the turn has no covector");
+            assert_eq!(db, (carry_drive(kappa, du.0).unwrap(), carry_drive(kappa, du.1).unwrap()), "ℓ {l}: δb = κ u");
+            let w = release(i128::from(drive.0) * i128::from(du.0) + i128::from(drive.1) * i128::from(du.1), FACE_BITS);
+            let one = (1i128 << 16) + d;
+            let ddk = div_nearest((5 * w) << 32, one * one);
+            let at_word = release(release(ddk * ln2, LN2_FACE_BITS) * d, 16);
+            assert!(dl != 0, "ℓ {l}: the coupling's covector stands at every read");
+            assert_eq!(dl.signum() as i128, w.signum(), "ℓ {l}: the drive's covector pulls the leak its own way");
+            if d >= 64 {
+                assert!((i128::from(dl) - at_word).abs() <= at_word.abs() / 1024 + 1, "ℓ {l}: δℓ {dl} against ln 2 · d · δd_κ {at_word}");
+            } else if l < -(14 << 16) {
+                assert!(i128::from(dl).abs() < at_word.abs(), "ℓ {l}: below the floor the chart's own derivative, under the floor's");
+            }
         }
     }
 }
@@ -2458,9 +2540,10 @@ fn a_growth_by_carry_circles_keeps_every_face_and_returns_through_its_circles() 
     assert_eq!(learner.to_text().lines().find(|l| l.starts_with("parts ")).unwrap().split(' ').count(), 2 + written_parts(0).len(), "a field without carry circles writes nineteen: the plain sixteen and the first lane's letter rows");
 }
 
-/// [definition; theory, November 11 17:25] **The carry circles' scan is the law, site by site in strand order**: on a drawn field with two
-/// circles, at every tick each plain contact is the built pair contact with its strand mate, each circle's gate is [`carry_gate`] of its charts'
-/// reads, and the circle's `p(t) = a(t) Qm(t)`, `Q(t) = b(t) + γ(t) Qm(t)` hold exactly in its strand order. With the current, the pair's
+/// [definition; theory, November 11 17:25 and November 12 (G98)] **The carry circles' scan is the law, site by site in strand order**: on a drawn
+/// field with two circles, at every tick each plain contact is the built pair contact with its strand mate, each circle's gate is [`carry_gate`] of
+/// its charts' reads and its drive the pair's `b` coupled through the same leak ([`carry_coupling`]), and the circle's `p(t) = a(t) Qm(t)`,
+/// `Q(t) = κ(t) b(t) + γ(t) Qm(t)` hold in its strand order. With the current, the pair's
 /// return and the moment's chart at zero (so the pair chart is the opening's), a left circle's pair at `t` reads the class of site `t − 4`, a
 /// right circle's that of `t + 3` (`t + 4` is the region's open site, which carries no word), and a plain contact's reads neither.
 #[test]
@@ -2506,8 +2589,11 @@ fn the_carry_circles_scan_is_the_law_site_by_site() {
                 assert_eq!((cell.c[tt * f + e] as i128, cell.c[tt * f + half + e] as i128), (release(ar * br - ai * bi, FACE_BITS), release(ar * bi + ai * br, FACE_BITS)), "tick {tick} site {tt} plain contact {e}");
             }
             for k in 0..c {
-                let (gamma, _) = carry_gate(&base.exponential, cell.qh[tt * c2 + k] as i128, cell.qh[tt * c2 + c + k] as i128).unwrap();
+                let (gamma, friction) = carry_gate(&base.exponential, cell.qh[tt * c2 + k] as i128, cell.qh[tt * c2 + c + k] as i128).unwrap();
                 assert_eq!((cell.gam[tt * c2 + k], cell.gam[tt * c2 + c + k]), gamma, "tick {tick} site {tt} circle {k}'s gate");
+                let (kappa, e) = (carry_coupling(friction), plain + k);
+                let drive = (carry_drive(kappa, cell.b[tt * f + e]).unwrap(), carry_drive(kappa, cell.b[tt * f + half + e]).unwrap());
+                assert_eq!((cell.kb[tt * c2 + k], cell.kb[tt * c2 + c + k]), drive, "tick {tick} site {tt} circle {k}'s drive, coupled through its leak");
             }
         }
         for k in 0..c {
@@ -2519,15 +2605,16 @@ fn the_carry_circles_scan_is_the_law_site_by_site() {
                 let (ar, ai) = (cell.a[tt * f + e] as i128, cell.a[tt * f + half + e] as i128);
                 assert_eq!((cell.c[tt * f + e] as i128, cell.c[tt * f + half + e] as i128), (release(ar * qr - ai * qi, FACE_BITS), release(ar * qi + ai * qr, FACE_BITS)), "tick {tick} site {tt} circle {k}");
                 let (yr, yi) = (i128::from(cell.gam[tt * c2 + k]), i128::from(cell.gam[tt * c2 + c + k]));
-                (qr, qi) = (cell.b[tt * f + e] as i128 + release(yr * qr - yi * qi, GAMMA_BITS), cell.b[tt * f + half + e] as i128 + release(yr * qi + yi * qr, GAMMA_BITS));
+                (qr, qi) = (cell.kb[tt * c2 + k] as i128 + release(yr * qr - yi * qi, GAMMA_BITS), cell.kb[tt * c2 + c + k] as i128 + release(yr * qi + yi * qr, GAMMA_BITS));
             }
         }
     }
 }
 
-/// [definition; theory, November 11 17:25 and November 12] **The carry circles' adjoint agrees with its code's central difference** on a drawn
-/// field with two circles (ticks two, three fixtures), their charts, biases and `W` columns off zero and the leak `ℓ` below zero on some sites and
-/// above on others: each family's three entries with the largest covectors (the circles' charts and biases, `a`, `b` and `W` among them) against
+/// [definition; theory, November 11 17:25 and November 12 (G98)] **The carry circles' adjoint agrees with its code's central difference** on a
+/// drawn field with two circles (ticks two, three fixtures), their charts, biases and `W` columns off zero and the leak `ℓ` below zero on some sites
+/// and above on others (so the drive's coupling `κ` stands off one and its covector is read through `b` and `ℓ`): each family's three entries with
+/// the largest covectors (the circles' charts and biases, `a`, `b` and `W` among them) against
 /// the code's difference ([`the_laned_fields_covector_matches_its_codes_difference`]'s probe law), the circles' charts and biases read at least
 /// once each. On the leak's log chart the friction has no seam where it moves (the linear chart's `max(0, h)` had one at zero); the friction's
 /// floor of one grain stands at `ℓ < −14`, which no read of this fixture reaches.

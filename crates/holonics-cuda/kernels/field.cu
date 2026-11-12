@@ -60,6 +60,9 @@ typedef unsigned __int128 uwide;
 // A carry circle's founded friction `d₀ = 1/(NEAR − 2)` on `2^(−16)` (the host's `CARRY_LEAK_FOUNDING`): the leak's log chart reads
 // `d = d₀ 2^ℓ`, so a circle founded at `ℓ = 0` holds a group of `NEAR − 1` places.
 #define CARRY_LEAK_FOUNDING (((wide)1 << FACE_BITS) / (NEAR - 2))
+// A carry circle's founded group `N₀ = (1 + d₀)/d₀ = NEAR − 1` (the host's `CARRY_GROUP_FOUNDING`): the drive is charged through the leak,
+// `κ = N₀ d/(1 + d)`, one at the founding (`carry_coupling`).
+#define CARRY_GROUP_FOUNDING ((wide)(NEAR - 1))
 
 #define REFUSED_CARRIER 1u
 #define REFUSED_WORD64 2u
@@ -434,11 +437,12 @@ struct FieldWords {
     // [the unified-theory reading of November 6, 10:31] Where set, past the last arrival a silent place runs at the bare rate
     // (`Field::bare_stretch`): no clamp to the stretch's first place, and no fold of its covector there.
     uint64_t bare_stretch;
-    // [definition; theory, November 11 17:25 and November 12] **The carry circles** (`FieldDeclaration::carry`): the last `carry` (`C`) of the `f/2`
-    // complex contacts carry the scan `Q(t) = b(t) + γ(t) Q(t∓1)`, `p(t) = a(t) Q(t∓1)` with the gate `γ = γ̂(q)/(1 + d₀ 2^ℓ)` (`carry_gate`, the leak
-    // on its log chart). `wg` and `wgb` are the circles' charts' and biases' offsets in the material (`FieldLayout::carry`, `carry_bias`) and `rg` the
-    // charts' reach; `pg` the charts' reads `q`, `ℓ` `[t][2C]` (`2^(−16)`), `pgam` the gate `[t][2C]` (real parts then imaginary, `2^(−30)`) and `pqm`
-    // the scan's operand `Q(t∓1)` `[t][2C]`, which the reverse reads.
+    // [definition; theory, November 11 17:25 and November 12 (G98)] **The carry circles** (`FieldDeclaration::carry`): the last `carry` (`C`) of the
+    // `f/2` complex contacts carry the scan `Q(t) = κ(t) b(t) + γ(t) Q(t∓1)`, `p(t) = a(t) Q(t∓1)` with the gate `γ = γ̂(q)/(1 + d₀ 2^ℓ)` (`carry_gate`,
+    // the leak on its log chart) and the drive charged through the same leak, `κ = N₀ d/(1 + d)` (`carry_coupling`). `wg` and `wgb` are the circles'
+    // charts' and biases' offsets in the material (`FieldLayout::carry`, `carry_bias`) and `rg` the charts' reach; `pg` the charts' reads `q`, `ℓ`
+    // `[t][2C]` (`2^(−16)`), `pgam` the gate `[t][2C]` (real parts then imaginary, `2^(−30)`), `pqm` the scan's operand `Q(t∓1)` `[t][2C]`, which the
+    // reverse reads, and `pkb` the coupled drive `κ b` `[t][2C]` (real parts then imaginary, `2^(−16)`), which the scan reads.
     uint64_t carry;
     uint64_t wg;
     uint64_t wgb;
@@ -446,6 +450,7 @@ struct FieldWords {
     int64_t *pg;
     int64_t *pgam;
     int64_t *pqm;
+    int64_t *pkb;
     // [definition; theory, November 11 04:14, step S] **The skin's exponent from site addresses**: `2π σ_x = q_x k + r_x`, `0 ≤ r_x < k`, `k = (n ln 2) << 24` of the
     // slot, written once a (site, paced head, mode) in `field_paces` beside `σ`: `[p][l][t]` three words each, `q`, then `r`'s low and high 64 bits (`r < k` is held 128 bits wide
     // from the start: `k` passes `INT64_MAX` at `n ≥ 739` and 64 unsigned bits at `n ≥ 1478`, and the pair's compare is made on 128 bits from `k` itself).
@@ -2677,10 +2682,11 @@ extern "C" __global__ void field_pair(FieldWords w) {
     }
 }
 
-// [definition; theory, November 11 17:25] **The carry circles' scan** (the host's `tick`): one thread a (region, carry circle) scanning the region's sites
-// in strand order, one release a step (a parallel prefix would reorder the releases). Circle `k` is complex contact `e = f/2 − C + k`: even `e` from the
-// left, odd from the right, `Q` zero before the first site (past the last), `p(t) = a(t) Q(t∓1)` and `Q(t) = b(t) + γ(t) Q(t∓1)` with the gate read from
-// `pgam` (`field_pair_gamma`). Block: 256 threads, grid-stride over `R C` jobs; no shared memory. Keeps `Q`'s operand per site and circle for the reverse.
+// [definition; theory, November 11 17:25 and November 12 (G98)] **The carry circles' scan** (the host's `tick`): one thread a (region, carry circle)
+// scanning the region's sites in strand order, one release a step (a parallel prefix would reorder the releases). Circle `k` is complex contact
+// `e = f/2 − C + k`: even `e` from the left, odd from the right, `Q` zero before the first site (past the last), `p(t) = a(t) Q(t∓1)` and
+// `Q(t) = κ(t) b(t) + γ(t) Q(t∓1)` with the gate read from `pgam` and the coupled drive `κ b` from `pkb` (both written by `field_pair_gamma`). Block:
+// 256 threads, grid-stride over `R C` jobs; no shared memory. Keeps `Q`'s operand per site and circle for the reverse.
 extern "C" __global__ void field_pair_scan(FieldWords w) {
     const uint32_t half = w.f / 2;
     const uint64_t C = w.carry, c2 = 2 * C, plain = half - C;
@@ -2699,8 +2705,8 @@ extern "C" __global__ void field_pair_scan(FieldWords w) {
             const wide ar = w.pa[re], ai = w.pa[im];
             w.pc[re] = fit64(rel(ar * qr - ai * qi, FACE_BITS), w.status);
             w.pc[im] = fit64(rel(ar * qi + ai * qr, FACE_BITS), w.status);
-            const wide nr = (wide)w.pb[re] + rel(yr * qr - yi * qi, MOVE_BITS);
-            const wide ni = (wide)w.pb[im] + rel(yr * qi + yi * qr, MOVE_BITS);
+            const wide nr = (wide)w.pkb[gr] + rel(yr * qr - yi * qi, MOVE_BITS);
+            const wide ni = (wide)w.pkb[gi] + rel(yr * qi + yi * qr, MOVE_BITS);
             qr = fit64(nr, w.status);
             qi = fit64(ni, w.status);
         }
@@ -2727,9 +2733,12 @@ __device__ __forceinline__ bool carry_friction(const FieldWords &w, int64_t l, w
 // `q`, `ℓ` on `2^(−16)` and the friction `d` on the leak's log chart (`carry_friction`), refused (`REFUSED_CARRIER`) where `|q|` reaches `2^39`,
 // `2^34 + q²` reaches `2^78` or the chart refuses; else `den = (2^34 + q²)(2^16 + d)`, `γ_re = (2^34 − q²) 2^46 / den` and `γ_im = q 2^64 / den` on
 // `2^(−30)`, each one division to the nearest (`div_nearest`), written to `pgam`. That is `γ̂(q)/(1 + d)`, `γ̂(q) = ((4 − q²) + 4iq)/(4 + q²)` the
-// Cayley step of `iq/2`; every bit is the host's.
+// Cayley step of `iq/2`. Then the drive charged through the same leak (G98, the host's `carry_coupling` and `carry_drive`): the coupling
+// `κ = (N₀ d) 2^30 / (2^16 + d)` to the nearest, and the circle's coupled drive `rel(κ b, 30)` (`b` at contact `e = f/2 − C + k`) written to `pkb`.
+// Every bit is the host's.
 extern "C" __global__ void field_pair_gamma(FieldWords w) {
-    const uint64_t C = w.carry, c2 = 2 * C;
+    const uint32_t half = w.f / 2;
+    const uint64_t C = w.carry, c2 = 2 * C, plain = half - C;
     const uint64_t cells = (uint64_t)w.T * C;
     for (uint64_t c = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; c < cells; c += (uint64_t)gridDim.x * blockDim.x) {
         const uint64_t t = c / C, k = c % C;
@@ -2751,13 +2760,18 @@ extern "C" __global__ void field_pair_gamma(FieldWords w) {
         const wide den = turn * (((wide)1 << 16) + d);
         w.pgam[gr] = fit64(div_nearest((((wide)1 << 34) - q * q) << 46, den), w.status);
         w.pgam[gi] = fit64(div_nearest(q << 64, den), w.status);
+        const wide kappa = div_nearest((CARRY_GROUP_FOUNDING * d) << MOVE_BITS, ((wide)1 << FACE_BITS) + d);
+        const uint64_t re = t * w.f + plain + k, im = re + half;
+        w.pkb[gr] = fit64(rel(kappa * (wide)w.pb[re], MOVE_BITS), w.status);
+        w.pkb[gi] = fit64(rel(kappa * (wide)w.pb[im], MOVE_BITS), w.status);
     }
 }
 
 // The carry circles' reverse (the host's `tick_return`): the same (region, circle) jobs in the opposite strand order, with the producing operands. With `u` the
-// covector of `Q(t)` (the next site of the reverse) and `δp(t)` the pair's covector: `δa(t) = conj(Qm(t)) δp(t)`, `δb(t) = u`, `δγ(t) = conj(Qm(t)) u`
-// released at the face's grain and written to `dg` `[t][2C]` (real parts then imaginary), `X(t) = conj(a(t)) δp(t) + conj(γ(t)) u` (the next `u`). The
-// gate's covectors are formed off the chain (`field_pair_gate_back`).
+// covector of `Q(t)` (the next site of the reverse) and `δp(t)` the pair's covector: `u` written to `db` (the coupled drive's covector, which
+// `field_pair_gate_back` carries through the coupling), `δa(t) = conj(Qm(t)) δp(t)`, `δγ(t) = conj(Qm(t)) u` released at the face's grain and written to `dg`
+// `[t][2C]` (real parts then imaginary), `X(t) = conj(a(t)) δp(t) + conj(γ(t)) u` (the next `u`). The gate's and the coupling's covectors are formed off the
+// chain (`field_pair_gate_back`).
 extern "C" __global__ void field_pair_scan_back(FieldWords w, const int64_t *dc, int64_t *da, int64_t *db, int64_t *dg) {
     const uint32_t half = w.f / 2;
     const uint64_t C = w.carry, c2 = 2 * C, plain = half - C;
@@ -2787,14 +2801,18 @@ extern "C" __global__ void field_pair_scan_back(FieldWords w, const int64_t *dc,
     }
 }
 
-// [definition; theory, November 11 17:25 and November 12 (G96's third branch); `CarryGate.lean`, `leak_hasDerivAt`] **The gate's covectors** (the host's
-// `carry_gate_return`), off the chain on the pair's grid (T C cells): from `δγ` in `dg`, the gate and the charts' reads, `im = Im(conj(γ) δγ)` and
-// `re = Re(conj(γ) δγ)` each released from `2^(−30)`, then `δq = im 2^34 / (2^34 + q²)` and `δd = −re 2^16 / (2^16 + d)` at the friction the forward
-// applied (`carry_friction`), each one division to the nearest, and the leak chart's derivative `δℓ = ln 2 · d₀ 2^ℓ · δd` read at the chart's face
-// (`v` released 15 bits): `rel(rel(δd ln 2, 30) d₀ rel(v, 15), 62 − a)`, under `2^126` before the release, nothing past a release of 126 bits. Written
-// over `δγ` in place (`δq` at the real part's slot, `δℓ` at the imaginary's: the circles' charts' row order).
-extern "C" __global__ void field_pair_gate_back(FieldWords w, int64_t *dg) {
-    const uint64_t C = w.carry, c2 = 2 * C;
+// [definition; theory, November 11 17:25 and November 12 (G96's third branch, G98); `CarryGate.lean`, `leak_hasDerivAt`, `coupling_hasDerivAt`] **The
+// gate's and the coupling's covectors** (the host's `carry_gate_return`), off the chain on the pair's grid (T C cells): from `δγ` in `dg`, `u` in `db` (the
+// scan's reverse wrote it at the circle's contact), the drive `b` in `pb` (the pair's affine's, before its coupling), the gate and the charts' reads,
+// `im = Im(conj(γ) δγ)` and `re = Re(conj(γ) δγ)` each released from `2^(−30)`, then `δq = im 2^34 / (2^34 + q²)`, and at the friction the forward applied
+// (`carry_friction`) the gate's `δd = −re 2^16 / (2^16 + d)` and the coupling's `δd_κ = N₀ w 2^32 / (2^16 + d)²` with `w = rel(Re(conj(b) u), 16)` within
+// 64 bits (`δd_κ` within 64 bits), each one division to the nearest; each lifted through the leak chart's derivative `ln 2 · d₀ 2^ℓ · δd` read at the
+// chart's face (`v` released 15 bits): `rel(rel(δd ln 2, 30) d₀ rel(v, 15), 62 − a)`, under `2^126` before the release, nothing past a release of 126 bits,
+// the two added into `δℓ`. Written over `δγ` in place (`δq` at the real part's slot, `δℓ` at the imaginary's: the circles' charts' row order), and the
+// drive's covector `δb = rel(κ u, 30)` over `u` in `db`.
+extern "C" __global__ void field_pair_gate_back(FieldWords w, int64_t *dg, int64_t *db) {
+    const uint32_t half = w.f / 2;
+    const uint64_t C = w.carry, c2 = 2 * C, plain = half - C;
     const uint64_t cells = (uint64_t)w.T * C;
     const wide ln2 = (wide)(((uwide)w.ln2_hi << 64) | (uwide)w.ln2_lo);
     for (uint64_t c = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; c < cells; c += (uint64_t)gridDim.x * blockDim.x) {
@@ -2811,12 +2829,21 @@ extern "C" __global__ void field_pair_gate_back(FieldWords w, int64_t *dg) {
             atomicOr(w.status, REFUSED_CARRIER);
             continue;
         }
-        const wide dd = -div_nearest(re << 16, ((wide)1 << 16) + d);
-        const wide lift = rel(dd * ln2, LN2_FACE_BITS) * CARRY_LEAK_FOUNDING * rel((wide)v, 15);
+        const wide one = ((wide)1 << FACE_BITS) + d;
+        const wide dd = -div_nearest(re << 16, one);
+        const uint64_t bre = t * w.f + plain + k, bim = bre + half;
+        const wide ur = db[bre], ui = db[bim];
+        const wide cw = fit64(rel((wide)w.pb[bre] * ur + (wide)w.pb[bim] * ui, FACE_BITS), w.status);
+        const wide ddk = fit64(div_nearest((CARRY_GROUP_FOUNDING * cw) << (2 * FACE_BITS), one * one), w.status);
         const int64_t shift = 62 - a;
-        const wide dl = shift > 126 ? 0 : rel(lift, (unsigned)shift);
+        const wide lift = rel(dd * ln2, LN2_FACE_BITS) * CARRY_LEAK_FOUNDING * rel((wide)v, 15);
+        const wide liftk = rel(ddk * ln2, LN2_FACE_BITS) * CARRY_LEAK_FOUNDING * rel((wide)v, 15);
+        const wide dl = shift > 126 ? 0 : rel(lift, (unsigned)shift) + rel(liftk, (unsigned)shift);
+        const wide kappa = div_nearest((CARRY_GROUP_FOUNDING * d) << MOVE_BITS, one);
         dg[gr] = fit64(dq, w.status);
         dg[gi] = fit64(dl, w.status);
+        db[bre] = fit64(rel(kappa * ur, MOVE_BITS), w.status);
+        db[bim] = fit64(rel(kappa * ui, MOVE_BITS), w.status);
     }
 }
 
