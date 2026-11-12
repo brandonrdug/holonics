@@ -1,0 +1,41 @@
+# symbol_located_ruler counts<=32 MB a slice (common_corpus_1/subset_1_1.parquet), read: the held role's first 330000 places a slice; load_s=6
+LOCATED slice=code counts_pairs=31971778 held_pairs=329449 bytes_met=225 order0=3.5441 map=2.7443(256 rows)
+  rings=(8,32)    rows=40   own_word: given=2.8262 located=2.8098 (rounds=7, last_moved=0, cells=154)  scramble: given=2.9507 located=2.8421 (rounds=10, last_moved=0, cells=114)  s=8
+  rings=(16,17)   rows=33   own_word: given=2.9537 located=2.8242 (rounds=9, last_moved=0, cells=111)  scramble: given=2.9526 located=2.8224 (rounds=12, last_moved=0, cells=112)  s=9
+  rings=(5,7)     rows=12   own_word: given=3.2629 located=2.9642 (rounds=9, last_moved=0, cells=30)  scramble: given=3.2275 located=2.9515 (rounds=7, last_moved=0, cells=30)  s=10
+  rings=(7,9)     rows=16   own_word: given=3.1846 located=2.9261 (rounds=9, last_moved=0, cells=53)  scramble: given=3.1883 located=2.9263 (rounds=7, last_moved=0, cells=51)  s=11
+  rings=(3,5,7)   rows=15   own_word: given=3.2172 located=2.9212 (rounds=6, last_moved=0, cells=64)  scramble: given=3.1872 located=2.9260 (rounds=6, last_moved=0, cells=65)  s=12
+  rings=(5,7,9)   rows=21   own_word: given=3.1152 located=2.8880 (rounds=14, last_moved=0, cells=97)  scramble: given=3.0822 located=2.8731 (rounds=10, last_moved=0, cells=106)  s=14
+  rings=(11,13)   rows=24   own_word: given=3.0754 located=2.8548 (rounds=15, last_moved=0, cells=77)  scramble: given=3.0297 located=2.8851 (rounds=7, last_moved=0, cells=85)  s=15
+LOCATED slice=web counts_pairs=16235097 held_pairs=329534 bytes_met=204 order0=3.4546 map=2.8298(256 rows)
+  rings=(8,32)    rows=40   own_word: given=2.8873 located=2.8626 (rounds=6, last_moved=0, cells=145)  scramble: given=2.9697 located=2.8864 (rounds=8, last_moved=0, cells=100)  s=17
+  rings=(16,17)   rows=33   own_word: given=2.9999 located=2.8853 (rounds=8, last_moved=0, cells=110)  scramble: given=2.9647 located=2.8897 (rounds=9, last_moved=0, cells=99)  s=18
+  rings=(5,7)     rows=12   own_word: given=3.2047 located=2.9829 (rounds=7, last_moved=0, cells=31)  scramble: given=3.1269 located=2.9888 (rounds=9, last_moved=0, cells=34)  s=19
+  rings=(7,9)     rows=16   own_word: given=3.1555 located=2.9592 (rounds=9, last_moved=0, cells=45)  scramble: given=3.0958 located=2.9371 (rounds=7, last_moved=0, cells=49)  s=20
+  rings=(3,5,7)   rows=15   own_word: given=3.1699 located=2.9957 (rounds=10, last_moved=0, cells=61)  scramble: given=3.0946 located=2.9554 (rounds=14, last_moved=0, cells=58)  s=22
+  rings=(5,7,9)   rows=21   own_word: given=3.0849 located=2.9140 (rounds=6, last_moved=0, cells=94)  scramble: given=3.0338 located=2.9217 (rounds=7, last_moved=0, cells=106)  s=23
+  rings=(11,13)   rows=24   own_word: given=3.0725 located=2.9016 (rounds=14, last_moved=0, cells=80)  scramble: given=3.0532 located=2.9467 (rounds=8, last_moved=0, cells=77)  s=25
+LOCATED slice=science counts_pairs=32004700 held_pairs=329936 bytes_met=230 order0=3.5319 map=2.7715(256 rows)
+  rings=(8,32)    rows=40   own_word: given=2.8155 located=2.7929 (rounds=6, last_moved=0, cells=159)  scramble: given=2.9073 located=2.8131 (rounds=11, last_moved=0, cells=117)  s=26
+  rings=(16,17)   rows=33   own_word: given=2.9689 located=2.8220 (rounds=8, last_moved=0, cells=104)  scramble: given=2.9436 located=2.8160 (rounds=9, last_moved=0, cells=124)  s=27
+  rings=(5,7)     rows=12   own_word: given=3.2175 located=2.9250 (rounds=6, last_moved=0, cells=33)  scramble: given=3.2783 located=2.9144 (rounds=7, last_moved=0, cells=33)  s=28
+  rings=(7,9)     rows=16   own_word: given=3.1797 located=2.8917 (rounds=7, last_moved=0, cells=48)  scramble: given=3.1429 located=2.9161 (rounds=8, last_moved=0, cells=49)  s=29
+  rings=(3,5,7)   rows=15   own_word: given=3.1772 located=2.9448 (rounds=7, last_moved=0, cells=67)  scramble: given=3.1819 located=2.9041 (rounds=8, last_moved=0, cells=66)  s=31
+  rings=(5,7,9)   rows=21   own_word: given=3.0905 located=2.8720 (rounds=10, last_moved=0, cells=118)  scramble: given=3.0875 located=2.8723 (rounds=9, last_moved=0, cells=116)  s=33
+  rings=(11,13)   rows=24   own_word: given=3.0553 located=2.8314 (rounds=10, last_moved=0, cells=78)  scramble: given=3.0357 located=2.8531 (rounds=6, last_moved=0, cells=94)  s=34
+LOCATED slice=books counts_pairs=32016902 held_pairs=329959 bytes_met=178 order0=3.1646 map=2.5121(256 rows)
+  rings=(8,32)    rows=40   own_word: given=2.5335 located=2.5208 (rounds=7, last_moved=0, cells=110)  scramble: given=2.5923 located=2.5353 (rounds=10, last_moved=0, cells=92)  s=35
+  rings=(16,17)   rows=33   own_word: given=2.5860 located=2.5400 (rounds=8, last_moved=0, cells=86)  scramble: given=2.5925 located=2.5378 (rounds=13, last_moved=0, cells=91)  s=36
+  rings=(5,7)     rows=12   own_word: given=2.8041 located=2.6448 (rounds=8, last_moved=0, cells=33)  scramble: given=2.8289 located=2.6521 (rounds=6, last_moved=0, cells=32)  s=37
+  rings=(7,9)     rows=16   own_word: given=2.7622 located=2.5951 (rounds=6, last_moved=0, cells=45)  scramble: given=2.7431 located=2.5783 (rounds=11, last_moved=0, cells=45)  s=38
+  rings=(3,5,7)   rows=15   own_word: given=2.7645 located=2.6145 (rounds=7, last_moved=0, cells=64)  scramble: given=2.7572 located=2.6016 (rounds=7, last_moved=0, cells=60)  s=40
+  rings=(5,7,9)   rows=21   own_word: given=2.6835 located=2.5769 (rounds=10, last_moved=0, cells=91)  scramble: given=2.6695 located=2.5623 (rounds=8, last_moved=0, cells=94)  s=41
+  rings=(11,13)   rows=24   own_word: given=2.6506 located=2.5474 (rounds=13, last_moved=0, cells=70)  scramble: given=2.6664 located=2.5511 (rounds=14, last_moved=0, cells=69)  s=43
+LOCATED slice=wikidata counts_pairs=19915149 held_pairs=329704 bytes_met=201 order0=4.0116 map=2.8576(256 rows)
+  rings=(8,32)    rows=40   own_word: given=2.9497 located=2.9267 (rounds=6, last_moved=0, cells=149)  scramble: given=3.1683 located=2.9541 (rounds=5, last_moved=0, cells=123)  s=44
+  rings=(16,17)   rows=33   own_word: given=3.2817 located=2.9588 (rounds=6, last_moved=0, cells=120)  scramble: given=3.2264 located=2.9379 (rounds=8, last_moved=0, cells=125)  s=45
+  rings=(5,7)     rows=12   own_word: given=3.6549 located=3.0408 (rounds=7, last_moved=0, cells=30)  scramble: given=3.6112 located=3.0514 (rounds=7, last_moved=0, cells=34)  s=45
+  rings=(7,9)     rows=16   own_word: given=3.5497 located=2.9967 (rounds=7, last_moved=0, cells=51)  scramble: given=3.5062 located=3.0163 (rounds=7, last_moved=0, cells=49)  s=46
+  rings=(3,5,7)   rows=15   own_word: given=3.6100 located=3.0478 (rounds=11, last_moved=0, cells=71)  scramble: given=3.5346 located=3.0075 (rounds=8, last_moved=0, cells=78)  s=48
+  rings=(5,7,9)   rows=21   own_word: given=3.4650 located=3.0048 (rounds=8, last_moved=0, cells=118)  scramble: given=3.4071 located=2.9806 (rounds=5, last_moved=0, cells=115)  s=49
+  rings=(11,13)   rows=24   own_word: given=3.4348 located=2.9616 (rounds=11, last_moved=0, cells=86)  scramble: given=3.3817 located=2.9838 (rounds=7, last_moved=0, cells=88)  s=50

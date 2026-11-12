@@ -1807,3 +1807,24 @@ lanes", its section 6, steps 0 to 3). Every step keeps every bit; none changes a
   What it does not read. The level: nothing here changes a bit of any state. The dark share (the count of compared places by octave of surprise,
   by slice, on the states at the crossing, 2,001 and 5,001 sections) is read-store's, and the law that releases a covector under a declared grain
   gets its own guess after that read.
+
+G116 (d) scored 2026-11-12T22:03Z (the same thread; the PC's P50 step 0, PR #729 merged at 66a3369a4; receipt p50_step0.txt in the receipts of the record of
+this date, "A site's arithmetic is counted against the card's lanes"; the binary entered the line with 100 of 100 section lines equal and STATE.100
+and MEAN.100 equal to P49a's):
+  (d) fixed 0.78 (0.70 to 0.86), read 0.731: IN. Of field_contact_rows' 57.69 ms a profiled section the still heads hold 8.62 and 6.90 and the
+      paced heads 20.45 and 21.72, on 14,783,252, 9,941,520, 10,014,764 and 10,926,621 pairs met a section: a paced pair 2.04 and 1.99 ns, a still
+      pair 0.58 and 0.69, a ratio of 3.2 where the units of the derivation gave 3.6. field_contact_columns' paced share 0.706 of 33.67 ms;
+      field_pace_skin_back 39.78 ms, the paced heads' alone. By the rule (above 0.65) step 1 is built.
+  (c)'s premise MISSED, on arithmetic the line's own lines held before the guess was fixed: "batches a section stay 1.00 ... about 0.99 GB on a
+      peak of 7.54". A batch's cut is four fifths of the batch budget, 8,489,376,152 octets of 10,612,244,480 at this open; leg 1's peak_store is
+      7,574,201,370 and its largest section's 15,606,215 pairs add about 1.05 GB at 64 octets a pair of sites, so about 767 of leg 1's 3,000
+      sections would take two batches. I read the peak and did not read the cut. The repair (P51, ordered before the dense build was read): the
+      skin's store on the row's support (atlas tower.field-support-stride applied to this store alone: a region's stride K_r = NEAR_SLOTS + D_r,
+      reserved the sum over regions of S_r K_r in place of the sum of S_r squared), with the count of leg 1's sections that would pass the cut
+      printed and held to zero. (a), (b) and (c)'s rates stand as fixed and are scored on the support's build; (a)'s rule named the support as
+      the store's next address, and it is now its first.
+  The card's yardsticks, measured in the same step (they replace the published figures in "Against the card"): 5.1914e12 narrow products a second
+  with one thread a 4 by 4 tile, 5.7247e11 octets a second read in order. The count's floors on them: 8.39 and 15.53 ms a section, 0.587 us a
+  site; the count's receipt of 424.8 ms a section stands at 50.6 times the arithmetic's floor and 17.8 times the sum (42 and 19 on the published
+  figures). At (c)'s 7.8 us a site the realization would stand at 13.3 times the sum of the measured floors. The bar of 1 us a site is 1.70 times
+  that sum.

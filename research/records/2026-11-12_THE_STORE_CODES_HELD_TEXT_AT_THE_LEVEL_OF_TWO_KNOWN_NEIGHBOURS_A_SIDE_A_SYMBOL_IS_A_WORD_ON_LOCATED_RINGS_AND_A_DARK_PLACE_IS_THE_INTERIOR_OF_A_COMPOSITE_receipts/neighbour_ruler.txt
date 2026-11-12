@@ -1,0 +1,42 @@
+# neighbour_ruler counts<=32 MB a slice of common_corpus_1/subset_1_1.parquet; read: the first 330000 places a slice of the held role rebuilt from
+# common_corpus_10/subset_100_10.parquet; reach 3; load_s=6
+HELD_REBUILT slice=code documents=128 pieces=128 octets=470224 sha256=9ba7c96215841074fc55879f4bce51e5115519009a5b4b293cf7388ee4172844
+HELD_REBUILT slice=web documents=128 pieces=128 octets=490738 sha256=68fd8825f4c6daaad56c38c75d03d7adf4f40284351cae81532030bef2fff8e1
+HELD_REBUILT slice=science documents=128 pieces=912 octets=6624256 sha256=224e84bf227d37293c1b2a38efd92cacadee25dd7c5e1ac219585ff87f9cb207
+HELD_REBUILT slice=books documents=128 pieces=128 octets=5113955 sha256=d1a69701ab170590ffb3d7f033cbfa472db1814641deb9973e118f6235c69b80
+HELD_REBUILT slice=wikidata documents=128 pieces=128 octets=618915 sha256=527dfd0db7f6a2c25af538e31c521d7dd8cd17fbf9c2826918778db125b36921
+RULER slice=code counts_octets=32010303 read_places=330339 classes_order0=3.6452
+  mask_whole places=32033 order0=3.4593 reach1=2.8331 reach2=2.4916 reach3=2.3328 se=0.0119 | nearest_known both=0.217 one=0.337 neither=0.446 neither_within_2=0.283 | reach3 by them both=1.1036 one=2.0119 neither=3.1736 neither_within_2=3.3983 | order0 by them both=3.5039 one=3.4300 neither=3.4598
+  mask_run places=13505 order0=3.4701 reach1=2.8321 reach2=2.4897 reach3=2.3385 se=0.0182 | nearest_known both=0.215 one=0.337 neither=0.448 neither_within_2=0.289 | reach3 by them both=1.0665 one=2.0269 neither=3.1829 neither_within_2=3.3984 | order0 by them both=3.4418 one=3.4844 neither=3.4729
+  next places=798 order0=3.5469 left1=2.7503(se 0.0588) left2=2.1867(se 0.0650) left3=1.8573(se 0.0734) left4=1.7699(se 0.0833) left5=1.7867(se 0.0935)
+  distance2 places=798 order0=3.6711 two_nearest_known=2.8677(se 0.0698)
+  distance3 places=798 order0=3.6670 two_nearest_known=3.0412(se 0.0623)
+  cells left1=226 contexts, 20083 pairs left2=20083 contexts, 302129 pairs left3=302129 contexts, 1123603 pairs left4=1123603 contexts, 2502515 pairs left5=2502515 contexts, 4139778 pairs  s=68
+RULER slice=web counts_octets=16256712 read_places=330302 classes_order0=3.4180
+  mask_whole places=33365 order0=3.4565 reach1=2.9485 reach2=2.6298 reach3=2.4553 se=0.0106 | nearest_known both=0.205 one=0.318 neither=0.477 neither_within_2=0.332 | reach3 by them both=1.0824 one=2.0849 neither=3.2928 neither_within_2=3.4748 | order0 by them both=3.4423 one=3.4300 neither=3.4803
+  mask_run places=12161 order0=3.5014 reach1=2.8661 reach2=2.4745 reach3=2.2633 se=0.0189 | nearest_known both=0.256 one=0.367 neither=0.377 neither_within_2=0.225 | reach3 by them both=1.1086 one=2.0857 neither=3.2222 neither_within_2=3.4335 | order0 by them both=3.4470 one=3.5140 neither=3.5261
+  next places=756 order0=3.5034 left1=2.8184(se 0.0542) left2=2.3214(se 0.0614) left3=1.9072(se 0.0700) left4=1.7491(se 0.0793) left5=1.7096(se 0.0899)
+  distance2 places=756 order0=3.5914 two_nearest_known=2.9578(se 0.0646)
+  distance3 places=756 order0=3.5878 two_nearest_known=3.2451(se 0.0571)
+  cells left1=205 contexts, 13885 pairs left2=13885 contexts, 162899 pairs left3=162899 contexts, 660903 pairs left4=660903 contexts, 1560427 pairs left5=1560427 contexts, 2715171 pairs  s=94
+RULER slice=science counts_octets=32012147 read_places=330138 classes_order0=3.4780
+  mask_whole places=29265 order0=3.5126 reach1=2.8970 reach2=2.5629 reach3=2.3799 se=0.0118 | nearest_known both=0.223 one=0.349 neither=0.428 neither_within_2=0.270 | reach3 by them both=1.1474 one=2.1020 neither=3.2476 neither_within_2=3.4599 | order0 by them both=3.5205 one=3.5038 neither=3.5157
+  mask_run places=15002 order0=3.5458 reach1=2.9101 reach2=2.5695 reach3=2.3738 se=0.0167 | nearest_known both=0.236 one=0.337 neither=0.427 neither_within_2=0.280 | reach3 by them both=1.1784 one=2.0959 neither=3.2541 neither_within_2=3.4411 | order0 by them both=3.5793 one=3.5715 neither=3.5069
+  next places=765 order0=3.4525 left1=2.6827(se 0.0482) left2=2.3062(se 0.0551) left3=1.9622(se 0.0679) left4=1.7889(se 0.0834) left5=1.7709(se 0.0949)
+  distance2 places=758 order0=3.6581 two_nearest_known=2.9927(se 0.0555)
+  distance3 places=758 order0=3.6485 two_nearest_known=3.3516(se 0.0674)
+  cells left1=231 contexts, 13869 pairs left2=13869 contexts, 155849 pairs left3=155849 contexts, 731047 pairs left4=731047 contexts, 2071657 pairs left5=2071657 contexts, 3898646 pairs  s=154
+RULER slice=books counts_octets=32020827 read_places=330003 classes_order0=3.2406
+  mask_whole places=28069 order0=3.1624 reach1=2.6442 reach2=2.3469 reach3=2.1742 se=0.0101 | nearest_known both=0.200 one=0.349 neither=0.451 neither_within_2=0.283 | reach3 by them both=0.9343 one=1.8876 neither=2.9454 neither_within_2=3.1154 | order0 by them both=3.1868 one=3.1543 neither=3.1578
+  mask_run places=13126 order0=3.1395 reach1=2.5862 reach2=2.2571 reach3=2.0600 se=0.0149 | nearest_known both=0.244 one=0.330 neither=0.427 neither_within_2=0.280 | reach3 by them both=0.8503 one=1.8174 neither=2.9382 neither_within_2=3.1468 | order0 by them both=3.1238 one=3.1387 neither=3.1491
+  next places=797 order0=3.1716 left1=2.5230(se 0.0492) left2=2.1048(se 0.0519) left3=1.7670(se 0.0545) left4=1.5254(se 0.0556) left5=1.4479(se 0.0603)
+  distance2 places=797 order0=3.1740 two_nearest_known=2.6530(se 0.0524)
+  distance3 places=797 order0=3.1771 two_nearest_known=2.9217(se 0.0450)
+  cells left1=179 contexts, 11254 pairs left2=11254 contexts, 171350 pairs left3=171350 contexts, 800140 pairs left4=800140 contexts, 2162500 pairs left5=2162500 contexts, 4145620 pairs  s=207
+RULER slice=wikidata counts_octets=19930144 read_places=330070 classes_order0=4.0894
+  mask_whole places=29007 order0=3.9500 reach1=3.1971 reach2=2.9556 reach3=2.8924 se=0.0145 | nearest_known both=0.214 one=0.320 neither=0.465 neither_within_2=0.321 | reach3 by them both=1.9324 one=2.4772 neither=3.6212 neither_within_2=3.8524 | order0 by them both=3.9735 one=3.9502 neither=3.9391
+  mask_run places=15425 order0=4.1074 reach1=3.3230 reach2=3.0452 reach3=2.9766 se=0.0196 | nearest_known both=0.200 one=0.331 neither=0.470 neither_within_2=0.315 | reach3 by them both=1.9777 one=2.5850 neither=3.6774 neither_within_2=4.0014 | order0 by them both=4.1152 one=4.0588 neither=4.1384
+  next places=821 order0=4.0831 left1=2.9032(se 0.0443) left2=2.4923(se 0.0597) left3=2.4332(se 0.0863) left4=2.6201(se 0.1128) left5=2.7507(se 0.1293)
+  distance2 places=821 order0=4.0707 two_nearest_known=3.0073(se 0.0643)
+  distance3 places=821 order0=4.0843 two_nearest_known=3.2544(se 0.0679)
+  cells left1=202 contexts, 12721 pairs left2=12721 contexts, 97439 pairs left3=97439 contexts, 359832 pairs left4=359832 contexts, 859843 pairs left5=859843 contexts, 1462129 pairs  s=240

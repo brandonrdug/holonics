@@ -403,8 +403,9 @@ Athena text milestone claimed before a test of use was retracted or retired.
   by its measurement ("the predictor codes above flat on unseen families"), not as a missing part.
 
 [project-postulate] **Method, each rule with its reason.** These were given in conversation between
-October 29 and November 12; the three before the last were derived from a failure, from readings of
-November 11 and from Brandon's lens of that day, and the last two from his corrections of November 12. They are written here with their reasons so that no agent holds them as slogans.
+October 29 and November 12; the last three are from his corrections of November 12, and the three
+before them were derived from a failure, from readings of November 11 and from Brandon's lens of
+that day. They are written here with their reasons so that no agent holds them as slogans.
 - **Theory picks, and a run tests a stated prediction** (November 4). Derive which law the theory
   gives, fix its guess as a number before the read, run that one law and score the guess, a miss
   included. Reason: arms cost card time and choose by a short reading, and a winner picked that way
@@ -531,6 +532,26 @@ November 11 and from Brandon's lens of that day, and the last two from his corre
   yardstick is `agent-inferred`; the direction is his. Scope: every projection of a learner run and
   every guess of a rate. The workload is still never cut to fit (GPU first, below), and a long run
   stays lawful once the realization stands near its count.
+- **A symbol is a word, never a class index with free rows** (Brandon, November 12). A symbol is
+  stated and designed as its word: its key on a few coprime rings, located by the machine; the
+  rows its rings hold, shared by every symbol at a residue; and its code length, the rings that
+  tell it apart. A codec, an encoding or a growth of an alphabet states that word and what its
+  rows share, its periods are read by a ruler before a chart is built, and a composite (a
+  character of several bytes, a frequent run) is its factors' strand with a remainder. No design
+  indexes a table of free rows by a symbol, and an encoding's bytes are not called "the letters".
+  Reason: the store's alphabet of November 12 gave each of 244 byte classes 259 entries of its
+  own, 0.54 of the constitution's 117,478, the class a byte's rank among the bytes met, so no two
+  symbols shared an entry, a rare byte learned only from its own occurrences, and the writes drew
+  bytes of characters without their partners. He named it the same day: a code length is the
+  width the precision law gives an arithmetic symbol, and a character mapping whose arithmetic no
+  receiver reads is only a character map. The precision law and the atlas held the word for
+  values and had never applied it to the alphabet. That the key is located and never read off a
+  code table is `agent-inferred`, from the day's rulers: a code point's coprime residues keep no
+  more than a scramble keeps, and an address located from counts keeps 0.90 to 0.96 of a free
+  row's content on 33 rows. Scope: every codec, encoding, alphabet and chart, for text, image,
+  acoustic and motor input, and every message, record and brief that describes one. The built
+  line's class names stay the code's where the code is cited
+  ([the record](research/records/2026-11-12_THE_STORE_CODES_HELD_TEXT_AT_THE_LEVEL_OF_TWO_KNOWN_NEIGHBOURS_A_SIDE_A_SYMBOL_IS_A_WORD_ON_LOCATED_RINGS_AND_A_DARK_PLACE_IS_THE_INTERIOR_OF_A_COMPOSITE.md) §5 to §9).
 
 [project-postulate] **GPU first, and the design fixes the workload** (Brandon, October 27;
 [the record](research/records/2026-10-27_THE_LEARNER_RUNS_ON_THE_CARD_AND_ITS_WORKLOAD_IS_NEVER_TRADED_FOR_TIME.md)). The RTX 4080 SUPER is a consumer card, and
