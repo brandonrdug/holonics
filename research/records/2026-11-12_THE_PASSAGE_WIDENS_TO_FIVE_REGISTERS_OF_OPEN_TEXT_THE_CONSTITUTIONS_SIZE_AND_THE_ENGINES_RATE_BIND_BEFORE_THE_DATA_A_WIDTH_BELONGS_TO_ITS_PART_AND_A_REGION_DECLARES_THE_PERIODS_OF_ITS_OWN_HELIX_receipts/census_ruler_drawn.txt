@@ -1,0 +1,18 @@
+apart rows=101 columns=64 k=44.6 k_of_one_span=54.0
+apart rows=64 columns=64 k=40.9 k_of_one_span=47.7
+apart rows=128 columns=64 k=45.4 k_of_one_span=55.4
+apart rows=32 columns=64 k=26.4 k_of_one_span=28.0
+apart rows=101 columns=32 k=23.4 k_of_one_span=29.0
+apart rows=64 columns=32 k=22.9 k_of_one_span=28.0
+apart rows=128 columns=32 k=23.6 k_of_one_span=29.0
+apart rows=32 columns=32 k=20.6 k_of_one_span=24.1
+shared s=0.25 rows=101 columns=64 k=44.0
+shared s=0.5 rows=101 columns=64 k=43.1
+shared s=0.75 rows=101 columns=64 k=44.7
+confined r=8 rows=101 columns=64 k=6.2 k_of_one_span=8.0
+confined r=16 rows=101 columns=64 k=11.6 k_of_one_span=14.9
+confined r=24 rows=101 columns=64 k=16.6 k_of_one_span=21.0
+confined r=32 rows=101 columns=64 k=21.2 k_of_one_span=27.0
+confined r=40 rows=101 columns=64 k=25.2 k_of_one_span=32.6
+confined r=48 rows=101 columns=64 k=28.6 k_of_one_span=37.4
+confined r=56 rows=101 columns=64 k=31.5 k_of_one_span=41.5

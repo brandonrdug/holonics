@@ -1,0 +1,51 @@
+# G113 re-declared 2026-11-12T16:58Z (P45), tp1: te7's lap from te6/STATE.0 by bin-carry-coupled (87994ea23's release field_pass) with
+# lap_tf.sh's exports and arguments as te7 had, FIELD_PHASES=1 alone (the host's phases marked without a synchronization), the lap bound 120,000 ms and the run's 300,000 ms, in a fresh run directory tp1
+# (RUN is P24's run directory); its state STATE.stopped is a ruler's and trains nothing. It scores (d) and (f3); this receipt scores nothing.
+# Device line: the card, the RTX 4080 SUPER under HOLONICS_ROOT/.local/gpu.lock, its own hold, alone on the card with nothing else on the host; outer
+# timeout 240 s, at most 12 GB (11,444 MiB) of the card's memory read by nvidia-smi every 5 s, a 12 GiB ceiling on the host's resident set; stopped
+# past 950 ms a section over n=0..99. Dispatched with tools/runs.py (p45). The gate on the host, one thread, after it.
+## the run (header)
+# p45 chain at main 96557dc64 17:23:10
+# tp1 from te6/STATE.0 2109252566736ded; binary 54f9cb36459453d2 (87994ea23); FIELD_PHASES=1 alone; lap bound 120000 ms, the run's 300000 ms, outer 240 s, early stop past 950 ms over n=0..99 17:23:10
+# tp1: lock taken 17:23:10 wait_s=.002967488
+EARLY_RATE tp1 sections=100 mean_section_ms=931.8 bound_ms=950 17:24:56
+# tp1: run exit 0 released 17:25:23
+CARD_PEAK tp1 used_memory_mib=10376 (nvidia-smi, sampled every 5 s)
+ENDED_BY_LAP_BOUND tp1 yes
+SECTIONS tp1 sections=130 mean_first100_ms=931.8 mean_all_ms=927.1 sections_sum_ms=120527 (te7's same sections: first100 839.1 ms, all 130 825.9 ms)
+GATE_SECTIONS tp1 compared=130 equal=130 te7_lines=130 differing_lines=0 EQUAL
+FIELD_CARD_OPEN card=NVIDIA GeForce RTX 4080 SUPER free=15498412032 total=16802250752 batch_budget=10507321344
+FIELD_UNSEEN lap=-1 code=0.778 sites=43660 next=- ms=10711
+FIELD_STOPPED lap=0 sections=130/1535 reason=lap sites=1392272 before=3.135 after=- deposited=130 halvings=0 next_halved=0 next_refused=0 lap_ms=121888 ms=132600
+FIELD_UNSEEN lap=0 stopped code=0.778 sites=43660 next=- ms=132600
+MEASURE lap=tp1 rc=0 wall_s=133.1 peak_rss_kib=792044
+SECTION_MEANS tp1 sections=130 first100_ms=931.8 all_ms=927.1 sum_ms=120527 (te7 same sections: first100_ms=839.1 all_ms=825.9; ratio first100=1.110 all=1.123)
+OUTSIDE_SECTIONS tp1 elapsed_ms=132607 sections_ms=120527 outside_ms=12080 share=0.091
+OUTSIDE_SECTIONS te7 elapsed_ms=1285211 sections_ms=1265621 outside_ms=19590 (te7's whole lap, 1535 sections)
+## the card (FIELD_CARD)
+FIELD_CARD reads=46 read_ms=10949 returns=135 return_ms=119412 pairs=18048181571 batches=614 peak_store=8403285188 landmarks=0 landmark_ms=0 elapsed_ms=132607
+## the phases (FIELD_PHASE)
+FIELD_PHASE name=batch_drop_and_collect marks=614 ms=1988 us_a_mark=3237
+FIELD_PHASE name=batch_setup marks=614 ms=15263 us_a_mark=24859
+FIELD_PHASE name=face_launch marks=614 ms=1122 us_a_mark=1827
+FIELD_PHASE name=outside_the_card marks=181 ms=2228 us_a_mark=12310
+FIELD_PHASE name=reverse_launch marks=614 ms=81204 us_a_mark=132255
+FIELD_PHASE name=run_setup marks=614 ms=107 us_a_mark=174
+FIELD_PHASE name=status_wait marks=614 ms=540 us_a_mark=880
+FIELD_PHASE name=tick_exposure_wait marks=2456 ms=11900 us_a_mark=4845
+FIELD_PHASE name=tick_launch_post marks=2456 ms=61 us_a_mark=25
+FIELD_PHASE name=tick_launch_pre marks=2456 ms=18141 us_a_mark=7386
+PHASES_SUM ms=132554
+PHASE_SHARE name=batch_drop_and_collect ms=1988 share=0.0150
+PHASE_SHARE name=batch_setup ms=15263 share=0.1151
+PHASE_SHARE name=face_launch ms=1122 share=0.0085
+PHASE_SHARE name=outside_the_card ms=2228 share=0.0168
+PHASE_SHARE name=reverse_launch ms=81204 share=0.6126
+PHASE_SHARE name=run_setup ms=107 share=0.0008
+PHASE_SHARE name=status_wait ms=540 share=0.0041
+PHASE_SHARE name=tick_exposure_wait ms=11900 share=0.0898
+PHASE_SHARE name=tick_launch_post ms=61 share=0.0005
+PHASE_SHARE name=tick_launch_pre ms=18141 share=0.1369
+## the profile (FIELD_PROFILE, FIELD_PROFILE_SPLIT)
+(none: this read does not set FIELD_PROFILE)
+MAIN p45 chain done 17:29:40

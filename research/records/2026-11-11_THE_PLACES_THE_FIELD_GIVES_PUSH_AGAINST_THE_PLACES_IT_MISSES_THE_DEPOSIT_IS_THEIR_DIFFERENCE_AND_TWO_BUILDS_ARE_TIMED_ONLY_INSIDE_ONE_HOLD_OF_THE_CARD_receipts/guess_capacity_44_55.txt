@@ -1640,3 +1640,55 @@ with the face side as its 64 columns, whole and by lane.
   Rule. The face becomes a composition of lanes that each block declares it reads (atlas tower.face-lane-composition), entering the line at (32, 32)
   read by every block, by reproducing te7's lap. The first lane founded after that is read by the blocks the census names as bound, and its width
   and its readers are a guess fixed before its build, from this read. No block's rows are cut: a trained row is never narrowed.
+G113 scored 2026-11-12T17:38Z (the Fable thread; tp1 and tp2, the PC's P45; receipts g113_tp1.txt and g113_tp2.txt, commit f2eb2956a on
+claude/carry-reads). Both runs ended by their own lap bounds and printed, and both gates held: 130 of 130 and 223 of 223 FIELD_SECTION lines equal
+te7's for the same sections, timings aside. Card peaks 10,376 and 10,490 MiB; tp2's peak_store 8,495,155,928 bytes, 0.800 of the pool's batch budget.
+  (a) Kernels 0.808 of elapsed: HIT (0.72 to 0.92). Allocations 0.057: MISSED (0.03 or less; 285,742 calls in 14,399 ms). Copies 0.018: HIT.
+  (b) MISSED: 3.61 batches a run (990 over 274) against 1.0 to 1.4. The derivation's premise was false: the support stride did not make a return one
+  batch (November 11 read 3.73), so allocations fell 1.6 times from that day's 0.093 and batch setup 1.6 times from 0.180, where it gave four.
+  (c) The contact family 0.547 of kernel time: HIT (0.38 to 0.65). The circles' four entries 0.0766: MISSED (0.02 or less). Their two scans took
+  6,108 and 7,810 ms, 62 ms a profiled section, where the derivation gave a few milliseconds a section. The moment entries 0.1397: HIT (0.08 to 0.30).
+  (d) Of the phases' sum (132,554 ms): the reverse 0.6126, HIT (0.48 to 0.72); batch setup 0.1151, HIT (0.03 to 0.15), at 24.9 ms a batch; the tick
+  exposure wait with the tick launches 0.0898 + 0.1369 + 0.0005 = 0.2272, HIT (0.07 to 0.25).
+  (f1) 2,095 launches a section: HIT (1,800 to 3,500). (f2) The host between timed calls 0.117 of elapsed: MISSED (0.17 to 0.35).
+  (f3) MISSED: tp1's first hundred sections ran at 931.8 ms against te7's 839.1 (1.110 times; all 130 at 927.1 against 825.9). The hold had no
+  repeated control, so the read does not say whether the marks or the hour cost the 93 ms: a timing difference is read against a repeated control
+  (the guide), and tp1 declared none.
+  What the two reads say together (agent-inferred). Timed alone, the kernels sum to 917 ms a section where te7's same sections took 810 ms whole, so
+  a launch timed alone carries a wait of its own (2,095 launches a section, the short ones 126 us on the mean), and the card computes through most
+  of an unprofiled section. The host between calls is 133 ms a profiled section.
+  The rule. Launches stand under 3,500 a section and short launches hold 0.139 of kernel time (under 0.15), so joining launches is not first. The
+  reverse's contact entries by the ruler's own family (field_contact_columns 32,327 ms, field_pace_skin_back 20,406, field_contact_rows 15,603,
+  field_pair_scan_back 7,810, field_spread 5,084, field_pair_gate_back 1,117, field_pair_back 444) hold 82,791 of 204,411 ms, 0.405 of kernel time:
+  over 0.40 with the circles' reverse scan in the family, 0.367 without it. Batch setup stands over 0.10 of elapsed with the card idle (0.115). The
+  largest share is the next loop's subject: the contact's arithmetic, read term by term for the widths its terms need; batch setup staged under
+  the card's stroke follows it.
+  What the rule cannot reach. The reverse's contact entries are 371 ms of a 1,077 ms profiled section, so with every one of them free a section
+  falls by about a third, and a pass over a gigabyte stays near 20 hours. The card met 26,765,119,339 pairs in tp2 (FIELD_CARD pairs, its opening
+  reads included) over 2,293,154 training sites, about 11,700 pairs a site, and the contact family's time follows that count. What a row meets is
+  the larger term, and it is read at the contact's law beside its arithmetic.
+G114 scored 2026-11-12T17:38Z (the Fable thread; receipt g114_block_directions.txt, commit f2eb2956a; te2/MEAN.0 stands, so the spans are te4 less
+te2 and te7 less te5, lap means, sharing no lap).
+  (a) MISSED: enc 38, before 40, after 40 of 64 against 16 or less (by lane 22 or 23 of 32).
+  (b) MISSED: the widest k is 40 (before, after, a, b, w) and the narrowest 24 (moment_face, carry_leak), a factor 1.67 against two.
+  The refusal as written did not fire (1.67 against 1.5). Its reason did. The three blocks under the rest are the three whose moving rows number 32
+  (carry_turn and carry_leak have 32 rows, and moment_face's spectrum ends at its 32nd value), and 32 rows cap k. The ruler drawn on spans of known
+  kind (census_ruler_drawn.txt, the passage record's receipts; two independent spans of full rank with standard normal entries, 40 draws a shape)
+  reads k = 44.6 at 101 rows of 64 columns, 40.9 at 64 rows, 45.4 at 128 and 26.4 at 32, and 23 of 32 columns by lane. Against its own shape's
+  drawn count each block stands between 0.78 (v and out, 32 against 40.9) and 0.95 (carry_turn, 25 against 26.4), the letter rows at 0.85 to 0.90.
+  One span alone reads 0.85 to 1.00 of its drawn count (w's first span 47 against 55.4, enc 51 against 54.0, moment_face's second 28 against 28.0).
+  Every block's travel fills the directions it has, and none is confined.
+  The faults in the guess (the Fable thread's). (1) Its reading put a block bound by its row length at 60 of 64 without drawing the ruler; drawn,
+  travel of full rank reads 41 to 46 of 64. (2) Its premise took the letter rows' large share of the lasting fall on little heat as travel in few
+  directions; a share of heat says nothing of rank. (3) Drawn, two spans that share their directions and two that share none read the same k at full
+  rank (43.1 to 44.7 against 44.6), so k detects a confined column space and nothing else: it cannot tell travel that repeats from travel that does
+  not.
+  What the receipt adds. The letter rows and the heads' charts travelled as far in the second span as in the first (root mean square 731 and 797
+  for enc, 982 and 1,076 for before, 135,260 and 144,520 for q), while the contacts and the carry charts travelled about six times less (a:
+  1,124,800 and 190,500). Over the second span the line's level moved a few thousandths of a nat a place (te7 less te6: 0.0027). Travel of one size
+  in every direction beside a level that barely moves is what the standing spread's slow part does at a lap's mean (atlas
+  deposition.rate-temperature-standing-spread: a mean keeps the spread of directions slower than a lap). [agent-inferred; the census does not
+  separate it from learning that repeats]
+  The rule. The face as a composition of lanes stands, entering at (32, 32) read by every block. The census names no block apart from the rest, so
+  it sizes no lane, and no lane's width or readers are fixed from this read. A lane's width is derived from the partition its readers hold (atlas
+  radix.register-composition) and fixed as its own guess before its build.

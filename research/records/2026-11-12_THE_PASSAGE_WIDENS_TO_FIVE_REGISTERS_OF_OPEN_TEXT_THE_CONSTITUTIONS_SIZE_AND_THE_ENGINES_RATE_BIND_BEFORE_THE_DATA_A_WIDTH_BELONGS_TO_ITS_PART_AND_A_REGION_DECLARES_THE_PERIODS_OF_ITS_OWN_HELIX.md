@@ -265,24 +265,81 @@ no small set of classes compresses. Refused if every block's `k` lies within a f
 other's: then the deposit uses one width, and an unequal need lies by lane or by class and is read
 there next.
 
+**The score** (17:38Z; the guess file of the circle line; receipt `g114_block_directions.txt`).
+Both parts missed. The letter rows read `k` = 38, 40 and 40 of 64, and the widest block's 40 stands
+1.67 times the narrowest's 24. The three blocks under the rest are the three whose moving rows
+number 32, which caps `k`. The ruler was then drawn on spans of known kind
+(`census_ruler_drawn.txt`): two independent spans of full rank read `k` = 44.6 at 101 rows of 64
+columns, 40.9 at 64 rows, 45.4 at 128 and 26.4 at 32. Against its own shape's drawn count each
+block stands between 0.78 and 0.95. So every block's travel fills the directions it has, none is
+confined, and the census names no block apart from the rest.
+
+Three faults of the guess, all the guesser's. Its reading put a block bound by its row length at
+60 of 64 without drawing the ruler, where full rank reads 41 to 46. Its premise took a large share
+of the lasting fall on little heat as travel in few directions, and a share of heat says nothing
+of rank. And the drawn ruler shows that `k` reads the same for two spans that share their
+directions and two that share none (43.1 to 44.7 against 44.6), so it detects a confined column
+space and nothing else. The method rule it repeats: before a guess is fixed on a ruler, the ruler
+is drawn on a case whose answer is known.
+
+What follows. The composition of lanes stands, since it is the declaration's own defect that it
+repairs, and it enters at `(32, 32)`. The census sizes no lane. A lane's width is derived from the
+partition its readers hold (atlas `radix.register-composition`) and fixed as its own guess before
+its build.
+
 ## 5. The form at the boundary
 
-- **A record** is `question US answer RS` as now, raw bytes. A document is read on a fixed grid of
-  256-byte answers, each with the 256 bytes before it as its question; the first window's question
-  is the document's title line. 256 is the code passage's median answer (its quartiles are 148, 255
-  and 495 bytes). No cut follows a word, a sentence or a line, so no grammar is authored.
-- **The science slice's rule**: a window whose bytes a line average under 25 is dropped (tables and
-  figure axes from PDFs): 7.6% of its windows on the shard read, none of the books' (`slice_yield.txt`).
-  The conversion prints the share it drops.
-- **The order** interleaves the slices by the smallest share of their progress, as the October 25
-  passage interleaved its media, so every stretch of the pass holds the mix.
-- **Held**: 128 windows a slice from the far end of the shard order
-  (`common_corpus_10/subset_100_10` backward), sharing no document with training by a hash of its
-  text; the code passage's 128 held problems stay as a sixth held region, so the line's level stays
-  readable across the change of passage.
-- **The pass** runs from the circle line's state, with no reset. A stretch is 1,535 sections, the
-  circle line's lap in sections; a stretch's mean of states is read as a lap's mean (atlas
-  `tower.field-lap-mean`), by slice and by quarter of open sites.
+Corrected the same day (17:40Z), after the trainer's region code was read: the first form cut every
+document on one grid of 256-byte answers, each with the 256 bytes before it. Under it every answer
+would begin at one phase of every ring, every question would have one extent, and a document's end
+would fall at a fixed place in a region. A cut is the trainer's, keyed like its other draws, and the
+boundary keeps documents.
+
+- **The store** (`tools/corpus_passage.py`, 199 controls in `tools/test_corpus_passage.py`). A slice
+  is its documents' bytes one after another, raw, with an index of one row a piece: the document's
+  ordinal, the title's octets, the text's octets, and two marks, whether the piece opens its
+  document and whether it closes it. No byte is a separator. A document whose text an earlier one
+  holds (by SHA-256) is left out and counted.
+- **The science slice's rule** stays at the boundary on its own grain: the text is measured on
+  windows of 256 bytes and a window whose bytes a line average under 25 is left out (tables and
+  figure axes from PDFs: 7.6% of its windows on the shard read, none of the books',
+  `slice_yield.txt`). The runs that stay are the document's pieces, which is why a piece carries
+  its marks. The 256 is the grain the rule's rate was measured at and no extent of a region.
+- **The cut** (the trainer's; agent-inferred design, not built). A piece's stream is its title line
+  where it opens, then its text. Answers tile the text: every byte is an answer once. A region is
+  an answer and the bytes of the stream before it, its question; a piece that does not open gives
+  its first question's bytes to be heard only. The answer's extent and the question's are two
+  keyed draws, each an octave of the distance drawn equally often from the near field's `[4, 8)`
+  to `[256, 512)` and then a place in it. Reason for the octaves: the contact hears a source `d`
+  sites away at `⌊log₂ d⌋` fewer bits, so each cost of hearing is met as often as each other.
+  Reason for the top: the card holds 280 octets a pair of a region's sites (§4.1), so a region
+  costs its sites squared, and the top octave holds the code passage's median answer, 256 (its
+  quartiles are 148, 255 and 495). The draws' mean extent is 108 bytes each, and the cost an answer
+  byte `E[(q + a)²]/E[a]` is 752 pairs against the fixed grid's 1,024. The top rises when the pair
+  store stands on its support. No cut follows a word, a sentence or a line, so no grammar is
+  authored.
+- **A true end.** The void follows the last answer of a piece that closes its document. Every other
+  region is cut and its answer goes on, as the trainer's cut regions already read. So the length
+  law is learned from documents' ends and from nothing a grid placed.
+- **The order.** The trainer draws its next piece from the slice of least progress (the text bytes
+  cut over the slice's part of the tier), as the October 25 passage interleaved its media, so every
+  stretch of the pass holds the mix. The smaller tier is each slice's front documents.
+- **Held**: 128 whole documents a slice from the far end of the shard order, sharing no text with
+  training or with each other; 128 is the count of the code line's held problems, whose reads'
+  spread is on record. How much of a held document a read takes is the read's, cut by the same law
+  under a fixed key. The code passage's 128 held problems stay as a sixth held region, so the
+  line's level stays readable across the change of passage.
+- **The letters.** The built codec's letters are the bytes its first passage used (99 on the code
+  passage, and the void), and it refuses a byte it has not met (`field_train.rs`, `FieldCodec`).
+  The wider passage needs the chart's letters to grow by arrival: at the crossing into a stretch,
+  each byte the stretch holds and the chart lacks is founded as a letter, its rows drawn as a
+  founding draws them and its face bias set at the least trained letter's, and the old held read
+  is printed before and after. The letter-sized parts are the three letter rows, the read bias,
+  the moment rows and the pace. With no new letter the build reproduces te7's lap.
+- **The pass** runs from the circle line's state, with no reset, once the letters grow and the
+  trainer reads a store by stretches (it reads a passage whole under 64 MiB now). A stretch is
+  1,535 sections, the circle line's lap in sections; a stretch's mean of states is read as a lap's
+  mean (atlas `tower.field-lap-mean`), by slice and by quarter of open sites.
 - **The product read**, every few stretches: one release from a held prompt of each slice, shown
   whole in the conversation.
 - **Later passages**, in Brandon's order: the Holonics material once the neutral passage reads well;
@@ -294,8 +351,8 @@ there next.
 
 A text, image, acoustic or motor application is a boundary chart of the elementary objects. Read at
 the law's owner, a chart hands a region two things: **letters** (a class at each site, resolved or
-open) and **incidence** (which sites are mates). Today the letters are the 256 octets and their
-marks, and the incidence is unstated because it is a line. The law names the line in six places (the
+open) and **incidence** (which sites are mates). Today the letters are the bytes the code passage
+used, 99 of them, and the void (§5), and the incidence is unstated because it is a line. The law names the line in six places (the
 module text of `hnn::tower::field`):
 
 | Law | Where the line stands |
@@ -453,17 +510,20 @@ its loose form.
 
 Data and engine (the circle line's thread; #404, #407):
 
-1. **Fetch** tier B with its manifest; **convert** tier A to the record form of §5; the conversion
-   prints, by slice, its documents, windows, bytes and dropped share, and the held windows' hashes.
-   The codec is `tools/corpus_passage.py` (the circle line's thread, the same day).
+1. **Fetch** tier B as a store of documents (§5) with its manifest; the fetch prints, by slice,
+   its documents, pieces, bytes and what the line rule left out, and every store file's hash. Tier
+   A is each slice's front documents. The codec is `tools/corpus_passage.py`.
 2. **Profile** a lap; the largest entries name the engine's next build. Two figures are kept beside
    every later run: sites a second, and bytes of card a site and a pair of sites (§4.1).
-3. **The pass** over tier A from the circle line's state, with §4's prediction scored at each
-   stretch's mean, and the product read shown whole.
-4. **The census of directions by block** (§4.1), scored against its guess; then **the face as a
-   composition of lanes**, entering by reproducing te7's lap at `(32, 32)`; then **growth** by one
-   lane of the width the census names, read by the blocks whose lack it answers. Tier B when its
-   pass takes under two days.
+3. **The letters' growth** and **the trainer's read of a store** by stretches with its keyed cut
+   (§5), each entering the line by reproducing te7's lap; then **the pass** over tier A from the
+   circle line's state, with §4's prediction scored at each stretch's mean, and the product read
+   shown whole.
+4. **The census of directions by block** (§4.1), scored 17:38Z: both parts missed, every block's
+   travel fills the directions it has, and the census sizes no lane. **The face as a composition
+   of lanes** enters by reproducing te7's lap at `(32, 32)`; a lane's width is then derived from
+   the partition its readers hold and fixed as its own guess. Tier B when its pass takes under two
+   days.
 
 More than one medium (planned now, run after the pass has begun):
 
@@ -498,5 +558,8 @@ no machine, no learner run): `shard_read.py` and `shard_read.txt` (the shard's c
 `helix_ruler.txt` (MNIST, `train-images-idx3-ubyte.gz`, SHA-256 `440fcabf…523609`), and
 `card_octets.py` and `card_octets.txt` (the constitution's entries by block and the card's octets by term,
 arithmetic copied from the source at main `8854c9693`), and `digit_ruler.py` and `digit_ruler.txt`
-(MNIST, a leading digit's content by radix and cut). No text of the
+(MNIST, a leading digit's content by radix and cut), and `census_ruler_drawn.py` and
+`census_ruler_drawn.txt` (the census's count on drawn spans of known kind, numpy on the cloud
+host). The census's own receipt and the two timing reads' are in the circle line's receipts
+(`g114_block_directions.txt`, `g113_tp1.txt`, `g113_tp2.txt`, the PC, November 12). No text of the
 corpus and no private passage is in the repository.

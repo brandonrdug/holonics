@@ -1,9 +1,9 @@
 #!/usr/bin/env -S python3 -I
 """The wider passage's boundary codec (Brandon, November 12 16:13Z: neutral text past the code set, from Common Corpus,
-without its government collection; the slices, the grid and the held cut follow the Fable thread's plan of November 12
-16:35Z).
+without its government collection; the slices and the held cut follow the plan record of November 12). It writes a store
+of documents. The cut of a document into regions is the trainer's, and no grid of regions is fixed here.
 
-Usage: corpus_passage.py OUT [--revision REV] [--answer-bytes N] [--prefix-bytes P] [--held K] [--cache DIR]
+Usage: corpus_passage.py OUT [--revision REV] [--text-bytes N] [--prefix-bytes P] [--held K] [--cache DIR]
                              [--max-shards S] [--max-held-shards T] [--early E] [--early-ms MS]
 
 The dataset is `PleIAs/common_corpus` at REV (`307910e4`, the prefix of one commit of its default branch, resolved to the
@@ -18,34 +18,41 @@ most one slice:
 
 and no row of 'Open Government' falls in any.
 
-A document (its text's UTF-8 bytes) is read on a fixed grid of 256-byte answers from its first byte, each with the 256
-bytes before it as its question; the first answer's question is the title line (the title's first 255 bytes and a
-newline). Each window is a record `question US answer RS` (US 0x1F, RS 0x1E), as field_train.rs `problems_of` reads one,
-raw bytes. So a passage file holds about twice its answer bytes. Two kinds of window are dropped and counted: one whose
-question or answer holds a separator, and a science window whose answer's lines average under 25 bytes (its bytes under
-25 times its newlines plus one; PDF tables).
+A slice's store is three files. `DOCS_<slice>.bin` holds its documents' bytes one after another, raw (a title and a text
+are UTF-8 as the dataset gives them, and no byte is a separator). `DOCS_<slice>.tsv` holds one row a piece with its
+document's ordinal in the slice, its title's octets, its text's octets and two marks, `opens` (the piece begins at its
+document's first byte) and `closes` (it ends at the document's last byte); a piece's bytes are its title's and then its
+text's, and only a piece that opens carries the title. `IDS_<slice>.txt` holds one identifier a document, by ordinal.
 
-From the front of the order each slice takes whole documents while its answer bytes stand under its share of N
-(8,000,000,000 answer bytes). Each shard is read once and deleted, and its SHA-256 is kept. The slices then interleave by
-the smallest share of their progress (the answer bytes written over the slice's own total; ties by the table's order), so
-every stretch holds the mix. PASSAGE.txt holds every kept window, and TRAIN.txt its prefix while the answer bytes written
-stand under P (1,000,000,000), so the smaller passage is a prefix of the larger.
+A document is one piece, except under a slice's line floor. The science slice has a floor of 25 bytes a line (its PDF
+tables and figures arrive one number a line): its text is measured on windows of 256 bytes from its first byte, the last
+window taking a tail shorter than 256, and a window whose bytes stand under 25 times its lines (its newlines plus one) is
+left out. The runs of windows that stay are the document's pieces. The 256 is this rule's own grain, the one its rate was
+measured at (7.6% of the science slice's windows on one shard, November 12); it is no extent of a training region. A
+document with no window left is counted and writes nothing.
 
-Held: from the far end of the order backward, each slice takes K (128) windows, one a document, from documents whose
-text's SHA-256 stands in no training document. The window taken is the document's middle one (index windows // 2), or the
-first kept window after it, written to HELD_<slice>.txt. A held shard that the training already read is refused.
+Why the marks: a region's question is the bytes before its answer, and a document's end is a true end. A piece that
+does not open has no title before it, and one that does not close ends at a cut, so the trainer needs both.
+
+From the front of the order each slice takes whole documents while its kept text bytes stand under its share of N
+(8,000,000,000 text bytes). A document whose text's SHA-256 an earlier training document holds is left out and counted.
+Each shard is read once and deleted, and its SHA-256 is kept. The smaller passage is a prefix: in each slice, the
+documents from the front while its text bytes stood under its share of P (1,000,000,000). `STORE.tsv` gives each
+slice's counts for the whole store, the prefix and the held store, with the SHA-256 of the bytes each covers.
+
+Held: from the far end of the order backward, each slice takes K (128, the count of problems of the code line's held
+passage, whose reads' spread is on record) whole documents whose text's SHA-256 stands in no training document and no
+earlier held one, written the same way as `HELD_<slice>.bin`, `HELD_<slice>.tsv` and `HELD_IDS_<slice>.txt`. How much of a
+held document a read takes is the read's. A held shard that the training already read is refused.
 
 The run's bounds are its projection's upper ends (the slice plan's 96 shards, from one shard read whole, whose web yield
 binds): it stops, reported incomplete (`CORPUS_STOPPED`), when the training has read S (120) shards with a quota still
-short, when the held windows have read T (4) shards with a slice still short, or when its first E (8) training shards
+short, when the held documents have read T (4) shards with a slice still short, or when its first E (8) training shards
 took more than MS (40,000) ms a shard on the mean.
 
-Writes:
-- LISTING.tsv: the shards at the revision;
-- MANIFEST.tsv: each shard read, with its role, path, octets, SHA-256, rows, and documents and answer bytes a slice;
-- IDS_<slice>.txt and HELD_IDS_<slice>.txt: the documents' identifiers in order.
-Prints one line a shard with its own ms, each slice's counts and drops, and every passage's SHA-256. Dataset roles are
-exterior codec information, not native identities.
+Also writes LISTING.tsv (the shards at the revision) and MANIFEST.tsv (each shard read, with its role, path, octets,
+SHA-256, rows, and documents and text bytes a slice). Prints one line a shard with its own ms, each slice's counts, and
+every store file's SHA-256. Dataset roles are exterior codec information, not native identities.
 """
 import argparse
 import hashlib
@@ -54,10 +61,7 @@ import re
 import sys
 import time
 
-RS, US = b"\x1e", b"\x1f"
-GRID = 256
-TITLE = GRID - 1
-LINE_FLOOR = 25
+LINE_GRID = 256
 REPO = "PleIAs/common_corpus"
 COLUMNS = ("identifier", "collection", "open_type", "language", "title", "text")
 SHARD = re.compile(r"^common_corpus_(\d+)/subset_(\d+)_(\d+)\.parquet$")
@@ -71,6 +75,9 @@ SLICES = (
     ("wikidata", 8, lambda r: r["open_type"] == "Semantic data"),
 )
 NAMES = tuple(name for name, _, _ in SLICES)
+LINE_FLOOR = {"science": 25}
+INDEX_HEAD = "document\ttitle_octets\ttext_octets\topens\tcloses\n"
+STORE_HEAD = "role\tslice\tshare\tline_floor\tdocuments\tpieces\ttext_octets\tstore_octets\tsha256\n"
 
 
 def order_of(paths):
@@ -93,19 +100,37 @@ def slice_of(row):
     return None
 
 
-def windows_of(title, text):
-    """A document's windows on the grid, (question, answer) byte strings."""
-    head = title[:TITLE] + b"\n"
-    return [(head if s == 0 else text[s - GRID:s], text[s:s + GRID]) for s in range(0, len(text), GRID)]
+def windows_of(length):
+    """The line rule's windows over a text of `length` bytes, (start, end): 256 bytes each from the first byte, the last one
+    taking a tail shorter than 256."""
+    starts = list(range(0, length - LINE_GRID + 1, LINE_GRID)) or ([0] if length else [])
+    return [(s, length if s == starts[-1] else s + LINE_GRID) for s in starts]
 
 
-def dropped(name, question, answer):
-    """Why a window is dropped, or None."""
-    if RS in question or US in question or RS in answer or US in answer:
-        return "separator"
-    if name == "science" and len(answer) < LINE_FLOOR * (answer.count(b"\n") + 1):
-        return "lines"
-    return None
+def thin(window, floor):
+    """Whether a window's bytes stand under `floor` times its lines (its newlines plus one)."""
+    return len(window) < floor * (window.count(b"\n") + 1)
+
+
+def runs_of(name, text):
+    """A document's pieces as (start, end) in its text, and the count and bytes of the windows its slice's line floor
+    left out. A slice with no floor keeps the document as one piece."""
+    floor = LINE_FLOOR.get(name)
+    if not floor:
+        return ([(0, len(text))] if text else []), 0, 0
+    runs, start, left, left_bytes = [], None, 0, 0
+    for s, e in windows_of(len(text)):
+        if thin(text[s:e], floor):
+            left += 1
+            left_bytes += e - s
+            if start is not None:
+                runs.append((start, s))
+                start = None
+        elif start is None:
+            start = s
+    if start is not None:
+        runs.append((start, len(text)))
+    return runs, left, left_bytes
 
 
 def rows_of(local):
@@ -130,41 +155,79 @@ def sha256_of(path):
     return h.hexdigest()
 
 
-def records(path):
-    """The records of a passage file, (question, answer), read in chunks."""
-    with open(path, "rb") as f:
-        rest = b""
-        for chunk in iter(lambda: f.read(1 << 24), b""):
-            parts = (rest + chunk).split(RS)
-            rest = parts.pop()
-            for record in parts:
-                cut = record.find(US)
-                yield record[:cut], record[cut + 1:]
-        if rest:
-            raise SystemExit(f"{path} ends inside a record")
+class Store:
+    """A slice's store while it is written: the bytes, the index, the identifiers, the counts and the bytes' SHA-256."""
+
+    def __init__(self, out, stem, ids_stem, name):
+        self.names = (f"{stem}_{name}.bin", f"{stem}_{name}.tsv", f"{ids_stem}_{name}.txt")
+        self.bin = open(os.path.join(out, self.names[0]), "wb")
+        self.tsv = open(os.path.join(out, self.names[1]), "w")
+        self.ids = open(os.path.join(out, self.names[2]), "w")
+        self.tsv.write(INDEX_HEAD)
+        self.sha = hashlib.sha256()
+        self.documents = self.pieces = self.text_octets = self.octets = 0
+
+    def add(self, identifier, title, text, runs):
+        """Writes a document's pieces and returns its kept text bytes."""
+        got = 0
+        for start, end in runs:
+            opens, closes = start == 0, end == len(text)
+            body = (title if opens else b"") + text[start:end]
+            self.bin.write(body)
+            self.sha.update(body)
+            self.tsv.write(f"{self.documents}\t{len(title) if opens else 0}\t{end - start}\t{int(opens)}\t{int(closes)}\n")
+            self.pieces += 1
+            self.octets += len(body)
+            got += end - start
+        self.ids.write(str(identifier).replace("\n", " ") + "\n")
+        self.documents += 1
+        self.text_octets += got
+        return got
+
+    def counts(self):
+        return f"{self.documents}\t{self.pieces}\t{self.text_octets}\t{self.octets}\t{self.sha.copy().hexdigest()}"
+
+    def close(self):
+        for f in (self.bin, self.tsv, self.ids):
+            f.close()
 
 
-def build(order, fetch, out, answer_bytes, prefix_bytes, held, remove=True, log=print, max_shards=None, max_held=None, early=0,
+def pieces(out, name, stem="DOCS"):
+    """A written store's pieces in order: (document, title, text, opens, closes), the title and text as bytes."""
+    with open(os.path.join(out, f"{stem}_{name}.tsv")) as tsv, open(os.path.join(out, f"{stem}_{name}.bin"), "rb") as data:
+        if tsv.readline() != INDEX_HEAD:
+            raise SystemExit(f"{stem}_{name}.tsv does not open with the index's head")
+        for line in tsv:
+            document, title_octets, text_octets, opens, closes = (int(x) for x in line.split("\t"))
+            title, text = data.read(title_octets), data.read(text_octets)
+            if len(title) != title_octets or len(text) != text_octets:
+                raise SystemExit(f"{stem}_{name}.bin ends inside a piece")
+            yield document, title, text, bool(opens), bool(closes)
+        if data.read(1):
+            raise SystemExit(f"{stem}_{name}.bin holds bytes past its index")
+
+
+def build(order, fetch, out, text_bytes, prefix_bytes, held, remove=True, log=print, max_shards=None, max_held=None, early=0,
           early_ms=None, clock=time.monotonic):
-    """The passage, its prefix and the held windows from the shards in `order` (`fetch(path)` gives a local file)."""
+    """The stores, the prefix's counts and the held stores from the shards in `order` (`fetch(path)` gives a local file)."""
     started = clock()
     ms = lambda: int((clock() - started) * 1000)  # noqa: E731
-    quota = {name: answer_bytes * share // 100 for name, share, _ in SLICES}
-    taken = dict.fromkeys(NAMES, 0)
-    docs = dict.fromkeys(NAMES, 0)
-    windows = dict.fromkeys(NAMES, 0)
-    drops = {(n, why): 0 for n in NAMES for why in ("separator", "lines")}
+    share = {name: s for name, s, _ in SLICES}
+    quota = {name: text_bytes * share[name] // 100 for name in NAMES}
+    prefix_quota = {name: prefix_bytes * share[name] // 100 for name in NAMES}
+    stores = {n: Store(out, "DOCS", "IDS", n) for n in NAMES}
+    prefix = dict.fromkeys(NAMES)
+    left = {n: [0, 0, 0, 0] for n in NAMES}  # windows left out, their bytes, documents with nothing kept, repeated documents
     trained = set()
     manifest = open(os.path.join(out, "MANIFEST.tsv"), "w")
-    manifest.write("role\tpath\toctets\tsha256\trows\t" + "\t".join(f"{n}_documents\t{n}_answer_bytes" for n in NAMES) + "\n")
-    parts = {n: open(os.path.join(out, f"slice_{n}.windows"), "wb") for n in NAMES}
-    ids = {n: open(os.path.join(out, f"IDS_{n}.txt"), "w") for n in NAMES}
+    manifest.write("role\tpath\toctets\tsha256\trows\t" + "\t".join(f"{n}_documents\t{n}_text_bytes" for n in NAMES) + "\n")
+    taken = lambda n: stores[n].text_octets  # noqa: E731
     read, times = [], []
     for path in order:
-        if all(taken[n] >= quota[n] for n in NAMES):
+        if all(taken(n) >= quota[n] for n in NAMES):
             break
         if max_shards is not None and len(read) == max_shards:
-            short = ", ".join(f"{n} {taken[n]} of {quota[n]}" for n in NAMES if taken[n] < quota[n])
+            short = ", ".join(f"{n} {taken(n)} of {quota[n]}" for n in NAMES if taken(n) < quota[n])
             manifest.close()
             raise SystemExit(f"CORPUS_STOPPED the training read {max_shards} shards with quotas short: {short}")
         shard_start = ms()
@@ -174,123 +237,103 @@ def build(order, fetch, out, answer_bytes, prefix_bytes, held, remove=True, log=
         for row in rows_of(local):
             rows += 1
             name = slice_of(row)
-            if name is None or taken[name] >= quota[name] or not row["text"]:
+            if name is None or taken(name) >= quota[name] or not row["text"]:
                 continue
-            got = 0
-            for q, a in windows_of(row["title"], row["text"]):
-                why = dropped(name, q, a)
-                if why:
-                    drops[(name, why)] += 1
-                    continue
-                parts[name].write(q + US + a + RS)
-                got += len(a)
-                windows[name] += 1
-            if got:
-                taken[name] += got
-                docs[name] += 1
-                kept_docs[name] += 1
-                kept_bytes[name] += got
-                trained.add(hashlib.sha256(row["text"]).digest())
-                ids[name].write(str(row["identifier"]).replace("\n", " ") + "\n")
+            key = hashlib.sha256(row["text"]).digest()
+            if key in trained:
+                left[name][3] += 1
+                continue
+            runs, windows, window_bytes = runs_of(name, row["text"])
+            left[name][0] += windows
+            left[name][1] += window_bytes
+            if not runs:
+                left[name][2] += 1
+                continue
+            got = stores[name].add(row["identifier"], row["title"], row["text"], runs)
+            trained.add(key)
+            kept_docs[name] += 1
+            kept_bytes[name] += got
+            if prefix[name] is None and taken(name) >= prefix_quota[name]:
+                prefix[name] = stores[name].counts()
         read.append(path)
         manifest.write(f"train\t{path}\t{octets}\t{digest}\t{rows}\t" + "\t".join(f"{kept_docs[n]}\t{kept_bytes[n]}" for n in NAMES) + "\n")
         manifest.flush()
         if remove:
             os.remove(local)
         times.append(ms() - shard_start)
-        log(f"CORPUS_SHARD role=train k={len(read)} path={path} octets={octets} rows={rows} " + " ".join(f"{n}={taken[n]}" for n in NAMES)
+        log(f"CORPUS_SHARD role=train k={len(read)} path={path} octets={octets} rows={rows} " + " ".join(f"{n}={taken(n)}" for n in NAMES)
             + f" shard_ms={times[-1]} ms={ms()}")
         if early and len(times) == early and early_ms is not None and sum(times) > early * early_ms:
             manifest.close()
             raise SystemExit(f"CORPUS_STOPPED the first {early} shards took {sum(times) // early} ms a shard, past {early_ms}")
-    for f in (*parts.values(), *ids.values()):
-        f.close()
-    short = [n for n in NAMES if taken[n] < quota[n]]
+    for s in stores.values():
+        s.close()
+    short = [n for n in NAMES if taken(n) < quota[n]]
     if short:
         manifest.close()
         raise SystemExit(f"CORPUS_STOPPED the order ran out before the quotas of {', '.join(short)}")
 
-    # The interleave: the slice of least progress writes its next window (a/A < b/B as a·B < b·A, in integers).
-    readers = {n: records(os.path.join(out, f"slice_{n}.windows")) for n in NAMES}
-    written = dict.fromkeys(NAMES, 0)
-    pending = {n: next(readers[n], None) for n in NAMES}
-    answers = 0
-    with open(os.path.join(out, "PASSAGE.txt"), "wb") as passage, open(os.path.join(out, "TRAIN.txt"), "wb") as train:
-        while True:
-            live = [n for n in NAMES if pending[n] is not None]
-            if not live:
-                break
-            n = live[0]
-            for m in live[1:]:
-                if written[m] * taken[n] < written[n] * taken[m]:
-                    n = m
-            q, a = pending[n]
-            record = q + US + a + RS
-            passage.write(record)
-            if answers < prefix_bytes:
-                train.write(record)
-            answers += len(a)
-            written[n] += len(a)
-            pending[n] = next(readers[n], None)
-    if remove:
-        for n in NAMES:
-            os.remove(os.path.join(out, f"slice_{n}.windows"))
-    log(f"CORPUS_INTERLEAVE answer_bytes={answers} ms={ms()}")
-
-    # The held windows, from the far end backward.
+    # The held documents, from the far end backward.
+    helds = {n: Store(out, "HELD", "HELD_IDS", n) for n in NAMES}
     want = dict.fromkeys(NAMES, held)
-    held_files = {n: open(os.path.join(out, f"HELD_{n}.txt"), "wb") for n in NAMES}
-    held_ids = {n: open(os.path.join(out, f"HELD_IDS_{n}.txt"), "w") for n in NAMES}
     shared, held_read = 0, 0
     for path in reversed(order):
         if not any(want.values()):
             break
         if path in read:
             manifest.close()
-            raise SystemExit(f"CORPUS_STOPPED the held windows reached {path}, which the training read")
+            raise SystemExit(f"CORPUS_STOPPED the held documents reached {path}, which the training read")
         if max_held is not None and held_read == max_held:
             manifest.close()
-            raise SystemExit(f"CORPUS_STOPPED the held windows read {max_held} shards with slices short: "
+            raise SystemExit(f"CORPUS_STOPPED the held documents read {max_held} shards with slices short: "
                              + ", ".join(f"{n} {held - want[n]} of {held}" for n in NAMES if want[n]))
         shard_start = ms()
         local = fetch(path)
         octets, digest = os.path.getsize(local), sha256_of(local)
-        rows, kept = 0, dict.fromkeys(NAMES, 0)
+        rows, kept, kept_bytes = 0, dict.fromkeys(NAMES, 0), dict.fromkeys(NAMES, 0)
         for row in rows_of(local):
             rows += 1
             name = slice_of(row)
             if name is None or not want[name] or not row["text"]:
                 continue
-            if hashlib.sha256(row["text"]).digest() in trained:
+            key = hashlib.sha256(row["text"]).digest()
+            if key in trained:
                 shared += 1
                 continue
-            ws = windows_of(row["title"], row["text"])
-            pick = next(((q, a) for q, a in ws[len(ws) // 2:] if not dropped(name, q, a)), None)
-            if pick is None:
+            runs, _, _ = runs_of(name, row["text"])
+            if not runs:
                 continue
-            held_files[name].write(pick[0] + US + pick[1] + RS)
-            held_ids[name].write(str(row["identifier"]).replace("\n", " ") + "\n")
+            kept_bytes[name] += helds[name].add(row["identifier"], row["title"], row["text"], runs)
+            trained.add(key)
             want[name] -= 1
             kept[name] += 1
         held_read += 1
-        manifest.write(f"held\t{path}\t{octets}\t{digest}\t{rows}\t" + "\t".join(f"{kept[n]}\t0" for n in NAMES) + "\n")
+        manifest.write(f"held\t{path}\t{octets}\t{digest}\t{rows}\t" + "\t".join(f"{kept[n]}\t{kept_bytes[n]}" for n in NAMES) + "\n")
         manifest.flush()
         if remove:
             os.remove(local)
         log(f"CORPUS_SHARD role=held k={held_read} path={path} octets={octets} rows={rows} " + " ".join(f"{n}={held - want[n]}" for n in NAMES)
             + f" shard_ms={ms() - shard_start} ms={ms()}")
-    for f in (*held_files.values(), *held_ids.values()):
-        f.close()
+    for s in helds.values():
+        s.close()
     manifest.close()
     if any(want.values()):
-        raise SystemExit("CORPUS_STOPPED the order ran out before the held windows")
+        raise SystemExit("CORPUS_STOPPED the order ran out before the held documents")
 
+    with open(os.path.join(out, "STORE.tsv"), "w") as f:
+        f.write(STORE_HEAD)
+        for role, of in (("train", lambda n: stores[n].counts()), ("prefix", lambda n: prefix[n] or stores[n].counts()),
+                         ("held", lambda n: helds[n].counts())):
+            for n in NAMES:
+                f.write(f"{role}\t{n}\t{share[n]}\t{LINE_FLOOR.get(n, 0)}\t{of(n)}\n")
+                documents, count, text_octets, store_octets, sha = of(n).split("\t")
+                log(f"CORPUS_STORE role={role} slice={n} documents={documents} pieces={count} text_bytes={text_octets} "
+                    f"octets={store_octets} sha256={sha}")
     for n in NAMES:
-        seen = windows[n] + drops[(n, "separator")] + drops[(n, "lines")]
-        log(f"CORPUS_SLICE {n} quota={quota[n]} answer_bytes={taken[n]} documents={docs[n]} windows={windows[n]} "
-            f"dropped_separator={drops[(n, 'separator')]} dropped_lines={drops[(n, 'lines')]} of={seen}")
-    log(f"CORPUS_HELD windows={held} a slice; documents skipped as shared with training {shared}")
-    for name in ("PASSAGE.txt", "TRAIN.txt", *(f"HELD_{n}.txt" for n in NAMES)):
+        log(f"CORPUS_SLICE {n} quota={quota[n]} text_bytes={taken(n)} documents={stores[n].documents} pieces={stores[n].pieces} "
+            f"windows_left_out={left[n][0]} bytes_left_out={left[n][1]} documents_emptied={left[n][2]} documents_repeated={left[n][3]}")
+    log(f"CORPUS_HELD documents={held} a slice; documents skipped as shared with training or an earlier held one {shared}")
+    for name in ("STORE.tsv", "MANIFEST.tsv", *(f for n in NAMES for f in stores[n].names), *(f for n in NAMES for f in helds[n].names)):
         p = os.path.join(out, name)
         log(f"CORPUS_FILE {name} octets={os.path.getsize(p)} sha256={sha256_of(p)}")
     log(f"CORPUS_DONE shards_train={len(read)} shards_held={held_read} ms={ms()}")
@@ -313,7 +356,7 @@ def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     ap.add_argument("out")
     ap.add_argument("--revision", default="307910e4")
-    ap.add_argument("--answer-bytes", type=int, default=8_000_000_000)
+    ap.add_argument("--text-bytes", type=int, default=8_000_000_000)
     ap.add_argument("--prefix-bytes", type=int, default=1_000_000_000)
     ap.add_argument("--held", type=int, default=128)
     ap.add_argument("--cache", default=None, help="where a shard stands while it is read (default OUT/cache)")
@@ -323,7 +366,7 @@ def main(argv=None):
     ap.add_argument("--early-ms", type=int, default=40_000)
     args = ap.parse_args(argv)
     if os.path.exists(args.out):
-        sys.exit(f"{args.out} stands; a passage is written under a new directory")
+        sys.exit(f"{args.out} stands; a store is written under a new directory")
     from huggingface_hub import HfApi, hf_hub_download
 
     api = HfApi()
@@ -340,7 +383,7 @@ def main(argv=None):
     def fetch(path):
         return hf_hub_download(REPO, path, repo_type="dataset", revision=sha, local_dir=cache)
 
-    build(order, fetch, args.out, args.answer_bytes, args.prefix_bytes, args.held, log=lambda s: print(s, flush=True),
+    build(order, fetch, args.out, args.text_bytes, args.prefix_bytes, args.held, log=lambda s: print(s, flush=True),
           max_shards=args.max_shards, max_held=args.max_held_shards, early=args.early, early_ms=args.early_ms)
 
 

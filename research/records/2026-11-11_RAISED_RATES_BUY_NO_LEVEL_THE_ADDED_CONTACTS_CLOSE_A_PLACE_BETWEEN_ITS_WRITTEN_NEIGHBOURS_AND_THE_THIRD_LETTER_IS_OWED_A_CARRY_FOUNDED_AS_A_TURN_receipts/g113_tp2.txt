@@ -1,0 +1,132 @@
+# G113 re-declared 2026-11-12T16:58Z (P45), tp2: te7's lap from te6/STATE.0 by bin-carry-coupled (87994ea23's release field_pass) with
+# lap_tf.sh's exports and arguments as te7 had, FIELD_PROFILE=1 alone (every launch, transfer and allocation timed alone after the stream drains), the lap bound 240,000 ms and the run's 400,000 ms, in a fresh run directory tp2
+# (RUN is P24's run directory); its state STATE.stopped is a ruler's and trains nothing. It scores (a) to (c), (f1) and (f2); this receipt scores nothing.
+# Device line: the card, the RTX 4080 SUPER under HOLONICS_ROOT/.local/gpu.lock, its own hold, alone on the card with nothing else on the host; outer
+# timeout 420 s, at most 12 GB (11,444 MiB) of the card's memory read by nvidia-smi every 5 s, a 12 GiB ceiling on the host's resident set; stopped
+# past 1,290 ms a section over n=0..99. Dispatched with tools/runs.py (p45). The gate on the host, one thread, after it.
+## the run (header)
+# p45 chain at main 96557dc64 17:23:10
+# tp2 from te6/STATE.0 2109252566736ded; binary 54f9cb36459453d2 (87994ea23); FIELD_PROFILE=1 alone; lap bound 240000 ms, the run's 400000 ms, outer 420 s, early stop past 1290 ms over n=0..99 17:25:23
+# tp2: lock taken 17:25:26 wait_s=3.018154091
+EARLY_RATE tp2 sections=100 mean_section_ms=1117.8 bound_ms=1290 17:27:33
+# tp2: run exit 0 released 17:29:40
+CARD_PEAK tp2 used_memory_mib=10490 (nvidia-smi, sampled every 5 s)
+ENDED_BY_LAP_BOUND tp2 yes
+SECTIONS tp2 sections=223 mean_first100_ms=1117.8 mean_all_ms=1076.7 sections_sum_ms=240115 (te7's same sections: first100 839.1 ms, all 223 809.6 ms)
+GATE_SECTIONS tp2 compared=223 equal=223 te7_lines=223 differing_lines=0 EQUAL
+FIELD_CARD_OPEN card=NVIDIA GeForce RTX 4080 SUPER free=15611002880 total=16802250752 batch_budget=10619912192
+FIELD_UNSEEN lap=-1 code=0.778 sites=43660 next=- ms=11514
+FIELD_STOPPED lap=0 sections=223/1535 reason=lap sites=2293154 before=3.166 after=- deposited=223 halvings=0 next_halved=0 next_refused=0 lap_ms=241567 ms=253082
+FIELD_UNSEEN lap=0 stopped code=0.778 sites=43660 next=- ms=253082
+MEASURE lap=tp2 rc=0 wall_s=253.5 peak_rss_kib=952288
+SECTION_MEANS tp2 sections=223 first100_ms=1117.8 all_ms=1076.7 sum_ms=240115 (te7 same sections: first100_ms=839.1 all_ms=809.6; ratio first100=1.332 all=1.330)
+OUTSIDE_SECTIONS tp2 elapsed_ms=253090 sections_ms=240115 outside_ms=12975 share=0.051
+OUTSIDE_SECTIONS te7 elapsed_ms=1285211 sections_ms=1265621 outside_ms=19590 (te7's whole lap, 1535 sections)
+## the card (FIELD_CARD)
+FIELD_CARD reads=46 read_ms=11826 returns=228 return_ms=238203 pairs=26765119339 batches=990 peak_store=8495155928 landmarks=0 landmark_ms=0 elapsed_ms=253090
+## the phases (FIELD_PHASE)
+(none: this read does not set FIELD_PHASES)
+## the profile (FIELD_PROFILE, FIELD_PROFILE_SPLIT)
+FIELD_PROFILE entry=field_add launches=3720 ms=269 us_a_launch=72 grid_threads=2866555904 mean_grid_threads=770579
+FIELD_PROFILE entry=field_affine_tiled_x32 launches=31440 ms=7523 us_a_launch=239 grid_threads=33675557888 mean_grid_threads=1071105
+FIELD_PROFILE entry=field_affine_tiled_x64 launches=8910 ms=3395 us_a_launch=381 grid_threads=7741509120 mean_grid_threads=868856
+FIELD_PROFILE entry=field_blank_bias_enc launches=2790 ms=692 us_a_launch=248 grid_threads=3420941568 mean_grid_threads=1226143
+FIELD_PROFILE entry=field_blank_dx launches=2790 ms=137 us_a_launch=49 grid_threads=2149916928 mean_grid_threads=770579
+FIELD_PROFILE entry=field_blank_dy launches=2790 ms=695 us_a_launch=249 grid_threads=2149916928 mean_grid_threads=770579
+FIELD_PROFILE entry=field_blank_dz launches=2790 ms=645 us_a_launch=231 grid_threads=3359176704 mean_grid_threads=1204005
+FIELD_PROFILE entry=field_blank_lift_read launches=2790 ms=591 us_a_launch=211 grid_threads=2189432064 mean_grid_threads=784742
+FIELD_PROFILE entry=field_blank_rates launches=2970 ms=290 us_a_launch=97 grid_threads=81004800 mean_grid_threads=27274
+FIELD_PROFILE entry=field_carry_gates_read launches=64 ms=17 us_a_launch=275 grid_threads=60997632 mean_grid_threads=953088
+FIELD_PROFILE entry=field_chart launches=11880 ms=2465 us_a_launch=207 grid_threads=5161752576 mean_grid_threads=434490
+FIELD_PROFILE entry=field_classes launches=3960 ms=937 us_a_launch=236 grid_threads=7567360 mean_grid_threads=1910
+FIELD_PROFILE entry=field_contact_columns launches=14880 ms=32327 us_a_launch=2172 grid_threads=5733111808 mean_grid_threads=385289
+FIELD_PROFILE entry=field_contact_l5 launches=3857 ms=14182 us_a_launch=3677 grid_threads=6477682560 mean_grid_threads=1679461
+FIELD_PROFILE entry=field_contact_l6 launches=103 ms=1509 us_a_launch=14657 grid_threads=402946688 mean_grid_threads=3912103
+FIELD_PROFILE entry=field_contact_rows launches=14880 ms=15603 us_a_launch=1048 grid_threads=5733111808 mean_grid_threads=385289
+FIELD_PROFILE entry=field_current_back launches=3720 ms=293 us_a_launch=78 grid_threads=1433512960 mean_grid_threads=385352
+FIELD_PROFILE entry=field_echo_trips launches=60 ms=86 us_a_launch=1443 grid_threads=199117824 mean_grid_threads=3318630
+FIELD_PROFILE entry=field_encoding launches=2790 ms=167 us_a_launch=59 grid_threads=42757376 mean_grid_threads=15325
+FIELD_PROFILE entry=field_exponential launches=274 ms=18 us_a_launch=66 grid_threads=17956864 mean_grid_threads=65536
+FIELD_PROFILE entry=field_exposure launches=3960 ms=5633 us_a_launch=1422 grid_threads=6880629248 mean_grid_threads=1737532
+FIELD_PROFILE entry=field_face launches=3960 ms=355 us_a_launch=89 grid_threads=1720584192 mean_grid_threads=434490
+FIELD_PROFILE entry=field_face_covector launches=930 ms=60 us_a_launch=65 grid_threads=1119725568 mean_grid_threads=1204005
+FIELD_PROFILE entry=field_face_set launches=911 ms=82 us_a_launch=90 grid_threads=752341504 mean_grid_threads=825841
+FIELD_PROFILE entry=field_face_weigh launches=236 ms=21 us_a_launch=91 grid_threads=369276160 mean_grid_threads=1564729
+FIELD_PROFILE entry=field_frame launches=3960 ms=464 us_a_launch=117 grid_threads=1720584192 mean_grid_threads=434490
+FIELD_PROFILE entry=field_frame_probe launches=3960 ms=458 us_a_launch=115 grid_threads=1720584192 mean_grid_threads=434490
+FIELD_PROFILE entry=field_held_rows launches=80 ms=334 us_a_launch=4182 grid_threads=265493504 mean_grid_threads=3318668
+FIELD_PROFILE entry=field_moment_accumulate launches=8370 ms=928 us_a_launch=110 grid_threads=6449750784 mean_grid_threads=770579
+FIELD_PROFILE entry=field_moment_add launches=3960 ms=424 us_a_launch=107 grid_threads=3440670720 mean_grid_threads=868856
+FIELD_PROFILE entry=field_moment_add_probe launches=7680 ms=839 us_a_launch=109 grid_threads=6307226624 mean_grid_threads=821253
+FIELD_PROFILE entry=field_moment_admit_paced_all launches=7680 ms=393 us_a_launch=51 grid_threads=421462016 mean_grid_threads=54877
+FIELD_PROFILE entry=field_moment_ds_all launches=3720 ms=170 us_a_launch=45 grid_threads=717000704 mean_grid_threads=192742
+FIELD_PROFILE entry=field_moment_pace_back_all launches=3720 ms=4572 us_a_launch=1229 grid_threads=724156416 mean_grid_threads=194665
+FIELD_PROFILE entry=field_moment_paced_all launches=3960 ms=4519 us_a_launch=1141 grid_threads=868139008 mean_grid_threads=219227
+FIELD_PROFILE entry=field_moment_prefix_paced_all launches=19080 ms=1945 us_a_launch=101 grid_threads=1022230528 mean_grid_threads=53576
+FIELD_PROFILE entry=field_moment_return_paced_all launches=3720 ms=4123 us_a_launch=1108 grid_threads=724156416 mean_grid_threads=194665
+FIELD_PROFILE entry=field_moment_scatter_all launches=3960 ms=840 us_a_launch=212 grid_threads=860550144 mean_grid_threads=217310
+FIELD_PROFILE entry=field_moment_skinned_all launches=3720 ms=8156 us_a_launch=2192 grid_threads=14602240 mean_grid_threads=3925
+FIELD_PROFILE entry=field_moment_strand_return_all launches=3720 ms=976 us_a_launch=262 grid_threads=717000704 mean_grid_threads=192742
+FIELD_PROFILE entry=field_moment_strands_all launches=7680 ms=686 us_a_launch=89 grid_threads=1577550848 mean_grid_threads=205410
+FIELD_PROFILE entry=field_open launches=990 ms=73 us_a_launch=74 grid_threads=860167680 mean_grid_threads=868856
+FIELD_PROFILE entry=field_outer_bound_x32 launches=23250 ms=5087 us_a_launch=218 grid_threads=70041600 mean_grid_threads=3012
+FIELD_PROFILE entry=field_outer_bound_x64 launches=8370 ms=1546 us_a_launch=184 grid_threads=25214976 mean_grid_threads=3012
+FIELD_PROFILE entry=field_outer_x32 launches=55800 ms=8305 us_a_launch=148 grid_threads=24202286848 mean_grid_threads=433732
+FIELD_PROFILE entry=field_outer_x64 launches=8370 ms=1675 us_a_launch=200 grid_threads=9340444672 mean_grid_threads=1115943
+FIELD_PROFILE entry=field_pace_c_back launches=3720 ms=1249 us_a_launch=336 grid_threads=90037248 mean_grid_threads=24203
+FIELD_PROFILE entry=field_pace_current_back launches=3720 ms=248 us_a_launch=66 grid_threads=90037248 mean_grid_threads=24203
+FIELD_PROFILE entry=field_pace_frame_back launches=3720 ms=513 us_a_launch=137 grid_threads=90037248 mean_grid_threads=24203
+FIELD_PROFILE entry=field_pace_kappa_back launches=3720 ms=4121 us_a_launch=1107 grid_threads=952320 mean_grid_threads=256
+FIELD_PROFILE entry=field_pace_skin_back launches=7440 ms=20406 us_a_launch=2742 grid_threads=2866555904 mean_grid_threads=385289
+FIELD_PROFILE entry=field_paces launches=3960 ms=3770 us_a_launch=952 grid_threads=1019904 mean_grid_threads=257
+FIELD_PROFILE entry=field_pair launches=3960 ms=900 us_a_launch=227 grid_threads=1720584192 mean_grid_threads=434490
+FIELD_PROFILE entry=field_pair_back launches=3720 ms=444 us_a_launch=119 grid_threads=1433512960 mean_grid_threads=385352
+FIELD_PROFILE entry=field_pair_gamma launches=3960 ms=632 us_a_launch=159 grid_threads=1720584192 mean_grid_threads=434490
+FIELD_PROFILE entry=field_pair_gate_back launches=3720 ms=1117 us_a_launch=300 grid_threads=1433512960 mean_grid_threads=385352
+FIELD_PROFILE entry=field_pair_scan launches=3960 ms=6108 us_a_launch=1542 grid_threads=2378752 mean_grid_threads=600
+FIELD_PROFILE entry=field_pair_scan_back launches=3720 ms=7810 us_a_launch=2099 grid_threads=1874944 mean_grid_threads=504
+FIELD_PROFILE entry=field_pframes launches=3960 ms=1128 us_a_launch=284 grid_threads=860550144 mean_grid_threads=217310
+FIELD_PROFILE entry=field_ratio_adjoint launches=11160 ms=957 us_a_launch=85 grid_threads=4300538880 mean_grid_threads=385352
+FIELD_PROFILE entry=field_skin_addresses launches=3960 ms=817 us_a_launch=206 grid_threads=860550144 mean_grid_threads=217310
+FIELD_PROFILE entry=field_spread launches=14880 ms=5084 us_a_launch=341 grid_threads=44826624 mean_grid_threads=3012
+FIELD_PROFILE entry=field_sums launches=3960 ms=1345 us_a_launch=339 grid_threads=8207360 mean_grid_threads=2072
+FIELD_PROFILE entry=field_tied_back_e launches=930 ms=284 us_a_launch=305 grid_threads=1122649600 mean_grid_threads=1207150
+FIELD_PROFILE entry=field_tied_back_y launches=930 ms=201 us_a_launch=216 grid_threads=716638976 mean_grid_threads=770579
+FIELD_PROFILE entry=field_tied_face launches=3960 ms=883 us_a_launch=223 grid_threads=5344363520 mean_grid_threads=1349586
+FIELD_PROFILE entry=field_transposed launches=34410 ms=6190 us_a_launch=179 grid_threads=29381729024 mean_grid_threads=853871
+FIELD_PROFILE entry=field_unframe launches=11160 ms=1504 us_a_launch=134 grid_threads=4300538880 mean_grid_threads=385352
+FIELD_PROFILE entry=field_unit launches=3960 ms=1262 us_a_launch=318 grid_threads=6880867328 mean_grid_threads=1737592
+FIELD_PROFILE entry=field_unit_back launches=3720 ms=881 us_a_launch=236 grid_threads=5732642816 mean_grid_threads=1541033
+FIELD_PROFILE entry=field_unit_back_probe launches=3720 ms=802 us_a_launch=215 grid_threads=5732642816 mean_grid_threads=1541033
+FIELD_PROFILE entry=field_unit_probe launches=3960 ms=1250 us_a_launch=315 grid_threads=6880867328 mean_grid_threads=1737592
+FIELD_PROFILE_SPLIT kernels_ms=204448 copies=36658 copies_ms=4609 allocations=285742 allocations_ms=14399 elapsed_ms=253090
+LAUNCHES tp2 launches=467195 sections=223 launches_a_section=2095 (the run's opening reads and the stopped lap's withheld read included)
+CIRCLES_ENTRIES ms=15667 share_of_kernels=0.0766 field_pair_gamma=632 field_pair_gate_back=1117 field_pair_scan=6108 field_pair_scan_back=7810
+MOMENT_ENTRIES ms=28571 share_of_kernels=0.1397 entries=13
+PEAK_STORE tp2 peak_store=8495155928 batch_budget=10619912192 share_of_budget=0.800
+## the ruler (profile_budget.py on tp2's log)
+elapsed_ms=253090 kernels_ms=204448 entries_ms=204411 launches=467195 entries=72
+share_of_elapsed kernels=0.808 wide=0.696 short=0.112 allocations=0.057 copies=0.018 host=0.117
+short_launches=225401 mean_us=126 share_of_kernel=0.139 least_us_a_launch=45
+allocation_us=50.4 copy_us=125.7
+share_of_kernel contact=0.547 affine=0.053 top_five=0.444
+reads=46 returns=228 batches=990 batches_a_run=3.61 pairs_met=26765119339 pairs_a_run=9.768e+07 peak_store=8495155928
+a_batch launches=472 allocations=289 copies=37
+field_contact_columns              launches=  14880 ms= 32327 us_a_launch=  2172 share_of_kernel=0.158
+field_pace_skin_back               launches=   7440 ms= 20406 us_a_launch=  2742 share_of_kernel=0.100
+field_contact_rows                 launches=  14880 ms= 15603 us_a_launch=  1048 share_of_kernel=0.076
+field_contact_l5                   launches=   3857 ms= 14182 us_a_launch=  3677 share_of_kernel=0.069
+field_outer_x32                    launches=  55800 ms=  8305 us_a_launch=   148 share_of_kernel=0.041
+field_moment_skinned_all           launches=   3720 ms=  8156 us_a_launch=  2192 share_of_kernel=0.040
+field_pair_scan_back               launches=   3720 ms=  7810 us_a_launch=  2099 share_of_kernel=0.038
+field_affine_tiled_x32             launches=  31440 ms=  7523 us_a_launch=   239 share_of_kernel=0.037
+field_transposed                   launches=  34410 ms=  6190 us_a_launch=   179 share_of_kernel=0.030
+field_pair_scan                    launches=   3960 ms=  6108 us_a_launch=  1542 share_of_kernel=0.030
+field_exposure                     launches=   3960 ms=  5633 us_a_launch=  1422 share_of_kernel=0.028
+field_outer_bound_x32              launches=  23250 ms=  5087 us_a_launch=   218 share_of_kernel=0.025
+field_spread                       launches=  14880 ms=  5084 us_a_launch=   341 share_of_kernel=0.025
+field_moment_pace_back_all         launches=   3720 ms=  4572 us_a_launch=  1229 share_of_kernel=0.022
+field_moment_paced_all             launches=   3960 ms=  4519 us_a_launch=  1141 share_of_kernel=0.022
+field_moment_return_paced_all      launches=   3720 ms=  4123 us_a_launch=  1108 share_of_kernel=0.020
+RULER_EXIT 0
+MAIN p45 chain done 17:29:40
