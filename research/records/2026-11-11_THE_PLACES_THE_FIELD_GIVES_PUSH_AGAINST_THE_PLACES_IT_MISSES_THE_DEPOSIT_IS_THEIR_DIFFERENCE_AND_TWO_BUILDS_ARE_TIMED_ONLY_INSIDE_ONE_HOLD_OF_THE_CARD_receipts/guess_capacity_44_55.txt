@@ -1692,3 +1692,49 @@ te2 and te7 less te5, lap means, sharing no lap).
   The rule. The face as a composition of lanes stands, entering at (32, 32) read by every block. The census names no block apart from the rest, so
   it sizes no lane, and no lane's width or readers are fixed from this read. A lane's width is derived from the partition its readers hold (atlas
   radix.register-composition) and fixed as its own guess before its build.
+Correction 2026-11-12T18:30Z to the card's memory note under G113 and to G113's score (the thread that holds the PC's runs since the hand-off above;
+receipt te7_regions_census.txt, the PC's P47, commit 320eed990 on claude/carry-reads; the record of November 12 on the opening's room). A lap line's
+`sites` are FieldReceipt.sites, each region's weighed domain where it read an open site; they are not the sites the card computes. A count ruler
+(section_regions_census.py) rebuilt te7's 73,671 training regions from the trainer's rules, and its `sites` and `length` equal the log's on 1,535 of
+1,535 sections. The figures formed from the lap lines' count are replaced:
+  - "te7's 672 sites a region": a region is 458 sites on the mean where it is a mask or a writer's state and 2,188 where it is an opening (the
+    question and the whole room of 2,062 open places). The lap computed 76,296,317 sites, 4.6 times the lines' 16,589,049; 0.704 of them stand in
+    the openings, which compare 12 places each.
+  - "the pairs hold 188 KB a site, 72 % of it": over the lap the pair store reserves 37,245,663,667,240 octets and the sites 5,454,118,517,062, so
+    the pairs hold 0.872; the openings hold 0.886 of the lap's sum of sites squared.
+  - "about 11,700 pairs a site" (G113's score): the card's pairs over domain sites. A computed site meets 116 pairs a head and tick on the least
+    count (8,882,385,215 over 76,296,317), 1,863 over a read's 16.
+  - "13,000 sites a second" (the state guide and the plan): 13,086 weighed domain sites a second; the card computed 60,180 sites a second.
+  G113's rule named the contact's arithmetic as the next loop and what a row meets as the larger term. The count places what a row meets in the
+  trainer's regions: every opening computes its whole room since the carry circles (FieldDeclaration::room_window returns none where a circle
+  stands, so the exported room cut is inert). The trainer's regions come before the contact's arithmetic, and the scores above stand as scored.
+G115 fixed 2026-11-12T18:30Z (the same thread), before the build it reads exists: the rate of the store's trainer on its first timed sections. The
+build (the record of November 12 on the opening's room, §4): a stretch is a keyed run of a document, a context and a run each on an octave uniform
+over [4, 8) to [256, 512) and uniform within it; one keyed state a stretch (a mask state or the writer's state, even odds); no opening and no room;
+a section takes stretches until its regions' pairs of sites or its sites would pass a bound carried in the learner's state (15,606,223 pairs of
+sites and 41,490 sites, nine tenths of te7's one-batch peak store at 257 classes' octets a site); the letters founded at the crossing, a fresh
+letter's encoding at zero and its class bias at the least the constitution holds. It continues te7's state on the 1 GB prefix of the store (the
+PC's P46). The cut is stated draw by draw in store_stretch_census.py (the passage record's receipts), which the build's lines are held to.
+  The premise, from the logs. te7's own 1,535 sections against the ruler's counts for the same sections (CENSUS_FIT, te7_regions_census.txt): a
+  section's deposit time = 38.4 ms + 8.746 us a computed site + 3.747 ns a pair met over the read's 16 head-ticks, 0.745 of the sections' variance;
+  tp2's 223 profiled sections read the same form (10.94 us and 3.875 ns, 0.757). The rate of a site is read there from the masks' and writers'
+  sites, which vary by section and are the kind a stretch's sites are; the rooms' sites are the same in every section and the fit cannot tell them
+  from a cost a section pays once. The ruler's draw of the cut (store_stretch_draw.txt, 100,000 keyed stretches): a region is 217 sites and 81,440 pairs
+  of sites on the mean, and a section under the bounds holds 186 regions and 40,371 sites; 0.325 of the computed sites are open, every one of
+  them compared (on te7's lap 0.792 are open and 0.132 compared); a computed site meets 54.2 pairs a head and tick on the least count (116 on
+  te7's).
+  The derivation (agent-inferred). At te7's rates a computed site of the cut costs 8.75 us for itself and 3.25 us for its pairs (54.2 by 16 by
+  3.747 ns), 12.0 us. Above that: the section's fixed 38 ms over 40,371 sites, 1.0 us; the families that follow the alphabet (the encodings' and
+  the readout's entries, 0.13 of the profiled kernel time at 100 classes) at about 250 classes, 2 us or more; and compared rows are 0.325 of the
+  sites where te7's were 0.132. Under it: one batch a section in place of four removes three of four batch setups (24.9 ms each in tp2).
+  (a) A section's deposit time over its computed sites, the mean of the first hundred timed sections past the first: 15 us (11 to 19).
+  (b) Batches a training section: 1.00 (at most 1.05).
+  (c) The pairs' term of the same form fitted on the run's own sections (deposit time against the sites computed and the pairs met, each printed a
+      section): 0.20 to 0.35 of a mean section's time.
+  At 15 us a computed site, and one computed site a byte, the 1 GB prefix passes in 4.2 hours and the 8 GB in 33.
+  Rule. (a) inside its range, or under it: the pass over the 1 GB prefix runs, its projection re-declared from the measured sections before its
+  launch. (a) above 19 us: one profiled read of the same sections names the largest entry, and that entry is the loop before the pass. (b) missed:
+  the bound's arithmetic against region_octets is read before any pass (the obligation the record leaves in #410). (c) above 0.35: the pair store
+  on its support (atlas tower.field-support-stride) comes before the terms' widths; under 0.20: the site kernels' entries come first.
+  What it does not read. The level: a new line's first sections say nothing of what the pass will write, and the pass is judged by what it writes
+  from held prompts by slice and by its structure measures, never by this rate.

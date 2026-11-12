@@ -134,16 +134,24 @@ repository was reset on September 24; the pre-reset tree is
     against the line's binding measure, its rate. The count stays the circle's law and is owed one
     attempt on the next line; its first source, uncompiled and untested, is at the tag
     `archive/claude/carry-count`.
-  - The rate. te7 read 11.6 MB of passage (16,589,049 sites) in 1,268 s, about 9.2 KB and 13,000
-    sites a second, so a gigabyte of passage takes about 30 hours a pass. Where a lap spends its time
-    is read (G113, scored November 12 17:38Z from a phases run and a profile run that each ended by
-    its own lap bound): kernels are 0.808 of a profiled lap, the contact family 0.547 of kernel time
-    and its reverse entries 0.405 (371 ms of a 1,077 ms profiled section), batch setup 0.115 of a
-    lap with the card idle, 2,095 launches a section, 3.61 batches a run. The next loop by the
-    guess's rule is the contact's arithmetic, read term by term for the widths its terms need.
-    With every one of those entries free a pass over a gigabyte stays near 20 hours, and the card
-    met about 11,700 pairs a training site, so what a row meets is read at the contact's law beside
-    its arithmetic.
+  - The rate. te7 read 11.6 MB of passage in 1,268 s, 9.2 KB a second, so a gigabyte of passage
+    takes about 30 hours a pass on this line. Where a lap spends its time is read twice.
+    By kernel (G113, scored November 12 17:38Z from a phases run and a profile run that each ended
+    by its own lap bound): kernels are 0.808 of a profiled lap, the contact family 0.547 of kernel
+    time and its reverse entries 0.405 (371 ms of a 1,077 ms profiled section), batch setup 0.115
+    of a lap with the card idle, 2,095 launches a section, 3.61 batches a run.
+    By kind of region ([the record on the opening's room](research/records/2026-11-12_A_LAPS_CARD_TIME_STANDS_IN_THE_OPENINGS_EMPTY_ROOM_A_LAP_LINES_SITES_ARE_WEIGHED_DOMAINS_A_STRETCH_OF_A_DOCUMENT_TAKES_ONE_KEYED_STATE_AND_EVERY_EXTENT_OF_THE_DECLARATION_IS_GIVEN_ITS_PART.md);
+    a count ruler that rebuilds a lap's 73,671 training regions from the trainer's rules and equals
+    the lap's log on 1,535 of 1,535 sections): a lap line's `sites` are weighed domains
+    (16,589,049), and the card computes 76,296,317 sites a lap, 60,180 a second. Of those, 0.704
+    stand in the openings: each path problem's question with the codec's whole room of 2,062 open
+    places, computed to compare 12 of them. The openings hold 0.886 of the pair store the card
+    reserves (a section is cut into about four batches by it) and 0.732 of the pairs the open rows
+    meet, about two thirds of a lap's time by the lap's own sections. The room's cut that kept the
+    bits is inert since the carry circles (`FieldDeclaration::room_window`). A computed site meets
+    116 pairs a head and tick. The figures "13,000 sites a second" and "11,700 pairs a site" that
+    stood here were formed from the lap lines' count. The code line stays as it is: no build is
+    spent on its room, and the store's trainer holds none.
   - The census of directions by block (G114, scored the same hour) missed both its parts: every
     block's travel between lap means fills the directions it has (the letter rows 38 to 40 of 64,
     where two independent spans of full rank read 44.6 on the ruler drawn), so it names no block
@@ -151,11 +159,28 @@ repository was reset on September 24; the pre-reset tree is
   - The next line's passage is the wider one asked for on November 12: Common Corpus without its
     government collection, in five slices of code, web, science, books and wikidata, kept as a store
     of whole documents (`tools/corpus_passage.py`, 199 controls). The cut of a document into regions
-    is the trainer's, by keyed draws, with the void only at a document's true end. It is not fetched
-    yet. Before the trainer can read it, three builds are owed, each entering the line by
-    reproducing te7's lap: a read of a store by stretches (it reads a passage whole under a 64 MiB
-    budget), the keyed cut, and the growth of the chart's letters by arrival (the codec holds the 99
-    bytes its first passage used and refuses any other).
+    is the trainer's, by keyed draws, with the void only at a document's true end. It is fetched
+    and stands on the PC (November 12: 8,000,075,453 text bytes in 1,074 s; code 3.2 GB, web 1.6,
+    science 1.6, books 0.96, wikidata 0.64; a prefix of 1 GB; 128 held documents a slice).
+  - The store's trainer is designed and not built (the same record, §4). A stretch is a keyed run
+    of a document: a context and a run, each on an octave from `[4, 8)` to `[256, 512)`. A stretch
+    takes one keyed state, a mask state or the writer's state, and no opening and no room. A
+    section is a bound carried in the learner's state (15,606,223 pairs of sites and 41,490 sites,
+    one batch of the card). The letters are founded at the crossing: a fresh letter's encoding at
+    zero, its class bias at the least the constitution holds, the void at its index. The read is by
+    stretches from the store's files, and no law is read from the environment. The cut is stated
+    draw by draw in a reference port (`store_stretch_census.py`) that the build's lines are held
+    to. At the code line's own fitted rates a computed site of that cut costs 12 µs and a pass
+    meets one computed site a byte; G115 fixes 15 µs (11 to 19) before the build, a gigabyte in
+    about 4 hours.
+  - Every extent of the built declaration is given the part it sizes, how it was reached and what
+    sizes it (the same record, §5), with ten findings by file and line and the build that closes
+    each. The departures that stand: the face's 64 coordinates are two lanes of 32, the second a
+    copy of the first's width; the 128 pair contacts were reached by copies; the trainer's default
+    growth is still "by two", held off by an exported variable; the line's law stands partly in its
+    lap script's exports (38 variables are read across the trainer, the tower and the card); seven
+    grains are fixed by hand and a row's sum runs on 5 to 20 limbs of 64 bits. No extent is
+    reported as the machine's.
 - **The triad** (founded on te4's end, its first lap read; atlas `contact.triad-manley-rowe-gauge`,
   `code.triad-character-of-composition`;
   [the triad record](research/records/2026-11-12_THE_LAW_ACROSS_A_PLACE_IS_HELD_BY_A_PUMPED_CONTACT_A_TRIAD_IS_A_CHARACTER_OF_A_LAW_OF_COMPOSITION_AND_ITS_THREE_LEGS_EXCHANGE_EQUAL_QUANTA.md)).
