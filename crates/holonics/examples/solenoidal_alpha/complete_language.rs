@@ -903,6 +903,8 @@ pub(super) fn run_field_realized(args: &[String], realization: &mut dyn holonics
     match args.first().map(String::as_str) {
         Some("train-field") => field_train::train(args, realization),
         Some("train-store") => store_train::train(args, realization),
+        Some("read-store") => store_train::read(args, realization),
+        Some("write-store") => store_train::write(args, realization),
         Some("grow-contacts-field") => field_train::grow_contacts_field(args, realization),
         Some("grow-carry-field") => field_train::grow_carry_field(args, realization),
         Some("grow-triad-field") => field_train::grow_triad_field(args, realization),

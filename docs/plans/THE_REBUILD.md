@@ -157,16 +157,32 @@ references and no write is yet ordered text.
    engine**, ordered from the trainer's own profile by entry against a count of a section's
    arithmetic on the card's lanes
    ([the engine's record](../../research/records/2026-11-12_A_SITES_ARITHMETIC_IS_COUNTED_AGAINST_THE_CARDS_LANES_THE_STORE_TRAINER_RUNS_AT_ONE_FORTIETH_OF_THEM_A_PAIRS_SKIN_IS_FORMED_ONCE_A_CLOCK_AND_COST_FOLLOWS_SURPRISE.md),
-   §6; the trainer stands at 19 times the sum of the count's floors): first the realizations that
+   §6; the trainer stands at 17.8 times the sum of the count's floors on the card's measured
+   yardsticks, 19 on published figures): first the realizations that
    keep every bit, each entering by reproducing the line and timed inside one hold (a profile by
-   head and two measured yardsticks of the card; a pair's skin once a clock; a turn's phases and
+   head and two measured yardsticks of the card, done November 12; a pair's skin once a clock,
+   its store on the row's support, done November 12 at 0.948 of its control with its time guess
+   missed, the contact family read as bound by the octets it gathers and that reading's test
+   ordered before the series; a turn's phases and
    the moments' skins once a clock; the phase series on narrow words; the site's maps fused by
    chart; a batch's launches fused), their rates fixed as G116, then the laws at declared widths
    (a covector released under a declared grain so that the return's cost follows surprise; a row's
    carrier anchored at its peak; the pair store on its support, item 2, where the card holds 280
    octets a pair of sites against 71,486 a site); beside the engine, short reads of the three
    states the line has (the crossing, 2,001 and 5,001 sections): the held code by slice and kind,
-   the count of compared places by octave of surprise, and writes from held prompts by slice; one
+   the count of compared places by octave of surprise, and writes from held prompts by slice
+   (done November 12,
+   [the record](../../research/records/2026-11-12_THE_STORE_CODES_HELD_TEXT_AT_THE_LEVEL_OF_TWO_KNOWN_NEIGHBOURS_A_SIDE_A_SYMBOL_IS_A_WORD_ON_LOCATED_RINGS_AND_A_DARK_PLACE_IS_THE_INTERIOR_OF_A_COMPOSITE.md):
+   the store codes held text at the level of a count of two known neighbours a side, the share
+   of places under a sixteenth of a bit is 0.009 to 0.041 and does not move, and no state writes
+   language); **the symbol's word** (the same record, §8; atlas `code.symbol-word-located-rings`):
+   a symbol's rows as a series on a key of coprime rings that the machine locates, composites
+   composed by the machine where a place is dark given its neighbour (epochs of a paced clock as
+   the sites of the level above, never a table of merges), the codec's release the identity on
+   bytes; a repair of the located transport of October 5 and guard 9, beside which the tower's
+   codec entered (the record's §8.8); its first reading G118 (the store's trained paces by class
+   and where their carries fall on held text), then its design record, acceptance and guess,
+   fixed before its build, which comes ahead of any long pass; one
    continuous pass over tier A (1 GB), ordered once the engine stands near its count and judged by
    what it writes from held prompts by slice; the face as a composition of
    lanes, each block reading its own, entering at `(32, 32)`; then a lane whose width is derived
@@ -174,8 +190,8 @@ references and no write is yet ordered text.
    factor or padded to a power of two. A tier's pass is ordered only after its projection is read
    against the count (the guides' method rule of November 12); the rate is stated in two parts,
    the forward a site and the return a unit of surprise, by slice, and never as one mean a byte.
-   The bar before tier B (8 GB) is 1 µs a computed site, a guess until the card's measured
-   yardsticks replace the published ceilings.
+   The bar before tier B (8 GB) is 1 µs a computed site, 1.70 times the sum of the floors the
+   card's measured yardsticks give.
 6. **More than one medium** (the same record, §6 to §11): the region's helix in
    `hnn::tower::field` and on the card, a text region reproducing the line's lap; the rank page and
    MNIST's sections paired both ways with their labels; the acoustic chart with its remainder; then

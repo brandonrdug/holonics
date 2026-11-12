@@ -72,6 +72,9 @@ typedef unsigned __int128 uwide;
 #define REFUSED_KEY 32u
 // A temperature past its carrier in its chart (§16.12: `⌈log₂ T⌉ ≤ 7`, `T ≥ 2^(−23)`).
 #define REFUSED_TEMPER 64u
+// [theory, November 12, P50 step 1] A pair's or a crowd edge's skin read from the clock's store where its fill formed none
+// (`SKIN_UNFILLED`, `field_skin_fill`).
+#define REFUSED_UNFILLED 128u
 // The temperature's carrier and `ln 2`'s grain (`TEMPER_TOP`, `LN2_FACE_BITS` in `field.rs`).
 #define TEMPER_TOP 7
 #define LN2_FACE_BITS 30
@@ -327,7 +330,7 @@ struct FieldWords {
     const uint32_t *mix_class;
     const uint32_t *mix_share;
     uint32_t *status;
-    // The site pairs the contact met (`Σ |S_i^h|` over every row and tick).
+    // The site pairs the contact met, a word a head (`Σ_i |S_i^h|` over every row and tick).
     unsigned long long *met;
     // The tick's carriers the frame, the contact and the pair contact read and write (the charts'
     // reads and scales are passed to their own launches).
@@ -471,6 +474,23 @@ struct FieldWords {
     int64_t *pabg;
     int64_t *ptp;
     int64_t *pct;
+    // [definition; theory, November 12, P50 step 1 and P51] **The clock's skins** (`field_skin_fill`): a paced head's skin of each support entry
+    // `[p][entry][l]` at the row's support stride (atlas `tower.field-support-stride`): `entry = region_soff[r] + i K_r + k` for receiver `i`'s entry `k`,
+    // `K_r = NEAR_SLOTS + D_r` (`D_r` the region's definite sites, `dstart`), `region_soff` the prefix of `S_r K_r` over the batch's regions and `E2` its
+    // sum; and of each crowd edge `[p][t][slot][l]`. A 32-bit word each. Null where the batch keeps no store (no paced head, or a level whose paces are
+    // plain), where nothing reads them.
+    uint32_t *skin;
+    uint32_t *cskin;
+    const uint64_t *region_soff;
+    uint64_t E2;
+    // [definition; theory, November 12, P50 step 2] **A clock's near phases and skins** (`field_clock_fill`): for each moment mode `u` (`mcmap[u]`, the
+    // moment kernels' map, `tm` of them) and site `g`, at the near offsets `d = ±1..±5` (`near_slot`), `ζ^(τ_(g+d) − τ_g)` as two 32-bit words
+    // `mphase[u][g][slot][2]` and the skin `e^(−2π|σ_g − σ_(g+d)|/n)` as one `mskin[u][g][slot]`; the far skins stand in the crowd edges' store
+    // `cskin`. One store, formed again for each clock where its moments are read. Null where the batch keeps none.
+    int32_t *mphase;
+    uint32_t *mskin;
+    const uint32_t *mcmap;
+    uint64_t tm;
 };
 
 // [definition; agent-inferred, November 2] **A head's pace index** (§16, `Field::paces`): the heads that carry a moment
@@ -724,6 +744,118 @@ __device__ __forceinline__ wide carried_ij(const FieldWords &w, uint32_t h, uint
 // A wide value carried alike.
 __device__ __forceinline__ wide carried_wide_ij(const FieldWords &w, uint32_t h, uint32_t l, uint64_t gi, uint64_t gj, uint32_t gap, wide v) {
     return skinless(w, h) ? v : rel(skin_ij(w, h, l, gi, gj, gap) * v, MOVE_BITS);
+}
+
+// [definition; theory, November 12, P50 step 1 (G116 a); the engine's record §4 and §6] **A pair's skin is formed once a clock.** A paced head's skin
+// across a pair depends on the pair, the head, the mode and the clock alone (`skin_pair`), so it is formed once for each support pair and each crowd
+// edge of the head where its pace is not plain, by one launch after the clock is set (`field_skin_fill`: at each tick's forward before the exposure,
+// and again at each tick's return for that tick's clock), and read from there by the lock, the numerators, the rows, the columns and the skin's
+// return: the same integer `skin_ij` forms, read in place of formed again. A word holds a skin on 32 bits: a skin is at most 1 on `2^(−30)`
+// (`skin_pair` releases a face of at most `2^62` by 32 bits, and the resident decay is at most `2^30`), so every formed word is at most `2^30`; a word
+// above it was never formed (`SKIN_UNFILLED`, which the test build writes over the store before each clock's fill), and reading one is a refusal.
+#define SKIN_UNFILLED 0xFFFFFFFFu
+__device__ __forceinline__ wide skin_word(const FieldWords &w, uint32_t v) {
+    if (v > ((uint32_t)1 << MOVE_BITS)) {
+        atomicOr(w.status, REFUSED_UNFILLED);
+        return 0;
+    }
+    return (wide)v;
+}
+
+// [definition; theory, November 12, P51] **A row's support stride** (atlas `tower.field-support-stride`, applied to the clock's skins): region `r`'s rows
+// are `K_r = NEAR_SLOTS + D_r` entries long, every row's support fitting it (an open row's is the near field and the region's `D_r` definite sites; a
+// definite row's the near field and its probed classes' definite runs, which are disjoint because its probed classes are distinct, `probe_classes`:
+// each crossing set changes a distinct set of trits), and receiver `i`'s entry `k` stands at `region_soff[r] + i K_r + k`.
+__device__ __forceinline__ uint64_t support_row(const FieldWords &w, uint32_t r, uint32_t i) {
+    const uint64_t stride = NEAR_SLOTS + (uint64_t)(w.dstart[r + 1] - w.dstart[r]);
+    return w.region_soff[r] + (uint64_t)i * stride;
+}
+
+// The store's word of mode `l` of paced head `p` at a support entry's address `entry` (`support_row` plus the entry), and of a crowd edge of receiver `g`.
+__device__ __forceinline__ wide pair_skin_word(const FieldWords &w, int32_t p, uint64_t entry, uint32_t l) {
+    if (w.skin == nullptr) {
+        atomicOr(w.status, REFUSED_UNFILLED);
+        return 0;
+    }
+    return skin_word(w, w.skin[((uint64_t)p * w.E2 + entry) * w.n + l]);
+}
+
+// A crowd's slot from its octave and side (`crowd_at`: `level = 2 + slot/2`, the even slots on the left).
+__device__ __forceinline__ uint32_t crowd_slot_of(uint32_t level, bool right) {
+    return 2 * (level - 2) + (right ? 1u : 0u);
+}
+
+__device__ __forceinline__ wide crowd_skin_word(const FieldWords &w, int32_t p, uint64_t g, uint32_t level, bool right, uint32_t l) {
+    if (w.cskin == nullptr) {
+        atomicOr(w.status, REFUSED_UNFILLED);
+        return 0;
+    }
+    return skin_word(w, w.cskin[(((uint64_t)p * w.T + g) * w.slots + crowd_slot_of(level, right)) * w.n + l]);
+}
+
+// The eight modes' skins of a support entry (a head of eight modes) as two 16-octet loads: `(p E2 + entry) 8` words is a multiple of 32 octets.
+__device__ __forceinline__ void pair_skins8(const FieldWords &w, int32_t p, uint64_t entry, uint32_t (&dec)[8]) {
+    if (w.skin == nullptr) {
+        atomicOr(w.status, REFUSED_UNFILLED);
+#pragma unroll
+        for (int l = 0; l < 8; l++) {
+            dec[l] = 0;
+        }
+        return;
+    }
+    const uint4 *s4 = reinterpret_cast<const uint4 *>(w.skin + ((uint64_t)p * w.E2 + entry) * 8);
+    const uint4 a = s4[0], b = s4[1];
+    dec[0] = a.x; dec[1] = a.y; dec[2] = a.z; dec[3] = a.w;
+    dec[4] = b.x; dec[5] = b.y; dec[6] = b.z; dec[7] = b.w;
+    uint32_t top = 0;
+#pragma unroll
+    for (int l = 0; l < 8; l++) {
+        top = max(top, dec[l]);
+    }
+    if (top > ((uint32_t)1 << MOVE_BITS)) {
+        // A word no fill formed enters no sum: the row reads zero skins and the batch is refused.
+        atomicOr(w.status, REFUSED_UNFILLED);
+#pragma unroll
+        for (int l = 0; l < 8; l++) {
+            dec[l] = 0;
+        }
+    }
+}
+
+// `skin_ij` of receiver `gi`'s support entry at its address `entry`, read from the clock's store.
+__device__ __forceinline__ wide skin_ij_at(const FieldWords &w, uint32_t h, uint32_t l, uint64_t gi, uint64_t entry, uint32_t gap) {
+    if (paced_at(w, h, gi)) {
+        return pair_skin_word(w, paced_index(w, h), entry, l);
+    }
+    return decay_of(w, h, l, gap);
+}
+
+__device__ __forceinline__ wide skin_raw_at(const FieldWords &w, uint32_t h, uint32_t l, uint64_t gi, uint64_t entry, uint32_t gap) {
+    return skinless(w, h) ? (wide)1 : skin_ij_at(w, h, l, gi, entry, gap);
+}
+
+__device__ __forceinline__ wide carried_ij_at(const FieldWords &w, uint32_t h, uint32_t l, uint64_t gi, uint64_t entry, uint32_t gap, int64_t v) {
+    return skinless(w, h) ? (wide)v : rel(skin_ij_at(w, h, l, gi, entry, gap) * (wide)v, MOVE_BITS);
+}
+
+// `skin_ij` of receiver `gi`'s crowd edge at `level` on its side (the place `2^level` away), read from the clock's store.
+__device__ __forceinline__ wide crowd_skin_ij(const FieldWords &w, uint32_t h, uint32_t l, uint64_t gi, uint32_t level, bool right) {
+    if (paced_at(w, h, gi)) {
+        return crowd_skin_word(w, paced_index(w, h), gi, level, right, l);
+    }
+    return decay_of(w, h, l, (uint32_t)1 << level);
+}
+
+__device__ __forceinline__ wide crowd_skin_raw(const FieldWords &w, uint32_t h, uint32_t l, uint64_t gi, uint32_t level, bool right) {
+    return skinless(w, h) ? (wide)1 : crowd_skin_ij(w, h, l, gi, level, right);
+}
+
+__device__ __forceinline__ wide crowd_carried_ij(const FieldWords &w, uint32_t h, uint32_t l, uint64_t gi, uint32_t level, bool right, int64_t v) {
+    return skinless(w, h) ? (wide)v : rel(crowd_skin_ij(w, h, l, gi, level, right) * (wide)v, MOVE_BITS);
+}
+
+__device__ __forceinline__ wide crowd_carried_wide_ij(const FieldWords &w, uint32_t h, uint32_t l, uint64_t gi, uint32_t level, bool right, wide v) {
+    return skinless(w, h) ? v : rel(crowd_skin_ij(w, h, l, gi, level, right) * v, MOVE_BITS);
 }
 
 // The site an octave's crowd is skinned to from receiver `gi` (§16): the place `2^level` away on its side.
@@ -1800,6 +1932,45 @@ __device__ __forceinline__ uint32_t support_at(const uint32_t *members, const ui
     return gap >= NEAR ? j : UINT32_MAX;
 }
 
+// [definition; theory, November 12, P51] **Source `j`'s entry in receiver `i`'s support** (`support_at`'s order read backwards), for a pair the support
+// holds: a near place `d = |i − j| < NEAR` is entry `2(d − 1)`, and `2(d − 1) + 1` where `j` follows `i`; past the near field an open receiver's entry
+// is `NEAR_SLOTS` plus `j`'s rank among the region's definite sites (the definite prefix count `sc` of `field_sums`), and a definite receiver's is
+// `NEAR_SLOTS` plus the runs of its probed classes before `j`'s class (its `pcls` in order; the classes are distinct, so `j`'s class stands once) plus
+// `j`'s rank in its class's run (the definite members in ascending place, `field_classes`, found by bisection). A pair outside the support is refused.
+__device__ __forceinline__ uint32_t support_entry(const FieldWords &w, uint32_t h, uint32_t r, uint64_t first, const uint32_t *members, const uint32_t *off, uint32_t i, uint32_t j) {
+    const uint32_t gap = j > i ? j - i : i - j;
+    if (gap < NEAR) {
+        return 2 * (gap - 1) + (j > i ? 1u : 0u);
+    }
+    if (!definite_site(w, first + i)) {
+        const uint64_t rows1 = (uint64_t)w.T + w.R;
+        return NEAR_SLOTS + (uint32_t)w.sc[(uint64_t)h * rows1 + first + r + j];
+    }
+    const uint64_t hi = (uint64_t)h * w.T + first + i;
+    const uint32_t cj = w.cls[(uint64_t)h * w.T + first + j];
+    const uint32_t *probed = w.pcls + hi * probe_stride(w);
+    uint32_t before = 0;
+    for (uint32_t q = 0; q < w.pn[hi]; q++) {
+        const uint32_t c = probed[q];
+        const uint32_t from = off[2 * c], to = off[2 * c + 1];
+        if (c == cj) {
+            uint32_t lo = from, hi_ = to;
+            while (lo < hi_) {
+                const uint32_t mid = (lo + hi_) / 2;
+                if (members[mid] < j) {
+                    lo = mid + 1;
+                } else {
+                    hi_ = mid;
+                }
+            }
+            return NEAR_SLOTS + before + (lo - from);
+        }
+        before += to - from;
+    }
+    atomicOr(w.status, REFUSED_UNFILLED);
+    return 0;
+}
+
 // Source `j`'s receiver entry `k`: the near field, and where `j` is definite every definite receiver whose
 // support holds it past the near field (the receivers that probe its key's class, their own probe's class
 // among them, §16.19) and every open site of the region (§15.9: an open receiver hears every definite site). The support is
@@ -1990,11 +2161,11 @@ __device__ __forceinline__ int64_t scored(const FieldWords &w, wide temper, int6
 // The head's lock at unit gain `S` of the word `wi` (at unit power, its `span` reals) against site `j`'s across
 // `gap` sites: the sum over its `n` modes of each mode's lock carried by the skin (checked, exact), released
 // `16 + 2g + 1` bits (§2.5, §12, §15.2, §15.10); its score is `scored`.
-__device__ __forceinline__ int64_t pair_base(const FieldWords &w, uint32_t h, const int64_t *wi, const int64_t *wj, uint64_t gi, uint64_t gj, uint32_t gap) {
+__device__ __forceinline__ int64_t pair_base(const FieldWords &w, uint32_t h, const int64_t *wi, const int64_t *wj, uint64_t gi, uint64_t entry, uint32_t gap) {
     const uint32_t g = skinless(w, h) ? 0 : MOVE_BITS;
     wide s = 0;
     for (uint32_t l = 0; l < w.n; l++) {
-        const wide lk = lock_pair(wi[l], wi[w.n + l], wj[l], wj[w.n + l], (uint64_t)skin_raw(w, h, l, gi, gj, gap), g);
+        const wide lk = lock_pair(wi[l], wi[w.n + l], wj[l], wj[w.n + l], (uint64_t)skin_raw_at(w, h, l, gi, entry, gap), g);
         if (!add_fits(s, lk, &s)) {
             atomicOr(w.status, REFUSED_CARRIER);
         }
@@ -2005,8 +2176,9 @@ __device__ __forceinline__ int64_t pair_base(const FieldWords &w, uint32_t h, co
 // [agent-inferred, November 1] **The pair lock of a head of eight modes, from the vector rows** (`pair_score`
 // for `n = 8`, the same integers): the source's row of sixteen 32-bit words as four `int4` loads (the lanes of
 // a warp read different rows, so each load is a gather of one line a lane: sixteen 8-octet loads were
-// sixteen such gathers, and the skins another eight), its skins `[h][gap][8]` as two `uint4`.
-__device__ __forceinline__ int64_t pair_base8(const FieldWords &w, uint32_t h, const int32_t (&a)[16], const int4 *row, uint64_t gi, uint64_t gj, uint32_t gap) {
+// sixteen such gathers, and the skins another eight), its skins `[h][gap][8]` as two `uint4` (a paced head's from the clock's store at the support
+// entry's address `entry`, also two).
+__device__ __forceinline__ int64_t pair_base8(const FieldWords &w, uint32_t h, const int32_t (&a)[16], const int4 *row, uint64_t gi, uint64_t entry, uint32_t gap) {
     const bool still = skinless(w, h);
     const uint32_t g = still ? 0 : MOVE_BITS;
     int32_t b[16];
@@ -2025,11 +2197,8 @@ __device__ __forceinline__ int64_t pair_base8(const FieldWords &w, uint32_t h, c
             dec[l] = 1;
         }
     } else if (paced_at(w, h, gi)) {
-        // A paced head's skins follow its own clock (§16): each mode's from the pair's variation.
-#pragma unroll
-        for (int l = 0; l < 8; l++) {
-            dec[l] = (uint32_t)skin_ij(w, h, l, gi, gj, gap);
-        }
+        // A paced head's skins follow its own clock (§16): each mode's from the pair's variation, formed once a clock.
+        pair_skins8(w, paced_index(w, h), entry, dec);
     } else {
         const uint4 *d4 = reinterpret_cast<const uint4 *>(w.decay_t + ((uint64_t)h * w.dreach + gap) * 8);
         const uint4 d0 = d4[0], d1 = d4[1];
@@ -2053,7 +2222,7 @@ __device__ __forceinline__ int64_t crowd_base(const FieldWords &w, uint32_t h, c
     const uint32_t g = skinless(w, h) ? 0 : MOVE_BITS;
     wide s = 0;
     for (uint32_t l = 0; l < w.n; l++) {
-        const wide lk = lock_of(wi[l], wi[w.n + l], swhi[l] - swlo[l], swhi[w.n + l] - swlo[w.n + l], (wide)count, skin_raw(w, h, l, gi, octave_edge(gi, level, right), (uint32_t)1 << level), g, w.status);
+        const wide lk = lock_of(wi[l], wi[w.n + l], swhi[l] - swlo[l], swhi[w.n + l] - swlo[w.n + l], (wide)count, crowd_skin_raw(w, h, l, gi, level, right), g, w.status);
         if (!add_fits(s, lk, &s)) {
             atomicOr(w.status, REFUSED_CARRIER);
         }
@@ -2142,7 +2311,8 @@ extern "C" __global__ void __launch_bounds__(CONTACT_ROWS * 32, 8) field_exposur
             const uint32_t j = support_at(members, off, rcs[warp], i, sites, k);
             if (j != UINT32_MAX) {
                 const uint32_t gap = j > i ? j - i : i - j;
-                const int64_t base = eight ? pair_base8(w, h, ai, rows32 + (uint64_t)j * 4, g, first + j, gap) : pair_base(w, h, wi, words + (uint64_t)j * S, g, first + j, gap);
+                const uint64_t entry = support_row(w, r, i) + k;
+                const int64_t base = eight ? pair_base8(w, h, ai, rows32 + (uint64_t)j * 4, g, entry, gap) : pair_base(w, h, wi, words + (uint64_t)j * S, g, entry, gap);
                 // Conservation of faces (§16.38): a still head reads content at any distance, so its source shares its face's
                 // mass with its resonance class's definite sources (its score lowered by the octave of their count) and is
                 // not weighed by its distance; a turned head reads place, and the octave of its distance lowers its score.
@@ -2181,6 +2351,61 @@ extern "C" __global__ void __launch_bounds__(CONTACT_ROWS * 32, 8) field_exposur
             const uint64_t spread = (uint64_t)(amax - amin);
             atomicMax(&w.bits[1], (uint32_t)(spread > 0xFFFFFFFFull ? 0xFFFFFFFFu : spread));
         }
+    }
+}
+
+// [definition; theory, November 12, P50 step 1 (G116 a) and P51] **The clock's skins, formed once**: `skin_pair` for each support pair and each crowd
+// edge of a paced head, one warp a (paced head, receiving site), a lane a support entry and then a crowd slot, each mode's skin written at the entry's
+// address `[p][region_soff[r] + i K_r + k][l]` (the readers' `skin_ij_at`; the crowd edges `[p][t][slot][l]` are the clock's, `field_clock_fill`). An entry that meets no
+// site (a near place outside the region or unkeyed, a member inside the near field) is never read and never formed. Launched after the
+// clock is set: at each tick's forward before the exposure, and at each tick's return for that tick's clock. A row the cut room skipped, and a row whose
+// region's pace is plain, read no store word and form none; the support and the crowds are the readers' own (`row_prepare`, `support_at`, `crowd_at`).
+extern "C" __global__ void __launch_bounds__(CONTACT_ROWS * 32) field_skin_fill(FieldWords w, uint32_t paced) {
+    __shared__ RowCls rcs[CONTACT_ROWS];
+    const uint32_t warp = threadIdx.x >> 5, lane = threadIdx.x & 31;
+    const uint32_t n = w.n, classes = w.nclasses;
+    const uint64_t rows = (uint64_t)paced * w.T;
+    for (uint64_t pg = ((uint64_t)blockIdx.x * blockDim.x + threadIdx.x) >> 5; pg < rows; pg += (uint64_t)gridDim.x * (blockDim.x >> 5)) {
+        const int32_t p = (int32_t)(pg / w.T);
+        const uint64_t g = pg % w.T;
+        uint32_t h = 0;
+        while (h + 1 < w.H && paced_index(w, h) != p) {
+            h++;
+        }
+        if (skipped_row(w, g) || !paced_at(w, h, g)) {
+            continue;
+        }
+        const uint64_t hg = (uint64_t)h * w.T + g;
+        const uint32_t r = w.site_region[g];
+        const uint64_t first = w.region_off[r];
+        const uint32_t sites = w.region_off[r + 1] - (uint32_t)first, i = w.site_pos[g];
+        const uint32_t *members = w.members + (uint64_t)h * w.T + first;
+        const uint32_t *off = w.class_off + ((uint64_t)h * w.R + r) * (2 * classes + 1);
+        const uint32_t K = row_prepare(w, hg, off, rcs[warp], lane);
+        const uint32_t set = h % w.frames - w.still, sets = w.frames - w.still;
+        uint32_t *row = w.skin + ((uint64_t)p * w.E2 + support_row(w, r, i)) * n;
+        for (uint32_t k = lane; k < K; k += 32) {
+            const uint32_t j = support_at(members, off, rcs[warp], i, sites, k);
+            if (j == UINT32_MAX) {
+                continue;
+            }
+            uint32_t *at = row + (uint64_t)k * n;
+            if (n == 8) {
+                uint32_t dec[8];
+#pragma unroll
+                for (int l = 0; l < 8; l++) {
+                    dec[l] = (uint32_t)skin_pair(w, l * sets + set, l, p, g, first + j);
+                }
+                uint4 *a4 = reinterpret_cast<uint4 *>(at);
+                a4[0] = make_uint4(dec[0], dec[1], dec[2], dec[3]);
+                a4[1] = make_uint4(dec[4], dec[5], dec[6], dec[7]);
+            } else {
+                for (uint32_t l = 0; l < n; l++) {
+                    at[l] = (uint32_t)skin_pair(w, l * sets + set, l, p, g, first + j);
+                }
+            }
+        }
+        // (the crowd edges are the clock's, formed by `field_clock_fill` at every site of the head)
     }
 }
 
@@ -2247,7 +2472,7 @@ __device__ __forceinline__ int64_t carried_s(const FieldWords &w, uint32_t h, ui
 // The pairs met are counted.
 template <int L>
 __device__ void contact_body(const FieldWords &w, uint32_t store) {
-    __shared__ uint32_t stj[CONTACT_ROWS][32], sts[CONTACT_ROWS][32];
+    __shared__ uint32_t stj[CONTACT_ROWS][32], sts[CONTACT_ROWS][32], stk[CONTACT_ROWS][32];
     __shared__ uint64_t st0[CONTACT_ROWS][32], st1[CONTACT_ROWS][32], st2[CONTACT_ROWS][32];
     __shared__ uint32_t crlo[CONTACT_ROWS][32], crhi[CONTACT_ROWS][32], crlv[CONTACT_ROWS][32];
     __shared__ RowCls rcs[CONTACT_ROWS];
@@ -2287,6 +2512,8 @@ __device__ void contact_body(const FieldWords &w, uint32_t store) {
         const wide temper = temper_of(w, h, rcs[warp].open != 0);
         const int64_t amin = w.amin[hg];
         uint64_t *erow = w.e + (uint64_t)h * w.E + w.region_eoff[r] + (uint64_t)i * sites;
+        // The row's support entries' addresses (the clock's skins stand there).
+        const uint64_t srow = support_row(w, r, i);
         Big<L> M = big_zero<L>();
         Big<L> N = big_zero<L>();
         uint32_t negs = 0, met = 0;
@@ -2308,7 +2535,7 @@ __device__ void contact_body(const FieldWords &w, uint32_t store) {
                         const uint32_t gap = j > i ? j - i : i - j;
                         const int64_t raw = values[(uint64_t)j * S + entry];
                         // (a head of eight modes reads its skin from the vector table: the eight modes of a gap stand together)
-                        const int64_t v = still_h ? raw : paced_h ? carry_d((uint64_t)skin_ij(w, h, m, g, first + j, gap), raw) : w.n == 8 ? carry_d((uint64_t)w.decay_t[((uint64_t)h * w.dreach + gap) * 8 + m], raw) : carried_s(w, h, m, gap, raw);
+                        const int64_t v = still_h ? raw : paced_h ? carry_d((uint64_t)pair_skin_word(w, paced_index(w, h), srow + stk[warp][pos], m), raw) : w.n == 8 ? carry_d((uint64_t)w.decay_t[((uint64_t)h * w.dreach + gap) * 8 + m], raw) : carried_s(w, h, m, gap, raw);
                         const bool neg = v < 0;
                         const uint64_t mag = neg ? (uint64_t)0 - (uint64_t)v : (uint64_t)v;
                         const uwide lo = (uwide)st0[warp][pos] * (uwide)mag;
@@ -2369,12 +2596,12 @@ __device__ void contact_body(const FieldWords &w, uint32_t store) {
                 Big<L> p;
                 bool neg;
                 if (!crowd) {
-                    const wide v = carried_ij(w, h, m, g, first + j, j > i ? j - i : i - j, values[(uint64_t)j * S + entry]);
+                    const wide v = carried_ij_at(w, h, m, g, srow + stk[warp][jj], j > i ? j - i : i - j, values[(uint64_t)j * S + entry]);
                     neg = v < 0;
                     p = big_mul<L, false>(cf, mag64((int64_t)v), 0);
                 } else {
                     const uint32_t lo = crlo[warp][jj], hi_ = crhi[warp][jj], lv = crlv[warp][jj];
-                    const wide v = carried_wide_ij(w, h, m, g, octave_edge(g, lv, lo > i), (uint32_t)1 << lv, svp[(uint64_t)(hi_ + 1) * S + entry] - svp[(uint64_t)lo * S + entry]);
+                    const wide v = crowd_carried_wide_ij(w, h, m, g, lv, lo > i, svp[(uint64_t)(hi_ + 1) * S + entry] - svp[(uint64_t)lo * S + entry]);
                     neg = v < 0;
                     const uwide mag = (uwide)(neg ? -v : v);
                     p = big_mul<L, true>(cf, (uint64_t)mag, (uint64_t)(mag >> 64));
@@ -2431,6 +2658,7 @@ __device__ void contact_body(const FieldWords &w, uint32_t store) {
                     st1[warp][rank] = b == 0 ? 0 : face >> (64 - b);
                     sts[warp][rank] = key;
                     stj[warp][rank] = j;
+                    stk[warp][rank] = k;
                 }
             } else {
                 st0[warp][lane] = cf.c0;
@@ -2438,6 +2666,7 @@ __device__ void contact_body(const FieldWords &w, uint32_t store) {
                 st2[warp][lane] = cf.c2;
                 sts[warp][lane] = s;
                 stj[warp][lane] = j;
+                stk[warp][lane] = k;
             }
             __syncwarp();
             numerators(false, nvalid);
@@ -2516,7 +2745,7 @@ __device__ void contact_body(const FieldWords &w, uint32_t store) {
         }
         const int64_t yi = __shfl_sync(0xFFFFFFFFu, y, (lane + n) % 32);
         if (lane == 0) {
-            atomicAdd(w.met, (unsigned long long)met);
+            atomicAdd(w.met + h, (unsigned long long)met);
         }
         if (lane < n) {
             wide ur, ui;
@@ -3405,7 +3634,7 @@ __device__ __forceinline__ wide gained(wide v, int32_t beta, uint32_t *st) {
 // return.
 #define REV_ROWS 4
 extern "C" __global__ void __launch_bounds__(REV_ROWS * 32, 6) field_contact_rows(FieldWords w, uint32_t h, const int64_t *dyh, int64_t *ds, int64_t *dq) {
-    __shared__ uint32_t stj[REV_ROWS][32];
+    __shared__ uint32_t stj[REV_ROWS][32], stk[REV_ROWS][32];
     __shared__ int64_t dss[REV_ROWS][32];
     __shared__ wide dpcs[REV_ROWS][MAX_CROWD_SLOTS];
     __shared__ int64_t dsks[REV_ROWS][MAX_CROWD_SLOTS];
@@ -3444,6 +3673,8 @@ extern "C" __global__ void __launch_bounds__(REV_ROWS * 32, 6) field_contact_row
         const uint64_t *e = w.e + (uint64_t)h * w.E + w.region_eoff[r] + (uint64_t)i * sites;
         int64_t *dsr = ds + w.region_eoff[r] + (uint64_t)i * sites;
         wide *dpr = w.dpb + w.region_eoff[r] + (uint64_t)i * sites;
+        // The row's support entries' addresses (the clock's skins stand there).
+        const uint64_t srow = support_row(w, r, i);
         const int64_t *dyi = dyh + hg * S;
         const int64_t *values = w.vf + ((uint64_t)h * w.T + first) * S;
         const int64_t *words = w.qf + ((uint64_t)h * w.T + first) * S;
@@ -3455,11 +3686,11 @@ extern "C" __global__ void __launch_bounds__(REV_ROWS * 32, 6) field_contact_row
         const wide temper = temper_of(w, h, rcs[warp].open != 0);
         const int64_t *sbr = w.sb + (uint64_t)h * w.E + w.region_eoff[r] + (uint64_t)i * sites;
         // The pair's covector `⟨δỹ_i, D ṽ_j⟩` on `2^(−40)`.
-        const auto pair_dp = [&](uint32_t j, uint32_t gap) -> wide {
+        const auto pair_dp = [&](uint32_t j, uint32_t k, uint32_t gap) -> wide {
             const int64_t *vj = values + (uint64_t)j * S;
             wide dp = 0;
             for (uint32_t x = 0; x < S; x++) {
-                dp += (wide)dyi[x] * carried_ij(w, h, x % n, g, first + j, gap, vj[x]);
+                dp += (wide)dyi[x] * carried_ij_at(w, h, x % n, g, srow + k, gap, vj[x]);
             }
             return dp;
         };
@@ -3467,7 +3698,7 @@ extern "C" __global__ void __launch_bounds__(REV_ROWS * 32, 6) field_contact_row
         // and its skins as two (`pair_score8`).
         const bool eight = w.n == 8;
         const bool still_h = skinless(w, h), paced_h = paced_at(w, h, g);
-        const auto pair_dp8 = [&](uint32_t j, uint32_t gap) -> wide {
+        const auto pair_dp8 = [&](uint32_t j, uint32_t k, uint32_t gap) -> wide {
             const longlong2 *v2 = reinterpret_cast<const longlong2 *>(values + (uint64_t)j * S);
             uint32_t dec[8];
             if (still_h) {
@@ -3476,10 +3707,7 @@ extern "C" __global__ void __launch_bounds__(REV_ROWS * 32, 6) field_contact_row
                     dec[l] = 1;
                 }
             } else if (paced_h) {
-#pragma unroll
-                for (int l = 0; l < 8; l++) {
-                    dec[l] = (uint32_t)skin_ij(w, h, l, g, first + j, gap);
-                }
+                pair_skins8(w, paced_index(w, h), srow + k, dec);
             } else {
                 const uint4 *d4 = reinterpret_cast<const uint4 *>(w.decay_t + ((uint64_t)h * w.dreach + gap) * 8);
                 const uint4 d0 = d4[0], d1 = d4[1];
@@ -3521,7 +3749,7 @@ extern "C" __global__ void __launch_bounds__(REV_ROWS * 32, 6) field_contact_row
             }
             const wide p = (wide)e[j];
             const uint32_t gap = j > i ? j - i : i - j;
-            const wide dpj = eight ? pair_dp8(j, gap) : pair_dp(j, gap);
+            const wide dpj = eight ? pair_dp8(j, k, gap) : pair_dp(j, k, gap);
             dpr[j] = dpj;
             weighted += p * dpj;
         }
@@ -3529,7 +3757,7 @@ extern "C" __global__ void __launch_bounds__(REV_ROWS * 32, 6) field_contact_row
             const uint32_t lo = crlo[warp][lane], hi_ = crhi[warp][lane], lv = crlv[warp][lane];
             wide sum = 0;
             for (uint32_t x = 0; x < S; x++) {
-                sum += (wide)dyi[x] * carried_wide_ij(w, h, x % n, g, octave_edge(g, lv, lo > i), (uint32_t)1 << lv, svp[(uint64_t)(hi_ + 1) * S + x] - svp[(uint64_t)lo * S + x]);
+                sum += (wide)dyi[x] * crowd_carried_wide_ij(w, h, x % n, g, lv, lo > i, svp[(uint64_t)(hi_ + 1) * S + x] - svp[(uint64_t)lo * S + x]);
             }
             const wide dpc = div_nearest_by(sum, cdiv[warp][lane]);
             dpcs[warp][lane] = dpc;
@@ -3568,12 +3796,13 @@ extern "C" __global__ void __launch_bounds__(REV_ROWS * 32, 6) field_contact_row
             }
             dss[warp][lane] = dsv;
             stj[warp][lane] = j;
+            stk[warp][lane] = k;
             __syncwarp();
             if (active) {
                 for (uint32_t jj = part; jj < 32; jj += parts) {
                     const uint32_t jx = stj[warp][jj];
                     if (jx != UINT32_MAX) {
-                        sum += (wide)dss[warp][jj] * skin_raw(w, h, m, g, first + jx, jx > i ? jx - i : i - jx) * (wide)words[(uint64_t)jx * S + entry];
+                        sum += (wide)dss[warp][jj] * skin_raw_at(w, h, m, g, srow + stk[warp][jj], jx > i ? jx - i : i - jx) * (wide)words[(uint64_t)jx * S + entry];
                     }
                 }
             }
@@ -3617,7 +3846,7 @@ extern "C" __global__ void __launch_bounds__(REV_ROWS * 32, 6) field_contact_row
                     continue;
                 }
                 const uint32_t lo = crlo[warp][jj], hi_ = crhi[warp][jj], lv = crlv[warp][jj];
-                const wide d = skin_raw(w, h, m, g, octave_edge(g, lv, lo > i), (uint32_t)1 << lv);
+                const wide d = crowd_skin_raw(w, h, m, g, lv, lo > i);
                 const wide dsk = dsks[warp][jj];
                 const wide wsum = swp[(uint64_t)(hi_ + 1) * S + entry] - swp[(uint64_t)lo * S + entry];
                 sum += div_nearest_by(dsk * d * wsum, cdiv[warp][jj]);
@@ -3630,7 +3859,7 @@ extern "C" __global__ void __launch_bounds__(REV_ROWS * 32, 6) field_contact_row
                 const wide pw = div_nearest_by(prod, cdiv2[warp][jj]);
                 add_wide(w.cw + (first + r + lo) * S + entry, pw);
                 add_wide(w.cw + (first + r + hi_ + 1) * S + entry, -pw);
-                const wide pv = div_nearest_by((wide)w.ce[hg * w.slots + jj] * carried_ij(w, h, m, g, octave_edge(g, lv, lo > i), (uint32_t)1 << lv, dyi[entry]), cdiv[warp][jj]);
+                const wide pv = div_nearest_by((wide)w.ce[hg * w.slots + jj] * crowd_carried_ij(w, h, m, g, lv, lo > i, dyi[entry]), cdiv[warp][jj]);
                 add_wide(w.cv + (first + r + lo) * S + entry, pv);
                 add_wide(w.cv + (first + r + hi_ + 1) * S + entry, -pv);
             }
@@ -3662,6 +3891,7 @@ extern "C" __global__ void __launch_bounds__(CONTACT_ROWS * 32) field_contact_co
     const uint32_t entry = lane % S, part = lane / S, m = entry % n;
     const bool still = skinless(w, h);
     const uint32_t g0 = still ? 0 : MOVE_BITS;
+    const bool paced_c = !still && paced_index(w, h) >= 0;
     for (uint64_t g = ((uint64_t)blockIdx.x * blockDim.x + threadIdx.x) >> 5; g < w.T; g += (uint64_t)gridDim.x * (blockDim.x >> 5)) {
         const uint32_t r = w.site_region[g];
         const uint32_t j = w.site_pos[g];
@@ -3688,12 +3918,15 @@ extern "C" __global__ void __launch_bounds__(CONTACT_ROWS * 32) field_contact_co
                 }
                 const uint64_t at = (uint64_t)i * sites;
                 const uint32_t gap = j > i ? j - i : i - j;
-                const wide dec = skin_raw(w, h, m, first + i, g, gap);
+                // The pair's support entry in receiver `i`'s row (`support_entry`), where the clock's skins stand: read only on a paced head
+                // whose pace is not plain there, the one row that reads the store.
+                const uint64_t sentry = paced_c && paced_at(w, h, first + i) ? support_row(w, r, i) + support_entry(w, h, r, first, members, off, i, j) : 0;
+                const wide dec = skin_raw_at(w, h, m, first + i, sentry, gap);
                 // The key's bracket released by the skin's bits once (the probe's grain), then by the covector,
                 // against the receiver's probe (§16.19).
                 const int64_t probe_i = w.pq[((uint64_t)h * w.T + first + i) * S + entry];
                 sk += (wide)dsc[at] * rel(((dec * (wide)probe_i) << g0) - dec * dec * (wide)words[(uint64_t)j * S + entry], g0);
-                sv += (wide)e[at] * carried_ij(w, h, m, first + i, g, gap, dyr[(uint64_t)i * S + entry]);
+                sv += (wide)e[at] * carried_ij_at(w, h, m, first + i, sentry, gap, dyr[(uint64_t)i * S + entry]);
             }
         }
         sk = parts_sum(part < parts ? sk : 0, S, parts);
@@ -4393,6 +4626,108 @@ __device__ __forceinline__ wide paced_between(const FieldWords &w, const PacedMo
     return skin_pair(w, pm.slot, pm.l, pm.p, gt, gk);
 }
 
+// [definition; theory, November 12, P50 step 2 (G116 b)] **A clock's phases and skins are formed once where its moments are read.** A moment
+// mode's near phase `ζ^(τ_(g+d) − τ_g)` and skin across `d` places, and its far skins to the places `2^ℓ` away, depend on the mode, the site,
+// the offset and the clock alone (`paced_phase`, `paced_between`), so `field_clock_fill` forms each once for the clock (where its forward moments
+// are read, and again at each tick's return for that tick's clock) and the moments, their return, the skinned prefixes and the clocks' covector
+// read them: the same integers. The offset zero is the resident ring's and the resident decay's first entry, read where it stands. Width: a phase's
+// parts are a unit Gaussian's on `2^(−30)`, read through the resident ring (at most `2^30`) or summed by the series to the face's grain (the exact
+// value at most `2^30`, each of its at most 23 steps released once and divided once to the nearest, the rounding carried forward by at most
+// `π/k`, so `|re|, |im| < 2^30 + 2^10`): two 32-bit words hold it, the fill refusing one past them (`REFUSED_WORD32`), and `INT32_MIN` is the
+// word no fill formed (`PHASE_UNFILLED`, the test build's fill before each clock's). A skin is at most `2^30` (step 1).
+#define PHASE_UNFILLED ((int32_t)0x80000000)
+#define CLOCK_NEAR (2 * (NEAR - 1))
+
+// A near offset's slot: `d = −1..−5` at `0..4`, `d = 1..5` at `5..9`.
+__device__ __forceinline__ uint32_t near_slot(int32_t d) {
+    return d < 0 ? (uint32_t)(-d - 1) : (uint32_t)(NEAR - 2 + d);
+}
+
+__device__ __forceinline__ uint64_t clock_at(const FieldWords &fw, uint32_t u, uint64_t g, int32_t d) {
+    return ((uint64_t)u * fw.T + g) * CLOCK_NEAR + near_slot(d);
+}
+
+// `ζ^(τ_(g+d) − τ_g)` of moment mode `u` at site `g` (`paced_phase(g, g + d)`), the clock's.
+__device__ __forceinline__ MomentGauss clock_phase(const FieldWords &fw, const PacedMode &pm, uint32_t u, uint64_t g, int32_t d) {
+    if (d == 0) {
+        const uint64_t at = fw.ring_off[pm.slot];
+        return mg_make((wide)fw.phasor[2 * at], (wide)fw.phasor[2 * at + 1]);
+    }
+    if (fw.mphase == nullptr) {
+        atomicOr(fw.status, REFUSED_UNFILLED);
+        return mg_make(0, 0);
+    }
+    const int32_t *v = fw.mphase + 2 * clock_at(fw, u, g, d);
+    if (v[0] == PHASE_UNFILLED || v[1] == PHASE_UNFILLED) {
+        atomicOr(fw.status, REFUSED_UNFILLED);
+        return mg_make(0, 0);
+    }
+    return mg_make((wide)v[0], (wide)v[1]);
+}
+
+// `e^(−2π|σ_g − σ_(g+d)|/n)` of moment mode `u` at site `g` (`paced_between(g, g + d)`), the clock's.
+__device__ __forceinline__ wide clock_skin(const FieldWords &fw, const PacedMode &pm, uint32_t u, uint64_t g, int32_t d) {
+    if (d == 0) {
+        return (wide)fw.decay[(uint64_t)pm.slot * fw.dreach];
+    }
+    if (fw.mskin == nullptr) {
+        atomicOr(fw.status, REFUSED_UNFILLED);
+        return 0;
+    }
+    return skin_word(fw, fw.mskin[clock_at(fw, u, g, d)]);
+}
+
+// The skin from site `g` to the place `2^level` away on its side (`paced_between(g, g ± 2^level)`), the clock's, from the crowd edges' store.
+__device__ __forceinline__ wide clock_far(const FieldWords &fw, const PacedMode &pm, uint64_t g, uint32_t level, bool right) {
+    return crowd_skin_word(fw, pm.p, g, level, right, pm.l);
+}
+
+// [definition; theory, November 12, P50 step 2] **The clock's phases and skins, formed once** (`field_clock_fill`): one thread a site and moment mode of
+// a paced head (every region, plain or not: the clocks' covector reads the paced law on both), its near offsets' phases and skins within its region,
+// and its far skins to the places `2^ℓ` away on each side where `2^ℓ` is within the region (the skinned prefixes' rule, which holds the crowd
+// edges' at every level), each the integer `paced_phase` and `paced_between` form. A depth ring's mode carries no moment and forms none.
+extern "C" __global__ void field_clock_fill(FieldWords fw) {
+    const uint32_t u = blockIdx.y;
+    const uint32_t cm = fw.mcmap[u];
+    for (uint64_t g = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; g < fw.T; g += (uint64_t)gridDim.x * blockDim.x) {
+        const uint32_t r = fw.site_region[g], t = fw.site_pos[g];
+        PacedMode pm = paced_mode(fw, cm, r);
+        if (pm.p < 0 || (cm >> 31) != 0) {
+            continue;
+        }
+        const uint64_t first = fw.region_off[r];
+        const uint32_t sites = fw.region_off[r + 1] - (uint32_t)first;
+        for (int32_t d = -(int32_t)(NEAR - 1); d <= (int32_t)(NEAR - 1); ++d) {
+            if (d == 0 || (int64_t)t + d < 0 || (int64_t)t + d >= (int64_t)sites) {
+                continue;
+            }
+            const uint64_t gk = (uint64_t)((int64_t)g + d);
+            const MomentGauss ph = paced_phase(fw, pm, g, gk);
+            const uint64_t at = clock_at(fw, u, g, d);
+            if (ph.re <= (wide)INT32_MIN || ph.re > (wide)INT32_MAX || ph.im <= (wide)INT32_MIN || ph.im > (wide)INT32_MAX) {
+                atomicOr(fw.status, REFUSED_WORD32);
+                fw.mphase[2 * at] = PHASE_UNFILLED;
+                fw.mphase[2 * at + 1] = PHASE_UNFILLED;
+            } else {
+                fw.mphase[2 * at] = (int32_t)ph.re;
+                fw.mphase[2 * at + 1] = (int32_t)ph.im;
+            }
+            fw.mskin[at] = (uint32_t)paced_between(fw, pm, g, gk);
+        }
+        for (uint32_t level = 2; ((uint64_t)1 << level) < sites; ++level) {
+            const uint32_t pow = (uint32_t)1 << level;
+            for (uint32_t side = 0; side < 2; side++) {
+                const bool right = side == 1;
+                if (right ? t + pow >= sites : t < pow) {
+                    continue;
+                }
+                const uint64_t edge = right ? g + pow : g - pow;
+                fw.cskin[(((uint64_t)pm.p * fw.T + g) * fw.slots + crowd_slot_of(level, right)) * fw.n + pm.l] = (uint32_t)paced_between(fw, pm, g, edge);
+            }
+        }
+    }
+}
+
 // The paced region's admission (`Law::new` with a pace): the forward's or the return's certificate with the faces'
 // l1 at least `2^31` (`PACED_L1`); a plain region's is the slot's own. Grid `(regions, modes)`, dynamic shared
 // memory `3 · blockDim.x · 16`.
@@ -4500,29 +4835,29 @@ extern "C" __global__ void field_moment_prefix_paced_all(const MomentWords *ws, 
 
 // The paced moment of site `g` (place `t`) on `2^(−106)` (`moment_exact` with a pace): near `ζ^(τ_k − τ_t) D(σ)`, far
 // `conj(ζ^(τ_t))` at the receiver's skin to the place `2^ℓ` away on each side.
-__device__ MomentGauss moment_site_paced(const FieldWords &fw, const PacedMode &pm, const int64_t *before, const int64_t *after, const wide *up, const wide *down, uint64_t first, uint32_t sites, uint32_t t, const MomentWords &w) {
+__device__ MomentGauss moment_site_paced(const FieldWords &fw, const PacedMode &pm, uint32_t u, const int64_t *before, const int64_t *after, const wide *up, const wide *down, uint64_t first, uint32_t sites, uint32_t t, const MomentWords &w) {
     MomentGauss s = mg_make(0, 0);
     const uint64_t gt = first + t;
     const uint32_t forward = t + 1 < (uint32_t)NEAR ? t + 1 : (uint32_t)NEAR;
     for (uint32_t d = 0; d < forward; ++d) {
         const uint64_t gk = gt - d;
-        s = mg_add(s, moment_near(paced_phase(fw, pm, gt, gk), paced_between(fw, pm, gt, gk), mg_load(before, gk)));
+        s = mg_add(s, moment_near(clock_phase(fw, pm, u, gt, -(int32_t)d), clock_skin(fw, pm, u, gt, -(int32_t)d), mg_load(before, gk)));
     }
     const uint32_t backward = sites - t < (uint32_t)NEAR ? sites - t : (uint32_t)NEAR;
     for (uint32_t d = 0; d < backward; ++d) {
         const uint64_t gk = gt + d;
-        s = mg_add(s, moment_near(paced_phase(fw, pm, gt, gk), paced_between(fw, pm, gt, gk), mg_load(after, gk)));
+        s = mg_add(s, moment_near(clock_phase(fw, pm, u, gt, (int32_t)d), clock_skin(fw, pm, u, gt, (int32_t)d), mg_load(after, gk)));
     }
     const MomentGauss home = mg_conj(paced_absolute(fw, w, pm, gt));
     for (uint32_t level = 2; ((uint64_t)1 << level) < sites; ++level) {
         uint32_t lo, hi;
         if (moment_octave(t, sites, level, false, &lo, &hi)) {
             const MomentGauss sum = mg_sub(mg_load_wide(up, hi + 1), mg_load_wide(up, lo));
-            s = mg_add(s, mg_scale(mg_mul(home, sum), paced_between(fw, pm, gt, gt - ((uint64_t)1 << level))));
+            s = mg_add(s, mg_scale(mg_mul(home, sum), clock_far(fw, pm, gt, level, false)));
         }
         if (moment_octave(t, sites, level, true, &lo, &hi)) {
             const MomentGauss sum = mg_sub(mg_load_wide(down, hi + 1), mg_load_wide(down, lo));
-            s = mg_add(s, mg_scale(mg_mul(home, sum), paced_between(fw, pm, gt, gt + ((uint64_t)1 << level))));
+            s = mg_add(s, mg_scale(mg_mul(home, sum), clock_far(fw, pm, gt, level, true)));
         }
     }
     return s;
@@ -4553,7 +4888,7 @@ extern "C" __global__ void field_moment_paced_all(const MomentWords *ws, const u
                 atomicOr(w.status, MOMENT_REFUSED_SHAPE);
             }
         } else {
-            v = moment_site_paced(fw, pm, before, after, up + 2 * (first + r), down + 2 * (first + r), first, sites, t, w);
+            v = moment_site_paced(fw, pm, u, before, after, up + 2 * (first + r), down + 2 * (first + r), first, sites, t, w);
         }
         s[2 * g] = fit64(rel(v.re, MOMENT_COEFFICIENT_BITS), w.status);
         s[2 * g + 1] = fit64(rel(v.im, MOMENT_COEFFICIENT_BITS), w.status);
@@ -4589,8 +4924,7 @@ extern "C" __global__ void field_moment_skinned_all(const MomentWords *ws, const
             const bool reads = ((uint64_t)1 << level) < sites && (left ? t >= ((uint32_t)1 << level) : (uint64_t)t + ((uint64_t)1 << level) < sites);
             if (reads) {
                 const MomentGauss turned = mg_mul(paced_absolute(fw, w, pm, gt), mg_load(ds, gt));
-                const uint64_t edge = left ? gt - ((uint64_t)1 << level) : gt + ((uint64_t)1 << level);
-                sum = mg_add(sum, mg_scale(mg_make(rel(turned.re, MOVE_BITS), rel(turned.im, MOVE_BITS)), paced_between(fw, pm, gt, edge)));
+                sum = mg_add(sum, mg_scale(mg_make(rel(turned.re, MOVE_BITS), rel(turned.im, MOVE_BITS)), clock_far(fw, pm, gt, level, !left)));
             }
             out[2 * (uint64_t)(t + 1)] = sum.re;
             out[2 * (uint64_t)(t + 1) + 1] = sum.im;
@@ -4625,11 +4959,11 @@ extern "C" __global__ void field_moment_return_paced_all(const MomentWords *ws, 
         } else {
             const uint32_t forward = sites - k < (uint32_t)NEAR ? sites - k : (uint32_t)NEAR;
             for (uint32_t d = 0; d < forward; ++d) {
-                plus = mg_add(plus, moment_near_back(paced_phase(fw, pm, g + d, g), paced_between(fw, pm, g + d, g), mg_load(ds, g + d)));
+                plus = mg_add(plus, moment_near_back(clock_phase(fw, pm, u, g + d, -(int32_t)d), clock_skin(fw, pm, u, g + d, -(int32_t)d), mg_load(ds, g + d)));
             }
             const uint32_t backward = k + 1 < (uint32_t)NEAR ? k + 1 : (uint32_t)NEAR;
             for (uint32_t d = 0; d < backward; ++d) {
-                minus = mg_add(minus, moment_near_back(paced_phase(fw, pm, g - d, g), paced_between(fw, pm, g - d, g), mg_load(ds, g - d)));
+                minus = mg_add(minus, moment_near_back(clock_phase(fw, pm, u, g - d, (int32_t)d), clock_skin(fw, pm, u, g - d, (int32_t)d), mg_load(ds, g - d)));
             }
             const MomentGauss home = mg_conj(paced_absolute(fw, w, pm, g));
             for (uint32_t level = 2; ((uint64_t)1 << level) < sites; ++level) {
@@ -4727,12 +5061,12 @@ extern "C" __global__ void field_moment_pace_back_all(const MomentWords *ws, con
         const uint32_t forward = t + 1 < (uint32_t)NEAR ? t + 1 : (uint32_t)NEAR;
         for (uint32_t d = 0; d < forward; ++d) {
             const uint64_t gk = g - d;
-            moment_skin_back(fw, pm, g, gk, paced_between(fw, pm, g, gk), re_pair(fw, dr, di, mg_mul(paced_phase(fw, pm, g, gk), mg_load(before, gk))), b);
+            moment_skin_back(fw, pm, g, gk, clock_skin(fw, pm, u, g, -(int32_t)d), re_pair(fw, dr, di, mg_mul(clock_phase(fw, pm, u, g, -(int32_t)d), mg_load(before, gk))), b);
         }
         const uint32_t backward = sites - t < (uint32_t)NEAR ? sites - t : (uint32_t)NEAR;
         for (uint32_t d = 0; d < backward; ++d) {
             const uint64_t gk = g + d;
-            moment_skin_back(fw, pm, g, gk, paced_between(fw, pm, g, gk), re_pair(fw, dr, di, mg_mul(paced_phase(fw, pm, g, gk), mg_load(after, gk))), b);
+            moment_skin_back(fw, pm, g, gk, clock_skin(fw, pm, u, g, (int32_t)d), re_pair(fw, dr, di, mg_mul(clock_phase(fw, pm, u, g, (int32_t)d), mg_load(after, gk))), b);
         }
         PacedMode own = paced_mode(fw, cm, r);
         const MomentGauss home = mg_conj(paced_absolute(fw, w, own, g));
@@ -4747,7 +5081,7 @@ extern "C" __global__ void field_moment_pace_back_all(const MomentWords *ws, con
                 const MomentGauss f = mg_mul(home, mg_sub(mg_load_wide(pre, hi + 1), mg_load_wide(pre, lo)));
                 const MomentGauss face = mg_make(rel(f.re, MOVE_BITS), rel(f.im, MOVE_BITS));
                 const uint64_t edge = right ? g + ((uint64_t)1 << level) : g - ((uint64_t)1 << level);
-                moment_skin_back(fw, pm, g, edge, paced_between(fw, pm, g, edge), re_pair(fw, dr, di, face), b);
+                moment_skin_back(fw, pm, g, edge, clock_far(fw, pm, g, level, right), re_pair(fw, dr, di, face), b);
             }
         }
     }
@@ -4823,6 +5157,8 @@ extern "C" __global__ void __launch_bounds__(CONTACT_ROWS * 32) field_pace_skin_
         const int64_t *words = w.qf + ((uint64_t)h * w.T + first) * S;
         const int64_t *wi = w.pq + hg * S;
         const int64_t *sigma = w.sigma + (uint64_t)p * w.T;
+        // The row's support entries' addresses (the clock's skins stand there).
+        const uint64_t srow = support_row(w, r, i);
         const uint64_t prow0 = (uint64_t)h * rows1 + first + r;
         const wide *swp = w.sw + prow0 * S;
         const wide *svp = w.sv + prow0 * S;
@@ -4843,7 +5179,7 @@ extern "C" __global__ void __launch_bounds__(CONTACT_ROWS * 32) field_pace_skin_
             wide at = 0;
             for (uint32_t l = 0; l < n; l++) {
                 const uint32_t slot = l * (w.frames - w.still) + h % w.frames - w.still;
-                const wide dec = skin_ij(w, h, l, g, gj, gap);
+                const wide dec = skin_ij_at(w, h, l, g, srow + k, gap);
                 const wide inner = (wide)dyi[l] * (wide)values[(uint64_t)j * S + l] + (wide)dyi[n + l] * (wide)values[(uint64_t)j * S + n + l];
                 wide value = 0;
                 if (!mul_fits((wide)e[j], inner, &value)) {
@@ -4873,7 +5209,7 @@ extern "C" __global__ void __launch_bounds__(CONTACT_ROWS * 32) field_pace_skin_
                     const wide cnt = (wide)count;
                     for (uint32_t l = 0; l < n; l++) {
                         const uint32_t slot = l * (w.frames - w.still) + h % w.frames - w.still;
-                        const wide dec = skin_ij(w, h, l, g, ge, (uint32_t)1 << lv);
+                        const wide dec = crowd_skin_ij(w, h, l, g, lv, right);
                         const wide vr = svp[(uint64_t)(hi_ + 1) * S + l] - svp[(uint64_t)lo * S + l], vi = svp[(uint64_t)(hi_ + 1) * S + n + l] - svp[(uint64_t)lo * S + n + l];
                         wide x = 0, y = 0, value = 0;
                         if (!mul_fits((wide)dyi[l], vr, &x) || !mul_fits((wide)dyi[n + l], vi, &y) || !mul_fits((wide)w.ce[hg * w.slots + lane], x + y, &value)) {
@@ -5011,4 +5347,117 @@ extern "C" __global__ void field_scale_scatter(FieldWords w, const int64_t *src,
         const int64_t v = src[(p * period + local % period) * width + i];
         dst[c] = add ? fit64((wide)dst[c] + (wide)v, w.status) : v;
     }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+// [measurement; theory, November 12, P50 step 0b] **The card's yardsticks**: two readings of the card itself, no law and no
+// state (the engine's record, §2 and §6 step 0). They replace the published ceilings in the count of a site's arithmetic.
+//
+// Narrow products: a site's map at its shape (64 outputs by 64 inputs) held in a block's shared memory, `table[i][o]`, each
+// product two 32-bit words into a 64-bit sum (`mad.wide.u32`). The block's 64 sites' inputs `x[i][s]` stand beside it; after
+// each pass over the inputs every sum's low word becomes the next pass's input (the map iterated), so no pass can be read
+// from the one before. `cell`: one thread a cell (site, output), the shape of `affine_tiled` (4 sites a block of 256).
+// `tile`: one thread four outputs of four sites (64 sites a block), each pair of words read once for sixteen products.
+#define YARD_N 64
+extern "C" __global__ void field_yard_products_cell(const uint32_t *table, const uint32_t *input, uint64_t *out, uint32_t passes) {
+    __shared__ uint32_t t[YARD_N * YARD_N];
+    __shared__ uint32_t x[YARD_N * 4];
+    for (uint32_t c = threadIdx.x; c < YARD_N * YARD_N; c += blockDim.x) {
+        t[c] = table[c];
+    }
+    const uint32_t o = threadIdx.x % YARD_N, s = threadIdx.x / YARD_N;
+    for (uint32_t c = threadIdx.x; c < YARD_N * 4; c += blockDim.x) {
+        x[c] = input[((uint64_t)blockIdx.x * YARD_N * 4 + c) % (YARD_N * YARD_N)] ^ blockIdx.x;
+    }
+    __syncthreads();
+    uint64_t acc = 0;
+    for (uint32_t pass = 0; pass < passes; ++pass) {
+#pragma unroll 16
+        for (uint32_t i = 0; i < YARD_N; ++i) {
+            acc += (uint64_t)t[i * YARD_N + o] * (uint64_t)x[i * 4 + s];
+        }
+        __syncthreads();
+        x[o * 4 + s] = (uint32_t)acc;
+        __syncthreads();
+    }
+    out[(uint64_t)blockIdx.x * blockDim.x + threadIdx.x] = acc;
+}
+
+extern "C" __global__ void field_yard_products_tile(const uint32_t *table, const uint32_t *input, uint64_t *out, uint32_t passes) {
+    __shared__ __align__(16) uint32_t t[YARD_N * YARD_N];
+    __shared__ __align__(16) uint32_t x[YARD_N * YARD_N];
+    for (uint32_t c = threadIdx.x; c < YARD_N * YARD_N; c += blockDim.x) {
+        t[c] = table[c];
+        x[c] = input[c] ^ blockIdx.x;
+    }
+    __syncthreads();
+    const uint32_t to = threadIdx.x % 16, ts = threadIdx.x / 16;
+    uint64_t acc[4][4] = {};
+    for (uint32_t pass = 0; pass < passes; ++pass) {
+#pragma unroll 4
+        for (uint32_t i = 0; i < YARD_N; ++i) {
+            const uint4 tv = *reinterpret_cast<const uint4 *>(&t[i * YARD_N + 4 * to]);
+            const uint4 xv = *reinterpret_cast<const uint4 *>(&x[i * YARD_N + 4 * ts]);
+            const uint32_t ta[4] = {tv.x, tv.y, tv.z, tv.w}, xa[4] = {xv.x, xv.y, xv.z, xv.w};
+#pragma unroll
+            for (int a = 0; a < 4; ++a) {
+#pragma unroll
+                for (int b = 0; b < 4; ++b) {
+                    acc[a][b] += (uint64_t)ta[a] * (uint64_t)xa[b];
+                }
+            }
+        }
+        __syncthreads();
+#pragma unroll
+        for (int a = 0; a < 4; ++a) {
+#pragma unroll
+            for (int b = 0; b < 4; ++b) {
+                x[(4 * to + a) * YARD_N + 4 * ts + b] = (uint32_t)acc[a][b];
+            }
+        }
+        __syncthreads();
+    }
+    uint64_t sum = 0;
+#pragma unroll
+    for (int a = 0; a < 4; ++a) {
+#pragma unroll
+        for (int b = 0; b < 4; ++b) {
+            sum ^= acc[a][b];
+        }
+    }
+    out[(uint64_t)blockIdx.x * blockDim.x + threadIdx.x] = sum;
+}
+
+// Octets: a store of 32-bit words read in order (sixteen octets a thread a step, the grid striding the store), written in order,
+// and gathered eight words at a time at a random entry of a random row (rows of `entries` entries of eight words, the shape of a
+// skin row: a pair's eight modes), each gather thirty-two octets at their own sector. The sums are written so no read is idle.
+extern "C" __global__ void field_yard_read(const uint4 *store, uint64_t quads, uint64_t *out) {
+    uint32_t acc = 0;
+    for (uint64_t c = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; c < quads; c += (uint64_t)gridDim.x * blockDim.x) {
+        const uint4 v = store[c];
+        acc ^= v.x ^ v.y ^ v.z ^ v.w;
+    }
+    out[(uint64_t)blockIdx.x * blockDim.x + threadIdx.x] = acc;
+}
+
+extern "C" __global__ void field_yard_write(uint4 *store, uint64_t quads, uint32_t seed) {
+    for (uint64_t c = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; c < quads; c += (uint64_t)gridDim.x * blockDim.x) {
+        const uint32_t v = (uint32_t)c ^ seed;
+        store[c] = make_uint4(v, v + 1, v + 2, v + 3);
+    }
+}
+
+extern "C" __global__ void field_yard_gather(const uint4 *store, uint32_t rows, uint32_t entries, uint32_t gathers, uint32_t seed, uint64_t *out) {
+    const uint64_t thread = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x;
+    uint64_t state = (thread + 1) * 0x9E3779B97F4A7C15ull ^ seed;
+    uint32_t acc = 0;
+    for (uint32_t k = 0; k < gathers; ++k) {
+        state = state * 6364136223846793005ull + 1442695040888963407ull;
+        const uint32_t hi = (uint32_t)(state >> 32), lo = (uint32_t)state;
+        const uint32_t row = __umulhi(hi, rows), col = __umulhi(lo, entries);
+        const uint64_t quad = ((uint64_t)row * entries + col) * 2;
+        const uint4 a = store[quad], b = store[quad + 1];
+        acc ^= a.x ^ a.y ^ a.z ^ a.w ^ b.x ^ b.y ^ b.z ^ b.w;
+    }
+    out[thread] = acc;
 }

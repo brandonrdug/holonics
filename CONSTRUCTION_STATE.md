@@ -196,6 +196,46 @@ repository was reset on September 24; the pre-reset tree is
     `deposition.cost-follows-surprise`, open; its premise is the count of compared places by
     octave of surprise, by slice, on the three states the line has). The states: the crossing,
     2,001 sections and 5,001 sections.
+  - The three states are read, and the symbol's word is designed (November 12;
+    [the record](research/records/2026-11-12_THE_STORE_CODES_HELD_TEXT_AT_THE_LEVEL_OF_TWO_KNOWN_NEIGHBOURS_A_SIDE_A_SYMBOL_IS_A_WORD_ON_LOCATED_RINGS_AND_A_DARK_PLACE_IS_THE_INTERIOR_OF_A_COMPOSITE.md)).
+    Held, the state after 5,001 sections codes a whole mask at 2.39, 2.50, 2.62, 2.38 and 2.93
+    nats a compared place on code, web, science, books and wikidata: within 0.13 of a count
+    ruler's reading with two known neighbours a side on the same text, and over the count of
+    three on every slice. A release reads its first places, and from its fourth place on it reads
+    the slice's count of bytes; no state writes language. The share of compared places under a
+    sixteenth of a bit is 0.009 to 0.041 by slice and does not move with the pass, so the grain
+    of `deposition.cost-follows-surprise` is owed on the excess over a reader of the same
+    knowledge. The built alphabet is 244 byte classes with 259 entries each of their own, 0.54 of
+    the constitution. Rulers on a symbol's word: a code point's coprime residues keep no more
+    than a scramble keeps; an address located from counts keeps 0.90 to 0.96 of a free row's
+    content on 33 rows; 64 composites founded by count read at two symbols back what bytes read
+    three back. The design (not built; atlas `code.symbol-word-located-rings`,
+    `code.composite-reach`, `code.neighbour-count-level`): a symbol's rows are a series on a key
+    of coprime rings that the machine locates, and a composite is its factors' strand with a
+    remainder, composed where a place is dark given its neighbour (the next item: by the
+    machine's own clock, never by a table of merges). The engine's step 0 is in: on
+    the card's measured yardsticks the trainer stands at 17.8 times the sum of its floors (0.587
+    µs a site), the paced heads hold 0.731 of the forward contact's rows (G116 (d), inside its
+    range), and the first repair's skin store is ordered on the row's support, the dense address
+    having missed the batch's cut on about a quarter of the sections.
+  - The first repair is read, and the symbol's word is recovered (November 12; the same record
+    as amended, §7.2, §8.4, §8.8 and §10.4). A paced head's skin formed once a clock and held at
+    the row's support stride keeps every bit (600 of 600 section lines and the state's bytes) and
+    takes a section to 0.948 of its control inside one hold. The contact family reads 166.2 ms a
+    profiled section where G116 (a) fixed 130: missed. A still pair's row already costs what the
+    card's gather rate gives its octets, so the family is read as bound by what it gathers
+    (agent-inferred; its test is ordered before step 3), and its levers are the count's laws:
+    fewer octets a pair, a region's rows staged in a block, fewer pairs. Read at source the same
+    day: the located transport of October 5 and guard 9 of THE_MACHINE already held a symbol's
+    word for the alphabet (an occurrence steps the rings by its symbol's located advance; a class
+    is never an index into a table), and the tower of November took its classes on the codec's
+    sheet beside them. Only the pace kept the located advance's form. So the symbol's line
+    repairs a recorded law, and its composite is the machine's own: an epoch of a paced clock,
+    which is a site of the level above. A control on the located ruler: the 41 commonest bytes
+    keeping a row each give 0.76 to 0.94 of a free row's content where a located address gives
+    0.91 to 0.98, so what composition adds is the rare symbols'. The line's first reading is
+    G118: the store's trained paces by class, and whether their carries cut held text where it
+    is bright.
   - Every extent of the built declaration is given the part it sizes, how it was reached and what
     sizes it (the same record, §5), with ten findings by file and line and the build that closes
     each. The departures that stand: the face's 64 coordinates are two lanes of 32, the second a

@@ -1807,3 +1807,83 @@ lanes", its section 6, steps 0 to 3). Every step keeps every bit; none changes a
   What it does not read. The level: nothing here changes a bit of any state. The dark share (the count of compared places by octave of surprise,
   by slice, on the states at the crossing, 2,001 and 5,001 sections) is read-store's, and the law that releases a covector under a declared grain
   gets its own guess after that read.
+
+G116 (d) scored 2026-11-12T22:03Z (the same thread; the PC's P50 step 0, PR #729 merged at 66a3369a4; receipt p50_step0.txt in the receipts of the record of
+this date, "A site's arithmetic is counted against the card's lanes"; the binary entered the line with 100 of 100 section lines equal and STATE.100
+and MEAN.100 equal to P49a's):
+  (d) fixed 0.78 (0.70 to 0.86), read 0.731: IN. Of field_contact_rows' 57.69 ms a profiled section the still heads hold 8.62 and 6.90 and the
+      paced heads 20.45 and 21.72, on 14,783,252, 9,941,520, 10,014,764 and 10,926,621 pairs met a section: a paced pair 2.04 and 1.99 ns, a still
+      pair 0.58 and 0.69, a ratio of 3.2 where the units of the derivation gave 3.6. field_contact_columns' paced share 0.706 of 33.67 ms;
+      field_pace_skin_back 39.78 ms, the paced heads' alone. By the rule (above 0.65) step 1 is built.
+  (c)'s premise MISSED, on arithmetic the line's own lines held before the guess was fixed: "batches a section stay 1.00 ... about 0.99 GB on a
+      peak of 7.54". A batch's cut is four fifths of the batch budget, 8,489,376,152 octets of 10,612,244,480 at this open; leg 1's peak_store is
+      7,574,201,370 and its largest section's 15,606,215 pairs add about 1.05 GB at 64 octets a pair of sites, so about 767 of leg 1's 3,000
+      sections would take two batches. I read the peak and did not read the cut. The repair (P51, ordered before the dense build was read): the
+      skin's store on the row's support (atlas tower.field-support-stride applied to this store alone: a region's stride K_r = NEAR_SLOTS + D_r,
+      reserved the sum over regions of S_r K_r in place of the sum of S_r squared), with the count of leg 1's sections that would pass the cut
+      printed and held to zero. (a), (b) and (c)'s rates stand as fixed and are scored on the support's build; (a)'s rule named the support as
+      the store's next address, and it is now its first.
+  The card's yardsticks, measured in the same step (they replace the published figures in "Against the card"): 5.1914e12 narrow products a second
+  with one thread a 4 by 4 tile, 5.7247e11 octets a second read in order. The count's floors on them: 8.39 and 15.53 ms a section, 0.587 us a
+  site; the count's receipt of 424.8 ms a section stands at 50.6 times the arithmetic's floor and 17.8 times the sum (42 and 19 on the published
+  figures). At (c)'s 7.8 us a site the realization would stand at 13.3 times the sum of the measured floors. The bar of 1 us a site is 1.70 times
+  that sum.
+
+G116 (a) scored 2026-11-12T22:42Z (the same thread; the PC's P50 step 1 at P51's address, PR #731 merged at c04b4e68c; receipt p50_step1.txt in the receipts of
+the record of this date, "A site's arithmetic is counted against the card's lanes"; the build entered the line with 600 of 600 section lines equal
+run 2's from run 1's state at section 101, and STATE.600 and MEAN.600 equal byte for byte):
+  (a) fixed 130 ms a profiled section (110 to 155), read 166.2 (from 200.7 at step 0 in another hold): MISSED, above the range. By entry, step 1
+      against step 0: field_contact_rows 39.79 against 57.68, field_pace_skin_back 37.09 against 39.77, field_contact_l5 and _l6 32.85 against
+      45.31, field_contact_columns 27.59 against 33.66, field_skin_fill 10.12 (new), field_exposure 9.20 against 15.37, the rest 9.57 against 8.90.
+      Where the derivation failed: it gave the rows 24.6 and they read 39.8, the columns 11.4 and they read 27.6, the skin's return 27.2 and it
+      read 37.1. A paced pair's row fell from 2.04 and 1.99 ns to 1.16 and 1.12, so forming the skin was about 0.87 ns of it where the units put
+      1.45, and a paced pair still costs the rows 1.6 to 1.9 times a still pair with the skin read from the store: the units counted instructions
+      and the entries are paced by what they gather. The rule's branch for a read above 155 with (d) held ("the store goes on its support") is
+      spent: the store is on its support already (0.70 of the dense pairs' entries; none of leg 1's 3,000 sections over the batch's cut).
+  The reading (agent-inferred, untested): a still pair's row costs 0.60 and 0.71 ns, at or under the 0.886 ns the gather yardstick gives the 128
+      octets of a source's value row; the family as a whole is 3.6 ns a pair met. If the family is bound by the octets it gathers, the steps
+      that keep a pair's octets are worth about a twentieth each and (c)'s 318 ms will be missed with (a). Its test is ordered before step 3:
+      each entry's gathered octets a pair counted from source against the gather and in-order yardsticks, and an ablation timed in one hold.
+  In one hold (sections 2,001 to 2,100): control 451.0, step 1 427.5, control 450.8 ms a section: 0.948, 10.49 us a computed site at 40,741.
+  (c) is not scored here (steps 2 and 3 are not built).
+  (b)'s premise, stated before its read: the derivation said "the phases formed once a clock in place of three times". The forecast read before
+      step 2 is built: four kept clocks add 12,800 octets a site and 1,840 to 2,180 of leg 1's 3,000 sections would pass the batch's cut, so
+      the build keeps one store for the clock in use, with the far skins in step 1's store (1,920 octets a site, no section over the cut), and
+      a value is then formed twice a clock. (b)'s 18 ms (10 to 25) stands as fixed and is scored on that build with this premise's miss beside it.
+
+G118 fixed 2026-11-12T22:42Z (the same thread), before its reads: what the paces of the store's trained state hold, and whether the carries of the clocks
+deposition already moved cut the strand where it is bright. It is the first reading of the symbol's line (the record of this date, "The store
+codes held text at the level of two known neighbours a side", its sections 8.4, 8.8 and 11).
+  Premise, read from the records first. G33 (November 11, the code line's state rt4): the paces are not plain; mean rates 3.05 and 2.70 on the
+  two paced heads; on the head of larger spread the newline 13.5 against a word letter's 2.72, punctuation 1.32 of a word letter, the space
+  0.72 of one; on the other head the newline 1.75, punctuation 1.29, the space 1.16; "the line is the grain the built clocks already cut". The
+  store's state grew from that line, and its fresh classes' pace entries were founded at zero (a rate of 1). The count rulers of this date: a
+  place's code given two bytes before it reads 2.1 to 2.5 nats by slice.
+  The reads. R1, on the PC's host, no card: the pace family of the store's states A (the crossing) and C (5,001 sections; the mean of states
+  where one is saved, and the receipt says which), a row a class with its byte value, whether the open text added it, and its rate on each
+  paced head. R2, in the cloud on the public held shard, a count ruler: with R1's rates a paced head's sigma is summed along each slice's
+  held text (the store's rule for pieces), an epoch closes at each carry of sigma on a ring whose period makes the slice's mean epoch 6 places
+  (the built packets' length), and each place's code is the count ruler's, two bytes before it known (Witten-Bell on the counts stream). The
+  ratio read is the mean code of an epoch's first place over the mean code of its other places. Two controls on the same places: packets of a
+  fixed 6 places (the ratio a cut blind to the text reads), and a cut by the code itself (an epoch opens at each place whose code passes the
+  level that makes the mean epoch 6: the most a cut of that length can read).
+  (a) On state C the newline's rate is still the largest of the code line's classes on its head, at 3 or more times the mean rate of the ASCII
+      letters there (guess 4.5; G33 read 4.96). The classes the open text added have moved little: the median of |rate - 1| among them is
+      under 0.3 on both heads, where it is over 1 among the code line's classes.
+  (b) The ratio of first place to the rest, on the head of larger spread, pooled over the five slices: 1.10 (1.03 to 1.25). By slice, code the
+      largest (its lines are its units, 1.2) and books the least (1.03). Fixed packets read 1.00 within 0.02; the cut by the code reads 2.5 or
+      more.
+  Derivation of (b). At a mean stride of about 3 a ring of period about 18 makes the mean epoch 6. A newline advances the head of larger spread
+  by 13.5, three quarters of that period, so about three quarters of the newlines close an epoch and the place after a newline opens one;
+  punctuation's 1.32 adds little, and the space, at 0.72 of a letter, opens nothing. So the lift over a blind cut is the newline's, weighted by
+  how often a line ends: about a place in 40 in code and one in several hundred in prose.
+  Rule. (b) under 1.05 in four of five slices: a class's one rate does not cut the strand where it is bright, and the design's stride reads the
+  place's own surprise (the face the tick before gave it, as a blank's stride already does, the field record 16.44) with the class rate its
+  founding. (b) at 1.05 or more: the level above is first built on the stride clock as deposition already moves it, and the stride that reads
+  surprise is the comparison its acceptance names. Either way the cut by the code's own ratio is the size of what a stride law can reach.
+  (a)'s second part false (the fresh classes' rates have moved as far as the old ones'): the paces move fast enough to be read after a short
+  pass, and R2 is read on state C alone.
+  What is not ordered, and why. A ruler of the state's class rows against a located first-order series, and the held code with the rows
+  replaced by that series: the control of this date (the 41 commonest bytes a row each keep 0.76 to 0.94 of a free row's content, a located
+  address 0.91 to 0.98) says a share kept on the state's rows would read high for rows of any structure, and tying the byte alphabet is not
+  expected to lower the held code (the record's section 8.8). The reading that decides the design is the epoch's.
