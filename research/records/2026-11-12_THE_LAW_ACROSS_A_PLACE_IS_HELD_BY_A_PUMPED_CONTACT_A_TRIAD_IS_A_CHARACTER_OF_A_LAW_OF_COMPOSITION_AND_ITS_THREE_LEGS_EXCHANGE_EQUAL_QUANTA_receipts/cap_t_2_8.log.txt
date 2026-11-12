@@ -1,0 +1,47 @@
+K=2 R=8 left contexts 6657 right contexts 6636 joint contexts 356758; pair tables from the count tables  2s
+  step   0  HELD128 (seen contexts, share 0.9996) 1.2215
+  step   1  TRAIN 1.1595  HELD128 (seen contexts, share 0.9996) 1.1783   3s
+  step   5  TRAIN 1.0053  HELD128 (seen contexts, share 0.9996) 1.0282   9s
+  step  10  TRAIN 0.8422  HELD128 (seen contexts, share 0.9996) 0.9065   16s
+  step  15  TRAIN 0.7650  HELD128 (seen contexts, share 0.9996) 0.8426   23s
+  step  20  TRAIN 0.7243  HELD128 (seen contexts, share 0.9996) 0.8136   30s
+  step  25  TRAIN 0.6971  HELD128 (seen contexts, share 0.9996) 0.7935   37s
+  step  30  TRAIN 0.6787  HELD128 (seen contexts, share 0.9996) 0.7823   44s
+  step  35  TRAIN 0.6654  HELD128 (seen contexts, share 0.9996) 0.7752   51s
+  step  40  TRAIN 0.6557  HELD128 (seen contexts, share 0.9996) 0.7693   58s
+  step  45  TRAIN 0.6516  HELD128 (seen contexts, share 0.9996) 0.7675   65s
+  step  50  TRAIN 0.6487  HELD128 (seen contexts, share 0.9996) 0.7660   72s
+  step  55  TRAIN 0.6463  HELD128 (seen contexts, share 0.9996) 0.7646   79s
+  step  60  TRAIN 0.6441  HELD128 (seen contexts, share 0.9996) 0.7634   86s
+  step  65  TRAIN 0.6422  HELD128 (seen contexts, share 0.9996) 0.7624   93s
+  step  70  TRAIN 0.6404  HELD128 (seen contexts, share 0.9996) 0.7616   100s
+  step  75  TRAIN 0.6387  HELD128 (seen contexts, share 0.9996) 0.7609   107s
+  step  80  TRAIN 0.6371  HELD128 (seen contexts, share 0.9996) 0.7604   114s
+  step  85  TRAIN 0.6356  HELD128 (seen contexts, share 0.9996) 0.7598   121s
+  step  90  TRAIN 0.6342  HELD128 (seen contexts, share 0.9996) 0.7594   128s
+  step  95  TRAIN 0.6329  HELD128 (seen contexts, share 0.9996) 0.7590   135s
+  step 100  TRAIN 0.6317  HELD128 (seen contexts, share 0.9996) 0.7586   142s
+  step 105  TRAIN 0.6305  HELD128 (seen contexts, share 0.9996) 0.7583   149s
+  step 110  TRAIN 0.6294  HELD128 (seen contexts, share 0.9996) 0.7580   157s
+  step 115  TRAIN 0.6283  HELD128 (seen contexts, share 0.9996) 0.7578   164s
+  step 120  TRAIN 0.6273  HELD128 (seen contexts, share 0.9996) 0.7576   171s
+  step 125  TRAIN 0.6269  HELD128 (seen contexts, share 0.9996) 0.7575   178s
+  step 130  TRAIN 0.6266  HELD128 (seen contexts, share 0.9996) 0.7574   185s
+  step 135  TRAIN 0.6262  HELD128 (seen contexts, share 0.9996) 0.7573   192s
+  step 140  TRAIN 0.6259  HELD128 (seen contexts, share 0.9996) 0.7572   198s
+  step 145  TRAIN 0.6256  HELD128 (seen contexts, share 0.9996) 0.7571   205s
+  step 150  TRAIN 0.6253  HELD128 (seen contexts, share 0.9996) 0.7570   212s
+  step 155  TRAIN 0.6250  HELD128 (seen contexts, share 0.9996) 0.7569   219s
+  step 160  TRAIN 0.6247  HELD128 (seen contexts, share 0.9996) 0.7568   227s
+  step 165  TRAIN 0.6244  HELD128 (seen contexts, share 0.9996) 0.7567   233s
+  step 170  TRAIN 0.6241  HELD128 (seen contexts, share 0.9996) 0.7566   240s
+  step 175  TRAIN 0.6238  HELD128 (seen contexts, share 0.9996) 0.7565   247s
+  step 180  TRAIN 0.6235  HELD128 (seen contexts, share 0.9996) 0.7564   254s
+  step 185  TRAIN 0.6232  HELD128 (seen contexts, share 0.9996) 0.7563   261s
+  step 190  TRAIN 0.6229  HELD128 (seen contexts, share 0.9996) 0.7562   268s
+  step 195  TRAIN 0.6227  HELD128 (seen contexts, share 0.9996) 0.7561   275s
+  step 200  TRAIN 0.6224  HELD128 (seen contexts, share 0.9996) 0.7561   281s
+  step 205  TRAIN 0.6221  HELD128 (seen contexts, share 0.9996) 0.7560   288s
+  step 210  TRAIN 0.6218  HELD128 (seen contexts, share 0.9996) 0.7559   295s
+K=2 R=8 best HELD128 0.7559 at step 210 of 214
+MEASURE lap=triad_8 rc=0 wall_s=300.9 peak_rss_kib=968944
