@@ -1,0 +1,14 @@
+K=2 R=64 left contexts 6657 right contexts 6636 joint contexts 356758; pair tables from the count tables  2s
+  step   0  HELD128 (seen contexts, share 0.9996) 1.2216
+  step   1  TRAIN 1.1596  HELD128 (seen contexts, share 0.9996) 1.1641   9s
+  step   5  TRAIN 0.8297  HELD128 (seen contexts, share 0.9996) 0.8306   34s
+  step  10  TRAIN 0.6203  HELD128 (seen contexts, share 0.9996) 0.7108   66s
+  step  15  TRAIN 0.5428  HELD128 (seen contexts, share 0.9996) 0.6572   99s
+  step  20  TRAIN 0.5064  HELD128 (seen contexts, share 0.9996) 0.6415   131s
+  step  25  TRAIN 0.4843  HELD128 (seen contexts, share 0.9996) 0.6345   163s
+  step  30  TRAIN 0.4696  HELD128 (seen contexts, share 0.9996) 0.6317   195s
+  step  35  TRAIN 0.4594  HELD128 (seen contexts, share 0.9996) 0.6320   226s
+  step  40  TRAIN 0.4518  HELD128 (seen contexts, share 0.9996) 0.6363   258s
+  step  45  TRAIN 0.4484  HELD128 (seen contexts, share 0.9996) 0.6364   290s
+K=2 R=64 best HELD128 0.6317 at step 30 of 47
+MEASURE lap=triad_64 rc=0 wall_s=302.9 peak_rss_kib=1310396
