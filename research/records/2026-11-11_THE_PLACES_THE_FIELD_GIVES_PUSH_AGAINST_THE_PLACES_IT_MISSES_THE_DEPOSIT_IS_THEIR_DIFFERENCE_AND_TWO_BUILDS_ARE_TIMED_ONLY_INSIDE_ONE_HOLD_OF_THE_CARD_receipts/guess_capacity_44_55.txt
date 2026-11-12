@@ -1615,3 +1615,6 @@ states they leave are rulers' and train nothing.
   Rule, beside G113's: launches a section past 3,500 say the 299 ms are launch latency, the profile's shares overstate the short entries, and joining
   launches comes before the contact's widths; (f1) and (f2) inside their ranges say the host's stroke already runs under the card's and the card's
   own time sets the section, so the next loop is the largest family of the card's entries, read by (c).
+Correction 2026-11-12T17:20Z to G112's score: the count's first source is kept at the tag archive/claude/carry-count (75bce9b6c), the name that
+tools/repo_census.py --archive gives a branch claude/carry-count, not archive/carry-count. G113's re-declared reads, tp1 and tp2, are not run yet; the
+PC's host ran PR #715's controls only (P44), and the card stays free.
