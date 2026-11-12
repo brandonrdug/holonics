@@ -1,0 +1,65 @@
+# te5 (G104), 2026-11-12 UTC: one lap at the base rate from TE4B (te4/STATE.0 opened by main's tools/part_rates.py at 3ae1082a0 with every one of
+# the 22 parts at octave 0: the four carry parts back at the base rate beside the other 18) with bin-carry-coupled (87994ea23's release field_pass, sha256
+# 54f9cb36459453d2) and lap_tf.sh's exports, arguments and lap bound exactly as te4 had (L 3,703,955 ms, the run's 4,003,955 ms), the state aside, in a
+# fresh run directory te5 (RUN is P24's run directory, where te1 to te4 stand). Device line: the card, the RTX 4080 SUPER under
+# HOLONICS_ROOT/.local/gpu.lock, its own hold, nothing else on the card or the host; the host part as the lap runs it, with a 12 GiB ceiling on its
+# resident set. Dispatched with tools/runs.py (te5) to wait behind rt28's lap and reads, its receipts, and the triad build's gate (i) and builds.
+# Projection 1,150 to 1,450 s; deadline 1,600 s by its outer timeout; early stop past 950 ms a section over n=0..99.
+## TE4B and its gates (main's part_rates.py open RUN/te4/STATE.0 32 and 22 zeros RUN/TE4B, one thread)
+FIELD_PART_RATE part=w_new entries=2048 c=- rate_octaves=0 rate_bits=12
+FIELD_PART_RATE part=a_new entries=2080 c=- rate_octaves=0 rate_bits=12
+FIELD_PART_RATE part=b_new entries=2080 c=- rate_octaves=0 rate_bits=12
+FIELD_PART_RATE part=enc_lane entries=3232 c=- rate_octaves=0 rate_bits=12
+FIELD_PART_RATE part=before_lane entries=3232 c=- rate_octaves=0 rate_bits=12
+FIELD_PART_RATE part=after_lane entries=3232 c=- rate_octaves=0 rate_bits=12
+FIELD_PART_RATE part=q_lane entries=2048 c=- rate_octaves=0 rate_bits=12
+FIELD_PART_RATE part=v_lane entries=2048 c=- rate_octaves=0 rate_bits=12
+FIELD_PART_RATE part=probe_lane entries=2048 c=- rate_octaves=0 rate_bits=12
+FIELD_PART_RATE part=out_lane entries=2048 c=- rate_octaves=0 rate_bits=12
+FIELD_PART_RATE part=moment_face_lane entries=2048 c=- rate_octaves=0 rate_bits=12
+FIELD_PART_RATE part=read_lane entries=3072 c=- rate_octaves=0 rate_bits=12
+FIELD_PART_RATE part=face_biases_lane entries=128 c=- rate_octaves=0 rate_bits=12
+FIELD_PART_RATE part=a_lane entries=1024 c=- rate_octaves=0 rate_bits=12
+FIELD_PART_RATE part=b_lane entries=1024 c=- rate_octaves=0 rate_bits=12
+FIELD_PART_RATE part=carry entries=4160 c=- rate_octaves=0 rate_bits=12
+FIELD_PART_RATE part=w_carry entries=4096 c=- rate_octaves=0 rate_bits=12
+FIELD_PART_RATE part=a_carry entries=4160 c=- rate_octaves=0 rate_bits=12
+FIELD_PART_RATE part=b_carry entries=4160 c=- rate_octaves=0 rate_bits=12
+FIELD_PART_RATE part=enc_first entries=3232 c=- rate_octaves=0 rate_bits=12
+FIELD_PART_RATE part=before_first entries=3232 c=- rate_octaves=0 rate_bits=12
+FIELD_PART_RATE part=after_first entries=3232 c=- rate_octaves=0 rate_bits=12
+OPEN_EXIT 0
+GATE_TE4B_PARTS parts 32 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+GATE_TE4B_DIFF lines_other_than_parts=0
+< parts 32 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 3 3 3 3 0 0 0
+> parts 32 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+TE4B sha256 679855e3cd8b687baa86363c58793ed0743803f916684ea5b4a4c6007bc8040e
+## the run's output
+# te5 from TE4B 679855e3cd8b687b: hnn-field-learner-v3 12 175104 78 -; hnn-field-v14e 100 64 4 8 2 128 4 4 3771 2 0 32; binary 54f9cb36459453d2 (87994ea23); lap bound 3703955 ms, the run's 4003955 ms, outer 1600 s; waited 540 s 11:04:24
+# parts parts 32 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+# te5: lock taken 11:04:24 wait_s=.002455964
+PART_RATES_SEEN te5 FIELD_PART_RATES contacts_before=32 rate_bits=12 octaves w_new=0 a_new=0 b_new=0 enc_lane=0 before_lane=0 after_lane=0 q_lane=0 v_lane=0 probe_lane=0 out_lane=0 moment_face_lane=0 read_lane=0 face_biases_lane=0 a_lane=0 b_lane=0 carry=0 w_carry=0 a_carry=0 b_carry=0 enc_first=0 before_first=0 after_first=0
+GATE_RATES te5 ok
+EARLY_RATE te5 sections=100 mean_section_ms=886 bound_ms=950 11:06:05
+# te5: lap exit 0 released 11:26:05
+SECTION_STEPS te5 sections=1535 halved_or_next=0
+REFUSALS te5 0
+MAIN te5 done 11:29:15
+## the lap's lines
+FIELD_PART_RATES contacts_before=32 rate_bits=12 octaves w_new=0 a_new=0 b_new=0 enc_lane=0 before_lane=0 after_lane=0 q_lane=0 v_lane=0 probe_lane=0 out_lane=0 moment_face_lane=0 read_lane=0 face_biases_lane=0 a_lane=0 b_lane=0 carry=0 w_carry=0 a_carry=0 b_carry=0 enc_first=0 before_first=0 after_first=0
+FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.700677 foil_nats_a_place=1.831139 information_nats_a_place=0.130461 own_nats_a_word=12.779334 information_nats_a_word=0.980321
+FIELD_JOINT_STRATA lap=-1 open_quarters=1/2/3/4 own_nats_a_place=0.620079/1.215887/1.988175/2.968740 foil_nats_a_place=0.713012/1.346909/2.142519/3.112086 places=10818/10881/10853/10918 open_sites=5333/16153/26922/38725 terms_own=10147719260/20014116241/32642156510/49033140440 terms_foil=11668584269/22170814322/35176201190/51400718924
+FIELD_CARRY_GATES lap=-1 circles=32 reads=697064 modulus_sum=663487704984495/641151919398548/574282173896694/665240598499624/572137631042906/680822362251744/655322879382766/655455691270089/638687796106096/683099476659088/588047288299015/633877409757453/629447372826753/623814710222421/600999574117966/625216300803407/617296478376467/580275183564714/661796904466843/648021301364053/657112951136922/602308678435616/613584802699199/669614536188862/643598537121364/674727523022274/572884233596827/588031161628120/593859066674620/659799025506728/647086353589475/637133150010792 modulus_mean=951831833/919789172/823858603/954346514/820782067/976699933/940118668/940309198/916254169/979966655/843605878/909353244/902997964/894917411/862187079/896928116/885566430/832456106/949406230/929643908/942686684/864065105/880241703/960621314/923299061/967956346/821853134/843582743/851943389/946540096/928302643/914023891 leak_nonnegative=76252/167217/475676/78238/437358/30009/46180/118582/146079/19494/333127/128598/152744/206125/301319/213682/206584/378691/50496/93025/128765/282908/251998/49637/100743/17201/366494/334504/326688/46131/177528/103578
+FIELD_MEAN lap=0 states=1535 entries=80182 moved=77837 square=257244248677198
+FIELD_LAP lap=0 read=79 sites=16467309 before=3.157 after=- deposited=1535/1535 halvings=0 next_halved=0 next_refused=0 ms=1282109
+FIELD_JOINT_NATS lap=0 places=43470 words=5785 own_nats_a_place=1.693761 foil_nats_a_place=1.824222 information_nats_a_place=0.130461 own_nats_a_word=12.727364 information_nats_a_word=0.980317
+FIELD_JOINT_STRATA lap=0 open_quarters=1/2/3/4 own_nats_a_place=0.613170/1.202109/1.981511/2.968404 foil_nats_a_place=0.706298/1.330422/2.135001/3.115105 places=10818/10881/10853/10918 open_sites=5333/16153/26922/38725 terms_own=10034660257/19787327705/32532755443/49027585069 terms_foil=11558710925/21899416318/35052771369/51450578577
+FIELD_CARRY_GATES lap=0 circles=32 reads=697064 modulus_sum=648243997558987/619674668914365/538887562608919/651361924317836/528363671662358/674469716929911/644419469891508/622239880164014/621795212565123/674600727635508/555350019113179/620806773554769/602540551673979/607599307295651/575481983923803/586952425678825/566566351587119/573671317998197/633976961099681/618862896229590/631744237809489/563734519761981/580968474428246/654674237322173/616986897972756/660440475821609/556391762513966/553997834208502/549799131903214/637945087161212/625702344011570/597304191202911 modulus_mean=929963385/888978155/773081901/934436327/757984448/967586501/924476762/892658177/892020262/967774447/796698752/890602259/864397747/871654980/825579837/842035201/812789573/822982277/909496059/887813595/906293020/808727060/833450693/939188133/885122310/947460313/798193225/794758923/788735513/915188687/897625388/856885725 leak_nonnegative=110260/230565/603499/109140/557880/41435/74243/242243/209133/33160/415430/191481/235898/278693/460462/360694/428124/401163/152660/200077/221035/339486/366177/81874/206033/37057/405267/473320/441103/103813/258875/352473
+MEASURE lap=te5 rc=0 wall_s=1300.5 peak_rss_kib=822468
+FIRST_HUNDRED sections=100 mean_section_ms=886
+SECTIONS 1535
+## the FIELD_SECTION lines whose predicted_micro stands past 200,000 millionths either way, each with its FIELD_SECTION_PARTS line: 1
+FIELD_SECTION lap=0 n=879 sites=18379 before=2.968 after=- halvings=0 deposited=true next=- predicted_micro=-495478 change_micro=- transfer_micro=12494 external_micro=12494 curvature_micro=13014 rate=12 length=2302 regions_ms=1 deposit_ms=936 ms=938
+FIELD_SECTION_PARTS lap=0 n=879 predicted_micro=-495478 w_new=-14869 a_new=-8512 b_new=-15749 enc_lane=-2427 before_lane=-2362 after_lane=-2407 q_lane=-7839 v_lane=-16825 probe_lane=-9111 out_lane=-50065 moment_face_lane=-8822 read_lane=-22327 face_biases_lane=-5663 a_lane=-19870 b_lane=-38126 carry=-17649 w_carry=-16141 a_carry=-9850 b_carry=-15269 enc_first=-1555 before_first=-986 after_first=-973 old=-208068 rest=-13
+## errors, refusals and stops
+(none)

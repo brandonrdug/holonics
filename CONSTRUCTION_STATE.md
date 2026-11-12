@@ -71,8 +71,13 @@ repository was reset on September 24; the pre-reset tree is
   (G103 scored): quarters 1 to 3 of open sites gained as on te3 and quarter 4, the places whose
   regions are mostly open, turned 0.027 back and stands above rt27's, while the friction rose on
   more reads, the look-back fell to 7.5 places and letters 5 to 8 turned under rt27. So the raise
-  ends: te5 trains at the base rate (G104), and te4's end is the ground of the next founding. With
-  `C = 0` the field is the plain line bit for bit.
+  ends: te5 trains at the base rate (G104), and te4's end is the ground of the next founding. The
+  fifth lap, te5, at the base rate, held te4's level (1.687019 against 1.687069 at lap means) and led
+  rt28 by 0.0293 (G104 scored). The friction's drift went on at the base as fast as at eight times:
+  the look-back fell to 6.25 places at the mean and 5.74 at the end, and quarter 4 turned a further
+  0.019 back, to 0.032 above rt28's. So the turn is the friction's chart itself and not its heat,
+  and the circles' reach where a region is mostly open is the circle line's next subject, after the
+  triads' first lap. With `C = 0` the field is the plain line bit for bit.
 - **The triad** (to be founded; atlas `contact.triad-manley-rowe-gauge`,
   `code.triad-character-of-composition`;
   [the triad record](research/records/2026-11-12_THE_LAW_ACROSS_A_PLACE_IS_HELD_BY_A_PUMPED_CONTACT_A_TRIAD_IS_A_CHARACTER_OF_A_LAW_OF_COMPOSITION_AND_ITS_THREE_LEGS_EXCHANGE_EQUAL_QUANTA.md)).
@@ -84,8 +89,9 @@ repository was reset on September 24; the pre-reset tree is
   characters). Its three legs and return share a gauge of three complex scales, so the triad is one
   part at one rate. The ruler on the host (G102) read that 8, 16, 32 and 64 triads with free factors
   over the contexts hold 0.604, 0.745, 0.826 and 0.877 of the part, the remainder falling about as
-  `R^(−0.56)`, so `J = 16` (8,288 entries). The build is under way on the PC; it enters the line by
-  reproducing te4's lap with no triads, and the founding's first lap pairs with te5 (G105). The
+  `R^(−0.56)`, so `J = 16` (8,288 entries). The build has passed its host gate and its review, and
+  its card gates are running on the PC. It enters the line by reproducing te4's lap with no triads,
+  and the founding's first lap pairs with te5 (G105). The
   field's learner steps each entry at its own divisor, so the gauge's equal gains of the legs are no
   prediction for it; its covectors keep the scale identity at every state (the record, 3.2).
 - **The learner** (`FieldLearner`; the trainer is

@@ -1,0 +1,85 @@
+# rt28, the plain line's next lap, 2026-11-12 UTC, from rt27/STATE.0 with the rt line's own build and script exactly as rt27
+# ran (lap_line.sh rt: RUN/mean_lap.sh with bin-lap-mean b8fe4ba838dd27a6, L 1,215,000 ms, the run's 1,515,000 ms, outer 1,575 s, its own hold of the
+# card lock; the mean's held read by bin-joint-strata 4bd56aa83f564d66 through RUN/g61/held_group.sh; the mean's transmission read through
+# RUN/g74/transmission_open_lm.sh with b8fe4ba838dd27a6, each its own hold), after te4 and its reads. RUN is the line's run directory. Device line: the
+# card, the RTX 4080 SUPER under HOLONICS_ROOT/.local/gpu.lock; the host's part as the card's lap runs it; beside it on the host the triad
+# build's gate (i) (P28: cargo build of the workspace, bash tools/gate.sh, the field's tests and the tools' tests, 10:52:58 to 11:01:12 UTC), and beside
+# its reads the build of bin-triad and of the card suite's tests, all at 8 jobs pinned to hardware threads 0-7, never the card.
+# Dispatched with tools/runs.py (p27_rt28) at 10:10:40 UTC to wait behind te4. Projection 880 s for the lap (rt22 to rt27: 867.7, 875.5, 849.1, 845.4,
+# 850.0, 857.4 s), deadline 1,575 s by its outer timeout; the reads about 10 s and 175 s.
+## rt28 (the run's output)
+# rt lap rt28 from RUN/rt27/STATE.0 10:46:20
+# rt28 from STATE.0 c9c2a56bf945f44950fc6df2d44babe7c914bde2eaf5d7e18210b73b0698da60: hnn-field-learner-v3 12 134144 78 -; binary b8fe4ba838dd27a6 (8368f084b); lap bound 1215000 ms, the run's 1515000 ms, outer 1575 s 10:46:20
+# parts parts 32 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+# rt28: lock taken 10:46:20 wait_s=.001896854
+# rt28: released 11:01:04
+FIELD_PART_RATES contacts_before=32 rate_bits=12 octaves w_new=0 a_new=0 b_new=0 enc_lane=0 before_lane=0 after_lane=0 q_lane=0 v_lane=0 probe_lane=0 out_lane=0 moment_face_lane=0 read_lane=0 face_biases_lane=0 a_lane=0 b_lane=0 g_chart=0
+FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.721395 foil_nats_a_place=1.858206 information_nats_a_place=0.136812 own_nats_a_word=12.935008 information_nats_a_word=1.028037
+FIELD_MEAN lap=0 states=1535 entries=63606 moved=61257 square=85592896962636
+FIELD_LAP lap=0 read=79 sites=16467309 before=3.205 after=- deposited=1535/1535 halvings=0 next_halved=0 next_refused=0 ms=866530
+FIELD_JOINT_NATS lap=0 places=43470 words=5785 own_nats_a_place=1.721351 foil_nats_a_place=1.855927 information_nats_a_place=0.134576 own_nats_a_word=12.934682 information_nats_a_word=1.011236
+MEASURE lap=rt28 rc=0 wall_s=884.0 peak_rss_kib=866508
+MAIN rt28 exit 11:01:04
+SECTIONS 1535
+SECTION_STEPS rt28 halved_or_next=0
+# group P-rt28 11:01:04
+# mean_rt28: state rt28/MEAN.0 523f424c0083bd06; binary field_pass 4bd56aa83f564d66; asked 11:01:04
+# mean_rt28: lock taken 11:01:04 wait_s=.021932517
+# mean_rt28: run_s=9.785751284 rc=0 released 11:01:14
+READ mean_rt28 held=1.716283
+MAIN group P-rt28 done 11:01:14
+FIELD_JOINT_STRATA lap=-1 open_quarters=1/2/3/4 own_nats_a_place=0.656497/1.256284/2.017910/2.924970 foil_nats_a_place=0.754560/1.395260/2.176273/3.071146 places=10818/10881/10853/10918 open_sites=5333/16153/26922/38725 terms_own=10743710226/20679082226/33130352776/48310213493 terms_foil=12348536503/22966694991/35730372734/50724531044
+# BUILD 8368f084b binary b8fe4ba838dd27a6d1eb89354dd93509199d1cbb64c708663ae0376f027467a6 state 523f424c0083bd0655468995997e72190157a82f728c3417aab27fa3bc958bc2: hnn-field-v14 100 64 4 8 2 64 4 4 3771 2 0; parts 32 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0; mode open-0; projected 190 s, deadline 237 s
+# lock taken 11:01:14
+MEASURE lap=transmission_open_rt28_mean rc=0 wall_s=172.7 peak_rss_kib=362320
+OPEN rt28_mean left d=0..4 field 3.181 2.611 2.166 1.973 1.933
+OPEN rt28_mean left d=0..4 text  3.481 2.710 1.898 1.423 1.224
+OPEN rt28_mean left (d-1 minus d) d=1..4 field 0.570 0.445 0.192 0.040
+OPEN rt28_mean left (d-1 minus d) d=1..4 text  0.71 0.73 0.51 0.23
+OPEN rt28_mean both d=1..4 field 1.847 1.176 1.005 0.968
+OPEN rt28_mean both d=1..4 text  1.564 0.569 0.419 0.397
+OPEN rt28_mean splits (3L,1R) (1L,3R) (2L,1R) (1L,2R) field 1.328 1.370 1.466 1.473
+OPEN rt28_mean splits text  0.690 0.714 0.923 0.938
+OPEN rt28_mean places a row (left d=0) 8760, regions 8760
+MAIN transmission_open exit 11:04:07
+FIELD_TRANSMISSION mode=open-left l=0 r=0 spacing=0 regions=8760 places=8760 out=0 code_nats_a_place=3.181138 ms=13081
+FIELD_TRANSMISSION mode=open-left l=1 r=0 spacing=0 regions=8728 places=8728 out=32 code_nats_a_place=2.610862 ms=26038
+FIELD_TRANSMISSION mode=open-left l=2 r=0 spacing=0 regions=8696 places=8696 out=64 code_nats_a_place=2.165735 ms=38928
+FIELD_TRANSMISSION mode=open-left l=3 r=0 spacing=0 regions=8664 places=8664 out=96 code_nats_a_place=1.973319 ms=51675
+FIELD_TRANSMISSION mode=open-left l=4 r=0 spacing=0 regions=8632 places=8632 out=128 code_nats_a_place=1.933345 ms=64128
+FIELD_TRANSMISSION mode=open-left l=8 r=0 spacing=0 regions=8504 places=8504 out=256 code_nats_a_place=1.895040 ms=76914
+FIELD_TRANSMISSION mode=open-both l=1 r=1 spacing=0 regions=8696 places=8696 out=64 code_nats_a_place=1.846912 ms=89488
+FIELD_TRANSMISSION mode=open-both l=2 r=2 spacing=0 regions=8632 places=8632 out=128 code_nats_a_place=1.175823 ms=101343
+FIELD_TRANSMISSION mode=open-both l=3 r=3 spacing=0 regions=8568 places=8568 out=192 code_nats_a_place=1.004639 ms=113167
+FIELD_TRANSMISSION mode=open-both l=4 r=4 spacing=0 regions=8504 places=8504 out=256 code_nats_a_place=0.968151 ms=124932
+FIELD_TRANSMISSION mode=open-split l=3 r=1 spacing=0 regions=8632 places=8632 out=128 code_nats_a_place=1.327821 ms=136747
+FIELD_TRANSMISSION mode=open-split l=1 r=3 spacing=0 regions=8632 places=8632 out=128 code_nats_a_place=1.370234 ms=148540
+FIELD_TRANSMISSION mode=open-split l=2 r=1 spacing=0 regions=8664 places=8664 out=96 code_nats_a_place=1.466234 ms=160341
+FIELD_TRANSMISSION mode=open-split l=1 r=2 spacing=0 regions=8664 places=8664 out=96 code_nats_a_place=1.473134 ms=172187
+FIELD_TRANSMISSION_DONE ms=172189
+MAIN rt28 done 11:04:07
+MAIN p27 rt28 done 11:04:07
+RUN_EXIT 0 2026-11-12T11:04:07Z
+## mean_rt28 (its held read)
+FIELD_HELD lap=-1 answer=5.430522 classes=43470 context=0.902422 context_classes=43470 foil=1.066671 question=0.164249 ms=3580
+FIELD_JOINT_NATS lap=-1 places=43470 words=5785 own_nats_a_place=1.716283 foil_nats_a_place=1.851726 information_nats_a_place=0.135443 own_nats_a_word=12.896598 information_nats_a_word=1.017754
+FIELD_JOINT_STRATA lap=-1 open_quarters=1/2/3/4 own_nats_a_place=0.656497/1.256284/2.017910/2.924970 foil_nats_a_place=0.754560/1.395260/2.176273/3.071146 places=10818/10881/10853/10918 open_sites=5333/16153/26922/38725 terms_own=10743710226/20679082226/33130352776/48310213493 terms_foil=12348536503/22966694991/35730372734/50724531044
+FIELD_UNSEEN lap=-1 code=0.836 sites=43660 next=- ms=9364
+MEASURE lap=held_mean_rt28 rc=0 wall_s=9.8 peak_rss_kib=821452
+## rt28_mean (its transmission read)
+FIELD_TRANSMISSION mode=open-left l=0 r=0 spacing=0 regions=8760 places=8760 out=0 code_nats_a_place=3.181138 ms=13081
+FIELD_TRANSMISSION mode=open-left l=1 r=0 spacing=0 regions=8728 places=8728 out=32 code_nats_a_place=2.610862 ms=26038
+FIELD_TRANSMISSION mode=open-left l=2 r=0 spacing=0 regions=8696 places=8696 out=64 code_nats_a_place=2.165735 ms=38928
+FIELD_TRANSMISSION mode=open-left l=3 r=0 spacing=0 regions=8664 places=8664 out=96 code_nats_a_place=1.973319 ms=51675
+FIELD_TRANSMISSION mode=open-left l=4 r=0 spacing=0 regions=8632 places=8632 out=128 code_nats_a_place=1.933345 ms=64128
+FIELD_TRANSMISSION mode=open-left l=8 r=0 spacing=0 regions=8504 places=8504 out=256 code_nats_a_place=1.895040 ms=76914
+FIELD_TRANSMISSION mode=open-both l=1 r=1 spacing=0 regions=8696 places=8696 out=64 code_nats_a_place=1.846912 ms=89488
+FIELD_TRANSMISSION mode=open-both l=2 r=2 spacing=0 regions=8632 places=8632 out=128 code_nats_a_place=1.175823 ms=101343
+FIELD_TRANSMISSION mode=open-both l=3 r=3 spacing=0 regions=8568 places=8568 out=192 code_nats_a_place=1.004639 ms=113167
+FIELD_TRANSMISSION mode=open-both l=4 r=4 spacing=0 regions=8504 places=8504 out=256 code_nats_a_place=0.968151 ms=124932
+FIELD_TRANSMISSION mode=open-split l=3 r=1 spacing=0 regions=8632 places=8632 out=128 code_nats_a_place=1.327821 ms=136747
+FIELD_TRANSMISSION mode=open-split l=1 r=3 spacing=0 regions=8632 places=8632 out=128 code_nats_a_place=1.370234 ms=148540
+FIELD_TRANSMISSION mode=open-split l=2 r=1 spacing=0 regions=8664 places=8664 out=96 code_nats_a_place=1.466234 ms=160341
+FIELD_TRANSMISSION mode=open-split l=1 r=2 spacing=0 regions=8664 places=8664 out=96 code_nats_a_place=1.473134 ms=172187
+FIELD_TRANSMISSION_DONE ms=172189
+MEASURE lap=transmission_open_rt28_mean rc=0 wall_s=172.7 peak_rss_kib=362320
