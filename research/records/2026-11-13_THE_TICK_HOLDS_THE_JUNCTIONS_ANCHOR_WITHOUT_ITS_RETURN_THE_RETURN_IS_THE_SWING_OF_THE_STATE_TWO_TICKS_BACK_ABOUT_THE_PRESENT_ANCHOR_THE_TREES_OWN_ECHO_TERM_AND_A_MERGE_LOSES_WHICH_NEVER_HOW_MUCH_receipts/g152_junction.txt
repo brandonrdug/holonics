@@ -1,4 +1,4 @@
-# G152, read-junction on level3/MEAN.3000 grown by the return at its founding, 2026-11-13T19:23Z; host, RAYON 8 threads
+# G152, read-junction on level3/MEAN.3000 grown by the return at its founding, 2026-11-13T19:23Z; host, RAYON 8 threads (reprinted 19:44Z with d(code)/dl)
 JUNCTION_LAW role=held places=4000 ticks=4 width=64 level=true founded=true ms=47
 JUNCTION_SLICE slice=code stretches=24 places=4296 rows=25776 written_nonzero_at_last_tick=0 host_ms=8091 ms=8141
 JUNCTION_SLICE slice=web stretches=25 places=4394 rows=26364 written_nonzero_at_last_tick=0 host_ms=10109 ms=18262
@@ -8,78 +8,90 @@ JUNCTION_SLICE slice=wikidata stretches=25 places=4416 rows=26496 written_nonzer
 JUNCTION_DONE ms=45605
 MEASURE lap=junction_g152 rc=0 wall_s=45.9 peak_rss_kib=684048
 
-JUNCTION mask=0 tick=1 rows=open slice=pooled n=5634 sum=-292227027 magnitude=36899552709 coherence=0.0079 slope_nats_per_place_per_unit=+0.00214
-JUNCTION mask=0 tick=1 rows=open slice=code n=1161 sum=-473976606 magnitude=8126466884 coherence=0.0583 slope_nats_per_place_per_unit=+0.01687
-JUNCTION mask=0 tick=1 rows=open slice=web n=1101 sum=-335827835 magnitude=7820504231 coherence=0.0429 slope_nats_per_place_per_unit=+0.01260
-JUNCTION mask=0 tick=1 rows=open slice=science n=1161 sum=280455123 magnitude=6985111029 coherence=0.0402 slope_nats_per_place_per_unit=-0.00998
-JUNCTION mask=0 tick=1 rows=open slice=books n=1161 sum=-310188484 magnitude=7115508942 coherence=0.0436 slope_nats_per_place_per_unit=+0.01104
-JUNCTION mask=0 tick=1 rows=open slice=wikidata n=1050 sum=547310775 magnitude=6851961623 coherence=0.0799 slope_nats_per_place_per_unit=-0.02154
-JUNCTION mask=0 tick=1 rows=written slice=pooled n=16064 sum=1527174891 magnitude=18965879671 coherence=0.0805 slope_nats_per_place_per_unit=-0.01120
-JUNCTION mask=0 tick=1 rows=written slice=code n=3135 sum=832369834 magnitude=4041149194 coherence=0.2060 slope_nats_per_place_per_unit=-0.02962
-JUNCTION mask=0 tick=1 rows=written slice=web n=3293 sum=766598342 magnitude=3729179856 coherence=0.2056 slope_nats_per_place_per_unit=-0.02877
-JUNCTION mask=0 tick=1 rows=written slice=science n=3135 sum=-232269792 magnitude=3210877414 coherence=0.0723 slope_nats_per_place_per_unit=+0.00827
-JUNCTION mask=0 tick=1 rows=written slice=books n=3135 sum=59683953 magnitude=3696114983 coherence=0.0161 slope_nats_per_place_per_unit=-0.00212
-JUNCTION mask=0 tick=1 rows=written slice=wikidata n=3366 sum=100792554 magnitude=4288558224 coherence=0.0235 slope_nats_per_place_per_unit=-0.00397
-JUNCTION mask=0 tick=2 rows=open slice=pooled n=5634 sum=684955136 magnitude=24855824520 coherence=0.0276 slope_nats_per_place_per_unit=-0.00502
-JUNCTION mask=0 tick=2 rows=open slice=code n=1161 sum=110466454 magnitude=5397103936 coherence=0.0205 slope_nats_per_place_per_unit=-0.00393
-JUNCTION mask=0 tick=2 rows=open slice=web n=1101 sum=540317058 magnitude=4549948482 coherence=0.1188 slope_nats_per_place_per_unit=-0.02028
-JUNCTION mask=0 tick=2 rows=open slice=science n=1161 sum=-308547163 magnitude=5021315403 coherence=0.0614 slope_nats_per_place_per_unit=+0.01098
-JUNCTION mask=0 tick=2 rows=open slice=books n=1161 sum=286680841 magnitude=4869177769 coherence=0.0589 slope_nats_per_place_per_unit=-0.01020
-JUNCTION mask=0 tick=2 rows=open slice=wikidata n=1050 sum=56037946 magnitude=5018278930 coherence=0.0112 slope_nats_per_place_per_unit=-0.00220
-JUNCTION mask=0 tick=2 rows=written slice=pooled n=16064 sum=451622154 magnitude=7192629276 coherence=0.0628 slope_nats_per_place_per_unit=-0.00331
-JUNCTION mask=0 tick=2 rows=written slice=code n=3135 sum=229145003 magnitude=1415661931 coherence=0.1619 slope_nats_per_place_per_unit=-0.00815
-JUNCTION mask=0 tick=2 rows=written slice=web n=3293 sum=-52095268 magnitude=1333403446 coherence=0.0391 slope_nats_per_place_per_unit=+0.00195
-JUNCTION mask=0 tick=2 rows=written slice=science n=3135 sum=107194166 magnitude=1360072004 coherence=0.0788 slope_nats_per_place_per_unit=-0.00381
-JUNCTION mask=0 tick=2 rows=written slice=books n=3135 sum=-57705365 magnitude=1543599663 coherence=0.0374 slope_nats_per_place_per_unit=+0.00205
-JUNCTION mask=0 tick=2 rows=written slice=wikidata n=3366 sum=225083618 magnitude=1539892232 coherence=0.1462 slope_nats_per_place_per_unit=-0.00886
-JUNCTION mask=0 tick=3 rows=open slice=pooled n=5634 sum=2248790241 magnitude=28091031527 coherence=0.0801 slope_nats_per_place_per_unit=-0.01649
-JUNCTION mask=0 tick=3 rows=open slice=code n=1161 sum=823831538 magnitude=6396229846 coherence=0.1288 slope_nats_per_place_per_unit=-0.02932
-JUNCTION mask=0 tick=3 rows=open slice=web n=1101 sum=681157797 magnitude=5323289323 coherence=0.1280 slope_nats_per_place_per_unit=-0.02556
-JUNCTION mask=0 tick=3 rows=open slice=science n=1161 sum=-327321282 magnitude=5503537824 coherence=0.0595 slope_nats_per_place_per_unit=+0.01165
-JUNCTION mask=0 tick=3 rows=open slice=books n=1161 sum=786351390 magnitude=5380764796 coherence=0.1461 slope_nats_per_place_per_unit=-0.02798
-JUNCTION mask=0 tick=3 rows=open slice=wikidata n=1050 sum=284770798 magnitude=5487209738 coherence=0.0519 slope_nats_per_place_per_unit=-0.01120
-JUNCTION mask=0 tick=3 rows=written slice=pooled n=16064 sum=0 magnitude=0 coherence=0.0000 slope_nats_per_place_per_unit=+0.00000
-JUNCTION mask=0 tick=3 rows=written slice=code n=3135 sum=0 magnitude=0 coherence=0.0000 slope_nats_per_place_per_unit=+0.00000
-JUNCTION mask=0 tick=3 rows=written slice=web n=3293 sum=0 magnitude=0 coherence=0.0000 slope_nats_per_place_per_unit=+0.00000
-JUNCTION mask=0 tick=3 rows=written slice=science n=3135 sum=0 magnitude=0 coherence=0.0000 slope_nats_per_place_per_unit=+0.00000
-JUNCTION mask=0 tick=3 rows=written slice=books n=3135 sum=0 magnitude=0 coherence=0.0000 slope_nats_per_place_per_unit=+0.00000
-JUNCTION mask=0 tick=3 rows=written slice=wikidata n=3366 sum=0 magnitude=0 coherence=0.0000 slope_nats_per_place_per_unit=+0.00000
-JUNCTION mask=1 tick=1 rows=open slice=pooled n=122 sum=94416109 magnitude=454404891 coherence=0.2078 slope_nats_per_place_per_unit=-0.03197
-JUNCTION mask=1 tick=1 rows=open slice=code n=24 sum=-4963112 magnitude=98994356 coherence=0.0501 slope_nats_per_place_per_unit=+0.00854
-JUNCTION mask=1 tick=1 rows=open slice=web n=25 sum=28012696 magnitude=86839016 coherence=0.3226 slope_nats_per_place_per_unit=-0.04629
-JUNCTION mask=1 tick=1 rows=open slice=science n=24 sum=52391315 magnitude=103201403 coherence=0.5077 slope_nats_per_place_per_unit=-0.09019
-JUNCTION mask=1 tick=1 rows=open slice=books n=24 sum=-9453242 magnitude=66542108 coherence=0.1421 slope_nats_per_place_per_unit=+0.01627
-JUNCTION mask=1 tick=1 rows=open slice=wikidata n=25 sum=28428452 magnitude=98828008 coherence=0.2877 slope_nats_per_place_per_unit=-0.04698
-JUNCTION mask=1 tick=1 rows=written slice=pooled n=21576 sum=-45030445 magnitude=1395532203 coherence=0.0323 slope_nats_per_place_per_unit=+0.01525
-JUNCTION mask=1 tick=1 rows=written slice=code n=4272 sum=-30315517 magnitude=242197789 coherence=0.1252 slope_nats_per_place_per_unit=+0.05219
-JUNCTION mask=1 tick=1 rows=written slice=web n=4369 sum=24678212 magnitude=291561748 coherence=0.0846 slope_nats_per_place_per_unit=-0.04078
-JUNCTION mask=1 tick=1 rows=written slice=science n=4272 sum=-7633068 magnitude=294948618 coherence=0.0259 slope_nats_per_place_per_unit=+0.01314
-JUNCTION mask=1 tick=1 rows=written slice=books n=4272 sum=-673360 magnitude=252772804 coherence=0.0027 slope_nats_per_place_per_unit=+0.00116
-JUNCTION mask=1 tick=1 rows=written slice=wikidata n=4391 sum=-31086712 magnitude=314051244 coherence=0.0990 slope_nats_per_place_per_unit=+0.05137
-JUNCTION mask=1 tick=2 rows=open slice=pooled n=122 sum=58282608 magnitude=330280502 coherence=0.1765 slope_nats_per_place_per_unit=-0.01974
-JUNCTION mask=1 tick=2 rows=open slice=code n=24 sum=-12647499 magnitude=34235347 coherence=0.3694 slope_nats_per_place_per_unit=+0.02177
-JUNCTION mask=1 tick=2 rows=open slice=web n=25 sum=26777833 magnitude=79694349 coherence=0.3360 slope_nats_per_place_per_unit=-0.04425
-JUNCTION mask=1 tick=2 rows=open slice=science n=24 sum=10412553 magnitude=91603817 coherence=0.1137 slope_nats_per_place_per_unit=-0.01792
-JUNCTION mask=1 tick=2 rows=open slice=books n=24 sum=23765739 magnitude=60829043 coherence=0.3907 slope_nats_per_place_per_unit=-0.04091
-JUNCTION mask=1 tick=2 rows=open slice=wikidata n=25 sum=9973982 magnitude=63917946 coherence=0.1560 slope_nats_per_place_per_unit=-0.01648
-JUNCTION mask=1 tick=2 rows=written slice=pooled n=21576 sum=-36136357 magnitude=536165687 coherence=0.0674 slope_nats_per_place_per_unit=+0.01224
-JUNCTION mask=1 tick=2 rows=written slice=code n=4272 sum=-5395177 magnitude=88052799 coherence=0.0613 slope_nats_per_place_per_unit=+0.00929
-JUNCTION mask=1 tick=2 rows=written slice=web n=4369 sum=-14238804 magnitude=126221520 coherence=0.1128 slope_nats_per_place_per_unit=+0.02353
-JUNCTION mask=1 tick=2 rows=written slice=science n=4272 sum=-260999 magnitude=104846529 coherence=0.0025 slope_nats_per_place_per_unit=+0.00045
-JUNCTION mask=1 tick=2 rows=written slice=books n=4272 sum=-12747173 magnitude=101321453 coherence=0.1258 slope_nats_per_place_per_unit=+0.02194
-JUNCTION mask=1 tick=2 rows=written slice=wikidata n=4391 sum=-3494204 magnitude=115723386 coherence=0.0302 slope_nats_per_place_per_unit=+0.00577
-JUNCTION mask=1 tick=3 rows=open slice=pooled n=122 sum=28517110 magnitude=415304570 coherence=0.0687 slope_nats_per_place_per_unit=-0.00966
-JUNCTION mask=1 tick=3 rows=open slice=code n=24 sum=9356680 magnitude=57212672 coherence=0.1635 slope_nats_per_place_per_unit=-0.01611
-JUNCTION mask=1 tick=3 rows=open slice=web n=25 sum=23738770 magnitude=107088374 coherence=0.2217 slope_nats_per_place_per_unit=-0.03923
-JUNCTION mask=1 tick=3 rows=open slice=science n=24 sum=-6090267 magnitude=99410469 coherence=0.0613 slope_nats_per_place_per_unit=+0.01048
-JUNCTION mask=1 tick=3 rows=open slice=books n=24 sum=-9337172 magnitude=72630950 coherence=0.1286 slope_nats_per_place_per_unit=+0.01607
-JUNCTION mask=1 tick=3 rows=open slice=wikidata n=25 sum=10849099 magnitude=78962105 coherence=0.1374 slope_nats_per_place_per_unit=-0.01793
-JUNCTION mask=1 tick=3 rows=written slice=pooled n=21576 sum=0 magnitude=0 coherence=0.0000 slope_nats_per_place_per_unit=+0.00000
-JUNCTION mask=1 tick=3 rows=written slice=code n=4272 sum=0 magnitude=0 coherence=0.0000 slope_nats_per_place_per_unit=+0.00000
-JUNCTION mask=1 tick=3 rows=written slice=web n=4369 sum=0 magnitude=0 coherence=0.0000 slope_nats_per_place_per_unit=+0.00000
-JUNCTION mask=1 tick=3 rows=written slice=science n=4272 sum=0 magnitude=0 coherence=0.0000 slope_nats_per_place_per_unit=+0.00000
-JUNCTION mask=1 tick=3 rows=written slice=books n=4272 sum=0 magnitude=0 coherence=0.0000 slope_nats_per_place_per_unit=+0.00000
-JUNCTION mask=1 tick=3 rows=written slice=wikidata n=4391 sum=0 magnitude=0 coherence=0.0000 slope_nats_per_place_per_unit=+0.00000
+JUNCTION mask=0 tick=1 rows=open slice=pooled n=5634 sum=-292227027 magnitude=36899552709 coherence=0.0079 dcode_dl_nats_per_place=-0.00214
+JUNCTION mask=0 tick=1 rows=open slice=code n=1161 sum=-473976606 magnitude=8126466884 coherence=0.0583 dcode_dl_nats_per_place=-0.01687
+JUNCTION mask=0 tick=1 rows=open slice=web n=1101 sum=-335827835 magnitude=7820504231 coherence=0.0429 dcode_dl_nats_per_place=-0.01260
+JUNCTION mask=0 tick=1 rows=open slice=science n=1161 sum=280455123 magnitude=6985111029 coherence=0.0402 dcode_dl_nats_per_place=+0.00998
+JUNCTION mask=0 tick=1 rows=open slice=books n=1161 sum=-310188484 magnitude=7115508942 coherence=0.0436 dcode_dl_nats_per_place=-0.01104
+JUNCTION mask=0 tick=1 rows=open slice=wikidata n=1050 sum=547310775 magnitude=6851961623 coherence=0.0799 dcode_dl_nats_per_place=+0.02154
+JUNCTION mask=0 tick=1 rows=written slice=pooled n=16064 sum=1527174891 magnitude=18965879671 coherence=0.0805 dcode_dl_nats_per_place=+0.01120
+JUNCTION mask=0 tick=1 rows=written slice=code n=3135 sum=832369834 magnitude=4041149194 coherence=0.2060 dcode_dl_nats_per_place=+0.02962
+JUNCTION mask=0 tick=1 rows=written slice=web n=3293 sum=766598342 magnitude=3729179856 coherence=0.2056 dcode_dl_nats_per_place=+0.02877
+JUNCTION mask=0 tick=1 rows=written slice=science n=3135 sum=-232269792 magnitude=3210877414 coherence=0.0723 dcode_dl_nats_per_place=-0.00827
+JUNCTION mask=0 tick=1 rows=written slice=books n=3135 sum=59683953 magnitude=3696114983 coherence=0.0161 dcode_dl_nats_per_place=+0.00212
+JUNCTION mask=0 tick=1 rows=written slice=wikidata n=3366 sum=100792554 magnitude=4288558224 coherence=0.0235 dcode_dl_nats_per_place=+0.00397
+JUNCTION mask=0 tick=2 rows=open slice=pooled n=5634 sum=684955136 magnitude=24855824520 coherence=0.0276 dcode_dl_nats_per_place=+0.00502
+JUNCTION mask=0 tick=2 rows=open slice=code n=1161 sum=110466454 magnitude=5397103936 coherence=0.0205 dcode_dl_nats_per_place=+0.00393
+JUNCTION mask=0 tick=2 rows=open slice=web n=1101 sum=540317058 magnitude=4549948482 coherence=0.1188 dcode_dl_nats_per_place=+0.02028
+JUNCTION mask=0 tick=2 rows=open slice=science n=1161 sum=-308547163 magnitude=5021315403 coherence=0.0614 dcode_dl_nats_per_place=-0.01098
+JUNCTION mask=0 tick=2 rows=open slice=books n=1161 sum=286680841 magnitude=4869177769 coherence=0.0589 dcode_dl_nats_per_place=+0.01020
+JUNCTION mask=0 tick=2 rows=open slice=wikidata n=1050 sum=56037946 magnitude=5018278930 coherence=0.0112 dcode_dl_nats_per_place=+0.00220
+JUNCTION mask=0 tick=2 rows=written slice=pooled n=16064 sum=451622154 magnitude=7192629276 coherence=0.0628 dcode_dl_nats_per_place=+0.00331
+JUNCTION mask=0 tick=2 rows=written slice=code n=3135 sum=229145003 magnitude=1415661931 coherence=0.1619 dcode_dl_nats_per_place=+0.00815
+JUNCTION mask=0 tick=2 rows=written slice=web n=3293 sum=-52095268 magnitude=1333403446 coherence=0.0391 dcode_dl_nats_per_place=-0.00195
+JUNCTION mask=0 tick=2 rows=written slice=science n=3135 sum=107194166 magnitude=1360072004 coherence=0.0788 dcode_dl_nats_per_place=+0.00381
+JUNCTION mask=0 tick=2 rows=written slice=books n=3135 sum=-57705365 magnitude=1543599663 coherence=0.0374 dcode_dl_nats_per_place=-0.00205
+JUNCTION mask=0 tick=2 rows=written slice=wikidata n=3366 sum=225083618 magnitude=1539892232 coherence=0.1462 dcode_dl_nats_per_place=+0.00886
+JUNCTION mask=0 tick=3 rows=open slice=pooled n=5634 sum=2248790241 magnitude=28091031527 coherence=0.0801 dcode_dl_nats_per_place=+0.01649
+JUNCTION mask=0 tick=3 rows=open slice=code n=1161 sum=823831538 magnitude=6396229846 coherence=0.1288 dcode_dl_nats_per_place=+0.02932
+JUNCTION mask=0 tick=3 rows=open slice=web n=1101 sum=681157797 magnitude=5323289323 coherence=0.1280 dcode_dl_nats_per_place=+0.02556
+JUNCTION mask=0 tick=3 rows=open slice=science n=1161 sum=-327321282 magnitude=5503537824 coherence=0.0595 dcode_dl_nats_per_place=-0.01165
+JUNCTION mask=0 tick=3 rows=open slice=books n=1161 sum=786351390 magnitude=5380764796 coherence=0.1461 dcode_dl_nats_per_place=+0.02798
+JUNCTION mask=0 tick=3 rows=open slice=wikidata n=1050 sum=284770798 magnitude=5487209738 coherence=0.0519 dcode_dl_nats_per_place=+0.01120
+JUNCTION mask=0 tick=3 rows=written slice=pooled n=16064 sum=0 magnitude=0 coherence=0.0000 dcode_dl_nats_per_place=+0.00000
+JUNCTION mask=0 tick=3 rows=written slice=code n=3135 sum=0 magnitude=0 coherence=0.0000 dcode_dl_nats_per_place=+0.00000
+JUNCTION mask=0 tick=3 rows=written slice=web n=3293 sum=0 magnitude=0 coherence=0.0000 dcode_dl_nats_per_place=+0.00000
+JUNCTION mask=0 tick=3 rows=written slice=science n=3135 sum=0 magnitude=0 coherence=0.0000 dcode_dl_nats_per_place=+0.00000
+JUNCTION mask=0 tick=3 rows=written slice=books n=3135 sum=0 magnitude=0 coherence=0.0000 dcode_dl_nats_per_place=+0.00000
+JUNCTION mask=0 tick=3 rows=written slice=wikidata n=3366 sum=0 magnitude=0 coherence=0.0000 dcode_dl_nats_per_place=+0.00000
+JUNCTION mask=1 tick=1 rows=open slice=pooled n=122 sum=94416109 magnitude=454404891 coherence=0.2078 dcode_dl_nats_per_place=+0.03197
+JUNCTION mask=1 tick=1 rows=open slice=code n=24 sum=-4963112 magnitude=98994356 coherence=0.0501 dcode_dl_nats_per_place=-0.00854
+JUNCTION mask=1 tick=1 rows=open slice=web n=25 sum=28012696 magnitude=86839016 coherence=0.3226 dcode_dl_nats_per_place=+0.04629
+JUNCTION mask=1 tick=1 rows=open slice=science n=24 sum=52391315 magnitude=103201403 coherence=0.5077 dcode_dl_nats_per_place=+0.09019
+JUNCTION mask=1 tick=1 rows=open slice=books n=24 sum=-9453242 magnitude=66542108 coherence=0.1421 dcode_dl_nats_per_place=-0.01627
+JUNCTION mask=1 tick=1 rows=open slice=wikidata n=25 sum=28428452 magnitude=98828008 coherence=0.2877 dcode_dl_nats_per_place=+0.04698
+JUNCTION mask=1 tick=1 rows=written slice=pooled n=21576 sum=-45030445 magnitude=1395532203 coherence=0.0323 dcode_dl_nats_per_place=-0.01525
+JUNCTION mask=1 tick=1 rows=written slice=code n=4272 sum=-30315517 magnitude=242197789 coherence=0.1252 dcode_dl_nats_per_place=-0.05219
+JUNCTION mask=1 tick=1 rows=written slice=web n=4369 sum=24678212 magnitude=291561748 coherence=0.0846 dcode_dl_nats_per_place=+0.04078
+JUNCTION mask=1 tick=1 rows=written slice=science n=4272 sum=-7633068 magnitude=294948618 coherence=0.0259 dcode_dl_nats_per_place=-0.01314
+JUNCTION mask=1 tick=1 rows=written slice=books n=4272 sum=-673360 magnitude=252772804 coherence=0.0027 dcode_dl_nats_per_place=-0.00116
+JUNCTION mask=1 tick=1 rows=written slice=wikidata n=4391 sum=-31086712 magnitude=314051244 coherence=0.0990 dcode_dl_nats_per_place=-0.05137
+JUNCTION mask=1 tick=2 rows=open slice=pooled n=122 sum=58282608 magnitude=330280502 coherence=0.1765 dcode_dl_nats_per_place=+0.01974
+JUNCTION mask=1 tick=2 rows=open slice=code n=24 sum=-12647499 magnitude=34235347 coherence=0.3694 dcode_dl_nats_per_place=-0.02177
+JUNCTION mask=1 tick=2 rows=open slice=web n=25 sum=26777833 magnitude=79694349 coherence=0.3360 dcode_dl_nats_per_place=+0.04425
+JUNCTION mask=1 tick=2 rows=open slice=science n=24 sum=10412553 magnitude=91603817 coherence=0.1137 dcode_dl_nats_per_place=+0.01792
+JUNCTION mask=1 tick=2 rows=open slice=books n=24 sum=23765739 magnitude=60829043 coherence=0.3907 dcode_dl_nats_per_place=+0.04091
+JUNCTION mask=1 tick=2 rows=open slice=wikidata n=25 sum=9973982 magnitude=63917946 coherence=0.1560 dcode_dl_nats_per_place=+0.01648
+JUNCTION mask=1 tick=2 rows=written slice=pooled n=21576 sum=-36136357 magnitude=536165687 coherence=0.0674 dcode_dl_nats_per_place=-0.01224
+JUNCTION mask=1 tick=2 rows=written slice=code n=4272 sum=-5395177 magnitude=88052799 coherence=0.0613 dcode_dl_nats_per_place=-0.00929
+JUNCTION mask=1 tick=2 rows=written slice=web n=4369 sum=-14238804 magnitude=126221520 coherence=0.1128 dcode_dl_nats_per_place=-0.02353
+JUNCTION mask=1 tick=2 rows=written slice=science n=4272 sum=-260999 magnitude=104846529 coherence=0.0025 dcode_dl_nats_per_place=-0.00045
+JUNCTION mask=1 tick=2 rows=written slice=books n=4272 sum=-12747173 magnitude=101321453 coherence=0.1258 dcode_dl_nats_per_place=-0.02194
+JUNCTION mask=1 tick=2 rows=written slice=wikidata n=4391 sum=-3494204 magnitude=115723386 coherence=0.0302 dcode_dl_nats_per_place=-0.00577
+JUNCTION mask=1 tick=3 rows=open slice=pooled n=122 sum=28517110 magnitude=415304570 coherence=0.0687 dcode_dl_nats_per_place=+0.00966
+JUNCTION mask=1 tick=3 rows=open slice=code n=24 sum=9356680 magnitude=57212672 coherence=0.1635 dcode_dl_nats_per_place=+0.01611
+JUNCTION mask=1 tick=3 rows=open slice=web n=25 sum=23738770 magnitude=107088374 coherence=0.2217 dcode_dl_nats_per_place=+0.03923
+JUNCTION mask=1 tick=3 rows=open slice=science n=24 sum=-6090267 magnitude=99410469 coherence=0.0613 dcode_dl_nats_per_place=-0.01048
+JUNCTION mask=1 tick=3 rows=open slice=books n=24 sum=-9337172 magnitude=72630950 coherence=0.1286 dcode_dl_nats_per_place=-0.01607
+JUNCTION mask=1 tick=3 rows=open slice=wikidata n=25 sum=10849099 magnitude=78962105 coherence=0.1374 dcode_dl_nats_per_place=+0.01793
+JUNCTION mask=1 tick=3 rows=written slice=pooled n=21576 sum=0 magnitude=0 coherence=0.0000 dcode_dl_nats_per_place=+0.00000
+JUNCTION mask=1 tick=3 rows=written slice=code n=4272 sum=0 magnitude=0 coherence=0.0000 dcode_dl_nats_per_place=+0.00000
+JUNCTION mask=1 tick=3 rows=written slice=web n=4369 sum=0 magnitude=0 coherence=0.0000 dcode_dl_nats_per_place=+0.00000
+JUNCTION mask=1 tick=3 rows=written slice=science n=4272 sum=0 magnitude=0 coherence=0.0000 dcode_dl_nats_per_place=+0.00000
+JUNCTION mask=1 tick=3 rows=written slice=books n=4272 sum=0 magnitude=0 coherence=0.0000 dcode_dl_nats_per_place=+0.00000
+JUNCTION mask=1 tick=3 rows=written slice=wikidata n=4391 sum=0 magnitude=0 coherence=0.0000 dcode_dl_nats_per_place=+0.00000
+JUNCTION_SUM mask=0 slice=pooled places=5634 dcode_dlb_nats_per_place=+0.03388 (the sum over the returns and both kinds of row)
+JUNCTION_SUM mask=0 slice=code places=1161 dcode_dlb_nats_per_place=+0.05416 (the sum over the returns and both kinds of row)
+JUNCTION_SUM mask=0 slice=web places=1101 dcode_dlb_nats_per_place=+0.06005 (the sum over the returns and both kinds of row)
+JUNCTION_SUM mask=0 slice=science places=1161 dcode_dlb_nats_per_place=-0.01710 (the sum over the returns and both kinds of row)
+JUNCTION_SUM mask=0 slice=books places=1161 dcode_dlb_nats_per_place=+0.02722 (the sum over the returns and both kinds of row)
+JUNCTION_SUM mask=0 slice=wikidata places=1050 dcode_dlb_nats_per_place=+0.04777 (the sum over the returns and both kinds of row)
+JUNCTION_SUM mask=1 slice=pooled places=122 dcode_dlb_nats_per_place=+0.03388 (the sum over the returns and both kinds of row)
+JUNCTION_SUM mask=1 slice=code places=24 dcode_dlb_nats_per_place=-0.07568 (the sum over the returns and both kinds of row)
+JUNCTION_SUM mask=1 slice=web places=25 dcode_dlb_nats_per_place=+0.14703 (the sum over the returns and both kinds of row)
+JUNCTION_SUM mask=1 slice=science places=24 dcode_dlb_nats_per_place=+0.08404 (the sum over the returns and both kinds of row)
+JUNCTION_SUM mask=1 slice=books places=24 dcode_dlb_nats_per_place=-0.01454 (the sum over the returns and both kinds of row)
+JUNCTION_SUM mask=1 slice=wikidata places=25 dcode_dlb_nats_per_place=+0.02424 (the sum over the returns and both kinds of row)
 CHART mask=0 tick=1 rows=open coordinates=64 coherence_median=0.0263 coherence_max=0.1440 over_0.1=4
 CHART mask=0 tick=1 rows=written coordinates=64 coherence_median=0.0429 coherence_max=0.1174 over_0.1=4
 CHART mask=0 tick=2 rows=open coordinates=64 coherence_median=0.0274 coherence_max=0.1041 over_0.1=1

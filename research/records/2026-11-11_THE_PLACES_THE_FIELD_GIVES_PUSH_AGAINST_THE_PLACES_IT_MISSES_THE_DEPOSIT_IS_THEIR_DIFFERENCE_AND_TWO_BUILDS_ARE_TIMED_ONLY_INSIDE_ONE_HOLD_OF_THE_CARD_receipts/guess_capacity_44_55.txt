@@ -3669,3 +3669,55 @@ G154 scored 2026-11-13T19:29Z (receipt g154_heads.txt; read-echo with heads.tsv 
   Of 3 parts 3 held. What it adds to the premise: for heads 0 to 2 the round trips through other heads exceed their own (a row sum 5.3 to
   11.4 times the diagonal), most of it through head 3 (B(h, 3) = 0.0011 to 0.0014 against diagonals of 0.0002 to 0.0005): what a site tells
   in the second turned head comes back to it in every head. The echo is one head's lock, heard by all.
+
+G155 fixed 2026-11-13T19:36Z (the Opus PC thread), before its read: G152's founding covector on seen material, the theory thread's first
+caution after G152 (scaling what the ticks add is nearly a direction of the constitution itself, so at a lap's mean it is near stationary
+on the lap's own code; on held text the part of the slope where the constitution is surer than it has earned is a gap the deposit does not
+see). read-junction with the role `prefix` (the store's training documents, each slice from its first piece, so stretches the line has
+trained on) on level3/MEAN.3000, 4,000 places a slice, both masks. Stated as `d(code)/dℓ`, nats a place per unit of `ℓ` (positive: the
+code rises with `ℓ`, so the deposit lowers it); G152's held value summed over the three returns is +0.034 under both masks.
+  (a) the theory thread's: the sum over returns has the held sign, at 0.3 to 0.8 of its value, +0.010 to +0.027, under the cut's mask;
+  (b) this thread's: over open rows with one place open, the chart's coordinates keep a median coherence of at least 0.1 at the first
+      return (the direction that separates sites is not the held gap);
+  (c) every written row reads zero at the last return, which checks the reading.
+  Rule: (a) and (b) held, the card build goes on with the lap's guess on the located `L` before `ℓ_b`; the sum on seen material under
+  0.2 of the held value, `ℓ_b`'s push is the held gap and the lap's guess is fixed on `L` alone.
+
+G156 fixed 2026-11-13T19:36Z (the Opus PC thread), before its read: G153's selection, the theory thread's second caution (the least of
+seventeen stage codes is selected on the read; stages 0 to 2 hold a third of places). best_stage_ruler.py on the same out_level, printing
+the mean of min(s3, s4) and of min(s3, s4, s5) against s4, and the gap split by the place's code at stage 4 (under 0.01 nats, 0.01 to 1,
+over 1).
+  (a) the theory thread's: min(s3, s4) stands 0.03 to 0.10 nats a place under s4, and most of the 0.340 sits in places over 1 nat at s4;
+  (b) this thread's: min(s3, s4, s5) adds under 0.03 to min(s3, s4)'s gap (the third stage is where the gain is, the fifth adds little).
+  Rule: none; a size for the lap's guess on `ℓ`.
+
+G152 wording corrected 2026-11-13T19:44Z (the theory thread's note: the relay printed the last return as the code rising with ℓ and the
+total as a slope of −0.034, two signs that read as opposite). Both stated as d(code)/dℓ in nats a place per unit of ℓ, the receipt reprinted
+with them: with one place open the three returns give +0.0167 (open rows +0.0320, written −0.0153), +0.0075 (+0.0197, −0.0122) and +0.0097
+(open rows alone), and the sum over returns and kinds of row is +0.0339; under the cut's mask the sum is +0.0339. A positive d(code)/dℓ is a code that rises with ℓ, so a
+deposit lowers ℓ_b. The score stands as written.
+
+G155 scored 2026-11-13T19:44Z (receipt g155_junction.txt; read-junction with the role prefix on level3/MEAN.3000, 122 stretches of training
+documents, 5,523 open places under the cut's mask, 122 with one place open; host, 8 threads, 45.5 s, 643 MB):
+  (a) under the cut's mask the sum over returns is d(code)/dℓ_b = −0.0048 nats a place, against +0.010 to +0.027 (the held +0.0339):
+      missed, the opposite sign at 0.14 of the held value;
+  (b) over open rows with one place open the chart's coordinates keep a median coherence of 0.147 at the first return (44 of 64 over 0.1):
+      held;
+  (c) every written row reads zero at the last return: held.
+  Of 3 parts 2 held and 1 missed. The rule's second branch applies (the sum on seen material under 0.2 of the held value): ℓ_b's held push is
+  the held gap, which the deposit does not see. Read against a random-sign level (sqrt(2/π)·sqrt(Σδℓ²)/Σ|δℓ|, rows taken as independent, so a
+  floor), the seen sums under the cut's mask stand at 0.13 to 1.03 times it on four of the five regions; only the written rows at the second
+  return (3.5 times, the code falling as ℓ rises) stand above. The coordinates' coherence with one place open is 1.5 to 2 times its level, and
+  under the cut's mask, the regions a lap deposits from, the open rows' median is 0.020 with none over 0.1. So a deposit on the line's own
+  stretches would hold ℓ_b near zero and move L slowly.
+  Decided (agent-inferred, with the theory thread's answer of 19:35Z: a hold, Γ ≤ 0, has two real roots and cannot turn, so the return shortens
+  a stride and never rings): the card realization of the return waits. The host build stays as the founding the reader's reaction on its
+  source (the theory thread's next design) is built from, refused on the card. Its card work is not spent on a part whose first deposit
+  the line's own passage barely moves.
+
+G156 scored 2026-11-13T19:44Z (receipt g156_near.txt; best_stage_ruler.py on G149's out_level):
+  (a) min(s3, s4) stands 0.090 nats a place under s4 (0.071 to 0.113 by slice), against 0.03 to 0.10, and places over 1 nat at stage 4 hold
+      0.840 of the 0.340 gap (3,881 of 10,432 places): held;
+  (b) min(s3, s4, s5) adds 0.065 to min(s3, s4)'s gap (0.155), against under 0.03: missed.
+  Of 2 parts 1 held and 1 missed. The least over seventeen stages is mostly a selection on places the field reads badly at the trained depth;
+  near it a place's own rate could reach 0.09 to 0.16 nats a place on this read, itself a selection on the read.
