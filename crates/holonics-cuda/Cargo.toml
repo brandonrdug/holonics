@@ -24,6 +24,9 @@ ruler-rows-reads = []
 # [measurement; theory, November 12, P54 item 1] A ruler build of the profile example: the words' occupied bits by array and clock
 # (`field_yard_bits_*`). No learner's build enables it.
 ruler-bits = []
+# [measurement; theory, November 13, P59 item 2] A ruler build of the profile example: the contact's copies, one mechanism a copy, each launched
+# immediately before its entry on its words with the entry's outputs in scratch (`tools/contact_copies.py`). No learner's build enables it.
+ruler-copies = []
 
 [[bin]]
 name = "mount-smoke"

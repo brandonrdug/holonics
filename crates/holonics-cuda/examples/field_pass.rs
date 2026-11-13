@@ -172,6 +172,13 @@ fn run(args: &[String]) -> Result<()> {
                 a.registers, a.static_shared, a.local, a.max_threads, a.blocks_a_multiprocessor
             );
         }
+        // [measurement; theory, November 13, P59 item 2] The ruler build's copies: launches, long paths and status bits by copy.
+        for (entry, (launches, long, bits)) in &p.ruler_copies {
+            println!("FIELD_PROFILE_COPY entry={entry} launches={launches} long_paths={long} status_bits={bits}");
+        }
+        for (entry, (words, differ)) in &p.ruler_checks {
+            println!("FIELD_PROFILE_COPY_CHECK entry={entry} words_compared={words} words_differing={differ}");
+        }
         for ((line, class), [hits, misses, frees, freed, wide]) in &p.pool {
             println!("FIELD_PROFILE_POOL line={line} class_octets={class} hits={hits} misses={misses} frees={frees} freed_octets={freed} served_longer={wide}");
         }

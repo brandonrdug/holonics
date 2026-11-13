@@ -31,6 +31,23 @@
 
 #include <stdint.h>
 
+// [measurement; theory, November 13, P59 item 2] The ruler build's count of checked products that took their long path (`RULER_LONG`), raised
+// only while a copy runs (`field_ruler_counting`); without RULER_COPIES the mark is empty and the translation unit is the law's.
+#ifdef RULER_COPIES
+__device__ unsigned long long ruler_long;
+__device__ int ruler_counting;
+#define RULER_LONG()                       \
+    do {                                   \
+        if (ruler_counting) {              \
+            atomicAdd(&ruler_long, 1ull);  \
+        }                                  \
+    } while (0)
+#else
+#define RULER_LONG() \
+    do {             \
+    } while (0)
+#endif
+
 typedef __int128 wide;
 typedef unsigned __int128 uwide;
 
@@ -2123,6 +2140,7 @@ __device__ __forceinline__ bool mul_fits(wide a, wide b, wide *r) {
         *r = a * b;
         return true;
     }
+    RULER_LONG();
     const bool neg = (a < 0) != (b < 0);
     const uwide ua = (uwide)(a < 0 ? -a : a), ub = (uwide)(b < 0 ? -b : b);
     const uint64_t a0 = (uint64_t)ua, a1 = (uint64_t)(ua >> 64), b0 = (uint64_t)ub, b1 = (uint64_t)(ub >> 64);
@@ -2366,6 +2384,7 @@ __device__ __forceinline__ int64_t crowd_base_narrow(const FieldWords &w, uint32
             }
         }
         if (!narrow) {
+            RULER_LONG();
             lk = lock_of(wi[l], wi[w.n + l], b0, b1, (wide)count, d, g, w.status);
         }
         if (!add_fits(s, lk, &s)) {
@@ -4016,6 +4035,7 @@ extern "C" __global__ void __launch_bounds__(REV_ROWS * 32, 4) field_contact_row
                     // The key's bracket released by the skin's bits once, its product by the covector checked.
                     bracket = rel((mul64_128(mul32((int64_t)d, w.pq[((uint64_t)h * w.T + g) * S + entry]), (int64_t)count) << g0) - mul64_128(mul32((int64_t)d, (int64_t)d), w32), g0);
                 } else {
+                    RULER_LONG();
                     sum += div_nearest_by(dsk * d * wsum, cdiv[warp][jj]);
                     bracket = rel(((d * (wide)w.pq[((uint64_t)h * w.T + g) * S + entry] * (wide)count) << g0) - d * d * wsum, g0);
                 }
@@ -5422,6 +5442,7 @@ extern "C" __global__ void __launch_bounds__(CONTACT_ROWS * 32) field_pace_skin_
                             const int64_t power = mul32(mr32, mr32) + mul32(mi32, mi32);
                             bracket = div_nearest_by((mul64_128(pairing, 2 * (int64_t)count) << MOVE_BITS) - mul64_128(power, 2 * (int64_t)dec), qc2);
                         } else {
+                            RULER_LONG();
                             bracket = div_nearest_by(((2 * cnt * (wr * mr + wim * mi)) << MOVE_BITS) - 2 * dec * (mr * mr + mi * mi), qc2);
                         }
                         wide lock = 0;
@@ -5981,3 +6002,8 @@ extern "C" __global__ void field_yard_bits_words(const void *arr, uint32_t kind,
         }
     }
 }
+
+// [measurement; theory, November 13, P59 item 2] The contact's copies (tools/contact_copies.py), the ruler build alone.
+#ifdef RULER_COPIES
+#include "field_copies.cuh"
+#endif

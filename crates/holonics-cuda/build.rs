@@ -35,7 +35,7 @@ use std::process::Command;
 /// lowers its PTX for any newer card.
 const UNATTENDED_FLOOR: &str = "compute_75";
 
-const SOURCES: [&str; 12] = [
+const SOURCES: [&str; 13] = [
     "kernels/hnn.cu",
     "kernels/exact_integer.cuh",
     "kernels/hnn_word.cuh",
@@ -46,6 +46,7 @@ const SOURCES: [&str; 12] = [
     "kernels/tower.cu",
     "kernels/field.cu",
     "kernels/field_moment.cuh",
+    "kernels/field_copies.cuh",
     "kernels/number.cu",
     "kernels/number.cuh",
 ];
@@ -222,7 +223,17 @@ fn main() {
         return;
     };
     let architecture = declared_architecture();
+    // [measurement; theory, November 13, P59 item 2] The ruler build's define for `kernels/field.cu`, from its feature (`ruler-copies`: the contact's
+    // copies and the count of long paths); with none the translation unit is the law's.
+    let mut defines: Vec<&str> = Vec::new();
+    if env::var_os("CARGO_FEATURE_RULER_COPIES").is_some() {
+        defines.push("-DRULER_COPIES");
+    }
     let mut addressed = Vec::new();
+    for define in &defines {
+        addressed.extend_from_slice(define.as_bytes());
+        addressed.push(0);
+    }
     for source in SOURCES {
         addressed.extend_from_slice(source.as_bytes());
         addressed.push(0);
@@ -305,6 +316,7 @@ fn main() {
             "-o",
         ])
         .arg(&field_output)
+        .args(&defines)
         .status()
         .unwrap_or_else(|error| panic!("{} could not run: {error}", nvcc.display()));
     assert!(status.success(), "nvcc refused kernels/field.cu");

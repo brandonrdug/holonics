@@ -831,6 +831,12 @@ pub struct FieldProfile {
     /// [`TRACE_LAUNCHES`], with the run it belongs to, the last phase marked, its grid, block, dynamic shared octets, its timed ns
     /// and its head; and each entry's attributes as the driver lowered it, at each block and dynamic shared it was launched with.
     pub trace_on: bool,
+    /// [measurement; theory, November 13, P59 item 2] The ruler build's copies (`ruler-copies`) by entry: launches, the checked products that took
+    /// their long path, and the status bits any launch raised.
+    pub ruler_copies: std::collections::BTreeMap<&'static str, (u64, u64, u32)>,
+    /// [measurement; P59 item 2] The copies that must give their entry's words (the null copies, the columns from their record): the 64-bit
+    /// words compared against the entry's after it ran, and those that differ.
+    pub ruler_checks: std::collections::BTreeMap<&'static str, (u128, u128)>,
     pub trace: Vec<LaunchRecord>,
     /// Each traced run's batches' region lengths in sites.
     pub trace_regions: Vec<(u64, Vec<usize>)>,
@@ -1010,6 +1016,69 @@ impl<'c> CardField<'c> {
         }
         pools.live += (entry.0 * size) as u64;
         Ok(Pooled { buf: Some(entry), pools: self.pools.clone() })
+    }
+
+    /// [measurement; theory, November 13, P59 item 2] A scratch array of `octets` that starts as the array at `src` (zero where there is none): a
+    /// copy's outputs in the entry's layout, so its in-place reads see the entry's words and the state is untouched.
+    #[cfg(feature = "ruler-copies")]
+    fn ruler_scratch(&self, src: u64, octets: usize) -> Result<Pooled<'c, u8>> {
+        let s = self.take::<u8>(octets.max(1)).map_err(device)?;
+        if src != 0 && octets > 0 {
+            self.card.stream().copy_device_to_device_async(s.device_ptr(), src, octets).map_err(|e| device(e.into()))?;
+        } else {
+            self.card.zero_octets(&*s, 0, octets.max(1)).map_err(device)?;
+        }
+        Ok(s)
+    }
+
+    /// [measurement; P59 item 2] A copy's scratch outputs against its entry's, after the entry ran: the differing 64-bit words, recorded.
+    #[cfg(feature = "ruler-copies")]
+    fn ruler_check(&self, copy: &'static str, pairs: &[(&Pooled<'c, u8>, u64, usize)]) -> Result<()> {
+        let count = self.take_zeroed::<u64>(1).map_err(device)?;
+        let mut words = 0u128;
+        for &(scratch, real, octets) in pairs {
+            let n = (octets / 8) as u64;
+            let (mut a, mut b, mut nw, mut cp) = (scratch.device_ptr(), real, n, count.device_ptr());
+            self.launch("field_ruler_diff", Self::cells(n.max(1)), THREADS, &mut [arg(&mut a), arg(&mut b), arg(&mut nw), arg(&mut cp)])?;
+            words += u128::from(n);
+        }
+        let differ = self.card.fetch_range(&count, 0, 1).map_err(device)?[0];
+        if let Some(profile) = &self.profile {
+            let mut p = profile.borrow_mut();
+            let slot = p.ruler_checks.entry(copy).or_insert((0, 0));
+            (slot.0, slot.1) = (slot.0 + words, slot.1 + u128::from(differ));
+        }
+        Ok(())
+    }
+
+    /// [measurement; P59 item 2] (w)'s inputs: the pair words at `src` laid in walk order into `dst` for heads `h_first` to `h_first + h_count`.
+    #[cfg(feature = "ruler-copies")]
+    fn ruler_walk(&self, words: &Words, sites: usize, h_first: usize, h_count: usize, src: u64, dst: u64, head_stride: u64) -> Result<()> {
+        let mut wc = *words;
+        let (mut hf, mut hc, mut sp, mut dp, mut stride) = (h_first as u32, h_count as u32, src, dst, head_stride);
+        self.launch("field_copy_w_walk", Self::rows_grid((h_count * sites) as u64, CONTACT_ROWS), (CONTACT_ROWS * 32) as u32, &mut [arg(&mut wc), arg(&mut hf), arg(&mut hc), arg(&mut sp), arg(&mut dp), arg(&mut stride)])
+    }
+
+    /// [measurement; P59 item 2] One copy launched immediately before its entry, the count of long paths on around it; its long paths and status
+    /// bits read after it.
+    #[cfg(feature = "ruler-copies")]
+    fn ruler_copy(&self, entry: &'static str, grid: u32, block: u32, params: &mut [*mut c_void], status: &Pooled<'c, u32>) -> Result<()> {
+        let (mut on, mut reset) = (1i32, 1i32);
+        self.launch("field_ruler_counting", 1, 32, &mut [arg(&mut on), arg(&mut reset)])?;
+        self.launch(entry, grid, block, params)?;
+        let (mut off, mut keep) = (0i32, 0i32);
+        self.launch("field_ruler_counting", 1, 32, &mut [arg(&mut off), arg(&mut keep)])?;
+        let out = self.take::<u64>(1).map_err(device)?;
+        let mut op = out.device_ptr();
+        self.launch("field_ruler_long_read", 1, 32, &mut [arg(&mut op)])?;
+        let long = self.card.fetch_range(&out, 0, 1).map_err(device)?[0];
+        let bits = self.card.fetch_range(status, 0, 1).map_err(device)?[0];
+        if let Some(profile) = &self.profile {
+            let mut p = profile.borrow_mut();
+            let slot = p.ruler_copies.entry(entry).or_insert((0, 0, 0));
+            (slot.0, slot.1, slot.2) = (slot.0 + 1, slot.1 + long, slot.2 | bits);
+        }
+        Ok(())
     }
 
     /// [`take`](Self::take) with every element zero.
@@ -1861,7 +1930,39 @@ impl<'c> CardField<'c> {
         // is refused.
         let rows_per_block = CONTACT_ROWS;
         self.mark("tick_launch_pre");
+        // [measurement; theory, November 13, P59 item 2] The ruler build alone: the exposure's copies, each on the entry's words with its outputs in
+        // scratch arrays that start as the entry's.
+        #[cfg(feature = "ruler-copies")]
+        let mut exposure_check = None;
+        #[cfg(feature = "ruler-copies")]
+        if stored && self.profile.is_some() {
+            let grid = Self::rows_grid((heads * sites) as u64, rows_per_block);
+            for copy in ["field_copy_n_exposure", "field_copy_r_exposure", "field_copy_w_exposure"] {
+                let mut wc = *words;
+                let e_s = self.ruler_scratch(words.e, 8 * heads * pairs)?;
+                let sb_s = if returning && words.sb != 0 { Some(self.ruler_scratch(words.sb, 8 * heads * pairs)?) } else { None };
+                let amin_s = self.ruler_scratch(words.amin, 8 * heads * sites)?;
+                let bits_s = self.ruler_scratch(words.bits, 16)?;
+                let status_s = self.take_zeroed::<u32>(1).map_err(device)?;
+                (wc.e, wc.amin, wc.bits, wc.status) = (e_s.device_ptr(), amin_s.device_ptr(), bits_s.device_ptr(), status_s.device_ptr());
+                if let Some(s) = &sb_s {
+                    wc.sb = s.device_ptr();
+                }
+                self.ruler_copy(copy, grid, (rows_per_block * 32) as u32, &mut [arg(&mut wc)], &status_s)?;
+                if copy == "field_copy_n_exposure" {
+                    exposure_check = Some((e_s, sb_s, amin_s, bits_s));
+                }
+            }
+        }
         self.launch("field_exposure", Self::rows_grid((heads * sites) as u64, rows_per_block), (rows_per_block * 32) as u32, &mut [arg(words)])?;
+        #[cfg(feature = "ruler-copies")]
+        if let Some((e_s, sb_s, amin_s, bits_s)) = exposure_check.take() {
+            let mut pairs_c = vec![(&e_s, words.e, 8 * heads * pairs), (&amin_s, words.amin, 8 * heads * sites), (&bits_s, words.bits, 16)];
+            if let Some(s) = &sb_s {
+                pairs_c.push((s, words.sb, 8 * heads * pairs));
+            }
+            self.ruler_check("field_copy_n_exposure", &pairs_c)?;
+        }
         #[cfg(feature = "ruler-bits")]
         for h in 0..heads {
             // The score is a signed word (`scored`), read as one; the share after the contact is a 63-bit fraction, read unsigned.
@@ -1878,7 +1979,36 @@ impl<'c> CardField<'c> {
         self.mark("tick_exposure_wait");
         let limbs = row_limbs(field, spread)?;
         let contact: &'static str = ["field_contact_l5", "field_contact_l6", "field_contact_l7", "field_contact_l8", "field_contact_l9", "field_contact_l10", "field_contact_l11", "field_contact_l12", "field_contact_l13", "field_contact_l14", "field_contact_l15", "field_contact_l16", "field_contact_l17", "field_contact_l18", "field_contact_l19", "field_contact_l20"][limbs - MIN_LIMBS];
+        // [measurement; P59 item 2] The contact's copies, at the five and six limbs the copies are built at.
+        #[cfg(feature = "ruler-copies")]
+        let mut contact_check = None;
+        #[cfg(feature = "ruler-copies")]
+        if stored && self.profile.is_some() && limbs - MIN_LIMBS < 2 {
+            let grid = Self::rows_grid((heads * sites) as u64, rows_per_block);
+            let five = limbs == MIN_LIMBS;
+            for copy in if five { ["field_copy_n_contact_l5", "field_copy_r_contact_l5", "field_copy_w_contact_l5"] } else { ["field_copy_n_contact_l6", "field_copy_r_contact_l6", "field_copy_w_contact_l6"] } {
+                let mut wc = *words;
+                let y_s = self.ruler_scratch(words.y, 8 * sites * m2)?;
+                let e_s = self.ruler_scratch(words.e, 8 * heads * pairs)?;
+                let ce_s = self.ruler_scratch(words.ce, 8 * heads * sites * words.slots as usize)?;
+                let met_s = self.ruler_scratch(words.met, 8 * heads)?;
+                let status_s = self.take_zeroed::<u32>(1).map_err(device)?;
+                if copy.starts_with("field_copy_w_") {
+                    self.ruler_walk(words, sites, 0, heads, words.e, e_s.device_ptr(), pairs as u64)?;
+                }
+                (wc.y, wc.e, wc.ce, wc.met, wc.status) = (y_s.device_ptr(), e_s.device_ptr(), ce_s.device_ptr(), met_s.device_ptr(), status_s.device_ptr());
+                let mut st = store;
+                self.ruler_copy(copy, grid, (rows_per_block * 32) as u32, &mut [arg(&mut wc), arg(&mut st)], &status_s)?;
+                if copy.starts_with("field_copy_n_") {
+                    contact_check = Some((copy, y_s, e_s, ce_s, met_s));
+                }
+            }
+        }
         self.launch(contact, Self::rows_grid((heads * sites) as u64, rows_per_block), (rows_per_block * 32) as u32, &mut [arg(words), arg(&mut store)])?;
+        #[cfg(feature = "ruler-copies")]
+        if let Some((copy, y_s, e_s, ce_s, met_s)) = contact_check.take() {
+            self.ruler_check(copy, &[(&y_s, words.y, 8 * sites * m2), (&e_s, words.e, 8 * heads * pairs), (&ce_s, words.ce, 8 * heads * sites * words.slots as usize), (&met_s, words.met, 8 * heads)])?;
+        }
         #[cfg(feature = "ruler-bits")]
         if store != 0 {
             for h in 0..heads {
@@ -2869,7 +2999,70 @@ impl<'c> CardField<'c> {
                     &mut [arg(words), arg(&mut hh), arg(&mut dyhp), arg(&mut dsp_s), arg(&mut dqp_s), arg(&mut dpp_s), arg(&mut dpbp_s), arg(&mut cdsp_s), arg(&mut cwp_s), arg(&mut cvp_s), arg(&mut gcp_s)],
                 )?;
             }
+            // [measurement; P59 item 2] The rows' copies, their outputs (ds, dq and the words' dp, dpb, cds, cv, cw, gcov, dsshare) in scratch.
+            #[cfg(feature = "ruler-copies")]
+            let mut rows_check = None;
+            #[cfg(feature = "ruler-copies")]
+            if self.profile.is_some() {
+                let pairs_w = words.pairs as usize;
+                let (grid, block) = (Self::rows_grid(sites as u64, REV_ROWS), (REV_ROWS * 32) as u32);
+                for copy in ["field_copy_n_contact_rows", "field_copy_r_contact_rows", "field_copy_w_contact_rows", "field_copy_a_contact_rows"] {
+                    let mut wc = *words;
+                    let ds_s = self.ruler_scratch(ds.device_ptr(), 8 * pairs_w)?;
+                    let dq_s = self.ruler_scratch(dq.device_ptr(), 8 * sites * m2)?;
+                    let dp_s = self.ruler_scratch(words.dp, 8 * sites * m2)?;
+                    let dpb_s = self.ruler_scratch(words.dpb, 16 * pairs_w)?;
+                    let cds_s = if words.cds != 0 { Some(self.ruler_scratch(words.cds, 8 * heads * sites * words.slots as usize)?) } else { None };
+                    let cv_s = self.ruler_scratch(words.cv, 16 * rows * span)?;
+                    let cw_s = self.ruler_scratch(words.cw, 16 * rows * span)?;
+                    let gcov_s = if words.gcov != 0 { Some(self.ruler_scratch(words.gcov, 16 * field.layout().len)?) } else { None };
+                    let dss_s = if words.dsshare != 0 { Some(self.ruler_scratch(words.dsshare, 32 * heads)?) } else { None };
+                    let status_s = self.take_zeroed::<u32>(1).map_err(device)?;
+                    (wc.dp, wc.dpb, wc.cv, wc.cw, wc.status) = (dp_s.device_ptr(), dpb_s.device_ptr(), cv_s.device_ptr(), cw_s.device_ptr(), status_s.device_ptr());
+                    wc.cds = cds_s.as_ref().map_or(0, |s| s.device_ptr());
+                    wc.gcov = gcov_s.as_ref().map_or(0, |s| s.device_ptr());
+                    wc.dsshare = dss_s.as_ref().map_or(0, |s| s.device_ptr());
+                    // (w) reads the row's e and sb in walk order.
+                    let walked = if copy == "field_copy_w_contact_rows" {
+                        let e_w = self.ruler_scratch(words.e, 8 * heads * pairs_w)?;
+                        let sb_w = self.ruler_scratch(words.sb, 8 * heads * pairs_w)?;
+                        self.ruler_walk(words, sites, h, 1, words.e, e_w.device_ptr(), pairs_w as u64)?;
+                        self.ruler_walk(words, sites, h, 1, words.sb, sb_w.device_ptr(), pairs_w as u64)?;
+                        (wc.e, wc.sb) = (e_w.device_ptr(), sb_w.device_ptr());
+                        Some((e_w, sb_w))
+                    } else {
+                        None
+                    };
+                    let (mut hc, mut dyc, mut dsc, mut dqc) = (h as u32, dyh.device_ptr(), ds_s.device_ptr(), dq_s.device_ptr());
+                    if copy == "field_copy_a_contact_rows" {
+                        let plain = self.take::<i128>((grid as usize * block as usize).max(1)).map_err(device)?;
+                        let mut pp = plain.device_ptr();
+                        self.ruler_copy(copy, grid, block, &mut [arg(&mut wc), arg(&mut hc), arg(&mut dyc), arg(&mut dsc), arg(&mut dqc), arg(&mut pp)], &status_s)?;
+                    } else {
+                        self.ruler_copy(copy, grid, block, &mut [arg(&mut wc), arg(&mut hc), arg(&mut dyc), arg(&mut dsc), arg(&mut dqc)], &status_s)?;
+                    }
+                    drop(walked);
+                    if copy == "field_copy_n_contact_rows" {
+                        rows_check = Some((ds_s, dq_s, dp_s, dpb_s, cds_s, cv_s, cw_s, gcov_s, dss_s));
+                    }
+                }
+            }
             self.launch("field_contact_rows", Self::rows_grid(sites as u64, REV_ROWS), (REV_ROWS * 32) as u32, &mut [arg(words), arg(&mut hh), arg(&mut dyhp), arg(&mut dsp), arg(&mut dqp)])?;
+            #[cfg(feature = "ruler-copies")]
+            if let Some((ds_s, dq_s, dp_s, dpb_s, cds_s, cv_s, cw_s, gcov_s, dss_s)) = rows_check.take() {
+                let pairs_w = words.pairs as usize;
+                let mut pairs_c = vec![(&ds_s, ds.device_ptr(), 8 * pairs_w), (&dq_s, dq.device_ptr(), 8 * sites * m2), (&dp_s, words.dp, 8 * sites * m2), (&dpb_s, words.dpb, 16 * pairs_w), (&cv_s, words.cv, 16 * rows * span), (&cw_s, words.cw, 16 * rows * span)];
+                if let Some(s) = &cds_s {
+                    pairs_c.push((s, words.cds, 8 * heads * sites * words.slots as usize));
+                }
+                if let Some(s) = &gcov_s {
+                    pairs_c.push((s, words.gcov, 16 * field.layout().len));
+                }
+                if let Some(s) = &dss_s {
+                    pairs_c.push((s, words.dsshare, 32 * heads));
+                }
+                self.ruler_check("field_copy_n_contact_rows", &pairs_c)?;
+            }
             #[cfg(feature = "ruler-bits")]
             {
                 self.bits_pairs(words, h, 2, 0, ds.device_ptr(), 3, at, sites)?;
@@ -2878,10 +3071,111 @@ impl<'c> CardField<'c> {
             if d.carries_moment(h) && !d.is_depth(h) {
                 // The head's skins return to its variation (§16), from the pairs' and crowds' covectors just formed.
                 let (mut hh, mut dyhp, mut dsp) = (h as u32, dyh.device_ptr(), ds.device_ptr());
+                // [measurement; P59 item 2] The skin's return's copies, gsig in scratch.
+                #[cfg(feature = "ruler-copies")]
+                let mut skin_check = None;
+                #[cfg(feature = "ruler-copies")]
+                if self.profile.is_some() {
+                    let (grid, block) = (Self::rows_grid(sites as u64, CONTACT_ROWS), (CONTACT_ROWS * 32) as u32);
+                    for copy in ["field_copy_n_pace_skin_back", "field_copy_r_pace_skin_back", "field_copy_w_pace_skin_back", "field_copy_a_pace_skin_back"] {
+                        let mut wc = *words;
+                        let gsig_s = self.ruler_scratch(words.gsig, 16 * paced * sites)?;
+                        let status_s = self.take_zeroed::<u32>(1).map_err(device)?;
+                        (wc.gsig, wc.status) = (gsig_s.device_ptr(), status_s.device_ptr());
+                        let (mut hc, mut dyc, mut dsc) = (h as u32, dyh.device_ptr(), ds.device_ptr());
+                        // (w) reads the row's e and ds in walk order.
+                        let walked = if copy == "field_copy_w_pace_skin_back" {
+                            let pairs_w = words.pairs as usize;
+                            let e_w = self.ruler_scratch(words.e, 8 * heads * pairs_w)?;
+                            let ds_w = self.ruler_scratch(ds.device_ptr(), 8 * pairs_w)?;
+                            self.ruler_walk(words, sites, h, 1, words.e, e_w.device_ptr(), pairs_w as u64)?;
+                            self.ruler_walk(words, sites, h, 1, ds.device_ptr(), ds_w.device_ptr(), 0)?;
+                            (wc.e, dsc) = (e_w.device_ptr(), ds_w.device_ptr());
+                            Some((e_w, ds_w))
+                        } else {
+                            None
+                        };
+                        if copy == "field_copy_a_pace_skin_back" {
+                            let plain = self.take::<i128>((grid as usize * block as usize).max(1)).map_err(device)?;
+                            let mut pp = plain.device_ptr();
+                            self.ruler_copy(copy, grid, block, &mut [arg(&mut wc), arg(&mut hc), arg(&mut dyc), arg(&mut dsc), arg(&mut pp)], &status_s)?;
+                        } else {
+                            self.ruler_copy(copy, grid, block, &mut [arg(&mut wc), arg(&mut hc), arg(&mut dyc), arg(&mut dsc)], &status_s)?;
+                        }
+                        drop(walked);
+                        if copy == "field_copy_n_pace_skin_back" {
+                            skin_check = Some(gsig_s);
+                        }
+                    }
+                }
                 self.launch("field_pace_skin_back", Self::rows_grid(sites as u64, CONTACT_ROWS), (CONTACT_ROWS * 32) as u32, &mut [arg(words), arg(&mut hh), arg(&mut dyhp), arg(&mut dsp)])?;
+                #[cfg(feature = "ruler-copies")]
+                if let Some(gsig_s) = skin_check.take() {
+                    self.ruler_check("field_copy_n_pace_skin_back", &[(&gsig_s, words.gsig, 16 * paced * sites)])?;
+                }
             }
             let (mut hh, mut dyhp, mut dsp, mut dqp, mut dvp) = (h as u32, dyh.device_ptr(), ds.device_ptr(), dq.device_ptr(), dv.device_ptr());
+            // [measurement; P59 item 2] The columns' copies, dq and dv in scratch; (c) from its record in column order, formed first by
+            // `field_copy_c_columns_record` from the entry's own words.
+            #[cfg(feature = "ruler-copies")]
+            let mut columns_check = Vec::new();
+            #[cfg(feature = "ruler-copies")]
+            if self.profile.is_some() {
+                let pairs_w = words.pairs as usize;
+                let (grid, block) = (Self::rows_grid(sites as u64, CONTACT_ROWS), (CONTACT_ROWS * 32) as u32);
+                for copy in ["field_copy_n_contact_columns", "field_copy_r_contact_columns", "field_copy_c_contact_columns"] {
+                    let mut wc = *words;
+                    let dq_s = self.ruler_scratch(dq.device_ptr(), 8 * sites * m2)?;
+                    let dv_s = self.ruler_scratch(dv.device_ptr(), 8 * sites * m2)?;
+                    let status_s = self.take_zeroed::<u32>(1).map_err(device)?;
+                    wc.status = status_s.device_ptr();
+                    let (mut hc, mut dyc, mut dsc, mut dqc, mut dvc) = (h as u32, dyh.device_ptr(), ds.device_ptr(), dq_s.device_ptr(), dv_s.device_ptr());
+                    if copy == "field_copy_c_contact_columns" {
+                        // Each source's count of receivers, then the record's offsets (an exclusive prefix on the host).
+                        let kout = self.take::<u32>(sites.max(1)).map_err(device)?;
+                        let mut kp = kout.device_ptr();
+                        self.launch("field_copy_c_columns_count", grid, block, &mut [arg(&mut wc), arg(&mut hc), arg(&mut dyc), arg(&mut dsc), arg(&mut dqc), arg(&mut dvc), arg(&mut kp)])?;
+                        let counts = self.card.fetch_range(&kout, 0, sites).map_err(device)?;
+                        let mut offsets = Vec::with_capacity(sites);
+                        let mut total = 0u64;
+                        for &c in &counts {
+                            offsets.push(total);
+                            total += u64::from(c);
+                        }
+                        let rec_off = self.take_up(&offsets).map_err(device)?;
+                        let total = total as usize;
+                        let rec_i = self.take::<u32>(total.max(1)).map_err(device)?;
+                        let rec_ds = self.take::<i64>(total.max(1)).map_err(device)?;
+                        let rec_e = self.take::<u64>(total.max(1)).map_err(device)?;
+                        let rec_dec = self.take::<u32>((total * n).max(1)).map_err(device)?;
+                        let _ = pairs_w;
+                        let mut ro = rec_off.device_ptr();
+                        let (mut ri, mut rd, mut re, mut rk) = (rec_i.device_ptr(), rec_ds.device_ptr(), rec_e.device_ptr(), rec_dec.device_ptr());
+                        // The record's own status (a source with more receivers than the region's sites, which its layout cannot hold).
+                        let rec_status = self.take_zeroed::<u32>(1).map_err(device)?;
+                        let mut wr = wc;
+                        wr.status = rec_status.device_ptr();
+                        self.launch("field_copy_c_columns_record", grid, block, &mut [arg(&mut wr), arg(&mut hc), arg(&mut dyc), arg(&mut dsc), arg(&mut dqc), arg(&mut dvc), arg(&mut ro), arg(&mut ri), arg(&mut rd), arg(&mut re), arg(&mut rk)])?;
+                        let rbits = self.card.fetch_range(&rec_status, 0, 1).map_err(device)?[0];
+                        if let Some(profile) = &self.profile {
+                            let mut p = profile.borrow_mut();
+                            let slot = p.ruler_copies.entry("field_copy_c_columns_record").or_insert((0, 0, 0));
+                            (slot.0, slot.2) = (slot.0 + 1, slot.2 | rbits);
+                        }
+                        self.ruler_copy(copy, grid, block, &mut [arg(&mut wc), arg(&mut hc), arg(&mut dyc), arg(&mut dsc), arg(&mut dqc), arg(&mut dvc), arg(&mut ro), arg(&mut ri), arg(&mut rd), arg(&mut re), arg(&mut rk)], &status_s)?;
+                    } else {
+                        self.ruler_copy(copy, grid, block, &mut [arg(&mut wc), arg(&mut hc), arg(&mut dyc), arg(&mut dsc), arg(&mut dqc), arg(&mut dvc)], &status_s)?;
+                    }
+                    if copy != "field_copy_r_contact_columns" {
+                        columns_check.push((copy, dq_s, dv_s));
+                    }
+                }
+            }
             self.launch("field_contact_columns", Self::rows_grid(sites as u64, CONTACT_ROWS), (CONTACT_ROWS * 32) as u32, &mut [arg(words), arg(&mut hh), arg(&mut dyhp), arg(&mut dsp), arg(&mut dqp), arg(&mut dvp)])?;
+            #[cfg(feature = "ruler-copies")]
+            for (copy, dq_s, dv_s) in columns_check.drain(..) {
+                self.ruler_check(copy, &[(&dq_s, dq.device_ptr(), 8 * sites * m2), (&dv_s, dv.device_ptr(), 8 * sites * m2)])?;
+            }
             let (mut hh, mut dqp, mut dvp) = (h as u32, dq.device_ptr(), dv.device_ptr());
             self.launch("field_spread", (regions as u32).clamp(1, 65_535), THREADS, &mut [arg(words), arg(&mut hh), arg(&mut dqp), arg(&mut dvp)])?;
         }
