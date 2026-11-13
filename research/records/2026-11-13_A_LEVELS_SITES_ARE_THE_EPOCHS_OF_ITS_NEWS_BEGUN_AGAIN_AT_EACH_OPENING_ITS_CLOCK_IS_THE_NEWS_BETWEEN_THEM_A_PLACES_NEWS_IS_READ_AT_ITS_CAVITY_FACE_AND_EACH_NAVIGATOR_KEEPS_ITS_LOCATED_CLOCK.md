@@ -453,6 +453,17 @@ copies 2.95 ms a section from 6.61, the allocations 12.6 from 16.0, the line's s
 (6.6 times the bar) against 236.1 without the block. The peak rose to 11.59 GB at the reverse's start,
 so the live set at its peak is read by phase before another change.
 
+*The live set at its peak* (G142's rule; `g143_peak.txt`). Read by take line, the line's peak (11.59 GB
+against the budget's 10.74) and its control's (10.50) stand on the same stores: two of a tick's pair
+words of 2.15 GB each, its carriers of 1.62 GB, the contact's stores of 0.86 GB and the face's masses,
+about 9.4 GB that the section's two bounds size. Without the block the control already stands at 0.98
+of its budget, so any operand the opening's return adds beside them is allocated afresh each section.
+What the opening adds stands in its return's scratch and in a tick's row sums held through longer kept
+buffers (the pool's rule of P58). Two forms keep every bit and lower that addition: the return's
+scratch taken a moment mode at a time (its far prefixes 28 MiB a mode where they are 448 MiB at once),
+or the section's bounds re-derived from the card's memory with the opening's return counted, which
+changes the sections the pass cuts and so enters as a law with its own reproduction (`agent-inferred`).
+
 ### 4.5 An epoch's face is its moment on the news phase
 
 The built restriction opens a packet through one chart of its six sites' reads in place order.
