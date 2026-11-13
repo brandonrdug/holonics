@@ -1,0 +1,115 @@
+# P54 item 4 (step 4 of the engine, G122), 2026-11-13 UTC: field_contact_rows and field_pace_skin_back with each product in the word P54 item 2
+# proves, every bit kept, nothing else changed (claude/engine d411a53d9 from main 259bfe04c). Gates 1 and 2, the GPU suite alone on the card, the
+# reproduction from run 1's STATE.101 for 600 sections, then one hold on the pass's sections 2,001 to 2,100 from run 2's STATE.1900 (sha256
+# cda6ac8a1129f147), nothing else building or loading the host: control (main), step 4, control, then a profiled control and a profiled step 4.
+# Numbers only.
+## the builds
+d411a53d9 (step 4) field_pass a328ed5a707c3cb824785863d558bd3312e5724bf0a9e5d584511e78d5b0fbf3
+259bfe04c (main, control) field_pass b6c58bdbacf17c0ce297b9c70836cf5ae01eaa813b41baeb808cda3fd1b01f01
+## the forms (source; every 32-bit form's operands fit 32 bits by a refusal: fit32 for a unit word or probe, skin_word for a skin; a crowd's summed
+## word W by a read per crowd, the wide forms standing where it is 2^31 or more; a 64 by 64 product is exact for any two 64-bit words)
+FORM entry=field_contact_rows product='dy x carried v (pair_dp8, pair_dp)' word=64x64>128 (mul.lo, mul.hi.s64)
+FORM entry=field_contact_rows product='ds x (D w) (the probe role)' word='D w 32x32>64 (mul.wide.s32), ds x . 64x64>128'
+FORM entry=field_contact_rows product='crowd_base (the crowds' delta s)' word='w W, |W|^2, D^2 32x32>64; 2|C|D 64 low; pairing x 2|C|D, power x D^2 64x64>128; 2^g a shift' guard='|W| < 2^31, |C| < 2^31, len(pairing)+len(2|C|D)+g <= 126, else lock_of'
+FORM entry=field_contact_rows product='ds x (D W), the key bracket D w |C| 2^g - D^2 W' word='D W, D w, D^2 32x32>64; x ds, x |C|, x W 64x64>128' guard='|W| < 2^31, else the wide forms'
+FORM entry=field_contact_rows product='ce x release(D dy, 30)' word='carry_d (64-bit halves), ce x . unsigned by signed 64x64>128'
+FORM entry=field_pace_skin_back product='inner dy.v' word=64x64>128
+FORM entry=field_pace_skin_back product='the lock w.k, |k|^2' word=32x32>64 (mul.wide.s32), sums on 128 bits
+FORM entry=field_pace_skin_back product='2 D |k|^2' word=64x64>128 unsigned
+FORM entry=field_pace_skin_back product='a crowd's w.W, |W|^2; x 2|C|, x 2D' word='32x32>64; 64x64>128' guard='|W| < 2^31, else the wide forms'
+FORM unchanged='the compare, the temperature (dz sb, T dz), p dp, the divisions, crowd D V and dy V, mul_fits on ds and on e, skin_back_dev'
+## corrections to P54 item 2 and to P53 item 1, read from the shipped PTX and SASS at main 259bfe04c
+CORRECTION item2 the unit word's bound: |w| <= 7 2^16 < 2^19 (s = isqrt(floor(P/2n)) >= 1, |c| < sqrt(2n)(s+1)), not 2^18; no form here rests on it
+CORRECTION item2 today: a product of two visibly sign-extended 64-bit words was already 64x64>128 (mul.lo, mul.hi.s64) in the shipped PTX:
+CORRECTION item2   field_contact_rows dy x v' (16 a pair; 16 mul.hi.s64, pair_dp8 unrolled) and field_pace_skin_back dy.v, w.k, k.k (48 a pair; 6 mul.hi.s64)
+CORRECTION item2 narrowed by proof against the shipped forms: rows still 3745 of 5962 (0.628), rows paced 3375 of 6489 (0.520), pace_skin_back
+CORRECTION item2   2912 of 6453 (0.451; w.k and k.k narrow further, 64x64>128 to 32x32>64); the two entries together 10032 of 18904 (0.531)
+CORRECTION item2 the 32-bit form: (int64)(int32)a x (int64)(int32)b lowers to mul.lo.s64 (no mul.wide.s32 in the first build); written as mul.wide.s32
+CORRECTION p53 the SASS counts read only four-digit addresses (to 0xfff0, 4096 instructions): field_contact_rows' P53 line was its first 4096
+CORRECTION p53   instructions; the whole entry at 259bfe04c (its source 60fece148's) is the bin_main4 SASS line below (field_yard_rows, 2240, was whole)
+## the two entries compiled (field.ptx; SASS by ptxas -O3 for sm_89 and cuobjdump -sass; the driver lowers the PTX at the card's open, so the
+## card's SASS may differ in detail; static counts, the loops not unrolled save pair_dp8's)
+PTX build=main_259bfe04c entry=field_contact_rows instructions=4655 mul_lo_64=228 mul_hi_64=101 mul_wide_32=42 mad=42 mul_mad=425 ld_local=0 st_local=0 div_rem=27
+SASS build=main_259bfe04c entry=field_contact_rows instructions=7328 IMAD=2538 IMAD_WIDE=600 IMAD_HI=64 IADD3=1263 LDG=112 STG=7 LDS=47 STS=23 LDL=75 STL=46 RED=30 BRA=224
+RESOURCES build=main_259bfe04c entry=field_contact_rows registers=80 stack_octets=128 spill_store_octets=200 spill_load_octets=320 shared_octets=20128
+PTX build=main_259bfe04c entry=field_pace_skin_back instructions=3584 mul_lo_64=128 mul_hi_64=66 mul_wide_32=23 mad=66 mul_mad=298 ld_local=0 st_local=0 div_rem=19
+SASS build=main_259bfe04c entry=field_pace_skin_back instructions=4912 IMAD=1560 IMAD_WIDE=380 IMAD_HI=66 IADD3=1126 LDG=60 STG=0 LDS=13 STS=8 LDL=0 STL=0 RED=15 BRA=171
+RESOURCES build=main_259bfe04c entry=field_pace_skin_back registers=111 stack_octets=0 spill_store_octets=0 spill_load_octets=0 shared_octets=4256
+PTX build=step4_d411a53d9 entry=field_contact_rows instructions=4818 mul_lo_64=228 mul_hi_64=107 mul_wide_32=48 mad=43 mul_mad=439 ld_local=0 st_local=0 div_rem=28
+SASS build=step4_d411a53d9 entry=field_contact_rows instructions=7816 IMAD=2710 IMAD_WIDE=643 IMAD_HI=64 IADD3=1351 LDG=116 STG=7 LDS=50 STS=23 LDL=92 STL=49 RED=30 BRA=234
+RESOURCES build=step4_d411a53d9 entry=field_contact_rows registers=80 stack_octets=136 spill_store_octets=208 spill_load_octets=384 shared_octets=20128
+PTX build=step4_d411a53d9 entry=field_pace_skin_back instructions=3910 mul_lo_64=128 mul_hi_64=62 mul_wide_32=29 mad=81 mul_mad=317 ld_local=0 st_local=0 div_rem=21
+SASS build=step4_d411a53d9 entry=field_pace_skin_back instructions=5232 IMAD=1609 IMAD_WIDE=391 IMAD_HI=72 IADD3=1210 LDG=62 STG=0 LDS=13 STS=8 LDL=0 STL=0 RED=15 BRA=179
+RESOURCES build=step4_d411a53d9 entry=field_pace_skin_back registers=96 stack_octets=0 spill_store_octets=0 spill_load_octets=0 shared_octets=4256
+## gates (projection: gate about 600 s, deadline 1800; suite build, deadline 1200; suite 373 s, deadline 900)
+GATE_EXIT 0 00:15:53
+MEASURE lap=step4_gate rc=0 wall_s=296.2 peak_rss_kib=4295600
+SUITE_BUILD_EXIT 0 00:16:14
+HOLD suite: lock taken 00:16:14 wait_s=.006482360
+SUITE_EXIT 0 00:22:41
+HOLD suite: released 00:22:41
+MEASURE lap=step4_suite rc=0 wall_s=387.6 peak_rss_kib=1788296
+SUITE_TESTS_OK 140
+test result: ok. 89 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 339.14s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.08s
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.40s
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.32s
+test result: ok. 46 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 32.54s
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 5.01s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+## the reproduction (projection 600 x 428.6 ms = 257 s; stop 327,600 ms; outer 390 s)
+GATE_EXIT 0 00:15:53
+HOLD repro4: lock taken 00:22:41 wait_s=.002951528
+HOLD repro4: run exit 0 released 00:25:57
+STORE_SAVE k=600 sections=600 states=600 moved=106716 square=715909979972340 priced=599 transfer=-39755342747 external=-39771192152 curvature=15849405 octave=1 rate=12 reads=0 returns=600 pairs=27340062811 batches=600 peak_store=8456338512 ms=194597
+FIELD_CARD reads=0 read_ms=0 returns=600 return_ms=185963 pairs=27340062811 batches=600 peak_store=8456338512 landmarks=0 landmark_ms=0 elapsed_ms=194600
+MEASURE lap=repro4 rc=0 wall_s=195.1 peak_rss_kib=388972
+GATE_REPRO sections=600 run2_lines=600 equal=600 EQUAL
+GATE_SAVE k=600 equal_timings_and_peak_store_aside=True peak_store=8456338512 run2_peak_store=7577906356
+GATE_BYTES STATE.600 equal repro=a5b222844ffcbb71 run2=a5b222844ffcbb71
+GATE_BYTES MEAN.600 equal repro=a12e0da79e525ae9 run2=a12e0da79e525ae9
+REPRO measured_over_projected=0.759
+## the hold (each unprofiled run projected 43 s, stop 54,600 ms, outer 100 s; each profiled 50 s, stop 72,618 ms, outer 136 s)
+HOLD timing: lock taken 00:25:57 wait_s=.002763476
+HOLD tc7: exit 0 00:26:31
+HOLD ts4: exit 0 00:27:05
+HOLD tc8: exit 0 00:27:39
+HOLD tpc: exit 0 00:28:14
+HOLD tps: exit 0 00:28:49
+HOLD timing: released 00:28:49
+tc7 FIELD_CARD reads=0 read_ms=0 returns=100 return_ms=32041 pairs=4566615773 batches=100 peak_store=8410613236 landmarks=0 landmark_ms=0 elapsed_ms=33577
+tc7 MEASURE lap=tc7 rc=0 wall_s=34.1 peak_rss_kib=384328
+ts4 FIELD_CARD reads=0 read_ms=0 returns=100 return_ms=31726 pairs=4566615773 batches=100 peak_store=8410613236 landmarks=0 landmark_ms=0 elapsed_ms=33248
+ts4 MEASURE lap=ts4 rc=0 wall_s=33.7 peak_rss_kib=386328
+tc8 FIELD_CARD reads=0 read_ms=0 returns=100 return_ms=32277 pairs=4566615773 batches=100 peak_store=8410613236 landmarks=0 landmark_ms=0 elapsed_ms=33817
+tc8 MEASURE lap=tc8 rc=0 wall_s=34.3 peak_rss_kib=387032
+tpc FIELD_CARD reads=0 read_ms=0 returns=100 return_ms=33136 pairs=4566615773 batches=100 peak_store=8410613236 landmarks=0 landmark_ms=0 elapsed_ms=34683
+tpc FIELD_PROFILE_SPLIT kernels_ms=29225 copies=3800 copies_ms=947 allocations=30400 allocations_ms=1186 elapsed_ms=34683
+tpc MEASURE lap=tpc rc=0 wall_s=35.1 peak_rss_kib=383300
+tps FIELD_CARD reads=0 read_ms=0 returns=100 return_ms=32868 pairs=4566615773 batches=100 peak_store=8410613236 landmarks=0 landmark_ms=0 elapsed_ms=34354
+tps FIELD_PROFILE_SPLIT kernels_ms=29087 copies=3800 copies_ms=893 allocations=30400 allocations_ms=1180 elapsed_ms=34354
+tps MEASURE lap=tps rc=0 wall_s=34.8 peak_rss_kib=384988
+TIMING tc7 sections=100 equal_to_leg1=100/100 mean_section_ms=334.1
+TIMING ts4 sections=100 equal_to_leg1=100/100 mean_section_ms=330.6
+TIMING tc8 sections=100 equal_to_leg1=100/100 mean_section_ms=336.3
+TIMING tpc sections=100 equal_to_leg1=100/100 mean_section_ms=345.0
+TIMING tps sections=100 equal_to_leg1=100/100 mean_section_ms=341.6
+TIMING controls_spread_ms=2.2 controls_mean_ms=335.2 step_ms=330.6 step_over_controls=0.986 spread_over_controls=0.007 profiled_step_over_profiled_control=0.990
+ENTRY entry=field_contact_rows head=0 kind=still launches=400/400 control_ms_a_profiled_section=8.36 step_ms_a_profiled_section=8.00 step_over_control=0.958
+ENTRY entry=field_contact_rows head=1 kind=still launches=400/400 control_ms_a_profiled_section=6.74 step_ms_a_profiled_section=6.47 step_over_control=0.960
+ENTRY entry=field_contact_rows head=2 kind=paced launches=400/400 control_ms_a_profiled_section=10.38 step_ms_a_profiled_section=10.09 step_over_control=0.972
+ENTRY entry=field_contact_rows head=3 kind=paced launches=400/400 control_ms_a_profiled_section=10.85 step_ms_a_profiled_section=10.67 step_over_control=0.983
+ENTRY entry=field_contact_rows head=all control_ms_a_profiled_section=36.33 step_ms_a_profiled_section=35.23 step_over_control=0.970
+ENTRY entry=field_pace_skin_back head=2 kind=paced launches=400/400 control_ms_a_profiled_section=16.62 step_ms_a_profiled_section=15.08 step_over_control=0.908
+ENTRY entry=field_pace_skin_back head=3 kind=paced launches=400/400 control_ms_a_profiled_section=17.26 step_ms_a_profiled_section=15.66 step_over_control=0.907
+ENTRY entry=field_pace_skin_back head=all control_ms_a_profiled_section=33.87 step_ms_a_profiled_section=30.74 step_over_control=0.908
+STATE_SHA tc7 81377dbeaf26d65e 64954161619deda4
+STATE_SHA ts4 81377dbeaf26d65e 64954161619deda4
+STATE_SHA tc8 81377dbeaf26d65e 64954161619deda4
+STATE_SHA tpc 81377dbeaf26d65e 64954161619deda4
+STATE_SHA tps 81377dbeaf26d65e 64954161619deda4
+## G122 scored
+G122 part=a entry=field_contact_rows guess=0.72 band=0.60..0.85 read=0.970 (36.33 to 35.23 ms a profiled section; heads 0.958 0.960 0.972 0.983) missed_above_band
+G122 part=b entry=field_pace_skin_back guess=0.75 band=0.60..0.92 read=0.908 (33.87 to 30.74 ms; heads 0.908 0.907) inside_band_above_guess
+G122 part=c section guess=0.951 band=0.925..0.98 read=0.986 (335.2 to 330.6 ms; controls 334.1 and 336.3, spread 2.2 ms, 0.007) missed_above_band

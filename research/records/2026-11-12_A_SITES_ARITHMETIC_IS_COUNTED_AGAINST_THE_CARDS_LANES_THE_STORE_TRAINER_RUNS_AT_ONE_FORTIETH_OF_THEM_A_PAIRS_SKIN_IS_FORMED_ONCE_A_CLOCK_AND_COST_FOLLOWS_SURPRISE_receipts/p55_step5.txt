@@ -1,0 +1,108 @@
+# P55 A6 (step 5 of the engine, G126's rule), 2026-11-13 UTC: the rows at four blocks a multiprocessor; the skin's return's turn rates read once a
+# mode, its skin covector's products plain where their bounds prove them, its crowd quotients by divisors read once a crowd, a mode's sums to one
+# address summed on the lane (claude/engine eed238f15 from main 50b1bad10). Gates 1 and 2, the GPU suite alone on the card, the reproduction from
+# run 1's STATE.101 for 600 sections, then one hold on the pass's sections 2,001 to 2,100 from run 2's STATE.1900 (sha256 cda6ac8a1129f147): control,
+# step 5, control, a profiled control, a profiled step 5. Numbers only.
+## the builds
+eed238f15 (step 5) field_pass d03729bd0555118a62af6cf299af95c1121db40550e6368df4149c8f996a4730
+50b1bad10 (main, control) field_pass 43b866f93cd36e10d7e8570eb3af6f79d2b33146e24ba424a6432efe393a8f61
+## the guess, fixed before the read (from p55_helpers.txt's table)
+STEP5_PREDICTION fixed 2026-11-13 before the read, by G126's rule on p55's A5 table (a rebuilt helper keeps 0.35 of the time the table gave it, 0.20 to 0.55):
+  field_pace_skin_back rebuilt helpers' summed share 0.845 (skin_back_with_turn 0.390, add_wide 0.289, div128_bracket 0.107, div_value 0.059): reads 0.451 of its control (0.324 to 0.620).
+  field_contact_rows: its only change is the launch bound (G126 e); reads the four-block reading, 0.881 (0.85 to 0.91).
+## gates (projection: gate about 600 s, deadline 1800; suite 373 s, deadline 900)
+GATE_EXIT 0 01:17:11
+MEASURE lap=step5_gate rc=0 wall_s=207.0 peak_rss_kib=3347476
+SUITE_BUILD_EXIT 0 01:17:18
+HOLD suite: lock taken 01:17:18 wait_s=.003302738
+SUITE_EXIT 0 01:23:45
+HOLD suite: released 01:23:45
+MEASURE lap=step5_suite rc=0 wall_s=387.0 peak_rss_kib=1789448
+SUITE_TESTS_OK 140
+test result: ok. 89 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 340.54s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.10s
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.40s
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.31s
+test result: ok. 46 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 32.46s
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 4.96s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+## the reproduction (projection 600 x 428.6 ms = 257 s; stop 327,600 ms; outer 390 s)
+GATE_EXIT 0 01:17:11
+HOLD repro5: lock taken 01:23:45 wait_s=.003559949
+HOLD repro5: run exit 0 released 01:26:59
+MEASURE lap=repro5 rc=0 wall_s=194.2 peak_rss_kib=392116
+GATE_REPRO sections=600 run2_lines=600 equal=600 EQUAL
+GATE_SAVE k=600 equal_timings_and_peak_store_aside=False peak_store=8450086112 run2_peak_store=7577906356
+GATE_SAVE differing_fields=['batches', 'peak_store']
+GATE_BYTES STATE.600 equal repro=a5b222844ffcbb71 run2=a5b222844ffcbb71
+GATE_BYTES MEAN.600 equal repro=a12e0da79e525ae9 run2=a12e0da79e525ae9
+FIELD_CARD_OPEN card=NVIDIA GeForce RTX 4080 SUPER free=15560998912 total=16802250752 batch_budget=10569908224
+STORE_SAVE k=600 sections=600 states=600 moved=106716 square=715909979972340 priced=599 transfer=-39755342747 external=-39771192152 curvature=15849405 octave=1 rate=12 reads=0 returns=600 pairs=27340062811 batches=601 peak_store=8450086112 ms=193736
+FIELD_SKIN octets_a_entry=64 octets_a_site=1280 clock_octets_a_site=1920 entries=6295201510 dense_pairs=8970533523 peak_batch_entries=12200622 peak_batch_dense_pairs=15371207 peak_skin_store=913284608 peak_store=8450086112 batch_cut=8455507148 free_at_open=15560998912
+REPRO_DIFFERS line=STORE_SAVE k=600 field=batches step5=601 run2=600 (and peak_store, the split batch's): the card's free memory at the open read 15,560,998,912 octets
+REPRO_DIFFERS cause='a schedule, not the law': the batch cut 8,455,507,148 octets stood 831,364 under one section's peak (8,456,338,512 at step 4's reproduction, free 15,727,788,032),
+REPRO_DIFFERS cause='so one section ran as two batches'; every section line, the save line's other fields, the skin store's sizes and STATE.600, MEAN.600 are equal (P52: a split is the desktop's use of the card)
+REPRO measured_over_projected=0.756
+## the hold (each unprofiled run projected 43 s, stop 54,600 ms, outer 100 s; each profiled 50 s, stop 72,618 ms, outer 136 s)
+HOLD timing: lock taken 01:26:59 wait_s=.002496798
+HOLD tc11: exit 0 01:27:32
+HOLD ts5: exit 0 01:28:03
+HOLD tc12: exit 0 01:28:35
+HOLD tpc5: exit 0 01:29:08
+HOLD tps5: exit 0 01:29:40
+HOLD timing: released 01:29:40
+tc11 MEASURE lap=tc11 rc=0 wall_s=32.5 peak_rss_kib=388044
+ts5 MEASURE lap=ts5 rc=0 wall_s=31.1 peak_rss_kib=385432
+tc12 MEASURE lap=tc12 rc=0 wall_s=32.0 peak_rss_kib=384148
+tpc5 FIELD_PROFILE_SPLIT kernels_ms=27288 copies=3800 copies_ms=795 allocations=30400 allocations_ms=1202 elapsed_ms=32167
+tpc5 MEASURE lap=tpc5 rc=0 wall_s=32.6 peak_rss_kib=387352
+tps5 FIELD_PROFILE_SPLIT kernels_ms=26637 copies=3800 copies_ms=875 allocations=30400 allocations_ms=1221 elapsed_ms=31801
+tps5 MEASURE lap=tps5 rc=0 wall_s=32.3 peak_rss_kib=386760
+TIMING tc11 sections=100 equal_to_leg1=100/100 mean_section_ms=319.1
+TIMING ts5 sections=100 equal_to_leg1=100/100 mean_section_ms=305.0
+TIMING tc12 sections=100 equal_to_leg1=100/100 mean_section_ms=313.5
+TIMING tpc5 sections=100 equal_to_leg1=100/100 mean_section_ms=319.9
+TIMING tps5 sections=100 equal_to_leg1=100/100 mean_section_ms=316.3
+TIMING controls_spread_ms=5.6 controls_mean_ms=316.3 step_ms=305.0 step_over_controls=0.964 spread_over_controls=0.018 profiled_step_over_profiled_control=0.989
+ENTRY entry=field_contact_rows head=0 kind=still launches=400/400 control_ms_a_profiled_section=7.87 step_ms_a_profiled_section=6.94 step_over_control=0.882
+ENTRY entry=field_contact_rows head=1 kind=still launches=400/400 control_ms_a_profiled_section=6.36 step_ms_a_profiled_section=5.67 step_over_control=0.891
+ENTRY entry=field_contact_rows head=2 kind=paced launches=400/400 control_ms_a_profiled_section=9.60 step_ms_a_profiled_section=8.58 step_over_control=0.894
+ENTRY entry=field_contact_rows head=3 kind=paced launches=400/400 control_ms_a_profiled_section=9.99 step_ms_a_profiled_section=9.19 step_over_control=0.920
+ENTRY entry=field_contact_rows head=all control_ms_a_profiled_section=33.82 step_ms_a_profiled_section=30.38 step_over_control=0.898
+ENTRY entry=field_pace_skin_back head=2 kind=paced launches=400/400 control_ms_a_profiled_section=14.45 step_ms_a_profiled_section=8.32 step_over_control=0.576
+ENTRY entry=field_pace_skin_back head=3 kind=paced launches=400/400 control_ms_a_profiled_section=14.87 step_ms_a_profiled_section=8.34 step_over_control=0.561
+ENTRY entry=field_pace_skin_back head=all control_ms_a_profiled_section=29.32 step_ms_a_profiled_section=16.66 step_over_control=0.568
+STATE_SHA tc11 81377dbeaf26d65e 64954161619deda4
+STATE_SHA ts5 81377dbeaf26d65e 64954161619deda4
+STATE_SHA tc12 81377dbeaf26d65e 64954161619deda4
+STATE_SHA tpc5 81377dbeaf26d65e 64954161619deda4
+STATE_SHA tps5 81377dbeaf26d65e 64954161619deda4
+PROFILE entry=field_contact_rows control_ms=3381 step_ms=3037 ratio=0.898
+PROFILE entry=field_pace_skin_back control_ms=2931 step_ms=1665 ratio=0.568
+PROFILE entry=field_contact_l5 control_ms=2414 step_ms=2541 ratio=1.053
+PROFILE entry=field_contact_columns control_ms=2359 step_ms=2456 ratio=1.041
+PROFILE entry=field_transposed control_ms=1447 step_ms=1498 ratio=1.035
+PROFILE entry=field_outer_x32 control_ms=1280 step_ms=1352 ratio=1.056
+PROFILE entry=field_affine_tiled_x32 control_ms=1275 step_ms=1330 ratio=1.043
+PROFILE entry=field_clock_fill control_ms=860 step_ms=861 ratio=1.001
+PROFILE entry=field_exposure control_ms=828 step_ms=842 ratio=1.017
+PROFILE entry=field_skin_fill control_ms=792 step_ms=818 ratio=1.033
+PROFILE entry=field_moment_skinned_all control_ms=593 step_ms=598 ratio=1.008
+PROFILE entry=field_blank_bias_enc control_ms=516 step_ms=531 ratio=1.029
+PROFILE entry=field_blank_dy control_ms=418 step_ms=436 ratio=1.043
+PROFILE entry=field_outer_x64 control_ms=407 step_ms=417 ratio=1.025
+PROFILE note='the entries step 5 leaves unchanged read 1.02 to 1.30 in the profiled step: the card ran slower in that later run, so the two rebuilt entries' ratios (one profiled control each) stand at about +-5% resolution; the unprofiled section''s controls spread 0.018'
+## the two entries compiled (ptxas -O3 for sm_89, cuobjdump -sass; static counts)
+SASS build=main_50b1bad10 entry=field_contact_rows instructions=7816 IMAD=2710 IMAD_WIDE=643 IMAD_HI=64 IADD3=1351 LDG=116 STG=7 LDS=50 STS=23 LDL=92 STL=49 RED=30 BRA=234
+RESOURCES build=main_50b1bad10 entry=field_contact_rows registers=80 stack_octets=136 spill_store_octets=208 spill_load_octets=384 shared_octets=20128
+SASS build=main_50b1bad10 entry=field_pace_skin_back instructions=5232 IMAD=1609 IMAD_WIDE=391 IMAD_HI=72 IADD3=1210 LDG=62 STG=0 LDS=13 STS=8 LDL=0 STL=0 RED=15 BRA=179
+RESOURCES build=main_50b1bad10 entry=field_pace_skin_back registers=96 stack_octets=0 spill_store_octets=0 spill_load_octets=0 shared_octets=4256
+SASS build=step5_eed238f15 entry=field_contact_rows instructions=7576 IMAD=2665 IMAD_WIDE=634 IMAD_HI=64 IADD3=1350 LDG=116 STG=7 LDS=50 STS=23 LDL=2 STL=2 RED=30 BRA=234
+RESOURCES build=step5_eed238f15 entry=field_contact_rows registers=128 stack_octets=8 spill_store_octets=8 spill_load_octets=8 shared_octets=20128
+SASS build=step5_eed238f15 entry=field_pace_skin_back instructions=4024 IMAD=1329 IMAD_WIDE=319 IMAD_HI=50 IADD3=873 LDG=61 STG=0 LDS=14 STS=9 LDL=0 STL=0 RED=11 BRA=123
+RESOURCES build=step5_eed238f15 entry=field_pace_skin_back registers=96 stack_octets=0 spill_store_octets=0 spill_load_octets=0 shared_octets=4512
+## step 5 scored against G126's rule
+STEP5 entry=field_pace_skin_back read=0.568 (heads 0.576 0.561) guess=0.451 band=0.324..0.620 inside_band_above_guess (the rebuilt helpers kept 0.49 of the time the table gave them, against 0.35 fixed: inside 0.20..0.55)
+STEP5 entry=field_contact_rows read=0.898 (heads 0.882 0.891 0.894 0.920) guess=0.881 band=0.85..0.91 inside_band
+STEP5 section read=0.964 (controls 319.1 and 313.5 ms, spread 5.6 ms, 0.018; step 305.0 ms)

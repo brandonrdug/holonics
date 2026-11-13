@@ -2381,3 +2381,50 @@ G130 scored 2026-11-13T01:25Z (receipts beside G129's: rungs.c, band_ruler.py, b
   re-timed strand what ring n/lambda read of the original); this guess restated it without citing it, and what is new is its reading.
   Limits: one speaker, 481 seconds, a ratio of two, a reader of one step's bit length and sign (it cannot see pitch or formants, and
   equal codes are not equal knowledge), bands of one-pole rungs that overlap.
+
+G126 scored 2026-11-13T01:36Z (the PC's receipt p55_helpers.txt with helpers_table.py, the count record's receipts: the census from main 50b1bad10's
+source; a counting build whose kernels with no ruler flag are main's byte for byte and whose states are the line's; each helper's yardstick at
+its entry's launch shape; one hold: a profiled control, the parts' build, the rows at four blocks, a profiled control. Controls: the rows 34.27
+and 34.29 ms a profiled section, the skin's return 29.99 and 30.11).
+  (a) 0.621 (the crowds alone 0.419): HELD.
+  (b) 0.687 (the crowds alone 0.285): HELD.
+  (c) the rows on the paced clocks 0.010 (0.021 with the crowd divisors' own division): MISSED below, twelve times under the guess: one
+      division a crowd, 1,120,924 crowds a head, where a paced head's rows meet 10.0 and 10.9 million pairs. The skin's return 0.167 (the
+      bracket 0.107, the value 0.059): HELD.
+  (d) every checked product of the skin's return 0.401: MISSED above; the four a mode outside the skin covector 0.217, inside the range.
+      The premise was wrong by the two the skin covector holds itself.
+  (e) 0.881: MISSED below. At four blocks the entry keeps 128 registers and 8 octets of stack, where six cap it at 80 registers, 136 octets
+      of stack and 208 and 384 octets of spills.
+  The premises the census corrected: the skin's return forms four checked products a mode of a pair and six a mode of a crowd (two and four
+  were counted by hand); its bracket takes the 128 by 128 division at 0.94 of its calls, its value never; the turn's rate, a quotient that
+  is the head's and the mode's, was divided anew at every pair and mode; no checked product took its long path in the hundred sections.
+  The table, and its limit: count times yardstick sums to 1.37 of the rows' own time and 1.53 of the skin's return's, so a share is an upper
+  bound (a yardstick times its helper alone; an entry overlaps its helpers with each other and with its loads). By it the rows are their
+  pairs' products of two 64-bit words with their loads (0.87; 32 a pair, 45.67 million pairs a section over the four clocks, 0.65 of them on
+  open rows), then the atomic sums an entry of a crowd (0.296); the skin's return is its 64-bit products (0.44), the skin covector with the
+  turn's division (0.390), its atomic sums (0.289) and its checked products (0.217).
+  Rule applied: the helpers at 0.08 or more are rebuilt as step 5, and the rows' launch bounds change with it. In the rows no helper at 0.08
+  has a narrower proved form (the atomic sums go to four distinct addresses a lane; the quotients already use a divisor read once a crowd;
+  the products stand at their words since step 4), so the rows' only change is the bound.
+
+Step 5 scored 2026-11-13T01:36Z (the PC's receipt p55_step5.txt; PR #745, main 74c15a07c; its guess fixed in p55_helpers.txt before the read, by G126's
+rule on the table: the skin's return 0.451 of its control (0.324 to 0.620), the rows 0.881 (0.85 to 0.91)). Gate 1, the GPU suite (140 of 140),
+the reproduction (600 of 600 section lines, STATE.600 and MEAN.600 byte for byte), one hold (control, step 5, control, then both profiled).
+  The skin's return 0.568 (the two paced clocks 0.576 and 0.561; 29.32 to 16.66 ms a profiled section): inside the range, above the guess.
+  The rebuilt helpers kept 0.49 of the time the table gave them (0.35 fixed; 0.20 to 0.55): the table's shares are upper bounds, as read.
+  The rows 0.898 (0.882, 0.891, 0.894, 0.920; 33.82 to 30.38 ms): inside the range.
+  The section 0.964 (305.0 ms against controls of 319.1 and 313.5, which stand 0.018 apart): no guess was fixed for it. The two entries'
+  16.1 ms are 0.050 of a profiled section.
+  The reproduction's one differing field, ruled the same hour: the save line's count of batches, 601 against 600 (and its peak store). The
+  card's free memory at the open read 15,560,998,912 octets against 15,727,788,032 at step 4's, which put the batch's cut 831,364 octets
+  under one section's peak, so that section ran as two batches. A batch is a schedule (integer sums keep their bits on any partition), the
+  rule's subject is the section lines and the states, and those are equal: the reproduction holds. The comparison should name the two
+  fields as schedule fields beside the timings (ordered with P57).
+  What the profile says of the engine after five steps (control, ms a profiled section of 319.9, kernels 272.9): the rows 33.8, the skin's
+  return 29.3, the forward contact 24.1, the columns 23.6, the transposed site map 14.5, the two outer and affine site maps on 32-bit limbs
+  12.8 each, the clock's fill 8.6, the exposure 8.3, the skin's fill 7.9, and no other entry over 6. After step 5 no entry holds more than
+  0.115 of the kernels' time, and the section stands at 7.5 times the bar (40.7 ms). The profile is flat: a repair of one entry's helpers
+  moves the section by hundredths, and five of them have. The next repairs are of the section's structure, in the order of what each
+  holds (agent-inferred): the contact family as one launch a tick each way on a region resident in its block (the layout; 80 of the
+  section's 509 launches, and 111 ms of it in six of its entries after step 5), the site-local families fused the same way, and the
+  host's part beside the card's.

@@ -1,0 +1,211 @@
+# P55 part A (G126), 2026-11-13 UTC: the time of field_contact_rows and field_pace_skin_back by helper. The census from main 50b1bad10's source; the
+# counting build's calls on the pass's sections 2,001 to 2,100 from run 2's STATE.1900 (sha256 cda6ac8a1129f147); each helper's yardstick at its
+# entry's launch shape on operands sampled from those sections; one hold (a profiled control, the parts build, the rows at four blocks, a profiled
+# control); the table (helpers_table.py). Rulers on claude/engine-rulers (9899cfde0, a73bdb36e): no learner's build enables them, and with none the
+# kernels' PTX is main's byte for byte (read: equal). Numbers only.
+## the builds
+a73bdb36e + ruler source (--features ruler-calls) field_pass fb0c6e9da5bf1862d7a16e9b9ea792d3c5161f31f65e400fde4f62a71a702f01
+9899cfde0 + ruler source (--features ruler-parts) field_pass ff60bd23cd8f1606902e55cd9f2e3e2bc231e103d1c84c8dd8dd3f48f8dd3b72
+9899cfde0 + ruler source (--features ruler-rows-b4) field_pass 8ab4b7118abc2977cd20449c87496c630d6140db4ce7ea7e0aed6d8808b31452
+50b1bad10 (main, control) field_pass 43b866f93cd36e10d7e8570eb3af6f79d2b33146e24ba424a6432efe393a8f61
+## A1: the census, static, from the source at main 50b1bad10 (kernels/field.cu) and its SASS; each helper's calls, the loop each stands in and its
+## count a unit (P a pair, C a crowd, M a mode, E an entry lane of the span, R a row); agent-inferred from source, checked against the counting build
+CENSUS entry=field_contact_rows unit=R/warp layout='a warp a receiving row; a lane a support entry (passes A, B), an entry of the span with its part (B sums), a crowd slot (crowd blocks)'
+CENSUS entry=field_contact_rows helper=divisor_of calls=2 per=C loop='the crowds block (cdiv count, cdiv2 count^2)' note='holds a 128 by 64 software division ((~d) 2^64 + 2^64 - 1)/d'
+CENSUS entry=field_contact_rows helper=div_nearest_by calls=1 per=C loop='pass A, a crowd lane (its covector over count)'
+CENSUS entry=field_contact_rows helper=div_nearest_by calls=3 per=C.E loop='pass B, the crowd slots by entry lane (the probe role over count, the key share over count^2, the values share over count)'
+CENSUS entry=field_contact_rows helper=div_nearest calls=1 per=C loop='crowd_base_narrow, the crowds delta s' branch='paced clock: divisor count^2 2^77 > 2^63, the 128 by 128 branch at every call; still clock: count^2 2^17 under 2^63, the branch by |s|'
+CENSUS entry=field_contact_rows helper=mul_fits calls=1 per=C.E loop='pass B crowd slots (delta s_C times the key bracket)'
+CENSUS entry=field_contact_rows helper=mul_fits calls=1 per=R loop='temper_chain at lane 0 where the row has a temperature covector'
+CENSUS entry=field_contact_rows helper=mul_fits calls=3 per=C.M loop='lock_of, only for a mode crowd_base_narrow cannot prove (none counted)'
+CENSUS entry=field_contact_rows helper=add_fits calls=1 per=C.M loop='crowd_base_narrow, the sum over modes'
+CENSUS entry=field_contact_rows helper=sub_fits calls=1 per=C.M loop='lock_of, the fallback only'
+CENSUS entry=field_contact_rows helper=add_wide calls=4 per=C.E loop='pass B crowd slots (cw at lo and hi+1, cv at lo and hi+1); two 64-bit atomics each, the first returning'
+CENSUS entry=field_contact_rows helper=add_wide calls=1 per=R loop='lane 0, the temperature covector where nonzero'
+CENSUS entry=field_contact_rows helper=add_wide calls=2 per=R loop='lane 0, the covector shares near and far, where read (a reading)'
+CENSUS entry=field_contact_rows helper=atomicOr calls=0 per=- loop='refusals only'
+CENSUS entry=field_contact_rows helper=skin_back_dev,turn_rate_dev calls=0
+CENSUS entry=field_contact_rows helper=product_128x128 calls=5 per=P loop='pass A p dp (1); pass B the compare p (dp - mean) and ln2 x (2), dz sb (1), T dz (1)'
+CENSUS entry=field_contact_rows helper=product_128x128 calls=32+1 per=C loop='pass A: S=16 of dy x crowd_carried_wide_ij, which holds D x V (2 a step), ce dpc (1)'
+CENSUS entry=field_contact_rows helper=product_128x128 calls=4 per=C loop='crowd delta s: the compare (2), dz cs (1), T dz (1)'
+CENSUS entry=field_contact_rows helper=product_128x128 calls=6 per=C.E loop='pass B crowd slots, only where the crowd word W is 2^31 or more (none counted)'
+CENSUS entry=field_contact_rows helper=product_64x64 calls=32 per=P loop='pair_dp8 (16 mul64_128, 16 carry_d)'; product_64x64 calls=2 per=P.E loop='pass B probe role (mul32, mul64_128)'
+CENSUS entry=field_pace_skin_back unit=R/warp layout='a warp a receiving row of a paced head; a lane a support entry over the n=8 modes, then a crowd slot over the modes'
+CENSUS entry=field_pace_skin_back helper=mul_fits calls=4 per=P.M loop='e x inner, ds x bracket, and skin_back_dev E x D, release(E D,30) x b'
+CENSUS entry=field_pace_skin_back helper=mul_fits calls=6 per=C.M loop='dy vr, dy vi, ce (x+y), cds x bracket, and skin_back_dev two'
+CENSUS entry=field_pace_skin_back helper=turn_rate_dev calls=1 per=P.M and C.M loop='inside the skin_back call' branch='div_nearest(2 pi, n): 2 pi on 2^-46 under 2^63, the 64-bit branch at every call; the quotient is the head and the mode''s, the same at every pair'
+CENSUS entry=field_pace_skin_back helper=div_nearest calls=1 per=C.M loop='the value over count' branch='by data (counted: the 64-bit branch at every call)'
+CENSUS entry=field_pace_skin_back helper=div_nearest calls=1 per=C.M loop='the bracket over count^2' branch='by data: the numerator 2|C| pairing 2^30 is past 2^63 where 2|C| pairing 2^30 passes 2^63 (counted: 0.94 of calls the 128 by 128 branch)'
+CENSUS entry=field_pace_skin_back helper=add_wide calls=1 per=P.M loop='gsig at the source j (one address a pair, eight adds)'; add_wide calls=1 per=C.M loop='gsig at the crowd edge (one address a crowd)'; add_wide calls=1 per=R loop='own, lane 0'
+CENSUS entry=field_pace_skin_back helper=product_128x128 calls=1 per=P.M and C.M loop='sgn x at (a wide sign times a wide)'; calls=6 per=C.M loop='the bracket, only where W is 2^31 or more (none counted)'
+CENSUS entry=field_pace_skin_back helper=product_64x64 calls=7 per=P.M loop='inner (2 mul64_128), the lock w.k, k.k (4 mul32), 2 D |k|^2 (1 mulu64)'; calls=6 per=C.M loop='4 mul32, 2 mul64_128'
+CENSUS entry=field_contact_l5..l20 (contact_body) helper=crowd_score->crowd_base->lock_of calls=1 per=C (twice where the shares are stored) loop='the crowds chunk' note='lock_of a mode: 3 mul_fits, 2 add_fits, 1 sub_fits, 6 products 128x128; div_nearest by count^2 2^(17+2g): the 128 by 128 branch at every call on a paced clock'
+CENSUS entry=field_contact_l5..l20 helper=rowdiv_of,rowdiv_nearest calls=1+1 per=R, 1 per=P and C (the shares pass) note='the row divisor, read once a row'; atomicAdd calls=1 per=R (pairs met); no add_wide, no skin_back_dev
+CENSUS entry=field_contact_columns helper=none (no div, no mul_fits, no atomic: plain stores) products_128x128=6 per=P.E ('dsc x bracket, dec probe, dec dec word, e x carried, carried_ij_at D dy')
+CENSUS entry=field_exposure helper=lock_pair (64-bit products), add_fits calls=8 per=P (pair_base8), scored (T x base, 128x128) 1 per=P; crowd_score->crowd_base->lock_of 1 per=C (as in the contact); atomicMax 1 per=R
+CENSUS correction='G126 premise: the skin''s return forms four checked products a mode of a pair and six a mode of a crowd (two of each inside skin_back_dev), not two and four; the bracket over count^2 takes the 128 by 128 branch at 0.94 of its calls, not at every call; the value over count never does; the crowd lock does at every call on a paced clock, as read'
+## A2: the counting build's calls (lanes' calls a section; the table uses the warps' issues, the kinds' k + 1), by head and row, and the samples taken
+COUNTS head=0 kind=still row=definite rows=110724 pairs=7322111 crowds=1120924 crowd_entries=17934783 lock_modes=8967391 lock_fallbacks=0 w_wide=0 lockdiv64=1120924 lockdiv128=0 divisor_of=2241848 div_by=54925272 mul_fits_fast=18032749 mul_fits_slow=0 add_wide=71837097 | pace rows=0 pairs=0 signed_pairs=0 pair_modes=0 crowds=0 signed_crowds=0 turndiv64=0 turndiv128=0 valdiv64=0 valdiv128=0 brdiv64=0 brdiv128=0 mul_fits_fast=0 mul_fits_slow=0 add_wide=0 w_wide=0
+COUNTS head=0 kind=still row=open rows=52397 pairs=7461141 crowds=0 crowd_entries=0 lock_modes=0 lock_fallbacks=0 w_wide=0 lockdiv64=0 lockdiv128=0 divisor_of=0 div_by=0 mul_fits_fast=52169 mul_fits_slow=0 add_wide=52169 | pace rows=0 pairs=0 signed_pairs=0 pair_modes=0 crowds=0 signed_crowds=0 turndiv64=0 turndiv128=0 valdiv64=0 valdiv128=0 brdiv64=0 brdiv128=0 mul_fits_fast=0 mul_fits_slow=0 add_wide=0 w_wide=0
+COUNTS head=1 kind=still row=definite rows=110724 pairs=2480380 crowds=1120924 crowd_entries=17934783 lock_modes=8967391 lock_fallbacks=0 w_wide=0 lockdiv64=1120924 lockdiv128=0 divisor_of=2241848 div_by=54925272 mul_fits_fast=18032711 mul_fits_slow=0 add_wide=71837059 | pace rows=0 pairs=0 signed_pairs=0 pair_modes=0 crowds=0 signed_crowds=0 turndiv64=0 turndiv128=0 valdiv64=0 valdiv128=0 brdiv64=0 brdiv128=0 mul_fits_fast=0 mul_fits_slow=0 add_wide=0 w_wide=0
+COUNTS head=1 kind=still row=open rows=52397 pairs=7461141 crowds=0 crowd_entries=0 lock_modes=0 lock_fallbacks=0 w_wide=0 lockdiv64=0 lockdiv128=0 divisor_of=0 div_by=0 mul_fits_fast=52169 mul_fits_slow=0 add_wide=52169 | pace rows=0 pairs=0 signed_pairs=0 pair_modes=0 crowds=0 signed_crowds=0 turndiv64=0 turndiv128=0 valdiv64=0 valdiv128=0 brdiv64=0 brdiv128=0 mul_fits_fast=0 mul_fits_slow=0 add_wide=0 w_wide=0
+COUNTS head=2 kind=paced row=definite rows=110724 pairs=2553624 crowds=1120924 crowd_entries=17934783 lock_modes=8967391 lock_fallbacks=0 w_wide=0 lockdiv64=0 lockdiv128=1120924 divisor_of=2241848 div_by=54925272 mul_fits_fast=18033175 mul_fits_slow=0 add_wide=71837523 | pace rows=110724 pairs=2553624 signed_pairs=2553624 pair_modes=20428991 crowds=1120924 signed_crowds=1120924 turndiv64=29396382 turndiv128=0 valdiv64=8967391 valdiv128=0 brdiv64=543450 brdiv128=8423941 mul_fits_fast=135520312 mul_fits_slow=0 add_wide=29492153 w_wide=0
+COUNTS head=2 kind=paced row=open rows=52397 pairs=7461141 crowds=0 crowd_entries=0 lock_modes=0 lock_fallbacks=0 w_wide=0 lockdiv64=0 lockdiv128=0 divisor_of=0 div_by=0 mul_fits_fast=52169 mul_fits_slow=0 add_wide=52169 | pace rows=52397 pairs=7461141 signed_pairs=7461141 pair_modes=59689125 crowds=0 signed_crowds=0 turndiv64=59689125 turndiv128=0 valdiv64=0 valdiv128=0 brdiv64=0 brdiv128=0 mul_fits_fast=238756499 mul_fits_slow=0 add_wide=59741382 w_wide=0
+COUNTS head=3 kind=paced row=definite rows=110724 pairs=3465481 crowds=1120924 crowd_entries=17934783 lock_modes=8967391 lock_fallbacks=0 w_wide=0 lockdiv64=0 lockdiv128=1120924 divisor_of=2241848 div_by=54925272 mul_fits_fast=18033086 mul_fits_slow=0 add_wide=71837435 | pace rows=110724 pairs=3465481 signed_pairs=3465481 pair_modes=27723845 crowds=1120924 signed_crowds=1120924 turndiv64=36691236 turndiv128=0 valdiv64=8967391 valdiv128=0 brdiv64=734023 brdiv128=8233368 mul_fits_fast=164699726 mul_fits_slow=0 add_wide=36788000 w_wide=0
+COUNTS head=3 kind=paced row=open rows=52397 pairs=7461141 crowds=0 crowd_entries=0 lock_modes=0 lock_fallbacks=0 w_wide=0 lockdiv64=0 lockdiv128=0 divisor_of=0 div_by=0 mul_fits_fast=52169 mul_fits_slow=0 add_wide=52169 | pace rows=52397 pairs=7461141 signed_pairs=7461141 pair_modes=59689125 crowds=0 signed_crowds=0 turndiv64=59689125 turndiv128=0 valdiv64=0 valdiv128=0 brdiv64=0 brdiv128=0 mul_fits_fast=238756499 mul_fits_slow=0 add_wide=59741368 w_wide=0
+FIELD_SAMPLES kind=0 taken=16398
+FIELD_SAMPLES kind=1 taken=16484
+FIELD_SAMPLES kind=2 taken=17408
+FIELD_SAMPLES kind=3 taken=19008
+FIELD_SAMPLES kind=4 taken=20464
+FIELD_SAMPLES kind=5 taken=20144
+FIELD_SAMPLES kind=6 taken=18915
+FIELD_SAMPLES kind=7 taken=18804
+FIELD_SAMPLES kind=8 taken=18926
+FIELD_SAMPLES kind=9 taken=16771
+FIELD_SAMPLES kind=10 taken=16557
+FIELD_SAMPLES kind=11 taken=19024
+COUNT_RUN FIELD_CARD reads=0 read_ms=0 returns=100 return_ms=32547 pairs=4566615773 batches=100 peak_store=8410613236 landmarks=0 landmark_ms=0 elapsed_ms=34166
+COUNT_RUN MEASURE lap=count rc=0 wall_s=53.1 peak_rss_kib=628012
+STATE_SHA count 81377dbeaf26d65e 64954161619deda4
+LINES count sections=100 equal_to_leg1=100/100 mean_section_ms=339.2
+## A3: the yardsticks (a loaded sample serves eight calls, save the atomics' kinds 5, 6 and the loads' 15): kinds 0, 1 the crowd lock's division on a
+## paced and a still clock; 2, 3 the read divisor's division; 4 the rows' mul_fits; 5 add_wide at the rows' own addresses, 6 at a thread's own;
+## 7, 8 the skin's return's mul_fits; 9 skin_back_dev with turn_rate_dev; 10 turn_rate_dev alone; 11, 12 the skin's crowd divisions (bracket,
+## value); 13 a 64 by 64 product; 14 a 128 by 128 product; 15 the loads alone; 16, 17 divisor_of (count^2, count)
+FIELD_HELPER kind=0 blocks=10196 threads_a_block=128 reps=1751 seconds=0.5349 warp_issues=571302272 lane_calls=18281672704 ns_a_warp_issue=0.9363 ns_a_lane_call=0.02926
+FIELD_HELPER kind=1 blocks=10196 threads_a_block=128 reps=2399 seconds=0.5289 warp_issues=782726528 lane_calls=25047248896 ns_a_warp_issue=0.6757 ns_a_lane_call=0.02112
+FIELD_HELPER kind=2 blocks=10196 threads_a_block=128 reps=3601 seconds=0.4282 warp_issues=1174905472 lane_calls=37596975104 ns_a_warp_issue=0.3644 ns_a_lane_call=0.01139
+FIELD_HELPER kind=3 blocks=10196 threads_a_block=128 reps=3883 seconds=0.4575 warp_issues=1266914176 lane_calls=40541253632 ns_a_warp_issue=0.3611 ns_a_lane_call=0.01128
+FIELD_HELPER kind=4 blocks=10196 threads_a_block=128 reps=6918 seconds=0.3340 warp_issues=2257149696 lane_calls=72228790272 ns_a_warp_issue=0.1480 ns_a_lane_call=0.00462
+FIELD_HELPER kind=5 blocks=10196 threads_a_block=128 reps=10720 seconds=0.3906 warp_issues=437204480 lane_calls=13990543360 ns_a_warp_issue=0.8934 ns_a_lane_call=0.02792
+FIELD_HELPER kind=6 blocks=10196 threads_a_block=128 reps=12251 seconds=0.3569 warp_issues=499644784 lane_calls=15988633088 ns_a_warp_issue=0.7142 ns_a_lane_call=0.02232
+FIELD_HELPER kind=7 blocks=10196 threads_a_block=128 reps=5288 seconds=0.4846 warp_issues=1725326336 lane_calls=55210442752 ns_a_warp_issue=0.2809 ns_a_lane_call=0.00878
+FIELD_HELPER kind=8 blocks=10196 threads_a_block=128 reps=5434 seconds=0.4993 warp_issues=1772962048 lane_calls=56734785536 ns_a_warp_issue=0.2816 ns_a_lane_call=0.00880
+FIELD_HELPER kind=9 blocks=10196 threads_a_block=128 reps=1266 seconds=0.4949 warp_issues=413060352 lane_calls=13217931264 ns_a_warp_issue=1.1982 ns_a_lane_call=0.03744
+FIELD_HELPER kind=10 blocks=10196 threads_a_block=128 reps=2164 seconds=0.5348 warp_issues=706052608 lane_calls=22593683456 ns_a_warp_issue=0.7574 ns_a_lane_call=0.02367
+FIELD_HELPER kind=11 blocks=10196 threads_a_block=128 reps=1164 seconds=0.4857 warp_issues=379780608 lane_calls=12152979456 ns_a_warp_issue=1.2790 ns_a_lane_call=0.03997
+FIELD_HELPER kind=12 blocks=10196 threads_a_block=128 reps=2339 seconds=0.5312 warp_issues=763150208 lane_calls=24420806656 ns_a_warp_issue=0.6960 ns_a_lane_call=0.02175
+FIELD_HELPER kind=13 blocks=10196 threads_a_block=128 reps=7542 seconds=0.4924 warp_issues=2460743424 lane_calls=78743789568 ns_a_warp_issue=0.2001 ns_a_lane_call=0.00625
+FIELD_HELPER kind=14 blocks=10196 threads_a_block=128 reps=14156 seconds=0.4999 warp_issues=4618706432 lane_calls=147798605824 ns_a_warp_issue=0.1082 ns_a_lane_call=0.00338
+FIELD_HELPER kind=15 blocks=10196 threads_a_block=128 reps=15316 seconds=0.4061 warp_issues=624647744 lane_calls=19988727808 ns_a_warp_issue=0.6501 ns_a_lane_call=0.02031
+FIELD_HELPER kind=16 blocks=10196 threads_a_block=128 reps=3241 seconds=0.4961 warp_issues=1057447552 lane_calls=33838321664 ns_a_warp_issue=0.4691 ns_a_lane_call=0.01466
+FIELD_HELPER kind=17 blocks=10196 threads_a_block=128 reps=3103 seconds=0.4765 warp_issues=1012422016 lane_calls=32397504512 ns_a_warp_issue=0.4706 ns_a_lane_call=0.01471
+## A4: the hold (each run projected at most 46 s; stop 72,618 ms; outer 136 s)
+HOLD hold: lock taken 01:05:54 wait_s=.001929306
+HOLD tc9: exit 0 01:06:28
+HOLD tparts: exit 0 01:07:10
+HOLD tb4: exit 0 01:07:53
+HOLD tc10: exit 0 01:08:27
+HOLD hold: released 01:08:27
+tc9 FIELD_PROFILE_SPLIT kernels_ms=28169 copies=3800 copies_ms=861 allocations=30400 allocations_ms=1173 elapsed_ms=33187
+tc9 MEASURE lap=tc9 rc=0 wall_s=33.7 peak_rss_kib=386548
+tparts FIELD_PROFILE_SPLIT kernels_ms=34890 copies=3800 copies_ms=811 allocations=48000 allocations_ms=2947 elapsed_ms=41667
+tparts MEASURE lap=tparts rc=0 wall_s=42.1 peak_rss_kib=386908
+tb4 FIELD_PROFILE_SPLIT kernels_ms=27793 copies=3800 copies_ms=682 allocations=30400 allocations_ms=1175 elapsed_ms=32675
+tb4 MEASURE lap=tb4 rc=0 wall_s=42.9 peak_rss_kib=623488
+tc10 FIELD_PROFILE_SPLIT kernels_ms=28178 copies=3800 copies_ms=776 allocations=30400 allocations_ms=1178 elapsed_ms=33155
+tc10 MEASURE lap=tc10 rc=0 wall_s=33.6 peak_rss_kib=385108
+STATE_SHA tc9 81377dbeaf26d65e 64954161619deda4
+STATE_SHA tparts 81377dbeaf26d65e 64954161619deda4
+STATE_SHA tb4 81377dbeaf26d65e 64954161619deda4
+STATE_SHA tc10 81377dbeaf26d65e 64954161619deda4
+LINES tc9 sections=100 equal_to_leg1=100/100 mean_section_ms=330.2
+LINES tparts sections=100 equal_to_leg1=100/100 mean_section_ms=415.0
+LINES tb4 sections=100 equal_to_leg1=100/100 mean_section_ms=325.0
+LINES tc10 sections=100 equal_to_leg1=100/100 mean_section_ms=329.8
+ENTRY rows control1=34.27 control2=34.29 spread=0.02 pairs_only=21.29 (0.621) crowds_only=14.37 (0.419) four_blocks=30.21 (0.881)
+ENTRY pace control1=29.99 control2=30.11 spread=0.12 pairs_only=20.64 (0.687) crowds_only=8.55 (0.285)
+PARTS head=0 kind=still rows=7.94 rows_pairs=5.20 rows_crowds=3.17 rows_b4=6.94
+PARTS head=1 kind=still rows=6.39 rows_pairs=3.78 rows_crowds=3.05 rows_b4=5.67
+PARTS head=2 kind=paced rows=9.76 rows_pairs=5.96 rows_crowds=4.05 rows_b4=8.50 pace=14.75 pace_pairs=9.94 pace_crowds=4.29
+PARTS head=3 kind=paced rows=10.18 rows_pairs=6.34 rows_crowds=4.09 rows_b4=9.11 pace=15.31 pace_pairs=10.70 pace_crowds=4.26
+SASS build=main_50b1bad10 entry=field_contact_rows instructions=7816 IMAD=2710 IMAD_WIDE=643 IMAD_HI=64 IADD3=1351 LDG=116 STG=7 LDS=50 STS=23 LDL=92 STL=49 RED=30 BRA=234
+RESOURCES build=main_50b1bad10 entry=field_contact_rows registers=80 stack_octets=136 spill_store_octets=208 spill_load_octets=384 shared_octets=20128
+SASS build=rows_b4 entry=field_contact_rows instructions=7576 IMAD=2665 IMAD_WIDE=634 IMAD_HI=64 IADD3=1350 LDG=116 STG=7 LDS=50 STS=23 LDL=2 STL=2 RED=30 BRA=234
+RESOURCES build=rows_b4 entry=field_contact_rows registers=128 stack_octets=8 spill_store_octets=8 spill_load_octets=8 shared_octets=20128
+## A5: the table (count of warp issues times the helper's yardstick, ms a profiled section). The helpers' sums pass the entries' own times (the
+## remainders negative): a yardstick times its helper alone, where the entry overlaps its helpers with each other and with its loads, and the cheap
+## products' yardsticks stand on their own loop and loads. The shares are upper bounds; the parts' reading of A4 is the measured partition.
+TABLE entry=field_contact_rows head=0 kind=still helper=div128_crowd_lock ms=0.075 share=0.009 issues=0+110550(64)
+TABLE entry=field_contact_rows head=0 kind=still helper=divisor_of ms=0.104 share=0.013 issues=221101
+TABLE entry=field_contact_rows head=0 kind=still helper=div_nearest_by ms=0.771 share=0.097 issues=2125075
+TABLE entry=field_contact_rows head=0 kind=still helper=mul_fits ms=0.122 share=0.015 issues=821644+0(full)
+TABLE entry=field_contact_rows head=0 kind=still helper=add_wide ms=2.534 share=0.319 issues=2836168
+TABLE entry=field_contact_rows head=0 kind=still helper=products_128 ms=0.750 share=0.094 issues=5 pair+2 crowd_x+5 crowd+6 w_wide+4 fallback
+TABLE entry=field_contact_rows head=0 kind=still helper=products_64 ms=8.800 share=1.108 issues=32 pair+2 probe+8 crowd_entry+6 lock_mode
+TABLE entry=field_contact_rows head=0 kind=still helper=remainder ms=-5.214 share=-0.657 entry_ms=7.941
+TABLE entry=field_contact_rows head=1 kind=still helper=div128_crowd_lock ms=0.075 share=0.012 issues=0+110550(64)
+TABLE entry=field_contact_rows head=1 kind=still helper=divisor_of ms=0.104 share=0.016 issues=221101
+TABLE entry=field_contact_rows head=1 kind=still helper=div_nearest_by ms=0.771 share=0.121 issues=2125075
+TABLE entry=field_contact_rows head=1 kind=still helper=mul_fits ms=0.122 share=0.019 issues=821605+0(full)
+TABLE entry=field_contact_rows head=1 kind=still helper=add_wide ms=2.534 share=0.396 issues=2836130
+TABLE entry=field_contact_rows head=1 kind=still helper=products_128 ms=0.666 share=0.104 issues=5 pair+2 crowd_x+5 crowd+6 w_wide+4 fallback
+TABLE entry=field_contact_rows head=1 kind=still helper=products_64 ms=6.818 share=1.066 issues=32 pair+2 probe+8 crowd_entry+6 lock_mode
+TABLE entry=field_contact_rows head=1 kind=still helper=remainder ms=-4.694 share=-0.734 entry_ms=6.395
+TABLE entry=field_contact_rows head=2 kind=paced helper=div128_crowd_lock ms=0.104 share=0.011 issues=110550+0(64)
+TABLE entry=field_contact_rows head=2 kind=paced helper=divisor_of ms=0.104 share=0.011 issues=221101
+TABLE entry=field_contact_rows head=2 kind=paced helper=div_nearest_by ms=0.771 share=0.079 issues=2125075
+TABLE entry=field_contact_rows head=2 kind=paced helper=mul_fits ms=0.122 share=0.012 issues=822070+0(full)
+TABLE entry=field_contact_rows head=2 kind=paced helper=add_wide ms=2.534 share=0.260 issues=2836595
+TABLE entry=field_contact_rows head=2 kind=paced helper=products_128 ms=0.670 share=0.069 issues=5 pair+2 crowd_x+5 crowd+6 w_wide+4 fallback
+TABLE entry=field_contact_rows head=2 kind=paced helper=products_64 ms=6.879 share=0.705 issues=32 pair+2 probe+8 crowd_entry+6 lock_mode
+TABLE entry=field_contact_rows head=2 kind=paced helper=remainder ms=-1.424 share=-0.146 entry_ms=9.759
+TABLE entry=field_pace_skin_back head=2 kind=paced helper=div128_bracket ms=1.681 share=0.114 issues=1314566 (64: 406665)
+TABLE entry=field_pace_skin_back head=2 kind=paced helper=div_value ms=0.922 share=0.063 issues=0(128)+1324884(64)
+TABLE entry=field_pace_skin_back head=2 kind=paced helper=skin_back_with_turn ms=5.808 share=0.394 issues=4847455 (turn's division 64: 4668634, 128: 0)
+TABLE entry=field_pace_skin_back head=2 kind=paced helper=mul_fits_outside_skin_back ms=3.271 share=0.222 issues=11629393 (full 0 of all)
+TABLE entry=field_pace_skin_back head=2 kind=paced helper=add_wide ms=4.303 share=0.292 issues=4816662
+TABLE entry=field_pace_skin_back head=2 kind=paced helper=products_128 ms=0.524 share=0.036 issues=pair_modes+8 signed_crowds+6 w_wide
+TABLE entry=field_pace_skin_back head=2 kind=paced helper=products_64 ms=6.489 share=0.440 issues=7 pair_mode+48 signed_crowd
+TABLE entry=field_pace_skin_back head=2 kind=paced helper=remainder ms=-8.252 share=-0.560 entry_ms=14.747
+TABLE entry=field_contact_rows head=3 kind=paced helper=div128_crowd_lock ms=0.104 share=0.010 issues=110550+0(64)
+TABLE entry=field_contact_rows head=3 kind=paced helper=divisor_of ms=0.104 share=0.010 issues=221101
+TABLE entry=field_contact_rows head=3 kind=paced helper=div_nearest_by ms=0.771 share=0.076 issues=2125075
+TABLE entry=field_contact_rows head=3 kind=paced helper=mul_fits ms=0.122 share=0.012 issues=821981+0(full)
+TABLE entry=field_contact_rows head=3 kind=paced helper=add_wide ms=2.534 share=0.249 issues=2836506
+TABLE entry=field_contact_rows head=3 kind=paced helper=products_128 ms=0.682 share=0.067 issues=5 pair+2 crowd_x+5 crowd+6 w_wide+4 fallback
+TABLE entry=field_contact_rows head=3 kind=paced helper=products_64 ms=7.209 share=0.708 issues=32 pair+2 probe+8 crowd_entry+6 lock_mode
+TABLE entry=field_contact_rows head=3 kind=paced helper=remainder ms=-1.341 share=-0.132 entry_ms=10.185
+TABLE entry=field_pace_skin_back head=3 kind=paced helper=div128_bracket ms=1.549 share=0.101 issues=1211131 (64: 500118)
+TABLE entry=field_pace_skin_back head=3 kind=paced helper=div_value ms=0.854 share=0.056 issues=0(128)+1227688(64)
+TABLE entry=field_pace_skin_back head=3 kind=paced helper=skin_back_with_turn ms=5.912 share=0.386 issues=4933781 (turn's division 64: 4754475, 128: 0)
+TABLE entry=field_pace_skin_back head=3 kind=paced helper=mul_fits_outside_skin_back ms=3.264 share=0.213 issues=11605714 (full 0 of all)
+TABLE entry=field_pace_skin_back head=3 kind=paced helper=add_wide ms=4.381 share=0.286 issues=4903482
+TABLE entry=field_pace_skin_back head=3 kind=paced helper=products_128 ms=0.534 share=0.035 issues=pair_modes+8 signed_crowds+6 w_wide
+TABLE entry=field_pace_skin_back head=3 kind=paced helper=products_64 ms=6.629 share=0.433 issues=7 pair_mode+48 signed_crowd
+TABLE entry=field_pace_skin_back head=3 kind=paced helper=remainder ms=-7.817 share=-0.511 entry_ms=15.306
+SHARE entry=rows helper=add_wide ms=10.136 share_of_entry=0.296 rebuilt_by_rule=yes
+SHARE entry=rows helper=div128_crowd_lock ms=0.356 share_of_entry=0.010 rebuilt_by_rule=no
+SHARE entry=rows helper=div_nearest_by ms=3.083 share_of_entry=0.090 rebuilt_by_rule=yes
+SHARE entry=rows helper=divisor_of ms=0.416 share_of_entry=0.012 rebuilt_by_rule=no
+SHARE entry=rows helper=mul_fits ms=0.487 share_of_entry=0.014 rebuilt_by_rule=no
+SHARE entry=rows helper=products_128 ms=2.768 share_of_entry=0.081 rebuilt_by_rule=yes
+SHARE entry=rows helper=products_64 ms=29.706 share_of_entry=0.867 rebuilt_by_rule=yes
+SHARE entry=pace helper=add_wide ms=8.684 share_of_entry=0.289 rebuilt_by_rule=yes
+SHARE entry=pace helper=div128_bracket ms=3.230 share_of_entry=0.107 rebuilt_by_rule=yes
+SHARE entry=pace helper=div_value ms=1.777 share_of_entry=0.059 rebuilt_by_rule=no
+SHARE entry=pace helper=mul_fits_outside_skin_back ms=6.535 share_of_entry=0.217 rebuilt_by_rule=yes
+SHARE entry=pace helper=products_128 ms=1.058 share_of_entry=0.035 rebuilt_by_rule=no
+SHARE entry=pace helper=products_64 ms=13.118 share_of_entry=0.437 rebuilt_by_rule=yes
+SHARE entry=pace helper=skin_back_with_turn ms=11.720 share_of_entry=0.390 rebuilt_by_rule=yes
+## G126 scored
+G126 a rows_without_crowds=0.621 guess=0.50 band=0.30..0.70
+G126 b pace_without_crowds=0.687 guess=0.55 band=0.35..0.75
+G126 c rows_paced_division_128=0.010 (with divisor_of's own division 0.021) guess=0.12 band=0.04..0.25; pace_divisions=0.167 guess=0.30 band=0.12..0.50
+G126 d pace_checked_products=0.401 (outside skin_back_dev 0.217) guess=0.20 band=0.08..0.35
+G126 e rows_four_blocks=0.881 guess=1.00 band=0.90..1.12
+G126 score a=held (0.621, band 0.30..0.70) b=held (0.687, 0.35..0.75) c=rows missed below (0.010, 0.04..0.25), skin's return held (0.167, 0.12..0.50)
+G126 score d=held on the direct checked products (0.217, 0.08..0.35; with skin_back_dev's two 0.401, above) e=missed below (0.881, 0.90..1.12): the launch bounds change with step 5
+## step 5 by G126's rule (helpers at 0.08 or more of either entry, rebuilt in the form their bounds prove)
+RULE entry=rows helpers_at_0.08=add_wide,div_nearest_by,products_128,products_64 rebuilt=none (add_wide: four distinct addresses a lane, no same-address sums; div_nearest_by: already the read divisor a crowd; the products: at the words their bounds prove since step 4, the 128 by 128 ones observed only)
+RULE entry=rows launch_bounds=6->4 (G126 e)
+RULE entry=pace skin_back_with_turn: the turn rate read once a mode a block; skin_back_dev's two checks plain (|E| <= 2^65, D <= 2^30, |b| < 2^33)
+RULE entry=pace add_wide: a mode's sums to the source and to the crowd's edge summed on the lane, one add a pair and a crowd
+RULE entry=pace div128_bracket and div_value (one helper, a quotient by the count or its square a mode): divisor_of once a crowd, div_nearest_by a mode
+RULE entry=pace mul_fits_outside_skin_back (0.217): kept, no bound proves the value's, the lock's or the crowd's products under 2^127
+RULE other_entries=none hold the rebuilt helpers (turn_rate_dev and skin_back_dev are the skin's return's alone among the five; the crowd lock's quotient, in the exposure and the contact, stays at 0.010)
+STEP5_STEP5_PREDICTION fixed 2026-11-13 before the read, by G126's rule on p55's A5 table (a rebuilt helper keeps 0.35 of the time the table gave it, 0.20 to 0.55):
+STEP5_  field_pace_skin_back rebuilt helpers' summed share 0.845 (skin_back_with_turn 0.390, add_wide 0.289, div128_bracket 0.107, div_value 0.059): reads 0.451 of its control (0.324 to 0.620).
+STEP5_  field_contact_rows: its only change is the launch bound (G126 e); reads the four-block reading, 0.881 (0.85 to 0.91).
+PROJECTION count projected=about 60 s (39 s of sections, the yardsticks, the open) outer=150 measured_wall=53.1 s; hold runs projected at most 46 s each, measured 34.6 to 42.3 s wall
