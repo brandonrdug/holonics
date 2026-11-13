@@ -2077,3 +2077,56 @@ news, 1.057 and 1.089 pooled).
   0.85 or under with (c) inside its band: one clock cuts the level above, with equal news an epoch and a screening place at each
   opening. The own code over 0.85 and a friction cut at 0.85 or under: the level above is cut at the friction clock's carries and its
   load is read on the news. All of it is a count ruler's on public text at two bytes back; the machine's face is its own.
+
+G123 scored 2026-11-13T00:04Z (the same thread). Receipt screen_ruler.txt (the design record's receipts). Counts on 16 to 32 MB a slice of one public
+shard, 330,000 held places a slice of another.
+  (a) MISSED on both clocks, low. On the code slice the rates' rank correlation with minus a symbol's transmission reads 0.302 on the
+      clock with the newline at 14.46 (fixed 0.55, 0.40 to 0.75) and 0.261 on the other (fixed 0.50, 0.35 to 0.70); the first stands 0.03
+      over its correlation with the class-mean code, the second 0.17 under. By slice 0.28, 0.35, 0.28, -0.14 and 0.28, 0.39, 0.23, -0.08.
+      Why it missed (agent-inferred): the ruler's transmission is read across one place at two bytes back, and by it the digits and the
+      newline are the most opaque and the space among the least (0.229, a lower-case letter's 0.217), where the rates put the space over
+      a lower-case letter on one clock. No count of one symbol read here ranks the rates past 0.56: they are each clock's own.
+  (b) Screen ratios, pooled: fixed packets 1.001 (held); the trained rates 0.861 and 0.904 (fixed 0.80 and 0.85; both held), 0.775 and
+      0.873 on the code slice; the place's own code 0.822 (fixed 0.70, 0.50 to 0.90; held), by slice 0.839, 0.833, 0.811, 0.980, 0.637;
+      the symbol's friction on the counts stream 0.893 (fixed 0.55, 0.40 to 0.75): MISSED high, a constant a symbol screens no better
+      than the trained rates do.
+  (c) The spread of an epoch's news under the place's own code with the carrying place opening: 0.167 (fixed 0.17): held. The two
+      places before an opening place tell 0.379 as much of it as of another place; under every constant a symbol that ratio is 0.96 to
+      1.16.
+  Rule applied. (a) missed on both: no second quantity is read at a place, the stride's two sums are not parted and a symbol's length
+  is not made a complex number of its own angle. (b) with (c): the place's own code screens at 0.822 with the news an epoch even, so
+  one clock cuts the level above. What stays open, named and unbuilt on: on the slice they were trained on the first clock's carries
+  screen more than the own code's (0.775 against 0.839) while standing blind to the news (1.07), so the rates hold a cut of their
+  own that no count of one symbol explains.
+
+G124 fixed 2026-11-13T00:04Z (the same thread), before its ruler is written or run: whether a cut by carries keeps its sites when what stands before
+them changes, and what a written place's stride may read.
+Read first: G123's receipt and the atlas (wave.arrival-word-is-not-the-mean-rate: a locked ring's arrival word is not the carry word of
+its mean rate; hnn.tower-news-clock and its carry law: a level ticks where the summed code crosses a multiple of its section, the
+remainder kept; no row holds a cut that begins again at its own openings).
+  The derivation (agent-inferred; the design record states it). The odometer's carry of October places an epoch's opening by the whole
+  sum before it. A place opens when a threshold falls inside its stride, and a threshold's place depends on every code before it: the
+  same stretch met after another prefix is cut at other places, with the chance c/sigma that a place of code c opens. A change of clock
+  that adds any code at all, however little, moves every later opening. That privileges an origin as the fixed packets privilege a
+  rate. A cut that begins its sum again at each opening (an epoch opens at the place whose code would carry the news since the last
+  opening past the section, and that place's code begins the next sum; the remainder is inside the epoch's own length, so the lengths
+  still sum to the strand's) depends on the prefix only through the last opening: two readings of one stretch agree from the first
+  opening they share.
+  The ruler (as screen_ruler.py; cuts at a mean epoch of 6 places, the carrying place opening, read on the two-back code c2).
+  (a) The restarting cut by the place's own code, pooled: the opening places' code over the others' 1.75 (1.55 to 1.95); the spread of
+      an epoch's news 0.14 (0.10 to 0.18), under the odometer's 0.167.
+  (b) A shifted start (each piece's sum begun at an offset drawn evenly on one section, by a fixed generator): the share of the
+      unshifted cut's openings, a piece's first place left out, that the shifted cut also opens. Odometer by own code 0.35 (0.25 to
+      0.45); restarting by own code 0.93 (0.85 to 0.98); fixed packets with the start shifted by 1 to 5 places, 0.00 by construction.
+  (c) A change of clock the count reader predicts, on the code slice: every line's leading spaces doubled, the codes read again on the
+      copy with the same counts and each cut's own period kept. The share of the original's openings (leading spaces and a piece's first
+      place left out) whose place opens in the copy: odometer by own code 0.40 (0.25 to 0.55); restarting by own code 0.85 (0.72 to
+      0.95); fixed packets 0.20 (0.15 to 0.30).
+  (d) What a written place's stride may read, restarting cuts read on c2, pooled: the one-back code c1 (a pair's form), opening ratio
+      1.45 (1.30 to 1.60) and spread 0.22 (0.17 to 0.28); the code with one neighbour known a side (the place before and the place
+      after), 1.30 (1.15 to 1.45) and 0.26 (0.20 to 0.32); the class mean 1.28 (1.22 to 1.34) and 0.29 (0.25 to 0.33).
+  Rule. (b) and (c): the restarting cut at 0.80 or over on both with the odometer at 0.55 or under on both: the level above is cut by
+  the restarting carry, and October's odometer stands as the law of a level's count, never of where its sites open. Otherwise the
+  odometer stands for both. (d): a form that reads 0.60 or more of the own code's lift ((ratio - 1) over the own code's (ratio - 1))
+  with a spread of 0.25 or under is the written place's stride in the design; if neither the pair's form nor the two-sided form
+  does, a written place's stride needs a face of its own, and its cost is counted against the card before a build is ordered.
