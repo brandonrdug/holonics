@@ -2843,3 +2843,28 @@ Reading [agent-inferred]. (d) missed because its premise was not read at source 
 copies of layouts, and it is two passes of a step's arithmetic at about 20 billionths of a second an entry. The section stands at 6.9
 times the bar of 40.7 ms, and the kernels hold 267.6 of a profiled section's 289.9 ms: what is left of the host is 10 ms of deposit
 and about 4 of takes and copies, so the rate is now the kernels' (G131's schedule read, then the structural step).
+
+G131 scored 2026-11-13T03:24Z (receipt p57_schedule.txt with its generator schedule.py and the source survey kernel_survey.tsv on claude/carry-reads at
+9f922a5cf; the launch trace, a reading, on claude/engine-schedule at 3d9207f88: 100 traced sections print the line's 100 section lines,
+STATE.100 81377dbeaf26d65e and MEAN.100 64954161619deda4 the line's). One store-trainer section of 218 regions and 41,462 sites (the
+largest region 742 sites, the median 137) is 510 launches, the same 510 in the same order each section; the kernels hold 267.4 ms of a
+profiled section, the fourteen entries step 5 printed 184.3 of it and the 56 others 83.1.
+  (a) 56 entries against 45 (30 to 70): held. 297 launches a section against 330 (250 to 400): held. 0.279 ms a launch against 0.24
+      (0.19 to 0.31): held.
+  (b) the moments' and clocks' entries hold 0.288 of the 83.1 ms (23.9 ms) against 0.45 (0.30 to 0.60): missed below.
+  (c) the launches whose grid cannot fill the card hold 0.067 of the traced kernels' time (0.068 by the profile, 18.2 ms a section)
+      against 0.30 (0.15 to 0.45): missed below. Each of the eleven heaviest entries fills the card.
+  (d) entries that read nothing another region's launch wrote in the tick hold 0.793 (212.0 ms) against 0.85 (0.70 to 0.95): held.
+      The couplings: the contact's carrier width, one maximum over the batch fetched by the host each tick between the exposure and
+      the contact, 29.4 ms (0.110); the deposits' sums over tiles of the batch, 26.0 ms (0.097). No kernel reads another region's
+      values.
+  Four parts held, two missed. The premise was half wrong: a launch that runs as long as its largest region exists (twelve entries
+  whose unit is a region hold 31.0 ms, 0.116, the largest region 5.4 times the median), and it is not where the time stands. The time
+  stands in launches that fill the card and move few octets: by family against the count's floors at the card's lanes and its octets a
+  second, the contact 115.6 ms against 4.67 (24.7 times, 0.040 of the card's octets a second), the site maps 56.3 against 5.44 (10.3
+  times), the small site kernels 34.3 against 0.68 (50 times), the moments and clocks 29.9 against 0.23 (132 times), the blank clocks
+  16.5 against 0.79 (21 times), the faces 4.9 against 0.26 (19 times), the carry circles 9.8 with no product counted; all kernels
+  267.4 against 12.08 (22.1 times, 0.045 of the card's octets a second). The octets stand by family from the count: the card keeps
+  its profiling counters to its administrators, so no launch's octets were read.
+  Rule applied. (c) under 0.15: the contact's layout alone is ordered first (a pair's record in walk order, its forward entries one
+  launch and its return's one), and the small launches stay. (d) at 0.70 or over: no join is derived before the order.
