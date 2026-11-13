@@ -1257,15 +1257,15 @@ pub(super) fn train(args: &[String], realization: &mut dyn FieldRealization) -> 
     // so a run reads whether the trained body's width bounds its fall; the run then makes no further growth.
     let widen_factor = std::env::var("FIELD_WIDEN_FIRST").ok().map(|v| v.parse::<usize>().ok().filter(|&f| f > 1).unwrap_or(2));
     let widened_first = widen_factor.is_some() && args.len() == 24;
-    // [agent-inferred, November 3, the tower record, D3] `FIELD_SCALE_FIRST=P`: a continued learner grown in scale before its
-    // first lap (packets of `P` sites after half its ticks; the packets' field as wide as the fine one, twice its heads, half
-    // of them still, as many contacts and ticks, on the packets' reach), so a run reads the tower against the field alone.
-    let scaled_first = std::env::var("FIELD_SCALE_FIRST").ok().and_then(|v| v.parse::<usize>().ok()).filter(|&p| p > 1 && args.len() == 24);
-    if let Some(period) = scaled_first {
+    // [theory, November 13, the design record §4.9] `FIELD_SCALE_FIRST=H`: a continued learner (with the opening's block) grown by a
+    // level of `H` harmonics before its first lap (after half its ticks; its field's declaration `level_declaration`), so a run reads the
+    // level against the field alone.
+    let scaled_first = std::env::var("FIELD_SCALE_FIRST").ok().and_then(|v| v.parse::<usize>().ok()).filter(|&h| h > 0 && args.len() == 24);
+    if let Some(harmonics) = scaled_first {
         let d = learner.field.declaration;
-        let coarse = FieldDeclaration { alphabet: 2, heads: 2 * d.heads, frames: 2 * d.heads, still: d.heads, reach: d.reach.div_ceil(period), triads: 0, ..d };
-        learner = learner.scaled_up(period, (d.ticks / 2).max(1), coarse, &keys).map_err(|e| e.to_string())?;
-        println!("FIELD_SCALE lap=-1 period={period} split={} coarse_width={} coarse_heads={} material={} ms={}", (d.ticks / 2).max(1), coarse.width, coarse.heads, learner.field.material_len(), started.elapsed().as_millis());
+        let (coarse, split) = (holonics::hnn::tower::field::level_declaration(&d), holonics::hnn::tower::field::level_split(&d));
+        learner = learner.scaled_up(harmonics, split, coarse, &keys).map_err(|e| e.to_string())?;
+        println!("FIELD_SCALE lap=-1 harmonics={harmonics} split={split} coarse_width={} coarse_heads={} material={} ms={}", coarse.width, coarse.heads, learner.field.material_len(), started.elapsed().as_millis());
     }
     // [measurement; agent-inferred, November 3, §16.28] `FIELD_RATE_BITS`: a continued learner's step rate `2^(−k)` read at
     // `k` for this run, so a run reads whether the step's size bounds the trained field's fall.

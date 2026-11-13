@@ -1997,17 +1997,17 @@ fn refinement_moves_the_end_one_place_a_read() {
     assert!(reads > 0);
 }
 
-/// The packets' field of the tower fixtures: packets of three sites of the tiny field's reach of 16.
+/// The level's field of the tower fixtures.
 fn coarse_declaration() -> FieldDeclaration {
     FieldDeclaration { alphabet: 2, width: 8, heads: 2, modes: 3, still: 1, contacts: 4, ticks: 2, frames: 2, reach: 6, lanes: 1, depth: 0, carry: 0, triads: 0, opening: false }
 }
 
-/// A tower of scales on [`shaped`]`(still)`: packets of three sites after the first of its two ticks, founded from the
-/// fixtures' keys past the fine field's founding.
+/// A level on [`opened`]`(still)` (the level reads the opening's news): six harmonics after the first of its two ticks, founded
+/// from the fixtures' keys past the fine field's founding.
 fn towered(still: usize) -> Field {
-    let field = shaped(still);
+    let field = opened(still);
     let offset = 4 * field.declaration.founding_draws();
-    field.scaled_up(3, 1, coarse_declaration(), &keys(1 << 15), offset).unwrap().0
+    field.scaled_up(6, 1, coarse_declaration(), &keys(1 << 16), offset).unwrap().0
 }
 
 /// [`towered`] with its prolongation and every family of its packets' field drawn, so every path of the tower carries a
@@ -2039,9 +2039,11 @@ fn tower_covector(field: &Field, region: &Region) -> Vec<i128> {
 #[test]
 fn a_tower_founded_on_a_field_reads_its_faces() {
     for still in [0usize, 1, 2] {
-        let field = shaped(still);
+        let field = opened(still);
         let tower = towered(still);
         assert_eq!(tower.faces(&region()).unwrap(), field.faces(&region()).unwrap(), "still {still}");
+        let cut = tower.pass(&region(), false).unwrap().tower.unwrap().cut().clone();
+        assert!(cut.anchors.len() > 1 && cut.anchors.len() < region().classes.len(), "still {still}: the fixture's news cuts {} epochs of {} places", cut.anchors.len(), region().classes.len());
         let mut at = 0;
         for (start, len, _) in tower.families_all() {
             assert_eq!(start, at);
@@ -3758,4 +3760,61 @@ fn the_pass_line_is_the_learners_last_line_and_only_where_present() {
     }
     let short = format!("{plain}pass prefix {} 1 4 7 1 1 code 1 2\n", "ab".repeat(32));
     assert!(FieldLearner::from_text(&short).is_err(), "a slice of three words is refused");
+}
+
+/// [definition; theory, November 13, the record of the landmarks §5 and the design record §4.9] **A level's sites are the landmarks of its
+/// news**: on random streams the isolation's sites are the places no greater place reaches (`u ≻ t`: more news, or as much and earlier),
+/// read pair by pair; a place with a section of news or more is a site (statement 1); two sites stand a section or more apart (statement
+/// 2); under a flat face, each place carrying the section, every place is a site; a stream of equal places under a section is one epoch.
+#[test]
+fn a_levels_sites_are_the_landmarks_of_its_news() {
+    let section = 40i64;
+    let stream = keys(1 << 14);
+    for n in 0..200 {
+        let len = 1 + n % 23;
+        let news: Vec<i64> = (0..len).map(|t| (stream[(n * 31 + t) % stream.len()] % 64) as i64).collect();
+        let sum = |t: usize| news[..=t].iter().sum::<i64>();
+        let greater = |u: usize, t: usize| news[u] > news[t] || (news[u] == news[t] && u < t);
+        let brute: Vec<usize> = (0..len).filter(|&t| !(0..len).any(|u| u != t && greater(u, t) && (sum(u) - sum(t)).abs() < section)).collect();
+        let anchors = level_anchors(&news, section);
+        let sites: Vec<usize> = anchors.iter().copied().filter(|&a| a > 0 || brute.contains(&0)).collect();
+        assert_eq!(sites, brute, "stream {n}: {news:?}");
+        assert_eq!(anchors[0], 0);
+        for (t, &c) in news.iter().enumerate() {
+            if c >= section {
+                assert!(brute.contains(&t), "stream {n}: a place with a section of news is a site");
+            }
+        }
+        for w in brute.windows(2) {
+            assert!(sum(w[1]) - sum(w[0]) >= section, "stream {n}: two sites stand a section apart");
+        }
+    }
+    assert_eq!(level_anchors(&[40; 9], 40), (0..9).collect::<Vec<_>>(), "under a flat face every place is a site");
+    assert_eq!(level_anchors(&[5; 9], 40), vec![0], "equal places under a section are one epoch");
+    let flat = level_section(244);
+    assert_eq!(flat, face_code(1, 244));
+    assert!(flat > 7 << 20 && flat < 8 << 20, "the section over 244 classes is the flat face's 7.93 bits");
+}
+
+/// [definition; theory, November 13, the design record §4.5 and §4.9] **The cut's phases and clock**: a place's phase is the news from its
+/// epoch's anchor in sections, its first harmonic one and its others the turn's faces at whole multiples of the phase (a whole section
+/// is a whole turn, half a section a half turn); the level's clock is the news between anchors in sections; every epoch's places follow
+/// its anchor.
+#[test]
+fn the_levels_cut_reads_its_phases_and_clock() {
+    let pi = opened(1).half_turn();
+    let one = 1i64 << MOVE_BITS;
+    // Sites at 0 and 3 (news 8 a section of 8); the places between carry half a section and a quarter.
+    let news = [8i64, 4, 2, 8, 2, 2];
+    let cut = level_cut(&news, 8, 6, pi).unwrap();
+    assert_eq!(cut.anchors, vec![0, 3]);
+    assert_eq!(cut.epoch, vec![0, 0, 0, 1, 1, 1]);
+    let h = |t: usize| &cut.harmonics[t * 6..(t + 1) * 6];
+    assert_eq!(h(0), &[one, one, 0, one, 0, one][..], "at its anchor a place stands at phase zero");
+    // Place 1: half a section, so cos π = −1, sin π = 0, cos 2π = 1, sin 2π = 0, cos 3π = −1.
+    assert_eq!(h(1), &[one, -one, 0, one, 0, -one][..]);
+    // Place 2: three quarters of a section, so cos 3π/2 = 0, sin = −1, cos 3π = −1, sin 3π = 0, cos 9π/2 = 0.
+    assert_eq!(h(2), &[one, 0, -one, -one, 0, 0][..]);
+    assert_eq!(cut.tau, vec![0, (14i64 << PACE_BITS) / 8], "the news from the first anchor to the second, 14 of a section of 8");
+    assert!(level_cut(&[1, -1], 8, 6, pi).is_err(), "news below zero");
 }

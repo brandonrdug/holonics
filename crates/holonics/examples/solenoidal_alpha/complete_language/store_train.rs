@@ -16,7 +16,7 @@
 use super::field_train::{held_out, held_text, mix, problems_of, question_text, shape, step_transfer, units_of, views_of, weighed_domain, FieldCodec, Problems, Shape, TrainRegion};
 use super::tower_train::{count, positive, STATE_BUDGET};
 use super::*;
-use holonics::hnn::tower::field::{octave_of, FieldLearner, FieldRealization, MaterialMean, PassSlice, StorePass, NEAR};
+use holonics::hnn::tower::field::{level_declaration, level_split, octave_of, FieldLearner, FieldRealization, MaterialMean, PassSlice, StorePass, LEVEL_HARMONICS, NEAR};
 use std::collections::HashMap;
 use std::io::{BufRead, Seek, SeekFrom};
 
@@ -769,6 +769,217 @@ pub(super) fn found_opening(args: &[String]) -> Result<()> {
     }
     write_new(out, b.as_bytes())?;
     println!("FOUND_OPENING lines={} equal={} declaration={} parts={} material_lines={} material={} block={block} founded_material={} ms={}", la.len(), judged.0, judged.1, judged.2, judged.3, material, founded.field.material_len(), started.elapsed().as_millis());
+    Ok(())
+}
+
+/// [definition; theory, November 13, the design record §4.9; G145] **`found-level STATE STATE_SHA KEYS KEYS_SHA OUT`**: the learner `STATE` (with
+/// the opening's block, whose news the level reads) grown by a level above ([`FieldLearner::scaled_up`] at [`LEVEL_HARMONICS`], after
+/// [`level_split`] of its ticks, its field declared by [`level_declaration`]), its founding drawn from the key file past the learner's draws,
+/// written to the file `OUT`. Before it writes, every line is judged (`FOUND_LEVEL_LINE`): the learner's head may change only its count of
+/// key draws; the field's declaration and material lines are equal; four lines follow them (the level's line, its field's declaration and
+/// material, the glue); the two moment lines keep the source's words and append the level's entries at zero; every other line (the parts,
+/// the rates, the pass) is equal. Anything else is refused and nothing is written (November 11: a state tool that left a line behind).
+/// Reads no realization.
+pub(super) fn found_level(args: &[String]) -> Result<()> {
+    if args.len() != 6 {
+        return Err("found-level STATE STATE_SHA KEYS KEYS_SHA OUT".into());
+    }
+    let started = std::time::Instant::now();
+    let text = pinned_read(&args[1], &args[2], STATE_BUDGET)?;
+    let learner = FieldLearner::from_text(std::str::from_utf8(&text)?).map_err(|e| e.to_string())?;
+    if learner.to_text().as_bytes() != text.as_slice() {
+        return Err("a state that does not read and write back byte for byte".into());
+    }
+    let keys = pinned_read(&args[3], &args[4], STATE_BUDGET)?;
+    let out = Path::new(&args[5]);
+    if out.exists() {
+        return Err("a founded state's path that exists".into());
+    }
+    let d = learner.field.declaration;
+    let founded = learner.scaled_up(LEVEL_HARMONICS, level_split(&d), level_declaration(&d), &keys).map_err(|e| e.to_string())?;
+    let block = founded.field.material_len() - learner.field.material_len();
+    let (a, b) = (learner.to_text(), founded.to_text());
+    let (la, lb): (Vec<&str>, Vec<&str>) = (a.lines().collect(), b.lines().collect());
+    if lb.len() != la.len() + 4 {
+        return Err(format!("a founding that wrote {} lines for {}", lb.len(), la.len()).into());
+    }
+    let material = learner.field.material_len();
+    let s = founded.field.scale.as_deref().ok_or("a founding without its level")?;
+    let mut judged = 0usize;
+    for (k, y) in lb.iter().enumerate() {
+        let (x, verdict) = match k {
+            0 => {
+                let (wx, wy): (Vec<&str>, Vec<&str>) = (la[0].split(' ').collect(), y.split(' ').collect());
+                let ok = wx.len() == wy.len() && wx.iter().zip(&wy).enumerate().all(|(i, (p, q))| i == 2 || p == q);
+                if !ok {
+                    return Err("the learner's head changed beyond its count of key draws".into());
+                }
+                (la[0], format!("head draws {} to {}", wx[2], wy[2]))
+            }
+            1 | 2 if *y == la[k] => (la[k], "equal".to_string()),
+            3 if *y == format!("level {} {}", s.harmonics, s.split) => ("", format!("level harmonics={} split={}", s.harmonics, s.split)),
+            4 if Some(*y) == s.coarse.to_text().lines().next() => ("", format!("the level's field's declaration {y}")),
+            5 if y.split(' ').count() == s.coarse.theta.len() => ("", format!("the level's field's material {} words", s.coarse.theta.len())),
+            6 if y.split(' ').count() == s.glue.len() => ("", format!("the glue {} words, {} drawn", s.glue.len(), s.glue.iter().filter(|&&v| v != 0).count())),
+            7 | 8 => {
+                let (wx, wy): (Vec<&str>, Vec<&str>) = (la[k - 4].split(' ').collect(), y.split(' ').collect());
+                if wx.len() != material || wy.len() != material + block || wy[..material] != wx[..] || wy[material..].iter().any(|&w| w != "0") {
+                    return Err(format!("line {k}: a moment line that does not keep the source's words and append the level's at zero").into());
+                }
+                (la[k - 4], format!("moments kept={material} appended={block} at zero"))
+            }
+            _ if k > 8 && *y == la[k - 4] => (la[k - 4], "equal".to_string()),
+            _ => return Err(format!("line {k} changed beyond the level's founding").into()),
+        };
+        judged += 1;
+        let head: String = y.chars().take(24).collect();
+        println!("FOUND_LEVEL_LINE line={k} head={head} words_source={} words_founded={} {verdict}", if x.is_empty() { 0 } else { x.split(' ').count() }, y.split(' ').count());
+    }
+    write_new(out, b.as_bytes())?;
+    println!("FOUND_LEVEL lines={} judged={judged} material={material} block={block} founded_material={} draws={} ms={}", lb.len(), founded.field.material_len(), founded.drawn - learner.drawn, started.elapsed().as_millis());
+    Ok(())
+}
+
+/// [measurement; theory, November 13, the design record §4.9; G146, from the outside read of that day's points 1 and 3] `read-news UNITS
+/// UNITS_SHA STORE STORE_SHA KEYS KEYS_SHA CODEC CODEC_SHA PLACES STATE STATE_SHA`: **how far a place's news at its two-sided cavity falls
+/// short of a block's**, a reading on the host. Each slice of the held role is cut as `read-cavity` cuts it, whole stretches until `PLACES`
+/// places, every place written. `c1_t` is the opening's code of place `t` with it alone open (its cavity face); for blocks of `b = 2` and
+/// `3` places at every offset, `cb_t` is the code of `t` with its block open and every other place written, and a block's news is the sum
+/// of its places' `cb`. Read by slice: the sums of `cb` over the sums of `c1` on the same places (a pseudo-likelihood's shortfall: one
+/// over it is the share of a block's news the single places carry), the share of places dark at their cavity (`c1` under a bit) that carry
+/// four bits or more in a pair, and the level's cut on `c1` and on `c2` (offset 0) at the flat face's section: the sites' share, the mean
+/// epoch, the strides of three sections or more with their share of the news, and the sites the two cuts share. Numbers only.
+pub(super) fn read_news(args: &[String]) -> Result<()> {
+    if args.len() != 12 {
+        return Err("read-news UNITS UNITS_SHA STORE STORE_SHA KEYS KEYS_SHA CODEC CODEC_SHA PLACES STATE STATE_SHA".into());
+    }
+    let started = std::time::Instant::now();
+    refuse_variables("read-news")?;
+    let units = units_of(&args[1], &args[2])?;
+    if !units.merges().is_empty() {
+        return Err("the store's cut is on bytes: a units file of merges is refused".into());
+    }
+    let store = Path::new(&args[3]);
+    let counts = store_counts(std::str::from_utf8(&pinned_read(&store.join("STORE.tsv").to_string_lossy(), &args[4], READ_BUDGET as usize)?)?)?;
+    let keys = pinned_read(&args[5], &args[6], READ_BUDGET as usize)?;
+    let seed = u64::from_be_bytes(keys.get(keys.len().saturating_sub(8)..).filter(|w| w.len() == 8).ok_or("a key file of fewer than eight bytes")?.try_into()?);
+    let codec = FieldCodec::from_text(&String::from_utf8(pinned_read(&args[7], &args[8], READ_BUDGET as usize)?)?, units)?;
+    let places = positive(&args[9])?;
+    let learner = FieldLearner::from_text(std::str::from_utf8(&pinned_read(&args[10], &args[11], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
+    let law = learner.pass.clone().ok_or("a state with no pass line: read-news reads a state of the store's line")?;
+    if learner.field.declaration.alphabet != codec.alphabet() || !learner.field.declaration.opening {
+        return Err("a state whose alphabet is not its codec's, or without the opening's block".into());
+    }
+    let section = holonics::hnn::tower::field::level_section(codec.alphabet());
+    let bit = 1i64 << 20;
+    println!("NEWS_LAW role=held places={places} section={section} ms={}", started.elapsed().as_millis());
+    use rayon::prelude::*;
+    // Every place's opening code through the opening's lift (the level's news law at a written place) with the places `open` open and the
+    // rest written, at its written class.
+    let codes_at = |classes: &[usize], open: std::ops::Range<usize>| -> std::result::Result<Vec<i64>, String> {
+        let mut mask = vec![false; classes.len()];
+        mask[open].fill(true);
+        let region = [TrainRegion::plain(classes.to_vec(), mask)];
+        let views = views_of(&region);
+        learner.field.opening_codes(&views[0]).map_err(|e| e.to_string())?.into_iter().map(|c| c.ok_or_else(|| "a place the opening does not compare".to_string())).collect()
+    };
+    // The cut's readings on one stretch's news: (sites, strides of three sections or more, their news, the news).
+    let cut_of = |news: &[i64]| -> (Vec<usize>, usize, i128, i128) {
+        let anchors = holonics::hnn::tower::field::level_anchors(news, section);
+        let mut sum = vec![0i128; news.len() + 1];
+        for (t, &c) in news.iter().enumerate() {
+            sum[t + 1] = sum[t] + c as i128;
+        }
+        let (mut long, mut long_news) = (0usize, 0i128);
+        for w in anchors.windows(2) {
+            let l = sum[w[1] + 1] - sum[w[0] + 1];
+            if l >= 3 * section as i128 {
+                (long, long_news) = (long + 1, long_news + l);
+            }
+        }
+        (anchors, long, long_news, sum[news.len()])
+    };
+    for &name in &role_names(&counts, "held") {
+        let slice = open_slice(store, "held", name, &counts)?;
+        let pass = StorePass { role: "held".to_string(), store: args[4].clone(), stretches: 0, least: law.least, octaves: law.octaves, pairs: law.pairs, sites: law.sites, slices: vec![PassSlice { name: name.to_string(), piece: 0, cursor: 0, taken: 0 }] };
+        let mut cut = Cut { seed, slices: vec![slice], pass };
+        let mut stretches: Vec<Vec<usize>> = Vec::new();
+        let mut taken = 0usize;
+        while taken < places as usize {
+            let Some(drawn) = cut.next() else { break };
+            let stretch = cut.take(drawn, &codec)?;
+            taken += stretch.region.classes.len();
+            stretches.push(stretch.region.classes.clone());
+        }
+        let slice_start = std::time::Instant::now();
+        // Per stretch: c1 at every place, and for b in 2, 3 and each offset, every full block's places' codes.
+        type Read = (Vec<i64>, [Vec<Option<i64>>; 5]);
+        let reads: Vec<std::result::Result<Read, String>> = stretches
+            .par_iter()
+            .map(|classes| {
+                let n = classes.len();
+                let c1 = codes_at(classes, 0..0)?;
+                let mut blocks: [Vec<Option<i64>>; 5] = Default::default();
+                for (slot, (b, o)) in [(2usize, 0usize), (2, 1), (3, 0), (3, 1), (3, 2)].into_iter().enumerate() {
+                    let mut out = vec![None; n];
+                    let mut start = o;
+                    while start + b <= n {
+                        let codes = codes_at(classes, start..start + b)?;
+                        for t in start..start + b {
+                            out[t] = Some(codes[t]);
+                        }
+                        start += b;
+                    }
+                    blocks[slot] = out;
+                }
+                Ok((c1, blocks))
+            })
+            .collect();
+        let reads: Vec<Read> = reads.into_iter().collect::<std::result::Result<_, _>>()?;
+        let n_places: usize = reads.iter().map(|(c, _)| c.len()).sum();
+        for (slot, (b, o)) in [(2usize, 0usize), (2, 1), (3, 0), (3, 1), (3, 2)].into_iter().enumerate() {
+            let (mut sb, mut s1, mut covered) = (0i128, 0i128, 0usize);
+            for (c1, blocks) in &reads {
+                for (t, v) in blocks[slot].iter().enumerate() {
+                    if let Some(v) = v {
+                        (sb, s1, covered) = (sb + *v as i128, s1 + c1[t] as i128, covered + 1);
+                    }
+                }
+            }
+            let millibits = |sum: i128| sum * 1000 / (covered.max(1) as i128 * bit as i128);
+            println!("NEWS_BLOCKS slice={name} b={b} offset={o} places={covered} block_millibits={} single_millibits={} ratio_milli={}", millibits(sb), millibits(s1), if s1 > 0 { sb * 1000 / s1 } else { 0 });
+        }
+        let (mut dark, mut dark_bright) = (0usize, 0usize);
+        for (c1, blocks) in &reads {
+            for (t, &c) in c1.iter().enumerate() {
+                if c < bit {
+                    dark += 1;
+                    if blocks[0][t].or(blocks[1][t]).is_some_and(|v| v >= 4 * bit) {
+                        dark_bright += 1;
+                    }
+                }
+            }
+        }
+        println!("NEWS_DARK slice={name} places={n_places} dark_single={dark} of_them_four_bits_in_a_pair={dark_bright}");
+        for (label, pick) in [("c1", 0usize), ("c2", 1)] {
+            let (mut sites, mut epochs, mut long, mut long_news, mut news, mut shared, mut cut_places) = (0usize, 0usize, 0usize, 0i128, 0i128, 0usize, 0usize);
+            for (c1, blocks) in &reads {
+                let series: Vec<i64> = if pick == 0 { c1.clone() } else { blocks[0].iter().zip(c1).map(|(v, &c)| v.unwrap_or(c)).collect() };
+                let (anchors, l, ln, total) = cut_of(&series);
+                let (other, ..) = cut_of(c1);
+                sites += anchors.len();
+                epochs += anchors.len();
+                long += l;
+                long_news += ln;
+                news += total;
+                shared += anchors.iter().filter(|a| other.contains(a)).count();
+                cut_places += series.len();
+            }
+            println!("NEWS_CUT slice={name} news={label} places={cut_places} sites={sites} share_milli={} mean_epoch_milli={} long_strides={long} long_news_milli={} shared_with_c1={shared} millibits_a_place={}", sites * 1000 / cut_places.max(1), cut_places * 1000 / epochs.max(1), if news > 0 { long_news * 1000 / news } else { 0 }, news * 1000 / (cut_places.max(1) as i128 * bit as i128));
+        }
+        println!("NEWS_SLICE slice={name} stretches={} places={n_places} host_ms={} threads={}", stretches.len(), slice_start.elapsed().as_millis(), rayon::current_num_threads());
+    }
+    println!("NEWS_DONE ms={}", started.elapsed().as_millis());
     Ok(())
 }
 

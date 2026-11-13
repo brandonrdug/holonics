@@ -175,7 +175,7 @@
 //! the release's sweeps); the **cell holonomy** (the release's circulation receipt) and the **tower
 //! thread** (the octave falloff) stay attached.
 
-use super::{affine, covector, deposit_step, div_nearest, exp_series, fewer_bits_weighed, fit32, fit64, half_turn, on_step_grain, outer_sum, ratio_adjoint, ratio_to_power, reach, refuse, release, toward, transposed, weighed_code, Result, TowerError, TowerFace, FACE_BITS, FIRST_RATE, MATERIAL_BITS, MOVE_BITS, SECOND_RATE};
+use super::{affine, covector, deposit_step, div_nearest, exp_series, face_code, fewer_bits_weighed, fit32, fit64, half_turn, on_step_grain, outer_sum, ratio_adjoint, ratio_to_power, reach, refuse, release, toward, transposed, weighed_code, Result, TowerError, TowerFace, FACE_BITS, FIRST_RATE, MATERIAL_BITS, MOVE_BITS, SECOND_RATE};
 use crate::hnn::keyed_modes::{ln2_face, Exponential};
 use rayon::prelude::*;
 
@@ -3328,6 +3328,8 @@ impl Field {
         let mut x = self.open(region, &moment)?;
         let definite: Vec<bool> = (0..region.classes.len()).map(|t| Self::definite(region, t)).collect();
         let keyed: Vec<bool> = (0..region.classes.len()).map(|t| !region.unresolved[t] || Self::carried(region, t).is_some()).collect();
+        // [theory, November 13, the design record §4.9] The level reads the opening's news, formed before any tick.
+        let news = if self.scale.is_some() { self.level_news(region)? } else { Vec::new() };
         let mut out = FieldPass::default();
         let sites = region.classes.len();
         let mut trips = vec![0u128; sites];
@@ -3339,7 +3341,7 @@ impl Field {
         let mut clock: Option<Box<TickClock>> = None;
         for k in 0..d.ticks {
             if let Some(s) = self.scale.as_deref().filter(|s| s.split == k) {
-                out.tower = Some(self.scale_forward(s, &mut x, &definite, &keyed, keep)?);
+                out.tower = Some(self.scale_forward(s, &mut x, &news, &definite, &keyed, keep)?);
             }
             let own = clock.take();
             let (tick_paces, tick_moment) = own.as_ref().map_or((&paces, &moment), |c| (&c.paces, &c.moment));
@@ -5222,14 +5224,14 @@ impl Field {
     }
 
     /// The field as text: its head line, then its material on one line.
-    /// The field as text: its declaration and its material, each on one line; a tower adds a line `scale P split`, the
-    /// packets' field's two lines and the glue's one.
+    /// The field as text: its declaration and its material, each on one line; a level adds a line `level H split`, the
+    /// level's field's lines and the glue's one.
     pub fn to_text(&self) -> String {
         let theta: Vec<String> = self.theta.iter().map(i32::to_string).collect();
         let mut out = format!("{}\n{}\n", self.declaration.to_text(), theta.join(" "));
         if let Some(s) = &self.scale {
             let glue: Vec<String> = s.glue.iter().map(i32::to_string).collect();
-            out.push_str(&format!("scale {} {}\n{}{}\n", s.period, s.split, s.coarse.to_text(), glue.join(" ")));
+            out.push_str(&format!("level {} {}\n{}{}\n", s.harmonics, s.split, s.coarse.to_text(), glue.join(" ")));
         }
         out
     }
@@ -5246,17 +5248,21 @@ impl Field {
             return refuse("a field's material that is not its declaration's length");
         }
         let mut field = Self::with_theta(d, theta);
-        if let Some(head) = lines.peek().copied().filter(|l| l.starts_with("scale ")) {
+        // [November 13, G145] A `scale` line held the packets of November 3, a superseded prototype: it is refused, never read as a level.
+        if lines.peek().is_some_and(|l| l.starts_with("scale ")) {
+            return refuse("a packets' scale (retired November 13 for the level above): found the level again");
+        }
+        if let Some(head) = lines.peek().copied().filter(|l| l.starts_with("level ")) {
             lines.next();
-            let words: Vec<usize> = head.split(' ').skip(1).map(|w| w.parse::<usize>().map_err(|_| TowerError::Refused("a scale's line that is not two counts"))).collect::<Result<_>>()?;
-            let [period, split] = words[..] else { return refuse("a scale's line that is not two counts") };
+            let words: Vec<usize> = head.split(' ').skip(1).map(|w| w.parse::<usize>().map_err(|_| TowerError::Refused("a level's line that is not two counts"))).collect::<Result<_>>()?;
+            let [harmonics, split] = words[..] else { return refuse("a level's line that is not two counts") };
             let coarse = Self::from_lines(lines)?;
             let glue = read_numbers::<i32>(lines.next())?;
-            let (.., len) = scale::glue_len(period, field.declaration.width, coarse.declaration.width);
-            if glue.len() != len || split == 0 || split >= field.declaration.ticks {
-                return refuse("a scale's glue that is not its declaration's length, or a split outside the ticks");
+            let (.., len) = scale::glue_len(harmonics, field.declaration.width, coarse.declaration.width);
+            if glue.len() != len || harmonics == 0 || split == 0 || split >= field.declaration.ticks || !field.declaration.opening {
+                return refuse("a level's glue that is not its declaration's length, a split outside the ticks, or a field without the opening's block");
             }
-            field.scale = Some(Box::new(Scale { period, split, coarse, glue }));
+            field.scale = Some(Box::new(Scale { harmonics, split, coarse, glue }));
         }
         Ok(field)
     }
@@ -7443,13 +7449,20 @@ impl FieldLearner {
     /// ([`Field::scaled_up`], the key stream read on from the learner's drawn bytes), its moments kept on the fine field's
     /// material and opened at zero on the packets' field's and the glue's, which every coordinate opens at its own first
     /// nonzero covector.
-    pub fn scaled_up(&self, period: usize, split: usize, declaration: FieldDeclaration, keys: &[u8]) -> Result<Self> {
-        let (field, drawn) = self.field.scaled_up(period, split, declaration, keys, self.drawn)?;
+    pub fn scaled_up(&self, harmonics: usize, split: usize, declaration: FieldDeclaration, keys: &[u8]) -> Result<Self> {
+        let (field, drawn) = self.field.scaled_up(harmonics, split, declaration, keys, self.drawn)?;
         let len = field.material_len();
         let (mut first, mut second) = (self.first.clone(), self.second.clone());
         first.resize(len, 0);
         second.resize(len, 0);
-        Ok(Self { field, first, second, rate_bits: self.rate_bits, drawn, laps: self.laps, held: None, read_held: self.read_held, rate_parts: None, own_rates: None, last: None, pass: self.pass.clone() })
+        // [November 13, G145; the November 11 failure of a state tool that dropped the part rates] The fine field's entries keep the rates the
+        // line carries (its parts' octaves, or each entry's own rate); the level's entries open at the base rate.
+        let own_rates = self.own_rates.as_ref().map(|own| {
+            let mut out = own.clone();
+            out.resize(len, self.rate_bits);
+            out
+        });
+        Ok(Self { field, first, second, rate_bits: self.rate_bits, drawn, laps: self.laps, held: None, read_held: self.read_held, rate_parts: self.rate_parts, own_rates, last: None, pass: self.pass.clone() })
     }
 
     /// [measurement; agent-inferred, November 3, §16.31] **Each family's step coherence**: over the family's entries, `Σ |m|`
@@ -7756,7 +7769,7 @@ pub fn letter_balance(x: &[usize], faces: &[TowerFace]) -> (Vec<i128>, Vec<i128>
 
 pub mod moment;
 mod scale;
-pub use scale::Scale;
+pub use scale::{level_anchors, level_cut, level_declaration, level_isolation, level_section, level_split, LevelCut, Scale, LEVEL_HARMONICS};
 
 #[cfg(test)]
 mod tests;

@@ -492,6 +492,17 @@ repository was reset on September 24; the pre-reset tree is
     the pool's ring of frees ends (4 frees in 100 profiled sections against 298, allocations 1.96 ms
     a section against 5.96), every bit kept. The engine's queue stops here: the level's sites, clock
     and phase chart, ordered by G139's rule, are the next item.
+  - **The level above is built and stays** (November 13, G145; the design record §4.9). Its sites are
+    the landmarks of the opening's news (each place's code at its cavity, the expected code at an
+    open place), its epochs are led by them, the restriction and prolongation chart each place's
+    state by six harmonics of its phase in sections of news, and the level's field runs on its own
+    clock, the news between its sites; the packets of November 3 are retired with it. Host and card
+    agree in every face and covector entry. Founded on the founded line's latest state and trained
+    3,000 sections beside it, the level codes held places 0.0122 nats a place under the line at
+    one-place masks and 0.0103 under at whole masks, at lap means, every slice under, at 1.08 of the
+    line's section time. Before it trained, a reading of the two-sided cavity's shortfall (G146) found
+    a pair carrying 1.22 times its single places' news and one dark place in twenty lighting up in a
+    pair, under the rule's bound.
   - The open places need the written rows' ticks (November 13, P62, G140 scored; the design
     record §4.8). Read zero-shot on the line's latest lap mean with a written row held at its
     opening: the open rows alone code 3.29 nats a place worse at held one-place masks and 1.90
