@@ -1,0 +1,110 @@
+# P55 part B (G127), 2026-11-13 UTC: a held place's news at its cavity opening, a reading of state C of the store's line (leg 1's STATE.3000, pass section
+# 5,001; sha256 49e974cfd0279315) and its mean of states (MEAN.3000, 1,000 states; 04f29aa40b468081). read-cavity (claude/cavity-read 7f33d2089): each
+# slice of the held role cut afresh as read-store cuts it, whole stretches to at least 6,000 places; for each place t the stretch as a region with every
+# place written but t; c0 the face at the built opening with no tick (Field::opening_face, the host, checked equal to the whole opening's at every place of
+# each slice's first stretch), cK the face after the declared 4 ticks (read_faces on the card), both at t's written class; the cut (cavity_cut.py). No
+# state changes. Numbers only; the scores are read on the mean of states. The uniform face over the alphabet's 244 classes codes 5.497 nats.
+## the build
+7f33d2089 (read-cavity) field_pass 066bd4d737aab497e2292e4710f22606e4389a2c2ec75b6be74b40087d43bba1
+## the reads (each its own hold; projected at most 300 s, outer 900 s)
+HOLD read-cavity C_mean:
+HOLD C_mean: lock taken 01:36:25 wait_s=.002328863
+HOLD C_mean: exit 0 released 01:37:37
+C_mean CAVITY_LAW role=held places=6000 least=4 octaves=7 pairs_bound=15606223 sites_bound=41490 ticks=4 alphabet=244 ms=28
+C_mean CAVITY_SLICE slice=code stretches=28 places=6014 host_c0_ms=8001 card_cK_ms=4254 card_batches=56 copy_places=6062 host_copy_ms=8159 elapsed_ms=20445
+C_mean CAVITY_SLICE slice=web stretches=32 places=6320 host_c0_ms=8223 card_cK_ms=4433 card_batches=58 copy_places=0 host_copy_ms=0 elapsed_ms=33103
+C_mean CAVITY_SLICE slice=science stretches=28 places=6156 host_c0_ms=8568 card_cK_ms=4673 card_batches=61 copy_places=0 host_copy_ms=0 elapsed_ms=46357
+C_mean CAVITY_SLICE slice=books stretches=28 places=6156 host_c0_ms=8675 card_cK_ms=4695 card_batches=61 copy_places=0 host_copy_ms=0 elapsed_ms=59730
+C_mean CAVITY_SLICE slice=wikidata stretches=32 places=6031 host_c0_ms=7803 card_cK_ms=4299 card_batches=56 copy_places=0 host_copy_ms=0 elapsed_ms=71845
+C_mean CAVITY_DONE ms=71845
+C_mean MEASURE lap=C_mean rc=0 wall_s=72.3 peak_rss_kib=327296
+HOLD read-cavity C_state:
+HOLD C_state: lock taken 01:37:37 wait_s=.002368477
+HOLD C_state: exit 0 released 01:38:50
+C_state CAVITY_LAW role=held places=6000 least=4 octaves=7 pairs_bound=15606223 sites_bound=41490 ticks=4 alphabet=244 ms=31
+C_state CAVITY_SLICE slice=code stretches=28 places=6014 host_c0_ms=8105 card_cK_ms=4269 card_batches=56 copy_places=6062 host_copy_ms=8254 elapsed_ms=20662
+C_state CAVITY_SLICE slice=web stretches=32 places=6320 host_c0_ms=8261 card_cK_ms=4536 card_batches=58 copy_places=0 host_copy_ms=0 elapsed_ms=33461
+C_state CAVITY_SLICE slice=science stretches=28 places=6156 host_c0_ms=8707 card_cK_ms=4675 card_batches=61 copy_places=0 host_copy_ms=0 elapsed_ms=46845
+C_state CAVITY_SLICE slice=books stretches=28 places=6156 host_c0_ms=8669 card_cK_ms=4538 card_batches=61 copy_places=0 host_copy_ms=0 elapsed_ms=60054
+C_state CAVITY_SLICE slice=wikidata stretches=32 places=6031 host_c0_ms=8053 card_cK_ms=4074 card_batches=56 copy_places=0 host_copy_ms=0 elapsed_ms=72183
+C_state CAVITY_DONE ms=72183
+C_state MEASURE lap=C_state rc=0 wall_s=72.5 peak_rss_kib=325600
+DEVICE c0=the host (the built opening and readout, the host realization the card's parity reads; 24 hardware threads, a place a task) cK=the card (read_faces, the declared 4 ticks); a read 72 s wall, 330 MB peak resident
+PROJECTION projected=at most 300 s a read (2.9 ms a place at the development read's stretches) measured=72.3 and about 73 s
+## B3 to B5 on the mean of states (C_mean)
+B3 slice=code places=6014 stretches=28 mean_c0=7.442 mean_cK=0.907 c0_over_cK=8.201 spearman=0.249 share_c0_over_bar=0.5820
+B4 slice=code whole_epochs=5281 mean_epoch_places=1.132 one_place_share=0.904 news_spread=0.612 opening_code_over_rest=6.834
+B5i slice=code law=cut openings_past_32=4509 kept_under_start_7_later=1.0000
+B5i slice=code law=carry openings_past_32=3778 kept_under_start_7_later=0.9320
+B5i slice=code law=packets openings_past_32=5097 kept_under_start_7_later=1.0000 packet_size=1
+B3 slice=web places=6320 stretches=32 mean_c0=8.004 mean_cK=1.178 c0_over_cK=6.794 spearman=0.182 share_c0_over_bar=0.6206
+B4 slice=web whole_epochs=5650 mean_epoch_places=1.110 one_place_share=0.911 news_spread=0.594 opening_code_over_rest=5.570
+B5i slice=web law=cut openings_past_32=4748 kept_under_start_7_later=1.0000
+B5i slice=web law=carry openings_past_32=4050 kept_under_start_7_later=0.9244
+B5i slice=web law=packets openings_past_32=5275 kept_under_start_7_later=1.0000 packet_size=1
+B3 slice=science places=6156 stretches=28 mean_c0=7.563 mean_cK=1.164 c0_over_cK=6.499 spearman=0.169 share_c0_over_bar=0.5750
+B4 slice=science whole_epochs=5401 mean_epoch_places=1.133 one_place_share=0.897 news_spread=0.617 opening_code_over_rest=5.828
+B5i slice=science law=cut openings_past_32=4617 kept_under_start_7_later=1.0000
+B5i slice=science law=carry openings_past_32=3954 kept_under_start_7_later=0.9234
+B5i slice=science law=packets openings_past_32=5239 kept_under_start_7_later=1.0000 packet_size=1
+B3 slice=books places=6156 stretches=28 mean_c0=7.865 mean_cK=1.246 c0_over_cK=6.311 spearman=0.081 share_c0_over_bar=0.5811
+B4 slice=books whole_epochs=5408 mean_epoch_places=1.133 one_place_share=0.897 news_spread=0.618 opening_code_over_rest=5.446
+B5i slice=books law=cut openings_past_32=4618 kept_under_start_7_later=1.0000
+B5i slice=books law=carry openings_past_32=3925 kept_under_start_7_later=0.9445
+B5i slice=books law=packets openings_past_32=5239 kept_under_start_7_later=1.0000 packet_size=1
+B3 slice=wikidata places=6031 stretches=32 mean_c0=9.397 mean_cK=1.504 c0_over_cK=6.248 spearman=0.452 share_c0_over_bar=0.6813
+B4 slice=wikidata whole_epochs=5506 mean_epoch_places=1.084 one_place_share=0.934 news_spread=0.540 opening_code_over_rest=8.603
+B5i slice=wikidata law=cut openings_past_32=4607 kept_under_start_7_later=1.0000
+B5i slice=wikidata law=carry openings_past_32=4043 kept_under_start_7_later=0.9419
+B5i slice=wikidata law=packets openings_past_32=5002 kept_under_start_7_later=1.0000 packet_size=1
+B3 slice=pooled places=30677 mean_c0=8.051 mean_cK=1.200 c0_over_cK=6.710 spearman=0.232
+B4 slice=pooled whole_epochs=27246 mean_epoch_places=1.118 one_place_share=0.909
+B5ii slice=code law=cut openings_that_fit=5309 kept_under_doubled_leading_spaces=0.9998
+B5ii slice=code law=carry openings_that_fit=4449 kept_under_doubled_leading_spaces=0.9874
+B5ii slice=code law=packets openings_that_fit=6014 kept_under_doubled_leading_spaces=1.0000 packet_size=1
+## B3 to B5 on the end state (C_state)
+B3 slice=code places=6014 stretches=28 mean_c0=7.406 mean_cK=0.904 c0_over_cK=8.189 spearman=0.240 share_c0_over_bar=0.5793
+B4 slice=code whole_epochs=5273 mean_epoch_places=1.133 one_place_share=0.903 news_spread=0.610 opening_code_over_rest=6.829
+B5i slice=code law=cut openings_past_32=4501 kept_under_start_7_later=1.0000
+B5i slice=code law=carry openings_past_32=3817 kept_under_start_7_later=0.9248
+B5i slice=code law=packets openings_past_32=5097 kept_under_start_7_later=1.0000 packet_size=1
+B3 slice=web places=6320 stretches=32 mean_c0=7.975 mean_cK=1.179 c0_over_cK=6.764 spearman=0.171 share_c0_over_bar=0.6182
+B4 slice=web whole_epochs=5646 mean_epoch_places=1.111 one_place_share=0.911 news_spread=0.593 opening_code_over_rest=5.445
+B5i slice=web law=cut openings_past_32=4743 kept_under_start_7_later=1.0000
+B5i slice=web law=carry openings_past_32=4055 kept_under_start_7_later=0.9277
+B5i slice=web law=packets openings_past_32=5275 kept_under_start_7_later=1.0000 packet_size=1
+B3 slice=science places=6156 stretches=28 mean_c0=7.530 mean_cK=1.162 c0_over_cK=6.478 spearman=0.163 share_c0_over_bar=0.5721
+B4 slice=science whole_epochs=5396 mean_epoch_places=1.134 one_place_share=0.896 news_spread=0.615 opening_code_over_rest=5.778
+B5i slice=science law=cut openings_past_32=4614 kept_under_start_7_later=1.0000
+B5i slice=science law=carry openings_past_32=3935 kept_under_start_7_later=0.9271
+B5i slice=science law=packets openings_past_32=5239 kept_under_start_7_later=1.0000 packet_size=1
+B3 slice=books places=6156 stretches=28 mean_c0=7.844 mean_cK=1.248 c0_over_cK=6.284 spearman=0.073 share_c0_over_bar=0.5804
+B4 slice=books whole_epochs=5401 mean_epoch_places=1.134 one_place_share=0.896 news_spread=0.616 opening_code_over_rest=5.361
+B5i slice=books law=cut openings_past_32=4612 kept_under_start_7_later=1.0000
+B5i slice=books law=carry openings_past_32=3916 kept_under_start_7_later=0.9415
+B5i slice=books law=packets openings_past_32=5239 kept_under_start_7_later=1.0000 packet_size=1
+B3 slice=wikidata places=6031 stretches=32 mean_c0=9.304 mean_cK=1.498 c0_over_cK=6.211 spearman=0.436 share_c0_over_bar=0.6815
+B4 slice=wikidata whole_epochs=5506 mean_epoch_places=1.084 one_place_share=0.934 news_spread=0.538 opening_code_over_rest=8.598
+B5i slice=wikidata law=cut openings_past_32=4605 kept_under_start_7_later=1.0000
+B5i slice=wikidata law=carry openings_past_32=4055 kept_under_start_7_later=0.9435
+B5i slice=wikidata law=packets openings_past_32=5002 kept_under_start_7_later=1.0000 packet_size=1
+B3 slice=pooled places=30677 mean_c0=8.009 mean_cK=1.198 c0_over_cK=6.683 spearman=0.221
+B4 slice=pooled whole_epochs=27222 mean_epoch_places=1.119 one_place_share=0.908
+B5ii slice=code law=cut openings_that_fit=5301 kept_under_doubled_leading_spaces=0.9998
+B5ii slice=code law=carry openings_that_fit=4480 kept_under_doubled_leading_spaces=0.9877
+B5ii slice=code law=packets openings_that_fit=6014 kept_under_doubled_leading_spaces=1.0000 packet_size=1
+UNIFORM state=C_mean uniform_nats=5.497 share_c0_over_uniform=0.610 share_cK_over_uniform=0.024 median_c0=7.388 median_cK=0.437
+UNIFORM state=C_state uniform_nats=5.497 share_c0_over_uniform=0.609 share_cK_over_uniform=0.025 median_c0=7.391 median_cK=0.428
+## B6, from source (the store line's declaration: D 64, alphabet 244, complex 32, moment modes 16): a cavity face at every computed site adds, a site,
+## the opening (three rows of D, the moment chart 64 by 64), one moment step at the bare stride, and the readout (the chart, the lift 64 by 64, the tied face
+## 244 by 64, the face): about 23,900 products, 64 quotients, 2 roots and 244 face reads a site; at 40,741 computed sites a section about 0.97 G products
+## and six launches (opening, moment step, chart, lift, tied face, face), about 1.7 ms a section at step 5's profiled times a launch (0.08 + 0.12 + 0.32 +
+## 0.42 + 0.64 + 0.08 ms), 0.005 of a 305 ms section
+B6 products_a_site=23900 sites_a_section=40741 products_a_section=0.97e9 launches_a_section=6 ms_a_section=1.7
+## G127 scored (on the mean of states)
+G127 a cK_code=0.907 guess=1.45 band=1.15..1.80 missed_below; cK_pooled=1.200 guess=1.55 band=1.25..1.90 missed_below
+G127 b c0_over_cK_pooled=6.710 guess=1.35 band=1.12..1.70 missed_above; spearman code=0.249 web=0.182 science=0.169 books=0.081 wikidata=0.452 guess=0.65 band=0.45..0.82 missed on four slices (wikidata at the band's floor)
+G127 c mean_epoch_pooled=1.118 guess=2.5 band=2.0..3.2 missed_below; one_place_share=0.909 guess=0.34 band=0.22..0.46 missed_above
+G127 d kept_under_start_7_later=1.000 (every slice) guess=0.999 band=0.990..1.000 held; kept_under_doubled_leading_spaces=0.9998 guess=0.97 band=0.90..0.995 missed_above
+G127 note='the opening's face through the readout codes above the uniform face at 0.610 of places (mean 8.05 nats against 5.50): the cut opens almost every place, so the kept shares are those of a cut that opens everywhere, and say nothing of sites'
+G127 rule='a rank under 0.40 on four slices (three needed): the readout does not read an opening; by the rule the design gives the opening a face of its own before any build, a law change recorded first'
