@@ -2156,6 +2156,44 @@ __device__ __forceinline__ bool sub_fits(wide a, wide b, wide *r) {
     return true;
 }
 
+// [definition; theory, November 12, P54 step 4] **The contact's products on the words their bounds prove** (P54 item 2's table, every bit kept).
+// - A product of two 64-bit words is formed from its two 64-bit halves (`mul.lo`, `mul.hi`), never as a 128 by 128 product of their sign
+//   extensions: the same integer, under `2^126` in magnitude.
+// - A product of two words that fit 32 bits is one 32 by 32 product to 64 bits. The words that do: a unit word or probe (`qf`, `pq`, which
+//   `field_unit` fits to 32 bits, refused past them), a skin (`D ≤ 2^30`: `skin_word` refuses past it and a decay `e^(−x)` is at most one), a
+//   crowd's count (`< 2^31`, read), and a crowd's summed word `W` where it is under `2^31` in magnitude. No refusal bounds `W` (a unit word is
+//   at most `7 · 2^16` once its root is read, `ratio_to_power`, but a crowd's count is the declaration's), so it is read per crowd and the wide
+//   forms stand where it is not.
+// - A share (`e`, `ce`, an unsigned word) times a signed word is its magnitude's product, negated: under `2^127` for any two 64-bit words.
+__device__ __forceinline__ wide mul64_128(int64_t a, int64_t b) {
+    const uint64_t lo = (uint64_t)a * (uint64_t)b;
+    const uint64_t hi = (uint64_t)__mul64hi((long long)a, (long long)b);
+    return (wide)(((uwide)hi << 64) | (uwide)lo);
+}
+
+__device__ __forceinline__ uwide mulu64(uint64_t a, uint64_t b) {
+    return ((uwide)__umul64hi(a, b) << 64) | (uwide)(a * b);
+}
+
+__device__ __forceinline__ wide mulu64_128(uint64_t a, int64_t b) {
+    const wide p = (wide)mulu64(a, mag64(b));
+    return b < 0 ? -p : p;
+}
+
+// `a b` for two words that fit 32 bits (the caller's bound), as the one 32 by 32 product to 64 bits (`mul.wide.s32`; the compiler lowers the
+// same product of two sign-extended words to a 64-bit `mul.lo`).
+__device__ __forceinline__ int64_t mul32(int64_t a, int64_t b) {
+    int64_t r;
+    asm("mul.wide.s32 %0, %1, %2;" : "=l"(r) : "r"((int32_t)a), "r"((int32_t)b));
+    return r;
+}
+
+// Whether a wide word is under `2^31` in magnitude, and the word on 32 bits.
+__device__ __forceinline__ bool narrow31(wide v, int32_t *out) {
+    *out = (int32_t)(int64_t)v;
+    return (uwide)(v + ((((wide)1) << 31) - 1)) < ((((uwide)1) << 32) - 1);
+}
+
 // [definition; agent-inferred, November 1] **A mode's lock against the source that arrives** (the host's
 // `lock`, §15.2): `2 count D Re(conj(a) b) 2^g − D² |b|²` for the receiver's mode `a` and a source's `b`
 // (a crowd's summed word over its `count`) carried by the skin `(D, g)`, every product and sum checked
@@ -2297,6 +2335,39 @@ __device__ __forceinline__ int64_t crowd_base(const FieldWords &w, uint32_t h, c
     wide s = 0;
     for (uint32_t l = 0; l < w.n; l++) {
         const wide lk = lock_of(wi[l], wi[w.n + l], swhi[l] - swlo[l], swhi[w.n + l] - swlo[w.n + l], (wide)count, crowd_skin_raw(w, h, l, gi, level, right), g, w.status);
+        if (!add_fits(s, lk, &s)) {
+            atomicOr(w.status, REFUSED_CARRIER);
+        }
+    }
+    const uint32_t bits = FACE_BITS + 2 * g + 1;
+    return fit64(div_nearest(s, (wide)(count * count) << bits), w.status);
+}
+
+// [definition; theory, November 12, P54 step 4] `crowd_base` on the words its bounds prove (`field_contact_rows`' crowds): a mode whose summed
+// words are under `2^31` forms its pairing `w·W` and power `|W|²` as 32-bit products (each under `2^62`, their sums under `2^63`), `2 |C| D`
+// (under `2^62`) and `D²` (at most `2^60`) alike, the products of those as 64 by 64, and the grain's power as a shift where the lengths prove
+// `pairing · 2|C|D · 2^g` under `2^126`. There none of `lock_of`'s checks can fail and the lock is its integer; any other mode is `lock_of`'s.
+__device__ __forceinline__ int64_t crowd_base_narrow(const FieldWords &w, uint32_t h, const int64_t *wi, const wide *swlo, const wide *swhi, uint64_t count, uint32_t level, uint64_t gi, bool right) {
+    const uint32_t g = skinless(w, h) ? 0 : MOVE_BITS;
+    wide s = 0;
+    for (uint32_t l = 0; l < w.n; l++) {
+        const wide b0 = swhi[l] - swlo[l], b1 = swhi[w.n + l] - swlo[w.n + l];
+        const wide d = crowd_skin_raw(w, h, l, gi, level, right);
+        int32_t n0, n1;
+        wide lk = 0;
+        bool narrow = narrow31(b0, &n0) & narrow31(b1, &n1) & (count < ((uint64_t)1 << 31));
+        if (narrow) {
+            const int64_t pairing = mul32(wi[l], n0) + mul32(wi[w.n + l], n1);
+            const int64_t c2d = 2 * (int64_t)count * (int64_t)d;
+            narrow = bit_length(mag64(pairing)) + bit_length((uint64_t)c2d) + g <= 126;
+            if (narrow) {
+                const int64_t power = mul32(n0, n0) + mul32(n1, n1);
+                lk = (mul64_128(pairing, c2d) << g) - mul64_128(power, mul32((int64_t)d, (int64_t)d));
+            }
+        }
+        if (!narrow) {
+            lk = lock_of(wi[l], wi[w.n + l], b0, b1, (wide)count, d, g, w.status);
+        }
         if (!add_fits(s, lk, &s)) {
             atomicOr(w.status, REFUSED_CARRIER);
         }
@@ -3764,7 +3835,8 @@ extern "C" __global__ void __launch_bounds__(REV_ROWS * 32, 6) field_contact_row
             const int64_t *vj = values + (uint64_t)j * S;
             wide dp = 0;
             for (uint32_t x = 0; x < S; x++) {
-                dp += (wide)dyi[x] * carried_ij_at(w, h, x % n, g, srow + k, gap, vj[x]);
+                // [P54 step 4] The carried value is under `2^63` (`D ≤ 2^30`): the covector's product is 64 by 64.
+                dp += mul64_128(dyi[x], (int64_t)carried_ij_at(w, h, x % n, g, srow + k, gap, vj[x]));
             }
             return dp;
         };
@@ -3792,8 +3864,8 @@ extern "C" __global__ void __launch_bounds__(REV_ROWS * 32, 6) field_contact_row
 #pragma unroll
             for (int q = 0; q < 8; q++) {
                 const longlong2 t = v2[q];
-                dp += (wide)dyi[2 * q] * (wide)(still_h ? t.x : carry_d(dec[(2 * q) & 7], t.x));
-                dp += (wide)dyi[2 * q + 1] * (wide)(still_h ? t.y : carry_d(dec[(2 * q + 1) & 7], t.y));
+                dp += mul64_128(dyi[2 * q], still_h ? t.x : carry_d(dec[(2 * q) & 7], t.x));
+                dp += mul64_128(dyi[2 * q + 1], still_h ? t.y : carry_d(dec[(2 * q + 1) & 7], t.y));
             }
             return dp;
         };
@@ -3876,7 +3948,8 @@ extern "C" __global__ void __launch_bounds__(REV_ROWS * 32, 6) field_contact_row
                 for (uint32_t jj = part; jj < 32; jj += parts) {
                     const uint32_t jx = stj[warp][jj];
                     if (jx != UINT32_MAX) {
-                        sum += (wide)dss[warp][jj] * skin_raw_at(w, h, m, g, srow + stk[warp][jj], jx > i ? jx - i : i - jx) * (wide)words[(uint64_t)jx * S + entry];
+                        // [P54 step 4] `δs (D ŵ_j)`: the skin and the unit word on 32 bits (their product under `2^61`), then 64 by 64.
+                        sum += mul64_128(dss[warp][jj], mul32((int64_t)skin_raw_at(w, h, m, g, srow + stk[warp][jj], jx > i ? jx - i : i - jx), words[(uint64_t)jx * S + entry]));
                     }
                 }
             }
@@ -3887,7 +3960,7 @@ extern "C" __global__ void __launch_bounds__(REV_ROWS * 32, 6) field_contact_row
         if (cnts[warp][lane] != 0) {
             const wide dzc = compare((wide)w.ce[hg * w.slots + lane], dpcs[warp][lane]);
             const uint32_t clo = crlo[warp][lane], chi = crhi[warp][lane], clv = crlv[warp][lane];
-            const int64_t cs = crowd_base(w, h, w.pq + ((uint64_t)h * w.T + g) * S, swp + (uint64_t)clo * S, swp + (uint64_t)(chi + 1) * S, cnts[warp][lane], clv, g, clo > i);
+            const int64_t cs = crowd_base_narrow(w, h, w.pq + ((uint64_t)h * w.T + g) * S, swp + (uint64_t)clo * S, swp + (uint64_t)(chi + 1) * S, cnts[warp][lane], clv, g, clo > i);
             tacc += rel(dzc * (wide)cs, FACE_BITS);
             const wide dz = rel(temper * dzc, MATERIAL_BITS);
             if ((dz < 0 ? -dz : dz) >> min(w.dsbits, 63u) != 0) {
@@ -3923,9 +3996,18 @@ extern "C" __global__ void __launch_bounds__(REV_ROWS * 32, 6) field_contact_row
                 const wide d = crowd_skin_raw(w, h, m, g, lv, lo > i);
                 const wide dsk = dsks[warp][jj];
                 const wide wsum = swp[(uint64_t)(hi_ + 1) * S + entry] - swp[(uint64_t)lo * S + entry];
-                sum += div_nearest_by(dsk * d * wsum, cdiv[warp][jj]);
-                // The key's bracket released by the skin's bits once, its product by the covector checked.
-                const wide bracket = rel(((d * (wide)w.pq[((uint64_t)h * w.T + g) * S + entry] * (wide)count) << g0) - d * d * wsum, g0);
+                // [P54 step 4] Where the crowd's summed word is under `2^31`: `D W`, `D ŵ_i` and `D²` on 32 bits (under `2^61`), their
+                // products by the covector, the count and `W` as 64 by 64; otherwise the wide forms.
+                int32_t w32;
+                wide bracket;
+                if (narrow31(wsum, &w32)) {
+                    sum += div_nearest_by(mul64_128(dsks[warp][jj], mul32((int64_t)d, w32)), cdiv[warp][jj]);
+                    // The key's bracket released by the skin's bits once, its product by the covector checked.
+                    bracket = rel((mul64_128(mul32((int64_t)d, w.pq[((uint64_t)h * w.T + g) * S + entry]), (int64_t)count) << g0) - mul64_128(mul32((int64_t)d, (int64_t)d), w32), g0);
+                } else {
+                    sum += div_nearest_by(dsk * d * wsum, cdiv[warp][jj]);
+                    bracket = rel(((d * (wide)w.pq[((uint64_t)h * w.T + g) * S + entry] * (wide)count) << g0) - d * d * wsum, g0);
+                }
                 wide prod = 0;
                 if (!mul_fits(dsk, bracket, &prod)) {
                     atomicOr(w.status, REFUSED_KEY);
@@ -3933,7 +4015,9 @@ extern "C" __global__ void __launch_bounds__(REV_ROWS * 32, 6) field_contact_row
                 const wide pw = div_nearest_by(prod, cdiv2[warp][jj]);
                 add_wide(w.cw + (first + r + lo) * S + entry, pw);
                 add_wide(w.cw + (first + r + hi_ + 1) * S + entry, -pw);
-                const wide pv = div_nearest_by((wide)w.ce[hg * w.slots + jj] * crowd_carried_ij(w, h, m, g, lv, lo > i, dyi[entry]), cdiv[warp][jj]);
+                // [P54 step 4] The carried covector `release(D δỹ, 30)` on 64 bits (`carry_d`, under `2^63`), its share's product unsigned by signed.
+                const int64_t cy = still ? dyi[entry] : carry_d((uint64_t)crowd_skin_ij(w, h, m, g, lv, lo > i), dyi[entry]);
+                const wide pv = div_nearest_by(mulu64_128(w.ce[hg * w.slots + jj], cy), cdiv[warp][jj]);
                 add_wide(w.cv + (first + r + lo) * S + entry, pv);
                 add_wide(w.cv + (first + r + hi_ + 1) * S + entry, -pv);
             }
@@ -5254,14 +5338,18 @@ extern "C" __global__ void __launch_bounds__(CONTACT_ROWS * 32) field_pace_skin_
             for (uint32_t l = 0; l < n; l++) {
                 const uint32_t slot = l * (w.frames - w.still) + h % w.frames - w.still;
                 const wide dec = skin_ij_at(w, h, l, g, srow + k, gap);
-                const wide inner = (wide)dyi[l] * (wide)values[(uint64_t)j * S + l] + (wide)dyi[n + l] * (wide)values[(uint64_t)j * S + n + l];
+                // [P54 step 4] `Re(conj(δỹ) ṽ)` as two 64 by 64 products (each under `2^126`, their sum under `2^127`).
+                const wide inner = mul64_128(dyi[l], values[(uint64_t)j * S + l]) + mul64_128(dyi[n + l], values[(uint64_t)j * S + n + l]);
                 wide value = 0;
                 if (!mul_fits((wide)e[j], inner, &value)) {
                     atomicOr(w.status, REFUSED_CARRIER);
                 }
                 value = rel(value, SHARE_BITS);
-                const wide kr = words[(uint64_t)j * S + l], ki = words[(uint64_t)j * S + n + l];
-                const wide bracket = ((2 * ((wide)wi[l] * kr + (wide)wi[n + l] * ki)) << MOVE_BITS) - 2 * dec * (kr * kr + ki * ki);
+                // [P54 step 4] The lock's pairing `w·k` and power `|k|²` from 32-bit products (unit words), `2 D |k|²` as 64 by 64 unsigned.
+                const int64_t kr = words[(uint64_t)j * S + l], ki = words[(uint64_t)j * S + n + l];
+                const wide pairing = (wide)mul32(wi[l], kr) + (wide)mul32(wi[n + l], ki);
+                const uint64_t power = (uint64_t)mul32(kr, kr) + (uint64_t)mul32(ki, ki);
+                const wide bracket = (pairing << (MOVE_BITS + 1)) - (wide)mulu64(power, 2 * (uint64_t)dec);
                 wide lock = 0;
                 if (!mul_fits((wide)dsr[j], bracket, &lock)) {
                     atomicOr(w.status, REFUSED_KEY);
@@ -5292,7 +5380,17 @@ extern "C" __global__ void __launch_bounds__(CONTACT_ROWS * 32) field_pace_skin_
                         value = div_nearest(rel(value, SHARE_BITS), cnt);
                         const wide wr = wi[l], wim = wi[n + l];
                         const wide mr = swp[(uint64_t)(hi_ + 1) * S + l] - swp[(uint64_t)lo * S + l], mi = swp[(uint64_t)(hi_ + 1) * S + n + l] - swp[(uint64_t)lo * S + n + l];
-                        const wide bracket = div_nearest(((2 * cnt * (wr * mr + wim * mi)) << MOVE_BITS) - 2 * dec * (mr * mr + mi * mi), cnt * cnt);
+                        // [P54 step 4] Where the crowd's summed words are under `2^31`: its pairing and power from 32-bit products (sums under
+                        // `2^63`), their products by `2|C|` and `2D` as 64 by 64; otherwise the wide forms.
+                        int32_t mr32, mi32;
+                        wide bracket;
+                        if (narrow31(mr, &mr32) & narrow31(mi, &mi32)) {
+                            const int64_t pairing = mul32(wi[l], mr32) + mul32(wi[n + l], mi32);
+                            const int64_t power = mul32(mr32, mr32) + mul32(mi32, mi32);
+                            bracket = div_nearest((mul64_128(pairing, 2 * (int64_t)count) << MOVE_BITS) - mul64_128(power, 2 * (int64_t)dec), cnt * cnt);
+                        } else {
+                            bracket = div_nearest(((2 * cnt * (wr * mr + wim * mi)) << MOVE_BITS) - 2 * dec * (mr * mr + mi * mi), cnt * cnt);
+                        }
                         wide lock = 0;
                         if (!mul_fits((wide)w.cds[hg * w.slots + lane], bracket, &lock)) {
                             atomicOr(w.status, REFUSED_KEY);
@@ -5734,5 +5832,111 @@ extern "C" __global__ void __launch_bounds__(REV_ROWS * 32, 6) field_yard_rows(F
             dq[slot] = 0;
         }
         __syncwarp();
+    }
+}
+
+// [measurement; theory, November 12, P54 item 1] **The words' occupied bits** (a ruler; only the ruler build of the profile example, feature
+// `ruler-bits`, launches these): a histogram of each word's magnitude's binary length (0 for the zero word, to 128) by array and clock, over the
+// pairs a receiver's support meets (the region block's words, the clock's skins by mode, a crowd's share at its live slots) or over a batch's
+// rows. They read the law's arrays and write only their histograms.
+#define BITS_BINS 129
+__device__ __forceinline__ uint32_t bits_of_wide(wide v) {
+    const uwide m = (uwide)(v < 0 ? -v : v);
+    const uint64_t hi = (uint64_t)(m >> 64), lo = (uint64_t)m;
+    return hi ? 128 - (uint32_t)__clzll((long long)hi) : lo ? 64 - (uint32_t)__clzll((long long)lo) : 0;
+}
+
+// `kind`: 0 the score or share e (u64, a head's block), 1 the lock sb (i64, a head's block), 2 ds (i64, one head's block), 3 dpb (128 bits, one head's
+// block), 4 the clock's skin of mode `mode` (u32, the support stride; a paced head where its pace is not plain), 5 a crowd's share ce at its live slots.
+extern "C" __global__ void __launch_bounds__(CONTACT_ROWS * 32) field_yard_bits_pairs(FieldWords w, uint32_t h, uint32_t kind, uint32_t mode, const void *arr, unsigned long long *hist) {
+    __shared__ uint32_t local[BITS_BINS];
+    __shared__ RowCls rcs[CONTACT_ROWS];
+    for (uint32_t c = threadIdx.x; c < BITS_BINS; c += blockDim.x) {
+        local[c] = 0;
+    }
+    __syncthreads();
+    const uint32_t warp = threadIdx.x >> 5, lane = threadIdx.x & 31;
+    const uint32_t classes = w.nclasses;
+    for (uint64_t g = ((uint64_t)blockIdx.x * blockDim.x + threadIdx.x) >> 5; g < w.T; g += (uint64_t)gridDim.x * (blockDim.x >> 5)) {
+        if (skipped_row(w, g)) {
+            continue;
+        }
+        const uint64_t hg = (uint64_t)h * w.T + g;
+        const uint32_t r = w.site_region[g], i = w.site_pos[g];
+        const uint64_t first = w.region_off[r];
+        const uint32_t sites = w.region_off[r + 1] - (uint32_t)first;
+        const uint32_t *members = w.members + (uint64_t)h * w.T + first;
+        const uint32_t *off = w.class_off + ((uint64_t)h * w.R + r) * (2 * classes + 1);
+        const uint32_t K = row_prepare(w, hg, off, rcs[warp], lane);
+        if (kind == 5) {
+            const uint32_t nslots = rcs[warp].open ? 0 : crowd_slots(sites);
+            uint32_t lo, hi_, lv;
+            if (lane < nslots && crowd_at(i, sites, lane, &lo, &hi_, &lv)) {
+                const uint64_t v = ((const uint64_t *)arr)[hg * w.slots + lane];
+                atomicAdd(&local[v ? 64 - __clzll((long long)v) : 0], 1u);
+            }
+            continue;
+        }
+        if (kind == 4 && !paced_at(w, h, g)) {
+            continue;
+        }
+        const uint64_t at = w.region_eoff[r] + (uint64_t)i * sites;
+        const uint64_t srow = support_row(w, r, i);
+        for (uint32_t k = lane; k < K; k += 32) {
+            const uint32_t j = support_at(members, off, rcs[warp], i, sites, k);
+            if (j == UINT32_MAX) {
+                continue;
+            }
+            uint32_t b = 0;
+            if (kind == 0) {
+                const uint64_t v = ((const uint64_t *)arr)[(uint64_t)h * w.E + at + j];
+                b = v ? 64 - (uint32_t)__clzll((long long)v) : 0;
+            } else if (kind == 1) {
+                b = bits_of_wide((wide)((const int64_t *)arr)[(uint64_t)h * w.E + at + j]);
+            } else if (kind == 2) {
+                b = bits_of_wide((wide)((const int64_t *)arr)[at + j]);
+            } else if (kind == 3) {
+                b = bits_of_wide(((const wide *)arr)[at + j]);
+            } else {
+                const uint32_t v = ((const uint32_t *)arr)[((uint64_t)paced_index(w, h) * w.E2 + srow + k) * w.n + mode];
+                b = v ? 32 - (uint32_t)__clz((int)v) : 0;
+            }
+            atomicAdd(&local[b], 1u);
+        }
+    }
+    __syncthreads();
+    for (uint32_t c = threadIdx.x; c < BITS_BINS; c += blockDim.x) {
+        if (local[c]) {
+            atomicAdd(&hist[c], (unsigned long long)local[c]);
+        }
+    }
+}
+
+// A batch's rows: `kind` 0 a 64-bit signed word, 1 a 32-bit signed word, 2 a 128-bit word, 3 a 64-bit count.
+extern "C" __global__ void field_yard_bits_words(const void *arr, uint32_t kind, uint64_t count, unsigned long long *hist) {
+    __shared__ uint32_t local[BITS_BINS];
+    for (uint32_t c = threadIdx.x; c < BITS_BINS; c += blockDim.x) {
+        local[c] = 0;
+    }
+    __syncthreads();
+    for (uint64_t c = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; c < count; c += (uint64_t)gridDim.x * blockDim.x) {
+        uint32_t b;
+        if (kind == 0) {
+            b = bits_of_wide((wide)((const int64_t *)arr)[c]);
+        } else if (kind == 1) {
+            b = bits_of_wide((wide)((const int32_t *)arr)[c]);
+        } else if (kind == 2) {
+            b = bits_of_wide(((const wide *)arr)[c]);
+        } else {
+            const uint64_t v = ((const uint64_t *)arr)[c];
+            b = v ? 64 - (uint32_t)__clzll((long long)v) : 0;
+        }
+        atomicAdd(&local[b], 1u);
+    }
+    __syncthreads();
+    for (uint32_t c = threadIdx.x; c < BITS_BINS; c += blockDim.x) {
+        if (local[c]) {
+            atomicAdd(&hist[c], (unsigned long long)local[c]);
+        }
     }
 }

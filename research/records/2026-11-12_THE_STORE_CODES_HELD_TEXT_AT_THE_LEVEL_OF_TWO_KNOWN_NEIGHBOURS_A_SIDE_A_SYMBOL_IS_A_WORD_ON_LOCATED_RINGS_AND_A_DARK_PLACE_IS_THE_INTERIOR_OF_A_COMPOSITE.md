@@ -414,6 +414,11 @@ list of composites (agent-inferred, unbuilt):
   is the face the moments already form, and `ρ(c)` is what the level above learns in its own
   rows.
 
+*Amended November 13* ([the design record](2026-11-13_A_LEVELS_SITES_ARE_THE_EPOCHS_OF_ITS_NEWS_BEGUN_AGAIN_AT_EACH_OPENING_ITS_CLOCK_IS_THE_NEWS_BETWEEN_THEM_A_PLACES_NEWS_IS_READ_AT_ITS_CAVITY_FACE_AND_EACH_NAVIGATOR_KEEPS_ITS_LOCATED_CLOCK.md), §4): the clock whose epochs are the level
+above's sites is the clock of the places' own news, begun again at each opening, and never a
+paced clock's class rates, which stay each navigator's own. An epoch has no row of its own: its
+word is the moment its places composed, with a remainder.
+
 The built tower of scales (atlas `tower.field-scale-packets`) is the plain clock's case: a packet
 of a fixed six places, whose first reading missed its acceptance and whose record deferred
 "packets cut at landmarks". So the lens's law takes its structural form: **a site of the next
@@ -688,3 +693,5 @@ not hold for the build that fits, and (b) is scored as fixed with that stated.
   *Restated the same day:* the stride that reads the place and the level above on its epochs are
   the news clock of October 27, built for the earlier tower with its carry law proved in Lean
   (the same record, §7 and §8). The design joins the November tower to it.
+  *Written November 13* ([the design record](2026-11-13_A_LEVELS_SITES_ARE_THE_EPOCHS_OF_ITS_NEWS_BEGUN_AGAIN_AT_EACH_OPENING_ITS_CLOCK_IS_THE_NEWS_BETWEEN_THEM_A_PLACES_NEWS_IS_READ_AT_ITS_CAVITY_FACE_AND_EACH_NAVIGATOR_KEEPS_ITS_LOCATED_CLOCK.md)): what the stride reads and the level above;
+  the address half is ordered there after rulers on value alphabets.

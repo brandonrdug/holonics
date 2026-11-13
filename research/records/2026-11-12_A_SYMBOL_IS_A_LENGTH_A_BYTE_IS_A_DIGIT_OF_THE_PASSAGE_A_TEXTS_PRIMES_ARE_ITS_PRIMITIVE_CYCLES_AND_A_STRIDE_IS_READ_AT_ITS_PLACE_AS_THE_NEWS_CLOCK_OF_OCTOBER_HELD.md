@@ -294,6 +294,15 @@ are near blind to the news, and the carries of the place's own length even an ep
    news under the machine's own face, against 0.38 and 0.17 here), with the held code by slice and
    kind at lap means beside it, and its guess is fixed before its build is read.
 
+*Amended November 13* ([the design record](2026-11-13_A_LEVELS_SITES_ARE_THE_EPOCHS_OF_ITS_NEWS_BEGUN_AGAIN_AT_EACH_OPENING_ITS_CLOCK_IS_THE_NEWS_BETWEEN_THEM_A_PLACES_NEWS_IS_READ_AT_ITS_CAVITY_FACE_AND_EACH_NAVIGATOR_KEEPS_ITS_LOCATED_CLOCK.md), §4.1 to §4.4 and §5). Items 1 and 3 ran two
+things together: a navigator's clock and a receiver's section. The trained class rates are each
+paced clock's own friction (G123: they are no symbol's transmission, and they screen), so the
+moment's clocks keep them and item 1's stride for the moment is retired. Item 2 stands with its
+cut changed: the count begins again at each opening, since October's carry on a running sum
+keeps 0.31 to 0.70 of its sites where the start or a predicted stretch changes (G124, G125).
+The place's code is read at the opening the place would have as an open place, never at the
+tick before.
+
 ## 9. The recorded failures this line could repeat, and the guides' repair
 
 - *A located cause carried unrepaired into a new consumer*: the November tower entered beside the
@@ -357,6 +366,11 @@ withdrawn unread (G121).
    not. A recognized stretch is a stretch of null readings: it has no length on this clock, the
    moment of §2 crosses it unchanged, and what stood before it stays in contact with what
    follows (the lens of 20:31Z: predicted input goes dark, at the least mutual loss).
+   *Amended November 13* ([the design record](2026-11-13_A_LEVELS_SITES_ARE_THE_EPOCHS_OF_ITS_NEWS_BEGUN_AGAIN_AT_EACH_OPENING_ITS_CLOCK_IS_THE_NEWS_BETWEEN_THEM_A_PLACES_NEWS_IS_READ_AT_ITS_CAVITY_FACE_AND_EACH_NAVIGATOR_KEEPS_ITS_LOCATED_CLOCK.md), §3.2 and §5): the first clause holds only
+   where the inserted places code at zero. At a reader's real codes a carry on the running sum
+   takes its origin from the passage's start, and a count ruler read it keeping 0.310 of its
+   sites under a changed start and 0.433 under a doubled indentation at a mean epoch of six
+   places. The cut that keeps them begins its count again at each opening.
 2. **A uniform change of rate is a shift along the ladder of modes.** With
    `m(s) = Σ_k β(u_k) exp(−s(τ_t − τ_k))`, the re-timing `τ ↦ λτ` gives `m′(s) = m(λs)`, and
    with `s_n = (2π/n)(1 + i)`, `λ s_n = s_(n/λ)`: ring `n` reads of the re-timed strand what ring
@@ -481,6 +495,7 @@ between whole turns.
   the stride of §8.1 and the level above of §8.2 on the November tower, with October's news clock
   and located transport as its owners' ancestors, its device line, its acceptance and its guess.
   It is ordered beside the engine's steps and ahead of any long pass.
+  *Written November 13* ([the design record](2026-11-13_A_LEVELS_SITES_ARE_THE_EPOCHS_OF_ITS_NEWS_BEGUN_AGAIN_AT_EACH_OPENING_ITS_CLOCK_IS_THE_NEWS_BETWEEN_THEM_A_PLACES_NEWS_IS_READ_AT_ITS_CAVITY_FACE_AND_EACH_NAVIGATOR_KEEPS_ITS_LOCATED_CLOCK.md)), with §8.1 amended there.
 - **The invariance of §10.4** as the design's acceptance, with its guess and with the predicted
   failure of §11.5; **rows shared along the ladder of modes** (§10.2) **and along the units'
   orbits** (§11.4) as questions the design record answers before it sizes a part.

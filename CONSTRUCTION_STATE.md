@@ -270,6 +270,43 @@ repository was reset on September 24; the pre-reset tree is
     at 27.5 ms a section against today's 129, the columns' transposed walk the largest part of
     it (agent-inferred from source). By G120's rule the rows' products at the widths their
     bounds prove come first, the layout second, each with its guess fixed before its build.
+    Step 4 (November 13; every bit kept, 600 of 600 lines reproduced) formed each product of
+    `field_contact_rows` and `field_pace_skin_back` in the word its bounds prove, and read
+    0.970 and 0.908 of each entry's own time and 0.986 of the section inside one hold (330.6 ms
+    against controls of 334.1 and 336.3), where 0.72, 0.75 and 0.951 were guessed: G122 missed
+    on the rows and the section. The compiler already formed a product of two 64-bit words from
+    its halves, so the rows' cost is not their word widths. Read at source by line, what step 4
+    left is the crowds' and the modes' helpers: a quotient by `count² 2^b` that takes the
+    128-by-128 software division on every crowd of a paced clock (`b = 77`), checked 128-bit
+    products a mode, and a 128-bit atomic sum a mode at one address (agent-inferred, counted by
+    hand). Their time by helper is the next reading (G126), with the rebuild of any helper at
+    0.08 of an entry fixed in the same order.
+  - The level above is designed on the news, and three count rulers fixed its choices
+    (November 13; [the design record](research/records/2026-11-13_A_LEVELS_SITES_ARE_THE_EPOCHS_OF_ITS_NEWS_BEGUN_AGAIN_AT_EACH_OPENING_ITS_CLOCK_IS_THE_NEWS_BETWEEN_THEM_A_PLACES_NEWS_IS_READ_AT_ITS_CAVITY_FACE_AND_EACH_NAVIGATOR_KEEPS_ITS_LOCATED_CLOCK.md)). A level has two things the
+    record of the symbol's length ran together: its places (where a receiver's section is
+    arrived at) and its clock (the news elapsed between them). The trained class rates are each
+    paced clock's own friction: against a symbol's transmission they rank at 0.30 and 0.26
+    where 0.55 and 0.50 were guessed (G123, missed), and their carries screen (0.86 and 0.90
+    of the mutual information across a boundary of the same count, 0.82 for a place's own
+    code). So each navigator keeps its located clock, and the cut belongs to the level above.
+    October's carry on a running sum takes its origin from the passage's start: at a mean epoch
+    of six places it keeps 0.310 of its sites under a changed start and 0.433 under a doubled
+    indentation (G124). A count that begins again at each opening keeps 0.991 and 0.828 there,
+    and 0.9997 and 0.996 at a section of one input octet's news, 8 bits, where the odometer
+    keeps 0.61 and 0.70 (G125; of eleven guessed parts five missed, each recorded). The design
+    (agent-inferred, unbuilt): a level's sites are the epochs of its places' news under the
+    restarting carry (atlas `code.epoch-restarting-carry`), a place that carries opening its
+    epoch; the level's clock strides an epoch's news over the section, October's odometer
+    standing as the law of that clock; a place's news is read at the face of the opening it
+    would have as an open place, its own row and its own moment terms withheld
+    (`code.place-news-cavity-face`), one law for written and open places; an epoch enters the
+    level above through a chart on the news phase, of which the fixed packets are the case of
+    six places of equal news (`code.epoch-news-phase-chart`); the section is the width of the
+    boundary's digit, so the founding is the identity and epochs lengthen as places are
+    predicted. Its acceptance is an invariance (the share of sites kept under a changed start
+    and under re-timings the reader predicts, with a predicted failure under one it has not
+    met). Its first reading is ordered from a trained state before any build: every held
+    place's code at its cavity opening, by slice, and the cut on those codes.
   - Every extent of the built declaration is given the part it sizes, how it was reached and what
     sizes it (the same record, §5), with ten findings by file and line and the build that closes
     each. The departures that stand: the face's 64 coordinates are two lanes of 32, the second a

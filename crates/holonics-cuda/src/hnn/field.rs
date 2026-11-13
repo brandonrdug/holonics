@@ -389,6 +389,11 @@ pub fn skin_octets(d: &FieldDeclaration, sites: usize, definite: usize) -> (u64,
     (entry * sites as u64 * stride + (site + moment) * sites as u64, entry, site, moment)
 }
 
+/// [measurement; theory, November 12, P54 item 1] The ruler build's arrays whose words' bits it reads, by clock (`field_yard_bits_*`).
+pub const BITS_NAMES: [&str; 22] = ["e_score", "e_share", "sb", "ds", "dpb", "skin_l0", "skin_l1", "skin_l2", "skin_l3", "skin_l4", "skin_l5", "skin_l6", "skin_l7", "vf", "qf", "pq", "qf32", "pq32", "ce", "sc", "sw", "sv"];
+pub const BITS_TICKS: usize = 4;
+pub const BITS_BINS: usize = 129;
+
 /// The near offsets a moment mode reads about a site, `2(NEAR − 1)` (the clock's store, `near_slot`).
 const CLOCK_NEAR: usize = 2 * (NEAR - 1);
 
@@ -819,6 +824,9 @@ pub struct CardField<'c> {
     /// [theory, November 12, P50 step 1] The test build's negative control: the clock's fill withheld, its store left at `SKIN_UNFILLED`.
     #[cfg(test)]
     unfilled: std::cell::Cell<bool>,
+    /// [measurement; theory, November 12, P54 item 1] The ruler build's histograms of the words' bits (`BITS_NAMES` by clock by bit length).
+    #[cfg(feature = "ruler-bits")]
+    bits: std::cell::RefCell<Option<CardBuffer<'c, u64>>>,
     pools: std::rc::Rc<std::cell::RefCell<Pools<'c>>>,
     /// A held read's rows by where their mass lies (a reading for the receipts): the regions' answer starts
     /// while it is read, and the cells `[tick · heads + head][rows, question, soft_near, other, current, question_far, far_effective, far_rows]` summed.
@@ -858,7 +866,7 @@ impl<'c> CardField<'c> {
         let (free, total) = (memory.free_bytes as u64, memory.total_bytes as u64);
         let used = total.saturating_sub(free);
         let budget = free.min(BOARD_CEILING.saturating_sub(used)).saturating_sub(MARGIN);
-        Ok(Self { card, module, budget, times: FieldTimes::default(), profile: None, head: Default::default(), #[cfg(test)] unfilled: Default::default(), pools: Default::default(), held_questions: Default::default(), covector_shares: Default::default(), row_questions: Default::default(), row_out: Default::default(), row_cov: Default::default(), held_cells: Default::default(), tick_reads: Default::default(), carry_gates: Default::default(), near_sites: Default::default(), near_out: Default::default(), clock_sites: Default::default(), clock_out: Default::default(), phases: None })
+        Ok(Self { card, module, budget, times: FieldTimes::default(), profile: None, head: Default::default(), #[cfg(test)] unfilled: Default::default(), #[cfg(feature = "ruler-bits")] bits: Default::default(), pools: Default::default(), held_questions: Default::default(), covector_shares: Default::default(), row_questions: Default::default(), row_out: Default::default(), row_cov: Default::default(), held_cells: Default::default(), tick_reads: Default::default(), carry_gates: Default::default(), near_sites: Default::default(), near_out: Default::default(), clock_sites: Default::default(), clock_out: Default::default(), phases: None })
     }
 
     /// The octets a batch's weight and contact stores may take.
@@ -1654,6 +1662,20 @@ impl<'c> CardField<'c> {
         self.launch("field_sums", Self::cells((heads * regions * (2 * span + 1)) as u64), THREADS, &mut [arg(words)])?;
         // The clock's skins, formed once for the exposure and the contact (the return forms them again for this tick's clock).
         self.skin_fill(field, words, sites)?;
+        #[cfg(feature = "ruler-bits")]
+        {
+            let rows1 = sites + regions;
+            for (arr, kind, count, at) in [(words.vf, 0, heads * sites * span, 13), (words.qf, 0, heads * sites * span, 14), (words.pq, 0, heads * sites * span, 15), (words.qf32, 1, heads * sites * span, 16), (words.pq32, 1, heads * sites * span, 17), (words.sc, 3, heads * rows1, 19), (words.sw, 2, heads * rows1 * span, 20), (words.sv, 2, heads * rows1 * span, 21)] {
+                self.bits_words(arr, kind, count, at, k)?;
+            }
+            if words.skin != 0 {
+                for h in (0..heads).filter(|&h| d.carries_moment(h) && !d.is_depth(h)) {
+                    for l in 0..n {
+                        self.bits_pairs(words, h, 4, l as u32, words.skin, 5 + l, k, sites)?;
+                    }
+                }
+            }
+        }
         let mut store = u32::from(stored);
         if keep_last && k + 1 == d.ticks {
             // The last tick's rows are read whole: the entries outside its support read zero.
@@ -1667,6 +1689,14 @@ impl<'c> CardField<'c> {
         let rows_per_block = CONTACT_ROWS;
         self.mark("tick_launch_pre");
         self.launch("field_exposure", Self::rows_grid((heads * sites) as u64, rows_per_block), (rows_per_block * 32) as u32, &mut [arg(words)])?;
+        #[cfg(feature = "ruler-bits")]
+        for h in 0..heads {
+            // The score is a signed word (`scored`), read as one; the share after the contact is a 63-bit fraction, read unsigned.
+            self.bits_pairs(words, h, 1, 0, words.e, 0, k, sites)?;
+            if words.sb != 0 {
+                self.bits_pairs(words, h, 1, 0, words.sb, 2, k, sites)?;
+            }
+        }
         let spread = self.timed(Kind::Copy, || card.fetch(&tick.bits)).map_err(device)?[1] as u64;
         if std::env::var_os("FIELD_SPREAD").is_some() {
             let need = field.row_bits().ok().zip(field.row_gain().ok()).map(|(bits, gain)| bits as i64 - (gain as i64 + (usize::BITS - 1 - d.reach.leading_zeros()) as i64 + 2) + spread as i64);
@@ -1676,6 +1706,13 @@ impl<'c> CardField<'c> {
         let limbs = row_limbs(field, spread)?;
         let contact: &'static str = ["field_contact_l5", "field_contact_l6", "field_contact_l7", "field_contact_l8", "field_contact_l9", "field_contact_l10", "field_contact_l11", "field_contact_l12", "field_contact_l13", "field_contact_l14", "field_contact_l15", "field_contact_l16", "field_contact_l17", "field_contact_l18", "field_contact_l19", "field_contact_l20"][limbs - MIN_LIMBS];
         self.launch(contact, Self::rows_grid((heads * sites) as u64, rows_per_block), (rows_per_block * 32) as u32, &mut [arg(words), arg(&mut store)])?;
+        #[cfg(feature = "ruler-bits")]
+        if store != 0 {
+            for h in 0..heads {
+                self.bits_pairs(words, h, 0, 0, words.e, 1, k, sites)?;
+                self.bits_pairs(words, h, 5, 0, words.ce, 18, k, sites)?;
+            }
+        }
         // The echo's round trips of this tick against the last (§15.3).
         if logits && k > 0 {
             words.e_prev = ticks[k - 1].e.device_ptr();
@@ -2617,6 +2654,11 @@ impl<'c> CardField<'c> {
                 )?;
             }
             self.launch("field_contact_rows", Self::rows_grid(sites as u64, REV_ROWS), (REV_ROWS * 32) as u32, &mut [arg(words), arg(&mut hh), arg(&mut dyhp), arg(&mut dsp), arg(&mut dqp)])?;
+            #[cfg(feature = "ruler-bits")]
+            {
+                self.bits_pairs(words, h, 2, 0, ds.device_ptr(), 3, at, sites)?;
+                self.bits_pairs(words, h, 3, 0, words.dpb, 4, at, sites)?;
+            }
             if d.carries_moment(h) && !d.is_depth(h) {
                 // The head's skins return to its variation (§16), from the pairs' and crowds' covectors just formed.
                 let (mut hh, mut dyhp, mut dsp) = (h as u32, dyh.device_ptr(), ds.device_ptr());
@@ -2971,6 +3013,37 @@ impl<'c> CardField<'c> {
         let (mut bp, mut count, mut op) = (up.device_ptr(), bs.len() as u64, out.device_ptr());
         self.launch("field_series_check", Self::cells(bs.len() as u64), THREADS, &mut [arg(&mut bp), arg(&mut count), arg(&mut op)])?;
         card.fetch_range(&out, 0, 4 * bs.len()).map_err(device)
+    }
+
+    /// [measurement; theory, November 12, P54 item 1] The ruler build's histogram slot of one array at one clock.
+    #[cfg(feature = "ruler-bits")]
+    fn bits_slot(&self, array: usize, tick: usize) -> Result<u64> {
+        let mut b = self.bits.borrow_mut();
+        if b.is_none() {
+            *b = Some(self.card.zeroed::<u64>(BITS_NAMES.len() * BITS_TICKS * BITS_BINS).map_err(device)?);
+        }
+        Ok(b.as_ref().map_or(0, |b| b.device_ptr()) + (((array * BITS_TICKS + tick.min(BITS_TICKS - 1)) * BITS_BINS) * 8) as u64)
+    }
+
+    #[cfg(feature = "ruler-bits")]
+    #[allow(clippy::too_many_arguments)]
+    fn bits_pairs(&self, words: &mut Words, h: usize, kind: u32, mode: u32, arr: u64, array: usize, tick: usize, sites: usize) -> Result<()> {
+        let mut slot = self.bits_slot(array, tick)?;
+        let (mut hh, mut kd, mut md, mut ap) = (h as u32, kind, mode, arr);
+        self.launch("field_yard_bits_pairs", Self::rows_grid(sites as u64, CONTACT_ROWS), (CONTACT_ROWS * 32) as u32, &mut [arg(words), arg(&mut hh), arg(&mut kd), arg(&mut md), arg(&mut ap), arg(&mut slot)])
+    }
+
+    #[cfg(feature = "ruler-bits")]
+    fn bits_words(&self, arr: u64, kind: u32, count: usize, array: usize, tick: usize) -> Result<()> {
+        let mut slot = self.bits_slot(array, tick)?;
+        let (mut ap, mut kd, mut n) = (arr, kind, count as u64);
+        self.launch("field_yard_bits_words", Self::cells(count as u64), THREADS, &mut [arg(&mut ap), arg(&mut kd), arg(&mut n), arg(&mut slot)])
+    }
+
+    /// [measurement; theory, November 12, P54 item 1] The ruler build's histograms: `[array][tick][bits]`, the arrays in `BITS_NAMES`' order.
+    #[cfg(feature = "ruler-bits")]
+    pub fn bits_histograms(&self) -> Option<Vec<u64>> {
+        self.bits.borrow().as_ref().and_then(|b| self.card.fetch(b).ok())
     }
 
     /// The batch's refusals, read off the card.
