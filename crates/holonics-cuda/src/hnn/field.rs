@@ -390,7 +390,11 @@ pub fn skin_octets(d: &FieldDeclaration, sites: usize, definite: usize) -> (u64,
 }
 
 /// [measurement; theory, November 12, P54 item 1] The ruler build's arrays whose words' bits it reads, by clock (`field_yard_bits_*`).
-pub const BITS_NAMES: [&str; 22] = ["e_score", "e_share", "sb", "ds", "dpb", "skin_l0", "skin_l1", "skin_l2", "skin_l3", "skin_l4", "skin_l5", "skin_l6", "skin_l7", "vf", "qf", "pq", "qf32", "pq32", "ce", "sc", "sw", "sv"];
+/// [measurement; theory, November 13, P56 item 1] After them, the share `e` by head and by the receiver's kind (definite, open), heads 0 to 3.
+pub const BITS_NAMES: [&str; 30] = [
+    "e_score", "e_share", "sb", "ds", "dpb", "skin_l0", "skin_l1", "skin_l2", "skin_l3", "skin_l4", "skin_l5", "skin_l6", "skin_l7", "vf", "qf", "pq", "qf32", "pq32", "ce", "sc", "sw", "sv",
+    "e_share_h0_definite", "e_share_h0_open", "e_share_h1_definite", "e_share_h1_open", "e_share_h2_definite", "e_share_h2_open", "e_share_h3_definite", "e_share_h3_open",
+];
 pub const BITS_TICKS: usize = 4;
 pub const BITS_BINS: usize = 129;
 
@@ -790,6 +794,13 @@ pub struct FieldProfile {
     /// Each head's kind as the declaration reads it: `still`, `paced` (a turned ring set that is no depth ring, whose skin reads its
     /// own clock) or `depth`.
     pub head_kinds: Vec<&'static str>,
+    /// [measurement; theory, November 13, P56 item 4] Each copy and take by its call site's line in this file (`copy` or `take`): count and ns.
+    pub by_site: std::collections::BTreeMap<(&'static str, u32), (u64, u128)>,
+    /// [measurement; theory, November 13, P56 item 4] A zeroed take's zeroing by its call site's line: count, ns (timed alone, the stream drained
+    /// before and after) and octets zeroed.
+    pub zeroed: std::collections::BTreeMap<u32, (u64, u128, u128)>,
+    /// [measurement; theory, November 13, P56 item 4] Every timed launch, copy, take and zeroing summed (ns): what a phase's wall holds of the card's.
+    pub timed_ns: u128,
 }
 
 /// [measurement; theory, November 12, P50 step 0b] The card's yardsticks ([`CardField::yardsticks`]): each reading as (rate a
@@ -854,6 +865,9 @@ pub struct CardField<'c> {
     clock_out: std::cell::RefCell<Vec<BlankClocks>>,
     /// The host's wall time between marks, by name (`FIELD_PHASES`), no stream synchronized.
     phases: Option<std::cell::RefCell<(Instant, std::collections::BTreeMap<&'static str, (u64, u128)>)>>,
+    /// [measurement; theory, November 13, P56 item 4] Each phase's timed card ns (launches, copies, takes, zeroings) when also profiled, and the
+    /// profile's running total at the last mark.
+    phase_card: std::cell::RefCell<(u128, std::collections::BTreeMap<&'static str, u128>)>,
 }
 
 impl<'c> CardField<'c> {
@@ -866,7 +880,7 @@ impl<'c> CardField<'c> {
         let (free, total) = (memory.free_bytes as u64, memory.total_bytes as u64);
         let used = total.saturating_sub(free);
         let budget = free.min(BOARD_CEILING.saturating_sub(used)).saturating_sub(MARGIN);
-        Ok(Self { card, module, budget, times: FieldTimes::default(), profile: None, head: Default::default(), #[cfg(test)] unfilled: Default::default(), #[cfg(feature = "ruler-bits")] bits: Default::default(), pools: Default::default(), held_questions: Default::default(), covector_shares: Default::default(), row_questions: Default::default(), row_out: Default::default(), row_cov: Default::default(), held_cells: Default::default(), tick_reads: Default::default(), carry_gates: Default::default(), near_sites: Default::default(), near_out: Default::default(), clock_sites: Default::default(), clock_out: Default::default(), phases: None })
+        Ok(Self { card, module, budget, times: FieldTimes::default(), profile: None, head: Default::default(), #[cfg(test)] unfilled: Default::default(), #[cfg(feature = "ruler-bits")] bits: Default::default(), pools: Default::default(), held_questions: Default::default(), covector_shares: Default::default(), row_questions: Default::default(), row_out: Default::default(), row_cov: Default::default(), held_cells: Default::default(), tick_reads: Default::default(), carry_gates: Default::default(), near_sites: Default::default(), near_out: Default::default(), clock_sites: Default::default(), clock_out: Default::default(), phases: None, phase_card: Default::default() })
     }
 
     /// The octets a batch's weight and contact stores may take.
@@ -909,9 +923,24 @@ impl<'c> CardField<'c> {
     }
 
     /// [`take`](Self::take) with every element zero.
+    #[track_caller]
     fn take_zeroed<T: Poolable>(&self, len: usize) -> std::result::Result<Pooled<'c, T>, DeviceError> {
         let buffer = self.take::<T>(len)?;
-        self.card.zero_octets(&*buffer, 0, buffer.len() * core::mem::size_of::<T>())?;
+        let octets = buffer.len() * core::mem::size_of::<T>();
+        // [measurement; theory, November 13, P56 item 4] When profiled, the zeroing timed alone by its call site.
+        let line = std::panic::Location::caller().line();
+        let started = self.profile.as_ref().map(|_| {
+            let _ = self.card.synchronize();
+            Instant::now()
+        });
+        self.card.zero_octets(&*buffer, 0, octets)?;
+        if let (Some(profile), Some(started)) = (&self.profile, started) {
+            let _ = self.card.synchronize();
+            let ns = started.elapsed().as_nanos();
+            let mut p = profile.borrow_mut();
+            let z = p.zeroed.entry(line).or_insert((0, 0, 0));
+            (z.0, z.1, z.2) = (z.0 + 1, z.1 + ns, z.2 + octets as u128);
+        }
         Ok(buffer)
     }
 
@@ -946,7 +975,19 @@ impl<'c> CardField<'c> {
             let slot = p.1.entry(name).or_insert((0, 0));
             slot.0 += 1;
             slot.1 += ns;
+            if let Some(profile) = &self.profile {
+                let total = profile.borrow().timed_ns;
+                let mut c = self.phase_card.borrow_mut();
+                let delta = total.saturating_sub(c.0);
+                c.0 = total;
+                *c.1.entry(name).or_insert(0) += delta;
+            }
         }
+    }
+
+    /// [measurement; theory, November 13, P56 item 4] Each phase's timed card ns, when traced and profiled.
+    pub fn phase_card(&self) -> Vec<(&'static str, u128)> {
+        self.phase_card.borrow().1.iter().map(|(k, v)| (*k, *v)).collect()
     }
 
     /// The profile read so far, when profiled.
@@ -1021,19 +1062,25 @@ impl<'c> CardField<'c> {
     }
 
     /// A transfer or an allocation, timed after the stream drains when profiled.
+    #[track_caller]
     fn timed<T>(&self, kind: Kind, f: impl FnOnce() -> T) -> T {
         let Some(profile) = &self.profile else { return f() };
+        let line = std::panic::Location::caller().line();
         let _ = self.card.synchronize();
         let started = Instant::now();
         let out = f();
         let ns = started.elapsed().as_nanos();
         let mut p = profile.borrow_mut();
-        let slot = match kind {
-            Kind::Copy => &mut p.copies,
-            Kind::Alloc => &mut p.allocations,
+        let (slot, name) = match kind {
+            Kind::Copy => (&mut p.copies, "copy"),
+            Kind::Alloc => (&mut p.allocations, "take"),
         };
         slot.0 += 1;
         slot.1 += ns;
+        let site = p.by_site.entry((name, line)).or_insert((0, 0));
+        site.0 += 1;
+        site.1 += ns;
+        p.timed_ns += ns;
         out
     }
 
@@ -1064,6 +1111,7 @@ impl<'c> CardField<'c> {
             let slot = p.kernels.entry(entry).or_insert((0, 0));
             slot.0 += 1;
             slot.1 += started.elapsed().as_nanos();
+            p.timed_ns += started.elapsed().as_nanos();
             *p.threads.entry(entry).or_insert(0) += u128::from(grid.x) * u128::from(grid.y) * u128::from(grid.z) * u128::from(block);
             if let Some(h) = self.head.get() {
                 let slot = p.by_head.entry((entry, h)).or_insert((0, 0));
@@ -1306,6 +1354,8 @@ impl<'c> CardField<'c> {
         let started = Instant::now();
         let l = field.layout();
         let (mut words, upload, face_octets) = self.upload(field, None)?;
+        // [measurement; theory, November 13, P56 item 4] The material's upload (it reads the state the section before left).
+        self.mark("material_upload");
         // A tower's packets' level, uploaded beside the fine field once a run.
         let mut tower = match field.scale.as_deref() {
             Some(s) => Some(self.tower_run(field, s, words.face, returning)?),
@@ -1371,6 +1421,8 @@ impl<'c> CardField<'c> {
             Some(g) => self.timed(Kind::Copy, || card.fetch_range(&g, 0, l.len)).map_err(device)?,
             None => Vec::new(),
         };
+        // [measurement; theory, November 13, P56 item 4] The covector's fetch.
+        self.mark("covector_fetch");
         // A tower's covector over its whole material: the fine field's, the packets' field's and the glue's.
         if let (Some(tr), Some(s), true) = (tower.as_ref(), field.scale.as_deref(), returning) {
             if let (Some(cg), Some(gg)) = (tr.cg.as_ref(), tr.gg.as_ref()) {
@@ -1403,6 +1455,8 @@ impl<'c> CardField<'c> {
             self.times.reads += 1;
             self.times.read_ns += started.elapsed().as_nanos();
         }
+        // [measurement; theory, November 13, P56 item 4] The run's end: the next run's `outside_the_card` is the host's time between runs.
+        self.mark("run_end");
         Ok((faces, read_logits, g, rows, echoes))
     }
 
@@ -1571,6 +1625,8 @@ impl<'c> CardField<'c> {
         // A batch with no carried site still uploads one word, so every buffer has an address.
         let (mix_class_up, mix_share_up) = if mix_class.is_empty() { (vec![0u32], vec![0u32]) } else { (mix_class.clone(), mix_share.clone()) };
         // The batch's site and region tables go up in one transfer.
+        // [measurement; theory, November 13, P56 item 4] The batch's lists and tables, built from its regions and the declaration alone.
+        self.mark("stage_lists");
         let mut pack = Packed::default();
         let site_region_at = pack.put(&site_region);
         let site_pos_at = pack.put(&site_pos);
@@ -1594,6 +1650,7 @@ impl<'c> CardField<'c> {
         let mcmap: Vec<u32> = (0..d.heads).filter(|&h| d.carries_moment(h)).flat_map(|h| (0..d.modes).map(move |li| (h * d.modes + li) as u32 | if d.is_depth(h) { 1 << 31 } else { 0 })).collect();
         let mcmap_at = pack.put(if mcmap.is_empty() { &[0u32][..] } else { &mcmap[..] });
         let tables = self.timed(Kind::Copy, || self.take_up(&pack.bytes)).map_err(device)?;
+        self.mark("stage_pack_upload");
         let base = tables.device_ptr();
         let status = self.timed(Kind::Alloc, || self.take_zeroed::<u32>(1)).map_err(device)?;
         let x = self.timed(Kind::Alloc, || self.take::<i64>(sites * dw)).map_err(device)?;
@@ -1711,6 +1768,9 @@ impl<'c> CardField<'c> {
             for h in 0..heads {
                 self.bits_pairs(words, h, 0, 0, words.e, 1, k, sites)?;
                 self.bits_pairs(words, h, 5, 0, words.ce, 18, k, sites)?;
+                if h < 4 {
+                    self.bits_pairs(words, h, 6, (BITS_TICKS * BITS_BINS) as u32, words.e, 22 + 2 * h, k, sites)?;
+                }
             }
         }
         // The echo's round trips of this tick against the last (§15.3).
@@ -1958,6 +2018,8 @@ impl<'c> CardField<'c> {
         words.plain = plain.device_ptr();
         words.pframe = pframe.device_ptr();
         let t64 = sites as u64;
+        // [measurement; theory, November 13, P56 item 4] The batch's ticks' and clocks' takes.
+        self.mark("batch_takes");
         // The class lists' shared words: the buckets `2·3^b`, and a chunk's keys `[32][2^b]` and counts.
         let buckets = 4 * 3 * d.classes() as u32;
         self.launch("field_open", Self::cells(t64 * dw as u64), THREADS, &mut [arg(words)])?;
