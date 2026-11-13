@@ -146,6 +146,9 @@ fn run(args: &[String]) -> Result<()> {
         for ((kind, line), (calls, ns)) in &p.by_site {
             println!("FIELD_PROFILE_SITE kind={kind} line={line} calls={calls} ms={:.3}", *ns as f64 / 1e6);
         }
+        for ((line, class), [hits, misses, frees, freed, wide]) in &p.pool {
+            println!("FIELD_PROFILE_POOL line={line} class_octets={class} hits={hits} misses={misses} frees={frees} freed_octets={freed} served_longer={wide}");
+        }
         for (line, (calls, ns, octets)) in &p.zeroed {
             println!("FIELD_PROFILE_ZEROED line={line} calls={calls} ms={:.3} octets={octets}", *ns as f64 / 1e6);
         }

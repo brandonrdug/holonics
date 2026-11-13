@@ -607,6 +607,13 @@ pub(super) fn train(args: &[String], realization: &mut dyn FieldRealization) -> 
     }
     if host_phases {
         let ms = |ns: u128| ns as f64 / 1e6;
+        // [measurement; theory, November 13, P58 item 4] The deposit's parts (`SECTION_PARTS`).
+        let parts: Vec<String> = holonics::hnn::tower::field::SECTION_PARTS
+            .iter()
+            .zip(holonics::hnn::tower::field::SECTION_PART_NAMES)
+            .map(|(p, name)| format!("{name}_ms={:.1}", ms(u128::from(p.load(std::sync::atomic::Ordering::Relaxed)))))
+            .collect();
+        println!("STORE_DEPOSIT_PARTS sections={done} {}", parts.join(" "));
         println!(
             "STORE_HOST sections={done} cut_ms={:.1} views_ms={:.1} realized_ms={:.1} mean_ms={:.1} lines_ms={:.1} pass_ms={:.1} saves_ms={:.1} elapsed_ms={}",
             ms(host[0]),

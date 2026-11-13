@@ -659,7 +659,8 @@ enum Kind {
 /// stream). A buffer a batch is done with returns to its size class; the next batch takes one of its class
 /// (a class is a multiple of an eighth of the power of two above, so a buffer is at most a quarter too long).
 /// What the kept buffers cannot supply (a class up to twice the request's) is allocated; when the live buffers, the kept
-/// ones and the new one pass the batch budget, the largest kept ones are freed first, one at a time. The contents of a taken buffer are undefined, zeroed where
+/// ones and the new one pass the batch budget, a plain take is first served by the least kept buffer of its type at least
+/// its class (P58 item 1, at [`CardField::take`]), and otherwise the largest kept ones are freed first, one at a time. The contents of a taken buffer are undefined, zeroed where
 /// the call says so; the work of the stream is ordered, so a buffer a queued kernel still reads is never
 /// overwritten before it has.
 trait Poolable: Copy + Sized + 'static {
@@ -799,6 +800,10 @@ pub struct FieldProfile {
     /// [measurement; theory, November 13, P56 item 4] A zeroed take's zeroing by its call site's line: count, ns (timed alone, the stream drained
     /// before and after) and octets zeroed.
     pub zeroed: std::collections::BTreeMap<u32, (u64, u128, u128)>,
+    /// [measurement; theory, November 13, P58 item 1] The pool by a take's call site's line and its size class in octets: hits, misses (an
+    /// allocation), the kept buffers a miss freed and their octets.
+    /// [realization; P58 item 1] and the plain takes served by a larger kept buffer in place of an allocation.
+    pub pool: std::collections::BTreeMap<(u32, u64), [u64; 5]>,
     /// [measurement; theory, November 13, P56 item 4] Every timed launch, copy, take and zeroing summed (ns): what a phase's wall holds of the card's.
     pub timed_ns: u128,
 }
@@ -868,6 +873,10 @@ pub struct CardField<'c> {
     /// [measurement; theory, November 13, P56 item 4] Each phase's timed card ns (launches, copies, takes, zeroings) when also profiled, and the
     /// profile's running total at the last mark.
     phase_card: std::cell::RefCell<(u128, std::collections::BTreeMap<&'static str, u128>)>,
+    /// [realization; theory, November 13, P58 item 3] While the training path reads its faces at their classes
+    /// ([`FieldRealization::read_and_return_at_class`]): set, and each region's open sites' `(m_c, T)` gathered on the card.
+    narrow: std::cell::Cell<bool>,
+    narrow_out: std::cell::RefCell<Vec<Vec<Option<(u128, u128)>>>>,
 }
 
 impl<'c> CardField<'c> {
@@ -880,7 +889,7 @@ impl<'c> CardField<'c> {
         let (free, total) = (memory.free_bytes as u64, memory.total_bytes as u64);
         let used = total.saturating_sub(free);
         let budget = free.min(BOARD_CEILING.saturating_sub(used)).saturating_sub(MARGIN);
-        Ok(Self { card, module, budget, times: FieldTimes::default(), profile: None, head: Default::default(), #[cfg(test)] unfilled: Default::default(), #[cfg(feature = "ruler-bits")] bits: Default::default(), pools: Default::default(), held_questions: Default::default(), covector_shares: Default::default(), row_questions: Default::default(), row_out: Default::default(), row_cov: Default::default(), held_cells: Default::default(), tick_reads: Default::default(), carry_gates: Default::default(), near_sites: Default::default(), near_out: Default::default(), clock_sites: Default::default(), clock_out: Default::default(), phases: None, phase_card: Default::default() })
+        Ok(Self { card, module, budget, times: FieldTimes::default(), profile: None, head: Default::default(), #[cfg(test)] unfilled: Default::default(), #[cfg(feature = "ruler-bits")] bits: Default::default(), pools: Default::default(), held_questions: Default::default(), covector_shares: Default::default(), row_questions: Default::default(), row_out: Default::default(), row_cov: Default::default(), held_cells: Default::default(), tick_reads: Default::default(), carry_gates: Default::default(), near_sites: Default::default(), near_out: Default::default(), clock_sites: Default::default(), clock_out: Default::default(), phases: None, phase_card: Default::default(), narrow: Default::default(), narrow_out: Default::default() })
     }
 
     /// The octets a batch's weight and contact stores may take.
@@ -893,7 +902,13 @@ impl<'c> CardField<'c> {
     }
 
     /// A buffer of at least `len` elements, contents undefined (`Pooled`).
+    #[track_caller]
     fn take<T: Poolable>(&self, len: usize) -> std::result::Result<Pooled<'c, T>, DeviceError> {
+        self.take_with(len, true, std::panic::Location::caller().line())
+    }
+
+    /// [`take`](Self::take), `wide` where a kept buffer longer than twice the class may serve it.
+    fn take_with<T: Poolable>(&self, len: usize, wide: bool, line: u32) -> std::result::Result<Pooled<'c, T>, DeviceError> {
         let cap = size_class(len.max(1));
         let size = core::mem::size_of::<T>();
         let mut pools = self.pools.borrow_mut();
@@ -905,19 +920,57 @@ impl<'c> CardField<'c> {
             let list = T::list(&mut pools);
             list.iter().enumerate().filter(|(_, (c, _))| *c >= cap && *c <= 2 * cap).min_by_key(|(_, (c, _))| *c).map(|(i, _)| i).map(|i| list.swap_remove(i))
         };
+        let (mut frees, mut freed) = (0u64, 0u64);
+        // [realization; theory, November 13, P58 item 1] **A kept buffer longer than the class serves a plain take that the
+        // budget would otherwise pay for with a free.** The counted read of 100 sections (sections 2,001 to 2,100 of the store
+        // trainer's run 2) found the face covector's block (`dz`, 160 MiB) and the clock's skins (`sk`, 448 MiB), both `i128`,
+        // taken in turn within each batch and never live together: 5 of `dz`'s 300 takes and 98 of `sk`'s 400 hit, and each
+        // miss freed the other's kept buffer (294 frees of 465 MB on average at `dz`, 278 of 172 MB at `sk`), because the live
+        // set, the other's kept buffer and the new one passed the budget, and the other's buffer was more than twice `dz`'s
+        // class. Freeing what the last section did not take first, or holding a section's set, would not answer it: both are
+        // taken in every section, and the budget cannot hold both kept beside the live set. Taking the kept buffer as it is
+        // moves its octets from kept to live, so live plus kept stays as it was, under the budget. A zeroed take keeps the
+        // twice-class bound, so its zeroing stays its class's.
+        let mut widened = false;
+        let missed;
         let entry = match hit {
             Some(entry) => {
+                missed = false;
                 pools.retained = pools.retained.saturating_sub((entry.0 * size) as u64);
                 entry
             }
             None => {
                 let octets = (cap * size) as u64;
-                while pools.live + pools.retained + octets > self.budget && pools.retained > 0 {
-                    pools.free_largest();
+                let longer = if wide && pools.live + pools.retained + octets > self.budget {
+                    let list = T::list(&mut pools);
+                    list.iter().enumerate().filter(|(_, (c, _))| *c >= cap).min_by_key(|(_, (c, _))| *c).map(|(i, _)| i).map(|i| list.swap_remove(i))
+                } else {
+                    None
+                };
+                match longer {
+                    Some(entry) => {
+                        (missed, widened) = (false, true);
+                        pools.retained = pools.retained.saturating_sub((entry.0 * size) as u64);
+                        entry
+                    }
+                    None => {
+                        missed = true;
+                        while pools.live + pools.retained + octets > self.budget && pools.retained > 0 {
+                            let before = pools.retained;
+                            pools.free_largest();
+                            (frees, freed) = (frees + 1, freed + before.saturating_sub(pools.retained));
+                        }
+                        (cap, self.card.alloc::<T>(cap)?)
+                    }
                 }
-                (cap, self.card.alloc::<T>(cap)?)
             }
         };
+        if let Some(profile) = &self.profile {
+            let mut p = profile.borrow_mut();
+            let slot = p.pool.entry((line, (cap * size) as u64)).or_insert([0; 5]);
+            slot[if widened { 4 } else { usize::from(missed) }] += 1;
+            (slot[2], slot[3]) = (slot[2] + frees, slot[3] + freed);
+        }
         pools.live += (entry.0 * size) as u64;
         Ok(Pooled { buf: Some(entry), pools: self.pools.clone() })
     }
@@ -925,10 +978,10 @@ impl<'c> CardField<'c> {
     /// [`take`](Self::take) with every element zero.
     #[track_caller]
     fn take_zeroed<T: Poolable>(&self, len: usize) -> std::result::Result<Pooled<'c, T>, DeviceError> {
-        let buffer = self.take::<T>(len)?;
+        let line = std::panic::Location::caller().line();
+        let buffer = self.take_with::<T>(len, false, line)?;
         let octets = buffer.len() * core::mem::size_of::<T>();
         // [measurement; theory, November 13, P56 item 4] When profiled, the zeroing timed alone by its call site.
-        let line = std::panic::Location::caller().line();
         let started = self.profile.as_ref().map(|_| {
             let _ = self.card.synchronize();
             Instant::now()
@@ -2204,14 +2257,19 @@ impl<'c> CardField<'c> {
         set_clock(words, None, base_clock);
         // The faces at the unresolved sites.
         let fread = self.timed(Kind::Alloc, || self.take::<i32>(sites * dw)).map_err(device)?;
-        let fscale = self.timed(Kind::Alloc, || self.take_zeroed::<i128>(sites * field.declaration.lanes)).map_err(device)?;
+        // [realization; theory, November 13, P58 item 2] The face's scale and totals, and the lift below, are taken without zeroing: each word
+        // read is written first, at the open sites (`unresolved`) alone. `field_chart` writes every lane's scale of an open site, and its one reader,
+        // `field_ratio_adjoint` (the reverse's, on the same sites), reads the scale only there. `field_face` writes an open site's total, and its
+        // readers read it only there: `field_face_covector`, the host's faces at the batch's end and a port's places (`unresolved[t] != 0`).
+        let fscale = self.timed(Kind::Alloc, || self.take::<i128>(sites * field.declaration.lanes)).map_err(device)?;
         let z = self.timed(Kind::Alloc, || self.take::<i64>(sites * a)).map_err(device)?;
         let masses = self.timed(Kind::Alloc, || self.take::<u64>(sites * a)).map_err(device)?;
-        let totals = self.timed(Kind::Alloc, || self.take_zeroed::<i128>(sites)).map_err(device)?;
+        let totals = self.timed(Kind::Alloc, || self.take::<i128>(sites)).map_err(device)?;
         self.chart(words, words.x, &fread, &fscale, true)?;
         // The face read through the encoding (§16.26, the host's `Field::tied`): the lift `y = R r̂ + b_R`, then
-        // `z(a) = rel(⟨E(a), y⟩, 16) + c_a`.
-        let lift = self.timed(Kind::Alloc, || self.take_zeroed::<i64>(sites * dw)).map_err(device)?;
+        // `z(a) = rel(⟨E(a), y⟩, 16) + c_a`. [P58 item 2] The lift unzeroed: `affine` writes an open site's every output, and its readers,
+        // `field_tied_face` and the reverse's `field_tied_back_e`, read it at open sites alone.
+        let lift = self.timed(Kind::Alloc, || self.take::<i64>(sites * dw)).map_err(device)?;
         let lift_bias = field.layout().lift_bias as u64;
         self.affine("field_affine_x32", words, words.read, lift_bias, words.rread, dw, dw, fread.device_ptr(), dw, lift.device_ptr(), dw, 0, true)?;
         {
@@ -2292,6 +2350,25 @@ impl<'c> CardField<'c> {
         self.mark("reverse_launch");
         self.status(&status)?;
         self.mark("status_wait");
+        // [realization; theory, November 13, P58 item 3] The training path's faces (`narrow`, no port, no logits, no kept rows): each open site's
+        // mass at its class and its total, `(m_c, T)`, the words the learner's comparison reads of a face, gathered on the card and fetched alone
+        // (8 and 16 octets a site, where the whole faces are 8 octets a site and class). The same pairs as the whole faces give.
+        if self.narrow.get() && keep.is_none() && !logits && regions.iter().all(|r| r.port.is_none()) {
+            if (0..sites).any(|t| unresolved[t] != 0 && classes[t] as usize >= a) {
+                return Err(TowerError::Refused("an open site whose class is outside the alphabet"));
+            }
+            let picked = self.timed(Kind::Alloc, || self.take::<u64>(sites.max(1))).map_err(device)?;
+            let (mut mp, mut pp) = (masses.device_ptr(), picked.device_ptr());
+            self.launch("field_face_at_class", Self::cells(sites as u64), THREADS, &mut [arg(words), arg(&mut mp), arg(&mut pp)])?;
+            let picked = self.timed(Kind::Copy, || card.fetch_range(&picked, 0, sites)).map_err(device)?;
+            let totals = self.timed(Kind::Copy, || card.fetch_range(&totals, 0, sites)).map_err(device)?;
+            let mut out = self.narrow_out.borrow_mut();
+            for r in 0..regions.len() {
+                let span = region_off[r] as usize..region_off[r + 1] as usize;
+                out.push(span.map(|t| (unresolved[t] != 0).then(|| (u128::from(picked[t]), totals[t] as u128))).collect());
+            }
+            return Ok((Vec::new(), Vec::new(), Rows::new(), Vec::new()));
+        }
         let masses = self.timed(Kind::Copy, || card.fetch_range(&masses, 0, sites * a)).map_err(device)?;
         let totals = self.timed(Kind::Copy, || card.fetch_range(&totals, 0, sites)).map_err(device)?;
         let zs = if logits { self.timed(Kind::Copy, || card.fetch_range(&z, 0, sites * a)).map_err(device)? } else { Vec::new() };
@@ -2436,9 +2513,13 @@ impl<'c> CardField<'c> {
             let (mut gp, mut read, mut bias, mut dyp, mut rp) = (g.device_ptr(), words.read, l.lift_bias as u64, dy.device_ptr(), clock.fread.device_ptr());
             self.launch("field_blank_lift_read", Self::cells(dw as u64 * (dw as u64 + 1) * tiles), THREADS, &mut [arg(words), arg(&mut gp), arg(&mut read), arg(&mut bias), arg(&mut dyp), arg(&mut rp)])?;
         }
-        let dr = self.timed(Kind::Alloc, || self.take_zeroed::<i64>((sites * dw).max(1))).map_err(device)?;
+        // [realization; theory, November 13, P58 item 2] `dr` and `back` unzeroed. `field_transposed` (no accumulation) writes every column of a
+        // site the clock read (`blank_read`, set above), and `dr`'s one reader, `field_ratio_adjoint` on the same sites, reads its covector only
+        // there. `field_ratio_adjoint` with no base writes every word of `back`, zero at a site it skips and every lane's coordinates elsewhere,
+        // before `field_blank_dx` reads it.
+        let dr = self.timed(Kind::Alloc, || self.take::<i64>((sites * dw).max(1))).map_err(device)?;
         self.transposed(words, words.read, dw, dw, dy.device_ptr(), dw, dr.device_ptr(), false, true)?;
-        let back = self.timed(Kind::Alloc, || self.take_zeroed::<i64>((sites * dw).max(1))).map_err(device)?;
+        let back = self.timed(Kind::Alloc, || self.take::<i64>((sites * dw).max(1))).map_err(device)?;
         self.ratio_adjoint(words, clock.fread.device_ptr(), clock.fscale.device_ptr(), dr.device_ptr(), 0, back.device_ptr(), true)?;
         let (mut bp, mut dxp) = (back.device_ptr(), dx.device_ptr());
         let done = self.launch("field_blank_dx", Self::cells((sites * dw) as u64), THREADS, &mut [arg(words), arg(&mut bp), arg(&mut dxp)]);
@@ -2453,15 +2534,22 @@ impl<'c> CardField<'c> {
     fn blank_clock(&self, field: &Field, words: &mut Words, regions: usize, sites: usize) -> Result<CardClock<'c>> {
         let d = field.declaration;
         let (dw, a, n, m2, paced) = (d.width, d.alphabet, d.modes, 2 * d.complex(), d.paced_heads());
-        let fread = self.timed(Kind::Alloc, || self.take_zeroed::<i32>(sites * dw)).map_err(device)?;
-        let fscale = self.timed(Kind::Alloc, || self.take_zeroed::<i128>(sites * d.lanes)).map_err(device)?;
+        // [realization; theory, November 13, P58 item 2] The blank's read, scale, lift and totals are taken without zeroing where no clock is read
+        // at named sites: the face kernels write each at the sites the clock reads (`blank_read`) and every reader reads them only there:
+        // `field_affine` and `field_ratio_adjoint` (blank_back) on the same sites, `field_blank_bias_enc` and `field_blank_lift_read` only where
+        // the blank's face covector `dz` and its lift's `dy` are nonzero (written zero off those sites, by `field_blank_dz` and `field_blank_dy`),
+        // `field_blank_rates` and `field_blank_dz` on the same sites, and `field_pace_c_back` where `blank_read[t]`. The clocks' reading at named
+        // sites (`clock_sites`) fetches a silent site's face that the clock may not have read, so it keeps them zeroed.
+        let zeroed = self.clock_sites.borrow().is_some();
+        let fread = if zeroed { self.timed(Kind::Alloc, || self.take_zeroed::<i32>(sites * dw)) } else { self.timed(Kind::Alloc, || self.take::<i32>(sites * dw)) }.map_err(device)?;
+        let fscale = if zeroed { self.timed(Kind::Alloc, || self.take_zeroed::<i128>(sites * d.lanes)) } else { self.timed(Kind::Alloc, || self.take::<i128>(sites * d.lanes)) }.map_err(device)?;
         // [the unified-theory reading of November 6, 08:16] The faces are read only at the sites a clock reads (`blank_read`): the
         // face kernels read the open sites, so they are given those sites as the open ones, and the region's own are restored
         // before the clocks.
         let unresolved = words.unresolved;
         words.unresolved = words.blank_read;
         self.chart(words, words.x, &fread, &fscale, true)?;
-        let lift = self.timed(Kind::Alloc, || self.take_zeroed::<i64>(sites * dw)).map_err(device)?;
+        let lift = if zeroed { self.timed(Kind::Alloc, || self.take_zeroed::<i64>(sites * dw)) } else { self.timed(Kind::Alloc, || self.take::<i64>(sites * dw)) }.map_err(device)?;
         let lift_bias = field.layout().lift_bias as u64;
         self.affine("field_affine_x32", words, words.read, lift_bias, words.rread, dw, dw, fread.device_ptr(), dw, lift.device_ptr(), dw, 0, true)?;
         let z = self.timed(Kind::Alloc, || self.take::<i64>(sites * a)).map_err(device)?;
@@ -2470,7 +2558,7 @@ impl<'c> CardField<'c> {
             self.launch("field_tied_face", Self::cells((sites * a) as u64), THREADS, &mut [arg(words), arg(&mut enc), arg(&mut cb), arg(&mut yp), arg(&mut zp)])?;
         }
         let masses = self.timed(Kind::Alloc, || self.take::<u64>(sites * a)).map_err(device)?;
-        let totals = self.timed(Kind::Alloc, || self.take_zeroed::<i128>(sites)).map_err(device)?;
+        let totals = if zeroed { self.timed(Kind::Alloc, || self.take_zeroed::<i128>(sites)) } else { self.timed(Kind::Alloc, || self.take::<i128>(sites)) }.map_err(device)?;
         {
             let (mut zp, mut mp, mut tp) = (z.device_ptr(), masses.device_ptr(), totals.device_ptr());
             self.launch("field_face", Self::warps(sites as u64), THREADS, &mut [arg(words), arg(&mut zp), arg(&mut mp), arg(&mut tp)])?;
@@ -2906,7 +2994,9 @@ impl<'c> CardField<'c> {
             if let Some(clock) = clocks.get(at).and_then(Option::as_ref) {
                 self.moments_return_at(field, words, g, dmp, regions, sites)?;
                 if paced > 0 {
-                    let dkappa = self.timed(Kind::Alloc, || self.take_zeroed::<i128>((paced * sites).max(1))).map_err(device)?;
+                    // [realization; theory, November 13, P58 item 2] Unzeroed: `field_pace_kappa_back` writes every `(paced head, site)` word, each
+                    // region's sites from its last to its first, before `field_pace_c_back` and `field_blank_dz` read them.
+                    let dkappa = self.timed(Kind::Alloc, || self.take::<i128>((paced * sites).max(1))).map_err(device)?;
                     let (mut dkp, mut gp) = (dkappa.device_ptr(), g.device_ptr());
                     self.launch("field_pace_kappa_back", Self::cells((paced * regions) as u64), THREADS, &mut [arg(words), arg(&mut dkp)])?;
                     self.launch("field_pace_c_back", Self::cells((paced * sites) as u64), THREADS, &mut [arg(words), arg(&mut dkp), arg(&mut gp)])?;
@@ -2934,7 +3024,8 @@ impl<'c> CardField<'c> {
             (words.gtau, words.gsig) = (gtp, gsp);
             self.moments_return_at(field, words, g, dmp, regions, sites)?;
             if paced > 0 {
-                let dkappa = self.timed(Kind::Alloc, || self.take_zeroed::<i128>((paced * sites).max(1))).map_err(device)?;
+                // [P58 item 2] Unzeroed, as each tick's: `field_pace_kappa_back` writes every word before `field_pace_c_back` reads it.
+                let dkappa = self.timed(Kind::Alloc, || self.take::<i128>((paced * sites).max(1))).map_err(device)?;
                 let (mut dkp, mut gp) = (dkappa.device_ptr(), g.device_ptr());
                 self.launch("field_pace_kappa_back", Self::cells((paced * regions) as u64), THREADS, &mut [arg(words), arg(&mut dkp)])?;
                 self.launch("field_pace_c_back", Self::cells((paced * sites) as u64), THREADS, &mut [arg(words), arg(&mut dkp), arg(&mut gp)])?;
@@ -3251,6 +3342,25 @@ impl FieldRealization for CardField<'_> {
     fn read_and_return(&mut self, field: &Field, regions: &[Region]) -> Result<(Vec<Vec<Option<TowerFace>>>, Vec<i128>)> {
         let (faces, _, g, _, _) = self.run(field, regions, true, false, None)?;
         Ok((faces, g))
+    }
+
+    /// [realization; theory, November 13, P58 item 3] The faces' masses at their classes and their totals gathered on the card (`narrow`, read
+    /// at the batch's end), the whole faces where a region has a port (its coupling reads every class of its places).
+    fn read_and_return_at_class(&mut self, field: &Field, regions: &[Region]) -> Result<(Vec<Vec<Option<(u128, u128)>>>, Vec<i128>)> {
+        if regions.iter().any(|r| r.port.is_some()) {
+            let (faces, g) = self.read_and_return(field, regions)?;
+            return Ok((holonics::hnn::tower::field::faces_at_class(&faces, regions), g));
+        }
+        self.narrow_out.borrow_mut().clear();
+        self.narrow.set(true);
+        let run = self.run(field, regions, true, false, None);
+        self.narrow.set(false);
+        let (_, _, g, _, _) = run?;
+        let pairs = std::mem::take(&mut *self.narrow_out.borrow_mut());
+        if pairs.len() != regions.len() {
+            return Err(TowerError::Refused("a narrow read that did not return one row of faces a region"));
+        }
+        Ok((pairs, g))
     }
 
     fn read_faces(&mut self, field: &Field, regions: &[Region]) -> Result<Vec<Vec<Option<TowerFace>>>> {
@@ -3609,6 +3719,10 @@ mod tests {
         assert_eq!(host_g.len(), card_g.len());
         let unequal: Vec<usize> = (0..host_g.len()).filter(|&i| host_g[i] != card_g[i]).collect();
         assert!(unequal.is_empty(), "{} covector entries differ, the first at {:?} (triad at {}, triad_bias at {}, w_triad at {})", unequal.len(), unequal.first(), l.triad, l.triad_bias, l.w_triad);
+        // [P58 item 3] The faces at their classes gathered on the card are the whole faces' at their classes, beside the same covector.
+        let (at_class, narrow_g) = card_field.read_and_return_at_class(&field, &regions).unwrap();
+        assert_eq!(at_class, holonics::hnn::tower::field::faces_at_class(&host_faces, &regions));
+        assert!(narrow_g == card_g, "the narrow read's covector differs from the whole read's");
         for (name, start, len) in [("w_triad", l.w_triad, dw * 2 * triads), ("triad", l.triad, 6 * triads * dw), ("triad_bias", l.triad_bias, 6 * triads)] {
             assert!(host_g[start..start + len].iter().any(|&v| v != 0), "the triads' {name} takes no covector");
         }

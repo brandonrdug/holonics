@@ -3482,6 +3482,15 @@ extern "C" __global__ void field_face(FieldWords w, const int64_t *z, uint64_t *
     }
 }
 
+// [realization; theory, November 13, P58 item 3] The training path's reading of a face (the host's `compared`): each open site's mass at
+// its class, gathered so that the pass's end fetches one word a site beside its total in place of the face's every class; zero at a
+// resolved site, which carries no face. The host refuses a class past the alphabet at an open site before the launch. One thread a site.
+extern "C" __global__ void field_face_at_class(FieldWords w, const uint64_t *masses, uint64_t *picked) {
+    for (uint64_t t = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; t < w.T; t += (uint64_t)gridDim.x * blockDim.x) {
+        picked[t] = w.unresolved[t] ? masses[t * w.A + w.classes[t]] : 0;
+    }
+}
+
 // -------------------------------------------------------------------------------------------
 // the reverse
 
