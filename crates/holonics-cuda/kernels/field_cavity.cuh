@@ -152,13 +152,19 @@ extern "C" __global__ void field_cavity_open(FieldWords w, int64_t *cx) {
 // [definition; theory, November 13, P60 item 1e] **The cavity's far prefixes** (the host's `cavity_moment_return_exact`'s `sides`): for each moment
 // mode, paced region, octave level `ℓ` and side, `sk[2(ℓ − 2) + left][j] = Σ_(t<j, t reads its octave on that side) D_t release(ζ_t δs_t, 30)`, the
 // receivers that read their octave on the left at their cavity clocks (`ζ^(τ_c)`, `e^(−2π|σ_c − σ_(t−2^ℓ)|/n)`), those on the right at their standing
-// ones. One thread a mode, region and row, over the region's sites in order. `sk` is `[u][row][T + R][2]`.
-extern "C" __global__ void field_cavity_skinned_all(const MomentWords *ws, const uint32_t *cmap, FieldWords fw, const int64_t *dss, wide *sks, uint64_t stride, uint64_t sk_stride, uint32_t levels, uint32_t tm) {
-    const uint64_t cells = (uint64_t)tm * fw.R * 2 * levels;
+// ones. `sk` is `[u][row][T + R][2]`, a region's prefix at `first + r`, zero there.
+//
+// [realization; theory, November 13, G141 (G139's rule (d))] Formed in two passes, every bit the walk's: each term by one thread a mode, row and
+// site (`field_cavity_terms_all`, its face, skin and release as the walk formed them), then the region's terms summed in order into the
+// prefixes by one warp a mode, row and region (`field_cavity_scan_all`, integer sums, so any order gives the walk's bits). Where one thread a
+// mode, region and row walked its region, 62,420 threads a section held the card for 10 ms forming their faces one after another.
+extern "C" __global__ void field_cavity_terms_all(const MomentWords *ws, const uint32_t *cmap, FieldWords fw, const int64_t *dss, wide *sks, uint64_t stride, uint64_t sk_stride, uint32_t levels, uint32_t tm) {
+    const uint64_t rows = 2 * (uint64_t)levels, cells = (uint64_t)tm * rows * fw.T;
     for (uint64_t c = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; c < cells; c += (uint64_t)gridDim.x * blockDim.x) {
-        const uint32_t row = c % (2 * levels);
-        const uint32_t r = (c / (2 * levels)) % fw.R;
-        const uint32_t u = c / ((uint64_t)2 * levels * fw.R);
+        const uint64_t gt = c % fw.T;
+        const uint32_t row = (uint32_t)((c / fw.T) % rows);
+        const uint32_t u = (uint32_t)(c / (fw.T * rows));
+        const uint32_t r = fw.site_region[gt];
         const MomentWords &w = ws[u];
         const PacedMode pm = paced_mode(fw, cmap[u], r);
         if (!w.ok[r] || pm.plain) {
@@ -168,23 +174,76 @@ extern "C" __global__ void field_cavity_skinned_all(const MomentWords *ws, const
         const bool left = row % 2 == 1;
         const uint64_t first = w.region_off[r];
         const uint32_t sites = w.region_off[r + 1] - (uint32_t)first;
+        const uint32_t t = (uint32_t)(gt - first);
         const int64_t *ds = dss + (uint64_t)u * stride;
         wide *out = sks + (uint64_t)u * sk_stride + ((uint64_t)row * (fw.T + fw.R) + first + r) * 2;
         const uint64_t pow = (uint64_t)1 << level;
-        MomentGauss sum = mg_make(0, 0);
-        out[0] = 0;
-        out[1] = 0;
-        for (uint32_t t = 0; t < sites; t++) {
-            const uint64_t gt = first + t;
-            const bool reads = pow < sites && (left ? t >= pow : (uint64_t)t + pow < sites);
-            if (reads) {
-                const MomentGauss face = left ? cavity_turn(fw, pm.slot, cavity_tau(fw, pm.p, gt, t)) : paced_absolute(fw, w, pm, gt);
-                const MomentGauss turned = mg_mul(face, mg_load(ds, gt));
-                const wide skin = left ? skin_dev(fw, pm.slot, cavity_sigma(fw, pm.p, gt, t) - paced_sigma(fw, pm.p, gt - pow)) : skin_dev(fw, pm.slot, paced_sigma(fw, pm.p, gt) - paced_sigma(fw, pm.p, gt + pow));
-                sum = mg_add(sum, mg_scale(mg_make(rel(turned.re, MOVE_BITS), rel(turned.im, MOVE_BITS)), skin));
+        if (t == 0) {
+            out[0] = 0;
+            out[1] = 0;
+        }
+        const bool reads = pow < sites && (left ? t >= pow : (uint64_t)t + pow < sites);
+        MomentGauss term = mg_make(0, 0);
+        if (reads) {
+            const MomentGauss face = left ? cavity_turn(fw, pm.slot, cavity_tau(fw, pm.p, gt, t)) : paced_absolute(fw, w, pm, gt);
+            const MomentGauss turned = mg_mul(face, mg_load(ds, gt));
+            const wide skin = left ? skin_dev(fw, pm.slot, cavity_sigma(fw, pm.p, gt, t) - paced_sigma(fw, pm.p, gt - pow)) : skin_dev(fw, pm.slot, paced_sigma(fw, pm.p, gt) - paced_sigma(fw, pm.p, gt + pow));
+            term = mg_scale(mg_make(rel(turned.re, MOVE_BITS), rel(turned.im, MOVE_BITS)), skin);
+        }
+        out[2 * (uint64_t)(t + 1)] = term.re;
+        out[2 * (uint64_t)(t + 1) + 1] = term.im;
+    }
+}
+
+__device__ __forceinline__ wide shfl_up_ring(wide v, unsigned d) {
+    const uwide u = (uwide)v;
+    const uint64_t lo = __shfl_up_sync(0xffffffffu, (uint64_t)u, d);
+    const uint64_t hi = __shfl_up_sync(0xffffffffu, (uint64_t)(u >> 64), d);
+    return (wide)(((uwide)hi << 64) | lo);
+}
+
+__device__ __forceinline__ wide shfl_last_ring(wide v) {
+    const uwide u = (uwide)v;
+    const uint64_t lo = __shfl_sync(0xffffffffu, (uint64_t)u, 31);
+    const uint64_t hi = __shfl_sync(0xffffffffu, (uint64_t)(u >> 64), 31);
+    return (wide)(((uwide)hi << 64) | lo);
+}
+
+extern "C" __global__ void field_cavity_scan_all(const MomentWords *ws, const uint32_t *cmap, FieldWords fw, wide *sks, uint64_t sk_stride, uint32_t levels, uint32_t tm) {
+    const uint32_t lane = threadIdx.x & 31;
+    const uint64_t rows = 2 * (uint64_t)levels, cells = (uint64_t)tm * rows * fw.R;
+    const uint64_t warps = (uint64_t)gridDim.x * (blockDim.x >> 5);
+    for (uint64_t c = ((uint64_t)blockIdx.x * blockDim.x + threadIdx.x) >> 5; c < cells; c += warps) {
+        const uint32_t row = (uint32_t)(c % rows);
+        const uint32_t r = (uint32_t)((c / rows) % fw.R);
+        const uint32_t u = (uint32_t)(c / (rows * fw.R));
+        const MomentWords &w = ws[u];
+        const PacedMode pm = paced_mode(fw, cmap[u], r);
+        if (!w.ok[r] || pm.plain) {
+            continue;
+        }
+        const uint64_t first = w.region_off[r];
+        const uint32_t sites = w.region_off[r + 1] - (uint32_t)first;
+        wide *out = sks + (uint64_t)u * sk_stride + ((uint64_t)row * (fw.T + fw.R) + first + r) * 2;
+        wide carry_re = 0, carry_im = 0;
+        for (uint32_t base = 0; base < sites; base += 32) {
+            const uint32_t i = base + lane;
+            wide re = i < sites ? out[2 * (uint64_t)(i + 1)] : 0, im = i < sites ? out[2 * (uint64_t)(i + 1) + 1] : 0;
+            for (unsigned d = 1; d < 32; d <<= 1) {
+                const wide nre = shfl_up_ring(re, d), nim = shfl_up_ring(im, d);
+                if (lane >= d) {
+                    re += nre;
+                    im += nim;
+                }
             }
-            out[2 * (uint64_t)(t + 1)] = sum.re;
-            out[2 * (uint64_t)(t + 1) + 1] = sum.im;
+            re += carry_re;
+            im += carry_im;
+            if (i < sites) {
+                out[2 * (uint64_t)(i + 1)] = re;
+                out[2 * (uint64_t)(i + 1) + 1] = im;
+            }
+            carry_re = shfl_last_ring(re);
+            carry_im = shfl_last_ring(im);
         }
     }
 }

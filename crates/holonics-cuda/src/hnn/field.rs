@@ -2661,7 +2661,7 @@ impl<'c> CardField<'c> {
     /// compared place the face covector at unit gain, through the class biases, the encoding (`tied`), the opening's lift and bias, the chart and its
     /// lanes, by the field's own entries under the compared places' mask; the cavity opening's covector into the unresolved row and the neighbours'
     /// strand rows (`field_encoding`), the moment's chart and bias, and the cavity moments' covector through their return and their clocks
-    /// (`field_cavity_skinned_all`, `field_cavity_return_paced_all`, `field_cavity_pace_back_all`), added into `g` and into the pass's clock covectors
+    /// (`field_cavity_terms_all` and `field_cavity_scan_all`, `field_cavity_return_paced_all`, `field_cavity_pace_back_all`), added into `g` and into the pass's clock covectors
     /// the words name.
     #[allow(clippy::type_complexity)]
     fn opening_back(&self, field: &Field, words: &mut Words, op: &Opening<'c>, g: &CardBuffer<'c, i128>, (classes, unresolved, site_pos, mix_off, mix_class, mix_share): (&[u32], &[u8], &[u32], &[u32], &[u32], &[u32]), sites: usize) -> Result<()> {
@@ -2752,7 +2752,9 @@ impl<'c> CardField<'c> {
         let sk = self.timed(Kind::Alloc, || self.take::<i128>((tm * sk_stride as usize).max(1))).map_err(device)?;
         let (mut skp, mut sk_stride_a, mut levels_a) = (sk.device_ptr(), sk_stride, levels);
         if levels > 0 {
-            self.launch("field_cavity_skinned_all", Self::cells((tm * regions * 2 * levels as usize) as u64), THREADS, &mut [arg(&mut wsp), arg(&mut cmp), arg(&mut fw), arg(&mut dsp), arg(&mut skp), arg(&mut stride), arg(&mut sk_stride_a), arg(&mut levels_a), arg(&mut tm32)])?;
+            // [realization; G141] The far prefixes' terms a thread each, then their scan a warp a mode, row and region.
+            self.launch("field_cavity_terms_all", Self::cells((tm * 2 * levels as usize * sites) as u64), THREADS, &mut [arg(&mut wsp), arg(&mut cmp), arg(&mut fw), arg(&mut dsp), arg(&mut skp), arg(&mut stride), arg(&mut sk_stride_a), arg(&mut levels_a), arg(&mut tm32)])?;
+            self.launch("field_cavity_scan_all", Self::warps((tm * 2 * levels as usize * regions) as u64), THREADS, &mut [arg(&mut wsp), arg(&mut cmp), arg(&mut fw), arg(&mut skp), arg(&mut sk_stride_a), arg(&mut levels_a), arg(&mut tm32)])?;
         }
         self.launch_grid("field_cavity_return_paced_all", Dim3 { x: Self::cells(sites as u64), y: tm as u32, z: 1 }, THREADS, 0, &mut [arg(&mut wsp), arg(&mut cmp), arg(&mut fw), arg(&mut dsp), arg(&mut qp), arg(&mut skp), arg(&mut dbp), arg(&mut dap), arg(&mut stride), arg(&mut pre_stride), arg(&mut sk_stride_a)])?;
         self.launch("field_moment_strand_return_all", Self::cells((sites * tm) as u64), THREADS, &mut [arg(&mut w2), arg(&mut base_b), arg(&mut base_a), arg(&mut tm32), arg(&mut dbp), arg(&mut dap), arg(&mut gp)])?;
