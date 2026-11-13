@@ -4435,6 +4435,16 @@ impl Field {
         Ok(out)
     }
 
+    /// [measurement; agent-inferred, November 13; G167] **Every site's face after the ticks** (written sites included), read through the
+    /// readout from the state the last tick hands on: where the passage holds a written site's class, its code there is evidence a loop can
+    /// read of whether its releases mislead what is known. A reading only.
+    pub fn faces_everywhere(&self, region: &Region) -> Result<Vec<TowerFace>> {
+        let pass = self.pass(region, true)?;
+        let (dw, reaches) = (self.declaration.width, self.reaches());
+        let last = pass.ticks.last().ok_or(TowerError::Refused("a pass with no tick"))?;
+        (0..region.classes.len()).map(|t| Ok(self.face_of(&last.handed[t * dw..(t + 1) * dw], &reaches)?.face)).collect()
+    }
+
     /// [measurement; agent-inferred, November 13; G162] **The free ring on the host**: one region's forward at the field's declared ticks (a caller
     /// sets them past the trained depth), and for each stage (the state each tick hands on, after the mirror's stage where
     /// [`Field::mirror_strength`] is set) over the region's open places: the code of the place's class and the face's expected code, both on
