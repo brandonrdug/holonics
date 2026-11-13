@@ -111,6 +111,16 @@ stroke, with the field's trust in its own release learned where the passage cont
 sweeps the loop makes 38 to 48% of the open places confidently wrong, the stress such a deposit would carry. Its first reading is §4's,
 the covector of the strength at the founding against its random-sign floor.
 
+**§4's first reading: the mark pays at first order (G175, `read-carried`, `Field::carried_slopes`).** At the founding, were each open
+place's opening row to move toward the face the built read gave it at strength `α` (the opening's part; the carried place's voice not
+read), the open places' code moves by `d(code)/dα = −0.0455` nats a place a unit of `α`, 5.9 times its random-sign floor, on held text
+at the second pass's sixth lap mean (receipt `g175_carried.txt`, 37.7 s on the host). It falls in the code, science and books slices
+(−0.092, −0.062, −0.057, each three to six times its floor) and is near zero in web and wikidata. Half of it comes through the openings
+of the places' written neighbours, and the first read is calibrated, so the gain is not a place sharpening its own face but the field
+hearing, faintly and marked as its own, what it guessed beside a place (agent-inferred). That is self-induction's first gain in this
+build, at first order only: at full strength with the voice the second pass coded worse (G168). So §4's build starts from the mark: the
+strength a part of the constitution founded at zero, its finite-strength curve read before the card.
+
 ## 6. Owed
 
 The Lean statements of the two-cycle of a synchronously iterated symmetric map at a place hearing its own release, and of the parametron's

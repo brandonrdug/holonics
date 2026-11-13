@@ -2251,6 +2251,93 @@ fn redraw_with(args: &[String], deposit: bool) -> Result<()> {
     Ok(())
 }
 
+/// [measurement; agent-inferred, November 13; G175] `read-carried UNITS UNITS_SHA STORE STORE_SHA KEYS KEYS_SHA CODEC CODEC_SHA PLACES STATE
+/// STATE_SHA OUT ROLE`: **the release carried as a face, at its founding** (the ring record's §4 first reading). Each region of the cut's masks
+/// is read once (the built read), and [`holonics::hnn::tower::field::Field::carried_slopes`] reads, at every site, the region's comparison's
+/// covector at the opening against the change the opening would take were each open place's row to move toward the face that read gave it, at
+/// strength `α`: `d(code)/dα` at `α = 0`, the opening's part (the carried place's voice is not read). `OUT/carried.tsv` holds a line a slice
+/// (numbers only): the regions, the open places, and over the sites the sum of `r_t`, of `|r_t|`, of `(|r_t| >> 32)²` (the random-sign
+/// floor's square), split into open and written sites. The output directory is private.
+pub(super) fn read_carried(args: &[String]) -> Result<()> {
+    if args.len() != 14 {
+        return Err("read-carried UNITS UNITS_SHA STORE STORE_SHA KEYS KEYS_SHA CODEC CODEC_SHA PLACES STATE STATE_SHA OUT ROLE".into());
+    }
+    let started = std::time::Instant::now();
+    refuse_variables("read-carried")?;
+    let role = args[13].as_str();
+    if role != "held" && role != "prefix" {
+        return Err("read-carried reads the held role or the training documents (prefix)".into());
+    }
+    let units = units_of(&args[1], &args[2])?;
+    if !units.merges().is_empty() {
+        return Err("the store's cut is on bytes: a units file of merges is refused".into());
+    }
+    let store = Path::new(&args[3]);
+    let counts = store_counts(std::str::from_utf8(&pinned_read(&store.join("STORE.tsv").to_string_lossy(), &args[4], READ_BUDGET as usize)?)?)?;
+    let keys = pinned_read(&args[5], &args[6], READ_BUDGET as usize)?;
+    let seed = u64::from_be_bytes(keys.get(keys.len().saturating_sub(8)..).filter(|w| w.len() == 8).ok_or("a key file of fewer than eight bytes")?.try_into()?);
+    let codec = FieldCodec::from_text(&String::from_utf8(pinned_read(&args[7], &args[8], READ_BUDGET as usize)?)?, units)?;
+    let places = positive(&args[9])? as usize;
+    let learner = FieldLearner::from_text(std::str::from_utf8(&pinned_read(&args[10], &args[11], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
+    let law = learner.pass.clone().ok_or("a state with no pass line: read-carried reads a state of the store's line")?;
+    if learner.field.declaration.alphabet != codec.alphabet() {
+        return Err("a state whose alphabet is not its codec's".into());
+    }
+    let out = Path::new(&args[12]);
+    if out.exists() {
+        return Err(format!("{} exists", out.display()).into());
+    }
+    std::fs::create_dir_all(out)?;
+    use rayon::prelude::*;
+    use std::io::Write as _;
+    let mut tsv = std::io::BufWriter::new(std::fs::File::create(out.join("carried.tsv"))?);
+    writeln!(tsv, "slice\tregions\topen\tsum_open\tabs_open\tsq_open\tsum_written\tabs_written\tsq_written")?;
+    println!("CARRIED_LAW role={role} places={places} ms={}", started.elapsed().as_millis());
+    for (si, &name) in role_names(&counts, role).iter().enumerate() {
+        let slice = open_slice(store, role, name, &counts)?;
+        let pass = StorePass { role: role.to_string(), store: args[4].clone(), stretches: 0, least: law.least, octaves: law.octaves, pairs: law.pairs, sites: law.sites, slices: vec![PassSlice { name: name.to_string(), piece: 0, cursor: 0, taken: 0 }] };
+        let mut cut = Cut { seed, slices: vec![slice], pass };
+        let mut regions: Vec<TrainRegion> = Vec::new();
+        let mut taken = 0usize;
+        while taken < places {
+            let Some(drawn) = cut.next() else { break };
+            let stretch = cut.take(drawn, &codec)?;
+            taken += stretch.region.classes.len();
+            regions.push(TrainRegion::plain(stretch.region.classes.clone(), stretch.region.unresolved.clone()));
+        }
+        let slice_start = std::time::Instant::now();
+        let reads: Vec<std::result::Result<[i128; 7], String>> = regions
+            .par_iter()
+            .map(|region| {
+                let views = views_of(std::slice::from_ref(region));
+                let faces = learner.field.faces(&views[0]).map_err(|e| e.to_string())?;
+                let r = learner.field.carried_slopes(&views[0], &faces).map_err(|e| e.to_string())?;
+                let mut st = [0i128; 7];
+                for (t, &v) in r.iter().enumerate() {
+                    let k = if region.unresolved[t] { 0 } else { 3 };
+                    st[0] += i128::from(region.unresolved[t]);
+                    st[1 + k] += v;
+                    st[2 + k] += v.abs();
+                    st[3 + k] += (v.unsigned_abs() >> 32).pow(2) as i128;
+                }
+                Ok(st)
+            })
+            .collect();
+        let mut tot = [0i128; 7];
+        for read in reads {
+            for (x, y) in tot.iter_mut().zip(read?) {
+                *x += y;
+            }
+        }
+        let cells: Vec<String> = tot.iter().map(i128::to_string).collect();
+        writeln!(tsv, "{si}\t{}\t{}", regions.len(), cells.join("\t"))?;
+        println!("CARRIED_SLICE slice={name} regions={} host_ms={} ms={}", regions.len(), slice_start.elapsed().as_millis(), started.elapsed().as_millis());
+    }
+    tsv.flush()?;
+    println!("CARRIED_DONE ms={}", started.elapsed().as_millis());
+    Ok(())
+}
+
 /// [definition; agent-inferred, November 13] `next-pass STATE STATE_SHA OUT`: **a state's next pass over its role**: the state with its pass line's
 /// slices set back to their first piece (piece, cursor and places taken zero), its count of stretches kept, so the next pass's cuts and masks
 /// are drawn afresh from the key stream (a stretch's length and mask are keyed by that count, [`Cut::next`]) over the same documents, and

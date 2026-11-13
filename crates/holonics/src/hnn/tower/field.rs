@@ -3892,7 +3892,7 @@ impl Field {
         for region in regions {
             let pass = self.pass(region, true)?;
             let mut g = vec![0i128; self.material_len()];
-            self.returned_with(region, &pass, &mut g, Some(&mut out), None, None, None, None)?;
+            self.returned_with(region, &pass, &mut g, Some(&mut out), None, None, None, None, None)?;
         }
         Ok(out.chunks_exact(2).map(|c| [c[0], c[1]]).collect())
     }
@@ -3908,7 +3908,7 @@ impl Field {
         let mut covectors: Vec<Vec<i64>> = Vec::new();
         if returning {
             let mut g = vec![0i128; self.material_len()];
-            self.returned_with(region, &pass, &mut g, None, Some(&mut covectors), None, None, None)?;
+            self.returned_with(region, &pass, &mut g, None, Some(&mut covectors), None, None, None, None)?;
             covectors.reverse();
         }
         let mut out = Vec::new();
@@ -4020,7 +4020,7 @@ impl Field {
     /// into `g` on each family's natural grain (a face family's `Σ δz` on `2^(−24)`, a material family's `Σ δz x` on
     /// `2^(−40)`), which the reverse's law tests read against the code's difference.
     fn returned(&self, region: &Region, pass: &FieldPass, g: &mut [i128]) -> Result<()> {
-        self.returned_with(region, pass, g, None, None, None, None, None)
+        self.returned_with(region, pass, g, None, None, None, None, None, None)
     }
 
     /// [measurement; theory, November 13, the junction record §13.8; G158] **The reader's reaction's route**: for tick `k` and head `h`, each
@@ -4109,11 +4109,44 @@ impl Field {
     /// and reverse, and for each tick (in the forward's order), head and kind of reader (`[0]` open readers, `[1]` written) the written sources'
     /// [`ReactionSums`] of `a_j = ⟨λ_j^(k+1), ρ_j^(h,k)⟩` ([`Field::reaction_route`]), so `d(code)/dκ_h = −Σ_k Σ_j a_j` for the stage
     /// `x_j ← x_j − κ_h ρ_j` after tick `k`. A reading only: nothing in the law reads it.
+    /// [measurement; agent-inferred, November 13, the ring record's §4 first reading] **The release carried as a face, at its founding**: for
+    /// each site `t`, `r_t = ⟨λ⁰_t, D_t⟩`, the opening's covector `λ⁰` of the region's own comparison against the change the opening of `t`
+    /// would take were every open site's row to move toward its carried face at strength `α`: `D_t = Δ_t(enc) + Δ_(t−1)(before) +
+    /// Δ_(t+1)(after)`, `Δ_s(base) = release(Σ_c w_(s,c) E_base(c), 16) − E_base(∗)` at an open site `s` carrying `faces[s]` (its shares on
+    /// `2^(−16)`, [`shares`]) and zero at a written one. So `d(code)/dα` at `α = 0` is `Σ_t r_t` on the covector's grain against the state's
+    /// (`2^(−40)` bits a unit), the opening's part of the strength only: the carried site's voice (a source at strength `α`) is not read. A
+    /// reading: no state changes.
+    pub fn carried_slopes(&self, region: &Region, faces: &[Option<TowerFace>]) -> Result<Vec<i128>> {
+        let pass = self.pass(region, true)?;
+        let mut g = vec![0i128; self.material_len()];
+        let mut dx = Vec::new();
+        self.returned_with(region, &pass, &mut g, None, None, None, None, None, Some(&mut dx))?;
+        let (dw, sites, a) = (self.declaration.width, region.classes.len(), self.declaration.alphabet);
+        let l = &self.layout;
+        let delta = |base: usize, s: usize| -> Option<Vec<i64>> {
+            if !region.unresolved[s] {
+                return None;
+            }
+            let sh = shares(faces.get(s)?.as_ref()?);
+            let open = base + a * dw;
+            Some((0..dw).map(|i| release(sh.iter().map(|&(c, w)| w as i128 * self.theta[base + c as usize * dw + i] as i128).sum(), STATE_BITS) as i64 - self.theta[open + i] as i64).collect())
+        };
+        let mut r = vec![0i128; sites];
+        for (t, slot) in r.iter_mut().enumerate() {
+            let dxt = &dx[t * dw..(t + 1) * dw];
+            let parts = [delta(l.enc, t), t.checked_sub(1).and_then(|s| delta(l.before, s)), (t + 1 < sites).then(|| delta(l.after, t + 1)).flatten()];
+            for d in parts.into_iter().flatten() {
+                *slot += dxt.iter().zip(&d).map(|(&x, &y)| i128::from(x) * i128::from(y)).sum::<i128>();
+            }
+        }
+        Ok(r)
+    }
+
     pub fn reaction_covectors(&self, region: &Region) -> Result<Vec<Vec<[ReactionSums; 2]>>> {
         let pass = self.pass(region, true)?;
         let mut g = vec![0i128; self.material_len()];
         let mut lambdas: Vec<Vec<i64>> = Vec::new();
-        self.returned_with(region, &pass, &mut g, None, None, None, None, Some(&mut lambdas))?;
+        self.returned_with(region, &pass, &mut g, None, None, None, None, Some(&mut lambdas), None)?;
         lambdas.reverse();
         let (sites, dw, heads) = (region.classes.len(), self.declaration.width, self.declaration.heads);
         let definite: Vec<bool> = (0..sites).map(|t| Self::definite(region, t)).collect();
@@ -4251,7 +4284,7 @@ impl Field {
         let pass = self.pass(region, true)?;
         let mut g = vec![0i128; self.material_len()];
         let mut lambdas: Vec<Vec<i64>> = Vec::new();
-        self.returned_with(region, &pass, &mut g, None, None, None, None, Some(&mut lambdas))?;
+        self.returned_with(region, &pass, &mut g, None, None, None, None, Some(&mut lambdas), None)?;
         lambdas.reverse();
         let d = &self.declaration;
         let (sites, dw, heads, lanes) = (region.classes.len(), d.width, d.heads, d.lanes);
@@ -4308,7 +4341,7 @@ impl Field {
         let pass = self.pass(region, true)?;
         let mut g = vec![0i128; self.material_len()];
         let mut lambdas: Vec<Vec<i64>> = Vec::new();
-        self.returned_with(region, &pass, &mut g, None, None, None, None, Some(&mut lambdas))?;
+        self.returned_with(region, &pass, &mut g, None, None, None, None, Some(&mut lambdas), None)?;
         lambdas.reverse();
         let d = &self.declaration;
         let (sites, dw, heads, n, m, lanes) = (region.classes.len(), d.width, d.heads, d.modes, d.complex(), d.lanes);
@@ -4494,7 +4527,7 @@ impl Field {
         let pass = self.pass(region, true)?;
         let mut g = vec![0i128; self.material_len()];
         let mut flat: Vec<[ReachSums; 2]> = Vec::new();
-        self.returned_with(region, &pass, &mut g, None, None, None, Some(&mut flat), None)?;
+        self.returned_with(region, &pass, &mut g, None, None, None, Some(&mut flat), None, None)?;
         let heads = self.declaration.heads;
         let mut by_tick: Vec<Vec<[ReachSums; 2]>> = flat.chunks(heads).map(<[_]>::to_vec).collect();
         by_tick.reverse();
@@ -4513,7 +4546,7 @@ impl Field {
         let pass = self.pass(region, true)?;
         let mut g = vec![0i128; self.material_len()];
         let mut by_tick: Vec<(usize, Vec<i64>)> = Vec::new();
-        self.returned_with(region, &pass, &mut g, None, None, Some(&mut by_tick), None, None)?;
+        self.returned_with(region, &pass, &mut g, None, None, Some(&mut by_tick), None, None, None)?;
         by_tick.reverse();
         Ok((by_tick.into_iter().map(|(k, dl)| (k, dl, pass.ticks[k].read.clone())).collect(), g))
     }
@@ -5031,7 +5064,7 @@ impl Field {
 
     /// [`Field::returned`], with the contact covector's magnitude by where its pairs lie added into `shares`
     /// (`[h][near, far]`, [`Field::covector_shares`]) where given.
-    fn returned_with(&self, region: &Region, pass: &FieldPass, g: &mut [i128], mut shares: Option<&mut [u128]>, mut currents: Option<&mut Vec<Vec<i64>>>, mut junction: Option<&mut Vec<(usize, Vec<i64>)>>, mut reach: Option<&mut Vec<[ReachSums; 2]>>, mut lambdas: Option<&mut Vec<Vec<i64>>>) -> Result<()> {
+    fn returned_with(&self, region: &Region, pass: &FieldPass, g: &mut [i128], mut shares: Option<&mut [u128]>, mut currents: Option<&mut Vec<Vec<i64>>>, mut junction: Option<&mut Vec<(usize, Vec<i64>)>>, mut reach: Option<&mut Vec<[ReachSums; 2]>>, mut lambdas: Option<&mut Vec<Vec<i64>>>, opening: Option<&mut Vec<i64>>) -> Result<()> {
         let d = &self.declaration;
         let (dw, m, lanes) = (d.width, d.complex(), d.lanes);
         let m2 = 2 * m;
@@ -5147,6 +5180,10 @@ impl Field {
                     self.clock_return(region, &c.paces, &c.blank, Some((&c.reads, &mut dx)), &mut r, g)?;
                 }
             }
+        }
+        // [measurement; November 13, the ring record's §4 first reading] The covector the opening receives, `λ⁰`, where read.
+        if let Some(out) = opening {
+            *out = dx.clone();
         }
         // The moment's chart into the face (§16.22): `δC += Σ_t δx⁰_t s_tᵀ`, `δb += Σ_t δx⁰_t`, and the moments'
         // covector `δs_t += Cᵀ δx⁰_t`, joined to the values' and the probes' before the strands' return.
