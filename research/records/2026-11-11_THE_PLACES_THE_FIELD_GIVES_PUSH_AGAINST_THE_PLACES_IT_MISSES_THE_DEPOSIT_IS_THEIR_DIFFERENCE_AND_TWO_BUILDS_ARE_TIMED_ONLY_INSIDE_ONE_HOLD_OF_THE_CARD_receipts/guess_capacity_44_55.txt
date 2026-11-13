@@ -2178,3 +2178,21 @@ at B = 8 bits, one unpredicted octet's news, agent-inferred there).
   Rule. Restarting by own code at 0.80 or over under the stretch and 0.95 or over under the shift: the first level's section is the
   boundary digit's width. Under 0.80 on the stretch: the pick is reopened, and the section is read from the invariance (the least
   section whose share under the stretch reaches the reading at a mean of six places, 0.828).
+
+G125 scored 2026-11-13T00:20Z (the same thread). Receipt resync_ruler_octet.txt (the design record's receipts): the same counts and held places,
+every code stride cut at 5.5452 nats.
+  (a) Restarting by own code. The mean epoch 1.991 places on the code slice (fixed 2.0) and 1.903 pooled (fixed 1.9): held; by
+      slice 1.991, 1.875, 1.855, 2.054, 1.766. One-place epochs 0.422 of the whole epochs (fixed 0.45): held; by slice 0.489, 0.412,
+      0.421, 0.315, 0.465. The spread of an epoch's news 0.323 (fixed 0.45, 0.35 to 0.57): MISSED low, more even than guessed. The
+      opening places' code over the others' 2.291 (fixed 3.2, 2.5 to 4.0): MISSED low; 3.152 on the code slice and 2.0 to 2.2 on the
+      four others, which the guess took for the code slice's. The screen ratio 0.822 (fixed 0.85): held; by slice 0.944, 0.878,
+      0.798, 1.042, 0.513. An epoch fills 0.790 of its section in the mean (4.378 nats).
+  (b) A shifted start. Restarting by own code 0.9997 (fixed 0.997): held; its second openings 0.668 (fixed 0.45, 0.30 to 0.60):
+      MISSED high, the third 0.794, the fourth 0.852. Odometer by own code 0.606 (fixed 0.50): held.
+  (c) Leading spaces doubled, the code slice. Restarting by own code 0.996 (fixed 0.88, 0.80 to 0.94): above its band, a miss high.
+      Odometer by own code 0.699 (fixed 0.55, 0.42 to 0.68): MISSED high. Unguessed: the pair's form 0.997, the two-sided form 0.983,
+      the class mean 0.980; the two-sided form's screen 0.367 and its fill 0.973 at a mean epoch of 2.344 places.
+  Why the misses run one way (agent-inferred): at a section of one octet a place that codes past the section opens under every
+  reading, and such places stand within two or three openings of any place, so readings meet at once; the guess priced a stretch's
+  added news (0.19 nats a place against 5.5) and left out how soon a moved opening is met again.
+  Rule applied. 0.996 under the stretch and 0.9997 under the shift: the first level's section is the boundary digit's width, 8 bits.
