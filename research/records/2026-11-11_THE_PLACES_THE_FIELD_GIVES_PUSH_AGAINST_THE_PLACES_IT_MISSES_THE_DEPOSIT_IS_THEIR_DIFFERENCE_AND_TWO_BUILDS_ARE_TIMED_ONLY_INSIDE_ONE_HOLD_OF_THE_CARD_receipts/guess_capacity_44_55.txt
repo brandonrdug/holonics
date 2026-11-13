@@ -3994,3 +3994,23 @@ G165 scored 2026-11-13T21:45Z (receipt line_pass2_lap1.txt; the second pass's fi
   (c) every slice falls at one-place masks (code −0.0095, web −0.0104, science −0.0099, books −0.0105, wikidata −0.0164): held.
   Of 3 parts 3 held. A second pass over the same documents at fresh cuts and masks buys about what the first pass's last full laps bought;
   the rule's first branch: the second pass goes on lap by lap.
+
+G168 fixed 2026-11-13T21:47Z (the Opus PC thread), before its read: the snap. read-release locked on the cut's masks, 8 passes,
+undamped, EVIDENCE 1 and SNAP 1: an open place's release is shattered for every later pass (its opening and voice returned to the built
+read) at the first pass where the written places of its near field (|i − j| < NEAR) code worse in sum than at the first pass. Read first:
+G167's written places worsened 0.167 nats a place by pass 4 in the unsnapped loop.
+  (a) the snapped loop's open code at pass 8 stands within 0.2 nats a place of pass 1's 3.0085 (the snap breaks the runaway);
+  (b) it stands no lower than pass 1's less 0.005 (the trained field gains nothing from its own recursion it was never trained through);
+  (c) at least half of the open places are shattered by pass 4.
+  Rule: none; a reading for the lens. (b) missed (the snapped recursion codes under the first read) is self-induction's first gain in this
+  build, and the snap is then designed as a part.
+
+G168 scored 2026-11-13T21:54Z (receipt g168_snap.txt; read-release locked, 8 passes, undamped, EVIDENCE 1, SNAP 1; host, 8 threads, 169.1 s):
+  (a) the snapped loop's open code at pass 8 is 5.3032 nats a place, 2.29 over pass 1's: missed;
+  (b) it stands over pass 1's: held (no gain);
+  (c) 2,621 of 5,523 open places are shattered by pass 4 (0.475; 2,351 at pass 2, 2,677 by pass 8): missed, just under half.
+  Of 3 parts 1 held. The snap holds the known places (their code 4.035 to 4.040 from pass 2, against 4.169 unsnapped at pass 8) but not the
+  runaway: the unshattered releases mislead the open places, whose truth no evidence in the loop holds, as fast as before. And pass 2 codes
+  worse than pass 1 at every open place pooled (3.44 against 3.01), so no snap at any pass recovers more than the first read. So in this
+  trained field a release fed back is never better than the first read, and a snap only limits its harm: the recursion can only help where
+  the deposit runs through it, the plasticity the lens names beside the lightning (agent-inferred).

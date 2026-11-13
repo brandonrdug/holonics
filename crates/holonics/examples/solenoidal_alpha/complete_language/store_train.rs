@@ -1807,7 +1807,7 @@ pub(super) fn read_ring(args: &[String]) -> Result<()> {
 }
 
 /// [measurement; agent-inferred, November 13; G163] `read-release UNITS UNITS_SHA STORE STORE_SHA KEYS KEYS_SHA CODEC CODEC_SHA PLACES STATE STATE_SHA
-/// OUT ROLE PASSES LOCKED MASK [DAMP [EVIDENCE]]`: **the field's own release returned at a lag**, a reading of the reafference loop the junction record's §8
+/// OUT ROLE PASSES LOCKED MASK [DAMP [EVIDENCE [SNAP]]]`: **the field's own release returned at a lag**, a reading of the reafference loop the junction record's §8
 /// item 3 names: a region read `PASSES` times, each pass after the first opening every open place on its face from the pass before (a carried
 /// face, [`holonics::hnn::tower::field::shares`]), with `LOCKED` 1 also making those places sources at their faces (a lock, so the open places
 /// hear one another's releases), 0 leaving them silent. `MASK` 0 reads the cut's own masks, 1 a stretch's middle place alone. `DAMP` 1 (G164)
@@ -1816,12 +1816,19 @@ pub(super) fn read_ring(args: &[String]) -> Result<()> {
 /// code on `2^(−20)` bits summed, and the faces' change from the pass before (`Σ |Δw|²` over classes on `2^(−32)`) with its pairing with the change
 /// before that. The output directory is private.
 pub(super) fn read_release(args: &[String]) -> Result<()> {
-    if !(17..=19).contains(&args.len()) {
-        return Err("read-release UNITS UNITS_SHA STORE STORE_SHA KEYS KEYS_SHA CODEC CODEC_SHA PLACES STATE STATE_SHA OUT ROLE PASSES LOCKED MASK [DAMP [EVIDENCE]]".into());
+    if !(17..=20).contains(&args.len()) {
+        return Err("read-release UNITS UNITS_SHA STORE STORE_SHA KEYS KEYS_SHA CODEC CODEC_SHA PLACES STATE STATE_SHA OUT ROLE PASSES LOCKED MASK [DAMP [EVIDENCE [SNAP]]]".into());
     }
     let damp = args.get(17).is_some_and(|d| d == "1");
     // [G167] With EVIDENCE 1 every pass also codes the written places, read through the readout after the ticks.
     let evidence = args.get(18).is_some_and(|d| d == "1");
+    // [G168] With SNAP 1 (and EVIDENCE 1) an open place's release is shattered for every later pass, its opening and its voice returned to the
+    // built read, at the first pass where the written places of its near field (`|i − j| < NEAR`, the contact's own near reach) code worse in
+    // sum than at the first pass: the lens of November 13 21:12Z, a runaway let run and broken where the evidence turns.
+    let snap = args.get(19).is_some_and(|d| d == "1");
+    if snap && !evidence {
+        return Err("a snap reads the written places' evidence (EVIDENCE 1)".into());
+    }
     let started = std::time::Instant::now();
     refuse_variables("read-release")?;
     let role = args[13].as_str();
@@ -1854,7 +1861,7 @@ pub(super) fn read_release(args: &[String]) -> Result<()> {
     use rayon::prelude::*;
     use std::io::Write as _;
     let mut tsv = std::io::BufWriter::new(std::fs::File::create(out.join("release.tsv"))?);
-    writeln!(tsv, "slice\tpass\tplaces\tcode\texpected\tnorm\tinner\twritten_places\twritten_code")?;
+    writeln!(tsv, "slice\tpass\tplaces\tcode\texpected\tnorm\tinner\twritten_places\twritten_code\tshattered")?;
     let a = learner.field.declaration.alphabet;
     println!("RELEASE_LAW role={role} places={places} passes={passes} locked={locked} alone={alone} damp={damp} ms={}", started.elapsed().as_millis());
     for (si, &name) in role_names(&counts, role).iter().enumerate() {
@@ -1878,7 +1885,7 @@ pub(super) fn read_release(args: &[String]) -> Result<()> {
         }
         let slice_start = std::time::Instant::now();
         // Per region and pass: (places, code, expected, the faces' change, its pairing with the change before).
-        type Stage = (u64, i128, i128, u128, i128, u64, i128);
+        type Stage = (u64, i128, i128, u128, i128, u64, i128, u64);
         let reads: Vec<std::result::Result<Vec<Stage>, String>> = regions
             .par_iter()
             .map(|base| {
@@ -1887,16 +1894,33 @@ pub(super) fn read_release(args: &[String]) -> Result<()> {
                 let mut region = base.clone();
                 let (mut prev, mut prev_change): (Option<Vec<i64>>, Option<Vec<i64>>) = (None, None);
                 let mut stages = Vec::with_capacity(passes);
+                let (mut first_codes, mut shattered): (Vec<i64>, Vec<bool>) = (Vec::new(), vec![false; n]);
                 for _ in 0..passes {
                     let views = views_of(std::slice::from_ref(&region));
                     let faces = learner.field.faces(&views[0]).map_err(|e| e.to_string())?;
                     // [G167] The written places' code: what the loop does to what the passage holds.
-                    let written_code: i128 = if evidence {
+                    let per_place: Vec<i64> = if evidence {
                         let all = learner.field.faces_everywhere(&views[0]).map_err(|e| e.to_string())?;
-                        (0..n).filter(|&t| !base.unresolved[t]).map(|t| i128::from(all[t].code(base.classes[t]))).sum()
+                        (0..n).map(|t| if base.unresolved[t] { 0 } else { all[t].code(base.classes[t]) }).collect()
                     } else {
-                        0
+                        Vec::new()
                     };
+                    let written_code: i128 = per_place.iter().map(|&c| i128::from(c)).sum();
+                    if first_codes.is_empty() {
+                        first_codes = per_place.clone();
+                    } else if snap {
+                        for &t in &open {
+                            if shattered[t] {
+                                continue;
+                            }
+                            let (lo, hi) = (t.saturating_sub(NEAR - 1), (t + NEAR).min(n));
+                            let turn: i128 = (lo..hi).filter(|&j| !base.unresolved[j]).map(|j| i128::from(per_place[j]) - i128::from(first_codes[j])).sum();
+                            if turn > 0 {
+                                shattered[t] = true;
+                            }
+                        }
+                    }
+                    let snapped = shattered.iter().filter(|&&s| s).count() as u64;
                     let written_places = if evidence { (0..n).filter(|&t| !base.unresolved[t]).count() as u64 } else { 0 };
                     let (mut code, mut expected) = (0i128, 0i128);
                     let mut dense = vec![0i64; open.len() * a];
@@ -1931,23 +1955,29 @@ pub(super) fn read_release(args: &[String]) -> Result<()> {
                         prev_change = Some(change);
                     }
                     prev = Some(dense);
-                    stages.push((open.len() as u64, code, expected, norm, inner, written_places, written_code));
+                    stages.push((open.len() as u64, code, expected, norm, inner, written_places, written_code, snapped));
+                    // A shattered release opens and reads as the built read does: no carried face, no voice.
+                    for t in 0..n {
+                        if shattered[t] {
+                            carried[t] = None;
+                        }
+                    }
                     region.faces = carried;
                     if locked {
-                        region.locked = base.unresolved.clone();
+                        region.locked = (0..n).map(|t| base.unresolved[t] && !shattered[t]).collect();
                     }
                 }
                 Ok(stages)
             })
             .collect();
-        let mut sums: Vec<Stage> = vec![(0, 0, 0, 0, 0, 0, 0); passes];
+        let mut sums: Vec<Stage> = vec![(0, 0, 0, 0, 0, 0, 0, 0); passes];
         for read in reads {
             for (s, st) in sums.iter_mut().zip(read?) {
-                *s = (s.0 + st.0, s.1 + st.1, s.2 + st.2, s.3 + st.3, s.4 + st.4, s.5 + st.5, s.6 + st.6);
+                *s = (s.0 + st.0, s.1 + st.1, s.2 + st.2, s.3 + st.3, s.4 + st.4, s.5 + st.5, s.6 + st.6, s.7 + st.7);
             }
         }
         for (p, s) in sums.iter().enumerate() {
-            writeln!(tsv, "{si}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}", p + 1, s.0, s.1, s.2, s.3, s.4, s.5, s.6)?;
+            writeln!(tsv, "{si}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}", p + 1, s.0, s.1, s.2, s.3, s.4, s.5, s.6, s.7)?;
         }
         println!("RELEASE_SLICE slice={name} regions={} host_ms={} ms={}", regions.len(), slice_start.elapsed().as_millis(), started.elapsed().as_millis());
     }
