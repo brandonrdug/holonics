@@ -840,6 +840,114 @@ pub(super) fn found_level(args: &[String]) -> Result<()> {
     Ok(())
 }
 
+/// [measurement; theory, November 13, Brandon's self-induction (that day, 18:05Z) and an outside read's depth sweep; G149] `read-depth UNITS
+/// UNITS_SHA STORE STORE_SHA KEYS KEYS_SHA CODEC CODEC_SHA PLACES TICKS STATE STATE_SHA OUT`: **what the field's recurrence does past the depth
+/// it was trained at**, a reading. The state's field is read with its declared ticks replaced by `TICKS` (its material, its level's split and
+/// every law the same; a tick reads only the ticks before it, so the stage after tick `k` of one run is the face a run of `k` ticks gives).
+/// Each slice of the held role is cut as `read-cavity` cuts it, whole stretches until `PLACES` places, each place open alone among its
+/// stretch's written places, read by the realization's charts by stage (each tick's opening and after the last). `OUT/depth.tsv` holds a line
+/// a place (numbers only): the slice, the place's class, and for every stage the code of its class and the face's expected code, both on
+/// `2^(−20)` bits; `OUT/charts.bin` its charts by stage (`TICKS + 1` rows of `D` little-endian 32-bit words a place, in the rows' order). The
+/// output directory is private.
+pub(super) fn read_depth(args: &[String], realization: &mut dyn FieldRealization) -> Result<()> {
+    if args.len() != 14 {
+        return Err("read-depth UNITS UNITS_SHA STORE STORE_SHA KEYS KEYS_SHA CODEC CODEC_SHA PLACES TICKS STATE STATE_SHA OUT".into());
+    }
+    let started = std::time::Instant::now();
+    refuse_variables("read-depth")?;
+    let units = units_of(&args[1], &args[2])?;
+    if !units.merges().is_empty() {
+        return Err("the store's cut is on bytes: a units file of merges is refused".into());
+    }
+    let store = Path::new(&args[3]);
+    let counts = store_counts(std::str::from_utf8(&pinned_read(&store.join("STORE.tsv").to_string_lossy(), &args[4], READ_BUDGET as usize)?)?)?;
+    let keys = pinned_read(&args[5], &args[6], READ_BUDGET as usize)?;
+    let seed = u64::from_be_bytes(keys.get(keys.len().saturating_sub(8)..).filter(|w| w.len() == 8).ok_or("a key file of fewer than eight bytes")?.try_into()?);
+    let codec = FieldCodec::from_text(&String::from_utf8(pinned_read(&args[7], &args[8], READ_BUDGET as usize)?)?, units)?;
+    let places = positive(&args[9])? as usize;
+    let ticks = positive(&args[10])? as usize;
+    let learner = FieldLearner::from_text(std::str::from_utf8(&pinned_read(&args[11], &args[12], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
+    let law = learner.pass.clone().ok_or("a state with no pass line: read-depth reads a state of the store's line")?;
+    if learner.field.declaration.alphabet != codec.alphabet() {
+        return Err("a state whose alphabet is not its codec's".into());
+    }
+    if learner.field.scale.as_ref().is_some_and(|s| ticks <= s.split) {
+        return Err("a depth at or under the level's split".into());
+    }
+    let mut field = learner.field.clone();
+    field.declaration.ticks = ticks;
+    let out = Path::new(&args[13]);
+    if out.exists() {
+        return Err(format!("{} exists", out.display()).into());
+    }
+    std::fs::create_dir_all(out)?;
+    use std::io::Write as _;
+    let mut tsv = std::io::BufWriter::new(std::fs::File::create(out.join("depth.tsv"))?);
+    let mut charts_bin = std::io::BufWriter::new(std::fs::File::create(out.join("charts.bin"))?);
+    let stages = ticks + 1;
+    writeln!(tsv, "slice\tclass{}", (0..stages).map(|k| format!("\tcode{k}\tentropy{k}")).collect::<String>())?;
+    println!("DEPTH_LAW role=held places={places} ticks={ticks} declared_ticks={} level={} ms={}", learner.field.declaration.ticks, field.scale.is_some(), started.elapsed().as_millis());
+    let expected = |f: &holonics::hnn::tower::TowerFace| -> i64 {
+        let sum: i128 = f.masses.iter().map(|&m| m as i128 * holonics::hnn::tower::face_code(m, f.total) as i128).sum();
+        let total = (f.total as i128).max(1);
+        ((2 * sum + total) / (2 * total)) as i64
+    };
+    for &name in &role_names(&counts, "held") {
+        let slice = open_slice(store, "held", name, &counts)?;
+        let pass = StorePass { role: "held".to_string(), store: args[4].clone(), stretches: 0, least: law.least, octaves: law.octaves, pairs: law.pairs, sites: law.sites, slices: vec![PassSlice { name: name.to_string(), piece: 0, cursor: 0, taken: 0 }] };
+        let mut cut = Cut { seed, slices: vec![slice], pass };
+        let mut stretches: Vec<Vec<usize>> = Vec::new();
+        let mut taken = 0usize;
+        while taken < places {
+            let Some(drawn) = cut.next() else { break };
+            let stretch = cut.take(drawn, &codec)?;
+            taken += stretch.region.classes.len();
+            stretches.push(stretch.region.classes.clone());
+        }
+        let jobs: Vec<(usize, usize)> = stretches.iter().enumerate().flat_map(|(k, c)| (0..c.len()).map(move |t| (k, t))).collect();
+        let card_start = std::time::Instant::now();
+        let mut at = 0usize;
+        while at < jobs.len() {
+            let (mut in_pairs, mut in_sites, mut end) = (0u64, 0u64, at);
+            while end < jobs.len() {
+                let s = stretches[jobs[end].0].len() as u64;
+                if in_sites > 0 && (in_pairs + s * s > law.pairs || in_sites + s > law.sites) {
+                    break;
+                }
+                (in_pairs, in_sites, end) = (in_pairs + s * s, in_sites + s, end + 1);
+            }
+            let regions: Vec<TrainRegion> = jobs[at..end]
+                .iter()
+                .map(|&(k, t)| {
+                    let mut mask = vec![false; stretches[k].len()];
+                    mask[t] = true;
+                    TrainRegion::plain(stretches[k].clone(), mask)
+                })
+                .collect();
+            let (_, charts) = realization.read_tick_charts(&field, &views_of(&regions)).map_err(|e| e.to_string())?;
+            for (&(k, t), st) in jobs[at..end].iter().zip(&charts) {
+                if st.len() != stages || st.iter().any(|c| c.len() != field.declaration.width) {
+                    return Err("a place's charts by stage that are not one row of each stage".into());
+                }
+                let class = stretches[k][t];
+                let mut line = format!("{name}\t{class}");
+                for chart in st {
+                    let face = field.face_of_read(chart).map_err(|e| e.to_string())?;
+                    line.push_str(&format!("\t{}\t{}", face.code(class), expected(&face)));
+                    for &v in chart {
+                        charts_bin.write_all(&v.to_le_bytes())?;
+                    }
+                }
+                writeln!(tsv, "{line}")?;
+            }
+            at = end;
+        }
+        println!("DEPTH_SLICE slice={name} stretches={} places={} card_ms={} ms={}", stretches.len(), jobs.len(), card_start.elapsed().as_millis(), started.elapsed().as_millis());
+    }
+    println!("DEPTH_DONE {} ms={}", counters_text(realization), started.elapsed().as_millis());
+    Ok(())
+}
+
 /// [measurement; theory, November 13, an outside read of that day (its claim 1); G148] `read-influence UNITS UNITS_SHA STORE STORE_SHA KEYS
 /// KEYS_SHA CODEC CODEC_SHA PAIRS STATE STATE_SHA OUT`: **whether one place's influence on another follows the news between them or their
 /// distance**, a reading. Each slice of the held role is cut as `read-cavity` cuts it, whole stretches until four times `PAIRS` places, every

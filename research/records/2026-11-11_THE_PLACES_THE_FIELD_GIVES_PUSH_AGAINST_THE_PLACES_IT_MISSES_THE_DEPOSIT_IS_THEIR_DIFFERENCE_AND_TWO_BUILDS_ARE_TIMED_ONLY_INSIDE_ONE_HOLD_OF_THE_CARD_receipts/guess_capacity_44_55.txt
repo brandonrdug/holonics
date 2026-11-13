@@ -3502,3 +3502,21 @@ G148 scored 2026-11-13T18:15Z (receipt g148_influence.txt; read-influence on the
   on the news, sits above a field whose own transport privileges the place (agent-inferred: the reach of a head is the law that sets it).
   Rule applied: (a) the news's partial not more negative than the distance's: the fine heads' falloff on the news clock (a head's reach
   in sections of news, not in places) is the next law, with its guess.
+
+G149 fixed 2026-11-13T18:19Z (the Opus PC thread), before its read: self-induction, read as the field's recurrence past the depth it
+was trained at (Brandon, 18:05Z: recursive self-induction has an inflection past which loops cancel, and the perturbation of that cancellation
+is something like probabilistic certainty; an outside read's sweep of the depth). read-depth at 16 ticks (the field trained at 4) on the
+line's and on the level's second-lap means, 2,000 held places a slice, each open alone; depth_ruler.py. Read first: the trained depth is
+four ticks and the readout reads after the fourth; the opening is stage 0; a tick reads only the ticks before it, so one run gives every
+depth; every tick is the same constitution iterated, its moments added to every tick's values.
+  (a) On the line the code of a place's class falls to a minimum at stage 4 or 5 and rises past it: at stage 8, 0.15 nats a place over the
+      minimum (0.03 to 0.60); at stage 16, 0.6 over (0.1 to 2.5).
+  (b) Past the minimum the face's expected code keeps falling: at stage 16, 0.15 nats under its value at the minimum (0.02 to 0.60), while
+      the code rises: certainty without correctness.
+  (c) The cosine of two successive changes of a place's chart: positive through the trained ticks (0.2 at ticks 2 to 4; 0.0 to 0.6) and
+      negative past the minimum (−0.3 at ticks 8 to 16; −0.8 to −0.05): the loops reverse each other.
+  (d) The level's curve under the line's at its minimum, its rise past the minimum within 0.05 of the line's.
+  Rules. (a), (b) and (c) held: the inflection and the cancellation are read on the machine, and the next item is the same sweep with the
+  written places' states held at their opening every tick (a boundary driven afresh), to read whether fresh input removes the cancellation.
+  (c) positive past the minimum with the changes shrinking: the field settles and does not cancel, and its rise past the trained depth is
+  read as the constitution's untrained ticks; the next item is then a field trained at eight ticks against four, with its guess.
