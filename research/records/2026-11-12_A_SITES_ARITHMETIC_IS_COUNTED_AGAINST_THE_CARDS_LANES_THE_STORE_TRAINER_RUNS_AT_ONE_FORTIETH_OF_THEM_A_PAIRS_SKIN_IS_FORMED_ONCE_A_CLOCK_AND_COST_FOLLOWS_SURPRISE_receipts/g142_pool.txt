@@ -1,0 +1,294 @@
+G142 receipt: the opening's return first in the reverse, its forward's buffers ended there; and the pool read by take site. Numbers only. Device: the RTX 4080 SUPER under .local/gpu.lock; one hold, nothing else on the host.
+# the reading before the change (this tree's pool reading on main 9ad0ed477's law, 100 profiled sections a line)
+BEFORE FIELD_PROFILE_POOLPEAK live=10503265200 budget=10747183104
+BEFORE FIELD_PROFILE_SPLIT kernels_ms=22790 copies=3800 copies_ms=139 allocations=30501 allocations_ms=157 elapsed_ms=24993
+BEFORE FIELD_PROFILE_POOLPEAK live=11255543024 budget=10741743616
+BEFORE FIELD_PROFILE_SPLIT kernels_ms=25074 copies=5400 copies_ms=669 allocations=32801 allocations_ms=2101 elapsed_ms=30253
+BEFORE_LINE FIELD_PROFILE_POOLP line=1143 class_octets=64 allocations=2 mean_live=8068300240 mean_kept=0 mean_over_budget=0
+BEFORE_LINE FIELD_PROFILE_POOLP line=1143 class_octets=1536 allocations=2 mean_live=8068298704 mean_kept=0 mean_over_budget=0
+BEFORE_LINE FIELD_PROFILE_POOLP line=1143 class_octets=3072 allocations=2 mean_live=8068295632 mean_kept=0 mean_over_budget=0
+BEFORE_LINE FIELD_PROFILE_POOLP line=1143 class_octets=3584 allocations=2 mean_live=8072424752 mean_kept=2606870368 mean_over_budget=0
+BEFORE_LINE FIELD_PROFILE_POOLP line=1143 class_octets=4096 allocations=2 mean_live=8204349072 mean_kept=2122101856 mean_over_budget=0
+BEFORE_LINE FIELD_PROFILE_POOLP line=1143 class_octets=8192 allocations=78 mean_live=10253797574 mean_kept=122154619 mean_over_budget=0
+BEFORE_LINE FIELD_PROFILE_POOLP line=1143 class_octets=10240 allocations=161 mean_live=10179457241 mean_kept=203106504 mean_over_budget=0
+BEFORE_LINE FIELD_PROFILE_POOLP line=1143 class_octets=49152 allocations=1 mean_live=7798002736 mean_kept=12582912 mean_over_budget=0
+BEFORE_LINE FIELD_PROFILE_POOLP line=1143 class_octets=163840 allocations=74 mean_live=10100286709 mean_kept=542161887 mean_over_budget=2233290
+BEFORE_LINE FIELD_PROFILE_POOLP line=1143 class_octets=196608 allocations=262 mean_live=10194387536 mean_kept=260286582 mean_over_budget=14763374
+BEFORE_LINE FIELD_PROFILE_POOLP line=1143 class_octets=327680 allocations=34 mean_live=9885100336 mean_kept=558572201 mean_over_budget=6000
+BEFORE_LINE FIELD_PROFILE_POOLP line=1143 class_octets=393216 allocations=87 mean_live=9931976624 mean_kept=490205239 mean_over_budget=0
+BEFORE_LINE FIELD_PROFILE_POOLP line=1143 class_octets=1572864 allocations=1 mean_live=4456480 mean_kept=0 mean_over_budget=0
+BEFORE_LINE FIELD_PROFILE_POOLP line=1143 class_octets=1835008 allocations=1 mean_live=0 mean_kept=0 mean_over_budget=0
+BEFORE_LINE FIELD_PROFILE_POOLP line=1429 class_octets=524288 allocations=1 mean_live=1835008 mean_kept=0 mean_over_budget=0
+BEFORE_LINE FIELD_PROFILE_POOLP line=1432 class_octets=32 allocations=1 mean_live=2359296 mean_kept=0 mean_over_budget=0
+BEFORE_LINE FIELD_PROFILE_POOLP line=1576 class_octets=2097152 allocations=1 mean_live=2359328 mean_kept=0 mean_over_budget=0
+BEFORE_LINE FIELD_PROFILE_POOLP line=1688 class_octets=1572864 allocations=4 mean_live=3851157576 mean_kept=0 mean_over_budget=0
+BEFORE_LINE FIELD_PROFILE_POOLP line=1688 class_octets=25165824 allocations=32 mean_live=3559260232 mean_kept=0 mean_over_budget=0
+BEFORE_LINE FIELD_PROFILE_POOLP line=1688 class_octets=50331648 allocations=16 mean_live=3753771080 mean_kept=0 mean_over_budget=0
+BEFORE_LINE FIELD_PROFILE_POOLP line=1689 class_octets=229376 allocations=10 mean_live=3781574737 mean_kept=6741642193 mean_over_budget=0
+BEFORE_LINE FIELD_PROFILE_POOLP line=1689 class_octets=262144 allocations=20 mean_live=4374783677 mean_kept=4566273156 mean_over_budget=0
+BEFORE_LINE FIELD_PROFILE_POOLP line=1689 class_octets=327680 allocations=4 mean_live=4887511132 mean_kept=5816548180 mean_over_budget=0
+BEFORE_LINE FIELD_PROFILE_POOLP line=1689 class_octets=524288 allocations=4 mean_live=2749890632 mean_kept=0 mean_over_budget=0
+BEFORE_LINE FIELD_PROFILE_POOLP line=1689 class_octets=655360 allocations=4 mean_live=5297733728 mean_kept=5214360976 mean_over_budget=0
+BEFORE_LINE FIELD_PROFILE_POOLP line=1689 class_octets=786432 allocations=34 mean_live=4399075174 mean_kept=3400832401 mean_over_budget=0
+BEFORE_LINE FIELD_PROFILE_POOLP line=1689 class_octets=12582912 allocations=8 mean_live=2758410312 mean_kept=0 mean_over_budget=0
+BEFORE_LINE FIELD_PROFILE_POOLP line=1694 class_octets=12582912 allocations=4 mean_live=2577662024 mean_kept=0 mean_over_budget=0
+BEFORE_LINE FIELD_PROFILE_POOLP line=1695 class_octets=1572864 allocations=4 mean_live=2590244936 mean_kept=0 mean_over_budget=0
+BEFORE_LINE FIELD_PROFILE_POOLP line=1698 class_octets=12582912 allocations=4 mean_live=2667315272 mean_kept=0 mean_over_budget=0
+BEFORE_LINE FIELD_PROFILE_POOLP line=1700 class_octets=12582912 allocations=4 mean_live=2705064008 mean_kept=0 mean_over_budget=0
+BEFORE_LINE FIELD_PROFILE_POOLP line=1701 class_octets=3145728 allocations=4 mean_live=2717646920 mean_kept=0 mean_over_budget=0
+BEFORE_LINE FIELD_PROFILE_POOLP line=1703 class_octets=3145728 allocations=4 mean_live=2745958472 mean_kept=0 mean_over_budget=0
+BEFORE_LINE FIELD_PROFILE_POOLP line=1714 class_octets=536870912 allocations=4 mean_live=2777415752 mean_kept=0 mean_over_budget=0
+BEFORE_LINE FIELD_PROFILE_POOLP line=1720 class_octets=536870912 allocations=4 mean_live=3314286664 mean_kept=0 mean_over_budget=0
+BEFORE_LINE FIELD_PROFILE_POOLP line=1722 class_octets=50331648 allocations=4 mean_live=3852730440 mean_kept=0 mean_over_budget=0
+BEFORE_LINE FIELD_PROFILE_POOLP line=1723 class_octets=50331648 allocations=4 mean_live=3903062088 mean_kept=0 mean_over_budget=0
+BEFORE_LINE FIELD_PROFILE_POOLP line=1724 class_octets=1572864 allocations=4 mean_live=3953393736 mean_kept=0 mean_over_budget=0
+BEFORE_LINE FIELD_PROFILE_POOLP line=1725 class_octets=29360128 allocations=4 mean_live=3954966600 mean_kept=0 mean_over_budget=0
+BEFORE_LINE FIELD_PROFILE_POOLP line=1727 class_octets=12582912 allocations=4 mean_live=4009492552 mean_kept=0 mean_over_budget=0
+BEFORE_LINE FIELD_PROFILE_POOLP line=1728 class_octets=1572864 allocations=4 mean_live=4022075464 mean_kept=0 mean_over_budget=0
+BEFORE_LINE FIELD_PROFILE_POOLP line=1739 class_octets=16 allocations=4 mean_live=4275306568 mean_kept=0 mean_over_budget=0
+BEFORE_LINE FIELD_PROFILE_POOLP line=1876 class_octets=16 allocations=1 mean_live=6029344 mean_kept=0 mean_over_budget=0
+BEFORE_LINE FIELD_PROFILE_POOLP line=1877 class_octets=25165824 allocations=1 mean_live=6029360 mean_kept=0 mean_over_budget=0
+BEFORE_LINE FIELD_PROFILE_POOLP line=2202 class_octets=786432 allocations=1 mean_live=6821773424 mean_kept=0 mean_over_budget=0
+BEFORE_LINE FIELD_PROFILE_POOLP line=2205 class_octets=25165824 allocations=1 mean_live=6822559856 mean_kept=0 mean_over_budget=0
+BEFORE_LINE FIELD_PROFILE_POOLP line=2208 class_octets=25165824 allocations=1 mean_live=6847725680 mean_kept=0 mean_over_budget=0
+BEFORE_LINE FIELD_PROFILE_POOLP line=2212 class_octets=786432 allocations=1 mean_live=6872891504 mean_kept=0 mean_over_budget=0
+BEFORE_LINE FIELD_PROFILE_POOLP line=2213 class_octets=786432 allocations=1 mean_live=6873677936 mean_kept=0 mean_over_budget=0
+BEFORE_LINE FIELD_PROFILE_POOLP line=2214 class_octets=786432 allocations=1 mean_live=6874464368 mean_kept=0 mean_over_budget=0
+BEFORE_LINE FIELD_PROFILE_POOLP line=2215 class_octets=16777216 allocations=1 mean_live=6875250800 mean_kept=0 mean_over_budget=0
+BEFORE_LINE FIELD_PROFILE_POOLP line=2216 class_octets=384 allocations=1 mean_live=6892028016 mean_kept=0 mean_over_budget=0
+BEFORE_LINE FIELD_PROFILE_POOLP line=2216 class_octets=448 allocations=1 mean_live=6894059632 mean_kept=3785233024 mean_over_budget=0
+BEFORE_LINE FIELD_PROFILE_POOLP line=2216 class_octets=512 allocations=1 mean_live=6893863024 mean_kept=3432585088 mean_over_budget=0
+BEFORE_LINE FIELD_PROFILE_POOLP line=2217 class_octets=12582912 allocations=1 mean_live=6892028400 mean_kept=0 mean_over_budget=0
+BEFORE_LINE FIELD_PROFILE_POOLP line=2223 class_octets=58720256 allocations=1 mean_live=7575699952 mean_kept=0 mean_over_budget=0
+BEFORE_LINE FIELD_PROFILE_POOLP line=2223 class_octets=671088640 allocations=1 mean_live=6904611312 mean_kept=0 mean_over_budget=0
+BEFORE_LINE FIELD_PROFILE_POOLP line=2223 class_octets=805306368 allocations=1 mean_live=6904414768 mean_kept=3814266304 mean_over_budget=782243824
+BEFORE_LINE FIELD_PROFILE_POOLP line=2233 class_octets=29360128 allocations=1 mean_live=7693140464 mean_kept=0 mean_over_budget=0
+BEFORE_LINE FIELD_PROFILE_POOLP line=2233 class_octets=58720256 allocations=1 mean_live=7634420208 mean_kept=0 mean_over_budget=0
+BEFORE_LINE FIELD_PROFILE_POOLP line=2443 class_octets=12582912 allocations=1 mean_live=8517376176 mean_kept=171971136 mean_over_budget=0
+BEFORE_LINE FIELD_PROFILE_POOLP line=2448 class_octets=1572864 allocations=1 mean_live=8529959088 mean_kept=171971136 mean_over_budget=0
+BEFORE_LINE FIELD_PROFILE_POOLP line=2450 class_octets=83886080 allocations=1 mean_live=8615418032 mean_kept=88085056 mean_over_budget=0
+BEFORE_LINE FIELD_PROFILE_POOLP line=2451 class_octets=786432 allocations=1 mean_live=8699304112 mean_kept=88085056 mean_over_budget=0
+BEFORE_LINE FIELD_PROFILE_POOLP line=2460 class_octets=25165824 allocations=1 mean_live=8700090544 mean_kept=88085056 mean_over_budget=0
+BEFORE_LINE FIELD_PROFILE_POOLP line=2540 class_octets=327680 allocations=32 mean_live=8844084744 mean_kept=1801550800 mean_over_budget=0
+BEFORE_LINE FIELD_PROFILE_POOLP line=2540 class_octets=393216 allocations=66 mean_live=8863908109 mean_kept=1480410532 mean_over_budget=0
+BEFORE_LINE FIELD_PROFILE_POOLP line=2644 class_octets=25165824 allocations=1 mean_live=7798051888 mean_kept=12582912 mean_over_budget=0
+BEFORE_LINE FIELD_PROFILE_POOLP line=2645 class_octets=12582912 allocations=1 mean_live=7835800624 mean_kept=0 mean_over_budget=0
+BEFORE_LINE FIELD_PROFILE_POOLP line=2645 class_octets=25165824 allocations=2 mean_live=7868044336 mean_kept=0 mean_over_budget=0
+BEFORE_LINE FIELD_PROFILE_POOLP line=2645 class_octets=83886080 allocations=1 mean_live=7912870960 mean_kept=0 mean_over_budget=0
+BEFORE_LINE FIELD_PROFILE_POOLP line=2661 class_octets=12582912 allocations=1 mean_live=7873549360 mean_kept=0 mean_over_budget=0
+BEFORE_LINE FIELD_PROFILE_POOLP line=2662 class_octets=1572864 allocations=1 mean_live=7886132272 mean_kept=0 mean_over_budget=0
+BEFORE_LINE FIELD_PROFILE_POOLP line=2672 class_octets=83886080 allocations=1 mean_live=7996757040 mean_kept=0 mean_over_budget=0
+BEFORE_LINE FIELD_PROFILE_POOLP line=2673 class_octets=786432 allocations=1 mean_live=8080643120 mean_kept=0 mean_over_budget=0
+BEFORE_LINE FIELD_PROFILE_POOLP line=2694 class_octets=12582912 allocations=5 mean_live=10361678256 mean_kept=56109427 mean_over_budget=0
+BEFORE_LINE FIELD_PROFILE_POOLP line=2694 class_octets=83886080 allocations=100 mean_live=10099195079 mean_kept=625208680 mean_over_budget=66546224
+BEFORE_LINE FIELD_PROFILE_POOLP line=2695 class_octets=20971520 allocations=30 mean_live=10227635572 mean_kept=129737979 mean_over_budget=0
+BEFORE_LINE FIELD_PROFILE_POOLP line=2695 class_octets=25165824 allocations=65 mean_live=10275618728 mean_kept=60464365 mean_over_budget=0
+BEFORE_LINE FIELD_PROFILE_POOLP line=2750 class_octets=41943040 allocations=29 mean_live=10248043122 mean_kept=130362573 mean_over_budget=0
+BEFORE_LINE FIELD_PROFILE_POOLP line=2750 class_octets=50331648 allocations=66 mean_live=10298741377 mean_kept=62248473 mean_over_budget=0
+BEFORE_LINE FIELD_PROFILE_POOLP line=2757 class_octets=25165824 allocations=1 mean_live=10353499824 mean_kept=63266368 mean_over_budget=0
+BEFORE_LINE FIELD_PROFILE_POOLP line=2758 class_octets=20971520 allocations=4 mean_live=10380746224 mean_kept=21323200 mean_over_budget=0
+BEFORE_LINE FIELD_PROFILE_POOLP line=2758 class_octets=25165824 allocations=128 mean_live=10403520068 mean_kept=21847544 mean_over_budget=0
+BEFORE_LINE FIELD_PROFILE_POOLP line=2772 class_octets=402653184 allocations=11 mean_live=10375266101 mean_kept=65493178 mean_over_budget=101668848
+BEFORE_LINE FIELD_PROFILE_POOLP line=2772 class_octets=469762048 allocations=89 mean_live=10417731645 mean_kept=29833049 mean_over_budget=175583126
+BEFORE_LINE FIELD_PROFILE_POOLP line=2803 class_octets=10485760 allocations=60 mean_live=8726128731 mean_kept=1692553833 mean_over_budget=0
+BEFORE_LINE FIELD_PROFILE_POOLP line=2803 class_octets=12582912 allocations=8 mean_live=8128497368 mean_kept=12584080 mean_over_budget=0
+BEFORE_LINE FIELD_PROFILE_POOLP line=2805 class_octets=25165824 allocations=4 mean_live=8030546896 mean_kept=0 mean_over_budget=0
+BEFORE_LINE FIELD_PROFILE_POOLP line=2884 class_octets=20971520 allocations=15 mean_live=10608919676 mean_kept=428736098 mean_over_budget=316883678
+BEFORE_LINE FIELD_PROFILE_POOLP line=2884 class_octets=25165824 allocations=139 mean_live=10609492753 mean_kept=522488785 mean_over_budget=416103465
+BEFORE_LINE FIELD_PROFILE_POOLP line=2897 class_octets=20971520 allocations=33 mean_live=10598910159 mean_kept=130576029 mean_over_budget=8714092
+BEFORE_LINE FIELD_PROFILE_POOLP line=2897 class_octets=25165824 allocations=155 mean_live=10637116243 mean_kept=117099412 mean_over_budget=38523368
+BEFORE_LINE FIELD_PROFILE_POOLP line=2899 class_octets=20971520 allocations=57 mean_live=10601522392 mean_kept=125610730 mean_over_budget=7065035
+BEFORE_LINE FIELD_PROFILE_POOLP line=2899 class_octets=25165824 allocations=193 mean_live=10661008203 mean_kept=71725772 mean_over_budget=16399340
+BEFORE_LINE FIELD_PROFILE_POOLP line=2921 class_octets=12582912 allocations=3 mean_live=8154043824 mean_kept=150998058 mean_over_budget=0
+BEFORE_LINE FIELD_PROFILE_POOLP line=2922 class_octets=1572864 allocations=3 mean_live=8166626736 mean_kept=150998058 mean_over_budget=0
+BEFORE_LINE FIELD_PROFILE_POOLP line=2929 class_octets=25165824 allocations=2 mean_live=8259032688 mean_kept=171971136 mean_over_budget=0
+BEFORE_LINE FIELD_PROFILE_POOLP line=2937 class_octets=83886080 allocations=3 mean_live=8277251504 mean_kept=58723370 mean_over_budget=0
+BEFORE_LINE FIELD_PROFILE_POOLP line=2938 class_octets=786432 allocations=3 mean_live=8361137584 mean_kept=58723370 mean_over_budget=0
+BEFORE_LINE FIELD_PROFILE_POOLP line=2943 class_octets=786432 allocations=12 mean_live=8363103664 mean_kept=58723370 mean_over_budget=0
+BEFORE_LINE FIELD_PROFILE_POOLP line=2943 class_octets=12582912 allocations=1 mean_live=8200181168 mean_kept=0 mean_over_budget=0
+BEFORE_LINE FIELD_PROFILE_POOLP line=2943 class_octets=16777216 allocations=3 mean_live=8365069744 mean_kept=58723370 mean_over_budget=0
+BEFORE_LINE FIELD_PROFILE_POOLP line=2950 class_octets=384 allocations=3 mean_live=8381846960 mean_kept=58723370 mean_over_budget=0
+BEFORE_LINE FIELD_PROFILE_POOLP line=2950 class_octets=448 allocations=3 mean_live=8383879216 mean_kept=2295420309 mean_over_budget=0
+BEFORE_LINE FIELD_PROFILE_POOLP line=2950 class_octets=512 allocations=3 mean_live=8517900976 mean_kept=1808554986 mean_over_budget=0
+BEFORE_LINE FIELD_PROFILE_POOLP line=2952 class_octets=25165824 allocations=3 mean_live=8394430256 mean_kept=50334762 mean_over_budget=0
+BEFORE_LINE FIELD_PROFILE_POOLP line=3115 class_octets=65536 allocations=1 mean_live=9823115440 mean_kept=38539840 mean_over_budget=0
+BEFORE_LINE FIELD_PROFILE_POOLP line=3335 class_octets=25165824 allocations=18 mean_live=9392828378 mean_kept=245364145 mean_over_budget=1325921
+BEFORE_LINE FIELD_PROFILE_POOLP line=3335 class_octets=50331648 allocations=3 mean_live=8909805744 mean_kept=88085056 mean_over_budget=0
+BEFORE_LINE FIELD_PROFILE_POOLP line=3356 class_octets=134217728 allocations=1 mean_live=9236961456 mean_kept=88085056 mean_over_budget=0
+BEFORE_LINE FIELD_PROFILE_POOLP line=3358 class_octets=268435456 allocations=1 mean_live=9371179184 mean_kept=88085056 mean_over_budget=0
+BEFORE_LINE FIELD_PROFILE_POOLP line=3364 class_octets=10485760 allocations=17 mean_live=9757578777 mean_kept=619847533 mean_over_budget=570833
+BEFORE_LINE FIELD_PROFILE_POOLP line=3365 class_octets=10485760 allocations=18 mean_live=9768097427 mean_kept=590109191 mean_over_budget=0
+BEFORE_LINE FIELD_PROFILE_POOLP line=3369 class_octets=50331648 allocations=1 mean_live=9689946288 mean_kept=37753408 mean_over_budget=0
+BEFORE_LINE FIELD_PROFILE_POOLP line=3373 class_octets=1572864 allocations=1 mean_live=9740277936 mean_kept=37753408 mean_over_budget=0
+BEFORE_LINE FIELD_PROFILE_POOLP line=3374 class_octets=1572864 allocations=1 mean_live=9741850800 mean_kept=37753408 mean_over_budget=0
+BEFORE_LINE FIELD_PROFILE_POOLP line=3375 class_octets=29360128 allocations=8 mean_live=9855483280 mean_kept=752408448 mean_over_budget=15840276
+BEFORE_LINE FIELD_PROFILE_POOLP line=3389 class_octets=25165824 allocations=8 mean_live=9947372848 mean_kept=408065856 mean_over_budget=3696284
+BEFORE_LINE FIELD_PROFILE_POOLP line=3389 class_octets=83886080 allocations=1 mean_live=8725256368 mean_kept=88085056 mean_over_budget=0
+BEFORE_LINE FIELD_PROFILE_POOLP line=3442 class_octets=1572864 allocations=17 mean_live=10069369791 mean_kept=209483990 mean_over_budget=0
+BEFORE_LINE FIELD_PROFILE_POOLP line=3442 class_octets=41943040 allocations=1 mean_live=10088210096 mean_kept=183975488 mean_over_budget=0
+BEFORE_LINE FIELD_PROFILE_POOLP line=3442 class_octets=50331648 allocations=15 mean_live=10049678836 mean_kept=306654067 mean_over_budget=9821452
+BEFORE_LINE FIELD_PROFILE_POOLP line=3466 class_octets=1310720 allocations=17 mean_live=10074881094 mean_kept=652604058 mean_over_budget=0
+BEFORE_LINE FIELD_PROFILE_POOLP line=3466 class_octets=1572864 allocations=1 mean_live=9983613104 mean_kept=634131008 mean_over_budget=0
+BEFORE_LINE FIELD_PROFILE_POOLP line=3500 class_octets=1310720 allocations=27 mean_live=10065988366 mean_kept=656140257 mean_over_budget=0
+BEFORE_LINE FIELD_PROFILE_POOLP line=3500 class_octets=1572864 allocations=2 mean_live=9982499376 mean_kept=734008128 mean_over_budget=0
+BEFORE_LINE FIELD_PROFILE_POOLP line=3556 class_octets=25165824 allocations=9 mean_live=10153170579 mean_kept=155535196 mean_over_budget=0
+BEFORE_LINE FIELD_PROFILE_POOLP line=3557 class_octets=25165824 allocations=104 mean_live=10547495673 mean_kept=108056846 mean_over_budget=6758657
+BEFORE_LINE FIELD_PROFILE_POOLP line=3573 class_octets=402653184 allocations=7 mean_live=10160417373 mean_kept=223347565 mean_over_budget=44674507
+BEFORE_LINE FIELD_PROFILE_POOLP line=3573 class_octets=469762048 allocations=224 mean_live=10476664860 mean_kept=112224798 mean_over_budget=317686355
+BEFORE_LINE FIELD_PROFILE_POOLP line=3581 class_octets=10485760 allocations=24 mean_live=11038340122 mean_kept=14266709 mean_over_budget=323174866
+BEFORE_LINE FIELD_PROFILE_POOLP line=3581 class_octets=12582912 allocations=289 mean_live=11080685066 mean_kept=1071288 mean_over_budget=352696403
+BEFORE_LINE FIELD_PROFILE_POOLP line=3582 class_octets=20971520 allocations=75 mean_live=10667550666 mean_kept=90215082 mean_over_budget=37260323
+BEFORE_LINE FIELD_PROFILE_POOLP line=3582 class_octets=25165824 allocations=489 mean_live=10977769754 mean_kept=20784452 mean_over_budget=282634420
+BEFORE_LINE FIELD_PROFILE_POOLFREED class_octets=384 frees=4
+BEFORE_LINE FIELD_PROFILE_POOLFREED class_octets=448 frees=4
+BEFORE_LINE FIELD_PROFILE_POOLFREED class_octets=3072 frees=2
+BEFORE_LINE FIELD_PROFILE_POOLFREED class_octets=3584 frees=2
+BEFORE_LINE FIELD_PROFILE_POOLFREED class_octets=8192 frees=78
+BEFORE_LINE FIELD_PROFILE_POOLFREED class_octets=10240 frees=160
+BEFORE_LINE FIELD_PROFILE_POOLFREED class_octets=163840 frees=74
+BEFORE_LINE FIELD_PROFILE_POOLFREED class_octets=196608 frees=260
+BEFORE_LINE FIELD_PROFILE_POOLFREED class_octets=229376 frees=10
+BEFORE_LINE FIELD_PROFILE_POOLFREED class_octets=262144 frees=20
+BEFORE_LINE FIELD_PROFILE_POOLFREED class_octets=327680 frees=66
+BEFORE_LINE FIELD_PROFILE_POOLFREED class_octets=393216 frees=152
+BEFORE_LINE FIELD_PROFILE_POOLFREED class_octets=524288 frees=4
+BEFORE_LINE FIELD_PROFILE_POOLFREED class_octets=655360 frees=2
+BEFORE_LINE FIELD_PROFILE_POOLFREED class_octets=786432 frees=20
+BEFORE_LINE FIELD_PROFILE_POOLFREED class_octets=1310720 frees=44
+BEFORE_LINE FIELD_PROFILE_POOLFREED class_octets=1572864 frees=14
+BEFORE_LINE FIELD_PROFILE_POOLFREED class_octets=10485760 frees=119
+BEFORE_LINE FIELD_PROFILE_POOLFREED class_octets=12582912 frees=296
+BEFORE_LINE FIELD_PROFILE_POOLFREED class_octets=20971520 frees=212
+BEFORE_LINE FIELD_PROFILE_POOLFREED class_octets=25165824 frees=1292
+BEFORE_LINE FIELD_PROFILE_POOLFREED class_octets=29360128 frees=7
+BEFORE_LINE FIELD_PROFILE_POOLFREED class_octets=41943040 frees=30
+BEFORE_LINE FIELD_PROFILE_POOLFREED class_octets=50331648 frees=77
+BEFORE_LINE FIELD_PROFILE_POOLFREED class_octets=83886080 frees=100
+BEFORE_LINE FIELD_PROFILE_POOLFREED class_octets=402653184 frees=18
+BEFORE_LINE FIELD_PROFILE_POOLFREED class_octets=469762048 frees=313
+BEFORE_LINE FIELD_PROFILE_POOLFREED class_octets=671088640 frees=1
+BEFORE_CONTROL FIELD_PROFILE_POOLP line=1143 class_octets=64 allocations=1 mean_live=7810585584 mean_kept=0 mean_over_budget=0
+BEFORE_CONTROL FIELD_PROFILE_POOLP line=1143 class_octets=1536 allocations=1 mean_live=7810584048 mean_kept=0 mean_over_budget=0
+BEFORE_CONTROL FIELD_PROFILE_POOLP line=1143 class_octets=3072 allocations=1 mean_live=7810580976 mean_kept=0 mean_over_budget=0
+BEFORE_CONTROL FIELD_PROFILE_POOLP line=1143 class_octets=3584 allocations=1 mean_live=7812612656 mean_kept=2824486976 mean_over_budget=0
+BEFORE_CONTROL FIELD_PROFILE_POOLP line=1143 class_octets=4096 allocations=1 mean_live=7946437232 mean_kept=2657768768 mean_over_budget=0
+BEFORE_CONTROL FIELD_PROFILE_POOLP line=1143 class_octets=10240 allocations=1 mean_live=9734129264 mean_kept=878973504 mean_over_budget=0
+BEFORE_CONTROL FIELD_PROFILE_POOLP line=1143 class_octets=196608 allocations=2 mean_live=9733834352 mean_kept=878973504 mean_over_budget=0
+BEFORE_CONTROL FIELD_PROFILE_POOLP line=1143 class_octets=393216 allocations=2 mean_live=9548269168 mean_kept=37753408 mean_over_budget=0
+BEFORE_CONTROL FIELD_PROFILE_POOLP line=1143 class_octets=1572864 allocations=1 mean_live=4456480 mean_kept=0 mean_over_budget=0
+BEFORE_CONTROL FIELD_PROFILE_POOLP line=1143 class_octets=1835008 allocations=1 mean_live=0 mean_kept=0 mean_over_budget=0
+BEFORE_CONTROL FIELD_PROFILE_POOLP line=1429 class_octets=524288 allocations=1 mean_live=1835008 mean_kept=0 mean_over_budget=0
+BEFORE_CONTROL FIELD_PROFILE_POOLP line=1432 class_octets=32 allocations=1 mean_live=2359296 mean_kept=0 mean_over_budget=0
+BEFORE_CONTROL FIELD_PROFILE_POOLP line=1576 class_octets=2097152 allocations=1 mean_live=2359328 mean_kept=0 mean_over_budget=0
+BEFORE_CONTROL FIELD_PROFILE_POOLP line=1688 class_octets=1572864 allocations=4 mean_live=3851157576 mean_kept=0 mean_over_budget=0
+BEFORE_CONTROL FIELD_PROFILE_POOLP line=1688 class_octets=25165824 allocations=32 mean_live=3559260232 mean_kept=0 mean_over_budget=0
+BEFORE_CONTROL FIELD_PROFILE_POOLP line=1688 class_octets=50331648 allocations=16 mean_live=3753771080 mean_kept=0 mean_over_budget=0
+BEFORE_CONTROL FIELD_PROFILE_POOLP line=1689 class_octets=262144 allocations=4 mean_live=2764570696 mean_kept=0 mean_over_budget=0
+BEFORE_CONTROL FIELD_PROFILE_POOLP line=1689 class_octets=327680 allocations=4 mean_live=4887248988 mean_kept=5716795732 mean_over_budget=0
+BEFORE_CONTROL FIELD_PROFILE_POOLP line=1689 class_octets=524288 allocations=4 mean_live=2749890632 mean_kept=0 mean_over_budget=0
+BEFORE_CONTROL FIELD_PROFILE_POOLP line=1689 class_octets=655360 allocations=1 mean_live=5297995872 mean_kept=5336875088 mean_over_budget=0
+BEFORE_CONTROL FIELD_PROFILE_POOLP line=1689 class_octets=786432 allocations=15 mean_live=3259878681 mean_kept=1067375017 mean_over_budget=0
+BEFORE_CONTROL FIELD_PROFILE_POOLP line=1689 class_octets=12582912 allocations=8 mean_live=2758410312 mean_kept=0 mean_over_budget=0
+BEFORE_CONTROL FIELD_PROFILE_POOLP line=1694 class_octets=12582912 allocations=4 mean_live=2577662024 mean_kept=0 mean_over_budget=0
+BEFORE_CONTROL FIELD_PROFILE_POOLP line=1695 class_octets=1572864 allocations=4 mean_live=2590244936 mean_kept=0 mean_over_budget=0
+BEFORE_CONTROL FIELD_PROFILE_POOLP line=1698 class_octets=12582912 allocations=4 mean_live=2667315272 mean_kept=0 mean_over_budget=0
+BEFORE_CONTROL FIELD_PROFILE_POOLP line=1700 class_octets=12582912 allocations=4 mean_live=2705064008 mean_kept=0 mean_over_budget=0
+BEFORE_CONTROL FIELD_PROFILE_POOLP line=1701 class_octets=3145728 allocations=4 mean_live=2717646920 mean_kept=0 mean_over_budget=0
+BEFORE_CONTROL FIELD_PROFILE_POOLP line=1703 class_octets=3145728 allocations=4 mean_live=2745958472 mean_kept=0 mean_over_budget=0
+BEFORE_CONTROL FIELD_PROFILE_POOLP line=1714 class_octets=536870912 allocations=4 mean_live=2777415752 mean_kept=0 mean_over_budget=0
+BEFORE_CONTROL FIELD_PROFILE_POOLP line=1720 class_octets=536870912 allocations=4 mean_live=3314286664 mean_kept=0 mean_over_budget=0
+BEFORE_CONTROL FIELD_PROFILE_POOLP line=1722 class_octets=50331648 allocations=4 mean_live=3852730440 mean_kept=0 mean_over_budget=0
+BEFORE_CONTROL FIELD_PROFILE_POOLP line=1723 class_octets=50331648 allocations=4 mean_live=3903062088 mean_kept=0 mean_over_budget=0
+BEFORE_CONTROL FIELD_PROFILE_POOLP line=1724 class_octets=1572864 allocations=4 mean_live=3953393736 mean_kept=0 mean_over_budget=0
+BEFORE_CONTROL FIELD_PROFILE_POOLP line=1725 class_octets=29360128 allocations=4 mean_live=3954966600 mean_kept=0 mean_over_budget=0
+BEFORE_CONTROL FIELD_PROFILE_POOLP line=1727 class_octets=12582912 allocations=4 mean_live=4009492552 mean_kept=0 mean_over_budget=0
+BEFORE_CONTROL FIELD_PROFILE_POOLP line=1728 class_octets=1572864 allocations=4 mean_live=4022075464 mean_kept=0 mean_over_budget=0
+BEFORE_CONTROL FIELD_PROFILE_POOLP line=1739 class_octets=16 allocations=4 mean_live=4275306568 mean_kept=0 mean_over_budget=0
+BEFORE_CONTROL FIELD_PROFILE_POOLP line=1876 class_octets=16 allocations=1 mean_live=6029344 mean_kept=0 mean_over_budget=0
+BEFORE_CONTROL FIELD_PROFILE_POOLP line=1877 class_octets=25165824 allocations=1 mean_live=6029360 mean_kept=0 mean_over_budget=0
+BEFORE_CONTROL FIELD_PROFILE_POOLP line=2202 class_octets=786432 allocations=1 mean_live=6821773424 mean_kept=0 mean_over_budget=0
+BEFORE_CONTROL FIELD_PROFILE_POOLP line=2205 class_octets=25165824 allocations=1 mean_live=6822559856 mean_kept=0 mean_over_budget=0
+BEFORE_CONTROL FIELD_PROFILE_POOLP line=2208 class_octets=25165824 allocations=1 mean_live=6847725680 mean_kept=0 mean_over_budget=0
+BEFORE_CONTROL FIELD_PROFILE_POOLP line=2212 class_octets=786432 allocations=1 mean_live=6872891504 mean_kept=0 mean_over_budget=0
+BEFORE_CONTROL FIELD_PROFILE_POOLP line=2213 class_octets=786432 allocations=1 mean_live=6873677936 mean_kept=0 mean_over_budget=0
+BEFORE_CONTROL FIELD_PROFILE_POOLP line=2214 class_octets=786432 allocations=1 mean_live=6874464368 mean_kept=0 mean_over_budget=0
+BEFORE_CONTROL FIELD_PROFILE_POOLP line=2215 class_octets=16777216 allocations=1 mean_live=6875250800 mean_kept=0 mean_over_budget=0
+BEFORE_CONTROL FIELD_PROFILE_POOLP line=2216 class_octets=384 allocations=1 mean_live=6892028016 mean_kept=0 mean_over_budget=0
+BEFORE_CONTROL FIELD_PROFILE_POOLP line=2216 class_octets=448 allocations=1 mean_live=6894059632 mean_kept=3743039552 mean_over_budget=0
+BEFORE_CONTROL FIELD_PROFILE_POOLP line=2216 class_octets=512 allocations=1 mean_live=6893666416 mean_kept=3710539072 mean_over_budget=0
+BEFORE_CONTROL FIELD_PROFILE_POOLP line=2217 class_octets=12582912 allocations=1 mean_live=6892028400 mean_kept=0 mean_over_budget=0
+BEFORE_CONTROL FIELD_PROFILE_POOLP line=2223 class_octets=58720256 allocations=1 mean_live=7575699952 mean_kept=0 mean_over_budget=0
+BEFORE_CONTROL FIELD_PROFILE_POOLP line=2223 class_octets=671088640 allocations=1 mean_live=6904611312 mean_kept=0 mean_over_budget=0
+BEFORE_CONTROL FIELD_PROFILE_POOLP line=2223 class_octets=805306368 allocations=1 mean_live=6904545776 mean_kept=3732558784 mean_over_budget=695227824
+BEFORE_CONTROL FIELD_PROFILE_POOLP line=2233 class_octets=29360128 allocations=1 mean_live=7693140464 mean_kept=0 mean_over_budget=0
+BEFORE_CONTROL FIELD_PROFILE_POOLP line=2233 class_octets=58720256 allocations=1 mean_live=7634420208 mean_kept=0 mean_over_budget=0
+BEFORE_CONTROL FIELD_PROFILE_POOLP line=2443 class_octets=12582912 allocations=1 mean_live=8267499120 mean_kept=171971136 mean_over_budget=0
+BEFORE_CONTROL FIELD_PROFILE_POOLP line=2448 class_octets=1572864 allocations=1 mean_live=8280082032 mean_kept=171971136 mean_over_budget=0
+BEFORE_CONTROL FIELD_PROFILE_POOLP line=2450 class_octets=83886080 allocations=1 mean_live=8365540976 mean_kept=88085056 mean_over_budget=0
+BEFORE_CONTROL FIELD_PROFILE_POOLP line=2451 class_octets=786432 allocations=1 mean_live=8449427056 mean_kept=88085056 mean_over_budget=0
+BEFORE_CONTROL FIELD_PROFILE_POOLP line=2460 class_octets=25165824 allocations=1 mean_live=8450213488 mean_kept=88085056 mean_over_budget=0
+BEFORE_CONTROL FIELD_PROFILE_POOLP line=2803 class_octets=12582912 allocations=6 mean_live=7964984176 mean_kept=25168160 mean_over_budget=0
+BEFORE_CONTROL FIELD_PROFILE_POOLP line=2805 class_octets=25165824 allocations=2 mean_live=7772832240 mean_kept=0 mean_over_budget=0
+BEFORE_CONTROL FIELD_PROFILE_POOLP line=2873 class_octets=167772160 allocations=1 mean_live=9735308912 mean_kept=634131008 mean_over_budget=0
+BEFORE_CONTROL FIELD_PROFILE_POOLP line=2884 class_octets=25165824 allocations=1 mean_live=9903081072 mean_kept=634131008 mean_over_budget=0
+BEFORE_CONTROL FIELD_PROFILE_POOLP line=2897 class_octets=25165824 allocations=1 mean_live=9928246896 mean_kept=634131008 mean_over_budget=0
+BEFORE_CONTROL FIELD_PROFILE_POOLP line=2899 class_octets=25165824 allocations=1 mean_live=9953412720 mean_kept=634131008 mean_over_budget=0
+BEFORE_CONTROL FIELD_PROFILE_POOLP line=2921 class_octets=12582912 allocations=3 mean_live=7904166768 mean_kept=144009109 mean_over_budget=0
+BEFORE_CONTROL FIELD_PROFILE_POOLP line=2922 class_octets=1572864 allocations=3 mean_live=7916749680 mean_kept=144009109 mean_over_budget=0
+BEFORE_CONTROL FIELD_PROFILE_POOLP line=2929 class_octets=25165824 allocations=3 mean_live=7918322544 mean_kept=144009109 mean_over_budget=0
+BEFORE_CONTROL FIELD_PROFILE_POOLP line=2932 class_octets=83886080 allocations=1 mean_live=7761822192 mean_kept=88085056 mean_over_budget=0
+BEFORE_CONTROL FIELD_PROFILE_POOLP line=2937 class_octets=83886080 allocations=3 mean_live=8027374448 mean_kept=88085056 mean_over_budget=0
+BEFORE_CONTROL FIELD_PROFILE_POOLP line=2938 class_octets=786432 allocations=3 mean_live=8111260528 mean_kept=88085056 mean_over_budget=0
+BEFORE_CONTROL FIELD_PROFILE_POOLP line=2943 class_octets=786432 allocations=12 mean_live=8113226608 mean_kept=88085056 mean_over_budget=0
+BEFORE_CONTROL FIELD_PROFILE_POOLP line=2943 class_octets=16777216 allocations=3 mean_live=8115192688 mean_kept=88085056 mean_over_budget=0
+BEFORE_CONTROL FIELD_PROFILE_POOLP line=2950 class_octets=384 allocations=3 mean_live=8131969904 mean_kept=88085056 mean_over_budget=0
+BEFORE_CONTROL FIELD_PROFILE_POOLP line=2950 class_octets=448 allocations=3 mean_live=8134001648 mean_kept=2503102016 mean_over_budget=0
+BEFORE_CONTROL FIELD_PROFILE_POOLP line=2950 class_octets=512 allocations=3 mean_live=8267826288 mean_kept=2336384320 mean_over_budget=0
+BEFORE_CONTROL FIELD_PROFILE_POOLP line=2952 class_octets=25165824 allocations=3 mean_live=8144553200 mean_kept=75502144 mean_over_budget=0
+BEFORE_CONTROL FIELD_PROFILE_POOLP line=3115 class_octets=65536 allocations=1 mean_live=9573238384 mean_kept=38539840 mean_over_budget=0
+BEFORE_CONTROL FIELD_PROFILE_POOLP line=3335 class_octets=25165824 allocations=12 mean_live=8868158405 mean_kept=83890752 mean_over_budget=0
+BEFORE_CONTROL FIELD_PROFILE_POOLP line=3335 class_octets=50331648 allocations=3 mean_live=8659928688 mean_kept=88085056 mean_over_budget=0
+BEFORE_CONTROL FIELD_PROFILE_POOLP line=3356 class_octets=134217728 allocations=1 mean_live=8987084400 mean_kept=88085056 mean_over_budget=0
+BEFORE_CONTROL FIELD_PROFILE_POOLP line=3358 class_octets=268435456 allocations=1 mean_live=9121302128 mean_kept=88085056 mean_over_budget=0
+BEFORE_CONTROL FIELD_PROFILE_POOLP line=3364 class_octets=10485760 allocations=1 mean_live=9389803120 mean_kept=1223309888 mean_over_budget=0
+BEFORE_CONTROL FIELD_PROFILE_POOLP line=3365 class_octets=10485760 allocations=1 mean_live=9400288880 mean_kept=1223309888 mean_over_budget=0
+BEFORE_CONTROL FIELD_PROFILE_POOLP line=3369 class_octets=50331648 allocations=1 mean_live=9440069232 mean_kept=37753408 mean_over_budget=0
+BEFORE_CONTROL FIELD_PROFILE_POOLP line=3373 class_octets=1572864 allocations=1 mean_live=9490400880 mean_kept=37753408 mean_over_budget=0
+BEFORE_CONTROL FIELD_PROFILE_POOLP line=3374 class_octets=1572864 allocations=1 mean_live=9491973744 mean_kept=37753408 mean_over_budget=0
+BEFORE_CONTROL FIELD_PROFILE_POOLP line=3375 class_octets=29360128 allocations=1 mean_live=9493546608 mean_kept=37753408 mean_over_budget=0
+BEFORE_CONTROL FIELD_PROFILE_POOLP line=3389 class_octets=25165824 allocations=1 mean_live=9548072560 mean_kept=38539840 mean_over_budget=0
+BEFORE_CONTROL FIELD_PROFILE_POOLP line=3389 class_octets=83886080 allocations=1 mean_live=8475379312 mean_kept=88085056 mean_over_budget=0
+BEFORE_CONTROL FIELD_PROFILE_POOLP line=3442 class_octets=1572864 allocations=6 mean_live=9677899376 mean_kept=38539840 mean_over_budget=0
+BEFORE_CONTROL FIELD_PROFILE_POOLP line=3442 class_octets=50331648 allocations=3 mean_live=9626781296 mean_kept=38539840 mean_over_budget=0
+BEFORE_CONTROL FIELD_PROFILE_POOLP line=3466 class_octets=1572864 allocations=1 mean_live=9733736048 mean_kept=634131008 mean_over_budget=0
+BEFORE_CONTROL FIELD_PROFILE_POOLP line=3556 class_octets=25165824 allocations=1 mean_live=9746318960 mean_kept=25956928 mean_over_budget=0
+BEFORE_CONTROL FIELD_PROFILE_POOLP line=3557 class_octets=25165824 allocations=2 mean_live=9784067696 mean_kept=25956928 mean_over_budget=0
+BEFORE_CONTROL FIELD_PROFILE_POOLP line=3573 class_octets=402653184 allocations=1 mean_live=9922353328 mean_kept=379206912 mean_over_budget=0
+BEFORE_CONTROL FIELD_PROFILE_POOLP line=3573 class_octets=469762048 allocations=2 mean_live=9888929968 mean_kept=387063424 mean_over_budget=213396184
+BEFORE_CONTROL FIELD_PROFILE_POOLP line=3582 class_octets=25165824 allocations=2 mean_live=10329331888 mean_kept=786432 mean_over_budget=0
+# the change: claude/opening-pool 7d9982b80 against main 9ad0ed477
+PARITY_EXIT 0
+GATE1_EXIT 0 08:35:07
+GATES_OK 49
+GATE3_EXIT 0 08:41:59
+test result: ok. 89 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 351.04s
+STATE_SHA repro dad706563a1cd69c 129568c2278b4890 (the line's dad706563a1cd69c 129568c2278b4890)
+repro GATE_REPRO sections=100 line_lines=100 equal=100 EQUAL
+fn GATE_REPRO sections=100 line_lines=100 equal=100 EQUAL
+pfn GATE_REPRO sections=100 line_lines=100 equal=100 EQUAL
+HOLD unprofiled section_ms control_no_block=236.2/236.0 founded_old=276.4/277.5 founded_new=269.9 | founded_old_over=40.8 ms founded_new_over=33.8 ms nearer=7.1 ms | spreads 0.0011 0.0041
+KERNELS ms_a_section pfo1=246.6 pfn=247.3 pfo2=247.1
+FIELD_PROFILE_SPLIT kernels_ms=24695 copies=5400 copies_ms=661 allocations=32801 allocations_ms=1600 elapsed_ms=29256
+FIELD_PROFILE_POOLPEAK live=11590376368 budget=10747183104
+FIELD_PROFILE_SPLIT kernels_ms=24767 copies=5400 copies_ms=295 allocations=32801 allocations_ms=1255 elapsed_ms=28603
+FIELD_PROFILE_SPLIT kernels_ms=24745 copies=5400 copies_ms=661 allocations=32801 allocations_ms=1600 elapsed_ms=29298
+ORDER the profiled splits are pfo1 (old), pfn (the change), pfo2 (old); the pool's peak is printed by the change alone
+MEASURE lap=nc1 rc=0 wall_s=24.2 peak_rss_kib=265496
+MEASURE lap=fo1 rc=0 wall_s=28.3 peak_rss_kib=269904
+MEASURE lap=fn rc=0 wall_s=27.6 peak_rss_kib=268332
+MEASURE lap=fo2 rc=0 wall_s=28.4 peak_rss_kib=267992
+MEASURE lap=nc2 rc=0 wall_s=24.2 peak_rss_kib=268688
+MEASURE lap=repro rc=0 wall_s=27.9 peak_rss_kib=267248
+MEASURE lap=pfo1 rc=0 wall_s=29.7 peak_rss_kib=267116
+MEASURE lap=pfo2 rc=0 wall_s=29.7 peak_rss_kib=270324
+MEASURE lap=pfn rc=0 wall_s=29.0 peak_rss_kib=267160

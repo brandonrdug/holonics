@@ -1,0 +1,118 @@
+P61 receipt: a site's maps in the tile form (G117). Numbers only. Device: the RTX 4080 SUPER under .local/gpu.lock (80 multiprocessors); every card read in one hold with nothing else on the host.
+BUILD the tile form claude/site-maps-tile ad10a1bff (the outer pass's kind recorded at its own launch in the next commit, a reading); the control: origin/main 1b49b84f0 with item 3's reading
+# item 3, before the build: the line's own 100 sections from the founded state (P60), profiled; then three sections traced
+REPRO_READING the reading build's 100 section lines equal the founded line's (100 of 100)
+CARD_ATTRIBUTE name=NVIDIA GeForce RTX 4080 SUPER multiprocessors=80 warp=32
+CARD_ATTRIBUTE shared_per_block_default=49152
+CARD_ATTRIBUTE shared_per_block_optin=101376
+CARD_ATTRIBUTE shared_per_multiprocessor=102400
+CARD_ATTRIBUTE registers_per_multiprocessor=65536
+CARD_ATTRIBUTE registers_per_block=65536
+CARD_ATTRIBUTE max_threads_per_multiprocessor=1536
+CARD_ATTRIBUTE max_blocks_per_multiprocessor=24
+CARD_ATTRIBUTE l2_octets=67108864
+FIELD_ENTRY entry=field_affine_tiled_x32 block=256 shared=17952 registers=40 static_shared=0 local=0 max_threads=1024 blocks_a_multiprocessor=5
+FIELD_ENTRY entry=field_affine_tiled_x32 block=256 shared=34320 registers=40 static_shared=0 local=0 max_threads=1024 blocks_a_multiprocessor=2
+FIELD_ENTRY entry=field_affine_tiled_x64 block=256 shared=18976 registers=40 static_shared=0 local=0 max_threads=1024 blocks_a_multiprocessor=5
+FIELD_ENTRY entry=field_affine_tiled_x64 block=256 shared=37408 registers=40 static_shared=0 local=0 max_threads=1024 blocks_a_multiprocessor=2
+FIELD_ENTRY entry=field_outer_bound_x32 block=256 shared=0 registers=40 static_shared=512 local=0 max_threads=1024 blocks_a_multiprocessor=6
+FIELD_ENTRY entry=field_outer_bound_x64 block=256 shared=0 registers=44 static_shared=512 local=0 max_threads=1024 blocks_a_multiprocessor=5
+FIELD_ENTRY entry=field_outer_x32 block=256 shared=0 registers=40 static_shared=0 local=0 max_threads=1024 blocks_a_multiprocessor=6
+FIELD_ENTRY entry=field_outer_x64 block=256 shared=0 registers=40 static_shared=0 local=0 max_threads=1024 blocks_a_multiprocessor=6
+FIELD_ENTRY entry=field_transposed block=256 shared=0 registers=40 static_shared=0 local=0 max_threads=1024 blocks_a_multiprocessor=6
+# the maps by launch kind, 100 sections (us summed, us a launch, products a launch = sites x rows x cols as launched)
+FIELD_PROFILE_MAP entry=field_affine_tiled_x32 rows=64 cols=64 only_unresolved=0 add=0 launches=2000 us=532819 us_a_launch=266 products=333146521600 products_a_launch=166573260
+FIELD_PROFILE_MAP entry=field_affine_tiled_x32 rows=64 cols=64 only_unresolved=1 add=0 launches=500 us=108658 us_a_launch=217 products=83286630400 products_a_launch=166573260
+FIELD_PROFILE_MAP entry=field_affine_tiled_x32 rows=128 cols=64 only_unresolved=0 add=0 launches=800 us=694281 us_a_launch=867 products=266517217280 products_a_launch=333146521
+FIELD_PROFILE_MAP entry=field_affine_tiled_x64 rows=64 cols=64 only_unresolved=0 add=1 launches=600 us=182973 us_a_launch=304 products=99943956480 products_a_launch=166573260
+FIELD_PROFILE_MAP entry=field_affine_tiled_x64 rows=64 cols=128 only_unresolved=0 add=1 launches=400 us=262138 us_a_launch=655 products=133258608640 products_a_launch=333146521
+FIELD_PROFILE_MAP entry=field_outer_bound_x32 rows=64 cols=64 only_unresolved=0 add=0 launches=1600 us=196968 us_a_launch=123 products=266517217280 products_a_launch=166573260
+FIELD_PROFILE_MAP entry=field_outer_bound_x32 rows=64 cols=64 only_unresolved=1 add=0 launches=200 us=15947 us_a_launch=79 products=33314652160 products_a_launch=166573260
+FIELD_PROFILE_MAP entry=field_outer_bound_x32 rows=128 cols=64 only_unresolved=0 add=0 launches=800 us=192695 us_a_launch=240 products=266517217280 products_a_launch=333146521
+FIELD_PROFILE_MAP entry=field_outer_bound_x64 rows=64 cols=64 only_unresolved=0 add=0 launches=500 us=55332 us_a_launch=110 products=83286630400 products_a_launch=166573260
+FIELD_PROFILE_MAP entry=field_outer_bound_x64 rows=64 cols=64 only_unresolved=1 add=0 launches=100 us=10607 us_a_launch=106 products=16657326080 products_a_launch=166573260
+FIELD_PROFILE_MAP entry=field_outer_bound_x64 rows=64 cols=128 only_unresolved=0 add=0 launches=400 us=101732 us_a_launch=254 products=133258608640 products_a_launch=333146521
+FIELD_PROFILE_MAP entry=field_outer_x32 rows=64 cols=0 only_unresolved=0 add=0 launches=2500 us=143458 us_a_launch=57 products=6506768000 products_a_launch=2602707
+FIELD_PROFILE_MAP entry=field_outer_x32 rows=64 cols=0 only_unresolved=1 add=0 launches=300 us=18981 us_a_launch=63 products=780812160 products_a_launch=2602707
+FIELD_PROFILE_MAP entry=field_outer_x32 rows=64 cols=64 only_unresolved=0 add=0 launches=1600 us=538703 us_a_launch=336 products=266517217280 products_a_launch=166573260
+FIELD_PROFILE_MAP entry=field_outer_x32 rows=64 cols=64 only_unresolved=1 add=0 launches=200 us=68671 us_a_launch=343 products=33314652160 products_a_launch=166573260
+FIELD_PROFILE_MAP entry=field_outer_x32 rows=128 cols=0 only_unresolved=0 add=0 launches=800 us=88999 us_a_launch=111 products=4164331520 products_a_launch=5205414
+FIELD_PROFILE_MAP entry=field_outer_x32 rows=128 cols=64 only_unresolved=0 add=0 launches=800 us=520158 us_a_launch=650 products=266517217280 products_a_launch=333146521
+FIELD_PROFILE_MAP entry=field_outer_x32 rows=244 cols=0 only_unresolved=1 add=0 launches=200 us=24953 us_a_launch=124 products=1984564240 products_a_launch=9922821
+FIELD_PROFILE_MAP entry=field_outer_x64 rows=64 cols=64 only_unresolved=0 add=0 launches=500 us=159413 us_a_launch=318 products=83286630400 products_a_launch=166573260
+FIELD_PROFILE_MAP entry=field_outer_x64 rows=64 cols=64 only_unresolved=1 add=0 launches=100 us=45563 us_a_launch=455 products=16657326080 products_a_launch=166573260
+FIELD_PROFILE_MAP entry=field_outer_x64 rows=64 cols=128 only_unresolved=0 add=0 launches=400 us=248473 us_a_launch=621 products=133258608640 products_a_launch=333146521
+FIELD_PROFILE_MAP entry=field_transposed rows=64 cols=64 only_unresolved=0 add=0 launches=500 us=165391 us_a_launch=330 products=83286630400 products_a_launch=166573260
+FIELD_PROFILE_MAP entry=field_transposed rows=64 cols=64 only_unresolved=0 add=1 launches=1600 us=528083 us_a_launch=330 products=266517217280 products_a_launch=166573260
+FIELD_PROFILE_MAP entry=field_transposed rows=64 cols=64 only_unresolved=1 add=0 launches=600 us=113219 us_a_launch=188 products=99943956480 products_a_launch=166573260
+FIELD_PROFILE_MAP entry=field_transposed rows=64 cols=128 only_unresolved=0 add=0 launches=400 us=255980 us_a_launch=639 products=133258608640 products_a_launch=333146521
+FIELD_PROFILE_MAP entry=field_transposed rows=128 cols=64 only_unresolved=0 add=0 launches=800 us=489572 us_a_launch=611 products=266517217280 products_a_launch=333146521
+# the bits ruler on the words those launches read, three sections: w_bits the largest weight, bits the operands' largest (input or covector / outer y and x), under31 the sites whose row stands under 2^31 by operand, tiles of 64 sites proving 64-bit and 96-bit sums (one 32-bit limb a word under 2^31; tile_proves)
+FIELD_PROFILE_MAPBITS entry=field_affine_tiled_x32 rows=64 cols=64 only_unresolved=0 add=0 launches=60 w_bits=28 bits=19/0 sites=2464380 under31=2464380/0 tiles=38560 proved64=38560 proved96=38560 launches_all64=60 launches_all96=60
+FIELD_PROFILE_MAPBITS entry=field_affine_tiled_x32 rows=64 cols=64 only_unresolved=1 add=0 launches=15 w_bits=26 bits=19/0 sites=616095 under31=616095/0 tiles=9640 proved64=9640 proved96=9640 launches_all64=15 launches_all96=15
+FIELD_PROFILE_MAPBITS entry=field_affine_tiled_x32 rows=128 cols=64 only_unresolved=0 add=0 launches=24 w_bits=25 bits=19/0 sites=985752 under31=985752/0 tiles=15424 proved64=15424 proved96=15424 launches_all64=24 launches_all96=24
+FIELD_PROFILE_MAPBITS entry=field_affine_tiled_x64 rows=64 cols=64 only_unresolved=0 add=1 launches=18 w_bits=28 bits=20/0 sites=739314 under31=739314/0 tiles=11568 proved64=11568 proved96=11568 launches_all64=18 launches_all96=18
+FIELD_PROFILE_MAPBITS entry=field_affine_tiled_x64 rows=64 cols=128 only_unresolved=0 add=1 launches=12 w_bits=26 bits=22/0 sites=492876 under31=492876/0 tiles=7712 proved64=7712 proved96=7712 launches_all64=12 launches_all96=12
+FIELD_PROFILE_MAPBITS entry=field_outer_bound_x32 rows=64 cols=64 only_unresolved=0 add=0 launches=48 w_bits=1 bits=0/0 sites=1971504 under31=0/0 tiles=30848 proved64=30848 proved96=30848 launches_all64=48 launches_all96=48
+FIELD_PROFILE_MAPBITS entry=field_outer_bound_x32 rows=64 cols=64 only_unresolved=1 add=0 launches=6 w_bits=1 bits=0/0 sites=246438 under31=0/0 tiles=3856 proved64=3856 proved96=3856 launches_all64=6 launches_all96=6
+FIELD_PROFILE_MAPBITS entry=field_outer_bound_x32 rows=128 cols=64 only_unresolved=0 add=0 launches=24 w_bits=1 bits=0/0 sites=985752 under31=0/0 tiles=15424 proved64=15424 proved96=15424 launches_all64=24 launches_all96=24
+FIELD_PROFILE_MAPBITS entry=field_outer_bound_x64 rows=64 cols=64 only_unresolved=0 add=0 launches=15 w_bits=1 bits=0/0 sites=616095 under31=0/0 tiles=9640 proved64=9640 proved96=9640 launches_all64=15 launches_all96=15
+FIELD_PROFILE_MAPBITS entry=field_outer_bound_x64 rows=64 cols=64 only_unresolved=1 add=0 launches=3 w_bits=1 bits=0/0 sites=123219 under31=0/0 tiles=1928 proved64=1928 proved96=1928 launches_all64=3 launches_all96=3
+FIELD_PROFILE_MAPBITS entry=field_outer_bound_x64 rows=64 cols=128 only_unresolved=0 add=0 launches=12 w_bits=1 bits=0/0 sites=492876 under31=0/0 tiles=7712 proved64=7712 proved96=7712 launches_all64=12 launches_all96=12
+FIELD_PROFILE_MAPBITS entry=field_outer_x32 rows=64 cols=0 only_unresolved=0 add=0 launches=75 w_bits=1 bits=31/0 sites=3080475 under31=3080475/0 tiles=48200 proved64=48200 proved96=48200 launches_all64=75 launches_all96=75
+FIELD_PROFILE_MAPBITS entry=field_outer_x32 rows=64 cols=0 only_unresolved=1 add=0 launches=9 w_bits=1 bits=31/0 sites=369657 under31=369657/0 tiles=5784 proved64=5784 proved96=5784 launches_all64=9 launches_all96=9
+FIELD_PROFILE_MAPBITS entry=field_outer_x32 rows=64 cols=64 only_unresolved=0 add=0 launches=48 w_bits=1 bits=30/19 sites=1971504 under31=1971504/1971504 tiles=30848 proved64=30848 proved96=30848 launches_all64=48 launches_all96=48
+FIELD_PROFILE_MAPBITS entry=field_outer_x32 rows=64 cols=64 only_unresolved=1 add=0 launches=6 w_bits=1 bits=31/19 sites=246438 under31=246438/246438 tiles=3856 proved64=3856 proved96=3856 launches_all64=6 launches_all96=6
+FIELD_PROFILE_MAPBITS entry=field_outer_x32 rows=128 cols=0 only_unresolved=0 add=0 launches=24 w_bits=1 bits=30/0 sites=985752 under31=985752/0 tiles=15424 proved64=15424 proved96=15424 launches_all64=24 launches_all96=24
+FIELD_PROFILE_MAPBITS entry=field_outer_x32 rows=128 cols=64 only_unresolved=0 add=0 launches=24 w_bits=1 bits=30/19 sites=985752 under31=985752/985752 tiles=15424 proved64=15424 proved96=15424 launches_all64=24 launches_all96=24
+FIELD_PROFILE_MAPBITS entry=field_outer_x32 rows=244 cols=0 only_unresolved=1 add=0 launches=6 w_bits=1 bits=30/0 sites=246438 under31=246438/0 tiles=3856 proved64=3856 proved96=3856 launches_all64=6 launches_all96=6
+FIELD_PROFILE_MAPBITS entry=field_outer_x64 rows=64 cols=64 only_unresolved=0 add=0 launches=15 w_bits=1 bits=31/20 sites=616095 under31=616095/616095 tiles=9640 proved64=9640 proved96=9640 launches_all64=15 launches_all96=15
+FIELD_PROFILE_MAPBITS entry=field_outer_x64 rows=64 cols=64 only_unresolved=1 add=0 launches=3 w_bits=1 bits=21/20 sites=123219 under31=123219/123219 tiles=1928 proved64=1928 proved96=1928 launches_all64=3 launches_all96=3
+FIELD_PROFILE_MAPBITS entry=field_outer_x64 rows=64 cols=128 only_unresolved=0 add=0 launches=12 w_bits=1 bits=29/22 sites=492876 under31=492876/492876 tiles=7712 proved64=7712 proved96=7712 launches_all64=12 launches_all96=12
+FIELD_PROFILE_MAPBITS entry=field_transposed rows=64 cols=64 only_unresolved=0 add=0 launches=15 w_bits=28 bits=31/0 sites=616095 under31=616095/0 tiles=9640 proved64=9640 proved96=9640 launches_all64=15 launches_all96=15
+FIELD_PROFILE_MAPBITS entry=field_transposed rows=64 cols=64 only_unresolved=0 add=1 launches=48 w_bits=28 bits=30/0 sites=1971504 under31=1971504/0 tiles=30848 proved64=30848 proved96=30848 launches_all64=48 launches_all96=48
+FIELD_PROFILE_MAPBITS entry=field_transposed rows=64 cols=64 only_unresolved=1 add=0 launches=18 w_bits=27 bits=44/0 sites=739314 under31=705061/0 tiles=11568 proved64=8585 proved96=11568 launches_all64=9 launches_all96=18
+FIELD_PROFILE_MAPBITS entry=field_transposed rows=64 cols=128 only_unresolved=0 add=0 launches=12 w_bits=26 bits=29/0 sites=492876 under31=492876/0 tiles=7712 proved64=7712 proved96=7712 launches_all64=12 launches_all96=12
+FIELD_PROFILE_MAPBITS entry=field_transposed rows=128 cols=64 only_unresolved=0 add=0 launches=24 w_bits=25 bits=30/0 sites=985752 under31=985752/0 tiles=15424 proved64=15424 proved96=15424 launches_all64=24 launches_all96=24
+SHARE_G117d transposed and outer launches=339 every tile in 64-bit sums=330 (0.9735) with a third carry word=339 (1.0000); tiles=217864 proved64=214881 (0.9863)
+# item 5: gate 1 ok (49 of 49); gate 3 the card suite alone on the card, 89 passed (350 s), the crate's other tests 46, 2, 1, 1, 1 passed; the parity test a_sites_maps_in_the_tile_form_read_the_definitions_integers 96 cases equal (forward, transposed, outer with its bound and the bias's sums at every shape the line launches, wide tiles, a refused site, a refused region, masks, add, accumulate, sites 37, 200, 1093)
+REPRODUCTION the tile build from the founded state, 100 sections: 100 of 100 section lines equal the founded line's, timings aside; STATE.100 dad706563a1cd69c MEAN.100 129568c2278b4890, the line's (P60's development read on the same law); every run of the hold, build and control, profiled or not, ends on the same two digests
+# item 6, one hold: profiled control, build, control; then unprofiled control, build, control; 100 sections each from the same state
+UNPROFILED section_ms control1=313.0 build=284.5 control2=313.6 build_over_controls=0.9081 controls_spread=0.0021
+PROFILED section_ms control1=327.8 build=298.3 control2=327.0 build_over_controls=0.9112 controls_spread=0.0024
+ENTRY field_affine_tiled_x32 | pc1 3300 launches 13.09 ms/section | pb 3300 launches 6.31 ms/section | pc2 3300 launches 13.02 ms/section
+ENTRY field_affine_tiled_x64 | pc1 1000 launches 4.22 ms/section | pb 1000 launches 2.64 ms/section | pc2 1000 launches 4.18 ms/section
+ENTRY field_transposed | pc1 3900 launches 15.31 ms/section | pb 3900 launches 7.78 ms/section | pc2 3900 launches 15.25 ms/section
+ENTRY field_outer_x32 | pc1 6400 launches 13.69 ms/section | pb 6400 launches 8.60 ms/section | pc2 6400 launches 13.68 ms/section
+ENTRY field_outer_x64 | pc1 1000 launches 4.49 ms/section | pb 1000 launches 2.21 ms/section | pc2 1000 launches 4.49 ms/section
+ENTRY field_outer_bound_x32 | pc1 2600 launches 3.98 ms/section | pb 2600 launches 0.52 ms/section | pc2 2600 launches 3.95 ms/section
+ENTRY field_outer_bound_x64 | pc1 1000 launches 1.66 ms/section | pb 1000 launches 0.20 ms/section | pc2 1000 launches 1.65 ms/section
+FAMILY ms a profiled section: control1=56.44 build=28.26 control2=56.22 build_over_controls=0.5017
+KERNELS ms a profiled section: control1=283.5 build=254.5 control2=283.0
+FORWARD_64x64_x32 pc1 us_a_launch=262.5 launches=2000
+FORWARD_64x64_x32 pb us_a_launch=168.0 launches=2000
+FORWARD_64x64_x32 pc2 us_a_launch=259.8 launches=2000
+KIND field_affine_tiled_x32 rows=128 cols=64 only=0 add=0 | build 800 launches 278.7 us_a_launch | controls 855.9 851.6 us_a_launch
+KIND field_affine_tiled_x32 rows=64 cols=64 only=0 add=0 | build 2000 launches 168.0 us_a_launch | controls 262.5 259.8 us_a_launch
+KIND field_affine_tiled_x32 rows=64 cols=64 only=1 add=0 | build 500 launches 145.9 us_a_launch | controls 199.8 204.0 us_a_launch
+KIND field_affine_tiled_x64 rows=64 cols=128 only=0 add=1 | build 400 launches 322.5 us_a_launch | controls 632.6 621.3 us_a_launch
+KIND field_affine_tiled_x64 rows=64 cols=64 only=0 add=1 | build 600 launches 225.8 us_a_launch | controls 282.6 282.9 us_a_launch
+KIND field_outer_bound_x32 rows=128 cols=64 only=0 add=0 | build 800 launches 26.0 us_a_launch | controls 231.3 231.0 us_a_launch
+KIND field_outer_bound_x32 rows=64 cols=64 only=0 add=0 | build 1600 launches 17.4 us_a_launch | controls 122.9 122.0 us_a_launch
+KIND field_outer_bound_x32 rows=64 cols=64 only=1 add=0 | build 200 launches 18.4 us_a_launch | controls 83.5 80.6 us_a_launch
+KIND field_outer_bound_x64 rows=64 cols=128 only=0 add=0 | build 400 launches 22.0 us_a_launch | controls 251.4 251.9 us_a_launch
+KIND field_outer_bound_x64 rows=64 cols=64 only=0 add=0 | build 500 launches 19.3 us_a_launch | controls 111.0 107.7 us_a_launch
+KIND field_outer_bound_x64 rows=64 cols=64 only=1 add=0 | build 100 launches 20.9 us_a_launch | controls 100.9 106.8 us_a_launch
+KIND field_transposed rows=128 cols=64 only=0 add=0 | build 800 launches 257.0 us_a_launch | controls 602.3 600.4 us_a_launch
+KIND field_transposed rows=64 cols=128 only=0 add=0 | build 400 launches 271.4 us_a_launch | controls 623.1 623.7 us_a_launch
+KIND field_transposed rows=64 cols=64 only=0 add=0 | build 500 launches 150.7 us_a_launch | controls 322.7 322.1 us_a_launch
+KIND field_transposed rows=64 cols=64 only=0 add=1 | build 1600 launches 160.2 us_a_launch | controls 327.8 324.6 us_a_launch
+KIND field_transposed rows=64 cols=64 only=1 add=0 | build 600 launches 221.0 us_a_launch | controls 191.7 192.2 us_a_launch
+NOTE the build's kind lines of the outer sums with x read their bound's launch (a reading defect, corrected in the next commit); the entries' totals above are the profile's own
+ub.log:MEASURE lap=ub rc=0 wall_s=29.1 peak_rss_kib=268780
+uc1.log:MEASURE lap=uc1 rc=0 wall_s=31.9 peak_rss_kib=266396
+pc2.log:MEASURE lap=pc2 rc=0 wall_s=33.3 peak_rss_kib=269724
+uc2.log:MEASURE lap=uc2 rc=0 wall_s=32.0 peak_rss_kib=266264
+pb.log:MEASURE lap=pb rc=0 wall_s=30.5 peak_rss_kib=269852
+repro.log:MEASURE lap=repro rc=0 wall_s=29.3 peak_rss_kib=267024
+pc1.log:MEASURE lap=pc1 rc=0 wall_s=33.4 peak_rss_kib=265768

@@ -1,0 +1,36 @@
+G144 receipt: the opening's return run at the end of its own forward, before the ticks. Numbers only. The RTX 4080 SUPER under .local/gpu.lock; one hold; the controls' spread 0.039, four times G143's.
+BUILD claude/opening-early 9d2e969c2 against main 31e2b8892 (G143's binary)
+PARITY_EXIT 0
+GATE1_EXIT 0 15:42:10
+GATES_OK 49
+GATE3_EXIT 0 15:49:10
+test result: ok. 89 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 357.08s
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.06s
+STATE_SHA repro dad706563a1cd69c 129568c2278b4890 (the line's dad706563a1cd69c 129568c2278b4890)
+repro GATE_REPRO sections=100 line_lines=100 equal=100 EQUAL
+fn GATE_REPRO sections=100 line_lines=100 equal=100 EQUAL
+pfn GATE_REPRO sections=100 line_lines=100 equal=100 EQUAL
+HOLD unprofiled section_ms control_no_block=248.5/239.0 founded_old=275.4/266.4 founded_new=262.8 | founded_old_over=27.2 ms founded_new_over=19.0 ms nearer=8.2 ms | spreads 0.0387 0.0333
+KERNELS ms_a_section pfo1=252.5 pfn=251.7 pfo2=250.1
+FIELD_PROFILE_POOLPEAK live=10503265200 budget=10718740480
+FIELD_PROFILE_SPLIT kernels_ms=25288 copies=5400 copies_ms=198 allocations=32801 allocations_ms=596 elapsed_ms=28386
+FIELD_PROFILE_POOLPEAK live=10524236720 budget=10698752000
+FIELD_PROFILE_SPLIT kernels_ms=25207 copies=5400 copies_ms=203 allocations=32801 allocations_ms=196 elapsed_ms=27926
+FIELD_PROFILE_POOLPEAK live=10503265200 budget=10706550784
+FIELD_PROFILE_SPLIT kernels_ms=25056 copies=5400 copies_ms=197 allocations=32801 allocations_ms=1007 elapsed_ms=28563
+FREES pfo1 298
+FREES pfn 4
+FREES pfo2 978
+FIELD_PROFILE_PEAK phase=opening_back live=10503265200
+FIELD_PROFILE_PEAK phase=face_launch live=10524236720
+FIELD_PROFILE_PEAK phase=opening_back live=10503265200
+ORDER the profiled splits, peaks and frees are pfo1 (old), pfn (the change), pfo2 (old)
+MEASURE lap=fo1 rc=0 wall_s=28.1 peak_rss_kib=269224
+MEASURE lap=fn rc=0 wall_s=26.9 peak_rss_kib=267108
+MEASURE lap=fo2 rc=0 wall_s=27.3 peak_rss_kib=269436
+MEASURE lap=nc2 rc=0 wall_s=24.5 peak_rss_kib=265088
+MEASURE lap=repro rc=0 wall_s=28.6 peak_rss_kib=266588
+MEASURE lap=nc1 rc=0 wall_s=25.4 peak_rss_kib=265392
+MEASURE lap=pfn rc=0 wall_s=28.4 peak_rss_kib=267200
+MEASURE lap=pfo2 rc=0 wall_s=29.0 peak_rss_kib=270356
+MEASURE lap=pfo1 rc=0 wall_s=28.8 peak_rss_kib=267720

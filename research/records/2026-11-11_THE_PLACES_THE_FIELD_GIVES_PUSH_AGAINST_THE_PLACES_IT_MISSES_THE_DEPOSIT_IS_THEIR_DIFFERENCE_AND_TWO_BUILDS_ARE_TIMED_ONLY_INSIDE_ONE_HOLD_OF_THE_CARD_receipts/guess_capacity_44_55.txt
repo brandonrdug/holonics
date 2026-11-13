@@ -3339,3 +3339,40 @@ main 9759c74ea in one hold; the line reproduced 100 of 100 with its digests; the
   Of 3 parts 2 held. The premise that missed, low: a 448 MiB prefix taken once a section was guessed to lower the peak by its own size;
   it removed the whole excess, the rest of the return's scratch standing under the forward's peak once it was gone (agent-inferred).
   Rule applied: (a) at 9 or under with (b) held: the same form is carried to the return's other scratch taken for every mode at once.
+
+G144 fixed 2026-11-13T15:33Z (the Opus PC thread; its line first read 15:55Z, a slip corrected before the read), before its build: the opening's return run at the end of its own forward, before the
+ticks, with the pass's two clock covectors taken there (zeroed) and handed to the reverse (a realization: every integer sum the same, in
+another order; the forward's buffers end before the ticks). Read first, from G143's own profiled logs (pfn against the control's n of
+g143_peak): G143's rule does not reach the return's other scratch, so it is not applied. Its four all-mode buffers (the covector, the
+released prefix and the two strand covectors, about 74 MB) share their types and classes with the standing moments' return's, taken later
+in the same reverse, so they add nothing to the pool's footprint, and the opening's return stands at 10.12 GB, under the line's peak. The
+line's allocations (5.77 ms a profiled section against the control's 1.68; 328 takes a section against 305) are a ring of frees at three
+take sites, none in the control: the standing moments' far prefixes (448 MiB, 89 misses in 100 sections, 136 MB over the budget at a miss),
+the face's masses (80 MiB, 87) and the opening's face covector (80 MiB, 100), with 288 frees against the control's 4. The opening adds a
+buffer of each class it holds across the ticks and the face (its forward's masses, charts, lifts, kept moments and sides) and one of the
+face covector's beside the reverse's own, so the pool's footprint passes the budget by about a tenth of a gigabyte. The opening's return
+reads only its forward's buffers, the constitution, the base clock's frames and clocks (the words hold the base clock at the end of its
+forward and again at the reverse's start; its kernels read no filled clock store) and the host's arrays of the stage.
+  (a) The line's allocations 2.0 ms a profiled section (1.5 to 3.0) from 5.77, and the pool's frees in its 100 profiled sections under 10
+      (0 to 10) from 288.
+  (b) In one hold the line's section 4.2 ms nearer its control's (1.7 to 6.0), every bit kept (100 of 100 section lines and the line's
+      digests).
+  (c) The line's pool peak live 10.25 GB (10.0 to 10.45) from 10.50.
+  Rules. (a) at 3.0 or under with (b) held: the opening's remaining cost is its kernels, and the next item is the opening's tied face family
+  (6.9 ms a profiled section: the face, its encoding's covector and its lift's, at every compared place) read at source with its guess.
+  (a) over 3.0: the pool is read by take site again before any other change.
+
+G144 scored 2026-11-13T16:00Z (receipt g144_early.txt, the engine record's receipts; the change 9d2e969c2 against main 31e2b8892 in one hold;
+the line reproduced 100 of 100 with its digests; the opening's card parity and gates 1 and 3 passed):
+  (a) the line's allocations 1.96 ms a profiled section against 5.96 and 10.07 on the old tree, against 2.0 (1.5 to 3.0): held; the pool's
+      frees in 100 profiled sections 4 against 298 and 978, against under 10: held, the control's own count.
+  (b) the line's section 262.8 ms against 275.4 and 266.4 on the old tree, 8.2 ms nearer, against 4.2 (1.7 to 6.0): unresolved. The hold's
+      controls read 248.5 and 239.0 (a spread of 0.039, four times G143's), so its resolution is about 9.5 ms and the difference stands
+      inside it. Profiled, the sections read 279.3 against 283.9 and 285.6 with their kernels equal (251.7 against 252.5 and 250.1).
+  (c) the pool's peak live 10.52 GB against 10.25 (10.0 to 10.45): missed above; the peak now stands at the face (10.524 GB), 21 MB over
+      the control's own, and the opening's return no longer stands at it.
+  Of 4 parts 2 held, 1 missed, 1 unresolved. The premise that missed: the peak was guessed to fall with the opening's buffers; it is the
+  face's, which they never reached (agent-inferred). The change keeps every bit and removes the ring of frees, and it stands.
+  Rule not applied: (a) held, and its rule named the opening's tied face family next. That item is set aside by the order of work, not
+  by this score: G139's rule ordered the level's sites, clock and phase chart next, and the engine items G141 to G144 were run in its
+  place. The engine queue stops here, and the level is the next item with its own guess (G145).

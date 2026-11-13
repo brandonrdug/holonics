@@ -1,0 +1,25 @@
+G141 receipt: the cavity's far prefixes formed in parallel. Numbers only. Device: the RTX 4080 SUPER under .local/gpu.lock; one hold with nothing else on the host.
+BUILD claude/opening-kernels 16cad4f4c; the old tree: main 11f7ff4cc (P61's tile form)
+PARITY the_opening_comparison_on_the_card_reads_the_hosts_bits passed alone on the card
+GATE1_EXIT 0 08:10:03
+GATES_OK 49
+GATE3_EXIT 0 08:16:55
+test result: ok. 89 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 350.04s
+STATE_SHA repro dad706563a1cd69c 129568c2278b4890 (the line's dad706563a1cd69c 129568c2278b4890)
+repro GATE_REPRO sections=100 line_lines=100 equal=100 EQUAL
+fn GATE_REPRO sections=100 line_lines=100 equal=100 EQUAL
+pfn GATE_REPRO sections=100 line_lines=100 equal=100 EQUAL
+HOLD unprofiled section_ms control_no_block=235.8/235.9 founded_old=284.3/284.6 founded_new=277.3 | founded_old_over=48.6 ms founded_new_over=41.5 ms nearer=7.2 ms | spreads 0.0003 0.0011
+ENTRY field_cavity_skinned_all ms_a_section pfo1=10.07 pfn=0.00 pfo2=10.07
+ENTRY field_cavity_terms_all ms_a_section pfo1=0.00 pfn=1.24 pfo2=0.00
+ENTRY field_cavity_scan_all ms_a_section pfo1=0.00 pfn=1.49 pfo2=0.00
+KERNELS ms_a_section pfo1=254.5 pfn=247.4 pfo2=254.9
+MEASURE lap=fo1 rc=0 wall_s=29.0 peak_rss_kib=272200
+MEASURE lap=nc1 rc=0 wall_s=24.2 peak_rss_kib=264856
+MEASURE lap=fn rc=0 wall_s=28.3 peak_rss_kib=267724
+MEASURE lap=fo2 rc=0 wall_s=29.1 peak_rss_kib=267460
+MEASURE lap=repro rc=0 wall_s=28.4 peak_rss_kib=267156
+MEASURE lap=nc2 rc=0 wall_s=24.2 peak_rss_kib=267092
+MEASURE lap=pfo1 rc=0 wall_s=30.5 peak_rss_kib=266512
+MEASURE lap=pfo2 rc=0 wall_s=30.5 peak_rss_kib=268696
+MEASURE lap=pfn rc=0 wall_s=29.7 peak_rss_kib=267128

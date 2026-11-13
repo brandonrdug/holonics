@@ -466,7 +466,12 @@ changes the sections the pass cuts and so enters as a law with its own reproduct
 The first was built (G143; `g143_scratch.txt`): the far prefixes taken a moment mode at a time, every
 bit kept. The line's pool now peaks at its control's 10.50 GB, its allocations read 5.8 ms a section from
 12.6, and its section reads 262.2 ms, 6.4 times the bar, against 236.3 without the block: the opening
-costs its line 26 ms a section, where it cost 51 when it landed.
+costs its line 26 ms a section, where it cost 51 when it landed. Then the return was run at the end of
+the opening's own forward, before the ticks (G144; `g144_early.txt`): held across the ticks, the face
+and the reverse, the forward's buffers had added a buffer to each class they share, and the pool
+freed and allocated again at three take sites every section. Run there, its frees fall to the
+control's 4 in 100 sections and its allocations to 1.96 ms a section, every bit kept. The engine's
+items stop with it: the level's sites, clock and phase chart (§9, item 4) are next.
 
 ### 4.5 An epoch's face is its moment on the news phase
 
