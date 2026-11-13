@@ -335,6 +335,17 @@ repository was reset on September 24; the pre-reset tree is
     4.03e11 products a second, where the card's measured yardstick for their shape reads
     1.46e12 and 5.19e12; the transposed map and the outer sums read each word from the card's
     memory once a product or once an entry and sum in 128 bits. Guessed: 20 ms (13 to 32).
+    The contact's widths were then read at source and in the logs (the engine record §9). The
+    multiplier 2^62 cancels in a row's one quotient, a value stands on one 32-bit limb where it
+    was read, and a row's limbs can be chosen on the card, every bit kept. A limb of the row's
+    carrier costs 0.68 ms a launch of 7.52, so the widths are a realization worth about 10 ms
+    a section and no law's subject, ordered after the site maps with a reading of the
+    covector's word first. The family's multiple lies in which rows are computed: a candidate
+    law computes a written place's row only where the place is a landmark of the news (the
+    design record §4.8), and a zero-shot reading on saved states sizes it first (G140; its
+    order, P62, was drafted and not sent at the hand-off of November 13). The queue, the fixed
+    guesses, the open readings and the standing flags at that hand-off are in
+    [its record](research/records/2026-11-13_HAND_OFF_THE_ENGINE_AND_THE_LEVELS_FIRST_BUILD_PASS_TO_A_NEW_THREAD_THE_STATE_THE_QUEUE_THE_FIXED_GUESSES_THE_OPEN_READINGS_AND_THE_STANDING_FLAGS.md).
   - The level above is designed on the news, and three count rulers fixed its choices
     (November 13; [the design record](research/records/2026-11-13_A_LEVELS_SITES_ARE_THE_EPOCHS_OF_ITS_NEWS_BEGUN_AGAIN_AT_EACH_OPENING_ITS_CLOCK_IS_THE_NEWS_BETWEEN_THEM_A_PLACES_NEWS_IS_READ_AT_ITS_CAVITY_FACE_AND_EACH_NAVIGATOR_KEEPS_ITS_LOCATED_CLOCK.md)). A level has two things the
     record of the symbol's length ran together: its places (where a receiver's section is
