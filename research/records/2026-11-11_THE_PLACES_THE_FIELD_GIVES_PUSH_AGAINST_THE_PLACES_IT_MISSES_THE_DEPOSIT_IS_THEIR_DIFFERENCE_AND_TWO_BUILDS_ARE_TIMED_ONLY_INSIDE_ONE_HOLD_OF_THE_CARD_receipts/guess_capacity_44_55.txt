@@ -3449,3 +3449,17 @@ against 1,638 and 1,059 projected; read-cavity on P57's places at both lap means
   every place of an epoch from its whole, and a place whose neighbours are written reads it best).
   Rule applied: (c) 0.0103 at 0.010 or more under at the whole masks: the level stays, a second lap follows, and the invariance of the
   design record's §9 items 1 to 3 is read on the trained level's sites. (b) under 80 ms: no reading of the level's field against the card.
+
+G147 fixed 2026-11-13T17:23Z (the Opus PC thread), before its run: the level's second lap, by G145's rule. The level from its first lap's
+end (level_line STATE.3000) and the line from its own (control_line STATE.3000), 3,000 more sections each on the same sections, read at
+the second lap's means by read-cavity's last tick on P57's held places; the writes from each lap's end state (write-store, four documents
+a slice, prompts and runs of 256 places), shown whole in the thread and never committed. Read first: g145_level.txt (the lead at lap 1's
+means 0.0122 at one-place masks and 0.0103 at whole masks; the sections' training codes 0.9998 of the line's over the first 500 sections
+and 0.9977 over the last, still widening at about 0.0004 a 500 sections).
+  (a) At the second lap's means the level 0.018 nats a place under the line at one-place masks (0.010 to 0.030 under) and 0.016 under at
+      the whole masks' open places (0.008 to 0.030 under), every slice under.
+  (b) The sections' training codes 0.9960 of the line's over the lap's last 500 sections (0.9940 to 0.9975).
+  Rules. (a) at or over lap 1's lead at both masks (0.0122 and 0.0103): the level is the line from here, and the next item is the reading
+  of whether influence follows the news between two places or their distance (a place perturbed, another's code read, with and without the
+  level), with its guess. Under lap 1's lead at both: where the prolongation's covector stands (by slice, epoch length and harmonic) is
+  read before another lap.
