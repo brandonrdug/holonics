@@ -485,6 +485,9 @@ repository was reset on September 24; the pre-reset tree is
   - The opening's return runs first in the reverse (November 13, G142): the line's section reads
     269.9 ms, 6.6 times the bar, against 236.1 without the block, every bit kept. Its pool's live
     set peaks at 11.59 GB against a budget of 10.74, and that peak is read by phase next.
+  - The opening return's far prefixes are taken a moment mode at a time (November 13, G143): the
+    line's pool peaks at its control's 10.50 GB, and its section reads 262.2 ms, 6.4 times the bar,
+    against 236.3 without the block: the opening costs 26 ms a section, from 51 when it landed.
   - The open places need the written rows' ticks (November 13, P62, G140 scored; the design
     record §4.8). Read zero-shot on the line's latest lap mean with a written row held at its
     opening: the open rows alone code 3.29 nats a place worse at held one-place masks and 1.90

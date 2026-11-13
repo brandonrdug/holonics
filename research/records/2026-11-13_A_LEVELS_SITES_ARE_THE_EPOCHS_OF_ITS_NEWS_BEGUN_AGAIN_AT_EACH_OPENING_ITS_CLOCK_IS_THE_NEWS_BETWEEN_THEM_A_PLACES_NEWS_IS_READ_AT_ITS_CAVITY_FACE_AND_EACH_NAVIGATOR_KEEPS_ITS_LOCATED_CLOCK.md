@@ -463,6 +463,10 @@ buffers (the pool's rule of P58). Two forms keep every bit and lower that additi
 scratch taken a moment mode at a time (its far prefixes 28 MiB a mode where they are 448 MiB at once),
 or the section's bounds re-derived from the card's memory with the opening's return counted, which
 changes the sections the pass cuts and so enters as a law with its own reproduction (`agent-inferred`).
+The first was built (G143; `g143_scratch.txt`): the far prefixes taken a moment mode at a time, every
+bit kept. The line's pool now peaks at its control's 10.50 GB, its allocations read 5.8 ms a section from
+12.6, and its section reads 262.2 ms, 6.4 times the bar, against 236.3 without the block: the opening
+costs its line 26 ms a section, where it cost 51 when it landed.
 
 ### 4.5 An epoch's face is its moment on the news phase
 
