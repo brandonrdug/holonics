@@ -295,7 +295,20 @@ repository was reset on September 24; the pre-reset tree is
     memory at the open put one section 831,364 octets over the batch's cut. A batch is a
     schedule, and the section lines and the states are equal, so the reproduction holds.
     After five steps the profile is flat: no entry holds more than 0.115 of the kernels' time,
-    and a section stands at 7.5 times the bar. The next repairs are of the section's structure
+    and a section stood at 7.5 times the bar. Step 6 (November 13, PR #750; every bit kept, 600
+    of 600 lines and both states reproduced, the card suite's 140 tests) repaired the host's
+    part as its table gave it (G128, G134). The pool serves a plain take from a longer kept
+    buffer of its type where the budget would otherwise free one: the face covector's block and
+    the clock's skins had each freed the other's kept buffer at every miss (the two takes 11.05
+    to 0.05 ms a profiled section). Twelve takes are spared their zeroing, each with its proof
+    at the take (6.53 to 1.20 ms). The training path fetches each open site's mass at its class
+    and its total in place of the whole faces (10.97 to 0.38 ms). In one hold a section read
+    0.910 of its controls (279.4 ms against 306.1 and 308.1), 6.9 times the bar. The deposit on
+    the host reads 10.1 ms a section, 6.03 of it arithmetic over the constitution's 117,478
+    entries and 0.014 of it bare copies, where 2.0 and 0.60 were guessed (G134 (d), missed both
+    ways, its premise not read at source): by its rule the deposit's card realization is
+    derived and ordered after the structural step. The kernels hold 267.6 of a profiled
+    section's 289.9 ms, so the rate is the kernels'. The next repairs are of the section's structure
     (agent-inferred): the contact family as one launch a tick each way on a region resident in
     its block, the site-local families fused the same way, and the host's part beside the
     card's, each with its guess fixed before its build.
