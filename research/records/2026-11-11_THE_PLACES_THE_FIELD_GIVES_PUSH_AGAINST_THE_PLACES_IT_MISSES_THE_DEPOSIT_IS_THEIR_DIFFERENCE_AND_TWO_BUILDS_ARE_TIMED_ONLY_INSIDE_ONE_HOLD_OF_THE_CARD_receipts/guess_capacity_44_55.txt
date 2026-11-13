@@ -3293,3 +3293,15 @@ passed; the opening's card parity passed; the block was fixed at 08:0x, before t
   the 2.73 and the scan 1.49, so the rule's reason does not reach this case and it is not applied. What it leaves: the opening still
   costs its line 41.5 ms a section over the same tree without the block (277.3 against 235.9), of which the pool's allocations about
   14, the copies about 5 and the cavity's and tied face's kernels the rest (P60's profile); the allocations are read by take site next.
+
+G142 fixed 2026-11-13T08:45Z (the Opus PC thread), before its first read: the opening's return first in the reverse and its forward's buffers
+ended there, its codes read before the reverse (a realization: every integer sum the same, in another order). Read first, at this tree before
+the change (the pool's pressure by take site, 100 profiled sections a line in one hold): the line's pool reaches a live set of 11.26 GB
+against a budget of 10.74, where the same tree without the opening's block reaches 10.50; 2,101 ms of allocations against 157, 3,000
+allocations against 300, the largest at the standing moments' return (lines 3,581 to 3,582, live near 11.0 GB, nothing kept to free), and
+every class freed again and again (25 MiB 1,292 times, 448 MiB 313). The opening's forward holds about 0.3 GB through the whole reverse
+(its kept moments, cavity moments and sides, charts, lifts, masses and totals), and its return's scratch about 0.7 GB at its own step.
+  (a) The line's allocations 3 ms a profiled section (1.5 to 6) from 21.0, and its pool's peak live 10.7 GB (10.4 to 11.0).
+  (b) In one hold the line's section 13 ms nearer its control's (9 to 17), every bit kept (100 of 100 section lines and the line's digests).
+  Rules. (a) at 6 or under with (b) held: the opening's copies (about 5 ms a section) are read by site next. (a) over 6: the live set at
+  its peak is read by phase (which buffers stand there) before another change.
