@@ -3339,3 +3339,25 @@ main 9759c74ea in one hold; the line reproduced 100 of 100 with its digests; the
   Of 3 parts 2 held. The premise that missed, low: a 448 MiB prefix taken once a section was guessed to lower the peak by its own size;
   it removed the whole excess, the rest of the return's scratch standing under the forward's peak once it was gone (agent-inferred).
   Rule applied: (a) at 9 or under with (b) held: the same form is carried to the return's other scratch taken for every mode at once.
+
+G144 fixed 2026-11-13T15:55Z (the Opus PC thread), before its build: the opening's return run at the end of its own forward, before the
+ticks, with the pass's two clock covectors taken there (zeroed) and handed to the reverse (a realization: every integer sum the same, in
+another order; the forward's buffers end before the ticks). Read first, from G143's own profiled logs (pfn against the control's n of
+g143_peak): G143's rule does not reach the return's other scratch, so it is not applied. Its four all-mode buffers (the covector, the
+released prefix and the two strand covectors, about 74 MB) share their types and classes with the standing moments' return's, taken later
+in the same reverse, so they add nothing to the pool's footprint, and the opening's return stands at 10.12 GB, under the line's peak. The
+line's allocations (5.77 ms a profiled section against the control's 1.68; 328 takes a section against 305) are a ring of frees at three
+take sites, none in the control: the standing moments' far prefixes (448 MiB, 89 misses in 100 sections, 136 MB over the budget at a miss),
+the face's masses (80 MiB, 87) and the opening's face covector (80 MiB, 100), with 288 frees against the control's 4. The opening adds a
+buffer of each class it holds across the ticks and the face (its forward's masses, charts, lifts, kept moments and sides) and one of the
+face covector's beside the reverse's own, so the pool's footprint passes the budget by about a tenth of a gigabyte. The opening's return
+reads only its forward's buffers, the constitution, the base clock's frames and clocks (the words hold the base clock at the end of its
+forward and again at the reverse's start; its kernels read no filled clock store) and the host's arrays of the stage.
+  (a) The line's allocations 2.0 ms a profiled section (1.5 to 3.0) from 5.77, and the pool's frees in its 100 profiled sections under 10
+      (0 to 10) from 288.
+  (b) In one hold the line's section 4.2 ms nearer its control's (1.7 to 6.0), every bit kept (100 of 100 section lines and the line's
+      digests).
+  (c) The line's pool peak live 10.25 GB (10.0 to 10.45) from 10.50.
+  Rules. (a) at 3.0 or under with (b) held: the opening's remaining cost is its kernels, and the next item is the opening's tied face family
+  (6.9 ms a profiled section: the face, its encoding's covector and its lift's, at every compared place) read at source with its guess.
+  (a) over 3.0: the pool is read by take site again before any other change.
