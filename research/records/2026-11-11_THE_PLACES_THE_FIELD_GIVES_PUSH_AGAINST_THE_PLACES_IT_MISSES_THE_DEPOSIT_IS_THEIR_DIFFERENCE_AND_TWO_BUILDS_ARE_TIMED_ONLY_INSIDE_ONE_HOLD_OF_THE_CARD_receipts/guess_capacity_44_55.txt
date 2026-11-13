@@ -3721,3 +3721,39 @@ G156 scored 2026-11-13T19:44Z (receipt g156_near.txt; best_stage_ruler.py on G14
   (b) min(s3, s4, s5) adds 0.065 to min(s3, s4)'s gap (0.155), against under 0.03: missed.
   Of 2 parts 1 held and 1 missed. The least over seventeen stages is mostly a selection on places the field reads badly at the trained depth;
   near it a place's own rate could reach 0.09 to 0.16 nats a place on this read, itself a selection on the read.
+
+G152 checked 2026-11-13T19:58Z (the theory thread's note: its two pooled sums agree to 4 parts in a million an open place while their
+slices differ in sign). Read from junction.tsv region by region: no quantity is shared; the agreement is a coincidence of the pool. The first
+61 stretches read 1,299,783 an open place under the cut's mask and 1,533,382 with one place open, the last 61 read 400,395 and 106,766. So
+"+0.034 under both masks" is not two readings: each half moves the held value by a factor of up to four, and on held text the sign stands
+without its size.
+
+G157 fixed 2026-11-13T19:58Z (the Opus PC thread), before its read: a turned head's reach on its own clock, the theory thread's §13.9 (the
+falloff is the envelope of the bank its skins belong to, so it belongs on the clock σ). The founding it gives, every bit kept:
+`z_ij −= 2^16 ⌊log₂ d⌋ + u_h frac(log₂ d) + w_h log₂(max(Δσ_ij, one plain tick)/d)`, `u_h = w_h = 0`; a crowd takes the `w` term at the place its
+skin reads (`2^level` away) and no `u` term. Read before any build, from built passes: `d(code)/dw_h = −Σ ζ_ij log₂(Δσ_ij/d_ij)` and
+`d(code)/du_h = −Σ ζ_ij frac(log₂ d_ij)`, with `ζ_ij` the score's covector at a met source as the reverse forms it (Field::reach_covectors), by
+turned head, tick, mask and kind of receiver, summed a receiver row so the random-sign level is read over rows; on seen (prefix) and held
+stretches of level3/MEAN.3000. Signs and levels only (the readings carry the reverse's grain; no unit of `w` is read).
+  (a) the theory thread's: on seen stretches the code falls as `w` rises in the first turned head (head 2), the sum over twice its
+      random-sign level, the second (head 3) weaker;
+  (b) the theory thread's: `u` points to restoring the octave's remainder in both turned heads (the code falls as `u` rises);
+  (c) this thread's: on held stretches `w`'s sign in head 2 is seen's (a reach changes which sources a row hears, not how sure it is, so
+      it is no held gap as `ℓ_b`'s push was).
+  Rule. (a) held: the reach is built (host, card and parity), founded at zero, before the reader's reaction. A covector of `w` at its
+  random-sign level in both heads on seen stretches: the place count already carries what the clock would, and the reaction comes first.
+
+G157 scored 2026-11-13T20:06Z (receipt g157_reach.txt; read-reach on level3/MEAN.3000, the training documents (prefix) and the held role, 122
+stretches each, both masks; host, 8 threads, 45.1 and 48.3 s). Read by mask, turned head and kind of receiver over the three ticks with a
+covector, each against its random-sign level over receiver rows (a floor: rows within a region are not independent):
+  (a) on seen stretches in head 2 the code rises with `w` in three of four regions (ratios 0.43, 1.26 and 2.65; written rows with one place
+      open the 2.65) and falls in one (open rows alone, 1.12); head 3 stands at 0.12 to 1.46: missed;
+  (b) `u` falls in all four regions of head 2 on seen stretches (ratios 0.41 to 1.95) and rises in three of four of head 3's: held for head
+      2, missed for head 3;
+  (c) on held stretches `w`'s sign in head 2 differs from seen's in three of four regions: missed.
+  Of 3 parts none held whole, one half held. The rule's second branch applies: on seen stretches the covector of `w` stands at its random-sign
+  level in both turned heads but one region, and its sign is not held across held and seen text, so the place count already carries, at first
+  order from the trained state, what the head's clock would; the reader's reaction comes first.
+  What it adds: the return's chart (G155) and the reach on the clock both stand near first-order stationarity on the line's own text, two
+  directions the built tick does not span (the return's) or spans through the skins (the reach), each at its random-sign level. The theory's
+  ends (`Γ` from the echo, `u = w = 1`) are not visible at first order from where the deposit stands.

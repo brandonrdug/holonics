@@ -176,7 +176,7 @@
 //! thread** (the octave falloff) stay attached.
 
 use super::{affine, covector, deposit_step, div_nearest, exp_series, face_code, fewer_bits_weighed, fit32, fit64, half_turn, on_step_grain, outer_sum, ratio_adjoint, ratio_to_power, reach, refuse, release, toward, transposed, weighed_code, Result, TowerError, TowerFace, FACE_BITS, FIRST_RATE, MATERIAL_BITS, MOVE_BITS, SECOND_RATE};
-use crate::hnn::keyed_modes::{ln2_face, Exponential};
+use crate::hnn::keyed_modes::{ln2_face, log2_face, Exponential};
 use rayon::prelude::*;
 
 /// [agent-inferred, November 1] **A term's share of its row's mass** on `2^(−63)` (§14.11): formed
@@ -1803,6 +1803,39 @@ struct FieldPass {
     tower: Option<scale::ScalePass>,
     /// [measurement; theory, November 11 04:48, G39] The sites whose face covector a return leaves zero (empty: none), a reading of where the deposit's mass lies.
     skip: Vec<bool>,
+}
+
+/// [measurement; theory, November 13, the junction record §13.9; G157] **A turned head's reach on its own clock, its founding covector by
+/// receiver row**: over one tick's receiver rows of one head and kind, each row's `r_w = −Σ_j ζ_ij log₂(max(Δσ_ij, 1)/d_ij)` and
+/// `r_u = −Σ_j ζ_ij frac(log₂ d_ij)` ([`reach_logs`], the logs on `2^(−16)`, `ζ` the reverse's score covector at a met source, a crowd taking the
+/// clock's term at the place its skin reads and no remainder): their sums, their sums in magnitude and their squares after a release of 32 bits
+/// (a random-sign level's input), with the rows counted. Its grain is the reverse's; no unit of `w` or `u` is read.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub struct ReachSums {
+    pub rows: u64,
+    pub w: i128,
+    pub w_abs: u128,
+    pub w_sq: u128,
+    pub u: i128,
+    pub u_abs: u128,
+    pub u_sq: u128,
+}
+
+/// `log₂ n` on `2^(−16)` for `n ≥ 1` ([`log2_face`] of `n/2^(⌊log₂ n⌋ + 1)` and the whole part).
+fn log2_grain(n: u128) -> i64 {
+    let whole = 127 - i64::from(n.max(1).leading_zeros());
+    let p = n.max(1) << (61 - whole);
+    (log2_face(p, FACE_BITS) + (i128::from(whole + 1) << FACE_BITS)) as i64
+}
+
+/// [measurement; G157] The reach's two logs between receiver `i` and source `j` on the face's grain: `log₂(max(Δσ, one plain tick)/d)` with
+/// `Δσ = |σ_i − σ_j|` on `2^(−24)` and `d = |i − j|` places, and the octave's remainder `frac(log₂ d)`.
+fn reach_logs(sigma: &[i64], i: usize, j: usize) -> (i64, i64) {
+    let d = i.abs_diff(j).max(1) as u128;
+    let ld = log2_grain(d);
+    let ds = (sigma[i] - sigma[j]).unsigned_abs().max(1 << PACE_BITS) as u128;
+    let ls = log2_grain(ds) - ((PACE_BITS as i64) << FACE_BITS);
+    (ls - ld, ld - ((ld >> FACE_BITS) << FACE_BITS))
 }
 
 /// The round trips `Σ_j p_ji^(t) p_ij^(t+1)` of each site over consecutive ticks' rows (`[h][i]`), each
@@ -3770,7 +3803,7 @@ impl Field {
         for region in regions {
             let pass = self.pass(region, true)?;
             let mut g = vec![0i128; self.material_len()];
-            self.returned_with(region, &pass, &mut g, Some(&mut out), None, None)?;
+            self.returned_with(region, &pass, &mut g, Some(&mut out), None, None, None)?;
         }
         Ok(out.chunks_exact(2).map(|c| [c[0], c[1]]).collect())
     }
@@ -3786,7 +3819,7 @@ impl Field {
         let mut covectors: Vec<Vec<i64>> = Vec::new();
         if returning {
             let mut g = vec![0i128; self.material_len()];
-            self.returned_with(region, &pass, &mut g, None, Some(&mut covectors), None)?;
+            self.returned_with(region, &pass, &mut g, None, Some(&mut covectors), None, None)?;
             covectors.reverse();
         }
         let mut out = Vec::new();
@@ -3898,7 +3931,21 @@ impl Field {
     /// into `g` on each family's natural grain (a face family's `Σ δz` on `2^(−24)`, a material family's `Σ δz x` on
     /// `2^(−40)`), which the reverse's law tests read against the code's difference.
     fn returned(&self, region: &Region, pass: &FieldPass, g: &mut [i128]) -> Result<()> {
-        self.returned_with(region, pass, g, None, None, None)
+        self.returned_with(region, pass, g, None, None, None, None)
+    }
+
+    /// [measurement; theory, November 13, the junction record §13.9; G157] **A turned head's reach on its own clock, read at its founding**: one
+    /// region's forward and reverse, and for each tick (in the reverse's order turned back to the forward's) and head the receiver rows'
+    /// [`ReachSums`] by kind (`[0]` open, `[1]` written); a still head's are empty. A reading only: nothing in the law reads it.
+    pub fn reach_covectors(&self, region: &Region) -> Result<Vec<Vec<[ReachSums; 2]>>> {
+        let pass = self.pass(region, true)?;
+        let mut g = vec![0i128; self.material_len()];
+        let mut flat: Vec<[ReachSums; 2]> = Vec::new();
+        self.returned_with(region, &pass, &mut g, None, None, None, Some(&mut flat))?;
+        let heads = self.declaration.heads;
+        let mut by_tick: Vec<Vec<[ReachSums; 2]>> = flat.chunks(heads).map(<[_]>::to_vec).collect();
+        by_tick.reverse();
+        Ok(by_tick)
     }
 
     /// [measurement; theory, November 13, the junction record §9 and the theory thread's order after G151, item (a)] **The return's chart covector
@@ -3913,7 +3960,7 @@ impl Field {
         let pass = self.pass(region, true)?;
         let mut g = vec![0i128; self.material_len()];
         let mut by_tick: Vec<(usize, Vec<i64>)> = Vec::new();
-        self.returned_with(region, &pass, &mut g, None, None, Some(&mut by_tick))?;
+        self.returned_with(region, &pass, &mut g, None, None, Some(&mut by_tick), None)?;
         by_tick.reverse();
         Ok((by_tick.into_iter().map(|(k, dl)| (k, dl, pass.ticks[k].read.clone())).collect(), g))
     }
@@ -3924,7 +3971,8 @@ impl Field {
     /// shares and the currents' covectors where read). A region's reverse reads its ticks through it in reverse order; a
     /// tower of scales reads each level's ticks through it.
     #[allow(clippy::too_many_arguments)]
-    fn tick_return(&self, cell: &TickCell, dx: &mut [i64], g: &mut [i128], paces: &Paces, definite: &[bool], dm: &mut [i128], gtau: &mut [Vec<i128>], gsig: &mut [Vec<i128>], mut shares: Option<&mut [u128]>, mut currents: Option<&mut Vec<Vec<i64>>>) -> Result<()> {
+    #[allow(clippy::too_many_arguments)]
+    fn tick_return(&self, cell: &TickCell, dx: &mut [i64], g: &mut [i128], paces: &Paces, definite: &[bool], dm: &mut [i128], gtau: &mut [Vec<i128>], gsig: &mut [Vec<i128>], mut shares: Option<&mut [u128]>, mut currents: Option<&mut Vec<Vec<i64>>>, mut reach: Option<&mut Vec<[ReachSums; 2]>>) -> Result<()> {
         let d = &self.declaration;
         let (dw, m, n, f, heads, lanes) = (d.width, d.complex(), d.modes, d.contacts, d.heads, d.lanes);
         let m2 = 2 * m;
@@ -4127,6 +4175,9 @@ impl Field {
             // A receiver's probe word (§16.19).
             let probe_of = |i: usize, r: usize| -> i64 { ph[i * span + r] };
             let back = CONTACT_BITS + FACE_BITS + self.decay(h, 0, 0).1 - super::COVECTOR_BITS;
+            // [measurement; G157] A turned head's reach on its own clock: its founding covector by receiver row, where read.
+            let mut reach_rows = [ReachSums::default(); 2];
+            let reach_clock = reach.as_ref().and(paces.row[h]).filter(|_| d.carries_moment(h) && !d.is_depth(h)).map(|p| &paces.sigma[p]);
             // The values' return: `δṽ_jm = Σ_(i: j∈S_i) p_ij,m D_m(|i − j|) δỹ_im` with each term's
             // share `p` on `2^(−63)` (one integer sum, released once); a crowd's share is spread over
             // its members, `p_C/|C|` each, through a difference array over the places.
@@ -4197,8 +4248,13 @@ impl Field {
                 let compare = |p: i128, dpk: i128| -> i128 { release(ln2 * release(p * (dpk - mean), SHARE_BITS), MOVE_BITS) };
                 let mut out = Vec::with_capacity(row.len());
                 let mut dt = 0i128;
+                let (mut row_w, mut row_u) = (0i128, 0i128);
                 for (src, &dpj) in row.iter().zip(&dp) {
                     let dz = compare(src.p as i128, dpj);
+                    if let Some(sigma) = reach_clock {
+                        let (lw, lu) = reach_logs(sigma, i, src.j as usize);
+                        (row_w, row_u) = (row_w - dz * i128::from(lw), row_u - dz * i128::from(lu));
+                    }
                     dt += release(dz * src.s as i128, FACE_BITS);
                     let dsij = release(temper * dz, MATERIAL_BITS);
                     if dsij.unsigned_abs() >> d.contact_return_bits() != 0 {
@@ -4209,6 +4265,11 @@ impl Field {
                 let mut outc = Vec::with_capacity(crowd.len());
                 for (c, &dpj) in crowd.iter().zip(&dpc) {
                     let dz = compare(c.e as i128, dpj);
+                    if let Some(sigma) = reach_clock {
+                        // A crowd takes the clock's term at the place its skin reads, `2^level` away, and no remainder.
+                        let e = if c.lo > i { i + (1 << c.level) } else { i - (1 << c.level) };
+                        row_w -= dz * i128::from(reach_logs(sigma, i, e).0);
+                    }
                     dt += release(dz * c.s as i128, FACE_BITS);
                     let dsij = release(temper * dz, MATERIAL_BITS);
                     if dsij.unsigned_abs() >> d.contact_return_bits() != 0 {
@@ -4226,6 +4287,15 @@ impl Field {
                 }
                 ds.push(out);
                 dsc.push(outc);
+                if reach_clock.is_some() {
+                    let r = &mut reach_rows[usize::from(definite[i])];
+                    r.rows += 1;
+                    (r.w, r.w_abs, r.w_sq) = (r.w + row_w, r.w_abs + row_w.unsigned_abs(), r.w_sq + (row_w.unsigned_abs() >> 32).pow(2));
+                    (r.u, r.u_abs, r.u_sq) = (r.u + row_u, r.u_abs + row_u.unsigned_abs(), r.u_sq + (row_u.unsigned_abs() >> 32).pow(2));
+                }
+            }
+            if let Some(out) = reach.as_deref_mut() {
+                out.push(reach_rows);
             }
             // A paced head's skins follow its turn (§16): each pair's and crowd's `D(σ_i − σ_j)` returns to the
             // two ends of its variation, `E = 2^40 ∂/∂D` from the value (`p Re(conj(δỹ_i) D ṽ_j)/D`) and the
@@ -4408,7 +4478,7 @@ impl Field {
 
     /// [`Field::returned`], with the contact covector's magnitude by where its pairs lie added into `shares`
     /// (`[h][near, far]`, [`Field::covector_shares`]) where given.
-    fn returned_with(&self, region: &Region, pass: &FieldPass, g: &mut [i128], mut shares: Option<&mut [u128]>, mut currents: Option<&mut Vec<Vec<i64>>>, mut junction: Option<&mut Vec<(usize, Vec<i64>)>>) -> Result<()> {
+    fn returned_with(&self, region: &Region, pass: &FieldPass, g: &mut [i128], mut shares: Option<&mut [u128]>, mut currents: Option<&mut Vec<Vec<i64>>>, mut junction: Option<&mut Vec<(usize, Vec<i64>)>>, mut reach: Option<&mut Vec<[ReachSums; 2]>>) -> Result<()> {
         let d = &self.declaration;
         let (dw, m, lanes) = (d.width, d.complex(), d.lanes);
         let m2 = 2 * m;
@@ -4490,7 +4560,7 @@ impl Field {
             let r = returns[at].get_or_insert_with(|| ClockReturn::new(paced, sites, m2));
             // The return after this tick: `dx` holds `λ^(k+1)` and becomes the output's `(1 + Γ) λ^(k+1)` ([`Field::junction_back`]).
             let joined = if cell.jg.is_empty() { None } else { Some(self.junction_back(cell, &mut dx)?) };
-            self.tick_return(cell, &mut dx, g, pass.paces_at(cell), &definite, &mut r.dm, &mut r.gtau, &mut r.gsig, shares.as_deref_mut(), currents.as_deref_mut())?;
+            self.tick_return(cell, &mut dx, g, pass.paces_at(cell), &definite, &mut r.dm, &mut r.gtau, &mut r.gsig, shares.as_deref_mut(), currents.as_deref_mut(), reach.as_deref_mut())?;
             // Its chart's covector into the state this tick began from, then what the next tick's return owed that state; both before a level's
             // return, which reads the state as the tick began from it.
             let next_owed = match joined {

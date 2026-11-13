@@ -1,0 +1,16 @@
+The line's sixth lap: from the fifth lap's end, ended at section 1,630 with the training documents' pass (STORE_PASS ended=true, one pass over the store's 1 GB of training documents complete); read-cavity on MEAN.1630 (the mean of sections 1,001 to 1,630), read against the fifth lap's mean by the P60 ruler (F3 the sixth's, C3 the fifth's). Numbers only.
+BUILD claude/level-sites 19a4c7520 (the line's binary)
+STORE_SAVE k=1000 sections=1000 states=1000 moved=207299 square=607263794836880 priced=999 transfer=-142760385481 external=-142564978428 curvature=-195407053 octave=1 rate=12 reads=0 returns=1000 pair
+STORE_SAVE k=1630 sections=630 states=630 moved=209172 square=377141893603598 priced=630 transfer=-81350850365 external=-81683752422 curvature=332902057 octave=1 rate=12 reads=0 returns=1630 pairs=740
+STORE_PASS role=prefix sections=1630 stretches_read=4793758 ended=true code_pieces=93724 web_pieces=51617 science_pieces=32808 books_pieces=2960 wikidata_pieces=12446 ms=537671
+MEASURE lap=level6 rc=0 wall_s=538.3 peak_rss_kib=299324
+CAVITY_DONE ms=329884
+MEASURE lap=L18 rc=0 wall_s=330.5 peak_rss_kib=498880
+OPENING F3 one_place pooled=2.0553 places=100508 | code=1.8879(20124) web=2.2146(20043) science=1.8605(20088) books=1.6886(20028) wikidata=2.6208(20225)
+OPENING F3 whole_open pooled=2.8084 places=3717 | code=2.7366(730) web=2.9232(758) science=2.6840(776) books=2.5248(776) wikidata=3.2251(677)
+LAST_TICK F3 one_place pooled=1.0743 places=100508 | code=0.7549(20124) web=1.1392(20043) science=1.0334(20088) books=1.1015(20028) wikidata=1.3414(20225)
+LAST_TICK C3 one_place pooled=1.0800 places=100508 | code=0.7581(20124) web=1.1438(20043) science=1.0421(20088) books=1.1055(20028) wikidata=1.3496(20225)
+LAST_TICK_DIFF one_place founded_minus_control pooled=-0.0057 | code=-0.0031 web=-0.0045 science=-0.0087 books=-0.0040 wikidata=-0.0082
+LAST_TICK F3 whole_open pooled=2.4057 places=3717 | code=2.2667(730) web=2.5686(758) science=2.3343(776) books=2.2232(776) wikidata=2.6644(677)
+LAST_TICK C3 whole_open pooled=2.4073 places=3717 | code=2.2706(730) web=2.5789(758) science=2.3374(776) books=2.2239(776) wikidata=2.6531(677)
+LAST_TICK_DIFF whole_open founded_minus_control pooled=-0.0016 | code=-0.0040 web=-0.0103 science=-0.0031 books=-0.0007 wikidata=+0.0112

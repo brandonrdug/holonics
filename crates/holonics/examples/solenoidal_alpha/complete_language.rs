@@ -912,6 +912,7 @@ pub(super) fn run_field_realized(args: &[String], realization: &mut dyn holonics
         Some("read-depth") => store_train::read_depth(args, realization),
         Some("read-echo") => store_train::read_echo(args),
         Some("read-junction") => store_train::read_junction(args),
+        Some("read-reach") => store_train::read_reach(args),
         Some("read-ticks") => store_train::read_ticks(args, realization),
         Some("write-store") => store_train::write(args, realization),
         Some("grow-contacts-field") => field_train::grow_contacts_field(args, realization),
