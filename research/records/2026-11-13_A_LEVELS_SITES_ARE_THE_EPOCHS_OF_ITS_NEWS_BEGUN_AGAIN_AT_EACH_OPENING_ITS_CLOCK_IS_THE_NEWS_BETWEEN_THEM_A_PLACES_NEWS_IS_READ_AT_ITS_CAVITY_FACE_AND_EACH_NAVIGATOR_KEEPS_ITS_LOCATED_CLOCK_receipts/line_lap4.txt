@@ -1,0 +1,16 @@
+The line's fourth lap: 3,000 sections from the third lap's end, read-cavity on its lap mean, read against the third lap's mean by the P60 ruler (F3 the fourth lap's mean, C3 the third's). Numbers only.
+BUILD claude/level-sites 19a4c7520 (the line's binary)
+STORE_SAVE k=1000 sections=1000 states=1000 moved=207665 square=579099134557222 priced=999 transfer=-127172828649 external=-127159481720 curvature=-13346929 octave=1 rate=12 reads=0 returns=1000 pairs
+STORE_SAVE k=2000 sections=1000 states=1000 moved=206103 square=621296237321781 priced=1000 transfer=-188774839397 external=-188738980274 curvature=-35859123 octave=1 rate=12 reads=0 returns=2000 pair
+STORE_SAVE k=3000 sections=1000 states=1000 moved=208512 square=547055204874317 priced=1000 transfer=-139555954413 external=-139700361631 curvature=144407218 octave=1 rate=12 reads=0 returns=3000 pair
+MEASURE lap=level4 rc=0 wall_s=1022.0 peak_rss_kib=270268
+CAVITY_DONE ms=339709
+MEASURE lap=L12 rc=0 wall_s=340.2 peak_rss_kib=454052
+OPENING F3 one_place pooled=2.0877 places=100508 | code=1.9169(20124) web=2.2435(20043) science=1.8960(20088) books=1.7196(20028) wikidata=2.6584(20225)
+OPENING F3 whole_open pooled=2.8167 places=3717 | code=2.7458(730) web=2.9242(758) science=2.6970(776) books=2.5297(776) wikidata=3.2388(677)
+LAST_TICK F3 one_place pooled=1.0971 places=100508 | code=0.7690(20124) web=1.1620(20043) science=1.0549(20088) books=1.1145(20028) wikidata=1.3840(20225)
+LAST_TICK C3 one_place pooled=1.1112 places=100508 | code=0.7755(20124) web=1.1711(20043) science=1.0727(20088) books=1.1277(20028) wikidata=1.4080(20225)
+LAST_TICK_DIFF one_place founded_minus_control pooled=-0.0141 | code=-0.0065 web=-0.0091 science=-0.0178 books=-0.0132 wikidata=-0.0241
+LAST_TICK F3 whole_open pooled=2.4179 places=3717 | code=2.2760(730) web=2.5804(758) science=2.3558(776) books=2.2303(776) wikidata=2.6753(677)
+LAST_TICK C3 whole_open pooled=2.4278 places=3717 | code=2.2829(730) web=2.5822(758) science=2.3725(776) books=2.2382(776) wikidata=2.6919(677)
+LAST_TICK_DIFF whole_open founded_minus_control pooled=-0.0098 | code=-0.0068 web=-0.0018 science=-0.0167 books=-0.0078 wikidata=-0.0166

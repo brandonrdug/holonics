@@ -300,6 +300,23 @@ pub struct FieldDeclaration {
     /// as the last families. `false` writes every head line exactly as before; `true` writes `hnn-field-v14g`, the fourteen words of `v14f` with `C`
     /// and `J` written even at zero, then `1`. The declaration carries it; no variable, flag or argument decides it.
     pub opening: bool,
+    /// [definition; theory, November 13, the junction record §7 (atlas `tower.field-tick-return`, `junction.restitution-family`)] **The junction's
+    /// return**: after each tick past the first, a site's state of two ticks before returns, half-turned about the tick's output and shortened by
+    /// the reflection of the site's own load, `x^(k+1) = v^k + Γ^k (v^k − x^(k−1))` with `v^k` the built tick's output, `Γ = (ρ − 1)/(ρ + 1)`,
+    /// `ρ = 2^ℓ` and `ℓ = L r̂(x^k) + ℓ_b` read from the site's own chart at the tick's opening ([`FieldLayout::junction`], [`junction_gamma`]);
+    /// `x^(k−1)` is the state the tick before began from. The first tick is the built one (the reflection of time about the opening,
+    /// `x^(−1) := x^1`, gives `x^1 = v^0` at every `Γ`). Founded ([`Field::with_junction`]) at the matched load, `L = 0` and `ℓ_b = 0`, so `Γ = 0`
+    /// in integers and every face is the built tick's bit for bit; the covector of `ℓ` stands there, `(ln 2/2)(1 − Γ²) ⟨λ^(k+1), v^k − x^(k−1)⟩`.
+    ///
+    /// Why (the junction record §6 and §7): the built tick keeps the junction's anchor (the mean its contacts meet at) and drops its return, so a
+    /// tick is a move of first order, which no periodic change of the constitution can pump, and a free iteration past the trained depth relaxes
+    /// as a diffusion does (G149: the ratio of successive changes climbed from 0.633 to 0.906 with no gap seen). The return gives each site a
+    /// second coordinate, its rate, and `|Γ| < 1` at every finite `ℓ`, so the step is passive by its form (a store's quality stays finite, atlas
+    /// `store.finite-quality`). Why founded at the matched load: G151 read the constitution's own value `Γ* = B/(1 − B)` from each site's echo on
+    /// the line's third-lap mean, the median `B` 0.00068 over written rows, so the matched load is where the constitution stands on most rows and
+    /// the deposit locates `ℓ` from there. `false` writes every head line exactly as before; `true` writes `hnn-field-v14j`, the fifteen words of
+    /// `v14g` with the opening's word written as `0` or `1`, then `1`.
+    pub junction: bool,
 }
 
 impl FieldDeclaration {
@@ -593,8 +610,20 @@ impl FieldDeclaration {
     fn to_text(self) -> String {
         // [theory, November 12, the triad record §4] With triads the head is `v14f`: `v14e`'s words with `C` written even at zero, then `J`; without
         // them the line before, exactly.
-        let head = if self.opening { "hnn-field-v14g" } else if self.triads > 0 { "hnn-field-v14f" } else if self.carry > 0 { "hnn-field-v14e" } else { "hnn-field-v14" };
-        let tail = if self.opening {
+        let head = if self.junction {
+            "hnn-field-v14j"
+        } else if self.opening {
+            "hnn-field-v14g"
+        } else if self.triads > 0 {
+            "hnn-field-v14f"
+        } else if self.carry > 0 {
+            "hnn-field-v14e"
+        } else {
+            "hnn-field-v14"
+        };
+        let tail = if self.junction {
+            format!(" {} {} {} 1", self.carry, self.triads, u8::from(self.opening))
+        } else if self.opening {
             format!(" {} {} 1", self.carry, self.triads)
         } else if self.triads > 0 {
             format!(" {} {}", self.carry, self.triads)
@@ -610,28 +639,34 @@ impl FieldDeclaration {
         let words: Vec<&str> = line.split(' ').collect();
         // A v13 head line is a field with no depth ring (the line before the depth rings, its states the line's own).
         let n = |w: &str| w.parse::<usize>().map_err(|_| TowerError::Refused("a field's declaration that is not a count"));
-        let (depth_word, carry, triads, opening) = match (words.first().copied(), words.len()) {
-            (Some("hnn-field-v14"), 12) => (Some(words[11]), 0, 0, false),
+        let (depth_word, carry, triads, opening, junction) = match (words.first().copied(), words.len()) {
+            (Some("hnn-field-v14"), 12) => (Some(words[11]), 0, 0, false, false),
             (Some("hnn-field-v14e"), 13) => match n(words[12])? {
                 0 => return refuse("an hnn-field-v14e head line with no carry circles (a field without them is hnn-field-v14)"),
-                c => (Some(words[11]), c, 0, false),
+                c => (Some(words[11]), c, 0, false, false),
             },
             // [theory, November 12, the triad record §4] `C` may be zero here, `J` may not, as `v14e` refuses `C = 0`.
             (Some("hnn-field-v14f"), 14) => match n(words[13])? {
                 0 => return refuse("an hnn-field-v14f head line with no triads (a field without them is hnn-field-v14 or hnn-field-v14e)"),
-                j => (Some(words[11]), n(words[12])?, j, false),
+                j => (Some(words[11]), n(words[12])?, j, false, false),
             },
             // [theory, November 13, §4.4a] The opening's word is one; a field without the comparison writes a line before `v14g`.
             (Some("hnn-field-v14g"), 15) => match n(words[14])? {
-                1 => (Some(words[11]), n(words[12])?, n(words[13])?, true),
+                1 => (Some(words[11]), n(words[12])?, n(words[13])?, true, false),
                 _ => return refuse("an hnn-field-v14g head line whose opening word is not one (a field without the comparison writes the line before it)"),
+            },
+            // [theory, November 13, the junction record §7] The opening's word is zero or one here and the junction's is one; a field without the
+            // return writes a line before `v14j`.
+            (Some("hnn-field-v14j"), 16) => match (n(words[14])?, n(words[15])?) {
+                (o @ (0 | 1), 1) => (Some(words[11]), n(words[12])?, n(words[13])?, o == 1, true),
+                _ => return refuse("an hnn-field-v14j head line whose opening word is not zero or one or whose junction word is not one"),
             },
             (Some("hnn-field-v14k"), _) => return refuse("the carry founded at zero friction is retired (hnn-field-v14k): its states are receipts only"),
             (Some("hnn-field-v14t"), _) => return refuse("the carry's leak on its linear chart is retired (hnn-field-v14t): its states are receipts only"),
-            (Some("hnn-field-v13"), 11) => (None, 0, 0, false),
+            (Some("hnn-field-v13"), 11) => (None, 0, 0, false, false),
             _ => return refuse("a field's head line that is not hnn-field-v14"),
         };
-        let d = Self { alphabet: n(words[1])?, width: n(words[2])?, heads: n(words[3])?, modes: n(words[4])?, still: n(words[5])?, contacts: n(words[6])?, ticks: n(words[7])?, frames: n(words[8])?, reach: n(words[9])?, lanes: n(words[10])?, depth: depth_word.map(n).transpose()?.unwrap_or(0), carry, triads, opening };
+        let d = Self { alphabet: n(words[1])?, width: n(words[2])?, heads: n(words[3])?, modes: n(words[4])?, still: n(words[5])?, contacts: n(words[6])?, ticks: n(words[7])?, frames: n(words[8])?, reach: n(words[9])?, lanes: n(words[10])?, depth: depth_word.map(n).transpose()?.unwrap_or(0), carry, triads, opening, junction };
         d.admit()?;
         Ok(d)
     }
@@ -704,6 +739,11 @@ pub struct FieldLayout {
     /// `opening_bias`; the last families, zero long where the opening is not compared.
     pub opening: usize,
     pub opening_bias: usize,
+    /// [definition; theory, November 13, the junction record §7] **The junction's chart** ([`FieldDeclaration::junction`]): `L`, one row of `D` on
+    /// the material's grain at `junction`, and `ℓ_b`, one entry on the face's grain at `junction_bias`, so `ℓ = L r̂ + ℓ_b` on `2^(−16)` as the carry's
+    /// leak is read; the last families, zero long where the tick has no return.
+    pub junction: usize,
+    pub junction_bias: usize,
     pub len: usize,
     pub families: Vec<(usize, usize, u32)>,
 }
@@ -758,7 +798,9 @@ impl FieldLayout {
         let (triad, triad_bias, w_triad) = (tail(6 * d.triads * dw, MATERIAL_BITS), tail(6 * d.triads, FACE_BITS), tail(dw * 2 * d.triads, MATERIAL_BITS));
         let opened = usize::from(d.opening);
         let (opening, opening_bias) = (tail(opened * dw * dw, MATERIAL_BITS), tail(opened * dw, FACE_BITS));
-        Self { enc, before, after, q, q_bias, v, v_bias, out, out_bias, a: a_, a_bias, b, b_bias, w, w_bias, read, read_bias, moment_before, moment_after, temper, probe, probe_bias, pace, moment_face, moment_face_bias, lift_bias, carry, carry_bias, triad, triad_bias, w_triad, opening, opening_bias, len: at, families }
+        let joined = usize::from(d.junction);
+        let (junction, junction_bias) = (tail(joined * dw, MATERIAL_BITS), tail(joined, FACE_BITS));
+        Self { enc, before, after, q, q_bias, v, v_bias, out, out_bias, a: a_, a_bias, b, b_bias, w, w_bias, read, read_bias, moment_before, moment_after, temper, probe, probe_bias, pace, moment_face, moment_face_bias, lift_bias, carry, carry_bias, triad, triad_bias, w_triad, opening, opening_bias, junction, junction_bias, len: at, families }
     }
 }
 
@@ -1271,6 +1313,11 @@ struct BlankRead {
 struct TickCell {
     /// The tick's own clocks (§16.44), `None` where they are the pass's (the first tick, or a region with no blank).
     clock: Option<Box<TickClock>>,
+    /// [theory, November 13, the junction record §7] The tick's return, where the tick has one (past the first): each site's chart read `ℓ`
+    /// on `2^(−16)` and reflection `Γ` on `2^(−30)` (`[t]`), and the difference it carried, `v^k − x^(k−1)` (`[t][D]`); empty otherwise.
+    jl: Vec<i64>,
+    jg: Vec<i64>,
+    jd: Vec<i64>,
     read: Vec<i32>,
     scale: Vec<i128>,
     /// The unframed key word `[t][2M]`, and the unframed value and probe (the clock's covector reads them, §16).
@@ -1841,6 +1888,51 @@ fn carry_friction(exponential: &Exponential, l: i128) -> Result<(i128, i64, u128
     Ok((d, whole, v))
 }
 
+/// [definition; theory, November 13, the junction record §7] **The return's reflection on its log chart** ([`FieldDeclaration::junction`]): from
+/// `ℓ` on `2^(−16)` (a site's junction read), `ρ = 2^ℓ` read through the field's exponential navigator as the carry's leak reads it
+/// ([`carry_friction`]: `a = ⌊ℓ⌋` and `v` in `[2^61, 2^62)`, so `ρ = v 2^(a − 61)`), and `Γ = (ρ − 1)/(ρ + 1)` on `2^(−30)` by one division to the
+/// nearest: `(v 2^a − 2^61)/(v 2^a + 2^61)` for `a ≥ 0`, `(v − 2^(61 − a))/(v + 2^(61 − a))` below. At `ℓ = 0`, `v = 2^61` and `Γ = 0`: the matched
+/// load. Refused, typed, where `a` leaves `[−31, 30]`: past it `1 − |Γ|` falls under the grain and the reflection rounds to one, a store with no
+/// loss (atlas `store.finite-quality`); inside it every numerator stays under `2^92` before its shift of 30. Returns `Γ`.
+fn junction_gamma(exponential: &Exponential, l: i64) -> Result<i64> {
+    let whole = l >> FACE_BITS;
+    if !(JUNCTION_WHOLE_FLOOR..=JUNCTION_WHOLE_TOP).contains(&whole) {
+        return refuse("a junction's return whose reflection reaches one at its grain");
+    }
+    let v = exponential.below_one(i128::from(l & ((1 << FACE_BITS) - 1)) - (1i128 << FACE_BITS)) as i128;
+    let (num, den) = if whole >= 0 { ((v << whole) - (1i128 << 61), (v << whole) + (1i128 << 61)) } else { (v - (1i128 << (61 - whole)), v + (1i128 << (61 - whole))) };
+    fit64(div_nearest(num << GAMMA_BITS, den))
+}
+
+/// The return's chart's whole part, `⌊ℓ⌋`, admitted from `−31` to `30` ([`junction_gamma`]).
+const JUNCTION_WHOLE_FLOOR: i64 = -31;
+const JUNCTION_WHOLE_TOP: i64 = 30;
+
+/// [definition; theory, November 13, the junction record §7] **The return's sensitivity** `∂Γ/∂ℓ = (ln 2/2)(1 − Γ²)` on `2^(−30)`:
+/// `release(ln 2 · (2^60 − Γ²), 61)` with `ln 2` on `2^(−30)` ([`ln2_face`]) and `Γ` on `2^(−30)`, at most `ln 2/2`.
+fn junction_sensitivity(gamma: i64) -> i128 {
+    let g = i128::from(gamma);
+    release(ln2_face() * ((1i128 << (2 * GAMMA_BITS)) - g * g), 2 * GAMMA_BITS + 1)
+}
+
+/// [definition; theory, November 13, the junction record §7] **The return's covector at one site**: from the covector `λ` of the state the return
+/// formed (`x^(k+1)`, on the covector's grain), the difference `Δ = v^k − x^(k−1)` it carried and its `Γ`: the chart's `δℓ = release(S c, 46)` with
+/// `S = Σ_i λ_i Δ_i` and `c` the sensitivity ([`junction_sensitivity`]), so `δℓ` is `ℓ`'s covector on `2^(−16)` at the covector's grain (`Γ` on
+/// `2^(−30)` moves `x` by `Γ Δ 2^(−30)`, and `ℓ` on `2^(−16)` moves `Γ` by `c 2^(−16)`); and `r = release(Γ λ, 30)` an entry, so the output's
+/// covector is `λ + r` (`(1 + Γ) λ`) and the state two ticks back takes `−r`. Refused, typed, where `S` or `S c` passes its carrier.
+fn junction_return(lambda: &[i64], diff: &[i64], gamma: i64) -> Result<(i64, Vec<i64>)> {
+    let mut sum = 0i128;
+    for (&y, &x) in lambda.iter().zip(diff) {
+        sum = sum.checked_add(i128::from(y) * i128::from(x)).ok_or(TowerError::Refused(JUNCTION_RETURN))?;
+    }
+    let dl = fit64(release(sum.checked_mul(junction_sensitivity(gamma)).ok_or(TowerError::Refused(JUNCTION_RETURN))?, GAMMA_BITS + FACE_BITS))?;
+    let g = i128::from(gamma);
+    let r = lambda.iter().map(|&y| fit64(release(g * i128::from(y), GAMMA_BITS))).collect::<Result<Vec<_>>>()?;
+    Ok((dl, r))
+}
+
+const JUNCTION_RETURN: &str = "a junction's return covector past its 128-bit carrier";
+
 /// [definition; theory, November 11 17:25 and November 12 (G96's third branch); `lean/Holonics/HNN/CarryGate.lean`] **The carry's gate, a turn and a
 /// friction charted apart** ([`FieldDeclaration::carry`]): from `q` and `ℓ` on `2^(−16)` (a site's turn and leak charts), the friction `d` on the
 /// leak's log chart ([`carry_friction`]), and on `2^(−30)`, each part by one division to the nearest ([`div_nearest`], the card's own rounding),
@@ -2012,6 +2104,7 @@ struct Reaches {
     w_triad: u64,
     read: u64,
     moment_face: u64,
+    junction: u64,
 }
 
 impl Field {
@@ -2405,7 +2498,7 @@ impl Field {
         let l = &self.layout;
         let r = |start: usize, len: usize| reach(&self.theta[start..start + len]);
         let j = self.declaration.triads;
-        Reaches { probe: r(l.probe, m2 * dw), q: r(l.q, m2 * dw), v: r(l.v, m2 * dw), out: r(l.out, dw * m2), a: r(l.a, f * dw), b: r(l.b, f * dw), w: r(l.w, dw * f), carry: r(l.carry, 2 * self.declaration.carry * dw), triad: r(l.triad, 6 * j * dw), w_triad: r(l.w_triad, dw * 2 * j), read: r(l.read, dw * dw), moment_face: r(l.moment_face, dw * m2) }
+        Reaches { probe: r(l.probe, m2 * dw), q: r(l.q, m2 * dw), v: r(l.v, m2 * dw), out: r(l.out, dw * m2), a: r(l.a, f * dw), b: r(l.b, f * dw), w: r(l.w, dw * f), carry: r(l.carry, 2 * self.declaration.carry * dw), triad: r(l.triad, 6 * j * dw), w_triad: r(l.w_triad, dw * 2 * j), read: r(l.read, dw * dw), moment_face: r(l.moment_face, dw * m2), junction: r(l.junction, usize::from(self.declaration.junction) * dw) }
     }
 
     fn admit_region(&self, region: &Region) -> Result<()> {
@@ -3323,6 +3416,66 @@ impl Field {
         Ok(())
     }
 
+    /// [definition; theory, November 13, the junction record §7] **The tick's return** ([`FieldDeclaration::junction`]), after a tick past the
+    /// first: at each site the chart `ℓ = L r̂(x^k) + ℓ_b` (one affine of the tick's opening chart, at the grains the carry's leak is read at), the
+    /// reflection `Γ` ([`junction_gamma`]) and `x^(k+1) = v^k + release(Γ (v^k − x^(k−1)), 30)` an entry, with `x` holding `v^k` and `prev` the
+    /// state the tick before began from. The reads are kept in the cell for the reverse.
+    fn junction_forward(&self, x: &mut [i64], prev: &[i64], reaches: &Reaches, cell: &mut TickCell) -> Result<()> {
+        let (l, dw) = (&self.layout, self.declaration.width);
+        let sites = x.len() / dw;
+        (cell.jl, cell.jg, cell.jd) = (vec![0i64; sites], vec![0i64; sites], vec![0i64; sites * dw]);
+        let mut ell = [0i64; 1];
+        for t in 0..sites {
+            affine(&self.theta[l.junction..l.junction + dw], reaches.junction, dw, &cell.read[t * dw..(t + 1) * dw], Some(&self.theta[l.junction_bias..l.junction_bias + 1]), MATERIAL_BITS, MATERIAL_BITS, &mut ell)?;
+            let gamma = junction_gamma(&self.exponential, ell[0])?;
+            (cell.jl[t], cell.jg[t]) = (ell[0], gamma);
+            for i in t * dw..(t + 1) * dw {
+                let diff = fit64(i128::from(x[i]) - i128::from(prev[i]))?;
+                cell.jd[i] = diff;
+                x[i] = fit64(i128::from(x[i]) + release(i128::from(gamma) * i128::from(diff), GAMMA_BITS))?;
+            }
+        }
+        Ok(())
+    }
+
+    /// [definition; theory, November 13, the junction record §7] **The return's reverse at its output**: with `dx` the covector `λ^(k+1)` of the
+    /// state the return formed, each site's chart covector `δℓ` and the output's covector `(1 + Γ) λ^(k+1)` written over `dx`
+    /// ([`junction_return`]); returns `δℓ` (`[t]`) and what the state two ticks back takes, `−Γ λ^(k+1)` (`[t][D]`).
+    fn junction_back(&self, cell: &TickCell, dx: &mut [i64]) -> Result<(Vec<i64>, Vec<i64>)> {
+        let dw = self.declaration.width;
+        let sites = dx.len() / dw;
+        let (mut dl, mut back) = (vec![0i64; sites], vec![0i64; sites * dw]);
+        for t in 0..sites {
+            let span = t * dw..(t + 1) * dw;
+            let (d, r) = junction_return(&dx[span.clone()], &cell.jd[span.clone()], cell.jg[t])?;
+            dl[t] = d;
+            for ((slot, o), &v) in dx[span.clone()].iter_mut().zip(&mut back[span]).zip(&r) {
+                *slot = fit64(i128::from(*slot) + i128::from(v))?;
+                *o = -v;
+            }
+        }
+        Ok((dl, back))
+    }
+
+    /// [definition; theory, November 13, the junction record §7] **The return's chart's reverse**: `Σ_t δℓ_t r̂_tᵀ` into `L`, `Σ_t δℓ_t` into `ℓ_b`,
+    /// and `Lᵀ δℓ_t` through the lane adjoint of the tick's opening chart into the covector of the state the tick began from.
+    fn junction_chart_back(&self, cell: &TickCell, dl: &[i64], reaches: &Reaches, dx: &mut [i64], g: &mut [i128]) -> Result<()> {
+        let (l, dw, lanes) = (&self.layout, self.declaration.width, self.declaration.lanes);
+        let rs: Vec<&[i32]> = cell.read.chunks_exact(dw).collect();
+        let dls: Vec<&[i64]> = dl.chunks_exact(1).collect();
+        outer_sum(&mut g[l.junction..l.junction + dw], dw, &dls, &rs)?;
+        let mut dr = vec![0i64; dw];
+        for (t, &d) in dl.iter().enumerate() {
+            g[l.junction_bias] += i128::from(d);
+            transposed(&self.theta[l.junction..l.junction + dw], reaches.junction, dw, &dl[t..t + 1], MATERIAL_BITS, &mut dr)?;
+            let back = lane_adjoint(rs[t], &cell.scale[t * lanes..(t + 1) * lanes], &dr)?;
+            for (slot, &b) in dx[t * dw..(t + 1) * dw].iter_mut().zip(&back) {
+                *slot = fit64(i128::from(*slot) + i128::from(b))?;
+            }
+        }
+        Ok(())
+    }
+
     /// The region's forward: `K` ticks, then each unresolved site's face. `keep` holds each tick's
     /// temporaries for the reverse.
     fn pass(&self, region: &Region, keep: bool) -> Result<FieldPass> {
@@ -3346,6 +3499,8 @@ impl Field {
         let blanks = !paces.kappa.is_empty() && (0..sites).any(|t| Self::silent(region, t));
         let window = d.room_window(region);
         let mut clock: Option<Box<TickClock>> = None;
+        // [theory, November 13, the junction record §7] The state the tick before began from, where the tick has the return.
+        let mut prior: Option<Vec<i64>> = None;
         for k in 0..d.ticks {
             if let Some(s) = self.scale.as_deref().filter(|s| s.split == k) {
                 out.tower = Some(self.scale_forward(s, &mut x, &news, &definite, &keyed, keep)?);
@@ -3353,7 +3508,12 @@ impl Field {
             let own = clock.take();
             let (tick_paces, tick_moment) = own.as_ref().map_or((&paces, &moment), |c| (&c.paces, &c.moment));
             let mut cell = TickCell::default();
+            let began = d.junction.then(|| x.clone());
             self.tick(&mut x, &definite, &keyed, tick_paces, tick_moment, &reaches, window.as_deref(), &mut cell)?;
+            if let Some(prev) = prior.as_deref() {
+                self.junction_forward(&mut x, prev, &reaches, &mut cell)?;
+            }
+            prior = began;
             cell.clock = own;
             if blanks && k + 1 < d.ticks {
                 // [the unified-theory reading of November 6, 08:16] Only the blanks a clock reads are read: every silent place up
@@ -3533,6 +3693,25 @@ impl Field {
         Ok(trips.iter().map(|t| t.iter().map(|&b| ((b + read / 2) / read) as u64).collect()).collect())
     }
 
+    /// [measurement; theory, November 13, the theory thread's order after G151, item (c)] **Each site's round trips across heads** (`[h][h′][i]` on
+    /// `2^(−63)`): the mean over consecutive ticks of `Σ_j p_ji^(t, h′) p_ij^(t+1, h)`, what site `i` told `j` in head `h′` coming back to it in head
+    /// `h` a tick later; the diagonal is [`Field::echo_by_head`]. The strand's pair contacts, triads and carry circles are outside it (they are two-way
+    /// by build). A reading only: nothing in the law reads it.
+    pub fn echo_across_heads(&self, region: &Region) -> Result<Vec<Vec<Vec<u64>>>> {
+        let pass = self.pass(region, true)?;
+        let (sites, heads) = (region.classes.len(), self.declaration.heads);
+        let mut trips = vec![vec![vec![0u128; sites]; heads]; heads];
+        for w in pass.ticks.windows(2) {
+            for (h, by_h) in trips.iter_mut().enumerate() {
+                for (h2, t) in by_h.iter_mut().enumerate() {
+                    round_trips(&w[0].rows[h2 * sites..(h2 + 1) * sites], &w[1].rows[h * sites..(h + 1) * sites], sites, t);
+                }
+            }
+        }
+        let read = (pass.ticks.len().saturating_sub(1)).max(1) as u128;
+        Ok(trips.iter().map(|by_h| by_h.iter().map(|t| t.iter().map(|&b| ((b + read / 2) / read) as u64).collect()).collect()).collect())
+    }
+
     /// [measurement; agent-inferred, November 2] **A held read's rows by where their mass lies** ([`HeldRows`]):
     /// for each tick and head (`[tick · heads + head]`), over the region's unresolved sites, the shares of
     /// the question group (definite sites before `question`), of the soft near field and of the rest, and the
@@ -3591,7 +3770,7 @@ impl Field {
         for region in regions {
             let pass = self.pass(region, true)?;
             let mut g = vec![0i128; self.material_len()];
-            self.returned_with(region, &pass, &mut g, Some(&mut out), None)?;
+            self.returned_with(region, &pass, &mut g, Some(&mut out), None, None)?;
         }
         Ok(out.chunks_exact(2).map(|c| [c[0], c[1]]).collect())
     }
@@ -3607,7 +3786,7 @@ impl Field {
         let mut covectors: Vec<Vec<i64>> = Vec::new();
         if returning {
             let mut g = vec![0i128; self.material_len()];
-            self.returned_with(region, &pass, &mut g, None, Some(&mut covectors))?;
+            self.returned_with(region, &pass, &mut g, None, Some(&mut covectors), None)?;
             covectors.reverse();
         }
         let mut out = Vec::new();
@@ -3719,7 +3898,24 @@ impl Field {
     /// into `g` on each family's natural grain (a face family's `Σ δz` on `2^(−24)`, a material family's `Σ δz x` on
     /// `2^(−40)`), which the reverse's law tests read against the code's difference.
     fn returned(&self, region: &Region, pass: &FieldPass, g: &mut [i128]) -> Result<()> {
-        self.returned_with(region, pass, g, None, None)
+        self.returned_with(region, pass, g, None, None, None)
+    }
+
+    /// [measurement; theory, November 13, the junction record §9 and the theory thread's order after G151, item (a)] **The return's chart covector
+    /// by tick**: on a field with the junction's return, one region's forward and reverse, and for each tick with a return (past the first) its
+    /// index, each site's `δℓ` (`[t]`, `ℓ`'s covector on `2^(−16)` at the covector's grain, [`junction_return`]) and the tick's opening chart `r̂`
+    /// (`[t][D]`), with the code's covector over the whole material beside them. At the founding (`Γ = 0`) the forward is the built tick's and the
+    /// reverse the built reverse, so `δℓ = (ln 2/2) ⟨λ^(k+1), x^(k+1) − x^(k−1)⟩` reads what a first deposit of the return would see. A reading only.
+    pub fn junction_covectors(&self, region: &Region) -> Result<(Vec<(usize, Vec<i64>, Vec<i32>)>, Vec<i128>)> {
+        if !self.declaration.junction {
+            return refuse("a reading of the junction's return on a field without it");
+        }
+        let pass = self.pass(region, true)?;
+        let mut g = vec![0i128; self.material_len()];
+        let mut by_tick: Vec<(usize, Vec<i64>)> = Vec::new();
+        self.returned_with(region, &pass, &mut g, None, None, Some(&mut by_tick))?;
+        by_tick.reverse();
+        Ok((by_tick.into_iter().map(|(k, dl)| (k, dl, pass.ticks[k].read.clone())).collect(), g))
     }
 
     /// [agent-inferred, November 3, §16.39] **One tick's return**: the covector `dx` of a tick's output faces carried back
@@ -4212,7 +4408,7 @@ impl Field {
 
     /// [`Field::returned`], with the contact covector's magnitude by where its pairs lie added into `shares`
     /// (`[h][near, far]`, [`Field::covector_shares`]) where given.
-    fn returned_with(&self, region: &Region, pass: &FieldPass, g: &mut [i128], mut shares: Option<&mut [u128]>, mut currents: Option<&mut Vec<Vec<i64>>>) -> Result<()> {
+    fn returned_with(&self, region: &Region, pass: &FieldPass, g: &mut [i128], mut shares: Option<&mut [u128]>, mut currents: Option<&mut Vec<Vec<i64>>>, mut junction: Option<&mut Vec<(usize, Vec<i64>)>>) -> Result<()> {
         let d = &self.declaration;
         let (dw, m, lanes) = (d.width, d.complex(), d.lanes);
         let m2 = 2 * m;
@@ -4287,10 +4483,32 @@ impl Field {
             }
             outer_sum(&mut g[l.read..l.read + dw * dw], dw, &ys, &xs)?;
         }
+        // [theory, November 13, the junction record §7] What a tick's return owes the state the tick before began from, `−Γ^(k+1) λ^(k+2)`.
+        let mut owed: Option<Vec<i64>> = None;
         for (k, cell) in pass.ticks.iter().enumerate().rev() {
             let at = if cell.clock.is_some() { k + 1 } else { 0 };
             let r = returns[at].get_or_insert_with(|| ClockReturn::new(paced, sites, m2));
+            // The return after this tick: `dx` holds `λ^(k+1)` and becomes the output's `(1 + Γ) λ^(k+1)` ([`Field::junction_back`]).
+            let joined = if cell.jg.is_empty() { None } else { Some(self.junction_back(cell, &mut dx)?) };
             self.tick_return(cell, &mut dx, g, pass.paces_at(cell), &definite, &mut r.dm, &mut r.gtau, &mut r.gsig, shares.as_deref_mut(), currents.as_deref_mut())?;
+            // Its chart's covector into the state this tick began from, then what the next tick's return owed that state; both before a level's
+            // return, which reads the state as the tick began from it.
+            let next_owed = match joined {
+                Some((dl, back)) => {
+                    self.junction_chart_back(cell, &dl, &reaches, &mut dx, g)?;
+                    if let Some(out) = junction.as_deref_mut() {
+                        out.push((k, dl));
+                    }
+                    Some(back)
+                }
+                None => None,
+            };
+            if let Some(o) = owed.take() {
+                for (slot, &v) in dx.iter_mut().zip(&o) {
+                    *slot = fit64(i128::from(*slot) + i128::from(v))?;
+                }
+            }
+            owed = next_owed;
             if let Some(s) = self.scale.as_deref().filter(|s| s.split == k) {
                 let sp = pass.tower.as_ref().ok_or(TowerError::Refused("a tower's reverse reads a forward that held its scale"))?;
                 self.scale_return(s, sp, &mut dx, g)?;
@@ -5747,6 +5965,33 @@ impl Field {
         Ok((out, from))
     }
 
+    /// [definition; theory, November 13, the junction record §7] **The field with the junction's return** ([`FieldDeclaration::junction`]): `L`
+    /// and `ℓ_b` appended at the end of the fine field's material, founded at zero (the matched load, `Γ = 0`), every standing entry kept; no key is
+    /// read and the draws do not move. A tower keeps its level as it stands (its ticks carry no return), and its entries follow the fine field's in
+    /// the material ([`Field::material_len`]). Also the map over the whole material from each new entry to the old one it copies (`None` for the
+    /// chart). Refused on a field that has the return.
+    pub fn with_junction(&self) -> Result<(Self, Vec<Option<usize>>)> {
+        if self.declaration.junction {
+            return refuse("a field that already has the junction's return");
+        }
+        let d = FieldDeclaration { junction: true, ..self.declaration };
+        d.admit()?;
+        let layout = FieldLayout::new(&d);
+        if self.theta.len() != layout.junction {
+            return refuse("a field whose material does not end where the junction's chart begins");
+        }
+        let (fine, total) = (self.theta.len(), self.material_len());
+        let mut theta = self.theta.clone();
+        theta.resize(layout.len, 0);
+        let mut from: Vec<Option<usize>> = (0..fine).map(Some).collect();
+        from.resize(layout.len, None);
+        from.extend((fine..total).map(Some));
+        let mut out = Self::with_theta(d, theta);
+        out.scale = self.scale.clone();
+        (out.per_blank_clock, out.bare_stretch) = (self.per_blank_clock, self.bare_stretch);
+        Ok((out, from))
+    }
+
     /// [definition; theory, November 12 (the record of the opening's room, §4 item 4; corrected 18:44Z: the founding reads no key)]
     /// **The field with `fresh` more letters**, founded at a passage's crossing: the fresh classes follow the standing ones, so every
     /// standing class keeps its index (the void's included, wherever the codec holds it), and the open row (the unresolved operand,
@@ -6536,13 +6781,20 @@ fn predicted_parts(field: &Field, g: &[i128], step: &[i128], halvings: u32, part
 /// [definition; theory, November 13, P60 item 1f] The opening's lift is one part, `opening` (index 23, [`OPENING_PART`]): `R⁰` and `b⁰`. Why a part
 /// of its own: it is a new block whose covector reaches it from the opening's comparison alone, and the part rates' law sets each block's rate
 /// from its own travel. A parts line carries it only where the field has the opening's lift ([`written_parts`]).
-pub const PART_NAMES: [&str; 24] = ["w_new", "a_new", "b_new", "enc_lane", "before_lane", "after_lane", "q_lane", "v_lane", "probe_lane", "out_lane", "moment_face_lane", "read_lane", "face_biases_lane", "a_lane", "b_lane", "carry", "w_carry", "a_carry", "b_carry", "enc_first", "before_first", "after_first", "triad", "opening"];
+///
+/// [definition; theory, November 13, the junction record §7] The junction's chart is one part, `junction` (index 24, [`JUNCTION_PART`]): `L` and
+/// `ℓ_b`. Why a part of its own: it is a new block whose covector reaches it only through the tick's return, founded where that covector stands
+/// at first order, and the part rates' law sets each block's rate from its own travel. A parts line carries it only where the tick has the return.
+pub const PART_NAMES: [&str; 25] = ["w_new", "a_new", "b_new", "enc_lane", "before_lane", "after_lane", "q_lane", "v_lane", "probe_lane", "out_lane", "moment_face_lane", "read_lane", "face_biases_lane", "a_lane", "b_lane", "carry", "w_carry", "a_carry", "b_carry", "enc_first", "before_first", "after_first", "triad", "opening", "junction"];
 
 /// The triads' one part ([`PART_NAMES`] index 22), written after the first lane's letter rows only where the field has triads.
 pub const TRIAD_PART: usize = 22;
 
-/// The opening's lift's one part ([`PART_NAMES`] index 23), written last only where the field has the opening's lift.
+/// The opening's lift's one part ([`PART_NAMES`] index 23), written after the triad's only where the field has the opening's lift.
 pub const OPENING_PART: usize = 23;
+
+/// The junction's chart's one part ([`PART_NAMES`] index 24), written last only where the tick has the junction's return.
+pub const JUNCTION_PART: usize = 24;
 
 /// The plain founded parts (the first sixteen of [`PART_NAMES`]): every field writes them.
 pub const PLAIN_PARTS: usize = 16;
@@ -6561,8 +6813,8 @@ pub const FIRST_PARTS: std::ops::Range<usize> = 19..22;
 /// with like.
 ///
 /// [definition; theory, November 13, P60 item 1f] The opening's one part comes after them only where the field has the opening's lift, for the
-/// same reason: a field without it writes every line it wrote before.
-pub fn written_parts(carry: usize, triads: usize, opening: bool) -> Vec<usize> {
+/// same reason: a field without it writes every line it wrote before. So does the junction's one part, last, only where the tick has the return.
+pub fn written_parts(carry: usize, triads: usize, opening: bool, junction: bool) -> Vec<usize> {
     let mut out: Vec<usize> = (0..PLAIN_PARTS).collect();
     if carry > 0 {
         out.extend(CIRCLE_PARTS);
@@ -6573,6 +6825,9 @@ pub fn written_parts(carry: usize, triads: usize, opening: bool) -> Vec<usize> {
     }
     if opening {
         out.push(OPENING_PART);
+    }
+    if junction {
+        out.push(JUNCTION_PART);
     }
     out
 }
@@ -6745,6 +7000,11 @@ impl Field {
         if d.opening {
             parts[l.opening..l.opening + dw * dw].fill(OPENING_PART as u8);
             parts[l.opening_bias..l.opening_bias + dw].fill(OPENING_PART as u8);
+        }
+        // [theory, November 13, the junction record §7] The junction's chart, one part: `L` and `ℓ_b` ([`JUNCTION_PART`]).
+        if d.junction {
+            parts[l.junction..l.junction + dw].fill(JUNCTION_PART as u8);
+            parts[l.junction_bias] = JUNCTION_PART as u8;
         }
         parts
     }
@@ -7218,6 +7478,43 @@ impl FieldLearner {
         Ok(Self { field, first, second, rate_bits: self.rate_bits, drawn: self.drawn, laps: self.laps, held: None, read_held: self.read_held, rate_parts, own_rates, last: None, pass: self.pass.clone() })
     }
 
+    /// [definition; theory, November 13, the junction record §7] **The learner with the junction's return** ([`Field::with_junction`]), founded at
+    /// the matched load. Every standing entry keeps its moments, its remainder and its rate. The chart's first moments open at zero and its second
+    /// at the mean of its counterpart's standing second moments, as a growth opens a new block's ([`FieldLearner::with_opening`]): `L` and `ℓ_b`
+    /// read the site's chart as the carry circles' leak chart and its biases do, and where the field has no circles as the pair drive `a` and its
+    /// biases do (agent-inferred: the nearest block that reads the same chart into one real a site). Its rate: the founded parts' rates are kept
+    /// and the junction's part takes octave 0, what a newly grown block takes in this line; where the learner carries each entry's own rate, every
+    /// standing entry keeps it and the chart's entries take `rate_bits`. The draws, the laps and the pass are kept; the held step and the last
+    /// section's step are dropped. Refused while a step is held.
+    pub fn with_junction(&self) -> Result<Self> {
+        if self.held.is_some() {
+            return refuse("a learner takes the junction's return after its held step is read");
+        }
+        let (field, from) = self.field.with_junction()?;
+        let first = from.iter().map(|o| o.map_or(0, |i| self.first[i])).collect();
+        let mut second: Vec<i128> = from.iter().map(|o| o.map_or(0, |i| self.second[i])).collect();
+        let (old, new, d) = (&self.field.layout, &field.layout, self.field.declaration);
+        let dw = d.width;
+        let mean = |start: usize, len: usize| -> i128 {
+            let values = &self.second[start..start + len];
+            if values.is_empty() {
+                return 0;
+            }
+            let n = values.len() as i128;
+            values.iter().map(|v| v / n).sum::<i128>() + values.iter().map(|v| v % n).sum::<i128>() / n
+        };
+        let (rows, biases) = if d.carry > 0 { ((old.carry + d.carry * dw, d.carry * dw), (old.carry_bias + d.carry, d.carry)) } else { ((old.a, d.contacts * dw), (old.a_bias, d.contacts)) };
+        second[new.junction..new.junction + dw].fill(mean(rows.0, rows.1));
+        second[new.junction_bias] = mean(biases.0, biases.1);
+        let rate_parts = self.rate_parts.map(|rp| {
+            let mut octaves = rp.octaves;
+            octaves[JUNCTION_PART] = 0;
+            RateParts { octaves, ..rp }
+        });
+        let own_rates = self.own_rates.as_ref().map(|own| from.iter().map(|o| o.map_or(self.rate_bits, |i| own[i])).collect());
+        Ok(Self { field, first, second, rate_bits: self.rate_bits, drawn: self.drawn, laps: self.laps, held: None, read_held: self.read_held, rate_parts, own_rates, last: None, pass: self.pass.clone() })
+    }
+
     /// [definition; theory, November 12 (the record of the opening's room, §4 item 4)] **The learner with `fresh` more letters**
     /// ([`Field::lettered`]), founded at a passage's crossing. No key is read and the draws do not move. Every standing entry keeps its
     /// moments and its remainder (the open rows' with them, at their new place); a fresh entry's first moment opens at zero and its second
@@ -7517,7 +7814,7 @@ impl FieldLearner {
             // The parts the field has, in the line's order ([`written_parts`]): nineteen without carry circles, twenty-two with them, and the
             // triad's one more where the field has triads.
             let d = &self.field.declaration;
-            let parts = self.rate_parts.map_or(String::new(), |rp| format!("parts {} {}\n", rp.contacts_before, written_parts(d.carry, d.triads, d.opening).iter().map(|&p| rp.octaves[p].to_string()).collect::<Vec<_>>().join(" ")));
+            let parts = self.rate_parts.map_or(String::new(), |rp| format!("parts {} {}\n", rp.contacts_before, written_parts(d.carry, d.triads, d.opening, d.junction).iter().map(|&p| rp.octaves[p].to_string()).collect::<Vec<_>>().join(" ")));
             // [definition; theory, November 12 00:20] Each entry's own rate, a trailing line after the parts' (`rates r₀ … r_(n−1)`).
             let own = self.own_rates.as_ref().map_or(String::new(), |r| format!("rates {}\n", r.iter().map(u32::to_string).collect::<Vec<_>>().join(" ")));
             // [definition; theory, November 12] The pass's place over a store, the text's last line and only where present ([`StorePass`]).
@@ -7562,14 +7859,18 @@ impl FieldLearner {
                 // ones it lacks at the old rate.
                 // [theory, November 13, P60 item 1f] An opening field's line without the opening's octave (the line before its founding) reads with
                 // it at the old rate, as a triad field's line without the triad's.
-                let (carry, triads, opening) = (field.declaration.carry, field.declaration.triads, field.declaration.opening);
-                let order = written_parts(carry, triads, opening);
-                let unopened = written_parts(carry, triads, false);
-                let before = written_parts(carry, 0, false);
+                // [theory, November 13, the junction record §7] So does a field with the return whose line lacks the junction's octave.
+                let (carry, triads, opening, junction) = (field.declaration.carry, field.declaration.triads, field.declaration.opening, field.declaration.junction);
+                let order = written_parts(carry, triads, opening, junction);
+                let unjoined = written_parts(carry, triads, opening, false);
+                let unopened = written_parts(carry, triads, false, false);
+                let before = written_parts(carry, 0, false, false);
                 let older: Vec<usize> = if carry > 0 { (0..PLAIN_PARTS).chain(CIRCLE_PARTS).collect() } else { (0..PLAIN_PARTS).collect() };
                 let n = v.len().saturating_sub(1);
                 let slots: Vec<usize> = if n == order.len() {
                     order
+                } else if junction && n == unjoined.len() {
+                    unjoined
                 } else if opening && n == unopened.len() {
                     unopened
                 } else if triads > 0 && n == before.len() {

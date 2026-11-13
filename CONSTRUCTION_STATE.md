@@ -511,6 +511,14 @@ repository was reset on September 24; the pre-reset tree is
     flatten (G149): the built tick takes a junction's mean without its return, so no branch reflects
     and nothing rings; the junction's return in the tick is the next law, and a turned head's reach
     on its own clock (G150: its clock carries part of the influence, the place count part) after it.
+    The fourth lap fell 0.0141 and 0.0098 more (1.0971 and 2.4179 at its mean). The return is built
+    on the host (`FieldDeclaration::junction`), founded at the matched load so every face is kept,
+    and refused on the card until its card realization passes parity. Read before the kernels: a
+    written row's own echo is small (G151, median B 0.00068, most of it in the second turned head,
+    which every head hears, G154). The founding covector lowers the return's chart (G152: −0.034 nats
+    a place per unit of ℓ, both masks), so the deposit's return is a hold, the path slowed toward
+    its state two ticks back; most places reach their least code before the trained depth (G153).
+    The card realization is next, with its lap guessed for a falling ℓ.
   - The open places need the written rows' ticks (November 13, P62, G140 scored; the design
     record §4.8). Read zero-shot on the line's latest lap mean with a written row held at its
     opening: the open rows alone code 3.29 nats a place worse at held one-place masks and 1.90

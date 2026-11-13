@@ -1445,6 +1445,11 @@ impl<'c> CardField<'c> {
         if d.modes > MAX_MODES {
             return Err(TowerError::Refused("the card's rows carry at most 16 modes a head"));
         }
+        // [theory, November 13, the junction record §7] The tick's return is built on the host, its card realization owed: a field with it is refused
+        // here, so no card pass reads it as the built tick.
+        if d.junction {
+            return Err(TowerError::Refused("the junction's return has no card realization yet (the host's is the reference)"));
+        }
         let slots = crowd_slots(d.reach);
         if slots > MAX_CROWD_SLOTS {
             return Err(TowerError::Refused("the declaration's reach holds more crowds than a warp keeps (32)"));
@@ -4106,7 +4111,7 @@ mod tests {
     use super::*;
 
     fn declaration(width: usize, heads: usize, contacts: usize) -> FieldDeclaration {
-        FieldDeclaration { alphabet: 122, width, heads, modes: 8, still: 2, contacts, ticks: 2, frames: 4, reach: 2221, lanes: 1, depth: 0, carry: 0, triads: 0, opening: false }
+        FieldDeclaration { alphabet: 122, width, heads, modes: 8, still: 2, contacts, ticks: 2, frames: 4, reach: 2221, lanes: 1, depth: 0, carry: 0, triads: 0, opening: false, junction: false }
     }
 
     /// [measurement; theory, November 10 20:34] **The card's footprint by growth route** (host arithmetic, no card read): from the
@@ -4120,7 +4125,7 @@ mod tests {
     #[test]
     #[ignore]
     fn the_card_footprint_by_growth_route() {
-        let base = FieldDeclaration { alphabet: 100, width: 64, heads: 4, modes: 8, still: 2, contacts: 64, ticks: 4, frames: 4, reach: 3771, lanes: 2, depth: 0, carry: 0, triads: 0, opening: false };
+        let base = FieldDeclaration { alphabet: 100, width: 64, heads: 4, modes: 8, still: 2, contacts: 64, ticks: 4, frames: 4, reach: 3771, lanes: 2, depth: 0, carry: 0, triads: 0, opening: false, junction: false };
         let describe = |name: &str, d: FieldDeclaration| {
             let draws = 4 * d.founding_draws();
             let field = holonics::hnn::tower::field::Field::found(d, &vec![7u8; draws]).expect("founded");
