@@ -352,9 +352,16 @@ repository was reset on September 24; the pre-reset tree is
     reader it runs free. At a mean epoch of 6 places it keeps 0.212 of its openings against a
     chance of 0.171 under a passage begun 37 samples later and 0.236 against 0.170 under the
     shift of rung, where its control keeps 0.952, because no place of 811,614 passes the section
-    and nothing pins an opening. No level is founded on it for sound. Owed before a value chart
-    is built: the ruler of a ring's reading that is dark while its band continues (G135), and
-    the image's ruler.
+    and nothing pins an opening. No level is founded on it for sound. A ring read once a turn
+    on a stride was read next (G135; rings turning once in 8 to 128 samples, a place's symbol
+    its boost in octaves and its turn in quarter turns): speech is not dark on it (the ring
+    continues at 0.05 to 0.13 of places), and a place counted from the passage's first sample is
+    the raster's own, its symbol the same at 0.24 to 0.27 of places under the moved start. The
+    two readings share one law (agent-inferred): the cut keeps its sites as far as a place's
+    symbol is the same under the change, to the power of the epoch's length (0.96 the same keeps
+    0.63 at six places, 0.56 keeps 0.06). Owed before a value chart is built: the ruler of a
+    ring read at every sample with its own section arrivals as its places (G136), and the
+    image's ruler.
   - Every extent of the built declaration is given the part it sizes, how it was reached and what
     sizes it (the same record, §5), with ten findings by file and line and the build that closes
     each. The departures that stand: the face's 64 coordinates are two lanes of 32, the second a

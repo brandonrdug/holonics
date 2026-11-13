@@ -438,6 +438,30 @@ face).** The passage is 481 seconds of public speech (73 utterances of one Libri
   leading one, which this reader charges at every place and no reader of its kind predicts.
   So the cut is a law of a reader's news, and its sites stand only as far as that reader is
   dark at most places and bright at a few (receipts `band_cut.py`, `band_code_spread.py`).
+- *A ring read once a turn is not dark on speech, and a place counted from the first sample
+  is the raster's own (G135).* Rings 3 to 7 (ring `s` turning once in `2^s` samples, 2 kHz to
+  125 Hz), a place one turn, at a reach of one turn and of four. A place's symbol is its ratio
+  to the place before at two declared widths, the boost in octaves and the turn in quarter
+  turns against the free ring's (the dynamic section's lift, `hnn.dynamic-section-lift`), what
+  lies under the widths released. The ring continues at 0.05 of places at one turn and 0.13 at
+  four, and a reader of one place back codes a symbol at 2.7 to 2.8 nats of the 3.89 its width
+  holds. Under the start moved by 37 samples the symbol is the same at 0.24 to 0.27 of places,
+  where under the shift of rung, places meeting one to one, it is 0.62 to 0.66. The cut at a
+  mean epoch of 6 places keeps a lift of 0.03 under the moved start and 0.08 to 0.11 under the
+  shift of rung; places whose code alone passes the symbol's width are kept at a lift of 0.51
+  and 0.72 (one turn, the two places overlapping). The sum over rings is a more even drive than
+  any ring's (0.02 and 0.03).
+- *The cut keeps its sites as far as the symbols are the same, to the power of the epoch's
+  length.* [agent-inferred, from G135's rings] By ring at four turns under the shift of rung
+  the symbol is the same at 0.56, 0.69, 0.80, 0.89, 0.96 and the cut's lift at a mean epoch
+  of 6 is 0.06, 0.08, 0.16, 0.33, 0.63, where the sixth powers are 0.03, 0.10, 0.26, 0.48, 0.77.
+  This is §4.2's coalescence read from the other side: two readings agree from a shared
+  opening until their codes differ. A level's sites under a change therefore ask for a place's
+  symbol the same under it at about 0.98 for epochs of six places, and G133 is the same law met
+  with codes that differ at most places. A ring forgets its start within a few reaches, so its
+  state at a sample is the same under a start moved by whole samples; what moved was where the
+  stride read it. A stride counted from the passage's first sample is a privileged frame, the
+  fault §4.2 names in the odometer, met here in the place itself.
 
 Limits, each stated because the reading is narrow: one speaker; a ratio of two; a reader of a
 first step's bit length and sign, which cannot see pitch or formants, so the rows are shared at
@@ -449,9 +473,13 @@ has to come from a reading that is dark while the band continues and bright wher
 with what lies under a declared width released and accounted, never charged as news. The tree
 holds that reading since October 10 (atlas `hnn.ring-moment-keys`; the record of that day,
 §11: a ring's section word near-returns through most of a recording, 33,395 of 52,128 windows,
-at 0.44 of its spelled length, its departures kept as defects). Owed before a value chart is
-built: that reading's ruler on the same passage and the same four changes (G135); and the
-image's ruler (a stroke under a magnification the passage itself holds).
+at 0.44 of its spelled length, its departures kept as defects). Read once a turn on a stride
+it fails as above, so a sound's place is not a stride of any rung either: it is the ring's
+own section arrival (an epoch is the interval between a receiver's section arrivals), a time
+of the passage under any start. Owed before a value chart is built: the ruler of a ring read
+at every sample, its arrivals its places and its arrival word's cycle and defects its reader,
+on the same passage and changes (G136); and the image's ruler (a stroke under a magnification
+the passage itself holds).
 
 ## 9. Acceptance, the device line, and the order of work
 
