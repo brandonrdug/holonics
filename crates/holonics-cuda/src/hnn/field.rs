@@ -3044,7 +3044,9 @@ impl<'c> CardField<'c> {
             let took = timed(trial)?;
             let reps = ((f64::from(trial) * seconds / took.max(1e-9)).ceil() as u64).clamp(u64::from(trial), 1 << 20) as u32;
             let took = timed(reps)?;
-            out.push((kind, blocks, reps, took, u64::from(blocks) * 4 * u64::from(reps), u64::from(blocks) * 128 * u64::from(reps)));
+            // A loaded sample serves eight calls (`YARD_INNER`), save the atomics' kinds and the loads' (5, 6, 15).
+            let inner: u64 = if matches!(kind, 5 | 6 | 15) { 1 } else { 8 };
+            out.push((kind, blocks, reps, took, u64::from(blocks) * 4 * u64::from(reps) * inner, u64::from(blocks) * 128 * u64::from(reps) * inner));
         }
         Ok(out)
     }

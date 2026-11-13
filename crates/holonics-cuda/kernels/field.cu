@@ -6032,6 +6032,7 @@ extern "C" __global__ void field_ruler_take(unsigned long long *out) {
     }
 }
 
+#define YARD_INNER 8
 __device__ __forceinline__ uint32_t yard_sample_kind(uint32_t kind) {
     const uint32_t of[18] = {0, 1, 2, 3, 4, 5, 5, 6, 7, 8, 8, 9, 10, 11, 4, 4, 2, 3};
     return of[kind];
@@ -6052,8 +6053,13 @@ extern "C" __global__ void field_yard_helper(uint32_t kind, uint32_t reps, uint6
     for (uint32_t r = 0; r < reps; r++) {
         const uint64_t ix = (tid + (uint64_t)r * threads) % have;
         const int64_t *q = RULER_SAMPLE + ((uint64_t)sk * RULER_SAMPLES + ix) * RULER_SAMPLE_WORDS;
-        const wide a = (wide)(((uwide)(uint64_t)q[1] << 64) | (uwide)(uint64_t)q[0]);
+        const wide a0 = (wide)(((uwide)(uint64_t)q[1] << 64) | (uwide)(uint64_t)q[0]);
         const wide b = (wide)(((uwide)(uint64_t)q[3] << 64) | (uwide)(uint64_t)q[2]);
+        // A loaded sample serves YARD_INNER calls, its first operand moved by the call's index (so no call is hoisted), except the atomics' and the
+        // loads' own kinds, which take one.
+        const uint32_t inner = (kind == 5 || kind == 6 || kind == 15) ? 1u : YARD_INNER;
+        for (uint32_t c = 0; c < inner; c++) {
+        const wide a = a0 + (wide)c;
         wide out = 0;
         switch (kind) {
         case 0:
@@ -6080,7 +6086,7 @@ extern "C" __global__ void field_yard_helper(uint32_t kind, uint32_t reps, uint6
         case 7:
         case 8: {
             // The value's share is unsigned (`e`), the lock's covector signed (`ds`).
-            const wide x = kind == 7 ? (wide)(uint64_t)q[0] : (wide)q[0];
+            const wide x = (kind == 7 ? (wide)(uint64_t)q[0] : (wide)q[0]) + (wide)c;
             mul_fits(x, (wide)(((uwide)(uint64_t)q[2] << 64) | (uwide)(uint64_t)q[1]), &out);
             break;
         }
@@ -6092,21 +6098,21 @@ extern "C" __global__ void field_yard_helper(uint32_t kind, uint32_t reps, uint6
             break;
         case 9:
         case 10: {
-            const wide e = (wide)(((uwide)(uint64_t)q[2] << 64) | (uwide)(uint64_t)q[1]);
+            const wide e = (wide)(((uwide)(uint64_t)q[2] << 64) | (uwide)(uint64_t)q[1]) + (wide)c;
             const wide pi = (wide)(((uwide)(uint64_t)q[4] << 64) | (uwide)(uint64_t)q[3]);
-            const wide bt = rel(div_nearest(2 * pi, (wide)q[5]), FACE_BITS);
+            const wide bt = rel(div_nearest(2 * pi + (wide)c, (wide)q[5]), FACE_BITS);
             out = kind == 9 ? skin_back_dev(fw, bt, (wide)q[0], e) : bt;
             break;
         }
         case 13:
-            out = mul64_128(q[0], q[1]);
+            out = mul64_128(q[0] + (int64_t)c, q[1]);
             break;
         case 14:
             out = a * b;
             break;
         case 16:
         case 17: {
-            const Divisor dq = divisor_of((uint64_t)q[2]);
+            const Divisor dq = divisor_of((uint64_t)q[2] + c);
             out = (wide)(dq.v ^ dq.d ^ dq.s);
             break;
         }
@@ -6115,6 +6121,7 @@ extern "C" __global__ void field_yard_helper(uint32_t kind, uint32_t reps, uint6
             break;
         }
         acc ^= (uint64_t)out ^ (uint64_t)((uwide)out >> 64);
+        }
     }
     sink[tid] = acc;
 }
