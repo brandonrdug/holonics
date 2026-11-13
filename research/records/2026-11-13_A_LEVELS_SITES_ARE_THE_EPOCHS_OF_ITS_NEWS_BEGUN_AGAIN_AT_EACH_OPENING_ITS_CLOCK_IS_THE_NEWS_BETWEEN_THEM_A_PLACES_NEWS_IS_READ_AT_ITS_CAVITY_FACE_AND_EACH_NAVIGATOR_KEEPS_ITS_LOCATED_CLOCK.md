@@ -436,6 +436,15 @@ mean of each line's last 1,000 states, in nats a place:
 Rule applied: the comparison stays in the line, and the level's sites, clock and phase chart (§9)
 are ordered next with their guess, on `c_t` as built.
 
+*The opening's kernels* (G141, November 13; `g141_prefixes.txt` in the engine record's receipts).
+The cavity's far prefixes are formed in parallel, a thread a term and a warp's scan a mode, row and
+region, every bit kept: 2.73 ms of a profiled section from 10.07, and the line's section 7.2 ms
+nearer its control in one hold (277.3 ms against 235.9 on the same tree without the block, where it
+read 284.4). The opening still costs its line 41.5 ms a section, of which the pool's allocations about
+14 (a second prefix buffer of 448 MiB and the opening's forward buffers pass the batch's budget, so
+the largest kept buffers are freed every section) and the copies about 5; those are read next, by
+take site.
+
 ### 4.5 An epoch's face is its moment on the news phase
 
 The built restriction opens a packet through one chart of its six sites' reads in place order.
