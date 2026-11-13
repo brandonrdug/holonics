@@ -2820,3 +2820,26 @@ of one turn and 247,420 at four, rings 3 to 7, the 18 read utterances; figures a
   measured symbol (the opening stated on a bounded neighbourhood, with its section and its restart) and read on text against the
   cut before any chart of sound. For (iv) the passage word does not stand 0.12 over the ring word: a ratio off the ladder is carried
   by no single ring, and the chart across rings is derived next.
+
+G134 scored 2026-11-13T03:06Z (receipt p58_step6.txt with its generator on claude/carry-reads at 5f15b57ef; the build merged as PR #750, main
+8b34e48ce; reviewed at source: the pool's rule, the kernels' guards on open sites against the face path's three proofs, the narrow
+read's order of regions and what its early return skips, the learner's comparison against the old one with no held step and no port).
+  (a) The two takes: 0.048 ms a profiled section from 11.045 (the premise 10.9). MISSED below the range (0.1 to 2.0). The rule built
+      is not the one guessed: the face covector's block and the clock's skins, both 128 bits a word and never live together, had each
+      freed the other's kept buffer at every miss, so a plain take that the budget would pay for with a free is served by the least
+      kept buffer of its type at least its class (294 of the block's 300 takes in the profiled read).
+  (b) The spared zeroings: 5.325 of 6.526 ms (the premise 6.6). HELD (3.4 to 6.0). Twelve takes, each with its proof at the take.
+  (c) The faces' fetch and collection: 0.380 ms from 10.970 (the premise 12.4). MISSED below the range (0.5 to 4.0).
+  (d) The deposit on the host: 10.145 ms a section (the premise 11.1). Its arithmetic over the constitution's 117,478 entries 6.027
+      ms (the two steps 2.31 each, the moments 0.78, the stepped constitution 0.30, the grains 0.24, the rates 0.09): MISSED above
+      (0.3 to 3.0). Bare whole-layout copies 0.014 of it: MISSED below (0.35 to 0.85). The four first-order prices 1.13 ms, the
+      comparison and the code over the open sites 2.85.
+  (e) The step in one hold: 279.4 ms a section against controls of 306.1 and 308.1, 0.910 of them (spread 0.006). HELD (0.90 to 0.96).
+  Two parts held and four missed, (a) and (c) on the side of the repair.
+Rules applied. (d) as guessed: not met, so no seventh step removes whole-layout passes. (d) with the arithmetic over 6 ms: met at the
+rule's line by 0.027 ms, so the deposit's card realization is derived (the constitution resident on the card, parity against the
+host's bits) and ordered after the structural step. (e) over 0.96: not met.
+Reading [agent-inferred]. (d) missed because its premise was not read at source before the guess: the deposit's step was taken for
+copies of layouts, and it is two passes of a step's arithmetic at about 20 billionths of a second an entry. The section stands at 6.9
+times the bar of 40.7 ms, and the kernels hold 267.6 of a profiled section's 289.9 ms: what is left of the host is 10 ms of deposit
+and about 4 of takes and copies, so the rate is now the kernels' (G131's schedule read, then the structural step).
