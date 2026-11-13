@@ -1,0 +1,103 @@
+# P54 item 2, 2026-11-12 UTC: the contact family's arithmetic read from source at main 259bfe04c (kernels/field.cu), no run; contact_arithmetic.py.
+# Every line agent-inferred from source; the widths are the declarations' (and the releases' before them), never a reading. Numbers only.
+One line a product, quotient or release with its operands, where each is loaded from, the width its declaration proves, the bound those widths
+and the releases before it prove on the result, the word it is formed in today (from the shipped PTX: a 128-bit product of two sign-extended
+64-bit words is lowered to a full 128 by 128 sequence, three mul.lo.s64 and one mul.hi.u64), the narrowest form its bound proves (32x32>64,
+64x64 low, 64x64 high, 64x64>128, 128), and its count a pair (P), a row (R) or a crowd slot (C). A line whose bound is only observed (no
+declaration proves its operands' widths) stays wide and names the declaration that would prove it.
+
+Declared widths (proved, not observed):
+  D, a skin: <= 2^30 (31 bits unsigned; step 1).          w, a unit word (qf, qf32) or probe (pq, pq32) at unit power: |w| <= sqrt(2n) 2^16 = 2^18
+  v, a framed value (vf): fit64, < 2^63.                    (ratio_to_power over the head's 2n reals; field_unit fits it to 32 bits).
+  dy, the current's covector (dyh): fit64, < 2^63.          p, a share (e) or a crowd's share (ce): <= 2^63 (a mass fraction on 2^-63).
+  ds, a contact covector: |ds| < 2^dsbits = 2^52 (contact_return_bits: 126 - 60 - 2 - reach_bits(3771) = 52; refused past it).
+  sb, a lock at unit gain: fit64.  T, a temperature: <= 2^7 on 2^-24, 31 bits.  sw, a prefix of unit words: <= 2^12 x 2^18 = 2^30 (reach < 2^12).
+  sv, a prefix of values: < 2^63 x 2^12 = 2^75.  count, a crowd's: < 2^12.  b, a turn rate 2 pi/n on 2^-30: < 2^33.
+
+LINE entry=field_contact_rows unit=P count=16 today=64x64>128 narrowest=64x64>128 bound_bits=94 proved=yes product='carry_d(D, v): the source value carried by the skin (paced)' operands='D: skin store; v: vf row'
+LINE entry=field_contact_rows unit=P count=16 today=128 narrowest=64x64>128 bound_bits=126 proved=yes product="dy[x] * v' (pair_dp8's covector, both heads)" operands="dy: dyh row; v': carried value"
+LINE entry=field_contact_rows unit=P count=1 today=128 narrowest=128 bound_bits=- proved=observed_only product="p * dp (the weighted mean's term)" operands='p: e; dp: the 16-term sum'
+LINE entry=field_contact_rows unit=P count=1 today=128 narrowest=128 bound_bits=- proved=observed_only product='p * (dp - mean) (compare)' operands='p: e; dp: dpb'
+LINE entry=field_contact_rows unit=P count=1 today=128 narrowest=128 bound_bits=- proved=observed_only product='ln2 * release(., 63) (compare)' operands='ln2: constant; the release'
+LINE entry=field_contact_rows unit=P count=1 today=128 narrowest=128 bound_bits=- proved=observed_only product="dz * sb (the temperature's covector)" operands='dz; sb: sb[i][j]'
+LINE entry=field_contact_rows unit=P count=1 today=128 narrowest=128 bound_bits=- proved=observed_only product='T * dz (gained ds)' operands='T: temper; dz'
+LINE entry=field_contact_rows unit=P count=16 today=128 narrowest=32x32>64 bound_bits=49 proved=yes product='D * w (the probe role, regrouped: (ds D) w = ds (D w))' operands='D: skin store or 1; w: qf row'
+LINE entry=field_contact_rows unit=P count=16 today=128 narrowest=64x64>128 bound_bits=101 proved=yes product='ds * (D w) (the probe role)' operands='ds: dss (staged); D w'
+LINE entry=field_contact_rows unit=C count=16 today=128 narrowest=128 bound_bits=106 proved=yes product="D * V (a crowd's carried values, paced)" operands='D: crowd skin; V: sv prefix difference'
+LINE entry=field_contact_rows unit=C count=16 today=128 narrowest=128 bound_bits=- proved=observed_only product="dy * V' (a crowd's covector)" operands="dy; V'"
+LINE entry=field_contact_rows unit=C count=1 today=128 narrowest=128 bound_bits=- proved=observed_only product="div_nearest_by(., count) (a crowd's mean)" operands='the sum; the read divisor'
+LINE entry=field_contact_rows unit=C count=1 today=128 narrowest=128 bound_bits=- proved=observed_only product='ce * dpc' operands='ce; dpc'
+LINE entry=field_contact_rows unit=C count=2 today=128 narrowest=128 bound_bits=- proved=observed_only product="p * (dp - mean), ln2 * . (a crowd's compare)" operands='ce; dpc'
+LINE entry=field_contact_rows unit=C count=16 today=128 narrowest=32x32>64 bound_bits=49 proved=yes product="w * W (crowd_base's pairing, a0 b0 + a1 b1)" operands='w: pq row; W: sw prefix difference'
+LINE entry=field_contact_rows unit=C count=8 today=128 narrowest=32x32>64 bound_bits=44 proved=yes product='2 count D (crowd_base)' operands='count; D: crowd skin'
+LINE entry=field_contact_rows unit=C count=8 today=128 narrowest=64x64>128 bound_bits=94 proved=yes product='pairing * (2 count D)' operands='pairing; 2 count D'
+LINE entry=field_contact_rows unit=C count=8 today=128 narrowest=shift bound_bits=124 proved=yes product='pairing * 2^g (a shift)' operands='pairing; the grain'
+LINE entry=field_contact_rows unit=C count=16 today=128 narrowest=32x32>64 bound_bits=62 proved=yes product="W * W (crowd_base's power)" operands='W'
+LINE entry=field_contact_rows unit=C count=8 today=128 narrowest=32x32>64 bound_bits=60 proved=yes product='D * D (crowd_base)' operands='D'
+LINE entry=field_contact_rows unit=C count=8 today=128 narrowest=64x64>128 bound_bits=123 proved=yes product='power * D^2 (crowd_base)' operands='power; D^2'
+LINE entry=field_contact_rows unit=C count=1 today=128 narrowest=128 bound_bits=- proved=observed_only product='div_nearest(s, count^2 2^bits) (crowd_base)' operands='s; count'
+LINE entry=field_contact_rows unit=C count=2 today=128 narrowest=128 bound_bits=- proved=observed_only product="dz * cs, T * dz (a crowd's temperature and gain)" operands='dz; cs; T'
+LINE entry=field_contact_rows unit=C count=16 today=128 narrowest=32x32>64 bound_bits=61 proved=yes product="D * W (a crowd's probe role, regrouped)" operands='D; W: sw'
+LINE entry=field_contact_rows unit=C count=16 today=128 narrowest=64x64>128 bound_bits=113 proved=yes product="ds * (D W) (a crowd's probe role)" operands='dsk; D W'
+LINE entry=field_contact_rows unit=C count=16 today=128 narrowest=128 bound_bits=- proved=observed_only product="div_nearest_by(., count) (a crowd's probe role)" operands='the product; the read divisor'
+LINE entry=field_contact_rows unit=C count=16 today=128 narrowest=32x32>64 bound_bits=49 proved=yes product="D * w (the key's bracket)" operands='D; w: pq'
+LINE entry=field_contact_rows unit=C count=16 today=128 narrowest=64x64 low bound_bits=61 proved=yes product="(D w) * count (the key's bracket)" operands='D w; count'
+LINE entry=field_contact_rows unit=C count=16 today=128 narrowest=64x64>128 bound_bits=91 proved=yes product="D * D * W (the key's bracket)" operands='D; W'
+LINE entry=field_contact_rows unit=C count=16 today=128 narrowest=128 bound_bits=144 proved=yes product='ds * bracket (mul_fits, the key)' operands='dsk; bracket (<= 2^92)'
+LINE entry=field_contact_rows unit=C count=16 today=128 narrowest=128 bound_bits=- proved=observed_only product='div_nearest_by(prod, count^2)' operands='prod; the read divisor'
+LINE entry=field_contact_rows unit=C count=16 today=128 narrowest=64x64>128 bound_bits=93 proved=yes product='carried_ij(D, dy): D * dy' operands='D; dy'
+LINE entry=field_contact_rows unit=C count=16 today=128 narrowest=64x64>128 bound_bits=126 proved=yes product="ce * carried (the values' share)" operands='ce; carried'
+LINE entry=field_contact_rows unit=C count=16 today=128 narrowest=128 bound_bits=- proved=observed_only product="div_nearest_by(., count) (the values' share)" operands='the product; the read divisor'
+LINE entry=field_pace_skin_back unit=P count=16 today=128 narrowest=64x64>128 bound_bits=126 proved=yes product='dy * v (inner, two a mode)' operands='dy: dyh; v: vf row'
+LINE entry=field_pace_skin_back unit=P count=8 today=128 narrowest=128 bound_bits=- proved=observed_only product='e * inner (mul_fits)' operands='p: e; inner (< 2^127)'
+LINE entry=field_pace_skin_back unit=P count=16 today=128 narrowest=32x32>64 bound_bits=36 proved=yes product="w_i * k (the lock's pairing, two a mode)" operands='w_i: pq row; k: qf row'
+LINE entry=field_pace_skin_back unit=P count=16 today=128 narrowest=32x32>64 bound_bits=36 proved=yes product="k * k (the lock's power, two a mode)" operands='k: qf row'
+LINE entry=field_pace_skin_back unit=P count=8 today=128 narrowest=64x64>128 bound_bits=68 proved=yes product='D * |k|^2 (the bracket)' operands='D: skin store; |k|^2 (< 2^38)'
+LINE entry=field_pace_skin_back unit=P count=8 today=128 narrowest=128 bound_bits=121 proved=yes product='ds * bracket (mul_fits)' operands='ds: ds[i][j]; bracket (< 2^69)'
+LINE entry=field_pace_skin_back unit=P count=8 today=128 narrowest=128 bound_bits=- proved=observed_only product='E * D (skin_back_dev)' operands='E = value + lock; D'
+LINE entry=field_pace_skin_back unit=P count=8 today=128 narrowest=128 bound_bits=- proved=observed_only product='release(E D, 30) * b (skin_back_dev)' operands='the release; b'
+LINE entry=field_pace_skin_back unit=C count=16 today=128 narrowest=128 bound_bits=138 proved=observed_only product="dy * V (a crowd's value, two a mode)" operands='dy; V: sv'
+LINE entry=field_pace_skin_back unit=C count=8 today=128 narrowest=128 bound_bits=- proved=observed_only product='ce * (x + y) (mul_fits)' operands='ce; the sum'
+LINE entry=field_pace_skin_back unit=C count=8 today=128 narrowest=128 bound_bits=- proved=observed_only product='div_nearest(., count)' operands='the value; count'
+LINE entry=field_pace_skin_back unit=C count=16 today=128 narrowest=32x32>64 bound_bits=49 proved=yes product="w * W (the crowd's pairing)" operands='w: pq; W: sw'
+LINE entry=field_pace_skin_back unit=C count=8 today=128 narrowest=64x64 low bound_bits=63 proved=yes product='2 count * pairing' operands='count; pairing'
+LINE entry=field_pace_skin_back unit=C count=16 today=128 narrowest=32x32>64 bound_bits=62 proved=yes product="W * W (the crowd's power)" operands='W'
+LINE entry=field_pace_skin_back unit=C count=8 today=128 narrowest=64x64>128 bound_bits=93 proved=yes product='D * |W|^2' operands='D; |W|^2'
+LINE entry=field_pace_skin_back unit=C count=8 today=128 narrowest=128 bound_bits=- proved=observed_only product='div_nearest(., count^2)' operands='the bracket; count'
+LINE entry=field_pace_skin_back unit=C count=8 today=128 narrowest=128 bound_bits=147 proved=yes product='cds * bracket (mul_fits)' operands='cds (< 2^52); bracket'
+LINE entry=field_pace_skin_back unit=C count=16 today=128 narrowest=128 bound_bits=- proved=observed_only product="skin_back_dev's two products" operands='E; D; b'
+LINE entry=field_contact_l5 unit=P count=1 today=64x64>128 narrowest=shift bound_bits=124 proved=yes product='coef_of(face, 2^62): face * multiplier' operands="face: the exponential's face (<= 2^62); 2^62"
+LINE entry=field_contact_l5 unit=P count=16 today=64x64>128 narrowest=64x64>128 bound_bits=94 proved=yes product='carry_d(D, v) (paced)' operands='D: skin store; v: vf'
+LINE entry=field_contact_l5 unit=P count=32 today=64x64>128 narrowest=64x64>128 bound_bits=127 proved=yes product="(face << b) * |v| (the window's two limbs)" operands='the staged face (two limbs); |v| (< 2^63)'
+LINE entry=field_contact_l5 unit=R count=16 today=128 narrowest=128 bound_bits=- proved=observed_only product="rowdiv_nearest (the row's division, a lane an entry)" operands="N; the row's divisor"
+LINE entry=field_contact_l5 unit=R count=16 today=128 narrowest=64x64>128 bound_bits=94 proved=yes product="frame_of * y (the current's frame)" operands='U: the frame; y'
+LINE entry=field_contact_l5 unit=P count=1 today=128 narrowest=128 bound_bits=- proved=observed_only product='rowdiv_nearest (the stored share)' operands="the share's dividend; the divisor"
+LINE entry=field_contact_columns unit=P count=16 today=128 narrowest=32x32>64 bound_bits=49 proved=yes product="D * w_i (the key's bracket)" operands='D: skin store; w_i: pq row'
+LINE entry=field_contact_columns unit=P count=16 today=128 narrowest=64x64>128 bound_bits=79 proved=yes product="D * D * w_j (the key's bracket)" operands='D; w_j: qf row'
+LINE entry=field_contact_columns unit=P count=16 today=128 narrowest=128 bound_bits=133 proved=yes product='ds * bracket (the key)' operands='ds: ds[i][j]; bracket (< 2^80)'
+LINE entry=field_contact_columns unit=P count=16 today=128 narrowest=64x64>128 bound_bits=93 proved=yes product='carried_ij(D, dy): D * dy' operands='D; dy: dyh row'
+LINE entry=field_contact_columns unit=P count=16 today=128 narrowest=64x64>128 bound_bits=126 proved=yes product="p * carried (the value's return)" operands='p: e; carried (< 2^63)'
+LINE entry=field_exposure unit=P count=16 today=64x64 low narrowest=32x32>64 bound_bits=36 proved=yes product="a * b (the lock's pairing, 32-bit words, two a mode)" operands='a: pq32; b: qf32 row'
+LINE entry=field_exposure unit=P count=16 today=64x64 low narrowest=32x32>64 bound_bits=36 proved=yes product="b * b (the lock's power)" operands='b: qf32 row'
+LINE entry=field_exposure unit=P count=8 today=128 narrowest=64x64>128 bound_bits=69 proved=yes product='pairing * 2D' operands='pairing (< 2^38); D'
+LINE entry=field_exposure unit=P count=8 today=64x64 low narrowest=32x32>64 bound_bits=60 proved=yes product='D * D' operands='D'
+LINE entry=field_exposure unit=P count=8 today=128 narrowest=64x64>128 bound_bits=98 proved=yes product='power * D^2' operands='power (< 2^38); D^2'
+LINE entry=field_exposure unit=P count=1 today=128 narrowest=64x64>128 bound_bits=94 proved=yes product='T * S (scored)' operands='T: temper (31 bits); S: the lock at unit gain (fit64)'
+TOTAL entry=field_contact_rows unit=P products=69 narrowed_by_proof=48 share=0.696 today={'64x64>128': 16, '128': 53} after={'64x64>128': 48, '128': 5, '32x32>64': 16}
+TOTAL entry=field_contact_rows unit=C products=287 narrowed_by_proof=184 share=0.641 today={'128': 287} after={'128': 103, '32x32>64': 80, '64x64>128': 80, 'shift': 8, '64x64 low': 16}
+TOTAL entry=field_pace_skin_back unit=P products=88 narrowed_by_proof=56 share=0.636 today={'128': 88} after={'64x64>128': 24, '128': 32, '32x32>64': 32}
+TOTAL entry=field_pace_skin_back unit=C products=112 narrowed_by_proof=48 share=0.429 today={'128': 112} after={'128': 64, '32x32>64': 32, '64x64 low': 8, '64x64>128': 8}
+TOTAL entry=field_contact_l5 unit=P products=50 narrowed_by_proof=1 share=0.020 today={'64x64>128': 49, '128': 1} after={'shift': 1, '64x64>128': 48, '128': 1}
+TOTAL entry=field_contact_l5 unit=R products=32 narrowed_by_proof=16 share=0.500 today={'128': 32} after={'128': 16, '64x64>128': 16}
+TOTAL entry=field_contact_columns unit=P products=80 narrowed_by_proof=64 share=0.800 today={'128': 80} after={'32x32>64': 16, '64x64>128': 48, '128': 16}
+TOTAL entry=field_exposure unit=P products=57 narrowed_by_proof=57 share=1.000 today={'64x64 low': 40, '128': 17} after={'32x32>64': 40, '64x64>128': 17}
+UNITS pairs_a_row_still=75.8 pairs_a_row_paced=64.2 crowd_slots_a_row=7.18
+ROW entry=field_contact_rows head=still products_a_row=5962 narrowed_by_proof=4958 share=0.832 today={128: 5962} after={128: 1003, 32x32>64: 1787, 64x64 low: 115, 64x64>128: 2999, shift: 57}
+ROW entry=field_contact_rows head=paced products_a_row=6489 narrowed_by_proof=4402 share=0.678 today={128: 5462, 64x64>128: 1027} after={128: 1060, 32x32>64: 1601, 64x64 low: 115, 64x64>128: 3655, shift: 57}
+ROW entry=field_pace_skin_back head=paced products_a_row=6453 narrowed_by_proof=3939 share=0.610 today={128: 6453} after={128: 2513, 32x32>64: 2284, 64x64 low: 57, 64x64>128: 1598}
+ROW entry=field_contact_l5 head=still products_a_row=2609 narrowed_by_proof=92 share=0.035 today={128: 108, 64x64>128: 2501} after={128: 92, 64x64>128: 2441, shift: 76}
+ROW entry=field_contact_l5 head=paced products_a_row=3241 narrowed_by_proof=80 share=0.025 today={128: 96, 64x64>128: 3145} after={128: 80, 64x64>128: 3097, shift: 64}
+ROW entry=field_contact_columns head=still products_a_row=6063 narrowed_by_proof=4850 share=0.800 today={128: 6063} after={128: 1213, 32x32>64: 1213, 64x64>128: 3638}
+ROW entry=field_contact_columns head=paced products_a_row=5135 narrowed_by_proof=4108 share=0.800 today={128: 5135} after={128: 1027, 32x32>64: 1027, 64x64>128: 3081}
+ROW entry=field_exposure head=still products_a_row=4320 narrowed_by_proof=4320 share=1.000 today={128: 1288, 64x64 low: 3031} after={32x32>64: 3031, 64x64>128: 1288}
+ROW entry=field_exposure head=paced products_a_row=3659 narrowed_by_proof=3659 share=1.000 today={128: 1091, 64x64 low: 2568} after={32x32>64: 2568, 64x64>128: 1091}

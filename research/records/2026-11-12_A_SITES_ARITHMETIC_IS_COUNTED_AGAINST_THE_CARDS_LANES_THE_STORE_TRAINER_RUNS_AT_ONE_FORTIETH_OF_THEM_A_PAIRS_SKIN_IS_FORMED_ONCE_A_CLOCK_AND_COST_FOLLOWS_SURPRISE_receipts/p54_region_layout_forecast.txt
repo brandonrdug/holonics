@@ -1,0 +1,26 @@
+# P54 item 3, 2026-11-12 UTC: layout 4 (a region resident for its block), a forecast from source at main 259bfe04c (no build), on step 3's profiled read
+# and the census of its 100 sections; region_layout_forecast.py beside pair_layout_forecast.py. Every figure agent-inferred from source. Numbers only.
+REGIONS count=19496 sections=100 (every clock: a region's sites are its own at each of the 4 ticks)
+(a) SITES_A_REGION q50,q90,q99,max=[151, 477, 746, 1006]
+(a) DENSE_PAIRS_A_REGION q50,q90,q99,max=[22801, 227529, 556516, 1012036]  SUPPORT_STRIDE_ENTRIES_A_REGION q50,q90,q99,max=[13635, 170970, 427520, 988898]
+(a) MET_PAIRS_A_REGION_BY_CLOCK owed (the census holds no tick's classes; the profiled read's met pairs a tick are 4,566,615,773 over 4 ticks and 4 heads)
+(b) ROWS choice=vf width=today octets_a_site_a_head=128 region_rows_octets q50,q90,q99,max=[19328, 61056, 95488, 128768] fit_with_the_entrys_own_20128_in_102400 regions=0.976 support_entries=0.823
+(b) ROWS choice=vf width=proved octets_a_site_a_head=126 region_rows_octets q50,q90,q99,max=[19026, 60102, 93996, 126756] fit_with_the_entrys_own_20128_in_102400 regions=0.978 support_entries=0.834
+(b) ROWS choice=vf_qf width=today octets_a_site_a_head=256 region_rows_octets q50,q90,q99,max=[38656, 122112, 190976, 257536] fit_with_the_entrys_own_20128_in_102400 regions=0.752 support_entries=0.228
+(b) ROWS choice=vf_qf width=proved octets_a_site_a_head=164 region_rows_octets q50,q90,q99,max=[24764, 78228, 122344, 164984] fit_with_the_entrys_own_20128_in_102400 regions=0.921 support_entries=0.606
+(b) ROWS choice=all_five width=today octets_a_site_a_head=512 region_rows_octets q50,q90,q99,max=[77312, 244224, 381952, 515072] fit_with_the_entrys_own_20128_in_102400 regions=0.516 support_entries=0.051
+(b) ROWS choice=all_five width=proved octets_a_site_a_head=278 region_rows_octets q50,q90,q99,max=[41978, 132606, 207388, 279668] fit_with_the_entrys_own_20128_in_102400 regions=0.722 support_entries=0.193
+(b) SHARED driver MAX_SHARED_MEMORY_PER_MULTIPROCESSOR=102400 MAX_SHARED_MEMORY_PER_BLOCK=49152 field_contact_rows_own=20128 field_yard_rows_own=10912
+(d) FLOOR layout=4 forward_rows_GB=16.7 return_rows_GB=33.4 outputs_GB=33.4 records_GB=353.2 clock_GB=6.5 family_ms=774
+(d) FLOOR beside: layout 1 3,733 ms, layout 2 2,754 ms, today 12,932 ms (p53_pair_layout_forecast.txt), the read's 100 sections
+(c) NOT_FITTING choice=vf width=today support_share=0.177 met_pairs=809080887 copy_octets=103562353596 floor_ms=362 (written and read once, in order)
+(c) NOT_FITTING choice=vf width=proved support_share=0.166 met_pairs=756156352 copy_octets=95275700311 floor_ms=333 (written and read once, in order)
+(c) NOT_FITTING choice=vf_qf width=today support_share=0.772 met_pairs=3524120824 copy_octets=902174931066 floor_ms=3152 (written and read once, in order)
+(c) NOT_FITTING choice=vf_qf width=proved support_share=0.394 met_pairs=1798755909 copy_octets=294995969088 floor_ms=1031 (written and read once, in order)
+(c) NOT_FITTING choice=all_five width=today support_share=0.949 met_pairs=4331781926 copy_octets=2217872346224 floor_ms=7748 (written and read once, in order)
+(c) NOT_FITTING choice=all_five width=proved support_share=0.807 met_pairs=3684290414 copy_octets=1024232735075 floor_ms=3578 (written and read once, in order)
+(e) LAUNCHES today 509 a section, the family's 80 (exposure 4, l5/l6 4, rows 16, columns 16, skin back 8, spread 16, skin fill 8, sums 4, classes 4): 0.157
+(e) LAUNCHES layout 4: the forward one a tick (4) and the return one a tick (4), with sums and classes in the forward's block: 8 a section, 0.016 of 509
+(f) DEPENDENCY forward: the contact's carrier (its limbs) is chosen by the host from the batch's widest row (tick.bits[1], an atomicMax over every region) between the exposure and the contact: one launch needs the carrier chosen per region on the card (any carrier at least the row's keeps the bits)
+(f) DEPENDENCY return: the temperature's covector (gcov, an atomic into the material over every region) stays a global atomic; the skin's return gsig and the difference arrays cv, cw, the crowds' prefix rows sw, sv, sc and the probers' lists stay inside the region
+(f) DEPENDENCY across ticks: a tick's blank clock reads the faces of every head after the site maps, outside the family, so a tick keeps the maps' launches between its forward and the next tick's
