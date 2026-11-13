@@ -311,7 +311,18 @@ repository was reset on September 24; the pre-reset tree is
     section's 289.9 ms, so the rate is the kernels'. The next repairs are of the section's structure
     (agent-inferred): the contact family as one launch a tick each way on a region resident in
     its block, the site-local families fused the same way, and the host's part beside the
-    card's, each with its guess fixed before its build.
+    card's, each with its guess fixed before its build. The schedule of one section was then
+    read (G131, PR #752: 218 regions, 41,462 sites, 510 launches, the kernels 267.4 ms): the
+    contact family holds 115.6 ms where the octets its law moves give a floor of 4.67, and no
+    entry of it holds more than 30.4. Its forward entry's five limbs are its law's declared
+    widths (a row's bits less its bound, 225 and its spread), so no layout reaches them
+    (agent-inferred, from the source). What each mechanism of a layout removes from each
+    entry (a region's source rows resident, a pair's words in walk order, the crowds'
+    reductions as plain stores, the columns from a record in column order) is read on copies
+    in one hold before any rewrite (G138, fixed November 13, the order P59): a product of
+    their ratios under 60 ms builds the layout whole, 60 to 90 builds only the mechanisms
+    that remove 5 ms or more, and over 90 leaves the family's form and takes its multiple by
+    law (fewer pair-terms a site, the contact's declared widths).
   - The level above is designed on the news, and three count rulers fixed its choices
     (November 13; [the design record](research/records/2026-11-13_A_LEVELS_SITES_ARE_THE_EPOCHS_OF_ITS_NEWS_BEGUN_AGAIN_AT_EACH_OPENING_ITS_CLOCK_IS_THE_NEWS_BETWEEN_THEM_A_PLACES_NEWS_IS_READ_AT_ITS_CAVITY_FACE_AND_EACH_NAVIGATOR_KEEPS_ITS_LOCATED_CLOCK.md)). A level has two things the
     record of the symbol's length ran together: its places (where a receiver's section is
@@ -407,6 +418,26 @@ repository was reset on September 24; the pre-reset tree is
     that winds), the chart across rings (a ring's turn located by its drive), the count of
     isolations on the machine's own news for a second level's section, and the image's ruler
     read by the same program.
+  - A place's opening already holds news of it, and the opening is given a comparison of its
+    own (November 13, G132; the design record §4.4a; the store line's mean of states, 100,508
+    held one-place masks in 514 stretches over five slices, a face fitted at each stage by a
+    host ruler and read on 15,686 places). Pooled, the fitted face codes a place's written
+    class at 2.502 nats at the opening, 1.933, 1.543 and 1.359 after ticks one to three and
+    1.313 after the fourth, where the count of symbols alone codes 3.435 and the trained
+    readout reads the same states at 8.260, 4.226, 2.082, 1.430 and 1.318. By slice the
+    opening's fitted code is 1.991 (science), 2.039 (books), 2.224 (wikidata), 2.505 (code)
+    and 3.904 (web). At whole masks (3,717 places) the fitted codes are 3.745, 3.224, 2.824,
+    2.592 and 2.533 and the trained readout's last 2.487. So the neighbours' rows and the
+    moment bring 0.933 of the 2.122 nats the opening and four ticks bring together, and the
+    readout was never compared there. The law (agent-inferred, unbuilt): the cavity opening
+    of every place of a region, written or open, is read through the lane chart and a lift of
+    its own (64 by 64 entries and 64 of bias, founded at zero) onto the one tied face, and
+    compared with its written class at unit gain; its covector returns through the tied
+    face, the lift, the chart, the neighbours' rows and the moment the others bring, never
+    through the place's own row, term or stride. That code is the machine's news `c_t`, the
+    quantity the landmarks are counted on. It is the level's first build, alone, with its
+    guess fixed before it (G139); the level's sites, clock and phase chart follow on its
+    reading. The ticks stand as declared: each still removes news at these places.
   - Every extent of the built declaration is given the part it sizes, how it was reached and what
     sizes it (the same record, §5), with ten findings by file and line and the build that closes
     each. The departures that stand: the face's 64 coordinates are two lanes of 32, the second a

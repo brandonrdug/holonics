@@ -3072,3 +3072,30 @@ mechanism of the layout reaches them. What no log holds: what each mechanism rem
   layout is built, and its multiple is taken by law, each with its record first: the pair-terms a site (the level's sites and the
   length of a region under it) and the contact's declared widths (a row's carrier anchored at its peak). In every case the forward
   contact's limbs are law, and their narrowing is that record's subject, never a realization's.
+
+G139 fixed 2026-11-13T04:32Z (the same thread), before its build: the opening's comparison at every place (P60; the design record 4.4a; a law
+change, carried in the state). Read first: G127 (the trained readout reads a built opening at 8.05 nats, the uniform face 5.497);
+G132 (p57_faces.txt: a free face of 244 by 64 entries and its bias, fitted in floats on the frozen openings, codes 2.502 nats pooled
+at one-place masks, by slice 1.991 to 3.904, and 3.745 at whole masks; the trained readout's last tick 1.318 and 2.487; the count of
+symbols 3.435; the restarting cut on the last tick's code a mean epoch of 3.648 places, 0.9974 kept under a start seven later); G137
+(a count ruler's landmarks at the boundary's digit: a mean epoch of 4.4 places on octets); the source at main 6833f2553
+(tower/field.rs: `open`, `face_of`, `tied`, `affine`, `blank_return`, `opening_face`). From the last: the law's face is the tied
+form, a lift of 64 by 64 through the encoding rows, so its columns lie in those rows' span where the ruler's face was free, and it is
+founded at zero, where its first code is the tied face's bias alone. What no log holds: what that bias codes, how fast a block
+founded at zero takes its charge at the line's rates, and what a comparison at each of a section's 41,462 sites does to rows that its open places alone had trained.
+  The reading. One line trained 3,000 sections from the store line's last saved state with the block, beside the same sections
+  without it; every figure at the mean of the last 1,000 sections' states, on the held one-place masks and the held whole masks of
+  P57.
+  (a) The opening's code c0 at one-place masks, pooled: 3.3 nats (2.7 to 4.2); science and books lowest, near 2.8 (2.2 to 3.6); web
+      highest, near 4.2 (3.6 to 5.0). It falls between the second and the third thousand sections' means.
+  (b) The last tick's code against the control's: -0.01 at one-place masks (-0.08 to +0.04); -0.02 at whole masks (-0.10 to +0.05).
+  (c) The landmarks on c0 at a section of 8 bits: a mean epoch of 3.2 places (2.6 to 4.2); kept under a start seven later 0.97 (0.92
+      to 0.995); under doubled leading spaces on code 0.80 (0.60 to 0.93). The restarting cut on c0 keeps 0.93 under the start (0.80
+      to 0.99).
+  (d) The section's time 1.06 of its control in one hold (1.03 to 1.12).
+  Rules. c0 pooled at 3.6 or under and falling between laps, with the last tick's code at whole masks no more than 0.03 over the
+  control's: the comparison stays in the line, and the level's sites, clock and phase chart are ordered next with their guess. c0
+  over 4.5: a ruler fits the tied form on the frozen openings before anything further is built, to part the form from the rate. The
+  last tick's code worse by over 0.05 at whole masks: the law is read again before the level is built (the gain of the opening's
+  covector into the shared rows first). Between: one more thousand sections are read before a rule is applied. (d) over 1.12: the
+  opening's kernels are the next engine reading, and the law stands.
