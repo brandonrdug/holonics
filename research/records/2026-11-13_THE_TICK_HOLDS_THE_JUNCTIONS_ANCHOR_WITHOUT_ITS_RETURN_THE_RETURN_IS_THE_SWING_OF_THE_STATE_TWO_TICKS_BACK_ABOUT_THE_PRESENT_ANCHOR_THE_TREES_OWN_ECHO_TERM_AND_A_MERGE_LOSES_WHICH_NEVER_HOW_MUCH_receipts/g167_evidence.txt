@@ -1,0 +1,18 @@
+# G167, read-release on level3/MEAN.3000, seen text, undamped; host, RAYON 8 threads
+  written places by pass (EVIDENCE 1):
+    p1 written_code=3.9545 written_places=15975 open_code=3.0085
+    p2 written_code=4.0351 written_places=15975 open_code=3.4411
+    p3 written_code=4.1153 written_places=15975 open_code=3.8018
+    p4 written_code=4.1219 written_places=15975 open_code=4.3144
+    p5 written_code=4.1388 written_places=15975 open_code=5.0409
+    p6 written_code=4.1486 written_places=15975 open_code=5.7275
+    p7 written_code=4.1658 written_places=15975 open_code=6.1658
+    p8 written_code=4.1689 written_places=15975 open_code=6.4074
+    p9 written_code=4.1815 written_places=15975 open_code=6.6044
+    p10 written_code=4.1834 written_places=15975 open_code=6.7708
+    p11 written_code=4.1892 written_places=15975 open_code=6.9149
+    p12 written_code=4.1968 written_places=15975 open_code=7.0402
+    p13 written_code=4.1940 written_places=15975 open_code=7.2161
+    p14 written_code=4.2165 written_places=15975 open_code=7.3354
+    p15 written_code=4.2058 written_places=15975 open_code=7.6628
+    p16 written_code=4.2352 written_places=15975 open_code=7.8614

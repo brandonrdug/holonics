@@ -1807,7 +1807,7 @@ pub(super) fn read_ring(args: &[String]) -> Result<()> {
 }
 
 /// [measurement; agent-inferred, November 13; G163] `read-release UNITS UNITS_SHA STORE STORE_SHA KEYS KEYS_SHA CODEC CODEC_SHA PLACES STATE STATE_SHA
-/// OUT ROLE PASSES LOCKED MASK [DAMP]`: **the field's own release returned at a lag**, a reading of the reafference loop the junction record's §8
+/// OUT ROLE PASSES LOCKED MASK [DAMP [EVIDENCE]]`: **the field's own release returned at a lag**, a reading of the reafference loop the junction record's §8
 /// item 3 names: a region read `PASSES` times, each pass after the first opening every open place on its face from the pass before (a carried
 /// face, [`holonics::hnn::tower::field::shares`]), with `LOCKED` 1 also making those places sources at their faces (a lock, so the open places
 /// hear one another's releases), 0 leaving them silent. `MASK` 0 reads the cut's own masks, 1 a stretch's middle place alone. `DAMP` 1 (G164)
@@ -1816,10 +1816,12 @@ pub(super) fn read_ring(args: &[String]) -> Result<()> {
 /// code on `2^(−20)` bits summed, and the faces' change from the pass before (`Σ |Δw|²` over classes on `2^(−32)`) with its pairing with the change
 /// before that. The output directory is private.
 pub(super) fn read_release(args: &[String]) -> Result<()> {
-    if args.len() != 17 && args.len() != 18 {
-        return Err("read-release UNITS UNITS_SHA STORE STORE_SHA KEYS KEYS_SHA CODEC CODEC_SHA PLACES STATE STATE_SHA OUT ROLE PASSES LOCKED MASK [DAMP]".into());
+    if !(17..=19).contains(&args.len()) {
+        return Err("read-release UNITS UNITS_SHA STORE STORE_SHA KEYS KEYS_SHA CODEC CODEC_SHA PLACES STATE STATE_SHA OUT ROLE PASSES LOCKED MASK [DAMP [EVIDENCE]]".into());
     }
     let damp = args.get(17).is_some_and(|d| d == "1");
+    // [G167] With EVIDENCE 1 every pass also codes the written places, read through the readout after the ticks.
+    let evidence = args.get(18).is_some_and(|d| d == "1");
     let started = std::time::Instant::now();
     refuse_variables("read-release")?;
     let role = args[13].as_str();
@@ -1852,7 +1854,7 @@ pub(super) fn read_release(args: &[String]) -> Result<()> {
     use rayon::prelude::*;
     use std::io::Write as _;
     let mut tsv = std::io::BufWriter::new(std::fs::File::create(out.join("release.tsv"))?);
-    writeln!(tsv, "slice\tpass\tplaces\tcode\texpected\tnorm\tinner")?;
+    writeln!(tsv, "slice\tpass\tplaces\tcode\texpected\tnorm\tinner\twritten_places\twritten_code")?;
     let a = learner.field.declaration.alphabet;
     println!("RELEASE_LAW role={role} places={places} passes={passes} locked={locked} alone={alone} damp={damp} ms={}", started.elapsed().as_millis());
     for (si, &name) in role_names(&counts, role).iter().enumerate() {
@@ -1876,7 +1878,7 @@ pub(super) fn read_release(args: &[String]) -> Result<()> {
         }
         let slice_start = std::time::Instant::now();
         // Per region and pass: (places, code, expected, the faces' change, its pairing with the change before).
-        type Stage = (u64, i128, i128, u128, i128);
+        type Stage = (u64, i128, i128, u128, i128, u64, i128);
         let reads: Vec<std::result::Result<Vec<Stage>, String>> = regions
             .par_iter()
             .map(|base| {
@@ -1888,6 +1890,14 @@ pub(super) fn read_release(args: &[String]) -> Result<()> {
                 for _ in 0..passes {
                     let views = views_of(std::slice::from_ref(&region));
                     let faces = learner.field.faces(&views[0]).map_err(|e| e.to_string())?;
+                    // [G167] The written places' code: what the loop does to what the passage holds.
+                    let written_code: i128 = if evidence {
+                        let all = learner.field.faces_everywhere(&views[0]).map_err(|e| e.to_string())?;
+                        (0..n).filter(|&t| !base.unresolved[t]).map(|t| i128::from(all[t].code(base.classes[t]))).sum()
+                    } else {
+                        0
+                    };
+                    let written_places = if evidence { (0..n).filter(|&t| !base.unresolved[t]).count() as u64 } else { 0 };
                     let (mut code, mut expected) = (0i128, 0i128);
                     let mut dense = vec![0i64; open.len() * a];
                     let mut carried: Vec<Option<holonics::hnn::tower::field::Shares>> = vec![None; n];
@@ -1921,7 +1931,7 @@ pub(super) fn read_release(args: &[String]) -> Result<()> {
                         prev_change = Some(change);
                     }
                     prev = Some(dense);
-                    stages.push((open.len() as u64, code, expected, norm, inner));
+                    stages.push((open.len() as u64, code, expected, norm, inner, written_places, written_code));
                     region.faces = carried;
                     if locked {
                         region.locked = base.unresolved.clone();
@@ -1930,19 +1940,88 @@ pub(super) fn read_release(args: &[String]) -> Result<()> {
                 Ok(stages)
             })
             .collect();
-        let mut sums: Vec<Stage> = vec![(0, 0, 0, 0, 0); passes];
+        let mut sums: Vec<Stage> = vec![(0, 0, 0, 0, 0, 0, 0); passes];
         for read in reads {
             for (s, st) in sums.iter_mut().zip(read?) {
-                *s = (s.0 + st.0, s.1 + st.1, s.2 + st.2, s.3 + st.3, s.4 + st.4);
+                *s = (s.0 + st.0, s.1 + st.1, s.2 + st.2, s.3 + st.3, s.4 + st.4, s.5 + st.5, s.6 + st.6);
             }
         }
         for (p, s) in sums.iter().enumerate() {
-            writeln!(tsv, "{si}\t{}\t{}\t{}\t{}\t{}\t{}", p + 1, s.0, s.1, s.2, s.3, s.4)?;
+            writeln!(tsv, "{si}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}", p + 1, s.0, s.1, s.2, s.3, s.4, s.5, s.6)?;
         }
         println!("RELEASE_SLICE slice={name} regions={} host_ms={} ms={}", regions.len(), slice_start.elapsed().as_millis(), started.elapsed().as_millis());
     }
     tsv.flush()?;
     println!("RELEASE_DONE ms={}", started.elapsed().as_millis());
+    Ok(())
+}
+
+/// [definition; agent-inferred, November 13] `next-pass STATE STATE_SHA OUT`: **a state's next pass over its role**: the state with its pass line's
+/// slices set back to their first piece (piece, cursor and places taken zero), its count of stretches kept, so the next pass's cuts and masks
+/// are drawn afresh from the key stream (a stretch's length and mask are keyed by that count, [`Cut::next`]) over the same documents, and
+/// every other line of the state byte for byte. Refused where the state's pass has not ended (a slice short of its last piece). The written state
+/// is read back and checked: its every line but the pass line equal to the source's. Why: the line's first pass over the store's training
+/// documents ended at lap 6 (November 13), and a second pass is the same law over the same passage at new states.
+pub(super) fn next_pass(args: &[String]) -> Result<()> {
+    if args.len() != 4 {
+        return Err("next-pass STATE STATE_SHA OUT".into());
+    }
+    let text = String::from_utf8(pinned_read(&args[1], &args[2], STATE_BUDGET)?)?;
+    let out = Path::new(&args[3]);
+    if out.exists() {
+        return Err(format!("{} exists", out.display()).into());
+    }
+    let learner = FieldLearner::from_text(&text).map_err(|e| e.to_string())?;
+    let mut pass = learner.pass.clone().ok_or("a state with no pass line")?;
+    let before = pass.clone();
+    for slice in &mut pass.slices {
+        (slice.piece, slice.cursor, slice.taken) = (0, 0, 0);
+    }
+    let mut next = learner.clone();
+    next.pass = Some(pass);
+    let written = next.to_text();
+    let (old_lines, new_lines): (Vec<&str>, Vec<&str>) = (text.lines().collect(), written.lines().collect());
+    if old_lines.len() != new_lines.len() {
+        return Err("a next pass whose state has a different count of lines".into());
+    }
+    let differing: Vec<usize> = (0..old_lines.len()).filter(|&i| old_lines[i] != new_lines[i]).collect();
+    if differing.len() != 1 || !old_lines[differing[0]].starts_with("pass ") {
+        return Err(format!("a next pass that changes lines other than the pass line ({:?})", differing).into());
+    }
+    let back = FieldLearner::from_text(&written).map_err(|e| e.to_string())?;
+    if back.pass.as_ref().map(|p| p.stretches) != Some(before.stretches) || back.field != learner.field {
+        return Err("a next pass whose state does not read back as the source's field and count".into());
+    }
+    std::fs::write(out, &written)?;
+    println!("NEXT_PASS stretches={} before={} after={} lines={} differing_line={}", before.stretches, before.slices.iter().map(|s| format!("{}:{}:{}", s.name, s.piece, s.taken)).collect::<Vec<_>>().join(","), back.pass.as_ref().map_or(String::new(), |p| p.slices.iter().map(|s| format!("{}:{}:{}", s.name, s.piece, s.taken)).collect::<Vec<_>>().join(",")), old_lines.len(), differing[0] + 1);
+    Ok(())
+}
+
+/// [measurement; agent-inferred, November 13; G165] `read-coherence STATE STATE_SHA`: **each family's step coherence in a saved state**
+/// ([`holonics::hnn::tower::field::FieldLearner::step_coherence`]: `Σ |m| / Σ √v` of the deposit's two moments over the family, near one where
+/// its step keeps its sign from section to section and near zero where its signs cancel), a line a family over the whole material (the fine
+/// field's families named by the layout, a level's coarse and glue families after them by index), with its length. A reading of which parts'
+/// steps are still driven, the parts a growth would be sized from (atlas `radix.register-composition`).
+pub(super) fn read_coherence(args: &[String]) -> Result<()> {
+    if args.len() != 3 {
+        return Err("read-coherence STATE STATE_SHA".into());
+    }
+    let learner = FieldLearner::from_text(std::str::from_utf8(&pinned_read(&args[1], &args[2], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
+    let l = learner.field.layout().clone();
+    // A family zero long shares its start with the next: the families a field has come first where two names share a start.
+    let named = [
+        ("enc", l.enc), ("before", l.before), ("after", l.after), ("q", l.q), ("q_bias", l.q_bias), ("v", l.v), ("v_bias", l.v_bias), ("out", l.out), ("out_bias", l.out_bias),
+        ("a", l.a), ("a_bias", l.a_bias), ("b", l.b), ("b_bias", l.b_bias), ("w", l.w), ("w_bias", l.w_bias), ("read", l.read), ("read_bias", l.read_bias),
+        ("moment_before", l.moment_before), ("moment_after", l.moment_after), ("temper", l.temper), ("probe", l.probe), ("probe_bias", l.probe_bias), ("pace", l.pace),
+        ("moment_face", l.moment_face), ("moment_face_bias", l.moment_face_bias), ("lift_bias", l.lift_bias), ("carry", l.carry), ("carry_bias", l.carry_bias),
+        ("opening", l.opening), ("opening_bias", l.opening_bias), ("junction", l.junction), ("junction_bias", l.junction_bias), ("triad", l.triad),
+        ("triad_bias", l.triad_bias), ("w_triad", l.w_triad),
+    ];
+    let fine = learner.field.theta.len();
+    for (k, (&(start, _, _), &(len, m, v))) in learner.field.families_all().iter().zip(learner.step_coherence().iter()).enumerate() {
+        let name = if start < fine { named.iter().find(|(_, at)| *at == start).map_or("?", |(n, _)| *n).to_string() } else { format!("level_{k}") };
+        println!("COHERENCE family={name} start={start} len={len} coherence_millionths={}", if v == 0 { 0 } else { m * 1_000_000 / v });
+    }
     Ok(())
 }
 

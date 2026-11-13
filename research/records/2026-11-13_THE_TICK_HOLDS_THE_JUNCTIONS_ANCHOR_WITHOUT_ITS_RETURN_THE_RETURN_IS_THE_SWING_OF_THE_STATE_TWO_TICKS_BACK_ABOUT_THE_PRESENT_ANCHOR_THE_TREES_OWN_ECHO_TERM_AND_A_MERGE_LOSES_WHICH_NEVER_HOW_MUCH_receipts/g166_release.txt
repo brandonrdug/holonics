@@ -1,0 +1,1 @@
+# G166, read-release on level3/MEAN.3000, seen text, undamped; host, RAYON 8 threads

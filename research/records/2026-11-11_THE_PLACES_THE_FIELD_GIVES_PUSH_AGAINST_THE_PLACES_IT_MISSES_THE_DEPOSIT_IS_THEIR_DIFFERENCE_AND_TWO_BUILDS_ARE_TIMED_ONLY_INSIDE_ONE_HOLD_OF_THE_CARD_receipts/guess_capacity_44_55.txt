@@ -3936,3 +3936,61 @@ G164 scored 2026-11-13T21:10Z (receipt g164_release.txt; read-release with DAMP 
   self-consistent under its own release, which it never met in training since November 3 (§16.27 retired the carried release: it committed
   only certainty, and half of every lap trained states only the release met). So the release is a drive the field rings under (a two-cycle,
   undamped) but cannot yet use; to use it the field must deposit through it, a law this build does not have and §16.27's failures bound.
+
+G165 fixed 2026-11-13T21:19Z (the Opus PC thread), before its read: the line's second pass over the store's training documents. Its
+first lap trains 3,000 sections from lap 6's end state with the pass line set back to each slice's first piece (next-pass: the count of
+stretches kept, so the cuts and masks are drawn afresh; every other line of the state byte for byte), with the line's own binary, and is read
+by read-cavity at its lap mean against lap 6's last mean (MEAN.1630). Read first: the first pass's last laps fell 0.0141, 0.0171 and 0.0057
+nats a place at one-place masks (laps 4, 5 and the 630 sections of lap 6) and 0.0098, 0.0106 and 0.0016 at whole masks.
+  (a) one-place masks fall 0.005 to 0.020 nats a place from 1.0743;
+  (b) whole masks fall 0.002 to 0.012 from 2.4057;
+  (c) every slice falls at one-place masks.
+  Rule: (a) held, the second pass goes on lap by lap beside the growth's design; (a) under 0.005, a second pass buys too little at this size,
+  and the growth comes first.
+
+G166 fixed 2026-11-13T21:22Z (the Opus PC thread), before its read: the release loops run on, undamped, to 32 passes, on Brandon's lens
+of 21:12Z (overconfidence that runs off should falter when it is wrong and shatter its source in a snap, a phase transition; do not damp it
+before that is seen). read-release on level3/MEAN.3000, seen text: locked (the cut's masks, the open places sources at their releases) and
+alone. Read first: G163's locked loop read the code rising 3.01 to 6.41 and the expected code falling 3.04 to 1.77 over 8 passes, the
+successive pairing turning more negative at its end (−0.283, −0.462).
+  (a) locked: by pass 32 the expected code stands under 1.5 nats a place (the mutual loop locks onto its own faces);
+  (b) locked: no pass after the eighth lowers the pooled code by more than 0.3 nats a place (no snap in a loop with no channel for evidence);
+  (c) alone: the two-cycle stands to pass 32 (the successive pairing under −0.95 at every pass from 8).
+  Rule: none; a reading for the lens. A snap, (b) missed, is the transition the lens names, read without a deposit; its pass and its region
+  are then read before any design.
+
+G166 scored 2026-11-13T21:35Z (receipt g166_release.txt; read-release, 32 passes, undamped; host, 8 threads, 290.7 and 283.4 s):
+  (a) locked, the expected code at pass 32 is 1.280 nats a place: held (the mutual loop locks);
+  (b) locked, no pass after the eighth lowers the pooled code by more than 0.10 nats a place: held (no snap);
+  (c) alone, the two-cycle stands to pass 32 (pairing −0.997 to −0.999 from pass 9): held.
+  Of 3 parts 3 held. The mutual loop runs off to pass 21 (code 3.01 to 8.50, expected code 3.04 to 1.32) and then itself falls into a
+  two-cycle at its saturation (pairing −0.98 to −0.99, the code alternating 8.42 and 8.52): overconfidence that runs off does not falter
+  here, because nothing in the loop compares a release with what the passage holds; the only evidence the build has is its comparison, at
+  deposition. So the lens's snap, read on the objects, is the evidence reaching the loop (agent-inferred): either the deposit through the
+  loop, or a reading inside it of the places whose truth is known.
+
+G167 fixed 2026-11-13T21:32Z (the Opus PC thread), before its read: whether the mutual loop's runaway leaves evidence inside the
+field, at the places whose truth the passage holds. read-release locked, 16 passes, undamped, with EVIDENCE 1 (every pass also codes the
+written places through the readout after the ticks, Field::faces_everywhere). Read first: G166's mutual loop ran off to pass 21; nothing in it
+compares a release with the passage; the written places' faces are not compared in training (only the open places and the openings are).
+  (a) the written places' mean code rises from pass 1 to pass 16 by at least 0.2 nats a place (the releases mislead what is known);
+  (b) its rise leads the open places' (by pass 4 it has risen by at least a third of its rise to pass 16).
+  Rule: none; if (a) holds, the evidence the lens's snap needs is inside the field, readable without the deposit, and a gate on it is the
+  next design.
+
+G167 scored 2026-11-13T21:42Z (receipt g167_evidence.txt; read-release locked, 16 passes, undamped, EVIDENCE 1; host, 8 threads, 354.1 s):
+  (a) the written places' mean code rises 3.9545 to 4.2352 nats a place from pass 1 to pass 16 (15,975 written places a pass), +0.281:
+      held;
+  (b) by pass 4 it has risen 0.167, 0.59 of its rise to pass 16, while the open places' code has risen 1.31 of its 4.85: held.
+  Of 2 parts 2 held. So the mutual loop's runaway leaves evidence inside the field: the releases mislead what is known, early and in step
+  with the runaway. The read is the readout at written places, which no comparison trains (its level, 3.95 nats, is the uncompared
+  readout's); the opening's comparison at every place (P60) is the trained channel for the same evidence and is read before a gate is built.
+  The design the lens names: the loop run on undamped, and a snap when the evidence at the known places turns (agent-inferred).
+
+G165 scored 2026-11-13T21:45Z (receipt line_pass2_lap1.txt; the second pass's first lap, 3,000 sections from lap 6's end with its pass set back,
+976.1 s; read-cavity on its mean against lap 6's last mean):
+  (a) one-place masks fall 0.0114 nats a place, 1.0743 to 1.0630: held;
+  (b) whole masks fall 0.0029, 2.4057 to 2.4029: held;
+  (c) every slice falls at one-place masks (code −0.0095, web −0.0104, science −0.0099, books −0.0105, wikidata −0.0164): held.
+  Of 3 parts 3 held. A second pass over the same documents at fresh cuts and masks buys about what the first pass's last full laps bought;
+  the rule's first branch: the second pass goes on lap by lap.

@@ -912,6 +912,16 @@ the readout was never trained through a carried opening since November 3, when ย
 release for committing only certainty. The next design is the release as a part the field deposits through, founded where its first pass
 is the built one and bounded by ยง16.27's failures.
 
+*Run on* (G166 and G167, November 13 21:22 to 21:40Z, on Brandon's lens of 21:12Z: overconfidence that runs off should falter when it is
+wrong and shatter its source in a snap, so it is not damped before that is seen; receipts [g166](2026-11-13_THE_TICK_HOLDS_THE_JUNCTIONS_ANCHOR_WITHOUT_ITS_RETURN_THE_RETURN_IS_THE_SWING_OF_THE_STATE_TWO_TICKS_BACK_ABOUT_THE_PRESENT_ANCHOR_THE_TREES_OWN_ECHO_TERM_AND_A_MERGE_LOSES_WHICH_NEVER_HOW_MUCH_receipts/g166_release.txt),
+[g167](2026-11-13_THE_TICK_HOLDS_THE_JUNCTIONS_ANCHOR_WITHOUT_ITS_RETURN_THE_RETURN_IS_THE_SWING_OF_THE_STATE_TWO_TICKS_BACK_ABOUT_THE_PRESENT_ANCHOR_THE_TREES_OWN_ECHO_TERM_AND_A_MERGE_LOSES_WHICH_NEVER_HOW_MUCH_receipts/g167_evidence.txt)). Undamped to 32 passes the mutual loop runs off until pass 21 (the code 3.01 to 8.50 nats a place, the
+expected code 3.04 to 1.32) and then falls into a two-cycle at its saturation; no pass lowers the code by more than 0.10, and the lone loop
+keeps its two-cycle throughout. Nothing in the loop compares a release with the passage, so it has no evidence to falter on. The evidence is
+inside the field nonetheless: through the readout at the written places, whose classes the passage holds, the known places' code rises
+3.95 to 4.24 nats a place over 16 passes, 0.59 of it by pass 4, in step with the runaway. So the snap the lens names reads, on the objects,
+as the release's admittance cut where the places that hear it and whose truth is known turn worse (agent-inferred), the loop run on
+undamped until then.
+
 ### 13.9 A turned head's reach belongs on its own clock: its falloff is the envelope of the bank its skins are members of
 
 Asked by the engineering thread at 19:45Z, with G150 held for the answer; answered near 19:56Z.
