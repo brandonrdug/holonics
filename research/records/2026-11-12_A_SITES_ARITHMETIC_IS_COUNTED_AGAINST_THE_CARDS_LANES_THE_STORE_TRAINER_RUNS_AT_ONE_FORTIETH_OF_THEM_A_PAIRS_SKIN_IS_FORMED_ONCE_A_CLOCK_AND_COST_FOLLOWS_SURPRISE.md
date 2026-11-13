@@ -238,8 +238,11 @@ entry.
 **Phase 2, laws at declared widths** (each with host and card parity, its atlas row and its Lean
 obligation named in #410; none before phase 1's profile):
 - cost follows surprise (§5);
-- a row's carrier anchored at its peak, its terms released at a declared tolerance with the
-  remainder accounted, in place of five to twenty limbs;
+- ~~a row's carrier anchored at its peak, its terms released at a declared tolerance with the
+  remainder accounted, in place of five to twenty limbs~~ (struck November 13: the November 1
+  record's §14.11 retired a carrier at a fixed fraction of its row's peak, since a row is a
+  series and no term is released without its remainder; what the limbs can give with every
+  bit kept is §9);
 - the pair store on its support (`tower.field-support-stride`), a region's rows in one block.
 
 **The pass.** The pass over the 1 GB prefix waits until the engine stands near its count. The bar
@@ -257,3 +260,126 @@ slice do (P49). The count's rows are from the source and not from a measured ker
 ceilings are published figures. The skin's and the phase's shares of their entries are counted
 from instructions and are G116's subject. Whether the constitution's size or the step's rate
 limits the level is not read here.
+
+## 8. The pair kernels' layout was read on copies before any rewrite, and their multiple is the law's (G138, November 13)
+
+After step 6 a section reads 279.4 ms, 6.9 times the bar, and the contact family holds 115.6 ms of
+a profiled section in 72 launches (`p57_schedule.txt`). The layout of §6's phase 2 and of the
+forecasts (a pair's record in walk order, a region's rows resident in its block, the forward's
+entries as one launch and the return's as one) was the next build by G131's rule. Before any
+rewrite its mechanisms were read one at a time (`p59_copies.txt`, with `p59_copies.py` and
+`g138_lines.py`; the order P59, the guess G138 fixed before the read).
+
+**The instrument.** A copy of each pair entry, generated from the entry's own text with every
+substitution counted, launched immediately before its entry on the entry's words, its outputs in
+scratch arrays that start as the entry's. One mechanism a copy and a null copy of each entry; the
+copies are compiled only under a feature, and with it off the kernels' PTX is main's byte for
+byte. One hold of the card: a profiled control, the copies' run, a profiled control, sections
+2,001 to 2,100 from run 2's `STATE.1900`; all three print the line's 100 section lines and end on
+the line's state and mean. The null copies lower as their entries and give their words (0
+differing words over every array). A null copy reads 0.90 to 1.00 of its entry's controls by its
+place before the entry alone, so each ratio is given over the controls and, in brackets, over the
+null copy.
+
+| mechanism | rows (30.74 ms) | columns (25.65) | forward contact, five limbs (26.39) | skin's return (16.86) | exposure (8.57) |
+|---|---|---|---|---|---|
+| source rows resident (each load of another site's row reads the warp's own) | 0.881 [0.881] | 0.852 [0.946] | 0.951 [0.982] | 0.888 [0.941] | 0.938 [0.980] |
+| a pair's words in walk order | 0.967 [0.967] | | 0.963 [0.994] | 0.945 [1.001] | 0.891 [0.931] |
+| the reductions as plain stores | 0.937 [0.937] | | | 0.885 [0.938] | |
+| the columns from a record in column order | | 0.565 [0.627] | | | |
+
+The columns from their record read 0.422 on the paced heads and 0.839 on the still ones; the
+record was laid by a pass of its own at 14.1 ms a section, outside the copy's time. With each
+entry at the product of its copies' ratios and the small entries as they stand, the family reads
+91.1 ms from 118.9 in this hold's controls by the ratios over the controls, and 98.7 by the ratios
+over the null copies: 0.77 and 0.83 of itself. Summed over the entries and read over the null
+copies, resident rows remove at most 6.8 ms a section, walk order 1.9, plain reductions 3.0 and
+the columns' record 9.6 before its own cost. Of G138's 17 parts 15 held; the exposure's resident
+rows and the family's total missed, both above.
+
+**What it says.** The pair kernels are bound by their arithmetic and their walk, never by where
+their words lie. The forecasts by a count of gathers (27.5 ms and under for the family) overstated
+what a layout takes, as G120 had read of the rows. In the controls the forward contact at five
+limbs lowers to 9,720 instructions with 2,137 multiply-adds, 524 wide ones and 778 spill stores;
+the rows to 7,680 instructions with 1,987 and 632 on 128 registers.
+
+**The rule applied** (fixed before the read: the family over 90 ms). The family's form stands and
+no layout is built on it. Its multiple is the law's, each part with its record first:
+- *the contact's declared widths.* A row's carrier is `row_bits` and its spread: 62 bits of a
+  term's face, 62 of its weight, 64 of a value, and the counts, 225 and the spread, so five limbs
+  hold a spread of 95 and no row's own spread lowers them. The bits ruler reads a value at 23
+  bits, a unit word at 18 and a score at 23 (`p54_word_bits.txt`). The weight is `2^62` or a
+  crowd's count times it in every term of the present law (`agent-inferred`, from
+  `Field::contact`'s two pushes), a factor the row's one quotient cancels. The record owed
+  restates each width from what consumes the word, with §14.11 of the November 1 record kept:
+  every term enters the row's sums, no peak is subtracted and nothing is released without its
+  remainder. A carrier anchored at a row's peak that released the terms under it to nothing is
+  the build that section retired.
+- *the pair-terms a site.* A site holds 1,124 pair-terms (70 a head and tick). The level above
+  takes the far field of a place into an epoch's word, and the length of a region under it is
+  the design record's subject after the opening's comparison is read (G139).
+
+The columns' record is the one mechanism past 5 ms a section. It is carried into the build that
+rewrites the support under those two laws, where the forward entry writes it, and is not built as
+a step of its own on kernels about to be rewritten (`agent-inferred`).
+
+**The next realization: a site's maps** (G117, fixed before its build; the order P61). The profile
+outside the contact is flat except for one family. A site's maps hold 56.3 ms a profiled section
+in seven entries and stand at 4.03e11 products a second, where the card's measured yardstick for
+a map of their shape reads 1.46e12 with one thread a cell and 5.19e12 with one thread four
+outputs of four sites (`p50_step0.txt`). No step has changed them. Read at source: the forward
+map holds its weights and four sites' rows in shared memory and is the nearest to the yardstick
+(6.9e11 a second on a map of 64 by 64); the transposed map reads every weight and every covector
+word from the card's memory once a product and sums in 128 bits; the outer sum reads each word of
+a tile of 64 sites once an entry, 4,096 times, and adds each entry's partial by a 128-bit atomic
+step once a tile. The build gives the three kinds the yardstick's form with the same integers
+(a 64-bit covector as two 32-bit limbs whose sums stand in 64 bits where a tile's magnitudes
+prove it). G117 guesses the family at 20 ms (13 to 32) and the section at 0.885 of its control.
+
+## 9. The contact's widths, read from the source and the logs before any record of them orders a build (November 13)
+
+§8 owed a record that restates each width of a contact row. Its premise is read first from what
+the tree and the receipts already print.
+
+**What the source holds** (`contact_body` and `SeriesRow` at main 4f1347a6b):
+- *The multiplier.* It is `2^62` in every pair's term and in a crowd's value, and a crowd's count
+  times it in the crowd's mass (`Field::contact`'s two pushes; `coef_of` at five places in the
+  entry). A nearest quotient keeps its bits when its numerator and its divisor lose an even
+  common factor `K`: `⌊(|x|K + mK/2)/(mK)⌋ = ⌊(2|x| + m)/(2m)⌋`, and `⌊(|x| + ⌊m/2⌋)/m⌋` differs
+  from it only where `2|x| + m` is a multiple of `2m` with `m` odd, which an odd number never
+  is. So the currents and the shares at multiplier 1 are the same integers, and the 62 bits are
+  the carrier's, not the row's (`agent-inferred`; the lemma is owed to #410 beside the grouped
+  row's equality).
+- *A value.* Its 64 bits are `fit64`'s. The bits ruler reads a framed value at 23 bits and a
+  crowd's prefix at 30 (`p54_word_bits.txt`).
+- *The limbs.* The launch takes them from the widest row of the launch, which the host fetches
+  once a tick, where §14.11 of the November 1 record says the width is the row's.
+- *Once a pair.* The entry reads the exponential's face and forms the coefficient twice (for the
+  terms, then for the shares), and forms a crowd's score twice.
+
+With the multiplier gone and a value on one 32-bit limb where its row's read proves it, a row's
+fixed part is 131 bits against 225: three limbs hold a spread of 61 where five hold 95. Every
+form here keeps every bit, so these are realizations. §8 called the widths a law's subject; that
+word was wrong for them and is corrected here. A face's 62 bits and a share's 63 are the law's
+and are not touched.
+
+**What the logs already say of the gain.** P59's controls ran the forward entry at five limbs in
+351 launches and at six in 49 over 100 sections: 26.39 and 4.02 ms a section, so 7.52 and
+8.20 ms a launch. A limb costs 0.68 ms a launch, 9% of the entry (`agent-inferred`: the launches
+at six limbs are the ticks whose widest row is wider, and nothing else is known to differ). Two
+limbs fewer is about 5 ms a section of the forward entry's 30.4; the narrow numerators and the
+once-a-pair forms add a few more. The returns' wide forms rest on a share's 63 bits and on the
+covector `dy`, which no ruler has read.
+
+**What follows.** The widths are worth about 10 ms a section of 267, a tenth of the pair family
+and not a multiple. They are ordered after the site maps, with the reading of `dy` first. The
+pair family's multiple lies in the count of pair-terms alone: which rows are computed, and which
+sources a row meets. That is the design record's subject
+([§4.8 there](2026-11-13_A_LEVELS_SITES_ARE_THE_EPOCHS_OF_ITS_NEWS_BEGUN_AGAIN_AT_EACH_OPENING_ITS_CLOCK_IS_THE_NEWS_BETWEEN_THEM_A_PLACES_NEWS_IS_READ_AT_ITS_CAVITY_FACE_AND_EACH_NAVIGATOR_KEEPS_ITS_LOCATED_CLOCK.md), G140).
+
+**The ruler build of §8 is kept by tag, not in the trunk.** The contact's copies
+(`tools/contact_copies.py`, 74c049cb4, gate 1 passed) are the text of the entries as they stood,
+bound to asserted substitution counts. In the trunk the generated header would go stale at the
+first change of an entry or hold that change back, so the branch is set aside by tag
+(`archive/claude/contact-copies`, by the census tool on the PC, the first item of the order P61).
+The tag's commit is owed here in one sentence once the PC reports it.

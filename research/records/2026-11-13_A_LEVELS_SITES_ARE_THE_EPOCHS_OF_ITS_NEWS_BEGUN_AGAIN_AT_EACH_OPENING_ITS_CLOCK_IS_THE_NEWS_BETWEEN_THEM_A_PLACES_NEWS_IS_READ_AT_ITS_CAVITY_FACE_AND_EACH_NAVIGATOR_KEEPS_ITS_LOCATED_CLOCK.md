@@ -458,6 +458,58 @@ is owed on the machine's own news.
   the cut, the lengths and every face of the level as they were; the build carries that as a
   test on the tower's entries, since guard 9's tests stand on `hnn::encoding` alone.
 
+### 4.8 The contact's receivers and the level's sites (a candidate law, and a reading before it: G140)
+
+*Added November 13, after the engine record's §9 read the contact's widths at source. The whole
+of this section is `agent-inferred`, and nothing in it is built.*
+
+- **What is computed today.** Every site of a region is a receiving row at every head and tick
+  (atlas `tower.field-open-row-pairs`): an open row meets every definite site of its region,
+  and a definite row meets its near field and its probed classes' definite members. In the
+  store line a written place is compared nowhere after its opening. Its row is computed, at an
+  open row's price a pair, for one use: its refined state is a better source to the open rows.
+- **Two statements the tree already holds.** §4.2: a level's sites are the landmarks of the
+  news below it. The engine record and atlas `deposition.cost-follows-surprise`: the return's
+  cost follows the places whose surprise stands above the grain, "and the forward's is
+  unchanged". Beside them `landmark.pin-worth-surprise` bounds what a written place tells a
+  neighbour by the place's own surprise.
+- **They are one statement in two notations.** A written place whose news stands under its
+  section's largest tells its neighbours no more than that news, and the ticks of its row
+  refine a state the open rows can read no further than that bound. The candidate law: *a
+  written place's row is computed at a tick only where the place is a site of the level, a
+  landmark of the machine's own news `c_t` (§4.4a) at the level's section; an open place's row
+  is always computed; every written place is still heard, at its opening.* A second cut is
+  read apart from it: a written place that is no site is heard only through the moments and
+  the near field. Under a flat face every place is a site, since the founding of §4.6 is the
+  identity, so the law thins the rows only as the machine's news forms. It reads nothing but
+  that news: no kind of input, no authored boundary, no table.
+- **Its realization exists.** The room cut's mask (atlas `tower.field-room-cut`; `computed`
+  and `skipped_row` at source) already skips a row in the exposure, the contact and the row
+  return.
+- **What it would be worth is unread.** No log prints the split of a section's rows or of its
+  pair-terms between open and written places. G140 guesses the open places at 0.15 of a
+  section's sites and the written rows at 0.65 of its pair-terms. With §4.6's sites at 0.21 to
+  0.25 of places under the count reader, the computed rows would stand near a third and the
+  pair-terms near a half, and every family that follows the rows would follow them.
+- **The reading before the law (the order P62, G140).** On the store line's saved lap mean,
+  the held role at one-place masks and at whole masks, the code at open places through the
+  trained readout at the last tick, with: every row (A0); open rows alone (A1); open rows and
+  the written landmarks at 8 bits under the count reader of two octets back (A2); as many
+  written places by a keyed draw (A3); A2 with the uncomputed written places not heard as far
+  sources (A4). The count reader's news stands in for the machine's own as a ruler in this
+  reading alone, and no build consumes it. The reading is zero-shot: the line never trained
+  under the cut, so it can size a law and confirm one and cannot refute one. Its rules are in
+  [the guess file](2026-11-11_THE_PLACES_THE_FIELD_GIVES_PUSH_AGAINST_THE_PLACES_IT_MISSES_THE_DEPOSIT_IS_THEIR_DIFFERENCE_AND_TWO_BUILDS_ARE_TIMED_ONLY_INSIDE_ONE_HOLD_OF_THE_CARD_receipts/guess_capacity_44_55.txt).
+- **What the law owes when it is built.** The machine's own news of §4.4a as its only reader,
+  so the opening's comparison (P60) comes first. Atlas rows for the law, with
+  `deposition.cost-follows-surprise` restated, since the forward's cost would then follow the
+  news as well. A statement in #410. A trained line against its control at lap means. And a
+  check against two recorded failures before any build: a selection on the code that discards
+  what an expansion measures (the reread retired on November 5), and an order of work that
+  puts the most certain places first where activity should disperse. What the cut removes is
+  the refinement of a source's state and the return through that refinement; whether the open
+  rows' code holds without it is what G140 and then the trained line read.
+
 ## 5. What this corrects in the records of November 12
 
 - The record of the symbol's length §8.1 and §8.3 ("one clock"): the moments' strides stay
