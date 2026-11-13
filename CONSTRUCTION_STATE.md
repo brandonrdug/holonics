@@ -488,6 +488,10 @@ repository was reset on September 24; the pre-reset tree is
   - The opening return's far prefixes are taken a moment mode at a time (November 13, G143): the
     line's pool peaks at its control's 10.50 GB, and its section reads 262.2 ms, 6.4 times the bar,
     against 236.3 without the block: the opening costs 26 ms a section, from 51 when it landed.
+  - The opening's return runs at the end of its own forward, before the ticks (November 13, G144):
+    the pool's ring of frees ends (4 frees in 100 profiled sections against 298, allocations 1.96 ms
+    a section against 5.96), every bit kept. The engine's queue stops here: the level's sites, clock
+    and phase chart, ordered by G139's rule, are the next item.
   - The open places need the written rows' ticks (November 13, P62, G140 scored; the design
     record §4.8). Read zero-shot on the line's latest lap mean with a written row held at its
     opening: the open rows alone code 3.29 nats a place worse at held one-place masks and 1.90
