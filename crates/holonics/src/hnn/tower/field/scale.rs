@@ -65,7 +65,7 @@ fn glue_layout(harmonics: usize, fine: usize, coarse: usize) -> (usize, usize, u
 /// the fine field has after its split (`d.ticks / 2` of them, the split [`level_split`]). Its reach is the fine field's: a region's
 /// epochs are at most its places.
 pub fn level_declaration(d: &FieldDeclaration) -> FieldDeclaration {
-    FieldDeclaration { alphabet: 2, triads: 0, carry: 0, opening: false, ticks: d.ticks - level_split(d), ..*d }
+    FieldDeclaration { alphabet: 2, triads: 0, carry: 0, opening: false, junction: false, ticks: d.ticks - level_split(d), ..*d }
 }
 
 /// The fine ticks before a level's restriction: half the fine field's, at least one.

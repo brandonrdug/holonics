@@ -3595,3 +3595,129 @@ G151 scored 2026-11-13T19:06Z (receipt g151_echo.txt in the junction record's re
   so the build is read first for whether the deposit moves `ℓ` at all, with head 3's tail the region where `ℓ*` stands away from zero. The
   build's case does not rest on `B`: the return is also the term that lets the tick carry a rate (the record §7), a use the deposit locates
   or does not.
+
+G152 fixed 2026-11-13T19:20Z (the Opus PC thread), before its read: the return's founding covector, the theory thread's order after G151, item
+(a), before any kernel work. At `ℓ = 0` the forward is the built tick's and the reverse the built reverse, so the chart's covector
+`δℓ = (ln 2/2) ⟨λ^(k+1), x^(k+1) − x^(k−1)⟩` (Field::junction_covectors) reads what a first deposit of the return would see. read-junction on the
+line's third-lap mean grown by the return at its founding (in memory; nothing saved), the held slices cut as read-echo cuts them (4,000 places
+each, mask 0 the cut's own, mask 1 the middle place alone open), on the host. The slope of the code in `ℓ_b` is `Σ δℓ` over a tick's rows,
+read as nats over the region's open places per unit of `ℓ` (`Σ δℓ 2^(−24) ln 2 / places`; a negative sum is a code that falls as `ℓ` rises).
+Read first: no log prints `δℓ` (the part is new); G149's control read the held code at 1.2949, 1.1843 and 1.2421 nats at ticks 3, 4 and 5
+of the free iteration, from which the theory thread estimates the path's least code 0.16 of a tick past tick 4.
+  (a) at the last tick over open rows with one place open (mask 1), pooled over slices, the deposit raises `ℓ` (the sum negative), the
+      code's slope 0.01 to 0.05 nats a place per unit of `ℓ` (the theory thread's estimate 0.024);
+  (b) of the three ticks with a return, the first (after the second tick, whose two moves are unlike: cosine 0.06 in G149) is the least
+      coherent, `|Σ δℓ| / Σ |δℓ|` over open rows with one place open;
+  (c) every written row reads `δℓ = 0` at the last tick (no face is read at a written place, so `λ^K` is zero there), which checks the reading.
+  Rule. (a) held and the coherence at the last tick over open rows at least 0.1: the deposit sees a direction for the return, and the card
+  build goes on, its lap scored on the located `ℓ` and the held code at lap means. The pairing incoherent everywhere (under 0.05 at every tick
+  and region): the card build is not worth its parity work, and the next loop is the reader's reaction on its source (the theory thread's
+  item (c)). (c) missed: the reading is wrong, and nothing is read from it.
+
+G153 fixed 2026-11-13T19:22Z (the Opus PC thread), before its read: a size of what a site's own clock could buy, the theory thread's
+order after G151, item (b), with no build. From G149's per-place codes by stage (read-depth at 16 ticks, out_level: the level's second-lap
+mean, 10,432 held places opened alone), each place's least code over its seventeen stages against its code at stage 4 (the trained depth);
+best_stage_ruler.py. A rough ceiling: a place's least over stages is selected on the read itself, and rows' rates interact. Read first:
+G149 printed the mean codes by stage only (the minimum of the means at stage 4, 1.1843 nats on the control).
+  (a) the mean least code stands 0.15 to 0.35 nats a place under the mean code at stage 4, pooled;
+  (b) in every slice stage 4 is the commonest best stage, and it holds under half the places;
+  (c) at least 0.10 of places find their least past stage 8 (places whose code keeps falling while the mean's rises).
+  Rule: none; a ceiling sizes the next design (a site's own rate along its path, the theory thread's reading of `ℓ`), and decides no build.
+
+G152 scored 2026-11-13T19:26Z (receipt g152_junction.txt in the junction record's receipts; read-junction on level3/MEAN.3000 grown by the
+return at its founding, 122 stretches, 21,698 rows a tick under the cut's mask with 5,634 open, 21,698 with one place open, 122 of them open;
+host, 8 threads, 45.9 s, 684 MB). Ticks with a return are indexed 1 to 3 (the return after the second, third and fourth tick):
+  (a) at the last return over open rows with one place open the sum is +28,517,110 (coherence 0.069): the code rises with `ℓ`, so the
+      deposit lowers it, at 0.0097 nats a place per unit of `ℓ`, against a raise at 0.01 to 0.05: missed, the sign reversed;
+  (b) the first return is the most coherent there (0.208, against 0.177 and 0.069), against the least: missed;
+  (c) every written row reads `δℓ = 0` at the last return under both masks: held, and the reading checks.
+  Of 3 parts 1 held and 2 missed. The premise that missed: the trained path does not stop short of its least code. Summed over the three
+  returns (`ℓ_b` is shared), the code's slope is −0.034 nats a place per unit of `ℓ` under both masks (−0.0339 with one place open, over 122
+  places; −0.0339 under the cut's mask, over 5,634), so a first deposit lowers `ℓ_b`: a return the deposit finds is a hold (`Γ < 0`,
+  `x^(k+1) = (1 − |Γ|) v^k + |Γ| x^(k−1)`), the path slowed toward its state two ticks back. G153 reads the same from the codes by stage: the
+  commonest best stage is the third, before the trained depth. One place a stretch is a thin sample (the slices part in sign at the first
+  return: code and books against the rest); the cut's mask, 46 times as many open places, gives the same total.
+  The rule's branches are not met whole: (a) missed and the coherence at the last return is 0.069 (with one place open) and 0.080 (the cut's
+  mask), neither at least 0.1 nor under 0.05 everywhere (0.21 at the first return). Decided from the rule's reason (whether the deposit sees
+  a direction for the return): it sees one, opposite to the guessed, coherent in sign over the three returns on open rows with one place
+  open and under the cut's mask at two of three, with the chart's coordinates at a median coherence of 0.09 to 0.14 on open rows alone (35 to
+  41 of 64 over 0.1). The card build goes on, its lap's guess fixed for a falling `ℓ` (agent-inferred).
+
+G153 scored 2026-11-13T19:26Z (receipt g153_best.txt; best_stage_ruler.py on G149's out_level and out_control):
+  (a) on the level the mean least code stands 0.340 nats a place under stage 4's (1.1640 against 0.8237), against 0.15 to 0.35: held;
+  (b) stage 3 is the commonest best stage in every slice and pooled (2,701 places against stage 4's 2,036), stage 4 holding 0.195: missed
+      in its first half, held in its second;
+  (c) 0.064 of places find their least past stage 8, against at least 0.10: missed (315 places, 0.030, at stage 16, still falling).
+  Of 3 parts 1 held, 1 half held and 1 missed. The plurality of places reach their least before the trained depth (stages 0 to 3 hold 0.59 of
+  places), which agrees in direction with G152's founding covector: the path overshoots for most places.
+
+G154 fixed 2026-11-13T19:26Z (the Opus PC thread), before its read: the round trips across heads, the theory thread's order after
+G151, item (c), the premise of its next design (a head's read changes its receiver and leaves its source as it was). read-echo again on
+level3/MEAN.3000 with `B(h, h′) = Σ_j p_ji^(t, h′) p_ij^(t+1, h)` a row (Field::echo_across_heads); heads_ruler.py. Read first: G151 printed the
+diagonal only (head 3 median 0.0106, the others 0.0002 to 0.0005 over written rows).
+  (a) over written rows every off-diagonal median lies under the larger of its two heads' diagonal medians;
+  (b) head 3's row sum over `h′` stands under twice its diagonal at the median (its echo is its own head's, not the others');
+  (c) the diagonal reproduces G151's echo.tsv byte for byte, which checks the reading.
+  Rule: none; it is a premise, read for the theory thread's derivation of the reader's reaction on its source.
+
+G154 scored 2026-11-13T19:29Z (receipt g154_heads.txt; read-echo with heads.tsv on level3/MEAN.3000, 37,640 written site rows, host 8 threads,
+22.1 s, 633 MB):
+  (a) over written rows every off-diagonal median lies under the larger of its two heads' diagonal medians (pooled; the largest off-diagonal,
+      B(2, 3) = 0.00144, against head 3's 0.01075): held;
+  (b) head 3's row sum over `h′` stands at 1.507 times its diagonal at the median (1.33 to 1.60 by slice), under two: held;
+  (c) the diagonal reproduces G151's echo.tsv byte for byte: held, and the reading checks.
+  Of 3 parts 3 held. What it adds to the premise: for heads 0 to 2 the round trips through other heads exceed their own (a row sum 5.3 to
+  11.4 times the diagonal), most of it through head 3 (B(h, 3) = 0.0011 to 0.0014 against diagonals of 0.0002 to 0.0005): what a site tells
+  in the second turned head comes back to it in every head. The echo is one head's lock, heard by all.
+
+G155 fixed 2026-11-13T19:36Z (the Opus PC thread), before its read: G152's founding covector on seen material, the theory thread's first
+caution after G152 (scaling what the ticks add is nearly a direction of the constitution itself, so at a lap's mean it is near stationary
+on the lap's own code; on held text the part of the slope where the constitution is surer than it has earned is a gap the deposit does not
+see). read-junction with the role `prefix` (the store's training documents, each slice from its first piece, so stretches the line has
+trained on) on level3/MEAN.3000, 4,000 places a slice, both masks. Stated as `d(code)/dℓ`, nats a place per unit of `ℓ` (positive: the
+code rises with `ℓ`, so the deposit lowers it); G152's held value summed over the three returns is +0.034 under both masks.
+  (a) the theory thread's: the sum over returns has the held sign, at 0.3 to 0.8 of its value, +0.010 to +0.027, under the cut's mask;
+  (b) this thread's: over open rows with one place open, the chart's coordinates keep a median coherence of at least 0.1 at the first
+      return (the direction that separates sites is not the held gap);
+  (c) every written row reads zero at the last return, which checks the reading.
+  Rule: (a) and (b) held, the card build goes on with the lap's guess on the located `L` before `ℓ_b`; the sum on seen material under
+  0.2 of the held value, `ℓ_b`'s push is the held gap and the lap's guess is fixed on `L` alone.
+
+G156 fixed 2026-11-13T19:36Z (the Opus PC thread), before its read: G153's selection, the theory thread's second caution (the least of
+seventeen stage codes is selected on the read; stages 0 to 2 hold a third of places). best_stage_ruler.py on the same out_level, printing
+the mean of min(s3, s4) and of min(s3, s4, s5) against s4, and the gap split by the place's code at stage 4 (under 0.01 nats, 0.01 to 1,
+over 1).
+  (a) the theory thread's: min(s3, s4) stands 0.03 to 0.10 nats a place under s4, and most of the 0.340 sits in places over 1 nat at s4;
+  (b) this thread's: min(s3, s4, s5) adds under 0.03 to min(s3, s4)'s gap (the third stage is where the gain is, the fifth adds little).
+  Rule: none; a size for the lap's guess on `ℓ`.
+
+G152 wording corrected 2026-11-13T19:44Z (the theory thread's note: the relay printed the last return as the code rising with ℓ and the
+total as a slope of −0.034, two signs that read as opposite). Both stated as d(code)/dℓ in nats a place per unit of ℓ, the receipt reprinted
+with them: with one place open the three returns give +0.0167 (open rows +0.0320, written −0.0153), +0.0075 (+0.0197, −0.0122) and +0.0097
+(open rows alone), and the sum over returns and kinds of row is +0.0339; under the cut's mask the sum is +0.0339. A positive d(code)/dℓ is a code that rises with ℓ, so a
+deposit lowers ℓ_b. The score stands as written.
+
+G155 scored 2026-11-13T19:44Z (receipt g155_junction.txt; read-junction with the role prefix on level3/MEAN.3000, 122 stretches of training
+documents, 5,523 open places under the cut's mask, 122 with one place open; host, 8 threads, 45.5 s, 643 MB):
+  (a) under the cut's mask the sum over returns is d(code)/dℓ_b = −0.0048 nats a place, against +0.010 to +0.027 (the held +0.0339):
+      missed, the opposite sign at 0.14 of the held value;
+  (b) over open rows with one place open the chart's coordinates keep a median coherence of 0.147 at the first return (44 of 64 over 0.1):
+      held;
+  (c) every written row reads zero at the last return: held.
+  Of 3 parts 2 held and 1 missed. The rule's second branch applies (the sum on seen material under 0.2 of the held value): ℓ_b's held push is
+  the held gap, which the deposit does not see. Read against a random-sign level (sqrt(2/π)·sqrt(Σδℓ²)/Σ|δℓ|, rows taken as independent, so a
+  floor), the seen sums under the cut's mask stand at 0.13 to 1.03 times it on four of the five regions; only the written rows at the second
+  return (3.5 times, the code falling as ℓ rises) stand above. The coordinates' coherence with one place open is 1.5 to 2 times its level, and
+  under the cut's mask, the regions a lap deposits from, the open rows' median is 0.020 with none over 0.1. So a deposit on the line's own
+  stretches would hold ℓ_b near zero and move L slowly.
+  Decided (agent-inferred, with the theory thread's answer of 19:35Z: a hold, Γ ≤ 0, has two real roots and cannot turn, so the return shortens
+  a stride and never rings): the card realization of the return waits. The host build stays as the founding the reader's reaction on its
+  source (the theory thread's next design) is built from, refused on the card. Its card work is not spent on a part whose first deposit
+  the line's own passage barely moves.
+
+G156 scored 2026-11-13T19:44Z (receipt g156_near.txt; best_stage_ruler.py on G149's out_level):
+  (a) min(s3, s4) stands 0.090 nats a place under s4 (0.071 to 0.113 by slice), against 0.03 to 0.10, and places over 1 nat at stage 4 hold
+      0.840 of the 0.340 gap (3,881 of 10,432 places): held;
+  (b) min(s3, s4, s5) adds 0.065 to min(s3, s4)'s gap (0.155), against under 0.03: missed.
+  Of 2 parts 1 held and 1 missed. The least over seventeen stages is mostly a selection on places the field reads badly at the trained depth;
+  near it a place's own rate could reach 0.09 to 0.16 nats a place on this read, itself a selection on the read.

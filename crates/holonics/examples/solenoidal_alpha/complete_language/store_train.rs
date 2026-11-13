@@ -953,7 +953,9 @@ pub(super) fn read_depth(args: &[String], realization: &mut dyn FieldRealization
 /// constitution names (`Γ* = B/(1 − B)`, `ℓ* = −log₂(1 − 2B)`). Each slice of the held role is cut as `read-depth` cuts it, whole stretches until
 /// `PLACES` places, and each stretch is read twice on the host from the saved state: with the mask the cut drew (`mask 0`) and with its middle
 /// place alone open (`mask 1`). `OUT/echo.tsv` holds a line a row (numbers only): the slice's index, the mask, the read kind, the head, whether
-/// the row is written, and its `B` on `2^(−63)` ([`holonics::hnn::tower::field::Field::echo_by_head`]). The output directory is private.
+/// the row is written, and its `B` on `2^(−63)` ([`holonics::hnn::tower::field::Field::echo_by_head`]); `OUT/heads.tsv` a line a row with its
+/// round trips across heads, `B[h][h′]` in order ([`holonics::hnn::tower::field::Field::echo_across_heads`], the theory thread's item (c) after
+/// G151), whose diagonal is `echo.tsv`'s. The output directory is private.
 pub(super) fn read_echo(args: &[String]) -> Result<()> {
     if args.len() != 13 {
         return Err("read-echo UNITS UNITS_SHA STORE STORE_SHA KEYS KEYS_SHA CODEC CODEC_SHA PLACES STATE STATE_SHA OUT".into());
@@ -984,6 +986,8 @@ pub(super) fn read_echo(args: &[String]) -> Result<()> {
     use std::io::Write as _;
     let mut tsv = std::io::BufWriter::new(std::fs::File::create(out.join("echo.tsv"))?);
     writeln!(tsv, "slice\tmask\tkind\thead\twritten\tB")?;
+    let mut heads_tsv = std::io::BufWriter::new(std::fs::File::create(out.join("heads.tsv"))?);
+    writeln!(heads_tsv, "slice\tmask\tkind\twritten\tB[h][h2] in order")?;
     let d = learner.field.declaration;
     println!("ECHO_LAW role=held places={places} heads={} still={} frames={} ticks={} level={} ms={}", d.heads, d.still, d.frames, d.ticks, learner.field.scale.is_some(), started.elapsed().as_millis());
     for (si, &name) in role_names(&counts, "held").iter().enumerate() {
@@ -1000,7 +1004,7 @@ pub(super) fn read_echo(args: &[String]) -> Result<()> {
             stretches.push((stretch.region, kind));
         }
         let slice_start = std::time::Instant::now();
-        type Read = Vec<(usize, Vec<bool>, Vec<Vec<u64>>)>;
+        type Read = Vec<(usize, Vec<bool>, Vec<Vec<Vec<u64>>>)>;
         let reads: Vec<std::result::Result<Read, String>> = stretches
             .par_iter()
             .map(|(region, _)| {
@@ -1013,17 +1017,17 @@ pub(super) fn read_echo(args: &[String]) -> Result<()> {
                     .enumerate()
                     .map(|(mask, r)| {
                         let views = views_of(std::slice::from_ref(r));
-                        let echo = learner.field.echo_by_head(&views[0]).map_err(|e| e.to_string())?;
-                        Ok((mask, r.unresolved.clone(), echo))
+                        let across = learner.field.echo_across_heads(&views[0]).map_err(|e| e.to_string())?;
+                        Ok((mask, r.unresolved.clone(), across))
                     })
                     .collect()
             })
             .collect();
         let (mut rows, mut written_rows, mut open_nonzero) = (0u64, 0u64, 0u64);
         for ((_, kind), read) in stretches.iter().zip(reads) {
-            for (mask, unresolved, echo) in read? {
-                for (h, by_site) in echo.iter().enumerate() {
-                    for (t, &b) in by_site.iter().enumerate() {
+            for (mask, unresolved, across) in read? {
+                for (h, by_site) in across.iter().enumerate() {
+                    for (t, &b) in by_site[h].iter().enumerate() {
                         let written = !unresolved[t];
                         writeln!(tsv, "{si}\t{mask}\t{kind}\t{h}\t{}\t{b}", u8::from(written))?;
                         rows += 1;
@@ -1031,12 +1035,138 @@ pub(super) fn read_echo(args: &[String]) -> Result<()> {
                         open_nonzero += u64::from(!written && b != 0);
                     }
                 }
+                // [the theory thread's order after G151, item (c)] Each row's round trips across heads, `[h][h′]` in order.
+                for t in 0..unresolved.len() {
+                    let cells: Vec<String> = across.iter().flat_map(|by_h| by_h.iter().map(move |by_site| by_site[t].to_string())).collect();
+                    writeln!(heads_tsv, "{si}\t{mask}\t{kind}\t{}\t{}", u8::from(!unresolved[t]), cells.join("\t"))?;
+                }
             }
         }
         println!("ECHO_SLICE slice={name} stretches={} places={taken} rows={rows} written_rows={written_rows} open_rows_nonzero={open_nonzero} host_ms={} ms={}", stretches.len(), slice_start.elapsed().as_millis(), started.elapsed().as_millis());
     }
     tsv.flush()?;
+    heads_tsv.flush()?;
     println!("ECHO_DONE ms={}", started.elapsed().as_millis());
+    Ok(())
+}
+
+/// [measurement; theory, November 13, the junction record §9 and the theory thread's order after G151, item (a); G152] `read-junction UNITS
+/// UNITS_SHA STORE STORE_SHA KEYS KEYS_SHA CODEC CODEC_SHA PLACES STATE STATE_SHA OUT [ROLE]`: **the return's founding covector**, a reading of what a
+/// first deposit of the junction's return would see. The state's field is grown by the return at its founding in memory
+/// ([`holonics::hnn::tower::field::Field::with_junction`]; `Γ = 0`, so every face and the reverse are the state's own), and each slice of `ROLE`
+/// (`held` where it is not given; `prefix`, the training documents from each slice's first piece, reads seen material: the theory thread's first
+/// caution after G152, G155) is cut as `read-echo` cuts it, every stretch read on the host twice (`mask 0` the cut's own, `mask 1` its middle place alone open).
+/// `OUT/junction.tsv` holds a line a row and tick with a return (numbers only): the slice's index, the mask, the read kind, the tick, whether the
+/// row is written, the region's open places and the row's `δℓ` (`Field::junction_covectors`). `OUT/coords.tsv` holds, for each slice, mask, tick,
+/// kind of row and coordinate `i` of the tick's opening chart, `Σ δℓ r̂_i` and `Σ |δℓ r̂_i|` (the chart `L`'s covector and its magnitude). The output
+/// directory is private.
+pub(super) fn read_junction(args: &[String]) -> Result<()> {
+    if args.len() != 13 && args.len() != 14 {
+        return Err("read-junction UNITS UNITS_SHA STORE STORE_SHA KEYS KEYS_SHA CODEC CODEC_SHA PLACES STATE STATE_SHA OUT [ROLE]".into());
+    }
+    let role = args.get(13).map_or("held", String::as_str);
+    if role != "held" && role != "prefix" {
+        return Err("read-junction reads the held role or the training documents (prefix)".into());
+    }
+    let started = std::time::Instant::now();
+    refuse_variables("read-junction")?;
+    let units = units_of(&args[1], &args[2])?;
+    if !units.merges().is_empty() {
+        return Err("the store's cut is on bytes: a units file of merges is refused".into());
+    }
+    let store = Path::new(&args[3]);
+    let counts = store_counts(std::str::from_utf8(&pinned_read(&store.join("STORE.tsv").to_string_lossy(), &args[4], READ_BUDGET as usize)?)?)?;
+    let keys = pinned_read(&args[5], &args[6], READ_BUDGET as usize)?;
+    let seed = u64::from_be_bytes(keys.get(keys.len().saturating_sub(8)..).filter(|w| w.len() == 8).ok_or("a key file of fewer than eight bytes")?.try_into()?);
+    let codec = FieldCodec::from_text(&String::from_utf8(pinned_read(&args[7], &args[8], READ_BUDGET as usize)?)?, units)?;
+    let places = positive(&args[9])? as usize;
+    let learner = FieldLearner::from_text(std::str::from_utf8(&pinned_read(&args[10], &args[11], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
+    let law = learner.pass.clone().ok_or("a state with no pass line: read-junction reads a state of the store's line")?;
+    if learner.field.declaration.alphabet != codec.alphabet() {
+        return Err("a state whose alphabet is not its codec's".into());
+    }
+    let (field, _) = learner.field.with_junction().map_err(|e| e.to_string())?;
+    let out = Path::new(&args[12]);
+    if out.exists() {
+        return Err(format!("{} exists", out.display()).into());
+    }
+    std::fs::create_dir_all(out)?;
+    use rayon::prelude::*;
+    use std::io::Write as _;
+    let mut tsv = std::io::BufWriter::new(std::fs::File::create(out.join("junction.tsv"))?);
+    let mut coords = std::io::BufWriter::new(std::fs::File::create(out.join("coords.tsv"))?);
+    writeln!(tsv, "slice\tmask\tkind\ttick\twritten\tplaces\tdl")?;
+    writeln!(coords, "slice\tmask\ttick\twritten\tcoordinate\tsum\tmagnitude")?;
+    let d = field.declaration;
+    let dw = d.width;
+    println!("JUNCTION_LAW role={role} places={places} ticks={} width={dw} level={} founded=true ms={}", d.ticks, field.scale.is_some(), started.elapsed().as_millis());
+    for (si, &name) in role_names(&counts, role).iter().enumerate() {
+        let slice = open_slice(store, role, name, &counts)?;
+        let pass = StorePass { role: role.to_string(), store: args[4].clone(), stretches: 0, least: law.least, octaves: law.octaves, pairs: law.pairs, sites: law.sites, slices: vec![PassSlice { name: name.to_string(), piece: 0, cursor: 0, taken: 0 }] };
+        let mut cut = Cut { seed, slices: vec![slice], pass };
+        let mut stretches: Vec<(TrainRegion, usize)> = Vec::new();
+        let mut taken = 0usize;
+        while taken < places {
+            let Some(drawn) = cut.next() else { break };
+            let stretch = cut.take(drawn, &codec)?;
+            taken += stretch.region.classes.len();
+            let kind = read_kind(&stretch);
+            stretches.push((stretch.region, kind));
+        }
+        let slice_start = std::time::Instant::now();
+        type Read = Vec<(usize, Vec<bool>, Vec<(usize, Vec<i64>, Vec<i32>)>)>;
+        let reads: Vec<std::result::Result<Read, String>> = stretches
+            .par_iter()
+            .map(|(region, _)| {
+                let n = region.classes.len();
+                let mut alone = vec![false; n];
+                alone[n / 2] = true;
+                let one = TrainRegion::plain(region.classes.clone(), alone);
+                [region, &one]
+                    .into_iter()
+                    .enumerate()
+                    .map(|(mask, r)| {
+                        let views = views_of(std::slice::from_ref(r));
+                        let (by_tick, _) = field.junction_covectors(&views[0]).map_err(|e| e.to_string())?;
+                        Ok((mask, r.unresolved.clone(), by_tick))
+                    })
+                    .collect()
+            })
+            .collect();
+        // `[mask][tick][written][coordinate]`: `Σ δℓ r̂_i` and `Σ |δℓ r̂_i|`.
+        let mut sums = vec![vec![vec![vec![(0i128, 0u128); dw]; 2]; d.ticks]; 2];
+        let (mut rows, mut written_nonzero_last) = (0u64, 0u64);
+        for ((_, kind), read) in stretches.iter().zip(reads) {
+            for (mask, unresolved, by_tick) in read? {
+                let open = unresolved.iter().filter(|&&u| u).count();
+                for (tick, dl, chart) in &by_tick {
+                    for (t, &v) in dl.iter().enumerate() {
+                        let written = !unresolved[t];
+                        writeln!(tsv, "{si}\t{mask}\t{kind}\t{tick}\t{}\t{open}\t{v}", u8::from(written))?;
+                        rows += 1;
+                        written_nonzero_last += u64::from(written && *tick + 1 == d.ticks && v != 0);
+                        for (i, slot) in sums[mask][*tick][usize::from(written)].iter_mut().enumerate() {
+                            let p = i128::from(v) * i128::from(chart[t * dw + i]);
+                            (slot.0, slot.1) = (slot.0 + p, slot.1 + p.unsigned_abs());
+                        }
+                    }
+                }
+            }
+        }
+        for (mask, by_mask) in sums.iter().enumerate() {
+            for (tick, by_tick) in by_mask.iter().enumerate().skip(1) {
+                for (written, by_row) in by_tick.iter().enumerate() {
+                    for (i, &(sum, magnitude)) in by_row.iter().enumerate() {
+                        writeln!(coords, "{si}\t{mask}\t{tick}\t{written}\t{i}\t{sum}\t{magnitude}")?;
+                    }
+                }
+            }
+        }
+        println!("JUNCTION_SLICE slice={name} stretches={} places={taken} rows={rows} written_nonzero_at_last_tick={written_nonzero_last} host_ms={} ms={}", stretches.len(), slice_start.elapsed().as_millis(), started.elapsed().as_millis());
+    }
+    tsv.flush()?;
+    coords.flush()?;
+    println!("JUNCTION_DONE ms={}", started.elapsed().as_millis());
     Ok(())
 }
 

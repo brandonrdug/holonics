@@ -511,12 +511,26 @@ repository was reset on September 24; the pre-reset tree is
     flatten (G149): the built tick takes a junction's mean without its return, so no branch reflects
     and nothing rings; the junction's return in the tick is the next law, and a turned head's reach
     on its own clock (G150: its clock carries part of the influence, the place count part) after it.
+    The fourth lap fell 0.0141 and 0.0098 more (1.0971 and 2.4179 at its mean). The return is built
+    on the host (`FieldDeclaration::junction`), founded at the matched load so every face is kept,
+    and refused on the card until its card realization passes parity. Read before the kernels: a
+    written row's own echo is small (G151, median B 0.00068, most of it in the second turned head,
+    which every head hears, G154). On held text the code rises with the return's chart (G152:
+    d(code)/dℓ = +0.034 nats a place, both masks), a push toward a hold, but on the line's own
+    training stretches the push is −0.005 and near its random-sign level (G155), so it is the
+    held gap, which a deposit does not see; near the trained depth a place's own rate could reach
+    0.09 to 0.16 nats a place, mostly at places the field reads badly (G156). A hold cannot ring,
+    so the card realization of the return waits; the next design is the reader's reaction on its
+    source, which the theory thread is deriving, built from this host founding.
     Corrected the same day (the return's record, §13): the tick adds its current to a site's
     state, so the site term first derived is the site's own rate and takes no echo out; a head's
     read changes the reader and not its source, which on the pair is free fall; and the
     junction's return proper is a reader's reaction on its source, a design whose law is not yet
-    derived (atlas `tower.field-read-free-fall`). The echo within a head reads 0.00068 at the
-    median on the line's written rows (G151).
+    derived (atlas `tower.field-read-free-fall`); its covector's owner and equation are in §13.8.
+    A turned head's falloff is the envelope of the bank its skins are members of, so its reach
+    belongs on the head's own clock, founded on the log chart of the gap with every bit kept
+    (§13.9, atlas `tower.field-reach-on-clock`). Both are read from the built passes before a
+    build.
   - The open places need the written rows' ticks (November 13, P62, G140 scored; the design
     record §4.8). Read zero-shot on the line's latest lap mean with a written row held at its
     opening: the open rows alone code 3.29 nats a place worse at held one-place masks and 1.90

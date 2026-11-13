@@ -409,6 +409,22 @@ prints `B`, so the first item is that read.
    the matched founding on most written rows, and the build's first reading is whether the deposit moves `ℓ` at all, head 3's
    region the one where `ℓ*` is away from zero. The build's case does not rest on `B`, since the return is also the term that
    lets a tick carry a rate.
+
+   *Read after* (the theory thread's order after G151, its items (a) to (c); G152 to G154, November 13 19:23 to 19:29Z, the PC thread;
+   receipts [g152](2026-11-13_THE_TICK_HOLDS_THE_JUNCTIONS_ANCHOR_WITHOUT_ITS_RETURN_THE_RETURN_IS_THE_SWING_OF_THE_STATE_TWO_TICKS_BACK_ABOUT_THE_PRESENT_ANCHOR_THE_TREES_OWN_ECHO_TERM_AND_A_MERGE_LOSES_WHICH_NEVER_HOW_MUCH_receipts/g152_junction.txt), [g153](2026-11-13_THE_TICK_HOLDS_THE_JUNCTIONS_ANCHOR_WITHOUT_ITS_RETURN_THE_RETURN_IS_THE_SWING_OF_THE_STATE_TWO_TICKS_BACK_ABOUT_THE_PRESENT_ANCHOR_THE_TREES_OWN_ECHO_TERM_AND_A_MERGE_LOSES_WHICH_NEVER_HOW_MUCH_receipts/g153_best.txt), [g154](2026-11-13_THE_TICK_HOLDS_THE_JUNCTIONS_ANCHOR_WITHOUT_ITS_RETURN_THE_RETURN_IS_THE_SWING_OF_THE_STATE_TWO_TICKS_BACK_ABOUT_THE_PRESENT_ANCHOR_THE_TREES_OWN_ECHO_TERM_AND_A_MERGE_LOSES_WHICH_NEVER_HOW_MUCH_receipts/g154_heads.txt)). The return is
+   built on the host, founded at the matched load (`FieldDeclaration::junction`), and its founding covector was read on the line's third-lap
+   mean before any kernel work. Summed over the three returns, `d(code)/dℓ_b` is +0.034 nats a place on held text under both masks (the
+   cut's own, 5,634 open places; one place open, 122): the code rises with `ℓ`, so a first deposit on held text would lower `ℓ_b` toward a
+   hold, `Γ < 0`, the path slowed toward its state two ticks back, against the offered raise at the last return. On the line's own training
+   stretches (G155, [receipt](2026-11-13_THE_TICK_HOLDS_THE_JUNCTIONS_ANCHOR_WITHOUT_ITS_RETURN_THE_RETURN_IS_THE_SWING_OF_THE_STATE_TWO_TICKS_BACK_ABOUT_THE_PRESENT_ANCHOR_THE_TREES_OWN_ECHO_TERM_AND_A_MERGE_LOSES_WHICH_NEVER_HOW_MUCH_receipts/g155_junction.txt)) the same sum is −0.005, near its random-sign level on four of five regions:
+   the held push is the held gap, where the constitution is surer on held text than it has earned, and a deposit does not see it. The first return is the most coherent over open
+   rows alone (0.21), and every written row reads zero at the last (no face is read there). The codes by stage agree: the commonest best stage
+   is the third, before the trained depth, and 0.59 of places reach their least by it. Across heads, what a site tells in the second turned head
+   comes back to it in every head (heads 0 to 2 hear 5.3 to 11.4 times their own echo through the others, most of it through head 3).
+   Near the trained depth a place's own rate could reach 0.090 (the least of stages 3 and 4) to 0.155 nats a place (of 3 to 5) under stage
+   4's code, 0.84 of the whole gap at places coded over one nat there (G156, [receipt](2026-11-13_THE_TICK_HOLDS_THE_JUNCTIONS_ANCHOR_WITHOUT_ITS_RETURN_THE_RETURN_IS_THE_SWING_OF_THE_STATE_TWO_TICKS_BACK_ABOUT_THE_PRESENT_ANCHOR_THE_TREES_OWN_ECHO_TERM_AND_A_MERGE_LOSES_WHICH_NEVER_HOW_MUCH_receipts/g156_near.txt)). A hold has two real
+   roots and cannot turn, so the return shortens a stride and never rings (the theory thread, 19:35Z). The card realization waits; the host
+   build stays as the founding of the reader's reaction on its source.
 2. **The build.** The return as the tick's last step, founded at the matched load, on the card
    with its parity against the host; the grown state reads its source's faces bit for bit, and
    the build enters the line by reproducing the line's lap with the part at its founding and
@@ -580,13 +596,38 @@ at the last tick was forecast to lower the code by about 0.02 nats a place a uni
   places of each place's least code over the stages, against the code at stage 4, with the
   count of places by their best stage, by slice.
 
-**Scored** (G152 and G153, the engineering thread on the host, relayed 19:24Z; their receipts
-land with that thread's record, and their figures are left to it because they have not been read
-at the receipt here). Over held stretches, with one place open and with the cut's own mask: at
-the last return the code rises with `ℓ`, the opposite sign to the forecast; the first return is
-the most coherent of the three, where the forecast said the least; and summed over the three
-returns a first deposit lowers `ℓ_b`. By place, the stage of least code is stage 3 more often
-than stage 4. Both parts of the offered guess are misses.
+**Scored** (G152 and G153, the engineering thread on the host; receipts `g152_junction.txt` and
+`g153_best.txt`, read here at the receipts; the state is the line's third-lap mean grown by the
+return at its founding, the stretches held, five slices; `d(code)/dℓ` in nats a place a unit of
+`ℓ`, positive where the code rises with `ℓ`).
+
+- *One place open* (122 open places, 21,576 written rows). Over the open rows the three returns
+  read +0.0320, +0.0197 and +0.0097, with coherence 0.208, 0.177 and 0.069; over the written rows
+  −0.0153 and −0.0122 at the first two, and zero at the last, where no written row is read. The
+  sum over returns and both kinds of row is +0.0339.
+- *The cut's own mask* (5,634 open places, 16,064 written rows). Open rows −0.0021, +0.0050 and
+  +0.0165 (coherence 0.008, 0.028, 0.080); written rows +0.0112 and +0.0033. The sum is +0.0339;
+  by slice it is +0.054 (code), +0.060 (web), −0.017 (science), +0.027 (books) and +0.048
+  (wikidata).
+- *The chart's coordinates.* With one place open, 41, 35 and 28 of the 64 coordinates stand over
+  0.1 in coherence on open rows (medians 0.145, 0.137, 0.093); under the cut's mask 4, 1 and 2 do
+  (medians 0.026 to 0.036).
+- *The best stage by place* (10,432 held places, the level's second-lap mean). The code at stage
+  4 is 1.1640 and the mean of each place's least code is 0.8237, a gap of 0.3402. The places
+  whose least code falls at stages 0 to 5 number 658, 914, 1,908, 2,701, 2,036 and 805; 315 put
+  it at stage 16.
+
+At the last return the code rises with `ℓ` under both masks, the opposite sign to the forecast;
+with one place open the first return is the most coherent of the three, where the forecast said
+the middle one was the least; and summed over the returns a first deposit on held text lowers
+`ℓ_b`. Both parts of the offered guess are misses.
+
+One check is open on the receipt. The two masks' sums agree to four parts in a million a place
+(4,620,315,395 over 5,634 open places and 100,049,025 over 122) while their slices differ in
+sign, and the same two sums on the line's own stretches do not agree (G155, below). Either the
+read shares a quantity between the masks or the agreement is an accident of about one in a
+hundred thousand; until the read's source is read for it, "+0.034 under both masks" is one
+reading and not two. The engineering thread was asked near 19:56Z.
 
 **The cause is in the receipt the forecast was read from.** Stage 4 is the trained end, and the
 control's code at stage 5 stands above its code at stage 4: the forward difference is +0.058
@@ -620,9 +661,32 @@ states:
   to 0.10 nats a place under stage 4, and most of the gap over all stages sits in places whose
   code at stage 4 is over one nat.
 
-The relay reads the pair chart's coordinates as coherent on open rows. If the receipt holds
-that, the worth is in `L`, which separates places that should hold from places that should run
-on, more than in the shared `ℓ_b`.
+**The two cautions, scored** (G155 and G156, the engineering thread on the host, 19:38Z;
+receipts `g155_junction.txt` and `g156_near.txt`, read here at the receipts).
+
+- *Region* (the line's training documents, 122 stretches). Under the cut's mask (5,523 open
+  places) the sum over returns and rows is −0.0048, the opposite sign at 0.14 of the held value;
+  by slice −0.045 (code), +0.015 (web), +0.0005 (science), −0.033 (books) and +0.039 (wikidata).
+  With one place open (122 places) it is +0.0143, the same sign at 0.42 of the held value, with
+  slices of both signs. The offered guess is scored a miss under the cut's mask, the mask a
+  deposit is made from; the reading with one place open stands on 122 places and earns it
+  nothing. The caution's substance held: on the lap's own stretches the push is near its
+  random-sign level (the engineering thread's count: within 0.13 to 1.03 of that level on four
+  of five regions), so the held push is the held gap, which a deposit does not see.
+- *The chart's coordinates on seen text.* With one place open, 44, 44 and 36 of 64 coordinates
+  stand over 0.1 on open rows (medians 0.147, 0.160, 0.115); under the cut's mask none, one and
+  none do (medians 0.020 to 0.027). The coherence of `L` with one place open is there on seen
+  text as on held; under the mask a deposit trains with it is not.
+- *Selection* (the same 10,432 places). The lesser of the codes at stages 3 and 4 stands 0.090
+  under stage 4's (0.071 to 0.113 by slice), and the least of stages 3 to 5 stands 0.155 under
+  it. Places coded over one nat at stage 4 (3,881 of them) hold 0.840 of the whole gap, places
+  between 0.01 and one nat 0.160, and the 1,054 places under 0.01 nats 0.001. Both parts of the
+  offered guess held.
+
+**What the engineering thread decided from them** (its decision, recorded in §9): the card
+realization of the return waits. A hold cannot ring (§13.2), and a deposit on the line's own
+stretches would leave `ℓ_b` near zero and move `L` slowly. The host build stays as the founding
+the reader's reaction is built from.
 
 ### 13.4 The hypothesis of §6 item 3, read
 
@@ -638,6 +702,24 @@ circles are two-way by their build (a site reads the mate before it through one 
 mate after it through another), and a directed cycle longer than two is not a round trip. The
 reading asked next is the table across heads, `B^(h,h′)_i = Σ_j p^h_ij p^(h′)_ji`, four by four,
 by region. It decides nothing about `ℓ`. It is the premise of §13.6.
+
+**Read** (G154, the engineering thread on the host, 19:29Z; receipt `g154_heads.txt`, read here;
+37,640 written rows of the five held slices, medians of `B(h, h′) = Σ_j p_ji^(t,h′) p_ij^(t+1,h)`):
+
+```text
+            h′ = 0     h′ = 1     h′ = 2     h′ = 3
+h = 0      0.00051    0.00020    0.00028    0.00131
+h = 1      0.00021    0.00017    0.00021    0.00113
+h = 2      0.00029    0.00024    0.00027    0.00144
+h = 3      0.00132    0.00122    0.00126    0.01075
+```
+
+The trips across heads are of the same order as the trips within one, a thousandth and under,
+and the table is near symmetric. What a site tells through the second turned head (`h = 3`)
+comes back to it in every head: a head's row sums to 5.3, 11.4, 9.9 and 1.5 times its own
+diagonal. So the constitution has not located a two-way part between heads by itself, and the
+premise of §13.6 stands as read: in this tick a reader does not act on its source by any route
+through a head.
 
 ### 13.5 The built read against the theory's reception
 
@@ -736,12 +818,16 @@ they encode).
 1. The founding covector of `ℓ` and the best stage by place (§13.3), on the host. Read as G152
    and G153; the forecast missed.
 2. The same covector on the lap's own stretches, and the least code over stages 3 and 4 by
-   place (§13.3's cautions), on the host.
-3. The round trips across heads (§13.4), on the host.
-4. The founding covector of `κ_h` (§13.6), on the host, once the stage's law is derived.
-5. The build whose covector is coherent, with its guess fixed then by the thread that orders
-   it. The build of §9 item 2 is not withdrawn: its guess on the sign of `ℓ` is fixed from item
-   2's reading, and a guess already fixed from §9 stands and is scored.
+   place (§13.3's cautions), on the host. Read as G155 and G156; of three offered guesses one
+   missed and two held.
+3. The round trips across heads (§13.4), on the host. Read as G154.
+4. The founding covector of a reader's reaction by head (§13.8), on the host, from the built
+   passes. Its owner and equation went to the engineering thread near 19:56Z.
+5. The founding covectors of a turned head's reach on its own clock (§13.9), on the host, from
+   the built passes.
+6. The build whose covector is coherent on the lap's own stretches, with its guess fixed then by
+   the thread that orders it. The card realization of §9 item 2 waits by the engineering
+   thread's decision (§13.3); a guess already fixed from §9 stands and is scored.
 
 The plan's line that named the triads' pumped contact as the pump's candidate is corrected with
 this section (§10 holds: a triad is a product along the strand inside one tick).
@@ -751,3 +837,125 @@ head, this build's loop has the gain G151 read: `2^(−10.5)` at the median over
 a hundredth in one turned head. That is a reading of this build's loop. It says the build has
 almost no path by which a site hears itself within a read, and G149's ring read the same absence
 from the other side.
+
+### 13.8 The reading of a reader's reaction: its owner and its equation
+
+Asked by the engineering thread at 19:40Z, answered near 19:56Z. Nothing here is a build.
+
+**Owner.** The reverse's value route in `Field::tick_return`, at the rows the cell kept (a met
+source's share `Source.p`; a crowd's share spread `p_C/|C|` over its definite sources at the
+octave's decay, as the reverse spreads it). Nothing passes through the lock, the keys or the
+probes, and nothing goes back through the pair contact.
+
+```text
+ρ_j^(h,k) = J_r̂(x_j^k)ᵀ V_hᵀ conj(U_j) Σ_(i: j ∈ S_i^h) p_ij D_ij U_i (O_hᵀ x_i^(k+1))
+A_h^k     = Σ_(j written) Re⟨λ_j^(k+1), ρ_j^(h,k)⟩
+x_j ← x_j − κ_h ρ_j^(h,k) after tick k       d(code)/dκ_h = −Σ_k A_h^k
+```
+
+`ρ` is tick `k`'s value route of head `h`, transposed, fed each reader's state after tick `k` in
+the place where the reverse feeds its covector (`O_hᵀ` restricted to the head's block of the
+current). `λ^(k+1)` is the covector `tick_return` receives for tick `k`. A written row carries no
+covector at the last tick (the receipts print `written_nonzero_at_last_tick=0`), so the reading
+has three ticks of four, as G152 had. Printed by head, tick, mask, region and the reader's kind
+(open readers, written readers): the sum, the sum of magnitudes, the coherence, `d(code)/dκ` a
+place and the random-sign level; and `m_h² = Σ|ρ_j|²/Σ|x_j|²`, the unit `κ` is read in (the pair
+of §13.6 stays passive for `κ m² < 4`). On held stretches and on the line's own.
+
+**The sign, on a chart read at unit power.** `κ > 0` is the turn: the source is charged what the
+reader took. `κ < 0` is the like sign, a boost on the bare pair (§13.6). Every read of a state
+goes through the lane chart `r̂ = x/‖x‖_rms`, which does not read a lane's scale, so the boost's
+growth is not read and what is read is the pair's approach to its growing direction: a relaxation
+onto agreement, the star of §13.5, a power iteration. So the like sign is no runaway here, and
+the reading's sign says whether the trained comparison asks a head for a turn or for agreement.
+
+**A leak needs no reading of its own.** `x ← (1 − ε) x + g` differs from `x ← x + g/(1 − ε)` by
+a scale no chart reads, at that tick and at every later one. A leak on the state is `ℓ`'s
+direction (§13.2), which G152 and G155 read. A thought of this hour, that the tick integrates
+with no restoring term of its own, comes to the same: at unit power a restoring term is the rate.
+
+**Why it can differ from `ℓ`'s covector.** No direction of the constitution spans it: no entry
+makes a reader act on its source within a tick. With one place open it is the only route by
+which an open place hears itself (G151: every open row's echo is zero), which is the loop the
+lens of §1 asserts and this build lacks.
+
+**Offered guess** (thin; the thread that orders the reading fixes it): on the line's own
+stretches under the cut's mask the code falls as `κ` rises in at least three of the four heads,
+the sum standing over twice its random-sign level in at least two. A covector at its random-sign
+level in every head would say the comparison read at one depth has no use for a reaction, which
+would be news about the comparison more than about the part.
+
+### 13.9 A turned head's reach belongs on its own clock: its falloff is the envelope of the bank its skins are members of
+
+Asked by the engineering thread at 19:45Z, with G150 held for the answer; answered near 19:56Z.
+A design, agent-inferred, unbuilt.
+
+**The built contact.** A turned head scores a met source at
+`z_ij = T · lock(ŵ_i, ŵ_j; D) − 2^16 ⌊log₂ |i − j|⌋` (`Field::tick`). Its skins run on its own
+clock, `D_m = e^(−2π|σ_i − σ_j|/n_m)` (`pair_decay`, `tower.field-pace`), its frames on `τ`, and
+its falloff and its crowds' ranges on the place count (`octave`, `crowd_ranges`).
+
+**What the tree holds.** `wave.matched-friction-reach` (October 29): one friction carries a push
+across `L` ticks at most `(L/(L + 1))^L/(L + 1)`, which tends to `1/(e L)`, and an octave bank of
+frictions carries every distance with harmonic falloff, the bank's sum times `L ln 2` tending to
+one. `tower.field-pace`: a clock's rates are a friction its navigator located, and the skin
+follows the turn on `σ`. So a harmonic falloff is the envelope of a bank of skins, and the
+envelope belongs to the clock its members run on: `1/Δσ`. The built head reads the members on
+its own clock and their envelope on the place count. That is where the built object is not the
+theory's. The floor is that envelope's container staircase at radix two with its remainder
+dropped (`radix.container-staircase`): every source of an octave is priced as the octave's
+nearest.
+
+**It is not the reader's reaction.** A reaction returns along a row at the shares the row
+already has; the reach is the row's prior. They are the two factors of one line, its attenuation
+and its return, and neither subsumes the other.
+
+**The founding.** The engineering thread's two obstacles were that a switch of gap changes every
+face of a trained state at once, the paces being located, and that a weight on a floor has no
+covector. Both are met on the log chart of the gap:
+
+```text
+z_ij −= 2^16 ⌊log₂ d⌋ + u_h · frac(log₂ d) + w_h · log₂(max(Δσ_ij, 1)/d)
+d = |i − j|,   Δσ_ij = |σ_h(i) − σ_h(j)| in plain ticks,   u_h = w_h = 0 at the founding
+```
+
+with the logarithms on the face's grain and one real `u_h` and one real `w_h` a turned head. At
+zero every bit is the built one. Both are first order there. `u` restores the floor's remainder.
+`w`'s term is the logarithm of the head's mean rate across the span, the stretch of its clock
+between the two places, and it is zero wherever the clock is plain. A gap under one plain tick
+reads as one: below its shortest member a bank's envelope is level. The theory's end is
+`u = w = 1`, the falloff `log₂ Δσ`. The paces gain a route through `w`'s term, second order at
+the founding. A crowd keeps its place octave at the founding and takes `w`'s term at the place
+its skin already reads (the place `2^level` away), where the remainder is zero; moving the
+crowds' ranges to octaves of the clock (contiguous on a monotone `σ`, so the prefix sums hold)
+is a later step with its own receipt.
+
+**A reading before any build**, from the built passes: with `ζ_ij` the covector of a met
+source's score, which the reverse forms,
+
+```text
+δw_h = −Σ ζ_ij log₂(Δσ_ij/d_ij)        δu_h = −Σ ζ_ij frac(log₂ d_ij)
+```
+
+by head, region and mask, on held stretches and on the line's own, each against its random-sign
+level. Offered guess (thin; the thread that orders the reading fixes it): on the line's own
+stretches the code falls as `w` rises in the first turned head, the sum over twice its
+random-sign level, and the second head's is weaker (G150 read the clock's partial at −0.114 and
+−0.063); `u` points to restoring the remainder in both.
+
+**What G150 can and cannot say.** Inside each octave of a head's clock gap the place distance
+still correlates with the influence at −0.14. A falloff built on places gives that by
+construction, so the reading does not separate a law that wants the place count from a build
+that put it there. The covectors above do.
+
+**The lens of the same hour.** A guided span multiplies by an equal ratio for an equal step,
+and a spreading one by an equal ratio for an equal ratio; a spread is an octave bank of guided
+spans. The skin is the first and the falloff the second, and the identity above is their
+relation.
+
+Recorded failures this could repeat, and how each is met: a width as a dial (met: `u` and `w`
+are located by their covectors and their end is the theory's, one); a switch of law that changes
+a line's faces at once (met: founded at zero, every bit kept); a design thought in arrays (met:
+stated as a bank's envelope, the crowd ranges left as they are at the founding); a guess on a
+premise a log settles (met: the covectors are read before a build); a branch on the kind of
+input (none).

@@ -1,0 +1,13 @@
+# G156, best_stage_ruler.py on G149's out_level (the level's second-lap mean), 10,432 held places
+BEST out_level slice=pooled places=10432 stage4=1.1640 least=0.8237 gap=0.3402 share_at_4=0.195 share_past_8=0.064 | s0:658 s1:914 s2:1908 s3:2701 s4:2036 s5:805 s6:385 s7:217 s8:139 s9:82 s10:84 s11:57 s12:54 s13:31 s14:26 s15:20 s16:315
+NEAR out_level slice=pooled min34_gap=0.0900 min345_gap=0.1552 | under_0.01:places=1054:gap_share=0.001 0.01_to_1:places=5497:gap_share=0.160 over_1:places=3881:gap_share=0.840
+BEST out_level slice=books places=2069 stage4=1.1804 least=0.7562 gap=0.4242 share_at_4=0.191 share_past_8=0.086 | s0:179 s1:241 s2:321 s3:429 s4:395 s5:155 s6:86 s7:45 s8:41 s9:23 s10:22 s11:16 s12:15 s13:8 s14:10 s15:6 s16:77
+NEAR out_level slice=books min34_gap=0.1130 min345_gap=0.1844 | under_0.01:places=186:gap_share=0.001 0.01_to_1:places=1043:gap_share=0.147 over_1:places=840:gap_share=0.853
+BEST out_level slice=code places=2069 stage4=0.8109 least=0.5621 gap=0.2488 share_at_4=0.226 share_past_8=0.044 | s0:114 s1:127 s2:376 s3:604 s4:467 s5:154 s6:77 s7:37 s8:22 s9:17 s10:17 s11:4 s12:6 s13:6 s14:2 s15:3 s16:36
+NEAR out_level slice=code min34_gap=0.0706 min345_gap=0.1223 | under_0.01:places=512:gap_share=0.001 0.01_to_1:places=1011:gap_share=0.173 over_1:places=546:gap_share=0.825
+BEST out_level slice=science places=2069 stage4=1.1980 least=0.8698 gap=0.3282 share_at_4=0.178 share_past_8=0.053 | s0:145 s1:192 s2:343 s3:580 s4:369 s5:167 s6:88 s7:45 s8:31 s9:12 s10:12 s11:13 s12:12 s13:3 s14:3 s15:3 s16:51
+NEAR out_level slice=science min34_gap=0.0906 min345_gap=0.1549 | under_0.01:places=112:gap_share=0.000 0.01_to_1:places=1170:gap_share=0.178 over_1:places=787:gap_share=0.822
+BEST out_level slice=web places=2041 stage4=1.2732 least=0.8778 gap=0.3954 share_at_4=0.173 share_past_8=0.070 | s0:145 s1:180 s2:402 s3:542 s4:353 s5:136 s6:72 s7:45 s8:23 s9:15 s10:13 s11:11 s12:6 s13:6 s14:5 s15:3 s16:84
+NEAR out_level slice=web min34_gap=0.1063 min345_gap=0.1793 | under_0.01:places=129:gap_share=0.000 0.01_to_1:places=1083:gap_share=0.161 over_1:places=829:gap_share=0.839
+BEST out_level slice=wikidata places=2184 stage4=1.3487 least=1.0416 gap=0.3071 share_at_4=0.207 share_past_8=0.068 | s0:75 s1:174 s2:466 s3:546 s4:452 s5:193 s6:62 s7:45 s8:22 s9:15 s10:20 s11:13 s12:15 s13:8 s14:6 s15:5 s16:67
+NEAR out_level slice=wikidata min34_gap=0.0706 min345_gap=0.1362 | under_0.01:places=115:gap_share=0.000 0.01_to_1:places=1190:gap_share=0.147 over_1:places=879:gap_share=0.852
