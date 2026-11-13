@@ -1406,7 +1406,7 @@ impl<'c> CardField<'c> {
         Ok((faces, read_logits, g, rows, echoes))
     }
 
-    fn tick(&self, sites: usize, pairs: usize, regions: usize, field: &Field, stored: bool, returning: bool) -> Result<Tick<'c>> {
+    fn tick(&self, sites: usize, pairs: usize, regions: usize, field: &Field, stored: bool, returning: bool, dense: bool) -> Result<Tick<'c>> {
         let d = field.declaration;
         let rows = sites + regions;
         let slots = crowd_slots(d.reach);
@@ -1442,7 +1442,12 @@ impl<'c> CardField<'c> {
             // The pairs' scores, then their shares, a word a pair; zeroed where the echo reads another tick's (a
             // pair absent from a row reads zero), else only the support's entries are ever written and read.
             sb: self.take::<i64>(if returning { (heads * pairs).max(1) } else { 1 }).map_err(device)?,
-            e: if stored { self.timed(Kind::Alloc, || self.take_zeroed::<u64>((heads * pairs).max(1))).map_err(device)? } else { self.timed(Kind::Alloc, || self.take::<u64>((heads * pairs).max(1))).map_err(device)? },
+            // [theory, November 13, P56 step 6] Taken without its zeroing where no dense reader runs (`dense`, at the call): every other word read is
+            // written first in the same tick. The exposure (`field_exposure`) writes the score at every support entry `[i][j]` of every computed row of
+            // every head; the contact (`contact_body`) reads it there and writes the share there; the rows, the skin's return and the rulers read only
+            // those entries of computed rows, and the columns read them at the pairs whose covector `ds` they read beside, which is an unzeroed take
+            // the rows write only at support entries. No reader meets an entry outside a computed row's support.
+            e: if stored && dense { self.timed(Kind::Alloc, || self.take_zeroed::<u64>((heads * pairs).max(1))).map_err(device)? } else { self.timed(Kind::Alloc, || self.take::<u64>((heads * pairs).max(1))).map_err(device)? },
             amin: alloc64(heads * sites)?,
             sw: self.timed(Kind::Alloc, || self.take::<i128>((heads * rows * span).max(1))).map_err(device)?,
             sv: self.timed(Kind::Alloc, || self.take::<i128>((heads * rows * span).max(1))).map_err(device)?,
@@ -1793,7 +1798,7 @@ impl<'c> CardField<'c> {
         let pregions: Vec<Region> = owned.iter().map(|(c, u, f)| Region { classes: c, unresolved: u, faces: if f.iter().any(Option::is_some) { f } else { &[] }, locked: &[], echo: &[], domain: None, port: None }).collect();
         let st = self.stage(&pregions, cd.alphabet, cd.width, &cd, &mut tr.cwords)?;
         let (sites, m2, n) = (st.sites, 2 * cd.complex(), cd.modes);
-        let ticks: Vec<Tick> = (0..if kept { cd.ticks } else { 1 }).map(|_| self.tick(sites, st.pairs, regions, coarse, stored, returning)).collect::<Result<_>>()?;
+        let ticks: Vec<Tick> = (0..if kept { cd.ticks } else { 1 }).map(|_| self.tick(sites, st.pairs, regions, coarse, stored, returning, true)).collect::<Result<_>>()?;
         let trips = self.timed(Kind::Alloc, || self.take_zeroed::<i128>(sites.max(1))).map_err(device)?;
         tr.cwords.trips = trips.device_ptr();
         // The packets carry no moments: their values and probes read zero there.
@@ -1913,7 +1918,10 @@ impl<'c> CardField<'c> {
         // echo (§15.3: the round trips of consecutive ticks, so every tick is kept).
         let stored = returning || keep.is_some() || logits;
         let kept = returning || logits;
-        let ticks: Vec<Tick> = (0..if kept { d.ticks } else { 1 }).map(|_| self.tick(sites, pairs, regions.len(), field, stored, returning)).collect::<Result<_>>()?;
+        // [theory, November 13, P56 step 6] The pairs' block `e` is read past its rows' supports only by a logits read (the echo's round trips at the reverse
+        // pair, the held rows and the rows' currents over every entry of a row) and by a landmark read (whole rows fetched): only those take it zeroed.
+        let dense = logits || keep.is_some();
+        let ticks: Vec<Tick> = (0..if kept { d.ticks } else { 1 }).map(|_| self.tick(sites, pairs, regions.len(), field, stored, returning, dense)).collect::<Result<_>>()?;
         // The round trips a site's echo sums (128 bits a site), over the heads and the ticks.
         let trips = self.timed(Kind::Alloc, || self.take_zeroed::<i128>(sites.max(1))).map_err(device)?;
         words.trips = trips.device_ptr();
