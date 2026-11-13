@@ -3013,12 +3013,13 @@ impl<'c> CardField<'c> {
         };
         self.launch(entry, grid, THREADS, &mut [arg(words), arg(&mut gp), arg(&mut at), arg(&mut rows32), arg(&mut cols32), arg(&mut y), arg(&mut ys), arg(&mut x), arg(&mut xs), arg(&mut u), arg(&mut maxima)])?;
         let ops: Vec<(u64, bool, usize, usize)> = if x != 0 { vec![(y, true, ys as usize, rows), (x, x64, xs as usize, cols)] } else { vec![(y, true, ys as usize, rows)] };
+        self.map_record((entry, rows32, if x != 0 { cols32 } else { 0 }, u != 0, false), words, None, None, None, &ops)?;
         if x != 0 {
             let bound = if x64 { "field_outer_bound_x64" } else { "field_outer_bound_x32" };
             self.launch(bound, words.r, THREADS, &mut [arg(words), arg(&mut rows32), arg(&mut cols32), arg(&mut y), arg(&mut ys), arg(&mut x), arg(&mut xs), arg(&mut u), arg(&mut maxima)])?;
             self.map_record((bound, rows32, cols32, u != 0, false), words, None, None, None, &[])?;
         }
-        self.map_record((entry, rows32, if x != 0 { cols32 } else { 0 }, u != 0, false), words, None, None, None, &ops)
+        Ok(())
     }
 
     /// [measurement; theory, November 13, P61 item 3] **A site's map's launch read by kind**, under the profile: its launches, ns (the launch just

@@ -336,6 +336,19 @@ step once a tile. The build gives the three kinds the yardstick's form with the 
 (a 64-bit covector as two 32-bit limbs whose sums stand in 64 bits where a tile's magnitudes
 prove it). G117 guesses the family at 20 ms (13 to 32) and the section at 0.885 of its control.
 
+**Built** (P61, November 13; G117 scored; `p61_maps.txt` in the receipts). The three kinds share one
+form, every bit kept (100 of 100 section lines and the line's two digests; 96 parity cases at every
+shape the line launches against the definitions). The bits ruler read first: every word the maps read
+stands under `2^31` but one covector kind's, which reached 44 bits at 0.046 of its sites, so 0.974 of
+the transposed and outer launches prove their sums in 64 bits in every tile; the form keeps one 32-bit
+limb a word and the wide form for a tile that does not prove its sums, and no two-limb form is built.
+In one hold the family reads 28.3 ms a profiled section from 56.3 (forward maps 8.9 from 17.3, the
+transposed map 7.8 from 15.3, the outer sums with their bounds 11.5 from 23.7, the bounds 0.7 from 5.6
+by a cheap test on the outer pass's largest words), and an unprofiled section 0.908 of its controls
+(284.5 ms from 313.3). A 64 by 64 forward launch reads 168 millionths of a second, 0.19 of the tile
+yardstick's products: the form does not yet bind the arithmetic, and a copy without its products reads
+what binds it before another map is built in it (G117's rule).
+
 ## 9. The contact's widths, read from the source and the logs before any record of them orders a build (November 13)
 
 §8 owed a record that restates each width of a contact row. Its premise is read first from what

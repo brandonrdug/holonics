@@ -3244,3 +3244,24 @@ flag 0.264 to 0.317 of places by slice. Nats a place at open places, the last ti
   and where an open row's mass lies by its source's news is read before any build. (e) with rows over 0.5 of A0's: the count reader's
   sites are too many, and the cut waits for the machine's own news, which P60 now gives. The candidate law of the design record's 4.8 is
   not built.
+
+G117 scored 2026-11-13T08:05Z (the PC's receipt p61_maps.txt, the engine record's receipts, on claude/carry-reads; the build on
+claude/site-maps-tile ad10a1bff against origin/main with item 3's reading; one hold of the card: profiled control, build, control, then
+unprofiled control, build, control, 100 sections each from the founded line's state; every run ends on the line's STATE.100 and MEAN.100
+and the build's section lines equal the line's, 100 of 100; 96 parity cases equal the definitions; gates 1 and 3 passed):
+  (a) the family's seven entries 28.26 ms a profiled section from 56.33 in this hold's controls (0.502) against 20 (13 to 32): held. The
+      forward maps 8.95 against 6.2 (4 to 10): held; the transposed map 7.78 against 5 (3 to 9): held; the outer sums with their bounds
+      11.53 against 9 (5.5 to 15): held (the bounds 0.72 from 5.62, their cheap test returning at every region read).
+  (b) a forward map of 64 by 64 on 32-bit inputs one launch of 168.0 millionths of a second (262.5 and 259.8 in the controls) against 85
+      (55 to 130): missed above; 9.9e11 products a second, 0.19 of the tile yardstick.
+  (c) the unprofiled section 0.908 of its controls (284.5 ms against 313.0 and 313.6, their spread 0.002) against 0.885 (0.85 to 0.93):
+      held.
+  (d) the transposed and outer launches whose every tile's sums stand in 64 bits, read before the build: 330 of 339 (0.974) against 0.9
+      (0.6 to 1.0): held. Every operand word read stood under 2^31 but one covector kind's, whose words reached 44 bits at 0.046 of its
+      sites; so the build keeps one 32-bit limb a word and the wide form for a tile that does not prove its sums, and builds no two-limb
+      form.
+  Of 7 parts 6 held. The premise that missed: a launch's time scales with its products; at 64 by 64 the form's launch still costs twice
+  the yardstick's products, which reads as the pre-pass's two reads of the tile's words and the weights' bound read every block, beside
+  a grid of one block a tile (agent-inferred, unread).
+  Rule applied: (a) from 25 to 40: the build stands, and a copy of the slowest kind without its products (P53's instrument) reads what
+  binds the form before another map is built in it.
