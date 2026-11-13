@@ -3099,3 +3099,59 @@ founded at zero takes its charge at the line's rates, and what a comparison at e
   last tick's code worse by over 0.05 at whole masks: the law is read again before the level is built (the gain of the opening's
   covector into the shared rows first). Between: one more thousand sections are read before a rule is applied. (d) over 1.12: the
   opening's kernels are the next engine reading, and the law stands.
+
+G138 scored 2026-11-13T04:57Z from p59_copies.txt (claude/carry-reads c96fed3e6; one hold, a profiled control, the copies' run, a profiled
+control, sections 2,001 to 2,100 from run 2's STATE.1900; all three print the line's 100 section lines and end on the line's state and mean;
+the null copies lower as their entries and give their words, 0 differing over every array; no copy raised a status bit). A copy's time over
+its entry's mean of the two controls, with its time over its own null copy in brackets (a null copy launched before its entry reads 0.90
+to 1.00 of the controls by its place alone):
+  (r) the rows 0.881 [0.881] HELD; the skin's return 0.888 [0.941] HELD; the exposure 0.938 [0.980] MISSED above 0.85; the forward contact
+      0.951 [0.982] at five limbs and 0.940 [0.966] at six, HELD; the columns 0.852 [0.946] HELD.
+  (w) the rows 0.967 [0.967], the exposure 0.891 [0.931], the forward contact 0.963 [0.994] and 0.948 [0.974], the skin's return 0.945
+      [1.001]: HELD, each.
+  (a) the rows 0.937 [0.937] HELD; the skin's return 0.885 [0.938] HELD.
+  (c) the columns 0.565 [0.627] HELD; on the paced heads 0.422 [0.46] HELD; on the still heads 0.839 [0.96] HELD. Its record was laid by a
+      pass of its own at 14.1 ms a section, outside the copy's time.
+  (s) the family at the products of the ratios over the controls 91.05 ms a section, from 118.9 in this hold's controls: MISSED above 90
+      (guessed 74). At the products of the ratios over the null copies it reads 98.7 ms, 0.830 of the family. Summed over its entries and
+      read over the null copies, a region's rows resident remove at most 6.8 ms, a pair's words in walk order 1.9, the reductions as plain
+      stores 3.0 and the columns' record 9.6 before its own cost.
+  Of 17 parts 15 held; the two that missed, missed above. The premise the guess leaned on too far: the forecasts by the count of gathers.
+  The pair kernels are bound by their arithmetic. In the controls the forward contact at five limbs lowers to 9,720 instructions with
+  2,137 multiply-adds, 524 wide multiply-adds and 778 spill stores; the rows to 7,680 instructions with 1,987 and 632 at 128 registers.
+  Rule applied: (s) over 90. The family's form stands and no layout is built. Its multiple is taken by law, each with its record first:
+  the contact's declared widths (a term's face of 62 bits, its weight of 62 and a value's carrier of 64, where the bits ruler read a
+  value at 23, a unit word at 18 and a score at 23), and the pair-terms a site (the level's sites and the length of a region under it).
+  The columns' record is the one mechanism past 5 ms; it is carried into the build that rewrites the support under those laws, where the
+  forward entry writes it, and is not built as a step of its own on kernels about to be rewritten (agent-inferred).
+
+G117 fixed 2026-11-13T05:04Z (the same thread), before its build: a site's maps in the tile form (P61; a realization, every bit kept). The number
+was reserved for the site maps on November 12. Read first: the yardsticks (p50_step0.txt: products of two 32-bit words into a 64-bit
+sum, a 64 by 64 map held in a block's shared memory, 1.46e12 a second with one thread a cell and 5.19e12 with one thread four outputs
+of four sites, each pair of words read once for sixteen products); the count (engine_count.txt: the maps' forward 7.34e9 products a
+section, their return 1.535e10); the schedule (p57_schedule.txt: the family's seven entries hold 56.3 ms a profiled section in 181
+launches: the tiled forward map 13.24 and 4.34 on 32- and 64-bit inputs, the transposed map 15.00, the outer sums 13.71 and 4.19,
+their bounds 4.13 and 1.66; a forward map of 64 by 64 is one launch of 247 millionths of a second, 6.9e11 products a second, and one
+of 128 rows 834, at two blocks a multiprocessor; the family 4.03e11 a second); and the source at main dfb06291b (kernels/field.cu:
+`affine_tiled` holds the weights and four sites' rows in shared memory, one thread a cell, sums in 64 bits where a site's bound proves
+it; `field_transposed` reads each weight and each covector word from the card's memory once a product, one thread a cell, every sum in
+128 bits; `outer` gives one thread an entry and a tile of 64 sites, so each word of the tile is read once an entry, 64 by 64 times,
+its sum in 128 bits and added by a 128-bit atomic step once an entry and tile; the bounds are a pass of their own, one block a
+region). No step of the engine has changed these entries. What no log holds: the magnitudes of the covector words the transposed
+and outer maps read (whether two 32-bit limbs' sums stand in 64 bits a tile), and what share of a map's time is its traffic.
+  The build. One form for the three kinds: the weights and a tile of sites' rows in a block's shared memory, each word read once a
+  block; a thread forms four outputs of four sites; a 64-bit word enters as two 32-bit limbs whose sums stand in 64 bits where the
+  tile's magnitudes prove it, read in the pass that loads the tile, and in the wide form otherwise; an outer sum's partial is kept by
+  its thread over the tiles its block walks and added once; the bound's refusal is formed in the same pass. The same integers.
+  (a) The family's seven entries read 20 ms a profiled section (13 to 32) from 56.3: the forward maps 6.2 (4 to 10) from 17.6, the
+      transposed map 5 (3 to 9) from 15.0, the outer sums with their bounds 9 (5.5 to 15) from 23.7.
+  (b) A forward map of 64 by 64 is one launch of 85 millionths of a second (55 to 130) from 247: 2.0e12 products a second, 0.39 of
+      the tile yardstick.
+  (c) In one hold the unprofiled section reads 0.885 of its controls (0.85 to 0.93).
+  (d) The premise's part, read before the build by the bits ruler: at 0.9 or more of the transposed and outer launches (0.6 to 1.0)
+      every tile's two limbs stand in 64-bit sums.
+  Rules. (a) at 25 or under: the form is carried to the remaining maps of a site (the charts, the unit words, the faces' maps and
+  the blank's), fused where two read one row, with their guess. 25 to 40: the build stands, and a copy of the slowest kind without
+  its products (P53's instrument) reads what binds the form before another map is built. Over 40: the premise failed (the form does
+  not bind); the maps' traffic and their blocks a multiprocessor are read before anything further is built on them. (d) under 0.6:
+  the covector's width is a law's subject with the contact's, and the build keeps the wide form there.
