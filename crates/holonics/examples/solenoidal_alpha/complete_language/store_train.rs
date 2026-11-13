@@ -711,23 +711,27 @@ pub(super) fn read_cavity(args: &[String], realization: &mut dyn FieldRealizatio
         // c0 on the host, a region a place; the first stretch's places checked against the whole opening.
         let host_start = std::time::Instant::now();
         let mut c0: Vec<Vec<i64>> = Vec::with_capacity(stretches.len());
+        // (the places of a stretch read on the host's threads: a reading, each place's region its own)
+        use rayon::prelude::*;
         for (k, (classes, _, _)) in stretches.iter().enumerate() {
-            let mut codes = Vec::with_capacity(classes.len());
-            for t in 0..classes.len() {
-                let mut mask = vec![false; classes.len()];
-                mask[t] = true;
-                let region = [TrainRegion::plain(classes.clone(), mask)];
-                let views = views_of(&region);
-                let face = learner.field.opening_face(&views[0], t).map_err(|e| e.to_string())?;
-                if k == 0 {
-                    let whole = learner.field.opening_face_whole(&views[0], t).map_err(|e| e.to_string())?;
-                    if whole.code(classes[t]) != face.code(classes[t]) {
-                        return Err(format!("the opening's face at a place differs from the whole opening's (stretch 1, place {t})").into());
+            let codes: Vec<std::result::Result<i64, String>> = (0..classes.len())
+                .into_par_iter()
+                .map(|t| {
+                    let mut mask = vec![false; classes.len()];
+                    mask[t] = true;
+                    let region = [TrainRegion::plain(classes.clone(), mask)];
+                    let views = views_of(&region);
+                    let face = learner.field.opening_face(&views[0], t).map_err(|e| e.to_string())?;
+                    if k == 0 {
+                        let whole = learner.field.opening_face_whole(&views[0], t).map_err(|e| e.to_string())?;
+                        if whole.code(classes[t]) != face.code(classes[t]) {
+                            return Err(format!("the opening's face at a place differs from the whole opening's (stretch 1, place {t})"));
+                        }
                     }
-                }
-                codes.push(face.code(classes[t]));
-            }
-            c0.push(codes);
+                    Ok(face.code(classes[t]))
+                })
+                .collect();
+            c0.push(codes.into_iter().collect::<std::result::Result<Vec<i64>, String>>()?);
         }
         let host_ms = host_start.elapsed().as_millis();
         // cK on the realization, the regions batched under the pass's two bounds.
@@ -795,13 +799,18 @@ pub(super) fn read_cavity(args: &[String], realization: &mut dyn FieldRealizatio
                 }
                 classes.truncate(COPY_BOUND);
                 source.truncate(COPY_BOUND);
-                for t in 0..classes.len() {
-                    let mut mask = vec![false; classes.len()];
-                    mask[t] = true;
-                    let region = [TrainRegion::plain(classes.clone(), mask)];
-                    let views = views_of(&region);
-                    let face = learner.field.opening_face(&views[0], t).map_err(|e| e.to_string())?;
-                    writeln!(tsv, "C\t{name}\t{k}\t{t}\t{}\t{}\t-\t{}", classes[t], face.code(classes[t]), source[t])?;
+                let codes: Vec<std::result::Result<i64, String>> = (0..classes.len())
+                    .into_par_iter()
+                    .map(|t| {
+                        let mut mask = vec![false; classes.len()];
+                        mask[t] = true;
+                        let region = [TrainRegion::plain(classes.clone(), mask)];
+                        let views = views_of(&region);
+                        Ok(learner.field.opening_face(&views[0], t).map_err(|e| e.to_string())?.code(classes[t]))
+                    })
+                    .collect();
+                for (t, code) in codes.into_iter().enumerate() {
+                    writeln!(tsv, "C\t{name}\t{k}\t{t}\t{}\t{}\t-\t{}", classes[t], code?, source[t])?;
                 }
                 copy_places += classes.len();
             }
