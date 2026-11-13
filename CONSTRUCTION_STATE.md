@@ -325,9 +325,10 @@ repository was reset on September 24; the pre-reset tree is
     indentation (G124). A count that begins again at each opening keeps 0.991 and 0.828 there,
     and 0.9997 and 0.996 at a section of one input octet's news, 8 bits, where the odometer
     keeps 0.61 and 0.70 (G125; of eleven guessed parts five missed, each recorded). The design
-    (agent-inferred, unbuilt): a level's sites are the epochs of its places' news under the
-    restarting carry (atlas `code.epoch-restarting-carry`), a place that carries opening its
-    epoch; the level's clock strides an epoch's news over the section, October's odometer
+    (agent-inferred, unbuilt): a level's sites were first written as the epochs of its places'
+    news under the restarting carry (atlas `code.epoch-restarting-carry`), a place that carries
+    opening its epoch, and are restated as the landmarks of that news (G137, the last item
+    below; atlas `code.site-isolation-landmark`); the level's clock strides an epoch's news over the section, October's odometer
     standing as the law of that clock; a place's news is read at the face of the opening it
     would have as an open place, its own row and its own moment terms withheld
     (`code.place-news-cavity-face`), one law for written and open places; an epoch enters the
@@ -380,10 +381,32 @@ repository was reset on September 24; the pre-reset tree is
     slowest ring's loud places 0.979 to 1.000 the same under both). A place that opens where
     its news stands above its neighbours' keeps 2.2 to 3.1 times what the cut keeps. Off the
     ladder (1.5 times the speed) the places themselves move and the symbol is the same at 0.13
-    to 0.18. Owed before any chart is built: the one law of sites (the carried cut against
-    the opening on a bounded neighbourhood), read on octets and on a wave's arrivals under the
-    same changes, a sample being a symbol (the design record §8); the chart across rings
-    (a ring's turn located by its drive); and the image's ruler.
+    to 0.18.
+  - One law of sites for every symbol stream was then written, proved on its definitions and
+    read (November 13, G137; the record of the landmarks; atlas `code.site-isolation-landmark`).
+    A place is a site when no larger news stands within a section of it on the clock of news:
+    its isolation, two nearest-greater reads, is a section or more. The carried cut, a
+    threshold and the release's re-draw order are claims under an order of precedence (a
+    place is a site unless a site that precedes it reaches it): the cut is the claim in the
+    order of arrival, and a level's sites are the first round of the claim in the order of
+    news, the part every stream agreeing within a section decides alike. The odometer is no
+    claim and stays the law of the level's clock. One program read octets (five slices of
+    open text) and a ring's arrivals (five rings of the specimen speech) under the same
+    changes, with no branch on the kind of stream. At a mean epoch of 6 places, pooled, the
+    landmarks keep a lift of 0.882 and 0.564 on octets and 0.949 and 0.810 on arrivals with the
+    reader's most expected symbol inserted after 0.05 and 0.25 of places, and 0.845 and 0.448,
+    0.867 and 0.499 with a symbol replaced at those shares; the carried cut keeps 0.319, 0.123,
+    0.319, 0.102 and 0.324, 0.097, 0.301, 0.077. The landmarks stand over the cut in 40 of 40
+    cases of a stream by a change, 2.65 to 8.35 times pooled. Under a moved start the
+    landmarks keep 1.000 and the cut 0.994 and 0.986. At the section of the boundary's digit the landmarks' mean epoch is 4.4
+    places on octets and 2.9 on arrivals, and 0.058 to 0.091 of strides are three sections or
+    more. The kinds parted once: under inserts at 0.25 the landmarks keep 0.564 on octets and
+    0.810 on arrivals, where 0.025 to 0.058 of octets and 0.11 to 0.18 of arrivals carry a
+    section or more. These are a count ruler's readings, never the machine's face. Owed
+    before a level is built: the epoch's interior where a stride passes a section (a chart
+    that winds), the chart across rings (a ring's turn located by its drive), the count of
+    isolations on the machine's own news for a second level's section, and the image's ruler
+    read by the same program.
   - Every extent of the built declaration is given the part it sizes, how it was reached and what
     sizes it (the same record, §5), with ten findings by file and line and the build that closes
     each. The departures that stand: the face's 64 coordinates are two lanes of 32, the second a

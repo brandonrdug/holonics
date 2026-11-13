@@ -2843,3 +2843,163 @@ Reading [agent-inferred]. (d) missed because its premise was not read at source 
 copies of layouts, and it is two passes of a step's arithmetic at about 20 billionths of a second an entry. The section stands at 6.9
 times the bar of 40.7 ms, and the kernels hold 267.6 of a profiled section's 289.9 ms: what is left of the host is 10 ms of deposit
 and about 4 of takes and copies, so the rate is now the kernels' (G131's schedule read, then the structural step).
+
+G131 scored 2026-11-13T03:24Z (receipt p57_schedule.txt with its generator schedule.py and the source survey kernel_survey.tsv on claude/carry-reads at
+9f922a5cf; the launch trace, a reading, on claude/engine-schedule at 3d9207f88: 100 traced sections print the line's 100 section lines,
+STATE.100 81377dbeaf26d65e and MEAN.100 64954161619deda4 the line's). One store-trainer section of 218 regions and 41,462 sites (the
+largest region 742 sites, the median 137) is 510 launches, the same 510 in the same order each section; the kernels hold 267.4 ms of a
+profiled section, the fourteen entries step 5 printed 184.3 of it and the 56 others 83.1.
+  (a) 56 entries against 45 (30 to 70): held. 297 launches a section against 330 (250 to 400): held. 0.279 ms a launch against 0.24
+      (0.19 to 0.31): held.
+  (b) the moments' and clocks' entries hold 0.288 of the 83.1 ms (23.9 ms) against 0.45 (0.30 to 0.60): missed below.
+  (c) the launches whose grid cannot fill the card hold 0.067 of the traced kernels' time (0.068 by the profile, 18.2 ms a section)
+      against 0.30 (0.15 to 0.45): missed below. Each of the eleven heaviest entries fills the card.
+  (d) entries that read nothing another region's launch wrote in the tick hold 0.793 (212.0 ms) against 0.85 (0.70 to 0.95): held.
+      The couplings: the contact's carrier width, one maximum over the batch fetched by the host each tick between the exposure and
+      the contact, 29.4 ms (0.110); the deposits' sums over tiles of the batch, 26.0 ms (0.097). No kernel reads another region's
+      values.
+  Four parts held, two missed. The premise was half wrong: a launch that runs as long as its largest region exists (twelve entries
+  whose unit is a region hold 31.0 ms, 0.116, the largest region 5.4 times the median), and it is not where the time stands. The time
+  stands in launches that fill the card and move few octets: by family against the count's floors at the card's lanes and its octets a
+  second, the contact 115.6 ms against 4.67 (24.7 times, 0.040 of the card's octets a second), the site maps 56.3 against 5.44 (10.3
+  times), the small site kernels 34.3 against 0.68 (50 times), the moments and clocks 29.9 against 0.23 (132 times), the blank clocks
+  16.5 against 0.79 (21 times), the faces 4.9 against 0.26 (19 times), the carry circles 9.8 with no product counted; all kernels
+  267.4 against 12.08 (22.1 times, 0.045 of the card's octets a second). The octets stand by family from the count: the card keeps
+  its profiling counters to its administrators, so no launch's octets were read.
+  Rule applied. (c) under 0.15: the contact's layout alone is ordered first (a pair's record in walk order, its forward entries one
+  launch and its return's one), and the small launches stay. (d) at 0.70 or over: no join is derived before the order.
+
+G137 fixed 2026-11-13T03:40Z, before any read of the law of sites on a real stream (the record of 2026-11-13, A LEVEL'S SITES ARE THE
+LANDMARKS OF ITS NEWS; the ruler site_ruler.py in its receipts, one program for every symbol stream: one reader of two symbols back,
+the odometer O, the carried cut C, the claim G with its rounds, the claim's first round P, and G136's window on a count of places W
+beside them; streams the five slices of the public corpus as in G124, octets, an alphabet of 256, and the arrivals of rings 3 to 7 on
+G136's specimen at a reach of four turns, an alphabet of 49; changes the same for every stream: the region begun 7 places later, the
+reader's most expected symbol inserted after 0.05 and 0.25 of places, a place's symbol replaced by a draw from the reader's face at
+0.05 and 0.25 of places, and each specimen's own: a line's leading spaces doubled, the wave's start moved a third of a sample, its
+double-speed copy read one ring down). A site is kept when the copy holds a site at its place; a lift is kept less chance over one
+less chance. Laws are compared at equal extent, a mean epoch of 2 places and of 6, each law's section located for it; the section
+ln A is read beside.
+Read first. G124 and G125 (octets, the reader of that day): at 8 bits the cut's mean epoch 1.903 (1.766 to 2.054 by slice) and it
+kept 0.9997 under a moved start and 0.996 under doubled spaces, the odometer 0.606 and 0.699; at a mean epoch of 6 the cut 0.991 and
+0.828, the odometer 0.310 and 0.433; news a place 2.11 to 2.48 nats by slice. G136's log (arrivals, a reader of one back, rings
+pooled): the cut at ln 49 has a mean epoch of 1.23 and lifts of 0.937 under a third of a sample and 0.720 under the double-speed
+copy; at a mean epoch of 2, 0.774 and 0.489; at 6, 0.349 and 0.168; the window of 3 places a side (mean epoch 7.31) 0.769 and 0.509.
+The made order-two chain over 12 states (the ruler's own check, no real stream): at a mean epoch of 6 lifts under inserts at 0.05
+and 0.25 and flips at 0.05 and 0.25: P 0.874, 0.505, 0.822, 0.348; G 0.784, 0.338, 0.734, 0.250; C 0.382, 0.116, 0.356, 0.092;
+O 0.10 or under; at a mean epoch of 2: P 0.963, 0.815, 0.912, 0.583; C 0.879, 0.553, 0.860, 0.504; at ln 12 the cut's mean epoch
+1.69 with 0.707 of its strides under a section, P's 3.78 with 0.070 of its strides 3 sections or more holding 0.133 of the news.
+No log holds: the first round or the claim on any real stream; any law under flipped or inserted symbols on octets; this reader on
+arrivals.
+  (a) Levels. Octets: news a place 2.05 to 2.55 nats by slice; places at or past ln 256, 0.07 (0.04 to 0.11); at ln 256 the mean
+      epoch of C 1.9 (1.75 to 2.1), of P 4.6 (3.6 to 6.0), of G 3.1 (2.6 to 3.8), and 0.72 (0.60 to 0.82) of G's sites in round
+      one. Arrivals: news a place 2.45 (2.1 to 2.8) nats over the rings; at ln 49 the mean epoch of C 1.25 (1.15 to 1.4), of P 3.3
+      (2.6 to 4.2), and 0.75 (0.62 to 0.86) of G's sites in round one.
+  (b) A moved start, pooled by kind. P and G keep 0.9995 or more at every extent. C at a mean epoch of 6 keeps 0.975 to 0.995 on
+      octets and 0.96 to 0.985 on arrivals. O's lift is under 0.30.
+  (c) Flips at a mean epoch of 6, pooled by kind, lifts at 0.05 and at 0.25. P on octets 0.78 (0.66 to 0.88) and 0.30 (0.16 to
+      0.46), on arrivals 0.80 (0.68 to 0.90) and 0.33 (0.18 to 0.50). C on octets 0.36 (0.22 to 0.52) and 0.08 (0.02 to 0.18), on
+      arrivals 0.34 (0.20 to 0.50) and 0.08 (0.02 to 0.18). G on octets 0.68 (0.52 to 0.82) and 0.22 (0.10 to 0.38). O under 0.15.
+  (d) Inserts at a mean epoch of 6, pooled by kind, lifts at 0.05 and at 0.25. P on octets 0.83 (0.70 to 0.92) and 0.42 (0.25 to
+      0.60), on arrivals 0.84 (0.70 to 0.93) and 0.45 (0.27 to 0.63). C on octets 0.40 (0.25 to 0.58) and 0.10 (0.03 to 0.22), on
+      arrivals 0.38 (0.22 to 0.55) and 0.10 (0.03 to 0.22).
+  (e) Each specimen's own change at a mean epoch of 6. Spaces doubled on the code slice: C keeps 0.83 (0.75 to 0.90), P 0.95 (0.90
+      to 0.99). Arrivals, lifts: a third of a sample, P 0.74 (0.62 to 0.84) against C 0.35 (0.25 to 0.45); the double-speed copy,
+      P 0.47 (0.34 to 0.60) against C 0.17 (0.10 to 0.26).
+  (f) At a mean epoch of 2 under flips at 0.05, pooled by kind, lifts: P 0.86 (0.76 to 0.93), C 0.75 (0.60 to 0.86), P over C 1.15
+      (1.02 to 1.4), on both kinds.
+  (g) At a mean epoch of 6 under flips at 0.05 the claim's round-one sites are kept at 0.10 or more over its later rounds' sites, on
+      both kinds.
+  (h) Strides at ln A, both kinds. Under P 0.10 (0.04 to 0.20) of strides are 3 sections or more and hold 0.18 (0.08 to 0.32) of
+      the news, the longest 6 to 30 sections. Under C 0.65 (0.5 to 0.8) of strides are under one section.
+  (i) The count of places whose isolation is x sections or more stands within a factor 1.5 of c/(2x + c), c the stream's mean news
+      a place, at x of 4 sections and over, on both kinds.
+Stated predictions.
+  One (one law on every stream). At a mean epoch of 6 P's lift is 1.6 times C's or more under each of the four made changes, on
+      octets and on arrivals (8 pooled cases), and P stands over C in at least 34 of the 40 cases of a stream by a change.
+  Two (no difference by kind). For each made change P's lift over C's on octets stands within a factor 1.6 of that ratio on
+      arrivals.
+  Three (the anchor). At a mean epoch of 6 the lifts order O under C under G under P in at least 7 of the 8 pooled cases.
+Rule.
+  One holds on both kinds: the design record's law of sites (its 4.2) is replaced by the first round on the clock of news for every
+      stream, the record's section 6 applied and the atlas amended; owed next the epoch's interior under strides past a section,
+      sized from (h), then the chart across rings.
+  One holds on one kind only: no law is kept by kind. The statistics of the news that part the two (the share of places past a
+      section, the strides' spread, the reader's reach) are read on both until one law with those as arguments accounts for both,
+      and nothing is built.
+  One fails on both: the window on a count of places is compared with P at equal extent before anything else.
+  Beside these, from (f): if at a mean epoch of 2 C's lift stands within 0.05 of P's on both kinds, the record says plainly that at
+      the first level's present extent the two keep alike and that the first round is picked for a section that is the passage's
+      own and a grain no finer than it (the record's R1 and R3), not for a reading.
+
+G137 addendum fixed 2026-11-13T03:43Z, before any read (the block above is not changed). The record's 5.1 names the law of which the
+cuts are cases: a claim under an order of precedence, a place a site unless a site that precedes it reaches it. In the order of
+arrival (the earlier first) the claim is the carried cut with its stride measured from arrival to arrival (law A in the ruler: a
+place opens when the news from the last site's arrival to its own is a section or more); in the order of news it is G. An order's
+first round is what its claim keeps in every stream that agrees within a section: under the order of arrival that is the places of
+a section or more, under the order of news the places of isolation a section or more.
+Read first. The made chain: at a mean epoch of 6, A's lifts under inserts at 0.05 and 0.25 and flips at 0.05 and 0.25 are 0.377,
+0.104, 0.327, 0.089 against C's 0.382, 0.116, 0.356, 0.092; at a mean epoch of 2, 0.913, 0.647, 0.886, 0.499 against 0.879, 0.553,
+0.860, 0.504. No log holds A on a real stream.
+  (j) At a mean epoch of 6, pooled by kind, A's lift stands within 0.06 of C's under each of the four made changes, on octets and
+      on arrivals (8 cases), and under a moved start A keeps within 0.02 of what C keeps.
+Stated prediction.
+  Four (the order parts the laws, the stride's convention does not). (j) holds in at least 7 of its 8 cases, and P's lift is 1.6
+      times A's or more in all 8.
+Rule. Four holds: the design record's cut is restated as the claim in the order of arrival, and the choice of a level's sites is
+stated as the choice of an order, fixed by the record's requirements as the order of news. Four fails with A over C by more than 0.06:
+the stride's convention carries part of what the cut loses, and the record says how much before the order is credited with it.
+
+G137 scored 2026-11-13T03:50Z (receipts site_ruler_octets.txt and site_ruler_arrivals.txt beside site_ruler.py in the record's receipts;
+the guess and its addendum pushed at 50e9e643b before either read). The instrument first: the first arrivals read printed a chance
+of zero for the three made changes, because it moved the copy's sites by a count of turns on the wave's clock, where none lands on
+an arrival's time; a made change is a change of places and is now compared by place on every stream. The made run and the octets
+read are the same to the last digit under the repaired ruler; the arrivals read was run again and is the one scored. Lifts below
+are pooled by kind over five slices of octets (330,000 held places each) and five rings of arrivals (12,751 to 106,160 places).
+  (a) Octets. News a place 2.108 to 2.481 nats by slice: held. Places at or past ln 256: 0.025 to 0.058 by slice, 0.043 pooled
+      against 0.07 (0.04 to 0.11): held at its lower edge, two slices under it. Mean epoch at ln 256: C 1.90, P 4.42, G 3.58: held;
+      G's sites in round one 0.80 to 0.82 against 0.72 (0.60 to 0.82): held at the upper edge. Arrivals. News a place 2.57 pooled
+      (2.80 to 1.67 by ring, rings 6 and 7 under the range): held pooled. At ln 49: C 1.29, P 2.87: held; round one 0.80 to 0.83:
+      held.
+  (b) A moved start. P and G keep every compared site at every extent on both kinds: held. C at a mean epoch of 6 keeps 0.994 on
+      octets: held; 0.986 on arrivals against 0.96 to 0.985: missed above by 0.001. O's lift 0.074 and 0.033 at a mean epoch of 6:
+      held there (the part named no extent; at a mean epoch of 2 it is 0.38 and 0.32).
+  (c) Flips at a mean epoch of 6, at 0.05 and 0.25. P on octets 0.845 and 0.448, on arrivals 0.867 and 0.499; C on octets 0.319 and
+      0.102, on arrivals 0.301 and 0.077; G on octets 0.779 and 0.353; O 0.097, 0.070, 0.077, 0.049. Every figure held.
+  (d) Inserts at a mean epoch of 6, at 0.05 and 0.25. P on octets 0.882 and 0.564: held. P on arrivals 0.949 and 0.810 against
+      0.84 (0.70 to 0.93) and 0.45 (0.27 to 0.63): both missed above. C on octets 0.319 and 0.123, on arrivals 0.324 and 0.097:
+      held.
+  (e) Spaces doubled on the code slice at a mean epoch of 6: C keeps 0.820: held; P keeps 0.9955 against 0.95 (0.90 to 0.99):
+      missed above. Arrivals: a third of a sample, P 0.759 against C 0.354: held; the double-speed copy one ring down, P 0.488
+      against C 0.171: held.
+  (f) Flips at 0.05 at a mean epoch of 2: P 0.928 on octets and 0.909 on arrivals, C 0.838 and 0.780, P over C 1.11 and 1.17: held.
+  (g) Flips at 0.05 at a mean epoch of 6: the claim's round-one sites kept 0.863 and 0.886, its later rounds' 0.693 and 0.717, a
+      difference of 0.170 and 0.169: held.
+  (h) At ln A under P: strides of 3 sections or more are 0.058 to 0.073 of strides on octets and 0.070 to 0.091 on arrivals, and
+      hold 0.109 to 0.137 and 0.132 to 0.171 of the news: held; the longest 6.0 to 7.6 sections on octets and 5.8 to 12.9 on
+      arrivals: held on nine streams, ring 7 at 5.8. A mean stride is 1.80 to 1.93 sections. Under C 0.67 to 0.77 of strides are
+      under a section: held.
+  (i) The count of places of isolation x sections or more over c/(2x + c): 0.97 to 1.09 at x of 4 to 32 on every stream but one
+      cell (wikidata at 32, 0.68): held. Under 2 sections the count stands over it (1.2 to 1.6 times at a quarter to one section).
+  (j) A against C at a mean epoch of 6: apart by 0.002 to 0.024 in the 8 cases, and 0.995 against 0.994 and 0.990 against 0.986
+      under a moved start: held.
+  One: held. P's lift over C's at a mean epoch of 6 is 2.76, 4.59, 2.65, 4.39 on octets and 2.93, 8.35, 2.88, 6.48 on arrivals
+      (inserts at 0.05 and 0.25, flips at 0.05 and 0.25), and P stands over C in 40 of the 40 cases of a stream by a change (by
+      1.6 or more in 39; ring 7 under inserts at 0.05, 1.58).
+  Two: held in three of the four changes, missed under inserts at 0.25 (4.59 against 8.35, a factor 1.82 against 1.6): on
+      arrivals the first round keeps 0.810 where on octets it keeps 0.564.
+  Three: held in 8 of 8 (O under C under G under P).
+  Four: held. (j) in 8 of 8, and P's lift is 2.7 to 9.3 times A's.
+  Four figures missed, all four above their ranges (the first round kept more than guessed three times, the cut 0.001 more
+  once); every other figure held, ring 7's longest stride 0.2 under its range.
+Rules applied. One holds on both kinds: the design record's law of sites is the first round on the clock of news for every stream
+(its 4.2, 4.3, 4.5 and 4.6 amended, the atlas with them). Owed next, sized from (h): the epoch's interior where a stride passes a
+section (about a third of strides are 2 sections or more, 0.06 to 0.09 are 3 or more and hold 0.11 to 0.17 of the news), then the
+chart across rings. Four holds: the design record's cut is restated as the claim in the order of arrival. The clause from (f) does
+not apply: at a mean epoch of 2 the first round keeps 0.09 and 0.13 more than the cut.
+Reading [agent-inferred]. What a site hangs on decides what it keeps. Under the specimens' own changes the first round keeps a
+site about as often as the copy holds the same symbol at the place (a third of a sample by ring: kept 0.692, 0.786, 0.883, 0.937,
+0.970 where the symbol is the same at 0.704, 0.772, 0.880, 0.943, 0.979 of places), the first power, where the cut in either
+order keeps it at about the power of its epoch's length. Two's miss is a difference of the news and not of the law, and it was
+not read: on arrivals 0.11 to 0.18 of places carry a section or more against 0.025 to 0.058 on octets, so a site there stands
+further above the news an inserted place can alter (not read as a margin). (i) says nothing of a second level's section: a reader
+of two symbols back shows no scale of the passage past its own context, and that reading is owed on the machine's own news.

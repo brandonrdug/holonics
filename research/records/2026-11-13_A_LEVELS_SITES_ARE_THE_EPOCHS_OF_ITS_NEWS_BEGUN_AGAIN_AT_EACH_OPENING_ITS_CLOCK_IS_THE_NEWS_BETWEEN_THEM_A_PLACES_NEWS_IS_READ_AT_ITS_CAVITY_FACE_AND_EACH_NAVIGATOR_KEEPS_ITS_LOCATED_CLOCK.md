@@ -1,6 +1,7 @@
 # A level's sites are the epochs of its news, begun again at each opening; its clock is the news between them; a place's news is read at its cavity face; and each navigator keeps its located clock
 
-Refs #404 #406 #410. Status: [design, with three count rulers; November 13], by the theory thread
+Refs #404 #406 #410. Status: [design, with three count rulers; November 13; its law of sites
+(§4.2) restated the same day by the record of the landmarks, G137], by the theory thread
 that holds the PC's runs and the engineering. This is the design record the symbol's line owed
 ([the store record](2026-11-12_THE_STORE_CODES_HELD_TEXT_AT_THE_LEVEL_OF_TWO_KNOWN_NEIGHBOURS_A_SIDE_A_SYMBOL_IS_A_WORD_ON_LOCATED_RINGS_AND_A_DARK_PLACE_IS_THE_INTERIOR_OF_A_COMPOSITE.md) §11,
 [the record of the symbol's length](2026-11-12_A_SYMBOL_IS_A_LENGTH_A_BYTE_IS_A_DIGIT_OF_THE_PASSAGE_A_TEXTS_PRIMES_ARE_ITS_PRIMITIVE_CYCLES_AND_A_STRIDE_IS_READ_AT_ITS_PLACE_AS_THE_NEWS_CLOCK_OF_OCTOBER_HELD.md) §12).
@@ -16,7 +17,8 @@ the face read through the encoding (`Field::tied`), the news clock of October (`
 `HNN/NewsClock`; atlas `hnn.tower-news-clock`, `hnn.tower-news-clock-carry`), the arrival word
 of a locked ring (atlas `wave.arrival-word-is-not-the-mean-rate`) and the located transport of
 October 5 (`compression::keys::transport`, `hnn::encoding`; THE_MACHINE guard 9). Three atlas
-rows enter (`code.epoch-restarting-carry`, `code.place-news-cavity-face`,
+rows enter (`code.epoch-restarting-carry`, restated the same day by
+`code.site-isolation-landmark`; `code.place-news-cavity-face`;
 `code.epoch-news-phase-chart`); `tower.field-pace`, `tower.field-scale-packets`,
 `code.epoch-cut-own-length` and `code.news-clock-proper-time` are amended. Receipts:
 `screen_ruler.py`, `screen_ruler.txt` (G123), `resync_ruler.py`, `resync_ruler.txt` (G124),
@@ -170,36 +172,52 @@ rank them. In a passage's transfer the news at a place and how fast two pasts st
 there are two exponents, and a moment's decay is the second. G123's rule also bars reading a
 second quantity into the stride (no complex length of its own angle).
 
-### 4.2 A level's sites are the epochs of the news below it, begun again at each opening
+### 4.2 A level's sites are the landmarks of the news below it
 
-Let `c_t ≥ 0` be the news of place `t` of a region (§4.4) and `σ` the level's section (§4.6).
+Restated on November 13 by [the record of the landmarks](2026-11-13_A_LEVELS_SITES_ARE_THE_LANDMARKS_OF_ITS_NEWS_A_PLACE_NO_LARGER_NEWS_STANDS_WITHIN_A_SECTION_OF_THE_CLAIM_THE_CARRIED_CUT_AND_THE_ODOMETER_ARE_ONE_LAW_ANCHORED_NEARER_AND_FARTHER_AND_ONE_PROGRAM_READS_EVERY_SYMBOL_STREAM.md) (G137). The title above this
+record keeps the law of its first writing, which is placed at the end of this section.
+
+Let `c_t > 0` be the news of place `t` of a region (§4.4), `S_t` its running sum, the place's
+arrival on the clock of news, and `σ` the level's section (§4.6).
 
 ```text
-a_o = c_o                                at an opening o (a region's first place opens)
-t opens  ⇔  a_(t−1) + c_t > σ,           then a_t = c_t;   otherwise a_t = a_(t−1) + c_t
-L_j = Σ_(t∈e_j) c_t,   Σ_j L_j = S       an epoch carries its own length; nothing is released
+u ≻ t          c_u > c_t, or c_u = c_t and u < t
+u reaches t    |S_u − S_t| < σ
+t is a site  ⇔  no u ≻ t reaches t  ⇔  ρ_t ≥ σ
+ρ_t = min( S_t − S_u at the last u < t with c_u ≥ c_t ,  S_u − S_t at the first u > t with c_u > c_t )
+L_j = S_(s_(j+1)) − S_(s_j)              the news from site j's arrival to the next site's;  Σ_j L_j = the news between the first site and the last
 ```
 
-- The place that would carry the sum past the section **opens** the next epoch, so an epoch is a
-  bright lead and the darker places that follow it. That is the moment's own convention (a
-  place's stride is the gap before it) and the composite of the store record's §8.4: a lead and
-  its continuation.
-- **Two readings that open at one place agree at every later place**, since the rule reads the
-  prefix only through the last opening. **A place whose news exceeds the section opens under
-  every reading.** Those places are landmarks in the objects' sense, faces where the paths of
-  every reading converge, and they are what makes the cut origin-free: §3.3's 0.9997.
-- An epoch of more than one place holds at most one section of news. An epoch of one place
-  holds that place's news, whatever it is.
-- The rule is integer sums and one comparison a place on the code's grain, so any partition of
-  the card gives the same bits. A serial scan of a region is a realization; so is a jump table
-  (`next(t)`, the first place the sum from `t` passes `σ`, is a function of `t` alone).
-- The cut and the lengths are data to the pass that reads them: a carry has no first-order
+- A site is a landmark of the news at the level's section: a place that no larger news stands
+  within a section of. It is the first round of a claim in the order of the news (the
+  release's re-draw order on the clock of news), and it is what that claim keeps in every
+  stream that agrees within a section of the place (the other record's statement 5).
+- **A place that carries a section of news or more is a site.** Two sites stand a section or
+  more apart. A place's isolation `ρ_t` is one number, and every level is a cut of it.
+- A site leads its epoch: the epoch of site `j` is the site and the places after it up to the
+  next site, the moment's own convention (a place's stride is the gap before it).
+- One law for every stream. It reads the order of the news and distances on its clock, and
+  nothing of the kind of symbol: octets and a ring's arrivals are read by one program.
+- The rule is integer sums and comparisons on the code's grain, so any partition of the card
+  gives the same bits. A place's isolation is two nearest-greater reads, one either way.
+- The sites and the lengths are data to the pass that reads them: a carry has no first-order
   return, and the built clock law already takes the face as an operand of the clock.
+- **What it replaces.** This section's first writing cut a level by a restarting carry: a
+  place opens when the news since the last opening, its own included, passes the section. That
+  is a claim in the order of arrival. It keeps its sites under a changed start (§3.2, §3.3)
+  and loses them under a change of the stream between a site and the opening before it. At a
+  mean epoch of 6 places, with a symbol replaced at 0.05 of places, it keeps a lift of 0.32
+  on octets and 0.30 on arrivals where the landmarks keep 0.85 and 0.87; with the reader's
+  most expected symbol inserted after 0.25 of places, 0.12 and 0.10 against 0.56 and 0.81.
+  The readings of §3 stand as that cut's.
 
 ### 4.3 The level's clock is the news between its sites
 
 Site `j` of the level strides `κ¹_j = L_j/σ` on the paced clock's grain, so
-`τ¹_j − τ¹_i = (news from epoch i+1 through epoch j)/σ`. This is October's clock of news kept as
+`τ¹_j − τ¹_i = (news from site i's arrival to site j's)/σ`. Two sites stand a section or more
+apart, so `κ¹_j ≥ 1`: the level steps at most once a section of news, and a stretch its reader
+predicts is one long stride (at 8 bits under the count reader a mean stride is 1.8 to 1.9
+sections, about a third of strides are 2 or more, and the longest read is 7.6). This is October's clock of news kept as
 a clock: its count law, its carry between sections that divide one another and its nesting
 (`hnn.tower-news-clock-carry`) are statements about `⌊S/σ⌋`, and they stand for the level's
 elapsed time. It is no longer the law of where the level's sites open. The built packets' level
@@ -276,7 +294,7 @@ A place order is a count of places, the clock §4.2 retires. An epoch is opened 
 phase-carried moment, the helical code's face `m = Σ_k Ĝ(τ(k))⁻¹E(u_k)` with the news as `τ`:
 
 ```text
-φ_t = (a_t − c_t)/σ ∈ [0, 1]                                 the news before t inside its epoch
+φ_t = (S_t − S_(s_j))/σ ≥ 0                                  the news from the epoch's site to t, in sections
 m_k(j) = Σ_(t∈e_j) e^(2πi k φ_t) r̂(x_t),   k ∈ ℤ/6             rings 2 and 3, the built packets' own
 restrict   x¹_j ← Σ_k A_k m_k(j) + b_A
 prolong    x_t += Re Σ_k e^(−2πi k φ_t) (B_k r̂(x¹_j) + b_k)     founded with B = 0, b = 0
@@ -291,25 +309,35 @@ turn, the series between). Rings 2 and 3 are the packets' declared periods and a
 the plain case's. How many harmonics an epoch's interior needs is read on a state once epochs
 are cut, and the part is sized from that reading.
 
+Under §4.2 as restated a stride is a section or more, so `φ_t` runs past one turn inside a
+long epoch. It is carried as windings and phase (the tree's elapsed time, `windings + phase`),
+and the chart of an interior that winds is owed: the harmonics above read the phase alone, so
+two places a whole section apart in one epoch fall on the same rows. G137 sizes the case: 0.06
+to 0.09 of strides are 3 sections or more and hold 0.11 to 0.17 of the news.
+
 ### 4.6 The section is the width of the boundary's digit
 
 A level's section is its receiver's. The first level above octets has one unit that is not a
 dial: the width of the digit the boundary codec delivers, 8 bits, the news of one place nothing
 predicts. October's first clocked level stood there (`B = 8`). Two consequences:
 
-- **The founding is the identity.** Under a flat face every place opens its own epoch: as many
-  sites above as places below. An epoch lengthens as its places are predicted. This is the lens
+- **The founding is the identity.** Under a flat face every place carries a section and is a
+  site (§4.2): as many sites above as places below. An epoch lengthens as its places are predicted. This is the lens
   of November 12 (20:31Z) as a law of extent: predicted input closes up, and the level above
   falls in sites as the machine learns.
 - **The extent today.** Under a count reader of two octets back (2.11 to 2.48 nats a place by
-  slice) an epoch is 1.9 places in the mean, 0.53 of the places as sites. The store at 5,001
+  slice) an epoch of the landmarks is 4.0 to 4.8 places in the mean by slice, 0.21 to 0.25 of
+  the places as sites (G137; the restarting carry's was 1.9 places). The store at 5,001
   sections codes a masked held place at 2.39 to 2.93 nats by slice, so its level above would
   open at about half its places or more (agent-inferred from the ruler's fill; the reading of
   §9 says).
 
-A second level's section is not fixed here. It is cut on the first level's lengths by the same
-rule, and its section is read from those lengths by a ruler before it is sized: it is not twice
-the first by default.
+A second level's section is not fixed here. A place's isolation ranks it for every section at
+once, so a second level is a cut of the same number at a larger section, and that section is
+read from the count of isolations by a ruler before it is sized: it is not twice the first by
+default. Under the count reader of two back that count shows no scale of its own from 4
+sections to 32 (G137), which is the reader's reach and no reading of the passage; the reading
+is owed on the machine's own news.
 
 ### 4.7 Which symbol: the address half
 
@@ -337,8 +365,9 @@ the first by default.
 - The same record §10.1 said a re-timing by places the reader predicts leaves the carries where
   they were. That holds only at a code of zero. Any code added earlier moves every later
   opening of the odometer: 0.31 kept under a shifted start and 0.43 under a doubled indentation
-  whose added places code 0.19 nats each. The restarting cut is the one that holds it (§3.2,
-  §3.3). The clock of news is still the strand's proper time; a place's opening is not a
+  whose added places code 0.19 nats each. The restarting cut holds it (§3.2, §3.3), and so do
+  the landmarks of §4.2, whose sites are decided within a section of themselves (G137: kept at
+  1.000 under a moved start, on octets and on arrivals). The clock of news is still the strand's proper time; a place's opening is not a
   reading of that clock.
 - The store record §8.4 called an epoch "the places between two carries of the accumulated
   stride on a declared ring", on a paced clock. The epoch is the news's, cut by §4.2.
@@ -418,7 +447,10 @@ alphabet's width against the reader's, and whose clock drew the sample), and no 
 medium's: the law of sites is read on octets and on arrivals under the same changes of a
 passage (a moved start; symbols the reader predicts inserted; a share of the symbols flipped),
 and what the cut lost on this specimen is charged to the law until octets under the third
-change say otherwise. Reason, in the agent's words: a category made from a file's format is
+change say otherwise. They said so (G137, the record of the landmarks, §9): on octets with a
+symbol replaced at 0.05 of places the cut keeps a lift of 0.32, as on arrivals (0.30), so the
+loss was the law's and §4.2 is restated. In the readings below "the cut" and "§4.2's cut" name
+§4.2's first writing, the restarting carry, which is the claim in the order of arrival. Reason, in the agent's words: a category made from a file's format is
 the lessons' design thought in the programming language.
 
 - *The recorder's frame is not a place a change of clock keeps.* A sample's news reads 6.76 nats at the
@@ -586,7 +618,8 @@ it as one reading and no level promised:
 3. *The law of the opening's face* is derived and recorded from that reading, with its Lean
    obligation named, before any build.
 4. *The build* is ordered after it, with its guess and its cost stated against the card: the
-   opening's comparison, the cut, the level's clock, the phase chart, a field of the level's own
+   opening's comparison, the level's sites (§4.2 as restated: a place's isolation is two
+   nearest-greater reads), the level's clock, the phase chart, a field of the level's own
    founded as the built `Scale` is. A first build of a new part: it enters the store's line by
    reproducing the line's lap with the level founded at zero.
 
@@ -595,7 +628,9 @@ saved state and leaves its bytes the same.
 
 ## 10. What is owed
 
-- **Lean (#410).** That two readings of the restarting cut which open at one place agree at
+- **Lean (#410).** For the law of sites as restated, statements 1 to 5 and 7 of the record of
+  the landmarks. For the claim in the order of arrival: that two readings of the restarting
+  cut which open at one place agree at
   every later place, and that a place whose code exceeds the section opens under every reading;
   that the epochs' lengths sum to the strand's news and an epoch of more than one place holds
   at most a section; that a cut on a level's lengths nests in the level's cut; that the phase
