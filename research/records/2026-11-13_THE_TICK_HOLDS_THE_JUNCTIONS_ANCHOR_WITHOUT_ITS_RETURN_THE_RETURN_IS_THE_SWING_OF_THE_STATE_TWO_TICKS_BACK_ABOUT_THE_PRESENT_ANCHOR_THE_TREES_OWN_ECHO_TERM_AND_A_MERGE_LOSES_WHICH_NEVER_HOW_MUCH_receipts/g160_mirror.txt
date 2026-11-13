@@ -1,0 +1,212 @@
+# G160, read-mirror on level3/MEAN.3000, seen (prefix, first READ) and held (second READ), 2026-11-13T20:36-20:37Z; host, RAYON 8 threads
+mirror_g160p.log:MIRROR_LAW role=prefix places=4000 ticks=4 heads=4 ms=41
+mirror_g160p.log:MIRROR_SLICE slice=code stretches=25 places=4276 open_cut=1051 open_alone=25 host_ms=10908 ms=10974
+mirror_g160p.log:MIRROR_SLICE slice=web stretches=24 places=4175 open_cut=1049 open_alone=24 host_ms=10234 ms=21249
+mirror_g160p.log:MIRROR_SLICE slice=science stretches=24 places=4296 open_cut=1161 open_alone=24 host_ms=8979 ms=30256
+mirror_g160p.log:MIRROR_SLICE slice=books stretches=24 places=4296 open_cut=1161 open_alone=24 host_ms=8934 ms=39227
+mirror_g160p.log:MIRROR_SLICE slice=wikidata stretches=25 places=4455 open_cut=1101 open_alone=25 host_ms=12514 ms=51764
+mirror_g160p.log:MIRROR_DONE ms=51764
+mirror_g160p.log:MEASURE lap=mirror_g160p rc=0 wall_s=52.2 peak_rss_kib=712440
+mirror_g160h.log:MIRROR_LAW role=held places=4000 ticks=4 heads=4 ms=41
+mirror_g160h.log:MIRROR_SLICE slice=code stretches=24 places=4296 open_cut=1161 open_alone=24 host_ms=9713 ms=9767
+mirror_g160h.log:MIRROR_SLICE slice=web stretches=25 places=4394 open_cut=1101 open_alone=25 host_ms=11855 ms=21634
+mirror_g160h.log:MIRROR_SLICE slice=science stretches=24 places=4296 open_cut=1161 open_alone=24 host_ms=10570 ms=32217
+mirror_g160h.log:MIRROR_SLICE slice=books stretches=24 places=4296 open_cut=1161 open_alone=24 host_ms=9074 ms=41303
+mirror_g160h.log:MIRROR_SLICE slice=wikidata stretches=25 places=4416 open_cut=1050 open_alone=25 host_ms=13632 ms=54948
+mirror_g160h.log:MIRROR_DONE ms=54949
+mirror_g160h.log:MEASURE lap=mirror_g160h rc=0 wall_s=55.3 peak_rss_kib=733132
+
+READ .local/run/mirror_g160p
+  MIRROR mask=0 head=0 readers=open tick=all sources=63900 | dcode_ds=+0.14978 nats a place | coherence=0.0911 ratio=5.34
+  MIRROR mask=0 head=0 readers=open tick=0 sources=15975 | dcode_ds=+0.08547 nats a place | coherence=0.0925 ratio=3.58
+  MIRROR mask=0 head=0 readers=open tick=1 sources=15975 | dcode_ds=+0.03748 nats a place | coherence=0.0722 ratio=2.75
+  MIRROR mask=0 head=0 readers=open tick=2 sources=15975 | dcode_ds=+0.02682 nats a place | coherence=0.1335 ratio=4.75
+  MIRROR mask=0 head=0 readers=written tick=all sources=63900 | dcode_ds=+0.11281 nats a place | coherence=0.0803 ratio=4.85
+  MIRROR mask=0 head=0 readers=written tick=0 sources=15975 | dcode_ds=+0.06529 nats a place | coherence=0.0846 ratio=3.32
+  MIRROR mask=0 head=0 readers=written tick=1 sources=15975 | dcode_ds=+0.02595 nats a place | coherence=0.0575 ratio=2.27
+  MIRROR mask=0 head=0 readers=written tick=2 sources=15975 | dcode_ds=+0.02157 nats a place | coherence=0.1183 ratio=4.28
+  MIRROR mask=0 head=0 readers=both tick=all sources=63900 | dcode_ds=+0.11714 nats a place | coherence=0.0796 ratio=4.81 | ray_chart median=0.0433 q75=0.0710 | audience_mean=1.346 | log2_power mean=18.90 sd=1.41
+  MIRROR mask=0 head=0 readers=both tick=0 sources=15975 | dcode_ds=+0.06737 nats a place | coherence=0.0829 ratio=3.31
+  MIRROR mask=0 head=0 readers=both tick=1 sources=15975 | dcode_ds=+0.02677 nats a place | coherence=0.0569 ratio=2.18
+  MIRROR mask=0 head=0 readers=both tick=2 sources=15975 | dcode_ds=+0.02299 nats a place | coherence=0.1222 ratio=4.39
+  MIRROR mask=0 head=1 readers=open tick=all sources=63900 | dcode_ds=-0.11965 nats a place | coherence=0.0339 ratio=2.20
+  MIRROR mask=0 head=1 readers=open tick=0 sources=15975 | dcode_ds=-0.02828 nats a place | coherence=0.0135 ratio=0.61
+  MIRROR mask=0 head=1 readers=open tick=1 sources=15975 | dcode_ds=-0.06412 nats a place | coherence=0.0624 ratio=2.52
+  MIRROR mask=0 head=1 readers=open tick=2 sources=15975 | dcode_ds=-0.02725 nats a place | coherence=0.0666 ratio=2.52
+  MIRROR mask=0 head=1 readers=written tick=all sources=63900 | dcode_ds=-0.07793 nats a place | coherence=0.0268 ratio=1.75
+  MIRROR mask=0 head=1 readers=written tick=0 sources=15975 | dcode_ds=-0.01192 nats a place | coherence=0.0071 ratio=0.31
+  MIRROR mask=0 head=1 readers=written tick=1 sources=15975 | dcode_ds=-0.04472 nats a place | coherence=0.0519 ratio=2.13
+  MIRROR mask=0 head=1 readers=written tick=2 sources=15975 | dcode_ds=-0.02129 nats a place | coherence=0.0588 ratio=2.23
+  MIRROR mask=0 head=1 readers=both tick=all sources=63900 | dcode_ds=-0.08489 nats a place | coherence=0.0275 ratio=1.79 | ray_chart median=0.0226 q75=0.0394 | audience_mean=1.346 | log2_power mean=18.90 sd=1.41
+  MIRROR mask=0 head=1 readers=both tick=0 sources=15975 | dcode_ds=-0.01348 nats a place | coherence=0.0075 ratio=0.33
+  MIRROR mask=0 head=1 readers=both tick=1 sources=15975 | dcode_ds=-0.04846 nats a place | coherence=0.0533 ratio=2.19
+  MIRROR mask=0 head=1 readers=both tick=2 sources=15975 | dcode_ds=-0.02295 nats a place | coherence=0.0611 ratio=2.33
+  MIRROR mask=0 head=2 readers=open tick=all sources=63900 | dcode_ds=+0.31536 nats a place | coherence=0.0958 ratio=4.39
+  MIRROR mask=0 head=2 readers=open tick=0 sources=15975 | dcode_ds=+0.22070 nats a place | coherence=0.1127 ratio=3.64
+  MIRROR mask=0 head=2 readers=open tick=1 sources=15975 | dcode_ds=+0.05162 nats a place | coherence=0.0552 ratio=1.52
+  MIRROR mask=0 head=2 readers=open tick=2 sources=15975 | dcode_ds=+0.04304 nats a place | coherence=0.1079 ratio=2.40
+  MIRROR mask=0 head=2 readers=written tick=all sources=63900 | dcode_ds=+0.12753 nats a place | coherence=0.0594 ratio=3.40
+  MIRROR mask=0 head=2 readers=written tick=0 sources=15975 | dcode_ds=+0.09804 nats a place | coherence=0.0740 ratio=2.95
+  MIRROR mask=0 head=2 readers=written tick=1 sources=15975 | dcode_ds=+0.01976 nats a place | coherence=0.0336 ratio=1.22
+  MIRROR mask=0 head=2 readers=written tick=2 sources=15975 | dcode_ds=+0.00974 nats a place | coherence=0.0419 ratio=1.47
+  MIRROR mask=0 head=2 readers=both tick=all sources=63900 | dcode_ds=+0.12547 nats a place | coherence=0.0573 ratio=3.20 | ray_chart median=0.0290 q75=0.0521 | audience_mean=0.356 | log2_power mean=18.90 sd=1.41
+  MIRROR mask=0 head=2 readers=both tick=0 sources=15975 | dcode_ds=+0.08795 nats a place | coherence=0.0649 ratio=2.50
+  MIRROR mask=0 head=2 readers=both tick=1 sources=15975 | dcode_ds=+0.02156 nats a place | coherence=0.0363 ratio=1.37
+  MIRROR mask=0 head=2 readers=both tick=2 sources=15975 | dcode_ds=+0.01596 nats a place | coherence=0.0664 ratio=2.31
+  MIRROR mask=0 head=3 readers=open tick=all sources=63900 | dcode_ds=+0.13400 nats a place | coherence=0.0164 ratio=0.97
+  MIRROR mask=0 head=3 readers=open tick=0 sources=15975 | dcode_ds=+0.13749 nats a place | coherence=0.0276 ratio=1.17
+  MIRROR mask=0 head=3 readers=open tick=1 sources=15975 | dcode_ds=-0.00177 nats a place | coherence=0.0008 ratio=0.03
+  MIRROR mask=0 head=3 readers=open tick=2 sources=15975 | dcode_ds=-0.00172 nats a place | coherence=0.0020 ratio=0.06
+  MIRROR mask=0 head=3 readers=written tick=all sources=63900 | dcode_ds=+0.23099 nats a place | coherence=0.0385 ratio=2.27
+  MIRROR mask=0 head=3 readers=written tick=0 sources=15975 | dcode_ds=+0.20666 nats a place | coherence=0.0579 ratio=2.36
+  MIRROR mask=0 head=3 readers=written tick=1 sources=15975 | dcode_ds=+0.02461 nats a place | coherence=0.0140 ratio=0.52
+  MIRROR mask=0 head=3 readers=written tick=2 sources=15975 | dcode_ds=-0.00028 nats a place | coherence=0.0004 ratio=0.01
+  MIRROR mask=0 head=3 readers=both tick=all sources=63900 | dcode_ds=+0.14044 nats a place | coherence=0.0215 ratio=1.28 | ray_chart median=0.0289 q75=0.0521 | audience_mean=0.544 | log2_power mean=18.90 sd=1.41
+  MIRROR mask=0 head=3 readers=both tick=0 sources=15975 | dcode_ds=+0.15713 nats a place | coherence=0.0398 ratio=1.67
+  MIRROR mask=0 head=3 readers=both tick=1 sources=15975 | dcode_ds=-0.00856 nats a place | coherence=0.0046 ratio=0.16
+  MIRROR mask=0 head=3 readers=both tick=2 sources=15975 | dcode_ds=-0.00813 nats a place | coherence=0.0114 ratio=0.36
+  MIRROR mask=1 head=0 readers=open tick=all sources=85487 | dcode_ds=+0.40580 nats a place | coherence=0.1109 ratio=5.71
+  MIRROR mask=1 head=0 readers=open tick=0 sources=21376 | dcode_ds=+0.27322 nats a place | coherence=0.1282 ratio=4.55
+  MIRROR mask=1 head=0 readers=open tick=1 sources=21375 | dcode_ds=+0.08256 nats a place | coherence=0.0734 ratio=2.38
+  MIRROR mask=1 head=0 readers=open tick=2 sources=21368 | dcode_ds=+0.05001 nats a place | coherence=0.1236 ratio=3.26
+  MIRROR mask=1 head=0 readers=written tick=all sources=85504 | dcode_ds=+0.26862 nats a place | coherence=0.0823 ratio=4.63
+  MIRROR mask=1 head=0 readers=written tick=0 sources=21376 | dcode_ds=+0.15291 nats a place | coherence=0.0853 ratio=3.21
+  MIRROR mask=1 head=0 readers=written tick=1 sources=21376 | dcode_ds=+0.08245 nats a place | coherence=0.0775 ratio=2.77
+  MIRROR mask=1 head=0 readers=written tick=2 sources=21376 | dcode_ds=+0.03325 nats a place | coherence=0.0815 ratio=2.33
+  MIRROR mask=1 head=0 readers=both tick=all sources=85504 | dcode_ds=+0.27804 nats a place | coherence=0.0848 ratio=4.77 | ray_chart median=0.0528 q75=0.0800 | audience_mean=1.006 | log2_power mean=18.89 sd=1.40
+  MIRROR mask=1 head=0 readers=both tick=0 sources=21376 | dcode_ds=+0.15565 nats a place | coherence=0.0865 ratio=3.25
+  MIRROR mask=1 head=0 readers=both tick=1 sources=21376 | dcode_ds=+0.08668 nats a place | coherence=0.0811 ratio=2.89
+  MIRROR mask=1 head=0 readers=both tick=2 sources=21376 | dcode_ds=+0.03572 nats a place | coherence=0.0870 ratio=2.48
+  MIRROR mask=1 head=1 readers=open tick=all sources=85504 | dcode_ds=-0.55673 nats a place | coherence=0.0670 ratio=3.60
+  MIRROR mask=1 head=1 readers=open tick=0 sources=21376 | dcode_ds=-0.28588 nats a place | coherence=0.0591 ratio=2.17
+  MIRROR mask=1 head=1 readers=open tick=1 sources=21376 | dcode_ds=-0.17983 nats a place | coherence=0.0717 ratio=2.48
+  MIRROR mask=1 head=1 readers=open tick=2 sources=21376 | dcode_ds=-0.09101 nats a place | coherence=0.0938 ratio=2.56
+  MIRROR mask=1 head=1 readers=written tick=all sources=85504 | dcode_ds=-0.47225 nats a place | coherence=0.0675 ratio=3.66
+  MIRROR mask=1 head=1 readers=written tick=0 sources=21376 | dcode_ds=-0.22061 nats a place | coherence=0.0551 ratio=2.04
+  MIRROR mask=1 head=1 readers=written tick=1 sources=21376 | dcode_ds=-0.16994 nats a place | coherence=0.0802 ratio=2.73
+  MIRROR mask=1 head=1 readers=written tick=2 sources=21376 | dcode_ds=-0.08169 nats a place | coherence=0.0941 ratio=2.53
+  MIRROR mask=1 head=1 readers=both tick=all sources=85504 | dcode_ds=-0.47415 nats a place | coherence=0.0677 ratio=3.67 | ray_chart median=0.0352 q75=0.0573 | audience_mean=1.006 | log2_power mean=18.89 sd=1.40
+  MIRROR mask=1 head=1 readers=both tick=0 sources=21376 | dcode_ds=-0.22186 nats a place | coherence=0.0553 ratio=2.05
+  MIRROR mask=1 head=1 readers=both tick=1 sources=21376 | dcode_ds=-0.17052 nats a place | coherence=0.0803 ratio=2.73
+  MIRROR mask=1 head=1 readers=both tick=2 sources=21376 | dcode_ds=-0.08177 nats a place | coherence=0.0941 ratio=2.53
+  MIRROR mask=1 head=2 readers=open tick=all sources=85504 | dcode_ds=-0.87983 nats a place | coherence=0.0785 ratio=2.79
+  MIRROR mask=1 head=2 readers=open tick=0 sources=21376 | dcode_ds=-0.61222 nats a place | coherence=0.0947 ratio=2.35
+  MIRROR mask=1 head=2 readers=open tick=1 sources=21376 | dcode_ds=-0.18941 nats a place | coherence=0.0576 ratio=1.19
+  MIRROR mask=1 head=2 readers=open tick=2 sources=21376 | dcode_ds=-0.07819 nats a place | coherence=0.0539 ratio=1.00
+  MIRROR mask=1 head=2 readers=written tick=all sources=85504 | dcode_ds=+0.04755 nats a place | coherence=0.0100 ratio=0.52
+  MIRROR mask=1 head=2 readers=written tick=0 sources=21376 | dcode_ds=+0.05595 nats a place | coherence=0.0192 ratio=0.70
+  MIRROR mask=1 head=2 readers=written tick=1 sources=21376 | dcode_ds=-0.02733 nats a place | coherence=0.0206 ratio=0.67
+  MIRROR mask=1 head=2 readers=written tick=2 sources=21376 | dcode_ds=+0.01893 nats a place | coherence=0.0351 ratio=0.97
+  MIRROR mask=1 head=2 readers=both tick=all sources=85504 | dcode_ds=+0.00953 nats a place | coherence=0.0020 ratio=0.10 | ray_chart median=0.0240 q75=0.0484 | audience_mean=0.280 | log2_power mean=18.89 sd=1.40
+  MIRROR mask=1 head=2 readers=both tick=0 sources=21376 | dcode_ds=+0.03983 nats a place | coherence=0.0136 ratio=0.50
+  MIRROR mask=1 head=2 readers=both tick=1 sources=21376 | dcode_ds=-0.03922 nats a place | coherence=0.0293 ratio=0.95
+  MIRROR mask=1 head=2 readers=both tick=2 sources=21376 | dcode_ds=+0.00893 nats a place | coherence=0.0162 ratio=0.40
+  MIRROR mask=1 head=3 readers=open tick=all sources=85504 | dcode_ds=-0.08776 nats a place | coherence=0.0045 ratio=0.25
+  MIRROR mask=1 head=3 readers=open tick=0 sources=21376 | dcode_ds=-0.14557 nats a place | coherence=0.0126 ratio=0.48
+  MIRROR mask=1 head=3 readers=open tick=1 sources=21376 | dcode_ds=+0.06844 nats a place | coherence=0.0118 ratio=0.42
+  MIRROR mask=1 head=3 readers=open tick=2 sources=21376 | dcode_ds=-0.01063 nats a place | coherence=0.0050 ratio=0.14
+  MIRROR mask=1 head=3 readers=written tick=all sources=85504 | dcode_ds=-0.10588 nats a place | coherence=0.0078 ratio=0.45
+  MIRROR mask=1 head=3 readers=written tick=0 sources=21376 | dcode_ds=-0.12252 nats a place | coherence=0.0155 ratio=0.62
+  MIRROR mask=1 head=3 readers=written tick=1 sources=21376 | dcode_ds=+0.01315 nats a place | coherence=0.0032 ratio=0.11
+  MIRROR mask=1 head=3 readers=written tick=2 sources=21376 | dcode_ds=+0.00348 nats a place | coherence=0.0023 ratio=0.07
+  MIRROR mask=1 head=3 readers=both tick=all sources=85504 | dcode_ds=-0.07632 nats a place | coherence=0.0056 ratio=0.33 | ray_chart median=0.0185 q75=0.0342 | audience_mean=0.436 | log2_power mean=18.89 sd=1.40
+  MIRROR mask=1 head=3 readers=both tick=0 sources=21376 | dcode_ds=-0.09570 nats a place | coherence=0.0121 ratio=0.48
+  MIRROR mask=1 head=3 readers=both tick=1 sources=21376 | dcode_ds=+0.01386 nats a place | coherence=0.0034 ratio=0.12
+  MIRROR mask=1 head=3 readers=both tick=2 sources=21376 | dcode_ds=+0.00552 nats a place | coherence=0.0036 ratio=0.10
+READ .local/run/mirror_g160h
+  MIRROR mask=0 head=0 readers=open tick=all sources=64256 | dcode_ds=-0.00508 nats a place | coherence=0.0035 ratio=0.22
+  MIRROR mask=0 head=0 readers=open tick=0 sources=16064 | dcode_ds=+0.00332 nats a place | coherence=0.0041 ratio=0.17
+  MIRROR mask=0 head=0 readers=open tick=1 sources=16064 | dcode_ds=+0.00195 nats a place | coherence=0.0041 ratio=0.17
+  MIRROR mask=0 head=0 readers=open tick=2 sources=16064 | dcode_ds=-0.01035 nats a place | coherence=0.0579 ratio=2.20
+  MIRROR mask=0 head=0 readers=written tick=all sources=64256 | dcode_ds=-0.00731 nats a place | coherence=0.0058 ratio=0.37
+  MIRROR mask=0 head=0 readers=written tick=0 sources=16064 | dcode_ds=+0.00515 nats a place | coherence=0.0076 ratio=0.32
+  MIRROR mask=0 head=0 readers=written tick=1 sources=16064 | dcode_ds=-0.00347 nats a place | coherence=0.0084 ratio=0.36
+  MIRROR mask=0 head=0 readers=written tick=2 sources=16064 | dcode_ds=-0.00899 nats a place | coherence=0.0549 ratio=2.07
+  MIRROR mask=0 head=0 readers=both tick=all sources=64256 | dcode_ds=-0.00890 nats a place | coherence=0.0067 ratio=0.44 | ray_chart median=0.0336 q75=0.0523 | audience_mean=1.351 | log2_power mean=18.93 sd=1.40
+  MIRROR mask=0 head=0 readers=both tick=0 sources=16064 | dcode_ds=+0.00334 nats a place | coherence=0.0046 ratio=0.20
+  MIRROR mask=0 head=0 readers=both tick=1 sources=16064 | dcode_ds=-0.00357 nats a place | coherence=0.0082 ratio=0.35
+  MIRROR mask=0 head=0 readers=both tick=2 sources=16064 | dcode_ds=-0.00866 nats a place | coherence=0.0512 ratio=1.95
+  MIRROR mask=0 head=1 readers=open tick=all sources=64256 | dcode_ds=-0.05218 nats a place | coherence=0.0165 ratio=1.10
+  MIRROR mask=0 head=1 readers=open tick=0 sources=16064 | dcode_ds=+0.01238 nats a place | coherence=0.0066 ratio=0.31
+  MIRROR mask=0 head=1 readers=open tick=1 sources=16064 | dcode_ds=-0.03934 nats a place | coherence=0.0428 ratio=1.82
+  MIRROR mask=0 head=1 readers=open tick=2 sources=16064 | dcode_ds=-0.02522 nats a place | coherence=0.0678 ratio=2.27
+  MIRROR mask=0 head=1 readers=written tick=all sources=64256 | dcode_ds=-0.05946 nats a place | coherence=0.0227 ratio=1.52
+  MIRROR mask=0 head=1 readers=written tick=0 sources=16064 | dcode_ds=+0.00364 nats a place | coherence=0.0024 ratio=0.11
+  MIRROR mask=0 head=1 readers=written tick=1 sources=16064 | dcode_ds=-0.04060 nats a place | coherence=0.0522 ratio=2.24
+  MIRROR mask=0 head=1 readers=written tick=2 sources=16064 | dcode_ds=-0.02250 nats a place | coherence=0.0684 ratio=2.37
+  MIRROR mask=0 head=1 readers=both tick=all sources=64256 | dcode_ds=-0.06077 nats a place | coherence=0.0217 ratio=1.44 | ray_chart median=0.0257 q75=0.0400 | audience_mean=1.351 | log2_power mean=18.93 sd=1.40
+  MIRROR mask=0 head=1 readers=both tick=0 sources=16064 | dcode_ds=+0.00555 nats a place | coherence=0.0034 ratio=0.15
+  MIRROR mask=0 head=1 readers=both tick=1 sources=16064 | dcode_ds=-0.04309 nats a place | coherence=0.0524 ratio=2.24
+  MIRROR mask=0 head=1 readers=both tick=2 sources=16064 | dcode_ds=-0.02323 nats a place | coherence=0.0680 ratio=2.39
+  MIRROR mask=0 head=2 readers=open tick=all sources=64256 | dcode_ds=-0.29638 nats a place | coherence=0.0969 ratio=2.63
+  MIRROR mask=0 head=2 readers=open tick=0 sources=16064 | dcode_ds=-0.09617 nats a place | coherence=0.0541 ratio=1.07
+  MIRROR mask=0 head=2 readers=open tick=1 sources=16064 | dcode_ds=-0.15083 nats a place | coherence=0.1673 ratio=2.31
+  MIRROR mask=0 head=2 readers=open tick=2 sources=16064 | dcode_ds=-0.04938 nats a place | coherence=0.1308 ratio=2.31
+  MIRROR mask=0 head=2 readers=written tick=all sources=64256 | dcode_ds=-0.08567 nats a place | coherence=0.0458 ratio=2.86
+  MIRROR mask=0 head=2 readers=written tick=0 sources=16064 | dcode_ds=-0.02066 nats a place | coherence=0.0175 ratio=0.76
+  MIRROR mask=0 head=2 readers=written tick=1 sources=16064 | dcode_ds=-0.04667 nats a place | coherence=0.0942 ratio=3.96
+  MIRROR mask=0 head=2 readers=written tick=2 sources=16064 | dcode_ds=-0.01834 nats a place | coherence=0.0934 ratio=3.60
+  MIRROR mask=0 head=2 readers=both tick=all sources=64256 | dcode_ds=-0.13370 nats a place | coherence=0.0688 ratio=4.18 | ray_chart median=0.0346 q75=0.0529 | audience_mean=0.356 | log2_power mean=18.93 sd=1.40
+  MIRROR mask=0 head=2 readers=both tick=0 sources=16064 | dcode_ds=-0.05687 nats a place | coherence=0.0469 ratio=2.00
+  MIRROR mask=0 head=2 readers=both tick=1 sources=16064 | dcode_ds=-0.05376 nats a place | coherence=0.1038 ratio=4.10
+  MIRROR mask=0 head=2 readers=both tick=2 sources=16064 | dcode_ds=-0.02307 nats a place | coherence=0.1079 ratio=3.71
+  MIRROR mask=0 head=3 readers=open tick=all sources=64256 | dcode_ds=+0.49894 nats a place | coherence=0.0730 ratio=4.15
+  MIRROR mask=0 head=3 readers=open tick=0 sources=16064 | dcode_ds=+0.29924 nats a place | coherence=0.0717 ratio=2.83
+  MIRROR mask=0 head=3 readers=open tick=1 sources=16064 | dcode_ds=+0.16786 nats a place | coherence=0.0858 ratio=3.23
+  MIRROR mask=0 head=3 readers=open tick=2 sources=16064 | dcode_ds=+0.03184 nats a place | coherence=0.0452 ratio=1.31
+  MIRROR mask=0 head=3 readers=written tick=all sources=64256 | dcode_ds=+0.43200 nats a place | coherence=0.0861 ratio=5.62
+  MIRROR mask=0 head=3 readers=written tick=0 sources=16064 | dcode_ds=+0.25138 nats a place | coherence=0.0839 ratio=3.75
+  MIRROR mask=0 head=3 readers=written tick=1 sources=16064 | dcode_ds=+0.15000 nats a place | coherence=0.1022 ratio=4.34
+  MIRROR mask=0 head=3 readers=written tick=2 sources=16064 | dcode_ds=+0.03062 nats a place | coherence=0.0553 ratio=2.15
+  MIRROR mask=0 head=3 readers=both tick=all sources=64256 | dcode_ds=+0.47795 nats a place | coherence=0.0884 ratio=5.77 | ray_chart median=0.0274 q75=0.0513 | audience_mean=0.540 | log2_power mean=18.93 sd=1.40
+  MIRROR mask=0 head=3 readers=both tick=0 sources=16064 | dcode_ds=+0.26948 nats a place | coherence=0.0826 ratio=3.72
+  MIRROR mask=0 head=3 readers=both tick=1 sources=16064 | dcode_ds=+0.16907 nats a place | coherence=0.1086 ratio=4.59
+  MIRROR mask=0 head=3 readers=both tick=2 sources=16064 | dcode_ds=+0.03940 nats a place | coherence=0.0673 ratio=2.53
+  MIRROR mask=1 head=0 readers=open tick=all sources=86231 | dcode_ds=-0.13557 nats a place | coherence=0.0318 ratio=1.72
+  MIRROR mask=1 head=0 readers=open tick=0 sources=21576 | dcode_ds=+0.00169 nats a place | coherence=0.0007 ratio=0.03
+  MIRROR mask=1 head=0 readers=open tick=1 sources=21576 | dcode_ds=-0.08954 nats a place | coherence=0.0653 ratio=2.11
+  MIRROR mask=1 head=0 readers=open tick=2 sources=21560 | dcode_ds=-0.04771 nats a place | coherence=0.0954 ratio=2.55
+  MIRROR mask=1 head=0 readers=written tick=all sources=86304 | dcode_ds=-0.15604 nats a place | coherence=0.0411 ratio=2.37
+  MIRROR mask=1 head=0 readers=written tick=0 sources=21576 | dcode_ds=-0.03729 nats a place | coherence=0.0182 ratio=0.71
+  MIRROR mask=1 head=0 readers=written tick=1 sources=21576 | dcode_ds=-0.08671 nats a place | coherence=0.0681 ratio=2.41
+  MIRROR mask=1 head=0 readers=written tick=2 sources=21576 | dcode_ds=-0.03204 nats a place | coherence=0.0677 ratio=1.97
+  MIRROR mask=1 head=0 readers=both tick=all sources=86304 | dcode_ds=-0.15915 nats a place | coherence=0.0418 ratio=2.41 | ray_chart median=0.0237 q75=0.0414 | audience_mean=1.006 | log2_power mean=18.92 sd=1.39
+  MIRROR mask=1 head=0 readers=both tick=0 sources=21576 | dcode_ds=-0.03929 nats a place | coherence=0.0191 ratio=0.75
+  MIRROR mask=1 head=0 readers=both tick=1 sources=21576 | dcode_ds=-0.08736 nats a place | coherence=0.0686 ratio=2.42
+  MIRROR mask=1 head=0 readers=both tick=2 sources=21576 | dcode_ds=-0.03250 nats a place | coherence=0.0684 ratio=1.98
+  MIRROR mask=1 head=1 readers=open tick=all sources=86304 | dcode_ds=+0.04387 nats a place | coherence=0.0047 ratio=0.26
+  MIRROR mask=1 head=1 readers=open tick=0 sources=21576 | dcode_ds=-0.09841 nats a place | coherence=0.0178 ratio=0.68
+  MIRROR mask=1 head=1 readers=open tick=1 sources=21576 | dcode_ds=+0.08927 nats a place | coherence=0.0320 ratio=1.14
+  MIRROR mask=1 head=1 readers=open tick=2 sources=21576 | dcode_ds=+0.05301 nats a place | coherence=0.0504 ratio=1.42
+  MIRROR mask=1 head=1 readers=written tick=all sources=86304 | dcode_ds=-0.02608 nats a place | coherence=0.0033 ratio=0.19
+  MIRROR mask=1 head=1 readers=written tick=0 sources=21576 | dcode_ds=-0.11963 nats a place | coherence=0.0260 ratio=1.01
+  MIRROR mask=1 head=1 readers=written tick=1 sources=21576 | dcode_ds=+0.04627 nats a place | coherence=0.0192 ratio=0.70
+  MIRROR mask=1 head=1 readers=written tick=2 sources=21576 | dcode_ds=+0.04728 nats a place | coherence=0.0502 ratio=1.41
+  MIRROR mask=1 head=1 readers=both tick=all sources=86304 | dcode_ds=-0.02389 nats a place | coherence=0.0030 ratio=0.17 | ray_chart median=0.0261 q75=0.0523 | audience_mean=1.006 | log2_power mean=18.92 sd=1.39
+  MIRROR mask=1 head=1 readers=both tick=0 sources=21576 | dcode_ds=-0.11941 nats a place | coherence=0.0259 ratio=1.01
+  MIRROR mask=1 head=1 readers=both tick=1 sources=21576 | dcode_ds=+0.04781 nats a place | coherence=0.0198 ratio=0.72
+  MIRROR mask=1 head=1 readers=both tick=2 sources=21576 | dcode_ds=+0.04771 nats a place | coherence=0.0506 ratio=1.42
+  MIRROR mask=1 head=2 readers=open tick=all sources=86304 | dcode_ds=-0.10788 nats a place | coherence=0.0083 ratio=0.34
+  MIRROR mask=1 head=2 readers=open tick=0 sources=21576 | dcode_ds=-0.17672 nats a place | coherence=0.0237 ratio=0.65
+  MIRROR mask=1 head=2 readers=open tick=1 sources=21576 | dcode_ds=+0.07166 nats a place | coherence=0.0185 ratio=0.47
+  MIRROR mask=1 head=2 readers=open tick=2 sources=21576 | dcode_ds=-0.00282 nats a place | coherence=0.0017 ratio=0.04
+  MIRROR mask=1 head=2 readers=written tick=all sources=86304 | dcode_ds=-0.13267 nats a place | coherence=0.0232 ratio=1.28
+  MIRROR mask=1 head=2 readers=written tick=0 sources=21576 | dcode_ds=-0.13098 nats a place | coherence=0.0375 ratio=1.45
+  MIRROR mask=1 head=2 readers=written tick=1 sources=21576 | dcode_ds=-0.00090 nats a place | coherence=0.0006 ratio=0.02
+  MIRROR mask=1 head=2 readers=written tick=2 sources=21576 | dcode_ds=-0.00079 nats a place | coherence=0.0012 ratio=0.04
+  MIRROR mask=1 head=2 readers=both tick=all sources=86304 | dcode_ds=-0.15166 nats a place | coherence=0.0262 ratio=1.43 | ray_chart median=0.0248 q75=0.0442 | audience_mean=0.279 | log2_power mean=18.92 sd=1.39
+  MIRROR mask=1 head=2 readers=both tick=0 sources=21576 | dcode_ds=-0.15271 nats a place | coherence=0.0432 ratio=1.64
+  MIRROR mask=1 head=2 readers=both tick=1 sources=21576 | dcode_ds=+0.00069 nats a place | coherence=0.0004 ratio=0.02
+  MIRROR mask=1 head=2 readers=both tick=2 sources=21576 | dcode_ds=+0.00035 nats a place | coherence=0.0006 ratio=0.02
+  MIRROR mask=1 head=3 readers=open tick=all sources=86304 | dcode_ds=+0.66205 nats a place | coherence=0.0307 ratio=1.75
+  MIRROR mask=1 head=3 readers=open tick=0 sources=21576 | dcode_ds=+0.46034 nats a place | coherence=0.0352 ratio=1.40
+  MIRROR mask=1 head=3 readers=open tick=1 sources=21576 | dcode_ds=+0.13125 nats a place | coherence=0.0212 ratio=0.78
+  MIRROR mask=1 head=3 readers=open tick=2 sources=21576 | dcode_ds=+0.07046 nats a place | coherence=0.0304 ratio=0.83
+  MIRROR mask=1 head=3 readers=written tick=all sources=86304 | dcode_ds=+0.31156 nats a place | coherence=0.0203 ratio=1.22
+  MIRROR mask=1 head=3 readers=written tick=0 sources=21576 | dcode_ds=+0.13683 nats a place | coherence=0.0150 ratio=0.63
+  MIRROR mask=1 head=3 readers=written tick=1 sources=21576 | dcode_ds=+0.10594 nats a place | coherence=0.0233 ratio=0.90
+  MIRROR mask=1 head=3 readers=written tick=2 sources=21576 | dcode_ds=+0.06880 nats a place | coherence=0.0404 ratio=1.14
+  MIRROR mask=1 head=3 readers=both tick=all sources=86304 | dcode_ds=+0.32252 nats a place | coherence=0.0209 ratio=1.26 | ray_chart median=0.0225 q75=0.0367 | audience_mean=0.433 | log2_power mean=18.92 sd=1.39
+  MIRROR mask=1 head=3 readers=both tick=0 sources=21576 | dcode_ds=+0.15505 nats a place | coherence=0.0169 ratio=0.71
+  MIRROR mask=1 head=3 readers=both tick=1 sources=21576 | dcode_ds=+0.10313 nats a place | coherence=0.0225 ratio=0.87
+  MIRROR mask=1 head=3 readers=both tick=2 sources=21576 | dcode_ds=+0.06434 nats a place | coherence=0.0375 ratio=1.06

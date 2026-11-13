@@ -525,9 +525,18 @@ repository was reset on September 24; the pre-reset tree is
     reach on its own clock stands at its random-sign level from the trained state (G157). The
     reader's reaction is the first new direction whose founding covector stands well over its
     floor on the line's own text (G158: 4.7 and 5.4 times in heads 0 and 3), coherent within each
-    slice with the slice's sign (agreement in wikidata and books, a turn in web), so it is built
-    next with its strength read a site from the source's own chart. The line's first pass over
-    the 1 GB of training documents ended at lap 6 (1.0743 one-place, 2.4057 whole masks).
+    slice with the slice's sign (agreement in wikidata and books, a turn in web). Read as the
+    read's mirror its first order is large (G160: 0.12 nats a place a unit of strength in heads
+    0 and 2), but at finite strength every uniform strength raises the code on the regions the
+    line deposits from (G161: curvature 2 to 3 nats a place a unit squared), and run past the
+    trained depth with the mirror on the free iteration does not ring: a turn slows its settling
+    and agreement hastens it (G162). Its build waits; the loop needs a drive the ticks lack. The
+    field's own release fed back as a place's opening is such a drive, and under it the field
+    rings for the first time: alone, a place flips between two faces each pass (a two-cycle, the
+    successive changes pairing at −0.99 by pass 8, G163); damped, it settles onto a point worse
+    than its first read (G164), since the readout was never trained through a carried opening.
+    The next design is the release as a part the field deposits through. The line's first pass
+    over the 1 GB of training documents ended at lap 6 (1.0743 one-place, 2.4057 whole masks).
     Corrected the same day (the return's record, §13): the tick adds its current to a site's
     state, so the site term first derived is the site's own rate and takes no echo out; a head's
     read changes the reader and not its source, which on the pair is free fall; and the
