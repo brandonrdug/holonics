@@ -1,7 +1,8 @@
 # A level's sites are the epochs of its news, begun again at each opening; its clock is the news between them; a place's news is read at its cavity face; and each navigator keeps its located clock
 
 Refs #404 #406 #410. Status: [design, with three count rulers; November 13; its law of sites
-(§4.2) restated the same day by the record of the landmarks, G137], by the theory thread
+(§4.2) restated the same day by the record of the landmarks, G137; the opening's comparison
+(§4.4a) written from G132's reading], by the theory thread
 that holds the PC's runs and the engineering. This is the design record the symbol's line owed
 ([the store record](2026-11-12_THE_STORE_CODES_HELD_TEXT_AT_THE_LEVEL_OF_TWO_KNOWN_NEIGHBOURS_A_SIDE_A_SYMBOL_IS_A_WORD_ON_LOCATED_RINGS_AND_A_DARK_PLACE_IS_THE_INTERIOR_OF_A_COMPOSITE.md) §11,
 [the record of the symbol's length](2026-11-12_A_SYMBOL_IS_A_LENGTH_A_BYTE_IS_A_DIGIT_OF_THE_PASSAGE_A_TEXTS_PRIMES_ARE_ITS_PRIMITIVE_CYCLES_AND_A_STRIDE_IS_READ_AT_ITS_PLACE_AS_THE_NEWS_CLOCK_OF_OCTOBER_HELD.md) §12).
@@ -268,16 +269,11 @@ c_t = −Σ_a p̃_t(a) log p̃_t(a)   at an open place (the face's expected code
   whole epochs, a mean of 1.118 places), and its share kept under a changed start (1.000) says
   nothing of sites. The guess's five parts missed but one, and that one trivially; each is
   recorded in the guess file.
-- **What follows** (`agent-inferred`). The ticks carry a place's state into the frame the
-  readout reads; the opening stands outside it. So the opening's face is owed a comparison of
-  its own, which changes what the deposit consumes, and the level's build is not ordered. Two
-  forms stand, and the next reading chooses (G132): the opening given a chart of its own onto
-  the one face the last tick is read through (a second face would give a symbol two words),
-  compared at every place of a region at its written class; or, if an opening's state holds
-  little of its class in any frame, the cut read at the first tick whose state does. That reading fits a face to a place's 64 words at
-  the opening and after each tick (a host ruler in floats, fit on four fifths of each slice's
-  stretches and read on the rest), with the trained readout's code beside it and the restarting
-  cut on the code after the ticks, the faithful reader's.
+- **What followed** (`agent-inferred`). The ticks carry a place's state into the frame the
+  readout reads; the opening stands outside it. So the opening's face was owed a comparison of
+  its own, which changes what the deposit consumes. Two forms stood, and a second reading chose
+  between them (G132, §4.4a): the opening given a chart of its own onto the one face the last
+  tick is read through, or the cut read at the first tick whose state holds its class.
 - **What the same reading says of the store's level** (`agent-inferred`). With one place open
   the store codes 0.91 nats on code, where a whole mask codes 2.39 on the same state and a count
   of three known neighbours a side with both immediate neighbours known codes 1.10
@@ -286,6 +282,111 @@ c_t = −Σ_a p̃_t(a) log p̃_t(a)   at an open place (the face's expected code
 - **Cost.** A cavity face at every place adds, a site, one step of its moment at the bare
   stride and one readout through the encoding, with no contact and no tick: about 23,900 narrow
   products a site, 0.005 of a section's count (from source, with the reading).
+
+### 4.4a The opening is compared through a lift of its own, at every place (G132)
+
+**The reading** (`p57_faces.txt` with `faces_by_tick.py`, the engine record's receipts; state C
+at the mean of its states; 100,508 held places in 514 whole stretches, each open alone, its
+chart of 64 words read on the card at the opening, after ticks 1, 2 and 3 and after the last;
+a face fitted a stage on the host, a ruler in floats, fit on four fifths of each slice's
+stretches and read on the 15,686 places of the rest). Nats a place, pooled over the five slices:
+
+| stage | fitted face | trained readout |
+|---|---|---|
+| opening | 2.502 | 8.260 |
+| after tick 1 | 1.933 | 4.226 |
+| after tick 2 | 1.543 | 2.082 |
+| after tick 3 | 1.359 | 1.430 |
+| after the last | 1.313 | 1.318 |
+
+The fit places' class frequencies code 3.435. By slice the fitted opening reads 2.505 (code),
+3.904 (web), 1.991 (science), 2.039 (books) and 2.224 (wikidata). At the open places of the
+held role's whole masks (3,717 places) the fitted faces read 3.745, 3.224, 2.824, 2.592 and
+2.533, where the trained readout reads 2.487 after the last tick.
+
+- The opening's chart holds news of its place before any tick: 0.933 nats under the class
+  frequencies, 0.44 of what four ticks take off them. The trained readout reads the same 64
+  words 5.76 nats worse than the fitted face: what it misses at the opening is the frame, never
+  the content. The two agree where the readout was compared (1.318 and 1.313).
+- Each tick adds less by the fitted faces: 0.569, 0.390, 0.184 and 0.046 nats with one place
+  open; at the whole masks the second tick's face stands 0.291 over the last's, so the declared
+  four ticks stand (G132's rule (g)).
+- The restarting cut at 8 bits on the last tick's code has a mean epoch of 3.648 places, 0.405
+  of its whole epochs one place, and keeps 0.9974 of its sites under a start seven places later.
+  It is the faithful reader's cut and costs the four ticks; it is kept as a reading beside the
+  opening's.
+
+**The law** (`agent-inferred`; G132's rule (b), fixed before the reading). The opening takes a
+lift of its own onto the one tied face, and it is compared at every place of a region:
+
+```text
+r̂⁰_t = chart(x^cav_t)                         the built lane chart of the cavity opening (§4.4), D = 64 words
+y⁰_t = R⁰ r̂⁰_t + b⁰                            the opening's lift: its own block, D × D entries and D of bias, founded at zero
+p̃_t  = face(tied(y⁰_t))   at temperature one   the one tied face: the encoding's rows and bias, which the last tick's face reads through
+c_t  = −log p̃_t(u_t)                           at every place t of a region, written or open, u_t the class the passage holds there
+δz_t = p̃_t − 1[u_t]                            its covector at unit gain, beside the last tick's comparison at the compared places
+```
+
+- *A lift of its own.* A frame has its own transport: the ticks carry a state into the frame
+  the lift `R` reads, and the opening stands before them. One lift read at both stages would
+  be drawn between two frames; the reading shows the built one at 8.260 on words that hold 2.502.
+- *One tied face.* A symbol's key is one word. A second encoding at the opening would give a
+  symbol two words and the opening's news a different alphabet from the one the level above
+  reads.
+- *At every place.* A written place's surprise is as physical as an open one's (§4.4). The
+  comparison reaches every place of a region where the last tick's reaches the mask's open
+  places, and `c_t` is the level's clock at every place (§4.3).
+- *Its return* uses the operands that produced it: the tied face (the encoding's rows and its
+  bias), `R⁰` and `b⁰`, the chart and its lanes, then the cavity opening's own operands: the
+  unresolved row `E(∗)`, the two neighbours' strand rows, the moment's chart `C` with its bias,
+  and through `C` the moment the other places bring (their terms and their clocks). The place's
+  own row, own moment term and own stride take nothing: the cavity opening does not hold them.
+  At an open place the cavity opening is the built opening, and the covector adds to the one
+  the ticks return there.
+- *Unit gain.* Each comparison's covector is what reached its locus. No weight between the two
+  comparisons is declared: a weight would be a literal with no reading behind it.
+- *The standing sums.* `s^cav_t` is formed from the region's standing sums (the others' terms
+  at their standing phases), the place's own term absent and its own phase at the bare stride.
+  In unrounded arithmetic this is the opening of the region with the place silent, the built
+  `opening_face` on the region masked at `t`; the two differ by the order of their releases,
+  and the difference is printed where the build is checked, never assumed zero.
+- *In a release* an open place holds no class: nothing is compared there, and its news is the
+  face's expected code (§4.4).
+- *Carried in the state.* The declaration says whether the opening is compared, and the block
+  is part of the constitution. A state without the block trains as the line does, byte for
+  byte; a founding adds the block at zero. No run switch selects it.
+- *Size, by part.* The opening's lift is `D × D + D` entries, 4,160 at the chart's row of 64:
+  the lift's own size, since both read one chart and write one face's row.
+- *What it is not.* It is no second readout of the ticks, no gate on them, and no cut: the
+  level's sites are §4.2's, read on `c_t`. It adds no key, index or table of contexts met.
+
+**Which recorded failures it could repeat.** A located cause carried into a new consumer
+unrepaired: the readout that does not read an opening (G127) is repaired here before the level
+consumes `c_t`. Bits read as progress: `c_t` falling is a code, and the acceptance below reads
+the sites' invariance and the last tick's code beside it. Seen material graded as unseen: every
+reading is on held stretches. A deposit whose gain is not read from its covector: unit gain,
+through the producing operands.
+
+**Text, image, acoustic, motor.** The law is stated on a stream's classes and a region's
+places. Nothing in it reads what the classes encode, and a boundary declares only its alphabet's
+width and whose clock drew the samples (§8).
+
+**Acceptance, fixed before the build** (G139 in the guess file; one new line trained from the
+store line's last saved state beside the same sections without the block):
+1. the card's cavity openings, faces and returns are the host's bits on the fixtures, and a
+   state without the block reproduces the line's lap;
+2. the opening's code at held places, by slice, at lap means, with one place open and at the
+   held role's whole masks, beside the fitted face's 2.502 and the class frequencies' 3.435;
+3. the last tick's code on the same places against the control's: the opening's comparison is
+   kept only if the ticks' level is not paid for it;
+4. the sites of §4.2 on the machine's own `c_t` (the landmarks at 8 bits beside the restarting
+   cut): the mean epoch, and the share kept under a start seven places later and under doubled
+   leading spaces on the code slice;
+5. the section's time against its control in one hold.
+
+**Lean owed (#410).** In unrounded arithmetic the cavity opening from the standing sums is the
+opening of the region with the place silent; at an open place the opening's covector and the
+comparison's add.
 
 ### 4.5 An epoch's face is its moment on the news phase
 
@@ -616,12 +717,14 @@ it as one reading and no level promised:
    the same fitted faces under the held role's whole masks. It decides the opening's face
    (§4.4) and reads whether the last two ticks add to a place's code.
 3. *The law of the opening's face* is derived and recorded from that reading, with its Lean
-   obligation named, before any build.
-4. *The build* is ordered after it, with its guess and its cost stated against the card: the
-   opening's comparison, the level's sites (§4.2 as restated: a place's isolation is two
-   nearest-greater reads), the level's clock, the phase chart, a field of the level's own
-   founded as the built `Scale` is. A first build of a new part: it enters the store's line by
-   reproducing the line's lap with the level founded at zero.
+   obligation named, before any build (done: §4.4a).
+4. *The build, in two parts.* First the opening's comparison alone (§4.4a, G139): it is the
+   smallest part, it gives the machine's own `c_t` at every place, and every later part reads
+   that clock. Then, on its readings and with its own guess and its cost stated against the
+   card: the level's sites (§4.2 as restated: a place's isolation is two nearest-greater
+   reads), the level's clock, the phase chart, and a field of the level's own founded as the
+   built `Scale` is. Each part enters the store's line by reproducing the line's lap with the
+   part absent from the state.
 
 **The device line.** The card, under its lock; the reading of item 1 is a host reading from a
 saved state and leaves its bytes the same.

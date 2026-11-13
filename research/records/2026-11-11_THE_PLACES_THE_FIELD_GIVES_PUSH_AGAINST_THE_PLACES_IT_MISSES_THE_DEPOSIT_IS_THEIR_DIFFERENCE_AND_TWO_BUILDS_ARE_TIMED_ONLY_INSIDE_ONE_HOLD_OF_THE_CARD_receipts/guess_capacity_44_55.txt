@@ -3003,3 +3003,99 @@ order keeps it at about the power of its epoch's length. Two's miss is a differe
 not read: on arrivals 0.11 to 0.18 of places carry a section or more against 0.025 to 0.058 on octets, so a site there stands
 further above the news an inserted place can alter (not read as a margin). (i) says nothing of a second level's section: a reader
 of two symbols back shows no scale of the passage past its own context, and that reading is owed on the machine's own news.
+
+G132 scored 2026-11-13T04:22Z (the PC's receipt p57_faces.txt with its ruler faces_by_tick.py, the count record's receipts, on claude/carry-reads at
+567cf882d; read-cavity at claude/cavity-read 30ee8d1f3 on state C's mean of states; 100,508 held places in 514 whole stretches, each open
+alone, its chart read on the card at the opening, after ticks 1, 2 and 3 and after the last; the faces fit on four fifths of each slice's
+stretches and read on the 15,686 places of the rest; the 30,677 places P55 part B read give the same class, c0 and cK at every one;
+the read 277.8 s against 340 projected). Pooled over the five slices, nats a place:
+  (a) the fitted face after the last tick 1.313 against 1.45 (1.25 to 1.75): held. The trained readout on the same places 1.318 against
+      1.20 (1.12 to 1.28): missed above.
+  (b) the fitted face at the opening 2.502 against 2.6 (2.1 to 3.1): held (code 2.505, web 3.904, science 1.991, books 2.039, wikidata
+      2.224). The unigram 3.435 against 3.25 (3.0 to 3.5): held.
+  (c) after ticks 1, 2 and 3: 1.933, 1.543 and 1.359 against 2.0, 1.65 and 1.50: held, each.
+  (d) the fitted opening's code against the last tick's in rank: 0.534, 0.617, 0.534, 0.665 and 0.499 by slice against 0.45 (0.30 to
+      0.60): held on three slices, missed above on web and books.
+  (e) the trained readout before the last tick: 4.226, 2.082 and 1.430 against 6.0, 3.5 and 2.0: held, missed below, held. At the
+      opening it reads 8.260.
+  (f) the restarting cut on the last tick's code: a mean epoch of 3.648 places against 3.0 (2.4 to 3.8): held; 0.405 of whole epochs one
+      place against 0.25 (0.15 to 0.35): missed above; 0.9974 kept under a start seven places later against 0.995: held.
+  (g) at the whole masks (3,717 open places of 95 masks): the fitted face after the last tick over the trained readout's code 1.018
+      (2.533 over 2.487) against 1.10 (1.02 to 1.25): missed below; the second tick's less the last's 0.291 against 0.35: held; the
+      third's less the last's 0.059 against 0.12: held.
+  Rules applied. (a) the fitted face stands 0.005 under the trained readout where both read the last tick, so the ruler is not too thin.
+  (b) the opening's chart holds news of its place, 0.933 nats under the unigram and before any tick: the law change is derived and
+  ordered with its guess, the opening given a chart of its own onto the one tied face and compared at every place of a region at its
+  written class. (g) at 0.291 the ticks stand: no declaration of fewer ticks is derived.
+  What the reading holds past its score (agent-inferred). The trained readout reads the opening at 8.260 where a fitted face reads the
+  same 64 words at 2.502: the frame, not the content, is what the readout misses there, which is the design record's 4.4 as G127 left
+  it. Each tick then adds less: 0.569, 0.390, 0.184 and 0.046 nats by the fitted faces. With one place open, 0.44 of what the
+  unigram's code loses by the last tick (0.933 of 2.122 nats) stands at the opening, whose face costs 0.005 of a section's count.
+
+G138 fixed 2026-11-13T04:22Z (the same thread), before its reads: what each mechanism of the contact's layout removes from each pair entry (P59;
+readings, no state changed), read before the layout is built. Read first: G120 (the rows' copy without its arithmetic 0.507 of the
+entry: 2,240 instructions of 4,096, 96 global loads of 99); G122 (the proved narrowing: the rows 0.970, the skin's return 0.908);
+G126 (the rows without crowds 0.621, the crowds alone 0.419; the skin's return 0.687 and 0.285; a table's share is an upper bound,
+and the rebuilt helpers kept 0.49 of what it gave them); G128 (the lanes' fill 0.773; shares under 2^-37 at 0.0035 of met pairs); the
+bits ruler (p54_word_bits.txt: a value's largest magnitude is 23 bits, a unit word's 18, a lock's 21 and a contact covector's 47,
+where the declarations prove 63, 18, 63 and 52; a score's is 23); the forecasts by the count of gathers (p53: 12,932 to 2,754 by a
+pair's record in walk order and one launch each way; p54: 774 with a region resident), which G120 read as overstating traffic; the
+schedule (p57_schedule.txt: the family 115.6 ms a section in 72 launches after step 6: the rows 30.43, the forward contact at five
+limbs 25.54, the columns 24.74, the skin's return 16.63, the exposure 8.43, the spread 3.47, the sums 1.83, the classes 0.74); and the
+source at main d04e18662 (kernels/field.cu: a warp a row, a lane a support entry; a pair's words e, sb, ds and dpb at the region's
+dense address by the source's place, its skins at the support stride; the columns a warp a source, its lanes a span entry each looping
+over the receivers, with a bisection a receiver on a paced head; `row_bits` 225 and the spread, of which 62 are a term's face, 62 its
+weight, 64 a value and 37 counts and the sign). From the last: five limbs hold a spread of 95, no row's own spread lowers them, and a
+value's read 23 bits would lower the need by 41 and no further. So the forward contact's limbs are its law's declared widths, and no
+mechanism of the layout reaches them. What no log holds: what each mechanism removes from each entry.
+  The reading. P53's instrument: a copy of an entry launched immediately before it on the same words, its stores and sums into scratch,
+  one mechanism a copy, in one hold with a profiled control before and after, on the pass's sections 2,001 to 2,100 from run 2's
+  STATE.1900. A copy's ratio is its time over the entry's mean of the two controls.
+  (r) Source rows resident. Every load of another site's row (a source's values and unit words in the exposure, the rows and the skin's
+      return; a receiver's covector and probe rows in the columns) reads the warp's own site's row in its place: the same instructions
+      and words, one row a warp. An upper bound of what a region's rows resident in its block's shared memory remove.
+      The rows 0.80 (0.62 to 0.93); the skin's return 0.72 (0.50 to 0.90); the exposure 0.60 (0.35 to 0.85); the forward contact 0.92
+      (0.78 to 1.00); the columns 0.85 (0.65 to 0.97).
+  (w) A pair's words in walk order. e, sb, ds and dpb read and written at the row's entry index in place of the source's place.
+      The rows 0.93 (0.82 to 0.99); the exposure 0.85 (0.65 to 0.97); the forward contact 0.94 (0.82 to 1.00); the skin's return 0.92
+      (0.80 to 0.99).
+  (a) The reductions as plain stores. Each atomic sum (cv, cw and gcov in the rows; gsig in the skin's return) stored plainly at an
+      address of the lane's own. The rows 0.84 (0.70 to 0.94); the skin's return 0.78 (0.60 to 0.92).
+  (c) The columns from a record in column order: ds, e, the skin's words and the receiver's place read in order along a source's
+      receivers, with no walk of the class lists and no bisection. 0.50 (0.30 to 0.72); on the paced heads 0.42 (0.22 to 0.65), on the
+      still heads 0.62 (0.40 to 0.85).
+  (s) With each entry at the product of its copies' ratios and the small entries as they stand, the family reads 74 ms a section (62
+      to 90) from 115.6. A product of upper bounds: a build keeps less (0.49 of a table's share at step 5).
+  Rules. (s) under 60: the layout is built whole as the engine's next build, its mechanisms in the order of the ms each removes, with
+  its own guess at 0.6 of what the copies removed. 60 to 90: a mechanism is built only where its copies remove 5 ms a section or more
+  over its entries, each as a step with the steps' gates and one hold; the others are not built. Over 90: the family's form stands, no
+  layout is built, and its multiple is taken by law, each with its record first: the pair-terms a site (the level's sites and the
+  length of a region under it) and the contact's declared widths (a row's carrier anchored at its peak). In every case the forward
+  contact's limbs are law, and their narrowing is that record's subject, never a realization's.
+
+G139 fixed 2026-11-13T04:32Z (the same thread), before its build: the opening's comparison at every place (P60; the design record 4.4a; a law
+change, carried in the state). Read first: G127 (the trained readout reads a built opening at 8.05 nats, the uniform face 5.497);
+G132 (p57_faces.txt: a free face of 244 by 64 entries and its bias, fitted in floats on the frozen openings, codes 2.502 nats pooled
+at one-place masks, by slice 1.991 to 3.904, and 3.745 at whole masks; the trained readout's last tick 1.318 and 2.487; the count of
+symbols 3.435; the restarting cut on the last tick's code a mean epoch of 3.648 places, 0.9974 kept under a start seven later); G137
+(a count ruler's landmarks at the boundary's digit: a mean epoch of 4.4 places on octets); the source at main 6833f2553
+(tower/field.rs: `open`, `face_of`, `tied`, `affine`, `blank_return`, `opening_face`). From the last: the law's face is the tied
+form, a lift of 64 by 64 through the encoding rows, so its columns lie in those rows' span where the ruler's face was free, and it is
+founded at zero, where its first code is the tied face's bias alone. What no log holds: what that bias codes, how fast a block
+founded at zero takes its charge at the line's rates, and what a comparison at each of a section's 41,462 sites does to rows that its open places alone had trained.
+  The reading. One line trained 3,000 sections from the store line's last saved state with the block, beside the same sections
+  without it; every figure at the mean of the last 1,000 sections' states, on the held one-place masks and the held whole masks of
+  P57.
+  (a) The opening's code c0 at one-place masks, pooled: 3.3 nats (2.7 to 4.2); science and books lowest, near 2.8 (2.2 to 3.6); web
+      highest, near 4.2 (3.6 to 5.0). It falls between the second and the third thousand sections' means.
+  (b) The last tick's code against the control's: -0.01 at one-place masks (-0.08 to +0.04); -0.02 at whole masks (-0.10 to +0.05).
+  (c) The landmarks on c0 at a section of 8 bits: a mean epoch of 3.2 places (2.6 to 4.2); kept under a start seven later 0.97 (0.92
+      to 0.995); under doubled leading spaces on code 0.80 (0.60 to 0.93). The restarting cut on c0 keeps 0.93 under the start (0.80
+      to 0.99).
+  (d) The section's time 1.06 of its control in one hold (1.03 to 1.12).
+  Rules. c0 pooled at 3.6 or under and falling between laps, with the last tick's code at whole masks no more than 0.03 over the
+  control's: the comparison stays in the line, and the level's sites, clock and phase chart are ordered next with their guess. c0
+  over 4.5: a ruler fits the tied form on the frozen openings before anything further is built, to part the form from the rate. The
+  last tick's code worse by over 0.05 at whole masks: the law is read again before the level is built (the gain of the opening's
+  covector into the shared rows first). Between: one more thousand sections are read before a rule is applied. (d) over 1.12: the
+  opening's kernels are the next engine reading, and the law stands.
