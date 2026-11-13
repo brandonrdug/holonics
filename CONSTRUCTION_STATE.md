@@ -477,6 +477,11 @@ repository was reset on September 24; the pre-reset tree is
     284.5 ms where it read 313.3, 7.0 times the bar of 40.7. A 64 by 64 forward launch still costs
     five times the yardstick's arithmetic, and what binds the form is read before another map is
     built in it.
+  - The cavity's far prefixes are formed in parallel (November 13, G141; the design record §4.4a):
+    2.7 ms of a section from 10.1, every bit kept, and the line's section reads 277.3 ms, 6.8 times
+    the bar, against 235.9 for the same tree without the opening's block. Of the 41.5 ms the
+    opening still costs, the pool's allocations hold about 14 and the copies about 5; they are read
+    by take site next.
   - The open places need the written rows' ticks (November 13, P62, G140 scored; the design
     record §4.8). Read zero-shot on the line's latest lap mean with a written row held at its
     opening: the open rows alone code 3.29 nats a place worse at held one-place masks and 1.90
