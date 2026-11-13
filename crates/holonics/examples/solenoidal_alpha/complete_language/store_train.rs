@@ -549,8 +549,16 @@ pub(super) fn train(args: &[String], realization: &mut dyn FieldRealization) -> 
             return Err(format!("a section whose receipt counts {} sites against the cut's domain of {}", receipt.sites, tally.domain).into());
         }
         let opt = |v: Option<i64>| v.map_or("-".to_string(), |c| micro(c, receipt.sites).to_string());
+        // [P60 item 6] The opening's code over the section's compared places, in millionths of a bit a place, where the field has the lift; a
+        // line of a field without it is the line as before.
+        let opening = if receipt.opening.is_empty() {
+            String::new()
+        } else {
+            let (code, places) = receipt.opening.iter().fold((0i128, 0usize), |(c, n), &(rc, rn)| (c + rc as i128, n + rn));
+            format!(" opening={} opening_places={places}", if places == 0 { 0 } else { (code * 1_000_000) / ((places as i128) << 20) })
+        };
         println!(
-            "STORE_SECTION n={done} {} {} stretches={} before={} after={} deposited={} transfer={} external={} rate={} regions_ms={regions_ms} deposit_ms={deposit_ms} ms={}",
+            "STORE_SECTION n={done} {} {} stretches={} before={} after={} deposited={} transfer={} external={} rate={}{opening} regions_ms={regions_ms} deposit_ms={deposit_ms} ms={}",
             tally.text(),
             cut.slices.iter().zip(&by_slice).map(|(s, n)| format!("{}={n}", s.name)).collect::<Vec<_>>().join(" "),
             cut.pass.stretches,
