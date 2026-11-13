@@ -342,7 +342,7 @@ repository was reset on September 24; the pre-reset tree is
     at its own, double and half speed). A wave's crossings follow the top of the frame's band at
     every loudness: 0.26 to 0.74 of the half-cycles of a peak octave stand at double speed and no
     octave reads 0.85, so October 25's half-cycle chart gives no place a change of clock keeps.
-    A sample's news is the same at both speeds (6.76 and 6.69 nats), so the passage's news
+    A recorder's frame's news is the same at both speeds (6.76 and 6.69 nats), so the passage's news
     follows its count of places (0.4945). On the tree's octave ladder (fading sums, each rung
     keeping its remainder, a band read at its rung's stride) the change of clock is a shift of
     rung: the copy's band costs the original's reader of the next rung 0.9995 to 1.0012 of what
@@ -367,8 +367,9 @@ repository was reset on September 24; the pre-reset tree is
     slowest ring's loud places 0.979 to 1.000 the same under both). A place that opens where
     its news stands above its neighbours' keeps 2.2 to 3.1 times what the cut keeps. Off the
     ladder (1.5 times the speed) the places themselves move and the symbol is the same at 0.13
-    to 0.18. Owed before a value chart is built: the law of sites for a measured symbol (the
-    opening on a bounded neighbourhood), read on text against the cut; the chart across rings
+    to 0.18. Owed before any chart is built: the one law of sites (the carried cut against
+    the opening on a bounded neighbourhood), read on octets and on a wave's arrivals under the
+    same changes, a sample being a symbol (the design record §8); the chart across rings
     (a ring's turn located by its drive); and the image's ruler.
   - Every extent of the built declaration is given the part it sizes, how it was reached and what
     sizes it (the same record, §5), with ten findings by file and line and the build that closes

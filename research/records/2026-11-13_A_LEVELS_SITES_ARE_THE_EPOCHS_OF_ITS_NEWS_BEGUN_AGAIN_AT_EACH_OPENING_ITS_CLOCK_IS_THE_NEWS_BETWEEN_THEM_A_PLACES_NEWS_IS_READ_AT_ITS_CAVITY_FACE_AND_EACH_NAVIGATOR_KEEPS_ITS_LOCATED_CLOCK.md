@@ -403,7 +403,25 @@ law of propagation is privileged to no medium). Its reason, in the agent's words
 from the specimen invites a chart built for the specimen, the failure the lessons record for
 text run on its codec's grain.
 
-- *The sample is not a place a change of clock keeps.* A sample's news reads 6.76 nats at the
+**A sample is a symbol** (Brandon's second correction of November 13, minutes after the
+first). Each is one draw from an alphabet at a place, a word of digits read at a declared
+width: an octet a draw from 256 states, a recorder's frame a draw from 65,536. This section's
+first writing kept them apart, a text's symbol as given and a wave's as measured with a law of
+its own, because it took the recorder's frame for the theory's sample. A frame is drawn on the
+recorder's clock, many to an event, with most of its digits under any reader's width; a signal
+of band `W` and length `T` holds about `2WT` samples (from training: the sampling theorem's
+count), and a uniform change of clock by `λ` takes `W` to `λW` and `T` to `T/λ` and keeps the
+count, where the frame's band still holds `λW`. An octet is a sample already drawn at its
+text's own events and cut at its width, and a wave read at its ring's arrivals at a declared
+width is a stream of the same kind. So the differences read below lie inside one object (the
+alphabet's width against the reader's, and whose clock drew the sample), and no law here is a
+medium's: the law of sites is read on octets and on arrivals under the same changes of a
+passage (a moved start; symbols the reader predicts inserted; a share of the symbols flipped),
+and what the cut lost on this specimen is charged to the law until octets under the third
+change say otherwise. Reason, in the agent's words: a category made from a file's format is
+the lessons' design thought in the programming language.
+
+- *The recorder's frame is not a place a change of clock keeps.* A sample's news reads 6.76 nats at the
   passage's own speed and 6.69 at double speed, each by its own reader, so the passage's news
   follows its count of places (0.4945 of it stands at double speed) and what lay above the
   frame's band is lost with them. What the change does not touch is the law: the faster copy
@@ -498,11 +516,12 @@ text run on its codec's grain.
   symbol's sameness at the first power (0.605, 0.721, 0.836, 0.881, 0.914 where the symbol is
   the same at 0.614, 0.702, 0.811, 0.885, 0.941), where the cut follows its seventh power above
   a floor near 0.1 to 0.2 (within 0.15 in 34 of 40 cases). This is §6's chart of codes read on
-  a measured symbol: §4.2's cut is free of its origin through its landmarks, the places whose
+  a stream whose symbols a change flips: §4.2's cut is free of its origin through its landmarks, the places whose
   news passes the section, and on these symbols no place passes the section of a mean epoch of
-  6. By G136's rule the law of sites is amended for a measured symbol, the opening stated on a
-  bounded neighbourhood with its section and its restart, and read on text against the cut
-  before any chart of a sampled wave.
+  6. G136's rule orders the law of sites restated with its opening on a bounded neighbourhood.
+  The rule's words set a "measured symbol" apart from text, and that split is withdrawn (the
+  paragraph above): the law of sites is one for every symbol stream, and both statements of it
+  are read on both specimens under the same changes before any chart is built.
 - *A ring holds what stands in its band.* [agent-inferred, from `arrival_spread`, read after
   the score] By ring the symbol's sameness climbs with the turn: under the part of a sample
   0.59 to 0.70 on ring 3 and 0.94 to 0.98 on ring 7, under the shift of rung 0.28 to 0.42 and
@@ -532,9 +551,9 @@ at 0.44 of its spelled length, its departures kept as defects). Read once a turn
 it fails as above, so a sampled wave's place is not a stride of any rung either: it is the ring's
 own section arrival (an epoch is the interval between a receiver's section arrivals), a time
 of the passage under any start. G136 read it: the arrivals stand, the symbol read at them at
-G135's widths does not, and a law of peaks keeps what the cut loses. Owed before a value chart
-is built: the law of sites for a measured symbol, derived on the objects and read on text
-against the cut; the chart across rings, a ring's turn located by its drive (a ratio off the
+G135's widths does not, and a law of peaks keeps what the cut loses. Owed before any chart
+is built: the one law of sites, derived on the objects and read on octets and on a wave's
+arrivals under the same changes, the carried cut against the peak; the chart across rings, a ring's turn located by its drive (a ratio off the
 ladder is carried by no single declared ring); and the image's ruler (a stroke under a
 magnification the passage itself holds).
 
