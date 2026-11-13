@@ -3013,6 +3013,18 @@ impl<'c> CardField<'c> {
         card.fetch_range(&out, 0, len).map_err(device)
     }
 
+    /// [measurement; theory, November 13, P56 item 3] The rows' fill (`field_ruler_fill_take`): `[head 8][row 2]` chunks of 32, then K's histogram
+    /// `[head 8][row 2][4096]`, then each head's largest count of live crowd slots in a definite row.
+    #[cfg(feature = "ruler-calls")]
+    pub fn ruler_fill(&self) -> Result<Vec<u64>> {
+        let card = self.card;
+        let len = 8 * 2 + 8 * 2 * 4096 + 8;
+        let out = self.take::<u64>(len).map_err(device)?;
+        let mut op = out.device_ptr();
+        self.launch("field_ruler_fill_take", 64, 256, &mut [arg(&mut op)])?;
+        card.fetch_range(&out, 0, len).map_err(device)
+    }
+
     /// [measurement; theory, November 13, P55 A3] **The helpers' yardsticks** (`field_yard_helper`): each kind alone at the launch shape of its entry
     /// (`rows_grid(sites, 4)` blocks of 128 threads, the rows' kinds at `rows_sites`, the skin's return's at `pace_sites`), a calibrating launch and then
     /// one timed to at least `seconds`: (kind, blocks, reps, seconds, warp issues, lane calls).

@@ -97,6 +97,39 @@ fn run(args: &[String]) -> Result<()> {
             }
             Err(e) => println!("FIELD_TALLY error={e}"),
         }
+        // [measurement; theory, November 13, P56 item 3] The rows' fill: by head and row, the rows, chunks, met entries (the pairs) and K's quantiles.
+        if let (Ok(fill), Ok(t)) = (card.ruler_fill(), card.ruler_tally()) {
+            for h in 0..8 {
+                for open in 0..2 {
+                    let chunks = fill[h * 2 + open];
+                    let k = &fill[16 + (h * 2 + open) * 4096..16 + (h * 2 + open + 1) * 4096];
+                    let rows: u64 = k.iter().sum();
+                    if rows == 0 {
+                        continue;
+                    }
+                    let q = |f: f64| {
+                        let mut acc = 0u64;
+                        (0..4096).find(|&b| {
+                            acc += k[b];
+                            acc as f64 >= f * rows as f64
+                        }).unwrap_or(4095)
+                    };
+                    let max = (0..4096).rev().find(|&b| k[b] > 0).unwrap_or(0);
+                    let met = t[((0 * 8 + h) * 2 + open) * 32 + 2];
+                    let crowds = t[((0 * 8 + h) * 2 + open) * 32 + 4];
+                    println!(
+                        "FIELD_FILL head={h} row={} rows={rows} chunks={chunks} met={met} fill={:.4} k_median={} k_q90={} k_q99={} k_max={max} live_crowds={crowds} live_crowds_a_row={:.3} live_crowds_max={}",
+                        ["definite", "open"][open],
+                        met as f64 / (32.0 * chunks.max(1) as f64),
+                        q(0.5),
+                        q(0.9),
+                        q(0.99),
+                        crowds as f64 / rows as f64,
+                        if open == 0 { fill[16 + 8 * 2 * 4096 + h] } else { 0 }
+                    );
+                }
+            }
+        }
         let at: Vec<u64> = std::env::var("RULER_SITES").ok().map(|v| v.split(',').filter_map(|x| x.parse().ok()).collect()).unwrap_or_default();
         if let [rows, pace] = at[..] {
             match card.helper_yardsticks(rows, pace, 0.5) {

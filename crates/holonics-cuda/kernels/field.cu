@@ -2207,6 +2207,12 @@ __device__ __forceinline__ bool narrow31(wide v, int32_t *out) {
 #define RULER_SAMPLE_WORDS 8
 __device__ unsigned long long RULER_TALLY[2 * RULER_HEADS * 2 * RULER_KINDS];
 __device__ unsigned long long RULER_SAMPLE_COUNT[RULER_SAMPLE_KINDS];
+// [measurement; theory, November 13, P56 item 3] The rows' lanes' fill: chunks of 32 a row walks (ceil(K/32)) by head and row, K's histogram (K
+// clamped to RULER_KBINS - 1) by head and row, and a definite row's largest count of live crowd slots by head.
+#define RULER_KBINS 4096
+__device__ unsigned long long RULER_FILL_CHUNKS[RULER_HEADS * 2];
+__device__ unsigned long long RULER_FILL_K[RULER_HEADS * 2 * RULER_KBINS];
+__device__ unsigned int RULER_FILL_CMAX[RULER_HEADS];
 __device__ int64_t RULER_SAMPLE[RULER_SAMPLE_KINDS * RULER_SAMPLES * RULER_SAMPLE_WORDS];
 __shared__ unsigned int RULER_T[4][RULER_KINDS];
 #define RULER_ON 1
@@ -3900,6 +3906,13 @@ extern "C" __global__ void __launch_bounds__(REV_ROWS * 32, ROWS_MIN_BLOCKS) fie
         if (lane == 0) {
             RULER_COUNT(RK_ROW);
         }
+#if RULER_ON
+        if (lane == 0) {
+            const unsigned o_ = rcs[warp].open ? 1u : 0u;
+            atomicAdd(&RULER_FILL_CHUNKS[h * 2 + o_], (unsigned long long)((K + 31) / 32));
+            atomicAdd(&RULER_FILL_K[(h * 2 + o_) * RULER_KBINS + min(K, (uint32_t)RULER_KBINS - 1)], 1ull);
+        }
+#endif
         const uint64_t *e = w.e + (uint64_t)h * w.E + w.region_eoff[r] + (uint64_t)i * sites;
         int64_t *dsr = ds + w.region_eoff[r] + (uint64_t)i * sites;
         wide *dpr = w.dpb + w.region_eoff[r] + (uint64_t)i * sites;
@@ -3974,6 +3987,14 @@ extern "C" __global__ void __launch_bounds__(REV_ROWS * 32, ROWS_MIN_BLOCKS) fie
             }
         }
         __syncwarp();
+#if RULER_ON
+        {
+            const unsigned live_ = __popc(__ballot_sync(0xffffffffu, cnts[warp][lane] != 0));
+            if (lane == 0 && !rcs[warp].open) {
+                atomicMax(&RULER_FILL_CMAX[h], live_);
+            }
+        }
+#endif
         // Pass A: the weighted sum of the pairs' and crowds' covectors.
         wide weighted = 0;
         for (uint32_t k = lane; k < K; k += 32) {
@@ -6025,6 +6046,14 @@ extern "C" __global__ void __launch_bounds__(REV_ROWS * 32, 6) field_yard_rows(F
 // 128 bits; 14 a 128 by 128 product; 15 the sample's loads alone (the yardsticks' floor); 16, 17 `divisor_of` (the read divisor's own division) of
 // a crowd's count squared and of its count.
 #ifdef RULER_CALLS
+// [measurement; theory, November 13, P56 item 3] The fill's counters read out: the chunks, K's histogram, the live crowd slots' largest.
+extern "C" __global__ void field_ruler_fill_take(unsigned long long *out) {
+    const uint32_t a = RULER_HEADS * 2, b = RULER_HEADS * 2 * RULER_KBINS;
+    for (uint32_t c = blockIdx.x * blockDim.x + threadIdx.x; c < a + b + RULER_HEADS; c += gridDim.x * blockDim.x) {
+        out[c] = c < a ? RULER_FILL_CHUNKS[c] : c < a + b ? RULER_FILL_K[c - a] : (unsigned long long)RULER_FILL_CMAX[c - a - b];
+    }
+}
+
 extern "C" __global__ void field_ruler_take(unsigned long long *out) {
     const uint32_t tallies = 2 * RULER_HEADS * 2 * RULER_KINDS;
     for (uint32_t c = blockIdx.x * blockDim.x + threadIdx.x; c < tallies + RULER_SAMPLE_KINDS; c += gridDim.x * blockDim.x) {
