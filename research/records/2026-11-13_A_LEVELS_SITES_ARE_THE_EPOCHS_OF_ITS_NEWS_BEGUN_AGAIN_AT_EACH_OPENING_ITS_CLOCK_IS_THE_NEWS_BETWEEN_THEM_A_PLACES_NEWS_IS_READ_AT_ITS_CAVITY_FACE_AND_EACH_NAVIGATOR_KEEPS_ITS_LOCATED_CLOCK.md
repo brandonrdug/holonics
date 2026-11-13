@@ -20,8 +20,8 @@ rows enter (`code.epoch-restarting-carry`, `code.place-news-cavity-face`,
 `code.epoch-news-phase-chart`); `tower.field-pace`, `tower.field-scale-packets`,
 `code.epoch-cut-own-length` and `code.news-clock-proper-time` are amended. Receipts:
 `screen_ruler.py`, `screen_ruler.txt` (G123), `resync_ruler.py`, `resync_ruler.txt` (G124),
-`resync_ruler_octet.txt` (G125); on sound (§8, added the same day; atlas
-`code.sound-place-frame-band`), `sound_ruler.py`, `sound_ruler.txt`, `sound_ruler_floor11.txt`
+`resync_ruler_octet.txt` (G125); on a sampled wave, the specimen recorded speech (§8, added the same day; atlas
+`code.wave-place-frame-band`), `sound_ruler.py`, `sound_ruler.txt`, `sound_ruler_floor11.txt`
 (G129), `rungs.c`, `rungs_kept.c`, `band_ruler.py`, `band_ruler.txt`, `band_ruler_kept.txt` (G130).
 The guesses and their scores are in the guess file of the line.
 
@@ -384,11 +384,24 @@ The cut reads a place's code under its cavity face and the boundary digit's widt
 of the medium. A motor chart's serial screw words are places with codes like any other. Only
 the boundary codec is the medium's. What a medium's places are is the codec's to say, and for
 values that is read before it is built: this section first said that a sample stream's places
-are cut like any other, and the first ruler on sound withdrew it.
+are cut like any other, and the first ruler on a sampled wave withdrew it.
 
-**Sound, read the same day (G129, G130; a count's code on a cloud host, never the machine's
+**A sampled propagation, read the same day on one specimen (G129, G130; a count's code on a cloud host, never the machine's
 face).** The passage is 481 seconds of public speech (73 utterances of one LibriSpeech speaker,
 16 bits at 16 kHz), with copies at double and at half speed (the rate renamed, then resampled).
+
+The subject of these readings is a sampled propagation: a ring driven by any wave a boundary
+samples, a pressure, a field or a current alike. Recorded speech is the specimen the rulers
+had, and nothing in the instruments is acoustic. What is any wave's: the identity that a
+change of clock is a shift of rung (a spectrum's lines moved by one ratio, the red shift, at
+every carrier), a place taken at a ring's own arrival, and a site taken at a peak of its news.
+What is this specimen's: every count below, and the sharing of rows along the ladder, which
+needs a spectrum that fills the octaves alike and is not expected of a narrow carrier
+(agent-inferred; no second specimen is read). This paragraph was added on November 13 after
+the section's first writing named sound as its subject (Brandon's correction of that day: a
+law of propagation is privileged to no medium). Its reason, in the agent's words: a name taken
+from the specimen invites a chart built for the specimen, the failure the lessons record for
+text run on its codec's grain.
 
 - *The sample is not a place a change of clock keeps.* A sample's news reads 6.76 nats at the
   passage's own speed and 6.69 at double speed, each by its own reader, so the passage's news
@@ -411,10 +424,10 @@ face).** The passage is 481 seconds of public speech (73 utterances of one Libri
   1.0012 of what it costs its own reader, where the original's reader of the same rung costs
   1.004 to 1.042. This is `code.news-clock-proper-time`'s identity (ring `n` reads of the
   re-timed strand what ring `n/λ` read of the original), read here for the first time.
-- *At this reader's grain the ladder's rows are shared on sound.* At one speed, band `s + 1`
+- *At this reader's grain the ladder's rows are shared on this speech.* At one speed, band `s + 1`
   read by band `s`'s reader costs 1.0005 to 1.041 of its own reader's news (gain-free words),
   1.003 to 1.040 with absolute words. Text read the other way (§4.7: the two paced clocks are
-  two keys). So for sound a change of clock by the ladder's ratio asks for one carried number,
+  two keys). So for such a wave a change of clock by the ladder's ratio asks for one carried number,
   the rung, and nothing learned anew, to the extent the rows are shared.
 - *A rung keeps its remainder.* The ladder as first built gained `(x − y) >> s` and dropped its
   leak's remainder: a dead zone of `2^s`, tied to the rung's number. On it the shift read 1.05
@@ -489,7 +502,7 @@ face).** The passage is 481 seconds of public speech (73 utterances of one Libri
   news passes the section, and on these symbols no place passes the section of a mean epoch of
   6. By G136's rule the law of sites is amended for a measured symbol, the opening stated on a
   bounded neighbourhood with its section and its restart, and read on text against the cut
-  before any chart of sound.
+  before any chart of a sampled wave.
 - *A ring holds what stands in its band.* [agent-inferred, from `arrival_spread`, read after
   the score] By ring the symbol's sameness climbs with the turn: under the part of a sample
   0.59 to 0.70 on ring 3 and 0.94 to 0.98 on ring 7, under the shift of rung 0.28 to 0.42 and
@@ -508,15 +521,15 @@ face).** The passage is 481 seconds of public speech (73 utterances of one Libri
 Limits, each stated because the reading is narrow: one speaker; a ratio of two; a reader of a
 first step's bit length and sign, which cannot see pitch or formants, so the rows are shared at
 that grain and equal codes are not equal knowledge; bands of one-pole rungs, which overlap.
-[agent-inferred] A sound's place is therefore read on a band at its rung's stride, never on the
+[agent-inferred] A sampled wave's place is therefore read on a band at its rung's stride, never on the
 sample stream or its crossings, and its rung's stride and gain are its navigator's clock. No
-level is founded on the cut for sound while a band is read by a first step: the place's news
+level is founded on the cut for a sampled wave while a band is read by a first step: the place's news
 has to come from a reading that is dark while the band continues and bright where it departs,
 with what lies under a declared width released and accounted, never charged as news. The tree
 holds that reading since October 10 (atlas `hnn.ring-moment-keys`; the record of that day,
 §11: a ring's section word near-returns through most of a recording, 33,395 of 52,128 windows,
 at 0.44 of its spelled length, its departures kept as defects). Read once a turn on a stride
-it fails as above, so a sound's place is not a stride of any rung either: it is the ring's
+it fails as above, so a sampled wave's place is not a stride of any rung either: it is the ring's
 own section arrival (an epoch is the interval between a receiver's section arrivals), a time
 of the passage under any start. G136 read it: the arrivals stand, the symbol read at them at
 G135's widths does not, and a law of peaks keeps what the cut loses. Owed before a value chart
@@ -571,5 +584,5 @@ saved state and leaves its bytes the same.
 - **The trained rates' own cut** (§3.1): what the two clocks located, read by a ruler that is
   not a count of one symbol.
 - **The harmonics an epoch needs and a second level's section**, each from a reading.
-- **The rulers on values** (§8): on sound the cut on a band's places and a reader of longer
+- **The rulers on values** (§8): on a sampled wave the cut on a band's places and a reader of longer
   context; the image's ruler.

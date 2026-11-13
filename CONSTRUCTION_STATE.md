@@ -336,7 +336,8 @@ repository was reset on September 24; the pre-reset tree is
     open it codes 0.91 nats on code where a whole mask codes 2.39, so "two known neighbours a
     side" was the whole mask's level, set by how much of a stretch is open at once
     (agent-inferred).
-  - On sound the design's places are read before they are named, and two count rulers say where
+  - On a sampled wave (the specimen recorded speech: the identities are any propagation's, the
+    counts this specimen's) the design's places are read before they are named, and two count rulers say where
     they are not (November 13; the design record §8, G129 and G130; 481 seconds of public speech
     at its own, double and half speed). A wave's crossings follow the top of the frame's band at
     every loudness: 0.26 to 0.74 of the half-cycles of a peak octave stand at double speed and no
@@ -347,12 +348,12 @@ repository was reset on September 24; the pre-reset tree is
     rung: the copy's band costs the original's reader of the next rung 0.9995 to 1.0012 of what
     it costs its own, and at one speed a band costs its neighbour's reader 1.0005 to 1.041. At
     that reader's grain (a first step's bit length and sign) the ladder's rows are shared on
-    sound, where text's two paced clocks read as two keys (atlas `code.sound-place-frame-band`,
+    that speech, where text's two paced clocks read as two keys (atlas `code.wave-place-frame-band`,
     `code.news-clock-proper-time`). The cut on a band's places was then read (G133): with that
     reader it runs free. At a mean epoch of 6 places it keeps 0.212 of its openings against a
     chance of 0.171 under a passage begun 37 samples later and 0.236 against 0.170 under the
     shift of rung, where its control keeps 0.952, because no place of 811,614 passes the section
-    and nothing pins an opening. No level is founded on it for sound. A ring read once a turn
+    and nothing pins an opening. No level is founded on it for a sampled wave. A ring read once a turn
     on a stride was read next (G135; rings turning once in 8 to 128 samples, a place's symbol
     its boost in octaves and its turn in quarter turns): speech is not dark on it (the ring
     continues at 0.05 to 0.13 of places), and a place counted from the passage's first sample is
