@@ -307,6 +307,20 @@ repository was reset on September 24; the pre-reset tree is
     and under re-timings the reader predicts, with a predicted failure under one it has not
     met). Its first reading is ordered from a trained state before any build: every held
     place's code at its cavity opening, by slice, and the cut on those codes.
+  - On sound the design's places are read before they are named, and two count rulers say where
+    they are not (November 13; the design record §8, G129 and G130; 481 seconds of public speech
+    at its own, double and half speed). A wave's crossings follow the top of the frame's band at
+    every loudness: 0.26 to 0.74 of the half-cycles of a peak octave stand at double speed and no
+    octave reads 0.85, so October 25's half-cycle chart gives no place a change of clock keeps.
+    A sample's news is the same at both speeds (6.76 and 6.69 nats), so the passage's news
+    follows its count of places (0.4945). On the tree's octave ladder (fading sums, each rung
+    keeping its remainder, a band read at its rung's stride) the change of clock is a shift of
+    rung: the copy's band costs the original's reader of the next rung 0.9995 to 1.0012 of what
+    it costs its own, and at one speed a band costs its neighbour's reader 1.0005 to 1.041. At
+    that reader's grain (a first step's bit length and sign) the ladder's rows are shared on
+    sound, where text's two paced clocks read as two keys (atlas `code.sound-place-frame-band`,
+    `code.news-clock-proper-time`). Owed before a value chart is built: the cut on a band's
+    places, a reader of longer context, and the image's ruler.
   - Every extent of the built declaration is given the part it sizes, how it was reached and what
     sizes it (the same record, §5), with ten findings by file and line and the build that closes
     each. The departures that stand: the face's 64 coordinates are two lanes of 32, the second a

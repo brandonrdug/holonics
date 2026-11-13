@@ -2362,3 +2362,22 @@ residual is no reader's), on the read utterances.
   row set, a rung's stride and gain its navigator's clock), and a change of clock is a shift of rung that needs nothing learned anew;
   the value chart's record states it before any build. (b) gain-free over 1.25 at any pair: rungs keep their own rows there, and the
   shift of rung is learned from re-timed passages. Between: the rows are shared by groups of rungs the reading names.
+
+G130 scored 2026-11-13T01:25Z (receipts beside G129's: rungs.c, band_ruler.py, band_ruler.txt; then rungs_kept.c, band_ruler_kept.txt).
+  (a) 1.0056 (the original by the double speed's reader 1.0053): HELD.
+  (b) absolute words, the five pairs 1.004, 1.009, 1.106, 1.063, 1.184, mean 1.073: HELD. Gain-free 1.001, 1.002, 1.003, 1.015,
+      1.041, mean 1.012: HELD; the largest 1.041, under 1.25: HELD.
+  (c) the shifted rung 1.000, 1.000, 1.022, 1.053, 1.146, mean 1.044: HELD; the same rung 1.004, 1.011, 1.067, 1.021, 1.047, mean
+      1.030: HELD. The order the guess stood on did not show: the shift read no better than staying, and worse at the two slowest rungs.
+  The instrument, read after the score: the rung as fixed gains (x - y_s) >> s and so drops its leak's remainder, which leaves y_s
+  anywhere within 2^s of its input: a dead zone tied to the rung's number, 64 and 128 at the slow rungs, where a quiet passage lives.
+  A rung that drops its remainder privileges a scale. With the sum kept on 2^-s (rungs_kept.c; the law and the guess unchanged):
+  (b) absolute 1.003, 1.009, 1.038, 1.017, 1.040, mean 1.021, which stands UNDER the fixed band (1.04 to 1.40): the gap between
+  absolute and gain-free words was the dead zone's; gain-free 1.001, 1.001, 1.041, 1.022, 1.022, mean 1.018. (c) the shifted rung
+  0.9998, 0.9995, 1.0009, 1.0012, 1.0006, mean 1.0004; the same rung 1.004, 1.011, 1.042, 1.017, 1.040, mean 1.023.
+  By the rule: on the read as fixed, between (the shift under 1.08 at rungs 1 to 4 only); on the rung that keeps its remainder, the
+  first branch at every pair: at this reader's grain a sound's rows are shared along the ladder, and a change of clock by the
+  ladder's ratio is a shift of rung. The identity is the atlas's of November 12 (code.news-clock-proper-time: ring n reads of the
+  re-timed strand what ring n/lambda read of the original); this guess restated it without citing it, and what is new is its reading.
+  Limits: one speaker, 481 seconds, a ratio of two, a reader of one step's bit length and sign (it cannot see pitch or formants, and
+  equal codes are not equal knowledge), bands of one-pole rungs that overlap.
