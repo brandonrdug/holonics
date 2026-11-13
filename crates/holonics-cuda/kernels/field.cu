@@ -5989,3 +5989,8 @@ extern "C" __global__ void field_yard_bits_words(const void *arr, uint32_t kind,
         }
     }
 }
+
+// -------------------------------------------------------------------------------------------
+// the opening's comparison at every place (P60, the design record of November 13 §4.4a)
+
+#include "field_cavity.cuh"

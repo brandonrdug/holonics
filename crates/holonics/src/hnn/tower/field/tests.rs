@@ -23,7 +23,7 @@ fn keys(n: usize) -> Vec<u8> {
 }
 
 fn tiny_declaration(still: usize) -> FieldDeclaration {
-    FieldDeclaration { alphabet: 5, width: 8, heads: 2, modes: 3, still, contacts: 4, ticks: 2, frames: 2, reach: 16, lanes: 1, depth: 0, carry: 0, triads: 0 }
+    FieldDeclaration { alphabet: 5, width: 8, heads: 2, modes: 3, still, contacts: 4, ticks: 2, frames: 2, reach: 16, lanes: 1, depth: 0, carry: 0, triads: 0, opening: false }
 }
 
 /// A tiny field with every family drawn from the keys (the founding holds the returns and the
@@ -813,7 +813,7 @@ fn no_site_meets_itself() {
 /// head's lock of an equal word (`n` at unit power, half its `2n` reals) reads `2⌈log₂ reach⌉` bits.
 #[test]
 fn the_contact_s_gain_covers_the_falloff() {
-    let at = |modes: usize, reach: usize| FieldDeclaration { alphabet: 5, width: 8, heads: 2, modes, still: 1, contacts: 4, ticks: 2, frames: 2, reach, lanes: 1, depth: 0, carry: 0, triads: 0 }.score_shift();
+    let at = |modes: usize, reach: usize| FieldDeclaration { alphabet: 5, width: 8, heads: 2, modes, still: 1, contacts: 4, ticks: 2, frames: 2, reach, lanes: 1, depth: 0, carry: 0, triads: 0, opening: false }.score_shift();
     assert_eq!(at(8, 2221), -2, "reading 8's declaration locks an equal word at 32 bits");
     assert_eq!(at(16, 16), 1);
     assert_eq!(at(3, 16), -2);
@@ -822,7 +822,7 @@ fn the_contact_s_gain_covers_the_falloff() {
         let gained = |b: i32| if b >= 0 { (modes as u128) >> b } else { (modes as u128) << -b };
         assert!(gained(beta) >= need && gained(beta + 1) < need, "the largest such shift: modes {modes} reach {reach}");
     }
-    let d = FieldDeclaration { alphabet: 5, width: 8, heads: 2, modes: 8, still: 1, contacts: 4, ticks: 2, frames: 2, reach: 2221, lanes: 1, depth: 0, carry: 0, triads: 0 };
+    let d = FieldDeclaration { alphabet: 5, width: 8, heads: 2, modes: 8, still: 1, contacts: 4, ticks: 2, frames: 2, reach: 2221, lanes: 1, depth: 0, carry: 0, triads: 0, opening: false };
     assert_eq!((d.class_trits(), d.classes()), (4, 81), "81 classes at reading 8's reach");
     assert_eq!(FieldDeclaration { modes: 3, ..d }.class_trits(), 3);
     assert_eq!((FieldDeclaration { reach: 81, ..d }.class_trits(), FieldDeclaration { reach: 82, ..d }.class_trits()), (2, 3));
@@ -877,7 +877,7 @@ fn the_skin_decay_is_an_e_fold_a_radian_and_vanishes_below_the_grain() {
 /// and a turned field. Probes across a sheet are left out and counted.
 #[test]
 fn the_covector_matches_the_code_across_the_far_support() {
-    let d = FieldDeclaration { alphabet: 5, width: 8, heads: 2, modes: 3, still: 1, contacts: 4, ticks: 2, frames: 2, reach: 32, lanes: 1, depth: 0, carry: 0, triads: 0 };
+    let d = FieldDeclaration { alphabet: 5, width: 8, heads: 2, modes: 3, still: 1, contacts: 4, ticks: 2, frames: 2, reach: 32, lanes: 1, depth: 0, carry: 0, triads: 0, opening: false };
     let classes: Vec<usize> = (0..26).map(|t| [1usize, 3, 2, 4, 0, 2, 1][t % 7]).collect();
     let open: Vec<bool> = (0..26).map(|t| t % 9 == 4 || t == 25).collect();
     let r = Region { classes: &classes, unresolved: &open, faces: &[], locked: &[], echo: &[], domain: None, port: None };
@@ -965,7 +965,7 @@ fn the_covector_matches_the_code_across_the_far_support() {
 /// of a row, the loudest far source 0.005.)
 #[test]
 fn a_listener_s_founding_row_keeps_its_near_field() {
-    let d = FieldDeclaration { alphabet: 44, width: 32, heads: 5, modes: 8, still: 2, contacts: 32, ticks: 2, frames: 5, reach: 484, lanes: 1, depth: 0, carry: 0, triads: 0 };
+    let d = FieldDeclaration { alphabet: 44, width: 32, heads: 5, modes: 8, still: 2, contacts: 32, ticks: 2, frames: 5, reach: 484, lanes: 1, depth: 0, carry: 0, triads: 0, opening: false };
     assert_eq!((d.score_shift(), d.listen_shift()), (-2, 2));
     let sites = 420;
     let classes = drawn_classes(7, sites, d.alphabet);
@@ -1203,6 +1203,231 @@ fn a_site_opens_on_its_moment() {
     assert_ne!(field, silent, "the chart is drawn at the founding");
     assert_eq!(field.opening(&r).unwrap(), silent.opening(&r).unwrap());
     assert_eq!(field.faces(&region()).unwrap(), silent.faces(&region()).unwrap());
+}
+
+/// [theory, November 13, the design record of that day §4.4a; P60 item 1c] **A place's cavity opening is its masked opening**: at every
+/// place of each fixture region, written or open, the cavity opening formed from the region's standing sums
+/// ([`Field::cavity_openings`]) against the built opening of the region with that place unresolved and silent ([`Field::opening`]).
+/// The difference is printed by word, in the opening's last place (`2^(−16)`), and is not assumed zero: the cavity moment recomposes the
+/// far crowds from prefix sums at the standing phases, where the masked region's crowds are released at its own, so the two can part
+/// by the moment's release (one unit of `2^(−16)` a mode) carried through the moment's chart. The bound read is that rounding: one unit
+/// a moment mode times the chart's largest row sum on `2^(−24)`, plus one unit for the affine's own release.
+#[test]
+fn a_place_s_cavity_opening_is_its_masked_opening() {
+    const WORDS: [usize; 11] = [1, 1, 2, 3, 4, 0, 0, 2, 3, 4, 1];
+    const KNOWN: [bool; 11] = [false; 11];
+    const LONG: [usize; 16] = [2, 0, 4, 1, 1, 3, 0, 2, 4, 4, 1, 0, 3, 2, 1, 0];
+    const LONG_OPEN: [bool; 16] = [false, false, true, false, false, false, true, true, false, false, false, true, false, false, false, true];
+    let regions = [
+        ("seven places, three open", region()),
+        ("eleven places, all written", Region { classes: &WORDS, unresolved: &KNOWN, faces: &[], locked: &[], echo: &[], domain: None, port: None }),
+        ("sixteen places, five open", Region { classes: &LONG, unresolved: &LONG_OPEN, faces: &[], locked: &[], echo: &[], domain: None, port: None }),
+    ];
+    for still in [0usize, 1, 2] {
+        let field = shaped(still);
+        let d = &field.declaration;
+        let (dw, m2) = (d.width, 2 * d.complex());
+        let mf = field.layout.moment_face;
+        let chart = &field.theta[mf..mf + dw * m2];
+        let row_sum = (0..dw).map(|i| chart[i * m2..(i + 1) * m2].iter().map(|&c| c.unsigned_abs() as u64).sum::<u64>()).max().unwrap();
+        let bound = row_sum.div_ceil(1 << 24) + 1;
+        for (name, r) in &regions {
+            let (worst, at, differ) = field.cavity_check(r).unwrap();
+            println!("CAVITY_CHECK still={still} region=\"{name}\" places={} words={} differing_words={differ} largest_difference={worst} at_place={at} bound={bound} (units of 2^-16)", r.classes.len(), r.classes.len() * dw);
+            assert!(worst <= bound, "still {still}, {name}: the cavity opening parts from the masked one by {worst} at place {at}, past the moment's release {bound}");
+            // The check is not vacuous: at a written place the cavity opening is not the place's own opening (its row and its own
+            // moment term are out), and where a turned mode carries a moment the cavity moment is not the standing one.
+            let (cav, own) = (field.cavity_openings(r).unwrap(), field.opening(r).unwrap());
+            let written: Vec<usize> = (0..r.classes.len()).filter(|&t| !r.unresolved[t]).collect();
+            assert!(written.iter().all(|&t| cav[t * dw..(t + 1) * dw] != own[t * dw..(t + 1) * dw]), "still {still}, {name}: a written place's cavity opening is its own");
+            if d.moment_modes() > 0 {
+                let paces = field.paces(r).unwrap();
+                let (cm, sm) = (field.cavity_moments_of(r, &paces).unwrap(), field.moments_of(r, &paces).unwrap());
+                assert!(cm.iter().any(|&v| v != 0), "still {still}, {name}: the cavity moments are zero");
+                assert!(written.iter().any(|&t| cm[t * m2..(t + 1) * m2] != sm[t * m2..(t + 1) * m2]), "still {still}, {name}: the cavity moment is the standing one");
+            }
+        }
+    }
+}
+
+/// A tiny field with the opening's lift, every family drawn from the keys (the lift too, so its return reaches the chart and the moment).
+fn opened(still: usize) -> Field {
+    shaped_with(FieldDeclaration { opening: true, ..tiny_declaration(still) })
+}
+
+/// [P60 item 1h] The opening comparison's covector alone at `places`, its clocks' covectors folded into the strides as the pass's own fold.
+fn opening_covector_of(field: &Field, region: &Region, places: std::ops::Range<usize>) -> Vec<i128> {
+    let paces = field.paces(region).unwrap();
+    let mut g = vec![0i128; field.theta.len()];
+    let mut r = ClockReturn::new(paces.kappa.len(), region.classes.len(), 2 * field.declaration.complex());
+    field.opening_compare_return(region, &paces, places, &mut g, &mut r.gtau, &mut r.gsig).unwrap();
+    field.clock_return(region, &paces, &[], None, &mut r, &mut g).unwrap();
+    g
+}
+
+/// The opening's summed code over a region's compared places, on `2^(−20)` bits.
+fn opening_code(field: &Field, region: &Region) -> i64 {
+    field.opening_codes(region).unwrap().iter().flatten().sum()
+}
+
+const LONG: [usize; 16] = [2, 0, 4, 1, 1, 3, 0, 2, 4, 4, 1, 0, 3, 2, 1, 0];
+const LONG_OPEN: [bool; 16] = [false, false, true, false, false, false, true, true, false, false, false, true, false, false, false, true];
+
+/// [theory, November 13, P60 item 1h] **The opening's comparison returns its code's covector**: on tiny fields with the opening's lift (paced
+/// heads, every family drawn), for each family the entries with the largest covectors are moved by `±δ` and the summed opening code's change is
+/// compared with the covector's prediction, as [`covector_matches_the_codes_difference`] reads the last tick's: the encoding's rows and bias
+/// through `tied`, the lift and its bias, the unresolved row, the neighbours' strand rows, the moment's chart and bias, the moment encodings
+/// (the others' terms) and the paces (their clocks). The opening's read crosses no sheet (the lane chart is smooth), so every probe is read.
+#[test]
+fn the_opening_comparison_s_covector_matches_its_codes_difference() {
+    let (mut read, mut seams, mut halvings) = (0usize, 0usize, 0u32);
+    let mut reached = std::collections::BTreeSet::new();
+    for still in [0usize, 1] {
+        let field = opened(still);
+        for r in [region(), Region { classes: &LONG, unresolved: &LONG_OPEN, faces: &[], locked: &[], echo: &[], domain: None, port: None }] {
+            let g = opening_covector_of(&field, &r, 0..r.classes.len());
+            let places = r.classes.len() as i128;
+            for &(start, len, grain) in field.families() {
+                let natural: u32 = if grain == MATERIAL_BITS { 40 } else { 24 };
+                let mut entries: Vec<usize> = (start..start + len).collect();
+                entries.sort_by_key(|&i| std::cmp::Reverse(g[i].unsigned_abs()));
+                for i in entries.into_iter().take(3) {
+                    if g[i] == 0 {
+                        continue;
+                    }
+                    // The opening's read has no sheet: the lane chart `r / ‖r‖_rms` is smooth, and no contact selects a support.
+                    let straddles = |_: i32| false;
+                    let shift = natural + grain - 20;
+                    let Some((delta, h)) = probe_step(grain, &|delta: i32| (g[i] * 2 * delta as i128) >> shift, &straddles) else {
+                        seams += 1;
+                        continue;
+                    };
+                    halvings += h;
+                    let (mut plus, mut minus) = (field.clone(), field.clone());
+                    plus.theta[i] += delta;
+                    minus.theta[i] -= delta;
+                    read += 1;
+                    reached.insert(start);
+                    let measured = (opening_code(&plus, &r) - opening_code(&minus, &r)) as i128;
+                    let predicted = (g[i] * 2 * delta as i128) >> shift;
+                    let tolerance = predicted.abs() / 8 + ((64 * ((places + 2) / 3)) << h);
+                    assert!((measured - predicted).abs() <= tolerance, "still {still} family at {start} (grain {grain}) entry {i} at {h} halvings: measured {measured}, predicted {predicted}");
+                }
+            }
+        }
+    }
+    let l = opened(0).layout;
+    let named = [("enc", l.enc), ("before", l.before), ("after", l.after), ("read_bias", l.read_bias), ("moment_before", l.moment_before), ("moment_after", l.moment_after), ("pace", l.pace), ("moment_face", l.moment_face), ("moment_face_bias", l.moment_face_bias), ("opening", l.opening), ("opening_bias", l.opening_bias)];
+    eprintln!("OPENING_PROBES read={read} halvings={halvings} on_a_seam={seams} families_reached={}", named.iter().filter(|(_, s)| reached.contains(s)).map(|(n, _)| *n).collect::<Vec<_>>().join(","));
+    for (name, start) in named {
+        assert!(reached.contains(&start), "the opening's covector was read against its code in family {name}");
+    }
+    assert!(16 * seams <= read, "read {read} probes, {seams} on a seam at the smallest step");
+}
+
+/// [theory, November 13, P60 items 1b and 1h] **A place's own row, own moment term and own stride are no operand of its comparison**: on the
+/// forward, a place's cavity opening and its opening face stand when the class written there changes (to every other class, written or open),
+/// to the moment's release carried through the chart (the bound of [`a_place_s_cavity_opening_is_its_masked_opening`]); on the return, one
+/// place's comparison alone, at a place whose class is written nowhere else in the region, returns nothing to that class's strand rows and
+/// moment encodings, and to its encoding row only the readout's own term (`tied`: `release(δz_u y⁰, 16)`); its stride's covector is printed, the
+/// remainder of its cavity moment's releases ([`moment`]'s test of the own stride bounds it).
+#[test]
+fn a_place_s_comparison_reaches_nothing_of_its_own() {
+    for still in [0usize, 1] {
+        let field = opened(still);
+        let d = &field.declaration;
+        let (dw, m2, a) = (d.width, 2 * d.complex(), d.alphabet);
+        let mf = field.layout.moment_face;
+        let chart = &field.theta[mf..mf + dw * m2];
+        let row_sum = (0..dw).map(|i| chart[i * m2..(i + 1) * m2].iter().map(|&c| c.unsigned_abs() as u64).sum::<u64>()).max().unwrap();
+        let bound = row_sum.div_ceil(1 << 24) + 1;
+        let (mut worst, mut changes) = (0u64, 0usize);
+        for (classes, open) in [(&CLASSES[..], &OPEN[..]), (&LONG[..], &LONG_OPEN[..])] {
+            let r = Region { classes, unresolved: open, faces: &[], locked: &[], echo: &[], domain: None, port: None };
+            let x = field.cavity_openings(&r).unwrap();
+            for t in 0..classes.len() {
+                for c in 0..a {
+                    for u in [false, true] {
+                        let mut cs = classes.to_vec();
+                        let mut us = open.to_vec();
+                        (cs[t], us[t]) = (c, u);
+                        let changed = Region { classes: &cs, unresolved: &us, ..r };
+                        let y = field.cavity_openings(&changed).unwrap();
+                        for (p, q) in x[t * dw..(t + 1) * dw].iter().zip(&y[t * dw..(t + 1) * dw]) {
+                            worst = worst.max(p.abs_diff(*q));
+                        }
+                        changes += 1;
+                    }
+                }
+            }
+        }
+        println!("OWN_FORWARD still={still} changes={changes} largest_difference={worst} bound={bound} (units of 2^-16)");
+        assert!(worst <= bound, "still {still}: a place's cavity opening moved by {worst} with its own class");
+        // The return of one place's comparison alone, at the places whose class the region writes nowhere else.
+        let r = region();
+        let l = &field.layout;
+        let paces = field.paces(&r).unwrap();
+        let tm = d.moment_modes();
+        let x = field.cavity_openings(&r).unwrap();
+        let reach_o = reach(&field.theta[l.opening..l.opening + dw * dw]);
+        for t in 0..CLASSES.len() {
+            let u = CLASSES[t];
+            if CLASSES.iter().filter(|&&c| c == u).count() > 1 {
+                continue;
+            }
+            let g = opening_covector_of(&field, &r, t..t + 1);
+            for (name, base, width) in [("before", l.before, dw), ("after", l.after, dw), ("moment_before", l.moment_before, 2 * tm), ("moment_after", l.moment_after, 2 * tm)] {
+                assert!(g[base + u * width..base + (u + 1) * width].iter().all(|&v| v == 0), "still {still} place {t}: its comparison reached its own class's {name} row");
+            }
+            let read = field.opening_read(&x[t * dw..(t + 1) * dw], reach_o).unwrap();
+            let dz = read.face.covector(u);
+            let tied: Vec<i128> = read.lift.iter().map(|&y| release(dz[u] as i128 * y as i128, STATE_BITS)).collect();
+            assert_eq!(g[l.enc + u * dw..l.enc + (u + 1) * dw].to_vec(), tied, "still {still} place {t}: its own encoding row took more than the readout's term");
+            let strides: Vec<i128> = (0..paces.kappa.len()).map(|p| g[l.pace + p * (a + 1) + u]).collect();
+            println!("OWN_STRIDE still={still} place={t} class={u} stride_covector_by_paced_head={strides:?}");
+        }
+    }
+}
+
+/// [theory, November 13, P60 items 1a, 1f and 3] **A learner founds the opening's lift and keeps every line**: the founded learner's text equals
+/// the source's but the declaration's head (`v14g` with the opening's word), the material, first and second moments (each the source's with the
+/// block appended), and the parts line (the opening's octave appended at 0); its field reads the same last-tick faces, restores from its text,
+/// and a section on it returns the opening's codes. A field read without the block reads as the declaration without it.
+#[test]
+fn a_learner_founds_the_opening_lift_and_keeps_every_line() {
+    let mut learner = FieldLearner::new(shaped(1), 6);
+    learner.rate_parts = Some(RateParts { contacts_before: learner.field.declaration.contacts, octaves: [1; PARTS] });
+    learner.section(&[region()]).unwrap();
+    let founded = learner.with_opening().unwrap();
+    assert!(founded.field.declaration.opening && !learner.field.declaration.opening);
+    let (dw, l) = (founded.field.declaration.width, &founded.field.layout);
+    assert_eq!(l.opening, learner.field.material_len());
+    assert_eq!(founded.field.material_len(), learner.field.material_len() + dw * dw + dw);
+    assert!(founded.field.theta[l.opening..].iter().all(|&v| v == 0), "the lift is founded at zero");
+    assert_eq!(founded.field.theta[..l.opening], learner.field.theta[..], "every standing entry kept");
+    assert_eq!(founded.rate_parts.unwrap().octaves[OPENING_PART], 0);
+    assert_eq!(founded.field.faces(&region()).unwrap(), learner.field.faces(&region()).unwrap(), "the last tick reads as before");
+    let (a, b) = (learner.to_text(), founded.to_text());
+    let (la, lb): (Vec<&str>, Vec<&str>) = (a.lines().collect(), b.lines().collect());
+    assert_eq!(la.len(), lb.len());
+    for (k, (x, y)) in la.iter().zip(&lb).enumerate() {
+        if x == y {
+            continue;
+        }
+        let (wx, wy): (Vec<&str>, Vec<&str>) = (x.split(' ').collect(), y.split(' ').collect());
+        match k {
+            1 => assert!(wy[0] == "hnn-field-v14g" && wy.last() == Some(&"1"), "the declaration's head: {y}"),
+            _ if wx[0] == "parts" => assert_eq!((&wy[..wx.len()], wy.len()), (&wx[..], wx.len() + 1), "the parts line gains the opening's octave"),
+            _ => assert_eq!(&wy[..wx.len()], &wx[..], "line {k} keeps every standing word, the block appended"),
+        }
+    }
+    let back = FieldLearner::from_text(&b).unwrap();
+    assert_eq!(back.to_text(), b);
+    let mut trained = founded.clone();
+    let receipt = trained.section(&[region()]).unwrap();
+    assert_eq!(receipt.opening.len(), 1);
+    assert_eq!(receipt.opening[0].1, CLASSES.len(), "every place compared");
+    assert!(learner.section(&[region()]).unwrap().opening.is_empty(), "no codes without the lift");
 }
 
 /// [§16.23] **A region's covector is its state's in the joint code**: a region whose `K` open sites were drawn from a
@@ -1774,7 +1999,7 @@ fn refinement_moves_the_end_one_place_a_read() {
 
 /// The packets' field of the tower fixtures: packets of three sites of the tiny field's reach of 16.
 fn coarse_declaration() -> FieldDeclaration {
-    FieldDeclaration { alphabet: 2, width: 8, heads: 2, modes: 3, still: 1, contacts: 4, ticks: 2, frames: 2, reach: 6, lanes: 1, depth: 0, carry: 0, triads: 0 }
+    FieldDeclaration { alphabet: 2, width: 8, heads: 2, modes: 3, still: 1, contacts: 4, ticks: 2, frames: 2, reach: 6, lanes: 1, depth: 0, carry: 0, triads: 0, opening: false }
 }
 
 /// A tower of scales on [`shaped`]`(still)`: packets of three sites after the first of its two ticks, founded from the
@@ -2534,12 +2759,12 @@ fn a_growth_by_carry_circles_keeps_every_face_and_returns_through_its_circles() 
     assert_eq!(grown.rate_parts, Some(RateParts { contacts_before: 8, octaves: [0; PARTS] }));
     let text = grown.to_text();
     // The parts a field with circles and no triads writes: every part before the triad's (twenty-two), the line as before the triads.
-    assert_eq!(text.lines().find(|l| l.starts_with("parts ")).unwrap().split(' ').count(), 2 + written_parts(2, 0).len(), "a field with carry circles writes all twenty-two parts before the triad's");
-    assert_eq!(written_parts(2, 0).len(), TRIAD_PART);
+    assert_eq!(text.lines().find(|l| l.starts_with("parts ")).unwrap().split(' ').count(), 2 + written_parts(2, 0, false).len(), "a field with carry circles writes all twenty-two parts before the triad's");
+    assert_eq!(written_parts(2, 0, false).len(), TRIAD_PART);
     let back = FieldLearner::from_text(&text).unwrap();
     assert_eq!((back.field.theta.clone(), back.first.clone(), back.second.clone(), back.rate_parts, back.drawn), (grown.field.theta.clone(), grown.first.clone(), grown.second.clone(), grown.rate_parts, grown.drawn));
     assert_eq!(back.field.declaration, grown.field.declaration);
-    assert_eq!(learner.to_text().lines().find(|l| l.starts_with("parts ")).unwrap().split(' ').count(), 2 + written_parts(0, 0).len(), "a field without carry circles writes nineteen: the plain sixteen and the first lane's letter rows");
+    assert_eq!(learner.to_text().lines().find(|l| l.starts_with("parts ")).unwrap().split(' ').count(), 2 + written_parts(0, 0, false).len(), "a field without carry circles writes nineteen: the plain sixteen and the first lane's letter rows");
 }
 
 /// [definition; theory, November 11 17:25 and November 12 (G98)] **The carry circles' scan is the law, site by site in strand order**: on a drawn
@@ -2991,8 +3216,8 @@ fn the_parts_line_reads_its_own_order_and_every_older_one() {
     let older: String = text.lines().map(|l| if l.starts_with("parts ") { format!("{}\n", l.split(' ').take(2 + PLAIN_PARTS).collect::<Vec<_>>().join(" ")) } else { format!("{l}\n") }).collect();
     let read = FieldLearner::from_text(&older).unwrap().rate_parts.unwrap();
     assert_eq!((read.octaves[3], read.octaves[19], read.octaves[20], read.octaves[21]), (1, 0, 0, 0), "a sixteen-part line reads the letter rows at octave 0");
-    assert_eq!(written_parts(0, 0), (0..16).chain(19..22).collect::<Vec<_>>());
-    assert_eq!(written_parts(2, 0), (0..22).collect::<Vec<_>>());
+    assert_eq!(written_parts(0, 0, false), (0..16).chain(19..22).collect::<Vec<_>>());
+    assert_eq!(written_parts(2, 0, false), (0..22).collect::<Vec<_>>());
 }
 
 /// The triads the drawn fixtures carry: four (the founding counts its triads in fours, the triad record §4).
@@ -3056,7 +3281,7 @@ fn the_triads_head_line_is_v14f_and_at_no_triads_every_line_is_as_before() {
         assert_eq!(new.families[..old.families.len()], old.families[..], "C {c}: every old family as before");
         assert_eq!(new.families[old.families.len()..], [(old.len, 6 * j * dw, MATERIAL_BITS), (old.len + 6 * j * dw, 6 * j, FACE_BITS), (old.len + 6 * j * dw + 6 * j, dw * 2 * j, MATERIAL_BITS)]);
         assert_eq!((new.triad, new.triad_bias, new.w_triad, new.len), (old.len, old.len + 6 * j * dw, old.len + 6 * j * dw + 6 * j, old.len + 6 * j * dw + 6 * j + dw * 2 * j));
-        assert_eq!(FieldLayout { triad: old.triad, triad_bias: old.triad_bias, w_triad: old.w_triad, len: old.len, families: old.families.clone(), ..new.clone() }, old, "C {c}: every old offset unchanged");
+        assert_eq!(FieldLayout { triad: old.triad, triad_bias: old.triad_bias, w_triad: old.w_triad, opening: old.opening, opening_bias: old.opening_bias, len: old.len, families: old.families.clone(), ..new.clone() }, old, "C {c}: every old offset unchanged");
     }
 }
 
@@ -3140,7 +3365,7 @@ fn a_growth_by_triads_keeps_every_face_and_its_return_has_a_covector() {
     fast.rate_parts.as_mut().unwrap().octaves[TRIAD_PART] = 3;
     let text = fast.to_text();
     let line = text.lines().find(|l| l.starts_with("parts ")).unwrap().to_string();
-    assert_eq!(line.split(' ').count(), 2 + written_parts(0, j).len());
+    assert_eq!(line.split(' ').count(), 2 + written_parts(0, j, false).len());
     assert_eq!(line.rsplit_once(' ').unwrap().1, "3", "the triad's octave written last");
     let back = FieldLearner::from_text(&text).unwrap();
     assert_eq!((back.field.clone(), back.first.clone(), back.second.clone(), back.rate_parts, back.drawn), (fast.field.clone(), fast.first.clone(), fast.second.clone(), fast.rate_parts, fast.drawn));
@@ -3360,11 +3585,12 @@ fn the_triads_are_the_law_site_by_site_with_none_at_a_regions_two_ends() {
 /// letter rows only where the field has triads, so at `J = 0` the written parts are the lines before.
 #[test]
 fn the_triad_is_one_founded_part_written_only_where_the_field_has_triads() {
-    assert_eq!((PART_NAMES[TRIAD_PART], TRIAD_PART, PARTS), ("triad", 22, 23));
-    assert_eq!(written_parts(0, 0), (0..16).chain(19..22).collect::<Vec<_>>());
-    assert_eq!(written_parts(2, 0), (0..22).collect::<Vec<_>>());
-    assert_eq!(written_parts(0, TRIADS), (0..16).chain(19..23).collect::<Vec<_>>());
-    assert_eq!(written_parts(2, TRIADS), (0..23).collect::<Vec<_>>());
+    assert_eq!((PART_NAMES[TRIAD_PART], TRIAD_PART, PARTS), ("triad", 22, 24));
+    assert_eq!((PART_NAMES[OPENING_PART], OPENING_PART), ("opening", 23));
+    assert_eq!(written_parts(0, 0, false), (0..16).chain(19..22).collect::<Vec<_>>());
+    assert_eq!(written_parts(2, 0, false), (0..22).collect::<Vec<_>>());
+    assert_eq!(written_parts(0, TRIADS, false), (0..16).chain(19..23).collect::<Vec<_>>());
+    assert_eq!(written_parts(2, TRIADS, false), (0..23).collect::<Vec<_>>());
     for circled in [false, true] {
         let field = if circled { circled_triad_shaped(1, TRIADS) } else { triad_shaped(1, TRIADS) };
         let (l, dw, j) = (field.layout.clone(), field.declaration.width, field.declaration.triads);

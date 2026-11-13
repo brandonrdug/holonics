@@ -549,8 +549,16 @@ pub(super) fn train(args: &[String], realization: &mut dyn FieldRealization) -> 
             return Err(format!("a section whose receipt counts {} sites against the cut's domain of {}", receipt.sites, tally.domain).into());
         }
         let opt = |v: Option<i64>| v.map_or("-".to_string(), |c| micro(c, receipt.sites).to_string());
+        // [P60 item 6] The opening's code over the section's compared places, in millionths of a bit a place, where the field has the lift; a
+        // line of a field without it is the line as before.
+        let opening = if receipt.opening.is_empty() {
+            String::new()
+        } else {
+            let (code, places) = receipt.opening.iter().fold((0i128, 0usize), |(c, n), &(rc, rn)| (c + rc as i128, n + rn));
+            format!(" opening={} opening_places={places}", if places == 0 { 0 } else { (code * 1_000_000) / ((places as i128) << 20) })
+        };
         println!(
-            "STORE_SECTION n={done} {} {} stretches={} before={} after={} deposited={} transfer={} external={} rate={} regions_ms={regions_ms} deposit_ms={deposit_ms} ms={}",
+            "STORE_SECTION n={done} {} {} stretches={} before={} after={} deposited={} transfer={} external={} rate={}{opening} regions_ms={regions_ms} deposit_ms={deposit_ms} ms={}",
             tally.text(),
             cut.slices.iter().zip(&by_slice).map(|(s, n)| format!("{}={n}", s.name)).collect::<Vec<_>>().join(" "),
             cut.pass.stretches,
@@ -694,6 +702,76 @@ const SURPRISE_OCTAVES: usize = 40;
 /// may reach one octave more).
 const READ_OCTAVES: usize = 10;
 
+/// [definition; theory, November 13, the design record §4.4a; P60 item 3] **`found-opening STATE STATE_SHA OUT`**: the learner `STATE` with the
+/// opening's lift founded at zero ([`FieldLearner::with_opening`]), written to the file `OUT`. Before it writes, every line of the state that the
+/// law reads is printed for the source and the founded state (`FOUND_OPENING_LINE`) and judged: a line is equal, or it is the declaration's line
+/// (its head `hnn-field-v14g`, the source's words kept and the opening's word appended), the parts line (the source's octaves and the opening's at
+/// 0), or one of the material's three lines (the source's words kept, the block's `D × D + D` words appended: the material and the first moments
+/// at 0, the second at the means the growth opens them at). Any other changed line, an empty line, or a different count of lines is refused and
+/// nothing is written: a state tool that leaves a line behind trains every part at a rate the law never set (November 11). Reads no realization.
+pub(super) fn found_opening(args: &[String]) -> Result<()> {
+    if args.len() != 4 {
+        return Err("found-opening STATE STATE_SHA OUT".into());
+    }
+    let started = std::time::Instant::now();
+    let text = pinned_read(&args[1], &args[2], STATE_BUDGET)?;
+    let learner = FieldLearner::from_text(std::str::from_utf8(&text)?).map_err(|e| e.to_string())?;
+    if learner.to_text().as_bytes() != text.as_slice() {
+        return Err("a state that does not read and write back byte for byte".into());
+    }
+    let out = Path::new(&args[3]);
+    if out.exists() {
+        return Err("a founded state's path that exists".into());
+    }
+    let founded = learner.with_opening().map_err(|e| e.to_string())?;
+    let (dw, block) = (founded.field.declaration.width, founded.field.material_len() - learner.field.material_len());
+    if block != dw * dw + dw {
+        return Err(format!("a founding that appended {block} entries, where the lift holds {}", dw * dw + dw).into());
+    }
+    let (a, b) = (learner.to_text(), founded.to_text());
+    let (la, lb): (Vec<&str>, Vec<&str>) = (a.lines().collect(), b.lines().collect());
+    if la.len() != lb.len() {
+        return Err(format!("a founding that wrote {} lines for {}", lb.len(), la.len()).into());
+    }
+    let material = learner.field.material_len();
+    let mut judged = (0usize, 0usize, 0usize, 0usize);
+    for (k, (x, y)) in la.iter().zip(&lb).enumerate() {
+        let (wx, wy): (Vec<&str>, Vec<&str>) = (x.split(' ').collect(), y.split(' ').collect());
+        if x.is_empty() || y.is_empty() {
+            return Err(format!("line {k} is empty in the source or the founded state").into());
+        }
+        let kept = wy.len() >= wx.len() && wy[..wx.len()] == wx[..];
+        let head = |w: &[&str]| w[0].chars().take(24).collect::<String>();
+        let verdict = if x == y {
+            judged.0 += 1;
+            "equal".to_string()
+        } else if k == 1 && wy[0] == "hnn-field-v14g" && wy.len() == wx.len() + 2 && wy[1..wx.len()] == wx[1..] && wy.last() == Some(&"1") {
+            judged.1 += 1;
+            format!("declaration source={x} founded={y}")
+        } else if wx[0] == "parts" && kept && wy.len() == wx.len() + 1 && wy.last() == Some(&"0") {
+            judged.2 += 1;
+            format!("parts appended={}", wy[wx.len()])
+        } else if kept && wx.len() == material && wy.len() == material + block {
+            judged.3 += 1;
+            let tail = &wy[material..];
+            let zeros = tail.iter().filter(|&&w| w == "0").count();
+            let mut distinct: Vec<&str> = tail.to_vec();
+            distinct.sort_unstable();
+            distinct.dedup();
+            format!("block appended={} zero={zeros} distinct={}", tail.len(), distinct.join(","))
+        } else {
+            return Err(format!("line {k} ({}) changed beyond the opening's lift: {} words for {}", head(&wx), wy.len(), wx.len()).into());
+        };
+        println!("FOUND_OPENING_LINE line={k} head={} words_source={} words_founded={} {verdict}", head(&wx), wx.len(), wy.len());
+    }
+    if judged.1 != 1 || judged.3 != 3 || (learner.rate_parts.is_some() && judged.2 != 1) {
+        return Err(format!("a founding whose changed lines are {} declaration, {} parts and {} material lines", judged.1, judged.2, judged.3).into());
+    }
+    write_new(out, b.as_bytes())?;
+    println!("FOUND_OPENING lines={} equal={} declaration={} parts={} material_lines={} material={} block={block} founded_material={} ms={}", la.len(), judged.0, judged.1, judged.2, judged.3, material, founded.field.material_len(), started.elapsed().as_millis());
+    Ok(())
+}
+
 /// [measurement; theory, November 13, P55 part B; the design record of November 13, §4.4] `read-cavity UNITS UNITS_SHA STORE STORE_SHA KEYS KEYS_SHA
 /// CODEC CODEC_SHA PLACES STATE STATE_SHA OUT`: **a held place's news at its cavity opening**, a reading. Each slice of the held role, alone and in the
 /// store's order, is cut afresh from stretch 1 with the key file's seed (as `read-store` cuts it), whole stretches until at least `PLACES` places.
@@ -737,11 +815,24 @@ pub(super) fn read_cavity(args: &[String], realization: &mut dyn FieldRealizatio
     std::fs::create_dir_all(out)?;
     let mut tsv = std::io::BufWriter::new(std::fs::File::create(out.join("cavity.tsv"))?);
     use std::io::Write as _;
-    writeln!(tsv, "row\tslice\tstretch\tt\tclass\tc0\tcK\tsource\tc1\tc2\tc3")?;
+    writeln!(tsv, "row\tslice\tstretch\tt\tclass\tc0\tcK\tsource\tc1\tc2\tc3\tcO")?;
     let mut words = std::io::BufWriter::new(std::fs::File::create(out.join("words.bin"))?);
     let mut words_whole = std::io::BufWriter::new(std::fs::File::create(out.join("words_whole.bin"))?);
     let dw = learner.field.declaration.width;
     let stages_expected = learner.field.declaration.ticks + 1;
+    // [P60 item 7] The opening's code through its lift at every place of a region (cavity openings only, no tick), where the field has the lift;
+    // `-` where it has not. At a written place it is the place's code with it alone open among the others (the cavity opening is the opening of
+    // the region masked there, §4.4a's check), so one region of every place written gives the one-place masks' codes.
+    let opened = learner.field.declaration.opening;
+    let opening_of = |classes: &[usize], unresolved: &[bool]| -> std::result::Result<Vec<Option<i64>>, String> {
+        if !opened {
+            return Ok(vec![None; classes.len()]);
+        }
+        let region = [TrainRegion::plain(classes.to_vec(), unresolved.to_vec())];
+        let views = views_of(&region);
+        learner.field.opening_codes(&views[0]).map_err(|e| e.to_string())
+    };
+    let cell = |v: Option<i64>| v.map_or("-".to_string(), |c| c.to_string());
     let code_of_read = |r: &[i32], class: usize| -> std::result::Result<i64, String> { Ok(learner.field.face_of_read(r).map_err(|e| e.to_string())?.code(class)) };
     let mut put_words = |w: &mut std::io::BufWriter<std::fs::File>, rows: &[Vec<i32>], at: usize| -> std::io::Result<()> {
         for stage in rows {
@@ -844,13 +935,16 @@ pub(super) fn read_cavity(args: &[String], realization: &mut dyn FieldRealizatio
             at = end;
         }
         let card_ms = card_start.elapsed().as_millis();
+        let opening_start = std::time::Instant::now();
+        let co: Vec<Vec<Option<i64>>> = stretches.par_iter().map(|(classes, _, _)| opening_of(classes, &vec![false; classes.len()])).collect::<std::result::Result<_, String>>()?;
+        let opening_ms = opening_start.elapsed().as_millis();
         for (k, (classes, _, _)) in stretches.iter().enumerate() {
             for t in 0..classes.len() {
                 if code_of_read(&charts[k][t][0], classes[t])? != c0[k][t] {
                     return Err(format!("the face of the opening's chart differs from the host's opening face (stretch {k}, place {t})").into());
                 }
                 let [c1, c2, c3] = mid[k][t];
-                writeln!(tsv, "P\t{name}\t{k}\t{t}\t{}\t{}\t{}\t-\t{c1}\t{c2}\t{c3}", classes[t], c0[k][t], ck[k][t])?;
+                writeln!(tsv, "P\t{name}\t{k}\t{t}\t{}\t{}\t{}\t-\t{c1}\t{c2}\t{c3}\t{}", classes[t], c0[k][t], ck[k][t], cell(co[k][t]))?;
                 put_words(&mut words, &charts[k][t], 0)?;
             }
         }
@@ -870,6 +964,7 @@ pub(super) fn read_cavity(args: &[String], realization: &mut dyn FieldRealizatio
             let regions: Vec<TrainRegion> = wholes[w_at..end].iter().map(|(_, r)| r.clone()).collect();
             let (faces, stages) = realization.read_tick_charts(&learner.field, &views_of(&regions)).map_err(|e| e.to_string())?;
             for ((k, region), (f, st)) in wholes[w_at..end].iter().zip(faces.iter().zip(&stages)) {
+                let wo = opening_of(&region.classes, &region.unresolved)?;
                 if st.len() != stages_expected {
                     return Err("a whole mask's charts by stage that are not one of each stage".into());
                 }
@@ -881,7 +976,7 @@ pub(super) fn read_cavity(args: &[String], realization: &mut dyn FieldRealizatio
                         return Err(format!("a whole mask's last chart's face differs from the realization's face (stretch {k}, place {t})").into());
                     }
                     let (w0, w1, w2, w3) = (code_of_read(at_row(0), class)?, code_of_read(at_row(1), class)?, code_of_read(at_row(2), class)?, code_of_read(at_row(3), class)?);
-                    writeln!(tsv, "W\t{name}\t{k}\t{t}\t{class}\t{w0}\t{cw}\t-\t{w1}\t{w2}\t{w3}")?;
+                    writeln!(tsv, "W\t{name}\t{k}\t{t}\t{class}\t{w0}\t{cw}\t-\t{w1}\t{w2}\t{w3}\t{}", cell(wo[t]))?;
                     put_words(&mut words_whole, st, row)?;
                     whole_places += 1;
                 }
@@ -927,14 +1022,40 @@ pub(super) fn read_cavity(args: &[String], realization: &mut dyn FieldRealizatio
                         Ok(learner.field.opening_face(&views[0], t).map_err(|e| e.to_string())?.code(classes[t]))
                     })
                     .collect();
+                let cc = opening_of(&classes, &vec![false; classes.len()])?;
                 for (t, code) in codes.into_iter().enumerate() {
-                    writeln!(tsv, "C\t{name}\t{k}\t{t}\t{}\t{}\t-\t{}", classes[t], code?, source[t])?;
+                    writeln!(tsv, "C\t{name}\t{k}\t{t}\t{}\t{}\t-\t{}\t-\t-\t-\t{}", classes[t], code?, source[t], cell(cc[t]))?;
                 }
                 copy_places += classes.len();
             }
         }
+        // [P60 item 7c] Each stretch begun seven places later (its bytes from the eighth on, a true end's voids kept), the opening's code at every
+        // place of the copy, `source` the place of the stretch it stands at; where the field has the lift.
+        let mut later_places = 0usize;
+        if opened {
+            const LATER: usize = 7;
+            let later: Vec<(usize, Vec<usize>, Vec<Option<i64>>)> = stretches
+                .par_iter()
+                .enumerate()
+                .filter(|(_, (_, bytes, _))| bytes.len() > LATER)
+                .map(|(k, (_, bytes, ends))| -> std::result::Result<_, String> {
+                    let mut classes = codec.encode(&bytes[LATER..]).map_err(|e| e.to_string())?;
+                    if *ends {
+                        classes.resize(classes.len() + NEAR, codec.void());
+                    }
+                    let codes = opening_of(&classes, &vec![false; classes.len()])?;
+                    Ok((k, classes, codes))
+                })
+                .collect::<std::result::Result<_, String>>()?;
+            for (k, classes, codes) in later {
+                for (t, (class, code)) in classes.iter().zip(codes).enumerate() {
+                    writeln!(tsv, "S\t{name}\t{k}\t{t}\t{class}\t-\t-\t{}\t-\t-\t-\t{}", t + LATER, cell(code))?;
+                }
+                later_places += classes.len();
+            }
+        }
         println!(
-            "CAVITY_SLICE slice={name} stretches={} places={taken} host_c0_ms={host_ms} card_cK_ms={card_ms} card_batches={batches} whole_masks={} whole_places={whole_places} whole_ms={} copy_places={copy_places} host_copy_ms={} elapsed_ms={}",
+            "CAVITY_SLICE slice={name} stretches={} places={taken} host_c0_ms={host_ms} card_cK_ms={card_ms} card_batches={batches} host_opening_ms={opening_ms} whole_masks={} whole_places={whole_places} whole_ms={} copy_places={copy_places} later_places={later_places} host_copy_ms={} elapsed_ms={}",
             stretches.len(),
             wholes.len(),
             whole_ms,

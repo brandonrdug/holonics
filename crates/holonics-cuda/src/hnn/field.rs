@@ -587,6 +587,35 @@ struct Staged<'c> {
     x: Pooled<'c, i64>,
 }
 
+/// [realization; theory, November 13, P60 item 2] **The standing moments' operands, kept for the cavity's**: every moment mode's strands and their
+/// exact prefixes, the forward's admission flags and the modes' words (`moments` with `keep`), which the cavity moments read at their standing
+/// phases and the cavity's clock covector reads again.
+struct MomentKeep<'c> {
+    before: Pooled<'c, i64>,
+    after: Pooled<'c, i64>,
+    up: Pooled<'c, i128>,
+    down: Pooled<'c, i128>,
+    _ok: Pooled<'c, u8>,
+    ws: Pooled<'c, u64>,
+    cmap: Pooled<'c, u32>,
+}
+
+/// [realization; theory, November 13, P60 item 2] **The opening's comparison's forward on the card** (the host's `Field::cavity_forward` and
+/// `Field::opening_read` at every compared place), kept for its return and its codes: the compared places (`mask`, the words' open-site mask while
+/// the opening is read), the cavity moments `[t][2M]` and their two sides `[u][t]`, the cavity openings, their charts, lifts and faces.
+struct Opening<'c> {
+    mask: Pooled<'c, u8>,
+    keep: Option<MomentKeep<'c>>,
+    cmoment: Pooled<'c, i64>,
+    sb: Pooled<'c, i64>,
+    sa: Pooled<'c, i64>,
+    read: Pooled<'c, i32>,
+    scale: Pooled<'c, i128>,
+    lift: Pooled<'c, i64>,
+    masses: Pooled<'c, u64>,
+    totals: Pooled<'c, i128>,
+}
+
 struct Tick<'c> {
     read: Pooled<'c, i32>,
     scale: Pooled<'c, i128>,
@@ -917,6 +946,10 @@ pub struct CardField<'c> {
     tick_charts: std::cell::RefCell<Option<Vec<Vec<Vec<i32>>>>>,
     /// [measurement; P57 item 1] The last phase marked, which a trace's launches are read under.
     last_mark: std::cell::Cell<&'static str>,
+    /// [realization; theory, November 13, P60 items 1d and 2] While the training path reads the opening's codes
+    /// ([`FieldRealization::read_and_return_opening`]): set, and each region's opening code at every compared place.
+    opening_wanted: std::cell::Cell<bool>,
+    opening_out: std::cell::RefCell<Vec<Vec<Option<i64>>>>,
 }
 
 impl<'c> CardField<'c> {
@@ -929,7 +962,7 @@ impl<'c> CardField<'c> {
         let (free, total) = (memory.free_bytes as u64, memory.total_bytes as u64);
         let used = total.saturating_sub(free);
         let budget = free.min(BOARD_CEILING.saturating_sub(used)).saturating_sub(MARGIN);
-        Ok(Self { card, module, budget, times: FieldTimes::default(), profile: None, head: Default::default(), #[cfg(test)] unfilled: Default::default(), #[cfg(feature = "ruler-bits")] bits: Default::default(), pools: Default::default(), held_questions: Default::default(), covector_shares: Default::default(), row_questions: Default::default(), row_out: Default::default(), row_cov: Default::default(), held_cells: Default::default(), tick_reads: Default::default(), carry_gates: Default::default(), near_sites: Default::default(), near_out: Default::default(), clock_sites: Default::default(), clock_out: Default::default(), phases: None, phase_card: Default::default(), narrow: Default::default(), narrow_out: Default::default(), last_mark: std::cell::Cell::new("open"), tick_charts: Default::default() })
+        Ok(Self { card, module, budget, times: FieldTimes::default(), profile: None, head: Default::default(), #[cfg(test)] unfilled: Default::default(), #[cfg(feature = "ruler-bits")] bits: Default::default(), pools: Default::default(), held_questions: Default::default(), covector_shares: Default::default(), row_questions: Default::default(), row_out: Default::default(), row_cov: Default::default(), held_cells: Default::default(), tick_reads: Default::default(), carry_gates: Default::default(), near_sites: Default::default(), near_out: Default::default(), clock_sites: Default::default(), clock_out: Default::default(), phases: None, phase_card: Default::default(), narrow: Default::default(), narrow_out: Default::default(), last_mark: std::cell::Cell::new("open"), tick_charts: Default::default(), opening_wanted: Default::default(), opening_out: Default::default() })
     }
 
     /// The octets a batch's weight and contact stores may take.
@@ -2150,10 +2183,13 @@ impl<'c> CardField<'c> {
             self.launch("field_skin_addresses", Self::cells((paced * n * sites) as u64), THREADS, &mut [arg(words)])?;
             self.launch("field_pframes", Self::cells((paced * sites * n) as u64), THREADS, &mut [arg(words)])?;
         }
-        self.moments(field, words, regions.len(), sites)?;
+        // [P60 item 2] The opening is compared in a training read where the field has the opening's lift: the standing moments' operands are kept.
+        let compared = d.opening && returning;
+        let kept_moments = self.moments(field, words, regions.len(), sites, compared)?;
         // The moment's chart into the face (§16.22, the host's `Field::open`): `x⁰ += release(C s + b, 24)`.
         let (mface, mface_bias, rmface) = moment_face(field);
         self.affine("field_affine_x64", words, mface, mface_bias, rmface, dw, m2, words.moment, m2, 0, dw, words.x, false)?;
+        let opening = if compared { Some(self.opening_forward(field, words, regions, &st, kept_moments)?) } else { None };
         let tb = match tower.as_deref_mut() {
             Some(tr) => Some(self.tower_batch(field, tr, &st, regions.len(), stored, returning, kept)?),
             None => None,
@@ -2408,7 +2444,7 @@ impl<'c> CardField<'c> {
                     }
                 }
             }
-            self.reverse(field, words, &ticks, (&clocks, base_clock), g, &fread, &fscale, &lift, &masses, &totals, &classes, &unresolved, &site_pos, &mix_off, &mix_class, &mix_share, &site_weight, &ported, sites, pairs, tower.as_deref_mut().zip(tb.as_ref()))?;
+            self.reverse(field, words, &ticks, (&clocks, base_clock), g, &fread, &fscale, &lift, &masses, &totals, &classes, &unresolved, &site_pos, &mix_off, &mix_class, &mix_share, &site_weight, &ported, sites, pairs, tower.as_deref_mut().zip(tb.as_ref()), opening.as_ref())?;
             if let Some(cov) = self.row_cov.borrow_mut().take() {
                 let span = 2 * n;
                 let mut out = self.row_out.borrow_mut();
@@ -2429,6 +2465,22 @@ impl<'c> CardField<'c> {
                 }
             }
             words.dsshare = 0;
+        }
+        // [P60 item 1d] The opening's code at every compared place, where the training path reads it: each place's mass at its class and its total.
+        if let Some(op) = opening.as_ref().filter(|_| self.opening_wanted.get()) {
+            let picked = self.timed(Kind::Alloc, || self.take::<u64>(sites.max(1))).map_err(device)?;
+            let mut cw = *words;
+            cw.unresolved = op.mask.device_ptr();
+            let (mut mp, mut pp) = (op.masses.device_ptr(), picked.device_ptr());
+            self.launch("field_face_at_class", Self::cells(sites as u64), THREADS, &mut [arg(&mut cw), arg(&mut mp), arg(&mut pp)])?;
+            let picked = self.timed(Kind::Copy, || card.fetch_range(&picked, 0, sites)).map_err(device)?;
+            let totals = self.timed(Kind::Copy, || card.fetch_range(&op.totals, 0, sites)).map_err(device)?;
+            let mask = self.timed(Kind::Copy, || card.fetch_range(&op.mask, 0, sites)).map_err(device)?;
+            let mut out = self.opening_out.borrow_mut();
+            for r in 0..regions.len() {
+                let span = region_off[r] as usize..region_off[r + 1] as usize;
+                out.push(span.map(|t| (mask[t] != 0).then(|| TowerFace { masses: vec![u128::from(picked[t])], total: totals[t] as u128 }.code(0))).collect());
+            }
         }
         self.mark("reverse_launch");
         self.status(&status)?;
@@ -2503,17 +2555,177 @@ impl<'c> CardField<'c> {
         Ok((out, out_z, rows, out_echo))
     }
 
+    /// [realization; theory, November 13, P60 item 2] **The opening's comparison's forward** (the host's `Field::cavity_forward` and
+    /// `Field::opening_read`): the cavity moments from the standing moments' kept operands (`field_cavity_moment_all`), the cavity openings
+    /// (`field_cavity_open`, then the moment's chart on the cavity moment), and at every compared place the lane chart, the opening's lift `R⁰ r̂ + b⁰`,
+    /// the face through the encoding and its masses, by the field's own entries with the words' open-site mask set to the compared places. Every
+    /// word a later kernel reads is written first: the cavity moment is zeroed (its still modes stay zero), the chart, the lift and the face are read
+    /// at the compared places alone. Launches a batch: one, two and the moment's chart's, then the chart, the lift, `tied` and the face.
+    fn opening_forward(&self, field: &Field, words: &mut Words, regions: &[Region], st: &Staged<'c>, keep: Option<MomentKeep<'c>>) -> Result<Opening<'c>> {
+        let d = field.declaration;
+        let (dw, m2, a, sites, tm, lanes) = (d.width, 2 * d.complex(), d.alphabet, st.sites, d.moment_modes(), d.lanes);
+        let l = field.layout();
+        let mut mask = vec![0u8; sites.max(1)];
+        for (r, region) in regions.iter().enumerate() {
+            let first = st.region_off[r] as usize;
+            let end = region.port.map_or(region.classes.len(), |p| p.start);
+            mask[first..first + end].fill(1);
+        }
+        let mask = self.timed(Kind::Copy, || self.take_up(&mask)).map_err(device)?;
+        let cmoment = self.timed(Kind::Alloc, || self.take_zeroed::<i64>((sites * m2).max(1))).map_err(device)?;
+        let alloc64 = |len: usize| self.timed(Kind::Alloc, || self.take::<i64>(len.max(1))).map_err(device);
+        let (sb, sa) = (alloc64(tm * 2 * sites)?, alloc64(tm * 2 * sites)?);
+        if let Some(k) = keep.as_ref() {
+            let (mut wsp, mut cmp, mut fw) = (k.ws.device_ptr(), k.cmap.device_ptr(), *words);
+            let (mut bp, mut ap, mut upp, mut dnp) = (k.before.device_ptr(), k.after.device_ptr(), k.up.device_ptr(), k.down.device_ptr());
+            let (mut sbp, mut sap, mut cp) = (sb.device_ptr(), sa.device_ptr(), cmoment.device_ptr());
+            let (mut stride, mut pre_stride) = ((2 * sites) as u64, (2 * (sites + regions.len())) as u64);
+            self.launch_grid("field_cavity_moment_all", Dim3 { x: Self::cells(sites as u64), y: tm as u32, z: 1 }, THREADS, 0, &mut [arg(&mut wsp), arg(&mut cmp), arg(&mut fw), arg(&mut bp), arg(&mut ap), arg(&mut upp), arg(&mut dnp), arg(&mut sbp), arg(&mut sap), arg(&mut cp), arg(&mut stride), arg(&mut pre_stride)])?;
+        }
+        let cx = alloc64(sites * dw)?;
+        let mut cxp = cx.device_ptr();
+        self.launch("field_cavity_open", Self::cells((sites * dw) as u64), THREADS, &mut [arg(words), arg(&mut cxp)])?;
+        let (mface, mface_bias, rmface) = moment_face(field);
+        self.affine("field_affine_x64", words, mface, mface_bias, rmface, dw, m2, cmoment.device_ptr(), m2, 0, dw, cx.device_ptr(), false)?;
+        let mut cw = *words;
+        cw.unresolved = mask.device_ptr();
+        let read = self.timed(Kind::Alloc, || self.take::<i32>((sites * dw).max(1))).map_err(device)?;
+        let scale = self.timed(Kind::Alloc, || self.take::<i128>((sites * lanes).max(1))).map_err(device)?;
+        self.chart(&mut cw, cx.device_ptr(), &read, &scale, true)?;
+        let reach = field.theta[l.opening..l.opening + dw * dw].iter().map(|v| v.unsigned_abs() as u64).max().unwrap_or(0);
+        let lift = alloc64(sites * dw)?;
+        self.affine("field_affine_x32", &mut cw, l.opening as u64, l.opening_bias as u64, reach, dw, dw, read.device_ptr(), dw, lift.device_ptr(), dw, 0, true)?;
+        let z = alloc64(sites * a)?;
+        {
+            let (mut enc, mut cb, mut yp, mut zp) = (cw.enc, cw.read_bias, lift.device_ptr(), z.device_ptr());
+            self.launch("field_tied_face", Self::cells((sites * a) as u64), THREADS, &mut [arg(&mut cw), arg(&mut enc), arg(&mut cb), arg(&mut yp), arg(&mut zp)])?;
+        }
+        let masses = self.timed(Kind::Alloc, || self.take::<u64>((sites * a).max(1))).map_err(device)?;
+        let totals = self.timed(Kind::Alloc, || self.take::<i128>(sites.max(1))).map_err(device)?;
+        let (mut zp, mut mp, mut tp) = (z.device_ptr(), masses.device_ptr(), totals.device_ptr());
+        self.launch("field_face", Self::warps(sites as u64), THREADS, &mut [arg(&mut cw), arg(&mut zp), arg(&mut mp), arg(&mut tp)])?;
+        self.mark("opening_forward");
+        Ok(Opening { mask, keep, cmoment, sb, sa, read, scale, lift, masses, totals })
+    }
+
+    /// [realization; theory, November 13, P60 item 2] **The opening's comparison's return** (the host's `Field::opening_compare_return`): at every
+    /// compared place the face covector at unit gain, through the class biases, the encoding (`tied`), the opening's lift and bias, the chart and its
+    /// lanes, by the field's own entries under the compared places' mask; the cavity opening's covector into the unresolved row and the neighbours'
+    /// strand rows (`field_encoding`), the moment's chart and bias, and the cavity moments' covector through their return and their clocks
+    /// (`field_cavity_skinned_all`, `field_cavity_return_paced_all`, `field_cavity_pace_back_all`), added into `g` and into the pass's clock covectors
+    /// the words name.
+    #[allow(clippy::type_complexity)]
+    fn opening_back(&self, field: &Field, words: &mut Words, op: &Opening<'c>, g: &CardBuffer<'c, i128>, (classes, unresolved, site_pos, mix_off, mix_class, mix_share): (&[u32], &[u8], &[u32], &[u32], &[u32], &[u32]), sites: usize) -> Result<()> {
+        let d = field.declaration;
+        let (dw, m2, a, tm) = (d.width, 2 * d.complex(), d.alphabet, d.moment_modes());
+        let l = field.layout();
+        let regions = words.r as usize;
+        let mut cw = *words;
+        cw.unresolved = op.mask.device_ptr();
+        let alloc64 = |len: usize| self.timed(Kind::Alloc, || self.take::<i64>(len.max(1))).map_err(device);
+        let zeroed64 = |len: usize| self.timed(Kind::Alloc, || self.take_zeroed::<i64>(len.max(1))).map_err(device);
+        // The face's covector at unit gain (no domain weighs it), written at every cell (zero past the compared places).
+        let dz = alloc64(sites * a)?;
+        let (mut mp, mut tp, mut dzp) = (op.masses.device_ptr(), op.totals.device_ptr(), dz.device_ptr());
+        self.launch("field_face_covector", Self::cells((sites * a) as u64), THREADS, &mut [arg(&mut cw), arg(&mut mp), arg(&mut tp), arg(&mut dzp)])?;
+        self.outer(&mut cw, g, words.read_bias, a, 0, dz.device_ptr(), a, 0, 0, false, true)?;
+        let dy = alloc64(sites * dw)?;
+        {
+            let (mut gp, mut enc, mut dzp, mut yp, mut dyp) = (g.device_ptr(), cw.enc, dz.device_ptr(), op.lift.device_ptr(), dy.device_ptr());
+            let tiles = (sites as u64).div_ceil(64);
+            self.launch("field_tied_back_e", Self::cells(a as u64 * dw as u64 * tiles), THREADS, &mut [arg(&mut cw), arg(&mut gp), arg(&mut enc), arg(&mut dzp), arg(&mut yp)])?;
+            let mut enc = cw.enc;
+            self.launch("field_tied_back_y", Self::cells((sites * dw) as u64), THREADS, &mut [arg(&mut cw), arg(&mut enc), arg(&mut dzp), arg(&mut dyp)])?;
+        }
+        self.outer(&mut cw, g, l.opening_bias as u64, dw, 0, dy.device_ptr(), dw, 0, 0, false, true)?;
+        self.outer(&mut cw, g, l.opening as u64, dw, dw, dy.device_ptr(), dw, op.read.device_ptr(), dw, false, true)?;
+        let dr = alloc64(sites * dw)?;
+        self.transposed(&mut cw, l.opening as u64, dw, dw, dy.device_ptr(), dw, dr.device_ptr(), false, true)?;
+        let dx = zeroed64(sites * dw)?;
+        self.ratio_adjoint(&mut cw, op.read.device_ptr(), op.scale.device_ptr(), dr.device_ptr(), 0, dx.device_ptr(), true)?;
+        // The cavity opening's rows: the unresolved row for every compared place, its neighbours' rows of theirs (a carried neighbour's mixture by
+        // its shares), the entries partitioned by row once for each encoding, as the reverse's opening.
+        let mask = self.timed(Kind::Copy, || self.card.fetch_range(&op.mask, 0, sites)).map_err(device)?;
+        let terms = |s: usize, t: u32| -> Vec<(usize, u32, u32)> {
+            let (from, to) = (mix_off[s] as usize, mix_off[s + 1] as usize);
+            if from == to {
+                return vec![(if unresolved[s] != 0 { a } else { classes[s] as usize }, t, 1 << STATE_BITS)];
+            }
+            (from..to).map(|k| (mix_class[k] as usize, t, mix_share[k])).collect()
+        };
+        let compared = |t: usize| mask[t] != 0;
+        let own: Vec<(usize, u32, u32)> = (0..sites).filter(|&t| compared(t)).map(|t| (a, t as u32, 1 << STATE_BITS)).collect();
+        let before: Vec<(usize, u32, u32)> = (0..sites).filter(|&t| compared(t) && site_pos[t] > 0).flat_map(|t| terms(t - 1, t as u32)).collect();
+        let after: Vec<(usize, u32, u32)> = (0..sites).filter(|&t| compared(t) && t + 1 < sites && site_pos[t + 1] > 0).flat_map(|t| terms(t + 1, t as u32)).collect();
+        for (base, rows) in [(words.enc, own), (words.enc_before, before), (words.enc_after, after)] {
+            let (rows_sites, rows_shares, segments) = encoding_partition(&rows, a + 1);
+            let count = (segments.len() / 3) as u32;
+            if count == 0 {
+                continue;
+            }
+            let rows_sites_c = self.timed(Kind::Copy, || self.take_up(&rows_sites)).map_err(device)?;
+            let rows_shares_c = self.timed(Kind::Copy, || self.take_up(&rows_shares)).map_err(device)?;
+            let segments_c = self.timed(Kind::Copy, || self.take_up(&segments)).map_err(device)?;
+            let (mut gp, mut dxp, mut rsp, mut rwp, mut sgp, mut count, mut base) = (g.device_ptr(), dx.device_ptr(), rows_sites_c.device_ptr(), rows_shares_c.device_ptr(), segments_c.device_ptr(), count, base);
+            self.launch("field_encoding", Self::cells(count as u64 * dw as u64), THREADS, &mut [arg(words), arg(&mut gp), arg(&mut dxp), arg(&mut rsp), arg(&mut rwp), arg(&mut sgp), arg(&mut count), arg(&mut base)])?;
+        }
+        // The moment's chart on the cavity moment: `δC += Σ_t δx_t s_tᵀ`, `δb += Σ_t δx_t`, `δs_t = Cᵀ δx_t` (zero past the compared places).
+        let (mface, mface_bias, _) = moment_face(field);
+        self.outer(&mut cw, g, mface_bias, dw, 0, dx.device_ptr(), dw, 0, 0, false, true)?;
+        self.outer(&mut cw, g, mface, dw, m2, dx.device_ptr(), dw, op.cmoment.device_ptr(), m2, true, true)?;
+        let dq = zeroed64(sites * m2)?;
+        self.transposed(&mut cw, mface, dw, m2, dx.device_ptr(), dw, dq.device_ptr(), false, true)?;
+        let Some(k) = op.keep.as_ref().filter(|_| tm > 0) else {
+            return Ok(());
+        };
+        let dm = self.timed(Kind::Alloc, || self.take_zeroed::<i128>((sites * m2).max(1))).map_err(device)?;
+        let (mut cp, mut dmp) = (dq.device_ptr(), dm.device_ptr());
+        self.launch("field_moment_accumulate", Self::cells((sites * m2) as u64), THREADS, &mut [arg(words), arg(&mut cp), arg(&mut dmp)])?;
+        // The cavity moments' return: each moment mode's covector, admitted by the return's certificate, its released prefix and the cavity's far
+        // prefixes, the return at every site into the strands' rows, then the clocks' covector.
+        let (strand, prefix) = ((2 * sites) as u64, (2 * (sites + regions)) as u64);
+        let ds = alloc64(tm * 2 * sites)?;
+        let q = self.timed(Kind::Alloc, || self.take::<i128>((tm * 2 * (sites + regions)).max(1))).map_err(device)?;
+        let (d_before, d_after) = (self.timed(Kind::Alloc, || self.take::<i128>((tm * 2 * sites).max(1))).map_err(device)?, self.timed(Kind::Alloc, || self.take::<i128>((tm * 2 * sites).max(1))).map_err(device)?);
+        let ok = self.timed(Kind::Alloc, || self.take_up(&vec![0u8; (tm * regions).max(1)])).map_err(device)?;
+        let (ws, cmap) = self.moment_modes(field, words, regions, sites, &ok)?;
+        let (mut wsp, mut cmp, mut dmp) = (ws.device_ptr(), cmap.device_ptr(), dm.device_ptr());
+        let (mut dsp, mut qp, mut dbp, mut dap, mut gp, mut none) = (ds.device_ptr(), q.device_ptr(), d_before.device_ptr(), d_after.device_ptr(), g.device_ptr(), 0u64);
+        let (mut w2, mut base_b, mut base_a, mut tm32) = (*words, l.moment_before as u64, l.moment_after as u64, tm as u32);
+        let (mut one32, mut stride, mut pre_stride) = (1u32, strand, prefix);
+        let grid = |x: usize| Dim3 { x: x.max(1) as u32, y: tm as u32, z: 1 };
+        self.launch("field_moment_ds_all", Self::cells((sites * tm) as u64), THREADS, &mut [arg(&mut w2), arg(&mut dmp), arg(&mut cmp), arg(&mut tm32), arg(&mut dsp)])?;
+        let mut fw = *words;
+        self.launch_grid("field_moment_admit_paced_all", grid(regions), MOMENT_BLOCK, 3 * MOMENT_BLOCK * 16, &mut [arg(&mut wsp), arg(&mut cmp), arg(&mut fw), arg(&mut dsp), arg(&mut none), arg(&mut stride), arg(&mut one32)])?;
+        self.launch_grid("field_moment_prefix_paced_all", grid(regions), MOMENT_BLOCK, MOMENT_BLOCK * 32, &mut [arg(&mut wsp), arg(&mut cmp), arg(&mut fw), arg(&mut dsp), arg(&mut qp), arg(&mut stride), arg(&mut pre_stride), arg(&mut one32)])?;
+        let levels = (2u32..).take_while(|&lv| (1usize << lv) < d.reach).count() as u32;
+        let sk_stride = (2 * levels as usize * 2 * (sites + regions)) as u64;
+        let sk = self.timed(Kind::Alloc, || self.take::<i128>((tm * sk_stride as usize).max(1))).map_err(device)?;
+        let (mut skp, mut sk_stride_a, mut levels_a) = (sk.device_ptr(), sk_stride, levels);
+        if levels > 0 {
+            self.launch("field_cavity_skinned_all", Self::cells((tm * regions * 2 * levels as usize) as u64), THREADS, &mut [arg(&mut wsp), arg(&mut cmp), arg(&mut fw), arg(&mut dsp), arg(&mut skp), arg(&mut stride), arg(&mut sk_stride_a), arg(&mut levels_a), arg(&mut tm32)])?;
+        }
+        self.launch_grid("field_cavity_return_paced_all", Dim3 { x: Self::cells(sites as u64), y: tm as u32, z: 1 }, THREADS, 0, &mut [arg(&mut wsp), arg(&mut cmp), arg(&mut fw), arg(&mut dsp), arg(&mut qp), arg(&mut skp), arg(&mut dbp), arg(&mut dap), arg(&mut stride), arg(&mut pre_stride), arg(&mut sk_stride_a)])?;
+        self.launch("field_moment_strand_return_all", Self::cells((sites * tm) as u64), THREADS, &mut [arg(&mut w2), arg(&mut base_b), arg(&mut base_a), arg(&mut tm32), arg(&mut dbp), arg(&mut dap), arg(&mut gp)])?;
+        let (mut bp, mut ap, mut upp, mut dnp) = (k.before.device_ptr(), k.after.device_ptr(), k.up.device_ptr(), k.down.device_ptr());
+        let (mut sbp, mut sap) = (op.sb.device_ptr(), op.sa.device_ptr());
+        self.launch_grid("field_cavity_pace_back_all", Dim3 { x: Self::cells(sites as u64), y: tm as u32, z: 1 }, THREADS, 0, &mut [arg(&mut wsp), arg(&mut cmp), arg(&mut fw), arg(&mut bp), arg(&mut ap), arg(&mut sbp), arg(&mut sap), arg(&mut dsp), arg(&mut dbp), arg(&mut dap), arg(&mut upp), arg(&mut dnp), arg(&mut stride), arg(&mut pre_stride)])?;
+        let _ = &mut none;
+        self.mark("opening_back");
+        Ok(())
+    }
+
     /// [definition; agent-inferred, November 1] **The site moments of a batch** (§15.1; the host's
     /// `Field::moments_of`, [`holonics::hnn::tower::field::moment`]), every moment mode (a turned head that
     /// is turned, each of its modes) in the same launches: the strands' encodings of each mode's ring
     /// slot gathered at every site (`field_moment_strands_all`), admitted by the l1 certificate, scanned to
     /// the prefix sums and read at every site (`kernels/field_moment.cuh` through its `_all` entries, a mode
     /// to a grid row), and placed at the unframed value's modes.
-    fn moments(&self, field: &Field, words: &Words, regions: usize, sites: usize) -> Result<()> {
+    fn moments(&self, field: &Field, words: &Words, regions: usize, sites: usize, keep: bool) -> Result<Option<MomentKeep<'c>>> {
         let d = field.declaration;
         let tm = d.moment_modes();
         if tm == 0 {
-            return Ok(());
+            return Ok(None);
         }
         let (n, l, card) = (d.modes, field.layout(), self.card);
         let (strand, prefix) = ((2 * sites) as u64, (2 * (sites + regions)) as u64);
@@ -2540,7 +2752,8 @@ impl<'c> CardField<'c> {
         self.launch_grid("field_moment_paced_all", Dim3 { x: Self::cells(sites as u64), y: tm as u32, z: 1 }, THREADS, 0, &mut [arg(&mut wsp), arg(&mut cmp), arg(&mut fw), arg(&mut bp), arg(&mut ap), arg(&mut upp), arg(&mut dnp), arg(&mut sp), arg(&mut stride), arg(&mut pre_stride)])?;
         self.launch("field_moment_scatter_all", Self::cells((sites * tm) as u64), THREADS, &mut [arg(&mut w2), arg(&mut sp), arg(&mut cmp), arg(&mut tm32)])?;
         let _ = &mut none;
-        Ok(())
+        // [P60 item 2] The strands, prefixes, admissions and modes' words kept where the opening is compared.
+        Ok(keep.then_some(MomentKeep { before, after, up, down, _ok: ok, ws, cmap }))
     }
 
     /// The moment kernels' words for every moment mode, in the order of the moment index (`MomentWords` in
@@ -2681,7 +2894,7 @@ impl<'c> CardField<'c> {
         self.launch("field_paces", Self::cells((paced * regions) as u64), THREADS, &mut [arg(words)])?;
         self.launch("field_skin_addresses", Self::cells((paced * n * sites) as u64), THREADS, &mut [arg(words)])?;
         self.launch("field_pframes", Self::cells((paced * sites * n) as u64), THREADS, &mut [arg(words)])?;
-        self.moments(field, words, regions, sites)?;
+        self.moments(field, words, regions, sites, false)?;
         Ok(clock)
     }
 
@@ -3007,7 +3220,7 @@ impl<'c> CardField<'c> {
     }
 
     #[allow(clippy::too_many_arguments)]
-    fn reverse(&self, field: &Field, words: &mut Words, ticks: &[Tick<'c>], (clocks, base_clock): (&[Option<CardClock<'c>>], [u64; 7]), g: &CardBuffer<'c, i128>, fread: &CardBuffer<'c, i32>, fscale: &CardBuffer<'c, i128>, lift: &CardBuffer<'c, i64>, masses: &CardBuffer<'c, u64>, totals: &CardBuffer<'c, i128>, classes: &[u32], unresolved: &[u8], site_pos: &[u32], mix_off: &[u32], mix_class: &[u32], mix_share: &[u32], site_weight: &[(u64, u64)], ported: &(Vec<u32>, Vec<i64>), sites: usize, pairs: usize, mut tower: Option<(&mut TowerRun<'c>, &TowerBatch<'c>)>) -> Result<()> {
+    fn reverse(&self, field: &Field, words: &mut Words, ticks: &[Tick<'c>], (clocks, base_clock): (&[Option<CardClock<'c>>], [u64; 7]), g: &CardBuffer<'c, i128>, fread: &CardBuffer<'c, i32>, fscale: &CardBuffer<'c, i128>, lift: &CardBuffer<'c, i64>, masses: &CardBuffer<'c, u64>, totals: &CardBuffer<'c, i128>, classes: &[u32], unresolved: &[u8], site_pos: &[u32], mix_off: &[u32], mix_class: &[u32], mix_share: &[u32], site_weight: &[(u64, u64)], ported: &(Vec<u32>, Vec<i64>), sites: usize, pairs: usize, mut tower: Option<(&mut TowerRun<'c>, &TowerBatch<'c>)>, opening: Option<&Opening<'c>>) -> Result<()> {
         let card = self.card;
         let d = field.declaration;
         let (dw, m, n, f, a, heads) = (d.width, d.complex(), d.modes, d.contacts, d.alphabet, d.heads);
@@ -3107,6 +3320,11 @@ impl<'c> CardField<'c> {
         self.transposed(words, mface, dw, m2, dx.device_ptr(), dw, dq.device_ptr(), false, false)?;
         let (mut cp, mut dmp) = (dq.device_ptr(), dm.device_ptr());
         self.launch("field_moment_accumulate", Self::cells((sites * m2) as u64), THREADS, &mut [arg(words), arg(&mut cp), arg(&mut dmp)])?;
+        // [theory, November 13, P60 item 1e] The opening's comparison at every place returns here, where the field has the opening's lift: its covector
+        // joins the last tick's in `g`, and its clocks' covectors join the pass's own (`gtau`, `gsig`) before they fold into the strides below.
+        if let Some(op) = opening {
+            self.opening_back(field, words, op, g, (classes, unresolved, site_pos, mix_off, mix_class, mix_share), sites)?;
+        }
         // The moments' return (§15.1): each moment mode's value covector, summed over the ticks that read one clock,
         // through the strands to the families on that clock (the host's `moments_return`); then the clocks return to
         // their paces (§16, §16.16): `δκ` by suffix sums, then `δc[u] += Σ_(u_t = u) δκ_t` on the class sheet, a blank's by
@@ -3456,6 +3674,21 @@ impl FieldRealization for CardField<'_> {
         Ok((pairs, g))
     }
 
+    /// [realization; theory, November 13, P60 items 1d and 2] The training path with the opening compared in the card's own forward: its codes at
+    /// every compared place gathered beside the faces' words and the covector of the same read and return.
+    fn read_and_return_opening(&mut self, field: &Field, regions: &[Region]) -> Result<(Vec<Vec<Option<(u128, u128)>>>, Vec<i128>, Vec<Vec<Option<i64>>>)> {
+        self.opening_out.borrow_mut().clear();
+        self.opening_wanted.set(field.declaration.opening);
+        let read = self.read_and_return_at_class(field, regions);
+        self.opening_wanted.set(false);
+        let (at_class, g) = read?;
+        let codes = std::mem::take(&mut *self.opening_out.borrow_mut());
+        if field.declaration.opening && codes.len() != regions.len() {
+            return Err(TowerError::Refused("an opening's read that did not return one row of codes a region"));
+        }
+        Ok((at_class, g, codes))
+    }
+
     fn read_faces(&mut self, field: &Field, regions: &[Region]) -> Result<Vec<Vec<Option<TowerFace>>>> {
         Ok(self.run(field, regions, false, false, None)?.0)
     }
@@ -3606,7 +3839,7 @@ mod tests {
     use super::*;
 
     fn declaration(width: usize, heads: usize, contacts: usize) -> FieldDeclaration {
-        FieldDeclaration { alphabet: 122, width, heads, modes: 8, still: 2, contacts, ticks: 2, frames: 4, reach: 2221, lanes: 1, depth: 0, carry: 0, triads: 0 }
+        FieldDeclaration { alphabet: 122, width, heads, modes: 8, still: 2, contacts, ticks: 2, frames: 4, reach: 2221, lanes: 1, depth: 0, carry: 0, triads: 0, opening: false }
     }
 
     /// [measurement; theory, November 10 20:34] **The card's footprint by growth route** (host arithmetic, no card read): from the
@@ -3622,7 +3855,7 @@ mod tests {
         // [theory, November 10 21:10] Contacts come in fours (f/2 even): each f from 68 by fours on the main line's declaration (width 64, two
         // lanes), its material, whether the contacts' two maps tile a block (`affine_tiling`: `(f, dw)` and `(dw, f)`) with the shared octets, and
         // the octets of the longest region; then the first f past 128 and the first refused, and the shared figure that refuses it.
-        let base = FieldDeclaration { alphabet: 100, width: 64, heads: 4, modes: 8, still: 2, contacts: 64, ticks: 4, frames: 4, reach: 3771, lanes: 2, depth: 0, carry: 0, triads: 0 };
+        let base = FieldDeclaration { alphabet: 100, width: 64, heads: 4, modes: 8, still: 2, contacts: 64, ticks: 4, frames: 4, reach: 3771, lanes: 2, depth: 0, carry: 0, triads: 0, opening: false };
         let mut first_refused = None;
         for f in (68..=512).step_by(4) {
             let d = FieldDeclaration { contacts: f, ..base };
@@ -3644,7 +3877,7 @@ mod tests {
     #[test]
     #[ignore]
     fn the_card_footprint_by_growth_route() {
-        let base = FieldDeclaration { alphabet: 100, width: 64, heads: 4, modes: 8, still: 2, contacts: 64, ticks: 4, frames: 4, reach: 3771, lanes: 2, depth: 0, carry: 0, triads: 0 };
+        let base = FieldDeclaration { alphabet: 100, width: 64, heads: 4, modes: 8, still: 2, contacts: 64, ticks: 4, frames: 4, reach: 3771, lanes: 2, depth: 0, carry: 0, triads: 0, opening: false };
         let describe = |name: &str, d: FieldDeclaration| {
             let draws = 4 * d.founding_draws();
             let field = holonics::hnn::tower::field::Field::found(d, &vec![7u8; draws]).expect("founded");
@@ -3838,6 +4071,66 @@ mod tests {
         for (name, start, len) in [("w_triad", l.w_triad, dw * 2 * triads), ("triad", l.triad, 6 * triads * dw), ("triad_bias", l.triad_bias, 6 * triads)] {
             assert!(host_g[start..start + len].iter().any(|&v| v != 0), "the triads' {name} takes no covector");
         }
+    }
+
+    /// [measurement; theory, November 13, P60 item 2] **The opening's comparison on the card reads the host's bits** (needs the card): a field of
+    /// two carry circles with the opening's lift, its readout, current, pair return and the lift moved off zero from a keyed stream's tail and its
+    /// paces moved off zero (so the paced heads' clocks are not plain and the cavity clocks differ from the standing ones), read and returned on
+    /// regions of 2, 3, 5, 64 and 257 sites (written and open places, the far crowds reached) through the host and through the card: every face,
+    /// every covector entry and every place's opening code equal, the covector reaching the lift, its bias, the unresolved row and the paces; and
+    /// one learner's section on both, its receipt (the opening's codes with it) and its state equal.
+    #[test]
+    #[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
+    fn the_opening_comparison_on_the_card_reads_the_hosts_bits() {
+        use holonics::hnn::tower::field::{FieldLearner, HostField};
+        let keys: Vec<u8> = (0..1u64 << 18).flat_map(|i| (i.wrapping_add(1).wrapping_mul(0x9E37_79B9_7F4A_7C15) ^ (i << 17)).to_be_bytes()).collect();
+        let founded = Field::found(declaration(32, 4, 32), &keys).unwrap();
+        let mut learner = FieldLearner::new(founded, 12).with_carry(2, &keys).unwrap().with_opening().unwrap();
+        let d = learner.field.declaration;
+        assert!(d.opening);
+        let (l, dw, f, m2) = (learner.field.layout().clone(), d.width, d.contacts, 2 * d.complex());
+        let moved: Vec<usize> = (l.read..l.read + dw * dw).chain(l.out..l.out + dw * m2).chain(l.w..l.w + dw * f).chain(l.opening..l.opening + dw * dw).collect();
+        let tail = keys.len() - 4 * moved.len() - 8;
+        for (k, &i) in moved.iter().enumerate() {
+            let word = &keys[tail + 4 * k..tail + 4 * k + 4];
+            learner.field.theta[i] = i32::from_be_bytes([word[0], word[1], word[2], word[3]]) >> 14;
+        }
+        let paces = d.paced_heads() * (d.alphabet + 1);
+        let before = tail - 4 * paces;
+        for k in 0..paces {
+            let word = &keys[before + 4 * k..before + 4 * k + 4];
+            learner.field.theta[l.pace + k] = i32::from_be_bytes([word[0], word[1], word[2], word[3]]) >> 12;
+        }
+        let field = learner.field.clone();
+        let lengths = [2usize, 3, 5, 64, 257];
+        let classes: Vec<Vec<usize>> = lengths.iter().map(|&n| (0..n).map(|t| (t * 37 + 11) % 120).collect()).collect();
+        let open: Vec<Vec<bool>> = lengths.iter().map(|&n| (0..n).map(|t| t % 3 == 1 || t + 1 == n).collect()).collect();
+        let regions: Vec<Region> = classes.iter().zip(&open).map(|(c, u)| Region { classes: c, unresolved: u, faces: &[], locked: &[], echo: &[], domain: None, port: None }).collect();
+        let (host_faces, host_g) = field.read_and_return(&regions).unwrap();
+        let card = Card::open(0).expect("a CUDA card with the field's kernels built");
+        let mut card_field = CardField::open(&card).unwrap();
+        let (card_faces, card_g) = card_field.read_and_return(&field, &regions).unwrap();
+        assert_eq!(host_faces, card_faces);
+        let unequal: Vec<usize> = (0..host_g.len()).filter(|&i| host_g[i] != card_g[i]).collect();
+        let family = |i: usize| field.families_all().iter().position(|&(s, n, _)| (s..s + n).contains(&i));
+        assert!(unequal.is_empty(), "{} covector entries differ, the first at {:?} (its family {:?}; opening at {}, opening_bias at {}, pace at {})", unequal.len(), unequal.first(), unequal.first().map(|&i| family(i)), l.opening, l.opening_bias, l.pace);
+        let (host_at, host_ng, host_codes) = HostField.read_and_return_opening(&field, &regions).unwrap();
+        let (card_at, card_ng, card_codes) = card_field.read_and_return_opening(&field, &regions).unwrap();
+        assert_eq!(host_at, card_at);
+        assert!(host_ng == card_ng && card_ng == card_g, "the opening's training read's covector differs");
+        assert_eq!(host_codes, card_codes);
+        assert_eq!(card_codes.iter().map(Vec::len).collect::<Vec<_>>(), lengths.to_vec());
+        assert!(card_codes.iter().flatten().all(Option::is_some), "every place compared");
+        for (name, start, len) in [("opening", l.opening, dw * dw), ("opening_bias", l.opening_bias, dw), ("unresolved row", l.enc + d.alphabet * dw, dw), ("pace", l.pace, paces)] {
+            assert!(host_g[start..start + len].iter().any(|&v| v != 0), "the opening's comparison returns nothing to {name}");
+        }
+        // One section on the host and on the card: the receipt with the opening's codes, and the state after the deposit.
+        let (mut host_learner, mut card_learner) = (learner.clone(), learner.clone());
+        let host_receipt = host_learner.section_realized(&regions, &mut HostField).unwrap();
+        let card_receipt = card_learner.section_realized(&regions, &mut card_field).unwrap();
+        assert_eq!(host_receipt, card_receipt);
+        assert_eq!(card_receipt.opening.len(), regions.len());
+        assert!(host_learner.to_text() == card_learner.to_text(), "the learner's state after a section differs between the host and the card");
     }
 
     /// The lettered learner's case ([`a_lettered_learners_section_on_the_card_reads_the_hosts_bits`]): the learner, its layout and width, the
