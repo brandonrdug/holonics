@@ -776,6 +776,33 @@ impl<T: Poolable> Drop for Pooled<'_, T> {
     }
 }
 
+/// [measurement; P57 item 1] One launch as a trace reads it (`FieldProfile::trace`).
+#[derive(Clone, Debug, Default)]
+pub struct LaunchRecord {
+    pub run: u64,
+    pub phase: &'static str,
+    pub entry: &'static str,
+    pub grid: [u32; 3],
+    pub block: u32,
+    pub shared: u32,
+    pub ns: u128,
+    pub head: Option<u32>,
+}
+
+/// [measurement; P57 item 1] An entry's lowering on the mounted card: registers a thread, static shared and local octets, the
+/// largest block, and the blocks a multiprocessor keeps resident at the launch's block and dynamic shared octets.
+#[derive(Clone, Copy, Debug, Default)]
+pub struct EntryAttributes {
+    pub registers: u32,
+    pub static_shared: u32,
+    pub local: usize,
+    pub max_threads: u32,
+    pub blocks_a_multiprocessor: u32,
+}
+
+/// [measurement; P57 item 1] The launches a trace keeps: a section's are about 510, so four sections and the run's opening.
+pub const TRACE_LAUNCHES: usize = 2600;
+
 /// [agent-inferred, November 1] A declared reading (`CardField::profile`): every launch timed alone,
 /// the card synchronized before and after it, by entry; every transfer and allocation timed after the
 /// card's stream has drained, so a run's wall time splits into kernels, copies, allocations and the
@@ -800,6 +827,14 @@ pub struct FieldProfile {
     /// [measurement; theory, November 13, P56 item 4] A zeroed take's zeroing by its call site's line: count, ns (timed alone, the stream drained
     /// before and after) and octets zeroed.
     pub zeroed: std::collections::BTreeMap<u32, (u64, u128, u128)>,
+    /// [measurement; theory, November 13, P57 item 1] Under `FIELD_TRACE` (with the profile): every launch in order, up to
+    /// [`TRACE_LAUNCHES`], with the run it belongs to, the last phase marked, its grid, block, dynamic shared octets, its timed ns
+    /// and its head; and each entry's attributes as the driver lowered it, at each block and dynamic shared it was launched with.
+    pub trace_on: bool,
+    pub trace: Vec<LaunchRecord>,
+    /// Each traced run's batches' region lengths in sites.
+    pub trace_regions: Vec<(u64, Vec<usize>)>,
+    pub attributes: std::collections::BTreeMap<(&'static str, u32, u32), EntryAttributes>,
     /// [measurement; theory, November 13, P58 item 1] The pool by a take's call site's line and its size class in octets: hits, misses (an
     /// allocation), the kept buffers a miss freed and their octets.
     /// [realization; P58 item 1] and the plain takes served by a larger kept buffer in place of an allocation.
@@ -880,6 +915,8 @@ pub struct CardField<'c> {
     /// [measurement; theory, November 13, P57 item 2 (G132)] While the charts are read by stage
     /// ([`FieldRealization::read_tick_charts`]): each region's open sites' chart rows at each tick's opening and after the last tick.
     tick_charts: std::cell::RefCell<Option<Vec<Vec<Vec<i32>>>>>,
+    /// [measurement; P57 item 1] The last phase marked, which a trace's launches are read under.
+    last_mark: std::cell::Cell<&'static str>,
 }
 
 impl<'c> CardField<'c> {
@@ -892,7 +929,7 @@ impl<'c> CardField<'c> {
         let (free, total) = (memory.free_bytes as u64, memory.total_bytes as u64);
         let used = total.saturating_sub(free);
         let budget = free.min(BOARD_CEILING.saturating_sub(used)).saturating_sub(MARGIN);
-        Ok(Self { card, module, budget, times: FieldTimes::default(), profile: None, head: Default::default(), #[cfg(test)] unfilled: Default::default(), #[cfg(feature = "ruler-bits")] bits: Default::default(), pools: Default::default(), held_questions: Default::default(), covector_shares: Default::default(), row_questions: Default::default(), row_out: Default::default(), row_cov: Default::default(), held_cells: Default::default(), tick_reads: Default::default(), carry_gates: Default::default(), near_sites: Default::default(), near_out: Default::default(), clock_sites: Default::default(), clock_out: Default::default(), phases: None, phase_card: Default::default(), narrow: Default::default(), narrow_out: Default::default(), tick_charts: Default::default() })
+        Ok(Self { card, module, budget, times: FieldTimes::default(), profile: None, head: Default::default(), #[cfg(test)] unfilled: Default::default(), #[cfg(feature = "ruler-bits")] bits: Default::default(), pools: Default::default(), held_questions: Default::default(), covector_shares: Default::default(), row_questions: Default::default(), row_out: Default::default(), row_cov: Default::default(), held_cells: Default::default(), tick_reads: Default::default(), carry_gates: Default::default(), near_sites: Default::default(), near_out: Default::default(), clock_sites: Default::default(), clock_out: Default::default(), phases: None, phase_card: Default::default(), narrow: Default::default(), narrow_out: Default::default(), last_mark: std::cell::Cell::new("open"), tick_charts: Default::default() })
     }
 
     /// The octets a batch's weight and contact stores may take.
@@ -1009,7 +1046,7 @@ impl<'c> CardField<'c> {
 
     /// Time every launch, transfer and allocation from here on ([`FieldProfile`]).
     pub fn profile(&mut self) {
-        self.profile = Some(Default::default());
+        self.profile = Some(std::cell::RefCell::new(FieldProfile { trace_on: std::env::var_os("FIELD_TRACE").is_some(), ..Default::default() }));
     }
 
     /// Time the host between the marks of a batch (`mark`), without synchronizing: where the wall time of a
@@ -1024,6 +1061,7 @@ impl<'c> CardField<'c> {
     }
 
     fn mark(&self, name: &'static str) {
+        self.last_mark.set(name);
         if let Some(p) = &self.phases {
             let mut p = p.borrow_mut();
             let ns = p.0.elapsed().as_nanos();
@@ -1173,6 +1211,20 @@ impl<'c> CardField<'c> {
                 let slot = p.by_head.entry((entry, h)).or_insert((0, 0));
                 slot.0 += 1;
                 slot.1 += started.elapsed().as_nanos();
+            }
+            if p.trace_on && p.trace.len() < TRACE_LAUNCHES {
+                let ns = started.elapsed().as_nanos();
+                p.trace.push(LaunchRecord { run: self.times.returns + self.times.reads, phase: self.last_mark.get(), entry, grid: [grid.x, grid.y, grid.z], block, shared, ns, head: self.head.get() });
+                if !p.attributes.contains_key(&(entry, block, shared)) {
+                    let a = EntryAttributes {
+                        registers: function.num_regs().map_err(|e| device(e.into()))?,
+                        static_shared: function.static_shared_bytes().map_err(|e| device(e.into()))?,
+                        local: function.local_size_bytes().map_err(|e| device(e.into()))?,
+                        max_threads: function.max_threads_per_block().map_err(|e| device(e.into()))?,
+                        blocks_a_multiprocessor: function.active_blocks_per_multiprocessor(block, shared).map_err(|e| device(e.into()))?,
+                    };
+                    p.attributes.insert((entry, block, shared), a);
+                }
             }
         }
         Ok(())
@@ -1431,6 +1483,12 @@ impl<'c> CardField<'c> {
                 + towered.map_or(0, |(cd, period)| read_octets(&cd, returning, false, sites.div_ceil(period)) + 16 * (sites * d.width) as u64 + 16 * (sites.div_ceil(period) * period * d.width) as u64)
         };
         let lengths: Vec<usize> = regions.iter().map(|r| r.classes.len()).collect();
+        if let Some(profile) = &self.profile {
+            let mut p = profile.borrow_mut();
+            if p.trace_on && p.trace.len() < TRACE_LAUNCHES {
+                p.trace_regions.push((self.times.returns + self.times.reads, lengths.clone()));
+            }
+        }
         // [theory, November 12, P51] The clock's skins at the support stride: each region's own need, its definite sites read (the fine level only;
         // the tower's packets keep no store).
         let definite: Vec<usize> = regions.iter().map(definite_sites).collect();
