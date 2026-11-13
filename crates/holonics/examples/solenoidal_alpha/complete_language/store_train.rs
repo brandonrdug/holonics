@@ -694,6 +694,76 @@ const SURPRISE_OCTAVES: usize = 40;
 /// may reach one octave more).
 const READ_OCTAVES: usize = 10;
 
+/// [definition; theory, November 13, the design record §4.4a; P60 item 3] **`found-opening STATE STATE_SHA OUT`**: the learner `STATE` with the
+/// opening's lift founded at zero ([`FieldLearner::with_opening`]), written to the file `OUT`. Before it writes, every line of the state that the
+/// law reads is printed for the source and the founded state (`FOUND_OPENING_LINE`) and judged: a line is equal, or it is the declaration's line
+/// (its head `hnn-field-v14g`, the source's words kept and the opening's word appended), the parts line (the source's octaves and the opening's at
+/// 0), or one of the material's three lines (the source's words kept, the block's `D × D + D` words appended: the material and the first moments
+/// at 0, the second at the means the growth opens them at). Any other changed line, an empty line, or a different count of lines is refused and
+/// nothing is written: a state tool that leaves a line behind trains every part at a rate the law never set (November 11). Reads no realization.
+pub(super) fn found_opening(args: &[String]) -> Result<()> {
+    if args.len() != 4 {
+        return Err("found-opening STATE STATE_SHA OUT".into());
+    }
+    let started = std::time::Instant::now();
+    let text = pinned_read(&args[1], &args[2], STATE_BUDGET)?;
+    let learner = FieldLearner::from_text(std::str::from_utf8(&text)?).map_err(|e| e.to_string())?;
+    if learner.to_text().as_bytes() != text.as_slice() {
+        return Err("a state that does not read and write back byte for byte".into());
+    }
+    let out = Path::new(&args[3]);
+    if out.exists() {
+        return Err("a founded state's path that exists".into());
+    }
+    let founded = learner.with_opening().map_err(|e| e.to_string())?;
+    let (dw, block) = (founded.field.declaration.width, founded.field.material_len() - learner.field.material_len());
+    if block != dw * dw + dw {
+        return Err(format!("a founding that appended {block} entries, where the lift holds {}", dw * dw + dw).into());
+    }
+    let (a, b) = (learner.to_text(), founded.to_text());
+    let (la, lb): (Vec<&str>, Vec<&str>) = (a.lines().collect(), b.lines().collect());
+    if la.len() != lb.len() {
+        return Err(format!("a founding that wrote {} lines for {}", lb.len(), la.len()).into());
+    }
+    let material = learner.field.material_len();
+    let mut judged = (0usize, 0usize, 0usize, 0usize);
+    for (k, (x, y)) in la.iter().zip(&lb).enumerate() {
+        let (wx, wy): (Vec<&str>, Vec<&str>) = (x.split(' ').collect(), y.split(' ').collect());
+        if x.is_empty() || y.is_empty() {
+            return Err(format!("line {k} is empty in the source or the founded state").into());
+        }
+        let kept = wy.len() >= wx.len() && wy[..wx.len()] == wx[..];
+        let head = |w: &[&str]| w[0].chars().take(24).collect::<String>();
+        let verdict = if x == y {
+            judged.0 += 1;
+            "equal".to_string()
+        } else if k == 1 && wy[0] == "hnn-field-v14g" && wy.len() == wx.len() + 2 && wy[1..wx.len()] == wx[1..] && wy.last() == Some(&"1") {
+            judged.1 += 1;
+            format!("declaration source={x} founded={y}")
+        } else if wx[0] == "parts" && kept && wy.len() == wx.len() + 1 && wy.last() == Some(&"0") {
+            judged.2 += 1;
+            format!("parts appended={}", wy[wx.len()])
+        } else if kept && wx.len() == material && wy.len() == material + block {
+            judged.3 += 1;
+            let tail = &wy[material..];
+            let zeros = tail.iter().filter(|&&w| w == "0").count();
+            let mut distinct: Vec<&str> = tail.to_vec();
+            distinct.sort_unstable();
+            distinct.dedup();
+            format!("block appended={} zero={zeros} distinct={}", tail.len(), distinct.join(","))
+        } else {
+            return Err(format!("line {k} ({}) changed beyond the opening's lift: {} words for {}", head(&wx), wy.len(), wx.len()).into());
+        };
+        println!("FOUND_OPENING_LINE line={k} head={} words_source={} words_founded={} {verdict}", head(&wx), wx.len(), wy.len());
+    }
+    if judged.1 != 1 || judged.3 != 3 || (learner.rate_parts.is_some() && judged.2 != 1) {
+        return Err(format!("a founding whose changed lines are {} declaration, {} parts and {} material lines", judged.1, judged.2, judged.3).into());
+    }
+    write_new(out, b.as_bytes())?;
+    println!("FOUND_OPENING lines={} equal={} declaration={} parts={} material_lines={} material={} block={block} founded_material={} ms={}", la.len(), judged.0, judged.1, judged.2, judged.3, material, founded.field.material_len(), started.elapsed().as_millis());
+    Ok(())
+}
+
 /// [measurement; theory, November 13, P55 part B; the design record of November 13, §4.4] `read-cavity UNITS UNITS_SHA STORE STORE_SHA KEYS KEYS_SHA
 /// CODEC CODEC_SHA PLACES STATE STATE_SHA OUT`: **a held place's news at its cavity opening**, a reading. Each slice of the held role, alone and in the
 /// store's order, is cut afresh from stretch 1 with the key file's seed (as `read-store` cuts it), whole stretches until at least `PLACES` places.

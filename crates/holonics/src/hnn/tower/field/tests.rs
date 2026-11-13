@@ -1329,7 +1329,8 @@ fn the_opening_comparison_s_covector_matches_its_codes_difference() {
 /// forward, a place's cavity opening and its opening face stand when the class written there changes (to every other class, written or open),
 /// to the moment's release carried through the chart (the bound of [`a_place_s_cavity_opening_is_its_masked_opening`]); on the return, one
 /// place's comparison alone, at a place whose class is written nowhere else in the region, returns nothing to that class's strand rows and
-/// moment encodings, and to its encoding row only the readout's own term (`tied`: `release(δz_u y⁰, 16)`); its stride's covector is printed.
+/// moment encodings, and to its encoding row only the readout's own term (`tied`: `release(δz_u y⁰, 16)`); its stride's covector is printed, the
+/// remainder of its cavity moment's releases ([`moment`]'s test of the own stride bounds it).
 #[test]
 fn a_place_s_comparison_reaches_nothing_of_its_own() {
     for still in [0usize, 1] {

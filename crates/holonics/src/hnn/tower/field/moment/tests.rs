@@ -832,3 +832,57 @@ fn a_paced_strand_equals_its_definition_bit_for_bit() {
     }
     assert!(checked > 1000);
 }
+
+/// [theory, November 13, the design record §4.4a; P60's open point] **A place's own stride takes only the remainder of its cavity moment's
+/// releases**: with one receiver's cavity covector `δs_t` alone, on paced strands whose rates stop, run backward and are fractional, the covector
+/// of `t`'s own stride is `Σ_(k≥t) ∂τ_k` (every clock from `t` on holds it) and `Σ_(k≥t) ∂σ_k`. Its skin part is zero, bit for bit: each pair's
+/// skin term lands on its two ends with one integer, and both ends of every pair `t` reads on its after side stand at or past `t`. Its turn part
+/// is the difference of two terms the mathematics cancels (the after side reads `ζ^(τ_k − τ_t)`, which holds no stride of `t`): the receiver's
+/// `−cross(δs_t, s⁺_t) b`, read on the after side released to `2^(−16)`, and the sources' `Σ_k cross(δE⁻_k, E⁺_k) b`, read on the return released
+/// to `2^(−24)` after the far part's turned covector was released once a term. So it is bounded by those releases' remainders: half a unit of
+/// `2^(−16)` a component against `|δs_t|₁`, two units of `2^(−24)` a component (the return's release and the turned covector's, through faces of
+/// modulus one) against each source's `|E⁺_k|₁`, and one unit for each released product. The own stride's covector is that remainder, declared
+/// at the releases' grains, and never a channel: no term of the place's own class is read (the forward check holds it to 0 at `2^(−16)`).
+#[test]
+fn a_place_s_own_stride_takes_only_its_cavity_moments_release_remainder() {
+    let mut next = mixer(43);
+    let one = 1i64 << crate::hnn::tower::field::PACE_BITS;
+    let rates = [0, one, one, 2 * one, -one / 2, one / 3, 5 * one / 7];
+    let (mut checked, mut worst, mut nearest) = (0usize, 0i128, (0i128, 1i128));
+    for slot in paced_slots(16, 4).into_iter().chain(paced_slots(300, 6)) {
+        let turn = |r: i128| crate::hnn::tower::field::turn_phasor(r, slot.n, slot.pi);
+        let skin = |s: i128| crate::hnn::tower::field::skin_of(s, slot.n, slot.pi, &slot.exponential);
+        let b = release(2 * slot.pi / slot.n as i128, FACE_BITS);
+        for &sites in LENGTHS.iter().filter(|&&s| (2..=100.min(slot.decay.len())).contains(&s)) {
+            let (tau, sigma) = clock_of(&mut next, sites, &rates);
+            let cavity = |clock: &[i64]| -> Vec<i64> { (0..sites).map(|t| if t == 0 { 0 } else { clock[t - 1] + one }).collect() };
+            let (tau_c, sigma_c) = (cavity(&tau), cavity(&sigma));
+            let pace = Pace { tau: &tau, sigma: &sigma, turn: &turn, skin: &skin };
+            let (before, after) = (strand(&mut next, sites, 1 << 16), strand(&mut next, sites, 1 << 16));
+            let parts = cavity_moment_parts_exact(&before, &after, &slot.ring, slot.n, &slot.decay, Some(&pace), &tau_c, &sigma_c).unwrap();
+            let side = |v: Vec<G>| -> Vec<(i64, i64)> { v.into_iter().map(|(re, im)| (fit64(release(re, COEFFICIENT_BITS)).unwrap(), fit64(release(im, COEFFICIENT_BITS)).unwrap())).collect() };
+            let (sb, sa): (Vec<G>, Vec<G>) = parts.into_iter().unzip();
+            let (sb, sa) = (side(sb), side(sa));
+            for t in 0..sites {
+                let mut ds = vec![(0i64, 0i64); sites];
+                ds[t] = strand(&mut next, 1, 1 << 24)[0];
+                let (back_b, back_a) = cavity_moments_return(&ds, &slot.ring, slot.n, &slot.decay, Some(&pace), &tau_c, &sigma_c).unwrap();
+                let (dtau, dsig) = cavity_pace_return(&before, &after, &sb, &sa, &ds, &back_b, &back_a, &slot.ring, slot.n, &slot.decay, &pace, &tau_c, &sigma_c, b).unwrap();
+                assert_eq!(dsig[t..].iter().sum::<i128>(), 0, "n {} S {sites} t {t}: the own stride's skin part", slot.n);
+                let own: i128 = dtau[t..].iter().sum();
+                let l1 = |(re, im): (i64, i64)| re.unsigned_abs() as i128 + im.unsigned_abs() as i128;
+                let carried = l1(ds[t]) + 4 * after[t + 1..].iter().map(|&e| l1(e)).sum::<i128>();
+                let bound = (carried * b.abs()) >> (MOVE_BITS + FACE_BITS + 1);
+                let bound = bound + (sites - t) as i128 + 2;
+                assert!(own.abs() <= bound, "n {} S {sites} t {t}: the own stride takes {own}, past its releases' remainder {bound}", slot.n);
+                worst = worst.max(own.abs());
+                if own.abs() * nearest.1 > nearest.0 * bound {
+                    nearest = (own.abs(), bound);
+                }
+                checked += 1;
+            }
+        }
+    }
+    println!("OWN_STRIDE_REMAINDER receivers={checked} largest={worst} nearest_its_bound={}/{} (units of 2^-24)", nearest.0, nearest.1);
+    assert!(checked > 500);
+}

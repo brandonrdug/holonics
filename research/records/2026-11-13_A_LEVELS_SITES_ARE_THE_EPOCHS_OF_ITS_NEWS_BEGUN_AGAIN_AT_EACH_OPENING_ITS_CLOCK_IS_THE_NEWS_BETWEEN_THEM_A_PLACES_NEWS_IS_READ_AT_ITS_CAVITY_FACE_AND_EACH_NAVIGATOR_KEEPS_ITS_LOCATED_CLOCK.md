@@ -343,6 +343,24 @@ c_t  = −log p̃_t(u_t)                           at every place t of a region,
   own row, own moment term and own stride take nothing: the cavity opening does not hold them.
   At an open place the cavity opening is the built opening, and the covector adds to the one
   the ticks return there.
+- *The own stride's remainder* (decided at the build, November 13; `agent-inferred`). In unrounded
+  arithmetic the place's own stride takes nothing: the after side reads `ζ^(τ_k − τ_t)`, which
+  holds no stride of `t`. The built clock covector reads that side through the absolute clocks
+  the prefix sums share, so the stride takes two terms the mathematics cancels, the receiver's
+  `−cross(δs_t, s⁺_t)` on the moment released to `2^(−16)` and its sources'
+  `Σ_k cross(δE⁻_k, E⁺_k)` on the return released to `2^(−24)`. What reaches it is their
+  releases' remainder, declared at those grains and bounded (half a unit a component against
+  `|δs_t|₁`, two units against each source's `|E⁺_k|₁`, a unit a released product): the bound
+  held on 1,952 receivers, the nearest at 382 of 414 units of `2^(−24)`, and the skin part is
+  zero bit for bit (each pair's skin lands on its two ends with one integer). On the fixtures'
+  one written place of a class written once the stride's covector read 26 and 18 units on the
+  two paced heads of a field with two, and 203 on a field with one. The return keeps the
+  operands that produced the forward; a finer grain picked to shrink the remainder would be a
+  width set by a reading, and the standing comparison's clock covector carries the same
+  remainder on every place's after side, so the line reproduces with it. Zero by construction
+  would need the turn's covector formed a pair at a time, landing on both ends with one integer
+  as the skins' does, for both comparisons at once; that changes the line's training comparison
+  and enters by its own reproduction.
 - *Unit gain.* Each comparison's covector is what reached its locus. No weight between the two
   comparisons is declared: a weight would be a literal with no reading behind it.
 - *The standing sums.* `s^cav_t` is formed from the region's standing sums (the others' terms
