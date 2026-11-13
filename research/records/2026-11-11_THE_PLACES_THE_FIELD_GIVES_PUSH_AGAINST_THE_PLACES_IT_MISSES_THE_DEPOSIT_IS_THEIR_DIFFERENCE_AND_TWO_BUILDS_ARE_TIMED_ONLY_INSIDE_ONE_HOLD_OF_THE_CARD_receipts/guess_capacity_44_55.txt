@@ -2196,3 +2196,64 @@ every code stride cut at 5.5452 nats.
   reading, and such places stand within two or three openings of any place, so readings meet at once; the guess priced a stretch's
   added news (0.19 nats a place against 5.5) and left out how soon a moved opening is met again.
   Rule applied. 0.996 under the stretch and 0.9997 under the shift: the first level's section is the boundary digit's width, 8 bits.
+
+G122 scored 2026-11-13T00:30Z (the PC's receipt p54_step4.txt, the count record's receipts; one hold, control, step 4, control, then both profiled;
+600 of 600 reproduced lines equal and STATE.600, MEAN.600 byte for byte).
+  (a) field_contact_rows 0.970 of its own time (36.33 to 35.23 ms a profiled section; by clock 0.958, 0.960 still, 0.972, 0.983 paced), fixed
+      0.72 (0.60 to 0.85): MISSED above its band.
+  (b) field_pace_skin_back 0.908 (33.87 to 30.74 ms; 0.908 and 0.907 by clock), fixed 0.75 (0.60 to 0.92): held, above the guess.
+  (c) The section 0.986 of its controls (335.2 to 330.6 ms; the controls 334.1 and 336.3, a spread of 0.007), fixed 0.951 (0.925 to 0.98):
+      MISSED above its band.
+  Why (read at source and in the receipt): the shipped PTX already formed a product of two sign-extended 64-bit words from its halves, so
+  the count of 64-bit multiplies a pair hardly moved in the rows; the skin's return gained where two 64 by 64 products became 32 by 32.
+  Rule applied. (a) above 0.85: the entry's arithmetic is not its word widths, and the entry is read by line before anything else is built.
+
+G126 fixed 2026-11-13T00:45Z (the same thread), before its read: the time of field_contact_rows and field_pace_skin_back by helper.
+Read first: step 4's receipt, G120's receipt (the rows without their products, releases and quotients at 0.507 of their time), and the two
+entries' source by line at step 4 (00b8e7be1). What the source holds that step 4 did not touch (agent-inferred, counted by hand):
+  - A crowd's lock divides by count^2 2^b with b = 17 on a still clock and 77 on a paced one (crowd_base, crowd_base_narrow:
+    div_nearest(s, count^2 shifted by FACE_BITS + 2g + 1)). On a paced clock the divisor passes 2^63, so every crowd of every definite row
+    takes div_nearest's 128 by 128 branch, the long software routine the kernel's own note of November 1 names. The skin's return divides a
+    crowd's value by its count and its bracket by count^2 once a mode (eight a crowd), the bracket's numerator past 2^63.
+  - The skin's return forms two checked 128-bit products (mul_fits) a mode of a pair and four a mode of a crowd, and one 128-bit atomic sum
+    a mode at one address (gsig at the source, or at the crowd's edge).
+  - The rows' crowds: three divisions by a read divisor, one checked product and four 128-bit atomic sums an entry of a crowd, on every
+    lane; by a count of instructions a warp the crowds' blocks are about half of a row's work where half the rows are definite.
+  The reading (P55 part A): a census of those helpers by entry (static), their counts a section (a counting build or the section's tables),
+  a unit time for each from a yardstick kernel at the section's operands, and in one hold each entry without its crowds, each without its
+  pairs, and the rows at four blocks a multiprocessor in their launch bounds (every bit kept).
+  (a) field_contact_rows without its crowds' blocks reads 0.50 of its own time over the four clocks (0.30 to 0.70).
+  (b) field_pace_skin_back without its crowds reads 0.55 of its own (0.35 to 0.75).
+  (c) The 128 by 128 divisions (count times unit time): 0.12 of the rows' time on the paced clocks (0.04 to 0.25), 0.30 of the skin's
+      return (0.12 to 0.50).
+  (d) The checked products: 0.20 of the skin's return (0.08 to 0.35).
+  (e) The rows at four blocks a multiprocessor (no cap at 80 registers, no spill): 1.00 of their time (0.90 to 1.12).
+  Rule. A helper the table gives 0.08 or more of either entry's time is rebuilt in the form its bounds prove, every bit kept, as step 5 in
+  the same order: a quotient by count^2 2^b as the numerator with its half released b bits, then the read divisor of count^2 (the floor of
+  a floor by a product: the same integer); a quotient by a count or its square a mode as a divisor read once a crowd; a checked product
+  whose operands' proved bounds leave the refusal nothing to catch as the plain product, the check standing wherever no bound proves it;
+  a mode's atomic sums to one address added on the lane and summed once. Step 5's own guess, fixed here as a rule on the reading's table:
+  a rebuilt helper keeps 0.35 of the time the table gave it (0.20 to 0.55), so an entry reads one less 0.65 of its rebuilt helpers'
+  summed share. No helper at 0.08: nothing is built, and the two entries' instructions executed a row are read by region against the
+  card's measured product rate before the layout's record is written. (e) under 0.90: the launch bounds change with step 5.
+
+G127 fixed 2026-11-13T00:45Z (the same thread), before its read: a held place's news at its cavity opening (the design record of
+November 13, §4.4 and §9; P55 part B; state C of the store's line; a reading, no state changed).
+Read first: the store record's §2 and §3 (a whole mask at C codes 2.38 to 2.93 nats a place by slice; a count of three known neighbours a
+side with both immediate neighbours known 1.10 on code), G125's receipt (the count's own code cut at 8 bits: a mean epoch of 1.90 places,
+0.422 of epochs one place, 0.9997 of sites kept under a shifted start and 0.996 under doubled leading spaces) and the source (an open
+place's opening is E(void) with its neighbours' rows and the moment; a silent place adds nothing to a moment; the readout's covector comes
+from the faces after the last tick). Premise not read by any log: whether the readout reads an opening at all.
+  The reading. For each held place t of a sample by slice: its stretch with every place written but t (one open place), the built opening
+  with no tick, the face through the readout at that opening, c0 = minus log of the face at the written class; and the same one-place mask
+  after the declared ticks, cK. Then the restarting cut at 5.545 nats on c0 along each stretch.
+  (a) cK, one open place, by slice: 1.45 nats on code (1.15 to 1.80), 1.55 pooled (1.25 to 1.90).
+  (b) c0 over cK in the mean: 1.35 pooled (1.12 to 1.70), and the rank agreement (Spearman) of c0 with cK over a slice's places 0.65
+      (0.45 to 0.82).
+  (c) The cut on c0: a mean epoch of 2.5 places pooled (2.0 to 3.2); 0.34 of whole epochs one place (0.22 to 0.46).
+  (d) Sites kept: 0.999 under a start seven places later (0.990 to 1.000); 0.97 under doubled leading spaces on the code slice, the copy's
+      codes read by the store itself (0.90 to 0.995).
+  Rule. A rank of 0.60 or over on at least four slices and 0.90 or over under the stretch: the cavity face stands as the reader of a place's
+  news, and the build of the level on epochs is ordered with its own guess after step 5 is timed. A rank under 0.40 on three slices: the
+  readout does not read an opening, and the design gives the opening a face of its own before any build (a law change, recorded first).
+  Between: the level's build waits and the opening after one tick is read the same way.
