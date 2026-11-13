@@ -371,6 +371,11 @@ limbs fewer is about 5 ms a section of the forward entry's 30.4; the narrow nume
 once-a-pair forms add a few more. The returns' wide forms rest on a share's 63 bits and on the
 covector `dy`, which no ruler has read.
 
+*The copies' ruler set aside* (November 13, P61's first item): `claude/contact-copies` is kept by the
+tag `archive/claude/contact-copies` at `74c049cb4`. It is not merged: its copies are the contact's
+entries as they stood, bound to asserted substitution counts, and those entries are to be rewritten
+under the widths' law, so in the trunk the copies would go stale or hold the rewrite back.
+
 **What follows.** The widths are worth about 10 ms a section of 267, a tenth of the pair family
 and not a multiple. They are ordered after the site maps, with the reading of `dy` first. The
 pair family's multiple lies in the count of pair-terms alone: which rows are computed, and which
