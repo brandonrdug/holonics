@@ -724,14 +724,14 @@ poolable!(i128, i128s);
 
 impl Pools<'_> {
     /// Free the kept buffer of the most octets, of any element type.
-    fn free_largest(&mut self) {
+    fn free_largest(&mut self) -> u64 {
         fn largest<T>(list: &[(usize, CardBuffer<'_, T>)]) -> Option<(usize, u64)> {
             list.iter().enumerate().map(|(i, (c, _))| (i, (*c * core::mem::size_of::<T>()) as u64)).max_by_key(|&(_, o)| o)
         }
         let candidates = [largest(&self.u8s), largest(&self.u32s), largest(&self.i32s), largest(&self.u64s), largest(&self.i64s), largest(&self.i128s)];
         let Some((which, (i, octets))) = candidates.iter().enumerate().filter_map(|(w, c)| c.map(|c| (w, c))).max_by_key(|&(_, (_, o))| o) else {
             self.retained = 0;
-            return;
+            return 0;
         };
         match which {
             0 => drop(self.u8s.swap_remove(i)),
@@ -742,6 +742,7 @@ impl Pools<'_> {
             _ => drop(self.i128s.swap_remove(i)),
         }
         self.retained = self.retained.saturating_sub(octets);
+        octets
     }
 
 }
@@ -912,6 +913,12 @@ pub struct FieldProfile {
     /// allocation), the kept buffers a miss freed and their octets.
     /// [realization; P58 item 1] and the plain takes served by a larger kept buffer in place of an allocation.
     pub pool: std::collections::BTreeMap<(u32, u64), [u64; 5]>,
+    /// [measurement; theory, November 13, G142] At each take that allocated, by its line and class: the takes, and the live, kept and over-budget
+    /// octets summed at that take (live and kept before it; over budget the octets by which live, kept and the new buffer passed the batch's
+    /// budget). Each kept buffer the budget freed, by its octets. The largest live set the batch's takes reached, and the budget.
+    pub pool_pressure: std::collections::BTreeMap<(u32, u64), [u128; 4]>,
+    pub pool_freed: std::collections::BTreeMap<u64, u64>,
+    pub pool_peak: (u64, u64),
     /// [measurement; theory, November 13, P56 item 4] Every timed launch, copy, take and zeroing summed (ns): what a phase's wall holds of the card's.
     pub timed_ns: u128,
 }
@@ -1076,9 +1083,18 @@ impl<'c> CardField<'c> {
                     }
                     None => {
                         missed = true;
+                        if let Some(profile) = &self.profile {
+                            let mut p = profile.borrow_mut();
+                            let over = (pools.live + pools.retained + octets).saturating_sub(self.budget);
+                            let slot = p.pool_pressure.entry((line, octets)).or_insert([0; 4]);
+                            (slot[0], slot[1], slot[2], slot[3]) = (slot[0] + 1, slot[1] + u128::from(pools.live), slot[2] + u128::from(pools.retained), slot[3] + u128::from(over));
+                        }
                         while pools.live + pools.retained + octets > self.budget && pools.retained > 0 {
                             let before = pools.retained;
-                            pools.free_largest();
+                            let class = pools.free_largest();
+                            if let Some(profile) = &self.profile {
+                                *profile.borrow_mut().pool_freed.entry(class).or_insert(0) += 1;
+                            }
                             (frees, freed) = (frees + 1, freed + before.saturating_sub(pools.retained));
                         }
                         (cap, self.card.alloc::<T>(cap)?)
@@ -1093,6 +1109,10 @@ impl<'c> CardField<'c> {
             (slot[2], slot[3]) = (slot[2] + frees, slot[3] + freed);
         }
         pools.live += (entry.0 * size) as u64;
+        if let Some(profile) = &self.profile {
+            let mut p = profile.borrow_mut();
+            p.pool_peak = (p.pool_peak.0.max(pools.live), self.budget);
+        }
         Ok(Pooled { buf: Some(entry), pools: self.pools.clone() })
     }
 
@@ -2452,6 +2472,23 @@ impl<'c> CardField<'c> {
         let (mut zp, mut mp, mut tp) = (z.device_ptr(), masses.device_ptr(), totals.device_ptr());
         self.launch("field_face", Self::warps(t64), THREADS, &mut [arg(words), arg(&mut zp), arg(&mut mp), arg(&mut tp)])?;
         self.mark("face_launch");
+        // [P60 item 1d] The opening's code at every compared place, where the training path reads it: each place's mass at its class and its total.
+        // [realization; G142] Read here, before the reverse, so the opening's forward buffers end with its return.
+        if let Some(op) = opening.as_ref().filter(|_| self.opening_wanted.get()) {
+            let picked = self.timed(Kind::Alloc, || self.take::<u64>(sites.max(1))).map_err(device)?;
+            let mut cw = *words;
+            cw.unresolved = op.mask.device_ptr();
+            let (mut mp, mut pp) = (op.masses.device_ptr(), picked.device_ptr());
+            self.launch("field_face_at_class", Self::cells(sites as u64), THREADS, &mut [arg(&mut cw), arg(&mut mp), arg(&mut pp)])?;
+            let picked = self.timed(Kind::Copy, || card.fetch_range(&picked, 0, sites)).map_err(device)?;
+            let totals = self.timed(Kind::Copy, || card.fetch_range(&op.totals, 0, sites)).map_err(device)?;
+            let mask = self.timed(Kind::Copy, || card.fetch_range(&op.mask, 0, sites)).map_err(device)?;
+            let mut out = self.opening_out.borrow_mut();
+            for r in 0..regions.len() {
+                let span = region_off[r] as usize..region_off[r + 1] as usize;
+                out.push(span.map(|t| (mask[t] != 0).then(|| TowerFace { masses: vec![u128::from(picked[t])], total: totals[t] as u128 }.code(0))).collect());
+            }
+        }
         if let Some(g) = g {
             // The covector's magnitude near and far, where read (§16.20).
             let shares = match self.covector_shares.borrow().is_some() {
@@ -2493,7 +2530,7 @@ impl<'c> CardField<'c> {
                     }
                 }
             }
-            self.reverse(field, words, &ticks, (&clocks, base_clock), g, &fread, &fscale, &lift, &masses, &totals, &classes, &unresolved, &site_pos, &mix_off, &mix_class, &mix_share, &site_weight, &ported, sites, pairs, tower.as_deref_mut().zip(tb.as_ref()), opening.as_ref())?;
+            self.reverse(field, words, &ticks, (&clocks, base_clock), g, &fread, &fscale, &lift, &masses, &totals, &classes, &unresolved, &site_pos, &mix_off, &mix_class, &mix_share, &site_weight, &ported, sites, pairs, tower.as_deref_mut().zip(tb.as_ref()), opening)?;
             if let Some(cov) = self.row_cov.borrow_mut().take() {
                 let span = 2 * n;
                 let mut out = self.row_out.borrow_mut();
@@ -2514,22 +2551,6 @@ impl<'c> CardField<'c> {
                 }
             }
             words.dsshare = 0;
-        }
-        // [P60 item 1d] The opening's code at every compared place, where the training path reads it: each place's mass at its class and its total.
-        if let Some(op) = opening.as_ref().filter(|_| self.opening_wanted.get()) {
-            let picked = self.timed(Kind::Alloc, || self.take::<u64>(sites.max(1))).map_err(device)?;
-            let mut cw = *words;
-            cw.unresolved = op.mask.device_ptr();
-            let (mut mp, mut pp) = (op.masses.device_ptr(), picked.device_ptr());
-            self.launch("field_face_at_class", Self::cells(sites as u64), THREADS, &mut [arg(&mut cw), arg(&mut mp), arg(&mut pp)])?;
-            let picked = self.timed(Kind::Copy, || card.fetch_range(&picked, 0, sites)).map_err(device)?;
-            let totals = self.timed(Kind::Copy, || card.fetch_range(&op.totals, 0, sites)).map_err(device)?;
-            let mask = self.timed(Kind::Copy, || card.fetch_range(&op.mask, 0, sites)).map_err(device)?;
-            let mut out = self.opening_out.borrow_mut();
-            for r in 0..regions.len() {
-                let span = region_off[r] as usize..region_off[r + 1] as usize;
-                out.push(span.map(|t| (mask[t] != 0).then(|| TowerFace { masses: vec![u128::from(picked[t])], total: totals[t] as u128 }.code(0))).collect());
-            }
         }
         self.mark("reverse_launch");
         self.status(&status)?;
@@ -3361,7 +3382,7 @@ impl<'c> CardField<'c> {
     }
 
     #[allow(clippy::too_many_arguments)]
-    fn reverse(&self, field: &Field, words: &mut Words, ticks: &[Tick<'c>], (clocks, base_clock): (&[Option<CardClock<'c>>], [u64; 7]), g: &CardBuffer<'c, i128>, fread: &CardBuffer<'c, i32>, fscale: &CardBuffer<'c, i128>, lift: &CardBuffer<'c, i64>, masses: &CardBuffer<'c, u64>, totals: &CardBuffer<'c, i128>, classes: &[u32], unresolved: &[u8], site_pos: &[u32], mix_off: &[u32], mix_class: &[u32], mix_share: &[u32], site_weight: &[(u64, u64)], ported: &(Vec<u32>, Vec<i64>), sites: usize, pairs: usize, mut tower: Option<(&mut TowerRun<'c>, &TowerBatch<'c>)>, opening: Option<&Opening<'c>>) -> Result<()> {
+    fn reverse(&self, field: &Field, words: &mut Words, ticks: &[Tick<'c>], (clocks, base_clock): (&[Option<CardClock<'c>>], [u64; 7]), g: &CardBuffer<'c, i128>, fread: &CardBuffer<'c, i32>, fscale: &CardBuffer<'c, i128>, lift: &CardBuffer<'c, i64>, masses: &CardBuffer<'c, u64>, totals: &CardBuffer<'c, i128>, classes: &[u32], unresolved: &[u8], site_pos: &[u32], mix_off: &[u32], mix_class: &[u32], mix_share: &[u32], site_weight: &[(u64, u64)], ported: &(Vec<u32>, Vec<i64>), sites: usize, pairs: usize, mut tower: Option<(&mut TowerRun<'c>, &TowerBatch<'c>)>, opening: Option<Opening<'c>>) -> Result<()> {
         let card = self.card;
         let d = field.declaration;
         let (dw, m, n, f, a, heads) = (d.width, d.complex(), d.modes, d.contacts, d.alphabet, d.heads);
@@ -3373,6 +3394,14 @@ impl<'c> CardField<'c> {
         let regions = words.r as usize;
         let rows = sites + regions;
         let paced = d.paced_heads();
+        // [theory, November 13, P60 item 1e; realization, G142] The opening's comparison at every place returns first, where the field has the opening's
+        // lift: its covector joins the ticks' in `g` and its clocks' covectors the pass's own (`gtau`, `gsig`, zeroed with the back buffers) before they
+        // fold into the strides below, every one an integer sum, so the order is the realization's. Its forward's buffers end here, before the ticks
+        // return, which keeps them out of the reverse's live set.
+        if let Some(op) = opening {
+            self.opening_back(field, words, &op, g, (classes, unresolved, site_pos, mix_off, mix_class, mix_share), sites)?;
+            drop(op);
+        }
         // The face.
         let (mut mp, mut tp, mut dzp) = (masses.device_ptr(), totals.device_ptr(), dz.device_ptr());
         self.launch("field_face_covector", Self::cells((sites * a) as u64), THREADS, &mut [arg(words), arg(&mut mp), arg(&mut tp), arg(&mut dzp)])?;
@@ -3461,11 +3490,6 @@ impl<'c> CardField<'c> {
         self.transposed(words, mface, dw, m2, dx.device_ptr(), dw, dq.device_ptr(), false, false)?;
         let (mut cp, mut dmp) = (dq.device_ptr(), dm.device_ptr());
         self.launch("field_moment_accumulate", Self::cells((sites * m2) as u64), THREADS, &mut [arg(words), arg(&mut cp), arg(&mut dmp)])?;
-        // [theory, November 13, P60 item 1e] The opening's comparison at every place returns here, where the field has the opening's lift: its covector
-        // joins the last tick's in `g`, and its clocks' covectors join the pass's own (`gtau`, `gsig`) before they fold into the strides below.
-        if let Some(op) = opening {
-            self.opening_back(field, words, op, g, (classes, unresolved, site_pos, mix_off, mix_class, mix_share), sites)?;
-        }
         // The moments' return (§15.1): each moment mode's value covector, summed over the ticks that read one clock,
         // through the strands to the families on that clock (the host's `moments_return`); then the clocks return to
         // their paces (§16, §16.16): `δκ` by suffix sums, then `δc[u] += Σ_(u_t = u) δκ_t` on the class sheet, a blank's by

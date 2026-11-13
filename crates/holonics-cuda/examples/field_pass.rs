@@ -182,6 +182,15 @@ fn run(args: &[String]) -> Result<()> {
                 a.registers, a.static_shared, a.local, a.max_threads, a.blocks_a_multiprocessor
             );
         }
+        // [measurement; theory, November 13, G142] The takes that allocated, by line and class, with the live, kept and over-budget octets at each.
+        for ((line, class), [n, live, kept, over]) in &p.pool_pressure {
+            let k = (*n).max(1);
+            println!("FIELD_PROFILE_POOLP line={line} class_octets={class} allocations={n} mean_live={} mean_kept={} mean_over_budget={}", live / k, kept / k, over / k);
+        }
+        for (class, n) in &p.pool_freed {
+            println!("FIELD_PROFILE_POOLFREED class_octets={class} frees={n}");
+        }
+        println!("FIELD_PROFILE_POOLPEAK live={} budget={}", p.pool_peak.0, p.pool_peak.1);
         for ((line, class), [hits, misses, frees, freed, wide]) in &p.pool {
             println!("FIELD_PROFILE_POOL line={line} class_octets={class} hits={hits} misses={misses} frees={frees} freed_octets={freed} served_longer={wide}");
         }
