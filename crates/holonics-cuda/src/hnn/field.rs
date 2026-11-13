@@ -31,6 +31,7 @@ use core::ffi::c_void;
 use std::time::Instant;
 
 use holonics::hnn::tower::field::{band_bits, landmarks_of, BlankClocks, CarryGates, Field, FieldDeclaration, FieldRead, FieldRealization, HeldRows, NearOffsets, RealizationCounters, RowCurrent, Region, Scale, TickRead, NEAR, SHARE_BITS, STATE_BITS};
+use holonics::hnn::tower::field::{level_cut, level_section, PACE_BITS};
 use holonics::hnn::tower::{TowerError, TowerFace, MATERIAL_BITS};
 
 use crate::cuda::{Dim3, Module};
@@ -496,8 +497,8 @@ fn held_at(b: &Option<Pooled<'_, i64>>) -> u64 {
     b.as_ref().map_or(0, |b| b.device_ptr())
 }
 
-/// A tower's packets' level for a run ([`CardField::tower_run`]): the packets' field's words and buffers, the glue's
-/// material (read by the packets' words pointed at it), and each level's covector.
+/// A level above for a run ([`CardField::tower_run`]): the level's field's words and buffers, the glue's material (read by the
+/// level's words pointed at it), each level's covector, and the cut's section and half turn.
 struct TowerRun<'c> {
     cwords: Words,
     glue_at: u64,
@@ -505,14 +506,17 @@ struct TowerRun<'c> {
     _glue: Pooled<'c, i32>,
     cg: Option<Pooled<'c, i128>>,
     gg: Option<Pooled<'c, i128>>,
-    period: usize,
+    harmonics: usize,
     split: usize,
+    section: i64,
+    pi: i128,
     offsets: (usize, usize, usize, usize, usize),
     reach_a: u64,
     reach_b: u64,
 }
 
-/// A tower's packets for one batch ([`CardField::tower_batch`]).
+/// A level's epochs for one batch ([`CardField::tower_batch`]): the epochs staged as the level's regions, each fine place's epoch, its
+/// harmonics, the epochs' fine offsets, and the per-pass buffers.
 struct TowerBatch<'c> {
     st: Staged<'c>,
     ticks: Vec<Tick<'c>>,
@@ -523,10 +527,16 @@ struct TowerBatch<'c> {
     _plain: Pooled<'c, u8>,
     split_read: Pooled<'c, i32>,
     split_scale: Pooled<'c, i128>,
-    pad_read: Pooled<'c, i32>,
+    restricted: Pooled<'c, i64>,
     read1: Pooled<'c, i32>,
     scale1: Pooled<'c, i128>,
     pad: Pooled<'c, i64>,
+    epoch: Pooled<'c, u32>,
+    harmonics: Pooled<'c, i64>,
+    off: Pooled<'c, u32>,
+    /// The level's skin addresses, its clock's skins and near phases (the stores the fine batch keeps for its own clock).
+    _saddr: Pooled<'c, i64>,
+    _stores: Vec<Pooled<'c, u32>>,
 }
 
 /// A level's reverse buffers ([`CardField::back_buffers`]).
@@ -1597,11 +1607,13 @@ impl<'c> CardField<'c> {
         // The batches: whole regions in order, each batch's every allocation within the budget.
         // A landmark read stores one tick's weights beside a read's carriers; a logits read keeps every tick
         // and its shares (the echo's round trips, §15.3).
-        let towered = field.scale.as_deref().map(|s| (s.coarse.declaration, s.period));
+        // [G145] A level's epochs are at most its places, so its field is sized at the places, beside the fine chart at the split, the
+        // epochs' harmonic blocks (restricted and returned) and each place's harmonics and epoch.
+        let towered = field.scale.as_deref().map(|s| (s.coarse.declaration, s.harmonics));
         let octets = |sites: usize| {
             read_octets(&d, returning, logits, sites)
                 + if keep.is_some() { 8 * (heads * sites * sites) as u64 } else { 0 }
-                + towered.map_or(0, |(cd, period)| read_octets(&cd, returning, false, sites.div_ceil(period)) + 16 * (sites * d.width) as u64 + 16 * (sites.div_ceil(period) * period * d.width) as u64)
+                + towered.map_or(0, |(cd, h)| read_octets(&cd, returning, false, sites) + 20 * (sites * d.width) as u64 + 16 * (sites * h * d.width) as u64 + 8 * (sites * h) as u64 + 8 * sites as u64)
         };
         let lengths: Vec<usize> = regions.iter().map(|r| r.classes.len()).collect();
         if let Some(profile) = &self.profile {
@@ -2064,128 +2076,174 @@ impl<'c> CardField<'c> {
         let gg = if returning { Some(self.timed(Kind::Alloc, || self.take_zeroed::<i128>(len)).map_err(device)?) } else { None };
         cwords.gcov = cg.as_ref().map_or(0, |g| g.device_ptr());
         let _ = (ab, bb);
-        Ok(TowerRun { cwords, glue_at: glue.device_ptr(), _cup: cup, _glue: glue, cg, gg, period: s.period, split: s.split, offsets, reach_a: reach(a, offsets.1), reach_b: reach(b, offsets.3) })
+        Ok(TowerRun { cwords, glue_at: glue.device_ptr(), _cup: cup, _glue: glue, cg, gg, harmonics: s.harmonics, split: s.split, section: level_section(field.declaration.alphabet), pi: field.half_turn(), offsets, reach_a: reach(a, offsets.1), reach_b: reach(b, offsets.3) })
     }
 
-    /// A batch's packets staged as the packets' field's regions (a packet definite where its every site is, keyed where any
-    /// is: unresolved and carrying class 0 where keyed and not definite), its ticks and its per-pass buffers.
+    /// A batch's epochs staged as the level's field's regions (an epoch definite where its every place is, keyed where any is: unresolved
+    /// and carrying class 0 where keyed and not definite), each region cut from its places' `news` by the host's `level_cut`; each fine
+    /// place's epoch and harmonics, the epochs' fine offsets, the level's clocks uploaded as the cut gives them, its ticks and its per-pass
+    /// buffers.
     #[allow(clippy::too_many_arguments)]
-    fn tower_batch(&self, field: &Field, tr: &mut TowerRun<'c>, fine: &Staged<'c>, regions: usize, stored: bool, returning: bool, kept: bool) -> Result<TowerBatch<'c>> {
-        let s = field.scale.as_deref().ok_or(TowerError::Refused("a tower batch of a field without a scale"))?;
+    fn tower_batch(&self, field: &Field, tr: &mut TowerRun<'c>, fine: &Staged<'c>, regions: usize, stored: bool, returning: bool, kept: bool, news: &[i64]) -> Result<TowerBatch<'c>> {
+        let s = field.scale.as_deref().ok_or(TowerError::Refused("a level's batch of a field without a level"))?;
         let coarse = &s.coarse;
         let cd = coarse.declaration;
-        let period = tr.period;
+        let h = tr.harmonics;
         let carried = vec![(0u32, 1u32 << 16)];
         let mut owned: Vec<(Vec<usize>, Vec<bool>, Vec<Option<Vec<(u32, u32)>>>)> = Vec::with_capacity(regions);
+        let (mut epoch_of, mut harm, mut off, mut taus) = (Vec::with_capacity(fine.sites), Vec::with_capacity(fine.sites * h), Vec::new(), Vec::with_capacity(regions));
         for r in 0..regions {
             let (first, end) = (fine.region_off[r] as usize, fine.region_off[r + 1] as usize);
-            let packets = (end - first).div_ceil(period);
-            let (mut unres, mut faces) = (Vec::with_capacity(packets), Vec::with_capacity(packets));
-            for j in 0..packets {
-                let span = first + period * j..(first + period * (j + 1)).min(end);
+            let cut = level_cut(&news[first..end], tr.section, h, tr.pi)?;
+            let base = off.len() as u32;
+            let epochs = cut.anchors.len();
+            let (mut unres, mut faces) = (Vec::with_capacity(epochs), Vec::with_capacity(epochs));
+            for j in 0..epochs {
+                let span = first + cut.anchors[j]..first + cut.anchors.get(j + 1).copied().unwrap_or(end - first);
+                off.push(span.start as u32);
                 let definite = span.clone().all(|t| fine.definite[t] != 0);
                 let keyed = span.clone().any(|t| fine.unresolved[t] == 0 || fine.mix_off[t + 1] != fine.mix_off[t]);
                 unres.push(!definite);
                 faces.push((keyed && !definite).then(|| carried.clone()));
             }
-            owned.push((vec![0usize; packets], unres, faces));
+            epoch_of.extend(cut.epoch.iter().map(|&j| base + j as u32));
+            harm.extend_from_slice(&cut.harmonics);
+            taus.push(cut.tau);
+            owned.push((vec![0usize; epochs], unres, faces));
         }
+        off.push(fine.sites as u32);
         let pregions: Vec<Region> = owned.iter().map(|(c, u, f)| Region { classes: c, unresolved: u, faces: if f.iter().any(Option::is_some) { f } else { &[] }, locked: &[], echo: &[], domain: None, port: None }).collect();
         let st = self.stage(&pregions, cd.alphabet, cd.width, &cd, &mut tr.cwords)?;
         let (sites, m2, n) = (st.sites, 2 * cd.complex(), cd.modes);
         let ticks: Vec<Tick> = (0..if kept { cd.ticks } else { 1 }).map(|_| self.tick(sites, st.pairs, regions, coarse, stored, returning, true)).collect::<Result<_>>()?;
         let trips = self.timed(Kind::Alloc, || self.take_zeroed::<i128>(sites.max(1))).map_err(device)?;
         tr.cwords.trips = trips.device_ptr();
-        // The packets carry no moments: their values and probes read zero there.
+        // The level carries no moments: its values and probes read zero there.
         let moment = self.timed(Kind::Alloc, || self.take_zeroed::<i64>((sites * m2).max(1))).map_err(device)?;
         tr.cwords.moment = moment.device_ptr();
         let pr = self.timed(Kind::Alloc, || self.take::<i64>((sites * m2).max(1))).map_err(device)?;
         tr.cwords.pr = pr.device_ptr();
+        // The level's clock (the host's `level_paces`): every turned head on the news between the epochs' anchors, uploaded as the cut
+        // gives it; the frames and the skins' addresses then follow by the fine field's own laws on the level's strand.
         let paced = cd.paced_heads();
+        let one = 1i64 << PACE_BITS;
+        let (mut kappa, mut tau, mut plain) = (Vec::with_capacity(paced * sites), Vec::with_capacity(paced * sites), Vec::with_capacity(paced * regions));
+        for _ in 0..paced {
+            for t in &taus {
+                tau.extend_from_slice(t);
+                kappa.extend((0..t.len()).map(|j| if j == 0 { one } else { t[j] - t[j - 1] }));
+            }
+            plain.extend(taus.iter().map(|t| u8::from((1..t.len()).all(|j| t[j] - t[j - 1] == one))));
+        }
+        let up64 = |v: &[i64]| self.timed(Kind::Copy, || self.take_up(if v.is_empty() { &[0i64][..] } else { v })).map_err(device);
         let alloc64 = |len: usize| self.timed(Kind::Alloc, || self.take::<i64>(len.max(1))).map_err(device);
-        let clocks = vec![alloc64(paced * sites)?, alloc64(paced * sites)?, alloc64(paced * sites)?, alloc64(2 * paced * sites * n)?];
-        let plain = self.timed(Kind::Alloc, || self.take::<u8>((paced * regions).max(1))).map_err(device)?;
+        let clocks = vec![up64(&kappa)?, up64(&tau)?, up64(&tau)?, self.timed(Kind::Alloc, || self.take::<i64>((2 * paced * sites * n).max(1))).map_err(device)?];
+        let plain = self.timed(Kind::Copy, || self.take_up(if plain.is_empty() { &[0u8][..] } else { &plain[..] })).map_err(device)?;
         tr.cwords.kappa = clocks[0].device_ptr();
         tr.cwords.tau = clocks[1].device_ptr();
         tr.cwords.sigma = clocks[2].device_ptr();
         tr.cwords.pframe = clocks[3].device_ptr();
         tr.cwords.plain = plain.device_ptr();
-        // The packets' clocks are plain (their pace material never moves from its founding's zero, so `κ = 1`): read by the
-        // fine field's own laws on the packets' strand.
+        // The level's own stores of its clock, as the fine batch keeps them for its own (`skin_fill` fills the pairs' and the crowds' skins at
+        // each tick, `clock_fill` the near phases and skins and the crowd edges' far skins once the clock is set).
+        let saddr = alloc64(3 * paced * n * sites)?;
+        tr.cwords.saddr = saddr.device_ptr();
+        let alloc32 = |len: usize| self.timed(Kind::Alloc, || self.take::<u32>(len.max(1))).map_err(device);
+        let mut stores = Vec::new();
         if paced > 0 {
-            self.launch("field_paces", Self::cells((paced * regions) as u64), THREADS, &mut [arg(&mut tr.cwords)])?;
+            stores.push(alloc32(paced * st.skin_entries * n)?);
+            stores.push(alloc32(paced * sites * tr.cwords.slots as usize * n)?);
+            (tr.cwords.skin, tr.cwords.cskin) = (stores[0].device_ptr(), stores[1].device_ptr());
+        } else {
+            (tr.cwords.skin, tr.cwords.cskin) = (0, 0);
+        }
+        let tm = cd.moment_modes();
+        if paced > 0 && tm > 0 {
+            let near = tm * sites * CLOCK_NEAR;
+            stores.push(alloc32(2 * near)?);
+            stores.push(alloc32(near)?);
+            (tr.cwords.mphase, tr.cwords.mskin) = (stores[2].device_ptr(), stores[3].device_ptr());
+        } else {
+            (tr.cwords.mphase, tr.cwords.mskin) = (0, 0);
+        }
+        if paced > 0 {
             self.launch("field_skin_addresses", Self::cells((paced * n * sites) as u64), THREADS, &mut [arg(&mut tr.cwords)])?;
             self.launch("field_pframes", Self::cells((paced * sites * n) as u64), THREADS, &mut [arg(&mut tr.cwords)])?;
+            self.clock_fill(coarse, &tr.cwords, sites)?;
         }
         let d0 = field.declaration.width;
         let split_read = self.timed(Kind::Alloc, || self.take::<i32>((fine.sites * d0).max(1))).map_err(device)?;
         let split_scale = self.timed(Kind::Alloc, || self.take::<i128>((fine.sites * field.declaration.lanes).max(1))).map_err(device)?;
-        let pad_read = self.timed(Kind::Alloc, || self.take::<i32>((sites * period * d0).max(1))).map_err(device)?;
+        let restricted = alloc64(sites * h * d0)?;
         let read1 = self.timed(Kind::Alloc, || self.take::<i32>((sites * cd.width).max(1))).map_err(device)?;
         let scale1 = self.timed(Kind::Alloc, || self.take::<i128>((sites * cd.lanes).max(1))).map_err(device)?;
-        let pad = alloc64(sites * period * d0)?;
-        Ok(TowerBatch { st, ticks, _trips: trips, _moment: moment, pr, _clocks: clocks, _plain: plain, split_read, split_scale, pad_read, read1, scale1, pad })
+        let pad = alloc64(sites * h * d0)?;
+        let epoch = self.timed(Kind::Copy, || self.take_up(if epoch_of.is_empty() { &[0u32][..] } else { &epoch_of[..] })).map_err(device)?;
+        let harmonics = up64(&harm)?;
+        let off = self.timed(Kind::Copy, || self.take_up(&off)).map_err(device)?;
+        Ok(TowerBatch { st, ticks, _trips: trips, _moment: moment, pr, _clocks: clocks, _plain: plain, split_read, split_scale, restricted, read1, scale1, pad, epoch, harmonics, off, _saddr: saddr, _stores: stores })
     }
 
-    /// The tower's forward at the split (the host's `scale_forward`): the fine faces read, restricted to their packets, the
-    /// packets' ticks, and the prolongation added back into the fine faces.
+    /// The level's forward at the split (the host's `scale_forward`): the fine faces read, each epoch's harmonics of its places' reads
+    /// restricted through `A`, the level's ticks, and the prolongation, each place reading its epoch's harmonic blocks at its own phase,
+    /// added back into the fine faces.
     #[allow(clippy::too_many_arguments)]
     fn tower_forward(&self, field: &Field, words: &mut Words, tr: &mut TowerRun<'c>, tb: &TowerBatch<'c>, regions: usize, stored: bool, returning: bool, kept: bool) -> Result<()> {
-        let s = field.scale.as_deref().ok_or(TowerError::Refused("a tower forward of a field without a scale"))?;
-        let (d0, d1, period) = (field.declaration.width, s.coarse.declaration.width, tr.period);
+        let s = field.scale.as_deref().ok_or(TowerError::Refused("a level's forward of a field without a level"))?;
+        let (d0, d1, h) = (field.declaration.width, s.coarse.declaration.width, tr.harmonics);
         let (a, ab, b, bb, _) = tr.offsets;
-        let packets = tb.st.sites;
+        let epochs = tb.st.sites;
         self.chart(words, words.x, &tb.split_read, &tb.split_scale, false)?;
-        let (mut src, mut dst, mut off, mut width, mut per) = (tb.split_read.device_ptr(), tb.pad_read.device_ptr(), words.region_off, d0 as u32, period as u32);
-        self.launch("field_scale_gather32", Self::cells((packets * period * d0) as u64), THREADS, &mut [arg(&mut tr.cwords), arg(&mut src), arg(&mut dst), arg(&mut off), arg(&mut width), arg(&mut per)])?;
+        let (mut src, mut hp, mut op, mut e64, mut h32, mut w32, mut dst) = (tb.split_read.device_ptr(), tb.harmonics.device_ptr(), tb.off.device_ptr(), epochs as u64, h as u32, d0 as u32, tb.restricted.device_ptr());
+        self.launch("field_level_chart32", Self::cells((epochs * h * d0) as u64), THREADS, &mut [arg(words), arg(&mut src), arg(&mut hp), arg(&mut op), arg(&mut e64), arg(&mut h32), arg(&mut w32), arg(&mut dst)])?;
         let mut gwords = tr.cwords;
         gwords.theta = tr.glue_at;
-        self.affine("field_affine_x32", &mut gwords, a as u64, ab as u64, tr.reach_a, d1, period * d0, tb.pad_read.device_ptr(), period * d0, tr.cwords.x, d1, 0, false)?;
+        self.affine("field_affine_x64", &mut gwords, a as u64, ab as u64, tr.reach_a, d1, h * d0, tb.restricted.device_ptr(), h * d0, tr.cwords.x, d1, 0, false)?;
         for k in 0..s.coarse.declaration.ticks {
-            self.tick_forward(&s.coarse, &mut tr.cwords, &tb.ticks, k, kept, stored, false, false, returning, tb.pr.device_ptr(), packets, tb.st.pairs, regions)?;
+            self.tick_forward(&s.coarse, &mut tr.cwords, &tb.ticks, k, kept, stored, false, false, returning, tb.pr.device_ptr(), epochs, tb.st.pairs, regions)?;
         }
         let x1 = tr.cwords.x;
         self.chart(&mut tr.cwords, x1, &tb.read1, &tb.scale1, false)?;
         let mut gwords = tr.cwords;
         gwords.theta = tr.glue_at;
-        self.affine("field_affine_x32", &mut gwords, b as u64, bb as u64, tr.reach_b, period * d0, d1, tb.read1.device_ptr(), d1, tb.pad.device_ptr(), period * d0, 0, false)?;
-        let (mut src, mut dst, mut off, mut width, mut per, mut add) = (tb.pad.device_ptr(), words.x, tr.cwords.region_off, d0 as u32, period as u32, 1u32);
-        self.launch("field_scale_scatter", Self::cells((tb_fine_sites(words) * d0) as u64), THREADS, &mut [arg(words), arg(&mut src), arg(&mut dst), arg(&mut off), arg(&mut width), arg(&mut per), arg(&mut add)])
+        self.affine("field_affine_x32", &mut gwords, b as u64, bb as u64, tr.reach_b, h * d0, d1, tb.read1.device_ptr(), d1, tb.pad.device_ptr(), h * d0, 0, false)?;
+        let (mut vp, mut hp, mut ep, mut h32, mut w32, mut dst, mut add) = (tb.pad.device_ptr(), tb.harmonics.device_ptr(), tb.epoch.device_ptr(), h as u32, d0 as u32, words.x, 1u32);
+        self.launch("field_level_unchart", Self::cells((tb_fine_sites(words) * d0) as u64), THREADS, &mut [arg(words), arg(&mut vp), arg(&mut hp), arg(&mut ep), arg(&mut h32), arg(&mut w32), arg(&mut dst), arg(&mut add)])
     }
 
-    /// The tower's reverse at the split (the host's `scale_return`): `back.dx`, the covector of the fine faces after the
-    /// prolongation, carried through the prolongation, the packets' ticks and the restriction into the covector of the fine
-    /// faces before it; the packets' and the glue's covectors added into their own buffers.
+    /// The level's reverse at the split (the host's `scale_return`): `back.dx`, the covector of the fine faces after the prolongation,
+    /// carried through the prolongation, the level's ticks and the restriction into the covector of the fine faces before it; the
+    /// level's and the glue's covectors added into their own buffers. The cut is data and takes nothing.
     fn tower_back(&self, field: &Field, words: &mut Words, tr: &mut TowerRun<'c>, tb: &TowerBatch<'c>, back: &Back<'c>, cb: &Back<'c>) -> Result<()> {
-        let s = field.scale.as_deref().ok_or(TowerError::Refused("a tower reverse of a field without a scale"))?;
-        let (d0, d1, period) = (field.declaration.width, s.coarse.declaration.width, tr.period);
+        let s = field.scale.as_deref().ok_or(TowerError::Refused("a level's reverse of a field without a level"))?;
+        let (d0, d1, h) = (field.declaration.width, s.coarse.declaration.width, tr.harmonics);
         let (a, ab, b, bb, _) = tr.offsets;
-        let packets = tb.st.sites;
+        let epochs = tb.st.sites;
         let (cg, gg) = match (tr.cg.as_deref(), tr.gg.as_deref()) {
             (Some(cg), Some(gg)) => (cg, gg),
-            _ => return Err(TowerError::Refused("a tower reverse without its levels' covectors")),
+            _ => return Err(TowerError::Refused("a level's reverse without its levels' covectors")),
         };
-        // The prolongation: the packets' places' covectors in place order, then `δb_B`, `δB` and `δr̂¹ = Bᵀ δx`.
-        let (mut src, mut dst, mut off, mut width, mut per) = (back.dx.device_ptr(), tb.pad.device_ptr(), words.region_off, d0 as u32, period as u32);
-        self.launch("field_scale_gather64", Self::cells((packets * period * d0) as u64), THREADS, &mut [arg(&mut tr.cwords), arg(&mut src), arg(&mut dst), arg(&mut off), arg(&mut width), arg(&mut per)])?;
-        self.outer(&mut tr.cwords, gg, bb as u64, period * d0, 0, tb.pad.device_ptr(), period * d0, 0, 0, false, false)?;
-        self.outer(&mut tr.cwords, gg, b as u64, period * d0, d1, tb.pad.device_ptr(), period * d0, tb.read1.device_ptr(), d1, false, false)?;
+        // The prolongation: `δv(j)` each epoch's harmonics of its places' covectors, then `δb_B`, `δB` and `δr̂¹ = Bᵀ δv`.
+        let (mut src, mut hp, mut op, mut e64, mut h32, mut w32, mut dst) = (back.dx.device_ptr(), tb.harmonics.device_ptr(), tb.off.device_ptr(), epochs as u64, h as u32, d0 as u32, tb.pad.device_ptr());
+        self.launch("field_level_chart64", Self::cells((epochs * h * d0) as u64), THREADS, &mut [arg(words), arg(&mut src), arg(&mut hp), arg(&mut op), arg(&mut e64), arg(&mut h32), arg(&mut w32), arg(&mut dst)])?;
+        self.outer(&mut tr.cwords, gg, bb as u64, h * d0, 0, tb.pad.device_ptr(), h * d0, 0, 0, false, false)?;
+        self.outer(&mut tr.cwords, gg, b as u64, h * d0, d1, tb.pad.device_ptr(), h * d0, tb.read1.device_ptr(), d1, false, false)?;
         let mut gwords = tr.cwords;
         gwords.theta = tr.glue_at;
-        self.transposed(&mut gwords, b as u64, period * d0, d1, tb.pad.device_ptr(), period * d0, cb.dr.device_ptr(), false, false)?;
+        self.transposed(&mut gwords, b as u64, h * d0, d1, tb.pad.device_ptr(), h * d0, cb.dr.device_ptr(), false, false)?;
         self.ratio_adjoint(&mut tr.cwords, tb.read1.device_ptr(), tb.scale1.device_ptr(), cb.dr.device_ptr(), 0, cb.dx.device_ptr(), false)?;
-        // The packets' ticks, in reverse.
+        // The level's ticks, in reverse.
         for (at, tick) in tb.ticks.iter().enumerate().rev() {
-            self.tick_back(&s.coarse, &mut tr.cwords, tick, at, cg, cb, cb.dm.device_ptr(), packets, false)?;
+            self.tick_back(&s.coarse, &mut tr.cwords, tick, at, cg, cb, cb.dm.device_ptr(), epochs, false)?;
         }
-        // The restriction: `δb_A`, `δA` and `δ[r̂] = Aᵀ δs`, each place's part through its read's adjoint into `δx`.
+        // The restriction: `δb_A`, `δA` and `δm = Aᵀ δx¹`, each place's part at its own phase through its read's adjoint into `δx`.
         self.outer(&mut tr.cwords, gg, ab as u64, d1, 0, cb.dx.device_ptr(), d1, 0, 0, false, false)?;
-        self.outer(&mut tr.cwords, gg, a as u64, d1, period * d0, cb.dx.device_ptr(), d1, tb.pad_read.device_ptr(), period * d0, false, false)?;
+        self.outer(&mut tr.cwords, gg, a as u64, d1, h * d0, cb.dx.device_ptr(), d1, tb.restricted.device_ptr(), h * d0, true, false)?;
         let mut gwords = tr.cwords;
         gwords.theta = tr.glue_at;
-        self.transposed(&mut gwords, a as u64, d1, period * d0, cb.dx.device_ptr(), d1, tb.pad.device_ptr(), false, false)?;
-        let (mut src, mut dst, mut off, mut width, mut per, mut add) = (tb.pad.device_ptr(), back.dr.device_ptr(), tr.cwords.region_off, d0 as u32, period as u32, 0u32);
-        self.launch("field_scale_scatter", Self::cells((tb_fine_sites(words) * d0) as u64), THREADS, &mut [arg(words), arg(&mut src), arg(&mut dst), arg(&mut off), arg(&mut width), arg(&mut per), arg(&mut add)])?;
+        self.transposed(&mut gwords, a as u64, d1, h * d0, cb.dx.device_ptr(), d1, tb.pad.device_ptr(), false, false)?;
+        let (mut vp, mut hp, mut ep, mut h32, mut w32, mut dst, mut add) = (tb.pad.device_ptr(), tb.harmonics.device_ptr(), tb.epoch.device_ptr(), h as u32, d0 as u32, back.dr.device_ptr(), 0u32);
+        self.launch("field_level_unchart", Self::cells((tb_fine_sites(words) * d0) as u64), THREADS, &mut [arg(words), arg(&mut vp), arg(&mut hp), arg(&mut ep), arg(&mut h32), arg(&mut w32), arg(&mut dst), arg(&mut add)])?;
         self.ratio_adjoint(words, tb.split_read.device_ptr(), tb.split_scale.device_ptr(), back.dr.device_ptr(), back.dx.device_ptr(), back.dx.device_ptr(), false)
     }
 
@@ -2273,11 +2331,25 @@ impl<'c> CardField<'c> {
         }
         // [P60 item 2] The opening is compared in a training read where the field has the opening's lift: the standing moments' operands are kept.
         let compared = d.opening && returning;
-        let kept_moments = self.moments(field, words, regions.len(), sites, compared)?;
+        // [theory, November 13, the design record §4.9] A level reads the opening's news in every pass, so the opening's forward runs
+        // wherever a level stands; its comparison and return only where the pass returns.
+        let opened = d.opening && (returning || field.scale.is_some());
+        let kept_moments = self.moments(field, words, regions.len(), sites, opened)?;
         // The moment's chart into the face (§16.22, the host's `Field::open`): `x⁰ += release(C s + b, 24)`.
         let (mface, mface_bias, rmface) = moment_face(field);
         self.affine("field_affine_x64", words, mface, mface_bias, rmface, dw, m2, words.moment, m2, 0, dw, words.x, false)?;
-        let opening = if compared { Some(self.opening_forward(field, words, regions, &st, kept_moments)?) } else { None };
+        let opening = if opened { Some(self.opening_forward(field, words, regions, &st, kept_moments)?) } else { None };
+        // [G145] The level's news at every place, from the opening's face (`field_level_news`, the host's `Field::level_news`), read to the
+        // host, which cuts each region's epochs (`level_cut`, a kind of work placed on the host; its bits are the host's own function's).
+        let news = match (opening.as_ref(), field.scale.is_some()) {
+            (Some(op), true) => {
+                let out = self.timed(Kind::Alloc, || self.take::<i64>(sites.max(1))).map_err(device)?;
+                let (mut mp, mut tp, mut np) = (op.masses.device_ptr(), op.totals.device_ptr(), out.device_ptr());
+                self.launch("field_level_news", Self::warps(sites as u64), THREADS, &mut [arg(words), arg(&mut mp), arg(&mut tp), arg(&mut np)])?;
+                Some(self.timed(Kind::Copy, || card.fetch_range(&out, 0, sites)).map_err(device)?)
+            }
+            _ => None,
+        };
         // [realization; theory, November 13, G144] **The opening's return runs at the end of its own forward, before the ticks.** It reads only its
         // forward's buffers, the constitution, the base clock's frames and clocks (the words hold the base clock here and again at the reverse's start,
         // and its kernels read no filled clock store) and the stage's host arrays; it adds into `g` and into the base clock's two covectors, taken here
@@ -2285,6 +2357,10 @@ impl<'c> CardField<'c> {
         // so none stands beside the ticks, the face or the reverse: held across them they added a buffer to each class they share, and the card's pool
         // passed its budget by about a tenth of a gigabyte, freeing and allocating again at three take sites every section (G143's profiled logs).
         let early_clocks = match opening {
+            Some(op) if !compared => {
+                drop(op);
+                None
+            }
             Some(op) => {
                 // [P60 item 1d] The opening's code at every compared place, where the training path reads it: each place's mass at its class and its total.
                 if self.opening_wanted.get() {
@@ -2314,7 +2390,7 @@ impl<'c> CardField<'c> {
             None => None,
         };
         let tb = match tower.as_deref_mut() {
-            Some(tr) => Some(self.tower_batch(field, tr, &st, regions.len(), stored, returning, kept)?),
+            Some(tr) => Some(self.tower_batch(field, tr, &st, regions.len(), stored, returning, kept, news.as_deref().ok_or(TowerError::Refused("a level without the opening's news"))?)?),
             None => None,
         };
         self.mark("batch_setup");
@@ -4466,6 +4542,60 @@ mod tests {
         assert_eq!(host_receipt, card_receipt);
         assert_eq!(card_receipt.opening.len(), regions.len());
         assert!(host_learner.to_text() == card_learner.to_text(), "the learner's state after a section differs between the host and the card");
+    }
+
+    /// [definition; theory, November 13, the design record §4.9; G145] **The level above on the card reads the host's bits**: a learner with
+    /// carry circles and the opening's block, its read, out, contact, opening and pace blocks drawn, grown by a level (six harmonics after half
+    /// its ticks), the level's prolongation drawn so every path of the level carries; the faces and the whole covector of a training read, and
+    /// the faces of a read that does not return (the level reads the opening's news there too), equal on host and card.
+    #[test]
+    #[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
+    fn the_level_on_the_card_reads_the_hosts_bits() {
+        use holonics::hnn::tower::field::{level_declaration, level_split, FieldLearner, FieldRealization, HostField, LEVEL_HARMONICS};
+        let keys: Vec<u8> = (0..1u64 << 18).flat_map(|i| (i.wrapping_add(1).wrapping_mul(0x9E37_79B9_7F4A_7C15) ^ (i << 17)).to_be_bytes()).collect();
+        let founded = Field::found(declaration(32, 4, 32), &keys).unwrap();
+        let mut learner = FieldLearner::new(founded, 12).with_carry(2, &keys).unwrap().with_opening().unwrap();
+        let d = learner.field.declaration;
+        let (l, dw, f, m2) = (learner.field.layout().clone(), d.width, d.contacts, 2 * d.complex());
+        let moved: Vec<usize> = (l.read..l.read + dw * dw).chain(l.out..l.out + dw * m2).chain(l.w..l.w + dw * f).chain(l.opening..l.opening + dw * dw).collect();
+        let tail = keys.len() - 4 * moved.len() - 8;
+        for (k, &i) in moved.iter().enumerate() {
+            let word = &keys[tail + 4 * k..tail + 4 * k + 4];
+            learner.field.theta[i] = i32::from_be_bytes([word[0], word[1], word[2], word[3]]) >> 14;
+        }
+        let paces = d.paced_heads() * (d.alphabet + 1);
+        let before = tail - 4 * paces;
+        for k in 0..paces {
+            let word = &keys[before + 4 * k..before + 4 * k + 4];
+            learner.field.theta[l.pace + k] = i32::from_be_bytes([word[0], word[1], word[2], word[3]]) >> 12;
+        }
+        let mut leveled = learner.scaled_up(LEVEL_HARMONICS, level_split(&d), level_declaration(&d), &keys).unwrap();
+        let s = leveled.field.scale.as_deref_mut().unwrap();
+        let (_, _, b, _, len) = s.glue_offsets(dw);
+        let back = before - 4 * (len - b) - 8;
+        for (k, v) in s.glue[b..].iter_mut().enumerate() {
+            let word = &keys[back + 4 * k..back + 4 * k + 4];
+            *v = i32::from_be_bytes([word[0], word[1], word[2], word[3]]) >> 12;
+        }
+        let field = leveled.field.clone();
+        let lengths = [2usize, 3, 5, 64, 257];
+        let classes: Vec<Vec<usize>> = lengths.iter().map(|&n| (0..n).map(|t| (t * 37 + 11) % 120).collect()).collect();
+        let open: Vec<Vec<bool>> = lengths.iter().map(|&n| (0..n).map(|t| t % 3 == 1 || t + 1 == n).collect()).collect();
+        let regions: Vec<Region> = classes.iter().zip(&open).map(|(c, u)| Region { classes: c, unresolved: u, faces: &[], locked: &[], echo: &[], domain: None, port: None }).collect();
+        let cuts: Vec<usize> = regions.iter().map(|r| holonics::hnn::tower::field::level_anchors(&field.level_news(r).unwrap(), holonics::hnn::tower::field::level_section(d.alphabet)).len()).collect();
+        assert!(cuts.iter().zip(&lengths).any(|(&e, &n)| e > 1 && e < n), "the fixture's news cuts some region into epochs: {cuts:?} of {lengths:?}");
+        let (host_faces, host_g) = field.read_and_return(&regions).unwrap();
+        let card = Card::open(0).expect("a CUDA card with the field's kernels built");
+        let mut card_field = CardField::open(&card).unwrap();
+        let (card_faces, card_g) = card_field.read_and_return(&field, &regions).unwrap();
+        assert_eq!(host_faces, card_faces);
+        let unequal: Vec<usize> = (0..host_g.len()).filter(|&i| host_g[i] != card_g[i]).collect();
+        let family = |i: usize| field.families_all().iter().position(|&(s, n, _)| (s..s + n).contains(&i));
+        assert!(unequal.is_empty(), "{} covector entries differ, the first at {:?} (its family {:?}; the fine material ends at {})", unequal.len(), unequal.first(), unequal.first().map(|&i| family(i)), field.theta.len());
+        assert!(host_g[field.theta.len()..].iter().any(|&v| v != 0), "the level's covector reaches its material");
+        let host_read = HostField.read_faces(&field, &regions).unwrap();
+        let card_read = card_field.read_faces(&field, &regions).unwrap();
+        assert_eq!(host_read, card_read, "a read that does not return");
     }
 
     /// The lettered learner's case ([`a_lettered_learners_section_on_the_card_reads_the_hosts_bits`]): the learner, its layout and width, the

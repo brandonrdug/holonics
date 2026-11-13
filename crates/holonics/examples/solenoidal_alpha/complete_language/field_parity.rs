@@ -333,24 +333,28 @@ pub(super) fn parity(args: &[String], card: &mut dyn FieldRealization) -> Result
         }
         println!("FIELD_PARITY_PACE shift={shift} entries={len}");
     }
-    // [agent-inferred, November 3, the tower record] A tower of scales (`FIELD_PARITY_SCALE=P`): the founded field grown in
-    // scale with packets of `P` sites after half its ticks, the packets' field declared as the fine one on the packets'
-    // reach, and the prolongation drawn from the key file's tail (its founding opens it at zero, where no covector reaches
-    // the packets), so the parity reads every path of the tower on both realizations.
-    if let Some(period) = std::env::var("FIELD_PARITY_SCALE").ok().and_then(|v| v.parse::<usize>().ok()).filter(|&p| p > 1) {
+    // [theory, November 13, the design record §4.9] A level above (`FIELD_PARITY_SCALE=H`, its harmonics): the founded field, with the
+    // opening's block the level reads its news from, grown by a level after half its ticks (its field's declaration `level_declaration`),
+    // and the prolongation drawn from the key file's tail (its founding opens it at zero, where no covector reaches the level), so the
+    // parity reads every path of the level on both realizations.
+    if let Some(harmonics) = std::env::var("FIELD_PARITY_SCALE").ok().and_then(|v| v.parse::<usize>().ok()).filter(|&h| h > 0) {
+        if !founded.field.declaration.opening {
+            founded = founded.with_opening().map_err(|e| e.to_string())?;
+        }
         let d = founded.field.declaration;
-        let coarse = holonics::hnn::tower::field::FieldDeclaration { alphabet: 2, reach: d.reach.div_ceil(period), triads: 0, ..d };
-        let (tower, read) = founded.field.scaled_up(period, (d.ticks / 2).max(1), coarse, &p.keys, founded.drawn).map_err(|e| e.to_string())?;
+        let coarse = holonics::hnn::tower::field::level_declaration(&d);
+        let split = holonics::hnn::tower::field::level_split(&d);
+        let (tower, read) = founded.field.scaled_up(harmonics, split, coarse, &p.keys, founded.drawn).map_err(|e| e.to_string())?;
         founded = holonics::hnn::tower::field::FieldLearner::new(tower, founded.rate_bits);
         founded.drawn = read;
-        let s = founded.field.scale.as_deref_mut().ok_or("a tower without its scale")?;
+        let s = founded.field.scale.as_deref_mut().ok_or("a field without its level")?;
         let (_, _, b, _, len) = s.glue_offsets(d.width);
         let tail = p.keys.len().checked_sub(4 * (len - b) + 8).ok_or("a key file too short for the prolongation's draws")?;
         for (k, v) in s.glue[b..].iter_mut().enumerate() {
             let word = &p.keys[tail + 4 * k..tail + 4 * k + 4];
             *v = i32::from_be_bytes([word[0], word[1], word[2], word[3]]) >> 12;
         }
-        println!("FIELD_PARITY_SCALE period={period} split={} coarse_width={} material={}", (d.ticks / 2).max(1), coarse.width, founded.field.material_len());
+        println!("FIELD_PARITY_SCALE harmonics={harmonics} split={split} coarse_width={} material={}", coarse.width, founded.field.material_len());
     }
     let d = founded.field.declaration;
     println!("FIELD_PARITY_DECLARATION width={} heads={} modes={} still={} contacts={} ticks={} frames={} reach={} rate={} material={} grow={grow} withheld_read={}", d.width, d.heads, d.modes, d.still, d.contacts, d.ticks, d.frames, d.reach, founded.rate_bits, founded.field.material_len(), withheld.len());

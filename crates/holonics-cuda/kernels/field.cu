@@ -5717,48 +5717,101 @@ extern "C" __global__ void field_pace_c_back(FieldWords w, const wide *dkappa, w
 }
 
 // -------------------------------------------------------------------------------------------
-// the tower of scales (the host's `field::scale`)
+// the level above (the host's `field::scale`; the design record of November 13, §4.9)
 
-// [definition; agent-inferred, November 3] A packet's rows in place order (the host's `padded`): `dst[p][k][i]` is fine site
-// `P jl + k` of packet `p`'s region, row `i`, zero past the region's last site. `cw` are the packets' words (their region
-// and place within it), `fine_off` the fine sites' region offsets.
-extern "C" __global__ void field_scale_gather32(FieldWords cw, const int32_t *src, int32_t *dst, const uint32_t *fine_off, uint32_t width, uint32_t period) {
-    const uint64_t per = (uint64_t)period * width;
-    const uint64_t cells = (uint64_t)cw.T * per;
-    for (uint64_t c = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; c < cells; c += (uint64_t)gridDim.x * blockDim.x) {
-        const uint64_t p = c / per, e = c % per;
-        const uint32_t k = e / width, i = e % width;
-        const uint32_t r = cw.site_region[p];
-        const uint64_t local = (uint64_t)period * cw.site_pos[p] + k;
-        const uint64_t len = fine_off[r + 1] - fine_off[r];
-        dst[c] = local < len ? src[(fine_off[r] + local) * width + i] : 0;
+// A class's code `−log₂(mass/total)` on `2^(−20)` bits (the host's `face_code`; the same integers as `tower.cu`'s): `p = mass 2^62 /
+// total`, at least one grain, its whole part from its width and twenty binary digits of its mantissa's logarithm by squaring.
+__device__ int64_t level_face_code(uint64_t mass, uwide total) {
+    uwide p = ((uwide)mass << UNIT_BITS) / total;
+    if (p == 0) {
+        p = 1;
+    }
+    const uint64_t lo = (uint64_t)p;
+    const int64_t width = 64 - __clzll((long long)lo);
+    const int64_t whole = width - 1 - UNIT_BITS;
+    uwide mantissa = (uwide)lo << (uint32_t)(UNIT_BITS + 1 - width);
+    int64_t fraction = 0;
+    for (uint32_t i = 0; i < 20; i++) {
+        mantissa = (mantissa * mantissa) >> UNIT_BITS;
+        fraction <<= 1;
+        if (mantissa >= ((uwide)2 << UNIT_BITS)) {
+            fraction |= 1;
+            mantissa >>= 1;
+        }
+    }
+    return -(whole * ((int64_t)1 << 20) + fraction);
+}
+
+// [definition; theory, November 13, the design record §4.9] **Each place's news** (the host's `Field::level_news`) from the opening's
+// face `masses[t][a]` and `totals[t]`: at a definite place the code of its class, elsewhere the face's expected code
+// `div_nearest(Σ_a mass_a code_a, total)`. One warp a place; the class sum is an integer sum, so any order gives the host's bits.
+extern "C" __global__ void field_level_news(FieldWords w, const uint64_t *masses, const wide *totals, int64_t *news) {
+    const uint32_t lane = threadIdx.x & 31;
+    const uint64_t warps = (uint64_t)gridDim.x * (blockDim.x >> 5);
+    for (uint64_t t = ((uint64_t)blockIdx.x * blockDim.x + threadIdx.x) >> 5; t < w.T; t += warps) {
+        const uwide total = (uwide)totals[t];
+        const uint64_t *m = masses + t * w.A;
+        if (w.definite[t]) {
+            if (lane == 0) {
+                news[t] = level_face_code(m[w.classes[t]], total);
+            }
+            continue;
+        }
+        wide sum = 0;
+        for (uint32_t a = lane; a < w.A; a += 32) {
+            sum += (wide)m[a] * (wide)level_face_code(m[a], total);
+        }
+        for (int o = 16; o > 0; o >>= 1) {
+            const uwide u = (uwide)sum;
+            const uint64_t lo = __shfl_down_sync(0xffffffffu, (uint64_t)u, o);
+            const uint64_t hi = __shfl_down_sync(0xffffffffu, (uint64_t)(u >> 64), o);
+            sum += (wide)(((uwide)hi << 64) | lo);
+        }
+        if (lane == 0) {
+            news[t] = fit64(div_nearest(sum, (wide)total), w.status);
+        }
     }
 }
 
-extern "C" __global__ void field_scale_gather64(FieldWords cw, const int64_t *src, int64_t *dst, const uint32_t *fine_off, uint32_t width, uint32_t period) {
-    const uint64_t per = (uint64_t)period * width;
-    const uint64_t cells = (uint64_t)cw.T * per;
-    for (uint64_t c = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; c < cells; c += (uint64_t)gridDim.x * blockDim.x) {
-        const uint64_t p = c / per, e = c % per;
-        const uint32_t k = e / width, i = e % width;
-        const uint32_t r = cw.site_region[p];
-        const uint64_t local = (uint64_t)period * cw.site_pos[p] + k;
-        const uint64_t len = fine_off[r + 1] - fine_off[r];
-        dst[c] = local < len ? src[(fine_off[r] + local) * width + i] : 0;
+// [definition; theory, November 13, the design record §4.9] **An epoch's harmonics of its places' rows** (the host's `charted`):
+// `out[e][k W + c] = release(Σ_(t∈e) h[t][k] rows[t][c], 30)`, epoch `e`'s places `off[e]..off[e + 1]` of the fine strand, `h` each
+// place's `H` harmonics on `2^(−30)`. One thread an entry.
+template <typename V>
+__device__ void level_chart(const V *rows, const int64_t *h, const uint32_t *off, uint64_t epochs, uint32_t H, uint32_t width, int64_t *out, uint32_t *status) {
+    const uint64_t per = (uint64_t)H * width;
+    for (uint64_t c = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; c < epochs * per; c += (uint64_t)gridDim.x * blockDim.x) {
+        const uint64_t e = c / per, kc = c % per;
+        const uint32_t k = kc / width, i = kc % width;
+        wide sum = 0;
+        for (uint32_t t = off[e]; t < off[e + 1]; t++) {
+            sum += (wide)h[(uint64_t)t * H + k] * (wide)rows[(uint64_t)t * width + i];
+        }
+        out[c] = fit64(rel(sum, MOVE_BITS), status);
     }
 }
 
-// Each fine site's part of its packet's rows (`src[p][k][i]`, `k` its place in the packet), added into `dst[t][i]` (`add`)
-// or written there. `w` are the fine sites' words, `packet_off` the packets' region offsets.
-extern "C" __global__ void field_scale_scatter(FieldWords w, const int64_t *src, int64_t *dst, const uint32_t *packet_off, uint32_t width, uint32_t period, uint32_t add) {
+extern "C" __global__ void field_level_chart32(FieldWords w, const int32_t *rows, const int64_t *h, const uint32_t *off, uint64_t epochs, uint32_t H, uint32_t width, int64_t *out) {
+    level_chart<int32_t>(rows, h, off, epochs, H, width, out, w.status);
+}
+
+extern "C" __global__ void field_level_chart64(FieldWords w, const int64_t *rows, const int64_t *h, const uint32_t *off, uint64_t epochs, uint32_t H, uint32_t width, int64_t *out) {
+    level_chart<int64_t>(rows, h, off, epochs, H, width, out, w.status);
+}
+
+// [definition; theory, November 13, the design record §4.9] **Each place's row from its epoch's harmonic blocks** (the host's
+// `uncharted`): `release(Σ_k h[t][k] v[e(t)][k W + c], 30)`, added into `dst[t][c]` (`add`) or written there. One thread an entry.
+extern "C" __global__ void field_level_unchart(FieldWords w, const int64_t *v, const int64_t *h, const uint32_t *epoch, uint32_t H, uint32_t width, int64_t *dst, uint32_t add) {
     const uint64_t cells = (uint64_t)w.T * width;
     for (uint64_t c = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; c < cells; c += (uint64_t)gridDim.x * blockDim.x) {
         const uint64_t t = c / width;
         const uint32_t i = c % width;
-        const uint32_t r = w.site_region[t], local = w.site_pos[t];
-        const uint64_t p = packet_off[r] + local / period;
-        const int64_t v = src[(p * period + local % period) * width + i];
-        dst[c] = add ? fit64((wide)dst[c] + (wide)v, w.status) : v;
+        const int64_t *vt = v + (uint64_t)epoch[t] * H * width;
+        wide sum = 0;
+        for (uint32_t k = 0; k < H; k++) {
+            sum += (wide)h[t * H + k] * (wide)vt[(uint64_t)k * width + i];
+        }
+        const int64_t r = fit64(rel(sum, MOVE_BITS), w.status);
+        dst[c] = add ? fit64((wide)dst[c] + (wide)r, w.status) : r;
     }
 }
 
