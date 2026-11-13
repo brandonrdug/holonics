@@ -606,16 +606,20 @@ pub(super) fn train(args: &[String], realization: &mut dyn FieldRealization) -> 
         println!("STORE_SAVE k={done} sections={since} states={} moved={moved} square={square} priced={priced} transfer={transfers} external={externals} curvature={curvatures} octave={} rate={} {} ms={}", mean.states(), step_transfer(2 * transfers, curvatures), learner.rate_bits, counters_text(realization), started.elapsed().as_millis());
     }
     if host_phases {
-        let ms = |ns: u128| ns as f64 / 1e6;
+        // A reading's milliseconds to one decimal from its nanoseconds, nearest (integers: the guard lints bar floats in this crate).
+        let ms = |ns: u128| {
+            let tenths = (ns + 50_000) / 100_000;
+            format!("{}.{}", tenths / 10, tenths % 10)
+        };
         // [measurement; theory, November 13, P58 item 4] The deposit's parts (`SECTION_PARTS`).
         let parts: Vec<String> = holonics::hnn::tower::field::SECTION_PARTS
             .iter()
             .zip(holonics::hnn::tower::field::SECTION_PART_NAMES)
-            .map(|(p, name)| format!("{name}_ms={:.1}", ms(u128::from(p.load(std::sync::atomic::Ordering::Relaxed)))))
+            .map(|(p, name)| format!("{name}_ms={}", ms(u128::from(p.load(std::sync::atomic::Ordering::Relaxed)))))
             .collect();
         println!("STORE_DEPOSIT_PARTS sections={done} {}", parts.join(" "));
         println!(
-            "STORE_HOST sections={done} cut_ms={:.1} views_ms={:.1} realized_ms={:.1} mean_ms={:.1} lines_ms={:.1} pass_ms={:.1} saves_ms={:.1} elapsed_ms={}",
+            "STORE_HOST sections={done} cut_ms={} views_ms={} realized_ms={} mean_ms={} lines_ms={} pass_ms={} saves_ms={} elapsed_ms={}",
             ms(host[0]),
             ms(host[1]),
             ms(host[2]),
@@ -689,6 +693,12 @@ const SURPRISE_OCTAVES: usize = 40;
 /// The octaves the writer's partitions read (octave 8 holds the farthest place a run of at most 511 places draws; a run that ends a piece
 /// may reach one octave more).
 const READ_OCTAVES: usize = 10;
+
+/// A share `n/d` to four decimals, nearest, as a reading prints it (integers: the guard lints bar floats in this crate).
+fn share4(n: u128, d: u128) -> String {
+    let v = (n * 10_000 + d.max(1) / 2) / d.max(1);
+    format!("{}.{:04}", v / 10_000, v % 10_000)
+}
 
 /// [measurement; theory, November 13, P56 item 2 (G128 b)] `read-ticks UNITS UNITS_SHA STORE STORE_SHA ROLE KEYS KEYS_SHA CODEC CODEC_SHA SECTIONS STATE
 /// STATE_SHA`: **a site's chart from tick to tick**, a reading. The pass's next `SECTIONS` sections, cut from the state's pass line as `train-store`
@@ -795,11 +805,11 @@ pub(super) fn read_ticks(args: &[String], realization: &mut dyn FieldRealization
                     }
                 }
                 println!(
-                    "TICKS_HIST chart={} kind={} tick={k} sites={total} zero_share={:.4} ge8_share={:.4} median_bits={} counts={}",
+                    "TICKS_HIST chart={} kind={} tick={k} sites={total} zero_share={} ge8_share={} median_bits={} counts={}",
                     ["read", "pair_read"][c],
                     ["definite", "open"][kind],
-                    h[0] as f64 / total as f64,
-                    ge8 as f64 / total as f64,
+                    share4(h[0] as u128, total as u128),
+                    share4(ge8 as u128, total as u128),
                     if median == i64::MAX { "zero".to_string() } else { median.to_string() },
                     (1..BINS).filter(|&b| h[b] > 0).map(|b| format!("{}:{}", b as i64 - 65, h[b])).collect::<Vec<_>>().join(",")
                 );
