@@ -322,7 +322,19 @@ repository was reset on September 24; the pre-reset tree is
     in one hold before any rewrite (G138, fixed November 13, the order P59): a product of
     their ratios under 60 ms builds the layout whole, 60 to 90 builds only the mechanisms
     that remove 5 ms or more, and over 90 leaves the family's form and takes its multiple by
-    law (fewer pair-terms a site, the contact's declared widths).
+    law (fewer pair-terms a site, the contact's declared widths). Read (`p59_copies.txt`, one
+    hold, the null copies giving their entries' words): the family at the products of its
+    copies' ratios stands at 91.1 ms of 118.9 over the controls and 98.7 over the null copies,
+    0.77 and 0.83 of itself; resident rows remove at most 6.8 ms a section, walk order 1.9,
+    plain reductions 3.0 and the columns' record 9.6 before its own pass. Of 17 parts 15 held
+    and the total missed above. The pair kernels are bound by their arithmetic and their walk,
+    so no layout is built on them: the contact's widths are restated by a record that keeps
+    every term in a row's sums (the November 1 record's §14.11), the pair-terms a site follow
+    the level, and the columns' record is carried into that rewrite (the engine record §8).
+    The next realization is a site's maps (G117, the order P61): seven entries at 56.3 ms and
+    4.03e11 products a second, where the card's measured yardstick for their shape reads
+    1.46e12 and 5.19e12; the transposed map and the outer sums read each word from the card's
+    memory once a product or once an entry and sum in 128 bits. Guessed: 20 ms (13 to 32).
   - The level above is designed on the news, and three count rulers fixed its choices
     (November 13; [the design record](research/records/2026-11-13_A_LEVELS_SITES_ARE_THE_EPOCHS_OF_ITS_NEWS_BEGUN_AGAIN_AT_EACH_OPENING_ITS_CLOCK_IS_THE_NEWS_BETWEEN_THEM_A_PLACES_NEWS_IS_READ_AT_ITS_CAVITY_FACE_AND_EACH_NAVIGATOR_KEEPS_ITS_LOCATED_CLOCK.md)). A level has two things the
     record of the symbol's length ran together: its places (where a receiver's section is

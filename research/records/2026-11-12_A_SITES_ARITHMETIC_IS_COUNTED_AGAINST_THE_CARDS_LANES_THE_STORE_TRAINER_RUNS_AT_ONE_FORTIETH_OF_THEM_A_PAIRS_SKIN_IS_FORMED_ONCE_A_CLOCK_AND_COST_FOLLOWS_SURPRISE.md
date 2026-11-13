@@ -257,3 +257,78 @@ slice do (P49). The count's rows are from the source and not from a measured ker
 ceilings are published figures. The skin's and the phase's shares of their entries are counted
 from instructions and are G116's subject. Whether the constitution's size or the step's rate
 limits the level is not read here.
+
+## 8. The pair kernels' layout was read on copies before any rewrite, and their multiple is the law's (G138, November 13)
+
+After step 6 a section reads 279.4 ms, 6.9 times the bar, and the contact family holds 115.6 ms of
+a profiled section in 72 launches (`p57_schedule.txt`). The layout of §6's phase 2 and of the
+forecasts (a pair's record in walk order, a region's rows resident in its block, the forward's
+entries as one launch and the return's as one) was the next build by G131's rule. Before any
+rewrite its mechanisms were read one at a time (`p59_copies.txt`, with `p59_copies.py` and
+`g138_lines.py`; the order P59, the guess G138 fixed before the read).
+
+**The instrument.** A copy of each pair entry, generated from the entry's own text with every
+substitution counted, launched immediately before its entry on the entry's words, its outputs in
+scratch arrays that start as the entry's. One mechanism a copy and a null copy of each entry; the
+copies are compiled only under a feature, and with it off the kernels' PTX is main's byte for
+byte. One hold of the card: a profiled control, the copies' run, a profiled control, sections
+2,001 to 2,100 from run 2's `STATE.1900`; all three print the line's 100 section lines and end on
+the line's state and mean. The null copies lower as their entries and give their words (0
+differing words over every array). A null copy reads 0.90 to 1.00 of its entry's controls by its
+place before the entry alone, so each ratio is given over the controls and, in brackets, over the
+null copy.
+
+| mechanism | rows (30.74 ms) | columns (25.65) | forward contact, five limbs (26.39) | skin's return (16.86) | exposure (8.57) |
+|---|---|---|---|---|---|
+| source rows resident (each load of another site's row reads the warp's own) | 0.881 [0.881] | 0.852 [0.946] | 0.951 [0.982] | 0.888 [0.941] | 0.938 [0.980] |
+| a pair's words in walk order | 0.967 [0.967] | | 0.963 [0.994] | 0.945 [1.001] | 0.891 [0.931] |
+| the reductions as plain stores | 0.937 [0.937] | | | 0.885 [0.938] | |
+| the columns from a record in column order | | 0.565 [0.627] | | | |
+
+The columns from their record read 0.422 on the paced heads and 0.839 on the still ones; the
+record was laid by a pass of its own at 14.1 ms a section, outside the copy's time. With each
+entry at the product of its copies' ratios and the small entries as they stand, the family reads
+91.1 ms from 118.9 in this hold's controls by the ratios over the controls, and 98.7 by the ratios
+over the null copies: 0.77 and 0.83 of itself. Summed over the entries and read over the null
+copies, resident rows remove at most 6.8 ms a section, walk order 1.9, plain reductions 3.0 and
+the columns' record 9.6 before its own cost. Of G138's 17 parts 15 held; the exposure's resident
+rows and the family's total missed, both above.
+
+**What it says.** The pair kernels are bound by their arithmetic and their walk, never by where
+their words lie. The forecasts by a count of gathers (27.5 ms and under for the family) overstated
+what a layout takes, as G120 had read of the rows. In the controls the forward contact at five
+limbs lowers to 9,720 instructions with 2,137 multiply-adds, 524 wide ones and 778 spill stores;
+the rows to 7,680 instructions with 1,987 and 632 on 128 registers.
+
+**The rule applied** (fixed before the read: the family over 90 ms). The family's form stands and
+no layout is built on it. Its multiple is the law's, each part with its record first:
+- *the contact's declared widths.* A row's carrier is `row_bits` and its spread: 62 bits of a
+  term's face, 62 of its weight, 64 of a value, and the counts, 225 and the spread, so five limbs
+  hold a spread of 95 and no row's own spread lowers them. The bits ruler reads a value at 23
+  bits, a unit word at 18 and a score at 23 (`p54_word_bits.txt`). The weight is `2^62` or a
+  crowd's count times it in every term of the present law (`agent-inferred`, from
+  `Field::contact`'s two pushes), a factor the row's one quotient cancels. The record owed
+  restates each width from what consumes the word, with §14.11 of the November 1 record kept:
+  every term enters the row's sums, no peak is subtracted and nothing is released without its
+  remainder. A carrier anchored at a row's peak that released the terms under it to nothing is
+  the build that section retired.
+- *the pair-terms a site.* A site holds 1,124 pair-terms (70 a head and tick). The level above
+  takes the far field of a place into an epoch's word, and the length of a region under it is
+  the design record's subject after the opening's comparison is read (G139).
+
+The columns' record is the one mechanism past 5 ms a section. It is carried into the build that
+rewrites the support under those two laws, where the forward entry writes it, and is not built as
+a step of its own on kernels about to be rewritten (`agent-inferred`).
+
+**The next realization: a site's maps** (G117, fixed before its build; the order P61). The profile
+outside the contact is flat except for one family. A site's maps hold 56.3 ms a profiled section
+in seven entries and stand at 4.03e11 products a second, where the card's measured yardstick for
+a map of their shape reads 1.46e12 with one thread a cell and 5.19e12 with one thread four
+outputs of four sites (`p50_step0.txt`). No step has changed them. Read at source: the forward
+map holds its weights and four sites' rows in shared memory and is the nearest to the yardstick
+(6.9e11 a second on a map of 64 by 64); the transposed map reads every weight and every covector
+word from the card's memory once a product and sums in 128 bits; the outer sum reads each word of
+a tile of 64 sites once an entry, 4,096 times, and adds each entry's partial by a 128-bit atomic
+step once a tile. The build gives the three kinds the yardstick's form with the same integers
+(a 64-bit covector as two 32-bit limbs whose sums stand in 64 bits where a tile's magnitudes
+prove it). G117 guesses the family at 20 ms (13 to 32) and the section at 0.885 of its control.
