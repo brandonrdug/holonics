@@ -290,6 +290,16 @@ pub struct FieldDeclaration {
     /// `hnn-field-v14e` exactly as before and every path is the one before it; `J > 0` writes `hnn-field-v14f`, the thirteen words of `v14e` with
     /// `C` written even where it is zero, then `J`.
     pub triads: usize,
+    /// [definition; theory, November 13, the design record of that day §4.4a (G132, G139)] **The opening is compared**: the cavity opening of every
+    /// place of a region (§4.4: the unresolved row in place of the place's own, its two neighbours' strand rows, and the moment's chart on the moment
+    /// the others bring at their standing phases, the place's own term absent and its own stride bare, [`Field::cavity_openings`]) is read through a
+    /// lift of its own onto the one tied face, `p̃_t = face(tied(R⁰ chart(x^cav_t) + b⁰))` at temperature one, and compared at the class the passage
+    /// holds there at unit gain ([`FieldLayout::opening`]). Why (§4.4a): the opening's chart holds 2.502 nats of news of its place where the class
+    /// frequencies code 3.435, and the trained readout reads the same words at 8.260: what it misses is the opening's frame, so the opening takes a
+    /// transport of its own, and a written place's surprise is as physical as an open one's. The block is founded at zero ([`Field::with_opening`])
+    /// as the last families. `false` writes every head line exactly as before; `true` writes `hnn-field-v14g`, the fourteen words of `v14f` with `C`
+    /// and `J` written even at zero, then `1`. The declaration carries it; no variable, flag or argument decides it.
+    pub opening: bool,
 }
 
 impl FieldDeclaration {
@@ -583,8 +593,16 @@ impl FieldDeclaration {
     fn to_text(self) -> String {
         // [theory, November 12, the triad record §4] With triads the head is `v14f`: `v14e`'s words with `C` written even at zero, then `J`; without
         // them the line before, exactly.
-        let head = if self.triads > 0 { "hnn-field-v14f" } else if self.carry > 0 { "hnn-field-v14e" } else { "hnn-field-v14" };
-        let tail = if self.triads > 0 { format!(" {} {}", self.carry, self.triads) } else if self.carry > 0 { format!(" {}", self.carry) } else { String::new() };
+        let head = if self.opening { "hnn-field-v14g" } else if self.triads > 0 { "hnn-field-v14f" } else if self.carry > 0 { "hnn-field-v14e" } else { "hnn-field-v14" };
+        let tail = if self.opening {
+            format!(" {} {} 1", self.carry, self.triads)
+        } else if self.triads > 0 {
+            format!(" {} {}", self.carry, self.triads)
+        } else if self.carry > 0 {
+            format!(" {}", self.carry)
+        } else {
+            String::new()
+        };
         format!("{head} {} {} {} {} {} {} {} {} {} {} {}{tail}", self.alphabet, self.width, self.heads, self.modes, self.still, self.contacts, self.ticks, self.frames, self.reach, self.lanes, self.depth)
     }
 
@@ -592,23 +610,28 @@ impl FieldDeclaration {
         let words: Vec<&str> = line.split(' ').collect();
         // A v13 head line is a field with no depth ring (the line before the depth rings, its states the line's own).
         let n = |w: &str| w.parse::<usize>().map_err(|_| TowerError::Refused("a field's declaration that is not a count"));
-        let (depth_word, carry, triads) = match (words.first().copied(), words.len()) {
-            (Some("hnn-field-v14"), 12) => (Some(words[11]), 0, 0),
+        let (depth_word, carry, triads, opening) = match (words.first().copied(), words.len()) {
+            (Some("hnn-field-v14"), 12) => (Some(words[11]), 0, 0, false),
             (Some("hnn-field-v14e"), 13) => match n(words[12])? {
                 0 => return refuse("an hnn-field-v14e head line with no carry circles (a field without them is hnn-field-v14)"),
-                c => (Some(words[11]), c, 0),
+                c => (Some(words[11]), c, 0, false),
             },
             // [theory, November 12, the triad record §4] `C` may be zero here, `J` may not, as `v14e` refuses `C = 0`.
             (Some("hnn-field-v14f"), 14) => match n(words[13])? {
                 0 => return refuse("an hnn-field-v14f head line with no triads (a field without them is hnn-field-v14 or hnn-field-v14e)"),
-                j => (Some(words[11]), n(words[12])?, j),
+                j => (Some(words[11]), n(words[12])?, j, false),
+            },
+            // [theory, November 13, §4.4a] The opening's word is one; a field without the comparison writes a line before `v14g`.
+            (Some("hnn-field-v14g"), 15) => match n(words[14])? {
+                1 => (Some(words[11]), n(words[12])?, n(words[13])?, true),
+                _ => return refuse("an hnn-field-v14g head line whose opening word is not one (a field without the comparison writes the line before it)"),
             },
             (Some("hnn-field-v14k"), _) => return refuse("the carry founded at zero friction is retired (hnn-field-v14k): its states are receipts only"),
             (Some("hnn-field-v14t"), _) => return refuse("the carry's leak on its linear chart is retired (hnn-field-v14t): its states are receipts only"),
-            (Some("hnn-field-v13"), 11) => (None, 0, 0),
+            (Some("hnn-field-v13"), 11) => (None, 0, 0, false),
             _ => return refuse("a field's head line that is not hnn-field-v14"),
         };
-        let d = Self { alphabet: n(words[1])?, width: n(words[2])?, heads: n(words[3])?, modes: n(words[4])?, still: n(words[5])?, contacts: n(words[6])?, ticks: n(words[7])?, frames: n(words[8])?, reach: n(words[9])?, lanes: n(words[10])?, depth: depth_word.map(n).transpose()?.unwrap_or(0), carry, triads };
+        let d = Self { alphabet: n(words[1])?, width: n(words[2])?, heads: n(words[3])?, modes: n(words[4])?, still: n(words[5])?, contacts: n(words[6])?, ticks: n(words[7])?, frames: n(words[8])?, reach: n(words[9])?, lanes: n(words[10])?, depth: depth_word.map(n).transpose()?.unwrap_or(0), carry, triads, opening };
         d.admit()?;
         Ok(d)
     }
@@ -676,6 +699,11 @@ pub struct FieldLayout {
     pub triad: usize,
     pub triad_bias: usize,
     pub w_triad: usize,
+    /// [definition; theory, November 13, §4.4a] **The opening's lift** ([`FieldDeclaration::opening`]): `R⁰`, `D` rows of `D` columns on the
+    /// material's grain, entry `(o, i)` at `opening + o·D + i` as the readout's lift `read` is laid, and its bias `b⁰`, `D` on the face's grain at
+    /// `opening_bias`; the last families, zero long where the opening is not compared.
+    pub opening: usize,
+    pub opening_bias: usize,
     pub len: usize,
     pub families: Vec<(usize, usize, u32)>,
 }
@@ -728,7 +756,9 @@ impl FieldLayout {
         };
         let (carry, carry_bias) = (tail(2 * d.carry * dw, MATERIAL_BITS), tail(2 * d.carry, FACE_BITS));
         let (triad, triad_bias, w_triad) = (tail(6 * d.triads * dw, MATERIAL_BITS), tail(6 * d.triads, FACE_BITS), tail(dw * 2 * d.triads, MATERIAL_BITS));
-        Self { enc, before, after, q, q_bias, v, v_bias, out, out_bias, a: a_, a_bias, b, b_bias, w, w_bias, read, read_bias, moment_before, moment_after, temper, probe, probe_bias, pace, moment_face, moment_face_bias, lift_bias, carry, carry_bias, triad, triad_bias, w_triad, len: at, families }
+        let opened = usize::from(d.opening);
+        let (opening, opening_bias) = (tail(opened * dw * dw, MATERIAL_BITS), tail(opened * dw, FACE_BITS));
+        Self { enc, before, after, q, q_bias, v, v_bias, out, out_bias, a: a_, a_bias, b, b_bias, w, w_bias, read, read_bias, moment_before, moment_after, temper, probe, probe_bias, pace, moment_face, moment_face_bias, lift_bias, carry, carry_bias, triad, triad_bias, w_triad, opening, opening_bias, len: at, families }
     }
 }
 
@@ -2599,6 +2629,295 @@ impl Field {
         Ok(out)
     }
 
+    /// [definition; theory, November 13, the design record of that day §4.4a] **Each place's cavity moment** `[t][2M]` on `2^(−16)`
+    /// ([`moment::cavity_moments`]): the moment the region's other places bring to `t` at their standing phases, `t`'s own terms absent and its
+    /// own stride bare (`κ_t = 1`, the rate of a silent place, §16.28), from the region's standing sums: the strands' rows as the region holds
+    /// them, and on a paced head `t`'s cavity clock `τ_(t−1) + 1`, `σ_(t−1) + 1` (zero at the region's first place, whose clock is zero either way).
+    fn cavity_moments_of(&self, region: &Region, paces: &Paces) -> Result<Vec<i64>> {
+        let d = &self.declaration;
+        let (m, n, sites, tm) = (d.complex(), d.modes, region.classes.len(), d.moment_modes());
+        let mut out = vec![0i64; sites * 2 * m];
+        if tm == 0 {
+            return Ok(out);
+        }
+        let l = &self.layout;
+        let rows = |base: usize| -> Vec<Vec<i64>> { (0..sites).map(|t| self.strand_row(region, base, 2 * tm, t)).collect() };
+        let (eb, ea) = (rows(l.moment_before), rows(l.moment_after));
+        for h in (0..d.heads).filter(|&h| d.carries_moment(h) && !d.is_depth(h)) {
+            let (tau_c, sigma_c) = Self::cavity_clocks(paces, h, sites);
+            for li in 0..n {
+                let idx = d.moment_index(h) + li;
+                let slot = self.slot(h, li);
+                let (period, ring) = &self.rings[slot];
+                let pick = |e: &[Vec<i64>]| -> Vec<(i64, i64)> { e.iter().map(|r| (r[idx], r[tm + idx])).collect() };
+                let (turn, skin) = (|r: i128| self.turn(slot, r), |s: i128| self.skin(slot, s));
+                let pace = self.pace_of(paces, h, &turn, &skin);
+                let s = moment::cavity_moments(&pick(&eb), &pick(&ea), ring, *period, &self.decays[slot], pace.as_ref(), &tau_c, &sigma_c)?;
+                for (t, &(re, im)) in s.iter().enumerate() {
+                    out[t * 2 * m + h * n + li] = re;
+                    out[t * 2 * m + m + h * n + li] = im;
+                }
+            }
+        }
+        Ok(out)
+    }
+
+    /// [definition; theory, November 13, the design record of that day §4.4a] **A paced head's cavity clocks** `(τ_c, σ_c)` over a region: at each
+    /// place the clocks it would hold silent, `τ_(t−1) + 1` and `σ_(t−1) + 1` (zero at the region's first place, whose clock is zero either way);
+    /// empty where the head reads no pace.
+    fn cavity_clocks(paces: &Paces, h: usize, sites: usize) -> (Vec<i64>, Vec<i64>) {
+        let one = 1i64 << PACE_BITS;
+        let cavity = |clock: &[i64]| -> Vec<i64> { (0..sites).map(|t| if t == 0 { 0 } else { clock[t - 1] + one }).collect() };
+        match paces.row.get(h).copied().flatten() {
+            Some(p) => (cavity(&paces.tau[p]), cavity(&paces.sigma[p])),
+            None => (Vec::new(), Vec::new()),
+        }
+    }
+
+    /// [definition; theory, November 13, the design record of that day §4.4 and §4.4a] **Each place's cavity opening** `[t][D]` on the opening's
+    /// grain: `x^cav_t = E(∗) + E₋(u_(t−1)) + E₊(u_(t+1)) + release(C s^cav_t + b_s, 24)`, the unresolved row in place of the place's own, its two
+    /// neighbours' strand rows as the region holds them (a carried neighbour by its mixture), and the moment's chart on the cavity moment
+    /// ([`Field::cavity_moments_of`]). At an open, silent place it is the built opening. Formed from the region's sums once, never by rebuilding
+    /// the region once a place. A reading and the opening's comparison's operand: no state changes.
+    pub fn cavity_openings(&self, region: &Region) -> Result<Vec<i64>> {
+        self.admit_region(region)?;
+        let paces = self.paces(region)?;
+        Ok(self.cavity_forward(region, &paces)?.0)
+    }
+
+    /// The cavity openings ([`Field::cavity_openings`]) and the cavity moments they read, on the region's clocks `paces`.
+    fn cavity_forward(&self, region: &Region, paces: &Paces) -> Result<(Vec<i64>, Vec<i64>)> {
+        let d = &self.declaration;
+        let (dw, m2) = (d.width, 2 * d.complex());
+        let sites = region.classes.len();
+        let moment = self.cavity_moments_of(region, paces)?;
+        let l = &self.layout;
+        let reach_c = reach(&self.theta[l.moment_face..l.moment_face + dw * m2]);
+        let unresolved = l.enc + d.alphabet * dw;
+        let mut x = vec![0i64; sites * dw];
+        let mut term = vec![0i64; dw];
+        for (t, xt) in x.chunks_exact_mut(dw).enumerate() {
+            for (slot, &e) in xt.iter_mut().zip(&self.theta[unresolved..unresolved + dw]) {
+                *slot += e as i64;
+            }
+            if t > 0 {
+                self.opening_term(region, l.before, t - 1, xt);
+            }
+            if t + 1 < sites {
+                self.opening_term(region, l.after, t + 1, xt);
+            }
+            affine(&self.theta[l.moment_face..l.moment_face + dw * m2], reach_c, m2, &moment[t * m2..(t + 1) * m2], Some(&self.theta[l.moment_face_bias..l.moment_face_bias + dw]), MATERIAL_BITS, MATERIAL_BITS, &mut term)?;
+            for (slot, &v) in xt.iter_mut().zip(&term) {
+                *slot = fit64(*slot as i128 + v as i128)?;
+            }
+        }
+        Ok((x, moment))
+    }
+
+    /// [definition; theory, November 13, P60 item 1d] **The places the opening compares**: every place of the region before its port (a port's places
+    /// take their coupling's comparison at the last tick, which names no class; `agent-inferred`), written or open.
+    fn opening_end(region: &Region) -> usize {
+        region.port.map_or(region.classes.len(), |p| p.start)
+    }
+
+    /// [definition; theory, November 13, P60 item 1d] **The opening's read of a cavity opening** `x` (`D` words): the lane chart `r̂`, the opening's
+    /// lift `y⁰ = R⁰ r̂ + b⁰` (its own block, founded at zero), the face through the encoding (`tied`) at temperature one: the forms [`Field::face_of`]
+    /// uses with the opening's block in place of the read block. `reach_o` is the opening block's reach.
+    fn opening_read(&self, x: &[i64], reach_o: u64) -> Result<BlankRead> {
+        let (d, l) = (&self.declaration, &self.layout);
+        let dw = d.width;
+        let (mut r, mut s) = (Vec::with_capacity(dw), Vec::with_capacity(d.lanes));
+        lane_chart(x, d.lanes, &mut r, &mut s)?;
+        let mut y = vec![0i64; dw];
+        affine(&self.theta[l.opening..l.opening + dw * dw], reach_o, dw, &r, Some(&self.theta[l.opening_bias..l.opening_bias + dw]), MATERIAL_BITS, MATERIAL_BITS, &mut y)?;
+        let mut z = vec![0i64; d.alphabet];
+        self.tied(&y, &mut z)?;
+        Ok(BlankRead { read: r, scale: s, lift: y, face: self.tempered(&z, 1) })
+    }
+
+    /// [measurement; theory, November 13, P60 items 1d and 7] **The opening's faces at every place** of a region: each place's cavity opening read
+    /// through the opening's lift ([`Field::opening_read`]), written or open. Refused on a field without the opening's block. A reading: no state
+    /// changes; in a release it is read and compared with nothing.
+    pub fn opening_faces(&self, region: &Region) -> Result<Vec<TowerFace>> {
+        if !self.declaration.opening {
+            return refuse("an opening's faces on a field without the opening's lift");
+        }
+        let dw = self.declaration.width;
+        let (x, _) = {
+            self.admit_region(region)?;
+            let paces = self.paces(region)?;
+            self.cavity_forward(region, &paces)?
+        };
+        let l = &self.layout;
+        let reach_o = reach(&self.theta[l.opening..l.opening + dw * dw]);
+        x.chunks_exact(dw).map(|xt| Ok(self.opening_read(xt, reach_o)?.face)).collect()
+    }
+
+    /// [definition; theory, November 13, P60 item 1d] **The opening's code at every compared place** ([`Field::opening_end`]): `−log₂ p̂⁰_t(u_t)` on
+    /// `2^(−20)` bits, the class the passage holds at the place (at a masked place the class the last tick is compared with), `None` past the
+    /// region's port. Empty on a field without the opening's block.
+    pub fn opening_codes(&self, region: &Region) -> Result<Vec<Option<i64>>> {
+        if !self.declaration.opening {
+            return Ok(Vec::new());
+        }
+        let end = Self::opening_end(region);
+        Ok(self.opening_faces(region)?.iter().enumerate().map(|(t, f)| (t < end).then(|| f.code(region.classes[t]))).collect())
+    }
+
+    /// [definition; theory, November 13, P60 item 1e] **The opening's comparison returned through the operands that produced it**: at every compared
+    /// place, the covector face minus the class's indicator at unit gain (`covector`, no domain weight) through the encoding's bias and rows
+    /// (`tied`), the opening's lift and bias, the chart and its lanes; then the cavity opening's covector into the unresolved row, the two
+    /// neighbours' strand rows, the moment's chart and bias, and through the chart into the cavity moments' covector, which returns to the other
+    /// places' moment terms ([`Field::cavity_moments_return`]) and their clocks (added into `gtau`, `gsig`, the region's own clock's covectors,
+    /// folded into the strides with the pass's own). No place's own row, own moment term or own stride is an operand of its comparison, so none is
+    /// returned to.
+    ///
+    /// `places` are the places compared, `0..opening_end` in the law (a test reads one place's return alone).
+    #[allow(clippy::too_many_arguments)]
+    fn opening_compare_return(&self, region: &Region, paces: &Paces, places: std::ops::Range<usize>, g: &mut [i128], gtau: &mut [Vec<i128>], gsig: &mut [Vec<i128>]) -> Result<()> {
+        let d = &self.declaration;
+        let (dw, m2, a, lanes) = (d.width, 2 * d.complex(), d.alphabet, d.lanes);
+        let sites = region.classes.len();
+        if places.end > Self::opening_end(region) {
+            return refuse("an opening compared past its region's compared places");
+        }
+        let l = &self.layout;
+        let reaches = self.reaches();
+        let reach_o = reach(&self.theta[l.opening..l.opening + dw * dw]);
+        let (x, moment) = self.cavity_forward(region, paces)?;
+        let mut dx = vec![0i64; sites * dw];
+        let (mut ys, mut rs): (Vec<Vec<i64>>, Vec<Vec<i32>>) = (Vec::new(), Vec::new());
+        for t in places.clone() {
+            let read = self.opening_read(&x[t * dw..(t + 1) * dw], reach_o)?;
+            let dz = covector(&read.face, region.classes[t]);
+            for (o, &dzo) in dz.iter().enumerate() {
+                g[l.read_bias + o] += dzo as i128;
+            }
+            // Through the encoding: `δE(c)_i += release(δz_c y⁰_i, 16)`, `δy⁰_i = release(Σ_c δz_c E(c)_i, 16)`.
+            let mut dy = vec![0i64; dw];
+            for (i, slot) in dy.iter_mut().enumerate() {
+                let sum: i128 = dz.iter().enumerate().map(|(c, &dzc)| dzc as i128 * self.theta[l.enc + c * dw + i] as i128).sum();
+                *slot = fit64(release(sum, STATE_BITS))?;
+            }
+            for (c, &dzc) in dz.iter().enumerate().take(a) {
+                for (i, &yi) in read.lift.iter().enumerate() {
+                    g[l.enc + c * dw + i] += release(dzc as i128 * yi as i128, STATE_BITS);
+                }
+            }
+            for (i, &dyi) in dy.iter().enumerate() {
+                g[l.opening_bias + i] += dyi as i128;
+            }
+            let mut dr = vec![0i64; dw];
+            transposed(&self.theta[l.opening..l.opening + dw * dw], reach_o, dw, &dy, MATERIAL_BITS, &mut dr)?;
+            let back = lane_adjoint(&read.read, &read.scale[..lanes], &dr)?;
+            dx[t * dw..(t + 1) * dw].copy_from_slice(&back);
+            ys.push(dy);
+            rs.push(read.read);
+        }
+        let xs: Vec<&[i32]> = rs.iter().map(Vec::as_slice).collect();
+        outer_sum(&mut g[l.opening..l.opening + dw * dw], dw, &ys, &xs)?;
+        // The cavity opening's covector: the unresolved row, the neighbours' strand rows, and the moment's chart on the cavity moment.
+        let unresolved = l.enc + a * dw;
+        let (mf, mfb) = (l.moment_face, l.moment_face_bias);
+        let dxs: Vec<&[i64]> = dx.chunks_exact(dw).collect();
+        let ss: Vec<&[i64]> = moment.chunks_exact(m2).collect();
+        outer_sum(&mut g[mf..mf + dw * m2], m2, &dxs[places.clone()], &ss[places.clone()])?;
+        let mut dm = vec![0i128; sites * m2];
+        let mut back = vec![0i64; m2];
+        for t in places {
+            let dxt = dxs[t];
+            for (i, &v) in dxt.iter().enumerate() {
+                g[unresolved + i] += v as i128;
+                g[mfb + i] += v as i128;
+            }
+            if t > 0 {
+                self.opening_return(region, l.before, t - 1, dxt, g);
+            }
+            if t + 1 < sites {
+                self.opening_return(region, l.after, t + 1, dxt, g);
+            }
+            transposed(&self.theta[mf..mf + dw * m2], reaches.moment_face, m2, dxt, MATERIAL_BITS, &mut back)?;
+            for (slot, &b) in dm[t * m2..(t + 1) * m2].iter_mut().zip(&back) {
+                *slot += b as i128;
+            }
+        }
+        self.cavity_moments_return(region, paces, &dm, g, gtau, gsig)
+    }
+
+    /// [definition; theory, November 13, P60 item 1e] **The cavity moments' return** ([`moment::cavity_moments_return`]): the cavity moments'
+    /// covector `dm` (`[t][2M]` on `2^(−24)`) back to the strands' moment encodings of the places that brought each term, and on a paced head to
+    /// their clocks ([`moment::cavity_pace_return`]), added into `gtau`, `gsig`.
+    fn cavity_moments_return(&self, region: &Region, paces: &Paces, dm: &[i128], g: &mut [i128], gtau: &mut [Vec<i128>], gsig: &mut [Vec<i128>]) -> Result<()> {
+        let d = &self.declaration;
+        let (m, n, sites, tm) = (d.complex(), d.modes, region.classes.len(), d.moment_modes());
+        if tm == 0 {
+            return Ok(());
+        }
+        let l = &self.layout;
+        let rows = |base: usize| -> Vec<Vec<i64>> { (0..sites).map(|t| self.strand_row(region, base, 2 * tm, t)).collect() };
+        let (eb, ea) = (rows(l.moment_before), rows(l.moment_after));
+        let (mut db, mut da) = (vec![vec![0i128; 2 * tm]; sites], vec![vec![0i128; 2 * tm]; sites]);
+        let side = |v: Vec<(i128, i128)>| -> Result<Vec<(i64, i64)>> { v.into_iter().map(|(re, im)| Ok((fit64(release(re, moment::COEFFICIENT_BITS))?, fit64(release(im, moment::COEFFICIENT_BITS))?))).collect() };
+        for h in (0..d.heads).filter(|&h| d.carries_moment(h) && !d.is_depth(h)) {
+            let (tau_c, sigma_c) = Self::cavity_clocks(paces, h, sites);
+            for li in 0..n {
+                let idx = d.moment_index(h) + li;
+                let slot = self.slot(h, li);
+                let (period, ring) = &self.rings[slot];
+                let ds: Vec<(i64, i64)> = (0..sites).map(|t| Ok((fit64(dm[t * 2 * m + h * n + li])?, fit64(dm[t * 2 * m + m + h * n + li])?))).collect::<Result<_>>()?;
+                let (turn, skin) = (|r: i128| self.turn(slot, r), |s: i128| self.skin(slot, s));
+                let pace = self.pace_of(paces, h, &turn, &skin);
+                let (back_b, back_a) = moment::cavity_moments_return(&ds, ring, *period, &self.decays[slot], pace.as_ref(), &tau_c, &sigma_c)?;
+                if let Some(p) = paces.row[h] {
+                    let full = moment::Pace { tau: &paces.tau[p], sigma: &paces.sigma[p], turn: &turn, skin: &skin };
+                    let pick = |e: &[Vec<i64>]| -> Vec<(i64, i64)> { e.iter().map(|r| (r[idx], r[tm + idx])).collect() };
+                    let (before, after) = (pick(&eb), pick(&ea));
+                    let parts = moment::cavity_moment_parts_exact(&before, &after, ring, *period, &self.decays[slot], pace.as_ref(), &tau_c, &sigma_c)?;
+                    let (sb, sa): (Vec<_>, Vec<_>) = parts.into_iter().unzip();
+                    let (sb, sa) = (side(sb)?, side(sa)?);
+                    let (dt, dsg) = moment::cavity_pace_return(&before, &after, &sb, &sa, &ds, &back_b, &back_a, ring, *period, &self.decays[slot], &full, &tau_c, &sigma_c, self.turn_rate(slot))?;
+                    for t in 0..sites {
+                        gtau[p][t] += dt[t];
+                        gsig[p][t] += dsg[t];
+                    }
+                }
+                for t in 0..sites {
+                    (db[t][idx], db[t][tm + idx]) = back_b[t];
+                    (da[t][idx], da[t][tm + idx]) = back_a[t];
+                }
+            }
+        }
+        for t in 0..sites {
+            self.strand_return(region, l.moment_before, 2 * tm, t, &db[t], g);
+            self.strand_return(region, l.moment_after, 2 * tm, t, &da[t], g);
+        }
+        Ok(())
+    }
+
+    /// [measurement; theory, November 13, §4.4a's check] **The cavity openings against the region masked at each place**: for each place `t`, the
+    /// built opening of the region with `t` unresolved and silent (`opening`), and the largest difference by word between it and `t`'s cavity
+    /// opening ([`Field::cavity_openings`]), in units of the opening's last place, over every place, with the place it stood at. A reading.
+    pub fn cavity_check(&self, region: &Region) -> Result<(u64, usize, usize)> {
+        let dw = self.declaration.width;
+        let cav = self.cavity_openings(region)?;
+        let (mut worst, mut at, mut differ) = (0u64, 0usize, 0usize);
+        for t in 0..region.classes.len() {
+            let mut unresolved = region.unresolved.to_vec();
+            unresolved[t] = true;
+            let faces: Vec<Option<Shares>> = (0..region.classes.len()).map(|k| if k == t { None } else { region.faces.get(k).cloned().flatten() }).collect();
+            let masked = Region { unresolved: &unresolved, faces: if region.faces.is_empty() { &[] } else { &faces }, ..*region };
+            let x = self.opening(&masked)?;
+            for (a, b) in x[t * dw..(t + 1) * dw].iter().zip(&cav[t * dw..(t + 1) * dw]) {
+                let gap = a.abs_diff(*b);
+                differ += usize::from(gap != 0);
+                if gap > worst {
+                    (worst, at) = (gap, t);
+                }
+            }
+        }
+        Ok((worst, at, differ))
+    }
+
     /// The moments' return (§15.1, [`moment::moments_return`]): each moment mode's value covector summed
     /// over the ticks, `dm` (`[t][2M]` on `2^(−24)`), back to the strands' encodings.
     fn moments_return(&self, region: &Region, paces: &Paces, dm: &[i128], g: &mut [i128], gtau: &mut [Vec<i128>], gsig: &mut [Vec<i128>]) -> Result<()> {
@@ -3977,6 +4296,12 @@ impl Field {
                 }
             }
         }
+        // [theory, November 13, P60 item 1e] The opening's comparison at every place, where the field has the opening's lift: its covector joins the
+        // last tick's in this one return, and its clocks' covectors join the pass's own before they fold into the strides.
+        if d.opening {
+            let r = returns[0].as_mut().ok_or(TowerError::Refused("a reverse without the pass's clock"))?;
+            self.opening_compare_return(region, &pass.paces, 0..Self::opening_end(region), g, &mut r.gtau, &mut r.gsig)?;
+        }
         // The pass's own clock (the first tick's and the opening's) returns last.
         if let Some(mut r) = returns[0].take() {
             self.clock_return(region, &pass.paces, &[], None, &mut r, g)?;
@@ -5336,6 +5661,10 @@ impl Field {
         if self.declaration.triads > 0 {
             return refuse("a field that already has triads");
         }
+        if self.declaration.opening {
+            // [agent-inferred, November 13] The opening's lift stands after the triads' families; triads grown after it would move it.
+            return refuse("a field with the opening's lift takes triads before it");
+        }
         if triads == 0 {
             return refuse("a growth by no triads");
         }
@@ -5357,6 +5686,32 @@ impl Field {
             *v = fit32((draw * ((num << MATERIAL_BITS) / den) as i128) >> 31, "a triad's founded chart row outgrew its 32-bit carrier")?;
         }
         debug_assert_eq!(cursor, 4 * self.declaration.triad_draws(triads));
+        let mut out = Self::with_theta(d, theta);
+        (out.per_blank_clock, out.bare_stretch) = (self.per_blank_clock, self.bare_stretch);
+        Ok((out, from))
+    }
+
+    /// [definition; theory, November 13, P60 items 1a and 3] **The field with the opening's lift** ([`FieldDeclaration::opening`]): `R⁰` and `b⁰`
+    /// appended at the end of the material, founded at zero, every standing entry kept at its index; no key is read and the draws do not move.
+    /// With `R⁰ = 0` and `b⁰ = 0` the opening's face is the class biases' alone, and the first covector reaches the block through `δR⁰ = δy⁰ r̂ᵀ`.
+    /// Also the map from each new entry to the old one it copies (`None` for the block). Refused on a tower, and on a field that has it.
+    pub fn with_opening(&self) -> Result<(Self, Vec<Option<usize>>)> {
+        if self.scale.is_some() {
+            return refuse("a tower's levels take the opening's lift level by level, not through the fine field alone");
+        }
+        if self.declaration.opening {
+            return refuse("a field that already has the opening's lift");
+        }
+        let d = FieldDeclaration { opening: true, ..self.declaration };
+        d.admit()?;
+        let layout = FieldLayout::new(&d);
+        let mut theta = self.theta.clone();
+        if theta.len() != layout.opening {
+            return refuse("a field whose material does not end where the opening's lift begins");
+        }
+        theta.resize(layout.len, 0);
+        let mut from: Vec<Option<usize>> = (0..self.theta.len()).map(Some).collect();
+        from.resize(layout.len, None);
         let mut out = Self::with_theta(d, theta);
         (out.per_blank_clock, out.bare_stretch) = (self.per_blank_clock, self.bare_stretch);
         Ok((out, from))
@@ -5803,6 +6158,15 @@ pub trait FieldRealization {
         let (faces, g) = self.read_and_return(field, regions)?;
         Ok((faces_at_class(&faces, regions), g))
     }
+    /// [realization; theory, November 13, P60 items 1d and 2] **The training path with the opening's codes**: [`FieldRealization::read_and_return_at_class`]
+    /// and, where the field has the opening's lift, each region's opening code at every compared place ([`Field::opening_codes`]; empty without it).
+    /// By default the codes are the host's; a realization that compares the opening in its own forward returns its own, the same words.
+    #[allow(clippy::type_complexity)]
+    fn read_and_return_opening(&mut self, field: &Field, regions: &[Region]) -> Result<(Vec<Vec<Option<(u128, u128)>>>, Vec<i128>, Vec<Vec<Option<i64>>>)> {
+        let (at_class, g) = self.read_and_return_at_class(field, regions)?;
+        let codes = if field.declaration.opening { regions.par_iter().map(|r| field.opening_codes(r)).collect::<Result<_>>()? } else { Vec::new() };
+        Ok((at_class, g, codes))
+    }
     fn read_faces(&mut self, field: &Field, regions: &[Region]) -> Result<Vec<Vec<Option<TowerFace>>>>;
     /// Each unresolved site's readout logits on `2^(−16)` bits ([`Field::logits`]), the release's read.
     fn read_logits(&mut self, field: &Field, regions: &[Region]) -> Result<Vec<FieldRead>>;
@@ -5942,7 +6306,7 @@ pub struct FieldNext {
 /// halvings (`0` since the step fluxes, November 5, and still printed), whether a step was deposited,
 /// and the held read of the step the section before deposited on this section's regions (only under
 /// [`FieldLearner::read_held`]).
-#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+#[derive(Clone, Debug, Default, PartialEq, Eq)]
 pub struct FieldReceipt {
     /// The sites the codes are of: each region's domain where it read an open site (§16.23).
     pub sites: usize,
@@ -5973,6 +6337,10 @@ pub struct FieldReceipt {
     /// `predicted`'s terms gathered by part, [`PART_NAMES`] in order and the old entries last, each on the codes' grain; their sum
     /// stands within one unit a family and part under `predicted`. `None` past its carrier. A reading.
     pub predicted_parts: Option<[i64; PARTS + 1]>,
+    /// [measurement; theory, November 13, P60 item 1d] **The opening's code** by region, where the field has the opening's lift: the sum of
+    /// `−log₂ p̂⁰_t(u_t)` over the region's compared places on `2^(−20)` bits, and their count (empty without the lift). Read at the material the
+    /// section's comparison read, before its deposit.
+    pub opening: Vec<(i64, usize)>,
 }
 
 /// A deposited step held for the next regions' read: the proposed step on each family's grain and
@@ -6134,10 +6502,17 @@ fn predicted_parts(field: &Field, g: &[i128], step: &[i128], halvings: u32, part
 /// learner divides each entry's step by its own `⌊√v⌋ + 1` (`deposit_step`), and its divisors move with what reaches each entry, so equal gains
 /// of the legs are no prediction for it. The part's one octave stands because an octave between the legs would be a rate set by hand. A parts
 /// line carries it only where the field has triads ([`written_parts`]).
-pub const PART_NAMES: [&str; 23] = ["w_new", "a_new", "b_new", "enc_lane", "before_lane", "after_lane", "q_lane", "v_lane", "probe_lane", "out_lane", "moment_face_lane", "read_lane", "face_biases_lane", "a_lane", "b_lane", "carry", "w_carry", "a_carry", "b_carry", "enc_first", "before_first", "after_first", "triad"];
+///
+/// [definition; theory, November 13, P60 item 1f] The opening's lift is one part, `opening` (index 23, [`OPENING_PART`]): `R⁰` and `b⁰`. Why a part
+/// of its own: it is a new block whose covector reaches it from the opening's comparison alone, and the part rates' law sets each block's rate
+/// from its own travel. A parts line carries it only where the field has the opening's lift ([`written_parts`]).
+pub const PART_NAMES: [&str; 24] = ["w_new", "a_new", "b_new", "enc_lane", "before_lane", "after_lane", "q_lane", "v_lane", "probe_lane", "out_lane", "moment_face_lane", "read_lane", "face_biases_lane", "a_lane", "b_lane", "carry", "w_carry", "a_carry", "b_carry", "enc_first", "before_first", "after_first", "triad", "opening"];
 
 /// The triads' one part ([`PART_NAMES`] index 22), written after the first lane's letter rows only where the field has triads.
 pub const TRIAD_PART: usize = 22;
+
+/// The opening's lift's one part ([`PART_NAMES`] index 23), written last only where the field has the opening's lift.
+pub const OPENING_PART: usize = 23;
 
 /// The plain founded parts (the first sixteen of [`PART_NAMES`]): every field writes them.
 pub const PLAIN_PARTS: usize = 16;
@@ -6154,7 +6529,10 @@ pub const FIRST_PARTS: std::ops::Range<usize> = 19..22;
 /// the letter rows' parts; or a triad field's line without the triad's octave) reads with the parts it lacks at octave 0. Why the triad's comes
 /// last and only with triads: at `J = 0` every line the field writes is the line before, so a build reproduces a line's lap and compares like
 /// with like.
-pub fn written_parts(carry: usize, triads: usize) -> Vec<usize> {
+///
+/// [definition; theory, November 13, P60 item 1f] The opening's one part comes after them only where the field has the opening's lift, for the
+/// same reason: a field without it writes every line it wrote before.
+pub fn written_parts(carry: usize, triads: usize, opening: bool) -> Vec<usize> {
     let mut out: Vec<usize> = (0..PLAIN_PARTS).collect();
     if carry > 0 {
         out.extend(CIRCLE_PARTS);
@@ -6162,6 +6540,9 @@ pub fn written_parts(carry: usize, triads: usize) -> Vec<usize> {
     out.extend(FIRST_PARTS);
     if triads > 0 {
         out.push(TRIAD_PART);
+    }
+    if opening {
+        out.push(OPENING_PART);
     }
     out
 }
@@ -6329,6 +6710,11 @@ impl Field {
             parts[l.triad..l.triad + j6 * dw].fill(TRIAD_PART as u8);
             parts[l.triad_bias..l.triad_bias + j6].fill(TRIAD_PART as u8);
             parts[l.w_triad..l.w_triad + dw * j2].fill(TRIAD_PART as u8);
+        }
+        // [theory, November 13, P60 item 1f] The opening's lift, one part: `R⁰` and `b⁰` ([`OPENING_PART`]).
+        if d.opening {
+            parts[l.opening..l.opening + dw * dw].fill(OPENING_PART as u8);
+            parts[l.opening_bias..l.opening_bias + dw].fill(OPENING_PART as u8);
         }
         parts
     }
@@ -6764,6 +7150,44 @@ impl FieldLearner {
         Ok(Self { field, first, second, rate_bits: self.rate_bits, drawn, laps: self.laps, held: None, read_held: self.read_held, rate_parts, own_rates, last: None, pass: self.pass.clone() })
     }
 
+    /// [definition; theory, November 13, P60 items 1f and 3] **The learner with the opening's lift** ([`Field::with_opening`]), founded at zero.
+    /// Every standing entry keeps its moments, its remainder and its rate; the block's first moments open at zero and its second at the mean of
+    /// its counterpart's standing second moments (`R⁰` the readout's lift `R`, `b⁰` the lift's bias `b_R`), as a growth opens a new block's
+    /// ([`FieldLearner::with_triads`]), so its first step is its covector over its counterpart's scale. Its rate: the founded parts' rates are kept
+    /// and the opening's part takes octave 0, what a newly grown block takes in this line (the triads took it); where the learner carries each
+    /// entry's own rate, every standing entry keeps it and the block's entries take `rate_bits`. The draws, the laps and the pass are kept; the
+    /// held step and the last section's step, of the old layout, are dropped. Refused while a step is held.
+    pub fn with_opening(&self) -> Result<Self> {
+        if self.held.is_some() {
+            return refuse("a learner takes the opening's lift after its held step is read");
+        }
+        let (field, from) = self.field.with_opening()?;
+        let first = from.iter().map(|o| o.map_or(0, |i| self.first[i])).collect();
+        let mut second: Vec<i128> = from.iter().map(|o| o.map_or(0, |i| self.second[i])).collect();
+        let (old, new, dw) = (&self.field.layout, &field.layout, self.field.declaration.width);
+        let mean = |start: usize, len: usize| -> i128 {
+            let values = &self.second[start..start + len];
+            if values.is_empty() {
+                return 0;
+            }
+            let n = values.len() as i128;
+            values.iter().map(|v| v / n).sum::<i128>() + values.iter().map(|v| v % n).sum::<i128>() / n
+        };
+        second[new.opening..new.opening + dw * dw].fill(mean(old.read, dw * dw));
+        second[new.opening_bias..new.opening_bias + dw].fill(mean(old.lift_bias, dw));
+        let rate_parts = self.rate_parts.map(|rp| {
+            let mut octaves = rp.octaves;
+            octaves[OPENING_PART] = 0;
+            RateParts { octaves, ..rp }
+        });
+        let own_rates = self.own_rates.as_ref().map(|own| {
+            let mut rates = own.clone();
+            rates.resize(field.material_len(), self.rate_bits);
+            rates
+        });
+        Ok(Self { field, first, second, rate_bits: self.rate_bits, drawn: self.drawn, laps: self.laps, held: None, read_held: self.read_held, rate_parts, own_rates, last: None, pass: self.pass.clone() })
+    }
+
     /// [definition; theory, November 12 (the record of the opening's room, §4 item 4)] **The learner with `fresh` more letters**
     /// ([`Field::lettered`]), founded at a passage's crossing. No key is read and the draws do not move. Every standing entry keeps its
     /// moments and its remainder (the open rows' with them, at their new place); a fresh entry's first moment opens at zero and its second
@@ -6924,15 +7348,18 @@ impl FieldLearner {
         };
         // [realization; theory, November 13, P58 item 3] With no held step and no port the comparison reads each open site's face at its
         // class alone, so the realization is asked for those words ([`FieldRealization::read_and_return_at_class`]); the same pairs.
-        let (faces_old, g, next) = if self.held.is_none() && regions.iter().all(|r| r.port.is_none()) {
-            let (at_class, g) = realization.read_and_return_at_class(&self.field, regions)?;
+        // [theory, November 13, P60 item 1d] Where the field has the opening's lift the call returns its codes beside the faces and the covector.
+        let (faces_old, g, next, codes) = if self.held.is_none() && regions.iter().all(|r| r.port.is_none()) {
+            let (at_class, g, codes) = realization.read_and_return_opening(&self.field, regions)?;
             mark(0);
-            (compared_at_class(&at_class, regions)?, Some(g), None)
+            (compared_at_class(&at_class, regions)?, Some(g), None, codes)
         } else {
             let (faces, g, next) = self.open(regions, realization, true)?;
+            let codes = if self.field.declaration.opening { regions.iter().map(|r| self.field.opening_codes(r)).collect::<Result<_>>()? } else { Vec::new() };
             mark(0);
-            (compared(&faces, regions)?, g, next)
+            (compared(&faces, regions)?, g, next, codes)
         };
+        let opening: Vec<(i64, usize)> = codes.iter().map(|c| (c.iter().flatten().sum(), c.iter().flatten().count())).collect();
         let mut g = g.ok_or(TowerError::Refused("a section's opening read returned no covector"))?;
         let spans = spans_of(regions);
         let code_before = code_of(&faces_old, &spans);
@@ -7000,7 +7427,7 @@ impl FieldLearner {
         let (candidate, moved) = stepped(&self.field, &step, 0)?;
         mark(13);
         if !moved {
-            return Ok(FieldReceipt { sites, code_before, code_after: None, halvings: 0, deposited: false, next, predicted, change: None, transfer, external, predicted_parts });
+            return Ok(FieldReceipt { sites, code_before, code_after: None, halvings: 0, deposited: false, next, predicted, change: None, transfer, external, predicted_parts, opening });
         }
         self.field = candidate;
         if self.read_held {
@@ -7009,7 +7436,7 @@ impl FieldLearner {
             self.last = Some(HeldStep { step, halvings: 0 });
         }
         mark(14);
-        Ok(FieldReceipt { sites, code_before, code_after: None, halvings: 0, deposited: true, next, predicted, change: None, transfer, external, predicted_parts })
+        Ok(FieldReceipt { sites, code_before, code_after: None, halvings: 0, deposited: true, next, predicted, change: None, transfer, external, predicted_parts, opening })
     }
 
     /// [definition; agent-inferred, November 3, the tower record] **The learner grown in scale**: its field grown in scale
@@ -7053,7 +7480,7 @@ impl FieldLearner {
             // The parts the field has, in the line's order ([`written_parts`]): nineteen without carry circles, twenty-two with them, and the
             // triad's one more where the field has triads.
             let d = &self.field.declaration;
-            let parts = self.rate_parts.map_or(String::new(), |rp| format!("parts {} {}\n", rp.contacts_before, written_parts(d.carry, d.triads).iter().map(|&p| rp.octaves[p].to_string()).collect::<Vec<_>>().join(" ")));
+            let parts = self.rate_parts.map_or(String::new(), |rp| format!("parts {} {}\n", rp.contacts_before, written_parts(d.carry, d.triads, d.opening).iter().map(|&p| rp.octaves[p].to_string()).collect::<Vec<_>>().join(" ")));
             // [definition; theory, November 12 00:20] Each entry's own rate, a trailing line after the parts' (`rates r₀ … r_(n−1)`).
             let own = self.own_rates.as_ref().map_or(String::new(), |r| format!("rates {}\n", r.iter().map(u32::to_string).collect::<Vec<_>>().join(" ")));
             // [definition; theory, November 12] The pass's place over a store, the text's last line and only where present ([`StorePass`]).
@@ -7096,13 +7523,18 @@ impl FieldLearner {
                 // The line's parts in its order ([`written_parts`]); an older line (fifteen or sixteen parts, or nineteen with carry
                 // circles, or a triad field's line without the triad's octave: the line before its growth) reads its parts in order with the
                 // ones it lacks at the old rate.
-                let (carry, triads) = (field.declaration.carry, field.declaration.triads);
-                let order = written_parts(carry, triads);
-                let before = written_parts(carry, 0);
+                // [theory, November 13, P60 item 1f] An opening field's line without the opening's octave (the line before its founding) reads with
+                // it at the old rate, as a triad field's line without the triad's.
+                let (carry, triads, opening) = (field.declaration.carry, field.declaration.triads, field.declaration.opening);
+                let order = written_parts(carry, triads, opening);
+                let unopened = written_parts(carry, triads, false);
+                let before = written_parts(carry, 0, false);
                 let older: Vec<usize> = if carry > 0 { (0..PLAIN_PARTS).chain(CIRCLE_PARTS).collect() } else { (0..PLAIN_PARTS).collect() };
                 let n = v.len().saturating_sub(1);
                 let slots: Vec<usize> = if n == order.len() {
                     order
+                } else if opening && n == unopened.len() {
+                    unopened
                 } else if triads > 0 && n == before.len() {
                     before
                 } else if n == older.len() || n == PLAIN_PARTS || n == PLAIN_PARTS - 1 {

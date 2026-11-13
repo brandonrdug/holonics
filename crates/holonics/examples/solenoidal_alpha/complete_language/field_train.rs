@@ -1172,7 +1172,7 @@ pub(super) fn train(args: &[String], realization: &mut dyn FieldRealization) -> 
         Some([path, sha]) => FieldLearner::from_text(std::str::from_utf8(&pinned_read(path, sha, STATE_BUDGET)?)?).map_err(|e| e.to_string())?,
         _ => {
             // The founding's heads are its ring sets; the reach is the passages'.
-            let declaration = FieldDeclaration { alphabet: codec.alphabet(), width, heads, modes, still, contacts, ticks, frames: heads, reach, lanes: 1, depth: 0, carry: 0, triads: 0 };
+            let declaration = FieldDeclaration { alphabet: codec.alphabet(), width, heads, modes, still, contacts, ticks, frames: heads, reach, lanes: 1, depth: 0, carry: 0, triads: 0, opening: false };
             let mut field = Field::found(declaration, &keys).map_err(|e| e.to_string())?;
             // [measurement; agent-inferred, November 3, §16.31] `FIELD_FOUND_RETURNS` (`returns`, or `lift` for the readout's
             // lift as well): the founding's zero families drawn instead, uniform on `±√(3/fan-in)` from a block of the key
@@ -1207,7 +1207,7 @@ pub(super) fn train(args: &[String], realization: &mut dyn FieldRealization) -> 
     declared_clocks(&mut learner.field);
     if let Some(rp) = learner.rate_parts {
         // The parts the field has, in the line's order (`written_parts`).
-        let octaves: Vec<String> = holonics::hnn::tower::field::written_parts(learner.field.declaration.carry, learner.field.declaration.triads).iter().map(|&p| format!("{}={}", holonics::hnn::tower::field::PART_NAMES[p], rp.octaves[p])).collect();
+        let octaves: Vec<String> = holonics::hnn::tower::field::written_parts(learner.field.declaration.carry, learner.field.declaration.triads, learner.field.declaration.opening).iter().map(|&p| format!("{}={}", holonics::hnn::tower::field::PART_NAMES[p], rp.octaves[p])).collect();
         println!("FIELD_PART_RATES contacts_before={} rate_bits={} octaves {}", rp.contacts_before, learner.rate_bits, octaves.join(" "));
     }
     if let Some(own) = &learner.own_rates {
@@ -1423,9 +1423,11 @@ pub(super) fn train(args: &[String], realization: &mut dyn FieldRealization) -> 
             if let (Some(p), Some(by)) = (receipt.predicted, receipt.predicted_parts) {
                 let parts: Vec<i128> = by.iter().map(|&v| micro(v)).collect();
                 let rest = micro(p) - parts.iter().sum::<i128>();
-                // The triad's part is printed only where the field has triads (`FieldDeclaration::triads`), so a line at J = 0 reads as before.
-                let shown = if learner.field.declaration.triads > 0 { PART_NAMES.len() } else { PART_NAMES.len() - 1 };
-                let named: Vec<String> = PART_NAMES[..shown].iter().zip(&parts).map(|(name, v)| format!("{name}={v}")).collect();
+                // The triad's part is printed only where the field has triads (`FieldDeclaration::triads`), and the opening's only where it has the
+                // opening's lift (November 13, P60), so a line without them reads as before.
+                let d = &learner.field.declaration;
+                let shown = (0..holonics::hnn::tower::field::TRIAD_PART).chain((d.triads > 0).then_some(holonics::hnn::tower::field::TRIAD_PART)).chain(d.opening.then_some(holonics::hnn::tower::field::OPENING_PART));
+                let named: Vec<String> = shown.map(|k| format!("{}={}", PART_NAMES[k], parts[k])).collect();
                 println!("FIELD_SECTION_PARTS lap={lap} n={n} predicted_micro={} {} old={} rest={rest}", micro(p), named.join(" "), parts[PARTS]);
             }
             if let (Some(t), Some(e)) = (receipt.transfer, prior) {

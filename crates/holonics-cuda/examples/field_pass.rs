@@ -221,7 +221,7 @@ fn reserve(args: &[String]) -> Result<()> {
     use holonics_cuda::hnn::field::{read_octets, skin_octets};
     let kv: std::collections::HashMap<&str, usize> = args.iter().filter_map(|a| a.split_once('=')).filter_map(|(k, v)| v.parse().ok().map(|v| (k, v))).collect();
     let get = |k: &str| kv.get(k).copied().ok_or_else(|| format!("reserve: {k}= is owed"));
-    let d = FieldDeclaration { alphabet: get("alphabet")?, width: get("lanes")? * get("lane_width")?, heads: get("heads")?, modes: get("modes")?, still: get("still")?, contacts: get("contacts")?, ticks: get("ticks")?, frames: get("frames")?, reach: get("reach")?, lanes: get("lanes")?, depth: kv.get("depth").copied().unwrap_or(0), carry: get("carry")?, triads: get("triads")? };
+    let d = FieldDeclaration { alphabet: get("alphabet")?, width: get("lanes")? * get("lane_width")?, heads: get("heads")?, modes: get("modes")?, still: get("still")?, contacts: get("contacts")?, ticks: get("ticks")?, frames: get("frames")?, reach: get("reach")?, lanes: get("lanes")?, depth: kv.get("depth").copied().unwrap_or(0), carry: get("carry")?, triads: get("triads")?, opening: false };
     let f = |s: usize| read_octets(&d, true, false, s);
     let (f1, f2, f3) = (f(1), f(2), f(3));
     let pair = (f3 + f1 - 2 * f2) / 2;
