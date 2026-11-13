@@ -1,0 +1,233 @@
+# P56 items 4 and 5 (G128 d), 2026-11-13 UTC: the host's part of a section, one profiled read (FIELD_PROFILE and FIELD_PHASES) of the pass's sections 2,001 to
+# 2,100 from run 2's STATE.1900 (sha256 cda6ac8a1129f147), the build at main f2b345791 (step 5 merged) with the readings' instruments (claude/p56-readings
+# cd1e629fa: each copy and take by its call site's line in field.rs, each zeroing timed alone with the stream drained before and after, each phase's
+# timed card ms beside its wall, train-store's own phases), alone on the card and the host. A phase is the wall between two marks; its card part is the
+# launches, copies, takes and zeroings timed inside it (each synchronized, so a profiled section is slower than an unprofiled one). ms a section is over 100.
+cd1e629fa (P56 readings) field_pass e4828844f75f704d0171d55b6521dfd7395f0c18aa0f009de731b926919e1353
+FIELD_CARD_OPEN card=NVIDIA GeForce RTX 4080 SUPER free=15651110912 total=16802250752 batch_budget=10660020224
+FIELD_CARD reads=0 read_ms=0 returns=100 return_ms=30968 pairs=4566615773 batches=100 peak_store=8410613236 landmarks=0 landmark_ms=0 elapsed_ms=32465
+MEASURE lap=host_out rc=0 wall_s=33.0 peak_rss_kib=385072
+STATE_SHA host 81377dbeaf26d65e 64954161619deda4
+## the card's attributes (cuDeviceGetAttribute)
+CARD_ATTRIBUTE name=NVIDIA GeForce RTX 4080 SUPER multiprocessors=80 warp=32
+CARD_ATTRIBUTE shared_per_block_default=49152
+CARD_ATTRIBUTE shared_per_block_optin=101376
+CARD_ATTRIBUTE shared_per_multiprocessor=102400
+CARD_ATTRIBUTE registers_per_multiprocessor=65536
+CARD_ATTRIBUTE registers_per_block=65536
+CARD_ATTRIBUTE max_threads_per_multiprocessor=1536
+CARD_ATTRIBUTE max_blocks_per_multiprocessor=24
+CARD_ATTRIBUTE l2_octets=67108864
+## the split
+STORE_HOST sections=100 cut_ms=263.1 views_ms=0.3 realized_ms=32068.6 mean_ms=8.5 lines_ms=1.9 pass_ms=0.1 saves_ms=42.8 elapsed_ms=32464
+FIELD_PROFILE_SPLIT kernels_ms=27096 copies=3800 copies_ms=959 allocations=30400 allocations_ms=1861 elapsed_ms=32465
+SPLIT host_alone_ms=2549 (elapsed less kernels, copies and takes) host_alone_ms_a_section=25.5
+## the phases in the order a section meets them, ms a section (wall, card part, host part), and what each reads
+PHASE name=outside_the_card marks=100 ms_a_section=14.40 card_ms_a_section=0.00 host_ms_a_section=14.40 reads='the host between runs: the deposit on the host (the section's covector, the moments: state), the mean of states and the saves (state), the lines and the pass line, and the next section's cut and views (the text and the pass line only)'
+PHASE name=run_setup marks=100 ms_a_section=0.23 card_ms_a_section=0.02 host_ms_a_section=0.21 reads='the regions' lengths and needs, the batches (the text only)'
+PHASE name=material_upload marks=100 ms_a_section=0.66 card_ms_a_section=0.31 host_ms_a_section=0.34 reads='the material and its faces (the state the section before left)'
+PHASE name=stage_lists marks=100 ms_a_section=0.54 card_ms_a_section=0.00 host_ms_a_section=0.54 reads='the batch's lists and tables from its regions and the declaration (the text only)'
+PHASE name=stage_pack_upload marks=100 ms_a_section=0.21 card_ms_a_section=0.12 host_ms_a_section=0.09 reads='their pack and its upload (the text only)'
+PHASE name=batch_takes marks=100 ms_a_section=4.60 card_ms_a_section=4.44 host_ms_a_section=0.16 reads='the ticks' and clocks' takes (no state; their zeroings)'
+PHASE name=batch_setup marks=100 ms_a_section=3.29 card_ms_a_section=3.26 host_ms_a_section=0.02 reads='the opening's launches (the state)'
+PHASE name=tick_launch_pre marks=400 ms_a_section=33.49 card_ms_a_section=33.23 host_ms_a_section=0.26 reads='a tick's launches to the exposure (the state)'
+PHASE name=tick_exposure_wait marks=400 ms_a_section=8.59 card_ms_a_section=8.58 host_ms_a_section=0.01 reads='the exposure's spread fetched (a wait on the card)'
+PHASE name=tick_launch_post marks=400 ms_a_section=48.51 card_ms_a_section=48.42 host_ms_a_section=0.08 reads='the tick's contact and the rest of its forward (the state)'
+PHASE name=face_launch marks=100 ms_a_section=1.74 card_ms_a_section=1.70 host_ms_a_section=0.03 reads='the faces' launches (the state)'
+PHASE name=reverse_launch marks=100 ms_a_section=194.76 card_ms_a_section=190.81 host_ms_a_section=3.94 reads='the return's launches (the state)'
+PHASE name=status_wait marks=100 ms_a_section=0.03 card_ms_a_section=0.03 host_ms_a_section=0.00 reads='the refusals' word fetched (a wait)'
+PHASE name=batch_drop_and_collect marks=100 ms_a_section=12.53 card_ms_a_section=7.79 host_ms_a_section=4.74 reads='the faces' masses and totals fetched (a wait) and the faces built on the host; the batch's buffers back to their pools'
+PHASE name=covector_fetch marks=100 ms_a_section=0.40 card_ms_a_section=0.40 host_ms_a_section=0.00 reads='the covector fetched (a wait)'
+PHASE name=run_end marks=100 ms_a_section=0.02 card_ms_a_section=0.02 host_ms_a_section=0.00 reads='the run's counters'
+STORE_PHASE cut_ms_a_section=2.63 views=0.00 realized=320.69 mean=0.09 lines=0.02 pass=0.00 saves=0.43 (one save of STATE and MEAN in the read, 42.8 ms)
+STORE_PHASE deposit_on_the_host_ms_a_section=11.1 (the realized section less the run's own phases, 320.7 less 309.6)
+## copies and takes by call site (field.rs at cd1e629fa), ms a section; the zeroings timed alone
+SITE kind=copy call=upload name=run_pack line=1197 calls_a_section=1 ms_a_section=0.165
+SITE kind=copy call=fetch name=- line=1421 calls_a_section=1 ms_a_section=0.400
+SITE kind=copy call=fetch name=met_by_head line=1433 calls_a_section=1 ms_a_section=0.027
+SITE kind=copy call=upload name=tables line=1652 calls_a_section=1 ms_a_section=0.128
+SITE kind=copy call=fetch name=spread line=1757 calls_a_section=4 ms_a_section=0.131
+SITE kind=copy call=fetch name=masses line=2287 calls_a_section=1 ms_a_section=7.677
+SITE kind=copy call=fetch name=totals line=2288 calls_a_section=1 ms_a_section=0.114
+SITE kind=copy call=upload name=- line=2399 calls_a_section=16 ms_a_section=0.334
+SITE kind=copy call=upload name=wm_c line=2839 calls_a_section=1 ms_a_section=0.078
+SITE kind=copy call=upload name=wk_c line=2840 calls_a_section=1 ms_a_section=0.082
+SITE kind=copy call=upload name=rows_sites_c line=2957 calls_a_section=3 ms_a_section=0.180
+SITE kind=copy call=upload name=rows_shares_c line=2958 calls_a_section=3 ms_a_section=0.116
+SITE kind=copy call=upload name=segments_c line=2959 calls_a_section=3 ms_a_section=0.128
+SITE kind=copy call=fetch name=bits line=3113 calls_a_section=1 ms_a_section=0.035
+SITE kind=take call=take name=- line=1219 calls_a_section=1 ms_a_section=0.002
+SITE kind=take call=take_zeroed name=met line=1222 calls_a_section=1 ms_a_section=0.105
+SITE kind=take call=take_zeroed name=g line=1366 calls_a_section=1 ms_a_section=0.025
+SITE kind=take call=take name=alloc64 line=1472 calls_a_section=52 ms_a_section=0.031
+SITE kind=take call=take name=alloc32 line=1473 calls_a_section=28 ms_a_section=0.010
+SITE kind=take call=take name=read line=1478 calls_a_section=4 ms_a_section=0.003
+SITE kind=take call=take name=scale line=1479 calls_a_section=4 ms_a_section=0.003
+SITE kind=take call=take name=qscale line=1487 calls_a_section=4 ms_a_section=0.002
+SITE kind=take call=take_zeroed name=e line=1499 calls_a_section=4 ms_a_section=3.559
+SITE kind=take call=take name=sw line=1501 calls_a_section=4 ms_a_section=0.003
+SITE kind=take call=take name=sv line=1502 calls_a_section=4 ms_a_section=0.002
+SITE kind=take call=take name=sc line=1503 calls_a_section=4 ms_a_section=0.002
+SITE kind=take call=take name=ce line=1504 calls_a_section=4 ms_a_section=0.002
+SITE kind=take call=take name=read2 line=1506 calls_a_section=4 ms_a_section=0.003
+SITE kind=take call=take name=scale2 line=1507 calls_a_section=4 ms_a_section=0.002
+SITE kind=take call=take_zeroed name=bits line=1518 calls_a_section=4 ms_a_section=0.372
+SITE kind=take call=take_zeroed name=status line=1655 calls_a_section=1 ms_a_section=0.045
+SITE kind=take call=take name=x line=1656 calls_a_section=1 ms_a_section=0.001
+SITE kind=take call=take_zeroed name=trips line=1978 calls_a_section=1 ms_a_section=0.023
+SITE kind=take call=take_zeroed name=moment line=1981 calls_a_section=1 ms_a_section=0.061
+SITE kind=take call=take name=pr line=1984 calls_a_section=1 ms_a_section=0.000
+SITE kind=take call=take name=kappa line=1988 calls_a_section=1 ms_a_section=0.000
+SITE kind=take call=take name=tau line=1989 calls_a_section=1 ms_a_section=0.000
+SITE kind=take call=take name=sigma line=1990 calls_a_section=1 ms_a_section=0.000
+SITE kind=take call=take name=saddr line=1991 calls_a_section=1 ms_a_section=0.001
+SITE kind=take call=take name=plain line=1992 calls_a_section=1 ms_a_section=0.000
+SITE kind=take call=take name=pframe line=1993 calls_a_section=1 ms_a_section=0.000
+SITE kind=take call=take name=- line=1999 calls_a_section=2 ms_a_section=0.321
+SITE kind=take call=take name=- line=2009 calls_a_section=2 ms_a_section=0.001
+SITE kind=take call=take name=fread line=2198 calls_a_section=1 ms_a_section=0.002
+SITE kind=take call=take_zeroed name=fscale line=2199 calls_a_section=1 ms_a_section=0.061
+SITE kind=take call=take name=z line=2200 calls_a_section=1 ms_a_section=0.000
+SITE kind=take call=take name=masses line=2201 calls_a_section=1 ms_a_section=0.001
+SITE kind=take call=take_zeroed name=totals line=2202 calls_a_section=1 ms_a_section=0.019
+SITE kind=take call=take_zeroed name=lift line=2206 calls_a_section=1 ms_a_section=0.050
+SITE kind=take call=take name=alloc64 line=2342 calls_a_section=12 ms_a_section=0.006
+SITE kind=take call=take name=- line=2344 calls_a_section=8 ms_a_section=0.002
+SITE kind=take call=upload name=ok line=2345 calls_a_section=4 ms_a_section=0.222
+SITE kind=take call=take name=dz line=2411 calls_a_section=3 ms_a_section=3.996
+SITE kind=take call=take name=dy line=2422 calls_a_section=3 ms_a_section=0.001
+SITE kind=take call=take_zeroed name=dr line=2431 calls_a_section=3 ms_a_section=0.251
+SITE kind=take call=take_zeroed name=back line=2433 calls_a_section=3 ms_a_section=0.163
+SITE kind=take call=take_zeroed name=fread line=2448 calls_a_section=3 ms_a_section=0.300
+SITE kind=take call=take_zeroed name=fscale line=2449 calls_a_section=3 ms_a_section=0.066
+SITE kind=take call=take_zeroed name=lift line=2456 calls_a_section=3 ms_a_section=0.173
+SITE kind=take call=take name=z line=2459 calls_a_section=3 ms_a_section=0.001
+SITE kind=take call=take name=masses line=2464 calls_a_section=3 ms_a_section=0.003
+SITE kind=take call=take_zeroed name=totals line=2465 calls_a_section=3 ms_a_section=0.181
+SITE kind=take call=take name=alloc64 line=2470 calls_a_section=18 ms_a_section=0.008
+SITE kind=take call=take name=plain line=2477 calls_a_section=3 ms_a_section=0.001
+SITE kind=take call=take_zeroed name=moment line=2479 calls_a_section=3 ms_a_section=0.145
+SITE kind=take call=take name=alloc64 line=2772 calls_a_section=15 ms_a_section=0.007
+SITE kind=take call=take name=ds line=2793 calls_a_section=1 ms_a_section=0.013
+SITE kind=take call=take name=dpb line=2795 calls_a_section=1 ms_a_section=0.011
+SITE kind=take call=take_zeroed name=cv line=2801 calls_a_section=1 ms_a_section=0.072
+SITE kind=take call=take_zeroed name=cw line=2802 calls_a_section=1 ms_a_section=0.073
+SITE kind=take call=take_zeroed name=dm line=2806 calls_a_section=1 ms_a_section=0.123
+SITE kind=take call=take_zeroed name=gtau line=2810 calls_a_section=1 ms_a_section=0.045
+SITE kind=take call=take_zeroed name=gsig line=2811 calls_a_section=1 ms_a_section=0.015
+SITE kind=take call=take_zeroed name=cds line=2812 calls_a_section=1 ms_a_section=0.074
+SITE kind=take call=take name=alloc64 line=2826 calls_a_section=2 ms_a_section=0.001
+SITE kind=take call=take_zeroed name=zeroed line=2879 calls_a_section=9 ms_a_section=0.433
+SITE kind=take call=take_zeroed name=dkappa line=2901 calls_a_section=3 ms_a_section=0.332
+SITE kind=take call=take_zeroed name=dkappa line=2929 calls_a_section=1 ms_a_section=0.070
+SITE kind=take call=take name=ds line=2984 calls_a_section=4 ms_a_section=0.001
+SITE kind=take call=take name=q line=2985 calls_a_section=4 ms_a_section=0.002
+SITE kind=take call=take name=- line=2986 calls_a_section=8 ms_a_section=0.002
+SITE kind=take call=upload name=ok line=2987 calls_a_section=4 ms_a_section=0.208
+SITE kind=take call=take name=sk line=3002 calls_a_section=4 ms_a_section=6.899
+SITE kind=take call=take name=- line=3010 calls_a_section=8 ms_a_section=0.001
+SITE kind=take call=take name=- line=3011 calls_a_section=8 ms_a_section=0.003
+ZEROED name=met line=1222 calls_a_section=1 ms_a_section=0.105 octets_a_section=32
+ZEROED name=g line=1366 calls_a_section=1 ms_a_section=0.024 octets_a_section=2097152
+ZEROED name=e line=1499 calls_a_section=4 ms_a_section=3.425 octets_a_section=2142114938
+ZEROED name=bits line=1518 calls_a_section=4 ms_a_section=0.370 octets_a_section=64
+ZEROED name=status line=1655 calls_a_section=1 ms_a_section=0.044 octets_a_section=16
+ZEROED name=trips line=1978 calls_a_section=1 ms_a_section=0.022 octets_a_section=786432
+ZEROED name=moment line=1981 calls_a_section=1 ms_a_section=0.060 octets_a_section=25165824
+ZEROED name=fscale line=2199 calls_a_section=1 ms_a_section=0.060 octets_a_section=1572864
+ZEROED name=totals line=2202 calls_a_section=1 ms_a_section=0.018 octets_a_section=786432
+ZEROED name=lift line=2206 calls_a_section=1 ms_a_section=0.049 octets_a_section=25165824
+ZEROED name=dr line=2431 calls_a_section=3 ms_a_section=0.248 octets_a_section=75497472
+ZEROED name=back line=2433 calls_a_section=3 ms_a_section=0.161 octets_a_section=76755763
+ZEROED name=fread line=2448 calls_a_section=3 ms_a_section=0.293 octets_a_section=37748736
+ZEROED name=fscale line=2449 calls_a_section=3 ms_a_section=0.062 octets_a_section=4718592
+ZEROED name=lift line=2456 calls_a_section=3 ms_a_section=0.168 octets_a_section=75497472
+ZEROED name=totals line=2465 calls_a_section=3 ms_a_section=0.178 octets_a_section=2359296
+ZEROED name=moment line=2479 calls_a_section=3 ms_a_section=0.142 octets_a_section=75497472
+ZEROED name=cv line=2801 calls_a_section=1 ms_a_section=0.070 octets_a_section=21642608
+ZEROED name=cw line=2802 calls_a_section=1 ms_a_section=0.071 octets_a_section=21642608
+ZEROED name=dm line=2806 calls_a_section=1 ms_a_section=0.122 octets_a_section=50331648
+ZEROED name=gtau line=2810 calls_a_section=1 ms_a_section=0.044 octets_a_section=1572864
+ZEROED name=gsig line=2811 calls_a_section=1 ms_a_section=0.014 octets_a_section=1572864
+ZEROED name=cds line=2812 calls_a_section=1 ms_a_section=0.073 octets_a_section=28940697
+ZEROED name=zeroed line=2879 calls_a_section=9 ms_a_section=0.424 octets_a_section=160432128
+ZEROED name=dkappa line=2901 calls_a_section=3 ms_a_section=0.329 octets_a_section=4718592
+ZEROED name=dkappa line=2929 calls_a_section=1 ms_a_section=0.069 octets_a_section=1572864
+ZEROED total_ms_a_section=6.64 of the takes' 18.61
+## every entry (launches, ms, microseconds a launch, share of the kernels' ms)
+ENTRY entry=field_contact_rows launches=1600 ms=3057 us_a_launch=1910 share=0.1130
+ENTRY entry=field_contact_l5 launches=351 ms=2569 us_a_launch=7320 share=0.0949
+ENTRY entry=field_contact_columns launches=1600 ms=2511 us_a_launch=1569 share=0.0928
+ENTRY entry=field_pace_skin_back launches=800 ms=1666 us_a_launch=2083 share=0.0616
+ENTRY entry=field_transposed launches=3700 ms=1519 us_a_launch=410 share=0.0561
+ENTRY entry=field_outer_x32 launches=6000 ms=1383 us_a_launch=230 share=0.0511
+ENTRY entry=field_affine_tiled_x32 launches=3200 ms=1362 us_a_launch=425 share=0.0503
+ENTRY entry=field_clock_fill launches=800 ms=864 us_a_launch=1080 share=0.0319
+ENTRY entry=field_exposure launches=400 ms=844 us_a_launch=2112 share=0.0312
+ENTRY entry=field_skin_fill launches=800 ms=815 us_a_launch=1018 share=0.0301
+ENTRY entry=field_moment_skinned_all launches=400 ms=599 us_a_launch=1497 share=0.0221
+ENTRY entry=field_blank_bias_enc launches=300 ms=538 us_a_launch=1794 share=0.0199
+ENTRY entry=field_blank_dy launches=300 ms=439 us_a_launch=1464 share=0.0162
+ENTRY entry=field_affine_tiled_x64 launches=900 ms=436 us_a_launch=485 share=0.0161
+ENTRY entry=field_outer_bound_x32 launches=2500 ms=431 us_a_launch=172 share=0.0159
+ENTRY entry=field_outer_x64 launches=900 ms=419 us_a_launch=465 share=0.0155
+ENTRY entry=field_blank_dz launches=300 ms=406 us_a_launch=1354 share=0.0150
+ENTRY entry=field_moment_pace_back_all launches=400 ms=392 us_a_launch=981 share=0.0145
+ENTRY entry=field_chart launches=1200 ms=390 us_a_launch=325 share=0.0144
+ENTRY entry=field_contact_l6 launches=49 ms=390 us_a_launch=7963 share=0.0144
+ENTRY entry=field_spread launches=1600 ms=370 us_a_launch=231 share=0.0137
+ENTRY entry=field_pair_scan_back launches=400 ms=352 us_a_launch=881 share=0.0130
+ENTRY entry=field_unit launches=400 ms=322 us_a_launch=806 share=0.0119
+ENTRY entry=field_unit_probe launches=400 ms=318 us_a_launch=795 share=0.0117
+ENTRY entry=field_moment_return_paced_all launches=400 ms=302 us_a_launch=755 share=0.0112
+ENTRY entry=field_pair_scan launches=400 ms=302 us_a_launch=756 share=0.0112
+ENTRY entry=field_moment_prefix_paced_all launches=2000 ms=261 us_a_launch=130 share=0.0096
+ENTRY entry=field_tied_face launches=400 ms=253 us_a_launch=632 share=0.0093
+ENTRY entry=field_paces launches=400 ms=202 us_a_launch=506 share=0.0075
+ENTRY entry=field_sums launches=400 ms=180 us_a_launch=450 share=0.0067
+ENTRY entry=field_moment_paced_all launches=400 ms=171 us_a_launch=428 share=0.0063
+ENTRY entry=field_ratio_adjoint launches=1200 ms=165 us_a_launch=137 share=0.0061
+ENTRY entry=field_outer_bound_x64 launches=900 ms=164 us_a_launch=182 share=0.0061
+ENTRY entry=field_pace_c_back launches=400 ms=158 us_a_launch=395 share=0.0058
+ENTRY entry=field_blank_lift_read launches=300 ms=157 us_a_launch=524 share=0.0058
+ENTRY entry=field_pace_kappa_back launches=400 ms=155 us_a_launch=389 share=0.0057
+ENTRY entry=field_moment_strand_return_all launches=400 ms=141 us_a_launch=353 share=0.0052
+ENTRY entry=field_pair_gate_back launches=400 ms=133 us_a_launch=333 share=0.0049
+ENTRY entry=field_unit_back_probe launches=400 ms=129 us_a_launch=324 share=0.0048
+ENTRY entry=field_unit_back launches=400 ms=127 us_a_launch=319 share=0.0047
+ENTRY entry=field_unframe launches=1200 ms=120 us_a_launch=100 share=0.0044
+ENTRY entry=field_moment_accumulate launches=900 ms=116 us_a_launch=129 share=0.0043
+ENTRY entry=field_pace_frame_back launches=400 ms=104 us_a_launch=261 share=0.0038
+ENTRY entry=field_blank_rates launches=300 ms=102 us_a_launch=342 share=0.0038
+ENTRY entry=field_tied_back_e launches=100 ms=101 us_a_launch=1012 share=0.0037
+ENTRY entry=field_moment_strands_all launches=800 ms=93 us_a_launch=117 share=0.0034
+ENTRY entry=field_pair_back launches=400 ms=89 us_a_launch=223 share=0.0033
+ENTRY entry=field_pair_gamma launches=400 ms=77 us_a_launch=194 share=0.0028
+ENTRY entry=field_classes launches=400 ms=76 us_a_launch=190 share=0.0028
+ENTRY entry=field_pframes launches=400 ms=70 us_a_launch=175 share=0.0026
+ENTRY entry=field_frame launches=400 ms=67 us_a_launch=167 share=0.0025
+ENTRY entry=field_pair launches=400 ms=65 us_a_launch=162 share=0.0024
+ENTRY entry=field_moment_add_probe launches=800 ms=64 us_a_launch=80 share=0.0024
+ENTRY entry=field_frame_probe launches=400 ms=63 us_a_launch=158 share=0.0023
+ENTRY entry=field_moment_admit_paced_all launches=800 ms=53 us_a_launch=66 share=0.0020
+ENTRY entry=field_tied_back_y launches=100 ms=47 us_a_launch=475 share=0.0017
+ENTRY entry=field_moment_ds_all launches=400 ms=42 us_a_launch=106 share=0.0016
+ENTRY entry=field_current_back launches=400 ms=40 us_a_launch=101 share=0.0015
+ENTRY entry=field_moment_scatter_all launches=400 ms=39 us_a_launch=99 share=0.0014
+ENTRY entry=field_add launches=400 ms=37 us_a_launch=94 share=0.0014
+ENTRY entry=field_pace_current_back launches=400 ms=36 us_a_launch=90 share=0.0013
+ENTRY entry=field_moment_add launches=400 ms=35 us_a_launch=89 share=0.0013
+ENTRY entry=field_skin_addresses launches=400 ms=34 us_a_launch=86 share=0.0013
+ENTRY entry=field_face launches=400 ms=31 us_a_launch=77 share=0.0011
+ENTRY entry=field_face_covector launches=100 ms=20 us_a_launch=207 share=0.0007
+ENTRY entry=field_encoding launches=300 ms=17 us_a_launch=58 share=0.0006
+ENTRY entry=field_blank_dx launches=300 ms=13 us_a_launch=45 share=0.0005
+ENTRY entry=field_face_weigh launches=100 ms=10 us_a_launch=105 share=0.0004
+ENTRY entry=field_open launches=100 ms=7 us_a_launch=79 share=0.0003
+ENTRY entry=field_exponential launches=100 ms=4 us_a_launch=44 share=0.0001
+ENTRY total_kernels_ms=27064 entries=70
+## G128 d scored
+G128 d cut_lists_tables_built_and_packed_ms=3.4 (cut 2.63, lists 0.54, pack and upload 0.21) guess=20 band=10..30 missed_below
+G128 d zeroing_ms=6.6 of the takes' 18.6 (the takes in this read include their zeroings' synchronizations) guess=8 of 11.9 band=4..11 held
+G128 d covector_fetch_deposit_saves_ms=11.9 (fetch 0.40, the deposit on the host 11.1, the saves 0.43 a section at one save in 100) guess=8 band=3..15 held
+G128 d rule='no host phase of 8 ms a section or more reads no state of the section before: the only one is the host between runs (14.4), whose 11.1 is the deposit, which reads the section''s covector and the moments; its text-only parts (the cut 2.63, the lists 0.54, the pack 0.09, the batches 0.21) are 3.5 together. The takes whose every word the source proves is written before it is read are spared their zeroing as step 6.'
