@@ -421,15 +421,37 @@ face).** The passage is 481 seconds of public speech (73 utterances of one Libri
   and 1.15 at the two slowest rungs and the absolute words read 1.07 along the ladder. With the
   sum kept on `2^(−s)` the readings above stand. A rung that drops its remainder privileges a
   scale, which is the precision law's clause on ratios met on an instrument.
+- *With a first step's reader the cut on a band's places runs free (G133).* The restarting cut
+  was read on bands 2 to 6 under four changes, the copy read by the original's reader: the cut
+  begun 7 places later on the same codes, the passage begun 37 samples later, the double-speed
+  copy's next rung, and a copy at one and a half times the speed. At a mean epoch of 6 places
+  the control keeps 0.952 of its openings. The moved start keeps 0.212 against a chance of
+  0.171, the shift of rung 0.236 against 0.170 (where a place's code agrees in rank at 0.90 to
+  0.98), and the ratio off the ladder 0.316 against 0.283. The counted part alone keeps 0.172
+  against 0.167 under the moved start. The instrument stands and the news it is given fails:
+  a place's code spreads 0.36 to 0.38 of its mean, and no place of 811,614 passes the section
+  or half of it. The landmark clause of §4.2 (a place brighter than the section opens under
+  every reading) has no place to act on, an opening is placed by a sum of about six nearly
+  equal codes, and two readings whose codes differ a little at every place drift apart as fast
+  as they meet. On text the same cut keeps 0.991 because a place's code runs from hundredths
+  of a nat to ten. The larger half of a band's place code is the bits under its residual's
+  leading one, which this reader charges at every place and no reader of its kind predicts.
+  So the cut is a law of a reader's news, and its sites stand only as far as that reader is
+  dark at most places and bright at a few (receipts `band_cut.py`, `band_code_spread.py`).
 
 Limits, each stated because the reading is narrow: one speaker; a ratio of two; a reader of a
 first step's bit length and sign, which cannot see pitch or formants, so the rows are shared at
 that grain and equal codes are not equal knowledge; bands of one-pole rungs, which overlap.
 [agent-inferred] A sound's place is therefore read on a band at its rung's stride, never on the
-sample stream or its crossings, and its rung's stride and gain are its navigator's clock. Owed
-before a value chart is built: the restarting cut on a band's places and its share kept under
-the shift of rung; the same reading with a reader of longer context; and the image's ruler (a
-stroke under a magnification the passage itself holds).
+sample stream or its crossings, and its rung's stride and gain are its navigator's clock. No
+level is founded on the cut for sound while a band is read by a first step: the place's news
+has to come from a reading that is dark while the band continues and bright where it departs,
+with what lies under a declared width released and accounted, never charged as news. The tree
+holds that reading since October 10 (atlas `hnn.ring-moment-keys`; the record of that day,
+§11: a ring's section word near-returns through most of a recording, 33,395 of 52,128 windows,
+at 0.44 of its spelled length, its departures kept as defects). Owed before a value chart is
+built: that reading's ruler on the same passage and the same four changes (G135); and the
+image's ruler (a stroke under a magnification the passage itself holds).
 
 ## 9. Acceptance, the device line, and the order of work
 

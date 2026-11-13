@@ -348,8 +348,13 @@ repository was reset on September 24; the pre-reset tree is
     it costs its own, and at one speed a band costs its neighbour's reader 1.0005 to 1.041. At
     that reader's grain (a first step's bit length and sign) the ladder's rows are shared on
     sound, where text's two paced clocks read as two keys (atlas `code.sound-place-frame-band`,
-    `code.news-clock-proper-time`). Owed before a value chart is built: the cut on a band's
-    places, a reader of longer context, and the image's ruler.
+    `code.news-clock-proper-time`). The cut on a band's places was then read (G133): with that
+    reader it runs free. At a mean epoch of 6 places it keeps 0.212 of its openings against a
+    chance of 0.171 under a passage begun 37 samples later and 0.236 against 0.170 under the
+    shift of rung, where its control keeps 0.952, because no place of 811,614 passes the section
+    and nothing pins an opening. No level is founded on it for sound. Owed before a value chart
+    is built: the ruler of a ring's reading that is dark while its band continues (G135), and
+    the image's ruler.
   - Every extent of the built declaration is given the part it sizes, how it was reached and what
     sizes it (the same record, §5), with ten findings by file and line and the build that closes
     each. The departures that stand: the face's 64 coordinates are two lanes of 32, the second a

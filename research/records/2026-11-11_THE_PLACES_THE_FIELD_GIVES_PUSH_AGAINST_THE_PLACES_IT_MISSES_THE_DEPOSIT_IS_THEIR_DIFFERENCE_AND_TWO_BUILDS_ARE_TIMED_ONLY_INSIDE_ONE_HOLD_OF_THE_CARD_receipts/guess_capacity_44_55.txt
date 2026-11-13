@@ -2581,3 +2581,36 @@ words is built for each unresolved place, where the trainer's line reads a place
   arithmetic over 6 ms: the deposit's card realization is derived (the constitution resident on the card, parity against the host's
   bits) and ordered after the structural step. (e) over 0.96: the takes and fetches are bound elsewhere, and the profile is read
   again before another host step.
+
+G133 scored 2026-11-13T02:14Z (receipts beside G130's: band_cut.py, band_cut.txt; for information band_code_spread.py, band_code_spread.txt).
+The read: 18 read utterances, bands 2 to 6, a place's whole code 5.74 to 6.37 nats and its counted part 2.42 to 2.61; the sections located
+for a mean epoch of 2 places at 14.9 to 16.6 nats (whole) and 6.2 to 6.7 (counted), for 6 places at 37.8 to 42.0 and 15.9 to 17.1; at 16
+bits the mean epoch is 1.309 places. Pooled over the five bands by openings, the cut:
+  (a) (i) the cut begun 7 places later, the whole code: 0.9957 kept at a mean epoch of 2, 0.9519 at 6 (counted 0.9998, 0.9919). HELD, both.
+  (b) (ii) the passage begun 37 samples later, at a mean epoch of 6: the whole code keeps 0.2117 against a chance of 0.1714, a lift of
+      0.0487: MISSED below, by the range's edge (0.05 to 0.35). The counted code keeps 0.1723 against 0.1665, a lift of 0.0070: MISSED
+      below (0.08 to 0.45). The counted over the whole: MISSED (the whole stands over it). At a mean epoch of 2 the whole code keeps
+      0.6406 (chance 0.5118, lift 0.2638): HELD (0.55 to 0.78).
+  (c) (iii) the shift of rung: a place's whole code agrees in rank at 0.9328 pooled (0.9006, 0.9479, 0.9689, 0.9774, 0.9800 by band;
+      the places whose code is the same 0.24, 0.37, 0.54, 0.64, 0.71): MISSED above (0.60 to 0.93), by the range's edge. The cut keeps
+      0.7029 at a mean epoch of 2 (lift 0.3907): MISSED below (0.88 to 0.99); 0.2363 at 6 (chance 0.1698, lift 0.0800; by band the lift
+      0.04, 0.09, 0.18, 0.15, 0.18): MISSED below (0.45 to 0.85).
+  (d) (iv) one and a half times the speed: the copy's band costs the original's reader 1.0027 of its own (0.9998 to 1.0434 by band):
+      HELD. The lift at a mean epoch of 6 0.0457 (kept 0.3155, chance 0.2827): HELD, and under (b)'s 0.0487.
+  (e) the odometer's lift at a mean epoch of 6: 0.0174 in (ii), 0.0344 in (iv), 0.0214 in (iii): HELD each. Its control (i) keeps 0.0369.
+  Six parts held, six missed; every miss of the cut runs low and the one miss of the code's agreement runs high.
+Rule applied: (b) under 0.50 on both codes. No level is founded on this cut for sound with a first step's reader.
+Reading [agent-inferred, with band_code_spread.txt]. The cut holds its control, so the instrument stands. What fails is the news it
+is given. A place's whole code has a spread of 0.36 to 0.38 of its mean and no place of 811,614 passes the section, nor half of it:
+the passage holds no place brighter than the section, the landmark at which every reading opens (code.epoch-restarting-carry), and on
+text that clause carries the cut (a place's code runs there from hundredths of a nat to ten). With no landmark an opening is placed by
+a sum of about six nearly equal codes, and two readings whose codes differ a little at every place drift apart as fast as they meet:
+under the shift of rung the codes agree in rank at 0.90 to 0.98 and the cut still keeps 0.24. The counted part is the raster's own:
+its rank agreement with the place nearest it in the copy begun 37 samples later is 0.09 to 0.49 (the whole code's 0.82 to 0.93, which
+is the loudness both hold). The larger half of a place's code is the bits under its residual's leading one, which no reader of this
+kind predicts and which this reader charges at every place.
+What follows. The cut is a law of a reader's news and it is only as good as the reader's dark: a level's sites stand where most places
+are dark and a few pass the section. For sound that asks for a reading of a band that is dark while the band continues, and bright
+where it departs, with what lies under a declared width released and accounted and never charged as news. The tree holds that reading
+since October 10 (hnn.ring-moment-keys and the record of that day: a ring's section word near-returns through most of a recording,
+33,395 of 52,128 windows, at 0.44 of its spelled length, the departures kept as defects). Its ruler is fixed next, as G135.
