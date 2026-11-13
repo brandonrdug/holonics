@@ -482,6 +482,9 @@ repository was reset on September 24; the pre-reset tree is
     the bar, against 235.9 for the same tree without the opening's block. Of the 41.5 ms the
     opening still costs, the pool's allocations hold about 14 and the copies about 5; they are read
     by take site next.
+  - The opening's return runs first in the reverse (November 13, G142): the line's section reads
+    269.9 ms, 6.6 times the bar, against 236.1 without the block, every bit kept. Its pool's live
+    set peaks at 11.59 GB against a budget of 10.74, and that peak is read by phase next.
   - The open places need the written rows' ticks (November 13, P62, G140 scored; the design
     record §4.8). Read zero-shot on the line's latest lap mean with a written row held at its
     opening: the open rows alone code 3.29 nats a place worse at held one-place masks and 1.90

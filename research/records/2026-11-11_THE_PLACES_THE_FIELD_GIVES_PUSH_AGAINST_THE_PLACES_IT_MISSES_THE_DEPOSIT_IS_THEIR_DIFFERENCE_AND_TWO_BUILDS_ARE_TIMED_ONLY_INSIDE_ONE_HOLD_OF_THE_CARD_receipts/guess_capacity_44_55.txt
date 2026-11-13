@@ -3293,3 +3293,28 @@ passed; the opening's card parity passed; the block was fixed at 08:0x, before t
   the 2.73 and the scan 1.49, so the rule's reason does not reach this case and it is not applied. What it leaves: the opening still
   costs its line 41.5 ms a section over the same tree without the block (277.3 against 235.9), of which the pool's allocations about
   14, the copies about 5 and the cavity's and tied face's kernels the rest (P60's profile); the allocations are read by take site next.
+
+G142 fixed 2026-11-13T08:45Z (the Opus PC thread), before its first read: the opening's return first in the reverse and its forward's buffers
+ended there, its codes read before the reverse (a realization: every integer sum the same, in another order). Read first, at this tree before
+the change (the pool's pressure by take site, 100 profiled sections a line in one hold): the line's pool reaches a live set of 11.26 GB
+against a budget of 10.74, where the same tree without the opening's block reaches 10.50; 2,101 ms of allocations against 157, 3,000
+allocations against 300, the largest at the standing moments' return (lines 3,581 to 3,582, live near 11.0 GB, nothing kept to free), and
+every class freed again and again (25 MiB 1,292 times, 448 MiB 313). The opening's forward holds about 0.3 GB through the whole reverse
+(its kept moments, cavity moments and sides, charts, lifts, masses and totals), and its return's scratch about 0.7 GB at its own step.
+  (a) The line's allocations 3 ms a profiled section (1.5 to 6) from 21.0, and its pool's peak live 10.7 GB (10.4 to 11.0).
+  (b) In one hold the line's section 13 ms nearer its control's (9 to 17), every bit kept (100 of 100 section lines and the line's digests).
+  Rules. (a) at 6 or under with (b) held: the opening's copies (about 5 ms a section) are read by site next. (a) over 6: the live set at
+  its peak is read by phase (which buffers stand there) before another change.
+
+G142 scored 2026-11-13T08:50Z (receipt g142_pool.txt, the engine record's receipts, on claude/carry-reads; the change 7d9982b80 against
+main 9ad0ed477 in one hold, the line reproduced 100 of 100 with its digests, the opening's card parity and gates 1 and 3 passed; the block
+was fixed near 08:28Z, before the read, though its line reads 08:45Z):
+  (a) the line's allocations 12.55 ms a profiled section against 16.00 and 16.00 on the old tree, against 3 (1.5 to 6): missed above; the
+      pool's peak live 11.59 GB against 10.7 (10.4 to 11.0): missed above, higher than the 11.26 before the change.
+  (b) the line's section 269.9 ms against 276.4 and 277.5 on the old tree, 7.1 ms nearer its control's 236.2 and 236.0, against 13 (9 to 17):
+      missed below. The copies fell to 2.95 ms a section from 6.61 (the codes read before the reverse); the kernels stand.
+  Of 3 parts none held. The premise that missed: that the peak stood where the opening's forward was held through the reverse. Run first,
+  the return's own scratch (its 448 MiB prefixes beside the face's covector and the cavity's charts) stands on the ticks' kept states at
+  the reverse's start, a higher peak than the one it removed (agent-inferred, unread by phase).
+  Rule applied: (a) over 6: the live set at its peak is read by phase (which buffers stand there) before another change. The change keeps
+  every bit and gains 7.1 ms, and it stands.

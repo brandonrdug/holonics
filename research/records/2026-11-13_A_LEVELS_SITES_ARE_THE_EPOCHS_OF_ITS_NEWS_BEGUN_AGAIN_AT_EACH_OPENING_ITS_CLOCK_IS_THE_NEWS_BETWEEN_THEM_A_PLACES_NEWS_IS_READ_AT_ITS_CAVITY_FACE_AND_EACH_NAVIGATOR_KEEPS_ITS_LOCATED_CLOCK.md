@@ -445,6 +445,14 @@ read 284.4). The opening still costs its line 41.5 ms a section, of which the po
 the largest kept buffers are freed every section) and the copies about 5; those are read next, by
 take site.
 
+*The opening's allocations* (G142, November 13; `g142_pool.txt`). Read by take site, the line's pool
+reaches a live set of 11.26 GB against its batch's budget of 10.74 (10.50 without the block), so every
+large take allocates and the kept buffers are freed each section. The opening's return now runs first
+in the reverse and its forward's buffers end there, its codes read before it: every bit kept, the
+copies 2.95 ms a section from 6.61, the allocations 12.6 from 16.0, the line's section 269.9 ms
+(6.6 times the bar) against 236.1 without the block. The peak rose to 11.59 GB at the reverse's start,
+so the live set at its peak is read by phase before another change.
+
 ### 4.5 An epoch's face is its moment on the news phase
 
 The built restriction opens a packet through one chart of its six sites' reads in place order.
