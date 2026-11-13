@@ -28,8 +28,10 @@ Changes, the copy read by the same reader and cut at the same sigma:
   insert q   after a place, at q of places, the reader's most expected symbol there is inserted
   flip q     at q of places the symbol is replaced by another, drawn from the reader's face there
   and the changes a boundary supplies of its own (a copy of the regions with its coordinates carried to the original's)
-A site is kept where the copy has a site within the change's tolerance of its coordinate (the same place, for the three made
-changes); sites past the 39th place of a region are compared. Chance: the copy's sites moved FAR along, around the region.
+A site is kept where the copy has a site within the change's tolerance of its coordinate; sites past the 39th place of a region
+are compared. The three made changes are changes of places, so on every stream they are compared by place (a place's index its
+coordinate, the same place kept); a boundary's own change is compared on the boundary's coordinate. Chance: the copy's sites
+moved FAR along, around the region (FAR places for a made change, FAR steps of the boundary's coordinate for its own).
 Lift: (kept - chance) / (1 - chance). `same`: the share of the original's places whose symbol stands in the copy at their
 coordinate; `untouched`: the share whose news is the same there.
 
@@ -347,17 +349,19 @@ def read(kind, streams):
         made = [("start", begun_later, 0.0)] + [("insert%.2f" % r, inserted, r) for r in RATES] + [("flip%.2f" % r, flipped, r) for r in RATES]
         for ci, (label, fn, rate) in enumerate(made):
             rng = np.random.default_rng([SEED, si, ci])
-            out = [fn(reader, s, x, rate, rng) for s, x in regions]
-            changes[label] = ([o[0] for o in out], [o[1] for o in out], st["tol"])
+            # a made change is a change of places, so it is compared by place on every stream (a place's index its coordinate)
+            idx = [np.arange(len(s), dtype=np.float64) for s, _ in regions]
+            out = [fn(reader, s, x, rate, rng) for (s, _), x in zip(regions, idx)]
+            changes[label] = ([o[0] for o in out], [o[1] for o in out], 0.25, float(FAR), 1.0, idx)
         for label, copy, tol in st["own"]:
             keep = [(s, x) for (s0, _), (s, x) in zip(st["read"], copy) if len(s0) >= SHORT]
-            changes[label] = ([s for s, _ in keep], [x for _, x in keep], tol)
+            changes[label] = ([s for s, _ in keep], [x for _, x in keep], tol, st["far"], st["step"], xs)
         ccodes, crhos = {}, {}
-        for label, (cs, cx, tol) in changes.items():
+        for label, (cs, cx, tol, far, step, xo) in changes.items():
             ccodes[label] = reader.codes(cs)
             crhos[label] = [isolation(c, np.cumsum(c)) if len(c) else np.zeros(0) for c in ccodes[label]]
             n = same = untouched = extra = 0
-            for s, x, c, s2, x2, c2 in zip(syms, xs, codes, cs, cx, ccodes[label]):
+            for s, x, c, s2, x2, c2 in zip(syms, xo, codes, cs, cx, ccodes[label]):
                 live = np.flatnonzero(np.isfinite(x2))
                 if len(live) == 0:
                     continue
@@ -393,12 +397,12 @@ def read(kind, streams):
                         float((rr == 1).mean()), float((rr == 2).mean()), float((rr == 3).mean()), float((rr >= 4).mean()), int(rr.max()))
                 print("  EXTENT %s law=%s sigma=%.4f sites=%d mean_epoch=%.3f%s" % (ext, law, sg, n_sites, places / max(n_sites, 1), tail))
                 parts = []
-                for label, (cs, cx, tol) in changes.items():
+                for label, (cs, cx, tol, far, step, xo) in changes.items():
                     acc = [0, 0, 0]
-                    for i, (x, z, x2, c2, r2) in enumerate(zip(xs, so, cx, ccodes[label], crhos[label])):
+                    for i, (x, z, x2, c2, r2) in enumerate(zip(xo, so, cx, ccodes[label], crhos[label])):
                         if len(c2) == 0:
                             continue
-                        kept, who, ch = compare(x, z, x2, sites_of(law, c2, r2, sg), tol, st["far"], st["step"])
+                        kept, who, ch = compare(x, z, x2, sites_of(law, c2, r2, sg), tol, far, step)
                         acc[0] += int(kept.sum())
                         acc[1] += len(kept)
                         acc[2] += ch

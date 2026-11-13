@@ -1,6 +1,6 @@
 # A level's sites are the landmarks of its news: a place no larger news stands within a section of; the claim, the carried cut and the odometer are one law anchored nearer and farther; and one program reads every symbol stream
 
-Refs #404 #406 #410. Status: [design, with one count ruler; November 13], by the theory thread
+Refs #404 #406 #410. Status: [design, with one count ruler, read and scored (G137); November 13], by the theory thread
 that holds the PC's runs and the engineering. It restates the law of sites of
 [the design record](2026-11-13_A_LEVELS_SITES_ARE_THE_EPOCHS_OF_ITS_NEWS_BEGUN_AGAIN_AT_EACH_OPENING_ITS_CLOCK_IS_THE_NEWS_BETWEEN_THEM_A_PLACES_NEWS_IS_READ_AT_ITS_CAVITY_FACE_AND_EACH_NAVIGATOR_KEEPS_ITS_LOCATED_CLOCK.md)
 (its §4.2), as that record's §8 owed. Every design statement is agent-inferred and nothing of
@@ -304,15 +304,98 @@ places; and the changes each specimen already has (a line's leading spaces doubl
 wave's start moved by a third of a sample, and its double-speed copy read one ring down).
 Laws are compared at equal extent: each law's section is located for a mean epoch of 2
 places and of 6. The section `ln A` is read beside, where the laws' extents differ (the
-carried cut's epochs are the shortest there). Streams: the five slices of the public corpus as in G124 (octets, `A = 256`), and
-the arrivals of rings 3 to 7 on the specimen of G136 at a reach of four turns (`A = 49`).
+carried cut's epochs are the shortest there). Streams: the five slices of the public corpus
+as in G124 (octets, `A = 256`, 330,000 held places a slice), and the arrivals of rings 3 to 7
+on the specimen of G136 at a reach of four turns (`A = 49`, 12,751 to 106,160 places a ring).
 
-The guess is fixed in the guess file before the read. The reading and its score follow
-here.
+The guess, its addendum and the rule were pushed at `50e9e643b` before either read.
+
+### 9.1 The instrument
+
+The first read of the arrivals printed a chance of zero for the three made changes. The
+ruler moved the copy's sites by a count of turns on the wave's clock, and no moved site
+lands on an arrival's time. A made change is a change of places, so it is now compared by
+place on every stream; a specimen's own change is compared on the specimen's coordinate. The
+made run and the octets read are the same to the last digit under the repaired ruler. The
+arrivals were read again, and that read is the one scored.
+
+### 9.2 The reading
+
+A site is kept when the copy holds a site at its place. Lift is kept less chance over one
+less chance. Pooled by kind, each law's section located for a mean epoch of 6 places:
+
+| Change | Kind | Odometer | Carried cut | Claim, order of arrival | Claim, order of news | Its first round | Window of 3 places a side (mean epoch 7.1, 7.2) |
+|---|---|---|---|---|---|---|---|
+| start moved 7 places (kept) | octets | 0.231 | 0.994 | 0.995 | 1.000 | 1.000 | 1.000 |
+| | arrivals | 0.193 | 0.986 | 0.990 | 1.000 | 1.000 | 1.000 |
+| most expected symbol inserted after 0.05 of places | octets | 0.103 | 0.319 | 0.306 | 0.811 | 0.882 | 0.809 |
+| | arrivals | 0.080 | 0.324 | 0.300 | 0.897 | 0.949 | 0.936 |
+| the same after 0.25 of places | octets | 0.090 | 0.123 | 0.108 | 0.436 | 0.564 | 0.375 |
+| | arrivals | 0.077 | 0.097 | 0.087 | 0.664 | 0.810 | 0.760 |
+| symbol replaced at 0.05 of places | octets | 0.097 | 0.319 | 0.315 | 0.779 | 0.845 | 0.776 |
+| | arrivals | 0.077 | 0.301 | 0.308 | 0.805 | 0.867 | 0.841 |
+| the same at 0.25 of places | octets | 0.070 | 0.102 | 0.090 | 0.353 | 0.448 | 0.288 |
+| | arrivals | 0.049 | 0.077 | 0.079 | 0.403 | 0.499 | 0.434 |
+| the wave begun a third of a sample later | arrivals | 0.162 | 0.354 | 0.363 | 0.709 | 0.759 | 0.757 |
+| the double-speed copy, one ring down | arrivals | 0.105 | 0.171 | 0.177 | 0.433 | 0.488 | 0.495 |
+| a line's leading spaces doubled, code slice (kept) | octets | | 0.820 | | | 0.9955 | |
+
+- **One law on both kinds.** The first round's lift over the carried cut's is 2.65 to 4.59 on
+  octets and 2.88 to 8.35 on arrivals under the four made changes, and the first round stands
+  over the cut in 40 of the 40 cases of a stream by a change. The order of the four laws is
+  the same in all 8 pooled cases: odometer, cut, claim, first round.
+- **The order parts the laws; the stride's convention does not.** The claim in the order of
+  arrival stands within 0.024 of the carried cut in every case. The claim in the order of
+  news keeps 0.35 to 0.90 where either keeps 0.08 to 0.32.
+- **Inside the claim, the first round is the part that holds.** Under a symbol replaced at 0.05
+  of places the claim's round-one sites are kept at 0.863 and 0.886, its later rounds' at 0.693
+  and 0.717. That is statement 5 read on a stream: what hangs on a chain moves with the chain.
+- **At a mean epoch of 2 places** the first round still keeps more than the cut: under a symbol
+  replaced at 0.05 of places 0.928 against 0.838 on octets and 0.909 against 0.780 on arrivals.
+  At the section `ln A` the cut's mean epoch is 1.90 places on octets and 1.29 on arrivals,
+  with 0.67 to 0.77 of its strides under a section; the first round's is 4.42 and 2.87, with
+  every stride a section or more.
+- **What a site hangs on is what it keeps** (agent-inferred from the specimens' own changes).
+  Under the start moved a third of a sample the first round keeps, by ring, 0.692, 0.786,
+  0.883, 0.937 and 0.970 of its sites, where the copy holds the same symbol at 0.704, 0.772,
+  0.880, 0.943 and 0.979 of places: a site is kept about as often as its own place is the
+  same. The cut in either order keeps a site at about the power of its epoch's length (G135).
+- **Strides at the section `ln A`.** A mean stride of the first round is 1.80 to 1.93 sections.
+  About a third of strides are 2 sections or more; 0.058 to 0.091 are 3 or more and hold 0.109
+  to 0.171 of the news; the longest is 5.8 to 12.9 sections.
+- **The isolation's count.** From 4 sections to 32 the share of places of isolation `x` or
+  more stands at 0.97 to 1.09 of `c̄/(2x + c̄)` on every stream (one cell aside, 0.68). Under 2
+  sections it stands over it, 1.2 to 1.6 times at a quarter to one section: near a bright
+  place the places are darker than a draw alike at every place would make them. A reader of
+  two symbols back shows no scale of the passage past its own context, so this says nothing
+  of a second level's section; that reading is owed on the machine's own news.
+- **What parted the kinds.** Under inserts at 0.25 of places the first round keeps 0.810 on
+  arrivals and 0.564 on octets (the stated prediction of no difference by kind missed there,
+  a factor 1.82 against 1.6). On arrivals 0.11 to 0.18 of places carry a section or more, on
+  octets 0.025 to 0.058. That is a difference of the news, read here only as that share; a
+  site's margin over the news an inserted place can alter was not read (agent-inferred).
+- **The window on a count of places** keeps as the first round does on arrivals and less on
+  octets under inserts (0.375 against 0.564 at 0.25 of places): inserted places move a count
+  of places and do not move the clock of news as far as they carry little.
+
+### 9.3 The score and the rule
+
+Every part of the guess is scored in the guess file. Four figures missed, all above their
+ranges; of the four stated predictions three held and one held in three of its four cases.
+The rule: the first holds on both kinds, so the design record's law of sites is the first
+round on the clock of news for every stream. Its §4.2, §4.3, §4.5 and §4.6 are amended with
+this record, and the atlas with them. The cut of that record is restated as the claim in
+the order of arrival.
 
 ## 10. What is owed
 
-The epoch's interior under strides past a section (§6, §4.5 of the design record); the chart
-across rings; the image's ruler; Lean statements of 1 to 5 and 7 (#410); the claim's card
-realization when a level is built (a place's isolation is two nearest-greater reads, one
-either way, and a region's places take them together).
+- The epoch's interior where a stride passes a section (§6, §4.5 of the design record), sized
+  from §9.2's strides: a third of strides are 2 sections or more.
+- The chart across rings.
+- The isolation's count on the machine's own news, for a second level's section.
+- A site's margin over the news a change can alter, the statistic §9.2 names and did not read.
+- The image's ruler: a stroke under a magnification the passage itself holds, read by the same
+  program through a third boundary.
+- Lean statements of 1 to 5 and 7 (#410).
+- The law's card realization when a level is built (a place's isolation is two
+  nearest-greater reads, one either way, and a region's places take them together).

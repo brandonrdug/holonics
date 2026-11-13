@@ -2948,3 +2948,58 @@ Stated prediction.
 Rule. Four holds: the design record's cut is restated as the claim in the order of arrival, and the choice of a level's sites is
 stated as the choice of an order, fixed by the record's requirements as the order of news. Four fails with A over C by more than 0.06:
 the stride's convention carries part of what the cut loses, and the record says how much before the order is credited with it.
+
+G137 scored 2026-11-13T03:50Z (receipts site_ruler_octets.txt and site_ruler_arrivals.txt beside site_ruler.py in the record's receipts;
+the guess and its addendum pushed at 50e9e643b before either read). The instrument first: the first arrivals read printed a chance
+of zero for the three made changes, because it moved the copy's sites by a count of turns on the wave's clock, where none lands on
+an arrival's time; a made change is a change of places and is now compared by place on every stream. The made run and the octets
+read are the same to the last digit under the repaired ruler; the arrivals read was run again and is the one scored. Lifts below
+are pooled by kind over five slices of octets (330,000 held places each) and five rings of arrivals (12,751 to 106,160 places).
+  (a) Octets. News a place 2.108 to 2.481 nats by slice: held. Places at or past ln 256: 0.025 to 0.058 by slice, 0.043 pooled
+      against 0.07 (0.04 to 0.11): held at its lower edge, two slices under it. Mean epoch at ln 256: C 1.90, P 4.42, G 3.58: held;
+      G's sites in round one 0.80 to 0.82 against 0.72 (0.60 to 0.82): held at the upper edge. Arrivals. News a place 2.57 pooled
+      (2.80 to 1.67 by ring, rings 6 and 7 under the range): held pooled. At ln 49: C 1.29, P 2.87: held; round one 0.80 to 0.83:
+      held.
+  (b) A moved start. P and G keep every compared site at every extent on both kinds: held. C at a mean epoch of 6 keeps 0.994 on
+      octets: held; 0.986 on arrivals against 0.96 to 0.985: missed above by 0.001. O's lift 0.074 and 0.033 at a mean epoch of 6:
+      held there (the part named no extent; at a mean epoch of 2 it is 0.38 and 0.32).
+  (c) Flips at a mean epoch of 6, at 0.05 and 0.25. P on octets 0.845 and 0.448, on arrivals 0.867 and 0.499; C on octets 0.319 and
+      0.102, on arrivals 0.301 and 0.077; G on octets 0.779 and 0.353; O 0.097, 0.070, 0.077, 0.049. Every figure held.
+  (d) Inserts at a mean epoch of 6, at 0.05 and 0.25. P on octets 0.882 and 0.564: held. P on arrivals 0.949 and 0.810 against
+      0.84 (0.70 to 0.93) and 0.45 (0.27 to 0.63): both missed above. C on octets 0.319 and 0.123, on arrivals 0.324 and 0.097:
+      held.
+  (e) Spaces doubled on the code slice at a mean epoch of 6: C keeps 0.820: held; P keeps 0.9955 against 0.95 (0.90 to 0.99):
+      missed above. Arrivals: a third of a sample, P 0.759 against C 0.354: held; the double-speed copy one ring down, P 0.488
+      against C 0.171: held.
+  (f) Flips at 0.05 at a mean epoch of 2: P 0.928 on octets and 0.909 on arrivals, C 0.838 and 0.780, P over C 1.11 and 1.17: held.
+  (g) Flips at 0.05 at a mean epoch of 6: the claim's round-one sites kept 0.863 and 0.886, its later rounds' 0.693 and 0.717, a
+      difference of 0.170 and 0.169: held.
+  (h) At ln A under P: strides of 3 sections or more are 0.058 to 0.073 of strides on octets and 0.070 to 0.091 on arrivals, and
+      hold 0.109 to 0.137 and 0.132 to 0.171 of the news: held; the longest 6.0 to 7.6 sections on octets and 5.8 to 12.9 on
+      arrivals: held on nine streams, ring 7 at 5.8. A mean stride is 1.80 to 1.93 sections. Under C 0.67 to 0.77 of strides are
+      under a section: held.
+  (i) The count of places of isolation x sections or more over c/(2x + c): 0.97 to 1.09 at x of 4 to 32 on every stream but one
+      cell (wikidata at 32, 0.68): held. Under 2 sections the count stands over it (1.2 to 1.6 times at a quarter to one section).
+  (j) A against C at a mean epoch of 6: apart by 0.002 to 0.024 in the 8 cases, and 0.995 against 0.994 and 0.990 against 0.986
+      under a moved start: held.
+  One: held. P's lift over C's at a mean epoch of 6 is 2.76, 4.59, 2.65, 4.39 on octets and 2.93, 8.35, 2.88, 6.48 on arrivals
+      (inserts at 0.05 and 0.25, flips at 0.05 and 0.25), and P stands over C in 40 of the 40 cases of a stream by a change (by
+      1.6 or more in 39; ring 7 under inserts at 0.05, 1.58).
+  Two: held in three of the four changes, missed under inserts at 0.25 (4.59 against 8.35, a factor 1.82 against 1.6): on
+      arrivals the first round keeps 0.810 where on octets it keeps 0.564.
+  Three: held in 8 of 8 (O under C under G under P).
+  Four: held. (j) in 8 of 8, and P's lift is 2.7 to 9.3 times A's.
+  Four figures missed, all four above their ranges (the first round kept more than guessed three times, the cut 0.001 more
+  once); every other figure held, ring 7's longest stride 0.2 under its range.
+Rules applied. One holds on both kinds: the design record's law of sites is the first round on the clock of news for every stream
+(its 4.2, 4.3, 4.5 and 4.6 amended, the atlas with them). Owed next, sized from (h): the epoch's interior where a stride passes a
+section (about a third of strides are 2 sections or more, 0.06 to 0.09 are 3 or more and hold 0.11 to 0.17 of the news), then the
+chart across rings. Four holds: the design record's cut is restated as the claim in the order of arrival. The clause from (f) does
+not apply: at a mean epoch of 2 the first round keeps 0.09 and 0.13 more than the cut.
+Reading [agent-inferred]. What a site hangs on decides what it keeps. Under the specimens' own changes the first round keeps a
+site about as often as the copy holds the same symbol at the place (a third of a sample by ring: kept 0.692, 0.786, 0.883, 0.937,
+0.970 where the symbol is the same at 0.704, 0.772, 0.880, 0.943, 0.979 of places), the first power, where the cut in either
+order keeps it at about the power of its epoch's length. Two's miss is a difference of the news and not of the law, and it was
+not read: on arrivals 0.11 to 0.18 of places carry a section or more against 0.025 to 0.058 on octets, so a site there stands
+further above the news an inserted place can alter (not read as a margin). (i) says nothing of a second level's section: a reader
+of two symbols back shows no scale of the passage past its own context, and that reading is owed on the machine's own news.
