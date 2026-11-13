@@ -946,7 +946,8 @@ pub(super) fn read_news(args: &[String]) -> Result<()> {
                     }
                 }
             }
-            println!("NEWS_BLOCKS slice={name} b={b} offset={o} places={covered} block_bits={:.4} single_bits={:.4} ratio_milli={}", sb as f64 / covered.max(1) as f64 / bit as f64, s1 as f64 / covered.max(1) as f64 / bit as f64, if s1 > 0 { sb * 1000 / s1 } else { 0 });
+            let millibits = |sum: i128| sum * 1000 / (covered.max(1) as i128 * bit as i128);
+            println!("NEWS_BLOCKS slice={name} b={b} offset={o} places={covered} block_millibits={} single_millibits={} ratio_milli={}", millibits(sb), millibits(s1), if s1 > 0 { sb * 1000 / s1 } else { 0 });
         }
         let (mut dark, mut dark_bright) = (0usize, 0usize);
         for (c1, blocks) in &reads {
@@ -974,7 +975,7 @@ pub(super) fn read_news(args: &[String]) -> Result<()> {
                 shared += anchors.iter().filter(|a| other.contains(a)).count();
                 cut_places += series.len();
             }
-            println!("NEWS_CUT slice={name} news={label} places={cut_places} sites={sites} share_milli={} mean_epoch_milli={} long_strides={long} long_news_milli={} shared_with_c1={shared} bits_a_place={:.4}", sites * 1000 / cut_places.max(1), cut_places * 1000 / epochs.max(1), if news > 0 { long_news * 1000 / news } else { 0 }, news as f64 / cut_places.max(1) as f64 / bit as f64);
+            println!("NEWS_CUT slice={name} news={label} places={cut_places} sites={sites} share_milli={} mean_epoch_milli={} long_strides={long} long_news_milli={} shared_with_c1={shared} millibits_a_place={}", sites * 1000 / cut_places.max(1), cut_places * 1000 / epochs.max(1), if news > 0 { long_news * 1000 / news } else { 0 }, news * 1000 / (cut_places.max(1) as i128 * bit as i128));
         }
         println!("NEWS_SLICE slice={name} stretches={} places={n_places} host_ms={} threads={}", stretches.len(), slice_start.elapsed().as_millis(), rayon::current_num_threads());
     }
