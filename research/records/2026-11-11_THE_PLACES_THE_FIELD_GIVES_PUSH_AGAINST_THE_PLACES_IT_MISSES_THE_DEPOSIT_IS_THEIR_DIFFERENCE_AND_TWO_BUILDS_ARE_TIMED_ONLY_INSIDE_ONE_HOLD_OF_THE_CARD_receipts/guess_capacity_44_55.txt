@@ -3757,3 +3757,35 @@ covector, each against its random-sign level over receiver rows (a floor: rows w
   What it adds: the return's chart (G155) and the reach on the clock both stand near first-order stationarity on the line's own text, two
   directions the built tick does not span (the return's) or spans through the skins (the reach), each at its random-sign level. The theory's
   ends (`Γ` from the echo, `u = w = 1`) are not visible at first order from where the deposit stands.
+
+G158 fixed 2026-11-13T20:07Z (the Opus PC thread), before its read: the reader's reaction on its source, the junction record's §13.8,
+read at its founding from built passes. read-reaction (Field::reaction_covectors, reaction_route: the reverse's value route alone, fed each
+reader's state after the tick) on level3/MEAN.3000, seen (prefix) and held stretches, both masks, by tick, head and kind of reader, each
+written source's `a_j = ⟨λ_j^(k+1), ρ_j⟩` summed; `d(code)/dκ_h = −Σ_k Σ_j a_j` for the stage `x_j ← x_j − κ_h ρ_j`; each sum against its
+random-sign level over sources (a floor). Read first: nothing prints `ρ`; G151 printed every open row's echo at zero, so with one place
+open the reaction is the only route by which an open place hears itself.
+  (a) the theory thread's: on seen stretches under the cut's mask the code falls as `κ` rises (`Σ a > 0`, readers of both kinds pooled) in
+      at least three of four heads, the sum over twice its random-sign level in at least two;
+  (b) this thread's: held and seen stretches agree in that sign in at least three of four heads (a reaction is not a direction of how sure
+      the constitution is, so it is no held gap as `ℓ_b`'s push was).
+  Rule. (a) held: the reaction is built (host, card and parity), founded at `κ = 0`, and trained a lap beside the line, its lap scored on
+  the located `κ` by head, the held code at lap means and read-depth's free ring. Its covector at the random-sign level in every head on
+  seen stretches: the comparison read at one depth has no use for a reaction (the theory thread's reading), and the next loop is the
+  comparison's depth, not a part.
+
+G158 scored 2026-11-13T20:16Z (receipt g158_reaction.txt; read-reaction on level3/MEAN.3000, the training documents (prefix) and the held role,
+122 stretches each, both masks; host, 8 threads, 49.6 and 53.5 s). "Falls" is the code falling as κ rises (Σ a > 0, the turn); "rises" asks
+the deposit for κ < 0, the like sign, a relaxation onto agreement (§13.8):
+  (a) on seen stretches under the cut's mask, readers pooled, the code rises with κ in three of four heads (head 0 at 4.69 times its
+      random-sign level, head 2 at 1.47, head 3 at 5.41) and falls in one (head 1, 0.77): missed, the sign reversed in the two coherent heads;
+  (b) held and seen agree in sign in two of four heads (heads 1 and 3); head 0 is coherent on both with opposite signs (seen rises at 4.69,
+      held falls at 3.67), a held gap: missed.
+  Of 2 parts none held. The rule's branches are not met whole: (a) missed in sign, and the covector stands well over its random-sign level
+  in heads 0 and 3 on seen text. By slice it is coherent within each slice and its sign is the slice's: on seen text head 0 reads −0.116,
+  +0.409, −0.120, −0.281 and −0.567 (code, web, science, books, wikidata; minus asks for agreement) and head 3 +0.076, +0.258, −0.226,
+  −0.022 and −0.515, each over some 25,000 written sources. So the trained comparison does ask a reader to act on its source, at first
+  order, and it asks for agreement in some text and for a turn in other text: the first new direction since G151 whose founding covector
+  stands well over its floor on the line's own stretches. One real a head would take the pooled pull of opposed slices. Decided
+  (agent-inferred): the reaction is the next build, its strength read a site from the source's own chart as `ℓ`'s was
+  (`κ = K_h r̂ + κ_b,h`, founded at zero), so that the deposit can locate where the comparison asks for agreement and where for a turn; the
+  theory thread is asked for the chart's form and its passivity bound (κ m² < 4) before the kernels.
