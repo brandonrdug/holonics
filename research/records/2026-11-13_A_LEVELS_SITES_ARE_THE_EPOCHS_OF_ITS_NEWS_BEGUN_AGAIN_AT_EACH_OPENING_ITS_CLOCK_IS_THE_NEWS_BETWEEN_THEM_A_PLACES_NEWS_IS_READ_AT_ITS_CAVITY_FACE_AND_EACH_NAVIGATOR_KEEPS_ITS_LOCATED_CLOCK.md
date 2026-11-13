@@ -615,6 +615,48 @@ receiver, and they flag too many places to pay. G140's rules: the candidate law 
 where an open row's mass lies by its source's news is read first, on the machine's own news
 (§4.4a, now built) and never on a count's.
 
+### 4.9 The level's first build (November 13, the Opus PC thread; every choice here is `agent-inferred`)
+
+The built tower (`Scale`, `Field::scaled_up`; atlas `tower.field-scale-packets`) is this law on the plain
+clock with equal news, so the build replaces its packets and its place-order chart and keeps its glue's
+shape, its founding (the prolongation at zero, so the tower reads every face of the field it was founded
+on) and its split. Each choice below is made from the sections above; where none settles it, the choice
+says why.
+
+- **The news.** `c_t` is the opening's code (§4.4a) on the code's grain (`2^(−20)` bits): at a written
+  place the code of its class at its cavity face; at a place the field does not know (open, carried or
+  past a port) the face's expected code `Σ_a p̃_t(a) code_t(a)`. An open place's class is the
+  comparison's target, and a cut that read it would carry the answer into the forward, so the
+  expected code is the only lawful news there (the blank's law of §16.44 with `−log p̃` for the rates).
+- **The section.** `σ = 8` bits (§4.6), `8·2^20` on the grain. A stride on the pace grain is then
+  `2 (S_b − S_a)`, with no remainder.
+- **The cut.** Sites by isolation, `ρ_t ≥ σ` (§4.2), two nearest-greater reads a place, region by
+  region. A site leads its epoch. The places before a region's first site form a leading epoch
+  anchored at the region's first place, because a region is a strand that begins there and nothing
+  reaches across its start (the cut is begun again at each opening).
+- **The phase chart.** `φ_t = (S_t − S_(a_j))/σ` from the epoch's anchor, and six harmonics on the
+  real chart `1, cos 2πφ, sin 2πφ, cos 4πφ, sin 4πφ, cos 6πφ`, the discrete Fourier chart of six
+  equal places in real form, so the glue keeps the packets' count of entries (`sin 6πφ` vanishes on
+  the plain clock, and a winding interior's chart is owed, §4.5). Each harmonic is the field's own
+  turn at a declared width (`turn_phasor` on a ring of one turn, its argument on the pace grain).
+  `m_k(j) = release(Σ_(t∈e_j) h_k(φ_t) r̂(x_t), 30)` restricts through `A` and `b_A`; the
+  prolongation adds `release(Σ_k h_k(φ_t) v_k(j), 30)` with `v = B r̂(x¹_j) + b_B`, founded at zero.
+- **The level's clock.** `κ¹_j = L_(j−1)/σ`, the stride into epoch `j` from the one before (the
+  moment's convention, a place's stride is the gap before it), `τ¹_j = (S_(a_j) − S_(a_0))/σ`, its
+  variation the same, every turned head of the level on that one clock: drive and move on the
+  level's own clock (§4.3). The first epoch's own rate is one.
+- **The level's field.** The fine field's declaration with an alphabet of two (a level names no
+  symbol), no triads, no carry circles and no opening of its own, and its ticks the fine field's
+  after the split (two of four). The cut and the phases are data: a carry has no first-order return,
+  so nothing returns to `c_t`.
+- **Its realization.** On the card the opening's forward already stands at the batch's start; a
+  kernel reads every place's news from its masses and total, the host cuts the regions and forms the
+  phases (a kind of work placed on the host, every bit kept, with its parity), and the card runs the
+  restriction, the level's ticks and the prolongation at the split.
+- **What it is checked against first.** The recorded failures of §7, and two more: a cut that reads
+  the answer (refused above), and a state tool that drops a law the line reads (the founding keeps
+  every part rate the line carries; the new parts start at the base rate).
+
 ## 5. What this corrects in the records of November 12
 
 - The record of the symbol's length §8.1 and §8.3 ("one clock"): the moments' strides stay
