@@ -1,0 +1,163 @@
+# P59 item 2, 2026-11-13 UTC: the contact's copies, one mechanism a copy, each launched immediately before its entry on the entry's words, its
+# outputs in scratch arrays that start as the entry's (claude/contact-copies; tools/contact_copies.py generates them from field.cu's entries).
+# One hold: a profiled control, the copies' run, a profiled control; the store trainer's sections 2,001 to 2,100 from run 2's STATE.1900.
+# ms are a profiled section's (a run's total over its 100 sections). SASS from ptxas for sm_89 on the ruler build's PTX. Numbers only.
+## the builds
+d04e18662+copies (claude/contact-copies, feature ruler-copies, uncommitted; walk order, the record by offsets, the checks) field_pass 6cdecbae2eca56fb9eaa02c8baab765bbefcdc7f8871a8ddae42cb898375862d
+d04e18662 control (the tree's default build; its field.cu PTX equals main d04e18662's) field_pass 505f223cc150f9da27036da3ec62ce9fcfde8c0ba324533641806d6beb6db279
+## the entries in the controls (ms a profiled section, both controls) and their lowering
+ENTRY entry=field_exposure launches=400/400 control1_ms=8.620 control2_ms=8.512 spread=0.013 registers=64 stack=152 spill_stores=220 spill_loads=356 instructions=3856 LDG=70 STG=3 ATOMG=0 RED=26 LDS=12 STS=8 LDL=79 STL=46 IMAD=865 IMAD_WIDE=325
+ENTRY entry=field_contact_l5 launches=351/351 control1_ms=26.806 control2_ms=25.974 spread=0.032 registers=64 stack=272 spill_stores=778 spill_loads=1284 instructions=9720 LDG=98 STG=6 ATOMG=0 RED=33 LDS=43 STS=21 LDL=297 STL=186 IMAD=2137 IMAD_WIDE=524
+ENTRY entry=field_contact_l6 launches=49/49 control1_ms=4.073 control2_ms=3.971 spread=0.025 registers=64 stack=288 spill_stores=830 spill_loads=1384 instructions=10520 LDG=98 STG=6 ATOMG=0 RED=33 LDS=43 STS=21 LDL=322 STL=199 IMAD=2355 IMAD_WIDE=536
+ENTRY entry=field_contact_rows launches=1600/1600 control1_ms=30.784 control2_ms=30.704 spread=0.003 registers=128 stack=16 spill_stores=12 spill_loads=12 instructions=7680 LDG=120 STG=7 ATOMG=7 RED=37 LDS=50 STS=23 LDL=3 STL=3 IMAD=1987 IMAD_WIDE=632
+ENTRY entry=field_contact_columns launches=1600/1600 control1_ms=26.064 control2_ms=25.232 spread=0.032 registers=72 stack=0 spill_stores=0 spill_loads=0 instructions=1256 LDG=46 STG=2 ATOMG=0 RED=7 LDS=0 STS=0 LDL=0 STL=0 IMAD=315 IMAD_WIDE=66
+ENTRY entry=field_pace_skin_back launches=800/800 control1_ms=16.920 control2_ms=16.800 spread=0.007 registers=96 stack=0 spill_stores=0 spill_loads=0 instructions=4152 LDG=66 STG=0 ATOMG=3 RED=18 LDS=14 STS=9 LDL=0 STL=0 IMAD=992 IMAD_WIDE=318
+## the copies
+COPY copy=field_copy_n_exposure entry=field_exposure mechanism=n (the entry as it stands) launches=400 copy_ms=8.196 control1_ms=8.620 control2_ms=8.512 controls_spread=0.013 ratio=0.957 over_null_copy=1.000 long_paths=0 status_bits=0
+  LOWERING registers=64 stack=152 spill_stores=220 spill_loads=356 instructions=3856 LDG=70 STG=3 ATOMG=0 RED=26 LDS=12 STS=8 LDL=79 STL=46 IMAD=865 IMAD_WIDE=325
+  CHECK the entry's words: compared=47678863616 differing=0
+COPY copy=field_copy_r_exposure entry=field_exposure mechanism=r (source rows resident) launches=400 copy_ms=8.036 control1_ms=8.620 control2_ms=8.512 controls_spread=0.013 ratio=0.938 over_null_copy=0.980 long_paths=0 status_bits=0
+  LOWERING registers=64 stack=168 spill_stores=240 spill_loads=404 instructions=3832 LDG=70 STG=3 ATOMG=0 RED=26 LDS=12 STS=8 LDL=90 STL=51 IMAD=842 IMAD_WIDE=325
+COPY copy=field_copy_w_exposure entry=field_exposure mechanism=w (a pair's words in walk order) launches=400 copy_ms=7.632 control1_ms=8.620 control2_ms=8.512 controls_spread=0.013 ratio=0.891 over_null_copy=0.931 long_paths=0 status_bits=0
+  LOWERING registers=64 stack=160 spill_stores=216 spill_loads=356 instructions=3864 LDG=70 STG=3 ATOMG=0 RED=26 LDS=12 STS=8 LDL=79 STL=45 IMAD=872 IMAD_WIDE=325
+COPY copy=field_copy_n_contact_l5 entry=field_contact_l5 mechanism=n (the entry as it stands) launches=351 copy_ms=25.574 control1_ms=26.806 control2_ms=25.974 controls_spread=0.032 ratio=0.969 over_null_copy=1.000 long_paths=0 status_bits=0
+  LOWERING registers=64 stack=272 spill_stores=778 spill_loads=1284 instructions=9720 LDG=98 STG=6 ATOMG=0 RED=33 LDS=43 STS=21 LDL=297 STL=186 IMAD=2137 IMAD_WIDE=524
+  CHECK the entry's words: compared=22956271904 differing=0
+COPY copy=field_copy_r_contact_l5 entry=field_contact_l5 mechanism=r (source rows resident) launches=351 copy_ms=25.107 control1_ms=26.806 control2_ms=25.974 controls_spread=0.032 ratio=0.951 over_null_copy=0.982 long_paths=0 status_bits=0
+  LOWERING registers=64 stack=272 spill_stores=778 spill_loads=1284 instructions=9720 LDG=98 STG=6 ATOMG=0 RED=33 LDS=43 STS=21 LDL=297 STL=186 IMAD=2145 IMAD_WIDE=522
+COPY copy=field_copy_w_contact_l5 entry=field_contact_l5 mechanism=w (a pair's words in walk order) launches=351 copy_ms=25.423 control1_ms=26.806 control2_ms=25.974 controls_spread=0.032 ratio=0.963 over_null_copy=0.994 long_paths=0 status_bits=0
+  LOWERING registers=64 stack=272 spill_stores=774 spill_loads=1272 instructions=9752 LDG=98 STG=6 ATOMG=0 RED=33 LDS=43 STS=21 LDL=294 STL=185 IMAD=2144 IMAD_WIDE=524
+COPY copy=field_copy_n_contact_l6 entry=field_contact_l6 mechanism=n (the entry as it stands) launches=49 copy_ms=3.914 control1_ms=4.073 control2_ms=3.971 controls_spread=0.025 ratio=0.973 over_null_copy=1.000 long_paths=0 status_bits=0
+  LOWERING registers=64 stack=288 spill_stores=830 spill_loads=1384 instructions=10520 LDG=98 STG=6 ATOMG=0 RED=33 LDS=43 STS=21 LDL=322 STL=199 IMAD=2355 IMAD_WIDE=536
+  CHECK the entry's words: compared=3199488960 differing=0
+COPY copy=field_copy_r_contact_l6 entry=field_contact_l6 mechanism=r (source rows resident) launches=49 copy_ms=3.781 control1_ms=4.073 control2_ms=3.971 controls_spread=0.025 ratio=0.940 over_null_copy=0.966 long_paths=0 status_bits=0
+  LOWERING registers=64 stack=288 spill_stores=838 spill_loads=1416 instructions=10536 LDG=98 STG=6 ATOMG=0 RED=33 LDS=43 STS=21 LDL=330 STL=201 IMAD=2367 IMAD_WIDE=534
+COPY copy=field_copy_w_contact_l6 entry=field_contact_l6 mechanism=w (a pair's words in walk order) launches=49 copy_ms=3.814 control1_ms=4.073 control2_ms=3.971 controls_spread=0.025 ratio=0.948 over_null_copy=0.974 long_paths=0 status_bits=0
+  LOWERING registers=64 stack=288 spill_stores=830 spill_loads=1392 instructions=10568 LDG=98 STG=6 ATOMG=0 RED=33 LDS=43 STS=21 LDL=324 STL=199 IMAD=2382 IMAD_WIDE=536
+COPY copy=field_copy_n_contact_rows entry=field_contact_rows mechanism=n (the entry as it stands) launches=1600 copy_ms=30.752 control1_ms=30.784 control2_ms=30.704 controls_spread=0.003 ratio=1.000 over_null_copy=1.000 long_paths=0 status_bits=0
+  LOWERING registers=128 stack=16 spill_stores=12 spill_loads=12 instructions=7680 LDG=120 STG=7 ATOMG=7 RED=37 LDS=50 STS=23 LDL=3 STL=3 IMAD=1987 IMAD_WIDE=632
+  HEAD head=0 kind=still launches=400 copy_ms=7.006 control1_ms=6.985 control2_ms=6.983 ratio=1.003 over_null_copy=1.000
+  HEAD head=1 kind=still launches=400 copy_ms=5.748 control1_ms=5.693 control2_ms=5.674 ratio=1.011 over_null_copy=1.000
+  HEAD head=2 kind=paced launches=400 copy_ms=8.674 control1_ms=8.679 control2_ms=8.686 ratio=0.999 over_null_copy=1.000
+  HEAD head=3 kind=paced launches=400 copy_ms=9.335 control1_ms=9.432 control2_ms=9.370 ratio=0.993 over_null_copy=1.000
+  CHECK the entry's words: compared=89563953504 differing=0
+COPY copy=field_copy_r_contact_rows entry=field_contact_rows mechanism=r (source rows resident) launches=1600 copy_ms=27.088 control1_ms=30.784 control2_ms=30.704 controls_spread=0.003 ratio=0.881 over_null_copy=0.881 long_paths=0 status_bits=0
+  LOWERING registers=128 stack=0 spill_stores=0 spill_loads=0 instructions=7656 LDG=120 STG=7 ATOMG=7 RED=37 LDS=50 STS=23 LDL=0 STL=0 IMAD=1990 IMAD_WIDE=634
+  HEAD head=0 kind=still launches=400 copy_ms=6.134 control1_ms=6.985 control2_ms=6.983 ratio=0.878 over_null_copy=0.876
+  HEAD head=1 kind=still launches=400 copy_ms=5.137 control1_ms=5.693 control2_ms=5.674 ratio=0.904 over_null_copy=0.894
+  HEAD head=2 kind=paced launches=400 copy_ms=7.721 control1_ms=8.679 control2_ms=8.686 ratio=0.889 over_null_copy=0.890
+  HEAD head=3 kind=paced launches=400 copy_ms=8.107 control1_ms=9.432 control2_ms=9.370 ratio=0.862 over_null_copy=0.868
+COPY copy=field_copy_w_contact_rows entry=field_contact_rows mechanism=w (a pair's words in walk order) launches=1600 copy_ms=29.744 control1_ms=30.784 control2_ms=30.704 controls_spread=0.003 ratio=0.967 over_null_copy=0.967 long_paths=0 status_bits=0
+  LOWERING registers=128 stack=16 spill_stores=12 spill_loads=12 instructions=7712 LDG=120 STG=7 ATOMG=7 RED=37 LDS=50 STS=23 LDL=3 STL=3 IMAD=2002 IMAD_WIDE=632
+  HEAD head=0 kind=still launches=400 copy_ms=6.654 control1_ms=6.985 control2_ms=6.983 ratio=0.953 over_null_copy=0.950
+  HEAD head=1 kind=still launches=400 copy_ms=5.559 control1_ms=5.693 control2_ms=5.674 ratio=0.978 over_null_copy=0.967
+  HEAD head=2 kind=paced launches=400 copy_ms=8.515 control1_ms=8.679 control2_ms=8.686 ratio=0.981 over_null_copy=0.982
+  HEAD head=3 kind=paced launches=400 copy_ms=9.035 control1_ms=9.432 control2_ms=9.370 ratio=0.961 over_null_copy=0.968
+COPY copy=field_copy_a_contact_rows entry=field_contact_rows mechanism=a (the reductions as plain stores) launches=1600 copy_ms=28.800 control1_ms=30.784 control2_ms=30.704 controls_spread=0.003 ratio=0.937 over_null_copy=0.937 long_paths=0 status_bits=0
+  LOWERING registers=128 stack=8 spill_stores=8 spill_loads=8 instructions=7576 LDG=120 STG=11 ATOMG=0 RED=30 LDS=49 STS=23 LDL=2 STL=2 IMAD=1956 IMAD_WIDE=629
+  HEAD head=0 kind=still launches=400 copy_ms=6.637 control1_ms=6.985 control2_ms=6.983 ratio=0.950 over_null_copy=0.947
+  HEAD head=1 kind=still launches=400 copy_ms=5.337 control1_ms=5.693 control2_ms=5.674 ratio=0.939 over_null_copy=0.928
+  HEAD head=2 kind=paced launches=400 copy_ms=8.107 control1_ms=8.679 control2_ms=8.686 ratio=0.934 over_null_copy=0.935
+  HEAD head=3 kind=paced launches=400 copy_ms=8.732 control1_ms=9.432 control2_ms=9.370 ratio=0.929 over_null_copy=0.935
+COPY copy=field_copy_n_contact_columns entry=field_contact_columns mechanism=n (the entry as it stands) launches=1600 copy_ms=23.104 control1_ms=26.064 control2_ms=25.232 controls_spread=0.032 ratio=0.901 over_null_copy=1.000 long_paths=0 status_bits=0
+  LOWERING registers=72 stack=0 spill_stores=0 spill_loads=0 instructions=1256 LDG=46 STG=2 ATOMG=0 RED=7 LDS=0 STS=0 LDL=0 STL=0 IMAD=315 IMAD_WIDE=66
+  HEAD head=0 kind=still launches=400 copy_ms=4.441 control1_ms=5.148 control2_ms=4.971 ratio=0.878 over_null_copy=1.000
+  HEAD head=1 kind=still launches=400 copy_ms=3.215 control1_ms=3.766 control2_ms=3.622 ratio=0.870 over_null_copy=1.000
+  HEAD head=2 kind=paced launches=400 copy_ms=7.247 control1_ms=8.086 control2_ms=7.852 ratio=0.909 over_null_copy=1.000
+  HEAD head=3 kind=paced launches=400 copy_ms=8.220 control1_ms=9.077 control2_ms=8.800 ratio=0.920 over_null_copy=1.000
+  CHECK the entry's words: compared=8351830016 differing=0
+COPY copy=field_copy_r_contact_columns entry=field_contact_columns mechanism=r (source rows resident) launches=1600 copy_ms=21.856 control1_ms=26.064 control2_ms=25.232 controls_spread=0.032 ratio=0.852 over_null_copy=0.946 long_paths=0 status_bits=0
+  LOWERING registers=72 stack=0 spill_stores=0 spill_loads=0 instructions=1256 LDG=46 STG=2 ATOMG=0 RED=7 LDS=0 STS=0 LDL=0 STL=0 IMAD=308 IMAD_WIDE=67
+  HEAD head=0 kind=still launches=400 copy_ms=4.105 control1_ms=5.148 control2_ms=4.971 ratio=0.811 over_null_copy=0.924
+  HEAD head=1 kind=still launches=400 copy_ms=2.930 control1_ms=3.766 control2_ms=3.622 ratio=0.793 over_null_copy=0.911
+  HEAD head=2 kind=paced launches=400 copy_ms=6.984 control1_ms=8.086 control2_ms=7.852 ratio=0.876 over_null_copy=0.964
+  HEAD head=3 kind=paced launches=400 copy_ms=7.850 control1_ms=9.077 control2_ms=8.800 ratio=0.878 over_null_copy=0.955
+COPY copy=field_copy_c_contact_columns entry=field_contact_columns mechanism=c (the columns from a record in column order) launches=1600 copy_ms=14.480 control1_ms=26.064 control2_ms=25.232 controls_spread=0.032 ratio=0.565 over_null_copy=0.627 long_paths=0 status_bits=0
+  LOWERING registers=48 stack=0 spill_stores=0 spill_loads=0 instructions=832 LDG=28 STG=2 ATOMG=0 RED=2 LDS=0 STS=0 LDL=0 STL=0 IMAD=195 IMAD_WIDE=67
+  HEAD head=0 kind=still launches=400 copy_ms=4.272 control1_ms=5.148 control2_ms=4.971 ratio=0.844 over_null_copy=0.962
+  HEAD head=1 kind=still launches=400 copy_ms=3.075 control1_ms=3.766 control2_ms=3.622 ratio=0.832 over_null_copy=0.956
+  HEAD head=2 kind=paced launches=400 copy_ms=3.432 control1_ms=8.086 control2_ms=7.852 ratio=0.431 over_null_copy=0.474
+  HEAD head=3 kind=paced launches=400 copy_ms=3.710 control1_ms=9.077 control2_ms=8.800 ratio=0.415 over_null_copy=0.451
+  CHECK the entry's words: compared=8351830016 differing=0
+COPY copy=field_copy_n_pace_skin_back entry=field_pace_skin_back mechanism=n (the entry as it stands) launches=800 copy_ms=15.912 control1_ms=16.920 control2_ms=16.800 controls_spread=0.007 ratio=0.944 over_null_copy=1.000 long_paths=0 status_bits=0
+  LOWERING registers=96 stack=0 spill_stores=0 spill_loads=0 instructions=4152 LDG=66 STG=0 ATOMG=3 RED=18 LDS=14 STS=9 LDL=0 STL=0 IMAD=992 IMAD_WIDE=318
+  HEAD head=2 kind=paced launches=400 copy_ms=7.873 control1_ms=8.417 control2_ms=8.365 ratio=0.938 over_null_copy=1.000
+  HEAD head=3 kind=paced launches=400 copy_ms=8.043 control1_ms=8.510 control2_ms=8.444 ratio=0.949 over_null_copy=1.000
+  CHECK the entry's words: compared=130497344 differing=0
+COPY copy=field_copy_r_pace_skin_back entry=field_pace_skin_back mechanism=r (source rows resident) launches=800 copy_ms=14.968 control1_ms=16.920 control2_ms=16.800 controls_spread=0.007 ratio=0.888 over_null_copy=0.941 long_paths=0 status_bits=0
+  LOWERING registers=96 stack=0 spill_stores=0 spill_loads=0 instructions=4152 LDG=66 STG=0 ATOMG=3 RED=18 LDS=14 STS=9 LDL=0 STL=0 IMAD=995 IMAD_WIDE=318
+  HEAD head=2 kind=paced launches=400 copy_ms=7.428 control1_ms=8.417 control2_ms=8.365 ratio=0.885 over_null_copy=0.943
+  HEAD head=3 kind=paced launches=400 copy_ms=7.547 control1_ms=8.510 control2_ms=8.444 ratio=0.890 over_null_copy=0.938
+COPY copy=field_copy_w_pace_skin_back entry=field_pace_skin_back mechanism=w (a pair's words in walk order) launches=800 copy_ms=15.928 control1_ms=16.920 control2_ms=16.800 controls_spread=0.007 ratio=0.945 over_null_copy=1.001 long_paths=0 status_bits=0
+  LOWERING registers=96 stack=0 spill_stores=0 spill_loads=0 instructions=4176 LDG=66 STG=0 ATOMG=3 RED=18 LDS=14 STS=9 LDL=0 STL=0 IMAD=1009 IMAD_WIDE=318
+  HEAD head=2 kind=paced launches=400 copy_ms=7.892 control1_ms=8.417 control2_ms=8.365 ratio=0.941 over_null_copy=1.002
+  HEAD head=3 kind=paced launches=400 copy_ms=8.041 control1_ms=8.510 control2_ms=8.444 ratio=0.949 over_null_copy=1.000
+COPY copy=field_copy_a_pace_skin_back entry=field_pace_skin_back mechanism=a (the reductions as plain stores) launches=800 copy_ms=14.928 control1_ms=16.920 control2_ms=16.800 controls_spread=0.007 ratio=0.885 over_null_copy=0.938 long_paths=0 status_bits=0
+  LOWERING registers=96 stack=0 spill_stores=0 spill_loads=0 instructions=4128 LDG=66 STG=3 ATOMG=0 RED=15 LDS=14 STS=9 LDL=0 STL=0 IMAD=998 IMAD_WIDE=321
+  HEAD head=2 kind=paced launches=400 copy_ms=7.377 control1_ms=8.417 control2_ms=8.365 ratio=0.879 over_null_copy=0.937
+  HEAD head=3 kind=paced launches=400 copy_ms=7.556 control1_ms=8.510 control2_ms=8.444 ratio=0.891 over_null_copy=0.939
+PREPARATION entry=field_copy_c_columns_count launches=1600 ms=0.816 status_bits=0 (outside every copy's time)
+PREPARATION entry=field_copy_c_columns_record launches=1600 ms=14.112 status_bits=0 (outside every copy's time)
+PREPARATION entry=field_copy_w_walk launches=5200 ms=13.260 status_bits=0 (outside every copy's time)
+HOLD hold: lock taken 04:48:27 wait_s=.002318784
+HOLD hc1: exit 0 04:48:58
+HOLD hcopies: exit 0 04:51:23
+HOLD hc2: exit 0 04:51:53
+HOLD hold: released 04:51:53
+HOLD MEASURE lap=hc1 rc=0 wall_s=30.6 peak_rss_kib=265124
+HOLD STATE_SHA hc1 81377dbeaf26d65e 64954161619deda4
+HOLD GATE_REPRO sections=100 line_lines=100 equal=100 EQUAL
+HOLD MEASURE lap=hcopies rc=0 wall_s=145.5 peak_rss_kib=271952
+HOLD STATE_SHA hcopies 81377dbeaf26d65e 64954161619deda4
+HOLD GATE_REPRO sections=100 line_lines=100 equal=100 EQUAL
+HOLD MEASURE lap=hc2 rc=0 wall_s=29.9 peak_rss_kib=265444
+HOLD STATE_SHA hc2 81377dbeaf26d65e 64954161619deda4
+HOLD GATE_REPRO sections=100 line_lines=100 equal=100 EQUAL
+KERNELS control1_ms=277.0 control2_ms=271.5
+## the development reads (three sections from run 2's STATE.1900, the copies' build then the control, profiled; each its own hold)
+DEV dev1 MEASURE lap=dev_copies rc=0 wall_s=21.7 peak_rss_kib=755328
+DEV dev1 MEASURE lap=dev_control rc=0 wall_s=1.6 peak_rss_kib=268264
+DEV dev2 MEASURE lap=dev_copies rc=0 wall_s=19.9 peak_rss_kib=763392
+DEV dev2 MEASURE lap=dev_control rc=0 wall_s=1.6 peak_rss_kib=264056
+DEV dev3 MEASURE lap=dev_copies rc=0 wall_s=19.2 peak_rss_kib=760588
+DEV dev3 MEASURE lap=dev_control rc=0 wall_s=1.6 peak_rss_kib=265332
+DEV dev1: the (w) contact copy raised status bit 1 (it read the exposure's scores at the entry index, where they stand at the source's place) and the
+  record of (c) raised bit 1 (a source's receivers can outnumber its region's sites); dev2 laid (w)'s inputs in walk order (field_copy_w_walk), dev3
+  took the record's offsets from each source's count of receivers and added the checks; each dev read ended on the control's STATE.3 and MEAN.3
+  (bc273abec16f0b06, 13c892a243f13dbf).
+## projections (from dev3: the copies' run 1.51 s a section at most, the control 0.36)
+PROJECTION hcopies 100 x 1.51 = 151 s, deadline (upper end) 190 s, stop 190,000 ms, outer 260 s; measured 145.5 s, 0.96 of the projection, peak RSS 271,952 KiB
+PROJECTION hc1 and hc2 100 x 0.36 = 36 s, stop 72,618 ms, outer 136 s; measured 30.6 s and 29.9 s, peak RSS 265,124 and 265,444 KiB
+## what the instrument shows of itself
+INSTRUMENT the null copies lower as their entries do (registers, stack, instructions and every counted operation equal) and give the entries' words
+  (0 differing words over every array they write); the columns from their record give the entry's dq and dv (0 differing). Launched before
+  their entries, the null copies read 0.90 (the columns) to 1.00 (the rows) of the controls: each copy's ratio over its null copy stands beside
+  its ratio over the controls. No copy raised a status bit and none took a long path (mul_fits past 126 bits, a narrow31 branch's wide form).
+
+# G138, fixed before its reads (the guess file at origin/main), beside P59's copies: a copy's time over its entry's mean of the two controls.
+G138 (r) the rows 0.881 (guess 0.8, 0.62 to 0.93): HELD
+G138 (r) the skin's return 0.888 (guess 0.72, 0.5 to 0.9): HELD
+G138 (r) the exposure 0.938 (guess 0.6, 0.35 to 0.85): MISSED above
+G138 (r) the forward contact at five limbs 0.951 (guess 0.92, 0.78 to 1.0): HELD
+G138 (r) the forward contact at six limbs 0.940 (guess 0.92, 0.78 to 1.0): HELD
+G138 (r) the columns 0.852 (guess 0.85, 0.65 to 0.97): HELD
+G138 (w) the rows 0.967 (guess 0.93, 0.82 to 0.99): HELD
+G138 (w) the exposure 0.891 (guess 0.85, 0.65 to 0.97): HELD
+G138 (w) the forward contact at five limbs 0.963 (guess 0.94, 0.82 to 1.0): HELD
+G138 (w) the forward contact at six limbs 0.948 (guess 0.94, 0.82 to 1.0): HELD
+G138 (w) the skin's return 0.945 (guess 0.92, 0.8 to 0.99): HELD
+G138 (a) the rows 0.937 (guess 0.84, 0.7 to 0.94): HELD
+G138 (a) the skin's return 0.885 (guess 0.78, 0.6 to 0.92): HELD
+G138 (c) the columns 0.565 (guess 0.5, 0.3 to 0.72): HELD
+G138 (c) the columns on the paced heads 0.422 (guess 0.42, 0.22 to 0.65): HELD
+G138 (c) the columns on the still heads 0.839 (guess 0.62, 0.4 to 0.85): HELD
+G138_FAMILY entry=field_contact_rows controls_ms=30.74 product=0.799 at_product_ms=24.55
+G138_FAMILY entry=field_contact_l5 controls_ms=26.39 product=0.917 at_product_ms=24.19
+G138_FAMILY entry=field_contact_columns controls_ms=25.65 product=0.481 at_product_ms=12.34
+G138_FAMILY entry=field_pace_skin_back controls_ms=16.86 product=0.743 at_product_ms=12.52
+G138_FAMILY entry=field_exposure controls_ms=8.57 product=0.836 at_product_ms=7.16
+G138_FAMILY entry=field_spread controls_ms=4.09 product=1.000 at_product_ms=4.09
+G138_FAMILY entry=field_contact_l6 controls_ms=4.02 product=0.891 at_product_ms=3.59
+G138_FAMILY entry=field_sums controls_ms=1.89 product=1.000 at_product_ms=1.89
+G138_FAMILY entry=field_classes controls_ms=0.74 product=1.000 at_product_ms=0.74
+G138 (s) the family at the products, from 118.9 ms a profiled section in this hold's controls (115.6 in p57_schedule) 91.052 (guess 74, 62 to 90): MISSED above

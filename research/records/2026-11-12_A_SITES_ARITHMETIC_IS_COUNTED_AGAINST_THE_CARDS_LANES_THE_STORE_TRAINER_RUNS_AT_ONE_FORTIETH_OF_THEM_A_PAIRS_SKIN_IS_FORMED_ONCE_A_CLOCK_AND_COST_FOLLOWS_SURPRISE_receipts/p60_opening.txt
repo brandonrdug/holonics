@@ -1,0 +1,88 @@
+P60 receipt: the opening's comparison at every place (G139). Numbers only. Device: the RTX 4080 SUPER under .local/gpu.lock; host 24 threads.
+BUILD de3ddbab0 (the lines, the reproduction's second run and the timing hold); 7f6936510 (the reads: read-cavity with the opening's code cO); 9fa631c93 (the first reproduction and the founding)
+REPRODUCTION from run 2's STATE.1900, 100 sections against leg1: 100 of 100 section lines equal (timings aside) twice (9fa631c93, de3ddbab0); STATE.100 81377dbeaf26d65e MEAN.100 64954161619deda4 both times, P59's control the same
+FOUNDING found-opening on leg1's STATE.3000: lines=7 equal=2 (head, pass) declaration=1 (hnn-field-v14e 13 words to hnn-field-v14g 15 words, the source's kept, triads 0 and opening 1 appended) parts=1 (octave 0 appended) material_lines=3 (117,478 words kept, 4,160 appended: material 0, first moments 0, second moments at two means)
+CARD_PARITY the_opening_comparison_on_the_card_reads_the_hosts_bits passed alone on the card (regions of 2, 3, 5, 64, 257 sites; faces, every covector entry, codes, a section's receipt and state equal)
+OWN_STRIDE moment test: 1,952 receivers, the skin part 0 bit for bit, the turn part under its releases' bound, the largest 518 and the nearest 382 of 414 units of 2^-24
+GATES gate 1 ok (49 of 49); gate 3 the card suite alone on the card, 90 passed (376 s), the crate's other tests 46, 2, 1, 1, 1 passed; gate 2 the field module 112 passed, the moment test passed
+PROJECTION founded largest_dev_section_ms=371 sections=3000 stop_ms=1113000 control_stop_ms=1638000
+FOUNDED_SHA STATE.1000=72827b519763ebe3 MEAN.1000=dc03881488670ee4 STATE.2000=9274372787f91bbd MEAN.2000=ec118585a5b908d7 STATE.3000=0e9ee0f4f7f8c819 MEAN.3000=721b94e5cbeedd43
+CONTROL_SHA STATE.1000=ae38805dce4ad374 MEAN.1000=78a9e6495426b506 STATE.2000=98537573e21d5aa2 MEAN.2000=46cbe3559aa73d77 STATE.3000=b19484567ca29e30 MEAN.3000=ab74c64e407b8846
+MEASURE lap=repro2 rc=0 wall_s=29.3 peak_rss_kib=267316
+MEASURE lap=dev rc=0 wall_s=35.4 peak_rss_kib=274132
+MEASURE lap=founded_line rc=0 wall_s=1027.0 peak_rss_kib=249992
+MEASURE lap=control_line rc=0 wall_s=840.8 peak_rss_kib=265100
+RUNS founded line 1,027.0 s against its projection's upper end 1,113 s (0.923); control 840.8 s against 1,638 s (0.513); peak resident 250 and 265 MB
+LINE founded sections 1 to 1000: section ms mean 347.1; last tick's code at the training sections' open places 3.8765 bits a site; the opening's code at their compared places 2.9580 nats a place
+LINE founded sections 1001 to 2000: section ms mean 338.7; last tick's code at the training sections' open places 3.8611 bits a site; the opening's code at their compared places 2.7210 nats a place
+LINE founded sections 2001 to 3000: section ms mean 338.9; last tick's code at the training sections' open places 3.8524 bits a site; the opening's code at their compared places 2.6583 nats a place
+LINE control sections 1 to 1000: section ms mean 275.6; last tick's code at the training sections' open places 3.8579 bits a site
+LINE control sections 1001 to 2000: section ms mean 280.3; last tick's code at the training sections' open places 3.8402 bits a site
+LINE control sections 2001 to 3000: section ms mean 282.4; last tick's code at the training sections' open places 3.8314 bits a site
+READS read-cavity, P57's places (PLACES 20,000 a slice, the held role, the key file's seed): F0 the founded state before training 352.9 s, F3 the founded MEAN.3000 285.5 s, F2 the founded MEAN.2000 279.5 s, C3 the control's MEAN.3000 275.8 s; projected 278 s each, outer 600 s
+P60_OPENING nats a place; pooled is the mean over the named places; by slice with the count of places
+# 7a the opening's code through the trained lift
+OPENING F3 one_place pooled=2.2978 places=100508 | code=2.1229(20124) web=2.4150(20043) science=2.0972(20088) books=1.9141(20028) wikidata=2.9350(20225)
+OPENING F3 whole_open pooled=2.8992 places=3717 | code=2.8869(730) web=2.9708(758) science=2.7759(776) books=2.5787(776) wikidata=3.3412(677)
+OPENING F2 one_place pooled=2.3677 places=100508 | code=2.2040(20124) web=2.4772(20043) science=2.1722(20088) books=1.9892(20028) wikidata=2.9912(20225)
+OPENING F2 whole_open pooled=2.9259 places=3717 | code=2.9102(730) web=2.9944(758) science=2.8071(776) books=2.6147(776) wikidata=3.3591(677)
+OPENING F0_bias_only one_place pooled=4.2853 places=100508 | code=4.1683(20124) web=4.1342(20043) science=4.1114(20088) books=4.0591(20028) wikidata=4.9483(20225)
+OPENING F0_bias_only whole_open pooled=4.1645 places=3717 | code=4.1889(730) web=4.0821(758) science=4.1416(776) books=4.0467(776) wikidata=4.3919(677)
+# beside: P57's fitted face at the opening 2.502 pooled, the class frequencies 3.435 (state C, one-place masks)
+# 7b the last tick's code, founded against control
+LAST_TICK F3 one_place pooled=1.2109 places=100508 | code=0.8443(20124) web=1.2475(20043) science=1.1650(20088) books=1.2021(20028) wikidata=1.5938(20225)
+LAST_TICK C3 one_place pooled=1.1866 places=100508 | code=0.8257(20124) web=1.2275(20043) science=1.1474(20088) books=1.1836(20028) wikidata=1.5471(20225)
+LAST_TICK_DIFF one_place founded_minus_control pooled=+0.0243 | code=+0.0186 web=+0.0201 science=+0.0176 books=+0.0185 wikidata=+0.0467
+LAST_TICK F3 whole_open pooled=2.4784 places=3717 | code=2.3664(730) web=2.6216(758) science=2.4362(776) books=2.2409(776) wikidata=2.7592(677)
+LAST_TICK C3 whole_open pooled=2.4608 places=3717 | code=2.3405(730) web=2.6128(758) science=2.4386(776) books=2.2282(776) wikidata=2.7124(677)
+LAST_TICK_DIFF whole_open founded_minus_control pooled=+0.0176 | code=+0.0259 web=+0.0088 science=-0.0024 books=+0.0127 wikidata=+0.0468
+SAME_PLACES one_place 100508 of 100508 100508
+# 7c the machine's own news c_t (F3's opening code, nothing masked) and its sites at 8 bits
+NEWS by slice code=2.1229(20124) web=2.4150(20043) science=2.0972(20088) books=1.9141(20028) wikidata=2.9350(20225)
+SITES landmarks slice=code sigma_bits=8 places=19060 sites=5008 mean_epoch=3.806 whole_epochs=4933 one_place_share=0.0797 | start kept=0.9902 chance=0.2928 lift=0.9861 (4173 compared) | doubled kept=0.9607 chance=0.2729 lift=0.9459 (4173 compared)
+SITES landmarks slice=web sigma_bits=8 places=18981 sites=5667 mean_epoch=3.349 whole_epochs=5596 one_place_share=0.1240 | start kept=0.9942 chance=0.3251 lift=0.9914 (4820 compared)
+SITES landmarks slice=science sigma_bits=8 places=19133 sites=5001 mean_epoch=3.826 whole_epochs=4932 one_place_share=0.0665 | start kept=0.9953 chance=0.2592 lift=0.9937 (4278 compared)
+SITES landmarks slice=books sigma_bits=8 places=19073 sites=4574 mean_epoch=4.170 whole_epochs=4506 one_place_share=0.0295 | start kept=0.9908 chance=0.2540 lift=0.9876 (3894 compared)
+SITES landmarks slice=wikidata sigma_bits=8 places=19091 sites=6612 mean_epoch=2.887 whole_epochs=6539 one_place_share=0.0924 | start kept=0.9961 chance=0.3616 lift=0.9939 (5617 compared)
+SITES landmarks slice=pooled sigma_bits=8 places=95338 sites=26862 mean_epoch=3.549 whole_epochs=26506 one_place_share=0.0812 | start kept=0.9935 chance=0.3037 lift=0.9907 (22782 compared) | doubled kept=0.9607 chance=0.2729 lift=0.9459 (4173 compared)
+SITES restarting_cut slice=code sigma_bits=8 places=19060 sites=9338 mean_epoch=2.041 whole_epochs=9263 one_place_share=0.4671 | start kept=0.9933 chance=0.5151 lift=0.9862 (7798 compared) | doubled kept=0.9654 chance=0.5101 lift=0.9293 (7798 compared)
+SITES restarting_cut slice=web sigma_bits=8 places=18981 sites=10281 mean_epoch=1.846 whole_epochs=10210 one_place_share=0.4811 | start kept=0.9955 chance=0.5695 lift=0.9896 (8734 compared)
+SITES restarting_cut slice=science sigma_bits=8 places=19133 sites=9144 mean_epoch=2.092 whole_epochs=9075 one_place_share=0.3394 | start kept=0.9942 chance=0.4861 lift=0.9888 (7820 compared)
+SITES restarting_cut slice=books sigma_bits=8 places=19073 sites=8426 mean_epoch=2.264 whole_epochs=8358 one_place_share=0.2877 | start kept=0.9946 chance=0.4514 lift=0.9901 (7187 compared)
+SITES restarting_cut slice=wikidata sigma_bits=8 places=19091 sites=12927 mean_epoch=1.477 whole_epochs=12854 one_place_share=0.6296 | start kept=0.9970 chance=0.7001 lift=0.9900 (10990 compared)
+SITES restarting_cut slice=pooled sigma_bits=8 places=95338 sites=50116 mean_epoch=1.902 whole_epochs=49760 one_place_share=0.4585 | start kept=0.9951 chance=0.5580 lift=0.9889 (42529 compared) | doubled kept=0.9654 chance=0.5101 lift=0.9293 (7798 compared)
+MEASURE lap=tc1 rc=0 wall_s=28.0 peak_rss_kib=267836
+MEASURE lap=tf rc=0 wall_s=33.0 peak_rss_kib=265864
+MEASURE lap=tc2 rc=0 wall_s=27.7 peak_rss_kib=268004
+MEASURE lap=pf rc=0 wall_s=33.3 peak_rss_kib=266796
+MEASURE lap=pc rc=0 wall_s=28.3 peak_rss_kib=265524
+HOLD section_ms control1=272.9 founded=323.2 control2=271.0 founded_over_controls=1.1887 controls_spread=0.0070
+PROFILE 100 sections from the same state in the same hold, founded against control: kernel ms 28314 against 25597, launches 54200 against 51000 (+32 a section, none a region)
+PROFILE new field_cavity_skinned_all launches=100 ms=1006 (ms a section 10.06)
+PROFILE new field_cavity_pace_back_all launches=100 ms=300 (ms a section 3.00)
+PROFILE new field_cavity_moment_all launches=100 ms=170 (ms a section 1.70)
+PROFILE new field_cavity_return_paced_all launches=100 ms=125 (ms a section 1.25)
+PROFILE new field_cavity_open launches=100 ms=10 (ms a section 0.10)
+PROFILE changed field_tied_face launches+100 ms+316
+PROFILE changed field_tied_back_e launches+100 ms+269
+PROFILE changed field_tied_back_y launches+100 ms+116
+PROFILE changed field_outer_x32 launches+400 ms+77
+PROFILE changed field_transposed launches+200 ms+60
+PROFILE changed field_outer_x64 launches+100 ms+45
+PROFILE changed field_chart launches+100 ms+43
+PROFILE changed field_moment_strand_return_all launches+100 ms+35
+PROFILE changed field_face launches+100 ms+33
+PROFILE changed field_face_covector launches+100 ms+32
+PROFILE changed field_ratio_adjoint launches+100 ms+23
+PROFILE changed field_affine_tiled_x32 launches+100 ms+21
+PROFILE changed field_affine_tiled_x64 launches+100 ms+19
+PROFILE changed field_encoding launches+300 ms+15
+PROFILE changed field_contact_l6 launches-2 ms-14
+PROFILE changed field_moment_prefix_paced_all launches+100 ms+14
+PROFILE changed field_moment_ds_all launches+100 ms+10
+PROFILE changed field_outer_bound_x64 launches+100 ms+10
+PROFILE changed field_moment_admit_paced_all launches+100 ms+9
+PROFILE changed field_moment_accumulate launches+100 ms+7
+PROFILE changed field_outer_bound_x32 launches+100 ms+7
+PROFILE changed field_face_at_class launches+100 ms+6
+PROFILE changed field_contact_l5 launches+2 ms+5

@@ -1,0 +1,1038 @@
+# Builds: claude/engine-schedule 3d9207f88 (step 6's realization with the launch trace, a reading; gate 1 ok, 49 gates). The trace's reproduction:
+# 100 traced sections from run 2's STATE.1900 print the line's 100 section lines (timings aside), STATE.100 81377dbeaf26d65e and MEAN.100
+# 64954161619deda4, the line's. The source survey (kernel_survey.tsv beside this receipt) read every entry's body at claude/engine-host f2518976f.
+# P57 item 1 (G131): the schedule of one store-trainer section, launch by launch, from a launch trace of claude/engine-schedule (step 6's
+# realization with a trace reading; kernels as main's but the faces' gather), sections 2,001 to 2,003 from run 2's STATE.1900, the second traced;
+# the entries' ms a section from the 100-section profiled control of P58's hold (main's kernels with the P56 readings). Numbers only.
+SECTION run=1 regions=218 sites=41462 largest_region=742 median_region=137 smallest_region=9 launches=510
+CARD multiprocessors=80 lane_steps_a_second=2.611e+13 steps_a_product=6 octets_a_second=7.36e+11
+## every launch in order: seq, after the phase mark, entry, grid (blocks), block, dynamic shared, registers, blocks a multiprocessor, resident warps a
+## multiprocessor, the grid's warps over the card's resident warps (fill, capped at 1), traced us, head
+L 510 after=outside_the_card field_exponential grid=256,1,1 block=256 shared=0 registers=28 blocks_a_sm=6 resident_warps_a_sm=48 fill=0.533 us=35.3 head=-
+L 511 after=batch_takes field_open grid=10366,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=62.9 head=-
+L 512 after=batch_takes field_paces grid=2,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=0.004 us=337.5 head=-
+L 513 after=batch_takes field_skin_addresses grid=2592,1,1 block=256 shared=0 registers=44 blocks_a_sm=5 resident_warps_a_sm=40 fill=1.000 us=39.7 head=-
+L 514 after=batch_takes field_pframes grid=2592,1,1 block=256 shared=0 registers=38 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=159.4 head=-
+L 515 after=batch_takes field_clock_fill grid=162,16,1 block=256 shared=0 registers=46 blocks_a_sm=5 resident_warps_a_sm=40 fill=1.000 us=1022.3 head=-
+L 516 after=batch_takes field_moment_strands_all grid=2592,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=45.8 head=-
+L 517 after=batch_takes field_moment_admit_paced_all grid=218,16,1 block=256 shared=12288 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=53.5 head=-
+L 518 after=batch_takes field_moment_prefix_paced_all grid=218,16,1 block=256 shared=8192 registers=72 blocks_a_sm=3 resident_warps_a_sm=24 fill=1.000 us=117.9 head=-
+L 519 after=batch_takes field_moment_prefix_paced_all grid=218,16,1 block=256 shared=8192 registers=72 blocks_a_sm=3 resident_warps_a_sm=24 fill=1.000 us=110.9 head=-
+L 520 after=batch_takes field_moment_paced_all grid=162,16,1 block=256 shared=0 registers=72 blocks_a_sm=3 resident_warps_a_sm=24 fill=1.000 us=411.5 head=-
+L 521 after=batch_takes field_moment_scatter_all grid=2592,1,1 block=256 shared=0 registers=18 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=64.8 head=-
+L 522 after=batch_takes field_affine_tiled_x64 grid=10366,1,1 block=256 shared=18976 registers=40 blocks_a_sm=5 resident_warps_a_sm=40 fill=1.000 us=253.2 head=-
+L 523 after=batch_setup field_chart grid=5183,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=390.2 head=-
+L 524 after=batch_setup field_affine_tiled_x32 grid=10366,1,1 block=256 shared=17952 registers=40 blocks_a_sm=5 resident_warps_a_sm=40 fill=1.000 us=247.0 head=-
+L 525 after=batch_setup field_affine_tiled_x32 grid=10366,1,1 block=256 shared=17952 registers=40 blocks_a_sm=5 resident_warps_a_sm=40 fill=1.000 us=247.8 head=-
+L 526 after=batch_setup field_moment_add grid=10366,1,1 block=256 shared=0 registers=16 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=55.7 head=-
+L 527 after=batch_setup field_affine_tiled_x32 grid=10366,1,1 block=256 shared=17952 registers=40 blocks_a_sm=5 resident_warps_a_sm=40 fill=1.000 us=249.8 head=-
+L 528 after=batch_setup field_moment_add_probe grid=10366,1,1 block=256 shared=0 registers=16 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=41.3 head=-
+L 529 after=batch_setup field_classes grid=872,1,1 block=32 shared=972 registers=52 blocks_a_sm=24 resident_warps_a_sm=24 fill=0.454 us=194.1 head=-
+L 530 after=batch_setup field_frame grid=5183,1,1 block=256 shared=0 registers=48 blocks_a_sm=5 resident_warps_a_sm=40 fill=1.000 us=149.9 head=-
+L 531 after=batch_setup field_unit grid=20731,1,1 block=256 shared=0 registers=54 blocks_a_sm=4 resident_warps_a_sm=32 fill=1.000 us=785.8 head=-
+L 532 after=batch_setup field_frame_probe grid=5183,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=93.8 head=-
+L 533 after=batch_setup field_unit_probe grid=20731,1,1 block=256 shared=0 registers=54 blocks_a_sm=4 resident_warps_a_sm=32 fill=1.000 us=791.1 head=-
+L 534 after=batch_setup field_sums grid=113,1,1 block=256 shared=0 registers=32 blocks_a_sm=6 resident_warps_a_sm=48 fill=0.235 us=519.6 head=-
+L 535 after=batch_setup field_skin_fill grid=20731,1,1 block=128 shared=0 registers=64 blocks_a_sm=8 resident_warps_a_sm=32 fill=1.000 us=898.5 head=-
+L 536 after=tick_launch_pre field_exposure grid=41462,1,1 block=128 shared=0 registers=64 blocks_a_sm=8 resident_warps_a_sm=32 fill=1.000 us=1964.5 head=-
+L 537 after=tick_exposure_wait field_contact_l5 grid=41462,1,1 block=128 shared=0 registers=64 blocks_a_sm=8 resident_warps_a_sm=32 fill=1.000 us=7315.9 head=-
+L 538 after=tick_exposure_wait field_affine_tiled_x64 grid=10366,1,1 block=256 shared=18976 registers=40 blocks_a_sm=5 resident_warps_a_sm=40 fill=1.000 us=498.6 head=-
+L 539 after=tick_exposure_wait field_chart grid=5183,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=400.2 head=-
+L 540 after=tick_exposure_wait field_affine_tiled_x32 grid=20731,1,1 block=256 shared=34320 registers=40 blocks_a_sm=2 resident_warps_a_sm=16 fill=1.000 us=834.8 head=-
+L 541 after=tick_exposure_wait field_affine_tiled_x32 grid=20731,1,1 block=256 shared=34320 registers=40 blocks_a_sm=2 resident_warps_a_sm=16 fill=1.000 us=833.4 head=-
+L 542 after=tick_exposure_wait field_pair grid=5183,1,1 block=256 shared=0 registers=38 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=77.2 head=-
+L 543 after=tick_exposure_wait field_affine_tiled_x32 grid=10366,1,1 block=256 shared=17952 registers=40 blocks_a_sm=5 resident_warps_a_sm=40 fill=1.000 us=253.4 head=-
+L 544 after=tick_exposure_wait field_pair_gamma grid=5183,1,1 block=256 shared=0 registers=56 blocks_a_sm=4 resident_warps_a_sm=32 fill=1.000 us=155.8 head=-
+L 545 after=tick_exposure_wait field_pair_scan grid=28,1,1 block=256 shared=0 registers=56 blocks_a_sm=4 resident_warps_a_sm=32 fill=0.087 us=682.2 head=-
+L 546 after=tick_exposure_wait field_affine_tiled_x64 grid=10366,1,1 block=256 shared=37408 registers=40 blocks_a_sm=2 resident_warps_a_sm=16 fill=1.000 us=860.1 head=-
+L 547 after=tick_launch_post field_chart grid=5183,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=100.2 head=-
+L 548 after=tick_launch_post field_affine_tiled_x32 grid=10366,1,1 block=256 shared=17952 registers=40 blocks_a_sm=5 resident_warps_a_sm=40 fill=1.000 us=168.5 head=-
+L 549 after=tick_launch_post field_tied_face grid=39519,1,1 block=256 shared=0 registers=44 blocks_a_sm=5 resident_warps_a_sm=40 fill=1.000 us=476.5 head=-
+L 550 after=tick_launch_post field_face grid=5183,1,1 block=256 shared=0 registers=33 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=45.8 head=-
+L 551 after=tick_launch_post field_blank_rates grid=324,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=0.675 us=326.9 head=-
+L 552 after=tick_launch_post field_paces grid=2,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=0.004 us=470.3 head=-
+L 553 after=tick_launch_post field_skin_addresses grid=2592,1,1 block=256 shared=0 registers=44 blocks_a_sm=5 resident_warps_a_sm=40 fill=1.000 us=37.0 head=-
+L 554 after=tick_launch_post field_pframes grid=2592,1,1 block=256 shared=0 registers=38 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=164.3 head=-
+L 555 after=tick_launch_post field_clock_fill grid=162,16,1 block=256 shared=0 registers=46 blocks_a_sm=5 resident_warps_a_sm=40 fill=1.000 us=1082.0 head=-
+L 556 after=tick_launch_post field_moment_strands_all grid=2592,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=45.0 head=-
+L 557 after=tick_launch_post field_moment_admit_paced_all grid=218,16,1 block=256 shared=12288 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=59.3 head=-
+L 558 after=tick_launch_post field_moment_prefix_paced_all grid=218,16,1 block=256 shared=8192 registers=72 blocks_a_sm=3 resident_warps_a_sm=24 fill=1.000 us=119.1 head=-
+L 559 after=tick_launch_post field_moment_prefix_paced_all grid=218,16,1 block=256 shared=8192 registers=72 blocks_a_sm=3 resident_warps_a_sm=24 fill=1.000 us=110.8 head=-
+L 560 after=tick_launch_post field_moment_paced_all grid=162,16,1 block=256 shared=0 registers=72 blocks_a_sm=3 resident_warps_a_sm=24 fill=1.000 us=410.2 head=-
+L 561 after=tick_launch_post field_moment_scatter_all grid=2592,1,1 block=256 shared=0 registers=18 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=57.1 head=-
+L 562 after=tick_launch_post field_chart grid=5183,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=395.2 head=-
+L 563 after=tick_launch_post field_affine_tiled_x32 grid=10366,1,1 block=256 shared=17952 registers=40 blocks_a_sm=5 resident_warps_a_sm=40 fill=1.000 us=245.8 head=-
+L 564 after=tick_launch_post field_affine_tiled_x32 grid=10366,1,1 block=256 shared=17952 registers=40 blocks_a_sm=5 resident_warps_a_sm=40 fill=1.000 us=245.5 head=-
+L 565 after=tick_launch_post field_moment_add grid=10366,1,1 block=256 shared=0 registers=16 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=53.3 head=-
+L 566 after=tick_launch_post field_affine_tiled_x32 grid=10366,1,1 block=256 shared=17952 registers=40 blocks_a_sm=5 resident_warps_a_sm=40 fill=1.000 us=253.9 head=-
+L 567 after=tick_launch_post field_moment_add_probe grid=10366,1,1 block=256 shared=0 registers=16 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=41.9 head=-
+L 568 after=tick_launch_post field_classes grid=872,1,1 block=32 shared=972 registers=52 blocks_a_sm=24 resident_warps_a_sm=24 fill=0.454 us=167.5 head=-
+L 569 after=tick_launch_post field_frame grid=5183,1,1 block=256 shared=0 registers=48 blocks_a_sm=5 resident_warps_a_sm=40 fill=1.000 us=153.8 head=-
+L 570 after=tick_launch_post field_unit grid=20731,1,1 block=256 shared=0 registers=54 blocks_a_sm=4 resident_warps_a_sm=32 fill=1.000 us=788.9 head=-
+L 571 after=tick_launch_post field_frame_probe grid=5183,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=288.5 head=-
+L 572 after=tick_launch_post field_unit_probe grid=20731,1,1 block=256 shared=0 registers=54 blocks_a_sm=4 resident_warps_a_sm=32 fill=1.000 us=800.6 head=-
+L 573 after=tick_launch_post field_sums grid=113,1,1 block=256 shared=0 registers=32 blocks_a_sm=6 resident_warps_a_sm=48 fill=0.235 us=358.4 head=-
+L 574 after=tick_launch_post field_skin_fill grid=20731,1,1 block=128 shared=0 registers=64 blocks_a_sm=8 resident_warps_a_sm=32 fill=1.000 us=884.2 head=-
+L 575 after=tick_launch_pre field_exposure grid=41462,1,1 block=128 shared=0 registers=64 blocks_a_sm=8 resident_warps_a_sm=32 fill=1.000 us=1935.8 head=-
+L 576 after=tick_exposure_wait field_contact_l5 grid=41462,1,1 block=128 shared=0 registers=64 blocks_a_sm=8 resident_warps_a_sm=32 fill=1.000 us=7578.3 head=-
+L 577 after=tick_exposure_wait field_affine_tiled_x64 grid=10366,1,1 block=256 shared=18976 registers=40 blocks_a_sm=5 resident_warps_a_sm=40 fill=1.000 us=260.6 head=-
+L 578 after=tick_exposure_wait field_chart grid=5183,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=394.6 head=-
+L 579 after=tick_exposure_wait field_affine_tiled_x32 grid=20731,1,1 block=256 shared=34320 registers=40 blocks_a_sm=2 resident_warps_a_sm=16 fill=1.000 us=857.8 head=-
+L 580 after=tick_exposure_wait field_affine_tiled_x32 grid=20731,1,1 block=256 shared=34320 registers=40 blocks_a_sm=2 resident_warps_a_sm=16 fill=1.000 us=1050.3 head=-
+L 581 after=tick_exposure_wait field_pair grid=5183,1,1 block=256 shared=0 registers=38 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=88.6 head=-
+L 582 after=tick_exposure_wait field_affine_tiled_x32 grid=10366,1,1 block=256 shared=17952 registers=40 blocks_a_sm=5 resident_warps_a_sm=40 fill=1.000 us=250.7 head=-
+L 583 after=tick_exposure_wait field_pair_gamma grid=5183,1,1 block=256 shared=0 registers=56 blocks_a_sm=4 resident_warps_a_sm=32 fill=1.000 us=164.3 head=-
+L 584 after=tick_exposure_wait field_pair_scan grid=28,1,1 block=256 shared=0 registers=56 blocks_a_sm=4 resident_warps_a_sm=32 fill=0.087 us=655.9 head=-
+L 585 after=tick_exposure_wait field_affine_tiled_x64 grid=10366,1,1 block=256 shared=37408 registers=40 blocks_a_sm=2 resident_warps_a_sm=16 fill=1.000 us=608.5 head=-
+L 586 after=tick_launch_post field_chart grid=5183,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=104.7 head=-
+L 587 after=tick_launch_post field_affine_tiled_x32 grid=10366,1,1 block=256 shared=17952 registers=40 blocks_a_sm=5 resident_warps_a_sm=40 fill=1.000 us=166.7 head=-
+L 588 after=tick_launch_post field_tied_face grid=39519,1,1 block=256 shared=0 registers=44 blocks_a_sm=5 resident_warps_a_sm=40 fill=1.000 us=480.6 head=-
+L 589 after=tick_launch_post field_face grid=5183,1,1 block=256 shared=0 registers=33 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=44.9 head=-
+L 590 after=tick_launch_post field_blank_rates grid=324,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=0.675 us=333.0 head=-
+L 591 after=tick_launch_post field_paces grid=2,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=0.004 us=471.0 head=-
+L 592 after=tick_launch_post field_skin_addresses grid=2592,1,1 block=256 shared=0 registers=44 blocks_a_sm=5 resident_warps_a_sm=40 fill=1.000 us=37.8 head=-
+L 593 after=tick_launch_post field_pframes grid=2592,1,1 block=256 shared=0 registers=38 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=159.6 head=-
+L 594 after=tick_launch_post field_clock_fill grid=162,16,1 block=256 shared=0 registers=46 blocks_a_sm=5 resident_warps_a_sm=40 fill=1.000 us=1104.1 head=-
+L 595 after=tick_launch_post field_moment_strands_all grid=2592,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=61.4 head=-
+L 596 after=tick_launch_post field_moment_admit_paced_all grid=218,16,1 block=256 shared=12288 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=56.7 head=-
+L 597 after=tick_launch_post field_moment_prefix_paced_all grid=218,16,1 block=256 shared=8192 registers=72 blocks_a_sm=3 resident_warps_a_sm=24 fill=1.000 us=122.6 head=-
+L 598 after=tick_launch_post field_moment_prefix_paced_all grid=218,16,1 block=256 shared=8192 registers=72 blocks_a_sm=3 resident_warps_a_sm=24 fill=1.000 us=124.8 head=-
+L 599 after=tick_launch_post field_moment_paced_all grid=162,16,1 block=256 shared=0 registers=72 blocks_a_sm=3 resident_warps_a_sm=24 fill=1.000 us=419.5 head=-
+L 600 after=tick_launch_post field_moment_scatter_all grid=2592,1,1 block=256 shared=0 registers=18 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=248.0 head=-
+L 601 after=tick_launch_post field_chart grid=5183,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=397.1 head=-
+L 602 after=tick_launch_post field_affine_tiled_x32 grid=10366,1,1 block=256 shared=17952 registers=40 blocks_a_sm=5 resident_warps_a_sm=40 fill=1.000 us=253.5 head=-
+L 603 after=tick_launch_post field_affine_tiled_x32 grid=10366,1,1 block=256 shared=17952 registers=40 blocks_a_sm=5 resident_warps_a_sm=40 fill=1.000 us=255.6 head=-
+L 604 after=tick_launch_post field_moment_add grid=10366,1,1 block=256 shared=0 registers=16 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=67.9 head=-
+L 605 after=tick_launch_post field_affine_tiled_x32 grid=10366,1,1 block=256 shared=17952 registers=40 blocks_a_sm=5 resident_warps_a_sm=40 fill=1.000 us=257.3 head=-
+L 606 after=tick_launch_post field_moment_add_probe grid=10366,1,1 block=256 shared=0 registers=16 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=600.3 head=-
+L 607 after=tick_launch_post field_classes grid=872,1,1 block=32 shared=972 registers=52 blocks_a_sm=24 resident_warps_a_sm=24 fill=0.454 us=209.1 head=-
+L 608 after=tick_launch_post field_frame grid=5183,1,1 block=256 shared=0 registers=48 blocks_a_sm=5 resident_warps_a_sm=40 fill=1.000 us=386.1 head=-
+L 609 after=tick_launch_post field_unit grid=20731,1,1 block=256 shared=0 registers=54 blocks_a_sm=4 resident_warps_a_sm=32 fill=1.000 us=784.4 head=-
+L 610 after=tick_launch_post field_frame_probe grid=5183,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=96.6 head=-
+L 611 after=tick_launch_post field_unit_probe grid=20731,1,1 block=256 shared=0 registers=54 blocks_a_sm=4 resident_warps_a_sm=32 fill=1.000 us=787.0 head=-
+L 612 after=tick_launch_post field_sums grid=113,1,1 block=256 shared=0 registers=32 blocks_a_sm=6 resident_warps_a_sm=48 fill=0.235 us=344.4 head=-
+L 613 after=tick_launch_post field_skin_fill grid=20731,1,1 block=128 shared=0 registers=64 blocks_a_sm=8 resident_warps_a_sm=32 fill=1.000 us=845.1 head=-
+L 614 after=tick_launch_pre field_exposure grid=41462,1,1 block=128 shared=0 registers=64 blocks_a_sm=8 resident_warps_a_sm=32 fill=1.000 us=1934.4 head=-
+L 615 after=tick_exposure_wait field_contact_l5 grid=41462,1,1 block=128 shared=0 registers=64 blocks_a_sm=8 resident_warps_a_sm=32 fill=1.000 us=6222.5 head=-
+L 616 after=tick_exposure_wait field_affine_tiled_x64 grid=10366,1,1 block=256 shared=18976 registers=40 blocks_a_sm=5 resident_warps_a_sm=40 fill=1.000 us=258.0 head=-
+L 617 after=tick_exposure_wait field_chart grid=5183,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=691.7 head=-
+L 618 after=tick_exposure_wait field_affine_tiled_x32 grid=20731,1,1 block=256 shared=34320 registers=40 blocks_a_sm=2 resident_warps_a_sm=16 fill=1.000 us=842.0 head=-
+L 619 after=tick_exposure_wait field_affine_tiled_x32 grid=20731,1,1 block=256 shared=34320 registers=40 blocks_a_sm=2 resident_warps_a_sm=16 fill=1.000 us=838.9 head=-
+L 620 after=tick_exposure_wait field_pair grid=5183,1,1 block=256 shared=0 registers=38 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=79.4 head=-
+L 621 after=tick_exposure_wait field_affine_tiled_x32 grid=10366,1,1 block=256 shared=17952 registers=40 blocks_a_sm=5 resident_warps_a_sm=40 fill=1.000 us=256.6 head=-
+L 622 after=tick_exposure_wait field_pair_gamma grid=5183,1,1 block=256 shared=0 registers=56 blocks_a_sm=4 resident_warps_a_sm=32 fill=1.000 us=155.6 head=-
+L 623 after=tick_exposure_wait field_pair_scan grid=28,1,1 block=256 shared=0 registers=56 blocks_a_sm=4 resident_warps_a_sm=32 fill=0.087 us=649.9 head=-
+L 624 after=tick_exposure_wait field_affine_tiled_x64 grid=10366,1,1 block=256 shared=37408 registers=40 blocks_a_sm=2 resident_warps_a_sm=16 fill=1.000 us=621.6 head=-
+L 625 after=tick_launch_post field_chart grid=5183,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=99.7 head=-
+L 626 after=tick_launch_post field_affine_tiled_x32 grid=10366,1,1 block=256 shared=17952 registers=40 blocks_a_sm=5 resident_warps_a_sm=40 fill=1.000 us=325.9 head=-
+L 627 after=tick_launch_post field_tied_face grid=39519,1,1 block=256 shared=0 registers=44 blocks_a_sm=5 resident_warps_a_sm=40 fill=1.000 us=1013.2 head=-
+L 628 after=tick_launch_post field_face grid=5183,1,1 block=256 shared=0 registers=33 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=292.5 head=-
+L 629 after=tick_launch_post field_blank_rates grid=324,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=0.675 us=351.8 head=-
+L 630 after=tick_launch_post field_paces grid=2,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=0.004 us=470.5 head=-
+L 631 after=tick_launch_post field_skin_addresses grid=2592,1,1 block=256 shared=0 registers=44 blocks_a_sm=5 resident_warps_a_sm=40 fill=1.000 us=256.7 head=-
+L 632 after=tick_launch_post field_pframes grid=2592,1,1 block=256 shared=0 registers=38 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=166.1 head=-
+L 633 after=tick_launch_post field_clock_fill grid=162,16,1 block=256 shared=0 registers=46 blocks_a_sm=5 resident_warps_a_sm=40 fill=1.000 us=1093.0 head=-
+L 634 after=tick_launch_post field_moment_strands_all grid=2592,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=50.8 head=-
+L 635 after=tick_launch_post field_moment_admit_paced_all grid=218,16,1 block=256 shared=12288 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=54.8 head=-
+L 636 after=tick_launch_post field_moment_prefix_paced_all grid=218,16,1 block=256 shared=8192 registers=72 blocks_a_sm=3 resident_warps_a_sm=24 fill=1.000 us=116.2 head=-
+L 637 after=tick_launch_post field_moment_prefix_paced_all grid=218,16,1 block=256 shared=8192 registers=72 blocks_a_sm=3 resident_warps_a_sm=24 fill=1.000 us=114.0 head=-
+L 638 after=tick_launch_post field_moment_paced_all grid=162,16,1 block=256 shared=0 registers=72 blocks_a_sm=3 resident_warps_a_sm=24 fill=1.000 us=415.1 head=-
+L 639 after=tick_launch_post field_moment_scatter_all grid=2592,1,1 block=256 shared=0 registers=18 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=59.1 head=-
+L 640 after=tick_launch_post field_chart grid=5183,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=394.1 head=-
+L 641 after=tick_launch_post field_affine_tiled_x32 grid=10366,1,1 block=256 shared=17952 registers=40 blocks_a_sm=5 resident_warps_a_sm=40 fill=1.000 us=247.6 head=-
+L 642 after=tick_launch_post field_affine_tiled_x32 grid=10366,1,1 block=256 shared=17952 registers=40 blocks_a_sm=5 resident_warps_a_sm=40 fill=1.000 us=246.3 head=-
+L 643 after=tick_launch_post field_moment_add grid=10366,1,1 block=256 shared=0 registers=16 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=59.9 head=-
+L 644 after=tick_launch_post field_affine_tiled_x32 grid=10366,1,1 block=256 shared=17952 registers=40 blocks_a_sm=5 resident_warps_a_sm=40 fill=1.000 us=245.3 head=-
+L 645 after=tick_launch_post field_moment_add_probe grid=10366,1,1 block=256 shared=0 registers=16 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=39.4 head=-
+L 646 after=tick_launch_post field_classes grid=872,1,1 block=32 shared=972 registers=52 blocks_a_sm=24 resident_warps_a_sm=24 fill=0.454 us=178.2 head=-
+L 647 after=tick_launch_post field_frame grid=5183,1,1 block=256 shared=0 registers=48 blocks_a_sm=5 resident_warps_a_sm=40 fill=1.000 us=146.7 head=-
+L 648 after=tick_launch_post field_unit grid=20731,1,1 block=256 shared=0 registers=54 blocks_a_sm=4 resident_warps_a_sm=32 fill=1.000 us=781.9 head=-
+L 649 after=tick_launch_post field_frame_probe grid=5183,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=92.9 head=-
+L 650 after=tick_launch_post field_unit_probe grid=20731,1,1 block=256 shared=0 registers=54 blocks_a_sm=4 resident_warps_a_sm=32 fill=1.000 us=789.2 head=-
+L 651 after=tick_launch_post field_sums grid=113,1,1 block=256 shared=0 registers=32 blocks_a_sm=6 resident_warps_a_sm=48 fill=0.235 us=340.8 head=-
+L 652 after=tick_launch_post field_skin_fill grid=20731,1,1 block=128 shared=0 registers=64 blocks_a_sm=8 resident_warps_a_sm=32 fill=1.000 us=827.0 head=-
+L 653 after=tick_launch_pre field_exposure grid=41462,1,1 block=128 shared=0 registers=64 blocks_a_sm=8 resident_warps_a_sm=32 fill=1.000 us=1908.1 head=-
+L 654 after=tick_exposure_wait field_contact_l5 grid=41462,1,1 block=128 shared=0 registers=64 blocks_a_sm=8 resident_warps_a_sm=32 fill=1.000 us=6205.6 head=-
+L 655 after=tick_exposure_wait field_affine_tiled_x64 grid=10366,1,1 block=256 shared=18976 registers=40 blocks_a_sm=5 resident_warps_a_sm=40 fill=1.000 us=942.1 head=-
+L 656 after=tick_exposure_wait field_chart grid=5183,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=645.5 head=-
+L 657 after=tick_exposure_wait field_affine_tiled_x32 grid=20731,1,1 block=256 shared=34320 registers=40 blocks_a_sm=2 resident_warps_a_sm=16 fill=1.000 us=834.3 head=-
+L 658 after=tick_exposure_wait field_affine_tiled_x32 grid=20731,1,1 block=256 shared=34320 registers=40 blocks_a_sm=2 resident_warps_a_sm=16 fill=1.000 us=832.1 head=-
+L 659 after=tick_exposure_wait field_pair grid=5183,1,1 block=256 shared=0 registers=38 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=78.9 head=-
+L 660 after=tick_exposure_wait field_affine_tiled_x32 grid=10366,1,1 block=256 shared=17952 registers=40 blocks_a_sm=5 resident_warps_a_sm=40 fill=1.000 us=249.1 head=-
+L 661 after=tick_exposure_wait field_pair_gamma grid=5183,1,1 block=256 shared=0 registers=56 blocks_a_sm=4 resident_warps_a_sm=32 fill=1.000 us=156.7 head=-
+L 662 after=tick_exposure_wait field_pair_scan grid=28,1,1 block=256 shared=0 registers=56 blocks_a_sm=4 resident_warps_a_sm=32 fill=0.087 us=653.5 head=-
+L 663 after=tick_exposure_wait field_affine_tiled_x64 grid=10366,1,1 block=256 shared=37408 registers=40 blocks_a_sm=2 resident_warps_a_sm=16 fill=1.000 us=612.1 head=-
+L 664 after=tick_launch_post field_chart grid=5183,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=175.5 head=-
+L 665 after=tick_launch_post field_affine_tiled_x32 grid=10366,1,1 block=256 shared=17952 registers=40 blocks_a_sm=5 resident_warps_a_sm=40 fill=1.000 us=181.8 head=-
+L 666 after=tick_launch_post field_tied_face grid=39519,1,1 block=256 shared=0 registers=44 blocks_a_sm=5 resident_warps_a_sm=40 fill=1.000 us=1057.3 head=-
+L 667 after=tick_launch_post field_face grid=5183,1,1 block=256 shared=0 registers=33 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=338.0 head=-
+L 668 after=face_launch field_face_covector grid=39519,1,1 block=256 shared=0 registers=32 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=189.6 head=-
+L 669 after=face_launch field_face_weigh grid=39519,1,1 block=256 shared=0 registers=30 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=86.5 head=-
+L 670 after=face_launch field_outer_x32 grid=618,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=44.5 head=-
+L 671 after=face_launch field_tied_back_e grid=39528,1,1 block=256 shared=0 registers=34 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=1031.0 head=-
+L 672 after=face_launch field_tied_back_y grid=10366,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=411.0 head=-
+L 673 after=face_launch field_outer_x32 grid=162,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=0.338 us=28.9 head=-
+L 674 after=face_launch field_outer_bound_x32 grid=218,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=0.454 us=49.6 head=-
+L 675 after=face_launch field_outer_x32 grid=10368,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=214.9 head=-
+L 676 after=face_launch field_transposed grid=10366,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=129.0 head=-
+L 677 after=face_launch field_ratio_adjoint grid=5183,1,1 block=256 shared=0 registers=48 blocks_a_sm=5 resident_warps_a_sm=40 fill=1.000 us=75.5 head=-
+L 678 after=face_launch field_outer_x32 grid=162,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=0.338 us=67.7 head=-
+L 679 after=face_launch field_outer_bound_x64 grid=218,1,1 block=256 shared=0 registers=44 blocks_a_sm=5 resident_warps_a_sm=40 fill=0.545 us=249.1 head=-
+L 680 after=face_launch field_outer_x64 grid=20736,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=602.0 head=-
+L 681 after=face_launch field_transposed grid=20731,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=607.5 head=-
+L 682 after=face_launch field_pair_back grid=5183,1,1 block=256 shared=0 registers=48 blocks_a_sm=5 resident_warps_a_sm=40 fill=1.000 us=169.2 head=-
+L 683 after=face_launch field_pair_scan_back grid=28,1,1 block=256 shared=0 registers=78 blocks_a_sm=3 resident_warps_a_sm=24 fill=0.117 us=753.6 head=-
+L 684 after=face_launch field_pair_gate_back grid=5183,1,1 block=256 shared=0 registers=72 blocks_a_sm=3 resident_warps_a_sm=24 fill=1.000 us=231.9 head=-
+L 685 after=face_launch field_outer_bound_x32 grid=218,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=0.454 us=242.8 head=-
+L 686 after=face_launch field_outer_x32 grid=20736,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=698.3 head=-
+L 687 after=face_launch field_outer_bound_x32 grid=218,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=0.454 us=335.7 head=-
+L 688 after=face_launch field_outer_x32 grid=20736,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=629.9 head=-
+L 689 after=face_launch field_outer_x32 grid=324,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=0.675 us=87.3 head=-
+L 690 after=face_launch field_outer_x32 grid=324,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=0.675 us=79.2 head=-
+L 691 after=face_launch field_outer_bound_x32 grid=218,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=0.454 us=116.2 head=-
+L 692 after=face_launch field_outer_x32 grid=10368,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=323.8 head=-
+L 693 after=face_launch field_outer_x32 grid=162,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=0.338 us=29.3 head=-
+L 694 after=face_launch field_transposed grid=10366,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=591.2 head=-
+L 695 after=face_launch field_transposed grid=10366,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=597.8 head=-
+L 696 after=face_launch field_transposed grid=10366,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=865.8 head=-
+L 697 after=face_launch field_add grid=10366,1,1 block=256 shared=0 registers=12 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=420.5 head=-
+L 698 after=face_launch field_ratio_adjoint grid=5183,1,1 block=256 shared=0 registers=48 blocks_a_sm=5 resident_warps_a_sm=40 fill=1.000 us=153.4 head=-
+L 699 after=face_launch field_outer_x32 grid=162,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=0.338 us=33.7 head=-
+L 700 after=face_launch field_outer_bound_x64 grid=218,1,1 block=256 shared=0 registers=44 blocks_a_sm=5 resident_warps_a_sm=40 fill=0.545 us=103.9 head=-
+L 701 after=face_launch field_outer_x64 grid=10368,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=307.8 head=-
+L 702 after=face_launch field_transposed grid=10366,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=310.1 head=-
+L 703 after=face_launch field_current_back grid=5183,1,1 block=256 shared=0 registers=38 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=61.0 head=-
+L 704 after=face_launch field_pace_current_back grid=324,1,1 block=256 shared=0 registers=48 blocks_a_sm=5 resident_warps_a_sm=40 fill=0.810 us=70.9 head=-
+L 705 after=face_launch field_clock_fill grid=162,16,1 block=256 shared=0 registers=46 blocks_a_sm=5 resident_warps_a_sm=40 fill=1.000 us=1088.4 head=-
+L 706 after=face_launch field_skin_fill grid=20731,1,1 block=128 shared=0 registers=64 blocks_a_sm=8 resident_warps_a_sm=32 fill=1.000 us=871.4 head=-
+L 707 after=face_launch field_contact_rows grid=10366,1,1 block=128 shared=0 registers=128 blocks_a_sm=4 resident_warps_a_sm=16 fill=1.000 us=1525.7 head=0
+L 708 after=face_launch field_contact_columns grid=10366,1,1 block=128 shared=0 registers=72 blocks_a_sm=7 resident_warps_a_sm=28 fill=1.000 us=895.5 head=0
+L 709 after=face_launch field_spread grid=218,1,1 block=256 shared=0 registers=48 blocks_a_sm=5 resident_warps_a_sm=40 fill=0.545 us=98.8 head=0
+L 710 after=face_launch field_contact_rows grid=10366,1,1 block=128 shared=0 registers=128 blocks_a_sm=4 resident_warps_a_sm=16 fill=1.000 us=1298.6 head=1
+L 711 after=face_launch field_contact_columns grid=10366,1,1 block=128 shared=0 registers=72 blocks_a_sm=7 resident_warps_a_sm=28 fill=1.000 us=720.8 head=1
+L 712 after=face_launch field_spread grid=218,1,1 block=256 shared=0 registers=48 blocks_a_sm=5 resident_warps_a_sm=40 fill=0.545 us=98.2 head=1
+L 713 after=face_launch field_contact_rows grid=10366,1,1 block=128 shared=0 registers=128 blocks_a_sm=4 resident_warps_a_sm=16 fill=1.000 us=1932.8 head=2
+L 714 after=face_launch field_pace_skin_back grid=10366,1,1 block=128 shared=0 registers=96 blocks_a_sm=5 resident_warps_a_sm=20 fill=1.000 us=2014.0 head=2
+L 715 after=face_launch field_contact_columns grid=10366,1,1 block=128 shared=0 registers=72 blocks_a_sm=7 resident_warps_a_sm=28 fill=1.000 us=1558.5 head=2
+L 716 after=face_launch field_spread grid=218,1,1 block=256 shared=0 registers=48 blocks_a_sm=5 resident_warps_a_sm=40 fill=0.545 us=107.4 head=2
+L 717 after=face_launch field_contact_rows grid=10366,1,1 block=128 shared=0 registers=128 blocks_a_sm=4 resident_warps_a_sm=16 fill=1.000 us=1981.9 head=3
+L 718 after=face_launch field_pace_skin_back grid=10366,1,1 block=128 shared=0 registers=96 blocks_a_sm=5 resident_warps_a_sm=20 fill=1.000 us=2416.3 head=3
+L 719 after=face_launch field_contact_columns grid=10366,1,1 block=128 shared=0 registers=72 blocks_a_sm=7 resident_warps_a_sm=28 fill=1.000 us=1942.4 head=3
+L 720 after=face_launch field_spread grid=218,1,1 block=256 shared=0 registers=48 blocks_a_sm=5 resident_warps_a_sm=40 fill=0.545 us=106.7 head=3
+L 721 after=face_launch field_unit_back grid=20731,1,1 block=256 shared=0 registers=56 blocks_a_sm=4 resident_warps_a_sm=32 fill=1.000 us=270.5 head=-
+L 722 after=face_launch field_unit_back_probe grid=20731,1,1 block=256 shared=0 registers=56 blocks_a_sm=4 resident_warps_a_sm=32 fill=1.000 us=273.8 head=-
+L 723 after=face_launch field_unframe grid=5183,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=83.5 head=-
+L 724 after=face_launch field_unframe grid=5183,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=69.8 head=-
+L 725 after=face_launch field_unframe grid=5183,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=94.0 head=-
+L 726 after=face_launch field_affine_tiled_x32 grid=10366,1,1 block=256 shared=17952 registers=40 blocks_a_sm=5 resident_warps_a_sm=40 fill=1.000 us=254.1 head=-
+L 727 after=face_launch field_moment_add_probe grid=10366,1,1 block=256 shared=0 registers=16 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=58.0 head=-
+L 728 after=face_launch field_pace_frame_back grid=324,1,1 block=256 shared=0 registers=58 blocks_a_sm=4 resident_warps_a_sm=32 fill=1.000 us=253.0 head=-
+L 729 after=face_launch field_moment_accumulate grid=10366,1,1 block=256 shared=0 registers=14 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=116.3 head=-
+L 730 after=face_launch field_moment_accumulate grid=10366,1,1 block=256 shared=0 registers=14 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=92.0 head=-
+L 731 after=face_launch field_outer_bound_x32 grid=218,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=0.454 us=126.9 head=-
+L 732 after=face_launch field_outer_x32 grid=10368,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=327.4 head=-
+L 733 after=face_launch field_outer_x32 grid=162,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=0.338 us=37.0 head=-
+L 734 after=face_launch field_transposed grid=10366,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=317.7 head=-
+L 735 after=face_launch field_outer_bound_x32 grid=218,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=0.454 us=120.1 head=-
+L 736 after=face_launch field_outer_x32 grid=10368,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=329.3 head=-
+L 737 after=face_launch field_outer_x32 grid=162,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=0.338 us=40.6 head=-
+L 738 after=face_launch field_transposed grid=10366,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=327.0 head=-
+L 739 after=face_launch field_outer_bound_x32 grid=218,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=0.454 us=302.9 head=-
+L 740 after=face_launch field_outer_x32 grid=10368,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=342.8 head=-
+L 741 after=face_launch field_outer_x32 grid=162,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=0.338 us=45.2 head=-
+L 742 after=face_launch field_transposed grid=10366,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=316.7 head=-
+L 743 after=face_launch field_ratio_adjoint grid=5183,1,1 block=256 shared=0 registers=48 blocks_a_sm=5 resident_warps_a_sm=40 fill=1.000 us=145.9 head=-
+L 744 after=face_launch field_moment_ds_all grid=2592,1,1 block=256 shared=0 registers=20 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=123.3 head=-
+L 745 after=face_launch field_moment_admit_paced_all grid=218,16,1 block=256 shared=12288 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=53.5 head=-
+L 746 after=face_launch field_moment_prefix_paced_all grid=218,16,1 block=256 shared=8192 registers=72 blocks_a_sm=3 resident_warps_a_sm=24 fill=1.000 us=115.1 head=-
+L 747 after=face_launch field_moment_skinned_all grid=273,1,1 block=256 shared=0 registers=56 blocks_a_sm=4 resident_warps_a_sm=32 fill=0.853 us=1404.5 head=-
+L 748 after=face_launch field_moment_return_paced_all grid=162,16,1 block=256 shared=0 registers=78 blocks_a_sm=3 resident_warps_a_sm=24 fill=1.000 us=642.9 head=-
+L 749 after=face_launch field_moment_strand_return_all grid=2592,1,1 block=256 shared=0 registers=36 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=218.5 head=-
+L 750 after=face_launch field_moment_strands_all grid=2592,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=49.8 head=-
+L 751 after=face_launch field_moment_prefix_paced_all grid=218,16,1 block=256 shared=8192 registers=72 blocks_a_sm=3 resident_warps_a_sm=24 fill=1.000 us=120.5 head=-
+L 752 after=face_launch field_moment_prefix_paced_all grid=218,16,1 block=256 shared=8192 registers=72 blocks_a_sm=3 resident_warps_a_sm=24 fill=1.000 us=118.8 head=-
+L 753 after=face_launch field_moment_pace_back_all grid=162,16,1 block=256 shared=0 registers=96 blocks_a_sm=2 resident_warps_a_sm=16 fill=1.000 us=975.2 head=-
+L 754 after=face_launch field_pace_kappa_back grid=2,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=0.004 us=363.2 head=-
+L 755 after=face_launch field_pace_c_back grid=324,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=0.675 us=526.4 head=-
+L 756 after=face_launch field_blank_dz grid=39519,1,1 block=256 shared=0 registers=56 blocks_a_sm=4 resident_warps_a_sm=32 fill=1.000 us=1330.8 head=-
+L 757 after=face_launch field_blank_bias_enc grid=40146,1,1 block=256 shared=0 registers=38 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=1940.9 head=-
+L 758 after=face_launch field_blank_dy grid=10366,1,1 block=256 shared=0 registers=38 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=1871.7 head=-
+L 759 after=face_launch field_blank_lift_read grid=10530,1,1 block=256 shared=0 registers=35 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=693.5 head=-
+L 760 after=face_launch field_transposed grid=10366,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=81.7 head=-
+L 761 after=face_launch field_ratio_adjoint grid=5183,1,1 block=256 shared=0 registers=48 blocks_a_sm=5 resident_warps_a_sm=40 fill=1.000 us=50.7 head=-
+L 762 after=face_launch field_blank_dx grid=10366,1,1 block=256 shared=0 registers=22 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=33.6 head=-
+L 763 after=face_launch field_outer_x32 grid=162,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=0.338 us=60.2 head=-
+L 764 after=face_launch field_outer_bound_x64 grid=218,1,1 block=256 shared=0 registers=44 blocks_a_sm=5 resident_warps_a_sm=40 fill=0.545 us=241.5 head=-
+L 765 after=face_launch field_outer_x64 grid=20736,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=617.8 head=-
+L 766 after=face_launch field_transposed grid=20731,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=603.9 head=-
+L 767 after=face_launch field_pair_back grid=5183,1,1 block=256 shared=0 registers=48 blocks_a_sm=5 resident_warps_a_sm=40 fill=1.000 us=173.1 head=-
+L 768 after=face_launch field_pair_scan_back grid=28,1,1 block=256 shared=0 registers=78 blocks_a_sm=3 resident_warps_a_sm=24 fill=0.117 us=881.8 head=-
+L 769 after=face_launch field_pair_gate_back grid=5183,1,1 block=256 shared=0 registers=72 blocks_a_sm=3 resident_warps_a_sm=24 fill=1.000 us=247.3 head=-
+L 770 after=face_launch field_outer_bound_x32 grid=218,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=0.454 us=247.6 head=-
+L 771 after=face_launch field_outer_x32 grid=20736,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=636.0 head=-
+L 772 after=face_launch field_outer_bound_x32 grid=218,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=0.454 us=203.8 head=-
+L 773 after=face_launch field_outer_x32 grid=20736,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=633.5 head=-
+L 774 after=face_launch field_outer_x32 grid=324,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=0.675 us=83.3 head=-
+L 775 after=face_launch field_outer_x32 grid=324,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=0.675 us=76.0 head=-
+L 776 after=face_launch field_outer_bound_x32 grid=218,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=0.454 us=113.9 head=-
+L 777 after=face_launch field_outer_x32 grid=10368,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=324.6 head=-
+L 778 after=face_launch field_outer_x32 grid=162,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=0.338 us=30.5 head=-
+L 779 after=face_launch field_transposed grid=10366,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=591.5 head=-
+L 780 after=face_launch field_transposed grid=10366,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=589.8 head=-
+L 781 after=face_launch field_transposed grid=10366,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=315.8 head=-
+L 782 after=face_launch field_add grid=10366,1,1 block=256 shared=0 registers=12 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=55.2 head=-
+L 783 after=face_launch field_ratio_adjoint grid=5183,1,1 block=256 shared=0 registers=48 blocks_a_sm=5 resident_warps_a_sm=40 fill=1.000 us=146.1 head=-
+L 784 after=face_launch field_outer_x32 grid=162,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=0.338 us=39.8 head=-
+L 785 after=face_launch field_outer_bound_x64 grid=218,1,1 block=256 shared=0 registers=44 blocks_a_sm=5 resident_warps_a_sm=40 fill=0.545 us=105.1 head=-
+L 786 after=face_launch field_outer_x64 grid=10368,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=313.4 head=-
+L 787 after=face_launch field_transposed grid=10366,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=317.3 head=-
+L 788 after=face_launch field_current_back grid=5183,1,1 block=256 shared=0 registers=38 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=57.2 head=-
+L 789 after=face_launch field_pace_current_back grid=324,1,1 block=256 shared=0 registers=48 blocks_a_sm=5 resident_warps_a_sm=40 fill=0.810 us=74.0 head=-
+L 790 after=face_launch field_clock_fill grid=162,16,1 block=256 shared=0 registers=46 blocks_a_sm=5 resident_warps_a_sm=40 fill=1.000 us=1150.2 head=-
+L 791 after=face_launch field_skin_fill grid=20731,1,1 block=128 shared=0 registers=64 blocks_a_sm=8 resident_warps_a_sm=32 fill=1.000 us=1035.9 head=-
+L 792 after=face_launch field_contact_rows grid=10366,1,1 block=128 shared=0 registers=128 blocks_a_sm=4 resident_warps_a_sm=16 fill=1.000 us=1592.1 head=0
+L 793 after=face_launch field_contact_columns grid=10366,1,1 block=128 shared=0 registers=72 blocks_a_sm=7 resident_warps_a_sm=28 fill=1.000 us=917.9 head=0
+L 794 after=face_launch field_spread grid=218,1,1 block=256 shared=0 registers=48 blocks_a_sm=5 resident_warps_a_sm=40 fill=0.545 us=108.8 head=0
+L 795 after=face_launch field_contact_rows grid=10366,1,1 block=128 shared=0 registers=128 blocks_a_sm=4 resident_warps_a_sm=16 fill=1.000 us=1348.9 head=1
+L 796 after=face_launch field_contact_columns grid=10366,1,1 block=128 shared=0 registers=72 blocks_a_sm=7 resident_warps_a_sm=28 fill=1.000 us=1289.3 head=1
+L 797 after=face_launch field_spread grid=218,1,1 block=256 shared=0 registers=48 blocks_a_sm=5 resident_warps_a_sm=40 fill=0.545 us=376.8 head=1
+L 798 after=face_launch field_contact_rows grid=10366,1,1 block=128 shared=0 registers=128 blocks_a_sm=4 resident_warps_a_sm=16 fill=1.000 us=1957.4 head=2
+L 799 after=face_launch field_pace_skin_back grid=10366,1,1 block=128 shared=0 registers=96 blocks_a_sm=5 resident_warps_a_sm=20 fill=1.000 us=1852.5 head=2
+L 800 after=face_launch field_contact_columns grid=10366,1,1 block=128 shared=0 registers=72 blocks_a_sm=7 resident_warps_a_sm=28 fill=1.000 us=1628.9 head=2
+L 801 after=face_launch field_spread grid=218,1,1 block=256 shared=0 registers=48 blocks_a_sm=5 resident_warps_a_sm=40 fill=0.545 us=106.3 head=2
+L 802 after=face_launch field_contact_rows grid=10366,1,1 block=128 shared=0 registers=128 blocks_a_sm=4 resident_warps_a_sm=16 fill=1.000 us=2017.0 head=3
+L 803 after=face_launch field_pace_skin_back grid=10366,1,1 block=128 shared=0 registers=96 blocks_a_sm=5 resident_warps_a_sm=20 fill=1.000 us=2019.9 head=3
+L 804 after=face_launch field_contact_columns grid=10366,1,1 block=128 shared=0 registers=72 blocks_a_sm=7 resident_warps_a_sm=28 fill=1.000 us=1733.7 head=3
+L 805 after=face_launch field_spread grid=218,1,1 block=256 shared=0 registers=48 blocks_a_sm=5 resident_warps_a_sm=40 fill=0.545 us=126.2 head=3
+L 806 after=face_launch field_unit_back grid=20731,1,1 block=256 shared=0 registers=56 blocks_a_sm=4 resident_warps_a_sm=32 fill=1.000 us=282.9 head=-
+L 807 after=face_launch field_unit_back_probe grid=20731,1,1 block=256 shared=0 registers=56 blocks_a_sm=4 resident_warps_a_sm=32 fill=1.000 us=275.1 head=-
+L 808 after=face_launch field_unframe grid=5183,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=82.0 head=-
+L 809 after=face_launch field_unframe grid=5183,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=78.1 head=-
+L 810 after=face_launch field_unframe grid=5183,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=78.7 head=-
+L 811 after=face_launch field_affine_tiled_x32 grid=10366,1,1 block=256 shared=17952 registers=40 blocks_a_sm=5 resident_warps_a_sm=40 fill=1.000 us=252.1 head=-
+L 812 after=face_launch field_moment_add_probe grid=10366,1,1 block=256 shared=0 registers=16 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=62.6 head=-
+L 813 after=face_launch field_pace_frame_back grid=324,1,1 block=256 shared=0 registers=58 blocks_a_sm=4 resident_warps_a_sm=32 fill=1.000 us=283.2 head=-
+L 814 after=face_launch field_moment_accumulate grid=10366,1,1 block=256 shared=0 registers=14 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=123.9 head=-
+L 815 after=face_launch field_moment_accumulate grid=10366,1,1 block=256 shared=0 registers=14 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=86.0 head=-
+L 816 after=face_launch field_outer_bound_x32 grid=218,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=0.454 us=128.5 head=-
+L 817 after=face_launch field_outer_x32 grid=10368,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=337.7 head=-
+L 818 after=face_launch field_outer_x32 grid=162,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=0.338 us=194.0 head=-
+L 819 after=face_launch field_transposed grid=10366,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=1048.1 head=-
+L 820 after=face_launch field_outer_bound_x32 grid=218,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=0.454 us=396.6 head=-
+L 821 after=face_launch field_outer_x32 grid=10368,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=332.9 head=-
+L 822 after=face_launch field_outer_x32 grid=162,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=0.338 us=34.6 head=-
+L 823 after=face_launch field_transposed grid=10366,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=320.1 head=-
+L 824 after=face_launch field_outer_bound_x32 grid=218,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=0.454 us=113.6 head=-
+L 825 after=face_launch field_outer_x32 grid=10368,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=325.8 head=-
+L 826 after=face_launch field_outer_x32 grid=162,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=0.338 us=33.9 head=-
+L 827 after=face_launch field_transposed grid=10366,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=320.8 head=-
+L 828 after=face_launch field_ratio_adjoint grid=5183,1,1 block=256 shared=0 registers=48 blocks_a_sm=5 resident_warps_a_sm=40 fill=1.000 us=148.7 head=-
+L 829 after=face_launch field_moment_ds_all grid=2592,1,1 block=256 shared=0 registers=20 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=127.4 head=-
+L 830 after=face_launch field_moment_admit_paced_all grid=218,16,1 block=256 shared=12288 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=56.1 head=-
+L 831 after=face_launch field_moment_prefix_paced_all grid=218,16,1 block=256 shared=8192 registers=72 blocks_a_sm=3 resident_warps_a_sm=24 fill=1.000 us=115.0 head=-
+L 832 after=face_launch field_moment_skinned_all grid=273,1,1 block=256 shared=0 registers=56 blocks_a_sm=4 resident_warps_a_sm=32 fill=0.853 us=1439.7 head=-
+L 833 after=face_launch field_moment_return_paced_all grid=162,16,1 block=256 shared=0 registers=78 blocks_a_sm=3 resident_warps_a_sm=24 fill=1.000 us=624.3 head=-
+L 834 after=face_launch field_moment_strand_return_all grid=2592,1,1 block=256 shared=0 registers=36 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=277.6 head=-
+L 835 after=face_launch field_moment_strands_all grid=2592,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=45.7 head=-
+L 836 after=face_launch field_moment_prefix_paced_all grid=218,16,1 block=256 shared=8192 registers=72 blocks_a_sm=3 resident_warps_a_sm=24 fill=1.000 us=114.9 head=-
+L 837 after=face_launch field_moment_prefix_paced_all grid=218,16,1 block=256 shared=8192 registers=72 blocks_a_sm=3 resident_warps_a_sm=24 fill=1.000 us=112.1 head=-
+L 838 after=face_launch field_moment_pace_back_all grid=162,16,1 block=256 shared=0 registers=96 blocks_a_sm=2 resident_warps_a_sm=16 fill=1.000 us=1003.6 head=-
+L 839 after=face_launch field_pace_kappa_back grid=2,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=0.004 us=523.4 head=-
+L 840 after=face_launch field_pace_c_back grid=324,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=0.675 us=476.0 head=-
+L 841 after=face_launch field_blank_dz grid=39519,1,1 block=256 shared=0 registers=56 blocks_a_sm=4 resident_warps_a_sm=32 fill=1.000 us=1319.6 head=-
+L 842 after=face_launch field_blank_bias_enc grid=40146,1,1 block=256 shared=0 registers=38 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=1665.9 head=-
+L 843 after=face_launch field_blank_dy grid=10366,1,1 block=256 shared=0 registers=38 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=1293.5 head=-
+L 844 after=face_launch field_blank_lift_read grid=10530,1,1 block=256 shared=0 registers=35 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=405.3 head=-
+L 845 after=face_launch field_transposed grid=10366,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=88.2 head=-
+L 846 after=face_launch field_ratio_adjoint grid=5183,1,1 block=256 shared=0 registers=48 blocks_a_sm=5 resident_warps_a_sm=40 fill=1.000 us=54.1 head=-
+L 847 after=face_launch field_blank_dx grid=10366,1,1 block=256 shared=0 registers=22 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=36.8 head=-
+L 848 after=face_launch field_outer_x32 grid=162,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=0.338 us=60.9 head=-
+L 849 after=face_launch field_outer_bound_x64 grid=218,1,1 block=256 shared=0 registers=44 blocks_a_sm=5 resident_warps_a_sm=40 fill=0.545 us=245.1 head=-
+L 850 after=face_launch field_outer_x64 grid=20736,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=654.1 head=-
+L 851 after=face_launch field_transposed grid=20731,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=780.2 head=-
+L 852 after=face_launch field_pair_back grid=5183,1,1 block=256 shared=0 registers=48 blocks_a_sm=5 resident_warps_a_sm=40 fill=1.000 us=170.9 head=-
+L 853 after=face_launch field_pair_scan_back grid=28,1,1 block=256 shared=0 registers=78 blocks_a_sm=3 resident_warps_a_sm=24 fill=0.117 us=761.4 head=-
+L 854 after=face_launch field_pair_gate_back grid=5183,1,1 block=256 shared=0 registers=72 blocks_a_sm=3 resident_warps_a_sm=24 fill=1.000 us=230.6 head=-
+L 855 after=face_launch field_outer_bound_x32 grid=218,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=0.454 us=238.2 head=-
+L 856 after=face_launch field_outer_x32 grid=20736,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=637.5 head=-
+L 857 after=face_launch field_outer_bound_x32 grid=218,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=0.454 us=205.3 head=-
+L 858 after=face_launch field_outer_x32 grid=20736,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=1196.7 head=-
+L 859 after=face_launch field_outer_x32 grid=324,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=0.675 us=317.1 head=-
+L 860 after=face_launch field_outer_x32 grid=324,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=0.675 us=99.3 head=-
+L 861 after=face_launch field_outer_bound_x32 grid=218,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=0.454 us=118.4 head=-
+L 862 after=face_launch field_outer_x32 grid=10368,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=332.5 head=-
+L 863 after=face_launch field_outer_x32 grid=162,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=0.338 us=38.1 head=-
+L 864 after=face_launch field_transposed grid=10366,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=595.5 head=-
+L 865 after=face_launch field_transposed grid=10366,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=591.4 head=-
+L 866 after=face_launch field_transposed grid=10366,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=316.4 head=-
+L 867 after=face_launch field_add grid=10366,1,1 block=256 shared=0 registers=12 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=53.3 head=-
+L 868 after=face_launch field_ratio_adjoint grid=5183,1,1 block=256 shared=0 registers=48 blocks_a_sm=5 resident_warps_a_sm=40 fill=1.000 us=346.1 head=-
+L 869 after=face_launch field_outer_x32 grid=162,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=0.338 us=41.9 head=-
+L 870 after=face_launch field_outer_bound_x64 grid=218,1,1 block=256 shared=0 registers=44 blocks_a_sm=5 resident_warps_a_sm=40 fill=0.545 us=103.4 head=-
+L 871 after=face_launch field_outer_x64 grid=10368,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=311.7 head=-
+L 872 after=face_launch field_transposed grid=10366,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=317.6 head=-
+L 873 after=face_launch field_current_back grid=5183,1,1 block=256 shared=0 registers=38 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=69.8 head=-
+L 874 after=face_launch field_pace_current_back grid=324,1,1 block=256 shared=0 registers=48 blocks_a_sm=5 resident_warps_a_sm=40 fill=0.810 us=75.9 head=-
+L 875 after=face_launch field_clock_fill grid=162,16,1 block=256 shared=0 registers=46 blocks_a_sm=5 resident_warps_a_sm=40 fill=1.000 us=1095.2 head=-
+L 876 after=face_launch field_skin_fill grid=20731,1,1 block=128 shared=0 registers=64 blocks_a_sm=8 resident_warps_a_sm=32 fill=1.000 us=865.1 head=-
+L 877 after=face_launch field_contact_rows grid=10366,1,1 block=128 shared=0 registers=128 blocks_a_sm=4 resident_warps_a_sm=16 fill=1.000 us=1645.3 head=0
+L 878 after=face_launch field_contact_columns grid=10366,1,1 block=128 shared=0 registers=72 blocks_a_sm=7 resident_warps_a_sm=28 fill=1.000 us=984.9 head=0
+L 879 after=face_launch field_spread grid=218,1,1 block=256 shared=0 registers=48 blocks_a_sm=5 resident_warps_a_sm=40 fill=0.545 us=103.3 head=0
+L 880 after=face_launch field_contact_rows grid=10366,1,1 block=128 shared=0 registers=128 blocks_a_sm=4 resident_warps_a_sm=16 fill=1.000 us=1388.4 head=1
+L 881 after=face_launch field_contact_columns grid=10366,1,1 block=128 shared=0 registers=72 blocks_a_sm=7 resident_warps_a_sm=28 fill=1.000 us=1021.3 head=1
+L 882 after=face_launch field_spread grid=218,1,1 block=256 shared=0 registers=48 blocks_a_sm=5 resident_warps_a_sm=40 fill=0.545 us=103.7 head=1
+L 883 after=face_launch field_contact_rows grid=10366,1,1 block=128 shared=0 registers=128 blocks_a_sm=4 resident_warps_a_sm=16 fill=1.000 us=1951.2 head=2
+L 884 after=face_launch field_pace_skin_back grid=10366,1,1 block=128 shared=0 registers=96 blocks_a_sm=5 resident_warps_a_sm=20 fill=1.000 us=1843.8 head=2
+L 885 after=face_launch field_contact_columns grid=10366,1,1 block=128 shared=0 registers=72 blocks_a_sm=7 resident_warps_a_sm=28 fill=1.000 us=1625.5 head=2
+L 886 after=face_launch field_spread grid=218,1,1 block=256 shared=0 registers=48 blocks_a_sm=5 resident_warps_a_sm=40 fill=0.545 us=770.7 head=2
+L 887 after=face_launch field_contact_rows grid=10366,1,1 block=128 shared=0 registers=128 blocks_a_sm=4 resident_warps_a_sm=16 fill=1.000 us=2012.9 head=3
+L 888 after=face_launch field_pace_skin_back grid=10366,1,1 block=128 shared=0 registers=96 blocks_a_sm=5 resident_warps_a_sm=20 fill=1.000 us=1848.1 head=3
+L 889 after=face_launch field_contact_columns grid=10366,1,1 block=128 shared=0 registers=72 blocks_a_sm=7 resident_warps_a_sm=28 fill=1.000 us=1716.5 head=3
+L 890 after=face_launch field_spread grid=218,1,1 block=256 shared=0 registers=48 blocks_a_sm=5 resident_warps_a_sm=40 fill=0.545 us=111.3 head=3
+L 891 after=face_launch field_unit_back grid=20731,1,1 block=256 shared=0 registers=56 blocks_a_sm=4 resident_warps_a_sm=32 fill=1.000 us=473.7 head=-
+L 892 after=face_launch field_unit_back_probe grid=20731,1,1 block=256 shared=0 registers=56 blocks_a_sm=4 resident_warps_a_sm=32 fill=1.000 us=287.5 head=-
+L 893 after=face_launch field_unframe grid=5183,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=88.2 head=-
+L 894 after=face_launch field_unframe grid=5183,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=75.5 head=-
+L 895 after=face_launch field_unframe grid=5183,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=90.4 head=-
+L 896 after=face_launch field_affine_tiled_x32 grid=10366,1,1 block=256 shared=17952 registers=40 blocks_a_sm=5 resident_warps_a_sm=40 fill=1.000 us=250.7 head=-
+L 897 after=face_launch field_moment_add_probe grid=10366,1,1 block=256 shared=0 registers=16 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=69.8 head=-
+L 898 after=face_launch field_pace_frame_back grid=324,1,1 block=256 shared=0 registers=58 blocks_a_sm=4 resident_warps_a_sm=32 fill=1.000 us=236.5 head=-
+L 899 after=face_launch field_moment_accumulate grid=10366,1,1 block=256 shared=0 registers=14 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=119.4 head=-
+L 900 after=face_launch field_moment_accumulate grid=10366,1,1 block=256 shared=0 registers=14 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=99.9 head=-
+L 901 after=face_launch field_outer_bound_x32 grid=218,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=0.454 us=127.8 head=-
+L 902 after=face_launch field_outer_x32 grid=10368,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=336.8 head=-
+L 903 after=face_launch field_outer_x32 grid=162,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=0.338 us=41.0 head=-
+L 904 after=face_launch field_transposed grid=10366,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=320.8 head=-
+L 905 after=face_launch field_outer_bound_x32 grid=218,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=0.454 us=113.1 head=-
+L 906 after=face_launch field_outer_x32 grid=10368,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=330.5 head=-
+L 907 after=face_launch field_outer_x32 grid=162,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=0.338 us=31.1 head=-
+L 908 after=face_launch field_transposed grid=10366,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=316.9 head=-
+L 909 after=face_launch field_outer_bound_x32 grid=218,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=0.454 us=112.8 head=-
+L 910 after=face_launch field_outer_x32 grid=10368,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=334.1 head=-
+L 911 after=face_launch field_outer_x32 grid=162,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=0.338 us=34.4 head=-
+L 912 after=face_launch field_transposed grid=10366,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=319.2 head=-
+L 913 after=face_launch field_ratio_adjoint grid=5183,1,1 block=256 shared=0 registers=48 blocks_a_sm=5 resident_warps_a_sm=40 fill=1.000 us=152.3 head=-
+L 914 after=face_launch field_moment_ds_all grid=2592,1,1 block=256 shared=0 registers=20 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=123.7 head=-
+L 915 after=face_launch field_moment_admit_paced_all grid=218,16,1 block=256 shared=12288 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=54.6 head=-
+L 916 after=face_launch field_moment_prefix_paced_all grid=218,16,1 block=256 shared=8192 registers=72 blocks_a_sm=3 resident_warps_a_sm=24 fill=1.000 us=124.7 head=-
+L 917 after=face_launch field_moment_skinned_all grid=273,1,1 block=256 shared=0 registers=56 blocks_a_sm=4 resident_warps_a_sm=32 fill=0.853 us=1418.9 head=-
+L 918 after=face_launch field_moment_return_paced_all grid=162,16,1 block=256 shared=0 registers=78 blocks_a_sm=3 resident_warps_a_sm=24 fill=1.000 us=643.9 head=-
+L 919 after=face_launch field_moment_strand_return_all grid=2592,1,1 block=256 shared=0 registers=36 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=503.3 head=-
+L 920 after=face_launch field_moment_strands_all grid=2592,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=50.5 head=-
+L 921 after=face_launch field_moment_prefix_paced_all grid=218,16,1 block=256 shared=8192 registers=72 blocks_a_sm=3 resident_warps_a_sm=24 fill=1.000 us=115.3 head=-
+L 922 after=face_launch field_moment_prefix_paced_all grid=218,16,1 block=256 shared=8192 registers=72 blocks_a_sm=3 resident_warps_a_sm=24 fill=1.000 us=116.3 head=-
+L 923 after=face_launch field_moment_pace_back_all grid=162,16,1 block=256 shared=0 registers=96 blocks_a_sm=2 resident_warps_a_sm=16 fill=1.000 us=964.5 head=-
+L 924 after=face_launch field_pace_kappa_back grid=2,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=0.004 us=379.4 head=-
+L 925 after=face_launch field_pace_c_back grid=324,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=0.675 us=401.5 head=-
+L 926 after=face_launch field_blank_dz grid=39519,1,1 block=256 shared=0 registers=56 blocks_a_sm=4 resident_warps_a_sm=32 fill=1.000 us=1863.7 head=-
+L 927 after=face_launch field_blank_bias_enc grid=40146,1,1 block=256 shared=0 registers=38 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=1902.8 head=-
+L 928 after=face_launch field_blank_dy grid=10366,1,1 block=256 shared=0 registers=38 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=1235.2 head=-
+L 929 after=face_launch field_blank_lift_read grid=10530,1,1 block=256 shared=0 registers=35 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=576.1 head=-
+L 930 after=face_launch field_transposed grid=10366,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=78.2 head=-
+L 931 after=face_launch field_ratio_adjoint grid=5183,1,1 block=256 shared=0 registers=48 blocks_a_sm=5 resident_warps_a_sm=40 fill=1.000 us=49.3 head=-
+L 932 after=face_launch field_blank_dx grid=10366,1,1 block=256 shared=0 registers=22 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=39.0 head=-
+L 933 after=face_launch field_outer_x32 grid=162,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=0.338 us=57.3 head=-
+L 934 after=face_launch field_outer_bound_x64 grid=218,1,1 block=256 shared=0 registers=44 blocks_a_sm=5 resident_warps_a_sm=40 fill=0.545 us=237.2 head=-
+L 935 after=face_launch field_outer_x64 grid=20736,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=613.3 head=-
+L 936 after=face_launch field_transposed grid=20731,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=603.8 head=-
+L 937 after=face_launch field_pair_back grid=5183,1,1 block=256 shared=0 registers=48 blocks_a_sm=5 resident_warps_a_sm=40 fill=1.000 us=164.3 head=-
+L 938 after=face_launch field_pair_scan_back grid=28,1,1 block=256 shared=0 registers=78 blocks_a_sm=3 resident_warps_a_sm=24 fill=0.117 us=750.1 head=-
+L 939 after=face_launch field_pair_gate_back grid=5183,1,1 block=256 shared=0 registers=72 blocks_a_sm=3 resident_warps_a_sm=24 fill=1.000 us=226.6 head=-
+L 940 after=face_launch field_outer_bound_x32 grid=218,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=0.454 us=239.8 head=-
+L 941 after=face_launch field_outer_x32 grid=20736,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=634.6 head=-
+L 942 after=face_launch field_outer_bound_x32 grid=218,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=0.454 us=207.2 head=-
+L 943 after=face_launch field_outer_x32 grid=20736,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=628.7 head=-
+L 944 after=face_launch field_outer_x32 grid=324,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=0.675 us=85.5 head=-
+L 945 after=face_launch field_outer_x32 grid=324,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=0.675 us=75.1 head=-
+L 946 after=face_launch field_outer_bound_x32 grid=218,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=0.454 us=114.5 head=-
+L 947 after=face_launch field_outer_x32 grid=10368,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=325.1 head=-
+L 948 after=face_launch field_outer_x32 grid=162,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=0.338 us=38.1 head=-
+L 949 after=face_launch field_transposed grid=10366,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=601.1 head=-
+L 950 after=face_launch field_transposed grid=10366,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=602.4 head=-
+L 951 after=face_launch field_transposed grid=10366,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=522.8 head=-
+L 952 after=face_launch field_add grid=10366,1,1 block=256 shared=0 registers=12 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=62.2 head=-
+L 953 after=face_launch field_ratio_adjoint grid=5183,1,1 block=256 shared=0 registers=48 blocks_a_sm=5 resident_warps_a_sm=40 fill=1.000 us=149.5 head=-
+L 954 after=face_launch field_outer_x32 grid=162,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=0.338 us=35.0 head=-
+L 955 after=face_launch field_outer_bound_x64 grid=218,1,1 block=256 shared=0 registers=44 blocks_a_sm=5 resident_warps_a_sm=40 fill=0.545 us=105.1 head=-
+L 956 after=face_launch field_outer_x64 grid=10368,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=310.0 head=-
+L 957 after=face_launch field_transposed grid=10366,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=312.5 head=-
+L 958 after=face_launch field_current_back grid=5183,1,1 block=256 shared=0 registers=38 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=54.4 head=-
+L 959 after=face_launch field_pace_current_back grid=324,1,1 block=256 shared=0 registers=48 blocks_a_sm=5 resident_warps_a_sm=40 fill=0.810 us=70.0 head=-
+L 960 after=face_launch field_clock_fill grid=162,16,1 block=256 shared=0 registers=46 blocks_a_sm=5 resident_warps_a_sm=40 fill=1.000 us=1029.9 head=-
+L 961 after=face_launch field_skin_fill grid=20731,1,1 block=128 shared=0 registers=64 blocks_a_sm=8 resident_warps_a_sm=32 fill=1.000 us=899.0 head=-
+L 962 after=face_launch field_contact_rows grid=10366,1,1 block=128 shared=0 registers=128 blocks_a_sm=4 resident_warps_a_sm=16 fill=1.000 us=1790.4 head=0
+L 963 after=face_launch field_contact_columns grid=10366,1,1 block=128 shared=0 registers=72 blocks_a_sm=7 resident_warps_a_sm=28 fill=1.000 us=1403.5 head=0
+L 964 after=face_launch field_spread grid=218,1,1 block=256 shared=0 registers=48 blocks_a_sm=5 resident_warps_a_sm=40 fill=0.545 us=247.8 head=0
+L 965 after=face_launch field_contact_rows grid=10366,1,1 block=128 shared=0 registers=128 blocks_a_sm=4 resident_warps_a_sm=16 fill=1.000 us=1318.5 head=1
+L 966 after=face_launch field_contact_columns grid=10366,1,1 block=128 shared=0 registers=72 blocks_a_sm=7 resident_warps_a_sm=28 fill=1.000 us=716.9 head=1
+L 967 after=face_launch field_spread grid=218,1,1 block=256 shared=0 registers=48 blocks_a_sm=5 resident_warps_a_sm=40 fill=0.545 us=103.0 head=1
+L 968 after=face_launch field_contact_rows grid=10366,1,1 block=128 shared=0 registers=128 blocks_a_sm=4 resident_warps_a_sm=16 fill=1.000 us=1999.2 head=2
+L 969 after=face_launch field_pace_skin_back grid=10366,1,1 block=128 shared=0 registers=96 blocks_a_sm=5 resident_warps_a_sm=20 fill=1.000 us=1902.4 head=2
+L 970 after=face_launch field_contact_columns grid=10366,1,1 block=128 shared=0 registers=72 blocks_a_sm=7 resident_warps_a_sm=28 fill=1.000 us=2016.2 head=2
+L 971 after=face_launch field_spread grid=218,1,1 block=256 shared=0 registers=48 blocks_a_sm=5 resident_warps_a_sm=40 fill=0.545 us=117.3 head=2
+L 972 after=face_launch field_contact_rows grid=10366,1,1 block=128 shared=0 registers=128 blocks_a_sm=4 resident_warps_a_sm=16 fill=1.000 us=2084.8 head=3
+L 973 after=face_launch field_pace_skin_back grid=10366,1,1 block=128 shared=0 registers=96 blocks_a_sm=5 resident_warps_a_sm=20 fill=1.000 us=1917.5 head=3
+L 974 after=face_launch field_contact_columns grid=10366,1,1 block=128 shared=0 registers=72 blocks_a_sm=7 resident_warps_a_sm=28 fill=1.000 us=1817.1 head=3
+L 975 after=face_launch field_spread grid=218,1,1 block=256 shared=0 registers=48 blocks_a_sm=5 resident_warps_a_sm=40 fill=0.545 us=744.7 head=3
+L 976 after=face_launch field_unit_back grid=20731,1,1 block=256 shared=0 registers=56 blocks_a_sm=4 resident_warps_a_sm=32 fill=1.000 us=537.0 head=-
+L 977 after=face_launch field_unit_back_probe grid=20731,1,1 block=256 shared=0 registers=56 blocks_a_sm=4 resident_warps_a_sm=32 fill=1.000 us=285.5 head=-
+L 978 after=face_launch field_unframe grid=5183,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=84.0 head=-
+L 979 after=face_launch field_unframe grid=5183,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=72.3 head=-
+L 980 after=face_launch field_unframe grid=5183,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=78.8 head=-
+L 981 after=face_launch field_affine_tiled_x32 grid=10366,1,1 block=256 shared=17952 registers=40 blocks_a_sm=5 resident_warps_a_sm=40 fill=1.000 us=249.9 head=-
+L 982 after=face_launch field_moment_add_probe grid=10366,1,1 block=256 shared=0 registers=16 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=58.2 head=-
+L 983 after=face_launch field_pace_frame_back grid=324,1,1 block=256 shared=0 registers=58 blocks_a_sm=4 resident_warps_a_sm=32 fill=1.000 us=257.3 head=-
+L 984 after=face_launch field_moment_accumulate grid=10366,1,1 block=256 shared=0 registers=14 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=121.4 head=-
+L 985 after=face_launch field_moment_accumulate grid=10366,1,1 block=256 shared=0 registers=14 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=92.6 head=-
+L 986 after=face_launch field_outer_bound_x32 grid=218,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=0.454 us=130.0 head=-
+L 987 after=face_launch field_outer_x32 grid=10368,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=325.7 head=-
+L 988 after=face_launch field_outer_x32 grid=162,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=0.338 us=37.9 head=-
+L 989 after=face_launch field_transposed grid=10366,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=313.7 head=-
+L 990 after=face_launch field_outer_bound_x32 grid=218,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=0.454 us=111.2 head=-
+L 991 after=face_launch field_outer_x32 grid=10368,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=326.4 head=-
+L 992 after=face_launch field_outer_x32 grid=162,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=0.338 us=37.1 head=-
+L 993 after=face_launch field_transposed grid=10366,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=313.8 head=-
+L 994 after=face_launch field_outer_bound_x32 grid=218,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=0.454 us=116.3 head=-
+L 995 after=face_launch field_outer_x32 grid=10368,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=324.5 head=-
+L 996 after=face_launch field_outer_x32 grid=162,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=0.338 us=58.0 head=-
+L 997 after=face_launch field_transposed grid=10366,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=315.8 head=-
+L 998 after=face_launch field_ratio_adjoint grid=5183,1,1 block=256 shared=0 registers=48 blocks_a_sm=5 resident_warps_a_sm=40 fill=1.000 us=147.9 head=-
+L 999 after=face_launch field_outer_x32 grid=162,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=0.338 us=32.7 head=-
+L 1000 after=face_launch field_outer_bound_x64 grid=218,1,1 block=256 shared=0 registers=44 blocks_a_sm=5 resident_warps_a_sm=40 fill=0.545 us=111.6 head=-
+L 1001 after=face_launch field_outer_x64 grid=10368,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=349.4 head=-
+L 1002 after=face_launch field_transposed grid=10366,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=494.5 head=-
+L 1003 after=face_launch field_moment_accumulate grid=10366,1,1 block=256 shared=0 registers=14 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=120.8 head=-
+L 1004 after=face_launch field_moment_ds_all grid=2592,1,1 block=256 shared=0 registers=20 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=65.9 head=-
+L 1005 after=face_launch field_moment_admit_paced_all grid=218,16,1 block=256 shared=12288 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=50.9 head=-
+L 1006 after=face_launch field_moment_prefix_paced_all grid=218,16,1 block=256 shared=8192 registers=72 blocks_a_sm=3 resident_warps_a_sm=24 fill=1.000 us=113.9 head=-
+L 1007 after=face_launch field_moment_skinned_all grid=273,1,1 block=256 shared=0 registers=56 blocks_a_sm=4 resident_warps_a_sm=32 fill=0.853 us=1432.9 head=-
+L 1008 after=face_launch field_moment_return_paced_all grid=162,16,1 block=256 shared=0 registers=78 blocks_a_sm=3 resident_warps_a_sm=24 fill=1.000 us=625.4 head=-
+L 1009 after=face_launch field_moment_strand_return_all grid=2592,1,1 block=256 shared=0 registers=36 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=284.5 head=-
+L 1010 after=face_launch field_moment_strands_all grid=2592,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=1.000 us=56.1 head=-
+L 1011 after=face_launch field_moment_prefix_paced_all grid=218,16,1 block=256 shared=8192 registers=72 blocks_a_sm=3 resident_warps_a_sm=24 fill=1.000 us=115.0 head=-
+L 1012 after=face_launch field_moment_prefix_paced_all grid=218,16,1 block=256 shared=8192 registers=72 blocks_a_sm=3 resident_warps_a_sm=24 fill=1.000 us=118.3 head=-
+L 1013 after=face_launch field_moment_pace_back_all grid=162,16,1 block=256 shared=0 registers=96 blocks_a_sm=2 resident_warps_a_sm=16 fill=1.000 us=973.7 head=-
+L 1014 after=face_launch field_pace_kappa_back grid=2,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=0.004 us=373.4 head=-
+L 1015 after=face_launch field_pace_c_back grid=324,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=0.675 us=33.1 head=-
+L 1016 after=face_launch field_encoding grid=183,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=0.381 us=54.0 head=-
+L 1017 after=face_launch field_encoding grid=182,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=0.379 us=155.3 head=-
+L 1018 after=face_launch field_encoding grid=182,1,1 block=256 shared=0 registers=40 blocks_a_sm=6 resident_warps_a_sm=48 fill=0.379 us=50.4 head=-
+L 1019 after=status_wait field_face_at_class grid=162,1,1 block=256 shared=0 registers=14 blocks_a_sm=6 resident_warps_a_sm=48 fill=0.338 us=22.0 head=-
+TRACE section_kernel_us=257201.9 launches=510
+## by entry: launches a section (trace), ms a section (100-section profile), fill range, the entry's lowering, family, unit, and the source survey's columns
+E field_contact_rows family=contact launches_traced=16 launches_a_section=16 ms_a_section=30.43 us_a_launch=1901.9 registers=128 fill_min=1.000 fill_max=1.000 printed_in_step5=yes cross_region=no:
+  grid: grid `Self::rows_grid(sites as u64, REV_ROWS)` = ceil(sites/4) blocks clamp(1,2^20); block `(REV_ROWS * 32)` = 128 threads; dynamic shared 0 (static shared per warp: stj,stk,dss,dpcs,dsks,cnts,crlo,crhi,crlv,cdiv,cdiv2,RowCls); __launch_bounds__(128,4); args (words, h, dyh, ds, dq)
+  unit: a warp a receiving site g (grid-stride over all T sites) of ONE head h (one launch a head); lanes: over support entries k in chunks of 32 (passes A and B), over span entries (entry=lane%S, part=lane/S) for the row return, one lane a crowd slot
+  reads: args dyh[h][t][S]; w.e (shares, own row), w.sb, w.ce[hg][slot], w.dpb (re-reads its own pass-A writes), w.vf, w.qf, w.pq, w.sw, w.sv, w.sc, w.skin (pair_skins8/pair_skin_word, paced head), w.cskin (crowd_skin_ij, paced head), w.decay, w.decay_t (non-paced), class lists w.members w.class_off w.cls w.pn w.pcls w.dlist w.dstart (row_prepare/support_at), w.unresolved w.mix_off w.definite w.computed, w.region_off w.region_eoff w.region_soff w.site_region w.site_pos, w.theta[temper_at], w.face w.fine_roots w.ln2_* w.plain w.slots w.dsbits
+  writes: ds `=` and w.dpb `=` (dense [region_eoff[r]+i*sites+j], support entries of computed rows only); dq `=0` and w.dp `=` (every (g, span entry) of the head; skipped rows get 0); w.cds `=` (crowd slots, if non-null); w.cv `+=` and w.cw `+=` (add_wide difference arrays at rows first+r+lo and first+r+hi+1 of OWN region, several rows of a region add to the same cell); w.gcov `+=` (temperature entry 2h+open, add_wide, one lane a row); w.dsshare `+=` (if set); w.status |= (atomicOr CARRIER/KEY)
+  cross_region: no: every array it reads (e, sb, ce, sw/sv/sc, skin, cskin, class lists) is addressed through the row's own region (region_eoff[r], prow0=h*rows1+first+r); cv/cw/gcov/dsshare adds are reductions (writes) and are read only by field_spread per region
+  notes: one warp per (head,row) with a loop over the support (K = NEAR_SLOTS + definite-run length, up to the region's definite sites for an open row) twice (pass A, pass B) plus S-long dot product a pair (pair_dp/pair_dp8 loops S per pair, 128-bit); pair_dp8 reads vector rows; crowd lanes do 128-bit divisions; skin store read per pair on paced heads; dense address [i][j] of the region block (sites^2 per region per head) for e, ds, dpb; atomics (add_wide) on cv/cw per crowd
+E field_contact_l5 family=contact launches_traced=4 launches_a_section=4 ms_a_section=25.54 us_a_launch=7276.4 registers=64 fill_min=1.000 fill_max=1.000 printed_in_step5=yes cross_region=no:
+  grid: grid `Self::rows_grid((heads * sites) as u64, rows_per_block)` with rows_per_block=CONTACT_ROWS=4 -> ceil(heads*sites/4) blocks; block `(rows_per_block * 32)` = 128; dynamic shared 0 (static: stj,sts,stk,st0..st2,crlo,crhi,crlv,RowCls per warp); __launch_bounds__(128, CONTACT_MIN_BLOCKS=8); args (words, store)
+  unit: a warp a (head h, receiving site g) = row hg (grid-stride over H*T rows); lanes: a support entry k (chunks of 32) for the terms and the mass, a (span entry, part) for the numerators, one lane a crowd slot; carrier L=5 limbs (contact_body<5>)
+  reads: w.amin[hg]; w.e (score from exposure); w.qf? (not read in body; words ptr unused), w.vf (values), w.pq (probe wi), w.sw w.sv w.sc, w.skin (paced head pair skin words), w.cskin (crowd edges, via crowd_skin_ij), w.decay w.decay_t (non-paced), class lists w.members w.class_off w.cls w.pn w.pcls w.dlist w.dstart w.unresolved w.mix_off w.definite w.computed, w.region_off w.region_eoff w.region_soff w.site_region w.site_pos, w.theta[temper_at], w.face w.fine_roots, frame_of (w.phasor w.ring_off w.ring_n w.pframe w.plain w.frames w.still)
+  writes: w.y `=` (its head's columns h*n+lane of [g][M2], both halves; zero for skipped rows); w.e `=` (the share p_ij overwrites the score at the dense address, only when store!=0); w.ce `=` ([hg][slot], lanes < nslots, only when store); w.met[h] `+=` (atomicAdd); w.status |= (atomicOr CARRIER/WORD64/REFUSED_UNFILLED)
+  cross_region: no: reads e/sw/sv/sc/skin/cskin/class lists only through the row's own region and the exposure's scores at the same dense block; y written at own site
+  notes: two passes over the support (mass/numerators, then shares); Big<L> multi-limb arithmetic (L=5), rowdiv exact division once a row; pass 3 re-derives each term's share (a division a term) when store; shfl_big reductions over 32 lanes; crowd lanes recompute crowd_score (lock) twice (terms and shares); __syncwarp staging in shared; host fetches bits[1] at 1815 (sync) between exposure and this launch; 351 of 400 launches use l5, 49 use l6
+E field_contact_columns family=contact launches_traced=16 launches_a_section=16 ms_a_section=24.74 us_a_launch=1546.2 registers=72 fill_min=1.000 fill_max=1.000 printed_in_step5=yes cross_region=no:
+  grid: grid `Self::rows_grid(sites as u64, CONTACT_ROWS)` = ceil(sites/4) blocks; block `(CONTACT_ROWS * 32)` = 128; dynamic shared 0; __launch_bounds__(128); args (words, h, dyh, ds, dq, dv)
+  unit: a warp a SOURCE site j=g (grid-stride over T sites) of ONE head h; lanes: (span entry = lane%S, part = lane/S), the parts split the receivers k of j (`receiver_at`)
+  reads: ds (dense [region_eoff+j+i*sites], read down the column i), w.e (same column), dyh[h][t][S], w.qf (words at j), w.pq (probe of receiver i), w.skin (paced head, via support_entry bisection + support_row), w.decay w.decay_t, class lists w.members w.class_off w.cls w.poff w.pmem w.olist w.ostart w.dstart, w.definite w.unresolved w.mix_off w.computed, w.region_off w.region_eoff w.region_soff w.site_region w.site_pos, w.sc w.cls w.pn w.pcls (support_entry for paced), dq (own slot, read)
+  writes: dq `+=` (non-atomic RMW fit64(dq+...) own slot [g][M2], span entries of head h); dv `=` (own slot, written once per head); w.status |=
+  cross_region: no: receivers i enumerated by receiver_at are sites of the SAME region (members/pmem/olist are region-local places); reads ds/e written by field_contact_rows for the same region and head; dq/dv written at the warp's own site
+  notes: the strided column read of ds/e at stride `sites` (dense block [i][j] read down a column: uncoalesced, one 8-octet read a receiver per lane-part); a loop over every receiver of j (class members + open sites + near field) per (entry,part) lane; support_entry with binary search per receiver on paced heads; skipped rows are skipped per receiver
+E field_pace_skin_back family=contact launches_traced=8 launches_a_section=8 ms_a_section=16.63 us_a_launch=2078.8 registers=96 fill_min=1.000 fill_max=1.000 printed_in_step5=yes cross_region=no:
+  grid: grid `Self::rows_grid(sites as u64, CONTACT_ROWS)` = ceil(sites/4) blocks; block `(CONTACT_ROWS * 32)` = 128; dynamic shared 0 (static RowCls[4], turn_b[16]); args (words, h, dyh, ds)
+  unit: a warp a receiving site g (grid-stride over T sites) of ONE paced head h; lanes: a support entry k (chunks of 32), then a crowd slot (lane<nslots); each lane loops the modes l<n and the span for its entry
+  reads: dyh, ds (dense), w.e, w.vf, w.qf, w.pq, w.sw w.sv w.sc, w.ce, w.cds, w.sigma (own head's p), w.skin (skin_ij_at) w.cskin (crowd_skin_ij), w.decay w.decay_t, class lists w.members w.class_off w.cls w.pn w.pcls w.dlist w.dstart w.unresolved w.mix_off w.definite w.computed, w.region_off w.region_eoff w.region_soff w.site_region w.site_pos, w.ring_n w.pi_lo w.pi_hi (turn_rate_dev), w.frames w.still
+  writes: w.gsig `+=` (add_wide at [p][source gj], [p][crowd edge ge] and [p][own g]; sources/edges are sites of the same region, so several warps add to one cell); w.status |=
+  cross_region: no: gj and ge are sites of the row's own region (support_at / octave_edge inside the region), sigma is read at those same-region sites, written by field_paces for that region; gsig is a reduction whose reader (field_pace_kappa_back) works per region
+  notes: per (receiver, support entry) an n-mode loop with 128-bit products and mul_fits checks, atomic add_wide to the SOURCE site's gsig per support entry (one 128-bit atomic pair a pair of sites: heavy atomics); a second per-crowd n-mode loop with two divisor_of per crowd; skip when sigma equal (sgn==0)
+E field_transposed family=site maps launches_traced=37 launches_a_section=37 ms_a_section=15.00 us_a_launch=405.4 registers=40 fill_min=1.000 fill_max=1.000 printed_in_step5=yes cross_region=no:
+  grid: grid `Self::cells(words.t as u64 * cols as u64)` (cells/256, clamp(1,65535)); block THREADS=256; dynamic shared 0; args (words, weight, rows, cols, y, y_stride, out, accumulate, only_unresolved)
+  unit: a thread a (site t, output column i < cols), grid-stride; loops over the `rows` entries o of y_t
+  reads: w.theta[weight + o*cols + i] (the weight, rows x cols), y[t*y_stride+o], w.unresolved (only_unresolved), w.T
+  writes: out[t*cols+i] `=` (or `+=` non-atomic own-cell RMW fit64(out+v) when accumulate=1); w.status |=
+  cross_region: no: reads only its own site's y and the material; writes its own cell
+  notes: a loop of `rows` 128-bit multiply-adds a cell with the weight column read at stride `cols` (consecutive threads read consecutive i: coalesced); no shared-memory tiling; rows is dw, f, m2, 2*circles or 6*triads depending on the caller
+E field_outer_x32 family=site maps launches_traced=60 launches_a_section=60 ms_a_section=13.71 us_a_launch=228.5 registers=40 fill_min=0.338 fill_max=1.000 printed_in_step5=yes cross_region=no:
+  grid: grid `Self::cells(entries * (words.t as u64).div_ceil(OUTER_TILE))` with entries = rows*cols (rows when x==0), OUTER_TILE=64; block THREADS=256; dynamic shared 0; args (words, g, at, rows, cols, y, y_stride, x, x_stride, only_unresolved)
+  unit: a thread an (entry (o,i), tile of 64 consecutive sites), grid-stride; sums y_t[o]*x_t[i] over the tile's sites
+  reads: y[t*y_stride+o], x[t*x_stride+i] (int32), w.unresolved (only_unresolved), w.T
+  writes: g[at+entry] `+=` (add_wide atomic pair on the 128-bit covector, once a thread, skipped when the tile's sum is 0)
+  cross_region: no: a tile of 64 consecutive sites may span regions, but each thread only reads its own tiles' sites' y and x (same launch inputs, nothing another region writes in this launch) and the output is a cross-site reduction (a write)
+  notes: the covector g is a reduction over ALL sites of the batch (cross-region by sum only); one thread does 64 sites serially, tile sums added with atomics (contention is per entry across ceil(T/64) tiles); entries*tiles threads: for a bias (x==0) only `rows` entries so few threads over many tiles
+E field_affine_tiled_x32 family=site maps launches_traced=32 launches_a_section=32 ms_a_section=13.24 us_a_launch=413.8 registers=40 fill_min=1.000 fill_max=1.000 printed_in_step5=yes cross_region=no:
+  grid: grid `(words.t as u64).div_ceil(per as u64).clamp(1, 65_535)` with per = 256/rows sites a block pass; block THREADS=256; dynamic shared `shared` octets = ((rows*(cols+1)+rows)*4 rounded to 16) + per*8 + per*cols*4 (<= AFFINE_SHARED 48 KiB); args (words, weight, bias, wmax, rows, cols, x, x_stride, out, out_stride, add, only_unresolved)
+  unit: a thread an (site p in the block's pass, output o<rows) (threadIdx = p*rows + o); the block holds W and the bias in shared memory and walks `per` sites a pass, grid-stride over passes; the carrier bound once a site by its o==0 thread
+  reads: w.theta[weight .. rows*cols] and w.theta[bias .. rows] (once a block into shared), x[t*x_stride+i] (int32 tick.read, or fread), w.unresolved (only_unresolved), w.T
+  writes: out[t*out_stride+o] `=` (add==0 for every x32 caller); w.status |= (atomicOr CARRIER, fit64)
+  cross_region: no: reads only its own site's x row and the material; writes its own cell
+  notes: weights staged to shared memory (rows*(cols+1) words) once a block then reused over all of the block's passes; a refusal check `terms >= 2^126` per site; sum in 64 bits below 2^62 else 128; 32 launches a section over x32 callers
+E field_clock_fill family=site kernels, small launches_traced=8 launches_a_section=8 ms_a_section=8.63 us_a_launch=1078.8 registers=46 fill_min=1.000 fill_max=1.000 printed_in_step5=yes cross_region=no:
+  grid: grid `Dim3 { x: Self::cells(sites as u64), y: tm as u32, z: 1 }` (x = ceil(sites/256) clamp 65535, y = tm moment modes); block THREADS=256; dynamic shared 0; args (fw)
+  unit: a thread a (site g, moment mode u=blockIdx.y), grid-stride over sites; fills its 10 near offsets (d=-5..-1,1..5 within the region) and its crowd edges (levels 2.., both sides, within the region)
+  reads: w.mcmap[u], w.site_region w.site_pos w.region_off, w.plain, w.frames w.still w.n (paced_mode), w.tau[p][gk], w.sigma[p][g], w.saddr (skin_pair, the large-distance path), w.decay, w.ring_n w.ring_off w.phasor w.dreach w.pi_lo w.pi_hi (turn_dev), w.face w.digits w.ln2_lo w.ln2_hi (below_one_face/skin_pair), w.slots, w.T
+  writes: w.mphase `=` (two int32 words a (mode, site, near slot), PHASE_UNFILLED on refusal); w.mskin `=` (uint32 a (mode, site, near slot)); w.cskin `=` ([p][g][slot][l] crowd edges of the mode's own (p,l), only where the pace of the region is... every paced head's mode, plain or not); w.status |= (REFUSED_WORD32)
+  cross_region: no: tau and sigma are read at sites gk=g+d inside the same region (guarded by t+d in [0,sites)) and edges g±2^level inside the region; tau/sigma were written by field_paces for that region; outputs at own (u,g)
+  notes: a dependent loop of 10 phase+skin forms a thread (turn_dev = resident ring or a 23-step series; skin_pair = decay table or a below_one_face with saddr compare) plus a crowd-edge loop over levels (~log2 region sites) x 2 sides; heavy per-thread integer math, grid y = tm so tm times more blocks; formed again for each tick return (the forward fill belongs to the clock set at batch open or a blank clock)
+E field_exposure family=contact launches_traced=4 launches_a_section=4 ms_a_section=8.43 us_a_launch=2107.5 registers=64 fill_min=1.000 fill_max=1.000 printed_in_step5=yes cross_region=no:
+  grid: grid `Self::rows_grid((heads * sites) as u64, rows_per_block)` rows_per_block=CONTACT_ROWS=4 -> ceil(heads*sites/4) blocks; block `(rows_per_block * 32)` = 128; dynamic shared 0 (static RowCls[4]); __launch_bounds__(128, 8); args (words)
+  unit: a warp a (head h, receiving site g) = row hg (grid-stride over H*T); lanes: a support entry k (chunks of 32) then a crowd slot (lane<nslots)
+  reads: w.qf32, w.pq32 (int4 rows, n==8) or w.qf/w.pq (generic), w.sw w.sc (crowd prefix), w.skin (pair skins, paced head, via pair_skins8), w.cskin (crowd skin_ij, paced head), w.decay w.decay_t (non-paced), class lists w.members w.class_off w.cls w.pn w.pcls w.dlist w.dstart w.unresolved w.mix_off w.definite w.computed, w.region_off w.region_eoff w.region_soff w.site_region w.site_pos, w.theta[temper_at] w.face w.fine_roots, w.plain w.frames w.still w.H
+  writes: w.e `=` (score z at the dense address [h][region_eoff+i*sites+j], support entries of computed rows only); w.sb `=` (lock at unit gain, only if non-null; the return build); w.amin[hg] `=` (once a row, lane 0); w.bits[1] `+=`-class (atomicMax of the spread, one a warp); w.status |= (atomicOr CARRIER/TEMPER/UNFILLED)
+  cross_region: no: reads sw/sc/skin/cskin/class lists through the row's own region and forms scores into the region's own dense block
+  notes: one warp a row, loop of K/32 chunks each lane a pair_base8 (8 modes of 128-bit lock_pair) per support entry; crowd lock per slot (n-mode loop); the dense block [i][j] is written only at support entries (sites^2 per region per head allocated); temper_of per row reads the face and fine roots; amin/amax via warp reductions; refused-width check feeds the host's limb choice (host sync after the launch)
+E field_skin_fill family=site kernels, small launches_traced=8 launches_a_section=8 ms_a_section=8.09 us_a_launch=1011.2 registers=64 fill_min=1.000 fill_max=1.000 printed_in_step5=yes cross_region=no:
+  grid: grid `Self::rows_grid((paced * sites) as u64, CONTACT_ROWS)` = ceil(paced*sites/4) blocks; block `(CONTACT_ROWS * 32)` = 128; dynamic shared 0 (static RowCls[4]); args (words, paced)
+  unit: a warp a (paced head p, receiving site g) (grid-stride over paced*T); lanes: a support entry k (chunks of 32), each forming the n modes' skin_pair
+  reads: w.sigma[p][g], w.sigma[p][first+j], w.saddr (large-distance path), w.decay, w.face w.digits w.ln2 w.ring_n, w.plain (paced_at), w.frames w.still w.H (the head search loop), class lists w.members w.class_off w.cls w.pn w.pcls w.dlist w.dstart w.unresolved w.mix_off w.definite w.computed, w.region_off w.region_soff w.site_region w.site_pos
+  writes: w.skin `=` ([p][region_soff[r]+i*K_r+k][l] uint32, one 8-mode uint4 pair for n==8; rows with a plain pace or skipped by the cut room write nothing); no status writes
+  cross_region: no: sigma and saddr are read at the row's own site and at first+j (same region); written by field_paces/field_skin_addresses for that region; output at the row's own support-entry addresses
+  notes: a `while (h+1<H && paced_index(h)!=p) h++` head search by every lane of the warp (up to H iterations, before the skipped/paced test); per support entry n skin_pair evaluations (a table read for whole variations, a below_one_face with 128-bit saddr compare otherwise); writes the whole support stride K_r = NEAR_SLOTS + definite sites of the region per receiver
+E field_moment_skinned_all family=moments and clocks launches_traced=4 launches_a_section=4 ms_a_section=5.97 us_a_launch=1492.5 registers=56 fill_min=0.853 fill_max=0.853 printed_in_step5=yes cross_region=no:
+  grid: grid `Self::cells((tm * regions * 2 * levels as usize) as u64)` blocks of THREADS=256; dynamic shared 0; args (wsp, cmp, fw, dsp, skp, stride, sk_stride, levels, tm)
+  unit: a thread a (moment mode u, region r, row = (octave level, side)), grid-stride; walks the region's sites in order accumulating the skinned prefix
+  reads: ws[u].ok[r], region_off, ds[u][2t] (the covector), fw.plain fw.frames fw.still fw.n (paced_mode), fw.pframe (paced_absolute), fw.cskin (crowd_skin_word via clock_far), fw.T fw.R fw.slots
+  writes: sks[u][row][(first+r+t+1)*2] `=` (wide prefix entries, only for regions whose pace is not plain and ok)
+  cross_region: no: a thread reads only its own region's ds, pframe and cskin entries and writes the region's own prefix rows
+  notes: a serial loop over ALL the region's sites per thread (parallelism only tm*R*2*levels threads, each doing `sites` steps with a 128-bit complex multiply and a skin read); plain regions are skipped with `continue`; launched once a tick return
+E field_blank_bias_enc family=blank clocks launches_traced=3 launches_a_section=3 ms_a_section=5.30 us_a_launch=1766.7 registers=38 fill_min=1.000 fill_max=1.000 printed_in_step5=yes cross_region=no:
+  grid: grid `Self::cells(a as u64 * (dw as u64 + 1) * tiles)` with tiles = ceil(sites/64); block THREADS=256; dynamic shared 0; args (words, g, enc, bias, dz, y)
+  unit: a thread an (entry (class b, i in 0..=D), tile of 64 sites); i==D is the class bias
+  reads: dz[t*A+b] (wide), y[t*D+i] (clock.lift int64), w.T (reads dz at ALL sites of the tile; the sites a clock reads are marked by dz!=0)
+  writes: g[enc+b*D+i] `+=` or g[bias+b] `+=` (add_wide atomic pair, per thread)
+  cross_region: no: reads its tile's dz,y (inputs, nothing another region writes in this launch); result is a cross-site reduction
+  notes: a reduction over all sites of the batch into the encoding covector (A*(D+1) entries x ceil(T/64) tiles threads); skips zero dz so cost follows the silent sites; the entry is launched with words.unresolved swapped to blank_read (not read by this kernel)
+E field_blank_dy family=blank clocks launches_traced=3 launches_a_section=3 ms_a_section=4.38 us_a_launch=1460.0 registers=38 fill_min=1.000 fill_max=1.000 printed_in_step5=yes cross_region=no:
+  grid: grid `Self::cells((sites * dw) as u64)`; block THREADS=256; dynamic shared 0; args (words, enc, dz, dy)
+  unit: a thread a (site t, coordinate i<D), grid-stride; loops over the A classes b
+  reads: dz[t*A+b] (wide), w.theta[enc + b*D + i] (the encoding rows), w.A w.D w.T
+  writes: dy[t*D+i] `=` (every cell, zero where dz is zero); w.status |= (mul_fits, fit64)
+  cross_region: no: own site's dz row and the material
+  notes: a loop of A classes a cell with a 128-bit mul_fits each (dz is mostly zero away from the silent sites: skipped by `d != 0`); words.unresolved is swapped to blank_read by the caller but this kernel does not read it
+E field_affine_tiled_x64 family=site maps launches_traced=9 launches_a_section=9 ms_a_section=4.34 us_a_launch=482.2 registers=40 fill_min=1.000 fill_max=1.000 printed_in_step5=no cross_region=no:
+  grid: grid `(words.t as u64).div_ceil(per as u64).clamp(1, 65_535)`, per=256/rows; block THREADS=256; dynamic shared = ((rows*(cols+1)+rows)*4 rounded to 16) + per*8 + per*cols*8; args as the x32 entry but x is int64
+  unit: a thread an (site in pass, output o), as the x32 tiled entry; add!=0 here: the result is added into the residual words.x
+  reads: w.theta weight rows and bias (to shared), x[t*x_stride+i] (int64: tick.y, tick.pc, w.moment), words.x (own cell, for the add), w.T
+  writes: w.x `+=` (non-atomic own-cell RMW add[t*os+o] = fit64(add+v), `out` is null); w.status |=
+  cross_region: no: own site's x row and own cell of words.x only
+  notes: identical structure to the x32 tiled entry with 8-octet x staged in shared (per*cols*8); in this section 9 launches a section (900/100)
+E field_outer_x64 family=site maps launches_traced=9 launches_a_section=9 ms_a_section=4.19 us_a_launch=465.6 registers=40 fill_min=1.000 fill_max=1.000 printed_in_step5=yes cross_region=no:
+  grid: grid `Self::cells(entries * (words.t as u64).div_ceil(OUTER_TILE))`, entries = rows*cols, OUTER_TILE=64; block THREADS=256; dynamic shared 0; args (words, g, at, rows, cols, y, y_stride, x, x_stride, only_unresolved)
+  unit: a thread an (entry (o,i), tile of 64 consecutive sites), grid-stride, summing y_t[o]*x_t[i] over the tile (x is int64)
+  reads: y[t*y_stride+o], x[t*x_stride+i] (int64: tick.pc, tick.y, w.moment, w.pct), w.unresolved (only_unresolved), w.T
+  writes: g[at+entry] `+=` (add_wide atomic pair per nonzero tile sum)
+  cross_region: no: reads only its tile's y and x (launch inputs); output is a cross-site reduction
+  notes: same reduction structure as the x32 outer; a dw*f or dw*m2 entry matrix times ceil(T/64) tiles = many threads, one 64-site serial loop each, one 128-bit atomic add a thread
+E field_outer_bound_x32 family=site maps launches_traced=25 launches_a_section=25 ms_a_section=4.13 us_a_launch=165.2 registers=40 fill_min=0.454 fill_max=0.454 printed_in_step5=no cross_region=no:
+  grid: grid `words.r` (one block a region, `launch` clamps to >= 1); block THREADS=256; dynamic shared 0 (static uwide part[32]); args (words, rows, cols, y, y_stride, x, x_stride, only_unresolved)
+  unit: a block a region r (blockIdx.x = r, grid not strided: needs R <= grid); threads stride the region's sites t, each computing max|y_t|*max|x_t| and a bounded running sum; block-wide ring sum
+  reads: y[t*y_stride+o] (all rows o, for max), x[t*x_stride+i] (int32, all cols i), w.region_off, w.unresolved (only_unresolved), w.R
+  writes: only w.status |= (atomicOr REFUSED_CARRIER)
+  cross_region: no: a block reads only its own region's sites (region_off[r]..region_off[r+1]); it writes nothing but the status flag
+  notes: a refusal check for the following outer launch, per region as the host reads each region's sum; per thread a full scan of rows+cols words per site (rows*cols reads of the site's y and x rows' magnitudes, no reuse); parallelism = regions x 256 only; launched before every outer sum with an x
+E field_blank_dz family=blank clocks launches_traced=3 launches_a_section=3 ms_a_section=4.06 us_a_launch=1353.3 registers=56 fill_min=1.000 fill_max=1.000 printed_in_step5=no cross_region=no:
+  grid: grid `Self::cells((sites * a) as u64)`, a = alphabet; block THREADS=256; dynamic shared 0; args (words, dkappa, dz)
+  unit: a thread a (site s, class b), grid-stride; an outer loop over the paced heads p, with an inner loop over all A classes for the mean (A^2 per site)
+  reads: w.unresolved (swapped to blank_read by the caller), w.mix_off, w.blank_totals, w.blank_masses[s*A+..], dkappa[p*T+s] (wide), w.theta[pace_at + p*(A+1) + a], w.paced w.frames w.still w.depth (depth_head/paced_head), w.ln2_lo w.ln2_hi
+  writes: dz[c] `=` (every cell, zero by default); w.status |= (mul_fits)
+  cross_region: no: own site's blank masses, totals and dkappa (written by field_pace_kappa_back for that site's region earlier in the same return, but the same site's region)
+  notes: per cell a loop of paced*A multiply-adds (the mean is recomputed in every class's thread: A times redundant); exits early at resolved/non-blank sites and where dk==0
+E field_chart family=site kernels, small launches_traced=12 launches_a_section=12 ms_a_section=3.92 us_a_launch=326.7 registers=40 fill_min=1.000 fill_max=1.000 printed_in_step5=no cross_region=no:
+  grid: grid `Self::warps(words.t as u64)` = ceil(T/8) blocks clamp(1,2^20); block THREADS=256 (8 warps); dynamic shared 0; args (words, x, read, scale, only_unresolved)
+  unit: a warp a site t (grid-stride); the warp walks the `lanes` lane groups of width lw = D/lanes in turn; lanes over the lw coordinates
+  reads: x[t*D+...] (int64 words.x or other), w.unresolved (only_unresolved), w.D w.lanes w.T
+  writes: read[t*D+k*lw+i] `=` (int32 r̂), scale[t*lanes+k] `=` (wide, lane 0), w.status |= (fit32)
+  cross_region: no: one site's own row only
+  notes: two passes a lane group (power sum with a 128-bit warp_sum, then the ratio div_nearest); isqrt128 a lane group per site; skipped when only_unresolved and the site is resolved
+E field_moment_pace_back_all family=moments and clocks launches_traced=4 launches_a_section=4 ms_a_section=3.91 us_a_launch=977.5 registers=96 fill_min=1.000 fill_max=1.000 printed_in_step5=no cross_region=no:
+  grid: grid `Dim3 { x: Self::cells(sites as u64), y: tm as u32, z: 1 }`; block THREADS=256; dynamic shared 0; args (wsp, cmp, fw, bp, ap, dsp, dbp, dap, upp, dnp, stride, pre_stride)
+  unit: a thread a (moment mode u=blockIdx.y, site g), grid-stride over sites; loops the near offsets (up to 2*NEAR-1) and the octave levels (2*log2 region) with a skin-back per term
+  reads: ws[u]: T site_region site_pos region_off ok; fw.moment[g*M2+cm], befores/afters/dss[u] (strand and covector pairs), d_befores/d_afters[u] (wide), ups/downs[u] (wide prefix rows first+r), fw.sigma[p][g and gk and edge], fw.mphase fw.mskin (clock_phase/clock_skin), fw.phasor fw.ring_off fw.decay (their offset-zero entries), fw.cskin (clock_far), fw.pframe fw.plain (paced_mode/paced_absolute), fw.ring_n fw.pi_lo fw.pi_hi (turn_rate_dev), cmap[u], fw.slots
+  writes: fw.gtau[p][g] `+=` (add_wide); fw.gsig[p][g] and [p][gk] and [p][edge] `+=` (add_wide, sites g-d, g+d, g+-2^level of the SAME region); fw.status |=
+  cross_region: no: all gk/edge sites are inside the region (loop bounds from t+1 and sites-t, octave via moment_octave); sigma/phase/skin/prefix reads are same-region
+  notes: per (u,g) ~10 near and up to ~2*(levels) far terms, each with 128-bit mul_fits and TWO add_wide (a 128-bit atomic pair each) onto gsig of g and of the other site: atomic-heavy and contended among threads of one region; tm times the sites' threads
+E field_spread family=contact launches_traced=16 launches_a_section=16 ms_a_section=3.47 us_a_launch=216.9 registers=48 fill_min=0.545 fill_max=0.545 printed_in_step5=no cross_region=no:
+  grid: grid `(regions as u32).clamp(1, 65_535)` blocks (one a region, grid-stride over r), block THREADS=256 (= SPREAD_THREADS); dynamic shared 0 (static wide psv[256], psw[256]); args (words, h, dqp, dvp)
+  unit: a block a region r; thread (entry x = tid%S, chunk ck = tid/S): nchunk = 256/S chunks of the region's sites, a thread sums its chunk of cv/cw then re-walks it with the scanned prefix
+  reads: w.cv, w.cw ([row=first+r+t][S] wide difference arrays from field_contact_rows), w.definite, w.region_off, dq/dv (own slots, read for the add), w.R w.span w.n w.M w.M2
+  writes: dq[slot] `+=` and dv[slot] `+=` (non-atomic own-slot RMW fit64(dq + rel(run..)), only at the region's DEFINITE sites; span entries of head h); w.status |=
+  cross_region: no: a block reads only its own region's cv/cw rows (first+r+t) and writes only its own region's definite sites; cv/cw were written (add_wide) by field_contact_rows rows of the same region
+  notes: a block a region: parallelism = regions x 256; each thread walks sites/nchunk sites twice (prefix over its chunk, then again); with few regions the grid is small; 1600 launches (a head a tick)
+E field_pair_scan_back family=carry circles launches_traced=4 launches_a_section=4 ms_a_section=3.46 us_a_launch=865.0 registers=78 fill_min=0.117 fill_max=0.117 printed_in_step5=no cross_region=no:
+  grid: grid `Self::cells((words.r as usize * circles) as u64)` (R*C jobs / 256, clamp 65535); block THREADS=256; dynamic shared 0; args (words, dc, da, db, dg)
+  unit: a thread a (region r, carry circle k) job, grid-stride; walks the region's sites in reverse strand order (`sites` serial steps)
+  reads: dc[re/im] (the pair's covector, strided t*f+e), w.pa (a at contact e=plain+k), w.pqm (Q operand), w.pgam (gate), w.region_off, w.f w.carry w.R
+  writes: db[re/im] `=`, da[re/im] `=`, dg[t*2C+k,+C] `=` for every site of the region (each slot written once); w.status |=
+  cross_region: no: a job reads only its own region's sites t in [first, first+sites)
+  notes: a serial loop over ALL the region's sites per thread with a 128-bit complex recurrence (parallelism = R*C threads only, not sites); a thread's steps are sequential by construction (a parallel prefix would reorder releases)
+E field_unit_probe family=site kernels, small launches_traced=4 launches_a_section=4 ms_a_section=3.22 us_a_launch=805.0 registers=54 fill_min=1.000 fill_max=1.000 printed_in_step5=no cross_region=no:
+  grid: grid `Self::warps((heads * sites) as u64)` = ceil(H*T/8) blocks clamp(1,2^20); block THREADS=256 (8 warps); dynamic shared 0; args (words, ps)
+  unit: a warp a (head h, site t) row hs = h*T+t (grid-stride); lanes over the span entries i (stride 32)
+  reads: w.pq [h][t][span] (read and rewritten in place), w.span w.H w.T
+  writes: w.pq `=` (in place, unit word r̂), w.pq32 `=` (int32 copy), pscale[hs] `=` (wide, lane 0); w.status |= (fit32); track=false so w.bits is not written
+  cross_region: no: a warp reads and rewrites only its own (h,t) row
+  notes: power sum (128-bit warp_sum) and a div_nearest per span entry, one isqrt128 a row; in place on pq
+E field_unit family=site kernels, small launches_traced=4 launches_a_section=4 ms_a_section=3.18 us_a_launch=795.0 registers=54 fill_min=1.000 fill_max=1.000 printed_in_step5=no cross_region=no:
+  grid: grid `Self::warps((heads * sites) as u64)`; block THREADS=256; dynamic shared 0; args (words, qs)
+  unit: a warp a (head h, site t) row hs (grid-stride); lanes over the span entries
+  reads: w.qf [h][t][span] (read then rewritten in place), w.span w.H w.T
+  writes: w.qf `=` (in place), w.qf32 `=`, qs[hs] `=` (wide, lane 0); w.bits[0] `+=`-class (atomicMax of the largest unit word's bit length, lane 0 of each warp, once a warp at loop end); w.status |= (fit32)
+  cross_region: no: a warp reads and rewrites only its own row; bits[0] is a reduction (a write) read by the host
+  notes: as field_unit_probe plus the binary-length max; `qb` is kept per warp across its rows and written once after the loop
+E field_pair_scan family=carry circles launches_traced=4 launches_a_section=4 ms_a_section=3.04 us_a_launch=760.0 registers=56 fill_min=0.087 fill_max=0.087 printed_in_step5=no cross_region=no:
+  grid: grid `Self::cells((words.r as usize * circles) as u64)`; block THREADS=256; dynamic shared 0; args (words)
+  unit: a thread a (region r, carry circle k) job, grid-stride; walks the region's sites in strand order (`sites` serial steps)
+  reads: w.pgam [t][2C] (gate), w.pkb [t][2C] (coupled drive), w.pa (a at contact e=plain+k), w.region_off, w.f w.carry w.R
+  writes: w.pqm[t*2C+k,+C] `=` (Q operand kept for the reverse), w.pc[re/im] `=` (the circle contacts' products p = a Q); w.status |= (fit64)
+  cross_region: no: reads only its own region's sites (t in [first, first+sites))
+  notes: a serial loop over ALL the region's sites per thread (R*C threads only), a 128-bit complex recurrence Q(t) = kb + gamma*Q(t-1); sequential by design (releases per step); reads and writes at stride f*t / 2C*t across the thread's own column
+E field_moment_return_paced_all family=moments and clocks launches_traced=4 launches_a_section=4 ms_a_section=2.86 us_a_launch=715.0 registers=78 fill_min=1.000 fill_max=1.000 printed_in_step5=no cross_region=no:
+  grid: grid `Dim3 { x: Self::cells(sites as u64), y: tm as u32, z: 1 }`; block THREADS=256; dynamic shared 0; args (wsp, cmp, fw, dsp, qp, skp, dbp, dap, stride, pre_stride, sk_stride)
+  unit: a thread a (moment mode u=blockIdx.y, site g), grid-stride over sites
+  reads: ws[u] T site_region site_pos region_off ok ring n ring_len decay (plain regions), ds[u] (covector pairs), q[u] (the released prefix Q), sk[u] (skinned prefixes, paced regions), fw.mphase fw.mskin (clock_phase/clock_skin near), fw.cskin (via the prefixes' build; here clock_skin only), fw.pframe fw.plain (paced_absolute)
+  writes: d_before[u][2g,2g+1] `=` and d_after[u][2g,2g+1] `=` (wide, every site; zero where the region is refused); ws[u].status |=
+  cross_region: no: all reads (ds at g+-d, q and sk prefix rows first+r) are the thread's own region's
+  notes: per site up to 2*(NEAR-1) near terms (128-bit complex products with clock stores) plus 2 far reads a level (sk prefix rows) for the paced law; plain regions take the single-slot exact return
+E field_tied_face family=faces launches_traced=4 launches_a_section=4 ms_a_section=2.54 us_a_launch=635.0 registers=44 fill_min=1.000 fill_max=1.000 printed_in_step5=no cross_region=no:
+  grid: grid `Self::cells(sites * A)`; block THREADS=256; dynamic shared 0; args (words, enc, bias, y, z)
+  unit: a thread a (site t, class a), grid-stride, a loop over D coordinates; skips resolved sites
+  reads: w.unresolved, w.theta[enc + a*D + i] (encoding rows), w.theta[bias + a], y[t*D+i] (the lift)
+  writes: z[t*A+a] `=` (open sites only; resolved sites' cells are left unwritten); w.status |=
+  cross_region: no: own site's lift row and the material
+  notes: a D-long 128-bit dot product a (site, class) cell with the encoding row shared by the sites of a class (read again by every site: no staging); the face z is then read by field_face
+E field_moment_prefix_paced_all family=moments and clocks launches_traced=20 launches_a_section=20 ms_a_section=2.53 us_a_launch=126.5 registers=72 fill_min=1.000 fill_max=1.000 printed_in_step5=no cross_region=no:
+  grid: grid `grid(regions)` = `Dim3 { x: regions.max(1), y: tm, z: 1 }`; block MOMENT_BLOCK=256; dynamic shared `MOMENT_BLOCK * 32` (MomentGauss totals[256]); args (wsp, cmp, fw, x, pre, stride, pre_stride, released)
+  unit: a block a (region r = blockIdx.x (grid-stride), moment mode u = blockIdx.y); each of 256 threads takes a chunk of ceil(sites/256) consecutive sites and scans it, chunk totals scanned by thread 0, offsets added back
+  reads: ws[u].ok, region_off, ring n, x[u] (strand or covector pairs), fw.plain fw.frames fw.still fw.n (paced_mode), fw.pframe (paced_absolute at non-plain), fw.site_pos, fw.T
+  writes: pre[u][2(first+r+k+1)] `=` (wide prefix rows), then the same cells `+=` (moment_offset_chunk, own chunk, non-atomic RMW); the region's first row zeroed by thread 0; refused (ok==0) regions are skipped, left unwritten
+  cross_region: no: a block reads and writes only its region's rows (first+r..first+r+sites) and its own strand x[first..]
+  notes: a block a (region, mode): parallelism regions*tm blocks x 256, each thread scanning sites/256 sites serially plus a serial 256-entry total scan on thread 0; 5 launches a section (two forward, one return, two clock-covector re-reads)
+E field_paces family=moments and clocks launches_traced=4 launches_a_section=4 ms_a_section=2.02 us_a_launch=505.0 registers=40 fill_min=0.004 fill_max=0.004 printed_in_step5=no cross_region=no:
+  grid: grid `Self::cells(paced * regions)`; block THREADS=256; dynamic shared 0; args (words)
+  unit: a thread a (paced head p, region r), grid-stride; walks the region's sites in order (`sites` serial steps) and scans the region backwards first for silent_stretch
+  reads: w.mix_off w.mix_class w.mix_share w.unresolved w.classes (row_of via w.A), w.theta[pace_at + p*(A+1) + a] (the pace sheet), w.blank_rate[p][t] (if set), w.per_blank w.bare_stretch w.depth w.frames w.still, w.region_off, w.paced w.R
+  writes: w.kappa[p*T+g] `=`, w.tau[p*T+g] `=`, w.sigma[p*T+g] `=` for every site g of the region; w.plain[p*R+r] `=`; w.status |= (fit64)
+  cross_region: no: a thread reads only its region's sites and writes its region's cells; the later readers (skin_fill, frame_of, clock_fill) read them through the same region
+  notes: a serial loop over all the region's sites per thread (paced*R threads); silent_stretch scans from the region's end back; w.sigma, w.tau are exact prefix sums (kept as int64)
+E field_sums family=contact launches_traced=4 launches_a_section=4 ms_a_section=1.83 us_a_launch=457.5 registers=32 fill_min=0.235 fill_max=0.235 printed_in_step5=no cross_region=no:
+  grid: grid `Self::cells((heads * regions * (2 * span + 1)) as u64)`; block THREADS=256; dynamic shared 0; args (words)
+  unit: a thread an (head h, region r, column x in 0..2S+1): x<S a column of the word prefix sw, S<=x<2S a column of the value prefix sv, x=2S the definite count sc; walks the region's sites in order (`sites` serial steps)
+  reads: w.qf [h][t][span] and w.vf (via src), w.definite, w.region_off, w.H w.R w.T w.span
+  writes: w.sw[(h*(T+R)+first+r+t+1)*S+xx] `=` and w.sv `=` (wide prefix rows, including row 0), w.sc[h*(T+R)+first+r+t+1] `=` (counts)
+  cross_region: no: reads only its own region's words/values and writes its region's prefix rows
+  notes: a serial loop over ALL the region's sites per thread, parallelism only H*R*(2S+1) threads; each step reads one 8-octet value at stride S (uncoalesced across the warp: neighbouring x read neighbouring words, so coalesced in x, strided in t); one 128-bit add a step
+E field_moment_paced_all family=moments and clocks launches_traced=4 launches_a_section=4 ms_a_section=1.68 us_a_launch=420.0 registers=72 fill_min=1.000 fill_max=1.000 printed_in_step5=no cross_region=no:
+  grid: grid `Dim3 { x: Self::cells(sites as u64), y: tm as u32, z: 1 }`; block THREADS=256; dynamic shared 0; args (wsp, cmp, fw, bp, ap, upp, dnp, sp, stride, pre_stride)
+  unit: a thread a (moment mode u=blockIdx.y, site g), grid-stride over sites; near terms and octave levels in a serial loop
+  reads: ws[u]: T site_region site_pos region_off ok ring n ring_len decay (plain regions via moment_site_exact); before/after[u] (strand pairs), up/down[u] (wide prefix rows first+r), fw.mphase fw.mskin (clock_phase/clock_skin near), fw.cskin (clock_far), fw.pframe fw.plain (paced_absolute), fw.phasor fw.ring_off fw.decay (offset-zero terms), fw.mcmap/cmap[u]
+  writes: s[u][2g,2g+1] `=` (int64, zero where the region is refused); ws[u].status |=
+  cross_region: no: all prefix rows, strands and clock-store entries read are at the thread's own region (near g-d..g+d clipped to the region; far through up/down rows of the region)
+  notes: per site up to 2*NEAR near terms (a 128-bit complex multiply and scale each, clock stores read) plus 2 prefix-row differences per octave level; tm times the sites in threads
+E field_blank_lift_read family=blank clocks launches_traced=3 launches_a_section=3 ms_a_section=1.67 us_a_launch=556.7 registers=35 fill_min=1.000 fill_max=1.000 printed_in_step5=no cross_region=no:
+  grid: grid `Self::cells(dw as u64 * (dw as u64 + 1) * tiles)` with tiles=ceil(sites/64); block THREADS=256; dynamic shared 0; args (words, g, read, bias, dy, r)
+  unit: a thread an (entry (i, j in 0..=D), tile of 64 sites), j==D is the lift bias
+  reads: dy[t*D+i] (int64), r[t*D+j] (clock.fread int32), w.D w.T
+  writes: g[read+i*D+j] `+=` or g[bias+i] `+=` (add_wide)
+  cross_region: no: reads its tile's dy,r; a cross-site reduction into g
+  notes: D*(D+1) entries x ceil(T/64) tiles threads, each 64 sites serially; skips sites with dy==0 so cost follows the silent sites
+E field_ratio_adjoint family=site kernels, small launches_traced=12 launches_a_section=12 ms_a_section=1.66 us_a_launch=138.3 registers=48 fill_min=1.000 fill_max=1.000 printed_in_step5=no cross_region=no:
+  grid: grid `Self::warps(words.t as u64)`; block THREADS=256; dynamic shared 0; args (words, read, scale, cov, base, dst, only_unresolved)
+  unit: a warp a site t (grid-stride); the warp walks the `lanes` lane groups, lanes over the lw=D/lanes coordinates
+  reads: read (int32 r̂), scale[t*lanes+k] (wide), cov (int64), base (int64, or null), w.unresolved (only_unresolved), w.D w.lanes w.T
+  writes: dst[t*D+..] `=` (every coordinate of every site; at a skipped site dst = base or 0); w.status |= (fit64)
+  cross_region: no: one site's own row
+  notes: per lane group a 128-bit warp_sum dot, then a div_nearest per coordinate; in place where dst==base (called with dst==dx etc.)
+E field_outer_bound_x64 family=site maps launches_traced=9 launches_a_section=9 ms_a_section=1.66 us_a_launch=184.4 registers=44 fill_min=0.545 fill_max=0.545 printed_in_step5=no cross_region=no:
+  grid: grid `words.r` (one block a region); block THREADS=256; dynamic shared 0 (static uwide part[32]); args (words, rows, cols, y, y_stride, x, x_stride, only_unresolved)
+  unit: a block a region r; threads stride the region's sites and scan max|y_t|, max|x_t| (x is int64); block ring sum
+  reads: y[t*y_stride+o], x[t*x_stride+i] (int64), w.region_off, w.unresolved (only_unresolved), w.R
+  writes: only w.status |= (atomicOr REFUSED_CARRIER)
+  cross_region: no: a block reads only its own region's sites
+  notes: same as field_outer_bound_x32 with int64 x; rows*cols are dw*f or dw*m2 scans a site
+E field_pace_c_back family=moments and clocks launches_traced=4 launches_a_section=4 ms_a_section=1.57 us_a_launch=392.5 registers=40 fill_min=0.675 fill_max=0.675 printed_in_step5=no cross_region=no:
+  grid: grid `Self::cells((paced * sites) as u64)`; block THREADS=256; dynamic shared 0; args (words, dkappa, g)
+  unit: a thread a (paced head p, site t), grid-stride
+  reads: dkappa[p*T+t] (wide), w.mix_off w.mix_class w.mix_share w.unresolved w.classes (row_of), w.blank_rate w.blank_read w.blank_masses w.blank_totals (blank_share), w.pace_at w.A w.depth w.frames w.still
+  writes: g[pace_at + p*(A+1) + class] `+=` (add_wide, covector on the class sheet; a blank site adds A entries, a carried site its mixture's classes)
+  cross_region: no: reads its own site's dkappa (written by field_pace_kappa_back for that site's region) and writes a cross-site reduction into the shared covector g
+  notes: add_wide (atomic pair) per site onto at most A+1 sheet entries: heavy contention on the same few sheet words across all sites; skips dk==0
+E field_pace_kappa_back family=moments and clocks launches_traced=4 launches_a_section=4 ms_a_section=1.56 us_a_launch=390.0 registers=40 fill_min=0.004 fill_max=0.004 printed_in_step5=no cross_region=no:
+  grid: grid `Self::cells((paced * regions) as u64)`; block THREADS=256; dynamic shared 0; args (words, dkappa)
+  unit: a thread a (paced head p, region r), grid-stride; walks the region's sites in REVERSE order (`sites` serial steps)
+  reads: w.gtau[p*T+..], w.gsig[p*T+..] (wide), w.kappa[p*T+..], w.mix_off w.unresolved (silent_stretch), w.per_blank w.bare_stretch, w.region_off, w.paced w.R
+  writes: dkappa[p*T+first+t] `=` (wide, every site of the region)
+  cross_region: no: reads gtau/gsig/kappa at its own region's sites; those were accumulated (add_wide, `+=`) by field_moment_pace_back_all, field_pace_skin_back, field_pace_current_back and field_pace_frame_back at same-region sites
+  notes: a serial reverse prefix over the region's sites per thread (paced*R threads); plain 128-bit adds
+E field_unit_back family=site kernels, small launches_traced=4 launches_a_section=4 ms_a_section=1.29 us_a_launch=322.5 registers=56 fill_min=1.000 fill_max=1.000 printed_in_step5=no cross_region=no:
+  grid: grid `Self::warps((heads * sites) as u64)`; block THREADS=256; dynamic shared 0; args (words, qs, dq)
+  unit: a warp a (head h, site t) row hs, lanes over the span entries
+  reads: w.qf [h][t][span] (unit word), qscale[hs] (wide), dq (read and rewritten in place at [t][M2] head slots)
+  writes: dq `=` (in place); w.status |= (fit64)
+  cross_region: no: one (head, site) row's own slots
+  notes: as field_unit_back_probe on the word's covector
+E field_unit_back_probe family=site kernels, small launches_traced=4 launches_a_section=4 ms_a_section=1.27 us_a_launch=317.5 registers=56 fill_min=1.000 fill_max=1.000 printed_in_step5=no cross_region=no:
+  grid: grid `Self::warps((heads * sites) as u64)`; block THREADS=256; dynamic shared 0; args (words, ps, dp)
+  unit: a warp a (head h, site t) row hs, lanes over the span entries
+  reads: w.pq [h][t][span] (unit word), pscale[hs] (wide), dp[t*M2 + (h*n+c | M+h*n+c-n)] (read and rewritten in place)
+  writes: dp `=` (in place at the head's slots of site t); w.status |= (fit64)
+  cross_region: no: one (head, site) row's own slots
+  notes: two passes over the span (a warp_sum dot then a div_nearest per entry), in place; the head's slots lie at stride M2 in the per-site row
+E field_moment_strand_return_all family=moments and clocks launches_traced=4 launches_a_section=4 ms_a_section=1.25 us_a_launch=312.5 registers=36 fill_min=1.000 fill_max=1.000 printed_in_step5=no cross_region=no:
+  grid: grid `Self::cells((sites * tm) as u64)`; block THREADS=256; dynamic shared 0; args (w2, base_b, base_a, tm, dbp, dap, g)
+  unit: a thread a (moment mode u = c/T, site t = c%T), grid-stride; loops sides (before/after) x parts (re/im)
+  reads: d_before, d_after [u][2t+part] (wide), w.mix_off w.mix_class w.mix_share w.unresolved w.classes (row_of), w.A w.T
+  writes: g[base + row*2*tm + col] `+=` (add_wide) where row = the site's class, or each carried class by share rel(share*v, 16); skipped where v==0; a non-carried site adds only if it is resolved (`!unresolved`)
+  cross_region: no: reads its own site's d_before/d_after (written by field_moment_return_paced_all at the same site); writes a cross-site reduction into g
+  notes: add_wide onto a class row of the encoding (A rows x 2*tm cols per family): every site of a class adds to the same 2*tm words, so contention is per class; 4 add_wide a (site, mode) at most
+E field_moment_accumulate family=moments and clocks launches_traced=9 launches_a_section=9 ms_a_section=1.16 us_a_launch=128.9 registers=14 fill_min=1.000 fill_max=1.000 printed_in_step5=no cross_region=no:
+  grid: grid `Self::cells((sites * m2) as u64)`; block THREADS=256; dynamic shared 0; args (words, dv, dm)
+  unit: a thread a (site t, slot k<M2) cell c, grid-stride
+  reads: dv[c] (int64), dm[c] (wide)
+  writes: dm[c] `+=` (non-atomic own-cell wide RMW)
+  cross_region: no: own cell only
+  notes: a plain elementwise add; two launches a tick (dv then dp) at 2851
+E field_pair_gate_back family=carry circles launches_traced=4 launches_a_section=4 ms_a_section=1.14 us_a_launch=285.0 registers=72 fill_min=1.000 fill_max=1.000 printed_in_step5=no cross_region=no:
+  grid: grid `Self::cells((sites * circles) as u64)`; block THREADS=256; dynamic shared 0; args (words, dg, db)
+  unit: a thread a (site t, circle k), grid-stride
+  reads: dg[gr,gi] (δγ, read then overwritten), db[bre,bim] (u, read then overwritten), w.pgam, w.pg (q and ℓ), w.pb (drive b at contact plain+k), w.face w.digits (carry_friction -> term_of), w.ln2_lo w.ln2_hi, w.f w.carry w.T
+  writes: dg[gr] `=` (δq), dg[gi] `=` (δℓ), db[bre,bim] `=` (δb = κ u), all in place; w.status |= (atomicOr CARRIER/fit64)
+  cross_region: no: own site and circle's cells only
+  notes: several 128-bit divisions (div_nearest) a cell and a below_one_face lookup in carry_friction; circles C cells per site
+E field_unframe family=site kernels, small launches_traced=12 launches_a_section=12 ms_a_section=1.10 us_a_launch=91.7 registers=40 fill_min=1.000 fill_max=1.000 printed_in_step5=no cross_region=no:
+  grid: grid `Self::cells((sites * m) as u64)` with m = d.complex() = M; block THREADS=256; dynamic shared 0; args (words, chart)
+  unit: a thread a (site t, mode m<M) cell, grid-stride
+  reads: chart[t*M2+m] and chart[t*M2+M+m] (read, rewritten in place), frame_of (w.phasor w.ring_off w.ring_n w.pframe w.plain w.frames w.still w.site_region w.site_pos w.n)
+  writes: chart[t*M2+m] `=`, chart[t*M2+M+m] `=` (in place); w.status |= (fit64)
+  cross_region: no: own site and mode
+  notes: two 128-bit complex products a cell; frame_of reads the ring slot at the site's place (phasor table) or pframe
+E field_blank_rates family=blank clocks launches_traced=3 launches_a_section=3 ms_a_section=1.01 us_a_launch=336.7 registers=40 fill_min=0.675 fill_max=0.675 printed_in_step5=no cross_region=no:
+  grid: grid `Self::cells((paced * sites) as u64)`; block THREADS=256; dynamic shared 0; args (words, rates)
+  unit: a thread a (paced head p, site s), grid-stride; loops the A classes
+  reads: w.unresolved, w.mix_off, w.blank_totals, w.blank_masses[s*A+a], w.theta[pace_at + p*(A+1) + a], w.A w.T w.paced
+  writes: rates[p*T+s] `=` (every cell; zero away from silent open sites); w.status |= (fit64)
+  cross_region: no: own site's blank face
+  notes: a loop of A class shares (one 128-bit division per class in blank_share) a cell
+E field_tied_back_e family=faces launches_traced=1 launches_a_section=1 ms_a_section=1.01 us_a_launch=1010.0 registers=34 fill_min=1.000 fill_max=1.000 printed_in_step5=no cross_region=no:
+  grid: grid `Self::cells(a as u64 * dw as u64 * tiles)` with tiles=ceil(sites/64); block THREADS=256; dynamic shared 0; args (words, g, enc, dz, y)
+  unit: a thread an (entry (a,i), tile of 64 sites), skipping resolved sites
+  reads: w.unresolved, dz[t*A+a] (int64), y[t*D+i] (the lift), w.A w.D w.T
+  writes: g[enc + a*D + i] `+=` (add_wide per nonzero tile sum)
+  cross_region: no: reads its tile's dz,y,unresolved (launch inputs); a cross-site reduction into the encoding covector
+  notes: A*D entries x ceil(T/64) tiles threads, 64 serial sites each; atomics per (entry, tile)
+E field_pace_frame_back family=moments and clocks launches_traced=4 launches_a_section=4 ms_a_section=1.01 us_a_launch=252.5 registers=58 fill_min=1.000 fill_max=1.000 printed_in_step5=no cross_region=no:
+  grid: grid `Self::cells((paced * sites) as u64)`; block THREADS=256; dynamic shared 0; args (words, dq, dv, dp, qkv, pr)
+  unit: a thread a (paced head p, site g), grid-stride, over the head's n modes
+  reads: dq, dv, dp (int64 [t][M2]), qkv[g*2*M2 + ..] (key and value), pr (the probe's re-read), w.ring_n w.pi_lo w.pi_hi (turn_rate_dev), w.frames w.still w.paced w.n w.M w.M2
+  writes: w.gtau[p*T+g] `+=` (non-atomic own-cell wide RMW); w.status |= (mul_fits)
+  cross_region: no: own site and head only
+  notes: per (p,g) n modes x 3 turned_back_dev (128-bit mul_fits each) and a 128-bit divide in turn_rate_dev per mode (recomputed a thread)
+E field_pair_back family=carry circles launches_traced=4 launches_a_section=4 ms_a_section=0.84 us_a_launch=210.0 registers=48 fill_min=1.000 fill_max=1.000 printed_in_step5=no cross_region=no:
+  grid: grid `Self::cells((sites * plain) as u64)` with plain = f/2 - circles; block THREADS=256; dynamic shared 0; args (words, dc, da, db)
+  unit: a thread a (site t, plain contact e), grid-stride
+  reads: dc[re/im] (own and of the site p whose mate t is), w.pb[s*f+e..] (the mate s's b), w.pa[p*f+e..] (site p's a), w.region_off w.site_region w.site_pos (strand_mate), w.f w.carry w.T
+  writes: da[re,im] `=` (zero without a mate) and db[re,im] `=` (zero without a mate), every cell; w.status |= (fit64)
+  cross_region: no: mates g-1 and g+1 are taken only where site_pos permits (inside the region)
+  notes: two 128-bit complex products a cell; reads at the neighbours' f-strided rows (t+-1)
+E field_moment_strands_all family=moments and clocks launches_traced=8 launches_a_section=8 ms_a_section=0.83 us_a_launch=103.8 registers=40 fill_min=1.000 fill_max=1.000 printed_in_step5=no cross_region=no:
+  grid: grid `Self::cells((sites * tm) as u64)`; block THREADS=256; dynamic shared 0; args (w2, base_b, base_a, tm, before, after)
+  unit: a thread a (moment mode u = c/T, site t = c%T), grid-stride; two parts x two sides
+  reads: w.mix_off w.mix_class w.mix_share (carried mixtures), w.unresolved, w.classes (row_of), w.theta[base + row*2*tm + col] (the moment_before / moment_after families), w.A w.T
+  writes: before[u*2T+2t+part] `=`, after[u*2T+2t+part] `=` (int64, every cell; a silent open site reads zero)
+  cross_region: no: own site's class row and the material
+  notes: gathers a class's row of the strand family at every site (indexed by class: rows shared by many sites); a carried site sums its mixture (128-bit) then releases
+E field_pair_gamma family=carry circles launches_traced=4 launches_a_section=4 ms_a_section=0.76 us_a_launch=190.0 registers=56 fill_min=1.000 fill_max=1.000 printed_in_step5=no cross_region=no:
+  grid: grid `Self::cells((sites * circles) as u64)`; block THREADS=256; dynamic shared 0; args (words)
+  unit: a thread a (site t, carry circle k), grid-stride
+  reads: w.pg [t][2C] (q and ℓ), w.pb (drive b at contact plain+k), w.face w.digits (carry_friction -> term_of), w.f w.carry w.T
+  writes: w.pgam[gr,gi] `=` (the gate), w.pkb[gr,gi] `=` (the coupled drive κ b); w.status |= (atomicOr CARRIER, fit64)
+  cross_region: no: own site and circle's cells
+  notes: two 128-bit divisions (div_nearest) for the gate and one for κ per cell; early `continue` leaves the cells unwritten on a refusal
+E field_classes family=contact launches_traced=4 launches_a_section=4 ms_a_section=0.74 us_a_launch=185.0 registers=52 fill_min=0.454 fill_max=0.454 printed_in_step5=no cross_region=no:
+  grid: grid `launch_shared("field_classes", (heads * regions).clamp(1, 1 << 20) as u32, 32, buckets, ...)`: (heads*regions) blocks, block 32 threads (one warp), dynamic shared `buckets` = 4*3*classes octets (3*classes u32); args (words)
+  unit: a block of ONE warp a (head h, region r) (grid-stride over H*R); lanes over the region's sites i in chunks of 32 (counting, then a stable counting sort by __match_any_sync rank)
+  reads: w.qkv (key at [g][2*M2 + h*n..]), w.pr (probe [g][M2] + h*n), w.definite, w.region_off, w.H w.R w.T w.M w.M2 w.n w.ctrits w.nclasses w.band
+  writes: w.cls[hg] `=`, w.pn[hg] `=`, w.pcls[hg*stride+k] `=` (definite sites only), w.class_off[(h*R+r)*(2*classes+1)+..] `=` and w.poff[(h*R+r)*(classes+1)+..] `=` (lane 0), w.members[h*T+first+base+rank] `=` (stable place lists), w.pmem[(h*T+first)*stride + atomic slot] `=` (slot from a shared atomicAdd; order inside a class is the atomic's)
+  cross_region: no: a block touches only its region's sites (first..first+sites) and its own (h,r) offsets rows
+  notes: one warp a (head, region): the region's sites walked 3 times in chunks of 32; probe_classes (up to b modes plus a subset enumeration over near-cone modes) twice a site; lane 0 does a serial O(3^b) offset scan; parallelism only H*R warps; shared atomics on class counters
+E field_pframes family=moments and clocks launches_traced=4 launches_a_section=4 ms_a_section=0.67 us_a_launch=167.5 registers=38 fill_min=1.000 fill_max=1.000 printed_in_step5=no cross_region=no:
+  grid: grid `Self::cells((paced * sites * n) as u64)`; block THREADS=256; dynamic shared 0; args (words)
+  unit: a thread a (paced head p, site g, mode l), grid-stride; skips plain regions of non-depth heads
+  reads: w.plain, w.site_region, w.tau[p*T+g], w.ring_n w.ring_off w.phasor w.dreach w.pi_lo w.pi_hi (turn_dev: the resident ring at whole places, a 23-step series otherwise), w.paced w.frames w.still w.depth w.n
+  writes: w.pframe[2c, 2c+1] `=` (int64 pair per (p,g,l); not written for plain regions)
+  cross_region: no: own site's tau (from field_paces for the site's region)
+  notes: a turn_dev per cell: a table read at a whole place within the reach, else a division and a series of up to ~23 steps with 128-bit/64-bit products
+E field_frame family=site kernels, small launches_traced=4 launches_a_section=4 ms_a_section=0.65 us_a_launch=162.5 registers=48 fill_min=1.000 fill_max=1.000 printed_in_step5=no cross_region=no:
+  grid: grid `Self::cells((heads * sites * n) as u64)`; block THREADS=256; dynamic shared 0; args (words)
+  unit: a thread a (head h, site t, local mode li<n), grid-stride
+  reads: w.qkv ([t][0..2M] key, [2M2..] value halves), frame_of (w.phasor w.ring_off w.ring_n w.pframe w.plain w.site_region w.site_pos w.frames w.still w.depth), w.n w.M w.M2 w.span w.T w.H
+  writes: w.qf[(h*T+t)*span + li, +n] `=` and w.vf[...] `=` (the framed key and value, real then imaginary; every (h,t,li)); w.status |= (fit64)
+  cross_region: no: own site's key/value and the site's own ring slot
+  notes: four 128-bit complex multiplies a cell
+E field_frame_probe family=site kernels, small launches_traced=4 launches_a_section=4 ms_a_section=0.62 us_a_launch=155.0 registers=40 fill_min=1.000 fill_max=1.000 printed_in_step5=no cross_region=no:
+  grid: grid `Self::cells((heads * sites * n) as u64)`; block THREADS=256; dynamic shared 0; args (words)
+  unit: a thread a (head h, site t, local mode li), grid-stride
+  reads: w.pr ([t][0..2M] probe), frame_of (w.phasor w.ring_off w.ring_n w.pframe w.plain w.site_region w.site_pos w.frames w.still w.depth), w.n w.M w.M2 w.span
+  writes: w.pq[(h*T+t)*span + li, +n] `=` (the framed probe); w.status |= (fit64)
+  cross_region: no: own site only
+  notes: two 128-bit complex products a cell
+E field_moment_add_probe family=moments and clocks launches_traced=8 launches_a_section=8 ms_a_section=0.60 us_a_launch=75.0 registers=16 fill_min=1.000 fill_max=1.000 printed_in_step5=no cross_region=no:
+  grid: grid `Self::cells((sites * m2) as u64)`; block THREADS=256; dynamic shared 0; args (words, pr)
+  unit: a thread a (site t, slot k<M2) cell, grid-stride
+  reads: pr[c] (int64), w.moment[c]
+  writes: pr[c] `+=` (non-atomic own-cell RMW fit64(pr+moment)); w.status |=
+  cross_region: no: own cell only (w.moment[c] at the same site was written by field_moment_scatter_all)
+  notes: a plain elementwise add; w.moment is the output of the moment scatter for the same site
+E field_pair family=carry circles launches_traced=4 launches_a_section=4 ms_a_section=0.58 us_a_launch=145.0 registers=38 fill_min=1.000 fill_max=1.000 printed_in_step5=no cross_region=no:
+  grid: grid `Self::cells((sites * plain) as u64)` with plain = f/2 - circles; block THREADS=256; dynamic shared 0; args (words)
+  unit: a thread a (site t, plain contact e), grid-stride
+  reads: w.pa[re/im], w.pb[mate*f+e, mate*f+half+e] (mate = g-1 at even e, g+1 at odd e, inside the region), w.region_off w.site_region w.site_pos (strand_mate), w.f w.carry w.T
+  writes: w.pc[re] `=` and w.pc[im] `=` (every plain-contact cell; a complex product, zero b where there is no mate); w.status |= (fit64)
+  cross_region: no: the mate is the neighbouring site and is taken only where site_pos permits (same region); pa/pb were written by the affine for the same tick
+  notes: two 128-bit complex products a cell; reads of the neighbour's f-strided row
+E field_moment_admit_paced_all family=moments and clocks launches_traced=8 launches_a_section=8 ms_a_section=0.55 us_a_launch=68.8 registers=40 fill_min=1.000 fill_max=1.000 printed_in_step5=no cross_region=no:
+  grid: grid `grid(regions)` = `Dim3 { x: regions.max(1), y: tm, z: 1 }`; block MOMENT_BLOCK=256; dynamic shared `3 * MOMENT_BLOCK * 16` (uwide peak[3*256]); args (wsp, cmp, fw, xs, ys, stride, returning)
+  unit: a block a (region r = blockIdx.x (grid-stride), moment mode u = blockIdx.y); threads stride the region's sites for max l1 and the ring's resident entries for the ring l1; a shared-memory max tree; thread 0 decides
+  reads: ws[u]: R region_off n ring_len dreach ring decay; xs[u] (and ys[u]) strand/covector pairs; fw.plain fw.frames fw.still fw.n fw.R (paced_mode), cmap[u]
+  writes: ws[u].ok[r] `=` (one thread a block); ws[u].status |= (atomicOr SHAPE / CARRIER)
+  cross_region: no: a block reads only its own region's strand entries and the slot's tables; writes its own region's ok flag
+  notes: a max reduction over the region's sites, the decay table (first `sites` entries) and the resident ring; 128-bit comparisons; a block per (region, mode) x 256 threads regardless of region size
+E field_tied_back_y family=faces launches_traced=1 launches_a_section=1 ms_a_section=0.47 us_a_launch=470.0 registers=40 fill_min=1.000 fill_max=1.000 printed_in_step5=no cross_region=no:
+  grid: grid `Self::cells((sites * dw) as u64)`; block THREADS=256; dynamic shared 0; args (words, enc, dz, dy)
+  unit: a thread a (site t, coordinate i<D), grid-stride; a loop over the A classes
+  reads: w.unresolved, dz[t*A+a] (int64), w.theta[enc + a*D + i], w.A w.D w.T
+  writes: dy[t*D+i] `=` (zero at resolved sites); w.status |=
+  cross_region: no: own site's dz row and the material
+  notes: an A-long 128-bit dot per cell; the encoding row entries (a*D+i) read at stride D across a
+E field_moment_ds_all family=moments and clocks launches_traced=4 launches_a_section=4 ms_a_section=0.41 us_a_launch=102.5 registers=20 fill_min=1.000 fill_max=1.000 printed_in_step5=no cross_region=no:
+  grid: grid `Self::cells((sites * tm) as u64)`; block THREADS=256; dynamic shared 0; args (w2, dm, cmap, tm, ds)
+  unit: a thread a (moment mode u = c/T, site t = c%T), grid-stride
+  reads: dm[t*M2 + cm, t*M2 + M + cm] (wide, the moment covector accumulated over the ticks), cmap[u], w.M w.M2 w.T
+  writes: ds[u*2T+2t, +1] `=` (int64, fit64; zero for a depth ring's mode); w.status |=
+  cross_region: no: own site's cell
+  notes: a gather of one mode column a site (stride M2) and fit64
+E field_moment_scatter_all family=moments and clocks launches_traced=4 launches_a_section=4 ms_a_section=0.36 us_a_launch=90.0 registers=18 fill_min=1.000 fill_max=1.000 printed_in_step5=no cross_region=no:
+  grid: grid `Self::cells((sites * tm) as u64)`; block THREADS=256; dynamic shared 0; args (w2, s, cmap, tm)
+  unit: a thread a (moment mode u = c/T, site t = c%T), grid-stride
+  reads: s[u*2T+2t, +1] (int64 moments), cmap[u], w.M w.M2 w.T
+  writes: w.moment[t*M2 + cm] `=` and w.moment[t*M2 + M + cm] `=` (zero for a depth ring's mode)
+  cross_region: no: own site's cell
+  notes: a scatter of one mode column a site (stride M2)
+E field_current_back family=site kernels, small launches_traced=4 launches_a_section=4 ms_a_section=0.36 us_a_launch=90.0 registers=38 fill_min=1.000 fill_max=1.000 printed_in_step5=no cross_region=no:
+  grid: grid `Self::cells((heads * sites * n) as u64)`; block THREADS=256; dynamic shared 0; args (words, dy, dyh)
+  unit: a thread a (head h, site t, local mode li), grid-stride
+  reads: dy[t*M2 + m, +M] (int64 current covector), frame_of (w.phasor w.ring_off w.ring_n w.pframe w.plain w.site_region w.site_pos w.frames w.still w.depth), w.n w.M w.M2 w.span
+  writes: dyh[(h*T+t)*span + li, +n] `=` (every (h,t,li)); w.status |=
+  cross_region: no: own site only
+  notes: two 128-bit complex products a cell
+E field_pace_current_back family=moments and clocks launches_traced=4 launches_a_section=4 ms_a_section=0.34 us_a_launch=85.0 registers=48 fill_min=0.810 fill_max=0.810 printed_in_step5=no cross_region=no:
+  grid: grid `Self::cells((paced * sites) as u64)`; block THREADS=256; dynamic shared 0; args (words, dy, y)
+  unit: a thread a (paced head p, site g), grid-stride, over the head's n modes
+  reads: dy[g*M2 + m, +M], y[g*M2 + m, +M] (int64 tick.y), w.ring_n w.pi_lo w.pi_hi (turn_rate_dev), w.frames w.still w.paced w.n
+  writes: w.gtau[p*T+g] `+=` (non-atomic own-cell wide RMW); w.status |= (mul_fits)
+  cross_region: no: own site and head only
+  notes: an n-mode loop with a 128-bit division (turn_rate_dev) and mul_fits per mode
+E field_moment_add family=moments and clocks launches_traced=4 launches_a_section=4 ms_a_section=0.33 us_a_launch=82.5 registers=16 fill_min=1.000 fill_max=1.000 printed_in_step5=no cross_region=no:
+  grid: grid `Self::cells((sites * m2) as u64)`; block THREADS=256; dynamic shared 0; args (words)
+  unit: a thread a (site t, slot k<M2) cell, grid-stride
+  reads: w.qkv[t*2*M2 + M2 + k] (the value half), w.moment[c]
+  writes: w.qkv[t*2*M2 + M2 + k] `+=` (non-atomic own-cell RMW fit64(v+moment)); w.status |=
+  cross_region: no: own cell only (w.moment from the same site)
+  notes: a plain elementwise add into the value half of the chart
+E field_face family=faces launches_traced=4 launches_a_section=4 ms_a_section=0.32 us_a_launch=80.0 registers=33 fill_min=1.000 fill_max=1.000 printed_in_step5=no cross_region=no:
+  grid: grid `Self::warps(sites)`; block THREADS=256; dynamic shared 0; args (words, z, masses, totals)
+  unit: a warp a site t (grid-stride); skips resolved sites; lanes over the A classes (stride 32), peak by warp_max then masses by below_one_face, warp_sum of the total
+  reads: z[t*A+c] (int64), w.unresolved, w.face w.digits (below_one_face), w.A w.T
+  writes: masses[t*A+c] `=` (uint64, 2^-62), totals[t] `=` (uwide, lane 0), open sites only
+  cross_region: no: one site's own readout row
+  notes: two passes over A classes per open site; below_one_face reads the exponential's 2^digits-word table (512 KiB at 16 digits) a class
+E field_add family=site kernels, small launches_traced=4 launches_a_section=4 ms_a_section=0.32 us_a_launch=80.0 registers=12 fill_min=1.000 fill_max=1.000 printed_in_step5=no cross_region=no:
+  grid: grid `Self::cells(cells)` with cells = sites*dw; block THREADS=256; dynamic shared 0; args (words, rap, rbp, cells)
+  unit: a thread a cell c (site, coordinate), grid-stride
+  reads: p[c] (int64, ra), q[c] (int64, rb)
+  writes: q[c] `+=` (non-atomic own-cell wrapping RMW, rb := ra + rb)
+  cross_region: no: own cell only
+  notes: a plain elementwise 64-bit wrapping add
+E field_skin_addresses family=moments and clocks launches_traced=4 launches_a_section=4 ms_a_section=0.28 us_a_launch=70.0 registers=44 fill_min=1.000 fill_max=1.000 printed_in_step5=no cross_region=no:
+  grid: grid `Self::cells((paced * n * sites) as u64)` (the grid counts all sites; the kernel's `span` = region_off[R]-region_off[0], the union of the regions); block THREADS=256; dynamic shared 0; args (words)
+  unit: a thread a (paced head p, mode l, site g), grid-stride; one 128-bit division of 2π σ by the slot's k = (n ln2) << 24
+  reads: w.sigma[p*T+g], w.region_off[0] w.region_off[R], w.ring_n w.ln2_lo w.ln2_hi w.pi_lo w.pi_hi (skin_k), w.frames w.still w.paced w.n w.R
+  writes: w.saddr[3*((p*n+l)*T+g) + 0,1,2] `=` (q, r low, r high; skipped where k<=0); w.status |= (fit64 of q)
+  cross_region: no: own site's sigma (written by field_paces for the site's region) and the slot constants
+  notes: a 128-bit division a cell (x/k, x - q*k) the one place the skin's exponent is formed from addresses; paced*n*sites threads
+E field_face_covector family=faces launches_traced=1 launches_a_section=1 ms_a_section=0.20 us_a_launch=200.0 registers=32 fill_min=1.000 fill_max=1.000 printed_in_step5=no cross_region=no:
+  grid: grid `Self::cells((sites * a) as u64)`; block THREADS=256; dynamic shared 0; args (words, masses, totals, dz)
+  unit: a thread a (site t, class cl), grid-stride
+  reads: masses[c] (uint64), totals[t] (uwide), w.unresolved, w.classes, w.A w.T
+  writes: dz[c] `=` (every cell; zero at a resolved site)
+  cross_region: no: own site's masses and total
+  notes: a 128-bit division (+ total/2) a cell
+E field_encoding family=faces launches_traced=3 launches_a_section=3 ms_a_section=0.15 us_a_launch=50.0 registers=40 fill_min=0.379 fill_max=0.381 printed_in_step5=no cross_region=no:
+  grid: grid `Self::cells(count as u64 * dw as u64)` with count = segments; block THREADS=256; dynamic shared 0; args (words, g, dx, rows_sites, rows_shares, segments, count, base)
+  unit: a thread a (segment, coordinate i<D), grid-stride; a segment is up to OUTER_TILE sites of ONE encoding row (host sorted); the thread sums rel(share*dx_site[i], 16) over them
+  reads: dx[site*D+i] (int64), rows_sites, rows_shares, segments (three u32 a segment: row, first, end)
+  writes: g[base + row*D + i] `+=` (add_wide, per nonzero sum)
+  cross_region: no: reads the listed sites' dx (launch inputs); a cross-site reduction into the encoding rows
+  notes: a gather of dx at host-chosen sites; add_wide contention per (row,i) across a row's segments; launched three times a batch (own, before, after)
+E field_blank_dx family=blank clocks launches_traced=3 launches_a_section=3 ms_a_section=0.13 us_a_launch=43.3 registers=22 fill_min=1.000 fill_max=1.000 printed_in_step5=no cross_region=no:
+  grid: grid `Self::cells((sites * dw) as u64)`; block THREADS=256; dynamic shared 0; args (words, back, dx)
+  unit: a thread a (site t, coordinate i), grid-stride
+  reads: back[c] (int64), w.unresolved (here the caller has swapped it to blank_read, restored after this launch), w.mix_off
+  writes: dx[c] `+=` (non-atomic own-cell RMW fit64(dx + rel(back,16)), at silent open sites only); w.status |=
+  cross_region: no: own cell only (back was produced by field_ratio_adjoint at the same site)
+  notes: a plain elementwise add; most sites skip
+E field_face_weigh family=faces launches_traced=1 launches_a_section=1 ms_a_section=0.12 us_a_launch=120.0 registers=30 fill_min=1.000 fill_max=1.000 printed_in_step5=no cross_region=no:
+  grid: grid `Self::cells((sites * a) as u64)`; block THREADS=256; dynamic shared 0; args (words, wm, wk, dz)
+  unit: a thread a (site t, class), grid-stride
+  reads: wm[t], wk[t] (host uint64 per site), w.unresolved, dz[c]
+  writes: dz[c] `+=`-class (non-atomic own-cell RMW dz := div_nearest(dz*wm, wk), only at open sites whose wm != wk); w.status |= (fit64)
+  cross_region: no: own cell only; wm/wk are host-supplied per-site weights (a region's state weight copied to its sites)
+  notes: two small host-uploaded arrays a launch (take_up copies); plain elementwise
+E field_open family=faces launches_traced=1 launches_a_section=1 ms_a_section=0.08 us_a_launch=80.0 registers=40 fill_min=1.000 fill_max=1.000 printed_in_step5=no cross_region=no:
+  grid: grid `Self::cells(sites * D)`; block THREADS=256; dynamic shared 0; args (words)
+  unit: a thread a (site t, coordinate i<D), grid-stride
+  reads: w.theta[enc / enc_before / enc_after + class_row*D + i] (the opening terms of site t, t-1, t+1), w.mix_off w.mix_class w.mix_share (carried mixtures), w.unresolved, w.classes (row_of), w.site_pos (neighbour only within the region), w.A w.D w.T
+  writes: w.x[c] `=` (every cell; the opening face x0 = E(u_t) + E-(u_(t-1)) + E+(u_(t+1)))
+  cross_region: no: the strand neighbours t-1 and t+1 are read only where site_pos[t]>0 and site_pos[t+1]>0 (within the same region); only the encoding material and class tables are read, never another site's state
+  notes: up to three class-row gathers a cell (a carried site sums its mixture)
+E field_exponential family=faces launches_traced=1 launches_a_section=1 ms_a_section=0.04 us_a_launch=40.0 registers=28 fill_min=0.533 fill_max=0.533 printed_in_step5=no cross_region=no:
+  grid: grid `Self::cells(1u64 << roots.len())` (the face of 2^digits words, 65,536 at 16 digits -> 256 blocks); block THREADS=256; dynamic shared 0; args (words, face)
+  unit: a thread a face entry c in 0..2^digits, grid-stride; loops the `digits` binary digits of c multiplying the roots
+  reads: w.roots (the digits' roots on 2^-62), w.digits
+  writes: face[c] `=` (uint64, every entry)
+  cross_region: no: reads only the root table
+  notes: 16 dependent 64x64->128 multiplies a thread; run once and read by every later face lookup (below_one_face)
+E field_face_at_class family=faces launches_traced=1 launches_a_section=0 ms_a_section=0.00 us_a_launch=0.0 registers=14 fill_min=0.338 fill_max=0.338 printed_in_step5=no cross_region=no:
+  grid: grid `Self::cells(sites as u64)`; block THREADS=256; dynamic shared 0; args (words, masses, picked)
+  unit: a thread a site t, grid-stride
+  reads: w.unresolved, w.classes, masses[t*A + class] (uint64)
+  writes: picked[t] `=` (zero at a resolved site)
+  cross_region: no: own site's mass row
+  notes: one gather (masses at the site's class) a site; the host fetches 8 octets a site in place of the whole face
+## G131
+G131 kernels_ms_a_section=267.4 printed_entries=14 printed_ms=184.3 rest_entries=56 rest_ms=83.1
+G131 part=a rest_entries=56 (guess 45, 30..70) rest_launches_a_section=297 (guess 330, 250..400) ms_a_launch=0.279 (guess 0.24, 0.19..0.31)
+G131 part=b moments_and_clocks_in_rest_ms=23.92 share=0.288 (guess 0.45, 0.30..0.60)
+G131 part=c unfilled_launches_traced_us=17322.6 share_of_traced_kernels=0.067 (guess 0.30, 0.15..0.45)
+G131 part=c_profile unfilled_ms_a_section=18.2 share_of_kernels=0.068 (each entry's profiled time split by its traced launches' fill)
+G131 part=d region_local_ms=212.0 share=0.793 (guess 0.85, 0.70..0.95); coupled: the carrier width 29.4 ms (0.110), the deposits' sums over tiles of the batch 26.0 (0.097), once a run 0.04, a cross-region read 0.0, not surveyed 0.0
+G131_SCORE a entries 56: HELD; launches 297: HELD; ms a launch 0.279: HELD
+G131_SCORE b 0.288: MISSED below
+G131_SCORE c 0.067 (the profile's 0.068): MISSED below
+G131_SCORE d 0.793: HELD
+G131_RULE (c) at 0.067: the contact's layout alone first (a pair's record in walk order, its forward entries one launch, its return's one), the small launches stay; (d) at 0.793: no join is derived before the order
+G131 region_units entries=12 ms_a_section=31.0 share=0.116 largest_over_median_region=5.42 (field_classes, field_moment_admit_paced_all, field_moment_prefix_paced_all, field_moment_skinned_all, field_outer_bound_x32, field_outer_bound_x64, field_pace_kappa_back, field_paces, field_pair_scan, field_pair_scan_back, field_spread, field_sums)
+## families: ms a section, launches, the count's products and octets a section, the floors at the card's lanes and its octets a second
+family | ms a section | launches a section | products a section | arithmetic floor ms | products a second achieved | octets a section | octets floor ms | octets a second achieved | over the card's | ms over the larger floor
+contact | 115.6 | 72 | 1.732e+10 | 3.98 | 1.5e+11 | 3.44e+09 | 4.67 | 2.97e+10 | 0.040 | 24.7
+moments and clocks | 29.9 | 113 | 6.258e+08 | 0.14 | 2.09e+10 | 1.669e+08 | 0.23 | 5.58e+09 | 0.008 | 131.8
+site maps | 56.3 | 181 | 2.269e+10 | 5.21 | 4.03e+11 | 4.005e+09 | 5.44 | 7.12e+10 | 0.097 | 10.3
+blank clocks | 16.5 | 18 | 1.663e+09 | 0.38 | 1e+11 | 5.836e+08 | 0.79 | 3.53e+10 | 0.048 | 20.9
+faces | 4.9 | 17 | 8.134e+08 | 0.19 | 1.65e+11 | 1.945e+08 | 0.26 | 3.95e+10 | 0.054 | 18.7
+carry circles | 9.8 | 24 | 0 | 0.00 | 0 | 0 | 0.00 | 0 | 0.000 | nan
+site kernels, small | 34.3 | 84 | 4.381e+08 | 0.10 | 1.28e+10 | 5.006e+08 | 0.68 | 1.46e+10 | 0.020 | 50.4
+all | 267.4 | 509 | 4.356e+10 | 10.01 | 1.63e+11 | 8.891e+09 | 12.08 | 3.32e+10 | 0.045 | 22.1
+FAMILY_NOTE the products and octets a section are engine_count.py's count on run 2 (40,741 sites a section, the traced one 41,462); no per-launch
+  octet counter is open on this card (the driver keeps profiling counters to its administrators and no Nsight Compute is installed), so the
+  octets stand by family from the count, and a launch row carries its grid, fill and traced time.

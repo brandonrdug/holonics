@@ -1,0 +1,41 @@
+P62 receipt: which receiving rows the open places need (G140). Numbers only. A ruler build (claude/receivers-ruler e26aeaad6, never merged). Device: the RTX 4080 SUPER under .local/gpu.lock, each read its own hold, nothing else building; flags on the host, one thread.
+STATE the line's latest lap mean: the founded line's MEAN.3000 (sections 2,001 to 3,000 after P60's founding; sha 721b94e5cbeedd43); the state's bytes the same before and after the read: true
+RULER the mask of computed rows is given through the room cut's path (computed, skipped_row); the carry circles' admission (room_window) is set aside for the ruled regions; a row outside the mask is skipped in the exposure, the contact and the row return and its state is held at its opening after every tick (field_ruler_hold). For A0 (every row computed) nothing is skipped or held: its codes equal the line's own read (read-cavity on the same state, P60's receipt) at every place read.
+FLAGS site_ruler.py's count reader of two octets back, counted on each slice's first 32 million octets of training documents, landmarks (the claim) at 8 bits on each held stretch:
+FLAGS slice=code count_octets=32013449 stretches=494 places=100191 flagged=26415 share=0.2636 news_a_place=2.1871
+FLAGS slice=web count_octets=32000972 stretches=496 places=100364 flagged=29796 share=0.2969 news_a_place=2.4892
+FLAGS slice=science count_octets=32008673 stretches=474 places=98624 flagged=26374 share=0.2674 news_a_place=2.2019
+FLAGS slice=books count_octets=32016117 stretches=470 places=100285 flagged=26665 share=0.2659 news_a_place=2.1849
+FLAGS slice=wikidata count_octets=32003642 stretches=485 places=99327 flagged=31513 share=0.3173 news_a_place=2.6209
+FLAGS_EXIT 0
+PROJECTION the development read (300 places a slice, a section a slice) 15.3 s; the whole read's upper end 1,395 s; measured 358.8 s (0.257); peak resident 830 MB
+P62_RECEIVERS nats a place at open places through the trained readout at the last tick; pooled, then by slice with the count
+ARM A0 one_place pooled=1.2109 places=100508 computed_rows=35042140 of 35042140 (1.0000) | code=0.8443(20124) web=1.2475(20043) science=1.1650(20088) books=1.2021(20028) wikidata=1.5938(20225)
+ARM A1 one_place pooled=4.5031 places=100508 computed_rows=100508 of 35042140 (0.0029) | code=4.2847(20124) web=4.6388(20043) science=4.1032(20088) books=3.8061(20028) wikidata=5.6734(20225)
+ARM A2 one_place pooled=2.8148 places=100508 computed_rows=9899123 of 35042140 (0.2825) | code=2.2189(20124) web=2.5853(20043) science=2.7551(20088) books=2.7222(20028) wikidata=3.7863(20225)
+ARM A3.0 one_place pooled=2.7609 places=100508 computed_rows=9899123 of 35042140 (0.2825) | code=2.1540(20124) web=2.5893(20043) science=2.7576(20088) books=2.6706(20028) wikidata=3.6274(20225)
+ARM A3.1 one_place pooled=2.7714 places=100508 computed_rows=9899123 of 35042140 (0.2825) | code=2.1766(20124) web=2.6059(20043) science=2.7729(20088) books=2.6630(20028) wikidata=3.6330(20225)
+ARM A3.2 one_place pooled=2.7559 places=100508 computed_rows=9899123 of 35042140 (0.2825) | code=2.1680(20124) web=2.5667(20043) science=2.7551(20088) books=2.6593(20028) wikidata=3.6249(20225)
+DIFF one_place A1_over_A0=+3.2922 | code=+3.4404 web=+3.3913 science=+2.9383 books=+2.6040 wikidata=+4.0796
+DIFF one_place A2_over_A0=+1.6039 | code=+1.3746 web=+1.3378 science=+1.5901 books=+1.5201 wikidata=+2.1925
+DIFF one_place A3_over_A2 draws=-0.0540 -0.0435 -0.0589 mean=-0.0521
+ARM A0 whole pooled=2.4784 places=3717 computed_rows=13391 of 13391 (1.0000) | code=2.3664(730) web=2.6216(758) science=2.4362(776) books=2.2409(776) wikidata=2.7592(677)
+ARM A1 whole pooled=4.3758 places=3717 computed_rows=3717 of 13391 (0.2776) | code=4.2815(730) web=4.4255(758) science=4.2108(776) books=3.8843(776) wikidata=5.1743(677)
+ARM A2 whole pooled=3.2058 places=3717 computed_rows=6369 of 13391 (0.4756) | code=2.9963(730) web=3.2525(758) science=3.1447(776) books=3.0235(776) wikidata=3.6582(677)
+ARM A3.0 whole pooled=3.2345 places=3717 computed_rows=6369 of 13391 (0.4756) | code=2.9755(730) web=3.3287(758) science=3.2029(776) books=2.9450(776) wikidata=3.7763(677)
+ARM A3.1 whole pooled=3.2017 places=3717 computed_rows=6369 of 13391 (0.4756) | code=2.9443(730) web=3.2805(758) science=3.1517(776) books=2.9180(776) wikidata=3.7737(677)
+ARM A3.2 whole pooled=3.1904 places=3717 computed_rows=6369 of 13391 (0.4756) | code=2.9573(730) web=3.2537(758) science=3.1519(776) books=2.9219(776) wikidata=3.7228(677)
+DIFF whole A1_over_A0=+1.8974 | code=+1.9151 web=+1.8039 science=+1.7746 books=+1.6434 wikidata=+2.4150
+DIFF whole A2_over_A0=+0.7274 | code=+0.6299 web=+0.6308 science=+0.7085 books=+0.7825 wikidata=+0.8990
+DIFF whole A3_over_A2 draws=+0.0287 -0.0040 -0.0154 mean=+0.0031
+A4 not run: the support's keyed mark (ClassLists::keyed) gates the near field alone; a written place is heard far as a definite member of a probed class or as a definite site an open receiver listens to, and nothing marks it unheard there without a new mechanism
+# the sections (the held role's, cut as read-store cuts them), by pass in one hold
+SECTIONS pass=0 arm=A0 sites=398283 open=135337 (0.3398) written_landmark=74452 (0.1869) written_other=188494 (0.4733) computed=398283 (1.0000) pairs=467440223 forward_ms=876 code_open=3.1262
+SECTIONS pass=1 arm=A1 sites=398283 open=135337 (0.3398) written_landmark=74452 (0.1869) written_other=188494 (0.4733) computed=135337 (0.3398) pairs=321931984 forward_ms=729 code_open=4.9719
+SECTIONS pass=2 arm=A2 sites=398283 open=135337 (0.3398) written_landmark=74452 (0.1869) written_other=188494 (0.4733) computed=209789 (0.5267) pairs=360231042 forward_ms=799 code_open=3.6103
+SECTIONS pass=3 arm=A3.0 sites=398283 open=135337 (0.3398) written_landmark=74452 (0.1869) written_other=188494 (0.4733) computed=209789 (0.5267) pairs=362020601 forward_ms=797 code_open=3.4996
+SECTIONS pass=4 arm=A2 sites=398283 open=135337 (0.3398) written_landmark=74452 (0.1869) written_other=188494 (0.4733) computed=209789 (0.5267) pairs=360231042 forward_ms=806 code_open=3.6103
+SECTIONS pass=5 arm=A0 sites=398283 open=135337 (0.3398) written_landmark=74452 (0.1869) written_other=188494 (0.4733) computed=398283 (1.0000) pairs=467440223 forward_ms=883 code_open=3.1262
+PAIRS by the receiving row's kind: open=321931984 (0.6887) written_landmark=38299058 (0.0819) written_other=107209181 (0.2294) of 467440223
+UNDER_A2 rows=0.5267 of A0's pairs=0.7706 forward=0.9125 (A2 799/806 ms against A0 876/883 ms; the controls' spread 0.0080)
+A0_AGAINST_LINE places_equal=104225 differ=0 missing=0 (the line's read of the same state, read-cavity's cK)

@@ -1,0 +1,185 @@
+# P58 step 6 of the engine, 2026-11-13 UTC (claude/engine-host 8ffb8ecb5, head f2518976f, from main 4d0870d1c): the pool serves a plain take
+# from a longer kept buffer, eleven takes spared their zeroing, the training path's faces gathered at their classes, the deposit's host parts
+# read. Sections 2,001 to 2,100 of the store trainer's pass from run 2's STATE.1900 (sha256 cda6ac8a1129f147) unless a line says otherwise.
+# Milliseconds are a section's (a read's total over its 100 sections), profiled reads synchronize the card around every launch, copy and take.
+# Numbers only.
+## the builds
+8ffb8ecb5 (step 6) field_pass ced663611a295b6ac6e623053784dd91d6e27b34abff41ed9ab8e4b9d23af190
+f2518976f (step 6, integer prints) field_pass 3f89a9ba109d1176fefb0ccdabb1e71dd3eb73f5f5774faac2891ec7f1319197
+4d0870d1c (main) field_pass 8cdeeaf89edfb62bab65176ab5b1ef03c3d8c6e0a80672091c3eca9d640c3a3c
+cd1e629fa (main's crates with the P56 readings) field_pass e4828844f75f704d0171d55b6521dfd7395f0c18aa0f009de731b926919e1353
+count read: claude/engine-host b43dba8bd (main 4d0870d1c with the P56 readings and step 6's spared e) with the pool's counters and the coarse deposit marks
+## item 1: the counted read of the pool (FIELD_PROFILE, 100 sections, its own hold)
+MEASURE lap=count rc=0 wall_s=35.1 peak_rss_kib=401356
+COUNT_POOL take=dz (the face covector's block, i128) class_octets=167772160 hits=5 misses=295 frees=294 freed_octets=136834973696 freed_octets_a_miss=463847368
+COUNT_POOL take=sk (the clock's skins, i128) class_octets=402653184 hits=8 misses=24 frees=24 freed_octets=4026531840 freed_octets_a_miss=167772160
+COUNT_POOL take=sk (the clock's skins, i128) class_octets=469762048 hits=90 misses=278 frees=278 freed_octets=47831842816 freed_octets_a_miss=172056988
+COUNT_POOL all_takes hits=34018 misses=882 frees=608 freed_octets=194867363840
+COUNT_TAKE take=dz calls=300 ms_a_section=3.979
+COUNT_TAKE take=sk calls=400 ms_a_section=6.941
+COUNT_READING: the two takes alternate within each batch and are never live together; each miss frees the other's kept buffer (the freed octets
+  a miss equal the other's class), the live set, the other's kept buffer and the new one passing the budget, and the other's buffer more than twice
+  the class the pool serves from. Both are taken in every section, so freeing what the last section did not take first, or holding a section's
+  set, leaves the budget unable to hold both beside the live set. Chosen: a plain take that the budget would pay for with a free is served by the
+  least kept buffer of its type at least its class (live plus kept unchanged, under the budget); a zeroed take keeps the twice-class bound.
+## item 1 in the step's profiled read (tps6) against the profiled control (tpc6, main's crates with the P56 readings)
+STEP_POOL take=picked class_octets=327680 hits=29 misses=0 frees=0 served_longer=0
+STEP_POOL take=picked class_octets=393216 hits=71 misses=0 frees=0 served_longer=0
+STEP_POOL take=dz class_octets=167772160 hits=5 misses=1 frees=0 served_longer=294
+STEP_POOL take=sk class_octets=402653184 hits=32 misses=0 frees=0 served_longer=0
+STEP_POOL take=sk class_octets=469762048 hits=365 misses=3 frees=3 served_longer=0
+STEP_POOL all_takes hits=34417 misses=289 frees=15 freed_octets=6694109184 served_longer=294
+TAKE side=control take=dz calls=300 ms_a_section=3.945
+TAKE side=control take=sk calls=400 ms_a_section=7.099
+TAKE side=step take=dz calls=300 ms_a_section=0.002
+TAKE side=step take=sk calls=400 ms_a_section=0.046
+TAKES_TWO control_ms_a_section=11.045 step_ms_a_section=0.048
+SPLIT side=control kernels_ms_a_section=267.75 copies=3800 copies_ms_a_section=8.31 takes=30400 takes_ms_a_section=18.33
+SPLIT side=step kernels_ms_a_section=267.62 copies=3800 copies_ms_a_section=1.55 takes=30500 takes_ms_a_section=2.29
+## item 2: the spared zeroings, each with its proof (the source's own comment at the take states it)
+SPARED take=e (the pairs' scores and shares) control_line=1499 step_line=1557 control_zeroing_ms_a_section=3.418 control_zeroed_octets_a_section=2142114938 step_zeroed=no
+  PROOF field_contact exposure writes the score at every support entry of each computed row and head; the contact, the rows, the pace and the rulers read only those entries; the columns read e at the pairs whose ds they read, which the rows write only at support entries; the dense readers (echo trips, held rows, row currents, a landmark's kept rows) run only under logits or kept rows, which zero it
+SPARED take=the face's scale control_line=2199 step_line=2264 control_zeroing_ms_a_section=0.062 control_zeroed_octets_a_section=1572864 step_zeroed=no
+  PROOF field_chart writes every lane's scale of an open site; its one reader, field_ratio_adjoint in the reverse, reads it at open sites alone
+SPARED take=the face's totals control_line=2202 step_line=2267 control_zeroing_ms_a_section=0.015 control_zeroed_octets_a_section=786432 step_zeroed=no
+  PROOF field_face writes an open site's total; field_face_covector, the host's faces at the batch's end and a port's places read it at open sites alone
+SPARED take=the face's lift control_line=2206 step_line=2272 control_zeroing_ms_a_section=0.075 control_zeroed_octets_a_section=25165824 step_zeroed=no
+  PROOF field_affine (no add) writes every output of an open site; field_tied_face and field_tied_back_e read it at open sites alone
+SPARED take=the blank's dr control_line=2431 step_line=2520 control_zeroing_ms_a_section=0.287 control_zeroed_octets_a_section=75497472 step_zeroed=no
+  PROOF field_transposed (no accumulation) writes every column of a site the clock read (blank_read); its one reader, field_ratio_adjoint on the same sites, reads it only there
+SPARED take=the blank's back control_line=2433 step_line=2522 control_zeroing_ms_a_section=0.190 control_zeroed_octets_a_section=76755763 step_zeroed=no
+  PROOF field_ratio_adjoint with no base writes every word: zero at a skipped site, every lane's coordinates at an open one, before field_blank_dx reads it
+SPARED take=the blank clock's read control_line=2448 step_line=2544 control_zeroing_ms_a_section=0.289 control_zeroed_octets_a_section=37748736 step_zeroed=no
+  PROOF field_chart writes it at blank_read sites; field_affine and field_ratio_adjoint read it there, field_blank_lift_read only where dy is nonzero (written zero elsewhere by field_blank_dy); zeroed while the clocks are read at named sites
+SPARED take=the blank clock's scale control_line=2449 step_line=2545 control_zeroing_ms_a_section=0.056 control_zeroed_octets_a_section=4718592 step_zeroed=no
+  PROOF field_chart writes every lane's scale at blank_read sites; field_ratio_adjoint (blank_back) reads it there alone; zeroed while the clocks are read at named sites
+SPARED take=the blank clock's lift control_line=2456 step_line=2552 control_zeroing_ms_a_section=0.210 control_zeroed_octets_a_section=75497472 step_zeroed=no
+  PROOF field_affine writes it at blank_read sites; field_tied_face reads it there, field_blank_bias_enc only where dz is nonzero (written zero elsewhere by field_blank_dz); zeroed while the clocks are read at named sites
+SPARED take=the blank clock's totals control_line=2465 step_line=2561 control_zeroing_ms_a_section=0.143 control_zeroed_octets_a_section=2359296 step_zeroed=no
+  PROOF field_face writes them at blank_read sites; field_blank_rates and field_blank_dz read them there, field_pace_c_back where blank_read[t]; zeroed while the clocks are read at named sites, whose reading fetches a silent site's face the clock may not have read
+SPARED take=dkappa at each tick's clock control_line=2901 step_line=2999 control_zeroing_ms_a_section=0.258 control_zeroed_octets_a_section=4718592 step_zeroed=no
+  PROOF field_pace_kappa_back writes every (paced head, site) word, each region from its last site to its first, before field_pace_c_back and field_blank_dz read it
+SPARED take=dkappa at the pass's clock control_line=2929 step_line=3028 control_zeroing_ms_a_section=0.084 control_zeroed_octets_a_section=1572864 step_zeroed=no
+  PROOF field_pace_kappa_back writes every word before field_pace_c_back reads it
+ZEROINGS control_ms_a_section=6.526 control_takes=26 step_ms_a_section=1.202 step_takes=14 spared_ms_a_section=5.325 the_spared_takes_own_control_ms=5.088
+ZEROED_OCTETS control_a_section=2838191256 step_a_section=389682410
+## item 3: the faces at the pass's end
+TRAINING_PATH_READS: the learner's comparison (compared) reads each open site's mass at its class and its total before a port; with no held step
+  and no port it asks for those alone (read_and_return_at_class); field_face_at_class gathers m_c on the card; the fetch is 8 octets a site of
+  m_c and 16 of the total, where the whole faces are 8 octets a site and class (alphabet 244) beside the totals. Whole faces stay for read_faces,
+  the held reads, the logits, the kept rows and every port.
+FETCH side=control words=masses_whole calls=100 ms_a_section=6.783
+FETCH side=control words=totals calls=100 ms_a_section=0.103
+FETCH side=step words=picked_m_c calls=100 ms_a_section=0.061
+FETCH side=step words=totals calls=100 ms_a_section=0.097
+COLLECT side=control phase=batch_drop_and_collect ms_a_section=10.97 card_ms_a_section=6.88 host_ms_a_section=4.08
+COLLECT side=step phase=batch_drop_and_collect ms_a_section=0.38 card_ms_a_section=0.19 host_ms_a_section=0.18
+## item 4: the deposit on the host (a reading; the step's profiled read, fine marks), ms a section
+DEPOSIT part=read_and_return ms_a_section=277.491
+DEPOSIT part=compared_and_code ms_a_section=2.851
+DEPOSIT part=covector_clone ms_a_section=0.125
+DEPOSIT part=transfer_price ms_a_section=0.264
+DEPOSIT part=entry_rates ms_a_section=0.089
+DEPOSIT part=external_step ms_a_section=2.312
+DEPOSIT part=external_price ms_a_section=0.256
+DEPOSIT part=covector_grains ms_a_section=0.242
+DEPOSIT part=moments ms_a_section=0.781
+DEPOSIT part=step ms_a_section=2.308
+DEPOSIT part=step_price ms_a_section=0.257
+DEPOSIT part=reading_parts ms_a_section=0.013
+DEPOSIT part=parts_price ms_a_section=0.350
+DEPOSIT part=stepped ms_a_section=0.295
+DEPOSIT part=rest ms_a_section=0.002
+DEPOSIT host_total_ms_a_section=10.145 (every part but the realization's read and return)
+DEPOSIT_CLASSES entries_arithmetic_ms=6.027 (the rates, the external step and the step, the covector's grains, the moments, the stepped constitution with its clone) prices_ms=1.127 (four first-order prices) compared_and_code_ms=2.851 (over the open sites) bare_copies_ms=0.138 (the covector's clone, the parts' fill)
+DEPOSIT_LAYOUT_PASSES the constitution's 117,478 entries: 10 passes that compute (transfer price, external step, external price, grains, moments, step,
+  step price, parts fill, parts price, stepped update) and 6 whole-layout copies or allocations a section: the covector's clone 1,879,648 octets,
+  the entries' rates 469,912, the external step 1,879,648, the step 1,879,648, the parts 117,478, the stepped constitution's material 469,912
+  (6,696,246 octets a section in all)
+TRAINER side=step mean_of_states_ms_a_section=0.081 cut_ms_a_section=2.731 saves_ms_a_section=0.569
+REALIZATION side=step phase=material_upload ms_a_section=0.650 card_ms_a_section=0.300 host_ms_a_section=0.350
+REALIZATION side=step phase=covector_fetch ms_a_section=0.220 card_ms_a_section=0.220 host_ms_a_section=0.000
+COUNT_DEPOSIT (coarse marks, before item 3) read_and_return_ms=305.940 compared_ms=3.084 transfer_ms=0.535 external_ms=2.543 grains_moments_ms=0.968 step_prices_ms=2.954 stepped_ms=0.305 rest_ms=0.002
+## gates at 8ffb8ecb5 (gate 1, then the GPU suite alone on the card)
+GATE_EXIT 1 02:33:59
+gate guard-lints: FAILED (38746 ms)
+MEASURE lap=step6_gate rc=1 wall_s=294.0 peak_rss_kib=4379116
+SUITE_BUILD_EXIT 0 02:34:18
+SUITE_EXIT 0 02:40:34
+test result: ok. 89 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 328.77s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.10s
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.40s
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.31s
+test result: ok. 46 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 32.58s
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 5.05s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+MEASURE lap=step6_suite rc=0 wall_s=376.1 peak_rss_kib=1793456
+SUITE_TESTS_OK 140
+GATE1_NOTE guard-lints failed at 8ffb8ecb5 on three float prints in store_train's readings (P56's and this step's); f2518976f prints them in integers
+## gates at the head f2518976f
+GATE_EXIT 0 02:51:29
+gate check: ok (5222 ms)
+gate guard-lints: ok (10724 ms)
+gate guard-doctests: ok (42139 ms)
+gate reproduction-controls: ok (72 ms)
+MEASURE lap=step6b_gate rc=0 wall_s=183.4 peak_rss_kib=3463180
+SUITE_BUILD_EXIT 0 02:51:36
+SUITE_EXIT 0 02:57:56
+test result: ok. 89 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 333.09s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.14s
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.42s
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.33s
+test result: ok. 46 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 32.37s
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 5.20s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+MEASURE lap=step6b_suite rc=0 wall_s=380.1 peak_rss_kib=1792952
+SUITE_TESTS_OK 140
+## the reproduction (run 1's STATE.101, 600 sections; projection 257 s, stop 327,600 ms, outer 390 s)
+repro6 MEASURE lap=repro6 rc=0 wall_s=169.4 peak_rss_kib=264404
+8ffb8ecb5 GATE_REPRO sections=600 run2_lines=600 equal=600 EQUAL
+8ffb8ecb5 GATE_SAVE k=600 equal_timings_and_schedule_aside=True batches=600 run2_batches=600 peak_store=8456338512 run2_peak_store=7577906356
+8ffb8ecb5 GATE_BYTES STATE.600 equal repro=a5b222844ffcbb71 run2=a5b222844ffcbb71
+8ffb8ecb5 GATE_BYTES MEAN.600 equal repro=a12e0da79e525ae9 run2=a12e0da79e525ae9
+repro6b MEASURE lap=repro6b rc=0 wall_s=169.0 peak_rss_kib=264400
+f2518976f GATE_REPRO sections=600 line_lines=600 equal=600 EQUAL
+f2518976f GATE_SAVE k=600 EQUAL timings_and_schedule_aside batches=600 line_batches=600 peak_store=8456338512 line_peak_store=7577906356
+f2518976f GATE_BYTES STATE.600 equal repro=a5b222844ffcbb71 run2=a5b222844ffcbb71
+f2518976f GATE_BYTES MEAN.600 equal repro=a12e0da79e525ae9 run2=a12e0da79e525ae9
+## the hold: control, step 6, control, profiled control, profiled step (each 100 sections; projections 43 s and 50 s, stops 54,600 and 72,618 ms)
+MEASURE lap=tc61 rc=0 wall_s=41.3 peak_rss_kib=622680
+MEASURE lap=ts6 rc=0 wall_s=28.6 peak_rss_kib=266668
+MEASURE lap=tc62 rc=0 wall_s=31.4 peak_rss_kib=384104
+MEASURE lap=tpc6 rc=0 wall_s=32.3 peak_rss_kib=388660
+MEASURE lap=tps6 rc=0 wall_s=29.6 peak_rss_kib=262256
+HOLD timing: lock taken 02:43:24 wait_s=.002346106
+HOLD timing: released 02:46:07
+TIMING tc61 sections=100 equal_to_leg1=100/100 mean_section_ms=306.1
+TIMING ts6 sections=100 equal_to_leg1=100/100 mean_section_ms=279.4
+TIMING tc62 sections=100 equal_to_leg1=100/100 mean_section_ms=308.1
+TIMING tpc6 sections=100 equal_to_leg1=100/100 mean_section_ms=316.7
+TIMING tps6 sections=100 equal_to_leg1=100/100 mean_section_ms=289.9
+TIMING controls_spread_ms=2.0 controls_mean_ms=307.1 step_ms=279.4 step_over_controls=0.910 spread_over_controls=0.006 profiled_step_over_profiled_control=0.915
+STATE_SHA tc61 81377dbeaf26d65e 64954161619deda4
+STATE_SHA ts6 81377dbeaf26d65e 64954161619deda4
+STATE_SHA tc62 81377dbeaf26d65e 64954161619deda4
+STATE_SHA tpc6 81377dbeaf26d65e 64954161619deda4
+STATE_SHA tps6 81377dbeaf26d65e 64954161619deda4
+## the head's profiled read (f2518976f, integer prints), its deposit parts and states
+tps6b STORE_DEPOSIT_PARTS sections=100 read_and_return_ms=27710.3 compared_and_code_ms=275.7 covector_clone_ms=12.7 transfer_price_ms=24.9 entry_rates_ms=8.8 external_step_ms=223.3 external_price_ms=25.1 covector_grains_ms=24.0 moments_ms=77.6 step_ms=226.4 step_price_ms=24.8 reading_parts_ms=1.3 parts_price_ms=34.0 stepped_ms=28.6 rest_ms=0.2
+tps6b MEASURE lap=tps6b rc=0 wall_s=29.6 peak_rss_kib=262048
+STATE_SHA tps6b 81377dbeaf26d65e 64954161619deda4
+## G134, fixed before the read, scored
+G134 part=a_two_takes guess=1.0_ms range=0.1..2.0_ms read=0.048_ms under
+  from control 11.045 ms (the guess's premise 10.9)
+G134 part=b_spared_zeroings guess=4.5_ms range=3.4..6.0_ms read=5.325_ms inside
+  of control 6.526 ms (the premise 6.6)
+G134 part=c_faces_fetch_and_collection guess=2.0_ms range=0.5..4.0_ms read=0.380_ms under
+  from control 10.970 ms (the premise 12.4)
+G134 part=d_deposit_arithmetic guess=2.0_ms range=0.3..3.0_ms read=6.027_ms over
+  of the deposit's host total 10.145 ms; with the prices and the code 10.005
+G134 part=d_whole_layout_copies_share guess=0.6 range=0.35..0.85 read=0.014 under
+  the allocations inside the external step's and the step's passes are counted in those passes (their pages are first written there)
+G134 part=e_unprofiled_step_over_controls guess=0.935 range=0.9..0.96 read=0.910 inside
+G134_RULES (d) as guessed (copies 0.60 of it): not met, the bare copies read 0.014 of the deposit; (d) arithmetic over 6 ms: met at the entries' arithmetic alone (6.027 ms, at the rule's line), 10.005 with the prices and the code; (e) over 0.96: not met (0.910).
