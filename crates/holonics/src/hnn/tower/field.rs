@@ -6176,6 +6176,11 @@ pub trait FieldRealization {
     fn met_pairs(&self) -> Option<u128> {
         None
     }
+    /// [ruler; P62, a ruler build never merged] **The receivers' ruler**: the rows each region computes, keyed by the address of the
+    /// region's classes, for the reads until the next call (`None` clears it). A realization without it refuses.
+    fn ruler_rows(&mut self, _rows: Option<std::collections::HashMap<usize, Vec<bool>>>) -> Result<()> {
+        refuse("a realization without the receivers' ruler")
+    }
     /// [measurement; theory, November 12] The realization's counters so far ([`RealizationCounters`]), where it keeps them: a reading for
     /// the receipts, which no law reads.
     fn counters(&self) -> Option<RealizationCounters> {

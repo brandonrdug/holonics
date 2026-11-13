@@ -1551,3 +1551,310 @@ mod tests {
         let _ = std::fs::remove_dir_all(&dir);
     }
 }
+
+/// [ruler; P62, a ruler build never merged; the design record of November 13, §4.8; G140] `read-receivers UNITS UNITS_SHA STORE STORE_SHA KEYS
+/// KEYS_SHA CODEC CODEC_SHA PLACES SECTIONS STATE STATE_SHA FLAGS OUT`: **which receiving rows the open places need**, a reading. The held role,
+/// each slice cut afresh from stretch 1 with the key file's seed twice: as `read-cavity` cuts it (whole stretches until `PLACES` places; each
+/// place open alone among the written others, and the whole masks' open places) and as `read-store` cuts it (`SECTIONS` sections under the
+/// pass's two bounds). With `FLAGS` `-` it writes each stretch's octets (`OUT/passages.tsv`, `OUT/passages.bin`, private) and ends; the
+/// flags (one a place, a landmark of a count ruler's news) are formed on the host by a ruler outside the machine. With `FLAGS` a file, each
+/// arm's computed rows are given through the realization's ruler (`ruler_rows`) and the regions read by `read_faces`: A0 every row; A1 the
+/// open rows; A2 the open rows and the flagged written places; A3 the open rows and as many written places a region as A2 holds, drawn by a
+/// keyed mixer (three draws). The code at open places at the last tick, in nats a place, pooled and by slice, at each kind of mask; on the
+/// sections, the rows by kind and the pairs the realization met, and the forward's time by arm (A0, A2, A0 again for the timing). A0's codes
+/// go to `OUT/a0.tsv` so that they are read against the line's own read. The state is read, never written.
+pub(super) fn read_receivers(args: &[String], realization: &mut dyn FieldRealization) -> Result<()> {
+    if args.len() != 15 {
+        return Err("read-receivers UNITS UNITS_SHA STORE STORE_SHA KEYS KEYS_SHA CODEC CODEC_SHA PLACES SECTIONS STATE STATE_SHA FLAGS OUT".into());
+    }
+    use std::io::Write as _;
+    let started = std::time::Instant::now();
+    refuse_variables("read-receivers")?;
+    let units = units_of(&args[1], &args[2])?;
+    if !units.merges().is_empty() {
+        return Err("the store's cut is on bytes: a units file of merges is refused".into());
+    }
+    let store = Path::new(&args[3]);
+    let counts = store_counts(std::str::from_utf8(&pinned_read(&store.join("STORE.tsv").to_string_lossy(), &args[4], READ_BUDGET as usize)?)?)?;
+    let keys = pinned_read(&args[5], &args[6], READ_BUDGET as usize)?;
+    let seed = u64::from_be_bytes(keys.get(keys.len().saturating_sub(8)..).filter(|w| w.len() == 8).ok_or("a key file of fewer than eight bytes")?.try_into()?);
+    let codec = FieldCodec::from_text(&String::from_utf8(pinned_read(&args[7], &args[8], READ_BUDGET as usize)?)?, units)?;
+    let (places, sections) = (positive(&args[9])?, positive(&args[10])?);
+    let state_text = pinned_read(&args[11], &args[12], STATE_BUDGET)?;
+    let learner = FieldLearner::from_text(std::str::from_utf8(&state_text)?).map_err(|e| e.to_string())?;
+    let law = learner.pass.clone().ok_or("a state with no pass line: read-receivers reads a state of the store's line")?;
+    if learner.field.declaration.alphabet != codec.alphabet() {
+        return Err("a state whose alphabet is not its codec's".into());
+    }
+    let out = Path::new(&args[14]);
+    if out.exists() {
+        return Err(format!("{} exists", out.display()).into());
+    }
+    std::fs::create_dir_all(out)?;
+    let role = "held";
+    let names = role_names(&counts, role);
+    // Each slice's stretches: the place read's (classes, octets, a whole mask's region) and the sections' (each a list of regions with octets).
+    type Placed = (Vec<usize>, Vec<u8>, Option<TrainRegion>);
+    let mut placed: Vec<(&str, Vec<Placed>)> = Vec::new();
+    let mut sectioned: Vec<(&str, Vec<Vec<(TrainRegion, Vec<u8>)>>)> = Vec::new();
+    for &name in &names {
+        let fresh = || -> Result<Cut> {
+            let slice = open_slice(store, role, name, &counts)?;
+            let pass = StorePass { role: role.to_string(), store: args[4].clone(), stretches: 0, least: law.least, octaves: law.octaves, pairs: law.pairs, sites: law.sites, slices: vec![PassSlice { name: name.to_string(), piece: 0, cursor: 0, taken: 0 }] };
+            Ok(Cut { seed, slices: vec![slice], pass })
+        };
+        let mut cut = fresh()?;
+        let (mut list, mut taken) = (Vec::new(), 0usize);
+        while taken < places as usize {
+            let Some(drawn) = cut.next() else { break };
+            let at = cut.pass.slices[drawn.slice].clone();
+            let bytes = cut.slices[drawn.slice].bytes(at.piece as usize, at.cursor, drawn.q + drawn.a)?;
+            let stretch = cut.take(drawn, &codec)?;
+            taken += stretch.region.classes.len();
+            let whole = (stretch.kind == Kind::MaskWhole).then(|| stretch.region.clone());
+            list.push((stretch.region.classes.clone(), bytes, whole));
+        }
+        placed.push((name, list));
+        let mut cut = fresh()?;
+        let mut secs = Vec::new();
+        for _ in 0..sections {
+            let (mut regions, mut in_pairs, mut in_sites) = (Vec::new(), 0u64, 0u64);
+            while let Some(drawn) = cut.next() {
+                let s = drawn.sites();
+                if in_sites > 0 && (in_pairs + s * s > cut.pass.pairs || in_sites + s > cut.pass.sites) {
+                    break;
+                }
+                let at = cut.pass.slices[drawn.slice].clone();
+                let bytes = cut.slices[drawn.slice].bytes(at.piece as usize, at.cursor, drawn.q + drawn.a)?;
+                let stretch = cut.take(drawn, &codec)?;
+                (in_pairs, in_sites) = (in_pairs + s * s, in_sites + s);
+                regions.push((stretch.region, bytes));
+            }
+            if regions.is_empty() {
+                break;
+            }
+            secs.push(regions);
+        }
+        sectioned.push((name, secs));
+    }
+    let flags_arg = args[13].as_str();
+    if flags_arg == "-" {
+        let mut tsv = std::io::BufWriter::new(std::fs::File::create(out.join("passages.tsv"))?);
+        let mut bin = std::io::BufWriter::new(std::fs::File::create(out.join("passages.bin"))?);
+        writeln!(tsv, "use\tslice\ta\tb\toffset\toctets\tplaces")?;
+        let mut offset = 0u64;
+        for (name, list) in &placed {
+            for (k, (classes, bytes, _)) in list.iter().enumerate() {
+                writeln!(tsv, "P\t{name}\t{k}\t0\t{offset}\t{}\t{}", bytes.len(), classes.len())?;
+                bin.write_all(bytes)?;
+                offset += bytes.len() as u64;
+            }
+        }
+        for (name, secs) in &sectioned {
+            for (n, regions) in secs.iter().enumerate() {
+                for (j, (region, bytes)) in regions.iter().enumerate() {
+                    writeln!(tsv, "S\t{name}\t{n}\t{j}\t{offset}\t{}\t{}", bytes.len(), region.classes.len())?;
+                    bin.write_all(bytes)?;
+                    offset += bytes.len() as u64;
+                }
+            }
+        }
+        tsv.flush()?;
+        bin.flush()?;
+        println!("RECEIVERS_EXPORT stretches={} sections={} octets={offset} ms={}", placed.iter().map(|(_, l)| l.len()).sum::<usize>(), sectioned.iter().map(|(_, s)| s.len()).sum::<usize>(), started.elapsed().as_millis());
+        return Ok(());
+    }
+    // The flags: one line a stretch, `use slice a b bits`.
+    let mut flags: HashMap<(String, String, usize, usize), Vec<bool>> = HashMap::new();
+    for line in std::fs::read_to_string(flags_arg)?.lines().skip(1) {
+        let w: Vec<&str> = line.split('\t').collect();
+        if w.len() != 5 {
+            return Err("a flags line that is not five fields".into());
+        }
+        flags.insert((w[0].to_string(), w[1].to_string(), w[2].parse()?, w[3].parse()?), w[4].bytes().map(|b| b == b'1').collect());
+    }
+    let flag_of = |key: (&str, &str, usize, usize), n: usize| -> Result<Vec<bool>> {
+        let f = flags.get(&(key.0.to_string(), key.1.to_string(), key.2, key.3)).ok_or("a stretch with no flags")?;
+        if f.len() != n {
+            return Err(format!("a stretch's flags of {} places for {n}", f.len()).into());
+        }
+        Ok(f.clone())
+    };
+    // An arm's computed rows for a region with open places `open` and flags `flag`.
+    #[derive(Clone, Copy, PartialEq)]
+    enum Arm {
+        A0,
+        A1,
+        A2,
+        A3(u64),
+    }
+    let label = |arm: Arm| -> String {
+        match arm {
+            Arm::A0 => "A0".into(),
+            Arm::A1 => "A1".into(),
+            Arm::A2 => "A2".into(),
+            Arm::A3(d) => format!("A3.{d}"),
+        }
+    };
+    let rows_of = |arm: Arm, open: &[bool], flag: &[bool], key: u64| -> Vec<bool> {
+        let n = open.len();
+        match arm {
+            Arm::A0 => vec![true; n],
+            Arm::A1 => open.to_vec(),
+            Arm::A2 => (0..n).map(|t| open[t] || flag[t]).collect(),
+            Arm::A3(d) => {
+                let want = (0..n).filter(|&t| !open[t] && flag[t]).count();
+                let mut written: Vec<usize> = (0..n).filter(|&t| !open[t]).collect();
+                // A keyed draw of `want` written places: each ranked by a mixer of the seed, the draw, the stretch's key and the place.
+                written.sort_by_key(|&t| mix(seed ^ (d + 1).wrapping_mul(0x9E37_79B9_7F4A_7C15), key.wrapping_mul(1_000_003).wrapping_add(t as u64)));
+                let mut rows = open.to_vec();
+                for &t in written.iter().take(want) {
+                    rows[t] = true;
+                }
+                rows
+            }
+        }
+    };
+    let state_sha_before = sha256(learner.to_text().as_bytes())?;
+    // Read a list of regions under the pass's two bounds, each with its computed rows; their faces.
+    let mut read = |regions: &[TrainRegion], rows: &[Vec<bool>]| -> Result<(Vec<Vec<Option<holonics::hnn::tower::TowerFace>>>, u128, u128)> {
+        let (mut faces, mut pairs, mut ns) = (Vec::with_capacity(regions.len()), 0u128, 0u128);
+        let mut at = 0usize;
+        while at < regions.len() {
+            let (mut in_pairs, mut in_sites, mut end) = (0u64, 0u64, at);
+            while end < regions.len() {
+                let s = regions[end].classes.len() as u64;
+                if in_sites > 0 && (in_pairs + s * s > law.pairs || in_sites + s > law.sites) {
+                    break;
+                }
+                (in_pairs, in_sites, end) = (in_pairs + s * s, in_sites + s, end + 1);
+            }
+            let map: HashMap<usize, Vec<bool>> = regions[at..end].iter().zip(&rows[at..end]).map(|(r, w)| (r.classes.as_ptr() as usize, w.clone())).collect();
+            realization.ruler_rows(Some(map)).map_err(|e| e.to_string())?;
+            let before = realization.met_pairs().unwrap_or(0);
+            let t0 = std::time::Instant::now();
+            let got = realization.read_faces(&learner.field, &views_of(&regions[at..end])).map_err(|e| e.to_string())?;
+            ns += t0.elapsed().as_nanos();
+            pairs += realization.met_pairs().unwrap_or(0) - before;
+            realization.ruler_rows(None).map_err(|e| e.to_string())?;
+            faces.extend(got);
+            at = end;
+        }
+        Ok((faces, pairs, ns))
+    };
+    let mut a0 = std::io::BufWriter::new(std::fs::File::create(out.join("a0.tsv"))?);
+    writeln!(a0, "row\tslice\tstretch\tt\tclass\tcK")?;
+    let arms = [Arm::A0, Arm::A1, Arm::A2, Arm::A3(0), Arm::A3(1), Arm::A3(2)];
+    for &arm in &arms {
+        // One-place masks and the whole masks' open places: a code sum on 2^-20 bits and a count, by slice.
+        let mut line_p = Vec::new();
+        let mut line_w = Vec::new();
+        let (mut rows_p, mut computed_p, mut rows_w, mut computed_w) = (0u64, 0u64, 0u64, 0u64);
+        for (si, (name, list)) in placed.iter().enumerate() {
+            let mut regions = Vec::new();
+            let mut rows = Vec::new();
+            let mut at_place = Vec::new();
+            for (k, (classes, _, _)) in list.iter().enumerate() {
+                let flag = flag_of(("P", name, k, 0), classes.len())?;
+                for t in 0..classes.len() {
+                    let mut open = vec![false; classes.len()];
+                    open[t] = true;
+                    let r = rows_of(arm, &open, &flag, ((si as u64) << 40) ^ ((k as u64) << 20) ^ t as u64);
+                    rows_p += r.len() as u64;
+                    computed_p += r.iter().filter(|&&c| c).count() as u64;
+                    rows.push(r);
+                    regions.push(TrainRegion::plain(classes.clone(), open));
+                    at_place.push((k, t));
+                }
+            }
+            let (faces, _, _) = read(&regions, &rows)?;
+            let (mut code, mut count) = (0i128, 0u64);
+            for ((k, t), f) in at_place.iter().zip(&faces) {
+                let class = list[*k].0[*t];
+                let c = f[*t].as_ref().ok_or("an open place without a face")?.code(class);
+                code += c as i128;
+                count += 1;
+                if arm == Arm::A0 {
+                    writeln!(a0, "P\t{name}\t{k}\t{t}\t{class}\t{c}")?;
+                }
+            }
+            line_p.push((name.to_string(), code, count));
+            let wholes: Vec<(usize, TrainRegion)> = list.iter().enumerate().filter_map(|(k, (_, _, w))| w.clone().map(|w| (k, w))).collect();
+            let mut wrows = Vec::new();
+            for (k, region) in &wholes {
+                let flag = flag_of(("P", name, *k, 0), region.classes.len())?;
+                let r = rows_of(arm, &region.unresolved, &flag, ((si as u64) << 40) ^ ((*k as u64) << 20) ^ 0xFFFFF);
+                rows_w += r.len() as u64;
+                computed_w += r.iter().filter(|&&c| c).count() as u64;
+                wrows.push(r);
+            }
+            let wregions: Vec<TrainRegion> = wholes.iter().map(|(_, r)| r.clone()).collect();
+            let (wfaces, _, _) = read(&wregions, &wrows)?;
+            let (mut wcode, mut wcount) = (0i128, 0u64);
+            for ((k, region), f) in wholes.iter().zip(&wfaces) {
+                for t in (0..region.classes.len()).filter(|&t| region.unresolved[t]) {
+                    let c = f[t].as_ref().ok_or("an open place without a face")?.code(region.classes[t]);
+                    wcode += c as i128;
+                    wcount += 1;
+                    if arm == Arm::A0 {
+                        writeln!(a0, "W\t{name}\t{k}\t{t}\t{}\t{c}", region.classes[t])?;
+                    }
+                }
+            }
+            line_w.push((name.to_string(), wcode, wcount));
+        }
+        let show = |v: &[(String, i128, u64)]| -> String {
+            let (c, n): (i128, u64) = v.iter().fold((0, 0), |(a, b), (_, c, n)| (a + c, b + n));
+            let part = v.iter().map(|(s, c, n)| format!("{s}={}/{n}", c)).collect::<Vec<_>>().join(" ");
+            format!("code_sum_2^-20_bits={c} places={n} | {part}")
+        };
+        println!("RECEIVERS_ARM arm={} kind=one_place rows={rows_p} computed={computed_p} {} ms={}", label(arm), show(&line_p), started.elapsed().as_millis());
+        println!("RECEIVERS_ARM arm={} kind=whole rows={rows_w} computed={computed_w} {} ms={}", label(arm), show(&line_w), started.elapsed().as_millis());
+    }
+    a0.flush()?;
+    // The sections: rows by kind and the pairs met, by arm, with the forward's time; A0 read again last for the timing.
+    let order = [Arm::A0, Arm::A1, Arm::A2, Arm::A3(0), Arm::A2, Arm::A0];
+    for (pass, &arm) in order.iter().enumerate() {
+        let (mut kinds, mut computed_kinds, mut pairs, mut ns, mut code, mut count) = ([0u64; 3], [0u64; 3], 0u128, 0u128, 0i128, 0u64);
+        for (si, (name, secs)) in sectioned.iter().enumerate() {
+            for (n, regions) in secs.iter().enumerate() {
+                let mut rows = Vec::new();
+                for (j, (region, _)) in regions.iter().enumerate() {
+                    let flag = flag_of(("S", name, n, j), region.classes.len())?;
+                    let r = rows_of(arm, &region.unresolved, &flag, ((si as u64) << 40) ^ ((n as u64) << 30) ^ ((j as u64) << 20) ^ 0xEEEEE);
+                    for t in 0..r.len() {
+                        let kind = if region.unresolved[t] { 0 } else if flag[t] { 1 } else { 2 };
+                        kinds[kind] += 1;
+                        computed_kinds[kind] += u64::from(r[t]);
+                    }
+                    rows.push(r);
+                }
+                let trs: Vec<TrainRegion> = regions.iter().map(|(r, _)| r.clone()).collect();
+                let (faces, p, t) = read(&trs, &rows)?;
+                pairs += p;
+                ns += t;
+                for (region, f) in trs.iter().zip(&faces) {
+                    for t in (0..region.classes.len()).filter(|&t| region.unresolved[t]) {
+                        code += f[t].as_ref().ok_or("an open place without a face")?.code(region.classes[t]) as i128;
+                        count += 1;
+                    }
+                }
+            }
+        }
+        println!(
+            "RECEIVERS_SECTIONS pass={pass} arm={} sites={} open={} written_landmark={} written_other={} computed_open={} computed_landmark={} computed_other={} pairs={pairs} forward_ms={} code_sum_2^-20_bits={code} open_places={count}",
+            label(arm),
+            kinds.iter().sum::<u64>(),
+            kinds[0],
+            kinds[1],
+            kinds[2],
+            computed_kinds[0],
+            computed_kinds[1],
+            computed_kinds[2],
+            ns / 1_000_000
+        );
+    }
+    let state_sha_after = sha256(learner.to_text().as_bytes())?;
+    println!("RECEIVERS_STATE bytes={} sha_before={} sha_after={} equal={} source_equal={} ms={}", state_text.len(), &state_sha_before[..16], &state_sha_after[..16], state_sha_before == state_sha_after, learner.to_text().as_bytes() == state_text.as_slice(), started.elapsed().as_millis());
+    Ok(())
+}

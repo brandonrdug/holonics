@@ -5994,3 +5994,17 @@ extern "C" __global__ void field_yard_bits_words(const void *arr, uint32_t kind,
 // the opening's comparison at every place (P60, the design record of November 13 §4.4a)
 
 #include "field_cavity.cuh"
+
+// [ruler; P62, a ruler build never merged] The receivers' ruler: a row the ruler leaves out keeps its opening's state through every tick.
+// `back` 0 keeps the opening (`x0 = x`), 1 restores it at each skipped row (`skipped_row`).
+extern "C" __global__ void field_ruler_hold(FieldWords w, int64_t *x0, uint64_t n, uint32_t dw, uint32_t back) {
+    const uint64_t i = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x;
+    if (i >= n) {
+        return;
+    }
+    if (back == 0) {
+        x0[i] = w.x[i];
+    } else if (skipped_row(w, i / dw)) {
+        w.x[i] = x0[i];
+    }
+}

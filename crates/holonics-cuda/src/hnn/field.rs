@@ -1693,7 +1693,9 @@ impl<'c> CardField<'c> {
         let any_echo = regions.iter().any(|r| r.echo.iter().any(Option::is_some));
         // [E] The cut rooms' windows, each site's row computed or not (every site of an uncut region); kept whole where the field has carry
         // circles (the host's `FieldDeclaration::room_window`, the one owner of the cut's admission).
-        let windows: Vec<Option<Vec<bool>>> = regions.iter().map(|r| declaration.room_window(r)).collect();
+        // [ruler; P62, a ruler build never merged] The receivers' ruler gives a region's computed rows where it is set; the carry circles'
+        // admission (`room_window`) is set aside for those regions so that the mask can be given.
+        let windows: Vec<Option<Vec<bool>>> = regions.iter().map(|r| ruler_rows(r).or_else(|| declaration.room_window(r))).collect();
         let (per_blank, bare) = (words.per_blank != 0, words.bare_stretch != 0);
         let blank_read: Vec<u8> = regions
             .iter()
@@ -2203,6 +2205,16 @@ impl<'c> CardField<'c> {
         // [measurement; part P2] The carry circles' gates, where read: one accumulator a batch, added into after each tick's forward from that tick's
         // own gate and leak reads, fetched once the ticks end.
         let gate_acc = if d.carry > 0 && self.carry_gates.borrow().is_some() { Some(self.timed(Kind::Alloc, || self.take_zeroed::<u64>(2 * d.carry + 1)).map_err(device)?) } else { None };
+        // [ruler; P62] A row the ruler leaves out keeps its opening's state through every tick: the opening is kept here and restored at each
+        // skipped row after each tick.
+        let ruler_hold = if ruler_on() && words.computed != 0 {
+            let x0 = self.timed(Kind::Alloc, || self.take::<i64>(sites * dw)).map_err(device)?;
+            let (mut p0, mut n, mut w32, mut back) = (x0.device_ptr(), (sites * dw) as u64, dw as u32, 0u32);
+            self.launch("field_ruler_hold", Self::cells(n), THREADS, &mut [arg(words), arg(&mut p0), arg(&mut n), arg(&mut w32), arg(&mut back)])?;
+            Some(x0)
+        } else {
+            None
+        };
         for k in 0..d.ticks {
             set_clock(words, clocks[k].as_ref(), base_clock);
             if let (Some(tr), Some(tb)) = (tower.as_deref_mut(), tb.as_ref()) {
@@ -2211,6 +2223,10 @@ impl<'c> CardField<'c> {
                 }
             }
             self.tick_forward(field, words, &ticks, k, kept, stored, keep.is_some(), logits, returning, pr.device_ptr(), sites, pairs, regions.len())?;
+            if let Some(x0) = ruler_hold.as_ref() {
+                let (mut p0, mut n, mut w32, mut back) = (x0.device_ptr(), (sites * dw) as u64, dw as u32, 1u32);
+                self.launch("field_ruler_hold", Self::cells(n), THREADS, &mut [arg(words), arg(&mut p0), arg(&mut n), arg(&mut w32), arg(&mut back)])?;
+            }
             if let Some(acc) = gate_acc.as_ref() {
                 let tick = &ticks[if kept { k } else { 0 }];
                 (words.pg, words.pgam) = (tick.pg.device_ptr(), tick.pgam.device_ptr());
@@ -3739,6 +3755,11 @@ impl FieldRealization for CardField<'_> {
         Some(self.times.pairs)
     }
 
+    fn ruler_rows(&mut self, rows: Option<std::collections::HashMap<usize, Vec<bool>>>) -> Result<()> {
+        *RULER_ROWS.lock().map_err(|_| TowerError::Refused("the receivers' ruler's lock is poisoned"))? = rows;
+        Ok(())
+    }
+
     fn counters(&self) -> Option<RealizationCounters> {
         let t = self.times;
         Some(RealizationCounters { reads: t.reads, returns: t.returns, pairs: t.pairs, batches: t.batches, peak_store: t.peak_store })
@@ -3820,6 +3841,18 @@ impl FieldRealization for CardField<'_> {
 
 /// Each kept site's still heads' rows: the met sources with their weights, and the row's mass.
 type Rows = Vec<Vec<(Vec<(u32, u64)>, u64)>>;
+
+/// [ruler; P62, a ruler build never merged] **The receivers' ruler's computed rows**, by region, keyed by the address of the region's classes,
+/// set by the reading before each read and cleared after it. None in every other read, so every other read is the tree's.
+pub static RULER_ROWS: std::sync::Mutex<Option<std::collections::HashMap<usize, Vec<bool>>>> = std::sync::Mutex::new(None);
+
+fn ruler_rows(r: &Region) -> Option<Vec<bool>> {
+    RULER_ROWS.lock().ok()?.as_ref()?.get(&(r.classes.as_ptr() as usize)).cloned()
+}
+
+fn ruler_on() -> bool {
+    RULER_ROWS.lock().map(|g| g.is_some()).unwrap_or(false)
+}
 
 #[cfg(test)]
 mod tests {
