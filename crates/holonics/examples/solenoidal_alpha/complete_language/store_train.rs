@@ -1986,6 +1986,271 @@ pub(super) fn read_release(args: &[String]) -> Result<()> {
     Ok(())
 }
 
+/// [measurement; agent-inferred, November 13; G169] `read-redraw UNITS UNITS_SHA STORE STORE_SHA KEYS KEYS_SHA CODEC CODEC_SHA PLACES STATE
+/// STATE_SHA OUT ROLE SWEEPS RULER`: **the field's own release drawn from its face and heard as written**, the loop of `read-release` in
+/// the regime the field was trained in. A region of the cut's masks is read once with every open place open (the built read), and each open
+/// place is drawn from its face (`RULER` 0: an integer draw against the face's masses, keyed by the place, the region and the sweep, the face
+/// at the temperature the field holds; 1: the face's top, the deterministic limit read as a ruler, which is no mode of the machine: Brandon,
+/// November 13 22:33Z, a temperature is a store's state and never a reading's dial). Then `SWEEPS` sweeps: each sweep opens the open places of one residue modulo `NEAR` at a time (so no
+/// two open at once stand within each other's near field), every other open place standing written at its last draw, reads the region, and
+/// redraws them. A carried face is never formed, so every read is a mask state of the kind the field trained on. `OUT/redraw.tsv` holds a line a
+/// slice and sweep (numbers only): the open places; the truth's code on the faces the places were drawn from and their expected code (on
+/// `2^(−20)` bits, summed); the places whose draw is the truth; the places that changed class, the open neighbours both of which changed, and
+/// the open neighbours in all; the runs of three or more neighbouring places that changed together after holding a sweep, and their places;
+/// the truth's code on each place's faces averaged over the sweeps so far (its draws' average, the field's recursion read as a mean of its own
+/// reads); the field's code of each place's last draw on its new face (its surprise at its own release); and the places whose face gives one
+/// class at least half and that class is not the truth. The output directory is private.
+pub(super) fn read_redraw(args: &[String]) -> Result<()> {
+    redraw_with(args, false)
+}
+
+/// [measurement; agent-inferred, November 13; G170] `read-breakdown` (the arguments of `read-redraw`): **the loop of `read-redraw` with the
+/// passage's evidence deposited through it**, the lightning loop of atlas `heat.leader-breakdown` (a current that deposits along its channel,
+/// and a return stroke re-solved on the changed constitution) read on one region at a time. After each sweep's draws, a copy of the learner
+/// local to the region takes one section of its own law ([`FieldLearner::section`]: its rates, its moments, its step) on the region with
+/// every open place written at its last draw and the written places of one residue modulo `NEAR` opened (the sweep's residue), so the
+/// comparison is only at places whose classes the passage holds, given the field's own release; the next sweep reads on the moved
+/// constitution. No temperature and no gain is set by the reading: the heat is the covector the evidence returns, largest where a confident
+/// release contradicts what the passage holds (Brandon, November 13 22:33Z). The copy is dropped with the region; the state's bytes are
+/// unchanged. `OUT/redraw.tsv` adds, a slice and sweep, the opened written places, their code before the step (the section's own, on
+/// `2^(−20)` bits) and the sections that deposited.
+pub(super) fn read_breakdown(args: &[String]) -> Result<()> {
+    redraw_with(args, true)
+}
+
+fn redraw_with(args: &[String], deposit: bool) -> Result<()> {
+    let command = if deposit { "read-breakdown" } else { "read-redraw" };
+    if args.len() != 16 && !(deposit && args.len() == 17) {
+        return Err(format!("{command} UNITS UNITS_SHA STORE STORE_SHA KEYS KEYS_SHA CODEC CODEC_SHA PLACES STATE STATE_SHA OUT ROLE SWEEPS RULER{}", if deposit { " [CONTROL]" } else { "" }).into());
+    }
+    // [G171] With CONTROL 1 each section reads the next of the slice's own training stretches (the prefix role, the cut's own states) in place
+    // of the region's evidence: the same count of the learner's own sections, none of them shaped by the region, so what the evidence adds
+    // is read apart from what any step adds (a step from a mean of states re-adds the rate's standing spread, a heat of its own).
+    // [G173] With CONTROL 2 the same training sections are all taken before the region's first read and none during the sweeps, so a
+    // step's destination is read apart from a constitution moving while the release runs.
+    let before = args.get(16).is_some_and(|c| c == "2");
+    let control = before || args.get(16).is_some_and(|c| c == "1");
+    let started = std::time::Instant::now();
+    refuse_variables(command)?;
+    let role = args[13].as_str();
+    if role != "held" && role != "prefix" {
+        return Err(format!("{command} reads the held role or the training documents (prefix)").into());
+    }
+    let sweeps = positive(&args[14])? as usize;
+    let drawn_at_one = match args[15].as_str() {
+        "0" => true,
+        "1" => false,
+        _ => return Err("RULER is 0 (a draw against the field's own face) or 1 (the face's top, a ruler)".into()),
+    };
+    let units = units_of(&args[1], &args[2])?;
+    if !units.merges().is_empty() {
+        return Err("the store's cut is on bytes: a units file of merges is refused".into());
+    }
+    let store = Path::new(&args[3]);
+    let counts = store_counts(std::str::from_utf8(&pinned_read(&store.join("STORE.tsv").to_string_lossy(), &args[4], READ_BUDGET as usize)?)?)?;
+    let keys = pinned_read(&args[5], &args[6], READ_BUDGET as usize)?;
+    let seed = u64::from_be_bytes(keys.get(keys.len().saturating_sub(8)..).filter(|w| w.len() == 8).ok_or("a key file of fewer than eight bytes")?.try_into()?);
+    let codec = FieldCodec::from_text(&String::from_utf8(pinned_read(&args[7], &args[8], READ_BUDGET as usize)?)?, units)?;
+    let places = positive(&args[9])? as usize;
+    let learner = FieldLearner::from_text(std::str::from_utf8(&pinned_read(&args[10], &args[11], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
+    let law = learner.pass.clone().ok_or("a state with no pass line: the reading reads a state of the store's line")?;
+    if learner.field.declaration.alphabet != codec.alphabet() {
+        return Err("a state whose alphabet is not its codec's".into());
+    }
+    let out = Path::new(&args[12]);
+    if out.exists() {
+        return Err(format!("{} exists", out.display()).into());
+    }
+    std::fs::create_dir_all(out)?;
+    use rayon::prelude::*;
+    use std::io::Write as _;
+    let mut tsv = std::io::BufWriter::new(std::fs::File::create(out.join("redraw.tsv"))?);
+    writeln!(tsv, "slice\tsweep\tplaces\tcode\texpected\tagree\tflips\tpair_flips\tpairs\tsnaps\tsnap_places\taverage_code\town_code\tconfident_wrong\tevidence_places\tevidence_code\tdeposited")?;
+    let a = learner.field.declaration.alphabet;
+    println!("REDRAW_LAW command={command} role={role} places={places} sweeps={sweeps} ruler={} near={NEAR} ms={}", u8::from(!drawn_at_one), started.elapsed().as_millis());
+    // One sweep's sums over a region: (places, code, expected, agree, flips, pair_flips, pairs, snaps, snap_places, average_code, own_code,
+    // confident_wrong, evidence_places, evidence_code, deposited).
+    type Stage = [i128; 15];
+    // A face's class drawn by `key`: against its masses (the face the field forms), or its top (the ruler).
+    let draw = |face: &holonics::hnn::tower::TowerFace, key: u128| -> usize {
+        if !drawn_at_one {
+            let top = face.masses.iter().copied().max().unwrap_or(0);
+            return face.masses.iter().position(|&m| m == top).unwrap_or(0);
+        }
+        let mut u = key % face.total.max(1);
+        for (c, &m) in face.masses.iter().enumerate() {
+            if u < m {
+                return c;
+            }
+            u -= m;
+        }
+        face.masses.len() - 1
+    };
+    for (si, &name) in role_names(&counts, role).iter().enumerate() {
+        let slice = open_slice(store, role, name, &counts)?;
+        let pass = StorePass { role: role.to_string(), store: args[4].clone(), stretches: 0, least: law.least, octaves: law.octaves, pairs: law.pairs, sites: law.sites, slices: vec![PassSlice { name: name.to_string(), piece: 0, cursor: 0, taken: 0 }] };
+        let mut cut = Cut { seed, slices: vec![slice], pass };
+        let mut regions: Vec<TrainRegion> = Vec::new();
+        let mut taken = 0usize;
+        while taken < places {
+            let Some(drawn) = cut.next() else { break };
+            let stretch = cut.take(drawn, &codec)?;
+            taken += stretch.region.classes.len();
+            regions.push(TrainRegion::plain(stretch.region.classes.clone(), stretch.region.unresolved.clone()));
+        }
+        let mut training: Vec<TrainRegion> = Vec::new();
+        if control {
+            let slice = open_slice(store, "prefix", name, &counts)?;
+            let pass = StorePass { role: "prefix".to_string(), store: args[4].clone(), stretches: 0, least: law.least, octaves: law.octaves, pairs: law.pairs, sites: law.sites, slices: vec![PassSlice { name: name.to_string(), piece: 0, cursor: 0, taken: 0 }] };
+            let mut cut = Cut { seed, slices: vec![slice], pass };
+            while training.len() < regions.len() * (sweeps + 1) {
+                let Some(drawn) = cut.next() else { break };
+                let stretch = cut.take(drawn, &codec)?;
+                if stretch.region.unresolved.iter().any(|&u| u) {
+                    training.push(stretch.region);
+                }
+            }
+            if training.len() < regions.len() * (sweeps + 1) {
+                return Err("the slice's training documents hold fewer stretches than the control's sections".into());
+            }
+        }
+        let slice_start = std::time::Instant::now();
+        let reads: Vec<std::result::Result<Vec<Stage>, String>> = regions
+            .par_iter()
+            .enumerate()
+            .map(|(ri, base)| {
+                let n = base.classes.len();
+                let open: Vec<usize> = (0..n).filter(|&t| base.unresolved[t]).collect();
+                let region_key = mix(seed, ((si as u64) << 40) | ri as u64);
+                let key = |sweep: usize, t: usize| -> u128 {
+                    let c = ((sweep as u64) << 24) | t as u64;
+                    (u128::from(mix(region_key, 2 * c)) << 64) | u128::from(mix(region_key, 2 * c + 1))
+                };
+                let pairs = open.windows(2).filter(|w| w[1] == w[0] + 1).count() as i128;
+                let mut fill = base.classes.clone();
+                let (mut sums, mut age): (Vec<Vec<u128>>, Vec<usize>) = (vec![vec![0u128; a]; n], vec![0; n]);
+                let mut stages: Vec<Stage> = Vec::with_capacity(sweeps + 1);
+                let mut local = deposit.then(|| learner.clone());
+                if let (Some(l), true) = (local.as_mut(), before) {
+                    for k in 0..=sweeps {
+                        let other = &training[ri * (sweeps + 1) + k];
+                        l.section(&views_of(std::slice::from_ref(other))).map_err(|e| e.to_string())?;
+                    }
+                }
+                for sweep in 0..=sweeps {
+                    let mut st: Stage = [0; 15];
+                    st[0] = open.len() as i128;
+                    st[6] = pairs;
+                    let mut changed = vec![false; n];
+                    let residues: Vec<Option<usize>> = if sweep == 0 { vec![None] } else { (0..NEAR).map(Some).collect() };
+                    for residue in residues {
+                        let now: Vec<usize> = open.iter().copied().filter(|&t| residue.is_none_or(|r| t % NEAR == r)).collect();
+                        if now.is_empty() {
+                            continue;
+                        }
+                        let mut unresolved = vec![false; n];
+                        for &t in &now {
+                            unresolved[t] = true;
+                        }
+                        let region = TrainRegion::plain(fill.clone(), unresolved);
+                        let views = views_of(std::slice::from_ref(&region));
+                        let faces = local.as_ref().map_or(&learner.field, |l| &l.field).faces(&views[0]).map_err(|e| e.to_string())?;
+                        for &t in &now {
+                            let face = faces[t].as_ref().ok_or("an open place with no face")?;
+                            let truth = base.classes[t];
+                            st[1] += i128::from(face.code(truth));
+                            let sum: i128 = face.masses.iter().map(|&m| m as i128 * holonics::hnn::tower::face_code(m, face.total) as i128).sum();
+                            st[2] += sum / (face.total as i128).max(1);
+                            let top = face.masses.iter().copied().max().unwrap_or(0);
+                            if 2 * top >= face.total && face.masses[truth] != top {
+                                st[11] += 1;
+                            }
+                            if sweep > 0 {
+                                st[10] += i128::from(face.code(fill[t]));
+                                for (s, &m) in sums[t].iter_mut().zip(&face.masses) {
+                                    *s += (m << 62) / face.total.max(1);
+                                }
+                            }
+                            let class = draw(face, key(sweep, t));
+                            changed[t] = sweep > 0 && class != fill[t];
+                            fill[t] = class;
+                        }
+                    }
+                    for &t in &open {
+                        st[3] += i128::from(fill[t] == base.classes[t]);
+                        st[4] += i128::from(changed[t]);
+                        if sweep > 0 {
+                            let total: u128 = sums[t].iter().sum();
+                            st[9] += i128::from(holonics::hnn::tower::face_code(sums[t][base.classes[t]].max(1), total.max(1)));
+                        }
+                    }
+                    if sweep == 0 {
+                        st[9] = st[1];
+                    }
+                    st[5] = open.windows(2).filter(|w| w[1] == w[0] + 1 && changed[w[0]] && changed[w[1]]).count() as i128;
+                    // Runs of three or more neighbouring open places that changed together, each having held the sweep before.
+                    let mut k = 0;
+                    while k < open.len() {
+                        let mut j = k;
+                        while j < open.len() && changed[open[j]] && age[open[j]] >= 1 && (j == k || open[j] == open[j - 1] + 1) {
+                            j += 1;
+                        }
+                        if j - k >= 3 {
+                            st[7] += 1;
+                            st[8] += (j - k) as i128;
+                        }
+                        k = j.max(k + 1);
+                    }
+                    for &t in &open {
+                        age[t] = if changed[t] || sweep == 0 { 0 } else { age[t] + 1 };
+                    }
+                    // [G170] The evidence deposited through the release: the written places of the sweep's residue opened, every open
+                    // place written at its draw, one section of the learner's own law on the region.
+                    if before {
+                        // The control's steps were all taken before the first read.
+                    } else if let (Some(l), true) = (local.as_mut(), control) {
+                        let other = &training[ri * (sweeps + 1) + sweep];
+                        let views = views_of(std::slice::from_ref(other));
+                        let receipt = l.section(&views).map_err(|e| e.to_string())?;
+                        st[12] = other.unresolved.iter().filter(|&&u| u).count() as i128;
+                        st[13] = i128::from(receipt.code_before);
+                        st[14] = i128::from(receipt.deposited);
+                    } else if let Some(l) = local.as_mut() {
+                        let opened: Vec<bool> = (0..n).map(|t| !base.unresolved[t] && t % NEAR == sweep % NEAR).collect();
+                        let k = opened.iter().filter(|&&o| o).count();
+                        if k > 0 {
+                            let region = TrainRegion::plain(fill.clone(), opened);
+                            let views = views_of(std::slice::from_ref(&region));
+                            let receipt = l.section(&views).map_err(|e| e.to_string())?;
+                            st[12] = k as i128;
+                            st[13] = i128::from(receipt.code_before);
+                            st[14] = i128::from(receipt.deposited);
+                        }
+                    }
+                    stages.push(st);
+                }
+                Ok(stages)
+            })
+            .collect();
+        let mut totals: Vec<Stage> = vec![[0; 15]; sweeps + 1];
+        for read in reads {
+            for (s, st) in totals.iter_mut().zip(read?) {
+                for (x, y) in s.iter_mut().zip(st) {
+                    *x += y;
+                }
+            }
+        }
+        for (sweep, s) in totals.iter().enumerate() {
+            let cells: Vec<String> = s.iter().map(i128::to_string).collect();
+            writeln!(tsv, "{si}\t{sweep}\t{}", cells.join("\t"))?;
+        }
+        println!("REDRAW_SLICE slice={name} regions={} host_ms={} ms={}", regions.len(), slice_start.elapsed().as_millis(), started.elapsed().as_millis());
+    }
+    tsv.flush()?;
+    println!("REDRAW_DONE ms={}", started.elapsed().as_millis());
+    Ok(())
+}
+
 /// [definition; agent-inferred, November 13] `next-pass STATE STATE_SHA OUT`: **a state's next pass over its role**: the state with its pass line's
 /// slices set back to their first piece (piece, cursor and places taken zero), its count of stretches kept, so the next pass's cuts and masks
 /// are drawn afresh from the key stream (a stretch's length and mask are keyed by that count, [`Cut::next`]) over the same documents, and

@@ -4014,3 +4014,144 @@ G168 scored 2026-11-13T21:54Z (receipt g168_snap.txt; read-release locked, 8 pas
   worse than pass 1 at every open place pooled (3.44 against 3.01), so no snap at any pass recovers more than the first read. So in this
   trained field a release fed back is never better than the first read, and a snap only limits its harm: the recursion can only help where
   the deposit runs through it, the plasticity the lens names beside the lightning (agent-inferred).
+
+G169 fixed 2026-11-13T22:10Z (the Opus PC thread), before its read: the release drawn at its temperature and heard as written (read-redraw;
+the derivation of 22:00Z: the soft loop of G163 to G168 is mean field, and a mean-field loop has no fluctuation, so a metastable lock of its
+open places never decays; the decay the lens names is nucleation, which needs the release's own noise, and a draw heard as a written place
+is a mask state the field trained on). The cut's masks on held text, the line's second pass's second lap mean (MEAN.3000), 4,000 places a
+slice; sweep 0 the built read with every open place open and each drawn from its face; then 8 sweeps, each opening the open places of one
+residue modulo NEAR at a time beside the others written at their last draws. Run at temperature one (a draw against the face) and at zero
+(the face's top). Read first: G168's first pass coded the open places of the cut's masks at 3.0085 nats a place on seen text (lap 3 of the
+first pass), the line's whole masks code held text at 2.3980 and its one-place masks at 1.0542 at this mean.
+  (a) sweep 0 codes the open places at 2.70 to 3.20 nats a place;
+  (b) at temperature one the truth's code on each sweep's own faces stands above sweep 0's at every sweep from 1 to 8 (one draw of the
+      others misleads more than it tells);
+  (c) at temperature one the truth's code on each place's faces averaged over sweeps 1 to 8 stands under sweep 0's by at least 0.02 nats
+      a place (the recursion through the field's own draws, read as a mean, beats its direct read);
+  (d) at temperature one at least 15% of the open places change class at sweep 8; at zero under 2% do at every sweep from 4 (a
+      deterministic loop freezes, a drawn one keeps moving);
+  (e) at temperature one neighbouring open places change together at least 1.5 times as often as independent changes at that sweep's
+      rate would (changes come as avalanches);
+  (f) at zero the places drawn at the truth at sweep 8 exceed sweep 0's by no more than 1% of the open places (the built read's top is
+      the best per-place answer its own marginals give);
+  (g) at zero the confidently wrong places (one class at least half, not the truth) rise from sweep 1 to sweep 8; at one they stay within
+      10% of sweep 1's.
+  Rule: (c) held is self-induction's first gain in this build, read in the regime the field was trained in, and the averaged release
+  becomes the next design, its cost per gain read against the card. (c) missed with (b) held: the field's conditionals on its own draws
+  hold less than its direct read, and the release's use stays owed to training through it (the ring record's §4).
+
+G169 scored 2026-11-13T22:40Z (receipt g169_redraw.txt; read-redraw, host, 8 threads; the field's own face 24 sweeps in 1,377.4 s, the top
+8 sweeps in 460.9 s). Brandon named the arm "at temperature zero" a dial at 22:33Z, before the score: it is read here as a ruler of the
+deterministic limit, which is no mode of the machine (the guides' rule of that day).
+  (a) sweep 0 codes the open places at 3.0513 nats a place: held;
+  (b) on its own face the truth's code on each sweep's faces stands above sweep 0's at every sweep (4.785 at sweep 1, 6.118 at 8, 6.913 at
+      24): held;
+  (c) the faces averaged over sweeps 1 to 8 code the truth at 4.0779, 1.03 above sweep 0's (4.03 to 4.05 from sweep 17 to 24): missed;
+  (d) on its own face 56.6% of the open places change at sweep 8 (46.1% at 24); under the top 5.3% change at sweep 4 and under 2% only from
+      sweep 7: missed;
+  (e) neighbouring places change together 1.21 times as often as independent changes at sweep 8 (1.06 to 1.33 over the 24 sweeps): missed;
+      under the top the ratio climbs from 1.72 to 18.9 as the changes fall to the walls between ordered runs;
+  (f) under the top 19.31% of the open places are drawn at the truth at sweep 8 against 21.28% at sweep 0: held;
+  (g) under the top the confidently wrong rise from 59.5% at sweep 1 to 71.6% at 8: held; on its own face they rise from 26.3% to 48.3%
+      at 8 and 56.5% at 24: missed.
+  Of 7 parts 3 held. The drawn loop runs off as the soft loop did: its faces sharpen (expected code 3.06 to 1.36 at sweep 8, 1.10 at 24),
+  its surprise at its own draws falls (3.70 to 1.86 to 1.48), and the confidently wrong keep rising at sweep 24, so noise alone never
+  bites the overconfidence. The deterministic ruler orders into fluent wrong text (the field codes its own fill at 0.22 nats a place, the
+  truth at 7.65) and coarsens, its changes falling onto the walls between runs. So the runaway is not the soft regime's: a field that
+  hears its own release as written text, at any temperature it holds, treats its own news as the passage's (agent-inferred). The rule's
+  second branch: the release's use stays owed to training through it.
+
+G170 fixed 2026-11-13T22:38Z (the Opus PC thread), before its read: the loop of G169 with the passage's evidence deposited through it
+(read-breakdown; the lightning loop of atlas heat.leader-breakdown, and the heat Brandon's correction of 22:33Z asks for, with no
+temperature set by the reading). G169's regions, keys and schedule (held text, MEAN.3000 of the second pass's second lap, 4,000 places a
+slice, 8 sweeps, each place drawn from the field's own face); after each sweep a copy of the learner local to the region takes one section
+of its own law on the region, every open place written at its last draw and the written places of the sweep's residue modulo NEAR opened,
+so the comparison is only where the passage holds the class. Read first: G169 at the field's own face coded the open places at 3.0513 at
+sweep 0, 6.1184 on single faces and 4.0779 averaged at sweep 8, with 48.3% of them confidently wrong; the line's one-place level fell
+0.0078 nats a place over its last 3,000 sections (one region a section).
+  (a) the opened written places' code, summed over a region's sections, falls from sweep 0's to sweep 8's by less than 0.02 nats a place
+      (one region's section at the line's rate is the no-event regime of October 8: it does not move what one region reads);
+  (b) the open places' code on single faces at sweep 8 stands within 0.10 nats a place of G169's 6.1184;
+  (c) the averaged code at sweep 8 stands within 0.10 of G169's 4.0779, so above sweep 0's;
+  (d) the confidently wrong fraction at sweep 8 stands within 0.03 of G169's 0.4833.
+  Rule: none; a reading. (a) to (d) held: the read-time deposit at the line's rate cannot reach the runaway, and the evidence's heat
+  must enter where the line deposits, through training on its own release (the ring record's §4). (b) or (c) missed downward: the
+  evidence's deposit bites the runaway at read time, and the read-time deposit is designed as a part.
+
+G170 scored 2026-11-13T22:53Z (receipt g170_breakdown.txt; read-breakdown, host, 8 threads, 804.5 s; every one of the 122 regions deposited at
+every sweep):
+  (a) the opened written places' code moves with the sweep's residue and does not fall: 1.2556 nats a place at sweep 0, 1.2715 at sweep 8
+      (1.14 to 1.27 between): held;
+  (b) the open places' code on single faces at sweep 8 is 5.5047, 0.614 under G169's 6.1184: missed, downward;
+  (c) the averaged code at sweep 8 is 3.8980, 0.180 under G169's 4.0779 and 0.847 above sweep 0's: missed, downward;
+  (d) the confidently wrong at sweep 8 are 38.46% against G169's 48.33%: missed, downward.
+  Of 4 parts 1 held. With one section of its own law a sweep the loop runs off less: its faces stay softer (expected code 1.67 at sweep 8
+  against 1.36), its runaway in single faces stops from sweep 5 (5.51, 5.58, 5.55, 5.50) where G169's climbed to 6.12, and the
+  confidently wrong stand at 38 to 39% from sweep 5 where G169's rose to 48%. The written places it compared did not code better, so
+  what bit the runaway is not what the section learned of the region's text. The rule's second branch names the read-time deposit as a
+  part; it waits on G171, which reads whether the bite is the evidence's or any step's.
+
+G171 fixed 2026-11-13T22:53Z (the Opus PC thread), before its read: G170's control. The same loop, keys and count of sections, each section
+of the learner's own law reading the next of the slice's own training stretches (the prefix role, the cut's own states) in place of the
+region's evidence (read-breakdown CONTROL 1). Read first: G170 at sweep 8 coded the open places at 5.5047 on single faces and 3.8980
+averaged, 38.46% confidently wrong, with the written places it compared not coding better; G169, with no section, 6.1184, 4.0779 and
+48.33%. A step from a mean of states re-adds the rate's standing spread (atlas deposition.rate-temperature-standing-spread), a heat any
+section carries.
+  (a) the control's single-face code at sweep 8 stands at least 0.20 nats a place above G170's 5.5047 (the region's evidence is at least
+      a third of the bite);
+  (b) its confidently wrong share at sweep 8 stands at least 0.03 above G170's 0.3846;
+  (c) its averaged code at sweep 8 stands above G170's 3.8980.
+  Rule: (a) held: the evidence's covector is the heat that bites, Brandon's mechanism, and the read-time deposit of the passage's evidence
+  is designed as a part. (a) missed: any section's heat bites as much, the bite is the standing spread a step re-adds to a mean of
+  states, and the design reads that spread's place before any part is built.
+
+G171 scored 2026-11-13T23:05Z (receipt g171_control.txt; read-breakdown CONTROL 1, host, 8 threads, 643.5 s; every region deposited at every
+sweep):
+  (a) the control's single-face code at sweep 8 is 5.4998, 0.005 under G170's 5.5047: missed;
+  (b) its confidently wrong share is 37.72% against G170's 38.46%: missed;
+  (c) its averaged code is 3.9070 against G170's 3.8980: held, by 0.009, inside what a sweep moves.
+  Of 3 parts 1 held. Sections on text the region never met bite the runaway as much as sections on the region's own evidence: the bite
+  is what any step does to a mean of states, the standing spread the rate re-adds (atlas deposition.rate-temperature-standing-spread),
+  not the evidence's covector. At the line's rate one region's evidence moves nothing a release reads: October 8's no-event regime, at
+  read time. The rule's second branch: the spread's place is read before any part is built.
+
+G172 fixed 2026-11-13T23:05Z (the Opus PC thread), before its read: the spread's place. G169's loop (no section) on the second lap's end state
+(lap2/STATE.3000, the state the lap's last section left, whose mean is G169's MEAN.3000), its keys and schedule, 8 sweeps. Read first:
+G169 on the mean coded the open places at 3.0513 at sweep 0, 6.1184 on single faces and 4.0779 averaged at sweep 8, 48.33% confidently
+wrong; G170 and G171, nine sections from the mean, 5.50, 3.90 and 38%; the lap-mean rule records end states coding 0.0055 to 0.0107 nats
+a place above their means at the old rate.
+  (a) sweep 0 codes the open places within 0.03 of G169's 3.0513;
+  (b) the single-face code at sweep 8 stands within 0.15 of G171's 5.4998, and at least 0.4 under G169's 6.1184;
+  (c) the confidently wrong share at sweep 8 stands within 0.04 of G171's 0.3772.
+  Rule: (b) held: the live constitution's own spread is what bites the runaway, a mean of states is a store at rest and no store is,
+  and every release reading is read on a live state beside its mean. (b) missed: the bite is a step's direction, not its spread, and
+  the step's parts are read.
+
+G172 scored 2026-11-13T23:17Z (receipt g172_end_state.txt; read-redraw on lap2/STATE.3000, host, 8 threads, 529.1 s):
+  (a) sweep 0 codes the open places at 3.0571, 0.006 above the mean's: held;
+  (b) the single-face code at sweep 8 is 6.1033, 0.60 above G171's and 0.015 under G169's: missed;
+  (c) the confidently wrong at sweep 8 are 45.99%, 0.083 above G171's: missed.
+  Of 3 parts 1 held. The lap's end state, whose spread the mean has shed, runs off as the mean does: the bite of G170 and G171 is not the
+  live constitution's spread. It came with the sections taken while the loop ran. The rule's second branch: the step's parts are read.
+
+G173 fixed 2026-11-13T23:17Z (the Opus PC thread), before its read: a step's destination against a constitution moving under the release.
+G171's nine training sections a region, all taken before the region's first read and none during the sweeps (read-breakdown CONTROL 2);
+otherwise as G171. Read first: G171 (the sections between sweeps) 5.4998 on single faces at sweep 8 and 37.72% confidently wrong; G169
+(none) 6.1184 and 48.33%; G172 (the end state, none) 6.1033 and 45.99%; nine sections move a few thousand of the constitution's 397,824
+entries by a grain or so (the line's saves read about 207 moved a section).
+  (a) the single-face code at sweep 8 stands within 0.15 of G169's 6.1184 (a destination nine steps away is no different from the end
+      state's, so what bit is the motion during the loop);
+  (b) the confidently wrong share at sweep 8 stands within 0.04 of G169's 0.4833.
+  Rule: (a) held: a constitution that moves while the release runs bites its runaway where a frozen one, mean or end state, does not;
+  no store is at rest, and a release read on a frozen constitution reads a store the machine never holds. (a) missed: the nine steps'
+  destination bites, and their direction is read by part.
+
+G173 scored 2026-11-13T23:29Z (receipt g173_before.txt; read-breakdown CONTROL 2, host, 8 threads, 637.1 s):
+  (a) the single-face code at sweep 8 is 5.5217, 0.60 under G169's 6.1184: missed;
+  (b) the confidently wrong at sweep 8 are 34.27%, 0.14 under G169's: missed.
+  Of 2 parts 0 held. Nine of the learner's own sections taken before the first read bite as much as nine taken between sweeps: the bite is
+  the steps' destination, not a constitution moving under the release. That destination is a warmer field: the first read's faces are
+  softer (expected code 3.1988 against the mean's 3.0609, the end state's 3.0758) and code the truth a little worse (3.0667 against
+  3.0513), and from them the loop runs off to a lower level (5.52 on single faces, 3.80 averaged, 34% confidently wrong). Every arm
+  stays above its first read. The rule's second branch: the steps' direction is read by part; it is owed, since what it would read is
+  how the field is warmed, and a warmer field only lowers the runaway's level.

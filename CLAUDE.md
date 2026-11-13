@@ -414,7 +414,7 @@ Athena text milestone claimed before a test of use was retracted or retired.
   by its measurement ("the predictor codes above flat on unseen families"), not as a missing part.
 
 [project-postulate] **Method, each rule with its reason.** These were given in conversation between
-October 29 and November 13; the last four are from his corrections of November 12 and 13, and the
+October 29 and November 13; the last five are from his corrections of November 12 and 13, and the
 three before them were derived from a failure, from readings of November 11 and from Brandon's lens of
 that day. They are written here with their reasons so that no agent holds them as slogans.
 - **Theory picks, and a run tests a stated prediction** (November 4). Derive which law the theory
@@ -590,6 +590,20 @@ that day. They are written here with their reasons so that no agent holds them a
   telling. The direction is his; the wording is `agent-inferred`. Scope: every design, guess,
   test, record, brief and message. A reading still names its specimen and its region
   ([the record](research/records/2026-11-13_A_LEVELS_SITES_ARE_THE_LANDMARKS_OF_ITS_NEWS_A_PLACE_NO_LARGER_NEWS_STANDS_WITHIN_A_SECTION_OF_THE_CLAIM_THE_CARRIED_CUT_AND_THE_ODOMETER_ARE_ONE_LAW_ANCHORED_NEARER_AND_FARTHER_AND_ONE_PROGRAM_READS_EVERY_SYMBOL_STREAM.md)).
+- **A temperature is a store's state, never a reading's dial** (Brandon, November 13 22:33Z). No release,
+  reading, guess or design sets a temperature, a pump or a sharpness by hand. A temperature named in a design
+  is the state of a named store with its balance: the lock temperatures the constitution deposits, a
+  deposit's rate (whose standing spread is a temperature), or a heat the release's own flux charges and
+  leaks. The deterministic limit is not a mode of the machine: it is a store at rest, which no store is.
+  Reason: G169 drew the release "at temperature one and zero" as an argument of the reading, and he named
+  the knob a red flag the same day. The repository already carried the lock's temperature as deposited
+  material in its logarithm (November 1, §15.10 and §16.13), the pump as the inverse temperature (atlas
+  `parametron.pump-inverse-temperature`) and a deposit's rate as a temperature
+  (`deposition.rate-temperature-standing-spread`), and a heat set from outside answers the runaway for
+  the field instead of letting its own surprise answer it. The wording is `agent-inferred`. Scope: every
+  release, reading, guess and design; a reading of the field's own face is its face at the temperature the
+  field holds, and a limit read beside it is named a ruler
+  ([the record](research/records/2026-11-13_THE_FIELD_RINGS_UNDER_ITS_OWN_RELEASE_A_PLACE_HEARING_ITSELF_FLIPS_EACH_PASS_THE_RUNAWAY_LEAVES_EVIDENCE_AT_THE_KNOWN_PLACES_AND_RECURSION_HELPS_ONLY_WHERE_THE_DEPOSIT_RUNS_THROUGH_IT.md) §5).
 
 [project-postulate] **GPU first, and the design fixes the workload** (Brandon, October 27;
 [the record](research/records/2026-10-27_THE_LEARNER_RUNS_ON_THE_CARD_AND_ITS_WORKLOAD_IS_NEVER_TRADED_FOR_TIME.md)). The RTX 4080 SUPER is a consumer card, and
