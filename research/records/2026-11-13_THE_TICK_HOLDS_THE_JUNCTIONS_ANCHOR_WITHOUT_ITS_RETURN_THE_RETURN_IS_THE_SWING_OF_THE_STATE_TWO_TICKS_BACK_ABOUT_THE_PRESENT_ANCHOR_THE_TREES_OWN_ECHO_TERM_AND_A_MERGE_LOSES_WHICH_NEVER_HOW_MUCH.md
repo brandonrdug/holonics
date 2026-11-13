@@ -885,6 +885,33 @@ the sum standing over twice its random-sign level in at least two. A covector at
 level in every head would say the comparison read at one depth has no use for a reaction, which
 would be news about the comparison more than about the part.
 
+*Read after* (G158 to G162, November 13 20:10 to 20:57Z, the PC thread; receipts [g158](2026-11-13_THE_TICK_HOLDS_THE_JUNCTIONS_ANCHOR_WITHOUT_ITS_RETURN_THE_RETURN_IS_THE_SWING_OF_THE_STATE_TWO_TICKS_BACK_ABOUT_THE_PRESENT_ANCHOR_THE_TREES_OWN_ECHO_TERM_AND_A_MERGE_LOSES_WHICH_NEVER_HOW_MUCH_receipts/g158_reaction.txt),
+[g159](2026-11-13_THE_TICK_HOLDS_THE_JUNCTIONS_ANCHOR_WITHOUT_ITS_RETURN_THE_RETURN_IS_THE_SWING_OF_THE_STATE_TWO_TICKS_BACK_ABOUT_THE_PRESENT_ANCHOR_THE_TREES_OWN_ECHO_TERM_AND_A_MERGE_LOSES_WHICH_NEVER_HOW_MUCH_receipts/g159_forms.txt), [g160](2026-11-13_THE_TICK_HOLDS_THE_JUNCTIONS_ANCHOR_WITHOUT_ITS_RETURN_THE_RETURN_IS_THE_SWING_OF_THE_STATE_TWO_TICKS_BACK_ABOUT_THE_PRESENT_ANCHOR_THE_TREES_OWN_ECHO_TERM_AND_A_MERGE_LOSES_WHICH_NEVER_HOW_MUCH_receipts/g160_mirror.txt), [g161](2026-11-13_THE_TICK_HOLDS_THE_JUNCTIONS_ANCHOR_WITHOUT_ITS_RETURN_THE_RETURN_IS_THE_SWING_OF_THE_STATE_TWO_TICKS_BACK_ABOUT_THE_PRESENT_ANCHOR_THE_TREES_OWN_ECHO_TERM_AND_A_MERGE_LOSES_WHICH_NEVER_HOW_MUCH_receipts/g161_strength.txt), [g162](2026-11-13_THE_TICK_HOLDS_THE_JUNCTIONS_ANCHOR_WITHOUT_ITS_RETURN_THE_RETURN_IS_THE_SWING_OF_THE_STATE_TWO_TICKS_BACK_ABOUT_THE_PRESENT_ANCHOR_THE_TREES_OWN_ECHO_TERM_AND_A_MERGE_LOSES_WHICH_NEVER_HOW_MUCH_receipts/g162_ring.txt)). The route above,
+read on the line's third-lap mean, is the first new direction since G151 whose founding covector stands well over its random-sign floor on
+the line's own text (heads 0 and 3 at 4.7 and 5.4 times under the cut's mask), and within each slice its sign is the slice's: agreement in
+wikidata and books, a turn in web. Its pair decomposition reproduces the route on 0.98 to 1.00 of written sources. Read as the read's
+mirror (`μ_j = (1/n_j) Σ_i W_ijᵀ r̂_i`, the readers' rays through `O_hᵀ`, the frames, shares and skins and `V_hᵀ`, a pure strength `s`), its
+first order is large: `d(code)/ds = +0.117` and `+0.125` nats a place in heads 0 and 2 on seen text. At finite strength it is curvature's: under
+the cut's mask every uniform strength from −0.2 to +0.1 raises the code, the curvature some 2 to 3 nats a place a unit squared (over 20 in head
+3), and only places opened alone gain, 0.008 nats a place near `s = −0.05` in head 0. Run past the trained depth with the mirror in every head,
+the free iteration does not ring: a turn (`s = +0.5`) slows its settling, the successive-change cosine over stages 8 to 16 at 0.947 against the
+built tick's 0.988 and positive at every stage, and agreement (`s = −0.1`) settles it faster (0.994). So this build's reaction, at the
+strengths read, is damped by the tick's own relaxation, and the loop the lens of §1 asserts needs a drive the ticks do not have (§8 item 3).
+The mirror's build waits.
+
+*The release returned at a lag* (G163 and G164, November 13 21:00 to 21:07Z; receipts [g163](2026-11-13_THE_TICK_HOLDS_THE_JUNCTIONS_ANCHOR_WITHOUT_ITS_RETURN_THE_RETURN_IS_THE_SWING_OF_THE_STATE_TWO_TICKS_BACK_ABOUT_THE_PRESENT_ANCHOR_THE_TREES_OWN_ECHO_TERM_AND_A_MERGE_LOSES_WHICH_NEVER_HOW_MUCH_receipts/g163_release.txt),
+[g164](2026-11-13_THE_TICK_HOLDS_THE_JUNCTIONS_ANCHOR_WITHOUT_ITS_RETURN_THE_RETURN_IS_THE_SWING_OF_THE_STATE_TWO_TICKS_BACK_ABOUT_THE_PRESENT_ANCHOR_THE_TREES_OWN_ECHO_TERM_AND_A_MERGE_LOSES_WHICH_NEVER_HOW_MUCH_receipts/g164_release.txt), `read-release`). The drive of §8 item 3 read on the same state: a region read eight times, each pass after the
+first opening every open place on its face from the pass before. Alone, a place hearing its own release rings: it flips between two faces
+each pass, the successive changes pairing at −0.77 at pass 3 and −0.99 by pass 8 in every slice, the code alternating 1.19, 1.88, 1.65,
+2.00, … 2.15 nats a place. That is the period-doubled response, the parametron's subharmonic at half its pump's rate (its two phases a bit,
+the half-turn sheets of the elementary objects), and the synchronous two-cycle `tower.field-echo` names. Mutual (the open places of the cut's
+masks made sources at their releases), the loop runs toward overconfidence: the code rises from 3.01 to 6.41 while the expected code falls
+from 3.04 to 1.77. Damped (each pass carrying the mean of the face before and the face it gave), the two-cycle settles by pass 5, onto a
+fixed point the field reads 0.61 nats a place worse than its first read. So this build rings under its own release and cannot yet use it:
+the readout was never trained through a carried opening since November 3, when §16.27 of the record of November 1 retired the carried
+release for committing only certainty. The next design is the release as a part the field deposits through, founded where its first pass
+is the built one and bounded by §16.27's failures.
+
 ### 13.9 A turned head's reach belongs on its own clock: its falloff is the envelope of the bank its skins are members of
 
 Asked by the engineering thread at 19:45Z, with G150 held for the answer; answered near 19:56Z.

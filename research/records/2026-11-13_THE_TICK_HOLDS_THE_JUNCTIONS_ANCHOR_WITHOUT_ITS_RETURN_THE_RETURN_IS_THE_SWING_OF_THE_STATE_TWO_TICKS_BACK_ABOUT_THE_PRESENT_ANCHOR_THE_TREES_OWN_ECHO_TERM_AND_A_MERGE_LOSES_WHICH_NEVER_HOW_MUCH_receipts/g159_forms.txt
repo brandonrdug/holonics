@@ -1,0 +1,36 @@
+# G159, read-reaction-forms on level3/MEAN.3000, seen (prefix, first READ) and held (second READ), 2026-11-13T20:28-20:29Z; host, RAYON 8 threads
+forms_g159h.log:FORMS_LAW role=held places=4000 ticks=4 heads=4 ms=38
+forms_g159h.log:FORMS_SLICE slice=code stretches=24 places=4296 host_ms=9227 ms=9278
+forms_g159h.log:FORMS_SLICE slice=web stretches=25 places=4394 host_ms=12590 ms=21881
+forms_g159h.log:FORMS_SLICE slice=science stretches=24 places=4296 host_ms=9944 ms=31827
+forms_g159h.log:FORMS_SLICE slice=books stretches=24 places=4296 host_ms=11464 ms=43293
+forms_g159h.log:FORMS_SLICE slice=wikidata stretches=25 places=4416 host_ms=14314 ms=57621
+forms_g159h.log:FORMS_DONE ms=57621
+forms_g159h.log:MEASURE lap=forms_g159h rc=0 wall_s=58.0 peak_rss_kib=736240
+forms_g159p.log:FORMS_LAW role=prefix places=4000 ticks=4 heads=4 ms=43
+forms_g159p.log:FORMS_SLICE slice=code stretches=25 places=4276 host_ms=11384 ms=11450
+forms_g159p.log:FORMS_SLICE slice=web stretches=24 places=4175 host_ms=9665 ms=21159
+forms_g159p.log:FORMS_SLICE slice=science stretches=24 places=4296 host_ms=9850 ms=31036
+forms_g159p.log:FORMS_SLICE slice=books stretches=24 places=4296 host_ms=9461 ms=40521
+forms_g159p.log:FORMS_SLICE slice=wikidata stretches=25 places=4455 host_ms=13640 ms=54197
+forms_g159p.log:FORMS_DONE ms=54197
+forms_g159p.log:MEASURE lap=forms_g159p rc=0 wall_s=54.6 peak_rss_kib=684472
+
+READ .local/run/forms_g159p
+  FORMS mask=0 head=0 sources=63900 agree=1.000 | source_chart median=0.0623 q75=0.1048 | reader_chart median=0.1346 q75=0.1994 | raw rises | metric rises coherence=0.0591 ratio=4.09
+  FORMS mask=0 head=1 sources=63900 agree=0.999 | source_chart median=0.0479 q75=0.0892 | reader_chart median=0.0658 q75=0.1009 | raw falls | metric falls coherence=0.0423 ratio=3.04
+  FORMS mask=0 head=2 sources=63900 agree=0.999 | source_chart median=0.0508 q75=0.0760 | reader_chart median=0.0363 q75=0.0556 | raw rises | metric rises coherence=0.0389 ratio=2.44
+  FORMS mask=0 head=3 sources=63900 agree=0.999 | source_chart median=0.0639 q75=0.0872 | reader_chart median=0.0642 q75=0.1246 | raw rises | metric falls coherence=0.0044 ratio=0.29
+  FORMS mask=1 head=0 sources=85504 agree=0.993 | source_chart median=0.0470 q75=0.1013 | reader_chart median=0.0770 q75=0.1465 | raw rises | metric rises coherence=0.0255 ratio=1.54
+  FORMS mask=1 head=1 sources=85504 agree=0.987 | source_chart median=0.0295 q75=0.0627 | reader_chart median=0.0440 q75=0.0832 | raw falls | metric falls coherence=0.0898 ratio=4.92
+  FORMS mask=1 head=2 sources=85504 agree=0.990 | source_chart median=0.0355 q75=0.0628 | reader_chart median=0.0281 q75=0.0543 | raw rises | metric falls coherence=0.0308 ratio=1.60
+  FORMS mask=1 head=3 sources=85504 agree=0.992 | source_chart median=0.0198 q75=0.0381 | reader_chart median=0.0201 q75=0.0410 | raw rises | metric falls coherence=0.0086 ratio=0.53
+READ .local/run/forms_g159h
+  FORMS mask=0 head=0 sources=64256 agree=0.999 | source_chart median=0.0383 q75=0.0723 | reader_chart median=0.0583 q75=0.0814 | raw falls | metric rises coherence=0.0609 ratio=4.38
+  FORMS mask=0 head=1 sources=64256 agree=0.998 | source_chart median=0.0689 q75=0.1004 | reader_chart median=0.0989 q75=0.1923 | raw falls | metric falls coherence=0.0179 ratio=1.27
+  FORMS mask=0 head=2 sources=64256 agree=0.999 | source_chart median=0.0364 q75=0.0645 | reader_chart median=0.0274 q75=0.0517 | raw falls | metric falls coherence=0.0836 ratio=5.60
+  FORMS mask=0 head=3 sources=64256 agree=0.999 | source_chart median=0.0309 q75=0.0570 | reader_chart median=0.0645 q75=0.1007 | raw rises | metric rises coherence=0.0698 ratio=4.96
+  FORMS mask=1 head=0 sources=86304 agree=0.987 | source_chart median=0.0412 q75=0.0714 | reader_chart median=0.0591 q75=0.0894 | raw falls | metric falls coherence=0.0072 ratio=0.45
+  FORMS mask=1 head=1 sources=86304 agree=0.977 | source_chart median=0.0269 q75=0.0458 | reader_chart median=0.0342 q75=0.0569 | raw falls | metric rises coherence=0.0011 ratio=0.06
+  FORMS mask=1 head=2 sources=86304 agree=0.983 | source_chart median=0.0450 q75=0.0709 | reader_chart median=0.0433 q75=0.0753 | raw falls | metric rises coherence=0.0315 ratio=1.54
+  FORMS mask=1 head=3 sources=86304 agree=0.984 | source_chart median=0.0226 q75=0.0408 | reader_chart median=0.0197 q75=0.0353 | raw rises | metric falls coherence=0.0197 ratio=1.18
