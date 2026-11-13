@@ -652,6 +652,172 @@ const SURPRISE_OCTAVES: usize = 40;
 /// may reach one octave more).
 const READ_OCTAVES: usize = 10;
 
+/// [measurement; theory, November 13, P55 part B; the design record of November 13, §4.4] `read-cavity UNITS UNITS_SHA STORE STORE_SHA KEYS KEYS_SHA
+/// CODEC CODEC_SHA PLACES STATE STATE_SHA OUT`: **a held place's news at its cavity opening**, a reading. Each slice of the held role, alone and in the
+/// store's order, is cut afresh from stretch 1 with the key file's seed (as `read-store` cuts it), whole stretches until at least `PLACES` places.
+/// For each place `t` of a stretch: the stretch as a region with every place written but `t`; `c0`, the face at the built opening with no tick
+/// ([`holonics::hnn::tower::field::Field::opening_face`], on the host) at `t`'s written class; `cK`, the face after the declared ticks by the
+/// realization's read (`read_faces`, the regions batched under the pass's two bounds) at the same class. On the code slice each stretch is also
+/// read with the leading spaces of each line that begins inside it doubled (the copy cut at the stretch's bound of 1,022 places), `c0` at every
+/// place of the copy. Codes are on `2^(−20)` bits. One line a place to `OUT/cavity.tsv` (numbers only); a line a slice with the devices' times.
+pub(super) fn read_cavity(args: &[String], realization: &mut dyn FieldRealization) -> Result<()> {
+    if args.len() != 13 {
+        return Err("read-cavity UNITS UNITS_SHA STORE STORE_SHA KEYS KEYS_SHA CODEC CODEC_SHA PLACES STATE STATE_SHA OUT".into());
+    }
+    let started = std::time::Instant::now();
+    refuse_variables("read-cavity")?;
+    let units = units_of(&args[1], &args[2])?;
+    if !units.merges().is_empty() {
+        return Err("the store's cut is on bytes: a units file of merges is refused".into());
+    }
+    let store = Path::new(&args[3]);
+    let counts = store_counts(std::str::from_utf8(&pinned_read(&store.join("STORE.tsv").to_string_lossy(), &args[4], READ_BUDGET as usize)?)?)?;
+    let keys = pinned_read(&args[5], &args[6], READ_BUDGET as usize)?;
+    let seed = u64::from_be_bytes(keys.get(keys.len().saturating_sub(8)..).filter(|w| w.len() == 8).ok_or("a key file of fewer than eight bytes")?.try_into()?);
+    let codec = FieldCodec::from_text(&String::from_utf8(pinned_read(&args[7], &args[8], READ_BUDGET as usize)?)?, units)?;
+    let places = positive(&args[9])?;
+    let learner = FieldLearner::from_text(std::str::from_utf8(&pinned_read(&args[10], &args[11], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
+    let law = learner.pass.clone().ok_or("a state with no pass line: read-cavity reads a state of the store's line")?;
+    if learner.field.declaration.alphabet != codec.alphabet() {
+        return Err("a state whose alphabet is not its codec's".into());
+    }
+    let out = Path::new(&args[12]);
+    if out.exists() {
+        return Err(format!("{} exists", out.display()).into());
+    }
+    std::fs::create_dir_all(out)?;
+    let mut tsv = std::io::BufWriter::new(std::fs::File::create(out.join("cavity.tsv"))?);
+    use std::io::Write as _;
+    writeln!(tsv, "row\tslice\tstretch\tt\tclass\tc0\tcK\tsource")?;
+    let role = "held";
+    let names = role_names(&counts, role);
+    println!("CAVITY_LAW role={role} places={places} least={} octaves={} pairs_bound={} sites_bound={} ticks={} alphabet={} ms={}", law.least, law.octaves, law.pairs, law.sites, learner.field.declaration.ticks, codec.alphabet(), started.elapsed().as_millis());
+    const COPY_BOUND: usize = 1022;
+    for &name in &names {
+        let slice = open_slice(store, role, name, &counts)?;
+        let pass = StorePass { role: role.to_string(), store: args[4].clone(), stretches: 0, least: law.least, octaves: law.octaves, pairs: law.pairs, sites: law.sites, slices: vec![PassSlice { name: name.to_string(), piece: 0, cursor: 0, taken: 0 }] };
+        let mut cut = Cut { seed, slices: vec![slice], pass };
+        let mut stretches: Vec<(Vec<usize>, Vec<u8>, bool)> = Vec::new();
+        let mut taken = 0usize;
+        while taken < places as usize {
+            let Some(drawn) = cut.next() else { break };
+            let at = cut.pass.slices[drawn.slice].clone();
+            let bytes = cut.slices[drawn.slice].bytes(at.piece as usize, at.cursor, drawn.q + drawn.a)?;
+            let ends = drawn.ends;
+            let stretch = cut.take(drawn, &codec)?;
+            taken += stretch.region.classes.len();
+            stretches.push((stretch.region.classes.clone(), bytes, ends));
+        }
+        // c0 on the host, a region a place; the first stretch's places checked against the whole opening.
+        let host_start = std::time::Instant::now();
+        let mut c0: Vec<Vec<i64>> = Vec::with_capacity(stretches.len());
+        for (k, (classes, _, _)) in stretches.iter().enumerate() {
+            let mut codes = Vec::with_capacity(classes.len());
+            for t in 0..classes.len() {
+                let mut mask = vec![false; classes.len()];
+                mask[t] = true;
+                let region = [TrainRegion::plain(classes.clone(), mask)];
+                let views = views_of(&region);
+                let face = learner.field.opening_face(&views[0], t).map_err(|e| e.to_string())?;
+                if k == 0 {
+                    let whole = learner.field.opening_face_whole(&views[0], t).map_err(|e| e.to_string())?;
+                    if whole.code(classes[t]) != face.code(classes[t]) {
+                        return Err(format!("the opening's face at a place differs from the whole opening's (stretch 1, place {t})").into());
+                    }
+                }
+                codes.push(face.code(classes[t]));
+            }
+            c0.push(codes);
+        }
+        let host_ms = host_start.elapsed().as_millis();
+        // cK on the realization, the regions batched under the pass's two bounds.
+        let card_start = std::time::Instant::now();
+        let mut ck: Vec<Vec<i64>> = stretches.iter().map(|(c, _, _)| vec![0i64; c.len()]).collect();
+        let jobs: Vec<(usize, usize)> = stretches.iter().enumerate().flat_map(|(k, (c, _, _))| (0..c.len()).map(move |t| (k, t))).collect();
+        let mut at = 0usize;
+        let mut batches = 0usize;
+        while at < jobs.len() {
+            let (mut in_pairs, mut in_sites, mut end) = (0u64, 0u64, at);
+            while end < jobs.len() {
+                let s = stretches[jobs[end].0].0.len() as u64;
+                if in_sites > 0 && (in_pairs + s * s > law.pairs || in_sites + s > law.sites) {
+                    break;
+                }
+                (in_pairs, in_sites, end) = (in_pairs + s * s, in_sites + s, end + 1);
+            }
+            let regions: Vec<TrainRegion> = jobs[at..end]
+                .iter()
+                .map(|&(k, t)| {
+                    let classes = &stretches[k].0;
+                    let mut mask = vec![false; classes.len()];
+                    mask[t] = true;
+                    TrainRegion::plain(classes.clone(), mask)
+                })
+                .collect();
+            let faces = realization.read_faces(&learner.field, &views_of(&regions)).map_err(|e| e.to_string())?;
+            for (&(k, t), f) in jobs[at..end].iter().zip(&faces) {
+                ck[k][t] = f[t].as_ref().ok_or("an open place without a face")?.code(stretches[k].0[t]);
+            }
+            batches += 1;
+            at = end;
+        }
+        let card_ms = card_start.elapsed().as_millis();
+        for (k, (classes, _, _)) in stretches.iter().enumerate() {
+            for t in 0..classes.len() {
+                writeln!(tsv, "P\t{name}\t{k}\t{t}\t{}\t{}\t{}\t-", classes[t], c0[k][t], ck[k][t])?;
+            }
+        }
+        // The code slice's copies: each line's leading spaces doubled, c0 on the host at every place of the copy.
+        let mut copy_places = 0usize;
+        let copy_start = std::time::Instant::now();
+        if name == "code" {
+            for (k, (_, bytes, ends)) in stretches.iter().enumerate() {
+                let (mut copy, mut source) = (Vec::with_capacity(2 * bytes.len()), Vec::with_capacity(2 * bytes.len()));
+                let mut leading = false;
+                for (t, &b) in bytes.iter().enumerate() {
+                    if b == b'\n' {
+                        leading = true;
+                    } else if b != b' ' {
+                        leading = false;
+                    }
+                    copy.push(b);
+                    source.push(t);
+                    if leading && b == b' ' {
+                        copy.push(b);
+                        source.push(t);
+                    }
+                }
+                let mut classes = codec.encode(&copy)?;
+                if *ends {
+                    let first_void = bytes.len();
+                    classes.resize(classes.len() + NEAR, codec.void());
+                    source.extend((0..NEAR).map(|v| first_void + v));
+                }
+                classes.truncate(COPY_BOUND);
+                source.truncate(COPY_BOUND);
+                for t in 0..classes.len() {
+                    let mut mask = vec![false; classes.len()];
+                    mask[t] = true;
+                    let region = [TrainRegion::plain(classes.clone(), mask)];
+                    let views = views_of(&region);
+                    let face = learner.field.opening_face(&views[0], t).map_err(|e| e.to_string())?;
+                    writeln!(tsv, "C\t{name}\t{k}\t{t}\t{}\t{}\t-\t{}", classes[t], face.code(classes[t]), source[t])?;
+                }
+                copy_places += classes.len();
+            }
+        }
+        println!(
+            "CAVITY_SLICE slice={name} stretches={} places={taken} host_c0_ms={host_ms} card_cK_ms={card_ms} card_batches={batches} copy_places={copy_places} host_copy_ms={} elapsed_ms={}",
+            stretches.len(),
+            copy_start.elapsed().as_millis(),
+            started.elapsed().as_millis()
+        );
+    }
+    tsv.flush()?;
+    println!("CAVITY_DONE ms={}", started.elapsed().as_millis());
+    Ok(())
+}
+
 /// [measurement; theory, November 12, P49 item 3] `read-store UNITS UNITS_SHA STORE STORE_SHA ROLE KEYS KEYS_SHA CODEC CODEC_SHA HELD HELD_SHA
 /// SECTIONS STATE STATE_SHA`: **the pass's cut over a role, read and never deposited**. `STATE` is a state or a mean of the line; the read takes
 /// the law of its pass line (the least context, the octaves, the section's two bounds) and none of its place, and writes nothing. Each slice

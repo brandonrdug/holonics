@@ -2291,6 +2291,45 @@ impl Field {
         self.open(region, &moment)
     }
 
+    /// [measurement; theory, November 13, P55 part B; the design record of November 13, §4.4] **A place's face at the region's opening**, before
+    /// any tick: the opening `x⁰_t` (its row, its neighbours' rows and its moment from the region's other places, as `open` forms it) read through
+    /// the readout at temperature one (`face_of`: the chart, the lift, the encoding). With `t` the region's one open, silent place this is its
+    /// cavity opening by the built law. A reading: no state changes.
+    pub fn opening_face(&self, region: &Region, t: usize) -> Result<TowerFace> {
+        self.admit_region(region)?;
+        let d = &self.declaration;
+        let (dw, m2) = (d.width, 2 * d.complex());
+        let sites = region.classes.len();
+        if t >= sites {
+            return Err(TowerError::Refused("an opening's place outside its region"));
+        }
+        let paces = self.paces(region)?;
+        let moment = self.moments_of(region, &paces)?;
+        let l = &self.layout;
+        let mut xt = vec![0i64; dw];
+        self.opening_term(region, l.enc, t, &mut xt);
+        if t > 0 {
+            self.opening_term(region, l.before, t - 1, &mut xt);
+        }
+        if t + 1 < sites {
+            self.opening_term(region, l.after, t + 1, &mut xt);
+        }
+        let reach_c = reach(&self.theta[l.moment_face..l.moment_face + dw * m2]);
+        let mut term = vec![0i64; dw];
+        affine(&self.theta[l.moment_face..l.moment_face + dw * m2], reach_c, m2, &moment[t * m2..(t + 1) * m2], Some(&self.theta[l.moment_face_bias..l.moment_face_bias + dw]), MATERIAL_BITS, MATERIAL_BITS, &mut term)?;
+        for (slot, &v) in xt.iter_mut().zip(&term) {
+            *slot = fit64(*slot as i128 + v as i128)?;
+        }
+        Ok(self.face_of(&xt, &self.reaches())?.face)
+    }
+
+    /// [measurement; theory, November 13, P55 part B] The same face from the whole opening (`open` over every place), the check of `opening_face`.
+    pub fn opening_face_whole(&self, region: &Region, t: usize) -> Result<TowerFace> {
+        let x = self.opening(region)?;
+        let dw = self.declaration.width;
+        Ok(self.face_of(&x[t * dw..(t + 1) * dw], &self.reaches())?.face)
+    }
+
     /// [measurement] Each paced head's rates `κ` over a region on `2^(−24)` (§16), a reading for the receipts.
     pub fn pace_rates(&self, region: &Region) -> Result<Vec<(usize, Vec<i64>)>> {
         self.admit_region(region)?;
