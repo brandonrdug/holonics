@@ -3449,3 +3449,56 @@ against 1,638 and 1,059 projected; read-cavity on P57's places at both lap means
   every place of an epoch from its whole, and a place whose neighbours are written reads it best).
   Rule applied: (c) 0.0103 at 0.010 or more under at the whole masks: the level stays, a second lap follows, and the invariance of the
   design record's §9 items 1 to 3 is read on the trained level's sites. (b) under 80 ms: no reading of the level's field against the card.
+
+G147 fixed 2026-11-13T17:23Z (the Opus PC thread), before its run: the level's second lap, by G145's rule. The level from its first lap's
+end (level_line STATE.3000) and the line from its own (control_line STATE.3000), 3,000 more sections each on the same sections, read at
+the second lap's means by read-cavity's last tick on P57's held places; the writes from each lap's end state (write-store, four documents
+a slice, prompts and runs of 256 places), shown whole in the thread and never committed. Read first: g145_level.txt (the lead at lap 1's
+means 0.0122 at one-place masks and 0.0103 at whole masks; the sections' training codes 0.9998 of the line's over the first 500 sections
+and 0.9977 over the last, still widening at about 0.0004 a 500 sections).
+  (a) At the second lap's means the level 0.018 nats a place under the line at one-place masks (0.010 to 0.030 under) and 0.016 under at
+      the whole masks' open places (0.008 to 0.030 under), every slice under.
+  (b) The sections' training codes 0.9960 of the line's over the lap's last 500 sections (0.9940 to 0.9975).
+  Rules. (a) at or over lap 1's lead at both masks (0.0122 and 0.0103): the level is the line from here, and the next item is the reading
+  of whether influence follows the news between two places or their distance (a place perturbed, another's code read, with and without the
+  level), with its guess. Under lap 1's lead at both: where the prolongation's covector stands (by slice, epoch length and harmonic) is
+  read before another lap.
+
+G148 fixed 2026-11-13T17:26Z (the Opus PC thread), before its read: whether one place's influence on another follows the news
+between them or their distance (an outside read of that day, its claim 1: influence through a learned medium decays with the news in
+between, not with the count of places). read-influence on the second lap's end states of the line and of the level, 4,000 pairs a slice:
+a place b open alone, a source a at a log-uniform distance with its class replaced by another place's, b's code read both ways at the last
+tick; influence_ruler.py. Read first: the fine field's falloff is by octave of place distance (its heads' rings at a place's reach), its
+paced clocks by a class's located rate, and only the level runs on the news; a place carries about 3 bits on held text, so news and
+distance correlate across octaves and only the partial readings tell them apart.
+  (a) On the line, inside each octave of distance the influence falls with the news between: a pooled rank correlation of −0.12 (−0.25
+      to −0.04); inside each octave of news it falls with the distance by −0.04 (−0.12 to +0.04).
+  (b) On the level the news's partial correlation more negative than the line's by 0.02 (0.00 to 0.06).
+  Rules. (a) the news's partial more negative than the distance's on the line: the trained field already propagates by the news, and the
+  fine heads' falloff is read on the news clock next only as a realization. Otherwise: the fine heads' falloff on the news clock (a
+  head's reach in sections of news, not in places) is the next law, with its guess.
+
+G147 scored 2026-11-13T18:15Z (receipt g147_lap2.txt, the design record's receipts; the level's and the line's second laps, 3,000 sections
+each on the same sections; read-cavity on both lap means, 295 s and 320 s; the writes read and shown in the thread, never committed):
+  (a) at the second lap's means the level 0.0194 nats a place under the line at one-place masks (code 0.0140, web 0.0207, science 0.0252,
+      books 0.0147, wikidata 0.0222), against 0.018 (0.010 to 0.030 under): held; 0.0137 under at the whole masks' open places (code 0.0161,
+      web 0.0110, science 0.0149, books 0.0098, wikidata 0.0174), against 0.016 (0.008 to 0.030 under): held; every slice under: held.
+  (b) the sections' training codes 0.9961 of the line's over the lap's last 500 sections, against 0.9960 (0.9940 to 0.9975): held.
+  Of 3 parts 3 held. The lead grew in the second lap at both masks, from 0.0122 and 0.0103.
+  Rule applied: (a) over lap 1's lead at both masks: the level is the line from here, and the influence reading (G148) is the next item.
+
+G148 scored 2026-11-13T18:15Z (receipt g148_influence.txt; read-influence on the second laps' end states, 20,000 pairs a state, 28 s and
+40 s on the card):
+  (a) on the line, inside each octave of distance the influence's rank correlation with the news between is +0.014 pooled, against −0.12
+      (−0.25 to −0.04): missed; inside each octave of news its correlation with the distance is −0.275, against −0.04 (−0.12 to +0.04):
+      missed. Over every pair the influence correlates with the distance at −0.60 and with the news at −0.58. By octave of distance a
+      replaced class moves its neighbour's code 2.65 bits at one place, 0.69 at two to three, 0.14 at four to seven, then 0.04 to 0.06
+      out to 255 places.
+  (b) on the level the news's partial correlation +0.010, against 0.02 more negative than the line's: missed. The level carries more
+      influence at every distance past one place (0.077 bits against 0.064 at eight to fifteen places, 0.049 against 0.044 at 32 to 63).
+  Of 3 parts none held. The premise that missed: that a trained field already propagates by the news between two places, since its
+  readouts and contacts are gated by content. It propagates by the count of places: at an equal count more news between changes nothing,
+  and at equal news a larger count weakens it. The fine heads' falloff is by octave of place distance, and the level's clock, which runs
+  on the news, sits above a field whose own transport privileges the place (agent-inferred: the reach of a head is the law that sets it).
+  Rule applied: (a) the news's partial not more negative than the distance's: the fine heads' falloff on the news clock (a head's reach
+  in sections of news, not in places) is the next law, with its guess.

@@ -673,6 +673,16 @@ held places 0.0122 nats a place under the line at one-place masks and 0.0103 und
 costs 24.9 ms more, 1.08 of the line's. The level's own field holds 50,640 entries and its glue 49,600. The level stays: a second lap follows,
 with the invariance of §9 read on its trained sites.
 
+**The second lap, and what the field propagates by** (G147, G148; `g147_lap2.txt`, `g148_influence.txt`). In its second lap the level's
+lead grew: 0.0194 nats a place at one-place masks and 0.0137 at whole masks at lap means, every slice, so the level is the line. Its writes
+are not yet ordered text, the line's no more than the level's. Then a reading of whether one place's influence on another follows the news
+between them or their count: a class replaced at a source, the receiver's code read with it alone open, 20,000 pairs a state. It follows the
+count. At an equal count more news between changes nothing (a rank correlation of +0.01 inside each octave of distance), and at equal news a
+larger count weakens it (−0.27 inside each octave of news), on the line and on the level alike. The fine heads' falloff is by octave of place
+distance, so the field's own transport privileges the place while its level runs on the news: no clock is privileged, by the elementary
+objects, and the transport is where the place clock still stands. The next law puts a head's reach on the news clock (a reach in sections of
+news, not in places), with its guess fixed before its build.
+
 ## 5. What this corrects in the records of November 12
 
 - The record of the symbol's length §8.1 and §8.3 ("one clock"): the moments' strides stay

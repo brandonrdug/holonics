@@ -840,6 +840,138 @@ pub(super) fn found_level(args: &[String]) -> Result<()> {
     Ok(())
 }
 
+/// [measurement; theory, November 13, an outside read of that day (its claim 1); G148] `read-influence UNITS UNITS_SHA STORE STORE_SHA KEYS
+/// KEYS_SHA CODEC CODEC_SHA PAIRS STATE STATE_SHA OUT`: **whether one place's influence on another follows the news between them or their
+/// distance**, a reading. Each slice of the held role is cut as `read-cavity` cuts it, whole stretches until four times `PAIRS` places, every
+/// place written. `PAIRS` pairs a slice are drawn by the key file's seed: a receiving place `b` (uniform over the slice's places), a distance
+/// `d` log-uniform over the stretch, the source `a = b − d` (or `b + d` where that leaves the stretch), and a class drawn from another place of
+/// the slice, unequal to `a`'s. Each pair is read twice by the realization at the last tick with `b` alone open: as the stretch holds it, and
+/// with `a`'s class replaced. `OUT/influence.tsv` holds a line a pair (numbers only): the slice, `d`, the news strictly between `a` and `b`
+/// (the opening's codes, the level's news law at a written place, on `2^(−20)` bits), `b`'s code both ways. The output directory is private.
+pub(super) fn read_influence(args: &[String], realization: &mut dyn FieldRealization) -> Result<()> {
+    if args.len() != 13 {
+        return Err("read-influence UNITS UNITS_SHA STORE STORE_SHA KEYS KEYS_SHA CODEC CODEC_SHA PAIRS STATE STATE_SHA OUT".into());
+    }
+    let started = std::time::Instant::now();
+    refuse_variables("read-influence")?;
+    let units = units_of(&args[1], &args[2])?;
+    if !units.merges().is_empty() {
+        return Err("the store's cut is on bytes: a units file of merges is refused".into());
+    }
+    let store = Path::new(&args[3]);
+    let counts = store_counts(std::str::from_utf8(&pinned_read(&store.join("STORE.tsv").to_string_lossy(), &args[4], READ_BUDGET as usize)?)?)?;
+    let keys = pinned_read(&args[5], &args[6], READ_BUDGET as usize)?;
+    let seed = u64::from_be_bytes(keys.get(keys.len().saturating_sub(8)..).filter(|w| w.len() == 8).ok_or("a key file of fewer than eight bytes")?.try_into()?);
+    let codec = FieldCodec::from_text(&String::from_utf8(pinned_read(&args[7], &args[8], READ_BUDGET as usize)?)?, units)?;
+    let pairs = positive(&args[9])? as usize;
+    let learner = FieldLearner::from_text(std::str::from_utf8(&pinned_read(&args[10], &args[11], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
+    let law = learner.pass.clone().ok_or("a state with no pass line: read-influence reads a state of the store's line")?;
+    if learner.field.declaration.alphabet != codec.alphabet() || !learner.field.declaration.opening {
+        return Err("a state whose alphabet is not its codec's, or without the opening's block".into());
+    }
+    let out = Path::new(&args[12]);
+    if out.exists() {
+        return Err(format!("{} exists", out.display()).into());
+    }
+    std::fs::create_dir_all(out)?;
+    use std::io::Write as _;
+    let mut tsv = std::io::BufWriter::new(std::fs::File::create(out.join("influence.tsv"))?);
+    writeln!(tsv, "slice\td\tnews_between\tcode\tcode_moved")?;
+    println!("INFLUENCE_LAW role=held pairs={pairs} level={} ms={}", learner.field.scale.is_some(), started.elapsed().as_millis());
+    use rayon::prelude::*;
+    let mut state = seed ^ 0x9E37_79B9_7F4A_7C15;
+    let mut draw = move || {
+        state = state.wrapping_add(0x9E37_79B9_7F4A_7C15);
+        let mut z = state;
+        z = (z ^ (z >> 30)).wrapping_mul(0xBF58_476D_1CE4_E5B9);
+        z = (z ^ (z >> 27)).wrapping_mul(0x94D0_49BB_1331_11EB);
+        z ^ (z >> 31)
+    };
+    for &name in &role_names(&counts, "held") {
+        let slice = open_slice(store, "held", name, &counts)?;
+        let pass = StorePass { role: "held".to_string(), store: args[4].clone(), stretches: 0, least: law.least, octaves: law.octaves, pairs: law.pairs, sites: law.sites, slices: vec![PassSlice { name: name.to_string(), piece: 0, cursor: 0, taken: 0 }] };
+        let mut cut = Cut { seed, slices: vec![slice], pass };
+        let mut stretches: Vec<Vec<usize>> = Vec::new();
+        let mut taken = 0usize;
+        while taken < 4 * pairs {
+            let Some(drawn) = cut.next() else { break };
+            let stretch = cut.take(drawn, &codec)?;
+            taken += stretch.region.classes.len();
+            stretches.push(stretch.region.classes.clone());
+        }
+        let news: Vec<Vec<i64>> = stretches
+            .par_iter()
+            .map(|classes| {
+                let region = [TrainRegion::plain(classes.clone(), vec![false; classes.len()])];
+                let views = views_of(&region);
+                learner.field.opening_codes(&views[0]).map_err(|e| e.to_string())?.into_iter().map(|c| c.ok_or_else(|| "a place the opening does not compare".to_string())).collect::<std::result::Result<Vec<i64>, String>>()
+            })
+            .collect::<std::result::Result<_, String>>()?;
+        let places: Vec<(usize, usize)> = stretches.iter().enumerate().flat_map(|(k, c)| (0..c.len()).map(move |t| (k, t))).collect();
+        // (stretch, b, a, moved class)
+        let mut drawn_pairs: Vec<(usize, usize, usize, usize)> = Vec::with_capacity(pairs);
+        let mut tries = 0usize;
+        while drawn_pairs.len() < pairs && tries < 64 * pairs {
+            tries += 1;
+            let (k, b) = places[(draw() % places.len() as u64) as usize];
+            let n = stretches[k].len();
+            if n < 2 {
+                continue;
+            }
+            // A distance log-uniform over the stretch: an octave `o` with `2^o ≤ n − 1`, then a distance within it.
+            let octaves = (64 - ((n - 1) as u64).leading_zeros()) as u64;
+            let o = (draw() % octaves) as u32;
+            let (lo, hi) = (1usize << o, ((1usize << (o + 1)) - 1).min(n - 1));
+            let d = lo + (draw() % (hi - lo + 1) as u64) as usize;
+            let a = if b >= d { b - d } else if b + d < n { b + d } else { continue };
+            let (k2, t2) = places[(draw() % places.len() as u64) as usize];
+            let moved = stretches[k2][t2];
+            if moved == stretches[k][a] {
+                continue;
+            }
+            drawn_pairs.push((k, b, a, moved));
+        }
+        // Each pair's two regions, batched under the pass's bounds.
+        let mut regions: Vec<TrainRegion> = Vec::with_capacity(2 * drawn_pairs.len());
+        for &(k, b, a, moved) in &drawn_pairs {
+            let mut mask = vec![false; stretches[k].len()];
+            mask[b] = true;
+            regions.push(TrainRegion::plain(stretches[k].clone(), mask.clone()));
+            let mut c = stretches[k].clone();
+            c[a] = moved;
+            regions.push(TrainRegion::plain(c, mask));
+        }
+        let card_start = std::time::Instant::now();
+        let mut codes: Vec<i64> = Vec::with_capacity(regions.len());
+        let mut at = 0usize;
+        while at < regions.len() {
+            let (mut in_pairs, mut in_sites, mut end) = (0u64, 0u64, at);
+            while end < regions.len() {
+                let s = regions[end].classes.len() as u64;
+                if in_sites > 0 && (in_pairs + s * s > law.pairs || in_sites + s > law.sites) {
+                    break;
+                }
+                (in_pairs, in_sites, end) = (in_pairs + s * s, in_sites + s, end + 1);
+            }
+            let faces = realization.read_faces(&learner.field, &views_of(&regions[at..end])).map_err(|e| e.to_string())?;
+            for (j, f) in faces.iter().enumerate() {
+                let r = &regions[at + j];
+                let b = r.unresolved.iter().position(|&u| u).ok_or("a region without its open place")?;
+                codes.push(f[b].as_ref().ok_or("an open place without a face")?.code(r.classes[b]));
+            }
+            at = end;
+        }
+        for (i, &(k, b, a, _)) in drawn_pairs.iter().enumerate() {
+            let (lo, hi) = (a.min(b), a.max(b));
+            let between: i64 = news[k][lo + 1..hi].iter().sum();
+            writeln!(tsv, "{name}\t{}\t{between}\t{}\t{}", hi - lo, codes[2 * i], codes[2 * i + 1])?;
+        }
+        println!("INFLUENCE_SLICE slice={name} stretches={} pairs={} reads={} card_ms={} ms={}", stretches.len(), drawn_pairs.len(), regions.len(), card_start.elapsed().as_millis(), started.elapsed().as_millis());
+    }
+    println!("INFLUENCE_DONE {} ms={}", counters_text(realization), started.elapsed().as_millis());
+    Ok(())
+}
+
 /// [measurement; theory, November 13, the design record §4.9; G146, from the outside read of that day's points 1 and 3] `read-news UNITS
 /// UNITS_SHA STORE STORE_SHA KEYS KEYS_SHA CODEC CODEC_SHA PLACES STATE STATE_SHA`: **how far a place's news at its two-sided cavity falls
 /// short of a block's**, a reading on the host. Each slice of the held role is cut as `read-cavity` cuts it, whole stretches until `PLACES`

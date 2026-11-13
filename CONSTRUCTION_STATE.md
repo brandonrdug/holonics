@@ -502,7 +502,10 @@ repository was reset on September 24; the pre-reset tree is
     one-place masks and 0.0103 under at whole masks, at lap means, every slice under, at 1.08 of the
     line's section time. Before it trained, a reading of the two-sided cavity's shortfall (G146) found
     a pair carrying 1.22 times its single places' news and one dark place in twenty lighting up in a
-    pair, under the rule's bound.
+    pair, under the rule's bound. Its second lap widened the lead to 0.0194 and 0.0137 (G147), so the
+    level is the line. A place's influence on another, read by replacing its class, follows their
+    count of places and not the news between them (G148): the fine heads' falloff by place distance
+    is where the place clock still stands, and a head's reach on the news clock is the next law.
   - The open places need the written rows' ticks (November 13, P62, G140 scored; the design
     record §4.8). Read zero-shot on the line's latest lap mean with a written row held at its
     opening: the open rows alone code 3.29 nats a place worse at held one-place masks and 1.90

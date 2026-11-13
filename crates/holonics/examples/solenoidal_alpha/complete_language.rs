@@ -908,6 +908,7 @@ pub(super) fn run_field_realized(args: &[String], realization: &mut dyn holonics
         Some("found-opening") => store_train::found_opening(args),
         Some("found-level") => store_train::found_level(args),
         Some("read-news") => store_train::read_news(args),
+        Some("read-influence") => store_train::read_influence(args, realization),
         Some("read-ticks") => store_train::read_ticks(args, realization),
         Some("write-store") => store_train::write(args, realization),
         Some("grow-contacts-field") => field_train::grow_contacts_field(args, realization),
