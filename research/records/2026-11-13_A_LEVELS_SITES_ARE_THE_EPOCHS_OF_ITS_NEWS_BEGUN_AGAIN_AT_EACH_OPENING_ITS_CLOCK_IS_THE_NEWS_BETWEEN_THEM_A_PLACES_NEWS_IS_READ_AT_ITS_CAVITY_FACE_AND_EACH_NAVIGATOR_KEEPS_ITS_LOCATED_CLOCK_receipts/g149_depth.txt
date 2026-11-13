@@ -1,0 +1,40 @@
+G149 receipt: read-depth at 16 ticks (the field trained at 4) on the line's and the level's second-lap means (control2 and level2 MEAN.3000), 2,000 held places a slice, each open alone; depth_ruler.py. Numbers only. The RTX 4080 SUPER under .local/gpu.lock, each state its own hold.
+BUILD claude/depth-sweep c8cf983b3
+DEPTH_LAW role=held places=2000 ticks=16 declared_ticks=4 level=true ms=42
+DEPTH_SLICE slice=code stretches=11 places=2069 card_ms=10072 ms=10116
+DEPTH_SLICE slice=web stretches=13 places=2041 card_ms=8985 ms=19112
+DEPTH_SLICE slice=science stretches=11 places=2069 card_ms=9922 ms=29037
+DEPTH_SLICE slice=books stretches=11 places=2069 card_ms=9949 ms=38998
+DEPTH_SLICE slice=wikidata stretches=12 places=2184 card_ms=11031 ms=50030
+DEPTH_DONE reads=92 returns=0 pairs=8016515705 batches=254 peak_store=8414193672 ms=50030
+MEASURE lap=level rc=0 wall_s=50.5 peak_rss_kib=375636
+DEPTH_LAW role=held places=2000 ticks=16 declared_ticks=4 level=false ms=28
+DEPTH_SLICE slice=code stretches=11 places=2069 card_ms=9230 ms=9260
+DEPTH_SLICE slice=web stretches=13 places=2041 card_ms=8107 ms=17379
+DEPTH_SLICE slice=science stretches=11 places=2069 card_ms=9449 ms=26844
+DEPTH_SLICE slice=books stretches=11 places=2069 card_ms=9581 ms=36426
+DEPTH_SLICE slice=wikidata stretches=12 places=2184 card_ms=10350 ms=46788
+DEPTH_DONE reads=92 returns=0 pairs=8010505385 batches=205 peak_store=8439699492 ms=46788
+MEASURE lap=control rc=0 wall_s=47.4 peak_rss_kib=406848
+DEPTH out_control places=10432 stages=17
+  code_nats s0=8.1660 s1=3.2757 s2=1.8525 s3=1.2949 s4=1.1843 s5=1.2421 s6=1.3788 s7=1.5607 s8=1.7581 s9=1.9502 s10=2.1273 s11=2.2865 s12=2.4283 s13=2.5540 s14=2.6650 s15=2.7633 s16=2.8505
+  entropy_nats s0=0.8171 s1=1.0125 s2=1.0006 s3=1.0764 s4=1.2506 s5=1.4667 s6=1.6741 s7=1.8476 s8=1.9882 s9=2.1047 s10=2.2020 s11=2.2830 s12=2.3503 s13=2.4067 s14=2.4542 s15=2.4947 s16=2.5294
+  change_norm t1=373906.3 t2=271104.1 t3=219611.8 t4=138685.3 t5=87781.1 t6=59667.6 t7=43220.1 t8=33019.7 t9=26361.6 t10=21717.4 t11=18356.2 t12=15820.7 t13=13861.2 t14=12302.7 t15=11047.1 t16=10008.3
+  successive_cos t2=0.059 t3=0.454 t4=0.696 t5=0.881 t6=0.946 t7=0.969 t8=0.980 t9=0.986 t10=0.989 t11=0.992 t12=0.994 t13=0.995 t14=0.996 t15=0.996 t16=0.997
+  minimum stage=4 code=1.1843 entropy=1.2506 | last stage code over the minimum 1.6662, entropy over its own at the minimum 1.2788
+  slice code places=2069 code_by_stage 7.528 2.920 1.432 0.916 0.832 0.883 0.990 1.127 1.277 1.429 1.575 1.711 1.837 1.951 2.056 2.152 2.240
+  slice web places=2041 code_by_stage 8.018 3.533 2.029 1.420 1.300 1.368 1.492 1.631 1.771 1.902 2.023 2.132 2.231 2.321 2.402 2.475 2.542
+  slice science places=2069 code_by_stage 7.343 3.381 1.958 1.349 1.229 1.294 1.414 1.553 1.692 1.825 1.949 2.061 2.163 2.255 2.339 2.415 2.485
+  slice books places=2069 code_by_stage 7.963 3.292 1.895 1.299 1.192 1.249 1.350 1.461 1.570 1.673 1.769 1.858 1.939 2.015 2.084 2.149 2.209
+  slice wikidata places=2184 code_by_stage 9.881 3.257 1.946 1.482 1.360 1.409 1.636 2.008 2.442 2.870 3.257 3.596 3.888 4.137 4.347 4.523 4.672
+DEPTH out_level places=10432 stages=17
+  code_nats s0=8.1751 s1=3.2723 s2=1.8284 s3=1.2732 s4=1.1640 s5=1.2199 s6=1.3502 s7=1.5261 s8=1.7197 s9=1.9106 s10=2.0874 s11=2.2474 s12=2.3903 s13=2.5168 s14=2.6288 s15=2.7275 s16=2.8150
+  entropy_nats s0=0.8173 s1=1.0238 s2=0.9954 s3=1.0604 s4=1.2291 s5=1.4462 s6=1.6614 s7=1.8424 s8=1.9887 s9=2.1102 s10=2.2126 s11=2.2986 s12=2.3707 s13=2.4315 s14=2.4833 s15=2.5278 s16=2.5663
+  change_norm t1=371468.3 t2=277553.0 t3=218406.5 t4=139666.8 t5=88937.1 t6=60536.4 t7=43826.4 t8=33437.9 t9=26624.2 t10=21860.1 t11=18415.9 t12=15822.0 t13=13806.4 t14=12213.3 t15=10924.5 t16=9863.8
+  successive_cos t2=0.040 t3=0.426 t4=0.688 t5=0.878 t6=0.944 t7=0.969 t8=0.980 t9=0.986 t10=0.990 t11=0.992 t12=0.994 t13=0.995 t14=0.996 t15=0.996 t16=0.997
+  minimum stage=4 code=1.1640 entropy=1.2291 | last stage code over the minimum 1.6510, entropy over its own at the minimum 1.3371
+  slice code places=2069 code_by_stage 7.536 2.912 1.407 0.897 0.811 0.862 0.968 1.105 1.256 1.408 1.555 1.691 1.817 1.932 2.036 2.132 2.220
+  slice web places=2041 code_by_stage 8.028 3.529 1.997 1.392 1.273 1.340 1.464 1.604 1.744 1.877 1.999 2.109 2.209 2.298 2.380 2.453 2.519
+  slice science places=2069 code_by_stage 7.354 3.384 1.915 1.313 1.198 1.264 1.386 1.525 1.666 1.800 1.924 2.036 2.138 2.231 2.315 2.391 2.460
+  slice books places=2069 code_by_stage 7.970 3.280 1.898 1.290 1.180 1.236 1.337 1.447 1.557 1.661 1.757 1.846 1.928 2.003 2.072 2.136 2.195
+  slice wikidata places=2184 code_by_stage 9.890 3.261 1.922 1.464 1.349 1.389 1.585 1.928 2.341 2.759 3.143 3.484 3.780 4.033 4.248 4.427 4.579

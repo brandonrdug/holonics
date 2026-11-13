@@ -3520,3 +3520,21 @@ depth; every tick is the same constitution iterated, its moments added to every 
   written places' states held at their opening every tick (a boundary driven afresh), to read whether fresh input removes the cancellation.
   (c) positive past the minimum with the changes shrinking: the field settles and does not cancel, and its rise past the trained depth is
   read as the constitution's untrained ticks; the next item is then a field trained at eight ticks against four, with its guess.
+
+G149 scored 2026-11-13T18:30Z (receipt g149_depth.txt; read-depth at 16 ticks on both second-lap means, 10,432 places a state, 47 s and 50 s;
+Brandon, 18:21Z: self-induction is his postulate and no reading tests it; this reads how the trained field rings):
+  (a) the code's minimum at stage 4 (1.184 nats a place on the line, 1.164 on the level): held; at stage 8, 0.574 over it, against 0.15
+      (0.03 to 0.60): held at its edge; at stage 16, 1.666 over, against 0.6 (0.1 to 2.5): held.
+  (b) the face's expected code past the minimum: it rises, 1.251 at stage 4 to 2.529 at stage 16, against a fall of 0.15 (0.02 to 0.60):
+      missed. The faces flatten as the field rings on; the one confident and wrong face is the opening's (code 8.17 at entropy 0.82).
+  (c) the cosine of two successive changes: 0.06, 0.45 and 0.70 at ticks 2 to 4, against 0.2 (0.0 to 0.6): held at ticks 2 and 3 and over
+      at tick 4; past the minimum 0.88 at tick 5, 0.98 by tick 8 and 0.997 at tick 16, against −0.3 (−0.8 to −0.05): missed. Each tick's
+      change shrinks by 0.6 to 0.9 of the one before (374,000 words at tick 1, 33,000 at tick 8, 10,000 at tick 16).
+  (d) the level's minimum 0.020 under the line's and its rise past it 0.015 under the line's: held.
+  Of 6 parts 4 held and 2 missed. The premise that missed: that the field's iteration past its depth turns on itself. It relaxes: every
+  tick contracts, the changes align onto one slow direction, and that slow drift washes out what the places hold (code and entropy rising
+  together). The minimum at tick 4 is where the readout was trained to read (agent-inferred: the constitution's ticks are damped on the read
+  directions, a passive medium below the parametron's bifurcation, so without fresh input its ringing only dissipates).
+  Rule applied: (c) positive past the minimum with the changes shrinking: the field settles and does not cancel. The rule names a field
+  trained at eight ticks next; the result and the question of which part of the law would carry a mode past the bifurcation went to the
+  theory thread, and the order of the next item waits on its read.
