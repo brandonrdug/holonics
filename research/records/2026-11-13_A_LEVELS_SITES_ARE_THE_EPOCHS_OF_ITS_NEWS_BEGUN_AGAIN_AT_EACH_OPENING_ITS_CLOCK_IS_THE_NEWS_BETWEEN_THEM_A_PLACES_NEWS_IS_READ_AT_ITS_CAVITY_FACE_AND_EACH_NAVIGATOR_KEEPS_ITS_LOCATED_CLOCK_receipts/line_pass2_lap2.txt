@@ -1,0 +1,17 @@
+The line's second pass, second lap: 3,000 sections from lap 1's end state, read-cavity on its lap mean, read against the first lap's mean (MEAN.3000) by the P60 ruler (F3 this lap's mean, C3 the first lap's). Numbers only.
+BUILD claude/level-sites 19a4c7520 (the line's binary)
+STORE_PASS_AT stretches=5377646 code_piece=11443 code_cursor=2278 code_taken=48844303 web_piece=6526 web_cursor=0 web_taken=24431338 science_piece=3839 science_cursor=9711 science_taken=24408778 books_piece=353 books_cursor=22590 books_taken=14640701 wikidata_piece=1365 wikidata_cursor=6617 wikidata
+STORE_SAVE k=1000 sections=1000 states=1000 moved=207170 square=660076808758544 priced=999 transfer=-167714370923 external=-167691598128 curvature=-22772795 octave=1 rate=12 reads=0 returns=1000 pairs=45657080999 batches=2000 peak_store=8585930196 ms=333706
+STORE_SAVE k=2000 sections=1000 states=1000 moved=208123 square=538777671266578 priced=1000 transfer=-123128529817 external=-123075351829 curvature=-53177988 octave=1 rate=12 reads=0 returns=2000 pairs=91217194885 batches=4000 peak_store=8585972656 ms=671593
+STORE_SAVE k=3000 sections=1000 states=1000 moved=205832 square=516977212358823 priced=1000 transfer=-157829842568 external=-157837456343 curvature=7613775 octave=1 rate=12 reads=0 returns=3000 pairs=136739801925 batches=6000 peak_store=8585979236 ms=1009870
+MEASURE lap=lap2 rc=0 wall_s=1010.5 peak_rss_kib=274132
+CAVITY_DONE ms=379689
+MEASURE lap=P2 rc=0 wall_s=380.2 peak_rss_kib=439496
+OPENING F3 one_place pooled=2.0290 places=100508 | code=1.8533(20124) web=2.1909(20043) science=1.8371(20088) books=1.6606(20028) wikidata=2.5989(20225)
+OPENING F3 whole_open pooled=2.8020 places=3717 | code=2.7282(730) web=2.9175(758) science=2.6764(776) books=2.5200(776) wikidata=3.2193(677)
+LAST_TICK F3 one_place pooled=1.0542 places=100508 | code=0.7405(20124) web=1.1224(20043) science=1.0140(20088) books=1.0859(20028) wikidata=1.3070(20225)
+LAST_TICK C3 one_place pooled=1.0630 places=100508 | code=0.7454(20124) web=1.1288(20043) science=1.0236(20088) books=1.0910(20028) wikidata=1.3250(20225)
+LAST_TICK_DIFF one_place founded_minus_control pooled=-0.0088 | code=-0.0049 web=-0.0064 science=-0.0096 books=-0.0051 wikidata=-0.0180
+LAST_TICK F3 whole_open pooled=2.3980 places=3717 | code=2.2482(730) web=2.5843(758) science=2.3294(776) books=2.2193(776) wikidata=2.6344(677)
+LAST_TICK C3 whole_open pooled=2.4029 places=3717 | code=2.2580(730) web=2.5818(758) science=2.3206(776) books=2.2238(776) wikidata=2.6582(677)
+LAST_TICK_DIFF whole_open founded_minus_control pooled=-0.0049 | code=-0.0097 web=+0.0025 science=+0.0088 books=-0.0045 wikidata=-0.0238

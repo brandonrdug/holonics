@@ -919,6 +919,8 @@ pub(super) fn run_field_realized(args: &[String], realization: &mut dyn holonics
         Some("read-mirror-strength") => store_train::read_mirror_strength(args),
         Some("read-ring") => store_train::read_ring(args),
         Some("read-release") => store_train::read_release(args),
+        Some("read-redraw") => store_train::read_redraw(args),
+        Some("read-breakdown") => store_train::read_breakdown(args),
         Some("read-coherence") => store_train::read_coherence(args),
         Some("next-pass") => store_train::next_pass(args),
         Some("read-ticks") => store_train::read_ticks(args, realization),

@@ -538,11 +538,18 @@ repository was reset on September 24; the pre-reset tree is
     Run on undamped (Brandon's lens: let a runaway run until it is wrong), the mutual loop runs
     off and locks into a two-cycle with no snap (G166); the known places worsen in step with it,
     evidence inside the field (G167); a snap on that evidence limits the harm and buys nothing
-    (G168). So recursion helps only where the deposit runs through it: the next design is the
-    release as a part the field deposits through, founded at zero, its covector read first
-    ([the record](research/records/2026-11-13_THE_FIELD_RINGS_UNDER_ITS_OWN_RELEASE_A_PLACE_HEARING_ITSELF_FLIPS_EACH_PASS_THE_RUNAWAY_LEAVES_EVIDENCE_AT_THE_KNOWN_PLACES_AND_RECURSION_HELPS_ONLY_WHERE_THE_DEPOSIT_RUNS_THROUGH_IT.md)).
+    (G168). Drawn from its own face and heard as written text, the loop runs off as well: noise
+    never bites it (G169), the passage's evidence deposited through it at the line's rate adds
+    nothing beyond any section (G170, G171), and what lowers the runaway is a warmer field, at a
+    small cost to the first read (G172, G173). The field takes its own release for the passage's
+    news. So recursion helps only where the deposit runs through it: the next design is the
+    release carried as a face, a part the field deposits through, founded at zero, its covector
+    read first (the record's §5; Brandon's correction of the same day: a temperature is a store's
+    state, never a reading's dial; [the record](research/records/2026-11-13_THE_FIELD_RINGS_UNDER_ITS_OWN_RELEASE_A_PLACE_HEARING_ITSELF_FLIPS_EACH_PASS_THE_RUNAWAY_LEAVES_EVIDENCE_AT_THE_KNOWN_PLACES_AND_RECURSION_HELPS_ONLY_WHERE_THE_DEPOSIT_RUNS_THROUGH_IT.md)).
     The line's first pass over the 1 GB of training documents ended at lap 6 (1.0743 one-place,
-    2.4057 whole masks); the second pass's first lap read 1.0630 and 2.4029 (G165).
+    2.4057 whole masks); the second pass's laps read 1.0630, 1.0542, 1.0464, 1.0383 and 1.0320
+    one-place and 2.4029 to 2.3835 whole masks at their means, every slice falling at one-place
+    masks each lap (G165; receipts `line_pass2_lap1.txt` to `line_pass2_lap5.txt`).
     Corrected the same day (the return's record, §13): the tick adds its current to a site's
     state, so the site term first derived is the site's own rate and takes no echo out; a head's
     read changes the reader and not its source, which on the pair is free fall; and the
