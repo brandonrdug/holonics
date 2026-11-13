@@ -1,0 +1,35 @@
+# mean_ruler.py on g149_depth.txt (G149's receipt, the level record's _receipts/), run 2026-11-13 in the cloud: arithmetic on a public receipt, no build and no card. Numbers only.
+MEAN_RULER line=out_control ticks=16
+  tick=5 ratio=0.6330 mean_at_a1=0.6667 rate_on_ticks=0.4574 power_on_log=2.050 bend_per_efold=2.464
+  tick=6 ratio=0.6797 mean_at_a1=0.7143 rate_on_ticks=0.3861 power_on_log=2.117 bend_per_efold=1.981
+  tick=7 ratio=0.7243 mean_at_a1=0.7500 rate_on_ticks=0.3225 power_on_log=2.092 bend_per_efold=1.748
+  tick=8 ratio=0.7640 mean_at_a1=0.7778 rate_on_ticks=0.2692 power_on_log=2.016 bend_per_efold=1.603
+  tick=9 ratio=0.7984 mean_at_a1=0.8000 rate_on_ticks=0.2252 power_on_log=1.912 bend_per_efold=1.508
+  tick=10 ratio=0.8238 mean_at_a1=0.8182 rate_on_ticks=0.1938 power_on_log=1.839 bend_per_efold=1.485
+  tick=11 ratio=0.8452 mean_at_a1=0.8333 rate_on_ticks=0.1681 power_on_log=1.764 bend_per_efold=1.392
+  tick=12 ratio=0.8619 mean_at_a1=0.8462 rate_on_ticks=0.1486 power_on_log=1.708 bend_per_efold=1.315
+  tick=13 ratio=0.8761 mean_at_a1=0.8571 rate_on_ticks=0.1322 power_on_log=1.652 bend_per_efold=1.301
+  tick=14 ratio=0.8876 mean_at_a1=0.8667 rate_on_ticks=0.1193 power_on_log=1.609 bend_per_efold=1.253
+  tick=15 ratio=0.8979 mean_at_a1=0.8750 rate_on_ticks=0.1077 power_on_log=1.560 bend_per_efold=1.342
+  tick=16 ratio=0.9060 mean_at_a1=0.8824 rate_on_ticks=0.0988 power_on_log=1.530 bend_per_efold=1.240
+  rate_on_ticks first_over_last=4.63 power_on_log first_over_last=1.34
+  most_level a=1.15 largest_over_least=1.1356 opening_share tick4=0.223 tick16=0.067
+  at a=1 largest_over_least=1.1474
+  log_clock ln(17)/ln(5)=1.760 (the last tick against the fourth at a=1)
+MEAN_RULER line=out_level ticks=16
+  tick=5 ratio=0.6368 mean_at_a1=0.6667 rate_on_ticks=0.4513 power_on_log=2.023 bend_per_efold=2.496
+  tick=6 ratio=0.6807 mean_at_a1=0.7143 rate_on_ticks=0.3847 power_on_log=2.110 bend_per_efold=2.017
+  tick=7 ratio=0.7240 mean_at_a1=0.7500 rate_on_ticks=0.3230 power_on_log=2.095 bend_per_efold=1.748
+  tick=8 ratio=0.7630 mean_at_a1=0.7778 rate_on_ticks=0.2705 power_on_log=2.026 bend_per_efold=1.603
+  tick=9 ratio=0.7962 mean_at_a1=0.8000 rate_on_ticks=0.2279 power_on_log=1.935 bend_per_efold=1.508
+  tick=10 ratio=0.8211 mean_at_a1=0.8182 rate_on_ticks=0.1972 power_on_log=1.871 bend_per_efold=1.415
+  tick=11 ratio=0.8424 mean_at_a1=0.8333 rate_on_ticks=0.1714 power_on_log=1.799 bend_per_efold=1.392
+  tick=12 ratio=0.8591 mean_at_a1=0.8462 rate_on_ticks=0.1518 power_on_log=1.745 bend_per_efold=1.315
+  tick=13 ratio=0.8726 mean_at_a1=0.8571 rate_on_ticks=0.1363 power_on_log=1.702 bend_per_efold=1.301
+  tick=14 ratio=0.8846 mean_at_a1=0.8667 rate_on_ticks=0.1226 power_on_log=1.654 bend_per_efold=1.253
+  tick=15 ratio=0.8945 mean_at_a1=0.8750 rate_on_ticks=0.1115 power_on_log=1.616 bend_per_efold=1.342
+  tick=16 ratio=0.9029 mean_at_a1=0.8824 rate_on_ticks=0.1021 power_on_log=1.583 bend_per_efold=1.240
+  rate_on_ticks first_over_last=4.42 power_on_log first_over_last=1.28
+  most_level a=1.00 largest_over_least=1.1197 opening_share tick4=0.200 tick16=0.059
+  at a=1 largest_over_least=1.1197
+  log_clock ln(17)/ln(5)=1.760 (the last tick against the fourth at a=1)
