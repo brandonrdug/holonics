@@ -1,0 +1,84 @@
+# epoch_cut_ruler: paces of 244 symbols the codec holds, 99 of them the code line's bytes; columns rate_A_head2 rate_C_head2 rate_A_head3 rate_C_head3
+PACES rate_A_head2 code_line: mean=2.718 spread=1.187 letters_mean=2.369 newline=4.362 space=2.744 | all bytes met later take their own
+PACES rate_C_head2 code_line: mean=2.755 spread=1.167 letters_mean=2.414 newline=4.396 space=2.856 | all bytes met later take their own
+PACES rate_A_head3 code_line: mean=3.093 spread=1.674 letters_mean=2.640 newline=14.247 space=2.021 | all bytes met later take their own
+PACES rate_C_head3 code_line: mean=3.152 spread=1.687 letters_mean=2.689 newline=14.456 space=2.196 | all bytes met later take their own
+# counts<=32 MB a slice, read: the held role's first 330000 places a slice; load_s=36
+SCREEN slice=code held_read=329339 mid_places=329228 mean c0=3.5437 c1=2.7436 c2=2.2104 mean_through=0.5332 transmission=0.1944  s=39
+  KIND code c2 | transmission | into: newline=1.816|0.049|1.757 space=0.616|0.229|0.956 lower=2.257|0.217|1.334 upper=4.586|0.183|1.141 digit=3.905|0.016|1.620 punct=3.519|0.138|1.516 high=3.644|0.139|5.271
+  RANK rate_C_head2 over 90 bytes: with minus transmission=0.261 with minus mean through=0.270 with minus counts transmission=0.078 | with unigram=0.325 with class_mean=0.428
+  RANK rate_C_head3 over 90 bytes: with minus transmission=0.302 with minus mean through=0.313 with minus counts transmission=0.147 | with unigram=0.203 with class_mean=0.273
+  RANK transmission with unigram=-0.140 with class_mean=-0.257; held with counts transmission=0.685
+  OPAQUE least transmission: W=-0.114 2=-0.066 7=-0.061 4=-0.052 5=-0.041 x09=-0.016 8=-0.006 )=0.010 (=0.011 ;=0.017 9=0.019 \=0.022 6=0.022 1=0.035
+  OPAQUE most transmission:  i=0.289 D=0.301 p=0.302 H=0.303 V=0.306 f=0.309 ?=0.325 o=0.328 #=0.328 ==0.331 !=0.332 j=0.341 /=0.357 u=0.366
+  fixed 6                 mean_epoch=5.995 screen=0.9985 (through at openings 0.5325, others 0.5333) into=1.0049 code=0.9982 spread=0.4737 | opens: newline=0.033 space=0.224 punct=0.134 upper=0.056 lower=0.511 digit=0.022 high=0.007
+  stride rate_C_head2    period=13.601 mean_epoch=6.000 screen=0.8727 (through at openings 0.4754, others 0.5447) into=0.9925 code=1.0474 spread=0.5968 | opens: newline=0.064 space=0.281 punct=0.219 upper=0.085 lower=0.301 digit=0.027 high=0.003
+  stride rate_C_head3    period=16.877 mean_epoch=6.000 screen=0.7752 (through at openings 0.4294, others 0.5539) into=1.0724 code=1.0697 spread=0.6119 | opens: newline=0.171 space=0.174 punct=0.188 upper=0.064 lower=0.360 digit=0.025 high=0.003
+  unigram                period=21.285 mean_epoch=6.000 screen=0.9742 (through at openings 0.5217, others 0.5355) into=1.1206 code=1.2523 spread=0.3676 | opens: newline=0.034 space=0.100 punct=0.192 upper=0.089 lower=0.517 digit=0.033 high=0.017
+  class                  period=13.277 mean_epoch=6.000 screen=0.9580 (through at openings 0.5144, others 0.5370) into=1.0499 code=1.3895 spread=0.3399 | opens: newline=0.027 space=0.064 punct=0.213 upper=0.115 lower=0.522 digit=0.038 high=0.012
+  own                    period=13.274 mean_epoch=6.000 screen=0.8385 (through at openings 0.4595, others 0.5479) into=0.2980 code=2.0226 spread=0.1720 | opens: newline=0.027 space=0.063 punct=0.213 upper=0.114 lower=0.523 digit=0.038 high=0.011
+  friction               period=8.886 mean_epoch=6.000 screen=0.9033 (through at openings 0.4895, others 0.5419) into=1.0001 code=1.0012 spread=0.4979 | opens: newline=0.044 space=0.206 punct=0.156 upper=0.046 lower=0.499 digit=0.025 high=0.003
+SCREEN slice=web held_read=329441 mid_places=329347 mean c0=3.4545 c1=2.8291 c2=2.3501 mean_through=0.4788 transmission=0.1692  s=41
+  KIND code c2 | transmission | into: newline=2.512|0.078|1.696 space=1.034|0.115|0.779 lower=2.247|0.196|1.017 upper=4.395|0.176|1.784 digit=3.877|0.045|2.100 punct=4.118|0.182|1.468 high=3.846|-0.018|4.444
+  RANK rate_C_head2 over 86 bytes: with minus transmission=0.276 with minus mean through=0.132 with minus counts transmission=0.151 | with unigram=0.428 with class_mean=0.391
+  RANK rate_C_head3 over 86 bytes: with minus transmission=0.278 with minus mean through=0.258 with minus counts transmission=0.059 | with unigram=0.389 with class_mean=0.383
+  RANK transmission with unigram=-0.380 with class_mean=-0.454; held with counts transmission=0.487
+  OPAQUE least transmission: ?=-0.131 |=-0.127 7=-0.013 9=0.000 )=0.007 6=0.014 _=0.018 U=0.019 }=0.026 <=0.030 \=0.030 3=0.033 1=0.038 5=0.042
+  OPAQUE most transmission:  w=0.235 ==0.241 j=0.248 g=0.265 I=0.283 u=0.287 o=0.309 y=0.314 '=0.320 f=0.337 V=0.348 -=0.348 N=0.485 ;=0.718
+  fixed 6                 mean_epoch=5.995 screen=1.0116 (through at openings 0.4834, others 0.4779) into=0.9991 code=1.0029 spread=0.3525 | opens: newline=0.013 space=0.160 punct=0.067 upper=0.057 lower=0.671 digit=0.027 high=0.004
+  stride rate_C_head2    period=11.706 mean_epoch=6.000 screen=0.9651 (through at openings 0.4648, others 0.4816) into=1.0772 code=1.0795 spread=0.3958 | opens: newline=0.031 space=0.238 punct=0.128 upper=0.099 lower=0.461 digit=0.041 high=0.002
+  stride rate_C_head3    period=14.314 mean_epoch=6.000 screen=0.9263 (through at openings 0.4490, others 0.4848) into=1.1041 code=1.1002 spread=0.4000 | opens: newline=0.084 space=0.148 punct=0.099 upper=0.077 lower=0.553 digit=0.036 high=0.002
+  unigram                period=20.749 mean_epoch=6.000 screen=0.9876 (through at openings 0.4739, others 0.4798) into=1.1592 code=1.2102 spread=0.2948 | opens: newline=0.016 space=0.088 punct=0.109 upper=0.103 lower=0.629 digit=0.046 high=0.010
+  class                  period=14.114 mean_epoch=6.000 screen=0.9850 (through at openings 0.4728, others 0.4800) into=1.0981 code=1.2643 spread=0.2836 | opens: newline=0.014 space=0.073 punct=0.118 upper=0.107 lower=0.637 digit=0.045 high=0.006
+  own                    period=14.104 mean_epoch=6.000 screen=0.8325 (through at openings 0.4101, others 0.4925) into=0.3958 code=1.6833 spread=0.1540 | opens: newline=0.015 space=0.070 punct=0.118 upper=0.106 lower=0.641 digit=0.045 high=0.006
+  friction               period=10.013 mean_epoch=6.000 screen=0.9549 (through at openings 0.4607, others 0.4824) into=0.9785 code=0.9638 spread=0.3799 | opens: newline=0.017 space=0.196 punct=0.065 upper=0.051 lower=0.635 digit=0.033 high=0.004
+SCREEN slice=science held_read=329929 mid_places=329893 mean c0=3.5320 c1=2.7718 c2=2.3547 mean_through=0.4171 transmission=0.1505  s=44
+  KIND code c2 | transmission | into: newline=3.820|0.070|0.642 space=1.044|0.064|0.903 lower=2.232|0.193|1.025 upper=4.331|0.104|1.692 digit=3.025|0.092|2.253 punct=3.551|0.147|1.742 high=4.167|-0.042|3.471
+  RANK rate_C_head2 over 81 bytes: with minus transmission=0.387 with minus mean through=0.297 with minus counts transmission=0.131 | with unigram=0.419 with class_mean=0.364
+  RANK rate_C_head3 over 81 bytes: with minus transmission=0.351 with minus mean through=0.347 with minus counts transmission=0.147 | with unigram=0.310 with class_mean=0.207
+  RANK transmission with unigram=-0.369 with class_mean=-0.340; held with counts transmission=0.424
+  OPAQUE least transmission: ;=-0.341 {=-0.263 }=-0.044 &=-0.027 5=-0.019 $=-0.011 [=0.004 ]=0.009 \=0.016 W=0.022 F=0.022 J=0.023 -=0.025 H=0.028
+  OPAQUE most transmission:  t=0.213 X=0.235 c=0.239 :=0.245 u=0.258 g=0.273 .=0.278 o=0.284 x=0.313 Y=0.337 /=0.350 f=0.413 j=0.430 |=0.788
+  fixed 6                 mean_epoch=5.998 screen=1.0114 (through at openings 0.4210, others 0.4163) into=0.9941 code=1.0047 spread=0.3499 | opens: newline=0.009 space=0.139 punct=0.066 upper=0.062 lower=0.668 digit=0.046 high=0.010
+  stride rate_C_head2    period=11.591 mean_epoch=6.000 screen=0.9157 (through at openings 0.3873, others 0.4230) into=1.0878 code=1.0809 spread=0.4061 | opens: newline=0.022 space=0.202 punct=0.130 upper=0.107 lower=0.463 digit=0.070 high=0.006
+  stride rate_C_head3    period=13.993 mean_epoch=6.000 screen=0.9034 (through at openings 0.3829, others 0.4239) into=1.0704 code=1.0966 spread=0.3872 | opens: newline=0.057 space=0.131 punct=0.095 upper=0.083 lower=0.563 digit=0.065 high=0.005
+  unigram                period=21.200 mean_epoch=6.000 screen=0.9655 (through at openings 0.4050, others 0.4195) into=1.1713 code=1.1877 spread=0.3087 | opens: newline=0.012 space=0.077 punct=0.099 upper=0.105 lower=0.614 digit=0.071 high=0.022
+  class                  period=14.129 mean_epoch=6.000 screen=0.9632 (through at openings 0.4042, others 0.4196) into=1.0565 code=1.2505 spread=0.2968 | opens: newline=0.015 space=0.061 punct=0.101 upper=0.112 lower=0.633 digit=0.061 high=0.018
+  own                    period=14.116 mean_epoch=6.000 screen=0.8112 (through at openings 0.3493, others 0.4306) into=0.4081 code=1.6611 spread=0.1554 | opens: newline=0.015 space=0.061 punct=0.099 upper=0.112 lower=0.633 digit=0.062 high=0.017
+  friction               period=10.682 mean_epoch=6.000 screen=0.8989 (through at openings 0.3813, others 0.4242) into=0.9916 code=0.9490 spread=0.3782 | opens: newline=0.015 space=0.204 punct=0.059 upper=0.057 lower=0.596 digit=0.061 high=0.009
+SCREEN slice=books held_read=329951 mid_places=329942 mean c0=3.1645 c1=2.5119 c2=2.1083 mean_through=0.4036 transmission=0.1607  s=48
+  KIND code c2 | transmission | into: newline=10.043|-0.051|0.572 space=0.829|0.050|0.907 lower=2.198|0.201|1.011 upper=4.223|0.172|2.033 digit=3.882|0.051|2.601 punct=4.192|0.090|0.959 high=2.661|0.019|4.250
+  RANK rate_C_head2 over 68 bytes: with minus transmission=0.230 with minus mean through=0.147 with minus counts transmission=0.151 | with unigram=0.487 with class_mean=0.490
+  RANK rate_C_head3 over 68 bytes: with minus transmission=0.276 with minus mean through=0.248 with minus counts transmission=0.145 | with unigram=0.509 with class_mean=0.465
+  RANK transmission with unigram=-0.359 with class_mean=-0.349; held with counts transmission=0.791
+  OPAQUE least transmission: ;=-0.064 :=-0.041 J=-0.011 9=0.022 ^=0.025 W=0.025 3=0.031 5=0.038 q=0.038 *=0.047 4=0.047 1=0.049 x20=0.050 8=0.056
+  OPAQUE most transmission:  O=0.229 R=0.230 E=0.234 t=0.235 F=0.237 u=0.250 H=0.258 N=0.272 y=0.282 o=0.315 g=0.318 U=0.346 f=0.371 Y=0.427
+  fixed 6                 mean_epoch=6.000 screen=0.9900 (through at openings 0.4002, others 0.4043) into=1.0020 code=0.9974 spread=0.2963 | opens: newline=0.000 space=0.177 punct=0.033 upper=0.036 lower=0.742 digit=0.006 high=0.006
+  stride rate_C_head2    period=10.643 mean_epoch=6.000 screen=0.8866 (through at openings 0.3647, others 0.4114) into=1.0382 code=1.0113 spread=0.3607 | opens: newline=0.000 space=0.286 punct=0.064 upper=0.070 lower=0.566 digit=0.010 high=0.003
+  stride rate_C_head3    period=12.574 mean_epoch=6.000 screen=0.9309 (through at openings 0.3801, others 0.4083) into=1.0349 code=1.0738 spread=0.3020 | opens: newline=0.000 space=0.186 punct=0.059 upper=0.051 lower=0.692 digit=0.010 high=0.003
+  unigram                period=18.989 mean_epoch=6.000 screen=1.0244 (through at openings 0.4118, others 0.4019) into=1.1277 code=1.1938 spread=0.2692 | opens: newline=0.000 space=0.097 punct=0.055 upper=0.069 lower=0.753 digit=0.013 high=0.013
+  class                  period=12.651 mean_epoch=6.000 screen=1.0292 (through at openings 0.4133, others 0.4016) into=1.0352 code=1.2810 spread=0.2538 | opens: newline=0.000 space=0.069 punct=0.068 upper=0.070 lower=0.774 digit=0.012 high=0.008
+  own                    period=12.646 mean_epoch=6.000 screen=0.9802 (through at openings 0.3969, others 0.4049) into=0.4832 code=1.6234 spread=0.1437 | opens: newline=0.000 space=0.070 punct=0.067 upper=0.068 lower=0.775 digit=0.012 high=0.008
+  friction               period=11.325 mean_epoch=6.000 screen=0.8796 (through at openings 0.3622, others 0.4118) into=0.9938 code=0.9297 spread=0.3285 | opens: newline=0.000 space=0.265 punct=0.031 upper=0.033 lower=0.652 digit=0.009 high=0.009
+SCREEN slice=wikidata held_read=329645 mid_places=329585 mean c0=4.0115 c1=2.8566 c2=2.4812 mean_through=0.3754 transmission=0.1314  s=50
+  KIND code c2 | transmission | into: newline=2.911|0.035|0.937 space=1.473|0.097|0.895 lower=2.591|0.096|0.886 upper=3.735|0.180|2.142 digit=2.832|-0.015|2.238 punct=4.931|0.129|0.997 high=1.900|0.317|3.615
+  RANK rate_C_head2 over 69 bytes: with minus transmission=-0.076 with minus mean through=-0.089 with minus counts transmission=-0.234 | with unigram=0.561 with class_mean=0.265
+  RANK rate_C_head3 over 69 bytes: with minus transmission=-0.143 with minus mean through=-0.078 with minus counts transmission=-0.122 | with unigram=0.421 with class_mean=0.241
+  RANK transmission with unigram=0.202 with class_mean=-0.107; held with counts transmission=0.513
+  OPAQUE least transmission: V=-0.189 b=-0.178 u=-0.127 7=-0.113 3=-0.096 W=-0.091 y=-0.086 .=-0.085 5=-0.069 q=-0.055 8=-0.052 L=-0.042 k=-0.030 4=-0.021
+  OPAQUE most transmission:  j=0.226 O=0.233 E=0.234 I=0.238 N=0.248 '=0.261 A=0.284 :=0.312 F=0.351 f=0.357 R=0.400 D=0.452 ,=0.456 /=0.622
+  fixed 6                 mean_epoch=5.997 screen=0.9918 (through at openings 0.3729, others 0.3760) into=0.9965 code=1.0072 spread=0.3769 | opens: newline=0.020 space=0.094 punct=0.013 upper=0.062 lower=0.577 digit=0.053 high=0.181
+  stride rate_C_head2    period=10.315 mean_epoch=6.000 screen=0.8786 (through at openings 0.3367, others 0.3832) into=0.9410 code=1.0739 spread=0.4141 | opens: newline=0.052 space=0.157 punct=0.027 upper=0.120 lower=0.450 digit=0.089 high=0.106
+  stride rate_C_head3    period=13.297 mean_epoch=6.000 screen=0.7829 (through at openings 0.3049, others 0.3895) into=0.8645 code=1.0932 spread=0.4525 | opens: newline=0.120 space=0.095 punct=0.018 upper=0.088 lower=0.517 digit=0.076 high=0.087
+  unigram                period=24.083 mean_epoch=6.000 screen=1.1171 (through at openings 0.4114, others 0.3683) into=1.2261 code=1.0753 spread=0.4228 | opens: newline=0.019 space=0.055 punct=0.019 upper=0.091 lower=0.502 digit=0.066 high=0.248
+  class                  period=14.891 mean_epoch=6.000 screen=0.8735 (through at openings 0.3350, others 0.3835) into=0.8844 code=1.2058 spread=0.3088 | opens: newline=0.023 space=0.058 punct=0.027 upper=0.092 lower=0.603 digit=0.060 high=0.138
+  own                    period=14.884 mean_epoch=6.000 screen=0.6373 (through at openings 0.2546, others 0.3996) into=0.3468 code=1.6416 spread=0.1561 | opens: newline=0.025 space=0.056 punct=0.026 upper=0.092 lower=0.603 digit=0.060 high=0.138
+  friction               period=9.375 mean_epoch=6.000 screen=0.8089 (through at openings 0.3137, others 0.3878) into=0.8466 code=0.9635 spread=0.4040 | opens: newline=0.035 space=0.125 punct=0.008 upper=0.043 lower=0.608 digit=0.066 high=0.114
+SCREEN pooled over the five slices (each its own period)
+  fixed 6                 mean_epoch=5.997 screen=1.0010 (through at openings 0.4420, others 0.4415) into=0.9992 code=1.0023 spread=0.3793 | opens: newline=0.015 space=0.159 punct=0.063 upper=0.055 lower=0.634 digit=0.031 high=0.042
+  stride rate_C_head2     mean_epoch=6.000 screen=0.9041 (through at openings 0.4057, others 0.4487) into=1.0202 code=1.0598 spread=0.4446 | opens: newline=0.034 space=0.233 punct=0.113 upper=0.096 lower=0.448 digit=0.047 high=0.024
+  stride rate_C_head3     mean_epoch=6.000 screen=0.8610 (through at openings 0.3892, others 0.4520) into=1.0185 code=1.0872 spread=0.4470 | opens: newline=0.087 space=0.147 punct=0.092 upper=0.072 lower=0.537 digit=0.042 high=0.020
+  unigram                 mean_epoch=6.000 screen=1.0084 (through at openings 0.4447, others 0.4410) into=1.1641 code=1.1810 spread=0.3463 | opens: newline=0.016 space=0.083 punct=0.095 upper=0.091 lower=0.603 digit=0.046 high=0.062
+  class                   mean_epoch=6.000 screen=0.9630 (through at openings 0.4279, others 0.4443) into=1.0153 code=1.2754 spread=0.3044 | opens: newline=0.016 space=0.065 punct=0.105 upper=0.099 lower=0.634 digit=0.043 high=0.036
+  own                     mean_epoch=6.000 screen=0.8219 (through at openings 0.3740, others 0.4551) into=0.3793 code=1.7208 spread=0.1666 | opens: newline=0.016 space=0.064 punct=0.104 upper=0.098 lower=0.635 digit=0.044 high=0.036
+  friction                mean_epoch=6.000 screen=0.8928 (through at openings 0.4014, others 0.4496) into=0.9550 code=0.9615 spread=0.4062 | opens: newline=0.022 space=0.199 punct=0.064 upper=0.046 lower=0.598 digit=0.039 high=0.028

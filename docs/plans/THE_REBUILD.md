@@ -197,7 +197,17 @@ references and no write is yet ordered text.
    invariance (a held passage and its re-timed copy open the same epochs, atlas
    `code.news-clock-proper-time`; no loss under a stretch by a unit of a ring and the merged
    residues under a factor sharing its prime, `code.stretch-unit-orbit`), with its guess
-   fixed before its build, which comes ahead of any long pass; one
+   fixed before its build, which comes ahead of any long pass (written November 13,
+   [the design record](../../research/records/2026-11-13_A_LEVELS_SITES_ARE_THE_EPOCHS_OF_ITS_NEWS_BEGUN_AGAIN_AT_EACH_OPENING_ITS_CLOCK_IS_THE_NEWS_BETWEEN_THEM_A_PLACES_NEWS_IS_READ_AT_ITS_CAVITY_FACE_AND_EACH_NAVIGATOR_KEEPS_ITS_LOCATED_CLOCK.md):
+   each navigator keeps its located clock; a level's sites are the epochs of its places' news
+   under a carry that begins again at each opening, `code.epoch-restarting-carry`, which a
+   count ruler read keeping 0.996 of its sites under a doubled indentation and 0.9997 under a
+   changed start at a section of 8 bits, where October's carry on a running sum keeps 0.70 and
+   0.61; a place's news is read at its cavity face, `code.place-news-cavity-face`; **next, its
+   first reading** on the PC from a trained state, outside any timing hold: every held place's
+   code at its cavity opening by slice, its rank against the last tick's code, the cut on those
+   codes and the count of what a cavity face a site adds to a section, its guess fixed in its
+   order; then the build, after that reading and after the engine's fourth step is timed); one
    continuous pass over tier A (1 GB), ordered once the engine stands near its count and judged by
    what it writes from held prompts by slice; the face as a composition of
    lanes, each block reading its own, entering at `(32, 32)`; then a lane whose width is derived
