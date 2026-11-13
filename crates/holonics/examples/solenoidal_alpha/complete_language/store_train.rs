@@ -1376,6 +1376,576 @@ pub(super) fn read_reaction(args: &[String]) -> Result<()> {
     Ok(())
 }
 
+/// [measurement; theory, November 13, the theory thread's answers of 20:20Z; G159] `read-reaction-forms UNITS UNITS_SHA STORE STORE_SHA KEYS
+/// KEYS_SHA CODEC CODEC_SHA PLACES STATE STATE_SHA OUT ROLE`: **the reader's reaction's forms at its founding**
+/// ([`holonics::hnn::tower::field::Field::reaction_forms`]), each slice of `ROLE` cut as `read-reaction` cuts it, both masks. `OUT/forms.tsv`
+/// holds a line a slice, mask, tick and head (numbers only): the sources, the readers, the route's and the pair decomposition's sums, the
+/// sources agreeing in sign, and the metric-raised strength's sum, magnitude and squares; `OUT/charts.tsv` a line a slice, mask, tick, head,
+/// chart (0 the source's, 1 the reader's) and coordinate with its sum and magnitude. The output directory is private.
+pub(super) fn read_reaction_forms(args: &[String]) -> Result<()> {
+    if args.len() != 14 {
+        return Err("read-reaction-forms UNITS UNITS_SHA STORE STORE_SHA KEYS KEYS_SHA CODEC CODEC_SHA PLACES STATE STATE_SHA OUT ROLE".into());
+    }
+    let started = std::time::Instant::now();
+    refuse_variables("read-reaction-forms")?;
+    let role = args[13].as_str();
+    if role != "held" && role != "prefix" {
+        return Err("read-reaction-forms reads the held role or the training documents (prefix)".into());
+    }
+    let units = units_of(&args[1], &args[2])?;
+    if !units.merges().is_empty() {
+        return Err("the store's cut is on bytes: a units file of merges is refused".into());
+    }
+    let store = Path::new(&args[3]);
+    let counts = store_counts(std::str::from_utf8(&pinned_read(&store.join("STORE.tsv").to_string_lossy(), &args[4], READ_BUDGET as usize)?)?)?;
+    let keys = pinned_read(&args[5], &args[6], READ_BUDGET as usize)?;
+    let seed = u64::from_be_bytes(keys.get(keys.len().saturating_sub(8)..).filter(|w| w.len() == 8).ok_or("a key file of fewer than eight bytes")?.try_into()?);
+    let codec = FieldCodec::from_text(&String::from_utf8(pinned_read(&args[7], &args[8], READ_BUDGET as usize)?)?, units)?;
+    let places = positive(&args[9])? as usize;
+    let learner = FieldLearner::from_text(std::str::from_utf8(&pinned_read(&args[10], &args[11], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
+    let law = learner.pass.clone().ok_or("a state with no pass line: read-reaction-forms reads a state of the store's line")?;
+    if learner.field.declaration.alphabet != codec.alphabet() {
+        return Err("a state whose alphabet is not its codec's".into());
+    }
+    let out = Path::new(&args[12]);
+    if out.exists() {
+        return Err(format!("{} exists", out.display()).into());
+    }
+    std::fs::create_dir_all(out)?;
+    use rayon::prelude::*;
+    use std::io::Write as _;
+    let mut forms = std::io::BufWriter::new(std::fs::File::create(out.join("forms.tsv"))?);
+    let mut charts = std::io::BufWriter::new(std::fs::File::create(out.join("charts.tsv"))?);
+    writeln!(forms, "slice\tmask\ttick\thead\tsources\treaders\troute\tpair\tagree\tw\tw_abs\tw_sq")?;
+    writeln!(charts, "slice\tmask\ttick\thead\tchart\tcoordinate\tsum\tmagnitude")?;
+    let d = learner.field.declaration;
+    println!("FORMS_LAW role={role} places={places} ticks={} heads={} ms={}", d.ticks, d.heads, started.elapsed().as_millis());
+    for (si, &name) in role_names(&counts, role).iter().enumerate() {
+        let slice = open_slice(store, role, name, &counts)?;
+        let pass = StorePass { role: role.to_string(), store: args[4].clone(), stretches: 0, least: law.least, octaves: law.octaves, pairs: law.pairs, sites: law.sites, slices: vec![PassSlice { name: name.to_string(), piece: 0, cursor: 0, taken: 0 }] };
+        let mut cut = Cut { seed, slices: vec![slice], pass };
+        let mut stretches: Vec<TrainRegion> = Vec::new();
+        let mut taken = 0usize;
+        while taken < places {
+            let Some(drawn) = cut.next() else { break };
+            let stretch = cut.take(drawn, &codec)?;
+            taken += stretch.region.classes.len();
+            stretches.push(stretch.region);
+        }
+        let slice_start = std::time::Instant::now();
+        type Read = Vec<(usize, Vec<Vec<holonics::hnn::tower::field::ReactionForms>>)>;
+        let reads: Vec<std::result::Result<Read, String>> = stretches
+            .par_iter()
+            .map(|region| {
+                let n = region.classes.len();
+                let mut alone = vec![false; n];
+                alone[n / 2] = true;
+                let one = TrainRegion::plain(region.classes.clone(), alone);
+                [region, &one]
+                    .into_iter()
+                    .enumerate()
+                    .map(|(mask, r)| {
+                        let views = views_of(std::slice::from_ref(r));
+                        Ok((mask, learner.field.reaction_forms(&views[0]).map_err(|e| e.to_string())?))
+                    })
+                    .collect()
+            })
+            .collect();
+        let dw = d.width;
+        let blank = || holonics::hnn::tower::field::ReactionForms { src: vec![(0, 0); dw], rdr: vec![(0, 0); dw], ..Default::default() };
+        let mut sums: Vec<Vec<Vec<holonics::hnn::tower::field::ReactionForms>>> = (0..2).map(|_| (0..d.ticks).map(|_| (0..d.heads).map(|_| blank()).collect()).collect()).collect();
+        for read in reads {
+            for (mask, by_tick) in read? {
+                for (k, by_head) in by_tick.iter().enumerate() {
+                    for (h, f) in by_head.iter().enumerate() {
+                        let a = &mut sums[mask][k][h];
+                        (a.sources, a.readers, a.route, a.pair, a.agree) = (a.sources + f.sources, a.readers + f.readers, a.route + f.route, a.pair + f.pair, a.agree + f.agree);
+                        (a.w, a.w_abs, a.w_sq) = (a.w + f.w, a.w_abs + f.w_abs, a.w_sq + f.w_sq);
+                        for (x, y) in a.src.iter_mut().zip(&f.src) {
+                            (x.0, x.1) = (x.0 + y.0, x.1 + y.1);
+                        }
+                        for (x, y) in a.rdr.iter_mut().zip(&f.rdr) {
+                            (x.0, x.1) = (x.0 + y.0, x.1 + y.1);
+                        }
+                    }
+                }
+            }
+        }
+        for (mask, by_mask) in sums.iter().enumerate() {
+            for (k, by_tick) in by_mask.iter().enumerate() {
+                for (h, a) in by_tick.iter().enumerate().filter(|(_, a)| a.sources > 0) {
+                    writeln!(forms, "{si}\t{mask}\t{k}\t{h}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}", a.sources, a.readers, a.route, a.pair, a.agree, a.w, a.w_abs, a.w_sq)?;
+                    for (chart, coords) in [(0, &a.src), (1, &a.rdr)] {
+                        for (i, (sum, mag)) in coords.iter().enumerate() {
+                            writeln!(charts, "{si}\t{mask}\t{k}\t{h}\t{chart}\t{i}\t{sum}\t{mag}")?;
+                        }
+                    }
+                }
+            }
+        }
+        println!("FORMS_SLICE slice={name} stretches={} places={taken} host_ms={} ms={}", stretches.len(), slice_start.elapsed().as_millis(), started.elapsed().as_millis());
+    }
+    forms.flush()?;
+    charts.flush()?;
+    println!("FORMS_DONE ms={}", started.elapsed().as_millis());
+    Ok(())
+}
+
+/// [measurement; agent-inferred, November 13; G160] `read-mirror UNITS UNITS_SHA STORE STORE_SHA KEYS KEYS_SHA CODEC CODEC_SHA PLACES STATE STATE_SHA OUT
+/// ROLE`: **the read's mirror at its founding** ([`holonics::hnn::tower::field::Field::mirror_covectors`]), each slice of `ROLE` cut as `read-reaction`
+/// cuts it, both masks. `OUT/mirror.tsv` holds a line a slice, mask, tick, head and kind of reader (0 open, 1 written, 2 both; numbers only): the
+/// region's open places summed, the sources, the sums of `a_j`, in magnitude and squared, the audience and the lanes' powers; `OUT/chart.tsv` a line
+/// a slice, mask, tick, head and coordinate of the source's ray with its sum and magnitude. The output directory is private.
+pub(super) fn read_mirror(args: &[String]) -> Result<()> {
+    if args.len() != 14 {
+        return Err("read-mirror UNITS UNITS_SHA STORE STORE_SHA KEYS KEYS_SHA CODEC CODEC_SHA PLACES STATE STATE_SHA OUT ROLE".into());
+    }
+    let started = std::time::Instant::now();
+    refuse_variables("read-mirror")?;
+    let role = args[13].as_str();
+    if role != "held" && role != "prefix" {
+        return Err("read-mirror reads the held role or the training documents (prefix)".into());
+    }
+    let units = units_of(&args[1], &args[2])?;
+    if !units.merges().is_empty() {
+        return Err("the store's cut is on bytes: a units file of merges is refused".into());
+    }
+    let store = Path::new(&args[3]);
+    let counts = store_counts(std::str::from_utf8(&pinned_read(&store.join("STORE.tsv").to_string_lossy(), &args[4], READ_BUDGET as usize)?)?)?;
+    let keys = pinned_read(&args[5], &args[6], READ_BUDGET as usize)?;
+    let seed = u64::from_be_bytes(keys.get(keys.len().saturating_sub(8)..).filter(|w| w.len() == 8).ok_or("a key file of fewer than eight bytes")?.try_into()?);
+    let codec = FieldCodec::from_text(&String::from_utf8(pinned_read(&args[7], &args[8], READ_BUDGET as usize)?)?, units)?;
+    let places = positive(&args[9])? as usize;
+    let learner = FieldLearner::from_text(std::str::from_utf8(&pinned_read(&args[10], &args[11], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
+    let law = learner.pass.clone().ok_or("a state with no pass line: read-mirror reads a state of the store's line")?;
+    if learner.field.declaration.alphabet != codec.alphabet() {
+        return Err("a state whose alphabet is not its codec's".into());
+    }
+    let out = Path::new(&args[12]);
+    if out.exists() {
+        return Err(format!("{} exists", out.display()).into());
+    }
+    std::fs::create_dir_all(out)?;
+    use rayon::prelude::*;
+    use std::io::Write as _;
+    let mut tsv = std::io::BufWriter::new(std::fs::File::create(out.join("mirror.tsv"))?);
+    let mut chart = std::io::BufWriter::new(std::fs::File::create(out.join("chart.tsv"))?);
+    writeln!(tsv, "slice\tmask\ttick\thead\treaders\tplaces\tsources\ta\ta_abs\ta_sq\taudience\tpower_log\tpower_log_sq\tlanes")?;
+    writeln!(chart, "slice\tmask\ttick\thead\tcoordinate\tsum\tmagnitude")?;
+    let d = learner.field.declaration;
+    println!("MIRROR_LAW role={role} places={places} ticks={} heads={} ms={}", d.ticks, d.heads, started.elapsed().as_millis());
+    for (si, &name) in role_names(&counts, role).iter().enumerate() {
+        let slice = open_slice(store, role, name, &counts)?;
+        let pass = StorePass { role: role.to_string(), store: args[4].clone(), stretches: 0, least: law.least, octaves: law.octaves, pairs: law.pairs, sites: law.sites, slices: vec![PassSlice { name: name.to_string(), piece: 0, cursor: 0, taken: 0 }] };
+        let mut cut = Cut { seed, slices: vec![slice], pass };
+        let mut stretches: Vec<TrainRegion> = Vec::new();
+        let mut taken = 0usize;
+        while taken < places {
+            let Some(drawn) = cut.next() else { break };
+            let stretch = cut.take(drawn, &codec)?;
+            taken += stretch.region.classes.len();
+            stretches.push(stretch.region);
+        }
+        let slice_start = std::time::Instant::now();
+        type Read = Vec<(usize, usize, Vec<Vec<[holonics::hnn::tower::field::MirrorSums; 3]>>)>;
+        let reads: Vec<std::result::Result<Read, String>> = stretches
+            .par_iter()
+            .map(|region| {
+                let n = region.classes.len();
+                let mut alone = vec![false; n];
+                alone[n / 2] = true;
+                let one = TrainRegion::plain(region.classes.clone(), alone);
+                [region, &one]
+                    .into_iter()
+                    .enumerate()
+                    .map(|(mask, r)| {
+                        let views = views_of(std::slice::from_ref(r));
+                        let open = r.unresolved.iter().filter(|&&u| u).count();
+                        Ok((mask, open, learner.field.mirror_covectors(&views[0]).map_err(|e| e.to_string())?))
+                    })
+                    .collect()
+            })
+            .collect();
+        let dw = d.width;
+        let mut sums: Vec<Vec<Vec<[holonics::hnn::tower::field::MirrorSums; 3]>>> = (0..2).map(|_| (0..d.ticks).map(|_| (0..d.heads).map(|_| Default::default()).collect()).collect()).collect();
+        let mut open_places = [0usize; 2];
+        for read in reads {
+            for (mask, open, by_tick) in read? {
+                open_places[mask] += open;
+                for (k, by_head) in by_tick.iter().enumerate() {
+                    for (h, kinds) in by_head.iter().enumerate() {
+                        for (w, r) in kinds.iter().enumerate() {
+                            let a = &mut sums[mask][k][h][w];
+                            a.sources += r.sources;
+                            (a.a, a.a_abs, a.a_sq, a.audience) = (a.a + r.a, a.a_abs + r.a_abs, a.a_sq + r.a_sq, a.audience + r.audience);
+                            (a.power_log, a.power_log_sq, a.lanes) = (a.power_log + r.power_log, a.power_log_sq + r.power_log_sq, a.lanes + r.lanes);
+                            if !r.chart.is_empty() {
+                                if a.chart.is_empty() {
+                                    a.chart = vec![(0, 0); dw];
+                                }
+                                for (x, y) in a.chart.iter_mut().zip(&r.chart) {
+                                    (x.0, x.1) = (x.0 + y.0, x.1 + y.1);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        for (mask, by_mask) in sums.iter().enumerate() {
+            for (k, by_tick) in by_mask.iter().enumerate() {
+                for (h, kinds) in by_tick.iter().enumerate() {
+                    for (w, a) in kinds.iter().enumerate().filter(|(_, a)| a.sources > 0) {
+                        writeln!(tsv, "{si}\t{mask}\t{k}\t{h}\t{w}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}", open_places[mask], a.sources, a.a, a.a_abs, a.a_sq, a.audience, a.power_log, a.power_log_sq, a.lanes)?;
+                        for (i, (sum, mag)) in a.chart.iter().enumerate() {
+                            writeln!(chart, "{si}\t{mask}\t{k}\t{h}\t{i}\t{sum}\t{mag}")?;
+                        }
+                    }
+                }
+            }
+        }
+        println!("MIRROR_SLICE slice={name} stretches={} places={taken} open_cut={} open_alone={} host_ms={} ms={}", stretches.len(), open_places[0], open_places[1], slice_start.elapsed().as_millis(), started.elapsed().as_millis());
+    }
+    tsv.flush()?;
+    chart.flush()?;
+    println!("MIRROR_DONE ms={}", started.elapsed().as_millis());
+    Ok(())
+}
+
+/// [measurement; agent-inferred, November 13; G161] `read-mirror-strength UNITS UNITS_SHA STORE STORE_SHA KEYS KEYS_SHA CODEC CODEC_SHA PLACES STATE
+/// STATE_SHA OUT ROLE`: **the read's mirror at finite strength**, a reading of the state: each slice of `ROLE` cut as `read-mirror` cuts it, both
+/// masks, each region coded on the host with the mirror off and with it at one head's uniform strength `s ∈ {−0.2, −0.1, −0.05, +0.05, +0.1}`
+/// ([`holonics::hnn::tower::field::Field::mirror_strength`], the forward only). `OUT/strength.tsv` holds a line a slice, mask, head and strength
+/// (`s` on `2^(−16)`; head and strength zero for the mirror off): the regions' open places and their code on `2^(−20)` bits summed. The output
+/// directory is private.
+pub(super) fn read_mirror_strength(args: &[String]) -> Result<()> {
+    if args.len() != 14 {
+        return Err("read-mirror-strength UNITS UNITS_SHA STORE STORE_SHA KEYS KEYS_SHA CODEC CODEC_SHA PLACES STATE STATE_SHA OUT ROLE".into());
+    }
+    let started = std::time::Instant::now();
+    refuse_variables("read-mirror-strength")?;
+    let role = args[13].as_str();
+    if role != "held" && role != "prefix" {
+        return Err("read-mirror-strength reads the held role or the training documents (prefix)".into());
+    }
+    let units = units_of(&args[1], &args[2])?;
+    if !units.merges().is_empty() {
+        return Err("the store's cut is on bytes: a units file of merges is refused".into());
+    }
+    let store = Path::new(&args[3]);
+    let counts = store_counts(std::str::from_utf8(&pinned_read(&store.join("STORE.tsv").to_string_lossy(), &args[4], READ_BUDGET as usize)?)?)?;
+    let keys = pinned_read(&args[5], &args[6], READ_BUDGET as usize)?;
+    let seed = u64::from_be_bytes(keys.get(keys.len().saturating_sub(8)..).filter(|w| w.len() == 8).ok_or("a key file of fewer than eight bytes")?.try_into()?);
+    let codec = FieldCodec::from_text(&String::from_utf8(pinned_read(&args[7], &args[8], READ_BUDGET as usize)?)?, units)?;
+    let places = positive(&args[9])? as usize;
+    let learner = FieldLearner::from_text(std::str::from_utf8(&pinned_read(&args[10], &args[11], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
+    let law = learner.pass.clone().ok_or("a state with no pass line: read-mirror-strength reads a state of the store's line")?;
+    if learner.field.declaration.alphabet != codec.alphabet() {
+        return Err("a state whose alphabet is not its codec's".into());
+    }
+    let out = Path::new(&args[12]);
+    if out.exists() {
+        return Err(format!("{} exists", out.display()).into());
+    }
+    std::fs::create_dir_all(out)?;
+    use rayon::prelude::*;
+    use std::io::Write as _;
+    let mut tsv = std::io::BufWriter::new(std::fs::File::create(out.join("strength.tsv"))?);
+    writeln!(tsv, "slice\tmask\thead\tstrength\tplaces\tcode")?;
+    let heads = learner.field.declaration.heads;
+    // The strengths on `2^(−16)`: −0.2, −0.1, −0.05, +0.05 and +0.1 to the nearest.
+    let strengths: [i64; 5] = [-13107, -6554, -3277, 3277, 6554];
+    let mut fields: Vec<(usize, i64, holonics::hnn::tower::field::Field)> = vec![(0, 0, learner.field.clone())];
+    for h in 0..heads {
+        for &st in &strengths {
+            let mut f = learner.field.clone();
+            let mut v = vec![0i64; heads];
+            v[h] = st;
+            f.mirror_strength = Some(v);
+            fields.push((h, st, f));
+        }
+    }
+    println!("STRENGTH_LAW role={role} places={places} heads={heads} strengths={} ms={}", strengths.len(), started.elapsed().as_millis());
+    for (si, &name) in role_names(&counts, role).iter().enumerate() {
+        let slice = open_slice(store, role, name, &counts)?;
+        let pass = StorePass { role: role.to_string(), store: args[4].clone(), stretches: 0, least: law.least, octaves: law.octaves, pairs: law.pairs, sites: law.sites, slices: vec![PassSlice { name: name.to_string(), piece: 0, cursor: 0, taken: 0 }] };
+        let mut cut = Cut { seed, slices: vec![slice], pass };
+        let mut stretches: Vec<TrainRegion> = Vec::new();
+        let mut taken = 0usize;
+        while taken < places {
+            let Some(drawn) = cut.next() else { break };
+            let stretch = cut.take(drawn, &codec)?;
+            taken += stretch.region.classes.len();
+            stretches.push(stretch.region);
+        }
+        let slice_start = std::time::Instant::now();
+        let mut regions: Vec<(usize, TrainRegion)> = Vec::new();
+        for region in &stretches {
+            let n = region.classes.len();
+            let mut alone = vec![false; n];
+            alone[n / 2] = true;
+            regions.push((0, region.clone()));
+            regions.push((1, TrainRegion::plain(region.classes.clone(), alone)));
+        }
+        let jobs: Vec<(usize, usize)> = (0..fields.len()).flat_map(|fi| (0..regions.len()).map(move |ri| (fi, ri))).collect();
+        let codes: Vec<std::result::Result<(usize, usize, i64, usize), String>> = jobs
+            .par_iter()
+            .map(|&(fi, ri)| {
+                let views = views_of(std::slice::from_ref(&regions[ri].1));
+                let (code, n) = fields[fi].2.code(&views[0]).map_err(|e| e.to_string())?;
+                Ok((fi, regions[ri].0, code, n))
+            })
+            .collect();
+        let mut sums = vec![[(0i128, 0usize); 2]; fields.len()];
+        for c in codes {
+            let (fi, mask, code, n) = c?;
+            sums[fi][mask].0 += i128::from(code);
+            sums[fi][mask].1 += n;
+        }
+        for (fi, (h, st, _)) in fields.iter().enumerate() {
+            for (mask, (code, n)) in sums[fi].iter().enumerate() {
+                writeln!(tsv, "{si}\t{mask}\t{h}\t{st}\t{n}\t{code}")?;
+            }
+        }
+        println!("STRENGTH_SLICE slice={name} stretches={} places={taken} host_ms={} ms={}", stretches.len(), slice_start.elapsed().as_millis(), started.elapsed().as_millis());
+    }
+    tsv.flush()?;
+    println!("STRENGTH_DONE ms={}", started.elapsed().as_millis());
+    Ok(())
+}
+
+/// [measurement; agent-inferred, November 13; G162] `read-ring UNITS UNITS_SHA STORE STORE_SHA KEYS KEYS_SHA CODEC CODEC_SHA PLACES STATE STATE_SHA OUT
+/// ROLE TICKS STRENGTH`: **the free ring on the host, with the read's mirror at a uniform strength in every head** (`STRENGTH` a signed count on
+/// `2^(−16)`, zero for the built tick; [`holonics::hnn::tower::field::Field::free_ring`]), the field run to `TICKS` ticks. Each slice of `ROLE`
+/// cut as `read-mirror` cuts it, eight places of each stretch, spread evenly, each opened alone. `OUT/ring.tsv` holds a line a slice and stage
+/// (numbers only): the places, the code and expected code on `2^(−20)` bits, and the charts' change norm and successive pairing. The output
+/// directory is private.
+pub(super) fn read_ring(args: &[String]) -> Result<()> {
+    if args.len() != 16 {
+        return Err("read-ring UNITS UNITS_SHA STORE STORE_SHA KEYS KEYS_SHA CODEC CODEC_SHA PLACES STATE STATE_SHA OUT ROLE TICKS STRENGTH".into());
+    }
+    let started = std::time::Instant::now();
+    refuse_variables("read-ring")?;
+    let role = args[13].as_str();
+    if role != "held" && role != "prefix" {
+        return Err("read-ring reads the held role or the training documents (prefix)".into());
+    }
+    let ticks = positive(&args[14])? as usize;
+    let strength: i64 = args[15].parse().map_err(|_| "a strength that is not a signed count")?;
+    let units = units_of(&args[1], &args[2])?;
+    if !units.merges().is_empty() {
+        return Err("the store's cut is on bytes: a units file of merges is refused".into());
+    }
+    let store = Path::new(&args[3]);
+    let counts = store_counts(std::str::from_utf8(&pinned_read(&store.join("STORE.tsv").to_string_lossy(), &args[4], READ_BUDGET as usize)?)?)?;
+    let keys = pinned_read(&args[5], &args[6], READ_BUDGET as usize)?;
+    let seed = u64::from_be_bytes(keys.get(keys.len().saturating_sub(8)..).filter(|w| w.len() == 8).ok_or("a key file of fewer than eight bytes")?.try_into()?);
+    let codec = FieldCodec::from_text(&String::from_utf8(pinned_read(&args[7], &args[8], READ_BUDGET as usize)?)?, units)?;
+    let places = positive(&args[9])? as usize;
+    let learner = FieldLearner::from_text(std::str::from_utf8(&pinned_read(&args[10], &args[11], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
+    let law = learner.pass.clone().ok_or("a state with no pass line: read-ring reads a state of the store's line")?;
+    if learner.field.declaration.alphabet != codec.alphabet() {
+        return Err("a state whose alphabet is not its codec's".into());
+    }
+    if learner.field.scale.as_ref().is_some_and(|s| ticks <= s.split) {
+        return Err("a depth at or under the level's split".into());
+    }
+    let mut field = learner.field.clone();
+    field.declaration.ticks = ticks;
+    if strength != 0 {
+        field.mirror_strength = Some(vec![strength; field.declaration.heads]);
+    }
+    let out = Path::new(&args[12]);
+    if out.exists() {
+        return Err(format!("{} exists", out.display()).into());
+    }
+    std::fs::create_dir_all(out)?;
+    use rayon::prelude::*;
+    use std::io::Write as _;
+    let mut tsv = std::io::BufWriter::new(std::fs::File::create(out.join("ring.tsv"))?);
+    writeln!(tsv, "slice\tstage\tplaces\tcode\texpected\tnorm\tinner")?;
+    println!("RING_LAW role={role} places={places} ticks={ticks} strength={strength} ms={}", started.elapsed().as_millis());
+    for (si, &name) in role_names(&counts, role).iter().enumerate() {
+        let slice = open_slice(store, role, name, &counts)?;
+        let pass = StorePass { role: role.to_string(), store: args[4].clone(), stretches: 0, least: law.least, octaves: law.octaves, pairs: law.pairs, sites: law.sites, slices: vec![PassSlice { name: name.to_string(), piece: 0, cursor: 0, taken: 0 }] };
+        let mut cut = Cut { seed, slices: vec![slice], pass };
+        let mut regions: Vec<TrainRegion> = Vec::new();
+        let mut taken = 0usize;
+        while taken < places {
+            let Some(drawn) = cut.next() else { break };
+            let stretch = cut.take(drawn, &codec)?;
+            taken += stretch.region.classes.len();
+            let n = stretch.region.classes.len();
+            for q in 1..=8usize {
+                let mut alone = vec![false; n];
+                alone[(n * q / 9).min(n - 1)] = true;
+                regions.push(TrainRegion::plain(stretch.region.classes.clone(), alone));
+            }
+        }
+        let slice_start = std::time::Instant::now();
+        let reads: Vec<std::result::Result<Vec<holonics::hnn::tower::field::RingStage>, String>> = regions
+            .par_iter()
+            .map(|r| {
+                let views = views_of(std::slice::from_ref(r));
+                field.free_ring(&views[0]).map_err(|e| e.to_string())
+            })
+            .collect();
+        let mut sums = vec![holonics::hnn::tower::field::RingStage::default(); ticks];
+        for read in reads {
+            for (a, st) in sums.iter_mut().zip(read?) {
+                (a.places, a.code, a.expected, a.norm, a.inner) = (a.places + st.places, a.code + st.code, a.expected + st.expected, a.norm + st.norm, a.inner + st.inner);
+            }
+        }
+        for (k, a) in sums.iter().enumerate() {
+            writeln!(tsv, "{si}\t{}\t{}\t{}\t{}\t{}\t{}", k + 1, a.places, a.code, a.expected, a.norm, a.inner)?;
+        }
+        println!("RING_SLICE slice={name} regions={} host_ms={} ms={}", regions.len(), slice_start.elapsed().as_millis(), started.elapsed().as_millis());
+    }
+    tsv.flush()?;
+    println!("RING_DONE ms={}", started.elapsed().as_millis());
+    Ok(())
+}
+
+/// [measurement; agent-inferred, November 13; G163] `read-release UNITS UNITS_SHA STORE STORE_SHA KEYS KEYS_SHA CODEC CODEC_SHA PLACES STATE STATE_SHA
+/// OUT ROLE PASSES LOCKED MASK [DAMP]`: **the field's own release returned at a lag**, a reading of the reafference loop the junction record's §8
+/// item 3 names: a region read `PASSES` times, each pass after the first opening every open place on its face from the pass before (a carried
+/// face, [`holonics::hnn::tower::field::shares`]), with `LOCKED` 1 also making those places sources at their faces (a lock, so the open places
+/// hear one another's releases), 0 leaving them silent. `MASK` 0 reads the cut's own masks, 1 a stretch's middle place alone. `DAMP` 1 (G164)
+/// carries the mean of the face before and the face the pass gave, each class's share on `2^(−16)` to the nearest, in place of the face alone. Each slice of
+/// `ROLE` cut as `read-mirror` cuts it. `OUT/release.tsv` holds a line a slice and pass (numbers only): the open places, their code and expected
+/// code on `2^(−20)` bits summed, and the faces' change from the pass before (`Σ |Δw|²` over classes on `2^(−32)`) with its pairing with the change
+/// before that. The output directory is private.
+pub(super) fn read_release(args: &[String]) -> Result<()> {
+    if args.len() != 17 && args.len() != 18 {
+        return Err("read-release UNITS UNITS_SHA STORE STORE_SHA KEYS KEYS_SHA CODEC CODEC_SHA PLACES STATE STATE_SHA OUT ROLE PASSES LOCKED MASK [DAMP]".into());
+    }
+    let damp = args.get(17).is_some_and(|d| d == "1");
+    let started = std::time::Instant::now();
+    refuse_variables("read-release")?;
+    let role = args[13].as_str();
+    if role != "held" && role != "prefix" {
+        return Err("read-release reads the held role or the training documents (prefix)".into());
+    }
+    let passes = positive(&args[14])? as usize;
+    let locked = args[15] == "1";
+    let alone = args[16] == "1";
+    let units = units_of(&args[1], &args[2])?;
+    if !units.merges().is_empty() {
+        return Err("the store's cut is on bytes: a units file of merges is refused".into());
+    }
+    let store = Path::new(&args[3]);
+    let counts = store_counts(std::str::from_utf8(&pinned_read(&store.join("STORE.tsv").to_string_lossy(), &args[4], READ_BUDGET as usize)?)?)?;
+    let keys = pinned_read(&args[5], &args[6], READ_BUDGET as usize)?;
+    let seed = u64::from_be_bytes(keys.get(keys.len().saturating_sub(8)..).filter(|w| w.len() == 8).ok_or("a key file of fewer than eight bytes")?.try_into()?);
+    let codec = FieldCodec::from_text(&String::from_utf8(pinned_read(&args[7], &args[8], READ_BUDGET as usize)?)?, units)?;
+    let places = positive(&args[9])? as usize;
+    let learner = FieldLearner::from_text(std::str::from_utf8(&pinned_read(&args[10], &args[11], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
+    let law = learner.pass.clone().ok_or("a state with no pass line: read-release reads a state of the store's line")?;
+    if learner.field.declaration.alphabet != codec.alphabet() {
+        return Err("a state whose alphabet is not its codec's".into());
+    }
+    let out = Path::new(&args[12]);
+    if out.exists() {
+        return Err(format!("{} exists", out.display()).into());
+    }
+    std::fs::create_dir_all(out)?;
+    use rayon::prelude::*;
+    use std::io::Write as _;
+    let mut tsv = std::io::BufWriter::new(std::fs::File::create(out.join("release.tsv"))?);
+    writeln!(tsv, "slice\tpass\tplaces\tcode\texpected\tnorm\tinner")?;
+    let a = learner.field.declaration.alphabet;
+    println!("RELEASE_LAW role={role} places={places} passes={passes} locked={locked} alone={alone} damp={damp} ms={}", started.elapsed().as_millis());
+    for (si, &name) in role_names(&counts, role).iter().enumerate() {
+        let slice = open_slice(store, role, name, &counts)?;
+        let pass = StorePass { role: role.to_string(), store: args[4].clone(), stretches: 0, least: law.least, octaves: law.octaves, pairs: law.pairs, sites: law.sites, slices: vec![PassSlice { name: name.to_string(), piece: 0, cursor: 0, taken: 0 }] };
+        let mut cut = Cut { seed, slices: vec![slice], pass };
+        let mut regions: Vec<TrainRegion> = Vec::new();
+        let mut taken = 0usize;
+        while taken < places {
+            let Some(drawn) = cut.next() else { break };
+            let stretch = cut.take(drawn, &codec)?;
+            taken += stretch.region.classes.len();
+            if alone {
+                let n = stretch.region.classes.len();
+                let mut one = vec![false; n];
+                one[n / 2] = true;
+                regions.push(TrainRegion::plain(stretch.region.classes.clone(), one));
+            } else {
+                regions.push(TrainRegion::plain(stretch.region.classes.clone(), stretch.region.unresolved.clone()));
+            }
+        }
+        let slice_start = std::time::Instant::now();
+        // Per region and pass: (places, code, expected, the faces' change, its pairing with the change before).
+        type Stage = (u64, i128, i128, u128, i128);
+        let reads: Vec<std::result::Result<Vec<Stage>, String>> = regions
+            .par_iter()
+            .map(|base| {
+                let n = base.classes.len();
+                let open: Vec<usize> = (0..n).filter(|&t| base.unresolved[t]).collect();
+                let mut region = base.clone();
+                let (mut prev, mut prev_change): (Option<Vec<i64>>, Option<Vec<i64>>) = (None, None);
+                let mut stages = Vec::with_capacity(passes);
+                for _ in 0..passes {
+                    let views = views_of(std::slice::from_ref(&region));
+                    let faces = learner.field.faces(&views[0]).map_err(|e| e.to_string())?;
+                    let (mut code, mut expected) = (0i128, 0i128);
+                    let mut dense = vec![0i64; open.len() * a];
+                    let mut carried: Vec<Option<holonics::hnn::tower::field::Shares>> = vec![None; n];
+                    for (k, &t) in open.iter().enumerate() {
+                        let face = faces[t].as_ref().ok_or("an open place with no face")?;
+                        code += i128::from(face.code(base.classes[t]));
+                        let sum: i128 = face.masses.iter().map(|&m| m as i128 * holonics::hnn::tower::face_code(m, face.total) as i128).sum();
+                        expected += sum / (face.total as i128).max(1);
+                        let sh = holonics::hnn::tower::field::shares(face);
+                        for &(c, w) in &sh {
+                            dense[k * a + c as usize] = i64::from(w);
+                        }
+                        carried[t] = Some(match (damp, region.faces.get(t).and_then(Option::as_ref)) {
+                            (true, Some(before)) => {
+                                let mut mixed = vec![0u64; a];
+                                for &(c, w) in before.iter().chain(&sh) {
+                                    mixed[c as usize] += u64::from(w);
+                                }
+                                mixed.iter().enumerate().filter(|(_, w)| **w > 0).map(|(c, &w)| (c as u32, w.div_ceil(2) as u32)).collect()
+                            }
+                            _ => sh,
+                        });
+                    }
+                    let (mut norm, mut inner) = (0u128, 0i128);
+                    if let Some(p) = prev.as_ref() {
+                        let change: Vec<i64> = dense.iter().zip(p).map(|(&x, &y)| x - y).collect();
+                        norm = change.iter().map(|&c| (c as i128 * c as i128) as u128).sum();
+                        if let Some(pc) = prev_change.as_ref() {
+                            inner = change.iter().zip(pc).map(|(&x, &y)| x as i128 * y as i128).sum();
+                        }
+                        prev_change = Some(change);
+                    }
+                    prev = Some(dense);
+                    stages.push((open.len() as u64, code, expected, norm, inner));
+                    region.faces = carried;
+                    if locked {
+                        region.locked = base.unresolved.clone();
+                    }
+                }
+                Ok(stages)
+            })
+            .collect();
+        let mut sums: Vec<Stage> = vec![(0, 0, 0, 0, 0); passes];
+        for read in reads {
+            for (s, st) in sums.iter_mut().zip(read?) {
+                *s = (s.0 + st.0, s.1 + st.1, s.2 + st.2, s.3 + st.3, s.4 + st.4);
+            }
+        }
+        for (p, s) in sums.iter().enumerate() {
+            writeln!(tsv, "{si}\t{}\t{}\t{}\t{}\t{}\t{}", p + 1, s.0, s.1, s.2, s.3, s.4)?;
+        }
+        println!("RELEASE_SLICE slice={name} regions={} host_ms={} ms={}", regions.len(), slice_start.elapsed().as_millis(), started.elapsed().as_millis());
+    }
+    tsv.flush()?;
+    println!("RELEASE_DONE ms={}", started.elapsed().as_millis());
+    Ok(())
+}
+
 /// [measurement; theory, November 13, an outside read of that day (its claim 1); G148] `read-influence UNITS UNITS_SHA STORE STORE_SHA KEYS
 /// KEYS_SHA CODEC CODEC_SHA PAIRS STATE STATE_SHA OUT`: **whether one place's influence on another follows the news between them or their
 /// distance**, a reading. Each slice of the held role is cut as `read-cavity` cuts it, whole stretches until four times `PAIRS` places, every

@@ -3789,3 +3789,150 @@ the deposit for κ < 0, the like sign, a relaxation onto agreement (§13.8):
   (agent-inferred): the reaction is the next build, its strength read a site from the source's own chart as `ℓ`'s was
   (`κ = K_h r̂ + κ_b,h`, founded at zero), so that the deposit can locate where the comparison asks for agreement and where for a turn; the
   theory thread is asked for the chart's form and its passivity bound (κ m² < 4) before the kernels.
+
+G159 fixed 2026-11-13T20:23Z (the Opus PC thread), before its read: the reaction's forms, the theory thread's answers of 20:20Z (the
+impulse is the pair's; what is free is the source's admittance, read on the source's chart, raised by its metric:
+`x_j ← x_j − s_j (‖x_j‖²/(γ_h² n_j)) ρ_j` each lane by its own power, `s_j = K_h r̂_j + s_b,h`). read-reaction-forms (Field::reaction_forms) on
+level3/MEAN.3000, seen and held stretches, both masks: the pair decomposition `a_ij`, the source's chart's covector `Σ_j a_j r̂_j` against the
+reader's `Σ_i b_i r̂_i` by coordinate, and the metric-raised strength's covector beside the raw one.
+  (a) the theory thread's: the source's chart's coordinates stand more coherent than the reader's (median over coordinates) in at least
+      three of four heads on seen stretches under the cut's mask;
+  (b) this thread's: the pair decomposition's `a_j` agrees in sign with the route's on at least 0.9 of written sources (one impulse read two
+      ways; it checks the reading);
+  (c) this thread's: in heads 0 and 3 the metric-raised strength's covector keeps the raw one's sign under the cut's mask on seen stretches
+      and stands over twice its random-sign level (the weights are positive, so a coherent raw covector stays coherent unless the loud
+      sources and the soft disagree).
+  Rule: (a) and (c) held, the reaction is built on the source's chart with the metric (the theory thread's form). (a) missed in most heads:
+  the reader's chart, or a pair's, is read before a build.
+
+G159 scored 2026-11-13T20:31Z (receipt g159_forms.txt; read-reaction-forms on level3/MEAN.3000, seen and held, both masks; host, 8 threads,
+54.6 and 58.0 s; the metric-raised covector reread once at a scale its squares could hold, the first read's squares having released to zero):
+  (a) on seen stretches under the cut's mask the source's chart is the more coherent (median over coordinates) in one of four heads (head 2,
+      0.051 against 0.036); the reader's in heads 0 and 1 (0.135 against 0.062, 0.066 against 0.048), equal in head 3: missed;
+  (b) the pair decomposition's a_j agrees in sign with the route's on 0.977 to 1.000 of written sources, its totals the route's to five
+      digits: held, and the reading checks;
+  (c) the metric-raised covector keeps the raw sign in head 0 (4.09 times its floor) and turns in head 3 (0.29, at its floor): missed.
+  Of 3 parts 1 held. The rule sends the reader's chart, or a pair's, to be read before a build. Read on the objects (agent-inferred): the
+  reader's chart's coherence is what a covector linear in the reader's raw state gives (b_i = ⟨x_i, w_i⟩ correlates with x_i's own ray),
+  so it is the raw x_i fed into the route, the same artifact the mirror form removes by feeding the reader's ray. The next reading is the
+  mirror form's founding covector, both charts read again there; the theory thread withdrew the metric-raised weighting (20:26Z).
+
+G160 fixed 2026-11-13T20:32Z (the Opus PC thread), before its read: the read's mirror at its founding, a design of this thread's on the
+theory thread's last input (20:26Z): the stage `x_j ← x_j − s_h μ_j` after a tick, `μ_j = (1/n_j) Σ_i W_ijᵀ r̂_i` the forward read taken by each source
+of its readers' rays (Field::mirror_route), `s` a pure number (`s = 1` equal and opposite). read-mirror on level3/MEAN.3000, seen (prefix) and
+held, both masks, by head and kind of reader; `d(code)/ds_h = −Σ_j a_j 2^(−40) ln 2` nats over the region's open places. Read first: G158
+read the route on raw reader states (`ρ`); its signs by region likely stand in this form, its sizes not.
+  (a) on seen stretches under the cut's mask, readers pooled, heads 0 and 3 keep G158's sign (the code rises with `s`: the deposit asks for
+      `s < 0`, agreement) at over twice their random-sign levels;
+  (b) the size: at least one head's `|d(code)/ds|` stands at or over 0.01 nats a place per unit of `s` under the cut's mask on seen stretches
+      (a stage the deposit can move by a tenth of a unit buys at least a thousandth of a nat at first order);
+  (c) the source's ray's coordinates keep a median coherence of at least 0.03 in every head (a chart `K_h` has a direction to locate).
+  Rule. (a) and (b) held: the mirror is built (host and card, founded at zero, parity), with `s_j = K_h r̂_j + s_b,h`, and trained a lap beside
+  the line. (b) missed in every head: its first order buys under a thousandth of a nat a place a tenth of a unit, and the build waits for a
+  reading at finite strength.
+
+G160 scored 2026-11-13T20:40Z (receipt g160_mirror.txt; read-mirror on level3/MEAN.3000, seen (prefix) and held, 122 stretches each, both masks;
+host, 8 threads, 52.2 and 55.3 s). d(code)/ds in nats a place per unit of s over the region's open places; positive asks the deposit for s < 0:
+  (a) on seen stretches under the cut's mask, readers pooled, head 0 keeps G158's sign at 4.81 times its floor (+0.117) and head 3 keeps the
+      sign at 1.28 (+0.140): half held;
+  (b) heads 0 and 2 stand at +0.117 and +0.125 (3.20 times its floor), head 1 at −0.085, head 3 at +0.140: held, a tenth of a unit of s
+      buys some 0.012 nats a place at first order in heads 0 and 2 alone;
+  (c) the source's ray's coordinates hold median coherences of 0.043, 0.023, 0.029 and 0.029: missed for three heads by a hair (each some
+      seven times the floor of 64,000 sources).
+  Of 3 parts 1 held, 1 half held and 1 missed. On held text the signs part: head 2 reverses (−0.134 at 4.18), head 0 falls to its floor, and
+  head 3 grows (+0.478 at 5.77). With one place open the seen readings grow (head 0 +0.278 at 4.77, head 1 −0.474 at 3.67). The audience is
+  1.35 a source in the still heads and 0.36 to 0.54 in the turned ones; a lane's power spreads 1.4 octaves.
+  The rule's first branch is met in its reason (the deposit sees a direction, and its first order is large), so the mirror is built. Before
+  the reverse and the kernels: a reading at finite strength, the forward stage at uniform s_h (host, forward only, a reading of the state),
+  whose code against s gives the curvature and the size a deposit can buy, fixed as G161 before it is read.
+
+G161 fixed 2026-11-13T20:37Z (the Opus PC thread), before its read: the read's mirror at finite strength. read-mirror-strength on
+level3/MEAN.3000, seen (prefix) and held, both masks, each region coded with the mirror off and with one head at a uniform s of −0.2, −0.1,
+−0.05, +0.05 and +0.1 (Field::mirror_strength, the forward only, a reading of the state). Read first: G160's first order on seen text under the
+cut's mask, d(code)/ds = +0.117 (head 0), −0.085 (1), +0.125 (2), +0.140 (3) nats a place per unit of s.
+  (a) head 0 at s = −0.1 codes 0.004 to 0.015 nats a place under the mirror off, seen text, the cut's mask;
+  (b) head 0's least of the five strengths stands at −0.1 or −0.2 there;
+  (c) head 1 at s = +0.1 codes under the mirror off there (its first order asks for a turn).
+  Rule. (a) held: the mirror is built with the guess for its lap fixed from these curves. Every head's best strength codes within 0.002 of
+  the mirror off: the first order is curvature's, and the build waits.
+
+G161 scored 2026-11-13T20:52Z (receipt g161_strength.txt; read-mirror-strength on level3/MEAN.3000, seen and held, both masks; host, 8 threads,
+273.5 and 282.5 s). Under the cut's mask on seen text every head's every uniform strength raises the code: head 0 +0.0032 at −0.05, +0.0078
+at −0.1, +0.0279 at −0.2, +0.0074 at +0.05; head 2 +0.0003 at −0.05; head 3 +0.059 at −0.05 and +0.665 at −0.2. So:
+  (a) head 0 at −0.1 codes 0.0078 nats a place over the mirror off, against 0.004 to 0.015 under it: missed;
+  (b) head 0's least of the five is at −0.05, against −0.1 or −0.2: missed;
+  (c) head 1 at +0.1 codes 0.043 over the mirror off: missed.
+  Of 3 parts none held. With one place open the curve is the covector's (head 0's central difference at ±0.05, +0.31 a unit, against G160's
+  +0.278 there), its least near s = −0.05 at −0.0083 nats a place on seen text; under the cut's mask the covector weighs each region by its
+  domain and the code read here does not, so there the slopes are not compared. The curvature is some 2 to 3 nats a place a unit squared in
+  heads 0 to 2 and over 20 in head 3: a uniform strength's best buys under a thousandth of a nat a place on the regions the line deposits
+  from. The rule's second branch applies: the build of the mirror waits.
+
+G162 fixed 2026-11-13T20:52Z (the Opus PC thread), before its read: the free ring with the read's mirror on, a reading of how the field
+rings (never a test of self-induction, Brandon 18:21Z). read-ring on level3/MEAN.3000, seen text, 16 ticks, eight places a stretch each
+opened alone (about 1,500 places a slice), with the mirror at a uniform strength in every head of 0 (the built tick), +0.1 and +0.5 (a turn:
+on the fastest pair 2 arcsin(√s/2) a tick) and −0.1 (agreement, a boost read through the chart as a relaxation); Field::free_ring on the host.
+Read first: G149's control on the card read the successive-change cosine at 0.059, 0.454, 0.696 at stages 2 to 4 rising to 0.997 by 16, the
+code least at stage 4.
+  (a) at s = +0.5 the mean successive-change cosine over stages 8 to 16 stands at least 0.1 under the built tick's (the free iteration
+      turns);
+  (b) at s = −0.1 it stands at or over the built tick's (the boost relaxes onto agreement);
+  (c) the built tick on the host keeps G149's shape: the cosine over stages 8 to 16 above 0.9, the code least at stage 3, 4 or 5.
+  Rule: none; a reading of the ring for the theory and for Brandon's lens. A turn that rings at s = +0.5 makes the mirror the part a pump
+  would act on, and its build is then read against the ring as well as the code.
+
+G162 scored 2026-11-13T21:00Z (receipt g162_ring.txt; read-ring on level3/MEAN.3000, seen text, 16 ticks, 280 places each opened alone (seven
+stretches a slice, eight places each), host, 8 threads, 71 to 88 s a strength):
+  (a) at s = +0.5 the mean successive-change cosine over stages 8 to 16 is 0.947 against the built tick's 0.988, 0.041 under it, against at
+      least 0.1: missed. The turn slows the settling (the change a stage stays 2.6 times the built tick's at stage 16) but every cosine stays
+      positive and climbs (0.115 at stage 3 to 0.983 at 16): no ringing; the code at stage 16 is 8.21 nats a place against 2.92;
+  (b) at s = −0.1 the cosine is 0.994, over the built tick's: held (agreement settles faster: the change at stage 16 is 0.60 of the built
+      tick's);
+  (c) the built tick on the host reads G149's shape: cosine 0.988 over stages 8 to 16, the code least at stage 4 (1.2485): held.
+  Of 3 parts 2 held. A reading of how this build rings: the reader's reaction as a turn adds rotation that the built tick's relaxation damps,
+  at every strength read; a turn at a tick's rate does not stand against it. The lens's loop needs a drive the ticks do not have: the
+  passage still arriving while they run, or the field's own release returned at a lag (the junction record §8 item 3). That is the next
+  reading's subject, not a stronger reaction.
+
+G163 fixed 2026-11-13T20:59Z (the Opus PC thread), before its read: the field's own release returned at a lag, the drive the junction
+record's §8 item 3 names (a reading of how the field rings, never a test of self-induction). read-release on level3/MEAN.3000, seen text, 8
+passes of the built 4 ticks, each pass after the first opening every open place on its face from the pass before; two forms: LOCKED 0 (the
+place opens on its release and stays silent, the middle place of each stretch alone), LOCKED 1 (the open places of the cut's masks become
+sources at their releases, so they hear one another). Read first: no command has carried a face since November 3 (§16.27), so the trained
+field never met a carried opening.
+  (a) with one place alone, the code at pass 2 stands above pass 1's (a release fed back confirms wrong faces as well as right ones);
+  (b) the expected code falls from pass 1 to pass 8 in both forms (the loop sharpens: certainty rises);
+  (c) the faces' successive changes keep a positive pairing at every pass in both forms (the loop settles; no ringing).
+  Rule: none; a reading of the loop for the next design. A loop whose code falls past pass 1 in either form is the drive the ring needs,
+  and its law (the release as a source) is then designed as a part, founded where its first pass is the built one.
+
+G163 scored 2026-11-13T21:05Z (receipt g163_release.txt; read-release on level3/MEAN.3000, seen text, 8 passes; host, 8 threads, 71.8 and 78.4 s):
+  (a) with one place alone the code at pass 2 is 1.877 nats a place against pass 1's 1.192: held;
+  (b) the expected code falls from pass 1 to pass 8 in both forms (alone 1.319 to 1.205, through an alternation; locked 3.035 to 1.771):
+      held;
+  (c) the faces' successive changes pair negatively: alone −0.767 at pass 3 to −0.994 at pass 8, in every slice (−0.989 to −0.999 at pass 8);
+      locked −0.222, −0.123, +0.093, −0.026, −0.283, −0.462: missed.
+  Of 3 parts 2 held and 1 missed. The miss is the news: the field's own release fed back as a place's opening RINGS. Alone, each place flips
+  between two faces each pass, a two-cycle (code 1.19, 1.88, 1.65, 2.00, 1.78, 2.11, 1.82, 2.15), the period-doubled response a pumped
+  parametron gives at half its pump's rate, and the synchronous two-cycle the echo row (tower.field-echo) names for a symmetric map iterated
+  in step. Locked, the open places hearing one another's releases run toward overconfidence (the code rises 3.01 to 6.41 while the expected
+  code falls 3.04 to 1.77). Neither settles onto a better face: the loop rings and flips, it does not yet converge. It is the first ring this
+  build has shown.
+
+G164 fixed 2026-11-13T21:06Z (the Opus PC thread), before its read: the same loop damped, each pass carrying the mean of the face before and
+the face it gave (DAMP 1), the classical cure of a synchronous two-cycle (a slope of −1 halved toward zero). read-release, both forms, 8 passes.
+  (a) alone, damped: the successive pairing turns positive by pass 4 (the two-cycle settles);
+  (b) alone, damped: the code at pass 8 stands under its undamped value (2.151) and within 0.3 nats of pass 1's;
+  (c) locked, damped: the code still rises from pass 1 (the mutual loop's runaway is not a two-cycle, so damping slows it without turning it).
+  Rule: none; the reading sizes whether a damped release can be the loop's drive.
+
+G164 scored 2026-11-13T21:10Z (receipt g164_release.txt; read-release with DAMP 1, both forms, 8 passes; host, 8 threads, 68.1 and 68.2 s):
+  (a) alone, damped, the successive pairing is −0.707 at pass 3, −0.251 at 4 and +0.226 at 5, the change falling from 32,706 to 1,550 a
+      place by pass 8: missed by one pass (the two-cycle settles at pass 5);
+  (b) alone, damped, the code at pass 8 is 1.799, under the undamped 2.151 and 0.607 over pass 1's: missed (the settled point codes worse
+      than the first read);
+  (c) locked, damped, the code still rises, 3.01 to 5.34: held.
+  Of 3 parts 1 held. Damped, the loop settles onto a fixed point the field reads worse than its first read: the trained readout is not
+  self-consistent under its own release, which it never met in training since November 3 (§16.27 retired the carried release: it committed
+  only certainty, and half of every lap trained states only the release met). So the release is a drive the field rings under (a two-cycle,
+  undamped) but cannot yet use; to use it the field must deposit through it, a law this build does not have and §16.27's failures bound.

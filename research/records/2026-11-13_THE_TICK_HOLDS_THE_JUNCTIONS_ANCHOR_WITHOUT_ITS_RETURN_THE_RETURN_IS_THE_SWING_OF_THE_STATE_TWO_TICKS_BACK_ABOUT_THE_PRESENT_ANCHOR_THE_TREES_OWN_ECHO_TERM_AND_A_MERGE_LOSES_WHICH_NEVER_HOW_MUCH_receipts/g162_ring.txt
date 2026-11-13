@@ -1,0 +1,54 @@
+# G162, read-ring on level3/MEAN.3000, seen text (prefix), 16 ticks, strengths 0, +0.1, +0.5 and -0.1 in every head (on 2^-16: 0, 6554, 32768, -6554), 2026-11-13T20:52-20:57Z; host, RAYON 8 threads
+s0 RING_LAW role=prefix places=1500 ticks=16 strength=0 ms=41
+s0 RING_SLICE slice=code regions=48 host_ms=13432 ms=13483
+s0 RING_SLICE slice=web regions=48 host_ms=15051 ms=28540
+s0 RING_SLICE slice=science regions=48 host_ms=15213 ms=43757
+s0 RING_SLICE slice=books regions=48 host_ms=14433 ms=58191
+s0 RING_SLICE slice=wikidata regions=88 host_ms=13101 ms=71294
+s0 RING_DONE ms=71294
+s0 MEASURE lap=ring_s0 rc=0 wall_s=71.7 peak_rss_kib=1690712
+s6554 RING_LAW role=prefix places=1500 ticks=16 strength=6554 ms=40
+s6554 RING_SLICE slice=code regions=48 host_ms=15893 ms=15943
+s6554 RING_SLICE slice=web regions=48 host_ms=18454 ms=34403
+s6554 RING_SLICE slice=science regions=48 host_ms=18047 ms=52454
+s6554 RING_SLICE slice=books regions=48 host_ms=18659 ms=71113
+s6554 RING_SLICE slice=wikidata regions=88 host_ms=16889 ms=88004
+s6554 RING_DONE ms=88004
+s6554 MEASURE lap=ring_s6554 rc=0 wall_s=88.4 peak_rss_kib=1686936
+s32768 RING_LAW role=prefix places=1500 ticks=16 strength=32768 ms=42
+s32768 RING_SLICE slice=code regions=48 host_ms=14973 ms=15024
+s32768 RING_SLICE slice=web regions=48 host_ms=16517 ms=31547
+s32768 RING_SLICE slice=science regions=48 host_ms=16538 ms=48088
+s32768 RING_SLICE slice=books regions=48 host_ms=16982 ms=65071
+s32768 RING_SLICE slice=wikidata regions=88 host_ms=13254 ms=78327
+s32768 RING_DONE ms=78327
+s32768 MEASURE lap=ring_s32768 rc=0 wall_s=78.7 peak_rss_kib=1639972
+s-6554 RING_LAW role=prefix places=1500 ticks=16 strength=-6554 ms=45
+s-6554 RING_SLICE slice=code regions=48 host_ms=13887 ms=13942
+s-6554 RING_SLICE slice=web regions=48 host_ms=15089 ms=29037
+s-6554 RING_SLICE slice=science regions=48 host_ms=15131 ms=44171
+s-6554 RING_SLICE slice=books regions=48 host_ms=15756 ms=59928
+s-6554 RING_SLICE slice=wikidata regions=88 host_ms=14633 ms=74563
+s-6554 RING_DONE ms=74563
+s-6554 MEASURE lap=ring_s-6554 rc=0 wall_s=75.0 peak_rss_kib=1643780
+
+RING .local/run/ring_s0 places=280 least_stage=4 least_code=1.2485 mean_cos_8_16=0.9882
+  code s1=3.2599 s2=1.9045 s3=1.3252 s4=1.2485 s5=1.3241 s6=1.4563 s7=1.6273 s8=1.8227 s9=2.0192 s10=2.1999 s11=2.3607 s12=2.5024 s13=2.6274 s14=2.7373 s15=2.8344 s16=2.9202
+  expected s1=1.0212 s2=0.9962 s3=1.0971 s4=1.2714 s5=1.5014 s6=1.7232 s7=1.8984 s8=2.0229 s9=2.1221 s10=2.2084 s11=2.2849 s12=2.3515 s13=2.4088 s14=2.4579 s15=2.5005 s16=2.5378
+  change s2=269625.7 s3=238794.9 s4=144991.2 s5=90820.5 s6=61637.6 s7=45097.2 s8=34919.6 s9=28273.9 s10=23571.6 s11=20143.8 s12=17559.2 s13=15562.9 s14=13990.8 s15=12715.9 s16=11639.4
+  cosine s3=0.399 s4=0.592 s5=0.851 s6=0.932 s7=0.961 s8=0.974 s9=0.981 s10=0.986 s11=0.989 s12=0.991 s13=0.992 s14=0.993 s15=0.994 s16=0.995
+RING .local/run/ring_s6554 places=280 least_stage=3 least_code=1.8778 mean_cos_8_16=0.9804
+  code s1=3.2599 s2=2.1347 s3=1.8778 s4=2.0468 s5=2.3755 s6=2.7496 s7=3.1174 s8=3.4389 s9=3.7127 s10=3.9507 s11=4.1615 s12=4.3490 s13=4.5168 s14=4.6676 s15=4.8038 s16=4.9274
+  expected s1=1.0212 s2=0.8791 s3=0.9560 s4=1.0840 s5=1.1960 s6=1.2510 s7=1.2644 s8=1.2728 s9=1.2816 s10=1.2903 s11=1.2985 s12=1.3073 s13=1.3161 s14=1.3237 s15=1.3304 s16=1.3362
+  change s2=353737.0 s3=289862.5 s4=166034.1 s5=107589.8 s6=77693.4 s7=60077.2 s8=48575.5 s9=40735.1 s10=35134.5 s11=30928.0 s12=27700.4 s13=25055.4 s14=22838.2 s15=20961.1 s16=19362.5
+  cosine s3=0.198 s4=0.423 s5=0.748 s6=0.874 s7=0.928 s8=0.952 s9=0.967 s10=0.976 s11=0.981 s12=0.985 s13=0.988 s14=0.990 s15=0.991 s16=0.993
+RING .local/run/ring_s32768 places=280 least_stage=1 least_code=3.2599 mean_cos_8_16=0.9470
+  code s1=3.2599 s2=5.5034 s3=5.9118 s4=6.2422 s5=6.6912 s6=6.9628 s7=7.1914 s8=7.3679 s9=7.5441 s10=7.6849 s11=7.8102 s12=7.9211 s13=8.0142 s14=8.0923 s15=8.1587 s16=8.2139
+  expected s1=1.0212 s2=0.7399 s3=0.8314 s4=0.9084 s5=0.9478 s6=0.9946 s7=1.0412 s8=1.0786 s9=1.0962 s10=1.1223 s11=1.1429 s12=1.1586 s13=1.1660 s14=1.1718 s15=1.1769 s16=1.1834
+  change s2=602997.6 s3=280850.0 s4=289015.4 s5=205498.5 s6=144459.7 s7=109173.4 s8=86958.2 s9=70946.6 s10=59665.1 s11=51438.2 s12=45339.9 s13=40651.4 s14=36601.9 s15=32884.7 s16=29772.2
+  cosine s3=0.115 s4=0.273 s5=0.407 s6=0.610 s7=0.751 s8=0.854 s9=0.910 s10=0.938 s11=0.953 s12=0.962 s13=0.970 s14=0.975 s15=0.978 s16=0.983
+RING .local/run/ring_s-6554 places=280 least_stage=3 least_code=1.5817 mean_cos_8_16=0.9942
+  code s1=3.2599 s2=1.9406 s3=1.5817 s4=1.6292 s5=1.7859 s6=1.9732 s7=2.1546 s8=2.3220 s9=2.4746 s10=2.6129 s11=2.7377 s12=2.8501 s13=2.9514 s14=3.0429 s15=3.1259 s16=3.2016
+  expected s1=1.0212 s2=1.3212 s3=1.6261 s4=2.0127 s5=2.3684 s6=2.6499 s7=2.8627 s8=3.0215 s9=3.1389 s10=3.2244 s11=3.2856 s12=3.3298 s13=3.3624 s14=3.3869 s15=3.4060 s16=3.4212
+  change s2=241913.2 s3=193728.0 s4=123329.9 s5=78194.8 s6=52071.3 s7=37013.6 s8=27700.6 s9=21579.4 s10=17353.0 s11=14299.4 s12=12031.3 s13=10306.3 s14=8958.9 s15=7894.4 s16=7033.7
+  cosine s3=0.559 s4=0.729 s5=0.920 s6=0.962 s7=0.979 s8=0.987 s9=0.991 s10=0.993 s11=0.995 s12=0.995 s13=0.996 s14=0.996 s15=0.997 s16=0.997

@@ -1,0 +1,116 @@
+# G161, read-mirror-strength on level3/MEAN.3000, seen (prefix, first READ) and held (second READ), 2026-11-13T20:43-20:52Z; host, RAYON 8 threads
+strength_g161h.log:STRENGTH_LAW role=held places=4000 heads=4 strengths=5 ms=52
+strength_g161h.log:STRENGTH_SLICE slice=code stretches=24 places=4296 host_ms=52533 ms=52588
+strength_g161h.log:STRENGTH_SLICE slice=web stretches=25 places=4394 host_ms=53531 ms=106130
+strength_g161h.log:STRENGTH_SLICE slice=science stretches=24 places=4296 host_ms=54596 ms=160740
+strength_g161h.log:STRENGTH_SLICE slice=books stretches=24 places=4296 host_ms=57500 ms=218252
+strength_g161h.log:STRENGTH_SLICE slice=wikidata stretches=25 places=4416 host_ms=63848 ms=282126
+strength_g161h.log:STRENGTH_DONE ms=282126
+strength_g161h.log:MEASURE lap=strength_g161h rc=0 wall_s=282.5 peak_rss_kib=473988
+strength_g161p.log:STRENGTH_LAW role=prefix places=4000 heads=4 strengths=5 ms=59
+strength_g161p.log:STRENGTH_SLICE slice=code stretches=25 places=4276 host_ms=51672 ms=51754
+strength_g161p.log:STRENGTH_SLICE slice=web stretches=24 places=4175 host_ms=53239 ms=105037
+strength_g161p.log:STRENGTH_SLICE slice=science stretches=24 places=4296 host_ms=57079 ms=162146
+strength_g161p.log:STRENGTH_SLICE slice=books stretches=24 places=4296 host_ms=55282 ms=217444
+strength_g161p.log:STRENGTH_SLICE slice=wikidata stretches=25 places=4455 host_ms=55576 ms=273058
+strength_g161p.log:STRENGTH_DONE ms=273058
+strength_g161p.log:MEASURE lap=strength_g161p rc=0 wall_s=273.5 peak_rss_kib=463012
+
+READ .local/run/strength_g161p
+  STRENGTH mask=0 slice=pooled head=0 off=3.0085 | -0.20:+0.02788 -0.10:+0.00777 -0.05:+0.00324 +0.05:+0.00744 +0.10:+0.01863
+  STRENGTH mask=0 slice=pooled head=1 off=3.0085 | -0.20:+0.10721 -0.10:+0.03627 -0.05:+0.01314 +0.05:+0.01111 +0.10:+0.04314
+  STRENGTH mask=0 slice=pooled head=2 off=3.0085 | -0.20:+0.03656 -0.10:+0.00904 -0.05:+0.00029 +0.05:+0.00695 +0.10:+0.01872
+  STRENGTH mask=0 slice=pooled head=3 off=3.0085 | -0.20:+0.66520 -0.10:+0.20491 -0.05:+0.05881 +0.05:+0.02915 +0.10:+0.11451
+  STRENGTH mask=0 slice=code head=0 off=3.1652 | -0.20:+0.08313 -0.10:+0.03858 -0.05:+0.02349 +0.05:+0.00494 +0.10:+0.01160
+  STRENGTH mask=0 slice=code head=1 off=3.1652 | -0.20:+0.14361 -0.10:+0.04201 -0.05:+0.01977 +0.05:+0.02594 +0.10:+0.08024
+  STRENGTH mask=0 slice=code head=2 off=3.1652 | -0.20:+0.03234 -0.10:+0.00241 -0.05:-0.00949 +0.05:+0.02030 +0.10:+0.04968
+  STRENGTH mask=0 slice=code head=3 off=3.1652 | -0.20:+1.20243 -0.10:+0.43757 -0.05:+0.14493 +0.05:-0.01727 +0.10:+0.05247
+  STRENGTH mask=0 slice=web head=0 off=2.8276 | -0.20:+0.04294 -0.10:+0.01715 -0.05:+0.00712 +0.05:-0.00197 +0.10:-0.00057
+  STRENGTH mask=0 slice=web head=1 off=2.8276 | -0.20:+0.12370 -0.10:+0.05073 -0.05:+0.02143 +0.05:-0.00354 +0.10:+0.00863
+  STRENGTH mask=0 slice=web head=2 off=2.8276 | -0.20:+0.04881 -0.10:+0.01726 -0.05:+0.00640 +0.05:+0.00065 +0.10:+0.00829
+  STRENGTH mask=0 slice=web head=3 off=2.8276 | -0.20:+0.65930 -0.10:+0.19583 -0.05:+0.06311 +0.05:+0.01463 +0.10:+0.07757
+  STRENGTH mask=0 slice=science head=0 off=3.1632 | -0.20:+0.01755 -0.10:+0.00074 -0.05:-0.00094 +0.05:+0.00506 +0.10:+0.01786
+  STRENGTH mask=0 slice=science head=1 off=3.1632 | -0.20:+0.08412 -0.10:+0.02699 -0.05:+0.00695 +0.05:+0.01397 +0.10:+0.04808
+  STRENGTH mask=0 slice=science head=2 off=3.1632 | -0.20:+0.02931 -0.10:+0.00468 -0.05:-0.00013 +0.05:+0.00682 +0.10:+0.01618
+  STRENGTH mask=0 slice=science head=3 off=3.1632 | -0.20:+0.54997 -0.10:+0.15276 -0.05:+0.03664 +0.05:+0.04293 +0.10:+0.13414
+  STRENGTH mask=0 slice=books head=0 off=2.8503 | -0.20:+0.01330 -0.10:+0.00009 -0.05:-0.00177 +0.05:+0.00546 +0.10:+0.01643
+  STRENGTH mask=0 slice=books head=1 off=2.8503 | -0.20:+0.09404 -0.10:+0.03087 -0.05:+0.00828 +0.05:+0.00895 +0.10:+0.03237
+  STRENGTH mask=0 slice=books head=2 off=2.8503 | -0.20:+0.02998 -0.10:+0.00753 -0.05:-0.00024 +0.05:+0.00479 +0.10:+0.01089
+  STRENGTH mask=0 slice=books head=3 off=2.8503 | -0.20:+0.55323 -0.10:+0.15021 -0.05:+0.03472 +0.05:+0.03430 +0.10:+0.09756
+  STRENGTH mask=0 slice=wikidata head=0 off=3.0347 | -0.20:-0.01295 -0.10:-0.01506 -0.05:-0.01012 +0.05:+0.02342 +0.10:+0.04678
+  STRENGTH mask=0 slice=wikidata head=1 off=3.0347 | -0.20:+0.09496 -0.10:+0.03248 -0.05:+0.01054 +0.05:+0.01016 +0.10:+0.04676
+  STRENGTH mask=0 slice=wikidata head=2 off=3.0347 | -0.20:+0.04348 -0.10:+0.01373 -0.05:+0.00478 +0.05:+0.00263 +0.10:+0.01004
+  STRENGTH mask=0 slice=wikidata head=3 off=3.0347 | -0.20:+0.39755 -0.10:+0.10414 -0.05:+0.02127 +0.05:+0.06733 +0.10:+0.20608
+  STRENGTH mask=1 slice=pooled head=0 off=1.1916 | -0.20:+0.03907 -0.10:-0.00597 -0.05:-0.00826 +0.05:+0.02271 +0.10:+0.05476
+  STRENGTH mask=1 slice=pooled head=1 off=1.1916 | -0.20:+0.27543 -0.10:+0.09683 -0.05:+0.04070 +0.05:-0.00505 +0.10:+0.01399
+  STRENGTH mask=1 slice=pooled head=2 off=1.1916 | -0.20:+0.12087 -0.10:+0.02902 -0.05:+0.00931 +0.05:+0.00939 +0.10:+0.03719
+  STRENGTH mask=1 slice=pooled head=3 off=1.1916 | -0.20:+1.09826 -0.10:+0.28618 -0.05:+0.06840 +0.05:+0.06301 +0.10:+0.24682
+  STRENGTH mask=1 slice=code head=0 off=0.7192 | -0.20:+0.14130 -0.10:+0.04221 -0.05:+0.01290 +0.05:-0.00699 +0.10:-0.00027
+  STRENGTH mask=1 slice=code head=1 off=0.7192 | -0.20:+0.35957 -0.10:+0.15548 -0.05:+0.06146 +0.05:-0.03021 +0.10:-0.04440
+  STRENGTH mask=1 slice=code head=2 off=0.7192 | -0.20:+0.20827 -0.10:+0.06800 -0.05:+0.02366 +0.05:-0.00154 +0.10:-0.00672
+  STRENGTH mask=1 slice=code head=3 off=0.7192 | -0.20:+1.49443 -0.10:+0.45373 -0.05:+0.16894 +0.05:+0.03196 +0.10:+0.30966
+  STRENGTH mask=1 slice=web head=0 off=1.2615 | -0.20:-0.02281 -0.10:-0.03214 -0.05:-0.02235 +0.05:+0.04060 +0.10:+0.09061
+  STRENGTH mask=1 slice=web head=1 off=1.2615 | -0.20:+0.16580 -0.10:+0.01997 -0.05:+0.02164 +0.05:+0.04885 +0.10:+0.09529
+  STRENGTH mask=1 slice=web head=2 off=1.2615 | -0.20:+0.10196 -0.10:+0.01648 -0.05:+0.01361 +0.05:+0.01940 +0.10:+0.06854
+  STRENGTH mask=1 slice=web head=3 off=1.2615 | -0.20:+0.96036 -0.10:+0.23403 -0.05:+0.02709 +0.05:+0.13181 +0.10:+0.31295
+  STRENGTH mask=1 slice=science head=0 off=2.0365 | -0.20:-0.00016 -0.10:-0.04344 -0.05:-0.02436 +0.05:+0.05172 +0.10:+0.11944
+  STRENGTH mask=1 slice=science head=1 off=2.0365 | -0.20:+0.28658 -0.10:+0.13464 -0.05:+0.07216 +0.05:-0.03227 +0.10:-0.01723
+  STRENGTH mask=1 slice=science head=2 off=2.0365 | -0.20:+0.15187 -0.10:+0.04239 -0.05:+0.01562 +0.05:+0.02199 +0.10:+0.04447
+  STRENGTH mask=1 slice=science head=3 off=2.0365 | -0.20:+0.77095 -0.10:+0.19621 -0.05:+0.01867 +0.05:+0.08986 +0.10:+0.36629
+  STRENGTH mask=1 slice=books head=0 off=0.8015 | -0.20:+0.05135 -0.10:+0.00535 -0.05:+0.00036 +0.05:+0.01011 +0.10:+0.03327
+  STRENGTH mask=1 slice=books head=1 off=0.8015 | -0.20:+0.30703 -0.10:+0.09922 -0.05:+0.03398 +0.05:+0.00401 +0.10:+0.02354
+  STRENGTH mask=1 slice=books head=2 off=0.8015 | -0.20:+0.13288 -0.10:+0.05594 -0.05:+0.02517 +0.05:-0.00881 +0.10:+0.01176
+  STRENGTH mask=1 slice=books head=3 off=0.8015 | -0.20:+1.00044 -0.10:+0.20759 -0.05:+0.02575 +0.05:+0.08653 +0.10:+0.23503
+  STRENGTH mask=1 slice=wikidata head=0 off=1.1602 | -0.20:+0.02212 -0.10:-0.00390 -0.05:-0.00871 +0.05:+0.01946 +0.10:+0.03390
+  STRENGTH mask=1 slice=wikidata head=1 off=1.1602 | -0.20:+0.25551 -0.10:+0.07335 -0.05:+0.01446 +0.05:-0.01419 +0.10:+0.01513
+  STRENGTH mask=1 slice=wikidata head=2 off=1.1602 | -0.20:+0.01035 -0.10:-0.03661 -0.05:-0.03044 +0.05:+0.01606 +0.10:+0.06844
+  STRENGTH mask=1 slice=wikidata head=3 off=1.1602 | -0.20:+1.24261 -0.10:+0.33049 -0.05:+0.09618 +0.05:-0.02032 +0.10:+0.01713
+READ .local/run/strength_g161h
+  STRENGTH mask=0 slice=pooled head=0 off=3.0754 | -0.20:+0.03862 -0.10:+0.01154 -0.05:+0.00411 +0.05:+0.00026 +0.10:+0.00817
+  STRENGTH mask=0 slice=pooled head=1 off=3.0754 | -0.20:+0.09764 -0.10:+0.03448 -0.05:+0.01047 +0.05:+0.00788 +0.10:+0.04003
+  STRENGTH mask=0 slice=pooled head=2 off=3.0754 | -0.20:+0.05329 -0.10:+0.01562 -0.05:+0.00426 +0.05:+0.00143 +0.10:+0.00996
+  STRENGTH mask=0 slice=pooled head=3 off=3.0754 | -0.20:+0.57448 -0.10:+0.16111 -0.05:+0.03668 +0.05:+0.04543 +0.10:+0.13999
+  STRENGTH mask=0 slice=code head=0 off=3.0746 | -0.20:+0.06483 -0.10:+0.02369 -0.05:+0.00851 +0.05:-0.00700 +0.10:-0.00069
+  STRENGTH mask=0 slice=code head=1 off=3.0746 | -0.20:+0.11474 -0.10:+0.04961 -0.05:+0.02080 +0.05:-0.00894 +0.10:+0.00868
+  STRENGTH mask=0 slice=code head=2 off=3.0746 | -0.20:+0.10762 -0.10:+0.03916 -0.05:+0.01693 +0.05:-0.00968 +0.10:-0.00648
+  STRENGTH mask=0 slice=code head=3 off=3.0746 | -0.20:+0.79569 -0.10:+0.20712 -0.05:+0.04642 +0.05:+0.03846 +0.10:+0.14482
+  STRENGTH mask=0 slice=web head=0 off=3.1784 | -0.20:+0.00672 -0.10:-0.00257 -0.05:-0.00394 +0.05:+0.00918 +0.10:+0.02505
+  STRENGTH mask=0 slice=web head=1 off=3.1784 | -0.20:+0.11028 -0.10:+0.04169 -0.05:+0.01411 +0.05:+0.00943 +0.10:+0.04698
+  STRENGTH mask=0 slice=web head=2 off=3.1784 | -0.20:+0.03713 -0.10:+0.00869 -0.05:+0.00242 +0.05:+0.00730 +0.10:+0.02022
+  STRENGTH mask=0 slice=web head=3 off=3.1784 | -0.20:+0.49703 -0.10:+0.14135 -0.05:+0.03791 +0.05:+0.04270 +0.10:+0.13275
+  STRENGTH mask=0 slice=science head=0 off=2.8781 | -0.20:+0.03652 -0.10:+0.01036 -0.05:+0.00443 +0.05:+0.00132 +0.10:+0.00561
+  STRENGTH mask=0 slice=science head=1 off=2.8781 | -0.20:+0.09415 -0.10:+0.02876 -0.05:+0.00858 +0.05:+0.01341 +0.10:+0.04858
+  STRENGTH mask=0 slice=science head=2 off=2.8781 | -0.20:+0.03751 -0.10:+0.01034 -0.05:+0.00162 +0.05:+0.00428 +0.10:+0.01399
+  STRENGTH mask=0 slice=science head=3 off=2.8781 | -0.20:+0.54133 -0.10:+0.15717 -0.05:+0.03462 +0.05:+0.04724 +0.10:+0.13260
+  STRENGTH mask=0 slice=books head=0 off=2.7162 | -0.20:+0.02372 -0.10:+0.00526 -0.05:+0.00106 +0.05:+0.00116 +0.10:+0.00812
+  STRENGTH mask=0 slice=books head=1 off=2.7162 | -0.20:+0.12083 -0.10:+0.04496 -0.05:+0.01566 +0.05:-0.00224 +0.10:+0.00818
+  STRENGTH mask=0 slice=books head=2 off=2.7162 | -0.20:+0.04287 -0.10:+0.01175 -0.05:+0.00273 +0.05:-0.00049 +0.10:+0.00663
+  STRENGTH mask=0 slice=books head=3 off=2.7162 | -0.20:+0.57347 -0.10:+0.18314 -0.05:+0.05193 +0.05:+0.01197 +0.10:+0.06281
+  STRENGTH mask=0 slice=wikidata head=0 off=3.5837 | -0.20:+0.06188 -0.10:+0.02117 -0.05:+0.01071 +0.05:-0.00321 +0.10:+0.00318
+  STRENGTH mask=0 slice=wikidata head=1 off=3.5837 | -0.20:+0.04369 -0.10:+0.00495 -0.05:-0.00839 +0.05:+0.02994 +0.10:+0.09315
+  STRENGTH mask=0 slice=wikidata head=2 off=3.5837 | -0.20:+0.03913 -0.10:+0.00697 -0.05:-0.00323 +0.05:+0.00654 +0.10:+0.01663
+  STRENGTH mask=0 slice=wikidata head=3 off=3.5837 | -0.20:+0.44885 -0.10:+0.11096 -0.05:+0.01005 +0.05:+0.09100 +0.10:+0.23573
+  STRENGTH mask=1 slice=pooled head=0 off=1.5565 | -0.20:+0.08182 -0.10:+0.02848 -0.05:+0.00769 +0.05:+0.00332 +0.10:+0.00584
+  STRENGTH mask=1 slice=pooled head=1 off=1.5565 | -0.20:+0.20008 -0.10:+0.04361 -0.05:+0.01101 +0.05:+0.00751 +0.10:+0.05971
+  STRENGTH mask=1 slice=pooled head=2 off=1.5565 | -0.20:+0.11848 -0.10:+0.04372 -0.05:+0.01128 +0.05:-0.00194 +0.10:+0.01282
+  STRENGTH mask=1 slice=pooled head=3 off=1.5565 | -0.20:+0.93034 -0.10:+0.22212 -0.05:+0.05528 +0.05:+0.07075 +0.10:+0.24569
+  STRENGTH mask=1 slice=code head=0 off=1.1011 | -0.20:-0.00708 -0.10:-0.01292 -0.05:-0.01465 +0.05:-0.00046 +0.10:+0.00016
+  STRENGTH mask=1 slice=code head=1 off=1.1011 | -0.20:+0.24095 -0.10:+0.10101 -0.05:+0.04573 +0.05:-0.07041 +0.10:-0.07151
+  STRENGTH mask=1 slice=code head=2 off=1.1011 | -0.20:+0.19958 -0.10:+0.06293 -0.05:+0.01924 +0.05:-0.04523 +0.10:-0.04827
+  STRENGTH mask=1 slice=code head=3 off=1.1011 | -0.20:+0.91619 -0.10:+0.13565 -0.05:-0.01429 +0.05:+0.01773 +0.10:+0.15749
+  STRENGTH mask=1 slice=web head=0 off=1.7053 | -0.20:+0.18456 -0.10:+0.08734 -0.05:+0.04961 +0.05:-0.01553 +0.10:-0.04735
+  STRENGTH mask=1 slice=web head=1 off=1.7053 | -0.20:+0.22078 -0.10:+0.02657 -0.05:-0.00320 +0.05:+0.04974 +0.10:+0.11613
+  STRENGTH mask=1 slice=web head=2 off=1.7053 | -0.20:+0.14817 -0.10:+0.05508 -0.05:+0.01372 +0.05:+0.01945 +0.10:+0.04753
+  STRENGTH mask=1 slice=web head=3 off=1.7053 | -0.20:+0.76052 -0.10:+0.13355 -0.05:+0.01785 +0.05:+0.19218 +0.10:+0.49576
+  STRENGTH mask=1 slice=science head=0 off=1.5540 | -0.20:+0.17480 -0.10:+0.06561 -0.05:+0.02432 +0.05:+0.01153 +0.10:+0.01145
+  STRENGTH mask=1 slice=science head=1 off=1.5540 | -0.20:+0.26244 -0.10:+0.04218 -0.05:+0.00285 +0.05:+0.03072 +0.10:+0.11780
+  STRENGTH mask=1 slice=science head=2 off=1.5540 | -0.20:+0.13115 -0.10:+0.05112 -0.05:+0.01672 +0.05:-0.00050 +0.10:+0.02262
+  STRENGTH mask=1 slice=science head=3 off=1.5540 | -0.20:+1.41862 -0.10:+0.37767 -0.05:+0.12374 +0.05:+0.02835 +0.10:+0.15822
+  STRENGTH mask=1 slice=books head=0 off=1.2371 | -0.20:+0.09071 -0.10:+0.04648 -0.05:+0.00997 +0.05:-0.01462 +0.10:-0.02079
+  STRENGTH mask=1 slice=books head=1 off=1.2371 | -0.20:+0.19141 -0.10:+0.08282 -0.05:+0.01618 +0.05:-0.00970 +0.10:+0.01226
+  STRENGTH mask=1 slice=books head=2 off=1.2371 | -0.20:+0.04939 -0.10:+0.00175 -0.05:-0.00576 +0.05:+0.03111 +0.10:+0.05185
+  STRENGTH mask=1 slice=books head=3 off=1.2371 | -0.20:+1.14483 -0.10:+0.40865 -0.05:+0.16408 +0.05:-0.08576 +0.10:-0.11823
+  STRENGTH mask=1 slice=wikidata head=0 off=2.1537 | -0.20:-0.03335 -0.10:-0.04355 -0.05:-0.03092 +0.05:+0.03514 +0.10:+0.08468
+  STRENGTH mask=1 slice=wikidata head=1 off=2.1537 | -0.20:+0.08859 -0.10:-0.03073 -0.05:-0.00524 +0.05:+0.03433 +0.10:+0.11906
+  STRENGTH mask=1 slice=wikidata head=2 off=2.1537 | -0.20:+0.06512 -0.10:+0.04713 -0.05:+0.01234 +0.05:-0.01485 +0.10:-0.01014
+  STRENGTH mask=1 slice=wikidata head=3 off=2.1537 | -0.20:+0.43907 -0.10:+0.06532 -0.05:-0.01066 +0.05:+0.19116 +0.10:+0.51360
