@@ -1,0 +1,9 @@
+# G168, read-release locked on the cut's masks, 8 passes, undamped, EVIDENCE 1, SNAP 1 (an open place's release shattered for every later pass where its near field's written places code worse in sum than at pass 1); level3/MEAN.3000, seen text; host, RAYON 8 threads, 169.1 s
+p1 open_code=3.0085 expected=3.0354 written_code=3.9545 shattered=0/5523
+p2 open_code=3.4411 expected=2.9951 written_code=4.0351 shattered=2351/5523
+p3 open_code=3.4462 expected=2.9621 written_code=4.0392 shattered=2574/5523
+p4 open_code=3.7238 expected=2.7728 written_code=4.0349 shattered=2621/5523
+p5 open_code=4.2356 expected=2.5381 written_code=4.0378 shattered=2651/5523
+p6 open_code=4.7093 expected=2.3724 written_code=4.0381 shattered=2656/5523
+p7 open_code=5.0869 expected=2.2269 written_code=4.0408 shattered=2674/5523
+p8 open_code=5.3032 expected=2.1572 written_code=4.0402 shattered=2677/5523
