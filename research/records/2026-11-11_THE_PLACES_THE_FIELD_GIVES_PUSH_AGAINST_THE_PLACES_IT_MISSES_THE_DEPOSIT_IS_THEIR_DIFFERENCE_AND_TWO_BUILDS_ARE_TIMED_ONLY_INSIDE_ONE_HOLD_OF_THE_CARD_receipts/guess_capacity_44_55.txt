@@ -3428,3 +3428,24 @@ places over five slices, 347.5 s on the host's 24 threads against 300 to 900 pro
   trains as built (G145). (b) 0.16 at 0.20 or under: the law of sites stays the first round. The running description length (each place's
   code with its future open, whose sum is the region's joint code under the opening) is the candidate news if the level's trained read
   shows the shortfall binding; it is recorded, not built.
+
+G145 scored 2026-11-13T17:25Z (receipt g145_level.txt, the design record's receipts; the build 19a4c7520's binary at 407a63c5f's law; the
+line reproduced with the level absent 100 of 100 with its digests; gates 1 and 3 (90 passed, the level's card parity among them); found-level
+judged 11 of 11 lines, the material 121,638 to 221,878 (the level's field 50,640, the glue 49,600); the control 898.8 s and the level 980.8 s
+against 1,638 and 1,059 projected; read-cavity on P57's places at both lap means, 297 s and 321 s):
+  (a) not read: no line of the training read prints a section's epochs. On the held places with nothing masked the level's news cuts 0.269
+      of places as sites (a mean epoch of 3.7), the open places of a training section being nearly all sites by (a)'s premise.
+  (b) in one hold a section with the level 24.9 ms over the line's (326.6 against 303.1 and 300.1, the controls' spread 0.010), against 45
+      (25 to 80): missed below by a tenth of a millisecond; every face at the founding equal to the line's (section 0's codes and opening code
+      equal): held; the line reproduced with the level absent: held.
+  (c) at the lap means by read-cavity's last tick: the whole masks' open places 0.0103 nats a place under the line's (code 0.0127, web 0.0123,
+      science 0.0118, books 0.0063, wikidata 0.0081), against 0.020 (0.000 to 0.050 under): held; the one-place masks 0.0122 under (code
+      0.0097, web 0.0107, science 0.0167, books 0.0091, wikidata 0.0148), against 0.005 (0.005 over to 0.020 under): held; the slices' order
+      of gain the order of their epochs' length: missed (books, the longest epochs, gains least at the whole masks and second least at one
+      place). The opening's code stands where it was (2.2017 against 2.2018): the level acts after it. The sections' training codes fall
+      under the control's steadily through the lap, 0.9998 of it over the first 500 sections and 0.9977 over the last, still widening.
+  Of 6 parts read 4 held and 2 missed, and one unread. The premise that missed: the gain was guessed to follow the epochs' length, where it
+  is nearly even across slices and the one-place masks gain more than the whole masks (agent-inferred: the level's prolongation reaches
+  every place of an epoch from its whole, and a place whose neighbours are written reads it best).
+  Rule applied: (c) 0.0103 at 0.010 or more under at the whole masks: the level stays, a second lap follows, and the invariance of the
+  design record's §9 items 1 to 3 is read on the trained level's sites. (b) under 80 ms: no reading of the level's field against the card.

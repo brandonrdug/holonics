@@ -666,6 +666,13 @@ more. Both stood under the rules fixed before the read, so the level trains on t
 length, each place's code with its future open (whose sum is the region's joint code under the opening, so the clock is the description
 length and not a pseudo-likelihood), is the candidate news if the trained level shows the shortfall binding.
 
+**What the first lap gave** (G145; `g145_level.txt`). Founded on the founded line's latest state, the level read every face of the line at
+its founding and trained 3,000 sections beside the line itself on the same sections. At the lap means, read-cavity's last tick codes the
+held places 0.0122 nats a place under the line at one-place masks and 0.0103 under at the whole masks' open places, every slice under
+(0.006 to 0.017), the sections' training codes falling under the control's through the whole lap and still widening at its end. A section
+costs 24.9 ms more, 1.08 of the line's. The level's own field holds 50,640 entries and its glue 49,600. The level stays: a second lap follows,
+with the invariance of §9 read on its trained sites.
+
 ## 5. What this corrects in the records of November 12
 
 - The record of the symbol's length §8.1 and §8.3 ("one clock"): the moments' strides stay
