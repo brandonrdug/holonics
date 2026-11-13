@@ -3778,7 +3778,9 @@ __device__ __forceinline__ wide gained(wide v, int32_t beta, uint32_t *st) {
 // `cw`. A lane is a pair for the row's sums and the staged `δs`, and an entry of the span for the row's
 // return.
 #define REV_ROWS 4
-extern "C" __global__ void __launch_bounds__(REV_ROWS * 32, 6) field_contact_rows(FieldWords w, uint32_t h, const int64_t *dyh, int64_t *ds, int64_t *dq) {
+// [theory, November 13, P55 step 5, G126 (e)] Four blocks a multiprocessor in the launch bounds: in one hold the rows read 0.881 of their time at
+// four, 128 registers and 8 octets of stack against six's cap of 80 registers, 136 octets of stack and 208 and 384 octets of spills (p55_helpers.txt).
+extern "C" __global__ void __launch_bounds__(REV_ROWS * 32, 4) field_contact_rows(FieldWords w, uint32_t h, const int64_t *dyh, int64_t *ds, int64_t *dq) {
     __shared__ uint32_t stj[REV_ROWS][32], stk[REV_ROWS][32];
     __shared__ int64_t dss[REV_ROWS][32];
     __shared__ wide dpcs[REV_ROWS][MAX_CROWD_SLOTS];
@@ -4477,6 +4479,15 @@ __device__ __forceinline__ wide skin_back_dev(const FieldWords &w, wide b, wide 
         atomicOr(w.status, REFUSED_CARRIER);
     }
     return rel(rel(y, MOVE_BITS), 16);
+}
+
+// [definition; theory, November 13, P55 step 5] **The skin's covector on the words its bounds prove** (`skin_back_dev`'s integers, every bit kept):
+// `release(release(release(E D, 30) b, 30), 16)` with plain products. In the skin's return `E` is a value plus a lock, each a release by 63 of a
+// product `mul_fits` admitted (under `2^127`, or zero where it refused), so `|E| ≤ 2^65`; a skin `D ≤ 2^30` (`skin_word` refuses past it, a decay is
+// at most one); a turn rate `|b| = release(2π/n, 16) < 2^33` (π on `2^(−46)`). So `|E D| ≤ 2^95` and `|release(E D, 30) b| < 2^98`: neither of
+// `skin_back_dev`'s checks can refuse, and the plain products are its integers.
+__device__ __forceinline__ wide skin_back_proved(wide b, wide decay, wide e) {
+    return rel(rel(rel(e * decay, MOVE_BITS) * b, MOVE_BITS), 16);
 }
 
 // A site's rate on paced head `p`'s class sheet (§16.16, the host's `Field::paces`): its own class's entry (zero at a
@@ -5289,12 +5300,19 @@ extern "C" __global__ void field_pace_frame_back(FieldWords w, const int64_t *dq
 // (its value `release(p_C Re(conj(δỹ) V), 63)/|C|`, its lock bracket over `|C|²`).
 extern "C" __global__ void __launch_bounds__(CONTACT_ROWS * 32) field_pace_skin_back(FieldWords w, uint32_t h, const int64_t *dyh, const int64_t *ds) {
     __shared__ RowCls rcs[CONTACT_ROWS];
+    // [theory, November 13, P55 step 5] Each mode's turn rate `b_l = release(2π/n_l, 16)` read once a block (`turn_rate_dev`): the quotient is the
+    // head's and the mode's, the same at every pair and crowd of every row (at most 16 modes: the card's span is at most 32 entries).
+    __shared__ wide turn_b[16];
     const uint32_t warp = threadIdx.x >> 5, lane = threadIdx.x & 31;
     const uint32_t S = w.span, n = w.n, classes = w.nclasses;
     const int32_t p = paced_index(w, h);
     if (p < 0) {
         return;
     }
+    for (uint32_t l = threadIdx.x; l < n; l += blockDim.x) {
+        turn_b[l] = turn_rate_dev(w, l * (w.frames - w.still) + h % w.frames - w.still);
+    }
+    __syncthreads();
     const uint64_t rows1 = (uint64_t)w.T + w.R;
     for (uint64_t g = ((uint64_t)blockIdx.x * blockDim.x + threadIdx.x) >> 5; g < w.T; g += (uint64_t)gridDim.x * (blockDim.x >> 5)) {
         const uint64_t hg = (uint64_t)h * w.T + g;
@@ -5335,8 +5353,9 @@ extern "C" __global__ void __launch_bounds__(CONTACT_ROWS * 32) field_pace_skin_
             }
             const uint32_t gap = j > i ? j - i : i - j;
             wide at = 0;
+            // [P55 step 5] The modes' sums to the source's covector, added on the lane and summed once (a ring sum on `Z/2^128`: the same bits).
+            uwide to_source = 0;
             for (uint32_t l = 0; l < n; l++) {
-                const uint32_t slot = l * (w.frames - w.still) + h % w.frames - w.still;
                 const wide dec = skin_ij_at(w, h, l, g, srow + k, gap);
                 // [P54 step 4] `Re(conj(δỹ) ṽ)` as two 64 by 64 products (each under `2^126`, their sum under `2^127`).
                 const wide inner = mul64_128(dyi[l], values[(uint64_t)j * S + l]) + mul64_128(dyi[n + l], values[(uint64_t)j * S + n + l]);
@@ -5355,10 +5374,11 @@ extern "C" __global__ void __launch_bounds__(CONTACT_ROWS * 32) field_pace_skin_
                     atomicOr(w.status, REFUSED_KEY);
                 }
                 lock = rel(lock, 2 * FACE_BITS + 1 + 2 * MOVE_BITS - MOVE_BITS);
-                at = skin_back_dev(w, turn_rate_dev(w, slot), dec, value + lock);
+                at = skin_back_proved(turn_b[l], dec, value + lock);
                 own -= sgn * at;
-                add_wide(w.gsig + (uint64_t)p * w.T + gj, sgn * at);
+                to_source += (uwide)(sgn * at);
             }
+            add_wide(w.gsig + (uint64_t)p * w.T + gj, (wide)to_source);
         }
         if (lane < nslots) {
             uint32_t lo, hi_, lv;
@@ -5369,15 +5389,19 @@ extern "C" __global__ void __launch_bounds__(CONTACT_ROWS * 32) field_pace_skin_
                 const wide sgn = sigma[g] > sigma[ge] ? 1 : sigma[g] < sigma[ge] ? -1 : 0;
                 if (count != 0 && sgn != 0) {
                     const wide cnt = (wide)count;
+                    // [P55 step 5] The quotients by the count and its square (a mode's value and bracket) by divisors read once a crowd
+                    // (`div_nearest_by`, the same integer: `⌊(|x| + ⌊k/2⌋)/k⌋` either way; `count < 2^32`, so `count² < 2^64`), and the modes' sums to
+                    // the edge's covector added on the lane and summed once.
+                    const Divisor qc = divisor_of(count), qc2 = divisor_of(count * count);
+                    uwide to_edge = 0;
                     for (uint32_t l = 0; l < n; l++) {
-                        const uint32_t slot = l * (w.frames - w.still) + h % w.frames - w.still;
                         const wide dec = crowd_skin_ij(w, h, l, g, lv, right);
                         const wide vr = svp[(uint64_t)(hi_ + 1) * S + l] - svp[(uint64_t)lo * S + l], vi = svp[(uint64_t)(hi_ + 1) * S + n + l] - svp[(uint64_t)lo * S + n + l];
                         wide x = 0, y = 0, value = 0;
                         if (!mul_fits((wide)dyi[l], vr, &x) || !mul_fits((wide)dyi[n + l], vi, &y) || !mul_fits((wide)w.ce[hg * w.slots + lane], x + y, &value)) {
                             atomicOr(w.status, REFUSED_CARRIER);
                         }
-                        value = div_nearest(rel(value, SHARE_BITS), cnt);
+                        value = div_nearest_by(rel(value, SHARE_BITS), qc);
                         const wide wr = wi[l], wim = wi[n + l];
                         const wide mr = swp[(uint64_t)(hi_ + 1) * S + l] - swp[(uint64_t)lo * S + l], mi = swp[(uint64_t)(hi_ + 1) * S + n + l] - swp[(uint64_t)lo * S + n + l];
                         // [P54 step 4] Where the crowd's summed words are under `2^31`: its pairing and power from 32-bit products (sums under
@@ -5387,19 +5411,20 @@ extern "C" __global__ void __launch_bounds__(CONTACT_ROWS * 32) field_pace_skin_
                         if (narrow31(mr, &mr32) & narrow31(mi, &mi32)) {
                             const int64_t pairing = mul32(wi[l], mr32) + mul32(wi[n + l], mi32);
                             const int64_t power = mul32(mr32, mr32) + mul32(mi32, mi32);
-                            bracket = div_nearest((mul64_128(pairing, 2 * (int64_t)count) << MOVE_BITS) - mul64_128(power, 2 * (int64_t)dec), cnt * cnt);
+                            bracket = div_nearest_by((mul64_128(pairing, 2 * (int64_t)count) << MOVE_BITS) - mul64_128(power, 2 * (int64_t)dec), qc2);
                         } else {
-                            bracket = div_nearest(((2 * cnt * (wr * mr + wim * mi)) << MOVE_BITS) - 2 * dec * (mr * mr + mi * mi), cnt * cnt);
+                            bracket = div_nearest_by(((2 * cnt * (wr * mr + wim * mi)) << MOVE_BITS) - 2 * dec * (mr * mr + mi * mi), qc2);
                         }
                         wide lock = 0;
                         if (!mul_fits((wide)w.cds[hg * w.slots + lane], bracket, &lock)) {
                             atomicOr(w.status, REFUSED_KEY);
                         }
                         lock = rel(lock, 2 * FACE_BITS + 1 + MOVE_BITS);
-                        const wide at = skin_back_dev(w, turn_rate_dev(w, slot), dec, value + lock);
+                        const wide at = skin_back_proved(turn_b[l], dec, value + lock);
                         own -= sgn * at;
-                        add_wide(w.gsig + (uint64_t)p * w.T + ge, sgn * at);
+                        to_edge += (uwide)(sgn * at);
                     }
+                    add_wide(w.gsig + (uint64_t)p * w.T + ge, (wide)to_edge);
                 }
             }
         }
