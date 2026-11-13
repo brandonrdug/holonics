@@ -30,6 +30,21 @@ fn run(args: &[String]) -> Result<()> {
     if mode == "reserve" {
         return reserve(rest);
     }
+    // [measurement; theory, November 13, P56 item 5] The card's attributes as the driver reports them (cuDeviceGetAttribute).
+    if mode == "attributes" {
+        let opened = Card::open(0)?;
+        let c = opened.census();
+        println!("CARD_ATTRIBUTE name={} multiprocessors={} warp={}", c.name, c.multiprocessors, c.warp);
+        println!("CARD_ATTRIBUTE shared_per_block_default={}", c.shared_per_block);
+        println!("CARD_ATTRIBUTE shared_per_block_optin={}", c.shared_per_block_optin);
+        println!("CARD_ATTRIBUTE shared_per_multiprocessor={}", c.shared_per_multiprocessor);
+        println!("CARD_ATTRIBUTE registers_per_multiprocessor={}", c.registers_per_multiprocessor);
+        println!("CARD_ATTRIBUTE registers_per_block={}", c.registers_per_block);
+        println!("CARD_ATTRIBUTE max_threads_per_multiprocessor={}", c.max_threads_per_multiprocessor);
+        println!("CARD_ATTRIBUTE max_blocks_per_multiprocessor={}", c.max_blocks_per_multiprocessor);
+        println!("CARD_ATTRIBUTE l2_octets={}", c.l2_octets);
+        return Ok(());
+    }
     if rest.first().map(String::as_str) != Some("complete-language") {
         return Err("field_pass parity|time|train complete-language COMMAND ARGS…".into());
     }
@@ -92,12 +107,19 @@ fn run(args: &[String]) -> Result<()> {
                     cum * 1000 >= count * 999
                 }).unwrap_or(largest);
                 println!("FIELD_BITS array={name} clock={k} words={count} zero={} zero_ppm={} largest_bits={largest} q999_bits={q999}", bins[0], bins[0] * 1_000_000 / count);
+                // [measurement; theory, November 13, P56 item 1] The shares' histograms whole: the count at every bit length 0 to 64.
+                if name.starts_with("e_share") || *name == "ce" {
+                    println!("FIELD_BITS_HIST array={name} clock={k} counts={}", bins[..65].iter().map(u64::to_string).collect::<Vec<_>>().join(","));
+                }
             }
         }
     }
     if let Some(phases) = card.phased() {
+        // [measurement; theory, November 13, P56 item 4] With the profile, each phase's timed card ms and the host's rest.
+        let cards: std::collections::BTreeMap<&str, u128> = card.phase_card().into_iter().collect();
         for (name, marks, ns) in phases {
-            println!("FIELD_PHASE name={name} marks={marks} ms={} us_a_mark={}", ns / 1_000_000, ns / 1_000 / (marks as u128).max(1));
+            let c = cards.get(name).copied().unwrap_or(0);
+            println!("FIELD_PHASE name={name} marks={marks} ms={} us_a_mark={} card_ms={} host_ms={}", ns / 1_000_000, ns / 1_000 / (marks as u128).max(1), c / 1_000_000, ns.saturating_sub(c) / 1_000_000);
         }
     }
     if let Some(p) = card.profiled() {
@@ -119,6 +141,16 @@ fn run(args: &[String]) -> Result<()> {
                 ns / 1_000,
                 ns * 1_000 / pairs.max(1)
             );
+        }
+        // [measurement; theory, November 13, P56 item 4] Each copy and take by its call site's line in field.rs, and each zeroing by its take's.
+        for ((kind, line), (calls, ns)) in &p.by_site {
+            println!("FIELD_PROFILE_SITE kind={kind} line={line} calls={calls} ms={:.3}", *ns as f64 / 1e6);
+        }
+        for ((line, class), [hits, misses, frees, freed, wide]) in &p.pool {
+            println!("FIELD_PROFILE_POOL line={line} class_octets={class} hits={hits} misses={misses} frees={frees} freed_octets={freed} served_longer={wide}");
+        }
+        for (line, (calls, ns, octets)) in &p.zeroed {
+            println!("FIELD_PROFILE_ZEROED line={line} calls={calls} ms={:.3} octets={octets}", *ns as f64 / 1e6);
         }
         println!(
             "FIELD_PROFILE_SPLIT kernels_ms={} copies={} copies_ms={} allocations={} allocations_ms={} elapsed_ms={}",

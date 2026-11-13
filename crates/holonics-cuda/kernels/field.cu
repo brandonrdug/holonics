@@ -3482,6 +3482,15 @@ extern "C" __global__ void field_face(FieldWords w, const int64_t *z, uint64_t *
     }
 }
 
+// [realization; theory, November 13, P58 item 3] The training path's reading of a face (the host's `compared`): each open site's mass at
+// its class, gathered so that the pass's end fetches one word a site beside its total in place of the face's every class; zero at a
+// resolved site, which carries no face. The host refuses a class past the alphabet at an open site before the launch. One thread a site.
+extern "C" __global__ void field_face_at_class(FieldWords w, const uint64_t *masses, uint64_t *picked) {
+    for (uint64_t t = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; t < w.T; t += (uint64_t)gridDim.x * blockDim.x) {
+        picked[t] = w.unresolved[t] ? masses[t * w.A + w.classes[t]] : 0;
+    }
+}
+
 // -------------------------------------------------------------------------------------------
 // the reverse
 
@@ -5872,11 +5881,12 @@ __device__ __forceinline__ uint32_t bits_of_wide(wide v) {
 }
 
 // `kind`: 0 the score or share e (u64, a head's block), 1 the lock sb (i64, a head's block), 2 ds (i64, one head's block), 3 dpb (128 bits, one head's
-// block), 4 the clock's skin of mode `mode` (u32, the support stride; a paced head where its pace is not plain), 5 a crowd's share ce at its live slots.
+// block), 4 the clock's skin of mode `mode` (u32, the support stride; a paced head where its pace is not plain), 5 a crowd's share ce at its live slots;
+// 6 the share e as kind 0, the definite rows' into `hist` and the open rows' into `hist + mode` (P56 item 1, by the receiver's kind).
 extern "C" __global__ void __launch_bounds__(CONTACT_ROWS * 32) field_yard_bits_pairs(FieldWords w, uint32_t h, uint32_t kind, uint32_t mode, const void *arr, unsigned long long *hist) {
-    __shared__ uint32_t local[BITS_BINS];
+    __shared__ uint32_t local[2 * BITS_BINS];
     __shared__ RowCls rcs[CONTACT_ROWS];
-    for (uint32_t c = threadIdx.x; c < BITS_BINS; c += blockDim.x) {
+    for (uint32_t c = threadIdx.x; c < 2 * BITS_BINS; c += blockDim.x) {
         local[c] = 0;
     }
     __syncthreads();
@@ -5913,9 +5923,12 @@ extern "C" __global__ void __launch_bounds__(CONTACT_ROWS * 32) field_yard_bits_
                 continue;
             }
             uint32_t b = 0;
-            if (kind == 0) {
+            if (kind == 0 || kind == 6) {
                 const uint64_t v = ((const uint64_t *)arr)[(uint64_t)h * w.E + at + j];
                 b = v ? 64 - (uint32_t)__clzll((long long)v) : 0;
+                if (kind == 6 && rcs[warp].open) {
+                    b += BITS_BINS;
+                }
             } else if (kind == 1) {
                 b = bits_of_wide((wide)((const int64_t *)arr)[(uint64_t)h * w.E + at + j]);
             } else if (kind == 2) {
@@ -5933,6 +5946,9 @@ extern "C" __global__ void __launch_bounds__(CONTACT_ROWS * 32) field_yard_bits_
     for (uint32_t c = threadIdx.x; c < BITS_BINS; c += blockDim.x) {
         if (local[c]) {
             atomicAdd(&hist[c], (unsigned long long)local[c]);
+        }
+        if (kind == 6 && local[BITS_BINS + c]) {
+            atomicAdd(&hist[mode + c], (unsigned long long)local[BITS_BINS + c]);
         }
     }
 }

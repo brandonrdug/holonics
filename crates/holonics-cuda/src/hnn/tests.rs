@@ -105,6 +105,7 @@ pub(super) fn census() -> DeviceCensus {
         shared_per_multiprocessor: 102_400,
         registers_per_block: 65_536,
         registers_per_multiprocessor: 65_536,
+        l2_octets: 67_108_864,
         memory: MemoryInfo {
             free_bytes: 0,
             total_bytes: 0,
