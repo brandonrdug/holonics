@@ -279,8 +279,26 @@ repository was reset on September 24; the pre-reset tree is
     left is the crowds' and the modes' helpers: a quotient by `count² 2^b` that takes the
     128-by-128 software division on every crowd of a paced clock (`b = 77`), checked 128-bit
     products a mode, and a 128-bit atomic sum a mode at one address (agent-inferred, counted by
-    hand). Their time by helper is the next reading (G126), with the rebuild of any helper at
-    0.08 of an entry fixed in the same order.
+    hand). Their time by helper was read next (G126, scored November 13: of its five parts two
+    held, the rows' 128-bit division read 0.010 of their time where 0.12 was guessed, the
+    skin's return's checked products 0.401 where 0.20 was, and the rows at four blocks a
+    multiprocessor 0.881 where 1.00 was). By a count times a yardstick, an upper bound, the rows
+    are their pairs' products of two 64-bit words with their loads, 32 a pair over 45.67
+    million pairs a section, and no helper. Step 5 (November 13; every bit kept, 600 of 600
+    lines and both states reproduced) rebuilt the skin's return's helpers by G126's rule (each
+    mode's turn rate read once a block, the skin covector's products plain where their bounds
+    prove them, a crowd's quotients by divisors read once a crowd, a mode's sums to one address
+    added on the lane and summed once) and set the rows' launch bounds to four blocks. In one
+    hold the skin's return read 0.568 of its own time and the rows 0.898, both inside the
+    ranges fixed before the read, and the section 0.964 (305.0 ms against controls of 319.1 and
+    313.5). The reproduction's save line counted 601 batches against 600: the card's free
+    memory at the open put one section 831,364 octets over the batch's cut. A batch is a
+    schedule, and the section lines and the states are equal, so the reproduction holds.
+    After five steps the profile is flat: no entry holds more than 0.115 of the kernels' time,
+    and a section stands at 7.5 times the bar. The next repairs are of the section's structure
+    (agent-inferred): the contact family as one launch a tick each way on a region resident in
+    its block, the site-local families fused the same way, and the host's part beside the
+    card's, each with its guess fixed before its build.
   - The level above is designed on the news, and three count rulers fixed its choices
     (November 13; [the design record](research/records/2026-11-13_A_LEVELS_SITES_ARE_THE_EPOCHS_OF_ITS_NEWS_BEGUN_AGAIN_AT_EACH_OPENING_ITS_CLOCK_IS_THE_NEWS_BETWEEN_THEM_A_PLACES_NEWS_IS_READ_AT_ITS_CAVITY_FACE_AND_EACH_NAVIGATOR_KEEPS_ITS_LOCATED_CLOCK.md)). A level has two things the
     record of the symbol's length ran together: its places (where a receiver's section is
