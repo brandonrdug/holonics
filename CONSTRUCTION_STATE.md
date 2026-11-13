@@ -506,6 +506,11 @@ repository was reset on September 24; the pre-reset tree is
     level is the line. A place's influence on another, read by replacing its class, follows their
     count of places and not the news between them (G148): the fine heads' falloff by place distance
     is where the place clock still stands, and a head's reach on the news clock is the next law.
+    The line's third lap fell 0.0251 nats a place at one-place masks and 0.0137 at whole masks from
+    the second's mean (1.1112 and 2.4278). Rung past its trained depth the field relaxes and its faces
+    flatten (G149): the built tick takes a junction's mean without its return, so no branch reflects
+    and nothing rings; the junction's return in the tick is the next law, and a turned head's reach
+    on its own clock (G150: its clock carries part of the influence, the place count part) after it.
   - The open places need the written rows' ticks (November 13, P62, G140 scored; the design
     record §4.8). Read zero-shot on the line's latest lap mean with a written row held at its
     opening: the open rows alone code 3.29 nats a place worse at held one-place masks and 1.90
