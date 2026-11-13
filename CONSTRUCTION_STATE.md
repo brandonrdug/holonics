@@ -471,6 +471,14 @@ repository was reset on September 24; the pre-reset tree is
     entries 16 ms of it, where the count gave 0.005 of a section: the opening's kernels are the
     next engine reading. The comparison stays in the line, and the level's sites, clock and
     phase chart are next, read on this news.
+  - The open places need the written rows' ticks (November 13, P62, G140 scored; the design
+    record §4.8). Read zero-shot on the line's latest lap mean with a written row held at its
+    opening: the open rows alone code 3.29 nats a place worse at held one-place masks and 1.90
+    at whole masks; with a count reader's landmarks at 8 bits also computed, 1.60 and 0.73;
+    written places drawn at random do as well as the landmarks. On held sections the open rows
+    meet 0.69 of the pair-terms, so the landmarks' cut keeps 0.77 of them and 0.91 of the
+    forward's time. The candidate cut of written rows is not built; where an open row's mass
+    lies by its source's news is read first, on the machine's own news.
   - Every extent of the built declaration is given the part it sizes, how it was reached and what
     sizes it (the same record, §5), with ten findings by file and line and the build that closes
     each. The departures that stand: the face's 64 coordinates are two lanes of 32, the second a

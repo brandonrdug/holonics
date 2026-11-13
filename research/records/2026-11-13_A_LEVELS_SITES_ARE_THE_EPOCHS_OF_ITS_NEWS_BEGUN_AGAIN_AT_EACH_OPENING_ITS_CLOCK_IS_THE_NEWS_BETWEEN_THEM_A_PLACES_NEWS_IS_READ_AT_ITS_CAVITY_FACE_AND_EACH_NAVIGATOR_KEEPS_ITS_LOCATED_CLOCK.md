@@ -558,6 +558,26 @@ of this section is `agent-inferred`, and nothing in it is built.*
   the refinement of a source's state and the return through that refinement; whether the open
   rows' code holds without it is what G140 and then the trained line read.
 
+**What the reading gave** (P62, November 13; G140 scored; `p62_receivers.txt` in the engine
+record's receipts). On the line's latest lap mean, with a written row outside the mask held at its
+opening through every tick, in nats a place at open places after the last tick:
+- every row computed reads the line's own read at all 104,225 places; the open rows alone read
+  3.292 worse at one-place masks and 1.897 at whole masks; the open rows with the count reader's
+  landmarks at 8 bits (0.26 to 0.32 of places) read 1.604 and 0.727 worse; as many written places
+  drawn at random read 0.052 better than the landmarks at one-place masks and 0.003 worse at whole
+  masks;
+- on ten held sections the open places are 0.340 of the sites and their rows meet 0.689 of the
+  pair-terms (an open row meets every definite site); under the landmarks' mask 0.527 of the rows
+  and 0.771 of the pairs are computed, and the forward takes 0.913 of every row's time in one hold.
+
+So a written place's ticks give the open rows far more than its own news bounds: held at its
+opening, it gives its neighbours its opening and not what its own sources brought it, and the
+bound of `landmark.pin-worth-surprise` is on what a pin tells a target directly
+(`agent-inferred`). The count reader's landmarks do not rank a written place's worth as a
+receiver, and they flag too many places to pay. G140's rules: the candidate law is not built;
+where an open row's mass lies by its source's news is read first, on the machine's own news
+(§4.4a, now built) and never on a count's.
+
 ## 5. What this corrects in the records of November 12
 
 - The record of the symbol's length §8.1 and §8.3 ("one clock"): the moments' strides stay

@@ -3215,3 +3215,32 @@ first, 100 of 100 section lines and both digests). Nats a place:
   the control's, under 0.03: the comparison stays in the line, and the level's sites, clock and phase chart are ordered next with their
   guess. (d) over 1.12: the opening's kernels are the next engine reading, and the law stands. The one-place masks pay 0.024 and
   wikidata 0.047 at both masks; the rule's bound is on the whole masks, and that payment is read again at the level's first lap means.
+
+G140 scored 2026-11-13T07:30Z (the PC's receipt p62_receivers.txt with its rulers p62_flags.py and p62_receivers.py, the engine record's
+receipts, on claude/carry-reads c74bb57ab; the ruler build archive/claude/receivers-ruler e26aeaad6, never merged; the line's latest lap mean,
+the founded line's MEAN.3000 after P60; P57's 100,508 one-place masks and 3,717 whole masks' open places, and ten held sections of 398,283
+sites; A0 equals the line's own read at all 104,225 places; the read 358.8 s against 1,395 projected). The count reader's landmarks at 8 bits
+flag 0.264 to 0.317 of places by slice. Nats a place at open places, the last tick:
+  (o) the open places 0.340 of a held section's sites against 0.15 (0.10 to 0.25): missed above; the written rows 0.311 of its pair-terms
+      (written landmarks 0.082, others 0.229) against 0.65 (0.50 to 0.80): missed below. An open row meets every definite site, so the
+      open rows hold 0.689 of the pair-terms.
+  (a) A1 over A0: +3.292 at one-place masks against 0.45 (0.20 to 0.90): missed above; +1.897 at whole masks against 0.40 (0.15 to 0.90):
+      missed above. By slice at one-place masks books +2.604 to wikidata +4.080.
+  (b) A2 over A0: +1.604 at one-place masks against 0.22 (0.08 to 0.50): missed above; +0.727 at whole masks against 0.20 (0.06 to 0.50):
+      missed above.
+  (c) A3 over A2: -0.052 at one-place masks (draws -0.054, -0.044, -0.059) against 0.08 (0.00 to 0.20): missed below, as many written
+      places drawn at random are worth a little more than the landmarks; +0.003 at whole masks (+0.029, -0.004, -0.015): held.
+  (d) not run: the support's keyed mark gates the near field alone, and a written place is heard far through the probed classes' definite
+      members and an open receiver's listened definite sites, which nothing marks without a new mechanism.
+  (e) under A2 the computed rows 0.527 of A0's against 0.34 (0.28 to 0.42): missed above; the pair-terms 0.771 against 0.50 (0.40 to
+      0.60): missed above; the forward 0.913 of A0's in one hold (799 and 806 ms against 876 and 883, the controls' spread 0.008) against
+      0.58 (0.45 to 0.72): missed above.
+  Of 12 parts 1 held and 10 missed, one not run. The premise that missed: that a written place's ticks give the open rows no more than its
+  own news (landmark.pin-worth-surprise); held at its opening, a written row gives its neighbours its opening and not what its own
+  sources brought it across the ticks, and the open rows lose 1.6 nats a place with the landmarks still computed. The bound is on what a
+  pin tells a target directly; a refined source carries what reached it from places the target never meets (agent-inferred). The held
+  sections' open places are a third of their sites, so the cut could not remove most of the pairs.
+  Rules applied: A2 over 0.35 with (c) under 0.03: the count reader's news does not rank a written place's worth as a receiver zero-shot,
+  and where an open row's mass lies by its source's news is read before any build. (e) with rows over 0.5 of A0's: the count reader's
+  sites are too many, and the cut waits for the machine's own news, which P60 now gives. The candidate law of the design record's 4.8 is
+  not built.
