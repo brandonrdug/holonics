@@ -2428,3 +2428,27 @@ the reproduction (600 of 600 section lines, STATE.600 and MEAN.600 byte for byte
   holds (agent-inferred): the contact family as one launch a tick each way on a region resident in its block (the layout; 80 of the
   section's 509 launches, and 111 ms of it in six of its entries after step 5), the site-local families fused the same way, and the
   host's part beside the card's.
+
+G131 fixed 2026-11-13T01:41Z (the same thread), before its read: where the kernels' time stands outside the fourteen entries step 5's receipt printed
+(P57; a reading of logs already on the PC and of the driver's source, no card time).
+Read first: p55_step5.txt (the profiled control: kernels 272.9 ms a profiled section; the fourteen entries printed hold 195.0 of it, the
+rows 33.8 down to the outer site map on 64-bit limbs 4.1, so the entries not printed hold 77.9, each under 4.1); profile_families.txt
+(step 0: 493 launches a section by family, the site maps 181, the moments and clocks 113, the contact 72, the small site kernels 68, the
+carry circles 24, the blank clocks 18, the faces 17; steps 1 to 3 fused some); the kernel source's own notes (the classes: one block of
+one warp a head and a region; the spread: a region a block). What is not in any log read here: an entry's grid, and so whether a launch
+fills the card. The premise (agent-inferred): a launch whose grid is a block a region, or a warp a region and head, runs for as long as
+its largest region (1,006 sites where the median region holds 151) while most of the card's multiprocessors stand empty, so its time is
+its longest block's and not its work's; and a chain of such launches cannot overlap one region's stage with another's.
+  (a) The entries not printed, launched in a trainer's section, number 45 (30 to 70), over 330 launches a section (250 to 400): 0.24 ms
+      a launch (0.19 to 0.31).
+  (b) Of their 77.9 ms the paced moments' and clocks' entries hold 0.45 (0.30 to 0.60).
+  (c) Over every entry, the launches whose grid cannot fill the card (its blocks times their warps under half of the warps the card
+      keeps resident at that entry's registers) hold 0.30 of the kernels' time (0.15 to 0.45).
+  (d) Of the kernels' time, entries whose unit is a site, a row or a region and which read nothing another region's launch wrote in the
+      same tick (by the schedule's read) hold 0.85 (0.70 to 0.95): the couplings across regions are the carrier's width (one maximum),
+      the temperature's covector (one sum) and the deposits (sums over a batch).
+  Rule. (c) at 0.25 or more: the fusion of a tick's region-local launches into one launch a tick each way, a block a region taking its
+  stages in turn, is ordered first, the contact's entries inside it, with its guess fixed on the table. (c) under 0.15: the contact's
+  layout alone is ordered first (a pair's record in walk order, its forward entries as one launch and its return's as one), and the
+  small launches stay. Between: the layout first, the fusion second. (d) under 0.70: the couplings the schedule names are derived as
+  joins at named crossings before either is ordered.
