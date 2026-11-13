@@ -1,0 +1,22 @@
+# P56 item 3 (G128 c), 2026-11-13 UTC: the rows' lanes' fill, counted on the card by the counting build (claude/engine-rulers 900d30772, ruler-calls):
+# by head and row (open, definite) over the read, the rows' launches over the four clocks: rows, chunks of 32 a row walks (ceil(K/32)), met entries (the
+# pairs pass A meets), fill = met / (32 chunks), K's quantiles, a definite row's live crowd slots (mean, largest).
+# the pass's sections 2,001 to 2,100 from run 2's STATE.1900 (sha256 cda6ac8a1129f147), each read alone in its own hold of the card lock. Numbers only.
+# the support of a row is fixed through a section's ticks, so each clock's fill is the read's
+900d30772 + ruler source (--features ruler-calls) field_pass 5abad09aeb6cb5984a7c5458ca3c22870098730ba4212de6714758b09573c121
+FIELD_CARD reads=0 read_ms=0 returns=100 return_ms=33546 pairs=4566615773 batches=100 peak_store=8410613236 landmarks=0 landmark_ms=0 elapsed_ms=34988
+MEASURE lap=fill_out rc=0 wall_s=46.0 peak_rss_kib=627852
+STATE_SHA fill 81377dbeaf26d65e 64954161619deda4
+FIELD_FILL head=0 row=definite rows=11072420 chunks=29432733 met=732211133 fill=0.7774 k_median=51 k_q90=143 k_q99=314 k_max=888 live_crowds=112092392 live_crowds_a_row=10.124 live_crowds_max=15
+FIELD_FILL head=0 row=open rows=5239748 chunks=27434684 met=746114060 fill=0.8499 k_median=100 k_q90=373 k_q99=596 k_max=983 live_crowds=0 live_crowds_a_row=0.000 live_crowds_max=0
+FIELD_FILL head=1 row=definite rows=11072420 chunks=13908679 met=248037956 fill=0.5573 k_median=17 k_q90=45 k_q99=98 k_max=649 live_crowds=112092392 live_crowds_a_row=10.124 live_crowds_max=15
+FIELD_FILL head=1 row=open rows=5239748 chunks=27434684 met=746114060 fill=0.8499 k_median=100 k_q90=373 k_q99=596 k_max=983 live_crowds=0 live_crowds_a_row=0.000 live_crowds_max=0
+FIELD_FILL head=2 row=definite rows=11072420 chunks=14663292 met=255362387 fill=0.5442 k_median=13 k_q90=53 k_q99=132 k_max=641 live_crowds=112092392 live_crowds_a_row=10.124 live_crowds_max=15
+FIELD_FILL head=2 row=open rows=5239748 chunks=27434684 met=746114060 fill=0.8499 k_median=100 k_q90=373 k_q99=596 k_max=983 live_crowds=0 live_crowds_a_row=0.000 live_crowds_max=0
+FIELD_FILL head=3 row=definite rows=11072420 chunks=16861911 met=346548057 fill=0.6423 k_median=22 k_q90=67 k_q99=170 k_max=746 live_crowds=112092392 live_crowds_a_row=10.124 live_crowds_max=15
+FIELD_FILL head=3 row=open rows=5239748 chunks=27434684 met=746114060 fill=0.8499 k_median=100 k_q90=373 k_q99=596 k_max=983 live_crowds=0 live_crowds_a_row=0.000 live_crowds_max=0
+FILL_POOLED row=definite met=1582159533 chunks=74866615 fill=0.6604
+FILL_POOLED row=open met=2984456240 chunks=109738736 fill=0.8499
+FILL_POOLED row=pooled met=4566615773 chunks=184605351 fill=0.7730
+G128 c open=0.8499 guess=0.90 band=0.75..0.98 held; definite=0.6604 guess=0.50 band=0.30..0.70 held; pooled_over_chunks=0.7730 guess=0.80 band=0.62..0.92 held
+G128 c rule='pooled 0.60 or over: the walk does not pack its met entries before its arithmetic on this count'
