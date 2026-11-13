@@ -1023,146 +1023,394 @@ extern "C" __global__ void field_chart(FieldWords w, const int64_t *x, int32_t *
     }
 }
 
-// `out[t][o] = release(Σ_i W[o][i] x[t][i] + bias[o] 2^24, 24)` (`affine`): the host's carrier bound
-// `wmax · xmax · (cols + 1)` refused at `2^126`, the sum in 64 bits below `2^62` and in 128 otherwise
-// (the same integer either way). With `add`, the result is added to `add[t][o]` (the residual).
+// [realization; theory, November 13, P61 item 4 (G117); the engine record §8] **A site's maps in the tile form**: one form for the forward map
+// `out[t][o] = release(Σ_i W[o][i] x[t][i] + b[o] 2^24, 24)` (`affine`), the transposed map `out[t][i] = release(Σ_o W[o][i] y[t][o], 24)`
+// (`transposed`) and the outer sum `g[o][i] += Σ_t y[t][o] x[t][i]` (`outer_sum`), every integer the host's. A block holds a tile of 64 outputs
+// by 64 sites (an outer sum's: 64 entries by 64 entries over a walk of sites); each of its 256 threads holds four outputs of four sites, reading
+// four adjacent outputs' words at one term in one 16-octet load and four adjacent sites' words at that term in another, sixteen products of
+// two 32-bit words into 64-bit sums from each pair of loads (the yardstick `field_yard_products_tile`'s layout), the terms walked in chunks
+// of `MAP_KC` through shared memory.
+//
+// The width (`agent-inferred`, from the bits ruler's reading, P61 item 3): every operand word is a 32-bit weight or a word whose magnitude the
+// tile reads first. A word under `2^31` is one signed 32-bit limb, so its product with a weight stands in 64 bits, and a tile's sum stands in
+// 64 bits where its magnitudes prove it: `k · a · b < 2^63`, `k` the terms a sum (a forward map's inputs, a transposed map's rows, an outer
+// sum's sites walked), `a` and `b` the tile's largest operands read from the words it sums (the weights its outputs read, the words of its
+// sites; the host's `tile_proves`). A tile that does not prove it takes the wide form,
+// its sums on 128 bits over the same words: the same integers either way, and no flag or argument chooses the path. (A word over `2^31` stood
+// at 0.026 of the transposed and outer launches' tiles read, all on one kind's covector; the two-limb form is not built for them.)
+#define MAP_TO 64
+#define MAP_TS 64
+#define MAP_KC 32
+#define OUTER_WALK 512
+
+__device__ __forceinline__ uint64_t warp_max64(uint64_t v) {
+    for (int o = 16; o > 0; o >>= 1) {
+        const uint64_t u = __shfl_xor_sync(0xffffffffu, v, o);
+        v = u > v ? u : v;
+    }
+    return v;
+}
+
+// A block's largest of each thread's `v` (256 threads, eight warps), in shared memory `part[8]`; every thread returns it.
+__device__ __forceinline__ uint64_t block_max64(uint64_t v, uint64_t *part) {
+    v = warp_max64(v);
+    if ((threadIdx.x & 31) == 0) {
+        part[threadIdx.x >> 5] = v;
+    }
+    __syncthreads();
+    uint64_t m = 0;
+    for (uint32_t k = 0; k < (blockDim.x >> 5); k++) {
+        m = part[k] > m ? part[k] : m;
+    }
+    __syncthreads();
+    return m;
+}
+
+// `k · a · b < 2^63` with both under `2^31` (the narrow form's proof).
+__device__ __forceinline__ bool narrow_proves(uint64_t k, uint64_t a, uint64_t b) {
+    if (a >= (1ull << 31) || b >= (1ull << 31)) {
+        return false;
+    }
+    return (uwide)k * (uwide)a * (uwide)b < ((uwide)1 << 63);
+}
+
+// The forward and transposed maps. `TRANSPOSED`: the outputs are `W`'s columns and the terms its rows (`W[o][i]` read at term `o`, output
+// `i`); otherwise the outputs are its rows and the terms its columns. `x` (`X` words, the forward map's input or the transposed map's
+// covector `y`) is `[t][term]` at `x_stride`. The forward map refuses a site whose carrier bound `wmax · xmax · (cols + 1)` reaches `2^126` (as
+// `affine` did) and adds `b[o] 2^24`; with `add` its result is added to `add[t][o]`, with `accumulate` the transposed map's to `out[t][i]`; a
+// site outside `only_unresolved` is computed and nothing of it is written or added.
+template <typename X, bool TRANSPOSED>
+__device__ void map_tile(const FieldWords &w, uint64_t weight, uint64_t bias, uint64_t wmax, uint32_t rows, uint32_t cols, const X *x, uint64_t x_stride, int64_t *out, uint64_t out_stride, int64_t *add, uint32_t accumulate, uint32_t only_unresolved) {
+    __shared__ __align__(16) int32_t as[MAP_KC][MAP_TO];
+    __shared__ __align__(16) int32_t bs[MAP_KC][MAP_TS];
+    __shared__ uint64_t smax[MAP_TS];
+    __shared__ uint64_t part[8];
+    const uint32_t outs = TRANSPOSED ? cols : rows, terms = TRANSPOSED ? rows : cols;
+    const uint32_t to = threadIdx.x % 16, ts = threadIdx.x / 16;
+    const uint64_t otiles = (outs + MAP_TO - 1) / MAP_TO, stiles = ((uint64_t)w.T + MAP_TS - 1) / MAP_TS;
+    for (uint64_t blk = blockIdx.x; blk < otiles * stiles; blk += gridDim.x) {
+        const uint32_t o0 = (uint32_t)(blk % otiles) * MAP_TO;
+        const uint64_t t0 = (blk / otiles) * MAP_TS;
+        // Each site's largest word, four threads a site, and the tile's.
+        {
+            const uint32_t s = threadIdx.x / 4, q = threadIdx.x % 4;
+            const uint64_t t = t0 + s;
+            uint64_t m = 0;
+            if (t < w.T) {
+                for (uint32_t i = q; i < terms; i += 4) {
+                    const uint64_t g = mag64((int64_t)x[t * x_stride + i]);
+                    m = g > m ? g : m;
+                }
+            }
+            const uint64_t a = __shfl_xor_sync(0xffffffffu, m, 1);
+            m = a > m ? a : m;
+            const uint64_t c = __shfl_xor_sync(0xffffffffu, m, 2);
+            m = c > m ? c : m;
+            if (q == 0) {
+                smax[s] = m;
+            }
+        }
+        // The largest weight this tile's sums read (its outputs' weights over every term): the proof's bound, read from the material.
+        uint64_t wm = 0;
+        for (uint32_t c = threadIdx.x; c < MAP_TO * terms; c += blockDim.x) {
+            const uint32_t output = o0 + c / terms, term = c % terms;
+            if (output < outs) {
+                const uint64_t g = mag64((int64_t)w.theta[weight + (TRANSPOSED ? (uint64_t)term * cols + output : (uint64_t)output * cols + term)]);
+                wm = g > wm ? g : wm;
+            }
+        }
+        __syncthreads();
+        const uint64_t wtile = block_max64(wm, part);
+        const uint64_t tmax = block_max64(threadIdx.x < MAP_TS ? smax[threadIdx.x] : 0, part);
+        const bool narrow = narrow_proves(terms, tmax, wtile);
+        int64_t acc[4][4];
+        wide accw[4][4];
+#pragma unroll
+        for (int a = 0; a < 4; a++) {
+#pragma unroll
+            for (int b = 0; b < 4; b++) {
+                acc[a][b] = 0;
+                accw[a][b] = 0;
+            }
+        }
+        for (uint32_t k0 = 0; k0 < terms; k0 += MAP_KC) {
+            // The weights' chunk, `[term][output]`: read along `W`'s rows (outputs for the transposed map, terms for the forward one).
+            for (uint32_t c = threadIdx.x; c < MAP_KC * MAP_TO; c += blockDim.x) {
+                uint32_t kc, o;
+                if (TRANSPOSED) {
+                    kc = c / MAP_TO;
+                    o = c % MAP_TO;
+                } else {
+                    o = c / MAP_KC;
+                    kc = c % MAP_KC;
+                }
+                const uint32_t term = k0 + kc, output = o0 + o;
+                as[kc][o] = (term < terms && output < outs) ? w.theta[weight + (TRANSPOSED ? (uint64_t)term * cols + output : (uint64_t)output * cols + term)] : 0;
+            }
+            if (narrow) {
+                for (uint32_t c = threadIdx.x; c < MAP_KC * MAP_TS; c += blockDim.x) {
+                    const uint32_t s = c / MAP_KC, kc = c % MAP_KC;
+                    const uint64_t t = t0 + s;
+                    bs[kc][s] = (t < w.T && k0 + kc < terms) ? (int32_t)x[t * x_stride + k0 + kc] : 0;
+                }
+            }
+            __syncthreads();
+            const uint32_t chunk = terms - k0 < MAP_KC ? terms - k0 : MAP_KC;
+            if (narrow) {
+                for (uint32_t kc = 0; kc < chunk; kc++) {
+                    const int4 av = *reinterpret_cast<const int4 *>(&as[kc][4 * to]);
+                    const int4 bv = *reinterpret_cast<const int4 *>(&bs[kc][4 * ts]);
+                    const int32_t aa[4] = {av.x, av.y, av.z, av.w}, bb[4] = {bv.x, bv.y, bv.z, bv.w};
+#pragma unroll
+                    for (int a = 0; a < 4; a++) {
+#pragma unroll
+                        for (int b = 0; b < 4; b++) {
+                            acc[a][b] += (int64_t)aa[a] * (int64_t)bb[b];
+                        }
+                    }
+                }
+            } else {
+                // The wide form: the same words, each site's read from the card's memory, the sums on 128 bits.
+                for (uint32_t kc = 0; kc < chunk; kc++) {
+                    const int4 av = *reinterpret_cast<const int4 *>(&as[kc][4 * to]);
+                    const int32_t aa[4] = {av.x, av.y, av.z, av.w};
+                    wide bb[4];
+#pragma unroll
+                    for (int b = 0; b < 4; b++) {
+                        const uint64_t t = t0 + 4 * ts + b;
+                        bb[b] = t < w.T ? (wide)x[t * x_stride + k0 + kc] : 0;
+                    }
+#pragma unroll
+                    for (int a = 0; a < 4; a++) {
+#pragma unroll
+                        for (int b = 0; b < 4; b++) {
+                            accw[a][b] += (wide)aa[a] * bb[b];
+                        }
+                    }
+                }
+            }
+            __syncthreads();
+        }
+#pragma unroll
+        for (int b = 0; b < 4; b++) {
+            const uint64_t t = t0 + 4 * ts + b;
+            if (t >= w.T || (only_unresolved && !w.unresolved[t])) {
+                continue;
+            }
+            if (!TRANSPOSED && (uwide)wmax * (uwide)smax[4 * ts + b] * (uwide)(cols + 1) >= ((uwide)1 << 126)) {
+                atomicOr(w.status, REFUSED_CARRIER);
+                continue;
+            }
+#pragma unroll
+            for (int a = 0; a < 4; a++) {
+                const uint32_t o = o0 + 4 * to + a;
+                if (o >= outs) {
+                    continue;
+                }
+                wide sum = narrow ? (wide)acc[a][b] : accw[a][b];
+                if (!TRANSPOSED && bias != NO_BIAS) {
+                    sum += (wide)w.theta[bias + o] << MATERIAL_BITS;
+                }
+                const int64_t v = fit64(rel(sum, MATERIAL_BITS), w.status);
+                if (TRANSPOSED) {
+                    const uint64_t c = t * cols + o;
+                    out[c] = accumulate ? fit64((wide)out[c] + (wide)v, w.status) : v;
+                } else if (add) {
+                    add[t * out_stride + o] = fit64((wide)add[t * out_stride + o] + (wide)v, w.status);
+                } else {
+                    out[t * out_stride + o] = v;
+                }
+            }
+        }
+        __syncthreads();
+    }
+}
+
+extern "C" __global__ void __launch_bounds__(256) field_affine_tiled_x32(FieldWords w, uint64_t weight, uint64_t bias, uint64_t wmax, uint32_t rows, uint32_t cols, const int32_t *x, uint64_t x_stride, int64_t *out, uint64_t out_stride, int64_t *add, uint32_t only_unresolved) {
+    map_tile<int32_t, false>(w, weight, bias, wmax, rows, cols, x, x_stride, out, out_stride, add, 0, only_unresolved);
+}
+
+extern "C" __global__ void __launch_bounds__(256) field_affine_tiled_x64(FieldWords w, uint64_t weight, uint64_t bias, uint64_t wmax, uint32_t rows, uint32_t cols, const int64_t *x, uint64_t x_stride, int64_t *out, uint64_t out_stride, int64_t *add, uint32_t only_unresolved) {
+    map_tile<int64_t, false>(w, weight, bias, wmax, rows, cols, x, x_stride, out, out_stride, add, 0, only_unresolved);
+}
+
+// `out[t][i] = release(Σ_o W[o][i] y[t][o], 24)` (`transposed`), the weight `rows × cols`; with `accumulate` it is added to `out[t][i]` (each
+// addition checked as the host's `fit64`).
+extern "C" __global__ void __launch_bounds__(256) field_transposed(FieldWords w, uint64_t weight, uint32_t rows, uint32_t cols, const int64_t *y, uint64_t y_stride, int64_t *out, uint32_t accumulate, uint32_t only_unresolved) {
+    map_tile<int64_t, true>(w, weight, NO_BIAS, 0, rows, cols, y, y_stride, out, cols, nullptr, accumulate, only_unresolved);
+}
+
+// The outer sum in the tile form: `g[at + o·cols + i] += Σ_t y[t][o] x[t][i]` over the batch's sites (with no `x`, the bias's
+// `g[at + o] += Σ_t y[t][o]`), a site outside `only_unresolved` adding nothing. A block holds a tile of 64 by 64 entries and walks `OUTER_WALK`
+// sites in chunks of `MAP_KC` through shared memory (`[site][o]` and `[site][i]`), each thread four by four entries; it reads its walk's
+// largest `y` and `x` first, and its sixteen partials stand in 64 bits where `walk · ymax · xmax < 2^63` with both under `2^31`, on 128 bits
+// otherwise. Each partial is added to its entry once a walk by the ring's atomic step (`add_wide`): an integer sum, the host's bits in any
+// order. The walk's two largest words go to `maxima` (atomic maxima of 64 bits, devices of compute capability 5.0 and over), where the
+// outer bound reads them.
 template <typename X>
-__device__ void affine(const FieldWords &w, uint64_t weight, uint64_t bias, uint64_t wmax, uint32_t rows, uint32_t cols, const X *x, uint64_t x_stride, int64_t *out, uint64_t out_stride, int64_t *add, uint32_t only_unresolved) {
-    const uint64_t cells = (uint64_t)w.T * rows;
-    for (uint64_t c = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; c < cells; c += (uint64_t)gridDim.x * blockDim.x) {
-        const uint64_t t = c / rows, o = c % rows;
-        if (only_unresolved && !w.unresolved[t]) {
-            continue;
-        }
-        const X *xt = x + t * x_stride;
-        uint64_t xmax = 0;
-        for (uint32_t i = 0; i < cols; i++) {
-            const uint64_t m = mag64((int64_t)xt[i]);
-            xmax = m > xmax ? m : xmax;
-        }
-        const uwide terms = (uwide)wmax * (uwide)xmax * (uwide)(cols + 1);
-        if (terms >= ((uwide)1 << 126)) {
-            atomicOr(w.status, REFUSED_CARRIER);
-            continue;
-        }
-        const int32_t *row = w.theta + weight + o * cols;
-        wide sum;
-        if (terms < ((uwide)1 << 62)) {
-            int64_t s = 0;
-            for (uint32_t i = 0; i < cols; i++) {
-                s += (int64_t)row[i] * (int64_t)xt[i];
+__device__ void outer_tile(const FieldWords &w, wide *g, uint64_t at, uint32_t rows, uint32_t cols, const int64_t *y, uint64_t y_stride, const X *x, uint64_t x_stride, uint32_t only_unresolved, unsigned long long *maxima) {
+    __shared__ __align__(16) int32_t ys[MAP_KC][MAP_TO];
+    __shared__ __align__(16) int32_t xs[MAP_KC][MAP_TS];
+    __shared__ uint64_t part[8];
+    const uint32_t to = threadIdx.x % 16, ti = threadIdx.x / 16;
+    const uint64_t otiles = (rows + MAP_TO - 1) / MAP_TO, itiles = (cols + MAP_TS - 1) / MAP_TS, walks = ((uint64_t)w.T + OUTER_WALK - 1) / OUTER_WALK;
+    for (uint64_t blk = blockIdx.x; blk < otiles * itiles * walks; blk += gridDim.x) {
+        const uint32_t o0 = (uint32_t)(blk % otiles) * MAP_TO, i0 = (uint32_t)((blk / otiles) % itiles) * MAP_TS;
+        const uint64_t s0 = (blk / (otiles * itiles)) * OUTER_WALK;
+        const uint64_t s1 = s0 + OUTER_WALK < w.T ? s0 + OUTER_WALK : w.T;
+        uint64_t ym = 0, xm = 0;
+        for (uint64_t c = threadIdx.x; c < (s1 - s0) * MAP_TO; c += blockDim.x) {
+            const uint64_t t = s0 + c / MAP_TO;
+            const uint32_t o = o0 + c % MAP_TO, i = i0 + c % MAP_TS;
+            if (only_unresolved && !w.unresolved[t]) {
+                continue;
             }
-            sum = s;
-        } else {
-            sum = 0;
-            for (uint32_t i = 0; i < cols; i++) {
-                sum += (wide)row[i] * (wide)xt[i];
+            if (o < rows) {
+                const uint64_t m = mag64(y[t * y_stride + o]);
+                ym = m > ym ? m : ym;
+            }
+            if (i < cols) {
+                const uint64_t m = mag64((int64_t)x[t * x_stride + i]);
+                xm = m > xm ? m : xm;
             }
         }
-        if (bias != NO_BIAS) {
-            sum += (wide)w.theta[bias + o] << MATERIAL_BITS;
+        ym = block_max64(ym, part);
+        xm = block_max64(xm, part);
+        if (maxima && threadIdx.x == 0) {
+            atomicMax(maxima, (unsigned long long)ym);
+            atomicMax(maxima + 1, (unsigned long long)xm);
         }
-        const int64_t v = fit64(rel(sum, MATERIAL_BITS), w.status);
-        if (add) {
-            add[t * out_stride + o] = fit64((wide)add[t * out_stride + o] + (wide)v, w.status);
-        } else {
-            out[t * out_stride + o] = v;
+        const bool narrow = narrow_proves(s1 - s0, ym, xm);
+        int64_t acc[4][4];
+        wide accw[4][4];
+#pragma unroll
+        for (int a = 0; a < 4; a++) {
+#pragma unroll
+            for (int b = 0; b < 4; b++) {
+                acc[a][b] = 0;
+                accw[a][b] = 0;
+            }
         }
-    }
-}
-
-// [agent-inferred, November 5] **The affine map by tiles** (Brandon, November 5: where the time goes; the profile read the
-// one-thread-a-cell `affine` at 42% of a training read's kernel time and 61% of a write's, every cell rereading its site's
-// whole row for the carrier bound and its weight row from the card's memory): a block holds `W` and the bias in shared
-// memory and walks `per = blockDim / rows` sites a pass, each site's row loaded once into shared memory, each thread one
-// `(site, output)` cell. The same integers as `affine`: the carrier bound `wmax · xmax · (cols + 1)` per site, the sum in 64
-// bits below `2^62` and in 128 otherwise, the bias at the material's grain, the release and the residual.
-template <typename X>
-__device__ void affine_tiled(const FieldWords &w, uint64_t weight, uint64_t bias, uint64_t wmax, uint32_t rows, uint32_t cols, const X *x, uint64_t x_stride, int64_t *out, uint64_t out_stride, int64_t *add, uint32_t only_unresolved) {
-    extern __shared__ __align__(16) unsigned char affine_shared[];
-    // [agent-inferred, November 5, the unified-theory reading of 18:53] Shared memory is a circle of 32 banks: `W`'s rows lie
-    // at the stride `cols + 1`, coprime to the banks wherever `cols` is a multiple of 32 (every map of the declaration), so a
-    // warp's lanes, one output row each, read one term each from 32 banks at once and not 32 times from one.
-    const uint32_t stride = cols + 1;
-    int32_t *ws = (int32_t *)affine_shared;
-    int32_t *bs = ws + (uint64_t)rows * stride;
-    uint64_t *xmaxs = (uint64_t *)(affine_shared + ((((uint64_t)rows * stride + rows) * sizeof(int32_t) + 15) & ~(uint64_t)15));
-    const uint32_t per = blockDim.x / rows;
-    X *xs = (X *)(xmaxs + per);
-    for (uint32_t i = threadIdx.x; i < rows * cols; i += blockDim.x) {
-        ws[(i / cols) * stride + i % cols] = w.theta[weight + i];
-    }
-    for (uint32_t i = threadIdx.x; i < rows; i += blockDim.x) {
-        bs[i] = bias == NO_BIAS ? 0 : w.theta[bias + i];
-    }
-    const uint32_t p = threadIdx.x / rows, o = threadIdx.x % rows;
-    for (uint64_t t0 = (uint64_t)blockIdx.x * per; t0 < w.T; t0 += (uint64_t)gridDim.x * per) {
+        for (uint64_t k0 = s0; k0 < s1; k0 += MAP_KC) {
+            const uint32_t chunk = s1 - k0 < MAP_KC ? (uint32_t)(s1 - k0) : MAP_KC;
+            if (narrow) {
+                for (uint32_t c = threadIdx.x; c < MAP_KC * MAP_TO; c += blockDim.x) {
+                    const uint32_t kc = c / MAP_TO, e = c % MAP_TO;
+                    const uint64_t t = k0 + kc;
+                    const bool live = kc < chunk && !(only_unresolved && !w.unresolved[t]);
+                    ys[kc][e] = (live && o0 + e < rows) ? (int32_t)y[t * y_stride + o0 + e] : 0;
+                    xs[kc][e] = (live && i0 + e < cols) ? (int32_t)x[t * x_stride + i0 + e] : 0;
+                }
+                __syncthreads();
+                for (uint32_t kc = 0; kc < chunk; kc++) {
+                    const int4 yv = *reinterpret_cast<const int4 *>(&ys[kc][4 * to]);
+                    const int4 xv = *reinterpret_cast<const int4 *>(&xs[kc][4 * ti]);
+                    const int32_t yy[4] = {yv.x, yv.y, yv.z, yv.w}, xx[4] = {xv.x, xv.y, xv.z, xv.w};
+#pragma unroll
+                    for (int a = 0; a < 4; a++) {
+#pragma unroll
+                        for (int b = 0; b < 4; b++) {
+                            acc[a][b] += (int64_t)yy[a] * (int64_t)xx[b];
+                        }
+                    }
+                }
+                __syncthreads();
+            } else {
+                // The wide form: the same words read from the card's memory, the partials on 128 bits.
+                for (uint32_t kc = 0; kc < chunk; kc++) {
+                    const uint64_t t = k0 + kc;
+                    if (only_unresolved && !w.unresolved[t]) {
+                        continue;
+                    }
+                    wide yy[4], xx[4];
+#pragma unroll
+                    for (int a = 0; a < 4; a++) {
+                        const uint32_t o = o0 + 4 * to + a, i = i0 + 4 * ti + a;
+                        yy[a] = o < rows ? (wide)y[t * y_stride + o] : 0;
+                        xx[a] = i < cols ? (wide)x[t * x_stride + i] : 0;
+                    }
+#pragma unroll
+                    for (int a = 0; a < 4; a++) {
+#pragma unroll
+                        for (int b = 0; b < 4; b++) {
+                            accw[a][b] += yy[a] * xx[b];
+                        }
+                    }
+                }
+            }
+        }
+#pragma unroll
+        for (int a = 0; a < 4; a++) {
+#pragma unroll
+            for (int b = 0; b < 4; b++) {
+                const uint32_t o = o0 + 4 * to + a, i = i0 + 4 * ti + b;
+                const wide v = narrow ? (wide)acc[a][b] : accw[a][b];
+                if (o < rows && i < cols && v != 0) {
+                    add_wide(g + at + (uint64_t)o * cols + i, v);
+                }
+            }
+        }
         __syncthreads();
-        for (uint32_t i = threadIdx.x; i < per * cols; i += blockDim.x) {
-            const uint64_t t = t0 + i / cols;
-            xs[i] = t < w.T ? x[t * x_stride + i % cols] : (X)0;
-        }
-        __syncthreads();
-        // Each site's carrier bound read once, by its first output's thread.
-        if (o == 0 && p < per) {
-            const X *xt = xs + (uint64_t)p * cols;
-            uint64_t xmax = 0;
-            for (uint32_t i = 0; i < cols; i++) {
-                const uint64_t m = mag64((int64_t)xt[i]);
-                xmax = m > xmax ? m : xmax;
-            }
-            xmaxs[p] = xmax;
-        }
-        __syncthreads();
-        const uint64_t t = t0 + p;
-        if (p >= per || t >= w.T || (only_unresolved && !w.unresolved[t])) {
-            continue;
-        }
-        const X *xt = xs + (uint64_t)p * cols;
-        const uint64_t xmax = xmaxs[p];
-        const uwide terms = (uwide)wmax * (uwide)xmax * (uwide)(cols + 1);
-        if (terms >= ((uwide)1 << 126)) {
-            atomicOr(w.status, REFUSED_CARRIER);
-            continue;
-        }
-        const int32_t *row = ws + (uint64_t)o * stride;
-        wide sum;
-        if (terms < ((uwide)1 << 62)) {
-            int64_t s = 0;
-            for (uint32_t i = 0; i < cols; i++) {
-                s += (int64_t)row[i] * (int64_t)xt[i];
-            }
-            sum = s;
-        } else {
-            sum = 0;
-            for (uint32_t i = 0; i < cols; i++) {
-                sum += (wide)row[i] * (wide)xt[i];
-            }
-        }
-        sum += (wide)bs[o] << MATERIAL_BITS;
-        const int64_t v = fit64(rel(sum, MATERIAL_BITS), w.status);
-        if (add) {
-            add[t * out_stride + o] = fit64((wide)add[t * out_stride + o] + (wide)v, w.status);
-        } else {
-            out[t * out_stride + o] = v;
-        }
     }
 }
 
-extern "C" __global__ void field_affine_tiled_x32(FieldWords w, uint64_t weight, uint64_t bias, uint64_t wmax, uint32_t rows, uint32_t cols, const int32_t *x, uint64_t x_stride, int64_t *out, uint64_t out_stride, int64_t *add, uint32_t only_unresolved) {
-    affine_tiled<int32_t>(w, weight, bias, wmax, rows, cols, x, x_stride, out, out_stride, add, only_unresolved);
+// The bias's sum (no `x`): one thread an entry of up to 256, a block a walk of `OUTER_WALK` sites, its partial in 64 bits where `walk · ymax`
+// stands under `2^63`, on 128 bits otherwise, added once a walk.
+__device__ void outer_bias_tile(const FieldWords &w, wide *g, uint64_t at, uint32_t rows, const int64_t *y, uint64_t y_stride, uint32_t only_unresolved) {
+    __shared__ uint64_t part[8];
+    const uint64_t otiles = (rows + blockDim.x - 1) / blockDim.x, walks = ((uint64_t)w.T + OUTER_WALK - 1) / OUTER_WALK;
+    for (uint64_t blk = blockIdx.x; blk < otiles * walks; blk += gridDim.x) {
+        const uint32_t o = (uint32_t)(blk % otiles) * blockDim.x + threadIdx.x;
+        const uint64_t s0 = (blk / otiles) * OUTER_WALK;
+        const uint64_t s1 = s0 + OUTER_WALK < w.T ? s0 + OUTER_WALK : w.T;
+        uint64_t ym = 0;
+        if (o < rows) {
+            for (uint64_t t = s0; t < s1; t++) {
+                if (only_unresolved && !w.unresolved[t]) {
+                    continue;
+                }
+                const uint64_t m = mag64(y[t * y_stride + o]);
+                ym = m > ym ? m : ym;
+            }
+        }
+        ym = block_max64(ym, part);
+        const bool narrow = (uwide)(s1 - s0) * (uwide)ym < ((uwide)1 << 63);
+        if (o < rows) {
+            int64_t acc = 0;
+            wide accw = 0;
+            for (uint64_t t = s0; t < s1; t++) {
+                if (only_unresolved && !w.unresolved[t]) {
+                    continue;
+                }
+                if (narrow) {
+                    acc += y[t * y_stride + o];
+                } else {
+                    accw += (wide)y[t * y_stride + o];
+                }
+            }
+            const wide v = narrow ? (wide)acc : accw;
+            if (v != 0) {
+                add_wide(g + at + o, v);
+            }
+        }
+        __syncthreads();
+    }
 }
 
-extern "C" __global__ void field_affine_tiled_x64(FieldWords w, uint64_t weight, uint64_t bias, uint64_t wmax, uint32_t rows, uint32_t cols, const int64_t *x, uint64_t x_stride, int64_t *out, uint64_t out_stride, int64_t *add, uint32_t only_unresolved) {
-    affine_tiled<int64_t>(w, weight, bias, wmax, rows, cols, x, x_stride, out, out_stride, add, only_unresolved);
+extern "C" __global__ void __launch_bounds__(256) field_outer_x32(FieldWords w, wide *g, uint64_t at, uint32_t rows, uint32_t cols, const int64_t *y, uint64_t y_stride, const int32_t *x, uint64_t x_stride, uint32_t only_unresolved, unsigned long long *maxima) {
+    if (x) {
+        outer_tile<int32_t>(w, g, at, rows, cols, y, y_stride, x, x_stride, only_unresolved, maxima);
+    } else {
+        outer_bias_tile(w, g, at, rows, y, y_stride, only_unresolved);
+    }
 }
 
-extern "C" __global__ void field_affine_x32(FieldWords w, uint64_t weight, uint64_t bias, uint64_t wmax, uint32_t rows, uint32_t cols, const int32_t *x, uint64_t x_stride, int64_t *out, uint64_t out_stride, int64_t *add, uint32_t only_unresolved) {
-    affine<int32_t>(w, weight, bias, wmax, rows, cols, x, x_stride, out, out_stride, add, only_unresolved);
-}
-
-extern "C" __global__ void field_affine_x64(FieldWords w, uint64_t weight, uint64_t bias, uint64_t wmax, uint32_t rows, uint32_t cols, const int64_t *x, uint64_t x_stride, int64_t *out, uint64_t out_stride, int64_t *add, uint32_t only_unresolved) {
-    affine<int64_t>(w, weight, bias, wmax, rows, cols, x, x_stride, out, out_stride, add, only_unresolved);
+extern "C" __global__ void __launch_bounds__(256) field_outer_x64(FieldWords w, wide *g, uint64_t at, uint32_t rows, uint32_t cols, const int64_t *y, uint64_t y_stride, const int64_t *x, uint64_t x_stride, uint32_t only_unresolved, unsigned long long *maxima) {
+    if (x) {
+        outer_tile<int64_t>(w, g, at, rows, cols, y, y_stride, x, x_stride, only_unresolved, maxima);
+    } else {
+        outer_bias_tile(w, g, at, rows, y, y_stride, only_unresolved);
+    }
 }
 
 // [definition; theory, November 12; the triad record §3 and §4] **The return of two blocks** (the host's `tick`, the pair's return where
@@ -3602,25 +3850,6 @@ extern "C" __global__ void field_face_set(FieldWords w, const uint32_t *at, cons
     }
 }
 
-// `out[t][i] = release(Σ_o W[o][i] y[t][o], 24)` (`transposed`), the weight `rows × cols`; with
-// `accumulate` it is added to `out[t][i]` (each addition checked as the host's `fit64`).
-extern "C" __global__ void field_transposed(FieldWords w, uint64_t weight, uint32_t rows, uint32_t cols, const int64_t *y, uint64_t y_stride, int64_t *out, uint32_t accumulate, uint32_t only_unresolved) {
-    const uint64_t cells = (uint64_t)w.T * cols;
-    for (uint64_t c = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; c < cells; c += (uint64_t)gridDim.x * blockDim.x) {
-        const uint64_t t = c / cols, i = c % cols;
-        if (only_unresolved && !w.unresolved[t]) {
-            continue;
-        }
-        const int64_t *yt = y + t * y_stride;
-        wide sum = 0;
-        for (uint32_t o = 0; o < rows; o++) {
-            sum += (wide)w.theta[weight + (uint64_t)o * cols + i] * (wide)yt[o];
-        }
-        const int64_t v = fit64(rel(sum, MATERIAL_BITS), w.status);
-        out[c] = accumulate ? fit64((wide)out[c] + (wide)v, w.status) : v;
-    }
-}
-
 // The adjoint of the chart (`ratio_adjoint`) of each site's covector `cov`, added to `base`, lane by lane (§16.40, the host's
 // `lane_adjoint`): `dst = base + (cov − r̂ ⟨r̂, cov⟩/W) / ‖r‖_rms` over each lane's `W` coordinates, one warp a site.
 extern "C" __global__ void field_ratio_adjoint(FieldWords w, const int32_t *read, const wide *scale, const int64_t *cov, const int64_t *base, int64_t *dst, uint32_t only_unresolved) {
@@ -4332,53 +4561,23 @@ extern "C" __global__ void field_unframe(FieldWords w, int64_t *chart) {
     }
 }
 
-// A family's covector `g[o][i] += Σ_t y_t[o] x_t[i]` over the batch's sites (`outer_sum`); with no
-// `x`, the bias `g[o] += Σ_t y_t[o]`. An integer sum: the host's bits in any order.
-//
-// [agent-inferred, November 1] One thread an entry and a tile of `OUTER_TILE` sites, its partial
-// added to the entry by the ring's atomic step (`add_wide`). (The first realization gave one thread
-// an entry and every site of the batch, so a bias of 32 entries was summed by 32 threads over
-// thousands of sites each.)
-#define OUTER_TILE 64
-template <typename X>
-__device__ void outer(const FieldWords &w, wide *g, uint64_t at, uint32_t rows, uint32_t cols, const int64_t *y, uint64_t y_stride, const X *x, uint64_t x_stride, uint32_t only_unresolved) {
-    const uint64_t entries = (uint64_t)rows * (x ? cols : 1);
-    const uint64_t tiles = ((uint64_t)w.T + OUTER_TILE - 1) / OUTER_TILE;
-    for (uint64_t c = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; c < entries * tiles; c += (uint64_t)gridDim.x * blockDim.x) {
-        const uint64_t entry = c % entries, tile = c / entries;
-        const uint64_t o = x ? entry / cols : entry, i = x ? entry % cols : 0;
-        const uint64_t from = tile * OUTER_TILE;
-        const uint64_t to = from + OUTER_TILE < w.T ? from + OUTER_TILE : w.T;
-        wide sum = 0;
-        for (uint64_t t = from; t < to; t++) {
-            if (only_unresolved && !w.unresolved[t]) {
-                continue;
-            }
-            const wide yv = y[t * y_stride + o];
-            sum += x ? yv * (wide)x[t * x_stride + i] : yv;
-        }
-        if (sum != 0) {
-            add_wide(g + at + entry, sum);
-        }
-    }
-}
-
-extern "C" __global__ void field_outer_x32(FieldWords w, wide *g, uint64_t at, uint32_t rows, uint32_t cols, const int64_t *y, uint64_t y_stride, const int32_t *x, uint64_t x_stride, uint32_t only_unresolved) {
-    outer<int32_t>(w, g, at, rows, cols, y, y_stride, x, x_stride, only_unresolved);
-}
-
-extern "C" __global__ void field_outer_x64(FieldWords w, wide *g, uint64_t at, uint32_t rows, uint32_t cols, const int64_t *y, uint64_t y_stride, const int64_t *x, uint64_t x_stride, uint32_t only_unresolved) {
-    outer<int64_t>(w, g, at, rows, cols, y, y_stride, x, x_stride, only_unresolved);
-}
-
 // The host's refusal of an outer sum, region by region: `Σ_t max|y_t| max|x_t| ≥ 2^126` refused
 // (`outer_sum`'s bound, read per region as the host reads each region's sum). One block a region.
 template <typename X>
-__device__ void outer_bound(const FieldWords &w, uint32_t rows, uint32_t cols, const int64_t *y, uint64_t y_stride, const X *x, uint64_t x_stride, uint32_t only_unresolved) {
+__device__ void outer_bound(const FieldWords &w, uint32_t rows, uint32_t cols, const int64_t *y, uint64_t y_stride, const X *x, uint64_t x_stride, uint32_t only_unresolved, const unsigned long long *maxima) {
     __shared__ uwide part[32];
     const uint32_t r = blockIdx.x;
     if (r >= w.R) {
         return;
+    }
+    // [realization; P61 item 4f] A cheap bound first: the region's sites times the outer pass's largest `y` and `x` (its `maxima`, read after
+    // it) bound every term's sum, so where that product stands under `2^126` no partial can be refused and the region is not read again.
+    if (maxima) {
+        const uwide p = (uwide)maxima[0] * (uwide)maxima[1];
+        const uwide n = (uwide)(w.region_off[r + 1] - w.region_off[r]);
+        if (p == 0 || (p < ((uwide)1 << 126) && n <= (((uwide)1 << 126) - 1) / p)) {
+            return;
+        }
     }
     uwide bound = 0;
     bool over = false;
@@ -4428,12 +4627,12 @@ __device__ void outer_bound(const FieldWords &w, uint32_t rows, uint32_t cols, c
     }
 }
 
-extern "C" __global__ void field_outer_bound_x32(FieldWords w, uint32_t rows, uint32_t cols, const int64_t *y, uint64_t y_stride, const int32_t *x, uint64_t x_stride, uint32_t only_unresolved) {
-    outer_bound<int32_t>(w, rows, cols, y, y_stride, x, x_stride, only_unresolved);
+extern "C" __global__ void field_outer_bound_x32(FieldWords w, uint32_t rows, uint32_t cols, const int64_t *y, uint64_t y_stride, const int32_t *x, uint64_t x_stride, uint32_t only_unresolved, const unsigned long long *maxima) {
+    outer_bound<int32_t>(w, rows, cols, y, y_stride, x, x_stride, only_unresolved, maxima);
 }
 
-extern "C" __global__ void field_outer_bound_x64(FieldWords w, uint32_t rows, uint32_t cols, const int64_t *y, uint64_t y_stride, const int64_t *x, uint64_t x_stride, uint32_t only_unresolved) {
-    outer_bound<int64_t>(w, rows, cols, y, y_stride, x, x_stride, only_unresolved);
+extern "C" __global__ void field_outer_bound_x64(FieldWords w, uint32_t rows, uint32_t cols, const int64_t *y, uint64_t y_stride, const int64_t *x, uint64_t x_stride, uint32_t only_unresolved, const unsigned long long *maxima) {
+    outer_bound<int64_t>(w, rows, cols, y, y_stride, x, x_stride, only_unresolved, maxima);
 }
 
 // An encoding's covector: each row's `Σ_t release(w_t dx_t, 16)` over the sites that opened on it,
@@ -5994,3 +6193,17 @@ extern "C" __global__ void field_yard_bits_words(const void *arr, uint32_t kind,
 // the opening's comparison at every place (P60, the design record of November 13 §4.4a)
 
 #include "field_cavity.cuh"
+
+// [measurement; theory, November 13, P61 item 3] The bits ruler a row: `out[r] = max_i |a[r·stride + i]|` over `width` words of 32 or 64 bits
+// (`kind`), one thread a row. A reading of the site maps' operands; nothing the field computes reads it.
+extern "C" __global__ void field_yard_rows_max(const void *a, uint32_t kind, uint64_t n, uint64_t stride, uint32_t width, uint64_t *out) {
+    for (uint64_t r = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; r < n; r += (uint64_t)gridDim.x * blockDim.x) {
+        uint64_t m = 0;
+        for (uint32_t i = 0; i < width; i++) {
+            const int64_t v = kind == 64 ? ((const int64_t *)a)[r * stride + i] : (int64_t)((const int32_t *)a)[r * stride + i];
+            const uint64_t g = mag64(v);
+            m = g > m ? g : m;
+        }
+        out[r] = m;
+    }
+}

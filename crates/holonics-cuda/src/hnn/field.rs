@@ -42,13 +42,6 @@ const THREADS: u32 = 256;
 /// The dynamic shared memory a tiled affine map may take in a block, the default 48 KiB.
 const AFFINE_SHARED: usize = 48 * 1024;
 
-/// [agent-inferred, November 5] A tiled affine map's sites a block pass and its dynamic shared octets (`W` at the stride
-/// `cols + 1` and the bias in 32-bit words, each site's carrier bound, then a pass's site rows), where they fit a block.
-fn affine_tiling(rows: usize, cols: usize, x64: bool) -> Option<(usize, usize)> {
-    let per = (THREADS as usize).checked_div(rows).filter(|&p| p > 0)?;
-    let shared = ((rows * (cols + 1) + rows) * 4).div_ceil(16) * 16 + per * 8 + per * cols * if x64 { 8 } else { 4 };
-    (shared <= AFFINE_SHARED).then_some((per, shared))
-}
 
 /// [agent-inferred, November 12; the triad record §4] The return of two blocks' tiling (`affine_two_tiled` in `kernels/field.cu`): a block passes
 /// `256/rows` sites, holding `W` at the stride `cols + 1`, `W₂` at the stride `cols₂ + 1` and the bias in 32-bit words, each site's joint carrier bound
@@ -74,8 +67,12 @@ const REV_ROWS: u64 = 4;
 const MOMENT_BLOCK: u32 = 256;
 /// The most crowds a receiver hears, one lane each (`MAX_CROWD_SLOTS` in `kernels/field.cu`).
 const MAX_CROWD_SLOTS: usize = 32;
-/// The sites a thread of a covector sum takes (`OUTER_TILE` in `kernels/field.cu`).
+/// The sites a thread of an encoding's covector segment takes (the segments' tile).
 const OUTER_TILE: u64 = 64;
+/// [realization; P61 item 4e] The sites an outer sum's block walks (`OUTER_WALK` in `kernels/field.cu`).
+const OUTER_WALK: u64 = 512;
+/// [realization; P61 item 4f] The outer passes' slots for their largest words, zeroed again each time they are spent.
+const OUTER_SLOTS: usize = 4096;
 /// The device octets the runs keep to (the board's, the desktop included).
 const BOARD_CEILING: u64 = 12 << 30;
 /// Octets kept free beside a batch's counted allocations for the driver, the material and the
@@ -829,6 +826,48 @@ pub struct EntryAttributes {
     pub blocks_a_multiprocessor: u32,
 }
 
+/// [measurement; theory, November 13, P61 item 3] A site's map's launch kind: the entry, its rows and cols, whether it reads only the open
+/// sites, and whether it adds into its output (`add` for a forward map, `accumulate` for a transposed one).
+pub type MapKind = (&'static str, u32, u32, bool, bool);
+
+/// [measurement; P61 item 3] A kind's operands read by the bits ruler: the largest weight (`wmax`) and each operand's largest word in bits;
+/// its sites and those whose row stands under `2^31`, by operand; its tiles of [`MAP_TILE`] sites and those whose sums stand in 64 bits under
+/// the limb test ([`tile_proves`]), and in 96 bits (a third carry word, a reading only); its launches whose every tile proves.
+#[derive(Clone, Debug, Default)]
+pub struct MapBits {
+    pub launches: u64,
+    pub w_bits: u32,
+    pub bits: [u32; 2],
+    pub sites: u64,
+    pub under31: [u64; 2],
+    pub tiles: u64,
+    pub proved64: u64,
+    pub proved96: u64,
+    pub launches_all64: u64,
+    pub launches_all96: u64,
+}
+
+/// [measurement; P61 item 3] The sites a tile of the tiled form holds (a block's 64 sites at a 64 by 64 map).
+pub const MAP_TILE: usize = 64;
+
+/// [definition; P61 item 4c, `agent-inferred`] **A tile's sums stand in `bits` bits** where its magnitudes prove it: `k` terms a sum, each a
+/// product of two operands of largest magnitudes `a` and `b` (a weight on 32 bits, a word on 32 or 64). An operand under `2^31` is one signed
+/// limb; one over it enters as two 32-bit limbs (the low one unsigned, under `2^32`, the high one signed, at most `(m >> 32) + 1`), and each
+/// limb's sum stands alone. One operand on two limbs: `k · 2^32 · b` and `k · ((a >> 32) + 1) · b` under `2^(bits − 1)`; both on two limbs: the
+/// low limbs' product reaches `2^64`, so only the wide form stands under 64 bits. Both under `2^31`: `k · a · b` under `2^(bits − 1)`.
+pub fn tile_proves(k: u128, a: u128, b: u128, bits: u32) -> bool {
+    let top = 1u128 << (bits - 1);
+    let small = |m: u128| m < (1u128 << 31);
+    let under = |x: Option<u128>| x.is_some_and(|v| v < top);
+    let prod = |x: u128, y: u128, z: u128| x.checked_mul(y).and_then(|v| v.checked_mul(z));
+    match (small(a), small(b)) {
+        (true, true) => under(prod(k, a, b)),
+        (false, true) => under(prod(k, 1u128 << 32, b)) && under(prod(k, (a >> 32) + 1, b)),
+        (true, false) => under(prod(k, a, 1u128 << 32)) && under(prod(k, a, (b >> 32) + 1)),
+        (false, false) => bits > 64 && under(prod(k, 1u128 << 32, 1u128 << 32)) && under(prod(k, (a >> 32) + 1, (b >> 32) + 1)) && under(prod(k, (a >> 32) + 1, 1u128 << 32)),
+    }
+}
+
 /// [measurement; P57 item 1] The launches a trace keeps: a section's are about 510, so four sections and the run's opening.
 pub const TRACE_LAUNCHES: usize = 2600;
 
@@ -856,6 +895,11 @@ pub struct FieldProfile {
     /// [measurement; theory, November 13, P56 item 4] A zeroed take's zeroing by its call site's line: count, ns (timed alone, the stream drained
     /// before and after) and octets zeroed.
     pub zeroed: std::collections::BTreeMap<u32, (u64, u128, u128)>,
+    /// [measurement; theory, November 13, P61 item 3] A site's maps by launch kind (entry, rows, cols, only_unresolved, add or accumulate):
+    /// launches, ns and products (sites times rows times cols as launched).
+    pub maps: std::collections::BTreeMap<MapKind, (u64, u128, u128)>,
+    /// [measurement; P61 item 3] Under `FIELD_TRACE`, each kind's operands' magnitudes and its tiles' proofs ([`MapBits`]).
+    pub map_bits: std::collections::BTreeMap<MapKind, MapBits>,
     /// [measurement; theory, November 13, P57 item 1] Under `FIELD_TRACE` (with the profile): every launch in order, up to
     /// [`TRACE_LAUNCHES`], with the run it belongs to, the last phase marked, its grid, block, dynamic shared octets, its timed ns
     /// and its head; and each entry's attributes as the driver lowered it, at each block and dynamic shared it was launched with.
@@ -901,6 +945,10 @@ pub struct CardField<'c> {
     profile: Option<std::cell::RefCell<FieldProfile>>,
     /// The head a launch is made for, where the launches go a head at a time (a profile's reading by head).
     head: std::cell::Cell<Option<u32>>,
+    /// [measurement; P61 item 3] The last launch's timed ns, under the profile.
+    last_ns: std::cell::Cell<u128>,
+    /// [realization; P61 item 4f] The outer passes' slots for their largest words and the next slot ([`CardField::outer_slot`]).
+    outer_maxima: std::cell::RefCell<Option<(Pooled<'c, u64>, usize)>>,
     /// [theory, November 12, P50 step 1] The test build's negative control: the clock's fill withheld, its store left at `SKIN_UNFILLED`.
     #[cfg(test)]
     unfilled: std::cell::Cell<bool>,
@@ -962,7 +1010,7 @@ impl<'c> CardField<'c> {
         let (free, total) = (memory.free_bytes as u64, memory.total_bytes as u64);
         let used = total.saturating_sub(free);
         let budget = free.min(BOARD_CEILING.saturating_sub(used)).saturating_sub(MARGIN);
-        Ok(Self { card, module, budget, times: FieldTimes::default(), profile: None, head: Default::default(), #[cfg(test)] unfilled: Default::default(), #[cfg(feature = "ruler-bits")] bits: Default::default(), pools: Default::default(), held_questions: Default::default(), covector_shares: Default::default(), row_questions: Default::default(), row_out: Default::default(), row_cov: Default::default(), held_cells: Default::default(), tick_reads: Default::default(), carry_gates: Default::default(), near_sites: Default::default(), near_out: Default::default(), clock_sites: Default::default(), clock_out: Default::default(), phases: None, phase_card: Default::default(), narrow: Default::default(), narrow_out: Default::default(), last_mark: std::cell::Cell::new("open"), tick_charts: Default::default(), opening_wanted: Default::default(), opening_out: Default::default() })
+        Ok(Self { card, module, budget, times: FieldTimes::default(), profile: None, head: Default::default(), last_ns: Default::default(), outer_maxima: Default::default(), #[cfg(test)] unfilled: Default::default(), #[cfg(feature = "ruler-bits")] bits: Default::default(), pools: Default::default(), held_questions: Default::default(), covector_shares: Default::default(), row_questions: Default::default(), row_out: Default::default(), row_cov: Default::default(), held_cells: Default::default(), tick_reads: Default::default(), carry_gates: Default::default(), near_sites: Default::default(), near_out: Default::default(), clock_sites: Default::default(), clock_out: Default::default(), phases: None, phase_card: Default::default(), narrow: Default::default(), narrow_out: Default::default(), last_mark: std::cell::Cell::new("open"), tick_charts: Default::default(), opening_wanted: Default::default(), opening_out: Default::default() })
     }
 
     /// The octets a batch's weight and contact stores may take.
@@ -1239,6 +1287,7 @@ impl<'c> CardField<'c> {
             slot.0 += 1;
             slot.1 += started.elapsed().as_nanos();
             p.timed_ns += started.elapsed().as_nanos();
+            self.last_ns.set(started.elapsed().as_nanos());
             *p.threads.entry(entry).or_insert(0) += u128::from(grid.x) * u128::from(grid.y) * u128::from(grid.z) * u128::from(block);
             if let Some(h) = self.head.get() {
                 let slot = p.by_head.entry((entry, h)).or_insert((0, 0));
@@ -2907,18 +2956,13 @@ impl<'c> CardField<'c> {
     fn affine(&self, entry: &'static str, words: &mut Words, weight: u64, bias: u64, wmax: u64, rows: usize, cols: usize, x: u64, x_stride: usize, out: u64, out_stride: usize, add: u64, only_unresolved: bool) -> Result<()> {
         let (mut weight, mut bias, mut wmax, mut rows32, mut cols32) = (weight, bias, wmax, rows as u32, cols as u32);
         let (mut x, mut xs, mut out, mut os, mut add, mut u) = (x, x_stride as u64, out, out_stride as u64, add, u32::from(only_unresolved));
-        let cells = words.t as u64 * rows as u64;
-        // [agent-inferred, November 5] The tiled map where its weights, bias and a pass's site rows fit a block's shared memory
-        // (every map of the field's declaration does), the cell map otherwise: the same integers either way.
-        if std::env::var_os("FIELD_AFFINE_TRACE").is_some() {
-            eprintln!("FIELD_AFFINE_TRACE entry={entry} rows={rows} cols={cols} tiling={:?}", affine_tiling(rows, cols, entry.ends_with("x64")));
-        }
-        if let Some((per, shared)) = affine_tiling(rows, cols, entry.ends_with("x64")) {
-            let tiled = if entry.ends_with("x64") { "field_affine_tiled_x64" } else { "field_affine_tiled_x32" };
-            let grid = (words.t as u64).div_ceil(per as u64).clamp(1, 65_535) as u32;
-            return self.launch_shared(tiled, grid, THREADS, shared as u32, &mut [arg(words), arg(&mut weight), arg(&mut bias), arg(&mut wmax), arg(&mut rows32), arg(&mut cols32), arg(&mut x), arg(&mut xs), arg(&mut out), arg(&mut os), arg(&mut add), arg(&mut u)]);
-        }
-        self.launch(entry, Self::cells(cells), THREADS, &mut [arg(words), arg(&mut weight), arg(&mut bias), arg(&mut wmax), arg(&mut rows32), arg(&mut cols32), arg(&mut x), arg(&mut xs), arg(&mut out), arg(&mut os), arg(&mut add), arg(&mut u)])
+        // [realization; P61 item 4] Every forward map in the tile form (`map_tile` in `kernels/field.cu`): a block a tile of 64 outputs by 64
+        // sites, whatever the map's shape; the cell map and its tiling are retired with it.
+        let x64 = entry.ends_with("x64");
+        let launched = if x64 { "field_affine_tiled_x64" } else { "field_affine_tiled_x32" };
+        let grid = (rows as u64).div_ceil(64).saturating_mul((words.t as u64).div_ceil(64)).clamp(1, 65_535) as u32;
+        self.launch(launched, grid, THREADS, &mut [arg(words), arg(&mut weight), arg(&mut bias), arg(&mut wmax), arg(&mut rows32), arg(&mut cols32), arg(&mut x), arg(&mut xs), arg(&mut out), arg(&mut os), arg(&mut add), arg(&mut u)])?;
+        self.map_record((launched, rows32, cols32, u != 0, add != 0), words, Some(cols), Some(wmax), None, &[(x, x64, xs as usize, cols)])
     }
 
     /// [definition; theory, November 12; the triad record §3 and §4] **The return of two blocks** (`field_affine_two_x64`; tiled,
@@ -2947,7 +2991,9 @@ impl<'c> CardField<'c> {
     #[allow(clippy::too_many_arguments)]
     fn transposed(&self, words: &mut Words, weight: u64, rows: usize, cols: usize, y: u64, y_stride: usize, out: u64, accumulate: bool, only_unresolved: bool) -> Result<()> {
         let (mut weight, mut rows32, mut cols32, mut y, mut ys, mut out, mut acc, mut u) = (weight, rows as u32, cols as u32, y, y_stride as u64, out, u32::from(accumulate), u32::from(only_unresolved));
-        self.launch("field_transposed", Self::cells(words.t as u64 * cols as u64), THREADS, &mut [arg(words), arg(&mut weight), arg(&mut rows32), arg(&mut cols32), arg(&mut y), arg(&mut ys), arg(&mut out), arg(&mut acc), arg(&mut u)])
+        let grid = (cols as u64).div_ceil(64).saturating_mul((words.t as u64).div_ceil(64)).clamp(1, 65_535) as u32;
+        self.launch("field_transposed", grid, THREADS, &mut [arg(words), arg(&mut weight), arg(&mut rows32), arg(&mut cols32), arg(&mut y), arg(&mut ys), arg(&mut out), arg(&mut acc), arg(&mut u)])?;
+        self.map_record(("field_transposed", rows32, cols32, u != 0, acc != 0), words, Some(rows), None, Some((weight, rows * cols)), &[(y, true, ys as usize, rows)])
     }
 
     /// A family's covector `g[at..] += Σ_t y_t ⊗ x_t` (or the bias's `Σ_t y_t` when `x` is zero), with
@@ -2955,13 +3001,105 @@ impl<'c> CardField<'c> {
     #[allow(clippy::too_many_arguments)]
     fn outer(&self, words: &mut Words, g: &CardBuffer<'c, i128>, at: u64, rows: usize, cols: usize, y: u64, y_stride: usize, x: u64, x_stride: usize, x64: bool, only_unresolved: bool) -> Result<()> {
         let (mut gp, mut at, mut rows32, mut cols32, mut y, mut ys, mut x, mut xs, mut u) = (g.device_ptr(), at, rows as u32, cols as u32, y, y_stride as u64, x, x_stride as u64, u32::from(only_unresolved));
-        if x != 0 {
-            let entry = if x64 { "field_outer_bound_x64" } else { "field_outer_bound_x32" };
-            self.launch(entry, words.r, THREADS, &mut [arg(words), arg(&mut rows32), arg(&mut cols32), arg(&mut y), arg(&mut ys), arg(&mut x), arg(&mut xs), arg(&mut u)])?;
-        }
-        let entries = rows as u64 * if x != 0 { cols as u64 } else { 1 };
+        // [realization; P61 items 4e and 4f] The outer sum in the tile form, then (where `x` is given) the host's per-region refusal, which
+        // first reads the outer pass's largest words from a slot of its own (`outer_slot`) and reads a region again only where they leave
+        // its bound open. Without a slot the bound reads every region as before.
+        let mut maxima = if x != 0 { self.outer_slot()? } else { 0 };
         let entry = if x64 { "field_outer_x64" } else { "field_outer_x32" };
-        self.launch(entry, Self::cells(entries * (words.t as u64).div_ceil(OUTER_TILE)), THREADS, &mut [arg(words), arg(&mut gp), arg(&mut at), arg(&mut rows32), arg(&mut cols32), arg(&mut y), arg(&mut ys), arg(&mut x), arg(&mut xs), arg(&mut u)])
+        let grid = if x != 0 {
+            (rows as u64).div_ceil(64).saturating_mul((cols as u64).div_ceil(64)).saturating_mul((words.t as u64).div_ceil(OUTER_WALK)).clamp(1, 65_535) as u32
+        } else {
+            (rows as u64).div_ceil(THREADS as u64).saturating_mul((words.t as u64).div_ceil(OUTER_WALK)).clamp(1, 65_535) as u32
+        };
+        self.launch(entry, grid, THREADS, &mut [arg(words), arg(&mut gp), arg(&mut at), arg(&mut rows32), arg(&mut cols32), arg(&mut y), arg(&mut ys), arg(&mut x), arg(&mut xs), arg(&mut u), arg(&mut maxima)])?;
+        let ops: Vec<(u64, bool, usize, usize)> = if x != 0 { vec![(y, true, ys as usize, rows), (x, x64, xs as usize, cols)] } else { vec![(y, true, ys as usize, rows)] };
+        if x != 0 {
+            let bound = if x64 { "field_outer_bound_x64" } else { "field_outer_bound_x32" };
+            self.launch(bound, words.r, THREADS, &mut [arg(words), arg(&mut rows32), arg(&mut cols32), arg(&mut y), arg(&mut ys), arg(&mut x), arg(&mut xs), arg(&mut u), arg(&mut maxima)])?;
+            self.map_record((bound, rows32, cols32, u != 0, false), words, None, None, None, &[])?;
+        }
+        self.map_record((entry, rows32, if x != 0 { cols32 } else { 0 }, u != 0, false), words, None, None, None, &ops)
+    }
+
+    /// [measurement; theory, November 13, P61 item 3] **A site's map's launch read by kind**, under the profile: its launches, ns (the launch just
+    /// made) and products (`words.t · rows · cols`). Under `FIELD_TRACE` its operands are read by the bits ruler (`field_yard_rows_max`, each site's
+    /// largest word a row), and its tiles of [`MAP_TILE`] sites judged by [`tile_proves`]: `k` terms a sum, the weight's largest `wmax` (read from
+    /// the material where not given) against the one operand (a forward or transposed map), or the covector against the input (an outer sum, `k`
+    /// the tile's sites). A reading: nothing the field computes moves.
+    #[allow(clippy::too_many_arguments)]
+    fn map_record(&self, kind: MapKind, words: &Words, k: Option<usize>, wmax: Option<u64>, weight: Option<(u64, usize)>, operands: &[(u64, bool, usize, usize)]) -> Result<()> {
+        let Some(profile) = &self.profile else { return Ok(()) };
+        let products = u128::from(words.t) * u128::from(kind.1) * u128::from(kind.2.max(1));
+        let trace = {
+            let mut p = profile.borrow_mut();
+            let slot = p.maps.entry(kind).or_insert((0, 0, 0));
+            (slot.0, slot.1, slot.2) = (slot.0 + 1, slot.1 + self.last_ns.get(), slot.2 + products);
+            p.trace_on
+        };
+        if !trace || words.t == 0 {
+            return Ok(());
+        }
+        let card = self.card;
+        let sites = words.t as usize;
+        let rows_max = |ptr: u64, x64: bool, n: usize, stride: usize, width: usize| -> Result<Vec<u64>> {
+            let out = self.timed(Kind::Alloc, || self.take::<u64>(n)).map_err(device)?;
+            let (mut a, mut kind64, mut nn, mut st, mut wd, mut o) = (ptr, if x64 { 64u32 } else { 32u32 }, n as u64, stride as u64, width as u32, out.device_ptr());
+            self.launch("field_yard_rows_max", Self::cells(n as u64), THREADS, &mut [arg(&mut a), arg(&mut kind64), arg(&mut nn), arg(&mut st), arg(&mut wd), arg(&mut o)])?;
+            Ok(self.timed(Kind::Copy, || card.fetch_range(&out, 0, n)).map_err(device)?)
+        };
+        let wmax = match (wmax, weight) {
+            (Some(w), _) => u128::from(w),
+            (None, Some((offset, len))) => u128::from(rows_max(words.theta + 4 * offset, false, 1, len, len)?[0]),
+            (None, None) => 1,
+        };
+        let maxima: Vec<Vec<u64>> = operands.iter().map(|&(ptr, x64, stride, width)| rows_max(ptr, x64, sites, stride, width)).collect::<Result<_>>()?;
+        let bits = |m: u64| 64 - m.leading_zeros();
+        let mut p = profile.borrow_mut();
+        let b = p.map_bits.entry(kind).or_default();
+        b.launches += 1;
+        b.w_bits = b.w_bits.max(bits(wmax as u64));
+        b.sites += sites as u64;
+        for (j, m) in maxima.iter().enumerate().take(2) {
+            b.bits[j] = b.bits[j].max(m.iter().copied().map(bits).max().unwrap_or(0));
+            b.under31[j] += m.iter().filter(|&&v| v < 1 << 31).count() as u64;
+        }
+        let (mut all64, mut all96) = (true, true);
+        for start in (0..sites).step_by(MAP_TILE) {
+            let end = (start + MAP_TILE).min(sites);
+            let tile = |j: usize| -> u128 { maxima.get(j).map_or(1, |m| u128::from(m[start..end].iter().copied().max().unwrap_or(0))) };
+            let (kk, a, c) = match k {
+                Some(terms) => (terms as u128, tile(0), wmax),
+                None => ((end - start) as u128, tile(0), tile(1)),
+            };
+            let (p64, p96) = (tile_proves(kk, a, c, 64), tile_proves(kk, a, c, 96));
+            b.tiles += 1;
+            b.proved64 += u64::from(p64);
+            b.proved96 += u64::from(p96);
+            all64 &= p64;
+            all96 &= p96;
+        }
+        b.launches_all64 += u64::from(all64);
+        b.launches_all96 += u64::from(all96);
+        Ok(())
+    }
+
+    /// [realization; P61 item 4f] **An outer pass's slot for its two largest words**: two 64-bit words of a card buffer of `OUTER_SLOTS` slots,
+    /// zeroed when it is first taken and again (in the stream's order, after every launch that read the slots before) each time its slots are
+    /// spent, so every pass reads a slot zeroed for it alone. The device address of the slot.
+    fn outer_slot(&self) -> Result<u64> {
+        let mut held = self.outer_maxima.borrow_mut();
+        if held.is_none() {
+            let buffer = self.timed(Kind::Alloc, || self.take_zeroed::<u64>(2 * OUTER_SLOTS)).map_err(device)?;
+            *held = Some((buffer, 0));
+        }
+        let (buffer, next) = held.as_mut().expect("the slots were just taken");
+        if *next == OUTER_SLOTS {
+            self.card.stream().memset_u32_async(buffer.device_ptr(), 0, 4 * OUTER_SLOTS).map_err(|e| device(e.into()))?;
+            *next = 0;
+        }
+        let at = buffer.device_ptr() + 16 * *next as u64;
+        *next += 1;
+        Ok(at)
     }
 
     fn ratio_adjoint(&self, words: &mut Words, read: u64, scale: u64, cov: u64, base: u64, dst: u64, only_unresolved: bool) -> Result<()> {
@@ -3823,19 +3961,6 @@ type Rows = Vec<Vec<(Vec<(u32, u64)>, u64)>>;
 
 #[cfg(test)]
 mod tests {
-    /// Every affine map of the field's declaration is tiled: the weights at their padded stride, the bias, the bounds and a
-    /// pass's site rows fit a block's shared memory, and a block passes `256/rows` sites.
-    #[test]
-    fn every_affine_map_of_the_declaration_is_tiled() {
-        let (dw, m2, f) = (32usize, 64usize, 32usize);
-        for (rows, cols, x64) in [(m2, dw, false), (dw, m2, true), (f, dw, false), (dw, f, true), (dw, dw, false)] {
-            let (per, shared) = super::affine_tiling(rows, cols, x64).unwrap_or_else(|| panic!("{rows} × {cols} not tiled"));
-            assert_eq!(per, 256 / rows);
-            assert!(shared <= super::AFFINE_SHARED);
-        }
-        assert!(super::affine_tiling(512, 32, false).is_none(), "more rows than a block's threads");
-    }
-
     use super::*;
 
     fn declaration(width: usize, heads: usize, contacts: usize) -> FieldDeclaration {
@@ -3849,30 +3974,6 @@ mod tests {
     /// of the declaration still tiles a block (`affine_tiling`: the contacts' rows and the width's rows are a block's threads at most),
     /// and the octets of the longest region (a return at the reach's 3,771 sites) and of one thousand. Printed as `ROUTE` lines; ignored
     /// by default, run with `--ignored --nocapture`.
-    #[test]
-    #[ignore]
-    fn the_contacts_by_fours_tile_on_the_card() {
-        // [theory, November 10 21:10] Contacts come in fours (f/2 even): each f from 68 by fours on the main line's declaration (width 64, two
-        // lanes), its material, whether the contacts' two maps tile a block (`affine_tiling`: `(f, dw)` and `(dw, f)`) with the shared octets, and
-        // the octets of the longest region; then the first f past 128 and the first refused, and the shared figure that refuses it.
-        let base = FieldDeclaration { alphabet: 100, width: 64, heads: 4, modes: 8, still: 2, contacts: 64, ticks: 4, frames: 4, reach: 3771, lanes: 2, depth: 0, carry: 0, triads: 0, opening: false };
-        let mut first_refused = None;
-        for f in (68..=512).step_by(4) {
-            let d = FieldDeclaration { contacts: f, ..base };
-            let field = holonics::hnn::tower::field::Field::found(d, &vec![7u8; 4 * d.founding_draws()]).expect("admitted");
-            let (dw, a, b) = (d.width, affine_tiling(f, d.width, false), affine_tiling(d.width, f, true));
-            let shared = |t: Option<(usize, usize)>| t.map_or("NO".to_string(), |(per, sh)| format!("{per}/{sh}"));
-            if f <= 132 || (a.is_some() && b.is_some() && f % 16 == 0) || (first_refused.is_none() && (a.is_none() || b.is_none())) {
-                // The shared octets a refused map would need: `((rows (cols + 1) + rows) 4 rounded to 16) + per 8 + per cols (4 or 8)`.
-                let need = |rows: usize, cols: usize, x64: bool| ((rows * (cols + 1) + rows) * 4).div_ceil(16) * 16 + (256usize.checked_div(rows).unwrap_or(0)) * 8 + (256usize.checked_div(rows).unwrap_or(0)) * cols * if x64 { 8 } else { 4 };
-                println!("CONTACTS f={f} material={} (f,dw) {} needs {} (dw,f) {} needs {} limit {} region_3771_octets={}", field.material_len(), shared(a), need(f, dw, false), shared(b), need(dw, f, true), AFFINE_SHARED, region_octets(&d, true, 3771, 3771));
-            }
-            if first_refused.is_none() && (a.is_none() || b.is_none()) {
-                first_refused = Some(f);
-            }
-        }
-        println!("CONTACTS first_refused={first_refused:?}");
-    }
 
     #[test]
     #[ignore]
@@ -3882,7 +3983,8 @@ mod tests {
             let draws = 4 * d.founding_draws();
             let field = holonics::hnn::tower::field::Field::found(d, &vec![7u8; draws]).expect("founded");
             let (m2, dw, f) = (2 * d.complex(), d.width, d.contacts);
-            let tiled: Vec<String> = [(m2, dw, false), (dw, m2, true), (f, dw, false), (dw, f, true), (dw, dw, false)].iter().map(|&(r, c, x)| affine_tiling(r, c, x).map_or(format!("{r}x{c}:NO"), |(per, sh)| format!("{r}x{c}:{per}/{sh}"))).collect();
+            // [P61] Every map takes the tile form, whatever its shape.
+            let tiled: Vec<String> = [(m2, dw), (dw, m2), (f, dw), (dw, f), (dw, dw)].iter().map(|&(r, c)| format!("{r}x{c}:tile")).collect();
             println!("ROUTE {name} width={dw} lanes={} contacts={f} material={} tiles[{}] region_3771_octets={} region_1000_octets={} site_octets={}", d.lanes, field.material_len(), tiled.join(" "), region_octets(&d, true, 3771, 3771), region_octets(&d, true, 1000, 1000), (region_octets(&d, true, 1001, 1001) - region_octets(&d, true, 1000, 1000)));
         };
         describe("base", base);
@@ -3989,8 +4091,6 @@ mod tests {
     #[test]
     fn the_triads_maps_tile_on_the_main_lines_declaration() {
         let (dw, f, triads) = (64usize, 128usize, 16usize);
-        let (per, shared) = affine_tiling(6 * triads, dw, false).expect("the triads' chart tiles");
-        assert_eq!((per, shared <= AFFINE_SHARED), (256 / (6 * triads), true));
         assert_eq!(affine_two_tiling(dw, f, 2 * triads), Some((4, 46_912)));
         let need = ((dw * (f + 1) + dw * (2 * triads + 1) + dw) * 4).div_ceil(16) * 16 + 4 * 16 + 4 * (f + 2 * triads) * 8;
         assert_eq!(need, 46_912);
@@ -4071,6 +4171,175 @@ mod tests {
         for (name, start, len) in [("w_triad", l.w_triad, dw * 2 * triads), ("triad", l.triad, 6 * triads * dw), ("triad_bias", l.triad_bias, 6 * triads)] {
             assert!(host_g[start..start + len].iter().any(|&v| v != 0), "the triads' {name} takes no covector");
         }
+    }
+
+    /// [realization; theory, November 13, P61 item 5] **A site's maps in the tile form read the definitions' integers** (needs the card): the
+    /// forward map, the transposed map and the outer sum with its bound, at every shape the store line's declaration launches (P61's reading:
+    /// forward 64 × 64 and 128 × 64 on 32-bit inputs, 64 × 64 and 64 × 128 on 64-bit ones; transposed 64 × 64, 64 × 128 and 128 × 64; outer
+    /// 64 × 64 and 128 × 64 on 32-bit inputs, 64 × 64 and 64 × 128 on 64-bit ones, and the bias's sums of 64, 128 and 244), against the
+    /// definitions summed here on 128 bits: every output word, every entry of `g` (a ring sum on 128 bits) and the status bits equal. The
+    /// fixtures force the wide form (words past `2^31` in some tiles), a site the forward map refuses (`wmax · xmax · (cols + 1) ≥ 2^126`), a
+    /// region the outer bound refuses, a mask of open sites, `add` and `accumulate`, site counts that are no multiple of a tile, and the bias's
+    /// sum with no `x`.
+    #[test]
+    #[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
+    fn a_sites_maps_in_the_tile_form_read_the_definitions_integers() {
+        let card = Card::open(0).expect("a CUDA card with the field's kernels built");
+        let cf = CardField::open(&card).unwrap();
+        let mut state = 0x9E37_79B9_7F4A_7C15u64;
+        let mut next = move || {
+            state = state.wrapping_add(0x9E37_79B9_7F4A_7C15);
+            let mut z = state;
+            z = (z ^ (z >> 30)).wrapping_mul(0xBF58_476D_1CE4_E5B9);
+            z = (z ^ (z >> 27)).wrapping_mul(0x94D0_49BB_1331_11EB);
+            z ^ (z >> 31)
+        };
+        // A word of `bits` bits, signed.
+        let mut word = |bits: u32| -> i64 { let v = (next() >> (64 - bits)) as i64; if next() & 1 == 1 { -v } else { v } };
+        let rel = |x: i128, bits: u32| -> i128 { let half = 1i128 << (bits - 1); if x >= 0 { (x + half) >> bits } else { -((-x + half) >> bits) } };
+        let (refused_carrier, refused_word64) = (1u32, 2u32);
+        let fit = |v: i128, st: &mut u32| -> i64 { if v > i64::MAX as i128 || v < i64::MIN as i128 { *st |= refused_word64; 0 } else { v as i64 } };
+        let mut checked = 0usize;
+        // Sites: no multiple of a tile, and more than a walk of the outer sum.
+        for &sites in &[37usize, 200, 1093] {
+            let regions: Vec<u32> = { let mut r = vec![0u32]; let mut at = 0u32; while (at as usize) < sites { at = (at + 97 + (word(9).unsigned_abs() % 300) as u32).min(sites as u32); r.push(at); } r };
+            for &only in &[false, true] {
+                let unresolved: Vec<u8> = (0..sites).map(|t| u8::from(!only || t % 3 != 1)).collect();
+                let mut base = Words { t: sites as u32, r: (regions.len() - 1) as u32, ..Default::default() };
+                let unresolved_buf = card.upload(&unresolved).unwrap();
+                let region_buf = card.upload(&regions).unwrap();
+                base.unresolved = unresolved_buf.device_ptr();
+                base.region_off = region_buf.device_ptr();
+                // The forward map.
+                for &(rows, cols, x64, add, wide_tile, refuse) in &[(64usize, 64usize, false, false, false, false), (128, 64, false, false, false, false), (64, 64, true, true, true, false), (64, 128, true, true, false, true), (64, 64, true, false, false, false)] {
+                    let w: Vec<i32> = (0..rows * cols).map(|_| word(28) as i32).collect();
+                    let b: Vec<i32> = (0..rows).map(|_| word(20) as i32).collect();
+                    let theta: Vec<i32> = w.iter().chain(&b).copied().collect();
+                    let wmax_true = w.iter().map(|v| v.unsigned_abs() as u64).max().unwrap();
+                    let x: Vec<i64> = (0..sites * cols).map(|c| { let t = c / cols; if x64 && wide_tile && t % 64 < 3 { word(40) } else if x64 && refuse && t == sites / 2 { if c % cols == 0 { 1i64 << 61 } else { word(40) } } else { word(22) } }).collect();
+                    // A refused site: the host's carrier bound read with a weight bound past the true one (`2^58 · 2^61 · 129` reaches `2^126`
+                    // and stands under `2^128`).
+                    let wmax = if refuse { 1u64 << 58 } else { wmax_true };
+                    let prior: Vec<i64> = (0..sites * rows).map(|_| word(40)).collect();
+                    let theta_buf = card.upload(&theta).unwrap();
+                    let status_buf = card.zeroed::<u32>(1).unwrap();
+                    let out_buf = card.upload(&prior).unwrap();
+                    let x_buf = if x64 { card.upload(&x).unwrap() } else { card.upload(&x.iter().map(|&v| v as i32 as i64).collect::<Vec<_>>()).unwrap() };
+                    let x32: Vec<i32> = x.iter().map(|&v| v as i32).collect();
+                    let x32_buf = card.upload(&x32).unwrap();
+                    let mut words = Words { theta: theta_buf.device_ptr(), status: status_buf.device_ptr(), ..base };
+                    let xp = if x64 { x_buf.device_ptr() } else { x32_buf.device_ptr() };
+                    let entry = if x64 { "field_affine_x64" } else { "field_affine_x32" };
+                    let (outp, addp) = if add { (0, out_buf.device_ptr()) } else { (out_buf.device_ptr(), 0) };
+                    cf.affine(entry, &mut words, 0, (rows * cols) as u64, wmax, rows, cols, xp, cols, outp, rows, addp, only).unwrap();
+                    let got = card.fetch(&out_buf).unwrap();
+                    let st = card.fetch(&status_buf).unwrap()[0];
+                    let (mut want, mut wst) = (prior.clone(), 0u32);
+                    for t in 0..sites {
+                        if only && unresolved[t] == 0 {
+                            continue;
+                        }
+                        let xt: Vec<i128> = (0..cols).map(|i| if x64 { x[t * cols + i] as i128 } else { x32[t * cols + i] as i128 }).collect();
+                        let xmax = xt.iter().map(|v| v.unsigned_abs()).max().unwrap();
+                        if (wmax as u128) * xmax * (cols as u128 + 1) >= 1u128 << 126 {
+                            wst |= refused_carrier;
+                            continue;
+                        }
+                        for o in 0..rows {
+                            let sum: i128 = (0..cols).map(|i| w[o * cols + i] as i128 * xt[i]).sum::<i128>() + ((b[o] as i128) << 24);
+                            let v = fit(rel(sum, 24), &mut wst);
+                            want[t * rows + o] = if add { fit(prior[t * rows + o] as i128 + v as i128, &mut wst) } else { v };
+                        }
+                    }
+                    assert_eq!(st, wst, "forward {rows}x{cols} x64={x64} sites={sites} only={only}: the status bits");
+                    assert!(got == want, "forward {rows}x{cols} x64={x64} add={add} sites={sites} only={only}: {} words differ", got.iter().zip(&want).filter(|(a, b)| a != b).count());
+                    checked += 1;
+                }
+                // The transposed map.
+                for &(rows, cols, acc, wide_tile) in &[(64usize, 64usize, false, true), (64, 64, true, false), (64, 128, false, false), (128, 64, true, true)] {
+                    let w: Vec<i32> = (0..rows * cols).map(|_| word(28) as i32).collect();
+                    let y: Vec<i64> = (0..sites * rows).map(|c| if wide_tile && (c / rows) % 64 == 5 { word(44) } else { word(31) }).collect();
+                    let prior: Vec<i64> = (0..sites * cols).map(|_| word(40)).collect();
+                    let theta_buf = card.upload(&w).unwrap();
+                    let status_buf = card.zeroed::<u32>(1).unwrap();
+                    let out_buf = card.upload(&prior).unwrap();
+                    let y_buf = card.upload(&y).unwrap();
+                    let mut words = Words { theta: theta_buf.device_ptr(), status: status_buf.device_ptr(), ..base };
+                    cf.transposed(&mut words, 0, rows, cols, y_buf.device_ptr(), rows, out_buf.device_ptr(), acc, only).unwrap();
+                    let got = card.fetch(&out_buf).unwrap();
+                    let st = card.fetch(&status_buf).unwrap()[0];
+                    let (mut want, mut wst) = (prior.clone(), 0u32);
+                    for t in 0..sites {
+                        if only && unresolved[t] == 0 {
+                            continue;
+                        }
+                        for i in 0..cols {
+                            let sum: i128 = (0..rows).map(|o| w[o * cols + i] as i128 * y[t * rows + o] as i128).sum();
+                            let v = fit(rel(sum, 24), &mut wst);
+                            want[t * cols + i] = if acc { fit(prior[t * cols + i] as i128 + v as i128, &mut wst) } else { v };
+                        }
+                    }
+                    assert_eq!(st, wst, "transposed {rows}x{cols} sites={sites} only={only}: the status bits");
+                    assert!(got == want, "transposed {rows}x{cols} acc={acc} sites={sites} only={only}: {} words differ", got.iter().zip(&want).filter(|(a, b)| a != b).count());
+                    checked += 1;
+                }
+                // The outer sum and its bound, and the bias's sums.
+                for &(rows, cols, x64, case) in &[(64usize, 64usize, false, 0u8), (128, 64, false, 1), (64, 64, true, 1), (64, 128, true, 2), (64, 0, false, 0), (128, 0, false, 1), (244, 0, false, 0)] {
+                    // case 0 narrow; 1 a wide walk (words past 2^31 in one walk); 2 a region refused by the bound.
+                    let y: Vec<i64> = (0..sites * rows).map(|c| { let t = c / rows; if case == 1 && t % 512 < 4 { word(40) } else if case == 2 && t < 8 { word(63) } else { word(31) } }).collect();
+                    let xw = cols.max(1);
+                    let x: Vec<i64> = (0..sites * xw).map(|c| { let t = c / xw; if case == 2 && t < 8 { word(63) } else { word(22) } }).collect();
+                    let x32: Vec<i32> = x.iter().map(|&v| v as i32).collect();
+                    let entries = rows * cols.max(1);
+                    let at = 3usize;
+                    let prior: Vec<i128> = (0..entries + 2 * at).map(|_| (word(60) as i128) << 20).collect();
+                    let status_buf = card.zeroed::<u32>(1).unwrap();
+                    let g_buf = card.upload(&prior).unwrap();
+                    let y_buf = card.upload(&y).unwrap();
+                    let x_buf = card.upload(&x).unwrap();
+                    let x32_buf = card.upload(&x32).unwrap();
+                    let mut words = Words { status: status_buf.device_ptr(), ..base };
+                    let xp = if cols == 0 { 0 } else if x64 { x_buf.device_ptr() } else { x32_buf.device_ptr() };
+                    cf.outer(&mut words, &g_buf, at as u64, rows, cols, y_buf.device_ptr(), rows, xp, xw, x64, only).unwrap();
+                    let got = card.fetch(&g_buf).unwrap();
+                    let st = card.fetch(&status_buf).unwrap()[0];
+                    let (mut want, mut wst) = (prior.clone(), 0u32);
+                    let live = |t: usize| !(only && unresolved[t] == 0);
+                    let xv = |t: usize, i: usize| -> i128 { if x64 { x[t * xw + i] as i128 } else { x32[t * xw + i] as i128 } };
+                    for o in 0..rows {
+                        for i in 0..cols.max(1) {
+                            let mut sum = 0i128;
+                            for t in (0..sites).filter(|&t| live(t)) {
+                                sum = sum.wrapping_add((y[t * rows + o] as i128).wrapping_mul(if cols == 0 { 1 } else { xv(t, i) }));
+                            }
+                            want[at + o * cols.max(1) + i] = want[at + o * cols.max(1) + i].wrapping_add(sum);
+                        }
+                    }
+                    if cols > 0 {
+                        for r in 0..regions.len() - 1 {
+                            let mut bound = 0u128;
+                            let mut over = false;
+                            for t in (regions[r] as usize..regions[r + 1] as usize).filter(|&t| live(t)) {
+                                let ym = (0..rows).map(|o| (y[t * rows + o] as i128).unsigned_abs()).max().unwrap();
+                                let xm = (0..cols).map(|i| xv(t, i).unsigned_abs()).max().unwrap();
+                                match bound.checked_add(ym * xm) {
+                                    Some(b) if b < 1u128 << 126 => bound = b,
+                                    _ => over = true,
+                                }
+                            }
+                            if over {
+                                wst |= refused_carrier;
+                            }
+                        }
+                    }
+                    assert_eq!(st, wst, "outer {rows}x{cols} x64={x64} case={case} sites={sites} only={only}: the status bits");
+                    assert!(got == want, "outer {rows}x{cols} x64={x64} case={case} sites={sites} only={only}: {} entries differ", got.iter().zip(&want).filter(|(a, b)| a != b).count());
+                    checked += 1;
+                }
+            }
+        }
+        println!("SITE_MAPS_PARITY cases={checked}");
+        assert_eq!(checked, 3 * 2 * (5 + 4 + 7));
     }
 
     /// [measurement; theory, November 13, P60 item 2] **The opening's comparison on the card reads the host's bits** (needs the card): a field of
