@@ -2257,3 +2257,34 @@ from the faces after the last tick). Premise not read by any log: whether the re
   news, and the build of the level on epochs is ordered with its own guess after step 5 is timed. A rank under 0.40 on three slices: the
   readout does not read an opening, and the design gives the opening a face of its own before any build (a law change, recorded first).
   Between: the level's build waits and the opening after one tick is read the same way.
+
+G128 fixed 2026-11-13T01:01Z (the same thread), before its reads: four premises of the engine's next builds (P56; readings, no state changed).
+Read first: step 4's profiled control (p54_step4.txt: of 346.8 ms a profiled section the kernels hold 292.3, the pooled takes 11.9 over
+304 a section, the copies 9.5 over 38, the host alone 33.3, and the unprofiled section reads 335.2, so the card stands idle through the
+host's part); the bits ruler (p54_word_bits.txt: a share is zero on 2^-63 at 27 to 157 millionths of met pairs, its 0.999 quantile 62 bits;
+at the last clock 0.167 of met pairs carry a zero covector, the definite rows', so open rows hold about 0.83 of the pairs); the record of
+November 1 (a row's far mass over 68 to 225 effective sources on the code line: rows are diffuse); G120 (the rows' entry with its
+arithmetic dropped reads 0.507 of its time); and the source (a row's walk gives a lane to each support entry, met or not; a definite row's
+support is ten near places and its probed classes' runs, an open row's ten and every definite site of its region; every tick's chart is
+read by the instrument read_ticks). From these, agent-inferred and the reason for the reads: the contact's entries are bound by the
+instructions a pair executes (about 2,000 a chunk of 32 pairs in the rows' entry and in the forward's at the card's measured product
+rate), so repairs of form reach two to three times on the family and the bar's further multiple needs fewer terms: by law, a pair that
+is dark, a tick that has settled, or a level above.
+  (a) A row's shares (the bits ruler's own histograms, printed whole). Met pairs whose share of their row's mass is under 2^-37 (below
+      the reader's grain of a mean of 24-bit values over 2^12 sources): 0.002 pooled over the clocks (0 to 0.02); under 2^-16: 0.03
+      (0.005 to 0.15); the median share 2^-8 (2^-10 to 2^-6).
+  (b) A site's chart from tick to tick (read_ticks on the pass's sections 2,001 to 2,100 from run 2's STATE.1900): definite sites whose
+      chart at the last tick's opening differs from the tick before by under 2^-8 of its largest entry: 0.03 (0 to 0.20); open sites
+      0.01 (0 to 0.10).
+  (c) The lanes' fill of a row's chunks of 32 (met entries over lanes): open rows 0.90 (0.75 to 0.98), definite rows 0.50 (0.30 to
+      0.70), pooled over chunks 0.80 (0.62 to 0.92).
+  (d) The host's part of a section, by phase: the next section's cut, lists and tables (built and packed) 20 ms (10 to 30); the takes'
+      zeroing 8 of their 11.9 (4 to 11); the covector's fetch, the deposit and the saves together 8 (3 to 15).
+  Rules. (a) under 0.15 below 2^-37: a row's dark sources are no lever at this state and the anchored carrier is built for its limbs
+  alone, inside the layout; 0.50 or over: its record (the release at the reader's grain, the remainder accounted) is written before the
+  layout's. (b) 0.50 or over of definite sites: a settling tick gets its derivation; under 0.20: none, and the ticks stand. (c) pooled
+  under 0.60: the layout's walk packs its met entries before its arithmetic. (d) every host phase of 8 ms a section or more that reads
+  no state of the section before it is prepared beside the card's work and joined at the section's opening, and a take whose every word
+  the source proves is written before it is read is taken without its zeroing: every bit kept, built as step 6 with the steps' gates
+  and one hold. Step 6's own guess, fixed here on the table: the unprofiled section falls by 0.60 of the moved phases' and the spared
+  zeroings' summed ms (0.40 to 0.85).
