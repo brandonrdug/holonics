@@ -507,6 +507,11 @@ pub(super) fn train(args: &[String], realization: &mut dyn FieldRealization) -> 
     let mut prior: Option<i128> = None;
     let mut done = 0usize;
     let mut ended = false;
+    // [measurement; theory, November 13, P56 item 4] The host's part of a section by phase, summed, printed where a reading is set (`FIELD_PROFILE`,
+    // `FIELD_PHASES`): the cut, the views, the realized section (the card's run and the deposit on the host), the mean of states, the lines, the pass
+    // line and the saves (ns).
+    let host_phases = std::env::var_os("FIELD_PROFILE").is_some() || std::env::var_os("FIELD_PHASES").is_some();
+    let mut host = [0u128; 7];
     while done < sections {
         let section_start = std::time::Instant::now();
         let mut regions: Vec<TrainRegion> = Vec::new();
@@ -528,11 +533,18 @@ pub(super) fn train(args: &[String], realization: &mut dyn FieldRealization) -> 
             break;
         }
         let regions_ms = section_start.elapsed().as_millis();
+        host[0] += section_start.elapsed().as_nanos();
+        let views_start = std::time::Instant::now();
         let views = views_of(&regions);
+        host[1] += views_start.elapsed().as_nanos();
         let deposit_start = std::time::Instant::now();
         let receipt = learner.section_realized(&views, realization).map_err(|e| e.to_string())?;
         let deposit_ms = deposit_start.elapsed().as_millis();
+        host[2] += deposit_start.elapsed().as_nanos();
+        let mean_start = std::time::Instant::now();
         mean.take(&learner.field).map_err(|e| e.to_string())?;
+        host[3] += mean_start.elapsed().as_nanos();
+        let lines_start = std::time::Instant::now();
         if receipt.sites as u64 != tally.domain {
             return Err(format!("a section whose receipt counts {} sites against the cut's domain of {}", receipt.sites, tally.domain).into());
         }
@@ -554,9 +566,13 @@ pub(super) fn train(args: &[String], realization: &mut dyn FieldRealization) -> 
             (transfers, externals, curvatures, priced) = (transfers + t as i128, externals + e, curvatures + (t as i128 - e), priced + 1);
         }
         prior = receipt.external.filter(|_| receipt.deposited && receipt.halvings == 0).map(i128::from);
+        host[4] += lines_start.elapsed().as_nanos();
+        let pass_start = std::time::Instant::now();
         learner.pass = Some(cut.pass.clone());
+        host[5] += pass_start.elapsed().as_nanos();
         done += 1;
         since += 1;
+        let saves_start = std::time::Instant::now();
         if done % save == 0 || done == sections {
             write_new(&out.join(format!("STATE.{done}")), learner.to_text().as_bytes())?;
             let (rest, moved, square) = mean.released(&learner.field).map_err(|e| e.to_string())?;
@@ -574,6 +590,7 @@ pub(super) fn train(args: &[String], realization: &mut dyn FieldRealization) -> 
             mean = MaterialMean::new(learner.field.material_len());
             (transfers, externals, curvatures, priced, since) = (0, 0, 0, 0, 0);
         }
+        host[6] += saves_start.elapsed().as_nanos();
         if started.elapsed().as_millis() > stop_ms {
             write_new(&out.join("STATE.stopped"), learner.to_text().as_bytes())?;
             println!("STORE_STOPPED sections={done}/{sections} stretches={} {} ms={}", cut.pass.stretches, counters_text(realization), started.elapsed().as_millis());
@@ -587,6 +604,20 @@ pub(super) fn train(args: &[String], realization: &mut dyn FieldRealization) -> 
         resting.field = rest;
         write_new(&out.join(format!("MEAN.{done}")), resting.to_text().as_bytes())?;
         println!("STORE_SAVE k={done} sections={since} states={} moved={moved} square={square} priced={priced} transfer={transfers} external={externals} curvature={curvatures} octave={} rate={} {} ms={}", mean.states(), step_transfer(2 * transfers, curvatures), learner.rate_bits, counters_text(realization), started.elapsed().as_millis());
+    }
+    if host_phases {
+        let ms = |ns: u128| ns as f64 / 1e6;
+        println!(
+            "STORE_HOST sections={done} cut_ms={:.1} views_ms={:.1} realized_ms={:.1} mean_ms={:.1} lines_ms={:.1} pass_ms={:.1} saves_ms={:.1} elapsed_ms={}",
+            ms(host[0]),
+            ms(host[1]),
+            ms(host[2]),
+            ms(host[3]),
+            ms(host[4]),
+            ms(host[5]),
+            ms(host[6]),
+            started.elapsed().as_millis()
+        );
     }
     println!(
         "STORE_PASS role={role} sections={done} stretches_read={} ended={ended} {} ms={}",
@@ -651,6 +682,126 @@ const SURPRISE_OCTAVES: usize = 40;
 /// The octaves the writer's partitions read (octave 8 holds the farthest place a run of at most 511 places draws; a run that ends a piece
 /// may reach one octave more).
 const READ_OCTAVES: usize = 10;
+
+/// [measurement; theory, November 13, P56 item 2 (G128 b)] `read-ticks UNITS UNITS_SHA STORE STORE_SHA ROLE KEYS KEYS_SHA CODEC CODEC_SHA SECTIONS STATE
+/// STATE_SHA`: **a site's chart from tick to tick**, a reading. The pass's next `SECTIONS` sections, cut from the state's pass line as `train-store`
+/// cuts them, each read on the realization by `read_ticks` from the one state, which nothing deposits into. For each site and each tick `k ≥ 1`:
+/// `m_k` the largest magnitude of the site's chart at tick `k`'s opening, `d_k` the largest magnitude of its difference from tick `k − 1`'s; the
+/// histogram of `bit_length(m_k) − bit_length(d_k)` (`d_k = 0` in its own bin) by tick and by the site's kind (open, definite), for the chart and
+/// for the pair contact's chart.
+pub(super) fn read_ticks(args: &[String], realization: &mut dyn FieldRealization) -> Result<()> {
+    if args.len() != 13 {
+        return Err("read-ticks UNITS UNITS_SHA STORE STORE_SHA ROLE KEYS KEYS_SHA CODEC CODEC_SHA SECTIONS STATE STATE_SHA".into());
+    }
+    let started = std::time::Instant::now();
+    refuse_variables("read-ticks")?;
+    let units = units_of(&args[1], &args[2])?;
+    if !units.merges().is_empty() {
+        return Err("the store's cut is on bytes: a units file of merges is refused".into());
+    }
+    let store = Path::new(&args[3]);
+    let counts = store_counts(std::str::from_utf8(&pinned_read(&store.join("STORE.tsv").to_string_lossy(), &args[4], READ_BUDGET as usize)?)?)?;
+    let role = args[5].as_str();
+    let keys = pinned_read(&args[6], &args[7], READ_BUDGET as usize)?;
+    let seed = u64::from_be_bytes(keys.get(keys.len().saturating_sub(8)..).filter(|w| w.len() == 8).ok_or("a key file of fewer than eight bytes")?.try_into()?);
+    let codec = FieldCodec::from_text(&String::from_utf8(pinned_read(&args[8], &args[9], READ_BUDGET as usize)?)?, units)?;
+    let sections = positive(&args[10])? as usize;
+    let learner = FieldLearner::from_text(std::str::from_utf8(&pinned_read(&args[11], &args[12], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
+    let pass = learner.pass.clone().ok_or("a state with no pass line: read-ticks reads a state of the store's line")?;
+    let names: Vec<&str> = SLICES.iter().copied().filter(|n| counts.contains_key(&(role.to_string(), n.to_string()))).collect();
+    if pass.role != role || pass.store != args[4] || pass.slices.iter().map(|s| s.name.as_str()).ne(names.iter().copied()) {
+        return Err("a state whose pass is of another role, store or slices".into());
+    }
+    if learner.field.declaration.alphabet != codec.alphabet() {
+        return Err("a state whose alphabet is not its codec's".into());
+    }
+    let stem = if role == "held" { "HELD" } else { "DOCS" };
+    let mut slices = Vec::with_capacity(names.len());
+    for &name in &names {
+        let (count, quota) = counts[&(role.to_string(), name.to_string())];
+        slices.push(Slice { name: name.to_string(), quota, pieces: pieces_of(&store.join(format!("{stem}_{name}.tsv")), count)?, file: std::fs::File::open(store.join(format!("{stem}_{name}.bin")))? });
+    }
+    let mut cut = Cut { seed, slices, pass };
+    let ticks = learner.field.declaration.ticks;
+    // [chart 2][kind 2][tick][bin]: bin 0 a zero difference, bin 65 + (bit_length(m) − bit_length(d)) otherwise.
+    const BINS: usize = 130;
+    let mut hist = vec![0u64; 2 * 2 * ticks * BINS];
+    let bits = |v: u64| 64 - v.leading_zeros() as i64;
+    let mut read_sections = 0usize;
+    for n in 0..sections {
+        let section_start = std::time::Instant::now();
+        let mut regions: Vec<TrainRegion> = Vec::new();
+        let (mut in_pairs, mut in_sites) = (0u64, 0u64);
+        while let Some(drawn) = cut.next() {
+            let s = drawn.sites();
+            if in_sites > 0 && (in_pairs + s * s > cut.pass.pairs || in_sites + s > cut.pass.sites) {
+                break;
+            }
+            let Stretch { region, .. } = cut.take(drawn, &codec)?;
+            (in_pairs, in_sites) = (in_pairs + s * s, in_sites + s);
+            regions.push(region);
+        }
+        if regions.is_empty() {
+            break;
+        }
+        let reads = realization.read_ticks(&learner.field, &views_of(&regions)).map_err(|e| e.to_string())?;
+        for (region, per_tick) in regions.iter().zip(&reads) {
+            let sites = region.classes.len();
+            for k in 1..per_tick.len().min(ticks) {
+                for (c, (cur, prev)) in [(&per_tick[k].read, &per_tick[k - 1].read), (&per_tick[k].pair_read, &per_tick[k - 1].pair_read)].into_iter().enumerate() {
+                    if cur.len() != prev.len() || cur.is_empty() || !cur.len().is_multiple_of(sites) {
+                        continue;
+                    }
+                    let dw = cur.len() / sites;
+                    for t in 0..sites {
+                        let (a, b) = (&cur[t * dw..(t + 1) * dw], &prev[t * dw..(t + 1) * dw]);
+                        let m = a.iter().map(|&v| u64::from(v.unsigned_abs())).max().unwrap_or(0);
+                        let d = a.iter().zip(b).map(|(&x, &y)| (i64::from(x) - i64::from(y)).unsigned_abs()).max().unwrap_or(0);
+                        let bin = if d == 0 { 0 } else { (65 + bits(m) - bits(d)).clamp(1, BINS as i64 - 1) as usize };
+                        let kind = usize::from(region.unresolved[t]);
+                        hist[((c * 2 + kind) * ticks + k) * BINS + bin] += 1;
+                    }
+                }
+            }
+        }
+        read_sections += 1;
+        println!("TICKS_SECTION n={n} regions={} sites={in_sites} ms={} elapsed_ms={}", regions.len(), section_start.elapsed().as_millis(), started.elapsed().as_millis());
+    }
+    for c in 0..2 {
+        for kind in 0..2 {
+            for k in 1..ticks {
+                let h = &hist[((c * 2 + kind) * ticks + k) * BINS..((c * 2 + kind) * ticks + k + 1) * BINS];
+                let total: u64 = h.iter().sum();
+                if total == 0 {
+                    continue;
+                }
+                let ge8: u64 = h[(65 + 8)..].iter().sum();
+                // The median of the difference in bits, the zero bin read as the largest difference of all.
+                let mut order: Vec<(i64, u64)> = (1..BINS).map(|b| (b as i64 - 65, h[b])).collect();
+                order.push((i64::MAX, h[0]));
+                let (mut acc, mut median) = (0u64, i64::MAX);
+                for &(v, cnt) in &order {
+                    acc += cnt;
+                    if 2 * acc >= total {
+                        median = v;
+                        break;
+                    }
+                }
+                println!(
+                    "TICKS_HIST chart={} kind={} tick={k} sites={total} zero_share={:.4} ge8_share={:.4} median_bits={} counts={}",
+                    ["read", "pair_read"][c],
+                    ["definite", "open"][kind],
+                    h[0] as f64 / total as f64,
+                    ge8 as f64 / total as f64,
+                    if median == i64::MAX { "zero".to_string() } else { median.to_string() },
+                    (1..BINS).filter(|&b| h[b] > 0).map(|b| format!("{}:{}", b as i64 - 65, h[b])).collect::<Vec<_>>().join(",")
+                );
+            }
+        }
+    }
+    println!("TICKS_DONE sections={read_sections} ms={}", started.elapsed().as_millis());
+    Ok(())
+}
 
 /// [measurement; theory, November 12, P49 item 3] `read-store UNITS UNITS_SHA STORE STORE_SHA ROLE KEYS KEYS_SHA CODEC CODEC_SHA HELD HELD_SHA
 /// SECTIONS STATE STATE_SHA`: **the pass's cut over a role, read and never deposited**. `STATE` is a state or a mean of the line; the read takes
