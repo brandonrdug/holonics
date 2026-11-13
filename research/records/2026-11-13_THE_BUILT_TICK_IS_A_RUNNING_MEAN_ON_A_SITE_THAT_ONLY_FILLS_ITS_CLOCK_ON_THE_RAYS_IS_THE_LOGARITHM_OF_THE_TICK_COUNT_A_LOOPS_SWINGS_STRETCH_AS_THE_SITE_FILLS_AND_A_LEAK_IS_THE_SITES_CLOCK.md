@@ -1,8 +1,9 @@
 # The built tick is a running mean on a site that only fills, so its clock on the rays is the logarithm of the tick count; a loop's swings stretch as the site fills; and a leak is the site's clock
 
 Refs #404 #406. Status: [theory's reading of the built tick's own time, with one ruler on a
-public receipt; November 13, 21:20Z], by the theory thread, which holds no runs. Nothing here is
-built and nothing here is an order. Every statement carries one of three grades: `tree` (an atlas
+public receipt; November 13, 21:20Z; §9 read after, near 21:50Z, on the engineering thread's
+receipts], by the theory thread, which holds no runs. Nothing here is built and nothing here is an
+order. Every statement carries one of three grades: `tree` (an atlas
 row or a source line, named), `from training` (a discipline's result, restated on the objects with
 its hypotheses) and `agent-inferred` (this thread's reading). Source read on `main` at
 `2ef3af73c`.
@@ -15,8 +16,10 @@ the reading of read-depth (`store_train.rs`: `read_depth`; G149's receipt `g149_
 `receiver.referent-mass`, `store.finite-quality`, `motion.quadratic-three-kinds`,
 `motion.mobius-multiplier-cross-ratio`, `spectro.clock-gauge`, `tower.field-read-free-fall`,
 `tower.field-site-power-unread`, `tower.field-tick-return`, `tower.field-reaction-mirror`,
-`contact.carry-coupling-through-the-leak`, `contact.pass-reach-gap`. Two atlas rows enter (§8). No
-row is amended and no owner moves.
+`contact.carry-coupling-through-the-leak`, `contact.pass-reach-gap`, and for §9 the readings
+`Field::free_ring` and `read_release` with their receipts, `junction.restitution-family`,
+`tower.field-echo` and `receipt.reafference-lag`. Three atlas rows enter (§8), and the scope of
+`tower.field-reaction-mirror` gains the readings that read it. No owner moves.
 
 ## 1. Why this record exists
 
@@ -25,12 +28,12 @@ about, whether they hold or miss, and said in the same message that self-inducti
 asserts and that no reading is a test of it. The engineering thread has since read a reader's
 reaction on its source four ways (its G159 to G162: the pair's decomposition, the reaction in the
 form of the read's mirror at first order, at finite strength, and in the free ring at sixteen
-ticks). Their receipts were not on `main` at this writing, so **no figure of theirs is repeated
-here**; what reached this thread is a relayed summary, of which this record uses one qualitative
-line (relayed at 20:58Z, to be read at its receipt when it lands): with the reaction on at a
-turning sign, the free ring showed no reversal within sixteen ticks, and the engineering thread
-read that as the tick's relaxation damping the turn and named a drive (the passage still arriving
-while the ticks run) as its next design.
+ticks). Their receipts were not in this thread's tree at this writing, so **no figure of theirs is
+repeated in §1 to §8**, and §9 reads them at their receipts; what reached this thread is a relayed
+summary, of which this record uses one qualitative line (relayed at 20:58Z, to be read at its
+receipt when it lands): with the reaction on at a turning sign, the free ring showed no reversal
+within sixteen ticks, and the engineering thread read that as the tick's relaxation damping the
+turn and named a drive (the passage still arriving while the ticks run) as its next design.
 
 This record reads what the free ring is made of before any reaction is added: the tick's source
 and G149's receipt, which is public. One sentence carries it (`agent-inferred`): **a site's state
@@ -354,9 +357,174 @@ open because a mean of cosines cannot decide it); a reading called a test of an 
 ## 8. Atlas rows, and what is owed
 
 Rows added: `motion.unit-power-push-log-clock` (geometry), `tower.field-tick-running-mean`
-(objects).
+(objects), and with §9 `motion.relaxed-step-three-kinds` (geometry). The scope of
+`tower.field-reaction-mirror` gains the readings that read it (G160 to G162) and of
+`tower.field-tick-running-mean` the ruler's figures on G162.
 
 Owed: no Lean statement is owed by this record, which adds no law of the machine (#410 gains no
 box). The running mean and its share are `HNN/ReferentMass`'s and the shear's finite series
 `Geometry/Motion`'s; the re-clocking of §3.4 is a change of variable. A leak along the tick, if
 built, would owe its statements with its builder, as the carry's did (`HNN/CarryGate`).
+
+## 9. Read after: the reaction's and the release's readings at their receipts
+
+Written near 21:50Z. The engineering thread's receipts for G159 to G164 reached `main` at 21:14Z
+(`78cdfa6d0`), nine minutes before this record's first commit (`d1294143e`, 21:23Z). This thread
+had not fetched them and read them only after that commit, so §7's guesses were written without
+them, and guess 3 keeps its mark as not blind in its sign. Every figure below is from
+`g161_strength.txt`, `g162_ring.txt`, `g163_release.txt` or `g164_release.txt` under the junction
+record's `_receipts/`, or from this record's ruler on the second of them
+([mean_ruler_g162.txt](2026-11-13_THE_BUILT_TICK_IS_A_RUNNING_MEAN_ON_A_SITE_THAT_ONLY_FILLS_ITS_CLOCK_ON_THE_RAYS_IS_THE_LOGARITHM_OF_THE_TICK_COUNT_A_LOOPS_SWINGS_STRETCH_AS_THE_SITE_FILLS_AND_A_LEAK_IS_THE_SITES_CLOCK_receipts/mean_ruler_g162.txt)).
+All are readings from level 3's lap mean (`MEAN.3000`), on the host, of seen text. Their programs
+were read at source (`Field::pass`'s mirror stage, `Field::free_ring`, `read_release`).
+
+### 9.1 With the reaction on, the free ring is still a running mean, and its bend rises with the strength
+
+G162 opens 280 places alone (48 a slice in four slices, 88 in wikidata), runs 16 ticks, and after
+every tick but the last adds every head's mirror at one strength `s` to the state. Its changes
+are the opened places' charts' (the root of the mean squared change a place) and its cosines are
+pooled over places, where G149's were means a place. The ruler, over ticks 5 to 16:
+
+| strength `s` | rate on ticks, first over last | power on the log, first over last | power, ticks 12 to 16 | bend an e-fold, ticks 12 to 16 | bend at tick 8, at tick 16 |
+|---|---|---|---|---|---|
+| −0.1 (the like sign) | 3.95 | 1.14 | 1.89 | 1.20 | 1.29, 1.24 |
+| 0 (the built tick) | 5.29 | 1.53 | 1.46 | 1.63 | 1.83, 1.60 |
+| +0.1 (the turn's sign) | 5.47 | 1.58 | 1.25 | 2.00 | 2.49, 1.89 |
+| +0.5 (the turn's sign) | 3.43 | 0.99 | 1.46 | 3.15 | 4.38, 2.95 |
+
+Read (`agent-inferred`):
+
+- **No strength gives the decay a rate on the ticks.** Read as a rate it falls 3.4 to 5.5 times
+  over the twelve ticks; read as a power of the tick count it moves 0.99 to 1.58 times. The
+  mirror's step is a ray's size added to a state that only fills, so §3 holds with it on. What
+  the junction record's §13.8 calls the tick's relaxation damping the turn is, at source, the
+  site ageing under the turn (§5.1, §5.2): the turn's angle a tick falls as one over the tick
+  count and nothing takes it out.
+- **Guess 3 held, narrowly.** At `s = +0.5` the bend an e-fold runs 4.38 at tick 8 to 2.95 at
+  tick 16, a factor 1.48 against the guess's 1.5, and stands between 2.95 and 3.39 from tick 11; at
+  `s = +0.1` 2.49 to 1.89, a factor 1.31; the built tick's own, on these places, 1.83 to 1.60.
+- **Unguessed: the bend rises with the strength through zero**, 1.20, 1.63, 2.00 and 3.15 radians
+  an e-fold over ticks 12 to 16, and at the small strengths the power on the logarithm moves the
+  other way (1.89, 1.46, 1.25). That is what a pair of real rates does as a skew part is added to
+  it: the gap closes and the phase opens (`motion.unit-power-push-log-clock`: a gap is an exponent
+  and a turn a phase on `ln k`). Under the like sign the opened place is the nearest of the four
+  to a current that keeps its direction (largest over least 1.06 at `a = 0.25`, the power 2.04 at
+  tick 5 and 1.79 at tick 16). The two small strengths are one fact, the sign of a slope at zero,
+  and `+0.5` continues it.
+- **A cosine of successive changes cannot read a slow swing.** It falls below zero only where one
+  tick turns the change by more than a quarter turn. At `s = +0.5` the largest angle a tick is
+  1.46 radians at stage 3 (cosine 0.115), and it is 0.55 at stage 8 and 0.18 at stage 16. Cosines
+  positive at every stage are what a site that fills gives for any loop whose swing is longer
+  than four ticks. So G162 reads that this loop does not reverse within a tick or two. Whether it
+  swings on its own clock G162 leaves open, and its own figures say it bends more the harder it
+  is turned.
+- G159 to G161 are the engineering thread's and stand as it read them. One check by region
+  (`g161_strength.txt`): the gains a slice shows at a uniform strength do not carry from seen to
+  held text (wikidata, head 0, the cut's masks, `s = −0.1`: 0.015 nats a place lower on seen text
+  and 0.021 higher on held), so that a uniform strength buys nothing is not the pooling's doing.
+
+### 9.2 The read that would tell a turn from a wander
+
+Reading 2 of §7 names it: the cosine of the change at one tick against the change at a later
+one. The ruler prints the two ends between which it must fall for tick 16 against tick 8, from
+the successive cosines alone: every tick's turn in one plane and one sense (the cosine of the
+summed angles), or every tick's turn unlike the ones before it (the product of the cosines).
+
+| strength `s` | summed angle, ticks 9 to 16 | one plane | unlike planes |
+|---|---|---|---|
+| −0.1 | 0.79 | 0.71 | 0.96 |
+| 0 | 1.10 | 0.45 | 0.92 |
+| +0.1 | 1.40 | 0.18 | 0.88 |
+| +0.5 | 2.23 | −0.61 | 0.71 |
+
+Offered guesses, fixed here before any such read and ordered by no one: pooled over the same
+280 places, the change at tick 16 against the change at tick 8 pairs **below 0.3 at `s = +0.5`**
+and **below 0.75 on the built tick**. A value over 0.5 at `s = +0.5` says the added bend is a
+wander of unlike directions and the reaction, at this strength, turns nothing a lag can see. A
+value below zero is a reversal, which a turn gives and which real rates give only once, by an
+overshoot of modes far from orthogonal; sixteen ticks are too few e-folds to tell those two apart,
+and a run to tick 64 (2.4 e-folds past tick 5 where sixteen give 1.0) would.
+
+### 9.3 The release returned at a lag replaces where the tick fills
+
+G163 and G164 read a region eight times, each pass after the first opening every open place on
+its face from the pass before. A pass begins from its opening again, so across passes the loop
+is closed by **replacement**: it has a rate, one a pass, where the ticks inside a pass have none.
+
+- **A place alone** (122 places, one open a stretch and silent as a source, so the loop is its own
+  opening and no contact's): from pass 3 the faces' change is level, 25,152 to 26,584 on `2^(−16)`
+  shares a place, and the successive cosine falls from −0.767 at pass 3 to −0.994 at pass 8,
+  −0.989 to −0.999 in every slice (in science the change first falls, 28,911 to 12,981). A change
+  of level size reversed each pass is the half-turn about an anchor at a restitution of one
+  (`junction.restitution-family` at `Γ = 1`, `2P − I`): at passes 7 and 8 the change grows 1.6%
+  and 1.9% a pass. Its period is two passes whatever the loop is. It is the update's period, the
+  two-cycle `tower.field-echo` names for a symmetric loop replaced synchronously, and it carries
+  no pitch of the loop's own.
+- **The mean** (G164; `o_(p+1) = (o_p + F(o_p))/2` at source, each class's share rounded up) is a
+  leak of one half on the pass clock: a multiplier `λ` of the pass becomes `(1 + λ)/2`, and a
+  half-turn goes to zero. Pooled, the change falls 32,706, 17,564, 5,782, 2,933, 1,534 and then
+  stands near 1,550 to 1,750. By slice that is three behaviours: code settles (446 at pass 8 and
+  falling); web and books keep a small two-cycle (cosines −0.92 and −0.95 at pass 8, at 1,893
+  and 1,561 against 28,256 and 31,353 without the mean); science and wikidata drift one way
+  (+0.62 and +0.82). The pooled state it settles toward codes 1.80 nats a place at pass 8 against
+  1.19 at the first read.
+- **Mutual** (5,523 places on the cut's masks, each also a source at its face): under the mean the
+  change stops falling after pass 4 (6,403, then 8,154, 9,260, 9,073, 7,773), the cosines stand at
+  0.64 to 0.77 from pass 5, the code rises from 3.01 to 5.34 and the face's expected code falls
+  from 3.04 to 2.02. A drift one way that does not slow is what a multiplier over one gives: a
+  boost. Without the mean the cosines are mixed (−0.46 to +0.09), the flip and the boost
+  together, and the code reaches 6.41. Neither read sets a site's echo (`read_release` builds its
+  regions with none), so the cavity term the tree holds (a region's `Echo`, taken out in `Field::pass`; §15.3 of
+  the record of November 1) is not in them.
+
+One family carries these and the tick (`agent-inferred`; the relaxed iteration of numerical
+analysis, the linear mixing of a self-consistent loop and the damping of a message-passing
+iteration are its names from training). For `x ← (1 − δ)x + δF(x)` with `F`'s multiplier `λ`
+about its fixed point, the step's multiplier is `1 − δ(1 − λ)`:
+
+- a flip (`λ < −1`) settles where `δ < 2/(1 − λ)`. A leak cures it, so a flip is a matter of the
+  clock;
+- a boost (`λ > 1`) settles at no leak: `1 − δ(1 − λ) > 1` for every `δ > 0`. Its cure is not
+  read here. The round trip's share is small where G151 read it (the median written row's
+  `B = 0.00068`), which leans against the cavity term alone, and the tree's other candidate is a
+  deposit that passes through the loop, the engineering thread's stated next design;
+- a turn (`λ = e^(iφ)`) keeps a pitch, `arg(1 − δ + δe^(iφ))`, and loses
+  `2δ(1 − δ)(1 − cos φ)` of its power a step: a finite quality (`store.finite-quality`). It is
+  the one kind of the three whose period is the loop's and not the update's.
+
+The built tick is the end `δ → 0` with the push kept (§3.5): no rate, the logarithmic clock. G164
+is `δ = 1/2`, G163 `δ = 1`. So the day's readings sort onto the Swing's kinds, each by how its
+loop is closed:
+
+| reading | the loop is closed by | what it shows |
+|---|---|---|
+| G149, G162 at `s = 0` | nothing: a one-way read | free fall: a power of the tick count |
+| G162 at `s = −0.1` | the reader's reaction, like sign | a boost: the gap widens, the bend falls |
+| G162 at `s = +0.1`, `+0.5` | the reader's reaction, the turn's sign | the bend rises; a turn if §9.2's read holds |
+| G163 alone | a place's own release a pass later, replaced | a half-turn at a restitution of one |
+| G163 and G164 mutual | the places' releases to one another | a boost toward certainty |
+
+### 9.4 What theory concludes
+
+1. **Inside a pass nothing can ring or settle in ticks, with a reaction or without**, because the
+   site has no rate. G162 shows it at four strengths. That is a property of this realization's
+   site and of no loop.
+2. **Between passes the release replaces**, and the two real kinds appear: a half-turn where a
+   place hears only itself, which is the update's own period and which a mean removes, and a
+   boost where places hear one another, which no mean removes.
+3. **A pitch of a loop's own is the third kind, a turn**, and of the day's readings only the
+   reaction at the turn's sign leans toward one, on a clock that stretches. Where it can keep a
+   pitch is a site that leaks as it fills: there a turn has its period in ticks and a finite
+   quality, a flip is cured, and a boost still asks its own cure. Against the three things the
+   junction record's §8 asks of such a build (a store of the rate, the echo known as the site's
+   own, a pump), this record changes the first: on a site that fills, the carried rate reads as the
+   opening's weight (§5.3), and the leak is what gives the loop a clock.
+4. **On the assertion.** No reading here is a test of self-induction (§6). What they do show is
+   the smallest state of this build that reproduces itself: a place opened each pass on the mean
+   of its last opening and the face that opening gave reaches, in the code slice (25 places), a
+   face that gives itself back within eight passes (the change 446 of 33,790 and falling). One
+   pass checks such a state, where reaching it took the loop. It reads worse than the first read
+   (1.52 nats a place against 0.72 in that slice), and no deposit has passed through that loop.
+
+Nothing here is an order, and §6 stands: the forms, the foundings and the next read are the
+engineering thread's.

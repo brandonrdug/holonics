@@ -16,6 +16,7 @@ MEAN_RULER line=out_control ticks=16
   most_level a=1.15 largest_over_least=1.1356 opening_share tick4=0.223 tick16=0.067
   at a=1 largest_over_least=1.1474
   log_clock ln(17)/ln(5)=1.760 (the last tick against the fourth at a=1)
+  lag tick16 against tick8: turn_sum=0.909 one_plane=0.615 unlike_planes=0.946
 MEAN_RULER line=out_level ticks=16
   tick=5 ratio=0.6368 mean_at_a1=0.6667 rate_on_ticks=0.4513 power_on_log=2.023 bend_per_efold=2.496
   tick=6 ratio=0.6807 mean_at_a1=0.7143 rate_on_ticks=0.3847 power_on_log=2.110 bend_per_efold=2.017
@@ -33,3 +34,4 @@ MEAN_RULER line=out_level ticks=16
   most_level a=1.00 largest_over_least=1.1197 opening_share tick4=0.200 tick16=0.059
   at a=1 largest_over_least=1.1197
   log_clock ln(17)/ln(5)=1.760 (the last tick against the fourth at a=1)
+  lag tick16 against tick8: turn_sum=0.902 one_plane=0.620 unlike_planes=0.947
