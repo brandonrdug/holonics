@@ -2539,7 +2539,7 @@ news passes a multiple of the section) beside the cut. Pooled over the five band
   and that reader's ruler is read next, on the same four changes. (b) at 0.50 or over and (c) at 0.85 or over at a mean epoch of 6:
   the cut carries to a band's places as it stands on text. (a) under its range: the instrument is read again before any other part.
 
-G128 scored 2026-11-13T02:14Z (the PC's receipts p56_shares.txt, p56_ticks.txt, p56_fill.txt and p56_host.txt, the count record's receipts; the
+G128 scored 2026-11-13T02:01Z (the PC's receipts p56_shares.txt, p56_ticks.txt, p56_fill.txt and p56_host.txt, the count record's receipts; the
 pass's sections 2,001 to 2,100 from run 2's STATE.1900, each read in its own hold, every training read ending on the line's states; the
 host's part from one profiled read of main with step 5: 324.6 ms a profiled section, kernels 271.0, copies 9.6, takes 18.6, the host alone
 25.5).
@@ -2561,10 +2561,10 @@ host's part from one profiled read of main with step 5: 324.6 ms a profiled sect
   a call: allocations, where a pool's hit costs a thousandth of that. (2) The faces' masses are fetched whole, 79.5 MB a section in
   7.7 ms, and a face a place is built on the host in 4.7 more. (3) The deposit on the host takes 11.1 ms. (4) The exposure's spread is
   fetched each tick, which is a wait of the exposure's own 8.6 ms and costs nothing more.
-  The complete table of entries (70 entries, 270.6 ms a profiled section, 509.5 launches a section): 56 entries stand outside the
+  The complete table of entries (70 entries, 270.6 ms a profiled section, 509 launches a section): 56 entries stand outside the
   fourteen printed, which G131 (a) reads with the schedule.
 
-G134 fixed 2026-11-13T02:14Z (the same thread), before its build and reads: the sixth repair widened to the host's part as the table
+G134 fixed 2026-11-13T02:01Z (the same thread), before its build and reads: the sixth repair widened to the host's part as the table
 gives it (P58; realizations and plumbing, every bit kept; the steps' gates, reproduction and one hold).
 Read first: p56_host.txt (above); the driver's pool at source (field.rs: a take is served by a kept buffer of its size class up to twice
 it, and under the batch budget the pool frees its LARGEST kept buffers one at a time, which are the ones the next section takes again);
