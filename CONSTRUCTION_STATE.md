@@ -359,9 +359,16 @@ repository was reset on September 24; the pre-reset tree is
     the raster's own, its symbol the same at 0.24 to 0.27 of places under the moved start. The
     two readings share one law (agent-inferred): the cut keeps its sites as far as a place's
     symbol is the same under the change, to the power of the epoch's length (0.96 the same keeps
-    0.63 at six places, 0.56 keeps 0.06). Owed before a value chart is built: the ruler of a
-    ring read at every sample with its own section arrivals as its places (G136), and the
-    image's ruler.
+    0.63 at six places, 0.56 keeps 0.06). A ring read at every sample, its places its own
+    section arrivals, was read next (G136): under a start moved by 37 and a third samples 0.98
+    of arrivals are met within an eighth of a turn, and the symbol read at them is the same at
+    0.70 to 0.79 (under the shift of rung 0.80 to 0.88 met, 0.47 to 0.59 the same; on the
+    slowest ring's loud places 0.979 to 1.000 the same under both). A place that opens where
+    its news stands above its neighbours' keeps 2.2 to 3.1 times what the cut keeps. Off the
+    ladder (1.5 times the speed) the places themselves move and the symbol is the same at 0.13
+    to 0.18. Owed before a value chart is built: the law of sites for a measured symbol (the
+    opening on a bounded neighbourhood), read on text against the cut; the chart across rings
+    (a ring's turn located by its drive); and the image's ruler.
   - Every extent of the built declaration is given the part it sizes, how it was reached and what
     sizes it (the same record, §5), with ten findings by file and line and the build that closes
     each. The departures that stand: the face's 64 coordinates are two lanes of 32, the second a

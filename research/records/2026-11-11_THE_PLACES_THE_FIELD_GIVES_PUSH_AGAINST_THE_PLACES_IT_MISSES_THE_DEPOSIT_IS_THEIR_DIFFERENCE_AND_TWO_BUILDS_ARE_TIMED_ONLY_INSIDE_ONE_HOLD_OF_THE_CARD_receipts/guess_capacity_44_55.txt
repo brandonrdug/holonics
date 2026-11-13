@@ -2770,3 +2770,53 @@ reach one turn, then four.
   apart next (the original held under 4 kHz on ring s against the copy on ring s-1). Beside these, for (iv): the passage word the same
   at 0.12 or more over the ring word and its bright lift at a whole turn 0.30 or over: a ratio off the ladder is carried on one ring
   by the ratio digit; else it is carried by no single ring and the chart across rings is derived next.
+
+G136 scored 2026-11-13T02:48Z (receipts beside G135's: ring_arrivals.c, arrival_cut.py, arrival_cut_reach1.txt, arrival_cut_reach4.txt; for
+information, read after the score, arrival_spread.py, arrival_spread_reach1.txt, arrival_spread_reach4.txt). 212,858 places at a reach
+of one turn and 247,420 at four, rings 3 to 7, the 18 read utterances; figures as reach one turn, then four.
+  (a) the places. Ring 3 arrives 0.42 and 0.51 times a free turn, ring 7 0.93 and 0.98: held. The ring continuing: the ring word
+      0.088 and 0.223: held twice; the passage word 0.130 and 0.215 against 0.40 and 0.50: missed twice. A place's code: the ring word
+      2.95 and 2.65 nats: held twice; the passage word 3.02 and 2.77 against 2.3 and 2.0: missed twice. Places past the symbol's
+      width 0.16 to 0.21: held.
+  (b) the controls. (i) 0.967 to 0.977: held. (ii): met 0.9995 and 0.9994, the same 0.9994 and 0.9985, the cut's lift at a mean epoch
+      of 6 0.956 to 0.971: held. (ch): the same 0.902 and 0.922 on the ring word, 0.899 and 0.925 on the passage word: held three
+      times, missed once by 0.001. The resampler alone takes the cut's lift at a mean epoch of 6 to 0.41 to 0.49.
+  (c) (ii3). Met 0.978 and 0.984: held. The same: the ring word 0.717 and 0.788, the passage word 0.700 and 0.781, against 0.87 to
+      0.92: missed four times. The cut's lift at a mean epoch of 6: 0.294 and 0.349, 0.309 and 0.318: held four times. The peak law
+      at h = 3 (a mean epoch of 7.3): 0.716 and 0.769, 0.684 and 0.733: held. The bright law at a whole turn 0.80 to 0.84: held.
+  (d) (iii). Met 0.797 and 0.876: held. The same: the ring word 0.470 and 0.588, the passage word 0.490 and 0.594: held four times;
+      by ring 0.28 and 0.42 on ring 3 to 0.89 and 0.96 on ring 7: held. The cut's lift at a mean epoch of 6: 0.134 and 0.168, 0.142
+      and 0.171: held four times. The peak law at h = 3: 0.412 and 0.509, 0.412 and 0.487 against 0.15 to 0.50: held three times,
+      missed once by 0.009 over. The bright law at a whole turn 0.50 to 0.55: held.
+  (e) (iv). Met 0.608 and 0.378 against 0.40 to 0.80: held, then missed. The same: the ring word 0.128 and 0.131: held twice; the
+      passage word 0.185 and 0.125 against 0.28 to 0.60: missed twice. The cut's lift at a mean epoch of 6: the ring word 0.119 and
+      0.087 against 0.00 to 0.10: missed, then held; the passage word 0.121 and 0.084: held twice. The peak law at h = 3 0.11 to 0.18:
+      held. The bright law at a whole turn 0.320 and 0.187, 0.338 and 0.203: held twice.
+  (f) One, the clock: under (iv) the passage word stands 0.057 over the ring word and 0.006 under it, against 0.12 or more: missed
+      (on ring 7 alone it stands at 0.479 and 0.413 where the ring word stands at 0.038 and 0.124); under (ii3) and (iii) the two
+      words stand within 0.02 of each other: held. Two, the law: the peak law's lift at h = 3 stands at 2.2 to 3.1 times the cut's
+      at a mean epoch of 6 in all eight cases: held. Three: the cut's lift stands within 0.15 of the seventh power of the ring's
+      sameness in 34 of 40 cases: held; the six that miss are rings 3 to 5 under (ii3) at one turn, where the cut keeps 0.20 to 0.41
+      and the seventh power stands at 0.02 to 0.23: under a low sameness the cut keeps a floor near 0.1 to 0.2.
+  (g) four turns over one: the ring continuing higher by 0.135 and 0.085, the symbol more the same by 0.07 to 0.12: held twice.
+  46 parts held, 15 missed. The misses stand in three places: the passage word is no more regular than the ring word (four); a
+  place's symbol under a part of a sample (four, and the resampler's control once); and the copy off the ladder (five, with the
+  clock's prediction); the fifteenth is the peak law under the shift of rung, once over its range.
+  What the reading holds beside its parts (the last three from arrival_spread, read after the score).
+  The places stand and the symbol does not: under a start moved by a part of a sample 0.98 of arrivals are met within an eighth of a
+  turn (their times spread 0.001 to 0.06 samples, by ring) and 0.70 to 0.79 of symbols are the same. It is the boost that changes:
+  of the places met, |z|'s digit differs at 0.17 to 0.26 and the interval's at 0.05 to 0.14.
+  By ring the sameness climbs with the ring's turn: under (ii3) 0.59 to 0.70 on ring 3 and 0.94 to 0.98 on ring 7; under (iii) 0.28
+  to 0.42 and 0.89 to 0.97. On ring 7's loud places (half of its places) the symbol is the same at 0.998 to 1.000 under (ii3) and at
+  0.979 to 0.997 under (iii); on ring 3's loud places it is less the same than on the rest (0.53 to 0.67 against 0.66 to 0.73 under
+  (ii3)). Ring 3 arrives 0.42 to 0.51 times a free turn: it is driven from under its band, and what it reads of that drive it reads
+  through its skirt, at 8 samples a turn (agent-inferred).
+  The peak law keeps as the sameness itself: by ring, under (ii3) on the ring word at one turn, 0.605, 0.721, 0.836, 0.881, 0.914
+  where the symbol is the same at 0.614, 0.702, 0.811, 0.885, 0.941.
+  Off the ladder the places themselves move: met at 0.61 and 0.38, their times spread 0.03 to 0.06 of a turn on every ring.
+  Rule applied. The first clause fails (the symbol the same at 0.70 to 0.79 under (ii3), the cut's lift 0.29 to 0.35). The second
+  holds on the ring word at four turns, by 0.009 on (iii): the peak law's lift at h = 3 stands at 0.769 under (ii3) and 0.509 under
+  (iii). So on a measured symbol a level's sites are the peaks of its news: the design record's law of sites is amended for a
+  measured symbol (the opening stated on a bounded neighbourhood, with its section and its restart) and read on text against the
+  cut before any chart of sound. For (iv) the passage word does not stand 0.12 over the ring word: a ratio off the ladder is carried
+  by no single ring, and the chart across rings is derived next.

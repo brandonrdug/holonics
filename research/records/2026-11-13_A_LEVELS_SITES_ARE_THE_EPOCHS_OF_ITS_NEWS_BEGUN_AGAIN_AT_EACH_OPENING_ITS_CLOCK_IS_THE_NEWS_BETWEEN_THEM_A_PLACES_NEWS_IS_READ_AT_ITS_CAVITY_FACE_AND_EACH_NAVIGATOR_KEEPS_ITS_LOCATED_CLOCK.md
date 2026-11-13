@@ -462,6 +462,48 @@ face).** The passage is 481 seconds of public speech (73 utterances of one Libri
   state at a sample is the same under a start moved by whole samples; what moved was where the
   stride read it. A stride counted from the passage's first sample is a privileged frame, the
   fault §4.2 names in the odometer, met here in the place itself.
+- *A ring's arrivals stand under a start moved by a part of a sample, and the symbol read at
+  them does not (G136).* A ring read at every sample, a place its arrival (the first crossing
+  of the section at each whole winding, its time and its `|z|` cut from the step that crossed,
+  taken as a straight line of `log z`), rings 3 to 7, a reach of one turn and of four; 212,858
+  and 247,420 places on the 18 read utterances. Under a start moved by 37 and a third samples
+  0.978 and 0.984 of arrivals are met within an eighth of a free turn, their times spread 0.001
+  to 0.06 samples by ring; a place's symbol (its boost and its turn at G135's two widths) is
+  the same at 0.70 to 0.79, and the resampler alone leaves it the same at 0.90 to 0.92. It is
+  the boost that changes: of the places met, `|z|`'s digit differs at 0.17 to 0.26 and the
+  interval's at 0.05 to 0.14. Under the shift of rung 0.80 and 0.88 of arrivals are met and
+  the symbol is the same at 0.47 to 0.59. The interval read against the interval before (the
+  passage's own clock in place of the ring's free turn) is the same as far as the interval
+  read against the free turn, within 0.02, and is no more regular (the ring continuing at 0.13
+  and 0.22 of places against 0.09 and 0.22). Receipts: `ring_arrivals.c`, `arrival_cut.py`,
+  `arrival_cut_reach1.txt`, `arrival_cut_reach4.txt`; 46 parts of the guess held, 15 missed.
+- *An opening that hangs on a bounded neighbourhood keeps as the sameness itself (G136).* A
+  place that opens where its news stands above every place's within three places either side
+  (a mean epoch of 7.3 places) keeps a lift of 0.68 to 0.77 under the part of a sample and of
+  0.41 to 0.51 under the shift of rung, where the cut at a mean epoch of 6 keeps 0.29 to 0.35
+  and 0.13 to 0.17: 2.2 to 3.1 times the cut's in all eight cases. By ring it follows the
+  symbol's sameness at the first power (0.605, 0.721, 0.836, 0.881, 0.914 where the symbol is
+  the same at 0.614, 0.702, 0.811, 0.885, 0.941), where the cut follows its seventh power above
+  a floor near 0.1 to 0.2 (within 0.15 in 34 of 40 cases). This is §6's chart of codes read on
+  a measured symbol: §4.2's cut is free of its origin through its landmarks, the places whose
+  news passes the section, and on these symbols no place passes the section of a mean epoch of
+  6. By G136's rule the law of sites is amended for a measured symbol, the opening stated on a
+  bounded neighbourhood with its section and its restart, and read on text against the cut
+  before any chart of sound.
+- *A ring holds what stands in its band.* [agent-inferred, from `arrival_spread`, read after
+  the score] By ring the symbol's sameness climbs with the turn: under the part of a sample
+  0.59 to 0.70 on ring 3 and 0.94 to 0.98 on ring 7, under the shift of rung 0.28 to 0.42 and
+  0.89 to 0.97. On ring 7's loud places, half of its places, the symbol is the same at 0.998
+  to 1.000 under the part of a sample and at 0.979 to 0.997 under the shift of rung, the level
+  the cut asks for. Ring 3 arrives 0.42 to 0.51 times a free turn and its loud places are less
+  the same than its others (0.53 to 0.67 against 0.66 to 0.73): it is driven from under its
+  band and reads that drive through its skirt, at 8 samples a turn. Off the ladder (the copy
+  at 1.5 times the speed, its ring `s−1`) the places themselves move: met at 0.61 and 0.38,
+  displaced 0.03 to 0.06 of a turn on every ring, the symbol the same at 0.13 to 0.18 on
+  either clock (on ring 7 alone the interval against the interval before stays the same at
+  0.48 and 0.41). A ring at a declared turn is a privileged scale to every drive that does
+  not stand on it, where §4.1 keeps every navigator's clock located; the reading it points to
+  is a ring whose turn its drive locates, which no ruler has read yet.
 
 Limits, each stated because the reading is narrow: one speaker; a ratio of two; a reader of a
 first step's bit length and sign, which cannot see pitch or formants, so the rows are shared at
@@ -476,10 +518,12 @@ holds that reading since October 10 (atlas `hnn.ring-moment-keys`; the record of
 at 0.44 of its spelled length, its departures kept as defects). Read once a turn on a stride
 it fails as above, so a sound's place is not a stride of any rung either: it is the ring's
 own section arrival (an epoch is the interval between a receiver's section arrivals), a time
-of the passage under any start. Owed before a value chart is built: the ruler of a ring read
-at every sample, its arrivals its places and its arrival word's cycle and defects its reader,
-on the same passage and changes (G136); and the image's ruler (a stroke under a magnification
-the passage itself holds).
+of the passage under any start. G136 read it: the arrivals stand, the symbol read at them at
+G135's widths does not, and a law of peaks keeps what the cut loses. Owed before a value chart
+is built: the law of sites for a measured symbol, derived on the objects and read on text
+against the cut; the chart across rings, a ring's turn located by its drive (a ratio off the
+ladder is carried by no single declared ring); and the image's ruler (a stroke under a
+magnification the passage itself holds).
 
 ## 9. Acceptance, the device line, and the order of work
 
