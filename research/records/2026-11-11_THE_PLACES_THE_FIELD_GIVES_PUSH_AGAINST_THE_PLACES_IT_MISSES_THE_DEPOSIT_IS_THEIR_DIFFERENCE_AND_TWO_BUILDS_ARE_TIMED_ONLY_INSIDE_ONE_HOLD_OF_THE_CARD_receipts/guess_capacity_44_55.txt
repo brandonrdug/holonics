@@ -2288,3 +2288,96 @@ is dark, a tick that has settled, or a level above.
   the source proves is written before it is read is taken without its zeroing: every bit kept, built as step 6 with the steps' gates
   and one hold. Step 6's own guess, fixed here on the table: the unprofiled section falls by 0.60 of the moved phases' and the spared
   zeroings' summed ms (0.40 to 0.85).
+
+G129 fixed 2026-11-13T01:15Z (the same thread), before its read: the count ruler the design record of November 13 owes on sound (its
+section 8), read in the cloud on public speech (a count's code, never the machine's face; no state, no card).
+Read first: October 25's chart of sound, which the tree holds (examples/listener/sections.rs: a recording is its half-cycles, a run of
+one sign with its length and its peak's octave, the fibre kept at the boundary; about 4,300 octets a second, so about 2,150 half-cycles,
+and 12,106 bits a second against the corpus FLAC's 146,882); the design record's section 8 (a sample stream's places are cut like any
+other) and its acceptance (an invariance under re-timings, never a length on one clock); the Ratio (a comparison carried as a pair, its
+chart the logarithm). From these, agent-inferred and the reason for the read: a white floor crosses zero at a rate set by the frame, so
+its half-cycles follow the places, while a voiced wave's follow its events; a change of clock therefore touches the first and not the
+second, and the octave from which counts follow events is the passage's own floor. Above it a place is a half-cycle, and what a change
+of speed or of gain cannot touch is its ratios to the half-cycle before (the interval between their starts and the step of their peaks).
+The passage: the public 73 utterances of LibriSpeech dev-clean (16 bits, 16 kHz), counts on the first 55, reads on the last 18. Its
+copies: at double speed and at half speed (the rate renamed, then resampled to 16 kHz), and at half gain (each sample shifted one bit).
+Words of a place above the floor: rho, the half-octave of the samples from the place before's start to its own; o, its peak's octave;
+x, whether its sign repeats the place before's. Absolute word (rho, o, x); relative word (rho's step, o's step, x). Each coded given the
+word before by counts with Witten-Bell backoff. One section: the absolute word's width, 10 bits (6.931 nats). A place of the original
+is matched in a copy when a place starts within two samples of its start's image.
+  (a) Half-cycles by peak octave, double speed over the original's count (octaves holding 1,000 or more): octaves 5 and under 0.55
+      (0.42 to 0.70); octaves 12 and over 0.95 (0.85 to 1.02). The floor (the least octave from which every octave reads 0.85 or
+      over): 11 (9 to 12).
+  (b) News of the read utterances above the floor at half speed over the original's, by the reader counted on the original only:
+      absolute words 1.25 (1.08 to 1.60); relative words 1.00 (0.96 to 1.05). At double speed: relative 0.97 (0.85 to 1.08).
+  (c) At the original's speed, the relative words' news over the absolute words': 1.06 (0.95 to 1.20).
+  (d) The restarting cut at one section on the relative words: openings kept at half speed 0.93 (0.80 to 0.99), under a changed start
+      0.90 (0.75 to 0.99); on the absolute words at half speed 0.60 (0.35 to 0.85). Places matched at half speed: 0.97 (0.93 to 1.00).
+  (e) The sample stream at its 16 bits (the best of the four polynomial predictors, its residual's law counted by the last step's
+      bit length, each reader counted on its own passage): the passage's news at double speed over the original's 0.56 (0.50 to 0.66).
+  Rule. (a) octaves 5 and under at 0.70 or less and a floor found: a sound chart's floor is read by this count on its passage and is
+  never set by hand; no floor found: the half-cycle is not sound's place and a raster of bands is read first. (b) and (d): relative news
+  within 0.95 to 1.05 at half speed and openings kept at 0.80 or over: a sound enters a level as its half-cycles above its passage's
+  floor, each read as its ratios to the one before, the absolute interval and peak being the navigator's clock and gain, and the cut of
+  November 13 applies to it unchanged; the sample stream is never a level's place. Kept under 0.60: the design record's section 8 is
+  withdrawn for sound until a raster of bands is read. Between: the word is read again with the place two before in its context.
+  The image's ruler (a stroke under a magnification the passage itself holds) stays owed.
+
+G129 scored 2026-11-13T01:21Z (receipts in the design record's receipts directory: sound_ruler.py, sound_ruler.txt, sound_ruler_floor11.txt; 73
+utterances of one speaker, 481.0 seconds, 7,696,558 samples, 1,272,107 half-cycles, 2,645 a second).
+  (a) octaves 5 and under 0.595: HELD. Octaves 12 and over 0.512: MISSED (0.95 fixed). The floor: none, MISSED (11 fixed). By octave the
+      count at double speed over the original's reads 0.49, 0.50, 0.53, 0.57, 0.61, 0.65, 0.70, 0.74, 0.68, 0.47, 0.26, 0.28, 0.48,
+      0.66 (octaves 0 to 13), and at half speed 1.03 to 1.19 where a re-timing that kept each crossing reads 1.00. The premise was false:
+      this speech's loud half-cycles are its upper band's as much as its floor's, and at every loudness a wave's crossings follow the
+      top of the frame's band.
+  (b), (c), (d) not read: they stand on a floor and none was found. For information only, at the guessed floor of octave 11 (not a
+      score): 551 places a second; relative words' news at half speed 1.233 of the original's and the absolute words' 1.948, at half
+      gain 1.0002 and 3.572; relative over absolute 1.190; the restarting cut on relative words keeps 0.9996 of its openings under a
+      changed start (0.0225 of places stand over the section), 0.761 at half speed (0.992 of places matched) and 0.288 at double speed
+      (0.323 matched).
+  (e) 0.4945: MISSED under the band (0.56 fixed, 0.50 to 0.66). A sample's news reads 6.763 nats at the original's speed and 6.689 at
+      double speed, each by its own reader: the same a place, so the passage's news follows its count of places and the half above the
+      frame's band is lost with them. At half speed 1.764 by a reader of four samples, which cannot see that the copy fills half its band.
+  By the rule: the half-cycle is not sound's place, and a raster of bands is read first (G130). The cut's own invariance under a changed
+  start is the one reading that carried over from text (0.9996 beside 0.9997).
+
+G130 fixed 2026-11-13T01:21Z (the same thread), before its read: the raster of bands G129's rule sends to, on the same passage and copies.
+Read first: G129's receipts (a sample's news is the same at the two speeds, 6.689 beside 6.763 nats, each by its own reader); the
+tree's octave ladder (atlas wave.matched-friction-reach: rungs of friction rho_s^2 = 1 - 2^-s, the fading sums the tower of October 25
+held as its slow resonators); the design record's 4.7 (on text the rows along the ladder of modes are not shared: two paced clocks read
+as two keys, 0.485 in rank). From these, agent-inferred: a change of clock by the ladder's ratio carries each rung's band onto the rung
+beside it, so what a change of clock cannot touch is a law that is the same along the ladder, and a reader whose rows are shared along
+it needs one carried number (which rung) to read either passage.
+The raster: rung s holds y_s, with y_s gaining (x - y_s) shifted down s bits at each sample (y_0 the sample); band s is y_s - y_(s+1),
+read at a stride of 2^s samples, s = 0 to 6. A band's reader is G129's stream reader (the best of four polynomial predictors on the
+count utterances, the residual's bit length and sign counted by the last step's bit length); its gain-free form counts the residual's
+bit length less the last step's, by the last two steps' difference of bit lengths. Ratios are of the counted parts (the flat rest of a
+residual is no reader's), on the read utterances.
+  (a) The sample stream: the double-speed copy read by the original's reader over by its own 1.02 (1.00 to 1.06).
+  (b) Along the ladder at the original's speed, band s+1 read by band s's reader over by its own, s = 1 to 5: with absolute words the
+      mean of the five 1.15 (1.04 to 1.40); gain-free 1.05 (1.01 to 1.15), and the largest of the five gain-free under 1.25.
+  (c) The shift of rung: the double-speed copy's band s-1 read by the original's band s reader over by its own, absolute words,
+      s = 2 to 6: mean 1.02 (1.00 to 1.08); the same band read by the original's reader of the same rung s-1: mean 1.10 (1.02 to 1.35).
+  Rule. (c) shifted under 1.08 and (b) gain-free under 1.10 at every pair: for sound a level's rows are shared along the ladder (one
+  row set, a rung's stride and gain its navigator's clock), and a change of clock is a shift of rung that needs nothing learned anew;
+  the value chart's record states it before any build. (b) gain-free over 1.25 at any pair: rungs keep their own rows there, and the
+  shift of rung is learned from re-timed passages. Between: the rows are shared by groups of rungs the reading names.
+
+G130 scored 2026-11-13T01:25Z (receipts beside G129's: rungs.c, band_ruler.py, band_ruler.txt; then rungs_kept.c, band_ruler_kept.txt).
+  (a) 1.0056 (the original by the double speed's reader 1.0053): HELD.
+  (b) absolute words, the five pairs 1.004, 1.009, 1.106, 1.063, 1.184, mean 1.073: HELD. Gain-free 1.001, 1.002, 1.003, 1.015,
+      1.041, mean 1.012: HELD; the largest 1.041, under 1.25: HELD.
+  (c) the shifted rung 1.000, 1.000, 1.022, 1.053, 1.146, mean 1.044: HELD; the same rung 1.004, 1.011, 1.067, 1.021, 1.047, mean
+      1.030: HELD. The order the guess stood on did not show: the shift read no better than staying, and worse at the two slowest rungs.
+  The instrument, read after the score: the rung as fixed gains (x - y_s) >> s and so drops its leak's remainder, which leaves y_s
+  anywhere within 2^s of its input: a dead zone tied to the rung's number, 64 and 128 at the slow rungs, where a quiet passage lives.
+  A rung that drops its remainder privileges a scale. With the sum kept on 2^-s (rungs_kept.c; the law and the guess unchanged):
+  (b) absolute 1.003, 1.009, 1.038, 1.017, 1.040, mean 1.021, which stands UNDER the fixed band (1.04 to 1.40): the gap between
+  absolute and gain-free words was the dead zone's; gain-free 1.001, 1.001, 1.041, 1.022, 1.022, mean 1.018. (c) the shifted rung
+  0.9998, 0.9995, 1.0009, 1.0012, 1.0006, mean 1.0004; the same rung 1.004, 1.011, 1.042, 1.017, 1.040, mean 1.023.
+  By the rule: on the read as fixed, between (the shift under 1.08 at rungs 1 to 4 only); on the rung that keeps its remainder, the
+  first branch at every pair: at this reader's grain a sound's rows are shared along the ladder, and a change of clock by the
+  ladder's ratio is a shift of rung. The identity is the atlas's of November 12 (code.news-clock-proper-time: ring n reads of the
+  re-timed strand what ring n/lambda read of the original); this guess restated it without citing it, and what is new is its reading.
+  Limits: one speaker, 481 seconds, a ratio of two, a reader of one step's bit length and sign (it cannot see pitch or formants, and
+  equal codes are not equal knowledge), bands of one-pole rungs that overlap.

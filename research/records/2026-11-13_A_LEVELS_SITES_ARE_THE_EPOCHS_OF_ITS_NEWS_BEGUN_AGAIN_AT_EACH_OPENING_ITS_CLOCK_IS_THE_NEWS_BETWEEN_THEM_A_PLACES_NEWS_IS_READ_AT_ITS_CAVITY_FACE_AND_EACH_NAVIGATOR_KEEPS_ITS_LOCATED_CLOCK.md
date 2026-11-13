@@ -20,7 +20,10 @@ rows enter (`code.epoch-restarting-carry`, `code.place-news-cavity-face`,
 `code.epoch-news-phase-chart`); `tower.field-pace`, `tower.field-scale-packets`,
 `code.epoch-cut-own-length` and `code.news-clock-proper-time` are amended. Receipts:
 `screen_ruler.py`, `screen_ruler.txt` (G123), `resync_ruler.py`, `resync_ruler.txt` (G124),
-`resync_ruler_octet.txt` (G125). The guesses and their scores are in the guess file of the line.
+`resync_ruler_octet.txt` (G125); on sound (§8, added the same day; atlas
+`code.sound-place-frame-band`), `sound_ruler.py`, `sound_ruler.txt`, `sound_ruler_floor11.txt`
+(G129), `rungs.c`, `rungs_kept.c`, `band_ruler.py`, `band_ruler.txt`, `band_ruler_kept.txt` (G130).
+The guesses and their scores are in the guess file of the line.
 
 ## 1. Why this record exists
 
@@ -354,11 +357,55 @@ and no comparison of a written place at its cavity face.
 ## 8. Text, image, acoustic, motor
 
 The cut reads a place's code under its cavity face and the boundary digit's width, and nothing
-of the medium. A pixel row's or a sample stream's places are cut the same way: a flat stretch
-closes into one epoch behind the edge that leads it. A motor chart's serial screw words are
-places with codes like any other. Only the boundary codec is the medium's. The count rulers of
-§3 on values (a place's own code against one constant a level, and the shares under a stretch)
-are owed before a value chart is built.
+of the medium. A motor chart's serial screw words are places with codes like any other. Only
+the boundary codec is the medium's. What a medium's places are is the codec's to say, and for
+values that is read before it is built: this section first said that a sample stream's places
+are cut like any other, and the first ruler on sound withdrew it.
+
+**Sound, read the same day (G129, G130; a count's code on a cloud host, never the machine's
+face).** The passage is 481 seconds of public speech (73 utterances of one LibriSpeech speaker,
+16 bits at 16 kHz), with copies at double and at half speed (the rate renamed, then resampled).
+
+- *The sample is not a place a change of clock keeps.* A sample's news reads 6.76 nats at the
+  passage's own speed and 6.69 at double speed, each by its own reader, so the passage's news
+  follows its count of places (0.4945 of it stands at double speed) and what lay above the
+  frame's band is lost with them. What the change does not touch is the law: the faster copy
+  costs the original's reader 1.0056 of what it costs its own.
+- *Nor is the half-cycle.* October 25's chart (`examples/listener/sections.rs`: a run of one
+  sign, its length and its peak's octave) was guessed to hold a floor above which a wave's
+  crossings follow its events. It holds none: by peak octave 0.26 to 0.74 of the half-cycles
+  stand at double speed, no octave reads 0.85, and at half speed 1.03 to 1.19 stand where a
+  re-timing that kept each crossing reads 1.00. This speech's loud crossings are its upper
+  band's, and at every loudness a wave's crossings follow the top of the frame's band (G129:
+  the low octaves held, the high octaves and the floor missed, the stream's ratio missed low).
+  One reading carried over from text: at an assumed floor the restarting cut keeps 0.9996 of
+  its openings under a changed start.
+- *On the octave ladder a change of clock is a shift of rung.* The raster is the tree's own
+  ladder (atlas `wave.matched-friction-reach`): rung `s` a fading sum of friction `1 − 2^(−s)`,
+  band `s` the difference of rungs `s` and `s + 1`, read at a stride of `2^s` samples. The
+  double-speed copy's band `s − 1`, read by the original's reader of band `s`, costs 0.9995 to
+  1.0012 of what it costs its own reader, where the original's reader of the same rung costs
+  1.004 to 1.042. This is `code.news-clock-proper-time`'s identity (ring `n` reads of the
+  re-timed strand what ring `n/λ` read of the original), read here for the first time.
+- *At this reader's grain the ladder's rows are shared on sound.* At one speed, band `s + 1`
+  read by band `s`'s reader costs 1.0005 to 1.041 of its own reader's news (gain-free words),
+  1.003 to 1.040 with absolute words. Text read the other way (§4.7: the two paced clocks are
+  two keys). So for sound a change of clock by the ladder's ratio asks for one carried number,
+  the rung, and nothing learned anew, to the extent the rows are shared.
+- *A rung keeps its remainder.* The ladder as first built gained `(x − y) >> s` and dropped its
+  leak's remainder: a dead zone of `2^s`, tied to the rung's number. On it the shift read 1.05
+  and 1.15 at the two slowest rungs and the absolute words read 1.07 along the ladder. With the
+  sum kept on `2^(−s)` the readings above stand. A rung that drops its remainder privileges a
+  scale, which is the precision law's clause on ratios met on an instrument.
+
+Limits, each stated because the reading is narrow: one speaker; a ratio of two; a reader of a
+first step's bit length and sign, which cannot see pitch or formants, so the rows are shared at
+that grain and equal codes are not equal knowledge; bands of one-pole rungs, which overlap.
+[agent-inferred] A sound's place is therefore read on a band at its rung's stride, never on the
+sample stream or its crossings, and its rung's stride and gain are its navigator's clock. Owed
+before a value chart is built: the restarting cut on a band's places and its share kept under
+the shift of rung; the same reading with a reader of longer context; and the image's ruler (a
+stroke under a magnification the passage itself holds).
 
 ## 9. Acceptance, the device line, and the order of work
 
@@ -401,4 +448,5 @@ saved state and leaves its bytes the same.
 - **The trained rates' own cut** (§3.1): what the two clocks located, read by a ruler that is
   not a count of one symbol.
 - **The harmonics an epoch needs and a second level's section**, each from a reading.
-- **The rulers on values** (§8).
+- **The rulers on values** (§8): on sound the cut on a band's places and a reader of longer
+  context; the image's ruler.

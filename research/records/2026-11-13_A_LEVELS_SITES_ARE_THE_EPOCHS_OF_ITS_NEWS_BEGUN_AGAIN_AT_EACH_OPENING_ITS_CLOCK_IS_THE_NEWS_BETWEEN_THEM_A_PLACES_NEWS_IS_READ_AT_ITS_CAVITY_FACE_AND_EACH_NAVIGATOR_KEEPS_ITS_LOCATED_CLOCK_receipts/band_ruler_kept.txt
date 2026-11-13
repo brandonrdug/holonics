@@ -1,0 +1,72 @@
+BANDS utterances=73 count=55 read=18
+A the sample stream, absolute words
+  double speed by the original's reader over its own         counted=1.0056 whole=1.0056 | own: order=1 counted a place=2.5300 flat=4.1590; other: order=1 counted=2.5440 flat=4.1590; places=838088
+  the original by the double speed's reader over its own     counted=1.0053 whole=1.0053 | own: order=1 counted a place=2.6057 flat=4.1576; other: order=1 counted=2.6196 flat=4.1576; places=1676248
+A double speed by the original's reader=1.0056 | the original by the double speed's reader=1.0053
+LADDER absolute words: a band's own reading at the original's speed, then at double speed
+  BAND orig s=0 order=1 places= 1676248 counted a place=2.6121 flat=3.4518 nats=10164577
+  BAND orig s=1 order=1 places=  838088 counted a place=2.5553 flat=3.2100 nats=4831908
+  BAND orig s=2 order=1 places=  419008 counted a place=2.5557 flat=3.4009 nats=2495870
+  BAND orig s=3 order=1 places=  209468 counted a place=2.6111 flat=3.5836 nats=1297607
+  BAND orig s=4 order=0 places=  104698 counted a place=2.5244 flat=3.8502 nats=667399
+  BAND orig s=5 order=0 places=   52315 counted a place=2.4960 flat=3.6462 nats=321327
+  BAND orig s=6 order=0 places=   26125 counted a place=2.4249 flat=3.3130 nats=149904
+  BAND fast s=0 order=1 places=  838088 counted a place=2.5830 flat=3.4046 nats=5018152
+  BAND fast s=1 order=1 places=  419008 counted a place=2.5859 flat=3.3842 nats=2501545
+  BAND fast s=2 order=1 places=  209468 counted a place=2.6203 flat=3.5504 nats=1292570
+  BAND fast s=3 order=0 places=  104698 counted a place=2.5135 flat=3.8225 nats=663368
+  BAND fast s=4 order=0 places=   52315 counted a place=2.4871 flat=3.6285 nats=319939
+  BAND fast s=5 order=0 places=   26125 counted a place=2.4188 flat=3.3035 nats=149497
+  BAND fast s=6 order=0 places=   13031 counted a place=2.6067 flat=2.8791 nats=71486
+B absolute: band s+1 read by band s's reader over by its own, the original's speed
+  band 2 by band 1's reader                                  counted=1.0033 whole=1.0033 | own: order=1 counted a place=2.5557 flat=3.4009; other: order=1 counted=2.5643 flat=3.4009; places=419008
+  band 3 by band 2's reader                                  counted=1.0086 whole=1.0086 | own: order=1 counted a place=2.6111 flat=3.5836; other: order=1 counted=2.6336 flat=3.5836; places=209468
+  band 4 by band 3's reader                                  counted=1.0377 whole=1.0096 | own: order=0 counted a place=2.5244 flat=3.8502; other: order=1 counted=2.6195 flat=3.7793; places=104698
+  band 5 by band 4's reader                                  counted=1.0174 whole=1.0174 | own: order=0 counted a place=2.4960 flat=3.6462; other: order=0 counted=2.5394 flat=3.6462; places=52315
+  band 6 by band 5's reader                                  counted=1.0399 whole=1.0399 | own: order=0 counted a place=2.4249 flat=3.3130; other: order=0 counted=2.5217 flat=3.3130; places=26125
+B absolute mean of the five=1.0214 largest=1.0399
+C the shift of rung, absolute words: the double-speed copy's band s-1
+  fast band 1 by the original's band 2 reader                counted=0.9998 whole=0.9998 | own: order=1 counted a place=2.5859 flat=3.3842; other: order=1 counted=2.5855 flat=3.3842; places=419008
+  fast band 2 by the original's band 3 reader                counted=0.9995 whole=0.9995 | own: order=1 counted a place=2.6203 flat=3.5504; other: order=1 counted=2.6189 flat=3.5504; places=209468
+  fast band 3 by the original's band 4 reader                counted=1.0009 whole=1.0009 | own: order=0 counted a place=2.5135 flat=3.8225; other: order=0 counted=2.5159 flat=3.8225; places=104698
+  fast band 4 by the original's band 5 reader                counted=1.0012 whole=1.0012 | own: order=0 counted a place=2.4871 flat=3.6285; other: order=0 counted=2.4902 flat=3.6285; places=52315
+  fast band 5 by the original's band 6 reader                counted=1.0006 whole=1.0006 | own: order=0 counted a place=2.4188 flat=3.3035; other: order=0 counted=2.4202 flat=3.3035; places=26125
+  fast band 1 by the original's band 1 reader                counted=1.0043 whole=1.0043 | own: order=1 counted a place=2.5859 flat=3.3842; other: order=1 counted=2.5969 flat=3.3842; places=419008
+  fast band 2 by the original's band 2 reader                counted=1.0113 whole=1.0113 | own: order=1 counted a place=2.6203 flat=3.5504; other: order=1 counted=2.6500 flat=3.5504; places=209468
+  fast band 3 by the original's band 3 reader                counted=1.0416 whole=1.0132 | own: order=0 counted a place=2.5135 flat=3.8225; other: order=1 counted=2.6179 flat=3.7512; places=104698
+  fast band 4 by the original's band 4 reader                counted=1.0172 whole=1.0172 | own: order=0 counted a place=2.4871 flat=3.6285; other: order=0 counted=2.5298 flat=3.6285; places=52315
+  fast band 5 by the original's band 5 reader                counted=1.0403 whole=1.0403 | own: order=0 counted a place=2.4188 flat=3.3035; other: order=0 counted=2.5163 flat=3.3035; places=26125
+C shifted rung mean=1.0004 largest=1.0012 | the same rung mean=1.0229 largest=1.0416
+LADDER gain-free words: a band's own reading at the original's speed, then at double speed
+  BAND orig s=0 order=1 places= 1676248 counted a place=2.5449 flat=3.4518 nats=10051890
+  BAND orig s=1 order=1 places=  838088 counted a place=2.5152 flat=3.2100 nats=4798254
+  BAND orig s=2 order=1 places=  419008 counted a place=2.5211 flat=3.4009 nats=2481360
+  BAND orig s=3 order=1 places=  209468 counted a place=2.5670 flat=3.5836 nats=1288362
+  BAND orig s=4 order=0 places=  104698 counted a place=2.4840 flat=3.8502 nats=663168
+  BAND orig s=5 order=0 places=   52315 counted a place=2.5190 flat=3.6462 nats=322533
+  BAND orig s=6 order=0 places=   26125 counted a place=2.5222 flat=3.3130 nats=152446
+  BAND fast s=0 order=1 places=  838088 counted a place=2.5264 flat=3.4046 nats=4970716
+  BAND fast s=1 order=1 places=  419008 counted a place=2.5376 flat=3.3842 nats=2481297
+  BAND fast s=2 order=1 places=  209468 counted a place=2.5673 flat=3.5504 nats=1281468
+  BAND fast s=3 order=0 places=  104698 counted a place=2.4810 flat=3.8225 nats=659964
+  BAND fast s=4 order=0 places=   52315 counted a place=2.5161 flat=3.6285 nats=321456
+  BAND fast s=5 order=0 places=   26125 counted a place=2.5227 flat=3.3035 nats=152211
+  BAND fast s=6 order=1 places=   13031 counted a place=2.6183 flat=2.7834 nats=70390
+B gain-free: band s+1 read by band s's reader over by its own, the original's speed
+  band 2 by band 1's reader                                  counted=1.0005 whole=1.0005 | own: order=1 counted a place=2.5211 flat=3.4009; other: order=1 counted=2.5224 flat=3.4009; places=419008
+  band 3 by band 2's reader                                  counted=1.0014 whole=1.0014 | own: order=1 counted a place=2.5670 flat=3.5836; other: order=1 counted=2.5706 flat=3.5836; places=209468
+  band 4 by band 3's reader                                  counted=1.0414 whole=1.0129 | own: order=0 counted a place=2.4840 flat=3.8502; other: order=1 counted=2.5869 flat=3.7793; places=104698
+  band 5 by band 4's reader                                  counted=1.0220 whole=1.0220 | own: order=0 counted a place=2.5190 flat=3.6462; other: order=0 counted=2.5745 flat=3.6462; places=52315
+  band 6 by band 5's reader                                  counted=1.0221 whole=1.0221 | own: order=0 counted a place=2.5222 flat=3.3130; other: order=0 counted=2.5780 flat=3.3130; places=26125
+B gain-free mean of the five=1.0175 largest=1.0414
+  fast band 1 by the original's band 2 reader                counted=0.9998 whole=0.9998 | own: order=1 counted a place=2.5376 flat=3.3842; other: order=1 counted=2.5372 flat=3.3842; places=419008
+  fast band 2 by the original's band 3 reader                counted=1.0000 whole=1.0000 | own: order=1 counted a place=2.5673 flat=3.5504; other: order=1 counted=2.5672 flat=3.5504; places=209468
+  fast band 3 by the original's band 4 reader                counted=0.9999 whole=0.9999 | own: order=0 counted a place=2.4810 flat=3.8225; other: order=0 counted=2.4808 flat=3.8225; places=104698
+  fast band 4 by the original's band 5 reader                counted=1.0001 whole=1.0001 | own: order=0 counted a place=2.5161 flat=3.6285; other: order=0 counted=2.5163 flat=3.6285; places=52315
+  fast band 5 by the original's band 6 reader                counted=1.0002 whole=1.0002 | own: order=0 counted a place=2.5227 flat=3.3035; other: order=0 counted=2.5233 flat=3.3035; places=26125
+  fast band 1 by the original's band 1 reader                counted=1.0000 whole=1.0000 | own: order=1 counted a place=2.5376 flat=3.3842; other: order=1 counted=2.5377 flat=3.3842; places=419008
+  fast band 2 by the original's band 2 reader                counted=1.0019 whole=1.0019 | own: order=1 counted a place=2.5673 flat=3.5504; other: order=1 counted=2.5723 flat=3.5504; places=209468
+  fast band 3 by the original's band 3 reader                counted=1.0420 whole=1.0132 | own: order=0 counted a place=2.4810 flat=3.8225; other: order=1 counted=2.5851 flat=3.7512; places=104698
+  fast band 4 by the original's band 4 reader                counted=1.0218 whole=1.0218 | own: order=0 counted a place=2.5161 flat=3.6285; other: order=0 counted=2.5709 flat=3.6285; places=52315
+  fast band 5 by the original's band 5 reader                counted=1.0218 whole=1.0218 | own: order=0 counted a place=2.5227 flat=3.3035; other: order=0 counted=2.5778 flat=3.3035; places=26125
+(for information) gain-free: shifted rung mean=1.0000 | the same rung mean=1.0175

@@ -1,0 +1,19 @@
+SOUND utterances=73 count=55 read=18 samples=7696558 seconds=481.0 | fast samples=3848280 slow samples=15393116
+HALF_CYCLES all=1272107 a_second=2645 | fast over orig=0.5197 slow over orig=1.0802
+  OCTAVE  0 orig=   12350 share=0.0097 fast_over_orig=0.4867 slow_over_orig=1.1093
+  OCTAVE  1 orig=   21465 share=0.0169 fast_over_orig=0.5024 slow_over_orig=1.1019
+  OCTAVE  2 orig=   33329 share=0.0262 fast_over_orig=0.5335 slow_over_orig=1.0976
+  OCTAVE  3 orig=   49501 share=0.0389 fast_over_orig=0.5658 slow_over_orig=1.0848
+  OCTAVE  4 orig=   70272 share=0.0552 fast_over_orig=0.6140 slow_over_orig=1.0767
+  OCTAVE  5 orig=   94149 share=0.0740 fast_over_orig=0.6520 slow_over_orig=1.0715
+  OCTAVE  6 orig=  112428 share=0.0884 fast_over_orig=0.6988 slow_over_orig=1.0714
+  OCTAVE  7 orig=  127392 share=0.1001 fast_over_orig=0.7416 slow_over_orig=1.0674
+  OCTAVE  8 orig=  141853 share=0.1115 fast_over_orig=0.6847 slow_over_orig=1.0463
+  OCTAVE  9 orig=  163484 share=0.1285 fast_over_orig=0.4743 slow_over_orig=1.0324
+  OCTAVE 10 orig=  180664 share=0.1420 fast_over_orig=0.2642 slow_over_orig=1.0510
+  OCTAVE 11 orig=  158318 share=0.1245 fast_over_orig=0.2767 slow_over_orig=1.1345
+  OCTAVE 12 orig=   88239 share=0.0694 fast_over_orig=0.4811 slow_over_orig=1.1904
+  OCTAVE 13 orig=   18059 share=0.0142 fast_over_orig=0.6569 slow_over_orig=1.1709
+  OCTAVE 14 orig=     604 share=0.0005 fast_over_orig=0.7467 slow_over_orig=1.1010 (under 1,000)
+A octaves 5 and under fast_over_orig=0.5946 | octaves 12 and over=0.5123 | floor (least octave from which every octave reads 0.85 or over)=None
+A no floor found by the rule; the rest is not read
