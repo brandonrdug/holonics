@@ -1,0 +1,404 @@
+# A level's sites are the epochs of its news, begun again at each opening; its clock is the news between them; a place's news is read at its cavity face; and each navigator keeps its located clock
+
+Refs #404 #406 #410. Status: [design, with three count rulers; November 13], by the theory thread
+that holds the PC's runs and the engineering. This is the design record the symbol's line owed
+([the store record](2026-11-12_THE_STORE_CODES_HELD_TEXT_AT_THE_LEVEL_OF_TWO_KNOWN_NEIGHBOURS_A_SIDE_A_SYMBOL_IS_A_WORD_ON_LOCATED_RINGS_AND_A_DARK_PLACE_IS_THE_INTERIOR_OF_A_COMPOSITE.md) §11,
+[the record of the symbol's length](2026-11-12_A_SYMBOL_IS_A_LENGTH_A_BYTE_IS_A_DIGIT_OF_THE_PASSAGE_A_TEXTS_PRIMES_ARE_ITS_PRIMITIVE_CYCLES_AND_A_STRIDE_IS_READ_AT_ITS_PLACE_AS_THE_NEWS_CLOCK_OF_OCTOBER_HELD.md) §12).
+Every design statement is agent-inferred and nothing of it is built. The rulers are counts on a
+cloud host over public shards; their code is a count's and never the machine's face.
+
+Owners named: the tower of scales of November (`crates/holonics/src/hnn/tower/field/scale.rs`:
+`Scale`, `Field::scaled_up`; atlas `tower.field-scale-packets`), a site's opening and its moment
+(`Field::opening`, `moment::moments`; atlas `tower.field-one-region`, `tower.field-moment`), the
+paced clock and the blank's expected duration (`Field::paces`, `Field::paces_with`; atlas
+`tower.field-pace`), the cavity field of a read (`Echo`, `FieldRead`; atlas `tower.field-echo`),
+the face read through the encoding (`Field::tied`), the news clock of October (`NewsClock`; Lean
+`HNN/NewsClock`; atlas `hnn.tower-news-clock`, `hnn.tower-news-clock-carry`), the arrival word
+of a locked ring (atlas `wave.arrival-word-is-not-the-mean-rate`) and the located transport of
+October 5 (`compression::keys::transport`, `hnn::encoding`; THE_MACHINE guard 9). Three atlas
+rows enter (`code.epoch-restarting-carry`, `code.place-news-cavity-face`,
+`code.epoch-news-phase-chart`); `tower.field-pace`, `tower.field-scale-packets`,
+`code.epoch-cut-own-length` and `code.news-clock-proper-time` are amended. Receipts:
+`screen_ruler.py`, `screen_ruler.txt` (G123), `resync_ruler.py`, `resync_ruler.txt` (G124),
+`resync_ruler_octet.txt` (G125). The guesses and their scores are in the guess file of the line.
+
+## 1. Why this record exists
+
+The two records of November 12 left a design owed and gave it a first form: a stride read at its
+place as the place's code under its face, one clock moving the moments and cutting the level
+above, the level's sites the carries of October's clock of news, and an acceptance stated as an
+invariance under a change of clock (Brandon, November 12 23:20Z: no clock and no frame's length
+is privileged). Three rulers were read before the design was written, each with its guess fixed
+first. They changed the design in three places:
+
+- The trained strides are neither a symbol's length nor a symbol's screening of its past: they
+  are each clock's own located key (G123). So the moments' clocks are not replaced.
+- October's carry places an opening by the whole sum before it, so it privileges an origin: a
+  changed start keeps 0.31 of its openings (G124). The cut that keeps its sites begins its sum
+  again at each opening.
+- A written place has no face, and no form of two symbols reads its news well enough (G124).
+  The face it needs exists in the built law: the opening it would have as an open place.
+
+## 2. The one object
+
+A level of the tower is a strand read by receivers, and it has two things that the first form
+ran together.
+
+- **Places.** A place is where a receiver's section is arrived at. The elementary objects say an
+  epoch is an interval between a receiver's section arrivals, and that epochs count flux through
+  the receiver's section. The flux a level receives from the level below is its news. So the
+  places of a level are the epochs of the news below it.
+- **A clock.** Elapsed time is the pairing `⟨ω_R|γ⟩ = windings + phase`: a difference between two
+  places, into which no origin enters. Where the whole windings fall does depend on an origin.
+
+On the octets the places are given (an octet a place) and each navigator's clock is its key (a
+rate a class, located by deposition, `tower.field-pace`). On the level above nothing is given:
+its places have to be cut and its clock read. The first form cut the places by the clock's whole
+windings (October's odometer), which makes the places inherit the clock's origin. The two are
+separate readings of one sum `S_t = Σ_(k≤t) c_k` of the places' codes:
+
+```text
+clock    τ(b) − τ(a) = (S_b − S_a)/σ                         a difference; no origin enters
+places   a place opens when the news since the last opening,   an arrival word; it depends on what
+         its own included, passes one section σ               stands before only through the last opening
+```
+
+The second line is a joint under a slow drive, as the joints of October 8 state one
+(`deposition.threshold-regimes`: the drive loads it, the carry is its strain, and a landing
+releases it): the news loads the level's section, the place that breaks it opens, and the load
+begins again from that place. Its openings are the arrival word of a ring that locks to the
+strand's bright places, and the tree already holds that such a word is not the carry word of
+the ring's mean rate (`wave.arrival-word-is-not-the-mean-rate`, a counterexample on a loaded
+ring).
+
+## 3. What the rulers read
+
+All three: Witten–Bell counts on 16 to 32 MB a slice of one public shard, 330,000 held places a
+slice of another, the store's rule for pieces, five slices (code, web, science, books, wikidata).
+`c0`, `c1`, `c2` are a held place's code in nats with none, one and two octets before it known;
+`c2s` is its code with the octet before and the octet after known. Cuts are read on `c2`.
+`through(t) = c1(t+1) − c2(t+1)` is what the place before `t` tells of the place after `t`
+beyond what `t` tells, and a cut's **screen ratio** is its mean at the opening places over its
+mean at the others (lower screens more).
+
+### 3.1 What the trained strides hold (G123)
+
+The guess was that deposition had moved the two paced clocks' rates toward a symbol's opacity
+(how little the place before it tells of the place after it). It missed on both clocks.
+
+| Reading, state C, the code line's 99 classes | clock with the newline at 14.46 | the other clock |
+|---|---|---|
+| rank correlation of the rates with minus a symbol's transmission, code slice | 0.302 (fixed 0.55) | 0.261 (fixed 0.50) |
+| the same by the four other slices | 0.28, 0.35, 0.28, −0.14 | 0.28, 0.39, 0.23, −0.08 |
+| screen ratio of the rates' carries, pooled | 0.861 | 0.904 |
+| the same on the code slice | 0.775 | 0.873 |
+| their opening places' code over the others' (the record of the symbol's length §5) | 1.057 | 1.089 |
+
+The two clocks' rates agree with each other in rank at 0.485. One holds closers and line ends
+high (the newline 14.46, `}` 7.87, the quotes and closing brackets), the other openers and path
+separators (`[` 6.61, `.` 5.30, `/` 5.08, `(` 4.64). No count of one symbol read here ranks
+either past 0.56. Their carries screen, on the slice they were trained on more than the place's
+own code does (0.775 against 0.839), while standing blind to the news. So each clock holds a
+cut of its own: a friction located by its navigator, which is what a key is.
+
+The same ruler read the cut by the place's own code (October's carry, the carrying place
+opening its epoch): screen 0.822 pooled (by slice 0.839, 0.833, 0.811, 0.980, 0.637), the
+spread of an epoch's news 0.167 of its mean; a constant friction a symbol read from the counts
+screens at 0.893, no better than the trained rates.
+
+### 3.2 A cut that keeps its sites (G124)
+
+Two cuts by the place's own code, at a mean epoch of six places. **Odometer**: a place opens
+where the summed code crosses a multiple of the section. **Restarting**: a place opens when the
+code since the last opening, its own included, passes one section, and its code begins the next
+sum. Two changes of what stands before a place: **a shifted start** (each piece's sum begun at
+an offset drawn evenly on one section) and **a stretch** (every line's leading spaces doubled
+on the code slice, 48,900 places added at 0.194 nats each in the mean, 0.129 of the copy). The
+share is of the original's openings that the changed reading also opens.
+
+| Cut by the place's own code | opening code over the others' | spread of an epoch's news | screen | kept, shifted start | kept, stretch |
+|---|---|---|---|---|---|
+| fixed packets of six | 1.002 | 0.379 | 1.001 | 0.000 | 0.359 |
+| odometer | 1.722 | 0.167 | 0.820 | 0.310 | 0.433 |
+| restarting | 1.741 | 0.127 | 0.809 | 0.991 | 0.828 |
+
+The restarting cut's openings by their rank in a piece keep 0.226, 0.342, 0.406 and then 0.993:
+two readings take a few openings to meet and stay met. The odometer on the trained rates keeps
+0.155 and 0.248 under the shift.
+
+What a written place's stride may read, restarting cuts read on `c2`, pooled:
+
+| A written place's stride | opening code over the others' | share of the own code's lift | spread | screen | kept, stretch |
+|---|---|---|---|---|---|
+| the place's own code `c2` | 1.741 | 1 | 0.127 | 0.809 | 0.828 |
+| a pair's form `c1` | 1.406 | 0.548 | 0.244 | 1.038 | 0.657 |
+| two-sided `c2s` | 1.559 | 0.755 | 0.281 | 0.253 | 0.883 |
+| the class mean | 1.283 | 0.382 | 0.293 | 0.970 | 0.604 |
+
+The fixed rule asked a form for 0.60 of the lift with a spread of 0.25 or under. The pair's form
+fails on its lift and the two-sided form on its spread, so a written place's stride needs a face
+of its own. Of the forms read, the two-sided one is nearest: most of the lift, three times the
+own code's screen, and the most kept under the stretch.
+
+### 3.3 The same cuts at one octet's news (G125)
+
+Every cut above stands at a section fitted for the comparison with the built packets (12.7 to
+19.1 nats). At the section the design picks (§4.6), 8 bits or 5.545 nats:
+
+| Restarting cut, section 8 bits | mean epoch, places | one-place epochs | spread | screen | kept, shifted start | kept, stretch |
+|---|---|---|---|---|---|---|
+| the place's own code | 1.903 (by slice 1.991, 1.875, 1.855, 2.054, 1.766) | 0.422 | 0.323 | 0.822 | 0.9997 | 0.996 |
+| two-sided `c2s` | 2.344 | 0.330 | 0.451 | 0.367 | 0.9997 | 0.983 |
+| odometer, own code | 2.484 | 0.194 | 0.338 | 0.799 | 0.606 | 0.699 |
+
+An epoch fills 0.790 of its section in the mean (4.378 nats). The guesses for the two shares
+missed high: a place that codes past the section opens under every reading, such places stand
+within two or three openings of any place, and readings meet at once.
+
+## 4. The law
+
+### 4.1 Each navigator keeps its located clock
+
+The paced clocks stay as built: a rate a class, located by deposition, `τ` and `σ` tied by the
+one `κ`, a blank at its expected duration. The record of the symbol's length (§8.1) proposed that
+the moments' stride become the place's code. No reading supports that, and §3.1 speaks against
+it: the rates are frictions of each clock's own, whose carries screen where the news does not
+rank them. In a passage's transfer the news at a place and how fast two pasts stop differing
+there are two exponents, and a moment's decay is the second. G123's rule also bars reading a
+second quantity into the stride (no complex length of its own angle).
+
+### 4.2 A level's sites are the epochs of the news below it, begun again at each opening
+
+Let `c_t ≥ 0` be the news of place `t` of a region (§4.4) and `σ` the level's section (§4.6).
+
+```text
+a_o = c_o                                at an opening o (a region's first place opens)
+t opens  ⇔  a_(t−1) + c_t > σ,           then a_t = c_t;   otherwise a_t = a_(t−1) + c_t
+L_j = Σ_(t∈e_j) c_t,   Σ_j L_j = S       an epoch carries its own length; nothing is released
+```
+
+- The place that would carry the sum past the section **opens** the next epoch, so an epoch is a
+  bright lead and the darker places that follow it. That is the moment's own convention (a
+  place's stride is the gap before it) and the composite of the store record's §8.4: a lead and
+  its continuation.
+- **Two readings that open at one place agree at every later place**, since the rule reads the
+  prefix only through the last opening. **A place whose news exceeds the section opens under
+  every reading.** Those places are landmarks in the objects' sense, faces where the paths of
+  every reading converge, and they are what makes the cut origin-free: §3.3's 0.9997.
+- An epoch of more than one place holds at most one section of news. An epoch of one place
+  holds that place's news, whatever it is.
+- The rule is integer sums and one comparison a place on the code's grain, so any partition of
+  the card gives the same bits. A serial scan of a region is a realization; so is a jump table
+  (`next(t)`, the first place the sum from `t` passes `σ`, is a function of `t` alone).
+- The cut and the lengths are data to the pass that reads them: a carry has no first-order
+  return, and the built clock law already takes the face as an operand of the clock.
+
+### 4.3 The level's clock is the news between its sites
+
+Site `j` of the level strides `κ¹_j = L_j/σ` on the paced clock's grain, so
+`τ¹_j − τ¹_i = (news from epoch i+1 through epoch j)/σ`. This is October's clock of news kept as
+a clock: its count law, its carry between sections that divide one another and its nesting
+(`hnn.tower-news-clock-carry`) are statements about `⌊S/σ⌋`, and they stand for the level's
+elapsed time. It is no longer the law of where the level's sites open. The built packets' level
+runs plain clocks (`plain_paces`); the per-site `κ` the clock structure already carries takes
+`L_j/σ` in their place, and at equal lengths that is the plain clock. Drive and move stay on one
+clock, the level's own: an epoch arrives once and the level steps once (October's repair, the
+held step).
+
+### 4.4 A place's news is read at its cavity face
+
+A place's news is the surprise of what stands there under what the others bring to it before
+any of them has heard it. The built opening is that face. An open, silent place opens on
+
+```text
+x^cav_t = E(∗) + E₋(u_(t−1)) + E₊(u_(t+1)) + C s^cav_t + b_s,      p̃_t = face(x^cav_t)   read through the encoding
+```
+
+with `s^cav_t` the place's moment from the other places as they stand (its own terms absent, its
+own stride bare, as `Field::silent` has it). For a written place the same expression is its
+**cavity opening**: the opening it would have as an open place among the others. So
+
+```text
+c_t = −log p̃_t(u_t)            at a written place (its entry compared at its cavity face)
+c_t = −Σ_a p̃_t(a) log p̃_t(a)   at an open place (the face's expected code; the blank's law of §16.44 with −log p̃ for the class rates)
+```
+
+- It is the house's loss read at a written place: the log of the ratio of what the others'
+  currents produce there to what stands there. A written place's surprise is as physical as an
+  open one's; only its comparison was never read.
+- No echo enters: at the opening no place has heard another. The cavity field of a read
+  (`tower.field-echo`) removes the same term after ticks; here it is absent by construction.
+- It is first order in the sources: the two strand rows and the moment's sum over every source
+  at its skin. Its count analogue is the two-sided form of §3.2, without the moment.
+- One law for every place of a region, fixed before the first tick, so the level's sites stand
+  through the pass's ticks: a field iterates one constitution on one complex. A release cuts
+  again at each stage's opening, and a place that is written there changes its expected code
+  for its realized one, which is what the blank's clock law already says of its duration.
+- **What is unread.** The readout's covector comes from the faces after the last tick. Whether
+  it reads an opening well enough to rank a region's places is the first reading the build
+  waits on (§9). If it does not, the opening's face is compared as the last tick's is, which changes
+  what the deposit consumes and is decided on that reading.
+- **Cost.** A cavity face at every place adds, a site, one step of its moment at the bare
+  stride and one readout through the encoding, with no contact and no tick. It is counted from
+  source and timed with the reading, before any build is ordered.
+
+### 4.5 An epoch's face is its moment on the news phase
+
+The built restriction opens a packet through one chart of its six sites' reads in place order.
+A place order is a count of places, the clock §4.2 retires. An epoch is opened on its
+phase-carried moment, the helical code's face `m = Σ_k Ĝ(τ(k))⁻¹E(u_k)` with the news as `τ`:
+
+```text
+φ_t = (a_t − c_t)/σ ∈ [0, 1]                                 the news before t inside its epoch
+m_k(j) = Σ_(t∈e_j) e^(2πi k φ_t) r̂(x_t),   k ∈ ℤ/6             rings 2 and 3, the built packets' own
+restrict   x¹_j ← Σ_k A_k m_k(j) + b_A
+prolong    x_t += Re Σ_k e^(−2πi k φ_t) (B_k r̂(x¹_j) + b_k)     founded with B = 0, b = 0
+```
+
+With six places of equal news `φ_t = (t − 6j)/6`, and the six harmonics are the discrete
+Fourier chart of the six places' rows: the built packets are this law on the plain clock, with
+the same count of entries. Predicted places added to an epoch leave every other place's phase
+where it was; under the place-order chart they move every later place to another row. The
+phase between whole residues is the paced clock's realization (the resident ring at a whole
+turn, the series between). Rings 2 and 3 are the packets' declared periods and are kept only as
+the plain case's. How many harmonics an epoch's interior needs is read on a state once epochs
+are cut, and the part is sized from that reading.
+
+### 4.6 The section is the width of the boundary's digit
+
+A level's section is its receiver's. The first level above octets has one unit that is not a
+dial: the width of the digit the boundary codec delivers, 8 bits, the news of one place nothing
+predicts. October's first clocked level stood there (`B = 8`). Two consequences:
+
+- **The founding is the identity.** Under a flat face every place opens its own epoch: as many
+  sites above as places below. An epoch lengthens as its places are predicted. This is the lens
+  of November 12 (20:31Z) as a law of extent: predicted input closes up, and the level above
+  falls in sites as the machine learns.
+- **The extent today.** Under a count reader of two octets back (2.11 to 2.48 nats a place by
+  slice) an epoch is 1.9 places in the mean, 0.53 of the places as sites. The store at 5,001
+  sections codes a masked held place at 2.39 to 2.93 nats by slice, so its level above would
+  open at about half its places or more (agent-inferred from the ruler's fill; the reading of
+  §9 says).
+
+A second level's section is not fixed here. It is cut on the first level's lengths by the same
+rule, and its section is read from those lengths by a ruler before it is sized: it is not twice
+the first by default.
+
+### 4.7 Which symbol: the address half
+
+- **An epoch has no row.** Its word is its factors' strand, the moment of §4.5, with a
+  remainder the level above learns in its own entries. No table of epochs, merges or boundaries
+  exists anywhere in the machine, and the cut reads nothing but the machine's own faces.
+- **The octet alphabet is not tied on text.** The store record's control found most of a
+  located address's share in the law of frequencies, and expects no lower held code from tied
+  rows at the octet alphabet. A series on located rings is built where free rows cannot hold
+  the alphabet: for values (samples and pixels, by rank registers) when those charts enter.
+- **Rows along the ladder of modes** (the record of the symbol's length §10.2): not shared.
+  §3.1 reads the two paced clocks as two keys (0.485 in rank), not one table at two rates.
+- **Rows along a ring's units' orbits** (§11.4 there): on `ℤ/6` the orbits are `{0}`, `{3}`,
+  `{2, 4}`, `{1, 5}`, and a real chart already shares each conjugate pair. Nothing is added
+  until a longer ring is declared.
+- **Guard 9 reaches the tower with the build.** A relabelling of the exterior alphabet leaves
+  the cut, the lengths and every face of the level as they were; the build carries that as a
+  test on the tower's entries, since guard 9's tests stand on `hnn::encoding` alone.
+
+## 5. What this corrects in the records of November 12
+
+- The record of the symbol's length §8.1 and §8.3 ("one clock"): the moments' strides stay
+  located (§4.1); the stride that reads the place is the level above's. October's failure was a
+  drive and a move on two clocks inside one level, and §4.3 keeps one clock a level.
+- The same record §10.1 said a re-timing by places the reader predicts leaves the carries where
+  they were. That holds only at a code of zero. Any code added earlier moves every later
+  opening of the odometer: 0.31 kept under a shifted start and 0.43 under a doubled indentation
+  whose added places code 0.19 nats each. The restarting cut is the one that holds it (§3.2,
+  §3.3). The clock of news is still the strand's proper time; a place's opening is not a
+  reading of that clock.
+- The store record §8.4 called an epoch "the places between two carries of the accumulated
+  stride on a declared ring", on a paced clock. The epoch is the news's, cut by §4.2.
+
+## 6. The charts, and what stays behind
+
+| Discipline | Its name for the operation | What transfers | What stays behind |
+|---|---|---|---|
+| Friction, fracture | stick and slip; a joint that loads to a threshold and releases (the joints of October 8) | the release is an event of the load's own, placed by what broke it | the regimes of disorder (snap, crackle, pop), unread here |
+| Oscillators | a relaxation oscillator: charge to a threshold, discharge, begin again | the arrival word locks to the drive's large events, and two phases merge at one | a threshold as a tuned dial |
+| Probability | a renewal process with regeneration at its epochs; coupling | readings from two starts coalesce at a common epoch and agree after | independence of the increments (a text's are not) |
+| Codes, storage | a self-synchronizing code; a cut defined by content | a boundary that depends on a bounded past survives an insertion | an authored rule on the bytes (a hash, a comma) as machinery |
+| Statistical mechanics | the cavity field; a pseudo-likelihood's conditional | a site's field with the site removed is what its entry is compared with | the mean-field closure |
+| Signals | a spectrogram's time base; a phase vocoder's stretch | a stretch moves places and keeps phases on the event's own clock | the frame as a fixed count of samples |
+
+Each name was searched in the atlas, the records and the source before this section was
+written. The tree held the carry law, the counterexample of the arrival word, the joint that
+loads and releases, the cavity field of a read and the masked sum as a pseudo-likelihood
+(`code.order-agnostic-masked-bound`). It held no cut of a strand's places by such a release,
+and no comparison of a written place at its cavity face.
+
+## 7. Which recorded failures the design could repeat
+
+- *An authored routine standing in for learning.* The cut is one comparison on the machine's
+  own codes. A boundary rule on bytes, a list of composites or a parser would be the failure,
+  and none enters.
+- *Text run on its codec's grain as the exception.* The section is the boundary digit's width
+  and the cut names no class; §8 states the same law for values.
+- *Recitation counted as generation.* The invariance is graded on re-timed copies of held text
+  the machine has not met, never on items it has.
+- *A located cause carried unrepaired into a new consumer.* The trained rates' own cut (§3.1)
+  is named and left open, and nothing is built on it. The packets' missed acceptance (the field
+  record §16.39) is not assumed repaired by the new cut: no held code is promised.
+- *A design thought in the programming language.* The packet's slots become phases on rings;
+  the cut is a carry.
+- *A width as a dial.* The section follows from the boundary's digit, the harmonics and a
+  second section from readings.
+- *Bits read as progress.* The acceptance is structural first (§9).
+
+## 8. Text, image, acoustic, motor
+
+The cut reads a place's code under its cavity face and the boundary digit's width, and nothing
+of the medium. A pixel row's or a sample stream's places are cut the same way: a flat stretch
+closes into one epoch behind the edge that leads it. A motor chart's serial screw words are
+places with codes like any other. Only the boundary codec is the medium's. The count rulers of
+§3 on values (a place's own code against one constant a level, and the shares under a stretch)
+are owed before a value chart is built.
+
+## 9. Acceptance, the device line, and the order of work
+
+**The acceptance is an invariance**, read on the machine's own codes, with the held code beside
+it as one reading and no level promised:
+
+1. the share of a held passage's openings kept under a shifted start, and under re-timings the
+   trained reader predicts (the doubled indentation on the code slice; one more on prose, named
+   in the order), against the odometer's and the built packets' shares on the same pair;
+2. a predicted failure: under a re-timing the reader has not met (every octet doubled) the
+   added places are bright, the sites double and the share falls; it returns once the reader
+   has learned the doubling;
+3. the spread of an epoch's news and the screen ratio at the openings;
+4. the held code by slice and kind at lap means, and the writes by slice, against the line
+   without the level. The founding reads every face of the field it is founded on.
+
+**The order.**
+
+1. *A reading, on the PC, from state C, outside any timing hold* (the next order): every held
+   place's code at its cavity opening, by slice; its rank against the last tick's code where a
+   mask compares the place; the restarting cut at 8 bits on those codes (mean epoch, one-place
+   share, spread, shares under the shifted start and the stretch); and the count, from source,
+   of what a cavity face a site adds to a section. Its guess is fixed in the order.
+2. *The build* is ordered after that reading and after the engine's fourth repair is timed,
+   with its guess and its cost stated against the card: the cut, the level's clock, the phase
+   chart, a field of the level's own founded as the built `Scale` is. A first build of a new
+   part: it enters the store's line by reproducing the line's lap with the level founded at
+   zero.
+
+**The device line.** The card, under its lock; the reading of item 1 is a host reading from a
+saved state and leaves its bytes the same.
+
+## 10. What is owed
+
+- **Lean (#410).** That two readings of the restarting cut which open at one place agree at
+  every later place, and that a place whose code exceeds the section opens under every reading;
+  that the epochs' lengths sum to the strand's news and an epoch of more than one place holds
+  at most a section; that a cut on a level's lengths nests in the level's cut; that the phase
+  chart at equal codes is the discrete Fourier chart of the place-order chart.
+- **The trained rates' own cut** (§3.1): what the two clocks located, read by a ruler that is
+  not a count of one symbol.
+- **The harmonics an epoch needs and a second level's section**, each from a reading.
+- **The rulers on values** (§8).

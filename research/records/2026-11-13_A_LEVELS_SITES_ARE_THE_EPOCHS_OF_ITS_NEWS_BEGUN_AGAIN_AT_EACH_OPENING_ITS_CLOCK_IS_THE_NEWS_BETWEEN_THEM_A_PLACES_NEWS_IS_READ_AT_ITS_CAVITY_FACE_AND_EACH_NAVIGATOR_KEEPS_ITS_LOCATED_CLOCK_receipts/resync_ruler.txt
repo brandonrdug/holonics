@@ -1,0 +1,93 @@
+# epoch_cut_ruler: paces of 244 symbols the codec holds, 99 of them the code line's bytes; columns rate_A_head2 rate_C_head2 rate_A_head3 rate_C_head3
+PACES rate_A_head2 code_line: mean=2.718 spread=1.187 letters_mean=2.369 newline=4.362 space=2.744 | all bytes met later take their own
+PACES rate_C_head2 code_line: mean=2.755 spread=1.167 letters_mean=2.414 newline=4.396 space=2.856 | all bytes met later take their own
+PACES rate_A_head3 code_line: mean=3.093 spread=1.674 letters_mean=2.640 newline=14.247 space=2.021 | all bytes met later take their own
+PACES rate_C_head3 code_line: mean=3.152 spread=1.687 letters_mean=2.689 newline=14.456 space=2.196 | all bytes met later take their own
+# counts<=32 MB a slice, read: the held role's first 330000 places a slice; load_s=8
+RESYNC slice=code held_read=329339 pieces=111 mean c0=3.5437 c1=2.7436 c2=2.2104 c2s=1.8203  s=10
+  CUT fixed 6                     mean_epoch=5.995 code=0.9982 spread=0.4737 epoch_nats=13.251 screen=0.9985
+  CUT odometer own               period=13.275 mean_epoch=6.000 code=2.0251 spread=0.1728 epoch_nats=13.280 screen=0.8431
+  CUT restarting own             period=15.182 mean_epoch=6.000 code=2.0532 spread=0.1254 epoch_nats=13.275 screen=0.8235
+  CUT restarting pair c1         period=18.390 mean_epoch=5.999 code=1.6198 spread=0.2505 epoch_nats=13.268 screen=1.0405
+  CUT restarting two-sided c2s   period=12.674 mean_epoch=6.000 code=1.7994 spread=0.3086 epoch_nats=13.273 screen=0.2757
+  CUT restarting class           period=14.716 mean_epoch=6.000 code=1.3977 spread=0.3313 epoch_nats=13.265 screen=0.9570
+  CUT odometer rate_C_head2      period=13.602 mean_epoch=6.000 code=1.0500 spread=0.5967 epoch_nats=13.257 screen=0.8775
+  CUT restarting rate_C_head2    period=14.948 mean_epoch=6.000 code=1.0549 spread=0.6011 epoch_nats=13.252 screen=0.8828
+  CUT odometer rate_C_head3      period=16.876 mean_epoch=6.000 code=1.0738 spread=0.6121 epoch_nats=13.266 screen=0.7754
+  CUT restarting rate_C_head3    period=19.119 mean_epoch=6.000 code=1.0383 spread=0.6550 epoch_nats=13.263 screen=0.8148
+  STRETCH code: places 330111 to 379011 (added 48900, 0.1290 of the copy); mean c2 of an added space 0.1941, of an original leading space 0.1810, of the other read places 2.5643 to 2.5666 in the copy
+  STRETCH fixed 6                    kept=0.3593 of 46684
+  STRETCH odometer own               kept=0.4330 of 54110
+  STRETCH restarting own             kept=0.8282 of 54117
+  STRETCH restarting pair c1         kept=0.6569 of 53422
+  STRETCH restarting two-sided c2s   kept=0.8830 of 53869
+  STRETCH restarting class           kept=0.6035 of 52596
+  STRETCH odometer rate_C_head2      kept=0.3667 of 44538
+  STRETCH restarting rate_C_head2    kept=0.5605 of 44581
+  STRETCH odometer rate_C_head3      kept=0.4263 of 48462
+  STRETCH restarting rate_C_head3    kept=0.6721 of 47374
+RESYNC slice=web held_read=329441 pieces=94 mean c0=3.4545 c1=2.8291 c2=2.3501 c2s=1.9766  s=15
+  CUT fixed 6                     mean_epoch=5.995 code=1.0029 spread=0.3525 epoch_nats=14.103 screen=1.0116
+  CUT odometer own               period=14.105 mean_epoch=6.000 code=1.6801 spread=0.1528 epoch_nats=14.111 screen=0.8359
+  CUT restarting own             period=15.884 mean_epoch=6.000 code=1.7020 spread=0.1134 epoch_nats=14.106 screen=0.8172
+  CUT restarting pair c1         period=18.790 mean_epoch=6.000 code=1.3883 spread=0.2228 epoch_nats=14.113 screen=1.0194
+  CUT restarting two-sided c2s   period=13.489 mean_epoch=5.999 code=1.5354 spread=0.2589 epoch_nats=14.101 screen=0.3388
+  CUT restarting class           period=15.524 mean_epoch=5.999 code=1.2701 spread=0.2744 epoch_nats=14.114 screen=0.9923
+  CUT odometer rate_C_head2      period=11.707 mean_epoch=6.000 code=1.0778 spread=0.3961 epoch_nats=14.118 screen=0.9721
+  CUT restarting rate_C_head2    period=12.973 mean_epoch=5.999 code=1.0806 spread=0.4044 epoch_nats=14.114 screen=0.9676
+  CUT odometer rate_C_head3      period=14.313 mean_epoch=5.999 code=1.0937 spread=0.4006 epoch_nats=14.118 screen=0.9324
+  CUT restarting rate_C_head3    period=15.933 mean_epoch=6.000 code=1.1182 spread=0.4335 epoch_nats=14.120 screen=0.9125
+RESYNC slice=science held_read=329929 pieces=36 mean c0=3.5320 c1=2.7718 c2=2.3547 c2s=1.9351  s=21
+  CUT fixed 6                     mean_epoch=5.998 code=1.0047 spread=0.3499 epoch_nats=14.128 screen=1.0114
+  CUT odometer own               period=14.117 mean_epoch=6.000 code=1.6642 spread=0.1554 epoch_nats=14.135 screen=0.8065
+  CUT restarting own             period=15.878 mean_epoch=6.000 code=1.6796 spread=0.1148 epoch_nats=14.131 screen=0.7935
+  CUT restarting pair c1         period=18.411 mean_epoch=6.000 code=1.3751 spread=0.2280 epoch_nats=14.133 screen=1.0158
+  CUT restarting two-sided c2s   period=13.181 mean_epoch=6.000 code=1.5207 spread=0.2613 epoch_nats=14.131 screen=0.2510
+  CUT restarting class           period=15.543 mean_epoch=6.000 code=1.2639 spread=0.2811 epoch_nats=14.132 screen=0.9544
+  CUT odometer rate_C_head2      period=11.591 mean_epoch=6.000 code=1.0750 spread=0.4071 epoch_nats=14.133 screen=0.9113
+  CUT restarting rate_C_head2    period=12.848 mean_epoch=6.000 code=1.0848 spread=0.4154 epoch_nats=14.133 screen=0.9311
+  CUT odometer rate_C_head3      period=13.992 mean_epoch=6.000 code=1.1009 spread=0.3875 epoch_nats=14.133 screen=0.9056
+  CUT restarting rate_C_head3    period=15.594 mean_epoch=6.000 code=1.1266 spread=0.4167 epoch_nats=14.132 screen=0.8946
+RESYNC slice=books held_read=329951 pieces=9 mean c0=3.1645 c1=2.5119 c2=2.1083 c2s=1.7163  s=27
+  CUT fixed 6                     mean_epoch=6.000 code=0.9974 spread=0.2963 epoch_nats=12.650 screen=0.9900
+  CUT odometer own               period=12.646 mean_epoch=6.000 code=1.6238 spread=0.1435 epoch_nats=12.651 screen=0.9684
+  CUT restarting own             period=14.197 mean_epoch=5.999 code=1.6374 spread=0.1039 epoch_nats=12.649 screen=0.9652
+  CUT restarting pair c1         period=16.669 mean_epoch=6.000 code=1.3841 spread=0.1915 epoch_nats=12.651 screen=1.0963
+  CUT restarting two-sided c2s   period=11.691 mean_epoch=6.000 code=1.4882 spread=0.2574 epoch_nats=12.651 screen=0.5718
+  CUT restarting class           period=13.928 mean_epoch=5.999 code=1.2861 spread=0.2432 epoch_nats=12.650 screen=1.0486
+  CUT odometer rate_C_head2      period=10.643 mean_epoch=6.000 code=1.0089 spread=0.3605 epoch_nats=12.652 screen=0.8818
+  CUT restarting rate_C_head2    period=11.754 mean_epoch=6.000 code=1.0267 spread=0.3669 epoch_nats=12.652 screen=0.8839
+  CUT odometer rate_C_head3      period=12.573 mean_epoch=5.999 code=1.0740 spread=0.3008 epoch_nats=12.650 screen=0.9443
+  CUT restarting rate_C_head3    period=13.721 mean_epoch=6.000 code=1.0737 spread=0.2952 epoch_nats=12.652 screen=0.9224
+RESYNC slice=wikidata held_read=329645 pieces=60 mean c0=4.0115 c1=2.8566 c2=2.4812 c2s=2.0947  s=31
+  CUT fixed 6                     mean_epoch=5.997 code=1.0072 spread=0.3769 epoch_nats=14.884 screen=0.9918
+  CUT odometer own               period=14.883 mean_epoch=5.999 code=1.6441 spread=0.1561 epoch_nats=14.892 screen=0.6311
+  CUT restarting own             period=16.672 mean_epoch=6.000 code=1.6601 spread=0.1115 epoch_nats=14.892 screen=0.6381
+  CUT restarting pair c1         period=18.884 mean_epoch=6.000 code=1.2894 spread=0.2744 epoch_nats=14.892 screen=1.0224
+  CUT restarting two-sided c2s   period=14.328 mean_epoch=6.006 code=1.4757 spread=0.2837 epoch_nats=14.908 screen=-0.1716
+  CUT restarting class           period=16.339 mean_epoch=5.999 code=1.2119 spread=0.2965 epoch_nats=14.889 screen=0.8951
+  CUT odometer rate_C_head2      period=10.315 mean_epoch=6.000 code=1.0737 spread=0.4130 epoch_nats=14.891 screen=0.8776
+  CUT restarting rate_C_head2    period=11.449 mean_epoch=6.000 code=1.0706 spread=0.4181 epoch_nats=14.888 screen=0.9321
+  CUT odometer rate_C_head3      period=13.297 mean_epoch=6.000 code=1.0936 spread=0.4533 epoch_nats=14.889 screen=0.7671
+  CUT restarting rate_C_head3    period=15.195 mean_epoch=6.000 code=1.1238 spread=0.5308 epoch_nats=14.886 screen=0.5974
+RESYNC pooled over the five slices (each its own period)
+  CUT fixed 6                     mean_epoch=5.997 code=1.0023 spread=0.3793 epoch_nats=13.803 screen=1.0010
+  CUT odometer own                mean_epoch=6.000 code=1.7218 spread=0.1665 epoch_nats=13.814 screen=0.8196
+  CUT restarting own              mean_epoch=6.000 code=1.7406 spread=0.1272 epoch_nats=13.810 screen=0.8092
+  CUT restarting pair c1          mean_epoch=6.000 code=1.4061 spread=0.2442 epoch_nats=13.811 screen=1.0382
+  CUT restarting two-sided c2s    mean_epoch=6.001 code=1.5594 spread=0.2809 epoch_nats=13.812 screen=0.2530
+  CUT restarting class            mean_epoch=6.000 code=1.2831 spread=0.2933 epoch_nats=13.810 screen=0.9699
+  CUT odometer rate_C_head2       mean_epoch=6.000 code=1.0583 spread=0.4446 epoch_nats=13.810 screen=0.9049
+  CUT restarting rate_C_head2     mean_epoch=6.000 code=1.0644 spread=0.4508 epoch_nats=13.808 screen=0.9186
+  CUT odometer rate_C_head3       mean_epoch=6.000 code=1.0877 spread=0.4473 epoch_nats=13.811 screen=0.8624
+  CUT restarting rate_C_head3     mean_epoch=6.000 code=1.0974 spread=0.4877 epoch_nats=13.810 screen=0.8313
+  SHIFT odometer own               kept=0.3099 of 274592 | by opening: second=0.323 third=0.294 fourth=0.300 later=0.310
+  SHIFT restarting own             kept=0.9909 of 274616 | by opening: second=0.226 third=0.342 fourth=0.406 later=0.993
+  SHIFT restarting pair c1         kept=0.9832 of 274578 | by opening: second=0.165 third=0.268 fourth=0.316 later=0.986
+  SHIFT restarting two-sided c2s   kept=0.9929 of 274428 | by opening: second=0.265 third=0.413 fourth=0.510 later=0.995
+  SHIFT restarting class           kept=0.9806 of 275226 | by opening: second=0.139 third=0.181 fourth=0.274 later=0.983
+  SHIFT odometer rate_C_head2      kept=0.1552 of 274537 | by opening: second=0.184 third=0.174 fourth=0.219 later=0.155
+  SHIFT restarting rate_C_head2    kept=0.9849 of 274557 | by opening: second=0.135 third=0.177 fourth=0.245 later=0.988
+  SHIFT odometer rate_C_head3      kept=0.2482 of 274587 | by opening: second=0.277 third=0.319 fourth=0.500 later=0.248
+  SHIFT restarting rate_C_head3    kept=0.9963 of 274646 | by opening: second=0.219 third=0.406 fourth=0.716 later=0.998
+  SHIFT fixed 6                    kept=0.0000 of 274879 | by opening: second=0.000 third=0.000 fourth=0.000 later=0.000
