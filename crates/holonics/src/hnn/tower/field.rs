@@ -3516,6 +3516,23 @@ impl Field {
         Ok(out)
     }
 
+    /// [measurement; theory, November 13, the junction record §9 item 1] **Each site's echo by head** (`[h][i]` on `2^(−63)`): head `h`'s
+    /// `B_i^h`, the mean over consecutive ticks of `Σ_j p_ji^(t) p_ij^(t+1)` ([`round_trips`]), the share of a site's arrival that is its own
+    /// state of two ticks before, returned by the sites it told. [`FieldRead::echo`] is its mean over heads. An unresolved site is no source,
+    /// so its row reads zero. A reading only: nothing in the law reads it.
+    pub fn echo_by_head(&self, region: &Region) -> Result<Vec<Vec<u64>>> {
+        let pass = self.pass(region, true)?;
+        let (sites, heads) = (region.classes.len(), self.declaration.heads);
+        let mut trips = vec![vec![0u128; sites]; heads];
+        for w in pass.ticks.windows(2) {
+            for (h, t) in trips.iter_mut().enumerate() {
+                round_trips(&w[0].rows[h * sites..(h + 1) * sites], &w[1].rows[h * sites..(h + 1) * sites], sites, t);
+            }
+        }
+        let read = (pass.ticks.len().saturating_sub(1)).max(1) as u128;
+        Ok(trips.iter().map(|t| t.iter().map(|&b| ((b + read / 2) / read) as u64).collect()).collect())
+    }
+
     /// [measurement; agent-inferred, November 2] **A held read's rows by where their mass lies** ([`HeldRows`]):
     /// for each tick and head (`[tick · heads + head]`), over the region's unresolved sites, the shares of
     /// the question group (definite sites before `question`), of the soft near field and of the rest, and the
