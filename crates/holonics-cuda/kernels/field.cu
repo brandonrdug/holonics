@@ -2194,6 +2194,74 @@ __device__ __forceinline__ bool narrow31(wide v, int32_t *out) {
     return (uwide)(v + ((((wide)1) << 31) - 1)) < ((((uwide)1) << 32) - 1);
 }
 
+// [measurement; theory, November 13, P55 A2 and A3] **The helpers' calls, counted, and their operands, sampled** (a ruler: only the counting build
+// of the profile example defines RULER_CALLS, so a learner's PTX is the law's byte for byte). At each call site of the two return entries a lane's
+// call is counted, and the warp's issue of it once (by its lowest active lane), into the block's shared tally (kind `k` the lanes, `k + 1` the
+// warps); each row adds its tally to the run's, by entry, head and row (open or definite). A helper's first RULER_SAMPLES calls keep their operands
+// for the yardsticks (`field_yard_helper`).
+#ifdef RULER_CALLS
+#define RULER_KINDS 32
+#define RULER_HEADS 8
+#define RULER_SAMPLES (1u << 14)
+#define RULER_SAMPLE_KINDS 12
+#define RULER_SAMPLE_WORDS 8
+__device__ unsigned long long RULER_TALLY[2 * RULER_HEADS * 2 * RULER_KINDS];
+__device__ unsigned long long RULER_SAMPLE_COUNT[RULER_SAMPLE_KINDS];
+__device__ int64_t RULER_SAMPLE[RULER_SAMPLE_KINDS * RULER_SAMPLES * RULER_SAMPLE_WORDS];
+__shared__ unsigned int RULER_T[4][RULER_KINDS];
+#define RULER_ON 1
+#define RULER_ZERO() do { RULER_T[threadIdx.x >> 5][threadIdx.x & 31] = 0u; __syncwarp(); } while (0)
+#define RULER_COUNT(k) do { const unsigned rw_ = threadIdx.x >> 5, rl_ = threadIdx.x & 31; atomicAdd(&RULER_T[rw_][(k)], 1u); if ((__activemask() & ((1u << rl_) - 1u)) == 0u) { atomicAdd(&RULER_T[rw_][(k) + 1], 1u); } } while (0)
+#define RULER_FLUSH(entry, h, open) do { __syncwarp(); const unsigned rw_ = threadIdx.x >> 5, rl_ = threadIdx.x & 31; const unsigned v_ = RULER_T[rw_][rl_]; if (v_ != 0u) { atomicAdd(&RULER_TALLY[(((entry) * RULER_HEADS + (h)) * 2 + ((open) ? 1 : 0)) * RULER_KINDS + rl_], (unsigned long long)v_); } RULER_T[rw_][rl_] = 0u; __syncwarp(); } while (0)
+#define RULER_TAKE(kind, a0, a1, a2, a3, a4, a5) do { if (RULER_SAMPLE_COUNT[(kind)] < RULER_SAMPLES) { const unsigned long long ix_ = atomicAdd(&RULER_SAMPLE_COUNT[(kind)], 1ull); if (ix_ < RULER_SAMPLES) { int64_t *s_ = RULER_SAMPLE + ((uint64_t)(kind) * RULER_SAMPLES + ix_) * RULER_SAMPLE_WORDS; s_[0] = (int64_t)(a0); s_[1] = (int64_t)(a1); s_[2] = (int64_t)(a2); s_[3] = (int64_t)(a3); s_[4] = (int64_t)(a4); s_[5] = (int64_t)(a5); } } } while (0)
+// div_nearest's 128 by 128 branch (its own test), and mul_fits's full product (past its 126-bit test).
+#define RULER_DIV(k64, x, k) do { const wide x_ = (x), k_ = (k); const wide n_ = (x_ >= 0 ? x_ : -x_) + k_ / 2; if (n_ <= (wide)INT64_MAX && k_ <= (wide)INT64_MAX) { RULER_COUNT(k64); } else { RULER_COUNT((k64) + 2); } } while (0)
+#define RULER_MULFITS(kfast, a, b) do { if (wide_bits((a)) + wide_bits((b)) <= 126) { RULER_COUNT(kfast); } else { RULER_COUNT((kfast) + 2); } } while (0)
+#define WLO(x) ((int64_t)(uint64_t)(uwide)(x))
+#define WHI(x) ((int64_t)(uint64_t)((uwide)(x) >> 64))
+#else
+#define RULER_ON 0
+#define RULER_ZERO() do { } while (0)
+#define RULER_COUNT(k) do { } while (0)
+#define RULER_FLUSH(entry, h, open) do { } while (0)
+#define RULER_TAKE(kind, a0, a1, a2, a3, a4, a5) do { } while (0)
+#define RULER_DIV(k64, x, k) do { } while (0)
+#define RULER_MULFITS(kfast, a, b) do { } while (0)
+#endif
+// The rows' kinds (entry 0) and the skin's return's (entry 1).
+#define RK_ROW 0
+#define RK_PAIR 2
+#define RK_CROWD 4
+#define RK_DIVISOR 6
+#define RK_DIVBY 8
+#define RK_LOCKDIV64 10
+#define RK_LOCKDIV128 12
+#define RK_LOCK_FALLBACK 14
+#define RK_MULFITS_FAST 16
+#define RK_MULFITS_SLOW 18
+#define RK_ADDWIDE 20
+#define RK_W_WIDE 22
+#define RK_PROBE 24
+#define RK_CROWD_ENTRY 26
+#define RK_CROWD_X 28
+#define RK_LOCKMODE 30
+#define PK_ROW 0
+#define PK_PAIR 2
+#define PK_PAIR_SIGNED 4
+#define PK_PAIR_MODE 6
+#define PK_CROWD 8
+#define PK_CROWD_SIGNED 10
+#define PK_TURNDIV64 12
+#define PK_TURNDIV128 14
+#define PK_VALDIV64 16
+#define PK_VALDIV128 18
+#define PK_MULFITS_FAST 20
+#define PK_MULFITS_SLOW 22
+#define PK_ADDWIDE 24
+#define PK_W_WIDE 26
+#define PK_BRDIV64 28
+#define PK_BRDIV128 30
+
 // [definition; agent-inferred, November 1] **A mode's lock against the source that arrives** (the host's
 // `lock`, §15.2): `2 count D Re(conj(a) b) 2^g − D² |b|²` for the receiver's mode `a` and a source's `b`
 // (a crowd's summed word over its `count`) carried by the skin `(D, g)`, every product and sum checked
@@ -2365,7 +2433,9 @@ __device__ __forceinline__ int64_t crowd_base_narrow(const FieldWords &w, uint32
                 lk = (mul64_128(pairing, c2d) << g) - mul64_128(power, mul32((int64_t)d, (int64_t)d));
             }
         }
+        RULER_COUNT(RK_LOCKMODE);
         if (!narrow) {
+            RULER_COUNT(RK_LOCK_FALLBACK);
             lk = lock_of(wi[l], wi[w.n + l], b0, b1, (wide)count, d, g, w.status);
         }
         if (!add_fits(s, lk, &s)) {
@@ -2373,6 +2443,13 @@ __device__ __forceinline__ int64_t crowd_base_narrow(const FieldWords &w, uint32
         }
     }
     const uint32_t bits = FACE_BITS + 2 * g + 1;
+    RULER_DIV(RK_LOCKDIV64, s, (wide)(count * count) << bits);
+#if RULER_ON
+    {
+        const wide k_ = (wide)(count * count) << bits;
+        RULER_TAKE(g != 0 ? 0 : 1, WLO(s), WHI(s), WLO(k_), WHI(k_), 0, 0);
+    }
+#endif
     return fit64(div_nearest(s, (wide)(count * count) << bits), w.status);
 }
 
@@ -3778,7 +3855,11 @@ __device__ __forceinline__ wide gained(wide v, int32_t beta, uint32_t *st) {
 // `cw`. A lane is a pair for the row's sums and the staged `δs`, and an entry of the span for the row's
 // return.
 #define REV_ROWS 4
-extern "C" __global__ void __launch_bounds__(REV_ROWS * 32, 6) field_contact_rows(FieldWords w, uint32_t h, const int64_t *dyh, int64_t *ds, int64_t *dq) {
+// [measurement; theory, November 13, P55 A4] The rows' least blocks a multiprocessor in their launch bounds (6; a reading build defines 4).
+#ifndef ROWS_MIN_BLOCKS
+#define ROWS_MIN_BLOCKS 6
+#endif
+extern "C" __global__ void __launch_bounds__(REV_ROWS * 32, ROWS_MIN_BLOCKS) field_contact_rows(FieldWords w, uint32_t h, const int64_t *dyh, int64_t *ds, int64_t *dq) {
     __shared__ uint32_t stj[REV_ROWS][32], stk[REV_ROWS][32];
     __shared__ int64_t dss[REV_ROWS][32];
     __shared__ wide dpcs[REV_ROWS][MAX_CROWD_SLOTS];
@@ -3796,6 +3877,7 @@ extern "C" __global__ void __launch_bounds__(REV_ROWS * 32, 6) field_contact_row
     const bool still = skinless(w, h);
     const uint32_t g0 = still ? 0 : MOVE_BITS;
     const uint64_t rows1 = (uint64_t)w.T + w.R;
+    RULER_ZERO();
     for (uint64_t g = ((uint64_t)blockIdx.x * blockDim.x + threadIdx.x) >> 5; g < w.T; g += (uint64_t)gridDim.x * (blockDim.x >> 5)) {
         const uint64_t hg = (uint64_t)h * w.T + g;
         if (skipped_row(w, g)) {
@@ -3815,6 +3897,9 @@ extern "C" __global__ void __launch_bounds__(REV_ROWS * 32, 6) field_contact_row
         const uint32_t *off = w.class_off + ((uint64_t)h * w.R + r) * (2 * classes + 1);
         const uint32_t c = w.cls[hg];
         const uint32_t K = row_prepare(w, hg, off, rcs[warp], lane);
+        if (lane == 0) {
+            RULER_COUNT(RK_ROW);
+        }
         const uint64_t *e = w.e + (uint64_t)h * w.E + w.region_eoff[r] + (uint64_t)i * sites;
         int64_t *dsr = ds + w.region_eoff[r] + (uint64_t)i * sites;
         wide *dpr = w.dpb + w.region_eoff[r] + (uint64_t)i * sites;
@@ -3881,6 +3966,9 @@ extern "C" __global__ void __launch_bounds__(REV_ROWS * 32, 6) field_contact_row
             crhi[warp][lane] = hi_;
             crlv[warp][lane] = lv;
             if (count != 0) {
+                RULER_COUNT(RK_CROWD);
+                RULER_COUNT(RK_DIVISOR);
+                RULER_COUNT(RK_DIVISOR);
                 cdiv[warp][lane] = divisor_of(count);
                 cdiv2[warp][lane] = divisor_of(count * count);
             }
@@ -3893,6 +3981,7 @@ extern "C" __global__ void __launch_bounds__(REV_ROWS * 32, 6) field_contact_row
             if (j == UINT32_MAX) {
                 continue;
             }
+            RULER_COUNT(RK_PAIR);
             const wide p = (wide)e[j];
             const uint32_t gap = j > i ? j - i : i - j;
             const wide dpj = eight ? pair_dp8(j, k, gap) : pair_dp(j, k, gap);
@@ -3903,8 +3992,10 @@ extern "C" __global__ void __launch_bounds__(REV_ROWS * 32, 6) field_contact_row
             const uint32_t lo = crlo[warp][lane], hi_ = crhi[warp][lane], lv = crlv[warp][lane];
             wide sum = 0;
             for (uint32_t x = 0; x < S; x++) {
+                RULER_COUNT(RK_CROWD_X);
                 sum += (wide)dyi[x] * crowd_carried_wide_ij(w, h, x % n, g, lv, lo > i, svp[(uint64_t)(hi_ + 1) * S + x] - svp[(uint64_t)lo * S + x]);
             }
+            RULER_COUNT(RK_DIVBY);
             const wide dpc = div_nearest_by(sum, cdiv[warp][lane]);
             dpcs[warp][lane] = dpc;
             weighted += (wide)w.ce[hg * w.slots + lane] * dpc;
@@ -3948,6 +4039,7 @@ extern "C" __global__ void __launch_bounds__(REV_ROWS * 32, 6) field_contact_row
                 for (uint32_t jj = part; jj < 32; jj += parts) {
                     const uint32_t jx = stj[warp][jj];
                     if (jx != UINT32_MAX) {
+                        RULER_COUNT(RK_PROBE);
                         // [P54 step 4] `δs (D ŵ_j)`: the skin and the unit word on 32 bits (their product under `2^61`), then 64 by 64.
                         sum += mul64_128(dss[warp][jj], mul32((int64_t)skin_raw_at(w, h, m, g, srow + stk[warp][jj], jx > i ? jx - i : i - jx), words[(uint64_t)jx * S + entry]));
                     }
@@ -3976,12 +4068,16 @@ extern "C" __global__ void __launch_bounds__(REV_ROWS * 32, 6) field_contact_row
             near_ds = warp_sum(near_ds);
             far_ds = warp_sum(far_ds);
             if (lane == 0) {
+                RULER_COUNT(RK_ADDWIDE);
+                RULER_COUNT(RK_ADDWIDE);
                 add_wide(w.dsshare + 2 * h, near_ds);
                 add_wide(w.dsshare + 2 * h + 1, far_ds);
             }
         }
         tacc = warp_sum(tacc);
         if (lane == 0 && tacc != 0) {
+            RULER_MULFITS(RK_MULFITS_FAST, tacc, rel(temper * ln2, LN2_FACE_BITS));
+            RULER_COUNT(RK_ADDWIDE);
             // Into the temperature's own chart (§16.12): `δℓ = release(δT · release(T ln 2, 30), 24)`, the row's.
             add_wide(w.gcov + w.temper_at + 2 * h + (rcs[warp].open ? 1 : 0), temper_chain(w, temper, tacc));
         }
@@ -3998,6 +4094,7 @@ extern "C" __global__ void __launch_bounds__(REV_ROWS * 32, 6) field_contact_row
                 const wide wsum = swp[(uint64_t)(hi_ + 1) * S + entry] - swp[(uint64_t)lo * S + entry];
                 // [P54 step 4] Where the crowd's summed word is under `2^31`: `D W`, `D ŵ_i` and `D²` on 32 bits (under `2^61`), their
                 // products by the covector, the count and `W` as 64 by 64; otherwise the wide forms.
+                RULER_COUNT(RK_CROWD_ENTRY);
                 int32_t w32;
                 wide bracket;
                 if (narrow31(wsum, &w32)) {
@@ -4005,13 +4102,32 @@ extern "C" __global__ void __launch_bounds__(REV_ROWS * 32, 6) field_contact_row
                     // The key's bracket released by the skin's bits once, its product by the covector checked.
                     bracket = rel((mul64_128(mul32((int64_t)d, w.pq[((uint64_t)h * w.T + g) * S + entry]), (int64_t)count) << g0) - mul64_128(mul32((int64_t)d, (int64_t)d), w32), g0);
                 } else {
+                    RULER_COUNT(RK_W_WIDE);
                     sum += div_nearest_by(dsk * d * wsum, cdiv[warp][jj]);
                     bracket = rel(((d * (wide)w.pq[((uint64_t)h * w.T + g) * S + entry] * (wide)count) << g0) - d * d * wsum, g0);
                 }
+                RULER_MULFITS(RK_MULFITS_FAST, dsk, bracket);
                 wide prod = 0;
                 if (!mul_fits(dsk, bracket, &prod)) {
                     atomicOr(w.status, REFUSED_KEY);
                 }
+#if RULER_ON
+                {
+                    RULER_COUNT(RK_DIVBY);
+                    RULER_COUNT(RK_DIVBY);
+                    RULER_COUNT(RK_DIVBY);
+                    RULER_COUNT(RK_ADDWIDE);
+                    RULER_COUNT(RK_ADDWIDE);
+                    RULER_COUNT(RK_ADDWIDE);
+                    RULER_COUNT(RK_ADDWIDE);
+                    const Divisor q1_ = cdiv[warp][jj], q2_ = cdiv2[warp][jj];
+                    const wide x_ = dsk * d * wsum;
+                    RULER_TAKE(2, WLO(prod), WHI(prod), q2_.k, q2_.d, q2_.v, q2_.s);
+                    RULER_TAKE(3, WLO(x_), WHI(x_), q1_.k, q1_.d, q1_.v, q1_.s);
+                    RULER_TAKE(4, WLO(dsk), WHI(dsk), WLO(bracket), WHI(bracket), 0, 0);
+                    RULER_TAKE(5, (first + r + lo) * S + entry, (first + r + hi_ + 1) * S + entry, 0, 0, 0, 0);
+                }
+#endif
                 const wide pw = div_nearest_by(prod, cdiv2[warp][jj]);
                 add_wide(w.cw + (first + r + lo) * S + entry, pw);
                 add_wide(w.cw + (first + r + hi_ + 1) * S + entry, -pw);
@@ -4031,6 +4147,7 @@ extern "C" __global__ void __launch_bounds__(REV_ROWS * 32, 6) field_contact_row
             w.dp[slot] = probe_role;
             dq[slot] = 0;
         }
+        RULER_FLUSH(0, h, rcs[warp].open != 0);
         __syncwarp();
     }
 }
@@ -5296,6 +5413,7 @@ extern "C" __global__ void __launch_bounds__(CONTACT_ROWS * 32) field_pace_skin_
         return;
     }
     const uint64_t rows1 = (uint64_t)w.T + w.R;
+    RULER_ZERO();
     for (uint64_t g = ((uint64_t)blockIdx.x * blockDim.x + threadIdx.x) >> 5; g < w.T; g += (uint64_t)gridDim.x * (blockDim.x >> 5)) {
         const uint64_t hg = (uint64_t)h * w.T + g;
         // [E] A row the cut room did not compute met no source: its skins return nothing.
@@ -5311,6 +5429,9 @@ extern "C" __global__ void __launch_bounds__(CONTACT_ROWS * 32) field_pace_skin_
         const uint64_t *e = w.e + (uint64_t)h * w.E + w.region_eoff[r] + (uint64_t)i * sites;
         const int64_t *dsr = ds + w.region_eoff[r] + (uint64_t)i * sites;
         const int64_t *dyi = dyh + hg * S;
+        if (lane == 0) {
+            RULER_COUNT(PK_ROW);
+        }
         const int64_t *values = w.vf + ((uint64_t)h * w.T + first) * S;
         const int64_t *words = w.qf + ((uint64_t)h * w.T + first) * S;
         const int64_t *wi = w.pq + hg * S;
@@ -5328,11 +5449,13 @@ extern "C" __global__ void __launch_bounds__(CONTACT_ROWS * 32) field_pace_skin_
             if (j == UINT32_MAX) {
                 continue;
             }
+            RULER_COUNT(PK_PAIR);
             const uint64_t gj = first + j;
             const wide sgn = sigma[g] > sigma[gj] ? 1 : sigma[g] < sigma[gj] ? -1 : 0;
             if (sgn == 0) {
                 continue;
             }
+            RULER_COUNT(PK_PAIR_SIGNED);
             const uint32_t gap = j > i ? j - i : i - j;
             wide at = 0;
             for (uint32_t l = 0; l < n; l++) {
@@ -5355,6 +5478,25 @@ extern "C" __global__ void __launch_bounds__(CONTACT_ROWS * 32) field_pace_skin_
                     atomicOr(w.status, REFUSED_KEY);
                 }
                 lock = rel(lock, 2 * FACE_BITS + 1 + 2 * MOVE_BITS - MOVE_BITS);
+#if RULER_ON
+                {
+                    RULER_COUNT(PK_PAIR_MODE);
+                    RULER_MULFITS(PK_MULFITS_FAST, (wide)e[j], inner);
+                    RULER_MULFITS(PK_MULFITS_FAST, (wide)dsr[j], bracket);
+                    const wide pi_ = (wide)(((uwide)w.pi_hi << 64) | (uwide)w.pi_lo);
+                    RULER_DIV(PK_TURNDIV64, 2 * pi_, (wide)w.ring_n[slot]);
+                    const wide b_ = turn_rate_dev(w, slot), e_ = value + lock;
+                    wide x_ = 0;
+                    RULER_MULFITS(PK_MULFITS_FAST, e_, dec);
+                    mul_fits(e_, dec, &x_);
+                    RULER_MULFITS(PK_MULFITS_FAST, rel(x_, MOVE_BITS), b_);
+                    RULER_COUNT(PK_ADDWIDE);
+                    RULER_TAKE(6, (int64_t)e[j], WLO(inner), WHI(inner), 0, 0, 0);
+                    RULER_TAKE(7, dsr[j], WLO(bracket), WHI(bracket), 0, 0, 0);
+                    RULER_TAKE(8, WLO(dec), WLO(e_), WHI(e_), WLO(pi_), WHI(pi_), (int64_t)w.ring_n[slot]);
+                    RULER_TAKE(11, dyi[l], values[(uint64_t)j * S + l], 0, 0, 0, 0);
+                }
+#endif
                 at = skin_back_dev(w, turn_rate_dev(w, slot), dec, value + lock);
                 own -= sgn * at;
                 add_wide(w.gsig + (uint64_t)p * w.T + gj, sgn * at);
@@ -5367,6 +5509,12 @@ extern "C" __global__ void __launch_bounds__(CONTACT_ROWS * 32) field_pace_skin_
                 const bool right = lo > i;
                 const uint64_t ge = octave_edge(g, lv, right);
                 const wide sgn = sigma[g] > sigma[ge] ? 1 : sigma[g] < sigma[ge] ? -1 : 0;
+                if (count != 0) {
+                    RULER_COUNT(PK_CROWD);
+                    if (sgn != 0) {
+                        RULER_COUNT(PK_CROWD_SIGNED);
+                    }
+                }
                 if (count != 0 && sgn != 0) {
                     const wide cnt = (wide)count;
                     for (uint32_t l = 0; l < n; l++) {
@@ -5377,6 +5525,13 @@ extern "C" __global__ void __launch_bounds__(CONTACT_ROWS * 32) field_pace_skin_
                         if (!mul_fits((wide)dyi[l], vr, &x) || !mul_fits((wide)dyi[n + l], vi, &y) || !mul_fits((wide)w.ce[hg * w.slots + lane], x + y, &value)) {
                             atomicOr(w.status, REFUSED_CARRIER);
                         }
+#if RULER_ON
+                        RULER_MULFITS(PK_MULFITS_FAST, (wide)dyi[l], vr);
+                        RULER_MULFITS(PK_MULFITS_FAST, (wide)dyi[n + l], vi);
+                        RULER_MULFITS(PK_MULFITS_FAST, (wide)w.ce[hg * w.slots + lane], x + y);
+                        RULER_DIV(PK_VALDIV64, rel(value, SHARE_BITS), cnt);
+                        RULER_TAKE(10, WLO(rel(value, SHARE_BITS)), WHI(rel(value, SHARE_BITS)), (int64_t)count, 0, 0, 0);
+#endif
                         value = div_nearest(rel(value, SHARE_BITS), cnt);
                         const wide wr = wi[l], wim = wi[n + l];
                         const wide mr = swp[(uint64_t)(hi_ + 1) * S + l] - swp[(uint64_t)lo * S + l], mi = swp[(uint64_t)(hi_ + 1) * S + n + l] - swp[(uint64_t)lo * S + n + l];
@@ -5387,8 +5542,19 @@ extern "C" __global__ void __launch_bounds__(CONTACT_ROWS * 32) field_pace_skin_
                         if (narrow31(mr, &mr32) & narrow31(mi, &mi32)) {
                             const int64_t pairing = mul32(wi[l], mr32) + mul32(wi[n + l], mi32);
                             const int64_t power = mul32(mr32, mr32) + mul32(mi32, mi32);
+#if RULER_ON
+                            {
+                                const wide num_ = (mul64_128(pairing, 2 * (int64_t)count) << MOVE_BITS) - mul64_128(power, 2 * (int64_t)dec);
+                                RULER_DIV(PK_BRDIV64, num_, cnt * cnt);
+                                RULER_TAKE(9, WLO(num_), WHI(num_), WLO(cnt * cnt), WHI(cnt * cnt), 0, 0);
+                            }
+#endif
                             bracket = div_nearest((mul64_128(pairing, 2 * (int64_t)count) << MOVE_BITS) - mul64_128(power, 2 * (int64_t)dec), cnt * cnt);
                         } else {
+#if RULER_ON
+                            RULER_COUNT(PK_W_WIDE);
+                            RULER_DIV(PK_BRDIV64, ((2 * cnt * (wr * mr + wim * mi)) << MOVE_BITS) - 2 * dec * (mr * mr + mi * mi), cnt * cnt);
+#endif
                             bracket = div_nearest(((2 * cnt * (wr * mr + wim * mi)) << MOVE_BITS) - 2 * dec * (mr * mr + mi * mi), cnt * cnt);
                         }
                         wide lock = 0;
@@ -5396,6 +5562,19 @@ extern "C" __global__ void __launch_bounds__(CONTACT_ROWS * 32) field_pace_skin_
                             atomicOr(w.status, REFUSED_KEY);
                         }
                         lock = rel(lock, 2 * FACE_BITS + 1 + MOVE_BITS);
+#if RULER_ON
+                        {
+                            RULER_MULFITS(PK_MULFITS_FAST, (wide)w.cds[hg * w.slots + lane], bracket);
+                            const wide pi_ = (wide)(((uwide)w.pi_hi << 64) | (uwide)w.pi_lo);
+                            RULER_DIV(PK_TURNDIV64, 2 * pi_, (wide)w.ring_n[slot]);
+                            const wide b_ = turn_rate_dev(w, slot), e_ = value + lock;
+                            wide x_ = 0;
+                            RULER_MULFITS(PK_MULFITS_FAST, e_, dec);
+                            mul_fits(e_, dec, &x_);
+                            RULER_MULFITS(PK_MULFITS_FAST, rel(x_, MOVE_BITS), b_);
+                            RULER_COUNT(PK_ADDWIDE);
+                        }
+#endif
                         const wide at = skin_back_dev(w, turn_rate_dev(w, slot), dec, value + lock);
                         own -= sgn * at;
                         add_wide(w.gsig + (uint64_t)p * w.T + ge, sgn * at);
@@ -5405,8 +5584,10 @@ extern "C" __global__ void __launch_bounds__(CONTACT_ROWS * 32) field_pace_skin_
         }
         own = warp_sum(own);
         if (lane == 0 && own != 0) {
+            RULER_COUNT(PK_ADDWIDE);
             add_wide(w.gsig + (uint64_t)p * w.T + g, own);
         }
+        RULER_FLUSH(1, h, rcs[warp].open != 0);
     }
 }
 
@@ -5834,3 +6015,506 @@ extern "C" __global__ void __launch_bounds__(REV_ROWS * 32, 6) field_yard_rows(F
         __syncwarp();
     }
 }
+
+// [measurement; theory, November 13, P55 A2 and A3] The counting build's tally and samples' counts read out, and **the helpers' yardsticks**: each
+// thread runs one helper `reps` times over the operands the run sampled (index `(thread + r threads) mod count`), at the launch shape the host gives
+// (the entry's own), folding each result into a word it writes, so no call is dropped. Kinds: 0, 1 the crowd lock's `div_nearest` on a paced and on a
+// still clock; 2, 3 the read divisor's `div_nearest_by` (the key's share, the probe role's); 4 the rows' `mul_fits`; 5 `add_wide` at the rows' own
+// addresses (their sharing), 6 at a thread's own; 7, 8 the skin's return's `mul_fits` (the value's, the lock's); 9 `skin_back_dev` with
+// `turn_rate_dev`; 10 `turn_rate_dev` alone; 11, 12 the skin's return's crowd `div_nearest` (the bracket's, the value's); 13 a 64 by 64 product to
+// 128 bits; 14 a 128 by 128 product; 15 the sample's loads alone (the yardsticks' floor).
+#ifdef RULER_CALLS
+extern "C" __global__ void field_ruler_take(unsigned long long *out) {
+    const uint32_t tallies = 2 * RULER_HEADS * 2 * RULER_KINDS;
+    for (uint32_t c = blockIdx.x * blockDim.x + threadIdx.x; c < tallies + RULER_SAMPLE_KINDS; c += gridDim.x * blockDim.x) {
+        out[c] = c < tallies ? RULER_TALLY[c] : RULER_SAMPLE_COUNT[c - tallies];
+    }
+}
+
+__device__ __forceinline__ uint32_t yard_sample_kind(uint32_t kind) {
+    const uint32_t of[16] = {0, 1, 2, 3, 4, 5, 5, 6, 7, 8, 8, 9, 10, 11, 4, 4};
+    return of[kind];
+}
+
+extern "C" __global__ void field_yard_helper(uint32_t kind, uint32_t reps, uint64_t *sink, wide *scratch, uint64_t scratch_len, uint32_t *status) {
+    const uint64_t tid = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x;
+    const uint64_t threads = (uint64_t)gridDim.x * blockDim.x;
+    const uint32_t sk = yard_sample_kind(kind);
+    const uint64_t have = min(RULER_SAMPLE_COUNT[sk], (unsigned long long)RULER_SAMPLES);
+    if (have == 0) {
+        sink[tid] = 0;
+        return;
+    }
+    FieldWords fw = {};
+    fw.status = status;
+    uint64_t acc = 0;
+    for (uint32_t r = 0; r < reps; r++) {
+        const uint64_t ix = (tid + (uint64_t)r * threads) % have;
+        const int64_t *q = RULER_SAMPLE + ((uint64_t)sk * RULER_SAMPLES + ix) * RULER_SAMPLE_WORDS;
+        const wide a = (wide)(((uwide)(uint64_t)q[1] << 64) | (uwide)(uint64_t)q[0]);
+        const wide b = (wide)(((uwide)(uint64_t)q[3] << 64) | (uwide)(uint64_t)q[2]);
+        wide out = 0;
+        switch (kind) {
+        case 0:
+        case 1:
+        case 11:
+            out = div_nearest(a, b);
+            break;
+        case 12:
+            out = div_nearest(a, (wide)q[2]);
+            break;
+        case 2:
+        case 3: {
+            Divisor dq;
+            dq.k = (uint64_t)q[2];
+            dq.d = (uint64_t)q[3];
+            dq.v = (uint64_t)q[4];
+            dq.s = (uint32_t)q[5];
+            out = div_nearest_by(a, dq);
+            break;
+        }
+        case 4:
+            mul_fits(a, b, &out);
+            break;
+        case 7:
+        case 8: {
+            // The value's share is unsigned (`e`), the lock's covector signed (`ds`).
+            const wide x = kind == 7 ? (wide)(uint64_t)q[0] : (wide)q[0];
+            mul_fits(x, (wide)(((uwide)(uint64_t)q[2] << 64) | (uwide)(uint64_t)q[1]), &out);
+            break;
+        }
+        case 5:
+            add_wide(scratch + (uint64_t)q[0] % scratch_len, (wide)tid);
+            break;
+        case 6:
+            add_wide(scratch + tid % scratch_len, (wide)r);
+            break;
+        case 9:
+        case 10: {
+            const wide e = (wide)(((uwide)(uint64_t)q[2] << 64) | (uwide)(uint64_t)q[1]);
+            const wide pi = (wide)(((uwide)(uint64_t)q[4] << 64) | (uwide)(uint64_t)q[3]);
+            const wide bt = rel(div_nearest(2 * pi, (wide)q[5]), FACE_BITS);
+            out = kind == 9 ? skin_back_dev(fw, bt, (wide)q[0], e) : bt;
+            break;
+        }
+        case 13:
+            out = mul64_128(q[0], q[1]);
+            break;
+        case 14:
+            out = a * b;
+            break;
+        default:
+            out = (wide)(q[0] ^ q[1] ^ q[2] ^ q[3]);
+            break;
+        }
+        acc ^= (uint64_t)out ^ (uint64_t)((uwide)out >> 64);
+    }
+    sink[tid] = acc;
+}
+#endif
+
+// [measurement; theory, November 13, P55 A4] **The two return entries by part** (a ruler: only the parts build defines RULER_PARTS). Each is the
+// entry's own text: `PART` 1 keeps the pairs and finds no crowd (every crowd block reads a zero count and is skipped), `PART` 2 keeps the crowds
+// and meets no pair (the row's support length read as zero after its class is prepared). The host launches each immediately before its entry, with
+// the words' stores (`ds`, `dq`, `dp`, the block covector `dpb`, `cds`, `cw`, `cv`, the material covector, `gsig`, the covector's shares and the
+// status) pointed at scratch arrays of the same layouts, so the state's bytes are the law's. A part's values differ from the entry's where they
+// read the other part (the rows' mean over the row's terms), so a value-dependent branch may differ; its time is the part's.
+#ifdef RULER_PARTS
+template <int PART>
+__device__ __forceinline__ void yard_rows_part(FieldWords w, uint32_t h, const int64_t *dyh, int64_t *ds, int64_t *dq) {
+    __shared__ uint32_t stj[REV_ROWS][32], stk[REV_ROWS][32];
+    __shared__ int64_t dss[REV_ROWS][32];
+    __shared__ wide dpcs[REV_ROWS][MAX_CROWD_SLOTS];
+    __shared__ int64_t dsks[REV_ROWS][MAX_CROWD_SLOTS];
+    __shared__ uint64_t cnts[REV_ROWS][32];
+    __shared__ uint32_t crlo[REV_ROWS][32], crhi[REV_ROWS][32], crlv[REV_ROWS][32];
+    __shared__ Divisor cdiv[REV_ROWS][32], cdiv2[REV_ROWS][32];
+    __shared__ RowCls rcs[REV_ROWS];
+    const uint32_t warp = threadIdx.x >> 5, lane = threadIdx.x & 31;
+    const uint32_t S = w.span, n = w.n, classes = w.nclasses;
+    const uint32_t parts = span_parts(S);
+    const bool active = lane < S * parts;
+    const uint32_t entry = lane % S, part = lane / S, m = entry % n;
+    const wide ln2 = (wide)(((uwide)w.ln2_hi << 64) | (uwide)w.ln2_lo);
+    const bool still = skinless(w, h);
+    const uint32_t g0 = still ? 0 : MOVE_BITS;
+    const uint64_t rows1 = (uint64_t)w.T + w.R;
+    for (uint64_t g = ((uint64_t)blockIdx.x * blockDim.x + threadIdx.x) >> 5; g < w.T; g += (uint64_t)gridDim.x * (blockDim.x >> 5)) {
+        const uint64_t hg = (uint64_t)h * w.T + g;
+        if (skipped_row(w, g)) {
+            if (lane < S) {
+                const uint32_t mc = h * n + lane % n;
+                const uint64_t slot = g * w.M2 + (lane < n ? mc : w.M + mc);
+                w.dp[slot] = 0;
+                dq[slot] = 0;
+            }
+            continue;
+        }
+        const uint32_t r = w.site_region[g];
+        const uint32_t i = w.site_pos[g];
+        const uint64_t first = w.region_off[r];
+        const uint32_t sites = w.region_off[r + 1] - (uint32_t)first;
+        const uint32_t *members = w.members + (uint64_t)h * w.T + first;
+        const uint32_t *off = w.class_off + ((uint64_t)h * w.R + r) * (2 * classes + 1);
+        const uint32_t c = w.cls[hg];
+        const uint32_t K = row_prepare(w, hg, off, rcs[warp], lane) * (PART == 2 ? 0u : 1u);
+        const uint64_t *e = w.e + (uint64_t)h * w.E + w.region_eoff[r] + (uint64_t)i * sites;
+        int64_t *dsr = ds + w.region_eoff[r] + (uint64_t)i * sites;
+        wide *dpr = w.dpb + w.region_eoff[r] + (uint64_t)i * sites;
+        // The row's support entries' addresses (the clock's skins stand there).
+        const uint64_t srow = support_row(w, r, i);
+        const int64_t *dyi = dyh + hg * S;
+        const int64_t *values = w.vf + ((uint64_t)h * w.T + first) * S;
+        const int64_t *words = w.qf + ((uint64_t)h * w.T + first) * S;
+        const uint64_t prow0 = (uint64_t)h * rows1 + first + r;
+        const wide *swp = w.sw + prow0 * S;
+        const wide *svp = w.sv + prow0 * S;
+        const uint64_t *scp = w.sc + prow0;
+        const uint32_t nslots = rcs[warp].open ? 0 : crowd_slots(sites);
+        const wide temper = temper_of(w, h, rcs[warp].open != 0);
+        const int64_t *sbr = w.sb + (uint64_t)h * w.E + w.region_eoff[r] + (uint64_t)i * sites;
+        // The pair's covector `⟨δỹ_i, D ṽ_j⟩` on `2^(−40)`.
+        const auto pair_dp = [&](uint32_t j, uint32_t k, uint32_t gap) -> wide {
+            const int64_t *vj = values + (uint64_t)j * S;
+            wide dp = 0;
+            for (uint32_t x = 0; x < S; x++) {
+                // [P54 step 4] The carried value is under `2^63` (`D ≤ 2^30`): the covector's product is 64 by 64.
+                dp += mul64_128(dyi[x], (int64_t)carried_ij_at(w, h, x % n, g, srow + k, gap, vj[x]));
+            }
+            return dp;
+        };
+        // The same for a head of eight modes, from vector rows: the source's sixteen values as eight 16-octet loads
+        // and its skins as two (`pair_score8`).
+        const bool eight = w.n == 8;
+        const bool still_h = skinless(w, h), paced_h = paced_at(w, h, g);
+        const auto pair_dp8 = [&](uint32_t j, uint32_t k, uint32_t gap) -> wide {
+            const longlong2 *v2 = reinterpret_cast<const longlong2 *>(values + (uint64_t)j * S);
+            uint32_t dec[8];
+            if (still_h) {
+#pragma unroll
+                for (int l = 0; l < 8; l++) {
+                    dec[l] = 1;
+                }
+            } else if (paced_h) {
+                pair_skins8(w, paced_index(w, h), srow + k, dec);
+            } else {
+                const uint4 *d4 = reinterpret_cast<const uint4 *>(w.decay_t + ((uint64_t)h * w.dreach + gap) * 8);
+                const uint4 d0 = d4[0], d1 = d4[1];
+                dec[0] = d0.x; dec[1] = d0.y; dec[2] = d0.z; dec[3] = d0.w;
+                dec[4] = d1.x; dec[5] = d1.y; dec[6] = d1.z; dec[7] = d1.w;
+            }
+            wide dp = 0;
+#pragma unroll
+            for (int q = 0; q < 8; q++) {
+                const longlong2 t = v2[q];
+                dp += mul64_128(dyi[2 * q], still_h ? t.x : carry_d(dec[(2 * q) & 7], t.x));
+                dp += mul64_128(dyi[2 * q + 1], still_h ? t.y : carry_d(dec[(2 * q + 1) & 7], t.y));
+            }
+            return dp;
+        };
+        // The crowds: counts, places and their divisors.
+        {
+            uint64_t count = 0;
+            uint32_t lo = 0, hi_ = 0, lv = 0;
+            if (PART != 1 && lane < nslots && crowd_at(i, sites, lane, &lo, &hi_, &lv)) {
+                count = scp[hi_ + 1] - scp[lo];
+            }
+            cnts[warp][lane] = count;
+            crlo[warp][lane] = lo;
+            crhi[warp][lane] = hi_;
+            crlv[warp][lane] = lv;
+            if (count != 0) {
+                cdiv[warp][lane] = divisor_of(count);
+                cdiv2[warp][lane] = divisor_of(count * count);
+            }
+        }
+        __syncwarp();
+        // Pass A: the weighted sum of the pairs' and crowds' covectors.
+        wide weighted = 0;
+        for (uint32_t k = lane; k < K; k += 32) {
+            const uint32_t j = support_at(members, off, rcs[warp], i, sites, k);
+            if (j == UINT32_MAX) {
+                continue;
+            }
+            const wide p = (wide)e[j];
+            const uint32_t gap = j > i ? j - i : i - j;
+            const wide dpj = eight ? pair_dp8(j, k, gap) : pair_dp(j, k, gap);
+            dpr[j] = dpj;
+            weighted += p * dpj;
+        }
+        if (cnts[warp][lane] != 0) {
+            const uint32_t lo = crlo[warp][lane], hi_ = crhi[warp][lane], lv = crlv[warp][lane];
+            wide sum = 0;
+            for (uint32_t x = 0; x < S; x++) {
+                sum += (wide)dyi[x] * crowd_carried_wide_ij(w, h, x % n, g, lv, lo > i, svp[(uint64_t)(hi_ + 1) * S + x] - svp[(uint64_t)lo * S + x]);
+            }
+            const wide dpc = div_nearest_by(sum, cdiv[warp][lane]);
+            dpcs[warp][lane] = dpc;
+            weighted += (wide)w.ce[hg * w.slots + lane] * dpc;
+        }
+        const wide mean = rel(warp_sum(weighted), SHARE_BITS);
+        // The comparison of a term `p` (its covector `dpk`): the face's.
+        const auto compare = [&](wide p, wide dpk) -> wide { return rel(ln2 * rel(p * (dpk - mean), SHARE_BITS), MOVE_BITS); };
+        // Pass B: δs over the pairs, in chunks of 32 into the warp's shared chunk, whose sum over the word is
+        // read with the lanes over the span's entries (the probe role: `δs D ŵ_j`).
+        wide sum = 0;
+        // The temperature's covector (§15.10): `δT[h][kind] += release(δz S, 16)` over the row's sources and crowds,
+        // each released alone and summed (an exact integer sum, the lanes' partials added over the warp).
+        wide tacc = 0;
+        // The covector's magnitude near and far (§16.20), where read.
+        wide near_ds = 0, far_ds = 0;
+        for (uint32_t k0 = 0; k0 < K; k0 += 32) {
+            const uint32_t k = k0 + lane;
+            const uint32_t j = k < K ? support_at(members, off, rcs[warp], i, sites, k) : UINT32_MAX;
+            int64_t dsv = 0;
+            if (j != UINT32_MAX) {
+                const wide dzj = compare((wide)e[j], dpr[j]);
+                tacc += rel(dzj * (wide)sbr[j], FACE_BITS);
+                const wide dz = rel(temper * dzj, MATERIAL_BITS);
+                if ((dz < 0 ? -dz : dz) >> min(w.dsbits, 63u) != 0) {
+                    atomicOr(w.status, REFUSED_CARRIER);
+                }
+                dsv = (int64_t)dz;
+                dsr[j] = dsv;
+                const wide mag = dz < 0 ? -dz : dz;
+                if ((j > i ? j - i : i - j) < NEAR) {
+                    near_ds += mag;
+                } else {
+                    far_ds += mag;
+                }
+            }
+            dss[warp][lane] = dsv;
+            stj[warp][lane] = j;
+            stk[warp][lane] = k;
+            __syncwarp();
+            if (active) {
+                for (uint32_t jj = part; jj < 32; jj += parts) {
+                    const uint32_t jx = stj[warp][jj];
+                    if (jx != UINT32_MAX) {
+                        // [P54 step 4] `δs (D ŵ_j)`: the skin and the unit word on 32 bits (their product under `2^61`), then 64 by 64.
+                        sum += mul64_128(dss[warp][jj], mul32((int64_t)skin_raw_at(w, h, m, g, srow + stk[warp][jj], jx > i ? jx - i : i - jx), words[(uint64_t)jx * S + entry]));
+                    }
+                }
+            }
+            __syncwarp();
+        }
+        // The crowds' δs, then their share of the row's return and of the values' and the word's member
+        // returns through the difference arrays.
+        if (cnts[warp][lane] != 0) {
+            const wide dzc = compare((wide)w.ce[hg * w.slots + lane], dpcs[warp][lane]);
+            const uint32_t clo = crlo[warp][lane], chi = crhi[warp][lane], clv = crlv[warp][lane];
+            const int64_t cs = crowd_base_narrow(w, h, w.pq + ((uint64_t)h * w.T + g) * S, swp + (uint64_t)clo * S, swp + (uint64_t)(chi + 1) * S, cnts[warp][lane], clv, g, clo > i);
+            tacc += rel(dzc * (wide)cs, FACE_BITS);
+            const wide dz = rel(temper * dzc, MATERIAL_BITS);
+            if ((dz < 0 ? -dz : dz) >> min(w.dsbits, 63u) != 0) {
+                atomicOr(w.status, REFUSED_CARRIER);
+            }
+            dsks[warp][lane] = (int64_t)dz;
+            if (w.cds != nullptr) {
+                w.cds[hg * w.slots + lane] = (int64_t)dz;
+            }
+            far_ds += dz < 0 ? -dz : dz;
+        }
+        if (w.dsshare != nullptr) {
+            near_ds = warp_sum(near_ds);
+            far_ds = warp_sum(far_ds);
+            if (lane == 0) {
+                add_wide(w.dsshare + 2 * h, near_ds);
+                add_wide(w.dsshare + 2 * h + 1, far_ds);
+            }
+        }
+        tacc = warp_sum(tacc);
+        if (lane == 0 && tacc != 0) {
+            // Into the temperature's own chart (§16.12): `δℓ = release(δT · release(T ln 2, 30), 24)`, the row's.
+            add_wide(w.gcov + w.temper_at + 2 * h + (rcs[warp].open ? 1 : 0), temper_chain(w, temper, tacc));
+        }
+        __syncwarp();
+        if (active) {
+            for (uint32_t jj = part; jj < nslots; jj += parts) {
+                const uint64_t count = cnts[warp][jj];
+                if (count == 0) {
+                    continue;
+                }
+                const uint32_t lo = crlo[warp][jj], hi_ = crhi[warp][jj], lv = crlv[warp][jj];
+                const wide d = crowd_skin_raw(w, h, m, g, lv, lo > i);
+                const wide dsk = dsks[warp][jj];
+                const wide wsum = swp[(uint64_t)(hi_ + 1) * S + entry] - swp[(uint64_t)lo * S + entry];
+                // [P54 step 4] Where the crowd's summed word is under `2^31`: `D W`, `D ŵ_i` and `D²` on 32 bits (under `2^61`), their
+                // products by the covector, the count and `W` as 64 by 64; otherwise the wide forms.
+                int32_t w32;
+                wide bracket;
+                if (narrow31(wsum, &w32)) {
+                    sum += div_nearest_by(mul64_128(dsks[warp][jj], mul32((int64_t)d, w32)), cdiv[warp][jj]);
+                    // The key's bracket released by the skin's bits once, its product by the covector checked.
+                    bracket = rel((mul64_128(mul32((int64_t)d, w.pq[((uint64_t)h * w.T + g) * S + entry]), (int64_t)count) << g0) - mul64_128(mul32((int64_t)d, (int64_t)d), w32), g0);
+                } else {
+                    sum += div_nearest_by(dsk * d * wsum, cdiv[warp][jj]);
+                    bracket = rel(((d * (wide)w.pq[((uint64_t)h * w.T + g) * S + entry] * (wide)count) << g0) - d * d * wsum, g0);
+                }
+                wide prod = 0;
+                if (!mul_fits(dsk, bracket, &prod)) {
+                    atomicOr(w.status, REFUSED_KEY);
+                }
+                const wide pw = div_nearest_by(prod, cdiv2[warp][jj]);
+                add_wide(w.cw + (first + r + lo) * S + entry, pw);
+                add_wide(w.cw + (first + r + hi_ + 1) * S + entry, -pw);
+                // [P54 step 4] The carried covector `release(D δỹ, 30)` on 64 bits (`carry_d`, under `2^63`), its share's product unsigned by signed.
+                const int64_t cy = still ? dyi[entry] : carry_d((uint64_t)crowd_skin_ij(w, h, m, g, lv, lo > i), dyi[entry]);
+                const wide pv = div_nearest_by(mulu64_128(w.ce[hg * w.slots + jj], cy), cdiv[warp][jj]);
+                add_wide(w.cv + (first + r + lo) * S + entry, pv);
+                add_wide(w.cv + (first + r + hi_ + 1) * S + entry, -pv);
+            }
+        }
+        sum = parts_sum(active ? sum : 0, S, parts);
+        if (lane < S) {
+            const uint32_t mc = h * n + lane % n;
+            const uint64_t slot = g * w.M2 + (lane < n ? mc : w.M + mc);
+            const int64_t probe_role = fit64(rel(sum, CONTACT_BACK + g0), w.status);
+            // The probe role goes to the probe chart's covector, the key role (the columns) to the key's (§16.19).
+            w.dp[slot] = probe_role;
+            dq[slot] = 0;
+        }
+        __syncwarp();
+    }
+}
+
+extern "C" __global__ void __launch_bounds__(REV_ROWS * 32, ROWS_MIN_BLOCKS) field_yard_rows_pairs(FieldWords w, uint32_t h, const int64_t *dyh, int64_t *ds, int64_t *dq) {
+    yard_rows_part<1>(w, h, dyh, ds, dq);
+}
+
+extern "C" __global__ void __launch_bounds__(REV_ROWS * 32, ROWS_MIN_BLOCKS) field_yard_rows_crowds(FieldWords w, uint32_t h, const int64_t *dyh, int64_t *ds, int64_t *dq) {
+    yard_rows_part<2>(w, h, dyh, ds, dq);
+}
+
+template <int PART>
+__device__ __forceinline__ void yard_pace_part(FieldWords w, uint32_t h, const int64_t *dyh, const int64_t *ds) {
+    __shared__ RowCls rcs[CONTACT_ROWS];
+    const uint32_t warp = threadIdx.x >> 5, lane = threadIdx.x & 31;
+    const uint32_t S = w.span, n = w.n, classes = w.nclasses;
+    const int32_t p = paced_index(w, h);
+    if (p < 0) {
+        return;
+    }
+    const uint64_t rows1 = (uint64_t)w.T + w.R;
+    for (uint64_t g = ((uint64_t)blockIdx.x * blockDim.x + threadIdx.x) >> 5; g < w.T; g += (uint64_t)gridDim.x * (blockDim.x >> 5)) {
+        const uint64_t hg = (uint64_t)h * w.T + g;
+        // [E] A row the cut room did not compute met no source: its skins return nothing.
+        if (skipped_row(w, g)) {
+            continue;
+        }
+        const uint32_t r = w.site_region[g];
+        const uint64_t first = w.region_off[r];
+        const uint32_t sites = w.region_off[r + 1] - (uint32_t)first, i = w.site_pos[g];
+        const uint32_t *members = w.members + (uint64_t)h * w.T + first;
+        const uint32_t *off = w.class_off + ((uint64_t)h * w.R + r) * (2 * classes + 1);
+        const uint32_t K = row_prepare(w, hg, off, rcs[warp], lane) * (PART == 2 ? 0u : 1u);
+        const uint64_t *e = w.e + (uint64_t)h * w.E + w.region_eoff[r] + (uint64_t)i * sites;
+        const int64_t *dsr = ds + w.region_eoff[r] + (uint64_t)i * sites;
+        const int64_t *dyi = dyh + hg * S;
+        const int64_t *values = w.vf + ((uint64_t)h * w.T + first) * S;
+        const int64_t *words = w.qf + ((uint64_t)h * w.T + first) * S;
+        const int64_t *wi = w.pq + hg * S;
+        const int64_t *sigma = w.sigma + (uint64_t)p * w.T;
+        // The row's support entries' addresses (the clock's skins stand there).
+        const uint64_t srow = support_row(w, r, i);
+        const uint64_t prow0 = (uint64_t)h * rows1 + first + r;
+        const wide *swp = w.sw + prow0 * S;
+        const wide *svp = w.sv + prow0 * S;
+        const uint64_t *scp = w.sc + prow0;
+        const uint32_t nslots = rcs[warp].open ? 0 : crowd_slots(sites);
+        wide own = 0;
+        for (uint32_t k = lane; k < K; k += 32) {
+            const uint32_t j = support_at(members, off, rcs[warp], i, sites, k);
+            if (j == UINT32_MAX) {
+                continue;
+            }
+            const uint64_t gj = first + j;
+            const wide sgn = sigma[g] > sigma[gj] ? 1 : sigma[g] < sigma[gj] ? -1 : 0;
+            if (sgn == 0) {
+                continue;
+            }
+            const uint32_t gap = j > i ? j - i : i - j;
+            wide at = 0;
+            for (uint32_t l = 0; l < n; l++) {
+                const uint32_t slot = l * (w.frames - w.still) + h % w.frames - w.still;
+                const wide dec = skin_ij_at(w, h, l, g, srow + k, gap);
+                // [P54 step 4] `Re(conj(δỹ) ṽ)` as two 64 by 64 products (each under `2^126`, their sum under `2^127`).
+                const wide inner = mul64_128(dyi[l], values[(uint64_t)j * S + l]) + mul64_128(dyi[n + l], values[(uint64_t)j * S + n + l]);
+                wide value = 0;
+                if (!mul_fits((wide)e[j], inner, &value)) {
+                    atomicOr(w.status, REFUSED_CARRIER);
+                }
+                value = rel(value, SHARE_BITS);
+                // [P54 step 4] The lock's pairing `w·k` and power `|k|²` from 32-bit products (unit words), `2 D |k|²` as 64 by 64 unsigned.
+                const int64_t kr = words[(uint64_t)j * S + l], ki = words[(uint64_t)j * S + n + l];
+                const wide pairing = (wide)mul32(wi[l], kr) + (wide)mul32(wi[n + l], ki);
+                const uint64_t power = (uint64_t)mul32(kr, kr) + (uint64_t)mul32(ki, ki);
+                const wide bracket = (pairing << (MOVE_BITS + 1)) - (wide)mulu64(power, 2 * (uint64_t)dec);
+                wide lock = 0;
+                if (!mul_fits((wide)dsr[j], bracket, &lock)) {
+                    atomicOr(w.status, REFUSED_KEY);
+                }
+                lock = rel(lock, 2 * FACE_BITS + 1 + 2 * MOVE_BITS - MOVE_BITS);
+                at = skin_back_dev(w, turn_rate_dev(w, slot), dec, value + lock);
+                own -= sgn * at;
+                add_wide(w.gsig + (uint64_t)p * w.T + gj, sgn * at);
+            }
+        }
+        if (PART != 1 && lane < nslots) {
+            uint32_t lo, hi_, lv;
+            if (crowd_at(i, sites, lane, &lo, &hi_, &lv)) {
+                const uint64_t count = scp[hi_ + 1] - scp[lo];
+                const bool right = lo > i;
+                const uint64_t ge = octave_edge(g, lv, right);
+                const wide sgn = sigma[g] > sigma[ge] ? 1 : sigma[g] < sigma[ge] ? -1 : 0;
+                if (count != 0 && sgn != 0) {
+                    const wide cnt = (wide)count;
+                    for (uint32_t l = 0; l < n; l++) {
+                        const uint32_t slot = l * (w.frames - w.still) + h % w.frames - w.still;
+                        const wide dec = crowd_skin_ij(w, h, l, g, lv, right);
+                        const wide vr = svp[(uint64_t)(hi_ + 1) * S + l] - svp[(uint64_t)lo * S + l], vi = svp[(uint64_t)(hi_ + 1) * S + n + l] - svp[(uint64_t)lo * S + n + l];
+                        wide x = 0, y = 0, value = 0;
+                        if (!mul_fits((wide)dyi[l], vr, &x) || !mul_fits((wide)dyi[n + l], vi, &y) || !mul_fits((wide)w.ce[hg * w.slots + lane], x + y, &value)) {
+                            atomicOr(w.status, REFUSED_CARRIER);
+                        }
+                        value = div_nearest(rel(value, SHARE_BITS), cnt);
+                        const wide wr = wi[l], wim = wi[n + l];
+                        const wide mr = swp[(uint64_t)(hi_ + 1) * S + l] - swp[(uint64_t)lo * S + l], mi = swp[(uint64_t)(hi_ + 1) * S + n + l] - swp[(uint64_t)lo * S + n + l];
+                        // [P54 step 4] Where the crowd's summed words are under `2^31`: its pairing and power from 32-bit products (sums under
+                        // `2^63`), their products by `2|C|` and `2D` as 64 by 64; otherwise the wide forms.
+                        int32_t mr32, mi32;
+                        wide bracket;
+                        if (narrow31(mr, &mr32) & narrow31(mi, &mi32)) {
+                            const int64_t pairing = mul32(wi[l], mr32) + mul32(wi[n + l], mi32);
+                            const int64_t power = mul32(mr32, mr32) + mul32(mi32, mi32);
+                            bracket = div_nearest((mul64_128(pairing, 2 * (int64_t)count) << MOVE_BITS) - mul64_128(power, 2 * (int64_t)dec), cnt * cnt);
+                        } else {
+                            bracket = div_nearest(((2 * cnt * (wr * mr + wim * mi)) << MOVE_BITS) - 2 * dec * (mr * mr + mi * mi), cnt * cnt);
+                        }
+                        wide lock = 0;
+                        if (!mul_fits((wide)w.cds[hg * w.slots + lane], bracket, &lock)) {
+                            atomicOr(w.status, REFUSED_KEY);
+                        }
+                        lock = rel(lock, 2 * FACE_BITS + 1 + MOVE_BITS);
+                        const wide at = skin_back_dev(w, turn_rate_dev(w, slot), dec, value + lock);
+                        own -= sgn * at;
+                        add_wide(w.gsig + (uint64_t)p * w.T + ge, sgn * at);
+                    }
+                }
+            }
+        }
+        own = warp_sum(own);
+        if (lane == 0 && own != 0) {
+            add_wide(w.gsig + (uint64_t)p * w.T + g, own);
+        }
+    }
+}
+
+extern "C" __global__ void __launch_bounds__(CONTACT_ROWS * 32) field_yard_pace_pairs(FieldWords w, uint32_t h, const int64_t *dyh, const int64_t *ds) {
+    yard_pace_part<1>(w, h, dyh, ds);
+}
+
+extern "C" __global__ void __launch_bounds__(CONTACT_ROWS * 32) field_yard_pace_crowds(FieldWords w, uint32_t h, const int64_t *dyh, const int64_t *ds) {
+    yard_pace_part<2>(w, h, dyh, ds);
+}
+#endif

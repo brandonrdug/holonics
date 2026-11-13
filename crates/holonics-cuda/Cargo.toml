@@ -21,6 +21,12 @@ thiserror = { workspace = true }
 # their arithmetic (`field_yard_rows`), immediately before the entry, its stores into scratch. No learner's build enables it.
 [features]
 ruler-rows-reads = []
+# [measurement; theory, November 13, P55 A2 to A4] Ruler builds of the profile example: the two return entries' helpers counted and their operands
+# sampled, with the helpers' yardsticks (`ruler-calls`); the two entries by part, each a copy before its entry (`ruler-parts`); the rows at four
+# blocks a multiprocessor (`ruler-rows-b4`). No learner's build enables them.
+ruler-calls = []
+ruler-parts = []
+ruler-rows-b4 = []
 
 [[bin]]
 name = "mount-smoke"

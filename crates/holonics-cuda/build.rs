@@ -222,7 +222,23 @@ fn main() {
         return;
     };
     let architecture = declared_architecture();
+    // [measurement; theory, November 13, P55 A2 to A4] The ruler builds' defines for `kernels/field.cu`, from their features; with none the
+    // translation unit is the law's.
+    let mut defines: Vec<&str> = Vec::new();
+    if env::var_os("CARGO_FEATURE_RULER_CALLS").is_some() {
+        defines.push("-DRULER_CALLS");
+    }
+    if env::var_os("CARGO_FEATURE_RULER_PARTS").is_some() {
+        defines.push("-DRULER_PARTS");
+    }
+    if env::var_os("CARGO_FEATURE_RULER_ROWS_B4").is_some() {
+        defines.push("-DROWS_MIN_BLOCKS=4");
+    }
     let mut addressed = Vec::new();
+    for define in &defines {
+        addressed.extend_from_slice(define.as_bytes());
+        addressed.push(0);
+    }
     for source in SOURCES {
         addressed.extend_from_slice(source.as_bytes());
         addressed.push(0);
@@ -305,6 +321,7 @@ fn main() {
             "-o",
         ])
         .arg(&field_output)
+        .args(&defines)
         .status()
         .unwrap_or_else(|error| panic!("{} could not run: {error}", nvcc.display()));
     assert!(status.success(), "nvcc refused kernels/field.cu");

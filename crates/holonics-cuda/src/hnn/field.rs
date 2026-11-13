@@ -2616,8 +2616,47 @@ impl<'c> CardField<'c> {
                     &mut [arg(words), arg(&mut hh), arg(&mut dyhp), arg(&mut dsp_s), arg(&mut dqp_s), arg(&mut dpp_s), arg(&mut dpbp_s), arg(&mut cdsp_s), arg(&mut cwp_s), arg(&mut cvp_s), arg(&mut gcp_s)],
                 )?;
             }
+            // [measurement; theory, November 13, P55 A4] The parts build alone: the rows' pairs and their crowds, each a copy of the entry immediately
+            // before it, every store and atomic into scratch arrays of the entry's layouts (`field_yard_rows_pairs`, `field_yard_rows_crowds`).
+            #[cfg(feature = "ruler-parts")]
+            {
+                let pairs = words.pairs as usize;
+                let scratch64 = |len: usize| self.timed(Kind::Alloc, || self.take::<i64>(len.max(1))).map_err(device);
+                let scratch128 = |len: usize| self.timed(Kind::Alloc, || self.take::<i128>(len.max(1))).map_err(device);
+                let (ds_s, dq_s, dp_s) = (scratch64(pairs)?, scratch64(sites * m2)?, scratch64(sites * m2)?);
+                let (dpb_s, cds_s) = (scratch128(pairs)?, scratch64(heads * sites * words.slots as usize)?);
+                let (cw_s, cv_s, gcov_s, share_s) = (scratch128(rows * span)?, scratch128(rows * span)?, scratch128(field.layout().len)?, scratch128(2 * heads)?);
+                let status_s = self.timed(Kind::Alloc, || self.take::<u32>(1)).map_err(device)?;
+                let mut part = *words;
+                part.dp = dp_s.device_ptr();
+                part.dpb = dpb_s.device_ptr();
+                part.cds = if words.cds != 0 { cds_s.device_ptr() } else { 0 };
+                part.cw = cw_s.device_ptr();
+                part.cv = cv_s.device_ptr();
+                part.gcov = gcov_s.device_ptr();
+                part.dsshare = if words.dsshare != 0 { share_s.device_ptr() } else { 0 };
+                part.status = status_s.device_ptr();
+                for entry in ["field_yard_rows_pairs", "field_yard_rows_crowds"] {
+                    let (mut hh, mut dyhp, mut dsp_s, mut dqp_s) = (h as u32, dyh.device_ptr(), ds_s.device_ptr(), dq_s.device_ptr());
+                    self.launch(entry, Self::rows_grid(sites as u64, REV_ROWS), (REV_ROWS * 32) as u32, &mut [arg(&mut part), arg(&mut hh), arg(&mut dyhp), arg(&mut dsp_s), arg(&mut dqp_s)])?;
+                }
+            }
             self.launch("field_contact_rows", Self::rows_grid(sites as u64, REV_ROWS), (REV_ROWS * 32) as u32, &mut [arg(words), arg(&mut hh), arg(&mut dyhp), arg(&mut dsp), arg(&mut dqp)])?;
             if d.carries_moment(h) && !d.is_depth(h) {
+                // [measurement; theory, November 13, P55 A4] The parts build alone: the skin's return's pairs and its crowds, each a copy of the entry
+                // immediately before it, its sums to the variation's covector and its refusals into scratch (`field_yard_pace_pairs`, `_crowds`).
+                #[cfg(feature = "ruler-parts")]
+                {
+                    let gsig_s = self.timed(Kind::Alloc, || self.take::<i128>((heads * sites).max(1))).map_err(device)?;
+                    let status_s = self.timed(Kind::Alloc, || self.take::<u32>(1)).map_err(device)?;
+                    let mut part = *words;
+                    part.gsig = gsig_s.device_ptr();
+                    part.status = status_s.device_ptr();
+                    for entry in ["field_yard_pace_pairs", "field_yard_pace_crowds"] {
+                        let (mut hh, mut dyhp, mut dsp) = (h as u32, dyh.device_ptr(), ds.device_ptr());
+                        self.launch(entry, Self::rows_grid(sites as u64, CONTACT_ROWS), (CONTACT_ROWS * 32) as u32, &mut [arg(&mut part), arg(&mut hh), arg(&mut dyhp), arg(&mut dsp)])?;
+                    }
+                }
                 // The head's skins return to its variation (§16), from the pairs' and crowds' covectors just formed.
                 let (mut hh, mut dyhp, mut dsp) = (h as u32, dyh.device_ptr(), ds.device_ptr());
                 self.launch("field_pace_skin_back", Self::rows_grid(sites as u64, CONTACT_ROWS), (CONTACT_ROWS * 32) as u32, &mut [arg(words), arg(&mut hh), arg(&mut dyhp), arg(&mut dsp)])?;
@@ -2960,6 +2999,54 @@ impl<'c> CardField<'c> {
         }
         let mut fw = *words;
         self.launch_grid("field_clock_fill", Dim3 { x: Self::cells(sites as u64), y: tm as u32, z: 1 }, THREADS, 0, &mut [arg(&mut fw)])
+    }
+
+    /// [measurement; theory, November 13, P55 A2] The counting build's tally (`field_ruler_take`): `[entry 2][head 8][row 2][kind 32]` calls (entry 0
+    /// the rows, 1 the skin's return; row 0 definite, 1 open; kind `k` the lanes' calls, `k + 1` the warps' issues), then the twelve samples' counts.
+    #[cfg(feature = "ruler-calls")]
+    pub fn ruler_tally(&self) -> Result<Vec<u64>> {
+        let card = self.card;
+        let len = 2 * 8 * 2 * 32 + 12;
+        let out = self.take::<u64>(len).map_err(device)?;
+        let mut op = out.device_ptr();
+        self.launch("field_ruler_take", 4, 256, &mut [arg(&mut op)])?;
+        card.fetch_range(&out, 0, len).map_err(device)
+    }
+
+    /// [measurement; theory, November 13, P55 A3] **The helpers' yardsticks** (`field_yard_helper`): each kind alone at the launch shape of its entry
+    /// (`rows_grid(sites, 4)` blocks of 128 threads, the rows' kinds at `rows_sites`, the skin's return's at `pace_sites`), a calibrating launch and then
+    /// one timed to at least `seconds`: (kind, blocks, reps, seconds, warp issues, lane calls).
+    #[cfg(feature = "ruler-calls")]
+    pub fn helper_yardsticks(&self, rows_sites: u64, pace_sites: u64, seconds: f64) -> Result<Vec<(u32, u32, u32, f64, u64, u64)>> {
+        let card = self.card;
+        card.current().map_err(device)?;
+        let blocks_of = |kind: u32| Self::rows_grid(if (7..=13).contains(&kind) { pace_sites } else { rows_sites }, 4);
+        let most = blocks_of(0).max(blocks_of(7)) as usize;
+        let sink = self.take::<u64>(most * 128).map_err(device)?;
+        let scratch_len: u64 = 1 << 24;
+        let scratch = self.take::<i128>(scratch_len as usize).map_err(device)?;
+        let status = self.take::<u32>(1).map_err(device)?;
+        let function = self.module.function("field_yard_helper").map_err(|e| device(e.into()))?;
+        let mut out = Vec::new();
+        for kind in 0..16u32 {
+            let blocks = blocks_of(kind);
+            let timed = |reps: u32| -> Result<f64> {
+                let (mut k, mut r, mut sp, mut scp, mut sl, mut stp) = (kind, reps, sink.device_ptr(), scratch.device_ptr(), scratch_len, status.device_ptr());
+                card.synchronize().map_err(device)?;
+                let started = Instant::now();
+                function
+                    .launch_on_shared(card.stream(), Dim3::x(blocks), Dim3 { x: 128, y: 1, z: 1 }, 0, &mut [arg(&mut k), arg(&mut r), arg(&mut sp), arg(&mut scp), arg(&mut sl), arg(&mut stp)])
+                    .map_err(|e| device(e.into()))?;
+                card.synchronize().map_err(device)?;
+                Ok(started.elapsed().as_secs_f64())
+            };
+            let trial = 8u32;
+            let took = timed(trial)?;
+            let reps = ((f64::from(trial) * seconds / took.max(1e-9)).ceil() as u64).clamp(u64::from(trial), 1 << 20) as u32;
+            let took = timed(reps)?;
+            out.push((kind, blocks, reps, took, u64::from(blocks) * 4 * u64::from(reps), u64::from(blocks) * 128 * u64::from(reps)));
+        }
+        Ok(out)
     }
 
     /// [measurement; theory, November 12, P50 step 3] The turn's series against the wide one on the card (`field_series_check`): for each argument

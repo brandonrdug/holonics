@@ -73,6 +73,46 @@ fn run(args: &[String]) -> Result<()> {
         "FIELD_SKIN octets_a_entry={} octets_a_site={} clock_octets_a_site={} entries={} dense_pairs={} peak_batch_entries={} peak_batch_dense_pairs={} peak_skin_store={} peak_store={} batch_cut={} free_at_open={}",
         t.skin_entry_octets, t.skin_site_octets, t.clock_site_octets, t.skin_entries, t.skin_dense_pairs, t.skin_peak_entries, t.skin_peak_pairs, t.skin_store, t.peak_store, t.batch_cut, memory.free_bytes
     );
+    // [measurement; theory, November 13, P55 A2 and A3] The counting build's tally by entry, head, row and kind, its samples' counts, and the helpers'
+    // yardsticks at the entries' launch shape (`RULER_SITES=rows,pace`, a launch's rows; not a `FIELD_` variable, which the store's commands refuse).
+    #[cfg(feature = "ruler-calls")]
+    {
+        match card.ruler_tally() {
+            Ok(t) => {
+                for entry in 0..2 {
+                    for h in 0..8 {
+                        for open in 0..2 {
+                            for k in 0..32 {
+                                let v = t[((entry * 8 + h) * 2 + open) * 32 + k];
+                                if v != 0 {
+                                    println!("FIELD_TALLY entry={} head={h} row={} kind={k} calls={v}", ["rows", "pace"][entry], ["definite", "open"][open]);
+                                }
+                            }
+                        }
+                    }
+                }
+                for (k, c) in t[2 * 8 * 2 * 32..].iter().enumerate() {
+                    println!("FIELD_SAMPLES kind={k} taken={c}");
+                }
+            }
+            Err(e) => println!("FIELD_TALLY error={e}"),
+        }
+        let at: Vec<u64> = std::env::var("RULER_SITES").ok().map(|v| v.split(',').filter_map(|x| x.parse().ok()).collect()).unwrap_or_default();
+        if let [rows, pace] = at[..] {
+            match card.helper_yardsticks(rows, pace, 0.5) {
+                Ok(v) => {
+                    for (kind, blocks, reps, took, warps, lanes) in v {
+                        println!(
+                            "FIELD_HELPER kind={kind} blocks={blocks} threads_a_block=128 reps={reps} seconds={took:.4} warp_issues={warps} lane_calls={lanes} ns_a_warp_issue={:.4} ns_a_lane_call={:.5}",
+                            took * 1e9 / warps as f64,
+                            took * 1e9 / lanes as f64
+                        );
+                    }
+                }
+                Err(e) => println!("FIELD_HELPER error={e}"),
+            }
+        }
+    }
     if let Some(phases) = card.phased() {
         for (name, marks, ns) in phases {
             println!("FIELD_PHASE name={name} marks={marks} ms={} us_a_mark={}", ns / 1_000_000, ns / 1_000 / (marks as u128).max(1));
