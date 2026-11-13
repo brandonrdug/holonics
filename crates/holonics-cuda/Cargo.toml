@@ -21,6 +21,9 @@ thiserror = { workspace = true }
 # their arithmetic (`field_yard_rows`), immediately before the entry, its stores into scratch. No learner's build enables it.
 [features]
 ruler-rows-reads = []
+# [measurement; theory, November 12, P54 item 1] A ruler build of the profile example: the words' occupied bits by array and clock
+# (`field_yard_bits_*`). No learner's build enables it.
+ruler-bits = []
 
 [[bin]]
 name = "mount-smoke"
