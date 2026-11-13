@@ -5834,3 +5834,109 @@ extern "C" __global__ void __launch_bounds__(REV_ROWS * 32, 6) field_yard_rows(F
         __syncwarp();
     }
 }
+
+// [measurement; theory, November 12, P54 item 1] **The words' occupied bits** (a ruler; only the ruler build of the profile example, feature
+// `ruler-bits`, launches these): a histogram of each word's magnitude's binary length (0 for the zero word, to 128) by array and clock, over the
+// pairs a receiver's support meets (the region block's words, the clock's skins by mode, a crowd's share at its live slots) or over a batch's
+// rows. They read the law's arrays and write only their histograms.
+#define BITS_BINS 129
+__device__ __forceinline__ uint32_t bits_of_wide(wide v) {
+    const uwide m = (uwide)(v < 0 ? -v : v);
+    const uint64_t hi = (uint64_t)(m >> 64), lo = (uint64_t)m;
+    return hi ? 128 - (uint32_t)__clzll((long long)hi) : lo ? 64 - (uint32_t)__clzll((long long)lo) : 0;
+}
+
+// `kind`: 0 the score or share e (u64, a head's block), 1 the lock sb (i64, a head's block), 2 ds (i64, one head's block), 3 dpb (128 bits, one head's
+// block), 4 the clock's skin of mode `mode` (u32, the support stride; a paced head where its pace is not plain), 5 a crowd's share ce at its live slots.
+extern "C" __global__ void __launch_bounds__(CONTACT_ROWS * 32) field_yard_bits_pairs(FieldWords w, uint32_t h, uint32_t kind, uint32_t mode, const void *arr, unsigned long long *hist) {
+    __shared__ uint32_t local[BITS_BINS];
+    __shared__ RowCls rcs[CONTACT_ROWS];
+    for (uint32_t c = threadIdx.x; c < BITS_BINS; c += blockDim.x) {
+        local[c] = 0;
+    }
+    __syncthreads();
+    const uint32_t warp = threadIdx.x >> 5, lane = threadIdx.x & 31;
+    const uint32_t classes = w.nclasses;
+    for (uint64_t g = ((uint64_t)blockIdx.x * blockDim.x + threadIdx.x) >> 5; g < w.T; g += (uint64_t)gridDim.x * (blockDim.x >> 5)) {
+        if (skipped_row(w, g)) {
+            continue;
+        }
+        const uint64_t hg = (uint64_t)h * w.T + g;
+        const uint32_t r = w.site_region[g], i = w.site_pos[g];
+        const uint64_t first = w.region_off[r];
+        const uint32_t sites = w.region_off[r + 1] - (uint32_t)first;
+        const uint32_t *members = w.members + (uint64_t)h * w.T + first;
+        const uint32_t *off = w.class_off + ((uint64_t)h * w.R + r) * (2 * classes + 1);
+        const uint32_t K = row_prepare(w, hg, off, rcs[warp], lane);
+        if (kind == 5) {
+            const uint32_t nslots = rcs[warp].open ? 0 : crowd_slots(sites);
+            uint32_t lo, hi_, lv;
+            if (lane < nslots && crowd_at(i, sites, lane, &lo, &hi_, &lv)) {
+                const uint64_t v = ((const uint64_t *)arr)[hg * w.slots + lane];
+                atomicAdd(&local[v ? 64 - __clzll((long long)v) : 0], 1u);
+            }
+            continue;
+        }
+        if (kind == 4 && !paced_at(w, h, g)) {
+            continue;
+        }
+        const uint64_t at = w.region_eoff[r] + (uint64_t)i * sites;
+        const uint64_t srow = support_row(w, r, i);
+        for (uint32_t k = lane; k < K; k += 32) {
+            const uint32_t j = support_at(members, off, rcs[warp], i, sites, k);
+            if (j == UINT32_MAX) {
+                continue;
+            }
+            uint32_t b = 0;
+            if (kind == 0) {
+                const uint64_t v = ((const uint64_t *)arr)[(uint64_t)h * w.E + at + j];
+                b = v ? 64 - (uint32_t)__clzll((long long)v) : 0;
+            } else if (kind == 1) {
+                b = bits_of_wide((wide)((const int64_t *)arr)[(uint64_t)h * w.E + at + j]);
+            } else if (kind == 2) {
+                b = bits_of_wide((wide)((const int64_t *)arr)[at + j]);
+            } else if (kind == 3) {
+                b = bits_of_wide(((const wide *)arr)[at + j]);
+            } else {
+                const uint32_t v = ((const uint32_t *)arr)[((uint64_t)paced_index(w, h) * w.E2 + srow + k) * w.n + mode];
+                b = v ? 32 - (uint32_t)__clz((int)v) : 0;
+            }
+            atomicAdd(&local[b], 1u);
+        }
+    }
+    __syncthreads();
+    for (uint32_t c = threadIdx.x; c < BITS_BINS; c += blockDim.x) {
+        if (local[c]) {
+            atomicAdd(&hist[c], (unsigned long long)local[c]);
+        }
+    }
+}
+
+// A batch's rows: `kind` 0 a 64-bit signed word, 1 a 32-bit signed word, 2 a 128-bit word, 3 a 64-bit count.
+extern "C" __global__ void field_yard_bits_words(const void *arr, uint32_t kind, uint64_t count, unsigned long long *hist) {
+    __shared__ uint32_t local[BITS_BINS];
+    for (uint32_t c = threadIdx.x; c < BITS_BINS; c += blockDim.x) {
+        local[c] = 0;
+    }
+    __syncthreads();
+    for (uint64_t c = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; c < count; c += (uint64_t)gridDim.x * blockDim.x) {
+        uint32_t b;
+        if (kind == 0) {
+            b = bits_of_wide((wide)((const int64_t *)arr)[c]);
+        } else if (kind == 1) {
+            b = bits_of_wide((wide)((const int32_t *)arr)[c]);
+        } else if (kind == 2) {
+            b = bits_of_wide(((const wide *)arr)[c]);
+        } else {
+            const uint64_t v = ((const uint64_t *)arr)[c];
+            b = v ? 64 - (uint32_t)__clzll((long long)v) : 0;
+        }
+        atomicAdd(&local[b], 1u);
+    }
+    __syncthreads();
+    for (uint32_t c = threadIdx.x; c < BITS_BINS; c += blockDim.x) {
+        if (local[c]) {
+            atomicAdd(&hist[c], (unsigned long long)local[c]);
+        }
+    }
+}

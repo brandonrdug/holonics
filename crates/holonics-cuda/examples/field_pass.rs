@@ -73,6 +73,28 @@ fn run(args: &[String]) -> Result<()> {
         "FIELD_SKIN octets_a_entry={} octets_a_site={} clock_octets_a_site={} entries={} dense_pairs={} peak_batch_entries={} peak_batch_dense_pairs={} peak_skin_store={} peak_store={} batch_cut={} free_at_open={}",
         t.skin_entry_octets, t.skin_site_octets, t.clock_site_octets, t.skin_entries, t.skin_dense_pairs, t.skin_peak_entries, t.skin_peak_pairs, t.skin_store, t.peak_store, t.batch_cut, memory.free_bytes
     );
+    // [measurement; theory, November 12, P54 item 1] The ruler build's words' bits: by array and clock, the words read, the zero share, the largest
+    // magnitude's bits and the 0.999 quantile's.
+    #[cfg(feature = "ruler-bits")]
+    if let Some(h) = card.bits_histograms() {
+        use holonics_cuda::hnn::field::{BITS_BINS, BITS_NAMES, BITS_TICKS};
+        for (a, name) in BITS_NAMES.iter().enumerate() {
+            for k in 0..BITS_TICKS {
+                let bins = &h[(a * BITS_TICKS + k) * BITS_BINS..(a * BITS_TICKS + k + 1) * BITS_BINS];
+                let count: u64 = bins.iter().sum();
+                if count == 0 {
+                    continue;
+                }
+                let largest = (0..BITS_BINS).rev().find(|&b| bins[b] > 0).unwrap_or(0);
+                let mut cum = 0u64;
+                let q999 = (0..BITS_BINS).find(|&b| {
+                    cum += bins[b];
+                    cum * 1000 >= count * 999
+                }).unwrap_or(largest);
+                println!("FIELD_BITS array={name} clock={k} words={count} zero={} zero_ppm={} largest_bits={largest} q999_bits={q999}", bins[0], bins[0] * 1_000_000 / count);
+            }
+        }
+    }
     if let Some(phases) = card.phased() {
         for (name, marks, ns) in phases {
             println!("FIELD_PHASE name={name} marks={marks} ms={} us_a_mark={}", ns / 1_000_000, ns / 1_000 / (marks as u128).max(1));
