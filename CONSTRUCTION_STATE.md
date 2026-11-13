@@ -522,6 +522,15 @@ repository was reset on September 24; the pre-reset tree is
     0.09 to 0.16 nats a place, mostly at places the field reads badly (G156). A hold cannot ring,
     so the card realization of the return waits; the next design is the reader's reaction on its
     source, which the theory thread is deriving, built from this host founding.
+    Corrected the same day (the return's record, §13): the tick adds its current to a site's
+    state, so the site term first derived is the site's own rate and takes no echo out; a head's
+    read changes the reader and not its source, which on the pair is free fall; and the
+    junction's return proper is a reader's reaction on its source, a design whose law is not yet
+    derived (atlas `tower.field-read-free-fall`); its covector's owner and equation are in §13.8.
+    A turned head's falloff is the envelope of the bank its skins are members of, so its reach
+    belongs on the head's own clock, founded on the log chart of the gap with every bit kept
+    (§13.9, atlas `tower.field-reach-on-clock`). Both are read from the built passes before a
+    build.
   - The open places need the written rows' ticks (November 13, P62, G140 scored; the design
     record §4.8). Read zero-shot on the line's latest lap mean with a written row held at its
     opening: the open rows alone code 3.29 nats a place worse at held one-place masks and 1.90
