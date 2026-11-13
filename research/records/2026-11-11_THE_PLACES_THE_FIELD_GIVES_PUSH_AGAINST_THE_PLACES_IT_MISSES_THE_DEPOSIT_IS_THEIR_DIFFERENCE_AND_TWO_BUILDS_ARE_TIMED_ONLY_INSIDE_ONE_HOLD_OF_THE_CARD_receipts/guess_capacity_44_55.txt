@@ -3186,3 +3186,32 @@ and size a law and cannot refute one)
   under 0.03: the news does not rank a written place's worth as a receiver zero-shot; where an open row's mass lies by its
   source's news is read before any build. A1 within 0.10: the cut at open rows alone is built first. (e) with rows over 0.5 of
   A0's: the count reader's sites are too many, and the cut waits for the machine's own news.
+
+G139 scored 2026-11-13T07:05Z (the PC's receipt p60_opening.txt with its ruler p60_opening.py, the engine record's receipts, on
+claude/carry-reads; the build on claude/opening-compare de3ddbab0 and its reader 7f6936510; the founded line and its control 3,000 sections
+each from leg1's STATE.3000, 1,027.0 s and 840.8 s against 1,113 and 1,638 projected; read-cavity on P57's 100,508 one-place masks and 3,717
+whole masks' open places at each line's MEAN.3000 and the founded MEAN.2000, and on the founded state before training; the line reproduced
+first, 100 of 100 section lines and both digests). Nats a place:
+  (a) the opening's code through the trained lift at one-place masks, pooled, 2.298 against 3.3 (2.7 to 4.2): missed below. Science and
+      books lowest, 2.097 and 1.914 against near 2.8 (2.2 to 3.6): lowest held, the values missed below; code 2.123. Web highest near 4.2
+      (3.6 to 5.0): missed, web 2.415 is second and wikidata highest at 2.935. It falls between the second and the third thousand
+      sections' means, 2.368 to 2.298: held. At the whole masks' open places 2.926 then 2.899; the tied face's bias alone (the lift at
+      zero) 4.285 and 4.165.
+  (b) the last tick against the control: +0.024 at one-place masks against -0.01 (-0.08 to +0.04): held; +0.018 at whole masks against
+      -0.02 (-0.10 to +0.05): held. By slice at one-place masks code +0.019, web +0.020, science +0.018, books +0.019, wikidata +0.047.
+  (c) the landmarks on the opening's code at 8 bits: a mean epoch of 3.549 places against 3.2 (2.6 to 4.2): held (0.081 of whole epochs
+      one place; by slice 3.81, 3.35, 3.83, 4.17, 2.89); kept under a start seven places later 0.9935 against 0.97 (0.92 to 0.995): held
+      (chance 0.304, lift 0.991); under doubled leading spaces on code 0.961 against 0.80 (0.60 to 0.93): missed above (lift 0.946). The
+      restarting cut keeps 0.9951 under the start against 0.93 (0.80 to 0.99): missed above (its mean epoch 1.902, one-place epochs 0.459).
+  (d) a section 1.189 of its controls in one hold (323.2 ms against 272.9 and 271.0, the controls' spread 0.007) against 1.06 (1.03 to
+      1.12): missed above. The five cavity entries 16.1 ms a profiled section (the skinned faces 10.1), the tied face and its two returns
+      7.0, 32 launches a section added and none a region; the profile adds 27.2 ms where the hold reads 51.3.
+  Of 11 parts 5 held and 6 missed: two below (the pooled code, science and books), three above (the doubled spaces, the cut under the
+  start, the time) and web's place. The premise that missed: the code was
+  guessed from the free face fitted on frozen openings (2.502) with a cost for the tied form; trained, the tied lift reads 2.298, under
+  the free face, since every place's comparison moves the rows the opening is formed from (the encoding, the neighbours' strand rows and
+  the moment's chart), which the fit held still (agent-inferred). The landmarks are steadier on the machine's news than on a count's.
+  Rules applied: the opening's code 2.298 is at 3.6 or under and falling between laps, and the last tick at whole masks is 0.018 over
+  the control's, under 0.03: the comparison stays in the line, and the level's sites, clock and phase chart are ordered next with their
+  guess. (d) over 1.12: the opening's kernels are the next engine reading, and the law stands. The one-place masks pay 0.024 and
+  wikidata 0.047 at both masks; the rule's bound is on the whole masks, and that payment is read again at the level's first lap means.

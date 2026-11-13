@@ -1,6 +1,6 @@
 # Construction state
 
-**November 12.** Where the construction stands: what runs, what is built and lawful, and what is
+**November 13.** Where the construction stands: what runs, what is built and lawful, and what is
 open, each named by its measurement. [THE_REBUILD](docs/plans/THE_REBUILD.md) is the order, the laws
 live in their guides and owners, and dated records hold the derivations and receipts.
 
@@ -452,15 +452,25 @@ repository was reset on September 24; the pre-reset tree is
     and 3.904 (web). At whole masks (3,717 places) the fitted codes are 3.745, 3.224, 2.824,
     2.592 and 2.533 and the trained readout's last 2.487. So the neighbours' rows and the
     moment bring 0.933 of the 2.122 nats the opening and four ticks bring together, and the
-    readout was never compared there. The law (agent-inferred, unbuilt): the cavity opening
+    readout was never compared there. The law (agent-inferred): the cavity opening
     of every place of a region, written or open, is read through the lane chart and a lift of
     its own (64 by 64 entries and 64 of bias, founded at zero) onto the one tied face, and
     compared with its written class at unit gain; its covector returns through the tied
     face, the lift, the chart, the neighbours' rows and the moment the others bring, never
     through the place's own row, term or stride. That code is the machine's news `c_t`, the
-    quantity the landmarks are counted on. It is the level's first build, alone, with its
-    guess fixed before it (G139); the level's sites, clock and phase chart follow on its
-    reading. The ticks stand as declared: each still removes news at these places.
+    quantity the landmarks are counted on. The ticks stand as declared: each still removes
+    news at these places. Built and trained (November 13, P60, G139 scored; the design record
+    §4.4a): host and card equal bit for bit, the line reproduced with the law in the tree, and
+    3,000 sections from the store line's last saved state beside the same without the block.
+    The opening's code through the trained lift reads 2.298 nats a place pooled at held
+    one-place masks (books 1.914 to wikidata 2.935), falling between thousands, under the
+    fitted free face's 2.502; the last tick pays 0.024 at one-place masks and 0.018 at whole
+    masks against the control; the landmarks at 8 bits on the machine's own news have a mean
+    epoch of 3.55 places and keep 0.994 of their sites under a start seven places later and
+    0.961 under doubled leading spaces. A section takes 1.19 of its control's time, the cavity
+    entries 16 ms of it, where the count gave 0.005 of a section: the opening's kernels are the
+    next engine reading. The comparison stays in the line, and the level's sites, clock and
+    phase chart are next, read on this news.
   - Every extent of the built declaration is given the part it sizes, how it was reached and what
     sizes it (the same record, §5), with ten findings by file and line and the build that closes
     each. The departures that stand: the face's 64 coordinates are two lanes of 32, the second a

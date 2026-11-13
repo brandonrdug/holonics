@@ -406,6 +406,36 @@ store line's last saved state beside the same sections without the block):
 opening of the region with the place silent; at an open place the opening's covector and the
 comparison's add.
 
+**Built, and what the build read** (P60, November 13; G139 scored; `p60_opening.txt` in the engine
+record's receipts). The law is built on host and card with equal bits (the card's parity, gate 3),
+founded on the store line's last saved state by a state tool that keeps every other line, and the
+line reproduced with the law in the tree and no block (100 of 100 section lines). One line trained
+3,000 sections with the block beside the same sections without it; read on P57's held places at the
+mean of each line's last 1,000 states, in nats a place:
+- *The opening's code* through the trained lift at one-place masks is 2.298 pooled (books 1.914,
+  science 2.097, code 2.123, web 2.415, wikidata 2.935), from 2.368 at the mean of sections 1,001 to
+  2,000 and 4.285 with the lift at zero. It stands under the free face fitted on frozen openings
+  (2.502) and the class frequencies (3.435): trained, every place's comparison moves the rows the
+  opening is formed from, which the fit held still (`agent-inferred`). At the whole masks' open
+  places it reads 2.899.
+- *The last tick* pays a little: 0.024 over the control at one-place masks and 0.018 at whole masks,
+  wikidata 0.047 at both. The acceptance's third item is met within G139's bound (0.03 at whole
+  masks) and not at zero; the payment is read again at the level's first lap means.
+- *The sites on the machine's own news* (`c_t` at every place, nothing masked): the landmarks at 8
+  bits have a mean epoch of 3.549 places (0.081 of whole epochs one place) and keep 0.9935 of their
+  sites under a start seven places later (lift 0.991) and 0.961 under doubled leading spaces on code
+  (lift 0.946); the restarting cut, a mean epoch of 1.902, keeps 0.9951 and 0.965. These are the
+  first sites read on the machine's face rather than a count's.
+- *The section's time* is 1.189 of its controls in one hold. The cavity entries take 16.1 ms a
+  profiled section (the skinned faces 10.1: the faces formed with the turn and skin directly, never
+  from the clock's stores), the tied face and its two returns 7.0; 32 launches a section are added and
+  none a region. The count of §4.4 put the arithmetic at 0.005 of a section, so the realization
+  stands far over its count: the opening's kernels are the next engine reading (G139's rule (d)),
+  and the law stands.
+
+Rule applied: the comparison stays in the line, and the level's sites, clock and phase chart (§9)
+are ordered next with their guess, on `c_t` as built.
+
 ### 4.5 An epoch's face is its moment on the news phase
 
 The built restriction opens a packet through one chart of its six sites' reads in place order.
