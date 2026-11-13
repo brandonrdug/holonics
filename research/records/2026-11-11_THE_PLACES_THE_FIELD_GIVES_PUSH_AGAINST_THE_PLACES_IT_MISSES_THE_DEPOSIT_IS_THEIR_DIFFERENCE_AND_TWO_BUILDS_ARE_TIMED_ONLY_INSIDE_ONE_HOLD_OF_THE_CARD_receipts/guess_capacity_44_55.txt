@@ -2288,3 +2288,37 @@ is dark, a tick that has settled, or a level above.
   the source proves is written before it is read is taken without its zeroing: every bit kept, built as step 6 with the steps' gates
   and one hold. Step 6's own guess, fixed here on the table: the unprofiled section falls by 0.60 of the moved phases' and the spared
   zeroings' summed ms (0.40 to 0.85).
+
+G129 fixed 2026-11-13T01:22Z (the same thread), before its read: the count ruler the design record of November 13 owes on sound (its
+section 8), read in the cloud on public speech (a count's code, never the machine's face; no state, no card).
+Read first: October 25's chart of sound, which the tree holds (examples/listener/sections.rs: a recording is its half-cycles, a run of
+one sign with its length and its peak's octave, the fibre kept at the boundary; about 4,300 octets a second, so about 2,150 half-cycles,
+and 12,106 bits a second against the corpus FLAC's 146,882); the design record's section 8 (a sample stream's places are cut like any
+other) and its acceptance (an invariance under re-timings, never a length on one clock); the Ratio (a comparison carried as a pair, its
+chart the logarithm). From these, agent-inferred and the reason for the read: a white floor crosses zero at a rate set by the frame, so
+its half-cycles follow the places, while a voiced wave's follow its events; a change of clock therefore touches the first and not the
+second, and the octave from which counts follow events is the passage's own floor. Above it a place is a half-cycle, and what a change
+of speed or of gain cannot touch is its ratios to the half-cycle before (the interval between their starts and the step of their peaks).
+The passage: the public 73 utterances of LibriSpeech dev-clean (16 bits, 16 kHz), counts on the first 55, reads on the last 18. Its
+copies: at double speed and at half speed (the rate renamed, then resampled to 16 kHz), and at half gain (each sample shifted one bit).
+Words of a place above the floor: rho, the half-octave of the samples from the place before's start to its own; o, its peak's octave;
+x, whether its sign repeats the place before's. Absolute word (rho, o, x); relative word (rho's step, o's step, x). Each coded given the
+word before by counts with Witten-Bell backoff. One section: the absolute word's width, 10 bits (6.931 nats). A place of the original
+is matched in a copy when a place starts within two samples of its start's image.
+  (a) Half-cycles by peak octave, double speed over the original's count (octaves holding 1,000 or more): octaves 5 and under 0.55
+      (0.42 to 0.70); octaves 12 and over 0.95 (0.85 to 1.02). The floor (the least octave from which every octave reads 0.85 or
+      over): 11 (9 to 12).
+  (b) News of the read utterances above the floor at half speed over the original's, by the reader counted on the original only:
+      absolute words 1.25 (1.08 to 1.60); relative words 1.00 (0.96 to 1.05). At double speed: relative 0.97 (0.85 to 1.08).
+  (c) At the original's speed, the relative words' news over the absolute words': 1.06 (0.95 to 1.20).
+  (d) The restarting cut at one section on the relative words: openings kept at half speed 0.93 (0.80 to 0.99), under a changed start
+      0.90 (0.75 to 0.99); on the absolute words at half speed 0.60 (0.35 to 0.85). Places matched at half speed: 0.97 (0.93 to 1.00).
+  (e) The sample stream at its 16 bits (the best of the four polynomial predictors, its residual's law counted by the last step's
+      bit length, each reader counted on its own passage): the passage's news at double speed over the original's 0.56 (0.50 to 0.66).
+  Rule. (a) octaves 5 and under at 0.70 or less and a floor found: a sound chart's floor is read by this count on its passage and is
+  never set by hand; no floor found: the half-cycle is not sound's place and a raster of bands is read first. (b) and (d): relative news
+  within 0.95 to 1.05 at half speed and openings kept at 0.80 or over: a sound enters a level as its half-cycles above its passage's
+  floor, each read as its ratios to the one before, the absolute interval and peak being the navigator's clock and gain, and the cut of
+  November 13 applies to it unchanged; the sample stream is never a level's place. Kept under 0.60: the design record's section 8 is
+  withdrawn for sound until a raster of bands is read. Between: the word is read again with the place two before in its context.
+  The image's ruler (a stroke under a magnification the passage itself holds) stays owed.
