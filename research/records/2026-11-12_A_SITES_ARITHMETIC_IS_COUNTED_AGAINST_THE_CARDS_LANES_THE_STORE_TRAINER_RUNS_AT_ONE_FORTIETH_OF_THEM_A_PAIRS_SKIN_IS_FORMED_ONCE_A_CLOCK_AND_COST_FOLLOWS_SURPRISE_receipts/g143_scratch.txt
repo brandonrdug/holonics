@@ -1,0 +1,29 @@
+G143 receipt: the opening return's far prefixes taken a moment mode at a time. Numbers only. The RTX 4080 SUPER under .local/gpu.lock; one hold, nothing else on the host.
+BUILD claude/opening-scratch 3f77560ca against main 9759c74ea
+PARITY_EXIT 0
+GATE1_EXIT 0 09:00:39
+GATES_OK 49
+GATE3_EXIT 0 09:07:35
+test result: ok. 89 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 350.70s
+STATE_SHA repro dad706563a1cd69c 129568c2278b4890 (the line's dad706563a1cd69c 129568c2278b4890)
+repro GATE_REPRO sections=100 line_lines=100 equal=100 EQUAL
+fn GATE_REPRO sections=100 line_lines=100 equal=100 EQUAL
+pfn GATE_REPRO sections=100 line_lines=100 equal=100 EQUAL
+HOLD unprofiled section_ms control_no_block=236.1/236.4 founded_old=270.3/270.0 founded_new=262.2 | founded_old_over=33.9 ms founded_new_over=26.0 ms nearer=7.9 ms | spreads 0.0011 0.0011
+KERNELS ms_a_section pfo1=246.3 pfn=247.3 pfo2=246.9
+FIELD_PROFILE_POOLPEAK live=11590376368 budget=10747183104
+FIELD_PROFILE_SPLIT kernels_ms=24670 copies=5400 copies_ms=297 allocations=32801 allocations_ms=1256 elapsed_ms=28520
+FIELD_PROFILE_POOLPEAK live=10503265200 budget=10746855424
+FIELD_PROFILE_SPLIT kernels_ms=24763 copies=5400 copies_ms=196 allocations=32801 allocations_ms=577 elapsed_ms=27811
+FIELD_PROFILE_POOLPEAK live=11590376368 budget=10747183104
+FIELD_PROFILE_SPLIT kernels_ms=24734 copies=5400 copies_ms=297 allocations=32801 allocations_ms=1262 elapsed_ms=28595
+ORDER the profiled splits and peaks are pfo1 (old), pfn (the change), pfo2 (old)
+MEASURE lap=nc1 rc=0 wall_s=24.2 peak_rss_kib=267752
+MEASURE lap=fo1 rc=0 wall_s=27.6 peak_rss_kib=268344
+MEASURE lap=fn rc=0 wall_s=26.8 peak_rss_kib=267196
+MEASURE lap=fo2 rc=0 wall_s=27.6 peak_rss_kib=267892
+MEASURE lap=repro rc=0 wall_s=27.0 peak_rss_kib=266272
+MEASURE lap=nc2 rc=0 wall_s=24.3 peak_rss_kib=266108
+MEASURE lap=pfo1 rc=0 wall_s=29.0 peak_rss_kib=267676
+MEASURE lap=pfo2 rc=0 wall_s=29.0 peak_rss_kib=267224
+MEASURE lap=pfn rc=0 wall_s=28.2 peak_rss_kib=267148
