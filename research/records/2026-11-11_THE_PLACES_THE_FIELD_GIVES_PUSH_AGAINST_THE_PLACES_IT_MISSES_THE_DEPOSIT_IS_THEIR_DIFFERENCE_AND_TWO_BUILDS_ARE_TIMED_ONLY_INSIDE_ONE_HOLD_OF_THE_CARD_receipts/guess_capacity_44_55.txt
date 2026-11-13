@@ -3318,3 +3318,24 @@ was fixed near 08:28Z, before the read, though its line reads 08:45Z):
   the reverse's start, a higher peak than the one it removed (agent-inferred, unread by phase).
   Rule applied: (a) over 6: the live set at its peak is read by phase (which buffers stand there) before another change. The change keeps
   every bit and gains 7.1 ms, and it stands.
+
+G143 fixed 2026-11-13T08:52Z (the Opus PC thread), before its build: the opening return's far prefixes taken a moment mode at a time
+(one mode's 28 MiB reused by every mode, where every mode's 448 MiB were taken at once), every bit kept. Read first: g142_pool.txt and
+g143_peak.txt (the line's live set peaks at 11.59 GB against a budget of 10.74, its control's at 10.50 on about 9.4 GB of stores the
+section's bounds size; the line's allocations 12.6 ms a profiled section against 1.6 without the block).
+  (a) The line's allocations 5 ms a profiled section (2 to 9) from 12.6, and its pool's peak live 11.17 GB (11.0 to 11.3).
+  (b) In one hold the line's section 5 ms nearer its control's (2 to 9).
+  Rules. (a) at 9 or under with (b) held: the same form is carried to the return's other scratch taken for every mode at once. (a) over
+  9: the section's bounds are derived from the card's memory with the opening's return counted, a change of the sections the pass cuts
+  that enters with its own reproduction, as the next item.
+
+G143 scored 2026-11-13T09:15Z (receipt g143_scratch.txt, the engine record's receipts, on claude/carry-reads; the change 3f77560ca against
+main 9759c74ea in one hold; the line reproduced 100 of 100 with its digests; the opening's card parity and gates 1 and 3 passed):
+  (a) the line's allocations 5.77 ms a profiled section against 12.56 and 12.62 on the old tree, against 5 (2 to 9): held. The pool's peak
+      live 10.50 GB against 11.17 (11.0 to 11.3): missed below; it is the control's own peak, from 11.59, so the opening's return no longer
+      sets the peak at all.
+  (b) the line's section 262.2 ms against 270.3 and 270.0 on the old tree, 7.9 ms nearer its control's 236.1 and 236.4, against 5 (2 to 9):
+      held.
+  Of 3 parts 2 held. The premise that missed, low: a 448 MiB prefix taken once a section was guessed to lower the peak by its own size;
+  it removed the whole excess, the rest of the return's scratch standing under the forward's peak once it was gone (agent-inferred).
+  Rule applied: (a) at 9 or under with (b) held: the same form is carried to the return's other scratch taken for every mode at once.

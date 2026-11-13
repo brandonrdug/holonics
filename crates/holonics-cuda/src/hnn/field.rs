@@ -2789,14 +2789,20 @@ impl<'c> CardField<'c> {
         self.launch_grid("field_moment_prefix_paced_all", grid(regions), MOMENT_BLOCK, MOMENT_BLOCK * 32, &mut [arg(&mut wsp), arg(&mut cmp), arg(&mut fw), arg(&mut dsp), arg(&mut qp), arg(&mut stride), arg(&mut pre_stride), arg(&mut one32)])?;
         let levels = (2u32..).take_while(|&lv| (1usize << lv) < d.reach).count() as u32;
         let sk_stride = (2 * levels as usize * 2 * (sites + regions)) as u64;
-        let sk = self.timed(Kind::Alloc, || self.take::<i128>((tm * sk_stride as usize).max(1))).map_err(device)?;
-        let (mut skp, mut sk_stride_a, mut levels_a) = (sk.device_ptr(), sk_stride, levels);
-        if levels > 0 {
-            // [realization; G141] The far prefixes' terms a thread each, then their scan a warp a mode, row and region.
-            self.launch("field_cavity_terms_all", Self::cells((tm * 2 * levels as usize * sites) as u64), THREADS, &mut [arg(&mut wsp), arg(&mut cmp), arg(&mut fw), arg(&mut dsp), arg(&mut skp), arg(&mut stride), arg(&mut sk_stride_a), arg(&mut levels_a), arg(&mut tm32)])?;
-            self.launch("field_cavity_scan_all", Self::warps((tm * 2 * levels as usize * regions) as u64), THREADS, &mut [arg(&mut wsp), arg(&mut cmp), arg(&mut fw), arg(&mut skp), arg(&mut sk_stride_a), arg(&mut levels_a), arg(&mut tm32)])?;
+        // [realization; G143] The far prefixes are taken a moment mode at a time: one mode's prefixes (`sk_stride` words) serve every mode in turn,
+        // each mode's terms, scan and return launched on its own words (`MomentWords` of 88 octets, its covector, prefix and return at its
+        // offsets), so the return's scratch holds one mode's 1/tm of the prefixes every mode would hold at once. The same words and sums.
+        let sk = self.timed(Kind::Alloc, || self.take::<i128>((sk_stride as usize).max(1))).map_err(device)?;
+        let (mut skp, mut sk_stride_a, mut levels_a, mut one) = (sk.device_ptr(), sk_stride, levels, 1u32);
+        for u in 0..tm as u64 {
+            let (mut wsu, mut cmu, mut dsu, mut qu, mut dbu, mut dau) = (wsp + 88 * u, cmp + 4 * u, dsp + 8 * stride * u, qp + 16 * pre_stride * u, dbp + 16 * stride * u, dap + 16 * stride * u);
+            if levels > 0 {
+                // [realization; G141] The far prefixes' terms a thread each, then their scan a warp a row and region.
+                self.launch("field_cavity_terms_all", Self::cells((2 * levels as usize * sites) as u64), THREADS, &mut [arg(&mut wsu), arg(&mut cmu), arg(&mut fw), arg(&mut dsu), arg(&mut skp), arg(&mut stride), arg(&mut sk_stride_a), arg(&mut levels_a), arg(&mut one)])?;
+                self.launch("field_cavity_scan_all", Self::warps((2 * levels as usize * regions) as u64), THREADS, &mut [arg(&mut wsu), arg(&mut cmu), arg(&mut fw), arg(&mut skp), arg(&mut sk_stride_a), arg(&mut levels_a), arg(&mut one)])?;
+            }
+            self.launch_grid("field_cavity_return_paced_all", Dim3 { x: Self::cells(sites as u64), y: 1, z: 1 }, THREADS, 0, &mut [arg(&mut wsu), arg(&mut cmu), arg(&mut fw), arg(&mut dsu), arg(&mut qu), arg(&mut skp), arg(&mut dbu), arg(&mut dau), arg(&mut stride), arg(&mut pre_stride), arg(&mut sk_stride_a)])?;
         }
-        self.launch_grid("field_cavity_return_paced_all", Dim3 { x: Self::cells(sites as u64), y: tm as u32, z: 1 }, THREADS, 0, &mut [arg(&mut wsp), arg(&mut cmp), arg(&mut fw), arg(&mut dsp), arg(&mut qp), arg(&mut skp), arg(&mut dbp), arg(&mut dap), arg(&mut stride), arg(&mut pre_stride), arg(&mut sk_stride_a)])?;
         self.launch("field_moment_strand_return_all", Self::cells((sites * tm) as u64), THREADS, &mut [arg(&mut w2), arg(&mut base_b), arg(&mut base_a), arg(&mut tm32), arg(&mut dbp), arg(&mut dap), arg(&mut gp)])?;
         let (mut bp, mut ap, mut upp, mut dnp) = (k.before.device_ptr(), k.after.device_ptr(), k.up.device_ptr(), k.down.device_ptr());
         let (mut sbp, mut sap) = (op.sb.device_ptr(), op.sa.device_ptr());
