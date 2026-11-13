@@ -1172,7 +1172,7 @@ pub(super) fn train(args: &[String], realization: &mut dyn FieldRealization) -> 
         Some([path, sha]) => FieldLearner::from_text(std::str::from_utf8(&pinned_read(path, sha, STATE_BUDGET)?)?).map_err(|e| e.to_string())?,
         _ => {
             // The founding's heads are its ring sets; the reach is the passages'.
-            let declaration = FieldDeclaration { alphabet: codec.alphabet(), width, heads, modes, still, contacts, ticks, frames: heads, reach, lanes: 1, depth: 0, carry: 0, triads: 0, opening: false };
+            let declaration = FieldDeclaration { alphabet: codec.alphabet(), width, heads, modes, still, contacts, ticks, frames: heads, reach, lanes: 1, depth: 0, carry: 0, triads: 0, opening: false, junction: false };
             let mut field = Field::found(declaration, &keys).map_err(|e| e.to_string())?;
             // [measurement; agent-inferred, November 3, §16.31] `FIELD_FOUND_RETURNS` (`returns`, or `lift` for the readout's
             // lift as well): the founding's zero families drawn instead, uniform on `±√(3/fan-in)` from a block of the key
@@ -1207,7 +1207,7 @@ pub(super) fn train(args: &[String], realization: &mut dyn FieldRealization) -> 
     declared_clocks(&mut learner.field);
     if let Some(rp) = learner.rate_parts {
         // The parts the field has, in the line's order (`written_parts`).
-        let octaves: Vec<String> = holonics::hnn::tower::field::written_parts(learner.field.declaration.carry, learner.field.declaration.triads, learner.field.declaration.opening).iter().map(|&p| format!("{}={}", holonics::hnn::tower::field::PART_NAMES[p], rp.octaves[p])).collect();
+        let octaves: Vec<String> = holonics::hnn::tower::field::written_parts(learner.field.declaration.carry, learner.field.declaration.triads, learner.field.declaration.opening, learner.field.declaration.junction).iter().map(|&p| format!("{}={}", holonics::hnn::tower::field::PART_NAMES[p], rp.octaves[p])).collect();
         println!("FIELD_PART_RATES contacts_before={} rate_bits={} octaves {}", rp.contacts_before, learner.rate_bits, octaves.join(" "));
     }
     if let Some(own) = &learner.own_rates {

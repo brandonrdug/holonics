@@ -1,0 +1,89 @@
+# G154, read-echo's heads.tsv on level3/MEAN.3000, 2026-11-13T19:26Z; host, RAYON 8 threads
+ECHO_LAW role=held places=4000 heads=4 still=2 frames=4 ticks=4 level=true ms=41
+ECHO_SLICE slice=code stretches=24 places=4296 rows=34368 written_rows=29628 open_rows_nonzero=0 host_ms=3936 ms=3980
+ECHO_SLICE slice=web stretches=25 places=4394 rows=35152 written_rows=30648 open_rows_nonzero=0 host_ms=4722 ms=8713
+ECHO_SLICE slice=science stretches=24 places=4296 rows=34368 written_rows=29628 open_rows_nonzero=0 host_ms=3595 ms=12322
+ECHO_SLICE slice=books stretches=24 places=4296 rows=34368 written_rows=29628 open_rows_nonzero=0 host_ms=3991 ms=16325
+ECHO_SLICE slice=wikidata stretches=25 places=4416 rows=35328 written_rows=31028 open_rows_nonzero=0 host_ms=5474 ms=21812
+ECHO_DONE ms=21812
+MEASURE lap=heads_g154 rc=0 wall_s=22.1 peak_rss_kib=632664
+DIAGONAL_EQUAL to G151's echo.tsv (cmp)
+
+HEADS written pooled rows=37640
+  median h=0: 0.00051 0.00020 0.00028 0.00131
+  median h=1: 0.00021 0.00017 0.00021 0.00113
+  median h=2: 0.00029 0.00024 0.00027 0.00144
+  median h=3: 0.00132 0.00122 0.00126 0.01075
+  mean h=0: 0.00263 0.00186 0.00191 0.00437
+  mean h=1: 0.00200 0.00210 0.00206 0.00430
+  mean h=2: 0.00159 0.00165 0.00335 0.00478
+  mean h=3: 0.00432 0.00412 0.00597 0.03004
+  row_sum_over_diagonal h=0 median=5.266 (rows with a diagonal)
+  row_sum_over_diagonal h=1 median=11.398 (rows with a diagonal)
+  row_sum_over_diagonal h=2 median=9.944 (rows with a diagonal)
+  row_sum_over_diagonal h=3 median=1.507 (rows with a diagonal)
+HEADS written code rows=7407
+  median h=0: 0.00064 0.00023 0.00041 0.00128
+  median h=1: 0.00028 0.00025 0.00035 0.00134
+  median h=2: 0.00047 0.00037 0.00050 0.00216
+  median h=3: 0.00147 0.00142 0.00176 0.01039
+  mean h=0: 0.00294 0.00210 0.00226 0.00439
+  mean h=1: 0.00252 0.00305 0.00298 0.00474
+  mean h=2: 0.00218 0.00247 0.00492 0.00697
+  mean h=3: 0.00463 0.00449 0.00793 0.02595
+  row_sum_over_diagonal h=0 median=4.905 (rows with a diagonal)
+  row_sum_over_diagonal h=1 median=10.881 (rows with a diagonal)
+  row_sum_over_diagonal h=2 median=7.609 (rows with a diagonal)
+  row_sum_over_diagonal h=3 median=1.595 (rows with a diagonal)
+HEADS written web rows=7662
+  median h=0: 0.00047 0.00024 0.00034 0.00148
+  median h=1: 0.00025 0.00021 0.00025 0.00127
+  median h=2: 0.00035 0.00029 0.00030 0.00182
+  median h=3: 0.00143 0.00138 0.00143 0.01185
+  mean h=0: 0.00264 0.00207 0.00212 0.00472
+  mean h=1: 0.00217 0.00228 0.00230 0.00484
+  mean h=2: 0.00171 0.00187 0.00354 0.00489
+  mean h=3: 0.00459 0.00459 0.00624 0.03016
+  row_sum_over_diagonal h=0 median=5.776 (rows with a diagonal)
+  row_sum_over_diagonal h=1 median=10.941 (rows with a diagonal)
+  row_sum_over_diagonal h=2 median=10.593 (rows with a diagonal)
+  row_sum_over_diagonal h=3 median=1.517 (rows with a diagonal)
+HEADS written science rows=7407
+  median h=0: 0.00048 0.00021 0.00029 0.00147
+  median h=1: 0.00022 0.00017 0.00021 0.00119
+  median h=2: 0.00029 0.00025 0.00028 0.00143
+  median h=3: 0.00138 0.00131 0.00118 0.01078
+  mean h=0: 0.00231 0.00163 0.00170 0.00436
+  mean h=1: 0.00168 0.00160 0.00159 0.00404
+  mean h=2: 0.00136 0.00125 0.00254 0.00435
+  mean h=3: 0.00413 0.00386 0.00520 0.03120
+  row_sum_over_diagonal h=0 median=5.540 (rows with a diagonal)
+  row_sum_over_diagonal h=1 median=11.405 (rows with a diagonal)
+  row_sum_over_diagonal h=2 median=10.522 (rows with a diagonal)
+  row_sum_over_diagonal h=3 median=1.515 (rows with a diagonal)
+HEADS written books rows=7407
+  median h=0: 0.00042 0.00018 0.00022 0.00140
+  median h=1: 0.00017 0.00012 0.00014 0.00108
+  median h=2: 0.00022 0.00017 0.00015 0.00123
+  median h=3: 0.00133 0.00114 0.00088 0.01424
+  mean h=0: 0.00218 0.00149 0.00164 0.00426
+  mean h=1: 0.00156 0.00141 0.00146 0.00370
+  mean h=2: 0.00122 0.00101 0.00296 0.00421
+  mean h=3: 0.00405 0.00352 0.00527 0.04134
+  row_sum_over_diagonal h=0 median=5.673 (rows with a diagonal)
+  row_sum_over_diagonal h=1 median=12.795 (rows with a diagonal)
+  row_sum_over_diagonal h=2 median=16.018 (rows with a diagonal)
+  row_sum_over_diagonal h=3 median=1.326 (rows with a diagonal)
+HEADS written wikidata rows=7757
+  median h=0: 0.00058 0.00016 0.00022 0.00098
+  median h=1: 0.00016 0.00012 0.00018 0.00081
+  median h=2: 0.00021 0.00017 0.00024 0.00092
+  median h=3: 0.00100 0.00090 0.00114 0.00791
+  mean h=0: 0.00303 0.00199 0.00182 0.00413
+  mean h=1: 0.00209 0.00213 0.00194 0.00415
+  mean h=2: 0.00149 0.00164 0.00283 0.00356
+  mean h=3: 0.00419 0.00412 0.00526 0.02195
+  row_sum_over_diagonal h=0 median=4.395 (rows with a diagonal)
+  row_sum_over_diagonal h=1 median=11.233 (rows with a diagonal)
+  row_sum_over_diagonal h=2 median=8.000 (rows with a diagonal)
+  row_sum_over_diagonal h=3 median=1.597 (rows with a diagonal)

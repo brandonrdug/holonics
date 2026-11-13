@@ -397,6 +397,16 @@ prints `B`, so the first item is that read.
    the matched founding on most written rows, and the build's first reading is whether the deposit moves `ℓ` at all, head 3's
    region the one where `ℓ*` is away from zero. The build's case does not rest on `B`, since the return is also the term that
    lets a tick carry a rate.
+
+   *Read after* (the theory thread's order after G151, its items (a) to (c); G152 to G154, November 13 19:23 to 19:29Z, the PC thread;
+   receipts [g152](2026-11-13_THE_TICK_HOLDS_THE_JUNCTIONS_ANCHOR_WITHOUT_ITS_RETURN_THE_RETURN_IS_THE_SWING_OF_THE_STATE_TWO_TICKS_BACK_ABOUT_THE_PRESENT_ANCHOR_THE_TREES_OWN_ECHO_TERM_AND_A_MERGE_LOSES_WHICH_NEVER_HOW_MUCH_receipts/g152_junction.txt), [g153](2026-11-13_THE_TICK_HOLDS_THE_JUNCTIONS_ANCHOR_WITHOUT_ITS_RETURN_THE_RETURN_IS_THE_SWING_OF_THE_STATE_TWO_TICKS_BACK_ABOUT_THE_PRESENT_ANCHOR_THE_TREES_OWN_ECHO_TERM_AND_A_MERGE_LOSES_WHICH_NEVER_HOW_MUCH_receipts/g153_best.txt), [g154](2026-11-13_THE_TICK_HOLDS_THE_JUNCTIONS_ANCHOR_WITHOUT_ITS_RETURN_THE_RETURN_IS_THE_SWING_OF_THE_STATE_TWO_TICKS_BACK_ABOUT_THE_PRESENT_ANCHOR_THE_TREES_OWN_ECHO_TERM_AND_A_MERGE_LOSES_WHICH_NEVER_HOW_MUCH_receipts/g154_heads.txt)). The return is
+   built on the host, founded at the matched load (`FieldDeclaration::junction`), and its founding covector was read on the line's third-lap
+   mean before any kernel work. Summed over the three returns, the code's slope is −0.034 nats a place per unit of `ℓ` under both masks (the
+   cut's own, 5,634 open places; one place open, 122), so a first deposit lowers `ℓ_b`: the return the deposit finds is a hold, `Γ < 0`, the
+   path slowed toward its state two ticks back, against the offered raise at the last return. The first return is the most coherent over open
+   rows alone (0.21), and every written row reads zero at the last (no face is read there). The codes by stage agree: the commonest best stage
+   is the third, before the trained depth, and 0.59 of places reach their least by it. Across heads, what a site tells in the second turned head
+   comes back to it in every head (heads 0 to 2 hear 5.3 to 11.4 times their own echo through the others, most of it through head 3).
 2. **The build.** The return as the tick's last step, founded at the matched load, on the card
    with its parity against the host; the grown state reads its source's faces bit for bit, and
    the build enters the line by reproducing the line's lap with the part at its founding and
