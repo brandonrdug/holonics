@@ -3028,7 +3028,7 @@ impl<'c> CardField<'c> {
         let status = self.take::<u32>(1).map_err(device)?;
         let function = self.module.function("field_yard_helper").map_err(|e| device(e.into()))?;
         let mut out = Vec::new();
-        for kind in 0..16u32 {
+        for kind in 0..18u32 {
             let blocks = blocks_of(kind);
             let timed = |reps: u32| -> Result<f64> {
                 let (mut k, mut r, mut sp, mut scp, mut sl, mut stp) = (kind, reps, sink.device_ptr(), scratch.device_ptr(), scratch_len, status.device_ptr());

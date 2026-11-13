@@ -6022,7 +6022,8 @@ extern "C" __global__ void __launch_bounds__(REV_ROWS * 32, 6) field_yard_rows(F
 // still clock; 2, 3 the read divisor's `div_nearest_by` (the key's share, the probe role's); 4 the rows' `mul_fits`; 5 `add_wide` at the rows' own
 // addresses (their sharing), 6 at a thread's own; 7, 8 the skin's return's `mul_fits` (the value's, the lock's); 9 `skin_back_dev` with
 // `turn_rate_dev`; 10 `turn_rate_dev` alone; 11, 12 the skin's return's crowd `div_nearest` (the bracket's, the value's); 13 a 64 by 64 product to
-// 128 bits; 14 a 128 by 128 product; 15 the sample's loads alone (the yardsticks' floor).
+// 128 bits; 14 a 128 by 128 product; 15 the sample's loads alone (the yardsticks' floor); 16, 17 `divisor_of` (the read divisor's own division) of
+// a crowd's count squared and of its count.
 #ifdef RULER_CALLS
 extern "C" __global__ void field_ruler_take(unsigned long long *out) {
     const uint32_t tallies = 2 * RULER_HEADS * 2 * RULER_KINDS;
@@ -6032,7 +6033,7 @@ extern "C" __global__ void field_ruler_take(unsigned long long *out) {
 }
 
 __device__ __forceinline__ uint32_t yard_sample_kind(uint32_t kind) {
-    const uint32_t of[16] = {0, 1, 2, 3, 4, 5, 5, 6, 7, 8, 8, 9, 10, 11, 4, 4};
+    const uint32_t of[18] = {0, 1, 2, 3, 4, 5, 5, 6, 7, 8, 8, 9, 10, 11, 4, 4, 2, 3};
     return of[kind];
 }
 
@@ -6103,6 +6104,12 @@ extern "C" __global__ void field_yard_helper(uint32_t kind, uint32_t reps, uint6
         case 14:
             out = a * b;
             break;
+        case 16:
+        case 17: {
+            const Divisor dq = divisor_of((uint64_t)q[2]);
+            out = (wide)(dq.v ^ dq.d ^ dq.s);
+            break;
+        }
         default:
             out = (wide)(q[0] ^ q[1] ^ q[2] ^ q[3]);
             break;
