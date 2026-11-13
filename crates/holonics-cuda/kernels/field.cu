@@ -3491,6 +3491,14 @@ extern "C" __global__ void field_face_at_class(FieldWords w, const uint64_t *mas
     }
 }
 
+// [measurement; theory, November 13, P57 item 2 (G132)] A reading's gather: rows `at[k]` of a `[T][width]` array of 32-bit words into a
+// compact `[count][width]`. One thread a word.
+extern "C" __global__ void field_gather_rows32(const int32_t *src, const uint32_t *at, uint64_t count, uint32_t width, int32_t *dst) {
+    for (uint64_t c = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; c < count * width; c += (uint64_t)gridDim.x * blockDim.x) {
+        dst[c] = src[(uint64_t)at[c / width] * width + c % width];
+    }
+}
+
 // -------------------------------------------------------------------------------------------
 // the reverse
 

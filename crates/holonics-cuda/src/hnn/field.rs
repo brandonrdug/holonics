@@ -912,6 +912,9 @@ pub struct CardField<'c> {
     /// ([`FieldRealization::read_and_return_at_class`]): set, and each region's open sites' `(m_c, T)` gathered on the card.
     narrow: std::cell::Cell<bool>,
     narrow_out: std::cell::RefCell<Vec<Vec<Option<(u128, u128)>>>>,
+    /// [measurement; theory, November 13, P57 item 2 (G132)] While the charts are read by stage
+    /// ([`FieldRealization::read_tick_charts`]): each region's open sites' chart rows at each tick's opening and after the last tick.
+    tick_charts: std::cell::RefCell<Option<Vec<Vec<Vec<i32>>>>>,
     /// [measurement; P57 item 1] The last phase marked, which a trace's launches are read under.
     last_mark: std::cell::Cell<&'static str>,
 }
@@ -926,7 +929,7 @@ impl<'c> CardField<'c> {
         let (free, total) = (memory.free_bytes as u64, memory.total_bytes as u64);
         let used = total.saturating_sub(free);
         let budget = free.min(BOARD_CEILING.saturating_sub(used)).saturating_sub(MARGIN);
-        Ok(Self { card, module, budget, times: FieldTimes::default(), profile: None, head: Default::default(), #[cfg(test)] unfilled: Default::default(), #[cfg(feature = "ruler-bits")] bits: Default::default(), pools: Default::default(), held_questions: Default::default(), covector_shares: Default::default(), row_questions: Default::default(), row_out: Default::default(), row_cov: Default::default(), held_cells: Default::default(), tick_reads: Default::default(), carry_gates: Default::default(), near_sites: Default::default(), near_out: Default::default(), clock_sites: Default::default(), clock_out: Default::default(), phases: None, phase_card: Default::default(), narrow: Default::default(), narrow_out: Default::default(), last_mark: std::cell::Cell::new("open") })
+        Ok(Self { card, module, budget, times: FieldTimes::default(), profile: None, head: Default::default(), #[cfg(test)] unfilled: Default::default(), #[cfg(feature = "ruler-bits")] bits: Default::default(), pools: Default::default(), held_questions: Default::default(), covector_shares: Default::default(), row_questions: Default::default(), row_out: Default::default(), row_cov: Default::default(), held_cells: Default::default(), tick_reads: Default::default(), carry_gates: Default::default(), near_sites: Default::default(), near_out: Default::default(), clock_sites: Default::default(), clock_out: Default::default(), phases: None, phase_card: Default::default(), narrow: Default::default(), narrow_out: Default::default(), last_mark: std::cell::Cell::new("open"), tick_charts: Default::default() })
     }
 
     /// The octets a batch's weight and contact stores may take.
@@ -2214,6 +2217,24 @@ impl<'c> CardField<'c> {
                 out.push(read);
             }
         }
+        // [measurement; theory, November 13, P57 item 2 (G132)] The charts by stage, where they are read: each tick's chart at its opening,
+        // gathered at the open sites (`field_gather_rows32`), and after the last tick the face's (below).
+        let open_at: Vec<u32> = (0..sites as u32).filter(|&t| unresolved[t as usize] != 0).collect();
+        let mut stage_rows: Option<Vec<Vec<i32>>> = None;
+        let gather = |src: u64, at: &CardBuffer<'c, u32>| -> Result<Vec<i32>> {
+            let rows = self.timed(Kind::Alloc, || self.take::<i32>((open_at.len() * dw).max(1))).map_err(device)?;
+            let (mut sp, mut ap, mut count, mut width, mut dp) = (src, at.device_ptr(), open_at.len() as u64, dw as u32, rows.device_ptr());
+            self.launch("field_gather_rows32", Self::cells((open_at.len() * dw) as u64), THREADS, &mut [arg(&mut sp), arg(&mut ap), arg(&mut count), arg(&mut width), arg(&mut dp)])?;
+            self.timed(Kind::Copy, || card.fetch_range(&rows, 0, open_at.len() * dw)).map_err(device)
+        };
+        let open_buf = if self.tick_charts.borrow().is_some() && !open_at.is_empty() { Some(self.timed(Kind::Copy, || self.take_up(&open_at)).map_err(device)?) } else { None };
+        if let Some(at) = open_buf.as_ref() {
+            let mut stages = Vec::with_capacity(ticks.len() + 1);
+            for tick in &ticks {
+                stages.push(gather(tick.read.device_ptr(), at)?);
+            }
+            stage_rows = Some(stages);
+        }
         // Each tick's reads, where the ticks are read (a reading of expansion and volume).
         if let Some(out) = self.tick_reads.borrow_mut().as_mut() {
             let mut per: Vec<Vec<TickRead>> = vec![Vec::new(); regions.len()];
@@ -2324,6 +2345,10 @@ impl<'c> CardField<'c> {
         let masses = self.timed(Kind::Alloc, || self.take::<u64>(sites * a)).map_err(device)?;
         let totals = self.timed(Kind::Alloc, || self.take::<i128>(sites)).map_err(device)?;
         self.chart(words, words.x, &fread, &fscale, true)?;
+        // [P57 item 2] The chart after the last tick, the stage the faces read, gathered at the open sites beside each tick's.
+        if let (Some(stages), Some(at)) = (stage_rows.as_mut(), open_buf.as_ref()) {
+            stages.push(gather(fread.device_ptr(), at)?);
+        }
         // The face read through the encoding (§16.26, the host's `Field::tied`): the lift `y = R r̂ + b_R`, then
         // `z(a) = rel(⟨E(a), y⟩, 16) + c_a`. [P58 item 2] The lift unzeroed: `affine` writes an open site's every output, and its readers,
         // `field_tied_face` and the reverse's `field_tied_back_e`, read it at open sites alone.
@@ -2463,6 +2488,16 @@ impl<'c> CardField<'c> {
             out.push(span.clone().map(|t| (unresolved[t] != 0).then(|| TowerFace { masses: masses[t * a..(t + 1) * a].iter().map(|&v| v as u128).collect(), total: totals[t] as u128 })).collect());
             if logits {
                 out_z.push(span.map(|t| (unresolved[t] != 0).then(|| zs[t * a..(t + 1) * a].to_vec())).collect());
+            }
+        }
+        // [P57 item 2] The charts by stage, each region's open rows in site order.
+        if let Some(out) = self.tick_charts.borrow_mut().as_mut() {
+            let stages = stage_rows.unwrap_or_default();
+            let mut row = 0usize;
+            for r in 0..regions.len() {
+                let open = (region_off[r] as usize..region_off[r + 1] as usize).filter(|&t| unresolved[t] != 0).count();
+                out.push(stages.iter().map(|s| s[row * dw..(row + open) * dw].to_vec()).collect());
+                row += open;
             }
         }
         Ok((out, out_z, rows, out_echo))
@@ -3425,6 +3460,18 @@ impl FieldRealization for CardField<'_> {
         Ok(self.run(field, regions, false, false, None)?.0)
     }
 
+    /// [measurement; theory, November 13, P57 item 2 (G132)] The faces and the open sites' charts by stage, from one forward that keeps every tick.
+    fn read_tick_charts(&mut self, field: &Field, regions: &[Region]) -> Result<(Vec<Vec<Option<TowerFace>>>, Vec<Vec<Vec<i32>>>)> {
+        *self.tick_charts.borrow_mut() = Some(Vec::new());
+        let read = self.run(field, regions, false, true, None);
+        let charts = self.tick_charts.borrow_mut().take().unwrap_or_default();
+        let faces = read?.0;
+        if charts.len() != regions.len() {
+            return Err(TowerError::Refused("a read of the charts by stage that did not return one a region"));
+        }
+        Ok((faces, charts))
+    }
+
     /// [measurement; part P2] The faces and the carry circles' gates from the same pass: every tick's gate and leak reads are summed on the card
     /// over the open sites (`field_carry_gates_read`), so no face and no other read changes.
     fn read_faces_gated(&mut self, field: &Field, regions: &[Region]) -> Result<(Vec<Vec<Option<TowerFace>>>, CarryGates)> {
@@ -3781,6 +3828,13 @@ mod tests {
         let (at_class, narrow_g) = card_field.read_and_return_at_class(&field, &regions).unwrap();
         assert_eq!(at_class, holonics::hnn::tower::field::faces_at_class(&host_faces, &regions));
         assert!(narrow_g == card_g, "the narrow read's covector differs from the whole read's");
+        // [P57 item 2] The open sites' charts by stage on the card are the host's, beside the same faces.
+        let (charts_faces, card_charts) = card_field.read_tick_charts(&field, &regions).unwrap();
+        let (host_charts_faces, host_charts) = holonics::hnn::tower::field::HostField.read_tick_charts(&field, &regions).unwrap();
+        assert_eq!(charts_faces, host_charts_faces);
+        assert_eq!(card_charts.len(), regions.len());
+        assert!(card_charts == host_charts, "the charts by stage differ between the card and the host");
+        assert_eq!(card_charts[4].len(), field.declaration.ticks + 1);
         for (name, start, len) in [("w_triad", l.w_triad, dw * 2 * triads), ("triad", l.triad, 6 * triads * dw), ("triad_bias", l.triad_bias, 6 * triads)] {
             assert!(host_g[start..start + len].iter().any(|&v| v != 0), "the triads' {name} takes no covector");
         }
