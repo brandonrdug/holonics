@@ -2506,3 +2506,35 @@ kept under a shifted start). What no log holds: what an opening's 64 words hold 
   (g) g2 less g4 at 0.10 or under and g3 less g4 at 0.05 or under: the declared four ticks are read as a lever of the engine, and a
   declaration of two ticks gets its derivation and a founded line's read before the engine's structure is rebuilt around four; g2 less
   g4 at 0.25 or over: the ticks stand. Between: three ticks are read the same way.
+
+G133 fixed 2026-11-13T02:10Z (the same thread), before its read: the restarting cut on a band's places, and what of its openings a change
+of start, the shift of rung and a ratio off the ladder keep (the design record of November 13, section 8's first owed reading; a count's
+code on a cloud host, the passage and the kept ladder of G130).
+Read first: band_ruler_kept.txt (a band's place codes 2.42 to 2.62 nats in its counted part, the bit length and sign of a first step's
+residual by the last step's bit length, and 3.31 to 3.85 in its flat part, the residual's bits under its leading one: about 6 nats a
+place, of which the larger half is no reader's; the shifted rung costs the original's reader 0.9995 to 1.0012 of its own); G124 and G125
+(on text the cut keeps 0.991 of its openings under a shifted start at a mean epoch of 6 places and 0.9997 at one octet's section, where
+a place's code runs from hundredths of a nat to ten); G129 (0.9996 under a changed start on half-cycle places, the cut begun later on the
+same codes). What no log holds: a cut on a band's places; any reading under a start that moves the raster's own phase; any ratio off
+the ladder.
+The reading. Bands 2 to 6 of the kept ladder, the 18 read utterances, each band's reader fit on the 55 count utterances at the original's
+speed. A place's code two ways: whole (counted and flat) and counted alone. The section three ways: 16 bits (11.09 nats, the boundary
+digit's width) on the whole code, and for each code the section located on the original so that its mean epoch is 2 places and 6 places.
+Four changes, the copy always read by the original's reader of the band named: (i) the cut begun 7 places later on the same codes;
+(ii) the passage begun 37 samples later, so every band's places fall between the original's (the same band); (iii) the double-speed copy's
+band s-1 (the shift of rung; places one to one); (iv) a copy at one and a half times the speed, its band s-1, compared in the original's
+time. An opening is kept where the copy opens within half the wider of the two strides; beside each share its chance (the copy's
+openings moved 1,000 strides along) and the lift, (kept less chance) over (1 less chance). The odometer (an opening where the running
+news passes a multiple of the section) beside the cut. Pooled over the five bands by openings, and by band.
+  (a) (i), the instrument's control: 0.985 kept at a mean epoch of 2 (0.95 to 1.000) and 0.95 at 6 (0.85 to 0.995), the whole code.
+  (b) (ii), the raster's phase moved: at a mean epoch of 6 the whole code's lift 0.15 (0.05 to 0.35), the counted code's 0.22 (0.08 to
+      0.45), the counted over the whole; at a mean epoch of 2 the whole code keeps 0.66 (0.55 to 0.78).
+  (c) (iii), the shift of rung: a place's whole code agrees in rank with the original's at 0.80 (0.60 to 0.93); the cut keeps 0.95 at a
+      mean epoch of 2 (0.88 to 0.99) and 0.65 at 6 (0.45 to 0.85).
+  (d) (iv), off the ladder: the copy's band costs the original's reader 1.01 of its own (1.00 to 1.04); the lift at a mean epoch of 6
+      0.10 (0.00 to 0.30), under (b)'s.
+  (e) the odometer's lift at a mean epoch of 6: under 0.10 in (ii) and (iv), and 0.10 in (iii) (0.00 to 0.30).
+  Rule. (b) under 0.50 on both codes: a first step's news on a band names no sites that a moved start keeps, so no level is founded on
+  this cut for sound; the place's news waits on a reader that is dark between a band's events (a longer context: the band's own period),
+  and that reader's ruler is read next, on the same four changes. (b) at 0.50 or over and (c) at 0.85 or over at a mean epoch of 6:
+  the cut carries to a band's places as it stands on text. (a) under its range: the instrument is read again before any other part.
