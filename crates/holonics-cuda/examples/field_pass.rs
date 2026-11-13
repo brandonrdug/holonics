@@ -146,6 +146,32 @@ fn run(args: &[String]) -> Result<()> {
         for ((kind, line), (calls, ns)) in &p.by_site {
             println!("FIELD_PROFILE_SITE kind={kind} line={line} calls={calls} ms={:.3}", *ns as f64 / 1e6);
         }
+        // [measurement; theory, November 13, P57 item 1] The trace (`FIELD_TRACE`): every launch in order, and each entry's lowering.
+        for (seq, r) in p.trace.iter().enumerate() {
+            let head = r.head.map_or("-".to_string(), |h| h.to_string());
+            println!(
+                "FIELD_TRACE seq={seq} run={} phase={} entry={} grid={},{},{} block={} shared={} ns={} head={head}",
+                r.run, r.phase, r.entry, r.grid[0], r.grid[1], r.grid[2], r.block, r.shared, r.ns
+            );
+        }
+        for (run, lengths) in &p.trace_regions {
+            let mut sorted = lengths.clone();
+            sorted.sort_unstable();
+            let sites: usize = sorted.iter().sum();
+            println!(
+                "FIELD_TRACE_REGIONS run={run} regions={} sites={sites} largest={} median={} smallest={}",
+                sorted.len(),
+                sorted.last().copied().unwrap_or(0),
+                sorted.get(sorted.len() / 2).copied().unwrap_or(0),
+                sorted.first().copied().unwrap_or(0)
+            );
+        }
+        for ((entry, block, shared), a) in &p.attributes {
+            println!(
+                "FIELD_ENTRY entry={entry} block={block} shared={shared} registers={} static_shared={} local={} max_threads={} blocks_a_multiprocessor={}",
+                a.registers, a.static_shared, a.local, a.max_threads, a.blocks_a_multiprocessor
+            );
+        }
         for ((line, class), [hits, misses, frees, freed, wide]) in &p.pool {
             println!("FIELD_PROFILE_POOL line={line} class_octets={class} hits={hits} misses={misses} frees={frees} freed_octets={freed} served_longer={wide}");
         }

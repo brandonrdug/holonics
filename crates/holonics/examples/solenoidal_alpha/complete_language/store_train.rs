@@ -3,8 +3,8 @@
 //! batch of the card. Its cut is the reference port's (`store_stretch_census.py`, the passage record's receipts), draw for draw, and its lines
 //! are held to the port's. Its law is in code and in the learner's state: the rate held at the state's `rate_bits`, every step standing at its
 //! size, no growth but the letters' at the crossing, the step's transfer and external price printed and never acted on. It reads no
-//! environment variable for its law: a run where any variable named `FIELD_…` is set is refused, but for the two readings the card's driver
-//! reads before any command (`FIELD_PROFILE`, `FIELD_PHASES`), which leave every bit of the state as it is.
+//! environment variable for its law: a run where any variable named `FIELD_…` is set is refused, but for the readings the card's driver
+//! reads before any command (`FIELD_PROFILE`, `FIELD_PHASES`, `FIELD_TRACE`), which leave every bit of the state as it is.
 //!
 //! Why no room and no opening (the record §2 and §4): a document has no question and no answer; the code line's openings computed 0.704 of a
 //! lap's sites for 0.018 of its compared places. Why one state a stretch (§4 item 2): a pass over fresh text meets a new stretch at every draw,
@@ -39,7 +39,7 @@ const OCTAVES: u64 = 7;
 const PAIRS_BOUND: u64 = 15_606_223;
 const SITES_BOUND: u64 = 41_490;
 /// The readings the card's driver reads before any command, which leave the state's bytes as they are.
-const READINGS: [&str; 2] = ["FIELD_PROFILE", "FIELD_PHASES"];
+const READINGS: [&str; 3] = ["FIELD_PROFILE", "FIELD_PHASES", "FIELD_TRACE"];
 
 /// A piece of a slice's index: its offset in the slice's file, its title's and its text's octets, and whether it opens and closes its document.
 #[derive(Clone, Copy, Debug)]
