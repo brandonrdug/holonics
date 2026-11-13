@@ -984,7 +984,7 @@ pub(super) fn read_influence(args: &[String], realization: &mut dyn FieldRealiza
     std::fs::create_dir_all(out)?;
     use std::io::Write as _;
     let mut tsv = std::io::BufWriter::new(std::fs::File::create(out.join("influence.tsv"))?);
-    writeln!(tsv, "slice\td\tnews_between\tcode\tcode_moved")?;
+    writeln!(tsv, "slice\td\tnews_between\tcode\tcode_moved\tclocks_between")?;
     println!("INFLUENCE_LAW role=held pairs={pairs} level={} ms={}", learner.field.scale.is_some(), started.elapsed().as_millis());
     use rayon::prelude::*;
     let mut state = seed ^ 0x9E37_79B9_7F4A_7C15;
@@ -1013,6 +1013,15 @@ pub(super) fn read_influence(args: &[String], realization: &mut dyn FieldRealiza
                 let region = [TrainRegion::plain(classes.clone(), vec![false; classes.len()])];
                 let views = views_of(&region);
                 learner.field.opening_codes(&views[0]).map_err(|e| e.to_string())?.into_iter().map(|c| c.ok_or_else(|| "a place the opening does not compare".to_string())).collect::<std::result::Result<Vec<i64>, String>>()
+            })
+            .collect::<std::result::Result<_, String>>()?;
+        // [G150's premise] Each turned head's clock (its variation) over each stretch as it is written.
+        let clocks: Vec<Vec<Vec<i64>>> = stretches
+            .par_iter()
+            .map(|classes| {
+                let region = [TrainRegion::plain(classes.clone(), vec![false; classes.len()])];
+                let views = views_of(&region);
+                learner.field.head_variations(&views[0]).map_err(|e| e.to_string())
             })
             .collect::<std::result::Result<_, String>>()?;
         let places: Vec<(usize, usize)> = stretches.iter().enumerate().flat_map(|(k, c)| (0..c.len()).map(move |t| (k, t))).collect();
@@ -1072,7 +1081,8 @@ pub(super) fn read_influence(args: &[String], realization: &mut dyn FieldRealiza
         for (i, &(k, b, a, _)) in drawn_pairs.iter().enumerate() {
             let (lo, hi) = (a.min(b), a.max(b));
             let between: i64 = news[k][lo + 1..hi].iter().sum();
-            writeln!(tsv, "{name}\t{}\t{between}\t{}\t{}", hi - lo, codes[2 * i], codes[2 * i + 1])?;
+            let gaps: Vec<String> = clocks[k].iter().map(|sigma| (sigma[hi] - sigma[lo]).unsigned_abs().to_string()).collect();
+            writeln!(tsv, "{name}\t{}\t{between}\t{}\t{}\t{}", hi - lo, codes[2 * i], codes[2 * i + 1], gaps.join(","))?;
         }
         println!("INFLUENCE_SLICE slice={name} stretches={} pairs={} reads={} card_ms={} ms={}", stretches.len(), drawn_pairs.len(), regions.len(), card_start.elapsed().as_millis(), started.elapsed().as_millis());
     }

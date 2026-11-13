@@ -43,12 +43,15 @@ def octave(v):
 
 
 for d in sys.argv[1:]:
-    rows = []
+    rows, clock_rows = [], []
     with open(d + "/influence.tsv") as f:
         f.readline()
         for line in f:
-            s, dist, between, c, cm = line.rstrip("\n").split("\t")
+            w = line.rstrip("\n").split("\t")
+            s, dist, between, c, cm = w[:5]
             rows.append((s, int(dist), int(between) / BIT, abs(int(cm) - int(c)) / BIT))
+            if len(w) > 5 and w[5]:
+                clock_rows.append([int(g) / float(1 << 24) for g in w[5].split(",")])
     dist = np.array([r[1] for r in rows], dtype=float)
     news = np.array([r[2] for r in rows], dtype=float)
     infl = np.array([r[3] for r in rows], dtype=float)
@@ -72,6 +75,22 @@ for d in sys.argv[1:]:
         for i, k in enumerate(key):
             groups[octave(k)].append(i)
         print("  %s mean_bits %s" % (name, " ".join("o%d:%d:%.4f" % (o, len(groups[o]), infl[groups[o]].mean()) for o in sorted(groups))))
+    if clock_rows and len(clock_rows) == len(rows):
+        clocks = np.array(clock_rows, dtype=float)
+        for h in range(clocks.shape[1]):
+            gap = clocks[:, h]
+            print("  head_clock %d rho_clock=%.4f" % (h, spearman(infl, gap)))
+            for name, key, other, label in (("within_distance_octave", dist, gap, "clock"), ("within_clock_octave", gap, dist, "distance")):
+                groups = defaultdict(list)
+                for i, k in enumerate(key):
+                    groups[octave(k)].append(i)
+                acc, n = 0.0, 0
+                for o in sorted(groups):
+                    r = spearman(infl[groups[o]], other[groups[o]])
+                    if not math.isnan(r):
+                        acc += r * len(groups[o])
+                        n += len(groups[o])
+                print("    %s rho_%s_pooled=%.4f (%d pairs)" % (name, label, acc / max(n, 1), n))
     by_slice = defaultdict(list)
     for i, r in enumerate(rows):
         by_slice[r[0]].append(i)

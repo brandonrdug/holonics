@@ -2735,6 +2735,13 @@ impl Field {
         Ok(BlankRead { read: r, scale: s, lift: y, face: self.tempered(&z, 1) })
     }
 
+    /// [measurement; theory, November 13, G150's premise] **Each turned head's clock over a region**: its variation `σ_h(t)` on the pace grain
+    /// (`2^(−24)`), the clock its skins read, one row a paced head in the order of [`FieldDeclaration::paced_heads`]. A reading: no state changes.
+    pub fn head_variations(&self, region: &Region) -> Result<Vec<Vec<i64>>> {
+        self.admit_region(region)?;
+        Ok(self.paces(region)?.sigma)
+    }
+
     /// [measurement; theory, November 13, P60 items 1d and 7] **The opening's faces at every place** of a region: each place's cavity opening read
     /// through the opening's lift ([`Field::opening_read`]), written or open. Refused on a field without the opening's block. A reading: no state
     /// changes; in a release it is read and compared with nothing.
