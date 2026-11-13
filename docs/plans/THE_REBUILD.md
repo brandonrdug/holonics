@@ -203,11 +203,15 @@ references and no write is yet ordered text.
    under a carry that begins again at each opening, `code.epoch-restarting-carry`, which a
    count ruler read keeping 0.996 of its sites under a doubled indentation and 0.9997 under a
    changed start at a section of 8 bits, where October's carry on a running sum keeps 0.70 and
-   0.61; a place's news is read at its cavity face, `code.place-news-cavity-face`; **next, its
-   first reading** on the PC from a trained state, outside any timing hold: every held place's
-   code at its cavity opening by slice, its rank against the last tick's code, the cut on those
-   codes and the count of what a cavity face a site adds to a section, its guess fixed in its
-   order; then the build, after that reading and after the engine's fourth step is timed); one
+   0.61; a place's news is read at its cavity face, `code.place-news-cavity-face`; its readings, the opening's comparison at every place
+   (G139) and the level itself are built, and the level is the line (November 13, G145 and G147: two laps
+   beside the line, 0.0194 nats a place under it at one-place masks and 0.0137 at whole masks at lap
+   means, every slice); **next**, from the readings that followed it: a turned head's reach on its own
+   located clock, where it now falls off by the count of places and a place's influence follows that
+   count and not the news (G148), and the pump that would carry a mode past the parametron's
+   bifurcation, since the trained field rung past its depth relaxes and dissipates what the places
+   hold (G149; the triads' pumped contact, which the line runs at zero, is the tree's candidate), each
+   with its guess fixed before its build; one
    continuous pass over tier A (1 GB), ordered once the engine stands near its count and judged by
    what it writes from held prompts by slice; the face as a composition of
    lanes, each block reading its own, entering at `(32, 32)`; then a lane whose width is derived

@@ -1,0 +1,22 @@
+G150 receipt: read-influence with each turned head's clock (its variation) between the two places, on the level's second-lap end (level2 STATE.3000), 4,000 pairs a slice; influence_ruler.py. Numbers only.
+BUILD claude/next-law 57f5e11ee
+INFLUENCE_LAW role=held pairs=4000 level=true ms=44
+INFLUENCE_SLICE slice=code stretches=78 pairs=4000 reads=8000 card_ms=7821 ms=8039
+INFLUENCE_SLICE slice=web stretches=78 pairs=4000 reads=8000 card_ms=8141 ms=16358
+INFLUENCE_SLICE slice=science stretches=77 pairs=4000 reads=8000 card_ms=8004 ms=24531
+INFLUENCE_SLICE slice=books stretches=75 pairs=4000 reads=8000 card_ms=8163 ms=32863
+INFLUENCE_SLICE slice=wikidata stretches=80 pairs=4000 reads=8000 card_ms=7948 ms=40969
+INFLUENCE_DONE reads=396 returns=0 pairs=10922100148 batches=396 peak_store=4165353932 ms=40970
+MEASURE lap=influence_L6c rc=0 wall_s=41.4 peak_rss_kib=392364
+INFLUENCE influence_L6c pairs=20000 mean_bits=0.4805 rho_distance=-0.6064 rho_news=-0.5877
+  within_distance_octave rho_news_pooled=0.0104 (17491 pairs) o1:2584:-0.041 o2:2685:0.015 o3:2609:0.026 o4:2551:0.063 o5:2444:0.015 o6:2181:0.001 o7:1702:-0.008 o8:677:-0.018 o9:58:0.081
+  within_news_octave rho_distance_pooled=-0.2730 (19994 pairs) o-1:5299:-0.584 o0:1755:-0.351 o1:2156:-0.244 o2:2309:-0.179 o3:2411:-0.115 o4:2268:-0.098 o5:2059:-0.090 o6:1390:-0.071 o7:347:-0.071
+  by_distance_octave mean_bits o0:2509:2.6744 o1:2584:0.7075 o2:2685:0.1659 o3:2609:0.0768 o4:2551:0.0530 o5:2444:0.0489 o6:2181:0.0413 o7:1702:0.0389 o8:677:0.0204 o9:58:0.0144
+  by_news_sections_octave mean_bits o-1:5299:1.5876 o0:1755:0.2473 o1:2156:0.1137 o2:2309:0.0608 o3:2411:0.0517 o4:2268:0.0487 o5:2059:0.0431 o6:1390:0.0341 o7:347:0.0167 o8:6:0.0157
+  head_clock 0 rho_clock=-0.6040
+    within_distance_octave rho_clock_pooled=-0.1142 (20000 pairs)
+    within_clock_octave rho_distance_pooled=-0.1419 (19180 pairs)
+  head_clock 1 rho_clock=-0.6014
+    within_distance_octave rho_clock_pooled=-0.0632 (20000 pairs)
+    within_clock_octave rho_distance_pooled=-0.1331 (19859 pairs)
+  by_slice code:4000:rho_d=-0.586:rho_news=-0.560 web:4000:rho_d=-0.614:rho_news=-0.598 science:4000:rho_d=-0.621:rho_news=-0.607 books:4000:rho_d=-0.605:rho_news=-0.589 wikidata:4000:rho_d=-0.626:rho_news=-0.615

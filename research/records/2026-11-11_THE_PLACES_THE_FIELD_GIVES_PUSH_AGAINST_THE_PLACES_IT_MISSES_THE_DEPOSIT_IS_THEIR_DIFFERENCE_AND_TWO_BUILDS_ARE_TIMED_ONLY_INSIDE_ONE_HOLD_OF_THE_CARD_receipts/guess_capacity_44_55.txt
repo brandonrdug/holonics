@@ -3538,3 +3538,28 @@ Brandon, 18:21Z: self-induction is his postulate and no reading tests it; this r
   Rule applied: (c) positive past the minimum with the changes shrinking: the field settles and does not cancel. The rule names a field
   trained at eight ticks next; the result and the question of which part of the law would carry a mode past the bifurcation went to the
   theory thread, and the order of the next item waits on its read.
+
+G150 fixed 2026-11-13T18:31Z (the Opus PC thread), before its read: the premise of a turned head's reach on its own located clock
+(G148's rule). read-influence again on the level's second-lap end, now with each turned head's clock between the two places (its variation
+`σ_h`, the clock its skins read), 20,000 pairs; influence_ruler.py. Read first: a turned head's falloff is `−⌊log₂ |i − j|⌋` in places
+(`hnn::tower::field`'s contact), its skins `e^(−2π|σ_i − σ_j|/n)` on its own clock, and its clock's rates are located by class (the newline
+14.5, `}` 7.9, `[` 6.6, the design record §3.1), so the two clocks part where the text holds such symbols.
+  (a) Inside each octave of place distance, a head's clock gap correlates with the influence at −0.03 (−0.10 to +0.05), both heads; inside
+      each octave of a head's clock gap, the place distance at −0.25 (−0.35 to −0.12).
+  Rules. (a) as guessed (the place count governs, the heads' clocks add little): the head's reach on its own clock is the next law, its
+  falloff and its crowds' octaves read on its variation, founded where its clock is plain so that a plain clock reads as before. The
+  clock's partial at −0.10 or under while the distance's is over −0.12: the skins already carry the head's clock, and the falloff's move is a
+  smaller item than the guess premised; the pump (G149's question) comes first.
+
+G150 scored 2026-11-13T18:50Z (receipt g150_clocks.txt; read-influence with the heads' clocks on the level's second-lap end, 20,000 pairs):
+  (a) inside each octave of place distance a head's clock gap correlates with the influence at −0.114 (the first turned head) and −0.063
+      (the second), against −0.03 (−0.10 to +0.05): missed for the first, held for the second; inside each octave of a head's clock gap the
+      place distance at −0.142 and −0.133, against −0.25 (−0.35 to −0.12): held. The news between the two places stays at +0.010 inside each
+      octave of distance.
+  Of 4 parts 3 held and 1 missed. The premise that missed, by half: the heads' own clocks carry a part of the influence the place count
+  does not (the first head's, whose rates hold the closers and line ends high, the more), through the skins that already read them; the
+  place count still carries its own part inside each octave of either clock.
+  Neither rule's condition is met whole (the first head's clock partial is under −0.10 while the distance's is not over −0.12). Decided
+  from the theory thread's read of G149 (18:31Z): the junction's return in the tick, the term that lets a mode ring, comes first, and the
+  head's reach on its own clock follows it with its own guess (agent-inferred: a falloff moved onto a clock changes which sources a receiver
+  hears, while the missing return changes whether anything can ring at all).
