@@ -2507,7 +2507,7 @@ kept under a shifted start). What no log holds: what an opening's 64 words hold 
   declaration of two ticks gets its derivation and a founded line's read before the engine's structure is rebuilt around four; g2 less
   g4 at 0.25 or over: the ticks stand. Between: three ticks are read the same way.
 
-G133 fixed 2026-11-13T02:10Z (the same thread), before its read: the restarting cut on a band's places, and what of its openings a change
+G133 fixed 2026-11-13T01:59Z (the same thread), before its read: the restarting cut on a band's places, and what of its openings a change
 of start, the shift of rung and a ratio off the ladder keep (the design record of November 13, section 8's first owed reading; a count's
 code on a cloud host, the passage and the kept ladder of G130).
 Read first: band_ruler_kept.txt (a band's place codes 2.42 to 2.62 nats in its counted part, the bit length and sign of a first step's
@@ -2538,3 +2538,46 @@ news passes a multiple of the section) beside the cut. Pooled over the five band
   this cut for sound; the place's news waits on a reader that is dark between a band's events (a longer context: the band's own period),
   and that reader's ruler is read next, on the same four changes. (b) at 0.50 or over and (c) at 0.85 or over at a mean epoch of 6:
   the cut carries to a band's places as it stands on text. (a) under its range: the instrument is read again before any other part.
+
+G128 scored 2026-11-13T02:14Z (the PC's receipts p56_shares.txt, p56_ticks.txt, p56_fill.txt and p56_host.txt, the count record's receipts; the
+pass's sections 2,001 to 2,100 from run 2's STATE.1900, each read in its own hold, every training read ending on the line's states; the
+host's part from one profiled read of main with step 5: 324.6 ms a profiled section, kernels 271.0, copies 9.6, takes 18.6, the host alone
+25.5).
+  (a) under 2^-37: 0.0035 of 4.57 thousand million met pairs: HELD. Under 2^-16: 0.0545: HELD. The median 2^-9: HELD. By kind: no
+      definite row's pair stands under 2^-37; 0.0053 of open rows' do, every one of them the first still head's (0.0212 of its open rows'
+      pairs, 378,256 of them a zero share). A crowd's share is zero at 0.043 of its live slots.
+  (b) definite 0.000, open 0.000: HELD, at the range's floor. No site at any tick moves by under 2^-8 of its chart's largest entry: the
+      change from one tick's opening to the next stands within 0 to 3 bits of the largest entry (the median 1 to 2), at every tick, in
+      both kinds, and in the pair contact's chart alike.
+  (c) open 0.850, definite 0.660 (by head 0.777, 0.557, 0.544, 0.642), over chunks 0.773: HELD, each.
+  (d) the cut, lists and tables 3.4 ms a section: MISSED below (20 fixed), six times under. The zeroings 6.6 of the takes' 18.6: HELD.
+      The covector's fetch, the deposit and the saves 11.9: HELD.
+  Rules applied. (a) a row's dark sources are no lever at this state. (b) no settling tick is derived; the ticks stand. (c) the walk does
+  not pack its met entries first. (d) no host phase of 8 ms or more reads no state of the section before, so none is prepared beside the
+  card; step 6 is the spared zeroings alone, 6.6 ms a profiled section at most.
+  What the host's table holds past its score (agent-inferred; G134 fixes what is done with it). The guess's premise was the wrong part
+  of the host: the text-only work is 3.5 ms, and the 53.6 ms a profiled section outside kernels stand in four places the rule did not
+  name. (1) Two plain takes, the clock's skins (6.9 ms a section in 4 calls) and the face covector's block (4.0 in 3), cost 1.3 to 1.7 ms
+  a call: allocations, where a pool's hit costs a thousandth of that. (2) The faces' masses are fetched whole, 79.5 MB a section in
+  7.7 ms, and a face a place is built on the host in 4.7 more. (3) The deposit on the host takes 11.1 ms. (4) The exposure's spread is
+  fetched each tick, which is a wait of the exposure's own 8.6 ms and costs nothing more.
+  The complete table of entries (70 entries, 270.6 ms a profiled section, 509.5 launches a section): 56 entries stand outside the
+  fourteen printed, which G131 (a) reads with the schedule.
+
+G134 fixed 2026-11-13T02:14Z (the same thread), before its build and reads: the sixth repair widened to the host's part as the table
+gives it (P58; realizations and plumbing, every bit kept; the steps' gates, reproduction and one hold).
+Read first: p56_host.txt (above); the driver's pool at source (field.rs: a take is served by a kept buffer of its size class up to twice
+it, and under the batch budget the pool frees its LARGEST kept buffers one at a time, which are the ones the next section takes again);
+the pass's end at source (the masses of every site, sites by the alphabet's 244 classes at 8 octets, are fetched and a face of 244 wide
+words is built for each unresolved place, where the trainer's line reads a place's code at its compared class and its total).
+  (a) The two takes: with their buffers kept across sections, 10.9 ms a profiled section falls to under 1.0 (0.1 to 2.0).
+  (b) The spared zeroings: of their 6.6 ms, 4.5 are spared (3.4 to 6.0), the score and share block's 3.4 among them.
+  (c) The faces: with only the words the trainer reads fetched, the fetch and collection's 12.4 ms fall to 2.0 (0.5 to 4.0).
+  (d) The deposit on the host, read by part before anything is moved: its arithmetic over the constitution's entries holds under
+      2.0 ms of the 11.1 (0.3 to 3.0); conversions, copies and allocations of whole layouts hold 0.60 of it (0.35 to 0.85).
+  (e) The step, (a) to (c) built, in one hold against a repeated control: an unprofiled section at 0.935 of the control's (0.90 to
+      0.96), 305 ms to about 285.
+  Rule. (d) as guessed: the deposit's whole-layout passes are removed on the host as a seventh step, no law moved. (d) with the
+  arithmetic over 6 ms: the deposit's card realization is derived (the constitution resident on the card, parity against the host's
+  bits) and ordered after the structural step. (e) over 0.96: the takes and fetches are bound elsewhere, and the profile is read
+  again before another host step.
