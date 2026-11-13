@@ -414,8 +414,8 @@ Athena text milestone claimed before a test of use was retracted or retired.
   by its measurement ("the predictor codes above flat on unseen families"), not as a missing part.
 
 [project-postulate] **Method, each rule with its reason.** These were given in conversation between
-October 29 and November 12; the last three are from his corrections of November 12, and the three
-before them were derived from a failure, from readings of November 11 and from Brandon's lens of
+October 29 and November 13; the last four are from his corrections of November 12 and 13, and the
+three before them were derived from a failure, from readings of November 11 and from Brandon's lens of
 that day. They are written here with their reasons so that no agent holds them as slogans.
 - **Theory picks, and a run tests a stated prediction** (November 4). Derive which law the theory
   gives, fix its guess as a number before the read, run that one law and score the guess, a miss
@@ -573,6 +573,23 @@ that day. They are written here with their reasons so that no agent holds them a
   acoustic and motor input, and every message, record and brief that describes one. The built
   line's class names stay the code's where the code is cited
   ([the record](research/records/2026-11-12_THE_STORE_CODES_HELD_TEXT_AT_THE_LEVEL_OF_TWO_KNOWN_NEIGHBOURS_A_SIDE_A_SYMBOL_IS_A_WORD_ON_LOCATED_RINGS_AND_A_DARK_PLACE_IS_THE_INTERIOR_OF_A_COMPOSITE.md) §5 to §9).
+- **One law reads every stream, and nothing branches on the kind of input** (Brandon,
+  November 12 and 13). A symbol and a sample are one thing: a digit of a passage, read by a
+  receiver at its own clock. No law, test, guess or vocabulary takes a modality or an interface
+  as a category with mechanics of its own. No clock and no frame length is privileged: a
+  passage stretched in time keeps its crossings and exchanges rate for packing. A specimen (a
+  text, an image, a sampled wave, a motor trace) is named once as a specimen and never stands
+  for the subject, which is propagation. What differs between kinds of input lives only in a
+  boundary codec, and a level's sites, clock and faces are read from the machine's own news by
+  one program. Reason: on November 12 and 13 an account of recognition from a short excerpt
+  was written around the excerpt's duration, then around audio, with a class of measured
+  symbols set beside written ones. He corrected each the same day: the distinctions were the
+  notation's, and a law that branches on them builds one machine a modality. The repository
+  already held the one law (the lessons' check of every design against four inputs, the
+  precision law's word, the aeon's pairing with no privileged clock), and the slip was in the
+  telling. The direction is his; the wording is `agent-inferred`. Scope: every design, guess,
+  test, record, brief and message. A reading still names its specimen and its region
+  ([the record](research/records/2026-11-13_A_LEVELS_SITES_ARE_THE_LANDMARKS_OF_ITS_NEWS_A_PLACE_NO_LARGER_NEWS_STANDS_WITHIN_A_SECTION_OF_THE_CLAIM_THE_CARRIED_CUT_AND_THE_ODOMETER_ARE_ONE_LAW_ANCHORED_NEARER_AND_FARTHER_AND_ONE_PROGRAM_READS_EVERY_SYMBOL_STREAM.md)).
 
 [project-postulate] **GPU first, and the design fixes the workload** (Brandon, October 27;
 [the record](research/records/2026-10-27_THE_LEARNER_RUNS_ON_THE_CARD_AND_ITS_WORKLOAD_IS_NEVER_TRADED_FOR_TIME.md)). The RTX 4080 SUPER is a consumer card, and

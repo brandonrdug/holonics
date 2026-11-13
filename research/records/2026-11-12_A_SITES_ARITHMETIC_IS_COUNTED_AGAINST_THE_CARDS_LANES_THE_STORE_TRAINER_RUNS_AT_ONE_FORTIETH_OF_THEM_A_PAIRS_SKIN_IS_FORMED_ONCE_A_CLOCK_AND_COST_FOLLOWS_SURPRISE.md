@@ -238,8 +238,11 @@ entry.
 **Phase 2, laws at declared widths** (each with host and card parity, its atlas row and its Lean
 obligation named in #410; none before phase 1's profile):
 - cost follows surprise (§5);
-- a row's carrier anchored at its peak, its terms released at a declared tolerance with the
-  remainder accounted, in place of five to twenty limbs;
+- ~~a row's carrier anchored at its peak, its terms released at a declared tolerance with the
+  remainder accounted, in place of five to twenty limbs~~ (struck November 13: the November 1
+  record's §14.11 retired a carrier at a fixed fraction of its row's peak, since a row is a
+  series and no term is released without its remainder; what the limbs can give with every
+  bit kept is §9);
 - the pair store on its support (`tower.field-support-stride`), a region's rows in one block.
 
 **The pass.** The pass over the 1 GB prefix waits until the engine stands near its count. The bar
@@ -332,3 +335,51 @@ a tile of 64 sites once an entry, 4,096 times, and adds each entry's partial by 
 step once a tile. The build gives the three kinds the yardstick's form with the same integers
 (a 64-bit covector as two 32-bit limbs whose sums stand in 64 bits where a tile's magnitudes
 prove it). G117 guesses the family at 20 ms (13 to 32) and the section at 0.885 of its control.
+
+## 9. The contact's widths, read from the source and the logs before any record of them orders a build (November 13)
+
+§8 owed a record that restates each width of a contact row. Its premise is read first from what
+the tree and the receipts already print.
+
+**What the source holds** (`contact_body` and `SeriesRow` at main 4f1347a6b):
+- *The multiplier.* It is `2^62` in every pair's term and in a crowd's value, and a crowd's count
+  times it in the crowd's mass (`Field::contact`'s two pushes; `coef_of` at five places in the
+  entry). A nearest quotient keeps its bits when its numerator and its divisor lose an even
+  common factor `K`: `⌊(|x|K + mK/2)/(mK)⌋ = ⌊(2|x| + m)/(2m)⌋`, and `⌊(|x| + ⌊m/2⌋)/m⌋` differs
+  from it only where `2|x| + m` is a multiple of `2m` with `m` odd, which an odd number never
+  is. So the currents and the shares at multiplier 1 are the same integers, and the 62 bits are
+  the carrier's, not the row's (`agent-inferred`; the lemma is owed to #410 beside the grouped
+  row's equality).
+- *A value.* Its 64 bits are `fit64`'s. The bits ruler reads a framed value at 23 bits and a
+  crowd's prefix at 30 (`p54_word_bits.txt`).
+- *The limbs.* The launch takes them from the widest row of the launch, which the host fetches
+  once a tick, where §14.11 of the November 1 record says the width is the row's.
+- *Once a pair.* The entry reads the exponential's face and forms the coefficient twice (for the
+  terms, then for the shares), and forms a crowd's score twice.
+
+With the multiplier gone and a value on one 32-bit limb where its row's read proves it, a row's
+fixed part is 131 bits against 225: three limbs hold a spread of 61 where five hold 95. Every
+form here keeps every bit, so these are realizations. §8 called the widths a law's subject; that
+word was wrong for them and is corrected here. A face's 62 bits and a share's 63 are the law's
+and are not touched.
+
+**What the logs already say of the gain.** P59's controls ran the forward entry at five limbs in
+351 launches and at six in 49 over 100 sections: 26.39 and 4.02 ms a section, so 7.52 and
+8.20 ms a launch. A limb costs 0.68 ms a launch, 9% of the entry (`agent-inferred`: the launches
+at six limbs are the ticks whose widest row is wider, and nothing else is known to differ). Two
+limbs fewer is about 5 ms a section of the forward entry's 30.4; the narrow numerators and the
+once-a-pair forms add a few more. The returns' wide forms rest on a share's 63 bits and on the
+covector `dy`, which no ruler has read.
+
+**What follows.** The widths are worth about 10 ms a section of 267, a tenth of the pair family
+and not a multiple. They are ordered after the site maps, with the reading of `dy` first. The
+pair family's multiple lies in the count of pair-terms alone: which rows are computed, and which
+sources a row meets. That is the design record's subject
+([§4.8 there](2026-11-13_A_LEVELS_SITES_ARE_THE_EPOCHS_OF_ITS_NEWS_BEGUN_AGAIN_AT_EACH_OPENING_ITS_CLOCK_IS_THE_NEWS_BETWEEN_THEM_A_PLACES_NEWS_IS_READ_AT_ITS_CAVITY_FACE_AND_EACH_NAVIGATOR_KEEPS_ITS_LOCATED_CLOCK.md), G140).
+
+**The ruler build of §8 is kept by tag, not in the trunk.** The contact's copies
+(`tools/contact_copies.py`, 74c049cb4, gate 1 passed) are the text of the entries as they stood,
+bound to asserted substitution counts. In the trunk the generated header would go stale at the
+first change of an entry or hold that change back, so the branch is set aside by tag
+(`archive/claude/contact-copies`, by the census tool on the PC, the first item of the order P61).
+The tag's commit is owed here in one sentence once the PC reports it.
