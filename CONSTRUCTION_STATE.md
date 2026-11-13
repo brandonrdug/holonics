@@ -270,6 +270,17 @@ repository was reset on September 24; the pre-reset tree is
     at 27.5 ms a section against today's 129, the columns' transposed walk the largest part of
     it (agent-inferred from source). By G120's rule the rows' products at the widths their
     bounds prove come first, the layout second, each with its guess fixed before its build.
+    Step 4 (November 13; every bit kept, 600 of 600 lines reproduced) formed each product of
+    `field_contact_rows` and `field_pace_skin_back` in the word its bounds prove, and read
+    0.970 and 0.908 of each entry's own time and 0.986 of the section inside one hold (330.6 ms
+    against controls of 334.1 and 336.3), where 0.72, 0.75 and 0.951 were guessed: G122 missed
+    on the rows and the section. The compiler already formed a product of two 64-bit words from
+    its halves, so the rows' cost is not their word widths. Read at source by line, what step 4
+    left is the crowds' and the modes' helpers: a quotient by `count² 2^b` that takes the
+    128-by-128 software division on every crowd of a paced clock (`b = 77`), checked 128-bit
+    products a mode, and a 128-bit atomic sum a mode at one address (agent-inferred, counted by
+    hand). Their time by helper is the next reading (G126), with the rebuild of any helper at
+    0.08 of an entry fixed in the same order.
   - The level above is designed on the news, and three count rulers fixed its choices
     (November 13; [the design record](research/records/2026-11-13_A_LEVELS_SITES_ARE_THE_EPOCHS_OF_ITS_NEWS_BEGUN_AGAIN_AT_EACH_OPENING_ITS_CLOCK_IS_THE_NEWS_BETWEEN_THEM_A_PLACES_NEWS_IS_READ_AT_ITS_CAVITY_FACE_AND_EACH_NAVIGATOR_KEEPS_ITS_LOCATED_CLOCK.md)). A level has two things the
     record of the symbol's length ran together: its places (where a receiver's section is
