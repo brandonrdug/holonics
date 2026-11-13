@@ -2452,3 +2452,57 @@ its longest block's and not its work's; and a chain of such launches cannot over
   layout alone is ordered first (a pair's record in walk order, its forward entries as one launch and its return's as one), and the
   small launches stay. Between: the layout first, the fusion second. (d) under 0.70: the couplings the schedule names are derived as
   joins at named crossings before either is ordered.
+
+G127 scored 2026-11-13T01:45Z (the PC's receipt p55_cavity.txt with cavity_cut.py, the design record's receipts; state C of the store's line and its mean
+of 1,000 states, the scores on the mean; the held role cut afresh by slice, 28 to 32 whole stretches and 6,014 to 6,320 places a slice, 30,677
+places; c0 on the host, checked against the whole opening's face on each slice's first stretch; cK on the card after the declared four ticks;
+the end state reads within 0.04 of the mean on every figure. The uniform face over the alphabet's 244 classes codes 5.497 nats).
+  (a) cK on code 0.907: MISSED below. Pooled 1.200: MISSED below (web 1.178, science 1.164, books 1.246, wikidata 1.504; the median 0.437).
+  (b) c0 over cK 6.71 pooled (c0 8.05 nats, over the uniform face's code at 0.610 of places): MISSED above. The rank 0.249, 0.182, 0.169,
+      0.081 on code, web, science and books: MISSED; wikidata 0.452, at the range's floor.
+  (c) the cut on c0: a mean epoch of 1.118 places: MISSED below; 0.909 of whole epochs one place: MISSED above.
+  (d) 1.000 under the shifted start: HELD, and 0.9998 under doubled leading spaces: MISSED above; both are what a cut that opens at nearly
+      every place gives, and say nothing of sites.
+  Rule applied: the rank stands under 0.40 on four slices. The readout does not read an opening, and the design gives the opening a face
+  of its own before any build of the level; the level's build is not ordered. No build was made.
+  What the reading holds past its score (agent-inferred):
+  - Through the readout an opening is worse than no reading (8.05 nats where the uniform face codes 5.50). The readout's covector comes
+    from the faces after the last tick, and the ticks carry a place's state into the frame it reads; the opening stands outside it.
+  - With every other place of its stretch written, a held place codes 0.91 nats on code and 1.20 pooled after the ticks, where the whole
+    mask codes 2.39 to 2.93 on the same state and a count of three known neighbours a side with both immediate neighbours known codes
+    1.10 on code. The level "two known neighbours a side" was the whole mask's: what holds the store's code up there is how much of a
+    stretch is open at once, and with one place open the constitution reads past three neighbours a side.
+  - The codes are skewed (mean 1.20, median 0.44, 0.024 of places over the uniform face's code): most places are dark given both sides
+    and the news stands on a few. This is the composite's dark interior of the record of November 12, read on the machine's own face.
+  - The cut was read on c0 alone, as ordered. The cut on cK, the faithful reader's, is the reference the level's sites are judged
+    against, and is owed (G132 (f)).
+
+G132 fixed 2026-11-13T01:45Z (the same thread), before its read: what a place's state holds of its class at the opening and after each tick, by a
+fitted face, and the cut on the faithful code (P57; a reading of state C's mean of states, no state changed; a host ruler in floats).
+Read first: p55_cavity.txt (above); the design record's §4.4 (the opening is the void's row, the two neighbours' strand rows, the moment's
+chart and a bias: first order in the sources); the store record's count rulers (a whole mask at one, two and three known neighbours a
+side 2.83, 2.49, 2.33 on code); G125 (the count's own code cut at 8 bits: a mean epoch of 1.90 places, 0.422 of epochs one place, 0.9997
+kept under a shifted start). What no log holds: what an opening's 64 words hold of the place's class in any frame, and what each tick adds.
+  The reading. The one-place mask of P55 part B on at least 20,000 held places a slice in whole stretches; at each place its 64 words at
+  the opening and after ticks 1, 2, 3 and 4. A fitted face a tick: a softmax over the alphabet's classes on the 64 words (floats on the
+  host, a ruler), fit on the places of the first four fifths of each slice's stretches pooled, read on the last fifth by slice; f0 to f4
+  its code in nats a place. Beside them the trained readout's code at each tick (c0, c1, c2, c3, cK), the code of the fit places' class
+  frequencies (the unigram), and the restarting cut at 5.545 nats on cK. Then the same fitted faces at the open places of the held role's
+  own whole masks, as read-store cuts them (g0 to g4).
+  (a) f4 pooled 1.45 (1.25 to 1.75); cK on the same places 1.20 (1.12 to 1.28).
+  (b) f0 pooled 2.6 (2.1 to 3.1); the unigram 3.25 (3.0 to 3.5).
+  (c) f1 2.0 (1.6 to 2.4), f2 1.65 (1.40 to 1.95), f3 1.50 (1.30 to 1.75).
+  (d) The rank agreement of the fitted opening's code with cK over a slice's read places 0.45 (0.30 to 0.60).
+  (e) The trained readout before the last tick: c1 6.0 (4.0 to 8.0), c2 3.5 (2.2 to 5.0), c3 2.0 (1.4 to 2.8).
+  (f) The cut on cK: a mean epoch of 3.0 places pooled (2.4 to 3.8); 0.25 of whole epochs one place (0.15 to 0.35); 0.995 of sites kept
+      under a start seven places later (0.98 to 1.000).
+  (g) At the whole masks: g4 over the trained readout's code there 1.10 (1.02 to 1.25); g2 less g4 0.35 nats (0.15 to 0.60); g3 less g4
+      0.12 (0.04 to 0.25).
+  Rules. (a) f4 more than 0.40 over cK: the ruler is too thin to rule on the rest, and the sample is raised before anything is read from
+  it. (b) f0 at 3.0 or under and at least 0.25 under the unigram: the opening holds news of its place, and the law change is derived and
+  ordered with its guess: the opening is given a chart of its own onto the one tied face (a symbol's key is one word; a frame has its own
+  transport), compared at every place of a region at its written class. f0 within 0.25 of the unigram: an opening holds no news of its
+  place in this form, and the cut reads the first tick whose fitted face stands 0.5 under the unigram, that tick's cost counted first.
+  (g) g2 less g4 at 0.10 or under and g3 less g4 at 0.05 or under: the declared four ticks are read as a lever of the engine, and a
+  declaration of two ticks gets its derivation and a founded line's read before the engine's structure is rebuilt around four; g2 less
+  g4 at 0.25 or over: the ticks stand. Between: three ticks are read the same way.
