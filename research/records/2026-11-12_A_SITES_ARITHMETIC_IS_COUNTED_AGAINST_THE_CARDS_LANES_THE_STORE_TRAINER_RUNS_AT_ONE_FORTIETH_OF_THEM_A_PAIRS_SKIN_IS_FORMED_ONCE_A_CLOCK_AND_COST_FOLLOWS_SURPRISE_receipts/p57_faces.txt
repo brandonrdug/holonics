@@ -1,0 +1,44 @@
+# P57 item 2 (G132), 2026-11-13 UTC: what a place's chart holds of its class at the opening and after each tick, by a fitted face, and the cut
+# on the faithful code. read-cavity at claude/cavity-read 30ee8d1f3 on state C's mean of states (leg 1 MEAN.3000, sha256 04f29aa40b468081), the
+# held role cut afresh by slice, whole stretches until 20,000 places a slice; each place a one-place mask; its chart read on the card at the
+# opening, after ticks 1, 2 and 3 and after the last; the trained readout's code at each stage the face of that chart (c0 checked against the
+# host's opening face and cK against the card's face at every place); the same at the open places of each slice's whole masks. The ruler:
+# faces_by_tick.py (a softmax face a stage on the 64 chart words, floats on the host). Numbers only.
+## the read (projection from the development read about 340 s, its upper end 410 s; outer 600 s)
+READ places=100508 stretches=514 whole_masks=95 whole_places=3717 wall_s=277.8 measured_over_projected=0.82 peak_rss_kib=457444
+READ_CHECK the 30,677 places P55 part B read on the same state: class, c0 and cK equal at 30,677 of 30,677
+READ_CHECK the card's charts by stage equal the host's on the triads fixture (gate 2, the_triads_on_the_card_read_the_hosts_bits)
+## the fits (a process a stage, 600 iterations of Adam at 0.05, l2 1e-5, stopped on the last eighth of each slice's fit stretches; projection
+## 300 s a stage, measured 387 s, outer 600 s; the held-out code changed by under 0.001 nats from iteration 400 to 600 at every stage)
+FIT stage=0 iterations=600 seconds=387.5 fit_code=2.074 stop_code=2.349 read_code=2.502
+FIT stage=1 iterations=600 seconds=386.9 fit_code=1.612 stop_code=1.831 read_code=1.933
+FIT stage=2 iterations=600 seconds=389.2 fit_code=1.264 stop_code=1.414 read_code=1.543
+FIT stage=3 iterations=600 seconds=386.5 fit_code=1.094 stop_code=1.221 read_code=1.359
+FIT stage=4 iterations=600 seconds=388.0 fit_code=1.049 stop_code=1.174 read_code=1.313
+G132 slice=code places=2883 f0=2.505 f1=1.648 f2=1.225 f3=1.046 f4=1.012 c0=7.991 c1=4.516 c2=1.533 c3=0.968 cK=0.897 unigram=3.512 rank_f0_cK=0.534
+G132 slice=web places=2911 f0=3.904 f1=2.748 f2=2.131 f3=1.893 f4=1.841 c0=9.156 c1=4.800 c2=2.359 c3=1.691 cK=1.614 unigram=3.741 rank_f0_cK=0.617
+G132 slice=science places=3006 f0=1.991 f1=1.618 f2=1.255 f3=1.024 f4=0.964 c0=7.568 c1=3.563 c2=1.820 c3=1.129 cK=1.013 unigram=3.305 rank_f0_cK=0.534
+G132 slice=books places=3433 f0=2.039 f1=1.752 f2=1.458 f3=1.280 f4=1.227 c0=7.734 c1=3.688 c2=2.027 c3=1.350 cK=1.222 unigram=3.183 rank_f0_cK=0.665
+G132 slice=wikidata places=3453 f0=2.224 f1=1.940 f2=1.647 f3=1.540 f4=1.509 c0=8.856 c1=4.611 c2=2.589 c3=1.935 cK=1.779 unigram=3.475 rank_f0_cK=0.499
+G132 slice=pooled places=15686 f0=2.502 f1=1.933 f2=1.543 f3=1.359 f4=1.313 c0=8.260 c1=4.226 c2=2.082 c3=1.430 cK=1.318 unigram=3.435 rank_f0_cK=0.553
+G132_CUT on=cK stretches=514 whole_epochs=27033 mean_epoch_places=3.648 one_place_share=0.405 kept_under_start_7_later=0.9974
+G132_WHOLE places=3717 g0=3.745 g1=3.224 g2=2.824 g3=2.592 g4=2.533 trained_cK=2.487 g4_over_cK=1.018 g2_less_g4=0.291 g3_less_g4=0.059
+STOP_TRAJECTORY stage=0 STOP_CODE iteration=400 code=2.3496 STOP_CODE iteration=500 code=2.3494 STOP_CODE iteration=600 code=2.3494 
+STOP_TRAJECTORY stage=1 STOP_CODE iteration=400 code=1.8311 STOP_CODE iteration=500 code=1.8314 STOP_CODE iteration=600 code=1.8318 
+STOP_TRAJECTORY stage=2 STOP_CODE iteration=400 code=1.4141 STOP_CODE iteration=500 code=1.4138 STOP_CODE iteration=600 code=1.4139 
+STOP_TRAJECTORY stage=3 STOP_CODE iteration=400 code=1.2218 STOP_CODE iteration=500 code=1.2210 STOP_CODE iteration=600 code=1.2208 
+STOP_TRAJECTORY stage=4 STOP_CODE iteration=400 code=1.1757 STOP_CODE iteration=500 code=1.1748 STOP_CODE iteration=600 code=1.1744 
+## G132, fixed before the read, scored (pooled over the five slices' read places unless named)
+G132 (a) f4 1.313 (1.45, 1.25..1.75): HELD. cK on the same places 1.318 (1.20, 1.12..1.28): MISSED above.
+G132 (b) f0 2.502 (2.6, 2.1..3.1): HELD. The unigram 3.435 (3.25, 3.0..3.5): HELD.
+G132 (c) f1 1.933 (2.0, 1.6..2.4): HELD. f2 1.543 (1.65, 1.40..1.95): HELD. f3 1.359 (1.50, 1.30..1.75): HELD.
+G132 (d) the fitted opening's code against cK in rank, by slice: code 0.534, web 0.617, science 0.534, books 0.665, wikidata 0.499 (0.45, 0.30..0.60):
+         HELD on three slices, MISSED above on web and books; pooled 0.553.
+G132 (e) c1 4.226 (6.0, 4.0..8.0): HELD. c2 2.082 (3.5, 2.2..5.0): MISSED below. c3 1.430 (2.0, 1.4..2.8): HELD.
+G132 (f) the cut on cK: a mean epoch of 3.648 places (3.0, 2.4..3.8): HELD; 0.405 of whole epochs one place (0.25, 0.15..0.35): MISSED above;
+         0.9974 kept under a start seven places later (0.995, 0.98..1.000): HELD.
+G132 (g) at the whole masks: g4 over the trained readout's code there 1.018 (1.10, 1.02..1.25): MISSED below; g2 less g4 0.291 (0.35,
+         0.15..0.60): HELD; g3 less g4 0.059 (0.12, 0.04..0.25): HELD.
+G132_RULES (a) f4 stands 0.005 under cK, not 0.40 over it: the ruler is not too thin. (b) f0 2.502 is under 3.0 and 0.933 under the unigram: the
+         opening holds news of its place, so the law change is derived and ordered with its guess: the opening is given a chart of its own onto
+         the one tied face, compared at every place of a region at its written class. (g) g2 less g4 0.291 is at 0.25 or over: the ticks stand.
