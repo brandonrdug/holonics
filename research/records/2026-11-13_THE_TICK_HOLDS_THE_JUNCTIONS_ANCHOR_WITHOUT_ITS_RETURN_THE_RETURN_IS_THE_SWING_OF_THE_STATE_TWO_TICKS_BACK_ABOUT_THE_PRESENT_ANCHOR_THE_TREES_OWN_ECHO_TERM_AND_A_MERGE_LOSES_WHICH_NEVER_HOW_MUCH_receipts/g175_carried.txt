@@ -1,0 +1,7 @@
+# G175, read-carried on the cut's masks of held text at the second pass's sixth lap mean (pass2/lap6/MEAN.3000), 4,000 places a slice: d(code)/dα at α = 0 of the open places' code were each open place's opening row to move toward the face the built read gave it (the opening's part; the voice not read), against the random-sign floor; host, RAYON 8 threads, 37.7 s. Ruler carried_ruler.py; numbers only.
+pooled open_places=5634 | open: dcode_dalpha=-0.03050 ratio=4.36 | written: dcode_dalpha=-0.01501 ratio=4.61 | both: dcode_dalpha=-0.04551 ratio=5.89
+code open_places=1161 | open: dcode_dalpha=-0.06817 ratio=5.10 | written: dcode_dalpha=-0.02388 ratio=3.46 | both: dcode_dalpha=-0.09204 ratio=6.12
+web open_places=1101 | open: dcode_dalpha=-0.00720 ratio=0.51 | written: dcode_dalpha=+0.00160 ratio=0.22 | both: dcode_dalpha=-0.00560 ratio=0.35
+science open_places=1161 | open: dcode_dalpha=-0.04277 ratio=3.11 | written: dcode_dalpha=-0.01935 ratio=2.91 | both: dcode_dalpha=-0.06212 ratio=4.07
+books open_places=1161 | open: dcode_dalpha=-0.04397 ratio=2.63 | written: dcode_dalpha=-0.01293 ratio=1.76 | both: dcode_dalpha=-0.05690 ratio=3.11
+wikidata open_places=1050 | open: dcode_dalpha=+0.01517 ratio=0.76 | written: dcode_dalpha=-0.02014 ratio=2.47 | both: dcode_dalpha=-0.00497 ratio=0.23

@@ -4155,3 +4155,35 @@ G173 scored 2026-11-13T23:29Z (receipt g173_before.txt; read-breakdown CONTROL 2
   3.0513), and from them the loop runs off to a lower level (5.52 on single faces, 3.80 averaged, 34% confidently wrong). Every arm
   stays above its first read. The rule's second branch: the steps' direction is read by part; it is owed, since what it would read is
   how the field is warmed, and a warmer field only lowers the runaway's level.
+
+G174 fixed 2026-11-13T23:37Z (the Opus PC thread), before its read: the second pass's seventh and eighth laps, 3,000 sections each from lap 6's end
+(the pass has not ended: 8,296,001 stretches read), each read by read-cavity at its lap mean against the lap before's. Read first: the
+pass's laps fell 0.0114, 0.0088, 0.0078, 0.0080, 0.0063 and 0.0025 nats a place at one-place masks, and lap 6 rose 0.0025 at whole masks.
+  (a) lap 7 falls 0.000 to 0.005 at one-place masks from 1.0295;
+  (b) lap 7's whole masks stand within 0.006 of 2.3860;
+  (c) lap 8 falls less than lap 7 at one-place masks, or ends the pass.
+  Rule: (a) and (c) held: the second pass has nearly spent what the same documents give at this size, its last laps run beside the next
+  design, and the growth's reading comes first once it ends (G165's second branch, reached at the pass's end).
+
+G175 fixed 2026-11-13T23:41Z (the Opus PC thread), before its read: the ring record's §4 first reading, the release carried as a face at its
+founding (read-carried; Field::carried_slopes): on the cut's masks of held text at the second pass's sixth lap mean (lap6/MEAN.3000), 4,000
+places a slice, the slope d(code)/dα at α = 0 of the open places' code were each open place's opening row to move toward the face the built
+read gave it, the opening's part only (the carried place's voice not read), against the random-sign floor sqrt(2/π)·sqrt(Σ r_t²). Read
+first: the first read is calibrated (G169: expected code 3.06 against the truth's 3.05 at sweep 0), and a calibrated face's code is
+stationary in its own sharpness, so a place hearing its own face faintly moves its code at second order; at α = 1 with the voice, the
+second pass coded 3.44 against 3.01 (G168, an older state, seen text).
+  (a) the pooled slope stands under three times its random-sign floor;
+  (b) d(code)/dα stands within ±0.05 nats a place a unit of α.
+  Rule: (a) held: the opening's mark gives the deposit no first-order direction at the founding, the strength's training would start at
+  a saddle, and the voice's slope (the carried place as a source) is read before any build. (a) missed with the slope negative: the mark
+  alone pays at first order, and §4's build starts from it.
+
+G175 scored 2026-11-13T23:42Z (receipt g175_carried.txt; read-carried, host, 8 threads, 37.7 s):
+  (a) the pooled slope is 5.89 times its random-sign floor: missed, with the slope negative;
+  (b) d(code)/dα is −0.0455 nats a place a unit of α (−0.0305 through the open places' own openings, −0.0150 through their written
+      neighbours'): held.
+  Of 2 parts 1 held. A faint mark of the field's own release in the opening lowers the open places' code at first order, coherently:
+  code −0.092 (6.1 times the floor), science −0.062 (4.1), books −0.057 (3.1), web and wikidata near zero (0.35 and 0.23). The first
+  read being calibrated, the gain is not the place sharpening its own face: it reaches the place through its neighbours' openings as
+  much as its own (agent-inferred). The rule's second branch: the mark alone pays at first order, and §4's build starts from it, with
+  the finite-strength curve read before the card (at α = 1 with the voice the second pass coded worse, G168).
