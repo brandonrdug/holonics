@@ -1,0 +1,30 @@
+G148 receipt: read-influence on the second laps' end states (control2 and level2 STATE.3000), 4,000 pairs a slice, and influence_ruler.py. Numbers only; the pairs' rows stay under the run's private directory.
+BUILD claude/level-lap2 39f490374
+INFLUENCE_LAW role=held pairs=4000 level=true ms=43
+INFLUENCE_SLICE slice=code stretches=78 pairs=4000 reads=8000 card_ms=7649 ms=7849
+INFLUENCE_SLICE slice=web stretches=78 pairs=4000 reads=8000 card_ms=7954 ms=15962
+INFLUENCE_SLICE slice=science stretches=77 pairs=4000 reads=8000 card_ms=7802 ms=23920
+INFLUENCE_SLICE slice=books stretches=75 pairs=4000 reads=8000 card_ms=7968 ms=32037
+INFLUENCE_SLICE slice=wikidata stretches=80 pairs=4000 reads=8000 card_ms=7771 ms=39951
+INFLUENCE_DONE reads=396 returns=0 pairs=10922100148 batches=396 peak_store=4165353932 ms=39952
+MEASURE lap=influence_L6 rc=0 wall_s=40.3 peak_rss_kib=389140
+INFLUENCE_LAW role=held pairs=4000 level=false ms=28
+INFLUENCE_SLICE slice=code stretches=78 pairs=4000 reads=8000 card_ms=5275 ms=5463
+INFLUENCE_SLICE slice=web stretches=78 pairs=4000 reads=8000 card_ms=5519 ms=11148
+INFLUENCE_SLICE slice=science stretches=77 pairs=4000 reads=8000 card_ms=5459 ms=16770
+INFLUENCE_SLICE slice=books stretches=75 pairs=4000 reads=8000 card_ms=5545 ms=22469
+INFLUENCE_SLICE slice=wikidata stretches=80 pairs=4000 reads=8000 card_ms=5177 ms=27807
+INFLUENCE_DONE reads=396 returns=0 pairs=10890866774 batches=396 peak_store=2696097138 ms=27808
+MEASURE lap=influence_C6 rc=0 wall_s=28.2 peak_rss_kib=384752
+INFLUENCE influence_C6 pairs=20000 mean_bits=0.4679 rho_distance=-0.6015 rho_news=-0.5816
+  within_distance_octave rho_news_pooled=0.0137 (17491 pairs) o1:2584:-0.047 o2:2685:0.009 o3:2609:0.049 o4:2551:0.076 o5:2444:0.034 o6:2181:-0.010 o7:1702:-0.012 o8:677:-0.052 o9:58:0.120
+  within_news_octave rho_distance_pooled=-0.2752 (19994 pairs) o-1:5300:-0.597 o0:1753:-0.393 o1:2156:-0.241 o2:2309:-0.152 o3:2408:-0.108 o4:2270:-0.087 o5:2062:-0.106 o6:1389:-0.050 o7:347:-0.107
+  by_distance_octave mean_bits o0:2509:2.6496 o1:2584:0.6883 o2:2685:0.1381 o3:2609:0.0637 o4:2551:0.0494 o5:2444:0.0436 o6:2181:0.0392 o7:1702:0.0360 o8:677:0.0187 o9:58:0.0319
+  by_news_sections_octave mean_bits o-1:5300:1.5649 o0:1753:0.2178 o1:2156:0.0949 o2:2309:0.0545 o3:2408:0.0472 o4:2270:0.0449 o5:2062:0.0407 o6:1389:0.0324 o7:347:0.0192 o8:6:0.0261
+  by_slice code:4000:rho_d=-0.591:rho_news=-0.562 web:4000:rho_d=-0.614:rho_news=-0.600 science:4000:rho_d=-0.612:rho_news=-0.596 books:4000:rho_d=-0.595:rho_news=-0.577 wikidata:4000:rho_d=-0.610:rho_news=-0.598
+INFLUENCE influence_L6 pairs=20000 mean_bits=0.4805 rho_distance=-0.6064 rho_news=-0.5877
+  within_distance_octave rho_news_pooled=0.0104 (17491 pairs) o1:2584:-0.041 o2:2685:0.015 o3:2609:0.026 o4:2551:0.063 o5:2444:0.015 o6:2181:0.001 o7:1702:-0.008 o8:677:-0.018 o9:58:0.081
+  within_news_octave rho_distance_pooled=-0.2730 (19994 pairs) o-1:5299:-0.584 o0:1755:-0.351 o1:2156:-0.244 o2:2309:-0.179 o3:2411:-0.115 o4:2268:-0.098 o5:2059:-0.090 o6:1390:-0.071 o7:347:-0.071
+  by_distance_octave mean_bits o0:2509:2.6744 o1:2584:0.7075 o2:2685:0.1659 o3:2609:0.0768 o4:2551:0.0530 o5:2444:0.0489 o6:2181:0.0413 o7:1702:0.0389 o8:677:0.0204 o9:58:0.0144
+  by_news_sections_octave mean_bits o-1:5299:1.5876 o0:1755:0.2473 o1:2156:0.1137 o2:2309:0.0608 o3:2411:0.0517 o4:2268:0.0487 o5:2059:0.0431 o6:1390:0.0341 o7:347:0.0167 o8:6:0.0157
+  by_slice code:4000:rho_d=-0.586:rho_news=-0.560 web:4000:rho_d=-0.614:rho_news=-0.598 science:4000:rho_d=-0.621:rho_news=-0.607 books:4000:rho_d=-0.605:rho_news=-0.589 wikidata:4000:rho_d=-0.626:rho_news=-0.615

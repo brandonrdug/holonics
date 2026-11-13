@@ -1,0 +1,67 @@
+G147 receipt: the level's second lap and the line's, 3,000 sections each from their first laps' ends (g145's control_line and level_line STATE.3000), on the same sections. Numbers only. The RTX 4080 SUPER under .local/gpu.lock, each step its own hold. The chain's first launch stopped at once on a wrong path in its script and was launched again four minutes later; no state was written by it.
+BUILD claude/level-sites 06a724206
+MEASURE lap=control2 rc=0 wall_s=888.5 peak_rss_kib=271188
+MEASURE lap=level2 rc=0 wall_s=978.0 peak_rss_kib=302448
+SHA control2 STATE.1000=3af62f6e77209d9d MEAN.1000=13e66c1870c71676 STATE.2000=f03be646734f8865 MEAN.2000=bd21deebf437b66d STATE.3000=98ce985dd06ba8a6 MEAN.3000=7f2e446fc069d9df 
+SHA level2 STATE.1000=0aaba135f8425175 MEAN.1000=63a7c5e0f3f24da7 STATE.2000=ad35d8bdc44ae4df MEAN.2000=17494fb8b35d5a9c STATE.3000=4c0806f63e4adb7c MEAN.3000=601864b7e85bc8d3 
+CAVITY_DONE ms=294771
+MEASURE lap=C6 rc=0 wall_s=295.2 peak_rss_kib=423340
+CAVITY_DONE ms=320285
+MEASURE lap=L6 rc=0 wall_s=320.7 peak_rss_kib=442568
+OPENING F3 one_place pooled=2.1482 places=100508 | code=1.9746(20124) web=2.2875(20043) science=1.9514(20088) books=1.7755(20028) wikidata=2.7474(20225)
+OPENING F3 whole_open pooled=2.8381 places=3717 | code=2.7772(730) web=2.9388(758) science=2.7187(776) books=2.5351(776) wikidata=3.2751(677)
+LAST_TICK F3 one_place pooled=1.1363 places=100508 | code=0.7941(20124) web=1.1919(20043) science=1.0912(20088) books=1.1464(20028) wikidata=1.4566(20225)
+LAST_TICK C3 one_place pooled=1.1557 places=100508 | code=0.8081(20124) web=1.2126(20043) science=1.1164(20088) books=1.1612(20028) wikidata=1.4788(20225)
+LAST_TICK_DIFF one_place founded_minus_control pooled=-0.0194 | code=-0.0140 web=-0.0207 science=-0.0252 books=-0.0147 wikidata=-0.0222
+LAST_TICK F3 whole_open pooled=2.4414 places=3717 | code=2.3038(730) web=2.6040(758) science=2.3937(776) books=2.2344(776) wikidata=2.6999(677)
+LAST_TICK C3 whole_open pooled=2.4552 places=3717 | code=2.3199(730) web=2.6149(758) science=2.4086(776) books=2.2443(776) wikidata=2.7172(677)
+LAST_TICK_DIFF whole_open founded_minus_control pooled=-0.0137 | code=-0.0161 web=-0.0110 science=-0.0149 books=-0.0098 wikidata=-0.0174
+SITES landmarks slice=pooled sigma_bits=8 places=95338 sites=25061 mean_epoch=3.804 whole_epochs=24705 one_place_share=0.0755 | start kept=0.9928 chance=0.2854 lift=0.9899 (21260 compared) | doubled kept=0.9574 chance=0.2634 lift=0.9421 (3872 compared)
+MEASURE lap=write_C6 rc=0 wall_s=7.6 peak_rss_kib=257996
+MEASURE lap=write_L6 rc=0 wall_s=10.0 peak_rss_kib=265188
+MAIN g147 chain done 18:10:29
+SECTION_CODES level/control by 500 sections:
+  sections 0-499 0.9974
+  sections 500-999 0.9971
+  sections 1000-1499 0.9967
+  sections 1500-1999 0.9966
+  sections 2000-2499 0.9965
+  sections 2500-2999 0.9961
+MEASURE lap=write_L6 rc=0 wall_s=10.0 peak_rss_kib=265188
+MEASURE lap=C6 rc=0 wall_s=295.2 peak_rss_kib=423340
+MEASURE lap=L6 rc=0 wall_s=320.7 peak_rss_kib=442568
+MEASURE lap=write_C6 rc=0 wall_s=7.6 peak_rss_kib=257996
+MEASURE lap=level2 rc=0 wall_s=978.0 peak_rss_kib=302448
+MEASURE lap=control2 rc=0 wall_s=888.5 peak_rss_kib=271188
+READS (the P60 ruler; F3 is the level's second-lap MEAN.3000, C3 the line's; the F2 and F0 rows are the line's, passed in their places)
+P60_OPENING nats a place; pooled is the mean over the named places; by slice with the count of places
+# 7a the opening's code through the trained lift
+OPENING F3 one_place pooled=2.1482 places=100508 | code=1.9746(20124) web=2.2875(20043) science=1.9514(20088) books=1.7755(20028) wikidata=2.7474(20225)
+OPENING F3 whole_open pooled=2.8381 places=3717 | code=2.7772(730) web=2.9388(758) science=2.7187(776) books=2.5351(776) wikidata=3.2751(677)
+OPENING F2 one_place pooled=2.1487 places=100508 | code=1.9751(20124) web=2.2881(20043) science=1.9518(20088) books=1.7760(20028) wikidata=2.7479(20225)
+OPENING F2 whole_open pooled=2.8382 places=3717 | code=2.7775(730) web=2.9388(758) science=2.7185(776) books=2.5352(776) wikidata=3.2757(677)
+OPENING F0_bias_only one_place pooled=2.1487 places=100508 | code=1.9751(20124) web=2.2881(20043) science=1.9518(20088) books=1.7760(20028) wikidata=2.7479(20225)
+OPENING F0_bias_only whole_open pooled=2.8382 places=3717 | code=2.7775(730) web=2.9388(758) science=2.7185(776) books=2.5352(776) wikidata=3.2757(677)
+# beside: P57's fitted face at the opening 2.502 pooled, the class frequencies 3.435 (state C, one-place masks)
+# 7b the last tick's code, founded against control
+LAST_TICK F3 one_place pooled=1.1363 places=100508 | code=0.7941(20124) web=1.1919(20043) science=1.0912(20088) books=1.1464(20028) wikidata=1.4566(20225)
+LAST_TICK C3 one_place pooled=1.1557 places=100508 | code=0.8081(20124) web=1.2126(20043) science=1.1164(20088) books=1.1612(20028) wikidata=1.4788(20225)
+LAST_TICK_DIFF one_place founded_minus_control pooled=-0.0194 | code=-0.0140 web=-0.0207 science=-0.0252 books=-0.0147 wikidata=-0.0222
+LAST_TICK F3 whole_open pooled=2.4414 places=3717 | code=2.3038(730) web=2.6040(758) science=2.3937(776) books=2.2344(776) wikidata=2.6999(677)
+LAST_TICK C3 whole_open pooled=2.4552 places=3717 | code=2.3199(730) web=2.6149(758) science=2.4086(776) books=2.2443(776) wikidata=2.7172(677)
+LAST_TICK_DIFF whole_open founded_minus_control pooled=-0.0137 | code=-0.0161 web=-0.0110 science=-0.0149 books=-0.0098 wikidata=-0.0174
+SAME_PLACES one_place 100508 of 100508 100508
+# 7c the machine's own news c_t (F3's opening code, nothing masked) and its sites at 8 bits
+NEWS by slice code=1.9746(20124) web=2.2875(20043) science=1.9514(20088) books=1.7755(20028) wikidata=2.7474(20225)
+SITES landmarks slice=code sigma_bits=8 places=19060 sites=4641 mean_epoch=4.107 whole_epochs=4566 one_place_share=0.0753 | start kept=0.9897 chance=0.2722 lift=0.9858 (3872 compared) | doubled kept=0.9574 chance=0.2634 lift=0.9421 (3872 compared)
+SITES landmarks slice=web sigma_bits=8 places=18981 sites=5298 mean_epoch=3.583 whole_epochs=5227 one_place_share=0.1110 | start kept=0.9893 chance=0.3071 lift=0.9846 (4494 compared)
+SITES landmarks slice=science sigma_bits=8 places=19133 sites=4664 mean_epoch=4.102 whole_epochs=4595 one_place_share=0.0646 | start kept=0.9947 chance=0.2478 lift=0.9930 (3999 compared)
+SITES landmarks slice=books sigma_bits=8 places=19073 sites=4251 mean_epoch=4.487 whole_epochs=4183 one_place_share=0.0287 | start kept=0.9934 chance=0.2297 lift=0.9914 (3631 compared)
+SITES landmarks slice=wikidata sigma_bits=8 places=19091 sites=6207 mean_epoch=3.076 whole_epochs=6134 one_place_share=0.0854 | start kept=0.9960 chance=0.3437 lift=0.9939 (5264 compared)
+SITES landmarks slice=pooled sigma_bits=8 places=95338 sites=25061 mean_epoch=3.804 whole_epochs=24705 one_place_share=0.0755 | start kept=0.9928 chance=0.2854 lift=0.9899 (21260 compared) | doubled kept=0.9574 chance=0.2634 lift=0.9421 (3872 compared)
+SITES restarting_cut slice=code sigma_bits=8 places=19060 sites=8680 mean_epoch=2.196 whole_epochs=8605 one_place_share=0.4242 | start kept=0.9904 chance=0.4792 lift=0.9815 (7254 compared) | doubled kept=0.9544 chance=0.4793 lift=0.9124 (7254 compared)
+SITES restarting_cut slice=web sigma_bits=8 places=18981 sites=9658 mean_epoch=1.965 whole_epochs=9587 one_place_share=0.4589 | start kept=0.9913 chance=0.5276 lift=0.9817 (8200 compared)
+SITES restarting_cut slice=science sigma_bits=8 places=19133 sites=8448 mean_epoch=2.265 whole_epochs=8379 one_place_share=0.3152 | start kept=0.9911 chance=0.4536 lift=0.9838 (7229 compared)
+SITES restarting_cut slice=books sigma_bits=8 places=19073 sites=7740 mean_epoch=2.464 whole_epochs=7672 one_place_share=0.2690 | start kept=0.9901 chance=0.4119 lift=0.9832 (6596 compared)
+SITES restarting_cut slice=wikidata sigma_bits=8 places=19091 sites=11827 mean_epoch=1.614 whole_epochs=11754 one_place_share=0.5331 | start kept=0.9960 chance=0.6384 lift=0.9890 (10044 compared)
+SITES restarting_cut slice=pooled sigma_bits=8 places=95338 sites=46353 mean_epoch=2.057 whole_epochs=45997 one_place_share=0.4135 | start kept=0.9921 chance=0.5139 lift=0.9838 (39323 compared) | doubled kept=0.9544 chance=0.4793 lift=0.9124 (7254 compared)
