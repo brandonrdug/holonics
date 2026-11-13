@@ -210,7 +210,10 @@ references and no write is yet ordered text.
    located clock, where it now falls off by the count of places and a place's influence follows that
    count and not the news (G148), and the pump that would carry a mode past the parametron's
    bifurcation, since the trained field rung past its depth relaxes and dissipates what the places
-   hold (G149; the triads' pumped contact, which the line runs at zero, is the tree's candidate), each
+   hold (G149; no pump across ticks is built, and a triad is a product along the strand inside one
+   tick, so the triads are judged on their own law and are not that pump; a pump needs a mode with
+   two energies, and the part owed first is a reader's reaction on its source, atlas
+   `tower.field-read-free-fall`, with a site's carried rate `tower.field-tick-return` beside it), each
    with its guess fixed before its build; one
    continuous pass over tier A (1 GB), ordered once the engine stands near its count and judged by
    what it writes from held prompts by slice; the face as a composition of
