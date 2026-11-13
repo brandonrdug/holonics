@@ -237,13 +237,37 @@ c_t = −Σ_a p̃_t(a) log p̃_t(a)   at an open place (the face's expected code
   through the pass's ticks: a field iterates one constitution on one complex. A release cuts
   again at each stage's opening, and a place that is written there changes its expected code
   for its realized one, which is what the blank's clock law already says of its duration.
-- **What is unread.** The readout's covector comes from the faces after the last tick. Whether
-  it reads an opening well enough to rank a region's places is the first reading the build
-  waits on (§9). If it does not, the opening's face is compared as the last tick's is, which changes
-  what the deposit consumes and is decided on that reading.
+- **What was unread, and what the reading gave** (G127, November 13; `p55_cavity.txt` in the
+  engine record's receipts; the store's state at the mean of 1,000 states, 30,677 held places
+  over five slices, each place open alone with every other place of its stretch written). The
+  readout's covector comes from the faces after the last tick, and it does not read an opening.
+  A place's written class codes 8.05 nats at the built opening, where the uniform face over the
+  alphabet's 244 classes codes 5.497, and stands over that face at 0.61 of places; after the four
+  declared ticks the same place codes 1.200 (code 0.907, web 1.178, science 1.164, books 1.246,
+  wikidata 1.504; the median 0.437, and 0.024 of places over the uniform face). The two codes'
+  rank agreement is 0.25, 0.18, 0.17 and 0.08 on code, web, science and books and 0.45 on
+  wikidata. A restarting cut on the opening's code is then a cut of one-place epochs (0.909 of
+  whole epochs, a mean of 1.118 places), and its share kept under a changed start (1.000) says
+  nothing of sites. The guess's five parts missed but one, and that one trivially; each is
+  recorded in the guess file.
+- **What follows** (`agent-inferred`). The ticks carry a place's state into the frame the
+  readout reads; the opening stands outside it. So the opening's face is owed a comparison of
+  its own, which changes what the deposit consumes, and the level's build is not ordered. Two
+  forms stand, and the next reading chooses (G132): the opening given a chart of its own onto
+  the one face the last tick is read through (a second face would give a symbol two words),
+  compared at every place of a region at its written class; or, if an opening's state holds
+  little of its class in any frame, the cut read at the first tick whose state does. That reading fits a face to a place's 64 words at
+  the opening and after each tick (a host ruler in floats, fit on four fifths of each slice's
+  stretches and read on the rest), with the trained readout's code beside it and the restarting
+  cut on the code after the ticks, the faithful reader's.
+- **What the same reading says of the store's level** (`agent-inferred`). With one place open
+  the store codes 0.91 nats on code, where a whole mask codes 2.39 on the same state and a count
+  of three known neighbours a side with both immediate neighbours known codes 1.10
+  (`code.neighbour-count-level`). The level "two known neighbours a side" of November 12 was the
+  whole mask's: what holds the code up there is how much of a stretch is open at once.
 - **Cost.** A cavity face at every place adds, a site, one step of its moment at the bare
-  stride and one readout through the encoding, with no contact and no tick. It is counted from
-  source and timed with the reading, before any build is ordered.
+  stride and one readout through the encoding, with no contact and no tick: about 23,900 narrow
+  products a site, 0.005 of a section's count (from source, with the reading).
 
 ### 4.5 An epoch's face is its moment on the news phase
 
@@ -424,16 +448,21 @@ it as one reading and no level promised:
 
 **The order.**
 
-1. *A reading, on the PC, from state C, outside any timing hold* (the next order): every held
-   place's code at its cavity opening, by slice; its rank against the last tick's code where a
-   mask compares the place; the restarting cut at 8 bits on those codes (mean epoch, one-place
-   share, spread, shares under the shifted start and the stretch); and the count, from source,
-   of what a cavity face a site adds to a section. Its guess is fixed in the order.
-2. *The build* is ordered after that reading and after the engine's fourth repair is timed,
-   with its guess and its cost stated against the card: the cut, the level's clock, the phase
-   chart, a field of the level's own founded as the built `Scale` is. A first build of a new
-   part: it enters the store's line by reproducing the line's lap with the level founded at
-   zero.
+1. *A reading, on the PC, from state C, outside any timing hold* (read November 13, G127;
+   §4.4): every held place's code at its cavity opening, by slice; its rank against the last
+   tick's code; the restarting cut at 8 bits on those codes; and the count, from source, of what
+   a cavity face a site adds to a section. The readout does not read an opening.
+2. *A second reading, from the same state* (G132, fixed before its read): what a place's 64
+   words hold of its class at the opening and after each of the four ticks, by a fitted face;
+   the trained readout's code at each tick; the restarting cut on the code after the ticks; and
+   the same fitted faces under the held role's whole masks. It decides the opening's face
+   (§4.4) and reads whether the last two ticks add to a place's code.
+3. *The law of the opening's face* is derived and recorded from that reading, with its Lean
+   obligation named, before any build.
+4. *The build* is ordered after it, with its guess and its cost stated against the card: the
+   opening's comparison, the cut, the level's clock, the phase chart, a field of the level's own
+   founded as the built `Scale` is. A first build of a new part: it enters the store's line by
+   reproducing the line's lap with the level founded at zero.
 
 **The device line.** The card, under its lock; the reading of item 1 is a host reading from a
 saved state and leaves its bytes the same.

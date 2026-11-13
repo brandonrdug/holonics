@@ -323,8 +323,19 @@ repository was reset on September 24; the pre-reset tree is
     boundary's digit, so the founding is the identity and epochs lengthen as places are
     predicted. Its acceptance is an invariance (the share of sites kept under a changed start
     and under re-timings the reader predicts, with a predicted failure under one it has not
-    met). Its first reading is ordered from a trained state before any build: every held
-    place's code at its cavity opening, by slice, and the cut on those codes.
+    met). Its first reading was made from a trained state before any build (G127, November 13;
+    the mean of 1,000 states, 30,677 held places over five slices, each open alone among written
+    places): the readout does not read an opening. A place's written class codes 8.05 nats at
+    the built opening, where the uniform face over the alphabet's 244 classes codes 5.497, and
+    1.200 after the four declared ticks (code 0.907, web 1.178, science 1.164, books 1.246,
+    wikidata 1.504); the two codes' rank agreement is 0.08 to 0.45 by slice, and a cut on the
+    opening's code is a cut of one-place epochs (0.909). The level's build is not ordered: the
+    opening's face is owed a comparison of its own, a change of what the deposit consumes,
+    decided on what a place's state holds of its class at the opening and after each tick
+    (G132, fixed before its read). The same reading places the store's level: with one place
+    open it codes 0.91 nats on code where a whole mask codes 2.39, so "two known neighbours a
+    side" was the whole mask's level, set by how much of a stretch is open at once
+    (agent-inferred).
   - On sound the design's places are read before they are named, and two count rulers say where
     they are not (November 13; the design record §8, G129 and G130; 481 seconds of public speech
     at its own, double and half speed). A wave's crossings follow the top of the frame's band at
