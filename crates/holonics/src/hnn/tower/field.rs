@@ -5730,6 +5730,31 @@ impl Field {
         Ok(out)
     }
 
+    /// [measurement; theory, November 13, P57 item 2 (G132)] **A region's charts by stage**: the chart `r̂` of every site's state at each tick's
+    /// opening (stage `k` the state before tick `k`, stage 0 the opening `x⁰`) and after the last tick (the stage the faces read), `[t][D]` on
+    /// `2^(−16)` each. A reading: no state changes.
+    pub fn tick_charts(&self, region: &Region) -> Result<Vec<Vec<i32>>> {
+        let pass = self.pass(region, true)?;
+        let mut stages: Vec<Vec<i32>> = pass.ticks.iter().map(|c| c.read.clone()).collect();
+        stages.push(pass.read.clone());
+        Ok(stages)
+    }
+
+    /// [measurement; theory, November 13, P57 item 2 (G132)] **The readout's face from a chart** `r̂` (`D` words on `2^(−16)`): the lift
+    /// `R r̂ + b_R`, the encoding and the face at temperature one, as [`Field::face_of`] reads a state after its chart. A reading.
+    pub fn face_of_read(&self, read: &[i32]) -> Result<TowerFace> {
+        let (d, l) = (&self.declaration, &self.layout);
+        let dw = d.width;
+        if read.len() != dw {
+            return refuse("a chart that is not one word a coordinate");
+        }
+        let mut y = vec![0i64; dw];
+        affine(&self.theta[l.read..l.read + dw * dw], self.reaches().read, dw, read, Some(&self.theta[l.lift_bias..l.lift_bias + dw]), MATERIAL_BITS, MATERIAL_BITS, &mut y)?;
+        let mut z = vec![0i64; d.alphabet];
+        self.tied(&y, &mut z)?;
+        Ok(self.tempered(&z, 1))
+    }
+
     /// Each tick's read of `region` ([`TickRead`]), in tick order.
     pub fn tick_reads(&self, region: &Region) -> Result<Vec<TickRead>> {
         let pass = self.pass(region, true)?;
@@ -5810,6 +5835,11 @@ pub trait FieldRealization {
     fn read_ticks(&mut self, _field: &Field, _regions: &[Region]) -> Result<Vec<Vec<TickRead>>> {
         refuse("a realization that cannot read its ticks")
     }
+    /// [measurement; theory, November 13, P57 item 2 (G132)] Each region's faces and, by stage ([`Field::tick_charts`]: each tick's opening,
+    /// then after the last tick), the open sites' chart rows in site order (`D` words each), a reading.
+    fn read_tick_charts(&mut self, _field: &Field, _regions: &[Region]) -> Result<(Vec<Vec<Option<TowerFace>>>, Vec<Vec<Vec<i32>>>)> {
+        refuse("a realization that cannot read its charts by stage")
+    }
     /// [measurement; theory, November 11 18:33, part P2] The faces of `regions` ([`FieldRealization::read_faces`]) and the carry circles' gates
     /// over their open sites ([`CarryGates`]), a reading. By default the faces are the realization's own read and the gates the host's
     /// ([`Field::carry_gates_of`]); a realization that holds the gates in its forward reads them from the same pass.
@@ -5871,6 +5901,19 @@ impl FieldRealization for HostField {
     }
     fn read_ticks(&mut self, field: &Field, regions: &[Region]) -> Result<Vec<Vec<TickRead>>> {
         regions.par_iter().map(|r| field.tick_reads(r)).collect()
+    }
+
+    fn read_tick_charts(&mut self, field: &Field, regions: &[Region]) -> Result<(Vec<Vec<Option<TowerFace>>>, Vec<Vec<Vec<i32>>>)> {
+        let dw = field.declaration.width;
+        let faces = field.read_faces(regions)?;
+        let charts = regions
+            .par_iter()
+            .map(|r| {
+                let stages = field.tick_charts(r)?;
+                Ok(stages.iter().map(|s| (0..r.classes.len()).filter(|&t| r.unresolved[t]).flat_map(|t| s[t * dw..(t + 1) * dw].iter().copied()).collect()).collect())
+            })
+            .collect::<Result<Vec<Vec<Vec<i32>>>>>()?;
+        Ok((faces, charts))
     }
 
     fn read_near_offsets(&mut self, field: &Field, region: &Region, sites: &[usize]) -> Result<Vec<NearOffsets>> {

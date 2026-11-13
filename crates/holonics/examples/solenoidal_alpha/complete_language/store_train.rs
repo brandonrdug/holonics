@@ -702,6 +702,13 @@ const READ_OCTAVES: usize = 10;
 /// realization's read (`read_faces`, the regions batched under the pass's two bounds) at the same class. On the code slice each stretch is also
 /// read with the leading spaces of each line that begins inside it doubled (the copy cut at the stretch's bound of 1,022 places), `c0` at every
 /// place of the copy. Codes are on `2^(−20)` bits. One line a place to `OUT/cavity.tsv` (numbers only); a line a slice with the devices' times.
+///
+/// [measurement; theory, November 13, P57 item 2 (G132)] With the faces, the realization reads each open place's chart `r̂` (64 words on
+/// `2^(−16)`) at the opening, after ticks 1, 2 and 3 (each tick's opening) and after the last tick ([`FieldRealization::read_tick_charts`]); the
+/// trained readout's code at each stage, `c0` to `c3` and `cK`, is the face of that chart at the written class (`c0` checked against the host's
+/// opening face, `cK` against the realization's face). The charts go to `OUT/words.bin` (the place rows' order, five stages of 64 little-endian
+/// 32-bit words a place). The same is read at the open places of each slice's whole masks, as `read-store` cuts them (rows `W`,
+/// `OUT/words_whole.bin`). The output directory is private: it holds no text, but it is the held passage's places.
 pub(super) fn read_cavity(args: &[String], realization: &mut dyn FieldRealization) -> Result<()> {
     if args.len() != 13 {
         return Err("read-cavity UNITS UNITS_SHA STORE STORE_SHA KEYS KEYS_SHA CODEC CODEC_SHA PLACES STATE STATE_SHA OUT".into());
@@ -730,7 +737,20 @@ pub(super) fn read_cavity(args: &[String], realization: &mut dyn FieldRealizatio
     std::fs::create_dir_all(out)?;
     let mut tsv = std::io::BufWriter::new(std::fs::File::create(out.join("cavity.tsv"))?);
     use std::io::Write as _;
-    writeln!(tsv, "row\tslice\tstretch\tt\tclass\tc0\tcK\tsource")?;
+    writeln!(tsv, "row\tslice\tstretch\tt\tclass\tc0\tcK\tsource\tc1\tc2\tc3")?;
+    let mut words = std::io::BufWriter::new(std::fs::File::create(out.join("words.bin"))?);
+    let mut words_whole = std::io::BufWriter::new(std::fs::File::create(out.join("words_whole.bin"))?);
+    let dw = learner.field.declaration.width;
+    let stages_expected = learner.field.declaration.ticks + 1;
+    let code_of_read = |r: &[i32], class: usize| -> std::result::Result<i64, String> { Ok(learner.field.face_of_read(r).map_err(|e| e.to_string())?.code(class)) };
+    let mut put_words = |w: &mut std::io::BufWriter<std::fs::File>, rows: &[Vec<i32>], at: usize| -> std::io::Result<()> {
+        for stage in rows {
+            for &v in &stage[at * dw..(at + 1) * dw] {
+                w.write_all(&v.to_le_bytes())?;
+            }
+        }
+        Ok(())
+    };
     let role = "held";
     let names = role_names(&counts, role);
     println!("CAVITY_LAW role={role} places={places} least={} octaves={} pairs_bound={} sites_bound={} ticks={} alphabet={} ms={}", law.least, law.octaves, law.pairs, law.sites, learner.field.declaration.ticks, codec.alphabet(), started.elapsed().as_millis());
@@ -740,6 +760,7 @@ pub(super) fn read_cavity(args: &[String], realization: &mut dyn FieldRealizatio
         let pass = StorePass { role: role.to_string(), store: args[4].clone(), stretches: 0, least: law.least, octaves: law.octaves, pairs: law.pairs, sites: law.sites, slices: vec![PassSlice { name: name.to_string(), piece: 0, cursor: 0, taken: 0 }] };
         let mut cut = Cut { seed, slices: vec![slice], pass };
         let mut stretches: Vec<(Vec<usize>, Vec<u8>, bool)> = Vec::new();
+        let mut wholes: Vec<(usize, TrainRegion)> = Vec::new();
         let mut taken = 0usize;
         while taken < places as usize {
             let Some(drawn) = cut.next() else { break };
@@ -748,6 +769,9 @@ pub(super) fn read_cavity(args: &[String], realization: &mut dyn FieldRealizatio
             let ends = drawn.ends;
             let stretch = cut.take(drawn, &codec)?;
             taken += stretch.region.classes.len();
+            if stretch.kind == Kind::MaskWhole {
+                wholes.push((stretches.len(), stretch.region.clone()));
+            }
             stretches.push((stretch.region.classes.clone(), bytes, ends));
         }
         // c0 on the host, a region a place; the first stretch's places checked against the whole opening.
@@ -779,6 +803,9 @@ pub(super) fn read_cavity(args: &[String], realization: &mut dyn FieldRealizatio
         // cK on the realization, the regions batched under the pass's two bounds.
         let card_start = std::time::Instant::now();
         let mut ck: Vec<Vec<i64>> = stretches.iter().map(|(c, _, _)| vec![0i64; c.len()]).collect();
+        // [P57 item 2] Each place's charts by stage (its one open row at each stage) and the trained readout's codes c1 to c3.
+        let mut charts: Vec<Vec<Vec<Vec<i32>>>> = stretches.iter().map(|(c, _, _)| vec![Vec::new(); c.len()]).collect();
+        let mut mid: Vec<Vec<[i64; 3]>> = stretches.iter().map(|(c, _, _)| vec![[0i64; 3]; c.len()]).collect();
         let jobs: Vec<(usize, usize)> = stretches.iter().enumerate().flat_map(|(k, (c, _, _))| (0..c.len()).map(move |t| (k, t))).collect();
         let mut at = 0usize;
         let mut batches = 0usize;
@@ -800,9 +827,18 @@ pub(super) fn read_cavity(args: &[String], realization: &mut dyn FieldRealizatio
                     TrainRegion::plain(classes.clone(), mask)
                 })
                 .collect();
-            let faces = realization.read_faces(&learner.field, &views_of(&regions)).map_err(|e| e.to_string())?;
-            for (&(k, t), f) in jobs[at..end].iter().zip(&faces) {
-                ck[k][t] = f[t].as_ref().ok_or("an open place without a face")?.code(stretches[k].0[t]);
+            let (faces, stages) = realization.read_tick_charts(&learner.field, &views_of(&regions)).map_err(|e| e.to_string())?;
+            for ((&(k, t), f), st) in jobs[at..end].iter().zip(&faces).zip(stages) {
+                let class = stretches[k].0[t];
+                ck[k][t] = f[t].as_ref().ok_or("an open place without a face")?.code(class);
+                if st.len() != stages_expected || st.iter().any(|s| s.len() != dw) {
+                    return Err("a place's charts by stage that are not one row of each stage".into());
+                }
+                if code_of_read(&st[stages_expected - 1], class)? != ck[k][t] {
+                    return Err(format!("the face of the last chart differs from the realization's face (stretch {k}, place {t})").into());
+                }
+                mid[k][t] = [code_of_read(&st[1], class)?, code_of_read(&st[2], class)?, code_of_read(&st[3], class)?];
+                charts[k][t] = st;
             }
             batches += 1;
             at = end;
@@ -810,9 +846,49 @@ pub(super) fn read_cavity(args: &[String], realization: &mut dyn FieldRealizatio
         let card_ms = card_start.elapsed().as_millis();
         for (k, (classes, _, _)) in stretches.iter().enumerate() {
             for t in 0..classes.len() {
-                writeln!(tsv, "P\t{name}\t{k}\t{t}\t{}\t{}\t{}\t-", classes[t], c0[k][t], ck[k][t])?;
+                if code_of_read(&charts[k][t][0], classes[t])? != c0[k][t] {
+                    return Err(format!("the face of the opening's chart differs from the host's opening face (stretch {k}, place {t})").into());
+                }
+                let [c1, c2, c3] = mid[k][t];
+                writeln!(tsv, "P\t{name}\t{k}\t{t}\t{}\t{}\t{}\t-\t{c1}\t{c2}\t{c3}", classes[t], c0[k][t], ck[k][t])?;
+                put_words(&mut words, &charts[k][t], 0)?;
             }
         }
+        // [P57 item 2] The slice's whole masks as the cut gives them, their open places' charts by stage and codes.
+        let whole_start = std::time::Instant::now();
+        let mut whole_places = 0usize;
+        let mut w_at = 0usize;
+        while w_at < wholes.len() {
+            let (mut in_pairs, mut in_sites, mut end) = (0u64, 0u64, w_at);
+            while end < wholes.len() {
+                let s = wholes[end].1.classes.len() as u64;
+                if in_sites > 0 && (in_pairs + s * s > law.pairs || in_sites + s > law.sites) {
+                    break;
+                }
+                (in_pairs, in_sites, end) = (in_pairs + s * s, in_sites + s, end + 1);
+            }
+            let regions: Vec<TrainRegion> = wholes[w_at..end].iter().map(|(_, r)| r.clone()).collect();
+            let (faces, stages) = realization.read_tick_charts(&learner.field, &views_of(&regions)).map_err(|e| e.to_string())?;
+            for ((k, region), (f, st)) in wholes[w_at..end].iter().zip(faces.iter().zip(&stages)) {
+                if st.len() != stages_expected {
+                    return Err("a whole mask's charts by stage that are not one of each stage".into());
+                }
+                for (row, t) in (0..region.classes.len()).filter(|&t| region.unresolved[t]).enumerate() {
+                    let class = region.classes[t];
+                    let cw = f[t].as_ref().ok_or("an open place without a face")?.code(class);
+                    let at_row = |s: usize| &st[s][row * dw..(row + 1) * dw];
+                    if code_of_read(at_row(stages_expected - 1), class)? != cw {
+                        return Err(format!("a whole mask's last chart's face differs from the realization's face (stretch {k}, place {t})").into());
+                    }
+                    let (w0, w1, w2, w3) = (code_of_read(at_row(0), class)?, code_of_read(at_row(1), class)?, code_of_read(at_row(2), class)?, code_of_read(at_row(3), class)?);
+                    writeln!(tsv, "W\t{name}\t{k}\t{t}\t{class}\t{w0}\t{cw}\t-\t{w1}\t{w2}\t{w3}")?;
+                    put_words(&mut words_whole, st, row)?;
+                    whole_places += 1;
+                }
+            }
+            w_at = end;
+        }
+        let whole_ms = whole_start.elapsed().as_millis();
         // The code slice's copies: each line's leading spaces doubled, c0 on the host at every place of the copy.
         let mut copy_places = 0usize;
         let copy_start = std::time::Instant::now();
@@ -858,13 +934,17 @@ pub(super) fn read_cavity(args: &[String], realization: &mut dyn FieldRealizatio
             }
         }
         println!(
-            "CAVITY_SLICE slice={name} stretches={} places={taken} host_c0_ms={host_ms} card_cK_ms={card_ms} card_batches={batches} copy_places={copy_places} host_copy_ms={} elapsed_ms={}",
+            "CAVITY_SLICE slice={name} stretches={} places={taken} host_c0_ms={host_ms} card_cK_ms={card_ms} card_batches={batches} whole_masks={} whole_places={whole_places} whole_ms={} copy_places={copy_places} host_copy_ms={} elapsed_ms={}",
             stretches.len(),
+            wholes.len(),
+            whole_ms,
             copy_start.elapsed().as_millis(),
             started.elapsed().as_millis()
         );
     }
     tsv.flush()?;
+    words.flush()?;
+    words_whole.flush()?;
     println!("CAVITY_DONE ms={}", started.elapsed().as_millis());
     Ok(())
 }
