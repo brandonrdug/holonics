@@ -683,6 +683,15 @@ distance, so the field's own transport privileges the place while its level runs
 objects, and the transport is where the place clock still stands. The next law puts a head's reach on the news clock (a reach in sections of
 news, not in places), with its guess fixed before its build.
 
+**How the trained field rings past its depth** (G149; `g149_depth.txt`). Brandon's self-induction (November 13, 18:05Z, and 18:21Z: his
+postulate, never put to a test) asks what a field does when it re-reads its own state without fresh input. The trained state, rung for 16
+ticks where it was trained at four, relaxes: its code is best at the fourth tick (1.18 nats a place) and rises after it (2.85 at the 16th),
+its faces flatten as the code rises (an expected code of 1.25 at the fourth tick, 2.53 at the 16th), and each tick's change shrinks by 0.6 to
+0.9 of the last while aligning with it (a cosine of 0.98 by the eighth tick). There is no reversal and no sustained ring. Read on the
+objects (`agent-inferred`): the iterated constitution is damped on the directions the readout reads, a passive medium below its
+parametron's bifurcation, so without fresh input its ringing dissipates what the places hold. A self-inducing field would run a pumped mode
+at or past the bifurcation. Which part of the law carries a mode there is the theory thread's question.
+
 ## 5. What this corrects in the records of November 12
 
 - The record of the symbol's length §8.1 and §8.3 ("one clock"): the moments' strides stay
