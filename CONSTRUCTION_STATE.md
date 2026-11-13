@@ -471,6 +471,12 @@ repository was reset on September 24; the pre-reset tree is
     entries 16 ms of it, where the count gave 0.005 of a section: the opening's kernels are the
     next engine reading. The comparison stays in the line, and the level's sites, clock and
     phase chart are next, read on this news.
+  - A site's maps take the tile form (November 13, P61, G117 scored; the engine record §8): the
+    forward map, the transposed map and the outer sum, every bit kept, read 28.3 ms of a profiled
+    section where they read 56.3, and a section of the line with the opening's comparison reads
+    284.5 ms where it read 313.3, 7.0 times the bar of 40.7. A 64 by 64 forward launch still costs
+    five times the yardstick's arithmetic, and what binds the form is read before another map is
+    built in it.
   - The open places need the written rows' ticks (November 13, P62, G140 scored; the design
     record §4.8). Read zero-shot on the line's latest lap mean with a written row held at its
     opening: the open rows alone code 3.29 nats a place worse at held one-place masks and 1.90

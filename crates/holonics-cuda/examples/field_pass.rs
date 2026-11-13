@@ -128,6 +128,16 @@ fn run(args: &[String]) -> Result<()> {
             let threads = p.threads.get(entry).copied().unwrap_or(0);
             println!("FIELD_PROFILE entry={entry} launches={calls} ms={} us_a_launch={} grid_threads={threads} mean_grid_threads={}", ns / 1_000_000, ns / 1_000 / (*calls as u128).max(1), threads / (*calls as u128).max(1));
         }
+        // [measurement; theory, November 13, P61 item 3] A site's maps by launch kind, and under the trace their operands' bits and tiles.
+        for ((entry, rows, cols, only_unresolved, add), (calls, ns, products)) in &p.maps {
+            println!("FIELD_PROFILE_MAP entry={entry} rows={rows} cols={cols} only_unresolved={} add={} launches={calls} us={} us_a_launch={} products={products} products_a_launch={}", u8::from(*only_unresolved), u8::from(*add), ns / 1_000, ns / 1_000 / (*calls as u128).max(1), products / (*calls as u128).max(1));
+        }
+        for ((entry, rows, cols, only_unresolved, add), b) in &p.map_bits {
+            println!(
+                "FIELD_PROFILE_MAPBITS entry={entry} rows={rows} cols={cols} only_unresolved={} add={} launches={} w_bits={} bits={}/{} sites={} under31={}/{} tiles={} proved64={} proved96={} launches_all64={} launches_all96={}",
+                u8::from(*only_unresolved), u8::from(*add), b.launches, b.w_bits, b.bits[0], b.bits[1], b.sites, b.under31[0], b.under31[1], b.tiles, b.proved64, b.proved96, b.launches_all64, b.launches_all96
+            );
+        }
         // [measurement; theory, November 12, P50 step 0] The launches made a head at a time, by head, with the head's kind and
         // the pairs its forward contact met.
         for (h, pairs) in p.pairs_by_head.iter().enumerate() {
