@@ -2614,3 +2614,49 @@ are dark and a few pass the section. For sound that asks for a reading of a band
 where it departs, with what lies under a declared width released and accounted and never charged as news. The tree holds that reading
 since October 10 (hnn.ring-moment-keys and the record of that day: a ring's section word near-returns through most of a recording,
 33,395 of 52,128 windows, at 0.44 of its spelled length, the departures kept as defects). Its ruler is fixed next, as G135.
+
+G135 fixed 2026-11-13T02:22Z (the same thread), before its read: the restarting cut on the places of driven rings read once a turn, the reading
+G133's rule sends to (the design record of November 13, section 8; a count's code on a cloud host, the passage and copies of G133).
+Read first: G133 and band_code_spread.txt (with a first step's reader no place passes the section; the counted part agrees in rank at
+0.09 to 0.49 with the place nearest it under a start moved by 37 samples); the record of October 10 (a declared bank of 24 rings read
+at every tick on a 93,680-tick recording: a free ring gives up half its energy in 1 to 3 turns and its keys cost 2.6 times the samples;
+exact locks hold 6,730 of 52,349 windows of four turns and the rings under 400 Hz almost never lock; the section word near-returns in
+33,395 of 52,128 windows at 0.44 of its spelled length, and a slowly turning ring's word is mostly zeros). What no log holds: a ring
+read once a turn; a ring's boost beside its turn; any cut on a ring's symbols; a ring under a moved start, a shift of rung or a ratio
+off the ladder.
+The reading (ring_sections.c, ring_cut.py; the instrument checked on made tones only: a tone on the ring's turn advances nothing, one a
+tenth above it 0.40 quarter turns a place, a phase jump one place). Ring s turns once in 2^s samples; a place is one turn; rings 3 to 7
+(2 kHz to 125 Hz at 16 kHz). Two reaches, the same rings and places: one turn (the ring keeps 1 - 2^-s a sample) and four turns
+(1 - 2^-(s+2)). A place's symbol is its ratio to the place before at two declared widths, the boost in octaves and the turn in quarter
+turns against the free ring's, each clipped to 3 either way: 49 classes, (0, 0) the ring continuing; what lies under the widths is
+released and not charged. The reader counts a symbol by the place before it, on the 55 count utterances. Sections: the symbol's own
+width (ln 49 = 3.89 nats) and those located for a mean epoch of 2 places and of 6. G133's four changes, the copy read by the original's
+reader (the faster copies on ring s-1). Laws: the cut, the odometer, and two with no sum: bright (a place whose code alone passes the
+symbol's width) and events (a place whose symbol is not the ring continuing). Kept at half the wider stride as in G133, and at a whole
+stride (the two places overlap). Pooled over the five rings by openings; the 18 read utterances.
+  (a) the reading itself. The ring continuing: 0.22 of places at a reach of one turn (0.10 to 0.40), 0.45 at four (0.25 to 0.65). A
+      place's code: 2.5 nats at one turn (2.0 to 3.0), 1.7 at four (1.2 to 2.3). Places past the symbol's width: 0.12 (0.05 to 0.22) at
+      either reach.
+  (b) (i), the control, the cut at a mean epoch of 6: 0.95 kept or more at either reach (0.90 to 1.00).
+  (c) (iii), the shift of rung: a place's symbol is the same at 0.80 of places at one turn (0.60 to 0.93), 0.88 at four (0.70 to 0.97);
+      the cut's lift at a mean epoch of 6: 0.35 at one turn (0.15 to 0.60), 0.50 at four (0.25 to 0.75).
+  (d) (ii), the start moved: the symbol the same at the nearest place 0.35 at one turn (0.20 to 0.55), 0.55 at four (0.35 to 0.75); the
+      cut's lift at a mean epoch of 6: 0.08 at one turn (0.02 to 0.20), 0.18 at four (0.06 to 0.40); at the symbol's width 0.20 at one
+      turn (0.08 to 0.40), 0.30 at four (0.12 to 0.55). The bright law's lift at a whole stride: 0.35 at one turn (0.15 to 0.60), 0.45
+      at four (0.20 to 0.70).
+  (e) (iv), off the ladder: the cut's lift at a mean epoch of 6 0.03 at either reach (0.00 to 0.10), under (d)'s; the bright law's lift
+      at a whole stride 0.15 (0.03 to 0.35).
+  (f) the column (every ring's code laid evenly over ring 3's places), the cut at a mean epoch of 6 columns: under (ii) 0.08 at one turn
+      (0.02 to 0.20) and 0.15 at four (0.05 to 0.35); under (iii) 0.35 and 0.50 (0.15 to 0.60; 0.25 to 0.75).
+  (g) the two reaches test one stated prediction: a ring whose reach spans several of its places is darker (the ring continuing higher
+      by 0.15 or more) and its cut keeps more under the moved start (its lift higher at both sections). And on the loud openings the
+      cut's lift stands over its lift on all openings in (ii) and (iii) at a mean epoch of 6.
+  Rule. On either reach, the cut's lift at the symbol's width 0.50 or over under (ii) and 0.70 or over under (iii): the cut carries to
+  that ring's places, and sound's value chart is written from it (a ring's boost and turn once a turn at that reach) in the design
+  record before any build. Else, the bright law's lift at a whole stride 0.50 or over under (ii) and (iii) on either reach: a ring's
+  landmarks stand under a moved start and the sum between them runs free, so what fails is the reader between landmarks, and a reader
+  of the ring's cycle with its defects (October 10's near-return) is read on the same rasters before any chart is written. Else: a
+  ring read once a turn at these widths names no sites a moved start keeps; the place, one turn on a raster fixed from the passage's
+  first sample, is the raster's own, and the reading goes to the ring's section arrivals at every sample (the tree's reader), where
+  an arrival is a time of the passage; the image's ruler is read before more of sound. (b) under its range: the instrument is read
+  again before any other part.
