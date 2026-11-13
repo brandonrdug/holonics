@@ -2289,7 +2289,7 @@ is dark, a tick that has settled, or a level above.
   and one hold. Step 6's own guess, fixed here on the table: the unprofiled section falls by 0.60 of the moved phases' and the spared
   zeroings' summed ms (0.40 to 0.85).
 
-G129 fixed 2026-11-13T01:22Z (the same thread), before its read: the count ruler the design record of November 13 owes on sound (its
+G129 fixed 2026-11-13T01:15Z (the same thread), before its read: the count ruler the design record of November 13 owes on sound (its
 section 8), read in the cloud on public speech (a count's code, never the machine's face; no state, no card).
 Read first: October 25's chart of sound, which the tree holds (examples/listener/sections.rs: a recording is its half-cycles, a run of
 one sign with its length and its peak's octave, the fibre kept at the boundary; about 4,300 octets a second, so about 2,150 half-cycles,
