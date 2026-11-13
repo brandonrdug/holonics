@@ -3563,3 +3563,35 @@ G150 scored 2026-11-13T18:50Z (receipt g150_clocks.txt; read-influence with the 
   from the theory thread's read of G149 (18:31Z): the junction's return in the tick, the term that lets a mode ring, comes first, and the
   head's reach on its own clock follows it with its own guess (agent-inferred: a falloff moved onto a clock changes which sources a receiver
   hears, while the missing return changes whether anything can ring at all).
+
+G151 fixed 2026-11-13T19:03Z (the Opus PC thread), before its read: the junction's return has the value the constitution names,
+`Γ* = B/(1 − B)` and `ℓ* = −log₂(1 − 2B)`, from each site's echo `B_i = Σ_j p_ji^(t) p_ij^(t+1)` (the junction record §7, §9 item 1). No log
+prints `B`: `FieldRead::echo` is formed and consumed by none since November 3. read-echo on the line's third-lap mean (level3/MEAN.3000),
+each held slice cut to 4,000 places, each stretch read on the host twice (mask 0: the cut's own mask; mask 1: its middle place alone open),
+every head apart; echo_ruler.py. The theory thread's offered guess, taken whole, and one part of this thread's:
+  (a) the median `B` over written rows (both masks, all heads, pooled) lies between 2^(−4) and 2^(−2);
+  (b) under 0.05 of written rows stand at `B ≥ ½`;
+  (c) every open row reads `B = 0` (an unresolved site is no source), which checks the ruler;
+  (d) in every slice the median `B` over written rows under the cut's mask stands at or above its median with one place open (agent-inferred:
+      an open place is no source, so a written row's shares gather on fewer partners and its round trips rise).
+  Rule. (a) and (b) as guessed: the return's founding at `ℓ = 0` is a matched load the constitution's own value lies well away from, the
+  build goes on as ordered, and its located `ℓ` is read against `ℓ*` by row. A median under 2^(−4): the written rows hear one another
+  little within a round, the return's value is near the founding, and the build's located `ℓ` is expected to stay near zero, so its lap is
+  read first for whether the deposit moves `ℓ` at all. (c) missed: the ruler is wrong, and nothing is read from it.
+
+G151 scored 2026-11-13T19:06Z (receipt g151_echo.txt in the junction record's receipts; read-echo on level3/MEAN.3000, five held slices of
+4,296 to 4,416 places, 122 stretches, 150,560 written rows and 23,024 open rows over four heads; host, 8 threads, 22.2 s, 630 MB):
+  (a) the median `B` over written rows, pooled, is 0.00068 (2^(−10.5)), against 2^(−4) to 2^(−2): missed, six octaves under; the mean is
+      0.0095 and the upper decile 0.021;
+  (b) 0.0002 of written rows stand at `B ≥ ½`, against under 0.05: held;
+  (c) all 23,024 open rows read `B = 0`: held, and the ruler checks;
+  (d) the cut's mask stands above one place open in every slice (code 0.00123 against 0.00096, web 0.00090 against 0.00067, science 0.00073
+      against 0.00058, books 0.00056 against 0.00046, wikidata 0.00061 against 0.00057): held.
+  Of 4 parts 3 held and 1 missed. The premise that missed: the written rows hear one another far less within a round than a near field of
+  eleven places with sharp locks would give (`B = 1/d` would need some 1,500 equal reciprocal partners); a written row's shares do not come
+  back. The echo there is lives in one head: the second turned head (head 3) has median 0.0106 (2^(−6.6)), twenty to sixty times the other
+  three (0.0002 to 0.0005), and holds most of the tail (18% of its written rows at `ℓ* ≥ 1/8`, against at most 1.2% in the others).
+  The rule for a median under 2^(−4) applies: the constitution's own value of the return is near the matched founding on most written rows,
+  so the build is read first for whether the deposit moves `ℓ` at all, with head 3's tail the region where `ℓ*` stands away from zero. The
+  build's case does not rest on `B`: the return is also the term that lets the tick carry a rate (the record §7), a use the deposit locates
+  or does not.

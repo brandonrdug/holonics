@@ -386,6 +386,17 @@ prints `B`, so the first item is that read.
    raise `B`, the mean over heads and the near field's eleven places lower it): the median `B`
    over written rows lies between `2^(−4)` and `2^(−2)`, under 0.05 of written rows stand at
    `B ≥ ½`, and every row opened alone reads `B = 0`, which checks the ruler.
+
+   *Read* (G151, November 13 19:04Z, the PC thread; [receipt](2026-11-13_THE_TICK_HOLDS_THE_JUNCTIONS_ANCHOR_WITHOUT_ITS_RETURN_THE_RETURN_IS_THE_SWING_OF_THE_STATE_TWO_TICKS_BACK_ABOUT_THE_PRESENT_ANCHOR_THE_TREES_OWN_ECHO_TERM_AND_A_MERGE_LOSES_WHICH_NEVER_HOW_MUCH_receipts/g151_echo.txt),
+   `read-echo` and `echo_ruler.py`): on the line's third-lap mean, over 150,560 written rows of five held slices and four heads,
+   the median `B` is 0.00068 (2^(−10.5)), the mean 0.0095, the upper decile 0.021, and 0.0002 of rows stand at `B ≥ ½`; all
+   23,024 open rows read zero. The guess's median missed by six octaves; the other three parts held (the cut's own mask stands
+   above one place open in every slice). A written row's shares mostly do not come back within a round: `B = 1/d` would need some
+   1,500 equal reciprocal partners. What echo there is lives in the second turned head, whose median is 0.0106 and which holds
+   most of the tail (18% of its written rows at `ℓ* ≥ 1/8`, at most 1.2% in the other heads). So `Γ*` stands within 0.001 of
+   the matched founding on most written rows, and the build's first reading is whether the deposit moves `ℓ` at all, head 3's
+   region the one where `ℓ*` is away from zero. The build's case does not rest on `B`, since the return is also the term that
+   lets a tick carry a rate.
 2. **The build.** The return as the tick's last step, founded at the matched load, on the card
    with its parity against the host; the grown state reads its source's faces bit for bit, and
    the build enters the line by reproducing the line's lap with the part at its founding and

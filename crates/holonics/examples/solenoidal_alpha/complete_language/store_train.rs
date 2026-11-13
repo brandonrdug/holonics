@@ -948,6 +948,98 @@ pub(super) fn read_depth(args: &[String], realization: &mut dyn FieldRealization
     Ok(())
 }
 
+/// [measurement; theory, November 13, the junction record §9 item 1; G151] `read-echo UNITS UNITS_SHA STORE STORE_SHA KEYS KEYS_SHA CODEC
+/// CODEC_SHA PLACES STATE STATE_SHA OUT`: **each site's own echo by head**, a reading of where the junction's return has a value the
+/// constitution names (`Γ* = B/(1 − B)`, `ℓ* = −log₂(1 − 2B)`). Each slice of the held role is cut as `read-depth` cuts it, whole stretches until
+/// `PLACES` places, and each stretch is read twice on the host from the saved state: with the mask the cut drew (`mask 0`) and with its middle
+/// place alone open (`mask 1`). `OUT/echo.tsv` holds a line a row (numbers only): the slice's index, the mask, the read kind, the head, whether
+/// the row is written, and its `B` on `2^(−63)` ([`holonics::hnn::tower::field::Field::echo_by_head`]). The output directory is private.
+pub(super) fn read_echo(args: &[String]) -> Result<()> {
+    if args.len() != 13 {
+        return Err("read-echo UNITS UNITS_SHA STORE STORE_SHA KEYS KEYS_SHA CODEC CODEC_SHA PLACES STATE STATE_SHA OUT".into());
+    }
+    let started = std::time::Instant::now();
+    refuse_variables("read-echo")?;
+    let units = units_of(&args[1], &args[2])?;
+    if !units.merges().is_empty() {
+        return Err("the store's cut is on bytes: a units file of merges is refused".into());
+    }
+    let store = Path::new(&args[3]);
+    let counts = store_counts(std::str::from_utf8(&pinned_read(&store.join("STORE.tsv").to_string_lossy(), &args[4], READ_BUDGET as usize)?)?)?;
+    let keys = pinned_read(&args[5], &args[6], READ_BUDGET as usize)?;
+    let seed = u64::from_be_bytes(keys.get(keys.len().saturating_sub(8)..).filter(|w| w.len() == 8).ok_or("a key file of fewer than eight bytes")?.try_into()?);
+    let codec = FieldCodec::from_text(&String::from_utf8(pinned_read(&args[7], &args[8], READ_BUDGET as usize)?)?, units)?;
+    let places = positive(&args[9])? as usize;
+    let learner = FieldLearner::from_text(std::str::from_utf8(&pinned_read(&args[10], &args[11], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
+    let law = learner.pass.clone().ok_or("a state with no pass line: read-echo reads a state of the store's line")?;
+    if learner.field.declaration.alphabet != codec.alphabet() {
+        return Err("a state whose alphabet is not its codec's".into());
+    }
+    let out = Path::new(&args[12]);
+    if out.exists() {
+        return Err(format!("{} exists", out.display()).into());
+    }
+    std::fs::create_dir_all(out)?;
+    use rayon::prelude::*;
+    use std::io::Write as _;
+    let mut tsv = std::io::BufWriter::new(std::fs::File::create(out.join("echo.tsv"))?);
+    writeln!(tsv, "slice\tmask\tkind\thead\twritten\tB")?;
+    let d = learner.field.declaration;
+    println!("ECHO_LAW role=held places={places} heads={} still={} frames={} ticks={} level={} ms={}", d.heads, d.still, d.frames, d.ticks, learner.field.scale.is_some(), started.elapsed().as_millis());
+    for (si, &name) in role_names(&counts, "held").iter().enumerate() {
+        let slice = open_slice(store, "held", name, &counts)?;
+        let pass = StorePass { role: "held".to_string(), store: args[4].clone(), stretches: 0, least: law.least, octaves: law.octaves, pairs: law.pairs, sites: law.sites, slices: vec![PassSlice { name: name.to_string(), piece: 0, cursor: 0, taken: 0 }] };
+        let mut cut = Cut { seed, slices: vec![slice], pass };
+        let mut stretches: Vec<(TrainRegion, usize)> = Vec::new();
+        let mut taken = 0usize;
+        while taken < places {
+            let Some(drawn) = cut.next() else { break };
+            let stretch = cut.take(drawn, &codec)?;
+            taken += stretch.region.classes.len();
+            let kind = read_kind(&stretch);
+            stretches.push((stretch.region, kind));
+        }
+        let slice_start = std::time::Instant::now();
+        type Read = Vec<(usize, Vec<bool>, Vec<Vec<u64>>)>;
+        let reads: Vec<std::result::Result<Read, String>> = stretches
+            .par_iter()
+            .map(|(region, _)| {
+                let n = region.classes.len();
+                let mut alone = vec![false; n];
+                alone[n / 2] = true;
+                let one = TrainRegion::plain(region.classes.clone(), alone);
+                [region, &one]
+                    .into_iter()
+                    .enumerate()
+                    .map(|(mask, r)| {
+                        let views = views_of(std::slice::from_ref(r));
+                        let echo = learner.field.echo_by_head(&views[0]).map_err(|e| e.to_string())?;
+                        Ok((mask, r.unresolved.clone(), echo))
+                    })
+                    .collect()
+            })
+            .collect();
+        let (mut rows, mut written_rows, mut open_nonzero) = (0u64, 0u64, 0u64);
+        for ((_, kind), read) in stretches.iter().zip(reads) {
+            for (mask, unresolved, echo) in read? {
+                for (h, by_site) in echo.iter().enumerate() {
+                    for (t, &b) in by_site.iter().enumerate() {
+                        let written = !unresolved[t];
+                        writeln!(tsv, "{si}\t{mask}\t{kind}\t{h}\t{}\t{b}", u8::from(written))?;
+                        rows += 1;
+                        written_rows += u64::from(written);
+                        open_nonzero += u64::from(!written && b != 0);
+                    }
+                }
+            }
+        }
+        println!("ECHO_SLICE slice={name} stretches={} places={taken} rows={rows} written_rows={written_rows} open_rows_nonzero={open_nonzero} host_ms={} ms={}", stretches.len(), slice_start.elapsed().as_millis(), started.elapsed().as_millis());
+    }
+    tsv.flush()?;
+    println!("ECHO_DONE ms={}", started.elapsed().as_millis());
+    Ok(())
+}
+
 /// [measurement; theory, November 13, an outside read of that day (its claim 1); G148] `read-influence UNITS UNITS_SHA STORE STORE_SHA KEYS
 /// KEYS_SHA CODEC CODEC_SHA PAIRS STATE STATE_SHA OUT`: **whether one place's influence on another follows the news between them or their
 /// distance**, a reading. Each slice of the held role is cut as `read-cavity` cuts it, whole stretches until four times `PAIRS` places, every
