@@ -2660,3 +2660,46 @@ stride (the two places overlap). Pooled over the five rings by openings; the 18 
   first sample, is the raster's own, and the reading goes to the ring's section arrivals at every sample (the tree's reader), where
   an arrival is a time of the passage; the image's ruler is read before more of sound. (b) under its range: the instrument is read
   again before any other part.
+
+G135 scored 2026-11-13T02:25Z (receipts beside G133's: ring_sections.c, ring_cut.py, ring_cut_reach1.txt, ring_cut_reach4.txt).
+The read: 18 read utterances, rings 3 to 7, 405,817 places; pooled by places for the reading itself and by openings for the laws.
+  (a) the ring continuing: 0.051 of places at a reach of one turn (by ring 0.04, 0.03, 0.08, 0.08, 0.27): MISSED below (0.10 to 0.40);
+      0.131 at four (0.10, 0.09, 0.20, 0.25, 0.42): MISSED below (0.25 to 0.65). A place's code 2.80 nats at one turn: HELD; 2.69 at
+      four: MISSED above (1.2 to 2.3). Places past the symbol's width 0.183 and 0.167: HELD, both.
+  (b) (i) the control, the cut at a mean epoch of 6: 0.9820 and 0.9823 kept: HELD, both.
+  (c) (iii) the shift of rung: a place's symbol the same at 0.615 of places at one turn (0.51, 0.66, 0.75, 0.83, 0.90 by ring): HELD;
+      0.658 at four (0.56, 0.69, 0.80, 0.89, 0.96): MISSED below (0.70 to 0.97). The cut's lift at a mean epoch of 6: 0.084 at one turn
+      (0.06, 0.07, 0.10, 0.19, 0.38 by ring) and 0.113 at four (0.06, 0.08, 0.16, 0.33, 0.63): MISSED below, both.
+  (d) (ii) the start moved: the symbol the same at the nearest place 0.241 at one turn: HELD; 0.265 at four: MISSED below (0.35 to
+      0.75). The cut's lift at a mean epoch of 6: 0.028 at one turn: HELD; 0.031 at four: MISSED below (0.06 to 0.40). At the symbol's
+      width 0.350 and 0.289: HELD, both. The bright law at a whole stride 0.507 and 0.413 (at half a stride 0.338 and 0.284): HELD, both.
+  (e) (iv) off the ladder: the cut's lift at a mean epoch of 6 0.038 at one turn and 0.022 at four: HELD, both; under (d)'s: MISSED at
+      one turn (0.038 over 0.028), HELD at four. The bright law at a whole stride 0.427 at one turn: MISSED above (0.03 to 0.35);
+      0.245 at four: HELD.
+  (f) the column at a mean epoch of 6 columns: under (ii) 0.020 and 0.013: MISSED below, both (the first by the range's edge); under
+      (iii) 0.034 and 0.031: MISSED below, both. A column's news spreads 0.32 of its mean and one column in ten thousand passes the
+      section for a mean epoch of 2: the sum over rings is a more even drive than any ring's.
+  (g) the reach of four turns is darker by 0.080: MISSED (0.15 or more). Its cut keeps more under the moved start at a mean epoch of 6
+      (0.031 over 0.028) and less at the symbol's width (0.289 under 0.350): MISSED. On the loud openings the cut's lift stands under
+      its lift on all openings in (ii) and (iii) at both reaches (0.007 and 0.017 under 0.028 and 0.031; 0.059 and 0.097 under 0.084
+      and 0.113): MISSED.
+  Fifteen parts held, eighteen missed. Every miss of the cut and of the dark runs low.
+Rule applied: the first clause fails (the cut's lift at the symbol's width 0.35 and 0.29 under (ii)). The second holds on the reach of
+one turn, by the range's edge: the bright law's lift at a whole stride is 0.507 under (ii) and 0.717 under (iii) (0.413 and 0.689 at
+four turns). By the rule the reader between landmarks is read next on the ring's cycle with its defects.
+Reading [agent-inferred]. Three things stand in the numbers and the rule's second clause names only the first.
+  1. Speech is not dark on a ring read once a turn: the ring continues at one place in twenty at a reach of one turn and one in eight
+     at four, and the one-place reader codes a symbol at 2.7 to 2.8 nats of the 3.89 its width holds. A longer reach is not the lever.
+  2. The place is the raster's own. Under a start moved by 37 samples a place's symbol is the same at 0.24 to 0.27 of places, and at
+     0.26 on ring 5, where the nearest place stands 5 samples of 32 away; under the shift of rung, where places meet one to one, it is
+     0.62 to 0.66. A ring forgets its start within a few reaches, so its state at a sample is the same under a start moved by whole
+     samples; what moves is where the stride reads it. A stride counted from the passage's first sample is a privileged frame.
+  3. The cut keeps its sites as far as the symbols are the same, to the power of the epoch's length. By ring at four turns under the
+     shift of rung the symbol is the same at 0.56, 0.69, 0.80, 0.89, 0.96 and the cut's lift at a mean epoch of 6 is 0.06, 0.08, 0.16,
+     0.33, 0.63, where the sixth powers are 0.03, 0.11, 0.26, 0.48, 0.78. Two readings agree from a shared opening until their codes
+     differ (code.epoch-restarting-carry), so a level's sites under a change ask for a place's symbol the same under it at about 0.98
+     for epochs of six places. G133's reading is the same law met with codes that differ at most places.
+What follows. The reading the rule sends to and the reading (2) sends to are one, and the tree's own (hnn.dynamic-section-lift, the
+record of October 10): the ring read at every sample, its places its own section arrivals (an epoch is the interval between a
+receiver's section arrivals), which are times of the passage under any start, with the arrival word's cycle and defects as the reader.
+Its ruler is fixed next, as G136.
