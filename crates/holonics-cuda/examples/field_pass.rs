@@ -191,6 +191,16 @@ fn run(args: &[String]) -> Result<()> {
             println!("FIELD_PROFILE_POOLFREED class_octets={class} frees={n}");
         }
         println!("FIELD_PROFILE_POOLPEAK live={} budget={}", p.pool_peak.0, p.pool_peak.1);
+        // [measurement; G143] The live set at its peak by take line, and each phase's largest live set.
+        println!("FIELD_PROFILE_PEAK phase={} live={}", p.peak_phase, p.pool_peak.0);
+        let mut lines = p.peak_by_line.clone();
+        lines.sort_by_key(|&(_, v)| std::cmp::Reverse(v));
+        for (line, octets) in lines {
+            println!("FIELD_PROFILE_PEAK_LINE line={line} octets={octets}");
+        }
+        for (phase, live) in &p.phase_peak {
+            println!("FIELD_PROFILE_PHASE_PEAK phase={phase} live={live}");
+        }
         for ((line, class), [hits, misses, frees, freed, wide]) in &p.pool {
             println!("FIELD_PROFILE_POOL line={line} class_octets={class} hits={hits} misses={misses} frees={frees} freed_octets={freed} served_longer={wide}");
         }

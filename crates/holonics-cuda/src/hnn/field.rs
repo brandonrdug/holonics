@@ -704,6 +704,8 @@ struct Pools<'c> {
     /// The octets of the buffers taken and not yet returned, and of those kept.
     live: u64,
     retained: u64,
+    /// [measurement; G143] The live octets by the line of the take that holds them.
+    live_by_line: std::collections::BTreeMap<u32, u64>,
 }
 
 macro_rules! poolable {
@@ -781,6 +783,8 @@ impl Packed {
 struct Pooled<'c, T: Poolable> {
     buf: Option<(usize, CardBuffer<'c, T>)>,
     pools: std::rc::Rc<std::cell::RefCell<Pools<'c>>>,
+    /// [measurement; G143] The line of the take that holds it (the live set by take site, a reading).
+    line: u32,
 }
 
 impl<'c, T: Poolable> std::ops::Deref for Pooled<'c, T> {
@@ -797,6 +801,9 @@ impl<T: Poolable> Drop for Pooled<'_, T> {
             let mut pools = self.pools.borrow_mut();
             pools.live = pools.live.saturating_sub(octets);
             pools.retained += octets;
+            if let Some(v) = pools.live_by_line.get_mut(&self.line) {
+                *v = v.saturating_sub(octets);
+            }
             T::list(&mut pools).push((cap, buf));
 
         }
@@ -919,6 +926,10 @@ pub struct FieldProfile {
     pub pool_pressure: std::collections::BTreeMap<(u32, u64), [u128; 4]>,
     pub pool_freed: std::collections::BTreeMap<u64, u64>,
     pub pool_peak: (u64, u64),
+    /// [measurement; G143] The phase (the last mark) of the live set's peak and the live octets by take line there; and each phase's largest live set.
+    pub peak_phase: &'static str,
+    pub peak_by_line: Vec<(u32, u64)>,
+    pub phase_peak: std::collections::BTreeMap<&'static str, u64>,
     /// [measurement; theory, November 13, P56 item 4] Every timed launch, copy, take and zeroing summed (ns): what a phase's wall holds of the card's.
     pub timed_ns: u128,
 }
@@ -1109,11 +1120,19 @@ impl<'c> CardField<'c> {
             (slot[2], slot[3]) = (slot[2] + frees, slot[3] + freed);
         }
         pools.live += (entry.0 * size) as u64;
+        *pools.live_by_line.entry(line).or_insert(0) += (entry.0 * size) as u64;
         if let Some(profile) = &self.profile {
             let mut p = profile.borrow_mut();
+            // [measurement; G143] At each new peak of the live set: the phase it stood in (the last mark) and the live octets by take site.
+            if pools.live > p.pool_peak.0 {
+                p.peak_phase = self.last_mark.get();
+                p.peak_by_line = pools.live_by_line.iter().filter(|(_, v)| **v > 0).map(|(l, v)| (*l, *v)).collect();
+            }
             p.pool_peak = (p.pool_peak.0.max(pools.live), self.budget);
+            let slot = p.phase_peak.entry(self.last_mark.get()).or_insert(0);
+            *slot = (*slot).max(pools.live);
         }
-        Ok(Pooled { buf: Some(entry), pools: self.pools.clone() })
+        Ok(Pooled { buf: Some(entry), pools: self.pools.clone(), line })
     }
 
     /// [`take`](Self::take) with every element zero.
