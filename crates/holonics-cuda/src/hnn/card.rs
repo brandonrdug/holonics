@@ -71,6 +71,8 @@ pub struct DeviceCensus {
     pub shared_per_multiprocessor: u32,
     pub registers_per_block: u32,
     pub registers_per_multiprocessor: u32,
+    /// [measurement; theory, November 13, P56 item 5] The L2 cache's octets.
+    pub l2_octets: u32,
     /// Free and total device memory at the open.
     pub memory: MemoryInfo,
 }
@@ -140,6 +142,7 @@ impl DeviceCensus {
                 DeviceAttribute::MAX_REGISTERS_PER_MULTIPROCESSOR,
                 "registers per multiprocessor",
             )?,
+            l2_octets: read(DeviceAttribute::from_raw(38), "L2 cache octets")?,
             memory,
         })
     }

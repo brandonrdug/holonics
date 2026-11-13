@@ -2257,3 +2257,589 @@ from the faces after the last tick). Premise not read by any log: whether the re
   news, and the build of the level on epochs is ordered with its own guess after step 5 is timed. A rank under 0.40 on three slices: the
   readout does not read an opening, and the design gives the opening a face of its own before any build (a law change, recorded first).
   Between: the level's build waits and the opening after one tick is read the same way.
+
+G128 fixed 2026-11-13T01:01Z (the same thread), before its reads: four premises of the engine's next builds (P56; readings, no state changed).
+Read first: step 4's profiled control (p54_step4.txt: of 346.8 ms a profiled section the kernels hold 292.3, the pooled takes 11.9 over
+304 a section, the copies 9.5 over 38, the host alone 33.3, and the unprofiled section reads 335.2, so the card stands idle through the
+host's part); the bits ruler (p54_word_bits.txt: a share is zero on 2^-63 at 27 to 157 millionths of met pairs, its 0.999 quantile 62 bits;
+at the last clock 0.167 of met pairs carry a zero covector, the definite rows', so open rows hold about 0.83 of the pairs); the record of
+November 1 (a row's far mass over 68 to 225 effective sources on the code line: rows are diffuse); G120 (the rows' entry with its
+arithmetic dropped reads 0.507 of its time); and the source (a row's walk gives a lane to each support entry, met or not; a definite row's
+support is ten near places and its probed classes' runs, an open row's ten and every definite site of its region; every tick's chart is
+read by the instrument read_ticks). From these, agent-inferred and the reason for the reads: the contact's entries are bound by the
+instructions a pair executes (about 2,000 a chunk of 32 pairs in the rows' entry and in the forward's at the card's measured product
+rate), so repairs of form reach two to three times on the family and the bar's further multiple needs fewer terms: by law, a pair that
+is dark, a tick that has settled, or a level above.
+  (a) A row's shares (the bits ruler's own histograms, printed whole). Met pairs whose share of their row's mass is under 2^-37 (below
+      the reader's grain of a mean of 24-bit values over 2^12 sources): 0.002 pooled over the clocks (0 to 0.02); under 2^-16: 0.03
+      (0.005 to 0.15); the median share 2^-8 (2^-10 to 2^-6).
+  (b) A site's chart from tick to tick (read_ticks on the pass's sections 2,001 to 2,100 from run 2's STATE.1900): definite sites whose
+      chart at the last tick's opening differs from the tick before by under 2^-8 of its largest entry: 0.03 (0 to 0.20); open sites
+      0.01 (0 to 0.10).
+  (c) The lanes' fill of a row's chunks of 32 (met entries over lanes): open rows 0.90 (0.75 to 0.98), definite rows 0.50 (0.30 to
+      0.70), pooled over chunks 0.80 (0.62 to 0.92).
+  (d) The host's part of a section, by phase: the next section's cut, lists and tables (built and packed) 20 ms (10 to 30); the takes'
+      zeroing 8 of their 11.9 (4 to 11); the covector's fetch, the deposit and the saves together 8 (3 to 15).
+  Rules. (a) under 0.15 below 2^-37: a row's dark sources are no lever at this state and the anchored carrier is built for its limbs
+  alone, inside the layout; 0.50 or over: its record (the release at the reader's grain, the remainder accounted) is written before the
+  layout's. (b) 0.50 or over of definite sites: a settling tick gets its derivation; under 0.20: none, and the ticks stand. (c) pooled
+  under 0.60: the layout's walk packs its met entries before its arithmetic. (d) every host phase of 8 ms a section or more that reads
+  no state of the section before it is prepared beside the card's work and joined at the section's opening, and a take whose every word
+  the source proves is written before it is read is taken without its zeroing: every bit kept, built as step 6 with the steps' gates
+  and one hold. Step 6's own guess, fixed here on the table: the unprofiled section falls by 0.60 of the moved phases' and the spared
+  zeroings' summed ms (0.40 to 0.85).
+
+G129 fixed 2026-11-13T01:15Z (the same thread), before its read: the count ruler the design record of November 13 owes on sound (its
+section 8), read in the cloud on public speech (a count's code, never the machine's face; no state, no card).
+Read first: October 25's chart of sound, which the tree holds (examples/listener/sections.rs: a recording is its half-cycles, a run of
+one sign with its length and its peak's octave, the fibre kept at the boundary; about 4,300 octets a second, so about 2,150 half-cycles,
+and 12,106 bits a second against the corpus FLAC's 146,882); the design record's section 8 (a sample stream's places are cut like any
+other) and its acceptance (an invariance under re-timings, never a length on one clock); the Ratio (a comparison carried as a pair, its
+chart the logarithm). From these, agent-inferred and the reason for the read: a white floor crosses zero at a rate set by the frame, so
+its half-cycles follow the places, while a voiced wave's follow its events; a change of clock therefore touches the first and not the
+second, and the octave from which counts follow events is the passage's own floor. Above it a place is a half-cycle, and what a change
+of speed or of gain cannot touch is its ratios to the half-cycle before (the interval between their starts and the step of their peaks).
+The passage: the public 73 utterances of LibriSpeech dev-clean (16 bits, 16 kHz), counts on the first 55, reads on the last 18. Its
+copies: at double speed and at half speed (the rate renamed, then resampled to 16 kHz), and at half gain (each sample shifted one bit).
+Words of a place above the floor: rho, the half-octave of the samples from the place before's start to its own; o, its peak's octave;
+x, whether its sign repeats the place before's. Absolute word (rho, o, x); relative word (rho's step, o's step, x). Each coded given the
+word before by counts with Witten-Bell backoff. One section: the absolute word's width, 10 bits (6.931 nats). A place of the original
+is matched in a copy when a place starts within two samples of its start's image.
+  (a) Half-cycles by peak octave, double speed over the original's count (octaves holding 1,000 or more): octaves 5 and under 0.55
+      (0.42 to 0.70); octaves 12 and over 0.95 (0.85 to 1.02). The floor (the least octave from which every octave reads 0.85 or
+      over): 11 (9 to 12).
+  (b) News of the read utterances above the floor at half speed over the original's, by the reader counted on the original only:
+      absolute words 1.25 (1.08 to 1.60); relative words 1.00 (0.96 to 1.05). At double speed: relative 0.97 (0.85 to 1.08).
+  (c) At the original's speed, the relative words' news over the absolute words': 1.06 (0.95 to 1.20).
+  (d) The restarting cut at one section on the relative words: openings kept at half speed 0.93 (0.80 to 0.99), under a changed start
+      0.90 (0.75 to 0.99); on the absolute words at half speed 0.60 (0.35 to 0.85). Places matched at half speed: 0.97 (0.93 to 1.00).
+  (e) The sample stream at its 16 bits (the best of the four polynomial predictors, its residual's law counted by the last step's
+      bit length, each reader counted on its own passage): the passage's news at double speed over the original's 0.56 (0.50 to 0.66).
+  Rule. (a) octaves 5 and under at 0.70 or less and a floor found: a sound chart's floor is read by this count on its passage and is
+  never set by hand; no floor found: the half-cycle is not sound's place and a raster of bands is read first. (b) and (d): relative news
+  within 0.95 to 1.05 at half speed and openings kept at 0.80 or over: a sound enters a level as its half-cycles above its passage's
+  floor, each read as its ratios to the one before, the absolute interval and peak being the navigator's clock and gain, and the cut of
+  November 13 applies to it unchanged; the sample stream is never a level's place. Kept under 0.60: the design record's section 8 is
+  withdrawn for sound until a raster of bands is read. Between: the word is read again with the place two before in its context.
+  The image's ruler (a stroke under a magnification the passage itself holds) stays owed.
+
+G129 scored 2026-11-13T01:21Z (receipts in the design record's receipts directory: sound_ruler.py, sound_ruler.txt, sound_ruler_floor11.txt; 73
+utterances of one speaker, 481.0 seconds, 7,696,558 samples, 1,272,107 half-cycles, 2,645 a second).
+  (a) octaves 5 and under 0.595: HELD. Octaves 12 and over 0.512: MISSED (0.95 fixed). The floor: none, MISSED (11 fixed). By octave the
+      count at double speed over the original's reads 0.49, 0.50, 0.53, 0.57, 0.61, 0.65, 0.70, 0.74, 0.68, 0.47, 0.26, 0.28, 0.48,
+      0.66 (octaves 0 to 13), and at half speed 1.03 to 1.19 where a re-timing that kept each crossing reads 1.00. The premise was false:
+      this speech's loud half-cycles are its upper band's as much as its floor's, and at every loudness a wave's crossings follow the
+      top of the frame's band.
+  (b), (c), (d) not read: they stand on a floor and none was found. For information only, at the guessed floor of octave 11 (not a
+      score): 551 places a second; relative words' news at half speed 1.233 of the original's and the absolute words' 1.948, at half
+      gain 1.0002 and 3.572; relative over absolute 1.190; the restarting cut on relative words keeps 0.9996 of its openings under a
+      changed start (0.0225 of places stand over the section), 0.761 at half speed (0.992 of places matched) and 0.288 at double speed
+      (0.323 matched).
+  (e) 0.4945: MISSED under the band (0.56 fixed, 0.50 to 0.66). A sample's news reads 6.763 nats at the original's speed and 6.689 at
+      double speed, each by its own reader: the same a place, so the passage's news follows its count of places and the half above the
+      frame's band is lost with them. At half speed 1.764 by a reader of four samples, which cannot see that the copy fills half its band.
+  By the rule: the half-cycle is not sound's place, and a raster of bands is read first (G130). The cut's own invariance under a changed
+  start is the one reading that carried over from text (0.9996 beside 0.9997).
+
+G130 fixed 2026-11-13T01:21Z (the same thread), before its read: the raster of bands G129's rule sends to, on the same passage and copies.
+Read first: G129's receipts (a sample's news is the same at the two speeds, 6.689 beside 6.763 nats, each by its own reader); the
+tree's octave ladder (atlas wave.matched-friction-reach: rungs of friction rho_s^2 = 1 - 2^-s, the fading sums the tower of October 25
+held as its slow resonators); the design record's 4.7 (on text the rows along the ladder of modes are not shared: two paced clocks read
+as two keys, 0.485 in rank). From these, agent-inferred: a change of clock by the ladder's ratio carries each rung's band onto the rung
+beside it, so what a change of clock cannot touch is a law that is the same along the ladder, and a reader whose rows are shared along
+it needs one carried number (which rung) to read either passage.
+The raster: rung s holds y_s, with y_s gaining (x - y_s) shifted down s bits at each sample (y_0 the sample); band s is y_s - y_(s+1),
+read at a stride of 2^s samples, s = 0 to 6. A band's reader is G129's stream reader (the best of four polynomial predictors on the
+count utterances, the residual's bit length and sign counted by the last step's bit length); its gain-free form counts the residual's
+bit length less the last step's, by the last two steps' difference of bit lengths. Ratios are of the counted parts (the flat rest of a
+residual is no reader's), on the read utterances.
+  (a) The sample stream: the double-speed copy read by the original's reader over by its own 1.02 (1.00 to 1.06).
+  (b) Along the ladder at the original's speed, band s+1 read by band s's reader over by its own, s = 1 to 5: with absolute words the
+      mean of the five 1.15 (1.04 to 1.40); gain-free 1.05 (1.01 to 1.15), and the largest of the five gain-free under 1.25.
+  (c) The shift of rung: the double-speed copy's band s-1 read by the original's band s reader over by its own, absolute words,
+      s = 2 to 6: mean 1.02 (1.00 to 1.08); the same band read by the original's reader of the same rung s-1: mean 1.10 (1.02 to 1.35).
+  Rule. (c) shifted under 1.08 and (b) gain-free under 1.10 at every pair: for sound a level's rows are shared along the ladder (one
+  row set, a rung's stride and gain its navigator's clock), and a change of clock is a shift of rung that needs nothing learned anew;
+  the value chart's record states it before any build. (b) gain-free over 1.25 at any pair: rungs keep their own rows there, and the
+  shift of rung is learned from re-timed passages. Between: the rows are shared by groups of rungs the reading names.
+
+G130 scored 2026-11-13T01:25Z (receipts beside G129's: rungs.c, band_ruler.py, band_ruler.txt; then rungs_kept.c, band_ruler_kept.txt).
+  (a) 1.0056 (the original by the double speed's reader 1.0053): HELD.
+  (b) absolute words, the five pairs 1.004, 1.009, 1.106, 1.063, 1.184, mean 1.073: HELD. Gain-free 1.001, 1.002, 1.003, 1.015,
+      1.041, mean 1.012: HELD; the largest 1.041, under 1.25: HELD.
+  (c) the shifted rung 1.000, 1.000, 1.022, 1.053, 1.146, mean 1.044: HELD; the same rung 1.004, 1.011, 1.067, 1.021, 1.047, mean
+      1.030: HELD. The order the guess stood on did not show: the shift read no better than staying, and worse at the two slowest rungs.
+  The instrument, read after the score: the rung as fixed gains (x - y_s) >> s and so drops its leak's remainder, which leaves y_s
+  anywhere within 2^s of its input: a dead zone tied to the rung's number, 64 and 128 at the slow rungs, where a quiet passage lives.
+  A rung that drops its remainder privileges a scale. With the sum kept on 2^-s (rungs_kept.c; the law and the guess unchanged):
+  (b) absolute 1.003, 1.009, 1.038, 1.017, 1.040, mean 1.021, which stands UNDER the fixed band (1.04 to 1.40): the gap between
+  absolute and gain-free words was the dead zone's; gain-free 1.001, 1.001, 1.041, 1.022, 1.022, mean 1.018. (c) the shifted rung
+  0.9998, 0.9995, 1.0009, 1.0012, 1.0006, mean 1.0004; the same rung 1.004, 1.011, 1.042, 1.017, 1.040, mean 1.023.
+  By the rule: on the read as fixed, between (the shift under 1.08 at rungs 1 to 4 only); on the rung that keeps its remainder, the
+  first branch at every pair: at this reader's grain a sound's rows are shared along the ladder, and a change of clock by the
+  ladder's ratio is a shift of rung. The identity is the atlas's of November 12 (code.news-clock-proper-time: ring n reads of the
+  re-timed strand what ring n/lambda read of the original); this guess restated it without citing it, and what is new is its reading.
+  Limits: one speaker, 481 seconds, a ratio of two, a reader of one step's bit length and sign (it cannot see pitch or formants, and
+  equal codes are not equal knowledge), bands of one-pole rungs that overlap.
+
+G126 scored 2026-11-13T01:36Z (the PC's receipt p55_helpers.txt with helpers_table.py, the count record's receipts: the census from main 50b1bad10's
+source; a counting build whose kernels with no ruler flag are main's byte for byte and whose states are the line's; each helper's yardstick at
+its entry's launch shape; one hold: a profiled control, the parts' build, the rows at four blocks, a profiled control. Controls: the rows 34.27
+and 34.29 ms a profiled section, the skin's return 29.99 and 30.11).
+  (a) 0.621 (the crowds alone 0.419): HELD.
+  (b) 0.687 (the crowds alone 0.285): HELD.
+  (c) the rows on the paced clocks 0.010 (0.021 with the crowd divisors' own division): MISSED below, twelve times under the guess: one
+      division a crowd, 1,120,924 crowds a head, where a paced head's rows meet 10.0 and 10.9 million pairs. The skin's return 0.167 (the
+      bracket 0.107, the value 0.059): HELD.
+  (d) every checked product of the skin's return 0.401: MISSED above; the four a mode outside the skin covector 0.217, inside the range.
+      The premise was wrong by the two the skin covector holds itself.
+  (e) 0.881: MISSED below. At four blocks the entry keeps 128 registers and 8 octets of stack, where six cap it at 80 registers, 136 octets
+      of stack and 208 and 384 octets of spills.
+  The premises the census corrected: the skin's return forms four checked products a mode of a pair and six a mode of a crowd (two and four
+  were counted by hand); its bracket takes the 128 by 128 division at 0.94 of its calls, its value never; the turn's rate, a quotient that
+  is the head's and the mode's, was divided anew at every pair and mode; no checked product took its long path in the hundred sections.
+  The table, and its limit: count times yardstick sums to 1.37 of the rows' own time and 1.53 of the skin's return's, so a share is an upper
+  bound (a yardstick times its helper alone; an entry overlaps its helpers with each other and with its loads). By it the rows are their
+  pairs' products of two 64-bit words with their loads (0.87; 32 a pair, 45.67 million pairs a section over the four clocks, 0.65 of them on
+  open rows), then the atomic sums an entry of a crowd (0.296); the skin's return is its 64-bit products (0.44), the skin covector with the
+  turn's division (0.390), its atomic sums (0.289) and its checked products (0.217).
+  Rule applied: the helpers at 0.08 or more are rebuilt as step 5, and the rows' launch bounds change with it. In the rows no helper at 0.08
+  has a narrower proved form (the atomic sums go to four distinct addresses a lane; the quotients already use a divisor read once a crowd;
+  the products stand at their words since step 4), so the rows' only change is the bound.
+
+Step 5 scored 2026-11-13T01:36Z (the PC's receipt p55_step5.txt; PR #745, main 74c15a07c; its guess fixed in p55_helpers.txt before the read, by G126's
+rule on the table: the skin's return 0.451 of its control (0.324 to 0.620), the rows 0.881 (0.85 to 0.91)). Gate 1, the GPU suite (140 of 140),
+the reproduction (600 of 600 section lines, STATE.600 and MEAN.600 byte for byte), one hold (control, step 5, control, then both profiled).
+  The skin's return 0.568 (the two paced clocks 0.576 and 0.561; 29.32 to 16.66 ms a profiled section): inside the range, above the guess.
+  The rebuilt helpers kept 0.49 of the time the table gave them (0.35 fixed; 0.20 to 0.55): the table's shares are upper bounds, as read.
+  The rows 0.898 (0.882, 0.891, 0.894, 0.920; 33.82 to 30.38 ms): inside the range.
+  The section 0.964 (305.0 ms against controls of 319.1 and 313.5, which stand 0.018 apart): no guess was fixed for it. The two entries'
+  16.1 ms are 0.050 of a profiled section.
+  The reproduction's one differing field, ruled the same hour: the save line's count of batches, 601 against 600 (and its peak store). The
+  card's free memory at the open read 15,560,998,912 octets against 15,727,788,032 at step 4's, which put the batch's cut 831,364 octets
+  under one section's peak, so that section ran as two batches. A batch is a schedule (integer sums keep their bits on any partition), the
+  rule's subject is the section lines and the states, and those are equal: the reproduction holds. The comparison should name the two
+  fields as schedule fields beside the timings (ordered with P57).
+  What the profile says of the engine after five steps (control, ms a profiled section of 319.9, kernels 272.9): the rows 33.8, the skin's
+  return 29.3, the forward contact 24.1, the columns 23.6, the transposed site map 14.5, the two outer and affine site maps on 32-bit limbs
+  12.8 each, the clock's fill 8.6, the exposure 8.3, the skin's fill 7.9, and no other entry over 6. After step 5 no entry holds more than
+  0.115 of the kernels' time, and the section stands at 7.5 times the bar (40.7 ms). The profile is flat: a repair of one entry's helpers
+  moves the section by hundredths, and five of them have. The next repairs are of the section's structure, in the order of what each
+  holds (agent-inferred): the contact family as one launch a tick each way on a region resident in its block (the layout; 80 of the
+  section's 509 launches, and 111 ms of it in six of its entries after step 5), the site-local families fused the same way, and the
+  host's part beside the card's.
+
+G131 fixed 2026-11-13T01:41Z (the same thread), before its read: where the kernels' time stands outside the fourteen entries step 5's receipt printed
+(P57; a reading of logs already on the PC and of the driver's source, no card time).
+Read first: p55_step5.txt (the profiled control: kernels 272.9 ms a profiled section; the fourteen entries printed hold 195.0 of it, the
+rows 33.8 down to the outer site map on 64-bit limbs 4.1, so the entries not printed hold 77.9, each under 4.1); profile_families.txt
+(step 0: 493 launches a section by family, the site maps 181, the moments and clocks 113, the contact 72, the small site kernels 68, the
+carry circles 24, the blank clocks 18, the faces 17; steps 1 to 3 fused some); the kernel source's own notes (the classes: one block of
+one warp a head and a region; the spread: a region a block). What is not in any log read here: an entry's grid, and so whether a launch
+fills the card. The premise (agent-inferred): a launch whose grid is a block a region, or a warp a region and head, runs for as long as
+its largest region (1,006 sites where the median region holds 151) while most of the card's multiprocessors stand empty, so its time is
+its longest block's and not its work's; and a chain of such launches cannot overlap one region's stage with another's.
+  (a) The entries not printed, launched in a trainer's section, number 45 (30 to 70), over 330 launches a section (250 to 400): 0.24 ms
+      a launch (0.19 to 0.31).
+  (b) Of their 77.9 ms the paced moments' and clocks' entries hold 0.45 (0.30 to 0.60).
+  (c) Over every entry, the launches whose grid cannot fill the card (its blocks times their warps under half of the warps the card
+      keeps resident at that entry's registers) hold 0.30 of the kernels' time (0.15 to 0.45).
+  (d) Of the kernels' time, entries whose unit is a site, a row or a region and which read nothing another region's launch wrote in the
+      same tick (by the schedule's read) hold 0.85 (0.70 to 0.95): the couplings across regions are the carrier's width (one maximum),
+      the temperature's covector (one sum) and the deposits (sums over a batch).
+  Rule. (c) at 0.25 or more: the fusion of a tick's region-local launches into one launch a tick each way, a block a region taking its
+  stages in turn, is ordered first, the contact's entries inside it, with its guess fixed on the table. (c) under 0.15: the contact's
+  layout alone is ordered first (a pair's record in walk order, its forward entries as one launch and its return's as one), and the
+  small launches stay. Between: the layout first, the fusion second. (d) under 0.70: the couplings the schedule names are derived as
+  joins at named crossings before either is ordered.
+
+G127 scored 2026-11-13T01:45Z (the PC's receipt p55_cavity.txt with cavity_cut.py, the design record's receipts; state C of the store's line and its mean
+of 1,000 states, the scores on the mean; the held role cut afresh by slice, 28 to 32 whole stretches and 6,014 to 6,320 places a slice, 30,677
+places; c0 on the host, checked against the whole opening's face on each slice's first stretch; cK on the card after the declared four ticks;
+the end state reads within 0.04 of the mean on every figure. The uniform face over the alphabet's 244 classes codes 5.497 nats).
+  (a) cK on code 0.907: MISSED below. Pooled 1.200: MISSED below (web 1.178, science 1.164, books 1.246, wikidata 1.504; the median 0.437).
+  (b) c0 over cK 6.71 pooled (c0 8.05 nats, over the uniform face's code at 0.610 of places): MISSED above. The rank 0.249, 0.182, 0.169,
+      0.081 on code, web, science and books: MISSED; wikidata 0.452, at the range's floor.
+  (c) the cut on c0: a mean epoch of 1.118 places: MISSED below; 0.909 of whole epochs one place: MISSED above.
+  (d) 1.000 under the shifted start: HELD, and 0.9998 under doubled leading spaces: MISSED above; both are what a cut that opens at nearly
+      every place gives, and say nothing of sites.
+  Rule applied: the rank stands under 0.40 on four slices. The readout does not read an opening, and the design gives the opening a face
+  of its own before any build of the level; the level's build is not ordered. No build was made.
+  What the reading holds past its score (agent-inferred):
+  - Through the readout an opening is worse than no reading (8.05 nats where the uniform face codes 5.50). The readout's covector comes
+    from the faces after the last tick, and the ticks carry a place's state into the frame it reads; the opening stands outside it.
+  - With every other place of its stretch written, a held place codes 0.91 nats on code and 1.20 pooled after the ticks, where the whole
+    mask codes 2.39 to 2.93 on the same state and a count of three known neighbours a side with both immediate neighbours known codes
+    1.10 on code. The level "two known neighbours a side" was the whole mask's: what holds the store's code up there is how much of a
+    stretch is open at once, and with one place open the constitution reads past three neighbours a side.
+  - The codes are skewed (mean 1.20, median 0.44, 0.024 of places over the uniform face's code): most places are dark given both sides
+    and the news stands on a few. This is the composite's dark interior of the record of November 12, read on the machine's own face.
+  - The cut was read on c0 alone, as ordered. The cut on cK, the faithful reader's, is the reference the level's sites are judged
+    against, and is owed (G132 (f)).
+
+G132 fixed 2026-11-13T01:45Z (the same thread), before its read: what a place's state holds of its class at the opening and after each tick, by a
+fitted face, and the cut on the faithful code (P57; a reading of state C's mean of states, no state changed; a host ruler in floats).
+Read first: p55_cavity.txt (above); the design record's §4.4 (the opening is the void's row, the two neighbours' strand rows, the moment's
+chart and a bias: first order in the sources); the store record's count rulers (a whole mask at one, two and three known neighbours a
+side 2.83, 2.49, 2.33 on code); G125 (the count's own code cut at 8 bits: a mean epoch of 1.90 places, 0.422 of epochs one place, 0.9997
+kept under a shifted start). What no log holds: what an opening's 64 words hold of the place's class in any frame, and what each tick adds.
+  The reading. The one-place mask of P55 part B on at least 20,000 held places a slice in whole stretches; at each place its 64 words at
+  the opening and after ticks 1, 2, 3 and 4. A fitted face a tick: a softmax over the alphabet's classes on the 64 words (floats on the
+  host, a ruler), fit on the places of the first four fifths of each slice's stretches pooled, read on the last fifth by slice; f0 to f4
+  its code in nats a place. Beside them the trained readout's code at each tick (c0, c1, c2, c3, cK), the code of the fit places' class
+  frequencies (the unigram), and the restarting cut at 5.545 nats on cK. Then the same fitted faces at the open places of the held role's
+  own whole masks, as read-store cuts them (g0 to g4).
+  (a) f4 pooled 1.45 (1.25 to 1.75); cK on the same places 1.20 (1.12 to 1.28).
+  (b) f0 pooled 2.6 (2.1 to 3.1); the unigram 3.25 (3.0 to 3.5).
+  (c) f1 2.0 (1.6 to 2.4), f2 1.65 (1.40 to 1.95), f3 1.50 (1.30 to 1.75).
+  (d) The rank agreement of the fitted opening's code with cK over a slice's read places 0.45 (0.30 to 0.60).
+  (e) The trained readout before the last tick: c1 6.0 (4.0 to 8.0), c2 3.5 (2.2 to 5.0), c3 2.0 (1.4 to 2.8).
+  (f) The cut on cK: a mean epoch of 3.0 places pooled (2.4 to 3.8); 0.25 of whole epochs one place (0.15 to 0.35); 0.995 of sites kept
+      under a start seven places later (0.98 to 1.000).
+  (g) At the whole masks: g4 over the trained readout's code there 1.10 (1.02 to 1.25); g2 less g4 0.35 nats (0.15 to 0.60); g3 less g4
+      0.12 (0.04 to 0.25).
+  Rules. (a) f4 more than 0.40 over cK: the ruler is too thin to rule on the rest, and the sample is raised before anything is read from
+  it. (b) f0 at 3.0 or under and at least 0.25 under the unigram: the opening holds news of its place, and the law change is derived and
+  ordered with its guess: the opening is given a chart of its own onto the one tied face (a symbol's key is one word; a frame has its own
+  transport), compared at every place of a region at its written class. f0 within 0.25 of the unigram: an opening holds no news of its
+  place in this form, and the cut reads the first tick whose fitted face stands 0.5 under the unigram, that tick's cost counted first.
+  (g) g2 less g4 at 0.10 or under and g3 less g4 at 0.05 or under: the declared four ticks are read as a lever of the engine, and a
+  declaration of two ticks gets its derivation and a founded line's read before the engine's structure is rebuilt around four; g2 less
+  g4 at 0.25 or over: the ticks stand. Between: three ticks are read the same way.
+
+G133 fixed 2026-11-13T01:59Z (the same thread), before its read: the restarting cut on a band's places, and what of its openings a change
+of start, the shift of rung and a ratio off the ladder keep (the design record of November 13, section 8's first owed reading; a count's
+code on a cloud host, the passage and the kept ladder of G130).
+Read first: band_ruler_kept.txt (a band's place codes 2.42 to 2.62 nats in its counted part, the bit length and sign of a first step's
+residual by the last step's bit length, and 3.31 to 3.85 in its flat part, the residual's bits under its leading one: about 6 nats a
+place, of which the larger half is no reader's; the shifted rung costs the original's reader 0.9995 to 1.0012 of its own); G124 and G125
+(on text the cut keeps 0.991 of its openings under a shifted start at a mean epoch of 6 places and 0.9997 at one octet's section, where
+a place's code runs from hundredths of a nat to ten); G129 (0.9996 under a changed start on half-cycle places, the cut begun later on the
+same codes). What no log holds: a cut on a band's places; any reading under a start that moves the raster's own phase; any ratio off
+the ladder.
+The reading. Bands 2 to 6 of the kept ladder, the 18 read utterances, each band's reader fit on the 55 count utterances at the original's
+speed. A place's code two ways: whole (counted and flat) and counted alone. The section three ways: 16 bits (11.09 nats, the boundary
+digit's width) on the whole code, and for each code the section located on the original so that its mean epoch is 2 places and 6 places.
+Four changes, the copy always read by the original's reader of the band named: (i) the cut begun 7 places later on the same codes;
+(ii) the passage begun 37 samples later, so every band's places fall between the original's (the same band); (iii) the double-speed copy's
+band s-1 (the shift of rung; places one to one); (iv) a copy at one and a half times the speed, its band s-1, compared in the original's
+time. An opening is kept where the copy opens within half the wider of the two strides; beside each share its chance (the copy's
+openings moved 1,000 strides along) and the lift, (kept less chance) over (1 less chance). The odometer (an opening where the running
+news passes a multiple of the section) beside the cut. Pooled over the five bands by openings, and by band.
+  (a) (i), the instrument's control: 0.985 kept at a mean epoch of 2 (0.95 to 1.000) and 0.95 at 6 (0.85 to 0.995), the whole code.
+  (b) (ii), the raster's phase moved: at a mean epoch of 6 the whole code's lift 0.15 (0.05 to 0.35), the counted code's 0.22 (0.08 to
+      0.45), the counted over the whole; at a mean epoch of 2 the whole code keeps 0.66 (0.55 to 0.78).
+  (c) (iii), the shift of rung: a place's whole code agrees in rank with the original's at 0.80 (0.60 to 0.93); the cut keeps 0.95 at a
+      mean epoch of 2 (0.88 to 0.99) and 0.65 at 6 (0.45 to 0.85).
+  (d) (iv), off the ladder: the copy's band costs the original's reader 1.01 of its own (1.00 to 1.04); the lift at a mean epoch of 6
+      0.10 (0.00 to 0.30), under (b)'s.
+  (e) the odometer's lift at a mean epoch of 6: under 0.10 in (ii) and (iv), and 0.10 in (iii) (0.00 to 0.30).
+  Rule. (b) under 0.50 on both codes: a first step's news on a band names no sites that a moved start keeps, so no level is founded on
+  this cut for sound; the place's news waits on a reader that is dark between a band's events (a longer context: the band's own period),
+  and that reader's ruler is read next, on the same four changes. (b) at 0.50 or over and (c) at 0.85 or over at a mean epoch of 6:
+  the cut carries to a band's places as it stands on text. (a) under its range: the instrument is read again before any other part.
+
+G128 scored 2026-11-13T02:01Z (the PC's receipts p56_shares.txt, p56_ticks.txt, p56_fill.txt and p56_host.txt, the count record's receipts; the
+pass's sections 2,001 to 2,100 from run 2's STATE.1900, each read in its own hold, every training read ending on the line's states; the
+host's part from one profiled read of main with step 5: 324.6 ms a profiled section, kernels 271.0, copies 9.6, takes 18.6, the host alone
+25.5).
+  (a) under 2^-37: 0.0035 of 4.57 thousand million met pairs: HELD. Under 2^-16: 0.0545: HELD. The median 2^-9: HELD. By kind: no
+      definite row's pair stands under 2^-37; 0.0053 of open rows' do, every one of them the first still head's (0.0212 of its open rows'
+      pairs, 378,256 of them a zero share). A crowd's share is zero at 0.043 of its live slots.
+  (b) definite 0.000, open 0.000: HELD, at the range's floor. No site at any tick moves by under 2^-8 of its chart's largest entry: the
+      change from one tick's opening to the next stands within 0 to 3 bits of the largest entry (the median 1 to 2), at every tick, in
+      both kinds, and in the pair contact's chart alike.
+  (c) open 0.850, definite 0.660 (by head 0.777, 0.557, 0.544, 0.642), over chunks 0.773: HELD, each.
+  (d) the cut, lists and tables 3.4 ms a section: MISSED below (20 fixed), six times under. The zeroings 6.6 of the takes' 18.6: HELD.
+      The covector's fetch, the deposit and the saves 11.9: HELD.
+  Rules applied. (a) a row's dark sources are no lever at this state. (b) no settling tick is derived; the ticks stand. (c) the walk does
+  not pack its met entries first. (d) no host phase of 8 ms or more reads no state of the section before, so none is prepared beside the
+  card; step 6 is the spared zeroings alone, 6.6 ms a profiled section at most.
+  What the host's table holds past its score (agent-inferred; G134 fixes what is done with it). The guess's premise was the wrong part
+  of the host: the text-only work is 3.5 ms, and the 53.6 ms a profiled section outside kernels stand in four places the rule did not
+  name. (1) Two plain takes, the clock's skins (6.9 ms a section in 4 calls) and the face covector's block (4.0 in 3), cost 1.3 to 1.7 ms
+  a call: allocations, where a pool's hit costs a thousandth of that. (2) The faces' masses are fetched whole, 79.5 MB a section in
+  7.7 ms, and a face a place is built on the host in 4.7 more. (3) The deposit on the host takes 11.1 ms. (4) The exposure's spread is
+  fetched each tick, which is a wait of the exposure's own 8.6 ms and costs nothing more.
+  The complete table of entries (70 entries, 270.6 ms a profiled section, 509 launches a section): 56 entries stand outside the
+  fourteen printed, which G131 (a) reads with the schedule.
+
+G134 fixed 2026-11-13T02:01Z (the same thread), before its build and reads: the sixth repair widened to the host's part as the table
+gives it (P58; realizations and plumbing, every bit kept; the steps' gates, reproduction and one hold).
+Read first: p56_host.txt (above); the driver's pool at source (field.rs: a take is served by a kept buffer of its size class up to twice
+it, and under the batch budget the pool frees its LARGEST kept buffers one at a time, which are the ones the next section takes again);
+the pass's end at source (the masses of every site, sites by the alphabet's 244 classes at 8 octets, are fetched and a face of 244 wide
+words is built for each unresolved place, where the trainer's line reads a place's code at its compared class and its total).
+  (a) The two takes: with their buffers kept across sections, 10.9 ms a profiled section falls to under 1.0 (0.1 to 2.0).
+  (b) The spared zeroings: of their 6.6 ms, 4.5 are spared (3.4 to 6.0), the score and share block's 3.4 among them.
+  (c) The faces: with only the words the trainer reads fetched, the fetch and collection's 12.4 ms fall to 2.0 (0.5 to 4.0).
+  (d) The deposit on the host, read by part before anything is moved: its arithmetic over the constitution's entries holds under
+      2.0 ms of the 11.1 (0.3 to 3.0); conversions, copies and allocations of whole layouts hold 0.60 of it (0.35 to 0.85).
+  (e) The step, (a) to (c) built, in one hold against a repeated control: an unprofiled section at 0.935 of the control's (0.90 to
+      0.96), 305 ms to about 285.
+  Rule. (d) as guessed: the deposit's whole-layout passes are removed on the host as a seventh step, no law moved. (d) with the
+  arithmetic over 6 ms: the deposit's card realization is derived (the constitution resident on the card, parity against the host's
+  bits) and ordered after the structural step. (e) over 0.96: the takes and fetches are bound elsewhere, and the profile is read
+  again before another host step.
+
+G133 scored 2026-11-13T02:14Z (receipts beside G130's: band_cut.py, band_cut.txt; for information band_code_spread.py, band_code_spread.txt).
+The read: 18 read utterances, bands 2 to 6, a place's whole code 5.74 to 6.37 nats and its counted part 2.42 to 2.61; the sections located
+for a mean epoch of 2 places at 14.9 to 16.6 nats (whole) and 6.2 to 6.7 (counted), for 6 places at 37.8 to 42.0 and 15.9 to 17.1; at 16
+bits the mean epoch is 1.309 places. Pooled over the five bands by openings, the cut:
+  (a) (i) the cut begun 7 places later, the whole code: 0.9957 kept at a mean epoch of 2, 0.9519 at 6 (counted 0.9998, 0.9919). HELD, both.
+  (b) (ii) the passage begun 37 samples later, at a mean epoch of 6: the whole code keeps 0.2117 against a chance of 0.1714, a lift of
+      0.0487: MISSED below, by the range's edge (0.05 to 0.35). The counted code keeps 0.1723 against 0.1665, a lift of 0.0070: MISSED
+      below (0.08 to 0.45). The counted over the whole: MISSED (the whole stands over it). At a mean epoch of 2 the whole code keeps
+      0.6406 (chance 0.5118, lift 0.2638): HELD (0.55 to 0.78).
+  (c) (iii) the shift of rung: a place's whole code agrees in rank at 0.9328 pooled (0.9006, 0.9479, 0.9689, 0.9774, 0.9800 by band;
+      the places whose code is the same 0.24, 0.37, 0.54, 0.64, 0.71): MISSED above (0.60 to 0.93), by the range's edge. The cut keeps
+      0.7029 at a mean epoch of 2 (lift 0.3907): MISSED below (0.88 to 0.99); 0.2363 at 6 (chance 0.1698, lift 0.0800; by band the lift
+      0.04, 0.09, 0.18, 0.15, 0.18): MISSED below (0.45 to 0.85).
+  (d) (iv) one and a half times the speed: the copy's band costs the original's reader 1.0027 of its own (0.9998 to 1.0434 by band):
+      HELD. The lift at a mean epoch of 6 0.0457 (kept 0.3155, chance 0.2827): HELD, and under (b)'s 0.0487.
+  (e) the odometer's lift at a mean epoch of 6: 0.0174 in (ii), 0.0344 in (iv), 0.0214 in (iii): HELD each. Its control (i) keeps 0.0369.
+  Six parts held, six missed; every miss of the cut runs low and the one miss of the code's agreement runs high.
+Rule applied: (b) under 0.50 on both codes. No level is founded on this cut for sound with a first step's reader.
+Reading [agent-inferred, with band_code_spread.txt]. The cut holds its control, so the instrument stands. What fails is the news it
+is given. A place's whole code has a spread of 0.36 to 0.38 of its mean and no place of 811,614 passes the section, nor half of it:
+the passage holds no place brighter than the section, the landmark at which every reading opens (code.epoch-restarting-carry), and on
+text that clause carries the cut (a place's code runs there from hundredths of a nat to ten). With no landmark an opening is placed by
+a sum of about six nearly equal codes, and two readings whose codes differ a little at every place drift apart as fast as they meet:
+under the shift of rung the codes agree in rank at 0.90 to 0.98 and the cut still keeps 0.24. The counted part is the raster's own:
+its rank agreement with the place nearest it in the copy begun 37 samples later is 0.09 to 0.49 (the whole code's 0.82 to 0.93, which
+is the loudness both hold). The larger half of a place's code is the bits under its residual's leading one, which no reader of this
+kind predicts and which this reader charges at every place.
+What follows. The cut is a law of a reader's news and it is only as good as the reader's dark: a level's sites stand where most places
+are dark and a few pass the section. For sound that asks for a reading of a band that is dark while the band continues, and bright
+where it departs, with what lies under a declared width released and accounted and never charged as news. The tree holds that reading
+since October 10 (hnn.ring-moment-keys and the record of that day: a ring's section word near-returns through most of a recording,
+33,395 of 52,128 windows, at 0.44 of its spelled length, the departures kept as defects). Its ruler is fixed next, as G135.
+
+G135 fixed 2026-11-13T02:22Z (the same thread), before its read: the restarting cut on the places of driven rings read once a turn, the reading
+G133's rule sends to (the design record of November 13, section 8; a count's code on a cloud host, the passage and copies of G133).
+Read first: G133 and band_code_spread.txt (with a first step's reader no place passes the section; the counted part agrees in rank at
+0.09 to 0.49 with the place nearest it under a start moved by 37 samples); the record of October 10 (a declared bank of 24 rings read
+at every tick on a 93,680-tick recording: a free ring gives up half its energy in 1 to 3 turns and its keys cost 2.6 times the samples;
+exact locks hold 6,730 of 52,349 windows of four turns and the rings under 400 Hz almost never lock; the section word near-returns in
+33,395 of 52,128 windows at 0.44 of its spelled length, and a slowly turning ring's word is mostly zeros). What no log holds: a ring
+read once a turn; a ring's boost beside its turn; any cut on a ring's symbols; a ring under a moved start, a shift of rung or a ratio
+off the ladder.
+The reading (ring_sections.c, ring_cut.py; the instrument checked on made tones only: a tone on the ring's turn advances nothing, one a
+tenth above it 0.40 quarter turns a place, a phase jump one place). Ring s turns once in 2^s samples; a place is one turn; rings 3 to 7
+(2 kHz to 125 Hz at 16 kHz). Two reaches, the same rings and places: one turn (the ring keeps 1 - 2^-s a sample) and four turns
+(1 - 2^-(s+2)). A place's symbol is its ratio to the place before at two declared widths, the boost in octaves and the turn in quarter
+turns against the free ring's, each clipped to 3 either way: 49 classes, (0, 0) the ring continuing; what lies under the widths is
+released and not charged. The reader counts a symbol by the place before it, on the 55 count utterances. Sections: the symbol's own
+width (ln 49 = 3.89 nats) and those located for a mean epoch of 2 places and of 6. G133's four changes, the copy read by the original's
+reader (the faster copies on ring s-1). Laws: the cut, the odometer, and two with no sum: bright (a place whose code alone passes the
+symbol's width) and events (a place whose symbol is not the ring continuing). Kept at half the wider stride as in G133, and at a whole
+stride (the two places overlap). Pooled over the five rings by openings; the 18 read utterances.
+  (a) the reading itself. The ring continuing: 0.22 of places at a reach of one turn (0.10 to 0.40), 0.45 at four (0.25 to 0.65). A
+      place's code: 2.5 nats at one turn (2.0 to 3.0), 1.7 at four (1.2 to 2.3). Places past the symbol's width: 0.12 (0.05 to 0.22) at
+      either reach.
+  (b) (i), the control, the cut at a mean epoch of 6: 0.95 kept or more at either reach (0.90 to 1.00).
+  (c) (iii), the shift of rung: a place's symbol is the same at 0.80 of places at one turn (0.60 to 0.93), 0.88 at four (0.70 to 0.97);
+      the cut's lift at a mean epoch of 6: 0.35 at one turn (0.15 to 0.60), 0.50 at four (0.25 to 0.75).
+  (d) (ii), the start moved: the symbol the same at the nearest place 0.35 at one turn (0.20 to 0.55), 0.55 at four (0.35 to 0.75); the
+      cut's lift at a mean epoch of 6: 0.08 at one turn (0.02 to 0.20), 0.18 at four (0.06 to 0.40); at the symbol's width 0.20 at one
+      turn (0.08 to 0.40), 0.30 at four (0.12 to 0.55). The bright law's lift at a whole stride: 0.35 at one turn (0.15 to 0.60), 0.45
+      at four (0.20 to 0.70).
+  (e) (iv), off the ladder: the cut's lift at a mean epoch of 6 0.03 at either reach (0.00 to 0.10), under (d)'s; the bright law's lift
+      at a whole stride 0.15 (0.03 to 0.35).
+  (f) the column (every ring's code laid evenly over ring 3's places), the cut at a mean epoch of 6 columns: under (ii) 0.08 at one turn
+      (0.02 to 0.20) and 0.15 at four (0.05 to 0.35); under (iii) 0.35 and 0.50 (0.15 to 0.60; 0.25 to 0.75).
+  (g) the two reaches test one stated prediction: a ring whose reach spans several of its places is darker (the ring continuing higher
+      by 0.15 or more) and its cut keeps more under the moved start (its lift higher at both sections). And on the loud openings the
+      cut's lift stands over its lift on all openings in (ii) and (iii) at a mean epoch of 6.
+  Rule. On either reach, the cut's lift at the symbol's width 0.50 or over under (ii) and 0.70 or over under (iii): the cut carries to
+  that ring's places, and sound's value chart is written from it (a ring's boost and turn once a turn at that reach) in the design
+  record before any build. Else, the bright law's lift at a whole stride 0.50 or over under (ii) and (iii) on either reach: a ring's
+  landmarks stand under a moved start and the sum between them runs free, so what fails is the reader between landmarks, and a reader
+  of the ring's cycle with its defects (October 10's near-return) is read on the same rasters before any chart is written. Else: a
+  ring read once a turn at these widths names no sites a moved start keeps; the place, one turn on a raster fixed from the passage's
+  first sample, is the raster's own, and the reading goes to the ring's section arrivals at every sample (the tree's reader), where
+  an arrival is a time of the passage; the image's ruler is read before more of sound. (b) under its range: the instrument is read
+  again before any other part.
+
+G135 scored 2026-11-13T02:25Z (receipts beside G133's: ring_sections.c, ring_cut.py, ring_cut_reach1.txt, ring_cut_reach4.txt).
+The read: 18 read utterances, rings 3 to 7, 405,817 places; pooled by places for the reading itself and by openings for the laws.
+  (a) the ring continuing: 0.051 of places at a reach of one turn (by ring 0.04, 0.03, 0.08, 0.08, 0.27): MISSED below (0.10 to 0.40);
+      0.131 at four (0.10, 0.09, 0.20, 0.25, 0.42): MISSED below (0.25 to 0.65). A place's code 2.80 nats at one turn: HELD; 2.69 at
+      four: MISSED above (1.2 to 2.3). Places past the symbol's width 0.183 and 0.167: HELD, both.
+  (b) (i) the control, the cut at a mean epoch of 6: 0.9820 and 0.9823 kept: HELD, both.
+  (c) (iii) the shift of rung: a place's symbol the same at 0.615 of places at one turn (0.51, 0.66, 0.75, 0.83, 0.90 by ring): HELD;
+      0.658 at four (0.56, 0.69, 0.80, 0.89, 0.96): MISSED below (0.70 to 0.97). The cut's lift at a mean epoch of 6: 0.084 at one turn
+      (0.06, 0.07, 0.10, 0.19, 0.38 by ring) and 0.113 at four (0.06, 0.08, 0.16, 0.33, 0.63): MISSED below, both.
+  (d) (ii) the start moved: the symbol the same at the nearest place 0.241 at one turn: HELD; 0.265 at four: MISSED below (0.35 to
+      0.75). The cut's lift at a mean epoch of 6: 0.028 at one turn: HELD; 0.031 at four: MISSED below (0.06 to 0.40). At the symbol's
+      width 0.350 and 0.289: HELD, both. The bright law at a whole stride 0.507 and 0.413 (at half a stride 0.338 and 0.284): HELD, both.
+  (e) (iv) off the ladder: the cut's lift at a mean epoch of 6 0.038 at one turn and 0.022 at four: HELD, both; under (d)'s: MISSED at
+      one turn (0.038 over 0.028), HELD at four. The bright law at a whole stride 0.427 at one turn: MISSED above (0.03 to 0.35);
+      0.245 at four: HELD.
+  (f) the column at a mean epoch of 6 columns: under (ii) 0.020 and 0.013: MISSED below, both (the first by the range's edge); under
+      (iii) 0.034 and 0.031: MISSED below, both. A column's news spreads 0.32 of its mean and one column in ten thousand passes the
+      section for a mean epoch of 2: the sum over rings is a more even drive than any ring's.
+  (g) the reach of four turns is darker by 0.080: MISSED (0.15 or more). Its cut keeps more under the moved start at a mean epoch of 6
+      (0.031 over 0.028) and less at the symbol's width (0.289 under 0.350): MISSED. On the loud openings the cut's lift stands under
+      its lift on all openings in (ii) and (iii) at both reaches (0.007 and 0.017 under 0.028 and 0.031; 0.059 and 0.097 under 0.084
+      and 0.113): MISSED.
+  Sixteen parts held, seventeen missed. Every miss of the cut and of the dark runs low.
+Rule applied: the first clause fails (the cut's lift at the symbol's width 0.35 and 0.29 under (ii)). The second holds on the reach of
+one turn, by the range's edge: the bright law's lift at a whole stride is 0.507 under (ii) and 0.718 under (iii) (0.413 and 0.689 at
+four turns). By the rule the reader between landmarks is read next on the ring's cycle with its defects.
+Reading [agent-inferred]. Three things stand in the numbers and the rule's second clause names only the first.
+  1. Speech is not dark on a ring read once a turn: the ring continues at one place in twenty at a reach of one turn and one in eight
+     at four, and the one-place reader codes a symbol at 2.7 to 2.8 nats of the 3.89 its width holds. A longer reach is not the lever.
+  2. The place is the raster's own. Under a start moved by 37 samples a place's symbol is the same at 0.24 to 0.27 of places, and at
+     0.26 and 0.30 on ring 5, where the nearest place stands 5 samples of 32 away; under the shift of rung, where places meet one to one, it is
+     0.62 to 0.66. A ring forgets its start within a few reaches, so its state at a sample is the same under a start moved by whole
+     samples; what moves is where the stride reads it. A stride counted from the passage's first sample is a privileged frame.
+  3. The cut keeps its sites as far as the symbols are the same, to the power of the epoch's length. By ring at four turns under the
+     shift of rung the symbol is the same at 0.56, 0.69, 0.80, 0.89, 0.96 and the cut's lift at a mean epoch of 6 is 0.06, 0.08, 0.16,
+     0.33, 0.63, where the sixth powers are 0.03, 0.10, 0.26, 0.48, 0.77. Two readings agree from a shared opening until their codes
+     differ (code.epoch-restarting-carry), so a level's sites under a change ask for a place's symbol the same under it at about 0.98
+     for epochs of six places. G133's reading is the same law met with codes that differ at most places.
+What follows. The reading the rule sends to and the reading (2) sends to are one, and the tree's own (hnn.dynamic-section-lift, the
+record of October 10): the ring read at every sample, its places its own section arrivals (an epoch is the interval between a
+receiver's section arrivals), which are times of the passage under any start, with the arrival word's cycle and defects as the reader.
+Its ruler is fixed next, as G136.
+
+G136 fixed 2026-11-13T02:44Z (the same thread), before its read: a ring's own section arrivals as a sound's places, the reading G135's score sends
+to (the design record of November 13, section 8; a count's code on a cloud host, the passage and copies of G133 and one more copy).
+Read first: G133 and G135 (on a raster of turns counted from the first sample the ring continuing stands at 0.05 and 0.13 of places,
+a place's symbol is the same under the shift of rung at 0.62 and 0.66, by ring 0.51 to 0.96, and under a start moved by 37 samples at
+0.24 and 0.27; the cut keeps a lift of 0.06 to 0.63 at a mean epoch of 6 where the symbol is the same at 0.56 to 0.96); G129 (the raw
+wave's half-cycles stand at double speed at 0.26 to 0.74 by peak octave: speech's loud crossings are its upper band's, which the
+double-speed copy at 16 kHz does not hold); the record of October 10 (a free ring gives up half its energy in 1 to 3 turns; the rings
+under 400 Hz almost never lock); the design record's own chart of codes (section 6: a boundary that depends on a bounded past survives
+an insertion). What no log holds: a ring's arrivals as places; an interval read against the arrival before; a law of peaks; a start
+moved by a part of a sample.
+The reading (ring_arrivals.c, arrival_cut.py). Ring s turns once in 2^s samples free and is read at every sample; a place is an
+arrival: the first crossing of the ray u = 0, w > 0 at each whole winding, its time and its |z| cut from the step that crossed, taken
+as a straight line of log z. Rings 3 to 7 of the original; two reaches, one turn and four. The instrument was dry-run on a made passage
+only, where it showed two faults of its own, both repaired before this block: a lift begun at zero moved the section with the start
+(now begun at the first state's class: a start moved by whole samples leaves every arrival within a millionth of a sample past the
+transient), and |z| read at the sample after the crossing followed the sampling's phase (now read at the crossing). A place's symbol,
+two ways, each (boost, turn) clipped to 3 either way, 49 classes: the ring word (the octave's step on the fixed grid; the interval
+against the ring's free turn, in quarter turns) and the passage word (|z| against |z| at the arrival before, to the nearest octave;
+the interval against the interval before, in quarters). The reader counts a symbol by the symbol before, on the 55 count utterances.
+Changes: (i) the law begun 7 places later; (ii) the start moved 37 samples (the instrument's control); (ch) the same through the
+resampler, 16 to 48 to 16 kHz (the resampler's control); (ii3) the start moved 37 and a third samples (112 at 48 kHz; the copy's shift
+read at 37.3333 by the cross-spectrum's slope); (iii) the double-speed copy's ring s-1; (iv) the copy at 1.5 times the speed, its ring
+s-1. Laws: the cut (sections the symbol's width and those located for a mean epoch of 2 and of 6), the odometer, bright, and peak (a
+place opens where its code is above every code within h places before it and not under any within h after: h = 1 and 3). Kept within
+half the ring's free turn in the original's time, and within a whole turn; chance by a move of 1,000 free turns. A place met: the copy
+has an arrival within an eighth of a turn. A place's symbol the same: the copy's nearest arrival stands within half a turn and carries
+the same symbol, over all the original's places. Pooled over the five rings by places or openings; the 18 read utterances. Figures as
+reach one turn, then four.
+  (a) the places. Ring 3 arrives under 0.7 times a free turn and ring 7 over 0.9 times, at a reach of one turn (a driven ring follows
+      its drive, and speech's drive stands low). The ring continuing: the ring word 0.12 (0.05 to 0.25) and 0.25 (0.12 to 0.45); the
+      passage word 0.40 (0.25 to 0.60) and 0.50 (0.30 to 0.70). A place's code: the ring word 2.6 nats (2.0 to 3.1) and 2.3 (1.7 to
+      2.9); the passage word 2.3 (1.7 to 2.9) and 2.0 (1.4 to 2.7). Places past the symbol's width: 0.15 (0.08 to 0.22), either word
+      and reach.
+  (b) the controls. (i), the cut at a mean epoch of 6: 0.95 kept or more. (ii): met 0.99 or more, the same 0.99 or more, the cut's
+      lift at a mean epoch of 6 0.90 or more. (ch): the same 0.95 (0.90 to 0.99).
+  (c) (ii3), a start moved by a part of a sample. Met: 0.97 (0.92 to 0.995). The same: the ring word 0.88 (0.78 to 0.95) and 0.92
+      (0.84 to 0.97); the passage word 0.87 (0.77 to 0.95) and 0.91 (0.83 to 0.97). The cut's lift at a mean epoch of 6: 0.35 (0.18
+      to 0.55) and 0.45 (0.25 to 0.65), either word. The peak law's lift at h = 3: 0.65 (0.45 to 0.85). The bright law's lift at a
+      whole turn: 0.75 (0.55 to 0.90).
+  (d) (iii), the shift of rung. Met: 0.75 (0.60 to 0.90). The same: the ring word 0.62 (0.45 to 0.78) and 0.70 (0.50 to 0.85); the
+      passage word 0.60 (0.43 to 0.78) and 0.68 (0.48 to 0.85); by ring it rises, ring 3 under 0.50 and ring 7 over 0.80. The cut's
+      lift at a mean epoch of 6: 0.10 (0.04 to 0.22) and 0.14 (0.05 to 0.30). The peak law's lift at h = 3: 0.30 (0.15 to 0.50). The
+      bright law's lift at a whole turn: 0.50 (0.30 to 0.70).
+  (e) (iv), off the ladder. Met: 0.60 (0.40 to 0.80). The same: the ring word 0.22 (0.10 to 0.40), the passage word 0.42 (0.28 to
+      0.60). The cut's lift at a mean epoch of 6: the ring word 0.03 (0.00 to 0.10), the passage word 0.06 (0.01 to 0.15). The peak
+      law's lift at h = 3: 0.12 (0.04 to 0.30). The bright law's lift at a whole turn: the ring word 0.20 (0.08 to 0.40), the passage
+      word 0.30 (0.12 to 0.50).
+  (f) three stated predictions. One, the clock: a ring's free turn is itself a clock, so under (iv) the passage word is the same at
+      0.12 or more over the ring word, while under (ii3) and (iii) the two words stand within 0.05 of each other. Two, the law: an
+      opening that hangs on a bounded neighbourhood keeps as the sameness of its few symbols and never to the power of the epoch, so
+      the peak law's lift at h = 3 stands at 1.5 times the cut's at a mean epoch of 6, or more, under (ii3) and (iii) on both words
+      and reaches. Three, G135's law on arrivals: by ring, the cut's lift at a mean epoch of 6 stands within 0.15 of the seventh power
+      of that ring's sameness, in three of four cases over (ii3) and (iii), the two words and the two reaches.
+  (g) the two reaches: four turns is the more regular (the ring continuing higher by 0.08 or more on both words) and the more the same
+      under (ii3) and (iii) (by 0.03 or more).
+  Rule. On some word and reach, under (ii3) and (iii) both, the symbol the same at 0.90 or over and the cut's lift at a mean epoch of
+  6 at 0.50 or over: a sound's place is its ring's arrival and a level's sites are the cut on the arrival word's news; sound's chart is
+  written in the design record, (iv) its open part, before the image's ruler. Else, the peak law's lift at h = 3 at 0.50 or over under
+  (ii3) and (iii) on some word and reach: on a measured symbol a level's sites are the peaks of its news, and the design record's law
+  of sites is amended for a measured symbol (the opening stated on a bounded neighbourhood, with its section and its restart) and read
+  on text against the cut before any chart of sound. Else, under (ii3) the symbol the same under 0.90 on every word and reach: the
+  symbol's two widths are read first against the spread of the interval and of |z| under the part of a sample, before any law. Else
+  (the part of a sample holds at 0.90 and the shift of rung fails): the copy's lost octave and its halved samples a turn are told
+  apart next (the original held under 4 kHz on ring s against the copy on ring s-1). Beside these, for (iv): the passage word the same
+  at 0.12 or more over the ring word and its bright lift at a whole turn 0.30 or over: a ratio off the ladder is carried on one ring
+  by the ratio digit; else it is carried by no single ring and the chart across rings is derived next.
+
+G136 scored 2026-11-13T02:48Z (receipts beside G135's: ring_arrivals.c, arrival_cut.py, arrival_cut_reach1.txt, arrival_cut_reach4.txt; for
+information, read after the score, arrival_spread.py, arrival_spread_reach1.txt, arrival_spread_reach4.txt). 212,858 places at a reach
+of one turn and 247,420 at four, rings 3 to 7, the 18 read utterances; figures as reach one turn, then four.
+  (a) the places. Ring 3 arrives 0.42 and 0.51 times a free turn, ring 7 0.93 and 0.98: held. The ring continuing: the ring word
+      0.088 and 0.223: held twice; the passage word 0.130 and 0.215 against 0.40 and 0.50: missed twice. A place's code: the ring word
+      2.95 and 2.65 nats: held twice; the passage word 3.02 and 2.77 against 2.3 and 2.0: missed twice. Places past the symbol's
+      width 0.16 to 0.21: held.
+  (b) the controls. (i) 0.967 to 0.977: held. (ii): met 0.9995 and 0.9994, the same 0.9994 and 0.9985, the cut's lift at a mean epoch
+      of 6 0.956 to 0.971: held. (ch): the same 0.902 and 0.922 on the ring word, 0.899 and 0.925 on the passage word: held three
+      times, missed once by 0.001. The resampler alone takes the cut's lift at a mean epoch of 6 to 0.41 to 0.49.
+  (c) (ii3). Met 0.978 and 0.984: held. The same: the ring word 0.717 and 0.788, the passage word 0.700 and 0.781, against 0.87 to
+      0.92: missed four times. The cut's lift at a mean epoch of 6: 0.294 and 0.349, 0.309 and 0.318: held four times. The peak law
+      at h = 3 (a mean epoch of 7.3): 0.716 and 0.769, 0.684 and 0.733: held. The bright law at a whole turn 0.80 to 0.84: held.
+  (d) (iii). Met 0.797 and 0.876: held. The same: the ring word 0.470 and 0.588, the passage word 0.490 and 0.594: held four times;
+      by ring 0.28 and 0.42 on ring 3 to 0.89 and 0.96 on ring 7: held. The cut's lift at a mean epoch of 6: 0.134 and 0.168, 0.142
+      and 0.171: held four times. The peak law at h = 3: 0.412 and 0.509, 0.412 and 0.487 against 0.15 to 0.50: held three times,
+      missed once by 0.009 over. The bright law at a whole turn 0.50 to 0.55: held.
+  (e) (iv). Met 0.608 and 0.378 against 0.40 to 0.80: held, then missed. The same: the ring word 0.128 and 0.131: held twice; the
+      passage word 0.185 and 0.125 against 0.28 to 0.60: missed twice. The cut's lift at a mean epoch of 6: the ring word 0.119 and
+      0.087 against 0.00 to 0.10: missed, then held; the passage word 0.121 and 0.084: held twice. The peak law at h = 3 0.11 to 0.18:
+      held. The bright law at a whole turn 0.320 and 0.187, 0.338 and 0.203: held twice.
+  (f) One, the clock: under (iv) the passage word stands 0.057 over the ring word and 0.006 under it, against 0.12 or more: missed
+      (on ring 7 alone it stands at 0.479 and 0.413 where the ring word stands at 0.038 and 0.124); under (ii3) and (iii) the two
+      words stand within 0.02 of each other: held. Two, the law: the peak law's lift at h = 3 stands at 2.2 to 3.1 times the cut's
+      at a mean epoch of 6 in all eight cases: held. Three: the cut's lift stands within 0.15 of the seventh power of the ring's
+      sameness in 34 of 40 cases: held; the six that miss are rings 3 to 5 under (ii3) at one turn, where the cut keeps 0.20 to 0.41
+      and the seventh power stands at 0.02 to 0.23: under a low sameness the cut keeps a floor near 0.1 to 0.2.
+  (g) four turns over one: the ring continuing higher by 0.135 and 0.085, the symbol more the same by 0.07 to 0.12: held twice.
+  46 parts held, 15 missed. The misses stand in three places: the passage word is no more regular than the ring word (four); a
+  place's symbol under a part of a sample (four, and the resampler's control once); and the copy off the ladder (five, with the
+  clock's prediction); the fifteenth is the peak law under the shift of rung, once over its range.
+  What the reading holds beside its parts (the last three from arrival_spread, read after the score).
+  The places stand and the symbol does not: under a start moved by a part of a sample 0.98 of arrivals are met within an eighth of a
+  turn (their times spread 0.001 to 0.06 samples, by ring) and 0.70 to 0.79 of symbols are the same. It is the boost that changes:
+  of the places met, |z|'s digit differs at 0.17 to 0.26 and the interval's at 0.05 to 0.14.
+  By ring the sameness climbs with the ring's turn: under (ii3) 0.59 to 0.70 on ring 3 and 0.94 to 0.98 on ring 7; under (iii) 0.28
+  to 0.42 and 0.89 to 0.97. On ring 7's loud places (half of its places) the symbol is the same at 0.998 to 1.000 under (ii3) and at
+  0.979 to 0.997 under (iii); on ring 3's loud places it is less the same than on the rest (0.53 to 0.67 against 0.66 to 0.73 under
+  (ii3)). Ring 3 arrives 0.42 to 0.51 times a free turn: it is driven from under its band, and what it reads of that drive it reads
+  through its skirt, at 8 samples a turn (agent-inferred).
+  The peak law keeps as the sameness itself: by ring, under (ii3) on the ring word at one turn, 0.605, 0.721, 0.836, 0.881, 0.914
+  where the symbol is the same at 0.614, 0.702, 0.811, 0.885, 0.941.
+  Off the ladder the places themselves move: met at 0.61 and 0.38, their times spread 0.03 to 0.06 of a turn on every ring.
+  Rule applied. The first clause fails (the symbol the same at 0.70 to 0.79 under (ii3), the cut's lift 0.29 to 0.35). The second
+  holds on the ring word at four turns, by 0.009 on (iii): the peak law's lift at h = 3 stands at 0.769 under (ii3) and 0.509 under
+  (iii). So on a measured symbol a level's sites are the peaks of its news: the design record's law of sites is amended for a
+  measured symbol (the opening stated on a bounded neighbourhood, with its section and its restart) and read on text against the
+  cut before any chart of sound. For (iv) the passage word does not stand 0.12 over the ring word: a ratio off the ladder is carried
+  by no single ring, and the chart across rings is derived next.
+
+G134 scored 2026-11-13T03:06Z (receipt p58_step6.txt with its generator on claude/carry-reads at 5f15b57ef; the build merged as PR #750, main
+8b34e48ce; reviewed at source: the pool's rule, the kernels' guards on open sites against the face path's three proofs, the narrow
+read's order of regions and what its early return skips, the learner's comparison against the old one with no held step and no port).
+  (a) The two takes: 0.048 ms a profiled section from 11.045 (the premise 10.9). MISSED below the range (0.1 to 2.0). The rule built
+      is not the one guessed: the face covector's block and the clock's skins, both 128 bits a word and never live together, had each
+      freed the other's kept buffer at every miss, so a plain take that the budget would pay for with a free is served by the least
+      kept buffer of its type at least its class (294 of the block's 300 takes in the profiled read).
+  (b) The spared zeroings: 5.325 of 6.526 ms (the premise 6.6). HELD (3.4 to 6.0). Twelve takes, each with its proof at the take.
+  (c) The faces' fetch and collection: 0.380 ms from 10.970 (the premise 12.4). MISSED below the range (0.5 to 4.0).
+  (d) The deposit on the host: 10.145 ms a section (the premise 11.1). Its arithmetic over the constitution's 117,478 entries 6.027
+      ms (the two steps 2.31 each, the moments 0.78, the stepped constitution 0.30, the grains 0.24, the rates 0.09): MISSED above
+      (0.3 to 3.0). Bare whole-layout copies 0.014 of it: MISSED below (0.35 to 0.85). The four first-order prices 1.13 ms, the
+      comparison and the code over the open sites 2.85.
+  (e) The step in one hold: 279.4 ms a section against controls of 306.1 and 308.1, 0.910 of them (spread 0.006). HELD (0.90 to 0.96).
+  Two parts held and four missed, (a) and (c) on the side of the repair.
+Rules applied. (d) as guessed: not met, so no seventh step removes whole-layout passes. (d) with the arithmetic over 6 ms: met at the
+rule's line by 0.027 ms, so the deposit's card realization is derived (the constitution resident on the card, parity against the
+host's bits) and ordered after the structural step. (e) over 0.96: not met.
+Reading [agent-inferred]. (d) missed because its premise was not read at source before the guess: the deposit's step was taken for
+copies of layouts, and it is two passes of a step's arithmetic at about 20 billionths of a second an entry. The section stands at 6.9
+times the bar of 40.7 ms, and the kernels hold 267.6 of a profiled section's 289.9 ms: what is left of the host is 10 ms of deposit
+and about 4 of takes and copies, so the rate is now the kernels' (G131's schedule read, then the structural step).

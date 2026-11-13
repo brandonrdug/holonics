@@ -20,7 +20,10 @@ rows enter (`code.epoch-restarting-carry`, `code.place-news-cavity-face`,
 `code.epoch-news-phase-chart`); `tower.field-pace`, `tower.field-scale-packets`,
 `code.epoch-cut-own-length` and `code.news-clock-proper-time` are amended. Receipts:
 `screen_ruler.py`, `screen_ruler.txt` (G123), `resync_ruler.py`, `resync_ruler.txt` (G124),
-`resync_ruler_octet.txt` (G125). The guesses and their scores are in the guess file of the line.
+`resync_ruler_octet.txt` (G125); on a sampled wave, the specimen recorded speech (§8, added the same day; atlas
+`code.wave-place-frame-band`), `sound_ruler.py`, `sound_ruler.txt`, `sound_ruler_floor11.txt`
+(G129), `rungs.c`, `rungs_kept.c`, `band_ruler.py`, `band_ruler.txt`, `band_ruler_kept.txt` (G130).
+The guesses and their scores are in the guess file of the line.
 
 ## 1. Why this record exists
 
@@ -234,13 +237,37 @@ c_t = −Σ_a p̃_t(a) log p̃_t(a)   at an open place (the face's expected code
   through the pass's ticks: a field iterates one constitution on one complex. A release cuts
   again at each stage's opening, and a place that is written there changes its expected code
   for its realized one, which is what the blank's clock law already says of its duration.
-- **What is unread.** The readout's covector comes from the faces after the last tick. Whether
-  it reads an opening well enough to rank a region's places is the first reading the build
-  waits on (§9). If it does not, the opening's face is compared as the last tick's is, which changes
-  what the deposit consumes and is decided on that reading.
+- **What was unread, and what the reading gave** (G127, November 13; `p55_cavity.txt` in the
+  engine record's receipts; the store's state at the mean of 1,000 states, 30,677 held places
+  over five slices, each place open alone with every other place of its stretch written). The
+  readout's covector comes from the faces after the last tick, and it does not read an opening.
+  A place's written class codes 8.05 nats at the built opening, where the uniform face over the
+  alphabet's 244 classes codes 5.497, and stands over that face at 0.61 of places; after the four
+  declared ticks the same place codes 1.200 (code 0.907, web 1.178, science 1.164, books 1.246,
+  wikidata 1.504; the median 0.437, and 0.024 of places over the uniform face). The two codes'
+  rank agreement is 0.25, 0.18, 0.17 and 0.08 on code, web, science and books and 0.45 on
+  wikidata. A restarting cut on the opening's code is then a cut of one-place epochs (0.909 of
+  whole epochs, a mean of 1.118 places), and its share kept under a changed start (1.000) says
+  nothing of sites. The guess's five parts missed but one, and that one trivially; each is
+  recorded in the guess file.
+- **What follows** (`agent-inferred`). The ticks carry a place's state into the frame the
+  readout reads; the opening stands outside it. So the opening's face is owed a comparison of
+  its own, which changes what the deposit consumes, and the level's build is not ordered. Two
+  forms stand, and the next reading chooses (G132): the opening given a chart of its own onto
+  the one face the last tick is read through (a second face would give a symbol two words),
+  compared at every place of a region at its written class; or, if an opening's state holds
+  little of its class in any frame, the cut read at the first tick whose state does. That reading fits a face to a place's 64 words at
+  the opening and after each tick (a host ruler in floats, fit on four fifths of each slice's
+  stretches and read on the rest), with the trained readout's code beside it and the restarting
+  cut on the code after the ticks, the faithful reader's.
+- **What the same reading says of the store's level** (`agent-inferred`). With one place open
+  the store codes 0.91 nats on code, where a whole mask codes 2.39 on the same state and a count
+  of three known neighbours a side with both immediate neighbours known codes 1.10
+  (`code.neighbour-count-level`). The level "two known neighbours a side" of November 12 was the
+  whole mask's: what holds the code up there is how much of a stretch is open at once.
 - **Cost.** A cavity face at every place adds, a site, one step of its moment at the bare
-  stride and one readout through the encoding, with no contact and no tick. It is counted from
-  source and timed with the reading, before any build is ordered.
+  stride and one readout through the encoding, with no contact and no tick: about 23,900 narrow
+  products a site, 0.005 of a section's count (from source, with the reading).
 
 ### 4.5 An epoch's face is its moment on the news phase
 
@@ -354,11 +381,181 @@ and no comparison of a written place at its cavity face.
 ## 8. Text, image, acoustic, motor
 
 The cut reads a place's code under its cavity face and the boundary digit's width, and nothing
-of the medium. A pixel row's or a sample stream's places are cut the same way: a flat stretch
-closes into one epoch behind the edge that leads it. A motor chart's serial screw words are
-places with codes like any other. Only the boundary codec is the medium's. The count rulers of
-§3 on values (a place's own code against one constant a level, and the shares under a stretch)
-are owed before a value chart is built.
+of the medium. A motor chart's serial screw words are places with codes like any other. Only
+the boundary codec is the medium's. What a medium's places are is the codec's to say, and for
+values that is read before it is built: this section first said that a sample stream's places
+are cut like any other, and the first ruler on a sampled wave withdrew it.
+
+**A sampled propagation, read the same day on one specimen (G129, G130; a count's code on a cloud host, never the machine's
+face).** The passage is 481 seconds of public speech (73 utterances of one LibriSpeech speaker,
+16 bits at 16 kHz), with copies at double and at half speed (the rate renamed, then resampled).
+
+The subject of these readings is a sampled propagation: a ring driven by any wave a boundary
+samples, a pressure, a field or a current alike. Recorded speech is the specimen the rulers
+had, and nothing in the instruments is acoustic. What is any wave's: the identity that a
+change of clock is a shift of rung (a spectrum's lines moved by one ratio, the red shift, at
+every carrier), a place taken at a ring's own arrival, and a site taken at a peak of its news.
+What is this specimen's: every count below, and the sharing of rows along the ladder, which
+needs a spectrum that fills the octaves alike and is not expected of a narrow carrier
+(agent-inferred; no second specimen is read). This paragraph was added on November 13 after
+the section's first writing named sound as its subject (Brandon's correction of that day: a
+law of propagation is privileged to no medium). Its reason, in the agent's words: a name taken
+from the specimen invites a chart built for the specimen, the failure the lessons record for
+text run on its codec's grain.
+
+**A sample is a symbol** (Brandon's second correction of November 13, minutes after the
+first). Each is one draw from an alphabet at a place, a word of digits read at a declared
+width: an octet a draw from 256 states, a recorder's frame a draw from 65,536. This section's
+first writing kept them apart, a text's symbol as given and a wave's as measured with a law of
+its own, because it took the recorder's frame for the theory's sample. A frame is drawn on the
+recorder's clock, many to an event, with most of its digits under any reader's width; a signal
+of band `W` and length `T` holds about `2WT` samples (from training: the sampling theorem's
+count), and a uniform change of clock by `λ` takes `W` to `λW` and `T` to `T/λ` and keeps the
+count, where the frame's band still holds `λW`. An octet is a sample already drawn at its
+text's own events and cut at its width, and a wave read at its ring's arrivals at a declared
+width is a stream of the same kind. So the differences read below lie inside one object (the
+alphabet's width against the reader's, and whose clock drew the sample), and no law here is a
+medium's: the law of sites is read on octets and on arrivals under the same changes of a
+passage (a moved start; symbols the reader predicts inserted; a share of the symbols flipped),
+and what the cut lost on this specimen is charged to the law until octets under the third
+change say otherwise. Reason, in the agent's words: a category made from a file's format is
+the lessons' design thought in the programming language.
+
+- *The recorder's frame is not a place a change of clock keeps.* A sample's news reads 6.76 nats at the
+  passage's own speed and 6.69 at double speed, each by its own reader, so the passage's news
+  follows its count of places (0.4945 of it stands at double speed) and what lay above the
+  frame's band is lost with them. What the change does not touch is the law: the faster copy
+  costs the original's reader 1.0056 of what it costs its own.
+- *Nor is the half-cycle.* October 25's chart (`examples/listener/sections.rs`: a run of one
+  sign, its length and its peak's octave) was guessed to hold a floor above which a wave's
+  crossings follow its events. It holds none: by peak octave 0.26 to 0.74 of the half-cycles
+  stand at double speed, no octave reads 0.85, and at half speed 1.03 to 1.19 stand where a
+  re-timing that kept each crossing reads 1.00. This speech's loud crossings are its upper
+  band's, and at every loudness a wave's crossings follow the top of the frame's band (G129:
+  the low octaves held, the high octaves and the floor missed, the stream's ratio missed low).
+  One reading carried over from text: at an assumed floor the restarting cut keeps 0.9996 of
+  its openings under a changed start.
+- *On the octave ladder a change of clock is a shift of rung.* The raster is the tree's own
+  ladder (atlas `wave.matched-friction-reach`): rung `s` a fading sum of friction `1 − 2^(−s)`,
+  band `s` the difference of rungs `s` and `s + 1`, read at a stride of `2^s` samples. The
+  double-speed copy's band `s − 1`, read by the original's reader of band `s`, costs 0.9995 to
+  1.0012 of what it costs its own reader, where the original's reader of the same rung costs
+  1.004 to 1.042. This is `code.news-clock-proper-time`'s identity (ring `n` reads of the
+  re-timed strand what ring `n/λ` read of the original), read here for the first time.
+- *At this reader's grain the ladder's rows are shared on this speech.* At one speed, band `s + 1`
+  read by band `s`'s reader costs 1.0005 to 1.041 of its own reader's news (gain-free words),
+  1.003 to 1.040 with absolute words. Text read the other way (§4.7: the two paced clocks are
+  two keys). So for such a wave a change of clock by the ladder's ratio asks for one carried number,
+  the rung, and nothing learned anew, to the extent the rows are shared.
+- *A rung keeps its remainder.* The ladder as first built gained `(x − y) >> s` and dropped its
+  leak's remainder: a dead zone of `2^s`, tied to the rung's number. On it the shift read 1.05
+  and 1.15 at the two slowest rungs and the absolute words read 1.07 along the ladder. With the
+  sum kept on `2^(−s)` the readings above stand. A rung that drops its remainder privileges a
+  scale, which is the precision law's clause on ratios met on an instrument.
+- *With a first step's reader the cut on a band's places runs free (G133).* The restarting cut
+  was read on bands 2 to 6 under four changes, the copy read by the original's reader: the cut
+  begun 7 places later on the same codes, the passage begun 37 samples later, the double-speed
+  copy's next rung, and a copy at one and a half times the speed. At a mean epoch of 6 places
+  the control keeps 0.952 of its openings. The moved start keeps 0.212 against a chance of
+  0.171, the shift of rung 0.236 against 0.170 (where a place's code agrees in rank at 0.90 to
+  0.98), and the ratio off the ladder 0.316 against 0.283. The counted part alone keeps 0.172
+  against 0.167 under the moved start. The instrument stands and the news it is given fails:
+  a place's code spreads 0.36 to 0.38 of its mean, and no place of 811,614 passes the section
+  or half of it. The landmark clause of §4.2 (a place brighter than the section opens under
+  every reading) has no place to act on, an opening is placed by a sum of about six nearly
+  equal codes, and two readings whose codes differ a little at every place drift apart as fast
+  as they meet. On text the same cut keeps 0.991 because a place's code runs from hundredths
+  of a nat to ten. The larger half of a band's place code is the bits under its residual's
+  leading one, which this reader charges at every place and no reader of its kind predicts.
+  So the cut is a law of a reader's news, and its sites stand only as far as that reader is
+  dark at most places and bright at a few (receipts `band_cut.py`, `band_code_spread.py`).
+- *A ring read once a turn is not dark on speech, and a place counted from the first sample
+  is the raster's own (G135).* Rings 3 to 7 (ring `s` turning once in `2^s` samples, 2 kHz to
+  125 Hz), a place one turn, at a reach of one turn and of four. A place's symbol is its ratio
+  to the place before at two declared widths, the boost in octaves and the turn in quarter
+  turns against the free ring's (the dynamic section's lift, `hnn.dynamic-section-lift`), what
+  lies under the widths released. The ring continues at 0.05 of places at one turn and 0.13 at
+  four, and a reader of one place back codes a symbol at 2.7 to 2.8 nats of the 3.89 its width
+  holds. Under the start moved by 37 samples the symbol is the same at 0.24 to 0.27 of places,
+  where under the shift of rung, places meeting one to one, it is 0.62 to 0.66. The cut at a
+  mean epoch of 6 places keeps a lift of 0.03 under the moved start and 0.08 to 0.11 under the
+  shift of rung; places whose code alone passes the symbol's width are kept at a lift of 0.51
+  and 0.72 (one turn, the two places overlapping). The sum over rings is a more even drive than
+  any ring's (0.02 and 0.03).
+- *The cut keeps its sites as far as the symbols are the same, to the power of the epoch's
+  length.* [agent-inferred, from G135's rings] By ring at four turns under the shift of rung
+  the symbol is the same at 0.56, 0.69, 0.80, 0.89, 0.96 and the cut's lift at a mean epoch
+  of 6 is 0.06, 0.08, 0.16, 0.33, 0.63, where the sixth powers are 0.03, 0.10, 0.26, 0.48, 0.77.
+  This is §4.2's coalescence read from the other side: two readings agree from a shared
+  opening until their codes differ. A level's sites under a change therefore ask for a place's
+  symbol the same under it at about 0.98 for epochs of six places, and G133 is the same law met
+  with codes that differ at most places. A ring forgets its start within a few reaches, so its
+  state at a sample is the same under a start moved by whole samples; what moved was where the
+  stride read it. A stride counted from the passage's first sample is a privileged frame, the
+  fault §4.2 names in the odometer, met here in the place itself.
+- *A ring's arrivals stand under a start moved by a part of a sample, and the symbol read at
+  them does not (G136).* A ring read at every sample, a place its arrival (the first crossing
+  of the section at each whole winding, its time and its `|z|` cut from the step that crossed,
+  taken as a straight line of `log z`), rings 3 to 7, a reach of one turn and of four; 212,858
+  and 247,420 places on the 18 read utterances. Under a start moved by 37 and a third samples
+  0.978 and 0.984 of arrivals are met within an eighth of a free turn, their times spread 0.001
+  to 0.06 samples by ring; a place's symbol (its boost and its turn at G135's two widths) is
+  the same at 0.70 to 0.79, and the resampler alone leaves it the same at 0.90 to 0.92. It is
+  the boost that changes: of the places met, `|z|`'s digit differs at 0.17 to 0.26 and the
+  interval's at 0.05 to 0.14. Under the shift of rung 0.80 and 0.88 of arrivals are met and
+  the symbol is the same at 0.47 to 0.59. The interval read against the interval before (the
+  passage's own clock in place of the ring's free turn) is the same as far as the interval
+  read against the free turn, within 0.02, and is no more regular (the ring continuing at 0.13
+  and 0.22 of places against 0.09 and 0.22). Receipts: `ring_arrivals.c`, `arrival_cut.py`,
+  `arrival_cut_reach1.txt`, `arrival_cut_reach4.txt`; 46 parts of the guess held, 15 missed.
+- *An opening that hangs on a bounded neighbourhood keeps as the sameness itself (G136).* A
+  place that opens where its news stands above every place's within three places either side
+  (a mean epoch of 7.3 places) keeps a lift of 0.68 to 0.77 under the part of a sample and of
+  0.41 to 0.51 under the shift of rung, where the cut at a mean epoch of 6 keeps 0.29 to 0.35
+  and 0.13 to 0.17: 2.2 to 3.1 times the cut's in all eight cases. By ring it follows the
+  symbol's sameness at the first power (0.605, 0.721, 0.836, 0.881, 0.914 where the symbol is
+  the same at 0.614, 0.702, 0.811, 0.885, 0.941), where the cut follows its seventh power above
+  a floor near 0.1 to 0.2 (within 0.15 in 34 of 40 cases). This is §6's chart of codes read on
+  a stream whose symbols a change flips: §4.2's cut is free of its origin through its landmarks, the places whose
+  news passes the section, and on these symbols no place passes the section of a mean epoch of
+  6. G136's rule orders the law of sites restated with its opening on a bounded neighbourhood.
+  The rule's words set a "measured symbol" apart from text, and that split is withdrawn (the
+  paragraph above): the law of sites is one for every symbol stream, and both statements of it
+  are read on both specimens under the same changes before any chart is built.
+- *A ring holds what stands in its band.* [agent-inferred, from `arrival_spread`, read after
+  the score] By ring the symbol's sameness climbs with the turn: under the part of a sample
+  0.59 to 0.70 on ring 3 and 0.94 to 0.98 on ring 7, under the shift of rung 0.28 to 0.42 and
+  0.89 to 0.97. On ring 7's loud places, half of its places, the symbol is the same at 0.998
+  to 1.000 under the part of a sample and at 0.979 to 0.997 under the shift of rung, the level
+  the cut asks for. Ring 3 arrives 0.42 to 0.51 times a free turn and its loud places are less
+  the same than its others (0.53 to 0.67 against 0.66 to 0.73): it is driven from under its
+  band and reads that drive through its skirt, at 8 samples a turn. Off the ladder (the copy
+  at 1.5 times the speed, its ring `s−1`) the places themselves move: met at 0.61 and 0.38,
+  displaced 0.03 to 0.06 of a turn on every ring, the symbol the same at 0.13 to 0.18 on
+  either clock (on ring 7 alone the interval against the interval before stays the same at
+  0.48 and 0.41). A ring at a declared turn is a privileged scale to every drive that does
+  not stand on it, where §4.1 keeps every navigator's clock located; the reading it points to
+  is a ring whose turn its drive locates, which no ruler has read yet.
+
+Limits, each stated because the reading is narrow: one speaker; a ratio of two; a reader of a
+first step's bit length and sign, which cannot see pitch or formants, so the rows are shared at
+that grain and equal codes are not equal knowledge; bands of one-pole rungs, which overlap.
+[agent-inferred] A sampled wave's place is therefore read on a band at its rung's stride, never on the
+sample stream or its crossings, and its rung's stride and gain are its navigator's clock. No
+level is founded on the cut for a sampled wave while a band is read by a first step: the place's news
+has to come from a reading that is dark while the band continues and bright where it departs,
+with what lies under a declared width released and accounted, never charged as news. The tree
+holds that reading since October 10 (atlas `hnn.ring-moment-keys`; the record of that day,
+§11: a ring's section word near-returns through most of a recording, 33,395 of 52,128 windows,
+at 0.44 of its spelled length, its departures kept as defects). Read once a turn on a stride
+it fails as above, so a sampled wave's place is not a stride of any rung either: it is the ring's
+own section arrival (an epoch is the interval between a receiver's section arrivals), a time
+of the passage under any start. G136 read it: the arrivals stand, the symbol read at them at
+G135's widths does not, and a law of peaks keeps what the cut loses. Owed before any chart
+is built: the one law of sites, derived on the objects and read on octets and on a wave's
+arrivals under the same changes, the carried cut against the peak; the chart across rings, a ring's turn located by its drive (a ratio off the
+ladder is carried by no single declared ring); and the image's ruler (a stroke under a
+magnification the passage itself holds).
 
 ## 9. Acceptance, the device line, and the order of work
 
@@ -377,16 +574,21 @@ it as one reading and no level promised:
 
 **The order.**
 
-1. *A reading, on the PC, from state C, outside any timing hold* (the next order): every held
-   place's code at its cavity opening, by slice; its rank against the last tick's code where a
-   mask compares the place; the restarting cut at 8 bits on those codes (mean epoch, one-place
-   share, spread, shares under the shifted start and the stretch); and the count, from source,
-   of what a cavity face a site adds to a section. Its guess is fixed in the order.
-2. *The build* is ordered after that reading and after the engine's fourth repair is timed,
-   with its guess and its cost stated against the card: the cut, the level's clock, the phase
-   chart, a field of the level's own founded as the built `Scale` is. A first build of a new
-   part: it enters the store's line by reproducing the line's lap with the level founded at
-   zero.
+1. *A reading, on the PC, from state C, outside any timing hold* (read November 13, G127;
+   §4.4): every held place's code at its cavity opening, by slice; its rank against the last
+   tick's code; the restarting cut at 8 bits on those codes; and the count, from source, of what
+   a cavity face a site adds to a section. The readout does not read an opening.
+2. *A second reading, from the same state* (G132, fixed before its read): what a place's 64
+   words hold of its class at the opening and after each of the four ticks, by a fitted face;
+   the trained readout's code at each tick; the restarting cut on the code after the ticks; and
+   the same fitted faces under the held role's whole masks. It decides the opening's face
+   (§4.4) and reads whether the last two ticks add to a place's code.
+3. *The law of the opening's face* is derived and recorded from that reading, with its Lean
+   obligation named, before any build.
+4. *The build* is ordered after it, with its guess and its cost stated against the card: the
+   opening's comparison, the cut, the level's clock, the phase chart, a field of the level's own
+   founded as the built `Scale` is. A first build of a new part: it enters the store's line by
+   reproducing the line's lap with the level founded at zero.
 
 **The device line.** The card, under its lock; the reading of item 1 is a host reading from a
 saved state and leaves its bytes the same.
@@ -401,4 +603,5 @@ saved state and leaves its bytes the same.
 - **The trained rates' own cut** (§3.1): what the two clocks located, read by a ruler that is
   not a count of one symbol.
 - **The harmonics an epoch needs and a second level's section**, each from a reading.
-- **The rulers on values** (§8).
+- **The rulers on values** (§8): on a sampled wave the cut on a band's places and a reader of longer
+  context; the image's ruler.

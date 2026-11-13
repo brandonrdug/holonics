@@ -5530,6 +5530,29 @@ fn read_numbers<T: std::str::FromStr>(line: Option<&str>) -> Result<Vec<T>> {
     line.split(' ').map(|w| w.parse::<T>().map_err(|_| TowerError::Refused("a field's material that is not a number"))).collect()
 }
 
+/// [measurement; theory, November 13, P58 item 4] **The deposit's parts on the host**, summed over every section a process realizes (ns; a
+/// reading, no state changes), in the order [`FieldLearner::section_realized`] runs them ([`SECTION_PART_NAMES`]).
+pub static SECTION_PARTS: [std::sync::atomic::AtomicU64; 15] = [const { std::sync::atomic::AtomicU64::new(0) }; 15];
+
+/// [measurement; P58 item 4] The names of [`SECTION_PARTS`], with the whole-layout passes each makes over the constitution's entries.
+pub const SECTION_PART_NAMES: [&str; 15] = [
+    "read_and_return",
+    "compared_and_code",
+    "covector_clone",
+    "transfer_price",
+    "entry_rates",
+    "external_step",
+    "external_price",
+    "covector_grains",
+    "moments",
+    "step",
+    "step_price",
+    "reading_parts",
+    "parts_price",
+    "stepped",
+    "rest",
+];
+
 /// [measurement; agent-inferred, November 4] **A tick's read of a region**: each site's chart `r̂` on `2^(−16)` and its scales (the
 /// faces' power, one a lane) at the opening of each tick, the field's state as its ticks meet it (a reading of expansion and
 /// volume); and (§16.40) the pair contact's chart and scales, the state after the tick's current and before its pair contact.
@@ -5748,6 +5771,13 @@ impl CarryGates {
 /// refuses, never substitutes.
 pub trait FieldRealization {
     fn read_and_return(&mut self, field: &Field, regions: &[Region]) -> Result<(Vec<Vec<Option<TowerFace>>>, Vec<i128>)>;
+    /// [realization; theory, November 13, P58 item 3] **The training path's faces**: each region's open sites' masses at their classes with
+    /// their totals, `(m_c, T)` (what [`compared`] reads of a face before a port, [`faces_at_class`]), and the covector, from one read and
+    /// return. By default read off the whole faces; a realization that gathers them fetches those words alone. The same pairs either way.
+    fn read_and_return_at_class(&mut self, field: &Field, regions: &[Region]) -> Result<(Vec<Vec<Option<(u128, u128)>>>, Vec<i128>)> {
+        let (faces, g) = self.read_and_return(field, regions)?;
+        Ok((faces_at_class(&faces, regions), g))
+    }
     fn read_faces(&mut self, field: &Field, regions: &[Region]) -> Result<Vec<Vec<Option<TowerFace>>>>;
     /// Each unresolved site's readout logits on `2^(−16)` bits ([`Field::logits`]), the release's read.
     fn read_logits(&mut self, field: &Field, regions: &[Region]) -> Result<Vec<FieldRead>>;
@@ -5919,6 +5949,19 @@ struct Compared {
     pairs: Vec<(u128, u128)>,
     coupled: i64,
     ported: bool,
+}
+
+/// [realization; theory, November 13, P58 item 3] Each region's faces read at their classes, `(m_c, T)` where a site carries a face.
+pub fn faces_at_class(faces: &[Vec<Option<TowerFace>>], regions: &[Region]) -> Vec<Vec<Option<(u128, u128)>>> {
+    faces.iter().zip(regions).map(|(f, r)| f.iter().zip(r.classes).map(|(face, &c)| face.as_ref().map(|face| (face.masses[c], face.total))).collect()).collect()
+}
+
+/// [`compared`] from the faces read at their classes ([`faces_at_class`]), where no region has a port: the same pairs.
+fn compared_at_class(at_class: &[Vec<Option<(u128, u128)>>], regions: &[Region]) -> Result<Compared> {
+    if at_class.len() != regions.len() || regions.iter().any(|r| r.port.is_some()) {
+        return refuse("faces at their classes are compared one row a region, with no port");
+    }
+    Ok(Compared { pairs: at_class.iter().zip(regions).flat_map(|(f, r)| f.iter().take(r.classes.len()).filter_map(|p| *p)).collect(), coupled: 0, ported: false })
 }
 
 fn compared(faces: &[Vec<Option<TowerFace>>], regions: &[Region]) -> Result<Compared> {
@@ -6831,9 +6874,23 @@ impl FieldLearner {
     /// [`FieldLearner::section`] on a declared realization of the field's read and return; the step
     /// is deposited at its size, and the moments and the step stay on the host.
     pub fn section_realized(&mut self, regions: &[Region], realization: &mut dyn FieldRealization) -> Result<FieldReceipt> {
-        let (faces, g, next) = self.open(regions, realization, true)?;
+        let mut part = std::time::Instant::now();
+        let mut mark = |k: usize| {
+            SECTION_PARTS[k].fetch_add(part.elapsed().as_nanos() as u64, std::sync::atomic::Ordering::Relaxed);
+            part = std::time::Instant::now();
+        };
+        // [realization; theory, November 13, P58 item 3] With no held step and no port the comparison reads each open site's face at its
+        // class alone, so the realization is asked for those words ([`FieldRealization::read_and_return_at_class`]); the same pairs.
+        let (faces_old, g, next) = if self.held.is_none() && regions.iter().all(|r| r.port.is_none()) {
+            let (at_class, g) = realization.read_and_return_at_class(&self.field, regions)?;
+            mark(0);
+            (compared_at_class(&at_class, regions)?, Some(g), None)
+        } else {
+            let (faces, g, next) = self.open(regions, realization, true)?;
+            mark(0);
+            (compared(&faces, regions)?, g, next)
+        };
         let mut g = g.ok_or(TowerError::Refused("a section's opening read returned no covector"))?;
-        let faces_old = compared(&faces, regions)?;
         let spans = spans_of(regions);
         let code_before = code_of(&faces_old, &spans);
         if faces_old.pairs.is_empty() && !faces_old.ported {
@@ -6842,23 +6899,30 @@ impl FieldLearner {
         // The sites the weighed code is a code of (§16.23): each region's domain where it reads an open site.
         let sites = spans.iter().filter(|s| s.0 > 0).map(|s| s.1 as usize).sum::<usize>()
             + regions.iter().filter_map(|r| r.port.map(|p| (p.start..p.stop.unwrap_or(r.classes.len()).min(r.classes.len())).filter(|&t| r.unresolved[t] && p.heard.is_none_or(|h| h[t])).count())).sum::<usize>();
+        mark(1);
         let raw = g.clone();
+        mark(2);
         let transfer = self.last.take().and_then(|s| predicted_change(&self.field, &raw, &s.step, s.halvings));
+        mark(3);
         // [the unified-theory reading of November 6, 08:54] The step the moments would deposit before this section moves them,
         // priced on this section: the external price, a step this section never shaped.
         let rates = self.entry_rates();
+        mark(4);
         let mut external_step = vec![0i128; g.len()];
         for &(start, len, grain) in &self.field.families_all() {
             for i in start..start + len {
                 external_step[i] = deposit_step(self.first[i], self.second[i], grain, rates[i]);
             }
         }
+        mark(5);
         let external = predicted_change(&self.field, &raw, &external_step, 0);
+        mark(6);
         for &(start, len, grain) in &self.field.families_all() {
             for v in &mut g[start..start + len] {
                 *v = on_step_grain(grain, *v);
             }
         }
+        mark(7);
         for ((m, v), gv) in self.first.iter_mut().zip(self.second.iter_mut()).zip(&g) {
             let square = gv.checked_mul(*gv).ok_or(TowerError::Refused("a covector's square outgrew its 128-bit carrier"))?;
             if *m == 0 && *v == 0 {
@@ -6869,14 +6933,20 @@ impl FieldLearner {
                 *v = toward(*v, square, SECOND_RATE);
             }
         }
+        mark(8);
         let mut step = vec![0i128; g.len()];
         for &(start, len, grain) in &self.field.families_all() {
             for i in start..start + len {
                 step[i] = deposit_step(self.first[i], self.second[i], grain, rates[i]);
             }
         }
+        mark(9);
         let predicted = predicted_change(&self.field, &raw, &step, 0);
-        let predicted_parts = predicted_parts(&self.field, &raw, &step, 0, &self.reading_parts());
+        mark(10);
+        let parts = self.reading_parts();
+        mark(11);
+        let predicted_parts = predicted_parts(&self.field, &raw, &step, 0, &parts);
+        mark(12);
         // [definition; Brandon, November 5 17:29 and 17:32] **The step fluxes**: it deposits at its size, and no reread of the
         // section certifies it. The reread kept a step only where the regions reread under it coded strictly fewer bits, a
         // selection on the code (a maximum in effect) that discarded what an expansion measures ("you can't discard failure
@@ -6885,6 +6955,7 @@ impl FieldLearner {
         // the next section's own covector prices it at first order ([`FieldReceipt::transfer`]), contraction and expansion
         // alike, and the moments carry every covector.
         let (candidate, moved) = stepped(&self.field, &step, 0)?;
+        mark(13);
         if !moved {
             return Ok(FieldReceipt { sites, code_before, code_after: None, halvings: 0, deposited: false, next, predicted, change: None, transfer, external, predicted_parts });
         }
@@ -6894,6 +6965,7 @@ impl FieldLearner {
         } else {
             self.last = Some(HeldStep { step, halvings: 0 });
         }
+        mark(14);
         Ok(FieldReceipt { sites, code_before, code_after: None, halvings: 0, deposited: true, next, predicted, change: None, transfer, external, predicted_parts })
     }
 

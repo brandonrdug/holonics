@@ -1,0 +1,38 @@
+SOUND utterances=73 count=55 read=18 samples=7696558 seconds=481.0 | fast samples=3848280 slow samples=15393116
+HALF_CYCLES all=1272107 a_second=2645 | fast over orig=0.5197 slow over orig=1.0802
+  OCTAVE  0 orig=   12350 share=0.0097 fast_over_orig=0.4867 slow_over_orig=1.1093
+  OCTAVE  1 orig=   21465 share=0.0169 fast_over_orig=0.5024 slow_over_orig=1.1019
+  OCTAVE  2 orig=   33329 share=0.0262 fast_over_orig=0.5335 slow_over_orig=1.0976
+  OCTAVE  3 orig=   49501 share=0.0389 fast_over_orig=0.5658 slow_over_orig=1.0848
+  OCTAVE  4 orig=   70272 share=0.0552 fast_over_orig=0.6140 slow_over_orig=1.0767
+  OCTAVE  5 orig=   94149 share=0.0740 fast_over_orig=0.6520 slow_over_orig=1.0715
+  OCTAVE  6 orig=  112428 share=0.0884 fast_over_orig=0.6988 slow_over_orig=1.0714
+  OCTAVE  7 orig=  127392 share=0.1001 fast_over_orig=0.7416 slow_over_orig=1.0674
+  OCTAVE  8 orig=  141853 share=0.1115 fast_over_orig=0.6847 slow_over_orig=1.0463
+  OCTAVE  9 orig=  163484 share=0.1285 fast_over_orig=0.4743 slow_over_orig=1.0324
+  OCTAVE 10 orig=  180664 share=0.1420 fast_over_orig=0.2642 slow_over_orig=1.0510
+  OCTAVE 11 orig=  158318 share=0.1245 fast_over_orig=0.2767 slow_over_orig=1.1345
+  OCTAVE 12 orig=   88239 share=0.0694 fast_over_orig=0.4811 slow_over_orig=1.1904
+  OCTAVE 13 orig=   18059 share=0.0142 fast_over_orig=0.6569 slow_over_orig=1.1709
+  OCTAVE 14 orig=     604 share=0.0005 fast_over_orig=0.7467 slow_over_orig=1.1010 (under 1,000)
+A octaves 5 and under fast_over_orig=0.5946 | octaves 12 and over=0.5123 | floor (least octave from which every octave reads 0.85 or over)=None
+A floor set on the command line for this read: 11
+PLACES floor=11 places=265220 a_second=551.4 of half-cycles=0.2085 | fast over orig=0.3716 slow over orig=1.1555 half gain over orig=1.0002
+  NEWS orig      absolute places=  63145 nats=166910.3 a_place=2.6433
+  NEWS orig      relative places=  63145 nats=198585.4 a_place=3.1449
+  NEWS slow      absolute places=  73761 nats=325060.0 a_place=4.4069
+  NEWS slow      relative places=  73761 nats=244814.7 a_place=3.3190
+  NEWS fast      absolute places=  19512 nats=80234.4 a_place=4.1121
+  NEWS fast      relative places=  19512 nats=64703.1 a_place=3.3161
+  NEWS half gain absolute places=  63161 nats=596129.0 a_place=9.4382
+  NEWS half gain relative places=  63161 nats=198633.0 a_place=3.1449
+B absolute news over the original's: half speed=1.9475 double speed=0.4807 half gain=3.5716
+B relative news over the original's: half speed=1.2328 double speed=0.3258 half gain=1.0002
+C relative over absolute at the original's speed=1.1898
+D section=6.9315 nats | the resampler's delay: half speed -1 samples, double speed +0 samples
+  CUT relative mean_epoch=1.676 over_section=0.0225 | kept: changed start=0.9996 half speed=0.7613 double speed=0.2878 of 37652 | matched: half speed=0.9917 double speed=0.3227 | a copy's openings a place: half speed=0.6382 double speed=0.6331
+  CUT absolute mean_epoch=2.047 over_section=0.0110 | kept: changed start=0.9994 half speed=0.8175 double speed=0.3008 of 30837 | matched: half speed=0.9917 double speed=0.3227 | a copy's openings a place: half speed=0.7581 double speed=0.7946
+  STREAM orig order=1 samples=1676266 nats=11336948 a_sample=6.7632 bits a_sample=9.7573
+  STREAM fast order=1 samples=838106 nats=5605877 a_sample=6.6887 bits a_sample=9.6498
+  STREAM slow order=3 samples=3352586 nats=20000223 a_sample=5.9656 bits a_sample=8.6066
+E the sample stream's news over the original's: double speed=0.4945 half speed=1.7642

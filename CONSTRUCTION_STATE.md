@@ -279,8 +279,39 @@ repository was reset on September 24; the pre-reset tree is
     left is the crowds' and the modes' helpers: a quotient by `count² 2^b` that takes the
     128-by-128 software division on every crowd of a paced clock (`b = 77`), checked 128-bit
     products a mode, and a 128-bit atomic sum a mode at one address (agent-inferred, counted by
-    hand). Their time by helper is the next reading (G126), with the rebuild of any helper at
-    0.08 of an entry fixed in the same order.
+    hand). Their time by helper was read next (G126, scored November 13: of its five parts two
+    held, the rows' 128-bit division read 0.010 of their time where 0.12 was guessed, the
+    skin's return's checked products 0.401 where 0.20 was, and the rows at four blocks a
+    multiprocessor 0.881 where 1.00 was). By a count times a yardstick, an upper bound, the rows
+    are their pairs' products of two 64-bit words with their loads, 32 a pair over 45.67
+    million pairs a section, and no helper. Step 5 (November 13; every bit kept, 600 of 600
+    lines and both states reproduced) rebuilt the skin's return's helpers by G126's rule (each
+    mode's turn rate read once a block, the skin covector's products plain where their bounds
+    prove them, a crowd's quotients by divisors read once a crowd, a mode's sums to one address
+    added on the lane and summed once) and set the rows' launch bounds to four blocks. In one
+    hold the skin's return read 0.568 of its own time and the rows 0.898, both inside the
+    ranges fixed before the read, and the section 0.964 (305.0 ms against controls of 319.1 and
+    313.5). The reproduction's save line counted 601 batches against 600: the card's free
+    memory at the open put one section 831,364 octets over the batch's cut. A batch is a
+    schedule, and the section lines and the states are equal, so the reproduction holds.
+    After five steps the profile is flat: no entry holds more than 0.115 of the kernels' time,
+    and a section stood at 7.5 times the bar. Step 6 (November 13, PR #750; every bit kept, 600
+    of 600 lines and both states reproduced, the card suite's 140 tests) repaired the host's
+    part as its table gave it (G128, G134). The pool serves a plain take from a longer kept
+    buffer of its type where the budget would otherwise free one: the face covector's block and
+    the clock's skins had each freed the other's kept buffer at every miss (the two takes 11.05
+    to 0.05 ms a profiled section). Twelve takes are spared their zeroing, each with its proof
+    at the take (6.53 to 1.20 ms). The training path fetches each open site's mass at its class
+    and its total in place of the whole faces (10.97 to 0.38 ms). In one hold a section read
+    0.910 of its controls (279.4 ms against 306.1 and 308.1), 6.9 times the bar. The deposit on
+    the host reads 10.1 ms a section, 6.03 of it arithmetic over the constitution's 117,478
+    entries and 0.014 of it bare copies, where 2.0 and 0.60 were guessed (G134 (d), missed both
+    ways, its premise not read at source): by its rule the deposit's card realization is
+    derived and ordered after the structural step. The kernels hold 267.6 of a profiled
+    section's 289.9 ms, so the rate is the kernels'. The next repairs are of the section's structure
+    (agent-inferred): the contact family as one launch a tick each way on a region resident in
+    its block, the site-local families fused the same way, and the host's part beside the
+    card's, each with its guess fixed before its build.
   - The level above is designed on the news, and three count rulers fixed its choices
     (November 13; [the design record](research/records/2026-11-13_A_LEVELS_SITES_ARE_THE_EPOCHS_OF_ITS_NEWS_BEGUN_AGAIN_AT_EACH_OPENING_ITS_CLOCK_IS_THE_NEWS_BETWEEN_THEM_A_PLACES_NEWS_IS_READ_AT_ITS_CAVITY_FACE_AND_EACH_NAVIGATOR_KEEPS_ITS_LOCATED_CLOCK.md)). A level has two things the
     record of the symbol's length ran together: its places (where a receiver's section is
@@ -305,8 +336,54 @@ repository was reset on September 24; the pre-reset tree is
     boundary's digit, so the founding is the identity and epochs lengthen as places are
     predicted. Its acceptance is an invariance (the share of sites kept under a changed start
     and under re-timings the reader predicts, with a predicted failure under one it has not
-    met). Its first reading is ordered from a trained state before any build: every held
-    place's code at its cavity opening, by slice, and the cut on those codes.
+    met). Its first reading was made from a trained state before any build (G127, November 13;
+    the mean of 1,000 states, 30,677 held places over five slices, each open alone among written
+    places): the readout does not read an opening. A place's written class codes 8.05 nats at
+    the built opening, where the uniform face over the alphabet's 244 classes codes 5.497, and
+    1.200 after the four declared ticks (code 0.907, web 1.178, science 1.164, books 1.246,
+    wikidata 1.504); the two codes' rank agreement is 0.08 to 0.45 by slice, and a cut on the
+    opening's code is a cut of one-place epochs (0.909). The level's build is not ordered: the
+    opening's face is owed a comparison of its own, a change of what the deposit consumes,
+    decided on what a place's state holds of its class at the opening and after each tick
+    (G132, fixed before its read). The same reading places the store's level: with one place
+    open it codes 0.91 nats on code where a whole mask codes 2.39, so "two known neighbours a
+    side" was the whole mask's level, set by how much of a stretch is open at once
+    (agent-inferred).
+  - On a sampled wave (the specimen recorded speech: the identities are any propagation's, the
+    counts this specimen's) the design's places are read before they are named, and two count rulers say where
+    they are not (November 13; the design record §8, G129 and G130; 481 seconds of public speech
+    at its own, double and half speed). A wave's crossings follow the top of the frame's band at
+    every loudness: 0.26 to 0.74 of the half-cycles of a peak octave stand at double speed and no
+    octave reads 0.85, so October 25's half-cycle chart gives no place a change of clock keeps.
+    A recorder's frame's news is the same at both speeds (6.76 and 6.69 nats), so the passage's news
+    follows its count of places (0.4945). On the tree's octave ladder (fading sums, each rung
+    keeping its remainder, a band read at its rung's stride) the change of clock is a shift of
+    rung: the copy's band costs the original's reader of the next rung 0.9995 to 1.0012 of what
+    it costs its own, and at one speed a band costs its neighbour's reader 1.0005 to 1.041. At
+    that reader's grain (a first step's bit length and sign) the ladder's rows are shared on
+    that speech, where text's two paced clocks read as two keys (atlas `code.wave-place-frame-band`,
+    `code.news-clock-proper-time`). The cut on a band's places was then read (G133): with that
+    reader it runs free. At a mean epoch of 6 places it keeps 0.212 of its openings against a
+    chance of 0.171 under a passage begun 37 samples later and 0.236 against 0.170 under the
+    shift of rung, where its control keeps 0.952, because no place of 811,614 passes the section
+    and nothing pins an opening. No level is founded on it for a sampled wave. A ring read once a turn
+    on a stride was read next (G135; rings turning once in 8 to 128 samples, a place's symbol
+    its boost in octaves and its turn in quarter turns): speech is not dark on it (the ring
+    continues at 0.05 to 0.13 of places), and a place counted from the passage's first sample is
+    the raster's own, its symbol the same at 0.24 to 0.27 of places under the moved start. The
+    two readings share one law (agent-inferred): the cut keeps its sites as far as a place's
+    symbol is the same under the change, to the power of the epoch's length (0.96 the same keeps
+    0.63 at six places, 0.56 keeps 0.06). A ring read at every sample, its places its own
+    section arrivals, was read next (G136): under a start moved by 37 and a third samples 0.98
+    of arrivals are met within an eighth of a turn, and the symbol read at them is the same at
+    0.70 to 0.79 (under the shift of rung 0.80 to 0.88 met, 0.47 to 0.59 the same; on the
+    slowest ring's loud places 0.979 to 1.000 the same under both). A place that opens where
+    its news stands above its neighbours' keeps 2.2 to 3.1 times what the cut keeps. Off the
+    ladder (1.5 times the speed) the places themselves move and the symbol is the same at 0.13
+    to 0.18. Owed before any chart is built: the one law of sites (the carried cut against
+    the opening on a bounded neighbourhood), read on octets and on a wave's arrivals under the
+    same changes, a sample being a symbol (the design record §8); the chart across rings
+    (a ring's turn located by its drive); and the image's ruler.
   - Every extent of the built declaration is given the part it sizes, how it was reached and what
     sizes it (the same record, §5), with ten findings by file and line and the build that closes
     each. The departures that stand: the face's 64 coordinates are two lanes of 32, the second a
