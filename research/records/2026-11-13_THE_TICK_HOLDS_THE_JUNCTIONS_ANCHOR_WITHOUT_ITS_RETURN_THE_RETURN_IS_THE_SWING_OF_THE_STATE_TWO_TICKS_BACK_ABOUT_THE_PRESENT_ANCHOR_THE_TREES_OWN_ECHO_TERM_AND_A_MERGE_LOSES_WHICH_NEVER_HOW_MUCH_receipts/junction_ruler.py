@@ -2,8 +2,9 @@
 
 At the founding (Gamma = 0) the chart's covector is dl = (ln 2/2) <lambda^(k+1), x^(k+1) - x^(k-1)>, on 2^-16 of l at the covector's grain, so a
 unit of l_b moves a region's code by sum(dl) 2^-24 bits. Prints, by mask (0: the cut's own; 1: the middle place alone open), tick and kind of
-row, pooled and by slice: the rows, sum(dl), sum|dl|, the coherence |sum|/sum|.|, and the slope -sum(dl) ln 2 2^-24 / places in nats a place per
-unit of l (positive: raising l lowers the code), places the open rows of the same mask, tick and slice. Then the chart L's covector by
+row, pooled and by slice: the rows, sum(dl), sum|dl|, the coherence |sum|/sum|.|, and d(code)/dl = sum(dl) ln 2 2^-24 / places in nats a place
+per unit of l (positive: the code rises with l, so the deposit lowers it), places the open rows of the same mask, tick and slice; then for each
+mask and slice d(code)/dl_b, the sum over returns and kinds of row (l_b is shared). Then the chart L's covector by
 coordinate of the tick's opening chart: per coordinate |sum(dl r_i)| / sum|dl r_i|, its median and largest over the coordinates.
 Usage: python3 -I junction_ruler.py OUT
 """
@@ -45,9 +46,15 @@ def main(out):
                     if rows == 0:
                         continue
                     coh = abs(tot) / mag if mag else 0.0
-                    slope = -tot * math.log(2) / 2**24 / places if places else 0.0
+                    slope = tot * math.log(2) / 2**24 / places if places else 0.0
                     name = "pooled" if s is None else SLICES[s]
-                    print(f"JUNCTION mask={m} tick={t} rows={'written' if w else 'open'} slice={name} n={rows} sum={tot} magnitude={mag} coherence={coh:.4f} slope_nats_per_place_per_unit={slope:+.5f}")
+                    print(f"JUNCTION mask={m} tick={t} rows={'written' if w else 'open'} slice={name} n={rows} sum={tot} magnitude={mag} coherence={coh:.4f} dcode_dl_nats_per_place={slope:+.5f}")
+    for m in masks:
+        for s in [None] + slices:
+            total = sum(pooled(m, t, w, s)[1] for t in ticks for w in (0, 1))
+            places = pooled(m, ticks[0], 0, s)[0]
+            name = "pooled" if s is None else SLICES[s]
+            print(f"JUNCTION_SUM mask={m} slice={name} places={places} dcode_dlb_nats_per_place={total * math.log(2) / 2**24 / places:+.5f} (the sum over the returns and both kinds of row)")
     coords = defaultdict(lambda: [0, 0])
     with open(os.path.join(out, "coords.tsv")) as f:
         next(f)

@@ -401,12 +401,18 @@ prints `B`, so the first item is that read.
    *Read after* (the theory thread's order after G151, its items (a) to (c); G152 to G154, November 13 19:23 to 19:29Z, the PC thread;
    receipts [g152](2026-11-13_THE_TICK_HOLDS_THE_JUNCTIONS_ANCHOR_WITHOUT_ITS_RETURN_THE_RETURN_IS_THE_SWING_OF_THE_STATE_TWO_TICKS_BACK_ABOUT_THE_PRESENT_ANCHOR_THE_TREES_OWN_ECHO_TERM_AND_A_MERGE_LOSES_WHICH_NEVER_HOW_MUCH_receipts/g152_junction.txt), [g153](2026-11-13_THE_TICK_HOLDS_THE_JUNCTIONS_ANCHOR_WITHOUT_ITS_RETURN_THE_RETURN_IS_THE_SWING_OF_THE_STATE_TWO_TICKS_BACK_ABOUT_THE_PRESENT_ANCHOR_THE_TREES_OWN_ECHO_TERM_AND_A_MERGE_LOSES_WHICH_NEVER_HOW_MUCH_receipts/g153_best.txt), [g154](2026-11-13_THE_TICK_HOLDS_THE_JUNCTIONS_ANCHOR_WITHOUT_ITS_RETURN_THE_RETURN_IS_THE_SWING_OF_THE_STATE_TWO_TICKS_BACK_ABOUT_THE_PRESENT_ANCHOR_THE_TREES_OWN_ECHO_TERM_AND_A_MERGE_LOSES_WHICH_NEVER_HOW_MUCH_receipts/g154_heads.txt)). The return is
    built on the host, founded at the matched load (`FieldDeclaration::junction`), and its founding covector was read on the line's third-lap
-   mean before any kernel work. Summed over the three returns, the code's slope is −0.034 nats a place per unit of `ℓ` under both masks (the
-   cut's own, 5,634 open places; one place open, 122), so a first deposit lowers `ℓ_b`: the return the deposit finds is a hold, `Γ < 0`, the
-   path slowed toward its state two ticks back, against the offered raise at the last return. The first return is the most coherent over open
+   mean before any kernel work. Summed over the three returns, `d(code)/dℓ_b` is +0.034 nats a place on held text under both masks (the
+   cut's own, 5,634 open places; one place open, 122): the code rises with `ℓ`, so a first deposit on held text would lower `ℓ_b` toward a
+   hold, `Γ < 0`, the path slowed toward its state two ticks back, against the offered raise at the last return. On the line's own training
+   stretches (G155, [receipt](2026-11-13_THE_TICK_HOLDS_THE_JUNCTIONS_ANCHOR_WITHOUT_ITS_RETURN_THE_RETURN_IS_THE_SWING_OF_THE_STATE_TWO_TICKS_BACK_ABOUT_THE_PRESENT_ANCHOR_THE_TREES_OWN_ECHO_TERM_AND_A_MERGE_LOSES_WHICH_NEVER_HOW_MUCH_receipts/g155_junction.txt)) the same sum is −0.005, near its random-sign level on four of five regions:
+   the held push is the held gap, where the constitution is surer on held text than it has earned, and a deposit does not see it. The first return is the most coherent over open
    rows alone (0.21), and every written row reads zero at the last (no face is read there). The codes by stage agree: the commonest best stage
    is the third, before the trained depth, and 0.59 of places reach their least by it. Across heads, what a site tells in the second turned head
    comes back to it in every head (heads 0 to 2 hear 5.3 to 11.4 times their own echo through the others, most of it through head 3).
+   Near the trained depth a place's own rate could reach 0.090 (the least of stages 3 and 4) to 0.155 nats a place (of 3 to 5) under stage
+   4's code, 0.84 of the whole gap at places coded over one nat there (G156, [receipt](2026-11-13_THE_TICK_HOLDS_THE_JUNCTIONS_ANCHOR_WITHOUT_ITS_RETURN_THE_RETURN_IS_THE_SWING_OF_THE_STATE_TWO_TICKS_BACK_ABOUT_THE_PRESENT_ANCHOR_THE_TREES_OWN_ECHO_TERM_AND_A_MERGE_LOSES_WHICH_NEVER_HOW_MUCH_receipts/g156_near.txt)). A hold has two real
+   roots and cannot turn, so the return shortens a stride and never rings (the theory thread, 19:35Z). The card realization waits; the host
+   build stays as the founding of the reader's reaction on its source.
 2. **The build.** The return as the tick's last step, founded at the matched load, on the card
    with its parity against the host; the grown state reads its source's faces bit for bit, and
    the build enters the line by reproducing the line's lap with the part at its founding and

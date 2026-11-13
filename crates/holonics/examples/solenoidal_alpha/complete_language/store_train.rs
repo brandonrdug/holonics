@@ -1051,17 +1051,22 @@ pub(super) fn read_echo(args: &[String]) -> Result<()> {
 }
 
 /// [measurement; theory, November 13, the junction record §9 and the theory thread's order after G151, item (a); G152] `read-junction UNITS
-/// UNITS_SHA STORE STORE_SHA KEYS KEYS_SHA CODEC CODEC_SHA PLACES STATE STATE_SHA OUT`: **the return's founding covector**, a reading of what a
+/// UNITS_SHA STORE STORE_SHA KEYS KEYS_SHA CODEC CODEC_SHA PLACES STATE STATE_SHA OUT [ROLE]`: **the return's founding covector**, a reading of what a
 /// first deposit of the junction's return would see. The state's field is grown by the return at its founding in memory
-/// ([`holonics::hnn::tower::field::Field::with_junction`]; `Γ = 0`, so every face and the reverse are the state's own), and each slice of the held
-/// role is cut as `read-echo` cuts it, every stretch read on the host twice (`mask 0` the cut's own, `mask 1` its middle place alone open).
+/// ([`holonics::hnn::tower::field::Field::with_junction`]; `Γ = 0`, so every face and the reverse are the state's own), and each slice of `ROLE`
+/// (`held` where it is not given; `prefix`, the training documents from each slice's first piece, reads seen material: the theory thread's first
+/// caution after G152, G155) is cut as `read-echo` cuts it, every stretch read on the host twice (`mask 0` the cut's own, `mask 1` its middle place alone open).
 /// `OUT/junction.tsv` holds a line a row and tick with a return (numbers only): the slice's index, the mask, the read kind, the tick, whether the
 /// row is written, the region's open places and the row's `δℓ` (`Field::junction_covectors`). `OUT/coords.tsv` holds, for each slice, mask, tick,
 /// kind of row and coordinate `i` of the tick's opening chart, `Σ δℓ r̂_i` and `Σ |δℓ r̂_i|` (the chart `L`'s covector and its magnitude). The output
 /// directory is private.
 pub(super) fn read_junction(args: &[String]) -> Result<()> {
-    if args.len() != 13 {
-        return Err("read-junction UNITS UNITS_SHA STORE STORE_SHA KEYS KEYS_SHA CODEC CODEC_SHA PLACES STATE STATE_SHA OUT".into());
+    if args.len() != 13 && args.len() != 14 {
+        return Err("read-junction UNITS UNITS_SHA STORE STORE_SHA KEYS KEYS_SHA CODEC CODEC_SHA PLACES STATE STATE_SHA OUT [ROLE]".into());
+    }
+    let role = args.get(13).map_or("held", String::as_str);
+    if role != "held" && role != "prefix" {
+        return Err("read-junction reads the held role or the training documents (prefix)".into());
     }
     let started = std::time::Instant::now();
     refuse_variables("read-junction")?;
@@ -1094,10 +1099,10 @@ pub(super) fn read_junction(args: &[String]) -> Result<()> {
     writeln!(coords, "slice\tmask\ttick\twritten\tcoordinate\tsum\tmagnitude")?;
     let d = field.declaration;
     let dw = d.width;
-    println!("JUNCTION_LAW role=held places={places} ticks={} width={dw} level={} founded=true ms={}", d.ticks, field.scale.is_some(), started.elapsed().as_millis());
-    for (si, &name) in role_names(&counts, "held").iter().enumerate() {
-        let slice = open_slice(store, "held", name, &counts)?;
-        let pass = StorePass { role: "held".to_string(), store: args[4].clone(), stretches: 0, least: law.least, octaves: law.octaves, pairs: law.pairs, sites: law.sites, slices: vec![PassSlice { name: name.to_string(), piece: 0, cursor: 0, taken: 0 }] };
+    println!("JUNCTION_LAW role={role} places={places} ticks={} width={dw} level={} founded=true ms={}", d.ticks, field.scale.is_some(), started.elapsed().as_millis());
+    for (si, &name) in role_names(&counts, role).iter().enumerate() {
+        let slice = open_slice(store, role, name, &counts)?;
+        let pass = StorePass { role: role.to_string(), store: args[4].clone(), stretches: 0, least: law.least, octaves: law.octaves, pairs: law.pairs, sites: law.sites, slices: vec![PassSlice { name: name.to_string(), piece: 0, cursor: 0, taken: 0 }] };
         let mut cut = Cut { seed, slices: vec![slice], pass };
         let mut stretches: Vec<(TrainRegion, usize)> = Vec::new();
         let mut taken = 0usize;

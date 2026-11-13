@@ -515,10 +515,13 @@ repository was reset on September 24; the pre-reset tree is
     on the host (`FieldDeclaration::junction`), founded at the matched load so every face is kept,
     and refused on the card until its card realization passes parity. Read before the kernels: a
     written row's own echo is small (G151, median B 0.00068, most of it in the second turned head,
-    which every head hears, G154). The founding covector lowers the return's chart (G152: −0.034 nats
-    a place per unit of ℓ, both masks), so the deposit's return is a hold, the path slowed toward
-    its state two ticks back; most places reach their least code before the trained depth (G153).
-    The card realization is next, with its lap guessed for a falling ℓ.
+    which every head hears, G154). On held text the code rises with the return's chart (G152:
+    d(code)/dℓ = +0.034 nats a place, both masks), a push toward a hold, but on the line's own
+    training stretches the push is −0.005 and near its random-sign level (G155), so it is the
+    held gap, which a deposit does not see; near the trained depth a place's own rate could reach
+    0.09 to 0.16 nats a place, mostly at places the field reads badly (G156). A hold cannot ring,
+    so the card realization of the return waits; the next design is the reader's reaction on its
+    source, which the theory thread is deriving, built from this host founding.
   - The open places need the written rows' ticks (November 13, P62, G140 scored; the design
     record §4.8). Read zero-shot on the line's latest lap mean with a written row held at its
     opening: the open rows alone code 3.29 nats a place worse at held one-place masks and 1.90
