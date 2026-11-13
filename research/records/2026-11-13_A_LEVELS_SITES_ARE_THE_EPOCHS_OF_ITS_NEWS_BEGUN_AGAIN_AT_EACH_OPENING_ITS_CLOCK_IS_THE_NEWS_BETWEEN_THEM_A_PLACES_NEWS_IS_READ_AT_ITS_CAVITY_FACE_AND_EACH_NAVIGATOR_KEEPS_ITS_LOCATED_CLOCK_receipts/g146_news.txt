@@ -1,0 +1,51 @@
+G146 receipt: read-news on the founded line's MEAN.3000 (721b94e5cbeedd43), 6,000 held places a slice, on the host's 24 threads (a reading from a saved state; the card not used). Numbers only. The run printed bits with four decimals; the committed reader prints millibits, the same integers.
+BUILD claude/level-sites 407a63c5f
+NEWS_LAW role=held places=6000 section=8315981 ms=28
+NEWS_BLOCKS slice=code b=2 offset=0 places=6000 block_bits=3.9646 single_bits=3.1673 ratio_milli=1251
+NEWS_BLOCKS slice=code b=2 offset=1 places=5972 block_bits=3.9941 single_bits=3.1609 ratio_milli=1263
+NEWS_BLOCKS slice=code b=3 offset=0 places=5982 block_bits=4.3107 single_bits=3.1665 ratio_milli=1361
+NEWS_BLOCKS slice=code b=3 offset=1 places=5955 block_bits=4.3504 single_bits=3.1607 ratio_milli=1376
+NEWS_BLOCKS slice=code b=3 offset=2 places=5937 block_bits=4.3711 single_bits=3.1615 ratio_milli=1382
+NEWS_DARK slice=code places=6014 dark_single=909 of_them_four_bits_in_a_pair=64
+NEWS_CUT slice=code news=c1 places=6014 sites=1275 share_milli=212 mean_epoch_milli=4716 long_strides=128 long_news_milli=183 shared_with_c1=1275 bits_a_place=3.1678
+NEWS_CUT slice=code news=c2 places=6014 sites=1540 share_milli=256 mean_epoch_milli=3905 long_strides=178 long_news_milli=216 shared_with_c1=936 bits_a_place=3.9633
+NEWS_SLICE slice=code stretches=28 places=6014 host_ms=67545 threads=24
+NEWS_BLOCKS slice=web b=2 offset=0 places=6304 block_bits=3.9604 single_bits=3.2391 ratio_milli=1222
+NEWS_BLOCKS slice=web b=2 offset=1 places=6272 block_bits=3.9688 single_bits=3.2350 ratio_milli=1226
+NEWS_BLOCKS slice=web b=3 offset=0 places=6285 block_bits=4.3050 single_bits=3.2405 ratio_milli=1328
+NEWS_BLOCKS slice=web b=3 offset=1 places=6252 block_bits=4.2903 single_bits=3.2319 ratio_milli=1327
+NEWS_BLOCKS slice=web b=3 offset=2 places=6231 block_bits=4.3697 single_bits=3.2330 ratio_milli=1351
+NEWS_DARK slice=web places=6320 dark_single=857 of_them_four_bits_in_a_pair=37
+NEWS_CUT slice=web news=c1 places=6320 sites=1388 share_milli=219 mean_epoch_milli=4553 long_strides=114 long_news_milli=166 shared_with_c1=1388 bits_a_place=3.2436
+NEWS_CUT slice=web news=c2 places=6320 sites=1690 share_milli=267 mean_epoch_milli=3739 long_strides=141 long_news_milli=156 shared_with_c1=1025 bits_a_place=3.9631
+NEWS_SLICE slice=web stretches=32 places=6320 host_ms=70225 threads=24
+NEWS_BLOCKS slice=science b=2 offset=0 places=6142 block_bits=3.7485 single_bits=3.0185 ratio_milli=1241
+NEWS_BLOCKS slice=science b=2 offset=1 places=6114 block_bits=3.7738 single_bits=3.0172 ratio_milli=1250
+NEWS_BLOCKS slice=science b=3 offset=0 places=6126 block_bits=4.1210 single_bits=3.0178 ratio_milli=1365
+NEWS_BLOCKS slice=science b=3 offset=1 places=6096 block_bits=4.0882 single_bits=3.0180 ratio_milli=1354
+NEWS_BLOCKS slice=science b=3 offset=2 places=6078 block_bits=4.0686 single_bits=3.0140 ratio_milli=1349
+NEWS_DARK slice=science places=6156 dark_single=788 of_them_four_bits_in_a_pair=45
+NEWS_CUT slice=science news=c1 places=6156 sites=1194 share_milli=193 mean_epoch_milli=5155 long_strides=117 long_news_milli=190 shared_with_c1=1194 bits_a_place=3.0222
+NEWS_CUT slice=science news=c2 places=6156 sites=1478 share_milli=240 mean_epoch_milli=4165 long_strides=172 long_news_milli=212 shared_with_c1=841 bits_a_place=3.7505
+NEWS_SLICE slice=science stretches=28 places=6156 host_ms=73671 threads=24
+NEWS_BLOCKS slice=books b=2 offset=0 places=6142 block_bits=3.4753 single_bits=2.7366 ratio_milli=1269
+NEWS_BLOCKS slice=books b=2 offset=1 places=6114 block_bits=3.4624 single_bits=2.7281 ratio_milli=1269
+NEWS_BLOCKS slice=books b=3 offset=0 places=6126 block_bits=3.8063 single_bits=2.7358 ratio_milli=1391
+NEWS_BLOCKS slice=books b=3 offset=1 places=6096 block_bits=3.8073 single_bits=2.7261 ratio_milli=1396
+NEWS_BLOCKS slice=books b=3 offset=2 places=6078 block_bits=3.7565 single_bits=2.7313 ratio_milli=1375
+NEWS_DARK slice=books places=6156 dark_single=1106 of_them_four_bits_in_a_pair=32
+NEWS_CUT slice=books news=c1 places=6156 sites=1115 share_milli=181 mean_epoch_milli=5521 long_strides=98 long_news_milli=166 shared_with_c1=1115 bits_a_place=2.7363
+NEWS_CUT slice=books news=c2 places=6156 sites=1416 share_milli=230 mean_epoch_milli=4347 long_strides=124 long_news_milli=166 shared_with_c1=764 bits_a_place=3.4734
+NEWS_SLICE slice=books stretches=28 places=6156 host_ms=70394 threads=24
+NEWS_BLOCKS slice=wikidata b=2 offset=0 places=6012 block_bits=4.5490 single_bits=4.0074 ratio_milli=1135
+NEWS_BLOCKS slice=wikidata b=2 offset=1 places=5986 block_bits=4.5173 single_bits=4.0036 ratio_milli=1128
+NEWS_BLOCKS slice=wikidata b=3 offset=0 places=5997 block_bits=4.7840 single_bits=4.0095 ratio_milli=1193
+NEWS_BLOCKS slice=wikidata b=3 offset=1 places=5967 block_bits=4.7858 single_bits=4.0011 ratio_milli=1196
+NEWS_BLOCKS slice=wikidata b=3 offset=2 places=5937 block_bits=4.7686 single_bits=4.0118 ratio_milli=1188
+NEWS_DARK slice=wikidata places=6031 dark_single=331 of_them_four_bits_in_a_pair=17
+NEWS_CUT slice=wikidata news=c1 places=6031 sites=1758 share_milli=291 mean_epoch_milli=3430 long_strides=86 long_news_milli=96 shared_with_c1=1758 bits_a_place=4.0079
+NEWS_CUT slice=wikidata news=c2 places=6031 sites=1993 share_milli=330 mean_epoch_milli=3026 long_strides=117 long_news_milli=119 shared_with_c1=1441 bits_a_place=4.5478
+NEWS_SLICE slice=wikidata stretches=32 places=6031 host_ms=65621 threads=24
+NEWS_DONE ms=347514
+FIELD_SKIN octets_a_entry=0 octets_a_site=0 clock_octets_a_site=0 entries=0 dense_pairs=0 peak_batch_entries=0 peak_batch_dense_pairs=0 peak_skin_store=0 peak_store=0 batch_cut=0 free_at_open=15536947200
+MEASURE wall_s=347.5 projected 300 to 900 s

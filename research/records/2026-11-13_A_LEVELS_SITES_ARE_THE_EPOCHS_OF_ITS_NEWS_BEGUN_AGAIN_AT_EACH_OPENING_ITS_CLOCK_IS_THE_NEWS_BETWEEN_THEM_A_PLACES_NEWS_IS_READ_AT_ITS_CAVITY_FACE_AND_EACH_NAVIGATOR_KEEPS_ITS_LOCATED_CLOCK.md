@@ -657,6 +657,15 @@ says why.
   the answer (refused above), and a state tool that drops a law the line reads (the founding keeps
   every part rate the line carries; the new parts start at the base rate).
 
+**What was read before it trained** (G146; `g146_news.txt` in this record's receipts). An outside reading of November 13 named a
+blind spot: a place's news at its two-sided cavity is a pseudo-likelihood, whose sum falls short of the description length the level's
+clock should run on, shortest inside tightly bonded runs. On the founded line's lap mean, 30,677 held places: a pair's places opened
+together code 1.22 times their single-place codes, a triple's 1.32, wikidata least (1.13) and books most (1.27); of the places dark at their
+cavity, one in twenty carries four bits or more in a pair. The law of sites leaves 0.10 to 0.19 of the news in strides of three sections or
+more. Both stood under the rules fixed before the read, so the level trains on the single place's news as built. The running description
+length, each place's code with its future open (whose sum is the region's joint code under the opening, so the clock is the description
+length and not a pseudo-likelihood), is the candidate news if the trained level shows the shortfall binding.
+
 ## 5. What this corrects in the records of November 12
 
 - The record of the symbol's length §8.1 and §8.3 ("one clock"): the moments' strides stay

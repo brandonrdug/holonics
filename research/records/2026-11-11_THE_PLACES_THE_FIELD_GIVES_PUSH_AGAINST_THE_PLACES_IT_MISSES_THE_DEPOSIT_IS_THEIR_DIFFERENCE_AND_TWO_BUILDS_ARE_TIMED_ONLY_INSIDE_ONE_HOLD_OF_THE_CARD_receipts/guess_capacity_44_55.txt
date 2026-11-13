@@ -3411,3 +3411,20 @@ more, holding 0.11 to 0.17 of the news).
   the level's news and the level trains as built (G145). Over either: the level does not train on it, and the news at the scale of an
   epoch (a block's code) is designed next. (b) the long strides' news at 0.20 or under: the law of sites stays the first round; over
   0.20: the claim's rounds bound the strides before the level trains.
+
+G146 scored 2026-11-13T16:30Z (receipt g146_news.txt, the design record's receipts; read-news on the founded line's MEAN.3000, 30,677 held
+places over five slices, 347.5 s on the host's 24 threads against 300 to 900 projected):
+  (a) a pair's places opened together code 1.220 times their single-place codes pooled, against 1.12 (1.05 to 1.22): held at its edge (code
+      1.257, web 1.224, science 1.245, books 1.269, wikidata 1.131); a triple's 1.321, against 1.17 (1.08 to 1.27): missed above; of the
+      3,991 places dark at their cavity, 195 carry four bits or more in a pair (0.049), against 0.08 (0.03 to 0.20): held.
+  (b) on the single-place news the sites are 0.219 of places against 0.28 (0.22 to 0.34): missed below by a thousandth (a mean epoch of
+      4.6 places, 3.4 on wikidata to 5.5 on books); the strides of three sections or more hold 0.096 to 0.190 of the news by slice, about
+      0.16 pooled, against 0.10 (0.05 to 0.20): held; the cut on a pair's news keeps 0.744 of those sites, against 0.80 (0.65 to 0.92): held.
+  Of 6 parts 4 held and 2 missed. The premise that missed: the shortfall grows with the block (1.22 at pairs, 1.32 at triples), so a
+  single place carries about 0.82 of a pair's mean-field news and 0.76 of a triple's; a block's mean-field code bounds its joint code from
+  above, so the pseudo-likelihood's shortfall against the joint is under these (agent-inferred). Bonded pairs that hide are rare here: one
+  dark place in twenty lights up in a pair.
+  Rules applied: (a) 1.220 at 1.25 or under and 0.049 at 0.20 or under: the single place's news stands as the level's news and the level
+  trains as built (G145). (b) 0.16 at 0.20 or under: the law of sites stays the first round. The running description length (each place's
+  code with its future open, whose sum is the region's joint code under the opening) is the candidate news if the level's trained read
+  shows the shortfall binding; it is recorded, not built.
