@@ -1,0 +1,116 @@
+# G158, read-reaction on level3/MEAN.3000, the training documents (prefix, first READ) and the held role (second READ), 2026-11-13T20:10-20:11Z; host, RAYON 8 threads
+reaction_g158h.log:REACTION_LAW role=held places=4000 ticks=4 heads=4 still=2 level=true ms=43
+reaction_g158h.log:REACTION_SLICE slice=code stretches=24 places=4296 host_ms=9517 ms=9573
+reaction_g158h.log:REACTION_SLICE slice=web stretches=25 places=4394 host_ms=11965 ms=21550
+reaction_g158h.log:REACTION_SLICE slice=science stretches=24 places=4296 host_ms=9740 ms=31303
+reaction_g158h.log:REACTION_SLICE slice=books stretches=24 places=4296 host_ms=8832 ms=40146
+reaction_g158h.log:REACTION_SLICE slice=wikidata stretches=25 places=4416 host_ms=13303 ms=53462
+reaction_g158h.log:REACTION_DONE ms=53462
+reaction_g158h.log:MEASURE lap=reaction_g158h rc=0 wall_s=53.8 peak_rss_kib=716180
+reaction_g158p.log:REACTION_LAW role=prefix places=4000 ticks=4 heads=4 still=2 level=true ms=43
+reaction_g158p.log:REACTION_SLICE slice=code stretches=25 places=4276 host_ms=10668 ms=10734
+reaction_g158p.log:REACTION_SLICE slice=web stretches=24 places=4175 host_ms=8608 ms=19380
+reaction_g158p.log:REACTION_SLICE slice=science stretches=24 places=4296 host_ms=8803 ms=28209
+reaction_g158p.log:REACTION_SLICE slice=books stretches=24 places=4296 host_ms=8750 ms=36983
+reaction_g158p.log:REACTION_SLICE slice=wikidata stretches=25 places=4455 host_ms=12560 ms=49576
+reaction_g158p.log:REACTION_DONE ms=49576
+reaction_g158p.log:MEASURE lap=reaction_g158p rc=0 wall_s=50.0 peak_rss_kib=723340
+
+READ .local/run/reaction_g158p
+  REACTION mask=0 head=0 readers=both tick=all sources=127800 | rises coherence=0.1571 ratio=4.69 m2=2.727e+00
+  REACTION mask=0 head=0 readers=both tick=0 sources=31950 | rises coherence=0.1593 ratio=2.95 m2=5.418e+00
+  REACTION mask=0 head=0 readers=both tick=1 sources=31950 | rises coherence=0.1081 ratio=2.25 m2=3.487e+00
+  REACTION mask=0 head=0 readers=both tick=2 sources=31950 | rises coherence=0.2378 ratio=3.37 m2=3.381e+00
+  REACTION mask=0 head=0 readers=open tick=all sources=63900 | rises coherence=0.2063 ratio=3.95 m2=4.867e+00
+  REACTION mask=0 head=0 readers=written tick=all sources=63900 | rises coherence=0.0740 ratio=4.14 m2=5.871e-01
+  REACTION mask=0 head=1 readers=both tick=all sources=127800 | falls coherence=0.0273 ratio=0.77 m2=6.445e+00
+  REACTION mask=0 head=1 readers=both tick=0 sources=31950 | falls coherence=0.0306 ratio=0.57 m2=8.841e+00
+  REACTION mask=0 head=1 readers=both tick=1 sources=31950 | falls coherence=0.0209 ratio=0.36 m2=9.159e+00
+  REACTION mask=0 head=1 readers=both tick=2 sources=31950 | falls coherence=0.0280 ratio=0.44 m2=8.660e+00
+  REACTION mask=0 head=1 readers=open tick=all sources=63900 | falls coherence=0.0465 ratio=0.87 m2=1.162e+01
+  REACTION mask=0 head=1 readers=written tick=all sources=63900 | rises coherence=0.0076 ratio=0.32 m2=1.269e+00
+  REACTION mask=0 head=2 readers=both tick=all sources=127800 | rises coherence=0.0590 ratio=1.47 m2=1.768e-01
+  REACTION mask=0 head=2 readers=both tick=0 sources=31950 | rises coherence=0.0556 ratio=0.91 m2=6.048e-01
+  REACTION mask=0 head=2 readers=both tick=1 sources=31950 | rises coherence=0.0488 ratio=0.84 m2=3.372e-01
+  REACTION mask=0 head=2 readers=both tick=2 sources=31950 | rises coherence=0.0984 ratio=2.23 m2=1.770e-01
+  REACTION mask=0 head=2 readers=open tick=all sources=63900 | rises coherence=0.0516 ratio=0.79 m2=2.601e-01
+  REACTION mask=0 head=2 readers=written tick=all sources=63900 | rises coherence=0.0706 ratio=3.34 m2=9.352e-02
+  REACTION mask=0 head=3 readers=both tick=all sources=127800 | rises coherence=0.0950 ratio=5.41 m2=1.498e+00
+  REACTION mask=0 head=3 readers=both tick=0 sources=31950 | rises coherence=0.1394 ratio=5.26 m2=2.805e+00
+  REACTION mask=0 head=3 readers=both tick=1 sources=31950 | rises coherence=0.0640 ratio=2.29 m2=2.183e+00
+  REACTION mask=0 head=3 readers=both tick=2 sources=31950 | rises coherence=0.0026 ratio=0.07 m2=1.924e+00
+  REACTION mask=0 head=3 readers=open tick=all sources=63900 | rises coherence=0.0944 ratio=3.55 m2=2.155e+00
+  REACTION mask=0 head=3 readers=written tick=all sources=63900 | rises coherence=0.0958 ratio=4.92 m2=8.411e-01
+  REACTION mask=1 head=0 readers=both tick=all sources=171008 | rises coherence=0.1031 ratio=5.21 m2=2.731e-01
+  REACTION mask=1 head=0 readers=both tick=0 sources=42752 | rises coherence=0.0908 ratio=2.96 m2=5.889e-01
+  REACTION mask=1 head=0 readers=both tick=1 sources=42752 | rises coherence=0.1165 ratio=3.73 m2=3.666e-01
+  REACTION mask=1 head=0 readers=both tick=2 sources=42752 | rises coherence=0.1168 ratio=3.19 m2=3.090e-01
+  REACTION mask=1 head=0 readers=open tick=all sources=85504 | rises coherence=0.1840 ratio=2.98 m2=8.882e-04
+  REACTION mask=1 head=0 readers=written tick=all sources=85504 | rises coherence=0.1012 ratio=5.01 m2=5.453e-01
+  REACTION mask=1 head=1 readers=both tick=all sources=171008 | falls coherence=0.0590 ratio=3.10 m2=5.875e-01
+  REACTION mask=1 head=1 readers=both tick=0 sources=42752 | falls coherence=0.0596 ratio=2.05 m2=1.401e+00
+  REACTION mask=1 head=1 readers=both tick=1 sources=42752 | falls coherence=0.0533 ratio=1.78 m2=8.145e-01
+  REACTION mask=1 head=1 readers=both tick=2 sources=42752 | falls coherence=0.0679 ratio=1.78 m2=6.434e-01
+  REACTION mask=1 head=1 readers=open tick=all sources=85504 | falls coherence=0.0437 ratio=0.57 m2=4.555e-04
+  REACTION mask=1 head=1 readers=written tick=all sources=85504 | falls coherence=0.0592 ratio=3.07 m2=1.175e+00
+  REACTION mask=1 head=2 readers=both tick=all sources=171008 | rises coherence=0.0142 ratio=0.56 m2=3.842e-02
+  REACTION mask=1 head=2 readers=both tick=0 sources=42752 | rises coherence=0.0462 ratio=1.22 m2=1.723e-01
+  REACTION mask=1 head=2 readers=both tick=1 sources=42752 | falls coherence=0.0477 ratio=1.25 m2=4.984e-02
+  REACTION mask=1 head=2 readers=both tick=2 sources=42752 | rises coherence=0.0061 ratio=0.14 m2=3.116e-02
+  REACTION mask=1 head=2 readers=open tick=all sources=85504 | falls coherence=0.2379 ratio=2.15 m2=2.063e-04
+  REACTION mask=1 head=2 readers=written tick=all sources=85504 | rises coherence=0.0247 ratio=0.95 m2=7.663e-02
+  REACTION mask=1 head=3 readers=both tick=all sources=171008 | rises coherence=0.0014 ratio=0.06 m2=4.091e-01
+  REACTION mask=1 head=3 readers=both tick=0 sources=42752 | falls coherence=0.0022 ratio=0.06 m2=8.915e-01
+  REACTION mask=1 head=3 readers=both tick=1 sources=42752 | rises coherence=0.0048 ratio=0.14 m2=6.262e-01
+  REACTION mask=1 head=3 readers=both tick=2 sources=42752 | rises coherence=0.0059 ratio=0.16 m2=4.526e-01
+  REACTION mask=1 head=3 readers=open tick=all sources=85504 | rises coherence=0.0921 ratio=0.76 m2=1.658e-03
+  REACTION mask=1 head=3 readers=written tick=all sources=85504 | falls coherence=0.0046 ratio=0.21 m2=8.165e-01
+READ .local/run/reaction_g158h
+  REACTION mask=0 head=0 readers=both tick=all sources=128512 | falls coherence=0.0882 ratio=3.67 m2=2.316e+00
+  REACTION mask=0 head=0 readers=both tick=0 sources=32128 | falls coherence=0.0760 ratio=1.90 m2=3.715e+00
+  REACTION mask=0 head=0 readers=both tick=1 sources=32128 | falls coherence=0.1027 ratio=3.03 m2=2.874e+00
+  REACTION mask=0 head=0 readers=both tick=2 sources=32128 | falls coherence=0.0973 ratio=2.38 m2=2.978e+00
+  REACTION mask=0 head=0 readers=open tick=all sources=64256 | falls coherence=0.0999 ratio=2.72 m2=4.078e+00
+  REACTION mask=0 head=0 readers=written tick=all sources=64256 | falls coherence=0.0679 ratio=4.10 m2=5.553e-01
+  REACTION mask=0 head=1 readers=both tick=all sources=128512 | falls coherence=0.1521 ratio=4.60 m2=6.000e+00
+  REACTION mask=0 head=1 readers=both tick=0 sources=32128 | falls coherence=0.0841 ratio=1.80 m2=8.746e+00
+  REACTION mask=0 head=1 readers=both tick=1 sources=32128 | falls coherence=0.1931 ratio=3.27 m2=7.406e+00
+  REACTION mask=0 head=1 readers=both tick=2 sources=32128 | falls coherence=0.2938 ratio=3.92 m2=8.139e+00
+  REACTION mask=0 head=1 readers=open tick=all sources=64256 | falls coherence=0.2063 ratio=4.28 m2=1.078e+01
+  REACTION mask=0 head=1 readers=written tick=all sources=64256 | falls coherence=0.0390 ratio=2.33 m2=1.218e+00
+  REACTION mask=0 head=2 readers=both tick=all sources=128512 | falls coherence=0.0419 ratio=1.66 m2=1.366e-01
+  REACTION mask=0 head=2 readers=both tick=0 sources=32128 | rises coherence=0.0077 ratio=0.21 m2=5.249e-01
+  REACTION mask=0 head=2 readers=both tick=1 sources=32128 | falls coherence=0.1136 ratio=2.88 m2=2.512e-01
+  REACTION mask=0 head=2 readers=both tick=2 sources=32128 | falls coherence=0.1213 ratio=3.74 m2=1.230e-01
+  REACTION mask=0 head=2 readers=open tick=all sources=64256 | falls coherence=0.0371 ratio=0.96 m2=1.882e-01
+  REACTION mask=0 head=2 readers=written tick=all sources=64256 | falls coherence=0.0497 ratio=2.45 m2=8.487e-02
+  REACTION mask=0 head=3 readers=both tick=all sources=128512 | rises coherence=0.0838 ratio=4.01 m2=1.330e+00
+  REACTION mask=0 head=3 readers=both tick=0 sources=32128 | rises coherence=0.1157 ratio=3.67 m2=2.662e+00
+  REACTION mask=0 head=3 readers=both tick=1 sources=32128 | rises coherence=0.0576 ratio=1.69 m2=2.078e+00
+  REACTION mask=0 head=3 readers=both tick=2 sources=32128 | rises coherence=0.0279 ratio=0.69 m2=1.636e+00
+  REACTION mask=0 head=3 readers=open tick=all sources=64256 | rises coherence=0.0883 ratio=2.81 m2=1.869e+00
+  REACTION mask=0 head=3 readers=written tick=all sources=64256 | rises coherence=0.0762 ratio=4.14 m2=7.905e-01
+  REACTION mask=1 head=0 readers=both tick=all sources=172608 | falls coherence=0.0719 ratio=3.81 m2=2.635e-01
+  REACTION mask=1 head=0 readers=both tick=0 sources=43152 | falls coherence=0.0327 ratio=1.13 m2=5.792e-01
+  REACTION mask=1 head=0 readers=both tick=1 sources=43152 | falls coherence=0.1048 ratio=3.54 m2=3.580e-01
+  REACTION mask=1 head=0 readers=both tick=2 sources=43152 | falls coherence=0.1363 ratio=3.52 m2=2.940e-01
+  REACTION mask=1 head=0 readers=open tick=all sources=86304 | falls coherence=0.3377 ratio=4.36 m2=8.736e-04
+  REACTION mask=1 head=0 readers=written tick=all sources=86304 | falls coherence=0.0639 ratio=3.31 m2=5.261e-01
+  REACTION mask=1 head=1 readers=both tick=all sources=172608 | falls coherence=0.0036 ratio=0.17 m2=5.763e-01
+  REACTION mask=1 head=1 readers=both tick=0 sources=43152 | falls coherence=0.0353 ratio=1.19 m2=1.413e+00
+  REACTION mask=1 head=1 readers=both tick=1 sources=43152 | rises coherence=0.0078 ratio=0.20 m2=8.076e-01
+  REACTION mask=1 head=1 readers=both tick=2 sources=43152 | rises coherence=0.0875 ratio=2.25 m2=6.205e-01
+  REACTION mask=1 head=1 readers=open tick=all sources=86304 | rises coherence=0.0878 ratio=1.95 m2=4.987e-04
+  REACTION mask=1 head=1 readers=written tick=all sources=86304 | falls coherence=0.0051 ratio=0.24 m2=1.152e+00
+  REACTION mask=1 head=2 readers=both tick=all sources=172608 | falls coherence=0.0689 ratio=2.83 m2=3.573e-02
+  REACTION mask=1 head=2 readers=both tick=0 sources=43152 | falls coherence=0.0879 ratio=2.47 m2=1.343e-01
+  REACTION mask=1 head=2 readers=both tick=1 sources=43152 | falls coherence=0.0381 ratio=0.97 m2=5.041e-02
+  REACTION mask=1 head=2 readers=both tick=2 sources=43152 | falls coherence=0.0501 ratio=1.11 m2=3.081e-02
+  REACTION mask=1 head=2 readers=open tick=all sources=86304 | rises coherence=0.0359 ratio=0.33 m2=2.800e-04
+  REACTION mask=1 head=2 readers=written tick=all sources=86304 | falls coherence=0.0754 ratio=3.01 m2=7.118e-02
+  REACTION mask=1 head=3 readers=both tick=all sources=172608 | rises coherence=0.0116 ratio=0.54 m2=3.946e-01
+  REACTION mask=1 head=3 readers=both tick=0 sources=43152 | falls coherence=0.0119 ratio=0.36 m2=8.971e-01
+  REACTION mask=1 head=3 readers=both tick=1 sources=43152 | rises coherence=0.0247 ratio=0.74 m2=6.186e-01
+  REACTION mask=1 head=3 readers=both tick=2 sources=43152 | rises coherence=0.0666 ratio=1.43 m2=4.303e-01
+  REACTION mask=1 head=3 readers=open tick=all sources=86304 | falls coherence=0.0595 ratio=0.81 m2=1.451e-03
+  REACTION mask=1 head=3 readers=written tick=all sources=86304 | rises coherence=0.0161 ratio=0.72 m2=7.877e-01

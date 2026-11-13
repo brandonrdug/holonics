@@ -943,6 +943,15 @@ stretches the code falls as `w` rises in the first turned head, the sum over twi
 random-sign level, and the second head's is weaker (G150 read the clock's partial at −0.114 and
 −0.063); `u` points to restoring the remainder in both.
 
+*Read* (G157, November 13 20:03Z, the PC thread; [receipt](2026-11-13_THE_TICK_HOLDS_THE_JUNCTIONS_ANCHOR_WITHOUT_ITS_RETURN_THE_RETURN_IS_THE_SWING_OF_THE_STATE_TWO_TICKS_BACK_ABOUT_THE_PRESENT_ANCHOR_THE_TREES_OWN_ECHO_TERM_AND_A_MERGE_LOSES_WHICH_NEVER_HOW_MUCH_receipts/g157_reach.txt), `read-reach` and
+`reach_ruler.py`, both covectors read from the built passes on the line's third-lap mean, 122 stretches of the training documents and
+of the held role, both masks, each against its random-sign level over receiver rows). On the line's own text the covector of `w`
+stands at its random-sign level in both turned heads but one region (written rows with one place open in head 2, 2.65 times, where
+the code rises with `w`), and its sign is not kept between seen and held text in three of four regions of head 2. `u` falls in all
+four regions of head 2 on seen text, at 0.41 to 1.95 times its level, and mixes in head 3. So from where the deposit stands, the
+place count already carries at first order what the head's clock would; the theory's end, `u = w = 1`, is not visible from the
+trained state's first order, as `Γ*` was not (G155). By the guess's rule the reader's reaction comes first.
+
 **What G150 can and cannot say.** Inside each octave of a head's clock gap the place distance
 still correlates with the influence at −0.14. A falloff built on places gives that by
 construction, so the reading does not separate a law that wants the place count from a build

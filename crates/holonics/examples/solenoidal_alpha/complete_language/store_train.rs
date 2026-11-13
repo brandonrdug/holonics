@@ -1170,6 +1170,212 @@ pub(super) fn read_junction(args: &[String]) -> Result<()> {
     Ok(())
 }
 
+/// [measurement; theory, November 13, the junction record §13.9; G157] `read-reach UNITS UNITS_SHA STORE STORE_SHA KEYS KEYS_SHA CODEC CODEC_SHA
+/// PLACES STATE STATE_SHA OUT ROLE`: **a turned head's reach on its own clock, read at its founding** from the state's own passes
+/// ([`holonics::hnn::tower::field::Field::reach_covectors`]): each slice of `ROLE` (`held`, or `prefix` for the training documents) cut as
+/// `read-echo` cuts it, every stretch read on the host twice (`mask 0` the cut's own, `mask 1` its middle place alone open). `OUT/reach.tsv` holds
+/// a line a slice, mask, tick, head and kind of receiver (numbers only): the rows and the [`holonics::hnn::tower::field::ReachSums`] words. The
+/// output directory is private.
+pub(super) fn read_reach(args: &[String]) -> Result<()> {
+    if args.len() != 14 {
+        return Err("read-reach UNITS UNITS_SHA STORE STORE_SHA KEYS KEYS_SHA CODEC CODEC_SHA PLACES STATE STATE_SHA OUT ROLE".into());
+    }
+    let started = std::time::Instant::now();
+    refuse_variables("read-reach")?;
+    let role = args[13].as_str();
+    if role != "held" && role != "prefix" {
+        return Err("read-reach reads the held role or the training documents (prefix)".into());
+    }
+    let units = units_of(&args[1], &args[2])?;
+    if !units.merges().is_empty() {
+        return Err("the store's cut is on bytes: a units file of merges is refused".into());
+    }
+    let store = Path::new(&args[3]);
+    let counts = store_counts(std::str::from_utf8(&pinned_read(&store.join("STORE.tsv").to_string_lossy(), &args[4], READ_BUDGET as usize)?)?)?;
+    let keys = pinned_read(&args[5], &args[6], READ_BUDGET as usize)?;
+    let seed = u64::from_be_bytes(keys.get(keys.len().saturating_sub(8)..).filter(|w| w.len() == 8).ok_or("a key file of fewer than eight bytes")?.try_into()?);
+    let codec = FieldCodec::from_text(&String::from_utf8(pinned_read(&args[7], &args[8], READ_BUDGET as usize)?)?, units)?;
+    let places = positive(&args[9])? as usize;
+    let learner = FieldLearner::from_text(std::str::from_utf8(&pinned_read(&args[10], &args[11], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
+    let law = learner.pass.clone().ok_or("a state with no pass line: read-reach reads a state of the store's line")?;
+    if learner.field.declaration.alphabet != codec.alphabet() {
+        return Err("a state whose alphabet is not its codec's".into());
+    }
+    let out = Path::new(&args[12]);
+    if out.exists() {
+        return Err(format!("{} exists", out.display()).into());
+    }
+    std::fs::create_dir_all(out)?;
+    use rayon::prelude::*;
+    use std::io::Write as _;
+    let mut tsv = std::io::BufWriter::new(std::fs::File::create(out.join("reach.tsv"))?);
+    writeln!(tsv, "slice\tmask\ttick\thead\twritten\trows\tw\tw_abs\tw_sq\tu\tu_abs\tu_sq")?;
+    let d = learner.field.declaration;
+    println!("REACH_LAW role={role} places={places} ticks={} heads={} still={} level={} ms={}", d.ticks, d.heads, d.still, learner.field.scale.is_some(), started.elapsed().as_millis());
+    for (si, &name) in role_names(&counts, role).iter().enumerate() {
+        let slice = open_slice(store, role, name, &counts)?;
+        let pass = StorePass { role: role.to_string(), store: args[4].clone(), stretches: 0, least: law.least, octaves: law.octaves, pairs: law.pairs, sites: law.sites, slices: vec![PassSlice { name: name.to_string(), piece: 0, cursor: 0, taken: 0 }] };
+        let mut cut = Cut { seed, slices: vec![slice], pass };
+        let mut stretches: Vec<TrainRegion> = Vec::new();
+        let mut taken = 0usize;
+        while taken < places {
+            let Some(drawn) = cut.next() else { break };
+            let stretch = cut.take(drawn, &codec)?;
+            taken += stretch.region.classes.len();
+            stretches.push(stretch.region);
+        }
+        let slice_start = std::time::Instant::now();
+        type Read = Vec<(usize, Vec<Vec<[holonics::hnn::tower::field::ReachSums; 2]>>)>;
+        let reads: Vec<std::result::Result<Read, String>> = stretches
+            .par_iter()
+            .map(|region| {
+                let n = region.classes.len();
+                let mut alone = vec![false; n];
+                alone[n / 2] = true;
+                let one = TrainRegion::plain(region.classes.clone(), alone);
+                [region, &one]
+                    .into_iter()
+                    .enumerate()
+                    .map(|(mask, r)| {
+                        let views = views_of(std::slice::from_ref(r));
+                        Ok((mask, learner.field.reach_covectors(&views[0]).map_err(|e| e.to_string())?))
+                    })
+                    .collect()
+            })
+            .collect();
+        let mut sums = vec![vec![vec![[holonics::hnn::tower::field::ReachSums::default(); 2]; d.heads]; d.ticks]; 2];
+        for read in reads {
+            for (mask, by_tick) in read? {
+                for (k, by_head) in by_tick.iter().enumerate() {
+                    for (h, kinds) in by_head.iter().enumerate() {
+                        for (w, r) in kinds.iter().enumerate() {
+                            let a = &mut sums[mask][k][h][w];
+                            a.rows += r.rows;
+                            (a.w, a.w_abs, a.w_sq, a.u, a.u_abs, a.u_sq) = (a.w + r.w, a.w_abs + r.w_abs, a.w_sq + r.w_sq, a.u + r.u, a.u_abs + r.u_abs, a.u_sq + r.u_sq);
+                        }
+                    }
+                }
+            }
+        }
+        for (mask, by_mask) in sums.iter().enumerate() {
+            for (k, by_tick) in by_mask.iter().enumerate() {
+                for (h, kinds) in by_tick.iter().enumerate() {
+                    for (w, a) in kinds.iter().enumerate().filter(|(_, a)| a.rows > 0) {
+                        writeln!(tsv, "{si}\t{mask}\t{k}\t{h}\t{w}\t{}\t{}\t{}\t{}\t{}\t{}\t{}", a.rows, a.w, a.w_abs, a.w_sq, a.u, a.u_abs, a.u_sq)?;
+                    }
+                }
+            }
+        }
+        println!("REACH_SLICE slice={name} stretches={} places={taken} host_ms={} ms={}", stretches.len(), slice_start.elapsed().as_millis(), started.elapsed().as_millis());
+    }
+    tsv.flush()?;
+    println!("REACH_DONE ms={}", started.elapsed().as_millis());
+    Ok(())
+}
+
+/// [measurement; theory, November 13, the junction record §13.8; G158] `read-reaction UNITS UNITS_SHA STORE STORE_SHA KEYS KEYS_SHA CODEC CODEC_SHA
+/// PLACES STATE STATE_SHA OUT ROLE`: **the reader's reaction on its source, read at its founding** from the state's own passes
+/// ([`holonics::hnn::tower::field::Field::reaction_covectors`]): each slice of `ROLE` (`held`, or `prefix` for the training documents) cut as
+/// `read-echo` cuts it, every stretch read on the host twice (`mask 0` the cut's own, `mask 1` its middle place alone open). `OUT/reaction.tsv`
+/// holds a line a slice, mask, tick, head and kind of reader (numbers only): the [`holonics::hnn::tower::field::ReactionSums`] words. The
+/// output directory is private.
+pub(super) fn read_reaction(args: &[String]) -> Result<()> {
+    if args.len() != 14 {
+        return Err("read-reaction UNITS UNITS_SHA STORE STORE_SHA KEYS KEYS_SHA CODEC CODEC_SHA PLACES STATE STATE_SHA OUT ROLE".into());
+    }
+    let started = std::time::Instant::now();
+    refuse_variables("read-reaction")?;
+    let role = args[13].as_str();
+    if role != "held" && role != "prefix" {
+        return Err("read-reaction reads the held role or the training documents (prefix)".into());
+    }
+    let units = units_of(&args[1], &args[2])?;
+    if !units.merges().is_empty() {
+        return Err("the store's cut is on bytes: a units file of merges is refused".into());
+    }
+    let store = Path::new(&args[3]);
+    let counts = store_counts(std::str::from_utf8(&pinned_read(&store.join("STORE.tsv").to_string_lossy(), &args[4], READ_BUDGET as usize)?)?)?;
+    let keys = pinned_read(&args[5], &args[6], READ_BUDGET as usize)?;
+    let seed = u64::from_be_bytes(keys.get(keys.len().saturating_sub(8)..).filter(|w| w.len() == 8).ok_or("a key file of fewer than eight bytes")?.try_into()?);
+    let codec = FieldCodec::from_text(&String::from_utf8(pinned_read(&args[7], &args[8], READ_BUDGET as usize)?)?, units)?;
+    let places = positive(&args[9])? as usize;
+    let learner = FieldLearner::from_text(std::str::from_utf8(&pinned_read(&args[10], &args[11], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
+    let law = learner.pass.clone().ok_or("a state with no pass line: read-reaction reads a state of the store's line")?;
+    if learner.field.declaration.alphabet != codec.alphabet() {
+        return Err("a state whose alphabet is not its codec's".into());
+    }
+    let out = Path::new(&args[12]);
+    if out.exists() {
+        return Err(format!("{} exists", out.display()).into());
+    }
+    std::fs::create_dir_all(out)?;
+    use rayon::prelude::*;
+    use std::io::Write as _;
+    let mut tsv = std::io::BufWriter::new(std::fs::File::create(out.join("reaction.tsv"))?);
+    writeln!(tsv, "slice\tmask\ttick\thead\twritten_readers\trows\ta\ta_abs\ta_sq\trho_sq\tx_sq")?;
+    let d = learner.field.declaration;
+    println!("REACTION_LAW role={role} places={places} ticks={} heads={} still={} level={} ms={}", d.ticks, d.heads, d.still, learner.field.scale.is_some(), started.elapsed().as_millis());
+    for (si, &name) in role_names(&counts, role).iter().enumerate() {
+        let slice = open_slice(store, role, name, &counts)?;
+        let pass = StorePass { role: role.to_string(), store: args[4].clone(), stretches: 0, least: law.least, octaves: law.octaves, pairs: law.pairs, sites: law.sites, slices: vec![PassSlice { name: name.to_string(), piece: 0, cursor: 0, taken: 0 }] };
+        let mut cut = Cut { seed, slices: vec![slice], pass };
+        let mut stretches: Vec<TrainRegion> = Vec::new();
+        let mut taken = 0usize;
+        while taken < places {
+            let Some(drawn) = cut.next() else { break };
+            let stretch = cut.take(drawn, &codec)?;
+            taken += stretch.region.classes.len();
+            stretches.push(stretch.region);
+        }
+        let slice_start = std::time::Instant::now();
+        type Read = Vec<(usize, Vec<Vec<[holonics::hnn::tower::field::ReactionSums; 2]>>)>;
+        let reads: Vec<std::result::Result<Read, String>> = stretches
+            .par_iter()
+            .map(|region| {
+                let n = region.classes.len();
+                let mut alone = vec![false; n];
+                alone[n / 2] = true;
+                let one = TrainRegion::plain(region.classes.clone(), alone);
+                [region, &one]
+                    .into_iter()
+                    .enumerate()
+                    .map(|(mask, r)| {
+                        let views = views_of(std::slice::from_ref(r));
+                        Ok((mask, learner.field.reaction_covectors(&views[0]).map_err(|e| e.to_string())?))
+                    })
+                    .collect()
+            })
+            .collect();
+        let mut sums = vec![vec![vec![[holonics::hnn::tower::field::ReactionSums::default(); 2]; d.heads]; d.ticks]; 2];
+        for read in reads {
+            for (mask, by_tick) in read? {
+                for (k, by_head) in by_tick.iter().enumerate() {
+                    for (h, kinds) in by_head.iter().enumerate() {
+                        for (w, r) in kinds.iter().enumerate() {
+                            let a = &mut sums[mask][k][h][w];
+                            a.rows += r.rows;
+                            (a.a, a.a_abs, a.a_sq, a.rho_sq, a.x_sq) = (a.a + r.a, a.a_abs + r.a_abs, a.a_sq + r.a_sq, a.rho_sq + r.rho_sq, a.x_sq + r.x_sq);
+                        }
+                    }
+                }
+            }
+        }
+        for (mask, by_mask) in sums.iter().enumerate() {
+            for (k, by_tick) in by_mask.iter().enumerate() {
+                for (h, kinds) in by_tick.iter().enumerate() {
+                    for (w, a) in kinds.iter().enumerate().filter(|(_, a)| a.rows > 0) {
+                        writeln!(tsv, "{si}\t{mask}\t{k}\t{h}\t{w}\t{}\t{}\t{}\t{}\t{}\t{}", a.rows, a.a, a.a_abs, a.a_sq, a.rho_sq, a.x_sq)?;
+                    }
+                }
+            }
+        }
+        println!("REACTION_SLICE slice={name} stretches={} places={taken} host_ms={} ms={}", stretches.len(), slice_start.elapsed().as_millis(), started.elapsed().as_millis());
+    }
+    tsv.flush()?;
+    println!("REACTION_DONE ms={}", started.elapsed().as_millis());
+    Ok(())
+}
+
 /// [measurement; theory, November 13, an outside read of that day (its claim 1); G148] `read-influence UNITS UNITS_SHA STORE STORE_SHA KEYS
 /// KEYS_SHA CODEC CODEC_SHA PAIRS STATE STATE_SHA OUT`: **whether one place's influence on another follows the news between them or their
 /// distance**, a reading. Each slice of the held role is cut as `read-cavity` cuts it, whole stretches until four times `PAIRS` places, every

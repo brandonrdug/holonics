@@ -521,7 +521,13 @@ repository was reset on September 24; the pre-reset tree is
     held gap, which a deposit does not see; near the trained depth a place's own rate could reach
     0.09 to 0.16 nats a place, mostly at places the field reads badly (G156). A hold cannot ring,
     so the card realization of the return waits; the next design is the reader's reaction on its
-    source, which the theory thread is deriving, built from this host founding.
+    source, which the theory thread is deriving, built from this host founding. A turned head's
+    reach on its own clock stands at its random-sign level from the trained state (G157). The
+    reader's reaction is the first new direction whose founding covector stands well over its
+    floor on the line's own text (G158: 4.7 and 5.4 times in heads 0 and 3), coherent within each
+    slice with the slice's sign (agreement in wikidata and books, a turn in web), so it is built
+    next with its strength read a site from the source's own chart. The line's first pass over
+    the 1 GB of training documents ended at lap 6 (1.0743 one-place, 2.4057 whole masks).
     Corrected the same day (the return's record, §13): the tick adds its current to a site's
     state, so the site term first derived is the site's own rate and takes no echo out; a head's
     read changes the reader and not its source, which on the pair is free fall; and the

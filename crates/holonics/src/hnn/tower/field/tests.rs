@@ -3950,3 +3950,20 @@ fn the_junctions_reflection_is_the_cayley_map_of_its_load() {
     assert!(junction_gamma(&e, 31 << 16).is_err() && junction_gamma(&e, -(32 << 16)).is_err());
     assert_eq!(junction_sensitivity(0), release(ln2_face(), 1));
 }
+
+/// [measurement; G157] **The reach's logs**: `log₂ n` on the face's grain is the octave at powers of two and `log₂ 3` between, and at a plain
+/// clock (a tick a place) the clock's log is zero and the remainder the place's.
+#[test]
+fn the_reachs_logs_are_zero_at_a_plain_clock() {
+    assert_eq!((log2_grain(1), log2_grain(2), log2_grain(1024)), (0, 1 << 16, 10 << 16));
+    assert!((log2_grain(3) - 103_872).abs() <= 2, "log₂ 3 on 2^(−16): {}", log2_grain(3));
+    let plain: Vec<i64> = (0..40).map(|t| (t as i64) << PACE_BITS).collect();
+    for (i, j) in [(5usize, 4usize), (20, 3), (0, 39), (7, 13)] {
+        let (lw, lu) = reach_logs(&plain, i, j);
+        assert_eq!(lw, 0, "a plain clock reads the place count at {i} {j}");
+        assert_eq!(lu, log2_grain(i.abs_diff(j) as u128) & ((1 << 16) - 1));
+    }
+    // A clock twice the place count reads one octave more.
+    let fast: Vec<i64> = (0..40).map(|t| (2 * t as i64) << PACE_BITS).collect();
+    assert_eq!(reach_logs(&fast, 20, 3).0, 1 << 16);
+}

@@ -1,0 +1,100 @@
+# G157, read-reach on level3/MEAN.3000, the training documents (prefix, first READ) and the held role (second READ), 2026-11-13T20:03-20:04Z; host, RAYON 8 threads
+reach_g157h.log:REACH_LAW role=held places=4000 ticks=4 heads=4 still=2 level=true ms=43
+reach_g157h.log:REACH_SLICE slice=code stretches=24 places=4296 host_ms=8180 ms=8237
+reach_g157h.log:REACH_SLICE slice=web stretches=25 places=4394 host_ms=10321 ms=18570
+reach_g157h.log:REACH_SLICE slice=science stretches=24 places=4296 host_ms=9462 ms=28035
+reach_g157h.log:REACH_SLICE slice=books stretches=24 places=4296 host_ms=7963 ms=36010
+reach_g157h.log:REACH_SLICE slice=wikidata stretches=25 places=4416 host_ms=11967 ms=47979
+reach_g157h.log:REACH_DONE ms=47979
+reach_g157h.log:MEASURE lap=reach_g157h rc=0 wall_s=48.3 peak_rss_kib=698808
+reach_g157p.log:REACH_LAW role=prefix places=4000 ticks=4 heads=4 still=2 level=true ms=41
+reach_g157p.log:REACH_SLICE slice=code stretches=25 places=4276 host_ms=9205 ms=9270
+reach_g157p.log:REACH_SLICE slice=web stretches=24 places=4175 host_ms=7787 ms=17090
+reach_g157p.log:REACH_SLICE slice=science stretches=24 places=4296 host_ms=7969 ms=25075
+reach_g157p.log:REACH_SLICE slice=books stretches=24 places=4296 host_ms=8178 ms=33277
+reach_g157p.log:REACH_SLICE slice=wikidata stretches=25 places=4455 host_ms=11284 ms=44593
+reach_g157p.log:REACH_DONE ms=44593
+reach_g157p.log:MEASURE lap=reach_g157p rc=0 wall_s=45.1 peak_rss_kib=682428
+
+READ .local/run/reach_g157p
+  REACH mask=0 head=2 rows=open tick=all n=22092 | w: rises coherence=0.0166 ratio=0.43 | u: falls coherence=0.0398 ratio=1.40
+  REACH mask=0 head=2 rows=open tick=0 n=5523 | w: rises coherence=0.0256 ratio=0.43 | u: falls coherence=0.0654 ratio=1.48
+  REACH mask=0 head=2 rows=open tick=1 n=5523 | w: rises coherence=0.0104 ratio=0.30 | u: rises coherence=0.0117 ratio=0.39
+  REACH mask=0 head=2 rows=open tick=2 n=5523 | w: rises coherence=0.0253 ratio=0.40 | u: rises coherence=0.0238 ratio=0.56
+  REACH mask=0 head=2 rows=open tick=3 n=5523 | w: falls coherence=0.0595 ratio=1.23 | u: falls coherence=0.0499 ratio=1.24
+  REACH mask=0 head=2 rows=written tick=all n=63900 | w: rises coherence=0.0289 ratio=1.26 | u: falls coherence=0.0230 ratio=0.97
+  REACH mask=0 head=2 rows=written tick=0 n=15975 | w: rises coherence=0.0536 ratio=1.67 | u: falls coherence=0.0476 ratio=1.44
+  REACH mask=0 head=2 rows=written tick=1 n=15975 | w: falls coherence=0.0190 ratio=0.52 | u: rises coherence=0.0241 ratio=0.57
+  REACH mask=0 head=2 rows=written tick=2 n=15975 | w: falls coherence=0.0036 ratio=0.10 | u: falls coherence=0.0185 ratio=0.46
+  REACH mask=0 head=2 rows=written tick=3 n=15975 | w: falls coherence=0.0361 ratio=0.70 | u: rises coherence=0.0661 ratio=1.25
+  REACH mask=0 head=3 rows=open tick=all n=22092 | w: falls coherence=0.0027 ratio=0.12 | u: rises coherence=0.0293 ratio=1.80
+  REACH mask=0 head=3 rows=open tick=0 n=5523 | w: rises coherence=0.0012 ratio=0.04 | u: rises coherence=0.0277 ratio=1.02
+  REACH mask=0 head=3 rows=open tick=1 n=5523 | w: falls coherence=0.0518 ratio=1.40 | u: rises coherence=0.0027 ratio=0.10
+  REACH mask=0 head=3 rows=open tick=2 n=5523 | w: rises coherence=0.0203 ratio=0.32 | u: rises coherence=0.0462 ratio=1.43
+  REACH mask=0 head=3 rows=open tick=3 n=5523 | w: rises coherence=0.0768 ratio=0.70 | u: rises coherence=0.0905 ratio=1.77
+  REACH mask=0 head=3 rows=written tick=all n=63900 | w: falls coherence=0.0604 ratio=1.46 | u: falls coherence=0.0409 ratio=2.05
+  REACH mask=0 head=3 rows=written tick=0 n=15975 | w: falls coherence=0.1253 ratio=1.90 | u: falls coherence=0.0571 ratio=1.84
+  REACH mask=0 head=3 rows=written tick=1 n=15975 | w: rises coherence=0.0164 ratio=0.29 | u: falls coherence=0.0388 ratio=1.14
+  REACH mask=0 head=3 rows=written tick=2 n=15975 | w: rises coherence=0.0461 ratio=1.21 | u: falls coherence=0.0041 ratio=0.11
+  REACH mask=0 head=3 rows=written tick=3 n=15975 | w: rises coherence=0.0686 ratio=1.04 | u: rises coherence=0.0300 ratio=0.47
+  REACH mask=1 head=2 rows=open tick=all n=488 | w: falls coherence=0.1189 ratio=1.12 | u: falls coherence=0.1930 ratio=1.95
+  REACH mask=1 head=2 rows=open tick=0 n=122 | w: falls coherence=0.1701 ratio=1.04 | u: falls coherence=0.3424 ratio=2.15
+  REACH mask=1 head=2 rows=open tick=1 n=122 | w: falls coherence=0.0767 ratio=0.40 | u: falls coherence=0.0689 ratio=0.40
+  REACH mask=1 head=2 rows=open tick=2 n=122 | w: falls coherence=0.0936 ratio=0.45 | u: rises coherence=0.0909 ratio=0.49
+  REACH mask=1 head=2 rows=open tick=3 n=122 | w: rises coherence=0.0446 ratio=0.23 | u: falls coherence=0.0753 ratio=0.48
+  REACH mask=1 head=2 rows=written tick=all n=85504 | w: rises coherence=0.0675 ratio=2.65 | u: falls coherence=0.0118 ratio=0.41
+  REACH mask=1 head=2 rows=written tick=0 n=21376 | w: rises coherence=0.0346 ratio=0.98 | u: falls coherence=0.0244 ratio=0.58
+  REACH mask=1 head=2 rows=written tick=1 n=21376 | w: rises coherence=0.1287 ratio=3.06 | u: falls coherence=0.0402 ratio=0.97
+  REACH mask=1 head=2 rows=written tick=2 n=21376 | w: rises coherence=0.1281 ratio=2.30 | u: rises coherence=0.0640 ratio=1.00
+  REACH mask=1 head=2 rows=written tick=3 n=21376 | w: rises coherence=0.1272 ratio=1.64 | u: rises coherence=0.2723 ratio=2.59
+  REACH mask=1 head=3 rows=open tick=all n=488 | w: rises coherence=0.1209 ratio=1.02 | u: rises coherence=0.1546 ratio=1.78
+  REACH mask=1 head=3 rows=open tick=0 n=122 | w: rises coherence=0.2995 ratio=1.45 | u: rises coherence=0.2960 ratio=1.66
+  REACH mask=1 head=3 rows=open tick=1 n=122 | w: rises coherence=0.0703 ratio=0.45 | u: rises coherence=0.0677 ratio=0.55
+  REACH mask=1 head=3 rows=open tick=2 n=122 | w: falls coherence=0.2601 ratio=1.65 | u: rises coherence=0.0749 ratio=0.57
+  REACH mask=1 head=3 rows=open tick=3 n=122 | w: falls coherence=0.1277 ratio=0.72 | u: rises coherence=0.0028 ratio=0.02
+  REACH mask=1 head=3 rows=written tick=all n=85504 | w: rises coherence=0.0111 ratio=0.44 | u: rises coherence=0.0024 ratio=0.10
+  REACH mask=1 head=3 rows=written tick=0 n=21376 | w: rises coherence=0.0000 ratio=0.00 | u: rises coherence=0.0115 ratio=0.31
+  REACH mask=1 head=3 rows=written tick=1 n=21376 | w: rises coherence=0.0260 ratio=0.71 | u: falls coherence=0.0238 ratio=0.55
+  REACH mask=1 head=3 rows=written tick=2 n=21376 | w: rises coherence=0.0295 ratio=0.60 | u: rises coherence=0.0223 ratio=0.44
+  REACH mask=1 head=3 rows=written tick=3 n=21376 | w: falls coherence=0.0285 ratio=0.47 | u: rises coherence=0.0471 ratio=0.71
+READ .local/run/reach_g157h
+  REACH mask=0 head=2 rows=open tick=all n=22536 | w: falls coherence=0.0158 ratio=0.76 | u: rises coherence=0.0354 ratio=1.88
+  REACH mask=0 head=2 rows=open tick=0 n=5634 | w: falls coherence=0.0147 ratio=0.48 | u: rises coherence=0.0639 ratio=2.25
+  REACH mask=0 head=2 rows=open tick=1 n=5634 | w: falls coherence=0.0160 ratio=0.55 | u: falls coherence=0.0184 ratio=0.70
+  REACH mask=0 head=2 rows=open tick=2 n=5634 | w: falls coherence=0.0397 ratio=0.86 | u: falls coherence=0.0303 ratio=0.87
+  REACH mask=0 head=2 rows=open tick=3 n=5634 | w: falls coherence=0.0006 ratio=0.01 | u: rises coherence=0.0373 ratio=0.80
+  REACH mask=0 head=2 rows=written tick=all n=64256 | w: rises coherence=0.0412 ratio=2.30 | u: falls coherence=0.0644 ratio=2.50
+  REACH mask=0 head=2 rows=written tick=0 n=16064 | w: rises coherence=0.0230 ratio=0.93 | u: falls coherence=0.0776 ratio=2.10
+  REACH mask=0 head=2 rows=written tick=1 n=16064 | w: rises coherence=0.0689 ratio=2.49 | u: falls coherence=0.0468 ratio=1.25
+  REACH mask=0 head=2 rows=written tick=2 n=16064 | w: rises coherence=0.0924 ratio=2.12 | u: falls coherence=0.0093 ratio=0.24
+  REACH mask=0 head=2 rows=written tick=3 n=16064 | w: rises coherence=0.0871 ratio=1.72 | u: falls coherence=0.0921 ratio=1.43
+  REACH mask=0 head=3 rows=open tick=all n=22536 | w: rises coherence=0.0263 ratio=1.57 | u: falls coherence=0.0108 ratio=0.74
+  REACH mask=0 head=3 rows=open tick=0 n=5634 | w: rises coherence=0.0343 ratio=1.42 | u: falls coherence=0.0072 ratio=0.30
+  REACH mask=0 head=3 rows=open tick=1 n=5634 | w: falls coherence=0.0144 ratio=0.53 | u: falls coherence=0.0271 ratio=1.16
+  REACH mask=0 head=3 rows=open tick=2 n=5634 | w: rises coherence=0.0312 ratio=0.76 | u: falls coherence=0.0040 ratio=0.13
+  REACH mask=0 head=3 rows=open tick=3 n=5634 | w: rises coherence=0.0885 ratio=1.57 | u: rises coherence=0.0087 ratio=0.20
+  REACH mask=0 head=3 rows=written tick=all n=64256 | w: falls coherence=0.0135 ratio=0.68 | u: rises coherence=0.0185 ratio=0.94
+  REACH mask=0 head=3 rows=written tick=0 n=16064 | w: falls coherence=0.0390 ratio=1.45 | u: rises coherence=0.0127 ratio=0.43
+  REACH mask=0 head=3 rows=written tick=1 n=16064 | w: rises coherence=0.0261 ratio=0.66 | u: falls coherence=0.0221 ratio=0.70
+  REACH mask=0 head=3 rows=written tick=2 n=16064 | w: rises coherence=0.0103 ratio=0.23 | u: rises coherence=0.0973 ratio=1.78
+  REACH mask=0 head=3 rows=written tick=3 n=16064 | w: falls coherence=0.0547 ratio=0.98 | u: rises coherence=0.1719 ratio=1.62
+  REACH mask=1 head=2 rows=open tick=all n=488 | w: rises coherence=0.1735 ratio=1.61 | u: falls coherence=0.1127 ratio=1.10
+  REACH mask=1 head=2 rows=open tick=0 n=122 | w: rises coherence=0.0081 ratio=0.05 | u: falls coherence=0.1120 ratio=0.61
+  REACH mask=1 head=2 rows=open tick=1 n=122 | w: rises coherence=0.3892 ratio=2.28 | u: falls coherence=0.1229 ratio=0.74
+  REACH mask=1 head=2 rows=open tick=2 n=122 | w: rises coherence=0.4402 ratio=2.52 | u: falls coherence=0.1241 ratio=0.76
+  REACH mask=1 head=2 rows=open tick=3 n=122 | w: rises coherence=0.3038 ratio=2.13 | u: falls coherence=0.0836 ratio=0.56
+  REACH mask=1 head=2 rows=written tick=all n=86304 | w: falls coherence=0.0253 ratio=0.94 | u: falls coherence=0.0311 ratio=1.11
+  REACH mask=1 head=2 rows=written tick=0 n=21576 | w: falls coherence=0.0550 ratio=1.44 | u: falls coherence=0.0500 ratio=1.26
+  REACH mask=1 head=2 rows=written tick=1 n=21576 | w: falls coherence=0.0072 ratio=0.20 | u: rises coherence=0.0178 ratio=0.38
+  REACH mask=1 head=2 rows=written tick=2 n=21576 | w: rises coherence=0.1168 ratio=1.99 | u: falls coherence=0.0566 ratio=0.96
+  REACH mask=1 head=2 rows=written tick=3 n=21576 | w: rises coherence=0.0702 ratio=0.98 | u: falls coherence=0.0124 ratio=0.16
+  REACH mask=1 head=3 rows=open tick=all n=488 | w: falls coherence=0.1789 ratio=2.13 | u: rises coherence=0.0847 ratio=1.23
+  REACH mask=1 head=3 rows=open tick=0 n=122 | w: falls coherence=0.1137 ratio=0.82 | u: rises coherence=0.0005 ratio=0.00
+  REACH mask=1 head=3 rows=open tick=1 n=122 | w: falls coherence=0.2228 ratio=1.48 | u: rises coherence=0.3216 ratio=2.56
+  REACH mask=1 head=3 rows=open tick=2 n=122 | w: falls coherence=0.2426 ratio=1.48 | u: rises coherence=0.0409 ratio=0.30
+  REACH mask=1 head=3 rows=open tick=3 n=122 | w: falls coherence=0.2530 ratio=1.22 | u: falls coherence=0.0638 ratio=0.50
+  REACH mask=1 head=3 rows=written tick=all n=86304 | w: rises coherence=0.0691 ratio=2.08 | u: falls coherence=0.0073 ratio=0.35
+  REACH mask=1 head=3 rows=written tick=0 n=21576 | w: rises coherence=0.0915 ratio=1.52 | u: rises coherence=0.0172 ratio=0.53
+  REACH mask=1 head=3 rows=written tick=1 n=21576 | w: rises coherence=0.0613 ratio=1.68 | u: falls coherence=0.0205 ratio=0.61
+  REACH mask=1 head=3 rows=written tick=2 n=21576 | w: rises coherence=0.0151 ratio=0.33 | u: falls coherence=0.0777 ratio=1.47
+  REACH mask=1 head=3 rows=written tick=3 n=21576 | w: rises coherence=0.0368 ratio=0.54 | u: rises coherence=0.0687 ratio=1.09
