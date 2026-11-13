@@ -3265,3 +3265,31 @@ and the build's section lines equal the line's, 100 of 100; 96 parity cases equa
   a grid of one block a tile (agent-inferred, unread).
   Rule applied: (a) from 25 to 40: the build stands, and a copy of the slowest kind without its products (P53's instrument) reads what
   binds the form before another map is built in it.
+
+G141 fixed 2026-11-13T08:20Z (the Opus PC thread), before its build: the cavity's far prefixes formed in parallel (G139's rule (d): the
+opening's kernels are the next engine reading). Read first: P60's hold (p60_opening.txt): the founded line's section 323.2 ms against its
+controls' 272.0, the profiled kernels 27.2 ms over the control's, of them field_cavity_skinned_all 10.06 ms in one launch a section of
+62,420 threads, each a mode, region and row walking its region's sites in order and forming every face and skin with turn_dev and
+skin_dev; its standing twin field_moment_skinned_all, which reads its skins from the clock's store, 1.43 ms a launch; the copies 5.1 ms
+and the allocations 14.4 ms a section over the control's (the pool's misses 3,134 against 284 in 100 sections: a second 448 MiB prefix
+buffer and the opening's forward buffers push the live and kept set past the batch's budget, and the largest kept buffers are freed
+every section). The build: one thread a term over every mode, row and site (the same face, skin and release as now), then a scan a
+warp a mode, row and region, the same integer sums; no buffer, release or face changes.
+  (a) The far prefixes 1.2 ms a profiled section (0.6 to 2.5) from 10.06.
+  (b) In one hold the founded line's section 9 ms nearer its control's (6 to 11), the allocations and copies as they stand.
+  Rules. (a) at 2.5 or under: the form stands, and the opening's allocations (the pool's budget against its live and kept set) are
+  the next item, read by take site before any change. (a) over 2.5: the faces bind, not the walk, and the cavity's faces are read from
+  a store a mode and site before the allocations are read.
+
+G141 scored 2026-11-13T08:25Z (receipt g141_prefixes.txt, the engine record's receipts, on claude/carry-reads; the build 16cad4f4c against
+main 11f7ff4cc in one hold: the line reproduced from the founded state, 100 of 100 section lines and its two digests; gates 1 and 3
+passed; the opening's card parity passed; the block was fixed at 08:0x, before the build's commit, though its line reads 08:20Z):
+  (a) the far prefixes 2.73 ms a profiled section (the terms 1.24, the scan 1.49) from 10.07 against 1.2 (0.6 to 2.5): missed above.
+  (b) the founded line's section 277.3 ms against 284.3 and 284.6 on the old tree, 7.2 ms nearer its control's 235.8 and 235.9
+      (spreads 0.0003 and 0.0011) against 9 (6 to 11): held.
+  Of 2 parts 1 held. The premise that missed: the walk's 62,420 serial threads were not all of the cost; the scan of complex words on
+  128 bits by warp shuffles holds 1.49 ms and the terms' faces 1.24.
+  Rule: (a) over 2.5 orders the cavity's faces read from a store, because it reads a miss as the faces binding; the faces hold 1.24 of
+  the 2.73 and the scan 1.49, so the rule's reason does not reach this case and it is not applied. What it leaves: the opening still
+  costs its line 41.5 ms a section over the same tree without the block (277.3 against 235.9), of which the pool's allocations about
+  14, the copies about 5 and the cavity's and tied face's kernels the rest (P60's profile); the allocations are read by take site next.
