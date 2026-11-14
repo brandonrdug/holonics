@@ -1,0 +1,24 @@
+[package]
+name = "holonics-engine"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish = false
+
+# The engine: the law that trains and its host reference (docs/plans/THE_CONSOLIDATION.md, D1). It depends on nothing in
+# `crates/holonics`; the library imports it (C3 of #603).
+[lib]
+name = "holonics_engine"
+path = "src/lib.rs"
+
+# The certificate's acceptance read (`inherited::tower`, `fewer_bits`), forwarded from the library's feature of the same name.
+[features]
+certificate-check = []
+
+[dependencies]
+num-bigint = { workspace = true }
+num-rational = { workspace = true }
+num-traits = { workspace = true }
+num-integer = { workspace = true }
+thiserror = { workspace = true }
+rayon = "1.12"

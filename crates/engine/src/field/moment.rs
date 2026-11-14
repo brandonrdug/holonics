@@ -120,8 +120,8 @@
 //! part by the ring faces' rounding.
 
 use super::{crowd_ranges, NEAR};
-use crate::hnn::keyed_modes::release;
-use crate::hnn::tower::{fit64, refuse, Result, COVECTOR_BITS, FACE_BITS, MOVE_BITS};
+use crate::inherited::keyed_modes::release;
+use crate::inherited::tower::{fit64, refuse, Result, COVECTOR_BITS, FACE_BITS, MOVE_BITS};
 
 /// A Gaussian integer `(re, im)`.
 type Gauss = (i128, i128);
@@ -145,7 +145,7 @@ pub const PACED_L1: u128 = 1 << 31;
 fn carried(x: Option<i128>) -> Result<i128> {
     match x {
         Some(v) => {
-            crate::number::census::reach(CARRIER, &v);
+            crate::inherited::census::reach(CARRIER, &v);
             Ok(v)
         }
         None => refuse(CARRIER),

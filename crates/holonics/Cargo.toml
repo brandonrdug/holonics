@@ -8,9 +8,10 @@ license.workspace = true
 [features]
 # The certificate's acceptance read: each decision its readings make is compared with the exact
 # products, and a disagreement stops the run (`hnn::tower`, `fewer_bits`).
-certificate-check = []
+certificate-check = ["holonics-engine/certificate-check"]
 
 [dependencies]
+holonics-engine = { path = "../engine" }
 num-rational = { workspace = true }
 num-bigint = { workspace = true }
 num-traits = { workspace = true }

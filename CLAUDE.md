@@ -53,14 +53,16 @@ restore wholesale. [THE_REBUILD](docs/plans/THE_REBUILD.md) gives the order.
 
 | Path | Role |
 |---|---|
+| `crates/engine/` | The engine (package `holonics-engine`): `field`, the law that trains and its host reference, and `inherited`, the items it took from the October machine, each in the file of the module it stood in. It depends on nothing in `crates/holonics` (C3 of #603). |
 | `crates/holonics/` | The main library: the Holon law and its facets, ratio/ring arithmetic, geometry (frames, screws, winding), navigators, receivers, standing and release. The operator layout and HNN campaigns 1–2 are built; the active work is in THE_REBUILD. |
 | `crates/holonics-cuda/` | The CUDA driver and resident HNN realization, advancing with the host laws and checked against their reference. |
 | `lean/` | The Lean package `holonics`: library `Holonics` (the `Framework` closure, the default target) and `HolonicsResearch` (the rest), namespace `Holonics`. |
 | `docs/` | The object and mathematics guides and the canon. The canon is historical doctrine; the elementary objects govern its wording. |
 | `research/` | Dated records (derivations, measurements, lessons), papers, design, notebook. |
 
-The engine, the machine that trains, is `hnn::tower::field` with its card realization
-`holonics-cuda`'s `hnn::field` and the store line's commands. From November 14 the
+The engine, the machine that trains, is `holonics_engine::field` in `crates/engine` (lifted from
+`hnn::tower::field` on November 14, and imported back under that path while `crates/holonics`
+stands) with its card realization `holonics-cuda`'s `hnn::field` and the store line's commands. From November 14 the
 [consolidation](docs/plans/THE_CONSOLIDATION.md) (#603) moves it to `crates/engine`,
 `crates/engine-cuda` and `crates/athena`, cut by object, and retires what no path from it reaches;
 each of its steps updates this table.

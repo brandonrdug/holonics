@@ -61,7 +61,7 @@
 //! ```
 
 mod accumulation;
-pub mod census;
+pub use holonics_engine::inherited::census;
 mod closing;
 mod inverse;
 mod register;

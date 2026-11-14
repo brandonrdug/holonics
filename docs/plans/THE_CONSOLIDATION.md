@@ -398,6 +398,26 @@ laboratory's archive note. No code.
 - A leaf the move would have to edit to keep compiling may retire first, by D6's test.
 - Done when the engine crates build with no dependency on `holonics`, and parity, reproduction and
   timing hold.
+- The host part, read November 14:
+  - `crates/engine` holds `field`, with the items it borrowed moved from where they stood. They are
+    five files (`inherited/{tower,keyed_modes,coupling,context,census}.rs`), not one, because two
+    names stand in two of the files (`reach`, `UNIT_BITS`).
+  - The borrowed items are larger than fact 2 said. The tower's 29 named items reach 45 with their
+    own dependencies (450 lines), and `coupling_code` brings 15 of `coupling.rs`'s items. `fit64`
+    calls the census, so `number/census.rs` moves whole, keeping its counters single.
+- The card part meets two facts the plan missed:
+  - `Card::open` loads the October image (`hnn.ptx`, from `hnn.cu` and its headers) and keeps its
+    module for the October owners' launches.
+  - `DeviceError` carries the October's refusals beside the card's own:
+    - the October's: `OffLattice`, `Word`, `Carrier`, `Malformed`, `Status`, `EpochFlow`,
+      `InverseExact`, `WordExact`, and `Hnn` from `HnnError`;
+    - the card's: `Driver`, `NoKernels`, `Census`, `ForeignBuffer`, `Launch`, `Shape`.
+
+  The card realization reaches neither: it launches only its own image and returns only the card's
+  refusals. So the card part comes in three commits, each held by gate 3:
+  1. the card opens with no image, and the October owners open it with theirs;
+  2. the card's refusals become their own type, into which the October's error converts;
+  3. the move.
 
 **C4. The codec, the region and the passage come in** (the PC; moves only). From `field_train.rs`,
 `store_train.rs` and `hnn/units.rs` into `codec.rs`, `region.rs` and `passage.rs`, bit for bit.
