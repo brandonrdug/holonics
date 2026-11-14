@@ -2822,7 +2822,8 @@ pub(super) fn read_news(args: &[String]) -> Result<()> {
 }
 
 /// [measurement; theory, November 13, P55 part B; the design record of November 13, §4.4] `read-cavity UNITS UNITS_SHA STORE STORE_SHA KEYS KEYS_SHA
-/// CODEC CODEC_SHA PLACES STATE STATE_SHA OUT`: **a held place's news at its cavity opening**, a reading. Each slice of the held role, alone and in the
+/// CODEC CODEC_SHA PLACES STATE STATE_SHA OUT [ROLE]`: **a held place's news at its cavity opening**, a reading (with `ROLE` = `prefix`, the
+/// same reading on the documents the line trains on, G187). Each slice of the held role, alone and in the
 /// store's order, is cut afresh from stretch 1 with the key file's seed (as `read-store` cuts it), whole stretches until at least `PLACES` places.
 /// For each place `t` of a stretch: the stretch as a region with every place written but `t`; `c0`, the face at the built opening with no tick
 /// ([`holonics::hnn::tower::field::Field::opening_face`], on the host) at `t`'s written class; `cK`, the face after the declared ticks by the
@@ -2837,8 +2838,8 @@ pub(super) fn read_news(args: &[String]) -> Result<()> {
 /// 32-bit words a place). The same is read at the open places of each slice's whole masks, as `read-store` cuts them (rows `W`,
 /// `OUT/words_whole.bin`). The output directory is private: it holds no text, but it is the held passage's places.
 pub(super) fn read_cavity(args: &[String], realization: &mut dyn FieldRealization) -> Result<()> {
-    if args.len() != 13 {
-        return Err("read-cavity UNITS UNITS_SHA STORE STORE_SHA KEYS KEYS_SHA CODEC CODEC_SHA PLACES STATE STATE_SHA OUT".into());
+    if args.len() != 13 && args.len() != 14 {
+        return Err("read-cavity UNITS UNITS_SHA STORE STORE_SHA KEYS KEYS_SHA CODEC CODEC_SHA PLACES STATE STATE_SHA OUT [ROLE]".into());
     }
     let started = std::time::Instant::now();
     refuse_variables("read-cavity")?;
@@ -2891,7 +2892,13 @@ pub(super) fn read_cavity(args: &[String], realization: &mut dyn FieldRealizatio
         }
         Ok(())
     };
-    let role = "held";
+    // [measurement; G187] The role read: the held documents by default (the line's reads, every line kept), or `prefix`, the documents the line
+    // trains on, cut and read the same way, so the codes on text the field has met stand beside the codes on text it has not.
+    let role = match args.get(13).map(String::as_str) {
+        None | Some("held") => "held",
+        Some("prefix") => "prefix",
+        Some(other) => return Err(format!("read-cavity reads the held or the prefix role, not {other}").into()),
+    };
     let names = role_names(&counts, role);
     println!("CAVITY_LAW role={role} places={places} least={} octaves={} pairs_bound={} sites_bound={} ticks={} alphabet={} ms={}", law.least, law.octaves, law.pairs, law.sites, learner.field.declaration.ticks, codec.alphabet(), started.elapsed().as_millis());
     const COPY_BOUND: usize = 1022;
