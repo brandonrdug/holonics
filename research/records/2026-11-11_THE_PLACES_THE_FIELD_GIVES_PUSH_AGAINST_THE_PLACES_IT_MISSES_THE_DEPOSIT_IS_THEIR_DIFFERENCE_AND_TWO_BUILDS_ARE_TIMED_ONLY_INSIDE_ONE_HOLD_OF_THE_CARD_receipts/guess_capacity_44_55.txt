@@ -4489,3 +4489,17 @@ one-place masks (G188); at that price a factor 1.273 would buy 0.0097 and 0.0065
   Rule: (a) held: the face's price stands above its cost at four lanes, and the face goes on growing by a lane a lap read this way. (a)
   missed: the face's price has fallen under its cost at four lanes, and growth is read at another part (the contacts, the heads, the level
   above) on the same scale, the third lane kept.
+
+G189 held 2026-11-14T13:45Z, unread: the three-lane line's next thousand sections (its lap 1, the fourth pass's last 1,004 sections, read
+at its MEAN.1004) stood 0.0040 under the two-lane line's lap 9 at one-place masks and 0.0058 over it at whole masks, where G188's window
+stood 0.0086 and 0.0129 under; the lane's means ran 0.9677, 0.9631, 0.9671 one-place and 2.3284, 2.3202, 2.3397 whole. A founding's
+transient would read in G189 as a price, so G189 waits on G190. Its run was stopped before it founded anything.
+
+G190 fixed 2026-11-14T13:43Z (the Opus PC thread), before its read: does the third lane's worth persist past its founding. The
+two-lane line goes on into the fifth pass from its lap-9 end state (next-pass), lap for lap beside the three-lane line, which entered the
+fifth pass from its own end of the fourth; both read the same documents in the same order, and each lap is read at its mean.
+  (a) the three-lane line's first fifth-pass lap stands under the two-lane line's at one-place masks by at least 0.003;
+  (b) the same at whole masks by at least 0.003.
+  Rule: (a) and (b) held: the lane's worth persists, G188's reading stands, and G189 runs. (b) missed: the gain G188 read was mostly the
+  founding's transient where the writer reads, the face's width does not bind there beyond it, and growth is judged only by a lead that
+  lasts a lap past its founding (the lane kept or set aside by that reading).
