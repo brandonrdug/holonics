@@ -1,0 +1,1027 @@
+//! The engine's founding (C5 of #603: cut from `field.rs` by object, each item's text as it stood but for its visibility).
+
+#[allow(unused_imports)]
+use crate::field::*;
+#[allow(unused_imports)]
+use crate::inherited::tower::{affine, covector, deposit_step, div_nearest, exp_series, face_code, fewer_bits_weighed, fit32, fit64, half_turn, on_step_grain, outer_sum, ratio_adjoint, ratio_to_power, reach, refuse, release, toward, transposed, weighed_code, Result, TowerError, TowerFace, FACE_BITS, FIRST_RATE, MATERIAL_BITS, MOVE_BITS, SECOND_RATE};
+#[allow(unused_imports)]
+use crate::inherited::keyed_modes::{ln2_face, log2_face, Exponential};
+#[allow(unused_imports)]
+use rayon::prelude::*;
+
+impl Field {
+
+    pub(crate) fn with_theta(declaration: FieldDeclaration, theta: Vec<i32>) -> Self {
+        let layout = FieldLayout::new(&declaration);
+        let pi = half_turn(MOVE_BITS + 16);
+        let rings: Vec<(usize, Vec<(i64, i64)>)> = ring_periods(declaration.turned_slots(), declaration.reach).into_iter().map(|n| (n, (0..n.min(declaration.reach)).map(|r| ring_phasor(r, n, pi)).collect())).collect();
+        let exponential = Exponential::new(FACE_BITS);
+        let decays = rings.iter().map(|&(n, _)| (0..declaration.reach).map(|d| skin_decay(d, n, pi, &exponential)).collect()).collect();
+        Self { declaration, theta, layout, rings, decays, exponential, fine: Exponential::new(MATERIAL_BITS), pi, scale: None, per_blank_clock: false, bare_stretch: false, mirror_strength: None, mark: None }
+    }
+
+    /// [definition; agent-inferred, November 6] **A field's last `depth` turned ring sets become depth rings**
+    /// ([`FieldDeclaration::depth`]): their increments founded at zero (the rings plain, each a still head's reading with
+    /// frames that can turn), every other parameter kept; a turned head that becomes a ring gives up its clock and its moment.
+    pub fn with_depth(mut self, depth: usize) -> Result<Self> {
+        let declaration = FieldDeclaration { depth, ..self.declaration };
+        declaration.admit()?;
+        let width = declaration.alphabet + 1;
+        for (p, h) in (0..declaration.heads).filter(|&h| declaration.carries_moment(h)).enumerate() {
+            if declaration.is_depth(h) && !self.declaration.is_depth(h) {
+                let base = self.layout.pace + p * width;
+                for v in &mut self.theta[base..base + width] {
+                    *v = 0;
+                }
+            }
+        }
+        self.declaration = declaration;
+        Ok(self)
+    }
+}
+
+impl Field {
+    /// The key draws a growth by `factor` reads, four bytes a draw: `f − 1` a part of each row
+    /// copy's entry of every family the founding opens away from zero (the charts and the pair
+    /// drives).
+    pub fn growth_draws(&self, factor: usize) -> usize {
+        self.declaration.growth_draws(factor)
+    }
+
+    /// [definition; agent-inferred, November 1; November 3, §16.29] **The field widened by `factor`**, by the tower's
+    /// growth law (`hnn::tower::growth`): every face coordinate gets `f` equal copies (the encoding and every face bias
+    /// repeated), every contact repeated, and every matrix entry that reads the face split over its `f` column copies
+    /// into parts that sum to it; a matrix that writes the face (the current's return, the moment's chart, the pair's
+    /// return) has its rows repeated over the face copies, the current's and the moment's columns whole. The heads
+    /// are kept: their charts' rows, biases, moments, clocks and temperatures are the old ones. A part's zero-sum
+    /// difference is the grown founding's draw at its scale (`√(3/fD)` for the charts and pair drives, read from
+    /// `keys` four bytes a draw); the families founded at zero (the returns and the readout) split evenly. Every sum
+    /// the forward forms is then the old sum, so the grown field reads the old faces exactly, and the copies part
+    /// under learning.
+    ///
+    /// Returns the grown field and, for each grown entry, the old entry it carries and whether its
+    /// covector is divided among the copies (every family but the readout's).
+    pub fn grown(&self, factor: usize, keys: &[u8]) -> Result<(Self, Vec<(usize, bool)>)> {
+        if factor < 2 {
+            return refuse("a growth makes at least two copies");
+        }
+        if self.scale.is_some() {
+            return refuse("a tower grows by its levels' lanes, not by copies (the tower record, D2)");
+        }
+        if self.declaration.carry > 0 {
+            return refuse("a field with carry circles grows by lanes, not by copies (a copy would split a circle's scan)");
+        }
+        if self.declaration.triads > 0 {
+            // [theory, November 12, the triad record §4] The triads are founded last; a copy of their charts and return is not built.
+            return refuse("a field with triads grows by no copies (the triads are founded last; their copies are not built)");
+        }
+        let old = self.declaration;
+        let d = old.grown(factor)?;
+        let layout = FieldLayout::new(&d);
+        let (ol, f) = (&self.layout, factor);
+        let (dw, m, fc, a) = (old.width, old.complex(), old.contacts, old.alphabet);
+        let dw2 = d.width;
+        let mut new = vec![0i32; layout.len];
+        let mut from = vec![(0usize, true); layout.len];
+        let mut cursor = 0usize;
+        let mut draw = |scale: Option<(u128, u128)>| -> Result<i128> {
+            let Some((num, den)) = scale else { return Ok(0) };
+            let word = keys.get(cursor..cursor + 4).ok_or(TowerError::Refused("fewer key bytes than the growth draws"))?;
+            cursor += 4;
+            let k = i32::from_be_bytes([word[0], word[1], word[2], word[3]]) as i128;
+            Ok((k * ((num << MATERIAL_BITS) / den) as i128) >> 31)
+        };
+        // A matrix of `rows × cols` (old), its rows mapped by `row_of(b, r)` over `row_copies`
+        // copies and each column's `f` parts placed at `col_of(c, j)` in a row of `new_cols`.
+        let mut split = |old_at: usize, new_at: usize, rows: usize, cols: usize, row_copies: usize, row_of: &dyn Fn(usize, usize) -> usize, new_cols: usize, col_of: &dyn Fn(usize, usize) -> usize, scale: Option<(u128, u128)>, divided: bool| -> Result<()> {
+            for b in 0..row_copies {
+                for r in 0..rows {
+                    let nr = row_of(b, r);
+                    for j in 0..cols {
+                        let v = self.theta[old_at + r * cols + j] as i128;
+                        let (q, rem) = (v.div_euclid(f as i128), v.rem_euclid(f as i128));
+                        let mut spent = 0i128;
+                        for c in 0..f {
+                            let delta = if c + 1 < f { draw(scale)? } else { -spent };
+                            spent += delta;
+                            let at = new_at + nr * new_cols + col_of(c, j);
+                            new[at] = fit32(q + i128::from((c as i128) < rem) + delta, "a grown part outgrew its 32-bit carrier")?;
+                            from[at] = (old_at + r * cols + j, divided);
+                        }
+                    }
+                }
+            }
+            Ok(())
+        };
+        let scale = Some(chart_scale(dw2));
+        // Index maps: a face coordinate's copy `c` at `cD + j`; a contact's at `bf + e`.
+        let face = |c: usize, j: usize| c * dw + j;
+        // A contact is a complex pair (`e`, `f/2 + e`, §15.1): copy `c` of its real part at `c f/2 + e`,
+        // of its imaginary part at `f'/2 + c f/2 + e`, so every copy keeps its pair.
+        let contact = |c: usize, e: usize| if e < fc / 2 { c * (fc / 2) + e } else { f * fc / 2 + c * (fc / 2) + e - fc / 2 };
+        let kept = |_: usize, r: usize| r;
+        // [§16.29] A head's chart reads every face copy (its row kept, each entry split over its column's copies), and the
+        // current returns whole to every face copy (each row repeated, below): every copy of a coordinate stays its source.
+        split(ol.q, layout.q, 2 * m, dw, 1, &kept, dw2, &face, scale, false)?;
+        split(ol.v, layout.v, 2 * m, dw, 1, &kept, dw2, &face, scale, false)?;
+        split(ol.probe, layout.probe, 2 * m, dw, 1, &kept, dw2, &face, scale, false)?;
+        split(ol.a, layout.a, fc, dw, f, &contact, dw2, &face, scale, true)?;
+        split(ol.b, layout.b, fc, dw, f, &contact, dw2, &face, scale, true)?;
+        split(ol.w, layout.w, dw, fc, f, &face, f * fc, &contact, None, true)?;
+        // The current's return and the moment's chart into the face (§16.22) write the face: each row repeated over the
+        // face copies, its columns (the heads' modes, kept) whole, so the grown current and opening are the old ones on
+        // every copy; a copy's covector arrives divided, as the face's does.
+        for (old_at, new_at) in [(ol.out, layout.out), (ol.moment_face, layout.moment_face)] {
+            for b in 0..f {
+                for r in 0..dw {
+                    for k in 0..2 * m {
+                        let at = new_at + face(b, r) * 2 * m + k;
+                        new[at] = self.theta[old_at + r * 2 * m + k];
+                        from[at] = (old_at + r * 2 * m + k, true);
+                    }
+                }
+            }
+        }
+        // [§16.26] The readout's lift reads every face copy and writes the first copy of each coordinate only, each entry split
+        // evenly over its column's copies, its bias the first copy's; the encoding's rows are repeated over the copies, so the
+        // grown face `⟨E′(a), y′⟩ = ⟨E(a), y⟩` exactly, and the copies part under learning.
+        for j in 0..dw {
+            for k in 0..dw {
+                let old_at = ol.read + j * dw + k;
+                let v = self.theta[old_at] as i128;
+                let (q, rem) = (v.div_euclid(f as i128), v.rem_euclid(f as i128));
+                for b in 0..f {
+                    for c in 0..f {
+                        let at = layout.read + face(b, j) * dw2 + face(c, k);
+                        new[at] = if b == 0 { fit32(q + i128::from((c as i128) < rem), "a grown part outgrew its 32-bit carrier")? } else { 0 };
+                        from[at] = (old_at, true);
+                    }
+                }
+            }
+            for b in 0..f {
+                let at = layout.lift_bias + face(b, j);
+                new[at] = if b == 0 { self.theta[ol.lift_bias + j] } else { 0 };
+                from[at] = (ol.lift_bias + j, true);
+            }
+        }
+        // The heads' own families (§16.29: kept, no face coordinate among them): the paces (§16.16), the moment encodings
+        // (§15.1), the temperatures (§15.10) and the charts' biases, each its source's, its covector its source's whole.
+        for (old_at, new_at, len) in [
+            (ol.pace, layout.pace, layout.moment_face - layout.pace),
+            (ol.moment_before, layout.moment_before, layout.moment_after - layout.moment_before),
+            (ol.moment_after, layout.moment_after, layout.temper - layout.moment_after),
+            (ol.temper, layout.temper, 2 * old.heads),
+            (ol.q_bias, layout.q_bias, 2 * m),
+            (ol.v_bias, layout.v_bias, 2 * m),
+            (ol.probe_bias, layout.probe_bias, 2 * m),
+        ] {
+            for i in 0..len {
+                new[new_at + i] = self.theta[old_at + i];
+                from[new_at + i] = (old_at + i, false);
+            }
+        }
+        // Vector families: each entry's copies.
+        let mut repeat = |old_at: usize, new_at: usize, len: usize, copies: usize, index: &dyn Fn(usize, usize) -> usize, divided: bool| {
+            for c in 0..copies {
+                for i in 0..len {
+                    new[new_at + index(c, i)] = self.theta[old_at + i];
+                    from[new_at + index(c, i)] = (old_at + i, divided);
+                }
+            }
+        };
+        for row in 0..=a {
+            repeat(ol.enc + row * dw, layout.enc + row * dw2, dw, f, &face, true);
+            repeat(ol.before + row * dw, layout.before + row * dw2, dw, f, &face, true);
+            repeat(ol.after + row * dw, layout.after + row * dw2, dw, f, &face, true);
+        }
+        repeat(ol.out_bias, layout.out_bias, dw, f, &face, true);
+        repeat(ol.a_bias, layout.a_bias, fc, f, &contact, true);
+        repeat(ol.b_bias, layout.b_bias, fc, f, &contact, true);
+        repeat(ol.w_bias, layout.w_bias, dw, f, &face, true);
+        repeat(ol.read_bias, layout.read_bias, a, 1, &kept, false);
+        repeat(ol.moment_face_bias, layout.moment_face_bias, dw, f, &face, true);
+        Ok((Self::with_theta(d, new), from))
+    }
+
+    /// [definition; agent-inferred, November 4, §16.40] **The field with one more lane** (the tower record, D2): a lane of
+    /// `W` coordinates founded after the others as a founding founds them, the encoding's and the strand contacts' rows of
+    /// every class uniform on `±1` (the unresolved row at zero) and the moment's chart into the lane uniform on `±√(3/2T)`
+    /// at the turned modes, read from `keys` four bytes a draw in that order; every read from the lane (the key, value and
+    /// probe charts' columns, both pair drives' columns, the readout's lift, its rows and its columns) and every other
+    /// write into it (the current's return, the pair contact's return, the biases) at zero. Every old entry keeps its row
+    /// and column in its family. Each old lane's chart is its own ([`lane_chart`]), nothing reads the new lane and nothing
+    /// it is written by reaches a read, so the laned field reads every face exactly as the old one did; and every read
+    /// from the lane has a covector from the first section on (the lane's chart times the read's covector), so the lane
+    /// opens with no copy's symmetry to break (§16.37).
+    ///
+    /// Returns the laned field and, for each entry, the old entry it carries (`None` for the lane's own).
+    pub fn laned(&self, keys: &[u8]) -> Result<(Self, Vec<Option<usize>>)> {
+        if self.declaration.triads > 0 {
+            // [theory, November 12, the triad record §4] The triads are founded last; the lane's columns of their charts are not built.
+            return refuse("a growth in lanes of a field with triads (the triads are founded last; a growth after them is not built)");
+        }
+        let old = self.declaration;
+        let d = old.laned()?;
+        let layout = FieldLayout::new(&d);
+        let ol = &self.layout;
+        let (dw, dw2, m2, fc, a) = (old.width, d.width, 2 * old.complex(), old.contacts, old.alphabet);
+        let mut new = vec![0i32; layout.len];
+        let mut from: Vec<Option<usize>> = vec![None; layout.len];
+        // A block of `rows × cols` (old) placed at the same rows and columns of a block `new_cols` wide.
+        let mut place = |old_at: usize, new_at: usize, rows: usize, cols: usize, new_cols: usize| {
+            for r in 0..rows {
+                for c in 0..cols {
+                    new[new_at + r * new_cols + c] = self.theta[old_at + r * cols + c];
+                    from[new_at + r * new_cols + c] = Some(old_at + r * cols + c);
+                }
+            }
+        };
+        // The reads of the face (its coordinates the columns) and the encodings (a class a row).
+        for (o, n, rows) in [(ol.q, layout.q, m2), (ol.v, layout.v, m2), (ol.probe, layout.probe, m2), (ol.a, layout.a, fc), (ol.b, layout.b, fc), (ol.enc, layout.enc, a + 1), (ol.before, layout.before, a + 1), (ol.after, layout.after, a + 1)] {
+            place(o, n, rows, dw, dw2);
+        }
+        // The writes into the face (its coordinates the rows), and the face's own vectors.
+        for (o, n, cols) in [(ol.out, layout.out, m2), (ol.w, layout.w, fc), (ol.moment_face, layout.moment_face, m2)] {
+            place(o, n, dw, cols, cols);
+        }
+        for (o, n) in [(ol.out_bias, layout.out_bias), (ol.w_bias, layout.w_bias), (ol.moment_face_bias, layout.moment_face_bias), (ol.lift_bias, layout.lift_bias)] {
+            place(o, n, 1, dw, dw);
+        }
+        place(ol.read, layout.read, dw, dw, dw2);
+        // The families with no face coordinate: as they were.
+        for (o, n, len) in [
+            (ol.q_bias, layout.q_bias, m2),
+            (ol.v_bias, layout.v_bias, m2),
+            (ol.probe_bias, layout.probe_bias, m2),
+            (ol.a_bias, layout.a_bias, fc),
+            (ol.b_bias, layout.b_bias, fc),
+            (ol.read_bias, layout.read_bias, a),
+            (ol.moment_before, layout.moment_before, ol.moment_after - ol.moment_before),
+            (ol.moment_after, layout.moment_after, ol.temper - ol.moment_after),
+            (ol.temper, layout.temper, 2 * old.heads),
+            (ol.pace, layout.pace, ol.moment_face - ol.pace),
+        ] {
+            place(o, n, 1, len, len);
+        }
+        // [theory, November 11 17:25] The carry circles' charts read the face as `a` and `b` do (its columns the coordinates): the lane's columns at
+        // zero; their biases as they were.
+        if d.carry > 0 {
+            place(ol.carry, layout.carry, 2 * d.carry, dw, dw2);
+            place(ol.carry_bias, layout.carry_bias, 1, 2 * d.carry, 2 * d.carry);
+        }
+        // [agent-inferred, November 14] The opening's lift reads the charted face as the read block does (`R⁰ r̂ + b⁰`, its rows the lift's
+        // coordinates, its columns the face's): the lane's rows and columns at zero, its bias's lane at zero. The junction's row reads the charted
+        // read (its columns the face's): the lane's columns at zero. The mark's strengths read no coordinate: as they were.
+        if d.opening {
+            place(ol.opening, layout.opening, dw, dw, dw2);
+            place(ol.opening_bias, layout.opening_bias, 1, dw, dw);
+        }
+        if d.junction {
+            place(ol.junction, layout.junction, 1, dw, dw2);
+            place(ol.junction_bias, layout.junction_bias, 1, 1, 1);
+        }
+        if d.mark {
+            place(ol.mark, layout.mark, 1, MARK_BASES, MARK_BASES);
+        }
+        // The lane's founding draws.
+        let mut cursor = 0usize;
+        let mut draw = |num: u128, den: u128, bits: u32| -> Result<i32> {
+            let word = keys.get(cursor..cursor + 4).ok_or(TowerError::Refused("fewer key bytes than the lane's founding reads"))?;
+            cursor += 4;
+            let k = i32::from_be_bytes([word[0], word[1], word[2], word[3]]) as i128;
+            fit32((k * ((num << bits) / den) as i128) >> 31, "a lane's founded value outgrew its 32-bit carrier")
+        };
+        for start in [layout.enc, layout.before, layout.after] {
+            for row in 0..a {
+                for j in dw..dw2 {
+                    new[start + row * dw2 + j] = draw(1, 1, FACE_BITS)?;
+                }
+            }
+        }
+        let tm = old.moment_modes();
+        if tm > 0 {
+            let (three_m, dd_m) = chart_scale(2 * tm);
+            let carries: Vec<bool> = (0..m2).map(|k| old.carries_moment((k % old.complex()) / old.modes)).collect();
+            for o in dw..dw2 {
+                for (k, &on) in carries.iter().enumerate() {
+                    if on {
+                        new[layout.moment_face + o * m2 + k] = draw(three_m, dd_m, MATERIAL_BITS)?;
+                    }
+                }
+            }
+        }
+        debug_assert_eq!(cursor, 4 * old.lane_draws());
+        let mut out = Self::with_theta(d, new);
+        (out.per_blank_clock, out.bare_stretch) = (self.per_blank_clock, self.bare_stretch);
+        // [agent-inferred, November 14] A tower grows the fine level's lanes alone: the level's field is kept, and the glue's reads and writes of
+        // the fine face (`A`'s columns of each harmonic, `B`'s rows and `b_B` of each harmonic) take the lane at zero, so the restriction reads no
+        // lane coordinate and the prolongation writes none, and every face is kept. Each block is harmonic-major (`k D₀ + c`, [`charted`]).
+        if let Some(sc) = &self.scale {
+            let (h, d1) = (sc.harmonics, sc.coarse.declaration.width);
+            let (a0, ab0, b0, bb0, len0) = sc.glue_offsets(dw);
+            let (a1, ab1, b1, bb1, len1) = sc.glue_offsets(dw2);
+            let (old_fine, new_fine, coarse) = (self.theta.len(), layout.len, sc.coarse.theta.len());
+            let mut glue = vec![0i32; len1];
+            from.resize(new_fine, None);
+            from.extend((0..coarse).map(|k| Some(old_fine + k)));
+            let mut gfrom: Vec<Option<usize>> = vec![None; len1];
+            let (og, ng) = (old_fine + coarse, new_fine + coarse);
+            let mut copy = |o: usize, n: usize| {
+                glue[n] = sc.glue[o];
+                gfrom[n] = Some(og + o);
+            };
+            for r in 0..d1 {
+                for k in 0..h {
+                    for c in 0..dw {
+                        copy(a0 + r * h * dw + k * dw + c, a1 + r * h * dw2 + k * dw2 + c);
+                    }
+                }
+            }
+            for r in 0..d1 {
+                copy(ab0 + r, ab1 + r);
+            }
+            for k in 0..h {
+                for c in 0..dw {
+                    for col in 0..d1 {
+                        copy(b0 + (k * dw + c) * d1 + col, b1 + (k * dw2 + c) * d1 + col);
+                    }
+                    copy(bb0 + k * dw + c, bb1 + k * dw2 + c);
+                }
+            }
+            debug_assert_eq!((len0, gfrom.len()), (bb0 + h * dw, len1));
+            debug_assert_eq!(ng, from.len());
+            from.extend(gfrom);
+            out.scale = Some(Box::new(Scale { harmonics: h, split: sc.split, coarse: sc.coarse.clone(), glue }));
+        }
+        Ok((out, from))
+    }
+}
+
+impl Field {
+    /// [definition; theory, November 11 17:25] **The field with `circles` carry circles** ([`FieldDeclaration::carry`]): first the growth by
+    /// `2 circles` pair contacts ([`Field::contacted`], its draws from `keys`), so the circles are the grown field's last `circles` complex
+    /// contacts, their `a` and `b` drawn as a growth draws them, their columns of `W` and their biases at zero; then the circles' charts after
+    /// every family: the turn rows `Q` drawn uniform on `±√(3/D)` at the material's grain from `keys` past the contacts' draws (four bytes a draw,
+    /// the rows in order, as the contacts' drives are drawn), so `q` opens at unit power and a site's turn is a phase of about a radian set by its
+    /// own read; the leak rows `L` and both biases `q_b`, `ℓ_b` at zero, so the leak's log chart reads `ℓ = 0` and `d = d₀ = 1/4` at every site
+    /// ([`carry_friction`], [`CARRY_LEAK_FOUNDING`]) and each circle is founded as a turn with the near field's friction, `|γ| = 4/5`, a group of
+    /// `NEAR − 1` places (founded at `d = 0` the group was unbounded and the first carry lap was refused, [`FieldDeclaration::carry`]), its drive
+    /// coupled at one ([`carry_coupling`]): the chart's zero is the founded friction. Every sum the forward forms into the face is
+    /// then the old sum (the circles' `W` columns are zero), so every face is kept bit for bit; the circles' return has a covector from the
+    /// first section on.
+    ///
+    /// Refused for a tower's levels and for a field that already has carry circles (a plain growth by contacts in such a field is refused
+    /// too, [`FieldDeclaration::contacted`]: the circles stay the last contacts). Returns the grown field and, for each entry, the old entry
+    /// it carries.
+    pub fn with_carry(&self, circles: usize, keys: &[u8]) -> Result<(Self, Vec<Option<usize>>)> {
+        if self.scale.is_some() {
+            return refuse("a tower's levels take carry circles level by level, not through the fine field alone");
+        }
+        if self.declaration.carry > 0 {
+            return refuse("a field that already has carry circles");
+        }
+        if self.declaration.triads > 0 {
+            // [theory, November 12, the triad record §4] The triads' families stand after the circles'; circles grown after them are not built.
+            return refuse("a growth in carry circles of a field with triads (the triads are founded last; a growth after them is not built)");
+        }
+        if circles == 0 {
+            return refuse("a growth by no carry circles");
+        }
+        let (contacted, mut from) = self.contacted(2 * circles, keys)?;
+        let d = FieldDeclaration { carry: circles, ..contacted.declaration };
+        d.admit()?;
+        let layout = FieldLayout::new(&d);
+        let dw = d.width;
+        let mut theta = contacted.theta;
+        debug_assert_eq!(theta.len(), layout.carry);
+        theta.resize(layout.len, 0);
+        from.resize(layout.len, None);
+        let (num, den) = chart_scale(dw);
+        let mut cursor = 4 * self.declaration.contact_draws(2 * circles);
+        for v in theta[layout.carry..layout.carry + circles * dw].iter_mut() {
+            let word = keys.get(cursor..cursor + 4).ok_or(TowerError::Refused("fewer key bytes than the carry circles' founding reads"))?;
+            cursor += 4;
+            let draw = i32::from_be_bytes([word[0], word[1], word[2], word[3]]) as i128;
+            *v = fit32((draw * ((num << MATERIAL_BITS) / den) as i128) >> 31, "a carry circle's founded turn row outgrew its 32-bit carrier")?;
+        }
+        debug_assert_eq!(cursor, 4 * self.declaration.carry_draws(circles));
+        let mut out = Self::with_theta(d, theta);
+        (out.per_blank_clock, out.bare_stretch) = (self.per_blank_clock, self.bare_stretch);
+        Ok((out, from))
+    }
+
+    /// [definition; theory, November 12, the triad record §4] **The field with `triads` triads** ([`FieldDeclaration::triads`]): the triads'
+    /// families after every other ([`FieldLayout::triad`]), every old entry kept at its offset; the charts' rows `A`, `B` and `G` drawn uniform on
+    /// `±√(3/D)` at the material's grain from `keys`, four bytes a draw, the rows in order (`A`, then `B`, then `G`), as a growth in contacts draws
+    /// the drives `a` and `b` ([`Field::contacted`]), so each leg's read opens at unit power; the charts' biases and the return `W_T` at zero. Every
+    /// sum the forward forms into the face is then the old sum (`W_T` is zero, so the one sum `W c + W_T c^T + b_c` is `W c + b_c`), and every face
+    /// is kept bit for bit; at the founding only `W_T` has a covector at first order (`∇_α ℓ = 0` while `W_T = 0`, §3.2), and as `W_T` opens the
+    /// three legs open with it.
+    ///
+    /// Refused for a tower's levels, for a field that already has triads and for none. A growth in contacts, in circles, in lanes or by copies of a
+    /// field with triads is refused too ([`FieldDeclaration::contacted`], [`Field::with_carry`], [`Field::laned`], [`Field::grown`]): the triads
+    /// are founded last, and a growth after them is not built. Returns the grown field and, for each entry, the old entry it carries (`None` for
+    /// the triads' own).
+    pub fn with_triads(&self, triads: usize, keys: &[u8]) -> Result<(Self, Vec<Option<usize>>)> {
+        if self.scale.is_some() {
+            return refuse("a tower's levels take triads level by level, not through the fine field alone");
+        }
+        if self.declaration.triads > 0 {
+            return refuse("a field that already has triads");
+        }
+        if self.declaration.opening {
+            // [agent-inferred, November 13] The opening's lift stands after the triads' families; triads grown after it would move it.
+            return refuse("a field with the opening's lift takes triads before it");
+        }
+        if triads == 0 {
+            return refuse("a growth by no triads");
+        }
+        let d = FieldDeclaration { triads, ..self.declaration };
+        d.admit()?;
+        let layout = FieldLayout::new(&d);
+        let dw = d.width;
+        let mut theta = self.theta.clone();
+        debug_assert_eq!(theta.len(), layout.triad);
+        theta.resize(layout.len, 0);
+        let mut from: Vec<Option<usize>> = (0..self.theta.len()).map(Some).collect();
+        from.resize(layout.len, None);
+        let (num, den) = chart_scale(dw);
+        let mut cursor = 0usize;
+        for v in theta[layout.triad..layout.triad + 6 * triads * dw].iter_mut() {
+            let word = keys.get(cursor..cursor + 4).ok_or(TowerError::Refused("fewer key bytes than the triads' founding reads"))?;
+            cursor += 4;
+            let draw = i32::from_be_bytes([word[0], word[1], word[2], word[3]]) as i128;
+            *v = fit32((draw * ((num << MATERIAL_BITS) / den) as i128) >> 31, "a triad's founded chart row outgrew its 32-bit carrier")?;
+        }
+        debug_assert_eq!(cursor, 4 * self.declaration.triad_draws(triads));
+        let mut out = Self::with_theta(d, theta);
+        (out.per_blank_clock, out.bare_stretch) = (self.per_blank_clock, self.bare_stretch);
+        Ok((out, from))
+    }
+
+    /// [definition; theory, November 13, P60 items 1a and 3] **The field with the opening's lift** ([`FieldDeclaration::opening`]): `R⁰` and `b⁰`
+    /// appended at the end of the material, founded at zero, every standing entry kept at its index; no key is read and the draws do not move.
+    /// With `R⁰ = 0` and `b⁰ = 0` the opening's face is the class biases' alone, and the first covector reaches the block through `δR⁰ = δy⁰ r̂ᵀ`.
+    /// Also the map from each new entry to the old one it copies (`None` for the block). Refused on a tower, and on a field that has it.
+    pub fn with_opening(&self) -> Result<(Self, Vec<Option<usize>>)> {
+        if self.scale.is_some() {
+            return refuse("a tower's levels take the opening's lift level by level, not through the fine field alone");
+        }
+        if self.declaration.opening {
+            return refuse("a field that already has the opening's lift");
+        }
+        let d = FieldDeclaration { opening: true, ..self.declaration };
+        d.admit()?;
+        let layout = FieldLayout::new(&d);
+        let mut theta = self.theta.clone();
+        if theta.len() != layout.opening {
+            return refuse("a field whose material does not end where the opening's lift begins");
+        }
+        theta.resize(layout.len, 0);
+        let mut from: Vec<Option<usize>> = (0..self.theta.len()).map(Some).collect();
+        from.resize(layout.len, None);
+        let mut out = Self::with_theta(d, theta);
+        (out.per_blank_clock, out.bare_stretch) = (self.per_blank_clock, self.bare_stretch);
+        Ok((out, from))
+    }
+
+    /// [definition; theory, November 13, the junction record §7] **The field with the junction's return** ([`FieldDeclaration::junction`]): `L`
+    /// and `ℓ_b` appended at the end of the fine field's material, founded at zero (the matched load, `Γ = 0`), every standing entry kept; no key is
+    /// read and the draws do not move. A tower keeps its level as it stands (its ticks carry no return), and its entries follow the fine field's in
+    /// the material ([`Field::material_len`]). Also the map over the whole material from each new entry to the old one it copies (`None` for the
+    /// chart). Refused on a field that has the return.
+    pub fn with_junction(&self) -> Result<(Self, Vec<Option<usize>>)> {
+        if self.declaration.junction {
+            return refuse("a field that already has the junction's return");
+        }
+        let d = FieldDeclaration { junction: true, ..self.declaration };
+        d.admit()?;
+        let layout = FieldLayout::new(&d);
+        if self.theta.len() != layout.junction {
+            return refuse("a field whose material does not end where the junction's chart begins");
+        }
+        let (fine, total) = (self.theta.len(), self.material_len());
+        let mut theta = self.theta.clone();
+        theta.resize(layout.len, 0);
+        let mut from: Vec<Option<usize>> = (0..fine).map(Some).collect();
+        from.resize(layout.len, None);
+        from.extend((fine..total).map(Some));
+        let mut out = Self::with_theta(d, theta);
+        out.scale = self.scale.clone();
+        (out.per_blank_clock, out.bare_stretch) = (self.per_blank_clock, self.bare_stretch);
+        Ok((out, from))
+    }
+
+    /// [definition; agent-inferred, November 14, the ring record §4] **The field that reads twice** ([`FieldDeclaration::mark`]): the mark's
+    /// strengths `α_b` appended at the end of the fine field's material, founded at zero, every standing entry kept; no key is read and the
+    /// draws do not move. At zero the second read opens every silent site on its open row, so every face is the source's bit for bit. A tower
+    /// keeps its level as it stands (it reads with the fine field). Also the map over the whole material from each new entry to the old one it
+    /// copies (`None` for the strengths). Refused on a field that reads twice.
+    pub fn with_mark(&self) -> Result<(Self, Vec<Option<usize>>)> {
+        if self.declaration.mark {
+            return refuse("a field that already reads twice");
+        }
+        let d = FieldDeclaration { mark: true, ..self.declaration };
+        d.admit()?;
+        let layout = FieldLayout::new(&d);
+        if self.theta.len() != layout.mark {
+            return refuse("a field whose material does not end where the mark's strengths begin");
+        }
+        let (fine, total) = (self.theta.len(), self.material_len());
+        let mut theta = self.theta.clone();
+        theta.resize(layout.len, 0);
+        let mut from: Vec<Option<usize>> = (0..fine).map(Some).collect();
+        from.resize(layout.len, None);
+        from.extend((fine..total).map(Some));
+        let mut out = Self::with_theta(d, theta);
+        out.scale = self.scale.clone();
+        (out.per_blank_clock, out.bare_stretch) = (self.per_blank_clock, self.bare_stretch);
+        Ok((out, from))
+    }
+
+    /// [definition; theory, November 12 (the record of the opening's room, §4 item 4; corrected 18:44Z: the founding reads no key)]
+    /// **The field with `fresh` more letters**, founded at a passage's crossing: the fresh classes follow the standing ones, so every
+    /// standing class keeps its index (the void's included, wherever the codec holds it), and the open row (the unresolved operand,
+    /// row `A` of each family with one) moves to the end of its family, row `A + F`. A fresh class's rows of the encoding `E`, of the two
+    /// strand encodings `E₋` and `E₊`, of the two moment encodings and of each paced head's pace open at zero, and its class bias `c_a` at the
+    /// least class bias the standing classes hold. Every other family is copied as it stands.
+    ///
+    /// Why at zero (the record, §4 item 4): the face reads a class through the encoding that encodes it, `z(a) = ⟨E(a), R r̂ + b_R⟩ + c_a`,
+    /// and a site's opening face is a sum of rows, `x⁰_t = E(u_t) + E₋(u_(t−1)) + E₊(u_(t+1))` and its moment's term. Every reader here is
+    /// trained, so a drawn row would read each fresh letter at a random height at every face and be heard beside it as a letter it is not.
+    /// At zero a fresh letter reads `c_a` at every face, the share the least-favoured standing letter is given, and its rows take their
+    /// covector from the first face compared and the first place the letter stands at or beside; the sum has no product of two fresh rows.
+    /// A fresh pace row at zero is the founding's pace, the strand's own clock (agent-inferred: the paces are founded at zero, and the
+    /// record names no other opening for them). The readout's map is kept for every lift: `z(a)` at a standing class is its value before,
+    /// entry for entry, and at a fresh class it is the least bias. The whole forward on a region of standing classes keeps every face's
+    /// standing logits only where no head is paced: on a paced head a blank between arrivals runs at `κ = 1 + Σ_a p_a c[a]` over its own
+    /// face, which the fresh classes' share at the least bias moves, so there the faces move by the founding's price (the record §4 item 4;
+    /// the price at a face owed to #410).
+    ///
+    /// No key is read. Refused for a tower's levels. `fresh = 0` returns the field as it stands. Returns the grown field and, for each
+    /// entry, the old entry it carries (`None` for a fresh class's own).
+    pub fn lettered(&self, fresh: usize) -> Result<(Self, Vec<Option<usize>>)> {
+        if self.scale.is_some() {
+            return refuse("a tower's levels take letters level by level, not through the fine field alone");
+        }
+        let old = self.declaration;
+        let d = old.lettered(fresh)?;
+        let layout = FieldLayout::new(&d);
+        let ol = &self.layout;
+        let (a, a2, dw, tm2, paced) = (old.alphabet, d.alphabet, old.width, 2 * old.moment_modes(), old.paced_heads());
+        let mut new = vec![0i32; layout.len];
+        let mut from: Vec<Option<usize>> = vec![None; layout.len];
+        // Where an old row of a family with one row a class lands: a class keeps its index, the open row (index `A`) moves to `A + F`.
+        let row = |r: usize| if r < a { r } else { a2 };
+        let mut place = |o: usize, n: usize| {
+            new[n] = self.theta[o];
+            from[n] = Some(o);
+        };
+        // The families with a row a class and the open row: the encodings, the moment encodings.
+        for (o, n, width) in [(ol.enc, layout.enc, dw), (ol.before, layout.before, dw), (ol.after, layout.after, dw), (ol.moment_before, layout.moment_before, tm2), (ol.moment_after, layout.moment_after, tm2)] {
+            for r in 0..=a {
+                for j in 0..width {
+                    place(o + r * width + j, n + row(r) * width + j);
+                }
+            }
+        }
+        // The paces: each paced head's rate a class and the open row.
+        for p in 0..paced {
+            for r in 0..=a {
+                place(ol.pace + p * (a + 1) + r, layout.pace + p * (a2 + 1) + row(r));
+            }
+        }
+        // The class biases: each standing class at its index; the fresh at the least the standing hold.
+        for c in 0..a {
+            place(ol.read_bias + c, layout.read_bias + c);
+        }
+        // The families no class indexes, in their three stretches of the layout: the charts from `q` to the lift, the temperatures and the
+        // probe chart, and the moment's chart into the face with every family after it.
+        for (o_from, o_to, n_from) in [(ol.q, ol.read_bias, layout.q), (ol.temper, ol.pace, layout.temper), (ol.moment_face, ol.len, layout.moment_face)] {
+            for k in 0..o_to - o_from {
+                place(o_from + k, n_from + k);
+            }
+        }
+        let least = self.theta[ol.read_bias..ol.read_bias + a].iter().copied().min().unwrap_or(0);
+        new[layout.read_bias + a..layout.read_bias + a2].fill(least);
+        // [theory, November 12, P49] The two coverage checks are refusals: a growth is rare, and a release build must not pass a family it
+        // missed (the stretches no class indexes keep their lengths, and every standing entry is carried once).
+        if (layout.read_bias - layout.q, layout.pace - layout.temper, layout.len - layout.moment_face) != (ol.read_bias - ol.q, ol.pace - ol.temper, ol.len - ol.moment_face) {
+            return refuse("a growth by letters whose families no class indexes changed their lengths");
+        }
+        if from.iter().filter(|o| o.is_some()).count() != self.theta.len() {
+            return refuse("a growth by letters that did not carry every standing entry once");
+        }
+        let mut out = Self::with_theta(d, new);
+        (out.per_blank_clock, out.bare_stretch) = (self.per_blank_clock, self.bare_stretch);
+        Ok((out, from))
+    }
+
+    /// [definition; theory, November 10 09:55] **The field with `added` more pair contacts** (the merge's `c = (aᵀs)(bᵀx)`
+    /// joined to the face by `W`): the new contacts' `a` and `b` rows are the pair drives, drawn as a founding of this
+    /// declaration draws them, uniform on `±√(3/D)` at the material's grain, read from `keys` four bytes a draw (the new set's
+    /// rows in order, `a` then `b`); every family that writes the face from the contacts (the pair's return `W`, and in an
+    /// energy field the contraction `c`) takes the new contacts' columns at zero, and the contacts' biases open at zero as a
+    /// founding opens them. Every sum the forward forms is then the old sum, so every face is kept bit for bit; the new
+    /// contacts have a covector from the first section on (`W`'s new columns read the new `c`; the drives learn once `W` moves).
+    ///
+    /// The contacts are complex pairs (`e`, `f/2 + e`): the real parts then the imaginary parts, so the old contacts keep
+    /// their pair and strand side (`e` even reads the site before, odd the one after) at the same indices within each half,
+    /// and the new ones follow them in each half. The heads, the lanes and everything else are copied family by family.
+    ///
+    /// Returns the grown field and, for each entry, the old entry it carries (`None` for a new contact's own).
+    pub fn contacted(&self, added: usize, keys: &[u8]) -> Result<(Self, Vec<Option<usize>>)> {
+        if self.scale.is_some() {
+            return refuse("a tower's levels grow their contacts level by level, not through the fine field alone");
+        }
+        let old = self.declaration;
+        let d = old.contacted(added)?;
+        let layout = FieldLayout::new(&d);
+        let ol = &self.layout;
+        let (dw, fc, f2) = (old.width, old.contacts, d.contacts);
+        let mut new = vec![0i32; layout.len];
+        let mut from: Vec<Option<usize>> = vec![None; layout.len];
+        // Contact `e` of the old set at its index in the grown: a real part keeps its place, an imaginary part moves past the new
+        // real parts. The new contact `k` (of `added`) follows its half's old contacts.
+        let kept = |e: usize| if e < fc / 2 { e } else { f2 / 2 + e - fc / 2 };
+        let fresh = |k: usize| if k < added / 2 { fc / 2 + k } else { f2 / 2 + fc / 2 + k - added / 2 };
+        if ol.families.len() != layout.families.len() {
+            return refuse("a growth in contacts that changes the families");
+        }
+        // The families that read or write the face through a contact, by their old start: the pair drives (a contact a row),
+        // their biases, the pair's return (a contact a column) and the energy's contraction.
+        let drives = [(ol.a, layout.a), (ol.b, layout.b)];
+        for (&(os, ol_len, _), &(ns, nl_len, _)) in ol.families.iter().zip(&layout.families) {
+            if let Some(&(_, ns)) = drives.iter().find(|&&(o, _)| o == os) {
+                for e in 0..fc {
+                    for j in 0..dw {
+                        new[ns + kept(e) * dw + j] = self.theta[os + e * dw + j];
+                        from[ns + kept(e) * dw + j] = Some(os + e * dw + j);
+                    }
+                }
+            } else if os == ol.a_bias || os == ol.b_bias || false {
+                for e in 0..fc {
+                    new[ns + kept(e)] = self.theta[os + e];
+                    from[ns + kept(e)] = Some(os + e);
+                }
+            } else if os == ol.w {
+                for r in 0..dw {
+                    for e in 0..fc {
+                        new[ns + r * f2 + kept(e)] = self.theta[os + r * fc + e];
+                        from[ns + r * f2 + kept(e)] = Some(os + r * fc + e);
+                    }
+                }
+            } else {
+                if ol_len != nl_len {
+                    return refuse("a family that changes its length with the contacts but is not one they index");
+                }
+                for i in 0..ol_len {
+                    new[ns + i] = self.theta[os + i];
+                    from[ns + i] = Some(os + i);
+                }
+            }
+        }
+        // The new contacts' drives: a founding's draws at the grown width's scale, the new set's rows in order.
+        let (num, den) = chart_scale(dw);
+        let mut cursor = 0usize;
+        for start in [layout.a, layout.b] {
+            for k in 0..added {
+                for j in 0..dw {
+                    let word = keys.get(cursor..cursor + 4).ok_or(TowerError::Refused("fewer key bytes than the new contacts' founding reads"))?;
+                    cursor += 4;
+                    let draw = i32::from_be_bytes([word[0], word[1], word[2], word[3]]) as i128;
+                    new[start + fresh(k) * dw + j] = fit32((draw * ((num << MATERIAL_BITS) / den) as i128) >> 31, "a new contact's founded value outgrew its 32-bit carrier")?;
+                }
+            }
+        }
+        debug_assert_eq!(cursor, 4 * old.contact_draws(added));
+        { let mut grown = Self::with_theta(d, new); (grown.per_blank_clock, grown.bare_stretch) = (self.per_blank_clock, self.bare_stretch); Ok((grown, from)) }
+    }
+}
+
+impl FieldLearner {
+
+    /// [definition; agent-inferred, November 1] **The learner widened** ([`Field::grown`]), its
+    /// differences read from the founding key stream past every draw read before, and its moments
+    /// lifted as the tower's are: split evenly, each grown coordinate's covector at the growth
+    /// point is the old one divided among its `f` copies and the readout's the old one, so a grown
+    /// coordinate carries `m/f` and `v/f²`, the readout `m` and `v`, and opens on the old
+    /// normalized step. Each copy then steps as the old coordinate did, and the `f` copies of a
+    /// sum move together, so the rate falls by `⌈log₂ f⌉` bits: the field's step stays the old one.
+    /// A learner holding a step is refused: the step is read first ([`FieldLearner::read_step_on`]).
+    pub fn widened(&self, factor: usize, keys: &[u8]) -> Result<Self> {
+        if self.held.is_some() {
+            return refuse("a learner widens after its held step is read");
+        }
+        let rest = keys.get(self.drawn..).ok_or(TowerError::Refused("fewer key bytes than the growth draws"))?;
+        let (field, from) = self.field.grown(factor, rest)?;
+        let (f, f2) = (factor as i128, (factor * factor) as i128);
+        let first = from.iter().map(|&(i, divided)| if divided { div_nearest(self.first[i], f) } else { self.first[i] }).collect();
+        let second = from.iter().map(|&(i, divided)| if divided { div_nearest(self.second[i], f2) } else { self.second[i] }).collect();
+        let drawn = self.drawn + 4 * self.field.growth_draws(factor);
+        let rate_bits = self.rate_bits + (usize::BITS - (factor - 1).leading_zeros());
+        Ok(Self { field, first, second, rate_bits, drawn, laps: self.laps, held: None, read_held: self.read_held, rate_parts: None, own_rates: None, last: None, pass: self.pass.clone() })
+    }
+
+    /// [definition; agent-inferred, November 4, §16.40] **The learner with one more lane** ([`Field::laned`]), the lane's
+    /// draws read from the founding key stream past every draw read before. Every old entry keeps its moments; each of the
+    /// lane's entries opens on its family's statistics, its first moment at zero and its second at the mean of its
+    /// family's old second moments (a family no covector has reached opens at zero, at its own first covector, as a
+    /// founding's entries do). The rate is kept: no coordinate is shared among copies, so each steps as it did.
+    ///
+    /// Why the family's statistics and not the founding's opening: an entry opened at its first covector takes the
+    /// largest normalized step, `2^(grain − rate)` with the covector's sign, and every read from a fresh lane opens at
+    /// once and in agreement, so the lane moved the trained keys, values and drives together by about a tenth of their
+    /// unit a section. Measured from run41's alone state grown to `D 512` (`_receipts/law44/probe_founding.txt`): 208
+    /// halvings over 212 sections against the alone arm's one, 166 of 212 deposited, the sections' code before their step
+    /// 1.628 bits a byte against 1.470, and the withheld code 0.268 to 0.294 bits a site in half a lap. Opened on its
+    /// family's second moment, a lane entry's first step is an eighth of its covector over the family's own scale, the
+    /// step the trained entries beside it take; on the same state (`probe_family.txt`): 169 halvings over 219 sections,
+    /// 211 deposited, the withheld code 0.268 to 0.286. Smaller, not gone: the lane's covectors stay coherent, so its steps
+    /// grow toward the full normalized size as its first moments fill.
+    pub fn laned(&self, keys: &[u8]) -> Result<Self> {
+        if self.held.is_some() {
+            return refuse("a learner grows a lane after its held step is read");
+        }
+        let rest = keys.get(self.drawn..).ok_or(TowerError::Refused("fewer key bytes than the lane's draws"))?;
+        let (field, from) = self.field.laned(rest)?;
+        let first = from.iter().map(|o| o.map_or(0, |i| self.first[i])).collect();
+        let mut second: Vec<i128> = from.iter().map(|o| o.map_or(0, |i| self.second[i])).collect();
+        for &(start, len, _) in field.families_all().iter() {
+            let old: Vec<i128> = (start..start + len).filter_map(|k| from[k].map(|i| self.second[i])).collect();
+            if old.len() == len || old.is_empty() {
+                continue;
+            }
+            // The mean term by term (each second moment is under `2^126`, so a family's sum is not formed).
+            let n = old.len() as i128;
+            let mean = old.iter().map(|v| v / n).sum::<i128>() + old.iter().map(|v| v % n).sum::<i128>() / n;
+            for k in (start..start + len).filter(|&k| from[k].is_none()) {
+                second[k] = mean;
+            }
+        }
+        let drawn = self.drawn + 4 * self.field.declaration.lane_draws();
+        // [agent-inferred, November 14] The founded parts' rates are kept (the lane's entries join the lane parts, [`Field::founded_parts`]), and
+        // where the learner carries each entry's own rate every standing entry keeps it and a lane entry takes `rate_bits`.
+        let own_rates = self.own_rates.as_ref().map(|own| from.iter().map(|o| o.map_or(self.rate_bits, |i| own[i])).collect());
+        Ok(Self { field, first, second, rate_bits: self.rate_bits, drawn, laps: self.laps, held: None, read_held: self.read_held, rate_parts: self.rate_parts, own_rates, last: None, pass: self.pass.clone() })
+    }
+
+    /// [definition; theory, November 11 17:25] **The learner with `circles` carry circles** ([`Field::with_carry`]), the circles' draws read from
+    /// the founding key stream past every draw read before. Every old entry keeps its moments and its remainder; the circles' contacts' entries
+    /// open as a growth in contacts opens them ([`FieldLearner::contacted`]: the first moments at zero, the second at the mean of their family's
+    /// old second moments), and the circles' charts' moments at zero (a family with no old entry). The draws advance past the contacts' and
+    /// the turn rows'. The founded parts' rates are kept, the circles' parts at the old rate (octaves 0), so the parts line goes on telling the
+    /// contacts before the last plain growth; the held step and the last section's step, of the old layout, are dropped.
+    pub fn with_carry(&self, circles: usize, keys: &[u8]) -> Result<Self> {
+        if self.held.is_some() {
+            return refuse("a learner takes carry circles after its held step is read");
+        }
+        let rest = keys.get(self.drawn..).ok_or(TowerError::Refused("fewer key bytes than the carry circles' draws"))?;
+        let (field, from) = self.field.with_carry(circles, rest)?;
+        let first = from.iter().map(|o| o.map_or(0, |i| self.first[i])).collect();
+        let mut second: Vec<i128> = from.iter().map(|o| o.map_or(0, |i| self.second[i])).collect();
+        for &(start, len, _) in field.families_all().iter() {
+            let old: Vec<i128> = (start..start + len).filter_map(|k| from[k].map(|i| self.second[i])).collect();
+            if old.len() == len || old.is_empty() {
+                continue;
+            }
+            // The mean term by term (each second moment is under `2^126`, so a family's sum is not formed).
+            let n = old.len() as i128;
+            let mean = old.iter().map(|v| v / n).sum::<i128>() + old.iter().map(|v| v % n).sum::<i128>() / n;
+            for k in (start..start + len).filter(|&k| from[k].is_none()) {
+                second[k] = mean;
+            }
+        }
+        let drawn = self.drawn + 4 * self.field.declaration.carry_draws(circles);
+        Ok(Self { field, first, second, rate_bits: self.rate_bits, drawn, laps: self.laps, held: None, read_held: self.read_held, rate_parts: self.rate_parts, own_rates: None, last: None, pass: self.pass.clone() })
+    }
+
+    /// [definition; theory, November 12, the triad record §4] **The learner with `triads` triads** ([`Field::with_triads`]), the triads' draws read
+    /// from the founding key stream past every draw read before (`6 J D` draws, four bytes a draw). Every old entry keeps its moments and its
+    /// remainder. The triads' first moments open at zero, and their second moments at the mean of their counterparts' old second moments: the
+    /// charts `A`, `B` and `G` at the mean over the pair drives `a` and `b`, the charts' biases at the mean over the drives' biases, and `W_T` at the
+    /// mean over `W`. Reason (`agent-inferred`, from the growth in contacts' law, [`FieldLearner::contacted`]): a new entry's first step is then its
+    /// covector over its family's scale, the step a trained entry takes, and never the largest normalized step of a fresh entry; the triad's charts
+    /// and return are the drives' and `W`'s counterparts with one operand more. The draws advance by `4 · 6 J D` bytes. The founded parts' rates are
+    /// kept, the triad's part at octave 0 (the base rate), and where the learner carries each entry's own rate ([`FieldLearner::own_rates`]) every
+    /// old entry keeps it and the triads' entries take the base rate, the rate their part's octave 0 gives. Reason for keeping them
+    /// (`agent-inferred`, from the record of November 11 on a build entering a line): a growth that keeps every face and every moment keeps every
+    /// old entry's rate too, since a state tool that left the part rates behind once made every part train at the base rate with nothing refused.
+    /// The held step and the last section's step, of the old layout, are dropped. Refused while a step is held.
+    pub fn with_triads(&self, triads: usize, keys: &[u8]) -> Result<Self> {
+        if self.held.is_some() {
+            return refuse("a learner takes triads after its held step is read");
+        }
+        let rest = keys.get(self.drawn..).ok_or(TowerError::Refused("fewer key bytes than the triads' draws"))?;
+        let (field, from) = self.field.with_triads(triads, rest)?;
+        let first = from.iter().map(|o| o.map_or(0, |i| self.first[i])).collect();
+        let mut second: Vec<i128> = from.iter().map(|o| o.map_or(0, |i| self.second[i])).collect();
+        let (old, new) = (&self.field.layout, &field.layout);
+        let (dw, f, j2, j6) = (self.field.declaration.width, self.field.declaration.contacts, 2 * triads, 6 * triads);
+        // The mean term by term over the counterparts' old second moments (each under `2^126`, so a family's sum is not formed); zero where no
+        // covector has reached them, as a founding's entries open.
+        let mean = |ranges: &[(usize, usize)]| -> i128 {
+            let values: Vec<i128> = ranges.iter().flat_map(|&(start, len)| self.second[start..start + len].iter().copied()).collect();
+            if values.is_empty() {
+                return 0;
+            }
+            let n = values.len() as i128;
+            values.iter().map(|v| v / n).sum::<i128>() + values.iter().map(|v| v % n).sum::<i128>() / n
+        };
+        second[new.triad..new.triad + j6 * dw].fill(mean(&[(old.a, f * dw), (old.b, f * dw)]));
+        second[new.triad_bias..new.triad_bias + j6].fill(mean(&[(old.a_bias, f), (old.b_bias, f)]));
+        second[new.w_triad..new.w_triad + dw * j2].fill(mean(&[(old.w, dw * f)]));
+        let rate_parts = self.rate_parts.map(|rp| {
+            let mut octaves = rp.octaves;
+            octaves[TRIAD_PART] = 0;
+            RateParts { octaves, ..rp }
+        });
+        let own_rates = self.own_rates.as_ref().map(|own| {
+            let mut rates = own.clone();
+            rates.resize(field.material_len(), self.rate_bits);
+            rates
+        });
+        let drawn = self.drawn + 4 * self.field.declaration.triad_draws(triads);
+        Ok(Self { field, first, second, rate_bits: self.rate_bits, drawn, laps: self.laps, held: None, read_held: self.read_held, rate_parts, own_rates, last: None, pass: self.pass.clone() })
+    }
+
+    /// [definition; theory, November 13, P60 items 1f and 3] **The learner with the opening's lift** ([`Field::with_opening`]), founded at zero.
+    /// Every standing entry keeps its moments, its remainder and its rate; the block's first moments open at zero and its second at the mean of
+    /// its counterpart's standing second moments (`R⁰` the readout's lift `R`, `b⁰` the lift's bias `b_R`), as a growth opens a new block's
+    /// ([`FieldLearner::with_triads`]), so its first step is its covector over its counterpart's scale. Its rate: the founded parts' rates are kept
+    /// and the opening's part takes octave 0, what a newly grown block takes in this line (the triads took it); where the learner carries each
+    /// entry's own rate, every standing entry keeps it and the block's entries take `rate_bits`. The draws, the laps and the pass are kept; the
+    /// held step and the last section's step, of the old layout, are dropped. Refused while a step is held.
+    pub fn with_opening(&self) -> Result<Self> {
+        if self.held.is_some() {
+            return refuse("a learner takes the opening's lift after its held step is read");
+        }
+        let (field, from) = self.field.with_opening()?;
+        let first = from.iter().map(|o| o.map_or(0, |i| self.first[i])).collect();
+        let mut second: Vec<i128> = from.iter().map(|o| o.map_or(0, |i| self.second[i])).collect();
+        let (old, new, dw) = (&self.field.layout, &field.layout, self.field.declaration.width);
+        let mean = |start: usize, len: usize| -> i128 {
+            let values = &self.second[start..start + len];
+            if values.is_empty() {
+                return 0;
+            }
+            let n = values.len() as i128;
+            values.iter().map(|v| v / n).sum::<i128>() + values.iter().map(|v| v % n).sum::<i128>() / n
+        };
+        second[new.opening..new.opening + dw * dw].fill(mean(old.read, dw * dw));
+        second[new.opening_bias..new.opening_bias + dw].fill(mean(old.lift_bias, dw));
+        let rate_parts = self.rate_parts.map(|rp| {
+            let mut octaves = rp.octaves;
+            octaves[OPENING_PART] = 0;
+            RateParts { octaves, ..rp }
+        });
+        let own_rates = self.own_rates.as_ref().map(|own| {
+            let mut rates = own.clone();
+            rates.resize(field.material_len(), self.rate_bits);
+            rates
+        });
+        Ok(Self { field, first, second, rate_bits: self.rate_bits, drawn: self.drawn, laps: self.laps, held: None, read_held: self.read_held, rate_parts, own_rates, last: None, pass: self.pass.clone() })
+    }
+
+    /// [definition; theory, November 13, the junction record §7] **The learner with the junction's return** ([`Field::with_junction`]), founded at
+    /// the matched load. Every standing entry keeps its moments, its remainder and its rate. The chart's first moments open at zero and its second
+    /// at the mean of its counterpart's standing second moments, as a growth opens a new block's ([`FieldLearner::with_opening`]): `L` and `ℓ_b`
+    /// read the site's chart as the carry circles' leak chart and its biases do, and where the field has no circles as the pair drive `a` and its
+    /// biases do (agent-inferred: the nearest block that reads the same chart into one real a site). Its rate: the founded parts' rates are kept
+    /// and the junction's part takes octave 0, what a newly grown block takes in this line; where the learner carries each entry's own rate, every
+    /// standing entry keeps it and the chart's entries take `rate_bits`. The draws, the laps and the pass are kept; the held step and the last
+    /// section's step are dropped. Refused while a step is held.
+    pub fn with_junction(&self) -> Result<Self> {
+        if self.held.is_some() {
+            return refuse("a learner takes the junction's return after its held step is read");
+        }
+        let (field, from) = self.field.with_junction()?;
+        let first = from.iter().map(|o| o.map_or(0, |i| self.first[i])).collect();
+        let mut second: Vec<i128> = from.iter().map(|o| o.map_or(0, |i| self.second[i])).collect();
+        let (old, new, d) = (&self.field.layout, &field.layout, self.field.declaration);
+        let dw = d.width;
+        let mean = |start: usize, len: usize| -> i128 {
+            let values = &self.second[start..start + len];
+            if values.is_empty() {
+                return 0;
+            }
+            let n = values.len() as i128;
+            values.iter().map(|v| v / n).sum::<i128>() + values.iter().map(|v| v % n).sum::<i128>() / n
+        };
+        let (rows, biases) = if d.carry > 0 { ((old.carry + d.carry * dw, d.carry * dw), (old.carry_bias + d.carry, d.carry)) } else { ((old.a, d.contacts * dw), (old.a_bias, d.contacts)) };
+        second[new.junction..new.junction + dw].fill(mean(rows.0, rows.1));
+        second[new.junction_bias] = mean(biases.0, biases.1);
+        let rate_parts = self.rate_parts.map(|rp| {
+            let mut octaves = rp.octaves;
+            octaves[JUNCTION_PART] = 0;
+            RateParts { octaves, ..rp }
+        });
+        let own_rates = self.own_rates.as_ref().map(|own| from.iter().map(|o| o.map_or(self.rate_bits, |i| own[i])).collect());
+        Ok(Self { field, first, second, rate_bits: self.rate_bits, drawn: self.drawn, laps: self.laps, held: None, read_held: self.read_held, rate_parts, own_rates, last: None, pass: self.pass.clone() })
+    }
+
+    /// [definition; agent-inferred, November 14, the ring record §4] **The learner that reads twice** ([`Field::with_mark`]), its strengths
+    /// founded at zero. Every standing entry keeps its moments, its remainder and its rate. The strengths' moments open at zero, so each opens at
+    /// its own first nonzero covector (the deposit's law for a coordinate with no history): a strength's covector sums a pairing over every
+    /// marked site and coordinate, and no standing block's second moment is its scale (agent-inferred). Its rate: the founded parts' rates are
+    /// kept and the mark's part takes octave 0, what a newly grown block takes in this line; where the learner carries each entry's own rate,
+    /// every standing entry keeps it and the strengths take `rate_bits`. The draws, the laps and the pass are kept; the held step and the last
+    /// section's step are dropped. Refused while a step is held.
+    pub fn with_mark(&self) -> Result<Self> {
+        if self.held.is_some() {
+            return refuse("a learner reads twice after its held step is read");
+        }
+        let (field, from) = self.field.with_mark()?;
+        let first = from.iter().map(|o| o.map_or(0, |i| self.first[i])).collect();
+        let second = from.iter().map(|o| o.map_or(0, |i| self.second[i])).collect();
+        let rate_parts = self.rate_parts.map(|rp| {
+            let mut octaves = rp.octaves;
+            octaves[MARK_PART] = 0;
+            RateParts { octaves, ..rp }
+        });
+        let own_rates = self.own_rates.as_ref().map(|own| from.iter().map(|o| o.map_or(self.rate_bits, |i| own[i])).collect());
+        Ok(Self { field, first, second, rate_bits: self.rate_bits, drawn: self.drawn, laps: self.laps, held: None, read_held: self.read_held, rate_parts, own_rates, last: None, pass: self.pass.clone() })
+    }
+
+    /// [definition; theory, November 12 (the record of the opening's room, §4 item 4)] **The learner with `fresh` more letters**
+    /// ([`Field::lettered`]), founded at a passage's crossing. No key is read and the draws do not move. Every standing entry keeps its
+    /// moments and its remainder (the open rows' with them, at their new place); a fresh entry's first moment opens at zero and its second
+    /// at the mean of its family's standing second moments, as a growth in contacts opens a new contact's ([`FieldLearner::contacted`]), so its
+    /// first step is its covector over its family's own scale and never the largest normalized step of a fresh entry. The founded parts'
+    /// rates are kept, and where the learner carries each entry's own rate ([`FieldLearner::own_rates`]) every standing entry keeps it and a
+    /// fresh one takes `rate_bits`. The held step and the last section's step, of the old layout, are dropped; the pass is kept. Refused while
+    /// a step is held.
+    pub fn lettered(&self, fresh: usize) -> Result<Self> {
+        if self.held.is_some() {
+            return refuse("a learner takes letters after its held step is read");
+        }
+        let (field, from) = self.field.lettered(fresh)?;
+        let first = from.iter().map(|o| o.map_or(0, |i| self.first[i])).collect();
+        let mut second: Vec<i128> = from.iter().map(|o| o.map_or(0, |i| self.second[i])).collect();
+        for &(start, len, _) in field.families_all().iter() {
+            let old: Vec<i128> = (start..start + len).filter_map(|k| from[k].map(|i| self.second[i])).collect();
+            if old.len() == len || old.is_empty() {
+                continue;
+            }
+            // The mean term by term (each second moment is under `2^126`, so a family's sum is not formed).
+            let n = old.len() as i128;
+            let mean = old.iter().map(|v| v / n).sum::<i128>() + old.iter().map(|v| v % n).sum::<i128>() / n;
+            for k in (start..start + len).filter(|&k| from[k].is_none()) {
+                second[k] = mean;
+            }
+        }
+        let own_rates = self.own_rates.as_ref().map(|own| from.iter().map(|o| o.map_or(self.rate_bits, |i| own[i])).collect());
+        Ok(Self { field, first, second, rate_bits: self.rate_bits, drawn: self.drawn, laps: self.laps, held: None, read_held: self.read_held, rate_parts: self.rate_parts, own_rates, last: None, pass: self.pass.clone() })
+    }
+
+    /// [definition; theory, November 10 09:55] **The learner with `added` more pair contacts** ([`Field::contacted`]), the
+    /// contacts' draws read from the founding key stream past every draw read before. Every old entry keeps its moments and its
+    /// remainder, and the families' lengths (the families are the same ones); each new contact's entries open on the moments the
+    /// lane's open on ([`FieldLearner::laned`]): the first at zero, the second at the mean of the family's old second moments, so a
+    /// new contact's first step is an eighth of its covector over the family's own scale, the step its family's trained entries
+    /// take, and not the largest normalized step of a fresh entry. The rate is kept: no coordinate is shared among copies. The step
+    /// the last section stood at is of the old layout and is dropped, as every growth drops it.
+    pub fn contacted(&self, added: usize, keys: &[u8]) -> Result<Self> {
+        if self.held.is_some() {
+            return refuse("a learner grows its contacts after its held step is read");
+        }
+        let rest = keys.get(self.drawn..).ok_or(TowerError::Refused("fewer key bytes than the new contacts' draws"))?;
+        let (field, from) = self.field.contacted(added, rest)?;
+        let first = from.iter().map(|o| o.map_or(0, |i| self.first[i])).collect();
+        let mut second: Vec<i128> = from.iter().map(|o| o.map_or(0, |i| self.second[i])).collect();
+        for &(start, len, _) in field.families_all().iter() {
+            let old: Vec<i128> = (start..start + len).filter_map(|k| from[k].map(|i| self.second[i])).collect();
+            if old.len() == len || old.is_empty() {
+                continue;
+            }
+            // The mean term by term (each second moment is under `2^126`, so a family's sum is not formed).
+            let n = old.len() as i128;
+            let mean = old.iter().map(|v| v / n).sum::<i128>() + old.iter().map(|v| v % n).sum::<i128>() / n;
+            for k in (start..start + len).filter(|&k| from[k].is_none()) {
+                second[k] = mean;
+            }
+        }
+        let drawn = self.drawn + 4 * self.field.declaration.contact_draws(added);
+        Ok(Self { field, first, second, rate_bits: self.rate_bits, drawn, laps: self.laps, held: None, read_held: self.read_held, rate_parts: None, own_rates: None, last: None, pass: self.pass.clone() })
+    }
+
+    /// [definition; agent-inferred, November 3, the tower record] **The learner grown in scale**: its field grown in scale
+    /// ([`Field::scaled_up`], the key stream read on from the learner's drawn bytes), its moments kept on the fine field's
+    /// material and opened at zero on the packets' field's and the glue's, which every coordinate opens at its own first
+    /// nonzero covector.
+    pub fn scaled_up(&self, harmonics: usize, split: usize, declaration: FieldDeclaration, keys: &[u8]) -> Result<Self> {
+        let (field, drawn) = self.field.scaled_up(harmonics, split, declaration, keys, self.drawn)?;
+        let len = field.material_len();
+        let (mut first, mut second) = (self.first.clone(), self.second.clone());
+        first.resize(len, 0);
+        second.resize(len, 0);
+        // [November 13, G145; the November 11 failure of a state tool that dropped the part rates] The fine field's entries keep the rates the
+        // line carries (its parts' octaves, or each entry's own rate); the level's entries open at the base rate.
+        let own_rates = self.own_rates.as_ref().map(|own| {
+            let mut out = own.clone();
+            out.resize(len, self.rate_bits);
+            out
+        });
+        Ok(Self { field, first, second, rate_bits: self.rate_bits, drawn, laps: self.laps, held: None, read_held: self.read_held, rate_parts: self.rate_parts, own_rates, last: None, pass: self.pass.clone() })
+    }
+}

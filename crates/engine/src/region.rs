@@ -2,7 +2,7 @@
 //! Moved from the store line's harness (`complete_language/field_train.rs`) by C4 of #603, each item's text as it stood but for its visibility.
 
 use crate::codec::FieldCodec;
-use crate::field::{Echo, Port, Region, Shares};
+use crate::field::Shares;
 
 /// A training region: its classes, its unresolved sites, its carried faces and its locks (each
 /// empty where none).
@@ -47,4 +47,306 @@ pub fn region_classes(codec: &FieldCodec, q: &[usize], a: &[usize], length: usiz
     let mut out: Vec<usize> = q.iter().chain(a).copied().collect();
     out.resize(length, codec.void());
     out
+}
+
+#[allow(unused_imports)]
+use crate::field::*;
+#[allow(unused_imports)]
+use crate::inherited::tower::{affine, covector, deposit_step, div_nearest, exp_series, face_code, fewer_bits_weighed, fit32, fit64, half_turn, on_step_grain, outer_sum, ratio_adjoint, ratio_to_power, reach, refuse, release, toward, transposed, weighed_code, Result, TowerError, TowerFace, FACE_BITS, FIRST_RATE, MATERIAL_BITS, MOVE_BITS, SECOND_RATE};
+#[allow(unused_imports)]
+use crate::inherited::keyed_modes::{ln2_face, log2_face, Exponential};
+#[allow(unused_imports)]
+use rayon::prelude::*;
+
+/// [definition; agent-inferred, November 1] A region: each site's class, whether it is
+/// unresolved (read, and compared with its class), and the sites carried as faces. A site carried as
+/// a face (`faces[t]`, its classes' shares on `2^(−16)`, [`shares`]) opens on the mixture of its
+/// classes' rows, `Σ_a w_a E(a)`, and so for its strand neighbours' rows (`E₋`, `E₊`), and holds no
+/// class for the closure; an unresolved site carried so is read and compared there (the release's
+/// sweeps and training's front regions, the dispersing field's §4, §14.3 and §14.6). An unresolved
+/// site not carried opens on the encoding's last row; a resolved one on its class's. `faces` is empty
+/// where no site is carried so. A carried site may be `locked` (a foil): with the known sites
+/// (resolved, carrying nothing) it is definite (§14.1), and only definite sources are heard past the
+/// near field. `locked` is empty where no site is locked.
+#[derive(Clone, Copy, Debug)]
+pub struct Region<'a> {
+    pub classes: &'a [usize],
+    pub unresolved: &'a [bool],
+    pub faces: &'a [Option<Shares>],
+    pub locked: &'a [bool],
+    /// Each carried site's echo (§15.3, [`Echo`]); empty where no site carries one.
+    pub echo: &'a [Option<Echo>],
+    /// [definition; agent-inferred, November 2, §16.23] **The sites the open ones were drawn from**: `m` where the
+    /// region's `K` unresolved sites are a state of a reading order of `m` sites, so its code is weighed `m/K`
+    /// ([`Region::weight`]); `None` where the open sites are the whole of what is read (weight one).
+    pub domain: Option<usize>,
+    /// [definition; agent-inferred, November 3, §16.24] **The answer port**, where one is compared through its coupling:
+    /// every site from `start` to the region's end is open, and their faces are compared with `target` (the answer's
+    /// cells, never the void) by the coupling at temperature one ([`crate::inherited::coupling::coupling_code`]), an
+    /// unused place writing `void`. `None` where every open site is compared at its own place.
+    pub port: Option<Port<'a>>,
+}
+
+/// [definition; agent-inferred, November 3, §16.24] **An answer port** ([`Region::port`]): the place its open strand
+/// starts, the void class an unused place writes, and the cells it is compared with; [§16.47] compared through the
+/// coupling, or at its boundary (`boundary`).
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct Port<'a> {
+    pub start: usize,
+    pub void: usize,
+    pub target: &'a [usize],
+    pub boundary: bool,
+    /// [§16.47] Where its comparison stops (none: the region's end): a place from here on is read and not compared, and
+    /// takes no covector (the near field's margin a writer's state keeps past its front, so the faces before it are the
+    /// whole room's).
+    pub stop: Option<usize>,
+    /// [definition; agent-inferred, November 5, the unified-theory reading of 23:26] **Which of its places are heard** (none:
+    /// every place before the stop), indexed by the region's sites: a place not heard is read and not compared, and takes no
+    /// covector, as one past the stop. A writer's state compares its front octave whole and, past it, one keyed place an
+    /// octave (b2's far share), the places between read on the one-rate clock and not compared.
+    pub heard: Option<&'a [bool]>,
+    /// [definition; agent-inferred, November 6, the unified-theory reading of 06:50, E] **The room is cut to its windows**
+    /// ([`Region::window`]): where set, a receiver's row is met only at the question's sites, the silent stretch's first
+    /// place and the places within `(NEAR − 1)·ticks` of a heard one; every other receiver meets no source that tick. A field with carry
+    /// circles keeps the room whole ([`FieldDeclaration::room_window`]): a circle carries a place's state the whole strand inside one tick.
+    pub window: bool,
+    /// [definition; agent-inferred, November 6, the unified-theory reading of 11:49] **Compared on its letters off the void**: each
+    /// open place of the port on its target's class within the letters, `−log₂(m_a/(T − m_∅))`, the release's own draw where the
+    /// end is given (a place before the end draws from its face restricted to the letters), so the void logit takes no covector
+    /// there; a resolved place carries no face and is not compared ([`letters_reading`]).
+    pub letters: bool,
+}
+
+/// [definition; agent-inferred, November 3, §16.24] **A port's reading**: its coupling code on `2^(−20)` bits and each
+/// place's covector `p̂_i − r_i` on the face covector's `2^(−24)` (the face's own shares less the target the coupling
+/// places there), from the faces at its places (each `(masses, total)`). The host's return and the card's read the same
+/// rows from the same faces.
+pub fn port_reading(faces: &[(&[u128], u128)], port: &Port) -> Result<(Vec<Vec<i64>>, i64)> {
+    use crate::inherited::coupling::TemperatureRefusal as Why;
+    if port.boundary {
+        return boundary_reading(faces, port);
+    }
+    if port.letters {
+        return letters_reading(faces, port);
+    }
+    let read = crate::inherited::coupling::coupling_code(faces, port.void, port.target, None).map_err(|why| {
+        TowerError::Refused(match why {
+            Why::Short { .. } => "a port with more target cells than places",
+            Why::VoidCell => "a port whose target holds the void",
+            Why::Face => "a port's face that is empty or misses a class",
+            Why::Released { .. } => "a port whose coupling's mass released to zero",
+        })
+    })?;
+    let mut rows = Vec::with_capacity(faces.len());
+    for ((masses, total), placed) in faces.iter().zip(&read.placed) {
+        let mut row: Vec<i64> = masses.iter().map(|&m| (((m << crate::inherited::tower::COVECTOR_BITS) + total / 2) / total) as i64).collect();
+        for &(c, share) in placed {
+            row[c] -= share as i64;
+        }
+        rows.push(row);
+    }
+    Ok((rows, read.code))
+}
+
+/// [definition; agent-inferred, November 5, §16.47] **A port compared at its boundary**: each place is compared with
+/// whether the answer has ended there, never with which letter it holds. Where the target holds a letter (a place before
+/// `target.len()`) the event is a letter, coded `−log₂(1 − p̂_void)`, and its covector `p̂ − r` takes `r` as the face's
+/// own letter shares renormalized off the void, `r_void = 0` and `r_a = p̂_a / (1 − p̂_void)`: the void's entry is
+/// `p̂_void` and each letter's `−p̂_a p̂_void / (1 − p̂_void)`, so no letter's content is compared. Where it holds the
+/// void (a place past the target), the place is compared with the void, `p̂ − e_void` and `−log₂ p̂_void`. Its minimizer
+/// is the answer's length law given what the face reads, the writer's opening's own boundary (the unified-theory reading
+/// of November 5, 08:09: the writer fixes its length in its first reads and never undoes a letter past the true end, so
+/// the opening's void mass past the end is what a release pays in places). On the face covector's `2^(−24)` and the codes'
+/// `2^(−20)` bits, read alike by the host's return and the card's. A resolved place (`(∅, 0)`, a state of the writer's
+/// path) is not compared: its row is empty and it adds no code.
+/// [`Port::letters`]'s reading: at each open place `i` (within the target) the covector `p̂_a/(1 − p̂_∅) − [a = target_i]` over the
+/// letters on the face covector's `2^(−24)`, zero at the void, and the code `−log₂(m_(target_i)/(T − m_∅))` on `2^(−20)` bits; a
+/// resolved place (an empty face) is not compared.
+pub(crate) fn letters_reading(faces: &[(&[u128], u128)], port: &Port) -> Result<(Vec<Vec<i64>>, i64)> {
+    let one = 1i64 << crate::inherited::tower::COVECTOR_BITS;
+    let mut rows = Vec::with_capacity(faces.len());
+    let mut code = 0i64;
+    for (i, &(masses, total)) in faces.iter().enumerate() {
+        if (total == 0 && masses.is_empty()) || i >= port.target.len() {
+            rows.push(Vec::new());
+            continue;
+        }
+        if total == 0 || port.void >= masses.len() || masses[port.void] >= total {
+            return refuse("a port's face that is empty, misses a class or holds no letter");
+        }
+        let rest = total - masses[port.void];
+        let mut row: Vec<i64> = masses.iter().map(|&m| (((m << crate::inherited::tower::COVECTOR_BITS) + rest / 2) / rest) as i64).collect();
+        row[port.void] = 0;
+        row[port.target[i]] -= one;
+        code += crate::inherited::tower::face_code(masses[port.target[i]], rest);
+        rows.push(row);
+    }
+    Ok((rows, code))
+}
+
+pub(crate) fn boundary_reading(faces: &[(&[u128], u128)], port: &Port) -> Result<(Vec<Vec<i64>>, i64)> {
+    let one = 1i128 << crate::inherited::tower::COVECTOR_BITS;
+    let mut rows = Vec::with_capacity(faces.len());
+    let mut code = 0i64;
+    for (i, &(masses, total)) in faces.iter().enumerate() {
+        // A resolved place (a state of the writer's path, §16.47) carries no face and is not compared.
+        if total == 0 && masses.is_empty() {
+            rows.push(Vec::new());
+            continue;
+        }
+        if total == 0 || port.void >= masses.len() {
+            return refuse("a port's face that is empty or misses a class");
+        }
+        let mut row: Vec<i64> = masses.iter().map(|&m| (((m << crate::inherited::tower::COVECTOR_BITS) + total / 2) / total) as i64).collect();
+        let void = row[port.void] as i128;
+        if i < port.target.len() {
+            let rest = one - void;
+            for (a, slot) in row.iter_mut().enumerate() {
+                if a != port.void {
+                    *slot = if rest == 0 { 0 } else { fit64(-div_nearest(*slot as i128 * void, rest))? };
+                }
+            }
+            code += crate::inherited::tower::face_code(total - masses[port.void], total);
+        } else {
+            row[port.void] -= one as i64;
+            code += crate::inherited::tower::face_code(masses[port.void], total);
+        }
+        rows.push(row);
+    }
+    Ok((rows, code))
+}
+
+impl Region<'_> {
+    /// [definition; agent-inferred, November 6, the unified-theory reading of 06:50, E] **The windows a cut room computes**
+    /// ([`Port::window`]): every site before the port, the silent stretch's first place ([`Field::silent_stretch`]) and each
+    /// heard open place, each with the `(NEAR − 1)·ticks` places on either side; none where the port does not cut its room.
+    /// Why exact (the unified-theory reading of 06:50): a silent place is no one's far source, so in one tick a receiver hears
+    /// past its near field only definite sources (the question, whole) and its crowds of them, and the near field and the
+    /// strand's pair contact carry a place's state at most `NEAR − 1` places a tick. A heard place's face after `ticks` ticks
+    /// therefore reads only its window, and a receiver outside every window reads, at worst, its window's edge, which is
+    /// `(NEAR − 1)·ticks` places from it; the stretch's clock past its first place runs at that place's rate (one passage), so
+    /// the clock at every far place is `τ_front + (t − front)κ` from a computed face. Backward, the covector of a heard face
+    /// reaches at most `(NEAR − 1)` places a tick, so it meets no receiver outside its window, and the clock's return reaches
+    /// the stretch's first place, whose window is computed. Not exact where blanks sit between arrivals (masks, writer
+    /// states), whose clocks read each blank's own face: those regions keep their room whole. Nor where the field has carry circles,
+    /// whose scan carries a place's state the whole strand in one tick: the forward asks [`FieldDeclaration::room_window`], which keeps
+    /// those rooms whole.
+    pub fn window(&self, ticks: usize) -> Option<Vec<bool>> {
+        let port = self.port.filter(|p| p.window)?;
+        let sites = self.classes.len();
+        let reach = (NEAR - 1) * ticks;
+        let mut out: Vec<bool> = (0..sites).map(|t| t < port.start).collect();
+        let stretch = Field::silent_stretch(self);
+        let centres = std::iter::once(stretch).chain((port.start..port.stop.unwrap_or(sites).min(sites)).filter(|&t| self.unresolved[t] && port.heard.is_none_or(|h| h[t])));
+        for c in centres.filter(|&c| c < sites) {
+            for slot in &mut out[c.saturating_sub(reach)..(c + reach + 1).min(sites)] {
+                *slot = true;
+            }
+        }
+        Some(out)
+    }
+
+    /// [definition; agent-inferred, November 2, §16.23] **A state's weight in the joint code**, `(m, K)`: of the `m`
+    /// sites of its domain `K` are open, so the region's code `Σ_open −log₂ p̂` read at `m/K` is an unbiased reading of
+    /// the order-averaged joint code `E_σ L_σ` when `K` is uniform on `1..m` and the open set uniform given `K` (the
+    /// order-agnostic bound). `(K, K)` where no domain is declared, and `(1, 1)` with nothing open. A port's sites are
+    /// compared by its coupling and are not among the `K` (§16.24).
+    pub fn weight(&self) -> (u64, u64) {
+        let open = self.unresolved[..self.port.map_or(self.unresolved.len(), |p| p.start)].iter().filter(|&&u| u).count() as u64;
+        if open == 0 {
+            return (1, 1);
+        }
+        (self.domain.map_or(open, |m| m as u64), open)
+    }
+}
+
+/// [definition; agent-inferred, November 1] **A read leaves its own echo out** (the dispersing field's
+/// §15.3): a site carried as a face is read through contacts both ways, so its face returns to it a
+/// round trip later; the read it meets is its cavity field, `z ← z − B ℓ`, with `ℓ` the logits its
+/// carried face was formed from and `B` its echo on `2^(−63)`, the round trip's share read on the read
+/// that formed `ℓ` ([`FieldRead::echo`]). Both are data: no covector passes through them.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct Echo {
+    pub b: u64,
+    pub logits: Vec<i64>,
+}
+
+impl Field {
+
+    pub(crate) fn admit_region(&self, region: &Region) -> Result<()> {
+        if region.classes.len() != region.unresolved.len() || region.classes.len() < 2 {
+            return refuse("a region needs one class and one resolution a site, and two sites to meet");
+        }
+        if region.classes.len() > self.declaration.reach {
+            return refuse("a region past the field's reach, where its frames would repeat");
+        }
+        if region.classes.iter().any(|&c| c >= self.declaration.alphabet) {
+            return refuse("a region's class outside the field's alphabet");
+        }
+        if !region.faces.is_empty() && region.faces.len() != region.classes.len() {
+            return refuse("a region's carried faces that are not one a site");
+        }
+        for face in region.faces.iter().flatten() {
+            if face.is_empty() || face.iter().any(|&(c, w)| c as usize >= self.declaration.alphabet || w > 1 << STATE_BITS) {
+                return refuse("a carried face that is empty, or whose class is outside the alphabet or share past one");
+            }
+        }
+        if !region.echo.is_empty() && region.echo.len() != region.classes.len() {
+            return refuse("a region's echoes that are not one a site");
+        }
+        if region.echo.iter().flatten().any(|e| e.logits.len() != self.declaration.alphabet) {
+            return refuse("an echo whose logits are not one a class");
+        }
+        if !region.locked.is_empty() && (region.locked.len() != region.classes.len() || (0..region.classes.len()).any(|t| region.locked[t] && Self::carried(region, t).is_none())) {
+            return refuse("a region's locks that are not one a site, or a lock on a site that carries no face");
+        }
+        if let Some(port) = region.port {
+            // [§16.47] A port at its boundary may hold resolved places (a state of the writer's path); it compares its open ones.
+            if port.start > region.classes.len() || (!port.boundary && !port.letters && region.unresolved[port.start..].iter().any(|&u| !u)) || (port.start..region.classes.len()).any(|t| region.locked.get(t).copied().unwrap_or(false)) {
+                return refuse("a port whose places are not every open, unlocked site to the region's end");
+            }
+            if port.void >= self.declaration.alphabet || port.target.iter().any(|&c| c == port.void || c >= self.declaration.alphabet) {
+                return refuse("a port's void or target outside the alphabet, or a target cell that is the void");
+            }
+            if port.target.len() > region.classes.len() - port.start {
+                return refuse("a port with more target cells than places");
+            }
+        }
+        Ok(())
+    }
+
+    /// [definition; agent-inferred, November 1] **A definite site** (§14.1): known (resolved and
+    /// carrying no mixture) or locked (a foil). Only definite sources are heard past the near field.
+    pub(crate) fn definite(region: &Region, t: usize) -> bool {
+        (!region.unresolved[t] && Self::carried(region, t).is_none()) || region.locked.get(t).copied().unwrap_or(false)
+    }
+
+    /// The face a site is carried as, if any.
+    pub(crate) fn carried<'r>(region: &'r Region, t: usize) -> Option<&'r Shares> {
+        region.faces.get(t).and_then(Option::as_ref)
+    }
+
+    /// [definition; agent-inferred, November 3, §16.28] **An open site is silent on the strand**: unresolved and carrying
+    /// no face, nothing has arrived there, so it adds nothing to any site's moment and its clock runs at the strand's own
+    /// place (`κ = 1`). Its own opening (`E(∗)` with its neighbours' contact rows) is its own and stays.
+    pub(crate) fn silent(region: &Region, t: usize) -> bool {
+        region.unresolved[t] && Self::carried(region, t).is_none()
+    }
+
+    /// [definition; agent-inferred, November 5, the unified-theory reading of 21:07] **A silent stretch past the last arrival
+    /// is one passage**: the first silent place past a region's last arrival (its last site that is not silent), or the
+    /// region's length where none is. Past it every place runs the free clock at that place's rate (its expected duration
+    /// from the tick before's face there, bare at the first tick), so a place `D` past the last arrival reads the clock
+    /// `c_f + D κ₁`: nothing arrives there, and a per-blank rate would be the field's guesses about the stretch driving its
+    /// own clock (near an uncertain end the faces split between the void and a byte and the clock races, §16.28). Stretches
+    /// between two arrivals keep their per-blank rates.
+    pub(crate) fn silent_stretch(region: &Region) -> usize {
+        let sites = region.classes.len();
+        (0..sites).rev().find(|&t| !Self::silent(region, t)).map_or(0, |last| last + 1)
+    }
+
+    /// A pass's port reading ([`port_reading`]) from the faces at the port's places.
+    pub(crate) fn port_of(&self, pass: &FieldPass, port: &Port) -> Result<(Vec<Vec<i64>>, i64)> {
+        port_reading(&port_faces(&pass.faces, port)?, port)
+    }
 }

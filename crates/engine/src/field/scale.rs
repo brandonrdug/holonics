@@ -48,7 +48,7 @@ impl Scale {
 }
 
 /// The glue's offsets: `A`, `b_A`, `B`, `b_B` and the length.
-pub(super) fn glue_len(harmonics: usize, fine: usize, coarse: usize) -> (usize, usize, usize, usize, usize) {
+pub(crate) fn glue_len(harmonics: usize, fine: usize, coarse: usize) -> (usize, usize, usize, usize, usize) {
     glue_layout(harmonics, fine, coarse)
 }
 
@@ -199,7 +199,7 @@ pub fn level_cut(news: &[i64], section: i64, harmonics: usize, pi: i128) -> Resu
 
 /// What a level's forward keeps for its reverse.
 #[derive(Clone, Debug, Default)]
-pub(super) struct ScalePass {
+pub(crate) struct ScalePass {
     /// Each fine place's read at the split `[t][D₀]`, with its scale.
     read: Vec<i32>,
     scale: Vec<i128>,
@@ -356,7 +356,7 @@ impl Field {
 
     /// The level's forward at the split: the region's cut from its `news`, `x` restricted to the epochs by the news phase, the level's
     /// ticks on its own clock, and the prolongation added back into `x`.
-    pub(super) fn scale_forward(&self, s: &Scale, x: &mut [i64], news: &[i64], definite: &[bool], keyed: &[bool], keep: bool) -> Result<ScalePass> {
+    pub(crate) fn scale_forward(&self, s: &Scale, x: &mut [i64], news: &[i64], definite: &[bool], keyed: &[bool], keep: bool) -> Result<ScalePass> {
         let (d0, d1, h) = (self.declaration.width, s.coarse.declaration.width, s.harmonics);
         let sites = definite.len();
         let cut = level_cut(news, level_section(self.declaration.alphabet), h, self.pi)?;
@@ -411,7 +411,7 @@ impl Field {
     /// The level's reverse at the split: `dx`, the covector of the faces after the prolongation, is carried through the prolongation,
     /// the level's ticks and the restriction into the covector of the faces before it; the level's field's covector and the glue's are
     /// added into `g` at their places in the material ([`Field::families_all`]). The cut is data and takes nothing.
-    pub(super) fn scale_return(&self, s: &Scale, pass: &ScalePass, dx: &mut [i64], g: &mut [i128]) -> Result<()> {
+    pub(crate) fn scale_return(&self, s: &Scale, pass: &ScalePass, dx: &mut [i64], g: &mut [i128]) -> Result<()> {
         let (d0, d1, h) = (self.declaration.width, s.coarse.declaration.width, s.harmonics);
         let cut = &pass.cut;
         let epochs = pass.definite.len();

@@ -1,0 +1,1082 @@
+//! The engine's ruler (C5 of #603: cut from `field.rs` by object, each item's text as it stood but for its visibility).
+
+#[allow(unused_imports)]
+use crate::field::*;
+#[allow(unused_imports)]
+use crate::inherited::tower::{affine, covector, deposit_step, div_nearest, exp_series, face_code, fewer_bits_weighed, fit32, fit64, half_turn, on_step_grain, outer_sum, ratio_adjoint, ratio_to_power, reach, refuse, release, toward, transposed, weighed_code, Result, TowerError, TowerFace, FACE_BITS, FIRST_RATE, MATERIAL_BITS, MOVE_BITS, SECOND_RATE};
+#[allow(unused_imports)]
+use crate::inherited::keyed_modes::{ln2_face, log2_face, Exponential};
+#[allow(unused_imports)]
+use rayon::prelude::*;
+
+/// [measurement; agent-inferred, November 2] **A held read's rows at the answer sites by where their mass
+/// lies** ([`Field::held_rows`]), one cell a tick and head, over the unresolved sites of the regions read:
+/// the rows, and the shares (on `2^(−63)`, summed) of the sources of three groups: `question`, the definite
+/// sites before the region's answer start; `soft_near`, the near field's sources that are not definite
+/// (unresolved or soft answer neighbours); `other`, everything else (the far definite sites, the near
+/// definite sites at or past the answer start, the crowds). `question_current` is the current's part from the
+/// question group, `Σ p · Σ_x |D ṽ_x|` over its sources (each source's `release(p Σ_x |D ṽ_x|, 63)`, on the
+/// value's grain).
+/// [measurement; agent-inferred, November 2] The question's far part (§16.19's far-contact review): `question_far`, the
+/// shares of the question sources past the near field (`|i − j| ≥ NEAR`); per row its collision
+/// `C = Σ release(p², 63)` over them, and where `C > 0` its effective count of far sources, the Rényi-2 count
+/// `(Σ p)² / Σ p²` (a lower bound of `2^H`), on `2^(−8)`, summed in `far_effective` over the `far_rows` rows
+/// counted. Region-level groups only: no source is paired with a receiver by its class.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub struct HeldRows {
+    pub rows: u64,
+    pub question: u128,
+    pub soft_near: u128,
+    pub other: u128,
+    pub question_current: i128,
+    pub question_far: u128,
+    pub far_effective: u128,
+    pub far_rows: u64,
+    /// [measurement; agent-inferred, November 3, §16.31] The shares of the near field's definite sources at or past the
+    /// answer start (the answer's own resolved neighbours, `|i − j| < NEAR`), taken out of `other`.
+    pub near_definite: u128,
+}
+
+/// [measurement; agent-inferred, November 4, §16.42] **A receiver's near field by offset** ([`Field::near_offsets`]): at
+/// each tick and head (`[tick · heads + head]`), the share on `2^(−63)` of the source `d` sites before the receiver
+/// (`before[d − 1]`) and `d` sites after it (`after[d − 1]`), `0 < d < NEAR`, zero where that source is not met; and the
+/// receiver's readout logits on `2^(−16)` bits where it is unresolved. Two shares of one row compare as their locks do:
+/// `log₂(e_ij / e_ik) = z_ij − z_ik` bits.
+#[derive(Clone, Debug, Default, PartialEq, Eq)]
+pub struct NearOffsets {
+    pub before: Vec<[u64; NEAR - 1]>,
+    pub after: Vec<[u64; NEAR - 1]>,
+    pub logits: Option<Vec<i64>>,
+}
+
+/// [measurement; agent-inferred, November 2] **A held answer row's current by where it comes from** (§16.21,
+/// [`Field::row_currents`]): one row (a tick, a head and an unresolved site), its framed current's part from the
+/// question past the near field (`far`, the definite sites before the answer start at `|i − j| ≥ NEAR`) and its part
+/// from the near field (`near`, every source at `|i − j| < NEAR`) and from every other source (`rest`: the answer's own
+/// sites past the near field and any site after the answer start), each `Σ release(p D ṽ_j, 63)` entry by entry on the
+/// value's grain over the head's `2n` reals, so `far + near + rest` is the row's current; the row's largest share on `2^(−63)`; and, where read with its return,
+/// the code's covector of the row's framed current `δỹ` (the reverse's, on the covector's grain). Region-level groups
+/// only: no source is paired with a receiver by its class.
+#[derive(Clone, Debug, Default, PartialEq, Eq)]
+pub struct RowCurrent {
+    pub tick: u32,
+    pub head: u32,
+    pub site: u32,
+    pub far: Vec<i128>,
+    pub near: Vec<i128>,
+    pub rest: Vec<i128>,
+    pub top: u64,
+    pub covector: Vec<i64>,
+}
+
+/// [measurement; theory, November 13, the junction record §13.9; G157] **A turned head's reach on its own clock, its founding covector by
+/// receiver row**: over one tick's receiver rows of one head and kind, each row's `r_w = −Σ_j ζ_ij log₂(max(Δσ_ij, 1)/d_ij)` and
+/// `r_u = −Σ_j ζ_ij frac(log₂ d_ij)` ([`reach_logs`], the logs on `2^(−16)`, `ζ` the reverse's score covector at a met source, a crowd taking the
+/// clock's term at the place its skin reads and no remainder): their sums, their sums in magnitude and their squares after a release of 32 bits
+/// (a random-sign level's input), with the rows counted. Its grain is the reverse's; no unit of `w` or `u` is read.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub struct ReachSums {
+    pub rows: u64,
+    pub w: i128,
+    pub w_abs: u128,
+    pub w_sq: u128,
+    pub u: i128,
+    pub u_abs: u128,
+    pub u_sq: u128,
+}
+
+/// [measurement; theory, November 13, the junction record §13.8; G158] **The reader's reaction at its founding, by written source**: over one
+/// tick's written sources of one head and kind of reader, `a_j = ⟨λ_j^(k+1), ρ_j⟩` ([`Field::reaction_covectors`]): their sum, sum in magnitude
+/// and squares after a release of 32 bits (a random-sign level's input), with the sources counted, and `Σ|ρ_j|²` and `Σ|x_j|²` each entry
+/// released 8 bits before its square (`m² = Σ|ρ|²/Σ|x|²`, the unit `κ` is read in, on the reverse's grain).
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub struct ReactionSums {
+    pub rows: u64,
+    pub a: i128,
+    pub a_abs: u128,
+    pub a_sq: u128,
+    pub rho_sq: u128,
+    pub x_sq: u128,
+}
+
+/// [measurement; G159] **The reaction's forms at one tick and head** ([`Field::reaction_forms`]): the written sources and the readers counted;
+/// the route's `Σ_j a_j` and the pair decomposition's, with the sources where the two agree in sign; the source's chart's covector by coordinate
+/// (`Σ_j a_j r̂_j`, `Σ_j |a_j r̂_j|`) and the reader's (`Σ_i b_i r̂_i`, `Σ_i |b_i r̂_i|`); and the strength raised by the source's metric,
+/// summed, in magnitude and squared after a release of 8 bits.
+#[derive(Clone, Debug, Default, PartialEq, Eq)]
+pub struct ReactionForms {
+    pub sources: u64,
+    pub readers: u64,
+    pub route: i128,
+    pub pair: i128,
+    pub agree: u64,
+    pub src: Vec<(i128, u128)>,
+    pub rdr: Vec<(i128, u128)>,
+    pub w: i128,
+    pub w_abs: u128,
+    pub w_sq: u128,
+}
+
+/// [measurement; G160] **The read's mirror at one tick, head and kind of reader** ([`Field::mirror_covectors`]): the written sources heard,
+/// the sum of `a_j = ⟨λ_j, μ_j⟩`, in magnitude and squared after a release of 32 bits; and with readers of both kinds the source's chart's
+/// covector by coordinate, the audience summed on `2^(−31)`, and the lanes' powers as `log₂` on `2^(−16)` summed and squared, with the lanes
+/// counted.
+#[derive(Clone, Debug, Default, PartialEq, Eq)]
+pub struct MirrorSums {
+    pub sources: u64,
+    pub a: i128,
+    pub a_abs: u128,
+    pub a_sq: u128,
+    pub chart: Vec<(i128, u128)>,
+    pub audience: u128,
+    pub power_log: i128,
+    pub power_log_sq: u128,
+    pub lanes: u64,
+}
+
+/// [measurement; G162] **One stage of the free ring** ([`Field::free_ring`]): the open places, their code and the faces' expected code on
+/// `2^(−20)` bits summed, and the charts' change from the stage before (`Σ |Δr̂|²`, unsigned) and its pairing with the change before that.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub struct RingStage {
+    pub places: u64,
+    pub code: i128,
+    pub expected: i128,
+    pub norm: u128,
+    pub inner: i128,
+}
+
+/// `log₂ n` on `2^(−16)` for `n ≥ 1` ([`log2_face`] of `n/2^(⌊log₂ n⌋ + 1)` and the whole part).
+pub(crate) fn log2_grain(n: u128) -> i64 {
+    let whole = 127 - i64::from(n.max(1).leading_zeros());
+    let p = n.max(1) << (61 - whole);
+    (log2_face(p, FACE_BITS) + (i128::from(whole + 1) << FACE_BITS)) as i64
+}
+
+/// [measurement; G157] The reach's two logs between receiver `i` and source `j` on the face's grain: `log₂(max(Δσ, one plain tick)/d)` with
+/// `Δσ = |σ_i − σ_j|` on `2^(−24)` and `d = |i − j|` places, and the octave's remainder `frac(log₂ d)`.
+pub(crate) fn reach_logs(sigma: &[i64], i: usize, j: usize) -> (i64, i64) {
+    let d = i.abs_diff(j).max(1) as u128;
+    let ld = log2_grain(d);
+    let ds = (sigma[i] - sigma[j]).unsigned_abs().max(1 << PACE_BITS) as u128;
+    let ls = log2_grain(ds) - ((PACE_BITS as i64) << FACE_BITS);
+    (ls - ld, ld - ((ld >> FACE_BITS) << FACE_BITS))
+}
+
+/// The round trips `Σ_j p_ji^(t) p_ij^(t+1)` of each site over consecutive ticks' rows (`[h][i]`), each
+/// product released to `2^(−63)`, added into `trips`.
+pub(crate) fn round_trips(before: &[Vec<Source>], after: &[Vec<Source>], sites: usize, trips: &mut [u128]) {
+    for (hi, row) in after.iter().enumerate() {
+        let (h, i) = (hi / sites, hi % sites);
+        for src in row {
+            let Some(back) = before[h * sites + src.j as usize].iter().find(|b| b.j as usize == i) else { continue };
+            trips[i] += (src.p as u128 * back.p as u128 + (1u128 << (SHARE_BITS - 1))) >> SHARE_BITS;
+        }
+    }
+}
+
+impl Field {
+
+    /// [measurement] **A region's rows read by where their mass lies** (§15.9's reading): over every
+    /// tick, head and receiver, open receivers (`[0]`) and definite ones (`[1]`) apart: the rows, the far
+    /// sources they meet, and the mass of their shares (on `2^(−63)`) on the near field, on far sources
+    /// and on crowds.
+    pub fn row_shares(&self, region: &Region) -> Result<RowShares> {
+        let pass = self.pass(region, true)?;
+        let sites = region.classes.len();
+        let mut out = RowShares::default();
+        for cell in &pass.ticks {
+            for (hi, row) in cell.rows.iter().enumerate() {
+                let i = hi % sites;
+                let k = usize::from(Self::definite(region, i));
+                out.rows[k] += 1;
+                for src in row {
+                    if (src.j as usize).abs_diff(i) < NEAR {
+                        out.near[k] += src.p as u128;
+                    } else {
+                        out.far[k] += src.p as u128;
+                        out.far_sources[k] += 1;
+                    }
+                }
+                out.crowd[k] += cell.crowds[hi].iter().map(|c| c.e as u128).sum::<u128>();
+                out.peak[k] += row.iter().map(|src| src.p).chain(cell.crowds[hi].iter().map(|c| c.e)).max().unwrap_or(0) as u128;
+            }
+        }
+        Ok(out)
+    }
+
+    /// [measurement; theory, November 13, the junction record §9 item 1] **Each site's echo by head** (`[h][i]` on `2^(−63)`): head `h`'s
+    /// `B_i^h`, the mean over consecutive ticks of `Σ_j p_ji^(t) p_ij^(t+1)` ([`round_trips`]), the share of a site's arrival that is its own
+    /// state of two ticks before, returned by the sites it told. [`FieldRead::echo`] is its mean over heads. An unresolved site is no source,
+    /// so its row reads zero. A reading only: nothing in the law reads it.
+    pub fn echo_by_head(&self, region: &Region) -> Result<Vec<Vec<u64>>> {
+        let pass = self.pass(region, true)?;
+        let (sites, heads) = (region.classes.len(), self.declaration.heads);
+        let mut trips = vec![vec![0u128; sites]; heads];
+        for w in pass.ticks.windows(2) {
+            for (h, t) in trips.iter_mut().enumerate() {
+                round_trips(&w[0].rows[h * sites..(h + 1) * sites], &w[1].rows[h * sites..(h + 1) * sites], sites, t);
+            }
+        }
+        let read = (pass.ticks.len().saturating_sub(1)).max(1) as u128;
+        Ok(trips.iter().map(|t| t.iter().map(|&b| ((b + read / 2) / read) as u64).collect()).collect())
+    }
+
+    /// [measurement; theory, November 13, the theory thread's order after G151, item (c)] **Each site's round trips across heads** (`[h][h′][i]` on
+    /// `2^(−63)`): the mean over consecutive ticks of `Σ_j p_ji^(t, h′) p_ij^(t+1, h)`, what site `i` told `j` in head `h′` coming back to it in head
+    /// `h` a tick later; the diagonal is [`Field::echo_by_head`]. The strand's pair contacts, triads and carry circles are outside it (they are two-way
+    /// by build). A reading only: nothing in the law reads it.
+    pub fn echo_across_heads(&self, region: &Region) -> Result<Vec<Vec<Vec<u64>>>> {
+        let pass = self.pass(region, true)?;
+        let (sites, heads) = (region.classes.len(), self.declaration.heads);
+        let mut trips = vec![vec![vec![0u128; sites]; heads]; heads];
+        for w in pass.ticks.windows(2) {
+            for (h, by_h) in trips.iter_mut().enumerate() {
+                for (h2, t) in by_h.iter_mut().enumerate() {
+                    round_trips(&w[0].rows[h2 * sites..(h2 + 1) * sites], &w[1].rows[h * sites..(h + 1) * sites], sites, t);
+                }
+            }
+        }
+        let read = (pass.ticks.len().saturating_sub(1)).max(1) as u128;
+        Ok(trips.iter().map(|by_h| by_h.iter().map(|t| t.iter().map(|&b| ((b + read / 2) / read) as u64).collect()).collect()).collect())
+    }
+
+    /// [measurement; agent-inferred, November 2] **A held read's rows by where their mass lies** ([`HeldRows`]):
+    /// for each tick and head (`[tick · heads + head]`), over the region's unresolved sites, the shares of
+    /// the question group (definite sites before `question`), of the soft near field and of the rest, and the
+    /// current's part from the question group. A reading only: nothing in the law reads it.
+    pub fn held_rows(&self, region: &Region, question: usize) -> Result<Vec<HeldRows>> {
+        let pass = self.pass(region, true)?;
+        let (sites, d) = (region.classes.len(), &self.declaration);
+        let (heads, n, span) = (d.heads, d.modes, 2 * d.modes);
+        let mut out = vec![HeldRows::default(); d.ticks * heads];
+        for (tick, cell) in pass.ticks.iter().enumerate() {
+            for h in 0..heads {
+                let acc = &mut out[tick * heads + h];
+                for i in (0..sites).filter(|&i| region.unresolved[i]) {
+                    acc.rows += 1;
+                    let hi = h * sites + i;
+                    let (mut far, mut collision) = (0u128, 0u128);
+                    for src in &cell.rows[hi] {
+                        let j = src.j as usize;
+                        let definite = Self::definite(region, j);
+                        if definite && j < question {
+                            acc.question += src.p as u128;
+                            if i.abs_diff(j) >= NEAR {
+                                far += src.p as u128;
+                                collision += release(src.p as i128 * src.p as i128, SHARE_BITS) as u128;
+                            }
+                            let vj = &cell.v[(h * sites + j) * span..(h * sites + j + 1) * span];
+                            let current: i128 = (0..span).map(|x| decayed(self.pair_decay(pass.paces_at(cell), h, x % n, i, j), vj[x]).abs()).sum();
+                            acc.question_current += release(src.p as i128 * current, SHARE_BITS);
+                        } else if i.abs_diff(j) < NEAR && !definite {
+                            acc.soft_near += src.p as u128;
+                        } else if i.abs_diff(j) < NEAR {
+                            acc.near_definite += src.p as u128;
+                        } else {
+                            acc.other += src.p as u128;
+                        }
+                    }
+                    acc.other += cell.crowds[hi].iter().map(|c| c.e as u128).sum::<u128>();
+                    acc.question_far += far;
+                    if collision > 0 {
+                        acc.far_effective += ((far * far) >> (SHARE_BITS - 8)) / collision;
+                        acc.far_rows += 1;
+                    }
+                }
+            }
+        }
+        Ok(out)
+    }
+
+    /// [measurement; agent-inferred, November 2] **The contact covector by where its pairs lie** (§16.20): over
+    /// `regions` read and returned, for each head `[near, far]`, `Σ |δs_ij|` over the near pairs (`|i − j| < NEAR`)
+    /// and over the far pairs and the crowds, on the contact covector's grain. The far share, `far / (near + far)`, is
+    /// the part of the probes' and keys' learning a far contact receives. A reading only.
+    pub fn covector_shares(&self, regions: &[Region]) -> Result<Vec<[u128; 2]>> {
+        let heads = self.declaration.heads;
+        let mut out = vec![0u128; 2 * heads];
+        for region in regions {
+            let pass = self.pass(region, true)?;
+            let mut g = vec![0i128; self.material_len()];
+            self.returned_with(region, &pass, &mut g, Some(&mut out), None, None, None, None, None)?;
+        }
+        Ok(out.chunks_exact(2).map(|c| [c[0], c[1]]).collect())
+    }
+
+    /// [measurement; agent-inferred, November 2] **The held answer rows' currents by where they come from**
+    /// ([`RowCurrent`], §16.21): for each tick, head and unresolved site of `region` in that order, the framed current's
+    /// part from the question past the near field (definite sites before `question`) and from the near field, the
+    /// row's largest share and, with `returning`, the code's covector of the row's framed current. A reading only.
+    pub fn row_currents(&self, region: &Region, question: usize, returning: bool) -> Result<Vec<RowCurrent>> {
+        let pass = self.pass(region, true)?;
+        let (sites, d) = (region.classes.len(), &self.declaration);
+        let (heads, n, span) = (d.heads, d.modes, 2 * d.modes);
+        let mut covectors: Vec<Vec<i64>> = Vec::new();
+        if returning {
+            let mut g = vec![0i128; self.material_len()];
+            self.returned_with(region, &pass, &mut g, None, Some(&mut covectors), None, None, None, None)?;
+            covectors.reverse();
+        }
+        let mut out = Vec::new();
+        for (tick, cell) in pass.ticks.iter().enumerate() {
+            for h in 0..heads {
+                for i in (0..sites).filter(|&i| region.unresolved[i]) {
+                    let (mut far, mut near, mut rest) = (vec![0i128; span], vec![0i128; span], vec![0i128; span]);
+                    let mut top = 0u64;
+                    for src in &cell.rows[h * sites + i] {
+                        let j = src.j as usize;
+                        top = top.max(src.p);
+                        let gap = i.abs_diff(j);
+                        let into = if gap < NEAR { &mut near } else if Self::definite(region, j) && j < question { &mut far } else { &mut rest };
+                        let vj = &cell.v[(h * sites + j) * span..(h * sites + j + 1) * span];
+                        for (x, slot) in into.iter_mut().enumerate() {
+                            *slot += release(src.p as i128 * decayed(self.pair_decay(pass.paces_at(cell), h, x % n, i, j), vj[x]), SHARE_BITS);
+                        }
+                    }
+                    let covector = covectors.get(tick).map(|c| c[(h * sites + i) * span..(h * sites + i + 1) * span].to_vec()).unwrap_or_default();
+                    out.push(RowCurrent { tick: tick as u32, head: h as u32, site: i as u32, far, near, rest, top, covector });
+                }
+            }
+        }
+        Ok(out)
+    }
+
+    /// [`Field::held_rows`] summed over `regions` (each with its own answer start `questions[r]`).
+    pub fn held_rows_all(&self, regions: &[Region], questions: &[usize]) -> Result<Vec<HeldRows>> {
+        if regions.len() != questions.len() {
+            return refuse("a held read's answer starts that are not one a region");
+        }
+        let mut out = vec![HeldRows::default(); self.declaration.ticks * self.declaration.heads];
+        for (region, &question) in regions.iter().zip(questions) {
+            for (acc, one) in out.iter_mut().zip(self.held_rows(region, question)?) {
+                acc.rows += one.rows;
+                acc.question += one.question;
+                acc.soft_near += one.soft_near;
+                acc.other += one.other;
+                acc.question_current += one.question_current;
+                acc.question_far += one.question_far;
+                acc.far_effective += one.far_effective;
+                acc.far_rows += one.far_rows;
+                acc.near_definite += one.near_definite;
+            }
+        }
+        Ok(out)
+    }
+
+    /// The site pairs the region's contact meets over its ticks and heads (`Σ |S_i^h|`).
+    pub fn met_pairs(&self, region: &Region) -> Result<u64> {
+        Ok(self.pass(region, false)?.pairs)
+    }
+
+    /// [measurement; theory, November 13, the junction record §13.8; G158] **The reader's reaction's route**: for tick `k` and head `h`, each
+    /// source's `ρ_j = J_r̂(x_j^k)ᵀ V_hᵀ conj(U_j) Σ_(i: j ∈ S_i^h) p_ij D_ij U_i (O_hᵀ x_i^(k+1))`, the reverse's value route alone (the frame,
+    /// each met source's share and skin, a crowd's share spread over its definite sources at the octave's decay, the unframing, `V`'s transpose and
+    /// the chart's lane adjoint, every release the reverse's), fed each reader's state after the tick where the reverse feeds its covector; with
+    /// `readers` only the readers of that kind (`false` open, `true` written). `[t][D]`. It repeats `Field::tick_return`'s value route, which a
+    /// change there must carry here.
+    pub(crate) fn reaction_route(&self, cell: &TickCell, paces: &Paces, definite: &[bool], h: usize, readers: bool) -> Result<Vec<i64>> {
+        let d = &self.declaration;
+        let (dw, m, n, lanes) = (d.width, d.complex(), d.modes, d.lanes);
+        let (m2, span) = (2 * m, 2 * n);
+        let sites = definite.len();
+        let (l, reaches) = (&self.layout, self.reaches());
+        // `O_hᵀ x^(k+1)`, the head's block of the current's transpose at each reader of the kind, framed: `U_i δy_i`.
+        let mut dyh = vec![0i64; sites * span];
+        let mut dy = vec![0i64; m2];
+        for t in (0..sites).filter(|&t| definite[t] == readers) {
+            transposed(&self.theta[l.out..l.out + dw * m2], reaches.out, m2, &cell.after[t * dw..(t + 1) * dw], MATERIAL_BITS, &mut dy)?;
+            for li in 0..n {
+                let c = h * n + li;
+                let (ur, ui) = self.frame(paces, t, h, li);
+                let (ur, ui) = (ur as i128, ui as i128);
+                let (gr, gi) = (dy[c] as i128, dy[m + c] as i128);
+                dyh[t * span + li] = fit64(release(ur * gr - ui * gi, MOVE_BITS))?;
+                dyh[t * span + n + li] = fit64(release(ui * gr + ur * gi, MOVE_BITS))?;
+            }
+        }
+        let rows = &cell.rows[h * sites..(h + 1) * sites];
+        let crowds = &cell.crowds[h * sites..(h + 1) * sites];
+        let mut sv = vec![0i128; sites * span];
+        let mut crowd_v = vec![0i128; (sites + 1) * span];
+        for i in 0..sites {
+            for src in &rows[i] {
+                let j = src.j as usize;
+                for r in 0..span {
+                    sv[j * span + r] += src.p as i128 * decayed(self.pair_decay(paces, h, r % n, i, j), dyh[i * span + r]);
+                }
+            }
+            for c in &crowds[i] {
+                for r in 0..span {
+                    let part = div_nearest(c.e as i128 * decayed(self.octave_decay(paces, h, r % n, i, c.level, c.lo > i), dyh[i * span + r]), c.count as i128);
+                    crowd_v[c.lo * span + r] += part;
+                    crowd_v[(c.hi + 1) * span + r] -= part;
+                }
+            }
+        }
+        let mut spread = crowd_v[..sites * span].to_vec();
+        for t in 1..sites {
+            for r in 0..span {
+                spread[t * span + r] += spread[(t - 1) * span + r];
+            }
+        }
+        let mut dv = vec![0i64; sites * m2];
+        for j in 0..sites {
+            for r in 0..span {
+                let c = h * n + r % n;
+                let slot = j * m2 + if r < n { c } else { m + c };
+                dv[slot] = fit64(release(sv[j * span + r], SHARE_BITS))?;
+                if definite[j] {
+                    dv[slot] = fit64(dv[slot] as i128 + release(spread[j * span + r], SHARE_BITS))?;
+                }
+            }
+        }
+        for t in 0..sites {
+            for li in 0..n {
+                let c = h * n + li;
+                let (ur, ui) = self.frame(paces, t, h, li);
+                let (ur, ui) = (ur as i128, ui as i128);
+                let (gr, gi) = (dv[t * m2 + c] as i128, dv[t * m2 + m + c] as i128);
+                dv[t * m2 + c] = fit64(release(ur * gr + ui * gi, MOVE_BITS))?;
+                dv[t * m2 + m + c] = fit64(release(ur * gi - ui * gr, MOVE_BITS))?;
+            }
+        }
+        let mut out = vec![0i64; sites * dw];
+        let mut back = vec![0i64; dw];
+        for t in 0..sites {
+            transposed(&self.theta[l.v..l.v + m2 * dw], reaches.v, dw, &dv[t * m2..(t + 1) * m2], MATERIAL_BITS, &mut back)?;
+            let rho = lane_adjoint(&cell.read[t * dw..(t + 1) * dw], &cell.scale[t * lanes..(t + 1) * lanes], &back)?;
+            out[t * dw..(t + 1) * dw].copy_from_slice(&rho);
+        }
+        Ok(out)
+    }
+
+    /// [measurement; theory, November 13, the junction record §13.8; G158] **The reader's reaction, read at its founding**: one region's forward
+    /// and reverse, and for each tick (in the forward's order), head and kind of reader (`[0]` open readers, `[1]` written) the written sources'
+    /// [`ReactionSums`] of `a_j = ⟨λ_j^(k+1), ρ_j^(h,k)⟩` ([`Field::reaction_route`]), so `d(code)/dκ_h = −Σ_k Σ_j a_j` for the stage
+    /// `x_j ← x_j − κ_h ρ_j` after tick `k`. A reading only: nothing in the law reads it.
+    /// [measurement; agent-inferred, November 13, the ring record's §4 first reading] **The release carried as a face, at its founding**: for
+    /// each site `t`, `r_t = ⟨λ⁰_t, D_t⟩`, the opening's covector `λ⁰` of the region's own comparison against the change the opening of `t`
+    /// would take were every open site's row to move toward its carried face at strength `α`: `D_t = Δ_t(enc) + Δ_(t−1)(before) +
+    /// Δ_(t+1)(after)`, `Δ_s(base) = release(Σ_c w_(s,c) E_base(c), 16) − E_base(∗)` at an open site `s` carrying `faces[s]` (its shares on
+    /// `2^(−16)`, [`shares`]) and zero at a written one. So `d(code)/dα` at `α = 0` is `Σ_t r_t` on the covector's grain against the state's
+    /// (`2^(−40)` bits a unit), the opening's part of the strength only: the carried site's voice (a source at strength `α`) is not read. A
+    /// reading: no state changes.
+    pub fn carried_slopes(&self, region: &Region, faces: &[Option<TowerFace>]) -> Result<Vec<i128>> {
+        let pass = self.pass(region, true)?;
+        let mut g = vec![0i128; self.material_len()];
+        let mut dx = Vec::new();
+        self.returned_with(region, &pass, &mut g, None, None, None, None, None, Some(&mut dx))?;
+        let (dw, sites, a) = (self.declaration.width, region.classes.len(), self.declaration.alphabet);
+        let l = &self.layout;
+        let delta = |base: usize, s: usize| -> Option<Vec<i64>> {
+            if !region.unresolved[s] {
+                return None;
+            }
+            let sh = shares(faces.get(s)?.as_ref()?);
+            let open = base + a * dw;
+            Some((0..dw).map(|i| release(sh.iter().map(|&(c, w)| w as i128 * self.theta[base + c as usize * dw + i] as i128).sum(), STATE_BITS) as i64 - self.theta[open + i] as i64).collect())
+        };
+        let mut r = vec![0i128; sites];
+        for (t, slot) in r.iter_mut().enumerate() {
+            let dxt = &dx[t * dw..(t + 1) * dw];
+            let parts = [delta(l.enc, t), t.checked_sub(1).and_then(|s| delta(l.before, s)), (t + 1 < sites).then(|| delta(l.after, t + 1)).flatten()];
+            for d in parts.into_iter().flatten() {
+                *slot += dxt.iter().zip(&d).map(|(&x, &y)| i128::from(x) * i128::from(y)).sum::<i128>();
+            }
+        }
+        Ok(r)
+    }
+
+    pub fn reaction_covectors(&self, region: &Region) -> Result<Vec<Vec<[ReactionSums; 2]>>> {
+        let pass = self.pass(region, true)?;
+        let mut g = vec![0i128; self.material_len()];
+        let mut lambdas: Vec<Vec<i64>> = Vec::new();
+        self.returned_with(region, &pass, &mut g, None, None, None, None, Some(&mut lambdas), None)?;
+        lambdas.reverse();
+        let (sites, dw, heads) = (region.classes.len(), self.declaration.width, self.declaration.heads);
+        let definite: Vec<bool> = (0..sites).map(|t| Self::definite(region, t)).collect();
+        let mut out = Vec::with_capacity(pass.ticks.len());
+        for (cell, lambda) in pass.ticks.iter().zip(&lambdas) {
+            let paces = pass.paces_at(cell);
+            let mut by_head = Vec::with_capacity(heads);
+            for h in 0..heads {
+                let mut kinds = [ReactionSums::default(); 2];
+                for (kind, sums) in kinds.iter_mut().enumerate() {
+                    let rho = self.reaction_route(cell, paces, &definite, h, kind == 1)?;
+                    for j in (0..sites).filter(|&j| definite[j]) {
+                        let span = j * dw..(j + 1) * dw;
+                        let a: i128 = lambda[span.clone()].iter().zip(&rho[span.clone()]).map(|(&y, &r)| i128::from(y) * i128::from(r)).sum();
+                        sums.rows += 1;
+                        (sums.a, sums.a_abs, sums.a_sq) = (sums.a + a, sums.a_abs + a.unsigned_abs(), sums.a_sq + (a.unsigned_abs() >> 32).pow(2));
+                        sums.rho_sq += rho[span.clone()].iter().map(|&r| (r.unsigned_abs() as u128 >> 8).pow(2)).sum::<u128>();
+                        sums.x_sq += cell.after[span].iter().map(|&x| (x.unsigned_abs() as u128 >> 8).pow(2)).sum::<u128>();
+                    }
+                }
+                by_head.push(kinds);
+            }
+            out.push(by_head);
+        }
+        Ok(out)
+    }
+
+    /// [definition; agent-inferred, November 13, from the junction record §13.8 and the theory thread's last input of 20:26Z; G160] **The read's
+    /// mirror**: the forward read of head `h` is `x_i += Σ_j W_ij r̂_j` with `W_ij = p_ij D_ij O_h conj(U_i) U_j V_h` (the current's return over
+    /// the framed, shared and decayed values of the sources' rays). Its mirror is the same read taken by each source of its readers,
+    /// `μ_j = (1/n_j) Σ_i W_ijᵀ r̂_i`, with `n_j = Σ_i p_ij D̄_ij` the source's audience (`D̄` the mean of the head's skins over its modes; a crowd's
+    /// share spread over its definite sources at the octave's decay): the readers' rays `r̂_i` (the chart of their state after the tick,
+    /// `cell.after`), `O_hᵀ`, the frame `U_i`, the shares and skins, `conj(U_j)` and `V_hᵀ`, every release the forward's grain, so `μ` is on the
+    /// state's grain and a pure number times it is a step a ray reads. No lane adjoint at the source and no raw reader state: every read takes
+    /// rays. With `readers` only the readers of that kind (`false` open, `true` written). Returns `μ` (`[t][D]`, zero at a site no reader hears) and
+    /// each site's audience on `2^(−63)`.
+    pub(crate) fn mirror_route(&self, cell: &TickCell, paces: &Paces, definite: &[bool], h: usize, readers: Option<bool>) -> Result<(Vec<i64>, Vec<u128>)> {
+        let d = &self.declaration;
+        let (dw, m, n, lanes) = (d.width, d.complex(), d.modes, d.lanes);
+        let (m2, span) = (2 * m, 2 * n);
+        let sites = definite.len();
+        let (l, reaches) = (&self.layout, self.reaches());
+        // Each reader's ray after the tick, its head's block of `O_hᵀ r̂_i`, framed `U_i`.
+        let mut hy = vec![0i64; sites * span];
+        let (mut rays, mut scales) = (Vec::with_capacity(dw), Vec::with_capacity(lanes));
+        let mut dy = vec![0i64; m2];
+        for t in (0..sites).filter(|&t| readers.is_none_or(|k| definite[t] == k)) {
+            (rays.clear(), scales.clear());
+            lane_chart(&cell.after[t * dw..(t + 1) * dw], lanes, &mut rays, &mut scales)?;
+            let ray: Vec<i64> = rays.iter().map(|&r| i64::from(r)).collect();
+            transposed(&self.theta[l.out..l.out + dw * m2], reaches.out, m2, &ray, MATERIAL_BITS, &mut dy)?;
+            for li in 0..n {
+                let c = h * n + li;
+                let (ur, ui) = self.frame(paces, t, h, li);
+                let (ur, ui) = (ur as i128, ui as i128);
+                let (gr, gi) = (dy[c] as i128, dy[m + c] as i128);
+                hy[t * span + li] = fit64(release(ur * gr - ui * gi, MOVE_BITS))?;
+                hy[t * span + n + li] = fit64(release(ui * gr + ur * gi, MOVE_BITS))?;
+            }
+        }
+        let rows = &cell.rows[h * sites..(h + 1) * sites];
+        let crowds = &cell.crowds[h * sites..(h + 1) * sites];
+        let mut sv = vec![0i128; sites * span];
+        let mut crowd_v = vec![0i128; (sites + 1) * span];
+        let mut audience = vec![0u128; sites];
+        let mut crowd_n = vec![0i128; sites + 1];
+        for i in (0..sites).filter(|&i| readers.is_none_or(|k| definite[i] == k)) {
+            for src in &rows[i] {
+                let j = src.j as usize;
+                let mut mean = 0i128;
+                for r in 0..span {
+                    let decay = self.pair_decay(paces, h, r % n, i, j);
+                    sv[j * span + r] += src.p as i128 * decayed(decay, hy[i * span + r]);
+                    if r < n {
+                        mean += release(src.p as i128 * decay.0, decay.1);
+                    }
+                }
+                audience[j] += (mean / n as i128).max(0) as u128;
+            }
+            for c in &crowds[i] {
+                let mut mean = 0i128;
+                for r in 0..span {
+                    let decay = self.octave_decay(paces, h, r % n, i, c.level, c.lo > i);
+                    let part = div_nearest(c.e as i128 * decayed(decay, hy[i * span + r]), c.count as i128);
+                    crowd_v[c.lo * span + r] += part;
+                    crowd_v[(c.hi + 1) * span + r] -= part;
+                    if r < n {
+                        mean += release(c.e as i128 * decay.0, decay.1);
+                    }
+                }
+                let share = div_nearest(mean / n as i128, c.count as i128);
+                crowd_n[c.lo] += share;
+                crowd_n[c.hi + 1] -= share;
+            }
+        }
+        let (mut run_v, mut run_n) = (vec![0i128; span], 0i128);
+        let mut out = vec![0i64; sites * dw];
+        let mut dv = vec![0i64; m2];
+        let mut back = vec![0i64; dw];
+        for j in 0..sites {
+            for r in 0..span {
+                run_v[r] += crowd_v[j * span + r];
+            }
+            run_n += crowd_n[j];
+            if definite[j] {
+                audience[j] += run_n.max(0) as u128;
+            }
+            if audience[j] == 0 {
+                continue;
+            }
+            dv.iter_mut().for_each(|v| *v = 0);
+            for li in 0..n {
+                let c = h * n + li;
+                let (ur, ui) = self.frame(paces, j, h, li);
+                let (ur, ui) = (ur as i128, ui as i128);
+                let crowd = |r: usize| if definite[j] { run_v[r] } else { 0 };
+                let (gr, gi) = (release(sv[j * span + li] + crowd(li), SHARE_BITS), release(sv[j * span + n + li] + crowd(n + li), SHARE_BITS));
+                dv[c] = fit64(release(ur * gr + ui * gi, MOVE_BITS))?;
+                dv[m + c] = fit64(release(ur * gi - ui * gr, MOVE_BITS))?;
+            }
+            transposed(&self.theta[l.v..l.v + m2 * dw], reaches.v, dw, &dv, MATERIAL_BITS, &mut back)?;
+            for (o, &b) in out[j * dw..(j + 1) * dw].iter_mut().zip(&back) {
+                *o = fit64(div_nearest(i128::from(b) << SHARE_BITS, audience[j] as i128))?;
+            }
+        }
+        Ok((out, audience))
+    }
+
+    /// [measurement; G160] **The read's mirror at its founding** ([`Field::mirror_route`]): one region's forward and reverse, and for each tick
+    /// (in the forward's order), head and kind of reader (`[0]` open readers, `[1]` written, `[2]` both) the written sources' [`MirrorSums`] of
+    /// `a_j = ⟨λ_j^(k+1), μ_j⟩`, so for the stage `x_j ← x_j − s_h μ_j` after tick `k` the code moves by `−s_h Σ_j a_j 2^(−40)` bits (the
+    /// covector's grain against the state's, read from the reverse's checked central differences), and with both kinds the source's chart's
+    /// covector `Σ_j a_j r̂_j` (its ray after the tick), the audience and the lane powers. A reading only.
+    pub fn mirror_covectors(&self, region: &Region) -> Result<Vec<Vec<[MirrorSums; 3]>>> {
+        let pass = self.pass(region, true)?;
+        let mut g = vec![0i128; self.material_len()];
+        let mut lambdas: Vec<Vec<i64>> = Vec::new();
+        self.returned_with(region, &pass, &mut g, None, None, None, None, Some(&mut lambdas), None)?;
+        lambdas.reverse();
+        let d = &self.declaration;
+        let (sites, dw, heads, lanes) = (region.classes.len(), d.width, d.heads, d.lanes);
+        let definite: Vec<bool> = (0..sites).map(|t| Self::definite(region, t)).collect();
+        let mut out = Vec::with_capacity(pass.ticks.len());
+        let (mut rays, mut scales) = (Vec::with_capacity(dw), Vec::with_capacity(lanes));
+        for (cell, lambda) in pass.ticks.iter().zip(&lambdas) {
+            let paces = pass.paces_at(cell);
+            let mut by_head = Vec::with_capacity(heads);
+            for h in 0..heads {
+                let mut kinds: [MirrorSums; 3] = Default::default();
+                for (kind, sums) in kinds.iter_mut().enumerate() {
+                    let readers = [Some(false), Some(true), None][kind];
+                    let (mu, audience) = self.mirror_route(cell, paces, &definite, h, readers)?;
+                    if readers.is_none() {
+                        sums.chart = vec![(0, 0); dw];
+                    }
+                    for j in (0..sites).filter(|&j| definite[j] && audience[j] > 0) {
+                        let span = j * dw..(j + 1) * dw;
+                        let a: i128 = lambda[span.clone()].iter().zip(&mu[span.clone()]).map(|(&y, &r)| i128::from(y) * i128::from(r)).sum();
+                        sums.sources += 1;
+                        (sums.a, sums.a_abs, sums.a_sq) = (sums.a + a, sums.a_abs + a.unsigned_abs(), sums.a_sq + (a.unsigned_abs() >> 32).pow(2));
+                        if readers.is_none() {
+                            (rays.clear(), scales.clear());
+                            lane_chart(&cell.after[span.clone()], lanes, &mut rays, &mut scales)?;
+                            for (slot, &r) in sums.chart.iter_mut().zip(&rays) {
+                                let v = a * i128::from(r);
+                                (slot.0, slot.1) = (slot.0 + v, slot.1 + v.unsigned_abs());
+                            }
+                            sums.audience += audience[j] >> 32;
+                            for &sc in &scales {
+                                let b = log2_grain(sc.max(1) as u128);
+                                (sums.power_log, sums.power_log_sq, sums.lanes) = (sums.power_log + i128::from(b), sums.power_log_sq + (i128::from(b) * i128::from(b)) as u128, sums.lanes + 1);
+                            }
+                        }
+                    }
+                }
+                by_head.push(kinds);
+            }
+            out.push(by_head);
+        }
+        Ok(out)
+    }
+
+    /// [measurement; theory, November 13, the theory thread's answers of 20:20Z on the reader's reaction; G159] **The reaction's forms at its
+    /// founding**, from one region's forward and reverse, for each tick and head ([`ReactionForms`]): the pair's impulse decomposed by reader
+    /// and source, `a_ij = p_ij Σ_l D_ijl ⟨g_jl, h_il⟩` with `g_j = U_j V_h J_r̂(x_j^k) λ_j^(k+1)` (the chart's Jacobian read through its
+    /// adjoint, which is symmetric) and `h_i = U_i O_hᵀ x_i^(k+1)`, a crowd's share spread over its definite sources at the octave's decay; the
+    /// source's chart's covector `Σ_j a_j r̂_j` and the reader's `Σ_i b_i r̂_i` (`a_j = Σ_i a_ij`, `b_i = Σ_j a_ij`), each coordinate with its
+    /// magnitude; and the covector of the strength raised by the source's metric, `Σ_j Σ_lane a_j,lane ‖x_j,lane‖²/n_j` with `n_j = Σ_i p_ij D̄_ij`
+    /// the source's audience (`D̄` the mean over the head's modes; the reaches' `γ_h²` a constant a head, left out). Beside them the route's own
+    /// `a_j` ([`Field::reaction_route`]) and the share of written sources where the two agree in sign. A reading only.
+    pub fn reaction_forms(&self, region: &Region) -> Result<Vec<Vec<ReactionForms>>> {
+        let pass = self.pass(region, true)?;
+        let mut g = vec![0i128; self.material_len()];
+        let mut lambdas: Vec<Vec<i64>> = Vec::new();
+        self.returned_with(region, &pass, &mut g, None, None, None, None, Some(&mut lambdas), None)?;
+        lambdas.reverse();
+        let d = &self.declaration;
+        let (sites, dw, heads, n, m, lanes) = (region.classes.len(), d.width, d.heads, d.modes, d.complex(), d.lanes);
+        let (m2, span, lw) = (2 * m, 2 * d.modes, d.width / d.lanes);
+        let (l, reaches) = (&self.layout, self.reaches());
+        let definite: Vec<bool> = (0..sites).map(|t| Self::definite(region, t)).collect();
+        let mut out = Vec::with_capacity(pass.ticks.len());
+        for (cell, lambda) in pass.ticks.iter().zip(&lambdas) {
+            let paces = pass.paces_at(cell);
+            let mut by_head = Vec::with_capacity(heads);
+            for h in 0..heads {
+                let mut f = ReactionForms { src: vec![(0, 0); dw], rdr: vec![(0, 0); dw], ..ReactionForms::default() };
+                // The route's own impulse, readers of both kinds.
+                let mut rho = self.reaction_route(cell, paces, &definite, h, false)?;
+                for (r, w) in rho.iter_mut().zip(self.reaction_route(cell, paces, &definite, h, true)?) {
+                    *r = fit64(i128::from(*r) + i128::from(w))?;
+                }
+                // `h_i`, the reader's framed current transposed, and `g_j`, the source's framed value pushed forward from `λ_j`.
+                let (mut hi_, mut gj) = (vec![0i128; sites * span], vec![0i128; sites * span]);
+                let mut dy = vec![0i64; m2];
+                for t in 0..sites {
+                    transposed(&self.theta[l.out..l.out + dw * m2], reaches.out, m2, &cell.after[t * dw..(t + 1) * dw], MATERIAL_BITS, &mut dy)?;
+                    let dr = lane_adjoint(&cell.read[t * dw..(t + 1) * dw], &cell.scale[t * lanes..(t + 1) * lanes], &lambda[t * dw..(t + 1) * dw])?;
+                    for li in 0..n {
+                        let c = h * n + li;
+                        let (ur, ui) = self.frame(paces, t, h, li);
+                        let (ur, ui) = (ur as i128, ui as i128);
+                        let (yr, yi) = (dy[c] as i128, dy[m + c] as i128);
+                        hi_[t * span + li] = release(ur * yr - ui * yi, MOVE_BITS);
+                        hi_[t * span + n + li] = release(ui * yr + ur * yi, MOVE_BITS);
+                        let row = |cc: usize| -> i128 { (0..dw).map(|i| i128::from(self.theta[l.v + cc * dw + i]) * i128::from(dr[i])).sum::<i128>() >> MATERIAL_BITS };
+                        let (vr, vi) = (row(c), row(m + c));
+                        gj[t * span + li] = release(ur * vr - ui * vi, MOVE_BITS);
+                        gj[t * span + n + li] = release(ui * vr + ur * vi, MOVE_BITS);
+                    }
+                }
+                let dot = |a: &[i128], b: &[i128], decay: &dyn Fn(usize) -> (i128, u32)| -> i128 {
+                    (0..n).map(|li| { let (dec, grain) = decay(li); release(dec * (a[li] * b[li] + a[n + li] * b[n + li]), grain) }).sum()
+                };
+                let (mut a_src, mut b_rdr, mut audience) = (vec![0i128; sites], vec![0i128; sites], vec![0u128; sites]);
+                let mut spread_h = vec![0i128; (sites + 1) * span];
+                let mut spread_n = vec![0i128; sites + 1];
+                let rows = &cell.rows[h * sites..(h + 1) * sites];
+                let crowds = &cell.crowds[h * sites..(h + 1) * sites];
+                // The definite sources' `g` summed over the places, for a crowd's members.
+                let mut gsum = vec![0i128; (sites + 1) * span];
+                for t in 0..sites {
+                    for r in 0..span {
+                        gsum[(t + 1) * span + r] = gsum[t * span + r] + if definite[t] { gj[t * span + r] } else { 0 };
+                    }
+                }
+                for i in 0..sites {
+                    let hrow = &hi_[i * span..(i + 1) * span];
+                    for src in &rows[i] {
+                        let j = src.j as usize;
+                        let term = dot(&gj[j * span..(j + 1) * span], hrow, &|li| self.pair_decay(paces, h, li, i, j));
+                        let a = release(src.p as i128 * term, SHARE_BITS);
+                        (a_src[j], b_rdr[i]) = (a_src[j] + a, b_rdr[i] + a);
+                        let mean: i128 = (0..n).map(|li| { let (dec, grain) = self.pair_decay(paces, h, li, i, j); release(src.p as i128 * dec, grain) }).sum::<i128>() / n as i128;
+                        audience[j] += mean.max(0) as u128;
+                    }
+                    for c in &crowds[i] {
+                        let members: Vec<i128> = (0..span).map(|r| gsum[(c.hi + 1) * span + r] - gsum[c.lo * span + r]).collect();
+                        let decay = |li: usize| self.octave_decay(paces, h, li, i, c.level, c.lo > i);
+                        let term = dot(&members, hrow, &decay);
+                        b_rdr[i] += release(div_nearest(c.e as i128 * term, c.count as i128), SHARE_BITS);
+                        for r in 0..span {
+                            let (dec, grain) = decay(r % n);
+                            let part = div_nearest(c.e as i128 * release(dec * hrow[r], grain), c.count as i128);
+                            spread_h[c.lo * span + r] += part;
+                            spread_h[(c.hi + 1) * span + r] -= part;
+                        }
+                        let mean: i128 = (0..n).map(|li| { let (dec, grain) = decay(li); release(c.e as i128 * dec, grain) }).sum::<i128>() / n as i128;
+                        let share = div_nearest(mean, c.count as i128);
+                        spread_n[c.lo] += share;
+                        spread_n[c.hi + 1] -= share;
+                    }
+                }
+                let (mut run_h, mut run_n) = (vec![0i128; span], 0i128);
+                for j in 0..sites {
+                    for r in 0..span {
+                        run_h[r] += spread_h[j * span + r];
+                    }
+                    run_n += spread_n[j];
+                    if !definite[j] {
+                        continue;
+                    }
+                    a_src[j] += release((0..span).map(|r| gj[j * span + r] * run_h[r]).sum::<i128>(), SHARE_BITS);
+                    audience[j] += run_n.max(0) as u128;
+                }
+                for j in (0..sites).filter(|&j| definite[j]) {
+                    let span_j = j * dw..(j + 1) * dw;
+                    let route: i128 = lambda[span_j.clone()].iter().zip(&rho[span_j.clone()]).map(|(&y, &r)| i128::from(y) * i128::from(r)).sum();
+                    f.sources += 1;
+                    f.route += route;
+                    f.pair += a_src[j];
+                    f.agree += u64::from((route > 0) == (a_src[j] > 0));
+                    for (i, slot) in f.src.iter_mut().enumerate() {
+                        let v = a_src[j] * i128::from(cell.read[j * dw + i]);
+                        (slot.0, slot.1) = (slot.0 + v, slot.1 + v.unsigned_abs());
+                    }
+                    // The strength raised by the source's metric: each lane's impulse times its power squared, over the audience.
+                    let n_j = (audience[j] >> 32).max(1) as i128;
+                    let mut weighted = 0i128;
+                    for lane in 0..lanes {
+                        let at = j * dw + lane * lw..j * dw + (lane + 1) * lw;
+                        let a_lane: i128 = lambda[at.clone()].iter().zip(&rho[at]).map(|(&y, &r)| i128::from(y) * i128::from(r)).sum();
+                        let power = (cell.scale[j * lanes + lane] >> 8).pow(2);
+                        weighted += a_lane.checked_mul(power).ok_or(TowerError::Refused("a reaction's metric-raised reading past its carrier"))? / n_j;
+                    }
+                    (f.w, f.w_abs, f.w_sq) = (f.w + weighted, f.w_abs + weighted.unsigned_abs(), f.w_sq + (weighted.unsigned_abs() >> 8).pow(2));
+                }
+                for i in 0..sites {
+                    f.readers += u64::from(b_rdr[i] != 0);
+                    for (k, slot) in f.rdr.iter_mut().enumerate() {
+                        let v = b_rdr[i] * i128::from(cell.read[i * dw + k]);
+                        (slot.0, slot.1) = (slot.0 + v, slot.1 + v.unsigned_abs());
+                    }
+                }
+                by_head.push(f);
+            }
+            out.push(by_head);
+        }
+        Ok(out)
+    }
+
+    /// [measurement; agent-inferred, November 13; G167] **Every site's face after the ticks** (written sites included), read through the
+    /// readout from the state the last tick hands on: where the passage holds a written site's class, its code there is evidence a loop can
+    /// read of whether its releases mislead what is known. A reading only.
+    pub fn faces_everywhere(&self, region: &Region) -> Result<Vec<TowerFace>> {
+        let pass = self.pass(region, true)?;
+        let (dw, reaches) = (self.declaration.width, self.reaches());
+        let last = pass.ticks.last().ok_or(TowerError::Refused("a pass with no tick"))?;
+        (0..region.classes.len()).map(|t| Ok(self.face_of(&last.handed[t * dw..(t + 1) * dw], &reaches)?.face)).collect()
+    }
+
+    /// [measurement; agent-inferred, November 13; G162] **The free ring on the host**: one region's forward at the field's declared ticks (a caller
+    /// sets them past the trained depth), and for each stage (the state each tick hands on, after the mirror's stage where
+    /// [`Field::mirror_strength`] is set) over the region's open places: the code of the place's class and the face's expected code, both on
+    /// `2^(−20)` bits summed, and the changes of the places' charts between stages, `Σ |Δr̂_k|²` and `Σ ⟨Δr̂_k, Δr̂_(k−1)⟩` (on `2^(−32)`, from
+    /// the second stage), the free iteration's relaxation or turning as read-depth reads it on the card (G149). A reading only.
+    pub fn free_ring(&self, region: &Region) -> Result<Vec<RingStage>> {
+        let pass = self.pass(region, true)?;
+        let d = &self.declaration;
+        let (dw, lanes) = (d.width, d.lanes);
+        let reaches = self.reaches();
+        let open: Vec<usize> = (0..region.classes.len()).filter(|&t| region.unresolved[t]).collect();
+        let mut out = Vec::with_capacity(pass.ticks.len());
+        let (mut prev, mut prev_change): (Option<Vec<i32>>, Option<Vec<i64>>) = (None, None);
+        let (mut rays, mut scales) = (Vec::new(), Vec::new());
+        for cell in &pass.ticks {
+            let mut stage = RingStage::default();
+            let mut charts = Vec::with_capacity(open.len() * dw);
+            for &t in &open {
+                let xt = &cell.handed[t * dw..(t + 1) * dw];
+                let read = self.face_of(xt, &reaches)?;
+                stage.code += i128::from(read.face.code(region.classes[t]));
+                let sum: i128 = read.face.masses.iter().map(|&m| m as i128 * face_code(m, read.face.total) as i128).sum();
+                stage.expected += sum / (read.face.total as i128).max(1);
+                (rays.clear(), scales.clear());
+                lane_chart(xt, lanes, &mut rays, &mut scales)?;
+                charts.extend_from_slice(&rays);
+            }
+            stage.places = open.len() as u64;
+            if let Some(p) = prev.as_ref() {
+                let change: Vec<i64> = charts.iter().zip(p).map(|(&a, &b)| i64::from(a) - i64::from(b)).collect();
+                stage.norm = change.iter().map(|&c| (c as i128 * c as i128) as u128).sum();
+                if let Some(pc) = prev_change.as_ref() {
+                    stage.inner = change.iter().zip(pc).map(|(&a, &b)| a as i128 * b as i128).sum();
+                }
+                prev_change = Some(change);
+            }
+            prev = Some(charts);
+            out.push(stage);
+        }
+        Ok(out)
+    }
+
+    /// [measurement; theory, November 13, the junction record §13.9; G157] **A turned head's reach on its own clock, read at its founding**: one
+    /// region's forward and reverse, and for each tick (in the reverse's order turned back to the forward's) and head the receiver rows'
+    /// [`ReachSums`] by kind (`[0]` open, `[1]` written); a still head's are empty. A reading only: nothing in the law reads it.
+    pub fn reach_covectors(&self, region: &Region) -> Result<Vec<Vec<[ReachSums; 2]>>> {
+        let pass = self.pass(region, true)?;
+        let mut g = vec![0i128; self.material_len()];
+        let mut flat: Vec<[ReachSums; 2]> = Vec::new();
+        self.returned_with(region, &pass, &mut g, None, None, None, Some(&mut flat), None, None)?;
+        let heads = self.declaration.heads;
+        let mut by_tick: Vec<Vec<[ReachSums; 2]>> = flat.chunks(heads).map(<[_]>::to_vec).collect();
+        by_tick.reverse();
+        Ok(by_tick)
+    }
+
+    /// [measurement; theory, November 13, the junction record §9 and the theory thread's order after G151, item (a)] **The return's chart covector
+    /// by tick**: on a field with the junction's return, one region's forward and reverse, and for each tick with a return (past the first) its
+    /// index, each site's `δℓ` (`[t]`, `ℓ`'s covector on `2^(−16)` at the covector's grain, [`junction_return`]) and the tick's opening chart `r̂`
+    /// (`[t][D]`), with the code's covector over the whole material beside them. At the founding (`Γ = 0`) the forward is the built tick's and the
+    /// reverse the built reverse, so `δℓ = (ln 2/2) ⟨λ^(k+1), x^(k+1) − x^(k−1)⟩` reads what a first deposit of the return would see. A reading only.
+    pub fn junction_covectors(&self, region: &Region) -> Result<(Vec<(usize, Vec<i64>, Vec<i32>)>, Vec<i128>)> {
+        if !self.declaration.junction {
+            return refuse("a reading of the junction's return on a field without it");
+        }
+        let pass = self.pass(region, true)?;
+        let mut g = vec![0i128; self.material_len()];
+        let mut by_tick: Vec<(usize, Vec<i64>)> = Vec::new();
+        self.returned_with(region, &pass, &mut g, None, None, Some(&mut by_tick), None, None, None)?;
+        by_tick.reverse();
+        Ok((by_tick.into_iter().map(|(k, dl)| (k, dl, pass.ticks[k].read.clone())).collect(), g))
+    }
+
+    /// [measurement; agent-inferred, November 5, §16.44] **Each of `sites`' clocks by tick** ([`BlankClocks`]): whether a
+    /// blank gap's expected duration holds its written length, and whether the faces the clocks read still predict the
+    /// byte. A reading only: nothing in the law reads it.
+    pub fn blank_clocks(&self, region: &Region, sites: &[usize]) -> Result<Vec<BlankClocks>> {
+        let pass = self.pass(region, true)?;
+        if sites.iter().any(|&i| i >= region.classes.len()) {
+            return refuse("a clock's site outside its region");
+        }
+        Ok(sites
+            .iter()
+            .map(|&i| BlankClocks {
+                ticks: pass
+                    .ticks
+                    .iter()
+                    .map(|cell| cell.clock.as_deref().and_then(|c| c.reads.get(i).and_then(Option::as_ref).map(|r| (c.paces.kappa.iter().map(|k| k[i]).collect(), r.face.clone()))))
+                    .collect(),
+            })
+            .collect())
+    }
+
+    /// [measurement; agent-inferred, November 4, §16.42] **Each of `sites`' near field by offset** ([`NearOffsets`]): whether
+    /// a receiver tells its neighbouring offsets apart where their faces are equal, as a restated result needs (in
+    /// `<<E=C>>D` the result C is written again as D, and D's `k`-th site reads C's `k`-th at offset `|C| + 2`). A reading
+    /// only: nothing in the law reads it.
+    pub fn near_offsets(&self, region: &Region, sites: &[usize]) -> Result<Vec<NearOffsets>> {
+        let pass = self.pass(region, true)?;
+        let n = region.classes.len();
+        if sites.iter().any(|&i| i >= n) {
+            return refuse("a near-field site outside its region");
+        }
+        let heads = self.declaration.heads;
+        Ok(sites
+            .iter()
+            .map(|&i| {
+                let mut out = NearOffsets { logits: pass.logits[i].clone(), ..NearOffsets::default() };
+                for cell in &pass.ticks {
+                    for h in 0..heads {
+                        let (mut before, mut after) = ([0u64; NEAR - 1], [0u64; NEAR - 1]);
+                        for src in &cell.rows[h * n + i] {
+                            let j = src.j as usize;
+                            if j < i && i - j < NEAR {
+                                before[i - j - 1] = src.p;
+                            } else if j > i && j - i < NEAR {
+                                after[j - i - 1] = src.p;
+                            }
+                        }
+                        out.before.push(before);
+                        out.after.push(after);
+                    }
+                }
+                out
+            })
+            .collect())
+    }
+}
+
+/// [measurement; agent-inferred, November 4] **A tick's read of a region**: each site's chart `r̂` on `2^(−16)` and its scales (the
+/// faces' power, one a lane) at the opening of each tick, the field's state as its ticks meet it (a reading of expansion and
+/// volume); and (§16.40) the pair contact's chart and scales, the state after the tick's current and before its pair contact.
+#[derive(Clone, Debug, Default, PartialEq, Eq)]
+pub struct TickRead {
+    pub read: Vec<i32>,
+    pub scale: Vec<i128>,
+    pub pair_read: Vec<i32>,
+    pub pair_scale: Vec<i128>,
+}
+
+impl Field {
+    /// [measurement; theory, November 11 04:48, G39] **A section's return read twice**: each region's forward once, then its return `G`, then its return with the face covector of
+    /// every loud place zeroed, `G_quiet`. A place's news mass is `m_t = ½ |p_t − q_t|₁` of its face `p_t` against its truth `q_t` (one-hot at the region's class), which is
+    /// `1 − p_t(x_t)`: quiet where `m_t < 2^(−bits)`, i.e. `(total − mass(x_t)) 2^bits < total` on the face's integers. The deposit weights `m/K` are as they stand. A reading: the field and
+    /// the regions are not changed.
+    pub fn read_and_return_split(&self, regions: &[Region], bits: u32) -> Result<SplitReturn> {
+        let len = self.material_len();
+        let mut out = regions
+            .par_iter()
+            .try_fold(
+                || SplitReturn { total: vec![0i128; len], quiet: vec![0i128; len], ..Default::default() },
+                |mut acc, region| -> Result<_> {
+                    let t0 = std::time::Instant::now();
+                    let mut pass = self.pass(region, true)?;
+                    acc.forward_ns += t0.elapsed().as_nanos();
+                    let t1 = std::time::Instant::now();
+                    self.returned(region, &pass, &mut acc.total)?;
+                    acc.return_ns += t1.elapsed().as_nanos();
+                    let mut loud = vec![false; region.classes.len()];
+                    for (t, face) in pass.faces.iter().enumerate() {
+                        let Some(face) = face else { continue };
+                        let own = face.masses.get(region.classes[t]).copied().unwrap_or(0);
+                        let news = face.total.saturating_sub(own);
+                        if news.checked_shl(bits).is_some_and(|n| n < face.total) {
+                            acc.quiet_places += 1;
+                        } else {
+                            loud[t] = true;
+                            acc.loud += 1;
+                        }
+                    }
+                    pass.skip = loud;
+                    let t2 = std::time::Instant::now();
+                    self.returned(region, &pass, &mut acc.quiet)?;
+                    acc.quiet_return_ns += t2.elapsed().as_nanos();
+                    Ok(acc)
+                },
+            )
+            .try_reduce(
+                || SplitReturn { total: vec![0i128; len], quiet: vec![0i128; len], ..Default::default() },
+                |mut a, b| {
+                    for (x, y) in a.total.iter_mut().zip(&b.total) {
+                        *x += y;
+                    }
+                    for (x, y) in a.quiet.iter_mut().zip(&b.quiet) {
+                        *x += y;
+                    }
+                    (a.loud, a.quiet_places) = (a.loud + b.loud, a.quiet_places + b.quiet_places);
+                    (a.forward_ns, a.return_ns, a.quiet_return_ns) = (a.forward_ns + b.forward_ns, a.return_ns + b.return_ns, a.quiet_return_ns + b.quiet_return_ns);
+                    Ok(a)
+                },
+            )?;
+        // [G180] Where the field reads twice, both sums are the two reads' mean ([`Field::both_reads_mean`]).
+        out.total = self.both_reads_mean(out.total);
+        out.quiet = self.both_reads_mean(out.quiet);
+        Ok(out)
+    }
+
+    /// [measurement; theory, November 13, P57 item 2 (G132)] **A region's charts by stage**: the chart `r̂` of every site's state at each tick's
+    /// opening (stage `k` the state before tick `k`, stage 0 the opening `x⁰`) and after the last tick (the stage the faces read), `[t][D]` on
+    /// `2^(−16)` each. A reading: no state changes.
+    pub fn tick_charts(&self, region: &Region) -> Result<Vec<Vec<i32>>> {
+        let pass = self.pass(region, true)?;
+        let mut stages: Vec<Vec<i32>> = pass.ticks.iter().map(|c| c.read.clone()).collect();
+        stages.push(pass.read.clone());
+        Ok(stages)
+    }
+
+    /// Each tick's read of `region` ([`TickRead`]), in tick order.
+    pub fn tick_reads(&self, region: &Region) -> Result<Vec<TickRead>> {
+        let pass = self.pass(region, true)?;
+        Ok(pass.ticks.iter().map(|c| TickRead { read: c.read.clone(), scale: c.scale.clone(), pair_read: c.read2.clone(), pair_scale: c.scale2.clone() }).collect())
+    }
+}
+
+impl FieldLearner {
+
+    /// [measurement; agent-inferred, November 3, §16.31] **Each family's step coherence**: over the family's entries, `Σ |m|`
+    /// and `Σ √v` of the covector's two moments, so `Σ|m| / Σ√v` is near one where the family's covector keeps its sign
+    /// from section to section (its step is driven) and near zero where its signs cancel (its step is noise). A reading only.
+    pub fn step_coherence(&self) -> Vec<(usize, u128, u128)> {
+        self.field
+            .families_all()
+            .iter()
+            .map(|&(start, len, _)| {
+                let m: u128 = self.first[start..start + len].iter().map(|v| v.unsigned_abs()).sum();
+                let v: u128 = self.second[start..start + len].iter().map(|v| v.unsigned_abs().isqrt()).sum();
+                (len, m, v)
+            })
+            .collect()
+    }
+}
+
+/// [definition; theory, November 10 03:55] **An answer's letter balance**: each letter's count `N(a)` on `2^72` and the
+/// faces' summed share `F(a) = Σ_t f_t(a)` on `2^(−72)` (each share floored on `2^(−40)`, its remainder carried on `2^(−72)`).
+pub fn letter_balance(x: &[usize], faces: &[TowerFace]) -> (Vec<i128>, Vec<i128>) {
+    let a = faces.first().map_or(0, |f| f.masses.len());
+    let mut n = vec![0i128; a];
+    for &c in x {
+        n[c] += 1 << 72;
+    }
+    let mut f = vec![0i128; a];
+    for face in faces {
+        for (c, &m) in face.masses.iter().enumerate() {
+            let share = (m << 40) / face.total;
+            let rem = (m << 40) - share * face.total;
+            f[c] += ((share as i128) << 32) + (((rem << 32) + face.total / 2) / face.total) as i128;
+        }
+    }
+    (n, f)
+}
+
+/// [definition; §16.47] A face's entropy `Σ_a p(a) (−log₂ p(a))` on the codes' `2^(−20)` bits, each class's code
+/// ([`TowerFace::code`]) weighed by its mass over the total and the sum released once at its nearest.
+pub fn entropy(face: &TowerFace) -> i128 {
+    let sum: i128 = face.masses.iter().enumerate().filter(|&(_, &m)| m > 0).map(|(a, &m)| m as i128 * face.code(a) as i128).sum();
+    div_nearest(sum, face.total as i128)
+}
