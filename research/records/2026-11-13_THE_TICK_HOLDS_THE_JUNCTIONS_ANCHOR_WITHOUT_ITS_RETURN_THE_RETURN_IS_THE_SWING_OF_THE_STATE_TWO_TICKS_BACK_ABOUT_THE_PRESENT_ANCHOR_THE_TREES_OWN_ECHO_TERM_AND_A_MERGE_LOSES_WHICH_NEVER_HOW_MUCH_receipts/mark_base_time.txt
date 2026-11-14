@@ -1,0 +1,40 @@
+# The field that reads twice stands on one base a batch (branch claude/mark-reuse, from main b2e84ac66): main's binary (control, c) against this build (b),
+# in one hold of the card lock, interleaved c1 b1 c2 b2 c3, each the store trainer's 100 sections (train-store, the line's own arguments) from a copy of
+# the line's lap-2 STATE.2000 (sha256 07f1fec0...), RTX 4080 SUPER, no build on the host (load at the hold's take and release beside it).
+# Projection 100 x 530 ms + 3 s = 56 s a run (the profiled read of main's binary, 529.5 ms a section with phases traced); deadline 600 s a run.
+# section_ms.py: each log's STORE_SECTION ms=; same_sections.py: each run's STORE_SECTION lines, timings aside, against c1's; cmp: STATE.100 and MEAN.100 against c1's.
+# hold: lock taken 04:56:25 load 1.99 2.36 3.49
+# c1: exit 0 04:57:11
+# b1: exit 0 04:57:55
+# c2: exit 0 04:58:40
+# b2: exit 0 04:59:24
+# c3: exit 0 05:00:09
+# hold: released 05:00:09 load 1.91 1.92 3.05
+SECTION_MS log=c1.log sections=100 mean=456.8 median=455.5 mean_from_10=456.6 min=431 max=503
+SECTION_MS log=b1.log sections=100 mean=426.0 median=425.0 mean_from_10=425.6 min=410 max=469
+SECTION_MS log=c2.log sections=100 mean=451.5 median=450.0 mean_from_10=451.1 min=428 max=498
+SECTION_MS log=b2.log sections=100 mean=423.1 median=421.0 mean_from_10=421.7 min=400 max=466
+SECTION_MS log=c3.log sections=100 mean=448.0 median=448.0 mean_from_10=447.7 min=429 max=495
+SAME_SECTIONS read=100 line=100 compared=100 equal=100
+SAME_SECTIONS read=100 line=100 compared=100 equal=100
+SAME_SECTIONS read=100 line=100 compared=100 equal=100
+SAME_SECTIONS read=100 line=100 compared=100 equal=100
+STATE_EQUAL b1 c1
+MEAN_EQUAL b1 c1
+STATE_EQUAL b2 c1
+MEAN_EQUAL b2 c1
+STATE_EQUAL c2 c1
+MEAN_EQUAL c2 c1
+STATE_EQUAL c3 c1
+MEAN_EQUAL c3 c1
+c1 returns=100 return_ms=43749 pairs=9110083455 batches=200
+b1 returns=100 return_ms=40709 pairs=9110083455 batches=200
+c2 returns=100 return_ms=43217 pairs=9110083455 batches=200
+b2 returns=100 return_ms=40358 pairs=9110083455 batches=200
+c3 returns=100 return_ms=42908 pairs=9110083455 batches=200
+# The card suite on this build (debug, the unfilled sentinels written): test result: ok. 17 passed; 0 failed; 0 ignored; 0 measured; 76 filtered out; finished in 429.68s
+MARK_SECTION field=tower section=0 code_before=1856644017 strengths=[4190209, 2101247, 3149823] state_equal=1
+MARK_SECTION field=tower section=1 code_before=1852902007 strengths=[4186105, 2105300, 3154017] state_equal=1
+MARK_PARITY field=tower strengths=[0, 0, 0] open_sites=144 covector_entries=64479 strengths_covector=[9657283230, -2917675976, -1482748498] faces_equal=1 covector_equal=1
+MARK_PARITY field=tower strengths=[4194304, 2097152, 3145728] open_sites=144 covector_entries=64479 strengths_covector=[9846851409, -2392314475, -1490505246] faces_equal=1 covector_equal=1
+# Measured 44 to 46 s a run (the hold's lines above), 0.79 to 0.82 of the projection; the card's run time a section (return_ms / 100) 429.1 to 437.5 ms for main's binary, 403.6 to 407.1 for this build.

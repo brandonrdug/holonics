@@ -1035,14 +1035,14 @@ extern "C" __global__ void field_open(FieldWords w) {
 }
 
 // [definition; agent-inferred, November 14, the ring record §4] **The first read's shares at the silent sites** (the host's `shares` of each
-// silent site's face, `Field::pass`): `⌊(m_c 2^16 + T/2)/T⌋` at each class, zero where the face has no mass (the host's empty mark) and at every
-// site that is not silent. A share is at most `2^16` (`m_c ≤ T`), one word. One thread a site and a class.
+// silent site's face, `Field::pass`): `⌊(m_c 2^16 + T/2)/T⌋` at each class, zero where the face has no mass (the host's empty mark). A share is at
+// most `2^16` (`m_c ≤ T`), one word. One thread a site and a class. [realization; agent-inferred, November 14] A row of a site that is not silent is
+// left unwritten: every reader reads a row only at a marked site (`marked_site`, the return's `marked` list), so its words were never read.
 extern "C" __global__ void field_mark_shares(FieldWords w, const uint64_t *masses, const uwide *totals, uint32_t *shares) {
     const uint64_t cells = (uint64_t)w.T * w.A;
     for (uint64_t c = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; c < cells; c += (uint64_t)gridDim.x * blockDim.x) {
         const uint64_t t = c / w.A;
         if (!w.unresolved[t] || w.mix_off[t] != w.mix_off[t + 1]) {
-            shares[c] = 0;
             continue;
         }
         const uwide total = totals[t];
