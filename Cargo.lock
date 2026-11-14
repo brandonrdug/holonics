@@ -57,6 +57,7 @@ name = "holonics-cuda"
 version = "0.1.0"
 dependencies = [
  "holonics",
+ "holonics-engine",
  "holonics-engine-cuda",
  "num-bigint",
  "num-rational",

@@ -192,7 +192,7 @@ pub mod ring;
 pub mod section_lock;
 pub(crate) mod state_text;
 pub mod tower;
-pub mod units;
+pub use holonics_engine::units;
 pub mod wave;
 pub mod word;
 

@@ -24,247 +24,15 @@
 
 use super::tower_train::{count, positive, STATE_BUDGET};
 use super::*;
-use holonics::hnn::tower::field::{Echo, Field, FieldDeclaration, FieldLearner, FieldNext, FieldRealization, FieldReceipt, HeldRows, HostField, MaterialMean, Port, Region, Shares, PARTS, PART_NAMES};
-use holonics::hnn::units::Units;
+use holonics::hnn::tower::field::{Field, FieldDeclaration, FieldLearner, FieldNext, FieldRealization, FieldReceipt, HeldRows, HostField, MaterialMean, Region, PARTS, PART_NAMES};
 use rayon::prelude::*;
-use std::collections::HashMap;
+pub(super) use holonics_engine::codec::{FieldCodec, question_text};
+pub(super) use holonics_engine::region::{TrainRegion, region_classes, views_of};
+pub(super) use holonics_engine::passage::{CONTEXT, Problems, Shape, context_regions, held_out, held_regions, mix, problems_of, shape, weighed_domain};
+pub(super) use super::{held_text, micro_bits, step_transfer, units_of};
 
 /// A codec's text ceiling, `2^24` bytes.
 const CODEC_BUDGET: usize = 1 << 24;
-
-/// The GSM8K boundary codec: the founded units, the units the passage uses (each one class, in
-/// unit order) and the answer's longest extent in classes.
-///
-/// [definition; theory, November 12 (the record of the opening's room, §4 item 4)] **The void at a kept index**
-/// (`field-codec-v3`): a codec founded on one passage holds the void as its last class (`field-codec-v2`, read and written
-/// as before); extended at a crossing to a store ([`FieldCodec::extended`]) it keeps every class where it stood, the void
-/// among them, and takes the fresh units after them, so `used` lists the units in class order with the void's index
-/// skipped. Decoding stops at the void by equality.
-pub(super) struct FieldCodec {
-    units: Units,
-    used: Vec<u32>,
-    class_of_unit: HashMap<u32, usize>,
-    /// The longest training answer in classes, plus its void: the answer sites a release opens.
-    pub answer: usize,
-    /// The void's class: `used.len()` (the last) on a `field-codec-v2`, kept where it stood on a `field-codec-v3`.
-    void: usize,
-    /// Whether the codec is written as `field-codec-v3` (its void at a kept index).
-    kept_void: bool,
-}
-
-/// A units file (`founded-units-v1 0`, a founding of no merges, is the bytes).
-pub(super) fn units_of(path: &str, sha: &str) -> Result<Units> {
-    Units::from_text(std::str::from_utf8(&pinned_read(path, sha, READ_BUDGET as usize)?)?).map_err(|e| e.to_string().into())
-}
-
-impl FieldCodec {
-    /// The codec of a training passage's problems.
-    pub(super) fn found(units: Units, problems: &[(Vec<u8>, Vec<u8>)]) -> Result<Self> {
-        let mut used: Vec<u32> = Vec::new();
-        for (q, a) in problems {
-            used.extend(units.parse(&question_text(q)).map_err(|e| e.to_string())?);
-            used.extend(units.parse(a).map_err(|e| e.to_string())?);
-        }
-        used.sort_unstable();
-        used.dedup();
-        let void = used.len();
-        let mut codec = Self::with(units, used, 0, void, false);
-        codec.answer = problems.iter().map(|(_, a)| codec.encode(a).map(|c| c.len())).collect::<Result<Vec<_>>>()?.into_iter().max().unwrap_or(0) + 1;
-        Ok(codec)
-    }
-
-    fn with(units: Units, used: Vec<u32>, answer: usize, void: usize, kept_void: bool) -> Self {
-        let class_of_unit = used.iter().enumerate().map(|(i, &u)| (u, if i < void { i } else { i + 1 })).collect();
-        Self { units, used, class_of_unit, answer, void, kept_void }
-    }
-
-    /// [definition; theory, November 12] **The codec extended by fresh units** at a crossing (`field-codec-v3`): every class keeps its
-    /// index, the void its own, and the fresh units take the classes after the last, in the order given. A unit the codec holds is refused.
-    pub(super) fn extended(&self, fresh: &[u32]) -> Result<Self> {
-        if let Some(u) = fresh.iter().find(|u| self.class_of_unit.contains_key(u)) {
-            return Err(format!("unit {u} is already in the codec").into());
-        }
-        if fresh.iter().any(|&u| u as usize >= self.units.len()) {
-            return Err("a fresh unit outside the units".into());
-        }
-        let mut used = self.used.clone();
-        used.extend_from_slice(fresh);
-        Ok(Self::with(self.units.clone(), used, self.answer, self.void, true))
-    }
-
-    /// The void class: the last on a codec founded on one passage, kept where it stood on an extended one.
-    pub(super) fn void(&self) -> usize {
-        self.void
-    }
-
-    pub(super) fn alphabet(&self) -> usize {
-        self.used.len() + 1
-    }
-
-    /// The units the codec holds, in class order with the void's index skipped.
-    pub(super) fn used(&self) -> &[u32] {
-        &self.used
-    }
-
-    /// A class's unit (none for the void).
-    fn unit_of(&self, class: usize) -> Option<u32> {
-        match class.cmp(&self.void) {
-            std::cmp::Ordering::Less => self.used.get(class).copied(),
-            std::cmp::Ordering::Equal => None,
-            std::cmp::Ordering::Greater => self.used.get(class - 1).copied(),
-        }
-    }
-
-    /// A text's classes; a unit the training passage never used is refused.
-    pub(super) fn encode(&self, text: &[u8]) -> Result<Vec<usize>> {
-        self.units.parse(text).map_err(|e| e.to_string())?.into_iter().map(|u| self.class_of_unit.get(&u).copied().ok_or_else(|| format!("unit {u} is not in the codec").into())).collect()
-    }
-
-    /// Classes back to bytes, up to the first void.
-    pub(super) fn decode(&self, classes: &[usize]) -> Vec<u8> {
-        let mut out = Vec::new();
-        for &c in classes.iter().take_while(|&&c| c != self.void) {
-            if let Some(u) = self.unit_of(c) {
-                out.extend_from_slice(self.units.piece(u as usize));
-            }
-        }
-        out
-    }
-
-    /// The codec as text: its head line, then the used units on one line (`field-codec-v2 ANSWER`, or `field-codec-v3 ANSWER VOID`).
-    pub(super) fn to_text(&self) -> String {
-        let used: Vec<String> = self.used.iter().map(u32::to_string).collect();
-        if self.kept_void {
-            return format!("field-codec-v3 {} {}\n{}\n", self.answer, self.void, used.join(" "));
-        }
-        format!("field-codec-v2 {}\n{}\n", self.answer, used.join(" "))
-    }
-
-    pub(super) fn from_text(text: &str, units: Units) -> Result<Self> {
-        let mut lines = text.lines();
-        let head: Vec<&str> = lines.next().unwrap_or("").split(' ').collect();
-        let (answer, void) = match (head.first().copied(), head.len()) {
-            (Some("field-codec-v2"), 2) => (count(head[1])?, None),
-            (Some("field-codec-v3"), 3) => (count(head[1])?, Some(count(head[2])?)),
-            _ => return Err("a codec that is not field-codec-v2 or field-codec-v3".into()),
-        };
-        let used = lines.next().unwrap_or("").split(' ').map(|w| w.parse::<u32>()).collect::<std::result::Result<Vec<_>, _>>()?;
-        if used.iter().any(|&u| u as usize >= units.len()) {
-            return Err("a codec's unit outside the units".into());
-        }
-        let mut seen = used.clone();
-        seen.sort_unstable();
-        seen.dedup();
-        if seen.len() != used.len() {
-            return Err("a codec that holds a unit twice".into());
-        }
-        match void {
-            None => {
-                let void = used.len();
-                Ok(Self::with(units, used, answer, void, false))
-            }
-            Some(v) if v <= used.len() => Ok(Self::with(units, used, answer, v, true)),
-            Some(_) => Err("a codec's void past its classes".into()),
-        }
-    }
-}
-
-/// A problem's question as its region opens it: the question, then the line it ends on.
-pub(super) fn question_text(q: &[u8]) -> Vec<u8> {
-    let mut out = q.to_vec();
-    out.push(b'\n');
-    out
-}
-
-/// The record separator and the unit separator of a passage of records (ASCII `RS` and `US`).
-pub(super) const RECORD: u8 = 0x1E;
-pub(super) const UNIT: u8 = 0x1F;
-
-/// The problems of a passage: `question \n answer` blocks separated by a blank line; or, where the passage carries the
-/// record separator, records `question US answer` separated by it, each part's bytes exact. [agent-inferred, November 5]
-/// Why the records: the code passage (Brandon, November 5: python-codes-25k in place of GSM8K) has answers that hold
-/// blank lines and questions of several lines, which the blank-line blocks would cut; neither separator stands in it.
-pub(super) fn problems_of(text: &[u8]) -> Vec<(Vec<u8>, Vec<u8>)> {
-    if text.contains(&RECORD) {
-        return text
-            .split(|&b| b == RECORD)
-            .filter_map(|record| {
-                let cut = record.iter().position(|&b| b == UNIT)?;
-                let (q, a) = (&record[..cut], &record[cut + 1..]);
-                (!q.is_empty() && !a.is_empty()).then(|| (q.to_vec(), a.to_vec()))
-            })
-            .collect();
-    }
-    let mut out = Vec::new();
-    for block in text.split(|&b| b == b'\n').collect::<Vec<_>>().split(|line| line.is_empty()) {
-        if block.len() < 2 {
-            continue;
-        }
-        let q = block[0].to_vec();
-        let a = block[1..].join(&b'\n');
-        out.push((q, a));
-    }
-    out
-}
-
-/// The exterior mask stream: an integer mixer of the key file's first word and a counter.
-pub(super) fn mix(seed: u64, counter: u64) -> u64 {
-    let mut z = seed.wrapping_add(counter.wrapping_mul(0x9E37_79B9_7F4A_7C15));
-    z = (z ^ (z >> 30)).wrapping_mul(0xBF58_476D_1CE4_E5B9);
-    z = (z ^ (z >> 27)).wrapping_mul(0x94D0_49BB_1331_11EB);
-    z ^ (z >> 31)
-}
-
-/// The encoded problems: each question's classes, its answer's and the answer's bytes.
-pub(super) type Problems = Vec<(Vec<usize>, Vec<usize>, usize)>;
-
-/// [definition; agent-inferred, November 3, §16.27] **A region's shape**: a keyed completion mask over the whole region
-/// (`Masked`), or over the answer and its void tail with the question known (`Answer`), the state the writer meets
-/// ([`Field::sample_realized`]: the question known, a uniform state of a random reading order of the answer's places).
-pub(super) enum Shape {
-    Masked(Vec<bool>),
-    Answer(Vec<bool>),
-}
-
-/// [definition; agent-inferred, November 3, §16.27; §16.32] **A region's shape**, drawn: `τ = u²`, `u` uniform on `(0, 1]` on
-/// `2^(−16)`, and each site open where its keyed draw falls below `τ`; with even odds over the whole region (the question's and the
-/// answer's language alike) or over the answer's sites and its void tail alone, the question known, so the field meets
-/// the writer's every state (`K` of the answer's places open, uniform given `K`); at least one site open in the domain.
-///
-/// Why the front regions are retired (the field's code read end to end, November 3): they were the states of the release
-/// that locked a place where one class held a majority and moved its front only past locked places; that writer could
-/// not write text, whose places are uncertain even under a perfect model, so it committed the bytes it was surest of
-/// (runs of `0`, `<<`, `=`, `####`) and left the rest open. The writer now draws every place from its own face in the
-/// training clock run backwards, whose states are these masks; the fronts' two reads (read 2 carrying faces at a pump
-/// rung) and their ports took half of every lap for states no writer meets.
-pub(super) fn shape(seed: u64, draw: u64, question: usize, sites: usize) -> Shape {
-    let head = mix(seed, draw);
-    let u = ((head >> 1) & 0xFFFF) + 1;
-    // [definition; agent-inferred, November 3, §16.32] The density is drawn at `τ = u²`, so the states where most of a site's
-    // neighbours are known come more often; each region is weighed back by its importance ratio ([`weighed_domain`]).
-    let tau = ((u * u) >> 16).max(1);
-    let whole = head & 1 == 1;
-    let from = if whole { 0 } else { question };
-    let mut out: Vec<bool> = (0..sites).map(|t| t >= from && (mix(seed, draw ^ ((t as u64 + 1) << 32)) & 0xFFFF) < tau).collect();
-    if !out.iter().any(|&u| u) {
-        out[from + mix(seed, draw.wrapping_add(1)) as usize % (sites - from)] = true;
-    }
-    if whole {
-        Shape::Masked(out)
-    } else {
-        Shape::Answer(out)
-    }
-}
-
-/// [definition; agent-inferred, November 3, §16.32] **A state's domain weighed back to the joint code**: a region whose `K`
-/// open sites among `m` were drawn at `τ = u²` (density `q(τ) = 1/(2√τ)`) against the joint code's uniform `τ`, so its
-/// importance ratio `p/q = 2√τ`, read at `τ ≈ K/m`, multiplies its weight `m/K` ([`Region::weight`]): the domain is read as
-/// `⌊2√(mK)⌋`, its weight `2√(m/K)`. The estimate of the order-averaged joint code stays unbiased (to `τ`'s reading
-/// through `K`), and its variance is spent where a site's neighbours are known.
-pub(super) fn weighed_domain(m: usize, mask: &[bool]) -> usize {
-    let k = mask.iter().filter(|&&u| u).count().max(1) as u128;
-    (4 * m as u128 * k).isqrt() as usize
-}
 
 /// [definition; agent-inferred, November 5, the unified-theory reading of 19:32, part 2 of 18:53] **A region ends five places
 /// past its lowest void**, the law since code85 stood against the keyed tail at equal laps (held context 2.124 against 2.181
@@ -320,13 +88,6 @@ pub(super) fn tail(seed: u64, draw: u64, room: usize) -> usize {
     let low = 1usize << k;
     let high = ((1usize << (k + 1)) - 1).min(room);
     low + (mix(seed, draw | 3 << 62) as usize) % (high - low + 1)
-}
-
-/// A problem's region classes: the question and its line, the answer, then `void` to `length`.
-pub(super) fn region_classes(codec: &FieldCodec, q: &[usize], a: &[usize], length: usize) -> Vec<usize> {
-    let mut out: Vec<usize> = q.iter().chain(a).copied().collect();
-    out.resize(length, codec.void());
-    out
 }
 
 /// The lengths of the regions `members` would form from `draw` on (each draw counted as
@@ -557,44 +318,6 @@ pub(super) fn opening_region_with(codec: &FieldCodec, q: &[usize], a: &[usize], 
     Some(TrainRegion { port: Some((q.len(), codec.void(), target, true, stop, heard)), window, ..TrainRegion::plain(classes, unresolved) })
 }
 
-/// A training region: its classes, its unresolved sites, its carried faces and its locks (each
-/// empty where none).
-#[derive(Clone, Debug, PartialEq, Eq)]
-pub(super) struct TrainRegion {
-    pub classes: Vec<usize>,
-    pub unresolved: Vec<bool>,
-    pub faces: Vec<Option<Shares>>,
-    pub locked: Vec<bool>,
-    /// Each carried site's echo (§15.3), empty where none.
-    pub echo: Vec<Option<Echo>>,
-    /// The sites its open ones were drawn from (§16.23, [`Region::domain`]).
-    pub domain: Option<usize>,
-    /// Its answer port (§16.24, [`Region::port`]): the first place, the void, the cells, and whether it is compared at
-    /// its boundary (§16.47) rather than through its coupling.
-    pub port: Option<(usize, usize, Vec<usize>, bool, Option<usize>, Option<Vec<bool>>)>,
-    /// Whether its port cuts the room to its windows ([`holonics::hnn::tower::field::Port::window`]).
-    pub window: bool,
-    /// Whether its port compares its open places on their letters off the void ([`holonics::hnn::tower::field::Port::letters`]).
-    pub letters: bool,
-}
-
-impl TrainRegion {
-    /// A region carrying no face and no lock.
-    pub(super) fn plain(classes: Vec<usize>, unresolved: Vec<bool>) -> Self {
-        Self { classes, unresolved, faces: Vec::new(), locked: Vec::new(), echo: Vec::new(), domain: None, port: None, window: false, letters: false }
-    }
-}
-
-/// A region as the field reads it.
-fn view_of(region: &TrainRegion) -> Region<'_> {
-    Region { classes: &region.classes, unresolved: &region.unresolved, faces: &region.faces, locked: &region.locked, echo: &region.echo, domain: region.domain, port: region.port.as_ref().map(|(start, void, target, boundary, stop, heard)| Port { start: *start, void: *void, target, boundary: *boundary, stop: *stop, heard: heard.as_deref(), window: region.window, letters: region.letters }) }
-}
-
-/// The regions as the field reads them.
-pub(super) fn views_of(regions: &[TrainRegion]) -> Vec<Region<'_>> {
-    regions.iter().map(view_of).collect()
-}
-
 /// **A section's regions as `train-field` forms them**: each member's classes (its question, its answer and a keyed
 /// void tail) and its shape ([`shape`]), one region a member, weighed in the joint code over the sites its open ones were
 /// drawn from ([`Region::weight`]: the whole region, or the answer and its tail); then a state of the writer's path of
@@ -678,46 +401,6 @@ pub(super) fn paths_of(seed: u64, read: u64, sections: &[Vec<usize>]) -> Vec<Vec
 /// training draw, a lap's count times the passage's).
 pub(super) const UNSEEN_DRAW: u64 = 1 << 61;
 
-/// The held-out read: at the release's own opening (the region the question and the codec's
-/// answer extent, every answer site unresolved at once), with each site's neighbours resolved
-/// ([`context_regions`], the region the question, the answer and its first void), and the same
-/// beside another problem's question (the foil, [`held_regions`]), the field's code over the
-/// answer's classes and its first void, on `2^(−20)` bits, beside each one's count: `[opening,
-/// context, foil]`. A reading of completion only (§16.23): no decision of the run reads it.
-/// [retired, November 2, §16.19] The split of each into its digits and its text: a class sorted by
-/// the codec's own byte kind was the numeral matcher's partition, read beside the field's own.
-pub(super) fn held_out(field: &Field, codec: &FieldCodec, problems: &Problems, realization: &mut dyn FieldRealization) -> Result<[(i64, usize); 3]> {
-    let regions = held_regions(codec, problems);
-    let views: Vec<Region> = regions.iter().map(|(c, u, _)| Region { classes: c, unresolved: u, faces: &[], locked: &[], echo: &[], domain: None, port: None }).collect();
-    let mut out = [(0i64, 0usize); 3];
-    let mut opening = 0usize;
-    for (chunk, parts) in views.chunks(64).zip(regions.chunks(64)) {
-        let faces = realization.read_faces(field, chunk).map_err(|e| e.to_string())?;
-        for ((region, faces), &(_, _, base)) in chunk.iter().zip(faces).zip(parts) {
-            if base == 0 {
-                // [agent-inferred, November 3, §16.27] The opening is read at its places, as the writer meets it: the answer's
-                // cells and its first void, each at its own place, every answer place open.
-                let (q, a, _) = &problems[opening];
-                opening += 1;
-                for (t, face) in faces.iter().enumerate().skip(q.len()).take(a.len() + 1) {
-                    let face = face.as_ref().ok_or("an opening place without a face")?;
-                    out[0].0 += face.code(region.classes[t]);
-                }
-                out[0].1 += a.len() + 1;
-                continue;
-            }
-            for (face, &class) in faces.iter().zip(region.classes) {
-                if let Some(face) = face {
-                    let code = face.code(class);
-                    out[base].0 += code;
-                    out[base].1 += 1;
-                }
-            }
-        }
-    }
-    Ok(out)
-}
-
 /// [measurement; agent-inferred, November 2] **The held answer sites' rows by where their mass lies**
 /// ([`FieldRealization::read_row_shares`]), on two sets of the held problems' regions: `opening`, the release's first
 /// read (base 0 of [`held_regions`]: the question definite and every answer site open), and `context`, the held
@@ -774,53 +457,6 @@ fn held_rows_text(field: &Field, codec: &FieldCodec, problems: &Problems, realiz
         }
     }
     Ok(())
-}
-
-/// [agent-inferred, November 1] **An answer read with its neighbours**: one problem's region (its
-/// question, answer and `length − |q| − |a|` voids) read in [`CONTEXT`] parts, the answer's sites
-/// and its first void at `t ≡ r (mod CONTEXT)` (counted from the answer's first site) unresolved in
-/// part `r` and every other site resolved, so each is read once with the three sites before it and
-/// after it resolved. Why (the third reading, November 1): the opening read, every answer site
-/// unresolved at once, reads what the question and the place tell a site, whose floor sits near
-/// the bytes' own table (the held answers coded at 5.34 bits a byte after a lap; the training
-/// answers' byte table codes them at 5.05), so it could not show what the field learned from an
-/// answer's own bytes (four bytes before a site code it at 1.98 bits on the same terms), which is
-/// what a release that commits only what the field resolves runs on.
-pub(super) fn context_regions(void: usize, q: &[usize], a: &[usize], length: usize) -> Vec<(Vec<usize>, Vec<bool>)> {
-    let mut classes: Vec<usize> = q.iter().chain(a).copied().collect();
-    classes.resize(length, void);
-    let end = q.len() + a.len() + 1;
-    (0..CONTEXT).map(|r| (classes.clone(), (0..length).map(|t| t >= q.len() && t < end && (t - q.len()) % CONTEXT == r).collect())).collect()
-}
-
-/// The held-out read's regions ([`held_out`]): each problem's opening (base 0), its [`CONTEXT`]
-/// parts read with their neighbours (base 1), and the same parts beside the next problem's
-/// question (base 2; the last problem beside the first's).
-///
-/// [agent-inferred, November 1] Why the foil: the sixth reading's answers beside their neighbours
-/// coded their digits below the bytes' own table (2.776 bits against 3.46), while the release
-/// wrote the commonest numbers and the answers read from the question alone did not fall (5.16 to
-/// 5.70). A neighbour inside the answer carries much of a digit (the result after `>>` repeats
-/// the one before it), so the context read cannot say whether the question is read at all. The
-/// same answer read beside another problem's question codes no more bits than beside its own
-/// unless the field reads its own question: the difference, foil minus context, is what the
-/// question tells the answer beyond its neighbours.
-pub(super) fn held_regions(codec: &FieldCodec, problems: &Problems) -> Vec<(Vec<usize>, Vec<bool>, usize)> {
-    let mut regions: Vec<(Vec<usize>, Vec<bool>, usize)> = problems
-        .iter()
-        .map(|(q, a, _)| {
-            let classes = region_classes(codec, q, a, q.len() + codec.answer);
-            let open = (0..classes.len()).map(|t| t >= q.len()).collect();
-            (classes, open, 0)
-        })
-        .collect();
-    regions.extend(problems.iter().flat_map(|(q, a, _)| context_regions(codec.void(), q, a, q.len() + a.len() + 1).into_iter().map(|(c, u)| (c, u, 1))));
-    let n = problems.len();
-    regions.extend((0..n).flat_map(|i| {
-        let ((_, a, _), (q, _, _)) = (&problems[i], &problems[(i + 1) % n]);
-        context_regions(codec.void(), q, a, q.len() + a.len() + 1).into_iter().map(|(c, u)| (c, u, 2))
-    }));
-    regions
 }
 
 /// [definition; agent-inferred, November 2, §16.23] **One held problem's states for the joint read**: its answer (and
@@ -1005,11 +641,6 @@ fn joint_read(field: &Field, codec: &FieldCodec, problems: &Problems, seed: u64,
     Ok(())
 }
 
-/// The parts of [`context_regions`]: a site read with the `CONTEXT − 1` sites on each side of it
-/// resolved (agent-inferred: the reach the bytes' own table needs to code a site at its
-/// four-byte-context rate, from either side).
-pub(super) const CONTEXT: usize = 4;
-
 /// [agent-inferred, November 1] **The withheld problems' regions, read with their neighbours**
 /// ([`context_regions`]): each problem's question, its answer and a keyed void tail (the draws from
 /// [`UNSEEN_DRAW`] on), so every lap reads the same regions over the same sites. Why not the
@@ -1054,22 +685,6 @@ fn unseen_read(learner: &mut FieldLearner, codec: &FieldCodec, problems: &Proble
     Ok((code, sites, next))
 }
 
-/// [agent-inferred, November 1] **The held-out read on `2^(−20)` bits to six decimals**
-/// (millionths): `[opening, context, foil]`, each a code over its sites ([`held_out`]), and the question's
-/// effect, the foil's rate less the context's (signed), beside the context's. Why six decimals
-/// (reading 9): the held answer coded 5.629 bits a byte beside its own question and 5.629 beside a
-/// foil's, equal at the printed thousandth, so a question effect below a thousandth of a bit could
-/// not be seen; the effect is the difference of the two rates and is printed as such, not left to
-/// the reader's subtraction of two rounded numbers. One formatter for every `FIELD_HELD` line.
-pub(super) fn held_text(held: &[(i64, usize); 3]) -> String {
-    let rate = |k: usize| micro_bits(held[k].0 as i128, held[k].1 as i128);
-    let effect = match (held[2], held[1]) {
-        ((_, 0), _) | (_, (_, 0)) => "-".to_string(),
-        ((a, na), (b, nb)) => micro_bits(a as i128 * nb as i128 - b as i128 * na as i128, na as i128 * nb as i128),
-    };
-    format!("answer={} classes={} context={} context_classes={} foil={} question={effect}", rate(0), held[0].1, rate(1), held[1].1, rate(2))
-}
-
 fn bits(code: i64, n: usize) -> String {
     if n == 0 {
         return "-".into();
@@ -1089,16 +704,6 @@ fn micro_nats(num: i128, n: i128) -> String {
 /// The word crossings of a text: its bytes that begin a word (a byte past a space or a line's end, or the first).
 fn word_crossings(text: &[u8]) -> usize {
     (0..text.len()).filter(|&i| !text[i].is_ascii_whitespace() && (i == 0 || text[i - 1].is_ascii_whitespace())).count()
-}
-
-fn micro_bits(num: i128, sites: i128) -> String {
-    if sites == 0 {
-        return "-".into();
-    }
-    let den = sites << 20;
-    let scaled = num * 1_000_000;
-    let millionths = if scaled >= 0 { (scaled + den / 2) / den } else { -((-scaled + den / 2) / den) };
-    format!("{}{}.{:06}", if millionths < 0 { "-" } else { "" }, millionths.abs() / 1_000_000, millionths.abs() % 1_000_000)
 }
 
 fn next_text(next: Option<FieldNext>) -> String {
@@ -1530,35 +1135,6 @@ pub(super) fn train(args: &[String], realization: &mut dyn FieldRealization) -> 
         previous = (code, unseen_sites);
     }
     Ok(())
-}
-
-
-/// [agent-inferred, November 4, §16.41] **The octave a lap's transfers read**: `+1` (the step doubles), `−1` (it halves) or
-/// `0`. Each step's transfer `t` is the first-order change of the next section's code were the step taken once more, so along
-/// the lap's steps the joint code is `F(μ) = cμ + b′μ²` with `F′(1) = Σ t`; `b′` is read from the own curvatures `Σ b` of the
-/// steps priced (a section's own parabola, the receipt's `change − predicted`), so the joint parabola's least is
-/// `μ* = 1 − Σt / 2Σb`. The step halves where `μ* < 1/√2` and doubles where `μ* > √2`, the octave nearest `μ*` on the rate's
-/// own carrier, compared exactly (`u = 2Σb − Σt = 2Σb μ*`: halve where `u < 0` or `u² < 2(Σb)²`, double where `u² > 8(Σb)²`).
-/// Where no curvature is read (`Σ b ≤ 0`) the transfer's sign alone moves it. [the unified-theory reading of November 6, 08:54]
-/// Since the step fluxes (no reread, so no `change`), the trainer reads it as the lap's line search, `step_transfer(2Σt,
-/// Σ(t − p_ext))`: `μ* = −Σp_ext / Σ(t − p_ext)`, the curvature `t − p_ext` read from the pass alone ([`FieldReceipt::external`]).
-/// Why the next sections and not the step's own:
-/// a step's own parabola read its least near five times the step at rate `2^(−11)` and its law drove the step to `2^(−7)`,
-/// where the joint code rose from 1.127 to 1.59 nats a place (`_receipts/law50/`): a step's own fall is mostly the fit to its
-/// own section, and only the next sections price what it generalizes.
-pub(super) fn step_transfer(transfers: i128, curvatures: i128) -> i32 {
-    if curvatures <= 0 {
-        return -(transfers.signum() as i32);
-    }
-    let u = 2 * curvatures - transfers;
-    let b2 = curvatures * curvatures;
-    if u < 0 || u.saturating_mul(u) < 2 * b2 {
-        -1
-    } else if u.saturating_mul(u) > 8 * b2 {
-        1
-    } else {
-        0
-    }
 }
 
 /// What a lap's withheld read decides of the body's width ([`growth`]).
@@ -4268,7 +3844,6 @@ mod tests {
         assert_eq!(problems[1].1, b"A two #### 2".to_vec());
     }
 
-
     /// The commands end to end on the host: a toy passage trains two laps, rests, continues from
     /// its rested learner, refuses to write over a run, and writes its held problems' answers with their
     /// coupling reads.
@@ -5083,7 +4658,6 @@ mod tests {
         assert!(line.contains(&format!(" longest_by_circle={}/{} ", leaks[0].longest, leaks[1].longest)), "{line}");
     }
 }
-
 
 /// [measurement; theory, November 11 04:48, G39] **`split-field STATE STATE_SHA UNITS UNITS_SHA TRAIN TRAIN_SHA HELD HELD_SHA KEYS KEYS_SHA SECTION OUT`**: the deposit covector of the
 /// first section of the walk a saved state's next lap makes, split by news. The section's regions are formed as `train-field` forms them (the codec founded on `TRAIN`, the walk, the

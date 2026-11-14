@@ -1,0 +1,421 @@
+//! **The passage's cut and a pass's place**: the problems of a passage of records, the masks a stretch is read with, the store's slices and
+//! pieces, the draws of a stretch's context and run, its one keyed state, and the cut that interleaves the slices by their quotas, the pass's
+//! place carried in the learner's state (`StorePass`). Moved from the store line's harness (`complete_language/field_train.rs` and
+//! `store_train.rs`) by C4 of #603, each item's text as it stood but for its visibility. A slice reads its bytes through [`PieceBytes`]; the
+//! store's file is the harness's source.
+
+use crate::codec::{question_text, FieldCodec, RECORD, UNIT};
+use crate::field::{octave_of, Field, FieldRealization, Region, StorePass, NEAR};
+use crate::region::{region_classes, TrainRegion};
+
+type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
+
+/// The encoded problems: each question's classes, its answer's and the answer's bytes.
+pub type Problems = Vec<(Vec<usize>, Vec<usize>, usize)>;
+
+/// [definition; agent-inferred, November 3, §16.27] **A region's shape**: a keyed completion mask over the whole region
+/// (`Masked`), or over the answer and its void tail with the question known (`Answer`), the state the writer meets
+/// ([`Field::sample_realized`]: the question known, a uniform state of a random reading order of the answer's places).
+pub enum Shape {
+    Masked(Vec<bool>),
+    Answer(Vec<bool>),
+}
+
+/// The problems of a passage: `question \n answer` blocks separated by a blank line; or, where the passage carries the
+/// record separator, records `question US answer` separated by it, each part's bytes exact. [agent-inferred, November 5]
+/// Why the records: the code passage (Brandon, November 5: python-codes-25k in place of GSM8K) has answers that hold
+/// blank lines and questions of several lines, which the blank-line blocks would cut; neither separator stands in it.
+pub fn problems_of(text: &[u8]) -> Vec<(Vec<u8>, Vec<u8>)> {
+    if text.contains(&RECORD) {
+        return text
+            .split(|&b| b == RECORD)
+            .filter_map(|record| {
+                let cut = record.iter().position(|&b| b == UNIT)?;
+                let (q, a) = (&record[..cut], &record[cut + 1..]);
+                (!q.is_empty() && !a.is_empty()).then(|| (q.to_vec(), a.to_vec()))
+            })
+            .collect();
+    }
+    let mut out = Vec::new();
+    for block in text.split(|&b| b == b'\n').collect::<Vec<_>>().split(|line| line.is_empty()) {
+        if block.len() < 2 {
+            continue;
+        }
+        let q = block[0].to_vec();
+        let a = block[1..].join(&b'\n');
+        out.push((q, a));
+    }
+    out
+}
+
+/// The exterior mask stream: an integer mixer of the key file's first word and a counter.
+pub fn mix(seed: u64, counter: u64) -> u64 {
+    let mut z = seed.wrapping_add(counter.wrapping_mul(0x9E37_79B9_7F4A_7C15));
+    z = (z ^ (z >> 30)).wrapping_mul(0xBF58_476D_1CE4_E5B9);
+    z = (z ^ (z >> 27)).wrapping_mul(0x94D0_49BB_1331_11EB);
+    z ^ (z >> 31)
+}
+
+/// [definition; agent-inferred, November 3, §16.27; §16.32] **A region's shape**, drawn: `τ = u²`, `u` uniform on `(0, 1]` on
+/// `2^(−16)`, and each site open where its keyed draw falls below `τ`; with even odds over the whole region (the question's and the
+/// answer's language alike) or over the answer's sites and its void tail alone, the question known, so the field meets
+/// the writer's every state (`K` of the answer's places open, uniform given `K`); at least one site open in the domain.
+///
+/// Why the front regions are retired (the field's code read end to end, November 3): they were the states of the release
+/// that locked a place where one class held a majority and moved its front only past locked places; that writer could
+/// not write text, whose places are uncertain even under a perfect model, so it committed the bytes it was surest of
+/// (runs of `0`, `<<`, `=`, `####`) and left the rest open. The writer now draws every place from its own face in the
+/// training clock run backwards, whose states are these masks; the fronts' two reads (read 2 carrying faces at a pump
+/// rung) and their ports took half of every lap for states no writer meets.
+pub fn shape(seed: u64, draw: u64, question: usize, sites: usize) -> Shape {
+    let head = mix(seed, draw);
+    let u = ((head >> 1) & 0xFFFF) + 1;
+    // [definition; agent-inferred, November 3, §16.32] The density is drawn at `τ = u²`, so the states where most of a site's
+    // neighbours are known come more often; each region is weighed back by its importance ratio ([`weighed_domain`]).
+    let tau = ((u * u) >> 16).max(1);
+    let whole = head & 1 == 1;
+    let from = if whole { 0 } else { question };
+    let mut out: Vec<bool> = (0..sites).map(|t| t >= from && (mix(seed, draw ^ ((t as u64 + 1) << 32)) & 0xFFFF) < tau).collect();
+    if !out.iter().any(|&u| u) {
+        out[from + mix(seed, draw.wrapping_add(1)) as usize % (sites - from)] = true;
+    }
+    if whole {
+        Shape::Masked(out)
+    } else {
+        Shape::Answer(out)
+    }
+}
+
+/// [definition; agent-inferred, November 3, §16.32] **A state's domain weighed back to the joint code**: a region whose `K`
+/// open sites among `m` were drawn at `τ = u²` (density `q(τ) = 1/(2√τ)`) against the joint code's uniform `τ`, so its
+/// importance ratio `p/q = 2√τ`, read at `τ ≈ K/m`, multiplies its weight `m/K` ([`Region::weight`]): the domain is read as
+/// `⌊2√(mK)⌋`, its weight `2√(m/K)`. The estimate of the order-averaged joint code stays unbiased (to `τ`'s reading
+/// through `K`), and its variance is spent where a site's neighbours are known.
+pub fn weighed_domain(m: usize, mask: &[bool]) -> usize {
+    let k = mask.iter().filter(|&&u| u).count().max(1) as u128;
+    (4 * m as u128 * k).isqrt() as usize
+}
+
+/// The held-out read: at the release's own opening (the region the question and the codec's
+/// answer extent, every answer site unresolved at once), with each site's neighbours resolved
+/// ([`context_regions`], the region the question, the answer and its first void), and the same
+/// beside another problem's question (the foil, [`held_regions`]), the field's code over the
+/// answer's classes and its first void, on `2^(−20)` bits, beside each one's count: `[opening,
+/// context, foil]`. A reading of completion only (§16.23): no decision of the run reads it.
+/// [retired, November 2, §16.19] The split of each into its digits and its text: a class sorted by
+/// the codec's own byte kind was the numeral matcher's partition, read beside the field's own.
+pub fn held_out(field: &Field, codec: &FieldCodec, problems: &Problems, realization: &mut dyn FieldRealization) -> Result<[(i64, usize); 3]> {
+    let regions = held_regions(codec, problems);
+    let views: Vec<Region> = regions.iter().map(|(c, u, _)| Region { classes: c, unresolved: u, faces: &[], locked: &[], echo: &[], domain: None, port: None }).collect();
+    let mut out = [(0i64, 0usize); 3];
+    let mut opening = 0usize;
+    for (chunk, parts) in views.chunks(64).zip(regions.chunks(64)) {
+        let faces = realization.read_faces(field, chunk).map_err(|e| e.to_string())?;
+        for ((region, faces), &(_, _, base)) in chunk.iter().zip(faces).zip(parts) {
+            if base == 0 {
+                // [agent-inferred, November 3, §16.27] The opening is read at its places, as the writer meets it: the answer's
+                // cells and its first void, each at its own place, every answer place open.
+                let (q, a, _) = &problems[opening];
+                opening += 1;
+                for (t, face) in faces.iter().enumerate().skip(q.len()).take(a.len() + 1) {
+                    let face = face.as_ref().ok_or("an opening place without a face")?;
+                    out[0].0 += face.code(region.classes[t]);
+                }
+                out[0].1 += a.len() + 1;
+                continue;
+            }
+            for (face, &class) in faces.iter().zip(region.classes) {
+                if let Some(face) = face {
+                    let code = face.code(class);
+                    out[base].0 += code;
+                    out[base].1 += 1;
+                }
+            }
+        }
+    }
+    Ok(out)
+}
+
+/// The held-out read's regions ([`held_out`]): each problem's opening (base 0), its [`CONTEXT`]
+/// parts read with their neighbours (base 1), and the same parts beside the next problem's
+/// question (base 2; the last problem beside the first's).
+///
+/// [agent-inferred, November 1] Why the foil: the sixth reading's answers beside their neighbours
+/// coded their digits below the bytes' own table (2.776 bits against 3.46), while the release
+/// wrote the commonest numbers and the answers read from the question alone did not fall (5.16 to
+/// 5.70). A neighbour inside the answer carries much of a digit (the result after `>>` repeats
+/// the one before it), so the context read cannot say whether the question is read at all. The
+/// same answer read beside another problem's question codes no more bits than beside its own
+/// unless the field reads its own question: the difference, foil minus context, is what the
+/// question tells the answer beyond its neighbours.
+pub fn held_regions(codec: &FieldCodec, problems: &Problems) -> Vec<(Vec<usize>, Vec<bool>, usize)> {
+    let mut regions: Vec<(Vec<usize>, Vec<bool>, usize)> = problems
+        .iter()
+        .map(|(q, a, _)| {
+            let classes = region_classes(codec, q, a, q.len() + codec.answer);
+            let open = (0..classes.len()).map(|t| t >= q.len()).collect();
+            (classes, open, 0)
+        })
+        .collect();
+    regions.extend(problems.iter().flat_map(|(q, a, _)| context_regions(codec.void(), q, a, q.len() + a.len() + 1).into_iter().map(|(c, u)| (c, u, 1))));
+    let n = problems.len();
+    regions.extend((0..n).flat_map(|i| {
+        let ((_, a, _), (q, _, _)) = (&problems[i], &problems[(i + 1) % n]);
+        context_regions(codec.void(), q, a, q.len() + a.len() + 1).into_iter().map(|(c, u)| (c, u, 2))
+    }));
+    regions
+}
+
+/// [agent-inferred, November 1] **An answer read with its neighbours**: one problem's region (its
+/// question, answer and `length − |q| − |a|` voids) read in [`CONTEXT`] parts, the answer's sites
+/// and its first void at `t ≡ r (mod CONTEXT)` (counted from the answer's first site) unresolved in
+/// part `r` and every other site resolved, so each is read once with the three sites before it and
+/// after it resolved. Why (the third reading, November 1): the opening read, every answer site
+/// unresolved at once, reads what the question and the place tell a site, whose floor sits near
+/// the bytes' own table (the held answers coded at 5.34 bits a byte after a lap; the training
+/// answers' byte table codes them at 5.05), so it could not show what the field learned from an
+/// answer's own bytes (four bytes before a site code it at 1.98 bits on the same terms), which is
+/// what a release that commits only what the field resolves runs on.
+pub fn context_regions(void: usize, q: &[usize], a: &[usize], length: usize) -> Vec<(Vec<usize>, Vec<bool>)> {
+    let mut classes: Vec<usize> = q.iter().chain(a).copied().collect();
+    classes.resize(length, void);
+    let end = q.len() + a.len() + 1;
+    (0..CONTEXT).map(|r| (classes.clone(), (0..length).map(|t| t >= q.len() && t < end && (t - q.len()) % CONTEXT == r).collect())).collect()
+}
+
+/// The parts of [`context_regions`]: a site read with the `CONTEXT − 1` sites on each side of it
+/// resolved (agent-inferred: the reach the bytes' own table needs to code a site at its
+/// four-byte-context rate, from either side).
+pub const CONTEXT: usize = 4;
+
+/// A piece of a slice's index: its offset in the slice's file, its title's and its text's octets, and whether it opens and closes its document.
+#[derive(Clone, Copy, Debug)]
+pub struct Piece {
+    pub document: u64,
+    pub offset: u64,
+    pub title: u64,
+    pub text: u64,
+    pub opens: bool,
+    pub closes: bool,
+}
+
+impl Piece {
+    /// Whether a line feed stands between the title and the text (a piece that opens with a title; the store keeps no separator).
+    pub fn line_feed(&self) -> bool {
+        self.opens && self.title > 0
+    }
+
+    /// The piece's places: its title's bytes, one line feed where it opens with a title, and its text's bytes.
+    pub fn places(&self) -> u64 {
+        self.title + u64::from(self.line_feed()) + self.text
+    }
+}
+
+/// [realization; November 14, C4 of #603] **Where a slice's bytes come from**: `out.len()` bytes from `at`. The cut reads its slices
+/// through it, so the passage's law (pieces, places, draws, stretches) holds no file: the store's file is one source ([`SliceFile`]).
+pub trait PieceBytes {
+    fn read_at(&mut self, at: u64, out: &mut [u8]) -> Result<()>;
+}
+
+/// A slice of the role read: its name, its quota (the role's store octets), its pieces in order and its source of bytes.
+pub struct Slice {
+    pub name: String,
+    pub quota: u128,
+    pub pieces: Vec<Piece>,
+    pub source: Box<dyn PieceBytes>,
+}
+
+impl Slice {
+    /// The places `[from, from + len)` of piece `k`, read from the slice's source at the piece's offset (never the slice in memory).
+    pub fn bytes(&mut self, k: usize, from: u64, len: u64) -> Result<Vec<u8>> {
+        let p = self.pieces[k];
+        let end = from + len;
+        if end > p.places() {
+            return Err("a stretch past its piece's places".into());
+        }
+        let mut out = Vec::with_capacity(len as usize);
+        let read = |source: &mut Box<dyn PieceBytes>, at: u64, n: u64, out: &mut Vec<u8>| -> Result<()> {
+            if n == 0 {
+                return Ok(());
+            }
+            let start = out.len();
+            out.resize(start + n as usize, 0);
+            source.read_at(at, &mut out[start..])
+        };
+        if !p.line_feed() {
+            read(&mut self.source, p.offset + from, len, &mut out)?;
+            return Ok(out);
+        }
+        // The title's places, the line feed at place `title`, then the text's places one past their bytes.
+        let t = p.title;
+        if from < t {
+            read(&mut self.source, p.offset + from, end.min(t) - from, &mut out)?;
+        }
+        if from <= t && t < end {
+            out.push(b'\n');
+        }
+        let text_from = from.max(t + 1);
+        if text_from < end {
+            read(&mut self.source, p.offset + text_from - 1, end - text_from, &mut out)?;
+        }
+        Ok(out)
+    }
+}
+
+/// A stretch drawn at the pass's place and not yet taken: its slice, its draw, its context and run, whether a true end follows it, and whether
+/// it finishes its piece.
+#[derive(Clone, Copy, Debug)]
+pub struct Drawn {
+    pub slice: usize,
+    pub d: u64,
+    pub q: u64,
+    pub a: u64,
+    pub ends: bool,
+    pub done: bool,
+}
+
+impl Drawn {
+    /// The stretch's sites: its context, its run and the near tail where a true end follows.
+    pub fn sites(&self) -> u64 {
+        self.q + self.a + if self.ends { NEAR as u64 } else { 0 }
+    }
+}
+
+/// [definition; the record §4 item 1; the port's `lengths_of`] A stretch's two draws, the `d`th of the pass.
+pub fn lengths_of(seed: u64, d: u64, least: u64, octaves: u64) -> (u64, u64) {
+    let oq = mix(seed, d | 1 << 60) % octaves;
+    let q = (least << oq) + mix(seed, d | 3 << 60) % (least << oq);
+    let oa = mix(seed, d | 1 << 62) % octaves;
+    let a = (least << oa) + mix(seed, d | 5 << 60) % (least << oa);
+    (q, a)
+}
+
+/// [definition; the record §4 item 1; the port's `cut_of`] The stretch at a cursor with `rest` places left: its context and run, whether a
+/// true end follows (the piece closes its document), and whether the piece is done. Where the next `q + a` places would leave at least the
+/// least context, the stretch is those places and the piece goes on; else it takes the rest, its context `min(q, rest − 1)`.
+pub fn cut_of(seed: u64, d: u64, rest: u64, closes: bool, least: u64, octaves: u64) -> (u64, u64, bool, bool) {
+    let (q, a) = lengths_of(seed, d, least, octaves);
+    if rest >= q + a + least {
+        return (q, a, false, false);
+    }
+    let q = q.min(rest - 1);
+    (q, rest - q, closes, true)
+}
+
+/// The kind of a stretch's one keyed state, as the port names it.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum Kind {
+    MaskWhole,
+    MaskRun,
+    Writer,
+}
+
+/// [definition; the record §4 item 2; the port's `state_of`] **A stretch's one keyed state**, from `head = mix(seed, d)`: bit 17 set, the
+/// writer's state (the context known, the run's places in the writer's octave order of their distance from the context, keyed within an
+/// octave, its first `k` resolved, `k` by octaves of reads, `k = 0` among them, and a true end's voids given); clear, a mask state (`shape`'s
+/// law over the whole stretch or past the context, the density `τ = u²`, weighed back by its domain `⌊2√(mK)⌋`). Regions are plain: no port.
+/// Returns the region, its kind, the sites its code is a code of (its weighed domain, or its open places for the writer's state), and
+/// for the writer's state its `k` and its front (the first open place of its order, the place the release draws next).
+pub fn state_of(seed: u64, d: u64, classes: Vec<usize>, q: usize, a: usize) -> Stretch {
+    let n = classes.len();
+    let head = mix(seed, d);
+    if (head >> 17) & 1 == 1 {
+        let key = mix(seed, d | 7 << 61);
+        let most = a - 1;
+        let o = (key % (u64::from(usize::BITS - most.leading_zeros()) + 1)) as u32;
+        let k = if o == 0 {
+            0
+        } else {
+            let low = 1usize << (o - 1);
+            let high = ((1usize << o) - 1).min(most);
+            low + (mix(seed, d | 15 << 60) as usize) % (high - low + 1)
+        };
+        let mut unresolved: Vec<bool> = (0..n).map(|t| t >= q && t < q + a).collect();
+        let mut order: Vec<usize> = (q..q + a).collect();
+        order.sort_by_key(|&t| (octave_of(t + 1 - q), mix(key, t as u64), t));
+        for &t in &order[..k] {
+            unresolved[t] = false;
+        }
+        return Stretch { region: TrainRegion::plain(classes, unresolved), kind: Kind::Writer, counted: a - k, q, writer: Some((k, order[k])) };
+    }
+    let (mask, kind, from) = match shape(seed, d, q, n) {
+        Shape::Masked(mask) => (mask, Kind::MaskWhole, 0),
+        Shape::Answer(mask) => (mask, Kind::MaskRun, q),
+    };
+    let domain = weighed_domain(n - from, &mask);
+    Stretch { region: TrainRegion { domain: Some(domain), ..TrainRegion::plain(classes, mask) }, kind, counted: domain, q, writer: None }
+}
+
+/// A stretch's one keyed state ([`state_of`]): its region, its kind, the sites its code is a code of, its context, and for the writer's
+/// state its `k` and its front place.
+pub struct Stretch {
+    pub region: TrainRegion,
+    pub kind: Kind,
+    pub counted: usize,
+    pub q: usize,
+    pub writer: Option<(usize, usize)>,
+}
+
+/// [definition; the record §4 items 1 and 5; the port's `store`] **The cut over a role of the store**: the slices interleaved by least progress
+/// against their quotas (the role's store octets; the earlier slice at a tie), each slice's pieces read in order from their cursors, the pass's
+/// place carried in the learner's state ([`StorePass`]).
+pub struct Cut {
+    pub seed: u64,
+    pub slices: Vec<Slice>,
+    pub pass: StorePass,
+}
+
+impl Cut {
+    /// The next stretch at the pass's place, drawn and not taken (none where every slice's pieces are read).
+    pub fn next(&self) -> Option<Drawn> {
+        let live: Vec<usize> = (0..self.slices.len()).filter(|&s| (self.pass.slices[s].piece as usize) < self.slices[s].pieces.len()).collect();
+        let mut slice = *live.first()?;
+        for &other in &live[1..] {
+            let (t_o, t_n) = (self.pass.slices[other].taken as u128, self.pass.slices[slice].taken as u128);
+            if t_o * self.slices[slice].quota < t_n * self.slices[other].quota {
+                slice = other;
+            }
+        }
+        let at = &self.pass.slices[slice];
+        let piece = self.slices[slice].pieces[at.piece as usize];
+        let d = self.pass.stretches + 1;
+        let (q, a, ends, done) = cut_of(self.seed, d, piece.places() - at.cursor, piece.closes, self.pass.least, self.pass.octaves);
+        Some(Drawn { slice, d, q, a, ends, done })
+    }
+
+    /// The drawn stretch taken: its region read from its slice's file, and the pass moved past it.
+    pub fn take(&mut self, drawn: Drawn, codec: &FieldCodec) -> Result<Stretch> {
+        let at = self.pass.slices[drawn.slice].clone();
+        let bytes = self.slices[drawn.slice].bytes(at.piece as usize, at.cursor, drawn.q + drawn.a)?;
+        let mut classes = codec.encode(&bytes)?;
+        if classes.len() != bytes.len() {
+            return Err("a stretch whose bytes are not one class each".into());
+        }
+        if drawn.ends {
+            classes.resize(classes.len() + NEAR, codec.void());
+        }
+        let region = state_of(self.seed, drawn.d, classes, drawn.q as usize, drawn.a as usize);
+        let place = &mut self.pass.slices[drawn.slice];
+        place.taken += drawn.q + drawn.a;
+        if drawn.done {
+            (place.piece, place.cursor) = (place.piece + 1, 0);
+        } else {
+            place.cursor += drawn.q + drawn.a;
+        }
+        self.pass.stretches = drawn.d;
+        Ok(region)
+    }
+}
+
+/// The code line's held passage (te7's lap script's `DEV`) as `train-field` reads it: its problems at the codec, those whose answer stands
+/// within the codec's extent.
+pub fn held_set(codec: &FieldCodec, text: &[u8]) -> Result<Problems> {
+    let mut out = Vec::new();
+    for (q, a) in problems_of(text) {
+        let (qc, ac) = (codec.encode(&question_text(&q))?, codec.encode(&a)?);
+        if ac.len() < codec.answer {
+            out.push((qc, ac, a.len()));
+        }
+    }
+    Ok(out)
+}
