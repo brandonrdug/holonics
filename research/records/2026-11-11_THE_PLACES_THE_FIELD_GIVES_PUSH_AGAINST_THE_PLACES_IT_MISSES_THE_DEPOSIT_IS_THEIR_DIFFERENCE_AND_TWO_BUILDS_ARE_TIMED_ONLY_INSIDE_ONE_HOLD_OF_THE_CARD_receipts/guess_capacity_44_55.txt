@@ -4512,3 +4512,17 @@ stretches read, the same pieces), read at their MEAN.3000:
   window at the pass's end. The three-lane lap took 1,920,458 ms to the two-lane lap's 1,773,641 (1.083 times), and the two-lane line fell
   0.0031 and 0.0023 a lap there, so the extra card time is worth about 0.0003. The rule's first branch: the lane's worth persists, G188's
   reading stands (the plateau was the face's width), and G189 runs.
+
+G191 fixed 2026-11-14T15:18Z (the Opus PC thread), before its builds are timed: two realization constants of the engine audit of
+November 14 (findings 2 and 4; a reading of source and of two_reads_profile.txt, nothing built there). Read first: the outer sums take 35.6 ms
+of a profiled section on 35 blocks a launch over 414 launches (OUTER_WALK 512 sites a block); the forward contact field_contact_l5 and
+field_exposure run under a forced 64-register bound (CONTACT_MIN_BLOCKS 8, field_exposure's own 8) with 778 and 220 spill stores, where the
+reverse rows read 0.881 of their time at four blocks (G126 (e)). Builds: base, OUTER_WALK 128 and 64 (the kernel's and the host's grid
+together), and minimum blocks 4 and 6 for both forward kernels. Timed inside one hold of the card on 24 sections of the three-lane line's
+training from its lap-2 end state, in the order base, walk128, walk64, blocks4, blocks6, base.
+  (a) every build's section lines, timings aside, equal the base's on all 24 sections (a realization keeps every bit);
+  (b) walk128 takes a section at least 10 ms under the two base runs' mean;
+  (c) blocks4 takes a section at least 4 ms under it.
+  The resolution is the two base runs' own spread; a difference inside it is no difference. Rule: a build that held (a) and stands outside
+  the spread enters the line's binary (the best walk and the best bound together, timed once more in one hold against base before the line
+  takes it); one that missed (a) is a defect and is read before anything else.
