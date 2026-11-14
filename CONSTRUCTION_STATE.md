@@ -549,7 +549,11 @@ repository was reset on September 24; the pre-reset tree is
     (G175); along its strength with the constitution fixed it buys 0.003 at 1/8 and turns by 1/4
     (G176), so the build is the field trained through the mark, now a host law: the field reads
     twice, its second read marked by the first at strengths founded at zero (`hnn-field-v14m`,
-    part `mark`), the card refusing it until its realization passes parity (the record's §4 and §5; Brandon's correction of the same day: a temperature is a store's
+    part `mark`), and its card realization reads the host's bits: each batch read twice, the first
+    read's silent faces' shares kept on the card for the second read's marks and return, faces,
+    covector and a learner's sections equal on plain, carry, opening and tower fields at the
+    founding and off it (atlas `tower.field-mark`; a marked field with the junction's return is
+    refused with the junction) (the record's §4 and §5; Brandon's correction of the same day: a temperature is a store's
     state, never a reading's dial; [the record](research/records/2026-11-13_THE_FIELD_RINGS_UNDER_ITS_OWN_RELEASE_A_PLACE_HEARING_ITSELF_FLIPS_EACH_PASS_THE_RUNAWAY_LEAVES_EVIDENCE_AT_THE_KNOWN_PLACES_AND_RECURSION_HELPS_ONLY_WHERE_THE_DEPOSIT_RUNS_THROUGH_IT.md)).
     The line's first pass over the 1 GB of training documents ended at lap 6 (1.0743 one-place,
     2.4057 whole masks); the second pass's laps read 1.0630, 1.0542, 1.0464, 1.0383 and 1.0320
