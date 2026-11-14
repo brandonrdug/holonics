@@ -2915,11 +2915,15 @@ pub(super) fn read_cavity(args: &[String], realization: &mut dyn FieldRealizatio
             stretches.push((stretch.region.classes.clone(), bytes, ends));
         }
         // c0 on the host, a region a place; the first stretch's places checked against the whole opening.
+        // [the ring record §4] On a field that reads twice the opening a place's chart begins from is the second read's, marked by the first
+        // read's face, so c0 is read from the realization's chart at that opening (its parity with the host's charts is on record, the card's
+        // `the_field_that_reads_twice_on_the_card_reads_the_hosts_bits`), and the host reads no opening of its own.
+        let marked = learner.field.declaration.mark;
         let host_start = std::time::Instant::now();
         let mut c0: Vec<Vec<i64>> = Vec::with_capacity(stretches.len());
         // (the places of a stretch read on the host's threads: a reading, each place's region its own)
         use rayon::prelude::*;
-        for (k, (classes, _, _)) in stretches.iter().enumerate() {
+        for (k, (classes, _, _)) in stretches.iter().enumerate().filter(|_| !marked) {
             let codes: Vec<std::result::Result<i64, String>> = (0..classes.len())
                 .into_par_iter()
                 .map(|t| {
@@ -2984,6 +2988,11 @@ pub(super) fn read_cavity(args: &[String], realization: &mut dyn FieldRealizatio
             at = end;
         }
         let card_ms = card_start.elapsed().as_millis();
+        if marked {
+            for (k, (classes, _, _)) in stretches.iter().enumerate() {
+                c0.push((0..classes.len()).map(|t| code_of_read(&charts[k][t][0], classes[t])).collect::<std::result::Result<Vec<i64>, _>>()?);
+            }
+        }
         let opening_start = std::time::Instant::now();
         let co: Vec<Vec<Option<i64>>> = stretches.par_iter().map(|(classes, _, _)| opening_of(classes, &vec![false; classes.len()])).collect::<std::result::Result<_, String>>()?;
         let opening_ms = opening_start.elapsed().as_millis();
