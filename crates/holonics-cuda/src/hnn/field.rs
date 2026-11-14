@@ -30,7 +30,7 @@
 use core::ffi::c_void;
 use std::time::Instant;
 
-use holonics::hnn::tower::field::{band_bits, landmarks_of, BlankClocks, CarryGates, Field, FieldDeclaration, FieldRead, FieldRealization, HeldRows, NearOffsets, RealizationCounters, RowCurrent, Region, Scale, TickRead, NEAR, SHARE_BITS, STATE_BITS};
+use holonics::hnn::tower::field::{band_bits, landmarks_of, BlankClocks, CarryGates, Field, FieldDeclaration, FieldRead, FieldRealization, HeldRows, NearOffsets, RealizationCounters, RowCurrent, Region, Scale, TickRead, MARK_BASES, NEAR, SHARE_BITS, STATE_BITS};
 use holonics::hnn::tower::field::{level_cut, level_section, PACE_BITS};
 use holonics::hnn::tower::{TowerError, TowerFace, MATERIAL_BITS};
 
@@ -3835,10 +3835,10 @@ impl<'c> CardField<'c> {
                 let count = marked.len();
                 let marked_c = self.timed(Kind::Copy, || self.take_up(&marked)).map_err(device)?;
                 // Unzeroed: `field_mark_back` writes every word `[b][k][i]` before `field_mark_rows` reads it.
-                let adx = alloc64(3 * count * dw)?;
+                let adx = alloc64(MARK_BASES * count * dw)?;
                 let (mut gp, mut dxp, mut mp, mut cnt, mut ap) = (g.device_ptr(), dx.device_ptr(), marked_c.device_ptr(), count as u32, adx.device_ptr());
                 self.launch("field_mark_back", Self::cells((count * dw) as u64), THREADS, &mut [arg(words), arg(&mut gp), arg(&mut dxp), arg(&mut mp), arg(&mut cnt), arg(&mut ap)])?;
-                self.launch("field_mark_rows", Self::cells((3 * (a + 1) * dw * count.div_ceil(64)) as u64), THREADS, &mut [arg(words), arg(&mut gp), arg(&mut mp), arg(&mut cnt), arg(&mut ap)])?;
+                self.launch("field_mark_rows", Self::cells((MARK_BASES * (a + 1) * dw * count.div_ceil(64)) as u64), THREADS, &mut [arg(words), arg(&mut gp), arg(&mut mp), arg(&mut cnt), arg(&mut ap)])?;
             }
         }
         Ok(())
@@ -4051,7 +4051,7 @@ pub fn read_octets(d: &FieldDeclaration, returning: bool, echo: bool, sites: usi
     // sites' list and `release(α_b dx, 24)` in each of the three encodings (`[3][t][D]` at most). [G180] Where both reads return, the first
     // leaves the base clock's two covectors from the opening's comparison (`[p][t]` on 128 bits each) for the second; the reads' own carriers
     // are each read's, one read at a time.
-    let mark_site = if d.mark { 4 * a + if returning { 4 + 3 * 8 * dw + 2 * 16 * d.paced_heads() as u64 } else { 0 } } else { 0 };
+    let mark_site = if d.mark { 4 * a + if returning { 4 + MARK_BASES as u64 * 8 * dw + 2 * 16 * d.paced_heads() as u64 } else { 0 } } else { 0 };
     let (s, pairs) = (sites as u64, (sites * sites) as u64);
     // The shares are kept for a return and an echo; the reverse holds one head's covector a pair on 64 bits.
     let weights = h * 8 * pairs * if returning { 2 } else { 1 };
@@ -4912,7 +4912,7 @@ mod tests {
 
     /// The strengths the mark is read at off its founding: a quarter, an eighth and three sixteenths on the material's grain (`enc`, `before`,
     /// `after`), the host's covector test's.
-    const MARK_STRENGTHS: [i32; 3] = [1 << 22, 1 << 21, 3 << 20];
+    const MARK_STRENGTHS: [i32; holonics::hnn::tower::field::MARK_BASES] = [1 << 21, 3 << 20];
 
     /// [the ring record §4] The learners a field that reads twice is grown onto on the card, before the growth: plain (its read, out and contact
     /// blocks drawn off zero from a keyed stream's tail), with two carry circles, with the circles and the opening's lift (the lift and the paces

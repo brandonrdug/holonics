@@ -492,7 +492,7 @@ struct FieldWords {
     const uint32_t *mcmap;
     uint64_t tm;
     // [definition; agent-inferred, November 14, the ring record §4] **The field that reads twice** (`FieldDeclaration::mark`): the strengths'
-    // offset in the material (`FieldLayout::mark`, `α_b` for `enc`, `before`, `after` on `2^(−24)`), and on the second read each silent site's
+    // offset in the material (`FieldLayout::mark`, `α_b` for the neighbours' `before` and `after` on `2^(−24)`, G184), and on the second read each silent site's
     // shares of the face the first read gave it, `[t][A]` on `2^(−16)` (the host's `shares`, zero at a class whose share releases to zero and at
     // every site that is not silent; `field_mark_shares`). Null on a first read and on a field that reads once, where no kernel reads a mark.
     uint64_t mark_at;
@@ -1017,18 +1017,18 @@ __device__ __forceinline__ int64_t mark_term(const FieldWords &w, uint64_t base,
 // A site's opening face `x⁰_t = E(u_t) + E₋(u_(t−1)) + E₊(u_(t+1))`: its row of the encoding (or its
 // mixture's) with its strand neighbours' rows of theirs, a neighbour only within the site's own region
 // (a site at its region's first place has none before it; the next site is the region's own when its
-// place is not the first). [the ring record §4] On a field's second read each marked site's row carries
-// its mark in every encoding it enters (`mark_term`, zero on a field that reads once).
+// place is not the first). [the ring record §4; G184] On a field's second read each marked site's row carries
+// its mark in its neighbours' openings (`mark_term`, zero on a field that reads once), never in its own: that would be its echo.
 extern "C" __global__ void field_open(FieldWords w) {
     const uint64_t cells = (uint64_t)w.T * w.D;
     for (uint64_t c = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; c < cells; c += (uint64_t)gridDim.x * blockDim.x) {
         const uint64_t t = c / w.D, i = c % w.D;
-        int64_t x = opening_term(w, w.enc, t, i) + mark_term(w, w.enc, 0, t, i);
+        int64_t x = opening_term(w, w.enc, t, i);
         if (w.site_pos[t] > 0) {
-            x += opening_term(w, w.enc_before, t - 1, i) + mark_term(w, w.enc_before, 1, t - 1, i);
+            x += opening_term(w, w.enc_before, t - 1, i) + mark_term(w, w.enc_before, 0, t - 1, i);
         }
         if (t + 1 < w.T && w.site_pos[t + 1] > 0) {
-            x += opening_term(w, w.enc_after, t + 1, i) + mark_term(w, w.enc_after, 2, t + 1, i);
+            x += opening_term(w, w.enc_after, t + 1, i) + mark_term(w, w.enc_after, 1, t + 1, i);
         }
         w.x[c] = x;
     }
@@ -4713,24 +4713,24 @@ extern "C" __global__ void field_encoding(FieldWords w, wide *g, const int64_t *
 }
 
 // [definition; agent-inferred, November 14, the ring record §4] **The mark's return at its sites** (the host's `Field::opening_return` at a site
-// `Field::law_mark` holds), one thread a marked site `marked[k]` and a coordinate `i`. For each encoding `b` the site's row enters (its own opening
-// at `t = s`; `before` at the next site's, `t = s + 1`, and `after` at the site's before it, `t = s − 1`, each within the site's region), with
+// `Field::law_mark` holds), one thread a marked site `marked[k]` and a coordinate `i`. For each neighbour's encoding `b` the site's row enters
+// (`before` at the next site's opening, `t = s + 1`, and `after` at the site's before it, `t = s − 1`, each within the site's region; G184), with
 // `dx_i` the covector at that opening: `a = release(α_b dx_i, 24)` is kept for the rows' return (`adx[b][k][i]`, `field_mark_rows`; zero where the
 // row enters no opening), and the strength takes `dx_i Δ_(s,b,i)`, the raw product the outer sum accumulates. `a` is held in one 64-bit word and
-// refused past it (`|α| < 2^31`: a covector word under `2^56` always fits). Each thread's three partials are summed over its warp and added by the
+// refused past it (`|α| < 2^31`: a covector word under `2^56` always fits). Each thread's two partials are summed over its warp and added by the
 // ring's atomic step, any order the same 128 bits.
 extern "C" __global__ void field_mark_back(FieldWords w, wide *g, const int64_t *dx, const uint32_t *marked, uint32_t count, int64_t *adx) {
     const uint64_t cells = (uint64_t)count * w.D;
-    wide part[3] = {0, 0, 0};
+    wide part[2] = {0, 0};
     for (uint64_t c = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; c < cells; c += (uint64_t)gridDim.x * blockDim.x) {
         const uint64_t k = c / w.D, i = c % w.D;
         const uint64_t s = marked[k];
-        for (uint32_t b = 0; b < 3; b++) {
-            const bool enters = b == 0 || (b == 1 ? s + 1 < w.T && w.site_pos[s + 1] > 0 : w.site_pos[s] > 0);
+        for (uint32_t b = 0; b < 2; b++) {
+            const bool enters = b == 0 ? s + 1 < w.T && w.site_pos[s + 1] > 0 : w.site_pos[s] > 0;
             int64_t a = 0;
             if (enters) {
-                const uint64_t t = b == 0 ? s : (b == 1 ? s + 1 : s - 1);
-                const uint64_t base = b == 0 ? w.enc : (b == 1 ? w.enc_before : w.enc_after);
+                const uint64_t t = b == 0 ? s + 1 : s - 1;
+                const uint64_t base = b == 0 ? w.enc_before : w.enc_after;
                 const int64_t d = dx[t * w.D + i];
                 a = fit64(rel((wide)w.theta[w.mark_at + b] * (wide)d, MATERIAL_BITS), w.status);
                 part[b] += (wide)d * (wide)mark_delta(w, base, s, i);
@@ -4739,7 +4739,7 @@ extern "C" __global__ void field_mark_back(FieldWords w, wide *g, const int64_t 
         }
     }
     const uint32_t lane = threadIdx.x & 31;
-    for (uint32_t b = 0; b < 3; b++) {
+    for (uint32_t b = 0; b < 2; b++) {
         const wide v = warp_sum(part[b]);
         if (lane == 0 && v != 0) {
             add_wide(g + w.mark_at + b, v);
@@ -4755,9 +4755,9 @@ extern "C" __global__ void field_mark_back(FieldWords w, wide *g, const int64_t 
 extern "C" __global__ void field_mark_rows(FieldWords w, wide *g, const uint32_t *marked, uint32_t count, const int64_t *adx) {
     const uint64_t entries = (uint64_t)(w.A + 1) * w.D;
     const uint64_t tiles = ((uint64_t)count + 63) / 64;
-    for (uint64_t c = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; c < 3 * entries * tiles; c += (uint64_t)gridDim.x * blockDim.x) {
+    for (uint64_t c = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; c < 2 * entries * tiles; c += (uint64_t)gridDim.x * blockDim.x) {
         const uint64_t entry = c % entries, rest = c / entries;
-        const uint64_t b = rest % 3, tile = rest / 3;
+        const uint64_t b = rest % 2, tile = rest / 2;
         const uint64_t row = entry / w.D, i = entry % w.D;
         const uint64_t from = tile * 64;
         const uint64_t to = from + 64 < count ? from + 64 : count;
@@ -4777,7 +4777,7 @@ extern "C" __global__ void field_mark_rows(FieldWords w, wide *g, const uint32_t
             }
         }
         if (sum != 0) {
-            const uint64_t base = b == 0 ? w.enc : (b == 1 ? w.enc_before : w.enc_after);
+            const uint64_t base = b == 0 ? w.enc_before : w.enc_after;
             add_wide(g + base + entry, sum);
         }
     }

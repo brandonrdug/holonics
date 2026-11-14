@@ -319,17 +319,21 @@ pub struct FieldDeclaration {
     pub junction: bool,
     /// [definition; agent-inferred, November 14, the ring record §4 and §5] **The release marked as the field's own**: the field reads a region
     /// twice. The first read is the built read; the second opens each open, silent site `s` on `E_b(∗) + release(α_b (release(Σ_c w_(s,c)
-    /// E_b(c), 16) − E_b(∗)), 24)` in each encoding `b` its row enters (its own `enc`, its neighbours' `before` and `after`), `w` the shares
-    /// of the face the first read gave it, the site silent otherwise; the faces are the second read's. `α_b`, one strength an encoding on the
-    /// material's grain ([`FieldLayout::mark`]), is founded at zero ([`Field::with_mark`]), so at the founding the second read is the first
-    /// bit for bit. The return runs through the second read into every part and into `α_b`; the first read's faces are data to it.
+    /// E_b(c), 16) − E_b(∗)), 24)` in each encoding `b` its row enters at its neighbours' openings (`before` at `s + 1`, `after` at `s − 1`),
+    /// `w` the shares of the face the first read gave it, and on its open row alone in its own opening (`enc`): a site hears its neighbours'
+    /// placements and never its own, which is its echo, the reaction term the cavity leaves out (G184; atlas `tower.field-echo`). The faces
+    /// are the second read's. `α_b`, one strength a neighbour's encoding on the material's grain ([`FieldLayout::mark`]), is founded at zero
+    /// ([`Field::with_mark`]), so at the founding the second read is the first bit for bit. Both reads are compared (G180): each returns into
+    /// every part, the second into `α_b` too, and the first read's faces are data to the second.
     ///
     /// Why (the ring record §5, G169 to G176): a field that hears its own release as written text takes its own news for the passage's and
     /// runs off at any temperature it holds; a faint mark of its own first read in the opening lowers the open places' code at first order
     /// (G175: −0.046 nats a place a unit of strength, 5.9 times its floor), and along the strength with the constitution fixed it buys 0.003
     /// and turns by a quarter (G176), so the field is trained through the mark. The mark mixes the text's own rows toward the open row and
-    /// keeps no rows of its own (a table of free rows indexed by a class is refused, November 12). `false` writes every head line exactly as
-    /// before; `true` writes `hnn-field-v14m`, the sixteen words of `v14j` with the junction's word written as `0` or `1`, then `1`.
+    /// keeps no rows of its own (a table of free rows indexed by a class is refused, November 12). On the line the self-mark read 0.0014 nats a
+    /// place worse than no mark at a lone open place, where the place's own first face is the only mark, while the neighbours' marks bought
+    /// 0.037 at whole masks (G183), so the site's own encoding carries none (G184). `false` writes every head line exactly as before; `true`
+    /// writes `hnn-field-v14m`, the sixteen words of `v14j` with the junction's word written as `0` or `1`, then `1`.
     pub mark: bool,
 }
 
@@ -768,16 +772,16 @@ pub struct FieldLayout {
     /// leak is read; the last families, zero long where the tick has no return.
     pub junction: usize,
     pub junction_bias: usize,
-    /// [definition; agent-inferred, November 14, the ring record §4] **The mark's strengths** ([`FieldDeclaration::mark`]): `α_b`, one entry an
-    /// encoding (`enc`, `before`, `after`, in that order) on the material's grain, so `α_b = 2^24` marks a site's row at its whole face; the last
-    /// family, zero long where the field reads once.
+    /// [definition; agent-inferred, November 14, the ring record §4; G184] **The mark's strengths** ([`FieldDeclaration::mark`]): `α_b`, one
+    /// entry a neighbour's encoding (`before`, `after`, in that order) on the material's grain, so `α_b = 2^24` marks a site's row at its whole
+    /// face; the last family, zero long where the field reads once. A site's own encoding (`enc`) carries no mark: it would be its echo.
     pub mark: usize,
     pub len: usize,
     pub families: Vec<(usize, usize, u32)>,
 }
 
-/// The encodings a mark's strengths are read in, in [`FieldLayout::mark`]'s order.
-pub const MARK_BASES: usize = 3;
+/// The encodings a mark's strengths are read in, in [`FieldLayout::mark`]'s order: the neighbours' `before` and `after` (G184).
+pub const MARK_BASES: usize = 2;
 
 impl FieldLayout {
     fn new(d: &FieldDeclaration) -> Self {
@@ -2700,15 +2704,16 @@ impl Field {
         region.faces.get(t).and_then(Option::as_ref)
     }
 
-    /// [definition; the ring record §4] The index of a mark's strength for the encoding at `base` ([`FieldLayout::mark`]'s order).
-    fn mark_base(&self, base: usize) -> usize {
+    /// [definition; the ring record §4; G184] The index of a mark's strength for the encoding at `base` ([`FieldLayout::mark`]'s order): the
+    /// neighbours' `before` and `after`; none for a site's own `enc`, whose mark would be its echo.
+    fn mark_base(&self, base: usize) -> Option<usize> {
         let l = &self.layout;
-        if base == l.enc {
-            0
-        } else if base == l.before {
-            1
+        if base == l.before {
+            Some(0)
+        } else if base == l.after {
+            Some(1)
         } else {
-            2
+            None
         }
     }
 
@@ -2731,8 +2736,9 @@ impl Field {
         if !self.declaration.mark || !region.unresolved[s] || Self::carried(region, s).is_some() {
             return None;
         }
+        let at = self.layout.mark + self.mark_base(base)?;
         let face = marks?.get(s)?.as_ref()?;
-        Some((i128::from(self.theta[self.layout.mark + self.mark_base(base)]), face))
+        Some((i128::from(self.theta[at]), face))
     }
 
     /// Site `s`'s opening term in the encoding at `base`: its row, or the superposition of its
@@ -2772,9 +2778,9 @@ impl Field {
                 let start = base + self.row(region, s) * dw;
                 // [the ring record §4] A marked site: `x = E(∗) + release(α Δ, 24)`, so `E(∗)` takes `dx − release(α dx, 24)`, each class's row
                 // `release(w_c release(α dx, 24), 16)`, and the strength `Σ_i dx_i Δ_i` (the outer sum's grain). The ruler's mark returns nothing.
-                match self.law_mark(region, base, s, marks) {
-                    Some((alpha, face)) => {
-                        let at = self.layout.mark + self.mark_base(base);
+                match self.law_mark(region, base, s, marks).zip(self.mark_base(base)) {
+                    Some(((alpha, face), b)) => {
+                        let at = self.layout.mark + b;
                         for i in 0..dw {
                             let a_dx = release(alpha * dx[i] as i128, MATERIAL_BITS);
                             g[start + i] += dx[i] as i128 - a_dx;
@@ -4248,6 +4254,13 @@ impl Field {
     /// (`2^(−40)` bits a unit), the opening's part of the strength only: the carried site's voice (a source at strength `α`) is not read. A
     /// reading: no state changes.
     pub fn carried_slopes(&self, region: &Region, faces: &[Option<TowerFace>]) -> Result<Vec<i128>> {
+        Ok(self.carried_slopes_by_kind(region, faces)?.into_iter().map(|[own, neighbours]| own + neighbours).collect())
+    }
+
+    /// [measurement; G184] [`Field::carried_slopes`] at each site split as `[own, neighbours]`: the term of the site's own carried face in its
+    /// own opening (`Δ_t(enc)`) and the terms of its neighbours' (`Δ_(t−1)(before) + Δ_(t+1)(after)`). The law's mark is the neighbours'
+    /// alone ([`FieldDeclaration::mark`]), so its founding covector is the second.
+    pub fn carried_slopes_by_kind(&self, region: &Region, faces: &[Option<TowerFace>]) -> Result<Vec<[i128; 2]>> {
         let pass = self.pass(region, true)?;
         let mut g = vec![0i128; self.material_len()];
         let mut dx = Vec::new();
@@ -4262,12 +4275,16 @@ impl Field {
             let open = base + a * dw;
             Some((0..dw).map(|i| release(sh.iter().map(|&(c, w)| w as i128 * self.theta[base + c as usize * dw + i] as i128).sum(), STATE_BITS) as i64 - self.theta[open + i] as i64).collect())
         };
-        let mut r = vec![0i128; sites];
+        let mut r = vec![[0i128; 2]; sites];
         for (t, slot) in r.iter_mut().enumerate() {
             let dxt = &dx[t * dw..(t + 1) * dw];
-            let parts = [delta(l.enc, t), t.checked_sub(1).and_then(|s| delta(l.before, s)), (t + 1 < sites).then(|| delta(l.after, t + 1)).flatten()];
-            for d in parts.into_iter().flatten() {
-                *slot += dxt.iter().zip(&d).map(|(&x, &y)| i128::from(x) * i128::from(y)).sum::<i128>();
+            let dot = |d: &[i64]| dxt.iter().zip(d).map(|(&x, &y)| i128::from(x) * i128::from(y)).sum::<i128>();
+            if let Some(d) = delta(l.enc, t) {
+                slot[0] += dot(&d);
+            }
+            let neighbours = [t.checked_sub(1).and_then(|s| delta(l.before, s)), (t + 1 < sites).then(|| delta(l.after, t + 1)).flatten()];
+            for d in neighbours.into_iter().flatten() {
+                slot[1] += dot(&d);
             }
         }
         Ok(r)

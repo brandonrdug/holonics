@@ -4022,7 +4022,7 @@ fn the_marks_covector_matches_its_codes_difference() {
     for still in [0usize, 1, 2] {
         let (mut field, _) = four_ticks(still).with_mark().unwrap();
         let l = field.layout.clone();
-        field.theta[l.mark..l.mark + MARK_BASES].copy_from_slice(&[1 << 22, 1 << 21, 3 << 20]);
+        field.theta[l.mark..l.mark + MARK_BASES].copy_from_slice(&[1 << 21, 3 << 20]);
         let r = region();
         let g = covector_of(&field, &r);
         let first = field.pass_with(&r, false, None).unwrap();
@@ -4070,9 +4070,9 @@ fn the_marks_covector_matches_its_codes_difference() {
 }
 
 /// [definition; agent-inferred, November 14, the ring record §4 and §5] **The mark's founding covector is the carried slope G175 read**: on a field
-/// reading twice at its founding, the strengths' covectors sum to `Σ_t ⟨λ⁰_t, D_t⟩` of [`Field::carried_slopes`] on the field before the growth,
-/// faced by its own first read, halved since both reads are compared and only the second is marked (G180); so the reading that sized the
-/// strength is the law's own first-order direction.
+/// reading twice at its founding, the strengths' covectors sum to the neighbours' part of `Σ_t ⟨λ⁰_t, D_t⟩` ([`Field::carried_slopes_by_kind`])
+/// on the field before the growth, faced by its own first read, halved since both reads are compared and only the second is marked (G180); so
+/// the reading that sized the strength is the law's own first-order direction, a site's own part left out as its echo (G184).
 #[test]
 fn the_marks_founding_covector_is_the_carried_slope() {
     for still in [0usize, 1, 2] {
@@ -4082,7 +4082,7 @@ fn the_marks_founding_covector_is_the_carried_slope() {
             let r = region();
             let g = covector_of(&grown, &r);
             let faces = plain.faces(&r).unwrap();
-            let slopes: i128 = plain.carried_slopes(&r, &faces).unwrap().iter().sum();
+            let slopes: i128 = plain.carried_slopes_by_kind(&r, &faces).unwrap().iter().map(|[_, neighbours]| neighbours).sum();
             // Both reads are compared and only the second is marked, so the strengths' covector is half the slope, each entry released by one bit.
             let doubled: i128 = g[l.mark..l.mark + MARK_BASES].iter().map(|v| 2 * v).sum();
             assert!((doubled - slopes).abs() <= MARK_BASES as i128, "still {still}: the strengths' covector is half the carried slope: {doubled} against {slopes}");
