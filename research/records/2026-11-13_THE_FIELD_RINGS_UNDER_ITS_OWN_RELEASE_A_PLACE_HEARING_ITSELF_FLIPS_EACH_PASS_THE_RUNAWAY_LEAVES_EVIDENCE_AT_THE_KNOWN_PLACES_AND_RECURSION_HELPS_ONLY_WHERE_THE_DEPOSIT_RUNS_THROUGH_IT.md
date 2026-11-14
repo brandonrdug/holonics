@@ -155,6 +155,22 @@ more through its neighbours' openings than its own. The gain is five times large
 regime. Two reads cost 1.33 times one on the line's sections, so the lap stopped at its projection after 2,748 sections; the evidence is
 one lap's, at a shared mean. The line reads twice from here (receipt `g179_mark_lap.txt` under the junction record's receipts).
 
+**Read 1 drifted with no comparison of its own, and both reads are now compared (G180, G181).** A review Brandon relayed on November 14
+(03:51Z) named that read 1 takes no gradient while it shares the constitution with read 2. Read with its strengths zeroed, the line's lap-2
+mean codes 0.012 nats a place over the unmarked line at one-place masks and 0.060 at whole masks (G180), while the same state reading twice
+leads it: the constitution had specialized to hearing marks that grew worse. Both reads are now compared (PR #791; the host's
+`Field::returned` adds read 1's own return, the section's sum halved once, so the founding stays the one read's; the card's covector the
+host's bit for bit). In its first 991 sections read 1 came back most of the way: its one-place code fell 0.021 to 0.9934, under the
+unmarked line's 0.9979, and the strengths fell from 0.39, 0.90 and 0.87 to 0.25, 0.75 and 0.71, the field leaning less on marks that are
+now honest (G181, on partial evidence). Read 2 paid 0.005 across the change of law and was recovering in the fourth pass's first lap
+(0.9861 and 2.3389), every slice but wikidata already better than under the one comparison. Two reads compared cost 632 ms a section on the
+line's sections, 1.9 times the unmarked line's: the gain is next read at equal card time, not only at equal sections.
+
+**Writes under revision drift toward filler on a drifted read 1.** From the lap-3 end state (one read compared), writes with 0, 1 and 2
+refine passes put 0.176, 0.186 and 0.197 of their bytes on their commonest byte, one code write running to slashes (0.72 to 0.83;
+`writes_filler_ruler.txt`): hearing its own draft drove the field toward its own filler, the self-hearing of G169 in the writes. The
+writes are read again on the line comparing both reads.
+
 ## 6. Owed
 
 The Lean statements of the two-cycle of a synchronously iterated symmetric map at a place hearing its own release, and of the parametron's
