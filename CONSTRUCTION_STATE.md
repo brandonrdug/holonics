@@ -561,7 +561,7 @@ repository was reset on September 24; the pre-reset tree is
     whole masks (G180), so each read returns into the one covector and a section's sum is released
     by one bit once, at the founding the one read's comparison bit for bit, on the host and on the
     card alike, at 585 ms a section on the card against 412 ms for the second read's comparison
-    alone (receipt `mark_both_time.txt`; the record's §4 and §5; Brandon's correction of the same day: a temperature is a store's
+    alone (receipt `mark_both_time.txt`). Compared both ways the field's own marks come back honest (G181), and the mark's worth stands where a stretch is open whole: on the fourth pass's third-lap mean read 2 codes 0.037 nats a place under read 1 there and 0.0014 over it at a lone open place (G183), the self-mark carrying nothing (G184); at equal card time a line reading once from the same state ties at one-place masks and stands 0.025 over at whole masks, every slice (G185), so the line reads twice, and the one-place cost, the neighbours' marks reaching written places through the heads, is the next subject. Revising a draft is level on it (G182), where the never-marked line's revision drifts toward filler (the record's §4 and §5; Brandon's correction of the same day: a temperature is a store's
     state, never a reading's dial; [the record](research/records/2026-11-13_THE_FIELD_RINGS_UNDER_ITS_OWN_RELEASE_A_PLACE_HEARING_ITSELF_FLIPS_EACH_PASS_THE_RUNAWAY_LEAVES_EVIDENCE_AT_THE_KNOWN_PLACES_AND_RECURSION_HELPS_ONLY_WHERE_THE_DEPOSIT_RUNS_THROUGH_IT.md)).
     The line's first pass over the 1 GB of training documents ended at lap 6 (1.0743 one-place,
     2.4057 whole masks); the second pass's laps read 1.0630, 1.0542, 1.0464, 1.0383 and 1.0320

@@ -4370,3 +4370,35 @@ neighbours' kept), read with the cavity.
   Rule: both held: the law's mark is the neighbours' placements only (before and after), the site's own left out as its echo, built
   as a change of the law entering the line by reproducing its lap with the enc strength at zero. (b) missed: the self-mark carries part
   of the whole masks' worth, and it is kept.
+
+G184 scored 2026-11-14T09:16Z (receipt g184_noself.txt), the third-lap mean with only the enc strength zeroed:
+  (a) its one-place code is 0.9808, 0.0016 over read 1's 0.9792 and 0.0003 over read 2's: missed;
+  (b) its whole masks are 2.3338, 0.0013 over read 2's 2.3326: held.
+  Of 2 parts 1 held. The self-mark is inert at both masks (its strength has fallen to 0.154 under the comparison of both reads, the
+  deposit already setting it aside), and it is not what costs at a lone open place. That cost comes from the neighbours' marks inside an
+  open stretch: the held passage's stretches carry their whole masks beside their one-place reads, and the marked sites' openings reach the
+  written places' cavities through the heads. The rule did not name this branch; decided from the reading: the self-mark is the echo the
+  cavity leaves out and carries nothing measured, so its removal is a simplification parked on a branch (host tests pass), not the next loop.
+  The next loop is G183's first branch.
+
+G185 fixed 2026-11-14T09:16Z (the Opus PC thread), before its read: the mark at equal card time. From the fourth pass's third-lap end
+state with its mark stripped (the strip reads as read 1 on every row of the held read), the line reads once and trains for the card time
+the marked fourth lap took from the same state (1,748,661 ms, its projection), saves every 1,000 sections, and is read at the mean whose
+window stands nearest the marked lap's MEAN.3000 in card time. Read first: the marked fourth lap reads 0.9774 one-place and 2.3371 whole
+masks at its mean; read 1 on the third lap's mean (the unmarked start) 0.9792 and 2.3699; the unmarked line fell about 0.0035 a lap at
+one-place masks in its third pass; a section reading once took 332 ms on the line's sections, twice 589.
+  (a) the unmarked continuation's one-place code stands under the marked lap's (0.9774) by at least 0.002;
+  (b) its whole masks stand over the marked lap's (2.3371) by at least 0.015.
+  Rule: the writer meets an open stretch at its frontier, so whole masks are the product's reading. (b) held: the mark earns its card time
+  where the product reads, and the line keeps reading twice, its one-place cost the next subject. (b) missed: the mark does not earn its
+  card time, the line reads once from the stripped state, and the mark returns only with a realization near one read's cost.
+
+G185 scored 2026-11-14T09:57Z (receipt g185_equal_card.txt). Reading once from the stripped state for the marked lap's card time
+(1,748,853 ms) trained 5,343 sections (327 ms a section) to the marked lap's 3,000 (583 ms). Read at its MEAN.5000 (sections 4,001 to
+5,000, its card-time window's middle within 1% of the marked MEAN.3000's):
+  (a) one-place 0.9770 against the marked lap's 0.9774, 0.0004 under: missed (MEAN.4000 reads 0.0007 over);
+  (b) whole masks 2.3617 against 2.3371, 0.0246 over, every slice over (books 0.010 to wikidata 0.033): held.
+  Of 2 parts 1 held. At equal card time, reading once ties at a lone open place and loses 0.025 nats a place where a stretch is open
+  whole, so the mark earns its card time where the writer reads. The rule's first branch: the line keeps reading twice (the fourth pass
+  goes on from lap 4's end state), and its one-place cost is the next subject. Reading once from the stripped state fell 0.0021 and 0.0083
+  from its start (read 1 on the third lap's mean) in that time.
