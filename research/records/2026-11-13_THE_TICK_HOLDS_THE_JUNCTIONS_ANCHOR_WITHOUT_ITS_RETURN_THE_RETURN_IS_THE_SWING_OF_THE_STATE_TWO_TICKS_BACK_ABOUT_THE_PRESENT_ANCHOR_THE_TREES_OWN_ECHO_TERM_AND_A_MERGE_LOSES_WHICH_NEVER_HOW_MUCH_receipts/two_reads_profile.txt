@@ -1,0 +1,58 @@
+# The engine's rate for two reads compared: 24 sections of the line's training from the fourth pass's lap-5 end state, every launch timed alone (FIELD_PROFILE) and the host's phases (FIELD_PHASES); a reading, the state's bytes kept. RTX 4080 SUPER; host threads as the trainer sets them. Numbers only.
+STORE_SAVE k=24 sections=24 states=24 moved=199014 square=8669175592479 priced=23 transfer=-762079775 external=-747649954 curvature=-14429821 octave=1 rate=12 reads=0 returns=24 pairs=2165270988 batches=48 peak_store=8600223272 ms=15702
+STORE_DEPOSIT_PARTS sections=24 read_and_return_ms=14928.7 compared_and_code_ms=70.0 covector_clone_ms=3.9 transfer_price_ms=11.1 entry_rates_ms=2.2 external_step_ms=103.5 external_price_ms=11.5 covector_grains_ms=12.8 moments_ms=36.2 step_ms=103.5 step_price_ms=11.6 reading_parts_ms=0.3 parts_price_ms=14.9 stepped_ms=12.3 rest_ms=0.1
+STORE_HOST sections=24 cut_ms=126.2 views_ms=0.0 realized_ms=15322.8 mean_ms=3.8 lines_ms=0.5 pass_ms=0.0 saves_ms=77.5 elapsed_ms=15702
+FIELD_CARD reads=0 read_ms=0 returns=24 return_ms=14928 pairs=2165270988 batches=48 peak_store=8600223272 landmarks=0 landmark_ms=0 elapsed_ms=15702
+MEASURE lap=profile rc=0 wall_s=16.2 peak_rss_kib=302792
+## phases by wall time
+FIELD_PHASE name=reverse_launch marks=96 ms=8805 us_a_mark=91728 card_ms=8616 host_ms=189
+FIELD_PHASE name=tick_launch_post marks=576 ms=2087 us_a_mark=3624 card_ms=2083 host_ms=3
+FIELD_PHASE name=tick_launch_pre marks=576 ms=1839 us_a_mark=3193 card_ms=1824 host_ms=15
+FIELD_PHASE name=outside_the_card marks=24 ms=679 us_a_mark=28320 card_ms=0 host_ms=679
+FIELD_PHASE name=stage_lists marks=96 ms=640 us_a_mark=6668 card_ms=10 host_ms=630
+FIELD_PHASE name=opening_back marks=48 ms=536 us_a_mark=11178 card_ms=457 host_ms=78
+FIELD_PHASE name=tick_exposure_wait marks=576 ms=443 us_a_mark=769 card_ms=442 host_ms=0
+FIELD_PHASE name=opening_forward marks=48 ms=237 us_a_mark=4948 card_ms=235 host_ms=1
+FIELD_PHASE name=face_launch marks=96 ms=81 us_a_mark=850 card_ms=78 host_ms=3
+FIELD_PHASE name=batch_takes marks=144 ms=77 us_a_mark=535 card_ms=55 host_ms=21
+FIELD_PHASE name=batch_setup marks=96 ms=68 us_a_mark=715 card_ms=65 host_ms=3
+FIELD_PHASE name=batch_base marks=48 ms=33 us_a_mark=692 card_ms=30 host_ms=2
+FIELD_PHASE name=run_end marks=24 ms=21 us_a_mark=888 card_ms=5 host_ms=16
+FIELD_PHASE name=run_setup marks=48 ms=16 us_a_mark=334 card_ms=6 host_ms=9
+FIELD_PHASE name=material_upload marks=24 ms=12 us_a_mark=521 card_ms=6 host_ms=5
+FIELD_PHASE name=batch_drop_and_collect marks=48 ms=10 us_a_mark=227 card_ms=6 host_ms=4
+FIELD_PHASE name=stage_pack_upload marks=96 ms=7 us_a_mark=78 card_ms=5 host_ms=1
+FIELD_PHASE name=covector_fetch marks=24 ms=5 us_a_mark=228 card_ms=5 host_ms=0
+FIELD_PHASE name=status_wait marks=96 ms=2 us_a_mark=26 card_ms=2 host_ms=0
+FIELD_PHASE name=mark_first_read marks=48 ms=0 us_a_mark=4 card_ms=0 host_ms=0
+## kernels by time (the 30 largest)
+FIELD_PROFILE entry=field_contact_rows launches=2304 ms=1559 us_a_launch=676 grid_threads=1101748224 mean_grid_threads=478189
+FIELD_PROFILE entry=field_contact_l5 launches=572 ms=1375 us_a_launch=2404 grid_threads=1091347968 mean_grid_threads=1907950
+FIELD_PROFILE entry=field_contact_columns launches=2304 ms=1311 us_a_launch=569 grid_threads=1101748224 mean_grid_threads=478189
+FIELD_PROFILE entry=field_pace_skin_back launches=1152 ms=868 us_a_launch=754 grid_threads=550874112 mean_grid_threads=478189
+FIELD_PROFILE entry=field_outer_x32 launches=8544 ms=669 us_a_launch=78 grid_threads=77109760 mean_grid_threads=9025
+FIELD_PROFILE entry=field_transposed launches=5184 ms=499 us_a_launch=96 grid_threads=365258752 mean_grid_threads=70458
+FIELD_PROFILE entry=field_clock_fill launches=1008 ms=494 us_a_launch=490 grid_threads=268787712 mean_grid_threads=266654
+FIELD_PROFILE entry=field_exposure launches=576 ms=432 us_a_launch=750 grid_threads=1101624320 mean_grid_threads=1912542
+FIELD_PROFILE entry=field_skin_fill launches=1152 ms=421 us_a_launch=366 grid_threads=1101665280 mean_grid_threads=956306
+FIELD_PROFILE entry=field_affine_tiled_x32 launches=4368 ms=415 us_a_launch=95 grid_threads=351945728 mean_grid_threads=80573
+FIELD_PROFILE entry=field_moment_skinned_all launches=384 ms=293 us_a_launch=763 grid_threads=12171264 mean_grid_threads=31696
+FIELD_PROFILE entry=field_chart launches=1776 ms=260 us_a_launch=146 grid_threads=908850432 mean_grid_threads=511740
+FIELD_PROFILE entry=field_pair_scan_back launches=384 ms=256 us_a_launch=667 grid_threads=1251328 mean_grid_threads=3258
+FIELD_PROFILE entry=field_pair_scan launches=384 ms=206 us_a_launch=537 grid_threads=1251328 mean_grid_threads=3258
+FIELD_PROFILE entry=field_blank_bias_enc launches=288 ms=205 us_a_launch=713 grid_threads=1463596032 mean_grid_threads=5081930
+FIELD_PROFILE entry=field_tied_face launches=432 ms=198 us_a_launch=459 grid_threads=2158041600 mean_grid_threads=4995466
+FIELD_PROFILE entry=field_moment_pace_back_all launches=384 ms=191 us_a_launch=499 grid_threads=126713856 mean_grid_threads=329984
+FIELD_PROFILE entry=field_outer_x64 launches=1392 ms=184 us_a_launch=132 grid_threads=15830016 mean_grid_threads=11372
+FIELD_PROFILE entry=field_blank_dz launches=288 ms=184 us_a_launch=641 grid_threads=1438694400 mean_grid_threads=4995466
+FIELD_PROFILE entry=field_affine_tiled_x64 launches=1392 ms=179 us_a_launch=129 grid_threads=82314240 mean_grid_threads=59133
+FIELD_PROFILE entry=field_unit_probe launches=576 ms=173 us_a_launch=301 grid_threads=1101665280 mean_grid_threads=1912613
+FIELD_PROFILE entry=field_unit launches=576 ms=172 us_a_launch=300 grid_threads=1101665280 mean_grid_threads=1912613
+FIELD_PROFILE entry=field_spread launches=2304 ms=171 us_a_launch=74 grid_threads=58245120 mean_grid_threads=25280
+FIELD_PROFILE entry=field_blank_dy launches=288 ms=167 us_a_launch=582 grid_threads=377387520 mean_grid_threads=1310373
+FIELD_PROFILE entry=field_paces launches=336 ms=157 us_a_launch=467 grid_threads=112896 mean_grid_threads=336
+FIELD_PROFILE entry=field_moment_return_paced_all launches=384 ms=140 us_a_launch=367 grid_threads=126713856 mean_grid_threads=329984
+FIELD_PROFILE entry=field_moment_prefix_paced_all launches=1872 ms=133 us_a_launch=71 grid_threads=757186560 mean_grid_threads=404480
+FIELD_PROFILE entry=field_pace_kappa_back launches=384 ms=130 us_a_launch=338 grid_threads=129024 mean_grid_threads=336
+FIELD_PROFILE entry=field_ratio_adjoint launches=1776 ms=117 us_a_launch=66 grid_threads=908850432 mean_grid_threads=511740
+FIELD_PROFILE entry=field_sums launches=576 ms=113 us_a_launch=197 grid_threads=7578624 mean_grid_threads=13157
