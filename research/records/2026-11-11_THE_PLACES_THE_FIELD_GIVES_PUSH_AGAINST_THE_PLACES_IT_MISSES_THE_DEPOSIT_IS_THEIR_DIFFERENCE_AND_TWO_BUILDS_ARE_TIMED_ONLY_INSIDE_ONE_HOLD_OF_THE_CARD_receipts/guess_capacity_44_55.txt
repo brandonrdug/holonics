@@ -4476,3 +4476,16 @@ lap 8's 587 on the same sections, 1.09 times; lap 8 took 3,000 in 1,754,046 ms),
   to 2.3320), so the line's plateau was the face's width. The rule's first branch: the face's width binds, and the next build is the face as
   a composition of lanes with a lane's width sized from its readers' need, the broader passage (tier B) waiting on it. The founding also
   passed its receipts: the build reproduces lap 8's first 24 sections, and the laned mean's held read is the line's own byte for byte.
+
+G189 fixed 2026-11-14T13:39Z (the Opus PC thread), before its read: the face's capacity price at a fourth lane. On the three-lane
+line's lap-2 end state (the fifth pass's first lap) a fourth lane of 32 is founded at zero (found-lane: the constitution 305,145 entries to
+about 388,400, a factor 1.273, ln r = 0.241). It trains for the card time the three-lane line's lap 3 takes from the same state (read from
+lap 3's own pass line before the training launches), with the same receipts first (its first 24 sections from the unlaned state equal lap
+3's; the four-lane mean's held read equals the three-lane lap-2 read byte for byte), and is read against lap 3 at equal card-time windows.
+Read first: the third lane's price in its first thousand sections was about 0.040 nats a place a nat of cells at whole masks and 0.027 at
+one-place masks (G188); at that price a factor 1.273 would buy 0.0097 and 0.0065. The guess allows the price to fall by half or more.
+  (a) the four-lane line stands under lap 3 by at least 0.004 nats a place at whole masks (equal card-time windows);
+  (b) the same by at least 0.002 at one-place masks.
+  Rule: (a) held: the face's price stands above its cost at four lanes, and the face goes on growing by a lane a lap read this way. (a)
+  missed: the face's price has fallen under its cost at four lanes, and growth is read at another part (the contacts, the heads, the level
+  above) on the same scale, the third lane kept.
