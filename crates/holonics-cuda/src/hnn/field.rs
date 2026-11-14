@@ -628,6 +628,41 @@ struct Opening<'c> {
     totals: Pooled<'c, i128>,
 }
 
+/// [realization; agent-inferred, November 14, the ring record §4] **What a batch's reads stand on** ([`CardField::batch_base`]): everything a
+/// read does before its opening `x⁰`, none of which the opening's state reaches. The host's `Field::pass_with` reads the region's clocks
+/// (`paces`) and moments (`moments_of`) from the region and the constitution alone, the opening's comparison from the cavity openings, which open
+/// no site on a mark (`cavity_forward` passes none), and the level's news from that comparison (`level_news`); only `open` takes the marks. So a
+/// field that reads twice ([`FieldDeclaration::mark`]) stages its regions, forms the base clock and its moments, reads the opening's comparison,
+/// fetches the news and cuts its level once a batch, and both reads stand on them: the first read's opening is the built one, the second's carries
+/// the marks, and from the opening on each read is its own. The opening's comparison is kept here until the read that compares it (the last)
+/// returns through it. The clock's stores (the skins, the near phases) are each clock's: a read after the first forms the base clock's again
+/// before its first tick (`reads`).
+struct BatchBase<'c> {
+    st: Staged<'c>,
+    /// The base clock (§16): its rates, clocks, variations, skin addresses, plainness and frames, and the site moments on it (§15.1).
+    kappa: Pooled<'c, i64>,
+    tau: Pooled<'c, i64>,
+    sigma: Pooled<'c, i64>,
+    saddr: Pooled<'c, i64>,
+    plain: Pooled<'c, u8>,
+    pframe: Pooled<'c, i64>,
+    moment: Pooled<'c, i64>,
+    /// The clock's skins and its near phases and skins, one store each for the batch, formed again at each clock.
+    _skins: Option<(Pooled<'c, u32>, Pooled<'c, u32>)>,
+    _clock_store: Option<(Pooled<'c, u32>, Pooled<'c, u32>)>,
+    opening: Option<Opening<'c>>,
+    tb: Option<TowerBatch<'c>>,
+    /// The reads taken on this base so far.
+    reads: usize,
+}
+
+impl BatchBase<'_> {
+    /// The words of the base clock, in [`set_clock`]'s order.
+    fn clock(&self) -> [u64; 7] {
+        [self.kappa.device_ptr(), self.tau.device_ptr(), self.sigma.device_ptr(), self.plain.device_ptr(), self.pframe.device_ptr(), self.moment.device_ptr(), self.saddr.device_ptr()]
+    }
+}
+
 struct Tick<'c> {
     read: Pooled<'c, i32>,
     scale: Pooled<'c, i128>,
@@ -1680,20 +1715,23 @@ impl<'c> CardField<'c> {
             // [definition; agent-inferred, November 14, the ring record §4] **The field that reads twice** (the host's `Field::pass`): the batch's
             // first read is the built read, no readings and no return, and leaves each silent site's shares of its face on the card
             // (`field_mark_shares`); the second read opens each silent site on its mark and is the batch's read, its faces, readings and return
-            // the field's. A region's marks are its own first read's, so the two reads run batch by batch.
+            // the field's. A region's marks are its own first read's, so the two reads run batch by batch. [realization; agent-inferred, November 14]
+            // Both stand on one base (`batch_base`): what comes before the opening is formed once a batch.
+            let mut base = self.batch_base(field, &regions[batch.clone()], &mut words, tower.as_mut(), returning)?;
             let (f, z, r, e) = if d.mark {
                 let mut shares = None;
-                self.batch(field, &regions[batch.clone()], batch.start, &mut words, None, false, None, tower.as_mut(), Some(&mut shares))?;
+                self.batch(field, &regions[batch.clone()], batch.start, &mut words, &mut base, None, false, None, tower.as_mut(), Some(&mut shares))?;
                 let shares = shares.ok_or(TowerError::Refused("a field's first read that left no shares for its marks"))?;
                 self.mark("mark_first_read");
                 words.mark_share = shares.device_ptr();
-                let read = self.batch(field, &regions[batch.clone()], batch.start, &mut words, g.as_deref(), logits, keep, tower.as_mut(), None);
+                let read = self.batch(field, &regions[batch.clone()], batch.start, &mut words, &mut base, g.as_deref(), logits, keep, tower.as_mut(), None);
                 words.mark_share = 0;
                 drop(shares);
                 read?
             } else {
-                self.batch(field, &regions[batch.clone()], batch.start, &mut words, g.as_deref(), logits, keep, tower.as_mut(), None)?
+                self.batch(field, &regions[batch.clone()], batch.start, &mut words, &mut base, g.as_deref(), logits, keep, tower.as_mut(), None)?
             };
+            drop(base);
             self.mark("batch_drop_and_collect");
             faces.extend(f);
             read_logits.extend(z);
@@ -2117,10 +2155,11 @@ impl<'c> CardField<'c> {
 
     /// A batch's epochs staged as the level's field's regions (an epoch definite where its every place is, keyed where any is: unresolved
     /// and carrying class 0 where keyed and not definite), each region cut from its places' `news` by the host's `level_cut`; each fine
-    /// place's epoch and harmonics, the epochs' fine offsets, the level's clocks uploaded as the cut gives them, its ticks and its per-pass
-    /// buffers.
-    #[allow(clippy::too_many_arguments)]
-    fn tower_batch(&self, field: &Field, tr: &mut TowerRun<'c>, fine: &Staged<'c>, regions: usize, stored: bool, returning: bool, kept: bool, news: &[i64]) -> Result<TowerBatch<'c>> {
+    /// place's epoch and harmonics, the epochs' fine offsets, the level's clocks uploaded as the cut gives them and its per-pass buffers.
+    /// [realization; agent-inferred, November 14, the ring record §4] The level's ticks are each read's own ([`CardField::level_ticks`]): the
+    /// news is the opening's comparison's face, which no mark enters (the host's `Field::level_news` reads `cavity_forward`), so a field that reads
+    /// twice cuts its level once a batch and both reads stand on the cut.
+    fn tower_batch(&self, field: &Field, tr: &mut TowerRun<'c>, fine: &Staged<'c>, regions: usize, news: &[i64]) -> Result<TowerBatch<'c>> {
         let s = field.scale.as_deref().ok_or(TowerError::Refused("a level's batch of a field without a level"))?;
         let coarse = &s.coarse;
         let cd = coarse.declaration;
@@ -2151,7 +2190,6 @@ impl<'c> CardField<'c> {
         let pregions: Vec<Region> = owned.iter().map(|(c, u, f)| Region { classes: c, unresolved: u, faces: if f.iter().any(Option::is_some) { f } else { &[] }, locked: &[], echo: &[], domain: None, port: None }).collect();
         let st = self.stage(&pregions, cd.alphabet, cd.width, &cd, &mut tr.cwords)?;
         let (sites, m2, n) = (st.sites, 2 * cd.complex(), cd.modes);
-        let ticks: Vec<Tick> = (0..if kept { cd.ticks } else { 1 }).map(|_| self.tick(sites, st.pairs, regions, coarse, stored, returning, true)).collect::<Result<_>>()?;
         let trips = self.timed(Kind::Alloc, || self.take_zeroed::<i128>(sites.max(1))).map_err(device)?;
         tr.cwords.trips = trips.device_ptr();
         // The level carries no moments: its values and probes read zero there.
@@ -2217,7 +2255,14 @@ impl<'c> CardField<'c> {
         let epoch = self.timed(Kind::Copy, || self.take_up(if epoch_of.is_empty() { &[0u32][..] } else { &epoch_of[..] })).map_err(device)?;
         let harmonics = up64(&harm)?;
         let off = self.timed(Kind::Copy, || self.take_up(&off)).map_err(device)?;
-        Ok(TowerBatch { st, ticks, _trips: trips, _moment: moment, pr, _clocks: clocks, _plain: plain, split_read, split_scale, restricted, read1, scale1, pad, epoch, harmonics, off, _saddr: saddr, _stores: stores })
+        Ok(TowerBatch { st, ticks: Vec::new(), _trips: trips, _moment: moment, pr, _clocks: clocks, _plain: plain, split_read, split_scale, restricted, read1, scale1, pad, epoch, harmonics, off, _saddr: saddr, _stores: stores })
+    }
+
+    /// A read's own ticks on a batch's level ([`CardField::tower_batch`]): every tick kept where the read keeps the fine field's, and the shares
+    /// stored where it stores them, taken as [`CardField::tick`] takes the fine field's.
+    fn level_ticks(&self, field: &Field, tb: &TowerBatch<'c>, regions: usize, stored: bool, returning: bool, kept: bool) -> Result<Vec<Tick<'c>>> {
+        let s = field.scale.as_deref().ok_or(TowerError::Refused("a level's ticks of a field without a level"))?;
+        (0..if kept { s.coarse.declaration.ticks } else { 1 }).map(|_| self.tick(tb.st.sites, tb.st.pairs, regions, &s.coarse, stored, returning, true)).collect()
     }
 
     /// The level's forward at the split (the host's `scale_forward`): the fine faces read, each epoch's harmonics of its places' reads
@@ -2283,51 +2328,23 @@ impl<'c> CardField<'c> {
         self.ratio_adjoint(words, tb.split_read.device_ptr(), tb.split_scale.device_ptr(), back.dr.device_ptr(), back.dx.device_ptr(), back.dx.device_ptr(), false)
     }
 
-    /// One batch of regions: the forward, each unresolved site's face (and its logits when
-    /// `logits`), when `g` is given the reverse added into it, and with `keep` the still heads'
-    /// last-tick weight rows of those sites (the batch's one region). With `first` (a field that reads
-    /// twice, [`FieldDeclaration::mark`]) it is the batch's first read: the forward to the faces with no
-    /// reading, and each silent site's shares of its face left on the card in `first`, nothing fetched.
-    #[allow(clippy::type_complexity)]
-    #[allow(clippy::too_many_arguments)]
-    fn batch(&self, field: &Field, regions: &[Region], at_region: usize, words: &mut Words, g: Option<&CardBuffer<'c, i128>>, logits: bool, keep: Option<&[usize]>, mut tower: Option<&mut TowerRun<'c>>, first: Option<&mut Option<Pooled<'c, u32>>>) -> Result<(Vec<Vec<Option<TowerFace>>>, Vec<Vec<Option<Vec<i64>>>>, Rows, Vec<Vec<u64>>)> {
+    /// [realization; agent-inferred, November 14, the ring record §4] **A batch's base** ([`BatchBase`]): the regions staged, the base clock formed
+    /// (its paces, skin addresses and frames), the site moments on it, the opening's comparison's forward wherever a read of the batch reads it
+    /// (`returning`: the batch's last read returns; a level reads its news in every read), the level's news fetched and its cut staged. The
+    /// opening's forward is kept only where the last read compares it (it returns through it before its ticks), and dropped here otherwise.
+    fn batch_base(&self, field: &Field, regions: &[Region], words: &mut Words, tower: Option<&mut TowerRun<'c>>, returning: bool) -> Result<BatchBase<'c>> {
         if field.scale.is_some() != tower.is_some() {
             return Err(TowerError::Refused("a tower is read with its packets' level"));
         }
-        // [the ring record §4] A first read is the built read alone: no return, no logits, no kept rows, no mark of its own, and none of the
-        // readings below (they read the second read, the field's).
-        let reading = first.is_none();
-        if !reading && (g.is_some() || logits || keep.is_some() || words.mark_share != 0) {
-            return Err(TowerError::Refused("a field's first read with a return, a reading or a mark"));
-        }
         let card = self.card;
         let d = field.declaration;
-        let (dw, m, n, f, a, heads) = (d.width, d.complex(), d.modes, d.contacts, d.alphabet, d.heads);
-        let m2 = 2 * m;
-        let span = 2 * n;
+        let (dw, n, a) = (d.width, d.modes, d.alphabet);
+        let m2 = 2 * d.complex();
         let st = self.stage(regions, a, dw, &d, words)?;
-        let (sites, pairs) = (st.sites, st.pairs);
-        let (site_region, site_pos, region_off, classes, unresolved, definite) = (&st.site_region, &st.site_pos, &st.region_off, &st.classes, &st.unresolved, &st.definite);
-        let (echo_has, mix_off, mix_class, mix_share, site_weight) = (&st.echo_has, &st.mix_off, &st.mix_class, &st.mix_share, &st.site_weight);
-        let (status, x) = (&st.status, &st.x);
-        let returning = g.is_some();
-        // The shares are stored for a return's reverse, for the rows `keep` reads, and for a logits read's
-        // echo (§15.3: the round trips of consecutive ticks, so every tick is kept).
-        let stored = returning || keep.is_some() || logits;
-        let kept = returning || logits;
-        // [theory, November 13, P56 step 6] The pairs' block `e` is read past its rows' supports only by a logits read (the echo's round trips at the reverse
-        // pair, the held rows and the rows' currents over every entry of a row) and by a landmark read (whole rows fetched): only those take it zeroed.
-        let dense = logits || keep.is_some();
-        let ticks: Vec<Tick> = (0..if kept { d.ticks } else { 1 }).map(|_| self.tick(sites, pairs, regions.len(), field, stored, returning, dense)).collect::<Result<_>>()?;
-        // The round trips a site's echo sums (128 bits a site), over the heads and the ticks.
-        let trips = self.timed(Kind::Alloc, || self.take_zeroed::<i128>(sites.max(1))).map_err(device)?;
-        words.trips = trips.device_ptr();
+        let sites = st.sites;
         // The site moments (§15.1), once for the pass, added into every tick's values.
         let moment = self.timed(Kind::Alloc, || self.take_zeroed::<i64>((sites * m2).max(1))).map_err(device)?;
         words.moment = moment.device_ptr();
-        // Every receiver's probe chart of the read, once a tick (§16.19), framed and put at unit power by head.
-        let pr = self.timed(Kind::Alloc, || self.take::<i64>((sites * m2).max(1))).map_err(device)?;
-        words.pr = pr.device_ptr();
         // The turned heads' clocks (§16): their rates, clocks, variations and plainness `[p][t]`, `[p][r]`, and frames.
         let paced = d.paced_heads();
         let kappa = self.timed(Kind::Alloc, || self.take::<i64>((paced * sites).max(1))).map_err(device)?;
@@ -2362,12 +2379,8 @@ impl<'c> CardField<'c> {
         words.saddr = saddr.device_ptr();
         words.plain = plain.device_ptr();
         words.pframe = pframe.device_ptr();
-        let t64 = sites as u64;
-        // [measurement; theory, November 13, P56 item 4] The batch's ticks' and clocks' takes.
+        // [measurement; theory, November 13, P56 item 4] The batch's clocks' takes.
         self.mark("batch_takes");
-        // The class lists' shared words: the buckets `2·3^b`, and a chunk's keys `[32][2^b]` and counts.
-        let buckets = 4 * 3 * d.classes() as u32;
-        self.launch("field_open", Self::cells(t64 * dw as u64), THREADS, &mut [arg(words)])?;
         if paced > 0 {
             self.launch("field_paces", Self::cells((paced * regions.len()) as u64), THREADS, &mut [arg(words)])?;
             self.launch("field_skin_addresses", Self::cells((paced * n * sites) as u64), THREADS, &mut [arg(words)])?;
@@ -2379,9 +2392,6 @@ impl<'c> CardField<'c> {
         // wherever a level stands; its comparison and return only where the pass returns.
         let opened = d.opening && (returning || field.scale.is_some());
         let kept_moments = self.moments(field, words, regions.len(), sites, opened)?;
-        // The moment's chart into the face (§16.22, the host's `Field::open`): `x⁰ += release(C s + b, 24)`.
-        let (mface, mface_bias, rmface) = moment_face(field);
-        self.affine("field_affine_x64", words, mface, mface_bias, rmface, dw, m2, words.moment, m2, 0, dw, words.x, false)?;
         let opening = if opened { Some(self.opening_forward(field, words, regions, &st, kept_moments)?) } else { None };
         // [G145] The level's news at every place, from the opening's face (`field_level_news`, the host's `Field::level_news`), read to the
         // host, which cuts each region's epochs (`level_cut`, a kind of work placed on the host; its bits are the host's own function's).
@@ -2394,15 +2404,92 @@ impl<'c> CardField<'c> {
             }
             _ => None,
         };
+        // The opening's forward ends here where no read compares it.
+        let opening = opening.filter(|_| compared);
+        let tb = match tower {
+            Some(tr) => Some(self.tower_batch(field, tr, &st, regions.len(), news.as_deref().ok_or(TowerError::Refused("a level without the opening's news"))?)?),
+            None => None,
+        };
+        self.mark("batch_base");
+        Ok(BatchBase { st, kappa, tau, sigma, saddr, plain, pframe, moment, _skins: skins, _clock_store: clock_store, opening, tb, reads: 0 })
+    }
+
+    /// One read of a batch of regions on its base ([`CardField::batch_base`]): the opening and the forward, each unresolved site's face (and its
+    /// logits when `logits`), when `g` is given the reverse added into it, and with `keep` the still heads' last-tick weight rows of those sites
+    /// (the batch's one region). With `first` (a field that reads twice, [`FieldDeclaration::mark`]) it is the batch's first read: the forward to
+    /// the faces with no reading, and each silent site's shares of its face left on the card in `first`, nothing fetched.
+    #[allow(clippy::type_complexity)]
+    #[allow(clippy::too_many_arguments)]
+    fn batch(&self, field: &Field, regions: &[Region], at_region: usize, words: &mut Words, base: &mut BatchBase<'c>, g: Option<&CardBuffer<'c, i128>>, logits: bool, keep: Option<&[usize]>, mut tower: Option<&mut TowerRun<'c>>, first: Option<&mut Option<Pooled<'c, u32>>>) -> Result<(Vec<Vec<Option<TowerFace>>>, Vec<Vec<Option<Vec<i64>>>>, Rows, Vec<Vec<u64>>)> {
+        if field.scale.is_some() != tower.is_some() || field.scale.is_some() != base.tb.is_some() {
+            return Err(TowerError::Refused("a tower is read with its packets' level"));
+        }
+        // [the ring record §4] A first read is the built read alone: no return, no logits, no kept rows, no mark of its own, and none of the
+        // readings below (they read the second read, the field's).
+        let reading = first.is_none();
+        if !reading && (g.is_some() || logits || keep.is_some() || words.mark_share != 0) {
+            return Err(TowerError::Refused("a field's first read with a return, a reading or a mark"));
+        }
+        let card = self.card;
+        let d = field.declaration;
+        let (dw, m, n, f, a, heads) = (d.width, d.complex(), d.modes, d.contacts, d.alphabet, d.heads);
+        let m2 = 2 * m;
+        let span = 2 * n;
+        let st = &base.st;
+        let (sites, pairs) = (st.sites, st.pairs);
+        let (site_region, site_pos, region_off, classes, unresolved, definite) = (&st.site_region, &st.site_pos, &st.region_off, &st.classes, &st.unresolved, &st.definite);
+        let (echo_has, mix_off, mix_class, mix_share, site_weight) = (&st.echo_has, &st.mix_off, &st.mix_class, &st.mix_share, &st.site_weight);
+        let (status, x) = (&st.status, &st.x);
+        let returning = g.is_some();
+        // The shares are stored for a return's reverse, for the rows `keep` reads, and for a logits read's
+        // echo (§15.3: the round trips of consecutive ticks, so every tick is kept).
+        let stored = returning || keep.is_some() || logits;
+        let kept = returning || logits;
+        // [theory, November 13, P56 step 6] The pairs' block `e` is read past its rows' supports only by a logits read (the echo's round trips at the reverse
+        // pair, the held rows and the rows' currents over every entry of a row) and by a landmark read (whole rows fetched): only those take it zeroed.
+        let dense = logits || keep.is_some();
+        // The read before's level ticks end before this read's are taken.
+        if let Some(tb) = base.tb.as_mut() {
+            tb.ticks = Vec::new();
+        }
+        let ticks: Vec<Tick> = (0..if kept { d.ticks } else { 1 }).map(|_| self.tick(sites, pairs, regions.len(), field, stored, returning, dense)).collect::<Result<_>>()?;
+        // The round trips a site's echo sums (128 bits a site), over the heads and the ticks.
+        let trips = self.timed(Kind::Alloc, || self.take_zeroed::<i128>(sites.max(1))).map_err(device)?;
+        words.trips = trips.device_ptr();
+        // Every receiver's probe chart of the read, once a tick (§16.19), framed and put at unit power by head.
+        let pr = self.timed(Kind::Alloc, || self.take::<i64>((sites * m2).max(1))).map_err(device)?;
+        words.pr = pr.device_ptr();
+        let paced = d.paced_heads();
+        // [§16.44] The base clock (the batch's, [`BatchBase`]): the words hold it from here to the first tick's end, and again after the ticks.
+        let base_clock = base.clock();
+        set_clock(words, None, base_clock);
+        let t64 = sites as u64;
+        // [measurement; theory, November 13, P56 item 4] The read's ticks' takes.
+        self.mark("batch_takes");
+        // The class lists' shared words: the buckets `2·3^b`, and a chunk's keys `[32][2^b]` and counts.
+        let buckets = 4 * 3 * d.classes() as u32;
+        self.launch("field_open", Self::cells(t64 * dw as u64), THREADS, &mut [arg(words)])?;
+        // [realization; agent-inferred, November 14] A read after the first forms the base clock's phases and skins again (`clock_fill`, as the base's
+        // moments did): the first read's blanks formed their own clocks' in the same stores, and the crowds and the moments read the clock's.
+        if base.reads > 0 {
+            self.clock_fill(field, words, sites)?;
+        }
+        base.reads += 1;
+        // The moment's chart into the face (§16.22, the host's `Field::open`): `x⁰ += release(C s + b, 24)`.
+        let (mface, mface_bias, rmface) = moment_face(field);
+        self.affine("field_affine_x64", words, mface, mface_bias, rmface, dw, m2, words.moment, m2, 0, dw, words.x, false)?;
         // [realization; theory, November 13, G144] **The opening's return runs at the end of its own forward, before the ticks.** It reads only its
         // forward's buffers, the constitution, the base clock's frames and clocks (the words hold the base clock here and again at the reverse's start,
         // and its kernels read no filled clock store) and the stage's host arrays; it adds into `g` and into the base clock's two covectors, taken here
         // zeroed and handed to the reverse as its own, every one an integer sum, so the order is the realization's. Its forward's buffers end here,
         // so none stands beside the ticks, the face or the reverse: held across them they added a buffer to each class they share, and the card's pool
         // passed its budget by about a tenth of a gigabyte, freeing and allocating again at three take sites every section (G143's profiled logs).
-        let early_clocks = match opening {
-            Some(op) if !compared => {
-                drop(op);
+        // [realization; agent-inferred, November 14] The forward is the base's (formed once a batch); the read that returns takes it, and a field that
+        // reads twice holds it across its first read, whose one tick's carriers stand under the second's every tick's.
+        let early_clocks = match base.opening.take() {
+            Some(op) if !returning => {
+                // A read that does not return leaves the forward to the read that does.
+                base.opening = Some(op);
                 None
             }
             Some(op) => {
@@ -2423,7 +2510,6 @@ impl<'c> CardField<'c> {
                     }
                 }
                 let g = g.ok_or(TowerError::Refused("the opening is compared only where the pass returns"))?;
-                let paced = d.paced_heads();
                 let gtau = self.timed(Kind::Alloc, || self.take_zeroed::<i128>((paced * sites).max(1))).map_err(device)?;
                 let gsig = self.timed(Kind::Alloc, || self.take_zeroed::<i128>((paced * sites).max(1))).map_err(device)?;
                 (words.gtau, words.gsig) = (gtau.device_ptr(), gsig.device_ptr());
@@ -2433,14 +2519,14 @@ impl<'c> CardField<'c> {
             }
             None => None,
         };
-        let tb = match tower.as_deref_mut() {
-            Some(tr) => Some(self.tower_batch(field, tr, &st, regions.len(), stored, returning, kept, news.as_deref().ok_or(TowerError::Refused("a level without the opening's news"))?)?),
-            None => None,
-        };
+        // The level's ticks, the read's own.
+        if let Some(tb) = base.tb.as_mut() {
+            tb.ticks = self.level_ticks(field, tb, regions.len(), stored, returning, kept)?;
+        }
+        let tb = base.tb.as_ref();
         self.mark("batch_setup");
         // [§16.44] The blanks run at the bare rate in the first tick, and each later tick at the faces the tick before
         // gave them (the host's `pass`).
-        let base_clock = [words.kappa, words.tau, words.sigma, words.plain, words.pframe, words.moment, words.saddr];
         let blanks = paced > 0 && (0..sites).any(|t| unresolved[t] != 0 && st.mix_off[t] == st.mix_off[t + 1]);
         let mut clocks: Vec<Option<CardClock<'c>>> = vec![None];
         // [measurement; part P2] The carry circles' gates, where read: one accumulator a batch, added into after each tick's forward from that tick's
@@ -2448,7 +2534,7 @@ impl<'c> CardField<'c> {
         let gate_acc = if reading && d.carry > 0 && self.carry_gates.borrow().is_some() { Some(self.timed(Kind::Alloc, || self.take_zeroed::<u64>(2 * d.carry + 1)).map_err(device)?) } else { None };
         for k in 0..d.ticks {
             set_clock(words, clocks[k].as_ref(), base_clock);
-            if let (Some(tr), Some(tb)) = (tower.as_deref_mut(), tb.as_ref()) {
+            if let (Some(tr), Some(tb)) = (tower.as_deref_mut(), tb) {
                 if k == tr.split {
                     self.tower_forward(field, words, tr, tb, regions.len(), stored, returning, kept)?;
                 }
@@ -2697,7 +2783,7 @@ impl<'c> CardField<'c> {
                     }
                 }
             }
-            self.reverse(field, words, &ticks, (&clocks, base_clock), g, &fread, &fscale, &lift, &masses, &totals, &classes, &unresolved, &site_pos, &mix_off, &mix_class, &mix_share, &site_weight, &ported, sites, pairs, tower.as_deref_mut().zip(tb.as_ref()), early_clocks)?;
+            self.reverse(field, words, &ticks, (&clocks, base_clock), g, &fread, &fscale, &lift, &masses, &totals, &classes, &unresolved, &site_pos, &mix_off, &mix_class, &mix_share, &site_weight, &ported, sites, pairs, tower.as_deref_mut().zip(tb), early_clocks)?;
             if let Some(cov) = self.row_cov.borrow_mut().take() {
                 let span = 2 * n;
                 let mut out = self.row_out.borrow_mut();
