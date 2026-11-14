@@ -317,10 +317,20 @@ impl ResidentRead<'_> {
     }
 }
 
-impl Card {
+/// The card's CardLatticeRead methods (C3 of #603: an `impl Card` outside the card's crate is an extension trait).
+pub trait CardLatticeRead {
     /// **The lattice read** `y_b = A x_b` (see the module header), resident: launched on the card's
     /// stream at the layout derived from its census ([`read_layout`]).
-    pub fn read<'c>(
+    fn read<'c>(
+        &'c self,
+        locus: &ResidentLattice<'c>,
+        operand: Operand<'_>,
+        gather: Option<&Gather<'c>>,
+    ) -> Result<ResidentRead<'c>, DeviceError>;
+}
+
+impl CardLatticeRead for Card {
+    fn read<'c>(
         &'c self,
         locus: &ResidentLattice<'c>,
         operand: Operand<'_>,
@@ -531,10 +541,26 @@ pub struct SplitRecord {
     pub status: Vec<u32>,
 }
 
-impl Card {
+/// The card's CardOuterUpdate methods (C3 of #603: an `impl Card` outside the card's crate is an extension trait).
+pub trait CardOuterUpdate {
     /// **The outer update on the card** (kernel `hnn_outer_update`): one block per entry, its
     /// threads over the samples.
-    pub fn outer_update(&self, samples: &OuterSamples) -> Result<OuterUpdate, DeviceError> {
+    fn outer_update(&self, samples: &OuterSamples) -> Result<OuterUpdate, DeviceError>;
+    /// **The budgeted split on the card** (kernel `hnn_budgeted_split`) of an update on `2^(−S)ℤ`
+    /// onto an array on the lattice `2^(−L)ℤ` with its carried remainders on `2^(−(L+k))ℤ`,
+    /// `S ≥ L + k`: one thread per entry.
+    fn budgeted_split(
+        &self,
+        update: &OuterUpdate,
+        lattice: Lattice,
+        precision: u32,
+        entries: &[i64],
+        remainders: &[i128],
+    ) -> Result<SplitRecord, DeviceError>;
+}
+
+impl CardOuterUpdate for Card {
+    fn outer_update(&self, samples: &OuterSamples) -> Result<OuterUpdate, DeviceError> {
         let entry = self.entry(OUTER_ENTRY)?;
         let base = read_layout(
             self.census(),
@@ -586,10 +612,7 @@ impl Card {
         })
     }
 
-    /// **The budgeted split on the card** (kernel `hnn_budgeted_split`) of an update on `2^(−S)ℤ`
-    /// onto an array on the lattice `2^(−L)ℤ` with its carried remainders on `2^(−(L+k))ℤ`,
-    /// `S ≥ L + k`: one thread per entry.
-    pub fn budgeted_split(
+    fn budgeted_split(
         &self,
         update: &OuterUpdate,
         lattice: Lattice,

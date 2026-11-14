@@ -557,11 +557,28 @@ impl<'c> ExactInverseWorkspace<'c> {
     }
 }
 
-impl Card {
+/// The card's CardInverseExact methods (C3 of #603: an `impl Card` outside the card's crate is an extension trait).
+pub trait CardInverseExact {
     /// Realize one exact residual/certificate and optionally the native rounded
     /// refinement. This control surface returns intermediates; the chart store's
     /// resident workspace reads only its certificate between refinement launches.
-    pub fn inverse_exact(
+    fn inverse_exact(
+        &self,
+        operator: &ExactInverseOperator,
+        chart: &ChartWords,
+        refine: bool,
+    ) -> Result<ExactInverseExecution, DeviceError>;
+    fn inverse_exact_at_capacity(
+        &self,
+        operator: &ExactInverseOperator,
+        chart: &ChartWords,
+        refine: bool,
+        capacity: Option<usize>,
+    ) -> Result<ExactInverseExecution, DeviceError>;
+}
+
+impl CardInverseExact for Card {
+    fn inverse_exact(
         &self,
         operator: &ExactInverseOperator,
         chart: &ChartWords,

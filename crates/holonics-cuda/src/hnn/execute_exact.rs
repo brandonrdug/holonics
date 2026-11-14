@@ -228,10 +228,27 @@ pub struct ExactWordCarry {
     pub magnitude_capacity: usize,
 }
 
-impl Card {
+/// The card's CardExactWord methods (C3 of #603: an `impl Card` outside the card's crate is an extension trait).
+pub trait CardExactWord {
     /// Apply actual immutable producing operands on the card. No product or sum
     /// is evaluated on the host. The common vector denominator is exact.
-    pub fn exact_word_stage<'c>(
+    fn exact_word_stage<'c>(
+        &'c self,
+        matrix: &ExactWordMatrix,
+        vectors: &[Vec<Rat>],
+        transpose: bool,
+    ) -> Result<ExactWordStage<'c>, DeviceError>;
+    fn exact_word_stage_at_capacity<'c>(
+        &'c self,
+        matrix: &ExactWordMatrix,
+        vectors: &[Vec<Rat>],
+        transpose: bool,
+        forced_capacity: Option<usize>,
+    ) -> Result<ExactWordStage<'c>, DeviceError>;
+}
+
+impl CardExactWord for Card {
+    fn exact_word_stage<'c>(
         &'c self,
         matrix: &ExactWordMatrix,
         vectors: &[Vec<Rat>],

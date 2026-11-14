@@ -162,11 +162,11 @@ pub use card::{
     Card, CardBuffer, CardError, DeviceCensus, EntryCensus, Layout, Operand, Realization,
     certificate_layout, copy_layout, ingest_layout, read_layout, word_layout,
 };
-pub use epoch::EpochFlowExecution;
+pub use epoch::{CardEpochFlow, EpochFlowExecution};
 pub use field::{CardField, FieldTimes, Yardsticks};
-pub use execute_exact::{ExactWordCarry, ExactWordMatrix, ExactWordStage};
-pub use inverse_exact::{ExactInverseExecution, ExactInverseOperator};
-pub use lattice::{Gather, LatticeCoordinates, LatticeRead, ResidentLattice, ResidentRead};
+pub use execute_exact::{CardExactWord, ExactWordCarry, ExactWordMatrix, ExactWordStage};
+pub use inverse_exact::{CardInverseExact, ExactInverseExecution, ExactInverseOperator};
+pub use lattice::{CardLatticeRead, CardOuterUpdate, Gather, LatticeCoordinates, LatticeRead, ResidentLattice, ResidentRead};
 pub use moment::{MomentCounts, MomentSnapshot, ResidentMoment};
 pub use port::{Mounted, ObservedEpochDevice, Resident, Traffic};
 pub use tower::{TowerCard, TowerCardTimes};

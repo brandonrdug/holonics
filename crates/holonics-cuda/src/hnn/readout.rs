@@ -45,6 +45,7 @@ use crate::hnn::dyadic::{DyadicMatrix, dot, l1, lift, sup, value, wide, wider};
 use crate::hnn::execute::{ForwardRecord, ReverseRecord, WordPlan};
 use crate::hnn::execute_exact::ExactWordMatrix;
 use crate::hnn::publication::Loci;
+use crate::hnn::CardExactWord;
 
 fn rat(numerator: BigInt, exponent: u32) -> Rat {
     value(numerator, exponent)

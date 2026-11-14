@@ -32,6 +32,7 @@ fn unavailable() -> HnnError {
 }
 
 use holonics::hnn::word::native_prediction::{NativePredictionExecution,NativeExecutedPrediction,NativeExecutedPath,NativeExecutedReturn};
+use crate::hnn::CardEpochFlow;
 
 type Reply<T> = mpsc::Sender<Result<T, HnnError>>;
 
