@@ -1,0 +1,11 @@
+# Gate 3 on C4 (claude/consolidation-c4: the slice's source, then the codec, the region and the passage moved into the engine), the four-lane line's lap 6. Numbers only.
+STORE_PARITY method=read_and_return_opening calls=3 unequal=0 card_ms=2232 host_ms=201958
+STORE_PARITY_DONE calls=3 unequal=0 unequal_sites=0 unequal_entries=0 first=- EQUAL
+GATE_REPRO sections=3 line_lines=3 equal=3 EQUAL
+GATE_SAVE aside (a run shorter than the line's first save)
+GATE_REPRO sections=24 line_lines=24 equal=24 EQUAL
+GATE_READ cavity.tsv EQUAL
+MEASURE lap=parity rc=0 wall_s=205.8 peak_rss_kib=5642492
+MEASURE lap=read rc=0 wall_s=290.8 peak_rss_kib=489448
+MEASURE lap=repro rc=0 wall_s=18.1 peak_rss_kib=341972
+GATE_ENGINE EQUAL

@@ -13,12 +13,14 @@
 //! the schedule. Why the letters at a crossing (§4 item 4, [`holonics::hnn::tower::field::Field::lettered`]): the codec held only the code
 //! passage's bytes and refused every other.
 
-use super::field_train::{held_out, held_text, mix, problems_of, question_text, shape, step_transfer, units_of, views_of, weighed_domain, FieldCodec, Problems, Shape, TrainRegion};
-use super::tower_train::{count, positive, STATE_BUDGET};
+use holonics_engine::codec::FieldCodec;
+use holonics_engine::passage::{held_out, mix};
+use holonics_engine::region::{views_of, TrainRegion};
 use super::*;
 use holonics::hnn::tower::field::{level_declaration, level_split, octave_of, FieldLearner, FieldRealization, MaterialMean, PassSlice, StorePass, LEVEL_HARMONICS, NEAR};
 use std::collections::HashMap;
 use std::io::{BufRead, Seek, SeekFrom};
+use holonics_engine::passage::{Cut, Kind, Piece, PieceBytes, Slice, Stretch, held_set};
 
 /// The store's slices in its own order (`tools/corpus_passage.py`'s `SLICES`).
 const SLICES: [&str; 5] = ["code", "web", "science", "books", "wikidata"];
@@ -41,218 +43,14 @@ const SITES_BOUND: u64 = 41_490;
 /// The readings the card's driver reads before any command, which leave the state's bytes as they are.
 const READINGS: [&str; 3] = ["FIELD_PROFILE", "FIELD_PHASES", "FIELD_TRACE"];
 
-/// A piece of a slice's index: its offset in the slice's file, its title's and its text's octets, and whether it opens and closes its document.
-#[derive(Clone, Copy, Debug)]
-struct Piece {
-    document: u64,
-    offset: u64,
-    title: u64,
-    text: u64,
-    opens: bool,
-    closes: bool,
-}
+/// A slice's file as its source of bytes.
+struct SliceFile(std::fs::File);
 
-impl Piece {
-    /// Whether a line feed stands between the title and the text (a piece that opens with a title; the store keeps no separator).
-    fn line_feed(&self) -> bool {
-        self.opens && self.title > 0
-    }
-
-    /// The piece's places: its title's bytes, one line feed where it opens with a title, and its text's bytes.
-    fn places(&self) -> u64 {
-        self.title + u64::from(self.line_feed()) + self.text
-    }
-}
-
-/// A slice of the role read: its name, its quota (the role's store octets), its pieces in order and its file.
-struct Slice {
-    name: String,
-    quota: u128,
-    pieces: Vec<Piece>,
-    file: std::fs::File,
-}
-
-impl Slice {
-    /// The places `[from, from + len)` of piece `k`, read from the slice's file at the piece's offset (never the slice in memory).
-    fn bytes(&mut self, k: usize, from: u64, len: u64) -> Result<Vec<u8>> {
-        let p = self.pieces[k];
-        let end = from + len;
-        if end > p.places() {
-            return Err("a stretch past its piece's places".into());
-        }
-        let mut out = Vec::with_capacity(len as usize);
-        let read = |file: &mut std::fs::File, at: u64, n: u64, out: &mut Vec<u8>| -> Result<()> {
-            if n == 0 {
-                return Ok(());
-            }
-            file.seek(SeekFrom::Start(at))?;
-            let start = out.len();
-            out.resize(start + n as usize, 0);
-            file.read_exact(&mut out[start..])?;
-            Ok(())
-        };
-        if !p.line_feed() {
-            read(&mut self.file, p.offset + from, len, &mut out)?;
-            return Ok(out);
-        }
-        // The title's places, the line feed at place `title`, then the text's places one past their bytes.
-        let t = p.title;
-        if from < t {
-            read(&mut self.file, p.offset + from, end.min(t) - from, &mut out)?;
-        }
-        if from <= t && t < end {
-            out.push(b'\n');
-        }
-        let text_from = from.max(t + 1);
-        if text_from < end {
-            read(&mut self.file, p.offset + text_from - 1, end - text_from, &mut out)?;
-        }
-        Ok(out)
-    }
-}
-
-/// A stretch drawn at the pass's place and not yet taken: its slice, its draw, its context and run, whether a true end follows it, and whether
-/// it finishes its piece.
-#[derive(Clone, Copy, Debug)]
-struct Drawn {
-    slice: usize,
-    d: u64,
-    q: u64,
-    a: u64,
-    ends: bool,
-    done: bool,
-}
-
-impl Drawn {
-    /// The stretch's sites: its context, its run and the near tail where a true end follows.
-    fn sites(&self) -> u64 {
-        self.q + self.a + if self.ends { NEAR as u64 } else { 0 }
-    }
-}
-
-/// [definition; the record §4 item 1; the port's `lengths_of`] A stretch's two draws, the `d`th of the pass.
-fn lengths_of(seed: u64, d: u64, least: u64, octaves: u64) -> (u64, u64) {
-    let oq = mix(seed, d | 1 << 60) % octaves;
-    let q = (least << oq) + mix(seed, d | 3 << 60) % (least << oq);
-    let oa = mix(seed, d | 1 << 62) % octaves;
-    let a = (least << oa) + mix(seed, d | 5 << 60) % (least << oa);
-    (q, a)
-}
-
-/// [definition; the record §4 item 1; the port's `cut_of`] The stretch at a cursor with `rest` places left: its context and run, whether a
-/// true end follows (the piece closes its document), and whether the piece is done. Where the next `q + a` places would leave at least the
-/// least context, the stretch is those places and the piece goes on; else it takes the rest, its context `min(q, rest − 1)`.
-fn cut_of(seed: u64, d: u64, rest: u64, closes: bool, least: u64, octaves: u64) -> (u64, u64, bool, bool) {
-    let (q, a) = lengths_of(seed, d, least, octaves);
-    if rest >= q + a + least {
-        return (q, a, false, false);
-    }
-    let q = q.min(rest - 1);
-    (q, rest - q, closes, true)
-}
-
-/// The kind of a stretch's one keyed state, as the port names it.
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
-enum Kind {
-    MaskWhole,
-    MaskRun,
-    Writer,
-}
-
-/// [definition; the record §4 item 2; the port's `state_of`] **A stretch's one keyed state**, from `head = mix(seed, d)`: bit 17 set, the
-/// writer's state (the context known, the run's places in the writer's octave order of their distance from the context, keyed within an
-/// octave, its first `k` resolved, `k` by octaves of reads, `k = 0` among them, and a true end's voids given); clear, a mask state (`shape`'s
-/// law over the whole stretch or past the context, the density `τ = u²`, weighed back by its domain `⌊2√(mK)⌋`). Regions are plain: no port.
-/// Returns the region, its kind, the sites its code is a code of (its weighed domain, or its open places for the writer's state), and
-/// for the writer's state its `k` and its front (the first open place of its order, the place the release draws next).
-fn state_of(seed: u64, d: u64, classes: Vec<usize>, q: usize, a: usize) -> Stretch {
-    let n = classes.len();
-    let head = mix(seed, d);
-    if (head >> 17) & 1 == 1 {
-        let key = mix(seed, d | 7 << 61);
-        let most = a - 1;
-        let o = (key % (u64::from(usize::BITS - most.leading_zeros()) + 1)) as u32;
-        let k = if o == 0 {
-            0
-        } else {
-            let low = 1usize << (o - 1);
-            let high = ((1usize << o) - 1).min(most);
-            low + (mix(seed, d | 15 << 60) as usize) % (high - low + 1)
-        };
-        let mut unresolved: Vec<bool> = (0..n).map(|t| t >= q && t < q + a).collect();
-        let mut order: Vec<usize> = (q..q + a).collect();
-        order.sort_by_key(|&t| (octave_of(t + 1 - q), mix(key, t as u64), t));
-        for &t in &order[..k] {
-            unresolved[t] = false;
-        }
-        return Stretch { region: TrainRegion::plain(classes, unresolved), kind: Kind::Writer, counted: a - k, q, writer: Some((k, order[k])) };
-    }
-    let (mask, kind, from) = match shape(seed, d, q, n) {
-        Shape::Masked(mask) => (mask, Kind::MaskWhole, 0),
-        Shape::Answer(mask) => (mask, Kind::MaskRun, q),
-    };
-    let domain = weighed_domain(n - from, &mask);
-    Stretch { region: TrainRegion { domain: Some(domain), ..TrainRegion::plain(classes, mask) }, kind, counted: domain, q, writer: None }
-}
-
-/// A stretch's one keyed state ([`state_of`]): its region, its kind, the sites its code is a code of, its context, and for the writer's
-/// state its `k` and its front place.
-struct Stretch {
-    region: TrainRegion,
-    kind: Kind,
-    counted: usize,
-    q: usize,
-    writer: Option<(usize, usize)>,
-}
-
-/// [definition; the record §4 items 1 and 5; the port's `store`] **The cut over a role of the store**: the slices interleaved by least progress
-/// against their quotas (the role's store octets; the earlier slice at a tie), each slice's pieces read in order from their cursors, the pass's
-/// place carried in the learner's state ([`StorePass`]).
-struct Cut {
-    seed: u64,
-    slices: Vec<Slice>,
-    pass: StorePass,
-}
-
-impl Cut {
-    /// The next stretch at the pass's place, drawn and not taken (none where every slice's pieces are read).
-    fn next(&self) -> Option<Drawn> {
-        let live: Vec<usize> = (0..self.slices.len()).filter(|&s| (self.pass.slices[s].piece as usize) < self.slices[s].pieces.len()).collect();
-        let mut slice = *live.first()?;
-        for &other in &live[1..] {
-            let (t_o, t_n) = (self.pass.slices[other].taken as u128, self.pass.slices[slice].taken as u128);
-            if t_o * self.slices[slice].quota < t_n * self.slices[other].quota {
-                slice = other;
-            }
-        }
-        let at = &self.pass.slices[slice];
-        let piece = self.slices[slice].pieces[at.piece as usize];
-        let d = self.pass.stretches + 1;
-        let (q, a, ends, done) = cut_of(self.seed, d, piece.places() - at.cursor, piece.closes, self.pass.least, self.pass.octaves);
-        Some(Drawn { slice, d, q, a, ends, done })
-    }
-
-    /// The drawn stretch taken: its region read from its slice's file, and the pass moved past it.
-    fn take(&mut self, drawn: Drawn, codec: &FieldCodec) -> Result<Stretch> {
-        let at = self.pass.slices[drawn.slice].clone();
-        let bytes = self.slices[drawn.slice].bytes(at.piece as usize, at.cursor, drawn.q + drawn.a)?;
-        let mut classes = codec.encode(&bytes)?;
-        if classes.len() != bytes.len() {
-            return Err("a stretch whose bytes are not one class each".into());
-        }
-        if drawn.ends {
-            classes.resize(classes.len() + NEAR, codec.void());
-        }
-        let region = state_of(self.seed, drawn.d, classes, drawn.q as usize, drawn.a as usize);
-        let place = &mut self.pass.slices[drawn.slice];
-        place.taken += drawn.q + drawn.a;
-        if drawn.done {
-            (place.piece, place.cursor) = (place.piece + 1, 0);
-        } else {
-            place.cursor += drawn.q + drawn.a;
-        }
-        self.pass.stretches = drawn.d;
-        Ok(region)
+impl PieceBytes for SliceFile {
+    fn read_at(&mut self, at: u64, out: &mut [u8]) -> Result<()> {
+        self.0.seek(SeekFrom::Start(at))?;
+        self.0.read_exact(out)?;
+        Ok(())
     }
 }
 
@@ -352,19 +150,6 @@ fn bytes_held(store: &Path) -> Result<[bool; 256]> {
         }
     }
     Ok(held)
-}
-
-/// The code line's held passage (te7's lap script's `DEV`) as `train-field` reads it: its problems at the codec, those whose answer stands
-/// within the codec's extent.
-fn held_set(codec: &FieldCodec, text: &[u8]) -> Result<Problems> {
-    let mut out = Vec::new();
-    for (q, a) in problems_of(text) {
-        let (qc, ac) = (codec.encode(&question_text(&q))?, codec.encode(&a)?);
-        if ac.len() < codec.answer {
-            out.push((qc, ac, a.len()));
-        }
-    }
-    Ok(out)
 }
 
 /// A count of codes on `2^(−20)` bits over `sites` in millionths of a bit a site (toward zero, as `train-field`'s section line).
@@ -497,7 +282,7 @@ pub(super) fn train(args: &[String], realization: &mut dyn FieldRealization) -> 
     let mut slices = Vec::with_capacity(names.len());
     for &name in &names {
         let (count, quota) = counts[&(role.to_string(), name.to_string())];
-        slices.push(Slice { name: name.to_string(), quota, pieces: pieces_of(&store.join(format!("{stem}_{name}.tsv")), count)?, file: std::fs::File::open(store.join(format!("{stem}_{name}.bin")))? });
+        slices.push(Slice { name: name.to_string(), quota, pieces: pieces_of(&store.join(format!("{stem}_{name}.tsv")), count)?, source: Box::new(SliceFile(std::fs::File::open(store.join(format!("{stem}_{name}.bin")))?)) });
     }
     println!("STORE_PASS_AT stretches={} {} {} ms={}", pass.stretches, pass.slices.iter().map(|s| format!("{}_piece={} {}_cursor={} {}_taken={}", s.name, s.piece, s.name, s.cursor, s.name, s.taken)).collect::<Vec<_>>().join(" "), counters_text(realization), started.elapsed().as_millis());
     let mut cut = Cut { seed, slices, pass };
@@ -665,7 +450,7 @@ fn role_names(counts: &HashMap<(String, String), (u64, u128)>, role: &str) -> Ve
 fn open_slice(store: &Path, role: &str, name: &str, counts: &HashMap<(String, String), (u64, u128)>) -> Result<Slice> {
     let stem = if role == "held" { "HELD" } else { "DOCS" };
     let (count, quota) = counts[&(role.to_string(), name.to_string())];
-    Ok(Slice { name: name.to_string(), quota, pieces: pieces_of(&store.join(format!("{stem}_{name}.tsv")), count)?, file: std::fs::File::open(store.join(format!("{stem}_{name}.bin")))? })
+    Ok(Slice { name: name.to_string(), quota, pieces: pieces_of(&store.join(format!("{stem}_{name}.tsv")), count)?, source: Box::new(SliceFile(std::fs::File::open(store.join(format!("{stem}_{name}.bin")))?)) })
 }
 
 /// A region's code over its unresolved places on the codes' own grain (`2^(−20)` bits), beside the count of those places: the sum of
@@ -3261,7 +3046,7 @@ pub(super) fn read_ticks(args: &[String], realization: &mut dyn FieldRealization
     let mut slices = Vec::with_capacity(names.len());
     for &name in &names {
         let (count, quota) = counts[&(role.to_string(), name.to_string())];
-        slices.push(Slice { name: name.to_string(), quota, pieces: pieces_of(&store.join(format!("{stem}_{name}.tsv")), count)?, file: std::fs::File::open(store.join(format!("{stem}_{name}.bin")))? });
+        slices.push(Slice { name: name.to_string(), quota, pieces: pieces_of(&store.join(format!("{stem}_{name}.tsv")), count)?, source: Box::new(SliceFile(std::fs::File::open(store.join(format!("{stem}_{name}.bin")))?)) });
     }
     let mut cut = Cut { seed, slices, pass };
     let ticks = learner.field.declaration.ticks;

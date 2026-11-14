@@ -433,6 +433,17 @@ laboratory's archive note. No code.
 `codec.rs` says in its first lines that the table of classes stands until the symbol's word
 replaces it, with the rule's date. Done when `store_train.rs` imports nothing from `field_train.rs`
 or `tower_train.rs`, and parity and reproduction hold.
+- Read November 14. Two facts the plan missed:
+  - The store's `Slice` held a file, and the guards keep the file system out of the engine. So a slice
+    now reads through `PieceBytes`, and the store's file (`SliceFile`) stays in the harness. This was
+    one alteration, before the move.
+  - The codec parses its text with the harness's `count`, so `count` moved with its consumer into
+    `codec.rs`.
+
+  `units.rs` moved whole as its own module rather than into `codec.rs`, so its history follows it.
+  The harness keeps what reads files and prints lines: `units_of`, `held_text`, `micro_bits`,
+  `step_transfer`, `positive` and `STATE_BUDGET`. They now stand in `complete_language.rs`, where
+  every command file sees them.
 
 **C5. The cut by object, then the names** (the PC). Two pull requests: the moves of §5 and §6
 (code, tests, kernels), then the renames. Done when no file of the engine holds two objects, no

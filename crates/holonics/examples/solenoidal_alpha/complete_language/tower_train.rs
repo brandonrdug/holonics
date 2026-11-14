@@ -18,21 +18,7 @@ use holonics::receiver::coupling::coupling;
 use holonics::receiver::release::{agreeing_class, agreement_face};
 use num_bigint::BigUint;
 use rayon::prelude::*;
-
-/// A learner's state read ceiling, `2^30` bytes.
-pub(super) const STATE_BUDGET: usize = 1 << 30;
-
-pub(super) fn count(s: &str) -> Result<usize> {
-    Ok(s.parse::<usize>()?)
-}
-
-/// A count a text is divided by (a number of streams, a stride): at least one.
-pub(super) fn positive(s: &str) -> Result<usize> {
-    match count(s)? {
-        0 => Err("a stream or stride count must be at least one".into()),
-        n => Ok(n),
-    }
-}
+pub(super) use super::{STATE_BUDGET, count, positive};
 
 /// The regions an exterior partition names, in order: question, answer prose, answer numbers,
 /// calculation markup.
@@ -712,7 +698,6 @@ fn tension_part(layout: &TensionLayout, name: &str, gram: &[i128], cells: usize,
     }
     Ok(())
 }
-
 
 /// `read-tower-floor STATE STATE_SHA TRAIN TRAIN_SHA TRAIN_ROLES TRAIN_ROLES_SHA DEV DEV_SHA
 /// DEV_ROLES DEV_ROLES_SHA STREAMS ORDER`: how much of the tension a frozen tower leaves is the

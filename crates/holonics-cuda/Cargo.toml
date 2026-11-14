@@ -11,6 +11,7 @@ path = "src/lib.rs"
 
 [dependencies]
 holonics = { path = "../holonics" }
+holonics-engine = { path = "../engine" }
 holonics-engine-cuda = { path = "../engine-cuda" }
 num-bigint = { workspace = true }
 num-rational = { workspace = true }
