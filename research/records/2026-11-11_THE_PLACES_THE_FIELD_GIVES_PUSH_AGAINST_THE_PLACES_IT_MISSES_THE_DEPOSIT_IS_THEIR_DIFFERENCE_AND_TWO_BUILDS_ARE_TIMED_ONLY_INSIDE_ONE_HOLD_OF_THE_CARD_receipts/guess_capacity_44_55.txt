@@ -4209,3 +4209,30 @@ G176 scored 2026-11-13T23:58Z (receipt g176_marked.txt; read-marked, host, 8 thr
   grows. (a)'s miss leaves the slope's calibration or its quantization at 2^-6 unread; the sign and the turn stand at every strength read.
   No branch of the rule names a best point inside the reach whose gain is under 0.005: read as the third, the first order carries too
   little alone, so the strength as a part waits on the field trained through the mark (the ring record's §4 with its return).
+
+G174 scored 2026-11-14T00:24Z (receipts line_pass2_lap7.txt and line_pass2_lap8.txt; read-cavity on each lap's mean against the lap before's):
+  (a) lap 7 falls 0.0055 nats a place at one-place masks, 1.0295 to 1.0240: missed, by 0.0005;
+  (b) lap 7's whole masks fall 0.0074, to 2.3786: missed;
+  (c) lap 8 falls 0.0046, less than lap 7, to 1.0194 (whole masks 2.3809, +0.0022), and the pass has not ended (9,464,980 stretches read): held.
+  Of 3 parts 1 held. Lap 6's 0.0025 was a slow lap, not the pass's end: the second pass still buys about 0.005 a lap at one-place masks
+  (0.0114, 0.0088, 0.0078, 0.0080, 0.0063, 0.0025, 0.0055, 0.0046), with every slice falling but wikidata's 0.0005 at lap 8. The rule
+  names no branch for (a) missed with (c) held; read as its intent, the pass runs on beside the mark's card build.
+
+G177 fixed 2026-11-14T00:24Z (the Opus PC thread), before its read: the second pass's ninth and tenth laps, as G174's. Read first: laps 1 to 8
+fell 0.0114, 0.0088, 0.0078, 0.0080, 0.0063, 0.0025, 0.0055 and 0.0046 at one-place masks.
+  (a) laps 9 and 10 together fall 0.004 to 0.012 at one-place masks from 1.0194;
+  (b) neither lap rises at one-place masks.
+  Rule: none; the line's level, read beside the mark's build.
+
+G177 retired 2026-11-14T00:29Z, unscored: the second pass ended at lap 9 after 636 sections (24,636 sections in all), so laps 9 and 10 as fixed
+did not run; lap 9's mean is read by its chain against lap 8's.
+
+G178 fixed 2026-11-14T00:29Z (the Opus PC thread), before its read: the line's third pass over the store's training documents, beside the mark's
+card build (the card would stand idle). Its first lap trains 3,000 sections from the second pass's end state with its pass set back
+(next-pass), read at its lap mean against the second pass's last mean (lap9/MEAN.636). Read first: the second pass's first lap fell
+0.0114 at one-place masks from the first pass's end, and its last full laps 0.0055 and 0.0046.
+  (a) the third pass's first lap falls 0.003 to 0.010 at one-place masks;
+  (b) every slice falls at one-place masks;
+  (c) whole masks stand within 0.006 of the second pass's last mean.
+  Rule: (a) held: the third pass goes on beside the build; (a) under 0.003: the documents are spent at this size, and the card goes to the
+  mark's lap as soon as its parity passes.

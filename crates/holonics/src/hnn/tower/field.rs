@@ -317,6 +317,20 @@ pub struct FieldDeclaration {
     /// the deposit locates `ℓ` from there. `false` writes every head line exactly as before; `true` writes `hnn-field-v14j`, the fifteen words of
     /// `v14g` with the opening's word written as `0` or `1`, then `1`.
     pub junction: bool,
+    /// [definition; agent-inferred, November 14, the ring record §4 and §5] **The release marked as the field's own**: the field reads a region
+    /// twice. The first read is the built read; the second opens each open, silent site `s` on `E_b(∗) + release(α_b (release(Σ_c w_(s,c)
+    /// E_b(c), 16) − E_b(∗)), 24)` in each encoding `b` its row enters (its own `enc`, its neighbours' `before` and `after`), `w` the shares
+    /// of the face the first read gave it, the site silent otherwise; the faces are the second read's. `α_b`, one strength an encoding on the
+    /// material's grain ([`FieldLayout::mark`]), is founded at zero ([`Field::with_mark`]), so at the founding the second read is the first
+    /// bit for bit. The return runs through the second read into every part and into `α_b`; the first read's faces are data to it.
+    ///
+    /// Why (the ring record §5, G169 to G176): a field that hears its own release as written text takes its own news for the passage's and
+    /// runs off at any temperature it holds; a faint mark of its own first read in the opening lowers the open places' code at first order
+    /// (G175: −0.046 nats a place a unit of strength, 5.9 times its floor), and along the strength with the constitution fixed it buys 0.003
+    /// and turns by a quarter (G176), so the field is trained through the mark. The mark mixes the text's own rows toward the open row and
+    /// keeps no rows of its own (a table of free rows indexed by a class is refused, November 12). `false` writes every head line exactly as
+    /// before; `true` writes `hnn-field-v14m`, the sixteen words of `v14j` with the junction's word written as `0` or `1`, then `1`.
+    pub mark: bool,
 }
 
 impl FieldDeclaration {
@@ -610,7 +624,9 @@ impl FieldDeclaration {
     fn to_text(self) -> String {
         // [theory, November 12, the triad record §4] With triads the head is `v14f`: `v14e`'s words with `C` written even at zero, then `J`; without
         // them the line before, exactly.
-        let head = if self.junction {
+        let head = if self.mark {
+            "hnn-field-v14m"
+        } else if self.junction {
             "hnn-field-v14j"
         } else if self.opening {
             "hnn-field-v14g"
@@ -621,7 +637,9 @@ impl FieldDeclaration {
         } else {
             "hnn-field-v14"
         };
-        let tail = if self.junction {
+        let tail = if self.mark {
+            format!(" {} {} {} {} 1", self.carry, self.triads, u8::from(self.opening), u8::from(self.junction))
+        } else if self.junction {
             format!(" {} {} {} 1", self.carry, self.triads, u8::from(self.opening))
         } else if self.opening {
             format!(" {} {} 1", self.carry, self.triads)
@@ -639,34 +657,40 @@ impl FieldDeclaration {
         let words: Vec<&str> = line.split(' ').collect();
         // A v13 head line is a field with no depth ring (the line before the depth rings, its states the line's own).
         let n = |w: &str| w.parse::<usize>().map_err(|_| TowerError::Refused("a field's declaration that is not a count"));
-        let (depth_word, carry, triads, opening, junction) = match (words.first().copied(), words.len()) {
-            (Some("hnn-field-v14"), 12) => (Some(words[11]), 0, 0, false, false),
+        let (depth_word, carry, triads, opening, junction, mark) = match (words.first().copied(), words.len()) {
+            (Some("hnn-field-v14"), 12) => (Some(words[11]), 0, 0, false, false, false),
             (Some("hnn-field-v14e"), 13) => match n(words[12])? {
                 0 => return refuse("an hnn-field-v14e head line with no carry circles (a field without them is hnn-field-v14)"),
-                c => (Some(words[11]), c, 0, false, false),
+                c => (Some(words[11]), c, 0, false, false, false),
             },
             // [theory, November 12, the triad record §4] `C` may be zero here, `J` may not, as `v14e` refuses `C = 0`.
             (Some("hnn-field-v14f"), 14) => match n(words[13])? {
                 0 => return refuse("an hnn-field-v14f head line with no triads (a field without them is hnn-field-v14 or hnn-field-v14e)"),
-                j => (Some(words[11]), n(words[12])?, j, false, false),
+                j => (Some(words[11]), n(words[12])?, j, false, false, false),
             },
             // [theory, November 13, §4.4a] The opening's word is one; a field without the comparison writes a line before `v14g`.
             (Some("hnn-field-v14g"), 15) => match n(words[14])? {
-                1 => (Some(words[11]), n(words[12])?, n(words[13])?, true, false),
+                1 => (Some(words[11]), n(words[12])?, n(words[13])?, true, false, false),
                 _ => return refuse("an hnn-field-v14g head line whose opening word is not one (a field without the comparison writes the line before it)"),
             },
             // [theory, November 13, the junction record §7] The opening's word is zero or one here and the junction's is one; a field without the
             // return writes a line before `v14j`.
             (Some("hnn-field-v14j"), 16) => match (n(words[14])?, n(words[15])?) {
-                (o @ (0 | 1), 1) => (Some(words[11]), n(words[12])?, n(words[13])?, o == 1, true),
+                (o @ (0 | 1), 1) => (Some(words[11]), n(words[12])?, n(words[13])?, o == 1, true, false),
                 _ => return refuse("an hnn-field-v14j head line whose opening word is not zero or one or whose junction word is not one"),
+            },
+            // [agent-inferred, November 14, the ring record §4] The opening's and the junction's words are zero or one here and the mark's is one; a
+            // field without the mark writes a line before `v14m`.
+            (Some("hnn-field-v14m"), 17) => match (n(words[14])?, n(words[15])?, n(words[16])?) {
+                (o @ (0 | 1), j @ (0 | 1), 1) => (Some(words[11]), n(words[12])?, n(words[13])?, o == 1, j == 1, true),
+                _ => return refuse("an hnn-field-v14m head line whose opening or junction word is not zero or one or whose mark word is not one"),
             },
             (Some("hnn-field-v14k"), _) => return refuse("the carry founded at zero friction is retired (hnn-field-v14k): its states are receipts only"),
             (Some("hnn-field-v14t"), _) => return refuse("the carry's leak on its linear chart is retired (hnn-field-v14t): its states are receipts only"),
-            (Some("hnn-field-v13"), 11) => (None, 0, 0, false, false),
+            (Some("hnn-field-v13"), 11) => (None, 0, 0, false, false, false),
             _ => return refuse("a field's head line that is not hnn-field-v14"),
         };
-        let d = Self { alphabet: n(words[1])?, width: n(words[2])?, heads: n(words[3])?, modes: n(words[4])?, still: n(words[5])?, contacts: n(words[6])?, ticks: n(words[7])?, frames: n(words[8])?, reach: n(words[9])?, lanes: n(words[10])?, depth: depth_word.map(n).transpose()?.unwrap_or(0), carry, triads, opening, junction };
+        let d = Self { alphabet: n(words[1])?, width: n(words[2])?, heads: n(words[3])?, modes: n(words[4])?, still: n(words[5])?, contacts: n(words[6])?, ticks: n(words[7])?, frames: n(words[8])?, reach: n(words[9])?, lanes: n(words[10])?, depth: depth_word.map(n).transpose()?.unwrap_or(0), carry, triads, opening, junction, mark };
         d.admit()?;
         Ok(d)
     }
@@ -744,9 +768,16 @@ pub struct FieldLayout {
     /// leak is read; the last families, zero long where the tick has no return.
     pub junction: usize,
     pub junction_bias: usize,
+    /// [definition; agent-inferred, November 14, the ring record §4] **The mark's strengths** ([`FieldDeclaration::mark`]): `α_b`, one entry an
+    /// encoding (`enc`, `before`, `after`, in that order) on the material's grain, so `α_b = 2^24` marks a site's row at its whole face; the last
+    /// family, zero long where the field reads once.
+    pub mark: usize,
     pub len: usize,
     pub families: Vec<(usize, usize, u32)>,
 }
+
+/// The encodings a mark's strengths are read in, in [`FieldLayout::mark`]'s order.
+pub const MARK_BASES: usize = 3;
 
 impl FieldLayout {
     fn new(d: &FieldDeclaration) -> Self {
@@ -800,7 +831,8 @@ impl FieldLayout {
         let (opening, opening_bias) = (tail(opened * dw * dw, MATERIAL_BITS), tail(opened * dw, FACE_BITS));
         let joined = usize::from(d.junction);
         let (junction, junction_bias) = (tail(joined * dw, MATERIAL_BITS), tail(joined, FACE_BITS));
-        Self { enc, before, after, q, q_bias, v, v_bias, out, out_bias, a: a_, a_bias, b, b_bias, w, w_bias, read, read_bias, moment_before, moment_after, temper, probe, probe_bias, pace, moment_face, moment_face_bias, lift_bias, carry, carry_bias, triad, triad_bias, w_triad, opening, opening_bias, junction, junction_bias, len: at, families }
+        let mark = tail(usize::from(d.mark) * MARK_BASES, MATERIAL_BITS);
+        Self { enc, before, after, q, q_bias, v, v_bias, out, out_bias, a: a_, a_bias, b, b_bias, w, w_bias, read, read_bias, moment_before, moment_after, temper, probe, probe_bias, pace, moment_face, moment_face_bias, lift_bias, carry, carry_bias, triad, triad_bias, w_triad, opening, opening_bias, junction, junction_bias, mark, len: at, families }
     }
 }
 
@@ -1818,6 +1850,9 @@ struct FieldPass {
     tower: Option<scale::ScalePass>,
     /// [measurement; theory, November 11 04:48, G39] The sites whose face covector a return leaves zero (empty: none), a reading of where the deposit's mass lies.
     skip: Vec<bool>,
+    /// [definition; agent-inferred, November 14, the ring record §4] The marks this read opened its silent sites on ([`FieldDeclaration::mark`]):
+    /// the shares of the faces the field's first read gave them, `None` at every other site; none on a read that is the first.
+    marks: Option<Vec<Option<Shares>>>,
 }
 
 /// [measurement; theory, November 13, the junction record §13.9; G157] **A turned head's reach on its own clock, its founding covector by
@@ -2519,7 +2554,7 @@ impl Field {
         self.admit_region(region)?;
         let paces = self.paces(region)?;
         let moment = self.moments_of(region, &paces)?;
-        self.open(region, &moment)
+        self.open(region, &moment, None)
     }
 
     /// [measurement; theory, November 13, P55 part B; the design record of November 13, §4.4] **A place's face at the region's opening**, before
@@ -2538,12 +2573,12 @@ impl Field {
         let moment = self.moments_of(region, &paces)?;
         let l = &self.layout;
         let mut xt = vec![0i64; dw];
-        self.opening_term(region, l.enc, t, &mut xt);
+        self.opening_term(region, l.enc, t, &mut xt, None);
         if t > 0 {
-            self.opening_term(region, l.before, t - 1, &mut xt);
+            self.opening_term(region, l.before, t - 1, &mut xt, None);
         }
         if t + 1 < sites {
-            self.opening_term(region, l.after, t + 1, &mut xt);
+            self.opening_term(region, l.after, t + 1, &mut xt, None);
         }
         let reach_c = reach(&self.theta[l.moment_face..l.moment_face + dw * m2]);
         let mut term = vec![0i64; dw];
@@ -2662,9 +2697,44 @@ impl Field {
         region.faces.get(t).and_then(Option::as_ref)
     }
 
+    /// [definition; the ring record §4] The index of a mark's strength for the encoding at `base` ([`FieldLayout::mark`]'s order).
+    fn mark_base(&self, base: usize) -> usize {
+        let l = &self.layout;
+        if base == l.enc {
+            0
+        } else if base == l.before {
+            1
+        } else {
+            2
+        }
+    }
+
+    /// [definition; the ring record §4; G176] **The mark a silent site opens on**, with its strength on the material's grain: the law's where the
+    /// field reads twice and `marks` (the second read's) holds the site's, at `α_b`; else the ruler's ([`Field::mark`], its `2^(−16)` strength
+    /// carried to the material's grain); none at a resolved or carried site.
+    fn marked<'m>(&'m self, region: &Region, base: usize, s: usize, marks: Option<&'m [Option<Shares>]>) -> Option<(i128, &'m Shares)> {
+        if !region.unresolved[s] || Self::carried(region, s).is_some() {
+            return None;
+        }
+        if let Some(law) = self.law_mark(region, base, s, marks) {
+            return Some(law);
+        }
+        let (alpha, ruler) = self.mark.as_ref()?;
+        Some((i128::from(*alpha) << (MATERIAL_BITS - STATE_BITS), ruler.get(s)?.as_ref()?))
+    }
+
+    /// The law's mark alone ([`Field::marked`]): where the field reads twice and the second read's `marks` holds the site's, at `α_b`.
+    fn law_mark<'m>(&self, region: &Region, base: usize, s: usize, marks: Option<&'m [Option<Shares>]>) -> Option<(i128, &'m Shares)> {
+        if !self.declaration.mark || !region.unresolved[s] || Self::carried(region, s).is_some() {
+            return None;
+        }
+        let face = marks?.get(s)?.as_ref()?;
+        Some((i128::from(self.theta[self.layout.mark + self.mark_base(base)]), face))
+    }
+
     /// Site `s`'s opening term in the encoding at `base`: its row, or the superposition of its
     /// carried face's rows, `release(Σ_a w_a E(a), 16)`, added into `x`.
-    fn opening_term(&self, region: &Region, base: usize, s: usize, x: &mut [i64]) {
+    fn opening_term(&self, region: &Region, base: usize, s: usize, x: &mut [i64], marks: Option<&[Option<Shares>]>) {
         let dw = self.declaration.width;
         match Self::carried(region, s) {
             None => {
@@ -2672,14 +2742,12 @@ impl Field {
                 for (slot, &e) in x.iter_mut().zip(&self.theta[start..start + dw]) {
                     *slot += e as i64;
                 }
-                // [G176] A silent site's mark at its strength, a ruler of the carried release's opening part.
-                if let Some((alpha, marks)) = self.mark.as_ref().filter(|_| region.unresolved[s]) {
-                    if let Some(face) = marks.get(s).and_then(Option::as_ref) {
-                        for (i, slot) in x.iter_mut().enumerate() {
-                            let sum: i128 = face.iter().map(|&(c, w)| w as i128 * self.theta[base + c as usize * dw + i] as i128).sum();
-                            let delta = release(sum, STATE_BITS) as i128 - self.theta[start + i] as i128;
-                            *slot += release(i128::from(*alpha) * delta, STATE_BITS) as i64;
-                        }
+                // [the ring record §4; G176] A silent site's mark at its strength: the law's (the second read's marks at `α_b`), or the ruler's.
+                if let Some((alpha, face)) = self.marked(region, base, s, marks) {
+                    for (i, slot) in x.iter_mut().enumerate() {
+                        let sum: i128 = face.iter().map(|&(c, w)| w as i128 * self.theta[base + c as usize * dw + i] as i128).sum();
+                        let delta = release(sum, STATE_BITS) as i128 - self.theta[start + i] as i128;
+                        *slot += release(alpha * delta, MATERIAL_BITS) as i64;
                     }
                 }
             }
@@ -2694,13 +2762,32 @@ impl Field {
 
     /// The opening term's return: `dx` into site `s`'s row, or each carried class's row by its
     /// share, `release(w_a dx, 16)` a term.
-    fn opening_return(&self, region: &Region, base: usize, s: usize, dx: &[i64], g: &mut [i128]) {
+    fn opening_return(&self, region: &Region, base: usize, s: usize, dx: &[i64], g: &mut [i128], marks: Option<&[Option<Shares>]>) {
         let dw = self.declaration.width;
         match Self::carried(region, s) {
             None => {
                 let start = base + self.row(region, s) * dw;
-                for i in 0..dw {
-                    g[start + i] += dx[i] as i128;
+                // [the ring record §4] A marked site: `x = E(∗) + release(α Δ, 24)`, so `E(∗)` takes `dx − release(α dx, 24)`, each class's row
+                // `release(w_c release(α dx, 24), 16)`, and the strength `Σ_i dx_i Δ_i` (the outer sum's grain). The ruler's mark returns nothing.
+                match self.law_mark(region, base, s, marks) {
+                    Some((alpha, face)) => {
+                        let at = self.layout.mark + self.mark_base(base);
+                        for i in 0..dw {
+                            let a_dx = release(alpha * dx[i] as i128, MATERIAL_BITS);
+                            g[start + i] += dx[i] as i128 - a_dx;
+                            let mut sum = 0i128;
+                            for &(c, w) in face {
+                                g[base + c as usize * dw + i] += release(w as i128 * a_dx, STATE_BITS);
+                                sum += w as i128 * self.theta[base + c as usize * dw + i] as i128;
+                            }
+                            g[at] += dx[i] as i128 * (release(sum, STATE_BITS) as i128 - self.theta[start + i] as i128);
+                        }
+                    }
+                    None => {
+                        for i in 0..dw {
+                            g[start + i] += dx[i] as i128;
+                        }
+                    }
                 }
             }
             Some(face) => {
@@ -2912,10 +2999,10 @@ impl Field {
                 *slot += e as i64;
             }
             if t > 0 {
-                self.opening_term(region, l.before, t - 1, xt);
+                self.opening_term(region, l.before, t - 1, xt, None);
             }
             if t + 1 < sites {
-                self.opening_term(region, l.after, t + 1, xt);
+                self.opening_term(region, l.after, t + 1, xt, None);
             }
             affine(&self.theta[l.moment_face..l.moment_face + dw * m2], reach_c, m2, &moment[t * m2..(t + 1) * m2], Some(&self.theta[l.moment_face_bias..l.moment_face_bias + dw]), MATERIAL_BITS, MATERIAL_BITS, &mut term)?;
             for (slot, &v) in xt.iter_mut().zip(&term) {
@@ -3049,10 +3136,10 @@ impl Field {
                 g[mfb + i] += v as i128;
             }
             if t > 0 {
-                self.opening_return(region, l.before, t - 1, dxt, g);
+                self.opening_return(region, l.before, t - 1, dxt, g, None);
             }
             if t + 1 < sites {
-                self.opening_return(region, l.after, t + 1, dxt, g);
+                self.opening_return(region, l.after, t + 1, dxt, g, None);
             }
             transposed(&self.theta[mf..mf + dw * m2], reaches.moment_face, m2, dxt, MATERIAL_BITS, &mut back)?;
             for (slot, &b) in dm[t * m2..(t + 1) * m2].iter_mut().zip(&back) {
@@ -3186,7 +3273,7 @@ impl Field {
     /// neighbours' rows of their own encodings and its moment read through its chart,
     /// `x⁰_t = E(u_t) + E₋(u_(t−1)) + E₊(u_(t+1)) + release(C s_t + b, 24)` (§16.22; a region's first site has no
     /// site before it, its last none after), `moment` the region's moments `[t][2M]` ([`Field::moments_of`]).
-    fn open(&self, region: &Region, moment: &[i64]) -> Result<Vec<i64>> {
+    fn open(&self, region: &Region, moment: &[i64], marks: Option<&[Option<Shares>]>) -> Result<Vec<i64>> {
         let d = &self.declaration;
         let (dw, m2) = (d.width, 2 * d.complex());
         let sites = region.classes.len();
@@ -3195,12 +3282,12 @@ impl Field {
         let mut x = vec![0i64; sites * dw];
         let mut term = vec![0i64; dw];
         for (t, xt) in x.chunks_exact_mut(dw).enumerate() {
-            self.opening_term(region, l.enc, t, xt);
+            self.opening_term(region, l.enc, t, xt, marks);
             if t > 0 {
-                self.opening_term(region, l.before, t - 1, xt);
+                self.opening_term(region, l.before, t - 1, xt, marks);
             }
             if t + 1 < sites {
-                self.opening_term(region, l.after, t + 1, xt);
+                self.opening_term(region, l.after, t + 1, xt, marks);
             }
             affine(&self.theta[l.moment_face..l.moment_face + dw * m2], reach_c, m2, &moment[t * m2..(t + 1) * m2], Some(&self.theta[l.moment_face_bias..l.moment_face_bias + dw]), MATERIAL_BITS, MATERIAL_BITS, &mut term)?;
             for (slot, &v) in xt.iter_mut().zip(&term) {
@@ -3595,15 +3682,28 @@ impl Field {
     }
 
     /// The region's forward: `K` ticks, then each unresolved site's face. `keep` holds each tick's
-    /// temporaries for the reverse.
+    /// temporaries for the reverse. [the ring record §4] Where the field reads twice ([`FieldDeclaration::mark`]), the first read is this one
+    /// with no marks, and the forward returned is the second, each silent site opened on the shares of the face the first gave it.
     fn pass(&self, region: &Region, keep: bool) -> Result<FieldPass> {
+        if !self.declaration.mark {
+            return self.pass_with(region, keep, None);
+        }
+        let first = self.pass_with(region, false, None)?;
+        let marks: Vec<Option<Shares>> = (0..region.classes.len()).map(|t| if Self::silent(region, t) { first.faces[t].as_ref().map(shares) } else { None }).collect();
+        let mut out = self.pass_with(region, keep, Some(&marks))?;
+        out.marks = Some(marks);
+        Ok(out)
+    }
+
+    /// One read of the region ([`Field::pass`]), its silent sites opened on `marks` where given.
+    fn pass_with(&self, region: &Region, keep: bool, marks: Option<&[Option<Shares>]>) -> Result<FieldPass> {
         self.admit_region(region)?;
         let d = &self.declaration;
         let dw = d.width;
         let reaches = self.reaches();
         let paces = self.paces(region)?;
         let moment = self.moments_of(region, &paces)?;
-        let mut x = self.open(region, &moment)?;
+        let mut x = self.open(region, &moment, marks)?;
         let definite: Vec<bool> = (0..region.classes.len()).map(|t| Self::definite(region, t)).collect();
         let keyed: Vec<bool> = (0..region.classes.len()).map(|t| !region.unresolved[t] || Self::carried(region, t).is_some()).collect();
         // [theory, November 13, the design record §4.9] The level reads the opening's news, formed before any tick.
@@ -5234,12 +5334,12 @@ impl Field {
         // face's rows by their shares).
         for t in 0..sites {
             let dxt = &dx[t * dw..(t + 1) * dw];
-            self.opening_return(region, l.enc, t, dxt, g);
+            self.opening_return(region, l.enc, t, dxt, g, pass.marks.as_deref());
             if t > 0 {
-                self.opening_return(region, l.before, t - 1, dxt, g);
+                self.opening_return(region, l.before, t - 1, dxt, g, pass.marks.as_deref());
             }
             if t + 1 < sites {
-                self.opening_return(region, l.after, t + 1, dxt, g);
+                self.opening_return(region, l.after, t + 1, dxt, g, pass.marks.as_deref());
             }
         }
         Ok(())
@@ -6672,6 +6772,33 @@ impl Field {
         Ok((out, from))
     }
 
+    /// [definition; agent-inferred, November 14, the ring record §4] **The field that reads twice** ([`FieldDeclaration::mark`]): the mark's
+    /// strengths `α_b` appended at the end of the fine field's material, founded at zero, every standing entry kept; no key is read and the
+    /// draws do not move. At zero the second read opens every silent site on its open row, so every face is the source's bit for bit. A tower
+    /// keeps its level as it stands (it reads with the fine field). Also the map over the whole material from each new entry to the old one it
+    /// copies (`None` for the strengths). Refused on a field that reads twice.
+    pub fn with_mark(&self) -> Result<(Self, Vec<Option<usize>>)> {
+        if self.declaration.mark {
+            return refuse("a field that already reads twice");
+        }
+        let d = FieldDeclaration { mark: true, ..self.declaration };
+        d.admit()?;
+        let layout = FieldLayout::new(&d);
+        if self.theta.len() != layout.mark {
+            return refuse("a field whose material does not end where the mark's strengths begin");
+        }
+        let (fine, total) = (self.theta.len(), self.material_len());
+        let mut theta = self.theta.clone();
+        theta.resize(layout.len, 0);
+        let mut from: Vec<Option<usize>> = (0..fine).map(Some).collect();
+        from.resize(layout.len, None);
+        from.extend((fine..total).map(Some));
+        let mut out = Self::with_theta(d, theta);
+        out.scale = self.scale.clone();
+        (out.per_blank_clock, out.bare_stretch) = (self.per_blank_clock, self.bare_stretch);
+        Ok((out, from))
+    }
+
     /// [definition; theory, November 12 (the record of the opening's room, §4 item 4; corrected 18:44Z: the founding reads no key)]
     /// **The field with `fresh` more letters**, founded at a passage's crossing: the fresh classes follow the standing ones, so every
     /// standing class keeps its index (the void's included, wherever the codec holds it), and the open row (the unresolved operand,
@@ -7465,7 +7592,11 @@ fn predicted_parts(field: &Field, g: &[i128], step: &[i128], halvings: u32, part
 /// [definition; theory, November 13, the junction record §7] The junction's chart is one part, `junction` (index 24, [`JUNCTION_PART`]): `L` and
 /// `ℓ_b`. Why a part of its own: it is a new block whose covector reaches it only through the tick's return, founded where that covector stands
 /// at first order, and the part rates' law sets each block's rate from its own travel. A parts line carries it only where the tick has the return.
-pub const PART_NAMES: [&str; 25] = ["w_new", "a_new", "b_new", "enc_lane", "before_lane", "after_lane", "q_lane", "v_lane", "probe_lane", "out_lane", "moment_face_lane", "read_lane", "face_biases_lane", "a_lane", "b_lane", "carry", "w_carry", "a_carry", "b_carry", "enc_first", "before_first", "after_first", "triad", "opening", "junction"];
+///
+/// [definition; agent-inferred, November 14, the ring record §4] The mark's strengths are one part, `mark` (index 25, [`MARK_PART`]): `α_b`.
+/// Why a part of its own: a new block whose covector reaches it only through the second read's opening, founded where G175 read that covector,
+/// and the part rates' law sets each block's rate from its own travel. A parts line carries it only where the field reads twice.
+pub const PART_NAMES: [&str; 26] = ["w_new", "a_new", "b_new", "enc_lane", "before_lane", "after_lane", "q_lane", "v_lane", "probe_lane", "out_lane", "moment_face_lane", "read_lane", "face_biases_lane", "a_lane", "b_lane", "carry", "w_carry", "a_carry", "b_carry", "enc_first", "before_first", "after_first", "triad", "opening", "junction", "mark"];
 
 /// The triads' one part ([`PART_NAMES`] index 22), written after the first lane's letter rows only where the field has triads.
 pub const TRIAD_PART: usize = 22;
@@ -7475,6 +7606,9 @@ pub const OPENING_PART: usize = 23;
 
 /// The junction's chart's one part ([`PART_NAMES`] index 24), written last only where the tick has the junction's return.
 pub const JUNCTION_PART: usize = 24;
+
+/// The mark's strengths' one part ([`PART_NAMES`] index 25), written last only where the field reads twice.
+pub const MARK_PART: usize = 25;
 
 /// The plain founded parts (the first sixteen of [`PART_NAMES`]): every field writes them.
 pub const PLAIN_PARTS: usize = 16;
@@ -7494,7 +7628,7 @@ pub const FIRST_PARTS: std::ops::Range<usize> = 19..22;
 ///
 /// [definition; theory, November 13, P60 item 1f] The opening's one part comes after them only where the field has the opening's lift, for the
 /// same reason: a field without it writes every line it wrote before. So does the junction's one part, last, only where the tick has the return.
-pub fn written_parts(carry: usize, triads: usize, opening: bool, junction: bool) -> Vec<usize> {
+pub fn written_parts(carry: usize, triads: usize, opening: bool, junction: bool, mark: bool) -> Vec<usize> {
     let mut out: Vec<usize> = (0..PLAIN_PARTS).collect();
     if carry > 0 {
         out.extend(CIRCLE_PARTS);
@@ -7508,6 +7642,9 @@ pub fn written_parts(carry: usize, triads: usize, opening: bool, junction: bool)
     }
     if junction {
         out.push(JUNCTION_PART);
+    }
+    if mark {
+        out.push(MARK_PART);
     }
     out
 }
@@ -7685,6 +7822,10 @@ impl Field {
         if d.junction {
             parts[l.junction..l.junction + dw].fill(JUNCTION_PART as u8);
             parts[l.junction_bias] = JUNCTION_PART as u8;
+        }
+        // [agent-inferred, November 14, the ring record §4] The mark's strengths, one part ([`MARK_PART`]).
+        if d.mark {
+            parts[l.mark..l.mark + MARK_BASES].fill(MARK_PART as u8);
         }
         parts
     }
@@ -8195,6 +8336,29 @@ impl FieldLearner {
         Ok(Self { field, first, second, rate_bits: self.rate_bits, drawn: self.drawn, laps: self.laps, held: None, read_held: self.read_held, rate_parts, own_rates, last: None, pass: self.pass.clone() })
     }
 
+    /// [definition; agent-inferred, November 14, the ring record §4] **The learner that reads twice** ([`Field::with_mark`]), its strengths
+    /// founded at zero. Every standing entry keeps its moments, its remainder and its rate. The strengths' moments open at zero, so each opens at
+    /// its own first nonzero covector (the deposit's law for a coordinate with no history): a strength's covector sums a pairing over every
+    /// marked site and coordinate, and no standing block's second moment is its scale (agent-inferred). Its rate: the founded parts' rates are
+    /// kept and the mark's part takes octave 0, what a newly grown block takes in this line; where the learner carries each entry's own rate,
+    /// every standing entry keeps it and the strengths take `rate_bits`. The draws, the laps and the pass are kept; the held step and the last
+    /// section's step are dropped. Refused while a step is held.
+    pub fn with_mark(&self) -> Result<Self> {
+        if self.held.is_some() {
+            return refuse("a learner reads twice after its held step is read");
+        }
+        let (field, from) = self.field.with_mark()?;
+        let first = from.iter().map(|o| o.map_or(0, |i| self.first[i])).collect();
+        let second = from.iter().map(|o| o.map_or(0, |i| self.second[i])).collect();
+        let rate_parts = self.rate_parts.map(|rp| {
+            let mut octaves = rp.octaves;
+            octaves[MARK_PART] = 0;
+            RateParts { octaves, ..rp }
+        });
+        let own_rates = self.own_rates.as_ref().map(|own| from.iter().map(|o| o.map_or(self.rate_bits, |i| own[i])).collect());
+        Ok(Self { field, first, second, rate_bits: self.rate_bits, drawn: self.drawn, laps: self.laps, held: None, read_held: self.read_held, rate_parts, own_rates, last: None, pass: self.pass.clone() })
+    }
+
     /// [definition; theory, November 12 (the record of the opening's room, §4 item 4)] **The learner with `fresh` more letters**
     /// ([`Field::lettered`]), founded at a passage's crossing. No key is read and the draws do not move. Every standing entry keeps its
     /// moments and its remainder (the open rows' with them, at their new place); a fresh entry's first moment opens at zero and its second
@@ -8494,7 +8658,7 @@ impl FieldLearner {
             // The parts the field has, in the line's order ([`written_parts`]): nineteen without carry circles, twenty-two with them, and the
             // triad's one more where the field has triads.
             let d = &self.field.declaration;
-            let parts = self.rate_parts.map_or(String::new(), |rp| format!("parts {} {}\n", rp.contacts_before, written_parts(d.carry, d.triads, d.opening, d.junction).iter().map(|&p| rp.octaves[p].to_string()).collect::<Vec<_>>().join(" ")));
+            let parts = self.rate_parts.map_or(String::new(), |rp| format!("parts {} {}\n", rp.contacts_before, written_parts(d.carry, d.triads, d.opening, d.junction, d.mark).iter().map(|&p| rp.octaves[p].to_string()).collect::<Vec<_>>().join(" ")));
             // [definition; theory, November 12 00:20] Each entry's own rate, a trailing line after the parts' (`rates r₀ … r_(n−1)`).
             let own = self.own_rates.as_ref().map_or(String::new(), |r| format!("rates {}\n", r.iter().map(u32::to_string).collect::<Vec<_>>().join(" ")));
             // [definition; theory, November 12] The pass's place over a store, the text's last line and only where present ([`StorePass`]).
@@ -8540,15 +8704,19 @@ impl FieldLearner {
                 // [theory, November 13, P60 item 1f] An opening field's line without the opening's octave (the line before its founding) reads with
                 // it at the old rate, as a triad field's line without the triad's.
                 // [theory, November 13, the junction record §7] So does a field with the return whose line lacks the junction's octave.
-                let (carry, triads, opening, junction) = (field.declaration.carry, field.declaration.triads, field.declaration.opening, field.declaration.junction);
-                let order = written_parts(carry, triads, opening, junction);
-                let unjoined = written_parts(carry, triads, opening, false);
-                let unopened = written_parts(carry, triads, false, false);
-                let before = written_parts(carry, 0, false, false);
+                // [agent-inferred, November 14, the ring record §4] So does a field that reads twice whose line lacks the mark's octave.
+                let (carry, triads, opening, junction, mark) = (field.declaration.carry, field.declaration.triads, field.declaration.opening, field.declaration.junction, field.declaration.mark);
+                let order = written_parts(carry, triads, opening, junction, mark);
+                let unmarked = written_parts(carry, triads, opening, junction, false);
+                let unjoined = written_parts(carry, triads, opening, false, false);
+                let unopened = written_parts(carry, triads, false, false, false);
+                let before = written_parts(carry, 0, false, false, false);
                 let older: Vec<usize> = if carry > 0 { (0..PLAIN_PARTS).chain(CIRCLE_PARTS).collect() } else { (0..PLAIN_PARTS).collect() };
                 let n = v.len().saturating_sub(1);
                 let slots: Vec<usize> = if n == order.len() {
                     order
+                } else if mark && n == unmarked.len() {
+                    unmarked
                 } else if junction && n == unjoined.len() {
                     unjoined
                 } else if opening && n == unopened.len() {
