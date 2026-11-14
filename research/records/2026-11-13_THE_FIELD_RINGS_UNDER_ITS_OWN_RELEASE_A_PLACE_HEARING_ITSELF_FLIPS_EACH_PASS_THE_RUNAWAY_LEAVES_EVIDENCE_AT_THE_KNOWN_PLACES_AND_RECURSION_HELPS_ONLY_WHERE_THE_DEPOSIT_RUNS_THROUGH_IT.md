@@ -7,7 +7,7 @@ receipt in the receipts of [the junction record](2026-11-13_THE_TICK_HOLDS_THE_J
 ## 1. Why this record exists
 
 Brandon holds self-induction as his own postulate (18:21Z: it is asserted from experience, never a "test" a reading could fail), and on
-21:12Z gave its lens for a loop that runs off: overconfidence reinforces itself until it is wrong, and then the evidence should shatter the
+21:12Z gave its lens for a loop that runs off: overconfidence reinforces itself until the passage disagrees with it, and then the evidence should shatter the
 source of the run-away in a snap, the way lightning and plasticity break and reform; it is not to be damped before that is seen. The
 junction record's §8 named what such a loop needs in this build: a store of the rate, its own echo known as its own, and a drive. The
 built tick has the first two only weakly (G151: a written row's echo is 0.00068 at the median) and no drive. This record reads the drive
@@ -57,7 +57,7 @@ owed to training.
   once, at its second pass, on the states the line already draws. A located cause carried unrepaired: the uncompared readout at written
   places (its 3.95 nats) is the evidence's read here only; a trained evidence channel (the opening's comparison at every place, P60) is read
   before any gate is built on it. A switch outside the law: `α` is part of the state, founded at zero.
-- **The snap within it.** With the deposit through the loop, the lens's snap is the step at a place whose release was confident and wrong:
+- **The snap within it.** With the deposit through the loop, the lens's snap is the step at a place whose confident release met a passage that disagreed:
   the comparison's covector there is the largest the loop carries, and the deposit acts where it lands.
 
 - **The build, as §5's readings leave it** (agent-inferred, November 14 00:05Z). The field reads a region twice. The first read is the
@@ -88,14 +88,14 @@ second lap; host, 8 threads; receipts `g169_redraw.txt` to `g173_before.txt` und
 - **Drawn and heard as written, the loop runs off too (G169, `read-redraw`).** Each open place is drawn from the field's own face, and
   every read is a mask state the field trained on: the open places of one residue modulo `NEAR` opened at a time, the others written at
   their last draws. The faces sharpen (expected code 3.06 nats a place at the first read, 1.36 at sweep 8, 1.10 at sweep 24), the
-  field's surprise at its own draws falls (3.70 to 1.48), the confidently wrong (one class at least half, not the truth) rise from 26% at
-  sweep 1 to 48% at sweep 8 and 57% at sweep 24 and are still rising, and the faces averaged over the sweeps code the truth at 4.08
-  against the first read's 3.05. The deterministic limit, read beside it as a ruler, orders into fluent wrong text (its own fill at 0.22
-  nats a place, the truth at 7.65, 72% confidently wrong) and coarsens: its changes fall from 28% to 1.4% of the places and onto the
+  field's surprise at its own draws falls (3.70 to 1.48), the places confident against the passage (one class at least half, not the passage's class) rise from 26% at
+  sweep 1 to 48% at sweep 8 and 57% at sweep 24 and are still rising, and the faces averaged over the sweeps code the passage's classes at 4.08
+  against the first read's 3.05. The deterministic limit, read beside it as a ruler, orders into fluent text of its own that the passage does not hold (its own fill at 0.22
+  nats a place, the passage's classes at 7.65, 72% confident against the passage) and coarsens: its changes fall from 28% to 1.4% of the places and onto the
   walls between ordered runs, where neighbours change together 19 times as often as chance. So noise does not bite either.
 - **Why: the field takes its own news for the passage's.** The receiver's news is `κ = S ⊖ E`, what it already predicts cancelling (the
   laboratory's foil). A release is the receiver's own `E`. Heard as a written class it arrives as `S`, with the weight of evidence, and a
-  field trained only on written neighbours trusts a neighbour fully, so a self-consistent release is a fixed point however wrong, and
+  field trained only on written neighbours trusts a neighbour fully, so a self-consistent release is a fixed point however far the passage stands from it, and
   its confidence is bought from the field itself. That is the junction record's §8 item, its own echo known as its own, and no
   temperature the field holds supplies it (agent-inferred).
 - **What could bite it, recovered.** October 8 read this lens on the constitution: a learning medium of joints driven by the reached
@@ -105,8 +105,8 @@ second lap; host, 8 threads; receipts `g169_redraw.txt` to `g173_before.txt` und
   the evidence returns, which is largest where a confident release contradicts what the passage holds.
 - **Read: the bite is a warmer field, not yet the evidence (G170 to G173, `read-breakdown`).** After each sweep a copy of the learner
   local to the region takes one section of its own law (its rates, its moments), compared only at written places of the sweep's residue
-  given the field's own release, with no gain or temperature set by the reading. At sweep 8 the single faces code the truth at 5.50
-  against 6.12, and 38% are confidently wrong against 48% (G170). The same count of sections on training text the region never met does
+  given the field's own release, with no gain or temperature set by the reading. At sweep 8 the single faces code the passage's classes at 5.50
+  against 6.12, and 38% are confident against the passage, against 48% (G170). The same count of sections on training text the region never met does
   as much (5.50, 38%; G171), the compared written places code no better, and the lap's end state with no section runs off as the mean
   does (6.10, 46%; G172). The sections taken all before the first read bite as much again (5.52, 34%; G173): what bites is their
   destination, a field whose first read is softer (expected code 3.20 against 3.06) and a little worse (3.067 against 3.051). One
@@ -118,10 +118,10 @@ runaway reaches (a warmer field, G173), and noise keeps it moving (G169), but ne
 heard as written carries no mark that it is the field's own, and the field has never been compared through one. The overconfidence that
 bites itself, which the lens names, is the deposit of §4 made through the loop: the release carried as a face (the mark the field can
 hear) at a strength founded at zero, the comparison read at the second pass, and its covector returned through the carried faces into the
-first pass. There a confidently wrong release is exactly where the comparison's covector is largest (`|p̂ − q|²` near 2, against
-`p̂(1 − p̂)` where it is right), so the runaway concentrates the deposit where it is wrong: the lightning's channel and its return
+first pass. There a release confident against the passage is exactly where the comparison's covector is largest (`|p̂ − q|²` near 2,
+against `p̂(1 − p̂)` where the passage agrees), so the runaway concentrates the deposit where a confident release meets a passage that disagrees: the lightning's channel and its return
 stroke, with the field's trust in its own release learned where the passage contradicts it. The readings size that build: in eight
-sweeps the loop makes 38 to 48% of the open places confidently wrong, the stress such a deposit would carry. Its first reading is §4's,
+sweeps the loop makes 38 to 48% of the open places confident against the passage, the stress such a deposit would carry. Its first reading is §4's,
 the covector of the strength at the founding against its random-sign floor.
 
 **§4's first reading: the mark pays at first order (G175, `read-carried`, `Field::carried_slopes`).** At the founding, were each open
@@ -150,3 +150,8 @@ The Lean statements of the two-cycle of a synchronously iterated symmetric map a
 period doubling in this chart, are owed to #410 with the release's law when it is built.
 The steps' direction by part, where G173's nine sections warm the field, is owed with that build's first reading; it would read how the
 field is warmed, and a warmer field only lowers the level a runaway reaches.
+
+[correction, November 14 02:30Z] Brandon's correction of 02:04Z (nothing a release does is wrong; a comparison is an agreement at a
+receiver) is applied to this record's words: "confidently wrong" reads "confident against the passage", and the truth reads the passage's
+classes, one specimen at its receiver ([the record](2026-11-14_THE_MARK_IS_THE_FIELD_KNOWING_ITS_OWN_PLACEMENTS_A_COMPARISON_IS_AN_AGREEMENT_AT_A_RECEIVER_AND_NOTHING_A_RELEASE_DOES_IS_WRONG.md)).
+The guesses keep the words they were fixed in.

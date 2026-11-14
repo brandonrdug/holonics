@@ -2066,12 +2066,12 @@ pub(super) fn read_release(args: &[String]) -> Result<()> {
 /// November 13 22:33Z, a temperature is a store's state and never a reading's dial). Then `SWEEPS` sweeps: each sweep opens the open places of one residue modulo `NEAR` at a time (so no
 /// two open at once stand within each other's near field), every other open place standing written at its last draw, reads the region, and
 /// redraws them. A carried face is never formed, so every read is a mask state of the kind the field trained on. `OUT/redraw.tsv` holds a line a
-/// slice and sweep (numbers only): the open places; the truth's code on the faces the places were drawn from and their expected code (on
-/// `2^(−20)` bits, summed); the places whose draw is the truth; the places that changed class, the open neighbours both of which changed, and
+/// slice and sweep (numbers only): the open places; the passage's class's code on the faces the places were drawn from and their expected code (on
+/// `2^(−20)` bits, summed); the places whose draw is the passage's class; the places that changed class, the open neighbours both of which changed, and
 /// the open neighbours in all; the runs of three or more neighbouring places that changed together after holding a sweep, and their places;
-/// the truth's code on each place's faces averaged over the sweeps so far (its draws' average, the field's recursion read as a mean of its own
+/// the passage's class's code on each place's faces averaged over the sweeps so far (its draws' average, the field's recursion read as a mean of its own
 /// reads); the field's code of each place's last draw on its new face (its surprise at its own release); and the places whose face gives one
-/// class at least half and that class is not the truth. The output directory is private.
+/// class at least half and that class is not the passage's (confident against the passage; Brandon, November 14: nothing a release does is wrong). The output directory is private.
 pub(super) fn read_redraw(args: &[String]) -> Result<()> {
     redraw_with(args, false)
 }
@@ -2137,11 +2137,11 @@ fn redraw_with(args: &[String], deposit: bool) -> Result<()> {
     use rayon::prelude::*;
     use std::io::Write as _;
     let mut tsv = std::io::BufWriter::new(std::fs::File::create(out.join("redraw.tsv"))?);
-    writeln!(tsv, "slice\tsweep\tplaces\tcode\texpected\tagree\tflips\tpair_flips\tpairs\tsnaps\tsnap_places\taverage_code\town_code\tconfident_wrong\tevidence_places\tevidence_code\tdeposited")?;
+    writeln!(tsv, "slice\tsweep\tplaces\tcode\texpected\tagree\tflips\tpair_flips\tpairs\tsnaps\tsnap_places\taverage_code\town_code\tconfident_against\tevidence_places\tevidence_code\tdeposited")?;
     let a = learner.field.declaration.alphabet;
     println!("REDRAW_LAW command={command} role={role} places={places} sweeps={sweeps} ruler={} near={NEAR} ms={}", u8::from(!drawn_at_one), started.elapsed().as_millis());
     // One sweep's sums over a region: (places, code, expected, agree, flips, pair_flips, pairs, snaps, snap_places, average_code, own_code,
-    // confident_wrong, evidence_places, evidence_code, deposited).
+    // confident_against, evidence_places, evidence_code, deposited).
     type Stage = [i128; 15];
     // A face's class drawn by `key`: against its masses (the face the field forms), or its top (the ruler).
     let draw = |face: &holonics::hnn::tower::TowerFace, key: u128| -> usize {
@@ -2229,12 +2229,12 @@ fn redraw_with(args: &[String], deposit: bool) -> Result<()> {
                         let faces = local.as_ref().map_or(&learner.field, |l| &l.field).faces(&views[0]).map_err(|e| e.to_string())?;
                         for &t in &now {
                             let face = faces[t].as_ref().ok_or("an open place with no face")?;
-                            let truth = base.classes[t];
-                            st[1] += i128::from(face.code(truth));
+                            let held = base.classes[t];
+                            st[1] += i128::from(face.code(held));
                             let sum: i128 = face.masses.iter().map(|&m| m as i128 * holonics::hnn::tower::face_code(m, face.total) as i128).sum();
                             st[2] += sum / (face.total as i128).max(1);
                             let top = face.masses.iter().copied().max().unwrap_or(0);
-                            if 2 * top >= face.total && face.masses[truth] != top {
+                            if 2 * top >= face.total && face.masses[held] != top {
                                 st[11] += 1;
                             }
                             if sweep > 0 {
