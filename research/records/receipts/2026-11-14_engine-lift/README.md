@@ -72,3 +72,22 @@ The difference is 0.6 ms a section (0.08%), inside the controls' own spread of 1
 **A finding for the line.** Laps 7 and 8 of the four-lane line stopped at 2,899 and 2,864 sections, at their projection (2,100 s).
 They ran beside this step's builds, which share the host's cores with the deposit's per-entry loops (#812). Lap 9, with no build
 beside it, ran its 3,000.
+
+## C4: the codec, the region and the passage (branch `claude/consolidation-c4`)
+
+- **One alteration first.** The store's `Slice` held a file, and the guards keep the file system out of the engine. A slice now
+  reads through `PieceBytes`, and the store's file (`SliceFile`) stays in the harness. The reads and their bytes are the same.
+- **The move.** Four modules come into the engine:
+  - `codec.rs`: `FieldCodec`, `question_text`, `RECORD`, `UNIT`, and the `count` parser it reads its text with;
+  - `region.rs`: `TrainRegion` and its views;
+  - `passage.rs`: the problems, the masks, the held read and the store's cut;
+  - `units.rs`: `hnn/units.rs`, whole.
+
+  A script compared the moved lines with the lines that left the harness. They are equal but for headers, imports and visibility.
+  The harness keeps what reads files and prints lines, at its root. `store_train.rs` imports nothing from `field_train.rs` or
+  `tower_train.rs`.
+- **Gate 1** passed (exit 0).
+- **Gate 3** (`gate3_c4.txt`) printed `GATE_ENGINE EQUAL`:
+  - parity on 3 sections;
+  - 24 of 24 sections reproduced;
+  - the lap's read equal byte for byte.
