@@ -45,6 +45,12 @@ The milestones are the steps; each issue body holds its dated status line and it
 | 8. Athena alpha | #404 with #405, #406, #407, and the November 2 review's #601, #602, #603 | #404's boxes: real text learned online through the native route, kept by retained deposition, a cold restart, a question answered from the retained state with its sources, readable text shown whole | the field on a code passage, learning lap by lap on the card (§3) |
 | Parked | #409 | the target laws #20, #22, #23, #32 and the contact terms #30, #31 | closed until their work starts |
 
+**The consolidation** (#603, from November 14) runs beside the steps and changes no law. The
+repository is reduced to the machine that runs, the engine gets one owner cut by object
+(`crates/engine`, with its card realization and its commands beside it), and the laws are stated
+once. Its order, its decisions and its receipts are in [THE_CONSOLIDATION](THE_CONSOLIDATION.md);
+its first step is a coverage reading of the live line on the PC.
+
 ## 3. The campaign under way: Athena alpha on a code passage
 
 **The terrain.** Since November 5, at Brandon's request, the field learns Python code
