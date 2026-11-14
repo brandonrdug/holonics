@@ -4340,3 +4340,15 @@ G182 scored 2026-11-14T08:30Z (receipt g182_writes.txt), the writes' commonest b
   comparing both reads it is level. Writes holding a byte that is not a whole character: 6, 5 and 4 of 20 on the both-reads state
   as refine passes are added, 6 and 6 on the unmarked one. The rule's first branch: the revision is lawful on the both-reads line,
   and the writes are shown with 2 refine passes.
+
+G183 fixed 2026-11-14T08:29Z (the Opus PC thread), before its read: what the mark still holds. Read 1 on the fourth pass's
+third-lap mean (both reads compared for 9,888 sections), its strengths zeroed in a copy, against read 2 on the same mean (0.9806
+one-place, 2.3326 whole masks). Read first: at G181's 991 sections read 1 stood 0.0042 over read 2 at one-place masks and 0.054 at
+whole masks; the strengths have fallen since to 0.154, 0.662 and 0.606 of a whole face (from 0.390, 0.896 and 0.866 at lap 6).
+  (a) read 1's one-place code stands less than 0.004 over read 2's;
+  (b) read 1's whole masks stand less than 0.04 over read 2's.
+  Rule: the second read costs 0.77 of a section more a section (589 ms against 332). The unmarked line fell about 0.0035 a lap at
+  one-place masks in its third pass, so a gap under 0.0027 at one-place masks is bought back by reading once within a lap of card
+  time; a gap at whole masks over 0.02 is not. Both held: the mark's worth is at whole masks, and an unmarked continuation from this
+  state is read at equal card time before more laps of two reads. (b) missed: the mark holds its level at whole masks, and the line
+  keeps reading twice.
