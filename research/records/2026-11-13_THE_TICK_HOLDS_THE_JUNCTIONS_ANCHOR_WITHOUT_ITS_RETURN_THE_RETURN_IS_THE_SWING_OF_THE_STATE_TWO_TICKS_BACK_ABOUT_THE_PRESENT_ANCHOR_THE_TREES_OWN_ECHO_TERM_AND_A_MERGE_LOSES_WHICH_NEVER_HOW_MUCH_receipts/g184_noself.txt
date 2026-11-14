@@ -1,0 +1,14 @@
+# G184: the fourth pass's third-lap mean with only the enc strength (the self-mark) zeroed in a copy, against read 2 and against read 1 (strengths all zeroed) on the same mean; and the strip's check (the mean with its mark stripped reads read 1's cavity rows byte for byte: STRIP_CHECK identical). Numbers only.
+CAVITY_DONE ms=272473
+MEASURE lap=R44 rc=0 wall_s=273.0 peak_rss_kib=484288
+## no self-mark (F3) against read 2 (C3)
+LAST_TICK F3 one_place pooled=0.9808 places=100508 | code=0.6714(20124) web=1.0605(20043) science=0.9302(20088) books=1.0211(20028) wikidata=1.2202(20225)
+LAST_TICK C3 one_place pooled=0.9806 places=100508 | code=0.6706(20124) web=1.0609(20043) science=0.9292(20088) books=1.0211(20028) wikidata=1.2202(20225)
+LAST_TICK_DIFF one_place founded_minus_control pooled=+0.0003 | code=+0.0007 web=-0.0004 science=+0.0010 books=-0.0000 wikidata=-0.0000
+LAST_TICK F3 whole_open pooled=2.3338 places=3717 | code=2.1833(730) web=2.5082(758) science=2.2460(776) books=2.1880(776) wikidata=2.5687(677)
+LAST_TICK C3 whole_open pooled=2.3326 places=3717 | code=2.1789(730) web=2.5061(758) science=2.2452(776) books=2.1899(776) wikidata=2.5676(677)
+LAST_TICK_DIFF whole_open founded_minus_control pooled=+0.0013 | code=+0.0044 web=+0.0021 science=+0.0008 books=-0.0019 wikidata=+0.0011
+## no self-mark against read 1
+LAST_TICK_DIFF one_place founded_minus_control pooled=+0.0016 | code=+0.0040 web=+0.0029 science=-0.0012 books=+0.0034 wikidata=-0.0009
+LAST_TICK_DIFF whole_open founded_minus_control pooled=-0.0361 | code=-0.0442 web=-0.0313 science=-0.0467 books=-0.0144 wikidata=-0.0457
+STRIP_CHECK identical (out_R43 against out_R43u, cavity.tsv)
