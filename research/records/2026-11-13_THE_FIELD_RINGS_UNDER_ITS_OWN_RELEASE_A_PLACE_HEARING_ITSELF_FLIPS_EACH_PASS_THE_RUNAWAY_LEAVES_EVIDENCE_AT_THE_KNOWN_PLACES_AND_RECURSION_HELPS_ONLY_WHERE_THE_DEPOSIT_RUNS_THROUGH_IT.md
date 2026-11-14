@@ -144,6 +144,17 @@ alone carries about one late lap of the second pass. What it lacks is the field 
 release in training reads it with a law of its own, which this ruler, holding the constitution fixed, cannot show, and that is §4's
 build with its return, the next step.
 
+**The field trained through its mark agrees with the passage more than the line at equal training (G179).** A lap reading twice, grown
+from the third pass's lap-2 end state by `found-mark` and trained on the card with the line's own law (the new binary first reproducing
+the line's sections and read with the mark off), read at the mean of its sections 1,001 to 2,000 against the line's own third lap's mean of
+the same sections: one-place masks 1.0067 nats a place against 1.0089 (−0.0022), whole masks 2.3535 against 2.3679 (−0.0144), every
+slice under the control in both, science most at whole masks (−0.026). The strengths rose from zero to 0.143 to 0.198 at section 1,000,
+0.226 to 0.371 at 2,000 and 0.260, 0.488 and 0.470 (enc, before, after) where the lap stopped, past G176's best of 1/8 with the constitution
+fixed: trained through the mark, the field reads its own placements at strengths the untrained field could not use, and it hears them
+more through its neighbours' openings than its own. The gain is five times larger where neighbours are open together, the release's
+regime. Two reads cost 1.33 times one on the line's sections, so the lap stopped at its projection after 2,748 sections; the evidence is
+one lap's, at a shared mean. The line reads twice from here (receipt `g179_mark_lap.txt` under the junction record's receipts).
+
 ## 6. Owed
 
 The Lean statements of the two-cycle of a synchronously iterated symmetric map at a place hearing its own release, and of the parametron's

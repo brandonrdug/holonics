@@ -4257,3 +4257,18 @@ unit of strength (the strengths' covector, by test); G176's best 0.003 at 1/8 wi
   (d) every strength at the lap's end stands between 2^-7 and 1/2 of a unit.
   Rule: (b) and (c) held: the line reads twice from here. (c) held and (b) missed: the mark buys in the span masks, the release's regime,
   and the line reads twice. Both missed: the mark waits, and its strengths' and rows' covectors are read by part on the marked lap.
+
+G179 scored 2026-11-14T03:06Z (receipt g179_mark_lap.txt under the junction record's receipts). The marked lap is incomplete: it stopped at its
+own projection (1,250,000 ms, from the fixture batch's 1.18) after 2,748 of 3,000 sections, two reads costing 1.33 times one on the
+line's sections (453.8 ms against 341.9). It is read at the mean both laps share, sections 1,001 to 2,000 from the same state, the
+control the line's own third lap's MEAN.2000.
+  (a) the new binary, the mark off, equals the line's first 50 sections (timings aside) and its read's rows: held;
+  (b) one-place masks stand 0.0022 nats a place under the control (1.0067 against 1.0089), every slice under it (code −0.0016, web −0.0024,
+      science −0.0015, books −0.0001, wikidata −0.0053): held;
+  (c) whole masks stand 0.0144 under the control (2.3535 against 2.3679), every slice under it (code −0.0135, web −0.0139, science −0.0259,
+      books −0.0095, wikidata −0.0082): held;
+  (d) the strengths at the lap's stop are 0.260, 0.488 and 0.470 of a unit (enc, before, after; 0.143 to 0.198 at section 1,000, 0.226 to
+      0.371 at 2,000), still rising, inside 2^-7 to 1/2: held.
+  Of 4 parts 4 held, on partial evidence at a shared mean. The field trained through its own marked release agrees with the passage more
+  than the line at equal training, most where its neighbours are open too (whole masks, five times the one-place gain), the strengths
+  running past G176's fixed-constitution best of 1/8. The rule's first branch: the line reads twice from here.
