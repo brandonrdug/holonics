@@ -1,0 +1,14 @@
+# G182: writes (write-store, 4 documents a slice, 256 places of prompt, 256 written) from the fourth pass's first-lap end state (both reads compared from the pass's start) with 0, 1 and 2 refine passes, and a control from the unmarked line's third-pass fifth-lap end state with 0 and 1. Each write's commonest byte's share of its written bytes, and the count of writes that do not decode as whole UTF-8 characters. Numbers only; the writes are private.
+both_reads_p4l1 refine=0 mean=0.149 max=0.289 broken=6/20 ms=18154
+both_reads_p4l1 refine=1 mean=0.148 max=0.289 broken=5/20 ms=34706
+both_reads_p4l1 refine=2 mean=0.150 max=0.270 broken=4/20 ms=48753
+unmarked_p3l5 refine=0 mean=0.151 max=0.238 broken=6/20 ms=9081
+unmarked_p3l5 refine=1 mean=0.156 max=0.266 broken=6/20 ms=17271
+marked_one_compared_lap3 refine=0 mean=0.176 max=0.723 (writes_filler_ruler.txt)
+marked_one_compared_lap3 refine=1 mean=0.186 max=0.824
+marked_one_compared_lap3 refine=2 mean=0.197 max=0.828
+# The fourth pass's laps at their means (one-place and whole masks, nats a place over the held passage's 100,508 and 3,717 places): lap 1 0.9861 and 2.3389 (MEAN.2000 of 2,897 sections), lap 2 0.9820 and 2.3368, lap 3 0.9806 and 2.3326 (3,000 sections at 589 ms a section).
+LAST_TICK_DIFF lap3_minus_lap2 one_place pooled=-0.0015 | code=-0.0057 web=+0.0024 science=-0.0040 books=-0.0027 wikidata=+0.0025
+LAST_TICK_DIFF lap3_minus_lap2 whole_open pooled=-0.0042 | code=-0.0143 web=-0.0087 science=-0.0064 books=+0.0016 wikidata=+0.0074
+LAST_TICK_DIFF lap2_minus_lap1 one_place pooled=-0.0041 | code=-0.0021 web=-0.0042 science=-0.0032 books=-0.0047 wikidata=-0.0063
+LAST_TICK_DIFF lap2_minus_lap1 whole_open pooled=-0.0021 | code=+0.0098 web=-0.0064 science=-0.0000 books=+0.0009 wikidata=-0.0159
