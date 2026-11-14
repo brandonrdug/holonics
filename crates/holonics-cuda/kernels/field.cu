@@ -1024,11 +1024,13 @@ extern "C" __global__ void field_open(FieldWords w) {
     for (uint64_t c = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; c < cells; c += (uint64_t)gridDim.x * blockDim.x) {
         const uint64_t t = c / w.D, i = c % w.D;
         int64_t x = opening_term(w, w.enc, t, i) + mark_term(w, w.enc, 0, t, i);
+        // [G186] A neighbour's mark is heard only by an open place (`marked_site` at the recipient): a written place's class is the passage's.
+        const bool open = marked_site(w, t);
         if (w.site_pos[t] > 0) {
-            x += opening_term(w, w.enc_before, t - 1, i) + mark_term(w, w.enc_before, 1, t - 1, i);
+            x += opening_term(w, w.enc_before, t - 1, i) + (open ? mark_term(w, w.enc_before, 1, t - 1, i) : 0);
         }
         if (t + 1 < w.T && w.site_pos[t + 1] > 0) {
-            x += opening_term(w, w.enc_after, t + 1, i) + mark_term(w, w.enc_after, 2, t + 1, i);
+            x += opening_term(w, w.enc_after, t + 1, i) + (open ? mark_term(w, w.enc_after, 2, t + 1, i) : 0);
         }
         w.x[c] = x;
     }
@@ -4726,7 +4728,8 @@ extern "C" __global__ void field_mark_back(FieldWords w, wide *g, const int64_t 
         const uint64_t k = c / w.D, i = c % w.D;
         const uint64_t s = marked[k];
         for (uint32_t b = 0; b < 3; b++) {
-            const bool enters = b == 0 || (b == 1 ? s + 1 < w.T && w.site_pos[s + 1] > 0 : w.site_pos[s] > 0);
+            // [G186] A neighbour's opening carries the mark only where that neighbour is itself silent.
+            const bool enters = b == 0 || (b == 1 ? s + 1 < w.T && w.site_pos[s + 1] > 0 && marked_site(w, s + 1) : w.site_pos[s] > 0 && marked_site(w, s - 1));
             int64_t a = 0;
             if (enters) {
                 const uint64_t t = b == 0 ? s : (b == 1 ? s + 1 : s - 1);

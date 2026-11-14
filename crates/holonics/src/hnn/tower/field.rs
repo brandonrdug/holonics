@@ -319,8 +319,11 @@ pub struct FieldDeclaration {
     pub junction: bool,
     /// [definition; agent-inferred, November 14, the ring record §4 and §5] **The release marked as the field's own**: the field reads a region
     /// twice. The first read is the built read; the second opens each open, silent site `s` on `E_b(∗) + release(α_b (release(Σ_c w_(s,c)
-    /// E_b(c), 16) − E_b(∗)), 24)` in each encoding `b` its row enters (its own `enc`, its neighbours' `before` and `after`), `w` the shares
-    /// of the face the first read gave it, the site silent otherwise; the faces are the second read's. `α_b`, one strength an encoding on the
+    /// E_b(c), 16) − E_b(∗)), 24)` in each encoding `b` its row enters (its own `enc`, and its neighbours' `before` and `after` where that
+    /// neighbour is itself silent), `w` the shares of the face the first read gave it, the site silent otherwise; the faces are the second
+    /// read's. A written place hears no neighbour's mark (G186): its class is the passage's, and a guess written into its opening only returns
+    /// the guess to the place it came from, the reaction term the cavity leaves out (at a lone open place it cost 0.0014 nats a place, G183,
+    /// G184). `α_b`, one strength an encoding on the
     /// material's grain ([`FieldLayout::mark`]), is founded at zero ([`Field::with_mark`]), so at the founding the second read is the first
     /// bit for bit. The return runs through the second read into every part and into `α_b`; the first read's faces are data to it.
     ///
@@ -3286,11 +3289,13 @@ impl Field {
         let mut term = vec![0i64; dw];
         for (t, xt) in x.chunks_exact_mut(dw).enumerate() {
             self.opening_term(region, l.enc, t, xt, marks);
+            // [G186] A neighbour's mark is heard only by an open place: a written place's class is the passage's.
+            let heard = marks.filter(|_| Self::silent(region, t));
             if t > 0 {
-                self.opening_term(region, l.before, t - 1, xt, marks);
+                self.opening_term(region, l.before, t - 1, xt, heard);
             }
             if t + 1 < sites {
-                self.opening_term(region, l.after, t + 1, xt, marks);
+                self.opening_term(region, l.after, t + 1, xt, heard);
             }
             affine(&self.theta[l.moment_face..l.moment_face + dw * m2], reach_c, m2, &moment[t * m2..(t + 1) * m2], Some(&self.theta[l.moment_face_bias..l.moment_face_bias + dw]), MATERIAL_BITS, MATERIAL_BITS, &mut term)?;
             for (slot, &v) in xt.iter_mut().zip(&term) {
@@ -4243,7 +4248,7 @@ impl Field {
     /// [measurement; agent-inferred, November 13, the ring record's §4 first reading] **The release carried as a face, at its founding**: for
     /// each site `t`, `r_t = ⟨λ⁰_t, D_t⟩`, the opening's covector `λ⁰` of the region's own comparison against the change the opening of `t`
     /// would take were every open site's row to move toward its carried face at strength `α`: `D_t = Δ_t(enc) + Δ_(t−1)(before) +
-    /// Δ_(t+1)(after)`, `Δ_s(base) = release(Σ_c w_(s,c) E_base(c), 16) − E_base(∗)` at an open site `s` carrying `faces[s]` (its shares on
+    /// Δ_(t+1)(after)`, the neighbours' terms only where `t` is itself open (G186), `Δ_s(base) = release(Σ_c w_(s,c) E_base(c), 16) − E_base(∗)` at an open site `s` carrying `faces[s]` (its shares on
     /// `2^(−16)`, [`shares`]) and zero at a written one. So `d(code)/dα` at `α = 0` is `Σ_t r_t` on the covector's grain against the state's
     /// (`2^(−40)` bits a unit), the opening's part of the strength only: the carried site's voice (a source at strength `α`) is not read. A
     /// reading: no state changes.
@@ -4265,7 +4270,9 @@ impl Field {
         let mut r = vec![0i128; sites];
         for (t, slot) in r.iter_mut().enumerate() {
             let dxt = &dx[t * dw..(t + 1) * dw];
-            let parts = [delta(l.enc, t), t.checked_sub(1).and_then(|s| delta(l.before, s)), (t + 1 < sites).then(|| delta(l.after, t + 1)).flatten()];
+            // [G186] A neighbour's mark is heard only by an open place, so its terms stand only where `t` is silent.
+            let open = Self::silent(region, t);
+            let parts = [delta(l.enc, t), t.checked_sub(1).filter(|_| open).and_then(|s| delta(l.before, s)), (open && t + 1 < sites).then(|| delta(l.after, t + 1)).flatten()];
             for d in parts.into_iter().flatten() {
                 *slot += dxt.iter().zip(&d).map(|(&x, &y)| i128::from(x) * i128::from(y)).sum::<i128>();
             }
@@ -5350,11 +5357,13 @@ impl Field {
         for t in 0..sites {
             let dxt = &dx[t * dw..(t + 1) * dw];
             self.opening_return(region, l.enc, t, dxt, g, pass.marks.as_deref());
+            // [G186] As the forward: a neighbour's mark returns only through an open place's opening.
+            let heard = pass.marks.as_deref().filter(|_| Self::silent(region, t));
             if t > 0 {
-                self.opening_return(region, l.before, t - 1, dxt, g, pass.marks.as_deref());
+                self.opening_return(region, l.before, t - 1, dxt, g, heard);
             }
             if t + 1 < sites {
-                self.opening_return(region, l.after, t + 1, dxt, g, pass.marks.as_deref());
+                self.opening_return(region, l.after, t + 1, dxt, g, heard);
             }
         }
         Ok(())

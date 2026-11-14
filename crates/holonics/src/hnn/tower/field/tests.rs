@@ -4091,3 +4091,28 @@ fn the_marks_founding_covector_is_the_carried_slope() {
 }
 
 
+
+/// [definition; agent-inferred, November 14, G186] **A mark is heard only by an open place**: on fields of four ticks reading twice with the
+/// neighbours' strengths off zero and the self-mark at zero, a region with one open place among written ones reads every face as the field
+/// reading once (the place's first face would reach it back only through its written neighbours' openings, which hear no mark); and where
+/// two open places stand side by side, the second read differs from the first (each hears the other's placement).
+#[test]
+fn a_mark_is_heard_only_by_an_open_place() {
+    for still in [0usize, 1, 2] {
+        let (mut field, _) = four_ticks(still).with_mark().unwrap();
+        let l = field.layout.clone();
+        field.theta[l.mark..l.mark + MARK_BASES].copy_from_slice(&[0, 1 << 22, 3 << 21]);
+        let n = CLASSES.len();
+        for t in 0..n {
+            let open: Vec<bool> = (0..n).map(|s| s == t).collect();
+            let r = Region { unresolved: &open, ..region() };
+            let once = field.pass_with(&r, false, None).unwrap();
+            let twice = field.pass(&r, false).unwrap();
+            assert_eq!(once.faces, twice.faces, "still {still}: a lone open place at {t} hears no mark");
+        }
+        let pair: Vec<bool> = (0..n).map(|s| s == 1 || s == 2).collect();
+        let r = Region { unresolved: &pair, ..region() };
+        let (once, twice) = (field.pass_with(&r, false, None).unwrap(), field.pass(&r, false).unwrap());
+        assert_ne!(once.faces, twice.faces, "still {still}: two open neighbours hear each other's placements");
+    }
+}
