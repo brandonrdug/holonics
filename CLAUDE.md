@@ -760,6 +760,13 @@ foreground shell time went to wait loops.
   another, a profile's entries included; an entry that changes by a multiple stands without it. A
   run's time against its own projection is the standard above
   ([the record](research/records/2026-11-11_THE_PLACES_THE_FIELD_GIVES_PUSH_AGAINST_THE_PLACES_IT_MISSES_THE_DEPOSIT_IS_THEIR_DIFFERENCE_AND_TWO_BUILDS_ARE_TIMED_ONLY_INSIDE_ONE_HOLD_OF_THE_CARD.md)).
+  The order inside the hold is balanced (control, build, build, control, control, build, build,
+  control, after a declared warm-up), and two builds are compared run state for run state where the
+  card's runs fall into states. Reason: on November 14 the card's runs alternated between two states
+  about 20 ms a section apart (the card's return, not the host's parts), and the plain alternation of
+  control and build put every build run on the slow state. It read a 2.8% gap that a balanced hold
+  showed to be the order's
+  ([the receipt](research/records/receipts/2026-11-14_engine-lift/README.md), C5).
 - **The orchestrator waits on notifications** (task notifications, a Monitor on the mailbox), never
   by sleeping.
 

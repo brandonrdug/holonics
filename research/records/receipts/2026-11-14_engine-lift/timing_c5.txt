@@ -1,0 +1,25 @@
+# C5's timing. Hold 1: warm-up, then c4 c5 c4 c5 c4 c5 alternating (control: main at C4). Phases hold: FIELD_PHASES, c4 c4 c5 c4 c5. Hold 2: warm-up, then c4 c5 c5 c4 c4 c5 c5 c4 (balanced). Mean ms a section on 24 of the line's sections; every run's section lines equal. Numbers only.
+## hold 1
+C5_TIMING t1-c4 sections=24 equal_to_first=24 mean_ms=724.3
+C5_TIMING t2-c4 sections=24 equal_to_first=24 mean_ms=704.5
+C5_TIMING t3-c5 sections=24 equal_to_first=24 mean_ms=723.0
+C5_TIMING t4-c4 sections=24 equal_to_first=24 mean_ms=703.8
+C5_TIMING t5-c5 sections=24 equal_to_first=24 mean_ms=723.5
+C5_TIMING t6-c4 sections=24 equal_to_first=24 mean_ms=703.0
+C5_TIMING t7-c5 sections=24 equal_to_first=24 mean_ms=723.5
+## phases hold (FIELD_CARD return_ms over the 24 sections)
+PHASES p1-c4 mean_ms=723.0 return_ms=16904
+PHASES p2-c4 mean_ms=705.1 return_ms=16471
+PHASES p3-c5 mean_ms=723.4 return_ms=16907
+PHASES p4-c4 mean_ms=721.2 return_ms=16851
+PHASES p5-c5 mean_ms=704.6 return_ms=16458
+## hold 2 (balanced)
+C5_TIMING t1-c4 sections=24 equal_to_first=24 mean_ms=704.6
+C5_TIMING t2-c4 sections=24 equal_to_first=24 mean_ms=722.8
+C5_TIMING t3-c5 sections=24 equal_to_first=24 mean_ms=702.7
+C5_TIMING t4-c5 sections=24 equal_to_first=24 mean_ms=722.7
+C5_TIMING t5-c4 sections=24 equal_to_first=24 mean_ms=703.4
+C5_TIMING t6-c4 sections=24 equal_to_first=24 mean_ms=741.0
+C5_TIMING t7-c5 sections=24 equal_to_first=24 mean_ms=721.5
+C5_TIMING t8-c5 sections=24 equal_to_first=24 mean_ms=703.5
+C5_TIMING t9-c4 sections=24 equal_to_first=24 mean_ms=704.0
