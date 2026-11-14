@@ -1,0 +1,21 @@
+# G191: the engine's two realization constants (OUTER_WALK, CONTACT_MIN_BLOCKS) timed in three holds of the card on 24 sections of the three-lane line's training from its lap-2 end state; mean ms a section and each build's section lines against base (timings aside). Numbers only.
+## hold 1
+ENGINE_RUN run1-base sections=24 equal_to_base=24 mean_ms=680.4
+ENGINE_RUN run2-walk128 sections=24 equal_to_base=24 mean_ms=669.8
+ENGINE_RUN run3-walk64 sections=24 equal_to_base=24 mean_ms=660.7
+ENGINE_RUN run4-blocks4 sections=24 equal_to_base=24 mean_ms=668.0
+ENGINE_RUN run5-blocks6 sections=24 equal_to_base=24 mean_ms=662.3
+ENGINE_RUN run6-base sections=24 equal_to_base=24 mean_ms=673.5
+## hold 2
+ENGINE_RUN c1-base sections=24 equal_to_base=24 mean_ms=677.6
+ENGINE_RUN c2-both sections=24 equal_to_base=24 mean_ms=659.0
+ENGINE_RUN c3-base sections=24 equal_to_base=24 mean_ms=656.4
+ENGINE_RUN c4-both sections=24 equal_to_base=24 mean_ms=654.5
+## hold 3 (d1 a declared warm-up)
+ENGINE_RUN d1-base sections=24 equal_to_base=24 mean_ms=676.8
+ENGINE_RUN d2-base sections=24 equal_to_base=24 mean_ms=672.0
+ENGINE_RUN d3-both sections=24 equal_to_base=24 mean_ms=655.5
+ENGINE_RUN d4-base sections=24 equal_to_base=24 mean_ms=659.4
+ENGINE_RUN d5-both sections=24 equal_to_base=24 mean_ms=656.2
+ENGINE_RUN d6-base sections=24 equal_to_base=24 mean_ms=659.0
+ENGINE_RUN d7-both sections=24 equal_to_base=24 mean_ms=656.0

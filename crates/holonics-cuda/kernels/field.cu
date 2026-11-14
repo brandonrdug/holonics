@@ -1096,7 +1096,12 @@ extern "C" __global__ void field_chart(FieldWords w, const int64_t *x, int32_t *
 #define MAP_TO 64
 #define MAP_TS 64
 #define MAP_KC 32
-#define OUTER_WALK 512
+// [realization; G191, November 14] The sites an outer sum's block walks: 64, where 512 left a launch at 35 blocks on average of the card's 80
+// multiprocessors (the engine audit's finding 2). Timed with the forward contact's bound of 6 (below) in three holds on 24 sections, every
+// section line kept: with the card warmed (a hold's first two runs read 10 to 20 ms slow), the pair reads 656 ms a section against 659 for
+// 512 and 8, about 0.5%, where a profile that times each launch alone had forecast 20 to 35 ms. The partials go in by `add_wide`, an integer
+// sum, so the walk changes no bit.
+#define OUTER_WALK 64
 
 __device__ __forceinline__ uint64_t warp_max64(uint64_t v) {
     for (int o = 16; o > 0; o >>= 1) {
@@ -2042,8 +2047,10 @@ __device__ bool rowdiv_nearest(Big<L> x, const RowDiv<L> &d, uint64_t *quotient)
 // The contact carriers up to this many limbs add each numerator term where it stands (`add_window`); wider ones
 // (rare: a row spread past 512 bits) shift and complement it whole.
 #define WINDOW_LIMBS 8
-// Blocks a multiprocessor keeps resident (the register file shared among them): 8 blocks of 4 warps.
-#define CONTACT_MIN_BLOCKS 8
+// Blocks a multiprocessor keeps resident (the register file shared among them): 6 blocks of 4 warps, for the forward contact and the
+// exposure. [realization; G191, November 14] At 8 both spilled under a 64-register bound (778 and 220 spill stores, the engine audit's
+// finding 4); timed with the outer sums' walk of 64 (above), the pair reads about 3 ms a section under 8 and 512 with the card warmed.
+#define CONTACT_MIN_BLOCKS 6
 // The block of `field_spread` (a region a block).
 #define SPREAD_THREADS 256
 // The most address modes a head's class carries, and the most classes a receiver probes across its seams
@@ -2708,7 +2715,7 @@ __device__ __forceinline__ wide parts_sum(wide v, uint32_t span, uint32_t parts)
 // entry: the row's least whole bit `a_0` over its terms (the support's and the crowds'), kept in
 // `amin[h][t]`, and the spread `a − a_0` the row holds, raised into `bits[1]`; the host reads the
 // launch's widest row and launches the contact with the carrier it needs.
-extern "C" __global__ void __launch_bounds__(CONTACT_ROWS * 32, 8) field_exposure(FieldWords w) {
+extern "C" __global__ void __launch_bounds__(CONTACT_ROWS * 32, CONTACT_MIN_BLOCKS) field_exposure(FieldWords w) {
     __shared__ RowCls rcs[CONTACT_ROWS];
     const uint32_t warp = threadIdx.x >> 5, lane = threadIdx.x & 31;
     const uint32_t S = w.span, classes = w.nclasses;

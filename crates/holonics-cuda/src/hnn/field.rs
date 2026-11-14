@@ -70,8 +70,8 @@ const MOMENT_BLOCK: u32 = 256;
 const MAX_CROWD_SLOTS: usize = 32;
 /// The sites a thread of an encoding's covector segment takes (the segments' tile).
 const OUTER_TILE: u64 = 64;
-/// [realization; P61 item 4e] The sites an outer sum's block walks (`OUTER_WALK` in `kernels/field.cu`).
-const OUTER_WALK: u64 = 512;
+/// [realization; P61 item 4e; G191] The sites an outer sum's block walks (`OUTER_WALK` in `kernels/field.cu`, whose comment gives the reading).
+const OUTER_WALK: u64 = 64;
 /// [realization; P61 item 4f] The outer passes' slots for their largest words, zeroed again each time they are spent.
 const OUTER_SLOTS: usize = 4096;
 /// The device octets the runs keep to (the board's, the desktop included).
