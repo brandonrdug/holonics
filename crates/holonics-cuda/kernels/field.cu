@@ -491,6 +491,12 @@ struct FieldWords {
     uint32_t *mskin;
     const uint32_t *mcmap;
     uint64_t tm;
+    // [definition; agent-inferred, November 14, the ring record §4] **The field that reads twice** (`FieldDeclaration::mark`): the strengths'
+    // offset in the material (`FieldLayout::mark`, `α_b` for `enc`, `before`, `after` on `2^(−24)`), and on the second read each silent site's
+    // shares of the face the first read gave it, `[t][A]` on `2^(−16)` (the host's `shares`, zero at a class whose share releases to zero and at
+    // every site that is not silent; `field_mark_shares`). Null on a first read and on a field that reads once, where no kernel reads a mark.
+    uint64_t mark_at;
+    const uint32_t *mark_share;
 };
 
 // [definition; agent-inferred, November 2] **A head's pace index** (§16, `Field::paces`): the heads that carry a moment
@@ -976,22 +982,71 @@ __device__ __forceinline__ int64_t opening_term(const FieldWords &w, uint64_t ba
     return (int64_t)rel(sum, FACE_BITS);
 }
 
+// [definition; agent-inferred, November 14, the ring record §4] **A silent site is marked on the second read**: unresolved, carrying no
+// mixture, and read where the first read's shares are uploaded (`mark_share`; the host's `Field::law_mark`).
+__device__ __forceinline__ bool marked_site(const FieldWords &w, uint64_t s) {
+    return w.mark_share && w.unresolved[s] && w.mix_off[s] == w.mix_off[s + 1];
+}
+
+// [definition; agent-inferred, November 14, the ring record §4] **The mark's difference** `Δ_(s,b,i) = release(Σ_c w_c E_b(c)_i, 16) − E_b(∗)_i` at
+// a marked site `s` in the encoding at `base` (the host's `Field::opening_term`, its `delta`): the shares of the face the first read gave the site
+// mixed through the encoding's class rows, less the open row. The sum is held in 64 bits: a share is `w_c = ⌊(m_c 2^16 + T/2)/T⌋ ≤ m_c 2^16/T + 1/2`
+// with `Σ_c m_c = T` (`field_face`), so `Σ_c w_c ≤ 2^16 + A/2`, and with `|E| < 2^31` the sum is under `2^31 (2^16 + A/2) < 2^63`; each product is
+// a 32 by 32 bit word, the narrow terms the precision law asks for. Zero terms (a share released to zero) add nothing, so the dense row sums to the
+// host's list's bits.
+__device__ __forceinline__ int64_t mark_delta(const FieldWords &w, uint64_t base, uint64_t s, uint64_t i) {
+    const uint32_t *ws = w.mark_share + s * w.A;
+    int64_t sum = 0;
+    for (uint32_t c = 0; c < w.A; c++) {
+        sum += (int64_t)ws[c] * (int64_t)w.theta[base + (uint64_t)c * w.D + i];
+    }
+    return (int64_t)(rel((wide)sum, FACE_BITS) - (wide)w.theta[base + (uint64_t)w.A * w.D + i]);
+}
+
+// [definition; agent-inferred, November 14, the ring record §4] **A marked site's mark in the opening**: `release(α_b Δ_(s,b,i), 24)` with `α_b`
+// the strength of the encoding at `base` (`b` 0, 1, 2 for `enc`, `before`, `after`), added beside the site's open row `E_b(∗)_i` that
+// `opening_term` reads (the host's `Field::opening_term` at a site `Field::marked` holds); zero at a site that is not marked. The product is
+// held wide (`|α| < 2^31`, `|Δ| < 2^33`) and the release cut to the 64-bit word the host's `as i64` keeps.
+__device__ __forceinline__ int64_t mark_term(const FieldWords &w, uint64_t base, uint32_t b, uint64_t s, uint64_t i) {
+    if (!marked_site(w, s)) {
+        return 0;
+    }
+    return (int64_t)rel((wide)w.theta[w.mark_at + b] * (wide)mark_delta(w, base, s, i), MATERIAL_BITS);
+}
+
 // A site's opening face `x⁰_t = E(u_t) + E₋(u_(t−1)) + E₊(u_(t+1))`: its row of the encoding (or its
 // mixture's) with its strand neighbours' rows of theirs, a neighbour only within the site's own region
 // (a site at its region's first place has none before it; the next site is the region's own when its
-// place is not the first).
+// place is not the first). [the ring record §4] On a field's second read each marked site's row carries
+// its mark in every encoding it enters (`mark_term`, zero on a field that reads once).
 extern "C" __global__ void field_open(FieldWords w) {
     const uint64_t cells = (uint64_t)w.T * w.D;
     for (uint64_t c = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; c < cells; c += (uint64_t)gridDim.x * blockDim.x) {
         const uint64_t t = c / w.D, i = c % w.D;
-        int64_t x = opening_term(w, w.enc, t, i);
+        int64_t x = opening_term(w, w.enc, t, i) + mark_term(w, w.enc, 0, t, i);
         if (w.site_pos[t] > 0) {
-            x += opening_term(w, w.enc_before, t - 1, i);
+            x += opening_term(w, w.enc_before, t - 1, i) + mark_term(w, w.enc_before, 1, t - 1, i);
         }
         if (t + 1 < w.T && w.site_pos[t + 1] > 0) {
-            x += opening_term(w, w.enc_after, t + 1, i);
+            x += opening_term(w, w.enc_after, t + 1, i) + mark_term(w, w.enc_after, 2, t + 1, i);
         }
         w.x[c] = x;
+    }
+}
+
+// [definition; agent-inferred, November 14, the ring record §4] **The first read's shares at the silent sites** (the host's `shares` of each
+// silent site's face, `Field::pass`): `⌊(m_c 2^16 + T/2)/T⌋` at each class, zero where the face has no mass (the host's empty mark) and at every
+// site that is not silent. A share is at most `2^16` (`m_c ≤ T`), one word. One thread a site and a class.
+extern "C" __global__ void field_mark_shares(FieldWords w, const uint64_t *masses, const uwide *totals, uint32_t *shares) {
+    const uint64_t cells = (uint64_t)w.T * w.A;
+    for (uint64_t c = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; c < cells; c += (uint64_t)gridDim.x * blockDim.x) {
+        const uint64_t t = c / w.A;
+        if (!w.unresolved[t] || w.mix_off[t] != w.mix_off[t + 1]) {
+            shares[c] = 0;
+            continue;
+        }
+        const uwide total = totals[t];
+        shares[c] = total == 0 ? 0u : (uint32_t)(((((uwide)masses[c]) << FACE_BITS) + total / 2) / total);
     }
 }
 
@@ -4653,6 +4708,77 @@ extern "C" __global__ void field_encoding(FieldWords w, wide *g, const int64_t *
         }
         if (sum != 0) {
             add_wide(g + base + (uint64_t)row * w.D + i, sum);
+        }
+    }
+}
+
+// [definition; agent-inferred, November 14, the ring record §4] **The mark's return at its sites** (the host's `Field::opening_return` at a site
+// `Field::law_mark` holds), one thread a marked site `marked[k]` and a coordinate `i`. For each encoding `b` the site's row enters (its own opening
+// at `t = s`; `before` at the next site's, `t = s + 1`, and `after` at the site's before it, `t = s − 1`, each within the site's region), with
+// `dx_i` the covector at that opening: `a = release(α_b dx_i, 24)` is kept for the rows' return (`adx[b][k][i]`, `field_mark_rows`; zero where the
+// row enters no opening), and the strength takes `dx_i Δ_(s,b,i)`, the raw product the outer sum accumulates. `a` is held in one 64-bit word and
+// refused past it (`|α| < 2^31`: a covector word under `2^56` always fits). Each thread's three partials are summed over its warp and added by the
+// ring's atomic step, any order the same 128 bits.
+extern "C" __global__ void field_mark_back(FieldWords w, wide *g, const int64_t *dx, const uint32_t *marked, uint32_t count, int64_t *adx) {
+    const uint64_t cells = (uint64_t)count * w.D;
+    wide part[3] = {0, 0, 0};
+    for (uint64_t c = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; c < cells; c += (uint64_t)gridDim.x * blockDim.x) {
+        const uint64_t k = c / w.D, i = c % w.D;
+        const uint64_t s = marked[k];
+        for (uint32_t b = 0; b < 3; b++) {
+            const bool enters = b == 0 || (b == 1 ? s + 1 < w.T && w.site_pos[s + 1] > 0 : w.site_pos[s] > 0);
+            int64_t a = 0;
+            if (enters) {
+                const uint64_t t = b == 0 ? s : (b == 1 ? s + 1 : s - 1);
+                const uint64_t base = b == 0 ? w.enc : (b == 1 ? w.enc_before : w.enc_after);
+                const int64_t d = dx[t * w.D + i];
+                a = fit64(rel((wide)w.theta[w.mark_at + b] * (wide)d, MATERIAL_BITS), w.status);
+                part[b] += (wide)d * (wide)mark_delta(w, base, s, i);
+            }
+            adx[((uint64_t)b * count + k) * w.D + i] = a;
+        }
+    }
+    const uint32_t lane = threadIdx.x & 31;
+    for (uint32_t b = 0; b < 3; b++) {
+        const wide v = warp_sum(part[b]);
+        if (lane == 0 && v != 0) {
+            add_wide(g + w.mark_at + b, v);
+        }
+    }
+}
+
+// [definition; agent-inferred, November 14, the ring record §4] **The mark's return into the encodings' rows**: each class row
+// `g[E_b(c)_i] += Σ_k release(w_(s_k, c) a_(b,k,i), 16)` (each term released before the integer sum, the host's order-free bits), and the open row
+// `g[E_b(∗)_i] −= Σ_k a_(b,k,i)`: `field_encoding` gives the open row `dx_i` at each of these sites (its share `2^16`), so it takes `dx − a`, the
+// host's one term. One thread an encoding, a row (the `A` class rows and the open row), a coordinate and a tile of 64 marked sites, as
+// `field_tied_back_e`.
+extern "C" __global__ void field_mark_rows(FieldWords w, wide *g, const uint32_t *marked, uint32_t count, const int64_t *adx) {
+    const uint64_t entries = (uint64_t)(w.A + 1) * w.D;
+    const uint64_t tiles = ((uint64_t)count + 63) / 64;
+    for (uint64_t c = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; c < 3 * entries * tiles; c += (uint64_t)gridDim.x * blockDim.x) {
+        const uint64_t entry = c % entries, rest = c / entries;
+        const uint64_t b = rest % 3, tile = rest / 3;
+        const uint64_t row = entry / w.D, i = entry % w.D;
+        const uint64_t from = tile * 64;
+        const uint64_t to = from + 64 < count ? from + 64 : count;
+        wide sum = 0;
+        for (uint64_t k = from; k < to; k++) {
+            const int64_t a = adx[(b * count + k) * w.D + i];
+            if (a == 0) {
+                continue;
+            }
+            if (row == w.A) {
+                sum -= (wide)a;
+            } else {
+                const uint32_t share = w.mark_share[(uint64_t)marked[k] * w.A + row];
+                if (share != 0) {
+                    sum += rel((wide)share * (wide)a, FACE_BITS);
+                }
+            }
+        }
+        if (sum != 0) {
+            const uint64_t base = b == 0 ? w.enc : (b == 1 ? w.enc_before : w.enc_after);
+            add_wide(g + base + entry, sum);
         }
     }
 }

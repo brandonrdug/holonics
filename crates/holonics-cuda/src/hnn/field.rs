@@ -275,6 +275,11 @@ struct Words {
     mskin: u64,
     mcmap: u64,
     tm: u64,
+    // [definition; agent-inferred, November 14, the ring record §4] The field that reads twice (`FieldWords::mark_at`, `mark_share`): the strengths'
+    // offset in the material, and on the second read each silent site's shares of the face the first read gave it `[t][A]` (zero elsewhere and on a
+    // first read).
+    mark_at: u64,
+    mark_share: u64,
 }
 
 /// The moment kernels' words (`MomentWords` in `kernels/field_moment.cuh`, field for field): the batch's
@@ -1450,10 +1455,6 @@ impl<'c> CardField<'c> {
         if d.junction {
             return Err(TowerError::Refused("the junction's return has no card realization yet (the host's is the reference)"));
         }
-        // [the ring record §4] The field that reads twice waits on its card realization; the host's is the reference.
-        if d.mark {
-            return Err(TowerError::Refused("the field that reads twice has no card realization yet (the host's is the reference)"));
-        }
         // [measurement; G161] The read's mirror at uniform strength is a host reading only.
         if field.mirror_strength.is_some() {
             return Err(TowerError::Refused("the read's mirror at uniform strength is a host reading, with no card realization"));
@@ -1558,6 +1559,8 @@ impl<'c> CardField<'c> {
             per_blank: u64::from(field.per_blank_clock),
             depth: d.depth as u64,
             bare_stretch: u64::from(field.bare_stretch),
+            // [the ring record §4] The strengths `α_b`, read from the uploaded material at the second read (`run` sets the shares there).
+            mark_at: l.mark as u64,
             ..Words::default()
         };
         // The exponential's resident face, read once by its own loop on the card (a tower's packets read the fine field's).
@@ -1674,7 +1677,23 @@ impl<'c> CardField<'c> {
             }
             self.times.batches += 1;
             self.mark("run_setup");
-            let (f, z, r, e) = self.batch(field, &regions[batch.clone()], batch.start, &mut words, g.as_deref(), logits, keep, tower.as_mut())?;
+            // [definition; agent-inferred, November 14, the ring record §4] **The field that reads twice** (the host's `Field::pass`): the batch's
+            // first read is the built read, no readings and no return, and leaves each silent site's shares of its face on the card
+            // (`field_mark_shares`); the second read opens each silent site on its mark and is the batch's read, its faces, readings and return
+            // the field's. A region's marks are its own first read's, so the two reads run batch by batch.
+            let (f, z, r, e) = if d.mark {
+                let mut shares = None;
+                self.batch(field, &regions[batch.clone()], batch.start, &mut words, None, false, None, tower.as_mut(), Some(&mut shares))?;
+                let shares = shares.ok_or(TowerError::Refused("a field's first read that left no shares for its marks"))?;
+                self.mark("mark_first_read");
+                words.mark_share = shares.device_ptr();
+                let read = self.batch(field, &regions[batch.clone()], batch.start, &mut words, g.as_deref(), logits, keep, tower.as_mut(), None);
+                words.mark_share = 0;
+                drop(shares);
+                read?
+            } else {
+                self.batch(field, &regions[batch.clone()], batch.start, &mut words, g.as_deref(), logits, keep, tower.as_mut(), None)?
+            };
             self.mark("batch_drop_and_collect");
             faces.extend(f);
             read_logits.extend(z);
@@ -2266,12 +2285,20 @@ impl<'c> CardField<'c> {
 
     /// One batch of regions: the forward, each unresolved site's face (and its logits when
     /// `logits`), when `g` is given the reverse added into it, and with `keep` the still heads'
-    /// last-tick weight rows of those sites (the batch's one region).
+    /// last-tick weight rows of those sites (the batch's one region). With `first` (a field that reads
+    /// twice, [`FieldDeclaration::mark`]) it is the batch's first read: the forward to the faces with no
+    /// reading, and each silent site's shares of its face left on the card in `first`, nothing fetched.
     #[allow(clippy::type_complexity)]
     #[allow(clippy::too_many_arguments)]
-    fn batch(&self, field: &Field, regions: &[Region], at_region: usize, words: &mut Words, g: Option<&CardBuffer<'c, i128>>, logits: bool, keep: Option<&[usize]>, mut tower: Option<&mut TowerRun<'c>>) -> Result<(Vec<Vec<Option<TowerFace>>>, Vec<Vec<Option<Vec<i64>>>>, Rows, Vec<Vec<u64>>)> {
+    fn batch(&self, field: &Field, regions: &[Region], at_region: usize, words: &mut Words, g: Option<&CardBuffer<'c, i128>>, logits: bool, keep: Option<&[usize]>, mut tower: Option<&mut TowerRun<'c>>, first: Option<&mut Option<Pooled<'c, u32>>>) -> Result<(Vec<Vec<Option<TowerFace>>>, Vec<Vec<Option<Vec<i64>>>>, Rows, Vec<Vec<u64>>)> {
         if field.scale.is_some() != tower.is_some() {
             return Err(TowerError::Refused("a tower is read with its packets' level"));
+        }
+        // [the ring record §4] A first read is the built read alone: no return, no logits, no kept rows, no mark of its own, and none of the
+        // readings below (they read the second read, the field's).
+        let reading = first.is_none();
+        if !reading && (g.is_some() || logits || keep.is_some() || words.mark_share != 0) {
+            return Err(TowerError::Refused("a field's first read with a return, a reading or a mark"));
         }
         let card = self.card;
         let d = field.declaration;
@@ -2418,7 +2445,7 @@ impl<'c> CardField<'c> {
         let mut clocks: Vec<Option<CardClock<'c>>> = vec![None];
         // [measurement; part P2] The carry circles' gates, where read: one accumulator a batch, added into after each tick's forward from that tick's
         // own gate and leak reads, fetched once the ticks end.
-        let gate_acc = if d.carry > 0 && self.carry_gates.borrow().is_some() { Some(self.timed(Kind::Alloc, || self.take_zeroed::<u64>(2 * d.carry + 1)).map_err(device)?) } else { None };
+        let gate_acc = if reading && d.carry > 0 && self.carry_gates.borrow().is_some() { Some(self.timed(Kind::Alloc, || self.take_zeroed::<u64>(2 * d.carry + 1)).map_err(device)?) } else { None };
         for k in 0..d.ticks {
             set_clock(words, clocks[k].as_ref(), base_clock);
             if let (Some(tr), Some(tb)) = (tower.as_deref_mut(), tb.as_ref()) {
@@ -2448,7 +2475,7 @@ impl<'c> CardField<'c> {
             }
         }
         // Each named site's clocks by tick (a reading, §16.44), the batch's one region.
-        if let Some(named) = self.clock_sites.borrow().as_ref() {
+        if let Some(named) = self.clock_sites.borrow().as_ref().filter(|_| reading) {
             let mut out = self.clock_out.borrow_mut();
             for &i in named {
                 if regions.len() != 1 || i >= sites {
@@ -2479,7 +2506,7 @@ impl<'c> CardField<'c> {
             self.launch("field_gather_rows32", Self::cells((open_at.len() * dw) as u64), THREADS, &mut [arg(&mut sp), arg(&mut ap), arg(&mut count), arg(&mut width), arg(&mut dp)])?;
             self.timed(Kind::Copy, || card.fetch_range(&rows, 0, open_at.len() * dw)).map_err(device)
         };
-        let open_buf = if self.tick_charts.borrow().is_some() && !open_at.is_empty() { Some(self.timed(Kind::Copy, || self.take_up(&open_at)).map_err(device)?) } else { None };
+        let open_buf = if reading && self.tick_charts.borrow().is_some() && !open_at.is_empty() { Some(self.timed(Kind::Copy, || self.take_up(&open_at)).map_err(device)?) } else { None };
         if let Some(at) = open_buf.as_ref() {
             let mut stages = Vec::with_capacity(ticks.len() + 1);
             for tick in &ticks {
@@ -2488,7 +2515,7 @@ impl<'c> CardField<'c> {
             stage_rows = Some(stages);
         }
         // Each tick's reads, where the ticks are read (a reading of expansion and volume).
-        if let Some(out) = self.tick_reads.borrow_mut().as_mut() {
+        if let Some(out) = self.tick_reads.borrow_mut().as_mut().filter(|_| reading) {
             let mut per: Vec<Vec<TickRead>> = vec![Vec::new(); regions.len()];
             for tick in &ticks {
                 let read = self.timed(Kind::Copy, || card.fetch_range(&tick.read, 0, sites * dw)).map_err(device)?;
@@ -2510,7 +2537,7 @@ impl<'c> CardField<'c> {
         }
         // Each named site's near field by offset (a reading, §16.42): every kept tick's shares of each head, the batch's one
         // region.
-        if let Some(named) = self.near_sites.borrow().as_ref() {
+        if let Some(named) = self.near_sites.borrow().as_ref().filter(|_| reading) {
             let mut out = self.near_out.borrow_mut();
             for &i in named {
                 if regions.len() != 1 || i >= sites {
@@ -2537,7 +2564,7 @@ impl<'c> CardField<'c> {
             }
         }
         // A held read's rows by where their mass lies (a reading for the receipts): each kept tick's shares.
-        if let Some(questions) = self.held_questions.borrow().as_ref() {
+        if let Some(questions) = self.held_questions.borrow().as_ref().filter(|_| reading) {
             let starts: Vec<u32> = (0..regions.len()).map(|r| questions[at_region + r] as u32).collect();
             let starts_c = self.timed(Kind::Copy, || self.take_up(&starts)).map_err(device)?;
             let acc = self.timed(Kind::Alloc, || self.take_zeroed::<i128>(d.ticks * heads * 9)).map_err(device)?;
@@ -2557,7 +2584,7 @@ impl<'c> CardField<'c> {
             }
         }
         // The held rows' currents by where they come from (a reading, §16.21): each kept tick's shares.
-        if let Some(questions) = self.row_questions.borrow().as_ref() {
+        if let Some(questions) = self.row_questions.borrow().as_ref().filter(|_| reading) {
             let span = 2 * n;
             let starts: Vec<u32> = (0..regions.len()).map(|r| questions[at_region + r] as u32).collect();
             let starts_c = self.timed(Kind::Copy, || self.take_up(&starts)).map_err(device)?;
@@ -2619,6 +2646,16 @@ impl<'c> CardField<'c> {
         let (mut zp, mut mp, mut tp) = (z.device_ptr(), masses.device_ptr(), totals.device_ptr());
         self.launch("field_face", Self::warps(t64), THREADS, &mut [arg(words), arg(&mut zp), arg(&mut mp), arg(&mut tp)])?;
         self.mark("face_launch");
+        // [the ring record §4] A first read ends at its faces: each silent site's shares of its face (the host's `shares`) stay on the card for the
+        // second read's marks, and nothing is fetched.
+        if let Some(out) = first {
+            let shares = self.timed(Kind::Alloc, || self.take::<u32>((sites * a).max(1))).map_err(device)?;
+            let mut sp = shares.device_ptr();
+            self.launch("field_mark_shares", Self::cells((sites * a) as u64), THREADS, &mut [arg(words), arg(&mut mp), arg(&mut tp), arg(&mut sp)])?;
+            self.status(&status)?;
+            *out = Some(shares);
+            return Ok((Vec::new(), Vec::new(), Rows::new(), Vec::new()));
+        }
         if let Some(g) = g {
             // The covector's magnitude near and far, where read (§16.20).
             let shares = match self.covector_shares.borrow().is_some() {
@@ -3667,6 +3704,22 @@ impl<'c> CardField<'c> {
             let (mut gp, mut dxp, mut rsp, mut rwp, mut sgp, mut count, mut base) = (g.device_ptr(), dx.device_ptr(), rows_sites_c.device_ptr(), rows_shares_c.device_ptr(), segments_c.device_ptr(), count, base);
             self.launch("field_encoding", Self::cells(count as u64 * dw as u64), THREADS, &mut [arg(words), arg(&mut gp), arg(&mut dxp), arg(&mut rsp), arg(&mut rwp), arg(&mut sgp), arg(&mut count), arg(&mut base)])?;
         }
+        // [definition; agent-inferred, November 14, the ring record §4] **The mark's return** (the host's `Field::opening_return` at a marked site):
+        // on a field's second read each silent site's rows above gave its open row `dx`; its mark adds `−release(α_b dx, 24)` there, each class's
+        // `release(w_c release(α_b dx, 24), 16)` and the strength's `Σ_i dx_i Δ_i`, in every encoding its row enters (`field_mark_back`, then
+        // `field_mark_rows` over the kept `release(α_b dx, 24)`).
+        if words.mark_share != 0 {
+            let marked: Vec<u32> = (0..sites).filter(|&s| unresolved[s] != 0 && mix_off[s] == mix_off[s + 1]).map(|s| s as u32).collect();
+            if !marked.is_empty() {
+                let count = marked.len();
+                let marked_c = self.timed(Kind::Copy, || self.take_up(&marked)).map_err(device)?;
+                // Unzeroed: `field_mark_back` writes every word `[b][k][i]` before `field_mark_rows` reads it.
+                let adx = alloc64(3 * count * dw)?;
+                let (mut gp, mut dxp, mut mp, mut cnt, mut ap) = (g.device_ptr(), dx.device_ptr(), marked_c.device_ptr(), count as u32, adx.device_ptr());
+                self.launch("field_mark_back", Self::cells((count * dw) as u64), THREADS, &mut [arg(words), arg(&mut gp), arg(&mut dxp), arg(&mut mp), arg(&mut cnt), arg(&mut ap)])?;
+                self.launch("field_mark_rows", Self::cells((3 * (a + 1) * dw * count.div_ceil(64)) as u64), THREADS, &mut [arg(words), arg(&mut gp), arg(&mut mp), arg(&mut cnt), arg(&mut ap)])?;
+            }
+        }
         Ok(())
     }
 
@@ -3873,10 +3926,13 @@ pub fn read_octets(d: &FieldDeclaration, returning: bool, echo: bool, sites: usi
     // The reverse adds its covectors (the triads' `δc^T` `[t][2J]` and `δabg` `[t][6J]` among them), the values' sum over the ticks and the
     // moments' return, and the crowds' two difference arrays.
     let reverse_site = if returning { 8 * 8 * d.triads as u64 + 16 * d.carry as u64 + 8 * m2 + 8 * a + 5 * 8 * dw + 3 * 8 * f + 8 * m2 + 8 * h * span + 2 * 8 * m2 + 16 * m2 + 2 * 16 * span + 112 * tm } else { 0 };
+    // [the ring record §4] A field that reads twice holds its first read's shares `[t][A]` through the second read, and its return the marked
+    // sites' list and `release(α_b dx, 24)` in each of the three encodings (`[3][t][D]` at most).
+    let mark_site = if d.mark { 4 * a + if returning { 4 + 3 * 8 * dw } else { 0 } } else { 0 };
     let (s, pairs) = (sites as u64, (sites * sites) as u64);
     // The shares are kept for a return and an echo; the reverse holds one head's covector a pair on 64 bits.
     let weights = h * 8 * pairs * if returning { 2 } else { 1 };
-    ticks_kept * (weights + s * tick_site + tick_fixed) + s * (face_site + mixture_site + moment_site + reverse_site + 8 * m2) + if returning { 24 * pairs } else { 0 }
+    ticks_kept * (weights + s * tick_site + tick_fixed) + s * (face_site + mixture_site + moment_site + reverse_site + mark_site + 8 * m2) + if returning { 24 * pairs } else { 0 }
 }
 
 /// A kept tick's octets a region beside its sites': the carrier's width (one word), the class
@@ -4729,5 +4785,185 @@ mod tests {
         card_field.unfilled.set(true);
         let refused = card_field.read_and_return(&learner.field, &regions).map(|_| ()).expect_err("a read of a store no fill formed is refused");
         assert!(refused.to_string().contains("a skin read from the clock's store where its fill formed none"), "{refused}");
+    }
+
+    /// The strengths the mark is read at off its founding: a quarter, an eighth and three sixteenths on the material's grain (`enc`, `before`,
+    /// `after`), the host's covector test's.
+    const MARK_STRENGTHS: [i32; 3] = [1 << 22, 1 << 21, 3 << 20];
+
+    /// [the ring record §4] The learners a field that reads twice is grown onto on the card, before the growth: plain (its read, out and contact
+    /// blocks drawn off zero from a keyed stream's tail), with two carry circles, with the circles and the opening's lift (the lift and the paces
+    /// drawn too, so the paced heads' clocks are not plain), and that learner grown by a level (its prolongation drawn).
+    fn mark_cases() -> Vec<(&'static str, holonics::hnn::tower::field::FieldLearner)> {
+        use holonics::hnn::tower::field::{level_declaration, level_split, FieldLearner, LEVEL_HARMONICS};
+        let keys: Vec<u8> = (0..1u64 << 18).flat_map(|i| (i.wrapping_add(1).wrapping_mul(0x9E37_79B9_7F4A_7C15) ^ (i << 17)).to_be_bytes()).collect();
+        let founded = Field::found(declaration(32, 4, 32), &keys).unwrap();
+        let drawn = |mut learner: FieldLearner, paces: bool| -> (FieldLearner, usize) {
+            let d = learner.field.declaration;
+            let (l, dw, f, m2) = (learner.field.layout().clone(), d.width, d.contacts, 2 * d.complex());
+            let lift = if d.opening { dw * dw } else { 0 };
+            let moved: Vec<usize> = (l.read..l.read + dw * dw).chain(l.out..l.out + dw * m2).chain(l.w..l.w + dw * f).chain(l.opening..l.opening + lift).collect();
+            let tail = keys.len() - 4 * moved.len() - 8;
+            for (k, &i) in moved.iter().enumerate() {
+                let word = &keys[tail + 4 * k..tail + 4 * k + 4];
+                learner.field.theta[i] = i32::from_be_bytes([word[0], word[1], word[2], word[3]]) >> 14;
+            }
+            let rates = if paces { d.paced_heads() * (d.alphabet + 1) } else { 0 };
+            let before = tail - 4 * rates;
+            for k in 0..rates {
+                let word = &keys[before + 4 * k..before + 4 * k + 4];
+                learner.field.theta[l.pace + k] = i32::from_be_bytes([word[0], word[1], word[2], word[3]]) >> 12;
+            }
+            (learner, before)
+        };
+        let (plain, _) = drawn(FieldLearner::new(founded.clone(), 12), false);
+        let (carry, _) = drawn(FieldLearner::new(founded.clone(), 12).with_carry(2, &keys).unwrap(), false);
+        let (opened, before) = drawn(FieldLearner::new(founded, 12).with_carry(2, &keys).unwrap().with_opening().unwrap(), true);
+        let d = opened.field.declaration;
+        let mut tower = opened.scaled_up(LEVEL_HARMONICS, level_split(&d), level_declaration(&d), &keys).unwrap();
+        let s = tower.field.scale.as_deref_mut().unwrap();
+        let (_, _, b, _, len) = s.glue_offsets(d.width);
+        let back = before - 4 * (len - b) - 8;
+        for (k, v) in s.glue[b..].iter_mut().enumerate() {
+            let word = &keys[back + 4 * k..back + 4 * k + 4];
+            *v = i32::from_be_bytes([word[0], word[1], word[2], word[3]]) >> 12;
+        }
+        vec![("plain", plain), ("carry", carry), ("opened", opened), ("tower", tower)]
+    }
+
+    /// [the ring record §4] The regions the mark is read on: 2, 3, 5, 64 and 257 sites (the ends with none, one and two strand mates, the far
+    /// crowds reached), written and open places, and in the two longest a carried face at some open places (unresolved and not silent, so no mark
+    /// there, each neighbour of a marked one), the 257 weighed by a domain.
+    #[allow(clippy::type_complexity)]
+    fn mark_regions() -> (Vec<Vec<usize>>, Vec<Vec<bool>>, Vec<Vec<Option<holonics::hnn::tower::field::Shares>>>, Vec<Option<usize>>) {
+        let lengths = [2usize, 3, 5, 64, 257];
+        let classes: Vec<Vec<usize>> = lengths.iter().map(|&n| (0..n).map(|t| (t * 37 + 11) % 120).collect()).collect();
+        let open: Vec<Vec<bool>> = lengths.iter().map(|&n| (0..n).map(|t| t % 3 == 1 || t + 1 == n || (n > 5 && t % 7 == 2)).collect()).collect();
+        let carried: Vec<Vec<Option<holonics::hnn::tower::field::Shares>>> = lengths
+            .iter()
+            .zip(&open)
+            .map(|(&n, u)| if n < 64 { Vec::new() } else { (0..n).map(|t| (u[t] && t % 9 == 4).then(|| vec![((t * 13 % 120) as u32, 40_000u32), ((t * 29 % 120 + 1) as u32, 25_536u32)])).collect() })
+            .collect();
+        let domains = lengths.iter().zip(&open).map(|(&n, u)| (n == 257).then(|| 2 * u.iter().filter(|&&o| o).count())).collect();
+        (classes, open, carried, domains)
+    }
+
+    /// [definition; agent-inferred, November 14, the ring record §4] **The field that reads twice on the card reads the host's bits** (needs the
+    /// card): grown onto each of [`mark_cases`] ([`holonics::hnn::tower::field::FieldLearner::with_mark`]) with its strengths at their founding
+    /// and at [`MARK_STRENGTHS`], read and returned on [`mark_regions`] through the host and through the card: every face, every covector entry
+    /// (the strengths' among them, nonzero), the faces of a read that does not return, the training path's words with the opening's codes, the
+    /// charts by stage and the logits with their echoes equal; at the founding every face is the field's before the growth on the card too, and
+    /// off it some face moves.
+    #[test]
+    #[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
+    fn the_field_that_reads_twice_on_the_card_reads_the_hosts_bits() {
+        use holonics::hnn::tower::field::{FieldRealization, HostField, MARK_BASES};
+        let (classes, open, carried, domains) = mark_regions();
+        let regions: Vec<Region> = (0..classes.len()).map(|r| Region { classes: &classes[r], unresolved: &open[r], faces: &carried[r], locked: &[], echo: &[], domain: domains[r], port: None }).collect();
+        let card = Card::open(0).expect("a CUDA card with the field's kernels built");
+        let mut card_field = CardField::open(&card).unwrap();
+        for (name, learner) in mark_cases() {
+            let before = card_field.read_and_return(&learner.field, &regions).unwrap();
+            let marked = learner.with_mark().unwrap();
+            let l = marked.field.layout().clone();
+            for strengths in [[0i32; MARK_BASES], MARK_STRENGTHS] {
+                let mut field = marked.field.clone();
+                field.theta[l.mark..l.mark + MARK_BASES].copy_from_slice(&strengths);
+                let (host_faces, host_g) = field.read_and_return(&regions).unwrap();
+                let (card_faces, card_g) = card_field.read_and_return(&field, &regions).unwrap();
+                assert_eq!(host_faces, card_faces, "{name} at {strengths:?}: the faces");
+                let unequal: Vec<usize> = (0..host_g.len()).filter(|&i| host_g.get(i) != card_g.get(i)).collect();
+                let family = |i: usize| field.families_all().iter().position(|&(s, n, _)| (s..s + n).contains(&i));
+                assert!(unequal.is_empty() && host_g.len() == card_g.len(), "{name} at {strengths:?}: {} covector entries differ, the first at {:?} (its family {:?}; the strengths at {})", unequal.len(), unequal.first(), unequal.first().map(|&i| family(i)), l.mark);
+                assert!(host_g[l.mark..l.mark + MARK_BASES].iter().all(|&v| v != 0), "{name} at {strengths:?}: every strength takes a covector");
+                if strengths == [0; MARK_BASES] {
+                    assert_eq!(card_faces, before.0, "{name}: founded at zero, every face is the field's before the growth");
+                } else {
+                    assert_ne!(card_faces, before.0, "{name}: off the founding some face moves");
+                }
+                assert_eq!(HostField.read_faces(&field, &regions).unwrap(), card_field.read_faces(&field, &regions).unwrap(), "{name} at {strengths:?}: a read that does not return");
+                let (host_at, host_ng, host_codes) = HostField.read_and_return_opening(&field, &regions).unwrap();
+                let (card_at, card_ng, card_codes) = card_field.read_and_return_opening(&field, &regions).unwrap();
+                assert_eq!(host_at, card_at, "{name} at {strengths:?}: the training path's words");
+                assert!(host_ng == card_ng && card_ng == card_g, "{name} at {strengths:?}: the training path's covector");
+                assert_eq!(host_codes, card_codes, "{name} at {strengths:?}: the opening's codes");
+                let (host_cf, host_charts) = HostField.read_tick_charts(&field, &regions).unwrap();
+                let (card_cf, card_charts) = card_field.read_tick_charts(&field, &regions).unwrap();
+                assert!(host_cf == card_cf && host_charts == card_charts, "{name} at {strengths:?}: the charts by stage");
+                assert_eq!(HostField.read_logits(&field, &regions).unwrap(), card_field.read_logits(&field, &regions).unwrap(), "{name} at {strengths:?}: the logits and echoes");
+                let open_sites: usize = regions.iter().map(|r| r.unresolved.iter().filter(|&&u| u).count()).sum();
+                println!("MARK_PARITY field={name} strengths={strengths:?} open_sites={open_sites} covector_entries={} strengths_covector={:?} faces_equal=1 covector_equal=1", card_g.len(), &card_g[l.mark..l.mark + MARK_BASES]);
+            }
+        }
+    }
+
+    /// [definition; agent-inferred, November 14, the ring record §4] **A marked learner's sections on the card read the host's bits** (needs the
+    /// card): each of [`mark_cases`] and the lettered learner grown to read twice, its strengths at [`MARK_STRENGTHS`], takes two sections on
+    /// [`mark_regions`] (the lettered one on its own stretches) through the host ([`holonics::hnn::tower::field::HostField`]) and through the card:
+    /// the receipts and the learner's whole state (the material, the strengths among it, and the moments) equal after each.
+    #[test]
+    #[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
+    fn a_marked_learners_sections_on_the_card_read_the_hosts_bits() {
+        use holonics::hnn::tower::field::{HostField, MARK_BASES};
+        let (classes, open, carried, domains) = mark_regions();
+        let regions: Vec<Region> = (0..classes.len()).map(|r| Region { classes: &classes[r], unresolved: &open[r], faces: &carried[r], locked: &[], echo: &[], domain: domains[r], port: None }).collect();
+        let (lettered, _, _, _, lclasses, lopen, ldomains) = lettered_case();
+        let lregions: Vec<Region> = lclasses.iter().zip(&lopen).zip(&ldomains).map(|((c, u), &dom)| Region { classes: c, unresolved: u, faces: &[], locked: &[], echo: &[], domain: dom, port: None }).collect();
+        let card = Card::open(0).expect("a CUDA card with the field's kernels built");
+        let mut card_field = CardField::open(&card).unwrap();
+        let mut cases = mark_cases();
+        cases.push(("lettered", lettered));
+        for (name, learner) in cases {
+            let mut marked = learner.with_mark().unwrap();
+            let l = marked.field.layout().clone();
+            marked.field.theta[l.mark..l.mark + MARK_BASES].copy_from_slice(&MARK_STRENGTHS);
+            let on = if name == "lettered" { &lregions } else { &regions };
+            let (mut on_host, mut on_card) = (marked.clone(), marked);
+            for section in 0..2 {
+                let host_receipt = on_host.section_realized(on, &mut HostField).unwrap();
+                let card_receipt = on_card.section_realized(on, &mut card_field).unwrap();
+                assert_eq!(host_receipt, card_receipt, "{name}: section {section}'s receipt");
+                assert!(host_receipt.deposited, "{name}: section {section} deposits");
+                assert!(on_host.to_text() == on_card.to_text(), "{name}: the learner's state after section {section} differs between the host and the card");
+                println!("MARK_SECTION field={name} section={section} code_before={} strengths={:?} state_equal=1", card_receipt.code_before, &on_card.field.theta[l.mark..l.mark + MARK_BASES]);
+            }
+        }
+    }
+
+    /// [measurement; the ring record §4] **The two reads' time on the card against one read** (needs the card): the opened learner's field before
+    /// the growth and grown to read twice at [`MARK_STRENGTHS`], each read and returned (a training read) and read without a return on one batch of 32 regions of 257
+    /// sites (the open places of [`mark_regions`]'s longest), timed inside one hold as control, marked, control, marked, control after a warm read
+    /// of each; the control's spread is the read's resolution.
+    #[test]
+    #[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
+    fn the_field_that_reads_twice_times_its_two_reads_on_the_card() {
+        use holonics::hnn::tower::field::MARK_BASES;
+        let (classes, open, _, _) = mark_regions();
+        let regions: Vec<Region> = (0..32).map(|_| Region { classes: &classes[4], unresolved: &open[4], faces: &[], locked: &[], echo: &[], domain: None, port: None }).collect();
+        let (_, learner) = mark_cases().into_iter().find(|(n, _)| *n == "opened").unwrap();
+        let plain = learner.field.clone();
+        let mut marked = learner.with_mark().unwrap().field;
+        let l = marked.layout().clone();
+        marked.theta[l.mark..l.mark + MARK_BASES].copy_from_slice(&MARK_STRENGTHS);
+        let card = Card::open(0).expect("a CUDA card with the field's kernels built");
+        let mut card_field = CardField::open(&card).unwrap();
+        let sites = regions.len() * classes[4].len();
+        let open_sites = regions.len() * open[4].iter().filter(|&&u| u).count();
+        // A training read (read and return) and a read that does not return, each in its own interleaved hold.
+        for returning in [true, false] {
+            let mut timed = |field: &Field| -> u128 {
+                let started = Instant::now();
+                if returning {
+                    card_field.read_and_return(field, &regions).unwrap();
+                } else {
+                    card_field.read_faces(field, &regions).unwrap();
+                }
+                started.elapsed().as_micros()
+            };
+            timed(&plain);
+            timed(&marked);
+            let reads: Vec<(&str, u128)> = [("control", &plain), ("marked", &marked), ("control", &plain), ("marked", &marked), ("control", &plain)].into_iter().map(|(n, f)| (n, timed(f))).collect();
+            println!("MARK_TIMES returning={} sites={sites} open_sites={open_sites} reads_us={}", u8::from(returning), reads.iter().map(|(n, us)| format!("{n}:{us}")).collect::<Vec<_>>().join(","));
+        }
     }
 }
