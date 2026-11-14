@@ -3447,9 +3447,10 @@ pub(super) fn write(args: &[String], realization: &mut dyn FieldRealization) -> 
     let seed = u64::from_be_bytes(keys.get(keys.len().saturating_sub(8)..).filter(|w| w.len() == 8).ok_or("a key file of fewer than eight bytes")?.try_into()?);
     let codec = FieldCodec::from_text(&String::from_utf8(pinned_read(&args[7], &args[8], READ_BUDGET as usize)?)?, units)?;
     let (documents, prompt, run) = (positive(&args[9])?, positive(&args[10])?, positive(&args[11])?);
-    // [agent-inferred, November 14, the mark's record §3] `REFINE` reads after the sweeps, each reopening the next place of the order and
-    // drawing it again on the region as it stands (a place reopened is silent, so on a field that reads twice its first read marks it):
-    // the draft reheard as the field's own. Zero, the default, is the writer as it stood.
+    // [agent-inferred, November 14, the mark's record §3] `REFINE` passes after the sweeps, each revisiting the written run one place a read in
+    // the writer's order and drawing each place again on the region as it stands (a place reopened is silent, so on a field that reads twice
+    // its first read marks it): the draft reheard as the field's own. A pass costs as many reads as the run has places. Zero, the default, is
+    // the writer as it stood. (Read first as a count of reads: 256 passes passed a 300 s deadline on November 14.)
     let refine = match args.get(15) { Some(r) => r.parse::<usize>().map_err(|_| "REFINE is a count")?, None => 0 };
     let out = Path::new(&args[12]);
     let learner = FieldLearner::from_text(std::str::from_utf8(&pinned_read(&args[13], &args[14], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
