@@ -1,0 +1,12 @@
+# Gate 3 on the unaltered build of claude/consolidation-c2 (main at b3c9e023d with parity-store), the four-lane line's lap 6: 3 sections of parity, 24 reproduced, the lap's read. Numbers only.
+STORE_PARITY method=read_and_return_opening calls=3 unequal=0 card_ms=2151 host_ms=194595
+STORE_PARITY_DONE calls=3 unequal=0 unequal_sites=0 unequal_entries=0 first=- EQUAL
+GATE_REPRO sections=3 line_lines=3 equal=3 EQUAL
+GATE_SAVE aside (a run shorter than the line's first save)
+GATE_REPRO sections=24 line_lines=24 equal=24 EQUAL
+GATE_SAVE aside (a run shorter than the line's first save)
+GATE_READ cavity.tsv EQUAL
+MEASURE lap=parity rc=0 wall_s=200.4 peak_rss_kib=6396260
+MEASURE lap=read rc=0 wall_s=279.0 peak_rss_kib=555484
+MEASURE lap=repro rc=0 wall_s=17.7 peak_rss_kib=348312
+GATE_ENGINE EQUAL

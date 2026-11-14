@@ -33,6 +33,8 @@ mod field_train;
 mod store_train;
 #[path = "complete_language/field_parity.rs"]
 mod field_parity;
+#[path = "complete_language/store_parity.rs"]
+mod store_parity;
 
 #[cfg(test)]
 #[path = "complete_language/code_parallel_controls.rs"]
@@ -957,12 +959,14 @@ pub(super) fn run_field_realized(args: &[String], realization: &mut dyn holonics
     }
 }
 /// The field's card parity and timing (`field_parity`): `parity-field` reads the host's field
-/// against `card` on `train-field`'s sections, `time-field` reads the card alone and projects.
+/// against `card` on `train-field`'s sections, `time-field` reads the card alone and projects, and
+/// `parity-store` holds every read of `train-store`'s sections on the card against the host's (`store_parity`).
 pub(super) fn run_field_parity(args: &[String], card: &mut dyn holonics::hnn::tower::field::FieldRealization) -> Result<()> {
     match args.first().map(String::as_str) {
         Some("parity-field") => field_parity::parity(args, card),
         Some("time-field") => field_parity::time(args, card),
-        _ => Err("a field parity command is parity-field or time-field".into()),
+        Some("parity-store") => store_parity::parity(args, card),
+        _ => Err("a field parity command is parity-field, time-field or parity-store".into()),
     }
 }
 /// The tower commands with each section's forward and reverse through a declared realization

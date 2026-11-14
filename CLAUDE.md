@@ -952,7 +952,13 @@ Commands use Bash; with a fish shell, invoke Bash explicitly. CUDA may need
 2. once per step or PR: the tests of the laws that step wrote or changed. Inherited tests count
    only after rebuild step 1 has audited them.
 3. at the end of a step that changes HNN behaviour or a kernel: the GPU suite, alone on an idle
-   card, `flock .local/gpu.lock cargo test -p <crate> -- --include-ignored --test-threads=1`;
+   card, `flock .local/gpu.lock cargo test -p <crate> -- --include-ignored --test-threads=1`; for
+   the engine, `bash tools/gate_engine.sh LINE BIN OUT` against the line that trains (parity on 3
+   of its sections, the reproduction of 24 and its lap's read; LINE is a private file under
+   `.local/` naming the line's inputs). Reason: the engine's GPU suite does not hold the store
+   line's declaration, and on November 14 a change to the deposit's divisor passed parity and the
+   first 3 reproduced sections and first differed at section 10
+   ([the receipt](research/records/receipts/2026-11-14_engine-gates/README.md));
 4. when Lean changes: the library build, `bash tools/lean_check.sh`.
 
 Record one verification receipt per step, in its PR or issue. A timeout is incomplete evidence. A
