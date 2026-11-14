@@ -1,0 +1,54 @@
+# The census of directions drawn on spans of known kind at the lanes' shapes (rows x 32), two statistics: k (15/16 of the cross singular values' sum, tools/block_directions.py) and k_sig (cross singular values above a row-shuffled null). Numbers only.
+rows=245 cols=32 full_rank_independent k=23.8  confined(r, k)=[(8, np.float64(19.9)), (16, np.float64(18.8)), (24, np.float64(20.7))]
+rows=128 cols=32 full_rank_independent k=23.6  confined(r, k)=[(8, np.float64(19.8)), (16, np.float64(18.7)), (24, np.float64(20.5))]
+rows=64 cols=32 full_rank_independent k=22.9  confined(r, k)=[(8, np.float64(18.9)), (16, np.float64(18.1)), (24, np.float64(20.0))]
+rows 245 (shared rank, noise, k_sig): [(32, 0.0, 21.6), (24, 0.5, 14.9), (16, 0.5, 13.2), (8, 0.5, 8.0), (8, 1.0, 5.3), (0, 1.0, 0.1)]
+rows 128 (shared rank, noise, k_sig): [(32, 0.0, 12.2), (24, 0.5, 8.2), (16, 0.5, 8.0), (8, 0.5, 6.5), (8, 1.0, 3.1), (0, 1.0, 0.2)]
+rows 64 (shared rank, noise, k_sig): [(32, 0.0, 6.5), (24, 0.5, 4.4), (16, 0.5, 4.3), (8, 0.5, 3.9), (8, 1.0, 1.7), (0, 1.0, 0.1)]
+## the fourth pass's lanes 1 and 2, laps 5 to 8 at their means (tools/block_directions.py, k by block and lane)
+block=enc lane=all rows=245 columns=64 k=39 k_d1=53 k_d2=53
+block=enc lane=1 rows=245 columns=32 k=21 k_d1=28 k_d2=28
+block=enc lane=2 rows=245 columns=32 k=22 k_d1=28 k_d2=28
+block=before lane=all rows=245 columns=64 k=43 k_d1=55 k_d2=55
+block=before lane=1 rows=245 columns=32 k=25 k_d1=29 k_d2=29
+block=before lane=2 rows=245 columns=32 k=24 k_d1=29 k_d2=29
+block=after lane=all rows=245 columns=64 k=41 k_d1=55 k_d2=55
+block=after lane=1 rows=245 columns=32 k=24 k_d1=28 k_d2=29
+block=after lane=2 rows=245 columns=32 k=23 k_d1=29 k_d2=29
+block=q lane=all rows=64 columns=64 k=35 k_d1=45 k_d2=46
+block=q lane=1 rows=64 columns=32 k=21 k_d1=27 k_d2=27
+block=q lane=2 rows=64 columns=32 k=21 k_d1=27 k_d2=28
+block=v lane=all rows=64 columns=64 k=29 k_d1=44 k_d2=45
+block=v lane=1 rows=64 columns=32 k=18 k_d1=26 k_d2=26
+block=v lane=2 rows=64 columns=32 k=20 k_d1=27 k_d2=27
+block=out lane=all rows=64 columns=64 k=29 k_d1=44 k_d2=44
+block=out lane=1 rows=64 columns=32 k=17 k_d1=27 k_d2=27
+block=out lane=2 rows=64 columns=32 k=18 k_d1=27 k_d2=27
+block=a lane=all rows=128 columns=64 k=44 k_d1=54 k_d2=54
+block=a lane=1 rows=128 columns=32 k=23 k_d1=28 k_d2=28
+block=a lane=2 rows=128 columns=32 k=23 k_d1=28 k_d2=28
+block=b lane=all rows=128 columns=64 k=43 k_d1=54 k_d2=54
+block=b lane=1 rows=128 columns=32 k=23 k_d1=28 k_d2=28
+block=b lane=2 rows=128 columns=32 k=22 k_d1=28 k_d2=28
+block=w lane=all rows=128 columns=64 k=42 k_d1=54 k_d2=54
+block=w lane=1 rows=128 columns=32 k=23 k_d1=29 k_d2=29
+block=w lane=2 rows=128 columns=32 k=23 k_d1=29 k_d2=29
+block=read lane=all rows=64 columns=64 k=37 k_d1=46 k_d2=46
+block=read lane=1 rows=64 columns=32 k=22 k_d1=27 k_d2=27
+block=read lane=2 rows=64 columns=32 k=22 k_d1=27 k_d2=27
+block=probe lane=all rows=64 columns=64 k=35 k_d1=46 k_d2=46
+block=probe lane=1 rows=64 columns=32 k=20 k_d1=27 k_d2=27
+block=probe lane=2 rows=64 columns=32 k=21 k_d1=27 k_d2=27
+block=moment_face lane=all rows=64 columns=64 k=24 k_d1=27 k_d2=27
+block=moment_face lane=1 rows=64 columns=32 k=18 k_d1=24 k_d2=23
+block=moment_face lane=2 rows=64 columns=32 k=18 k_d1=23 k_d2=23
+block=carry_turn lane=all rows=32 columns=64 k=25 k_d1=27 k_d2=28
+block=carry_turn lane=1 rows=32 columns=32 k=19 k_d1=24 k_d2=24
+block=carry_turn lane=2 rows=32 columns=32 k=20 k_d1=24 k_d2=24
+block=carry_leak lane=all rows=32 columns=64 k=25 k_d1=28 k_d2=28
+block=carry_leak lane=1 rows=32 columns=32 k=18 k_d1=23 k_d2=23
+block=carry_leak lane=2 rows=32 columns=32 k=20 k_d1=23 k_d2=24
+block=opening lane=all rows=64 columns=64 k=38 k_d1=46 k_d2=47
+block=opening lane=1 rows=64 columns=32 k=22 k_d1=27 k_d2=27
+block=opening lane=2 rows=64 columns=32 k=22 k_d1=27 k_d2=27
+whole-width k from 24 (moment_face) to 44

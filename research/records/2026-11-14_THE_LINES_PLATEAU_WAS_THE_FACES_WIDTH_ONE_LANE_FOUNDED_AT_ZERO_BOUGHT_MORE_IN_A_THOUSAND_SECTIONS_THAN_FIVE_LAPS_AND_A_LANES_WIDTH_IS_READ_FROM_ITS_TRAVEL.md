@@ -61,8 +61,23 @@ until a code improves; the copied lane is an instrument and says so); a refusal 
 zero with every face kept, not a raised bound); bits read as progress (the decision is the travel's rank, with the codes by slice beside it);
 a design thought in arrays (a lane is a register with its own power, and its width is a count of directions the deposit fills).
 
+**4.1 Amended the same day: the census does not size a lane, and the capacity price does** (receipt `census_lanes.txt`). Drawn on spans of
+known kind at the lanes' shapes, the census's `k` reads 22.9 to 23.8 for two full-rank spans of 32 columns and 18 to 21 for spans confined to
+8, 16 or 24 directions with modest noise beside them; a count above a row-shuffled null reads 21.6, 12.2 and 6.5 for one full-rank shared
+span at 245, 128 and 64 rows. Neither tells a confined lane from a full one on these shapes, so neither sizes a lane (the fourth pass's two
+lanes read `k` = 17 to 25, inside both ranges). The atlas already holds the reading that does: the capacity price (`code.capacity-price`),
+`π(V) = −dC/d ln V`, the code's fall a nat of cells. G188 reads it at the face: the constitution grew by a factor 1.375 (ln r = 0.319) and
+the code fell 0.0129 nats a place at whole masks and 0.0086 at one-place masks in the lane's first thousand sections, `π` ≈ 0.040 and 0.027
+(a lower bound while the lane is still opening). So the face grows by partition while a founded lane's price, read against its cost in card
+time (1.09 times a section here), stands above the price of the same card time spent on more sections; a lane's width is then the grain of
+the purchase, and the composition of unequal widths is needed only where two parts' prices call for different grains (agent-inferred). The
+next readings: the third lane's price as it opens (the laned line's laps against the line's last level), and the price of a part other than
+the face (the contacts' growth of November 10 bought 0.013 in four laps) on the same scale.
+
 ## 5. Owed
 
 - #410: a founding at zero keeps the forward (a block read by nothing and writing nothing leaves every face and every standing covector
   entry as it was), the laned tower's case included.
 - A fair sampler for G187's question (documents either side of the prefix's end, over many documents).
+- A Holonics slice in the passage (the repository's own guides and records, about 25 MB of prose, with a held set kept apart): the
+  project's first product is composed language about Holonics, and the passage holds none; a crossing of its own, after the face's growth.

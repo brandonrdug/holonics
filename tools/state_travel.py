@@ -142,6 +142,15 @@ def layout(d):
         # [theory, November 12; the triad record §4] The triads' charts (rows 0..2J A, 2J..4J B, 4J..6J G; within each, row k triad k's real
         # part and row J + k its imaginary part), their biases in the same order, and their return W_T, D rows of 2J columns.
         push("triad", (6 * j, dw), MAT); push("triad_bias", (6 * j,), FACE); push("w_triad", (dw, 2 * j), MAT)
+    if d.get("opening", 0):
+        # [theory, November 13, P60 item 1f] The opening's lift R0 (its rows the lift's coordinates, its columns the face's) and its bias.
+        push("opening", (dw, dw), MAT); push("opening_bias", (dw,), FACE)
+    if d.get("junction", 0):
+        # [theory, November 13] The junction's row (its columns the face's charted read) and its bias.
+        push("junction", (1, dw), MAT); push("junction_bias", (1,), FACE)
+    if d.get("mark", 0):
+        # [agent-inferred, November 14, the ring record §4] The mark's strengths, one an encoding (enc, before, after).
+        push("mark", (3,), MAT)
     return fam, at
 
 
@@ -154,9 +163,16 @@ def state(path):
     # The carry circles' count: hnn-field-v14e (the leak's log chart) and the retired hnn-field-v14t (its linear chart), read here as receipts
     # (the same layout; only the leak's chart differs). hnn-field-v14f (theory, November 12; the triad record §4) writes C even at 0, then the
     # triads' count J >= 1.
-    assert (words[0], len(words)) in (("hnn-field-v14", 12), ("hnn-field-v14e", 13), ("hnn-field-v14t", 13), ("hnn-field-v14f", 14), ("hnn-field-v13", 11)), "a field's head line that is not hnn-field-v14"
-    d["carry"] = int(words[12]) if words[0] in ("hnn-field-v14e", "hnn-field-v14t", "hnn-field-v14f") else 0
-    d["triads"] = int(words[13]) if words[0] == "hnn-field-v14f" else 0
+    # [November 14] hnn-field-v14g writes the opening's word after the triads' count, hnn-field-v14j the junction's after it, and
+    # hnn-field-v14m the mark's (one) after that.
+    heads = (("hnn-field-v14", 12), ("hnn-field-v14e", 13), ("hnn-field-v14t", 13), ("hnn-field-v14f", 14), ("hnn-field-v13", 11), ("hnn-field-v14g", 15), ("hnn-field-v14j", 16), ("hnn-field-v14m", 17))
+    assert (words[0], len(words)) in heads, "a field's head line that is not hnn-field-v14"
+    d["carry"] = int(words[12]) if words[0] in ("hnn-field-v14e", "hnn-field-v14t", "hnn-field-v14f", "hnn-field-v14g", "hnn-field-v14j", "hnn-field-v14m") else 0
+    d["triads"] = int(words[13]) if words[0] in ("hnn-field-v14f", "hnn-field-v14g", "hnn-field-v14j", "hnn-field-v14m") else 0
+    # The later heads' words are named only where the head writes them, so an older state reads as it did.
+    for name, at in (("opening", 14), ("junction", 15), ("mark", 16)):
+        if len(words) > at and words[0] in ("hnn-field-v14g", "hnn-field-v14j", "hnn-field-v14m"):
+            d[name] = int(words[at])
     assert words[0] != "hnn-field-v14f" or d["triads"] >= 1, "an hnn-field-v14f head line with no triads (a field without them is hnn-field-v14 or hnn-field-v14e)"
     theta = np.array([int(x) for x in lines[2].split(" ")], dtype=np.int64)
     return d, theta
