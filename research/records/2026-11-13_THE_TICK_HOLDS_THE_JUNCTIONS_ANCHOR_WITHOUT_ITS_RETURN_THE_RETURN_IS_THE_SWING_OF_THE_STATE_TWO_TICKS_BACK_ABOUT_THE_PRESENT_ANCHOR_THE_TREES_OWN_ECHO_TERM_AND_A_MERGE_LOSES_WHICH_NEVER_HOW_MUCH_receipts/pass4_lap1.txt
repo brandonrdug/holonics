@@ -1,0 +1,16 @@
+# The fourth pass, comparing both reads from its start: lap 1 (from STATE.0, next-pass of lap7/STATE.991) stopped at its projection (1,830,000 ms) after 2,897 sections (631.8 ms a section), read at its MEAN.2000; against the both-reads lap 7's MEAN.991 and the one-read-compared lap 6's mean. Numbers only.
+STORE_STOPPED sections=2897/3000 stretches=14945677 reads=0 returns=2897 pairs=263302590309 batches=5794 peak_store=8559933856 ms=1830365
+MEASURE lap=lap1 rc=0 wall_s=1830.9 peak_rss_kib=302464
+STRENGTHS lap1/STATE.stopped 2734162 10982709 10076611
+CAVITY_DONE ms=254127
+MEASURE lap=P1 rc=0 wall_s=254.7 peak_rss_kib=446988
+## against lap 7
+LAST_TICK F3 one_place pooled=0.9861 places=100508 | code=0.6785(20124) web=1.0627(20043) science=0.9364(20088) books=1.0284(20028) wikidata=1.2239(20225)
+LAST_TICK C3 one_place pooled=0.9892 places=100508 | code=0.6812(20124) web=1.0679(20043) science=0.9391(20088) books=1.0320(20028) wikidata=1.2249(20225)
+LAST_TICK_DIFF one_place founded_minus_control pooled=-0.0030 | code=-0.0028 web=-0.0052 science=-0.0027 books=-0.0036 wikidata=-0.0010
+LAST_TICK F3 whole_open pooled=2.3389 places=3717 | code=2.1833(730) web=2.5212(758) science=2.2516(776) books=2.1875(776) wikidata=2.5761(677)
+LAST_TICK C3 whole_open pooled=2.3423 places=3717 | code=2.1898(730) web=2.5268(758) science=2.2568(776) books=2.1983(776) wikidata=2.5634(677)
+LAST_TICK_DIFF whole_open founded_minus_control pooled=-0.0034 | code=-0.0065 web=-0.0055 science=-0.0052 books=-0.0108 wikidata=+0.0126
+## against lap 6
+LAST_TICK_DIFF one_place founded_minus_control pooled=+0.0020 | code=-0.0007 web=-0.0009 science=-0.0016 books=+0.0009 wikidata=+0.0121
+LAST_TICK_DIFF whole_open founded_minus_control pooled=+0.0015 | code=-0.0035 web=-0.0054 science=-0.0069 books=-0.0003 wikidata=+0.0261
