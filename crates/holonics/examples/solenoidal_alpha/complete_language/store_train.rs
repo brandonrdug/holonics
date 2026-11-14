@@ -64,16 +64,33 @@ impl Piece {
     }
 }
 
-/// A slice of the role read: its name, its quota (the role's store octets), its pieces in order and its file.
+/// [realization; November 14, C4 of #603] **Where a slice's bytes come from**: `out.len()` bytes from `at`. The cut reads its slices
+/// through it, so the passage's law (pieces, places, draws, stretches) holds no file: the store's file is one source ([`SliceFile`]).
+trait PieceBytes {
+    fn read_at(&mut self, at: u64, out: &mut [u8]) -> Result<()>;
+}
+
+/// A slice's file as its source of bytes.
+struct SliceFile(std::fs::File);
+
+impl PieceBytes for SliceFile {
+    fn read_at(&mut self, at: u64, out: &mut [u8]) -> Result<()> {
+        self.0.seek(SeekFrom::Start(at))?;
+        self.0.read_exact(out)?;
+        Ok(())
+    }
+}
+
+/// A slice of the role read: its name, its quota (the role's store octets), its pieces in order and its source of bytes.
 struct Slice {
     name: String,
     quota: u128,
     pieces: Vec<Piece>,
-    file: std::fs::File,
+    source: Box<dyn PieceBytes>,
 }
 
 impl Slice {
-    /// The places `[from, from + len)` of piece `k`, read from the slice's file at the piece's offset (never the slice in memory).
+    /// The places `[from, from + len)` of piece `k`, read from the slice's source at the piece's offset (never the slice in memory).
     fn bytes(&mut self, k: usize, from: u64, len: u64) -> Result<Vec<u8>> {
         let p = self.pieces[k];
         let end = from + len;
@@ -81,31 +98,29 @@ impl Slice {
             return Err("a stretch past its piece's places".into());
         }
         let mut out = Vec::with_capacity(len as usize);
-        let read = |file: &mut std::fs::File, at: u64, n: u64, out: &mut Vec<u8>| -> Result<()> {
+        let read = |source: &mut Box<dyn PieceBytes>, at: u64, n: u64, out: &mut Vec<u8>| -> Result<()> {
             if n == 0 {
                 return Ok(());
             }
-            file.seek(SeekFrom::Start(at))?;
             let start = out.len();
             out.resize(start + n as usize, 0);
-            file.read_exact(&mut out[start..])?;
-            Ok(())
+            source.read_at(at, &mut out[start..])
         };
         if !p.line_feed() {
-            read(&mut self.file, p.offset + from, len, &mut out)?;
+            read(&mut self.source, p.offset + from, len, &mut out)?;
             return Ok(out);
         }
         // The title's places, the line feed at place `title`, then the text's places one past their bytes.
         let t = p.title;
         if from < t {
-            read(&mut self.file, p.offset + from, end.min(t) - from, &mut out)?;
+            read(&mut self.source, p.offset + from, end.min(t) - from, &mut out)?;
         }
         if from <= t && t < end {
             out.push(b'\n');
         }
         let text_from = from.max(t + 1);
         if text_from < end {
-            read(&mut self.file, p.offset + text_from - 1, end - text_from, &mut out)?;
+            read(&mut self.source, p.offset + text_from - 1, end - text_from, &mut out)?;
         }
         Ok(out)
     }
@@ -497,7 +512,7 @@ pub(super) fn train(args: &[String], realization: &mut dyn FieldRealization) -> 
     let mut slices = Vec::with_capacity(names.len());
     for &name in &names {
         let (count, quota) = counts[&(role.to_string(), name.to_string())];
-        slices.push(Slice { name: name.to_string(), quota, pieces: pieces_of(&store.join(format!("{stem}_{name}.tsv")), count)?, file: std::fs::File::open(store.join(format!("{stem}_{name}.bin")))? });
+        slices.push(Slice { name: name.to_string(), quota, pieces: pieces_of(&store.join(format!("{stem}_{name}.tsv")), count)?, source: Box::new(SliceFile(std::fs::File::open(store.join(format!("{stem}_{name}.bin")))?)) });
     }
     println!("STORE_PASS_AT stretches={} {} {} ms={}", pass.stretches, pass.slices.iter().map(|s| format!("{}_piece={} {}_cursor={} {}_taken={}", s.name, s.piece, s.name, s.cursor, s.name, s.taken)).collect::<Vec<_>>().join(" "), counters_text(realization), started.elapsed().as_millis());
     let mut cut = Cut { seed, slices, pass };
@@ -665,7 +680,7 @@ fn role_names(counts: &HashMap<(String, String), (u64, u128)>, role: &str) -> Ve
 fn open_slice(store: &Path, role: &str, name: &str, counts: &HashMap<(String, String), (u64, u128)>) -> Result<Slice> {
     let stem = if role == "held" { "HELD" } else { "DOCS" };
     let (count, quota) = counts[&(role.to_string(), name.to_string())];
-    Ok(Slice { name: name.to_string(), quota, pieces: pieces_of(&store.join(format!("{stem}_{name}.tsv")), count)?, file: std::fs::File::open(store.join(format!("{stem}_{name}.bin")))? })
+    Ok(Slice { name: name.to_string(), quota, pieces: pieces_of(&store.join(format!("{stem}_{name}.tsv")), count)?, source: Box::new(SliceFile(std::fs::File::open(store.join(format!("{stem}_{name}.bin")))?)) })
 }
 
 /// A region's code over its unresolved places on the codes' own grain (`2^(−20)` bits), beside the count of those places: the sum of
@@ -3261,7 +3276,7 @@ pub(super) fn read_ticks(args: &[String], realization: &mut dyn FieldRealization
     let mut slices = Vec::with_capacity(names.len());
     for &name in &names {
         let (count, quota) = counts[&(role.to_string(), name.to_string())];
-        slices.push(Slice { name: name.to_string(), quota, pieces: pieces_of(&store.join(format!("{stem}_{name}.tsv")), count)?, file: std::fs::File::open(store.join(format!("{stem}_{name}.bin")))? });
+        slices.push(Slice { name: name.to_string(), quota, pieces: pieces_of(&store.join(format!("{stem}_{name}.tsv")), count)?, source: Box::new(SliceFile(std::fs::File::open(store.join(format!("{stem}_{name}.bin")))?)) });
     }
     let mut cut = Cut { seed, slices, pass };
     let ticks = learner.field.declaration.ticks;
