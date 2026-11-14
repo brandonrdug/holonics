@@ -1,0 +1,35 @@
+# G188: a third lane of 32 founded on the fourth pass's lap-7 end state (found-lane, every face kept), trained for the card time of the line's lap 8 from the same state, against lap 8. Numbers only.
+FOUND_LANE lines=11 equal=5 width=96 lanes=3 material=221881 founded_material=305145 lane_entries=83264 ms=143
+LANE_REPRO sections=24 equal=24
+LANE_FACES identical
+STORE_STOPPED sections=2732/6000 stretches=18982143 reads=0 returns=2732 pairs=248848905126 batches=5464 peak_store=8601898512 ms=1749825
+MEASURE lap=laned rc=0 wall_s=1750.3 peak_rss_kib=329236
+STORE_PASS role=prefix sections=3000 stretches_read=19034073 ended=false code_pieces=91008 web_pieces=50194 science_pieces=31730 books_pieces=2872 wikidata_pieces=12045 ms=1754046
+MEASURE lap=lap8 rc=0 wall_s=1754.5 peak_rss_kib=276728
+## laned MEAN.2000 (F3) against lap 8 MEAN.3000 (C3), the guess's reading
+LAST_TICK F3 one_place pooled=0.9631 places=100508 | code=0.6568(20124) web=1.0422(20043) science=0.9100(20088) books=1.0074(20028) wikidata=1.1982(20225)
+LAST_TICK C3 one_place pooled=0.9701 places=100508 | code=0.6649(20124) web=1.0464(20043) science=0.9225(20088) books=1.0133(20028) wikidata=1.2029(20225)
+LAST_TICK_DIFF one_place founded_minus_control pooled=-0.0071 | code=-0.0080 web=-0.0042 science=-0.0125 books=-0.0059 wikidata=-0.0047
+LAST_TICK F3 whole_open pooled=2.3202 places=3717 | code=2.1871(730) web=2.4702(758) science=2.2282(776) books=2.1707(776) wikidata=2.5726(677)
+LAST_TICK C3 whole_open pooled=2.3320 places=3717 | code=2.1938(730) web=2.4901(758) science=2.2461(776) books=2.1885(776) wikidata=2.5670(677)
+LAST_TICK_DIFF whole_open founded_minus_control pooled=-0.0118 | code=-0.0067 web=-0.0199 science=-0.0179 books=-0.0178 wikidata=+0.0055
+## laned MEAN.2000 against lap 8 MEAN.2000, equal card-time windows
+LAST_TICK F3 one_place pooled=0.9631 places=100508 | code=0.6568(20124) web=1.0422(20043) science=0.9100(20088) books=1.0074(20028) wikidata=1.1982(20225)
+LAST_TICK C3 one_place pooled=0.9717 places=100508 | code=0.6674(20124) web=1.0501(20043) science=0.9203(20088) books=1.0150(20028) wikidata=1.2048(20225)
+LAST_TICK_DIFF one_place founded_minus_control pooled=-0.0086 | code=-0.0105 web=-0.0079 science=-0.0103 books=-0.0076 wikidata=-0.0065
+LAST_TICK F3 whole_open pooled=2.3202 places=3717 | code=2.1871(730) web=2.4702(758) science=2.2282(776) books=2.1707(776) wikidata=2.5726(677)
+LAST_TICK C3 whole_open pooled=2.3331 places=3717 | code=2.1971(730) web=2.4825(758) science=2.2437(776) books=2.1894(776) wikidata=2.5797(677)
+LAST_TICK_DIFF whole_open founded_minus_control pooled=-0.0129 | code=-0.0100 web=-0.0123 science=-0.0156 books=-0.0187 wikidata=-0.0071
+## laned MEAN.1000 against lap 8 MEAN.2000
+LAST_TICK_DIFF one_place founded_minus_control pooled=-0.0040 | code=-0.0048 web=-0.0055 science=-0.0023 books=-0.0034 wikidata=-0.0042
+LAST_TICK_DIFF whole_open founded_minus_control pooled=-0.0047 | code=-0.0110 web=+0.0069 science=-0.0005 books=-0.0061 wikidata=-0.0144
+## the fourth pass, laps 1 to 9 at their means (one-place, whole)
+lap1 pooled=0.9861 lap1 pooled=2.3389 
+lap2 pooled=0.9820 lap2 pooled=2.3368 
+lap3 pooled=0.9806 lap3 pooled=2.3326 
+lap4 pooled=0.9774 lap4 pooled=2.3371 
+lap5 pooled=0.9741 lap5 pooled=2.3350 
+lap6 pooled=0.9742 lap6 pooled=2.3321 
+lap7 pooled=0.9725 lap7 pooled=2.3344 
+lap8 pooled=0.9701 lap8 pooled=2.3320 
+lap9 pooled=0.9712 lap9 pooled=2.3340 

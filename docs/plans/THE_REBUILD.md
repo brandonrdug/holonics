@@ -217,8 +217,10 @@ references and no write is yet ordered text.
    with its guess fixed before its build; one
    continuous pass over tier A (1 GB), ordered once the engine stands near its count and judged by
    what it writes from held prompts by slice; the face as a composition of
-   lanes, each block reading its own, entering at `(32, 32)`; then a lane whose width is derived
-   from the partition its readers hold, fixed as a guess before its build. No extent is sized by a
+   lanes, each block reading its own (moved ahead of the rest on November 14: a third lane of 32 founded at zero bought 0.0086
+   and 0.0129 nats a place at equal card time where five laps had bought nothing at whole masks, G188), entering at `(32, 32, 32)` by
+   reproducing the laned line; then a lane's width read from the count of directions its readers' travel fills (the census
+   of November 12 drawn on the third lane), fixed as a guess before its build ([the record](../../research/records/2026-11-14_THE_LINES_PLATEAU_WAS_THE_FACES_WIDTH_ONE_LANE_FOUNDED_AT_ZERO_BOUGHT_MORE_IN_A_THOUSAND_SECTIONS_THAN_FIVE_LAPS_AND_A_LANES_WIDTH_IS_READ_FROM_ITS_TRAVEL.md) §4). No extent is sized by a
    factor or padded to a power of two. A tier's pass is ordered only after its projection is read
    against the count (the guides' method rule of November 12); the rate is stated in two parts,
    the forward a site and the return a unit of surprise, by slice, and never as one mean a byte.
