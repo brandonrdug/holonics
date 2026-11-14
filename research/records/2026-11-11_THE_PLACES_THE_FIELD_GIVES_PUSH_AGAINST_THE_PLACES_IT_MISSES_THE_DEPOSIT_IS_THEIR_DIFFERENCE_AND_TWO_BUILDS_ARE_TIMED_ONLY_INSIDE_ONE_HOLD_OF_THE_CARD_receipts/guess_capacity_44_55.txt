@@ -4526,3 +4526,14 @@ training from its lap-2 end state, in the order base, walk128, walk64, blocks4, 
   The resolution is the two base runs' own spread; a difference inside it is no difference. Rule: a build that held (a) and stands outside
   the spread enters the line's binary (the best walk and the best bound together, timed once more in one hold against base before the line
   takes it); one that missed (a) is a defect and is read before anything else.
+
+G191 scored 2026-11-14T16:20Z (receipt g191_engine.txt), three holds of the card on 24 sections of the three-lane line's training:
+  (a) every build's section lines, timings aside, equal the base's on all 24 sections, in all three holds: held;
+  (b) walk128 at least 10 ms a section under base: missed (7.2 under in the first hold, where the base runs themselves stood 6.9 apart);
+  (c) blocks4 at least 4 ms under base: missed as a gain of its own (9.0 under in the first hold, inside what the warm-up spread became).
+  Of 3 parts 1 held. The first hold's differences (walk64 16.3, blocks6 14.7 under) did not survive: a hold's first two runs read 10 to 20 ms
+  a section slow while the card warms (676.8 and 672.0 in the third hold, where both opened with base). With a declared warm-up run and three
+  alternations, the pair (walk 64, bound 6) read 655.5, 656.2 and 656.0 against base's 659.4 and 659.0 in the later pairs: about 3 ms a
+  section, 0.5%, where the audit's forecast from a synchronized profile was 20 to 35 ms. The pair keeps every bit and enters the line's binary.
+  The protocol's correction: a hold opens with a declared warm-up run, and a forecast from a profile that times each launch alone overstates
+  latency-bound kernels.
