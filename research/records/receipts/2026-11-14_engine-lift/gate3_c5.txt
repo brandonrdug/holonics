@@ -1,0 +1,11 @@
+# Gate 3 on C5's cuts (claude/consolidation-c5: field.rs cut into 18 modules, the card realization into 8), the four-lane line's lap 6. Numbers only.
+STORE_PARITY method=read_and_return_opening calls=3 unequal=0 card_ms=2279 host_ms=186990
+STORE_PARITY_DONE calls=3 unequal=0 unequal_sites=0 unequal_entries=0 first=- EQUAL
+GATE_REPRO sections=3 line_lines=3 equal=3 EQUAL
+GATE_SAVE aside (a run shorter than the line's first save)
+GATE_REPRO sections=24 line_lines=24 equal=24 EQUAL
+GATE_READ cavity.tsv EQUAL
+MEASURE lap=parity rc=0 wall_s=190.6 peak_rss_kib=6457600
+MEASURE lap=read rc=0 wall_s=278.1 peak_rss_kib=513156
+MEASURE lap=repro rc=0 wall_s=17.6 peak_rss_kib=348688
+GATE_ENGINE EQUAL

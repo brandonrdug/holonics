@@ -2,8 +2,16 @@
 
 #![deny(clippy::float_arithmetic)]
 
+pub mod adjoint;
 pub mod card;
+pub mod carry;
+pub mod clock;
+pub mod contact;
 pub mod field;
+pub mod level;
+pub mod moment;
+pub mod profile;
+pub mod resident;
 
 pub use card::{
     Card, CardBuffer, CardError, DeviceCensus, EntryCensus, Layout, Operand, Realization,

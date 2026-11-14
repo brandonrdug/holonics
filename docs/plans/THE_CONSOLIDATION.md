@@ -448,6 +448,19 @@ or `tower_train.rs`, and parity and reproduction hold.
 **C5. The cut by object, then the names** (the PC). Two pull requests: the moves of §5 and §6
 (code, tests, kernels), then the renames. Done when no file of the engine holds two objects, no
 type is named "Field", and parity, reproduction and timing hold after each.
+- The cut, read November 14 (the receipt's C5 section):
+  - The host and the card are cut by object, every line kept. The pass's place goes to
+    `learner.rs`, because its text reads the tower's `Result`.
+  - `field` and the card's `hnn::field` stand as façades that re-export the modules, so every
+    path holds until the renames.
+  - Gate 3 is equal. Timing holds once the hold's order is balanced: the card's runs fall into two
+    states that a plain alternation confounds with the build.
+- Owed to C5's second part:
+  - The kernels' headers (§6).
+  - The `inherited` items' distribution into `width.rs`, `ratio.rs`, `face.rs` and `deposit.rs`.
+  - The renames. Three of §5's names collide with names that stand: `Layout` and `Realization`
+    with the card's launch layout and its realization, and `Resident` with an October card owner
+    (`holonics_cuda::hnn::port::Resident`). The renames choose around them.
 
 **C6. The commands** (the PC). `crates/athena` with the live commands by §7's rule; the dispatch,
 `train-field`, its switches and the retired readings leave; `field_pass` leaves. Done when

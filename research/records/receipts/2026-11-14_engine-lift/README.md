@@ -91,3 +91,44 @@ beside it, ran its 3,000.
   - parity on 3 sections;
   - 24 of 24 sections reproduced;
   - the lap's read equal byte for byte.
+
+## C5: the cut by object (branch `claude/consolidation-c5`)
+
+- **The host cut.** `field.rs` is cut into 18 modules by object (THE_CONSOLIDATION §5):
+  - width, ratio, declaration, constitution, founding, region, navigator, moment, contact;
+  - carry, face, adjoint, deposit, release, level, realization, learner, ruler.
+
+  The large `impl Field` and `impl FieldLearner` are split by method, one block per object. The pass's place (`StorePass`) goes to
+  `learner.rs`, because its text reads the tower's `Result`.
+- **The card cut.** `hnn/field.rs` is cut into 8 modules (§6): resident, moment, contact, carry, clock, adjoint, level, profile.
+- **Text check.** A script read every line of each original file in the new modules, normalised for visibility. No line is missing.
+  Private items reached across modules are `pub(crate)`.
+- **Paths.** `field` keeps its module text and re-exports every module whole, so every path into it holds.
+- **Gate 1** passed (exit 0).
+- **Gate 3** (`gate3_c5.txt`) printed `GATE_ENGINE EQUAL`:
+  - parity on 3 sections;
+  - 24 of 24 sections reproduced;
+  - the lap's read equal byte for byte.
+
+### Timing (`timing_c5.txt`)
+
+**The first hold.** It alternated control and build after a warm-up, as C3's had. It read C5 at 723.3 ms a section against the
+control's 703.8, a 2.8% gap outside the control's 1.5 ms spread.
+
+**Two more reads.** They showed the gap was the order's and not the build's:
+- **The card sits in one of two states, run by run**, about 703 and about 722 ms a section, with one run at 741. Each build ran in
+  both states.
+  - A phases read (`FIELD_PHASES`) put the whole difference in the card's return: 16.46 s against 16.90 s over the 24 sections.
+  - The host's deposit parts were equal between the builds.
+- **The first hold's alternation put every C5 run on the slow state.**
+- **A balanced hold** (warm-up, then c4 c5 c5 c4 c4 c5 c5 c4) gives these runs:
+
+  | State | C4 | C5 |
+  |---|---|---|
+  | Fast | 703.4, 704.0 ms | 702.7, 703.5 ms |
+  | Slow | 722.8, 741.0 ms | 722.7, 721.5 ms |
+
+  State for state, C5 equals C4 within 0.7 ms on the fast state and within 1.3 ms on the slow, apart from C4's one run at 741 ms.
+
+**The verdict.** The plan's guess for C5 (§8: within the spread) holds once the order is balanced. The first hold's reading of a 2.8%
+gap was the order's. The timing rule now asks for a balanced order (CLAUDE.md).
