@@ -4503,3 +4503,12 @@ fifth pass from its own end of the fourth; both read the same documents in the s
   Rule: (a) and (b) held: the lane's worth persists, G188's reading stands, and G189 runs. (b) missed: the gain G188 read was mostly the
   founding's transient where the writer reads, the face's width does not bind there beyond it, and growth is judged only by a lead that
   lasts a lap past its founding (the lane kept or set aside by that reading).
+
+G190 scored 2026-11-14T14:54Z (receipt g190_persists.txt). The fifth pass's first lap, both lines on the same documents (19,761,463
+stretches read, the same pieces), read at their MEAN.3000:
+  (a) one-place: three lanes 0.9405, two lanes 0.9670, 0.0266 under: held (every slice, wikidata 0.012 to science 0.034);
+  (b) whole masks: 2.3041 against 2.3297, 0.0257 under: held (every slice, 0.017 to 0.035).
+  Both held. The lane's lead did not fade past its founding: it tripled (G188: 0.0086 and 0.0129), and the dip of its lap 1 was the
+  window at the pass's end. The three-lane lap took 1,920,458 ms to the two-lane lap's 1,773,641 (1.083 times), and the two-lane line fell
+  0.0031 and 0.0023 a lap there, so the extra card time is worth about 0.0003. The rule's first branch: the lane's worth persists, G188's
+  reading stands (the plateau was the face's width), and G189 runs.

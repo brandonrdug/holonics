@@ -48,6 +48,11 @@ the two-lane line's lap 9 at one-place masks and 0.0058 over it at whole masks; 
 drawn letter rows read by readers that open at their own first covectors). G190 reads the two-lane line beside the three-lane line lap for lap
 through the fifth pass on the same documents, and the lane's worth stands only on a lead that lasts a lap past its founding.
 
+*Read 14:54Z (G190).* It lasts and grows. On the fifth pass's first lap, both lines on the same documents, the three-lane line codes 0.9405
+one-place and 2.3041 whole masks against the two-lane line's 0.9670 and 2.3297: 0.0266 and 0.0257 under, every slice at both, at 1.083 times
+the card time (worth about 0.0003 at the two-lane line's rate). The dip at the fourth pass's end was that window. The plateau was the face's
+width.
+
 ## 4. What follows: a lane's width read from its travel (design, agent-inferred)
 
 The width a reading names (atlas `tower.face-lane-composition`) is now asked of the deposit itself. A lane is a register of the face read

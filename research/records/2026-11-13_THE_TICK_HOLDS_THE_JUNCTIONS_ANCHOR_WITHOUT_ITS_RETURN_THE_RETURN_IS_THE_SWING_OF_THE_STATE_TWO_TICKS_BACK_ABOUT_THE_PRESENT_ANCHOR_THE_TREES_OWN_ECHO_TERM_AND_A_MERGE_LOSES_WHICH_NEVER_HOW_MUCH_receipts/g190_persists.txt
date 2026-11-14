@@ -1,0 +1,20 @@
+# G190: the fifth pass's first lap of the three-lane line (lane/line lap2) and of the two-lane line (two5 lap1), the same documents, read at their MEAN.3000; and the three-lane line's earlier means. Numbers only.
+two5/lap1.log:STORE_PASS role=prefix sections=3000 stretches_read=19761463 ended=false code_pieces=11452 web_pieces=6527 science_pieces=3840 books_pieces=353 wikidata_pieces=1365 ms=1773641
+two5/lap1.log:MEASURE lap=lap1 rc=0 wall_s=1774.1 peak_rss_kib=305616
+lane/line/lap2.log:STORE_PASS role=prefix sections=3000 stretches_read=19761463 ended=false code_pieces=11452 web_pieces=6527 science_pieces=3840 books_pieces=353 wikidata_pieces=1365 ms=1920458
+lane/line/lap2.log:MEASURE lap=lap2 rc=0 wall_s=1920.9 peak_rss_kib=329448
+## three lanes (F3) against two lanes (C3), the same documents
+LAST_TICK F3 one_place pooled=0.9405 places=100508 | code=0.6343(20124) web=1.0122(20043) science=0.8867(20088) books=0.9838(20028) wikidata=1.1845(20225)
+LAST_TICK C3 one_place pooled=0.9670 places=100508 | code=0.6638(20124) web=1.0418(20043) science=0.9208(20088) books=1.0114(20028) wikidata=1.1966(20225)
+LAST_TICK_DIFF one_place founded_minus_control pooled=-0.0266 | code=-0.0295 web=-0.0297 science=-0.0341 books=-0.0276 wikidata=-0.0121
+LAST_TICK F3 whole_open pooled=2.3041 places=3717 | code=2.1749(730) web=2.4744(758) science=2.2105(776) books=2.1538(776) wikidata=2.5320(677)
+LAST_TICK C3 whole_open pooled=2.3297 places=3717 | code=2.1948(730) web=2.4909(758) science=2.2456(776) books=2.1849(776) wikidata=2.5571(677)
+LAST_TICK_DIFF whole_open founded_minus_control pooled=-0.0257 | code=-0.0199 web=-0.0165 science=-0.0351 books=-0.0311 wikidata=-0.0251
+## the two-lane line against its own lap 8
+LAST_TICK_DIFF one_place founded_minus_control pooled=-0.0031 | code=-0.0010 web=-0.0046 science=-0.0017 books=-0.0020 wikidata=-0.0063
+LAST_TICK_DIFF whole_open founded_minus_control pooled=-0.0023 | code=+0.0010 web=+0.0008 science=-0.0004 books=-0.0036 wikidata=-0.0100
+## the three-lane line's means in order (one-place, whole)
+lane/out_MEAN.1000 pooled=0.9676 lane/out_MEAN.1000 pooled=2.3284 
+lane/out_MEAN.2000 pooled=0.9631 lane/out_MEAN.2000 pooled=2.3202 
+lane/line/out_P1 pooled=0.9671 lane/line/out_P1 pooled=2.3397 
+lane/line/out_P2 pooled=0.9405 lane/line/out_P2 pooled=2.3041 
