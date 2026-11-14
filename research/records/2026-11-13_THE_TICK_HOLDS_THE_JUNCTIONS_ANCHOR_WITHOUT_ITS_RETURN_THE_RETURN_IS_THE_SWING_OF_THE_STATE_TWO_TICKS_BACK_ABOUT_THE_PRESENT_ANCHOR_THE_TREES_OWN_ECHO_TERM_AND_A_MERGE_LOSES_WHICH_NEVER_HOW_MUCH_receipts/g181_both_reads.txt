@@ -1,0 +1,29 @@
+# G181, the line comparing both reads (PR #791): lap 7 from lap6/STATE.3000 ended with the third pass after 991 sections (634.6 ms a section), read at its MEAN.991 (read 2), and with its strengths zeroed in a copy (read 1). Against lap 6's mean (one read compared), against read 1 at lap 2 (G180), and against the unmarked third pass's fifth lap. Numbers only.
+STORE_PASS role=prefix sections=991 stretches_read=14382129 ended=true code_pieces=93724 web_pieces=51617 science_pieces=32808 books_pieces=2960 wikidata_pieces=12446 ms=628900
+MEASURE lap=lap7 rc=0 wall_s=629.4 peak_rss_kib=302108
+STRENGTHS lap6/STATE.3000 6546317 15026315 14528978
+STRENGTHS lap7/STATE.991 4230742 12645288 11854660
+R7.log:CAVITY_DONE ms=291273
+R7.log:MEASURE lap=R7 rc=0 wall_s=291.8 peak_rss_kib=469252
+P7.log:CAVITY_DONE ms=277552
+P7.log:MEASURE lap=P7 rc=0 wall_s=278.1 peak_rss_kib=451168
+## read 2 at lap 7 against read 2 at lap 6
+LAST_TICK F3 one_place pooled=0.9892 places=100508 | code=0.6812(20124) web=1.0679(20043) science=0.9391(20088) books=1.0320(20028) wikidata=1.2249(20225)
+LAST_TICK C3 one_place pooled=0.9842 places=100508 | code=0.6792(20124) web=1.0636(20043) science=0.9380(20088) books=1.0275(20028) wikidata=1.2118(20225)
+LAST_TICK_DIFF one_place founded_minus_control pooled=+0.0050 | code=+0.0020 web=+0.0043 science=+0.0011 books=+0.0045 wikidata=+0.0131
+LAST_TICK F3 whole_open pooled=2.3423 places=3717 | code=2.1898(730) web=2.5268(758) science=2.2568(776) books=2.1983(776) wikidata=2.5634(677)
+LAST_TICK C3 whole_open pooled=2.3374 places=3717 | code=2.1868(730) web=2.5267(758) science=2.2585(776) books=2.1878(776) wikidata=2.5500(677)
+LAST_TICK_DIFF whole_open founded_minus_control pooled=+0.0049 | code=+0.0030 web=+0.0001 science=-0.0017 books=+0.0104 wikidata=+0.0135
+## read 1 at lap 7 against read 2 at lap 7
+LAST_TICK F3 one_place pooled=0.9934 places=100508 | code=0.6821(20124) web=1.0675(20043) science=0.9508(20088) books=1.0357(20028) wikidata=1.2300(20225)
+LAST_TICK C3 one_place pooled=0.9892 places=100508 | code=0.6812(20124) web=1.0679(20043) science=0.9391(20088) books=1.0320(20028) wikidata=1.2249(20225)
+LAST_TICK_DIFF one_place founded_minus_control pooled=+0.0042 | code=+0.0008 web=-0.0004 science=+0.0117 books=+0.0037 wikidata=+0.0051
+LAST_TICK F3 whole_open pooled=2.3958 places=3717 | code=2.2623(730) web=2.5659(758) science=2.3227(776) books=2.2214(776) wikidata=2.6333(677)
+LAST_TICK C3 whole_open pooled=2.3423 places=3717 | code=2.1898(730) web=2.5268(758) science=2.2568(776) books=2.1983(776) wikidata=2.5634(677)
+LAST_TICK_DIFF whole_open founded_minus_control pooled=+0.0535 | code=+0.0725 web=+0.0391 science=+0.0658 books=+0.0232 wikidata=+0.0698
+## read 1 at lap 7 against read 1 at lap 2
+LAST_TICK_DIFF one_place founded_minus_control pooled=-0.0209 | code=-0.0201 web=-0.0168 science=-0.0263 books=-0.0195 wikidata=-0.0216
+LAST_TICK_DIFF whole_open founded_minus_control pooled=-0.0363 | code=-0.0448 web=-0.0234 science=-0.0500 books=-0.0318 wikidata=-0.0313
+## read 1 at lap 7 against the unmarked third pass's lap 5
+LAST_TICK_DIFF one_place founded_minus_control pooled=-0.0045 | code=-0.0093 web=-0.0064 science=+0.0051 books=+0.0052 wikidata=-0.0169
+LAST_TICK_DIFF whole_open founded_minus_control pooled=+0.0312 | code=+0.0484 web=+0.0250 science=+0.0366 books=+0.0226 wikidata=+0.0233
