@@ -104,7 +104,7 @@ fn covector_of(field: &Field, region: &Region) -> Vec<i128> {
     let pass = field.pass(region, true).unwrap();
     let mut g = vec![0i128; field.theta.len()];
     field.returned(region, &pass, &mut g).unwrap();
-    g
+    field.both_reads_mean(g)
 }
 
 /// The learner's covector of one region (the reverse).
@@ -2031,7 +2031,7 @@ fn tower_covector(field: &Field, region: &Region) -> Vec<i128> {
     let pass = field.pass(region, true).unwrap();
     let mut g = vec![0i128; field.material_len()];
     field.returned(region, &pass, &mut g).unwrap();
-    g
+    field.both_reads_mean(g)
 }
 
 /// [definition; the tower record, D1] **Growth in scale keeps every face**: a tower founded on a field (its prolongation
@@ -4013,8 +4013,9 @@ fn the_mark_founded_at_zero_keeps_every_face_and_the_built_reverse() {
 /// [definition; agent-inferred, November 14, the ring record §4] **The mark's covector matches its code's difference**: on fields of four ticks
 /// reading twice with the strengths off their founding (a quarter, an eighth and three sixteenths), the code's covector predicts the code's
 /// central difference at the entries with the largest covector of each family, the strengths among them, as the junction's covector test reads
-/// it, the marks held at the unmoved field's first read (the first read's faces are data to the second): so the marked opening's return into
-/// its open row, into each class row by its share and into its strength is the reverse of its forward.
+/// it, the marks held at the unmoved field's first read (the first read's faces are data to the second) and the two reads' codes summed
+/// (both are compared, G180): so each read's return, and the marked opening's into its open row, each class row by its share and its
+/// strength, is the reverse of its forward.
 #[test]
 fn the_marks_covector_matches_its_codes_difference() {
     let (mut read, mut seams, mut strengths_read) = (0usize, 0usize, 0usize);
@@ -4026,10 +4027,15 @@ fn the_marks_covector_matches_its_codes_difference() {
         let g = covector_of(&field, &r);
         let first = field.pass_with(&r, false, None).unwrap();
         let marks: Vec<Option<Shares>> = (0..r.classes.len()).map(|t| if Field::silent(&r, t) { first.faces[t].as_ref().map(shares) } else { None }).collect();
-        let held = |f: &Field| -> i64 { f.pass_with(&r, false, Some(&marks)).unwrap().faces.iter().zip(r.classes).filter_map(|(face, &c)| face.as_ref().map(|x| x.code(c))).sum() };
+        // [G180] Both reads are compared: the first read's code and the second's with the marks held, summed (the covector is their mean).
+        let code_of = |p: FieldPass| -> i64 { p.faces.iter().zip(r.classes).filter_map(|(face, &c)| face.as_ref().map(|x| x.code(c))).sum() };
+        let held = |f: &Field| -> i64 { code_of(f.pass_with(&r, false, None).unwrap()) + code_of(f.pass_with(&r, false, Some(&marks)).unwrap()) };
+        // Both reads' sheets, since both are compared: a probe that moves either read's classes stands on a seam.
         let sheets = |f: &Field| -> Vec<Vec<u32>> {
-            let p = f.pass_with(&r, true, Some(&marks)).unwrap();
-            p.ticks.iter().flat_map(|c| c.classes.iter().map(|cl| cl.off.iter().chain(&cl.members).copied().chain(cl.probes.iter().flat_map(|p| std::iter::once(u32::MAX).chain(p.iter().copied()))).collect())).collect()
+            [f.pass_with(&r, true, None).unwrap(), f.pass_with(&r, true, Some(&marks)).unwrap()]
+                .iter()
+                .flat_map(|p| p.ticks.iter().flat_map(|c| c.classes.iter().map(|cl| cl.off.iter().chain(&cl.members).copied().chain(cl.probes.iter().flat_map(|p| std::iter::once(u32::MAX).chain(p.iter().copied()))).collect())).collect::<Vec<Vec<u32>>>())
+                .collect()
         };
         for &(start, len, grain) in field.families() {
             if start == l.temper {
@@ -4046,14 +4052,14 @@ fn the_marks_covector_matches_its_codes_difference() {
                 };
                 let straddles = |delta: i32| sheets(&moved(delta)) != sheets(&field) || sheets(&moved(-delta)) != sheets(&field);
                 let shift = natural + grain - 20;
-                let Some((delta, h)) = probe_step(grain, &|delta: i32| (g[i] * 2 * delta as i128) >> shift, &straddles) else {
+                let Some((delta, h)) = probe_step(grain, &|delta: i32| (g[i] * 4 * delta as i128) >> shift, &straddles) else {
                     seams += 1;
                     continue;
                 };
                 read += 1;
                 strengths_read += usize::from(start == l.mark);
                 let measured = held(&moved(delta)) - held(&moved(-delta));
-                let predicted = (g[i] * 2 * delta as i128) >> shift;
+                let predicted = (g[i] * 4 * delta as i128) >> shift;
                 let tolerance = predicted.abs() / 8 + (64 << h);
                 assert!((measured as i128 - predicted).abs() <= tolerance, "still {still} family at {start} (grain {grain}) entry {i} at {h} halvings: measured {measured}, predicted {predicted}");
             }
@@ -4065,7 +4071,8 @@ fn the_marks_covector_matches_its_codes_difference() {
 
 /// [definition; agent-inferred, November 14, the ring record §4 and §5] **The mark's founding covector is the carried slope G175 read**: on a field
 /// reading twice at its founding, the strengths' covectors sum to `Σ_t ⟨λ⁰_t, D_t⟩` of [`Field::carried_slopes`] on the field before the growth,
-/// faced by its own first read; so the reading that sized the strength is the law's own first-order direction.
+/// faced by its own first read, halved since both reads are compared and only the second is marked (G180); so the reading that sized the
+/// strength is the law's own first-order direction.
 #[test]
 fn the_marks_founding_covector_is_the_carried_slope() {
     for still in [0usize, 1, 2] {
@@ -4076,8 +4083,11 @@ fn the_marks_founding_covector_is_the_carried_slope() {
             let g = covector_of(&grown, &r);
             let faces = plain.faces(&r).unwrap();
             let slopes: i128 = plain.carried_slopes(&r, &faces).unwrap().iter().sum();
-            assert_eq!(g[l.mark..l.mark + MARK_BASES].iter().sum::<i128>(), slopes, "still {still}: the strengths' covector is the carried slope");
+            // Both reads are compared and only the second is marked, so the strengths' covector is half the slope, each entry released by one bit.
+            let doubled: i128 = g[l.mark..l.mark + MARK_BASES].iter().map(|v| 2 * v).sum();
+            assert!((doubled - slopes).abs() <= MARK_BASES as i128, "still {still}: the strengths' covector is half the carried slope: {doubled} against {slopes}");
         }
     }
 }
+
 
